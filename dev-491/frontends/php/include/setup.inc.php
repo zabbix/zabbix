@@ -153,7 +153,7 @@ JS;
 			return array(
 				new CDiv(new CSpan($license), 'licence'),
 				BR(),
-				new CDiv(array(new CCheckBox('agree', 'no', $action), 'I agree'), 'center')
+				new CDiv(array(new CCheckBox('agree', 'no', $action), new CLabel('I agree', 'agree')), 'center')
 			);
 		}
 
@@ -268,7 +268,7 @@ JS;
 
 			return array(
 				'Please enter host name or host IP address', BR(),
-				'and port number of Zabbix server,', BR(), 
+				'and port number of Zabbix server,', BR(),
 				'as well as the name of the installation (optional).', BR(), BR(),
 				$table,
 				);
@@ -302,24 +302,74 @@ JS;
 		}
 
 		function stage6(){
-			global $ZBX_CONFIGURATION_FILE, $ZBX_SERVER, $ZBX_SERVER_PORT, $IMAGE_FORMAT_DEFAULT;
+			global $ZBX_CONFIGURATION_FILE;
 
-			$this->DISABLE_NEXT_BUTTON = true;
-			show_messages();
-			/* Write the new contents */
-			if($f = @fopen($ZBX_CONFIGURATION_FILE, 'w')){
-				if(fwrite($f, $this->getNewConfigurationFileContent())){
-					if(fclose($f)){
-						if($this->setConfig('ZBX_CONFIG_FILE_CORRECT', $this->CheckConfigurationFile())){
-							$this->DISABLE_NEXT_BUTTON = false;
-						}
-					}
+			$this->setConfig('ZBX_CONFIG_FILE_CORRECT', true);
+
+			$config = new CConfigFile($ZBX_CONFIGURATION_FILE);
+			$config->config = array(
+				'DB' => array(
+					'TYPE' => $this->getConfig('DB_TYPE'),
+					'SERVER' => $this->getConfig('DB_SERVER'),
+					'PORT' => $this->getConfig('DB_PORT'),
+					'DATABASE' => $this->getConfig('DB_DATABASE'),
+					'USER' => $this->getConfig('DB_USER'),
+					'PASSWORD' => $this->getConfig('DB_PASSWORD'),
+					'SCHEMA' => $this->getConfig('DB_SCHEMA'),
+				),
+				'ZBX_SERVER' => $this->getConfig('ZBX_SERVER'),
+				'ZBX_SERVER_PORT' => $this->getConfig('ZBX_SERVER_PORT'),
+				'ZBX_SERVER_NAME' => $this->getConfig('ZBX_SERVER_NAME'),
+			);
+			$config->save();
+
+			if($config->load()){
+				$error = '';
+
+				if($config->config['DB']['TYPE'] != $this->getConfig('DB_TYPE')){
+					$error = 'Config file DB type is not equal to wizard input.';
+				}
+				else if($config->config['DB']['SERVER'] != $this->getConfig('DB_SERVER')){
+					$error = 'Config file DB server is not equal to wizard input.';
+				}
+				else if($config->config['DB']['PORT'] != $this->getConfig('DB_PORT')){
+					$error = 'Config file DB port is not equal to wizard input.';
+				}
+				else if($config->config['DB']['DATABASE'] != $this->getConfig('DB_DATABASE')){
+					$error = 'Config file DB database is not equal to wizard input.';
+				}
+				else if($config->config['DB']['USER'] != $this->getConfig('DB_USER')){
+					$error = 'Config file DB user is not equal to wizard input.';
+				}
+				else if($config->config['DB']['PASSWORD'] != $this->getConfig('DB_PASSWORD')){
+					$error = 'Config file DB password is not equal to wizard input.';
+				}
+				else if(($this->getConfig('DB_TYPE') == 'IBM_DB2') && ($config->config['DB']['SCHEMA'] != $this->getConfig('DB_SCHEMA'))){
+					$error = 'Config file DB schema is not equal to wizard input.';
+				}
+				else if($config->config['ZBX_SERVER'] != $this->getConfig('ZBX_SERVER')){
+					$error = 'Config file Zabbix server is not equal to wizard input.';
+				}
+				else if($config->config['ZBX_SERVER_PORT'] != $this->getConfig('ZBX_SERVER_PORT')){
+					$error = 'Config file Zabbix server port is not equal to wizard input.';
+				}
+				else if($config->config['ZBX_SERVER_NAME'] != $this->getConfig('ZBX_SERVER_NAME')){
+					$error = 'Config file Zabbix server name is not equal to wizard input.';
 				}
 			}
-			else if($this->setConfig('ZBX_CONFIG_FILE_CORRECT', $this->CheckConfigurationFile())){
-				$this->DISABLE_NEXT_BUTTON = false;
+			else{
+				$error = $config->error;
 			}
-			clear_messages(); /* don't show errors */
+
+			clear_messages();
+			if(!empty($error)){
+				error($error);
+				show_messages();
+				$this->setConfig('ZBX_CONFIG_FILE_CORRECT', false);
+			}
+
+
+			$this->DISABLE_NEXT_BUTTON = !$this->getConfig('ZBX_CONFIG_FILE_CORRECT', false);
 
 			$table = new CTable(null, 'requirements');
 			$table->setAlign('center');
@@ -342,7 +392,7 @@ JS;
 						)
 					: null,
 				'When done, press the '.($this->DISABLE_NEXT_BUTTON ? '"Retry"' : '"Next"').' button'
-				);
+			);
 		}
 
 		function stage7(){
@@ -395,55 +445,6 @@ JS;
 			return $result;
 		}
 
-		function CheckConfigurationFile(){
-			global $ZBX_CONFIGURATION_FILE, $ZBX_SERVER, $ZBX_SERVER_PORT, $IMAGE_FORMAT_DEFAULT;
-
-			$error = null;
-
-			if(file_exists($ZBX_CONFIGURATION_FILE)){
-				include $ZBX_CONFIGURATION_FILE;
-
-				if(!checkConfigData($error)){ }
-				else if($DB['TYPE'] != $this->getConfig('DB_TYPE')){
-					$error = 'Config file DB type is not equal to wizard input.';
-				}
-				else if($DB['SERVER'] != $this->getConfig('DB_SERVER')){
-					$error = 'Config file DB server is not equal to wizard input.';
-				}
-				else if($DB['PORT'] != $this->getConfig('DB_PORT')){
-					$error = 'Config file DB port is not equal to wizard input.';
-				}
-				else if($DB['DATABASE'] != $this->getConfig('DB_DATABASE')){
-					$error = 'Config file DB database is not equal to wizard input.';
-				}
-				else if($DB['USER'] != $this->getConfig('DB_USER')){
-					$error = 'Config file DB user is not equal to wizard input.';
-				}
-				else if($DB['PASSWORD'] != $this->getConfig('DB_PASSWORD')){
-					$error = 'Config file DB password is not equal to wizard input.';
-				}
-				else if(($this->getConfig('DB_TYPE') == 'IBM_DB2') && ($this->getConfig('DB_SCHEMA') != $DB['SCHEMA'])){
-					$error = 'Config file DB schema is not equal to wizard input.';
-				}
-				else if($this->getConfig('ZBX_SERVER') != $ZBX_SERVER){
-					$error = 'Config file Zabbix server is not equal to wizard input.';
-				}
-				else if($this->getConfig('ZBX_SERVER_PORT') != $ZBX_SERVER_PORT){
-					$error = 'Config file Zabbix server port is not equal to wizard input.';
-				}
-				else if(!$this->CheckConnection()){
-					$error = 'Cannot connect to database.';
-				}
-			}
-			else{
-				$error = 'Missing configuration file ['.$ZBX_CONFIGURATION_FILE.'].';
-			}
-
-			if(isset($error)) error($error);
-
-			return !isset($error);
-		}
-
 		function EventHandler(){
 			if(isset($_REQUEST['back'][$this->getStep()]))	$this->DoBack();
 
@@ -488,75 +489,34 @@ JS;
 				$this->DoNext();
 			}
 			else if($this->getStep() == 6){
-				$this->setConfig('ZBX_CONFIG_FILE_CORRECT', $this->CheckConfigurationFile());
-
-				if(!$this->getConfig('ZBX_CONFIG_FILE_CORRECT', false)){
-					$this->DISABLE_NEXT_BUTTON = true;
-				}
-
 				if(isset($_REQUEST['save_config'])){
 					global $ZBX_CONFIGURATION_FILE;
 
 					/* Make zabbix.conf.php downloadable */
 					header('Content-Type: application/x-httpd-php');
 					header('Content-Disposition: attachment; filename="'.basename($ZBX_CONFIGURATION_FILE).'"');
-					die($this->getNewConfigurationFileContent());
-				 }
+					$config = new CConfigFile($ZBX_CONFIGURATION_FILE);
+					$config->config = array(
+						'DB' => array(
+							'TYPE' => $this->getConfig('DB_TYPE'),
+							'SERVER' => $this->getConfig('DB_SERVER'),
+							'PORT' => $this->getConfig('DB_PORT'),
+							'DATABASE' => $this->getConfig('DB_DATABASE'),
+							'USER' => $this->getConfig('DB_USER'),
+							'PASSWORD' => $this->getConfig('DB_PASSWORD'),
+							'SCHEMA' => $this->getConfig('DB_SCHEMA'),
+						),
+						'ZBX_SERVER' => $this->getConfig('ZBX_SERVER'),
+						'ZBX_SERVER_PORT' => $this->getConfig('ZBX_SERVER_PORT'),
+						'ZBX_SERVER_NAME' => $this->getConfig('ZBX_SERVER_NAME'),
+					);
+					die($config->getString());
+				}
 			}
 
 			if(isset($_REQUEST['next'][$this->getStep()])){
 				$this->DoNext();
 			}
-		}
-
-		function getNewConfigurationFileContent(){
-			$SCHEMA = '';
-			$dbschema = $this->getConfig('DB_SCHEMA', '');
-			$dbtype = $this->getConfig('DB_TYPE', '');
-
-			if(($dbtype == 'IBM_DB2')){
-				$SCHEMA = '$DB["SCHEMA"]			= \''.$dbschema.'\';'."\n";
-			}
-
-
-			return
-'<?php
-/*
-** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
-**
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
-**
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-**/
-
-global $DB;
-
-$DB["TYPE"]				= \''.$this->getConfig('DB_TYPE' ,'unknown').'\';
-$DB["SERVER"]			= \''.$this->getConfig('DB_SERVER' ,'unknown').'\';
-$DB["PORT"]				= \''.$this->getConfig('DB_PORT' ,'0').'\';
-$DB["DATABASE"]			= \''.$this->getConfig('DB_DATABASE' ,'unknown').'\';
-$DB["USER"]				= \''.$this->getConfig('DB_USER' ,'unknown').'\';
-$DB["PASSWORD"]			= \''.$this->getConfig('DB_PASSWORD' ,'').'\';
-'.$SCHEMA.'
-
-$ZBX_SERVER				= \''.$this->getConfig('ZBX_SERVER' ,'').'\';
-$ZBX_SERVER_PORT		= \''.$this->getConfig('ZBX_SERVER_PORT' ,'0').'\';
-$ZBX_SERVER_NAME		= \''.$this->getConfig('ZBX_SERVER_NAME' ,'').'\';
-
-$IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
-?>
-';
 		}
 	}
 ?>

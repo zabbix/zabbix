@@ -870,6 +870,7 @@ table.warning tr.center td.right{
 
 /**************** SETUP WIZARD ***********/
 table.setup_wizard{
+	margin-top: 15px;
 	width: 640px;
 	height: 480px;
 	border-spacing:	0; /* cellspacing */

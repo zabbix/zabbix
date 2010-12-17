@@ -1621,7 +1621,6 @@ class CChart extends CGraphDraw{
 
 		$i = ($this->type == GRAPH_TYPE_STACKED)?($this->num-1):0;
 		while(($i>=0) && ($i<$this->num)){
-			$row = array();
 
 			if($this->items[$i]['calc_type'] == GRAPH_ITEM_AGGREGATED){
 				$fnc_name = 'agr('.$this->items[$i]['periods_cnt'].')';
@@ -1685,7 +1684,8 @@ class CChart extends CGraphDraw{
 
 		$legend->draw();
 
-		if($this->sizeY < 120){
+		// if graph is small, we are not drawing percent line and trigger legends
+		if($this->sizeY < ZBX_GRAPH_LEGEND_HEIGHT){
 			return true;
 		}
 
@@ -1740,6 +1740,9 @@ class CChart extends CGraphDraw{
 		}
 
 		$legend->draw();
+
+
+
 
 		$legend = new CImageTextTable(
 				$this->im,
@@ -2049,9 +2052,12 @@ class CChart extends CGraphDraw{
 		}
 
 
-		foreach($this->percentile as $side => $percentile){
-			if(($percentile['percent']>0) && $percentile['value']){
-				$this->fullSizeY += 14;
+		//if graph height is big enough, we reserve space for percent line legend
+		if ($this->sizeY >= ZBX_GRAPH_LEGEND_HEIGHT){
+			foreach($this->percentile as $percentile){
+				if(($percentile['percent']>0) && $percentile['value']){
+					$this->fullSizeY += 14;
+				}
 			}
 		}
 
