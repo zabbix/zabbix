@@ -243,7 +243,7 @@
 // delete host profile
 		delete_host_profile($hostids);
 		delete_host_profile_ext($hostids);
-
+		$applicationids = array();
 		$query = 'SELECT a.applicationid'.
 				' FROM applications a'.
 				' WHERE	'.DBcondition('a.hostid', $hostids);

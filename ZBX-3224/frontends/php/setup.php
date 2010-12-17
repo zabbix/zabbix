@@ -131,7 +131,6 @@ include_once('include/page_header.php');
 			show_error_message($_REQUEST['message']);
 	}
 
-	echo SBR;
 	$ZBX_SETUP_WIZARD->show();
 
 	unset($_POST);
