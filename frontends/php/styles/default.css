@@ -18,42 +18,29 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **
 */
-root {
-    display: block;
-}
+root { display: block; }
 
 body{
 	background-color: #E5E5E5;
-	margin: 0px;
+	margin: 1px;
 	padding: 0px;
 	color:black;
-	font-family:verdana, arial, helvetica, sans-serif;
-	font-size:10px;
+	font-family: verdana, arial, helvetica, sans-serif;
+	font-size: 10px;
 	text-decoration: none;
 	line-height:16px;
 }
 
+label{ cursor: pointer; }
 /**************** MEDIA *****************/
 @media print {
-	div.printless{
-		visibility: hidden;
-		display: none;
-	}
-	div.printonly{
-		display: block;
-		visibility:visible;
-	}
+	div.printless{ visibility: hidden; display: none; }
+	div.printonly{ display: block; visibility:visible; }
 }
 
 @media screen {
-	div.printless{
-		visibility:visible;
-		display:block;
-	}
-	div.printonly{
-		visibility: hidden;
-		display:none;
-	}
+	div.printless{ visibility:visible; display:block; }
+	div.printonly{ visibility: hidden; display:none; }
 }
 
 /**************** OTHERS ****************/
@@ -80,59 +67,33 @@ img.top		{	vertical-align:text-top;			}
 img.bottom	{	vertical-align:text-bottom;			}
 img.borderless	{	border-width: 0px; vertical-align: bottom;	}
 
-.center{
-	width: 100%;
-	text-align: center;
-}
+.center{ width: 100%; text-align: center; }
+.left{ text-align: left; }
+.right{ text-align: right; }
 
-.vert{
-	width:1px;
-	/*writing-mode: tb-rl;*/
-}
+.vert{ width:1px;}
 
-.rarr{
-	font-size: 16px;
-}
+.rarr{ font-size: 16px; }
 
-.bold {
-	font-weight: bold;
-}
+.bold { font-weight: bold; }
 
-.nowrap {
-	white-space: nowrap;
-	word-spacing:	0px;
-}
+.nowrap { white-space: nowrap; word-spacing: 0px; }
 
-.delimiter{
-	font-weight:bold;
-	color:#000;
-}
+.delimiter{ font-weight:bold; color:#000; }
 
-.textcolorstyles{
-	color: #000000;
-}
+.textcolorstyles{ color: #000000; }
 
-.textblackwhite{
-	color: #000000;
-}
+.textblackwhite{ color: #000000; }
 
-.textwhite{
-	color: #FFFFFF;
-}
+.textwhite{ color: #FFFFFF; }
 
-.pointer{
-}
+.pointer{}
 
-.pointer:hover{
-	cursor: pointer;
-}
+.pointer:hover{ cursor: pointer; }
 
-.move{
-}
+.move{}
 
-.move:hover{
-	cursor: move;
-}
+.move:hover{ cursor: move; }
 /**************** HINT BOX *****************/
 
 #hint_box {
@@ -159,42 +120,19 @@ img.borderless	{	border-width: 0px; vertical-align: bottom;	}
 	position: absolute;
 	background-color: white;
 	padding: 2px;
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 10px;
 	line-height:15px;
 	border: 1px solid black;
 }
 
-#color_picker table tr td {
-	margin: 0px;
-	padding: 2px;
-}
+#color_picker table tr td { margin: 0px; padding: 2px; }
 
-#color_picker a {
-	text-decoration: none;
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 10px;
-	padding: 0px;
-	margin: 0px;
-}
+#color_picker a { text-decoration: none; padding: 0px; margin: 0px; }
 
 /************ END OF COLOR PICKER ***********/
 
 /************** DISCOVERY STATUS ************/
-.dhosts_active {
-	padding: 5px;
-	text-align: center;
-	color: #0FA00F;
-}
-.dhosts_disabled {
-	padding: 5px;
-	text-align: center;
-	color: #A00F0F;
-}
-.dservice_active {
-	background: #0FA00F;
-}
-.dservice_disabled {
-	background: #A00F0F;
-}
+.dhosts_active { padding: 5px; text-align: center; color: #0FA00F; }
+.dhosts_disabled { padding: 5px; text-align: center; color: #A00F0F; }
+.dservice_active { background: #0FA00F; }
+.dservice_disabled { background: #A00F0F; }
 /********** END OF DISCOVERY STATUS *********/

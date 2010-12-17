@@ -29,7 +29,6 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 	char		service[MAX_STRING_LEN];
 	char		port[MAX_STRING_LEN];
 	char		net_tcp_service[MAX_STRING_LEN];
-	const char	*conn;
 	int		ret = SUCCEED;
 
 	/* assumption: host name does not contain '_perf' */
@@ -37,8 +36,6 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): key_orig [%s]", __function_name, item->key_orig);
 
 	init_result(result);
-
-	conn = item->host.useip == 1 ? item->host.ip : item->host.dns;
 
 	service[0] ='\0';
 	port[0] = '\0';
@@ -91,9 +88,9 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 			strscpy(net_tcp_service, "net.tcp.service");
 
 		if ('\0' == port[0])
-			zbx_snprintf(check, sizeof(check), "%s[%s,%s]", net_tcp_service, service, conn);
+			zbx_snprintf(check, sizeof(check), "%s[%s,%s]", net_tcp_service, service, item->interface.addr);
 		else
-			zbx_snprintf(check, sizeof(check), "%s[%s,%s,%s]", net_tcp_service, service, conn, port);
+			zbx_snprintf(check, sizeof(check), "%s[%s,%s,%s]", net_tcp_service, service, item->interface.addr, port);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Transformed [%s] into [%s]", item->key, check);
 	}

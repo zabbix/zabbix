@@ -61,14 +61,14 @@ include_once('include/page_footer.php');
 			'Not implemented yet!',
 			BR(),BR(),BR()
 			),
-		new CButton('install',S_NEW_INSTALLATION));
+		new CSubmit('install',S_NEW_INSTALLATION));
 	$form->addRow(
 		array(bold(S_UPDATE_BIG),BR(),BR(),
 			bold(S_DESCRIPTION),BR(),
 			'Not implemented yet!',
 			BR(),BR(),BR()
 			),
-		new CButton('update',S_UPDATE));
+		new CSubmit('update',S_UPDATE));
 	$form->show();
 
 ?>

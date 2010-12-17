@@ -63,7 +63,9 @@ include_once('include/page_header.php');
 
 
 	if(isset($_REQUEST['save'])){
-		$result = update_trigger_comments($_REQUEST['triggerid'],$_REQUEST['comments']);
+		$result = DBexecute('UPDATE triggers '.
+						' SET comments='.zbx_dbstr($_REQUEST['comments']).
+						' WHERE triggerid='.$_REQUEST['triggerid']);
 		show_messages($result, S_COMMENT_UPDATED, S_CANNOT_UPDATE_COMMENT);
 
 		$trigger['comments'] = $_REQUEST['comments'];
@@ -94,7 +96,7 @@ include_once('include/page_header.php');
 	$frmComent->addRow(S_COMMENTS, new CTextArea('comments', $trigger['comments'], 100, 25, !$triggerEditable));
 	
 	if($triggerEditable){
-		$frmComent->addItemToBottomRow(new CButton("save",S_SAVE));
+		$frmComent->addItemToBottomRow(new CSubmit("save",S_SAVE));
 	}
 
 	$frmComent->addItemToBottomRow(new CButtonCancel('&triggerid='.$_REQUEST['triggerid']));

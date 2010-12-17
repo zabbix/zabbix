@@ -85,11 +85,11 @@
 		$sortfield = getPageSortField('host');
 		$sortorder = getPageSortOrder();
 		$options = array(
-			'extendoutput' => 1,
+			'output' => API_OUTPUT_EXTEND,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
-			'select_profile' => 1,
-			'select_groups' => 1,
+			'select_profile' => API_OUTPUT_EXTEND,
+			'selectGroups' => API_OUTPUT_EXTEND,
 			'limit' => ($config['search_limit']+1)
 		);
 		if($pageFilter->groupsSelected){

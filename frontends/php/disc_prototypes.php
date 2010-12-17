@@ -34,6 +34,7 @@ include_once('include/page_header.php');
 <?php
 // needed type to know which field name to use
 $itemType = get_request('type', 0);
+
 switch($itemType) {
 	case ITEM_TYPE_SSH: case ITEM_TYPE_TELNET: $paramsFieldName = S_EXECUTED_SCRIPT; break;
 	case ITEM_TYPE_DB_MONITOR: $paramsFieldName = S_PARAMS; break;
@@ -102,7 +103,7 @@ switch($itemType) {
 													ITEM_TYPE_SNMPV1.','.
 													ITEM_TYPE_SNMPV2C.','.
 													ITEM_TYPE_SNMPV3,'type')),
-		'snmp_port'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	'isset({save})&&isset({type})&&'.IN(
+		'port'=>		array(T_ZBX_STR, O_OPT,  null,  BETWEEN(0,65535),	'isset({save})&&isset({type})&&'.IN(
 													ITEM_TYPE_SNMPV1.','.
 													ITEM_TYPE_SNMPV2C.','.
 													ITEM_TYPE_SNMPV3,'type')),
@@ -128,6 +129,10 @@ switch($itemType) {
 		'new_application'=>	array(T_ZBX_STR, O_OPT, null,	null,	'isset({save})'),
 		'applications'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID, null),
 
+		'history'=>			array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),'isset({save})'),
+		'trends'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	'isset({save})&&isset({value_type})&&'.IN(
+												ITEM_VALUE_TYPE_FLOAT.','.
+												ITEM_VALUE_TYPE_UINT64, 'value_type')),
 		'del_history'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'add_delay_flex'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'del_delay_flex'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -165,10 +170,9 @@ switch($itemType) {
 		$options = array(
 			'itemids' => $_REQUEST['parent_discoveryid'],
 			'output' => API_OUTPUT_EXTEND,
-			'filter' => array('flags' => null),
 			'editable' => 1
 		);
-		$discovery_rule = CItem::get($options);
+		$discovery_rule = CDiscoveryRule::get($options);
 		$discovery_rule = reset($discovery_rule);
 		if(!$discovery_rule) access_deny();
 		$_REQUEST['hostid'] = $discovery_rule['hostid'];
@@ -203,12 +207,10 @@ switch($itemType) {
 		$_REQUEST['delay_flex'] = get_request('delay_flex', array());
 		array_push($_REQUEST['delay_flex'],$_REQUEST['new_delay_flex']);
 	}
-	else if(isset($_REQUEST['delete'])&&isset($_REQUEST['itemid'])){
-		$result = false;
-		if($item = get_item_by_itemid($_REQUEST['itemid'])){
-			$result = CItem::delete($_REQUEST['itemid']);
-		}
-
+	else if(isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])){
+		DBstart();
+		$result = CItemPrototype::delete($_REQUEST['itemid']);
+		$result = DBend($result);
 		show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
 
 		unset($_REQUEST['itemid']);
@@ -219,18 +221,28 @@ switch($itemType) {
 		$_REQUEST['form'] = 'clone';
 	}
 	else if(isset($_REQUEST['save'])){
-		$applications = get_request('applications', array());
 		$delay_flex = get_request('delay_flex', array());
-
 		$db_delay_flex = '';
 		foreach($delay_flex as $num => $val){
 			$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
 		}
 		$db_delay_flex = trim($db_delay_flex,';');
 
+		DBstart();
+
+		$applications = get_request('applications', array());
+		$fapp = reset($applications);
+		if($fapp == 0) array_shift($applications);
+
 		if(!zbx_empty($_REQUEST['new_application'])){
-			if($new_appid = add_application($_REQUEST['new_application'], $_REQUEST['hostid']))
+			$new_appid = CApplication::create(array(
+				'name' => $_REQUEST['new_application'],
+				'hostid' => $_REQUEST['hostid']
+			));
+			if($new_appid){
+				$new_appid = reset($new_appid['applicationids']);
 				$applications[$new_appid] = $new_appid;
+			}
 		}
 
 		$item = array(
@@ -244,7 +256,9 @@ switch($itemType) {
 			'snmp_oid'		=> get_request('snmp_oid'),
 			'value_type'	=> get_request('value_type'),
 			'trapper_hosts'	=> get_request('trapper_hosts'),
-			'snmp_port'		=> get_request('snmp_port'),
+			'port'		=> get_request('port'),
+			'history'		=> get_request('history'),
+			'trends'		=> get_request('trends'),
 			'units'			=> get_request('units'),
 			'multiplier'	=> get_request('multiplier', 0),
 			'delta'			=> get_request('delta'),
@@ -266,26 +280,30 @@ switch($itemType) {
 			'data_type'		=> get_request('data_type'),
 			'applications' => $applications,
 			'flags' => ZBX_FLAG_DISCOVERY_CHILD,
-			'parent_itemid' => get_request('parent_discoveryid'),
+			'ruleid' => get_request('parent_discoveryid'),
 		);
 
 		if(isset($_REQUEST['itemid'])){
-			DBstart();
-
 			$db_item = get_item_by_itemid_limited($_REQUEST['itemid']);
 			$db_item['applications'] = get_applications_by_itemid($_REQUEST['itemid']);
 
-			$result = smart_update_item($_REQUEST['itemid'], $item);
-			$result = DBend($result);
+			foreach($item as $field => $value){
+				if(isset($db_item[$field]) && ($item[$field] == $db_item[$field]))
+					unset($item[$field]);
+			}
+
+			$item['itemid'] = $_REQUEST['itemid'];
+
+			$result = CItemPrototype::update($item);
 
 			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 		}
 		else{
-			DBstart();
-			$result = add_item($item);
-			$result = DBend($result);
+			$result = CItemPrototype::create($item);
 			show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 		}
+
+		$result = DBend($result);
 
 		if($result){
 			unset($_REQUEST['itemid']);
@@ -293,7 +311,7 @@ switch($itemType) {
 		}
 	}
 
-// ----- GO -----
+// GO {{{
 	else if((($_REQUEST['go'] == 'activate') || ($_REQUEST['go'] == 'disable')) && isset($_REQUEST['group_itemid'])){
 		$group_itemid = $_REQUEST['group_itemid'];
 
@@ -303,38 +321,10 @@ switch($itemType) {
 		show_messages($go_result, ($_REQUEST['go'] == 'activate') ? S_ITEMS_ACTIVATED : S_ITEMS_DISABLED, null);
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_itemid'])){
-		global $USER_DETAILS;
-
-		$go_result = true;
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_WRITE);
-
 		$group_itemid = $_REQUEST['group_itemid'];
-
-		$sql = 'SELECT h.host, i.itemid, i.description, i.key_, i.templateid, i.type'.
-				' FROM items i, hosts h '.
-				' WHERE '.DBcondition('i.itemid',$group_itemid).
-					' AND h.hostid=i.hostid'.
-					' AND '.DBcondition('h.hostid',$available_hosts);
-		$db_items = DBselect($sql);
-		while($item = DBfetch($db_items)) {
-			if($item['templateid'] != ITEM_TYPE_ZABBIX) {
-				unset($group_itemid[$item['itemid']]);
-				error(S_ITEM.SPACE."'".$item['host'].':'.item_description($item)."'".SPACE.S_CANNOT_DELETE_ITEM.SPACE.'('.S_TEMPLATED_ITEM.')');
-				continue;
-			}
-			else if($item['type'] == ITEM_TYPE_HTTPTEST) {
-				unset($group_itemid[$item['itemid']]);
-				error(S_ITEM.SPACE."'".$item['host'].':'.item_description($item)."'".SPACE.S_CANNOT_DELETE_ITEM.SPACE.'('.S_WEB_ITEM.')');
-				continue;
-			}
-
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$item['itemid'].'] '.S_HOST.' ['.$item['host'].']');
-		}
-
-		$go_result &= !empty($group_itemid);
-		if($go_result) {
-			$go_result = CItem::delete($group_itemid);
-		}
+		DBstart();
+		$go_result = CItemPrototype::delete($group_itemid);
+		$go_result = DBend($go_result);
 		show_messages($go_result, S_ITEMS_DELETED, S_CANNOT_DELETE_ITEMS);
 	}
 
@@ -343,6 +333,7 @@ switch($itemType) {
 		$path = $url->getPath();
 		insert_js('cookie.eraseArray("'.$path.'")');
 	}
+// }}} GO
 ?>
 <?php
 	$items_wdgt = new CWidget();
@@ -352,7 +343,7 @@ switch($itemType) {
 	if(!isset($_REQUEST['form'])){
 		$form = new CForm(null, 'get');
 		$form->addVar('parent_discoveryid', $_REQUEST['parent_discoveryid']);
-		$form->addItem(new CButton('form', S_CREATE_PROTOTYPE));
+		$form->addItem(new CSubmit('form', S_CREATE_PROTOTYPE));
 	}
 	$items_wdgt->addPageHeader(S_CONFIGURATION_OF_ITEM_PROTOTYPES_BIG, $form);
 
@@ -398,14 +389,13 @@ switch($itemType) {
 		$options = array(
 			'discoveryids' => $_REQUEST['parent_discoveryid'],
 			'output' => API_OUTPUT_EXTEND,
-			'filter' => array('flags' => null),
 			'editable' => 1,
 			'select_applications' => API_OUTPUT_EXTEND,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
-		$items = CItem::get($options);
+		$items = CItemPrototype::get($options);
 
 		order_result($items, $sortfield, $sortorder);
 		$paging = getPagingLine($items);
@@ -435,7 +425,6 @@ switch($itemType) {
 				$error = new CDiv(SPACE, 'iconerror');
 				$error->setHint($item['error'], '', 'on');
 			}
-
 
 			$applications = zbx_objectValues($item['applications'], 'name');
 			$applications = implode(', ', $applications);
@@ -471,7 +460,7 @@ switch($itemType) {
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
-		$goButton = new CButton('goButton',S_GO);
+		$goButton = new CSubmit('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "group_itemid";');

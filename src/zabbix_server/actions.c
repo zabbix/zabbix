@@ -211,7 +211,7 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 	{
 		tmp_str = zbx_dsprintf(tmp_str, "%s", event->trigger_description);
 
-		substitute_simple_macros(event, NULL, NULL, NULL, NULL, &tmp_str, MACRO_TYPE_TRIGGER_DESCRIPTION, NULL, 0);
+		substitute_simple_macros(event, NULL, NULL, NULL, &tmp_str, MACRO_TYPE_TRIGGER_DESCRIPTION, NULL, 0);
 
 		switch (condition->operator)
 		{
@@ -898,7 +898,7 @@ static int	check_auto_registration_condition(DB_EVENT *event, DB_CONDITION *cond
 
 		if (NULL != (row = DBfetch(result)))
 		{
-			ZBX_DBROW2UINT64(id, row[0])
+			ZBX_DBROW2UINT64(id, row[0]);
 
 			switch (condition->operator)
 			{

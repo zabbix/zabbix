@@ -19,29 +19,13 @@
 **/
 ?>
 <?php
-class CCheckBox extends CTag{
+class CCheckBox extends CInput{
 /* public */
 	public function __construct($name='checkbox',$checked='no',$action=null,$value='yes'){
-		parent::__construct('input','no');
-		$this->tag_body_start = '';
+		parent::__construct('checkbox', $name, $value);
 
-		$this->setAttribute('class','checkbox');
-		$this->setAttribute('type','checkbox');
-		$this->setAttribute('value',$value);
-		$this->setAttribute('name',$name);
-		$this->setAttribute('id',$name);
-
-		$this->setAction($action);
+		$this->setAttribute('onclick', $action);
 		$this->setChecked($checked);
-	}
-
-	public function setEnabled($value='yes'){
-		if($value === 'yes' || $value == true || $value == 1){
-			return $this->removeAttribute('disabled');
-		}
-		$this->attributes['disabled'] = 'disabled';
-
-	return true;
 	}
 
 	public function setChecked($value='yes'){
@@ -49,10 +33,8 @@ class CCheckBox extends CTag{
 			return $this->attributes['checked'] = 'checked';
 
 		$this->removeAttribute('checked');
+		return $this;
 	}
 
-	public function setAction($value='submit()', $event='onclick'){
-		$this->addAction('onclick', $value);
-	}
 }
 ?>

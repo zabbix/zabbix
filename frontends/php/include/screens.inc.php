@@ -465,7 +465,7 @@ require_once('include/js.inc.php');
 // User-defined graph
 			$options = array(
 				'graphids' => $resourceid,
-				'select_hosts' => array('hostid', 'host'),
+				'selectHosts' => array('hostid', 'host'),
 				'output' => API_OUTPUT_EXTEND
 			);
 			$graphs = CGraph::get($options);
@@ -511,7 +511,7 @@ require_once('include/js.inc.php');
 // Simple graph
 			$options = array(
 				'itemids' => $resourceid,
-				'select_hosts' => array('hostid', 'host'),
+				'selectHosts' => array('hostid', 'host'),
 				'output' => API_OUTPUT_EXTEND
 			);
 			$items = CItem::get($options);
@@ -545,7 +545,7 @@ require_once('include/js.inc.php');
 				$selectbtn = new CButton('select', S_SELECT,
 					"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName().
 							"&real_hosts=1&dstfld1=resourceid&dstfld2=caption&srctbl=simple_graph&srcfld1=itemid".
-							"&srcfld2=description',800,450);");
+							"&srcflCButtond2=description',800,450);");
 			}
 
 			$form->addRow(S_PARAMETER, array($textfield, SPACE, $selectbtn));
@@ -574,7 +574,7 @@ require_once('include/js.inc.php');
 			$form->addVar('resourceid',$id);
 			$textfield = new Ctextbox('caption',$caption,60,'yes');
 
-			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name',400,450);");
+			$selectbtn = new CButton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name',400,450);");
 
 			$form->addRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
 
@@ -583,7 +583,7 @@ require_once('include/js.inc.php');
 // Plain text
 			$options = array(
 				'itemids' => $resourceid,
-				'select_hosts' => array('hostid', 'host'),
+				'selectHosts' => array('hostid', 'host'),
 				'output' => API_OUTPUT_EXTEND
 			);
 			$items = CItem::get($options);
@@ -738,7 +738,7 @@ require_once('include/js.inc.php');
 			$form->addVar('resourceid',$id);
 
 			$textfield = new Ctextbox('caption',$caption,60,'yes');
-			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=screens2&srcfld1=screenid&srcfld2=name&screenid=".$_REQUEST['screenid']."',800,450);");
+			$selectbtn = new CButton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=screens2&srcfld1=screenid&srcfld2=name&screenid=".$_REQUEST['screenid']."',800,450);");
 
 			$form->addRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
 		}
@@ -875,7 +875,7 @@ require_once('include/js.inc.php');
 			$form->addRow(S_DYNAMIC_ITEM,	new CCheckBox('dynamic',$dynamic,null,1));
 		}
 
-		$form->addItemToBottomRow(new CButton('save', S_SAVE));
+		$form->addItemToBottomRow(new CSubmit('save', S_SAVE));
 		if(isset($_REQUEST['screenitemid'])){
 			$form->addItemToBottomRow(array(SPACE, new CButtonDelete(null,
 				url_param('form').url_param('screenid').url_param('screenitemid'))));
@@ -893,6 +893,7 @@ require_once('include/js.inc.php');
 
 		$skip_field = array();
 		$screenItems = array();
+
 		foreach($screen['screenitems'] as $sinum => $screenItem){
 			$screenItems[] = $screenItem;
 			for($i = 0; $i < $screenItem['rowspan'] || $i == 0; $i++){
@@ -913,7 +914,7 @@ require_once('include/js.inc.php');
 			$new_cols = array(new Ccol(new Cimg('images/general/zero.gif','zero',1,1)));
 			for($c=0;$c<$screen['hsize']+1;$c++){
 				$add_icon = new Cimg('images/general/closed.gif', NULL, NULL, NULL, 'pointer');
-            $add_icon->addAction('onclick', "javascript: location.href = 'screenedit.php?config=1&screenid=".$screen['screenid']."&add_col=$c';");
+            	$add_icon->addAction('onclick', "javascript: location.href = 'screenedit.php?config=1&screenid=".$screen['screenid']."&add_col=$c';");
 				array_push($new_cols, new Ccol($add_icon));
 			}
 			$table->addRow($new_cols);
@@ -927,7 +928,7 @@ require_once('include/js.inc.php');
 
 			if($editmode == 1){
 				$add_icon = new Cimg('images/general/closed.gif', NULL, NULL, NULL, 'pointer');
-            $add_icon->addAction('onclick', "javascript: location.href = 'screenedit.php?config=1&screenid=".$screen['screenid']."&add_row=$r';");
+            	$add_icon->addAction('onclick', "javascript: location.href = 'screenedit.php?config=1&screenid=".$screen['screenid']."&add_row=$r';");
 				array_push($new_cols, new Ccol($add_icon));
 			}
 
@@ -981,11 +982,9 @@ require_once('include/js.inc.php');
 				}
 
 				if($editmode == 1 && $screenitemid!=0){
-					$onclick_action = "ZBX_SCREENS['".$_REQUEST['screenid']."'].screen.element_onclick('screenedit.php?form=update".url_param('screenid').'&screenitemid='.$screenitemid."#form');";
 					$action = 'screenedit.php?form=update'.url_param('screenid').'&screenitemid='.$screenitemid.'#form';
 				}
 				else if($editmode == 1 && $screenitemid==0){
-					$onclick_action = "ZBX_SCREENS['".$_REQUEST['screenid']."'].screen.element_onclick('screenedit.php?form=update".url_param('screenid').'&x='.$c.'&y='.$r."#form');";
 					$action = 'screenedit.php?form=update'.url_param('screenid').'&x='.$c.'&y='.$r.'#form';
 				}
 				else
@@ -1031,7 +1030,10 @@ require_once('include/js.inc.php');
 						$host = reset($hosts);
 
 						$def_items = array();
-						$di_res = get_graphitems_by_graphid($resourceid);
+						$di_res =  DBselect('SELECT * '.
+								' FROM graphs_items '.
+								' WHERE graphid='.$resourceid.
+								' ORDER BY itemid,drawtype,sortorder,color,yaxisside');
 						while($gitem = DBfetch($di_res)) $def_items[] = $gitem;
 
 						$new_items = get_same_graphitems_for_host($def_items, $_REQUEST['hostid'], false);
@@ -1457,7 +1459,7 @@ require_once('include/js.inc.php');
 					 case TIME_TYPE_HOST:
 						$options = array(
 							'itemids' => $resourceid,
-							'select_hosts' => API_OUTPUT_EXTEND,
+							'selectHosts' => API_OUTPUT_EXTEND,
 							'output' => API_OUTPUT_EXTEND
 						);
 
@@ -1580,7 +1582,7 @@ require_once('include/js.inc.php');
 							new CLink(
 								$trigger['description'],
 								'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid']
-								),
+							),
 							$value,
 							new CCol(get_severity_description($trigger['priority']), get_severity_style($trigger['priority'])),
 						));
@@ -1605,9 +1607,10 @@ require_once('include/js.inc.php');
 				if($valign == VALIGN_BOTTOM)	$str_valign = 'bttm';
 
 				if(($editmode == 1) && !$item_form){
-					$item = new CDiv($item,'draggable');
-					$item->setAttribute('id','position_'.$r.'_'.$c);
-					if($editmode == 1)	$item->setAttribute('onclick','javascript: '.$onclick_action);
+					$item = new CDiv($item, 'draggable');
+					$item->setAttribute('id', 'position_'.$r.'_'.$c);
+					$item->setAttribute('data-xcoord', $c);
+					$item->setAttribute('data-ycoord', $r);
 				}
 
 				$new_col = new CCol($item,$str_halign.'_'.$str_valign);

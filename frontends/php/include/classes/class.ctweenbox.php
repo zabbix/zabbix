@@ -27,8 +27,7 @@ class CTweenBox{
 		$this->name = $name.'_tweenbox';
 		$this->varname = $name;
 
-
-		$this->value = zbx_toHash($value, 't');
+		$this->value = zbx_toHash($value);
 
 		$this->id_l = $this->varname.'_left';
 		$this->id_r = $this->varname.'_right';
@@ -70,16 +69,6 @@ class CTweenBox{
 		}
 	}
 
-	public function setAction($expr, $event='onchange', $value='submit()'){
-//			$box = &$this->lbox;
-		if($expr){
-			$this->lbox->setAttribute($event,$value);
-		}
-		else{
-			$this->rbox->setAttribute($event,$value);
-		}
-	}
-
 	public function get($caption_l=S_IN,$caption_r=S_OTHER){
 		$grp_tab = new CTable();
 		$grp_tab->setAttribute('name',$this->name);
@@ -93,12 +82,10 @@ class CTweenBox{
 		}
 
 		$add_btn = new CButton('add',' « ');//S_ADD);//
-		$add_btn->setType('button');
-		$add_btn->setAction('javascript: moveListBoxSelectedItem("'.$this->form->GetName().'","'.$this->varname.'","'.$this->id_r.'","'.$this->id_l.'","add");');
+		$add_btn->setAttribute('onclick','javascript: moveListBoxSelectedItem("'.$this->form->GetName().'","'.$this->varname.'","'.$this->id_r.'","'.$this->id_l.'","add");');
 
 		$rmv_btn = new CButton('remove',' » ');//S_REMOVE);//
-		$rmv_btn->setType('button');
-		$rmv_btn->setAction('javascript: moveListBoxSelectedItem("'.$this->form->GetName().'","'.$this->varname.'","'.$this->id_l.'","'.$this->id_r.'","rmv");');
+		$rmv_btn->setAttribute('onclick', 'javascript: moveListBoxSelectedItem("'.$this->form->GetName().'","'.$this->varname.'","'.$this->id_l.'","'.$this->id_r.'","rmv");');
 
 		$grp_tab->addRow(array($this->lbox,new CCol(array($add_btn,BR(),$rmv_btn),'top'),$this->rbox));
 

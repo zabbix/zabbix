@@ -97,14 +97,14 @@
 				new CCol($this->getState(), 'right')
 				), 'center');
 
-			$next = new CButton('next['.$this->getStep().']', S_NEXT.' >>');
+			$next = new CSubmit('next['.$this->getStep().']', S_NEXT.' >>');
 			if($this->DISABLE_NEXT_BUTTON) $next->setEnabled(false);
 
 			$table->setFooter(array(
-				new CCol(new CButton('cancel',S_CANCEL),'left'),
+				new CCol(new CSubmit('cancel',S_CANCEL),'left'),
 				new CCol(array(
-					isset($this->stage[$this->getStep()-1]) ? new CButton('back['.$this->getStep().']', '<< '.S_PREVIOUS) : null,
-					isset($this->stage[$this->getStep()+1]) ? $next: new CButton('finish', S_FINISH)
+					isset($this->stage[$this->getStep()-1]) ? new CSubmit('back['.$this->getStep().']', '<< '.S_PREVIOUS) : null,
+					isset($this->stage[$this->getStep()+1]) ? $next: new CSubmit('finish', S_FINISH)
 					) , 'right')
 				),'footer');
 
@@ -211,7 +211,7 @@ JS;
 					BR(), BR(),
 					'Please correct all issues and press "Retry" button',
 					BR(), BR(),
-					new CButton('retry', S_RETRY)
+					new CSubmit('retry', S_RETRY)
 					);
 			}
 			else{
@@ -254,8 +254,8 @@ JS;
 				BR(),
 				!$this->DISABLE_NEXT_BUTTON ? new CSpan(S_OK, 'ok') :  new CSpan(S_FAIL, 'fail'),
 				BR(),
-				new CButton('retry', 'Test connection')
-			);
+				new  CSubmit('retry', 'Test connection')
+				);
 		}
 
 		function stage4(){
@@ -381,13 +381,13 @@ JS;
 
 			return array(
 				$table, BR(),
-				$this->DISABLE_NEXT_BUTTON ? array(new CButton('retry', S_RETRY), BR(),BR()) : null,
+				$this->DISABLE_NEXT_BUTTON ? array(new CSubmit('retry', S_RETRY), BR(),BR()) : null,
 				!$this->getConfig('ZBX_CONFIG_FILE_CORRECT', false) ?
 					array('Please install configuration file manually, or fix permissions on conf directory.',BR(),BR(),
 						'Press "Save configuration file" button, download configuration file ',
 						'and save it as ',BR(),
 						'"'.$ZBX_CONFIGURATION_FILE.'"',BR(),BR(),
-						new CButton('save_config',"Save configuration file"),
+						new CSubmit('save_config',"Save configuration file"),
 						BR(),BR()
 						)
 					: null,
