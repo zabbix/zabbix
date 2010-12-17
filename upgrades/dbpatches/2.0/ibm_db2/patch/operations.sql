@@ -14,7 +14,7 @@ CREATE INDEX opmessage_1 on opmessage (operationid)
 /
 ALTER TABLE opmessage ADD CONSTRAINT c_opmessage_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE
 /
-ALTER TABLE opmessage ADD CONSTRAINT c_opmessage_3 FOREIGN KEY (mediatypeid) REFERENCES media_type (mediatypeid)
+ALTER TABLE opmessage ADD CONSTRAINT c_opmessage_2 FOREIGN KEY (mediatypeid) REFERENCES media_type (mediatypeid)
 /
 
 CREATE SEQUENCE opmessage_seq AS bigint

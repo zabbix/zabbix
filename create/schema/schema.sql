@@ -384,7 +384,7 @@ FIELD		|operationid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|operations
 FIELD		|default_msg	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|subject	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|message	|t_text		|''	|NOT NULL	|ZBX_SYNC
-FIELD		|mediatypeid	|t_id		|	|NULL		|ZBX_SYNC		|3|media_type	|		|RESTRICT
+FIELD		|mediatypeid	|t_id		|	|NULL		|ZBX_SYNC		|2|media_type	|		|RESTRICT
 INDEX		|1		|operationid
 
 TABLE|opmessage_grp|opmessage_grpid|ZBX_SYNC
