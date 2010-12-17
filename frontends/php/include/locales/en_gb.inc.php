@@ -1691,7 +1691,7 @@
 
 //	screens.php
 	'S_CUSTOM_SCREENS'=>			_('Custom screens'),
-	'S_SCREENS_BIG'=>				_('SCREENS 45645645'),
+	'S_SCREENS_BIG'=>				_('SCREENS'),
 	'S_HOST_SCREENS'=>				_('Host screens'),
 
 	'S_SLIDESHOW_UPDATED'=>			_('Slideshow updated'),
