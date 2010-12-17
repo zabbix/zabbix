@@ -23,7 +23,6 @@
 /* time_t */
 #include <time.h>
 
-#include "zbxmacros.h"
 #include "common.h"
 #include "zbxdb.h"
 #include "dbschema.h"
@@ -86,28 +85,6 @@ typedef enum {
 #define DB_FULL_DELETE	0
 #define DB_PART_DELETE	1
 
-#define DB_ACTION	struct zbx_action_type
-#define DB_ALERT	struct zbx_alert_type
-#define DB_CONDITION	struct zbx_condition_type
-#define DB_DHOST	struct zbx_dhost_type
-#define DB_DRULE	struct zbx_drule_type
-#define DB_DSERVICE	struct zbx_dservice_type
-#define DB_DCHECK	struct zbx_dcheck_type
-#define DB_EVENT	struct zbx_event_type
-#define DB_FUNCTION	struct zbx_function_type
-#define DB_HOST		struct zbx_host_type
-#define DB_HOUSEKEEPER	struct zbx_housekeeper_type
-#define DB_ITEM		struct zbx_item_type
-#define DB_MEDIA	struct zbx_media_type
-#define DB_MEDIATYPE	struct zbx_mediatype_type
-#define DB_OPERATION	struct zbx_operation_type
-#define DB_TRIGGER	struct zbx_trigger_type
-#define DB_HTTPTEST	struct zbx_httptest_type
-#define DB_HTTPSTEP	struct zbx_httpstep_type
-#define DB_HTTPSTEPITEM	struct zbx_httpstepitem_type
-#define DB_HTTPTESTITEM	struct zbx_httptestitem_type
-#define DB_ESCALATION	struct zbx_escalation_type
-
 #define TRIGGER_DESCRIPTION_LEN		1020
 #define TRIGGER_DESCRIPTION_LEN_MAX	TRIGGER_DESCRIPTION_LEN+1
 #define TRIGGER_EXPRESSION_LEN		255
@@ -119,18 +96,21 @@ typedef enum {
 
 #define HOST_HOST_LEN			64
 #define HOST_HOST_LEN_MAX		HOST_HOST_LEN+1
-#define HOST_DNS_LEN			64
-#define HOST_DNS_LEN_MAX		HOST_DNS_LEN+1
-#define HOST_IP_LEN			39
-#define HOST_IP_LEN_MAX			HOST_IP_LEN+1
-#define HOST_ADDR_LEN			64 /* MAX(HOST_DNS_LEN,HOST_IP_LEN) */
-#define HOST_ADDR_LEN_MAX		HOST_ADDR_LEN+1
 #define HOST_ERROR_LEN			128
 #define HOST_ERROR_LEN_MAX		HOST_ERROR_LEN+1
 #define HOST_IPMI_USERNAME_LEN		16
 #define HOST_IPMI_USERNAME_LEN_MAX	HOST_IPMI_USERNAME_LEN+1
 #define HOST_IPMI_PASSWORD_LEN		20
 #define HOST_IPMI_PASSWORD_LEN_MAX	HOST_IPMI_PASSWORD_LEN+1
+
+#define INTERFACE_DNS_LEN		64
+#define INTERFACE_DNS_LEN_MAX		INTERFACE_DNS_LEN+1
+#define INTERFACE_IP_LEN		39
+#define INTERFACE_IP_LEN_MAX		INTERFACE_IP_LEN+1
+#define INTERFACE_ADDR_LEN		64 /* MAX(INTERFACE_DNS_LEN,INTERFACE_IP_LEN) */
+#define INTERFACE_ADDR_LEN_MAX		INTERFACE_ADDR_LEN+1
+#define INTERFACE_PORT_LEN		64
+#define INTERFACE_PORT_LEN_MAX		INTERFACE_PORT_LEN+1
 
 #define ITEM_KEY_LEN			1020
 #define ITEM_KEY_LEN_MAX		ITEM_KEY_LEN+1
@@ -226,12 +206,12 @@ typedef enum {
 #define HTTPSTEP_REQUIRED_LEN		255
 #define HTTPSTEP_REQUIRED_LEN_MAX	HTTPSTEP_REQUIRED_LEN+1
 
-#define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.type,h.useip,"	\
-				"h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,i.value_type,i.delta,"	\
-				"i.prevorgvalue,i.lastclock,i.units,i.multiplier,i.formula,i.status,"	\
-				"i.valuemapid,h.dns,i.trends,i.lastlogsize,i.data_type,i.mtime"
+#define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,i.type,i.history,i.lastvalue,"		\
+				"i.prevvalue,i.hostid,i.value_type,i.delta,i.prevorgvalue,"	\
+				"i.lastclock,i.units,i.multiplier,i.formula,i.status,"		\
+				"i.valuemapid,i.trends,i.data_type"
 #define ZBX_SQL_ITEM_TABLES	"hosts h,items i"
-#define ZBX_SQL_ITEM_FIELDS_NUM	27
+#define ZBX_SQL_ITEM_FIELDS_NUM	19
 #define ZBX_SQL_ITEM_SELECT	ZBX_SQL_ITEM_FIELDS " from " ZBX_SQL_ITEM_TABLES
 
 #ifdef HAVE_ORACLE
@@ -251,19 +231,20 @@ typedef enum {
 #define ZBX_DBROW2UINT64(uint, row)	if (SUCCEED == DBis_null(row))		\
 						uint = 0;			\
 					else					\
-						sscanf(row, ZBX_FS_UI64, &uint);
+						sscanf(row, ZBX_FS_UI64, &uint)
 
 #define ZBX_MAX_SQL_LEN		65535
 
-DB_DRULE
+typedef struct
 {
 	zbx_uint64_t	druleid;
 	char		*iprange;
 	char		*name;
 	zbx_uint64_t	unique_dcheckid;
-};
+}
+DB_DRULE;
 
-DB_DCHECK
+typedef struct
 {
 	zbx_uint64_t	dcheckid;
 	int		type;
@@ -274,26 +255,29 @@ DB_DCHECK
 	int		snmpv3_securitylevel;
 	char		*snmpv3_authpassphrase;
 	char		*snmpv3_privpassphrase;
-};
+}
+DB_DCHECK;
 
-DB_DHOST
+typedef struct
 {
 	zbx_uint64_t	dhostid;
 	int		status;
 	int		lastup;
 	int		lastdown;
-};
+}
+DB_DHOST;
 
-DB_DSERVICE
+typedef struct
 {
 	zbx_uint64_t	dserviceid;
 	int		status;
 	int		lastup;
 	int		lastdown;
 	char		value[DSERVICE_VALUE_LEN_MAX];
-};
+}
+DB_DSERVICE;
 
-DB_EVENT
+typedef struct
 {
 	zbx_uint64_t	eventid;
 	int		source;
@@ -309,39 +293,18 @@ DB_EVENT
 	char		*trigger_comments;
 	int		trigger_type;
 	int		ns;
-};
+}
+DB_EVENT;
 
-DB_HOST
-{
-	zbx_uint64_t     hostid;
-	char    host[HOST_HOST_LEN_MAX];
-	char    dns[HOST_DNS_LEN_MAX];
-	int     useip;
-	char    ip[HOST_IP_LEN_MAX];
-	int	port;
-	int	status;
-	int	disable_until;
-	int	errors_from;
-	char	error[HOST_ERROR_LEN_MAX];
-	int	available;
-};
-
-DB_ITEM
+typedef struct
 {
 	zbx_uint64_t	itemid;
 	zbx_uint64_t	hostid;
 	zbx_item_type_t	type;
 	zbx_item_data_type_t	data_type;
 	zbx_item_status_t	status;
-	char	*description;
 	char	*key;
-	char	*key_orig;
 	char	*host_name;
-	char	*host_ip;
-	char	*host_dns;
-	int	useip;
-	int     port;
-	int     delay;
 	int     history;
 	int	trends;
 	char	*prevorgvalue_str;
@@ -363,24 +326,22 @@ DB_ITEM
 	int	delta;
 	int	multiplier;
 	char	*units;
-
 	char	*formula;
-	int	lastlogsize;
-	int	mtime;
-
 	zbx_uint64_t	valuemapid;
-};
+}
+DB_ITEM;
 
-DB_FUNCTION
+typedef struct
 {
 	zbx_uint64_t     functionid;
 	zbx_uint64_t     itemid;
 	zbx_uint64_t     triggerid;
 	char    *function;
 	char	*parameter;
-};
+}
+DB_FUNCTION;
 
-DB_MEDIA
+typedef struct
 {
 	zbx_uint64_t	mediaid;
 	zbx_uint64_t	mediatypeid;
@@ -388,9 +349,10 @@ DB_MEDIA
 	char	*period;
 	int	active;
 	int	severity;
-};
+}
+DB_MEDIA;
 
-DB_MEDIATYPE
+typedef struct
 {
 	zbx_uint64_t		mediatypeid;
 	zbx_media_type_t	type;
@@ -402,9 +364,10 @@ DB_MEDIATYPE
 	char	*gsm_modem;
 	char	*username;
 	char	*passwd;
-};
+}
+DB_MEDIATYPE;
 
-DB_TRIGGER
+typedef struct
 {
 	zbx_uint64_t	triggerid;
 	char	expression[TRIGGER_EXPRESSION_LEN_MAX];
@@ -417,9 +380,10 @@ DB_TRIGGER
 	int	priority;
 	int	type;
 	char	error[TRIGGER_ERROR_LEN_MAX];
-};
+}
+DB_TRIGGER;
 
-DB_ACTION
+typedef struct
 {
 	zbx_uint64_t	actionid;
 	char		*shortdata;
@@ -427,9 +391,10 @@ DB_ACTION
 	int		esc_period;
 	unsigned char	eventsource;
 	unsigned char	recovery_msg;
-};
+}
+DB_ACTION;
 
-DB_OPERATION
+typedef struct
 {
 	zbx_uint64_t	operationid;
 	zbx_uint64_t	actionid;
@@ -442,18 +407,20 @@ DB_OPERATION
 	int		esc_period;
 	int		default_msg;
 	int		evaltype;
-};
+}
+DB_OPERATION;
 
-DB_CONDITION
+typedef struct
 {
 	zbx_uint64_t	conditionid;
 	zbx_uint64_t	actionid;
 	zbx_condition_type_t	conditiontype;
 	zbx_condition_op_t	operator;
 	char		*value;
-};
+}
+DB_CONDITION;
 
-DB_ALERT
+typedef struct
 {
 	zbx_uint64_t	alertid;
 	zbx_uint64_t 	actionid;
@@ -464,17 +431,19 @@ DB_ALERT
 	char		*message;
 	zbx_alert_status_t	status;
 	int		retries;
-};
+}
+DB_ALERT;
 
-DB_HOUSEKEEPER
+typedef struct
 {
 	zbx_uint64_t	housekeeperid;
 	char		*tablename;
 	char		*field;
 	zbx_uint64_t	value;
-};
+}
+DB_HOUSEKEEPER;
 
-DB_HTTPTEST
+typedef struct
 {
 	zbx_uint64_t	httptestid;
 	char		*name;
@@ -489,9 +458,10 @@ DB_HTTPTEST
 	int		authentication;
 	char		*http_user;
 	char		*http_password;
-};
+}
+DB_HTTPTEST;
 
-DB_HTTPSTEP
+typedef struct
 {
 	zbx_uint64_t	httpstepid;
 	zbx_uint64_t	httptestid;
@@ -502,25 +472,28 @@ DB_HTTPSTEP
 	char		posts[MAX_STRING_LEN];
 	char		required[HTTPSTEP_REQUIRED_LEN_MAX];
 	char		status_codes[HTTPSTEP_STATUS_LEN_MAX];
-};
+}
+DB_HTTPSTEP;
 
-DB_HTTPSTEPITEM
+typedef struct
 {
 	zbx_uint64_t	httpstepitemid;
 	zbx_uint64_t	httpstepid;
 	zbx_uint64_t	itemid;
 	zbx_httpitem_type_t	type;
-};
+}
+DB_HTTPSTEPITEM;
 
-DB_HTTPTESTITEM
+typedef struct
 {
 	zbx_uint64_t	httptestitemid;
 	zbx_uint64_t	httptestid;
 	zbx_uint64_t	itemid;
 	zbx_httpitem_type_t	type;
-};
+}
+DB_HTTPTESTITEM;
 
-DB_ESCALATION
+typedef struct
 {
 	zbx_uint64_t		escalationid;
 	zbx_uint64_t		actionid;
@@ -530,7 +503,8 @@ DB_ESCALATION
 	int			esc_step;
 	zbx_escalation_status_t	status;
 	int			nextcheck;
-};
+}
+DB_ESCALATION;
 
 #define DB_NODE "%s"
 #define DBnode_local(fieldid) DBnode(fieldid, CONFIG_NODEID)
@@ -541,7 +515,7 @@ int	DBping();
 void    DBconnect(int flag);
 void	DBinit();
 
-void    DBclose(void);
+void    DBclose();
 
 #ifdef HAVE___VA_ARGS__
 #	define DBexecute(fmt, ...) __zbx_DBexecute(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
@@ -624,7 +598,6 @@ void    DBget_item_from_db(DB_ITEM *item, DB_ROW row);
 
 zbx_uint64_t	DBadd_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available);
 int	DBhost_exists(char *server);
-int	DBget_host_by_hostid(int hostid,DB_HOST *host);
 int	DBadd_templates_to_host(int hostid,int host_templateid);
 
 int	DBadd_template_linkage(int hostid,int templateid,int items,int triggers,int graphs);
@@ -664,5 +637,8 @@ char	*DBget_unique_hostname_by_sample(char *host_name_sample);
 
 char	*DBsql_id_cmp(zbx_uint64_t id);
 char	*DBsql_id_ins(zbx_uint64_t id);
+
+zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
+		unsigned char useip, const char *ip, const char *dns, unsigned short port);
 
 #endif

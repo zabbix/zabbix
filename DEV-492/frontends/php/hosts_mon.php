@@ -137,10 +137,11 @@ include_once('include/page_header.php');
 		array(bold(S_PORT.': '), new CTextBox('filter_port', $_REQUEST['filter_port'], 20))
 	));
 
-	$reset = new CSpan( S_RESET,'biglink');
+	$reset = new CSpan(S_RESET,'menu_link');
 	$reset->onClick("javascript: clearAllForm('zbx_filter');");
-	$filter = new CSpan(S_FILTER,'biglink');
-	$filter->onClick("javascript: create_var('zbx_filter', 'filter_set', '1', true);");
+
+	$filter = new CButton('filter', S_FILTER, "javascript: create_var('zbx_filter', 'filter_set', '1', true);");
+	$filter->useJQueryStyle();
 
 	$footer_col = new CCol(array($filter, SPACE, SPACE, SPACE, $reset), 'center');
 	$footer_col->setColSpan(4);
@@ -164,7 +165,6 @@ include_once('include/page_header.php');
 		S_TRIGGERS,
 		S_GRAPHS,
 		S_SCREENS,
-		S_IP,
 		S_AVAILABILITY
 	));
 
@@ -202,7 +202,7 @@ include_once('include/page_header.php');
 		'hostids' => zbx_objectValues($hosts, 'hostid'),
 		'output' => API_OUTPUT_EXTEND,
 		'selectParentTemplates' => array('hostid', 'host'),
-		'select_items' => API_OUTPUT_COUNT,
+		'selectItems' => API_OUTPUT_COUNT,
 		'select_triggers' => API_OUTPUT_COUNT,
 		'select_graphs' => API_OUTPUT_COUNT,
 		'select_applications' => API_OUTPUT_COUNT,
@@ -226,24 +226,16 @@ include_once('include/page_header.php');
 
 		$description = array();
 		if($host['proxy_hostid']){
-			$proxy = CProxy::get(array('proxyids' => $host['proxy_hostid'], 'extendoutput' => 1));
+			$proxy = CProxy::get(array(
+				'proxyids' => $host['proxy_hostid'],
+				'output' => API_OUTPUT_EXTEND
+			));
 			$proxy = reset($proxy);
 			$description[] = $proxy['host'] . ':';
 		}
 
 		$description[] = new CLink($host['host'], 'hosts.php?form=update&hostid='.$host['hostid'].url_param('groupid'));
 
-
-		if(!empty($host['dns'])){
-			$dns = '('.$host['dns'].')';
-			$dns = (1 == $host['useip']) ? $dns : bold($dns);
-		}
-		else{
-			$dns = null;
-		}
-		$ip = (1 == $host['useip']) ?  bold($host['ip']) : $host['ip'];
-
-		$address = array($ip, $dns, ' :'.$host['port']);
 
 		switch($host['available']){
 			case HOST_AVAILABLE_TRUE:
@@ -294,7 +286,6 @@ include_once('include/page_header.php');
 			$triggers,
 			$graphs,
 			$screens,
-			$address,
 			$av_table
 		));
 	}

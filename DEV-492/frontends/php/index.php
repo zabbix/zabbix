@@ -111,7 +111,7 @@ include_once('include/page_header.php');
 				$pt = new CPassBox('password');
 				$pt->addStyle('width: 150px');
 				$frmLogin->addRow(S_PASSWORD, $pt);
-				$frmLogin->addItemToBottomRow(new CButton('enter','Enter'));
+				$frmLogin->addItemToBottomRow(new CSubmit('enter','Enter'));
 				$frmLogin->show(false);
 
 				setFocus($frmLogin->getName(),'name');

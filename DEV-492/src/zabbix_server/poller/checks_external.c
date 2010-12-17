@@ -41,21 +41,19 @@
  ******************************************************************************/
 int     get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 {
-	FILE*	fp;
-	char	*conn, scriptname[MAX_STRING_LEN];
+	FILE	*fp;
+	char	scriptname[MAX_STRING_LEN];
 	char	key[MAX_STRING_LEN];
 	char	params[MAX_STRING_LEN];
 	char	error[MAX_STRING_LEN];
 	char	cmd[MAX_STRING_LEN];
 	char	msg[MAX_STRING_LEN];
-	char	*p,*p2;
+	char	*p, *p2;
 	int	i;
 
 	int	ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In get_value_external() key:'%s'", item->key_orig);
-
-	conn = item->host.useip == 1 ? item->host.ip : item->host.dns;
 
 	init_result(result);
 
@@ -89,12 +87,14 @@ int     get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 		strscpy(scriptname,key);
 	}
 
-	zbx_snprintf(cmd, MAX_STRING_LEN-1, "%s/%s %s %s",
-		CONFIG_EXTERNALSCRIPTS,
-		scriptname,
-		conn,
-		params);
-	zabbix_log( LOG_LEVEL_DEBUG, "%s", cmd );
+	zbx_snprintf(cmd, sizeof(cmd), "%s/%s %s %s",
+			CONFIG_EXTERNALSCRIPTS,
+			scriptname,
+			item->interface.addr,
+			params);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s", cmd);
+
 	if (NULL == (fp = popen(cmd, "r")))
 	{
 		zbx_snprintf(error, sizeof(error), "External check is not supported, failed execution");

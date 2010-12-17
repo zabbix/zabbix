@@ -189,6 +189,13 @@ const ZBX_TABLE	tables[]={
 	"t_cksum_text"	=>	"text"  
 );
 
+sub rtrim($)
+{
+	my $string = shift;
+	$string =~ s/(\r|\n)*$//;
+	return $string;
+}
+
 sub newstate
 {
 	local $new = $_[0];
@@ -381,11 +388,14 @@ sub process_field
 				$fk_field = "${name}";
 			}
 
+# RESTRICT may contains new line chars we need to clean them out
+			$fk_flags = rtrim ($fk_flags);
+			
 			if ($fk_flags eq "")
 			{
 				$fk_flags = " ON DELETE CASCADE";
 			}
-			elsif ($fk_flags eq "RESTRICT")	# not default option
+			elsif ($fk_flags eq "RESTRICT")
 			{
 				$fk_flags = "";
 			}
@@ -408,6 +418,7 @@ sub process_field
 			else
 			{
 				$references = "";
+				
 				$fkeys = "${fkeys}${fk_bol}ALTER TABLE${only} ${table_name} ADD CONSTRAINT ${cname} FOREIGN KEY (${name}) REFERENCES ${fk_table} (${fk_field})${fk_flags}${fk_eol}\n";
 
 				if ($output{"database"} eq "mysql")

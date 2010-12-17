@@ -166,7 +166,7 @@ class zbxXML{
 				'trapper_hosts'		=> '',
 				'snmp_community'	=> '',
 				'snmp_oid'			=> '',
-				'snmp_port'			=> '',
+				'port'			=> '',
 				'snmpv3_securityname'	=> '',
 				'snmpv3_securitylevel'	=> '',
 				'snmpv3_authpassphrase'	=> '',
@@ -1018,7 +1018,8 @@ class zbxXML{
 							$options = array(
 								'filter' => array(
 									'hostid' => $item_db['hostid'],
-									'key_' => $item_db['key_']
+									'key_' => $item_db['key_'],
+									'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED),
 								),
 								'webitems' => 1,
 								'output' => API_OUTPUT_EXTEND,
@@ -1225,7 +1226,8 @@ class zbxXML{
 								if($current_item = CItem::exists($gitem_db)){
 									$current_item = CItem::get(array(
 										'filter' => array(
-											'key_' => $gitem_db['key_']
+											'key_' => $gitem_db['key_'],
+											'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED),
 										),
 										'webitems' => 1,
 										'host' => $gitem_db['host'],
@@ -1432,7 +1434,10 @@ class zbxXML{
 									$triggers_to_add_dep[] = $depends_triggerid['triggerid'];
 								}
 							}
-							$r = update_trigger($current_triggerid['triggerid'],null,$current_triggerid['description'],null,null,null,null,null,$triggers_to_add_dep,null);
+							$r = CTrigger::update(array(
+								'triggerid' => $current_triggerid['triggerid'],
+								'dependencies' => $triggers_to_add_dep,
+							));
 							if($r === false){
 								throw new Exception();
 							}
@@ -1584,8 +1589,6 @@ class zbxXML{
 						if(isset($data['graphs_items'])){
 							$graph_elements_node = $graph_node->appendChild(new DOMElement(XML_TAG_GRAPH_ELEMENTS));
 							foreach($data['graphs_items'] as $ginum => $gitem){
-								$tmp_item = get_item_by_itemid($gitem['itemid']);
-
 								$gitem['graphs'] = zbx_toHash($gitem['graphs'], 'graphid');
 								if(isset($gitem['graphs'][$graph['graphid']])){
 									self::addChildData($graph_elements_node, XML_TAG_GRAPH_ELEMENT, $gitem);

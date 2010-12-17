@@ -185,10 +185,10 @@ include_once('include/page_header.php');
 		if(!$filterEnable) $lstGroups->setAttribute('disabled', 'disabled');
 
 		$addButton = new CButton('add', S_ADD, "return PopUp('popup_right.php?dstfrm=" . $dashForm->getName() . "&permission=" . PERM_READ_WRITE . "',450,450);");
-		if(!$filterEnable) $addButton->setAttribute('disabled', 'disabled');
+		$addButton->setEnabled($filterEnable);
 
 		$delButton = new CButton('delete', S_DELETE_SELECTED);
-		if(!$filterEnable) $delButton->setAttribute('disabled', 'disabled');
+		$delButton->setEnabled($filterEnable);
 
 		$dashForm->addRow(
 			S_GROUPS,
@@ -239,7 +239,7 @@ include_once('include/page_header.php');
 	$dashForm->addRow(S_PROBLEM_DISPLAY, $cb);
 //-----
 
-	$dashForm->addItemToBottomRow(new CButton('save', S_SAVE));
+	$dashForm->addItemToBottomRow(new CSubmit('save', S_SAVE));
 
 	$dashboard_wdgt->addItem($dashForm);
 	$dashboard_wdgt->show();

@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2007 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@
 
 	define('ZBX_PAGE_NO_MENU', 1);
 
-include_once "include/page_header.php";
+	include_once ('include/page_header.php');
 
 //		VAR							TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields=array(
@@ -60,7 +60,7 @@ if(isset($_REQUEST['execute'])){
 			$message = '';
 		}
 
-		$frmResult = new CFormTable($script_info['name'].': '.script_make_command($scriptid, $hostid));
+		$frmResult = new CFormTable($script_info['name']);
 		$frmResult->addRow(S_RESULT, new CTextArea('message', $message, 100, 25, 'yes'));
 		$frmResult->addItemToBottomRow(new CButton('close', S_CLOSE, 'window.close();'));
 		$frmResult->show();

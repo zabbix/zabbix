@@ -127,9 +127,6 @@
 			return false;
 
 		if(validate_ipv4($parts[0], $arr)){
-			$ip_parts = explode('.', $parts[0]);
-
-//			if( !ereg('^[0-9]{1,2}$', $parts[1])) return false;
 			if(!preg_match('/^([0-9]{1,2})$/', $parts[1])) return false;
 
 			sscanf($parts[1], "%d", $mask);
@@ -137,9 +134,6 @@
 			if( $mask > 32 ) return false;
 		}
 		else if( defined('ZBX_HAVE_IPV6') && validate_ipv6($parts[0], $arr) ){
-			$ip_parts = explode(':', $parts[0]);
-
-//			if( !ereg('^[0-9]{1,3}$', $parts[1]) ) return false;
 			if(!preg_match('/^([0-9]{1,3})$/', $parts[1])) return false;
 
 			sscanf($parts[1], "%d", $mask);
@@ -494,7 +488,7 @@
 	function check_field(&$fields, &$field, $checks){
 		if(!isset($checks[5])) $checks[5] = $field;
 		list($type,$opt,$flags,$validation,$exception,$caption)=$checks;
-                                                            	
+
 		if($flags&P_UNSET_EMPTY && isset($_REQUEST[$field]) && $_REQUEST[$field]==''){
 			unset_request($field,'P_UNSET_EMPTY');
 		}

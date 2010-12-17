@@ -236,7 +236,7 @@ include_once('include/page_header.php');
 		$action = "javascript: if(confirm('".S_SWITCHING_HTTP."')) return true; else return false;";
 		$frmAuth->addRow(S_ZABBIX_INTERNAL_AUTH.SPACE.S_ENABLED, new CCheckBox('authentication_type', (ZBX_AUTH_INTERNAL == $config['authentication_type']), $action, ZBX_AUTH_INTERNAL));
 
-		$frmAuth->addItemToBottomRow(new CButton('save',S_SAVE));
+		$frmAuth->addItemToBottomRow(new CSubmit('save',S_SAVE));
 		$frmAuth->Show();
 	}
 	else if(ZBX_AUTH_LDAP==$_REQUEST['config']){
@@ -299,8 +299,8 @@ include_once('include/page_header.php');
 		$frmAuth->addRow(S_LOGIN , $usr_test);
 		$frmAuth->addRow(S_USER.SPACE.S_PASSWORD,new CPassBox('user_password'));
 
-		$frmAuth->addItemToBottomRow(new CButton('save',S_SAVE));
-		$frmAuth->addItemToBottomRow(new CButton('test',S_TEST));
+		$frmAuth->addItemToBottomRow(new CSubmit('save',S_SAVE));
+		$frmAuth->addItemToBottomRow(new CSubmit('test',S_TEST));
 		$frmAuth->Show();
 	}
 	else if(ZBX_AUTH_HTTP==$_REQUEST['config']){
@@ -322,7 +322,7 @@ include_once('include/page_header.php');
 		$action = "javascript: if(confirm('".S_SWITCHING_HTTP."')) return true; else return false;";
 		$frmAuth->addRow(S_HTTP_AUTH.SPACE.S_ENABLED, new CCheckBox('authentication_type', (ZBX_AUTH_HTTP == $config['authentication_type']), $action, ZBX_AUTH_HTTP));
 
-		$frmAuth->addItemToBottomRow(new CButton('save',S_SAVE));
+		$frmAuth->addItemToBottomRow(new CSubmit('save',S_SAVE));
 		$frmAuth->Show();
 	}
 

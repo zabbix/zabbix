@@ -140,7 +140,7 @@ include_once('include/page_header.php');
 		$options = array(
 			'triggerids' => $_REQUEST['triggerid'],
 			'output' => API_OUTPUT_EXTEND,
-			'select_hosts' => API_OUTPUT_EXTEND,
+			'selectHosts' => API_OUTPUT_EXTEND,
 			'nodeids' => get_current_nodeid(true)
 		);
 

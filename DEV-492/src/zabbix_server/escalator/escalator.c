@@ -914,7 +914,7 @@ static void	process_escalations(int now)
 		ZBX_STR2UINT64(escalation.actionid, row[1]);
 		ZBX_DBROW2UINT64(escalation.triggerid, row[2]);
 		ZBX_STR2UINT64(escalation.eventid, row[3]);
-		ZBX_DBROW2UINT64(escalation.r_eventid, row[4])
+		ZBX_DBROW2UINT64(escalation.r_eventid, row[4]);
 		escalation.esc_step	= atoi(row[5]);
 		escalation.status	= atoi(row[6]);
 		escalation.nextcheck	= 0;

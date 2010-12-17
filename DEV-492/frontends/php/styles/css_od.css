@@ -1,5 +1,6 @@
 /* CSS Document */
 /* Dark Orange Theme by Aly */
+@import "darkorange/jquery-ui-1.8.6.custom.css";
 
 @media print {
 	body{
@@ -473,22 +474,13 @@ div.calendar input.calendar_textbox{
 }
 
 /* SCROLLBAR */
-div.scrollbar{
-	background-color: #3F3F3F;
-	border: 1px solid #AA5500;
-}
+div.scrollbar{ background-color: #3F3F3F; border: 1px solid #AA5500; }
 
-div.scrollbar .info .zoom .text{
-	color: #DFDFDF;
-}
+div.scrollbar .info .zoom .text{ color: #DFDFDF; }
 
-div.scrollbar .subline .info_period{
-	color: #DFDFDF;
-}
+div.scrollbar .subline .info_period{ color: #DFDFDF; }
 
-div.scrollbar .subline .nav_links .text{
-	color: #DFDFDF;
-}
+div.scrollbar .subline .nav_links .text{ color: #DFDFDF; }
 
 /* MESAGES */
 div.messagecontainer .message .messagebox{
@@ -503,191 +495,92 @@ div.formElement_header{
 div.formElement_body{
 	border: 1px solid #222222;
 }
-div.formElement_footer{
-	background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left;
-}
+div.formElement_footer{ background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left; }
+div.thin_header{ background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left; }
+div.zabbix_logo{ background-image:url('../images/general/zabbix_od.png'); }
+.iconzbxavailable{ background-image: url('../images/general/zabbix_available_bb.png'); }
+.iconsnmpavailable{ background-image: url('../images/general/snmp_available_bb.png'); }
 
-div.thin_header{
-	background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left;
-}
+.iconipmiavailable{ background-image: url('../images/general/ipmi_available_bb.png'); }
+.sla_green{ background-image: url('../images/gradients/sla_blue15.png'); }
+.icon_sortup{ background-image: url('../images/general/sort_up_od.gif'); }
+.icon_sortdown{ background-image: url('../images/general/sort_down_od.gif'); }
 
-div.zabbix_logo{
-	background-image:url('../images/general/zabbix_od.png');
-}
+.menu_icon:hover{ background-color: #FF5500; }
+div.iconmenu_b{ background-color: transparent; }
 
-div.iconzbxavailable{
-	background-image: url('../images/general/zabbix_available_bb.png');
-}
+div.messagecontainer{ background-color: #8c8a8b;}
+div#scrolltableft{ color: #00CCFF; }
+div#scrolltabright{ color: #00CCFF; }
+div#selection_box{ filter:alpha(opacity=60); opacity:.60; background-color:#6666FF; }
 
-div.iconsnmpavailable{
-	background-image: url('../images/general/snmp_available_bb.png');
-}
+div.formElement{ border: 1px solid #5A5A5A;}
+div.formElement_body{ background-color: #1A1A1A; }
 
-div.iconipmiavailable{
-	background-image: url('../images/general/ipmi_available_bb.png');
-}
 
-div.sla_green{
-	background-image: url('../images/gradients/sla_blue15.png');
-}
+div.objectgroup{ border-color: #CC5500; background-color: #2F2F2F; }
 
-div.icon_sortup{
-	background-image: url('../images/general/sort_up_od.gif');
-}
+.footer .dt input.main{ border-color: #FF5500; }
+.footer .dt input.main:hover{ border-color: #FF5500; }
 
-div.icon_sortdown{
-	background-image: url('../images/general/sort_down_od.gif');
-}
 
-div.menu_icon:hover{
-	-webkit-box-shadow: 0 0 6px #FF5500;
-	-moz-box-shadow: 0 0 6px #FF5500;
-	box-shadow: 0 0 6px #FF5500;
-	background-color: #FF5500;
-}
-div.iconmenu_b{
-	background-color: transparent;
-}
+ul.objectlist li{ color: #DADADA; }
 
-div.messagecontainer{
-	background-color: #8c8a8b;
-}
+div.border_dotted{ border: 1px dotted #CC5500; }
 
-div#scrolltableft{
-	color: #00CCFF;
-}
+.formElementTable tr td{ color: #DFDFDF; }
 
-div#scrolltabright{
-	color: #00CCFF;
-}
+span.info{ color:	#FF5500; }
 
-div#selection_box{
-	filter:alpha(opacity=60);
-	opacity:.60;
-	background-color:#6666FF;
-}
+span.link{ color: #FF5500; }
+span.link:hover{ color: #FF8800; }
 
-div.formElement{
-	border: 1px solid #5A5A5A;
-}
+span.darklink{ color: #AA5500; }span.darklink:hover{ color: #FF5500; }
 
-div.formElement_body{
-	background-color: #1A1A1A;
-}
+div.suggest{ border: 1px #FF5500 solid; }
 
-div.objectlist{
-	border-color: #AA5500;
+/*////////////////	FORMS	////////////////////*/
+.input, .input[disabled]:hover{
+	border: 1px solid #DFDFDF;
 	background-color: #2F2F2F;
-}
-
-div.objectlist ul li{
-	color: #DADADA;
-}
-
-.formElementTable tr td{
 	color: #DFDFDF;
 }
 
-span.info{
-	color:	#FF5500;
-}
+.input:focus { border-color: #FF5500; color: #FF5500;}
+.input:hover { border-color: #FF5500; color: #FF5500;}
 
-span.link{
-	color: #FF5500;
-}
-
-span.link:hover{
-	color: #FF8800;
-}
-
-span.darklink{
-	color: #AA5500;
-}
-
-span.darklink:hover{
-	color: #FF5500;
-}
-
-span.biglink{
-	color: #FF5500;
-}
-
-span.biglink:hover{
-	color: #FF8800;
-}
-
-
-span.link_menu{
-	color: #FF5500;
-	border-bottom-color: #FF5500;
-}
-
-span.link_menu:hover{
-	color: #FF8800;
-	border-bottom-color: #FF8800;
-}
-
-div.suggest{
-	border: 1px #FF5500 solid;
-}
-
-/*////////////////	FORMS	////////////////////*/
-.button{
-	border-color: #FF5500;
-	background: #2f2f2f;
-	color: #FF5500;
-}
-
-.button:hover {
-	border-color: #2f2f2f;
-	color: #2f2f2f;
-	background: #FF5500;
-	text-decoration: none;
-	-webkit-box-shadow: 0 0 6px #FF5500;
-	-moz-box-shadow: 0 0 6px #FF5500;
-	box-shadow: 0 0 6px #FF5500;
-}
-
-.biginput[readonly], .biginput[readonly]:hover{
+.input[readonly], .input[readonly]:hover{
 /* NOTE: Ignored by IE */
 	border-color: #DFDFDF;
 	background-color: #777777;
 	color: #DFDFDF;
 }
 
+.shadow {}
+.shadow:hover{ -webkit-box-shadow: 0 0 6px #FF5500; -moz-box-shadow: 0 0 6px #FF5500; box-shadow: 0 0 6px #FF5500; }
 
-.select{
-	border: 1px solid #DFDFDF;
-	background: #2F2F2F;
-	color: white;
-	cursor: pointer;
-	margin: 1px 4px 1px 2px;
-}
+.select{ cursor: pointer; margin: 1px 4px 1px 2px; }
+.button{  border-color: #FF5500; background: #2f2f2f; color: #FF5500; }
+.button:hover { border-color: #2f2f2f; color: #2f2f2f; background: #FF5500; text-decoration: none; }
 
-.select:hover{
-	border-color: #FF5500;
-	background-color: #2F2F2F;
+.link_menu{
+	border: 0px;
+	background: none;
+
 	color: #FF5500;
+	border-bottom: 1px dotted #FF5500;
 }
 
-.select:focus{
-	border-color: #FF5500;
-	background-color: #2F2F2F;
-	color: #FF5500;
+.link_menu:hover{
+	color: #FF8800;
+	border-bottom-color: #FF8800;
 }
 
-.biginput, .biginput[disabled]:hover{
-	border: 1px solid #DFDFDF;
-	background-color: #2F2F2F;
+.link_menu[disabled], .link_menu[disabled]:hover{
 	color: #DFDFDF;
+	border: 0px;
+	cursor: default;
 }
 
-.biginput:focus	{
-	border-color: #FF5500;
-	color: #FF5500;
-}
-
-.biginput:hover	{
-	border-color: #FF5500;
-	color: #FF5500;
-}
+.column .widget .header{ border: 0px;}
+.column .widget .footer{ border: 0px;}
