@@ -1687,7 +1687,7 @@ class CChart extends CGraphDraw{
 
 		$legend->draw();
 
-		//if graph is small, we are not drawing percent line and trigger legends
+		// if graph is small, we are not drawing percent line and trigger legends
 		if($this->sizeY < ZBX_MIN_GRAPH_HEIGHT_TO_HIDE_LEGEND){
 			return true;
 		}
