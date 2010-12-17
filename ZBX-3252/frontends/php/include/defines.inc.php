@@ -37,7 +37,7 @@
 
 	define('ZBX_FONTPATH',					realpath('fonts'));	// where to search for font (GD > 2.0.18)
 	define('ZBX_GRAPH_FONT_NAME',			'DejaVuSans');		// font file name
-	define('ZBX_MIN_GRAPH_HEIGHT_TO_HIDE_LEGEND',120); // when graph height is less then this value, some legend will not show up
+	define('ZBX_GRAPH_LEGEND_HEIGHT',120); // when graph height is less then this value, some legend will not show up
 
 	define('ZBX_SCRIPT_TIMEOUT',			60); // in seconds
 	define('ZBX_SCRIPT_BYTES_LIMIT',		1048576); // 1048576 is 1MB in bytes
