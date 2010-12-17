@@ -433,8 +433,6 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 		return zbx_date2age(0,$value,true);
 	}
 
-	$u='';
-
 // Any other unit
 //-------------------
 // black list wich do not require units metrics..
@@ -1368,8 +1366,6 @@ function add_doll_objects($ref_tab, $pmid='mainpage'){
 }
 
 function format_doll_init($doll){
-	global $USER_DETAILS;
-
 	$args = array('frequency' => 60,
 					'url' => '',
 					'counter' => 0,
@@ -1466,4 +1462,5 @@ function bcround($number, $precision = 0) {
 }
 
 /************* END MATH *************/
+
 ?>

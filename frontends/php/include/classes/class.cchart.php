@@ -687,8 +687,6 @@ class CChart extends CGraphDraw{
 	}
 
 	protected function calcZero(){
-		$left = GRAPH_YAXIS_SIDE_LEFT;
-		$right = GRAPH_YAXIS_SIDE_RIGHT;
 		$sides = array(GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT);
 
 		foreach($sides as $num => $side){
@@ -1164,7 +1162,6 @@ class CChart extends CGraphDraw{
 		$main_interval = $this->grid['horizontal']['main']['interval'];
 		$main_intervalX = $this->grid['horizontal']['main']['intervalx'];
 		$main_offset = $this->grid['horizontal']['main']['offset'];
-		$main_offsetX = $this->grid['horizontal']['main']['offsetx'];
 
 		$sub = &$this->grid['horizontal']['sub'];
 		$interval = $sub['interval'];
@@ -1624,7 +1621,6 @@ class CChart extends CGraphDraw{
 
 		$i = ($this->type == GRAPH_TYPE_STACKED)?($this->num-1):0;
 		while(($i>=0) && ($i<$this->num)){
-			$row = array();
 
 			if($this->items[$i]['calc_type'] == GRAPH_ITEM_AGGREGATED){
 				$fnc_name = 'agr('.$this->items[$i]['periods_cnt'].')';
@@ -1688,7 +1684,8 @@ class CChart extends CGraphDraw{
 
 		$legend->draw();
 
-		if($this->sizeY < 120){
+		// if graph is small, we are not drawing percent line and trigger legends
+		if($this->sizeY < ZBX_GRAPH_LEGEND_HEIGHT){
 			return true;
 		}
 
@@ -1706,7 +1703,6 @@ class CChart extends CGraphDraw{
 			foreach($this->percentile as $side => $percentile){
 				if(($percentile['percent']>0) && $percentile['value']){
 
-					$str = '%sth percentile: %s';
 					$percentile['percent'] = (float) $percentile['percent'];
 					$legend->addCell($colNum,array('text' => $percentile['percent'].'th percentile: '.convert_units($percentile['value'], $units[$side]).'  ('.$side.')', ITEM_CONVERT_NO_UNITS));
 					if($side == 'left'){
@@ -1744,6 +1740,9 @@ class CChart extends CGraphDraw{
 		}
 
 		$legend->draw();
+
+
+
 
 		$legend = new CImageTextTable(
 				$this->im,
@@ -2049,14 +2048,16 @@ class CChart extends CGraphDraw{
 		$this->fullSizeY = $this->sizeY+$this->shiftY+$this->legendOffsetY;
 
 		if($this->drawLegend){
-			$trCount = $this->m_showTriggers?count($this->triggers):0;
 			$this->fullSizeY += 14 * ($this->num+1+(($this->sizeY < 120)?0:count($this->triggers))) + 8;
 		}
 
 
-		foreach($this->percentile as $side => $percentile){
-			if(($percentile['percent']>0) && $percentile['value']){
-				$this->fullSizeY += 14;
+		//if graph height is big enough, we reserve space for percent line legend
+		if ($this->sizeY >= ZBX_GRAPH_LEGEND_HEIGHT){
+			foreach($this->percentile as $percentile){
+				if(($percentile['percent']>0) && $percentile['value']){
+					$this->fullSizeY += 14;
+				}
 			}
 		}
 
@@ -2183,7 +2184,6 @@ class CChart extends CGraphDraw{
 
 		$this->drawLogo();
 
-		$end_time=getmicrotime();
 		$str=sprintf('%0.2f',(getmicrotime()-$start_time));
 
 // if we get chart from config by get method

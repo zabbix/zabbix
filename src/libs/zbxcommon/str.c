@@ -2199,7 +2199,7 @@ int	zbx_get_next_field(const char **line, char **output, int *olen, char separat
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	str_in_list(const char *list, const char *value, const char delimiter)
+int	str_in_list(const char *list, const char *value, char delimiter)
 {
 	const char	*end;
 	int		len, ret = FAIL;
@@ -2502,6 +2502,22 @@ const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type)
 	case ITEM_VALUE_TYPE_UINT64: return "Numeric (unsigned)";
 	case ITEM_VALUE_TYPE_TEXT: return "Text";
 	default: return "unknown";
+	}
+}
+
+const char	*zbx_interface_type_string(zbx_interface_type_t type)
+{
+	switch (type)
+	{
+		case INTERFACE_TYPE_AGENT:
+			return "Zabbix agent";
+		case INTERFACE_TYPE_SNMP:
+			return "SNMP";
+		case INTERFACE_TYPE_IPMI:
+			return "IPMI";
+		case INTERFACE_TYPE_UNKNOWN:
+		default:
+			return "unknown";
 	}
 }
 

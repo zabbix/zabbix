@@ -63,7 +63,7 @@
 			$post_script.='for(key in newLocale){locale[key] = newLocale[key];}'."\n";
 		}
 
-		$post_script.= 'function zbxCallPostScripts(){'."\n";
+		$post_script.= 'jQuery(document).ready(function(){'."\n";
 
 		if(isset($ZBX_PAGE_POST_JS)){
 			foreach($ZBX_PAGE_POST_JS as $num => $script){
@@ -79,7 +79,7 @@
 		$post_script.= 'chkbxRange.init();'."\n";
 		$post_script.= 'if(IE6){ie6pngfix.run(false);}'."\n";
 
-		$post_script.='}'."\n";
+		$post_script.='});'."\n";
 
 		if(!defined('ZBX_PAGE_NO_MENU') && !defined('ZBX_PAGE_NO_FOOTER')){
 			$table = new CTable(NULL,"page_footer");
@@ -102,7 +102,7 @@
 
 		insert_js($post_script);
 
-		echo "</body>\n";		
+		echo "</body>\n";
 		echo "</html>\n";
 	}
 

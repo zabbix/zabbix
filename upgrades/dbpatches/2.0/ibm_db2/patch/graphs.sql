@@ -30,15 +30,19 @@ ALTER TABLE graphs ALTER COLUMN show_legend SET DEFAULT 1
 /
 REORG TABLE graphs
 /
-UPDATE graphs SET show_legend=1 WHERE graphtype=0 OR graphtype=1
+ALTER TABLE graphs ADD flags integer WITH DEFAULT '0' NOT NULL
+/
+REORG TABLE graphs
+/
+UPDATE graphs SET show_legend=1 WHERE graphtype IN (0, 1)
 /
 UPDATE graphs SET templateid=NULL WHERE templateid=0
 /
-UPDATE graphs SET templateid=NULL WHERE NOT templateid IS NULL AND NOT templateid IN (SELECT graphid FROM graphs)
+UPDATE graphs SET templateid=NULL WHERE templateid IS NOT NULL AND templateid NOT IN (SELECT graphid FROM graphs)
 /
-UPDATE graphs SET ymin_itemid=NULL WHERE ymin_itemid=0 OR NOT ymin_itemid IN (SELECT itemid FROM items)
+UPDATE graphs SET ymin_itemid=NULL WHERE ymin_itemid=0 OR ymin_itemid NOT IN (SELECT itemid FROM items)
 /
-UPDATE graphs SET ymax_itemid=NULL WHERE ymax_itemid=0 OR NOT ymax_itemid IN (SELECT itemid FROM items)
+UPDATE graphs SET ymax_itemid=NULL WHERE ymax_itemid=0 OR ymax_itemid NOT IN (SELECT itemid FROM items)
 /
 UPDATE graphs SET ymin_type=0 WHERE ymin_type=2 AND ymin_itemid=NULL
 /

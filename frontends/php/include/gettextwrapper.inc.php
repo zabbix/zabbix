@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,28 +26,30 @@
  */
 
 
-if (!function_exists('_')){
+if(!function_exists('_')){
 	function _($string){
 		return $string;
 	}
 }
 
-if (!function_exists('gettext')){
+if(!function_exists('gettext')){
 	function gettext($string){
 		return $string;
 	}
 }
 
-if (!function_exists('ngettext')){
+if(!function_exists('ngettext')){
 	function ngettext($string1, $string2, $n){
 		return $n == 1 ? $string1 : $string2;
 	}
 }
 
+function _s($string){
+	$arguments = array_slice(func_get_args(), 1);
+	return vsprintf(_($string), $arguments);
+}
 
-
-
-
-
-
+function _n($string1, $string2, $value){
+	return sprintf(ngettext($string1, $string2, $value), $value);
+}
 ?>

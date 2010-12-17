@@ -30,7 +30,6 @@ private $css_class;
 private $pageHeaders;
 private $headers;
 private $flicker;
-private $items;
 
 	public function __construct($id=null,$body=null,$state=null){
 		if(is_null($id)){
@@ -85,23 +84,14 @@ private $items;
 	}
 
 	public function get(){
-//		$widget = new CTable();
-//		$widget->setAttribute('width','100%');
-//		$widget->setCellPadding(0);
-//		$widget->setCellSpacing(0);
-
 		$widget = array();
 
 		if(!empty($this->pageHeaders)){
-			$header_tab = $this->createPageHeader();
-//			$widget->addRow(new CCol($header_tab));
-			$widget[] = $header_tab;
+			$widget[] = $this->createPageHeader();
 		}
 
 		if(!empty($this->headers)){
-			$header_tab = $this->createHeader();
-//			$widget->addRow($header_tab);
-			$widget[] = $header_tab;
+			$widget[] = $this->createHeader();
 		}
 
 		if(is_null($this->state)){
@@ -140,17 +130,14 @@ private $items;
 
 			$flicker_tab->addRow($div);
 
-//			$widget->addRow($flicker_tab);
 			$widget[] = $flicker_tab;
 		}
 
-		$div = new CDiv($this->body);
+		$div = new CDiv($this->body, 'mainwidget');
 		$div->setAttribute('id',$this->domid);
-//		$div->setAttribute('style','width: 1180px; overflow: auto;');
 
 		if(!$this->state) $div->setAttribute('style','display: none;');
 
-//		$widget->addRow($div);
 		$widget[] = $div;
 
 	return $widget;
@@ -163,7 +150,6 @@ private $items;
 	public function toString(){
 		$tab = $this->get();
 
-//	return $tab->toString();
 	return unpack_object($tab);
 	}
 
@@ -174,16 +160,14 @@ private $items;
 			$pageHeader[] = $this->createPageHeaderRow($header['left'], $header['right']);
 		}
 
-		// $pageHeader[] = BR();
-
-	return $pageHeader;
+	return new CDiv($pageHeader, 'pageHeader');
 	}
 
 	private function createPageHeaderRow($col1, $col2=SPACE){
 		if(isset($_REQUEST['print'])){
 			hide_form_items($col1);
 			hide_form_items($col2);
-		//if empty header than do not show it
+//if empty header than do not show it
 			if(($col1 == SPACE) && ($col2 == SPACE)) return new CJSscript('');
 		}
 
@@ -202,11 +186,9 @@ private $items;
 		$right_tab = new CTable(null,'nowrap');
 		$right_tab->setAttribute('width','100%');
 
-//		$right_tab->addRow($right_row, 'textblackwhite');
 		$right_tab->addRow($right_row);
 
 		$table = new CTable(NULL,'header bottom_space');
-//		$table->setAttribute('border',0);
 		$table->setCellSpacing(0);
 		$table->setCellPadding(1);
 
@@ -219,8 +201,8 @@ private $items;
 	}
 
 	private function createHeader(){
-		$header = array_shift($this->headers);
-
+		$header = reset($this->headers);
+		//$header = array_shift($this->headers);
 
 		$td_l = new CCol(SPACE);
 		$td_l->setAttribute('width','100%');
@@ -257,10 +239,11 @@ private $items;
 		$header_tab->addRow($this->createHeaderRow($header['left'],$right_tab),'first');
 
 		foreach($this->headers as $num => $header){
+			if($num == 0) continue;
 			$header_tab->addRow($this->createHeaderRow($header['left'],$header['right']), 'next');
 		}
 
-	return $header_tab;
+	return new CDiv($header_tab, 'header');
 	}
 
 	private function createHeaderRow($col1, $col2=SPACE){
@@ -301,3 +284,89 @@ private $items;
 	return $table;
 	}
 }
+
+class CUIWidget extends CDiv{
+
+public $domid;
+public $state;
+public $css_class;
+
+private $header;
+private $body;
+private $footer;
+
+	public function __construct($id, $body=null, $state=null){
+		$this->domid = $id;
+		$this->state = $state;		// 0 - closed, 1 - opened
+
+		$this->css_class = 'header';
+
+		$this->header = null;
+		$this->body = array($body);
+		$this->footer = null;
+		
+		parent::__construct(null, 'ui-widget ui-widget-content ui-helper-clearfix ui-corner-all widget');
+		$this->setAttribute('id', $id.'_widget');
+	}
+
+	public function addItem($item){
+		if(!is_null($item)) $this->body[] = $item;
+	}
+
+	public function setHeader($caption=null, $icons = SPACE){
+		zbx_value2array($icons);
+
+		if(is_null($caption) && !is_null($icons)) $caption = SPACE;
+
+		$this->header = new CDiv(null, 'nowrap ui-corner-all ui-widget-header move '.$this->css_class);
+
+		if(!is_null($this->state)){
+			$icon = new CIcon(
+				S_SHOW.'/'.S_HIDE,
+				$this->state?'arrowup':'arrowdown',
+				"changeHatStateUI(this,'".$this->domid."');"
+			);
+			$icon->setAttribute('id',$this->domid.'_icon');
+			$this->header->addItem($icon);
+		}
+
+		$this->header->addItem($icons);
+		$this->header->addItem($caption);
+
+	return $this->header;
+	}
+
+	public function setFooter($footer, $right=false){
+		$this->footer = new CDiv($footer, 'nowrap ui-corner-all ui-widget-header footer '.($right?' right':' left'));
+
+	return $this->footer;
+	}
+
+	public function get(){
+		$this->cleanItems();
+		parent::addItem($this->header);
+
+		if(is_null($this->state)){
+			$this->state = true;
+		}
+		
+		$div = new CDiv($this->body, 'body');
+		$div->setAttribute('id',$this->domid);
+		
+		if(!$this->state){
+			$div->setAttribute('style','display: none;');
+			$this->footer->setAttribute('style','display: none;');
+		}
+
+		parent::addItem($div);
+		parent::addItem($this->footer);
+
+	return $this;
+	}
+
+	public function toString($destroy=true){
+		$this->get();
+	return parent::toString($destroy);
+	}
+}
+?>

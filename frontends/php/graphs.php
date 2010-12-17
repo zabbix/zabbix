@@ -105,7 +105,7 @@ include_once('include/page_header.php');
 	else if(get_request('hostid', 0) > 0){
 		$options = array(
 			'hostids' => $_REQUEST['hostid'],
-			'extendoutput' => 1,
+			'output' => API_OUTPUT_EXTEND,
 			'templated_hosts' => 1,
 			'editable' => 1
 		);
@@ -136,6 +136,7 @@ include_once('include/page_header.php');
 			$options = array(
 				'nodeids'=>get_current_nodeid(true),
 				'itemids'=>$itemids,
+				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 				'webitems'=>1,
 				'editable'=>1,
 			);
@@ -314,7 +315,7 @@ include_once('include/page_header.php');
 			DBstart();
 			foreach($_REQUEST['group_graphid'] as $gnum => $graph_id){
 				foreach($db_hosts as $hnum => $host){
-					$go_result &= (bool) copy_graph_to_host($graph_id, $host['hostid'], true);
+					$go_result &= (bool) copy_graph_to_host($graph_id, $host['hostid']);
 
 				}
 			}
@@ -353,8 +354,9 @@ include_once('include/page_header.php');
 
 // Config
 	if(!isset($_REQUEST['form'])){
+// removes form_refresh variable
 		$form->cleanItems();
-		$form->addItem(new CButton('form', S_CREATE_GRAPH));
+		$form->addItem(new CSubmit('form', S_CREATE_GRAPH));
 	}
 
 	show_table_header(S_CONFIGURATION_OF_GRAPHS_BIG,$form);
@@ -458,7 +460,7 @@ include_once('include/page_header.php');
 		$options = array(
 			'graphids' => $graphids,
 			'output' => API_OUTPUT_EXTEND,
-			'select_hosts' => API_OUTPUT_EXTEND,
+			'selectHosts' => API_OUTPUT_EXTEND,
 			'select_templates' => API_OUTPUT_EXTEND,
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 		);
@@ -493,10 +495,9 @@ include_once('include/page_header.php');
 				$name[] = new CLink($real_host['host'], 'graphs.php?'.'hostid='.$real_host['hostid'], 'unknown');
 				$name[] = ':'.$graph['name'];
 			}
-
-			if(!empty($graph['discoveryRule'])){
+			else if(!empty($graph['discoveryRule'])){
 				$name[] = new CLink($graph['discoveryRule']['description'], 'graph_prototypes.php?parent_discoveryid='.
-					$graph['discoveryRule']['itemid'],'discoveryName');
+						$graph['discoveryRule']['itemid'],'discoveryName');
 				$name[] = ':'.$graph['name'];
 			}
 			else{
@@ -505,7 +506,8 @@ include_once('include/page_header.php');
 
 
 			$chkBox = new CCheckBox('group_graphid['.$graphid.']', NULL, NULL, $graphid);
-			if($graph['templateid'] > 0) $chkBox->setEnabled(false);
+			if(($graph['templateid'] > 0) || !empty($graph['discoveryRule']))
+				$chkBox->setEnabled(false);
 
 			$table->addRow(array(
 				$chkBox,
@@ -526,7 +528,7 @@ include_once('include/page_header.php');
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
-		$goButton = new CButton('goButton',S_GO);
+		$goButton = new CSubmit('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "group_graphid";');

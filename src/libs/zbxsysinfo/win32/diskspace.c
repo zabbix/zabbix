@@ -45,16 +45,16 @@ int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	zbx_free(wpath);
 
 	if ('\0' == *mode || 0 == strcmp(mode, "total"))	/* default parameter */
-		SET_UI64_RESULT(result, totalBytes.QuadPart)
+		SET_UI64_RESULT(result, totalBytes.QuadPart);
 	else if (0 == strcmp(mode, "free"))
-		SET_UI64_RESULT(result, freeBytes.QuadPart)
+		SET_UI64_RESULT(result, freeBytes.QuadPart);
 	else if (0 == strcmp(mode, "used"))
-		SET_UI64_RESULT(result, totalBytes.QuadPart - freeBytes.QuadPart)
+		SET_UI64_RESULT(result, totalBytes.QuadPart - freeBytes.QuadPart);
 	else if (0 == strcmp(mode, "pfree"))
-		SET_DBL_RESULT(result, (double)(__int64)freeBytes.QuadPart * 100. / (double)(__int64)totalBytes.QuadPart)
+		SET_DBL_RESULT(result, (double)(__int64)freeBytes.QuadPart * 100. / (double)(__int64)totalBytes.QuadPart);
 	else if (0 == strcmp(mode, "pused"))
 		SET_DBL_RESULT(result, (double)((__int64)totalBytes.QuadPart - (__int64)freeBytes.QuadPart) * 100. /
-				(double)(__int64)totalBytes.QuadPart)
+				(double)(__int64)totalBytes.QuadPart);
 	else
 		return SYSINFO_RET_FAIL;
 
@@ -68,8 +68,6 @@ int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 	DWORD		dwSize;
 	size_t		sz;
 	struct zbx_json	j;
-
-	assert(result);
 
 	/* Make an initial call to GetLogicalDriveStrings to
 	   get the necessary size into the dwSize variable */

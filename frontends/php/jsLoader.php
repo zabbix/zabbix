@@ -17,16 +17,13 @@ $availableJScripts = array(
 	'common.js' => '',
 	'menu.js' => '',
 	'prototype.js' => '',
-	'builder.js' => 'scriptaculous/',
-	'controls.js' => 'scriptaculous/',
-	'dragdrop.js' => 'scriptaculous/',
-	'effects.js' => 'scriptaculous/',
-	'slider.js' => 'scriptaculous/',
-	'sound.js' => 'scriptaculous/',
+	'jquery.js' => 'jquery/',
+	'jquery-ui.js' => 'jquery/',
 	'gtlc.js' => '',
 	'functions.js' => '',
 	'main.js' => '',
 	'dom.js' => '',
+
 // classes
 	'class.bbcode.js' => '',
 	'class.calendar.js' => '',
@@ -44,7 +41,7 @@ $availableJScripts = array(
 	'class.pmaster.js' => '',
 	'class.cviewswitcher.js' => '',
 // templates
-	'sysmap.tpl.js' => 'templates/'
+	'sysmap.tpl.js' => 'templates/',
 );
 
 $tranStrings = array(
@@ -55,7 +52,6 @@ $tranStrings = array(
 		'S_EDIT_SERVICE', 'S_DELETE_SERVICE', 'S_DELETE_SELECTED_SERVICES_Q', 'S_CREATE_LOG_TRIGGER', 'S_DELETE',
 		'S_DELETE_KEYWORD_Q', 'S_DELETE_EXPRESSION_Q', 'S_SIMPLE_GRAPHS', 'S_HISTORY', 'S_HISTORY_AND_SIMPLE_GRAPHS'
 	),
-	'main.js' => array('S_CLOSE', 'S_NO_ELEMENTS_SELECTED'),
 	'class.calendar.js' => array('S_JANUARY', 'S_FEBRUARY', 'S_MARCH', 'S_APRIL', 'S_MAY', 'S_JUNE',
 		'S_JULY', 'S_AUGUST', 'S_SEPTEMBER', 'S_OCTOBER', 'S_NOVEMBER', 'S_DECEMBER', 'S_MONDAY_SHORT_BIG',
 		'S_TUESDAY_SHORT_BIG', 'S_WEDNESDAY_SHORT_BIG', 'S_THURSDAY_SHORT_BIG', 'S_FRIDAY_SHORT_BIG',
@@ -77,16 +73,17 @@ $tranStrings = array(
 	'class.cmessages.js' => array('S_MUTE','S_UNMUTE','S_MESSAGES','S_CLEAR','S_SNOOZE','S_MOVE'
 	),
 	'class.cookie.js' => array('S_MAX_COOKIE_SIZE_REACHED'
+	),
+	'main.js' => array('S_CLOSE', 'S_NO_ELEMENTS_SELECTED','S_INTERFACES',
 	)
 );
 
 if(empty($_GET['files'])){
 	$files = array(
 		'prototype.js',
-		'effects.js',
-		'dragdrop.js',
+		'jquery.js',
+		'jquery-ui.js',
 		'common.js',
-		'dom.js',
 		'class.cdebug.js',
 		'class.cdate.js',
 		'class.cookie.js',

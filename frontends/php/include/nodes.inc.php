@@ -103,7 +103,7 @@
 			if(isset($_REQUEST['select_nodes']))
 				// CProfile::update('web.nodes.selected', $ZBX_VIEWED_NODES['nodeids'], PROFILE_TYPE_ARRAY_ID);
 				update_node_profile($ZBX_VIEWED_NODES['nodeids']);
-			
+
 			if(isset($_REQUEST['switch_node']))
 				CProfile::update('web.nodes.switch_node', $ZBX_VIEWED_NODES['selected'], PROFILE_TYPE_ID);
 		}
@@ -152,10 +152,7 @@
 	}
 
 	function get_viewed_nodes($options=array()) {
-		global $USER_DETAILS;
-		global $ZBX_LOCALNODEID, $ZBX_AVAILABLE_NODES;
-
-		$config = select_config();
+		global $USER_DETAILS, $ZBX_LOCALNODEID;
 
 		$def_options = array(
 			'allow_all' => 0
@@ -176,7 +173,6 @@
 		$selected_nodeids = get_request('selected_nodes', get_node_profile(array($USER_DETAILS['node']['nodeid'])));
 
 // +++ Fill $result['NODEIDS'], $result['NODES'] +++
-		$nodes = array();
 		$nodeids = array();
 		foreach($selected_nodeids as $num => $nodeid) {
 			if(isset($available_nodes[$nodeid])) {
@@ -221,7 +217,7 @@
 	}
 
 	function getNodeIdByNodeName($nodeName){
-		global $ZBX_NODES, $ZBX_LOCALNODEID;
+		global $ZBX_NODES;
 
 		foreach($ZBX_NODES as $nodeid => $node){
 			if($node['name'] == $nodeName) return $nodeid;

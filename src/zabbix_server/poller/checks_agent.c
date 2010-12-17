@@ -46,14 +46,13 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 {
 	const char	*__function_name = "get_value_agent";
 	zbx_sock_t	s;
-	char		*buf, buffer[MAX_STRING_LEN], *conn;
+	char		*buf, buffer[MAX_STRING_LEN];
 	int		ret = SUCCEED;
 
-	conn = item->host.useip == 1 ? item->host.ip : item->host.dns;
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' key:'%s'",
-			__function_name, item->host.host, conn, item->key_orig);
+			__function_name, item->host.host, item->interface.addr, item->key_orig);
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, conn, item->host.port, 0)))
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, item->interface.addr, item->interface.port, 0)))
 	{
 		zbx_snprintf(buffer, sizeof(buffer), "%s\n", item->key);
 		zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", buffer);
@@ -86,7 +85,7 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 		{
 			zbx_snprintf(buffer, sizeof(buffer), "Got empty string from [%s]."
 					" Assuming that agent dropped connection because of access permissions",
-					conn);
+					item->interface.addr);
 			SET_MSG_RESULT(result, strdup(buffer));
 			ret = NETWORK_ERROR;
 		}

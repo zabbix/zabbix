@@ -177,7 +177,7 @@ static struct snmp_session	*snmp_open_session(DC_ITEM *item, char *err)
 {
 	const char		*__function_name = "snmp_open_session";
 	struct snmp_session	session, *ss = NULL;
-	char			addr[128], *conn;
+	char			addr[128];
 #ifdef HAVE_IPV6
 	int			family;
 #endif	/* HAVE_IPV6 */
@@ -194,21 +194,19 @@ static struct snmp_session	*snmp_open_session(DC_ITEM *item, char *err)
 		default:		THIS_SHOULD_NEVER_HAPPEN;		break;
 	}
 
-	conn = item->host.useip == 1 ? item->host.ip : item->host.dns;
-
 #ifdef HAVE_IPV6
-	if (SUCCEED != get_address_family(conn, &family, err, MAX_STRING_LEN))
+	if (SUCCEED != get_address_family(item->interface.addr, &family, err, MAX_STRING_LEN))
 		goto end;
 
 	if (family == PF_INET)
-		zbx_snprintf(addr, sizeof(addr), "%s:%d", conn, item->snmp_port);
+		zbx_snprintf(addr, sizeof(addr), "%s:%d", item->interface.addr, (int)item->interface.port);
 	else
-		zbx_snprintf(addr, sizeof(addr), "udp6:[%s]:%d", conn, item->snmp_port);
+		zbx_snprintf(addr, sizeof(addr), "udp6:[%s]:%d", item->interface.addr, (int)item->interface.port);
 #else
-	zbx_snprintf(addr, sizeof(addr), "%s:%d", conn, item->snmp_port);
+	zbx_snprintf(addr, sizeof(addr), "%s:%d", item->interface.addr, (int)item->interface.port);
 #endif	/* HAVE_IPV6 */
 	session.peername = addr;
-	session.remote_port = item->snmp_port;	/* remote_port is no longer used in latest versions of NET-SNMP */
+	session.remote_port = item->interface.port;	/* remote_port is no longer used in latest versions of NET-SNMP */
 
 	if (session.version == SNMP_VERSION_1 || session.version == SNMP_VERSION_2c)
 	{
@@ -351,7 +349,7 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM *item, char *OID, cha
 	size_t	anOID_len = MAX_OID_LEN;
 	size_t	rootOID_len = MAX_OID_LEN;
 
-	char	temp[MAX_STRING_LEN], *conn;
+	char	temp[MAX_STRING_LEN];
 	char	strval[MAX_STRING_LEN];
 
 	struct variable_list	*vars;
@@ -451,9 +449,8 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM *item, char *OID, cha
 			}
 			else if (status == STAT_TIMEOUT)
 			{
-				conn = item->host.useip == 1 ? item->host.ip : item->host.dns;
 				zbx_snprintf(err, MAX_STRING_LEN, "Timeout while connecting to [%s:%d]",
-						conn, item->snmp_port);
+						item->interface.addr, (int)item->interface.port);
 				running = 0;
 				ret = NETWORK_ERROR;
 			}
@@ -521,18 +518,18 @@ static int	snmp_set_value(const char *snmp_oid, struct variable_list *vars, DC_I
 	{
 		/* Negative integer values are converted to double */
 		if (*vars->val.integer < 0)
-			SET_DBL_RESULT(value, (double)*vars->val.integer)
+			SET_DBL_RESULT(value, (double)*vars->val.integer);
 		else
-			SET_UI64_RESULT(value, (zbx_uint64_t)*vars->val.integer)
+			SET_UI64_RESULT(value, (zbx_uint64_t)*vars->val.integer);
 	}
 #ifdef OPAQUE_SPECIAL_TYPES
 	else if (vars->type == ASN_FLOAT)
 	{
-		SET_DBL_RESULT(value, *vars->val.floatVal)
+		SET_DBL_RESULT(value, *vars->val.floatVal);
 	}
 	else if (vars->type == ASN_DOUBLE)
 	{
-		SET_DBL_RESULT(value, *vars->val.doubleVal)
+		SET_DBL_RESULT(value, *vars->val.doubleVal);
 	}
 #endif
 	else if (vars->type == ASN_IPADDRESS)
@@ -541,7 +538,7 @@ static int	snmp_set_value(const char *snmp_oid, struct variable_list *vars, DC_I
 				vars->val.string[0],
 				vars->val.string[1],
 				vars->val.string[2],
-				vars->val.string[3]))
+				vars->val.string[3]));
 	}
 	else
 	{
@@ -583,7 +580,7 @@ static int	snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID, AG
 	struct snmp_pdu		*pdu, *response;
 	oid			anOID[MAX_OID_LEN], rootOID[MAX_OID_LEN];
 	size_t			anOID_len = MAX_OID_LEN, rootOID_len = MAX_OID_LEN;
-	char			snmp_oid[MAX_STRING_LEN], *conn, *p;
+	char			snmp_oid[MAX_STRING_LEN], *p;
 	struct variable_list	*vars;
 	int			status, running, ret = SUCCEED;
 	struct zbx_json		j;
@@ -688,9 +685,8 @@ static int	snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID, AG
 			}
 			else if (status == STAT_TIMEOUT)
 			{
-				conn = item->host.useip == 1 ? item->host.ip : item->host.dns;
 				SET_MSG_RESULT(value, zbx_dsprintf(NULL, "Timeout while connecting to [%s:%d]",
-						conn, item->snmp_port));
+						item->interface.addr, (int)item->interface.port));
 				ret = NETWORK_ERROR;
 				running = 0;
 			}
@@ -724,7 +720,6 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGEN
 	const char		*__function_name = "get_snmp";
 
 	struct snmp_pdu		*pdu, *response;
-	char			*conn;
 	oid			anOID[MAX_OID_LEN];
 	size_t			anOID_len = MAX_OID_LEN;
 	struct variable_list	*vars;
@@ -760,9 +755,8 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGEN
 		}
 		else if (status == STAT_TIMEOUT)
 		{
-			conn = item->host.useip == 1 ? item->host.ip : item->host.dns;
 			SET_MSG_RESULT(value, zbx_dsprintf(NULL, "Timeout while connecting to [%s:%d]",
-					conn, item->snmp_port));
+					item->interface.addr, (int)item->interface.port));
 			ret = NETWORK_ERROR;
 		}
 		else

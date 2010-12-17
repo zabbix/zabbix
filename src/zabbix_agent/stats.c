@@ -62,7 +62,7 @@ ZBX_COLLECTOR_DATA	*collector = NULL;
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_get_cpu_num(void)
+static int	zbx_get_cpu_num()
 {
 #if defined(_WINDOWS)
 	SYSTEM_INFO	sysInfo;
@@ -152,7 +152,7 @@ return_one:
  * Comments: Linux version allocates memory as shared.                        *
  *                                                                            *
  ******************************************************************************/
-void	init_collector_data(void)
+void	init_collector_data()
 {
 	int	cpu_count;
 	size_t	sz, sz_cpu;
@@ -242,7 +242,7 @@ lbl_create:
  * Comments: Linux version allocates memory as shared.                        *
  *                                                                            *
  ******************************************************************************/
-void	free_collector_data(void)
+void	free_collector_data()
 {
 
 #if defined (_WINDOWS)
@@ -254,7 +254,8 @@ void	free_collector_data(void)
 	key_t	shm_key;
 	int	shm_id;
 
-	if(NULL == collector) return;
+	if (NULL == collector)
+		return;
 
 	ZBX_GET_SHM_KEY(shm_key);
 
@@ -294,6 +295,8 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 
 	if (0 != init_cpu_collector(&(collector->cpus)))
 		close_cpu_collector(&(collector->cpus));
+
+	collector_diskdevice_add("");
 
 	while (ZBX_IS_RUNNING())
 	{

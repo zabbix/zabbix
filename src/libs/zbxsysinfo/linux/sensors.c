@@ -18,103 +18,148 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
 
-#include "md5.h"
+#ifdef KERNEL_2_4
 
-static int	get_sensor(const char *name, unsigned flags, AGENT_RESULT *result)
+#define DO_ONE	0
+#define DO_AVG	1
+#define DO_MAX	2
+#define DO_MIN	3
+
+#define DEVICE_DIR	"/proc/sys/dev/sensors"
+
+static void	count_sensor(int do_task, const char *filename, double *aggr, int *cnt)
 {
-	DIR	*dir;
-	struct	dirent *entries;
-	struct	stat buf;
-	char	filename[MAX_STRING_LEN];
-	char	line[MAX_STRING_LEN];
-	double	d1,d2,d3;
-
 	FILE	*f;
+	char	line[MAX_STRING_LEN];
+	double	value;
 
-	assert(result);
+	if (NULL == (f = fopen(filename, "r")))
+		return;
 
-	init_result(result);
-
-	dir=opendir("/proc/sys/dev/sensors");
-	if(NULL == dir)
+	if (NULL == fgets(line, sizeof(line), f))
 	{
-		return SYSINFO_RET_FAIL;
+		zbx_fclose(f);
+		return;
 	}
 
-	while((entries=readdir(dir))!=NULL)
+	zbx_fclose(f);
+
+	if (1 == sscanf(line, "%*lf\t%*lf\t%lf\n", &value))
 	{
-		strscpy(filename,"/proc/sys/dev/sensors/");
-		zbx_strlcat(filename,entries->d_name,MAX_STRING_LEN);
-		zbx_strlcat(filename,name,MAX_STRING_LEN);
+		(*cnt)++;
 
-		if(stat(filename,&buf)==0)
+		switch (do_task)
 		{
-			if( NULL == (f = fopen(filename,"r") ))
-			{
-				continue;
-			}
-			if(NULL == fgets(line,MAX_STRING_LEN,f))
-			{
-				zbx_fclose(f);
-				continue;
-			}
-			zbx_fclose(f);
-
-			if(sscanf(line,"%lf\t%lf\t%lf\n",&d1, &d2, &d3) == 3)
-			{
-				closedir(dir);
-				SET_DBL_RESULT(result, d3);
-				return  SYSINFO_RET_OK;
-			}
-			else
-			{
-				closedir(dir);
-				return  SYSINFO_RET_FAIL;
-			}
+			case DO_ONE:
+				*aggr = value;
+				break;
+			case DO_AVG:
+				*aggr += value;
+				break;
+			case DO_MAX:
+				*aggr = (1 == *cnt ? value : MAX(*aggr, value));
+				break;
+			case DO_MIN:
+				*aggr = (1 == *cnt ? value : MIN(*aggr, value));
+				break;
 		}
 	}
-	closedir(dir);
-	return	SYSINFO_RET_FAIL;
 }
 
-int     OLD_SENSOR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static void	get_device_sensors(int do_task, const char *device, const char *name, double *aggr, int *cnt)
 {
-	char	key[MAX_STRING_LEN];
-	int	ret;
+	char	sensorname[MAX_STRING_LEN];
 
-	assert(result);
-
-	init_result(result);
-
-	if(num_param(param) > 1)
+	if (DO_ONE == do_task)
 	{
-		return SYSINFO_RET_FAIL;
-	}
-
-	if(get_param(param, 1, key, MAX_STRING_LEN) != 0)
-	{
-		return SYSINFO_RET_FAIL;
-	}
-
-	if(strcmp(key,"temp1") == 0)
-	{
-	ret = get_sensor("temp1", flags, result);
-	}
-	else if(strcmp(key,"temp2") == 0)
-	{
-	ret = get_sensor("temp2", flags, result);
-	}
-	else if(strcmp(key,"temp3") == 0)
-	{
-	ret = get_sensor("temp3", flags, result);
+		zbx_snprintf(sensorname, sizeof(sensorname), "%s/%s/%s", DEVICE_DIR, device, name);
+		count_sensor(do_task, sensorname, aggr, cnt);
 	}
 	else
 	{
-	ret = SYSINFO_RET_FAIL;
-	}
+		DIR		*devicedir = NULL, *sensordir = NULL;
+		struct dirent	*deviceent, *sensorent;
+		char		devicename[MAX_STRING_LEN];
 
-	return ret;
+		if (NULL == (devicedir = opendir(DEVICE_DIR)))
+			return;
+
+		while (NULL != (deviceent = readdir(devicedir)))
+		{
+			if (0 == strcmp(deviceent->d_name, ".") || 0 == strcmp(deviceent->d_name, ".."))
+				continue;
+
+			if (NULL == zbx_regexp_match(deviceent->d_name, device, NULL))
+				continue;
+
+			zbx_snprintf(devicename, sizeof(devicename), "%s/%s", DEVICE_DIR, deviceent->d_name);
+
+			if (NULL == (sensordir = opendir(devicename)))
+				continue;
+
+			while (NULL != (sensorent = readdir(sensordir)))
+			{
+				if (0 == strcmp(sensorent->d_name, ".") || 0 == strcmp(sensorent->d_name, ".."))
+					continue;
+
+				if (NULL == zbx_regexp_match(sensorent->d_name, name, NULL))
+					continue;
+
+				zbx_snprintf(sensorname, sizeof(sensorname), "%s/%s", devicename, sensorent->d_name);
+				count_sensor(do_task, sensorname, aggr, cnt);
+			}
+			closedir(sensordir);
+		}
+		closedir(devicedir);
+	}
 }
+
+int	GET_SENSOR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	char	device[MAX_STRING_LEN], name[MAX_STRING_LEN], function[8];
+	int	do_task, cnt = 0;
+	double	aggr = 0;
+
+	if (num_param(param) > 3)
+		return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 1, device, sizeof(device)))
+		return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 2, name, sizeof(name)))
+		return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 3, function, sizeof(function)))
+		do_task = DO_ONE;
+	else if (0 == strcmp(function, "avg"))
+		do_task = DO_AVG;
+	else if (0 == strcmp(function, "max"))
+		do_task = DO_MAX;
+	else if (0 == strcmp(function, "min"))
+		do_task = DO_MIN;
+	else
+		return SYSINFO_RET_FAIL;
+
+	get_device_sensors(do_task, device, name, &aggr, &cnt);
+
+	if (0 == cnt)
+		return SYSINFO_RET_FAIL;
+
+	if (DO_AVG == do_task)
+		SET_DBL_RESULT(result, aggr / cnt);
+	else
+		SET_DBL_RESULT(result, aggr);
+
+	return SYSINFO_RET_OK;
+}
+
+#else
+
+int	GET_SENSOR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	return SYSINFO_RET_FAIL;
+}
+
+#endif	/* KERNEL_2_4 */

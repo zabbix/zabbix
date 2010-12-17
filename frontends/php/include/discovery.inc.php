@@ -19,7 +19,6 @@
 **/
 ?>
 <?php
-
 	require_once('include/perm.inc.php');
 
 
@@ -174,11 +173,10 @@
 			' values ('.$druleid.','.zero2null($proxy_hostid).','.zbx_dbstr($name).','.zbx_dbstr($iprange).','.$delay.','.$status.')');
 
 		if($result && isset($dchecks)){
-			$unique_dcheckid = 0;
 			foreach($dchecks as $id => $data){
 				$data['dcheckid'] = add_discovery_check($druleid, $data['type'], $data['ports'], $data['key'],
 						$data['snmp_community'], $data['snmpv3_securityname'], $data['snmpv3_securitylevel'],
-						$data['snmpv3_authpassphrase'], $data['snmpv3_privpassphrase'], 
+						$data['snmpv3_authpassphrase'], $data['snmpv3_privpassphrase'],
 						($uniqueness_criteria == $id) ? 1 : 0);
 			}
 			$result = $druleid;
@@ -207,7 +205,7 @@
 				if($uniqueness_criteria == $id && $data['dcheckid'])
 					$unique_dcheckid = $data['dcheckid'];
 			}
-			
+
 			$sql = 'UPDATE dchecks SET uniq=0 WHERE druleid='.$druleid;
 			DBexecute($sql);
 

@@ -59,7 +59,7 @@ include_once('include/page_header.php');
 					'nodeids' => get_current_nodeid(true),
 					'triggerids'=> $_REQUEST['linktriggers'],
 					'editable'=> 1,
-					'select_hosts' => array('hostid', 'host'),
+					'selectHosts' => array('hostid', 'host'),
 					'output' => API_OUTPUT_EXTEND
 				);
 
@@ -106,7 +106,7 @@ include_once('include/page_header.php');
 					'nodeids' => get_current_nodeid(true),
 					'triggerids'=> $_REQUEST['linktriggers'],
 					'editable'=> 1,
-					'select_hosts' => array('hostid', 'host'),
+					'selectHosts' => array('hostid', 'host'),
 					'output' => API_OUTPUT_EXTEND
 				);
 
@@ -140,9 +140,8 @@ include_once('include/page_header.php');
 				'&multiselect=1'.
 				"&writeonly=1');",
 				'T');
-		$btnSelect->setType('button');
 
-		$btnRemove = new CButton('remove', S_REMOVE);
+		$btnRemove = new CSubmit('remove', S_REMOVE);
 
 // END preparation
 
@@ -161,7 +160,7 @@ include_once('include/page_header.php');
 		$frmCnct->addRow(S_TYPE.' ('.S_PROBLEM_BIG.')', $cmbType);
 		$frmCnct->addRow(S_COLOR.' ('.S_PROBLEM_BIG.')', new CColor('color', $color));
 
-		$frmCnct->addItemToBottomRow(new CButton('save', (isset($_REQUEST['triggerid'])) ? S_SAVE : S_ADD));
+		$frmCnct->addItemToBottomRow(new CSubmit('save', (isset($_REQUEST['triggerid'])) ? S_SAVE : S_ADD));
 		$frmCnct->addItemToBottomRow(SPACE);
 		$frmCnct->addItemToBottomRow(new CButton('cancel', S_CANCEL, 'javascript: window.close();'));
 

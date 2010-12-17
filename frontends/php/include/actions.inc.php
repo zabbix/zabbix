@@ -170,7 +170,7 @@ function condition_value2str($conditiontype, $value){
 				'triggerids' => $value,
 				'expandTriggerDescriptions' => true,
 				'output' => API_OUTPUT_EXTEND,
-				'select_hosts' => API_OUTPUT_EXTEND,
+				'selectHosts' => API_OUTPUT_EXTEND,
 				'nodeids' => get_current_nodeid(true),
 			));
 			$trig = reset($trig);
@@ -580,8 +580,6 @@ function	update_action_status($actionid, $status)
 }
 
 function validate_condition($conditiontype, $value){
-	global $USER_DETAILS;
-
 	switch($conditiontype){
 		case CONDITION_TYPE_HOST_GROUP:
 			$groups = CHostGroup::get(array(
@@ -1057,15 +1055,12 @@ function get_actions_hint_by_eventid($eventid,$status=NULL){
 
 		if($row["status"] == ALERT_STATUS_SENT){
 			$status=new CSpan(S_SENT,"green");
-			$retries=new CSpan(SPACE,"green");
 		}
 		else if($row["status"] == ALERT_STATUS_NOT_SENT){
 			$status=new CSpan(S_IN_PROGRESS,"orange");
-			$retries=new CSpan(ALERT_MAX_RETRIES - $row["retries"],"orange");
 		}
 		else{
 			$status=new CSpan(S_NOT_SENT,"red");
-			$retries=new CSpan(0,"red");
 		}
 
 		switch($row['alerttype']){

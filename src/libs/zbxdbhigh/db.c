@@ -51,7 +51,7 @@ void	DBclose()
  * Connect to the database.
  * If fails, program terminates.
  */
-void    DBconnect(int flag)
+void	DBconnect(int flag)
 {
 	int	err;
 
@@ -59,7 +59,7 @@ void    DBconnect(int flag)
 	do
 	{
 		err = zbx_db_connect(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD,
-					CONFIG_DBNAME, CONFIG_DBSOCKET, CONFIG_DBPORT);
+					CONFIG_DBNAME, CONFIG_DBSCHEMA, CONFIG_DBSOCKET, CONFIG_DBPORT);
 
 		switch(err) {
 		case ZBX_DB_OK:
@@ -102,7 +102,7 @@ void    DBconnect(int flag)
  ******************************************************************************/
 void	DBinit()
 {
-	zbx_db_init(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME, CONFIG_DBSOCKET, CONFIG_DBPORT);
+	zbx_db_init(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME, CONFIG_DBSCHEMA, CONFIG_DBSOCKET, CONFIG_DBPORT);
 }
 
 /******************************************************************************
@@ -124,7 +124,8 @@ int	DBping()
 {
 	int ret;
 
-	ret = (ZBX_DB_OK != zbx_db_connect(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME, CONFIG_DBSOCKET, CONFIG_DBPORT)) ? FAIL : SUCCEED;
+	ret = (ZBX_DB_OK != zbx_db_connect(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD,
+				CONFIG_DBNAME, CONFIG_DBSCHEMA, CONFIG_DBSOCKET, CONFIG_DBPORT)) ? FAIL : SUCCEED;
 	DBclose();
 
 	return ret;
@@ -1114,7 +1115,7 @@ int	DBget_escape_string_len(const char *src)
  *           and 'DBdyn_escape_string_len'                                    *
  *                                                                            *
  ******************************************************************************/
-void    DBescape_string(const char *src, char *dst, int len)
+void	DBescape_string(const char *src, char *dst, int len)
 {
 	const char	*s;
 	char		*d;
@@ -1347,7 +1348,7 @@ char	*DBdyn_escape_like_pattern(const char *src)
 {
 	int	len;
 	char	*dst = NULL;
-	
+
 	len = DBget_escape_like_pattern_len(src);
 
 	dst = zbx_malloc(dst, len);
@@ -1359,98 +1360,83 @@ char	*DBdyn_escape_like_pattern(const char *src)
 
 void	DBget_item_from_db(DB_ITEM *item, DB_ROW row)
 {
-	static char	*key = NULL;
-
 	ZBX_STR2UINT64(item->itemid, row[0]);
 	item->key			= row[1];
-	item->key_orig			= row[1];
 	item->host_name			= row[2];
-	item->port			= atoi(row[3]);
-	item->delay			= atoi(row[4]);
-	item->description		= row[5];
-	item->type			= atoi(row[6]);
-	item->useip			= atoi(row[7]);
-	item->host_ip			= row[8];
-	item->history			= atoi(row[9]);
-	item->trends			= atoi(row[23]);
-	item->value_type		= atoi(row[13]);
+	item->type			= atoi(row[3]);
+	item->history			= atoi(row[4]);
+	item->trends			= atoi(row[17]);
+	item->value_type		= atoi(row[8]);
 
-	if (SUCCEED == DBis_null(row[10]))
+	if (SUCCEED == DBis_null(row[5]))
 		item->lastvalue_null = 1;
 	else
 	{
 		item->lastvalue_null = 0;
 		switch (item->value_type) {
 		case ITEM_VALUE_TYPE_FLOAT:
-			item->lastvalue_dbl = atof(row[10]);
+			item->lastvalue_dbl = atof(row[5]);
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
-			ZBX_STR2UINT64(item->lastvalue_uint64, row[10]);
+			ZBX_STR2UINT64(item->lastvalue_uint64, row[5]);
 			break;
 		default:
-			item->lastvalue_str = row[10];
+			item->lastvalue_str = row[5];
 			break;
 		}
 	}
 
-	if (SUCCEED == DBis_null(row[11]))
+	if (SUCCEED == DBis_null(row[6]))
 		item->prevvalue_null = 1;
 	else
 	{
 		item->prevvalue_null = 0;
 		switch (item->value_type) {
 		case ITEM_VALUE_TYPE_FLOAT:
-			item->prevvalue_dbl = atof(row[11]);
+			item->prevvalue_dbl = atof(row[6]);
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
-			ZBX_STR2UINT64(item->prevvalue_uint64, row[11]);
+			ZBX_STR2UINT64(item->prevvalue_uint64, row[6]);
 			break;
 		default:
-			item->prevvalue_str = row[11];
+			item->prevvalue_str = row[6];
 			break;
 		}
 	}
 
-	ZBX_STR2UINT64(item->hostid, row[12]);
-	item->delta			= atoi(row[14]);
+	ZBX_STR2UINT64(item->hostid, row[7]);
+	item->delta			= atoi(row[9]);
 
-	if (SUCCEED == DBis_null(row[15]))
+	if (SUCCEED == DBis_null(row[10]))
 		item->prevorgvalue_null = 1;
 	else
 	{
 		item->prevorgvalue_null = 0;
 		switch (item->value_type) {
 		case ITEM_VALUE_TYPE_FLOAT:
-			item->prevorgvalue_dbl = atof(row[15]);
+			item->prevorgvalue_dbl = atof(row[10]);
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
-			ZBX_STR2UINT64(item->prevorgvalue_uint64, row[15]);
+			ZBX_STR2UINT64(item->prevorgvalue_uint64, row[10]);
 			break;
 		default:
-			item->prevorgvalue_str = row[15];
+			item->prevorgvalue_str = row[10];
 			break;
 		}
 	}
 
-	if (SUCCEED == DBis_null(row[16]))
+	if (SUCCEED == DBis_null(row[11]))
 		item->lastclock = 0;
 	else
-		item->lastclock = atoi(row[16]);
+		item->lastclock = atoi(row[11]);
 
-	item->units			= row[17];
-	item->multiplier		= atoi(row[18]);
-	item->formula			= row[19];
-	item->status			= atoi(row[20]);
-	ZBX_DBROW2UINT64(item->valuemapid, row[21]);
-	item->host_dns			= row[22];
+	item->units			= row[12];
+	item->multiplier		= atoi(row[13]);
+	item->formula			= row[14];
+	item->status			= atoi(row[15]);
+	ZBX_DBROW2UINT64(item->valuemapid, row[16]);
 
-	item->lastlogsize		= atoi(row[24]);
-	item->data_type			= atoi(row[25]);
-	item->mtime			= atoi(row[26]);
-
-	key = zbx_dsprintf(key, "%s", item->key_orig);
-	substitute_simple_macros(NULL, item, NULL, NULL, NULL, &key, MACRO_TYPE_ITEM_KEY, NULL, 0);
-	item->key = key;
+	item->data_type			= atoi(row[18]);
 }
 
 const ZBX_TABLE *DBget_table(const char *tablename)
@@ -1791,7 +1777,6 @@ char	*zbx_user_string(zbx_uint64_t userid)
 	return buf_string;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_host_key_function_string                                     *
@@ -1883,54 +1868,73 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 	DB_ROW		row;
 	DB_EVENT	event;
 	zbx_uint64_t	autoreg_hostid;
+	int		res = SUCCEED;
 
 	host_esc = DBdyn_escape_string_len(host, HOST_HOST_LEN);
-	ip_esc = DBdyn_escape_string_len(ip, HOST_IP_LEN);
+	ip_esc = DBdyn_escape_string_len(ip, INTERFACE_IP_LEN);
 
-	result = DBselect(
-			"select autoreg_hostid"
-			" from autoreg_host"
-			" where proxy_hostid%s"
-				" and host='%s'"
-				DB_NODE,
-			DBsql_id_cmp(proxy_hostid),
-			host_esc,
-			DBnode_local("autoreg_hostid"));
-
-	if (NULL != (row = DBfetch(result)))
+	if (0 != proxy_hostid)
 	{
-		ZBX_STR2UINT64(autoreg_hostid, row[0]);
+		result = DBselect(
+				"select hostid"
+				" from hosts"
+				" where proxy_hostid%s"
+					" and host='%s'"
+					DB_NODE,
+				DBsql_id_cmp(proxy_hostid), host_esc,
+				DBnode_local("hostid"));
 
-		DBexecute("update autoreg_host"
-				" set listen_ip='%s',listen_port=%d"
-				" where autoreg_hostid=" ZBX_FS_UI64,
-				ip_esc, (int)port, autoreg_hostid);
+		if (NULL != DBfetch(result))
+			res = FAIL;
+		DBfree_result(result);
 	}
-	else
+
+	if (SUCCEED == res)
 	{
-		autoreg_hostid = DBget_maxid("autoreg_host");
-		DBexecute("insert into autoreg_host"
-				" (autoreg_hostid,proxy_hostid,host,listen_ip,listen_port)"
-				" values"
-				" (" ZBX_FS_UI64 ",%s,'%s','%s',%d)",
-				autoreg_hostid, DBsql_id_ins(proxy_hostid),
-				host_esc, ip_esc, (int)port);
+		result = DBselect(
+				"select autoreg_hostid"
+				" from autoreg_host"
+				" where proxy_hostid%s"
+					" and host='%s'"
+					DB_NODE,
+				DBsql_id_cmp(proxy_hostid), host_esc,
+				DBnode_local("autoreg_hostid"));
+
+		if (NULL != (row = DBfetch(result)))
+		{
+			ZBX_STR2UINT64(autoreg_hostid, row[0]);
+
+			DBexecute("update autoreg_host"
+					" set listen_ip='%s',listen_port=%d"
+					" where autoreg_hostid=" ZBX_FS_UI64,
+					ip_esc, (int)port, autoreg_hostid);
+		}
+		else
+		{
+			autoreg_hostid = DBget_maxid("autoreg_host");
+			DBexecute("insert into autoreg_host"
+					" (autoreg_hostid,proxy_hostid,host,listen_ip,listen_port)"
+					" values"
+					" (" ZBX_FS_UI64 ",'%s','%s','%s',%d)",
+					autoreg_hostid, DBsql_id_ins(proxy_hostid),
+					host_esc, ip_esc, (int)port);
+		}
+		DBfree_result(result);
+
+		/* Preparing auto registration event for processing */
+		memset(&event, 0, sizeof(DB_EVENT));
+		event.source	= EVENT_SOURCE_AUTO_REGISTRATION;
+		event.object	= EVENT_OBJECT_ZABBIX_ACTIVE;
+		event.objectid	= autoreg_hostid;
+		event.clock	= now;
+		event.value	= TRIGGER_VALUE_TRUE;
+
+		/* Processing event */
+		process_event(&event, 1);
 	}
-	DBfree_result(result);
 
 	zbx_free(ip_esc);
 	zbx_free(host_esc);
-
-	/* Preparing auto registration event for processing */
-	memset(&event, 0, sizeof(DB_EVENT));
-	event.source	= EVENT_SOURCE_AUTO_REGISTRATION;
-	event.object	= EVENT_OBJECT_ZABBIX_ACTIVE;
-	event.objectid	= autoreg_hostid;
-	event.clock	= now;
-	event.value	= TRIGGER_VALUE_TRUE;
-
-	/* Processing event */
-	process_event(&event, 1);
 }
 
 /******************************************************************************
@@ -1953,7 +1957,7 @@ void	DBproxy_register_host(const char *host, const char *ip, unsigned short port
 	char	*host_esc, *ip_esc;
 
 	host_esc = DBdyn_escape_string_len(host, HOST_HOST_LEN);
-	ip_esc = DBdyn_escape_string_len(ip, HOST_IP_LEN);
+	ip_esc = DBdyn_escape_string_len(ip, INTERFACE_IP_LEN);
 
 	DBexecute("insert into proxy_autoreg_host"
 			" (clock,host,listen_ip,listen_port)"
@@ -2037,7 +2041,7 @@ char	*DBget_unique_hostname_by_sample(char *host_name_sample)
 			"select host"
 			" from hosts"
 			" where host like '%s%%' escape '%c'"
-		                 DB_NODE
+				DB_NODE
 			" group by host",
 			host_name_sample_esc,
 			ZBX_SQL_LIKE_ESCAPE_CHAR,

@@ -182,7 +182,18 @@ typedef enum
 	ITEM_TYPE_SSH,
 	ITEM_TYPE_TELNET,
 	ITEM_TYPE_CALCULATED
-} zbx_item_type_t;
+}
+zbx_item_type_t;
+
+typedef enum
+{
+	INTERFACE_TYPE_UNKNOWN = 0,
+	INTERFACE_TYPE_AGENT,
+	INTERFACE_TYPE_SNMP,
+	INTERFACE_TYPE_IPMI
+}
+zbx_interface_type_t;
+const char	*zbx_interface_type_string(zbx_interface_type_t type);
 
 #define ZBX_FLAG_DISCOVERY		0x01	/* low-level discovery rule */
 #define ZBX_FLAG_DISCOVERY_CHILD	0x02	/* low-level discovery proto-item, proto-trigger or proto-graph */
@@ -216,7 +227,7 @@ typedef enum
 
 typedef enum
 {
-	DOBJECT_STATUS_UP	= 0,
+	DOBJECT_STATUS_UP = 0,
 	DOBJECT_STATUS_DOWN,
 	DOBJECT_STATUS_DISCOVER,
 	DOBJECT_STATUS_LOST
@@ -654,11 +665,13 @@ const char	*zbx_nodetype_string(unsigned char nodetype);
 #define strscpy(x, y)		zbx_strlcpy(x, y, sizeof(x))
 #define strnscpy(x, y, n)	zbx_strlcpy(x, y, n);
 
-#define zbx_malloc(old, size)	zbx_malloc2(__FILE__, __LINE__, old , size)
-#define zbx_realloc(old, size)	zbx_realloc2(__FILE__, __LINE__, old , size)
+#define zbx_malloc(old, size)	zbx_malloc2(__FILE__, __LINE__, old, size)
+#define zbx_realloc(src, size)	zbx_realloc2(__FILE__, __LINE__, src, size)
+#define zbx_strdup(old, str)	zbx_strdup2(__FILE__, __LINE__, old, str)
 
 void    *zbx_malloc2(const char *filename, int line, void *old, size_t size);
 void    *zbx_realloc2(const char *filename, int line, void *src, size_t size);
+char    *zbx_strdup2(const char *filename, int line, char *old, const char *str);
 
 #define zbx_free(ptr)		\
 	if (ptr)		\
@@ -771,7 +784,7 @@ int	zbx_pg_escape_bytea(const u_char *input, int ilen, char **output, int *olen)
 int	zbx_pg_unescape_bytea(u_char *io);
 #endif
 int	zbx_get_next_field(const char **line, char **output, int *olen, char separator);
-int	str_in_list(const char *list, const char *value, const char delimiter);
+int	str_in_list(const char *list, const char *value, char delimiter);
 
 #ifdef HAVE___VA_ARGS__
 #	define zbx_setproctitle(fmt, ...) __zbx_zbx_setproctitle(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
@@ -943,5 +956,7 @@ int	parse_function(char **exp, char **func, char **params);
 int	parse_host_key(char *exp, char **host, char **key);
 
 void	make_hostname(char *host);
+
+unsigned char	get_interface_type_by_item_type(unsigned char type);
 
 #endif

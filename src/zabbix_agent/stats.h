@@ -49,11 +49,11 @@ typedef struct s_collector_data
 #endif	/* _AIX */
 } ZBX_COLLECTOR_DATA;
 
-extern ZBX_COLLECTOR_DATA *collector;
+extern ZBX_COLLECTOR_DATA	*collector;
 
 ZBX_THREAD_ENTRY(collector_thread, pSemColectorStarted);
 
-void	init_collector_data(void);
-void	free_collector_data(void);
+void	init_collector_data();
+void	free_collector_data();
 
 #endif

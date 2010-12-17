@@ -18,46 +18,31 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
-
-int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return SYSINFO_RET_FAIL;
-}
 
 static int	SYSTEM_CPU_IDLE1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	return EXECUTE_INT(cmd, "iostat 1 2 | tail -n 1 | awk '{printf(\"%s\",$(NF))}'", flags, result);
+	return EXECUTE_DBL(cmd, "iostat 1 2 | tail -n 1 | awk '{printf(\"%s\",$(NF))}'", flags, result);
 }
 
 static int	SYSTEM_CPU_SYS1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	return EXECUTE_INT(cmd, "iostat 1 2 | tail -n 1 | awk '{printf(\"%s\",$(NF-1))}'", flags, result);
+	return EXECUTE_DBL(cmd, "iostat 1 2 | tail -n 1 | awk '{printf(\"%s\",$(NF-1))}'", flags, result);
 }
 
 static int	SYSTEM_CPU_NICE1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	return EXECUTE_INT(cmd, "iostat 1 2 | tail -n 1 | awk '{printf(\"%s\",$(NF-2))}'", flags, result);
+	return EXECUTE_DBL(cmd, "iostat 1 2 | tail -n 1 | awk '{printf(\"%s\",$(NF-2))}'", flags, result);
 }
 
 static int	SYSTEM_CPU_USER1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	return EXECUTE_INT(cmd, "iostat 1 2 | tail -n 1 | awk '{printf(\"%s\",$(NF-3))}'", flags, result);
+	return EXECUTE_DBL(cmd, "iostat 1 2 | tail -n 1 | awk '{printf(\"%s\",$(NF-3))}'", flags, result);
 }
 
 int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-
-#define CPU_FNCLIST struct cpu_fnclist_s
-CPU_FNCLIST
-{
-	char *type;
-	char *mode;
-	int (*function)();
-};
-
-	CPU_FNCLIST fl[] =
+	TYPE_MODE_FUNCTION fl[] =
 	{
 		{"idle",	"avg1" ,	SYSTEM_CPU_IDLE1},
 		{"nice",	"avg1" ,	SYSTEM_CPU_NICE1},
@@ -70,10 +55,6 @@ CPU_FNCLIST
 	char type[MAX_STRING_LEN];
 	char mode[MAX_STRING_LEN];
 	int i;
-
-        assert(result);
-
-        init_result(result);
 
         if(num_param(param) > 3)
         {
@@ -116,44 +97,31 @@ CPU_FNCLIST
 	}
 
 	for(i=0; fl[i].type!=0; i++)
-	{
 		if(strncmp(type, fl[i].type, MAX_STRING_LEN)==0)
-		{
 			if(strncmp(mode, fl[i].mode, MAX_STRING_LEN)==0)
-			{
 				return (fl[i].function)(cmd, param, flags, result);
-			}
-		}
-	}
+
 	return SYSINFO_RET_FAIL;
 }
 
-int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	return EXECUTE_INT(cmd, "uptime | awk '{printf(\"%s\", $(NF))}' | sed 's/[ ,]//g'", flags, result);
+	return EXECUTE_DBL(cmd, "uptime | awk '{printf(\"%s\", $(NF))}' | sed 's/[ ,]//g'", flags, result);
 }
 
-int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	return EXECUTE_INT(cmd, "uptime | awk '{printf(\"%s\", $(NF-1))}' | sed 's/[ ,]//g'", flags, result);
+	return EXECUTE_DBL(cmd, "uptime | awk '{printf(\"%s\", $(NF-1))}' | sed 's/[ ,]//g'", flags, result);
 }
 
-int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	return EXECUTE_INT(cmd, "uptime | awk '{printf(\"%s\", $(NF-2))}' | sed 's/[ ,]//g'", flags, result);
+	return EXECUTE_DBL(cmd, "uptime | awk '{printf(\"%s\", $(NF-2))}' | sed 's/[ ,]//g'", flags, result);
 }
 
 int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-
-#define CPU_FNCLIST struct cpu_fnclist_s
-CPU_FNCLIST
-{
-	char *mode;
-	int (*function)();
-};
-
-	CPU_FNCLIST fl[] =
+	MODE_FUNCTION fl[] =
 	{
 		{"avg1" ,	SYSTEM_CPU_LOAD1},
 		{"avg5" ,	SYSTEM_CPU_LOAD5},
@@ -164,10 +132,6 @@ CPU_FNCLIST
 	char cpuname[MAX_STRING_LEN];
 	char mode[MAX_STRING_LEN];
 	int i;
-
-        assert(result);
-
-        init_result(result);
 
         if(num_param(param) > 2)
         {
@@ -198,30 +162,8 @@ CPU_FNCLIST
 		zbx_snprintf(mode, sizeof(mode), "avg1");
 	}
 	for(i=0; fl[i].mode!=0; i++)
-	{
 		if(strncmp(mode, fl[i].mode, MAX_STRING_LEN)==0)
-		{
 			return (fl[i].function)(cmd, param, flags, result);
-		}
-	}
-
-	return SYSINFO_RET_FAIL;
-}
-
-int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-        assert(result);
-
-        init_result(result);
-
-	return SYSINFO_RET_FAIL;
-}
-
-int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-        assert(result);
-
-        init_result(result);
 
 	return SYSINFO_RET_FAIL;
 }

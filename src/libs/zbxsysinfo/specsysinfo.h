@@ -17,8 +17,9 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#if !defined(SPECSYSINFO_H_INCLUDED)
+#ifndef ZABBIX_SPECSYSINFO_H
+#define ZABBIX_SPECSYSINFO_H
 
-extern ZBX_METRIC      parameters_specific[];
+extern ZBX_METRIC	parameters_specific[];
 
-#endif /* SPECSYSINFO_H_INCLUDED */
+#endif /* ZABBIX_SPECSYSINFO_H */

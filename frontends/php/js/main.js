@@ -970,6 +970,33 @@ function change_flicker_state(divid){
 	if(typeof(moveSBoxes) != 'undefined') moveSBoxes();
 }
 
+function changeHatStateUI(icon, divid){
+	deselectAll();
+
+
+	var switchIcon = function(){
+		switchElementsClass(icon,"arrowup","arrowdown");
+	}
+
+	jQuery($(divid).parentNode).
+		find('.body').toggle().end().
+		find('.footer').toggle().end();
+
+	switchIcon();
+
+	var hat_state = jQuery(icon).hasClass("arrowup") ? 1 : 0;
+	if(false === hat_state) return false;
+
+	var params = {
+		'action':	'flop',
+		'favobj': 	'hat',
+		'favref': 	divid,
+		'state':	hat_state
+	}
+
+	send_params(params);
+}
+
 function change_hat_state(icon, divid){
 	deselectAll();
 
