@@ -60,7 +60,7 @@ ZBX_METRIC	parameters_specific[] =
 	{"system.uptime",	0,		SYSTEM_UPTIME,		NULL,	NULL},
 	{"system.boottime",	0,		SYSTEM_BOOTTIME,	NULL,	NULL},
 
-	{"sensor",		CF_USEUPARAM,	GET_SENSOR,		NULL,	"temp1"},
+	{"sensor",		CF_USEUPARAM,	GET_SENSOR,		NULL,	"w83781d-i2c-0-2d,temp1"},
 
 	{0}
 };
