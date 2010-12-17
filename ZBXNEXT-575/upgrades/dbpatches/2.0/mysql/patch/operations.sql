@@ -11,7 +11,7 @@ CREATE TABLE opmessage (
 ) ENGINE=InnoDB;
 CREATE INDEX opmessage_1 ON opmessage (operationid);
 ALTER TABLE opmessage ADD CONSTRAINT c_opmessage_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE;
-ALTER TABLE opmessage ADD CONSTRAINT c_opmessage_3 FOREIGN KEY (mediatypeid) REFERENCES media_type (mediatypeid);
+ALTER TABLE opmessage ADD CONSTRAINT c_opmessage_2 FOREIGN KEY (mediatypeid) REFERENCES media_type (mediatypeid);
 
 SET @opmessageid := 0;
 INSERT INTO opmessage (opmessageid, operationid, default_msg, subject, message)
