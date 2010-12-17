@@ -153,7 +153,7 @@ JS;
 			return array(
 				new CDiv(new CSpan($license), 'licence'),
 				BR(),
-				new CDiv(array(new CCheckBox('agree', 'no', $action), 'I agree'), 'center')
+				new CDiv(array(new CCheckBox('agree', 'no', $action), new CLabel('I agree', 'agree')), 'center')
 			);
 		}
 
