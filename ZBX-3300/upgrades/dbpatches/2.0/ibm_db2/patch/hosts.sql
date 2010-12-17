@@ -93,6 +93,9 @@ UPDATE items SET port=snmp_port;
 ALTER TABLE items DROP COLUMN snmp_port;
 REORG TABLE items;
 
+CREATE INDEX items_5 on items (valuemapid);
+REORG TABLE items;
+
 -- host interface for non IPMI, SNMP and non templated items
 UPDATE items
 	SET interfaceid=(SELECT interfaceid FROM interface WHERE hostid=items.hostid AND main=1 AND type=1)
