@@ -69,7 +69,7 @@
 	<target name="gui">
 		<exec executable="phpunit" dir="${basedir}/frontends/php/tests" failonerror="off">
 			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml
-			-- bootstrap=${builddir}/frontends/php/tests/bootstrap.php
+			--bootstrap=${builddir}/frontends/php/tests/bootstrap.php
 			all.php
 			" />
 		</exec>
