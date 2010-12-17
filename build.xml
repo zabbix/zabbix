@@ -4,6 +4,7 @@
 	<property name="builddir" value="${BUILDDIR}"/>
 	<property name="svn" value="${SVN}"/>
 	<property name="dbtype" value="${DBTYPE}"/>
+	<property name="dbname" value="${DBNAME}"/>
 
 	<target name="init">
 		<!-- Create the different build directories -->
@@ -21,27 +22,27 @@
 		</exec>
 		<exec executable="mysql" dir="${builddir}/create/schema" failonerror="on">
 			<arg line="-uroot
-			-e 'drop database if exists test;'
+			-e 'drop database if exists ${dbname};'
 			" />
 		</exec>
 		<exec executable="mysql" dir="${builddir}/create/schema" failonerror="on">
 			<arg line="-uroot
-			-e 'create database test;'
+			-e 'create database ${dbname};'
 			" />
 		</exec>
 		<exec executable="mysql" dir="${builddir}/create/schema" input="${builddir}/create/schema/mysql.sql" failonerror="on">
 			<arg line="-uroot
-			test
+			${dbname}
 			" />
 		</exec>
 		<exec executable="mysql" dir="${builddir}/create/schema" input="${builddir}/create/data/images_mysql.sql" failonerror="on">
 			<arg line="-uroot
-			test
+			${dbname}
 			" />
 		</exec>
 		<exec executable="mysql" dir="${builddir}/create/schema" input="${builddir}/create/data/data.sql" failonerror="on">
 			<arg line="-uroot
-			test
+			${dbname}
 			" />
 		</exec>
 		<exec executable="cp" failonerror="on">
@@ -61,8 +62,8 @@
 	<target name="build" depends="init,gui" />
 
 	<target name="gui">
-		<exec executable="phpunit" dir="${basedir}/frontends/php/tests" failonerror="on">
-			<arg line="--log-xml=${basedir}/build/logs/phpunit.xml
+		<exec executable="phpunit" dir="${basedir}/frontends/php/tests" failonerror="off">
+			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml
 			all.php
 			" />
 		</exec>
