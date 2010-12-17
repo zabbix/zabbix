@@ -2545,14 +2545,16 @@
 
 // class.ctemplate.php
 	'S_CANNOT_SYNC_TEMPLATE' => 'Cannot sync template',
-	'S_CIRCULAR_LINK_CANNOT' => 'Circular link can not be created',
 
 // class.chost.php
 	'S_YOU_DO_NOT_HAVE_ENOUGH_RIGHTS' => 'You do not have enough rights for operation',
 	'S_HOST_UPDATE_FAILED' => 'Host update failed',
 
 // discoveryconf.php
-	'S_SECOND_IN_PARENTHESES' => '(seconds)'
+	'S_SECOND_IN_PARENTHESES' => '(seconds)',
+
+// class.cscreen.php
+	'S_INCORRECT_RESOURCE_PROVIDED_FOR_SCREEN_ITEM' => 'Incorrect resource provided for screen item'
 
 );
 ?>
