@@ -279,7 +279,7 @@ int	__zbx_DBexecute(const char *fmt, ...)
 	return rc;
 }
 
-int	DBis_null(char *field)
+int	DBis_null(const char *field)
 {
 	return zbx_db_is_null(field);
 }
@@ -631,7 +631,7 @@ void	DBdelete_trigger(zbx_uint64_t triggerid)
 	DBexecute("delete from triggers where triggerid=" ZBX_FS_UI64,triggerid);
 }
 
-void	DBupdate_triggers_status_after_restart(void)
+void	DBupdate_triggers_status_after_restart()
 {
 	const char	*__function_name = "DBupdate_triggers_status_after_restart";
 	DB_RESULT	result;
@@ -1008,40 +1008,6 @@ zbx_uint64_t	DBget_proxy_lastaccess(const char *hostname)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): " ZBX_FS_UI64, __function_name, lastaccess);
 
 	return lastaccess;
-}
-
-int	DBadd_alert(zbx_uint64_t actionid, zbx_uint64_t userid, zbx_uint64_t eventid,
-		zbx_uint64_t mediatypeid, char *sendto, char *subject, char *message)
-{
-	int	now;
-	char	*sendto_esc, *subject_esc, *message_esc;
-
-	zabbix_log(LOG_LEVEL_DEBUG,"In add_alert(eventid:" ZBX_FS_UI64 ")",
-		eventid);
-
-	now = time(NULL);
-
-	sendto_esc = DBdyn_escape_string_len(sendto, ALERT_SENDTO_LEN);
-	subject_esc = DBdyn_escape_string_len(subject, ALERT_SUBJECT_LEN);
-	message_esc = DBdyn_escape_string(message);
-
-	DBexecute("insert into alerts (alertid,actionid,eventid,userid,clock,mediatypeid,sendto,subject,message,status,retries)"
-		" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",'%s','%s','%s',0,0)",
-		DBget_maxid("alerts"),
-		actionid,
-		eventid,
-		userid,
-		now,
-		mediatypeid,
-		sendto_esc,
-		subject_esc,
-		message_esc);
-
-	zbx_free(sendto_esc);
-	zbx_free(subject_esc);
-	zbx_free(message_esc);
-
-	return SUCCEED;
 }
 
 int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid)
