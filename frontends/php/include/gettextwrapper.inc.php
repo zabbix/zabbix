@@ -50,6 +50,7 @@ function _s($string){
 }
 
 function _n($string1, $string2, $value){
-	return sprintf(ngettext($string1, $string2, $value), $value);
+	$arguments = array_slice(func_get_args(), 2);
+	return vsprintf(ngettext($string1, $string2, $value), $arguments);
 }
 ?>
