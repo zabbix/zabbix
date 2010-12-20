@@ -176,12 +176,15 @@ getSysmapBySysmapid: function(){
 	);
 },
 
-selementDragEnd: function(dragable) {
+selementDragEnd: function(e, ui){
 	this.debug('selementDragEnd');
 
 	this.deactivate_menu();
 
-	var element = dragable.element;
+	ui.helper.context.style.left = ui.position.left+'px';
+	ui.helper.context.style.top = ui.position.top+'px';
+	var element = ui.helper.context;
+
 	var element_id = element.id.split('_');
 	var selementid = element_id[(element_id.length - 1)];
 
@@ -847,7 +850,7 @@ updateSelementsIcon: function(){
 remove_selement_img: function(selement){
 	this.debug('remove_selement_img');
 
-	Draggables.unregister(selement.html_obj);
+	jQuery(selement.html_obj).draggable('destroy')	;
 	selement.html_obj.remove();
 },
 
@@ -858,11 +861,12 @@ makeSelementDragable: function(selement){
 	addListener(selement, 'click', this.show_menu.bindAsEventListener(this), false);
 	addListener(selement, 'mousedown', this.activate_menu.bindAsEventListener(this), false);
 
-	new Draggable(selement,{
-				ghosting: true,
-				snap: this.get_dragable_dimensions.bind(this),
-				onEnd: this.selementDragEnd.bind(this)
-				});
+	jQuery(selement).draggable({
+		containment: 'parent',
+		opacity: 0.5,
+		helper: 'clone',
+		stop: this.selementDragEnd.bind(this)
+	});
 
 },
 
@@ -948,44 +952,6 @@ set_container: function(event){
 
 // ---------- MISC FUNCTIONS ------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------
-get_window_dimensions: function(x,y,draggable){
-	this.debug('get_window_dimensions');
-//--
-
-	function constrain(n, lower, upper) {
-		if (n > upper) return upper;
-		else if (n < lower) return lower;
-		else return n;
-	}
-
-	var h = parseInt(document.body.offsetHeight);
-	var w = parseInt(document.body.offsetWidth);
-
-	return[
-		constrain(x, 0, w),
-		constrain(y, 0, h)
-	];
-},
-
-get_dragable_dimensions: function(x,y,draggable){
-	this.debug('get_dragable_dimensions');
-//--
-
-	function constrain(n, lower, upper) {
-		if (n > upper) return upper;
-		else if (n < lower) return lower;
-		else return n;
-	}
-
-	var element_dimensions = Element.getDimensions(draggable.element);
-	var parent_dimensions = Element.getDimensions(this.mapimg);
-
-	return[
-		constrain(x, 0, parent_dimensions.width - element_dimensions.width),
-		constrain(y, 0, parent_dimensions.height - element_dimensions.height)
-	];
-},
-
 get_update_params: function(params){
 	this.debug('get_update_params');
 
@@ -1116,12 +1082,11 @@ formShow: function(e, selementid){
 	this.form_link_hide(e);
 //---
 
-	new Draggable(divForm,{
-				  			'handle': this.selementForm.dragHandler,
-							'snap': this.get_window_dimensions.bind(this),
-							'starteffect': function(){ return true; },
-							'endeffect': function(){ return true; }
-						});
+	jQuery(divForm).draggable({
+		handle: this.selementForm.dragHandler,
+		containment: [0,0,3200,3200]
+	});
+
 	$(divForm).show();
 },
 
@@ -1465,6 +1430,7 @@ form_selement_newUrl: function(e){
 	var ll = $(this.selementForm.urls).select('tr[id^=urlrow]').length;
 	var sysmapelementurlid = selementid+''+ll;
 	var tpl = new Template(ZBX_TPL.selementFormUrls);
+
 	$('urlfooter').insert({'before' : tpl.evaluate({'sysmapelementurlid': sysmapelementurlid})});
 },
 
@@ -1568,7 +1534,7 @@ this.selementForm.massEdit.elementtype = e_tr_4;
 this.selementForm.elementtype = e_select_6;
 
 	e_select_6.setAttribute('size',"1");
-	e_select_6.className = "biginput";
+	e_select_6.className = "input";
 	e_select_6.setAttribute('name',"elementtype");
 	e_select_6.setAttribute('id',"elementtype");
 	e_td_5.appendChild(e_select_6);
@@ -1638,7 +1604,7 @@ this.selementForm.label = e_textarea_6;
 	e_textarea_6.setAttribute('cols',"56");
 	e_textarea_6.setAttribute('rows',"4");
 	e_textarea_6.setAttribute('name',"label");
-	e_textarea_6.className = "biginput";
+	e_textarea_6.className = "input";
 	e_td_5.appendChild(e_textarea_6);
 
 // LABEL LOCATION
@@ -1674,7 +1640,7 @@ this.selementForm.massEdit.chkboxLabelLocation = e_input_6
 this.selementForm.label_location = e_select_6;
 
 	e_select_6.setAttribute('size',"1");
-	e_select_6.className = "biginput";
+	e_select_6.className = "input";
 	e_select_6.setAttribute('name',"label_location");
 	e_select_6.setAttribute('id',"label_location");
 	e_td_5.appendChild(e_select_6);
@@ -1739,7 +1705,7 @@ this.selementForm.elementName = e_input_6;
 	e_input_6.setAttribute('size',"56");
 	e_input_6.setAttribute('id',"elementName");
 	e_input_6.setAttribute('name',"elementName");
-	e_input_6.className = "biginput";
+	e_input_6.className = "input";
 	e_td_5.appendChild(e_input_6);
 
 	e_td_5.appendChild(document.createTextNode('  '));
@@ -1785,7 +1751,7 @@ this.selementForm.massEdit.chkboxIconid_off = e_input_6
 	var e_select_6 = document.createElement('select');
 this.selementForm.iconid_off = e_select_6;
 
-	e_select_6.className = "biginput";
+	e_select_6.className = "input";
 	e_select_6.setAttribute('name',"iconid_off");
 	e_select_6.setAttribute('id',"iconid_off");
 	e_td_5.appendChild(e_select_6);
@@ -1864,7 +1830,7 @@ this.selementForm.massEdit.chkboxIconid_on = e_input_6;
 	var e_select_6 = document.createElement('select');
 this.selementForm.iconid_on = e_select_6;
 
-	e_select_6.className = "biginput";
+	e_select_6.className = "input";
 	e_select_6.setAttribute('name',"iconid_on");
 	e_select_6.setAttribute('id',"iconid_on");
 	e_td_5.appendChild(e_select_6);
@@ -1918,7 +1884,7 @@ this.selementForm.massEdit.chkboxIconid_maintenance = e_input_6;
 	var e_select_6 = document.createElement('select');
 this.selementForm.iconid_maintenance = e_select_6;
 
-	e_select_6.className = "biginput";
+	e_select_6.className = "input";
 	e_select_6.setAttribute('name',"iconid_maintenance");
 	e_select_6.setAttribute('id',"iconid_maintenance");
 	e_td_5.appendChild(e_select_6);
@@ -1973,7 +1939,7 @@ this.selementForm.massEdit.chkboxIconid_disabled = e_input_6;
 	var e_select_6 = document.createElement('select');
 this.selementForm.iconid_disabled = e_select_6;
 
-	e_select_6.className = "biginput";
+	e_select_6.className = "input";
 	e_select_6.setAttribute('name',"iconid_disabled");
 	e_select_6.setAttribute('id',"iconid_disabled");
 	e_td_5.appendChild(e_select_6);
@@ -2023,7 +1989,7 @@ this.selementForm.x = e_input_6;
 	e_input_6.setAttribute('size',"5");
 	e_input_6.setAttribute('id',"x");
 	e_input_6.setAttribute('name',"x");
-	e_input_6.className = "biginput";
+	e_input_6.className = "input";
 	e_td_5.appendChild(e_input_6);
 
 // Y
@@ -2054,7 +2020,7 @@ this.selementForm.y = e_input_6;
 	e_input_6.setAttribute('size',"5");
 	e_input_6.setAttribute('id',"y");
 	e_input_6.setAttribute('name',"y");
-	e_input_6.className = "biginput";
+	e_input_6.className = "input";
 	e_td_5.appendChild(e_input_6);
 
 
@@ -2084,7 +2050,7 @@ this.selementForm.urls = e_tr_4;
 	var e_input_6 = document.createElement('input');
 	e_input_6.setAttribute('type',"button");
 	e_input_6.setAttribute('name',"apply");
-	e_input_6.className = "button";
+	e_input_6.className = "input button shadow";
 	e_input_6.setAttribute('value',locale['S_APPLY']);
 
 
@@ -2097,7 +2063,7 @@ this.selementForm.urls = e_tr_4;
 	var e_input_6 = document.createElement('input');
 	e_input_6.setAttribute('type',"button");
 	e_input_6.setAttribute('name',"remove");
-	e_input_6.className = "button";
+	e_input_6.className = "input button shadow";
 	e_input_6.setAttribute('value',locale['S_REMOVE']);
 
 	addListener(e_input_6, 'click', this.form_selement_delete.bindAsEventListener(this));
@@ -2109,7 +2075,7 @@ this.selementForm.urls = e_tr_4;
 	var e_input_6 = document.createElement('input');
 	e_input_6.setAttribute('type',"button");
 	e_input_6.setAttribute('name',"close");
-	e_input_6.className = "button";
+	e_input_6.className = "input button shadow";
 	e_input_6.setAttribute('value',locale['S_CLOSE']);
 
 	addListener(e_input_6, 'click', this.formHide.bindAsEventListener(this));
@@ -2531,6 +2497,7 @@ form_selement_save: function(e){
 				alert(locale['S_INCORRECT_ELEMENT_MAP_LINK']);
 				return false;
 			}
+
 			params.urls[url.name] = url;
 		}
 
@@ -2707,7 +2674,7 @@ this.linkForm.linklabel = e_textarea_6;
 	e_textarea_6.setAttribute('rows',"4");
 	e_textarea_6.setAttribute('name',"linklabel");
 	e_textarea_6.setAttribute('id',"linklabel");
-	e_textarea_6.className = "biginput";
+	e_textarea_6.className = "input";
 	e_td_5.appendChild(e_textarea_6);
 
 
@@ -2731,7 +2698,7 @@ this.linkForm.linklabel = e_textarea_6;
 	var e_select_6 = document.createElement('select');
 this.linkForm.selementid1 = e_select_6;
 	e_select_6.setAttribute('size',"1");
-	e_select_6.className = "biginput";
+	e_select_6.className = "input";
 	e_select_6.setAttribute('name',"selementid1");
 	e_select_6.setAttribute('id',"selementid1");
 	e_td_5.appendChild(e_select_6);
@@ -2758,7 +2725,7 @@ this.linkForm.selementid1 = e_select_6;
 	var e_select_6 = document.createElement('select');
 this.linkForm.selementid2 = e_select_6;
 	e_select_6.setAttribute('size',"1");
-	e_select_6.className = "biginput";
+	e_select_6.className = "input";
 	e_select_6.setAttribute('name',"selementid2");
 	e_select_6.setAttribute('id',"selementid2");
 	e_td_5.appendChild(e_select_6);
@@ -2803,7 +2770,7 @@ this.linkForm.linkIndicatorsTable = e_td_5;
 this.linkForm.drawtype = e_select_6;
 
 	e_select_6.setAttribute('size',"1");
-	e_select_6.className = "biginput";
+	e_select_6.className = "input";
 	e_select_6.setAttribute('name',"drawtype");
 	e_select_6.setAttribute('id',"drawtype");
 	e_td_5.appendChild(e_select_6);
@@ -2857,7 +2824,7 @@ this.linkForm.color = e_input_6;
 	e_input_6.setAttribute('size',"7");
 	e_input_6.setAttribute('id',"color");
 	e_input_6.setAttribute('name',"color");
-	e_input_6.className = "biginput";
+	e_input_6.className = "input";
 	e_td_5.appendChild(e_input_6);
 
 
@@ -2899,7 +2866,7 @@ this.linkForm.colorPicker = e_div_6;
 	var e_input_6 = document.createElement('input');
 	e_input_6.setAttribute('type',"button");
 	e_input_6.setAttribute('name',"apply");
-	e_input_6.className = "button";
+	e_input_6.className = "input button shadow";
 	e_input_6.setAttribute('value',locale['S_APPLY']);
 	e_td_5.appendChild(e_input_6);
 	addListener(e_input_6, 'click', this.form_link_save.bindAsEventListener(this));
@@ -2911,7 +2878,7 @@ this.linkForm.colorPicker = e_div_6;
 	var e_input_6 = document.createElement('input');
 	e_input_6.setAttribute('type',"button");
 	e_input_6.setAttribute('name',"remove");
-	e_input_6.className = "button";
+	e_input_6.className = "input button shadow";
 	e_input_6.setAttribute('value',locale['S_REMOVE']);
 	e_td_5.appendChild(e_input_6);
 	addListener(e_input_6, 'click', this.form_link_delete.bindAsEventListener(this));
@@ -2923,7 +2890,7 @@ this.linkForm.colorPicker = e_div_6;
 	var e_input_6 = document.createElement('input');
 	e_input_6.setAttribute('type',"button");
 	e_input_6.setAttribute('name',"close");
-	e_input_6.className = "button";
+	e_input_6.className = "input button shadow";
 	e_input_6.setAttribute('value',locale['S_CLOSE']);
 	addListener(e_input_6, 'click', this.form_link_hide.bindAsEventListener(this));
 
@@ -3057,7 +3024,8 @@ this.linkForm.linkIndicatorsBody = e_tbody_7;
 	e_input_6.setAttribute('type',"button");
 	e_input_6.setAttribute('name',"Add");
 	e_input_6.setAttribute('value',locale['S_ADD']);
-	e_input_6.className = "button";
+	e_input_6.setAttribute('style',"margin: 2px 4px");
+	e_input_6.className = "input button link_menu";
 	this.linkForm.linkIndicatorsTable.appendChild(e_input_6);
 
 	var url = 'popup_link_tr.php?form=1&mapid='+this.id;
@@ -3068,7 +3036,8 @@ this.linkForm.linkIndicatorsBody = e_tbody_7;
 	e_input_6.setAttribute('type',"button");
 	e_input_6.setAttribute('name',"Remove");
 	e_input_6.setAttribute('value',locale['S_REMOVE']);
-	e_input_6.className = "button";
+	e_input_6.setAttribute('style',"margin: 2px 4px");
+	e_input_6.className = "input button link_menu";
 	this.linkForm.linkIndicatorsTable.appendChild(e_input_6);
 
 	addListener(e_input_6, 'click', function(){ remove_childs('linkForm','link_triggerids','tr'); });
@@ -3181,7 +3150,7 @@ form_link_addLinktrigger: function(linktrigger){
 
 	e_select_10.setAttribute('id',"link_triggers["+triggerid+"][drawtype]");
 	e_select_10.setAttribute('name', 'link_triggers['+triggerid+'][drawtype]');
-	e_select_10.className = 'biginput';
+	e_select_10.className = 'input';
 
 // items
 	var e_option_11 = document.createElement('option');
@@ -3218,7 +3187,7 @@ form_link_addLinktrigger: function(linktrigger){
 	e_input_22.setAttribute('size',"7");
 	e_input_22.setAttribute('id',"link_triggers["+triggerid+"][color]");
 	e_input_22.setAttribute('name',"link_triggers["+triggerid+"][color]");
-	e_input_22.className = "biginput";
+	e_input_22.className = "input";
 	e_td_9.appendChild(e_input_22);
 
 	var e_div_10 = document.createElement('div');
@@ -3704,7 +3673,7 @@ updateIcon: function(){
 removeImage: function(){
 	this.debug('remove_selement_img');
 
-	Draggables.unregister(this.html_obj);
+	jQuery(this.html_obj).draggable('destroy');
 	this.html_obj.remove();
 },
 
@@ -3714,12 +3683,12 @@ makeDragable: function(){
 	addListener(selement, 'click', this.sysmap.show_menu.bindAsEventListener(this.sysmap), false);
 	addListener(selement, 'mousedown', this.sysmap.activate_menu.bindAsEventListener(this.sysmap), false);
 
-	new Draggable(selement,{
-				ghosting: true,
-				snap: this.sysmap.get_dragable_dimensions.bind(this.sysmap),
-				onEnd: this.sysmap.sysmapUpdate.bind(this.sysmap)
-				});
-
+	jQuery(selement).draggable({
+		containment: 'parent',
+		opacity: 0.5,
+		helper: 'clone',
+		stop: this.sysmap.sysmapUpdate.bind(this.sysmap)
+	});
 }
 });
 */

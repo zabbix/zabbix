@@ -183,7 +183,7 @@ include_once 'include/page_header.php';
 			$frmPd->addVar('color',$color);
 
 
-		$frmPd->addItemToBottomRow(new CButton('save', isset($_REQUEST['period_id'])?S_UPDATE:S_ADD));
+		$frmPd->addItemToBottomRow(new CSubmit('save', isset($_REQUEST['period_id'])?S_UPDATE:S_ADD));
 
 		$frmPd->addItemToBottomRow(new CButtonCancel(null,'close_window();'));
 		$frmPd->Show();

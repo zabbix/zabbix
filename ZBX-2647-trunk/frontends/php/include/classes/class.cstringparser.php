@@ -471,8 +471,8 @@ class CStringParser {
 	private function saveSymbols() {
 		//$this->saveDebug("Saving symbol {$this->levelData[$this->currentLevel]['levelType']}\n");
 
-		$strStart = $this->levelData[$this->currentLevel]['openSymbolNum'];
-		$strEnd = $this->levelData[$this->currentLevel]['closeSymbolNum'];
+//		$strStart = $this->levelData[$this->currentLevel]['openSymbolNum'];
+//		$strEnd = $this->levelData[$this->currentLevel]['closeSymbolNum'];
 		//$this->levelData[$this->currentLevel]['value'] = mb_substr($this->expression, $strStart, $strEnd-$strStart+1); // should be changed to zbx_substr
 
 		//$this->saveDebug(print_r($this->levelData, true));
@@ -899,7 +899,10 @@ function triggerExpressionValidateItemKey(&$parent, &$levelData, $index, &$expre
 	}
 
 	$itemFound = CItem::get(array(
-		'filter' => array('hostid' => $hostId, 'key_' => $keyName.$keyParams, 'flags' => null),
+		'filter' => array(
+			'hostid' => $hostId,
+			'key_' => $keyName.$keyParams
+		),
 		'output' => API_OUTPUT_EXTEND,
 		'webitems' => true
 	));

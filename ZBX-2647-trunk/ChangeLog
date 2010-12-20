@@ -1,5 +1,7 @@
 Changes for 1.9.1
 
+ - [ZBXNEXT-588] improved template, host, proxy form view, dashboard screen (Aly,Vedmak)
+ - [ZBXNEXT-587] added support of multiple host interfaces (Aly,Sasha,Vedmak,asaveljevs)
  - [ZBX-3149] allow to translate more strings in screen element 'Server info'; add support for translator comments (Richlv)
  - [ZBXNEXT-564] added new {IPADDRESS} and {HOST.PORT} macros in auto registration notifications (Sasha)
  - [ZBX-3248] fixed empty and duplicate map URL name handling (KB)
@@ -27,6 +29,10 @@ Changes for 1.9.0
 
 Changes for 1.8.4rc3
 
+ - [ZBXNEXT-586] added sensor[device,sensor,<mode>] check for Linux 2.4 (asaveljevs)
+ - [ZBXNEXT-586] added sensor[device,sensor,<mode>] check for OpenBSD; thanks to Robert Nagy (asaveljevs)
+ - [ZBX-3252] fixed graph height calculations when graph height was less then 120px (KB)
+ - [ZBX-3261] fixed second level template deletion (Aly)
  - [ZBX-3295] fixed compilation warnings in eztexting module if code configured without cURL library (Sasha)
  - [ZBX-2862] it is now not possible to delete host group or user group used in scripts (KB)
  - [ZBX-3281] fixed system.cpu.util[] for all processors combined on NetBSD (asaveljevs)

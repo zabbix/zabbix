@@ -130,7 +130,7 @@ include_once('include/page_header.php');
 	$form = new CForm(null, 'get');
 
 	if(!isset($_REQUEST['form']))
-		$form->addItem(new CButton('form', S_CREATE_MEDIA_TYPE));
+		$form->addItem(new CSubmit('form', S_CREATE_MEDIA_TYPE));
 
 	$medias_wdgt->addPageHeader(S_CONFIGURATION_OF_MEDIA_TYPES_BIG, $form);
 
@@ -210,7 +210,7 @@ include_once('include/page_header.php');
 		}
 		else if($type == MEDIA_TYPE_JABBER || $type == MEDIA_TYPE_EZ_TEXTING){
 			if(isset($_REQUEST['mediatypeid']) && !empty($password)){
-				$chPass_btn = new CButton('chPass_btn', S_CHANGE_PASSWORD, 'this.style.display="none"; $("password").enable().show().focus();', false);
+				$chPass_btn = new CButton('chPass_btn', S_CHANGE_PASSWORD, 'this.style.display="none"; $("password").enable().show().focus();');
 				$pass_txt = new CPassBox('password', '', 30);
 				$pass_txt->setAttribute('disabled', 'disabled');
 				$pass_txt->addStyle('display: none;');
@@ -236,10 +236,9 @@ include_once('include/page_header.php');
 			}
 		}
 
-		$frmMedia->addItemToBottomRow(new CButton('save', S_SAVE));
+		$frmMedia->addItemToBottomRow(new CSubmit('save', S_SAVE));
 		if(isset($_REQUEST['mediatypeid'])){
-			$frmMedia->addItemToBottomRow(array(SPACE, new CButtonDelete(S_DELETE_SELECTED_MEDIA,
-				url_param('form').url_param('mediatypeid'))));
+			$frmMedia->addItemToBottomRow(array(SPACE, new CButtonDelete(S_DELETE_SELECTED_MEDIA,url_param('form').url_param('mediatypeid'))));
 		}
 		$frmMedia->addItemToBottomRow(array(SPACE, new CButtonCancel()));
 
@@ -319,7 +318,7 @@ include_once('include/page_header.php');
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
-		$goButton = new CButton('goButton',S_GO.' (0)');
+		$goButton = new CSubmit('goButton',S_GO.' (0)');
 		$goButton->setAttribute('id','goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "media_types";');

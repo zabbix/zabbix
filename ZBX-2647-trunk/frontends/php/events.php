@@ -191,16 +191,16 @@
 		$filterForm->addRow($row);
 
 		$filterForm->addVar('showUnknown',$_REQUEST['showUnknown']);
-		$unkcbx = new CCheckBox('hide_unk',$_REQUEST['showUnknown'],null,'1');
-		$unkcbx->setAction('javascript: create_var("'.$filterForm->GetName().'", "showUnknown", (this.checked?1:0), 0); ');
+		$unkcbx = new CCheckBox('hide_unk',
+			$_REQUEST['showUnknown'],
+			'javascript: create_var("'.$filterForm->GetName().'", "showUnknown", (this.checked?1:0), 0); ',
+			'1');
 
 		$filterForm->addRow(S_SHOW_UNKNOWN_EVENTS,$unkcbx);
 
-		$reset = new CButton('filter_rst',S_RESET);
-		$reset->setType('button');
-		$reset->setAction('javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
+		$reset = new CButton('filter_rst',S_RESET,'javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
 
-		$filterForm->addItemToBottomRow(new CButton('filter_set',S_FILTER));
+		$filterForm->addItemToBottomRow(new CSubmit('filter_set',S_FILTER));
 		$filterForm->addItemToBottomRow($reset);
 	}
 
@@ -230,6 +230,7 @@
 	else if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid'] > 0)){
 		$options['object'] = EVENT_OBJECT_TRIGGER;
 		$options['triggerids'] = $_REQUEST['triggerid'];
+		$options['filter'] = array('value_changed' => TRIGGER_VALUE_CHANGED_YES);
 	}
 
 	$firstEvent = CEvent::get($options);
@@ -267,9 +268,9 @@
 				'source' => EVENT_SOURCE_DISCOVERY,
 				'eventids' => zbx_objectValues($dsc_events,'eventid'),
 				'output' => API_OUTPUT_EXTEND,
-				'select_hosts' => API_OUTPUT_EXTEND,
+				'selectHosts' => API_OUTPUT_EXTEND,
 				'select_triggers' => API_OUTPUT_EXTEND,
-				'select_items' => API_OUTPUT_EXTEND,
+				'selectItems' => API_OUTPUT_EXTEND,
 			);
 			$dsc_events = CEvent::get($options);
 			order_result($dsc_events, 'eventid', ZBX_SORT_DOWN);
@@ -378,6 +379,7 @@
 			$options = array(
 				'nodeids' => get_current_nodeid(),
 				'filter' => array(
+					'value_changed' => TRIGGER_VALUE_CHANGED_YES,
 					'object' => EVENT_OBJECT_TRIGGER,
 				),
 				'time_from' => $from,
@@ -398,7 +400,6 @@
 			$options = array(
 				'nodeids' => get_current_nodeid(),
 				'eventids' => zbx_objectValues($events,'eventid'),
-				'filter' => array('value_changed' => null),
 				'output' => API_OUTPUT_EXTEND,
 				'select_acknowledges' => API_OUTPUT_COUNT,
 				'sortfield' => 'eventid',
@@ -411,9 +412,9 @@
 
 			$triggersOptions = array(
 				'triggerids' => zbx_objectValues($events, 'objectid'),
-				'select_hosts' => API_OUTPUT_EXTEND,
+				'selectHosts' => API_OUTPUT_EXTEND,
 				'select_triggers' => API_OUTPUT_EXTEND,
-				'select_items' => API_OUTPUT_EXTEND,
+				'selectItems' => API_OUTPUT_EXTEND,
 				'output' => API_OUTPUT_EXTEND
 			);
 			$triggers = CTrigger::get($triggersOptions);

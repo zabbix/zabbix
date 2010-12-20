@@ -25,6 +25,7 @@
 #include "alias.h"
 #include "sysinfo.h"
 #include "perfstat.h"
+#include "comms.h"
 
 #if defined(ZABBIX_DAEMON)
 /* use pid file configuration */
@@ -44,8 +45,8 @@ int	CONFIG_DISABLE_PASSIVE		= 0;
 int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
 int	CONFIG_LOG_REMOTE_COMMANDS	= 0;
 int	CONFIG_UNSAFE_USER_PARAMETERS	= 0;
-int	CONFIG_LISTEN_PORT		= 10050;
-int	CONFIG_SERVER_PORT		= 10051;
+int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_AGENT_PORT;
+int	CONFIG_SERVER_PORT		= ZBX_DEFAULT_SERVER_PORT;
 int	CONFIG_REFRESH_ACTIVE_CHECKS	= 120;
 char	*CONFIG_LISTEN_IP		= NULL;
 char	*CONFIG_SOURCE_IP		= NULL;

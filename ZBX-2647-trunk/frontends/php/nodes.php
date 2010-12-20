@@ -119,7 +119,7 @@
 	$frmForm->addItem($cmbConf);
 
 	if(!isset($_REQUEST['form']) && ZBX_DISTRIBUTED){
-		$frmForm->addItem(new CButton('form', S_NEW_NODE));
+		$frmForm->addItem(new CSubmit('form', S_NEW_NODE));
 	}
 
 	$nodes_wdgt->addPageHeader(S_CONFIGURATION_OF_NODES, $frmForm);
@@ -209,7 +209,7 @@
 			$frmNode->addRow(S_DO_NOT_KEEP_TRENDS_OLDER_THAN, new CNumericBox('slave_trends', $slave_trends, 6));
 
 
-			$frmNode->addItemToBottomRow(new CButton('save', S_SAVE));
+			$frmNode->addItemToBottomRow(new CSubmit('save', S_SAVE));
 			if(isset($_REQUEST['nodeid']) && $node_type != ZBX_NODE_LOCAL){
 				$frmNode->addItemToBottomRow(SPACE);
 				$frmNode->addItemToBottomRow(new CButtonDelete(S_DELETE_SELECTED_NODE_Q, url_param('form').url_param('nodeid')));

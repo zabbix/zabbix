@@ -36,7 +36,7 @@ class CTable extends CTag{
 
 	public function __construct($message=NULL,$class=NULL){
 		parent::__construct('table','yes');
-		$this->setClass($class);
+		$this->setAttribute('class', $class);
 
 		$this->rownum = 0;
 		$this->oddRowClass = NULL;
@@ -82,14 +82,14 @@ class CTable extends CTag{
 		}
 		if(is_object($item) && zbx_strtolower(get_class($item))=='crow') {
 			if(isset($rowClass))
-				$item->setClass($rowClass);
+				$item->setAttribute('class', $rowClass);
 		}
 		else{
 			$item = new CRow($item,$rowClass);
 		}
 		if(!isset($item->attributes['class']) || is_array($item->attributes['class'])){
 			$class = ($this->rownum % 2)?$this->oddRowClass:$this->evenRowClass;
-			$item->setClass($class);
+			$item->setAttribute('class', $class);
 			$item->setAttribute('origClass', $class);
 		}
 
@@ -101,7 +101,7 @@ class CTable extends CTag{
 		if(is_null($class)) $class = $this->headerClass;
 
 		if(is_object($value) && zbx_strtolower(get_class($value))=='crow') {
-			if(!is_null($class)) $value->setClass($class);
+			if(!is_null($class)) $value->setAttribute('class', $class);
 		}
 		else{
 			$value = new CRow($value,$class);
