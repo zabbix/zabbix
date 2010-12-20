@@ -897,14 +897,14 @@ COpt::memoryPick();
 									continue 2;
 							}
 
-							self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$tmp_graph['name'].' ]: already exists on [ '.$chd_host['host'].' ] (items are not identical)');
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph [ %1$s ]: already exists on [ %2$s ] (items are not identical)', $tmp_graph['name'], $chd_host['host']));
 						}
 
 						$tmp_graph['graphid'] = $chd_graph['graphid'];
 						self::updateReal($tmp_graph);
 					}
 					else{
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$tmp_graph['name'].' ]: already exists on [ '.$chd_host['host'].' ] (items are not identical)');
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph [ %1$s ]: already exists on [ %2$s ] (items are not identical)', $tmp_graph['name'], $chd_host['host']));
 					}
 				}
 				else{
@@ -1022,7 +1022,7 @@ COpt::memoryPick();
 					if(!isset($del_graphs[$graphid]))
 						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 					if($del_graphs[$graphid]['templateid'] != 0){
-						self::exception(ZBX_API_ERROR_PERMISSIONS, 'Cannot delete templated graphs');
+						self::exception(ZBX_API_ERROR_PERMISSIONS, _('Cannot delete templated graphs'));
 					}
 				}
 			}
@@ -1045,7 +1045,7 @@ COpt::memoryPick();
 				$created_graphs[$graph['graphid']] = $graph['graphid'];
 			}
 			$result = CGraph::delete($created_graphs, true);
-			if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete graph prototype');
+			if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete graph prototype'));
 
 
 			DB::delete('screens_items', array(
@@ -1086,7 +1086,7 @@ COpt::memoryPick();
 // EXCEPTION: GRAPH FIELDS {{{
 			$fields = array('name' => null);
 			if(!$update && !check_db_fields($fields, $graph)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for graph');
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for graph'));
 			}
 // }}} EXCEPTION: GRAPH FIELDS
 
@@ -1100,7 +1100,7 @@ COpt::memoryPick();
 			$fields = array('itemid' => null);
 			foreach($graph['gitems'] as $ginum => $gitem){
 				if(!check_db_fields($fields, $gitem)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for items');
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for items'));
 				}
 			}
 // }}} EXCEPTION: ITEMS FIELDS
@@ -1166,7 +1166,7 @@ COpt::memoryPick();
 				}
 			}
 			if(!$has_prototype){
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph prototype must have at least one prototype');
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Graph prototype must have at least one prototype'));
 			}
 // }}} PROTOTYPE
 		}
@@ -1200,7 +1200,7 @@ COpt::memoryPick();
 			$cnt_exist = CItem::get($options);
 
 			if($cnt != $cnt_exist)
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect item for axis value item');
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect item for axis value item'));
 		}
 
 		return true;
