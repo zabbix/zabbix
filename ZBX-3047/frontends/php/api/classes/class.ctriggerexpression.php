@@ -31,7 +31,7 @@ private $allowedFunctions;
 				$symbol = zbx_substr($expression, $symbolNum, 1);
 
 				$this->setExpressionParts($symbol);
-				
+
 				if($this->inQuotes($symbol)) continue;
 
 				$this->checkSymbolPrevious($symbol);
@@ -199,7 +199,7 @@ private $allowedFunctions;
 
 				continue;
 			}
-			
+
 			if(!$inQuotes){
 				if(($symbol == ',') && ($prevSymbol != '\\')){
 					$paramCount++;
