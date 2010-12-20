@@ -197,7 +197,8 @@ static void	add_user_msg(int source, zbx_uint64_t userid, zbx_uint64_t mediatype
 
 	while (NULL != p)
 	{
-		if (p->userid == userid && 0 == strcmp(p->subject, subject) && 0 == strcmp(p->message, message))
+		if (p->userid == userid && p->mediatypeid == mediatypeid &&
+				0 == strcmp(p->subject, subject) && 0 == strcmp(p->message, message))
 			break;
 
 		p = p->next;
