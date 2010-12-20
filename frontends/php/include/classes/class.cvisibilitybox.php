@@ -39,8 +39,6 @@ class CVisibilityBox extends CCheckBox{
 	}
 
 	public function toString($destroy=true){
-		global $ZBX_PAGE_POST_JS;
-
 		if(!isset($this->attributes['checked'])){
 			foreach($this->object_name as $obj_name){
 				if(empty($obj_name)) continue;

@@ -143,7 +143,7 @@ include_once('include/page_header.php');
 		'nodeids' => get_current_nodeid(),
 		'itemids' => $_REQUEST['itemid'],
 		'webitems' => 1,
-		'select_hosts' => array('hostid','host'),
+		'selectHosts' => array('hostid','host'),
 		'output' => API_OUTPUT_EXTEND
 	);
 
@@ -216,7 +216,7 @@ include_once('include/page_header.php');
 	$form->addItem($cmbAction);
 
 	if($_REQUEST['action'] != 'showgraph')
-		$form->addItem(array(SPACE, new CButton('plaintext',S_AS_PLAIN_TEXT)));
+		$form->addItem(array(SPACE, new CSubmit('plaintext',S_AS_PLAIN_TEXT)));
 
 	array_unshift($header['right'], $form, SPACE);
 //--
@@ -283,7 +283,7 @@ include_once('include/page_header.php');
 
 			$filterForm->addRow(S_SELECTED, $tmp);
 
-			$filterForm->addItemToBottomRow(new CButton('select',S_FILTER));
+			$filterForm->addItemToBottomRow(new CSubmit('select',S_FILTER));
 		}
 // ------
 
@@ -395,7 +395,7 @@ include_once('include/page_header.php');
 					$crow->setAttribute('style','background-color: '.sprintf("#%X%X%X",$int_color,$int_color,$int_color));
 				}
 				else if(!is_null($color_style)){
-					$crow->setClass($color_style);
+					$crow->setAttribute('class', $color_style);
 				}
 
 				$table->addRow($crow);

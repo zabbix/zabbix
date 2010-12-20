@@ -312,7 +312,7 @@ include_once('include/page_header.php');
 		$options['hosts']['monitored_hosts'] = true;
 	}
 	else if($real_hosts){
-		$options['groups']['real_hosts'] = true;		
+		$options['groups']['real_hosts'] = true;
 	}
 	else if($templated_hosts){
 		$options['hosts']['templated_hosts'] = true;
@@ -416,7 +416,7 @@ include_once('include/page_header.php');
 			$epmtyScript.= get_window_opener($dstfrm, $dstfld2, $value2);
 			$epmtyScript.= ' close_window(); return false;';
 
-			$frmTitle->addItem(array(SPACE,new CButton('empty',S_EMPTY, $epmtyScript)));
+			$frmTitle->addItem(array(SPACE,new CSubmit('empty',S_EMPTY, $epmtyScript)));
 		}
 	}
 
@@ -430,14 +430,15 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'nodeids' => $nodeid,
-			'groupids'=>$groupid,
+			'groupids' => $groupid,
 			'output' => API_OUTPUT_EXTEND,
-			'sortfield'=>'host'
+			'selectInterfaces' => API_OUTPUT_EXTEND,
 		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 		if(!is_null($host_status)) $options[$host_status] = 1;
 
 		$hosts = CHost::get($options);
+		order_result($hosts, 'host');
 
 		foreach($hosts as $hnum => $host){
 			$name = new CSpan($host['host'], 'link');
@@ -452,32 +453,29 @@ include_once('include/page_header.php');
 			else
 				$status=S_UNKNOWN;
 
-			if($host['status'] == HOST_STATUS_TEMPLATE){
-				$dns = $ip = $port = $available = '-';
-			}
-			else{
-				$dns = $host['dns'];
-				$ip = $host['ip'];
+			$interface = reset($host['interfaces']);
 
-				$tmp = ($host['useip'] == 1) ? 'ip' : 'dns';
-				$$tmp = bold($$tmp);
+			$dns = $interface['dns'];
+			$ip = $interface['ip'];
 
-				if($host['available'] == HOST_AVAILABLE_TRUE)
-					$available = new CSpan(S_AVAILABLE,'off');
-				else if($host['available'] == HOST_AVAILABLE_FALSE)
-					$available = new CSpan(S_NOT_AVAILABLE,'on');
-				else if($host['available'] == HOST_AVAILABLE_UNKNOWN)
-					$available = new CSpan(S_UNKNOWN,'unknown');
-			}
+			$tmp = ($interface['useip'] == 1) ? 'ip' : 'dns';
+			$$tmp = bold($$tmp);
+
+			if($host['available'] == HOST_AVAILABLE_TRUE)
+				$available = new CSpan(S_AVAILABLE,'off');
+			else if($host['available'] == HOST_AVAILABLE_FALSE)
+				$available = new CSpan(S_NOT_AVAILABLE,'on');
+			else if($host['available'] == HOST_AVAILABLE_UNKNOWN)
+				$available = new CSpan(S_UNKNOWN,'unknown');
 
 			$table->addRow(array(
 				$name,
 				$dns,
 				$ip,
-				$host['port'],
+				$interface['port'],
 				$status,
 				$available
-				));
+			));
 
 			unset($host);
 		}
@@ -532,7 +530,7 @@ include_once('include/page_header.php');
 			));
 		}
 
-		$table->setFooter(new CButton('select',S_SELECT));
+		$table->setFooter(new CSubmit('select',S_SELECT));
 		$form = new CForm();
 		$form->addVar('existed_templates',$existed_templates);
 
@@ -724,7 +722,7 @@ include_once('include/page_header.php');
 			'hostids' => $hostid,
 			'groupids' => $groupid,
 			'output' => API_OUTPUT_EXTEND,
-			'select_hosts' => API_OUTPUT_EXTEND,
+			'selectHosts' => API_OUTPUT_EXTEND,
 			'select_dependencies' => API_OUTPUT_EXTEND,
 			'expandDescription' => 1,
 		);
@@ -787,7 +785,6 @@ include_once('include/page_header.php');
 
 		if($multiselect){
 			$button = new CButton('select', S_SELECT, "javascript: addSelectedValues('triggers', ".zbx_jsvalue($reference).");");
-			$button->setType('button');
 			$table->setFooter(new CCol($button, 'right'));
 		}
 
@@ -831,9 +828,9 @@ include_once('include/page_header.php');
 			'groupids' => $groupid,
 			'hostids' => $hostid,
 			'webitems' => 1,
-			'filter' => array(),
+			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 			'output' => API_OUTPUT_EXTEND,
-			'select_hosts' => API_OUTPUT_EXTEND
+			'selectHosts' => API_OUTPUT_EXTEND
 		);
 
 		if(!is_null($normal_only)) $options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
@@ -886,7 +883,6 @@ include_once('include/page_header.php');
 
 		if($multiselect){
 			$button = new CButton('select', S_SELECT, "javascript: addSelectedValues('items', ".zbx_jsvalue($reference).");");
-			$button->setType('button');
 			$table->setFooter(new CCol($button, 'right'));
 		}
 
@@ -966,7 +962,6 @@ include_once('include/page_header.php');
 
 		if($multiselect){
 			$button = new CButton('select', S_SELECT, "javascript: addSelectedValues('items', ".zbx_jsvalue($reference).");");
-			$button->setType('button');
 			$table->setFooter(new CCol($button, 'right'));
 		}
 
@@ -1050,7 +1045,7 @@ include_once('include/page_header.php');
 			'hostids' => $hostid,
 			'output' => API_OUTPUT_EXTEND,
 			'nodeids' => $nodeid,
-			'select_hosts' => API_OUTPUT_EXTEND
+			'selectHosts' => API_OUTPUT_EXTEND
 		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 		if(!is_null($templated)) $options['templated'] = $templated;
@@ -1110,7 +1105,6 @@ include_once('include/page_header.php');
 
 		if($multiselect){
 			$button = new CButton('select', S_SELECT, "javascript: addSelectedValues('graphs', ".zbx_jsvalue($reference).");");
-			$button->setType('button');
 			$table->setFooter(new CCol($button, 'right'));
 		}
 
@@ -1151,12 +1145,13 @@ include_once('include/page_header.php');
 			'nodeids' => $nodeid,
 			'hostids' => $hostid,
 			'output' => API_OUTPUT_EXTEND,
-			'select_hosts' => API_OUTPUT_EXTEND,
+			'selectHosts' => API_OUTPUT_EXTEND,
 			'webitems' => 1,
 			'templated' => 0,
 			'filter' => array(
 				'value_type' => array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64),
-				'status' => ITEM_STATUS_ACTIVE
+				'status' => ITEM_STATUS_ACTIVE,
+				'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED),
 			)
 		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
@@ -1203,7 +1198,6 @@ include_once('include/page_header.php');
 
 		if($multiselect){
 			$button = new CButton('select', S_SELECT, "javascript: addSelectedValues('items', ".zbx_jsvalue($reference).");");
-			$button->setType('button');
 			$table->setFooter(new CCol($button, 'right'));
 		}
 
@@ -1273,7 +1267,6 @@ include_once('include/page_header.php');
 
 		if($multiselect){
 			$button = new CButton('select', S_SELECT, "javascript: addSelectedValues('sysmaps', ".zbx_jsvalue($reference).");");
-			$button->setType('button');
 			$table->setFooter(new CCol($button, 'right'));
 		}
 
@@ -1295,9 +1288,10 @@ include_once('include/page_header.php');
 				'nodeids' => $nodeid,
 				'hostids'=> $hostid,
 				'output' => API_OUTPUT_EXTEND,
-				'select_hosts' => API_OUTPUT_EXTEND,
+				'selectHosts' => API_OUTPUT_EXTEND,
 				'templated' => 0,
 				'filter' => array(
+					'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED),
 					'status' => ITEM_STATUS_ACTIVE
 				),
 				'sortfield'=>'description'
@@ -1385,7 +1379,6 @@ include_once('include/page_header.php');
 
 		if($multiselect){
 			$button = new CButton('select', S_SELECT, "javascript: addSelectedValues('slides', ".zbx_jsvalue($reference).");");
-			$button->setType('button');
 			$table->setFooter(new CCol($button, 'right'));
 		}
 
@@ -1450,7 +1443,6 @@ include_once('include/page_header.php');
 
 		if($multiselect){
 			$button = new CButton('select', S_SELECT, "javascript: addSelectedValues('screens', ".zbx_jsvalue($reference).");");
-			$button->setType('button');
 			$table->setFooter(new CCol($button, 'right'));
 		}
 

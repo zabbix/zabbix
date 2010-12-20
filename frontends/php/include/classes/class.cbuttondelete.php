@@ -20,8 +20,8 @@
 ?>
 <?php
 class CButtonDelete extends CButtonQMessage{
-	public function __construct($msg=NULL, $vars=NULL){
-		parent::__construct('delete',S_DELETE,$msg,$vars);
+	public function __construct($msg=NULL, $vars=NULL, $class=null){
+		parent::__construct('delete',S_DELETE,$msg,$vars,$class);
 	}
 }
 ?>

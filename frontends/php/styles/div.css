@@ -1,4 +1,7 @@
 /* CSS Document */
+div.min-width{
+	min-width: 1000px;
+}
 
 div.disaster{
 	background-color: #FF0000;
@@ -130,14 +133,7 @@ div.formElement_footer{
 /* </FORM ELEMENT> */
 
 /**** SCREEN DRAG & DROP ****/
-div.draggable {
-	cursor: pointer;
-}
-
-div.hoverclass123{
-	border:1px solid red;
-}
-/***************************/
+div.draggable { cursor: move; }
 
 /********* DIV IMG *********/
 div.zabbix_logo{
@@ -147,7 +143,8 @@ div.zabbix_logo{
 	cursor: pointer;
 }
 
-div.menu_icon{
+.menu_icon{
+	display: inline-block;
 	background-repeat:no-repeat;
 	height: 16px;
 	width: 16px;
@@ -158,50 +155,72 @@ div.menu_icon{
 	-o-border-radius: 2px;
 	border-radius: 2px;
 }
-div.menu_icon:hover{
+
+.menu_icon:hover{
 	-webkit-box-shadow: 0 0 6px white;
 	-moz-box-shadow: 0 0 6px white;
 	box-shadow: 0 0 6px white;
 }
 
-div.iconminus{
+.iconminus{
 	background-image: url('../images/general/bttn/minus.png');
 }
-div.iconplus{
+.iconplus{
 	background-image: url('../images/general/bttn/plus.png');
 }
-div.iconmenu{
+.iconmenu{
 	background-image: url('../images/general/bttn/menu.png');
 }
-div.iconmenu_b{
+.iconmenu_b{
 	background-image: url('../images/general/bttn/menu.png');
 	background-color: #5572AA;
 }
-div.arrowup{
+.arrowup{
 	background-image: url('../images/general/bttn/arrowup.png');
 }
-div.arrowdown{
+.arrowdown{
 	background-image: url('../images/general/bttn/arrowdown.png');
 }
-div.arrowleft{
+.arrowleft{
 	background-image: url('../images/general/bttn/arrowleft.png');
 }
-div.arrowright{
+.arrowright{
 	background-image: url('../images/general/bttn/arrowright.png');
 }
-div.fullscreen{
+.fullscreen{
 	background-image: url('../images/general/bttn/fullscreen.png');
 }
-div.iconhelp{
+.iconhelp{
 	background-image: url('../images/general/bttn/help.png');
 }
-div.iconconfig{
+.iconconfig{
 	background-image: url('../images/general/bttn/config.png');
 }
-div.iconconfig_hl{
+.iconconfig_hl{
 	background-image: url('../images/general/bttn/config_hl.png');
 }
-div.filterclosed{
+
+.iconsound{
+	background-image: url('../images/general/bttn/sound.png');
+}
+.iconmute{
+	background-image: url('../images/general/bttn/mute.png');
+}
+.iconreset{
+	background-image: url('../images/general/bttn/reset.png');
+}
+.iconsnooze{
+	background-image: url('../images/general/bttn/snooze.png');
+}
+.iconclose{
+	background-image: url('../images/general/bttn/close.png');
+}
+.iconmove{
+	background-image: url('../images/general/bttn/move.png');
+	cursor: move;
+}
+
+.filterclosed{
 	height: 9px;
 	width: 9px;
 	background-image: url('../images/general/closed.gif');
@@ -209,7 +228,7 @@ div.filterclosed{
 	cursor:pointer;
 }
 
-div.filteropened{
+.filteropened{
 	height: 9px;
 	width: 9px;
 	background-image: url('../images/general/opened.gif');
@@ -217,42 +236,21 @@ div.filteropened{
 	cursor:pointer;
 }
 
-div.iconsound{
-	background-image: url('../images/general/bttn/sound.png');
-}
-div.iconmute{
-	background-image: url('../images/general/bttn/mute.png');
-}
-div.iconreset{
-	background-image: url('../images/general/bttn/reset.png');
-}
-div.iconsnooze{
-	background-image: url('../images/general/bttn/snooze.png');
-}
-div.iconclose{
-	background-image: url('../images/general/bttn/close.png');
-}
-div.iconmove{
-	background-image: url('../images/general/bttn/move.png');
-	cursor: move;
-}
-
-
-div.iconerror{
+.iconerror{
 	height: 14px;
 	width: 14px;
 	background-image: url('../images/general/error_icon.png');
 	background-repeat:no-repeat;
 	cursor:pointer;
 }
-div.iconok{
+.iconok{
 	height: 14px;
 	width: 14px;
 	background-image: url('../images/general/ok_icon.png');
 	background-repeat:no-repeat;
 }
 
-div.iconunknown{
+.iconunknown{
 	height: 14px;
 	width: 14px;
 	background-image: url('../images/general/unknown_icon.png');
@@ -261,63 +259,63 @@ div.iconunknown{
 }
 
 /* <status icons> */
-div.iconzbxunknown{
+.iconzbxunknown{
 	height: 14px;
 	width: 14px;
 	background-image: url('../images/general/zabbix_unknown.png');
 	background-repeat:no-repeat;
 	margin: 0 1px;
 }
-div.iconzbxavailable{
+.iconzbxavailable{
 	height: 14px;
 	width: 14px;
 	background-image: url('../images/general/zabbix_available.png');
 	background-repeat:no-repeat;
 	margin: 0 1px;
 }
-div.iconzbxunavailable{
+.iconzbxunavailable{
 	height: 14px;
 	width: 14px;
 	background-image: url('../images/general/zabbix_unavailable.png');
 	background-repeat:no-repeat;
 	margin: 0 1px;
 }
-div.iconsnmpunknown{
+.iconsnmpunknown{
 	height: 14px;
 	width: 14px;
 	background-image: url('../images/general/snmp_unknown.png');
 	background-repeat:no-repeat;
 	margin: 0 1px;
 }
-div.iconsnmpavailable{
+.iconsnmpavailable{
 	height: 14px;
 	width: 14px;
 	background-image: url('../images/general/snmp_available.png');
 	background-repeat:no-repeat;
 	margin: 0 1px;
 }
-div.iconsnmpunavailable{
+.iconsnmpunavailable{
 	height: 14px;
 	width: 14px;
 	background-image: url('../images/general/snmp_unavailable.png');
 	background-repeat:no-repeat;
 	margin: 0 1px;
 }
-div.iconipmiunknown{
+.iconipmiunknown{
 	height: 14px;
 	width: 14px;
 	background-image: url('../images/general/ipmi_unknown.png');
 	background-repeat:no-repeat;
 	margin: 0 1px;
 }
-div.iconipmiavailable{
+.iconipmiavailable{
 	height: 14px;
 	width: 14px;
 	background-image: url('../images/general/ipmi_available.png');
 	background-repeat:no-repeat;
 	margin: 0 1px;
 }
-div.iconipmiunavailable{
+.iconipmiunavailable{
 	height: 14px;
 	width: 14px;
 	background-image: url('../images/general/ipmi_unavailable.png');
@@ -327,7 +325,7 @@ div.iconipmiunavailable{
 /* </status icons> */
 
 
-div.dbl_arrow_down{
+.dbl_arrow_down{
 	height: 10px;
 	width: 9px;
 	background-image: url('../images/general/dbl_arrow_down2.png');
@@ -335,7 +333,7 @@ div.dbl_arrow_down{
 	display:block;
 	cursor:pointer;
 }
-div.dbl_arrow_up{
+.dbl_arrow_up{
 	height: 10px;
 	width: 9px;
 	background-image: url('../images/general/dbl_arrow_up2.png');
@@ -343,211 +341,105 @@ div.dbl_arrow_up{
 	cursor:pointer;
 }
 
-div.sla_green{
+.sla_green{
 	height: 15px;
 	background-image: url('../images/gradients/sla_green15.png');
 	background-repeat:repeat-x;
 }
-div.sla_red{
+.sla_red{
 	height: 15px;
 	background-image: url('../images/gradients/sla_red15.png');
 	background-repeat:repeat-x;
 }
 
-div.icon_sortup{
+.icon_sortup{
 	height: 16px;
 	width: 19px;
 	background-image: url('../images/general/sort_up.gif');
 	background-repeat:no-repeat;
 	cursor: pointer;
 }
-div.icon_sortdown{
+.icon_sortdown{
 	height: 16px;
 	width: 19px;
 	background-image: url('../images/general/sort_down.gif');
 	background-repeat:no-repeat;
 	cursor: pointer;
 }
-
-/********** <OBJECT LIST> ************/
-div.objectlist{
-	margin: 5px 5px 5px 5px;
-	border: 1px solid #6C80B9;
-	background-color: #FFFFFF;
-}
-
-div.objectlist ul{
-	padding: 3px 0px 3px 0px;
-	list-style: none;
-	margin: 0px;
-}
-
-div.objectlist ul li{
-	display: inline-block;
-	margin: 2px 10px 2px 5px;
-	white-space: nowrap;
-	font-size: 1.1em;
-}
-
-div.objectlist ul li.selected{
-	font-weight: bold;
-	font-size: 1.2em;
-}
-
 /********* DIV IMG END *********/
 
-.link{
-	cursor: pointer;
-	color:#3C3089;
-	text-decoration: underline;
-}
+/********** <OBJECT LIST> ************/
+.objectgroup { padding: 4px; margin: 5px 0px 5px 0px; }
+.border_dotted{ border: 1px dotted #6C80B9; }
+.border_none{ border: 0px; }
 
-.link:hover{
-	color:#6C80B9;
-	text-decoration: underline;
-}
+.footer { padding-left: 1.6em; }
+.footer .dt { float: left; width: 20%; }
+.footer .dt input.main{ border-color: #FFAA33;}
+.footer .dt input.main:hover{ border-color: #DD7711; }
+.footer .dd { width: 70%; padding-left: 21%; }
+/***************************/
 
-.darklink{
-	color:#3C3089;
-	cursor: pointer;
-	text-decoration: underline;
-}
+.link{ cursor: pointer; color:#3C3089; text-decoration: underline; }
+.link:hover{ color:#6C80B9; text-decoration: underline; }
 
-.darklink:hover{
-	color:#6C80B9;
-	text-decoration: underline;
-}
+.darklink{ color:#3C3089; cursor: pointer; text-decoration: underline; }
+.darklink:hover{ color:#6C80B9; text-decoration: underline; }
 
-.blacklink{
-	color:#1A1A1A;
-	cursor: pointer;
-	text-decoration: underline;
-}
+.blacklink{ color:#1A1A1A; cursor: pointer; text-decoration: underline;}
+.blacklink:hover{ color:#3A3A3A; }
 
-.blacklink:hover{
-	color:#3A3A3A;
-}
+.whitelink{ color:#F3F3F3; cursor: pointer; text-decoration: underline; }
+.whitelink:hover { color:#DADADA; }
 
-.whitelink{
-	color:#F3F3F3;
-	cursor: pointer;
-	text-decoration: underline;
-}
+.link_menu{ color: #3C3089; cursor: pointer; text-decoration: none; border-bottom: 1px dotted #3C3089; }
+.link_menu:hover { color: #6C80B9; text-decoration: none; border-bottom: 1px dotted #6C80B9; }
 
-.whitelink:hover{
-	color:#DADADA;
-}
+.underline{ text-decoration: underline; }
 
-.link_menu{
-	color: #3C3089;
-	cursor: pointer;
-	text-decoration: none;
-	border-bottom: 1px dotted #3C3089;
-}
-
-.link_menu:hover{
-	color: #6C80B9;
-	text-decoration: none;
-	border-bottom: 1px dotted #6C80B9;
-}
-
-.underline{
-	text-decoration: underline;
-}
-
-span.footer_sign{
-	padding-right: 5px;
-	padding-left: 5px;
-}
-
-span.divider{
-	color: #000000;
-	font-family: Verdana, Arial, sans-serif;
-	font-size: 10px;
-	font-weight: normal;
-}
+span.footer_sign{ padding-right: 5px; padding-left: 5px; }
+span.divider{ color: #000000; font-weight: normal;}
 
 /********** <SUBFILTER BUTTONS> ************/
-span.subfilter_enabled{
-	color: #00AA00;
-	cursor: pointer;
-	text-decoration: none;
-	border-bottom: 1px dashed;
-}
-span.subfilter_enabled:hover{
-	color:#44CC44;
-}
-span.subfilter_disabled{
-	color:maroon;
-	cursor: pointer;
-	text-decoration: none;
-	border-bottom: 1px dashed;
-}
-span.subfilter_disabled:hover{
-	color:#CC4444;
-}
-span.subfilter_inactive{
-	color: #777777;
-}
-span.subfilter_inactive:hover{
-
-	color: #999999;
-}
-span.subfilter_active{
-	color: teal;
-}
+span.subfilter_enabled{ color: #00AA00; cursor: pointer; text-decoration: none; border-bottom: 1px dashed; }
+span.subfilter_enabled:hover{ color:#44CC44; }
+span.subfilter_disabled{ color:maroon; cursor: pointer; text-decoration: none; border-bottom: 1px dashed; }
+span.subfilter_disabled:hover{ color:#CC4444; }
+span.subfilter_inactive{ color: #777777; }
+span.subfilter_inactive:hover{ color: #999999; }
+span.subfilter_active{ color: teal; }
 /********** </SUBFILTER BUTTONS> ************/
 
 /********** REQUIREMENTS TABLE *************/
 
-span.ok{
-	white-space: normal;
-	color:		#00AA00;
-	font-weight:	bold;
-}
+span.ok{ white-space: normal; color: #00AA00; font-weight: bold; }
+span.fail{ color: #AA0000; font-weight: bold; }
+span.fail:hover{ color:	#AA0000; }
 
-span.fail{
-	color:		#AA0000;
-	font-weight:	bold;
-}
-span.fail:hover{
-	color:		#AA0000;
-}
+span.green { color: #00AA00; }
+span.red { color: #AA0000; }
+span.orange { color: #EE6000; }
+span.blue { color: #0033FF; }
+span.info{ font-weight: bold; color: #444444; font-size: 11px; }
+span.discoveryName{ color: #999900; }
 
-span.green{
-	color:		#00AA00;
-}
 
-span.red{
-	color:		#AA0000;
-}
+/* Sortable */
+.column{ margin: 5px 0px 5px 5px; min-width: 240px; padding-bottom: 100px; }
 
-span.orange{
-	color:		#EE6000;
-}
+.column .widget{ padding: 2px; margin-bottom: 5px; overflow: hidden;}
 
-span.blue{
-	color:		#0033FF;
-}
-
-span.info{
- font-weight: bold;
-	color: #444444;
-	font-size: 11px;
-}
-
-span.discoveryName{
-	color: #999900;
-}
-
-.biglink{
+.column .widget .header{
+	height: 18px;
+	line-height: 18px;
+	font-size: 1.1em;
 	font-weight: bold;
-	font-size: 13px;
-	color:#3C3089;
-	cursor: pointer;
-	text-decoration: underline;
+	padding: 3px;
+	margin-bottom: 2px;
 }
-.biglink:hover{
-	color:#6C80B9;
-	text-decoration: underline;
-}
+
+.widget .header .menu_icon{ float: right; margin-right: 2px; }
+
+.widget .footer { color: white; line-height: 12px; height: 12px; padding: 4px 4px; margin-top: 2px;}
+
+.inlineblock{ display: inline-block; }

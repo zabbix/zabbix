@@ -52,13 +52,13 @@ class CDService extends CZBXAPI{
  * @param boolean $options['with_graphs'] only with graphs
  * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
  * @param int $options['extendoutput'] return all fields for Services
- * @param boolean $options['select_groups'] select ServiceGroups
+ * @param boolean $options['selectGroups'] select ServiceGroups
  * @param boolean $options['select_templates'] select Templates
- * @param boolean $options['select_items'] select Items
+ * @param boolean $options['selectItems'] select Items
  * @param boolean $options['select_triggers'] select Triggers
  * @param boolean $options['select_graphs'] select Graphs
  * @param boolean $options['select_applications'] select Applications
- * @param boolean $options['select_macros'] select Macros
+ * @param boolean $options['selectMacros'] select Macros
  * @param boolean $options['select_profile'] select Profile
  * @param int $options['count'] count Services, returned column name is rowscount
  * @param string $options['pattern'] search hosts by pattern in Service name
@@ -447,7 +447,7 @@ Copt::memoryPick();
 			}
 		}
 
-// select_hosts
+// selectHosts
 		if(!is_null($options['selectHosts'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
@@ -534,7 +534,6 @@ Copt::memoryPick();
 		$errors = array();
 		$dservices = zbx_toArray($dservices);
 		$dserviceids = array();
-		$groupids = array();
 		$result = false;
 
 		if($result){
@@ -558,9 +557,6 @@ Copt::memoryPick();
  * @param _array $dservices multidimensional array with Services data
  */
 	public static function update($dservices){
-		$errors = array();
-		$result = true;
-
 		$dservices = zbx_toArray($dservices);
 		$dserviceids = zbx_objectValues($dservices, 'hostid');
 

@@ -88,15 +88,22 @@ include_once('include/page_header.php');
 /****** APPLICATIONS **********/
 	if(isset($_REQUEST['save'])){
 		DBstart();
+		$application = array(
+			'name' => $_REQUEST['appname'],
+			'hostid' => $_REQUEST['apphostid']
+		);
 		if(isset($_REQUEST['applicationid'])){
-			$applicationid = update_application($_REQUEST['applicationid'],$_REQUEST['appname'], $_REQUEST['apphostid']);
+			$application['applicationid'] = $_REQUEST['applicationid'];
+			$applicationid = CApplication::update($application);
+			$applicationid = reset($applicationid['applicationids']);
+
 			$action		= AUDIT_ACTION_UPDATE;
 			$msg_ok		= S_APPLICATION_UPDATED;
 			$msg_fail	= S_CANNOT_UPDATE_APPLICATION;
-
 		}
-		else {
-			$applicationid = add_application($_REQUEST['appname'], $_REQUEST['apphostid']);
+		else{
+			$applicationid = CApplication::create($application);
+			$applicationid = reset($applicationid['applicationids']);
 			$action		= AUDIT_ACTION_ADD;
 			$msg_ok		= S_APPLICATION_ADDED;
 			$msg_fail	= S_CANNOT_ADD_APPLICATION;
@@ -212,7 +219,7 @@ include_once('include/page_header.php');
 	$frmForm = new CForm(null, 'get');
 	if(!isset($_REQUEST['form'])){
 		$frmForm->addItem(SPACE);
-		$frmForm->addItem(new CButton('form', S_CREATE_APPLICATION));
+		$frmForm->addItem(new CSubmit('form', S_CREATE_APPLICATION));
 	}
 
 	$app_wdgt->addPageheader(S_CONFIGURATION_OF_APPLICATIONS, $frmForm);
@@ -266,7 +273,7 @@ include_once('include/page_header.php');
 				));
 		}
 
-		$frmApp->addItemToBottomRow(new CButton('save',S_SAVE));
+		$frmApp->addItemToBottomRow(new CSubmit('save',S_SAVE));
 		if(isset($_REQUEST['applicationid'])){
 			$frmApp->addItemToBottomRow(SPACE);
 			$frmApp->addItemToBottomRow(new CButtonDelete(S_DELETE_APPLICATION,
@@ -333,7 +340,7 @@ include_once('include/page_header.php');
 			$options = array(
 				'applicationids' => zbx_objectValues($applications, 'applicationid'),
 				'output' => API_OUTPUT_EXTEND,
-				'select_items' => API_OUTPUT_REFER,
+				'selectItems' => API_OUTPUT_REFER,
 				'expandData' => 1,
 			);
 			$applications = CApplication::get($options);
@@ -378,12 +385,12 @@ include_once('include/page_header.php');
 			$goBox->addItem($goOption);
 
 			// goButton name is necessary!!!
-			$goButton = new CButton('goButton',S_GO.' (0)');
+			$goButton = new CSubmit('goButton',S_GO.' (0)');
 			$goButton->setAttribute('id','goButton');
 
 			zbx_add_post_js('chkbxRange.pageGoName = "applications";');
 
-			$footer = get_table_header(new CCol(array($goBox, $goButton)));
+			$footer = get_table_header(array($goBox, $goButton));
 	//----
 
 			$table = array($paging,$table,$paging,$footer);

@@ -26,18 +26,14 @@ class CComboBox extends CTag{
 		parent::__construct('select', 'yes');
 		$this->tag_end = '';
 
-		$this->attributes['id'] = $name;
-		$this->attributes['name'] = $name;
+		$this->setAttribute('id', $name);
+		$this->setAttribute('name', $name);
 
-		$this->attributes['class'] = 'select';
-		$this->attributes['size'] = 1;
+		$this->setAttribute('class', 'input select');
+		$this->setAttribute('size', 1);
 
 		$this->value = $value;
-		$this->setAction($action);
-	}
-
-	public function setAction($value='submit()', $event='onchange'){
-		$this->setAttribute($event,$value);
+		$this->setAttribute('onchange',$action);
 	}
 
 	public function setValue($value=NULL){
@@ -50,8 +46,11 @@ class CComboBox extends CTag{
 			parent::addItem($value);
 		}
 		else{
+			$title = false;
+			
 			if(zbx_strlen($caption) > 44){
-				$this->setAttribute('class', 'select selectShorten');
+				$this->setAttribute('class', $this->getAttribute('class').' selectShorten');
+				$title = true;
 			}
 
 			if(is_null($selected)){
@@ -68,7 +67,9 @@ class CComboBox extends CTag{
 				$selected = 'yes';
 			}
 
-			parent::addItem(new CComboItem($value, $caption, $selected, $enabled));
+			$citem = new CComboItem($value, $caption, $selected, $enabled);
+			if($title) $citem->setTitle($caption);
+			parent::addItem($citem);
 		}
 	}
 
@@ -78,7 +79,7 @@ class CComboBox extends CTag{
 			parent::addItem(new CComboItem($value, $caption, $selected));
 		}
 	}
-	
+
 	public function addItemsInGroup($label, $items){
 		$group = new COptGroup($label);
 		foreach($items as $value => $caption){
@@ -92,8 +93,8 @@ class CComboBox extends CTag{
 class COptGroup extends CTag{
 	public function __construct($label){
 		parent::__construct('optgroup', 'yes');
-		
-		$this->setAttribute('label', $label);	
+
+		$this->setAttribute('label', $label);
 	}
 }
 

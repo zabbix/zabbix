@@ -88,6 +88,7 @@
 
 	'S_SCHEMA' => 'Schema',
 //	dicoveryconf.php
+	'S_CREATED_SMALL' => _('created'),
 	'S_HOST_IP'=>				_('Host IP'),
 	'S_SERVICE_TYPE'=>			_('Service type'),
 	'S_SERVICE_PORT'=>			_('Service port'),
@@ -850,6 +851,10 @@
 	'S_DELETE_SELECTED_GROUPS'=>		_('Delete selected groups'),
 
 //	hosts.php
+	'S_HOST_INTERFACE' =>			_('Host interface'),
+	'S_IPMI'=>			_('IPMI'),
+	'S_INTERFACE_IS_USED' =>		_('Interface used in item'),
+	'S_NEW_HOST' =>					_('New host'),
 	'S_IMPORT_TEMPLATE'=>			_('Import Template'),
 	'S_IMPORT_HOST'=>				_('Import Host'),
 	'S_MACROS'=>					_('Macros'),
@@ -929,9 +934,6 @@
 	'S_IP_ADDRESS'=>				_('IP address'),
 	'S_LINK_ADDITIONAL_TEMPLATES'=>			_('Link additional templates'),
 	'S_RELINK_TEMPLATES'=>			_('Replace linked templates'),
-	'S_USEIPMI'=>					_('Use IPMI'),
-	'S_IPMI_IP_ADDRESS'=>				_('IPMI IP address'),
-	'S_IPMI_PORT'=>					_('IPMI port'),
 	'S_IPMI_AUTHTYPE'=>				_('IPMI authentication algorithm'),
 	'S_AUTHTYPE_DEFAULT'=>				_('Default'),
 	'S_AUTHTYPE_NONE'=>				_('None'),
@@ -972,6 +974,12 @@
 	'S_DELETE_SELECTED_HOSTS_Q'=>			_('Delete selected hosts?'),
 	'S_UPDATED_STATUS_OF_HOST' =>		_('Updated status of host'),
 	'S_CLEAR_WHEN_UNLINKING' => _('Clear when unlinking'),
+	'S_SNMP' =>						'SNMP',
+	'S_MAIN' =>						'Main',
+	'S_INTERFACES' =>				'Interfaces',
+	'S_INTERFACE' =>				'Interface',
+	'S_DISABLE_IPMI' => 'Disable IPMI',
+	'S_ENABLE_IPMI' => 'Enable IPMI',
 
 // templates.php
 	'S_TEMPLATE_LIST'=>			_('Templates list'),
@@ -1683,7 +1691,7 @@
 
 //	screens.php
 	'S_CUSTOM_SCREENS'=>			_('Custom screens'),
-	'S_SCREENS_BIG'=>				_('SCREENS 45645645'),
+	'S_SCREENS_BIG'=>				_('SCREENS'),
 	'S_HOST_SCREENS'=>				_('Host screens'),
 
 	'S_SLIDESHOW_UPDATED'=>			_('Slideshow updated'),
@@ -2550,6 +2558,5 @@
 	'S_PREVIOUS_PAGE'=>		_('Previous'),
 	'S_NEXT_PAGE'=>			_('Next'),
 	'S_PREVIOUS_EVENTS'=>		_('Previous'),
-
 );
 ?>

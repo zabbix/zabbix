@@ -90,7 +90,7 @@ class CAlert extends CZBXAPI{
 			'output'				=> API_OUTPUT_REFER,
 			'select_mediatypes'		=> null,
 			'select_users'			=> null,
-			'select_hosts'			=> null,
+			'selectHosts'			=> null,
 			'countOutput'			=> null,
 			'preservekeys'			=> null,
 			'editable'				=> null,
@@ -375,7 +375,7 @@ class CAlert extends CZBXAPI{
 					}
 
 // hostids
-					if(isset($alert['hostid']) && is_null($options['select_hosts'])){
+					if(isset($alert['hostid']) && is_null($options['selectHosts'])){
 						if(!isset($result[$alert['alertid']]['hosts']))
 							$result[$alert['alertid']]['hosts'] = array();
 
@@ -414,9 +414,9 @@ COpt::memoryPick();
 		$mediatypes = array();
 
 // Adding hosts
-		if(!is_null($options['select_hosts']) && str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselects_allowed_outputs)){
 			$obj_params = array(
-				'output' => $options['select_hosts'],
+				'output' => $options['selectHosts'],
 				'hostids' => $hostids,
 				'preservekeys' => 1
 			);

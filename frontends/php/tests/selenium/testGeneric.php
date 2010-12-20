@@ -24,8 +24,8 @@ require_once 'PHPUnit/Extensions/SeleniumTestCase.php';
 class testGeneric extends PHPUnit_Extensions_SeleniumTestCase
 {
 	protected $captureScreenshotOnFailure = TRUE;
-	protected $screenshotPath = '/tmp/screenshots';
-	protected $screenshotUrl = 'http://localhost/screenshots';
+	protected $screenshotPath = '/home/hudson/public_html/screenshots';
+	protected $screenshotUrl = 'http://hudson/~hudson/screenshots';
 
 	// List of strings that should NOT appear on any page
 	public $failIfExists = array (
@@ -44,7 +44,8 @@ class testGeneric extends PHPUnit_Extensions_SeleniumTestCase
 		"PHP warning",
 		"Use of undefined",
 		"You must login",
-		"DEBUG INFO"
+		"DEBUG INFO",
+		"Cannot modify header"
 	);
 
 	// List of strings that SHOULD appear on every page
@@ -63,30 +64,31 @@ class testGeneric extends PHPUnit_Extensions_SeleniumTestCase
 		// List of URLs to test
 		// URL, expected page Title
 		return array(
+
 			// Monitoring
 			array('index.php',	'ZABBIX'),
 			array('dashboard.php',	'Dashboard'),
 			array('dashconf.php',	'Dashboard configuration'),
 
-			array('overview.php',	'Overview [refreshed every 30 sec]'),
-			array('overview.php?form_refresh=1&groupid=0&type=1',	'Overview [refreshed every 30 sec]'),
-			array('overview.php?form_refresh=1&groupid=0&type=1&view_style=0',	'Overview [refreshed every 30 sec]'),
-			array('overview.php?form_refresh=1&groupid=0&type=1&view_style=1',	'Overview [refreshed every 30 sec]'),
+			array('overview.php',	'Overview \[refreshed every 30 sec\]'),
+			array('overview.php?form_refresh=1&groupid=0&type=1',	'Overview \[refreshed every 30 sec\]'),
+			array('overview.php?form_refresh=1&groupid=0&type=1&view_style=0',	'Overview \[refreshed every 30 sec\]'),
+			array('overview.php?form_refresh=1&groupid=0&type=1&view_style=1',	'Overview \[refreshed every 30 sec\]'),
 
-			array('httpmon.php',	'Status of Web monitoring [refreshed every 30 sec]'),
-			array('latest.php',	'Latest data [refreshed every 30 sec]'),
+			array('httpmon.php',	'Status of Web monitoring \[refreshed every 30 sec\]'),
+			array('latest.php',	'Latest data \[refreshed every 30 sec\]'),
 			array('hosts_mon.php',	'Hosts'),
-			array('tr_status.php',	'Status of triggers [refreshed every 30 sec]'),
+			array('tr_status.php',	'Status of triggers \[refreshed every 30 sec\]'),
 
-			array('events.php',	'Latest events [refreshed every 30 sec]'),
-			array('events.php?source=0',	'Latest events [refreshed every 30 sec]'),
-			array('events.php?source=1',	'Latest events [refreshed every 30 sec]'),
+			array('events.php',	'Latest events \[refreshed every 30 sec\]'),
+			array('events.php?source=0',	'Latest events \[refreshed every 30 sec\]'),
+			array('events.php?source=1',	'Latest events \[refreshed every 30 sec\]'),
 
-			array('charts.php',	'Custom graphs [refreshed every 30 sec]'),
-			array('screens.php',	'Custom screens [refreshed every 30 sec]'),
+			array('charts.php',	'Custom graphs \[refreshed every 30 sec\]'),
+			array('screens.php',	'Custom screens \[refreshed every 30 sec\]'),
 			array('slides.php',	'Custom slides'),
-			array('maps.php',	'Network maps [refreshed every 30 sec]'),
-			array('srv_status.php',	'IT services [refreshed every 30 sec]'),
+			array('maps.php',	'Network maps \[refreshed every 30 sec\]'),
+			array('srv_status.php',	'IT services \[refreshed every 30 sec\]'),
 
 			// Configuration
 			array('hostgroups.php',	'Host groups'),
@@ -103,6 +105,7 @@ class testGeneric extends PHPUnit_Extensions_SeleniumTestCase
 			array('screenconf.php',	'Configuration of screens'),
 			array('slideconf.php',	'Configuration of slideshows'),
 			array('sysmaps.php',	'Network maps'),
+			array('discovery.php',	'Status of discovery'),
 			array('services.php',	'Configuration of IT services'),
 			array('discoveryconf.php','Configuration of discovery'),
 
@@ -145,10 +148,10 @@ class testGeneric extends PHPUnit_Extensions_SeleniumTestCase
 			array('auditlogs.php',	'Audit'),
 			array('auditacts.php',	'Audit'),
 
-			array('queue.php',	'Queue [refreshed every 30 sec]'),
-			array('queue.php?config=0',	'Queue [refreshed every 30 sec]'),
-			array('queue.php?config=1',	'Queue [refreshed every 30 sec]'),
-			array('queue.php?config=2',	'Queue [refreshed every 30 sec]'),
+			array('queue.php',	'Queue \[refreshed every 30 sec\]'),
+			array('queue.php?config=0',	'Queue \[refreshed every 30 sec\]'),
+			array('queue.php?config=1',	'Queue \[refreshed every 30 sec\]'),
+			array('queue.php?config=2',	'Queue \[refreshed every 30 sec\]'),
 
 			array('report4.php',	'Notification report'),
 			array('instal.php',	'Installation'),
@@ -163,18 +166,23 @@ class testGeneric extends PHPUnit_Extensions_SeleniumTestCase
 	{
 		$this->setHost('localhost');
 		$this->setBrowser('*firefox');
-		$this->setBrowserUrl('http://localhost/~zabbix/DEV-492/frontends/php/');
+		$this->setBrowserUrl('http://hudson/~hudson/'.PHPUNIT_URL.'/frontends/php/');
 	}
 
 	public function login()
 	{
 		$this->open('index.php');
-		$this->click('link=Login');
 		$this->waitForPageToLoad();
-		$this->type('name','Admin');
-		$this->type('password','zabbix');
-		$this->click('enter');
-		$this->waitForPageToLoad();
+		// Login if not logged in already
+		if($this->isElementPresent('link=Login'))
+		{
+			$this->click('link=Login');
+			$this->waitForPageToLoad();
+			$this->type('name','Admin');
+			$this->type('password','zabbix');
+			$this->click('enter');
+			$this->waitForPageToLoad();
+		}
 	}
 
 	public function logout()
@@ -190,7 +198,7 @@ class testGeneric extends PHPUnit_Extensions_SeleniumTestCase
 	{
 		$this->login();
 		$this->open($a);
-		$this->assertTitleEquals($b,'assertTitleEquals('.$a.','.$b.')');
+		$this->assertTitle($b);
 		$this->logout();
 	}
 

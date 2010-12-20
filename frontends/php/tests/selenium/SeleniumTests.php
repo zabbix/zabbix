@@ -20,6 +20,7 @@
 ?>
 <?php
 require_once 'testGeneric.php';
+require_once 'testClicks.php';
 // ...
 
 class SeleniumTests
@@ -29,6 +30,7 @@ class SeleniumTests
 		$suite = new PHPUnit_Framework_TestSuite('selenium');
 
 		$suite->addTestSuite('testGeneric');
+		$suite->addTestSuite('testClicks');
 		// ...
 
 		return $suite;

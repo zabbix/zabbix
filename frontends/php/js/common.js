@@ -17,6 +17,12 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 // javascript document
+
+// jQuery no conflict
+if(typeof(jQuery) != 'undefined'){
+	jQuery.noConflict();
+}
+
 var agt = navigator.userAgent.toLowerCase();
 var OP = (agt.indexOf("opera") != -1) && window.opera;
 var IE = (agt.indexOf("msie") != -1) && document.all && !OP;
@@ -48,6 +54,7 @@ return 0;
 }
 
 function isset(key, obj){
+	if(is_null(key) || is_null(obj)) return false;
 	return (typeof(obj[key]) != 'undefined');
 }
 
@@ -106,7 +113,7 @@ function SDI(msg){
 		div_help.setAttribute('id','div_help');
 		div_help.setAttribute('style','position: absolute; left: 10px; top: 100px; border: 1px red solid; width: 400px; height: 400px; background-color: white; font-size: 12px; overflow: auto; z-index: 20;');
 
-		//new Draggable(div_help,{});
+		//jQuery(div_help).draggable();
 	}
 
 	var pre = document.createElement('pre');

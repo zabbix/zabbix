@@ -667,9 +667,9 @@ COpt::memoryPick();
 				$operationids[] = $operationid['operationid'];
 			}
 
-			DB::delete('conditions', DBcondition('actionid', $actionids));
-			DB::delete('opconditions', DBcondition('operationid', $operationids));
-			DB::delete('operations', DBcondition('actionid', $actionids));
+			DB::delete('conditions',   array('actionid'=>$actionids));
+			DB::delete('opconditions', array('operationid'=>$operationids));
+			DB::delete('operations',   array('actionid'=>$actionids));
 
 			self::addOperations($operations);
 			self::addConditions($conditions);
@@ -742,7 +742,6 @@ COpt::memoryPick();
 		$operations = zbx_toArray($operations);
 		$operation_inserts = array();
 		$opcondition_inserts = array();
-		$opmediatype_inserts = array();
 
 		foreach($operations as $onum => $operation){
 			if(!validate_operation($operation)){
@@ -805,7 +804,7 @@ COpt::memoryPick();
 				}
 			}
 
-			DB::delete('actions', DBcondition('actionid', $actionids));
+			DB::delete('actions', array('actionid'=>$actionids));
 
 			self::EndTransaction(true, __METHOD__);
 			return array('actionids' => $actionids);

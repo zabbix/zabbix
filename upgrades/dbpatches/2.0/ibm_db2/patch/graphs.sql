@@ -14,6 +14,8 @@ ALTER TABLE graphs ALTER COLUMN ymax_itemid DROP NOT NULL;
 REORG TABLE graphs;
 ALTER TABLE graphs ALTER COLUMN show_legend SET DEFAULT 1;
 REORG TABLE graphs;
+ALTER TABLE graphs ADD flags integer WITH DEFAULT '0' NOT NULL;
+REORG TABLE graphs;
 UPDATE graphs SET show_legend=1 WHERE graphtype=0 OR graphtype=1;
 UPDATE graphs SET templateid=NULL WHERE templateid=0;
 UPDATE graphs SET templateid=NULL WHERE NOT templateid IS NULL AND NOT templateid IN (SELECT graphid FROM graphs);

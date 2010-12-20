@@ -991,7 +991,7 @@ int	get_value_ipmi(DC_ITEM *item, AGENT_RESULT *value)
 		return NOTSUPPORTED;
 	}
 
-	h = init_ipmi_host(item->host.ipmi_ip, item->host.ipmi_port, item->host.ipmi_authtype,
+	h = init_ipmi_host(item->interface.addr, item->interface.port, item->host.ipmi_authtype,
 			item->host.ipmi_privilege, item->host.ipmi_username, item->host.ipmi_password);
 
 	if (0 == h->domain_up)
@@ -1095,8 +1095,8 @@ int	set_ipmi_control_value(DC_ITEM *item, int value, char *error, size_t error_m
 		return NOTSUPPORTED;
 	}
 
-	h = init_ipmi_host(item->host.useip ? item->host.ip : item->host.dns, item->host.ipmi_port,
-			item->host.ipmi_authtype, item->host.ipmi_privilege, item->host.ipmi_username, item->host.ipmi_password);
+	h = init_ipmi_host(item->interface.addr, item->interface.port, item->host.ipmi_authtype,
+			item->host.ipmi_privilege, item->host.ipmi_username, item->host.ipmi_password);
 
 	if (0 == h->domain_up) {
 		if (NULL != h->err)
