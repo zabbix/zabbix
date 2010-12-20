@@ -740,7 +740,7 @@ AC_DEFINE(HAVE_FUNCTION_SYSCTL_KERN_CPTIME,1,[Define to 1 if 'KERN_CPTIME,KERN_C
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
-AC_MSG_CHECKING(for clock_gettime in time.h)
+AC_MSG_CHECKING(for function clock_gettime in time.h)
 AC_TRY_LINK([
 #ifdef HAVE_TIME_H
 #	include <time.h>
