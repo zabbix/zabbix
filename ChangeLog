@@ -1,5 +1,6 @@
 Changes for 1.8.4rc3
 
+ - [ZBX-3301] fixed server crash after libssh2_userauth_list() when processing SSH checks (asaveljevs)
  - [ZBX-2395] fixed sending of the same message to the same user using different media types (asaveljevs)
  - [ZBXNEXT-586] added sensor[device,sensor,<mode>] check for Linux 2.4 (asaveljevs)
  - [ZBXNEXT-586] added sensor[device,sensor,<mode>] check for OpenBSD; thanks to Robert Nagy (asaveljevs)
