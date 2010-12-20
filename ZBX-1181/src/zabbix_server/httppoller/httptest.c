@@ -264,7 +264,7 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot init cURL");
+		zabbix_log(LOG_LEVEL_ERR, "Web scenario [%s] error: cannot init cURL library", httptest->name);
 		return;
 	}
 
@@ -279,7 +279,8 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 			/* must be preserved by the calling application until the transfer finishes. */
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, httpstep.posts)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot set cURL option %d: [%s]", opt, curl_easy_strerror(err));
+		zabbix_log(LOG_LEVEL_ERR, "Web scenario [%s] error: cannot set cURL option [%d]: %s",
+				httptest->name, opt, curl_easy_strerror(err));
 		curl_easy_cleanup(easyhandle);
 		return;
 	}
@@ -361,7 +362,8 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HTTPAUTH, curlauth)) ||
 					CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_USERPWD, auth)))
 			{
-				zabbix_log(LOG_LEVEL_ERR, "Cannot set cURL option %d: [%s]", opt, curl_easy_strerror(err));
+				zabbix_log(LOG_LEVEL_ERR, "Web scenario step [%s:%s] error: cannot set cURL option [%d]: %s",
+						httptest->name, httpstep.name, opt, curl_easy_strerror(err));
 				err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 			}
 		}
@@ -374,7 +376,8 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 					CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_TIMEOUT, httpstep.timeout)) ||
 					CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_CONNECTTIMEOUT, httpstep.timeout)))
 			{
-				zabbix_log(LOG_LEVEL_ERR, "Cannot set cURL option %d: [%s]", opt, curl_easy_strerror(err));
+				zabbix_log(LOG_LEVEL_ERR, "Web scenario step [%s:%s] error: cannot set cURL option [%d]: %s",
+						httptest->name, httpstep.name, opt, curl_easy_strerror(err));
 				err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 			}
 		}
@@ -385,7 +388,8 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 
 			if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 			{
-				zabbix_log(LOG_LEVEL_ERR, "Error doing curl_easy_perform [%s]", curl_easy_strerror(err));
+				zabbix_log(LOG_LEVEL_ERR, "Web scenario step [%s:%s] error: error doing curl_easy_perform: %s",
+						httptest->name, httpstep.name, curl_easy_strerror(err));
 				err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 			}
 			else
@@ -398,7 +402,8 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 
 				if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE, &stat.rspcode)))
 				{
-					zabbix_log(LOG_LEVEL_ERR, "Error getting CURLINFO_RESPONSE_CODE [%s]", curl_easy_strerror(err));
+					zabbix_log(LOG_LEVEL_ERR, "Web scenario step [%s:%s] error: error getting CURLINFO_RESPONSE_CODE: %s",
+							httptest->name, httpstep.name, curl_easy_strerror(err));
 					err_str = (NULL == err_str ? zbx_strdup(err_str, curl_easy_strerror(err)) : err_str);
 				}
 				else if ('\0' != httpstep.status_codes[0] && FAIL == int_in_list(httpstep.status_codes, stat.rspcode))
@@ -409,13 +414,15 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 
 				if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_TOTAL_TIME, &stat.total_time)))
 				{
-					zabbix_log(LOG_LEVEL_ERR, "Error getting CURLINFO_TOTAL_TIME [%s]", curl_easy_strerror(err));
+					zabbix_log(LOG_LEVEL_ERR, "Web scenario step [%s:%s] error: error getting CURLINFO_TOTAL_TIME: %s",
+							httptest->name, httpstep.name, curl_easy_strerror(err));
 					err_str = (NULL == err_str ? zbx_strdup(err_str, curl_easy_strerror(err)) : err_str);
 				}
 
 				if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_SPEED_DOWNLOAD, &stat.speed_download)))
 				{
-					zabbix_log(LOG_LEVEL_ERR, "Error getting CURLINFO_SPEED_DOWNLOAD [%s]", curl_easy_strerror(err));
+					zabbix_log(LOG_LEVEL_ERR, "Web scenario step [%s:%s] error: error getting CURLINFO_SPEED_DOWNLOAD: %s",
+							httptest->name, httpstep.name, curl_easy_strerror(err));
 					err_str = (NULL == err_str ? zbx_strdup(err_str, curl_easy_strerror(err)) : err_str);
 				}
 				else
