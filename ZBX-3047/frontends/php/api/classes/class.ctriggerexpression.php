@@ -221,6 +221,7 @@ private $allowedFunctions;
 			throw new Exception('Incorrect trigger expression format " '.$expression.' "');
 
 		$exprCount = substr_count($expression, '{expression}');
+
 		if($linkageCount != $exprCount-1)
 			throw new Exception('Incorrect usage of expression logic linking symbols');
 	}

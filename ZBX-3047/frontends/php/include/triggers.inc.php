@@ -569,44 +569,6 @@ return $caption;
 	}
 
 /*
- * Function: get_hosts_by_expression
- *
- * Description:
- *	 retrieve selection of hosts by trigger expression
- *
- * Author:
- *	 Eugene Grigorjev (eugene.grigorjev@zabbix.com)
- *
- * Comments:
- *
- */
-	function get_hosts_by_expression($expression){
-		$expressionData = parseTriggerExpressions($expression, true);
-
-		//SDI($expression);
-
-		$hosts = array();
-		if(isset($expressionData[$expression]['hosts'])) {
-			foreach($expressionData[$expression]['hosts'] as &$hostData) {
-				$hostName = zbx_dbstr(zbx_substr($expression, $hostData['openSymbolNum']+1, $hostData['closeSymbolNum']-($hostData['openSymbolNum']+1)));
-				if(!in_array($hostName, $hosts)) $hosts[] = $hostName;
-			}
-		}
-
-		//SDII($hosts);
-
-		$sql = 'SELECT DISTINCT * '.
-				' FROM hosts '.
-				' WHERE '.DBin_node('hostid', false).
-					' AND status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.') '.
-					' AND host IN ('.(count($hosts) > 0 ? implode(',',$hosts) : '\'!#\'').')';
-		//SDI($sql);
-		/*$myhosts = CHost::get(Array('output' => API_OUTPUT_EXTEND, 'filter' => Array('host' => $hosts)));
-		return $myhosts;*/
-		return DBselect($sql);
-	}
-
-/*
  * Function: zbx_unquote_param
  *
  * Description:
@@ -1856,13 +1818,12 @@ return $caption;
 			}
 		}
 
-
-		$exp_hosts 	= get_hosts_by_expression($expression);
-		if( $exp_hosts ){
+		$exp_hosts = $expr->data['hosts'];
+		if(!empty($exp_hosts)){
 			$chd_hosts	= get_hosts_by_templateid($trig_host['hostid']);
 
 			if(DBfetch($chd_hosts)){
-				$exp_host = DBfetch($exp_hosts);
+				$expHostName = reset($exp_hosts);
 
 				$db_chd_triggers = get_triggers_by_templateid($triggerid);
 				while($db_chd_trigger = DBfetch($db_chd_triggers)){
@@ -1870,7 +1831,7 @@ return $caption;
 					$chd_trig_host = DBfetch($chd_trig_hosts);
 
 					$newexpression = str_replace(
-						'{'.$exp_host['host'].':',
+						'{'.$expHostName.':',
 						'{'.$chd_trig_host['host'].':',
 						$expression);
 
@@ -2193,9 +2154,14 @@ return $caption;
 			$templates = array();
 			$templateids = array();
 			$templated_trigger = false;
-			$db_triggerhosts = get_hosts_by_expression($expression);
 
-			while($triggerhost = DBfetch($db_triggerhosts)){
+			$expr = new CTriggerExpression(array('expression' => $expression));
+			$hosts = CHost::get(array(
+				'templated_hosts' => true,
+				'filter' => array('host' => $expr->data['hosts']),
+				'output' => array('host', 'status')
+			));
+			foreach($hosts as $hnum => $triggerhost){
 				if($triggerhost['status'] == HOST_STATUS_TEMPLATE){
 					$templates[$triggerhost['hostid']] = $triggerhost;
 					$templateids[$triggerhost['hostid']] = $triggerhost['hostid'];
@@ -3021,21 +2987,18 @@ return $caption;
 	function analyze_expression($expression){
 		if(empty($expression)) return array('', null);
 
-		$pasedData = parseTriggerExpressions($expression, true);
-
-		if(!isset($pasedData[$expression]['errors'])) {
-			$next = Array();
-			$nextletter = 'A';
-//			SDI('ANALYZE EXPRESSION!!!----------------------------------------------------------------------------------------->>>>>>>>>>>>>>>>>>');
-//			SDII($pasedData[$expression]['tree']);
-			$ret = build_expression_html_tree($expression, $pasedData[$expression]['tree'], 0, $next, $nextletter);
-//			SDII($pasedData[$expression]['tree']);
-			return $ret;
-		}else{
-			//SDII($pasedData[$expression]['errors']);
-			showExpressionErrors($expression, $pasedData[$expression]['errors']);
+		$expr = new CTriggerExpression(array('expression' => $expression));
+		if(!empty($expr->errors)){
+			foreach($expr->errors as $error) error($error);
 			return false;
 		}
+
+		$pasedData = parseTriggerExpressions($expression, true);
+
+		$next = array();
+		$nextletter = 'A';
+		$ret = build_expression_html_tree($expression, $pasedData[$expression]['tree'], 0, $next, $nextletter);
+	return $ret;
 	}
 
 	function showExpressionErrors($expression, $errors) {
@@ -3725,7 +3688,8 @@ return $caption;
 				'type'		=> T_ZBX_INT,
 				'validation'	=> IN('0,1')
 				);
-		}else{
+		}
+		else{
 			$hostId = $itemId = $function = null;
 			$expData = parseTriggerExpressions($expr, true);
 			if(!isset($expData[$expr]['errors'])) {
@@ -3929,11 +3893,7 @@ return $caption;
 		$noErrors = true;
 		foreach($expressions as $key => $str) {
 			if(!isset($triggersData[$str])) {
-				if(ZAPCAT_COMPATIBILITY){
-					$tmp_expr = str_replace(',,',',][,', $str);
-				}
-				else
-					$tmp_expr = $str;
+				$tmp_expr = $str;
 //SDI($tmp_expr);
 				if($scparser->parse($tmp_expr)) {
 					$triggersData[$str]['expressions'] = $scparser->getElements('expression');
