@@ -539,12 +539,12 @@ include_once('include/page_header.php');
 //----
 				if(!empty($macrosToDelete)){
 					if(!CUserMacro::deleteGlobal($macrosToDelete))
-						throw new Exception('Can\'t remove macro');
+						throw new Exception(_('Cannot remove macro'));
 				}
 
 				if(!empty($macrosToUpdate)){
 					if(!CUsermacro::updateGlobal($macrosToUpdate))
-						throw new Exception('Cannot update macro');
+						throw new Exception(_('Cannot update macro'));
 				}
 
 				if(!empty($newMacros)){
