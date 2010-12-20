@@ -31,7 +31,7 @@ private $allowedFunctions;
 				$symbol = zbx_substr($expression, $symbolNum, 1);
 
 				$this->setExpressionParts($symbol);
-
+				
 				if($this->inQuotes($symbol)) continue;
 
 				$this->checkSymbolPrevious($symbol);
@@ -63,7 +63,7 @@ private $allowedFunctions;
 	private function inQuotes($symbol){
 		if(($symbol == '"') || ($symbol == '\\')) return false;
 
-		return ($this->symbols['expr']['"'] % 2);
+		return (bool)($this->symbols['expr']['"'] % 2);
 	}
 
 	private function checkSymbolClose($symbol){
@@ -72,11 +72,11 @@ private $allowedFunctions;
 		switch($symbol){
 			case '}':
 				if($this->symbols['open']['{'] <= $this->symbols['close']['}'])
-					throw new Exception('Incorrect closing symbol in trigger expression');
+					throw new Exception('Incorrect closing curly braces in trigger expression');
 				break;
 			case ')':
 				if($this->symbols['open']['('] <= $this->symbols['close'][')'])
-					throw new Exception('Incorrect closing symbol in trigger expression');
+					throw new Exception('Incorrect closing parenthesis in trigger expression');
 				break;
 			default:
 				return true;
@@ -99,7 +99,7 @@ private $allowedFunctions;
 
 		if($this->currExpr['part']['expression']){
 			if($symbol == '"'){
-				if(($this->previous['expr'] == '\\') && ($this->symbols['sequence'] % 2 == 1)){
+				if(($this->previous['last'] == '\\') && ($this->symbols['sequence'] % 2 == 1)){
 					$this->symbols['expr'][$symbol]--;
 				}
 			}
@@ -109,10 +109,11 @@ private $allowedFunctions;
 			}
 		}
 		else{
+/*
 			if(isset($this->symbols['open'][$symbol])) return true;
 			if(isset($this->symbols['close'][$symbol])) return true;
 			if(isset($this->symbols['linkage'][$symbol])) return true;
-/*
+
 			if(!isset($this->symbols['linkage'][$this->previous['last']])){
 				if(!zbx_empty($this->previous['last']) && !zbx_ctype_digit($this->previous['last']))
 					throw new Exception('Unexpected symbols " '.$symbol.' " in trigger expresion');
@@ -131,7 +132,7 @@ private $allowedFunctions;
 
 	private function checkExpressionBrackets(&$expression){
 		if($this->symbols['open']['('] != $this->symbols['close'][')'])
-			throw new Exception('Incorrect parenthethis count in expression');
+			throw new Exception('Incorrect parenthesis count in expression');
 
 		if($this->symbols['open']['{'] != $this->symbols['close']['}'])
 			throw new Exception('Incorrect curly braces count in expression');
@@ -164,40 +165,77 @@ private $allowedFunctions;
 				if(!preg_match('/^'.ZBX_PREG_FUNCTION_FORMAT.'$/i', $expr['function']))
 					throw new Exception('Incorrect trigger function format is used in expression');
 
-				if(!zbx_empty($expr['functionParam'])){
-					$expr['functionParam'] = explode(',', $expr['functionParam']);
+				$this->checkFunctionParams($expr);
 
-					if(!is_null($this->allowedFunctions[$expr['functionName']]['args'])){
-						foreach($this->allowedFunctions[$expr['functionName']]['args'] as $anum => $arg){
-// mandatory check
-							if(isset($arg['mandat']) && $arg['mandat'] && !isset($expr['functionParam'][$anum]))
-								throw new Exception('Incorrect number of agruments passed to function " '.$expr['function'].' "');
-// type check
-							if(isset($arg['type']) && isset($expr['functionParam'][$anum])){
-								$typeFlag = true;
-								if($arg['type'] == 'str') $typeFlag = is_string($expr['functionParam'][$anum]);
-								if($arg['type'] == 'sec') $typeFlag = (validate_float($expr['functionParam'][$anum]) == 0);
-								if($arg['type'] == 'sec_num') $typeFlag = (validate_ticks($expr['functionParam'][$anum]) == 0);
-								if($arg['type'] == 'num') $typeFlag = is_numeric($expr['functionParam'][$anum]);
-
-								if(!$typeFlag)
-									throw new Exception('Incorrect type of agruments passed to function " '.$expr['function'].' "');
-							}
-						}
-					}
-				}
 
 				$this->data['hosts'][] = $expr['host'];
 				$this->data['items'][] = $expr['key'];
 				$this->data['functions'][] = $expr['functionName'];
 				$this->data['functionParams'][] = $expr['functionParam'];
 			}
-//SDII($this->data);
+
 			$expression = str_replace($expr['expression'], '{expression}', $expression);
 		}
 
 		if(empty($this->data['hosts']) || empty($this->data['items']))
 			throw new Exception('Trigger expression must contain at least one host:key reference');
+	}
+
+	private function checkFunctionParams($expr){
+		$paramCount = 0;
+		$inQuotes = false;
+		$prevSymbol = '';
+		$params = array();
+
+		$length = zbx_strlen($expr['functionParam']);
+		for($symbolNum = 0; $symbolNum < $length; $symbolNum++){
+			$symbol = zbx_substr($expr['functionParam'], $symbolNum, 1);
+
+			if(($symbol == '"') && ($prevSymbol != '\\')){
+				$inQuotes = !$inQuotes;
+
+				if($inQuotes && isset($params[$paramCount]))
+					throw new Exception('Incorrect trigger function parameter syntax is used in "'.$expr['function'].'"');
+
+				continue;
+			}
+			
+			if(!$inQuotes){
+				if(($symbol == ',') && ($prevSymbol != '\\')){
+					$paramCount++;
+					continue;
+				}
+				else if(($symbol == '\\') && ($symbol == $prevSymbol)){
+					$prevSymbol = '';
+					continue;
+				}
+			}
+
+			if(!isset($params[$paramCount])) $params[$paramCount] = '';
+			$params[$paramCount] .= $symbol;
+			$prevSymbol = $symbol;
+		}
+
+
+		$functionParam = $params;
+		if(!is_null($this->allowedFunctions[$expr['functionName']]['args'])){
+			foreach($this->allowedFunctions[$expr['functionName']]['args'] as $anum => $arg){
+// mandatory check
+				if(isset($arg['mandat']) && $arg['mandat'] && !isset($functionParam[$anum]))
+					throw new Exception('Incorrect number of agruments passed to function "'.$expr['function'].'"');
+// type check
+				if(isset($arg['type']) && isset($functionParam[$anum])){
+					$typeFlag = true;
+					if($arg['type'] == 'str') $typeFlag = is_string($functionParam[$anum]);
+					if($arg['type'] == 'sec') $typeFlag = (validate_float($functionParam[$anum]) == 0);
+					if($arg['type'] == 'sec_num') $typeFlag = (validate_ticks($functionParam[$anum]) == 0);
+					if($arg['type'] == 'num') $typeFlag = is_numeric($functionParam[$anum]);
+
+					if(!$typeFlag)
+						throw new Exception('Incorrect type of agruments passed to function "'.$expr['function'].'"');
+				}
+			}
+		}
 	}
 
 	private function checkSimpleExpression(&$expression){
@@ -337,10 +375,10 @@ private $allowedFunctions;
 			}
 
 			if($symbol == '}'){
-				$this->currExpr['object']['host'] = ltrim($this->currExpr['object']['host'], '{');
-				$this->currExpr['object']['key'] = ltrim($this->currExpr['object']['key'], ':');
+				$this->currExpr['object']['host'] = substr($this->currExpr['object']['host'], 1);
+				$this->currExpr['object']['key'] = substr($this->currExpr['object']['key'], 1);
 				$this->currExpr['object']['function'] = rtrim($this->currExpr['object']['function'], '}');
-				$this->currExpr['object']['functionParam'] = ltrim($this->currExpr['object']['functionParam'], '(');
+				$this->currExpr['object']['functionParam'] = substr($this->currExpr['object']['functionParam'], 1);
 
 				$this->expressions[] = $this->currExpr['object'];
 				return true;
