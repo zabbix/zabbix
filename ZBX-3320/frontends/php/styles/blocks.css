@@ -1,0 +1,392 @@
+/* CSS Document */
+/*
+** ZABBIX
+** Copyright (C) 2000-2009 SIA Zabbix
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+**
+*/
+
+/************************************************************/
+/*					ZABBIX MESSAGING						*/
+/************************************************************/
+div.messagecontainer{
+	position: absolute;
+	top: 84px;
+	right: 0px;
+	background-color: #94A1BB;
+	border: 2px solid #FFFFFF;
+	z-index: 1000;
+}
+
+div.messagecontainer .header{
+	height: 18px;
+	padding: 2px 0px 2px 2px;
+	margin: 0px 2px 0px 2px;
+	padding-right: 80px;
+}
+
+div.messagecontainer .header .headertext{
+	font-weight: bold;
+	color: #FFFFFF;
+	font-size: 10pt;
+	margin: 0px;
+}
+
+div.messagecontainer .header .controls{
+	position: absolute;
+	right: 1px;
+	top: 2px;
+}
+
+
+div.messagecontainer ul{
+	clear: right;
+	padding: 0px;
+	margin: 0px 0px 2px 1px;
+	list-style: none;
+}
+
+div.messagecontainer ul li.listItem{
+	margin: 1px 2px 1px 2px;
+	border: 1px solid #FFFFFF;
+}
+
+div.messagecontainer ul li.listItem .message{
+	white-space: nowrap;
+}
+
+div.messagecontainer .message .messagebox{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	padding: 0px 22px 2px 6px;
+	margin-left: 20px;
+	background-color: #4F4F4F;
+	color: #EAEAEA;
+}
+
+div.messagecontainer .message .messagebox span.title{
+	line-height: 22px;
+	font-size: 10pt;
+	font-weight: bold;
+	white-space: nowrap;
+}
+
+div.messagecontainer .messagebox span.title a{
+	font-size: 10pt;
+	color: #EAEAEA;
+	white-space: nowrap;
+	line-height: 22px;
+}
+
+div.messagecontainer .messagebox span.body{
+	line-height: 14px;
+	font-size: 7pt;
+	white-space: nowrap;
+}
+
+div.messagecontainer .messagebox span.body a{
+	color: #EAEAEA;
+	line-height: 14px;
+	font-size: 7pt;
+	white-space: nowrap;
+}
+/************************************************************/
+/*						SEARCH Suggest						*/
+/************************************************************/
+div.suggest{
+	position: absolute;
+	border: 1px #5C7099 solid;
+	width: 162px;
+	z-index: 100;
+	display: none;
+}
+
+/************************************************************/
+/*					SCROLLBAR III STYLES					*/
+/************************************************************/
+div.scrollbar{
+	position: relative;
+	border: 1px #4F6FA8 solid;
+	height: 56px;
+	background-color: #DDDDDD;
+	margin: 0 auto;
+/*	overflow: hidden; */
+}
+
+div.scrollbar .info{
+	height: 14px;
+	font-size: 10px;
+	vertical-align:bottom;
+}
+
+div.scrollbar .info .zoom{
+	float: left;
+	border: 0px #FF00FF solid;
+	white-space:nowrap;
+	height: 14px;
+	line-height: 14px;
+}
+
+div.scrollbar .info .zoom .text{
+	padding-left: 2px;
+	padding-right: 5px;
+	
+	font-weight: bold;
+	font-size: 11px;
+	color: #333333;
+}
+
+div.scrollbar .info .zoom .links{
+	font-size: 10px;
+	white-space: nowrap;
+}
+
+div.scrollbar .info .zoom .links .link{
+	padding-left: 3px;
+	padding-right: 3px;
+	line-height: 14px;
+	vertical-align: top;
+}
+
+div.scrollbar .info .timeline{
+	float: right;
+	border: 0px #FF00FF solid;
+	white-space:nowrap;
+	
+	height: 14px;
+	font-size: 10px;
+	vertical-align:bottom;
+}
+
+div.scrollbar .info .timeline .info_left{
+	border: 0px black solid;
+	padding-right: 5px;	
+
+	line-height: 12px;
+	vertical-align: bottom;
+	text-decoration: none;
+}
+
+div.scrollbar .info .timeline .info_sep1{
+	border: 0px black solid;
+	padding-right: 5px;
+
+	line-height: 14px;
+	vertical-align: bottom;
+}
+
+div.scrollbar .info .timeline .info_right{
+	border: 0px black solid;
+	padding-right: 2px;
+
+	line-height: 12px;
+	vertical-align: bottom;
+	text-decoration: none;
+}
+
+div.scrollbar .sublevel{
+}
+
+div.scrollbar .sublevel .bg{
+	height: 27px;
+	background-image: url(../images/general/bar/bg.png);
+	background-repeat:repeat-x;
+}
+
+div.scrollbar .sublevel .left{
+	float: left;
+	width: 17px;
+	height: 27px;
+	background-image: url(../images/general/bar/left.png);
+	cursor: pointer;
+}
+
+div.scrollbar .sublevel .right{
+	float: right;
+	width: 17px;
+	height: 27px;
+	background-image: url(../images/general/bar/right.png);
+	cursor: pointer;
+}
+
+div.scrollbar .overlevel{
+	position:absolute;
+	top: 14px;
+	border: 0px green solid;
+	height: 27px;
+	left: 17px;
+}
+
+div.scrollbar .overlevel .bar{
+	position:relative;
+	left: 74px;	
+	width: 140px;
+	height: 25px;
+	
+	border: 1px black solid;
+	
+	z-index: 1;
+	cursor: pointer;
+}
+
+div.scrollbar .overlevel .bar .icon{
+	position: relative;
+	height: 25px;
+	
+	background-image: url(../images/general/bar/bar_bg.png);
+	background-repeat:repeat-x;
+}
+
+div.scrollbar .overlevel .bar .icon .center{
+	background-image: url(../images/general/bar/bar_middle.png);
+	background-position:center;
+	background-repeat:no-repeat;
+
+	height: 25px;
+}
+
+div.scrollbar .overlevel .ghost{
+	position: absolute;
+	top: 0px;
+	left: 74px;
+
+	height: 25px;
+	width: 140px;
+	
+	line-height: 25px;
+	
+	border: 1px black solid;
+}
+
+div.scrollbar .overlevel .left_arr{
+	position: absolute;
+	top: 8px;
+	left: 70px;
+	width: 9px;
+	height: 13px;
+
+	background-image: url(../images/general/bar/left_arr.png);
+	
+	z-index: 99;
+	cursor:e-resize;
+}
+
+div.scrollbar .overlevel .right_arr{
+	position: absolute;
+	top: 8px;
+	left: 211px;
+	width: 9px;
+	height: 13px;
+
+	background-image: url(../images/general/bar/right_arr.png);
+	
+	z-index: 99;
+	cursor:e-resize;
+}
+
+div.scrollbar .subline{
+	height: 14px;
+	border: 0px blue solid;
+}
+
+div.scrollbar .subline .nav_links{
+	float: left;
+	border: 0px black solid;
+	padding-left: 2px;
+	padding-right: 5px;
+	line-height: 12px;
+}
+
+div.scrollbar .subline .nav_links .link{
+	padding-left: 3px;
+	padding-right: 3px;
+	line-height: 10px;
+	vertical-align: top;
+}
+
+div.scrollbar .subline .nav_links .text{
+	line-height: 12px;
+	vertical-align: top;
+	color: #333333;
+}
+
+div.scrollbar .subline .period{
+	float: right;
+	width: 60px;
+	text-align: right;
+}
+
+div.scrollbar .subline .period .period_state_begin{
+	padding-left: 2px;
+	line-height: 12px;
+	color: #888888;
+}
+
+div.scrollbar .subline .period .period_state_end{
+	padding-right: 2px;
+	line-height: 12px;
+	color: #888888;
+}
+
+div.scrollbar .subline .period .period_state{
+	line-height: 12px;
+	color: #888888;
+}
+
+div.scrollbar .subline .info_period{
+	float: right;
+	padding-left: 2px;
+	padding-right: 2px;
+	line-height: 14px;
+	vertical-align: bottom;
+	color: #333333;
+}
+
+/************************************************************/
+/*						SBOX STYLES							*/
+/************************************************************/
+
+div#selection_box{
+	position: absolute;
+	filter:alpha(opacity=40);
+	opacity:.40;
+	background-color:#0000FF;
+	border:1px black solid;
+	width: 1px;
+	height: 1px;
+	z-index: 4;
+	overflow:hidden;
+}
+
+div.box_on{
+	position: absolute;
+	z-index:2;
+	border: 0px red solid;
+/*
+	background-color:#FF0000;
+	opacity:.50;
+	filter:alpha(opacity=50);
+/**/
+}
+
+span#period_span{
+	font-weight: bold;
+	font-size: 11px;
+	color: #FFFFFF;
+	position: absolute;
+	top: 2px;
+	right: 4px;
+	text-decoration:none;
+}
