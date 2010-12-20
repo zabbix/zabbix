@@ -256,13 +256,11 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 
 	now = time(NULL);
 
-	DBexecute(
-		"update httptest"
-		" set lastcheck=%d,"
-			"nextcheck=%d+delay"
-		" where httptestid=" ZBX_FS_UI64,
-		now, now,
-		httptest->httptestid);
+	DBexecute("update httptest"
+			" set lastcheck=%d,"
+				"nextcheck=%d+delay"
+			" where httptestid=" ZBX_FS_UI64,
+			now, now, httptest->httptestid);
 
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
@@ -338,7 +336,7 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 		else
 			curl_easy_setopt(easyhandle, CURLOPT_POST, 0);
 
-		if (NULL == err_str && httptest->authentication != HTTPTEST_AUTH_NONE)
+		if (httptest->authentication != HTTPTEST_AUTH_NONE)
 		{
 			long	curlauth = 0;
 
@@ -443,20 +441,21 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 
 	curl_easy_cleanup(easyhandle);
 
-	DBexecute(
-		"update httptest"
-		" set curstep=0,curstate=%d,"
-			"lastcheck=%d,nextcheck=%d+delay,"
-			"lastfailedstep=%d,"
-			"time=" ZBX_FS_DBL ","
-			"error='%s'"
-		" where httptestid=" ZBX_FS_UI64,
-		HTTPTEST_STATE_IDLE,
-		now, now,
-		lastfailedstep,
-		httptest->time,
-		esc_err_str,
-		httptest->httptestid);
+	DBexecute("update httptest"
+			" set curstep=0,"
+				"curstate=%d,"
+				"lastcheck=%d,"
+				"nextcheck=%d+delay,"
+				"lastfailedstep=%d,"
+				"time=" ZBX_FS_DBL ","
+				"error='%s'"
+			" where httptestid=" ZBX_FS_UI64,
+			HTTPTEST_STATE_IDLE,
+			now, now,
+			lastfailedstep,
+			httptest->time,
+			esc_err_str,
+			httptest->httptestid);
 
 	zbx_free(esc_err_str);
 
