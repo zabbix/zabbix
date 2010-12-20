@@ -385,8 +385,10 @@ class CHost extends CZBXAPI{
 			}
 
 			$sql_parts['from']['dservices'] = 'dservices ds';
+			$sql_parts['from']['interface'] = 'interface i';
 			$sql_parts['where'][] = DBcondition('ds.dserviceid', $options['dserviceids']);
-			$sql_parts['where']['dsh'] = 'ds.ip=h.ip';
+			$sql_parts['where']['dsh'] = 'ds.ip=i.ip';
+			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
 
 			if(!is_null($options['groupCount'])){
 				$sql_parts['group']['dserviceid'] = 'ds.dserviceid';
