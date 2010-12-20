@@ -880,7 +880,7 @@ include_once('include/page_header.php');
 				$sql = 'SELECT COUNT(itemid) as cnt FROM items WHERE valuemapid='.$_REQUEST['valuemapid'];
 				$count = DBfetch(DBselect($sql));
 				if($count['cnt']){
-					$confirmMesage = _n('Delete selected value mapping? It is used for %d item!', 
+					$confirmMesage = _n('Delete selected value mapping? It is used for %d item!',
 						'Delete selected value mapping? It is used for %d items!', $count['cnt']);
 				}
 				else{
