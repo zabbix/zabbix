@@ -1160,11 +1160,18 @@ Copt::memoryPick();
 				if(!$result){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 				}
+				
+				foreach($host['groups'] as $group){
+					$hostgroupid = get_dbid('hosts_groups', 'hostgroupid');
+					$result = DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES ($hostgroupid, $hostid, {$group['groupid']})");
+					if(!$result){
+						self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+					}
+				}
 
 				$host['hostid'] = $hostid;
 				$options = array();
 				$options['hosts'] = $host;
-				$options['groups'] = $host['groups'];
 				if(isset($host['templates']) && !is_null($host['templates']))
 					$options['templates'] = $host['templates'];
 				if(isset($host['macros']) && !is_null($host['macros']))
@@ -1281,13 +1288,14 @@ Copt::memoryPick();
 
 		try{
 			self::BeginTransaction(__METHOD__);
-
+sdii($data['hosts']);
 			$options = array(
 				'hostids' => zbx_objectValues($data['hosts'], 'hostid'),
 				'editable' => 1,
 				'preservekeys' => 1
 			);
 			$upd_hosts = self::get($options);
+sdii($upd_hosts);
 			foreach($data['hosts'] as $hnum => $host){
 				if(!isset($upd_hosts[$host['hostid']])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, 'You do not have enough rights for operation');

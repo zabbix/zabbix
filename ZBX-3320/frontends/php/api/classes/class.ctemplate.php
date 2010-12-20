@@ -996,10 +996,17 @@ COpt::memoryPick();
 				if(!DBexecute($sql))
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBError');
 
+				foreach($template['groups'] as $group){
+					$hostgroupid = get_dbid('hosts_groups', 'hostgroupid');
+					$result = DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES ($hostgroupid, $templateid, {$group['groupid']})");
+					if(!$result){
+						self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+					}
+				}
+
 				$template['templateid'] = $templateid;
 				$options = array();
 				$options['templates'] = $template;
-				$options['groups'] = $template['groups'];
 				if(isset($template['templates']) && !is_null($template['templates']))
 					$options['templates_link'] = $template['templates'];
 				if(isset($template['macros']) && !is_null($template['macros']))
