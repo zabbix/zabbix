@@ -553,7 +553,7 @@ DB_RESULT	__zbx_DBselect(const char *fmt, ...);
 
 DB_RESULT	DBselectN(const char *query, int n);
 DB_ROW		DBfetch(DB_RESULT result);
-int		DBis_null(char *field);
+int		DBis_null(const char *field);
 void		DBbegin();
 void		DBcommit();
 void		DBrollback();
@@ -566,13 +566,11 @@ zbx_uint64_t	DBget_nextid(const char *tablename, int num);
 
 int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error);
 int	DBadd_service_alarm(zbx_uint64_t serviceid, int status, int clock);
-int	DBadd_alert(zbx_uint64_t actionid, zbx_uint64_t eventid, zbx_uint64_t userid, zbx_uint64_t mediatypeid, char *sendto, char *subject, char *message);
 int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid);
 int	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid);
 int	DBremove_escalation(zbx_uint64_t escalationid);
-void	DBupdate_triggers_status_after_restart(void);
-int	DBget_prev_trigger_value(zbx_uint64_t triggerid);
-int     DBupdate_trigger_value(zbx_uint64_t triggerid, int type, int value,
+void	DBupdate_triggers_status_after_restart();
+int	DBupdate_trigger_value(zbx_uint64_t triggerid, int type, int value,
 		const char *trigger_error, int new_value, int now, const char *reason);
 
 int	DBget_row_count(const char *table_name);
