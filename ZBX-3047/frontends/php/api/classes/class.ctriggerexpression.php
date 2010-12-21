@@ -285,8 +285,10 @@ private $allowedFunctions;
 		else{
 			$this->symbols['sequence'] = 1;
 
-			if($symbol != ' ')
+			if($symbol != ' '){
+				$this->previous['prelast'] = $this->previous['last'];
 				$this->previous['last'] = $symbol;
+			}
 		}
 
 		if(isset($this->symbols['open'][$symbol])){
@@ -322,10 +324,11 @@ private $allowedFunctions;
 						$this->currExpr['part']['host'] = true;
 						break;
 					case '$':
-						if($this->previous['last'] == '{'){
+						if($this->previous['prelast'] == '{'){
 							$this->currExpr['part']['usermacro'] = true;
 							$this->currExpr['part']['host'] = false;
 
+							$this->currExpr['object']['host'] = '';
 							$this->currExpr['object']['usermacro'] = $this->currExpr['object']['expression'];
 						}
 				}
@@ -384,6 +387,7 @@ private $allowedFunctions;
 
 			if($symbol == '}'){
 				$this->currExpr['object']['expression'] = '{'.$this->currExpr['object']['expression'].'}';
+				$this->currExpr['object']['usermacro'] = '{'.$this->currExpr['object']['usermacro'].'}';
 				$this->currExpr['object']['host'] = rtrim($this->currExpr['object']['host'], ':');
 				$this->currExpr['object']['key'] = $this->currExpr['object']['key'];
 				$this->currExpr['object']['function'] = $this->currExpr['object']['function'];
@@ -477,6 +481,7 @@ private $allowedFunctions;
 
 		$this->previous = array(
 			'last' => '',
+			'prelast' => '',
 			'open' => '',
 			'close' => '',
 			'linkage' => '',

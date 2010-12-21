@@ -1396,6 +1396,8 @@ return $caption;
 
 		$cuted = 0;
 		foreach($trigExpr->expressions as $exprPart){
+			if(zbx_empty($exprPart['host'])) continue;
+
 			$sql = 'SELECT i.itemid '.
 				' FROM items i,hosts h'.
 				' WHERE i.key_='.zbx_dbstr($exprPart['key']).
