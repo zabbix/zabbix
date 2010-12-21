@@ -134,6 +134,7 @@ private $allowedFunctions;
 		$this->checkExpressionBrackets($simpleExpression);
 		$this->checkExpressionParts($simpleExpression);
 		$this->checkSimpleExpression($simpleExpression);
+//SDII($this->data);
 	}
 
 	private function checkExpressionBrackets(&$expression){
@@ -199,11 +200,15 @@ private $allowedFunctions;
 			$symbol = zbx_substr($expr['functionParam'], $symbolNum, 1);
 
 			if(($symbol == '"') && ($prevSymbol != '\\')){
-				$inQuotes = !$inQuotes;
-
-				if($inQuotes && isset($params[$paramCount]))
-					throw new Exception('Incorrect trigger function parameter syntax is used in "'.$expr['function'].'"');
-
+				if($inQuotes){
+					$inQuotes = false;
+				}
+				else{
+					if($inQuotes = !isset($params[$paramCount]))
+						$params[$paramCount] = '';
+					else if(zbx_empty($params[$paramCount]))
+						throw new Exception('Incorrect trigger function parameter syntax is used in "'.$expr['function'].'"');
+				}
 				continue;
 			}
 
@@ -219,11 +224,12 @@ private $allowedFunctions;
 			}
 
 			if(!isset($params[$paramCount])) $params[$paramCount] = '';
+
 			$params[$paramCount] .= $symbol;
 			$prevSymbol = $symbol;
 		}
 
-//SDII($params);
+SDII($params);
 		$functionParam = $params;
 		if(!is_null($this->allowedFunctions[$expr['functionName']]['args'])){
 			foreach($this->allowedFunctions[$expr['functionName']]['args'] as $anum => $arg){
