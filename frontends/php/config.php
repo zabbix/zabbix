@@ -535,19 +535,19 @@ include_once('include/page_header.php');
 //----
 				if(!empty($macrosToDelete)){
 					if(!CUserMacro::deleteGlobal($macrosToDelete))
-						throw new Exception('Can\'t remove macro');
+						throw new Exception(S_CANNOT_REMOVE_MACRO);
 				}
 
 				if(!empty($macrosToUpdate)){
 					if(!CUsermacro::updateGlobal($macrosToUpdate))
-						throw new Exception('Cannot update macro');
+						throw new Exception(S_CANNOT_UPDATE_MACRO);
 				}
 
 				if(!empty($newMacros)){
 					$macrosToAdd = array_values($newMacros);
 					$new_macroids = CUsermacro::createGlobal($macrosToAdd);
 					if(!$new_macroids)
-						throw new Exception('Cannot add macro');
+						throw new Exception(S_CANNOT_ADD_MACRO);
 				}
 
 				if(!empty($macrosToAdd)){

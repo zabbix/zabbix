@@ -473,7 +473,7 @@ SDI('/////////////////////////////////');
 		$maps = array();
 		$screens = array();
 
-		$resources = array(SCREEN_RESOURCE_GRAPH, SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT, 
+		$resources = array(SCREEN_RESOURCE_GRAPH, SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT,
 					SCREEN_RESOURCE_MAP,SCREEN_RESOURCE_SCREEN, SCREEN_RESOURCE_TRIGGERS_OVERVIEW,
 					SCREEN_RESOURCE_DATA_OVERVIEW);
 
@@ -486,7 +486,7 @@ SDI('/////////////////////////////////');
 
 			if(isset($item['resourceid']) && ($item['resourceid'] == 0)){
 				if(uint_in_array($item['resourcetype'], $resources))
-					throw new Exception('Incorrect resource provided for screen item');
+					throw new Exception(S_INCORRECT_RESOURCE_PROVIDED_FOR_SCREEN_ITEM);
 				else
 					continue;
 			}
@@ -525,7 +525,7 @@ SDI('/////////////////////////////////');
 				'preservekeys' => 1,
 			));
 			foreach($hostgroups as $id){
-				if(!isset($result[$id])) 
+				if(!isset($result[$id]))
 					self::exception(ZBX_API_ERROR_PERMISSIONS, 'Incorrect Host group identity "'.$id.'" provided for Screens item resource');
 			}
 		}

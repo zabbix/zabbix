@@ -295,7 +295,7 @@ include_once('include/page_header.php');
 
 
 		$form->addRow(S_IP_RANGE, new CTextBox('iprange', $iprange, 27));
-		$form->addRow(S_DELAY.' (seconds)', new CNumericBox('delay', $delay, 8));
+		$form->addRow(S_DELAY.SPACE.S_SECOND_IN_PARENTHESES, new CNumericBox('delay', $delay, 8));
 
 		$form->addVar('dchecks', $dchecks);
 		$form->addVar('dchecks_deleted', $dchecks_deleted);
