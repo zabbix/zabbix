@@ -170,12 +170,12 @@
 		}
 
 		$speed = format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_IN]);
-		$respTime = format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME]);
+		$respTime = $httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME]['lastvalue'];
 		$resp = format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_RSPCODE]);
 		$table->addRow(array(
 			$httpstep_data['name'],
 			($speed == 0 ? '-' : $speed),
-			($respTime == 0 ? '-' : $respTime),
+			($respTime == 0 ? '-' : format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME])),
 			($resp == 0 ? '-' : $resp),
 			new CSpan($status['msg'], $status['style'])
 		));
