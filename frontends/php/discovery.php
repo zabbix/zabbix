@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ include_once('include/page_header.php');
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder('ip',ZBX_SORT_UP);
+	validate_sort_and_sortorder('ip', ZBX_SORT_UP);
 
 ?>
 <?php
@@ -61,18 +61,19 @@ include_once('include/page_header.php');
 	$dscvry_wdgt = new CWidget('hat_discovery');
 
 // HEADER
-	$r_form = new CForm();
-	$r_form->setMethod('get');
+	$r_form = new CForm(null, 'get');
 
-	$druleid = get_request('druleid', 0);
 	$fullscreen = get_request('fullscreen', 0);
+	$druleid = get_request('druleid', 0);
 
-	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
+	$r_form->addVar('fullscreen', $fullscreen);
+
+	$fs_icon = get_icon('fullscreen', array('fullscreen' => $fullscreen));
 	$dscvry_wdgt->addPageHeader(S_STATUS_OF_DISCOVERY_BIG, $fs_icon);
 
 // 2nd header
-	$cmbDRules = new CComboBox('druleid',$druleid,'submit()');
-	$cmbDRules->addItem(0,S_ALL_SMALL);
+	$cmbDRules = new CComboBox('druleid', $druleid, 'submit()');
+	$cmbDRules->addItem(0, S_ALL_SMALL);
 
 	$options = array(
 		'filter' => array(
@@ -89,34 +90,22 @@ include_once('include/page_header.php');
 			get_node_name_by_elid($drule['druleid'], null, ': ').$drule['name']
 		);
 	}
-	$r_form->addVar('fullscreen', $fullscreen);
-	$r_form->addItem(array(S_DISCOVERY_RULE.SPACE,$cmbDRules));
 
-//	$dscvry_wdgt->addHeader(array(S_FOUND.': ',$numrows), $r_form);
+	$r_form->addItem(array(S_DISCOVERY_RULE.SPACE, $cmbDRules));
 
-	$numrows = new CDiv();
-	$numrows->setAttribute('name', 'numrows');
 
 	$dscvry_wdgt->addHeader(S_DISCOVERY_RULES_BIG, $r_form);
-//	$dscvry_wdgt->addHeader($numrows);
-//-------------
-
-
-	$sortfield = getPageSortField('ip');
-	$sortorder = getPageSortOrder();
-
 	$options = array(
 		'selectHosts' => array('hostid', 'host', 'status'),
 		'output' => API_OUTPUT_EXTEND,
-		'sortfield' => $sortfield,
-		'sortorder' => $sortorder,
+		'sortfield' => getPageSortField('ip'),
+		'sortorder' => getPageSortOrder(),
 		'limitSelects' => 1
 	);
-
-	if($druleid>0) $options['druleids'] = $druleid;
-	else $options['druleids'] = zbx_objectValues($drules,'druleid');
-
+	if($druleid > 0) $options['druleids'] = $druleid;
+	else $options['druleids'] = zbx_objectValues($drules, 'druleid');
 	$dservices = CDService::get($options);
+
 	$gMacros = CUserMacro::get(array(
 		'output' => API_OUTPUT_EXTEND,
 		'globalmacro' => 1
@@ -241,7 +230,10 @@ include_once('include/page_header.php');
 						discovery_port2str($dservice['type'], $dservice['port']).
 						$key_;
 
-				$discovery_info[$dservice['ip']]['services'][$service_name] = array('class' => $class, 'time' => $dservice[$time]);
+				$discovery_info[$dservice['ip']]['services'][$service_name] = array(
+					'class' => $class,
+					'time' => $dservice[$time]
+				);
 			}
 		}
 
@@ -269,8 +261,6 @@ include_once('include/page_header.php');
 
 				$hint = new CDiv(SPACE, $class);
 
-
-
 				$hintTable = null;
 				if(isset($h_data['services'][$name])){
 					$class = $h_data['services'][$name]['class'];
@@ -279,10 +269,10 @@ include_once('include/page_header.php');
 					$hintTable = new CTableInfo();
 					$hintTable->setAttribute('style','width: auto;');
 
-					if ($class == 'active') {
+					if($class == 'active') {
 						$hintTable->setHeader(S_UP_TIME);
 					}
-					else if ($class == 'inactive') {
+					else if($class == 'inactive') {
 						$hintTable->setHeader(S_DOWN_TIME);
 					}
 
@@ -306,7 +296,5 @@ include_once('include/page_header.php');
 
 ?>
 <?php
-
 include_once('include/page_footer.php');
-
 ?>
