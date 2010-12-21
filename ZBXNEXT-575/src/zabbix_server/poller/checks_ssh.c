@@ -20,14 +20,13 @@
 #include "checks_ssh.h"
 
 #ifdef HAVE_SSH2
+
 #include "comms.h"
 #include "log.h"
 
 #define SSH_RUN_KEY	"ssh.run"
 
-/*****************************************************/
-const char		*password;
-/*****************************************************/
+static const char	*password;
 
 static void	kbd_callback(const char *name, int name_len, const char *instruction,
 		int instruction_len, int num_prompts,
@@ -38,10 +37,13 @@ static void	kbd_callback(const char *name, int name_len, const char *instruction
 	(void)name_len;
 	(void)instruction;
 	(void)instruction_len;
-	if (num_prompts == 1) {
+
+	if (num_prompts == 1)
+	{
 		responses[0].text = strdup(password);
 		responses[0].length = strlen(password);
 	}
+
 	(void)prompts;
 	(void)abstract;
 }
@@ -61,10 +63,10 @@ static int	waitsocket(int socket_fd, LIBSSH2_SESSION *session)
 	/* now make sure we wait in the correct direction */
 	dir = libssh2_session_block_directions(session);
 
-	if(dir & LIBSSH2_SESSION_BLOCK_INBOUND)
+	if (0 != (dir & LIBSSH2_SESSION_BLOCK_INBOUND))
 		readfd = &fd;
 
-	if(dir & LIBSSH2_SESSION_BLOCK_OUTBOUND)
+	if (0 != (dir & LIBSSH2_SESSION_BLOCK_OUTBOUND))
 		writefd = &fd;
 
 	rc = select(socket_fd + 1, readfd, writefd, NULL, &tv);
@@ -79,7 +81,6 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 	zbx_sock_t	s;
 	LIBSSH2_SESSION	*session;
 	LIBSSH2_CHANNEL	*channel;
-/*	const char	*fingerprint;*/
 	int		auth_pw = 0, rc, ret = NOTSUPPORTED,
 			exitcode, bytecount = 0;
 	char		buffer[MAX_BUFFER_LEN], buf[16], *userauthlist,
@@ -112,25 +113,21 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 		goto session_free;
 	}
 
-	/* At this point we havn't authenticated. The first thing to do is check
-	 * the hostkey's fingerprint against our known hosts. Your app may have it
-	 * hard coded, may go to a file, may present it to the user, that's your
-	 * call
-	 */
-/*	fingerprint = libssh2_hostkey_hash(session, LIBSSH2_HOSTKEY_HASH_MD5);*/
-
-/*	buffer = zbx_strdcatf(buffer, "Fingerprint: ");
-	for (i = 0; i < 16; i++)
-		buffer = zbx_strdcatf(buffer, "%02X:", (unsigned char)fingerprint[i]);*/
-
 	/* check what authentication methods are available */
-	userauthlist = libssh2_userauth_list(session, item->username, strlen(item->username));
-	if (NULL != strstr(userauthlist, "password"))
-		auth_pw |= 1;
-	if (NULL != strstr(userauthlist, "keyboard-interactive"))
-		auth_pw |= 2;
-	if (NULL != strstr(userauthlist, "publickey"))
-		auth_pw |= 4;
+	if (NULL != (userauthlist = libssh2_userauth_list(session, item->username, strlen(item->username))))
+	{
+		if (NULL != strstr(userauthlist, "password"))
+			auth_pw |= 1;
+		if (NULL != strstr(userauthlist, "keyboard-interactive"))
+			auth_pw |= 2;
+		if (NULL != strstr(userauthlist, "publickey"))
+			auth_pw |= 4;
+	}
+	else
+	{
+		SET_MSG_RESULT(result, strdup("Failure obtaining authentication methods"));
+		goto session_close;
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() Supported authentication methods:'%s'", __function_name, userauthlist);
 
@@ -235,7 +232,8 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 	for (;;)
 	{
 		/* loop until we block */
-		do {
+		do
+		{
 			if (0 < (rc = libssh2_channel_read(channel, buf, sizeof(buf))))
 			{
 				sz = (size_t)rc;
@@ -247,7 +245,8 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 				memcpy(buffer + bytecount, buf, sz);
 				bytecount += sz;
 			}
-		} while (rc > 0);
+		}
+		while (rc > 0);
 
 		/* this is due to blocking that would occur otherwise so we loop on
 		 * this condition
@@ -347,4 +346,5 @@ int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result)
 
 	return ssh_run(item, result, encoding);
 }
+
 #endif	/* HAVE_SSH2 */

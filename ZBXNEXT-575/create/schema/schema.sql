@@ -762,6 +762,7 @@ FIELD		|port		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 UNIQUE		|1		|hostid,key_
 INDEX		|3		|status
 INDEX		|4		|templateid
+INDEX		|5		|valuemapid
 
 TABLE|item_discovery|itemdiscoveryid|ZBX_SYNC
 FIELD		|itemdiscoveryid|t_id		|	|NOT NULL	|0

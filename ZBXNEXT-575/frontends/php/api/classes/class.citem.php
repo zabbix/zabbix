@@ -106,6 +106,7 @@ class CItem extends CZBXAPI{
 // OutPut
 			'output'				=> API_OUTPUT_REFER,
 			'selectHosts'			=> null,
+			'selectInterfaces'		=> null,
 			'select_triggers'		=> null,
 			'select_graphs'			=> null,
 			'select_applications'	=> null,
@@ -574,6 +575,27 @@ COpt::memoryPick();
 					unset($template['items']);
 					foreach($titems as $inum => $item){
 						$result[$item['itemid']]['hosts'][] = $template;
+					}
+				}
+			}
+		}
+
+// Adding interfaces
+		if(!is_null($options['selectInterfaces'])){
+			if(is_array($options['selectInterfaces']) || str_in_array($options['selectInterfaces'], $subselects_allowed_outputs)){
+				$obj_params = array(
+					'nodeids' => $nodeids,
+					'itemids' => $itemids,
+					'output' => $options['selectInterfaces'],
+					'nopermissions' => 1,
+					'preservekeys' => 1
+				);
+				$interfaces = CHostInterface::get($obj_params);
+				foreach($interfaces as $interfaceid => $interface){
+					$hitems = $interface['items'];
+					unset($interface['items']);
+					foreach($hitems as $inum => $item){
+						$result[$item['itemid']]['interfaces'][] = $interface;
 					}
 				}
 			}

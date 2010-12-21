@@ -533,7 +533,7 @@ DB_RESULT	__zbx_DBselect(const char *fmt, ...);
 
 DB_RESULT	DBselectN(const char *query, int n);
 DB_ROW		DBfetch(DB_RESULT result);
-int		DBis_null(char *field);
+int		DBis_null(const char *field);
 void		DBbegin();
 void		DBcommit();
 void		DBrollback();
@@ -574,7 +574,6 @@ int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64
 int	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid);
 int	DBremove_escalation(zbx_uint64_t escalationid);
 void	DBupdate_triggers_status_after_restart();
-int	DBget_prev_trigger_value(zbx_uint64_t triggerid);
 int	DBupdate_trigger_value(zbx_uint64_t triggerid, int trigger_type, int trigger_value, int trigger_flags,
 		const char *trigger_error, int new_value, int new_flags, const zbx_timespec_t *ts, const char *reason);
 
