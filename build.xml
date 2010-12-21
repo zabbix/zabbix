@@ -7,6 +7,99 @@
 	<property name="dbname" value="${DBNAME}"/>
 	<property name="url" value="${URL}"/>
 
+	<target name="buildagent">
+		<!-- Build agent binaries -->
+		<exec executable="./configure" failonerror="on">
+			<arg line="--enable-agent
+			" />
+		</exec>
+		<exec executable="make" failonerror="on"/>
+	</target>
+
+	<target name="buildserver">
+		<!-- Build PostgreSQL server binaries -->
+		<exec executable="./configure" failonerror="on">
+			<arg line="--enable-server
+			--with-postgresql
+			--with-net-snmp
+			--with-openipmi
+			--with-ldap
+			--with-ssh2
+			--with-libcurl
+			--with-jabber
+			" />
+		</exec>
+		<exec executable="make" failonerror="on"/>
+		<!-- Build MySQL server binaries -->
+		<exec executable="./configure" failonerror="on">
+			<arg line="--enable-server
+			--with-mysql
+			--with-net-snmp
+			--with-openipmi
+			--with-ldap
+			--with-ssh2
+			--with-libcurl
+			--with-jabber
+			" />
+		</exec>
+		<exec executable="make" failonerror="on"/>
+		<!-- Build SQlite server binaries -->
+		<exec executable="./configure" failonerror="on">
+			<arg line="--enable-server
+			--with-sqlite3
+			--with-net-snmp
+			--with-openipmi
+			--with-ldap
+			--with-ssh2
+			--with-libcurl
+			--with-jabber
+			" />
+		</exec>
+		<exec executable="make" failonerror="on"/>
+	</target>
+
+	<target name="buildproxy">
+		<!-- Build PostgreSQL proxy binaries -->
+		<exec executable="./configure" failonerror="on">
+			<arg line="--enable-proxy
+			--with-postgresql
+			--with-net-snmp
+			--with-openipmi
+			--with-ldap
+			--with-ssh2
+			--with-libcurl
+			--with-jabber
+			" />
+		</exec>
+		<exec executable="make" failonerror="on"/>
+		<!-- Build MySQL proxy binaries -->
+		<exec executable="./configure" failonerror="on">
+			<arg line="--enable-proxy
+			--with-mysql
+			--with-net-snmp
+			--with-openipmi
+			--with-ldap
+			--with-ssh2
+			--with-libcurl
+			--with-jabber
+			" />
+		</exec>
+		<exec executable="make" failonerror="on"/>
+		<!-- Build SQlite proxy binaries -->
+		<exec executable="./configure" failonerror="on">
+			<arg line="--enable-proxy
+			--with-sqlite3
+			--with-net-snmp
+			--with-openipmi
+			--with-ldap
+			--with-ssh2
+			--with-libcurl
+			--with-jabber
+			" />
+		</exec>
+		<exec executable="make" failonerror="on"/>
+	</target>
+
 	<target name="init">
 		<!-- Create the different build directories -->
 		<mkdir dir="${basedir}/build/logs" />
@@ -64,7 +157,7 @@
 	</target>
 
 	<!-- Default target -->
-	<target name="build" depends="init,gui" />
+	<target name="build" depends="clean,init,buildagent,buildproxy,buildserver,gui" />
 
 	<target name="gui">
 		<exec executable="phpunit" dir="${basedir}/frontends/php/tests" failonerror="off">

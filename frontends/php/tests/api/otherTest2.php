@@ -21,10 +21,10 @@
 <?php
 require_once 'PHPUnit/Framework.php';
 
-require_once('../include/func.inc.php');
-require_once('../include/items.inc.php');
-require_once('../include/defines.inc.php');
-require_once('../include/locales.inc.php');
+require_once(dirname(__FILE__).'/../../include/func.inc.php');
+require_once(dirname(__FILE__).'/../../include/items.inc.php');
+require_once(dirname(__FILE__).'/../../include/defines.inc.php');
+require_once(dirname(__FILE__).'/../../include/locales.inc.php');
 
 class otherTest2 extends PHPUnit_Framework_TestCase
 {
