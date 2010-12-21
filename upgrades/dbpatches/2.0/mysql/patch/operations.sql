@@ -142,12 +142,12 @@ BEGIN
 				SET h_pos = LOCATE(':', cur_string);
 				SET g_pos = LOCATE('#', cur_string);
 
-				IF h_pos <> 0 AND h_pos < g_pos THEN
+				IF h_pos <> 0 AND (g_pos = 0 OR h_pos < g_pos) THEN
 					INSERT INTO _opcommand_hst
 						VALUES (_operationid, TRIM(SUBSTRING(cur_string, 1, h_pos - 1)), TRIM(SUBSTRING(cur_string, h_pos + 1)), NULL);
 				END IF;
 
-				IF g_pos <> 0 AND g_pos < h_pos THEN
+				IF g_pos <> 0 AND (h_pos = 0 OR g_pos < h_pos) THEN
 					INSERT INTO _opcommand_grp
 						VALUES (_operationid, TRIM(SUBSTRING(cur_string, 1, g_pos - 1)), TRIM(SUBSTRING(cur_string, g_pos + 1)), NULL);
 				END IF;
