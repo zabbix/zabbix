@@ -465,10 +465,8 @@ typedef struct
 	zbx_uint64_t	applicationid;
 	int		nextcheck;
 	int		status;
-	int		delay;
 	char		*macros;
 	char		*agent;
-	double		speed;
 	double		time;
 	int		authentication;
 	char		*http_user;

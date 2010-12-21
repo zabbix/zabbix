@@ -513,7 +513,7 @@ void	process_httptests(int now)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect(
-			"select t.httptestid,t.name,t.applicationid,t.nextcheck,t.status,t.delay,"
+			"select t.httptestid,t.name,t.applicationid,t.nextcheck,t.status,"
 				"t.macros,t.agent,t.authentication,t.http_user,t.http_password"
 			" from httptest t,applications a,hosts h"
 			" where t.applicationid=a.applicationid"
@@ -538,12 +538,11 @@ void	process_httptests(int now)
 		ZBX_STR2UINT64(httptest.applicationid, row[2]);
 		httptest.nextcheck	= atoi(row[3]);
 		httptest.status		= atoi(row[4]);
-		httptest.delay		= atoi(row[5]);
-		httptest.macros		= row[6];
-		httptest.agent		= row[7];
-		httptest.authentication	= atoi(row[8]);
-		httptest.http_user	= row[9];
-		httptest.http_password	= row[10];
+		httptest.macros		= row[5];
+		httptest.agent		= row[6];
+		httptest.authentication	= atoi(row[7]);
+		httptest.http_user	= row[8];
+		httptest.http_password	= row[9];
 
 		process_httptest(&httptest);
 	}
