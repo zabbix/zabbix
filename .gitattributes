@@ -239,7 +239,9 @@ frontends/php/styles/originalblue/images/ui-icons_6da8d5_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_cd0a0a_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_d8e7f3_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_f9bd01_256x240.png -text
+frontends/php/tests/bootstrap.php.template -text
 frontends/php/tests/selenium/SeleniumTests.php -text
+frontends/php/tests/selenium/testClicks.php -text
 frontends/php/tests/selenium/testGeneric.php -text
 m4/ax_lib_ibm_db2.m4 -text
 m4/ax_lib_oracle_oci.m4 -text
@@ -261,6 +263,7 @@ misc/init.d/fedora/core5/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_server -text
 misc/init.d/tru64/zabbix_server -text
+tests/templates/zabbix.conf.php.mysql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/graph_discovery.sql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/item_discovery.sql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/trigger_discovery.sql -text

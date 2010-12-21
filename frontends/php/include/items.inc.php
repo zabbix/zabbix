@@ -563,7 +563,16 @@
 		}
 
 		if(!empty($macStack)){
-			$host = get_host_by_itemid($item['itemid']);
+			$dbItems = CItem::get(array(
+				'itemids' => $item['itemid'],
+				'selectInterfaces' => API_OUTPUT_EXTEND,
+				'selectHosts' => array('host'),
+				'output' => API_OUTPUT_REFER
+			));
+			$dbItem = reset($dbItems);
+
+			$host = reset($dbItem['hosts']);
+			$interface = reset($dbItem['interfaces']);
 
 			foreach($macStack as $macro){
 				switch($macro){
@@ -571,13 +580,13 @@
 						$key = str_replace('{HOSTNAME}', $host['host'], $key);
 					break;
 					case '{IPADDRESS}':
-						$key = str_replace('{IPADDRESS}', $host['ip'], $key);
+						$key = str_replace('{IPADDRESS}', $interface['ip'], $key);
 					break;
 					case '{HOST.DNS}':
-						$key = str_replace('{HOST.DNS}', $host['dns'], $key);
+						$key = str_replace('{HOST.DNS}', $interface['dns'], $key);
 					break;
 					case '{HOST.CONN}':
-						$key = str_replace('{HOST.CONN}', $host['useip'] ? $host['ip'] : $host['dns'], $key);
+						$key = str_replace('{HOST.CONN}', $interface['useip'] ? $interface['ip'] : $interface['dns'], $key);
 					break;
 				}
 			}
@@ -585,22 +594,15 @@
 
 		CUserMacro::resolveItem($item);
 
-		return $item['key_'];
+	return $item['key_'];
 	}
 
 	function item_description($item){
 		$descr = $item['description'];
 		$key = expand_item_key_by_data($item);
 
-		/**
-		 * Regular string functions used below are changed to zbx_*
-		 * wrappers to allow users to name steps in non-ascii chars.
-		 * Also $str[$i] calls were replased by zbx_substr($str, $i, 1)
-		 * @see ZBX-2349
-		 * @author Konstantin Buravcov
-		 */
         for($i=9;$i>0;$i--){
-            $descr = str_replace("$$i",get_n_param($key,$i),$descr);
+            $descr = str_replace('$'.$i,get_n_param($key,$i),$descr);
         }
 
 		if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $descr, $arr)){

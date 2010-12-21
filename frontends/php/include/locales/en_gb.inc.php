@@ -86,7 +86,7 @@
 	'S_DELETE_SELECTED'=>			_('Delete selected'),
 	'S_COPY_SELECTED_TO'=>			_('Copy selected to ...'),
 
-	'S_SCHEMA' => 'Schema',
+	'S_SCHEMA' => _('Schema'),
 //	dicoveryconf.php
 	'S_CREATED_SMALL' => _('created'),
 	'S_HOST_IP'=>				_('Host IP'),
@@ -596,7 +596,6 @@
 	'S_GROUP_FOR_DISCOVERED_HOSTS'=>		_('Group for discovered hosts'),
 
 	'S_VALUE_MAPS_CREATE_NUM_STRING'=>		_('Value maps are used to create a mapping between numeric values and string representations'),
-	'S_DELETE_SELECTED_VALUE_MAPPING'=>		_('Delete selected value mapping?'),
 
 // media_types.php
 	'S_DELETE_SELECTED_MEDIATYPES_Q'=>		_('Delete selected media types?'),
@@ -974,12 +973,12 @@
 	'S_DELETE_SELECTED_HOSTS_Q'=>			_('Delete selected hosts?'),
 	'S_UPDATED_STATUS_OF_HOST' =>		_('Updated status of host'),
 	'S_CLEAR_WHEN_UNLINKING' => _('Clear when unlinking'),
-	'S_SNMP' =>						'SNMP',
-	'S_MAIN' =>						'Main',
-	'S_INTERFACES' =>				'Interfaces',
-	'S_INTERFACE' =>				'Interface',
-	'S_DISABLE_IPMI' => 'Disable IPMI',
-	'S_ENABLE_IPMI' => 'Enable IPMI',
+	'S_SNMP' =>						_('SNMP'),
+	'S_MAIN' =>						_('Main'),
+	'S_INTERFACES' =>				_('Interfaces'),
+	'S_INTERFACE' =>				_('Interface'),
+	'S_DISABLE_IPMI' => _('Disable IPMI'),
+	'S_ENABLE_IPMI' => _('Enable IPMI'),
 
 // templates.php
 	'S_TEMPLATE_LIST'=>			_('Templates list'),
@@ -1484,17 +1483,9 @@
 	'S_BY_TRIGGER_TEMPLATE'=>		_('By trigger template'),
 
 //	chart4.php
-	'S_CHART4_HEADER_TITLE_PART1'=>		'',
-	'S_CHART4_HEADER_TITLE_PART2'=>		_('(year'),
-	'S_CHART4_HEADER_TITLE_PART3'=>		_(')'),
-	'S_CHART4_HEADER_DATE_FORMAT'=>		_('Y'),
 	'S_CHART4_TIMELINE_DATE_FORMAT'=>	_('d.M'),
 
 //	chart5.php
-	'S_CHART5_HEADER_TITLE_PART1'=>		'',
-	'S_CHART5_HEADER_TITLE_PART2'=>		_('(year'),
-	'S_CHART5_HEADER_TITLE_PART3'=>		_(')'),
-	'S_CHART5_HEADER_DATE_FORMAT'=>		_('Y'),
 	'S_CHART5_TIMELINE_DATE_FORMAT'=>	_('d.M'),
 
 //	chart_bar.php
@@ -1537,8 +1528,8 @@
 	'S_SERVICES_DOWNTIME_DATE_FORMAT'=>		_('l H:i'),
 	'S_SERVICES_ONETIME_DOWNTIME_DATE_FORMAT'=>	_('d M Y H:i'),
 	'S_ADD_SMALL'=>								_('add'),
-	'S_ERROR_ADDING_SERVICE_TIME'=>'Error adding service time',
-	'S_IS_A_WRONG_TIME_FORMAT'=>'is a wrong time format. Should be from 00:00 to 23:59.',
+	'S_ERROR_ADDING_SERVICE_TIME' => _('Error adding service time'),
+	'S_IS_A_WRONG_TIME_FORMAT' => _('is a wrong time format. Should be from 00:00 to 23:59.'),
 
 //	locales.php
 	'S_DO_NOT_ADD'=>			_('Do not add'),
@@ -1691,7 +1682,7 @@
 
 //	screens.php
 	'S_CUSTOM_SCREENS'=>			_('Custom screens'),
-	'S_SCREENS_BIG'=>				_('SCREENS 45645645'),
+	'S_SCREENS_BIG'=>				_('SCREENS'),
 	'S_HOST_SCREENS'=>				_('Host screens'),
 
 	'S_SLIDESHOW_UPDATED'=>			_('Slideshow updated'),
@@ -1703,8 +1694,8 @@
 	'S_DELETE_SLIDESHOW_Q'=>		_('Delete slideshow?'),
 	'S_DELETE_SLIDESHOW_Q'=>		_('Delete slideshow?'),
 
-	'S_ERROR_SCREEN_WITH_NAME_DOES_NOT_EXIST'=> 'Screen with name "%s" does not exist',
-	'S_ERROR_SCREEN_WITH_ID_DOES_NOT_EXIST'=> 'Screen with id "%d" does not exist',
+	'S_ERROR_SCREEN_WITH_NAME_DOES_NOT_EXIST' => _('Screen with name "%s" does not exist'),
+	'S_ERROR_SCREEN_WITH_ID_DOES_NOT_EXIST' => _('Screen with id "%d" does not exist'),
 
 // slides.php
 	'S_CUSTOM_SLIDES' =>			_('Custom slides'),
@@ -2229,7 +2220,7 @@
 	'S_DELETED_SMALL'=>				_('deleted'),
 	'S_UNKNOWN_VALUE_TYPE'=>			_('Unknown value type'),
 	'S_ITEMS_CHECK_KEY_DEFAULT_EXAMPLE_PASSED'=>	_('Check the key, please. Default example was passed'),
-	'S_ERROR_IN_ITEM_KEY' => 'Error in item key:',
+	'S_ERROR_IN_ITEM_KEY' => _('Error in item key:'),
 
 //	httptest.inc.php
 	'S_SCENARIO_STEP_NUMBER_CANNOT_BE_LESS_ONE'=>	_('Scenario step number cannot be less than 1'),
@@ -2328,7 +2319,7 @@
 	'S_EXPRESSION_HOST_KEY_DOES_NOT_ERROR'=>		_('Host key does not exist.'),
 	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART1'=>	_('Function \''),
 	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART2'=>	_('\' does not accept parameters.'),
-    'S_WRONG_DEPENDENCY_ERROR'=>	'Error adding dependencies. Following dependencies are not allowed: 1) from a host trigger to a template trigger; 2) from a template trigger to a host trigger; 3) between template triggers, where templates have links to other templates.',
+	'S_WRONG_DEPENDENCY_ERROR' =>	_('Error adding dependencies. Following dependencies are not allowed: 1) from a host trigger to a template trigger; 2) from a template trigger to a host trigger; 3) between template triggers, where templates have links to other templates.'),
 
 //	page_footer.php
 	'S_TRANSACTION_HAVE_NOT_BEEN_CLOSED_ABORTING'=>	_('Transaction has not been closed. Aborting..'),
@@ -2358,7 +2349,6 @@
 	'S_SKIPPED_COPYING_OF_GRAPH'=>				_('Skipped copying of graph'),
 	'S_GRAPH_DELETED_FROM_HOSTS_PART1'=>			_('Graph "'),
 	'S_GRAPH_DELETED_FROM_HOSTS_PART2'=>			_('" deleted from host'),
-	'S_GRAPH_DELETED_FROM_HOSTS_PART3'=>			'',
 
 //	profiles.inc.php
 	'S_UNABLE_TO_SELECT_CONFIGURATION'=>	_('Unable to select configuration'),

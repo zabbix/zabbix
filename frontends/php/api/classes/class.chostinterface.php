@@ -308,10 +308,10 @@ class CHostInterface extends CZBXAPI{
 
 // itemids
 					if(isset($interface['itemid']) && is_null($options['selectItems'])){
-						if(!isset($result[$interface['hostid']]['items']))
-							$result[$interface['hostid']]['items'] = array();
+						if(!isset($result[$interface['interfaceid']]['items']))
+							$result[$interface['interfaceid']]['items'] = array();
 
-						$result[$interface['hostid']]['items'][] = array('itemid' => $interface['itemid']);
+						$result[$interface['interfaceid']]['items'][] = array('itemid' => $interface['itemid']);
 						unset($interface['itemid']);
 					}
 //---

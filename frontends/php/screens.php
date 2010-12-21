@@ -166,7 +166,7 @@
 
 	//no screens defined at all
 	if(empty($screens)){
-		$screens_wdgt->addPageHeader(S_SCREENS_BIG, $formHeader);
+		$screens_wdgt->addPageHeader(_s('SCREENS'), $formHeader);
 		$screens_wdgt->addItem(BR());
 		$screens_wdgt->addItem(new CTableInfo(S_NO_SCREENS_DEFINED));
 		$screens_wdgt->show();
@@ -206,7 +206,7 @@
 		));
 		$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 
-		$screens_wdgt->addPageHeader(S_SCREENS_BIG, array($formHeader, SPACE, $icon, $fs_icon));
+		$screens_wdgt->addPageHeader(_s('SCREENS'), array($formHeader, SPACE, $icon, $fs_icon));
 		$screens_wdgt->addItem(BR());
 // }}} PAGE HEADER
 
@@ -297,6 +297,9 @@
 		echo SBR;
 	}
 
+?>
+<?php
 
 include_once('include/page_footer.php');
+
 ?>
