@@ -35,6 +35,7 @@ Changes for 1.9.0
 
 Changes for 1.8.4rc3
 
+ - [ZBX-2851] fixed apache hanging when frontend connects to empty database (Vedmak)
  - [ZBX-3294] fixed host status change confirmation dialog (Vedmak)
  - [ZBX-3301] fixed server crash after libssh2_userauth_list() when processing SSH checks (asaveljevs)
  - [ZBX-2395] fixed sending of the same message to the same user using different media types (asaveljevs)

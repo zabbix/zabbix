@@ -60,7 +60,7 @@ if(!isset($DB)){
 						$result = false;
 					}
 					else{
-						if (!mysql_select_db($DB['DATABASE'])){
+						if(!mysql_select_db($DB['DATABASE'])){
 							$error = 'Error database in selection ['.mysql_error().']';
 							$result = false;
 						}
@@ -424,7 +424,7 @@ if(!isset($DB)){
 						$query .= ' LIMIT '.intval($limit).' OFFSET '.intval($offset);
 					}
 
-					$result=mysql_query($query,$DB['DB']);
+					$result = mysql_query($query,$DB['DB']);
 					if(!$result){
 						error('Error in query ['.$query.'] ['.mysql_error().']');
 					}
@@ -471,8 +471,8 @@ if(!isset($DB)){
 					else if(true !== @db2_execute($result, $options)){
 						$e = @db2_stmt_errormsg($result);
 						error('SQL error ['.$query.'] in ['.$e.']');
+						$result = false;
 					}
-
 				break;
 				case 'SQLITE3':
 					if(!$DB['TRANSACTIONS']){
@@ -837,7 +837,9 @@ else {
 		do{
 			$min=bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000'), 0);
 			$max=bcadd(bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000')),'99999999999', 0);
-			$row = DBfetch(DBselect('SELECT nextid FROM ids WHERE nodeid='.$nodeid .' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field)));
+			$db_select = DBselect('SELECT nextid FROM ids WHERE nodeid='.$nodeid .' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field));
+			if(!is_resource($db_select)) return false;
+			$row = DBfetch($db_select);
 
 			if(!$row){
 				$row = DBfetch(DBselect('SELECT max('.$field.') AS id FROM '.$table.' WHERE '.$field.'>='.$min.' AND '.$field.'<='.$max));
