@@ -473,8 +473,8 @@ if(!isset($DB)){
 					else if(true !== @db2_execute($result, $options)){
 						$e = @db2_stmt_errormsg($result);
 						error('SQL error ['.$query.'] in ['.$e.']');
+						$result = false;
 					}
-
 				break;
 				case 'SQLITE3':
 					if(!$DB['TRANSACTIONS']){
