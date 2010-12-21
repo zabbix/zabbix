@@ -9,7 +9,7 @@ private $previous;
 private $currExpr;
 private $newExpr;
 
-private $allowedFunctions;
+private $allowed;
 
 	public function __construct($trigger){
 		$this->initializeVars();
@@ -152,7 +152,16 @@ private $allowedFunctions;
 		foreach($this->expressions as $enum => $expr){
 			if($expr['expression']){}
 
-			if(zbx_empty($expr['host'])){
+			if(isset($this->allowed['macros'][$expr['expression']])){
+				if(!preg_match('/^'.ZBX_PREG_EXPRESSION_SIMPLE_MACROS.'$/i', $expr['expression']))
+					throw new Exception('Incorrect macro is used in expression');
+
+				$this->expressions[$enum]['host'] = '';
+				$this->expressions[$enum]['macro'] = $expr['expression'];
+
+				$this->data['macros'][] = $expr['expression'];
+			}
+			else if(zbx_empty($expr['host'])){
 				if(!preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/i', $expr['usermacro']))
 					throw new Exception('Incorrect user macro format is used in expression');
 
@@ -167,8 +176,8 @@ private $allowedFunctions;
 					throw new Exception('Incorrect item key "'.$expr['key'].'" is used in expression, '.$checkResult['description']);
 
 				$expr['functionName'] = strtolower($expr['functionName']);
-				if(!isset($this->allowedFunctions[$expr['functionName']]))
-					throw new Exception('Unknown trigger function is used in expression');
+				if(!isset($this->allowed['functions'][$expr['functionName']]))
+					throw new Exception('Unknown trigger function is used in expression "'.$expr['functionName'].'"');
 
 				if(!preg_match('/^'.ZBX_PREG_FUNCTION_FORMAT.'$/i', $expr['function']))
 					throw new Exception('Incorrect trigger function format is used in expression');
@@ -191,7 +200,7 @@ private $allowedFunctions;
 
 	private function checkFunctionParams($expr){
 		$paramCount = 0;
-		$inQuotes = false;
+		$inQuotes = 0;
 		$prevSymbol = '';
 		$params = array();
 
@@ -200,19 +209,25 @@ private $allowedFunctions;
 			$symbol = zbx_substr($expr['functionParam'], $symbolNum, 1);
 
 			if(($symbol == '"') && ($prevSymbol != '\\')){
-				if($inQuotes){
-					$inQuotes = false;
+				if($inQuotes % 2 != 0){
+					$inQuotes++;
 				}
 				else{
-					if($inQuotes = !isset($params[$paramCount]))
+					if(!isset($params[($inQuotes+1)/2]))
+						$inQuotes++;
+
+					if($inQuotes % 2 != 0)
 						$params[$paramCount] = '';
 					else if(zbx_empty($params[$paramCount]))
+						throw new Exception('Incorrect trigger function parameter syntax is used in "'.$expr['function'].'"');
+
+					if(($inQuotes/2) > $paramCount+1)
 						throw new Exception('Incorrect trigger function parameter syntax is used in "'.$expr['function'].'"');
 				}
 				continue;
 			}
 
-			if(!$inQuotes){
+			if($inQuotes % 2 == 0){
 				if($symbol == ' ') continue;
 				if(($symbol == ',') && ($prevSymbol != '\\')){
 					$paramCount++;
@@ -232,8 +247,8 @@ private $allowedFunctions;
 
 //SDII($params);
 		$functionParam = $params;
-		if(!is_null($this->allowedFunctions[$expr['functionName']]['args'])){
-			foreach($this->allowedFunctions[$expr['functionName']]['args'] as $anum => $arg){
+		if(!is_null($this->allowed['functions'][$expr['functionName']]['args'])){
+			foreach($this->allowed['functions'][$expr['functionName']]['args'] as $anum => $arg){
 // mandatory check
 				if(isset($arg['mandat']) && $arg['mandat'] && !isset($functionParam[$anum]))
 					throw new Exception('Incorrect number of agruments passed to function "'.$expr['function'].'"');
@@ -387,7 +402,10 @@ private $allowedFunctions;
 
 			if($symbol == '}'){
 				$this->currExpr['object']['expression'] = '{'.$this->currExpr['object']['expression'].'}';
-				$this->currExpr['object']['usermacro'] = '{'.$this->currExpr['object']['usermacro'].'}';
+
+				if(!zbx_empty($this->currExpr['object']['usermacro']))
+					$this->currExpr['object']['usermacro'] = '{'.$this->currExpr['object']['usermacro'].'}';
+
 				$this->currExpr['object']['host'] = rtrim($this->currExpr['object']['host'], ':');
 				$this->currExpr['object']['key'] = $this->currExpr['object']['key'];
 				$this->currExpr['object']['function'] = $this->currExpr['object']['function'];
@@ -420,11 +438,11 @@ private $allowedFunctions;
 	}
 
 	private function initializeVars(){
-		$this->allowedFunctions = INIT_TRIGGER_EXPRESSION_STRUCTURES();
+		$this->allowed = INIT_TRIGGER_EXPRESSION_STRUCTURES();
 
 		$this->errors = array();
 		$this->expressions = array();
-		$this->data = array('hosts'=>array(),'usermacros'=>array(),'items'=>array(),'functions'=>array());
+		$this->data = array('hosts'=>array(),'usermacros'=>array(),'macros'=>array(),'items'=>array(),'functions'=>array());
 
 		$this->newExpr = array(
 			'part' => array(

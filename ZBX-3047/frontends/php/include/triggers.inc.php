@@ -34,7 +34,13 @@
 	function INIT_TRIGGER_EXPRESSION_STRUCTURES(){
 		global $ZBX_TR_EXPR_SIMPLE_MACROS, $ZBX_TR_EXPR_REPLACE_TO, $ZBX_TR_EXPR_ALLOWED_FUNCTIONS;
 
-		if( defined('TRIGGER_EXPRESSION_STRUCTURES_OK') ) return $ZBX_TR_EXPR_ALLOWED_FUNCTIONS;
+		if( defined('TRIGGER_EXPRESSION_STRUCTURES_OK') ){
+			return array(
+				'functions' => $ZBX_TR_EXPR_ALLOWED_FUNCTIONS,
+				'macros' => $ZBX_TR_EXPR_SIMPLE_MACROS
+			);
+		}
+
 		define('TRIGGER_EXPRESSION_STRUCTURES_OK', 1);
 
 		$ZBX_TR_EXPR_SIMPLE_MACROS['{TRIGGER.VALUE}'] = '{TRIGGER.VALUE}';
@@ -1396,7 +1402,7 @@ return $caption;
 
 		$cuted = 0;
 		foreach($trigExpr->expressions as $exprPart){
-			if(zbx_empty($exprPart['host'])) continue;
+			if(zbx_empty($exprPart['key'])) continue;
 
 			$sql = 'SELECT i.itemid '.
 				' FROM items i,hosts h'.
