@@ -229,7 +229,7 @@ private $allowedFunctions;
 			$prevSymbol = $symbol;
 		}
 
-SDII($params);
+//SDII($params);
 		$functionParam = $params;
 		if(!is_null($this->allowedFunctions[$expr['functionName']]['args'])){
 			foreach($this->allowedFunctions[$expr['functionName']]['args'] as $anum => $arg){
