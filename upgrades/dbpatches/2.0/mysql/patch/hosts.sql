@@ -78,6 +78,8 @@ ALTER TABLE items ADD CONSTRAINT c_items_4 FOREIGN KEY (interfaceid) REFERENCES 
 UPDATE items SET port=snmp_port;
 ALTER TABLE items DROP COLUMN snmp_port;
 
+CREATE INDEX items_5 on items (valuemapid);
+
 -- host interface for non IPMI, SNMP and non templated items
 UPDATE items
 	SET interfaceid=(SELECT interfaceid FROM interface WHERE hostid=items.hostid AND main=1 AND type=1)

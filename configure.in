@@ -484,6 +484,24 @@ AC_DEFINE(HAVE_SYSINFO_PROCS,1,[Define to 1 if 'sysinfo.procs' exists.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
+AC_MSG_CHECKING(for field tm_gmtoff in struct tm)
+AC_TRY_COMPILE([
+#ifdef HAVE_SYS_TIME_H
+#include <sys/time.h>
+#endif	/* HAVE_SYS_TIME_H */
+
+#ifdef HAVE_TIME_H
+#include <time.h>
+#endif	/* HAVE_TIME_H */
+],
+[
+	struct tm tm;
+	tm.tm_gmtoff;
+],
+AC_DEFINE(HAVE_TM_TM_GMTOFF,1,[Define to 1 if 'tm.tm_gmtoff' exists.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
 dnl *****************************************************************
 dnl *                                                               *
 dnl *                     Checks for functions                      *
@@ -719,6 +737,21 @@ int	i[] = {CP_USER, CP_NICE, CP_SYS, CP_INTR, CP_IDLE};
 }
 ],
 AC_DEFINE(HAVE_FUNCTION_SYSCTL_KERN_CPTIME,1,[Define to 1 if 'KERN_CPTIME,KERN_CPTIME2' exists.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+AC_MSG_CHECKING(for function clock_gettime in time.h)
+AC_TRY_LINK([
+#ifdef HAVE_TIME_H
+#	include <time.h>
+#elif HAVE_SYS_TIME_H
+#	include <sys/time.h>
+#endif	/* HAVE_SYS_TIME_H */
+],
+[struct timespec tp;
+clock_gettime(CLOCK_REALTIME, &tp);
+],
+AC_DEFINE(HAVE_TIME_CLOCK_GETTIME,1,[Define to 1 if function 'clock_gettime' exists.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
