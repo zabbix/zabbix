@@ -166,7 +166,7 @@
 		);
 
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['str']	= array(
-			'args' => array( array('type' => 'str','mandat' => true) ),
+			'args' => array( array('type' => 'str','mandat' => false) ),
 			'item_types' => array(
 				ITEM_VALUE_TYPE_STR,
 				ITEM_VALUE_TYPE_TEXT,
