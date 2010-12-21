@@ -116,7 +116,18 @@
 		$status['msg'] = S_OK_BIG;
 		$status['style'] = 'enabled';
 
-		if(HTTPTEST_STATE_BUSY == $httptest_data['curstate'] ){
+		if(($httptest_data['lastfailedstep'] == 0) && !zbx_empty($httptest_data['error'])){
+			if($httpstep_data['no'] == 1){
+				$status['msg'] = S_FAIL.' - '.S_ERROR.': '.$httptest_data['error'];
+				$status['style'] = 'disabled';
+			}
+			else{
+				$status['msg'] = S_UNKNOWN;
+				$status['style'] = 'unknown';
+			}
+			$status['skip'] = true;
+		}
+		else if(HTTPTEST_STATE_BUSY == $httptest_data['curstate'] ){
 			if($httptest_data['curstep'] == ($httpstep_data['no'])){
 				$status['msg'] = S_IN_PROGRESS;
 				$status['style'] = 'unknown';
@@ -149,7 +160,7 @@
 		}
 
 		$itemids = array();
-		$sql = 'SELECT i.*, hi.type as httpitem_type '.
+		$sql = 'SELECT i.lastvalue, i.value_type, i.valuemapid, i.units, i.itemid, hi.type as httpitem_type '.
 				' FROM items i, httpstepitem hi '.
 				' WHERE hi.itemid=i.itemid '.
 					' AND hi.httpstepid='.$httpstep_data['httpstepid'];
@@ -193,13 +204,18 @@
 		$status['msg'] = S_FAIL.' - '.S_ERROR.': '.$httptest_data['error'];
 		$status['style'] = 'disabled';
 	}
+	else if(($httptest_data['lastfailedstep'] == 0) && !zbx_empty($httptest_data['error'])){
+		$status['msg'] = S_FAIL.' - '.S_ERROR.': '.$httptest_data['error'];
+		$status['style'] = 'disabled';
+		$totalTime = null;
+	}
 
 	$table->addRow(array(
-		new CCol(S_TOTAL_BIG, 'bold'),
-		new CCol(SPACE, 'bold'),
-		new CCol(format_lastvalue($totalTime), 'bold'),
-		new CCol(SPACE, 'bold'),
-		new CCol(new CSpan($status['msg'], $status['style']), 'bold')
+		new CSpan(S_TOTAL_BIG, 'bold'),
+		SPACE,
+		new CSpan(format_lastvalue($totalTime), 'bold'),
+		SPACE,
+		new CSpan($status['msg'], $status['style'].' bold')
 	));
 
 	$details_wdgt->addItem($table);
@@ -309,7 +325,5 @@
 
 ?>
 <?php
-
 include_once('include/page_footer.php');
-
 ?>
