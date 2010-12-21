@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-require_once 'function_check_item_key.php';
+require_once(dirname(__FILE__).'/function_check_item_key.php');
 //require_once 'otherTest.php';
 
 class GeneralTests
