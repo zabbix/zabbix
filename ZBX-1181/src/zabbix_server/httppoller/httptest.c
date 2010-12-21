@@ -448,7 +448,7 @@ clean:
 
 			memset(&stat, 0, sizeof(stat));
 
-			process_step_data(httpstep.httpstepid, &stat);			
+			process_step_data(httpstep.httpstepid, &stat);
 		}
 		else
 			THIS_SHOULD_NEVER_HAPPEN;

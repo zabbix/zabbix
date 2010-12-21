@@ -17,16 +17,6 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#include <stdlib.h>
-#include <stdio.h>
-
-/* for setproctitle() */
-#include <sys/types.h>
-#include <unistd.h>
-
-#include <string.h>
-#include <strings.h>
-
 #include "zbxdb.h"
 #include "db.h"
 #include "log.h"
@@ -37,7 +27,7 @@
 #include "zbxserver.h"
 #include "dbcache.h"
 
-const char	*DBnode(const char *fieldid, const int nodeid)
+const char	*DBnode(const char *fieldid, int nodeid)
 {
 	static char	dbnode[128];
 
