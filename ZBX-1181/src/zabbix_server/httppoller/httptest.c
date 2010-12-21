@@ -254,18 +254,21 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() httptestid:" ZBX_FS_UI64 " name:'%s'",
 			__function_name, httptest->httptestid, httptest->name);
 
+	lastfailedstep = 0;
+	httptest->time = 0;
+
 	now = time(NULL);
 
 	DBexecute("update httptest"
-			" set lastcheck=%d,"
-				"nextcheck=%d+delay"
+			" set lastcheck=%d"
 			" where httptestid=" ZBX_FS_UI64,
-			now, now, httptest->httptestid);
+			now, httptest->httptestid);
 
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Web scenario [%s] error: cannot init cURL library", httptest->name);
-		return;
+		zabbix_log(LOG_LEVEL_ERR, "Web scenario [%s] error: could not init cURL library", httptest->name);
+		err_str = zbx_strdup(err_str, "could not init cURL library");
+		goto clean;
 	}
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_COOKIEFILE, "")) ||
@@ -279,14 +282,11 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 			/* must be preserved by the calling application until the transfer finishes. */
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, httpstep.posts)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Web scenario [%s] error: cannot set cURL option [%d]: %s",
+		zabbix_log(LOG_LEVEL_ERR, "Web scenario [%s] error: could not set cURL option [%d]: %s",
 				httptest->name, opt, curl_easy_strerror(err));
-		curl_easy_cleanup(easyhandle);
-		return;
+		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+		goto clean;
 	}
-
-	lastfailedstep = 0;
-	httptest->time = 0;
 
 	result = DBselect(
 			"select httpstepid,no,name,url,timeout,"
@@ -337,7 +337,7 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 		else
 			curl_easy_setopt(easyhandle, CURLOPT_POST, 0);
 
-		if (httptest->authentication != HTTPTEST_AUTH_NONE)
+		if (HTTPTEST_AUTH_NONE != httptest->authentication)
 		{
 			long	curlauth = 0;
 
@@ -362,7 +362,7 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HTTPAUTH, curlauth)) ||
 					CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_USERPWD, auth)))
 			{
-				zabbix_log(LOG_LEVEL_ERR, "Web scenario step [%s:%s] error: cannot set cURL option [%d]: %s",
+				zabbix_log(LOG_LEVEL_ERR, "Web scenario step [%s:%s] error: could not set cURL option [%d]: %s",
 						httptest->name, httpstep.name, opt, curl_easy_strerror(err));
 				err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 			}
@@ -376,7 +376,7 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 					CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_TIMEOUT, httpstep.timeout)) ||
 					CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_CONNECTTIMEOUT, httpstep.timeout)))
 			{
-				zabbix_log(LOG_LEVEL_ERR, "Web scenario step [%s:%s] error: cannot set cURL option [%d]: %s",
+				zabbix_log(LOG_LEVEL_ERR, "Web scenario step [%s:%s] error: could not set cURL option [%d]: %s",
 						httptest->name, httpstep.name, opt, curl_easy_strerror(err));
 				err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 			}
@@ -442,7 +442,7 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 		process_step_data(httptest, &httpstep, &stat);
 	}
 	DBfree_result(result);
-
+clean:
 	esc_err_str = DBdyn_escape_string_len(err_str, HTTPTEST_ERROR_LEN);
 	zbx_free(err_str);
 
