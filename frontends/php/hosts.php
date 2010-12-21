@@ -899,18 +899,18 @@ include_once('include/page_header.php');
 						$status_class = 'enabled';
 					}
 
-					$status_script = 'javascript: if(!Confirm('.zbx_jsvalue(S_DISABLE_HOST.'?').')) cancelEvent();';
+					$status_script = 'return Confirm('.zbx_jsvalue(S_DISABLE_HOST.'?').');';
 					$status_url = 'hosts.php?hosts%5B%5D='.$host['hostid'].'&go=disable'.url_param('groupid');
 					break;
 				case HOST_STATUS_NOT_MONITORED:
 					$status_caption = S_NOT_MONITORED;
 					$status_url = 'hosts.php?hosts%5B%5D='.$host['hostid'].'&go=activate'.url_param('groupid');
-					$status_script = 'javascript: if(!Confirm('.zbx_jsvalue(S_ENABLE_HOST.'?').')) cancelEvent();';
+					$status_script = 'return Confirm('.zbx_jsvalue(S_ENABLE_HOST.'?').');';
 					$status_class = 'disabled';
 					break;
 				default:
 					$status_caption = S_UNKNOWN;
-					$status_script = 'javascript: if(!Confirm('.zbx_jsvalue(S_DISABLE_HOST.'?').')) cancelEvent();';
+					$status_script = 'return Confirm('.zbx_jsvalue(S_DISABLE_HOST.'?').');';
 					$status_url = 'hosts.php?hosts%5B%5D='.$host['hostid'].'&go=disable'.url_param('groupid');
 					$status_class = 'unknown';
 			}
