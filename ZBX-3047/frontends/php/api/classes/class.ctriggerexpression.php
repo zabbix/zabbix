@@ -96,22 +96,17 @@ private $allowed;
 // watch for closing brakets
 		if(isset($this->symbols['close'][$symbol])) $this->symbols['close'][$symbol]++;
 
-		if(!$this->currExpr['part']['functionParam']){;
+		if(!$this->currExpr['part']['functionParam']){
 			if(isset($this->symbols['open'][$symbol])) $this->symbols['open'][$symbol]++;
+			if(isset($this->symbols['expr'][$symbol])) $this->symbols['expr'][$symbol]++;
+			if(isset($this->symbols['linkage'][$symbol])) $this->symbols['linkage'][$symbol]++;
 		}
-		
-		if(isset($this->symbols['linkage'][$symbol])) $this->symbols['linkage'][$symbol]++;
-		if(isset($this->symbols['expr'][$symbol])) $this->symbols['expr'][$symbol]++;
 
 		if($this->currExpr['part']['expression']){
 			if($symbol == '"'){
 				if(($this->previous['last'] == '\\') && ($this->symbols['sequence'] % 2 == 1)){
 					$this->symbols['expr'][$symbol]--;
 				}
-			}
-
-			if(isset($this->symbols['linkage'][$symbol]) && $this->currExpr['object']['functionParam']){
-				$this->symbols['linkage'][$symbol]--;
 			}
 		}
 		else{
