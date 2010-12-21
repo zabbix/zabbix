@@ -623,11 +623,12 @@ return $caption;
 	function zbx_get_params($string){
 		$params = array();
 		$quoted = false;
+		$prev_char = '';
 
-		for( $param_s = $i = 0, $len = zbx_strlen($string); $i < $len; $i++){
+		$len = zbx_strlen($string);
+		for( $param_s = $i = 0; $i < $len; $i++){
 			$char = zbx_substr($string, $i, 1);
-			$prev_char = $i > 0 ? zbx_substr($string, $i-1, 1) : '';
-			switch ( $char ){
+			switch( $char ){
 				case '"':
 					if ($prev_char!='\\'){
 						$quoted = !$quoted;
@@ -646,6 +647,7 @@ return $caption;
 						$i++;
 					break;
 			}
+			$prev_char = $char;
 		}
 
 		if( $quoted ){

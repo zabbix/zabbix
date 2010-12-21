@@ -2188,7 +2188,7 @@
 	'S_KEY_IS_VALID' => 'Key is valid',
 	'S_INCORRECT_SYNTAX_NEAR' => 'incorrect syntax near \'%1$s\' at position %2$d',
 	'S_INCORRECT_USAGE_OF_BRACKETS' => 'incorrect usage of bracket symbols. \'%s\' found after final bracket.',
-	'S_INVALID_CHARECTER_AT_POSITION' => 'ivalid charecter \'%1$s\' at position %2$d',
+	'S_INVALID_CHARACTER_AT_POSITION' => 'invalid character \'%1$s\' at position %2$d',
 	'S_INVALID_KEY_FORMAT' => 'Invalid key format',
 
 //	httptest.inc.php

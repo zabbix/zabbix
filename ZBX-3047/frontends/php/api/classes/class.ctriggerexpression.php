@@ -30,7 +30,8 @@ private $allowedFunctions;
 			for($symbolNum = 0; $symbolNum < $length; $symbolNum++){
 				$symbol = zbx_substr($expression, $symbolNum, 1);
 
-				$this->setExpressionParts($symbol);
+				$this->setOpenExpressionParts($this->previous['last']);
+				$this->setCloseExpressionParts($symbol);
 
 				if($this->inQuotes($symbol)) continue;
 
@@ -92,8 +93,13 @@ private $allowedFunctions;
 	}
 
 	private function checkSymbolSequence($symbol){
-		if(isset($this->symbols['open'][$symbol])) $this->symbols['open'][$symbol]++;
+// watch for closing brakets
 		if(isset($this->symbols['close'][$symbol])) $this->symbols['close'][$symbol]++;
+
+		if(!$this->currExpr['part']['functionParam']){;
+			if(isset($this->symbols['open'][$symbol])) $this->symbols['open'][$symbol]++;
+		}
+		
 		if(isset($this->symbols['linkage'][$symbol])) $this->symbols['linkage'][$symbol]++;
 		if(isset($this->symbols['expr'][$symbol])) $this->symbols['expr'][$symbol]++;
 
@@ -131,14 +137,14 @@ private $allowedFunctions;
 	}
 
 	private function checkExpressionBrackets(&$expression){
+		if($this->symbols['expr']['"'] % 2)
+			throw new Exception('Incorrect count of quotes in expression');
+
 		if($this->symbols['open']['('] != $this->symbols['close'][')'])
 			throw new Exception('Incorrect parenthesis count in expression');
 
 		if($this->symbols['open']['{'] != $this->symbols['close']['}'])
 			throw new Exception('Incorrect curly braces count in expression');
-
-		if($this->symbols['expr']['"'] % 2)
-			throw new Exception('Incorrect count of quotes in expression');
 	}
 
 	private function checkExpressionParts(&$expression){
@@ -155,8 +161,9 @@ private $allowedFunctions;
 				if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $expr['host']))
 					throw new Exception('Incorrect host name is used in expression');
 
-				if(!check_item_key($expr['key']))
-					throw new Exception('Incorrect item key is used in expression');
+				$checkResult = check_item_key($expr['key']);
+				if(!$checkResult['valid'])
+					throw new Exception('Incorrect item key "'.$expr['key'].'" is used in expression, '.$checkResult['description']);
 
 				$expr['functionName'] = strtolower($expr['functionName']);
 				if(!isset($this->allowedFunctions[$expr['functionName']]))
@@ -216,7 +223,7 @@ private $allowedFunctions;
 			$prevSymbol = $symbol;
 		}
 
-
+//SDII($params);
 		$functionParam = $params;
 		if(!is_null($this->allowedFunctions[$expr['functionName']]['args'])){
 			foreach($this->allowedFunctions[$expr['functionName']]['args'] as $anum => $arg){
@@ -292,10 +299,11 @@ private $allowedFunctions;
 		}
 	}
 
-	private function setExpressionParts($symbol){
+	private function setOpenExpressionParts($symbol){
+		if($symbol == '') return;
+
 		if(!$this->inQuotes($symbol)){
 			if(!$this->currExpr['part']['key']){
-
 // new expression
 				if($symbol == '{')
 					$this->currExpr = $this->newExpr;
@@ -336,11 +344,47 @@ private $allowedFunctions;
 							$this->currExpr['object']['key'] = substr($this->currExpr['object']['key'],0,$lastDot);
 						}
 						break;
+				}
+			}
+		}
+	}
+
+	private function setCloseExpressionParts($symbol){
+		if($symbol == '') return;
+
+		if(!$this->inQuotes($symbol)){
+			if(!$this->currExpr['part']['usermacro']){
+				switch($symbol){
 					case ')':
 						if($this->currExpr['part']['function']){
 							$this->currExpr['part']['functionParam'] = false;
 						}
 				}
+			}
+		}
+
+		if(!$this->inQuotes($symbol) && !$this->currExpr['part']['key']){
+// close symbols
+			switch($symbol){
+				case '}':
+					$this->currExpr['part']['usermacro'] = false;
+					$this->currExpr['part']['expression'] = false;
+					$this->currExpr['part']['host'] = false;
+					$this->currExpr['part']['key'] = false;
+					$this->currExpr['part']['function'] = false;
+					break;
+			}
+
+			if($symbol == '}'){
+				$this->currExpr['object']['expression'] = '{'.$this->currExpr['object']['expression'].'}';
+				$this->currExpr['object']['host'] = rtrim($this->currExpr['object']['host'], ':');
+				$this->currExpr['object']['key'] = $this->currExpr['object']['key'];
+				$this->currExpr['object']['function'] = $this->currExpr['object']['function'];
+				$this->currExpr['object']['functionName'] = rtrim($this->currExpr['object']['functionName'], '(');
+				$this->currExpr['object']['functionParam'] = $this->currExpr['object']['functionParam'];
+
+				$this->expressions[] = $this->currExpr['object'];
+				return true;
 			}
 		}
 
@@ -362,28 +406,6 @@ private $allowedFunctions;
 		if($this->currExpr['part']['functionParam'])
 			$this->currExpr['object']['functionParam'] .= $symbol;
 
-		if(!$this->inQuotes($symbol) && !$this->currExpr['part']['key']){
-// close symbols
-			switch($symbol){
-				case '}':
-					$this->currExpr['part']['usermacro'] = false;
-					$this->currExpr['part']['expression'] = false;
-					$this->currExpr['part']['host'] = false;
-					$this->currExpr['part']['key'] = false;
-					$this->currExpr['part']['function'] = false;
-					break;
-			}
-
-			if($symbol == '}'){
-				$this->currExpr['object']['host'] = substr($this->currExpr['object']['host'], 1);
-				$this->currExpr['object']['key'] = substr($this->currExpr['object']['key'], 1);
-				$this->currExpr['object']['function'] = rtrim($this->currExpr['object']['function'], '}');
-				$this->currExpr['object']['functionParam'] = substr($this->currExpr['object']['functionParam'], 1);
-
-				$this->expressions[] = $this->currExpr['object'];
-				return true;
-			}
-		}
 	}
 
 	private function initializeVars(){
