@@ -1402,11 +1402,11 @@ return $caption;
 
 		$cuted = 0;
 		foreach($trigExpr->expressions as $exprPart){
-			if(zbx_empty($exprPart['key'])) continue;
+			if(zbx_empty($exprPart['item'])) continue;
 
 			$sql = 'SELECT i.itemid '.
 				' FROM items i,hosts h'.
-				' WHERE i.key_='.zbx_dbstr($exprPart['key']).
+				' WHERE i.key_='.zbx_dbstr($exprPart['item']).
 					' AND h.host='.zbx_dbstr($exprPart['host']).
 					' AND h.hostid=i.hostid'.
 					' AND '.DBin_node('i.itemid');
