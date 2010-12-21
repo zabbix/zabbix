@@ -9,16 +9,16 @@
 
 	<target name="buildagent">
 		<!-- Build agent binaries -->
-		<exec executable="./configure" failonerror="on">
+		<exec executable="./configure" dir="${builddir}" failonerror="on">
 			<arg line="--enable-agent
 			" />
 		</exec>
-		<exec executable="make" failonerror="on"/>
+		<exec executable="make" dir="${builddir}" failonerror="on"/>
 	</target>
 
 	<target name="buildserver">
 		<!-- Build PostgreSQL server binaries -->
-		<exec executable="./configure" failonerror="on">
+		<exec executable="./configure" dir="${builddir}" failonerror="on">
 			<arg line="--enable-server
 			--with-postgresql
 			--with-net-snmp
@@ -29,9 +29,9 @@
 			--with-jabber
 			" />
 		</exec>
-		<exec executable="make" failonerror="on"/>
+		<exec executable="make" dir="${builddir}" failonerror="on"/>
 		<!-- Build MySQL server binaries -->
-		<exec executable="./configure" failonerror="on">
+		<exec executable="./configure" dir="${builddir}" failonerror="on">
 			<arg line="--enable-server
 			--with-mysql
 			--with-net-snmp
@@ -42,9 +42,9 @@
 			--with-jabber
 			" />
 		</exec>
-		<exec executable="make" failonerror="on"/>
+		<exec executable="make" dir="${builddir}" failonerror="on"/>
 		<!-- Build SQlite server binaries -->
-		<exec executable="./configure" failonerror="on">
+		<exec executable="./configure" dir="${builddir}" failonerror="on">
 			<arg line="--enable-server
 			--with-sqlite3
 			--with-net-snmp
@@ -55,12 +55,12 @@
 			--with-jabber
 			" />
 		</exec>
-		<exec executable="make" failonerror="on"/>
+		<exec executable="make" dir="${builddir}" failonerror="on"/>
 	</target>
 
 	<target name="buildproxy">
 		<!-- Build PostgreSQL proxy binaries -->
-		<exec executable="./configure" failonerror="on">
+		<exec executable="./configure" dir="${builddir}" failonerror="on">
 			<arg line="--enable-proxy
 			--with-postgresql
 			--with-net-snmp
@@ -71,9 +71,9 @@
 			--with-jabber
 			" />
 		</exec>
-		<exec executable="make" failonerror="on"/>
+		<exec executable="make" dir="${builddir}" failonerror="on"/>
 		<!-- Build MySQL proxy binaries -->
-		<exec executable="./configure" failonerror="on">
+		<exec executable="./configure" dir="${builddir}" failonerror="on">
 			<arg line="--enable-proxy
 			--with-mysql
 			--with-net-snmp
@@ -84,9 +84,9 @@
 			--with-jabber
 			" />
 		</exec>
-		<exec executable="make" failonerror="on"/>
+		<exec executable="make" dir="${builddir}" failonerror="on"/>
 		<!-- Build SQlite proxy binaries -->
-		<exec executable="./configure" failonerror="on">
+		<exec executable="./configure" dir="${builddir}" failonerror="on">
 			<arg line="--enable-proxy
 			--with-sqlite3
 			--with-net-snmp
@@ -97,7 +97,7 @@
 			--with-jabber
 			" />
 		</exec>
-		<exec executable="make" failonerror="on"/>
+		<exec executable="make" dir="${builddir}" failonerror="on"/>
 	</target>
 
 	<target name="init">
