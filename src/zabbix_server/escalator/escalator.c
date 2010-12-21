@@ -31,15 +31,15 @@
 
 #define CONFIG_ESCALATOR_FREQUENCY	3
 
-#define ZBX_USER_MSG struct zxb_user_msg_t
-ZBX_USER_MSG
+typedef struct
 {
 	zbx_uint64_t	userid;
 	zbx_uint64_t	mediatypeid;
 	char		*subject;
 	char		*message;
 	void		*next;
-};
+}
+ZBX_USER_MSG;
 
 /******************************************************************************
  *                                                                            *
@@ -182,9 +182,10 @@ static int	get_trigger_permission(zbx_uint64_t userid, zbx_uint64_t triggerid)
 static void	add_user_msg(int source, zbx_uint64_t userid, zbx_uint64_t mediatypeid,
 		zbx_uint64_t triggerid, ZBX_USER_MSG **user_msg, char *subject, char *message)
 {
+	const char	*__function_name = "add_user_msg";
 	ZBX_USER_MSG	*p;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In add_user_msg()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (SUCCEED != check_perm2system(userid))
 		return;
@@ -193,10 +194,11 @@ static void	add_user_msg(int source, zbx_uint64_t userid, zbx_uint64_t mediatype
 		return;
 
 	p = *user_msg;
+
 	while (NULL != p)
 	{
-		if (p->userid == userid && 0 == strcmp(p->subject, subject)
-				&& 0 == strcmp(p->message, message))
+		if (p->userid == userid && p->mediatypeid == mediatypeid &&
+				0 == strcmp(p->subject, subject) && 0 == strcmp(p->message, message))
 			break;
 
 		p = p->next;
@@ -214,6 +216,8 @@ static void	add_user_msg(int source, zbx_uint64_t userid, zbx_uint64_t mediatype
 
 		*user_msg = p;
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 static void	add_object_msg(int source, zbx_uint64_t triggerid, DB_OPERATION *operation, ZBX_USER_MSG **user_msg,
@@ -230,7 +234,7 @@ static void	add_object_msg(int source, zbx_uint64_t triggerid, DB_OPERATION *ope
 			break;
 		case OPERATION_OBJECT_GROUP:
 			result = DBselect("select ug.userid from users_groups ug,usrgrp g"
-					" WHERE ug.usrgrpid=" ZBX_FS_UI64 " AND g.usrgrpid=ug.usrgrpid AND g.users_status=%d",
+					" where ug.usrgrpid=" ZBX_FS_UI64 " and g.usrgrpid=ug.usrgrpid and g.users_status=%d",
 					operation->objectid,
 					GROUP_STATUS_ACTIVE);
 
@@ -255,11 +259,12 @@ static void	add_object_msg(int source, zbx_uint64_t triggerid, DB_OPERATION *ope
 
 static void	add_command_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACTION *action, char *command)
 {
+	const char	*__function_name = "add_command_alert";
 	zbx_uint64_t	alertid;
 	int		now;
 	char		*command_esc;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In add_command_alert()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	alertid		= DBget_maxid("alerts");
 	now		= time(NULL);
@@ -279,6 +284,8 @@ static void	add_command_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 	op_run_commands(command);
 
 	zbx_free(command_esc);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACTION *action,
@@ -810,7 +817,8 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 		DBfree_result(result);
 	}
 
-	switch (escalation->status) {
+	switch (escalation->status)
+	{
 		case ESCALATION_STATUS_ACTIVE:
 			result = DBselect("select actionid,eventsource,esc_period,def_shortdata,def_longdata,recovery_msg,status,name"
 					" from actions where actionid=" ZBX_FS_UI64,
@@ -846,7 +854,8 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 		else
 			action.longdata = strdup(row[4]);
 
-		switch (escalation->status) {
+		switch (escalation->status)
+		{
 			case ESCALATION_STATUS_ACTIVE:
 				if (SUCCEED == get_event_info(escalation->eventid, &event))
 				{
@@ -968,55 +977,6 @@ static void	process_escalations(int now)
 
 /******************************************************************************
  *                                                                            *
- * Function: get_minnextcheck                                                 *
- *                                                                            *
- * Purpose: calculate when we have to process earliest escalations            *
- *                                                                            *
- * Parameters: now - current timestamp                                        *
- *                                                                            *
- * Return value: timestamp of earliest check or -1 if not found               *
- *                                                                            *
- * Author: Aleksander Vladishev                                               *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-/*static int get_minnextcheck()
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		res;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In get_minnextcheck()");
-
-	result = DBselect("select count(*),min(nextcheck) from escalations where status in (%d,%d)" DB_NODE,
-			ESCALATION_STATUS_ACTIVE,
-			ESCALATION_STATUS_RECOVERY,
-			DBnode_local("escalationid"));
-
-	if (NULL == (row = DBfetch(result)) || DBis_null(row[0]) == SUCCEED || DBis_null(row[1]) == SUCCEED)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "No items to update for minnextcheck.");
-		res = FAIL;
-	}
-	else
-	{
-		if (atoi(row[0]) == 0)
-		{
-			res = FAIL;
-		}
-		else
-		{
-			res = atoi(row[1]);
-		}
-	}
-	DBfree_result(result);
-
-	return res;
-}*/
-
-/******************************************************************************
- *                                                                            *
  * Function: main_escalator_loop                                              *
  *                                                                            *
  * Purpose: periodically check table escalations and generate alerts          *
@@ -1032,13 +992,12 @@ static void	process_escalations(int now)
  ******************************************************************************/
 int	main_escalator_loop()
 {
-	int			now/*, nextcheck, sleeptime*/;
+	int			now;
 	double			sec;
 	struct sigaction	phan;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_escalator_loop()");
 
-/*	phan.sa_handler = child_signal_handler;*/
         phan.sa_sigaction = child_signal_handler;
 	sigemptyset(&phan.sa_mask);
 	phan.sa_flags = SA_SIGINFO;
@@ -1048,7 +1007,8 @@ int	main_escalator_loop()
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	for (;;) {
+	for (;;)
+	{
 		now = time(NULL);
 		sec = zbx_time();
 
@@ -1057,18 +1017,6 @@ int	main_escalator_loop()
 		process_escalations(now);
 
 		sec = zbx_time() - sec;
-
-/*		nextcheck = get_minnextcheck();
-
-		if (FAIL == nextcheck)
-			sleeptime = CONFIG_ESCALATOR_FREQUENCY;
-		else {
-			sleeptime = nextcheck - time(NULL);
-			if (sleeptime < 0)
-				sleeptime = 0;
-			else if (sleeptime > CONFIG_ESCALATOR_FREQUENCY)
-				sleeptime = CONFIG_ESCALATOR_FREQUENCY;
-		}*/
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Escalator spent " ZBX_FS_DBL " seconds while processing escalation items."
 				" Nextcheck after %d sec.",
@@ -1079,12 +1027,6 @@ int	main_escalator_loop()
 				CONFIG_ESCALATOR_FREQUENCY);
 
 		sleep(CONFIG_ESCALATOR_FREQUENCY);
-/*		if (sleeptime > 0) {
-			zbx_setproctitle("escalator [sleeping for %d seconds]",
-					sleeptime);
-
-			sleep(sleeptime);
-		}*/
 	}
 
 	/* Never reached */
