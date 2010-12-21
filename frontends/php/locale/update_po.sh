@@ -4,7 +4,7 @@ echo "Generating translation template..."
 
 xgettext --files-from=POTFILES.in --from-code=UTF-8 --directory=.. \
 --output=frontend.pot --copyright-holder="SIA Zabbix" --no-wrap \
---add-comments="GETTEXT:"
+--add-comments="GETTEXT:" --keyword=_n:1,2
 
 #--sort-output
 #--sort-by-file
