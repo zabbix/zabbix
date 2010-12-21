@@ -328,9 +328,6 @@ void	init_config(void)
 	{
 		CONFIG_EXTERNALSCRIPTS=strdup("/etc/zabbix/externalscripts");
 	}
-#ifndef	HAVE_LIBCURL
-	CONFIG_HTTPPOLLER_FORKS = 0;
-#endif
 }
 
 /******************************************************************************

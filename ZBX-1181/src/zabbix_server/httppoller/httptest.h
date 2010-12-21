@@ -38,14 +38,10 @@ typedef struct
 }
 ZBX_HTTPSTAT;
 
-#ifdef	HAVE_LIBCURL
-	void	process_httptests(int now);
-#else
-#	define process_httptests(now)
-#endif
-
 extern int	httppoller_num;
 
 extern int	CONFIG_HTTPPOLLER_FORKS;
+
+void	process_httptests(int now);
 
 #endif
