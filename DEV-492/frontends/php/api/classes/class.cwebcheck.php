@@ -324,7 +324,7 @@ COpt::memoryPick();
 
 			foreach($webchecks as $wnum => $webcheck){
 				if(empty($webcheck['steps']))
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Webcheck must have at least one step.');
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Webcheck must have at least one step.'));
 
 				$webcheck['webcheckid'] = $webcheckids[$wnum];
 
@@ -548,14 +548,16 @@ COpt::memoryPick();
 	protected static function createCheckItems($webcheck){
 		$checkitems = array(
 			array(
-				'description'	=> 'Download speed for scenario \'$1\'',
+				// GETTEXT: Legend below graph
+				'description'	=> _s('Download speed for scenario \'%s\'', '$1'),
 				'key_'		=> 'web.test.in['.$webcheck['name'].',,bps]',
 				'type'		=> ITEM_VALUE_TYPE_FLOAT,
 				'units'		=> 'Bps',
 				'httptestitemtype'=> HTTPSTEP_ITEM_TYPE_IN
 			),
 			array(
-				'description'	=> 'Failed step of scenario \'$1\'',
+				// GETTEXT: Legend below graph
+				'description'	=> _s('Failed step of scenario \'%s\'', '$1'),
 				'key_'		=> 'web.test.fail['.$webcheck['name'].']',
 				'type'		=> ITEM_VALUE_TYPE_UINT64,
 				'units'		=> '',
@@ -569,7 +571,7 @@ COpt::memoryPick();
 				'hostid' => $webcheck['hostid']
 			));
 			if($items_exist)
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Item with key ['.$item['key_'].'] '.S_ALREADY_EXISTS_SMALL);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key [%s] already exists', $item['key_']));
 
 			$item['data_type'] = ITEM_DATA_TYPE_DECIMAL;
 			$item['hostid'] = $webcheck['hostid'];
@@ -638,21 +640,21 @@ COpt::memoryPick();
 
 			$stepitems = array(
 				array(
-					'description'	=> 'Download speed for step \'$2\' of scenario \'$1\'',
+					'description'	=> _s('Download speed for step \'%1$s\' of scenario \'%2$s\'', '$2', '$1'),
 					'key_'		=> 'web.test.in['.$webcheck['name'].','.$webstep['name'].',bps]',
 					'type'		=> ITEM_VALUE_TYPE_FLOAT,
 					'units'		=> 'Bps',
 					'httpstepitemtype' => HTTPSTEP_ITEM_TYPE_IN
 				),
 				array(
-					'description'	=> 'Response time for step \'$2\' of scenario \'$1\'',
+					'description'	=> _s('Response time for step \'%1$s\' of scenario \'%2$s\'', '$2', '$1'),
 					'key_'		=> 'web.test.time['.$webcheck['name'].','.$webstep['name'].',resp]',
 					'type'		=> ITEM_VALUE_TYPE_FLOAT,
 					'units'		=> 's',
 					'httpstepitemtype' => HTTPSTEP_ITEM_TYPE_TIME
 				),
 				array(
-					'description'	=> 'Response code for step \'$2\' of scenario \'$1\'',
+					'description'	=> _s('Response code for step \'%1$s\' of scenario \'%2$s\'', '$2', '$1'),
 					'key_'		=> 'web.test.rspcode['.$webcheck['name'].','.$webstep['name'].']',
 					'type'		=> ITEM_VALUE_TYPE_UINT64,
 					'units'		=> '',

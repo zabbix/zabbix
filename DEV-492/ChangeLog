@@ -1,18 +1,24 @@
 Changes for 1.9.1
 
- - [ZBXNEXT-588] improved template, host, proxy form view, dashboard screen (Aly,Vedmak)
+New features:
  - [ZBXNEXT-587] added support of multiple host interfaces (Aly,Sasha,Vedmak,asaveljevs)
- - [ZBX-3149] allow to translate more strings in screen element 'Server info'; add support for translator comments (Richlv)
  - [ZBXNEXT-564] added new {IPADDRESS} and {HOST.PORT} macros in auto registration notifications (Sasha)
- - [ZBX-3248] fixed empty and duplicate map URL name handling (KB)
  - [ZBXNEXT-556] zabbix frontend translations are now handled by PHP gettext module (KB)
  - [ZBXNEXT-558] added support of monitoring auto-registered hosts with passive checks (Sasha)
+ - [ZBXNEXT-512] redesign of unknown events (Aly,asaveljevs,Sasha)
+
+Bug fixes:
+ - [ZBX-2647] Made some of hard coded strings translatable (KB)
+ - [ZBX-3300] fixed valuemapid not removed from items table when valuemap deleted (Vedmak)
+ - [ZBXNEXT-588] improved template, host, proxy form view, dashboard screen (Aly,Vedmak)
+ - [ZBX-3149] allow to translate more strings in screen element 'Server info'; add support for translator comments (Richlv)
+ - [ZBX-3248] fixed empty and duplicate map URL name handling (KB)
  - [ZBX-3190] fixed sql errors when processing proxy configuration (asaveljevs,Sasha)
  - [DEV-471] fixed sql scripts names consistency (Sasha)
  - [ZBXNEXT-538] include ibm_db2 upgrade patches in distribution package (Sasha)
- - [ZBXNEXT-512] redesign of unknown events (Aly,asaveljevs,Sasha)
  - [ZBX-3130] fixed bug when creating custom graph: host items now can be added (KB)
 
+--------------------------------------------------------------------------------
 Changes for 1.9.0
 
  - [DEV-477] added support of low-level discovery of file systems, network interfaces and SNMP OID's (Sasha,Vedmak)
@@ -29,6 +35,10 @@ Changes for 1.9.0
 
 Changes for 1.8.4rc3
 
+ - [ZBX-2851] fixed apache hanging when frontend connects to empty database (Vedmak)
+ - [ZBX-3294] fixed host status change confirmation dialog (Vedmak)
+ - [ZBX-3301] fixed server crash after libssh2_userauth_list() when processing SSH checks (asaveljevs)
+ - [ZBX-2395] fixed sending of the same message to the same user using different media types (asaveljevs)
  - [ZBXNEXT-586] added sensor[device,sensor,<mode>] check for Linux 2.4 (asaveljevs)
  - [ZBXNEXT-586] added sensor[device,sensor,<mode>] check for OpenBSD; thanks to Robert Nagy (asaveljevs)
  - [ZBX-3252] fixed graph height calculations when graph height was less then 120px (KB)
