@@ -116,18 +116,7 @@
 		$status['msg'] = S_OK_BIG;
 		$status['style'] = 'enabled';
 
-		if(($httptest_data['lastfailedstep'] == 0) && !zbx_empty($httptest_data['error'])){
-			if($httpstep_data['no'] == 1){
-				$status['msg'] = S_FAIL.' - '.S_ERROR.': '.$httptest_data['error'];
-				$status['style'] = 'disabled';
-			}
-			else{
-				$status['msg'] = S_UNKNOWN;
-				$status['style'] = 'unknown';
-			}
-			$status['skip'] = true;
-		}
-		else if(HTTPTEST_STATE_BUSY == $httptest_data['curstate'] ){
+		if(HTTPTEST_STATE_BUSY == $httptest_data['curstate'] ){
 			if($httptest_data['curstep'] == ($httpstep_data['no'])){
 				$status['msg'] = S_IN_PROGRESS;
 				$status['style'] = 'unknown';
@@ -180,11 +169,14 @@
 			$itemids[] = $item_data['itemid'];
 		}
 
+		$speed = format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_IN]);
+		$respTime = format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME]);
+		$resp = format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_RSPCODE]);
 		$table->addRow(array(
 			$httpstep_data['name'],
-			format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_IN]),
-			format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME]),
-			format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_RSPCODE]),
+			($speed == 0 ? '-' : $speed),
+			($respTime == 0 ? '-' : $respTime),
+			($resp == 0 ? '-' : $resp),
 			new CSpan($status['msg'], $status['style'])
 		));
 	}
@@ -203,11 +195,6 @@
 	else if($httptest_data['lastfailedstep'] > 0){
 		$status['msg'] = S_FAIL.' - '.S_ERROR.': '.$httptest_data['error'];
 		$status['style'] = 'disabled';
-	}
-	else if(($httptest_data['lastfailedstep'] == 0) && !zbx_empty($httptest_data['error'])){
-		$status['msg'] = S_FAIL.' - '.S_ERROR.': '.$httptest_data['error'];
-		$status['style'] = 'disabled';
-		$totalTime = null;
 	}
 
 	$table->addRow(array(
