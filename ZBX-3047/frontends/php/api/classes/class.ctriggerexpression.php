@@ -213,6 +213,7 @@ private $allowedFunctions;
 			}
 
 			if(!$inQuotes){
+				if($symbol == ' ') continue;
 				if(($symbol == ',') && ($prevSymbol != '\\')){
 					$paramCount++;
 					continue;
