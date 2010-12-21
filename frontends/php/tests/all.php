@@ -19,9 +19,9 @@
 **/
 ?>
 <?php
-require_once 'general/GeneralTests.php';
-require_once 'api/ApiTests.php';
-require_once 'selenium/SeleniumTests.php';
+require_once(dirname(__FILE__).'/general/GeneralTests.php');
+require_once(dirname(__FILE__).'/api/ApiTests.php');
+require_once(dirname(__FILE__).'/selenium/SeleniumTests.php');
 
 class All
 {

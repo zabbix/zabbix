@@ -19,8 +19,8 @@
 **/
 ?>
 <?php
-require_once 'testGeneric.php';
-require_once 'testClicks.php';
+require_once(dirname(__FILE__).'/testGeneric.php');
+require_once(dirname(__FILE__).'/testClicks.php');
 // ...
 
 class SeleniumTests
