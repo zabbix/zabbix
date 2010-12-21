@@ -357,7 +357,7 @@ include_once('include/page_header.php');
 		}
 
 		$goOption = new CComboItem('delete', S_DELETE_SELECTED);
-		$goOption->setAttribute('confirm', 'Delete selected screens?');
+		$goOption->setAttribute('confirm', _('Delete selected screens?'));
 		$goBox->addItem($goOption);
 
 		// goButton name is necessary!!!
