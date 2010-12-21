@@ -2,9 +2,13 @@
 
 echo "Generating translation template..."
 
-xgettext --files-from=POTFILES.in --from-code=UTF-8 --directory=.. \
+# xgettext will be used on all php files
+find .. -type f -name '*.php' > POTFILES.in
+
+# keyword "_n" is Zabbix frontend plural function
+xgettext --files-from=POTFILES.in --from-code=UTF-8 \
 --output=frontend.pot --copyright-holder="SIA Zabbix" --no-wrap \
---add-comments="GETTEXT:"
+--add-comments="GETTEXT:" --keyword=_n:1,2 --keyword=_s
 
 #--sort-output
 #--sort-by-file

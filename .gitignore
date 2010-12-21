@@ -31,6 +31,7 @@ frontends/php/images/general/*.db
 frontends/php/images/general/bar/*.db
 frontends/php/images/general/bttn/*.db
 frontends/php/images/general/tree/*.db
+frontends/php/locale/POTFILES.in
 frontends/php/locale/cs/LC_MESSAGES/frontend.mo
 frontends/php/locale/de/LC_MESSAGES/frontend.mo
 frontends/php/locale/es/LC_MESSAGES/frontend.mo
