@@ -113,7 +113,7 @@ private $allowed;
 		$this->checkExpressionParts($simpleExpression);
 		$this->checkSimpleExpression($simpleExpression);
 //SDII($this->data);
-SDII($this->expressions);
+//SDII($this->expressions);
 	}
 
 	private function checkExpressionBrackets(&$expression){
