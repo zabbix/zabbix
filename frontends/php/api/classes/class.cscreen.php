@@ -484,7 +484,7 @@ SDI('/////////////////////////////////');
 		$maps = array();
 		$screens = array();
 
-		$resources = array(SCREEN_RESOURCE_GRAPH, SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT, 
+		$resources = array(SCREEN_RESOURCE_GRAPH, SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT,
 					SCREEN_RESOURCE_MAP,SCREEN_RESOURCE_SCREEN, SCREEN_RESOURCE_TRIGGERS_OVERVIEW,
 					SCREEN_RESOURCE_DATA_OVERVIEW);
 
@@ -497,7 +497,7 @@ SDI('/////////////////////////////////');
 
 			if(isset($item['resourceid']) && ($item['resourceid'] == 0)){
 				if(uint_in_array($item['resourcetype'], $resources))
-					throw new Exception('Incorrect resource provided for screen item');
+					throw new Exception(_('Incorrect resource provided for screen item'));
 				else
 					continue;
 			}
@@ -536,8 +536,8 @@ SDI('/////////////////////////////////');
 				'preservekeys' => 1,
 			));
 			foreach($hostgroups as $id){
-				if(!isset($result[$id])) 
-					self::exception(ZBX_API_ERROR_PERMISSIONS, 'Incorrect Host group identity "'.$id.'" provided for Screens item resource');
+				if(!isset($result[$id]))
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect Host group identity "%s" provided for Screens item resource', $id));
 			}
 		}
 		if(!empty($hosts)){
@@ -548,7 +548,7 @@ SDI('/////////////////////////////////');
 			));
 			foreach($hosts as $id){
 				if(!isset($result[$id]))
-					self::exception(ZBX_API_ERROR_PERMISSIONS, 'Incorrect Host identity "'.$id.'" provided for Screens item resource');
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect Host identity "%s" provided for Screens item resource', $id));
 			}
 		}
 		if(!empty($graphs)){
@@ -559,7 +559,7 @@ SDI('/////////////////////////////////');
 			));
 			foreach($graphs as $id){
 				if(!isset($result[$id]))
-					self::exception(ZBX_API_ERROR_PERMISSIONS, 'Incorrect Graph identity "'.$id.'" provided for Screens item resource');
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect Graph identity "%s" provided for Screens item resource', $id));
 			}
 		}
 		if(!empty($items)){
@@ -571,7 +571,7 @@ SDI('/////////////////////////////////');
 			));
 			foreach($items as $id){
 				if(!isset($result[$id]))
-					self::exception(ZBX_API_ERROR_PERMISSIONS, 'Incorrect Item identity "'.$id.'" provided for Screens item resource');
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect Item identity "%s" provided for Screens item resource', $id));
 			}
 		}
 		if(!empty($maps)){
@@ -582,7 +582,7 @@ SDI('/////////////////////////////////');
 			));
 			foreach($maps as $id){
 				if(!isset($result[$id]))
-					self::exception(ZBX_API_ERROR_PERMISSIONS, 'Incorrect Map identity "'.$id.'" provided for Screens item resource');
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect Map identity "%s" provided for Screens item resource', $id));
 			}
 		}
 		if(!empty($screens)){
@@ -593,7 +593,7 @@ SDI('/////////////////////////////////');
 			));
 			foreach($screens as $id){
 				if(!isset($result[$id]))
-					self::exception(ZBX_API_ERROR_PERMISSIONS, 'Incorrect Screen identity "'.$id.'" provided for Screens item resource');
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect Screen identity "%s" provided for Screens item resource', $id));
 			}
 		}
 	}
@@ -631,7 +631,7 @@ SDI('/////////////////////////////////');
 
 				$screen_db_fields = array('name' => null);
 				if(!check_db_fields($screen_db_fields, $screen)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for screen [ '.$screen['name'].' ]');
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for screen [ %s ]', $screen['name']));
 				}
 
 				if(self::exists($screen)){
@@ -798,9 +798,9 @@ SDI('/////////////////////////////////');
 				'x' => null,
 				'y' => null,
 			);
-			
+
 			if(!check_db_fields($items_db_fields, $screenitem)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for screen items');
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for screen items'));
 			}
 
 			$insert[] = $screenitem;
@@ -836,7 +836,7 @@ SDI('/////////////////////////////////');
 				'y' => null,
 			);
 			if(!check_db_fields($items_db_fields, $new_item)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for screen items');
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for screen items'));
 			}
 		}
 
@@ -873,7 +873,7 @@ SDI('/////////////////////////////////');
 					'resourceid' => null,
 				);
 				if(!check_db_fields($items_db_fields, $new_item)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for screen items');
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for screen items'));
 				}
 
 				$new_item['screenid'] = $screen['screenid'];

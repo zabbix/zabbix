@@ -2191,7 +2191,7 @@ class CChart extends CGraphDraw{
 		if(isset($this->dataFrom))
 			$datafrom = 'Data from '.$this->dataFrom.'. ';
 
-		imagestring($this->im, 0,$this->fullSizeX-210,$this->fullSizeY-12,$datafrom.'Generated in '.$str.' sec', $this->getColor('Gray'));
+		imagestring($this->im, 0,$this->fullSizeX-210,$this->fullSizeY-12,$datafrom._s('Generated in %s sec', $str), $this->getColor('Gray'));
 
 		unset($this->items, $this->data);
 

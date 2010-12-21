@@ -827,17 +827,17 @@ COpt::memoryPick();
 			$tmp_graph['templateid'] = $graph['graphid'];
 
 			if(!$tmp_graph['gitems'] = get_same_graphitems_for_host($tmp_graph['gitems'], $chd_host['hostid']))
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$tmp_graph['name'].' ]: cannot inherit. No required items on [ '.$chd_host['host'].' ]');
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph [ %1$s ]: cannot inherit. No required items on [ %2$s ]', $tmp_graph['name'], $chd_host['host']));
 
 			if($tmp_graph['ymax_itemid'] > 0){
 				$ymax_itemid = get_same_graphitems_for_host(array(array('itemid' => $tmp_graph['ymax_itemid'])), $chd_host['hostid']);
-				if(!$ymax_itemid) self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$tmp_graph['name'].' ]: cannot inherit. No required items on [ '.$chd_host['host'].' ] (Ymax value item)');
+				if(!$ymax_itemid) self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph [ %1$s ]: cannot inherit. No required items on [ %2$s ] (Ymax value item)', $tmp_graph['name'], $chd_host['host']));
 				$ymax_itemid = reset($ymax_itemid);
 				$tmp_graph['ymax_itemid'] = $ymax_itemid['itemid'];
 			}
 			if($tmp_graph['ymin_itemid'] > 0){
 				$ymin_itemid = get_same_graphitems_for_host(array(array('itemid' => $tmp_graph['ymin_itemid'])), $chd_host['hostid']);
-				if(!$ymin_itemid) self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$tmp_graph['name'].' ]: cannot inherit. No required items on [ '.$chd_host['host'].' ] (Ymin value item)');
+				if(!$ymin_itemid) self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph [ %1$s ]: cannot inherit. No required items on [ %2$s ] (Ymin value item)', $tmp_graph['name'], $chd_host['host']));
 				$ymin_itemid = reset($ymin_itemid);
 				$tmp_graph['ymin_itemid'] = $ymin_itemid['itemid'];
 			}
@@ -854,10 +854,10 @@ COpt::memoryPick();
 				if((zbx_strtolower($tmp_graph['name']) != zbx_strtolower($chd_graph['name']))
 				&& self::exists(array('name' => $tmp_graph['name'], 'hostids' => $chd_host['hostid'])))
 				{
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$tmp_graph['name'].' ]: already exists on [ '.$chd_host['host'].' ]');
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph [ %1$s ]: already exists on [ %2$s ]', $tmp_graph['name'], $chd_host['host']));
 				}
 				else if($chd_graph['flags'] != $tmp_graph['flags']){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph with same name but other type exist');
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Graph with same name but other type exist'));
 				}
 
 				$tmp_graph['graphid'] = $chd_graph['graphid'];
@@ -875,10 +875,10 @@ COpt::memoryPick();
 				$chd_graph = self::get($options);
 				if($chd_graph = reset($chd_graph)){
 					if($chd_graph['templateid'] != 0){
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_GRAPH.' [ '.$tmp_graph['name'].' ]: already exists on [ '.$chd_host['host'].' ] (inherited from another template)');
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph [ %1$s ]: already exists on [ %2$s ] (inherited from another template)', $tmp_graph['name'], $chd_host['host']));
 					}
 					else if($chd_graph['flags'] != $tmp_graph['flags']){
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph with same name but other type exist');
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Graph with same name but other type exist'));
 					}
 
 					$options = array(
@@ -897,14 +897,14 @@ COpt::memoryPick();
 									continue 2;
 							}
 
-							self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$tmp_graph['name'].' ]: already exists on [ '.$chd_host['host'].' ] (items are not identical)');
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph [ %1$s ]: already exists on [ %2$s ] (items are not identical)', $tmp_graph['name'], $chd_host['host']));
 						}
 
 						$tmp_graph['graphid'] = $chd_graph['graphid'];
 						self::updateReal($tmp_graph);
 					}
 					else{
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$tmp_graph['name'].' ]: already exists on [ '.$chd_host['host'].' ] (items are not identical)');
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph [ %1$s ]: already exists on [ %2$s ] (items are not identical)', $tmp_graph['name'], $chd_host['host']));
 					}
 				}
 				else{
@@ -1022,7 +1022,7 @@ COpt::memoryPick();
 					if(!isset($del_graphs[$graphid]))
 						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 					if($del_graphs[$graphid]['templateid'] != 0){
-						self::exception(ZBX_API_ERROR_PERMISSIONS, 'Cannot delete templated graphs');
+						self::exception(ZBX_API_ERROR_PERMISSIONS, _('Cannot delete templated graphs'));
 					}
 				}
 			}
@@ -1045,7 +1045,7 @@ COpt::memoryPick();
 				$created_graphs[$graph['graphid']] = $graph['graphid'];
 			}
 			$result = CGraph::delete($created_graphs, true);
-			if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete graph prototype');
+			if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete graph prototype'));
 
 
 			DB::delete('screens_items', array(
@@ -1086,7 +1086,7 @@ COpt::memoryPick();
 // EXCEPTION: GRAPH FIELDS {{{
 			$fields = array('name' => null);
 			if(!$update && !check_db_fields($fields, $graph)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for graph');
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for graph'));
 			}
 // }}} EXCEPTION: GRAPH FIELDS
 
@@ -1100,7 +1100,7 @@ COpt::memoryPick();
 			$fields = array('itemid' => null);
 			foreach($graph['gitems'] as $ginum => $gitem){
 				if(!check_db_fields($fields, $gitem)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for items');
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for items'));
 				}
 			}
 // }}} EXCEPTION: ITEMS FIELDS
@@ -1166,7 +1166,7 @@ COpt::memoryPick();
 				}
 			}
 			if(!$has_prototype){
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph prototype must have at least one prototype');
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Graph prototype must have at least one prototype'));
 			}
 // }}} PROTOTYPE
 		}
@@ -1200,7 +1200,7 @@ COpt::memoryPick();
 			$cnt_exist = CItem::get($options);
 
 			if($cnt != $cnt_exist)
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect item for axis value item');
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect item for axis value item'));
 		}
 
 		return true;
