@@ -30,6 +30,7 @@ private $allowed;
 			for($symbolNum = 0; $symbolNum < $length; $symbolNum++){
 				$symbol = zbx_substr($expression, $symbolNum, 1);
 // SDI($symbol);
+ 
 				$this->detectOpenParts($this->previous['last']);
 				$this->detectCloseParts($symbol);
 // SDII($this->currExpr);
@@ -501,12 +502,12 @@ private $allowed;
 	private function detectParamClose($symbol){
 		if($symbol == ' ') return;
 // end params
-
+//		$this->writeParams();
 		if(!$this->inQuotes()){
 			if(($symbol == ']') && $this->currExpr['part']['item']){
-				$this->symbols['params'][$symbol]++;
-				if($this->symbols['params']['['] == $this->symbols['params'][']']){
-					$this->writeParams();
+// +1 because (detectParam is not counted this symbol yet)
+				if($this->symbols['params']['['] == ($this->symbols['params'][']'] + 1)){
+					$this->symbols['params'][$symbol]++;
 // count points to the last param index
 					if($this->currExpr['params']['count'] != $this->currExpr['params']['comma']){
 						throw new Exception('Incorrect item parameters syntax is used');
@@ -551,6 +552,9 @@ private $allowed;
 
 		if($this->currExpr['part']['item'])
 			$this->currExpr['object']['item'] .= $symbol;
+
+		if($this->currExpr['part']['itemParam'])
+			$this->currExpr['object']['itemParam'] .= $symbol;
 
 		if($this->currExpr['part']['function'])
 			$this->currExpr['object']['function'] .= $symbol;
