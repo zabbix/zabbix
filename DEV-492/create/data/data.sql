@@ -21,8 +21,6 @@
 -- Dumping data for table `usrgrp`
 --
 
-PRAGMA synchronous = OFF;
-
 INSERT INTO usrgrp VALUES (1,'UNIX administrators',0,0,0,0);
 INSERT INTO usrgrp VALUES (2,'Database administrators',0,0,0,0);
 INSERT INTO usrgrp VALUES (3,'Network administrators',0,0,0,0);
