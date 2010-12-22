@@ -120,14 +120,16 @@
 		</delete>
 	</target>
 
-	<!-- Default target -->
-<!--	<target name="build" depends="clean,init,buildagent,buildproxy,buildserver,gui" /> -->
-	<target name="build-mysql" depends="clean,init-mysql,buildagent,buildproxy,buildserver" />
-	<target name="build-postgresql" depends="clean,init-postgresql,buildagent,buildproxy,buildserver" />
-
 	<target name="gui">
 		<exec executable="phpunit" dir="${basedir}/frontends/php/tests" failonerror="off">
 			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml --bootstrap=${builddir}/frontends/php/tests/bootstrap.php all.php"/>
 		</exec>
 	</target>
+
+	<target name="build-mysql" depends="clean,init-mysql,buildagent,buildproxy,buildserver,gui" />
+	<target name="build-postgresql" depends="clean,init-postgresql,buildagent,buildproxy,buildserver,gui" />
+
+	<!-- Default target -->
+	<target name="build" depends="build-mysql,build-postgresql" />
+
 </project>
