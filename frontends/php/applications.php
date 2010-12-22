@@ -103,7 +103,7 @@ include_once('include/page_header.php');
 		}
 		else{
 			$applicationid = CApplication::create($application);
-			$applicationid = reset($applicationid['applicationids']);
+			if(isset($applicationid['applicationids'])) $applicationid = reset($applicationid['applicationids']);
 			$action		= AUDIT_ACTION_ADD;
 			$msg_ok		= S_APPLICATION_ADDED;
 			$msg_fail	= S_CANNOT_ADD_APPLICATION;
