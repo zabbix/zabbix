@@ -34,3 +34,4 @@ class APIException extends Exception{
 		return $this->errors;
 	}
 }
+?>

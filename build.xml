@@ -10,8 +10,7 @@
 	<target name="buildagent">
 		<!-- Build agent binaries -->
 		<exec executable="./configure" dir="${builddir}" failonerror="on">
-			<arg line="--enable-agent
-			" />
+			<arg value="--enable-agent"/>
 		</exec>
 		<exec executable="make" dir="${builddir}" failonerror="on"/>
 	</target>
@@ -19,41 +18,38 @@
 	<target name="buildserver">
 		<!-- Build PostgreSQL server binaries -->
 		<exec executable="./configure" dir="${builddir}" failonerror="on">
-			<arg line="--enable-server
-			--with-postgresql
-			--with-net-snmp
-			--with-openipmi
-			--with-ldap
-			--with-ssh2
-			--with-libcurl
-			--with-jabber
-			" />
+			<arg value="--enable-server"/>
+			<arg value="--with-postgresql"/>
+			<arg value="--with-net-snmp"/>
+			<arg value="--with-openipmi"/>
+			<arg value="--with-ldap"/>
+			<arg value="--with-ssh2"/>
+			<arg value="--with-libcurl"/>
+			<arg value="--with-jabber"/>
 		</exec>
 		<exec executable="make" dir="${builddir}" failonerror="on"/>
 		<!-- Build MySQL server binaries -->
 		<exec executable="./configure" dir="${builddir}" failonerror="on">
-			<arg line="--enable-server
-			--with-mysql
-			--with-net-snmp
-			--with-openipmi
-			--with-ldap
-			--with-ssh2
-			--with-libcurl
-			--with-jabber
-			" />
+			<arg value="--enable-server"/>
+			<arg value="--with-mysql"/>
+			<arg value="--with-net-snmp"/>
+			<arg value="--with-openipmi"/>
+			<arg value="--with-ldap"/>
+			<arg value="--with-ssh2"/>
+			<arg value="--with-libcurl"/>
+			<arg value="--with-jabber"/>
 		</exec>
 		<exec executable="make" dir="${builddir}" failonerror="on"/>
 		<!-- Build SQlite server binaries -->
 		<exec executable="./configure" dir="${builddir}" failonerror="on">
-			<arg line="--enable-server
-			--with-sqlite3
-			--with-net-snmp
-			--with-openipmi
-			--with-ldap
-			--with-ssh2
-			--with-libcurl
-			--with-jabber
-			" />
+			<arg value="--enable-server"/>
+			<arg value="--with-sqlite3"/>
+			<arg value="--with-net-snmp"/>
+			<arg value="--with-openipmi"/>
+			<arg value="--with-ldap"/>
+			<arg value="--with-ssh2"/>
+			<arg value="--with-libcurl"/>
+			<arg value="--with-jabber"/>
 		</exec>
 		<exec executable="make" dir="${builddir}" failonerror="on"/>
 	</target>
@@ -61,41 +57,38 @@
 	<target name="buildproxy">
 		<!-- Build PostgreSQL proxy binaries -->
 		<exec executable="./configure" dir="${builddir}" failonerror="on">
-			<arg line="--enable-proxy
-			--with-postgresql
-			--with-net-snmp
-			--with-openipmi
-			--with-ldap
-			--with-ssh2
-			--with-libcurl
-			--with-jabber
-			" />
+			<arg value="--enable-proxy"/>
+			<arg value="--with-postgresql"/>
+			<arg value="--with-net-snmp"/>
+			<arg value="--with-openipmi"/>
+			<arg value="--with-ldap"/>
+			<arg value="--with-ssh2"/>
+			<arg value="--with-libcurl"/>
+			<arg value="--with-jabber"/>
 		</exec>
 		<exec executable="make" dir="${builddir}" failonerror="on"/>
 		<!-- Build MySQL proxy binaries -->
 		<exec executable="./configure" dir="${builddir}" failonerror="on">
-			<arg line="--enable-proxy
-			--with-mysql
-			--with-net-snmp
-			--with-openipmi
-			--with-ldap
-			--with-ssh2
-			--with-libcurl
-			--with-jabber
-			" />
+			<arg value="--enable-proxy"/>
+			<arg value="--with-mysql"/>
+			<arg value="--with-net-snmp"/>
+			<arg value="--with-openipmi"/>
+			<arg value="--with-ldap"/>
+			<arg value="--with-ssh2"/>
+			<arg value="--with-libcurl"/>
+			<arg value="--with-jabber"/>
 		</exec>
 		<exec executable="make" dir="${builddir}" failonerror="on"/>
 		<!-- Build SQlite proxy binaries -->
 		<exec executable="./configure" dir="${builddir}" failonerror="on">
-			<arg line="--enable-proxy
-			--with-sqlite3
-			--with-net-snmp
-			--with-openipmi
-			--with-ldap
-			--with-ssh2
-			--with-libcurl
-			--with-jabber
-			" />
+			<arg value="--enable-proxy"/>
+			<arg value="--with-sqlite3"/>
+			<arg value="--with-net-snmp"/>
+			<arg value="--with-openipmi"/>
+			<arg value="--with-ldap"/>
+			<arg value="--with-ssh2"/>
+			<arg value="--with-libcurl"/>
+			<arg value="--with-jabber"/>
 		</exec>
 		<exec executable="make" dir="${builddir}" failonerror="on"/>
 	</target>
@@ -105,47 +98,51 @@
 		<mkdir dir="${basedir}/build/logs" />
 		<mkdir dir="${builddir}" />
 		<exec executable="svn" dir="${basedir}/frontends/php/tests" failonerror="on">
-			<arg line="checkout ${svn} ${builddir}
-			" />
+			<arg line="checkout ${svn} ${builddir}"/>
 		</exec>
 		<exec executable="./bootstrap.sh" dir="${builddir}" failonerror="on"></exec>
 		<exec executable="./configure" dir="${builddir}" failonerror="on"></exec>
 		<exec executable="make" dir="${builddir}" failonerror="on">
-			<arg line="dbschema
-			" />
+			<arg line="dbschema"/>
+		</exec>
+		<!-- Create MySQL database -->
+		<exec executable="mysql" failonerror="on">
+			<arg line="-uroot -e 'drop database if exists ${dbname};'"/>
 		</exec>
 		<exec executable="mysql" failonerror="on">
-			<arg line="-uroot
-			-e 'drop database if exists ${dbname};'
-			" />
-		</exec>
-		<exec executable="mysql" failonerror="on">
-			<arg line="-uroot
-			-e 'create database ${dbname};'
-			" />
+			<arg line="-uroot -e 'create database ${dbname};'"/>
 		</exec>
 		<exec executable="mysql" input="${builddir}/create/schema/mysql.sql" failonerror="on">
-			<arg line="-uroot
-			${dbname}
-			" />
+			<arg line="-uroot ${dbname}"/>
 		</exec>
 		<exec executable="mysql" input="${builddir}/create/data/images_mysql.sql" failonerror="on">
-			<arg line="-uroot
-			${dbname}
-			" />
+			<arg line="-uroot ${dbname}"/>
 		</exec>
 		<exec executable="mysql" input="${builddir}/create/data/data.sql" failonerror="on">
-			<arg line="-uroot
-			${dbname}
-			" />
+			<arg line="-uroot ${dbname}"/>
 		</exec>
+		<!-- Create PostgreSQL database -->
+		<exec executable="psql" failonerror="on">
+			<arg line="template1 -c 'drop database if exists ${dbname};'"/>
+		</exec>
+		<exec executable="psql" failonerror="on">
+			<arg line="template1 -c 'create database ${dbname};'"/>
+		</exec>
+		<exec executable="psql" input="${builddir}/create/schema/postgresql.sql" failonerror="on">
+			<arg line="${dbname}"/>
+		</exec>
+		<exec executable="psql" input="${builddir}/create/data/images_postgresql.sql" failonerror="on">
+			<arg line="${dbname}"/>
+		</exec>
+		<exec executable="psql" input="${builddir}/create/data/data.sql" failonerror="on">
+			<arg line="${dbname}"/>
+		</exec>
+
 		<exec executable="sed" failonerror="on" output="${builddir}/frontends/php/conf/zabbix.conf.php">
-			<arg line="'s/{DBNAME}/${dbname}/' ${builddir}/tests/templates/zabbix.conf.php.mysql
-			" />
+			<arg line="'s/{DBNAME}/${dbname}/' ${builddir}/tests/templates/zabbix.conf.php.mysql"/>
 		</exec>
 		<exec executable="sed" failonerror="on" output="${builddir}/frontends/php/tests/bootstrap.php">
-			<arg line="'s/{URL}/${url}/' ${builddir}/frontends/php/tests/bootstrap.php.template
-			" />
+			<arg line="'s/{URL}/${url}/' ${builddir}/frontends/php/tests/bootstrap.php.template"/>
 		</exec>
 	</target>
 
@@ -157,14 +154,12 @@
 	</target>
 
 	<!-- Default target -->
-	<target name="build" depends="clean,init,buildagent,buildproxy,buildserver,gui" />
+<!--	<target name="build" depends="clean,init,buildagent,buildproxy,buildserver,gui" /> -->
+	<target name="build" depends="clean,init,buildagent,buildproxy,buildserver" />
 
 	<target name="gui">
 		<exec executable="phpunit" dir="${basedir}/frontends/php/tests" failonerror="off">
-			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml
-			--bootstrap=${builddir}/frontends/php/tests/bootstrap.php
-			all.php
-			" />
+			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml --bootstrap=${builddir}/frontends/php/tests/bootstrap.php all.php"/>
 		</exec>
 	</target>
 </project>

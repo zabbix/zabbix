@@ -130,3 +130,4 @@ private function calcRows(){
 	}
 }
 }
+?>
