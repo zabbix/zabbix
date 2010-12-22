@@ -33,6 +33,8 @@ extern char	*CONFIG_TMPDIR;
 static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int interval, int size, int timeout,
 		char *error, int max_error_len)
 {
+	const char	*__function_name = "process_ping";
+
 	FILE		*f;
 	char		filename[MAX_STRING_LEN], tmp[MAX_STRING_LEN],
 			*c, *c2, params[64]; /*usually this amount of memory is enough*/
@@ -51,7 +53,8 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 #endif /* #ifdef HAVE_IPV6 */
 
 	assert(hosts);
-	zabbix_log(LOG_LEVEL_DEBUG, "In process_ping() [hosts_count:%d]", hosts_count);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hosts_count:%d", __function_name, hosts_count);
 
 	i = zbx_snprintf(params, sizeof(params), "-q -C%d", count);
 	if (0 != interval)
@@ -61,7 +64,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	if (0 != timeout)
 		i += zbx_snprintf(params + i, sizeof(params) - i, " -t%d", timeout);
 	if (NULL != CONFIG_SOURCE_IP)
-		i += zbx_snprintf(params + i, sizeof(/*source_ip*/params) - i, " -S%s ", CONFIG_SOURCE_IP);
+		i += zbx_snprintf(params + i, sizeof(params) - i, " -S%s", CONFIG_SOURCE_IP);
 
 	if (access(CONFIG_FPING_LOCATION, F_OK|X_OK) == -1)
 	{
@@ -103,9 +106,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 		}
 	}
 	else
-	{
 		fping_fping6_combination |= FPING6_EXISTS;
-	}
 	
 	if (NULL != CONFIG_SOURCE_IP)
 	{
@@ -174,7 +175,8 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 			filename);
 #endif /* HAVE_IPV6 */
 
-	if (NULL == (f = fopen(filename, "w"))) {
+	if (NULL == (f = fopen(filename, "w")))
+	{
 		zbx_snprintf(error, max_error_len, "%s: [%d] %s", filename, errno, strerror(errno));
 		return NOTSUPPORTED;
 	}
@@ -191,7 +193,8 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s", tmp);
 
-	if (0 == (f = popen(tmp, "r"))) {
+	if (0 == (f = popen(tmp, "r")))
+	{
 		zbx_snprintf(error, max_error_len, "%s: [%d] %s", tmp, errno, strerror(errno));
 
 		unlink(filename);
@@ -199,7 +202,8 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 		return NOTSUPPORTED;
 	}
 
-	while (NULL != fgets(tmp, sizeof(tmp), f)) {
+	while (NULL != fgets(tmp, sizeof(tmp), f))
+	{
 		zbx_rtrim(tmp, "\n");
 		zabbix_log(LOG_LEVEL_DEBUG, "Update IP [%s]",
 				tmp);
@@ -208,10 +212,12 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 		host = NULL;
 
-		if (NULL != (c = strchr(tmp, ' '))) {
+		if (NULL != (c = strchr(tmp, ' ')))
+		{
 			*c = '\0';
 			for (i = 0; i < hosts_count; i++)
-				if (0 == strcmp(tmp, hosts[i].addr)) {
+				if (0 == strcmp(tmp, hosts[i].addr))
+				{
 					host = &hosts[i];
 					break;
 				}
@@ -226,32 +232,34 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 		c += 3;
 
-		do {
+		do
+		{
 			if (NULL != (c2 = strchr(c, ' ')))
 				*c2 = '\0';
 
 			if (0 != strcmp(c, "-"))
 			{
 				/* Convert ms to seconds */
-				sec = atof(c)/1000;
+				sec = atof(c) / 1000;
 
 				if (host->rcv == 0 || host->min > sec)
 					host->min = sec;
 				if (host->rcv == 0 || host->max < sec)
 					host->max = sec;
-				host->avg = (host->avg * host->rcv + sec)/(host->rcv + 1);
+				host->avg = (host->avg * host->rcv + sec) / (host->rcv + 1);
 				host->rcv++;
 			}
 
 			if (NULL != c2)
 				*c2++ = ' ';
-		} while (NULL != (c = c2));
+		}
+		while (NULL != (c = c2));
 	}
 	pclose(f);
 
 	unlink(filename);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of process_ping()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return SUCCEED;
 }
@@ -269,15 +277,16 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments: use external binary 'fping' to avoid superuser priviledges       *
+ * Comments: use external binary 'fping' to avoid superuser privileges        *
  *                                                                            *
  ******************************************************************************/
 int	do_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int interval, int size, int timeout, char *error, int max_error_len)
 {
-	int res;
+	const char	*__function_name = "do_ping";
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In do_ping(hosts_count:%d)",
-			hosts_count);
+	int	res;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hosts_count:%d", __function_name, hosts_count);
 
 	if (NOTSUPPORTED == (res = process_ping(hosts, hosts_count, count, interval, size, timeout, error, max_error_len)))
 	{
@@ -285,8 +294,7 @@ int	do_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int interval, int
 		zabbix_syslog("%s", error);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of do_ping():%s",
-			zbx_result_string(res));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
 	return res;
 }
