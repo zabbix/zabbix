@@ -62,12 +62,15 @@
 	<target name="init-sqlite3" depends="init-common">
 		<!-- Create PostgreSQL database -->
 		<exec executable="sqlite3" input="${builddir}/create/schema/sqlite3.sql" failonerror="on">
+			<arg line="-init ${builddir}/tests/templates/sqlite3.init"/>
 			<arg line="${builddir}/${dbname}.db"/>
 		</exec>
 		<exec executable="sqlite3" input="${builddir}/create/data/data.sql" failonerror="on">
+			<arg line="-init ${builddir}/tests/templates/sqlite3.init"/>
 			<arg line="${builddir}/${dbname}.db"/>
 		</exec>
 		<exec executable="sqlite3" input="${builddir}/create/data/images_sqlite3.sql" failonerror="on">
+			<arg line="-init ${builddir}/tests/templates/sqlite3.init"/>
 			<arg line="${builddir}/${dbname}.db"/>
 		</exec>
 
