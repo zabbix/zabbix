@@ -304,6 +304,8 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page) {
 
 				if(!defined('ZBX_PAGE_NO_MENU')){
 					CProfile::update('web.menu.'.$label.'.last', $sub_page['url'], PROFILE_TYPE_STR);
+					if($sub_page['url'] != 'profile.php') CProfile::update('web.paging.lastpage', $page['file'], PROFILE_TYPE_STR);
+
 				}
 			}
 
