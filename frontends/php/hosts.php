@@ -235,7 +235,6 @@ include_once('include/page_header.php');
 			'output' => API_OUTPUT_EXTEND
 		);
 		$applications = Capplication::get($params);
-//sdii($applications);
 
 // SELECT TRIGGERS
 		$params = array(
@@ -640,7 +639,7 @@ include_once('include/page_header.php');
 		DBstart();
 		$result = CHost::delete(array('hostid' => $_REQUEST['hostid']));
 		$result = DBend($result);
-		
+
 		show_messages($result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
 
 		if($result){
@@ -819,6 +818,9 @@ include_once('include/page_header.php');
 			if($pageFilter->groupid > 0) $options['groupids'] = $pageFilter->groupid;
 
 			$hosts = CHost::get($options);
+		}
+		else{
+			$hosts = array();
 		}
 
 // sorting && paging
