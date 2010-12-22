@@ -1387,8 +1387,15 @@ Copt::memoryPick();
 				$options = array();
 				$options['hosts'] = $host;
 
-				if(isset($host['groups']) && !is_null($host['groups']))
-					$options['groups'] = $host['groups'];
+
+
+				foreach($host['groups'] as $group){
+					$hostgroupid = get_dbid('hosts_groups', 'hostgroupid');
+					$result = DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES ($hostgroupid, $hostid, {$group['groupid']})");
+					if(!$result){
+						self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+					}
+				}
 
 				if(isset($host['templates']) && !is_null($host['templates']))
 					$options['templates'] = $host['templates'];
@@ -1539,13 +1546,13 @@ Copt::memoryPick();
 
 		try{
 			self::BeginTransaction(__METHOD__);
-
 			$options = array(
 				'hostids' => zbx_objectValues($data['hosts'], 'hostid'),
 				'editable' => 1,
 				'preservekeys' => 1
 			);
 			$upd_hosts = self::get($options);
+
 			foreach($data['hosts'] as $hnum => $host){
 				if(!isset($upd_hosts[$host['hostid']])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have enough rights for operation'));
