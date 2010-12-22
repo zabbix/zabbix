@@ -1,7 +1,7 @@
 <?php
-/*
+/* 
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,21 +17,19 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-?>
-<?php
 
-class APIException extends Exception{
-	private $errors = array();
+global $DB;
 
-	public function __construct($code = ZBX_API_ERROR_INTERNAL, $errors = array(), $message = ''){
-        parent::__construct($message, $code);
+$DB["TYPE"]		= "POSTGRESQL";
+$DB["SERVER"]		= "localhost";
+$DB["PORT"]		= "0";
+$DB["DATABASE"]		= "{DBNAME}";
+$DB["USER"]		= "hudson";
+$DB["PASSWORD"]		= "zabbix";
 
-		$errors = zbx_toArray($errors);
-		$this->errors = $errors;
-    }
+$ZBX_SERVER		= "hudson";
+$ZBX_SERVER_PORT	= "10051";
+$ZBX_SERVER_NAME	= "";
 
-	public function getErrors(){
-		return $this->errors;
-	}
-}
+$IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 ?>
