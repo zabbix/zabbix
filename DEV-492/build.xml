@@ -115,7 +115,7 @@
 
 	<target name="clean">
 		<!-- Delete build directories from the previous run -->
-		<delete>
+		<delete failonerror="off">
 			<fileset dir="${basedir}/build/logs" includes="**.*" />
 		</delete>
 	</target>
