@@ -1664,7 +1664,7 @@ COpt::memoryPick();
 		foreach($start_points as $spnum => $start){
 			$path = array();
 			if(!self::checkCircularLink($graph, $start, $path)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Circular link can not be created');
+				self::exception(ZBX_API_ERROR_PARAMETERS, S_CIRCULAR_LINK_CANNOT_BE_CREATED);
 			}
 		}
 
@@ -1680,7 +1680,7 @@ COpt::memoryPick();
 					}
 				}
 				if(!sync_host_with_templates($targetid, $templateid))
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot sync template');
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_CANNOT_SYNC_TEMPLATE);
 			}
 		}
 

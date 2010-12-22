@@ -854,7 +854,7 @@ COpt::memoryPick();
 				if((zbx_strtolower($tmp_graph['name']) != zbx_strtolower($chd_graph['name']))
 					&& self::exists(array('name' => $tmp_graph['name'], 'hostids' => $chd_host['hostid'])))
 				{
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$tmp_graph['name'].' ]: already exists on [ '.$chd_host['host'].' ]');
+					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf(S_GRAPH_ALREADY_EXISTS_ON, $tmp_graph['name'], $chd_host['host']));
 				}
 
 				$tmp_graph['graphid'] = $chd_graph['graphid'];
@@ -872,7 +872,7 @@ COpt::memoryPick();
 				$chd_graph = self::get($options);
 				if($chd_graph = reset($chd_graph)){
 					if($chd_graph['templateid'] != 0){
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$tmp_graph['name'].' ]: already exists on [ '.$chd_host['host'].' ] (inherited from another template)');
+						self::exception(ZBX_API_ERROR_PARAMETERS, sprintf(S_GRAPH_ALREADY_EXISTS_ON, $tmp_graph['name'], $chd_host['host']).SPACE.S_INHERITED_FROM_ANOTHER_TEMPLATE);
 					}
 
 					$options = array(
@@ -891,14 +891,14 @@ COpt::memoryPick();
 									continue 2;
 							}
 
-							self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$tmp_graph['name'].' ]: already exists on [ '.$chd_host['host'].' ] (items are not identical)');
+							self::exception(ZBX_API_ERROR_PARAMETERS, sprint_f(S_GRAPH_ALREADY_EXISTS_ON, $tmp_graph['name'], $chd_host['host']).SPACE.S_ITEMS_ARE_NOT_IDENTICAL);
 						}
 
 						$tmp_graph['graphid'] = $chd_graph['graphid'];
 						self::updateReal($tmp_graph);
 					}
 					else{
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$tmp_graph['name'].' ]: already exists on [ '.$chd_host['host'].' ] (items are not identical)');
+						self::exception(ZBX_API_ERROR_PARAMETERS, sprint_f(S_GRAPH_ALREADY_EXISTS_ON, $tmp_graph['name'], $chd_host['host']).SPACE.S_ITEMS_ARE_NOT_IDENTICAL);
 					}
 				}
 				else{

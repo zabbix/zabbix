@@ -154,12 +154,15 @@ function __autoload($class_name){
 	}
 
 	if(file_exists($ZBX_CONFIGURATION_FILE) && !isset($_COOKIE['ZBX_CONFIG']) && !isset($DENY_GUI)){
-		ob_start();
-		include $ZBX_CONFIGURATION_FILE;
-		ob_end_clean();
-		if(!checkConfigData()){
-			unset($DB);
+		$config = new CConfigFile($ZBX_CONFIGURATION_FILE);
+		if($config->load()){
+			$config->makeGlobal();
 		}
+		else{
+			unset($DB);
+			error($config->error);
+		}
+
 		require_once('include/db.inc.php');
 
 		$error = '';
