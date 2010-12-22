@@ -366,6 +366,7 @@
 
 //	actions.php
 	'S_ACTIONS'=>				'Actions',
+	'S_INCORRECT_ESCALATION_PERIOD' => 'Incorrect escalation period',
 	'S_LOGS'=>				'Logs',
 	'S_LOGS_BIG'=>				'LOGS',
 	'S_ACTIONS_BIG'=>			'ACTIONS',
