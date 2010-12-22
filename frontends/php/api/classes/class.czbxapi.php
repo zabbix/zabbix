@@ -156,3 +156,4 @@ private static $transaction = array('counter' => 0);
 	}
 
 }
+?>
