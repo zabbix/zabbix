@@ -30,7 +30,7 @@ private $allowed;
 			for($symbolNum = 0; $symbolNum < $length; $symbolNum++){
 				$symbol = zbx_substr($expression, $symbolNum, 1);
 // SDI($symbol);
- 
+
 				$this->detectOpenParts($this->previous['last']);
 				$this->detectCloseParts($symbol);
 // SDII($this->currExpr);
@@ -131,7 +131,8 @@ private $allowed;
 		if(!isset($this->symbols['linkage'][$symbol])) return;
 
 		if(isset($this->symbols['linkage'][$symbol]) && ($this->previous['last'] == $symbol)){
-			throw new Exception('Incorrect symbol sequence in trigger expression 2');
+			if($symbol != '-' && $symbol != '+')
+				throw new Exception('Incorrect symbol sequence in trigger expression 2');
 		}
 	}
 
@@ -241,19 +242,20 @@ private $allowed;
 	}
 
 	private function checkSimpleExpression(&$expression){
-		$expression = preg_replace('/(\d\.\d)/', '{expression}', $expression);
-		$expression = preg_replace("/([0-9]+)/u", '{expression}', $expression);
-//SDI($expression);
+		$expression = preg_replace('/(\-*\+*\d\.\d)/', '{expression}', $expression);
+		$expression = preg_replace("/([\-\+]*[0-9]+)/u", '{expression}', $expression);
+// SDI($expression);
 
 		$simpleExpr = str_replace('{expression}','1',$expression);
-//SDI($simpleExpr);
+// SDI($simpleExpr);
 
 		$linkageCount = 0;
 		$linkageExpr = '';
 		foreach($this->symbols['linkage'] as $symb => $count){
 			if($symb == ' ') continue;
 
-			$linkageCount += $count;
+//			$linkageCount += $count;
+			$linkageCount += substr_count($expression, $symb);
 			$linkageExpr .= '\\'.$symb;
 		}
 
