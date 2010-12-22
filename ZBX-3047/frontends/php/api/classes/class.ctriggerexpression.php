@@ -130,7 +130,6 @@ private $allowed;
 		if(!isset($this->symbols['linkage'][$symbol])) return;
 
 		if(isset($this->symbols['linkage'][$symbol]) && ($this->previous['last'] == $symbol)){
-SDI($symbol);
 			throw new Exception('Incorrect symbol sequence in trigger expression 2');
 		}
 	}
