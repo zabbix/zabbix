@@ -32,10 +32,7 @@ private $allowed;
 // SDI($symbol);
 				$this->detectOpenParts($this->previous['last']);
 				$this->detectCloseParts($symbol);
-
- // SDII($this->currExpr);
-
-
+// SDII($this->currExpr);
 				if($this->inParameter($symbol)){
 					$this->setPreviousSymbol($symbol);
 					continue;
@@ -130,11 +127,12 @@ private $allowed;
 	}
 
 	private function checkSymbolPrevious($symbol){
+		if(!isset($this->symbols['linkage'][$symbol])) return;
+
 		if(isset($this->symbols['linkage'][$symbol]) && ($this->previous['last'] == $symbol)){
-			throw new Exception('Incorrect symbol sequence in trigger expression');
+SDI($symbol);
+			throw new Exception('Incorrect symbol sequence in trigger expression 2');
 		}
-
-
 	}
 
 	private function checkSymbolSequence($symbol){
@@ -165,8 +163,9 @@ private $allowed;
 		if($this->symbols['params']['"'] % 2 != 0)
 			throw new Exception('Incorrect count of quotes in expression');
 
-		if($this->symbols['open']['('] != $this->symbols['close'][')'])
+		if($this->symbols['open']['('] != $this->symbols['close'][')']){
 			throw new Exception('Incorrect parenthesis count in expression');
+		}
 
 		if($this->symbols['open']['{'] != $this->symbols['close']['}'])
 			throw new Exception('Incorrect curly braces count in expression');
@@ -506,8 +505,7 @@ private $allowed;
 		if(!$this->inQuotes()){
 			if(($symbol == ']') && $this->currExpr['part']['item']){
 				$this->symbols['params'][$symbol]++;
-
-				if($this->symbols['params']['['] == ($this->symbols['params'][']']+1)){
+				if($this->symbols['params']['['] == $this->symbols['params'][']']){
 					$this->writeParams();
 // count points to the last param index
 					if($this->currExpr['params']['count'] != $this->currExpr['params']['comma']){
@@ -635,7 +633,6 @@ private $allowed;
 				'>' => 0,		// greater
 				'&' => 0,		// ampersand
 				'|' => 0,		// vertivalBar
-				' ' => 0,
 			),
 			'expr' => array(
 				'$' => 0,		// dollar
