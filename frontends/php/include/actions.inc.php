@@ -687,6 +687,10 @@ function validate_condition($conditiontype, $value){
 }
 
 function validate_operation($operation){
+	if(isset($operation['esc_period']) && (($operation['esc_period'] > 0) && ($operation['esc_period'] < 60))){
+		error(S_INCORRECT_ESCALATION_PERIOD);
+		return false;
+	}
 
 	switch($operation['operationtype']){
 		case OPERATION_TYPE_MESSAGE:
