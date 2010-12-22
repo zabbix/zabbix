@@ -95,7 +95,6 @@ include_once('include/page_header.php');
 		if(isset($_REQUEST['applicationid'])){
 			$application['applicationid'] = $_REQUEST['applicationid'];
 			$applicationid = CApplication::update($application);
-			$applicationid = reset($applicationid['applicationids']);
 
 			$action		= AUDIT_ACTION_UPDATE;
 			$msg_ok		= S_APPLICATION_UPDATED;
@@ -103,7 +102,7 @@ include_once('include/page_header.php');
 		}
 		else{
 			$applicationid = CApplication::create($application);
-			if(isset($applicationid['applicationids'])) $applicationid = reset($applicationid['applicationids']);
+			
 			$action		= AUDIT_ACTION_ADD;
 			$msg_ok		= S_APPLICATION_ADDED;
 			$msg_fail	= S_CANNOT_ADD_APPLICATION;
@@ -112,6 +111,7 @@ include_once('include/page_header.php');
 
 		show_messages($result, $msg_ok, $msg_fail);
 		if($result){
+			$applicationid = reset($applicationid['applicationids']);
 			add_audit($action,AUDIT_RESOURCE_APPLICATION,S_APPLICATION.' ['.$_REQUEST['appname'].' ] ['.$applicationid.']');
 			unset($_REQUEST['form']);
 		}
