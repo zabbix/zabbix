@@ -4,7 +4,7 @@ public $errors;
 public $data;
 public $expressions;
 
-private $symbol;
+private $symbols;
 private $previous;
 private $currExpr;
 private $newExpr;
@@ -30,14 +30,17 @@ private $allowed;
 			for($symbolNum = 0; $symbolNum < $length; $symbolNum++){
 				$symbol = zbx_substr($expression, $symbolNum, 1);
 // SDI($symbol);
- 				$this->detectOpenParts($this->previous['last']);
+				$this->detectOpenParts($this->previous['last']);
 				$this->detectCloseParts($symbol);
-// SDII($this->currExpr);
+
+ // SDII($this->currExpr);
+
+
 				if($this->inParameter($symbol)){
 					$this->setPreviousSymbol($symbol);
 					continue;
 				}
- 
+
 				$this->checkSymbolPrevious($symbol);
 				$this->checkSymbolClose($symbol);
 				$this->checkSymbolSequence($symbol);
@@ -131,7 +134,7 @@ private $allowed;
 			throw new Exception('Incorrect symbol sequence in trigger expression');
 		}
 
-		
+
 	}
 
 	private function checkSymbolSequence($symbol){
@@ -265,8 +268,6 @@ private $allowed;
 	}
 
 	private function setPreviousSymbol($symbol){
-		if(($symbol == ' ') && !$this->inQuotes($symbol)) return;
-
 		$this->previous['prelast'] = $this->previous['last'];
 
 		if($this->previous['last'] == $symbol){
@@ -379,7 +380,7 @@ private $allowed;
 			if($this->inParameter()){
 				if($this->inQuotes()){
 // SDI('Open.inParameter.inQuotes: '.$symbol.' ');
- 
+
  					if(($symbol == '"') && !$this->isSlashed(true)){
 						$this->symbols['params'][$symbol]++;
 						$this->currExpr['params']['quoteClose'] = true;
@@ -390,7 +391,7 @@ private $allowed;
 				}
 				else{
 // SDI('Open.inParameter: '.$symbol.' ');
- 
+
 					if(($symbol == ']') && $this->currExpr['part']['itemParam'])
 						$this->symbols['params'][$symbol]++;
 					else if(($symbol == ')') && $this->currExpr['part']['functionParam'])
@@ -401,7 +402,7 @@ private $allowed;
 						$this->currExpr['params']['quoteClose'] = false;
 					}
 					else if($symbol == '"'){
-						if($this->emptyParameter()) 
+						if($this->emptyParameter())
 							$this->symbols['params'][$symbol]++;
 
 						if($this->currExpr['params']['quoteClose'])
@@ -487,7 +488,7 @@ private $allowed;
 			$this->currExpr['object']['functionName'] = rtrim($this->currExpr['object']['functionName'], '(');
 			$this->currExpr['object']['functionParam'] = $this->currExpr['object']['functionParam'];
 		}
-	
+
 		if(($symbol == '}') && isset($this->allowed['macros'][$this->currExpr['object']['expression']])){
 			$this->currExpr['object']['macro'] = '{'.$this->currExpr['object']['host'].'}';
 			$this->currExpr['object']['host'] = '';
