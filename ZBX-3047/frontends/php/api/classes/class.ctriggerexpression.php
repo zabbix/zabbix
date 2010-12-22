@@ -224,7 +224,7 @@ private $allowed;
 		foreach($this->allowed['functions'][$expr['functionName']]['args'] as $anum => $arg){
 // mandatory check
 			if(isset($arg['mandat']) && $arg['mandat'] && !isset($expr['functionParamList'][$anum]))
-				throw new Exception('Incorrect number of agruments passed to function "'.$expr['function'].'"');
+				throw new Exception('Incorrect number of agruments passed to function "'.$expr['functionParamList'].'"');
 // type check
 			if(isset($arg['type']) && isset($expr['functionParamList'][$anum])){
 				$typeFlag = true;
@@ -485,6 +485,7 @@ private $allowed;
 			$this->currExpr['object']['function'] = $this->currExpr['object']['function'];
 			$this->currExpr['object']['functionName'] = rtrim($this->currExpr['object']['functionName'], '(');
 			$this->currExpr['object']['functionParam'] = $this->currExpr['object']['functionParam'];
+			$this->currExpr['object']['functionParamList'] = $this->currExpr['params']['function'];
 		}
 
 		if(($symbol == '}') && isset($this->allowed['macros'][$this->currExpr['object']['expression']])){
@@ -600,6 +601,7 @@ private $allowed;
 				'function' => '',
 				'functionName' => '',
 				'functionParam' => '',
+				'functionParamList' => ''
 			),
 			'params' => array(
 				'quoteClose' => false,
