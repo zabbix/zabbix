@@ -27,7 +27,7 @@
 #include "zbxserver.h"
 #include "dbcache.h"
 
-const char	*DBnode(const char *fieldid, const int nodeid)
+const char	*DBnode(const char *fieldid, int nodeid)
 {
 	static char	dbnode[128];
 

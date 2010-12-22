@@ -19,11 +19,8 @@
 
 #include "common.h"
 
-#include "cfg.h"
-#include "pid.h"
 #include "db.h"
 #include "log.h"
-#include "zlog.h"
 
 #include "httpmacro.h"
 
@@ -42,7 +39,7 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void http_substitute_macros(DB_HTTPTEST *httptest, char *data, int data_max_len)
+void	http_substitute_macros(DB_HTTPTEST *httptest, char *data, int data_max_len)
 {
 	char
 		*pl = NULL,
