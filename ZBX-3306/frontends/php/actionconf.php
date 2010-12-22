@@ -907,14 +907,14 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 					S_TO,
 					new CCol(array(
 						new CNumericBox('new_operation[esc_step_to]', $new_operation['esc_step_to'], 4),
-						' ['.S_MIN_SMALL.' 60, 0-' . S_INFINITY.']'))
+						' [0-' . S_INFINITY.']'))
 				));
 
 				$tblStep->addRow(array(
 					S_PERIOD,
 					new CCol(array(
 						new CNumericBox('new_operation[esc_period]', $new_operation['esc_period'], 5),
-						' [0-' . S_DEFAULT . ']'))
+						' ['.S_MIN_SMALL.' 60, 0-' . S_DEFAULT . ']'))
 				));
 
 				$tblNewOperation->addRow(array(S_STEP, $tblStep));
