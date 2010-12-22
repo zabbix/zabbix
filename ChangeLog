@@ -1,5 +1,6 @@
 Changes for 1.8.4rc3
 
+ - [ZBX-3320] fixed host.create, template.create permission error for admin users (Vedmak)
  - [ZBX-266] made debugging output for Web scenarios more useful (Sasha)
  - [ZBX-1181] fixed infinite looping when failing cURL initialization and showing of such errors in the GUI (asaveljevs,Sasha,Vedmak)
  - [ZBX-1181] fixed download speed, response time, and response code not being saved for failed Web scenario steps (asaveljevs)
