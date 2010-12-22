@@ -194,7 +194,7 @@ include_once('include/page_header.php');
 
 		$hosts = CHost::get($options);
 	}
- 	else{
+	else{
 		$hosts = array();
 	}
 
