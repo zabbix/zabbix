@@ -419,7 +419,7 @@
 	'S_NOT_IN_SMALL'=>			_('not in'),
 	'S_RETRIES_LEFT'=>			_('Retries left'),
 	'S_ACTIONS_SINCE'=>			_('Actions since'),
-	'S_INCORRECT_ESCALATION_PERIOD' => 'Incorrect escalation period',
+	'S_INCORRECT_ESCALATION_PERIOD'=>	_('Incorrect escalation period'),
 
 //	alarms.php
 	'S_SHOW_ALL'=>				_('Show all'),
