@@ -29,12 +29,15 @@ private $allowed;
 
 			for($symbolNum = 0; $symbolNum < $length; $symbolNum++){
 				$symbol = zbx_substr($expression, $symbolNum, 1);
-
-				$this->detectOpenParts($this->previous['last']);
+// SDI($symbol);
+ 				$this->detectOpenParts($this->previous['last']);
 				$this->detectCloseParts($symbol);
-
-				if($this->inQuotes($symbol)) continue;
-
+// SDII($this->currExpr);
+				if($this->inParameter($symbol)){
+					$this->setPreviousSymbol($symbol);
+					continue;
+				}
+ 
 				$this->checkSymbolPrevious($symbol);
 				$this->checkSymbolClose($symbol);
 				$this->checkSymbolSequence($symbol);
@@ -61,10 +64,49 @@ private $allowed;
 		return (($startSymbol == '(') || ($startSymbol == '{') || zbx_ctype_digit($startSymbol));
 	}
 
+	private function isSlashed($pre=false){
+		if($pre)
+			return (($this->previous['prelast'] == '\\') && ($this->previous['sequence'] % 2 == 1));
+		else
+			return (($this->previous['last'] == '\\') && ($this->symbols['sequence'] % 2 == 1));
+	}
+
 	private function inQuotes($symbol=''){
 		if(($symbol == '"') || ($symbol == '\\')) return false;
 
-		return (bool)($this->symbols['inquotes'] % 2);
+		return (bool)($this->symbols['params']['"'] % 2);
+	}
+
+	private function inParameter($symbol=''){
+		if($this->inQuotes($symbol)) return true;
+
+		if($this->currExpr['part']['itemParam']){
+			if(($symbol == '\\') && $this->inQuotes()) return false;
+			if(!isset($this->currExpr['params']['item'][$this->currExpr['params']['count']])) return false;
+			return true;
+		}
+
+		if($this->currExpr['part']['functionParam']){
+			if(($symbol == '\\') && $this->inQuotes()) return false;
+			if(!isset($this->currExpr['params']['function'][$this->currExpr['params']['count']])) return false;
+			return true;
+		}
+
+	return false;
+	}
+
+	private function emptyParameter(){
+		if($this->currExpr['part']['itemParam']){
+			if(!isset($this->currExpr['params']['item'][$this->currExpr['params']['count']])) return true;
+			if(zbx_empty($this->currExpr['params']['item'][$this->currExpr['params']['count']])) return true;
+		}
+
+		if($this->currExpr['part']['functionParam']){
+			if(!isset($this->currExpr['params']['function'][$this->currExpr['params']['count']])) return true;
+			if(zbx_empty($this->currExpr['params']['function'][$this->currExpr['params']['count']])) return true;
+		}
+
+	return false;
 	}
 
 	private function checkSymbolClose($symbol){
@@ -85,11 +127,11 @@ private $allowed;
 	}
 
 	private function checkSymbolPrevious($symbol){
-		if(!isset($this->symbols['linkage'][$symbol])) return true;
-
 		if(isset($this->symbols['linkage'][$symbol]) && ($this->previous['last'] == $symbol)){
 			throw new Exception('Incorrect symbol sequence in trigger expression');
 		}
+
+		
 	}
 
 	private function checkSymbolSequence($symbol){
@@ -100,8 +142,8 @@ private $allowed;
 		if(isset($this->symbols['linkage'][$symbol])) $this->symbols['linkage'][$symbol]++;
 
 		if($this->currExpr['part']['expression']){
-			if(($symbol == '"') && ($this->previous['last'] == '\\') && ($this->symbols['sequence'] % 2 == 1)){
-				$this->symbols['expr'][$symbol]--;
+			if(($symbol == '"') && !$this->currExpr['part']['itemParam'] && !$this->currExpr['part']['functionParam']){
+				throw new Exception('Incorrect symbol sequence in trigger expression');
 			}
 		}
 	}
@@ -117,7 +159,7 @@ private $allowed;
 	}
 
 	private function checkExpressionBrackets(&$expression){
-		if($this->symbols['inquotes'] % 2 != 0)
+		if($this->symbols['params']['"'] % 2 != 0)
 			throw new Exception('Incorrect count of quotes in expression');
 
 		if($this->symbols['open']['('] != $this->symbols['close'][')'])
@@ -222,73 +264,20 @@ private $allowed;
 			throw new Exception('Incorrect usage of expression logic linking symbols');
 	}
 
-	private function parseParameter($symbol){
-		if($this->currExpr['part']['itemParam'])
-			$params = &$this->currExpr['object']['itemParamList'];
-		else
-			$params = &$this->currExpr['object']['functionParamList'];
-
-		$paramCount = count($params);
-		if($paramCount > 0) $paramCount--;
-
-		if(($symbol == '"') && (($this->previous['last'] != '\\') || ($this->symbols['sequence'] % 2 != 1))){
-
-			if($this->inQuotes()){
-// closing quoted string
-				$this->symbols['inquotes']++;
-			}
-			else{
-// assuming starting quoted string
-
-// param is not started or is empty
-				if(!isset($params[$this->symbols['inquotes']/2]) || zbx_empty($params[$this->symbols['inquotes']/2])){
-					$this->symbols['inquotes']++;
-					$params[$paramCount] = '';
-				}
-
-				if(!$this->inQuotes() && zbx_empty($params[$paramCount])){
-					if($this->currExpr['part']['itemParam'])
-						throw new Exception('Incorrect item parameter syntax is used');
-					else
-						throw new Exception('Incorrect trigger function parameter syntax is used');
-				}
-
-// if open/close quotes more then parameters
-				if(($this->symbols['inquotes']/2) > count($params)){
-					if($this->currExpr['part']['itemParam'])
-						throw new Exception('Incorrect item parameter syntax is used2');
-					else
-						throw new Exception('Incorrect trigger function parameter syntax is used2');
-				}
-			}
-			return;
-		}
-
-		if(!$this->inQuotes()){
-			if($symbol == ' ') return;
-			if(($symbol == ',') && (($this->previous['last'] != '\\') || ($this->symbols['sequence'] % 2 != 1))){
-				$params[$paramCount+1] = '';
-				return;
-			}
-		}
-
-		if(!isset($params[$paramCount]))
-			$params[$paramCount] = '';
-
-		$params[$paramCount] .= $symbol;
-	}
-
 	private function setPreviousSymbol($symbol){
+		if(($symbol == ' ') && !$this->inQuotes($symbol)) return;
+
+		$this->previous['prelast'] = $this->previous['last'];
+
 		if($this->previous['last'] == $symbol){
+			$this->previous['sequence'] = $this->symbols['sequence'];
 			$this->symbols['sequence']++;
 		}
 		else{
+			$this->previous['sequence'] = $this->symbols['sequence'];
 			$this->symbols['sequence'] = 1;
 
-			if($symbol != ' '){
-				$this->previous['prelast'] = $this->previous['last'];
-				$this->previous['last'] = $symbol;
-			}
+			$this->previous['last'] = $symbol;
 		}
 
 		if(isset($this->symbols['open'][$symbol])){
@@ -316,9 +305,9 @@ private $allowed;
 		if($symbol == '') return;
 
 		if(!$this->inQuotes($symbol)){
+
 			if(!$this->currExpr['part']['item']){
 				$this->detectExpression($symbol);
-				$this->detectUserMacro($symbol);
 			}
 
 			if(!$this->currExpr['part']['usermacro']){
@@ -337,16 +326,7 @@ private $allowed;
 			$this->currExpr['part']['expression'] = true;
 			$this->currExpr['part']['host'] = true;
 		}
-	}
 
-	private function detectMacro($symbol){
-		if(($symbol == '}') && isset($this->allowed['macros'][$this->currExpr['object']['expression']])){
-			$this->currExpr['object']['macro'] = '{'.$this->currExpr['object']['host'].'}';
-			$this->currExpr['object']['host'] = '';
-		}
-	}
-
-	private function detectUserMacro($symbol){
 // start usermacro
 		if($symbol == '$'){
 			if($this->previous['prelast'] == '{'){
@@ -356,6 +336,13 @@ private $allowed;
 				$this->currExpr['object']['host'] = '';
 				$this->currExpr['object']['usermacro'] = $this->currExpr['object']['expression'];
 			}
+		}
+	}
+
+	private function detectMacro($symbol){
+		if(($symbol == '}') && isset($this->allowed['macros'][$this->currExpr['object']['expression']])){
+			$this->currExpr['object']['macro'] = '{'.$this->currExpr['object']['host'].'}';
+			$this->currExpr['object']['host'] = '';
 		}
 	}
 
@@ -385,13 +372,75 @@ private $allowed;
 	}
 
 	private function detectParam($symbol){
+		if($symbol == ' ') return;
+
 // start params
-		if($this->currExpr['part']['item'] && ($symbol == '[')){
-			$this->currExpr['part']['itemParam'] = true;
+		if($this->currExpr['part']['itemParam'] || $this->currExpr['part']['functionParam']){
+			if($this->inParameter()){
+				if($this->inQuotes()){
+// SDI('Open.inParameter.inQuotes: '.$symbol.' ');
+ 
+ 					if(($symbol == '"') && !$this->isSlashed(true)){
+						$this->symbols['params'][$symbol]++;
+						$this->currExpr['params']['quoteClose'] = true;
+					}
+					else{
+						$this->writeParams($symbol);
+					}
+				}
+				else{
+// SDI('Open.inParameter: '.$symbol.' ');
+ 
+					if(($symbol == ']') && $this->currExpr['part']['itemParam'])
+						$this->symbols['params'][$symbol]++;
+					else if(($symbol == ')') && $this->currExpr['part']['functionParam'])
+						$this->symbols['close'][$symbol]++;
+					else if($symbol == ','){
+						$this->currExpr['params']['count']++;
+						$this->currExpr['params']['comma']++;
+						$this->currExpr['params']['quoteClose'] = false;
+					}
+					else if($symbol == '"'){
+						if($this->emptyParameter()) 
+							$this->symbols['params'][$symbol]++;
+
+						if($this->currExpr['params']['quoteClose'])
+							throw new Exception('Incorrect quote usage in trigger expression');
+					}
+					else{
+						$this->writeParams($symbol);
+					}
+				}
+			}
+			else{
+// SDI('Open: '.$symbol.' ');
+				if(isset($this->symbols['params'][$symbol]))
+					$this->symbols['params'][$symbol]++;
+
+				if($symbol == ','){
+					$this->writeParams();
+					$this->currExpr['params']['count']++;
+					$this->currExpr['params']['comma']++;
+				}
+				else if($this->currExpr['params']['count'] > 0){
+					$this->writeParams($symbol);
+				}
+			}
 		}
 
-		if($this->currExpr['part']['function']  && ($symbol == '(')){
-			$this->currExpr['part']['functionParam'] = true;
+		if(!$this->inParameter()){
+			if($this->currExpr['params']['count'] == 0){
+				if(($symbol == '[') && $this->currExpr['part']['item']){
+					$this->symbols['params'][$symbol]++;
+					$this->currExpr['part']['itemParam'] = true;
+					$this->writeParams();
+				}
+
+				if(($symbol == '(') && $this->currExpr['part']['function']){
+					$this->currExpr['part']['functionParam'] = true;
+					$this->writeParams();
+				}
+			}
 		}
 	}
 
@@ -403,26 +452,17 @@ private $allowed;
 
 		if(!$this->inQuotes($symbol)){
 			if(!$this->currExpr['part']['usermacro']){
-				$this->detectFunctionClose($symbol);
-
-				if(!$this->inQuotes())
-					$this->detectParamClose($symbol);
+				$this->detectParamClose($symbol);
 			}
 
 			if(!$this->currExpr['part']['item']){
 // close symbols
 				$this->detectExpressionClose($symbol);
-				$this->detectMacroClose($symbol);
-				$this->detectUserMacroClose($symbol);
 
 				if($symbol == '}'){
 					$this->expressions[] = $this->currExpr['object'];
 					return true;
 				}
-			}
-
-			if($this->currExpr['part']['itemParam'] || $this->currExpr['part']['functionParam']){
-				$this->parseParameter($symbol);
 			}
 		}
 
@@ -432,11 +472,13 @@ private $allowed;
 	private function detectExpressionClose($symbol){
 // end expression
 		if($symbol == '}'){
-			$this->currExpr['part']['usermacro'] = false;
 			$this->currExpr['part']['expression'] = false;
+			$this->currExpr['part']['usermacro'] = false;
 			$this->currExpr['part']['host'] = false;
 			$this->currExpr['part']['item'] = false;
+			$this->currExpr['part']['itemParam'] = false;
 			$this->currExpr['part']['function'] = false;
+			$this->currExpr['part']['functionParam'] = false;
 
 			$this->currExpr['object']['expression'] = '{'.$this->currExpr['object']['expression'].'}';
 			$this->currExpr['object']['host'] = rtrim($this->currExpr['object']['host'], ':');
@@ -445,39 +487,56 @@ private $allowed;
 			$this->currExpr['object']['functionName'] = rtrim($this->currExpr['object']['functionName'], '(');
 			$this->currExpr['object']['functionParam'] = $this->currExpr['object']['functionParam'];
 		}
-	}
-
-	private function detectMacroClose($symbol){
+	
 		if(($symbol == '}') && isset($this->allowed['macros'][$this->currExpr['object']['expression']])){
 			$this->currExpr['object']['macro'] = '{'.$this->currExpr['object']['host'].'}';
 			$this->currExpr['object']['host'] = '';
 		}
-	}
 
-	private function detectUserMacroClose($symbol){
 		if(($symbol == '}') && !zbx_empty($this->currExpr['object']['usermacro'])){
 			$this->currExpr['object']['usermacro'] = '{'.$this->currExpr['object']['usermacro'].'}';
 		}
 	}
 
-	private function detectFunctionClose($symbol){
-// end function, functionParam
-		if($symbol == ')'){
-			if(!$this->currExpr['part']['function']) return;
-
-			$this->currExpr['part']['functionParam'] = false;
-		}
-	}
 	private function detectParamClose($symbol){
+		if($symbol == ' ') return;
 // end params
-		if($this->currExpr['part']['itemParam'] && ($symbol == ']')){
-			$this->currExpr['part']['itemParam'] = false;
-			$this->symbols['inquotes'] = 0;
-		}
 
-		if($this->currExpr['part']['functionParam'] && ($symbol == ')')){
-			$this->currExpr['part']['functionParam'] = false;
-			$this->symbols['inquotes'] = 0;
+		if(!$this->inQuotes()){
+			if(($symbol == ']') && $this->currExpr['part']['item']){
+				$this->symbols['params'][$symbol]++;
+
+				if($this->symbols['params']['['] == ($this->symbols['params'][']']+1)){
+					$this->writeParams();
+// count points to the last param index
+					if($this->currExpr['params']['count'] != $this->currExpr['params']['comma']){
+						throw new Exception('Incorrect item parameters syntax is used');
+					}
+
+// do not turn of item part, till function is started
+//					$this->currExpr['part']['item'] = false;
+					$this->currExpr['part']['itemParam'] = false;
+					$this->currExpr['params']['count'] = 0;
+					$this->currExpr['params']['comma'] = 0;
+				}
+			}
+
+			if(($symbol == ')') && $this->currExpr['part']['function']){
+// +1 because (checkSequence is not counted this symbol yet)
+				if($this->symbols['open']['('] == ($this->symbols['close'][')'] + 1)){
+					$this->writeParams();
+// count points to the last param index
+					if($this->currExpr['params']['count'] != $this->currExpr['params']['comma']){
+						throw new Exception('Incorrect trigger function parameters syntax is used');
+					}
+
+// no need to close function part, it will be closed by expression end symbol
+//					$this->currExpr['part']['function'] = false;
+					$this->currExpr['part']['functionParam'] = false;
+					$this->currExpr['params']['count'] = 0;
+					$this->currExpr['params']['comma'] = 0;
+				}
+			}
 		}
 	}
 
@@ -499,6 +558,21 @@ private $allowed;
 
 		if($this->currExpr['part']['functionParam'])
 			$this->currExpr['object']['functionParam'] .= $symbol;
+	}
+
+	private function writeParams($symbol=''){
+		if($this->currExpr['part']['itemParam']){
+			if(!isset($this->currExpr['params']['item'][$this->currExpr['params']['count']]))
+				$this->currExpr['params']['item'][$this->currExpr['params']['count']] = '';
+
+			$this->currExpr['params']['item'][$this->currExpr['params']['count']] .= $symbol;
+		}
+		else if($this->currExpr['part']['functionParam']){
+			if(!isset($this->currExpr['params']['function'][$this->currExpr['params']['count']]))
+				$this->currExpr['params']['function'][$this->currExpr['params']['count']] = '';
+
+			$this->currExpr['params']['function'][$this->currExpr['params']['count']] .= $symbol;
+		}
 	}
 
 	private function initializeVars(){
@@ -525,18 +599,22 @@ private $allowed;
 				'host' => '',
 				'item' => '',
 				'itemParam' => '',
-				'itemParamList' => array(),
 				'function' => '',
 				'functionName' => '',
 				'functionParam' => '',
-				'functionParamList' => array()
+			),
+			'params' => array(
+				'quoteClose' => false,
+				'comma' => 0,
+				'count' => 0,
+				'item' => array(),
+				'function' => array()
 			)
 		);
 		$this->currExpr = $this->newExpr;
 
 		$this->symbols = array(
 			'sequence' => 0,
-			'inquotes' => 0,
 			'open' => array(
 				'(' => 0,		// parenthesis
 				'{' => 0		// curlyBrace
@@ -561,13 +639,18 @@ private $allowed;
 			'expr' => array(
 				'$' => 0,		// dollar
 				'\\' => 0,		// backslash
-				'"' => 0,		// quote
 				':' => 0,		// colon
 				'.' => 0,		// dot
+			),
+			'params' => array(
+				'"' => 0,		// quote
+				'[' => 0,		// open brace
+				']' => 0,		// closebrace
 			)
 		);
 
 		$this->previous = array(
+			'sequence' => '',
 			'last' => '',
 			'prelast' => '',
 			'open' => '',
