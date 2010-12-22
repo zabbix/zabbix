@@ -149,7 +149,7 @@
 		}
 
 		$itemids = array();
-		$sql = 'SELECT i.*, hi.type as httpitem_type '.
+		$sql = 'SELECT i.lastvalue, i.value_type, i.valuemapid, i.units, i.itemid, hi.type as httpitem_type '.
 				' FROM items i, httpstepitem hi '.
 				' WHERE hi.itemid=i.itemid '.
 					' AND hi.httpstepid='.$httpstep_data['httpstepid'];
@@ -169,11 +169,14 @@
 			$itemids[] = $item_data['itemid'];
 		}
 
+		$speed = format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_IN]);
+		$respTime = $httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME]['lastvalue'];
+		$resp = format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_RSPCODE]);
 		$table->addRow(array(
 			$httpstep_data['name'],
-			format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_IN]),
-			format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME]),
-			format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_RSPCODE]),
+			($speed == 0 ? '-' : $speed),
+			($respTime == 0 ? '-' : format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME])),
+			($resp == 0 ? '-' : $resp),
 			new CSpan($status['msg'], $status['style'])
 		));
 	}
@@ -195,11 +198,11 @@
 	}
 
 	$table->addRow(array(
-		new CCol(S_TOTAL_BIG, 'bold'),
-		new CCol(SPACE, 'bold'),
-		new CCol(format_lastvalue($totalTime), 'bold'),
-		new CCol(SPACE, 'bold'),
-		new CCol(new CSpan($status['msg'], $status['style']), 'bold')
+		new CSpan(S_TOTAL_BIG, 'bold'),
+		SPACE,
+		new CSpan(format_lastvalue($totalTime), 'bold'),
+		SPACE,
+		new CSpan($status['msg'], $status['style'].' bold')
 	));
 
 	$details_wdgt->addItem($table);
@@ -309,7 +312,5 @@
 
 ?>
 <?php
-
 include_once('include/page_footer.php');
-
 ?>
