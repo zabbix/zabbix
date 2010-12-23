@@ -988,7 +988,7 @@ COpt::memoryPick();
 // CHECK IF HOSTS HAVE AT LEAST 1 GROUP {{{
 			foreach($templates as $tnum => $template){
 				if(empty($template['groups'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'No groups for template [ '.$template['host'].' ]');
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for template [ %s ]', $template['host']));
 				}
 				$templates[$tnum]['groups'] = zbx_toArray($templates[$tnum]['groups']);
 
@@ -1019,11 +1019,11 @@ COpt::memoryPick();
 				);
 
 				if(!check_db_fields($template_db_fields, $template)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Field "host" is mandatory');
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "host" is mandatory'));
 				}
 
 				if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $template['host'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect characters used for Template name [ '.$template['host'].' ]');
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Template name [ %1$s ]'));
 				}
 
 				if(self::exists(array('host' => $template['host']))){
@@ -1037,10 +1037,17 @@ COpt::memoryPick();
 				$templateids[] = $templateid = reset($templateid);
 
 
+				foreach($template['groups'] as $group){
+					$hostgroupid = get_dbid('hosts_groups', 'hostgroupid');
+					$result = DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES ($hostgroupid, $templateid, {$group['groupid']})");
+					if(!$result){
+						self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+					}
+				}
+
 				$template['templateid'] = $templateid;
 				$options = array();
 				$options['templates'] = $template;
-				$options['groups'] = $template['groups'];
 				if(isset($template['templates']) && !is_null($template['templates']))
 					$options['templates_link'] = $template['templates'];
 				if(isset($template['macros']) && !is_null($template['macros']))
@@ -1102,7 +1109,7 @@ COpt::memoryPick();
 				$template['templates'] = array($tpl_tmp);
 
 				$result = self::massUpdate($template);
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Failed to update template');
+				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Failed to update template'));
 			}
 
 			self::EndTransaction(true, __METHOD__);
@@ -1330,7 +1337,7 @@ COpt::memoryPick();
 
 // CHECK IF TEMPLATES HAVE AT LEAST 1 GROUP {{{
 			if(isset($data['groups']) && empty($data['groups'])){
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'No groups for template');
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('No groups for template'));
 			}
 // }}} CHECK IF TEMPLATES HAVE AT LEAST 1 GROUP
 
@@ -1340,7 +1347,7 @@ COpt::memoryPick();
 // UPDATE TEMPLATES PROPERTIES {{{
 			if(isset($data['host'])){
 				if(count($templates) > 1){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot mass update template name');
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot mass update template name'));
 				}
 
 				$cur_template = reset($templates);
@@ -1366,7 +1373,7 @@ COpt::memoryPick();
 			}
 
 			if(isset($data['host']) && !preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $data['host'])){
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect characters used for Hostname [ ' . $data['host'] . ' ]');
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Hostname [ %s ]', $data['host']));
 			}
 
 			$sql_set = array();
@@ -1394,7 +1401,7 @@ COpt::memoryPick();
 						'groups' => zbx_toObject($groups_to_add, 'groupid')
 					));
 					if(!$result){
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Can\'t add group');
+						self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't add group"));
 					}
 				}
 
@@ -1405,7 +1412,7 @@ COpt::memoryPick();
 						'groupids' => $groupids_to_del
 					));
 					if(!$result){
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Can\'t remove group');
+						self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't remove group"));
 					}
 				}
 			}
@@ -1441,7 +1448,7 @@ COpt::memoryPick();
 						'templateids' => $templateids
 					));
 					if(!$result){
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Can\'t unlink template');
+						self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't unlink template"));
 					}
 				}
 			}
@@ -1459,7 +1466,7 @@ COpt::memoryPick();
 						'templateids_link' => $templateids_to_del
 					));
 					if(!$result){
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Can\'t unlink template');
+						self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't unlink template"));
 					}
 				}
 			}
@@ -1470,7 +1477,7 @@ COpt::memoryPick();
 				if(!empty($hosts_to_add)){
 					$result = self::massAdd(array('templates' => $templates, 'hosts' => $hosts_to_add));
 					if(!$result){
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Can\'t link template');
+						self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't link template"));
 					}
 				}
 			}
@@ -1480,7 +1487,7 @@ COpt::memoryPick();
 				if(!empty($templates_to_add)){
 					$result = self::massAdd(array('templates' => $templates, 'templates_link' => $templates_to_add));
 					if(!$result){
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Can\'t link template');
+						self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't link template"));
 					}
 				}
 			}
@@ -1520,14 +1527,14 @@ COpt::memoryPick();
 						'macros' => $macrosToDelete
 					));
 					if(!$result){
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Can\'t remove macro');
+						self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't remove macro"));
 					}
 				}
 
 				if(!empty($macrosToUpdate)){
 					$result = CUsermacro::massUpdate(array('templates' => $templates, 'macros' => $macrosToUpdate));
 					if(!$result){
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot update macro');
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update macro'));
 					}
 				}
 
@@ -1536,7 +1543,7 @@ COpt::memoryPick();
 
 					$result = self::massAdd(array('templates' => $templates, 'macros' => $macrosToAdd));
 					if(!$result){
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot add macro');
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot add macro'));
 					}
 				}
 			}
@@ -1590,7 +1597,7 @@ COpt::memoryPick();
 					'templateids' => $templateids
 				);
 				$result = CHostGroup::massRemove($options);
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Can\'t unlink groups');
+				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't unlink groups"));
 			}
 
 			if(isset($data['templateids_clear'])){
@@ -1614,7 +1621,7 @@ COpt::memoryPick();
 					'macros' => zbx_toArray($data['macros'])
 				);
 				$result = CUserMacro::massRemove($options);
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Can\'t remove macros');
+				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't remove macros"));
 			}
 
 			self::EndTransaction(true, __METHOD__);
@@ -1693,7 +1700,7 @@ COpt::memoryPick();
 				$tmp_tpl = reset($tmp_tpls);
 
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					'Trigger in template [ '.$tmp_tpl['host'].' ] has dependency with trigger in template [ '.$db_dephost['host'].' ]');
+					_s('Trigger in template [ %1$s ] has dependency with trigger in template [ %2$s ]', $tmp_tpl['host'], $db_dephost['host']));
 			}
 		}
 // }}} CHECK TEMPLATE TRIGGERS DEPENDENCIES
@@ -1763,7 +1770,7 @@ COpt::memoryPick();
 		foreach($start_points as $spnum => $start){
 			$path = array();
 			if(!self::checkCircularLink($graph, $start, $path)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Circular link can not be created');
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Circular link can not be created'));
 			}
 		}
 
@@ -1783,49 +1790,49 @@ COpt::memoryPick();
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot sync applications');
+				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot sync applications'));
 
 				$result = CDiscoveryRule::syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot sync discovery rules');
+				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot sync discovery rules'));
 
 				$result = CItemPrototype::syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot sync item prototypes');
+				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot sync item prototypes'));
 
 				$result = CItem::syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot sync items');
+				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot sync items'));
 
 				$result = CTrigger::syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot sync Triggers');
+				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot sync Triggers'));
 
 				$result = CTriggerPrototype::syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot sync Triggers prototypes');
+				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot sync Triggers prototypes'));
 
 				$result = CGraphPrototype::syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot sync graph prptotypes');
+				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot sync graph prptotypes'));
 
 				$result = CGraph::syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot sync graphs');
+				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot sync graphs'));
 			}
 		}
 
@@ -1869,7 +1876,7 @@ COpt::memoryPick();
 		if(!empty($items[ZBX_FLAG_DISCOVERY])){
 			if($clear){
 				$result = CDiscoveryRule::delete(array_keys($items[ZBX_FLAG_DISCOVERY]), true);
-				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Cannot unlink and clear discovery rules');
+				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear discovery rules'));
 			}
 			else{
 				DB::update('items', array(
@@ -1887,7 +1894,7 @@ COpt::memoryPick();
 		if(!empty($items[ZBX_FLAG_DISCOVERY_NORMAL])){
 			if($clear){
 				$result = CItem::delete(array_keys($items[ZBX_FLAG_DISCOVERY_NORMAL]), true);
-				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Cannot unlink and clear items');
+				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear items'));
 			}
 			else{
 				DB::update('items', array(
@@ -1905,7 +1912,7 @@ COpt::memoryPick();
 		if(!empty($items[ZBX_FLAG_DISCOVERY_CHILD])){
 			if($clear){
 				$result = CItemPrototype::delete(array_keys($items[ZBX_FLAG_DISCOVERY_CHILD]), true);
-				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Cannot unlink and clear item prototypes');
+				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear item prototypes'));
 			}
 			else{
 				DB::update('items', array(
@@ -1953,7 +1960,7 @@ COpt::memoryPick();
 		if(!empty($graphs[ZBX_FLAG_DISCOVERY_CHILD])){
 			if($clear){
 				$result = CGraphPrototype::delete(array_keys($graphs[ZBX_FLAG_DISCOVERY_CHILD]), true);
-				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Cannot unlink and clear graph prototypes');
+				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear graph prototypes'));
 			}
 			else{
 				DB::update('graphs', array(
@@ -1971,7 +1978,7 @@ COpt::memoryPick();
 		if(!empty($graphs[ZBX_FLAG_DISCOVERY_NORMAL])){
 			if($clear){
 				$result = CGraph::delete(array_keys($graphs[ZBX_FLAG_DISCOVERY_NORMAL]), true);
-				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Cannot unlink and clear graphs.');
+				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear graphs.'));
 			}
 			else{
 				DB::update('graphs', array(
@@ -2022,7 +2029,7 @@ COpt::memoryPick();
 		if(!empty($triggers[ZBX_FLAG_DISCOVERY_NORMAL])){
 			if($clear){
 				$result = CTrigger::delete(array_keys($triggers), true);
-				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Cannot unlink and clear triggers');
+				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear triggers'));
 			}
 			else{
 				DB::update('triggers', array(
@@ -2039,7 +2046,7 @@ COpt::memoryPick();
 		if(!empty($triggers[ZBX_FLAG_DISCOVERY_CHILD])){
 			if($clear){
 				$result = CTriggerPrototype::delete(array_keys($triggers[ZBX_FLAG_DISCOVERY_CHILD]), true);
-				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Cannot unlink and clear triggers');
+				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear triggers'));
 			}
 			else{
 				DB::update('triggers', array(
@@ -2074,7 +2081,7 @@ COpt::memoryPick();
 		if(!empty($applications)){
 			if($clear){
 				$result = CApplication::delete(array_keys($applications), true);
-				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Cannot unlink and clear applications');
+				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear applications'));
 			}
 			else{
 				DB::update('applications', array(

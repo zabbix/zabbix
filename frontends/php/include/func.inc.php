@@ -272,7 +272,6 @@ function zbx_date2age($start_date,$end_date=0,$utime = false){
 	}
 
 	$original_time = $time = abs($end_date-$start_date);
-//SDI($start_date.' - '.$end_date.' = '.$time);
 
 	$years = (int) ($time / (365*86400));
 	$time -= $years*365*86400;

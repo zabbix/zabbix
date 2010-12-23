@@ -181,13 +181,13 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
-frontends/php/locale/POTFILES.in -text
 frontends/php/locale/cs/LC_MESSAGES/frontend.po -text
 frontends/php/locale/de/LC_MESSAGES/frontend.po -text
 frontends/php/locale/es/LC_MESSAGES/frontend.po -text
 frontends/php/locale/fr/LC_MESSAGES/frontend.po -text
 frontends/php/locale/hu/LC_MESSAGES/frontend.po -text
 frontends/php/locale/it/LC_MESSAGES/frontend.po -text
+frontends/php/locale/ja/LC_MESSAGES/frontend.po -text
 frontends/php/locale/ko/LC_MESSAGES/frontend.po -text
 frontends/php/locale/lv/LC_MESSAGES/frontend.po -text
 frontends/php/locale/nl/LC_MESSAGES/frontend.po -text
@@ -239,6 +239,7 @@ frontends/php/styles/originalblue/images/ui-icons_6da8d5_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_cd0a0a_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_d8e7f3_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_f9bd01_256x240.png -text
+frontends/php/tests/api/classes/class.triggerexpressionTest.php -text
 frontends/php/tests/bootstrap.php.template -text
 frontends/php/tests/selenium/SeleniumTests.php -text
 frontends/php/tests/selenium/testClicks.php -text
@@ -263,7 +264,10 @@ misc/init.d/fedora/core5/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_server -text
 misc/init.d/tru64/zabbix_server -text
+tests/templates/sqlite3.init -text
 tests/templates/zabbix.conf.php.mysql -text
+tests/templates/zabbix.conf.php.postgresql -text
+tests/templates/zabbix.conf.php.sqlite3 -text
 upgrades/dbpatches/2.0/ibm_db2/patch/graph_discovery.sql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/item_discovery.sql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/trigger_discovery.sql -text

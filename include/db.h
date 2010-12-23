@@ -20,9 +20,6 @@
 #ifndef ZABBIX_DB_H
 #define ZABBIX_DB_H
 
-/* time_t */
-#include <time.h>
-
 #include "common.h"
 #include "zbxdb.h"
 #include "dbschema.h"
@@ -446,10 +443,8 @@ typedef struct
 	zbx_uint64_t	applicationid;
 	int		nextcheck;
 	int		status;
-	int		delay;
 	char		*macros;
 	char		*agent;
-	double		speed;
 	double		time;
 	int		authentication;
 	char		*http_user;
@@ -502,9 +497,9 @@ typedef struct
 }
 DB_ESCALATION;
 
-#define DB_NODE "%s"
-#define DBnode_local(fieldid) DBnode(fieldid, CONFIG_NODEID)
-const char *DBnode(const char *fieldid, const int nodeid);
+#define DB_NODE			"%s"
+#define DBnode_local(fieldid)	DBnode(fieldid, CONFIG_NODEID)
+const char	*DBnode(const char *fieldid, int nodeid);
 
 int	DBping();
 
