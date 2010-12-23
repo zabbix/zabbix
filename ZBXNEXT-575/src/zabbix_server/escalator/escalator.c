@@ -833,7 +833,7 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 	else
 	{
 		escalation->esc_step++;
- /* "object,objectid,default_msg,shortdata,longdata," ",mediatypeid"*/
+
 		result = DBselect(
 				"select o.operationid,o.operationtype,o.esc_period,o.evaltype,"
 					"m.opmessageid,m.default_msg,subject,message,mediatypeid"
