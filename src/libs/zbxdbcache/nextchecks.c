@@ -107,10 +107,12 @@ static void	DCrelease_nextchecks()
  ******************************************************************************/
 void	DCadd_nextcheck(zbx_uint64_t itemid, time_t now, const char *error_msg)
 {
+	const char	*__function_name = "DCadd_nextcheck";
+
 	int	i;
 	size_t	sz;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In DCadd_nextcheck()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (NULL == error_msg)
 		return;
@@ -143,7 +145,9 @@ void	DCadd_nextcheck(zbx_uint64_t itemid, time_t now, const char *error_msg)
 	nextchecks[i].now = now;
 	nextchecks[i].error_msg = (NULL != error_msg) ? strdup(error_msg) : NULL;
 
-	nextcheck_num ++;
+	nextcheck_num++;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 struct event_objectid_clock
@@ -162,13 +166,15 @@ struct event_objectid_clock
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev, Dmitry Borovikov                             *
+ * Author: Alexander Vladishev, Dmitry Borovikov                              *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	DCflush_nextchecks()
 {
+	const char	*__function_name = "DCflush_nextchecks";
+
 	int		i, sql_offset = 0, sql_allocated = 4096;
 	char		*sql = NULL;
 
@@ -192,7 +198,7 @@ void	DCflush_nextchecks()
 	struct event_objectid_clock 	*events = NULL;
 	int		events_num = 0, events_allocated = 32;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In DCflush_nextchecks()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (nextcheck_num == 0)
 		return;
@@ -327,5 +333,5 @@ void	DCflush_nextchecks()
 
 	DBcommit();
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of DCflush_nextchecks()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
