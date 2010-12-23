@@ -154,7 +154,10 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 						process_value(items[i].itemid, NULL, &value_dbl, now, ping_result, error);
 						break;
 					case ICMPPINGLOSS:
-						value_dbl = 100 * (1 - (double)hosts[h].rcv / (double)hosts[h].cnt);
+						if (0 == hosts[h].cnt)
+							value_dbl = 0;
+						else
+							value_dbl = 100 * (1 - (double)hosts[h].rcv / (double)hosts[h].cnt);
 						process_value(items[i].itemid, NULL, &value_dbl, now, ping_result, error);
 						break;
 				}
@@ -422,7 +425,7 @@ static void	add_pinger_host(ZBX_FPING_HOST **hosts, int *hosts_alloc, int *hosts
 	memset(h, 0, sizeof(ZBX_FPING_HOST));
 	h->addr = addr;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************

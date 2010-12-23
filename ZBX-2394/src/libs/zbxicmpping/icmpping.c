@@ -84,7 +84,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	int		i;
 	ZBX_FPING_HOST	*host;
 	double		sec;
-	
+
 #ifdef HAVE_IPV6
 	int		family;
 	char		params6[64];
@@ -114,11 +114,11 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 		{
 			if (FAIL == is_ip4(CONFIG_SOURCE_IP)) /* we do not have IPv4 family address in CONFIG_SOURCE_IP */
 			{
-				zbx_snprintf(error, max_error_len, 
+				zbx_snprintf(error, max_error_len,
 					"You should enable IPv6 support to use IPv6 family address for SourceIP '%s'.", CONFIG_SOURCE_IP);
 				return NOTSUPPORTED;
 			}
-		}		
+		}
 #endif	/* HAVE_IPV6 */
 	}
 
@@ -177,7 +177,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 	zbx_snprintf(filename, sizeof(filename), "%s/zabbix_server_%li.pinger",
 			CONFIG_TMPDIR, zbx_get_thread_id());
-	
+
 #ifdef HAVE_IPV6
 	if (NULL != CONFIG_SOURCE_IP)
 	{
@@ -188,7 +188,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 		{
 			if (0 == (fping_existence & FPING_EXISTS))
 			{
-				zbx_snprintf(error, max_error_len, "File '%s' cannot be found in the system.", 
+				zbx_snprintf(error, max_error_len, "File '%s' cannot be found in the system.",
 						CONFIG_FPING_LOCATION);
 				return NOTSUPPORTED;
 			}
@@ -199,7 +199,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 		{
 			if (0 == (fping_existence & FPING6_EXISTS))
 			{
-				zbx_snprintf(error, max_error_len, "File '%s' cannot be found in the system.", 
+				zbx_snprintf(error, max_error_len, "File '%s' cannot be found in the system.",
 						CONFIG_FPING6_LOCATION);
 				return NOTSUPPORTED;
 			}
