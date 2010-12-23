@@ -597,10 +597,10 @@
 					else if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER)
 						$sql =	'SELECT h.*, h2.host '.
 							' FROM interface h,items i,functions f,hosts h2 '.
-							' WHERE h.hostid=i.hostid '.
+							' WHERE h2.hostid=h.hostid '.
+							  ' AND h.hostid=i.hostid '.
 								' AND i.itemid=f.itemid '.
 								' AND f.triggerid='.$db_element['elementid'];
-
 					else{
 // Should never be here
 					}
