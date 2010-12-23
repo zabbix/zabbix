@@ -1,5 +1,8 @@
 Changes for 1.8.4rc3
 
+ - [ZBX-3256] added automatic detection of fping command line option to use for specifying source IP address (asaveljevs)
+ - [ZBX-3333] fixed icmppingloss[] returning bad values when NIC bonding is used (asaveljevs)
+ - [ZBX-1985,ZBX-2394] fixed icmppingloss[] returning bad values when fping is capable of pinging both address families (asaveljevs)
  - [ZBX-266] made debugging output for Web scenarios more useful (Sasha)
  - [ZBX-1181] fixed infinite looping when failing cURL initialization and showing of such errors in the GUI (asaveljevs,Sasha,Vedmak)
  - [ZBX-1181] fixed download speed, response time, and response code not being saved for failed Web scenario steps (asaveljevs)
