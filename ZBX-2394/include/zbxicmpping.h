@@ -24,7 +24,7 @@ typedef struct
 {
 	char	*addr;
 	double	min, avg, max;
-	int	rcv;
+	int	rcv, cnt;
 }
 ZBX_FPING_HOST;
 

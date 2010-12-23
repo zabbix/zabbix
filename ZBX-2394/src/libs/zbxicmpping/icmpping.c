@@ -36,8 +36,8 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	const char	*__function_name = "process_ping";
 
 	FILE		*f;
-	char		filename[MAX_STRING_LEN], tmp[MAX_STRING_LEN],
-			*c, *c2, params[64]; /*usually this amount of memory is enough*/
+	char		*c, *c2, params[64];
+	char		filename[MAX_STRING_LEN], tmp[MAX_STRING_LEN];
 	int		i;
 	ZBX_FPING_HOST	*host;
 	double		sec;
@@ -205,10 +205,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	while (NULL != fgets(tmp, sizeof(tmp), f))
 	{
 		zbx_rtrim(tmp, "\n");
-		zabbix_log(LOG_LEVEL_DEBUG, "Update IP [%s]",
-				tmp);
-
-		/* 12fc::21 : [0], 76 bytes, 0.39 ms (0.39 avg, 0% loss) */
+		zabbix_log(LOG_LEVEL_DEBUG, "Update IP [%s]", tmp);
 
 		host = NULL;
 
@@ -230,6 +227,12 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 		if (NULL == (c = strstr(tmp, " : ")))
 			continue;
 
+		/* when NIC bonding is used, there are also lines like */
+		/* 192.168.1.2 : duplicate for [0], 96 bytes, 0.19 ms */
+
+		if (NULL != strstr(tmp, "duplicate for"))
+			continue;
+
 		c += 3;
 
 		do
@@ -249,6 +252,8 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 				host->avg = (host->avg * host->rcv + sec) / (host->rcv + 1);
 				host->rcv++;
 			}
+
+			host->cnt++;
 
 			if (NULL != c2)
 				*c2++ = ' ';

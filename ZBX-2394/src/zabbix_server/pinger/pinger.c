@@ -129,15 +129,10 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 	{
 		if (NOTSUPPORTED == ping_result)
 			zabbix_log(LOG_LEVEL_DEBUG, "Host [%s] %s",
-					hosts[h].addr,
-					error);
+					hosts[h].addr, error);
 		else
-			zabbix_log(LOG_LEVEL_DEBUG, "Host [%s] rcv=%d min/max/avg=" ZBX_FS_DBL "/" ZBX_FS_DBL "/" ZBX_FS_DBL,
-					hosts[h].addr,
-					hosts[h].rcv,
-					hosts[h].min,
-					hosts[h].max,
-					hosts[h].avg);
+			zabbix_log(LOG_LEVEL_DEBUG, "Host [%s] cnt=%d rcv=%d min/max/avg=" ZBX_FS_DBL "/" ZBX_FS_DBL "/" ZBX_FS_DBL,
+					hosts[h].addr, hosts[h].cnt, hosts[h].rcv, hosts[h].min, hosts[h].max, hosts[h].avg);
 
 		for (i = first_index; i < last_index; i++)
 		{
@@ -159,7 +154,7 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 						process_value(items[i].itemid, NULL, &value_dbl, now, ping_result, error);
 						break;
 					case ICMPPINGLOSS:
-						value_dbl = 100 * (1 - (double)hosts[h].rcv / (double)items[i].count);
+						value_dbl = 100 * (1 - (double)hosts[h].rcv / (double)hosts[h].cnt);
 						process_value(items[i].itemid, NULL, &value_dbl, now, ping_result, error);
 						break;
 				}
