@@ -1100,21 +1100,24 @@ static void	execute_operations(DB_EVENT *event, zbx_uint64_t actionid)
 	DB_RESULT	result;
 	DB_ROW		row;
 	unsigned char	operationtype;
-	zbx_uint64_t	objectid;
+	zbx_uint64_t	groupid, templateid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64,
 			__function_name, actionid);
 
 	result = DBselect(
-			"select operationtype,objectid"
-			" from operations"
-			" where actionid=" ZBX_FS_UI64,
+			"select o.operationtype,g.groupid,t.templateid"
+			" from operations o"
+				" left join opgroup g on g.operationid=o.operationid"
+				" left join optemplate t on t.operationid=o.operationid"
+			" where o.actionid=" ZBX_FS_UI64,
 			actionid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
 		operationtype = (unsigned char)atoi(row[0]);
-		ZBX_STR2UINT64(objectid, row[1]);
+		ZBX_DBROW2UINT64(groupid, row[1]);
+		ZBX_DBROW2UINT64(templateid, row[2]);
 
 		switch (operationtype)
 		{
@@ -1131,19 +1134,23 @@ static void	execute_operations(DB_EVENT *event, zbx_uint64_t actionid)
 				op_host_disable(event);
 				break;
 			case OPERATION_TYPE_GROUP_ADD:
-				op_group_add(event, objectid);
+				if (0 != groupid)
+					op_group_add(event, groupid);
 				break;
 			case OPERATION_TYPE_GROUP_REMOVE:
-				op_group_del(event, objectid);
+				if (0 != groupid)
+					op_group_del(event, groupid);
 				break;
 			case OPERATION_TYPE_TEMPLATE_ADD:
-				op_template_add(event, objectid);
+				if (0 != templateid)
+					op_template_add(event, templateid);
 				break;
 			case OPERATION_TYPE_TEMPLATE_REMOVE:
-				op_template_del(event, objectid);
+				if (0 != templateid)
+					op_template_del(event, templateid);
 				break;
 			default:
-				break;
+				;
 		}
 	}
 	DBfree_result(result);
