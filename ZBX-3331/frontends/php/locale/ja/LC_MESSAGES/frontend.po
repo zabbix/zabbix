@@ -37,9 +37,6 @@ msgstr "d"
 msgid "h"
 msgstr "h"
 
-msgid "m"
-msgstr "m"
-
 msgid "s"
 msgstr "s"
 
@@ -135,9 +132,6 @@ msgstr "3月"
 
 msgid "April"
 msgstr "4月"
-
-msgid "May"
-msgstr "5月"
 
 msgid "June"
 msgstr "6月"
@@ -337,12 +331,6 @@ msgstr "監視中のホスト"
 msgid "Incorrect IP range."
 msgstr "IPアドレスの範囲が誤っています"
 
-msgid "d M Y H:i:s"
-msgstr "Y M d H:i:s"
-
-msgid "d M Y H:i:s"
-msgstr "Y M d H:i:s"
-
 msgid "Details of scenario"
 msgstr "シナリオの名前"
 
@@ -390,12 +378,6 @@ msgstr "ウェブ監視のステータス"
 
 msgid "State"
 msgstr "ステータス"
-
-msgid "d M Y H:i:s"
-msgstr "Y M d H:i:s"
-
-msgid "d M Y H:i:s"
-msgstr "Y M d H:i:s"
 
 msgid "Sort"
 msgstr "ソート"
@@ -619,12 +601,6 @@ msgstr "Zabbixは一時的に利用できません"
 msgid "Multibyte String module required to run FrontEnd"
 msgstr "フロントエンドの動作にはマルチバイトモジュールが必要です"
 
-msgid "d M Y H:i:s"
-msgstr "Y M d H:i:s"
-
-msgid "d M Y H:i:s"
-msgstr "Y M d H:i:s"
-
 msgid "Y.M.d H:i:s"
 msgstr "Y.M.d H:i:s"
 
@@ -714,12 +690,6 @@ msgstr "----[障害対応コメントの一括処理]----"
 
 msgid "Bulk acknowledge"
 msgstr "障害対応コメントの一括処理"
-
-msgid "d M Y H:i:s"
-msgstr "Y M d H:i:s"
-
-msgid "d M Y H:i:s"
-msgstr "Y M d H:i:s"
 
 msgid "Immediately"
 msgstr "すぐに"
@@ -1155,18 +1125,6 @@ msgstr "m.d"
 
 msgid "d.m H:i"
 msgstr "m.d H:i"
-
-msgid "d.m H:i"
-msgstr "m.d H:i"
-
-msgid "H:i"
-msgstr "H:i"
-
-msgid "d.m H:i"
-msgstr "m.d H:i"
-
-msgid "d.m"
-msgstr "m.d"
 
 msgid "d.m.Y H:i"
 msgstr "Y.m.d H:i"
@@ -1801,7 +1759,7 @@ msgstr "グラフを削除できません"
 msgid "Cannot add graph"
 msgstr "グラフを追加できません"
 
-msgid "Cannot add more than one item with type "Graph sum""
+msgid "Cannot add more than one item with type \"Graph sum\""
 msgstr "グラフの合計値は2つ以上設定できません"
 
 msgid "Id"
@@ -1939,17 +1897,8 @@ msgstr "成功の監査"
 msgid "[Y.M.d H:i:s]"
 msgstr "[Y.M.d H:i:s]"
 
-msgid "Y.M.d H:i:s"
-msgstr "Y.M.d H:i:s"
-
 msgid "Y-m-d H:i:s"
 msgstr "Y-m-d H:i:s"
-
-msgid "Y-m-d H:i:s"
-msgstr "Y-m-d H:i:s"
-
-msgid "Y.M.d H:i:s"
-msgstr "Y.M.d H:i:s"
 
 msgid "Maintenance"
 msgstr "メンテナンス"
@@ -2076,42 +2025,6 @@ msgstr "第4週"
 
 msgid "At"
 msgstr "開始時刻"
-
-msgid "January"
-msgstr "1月"
-
-msgid "February"
-msgstr "2月"
-
-msgid "March"
-msgstr "3月"
-
-msgid "April"
-msgstr "4月"
-
-msgid "May"
-msgstr "5月"
-
-msgid "June"
-msgstr "6月"
-
-msgid "July"
-msgstr "7月"
-
-msgid "August"
-msgstr "8月"
-
-msgid "September"
-msgstr "9月"
-
-msgid "October"
-msgstr "10月"
-
-msgid "November"
-msgstr "11月"
-
-msgid "December"
-msgstr "12月"
 
 msgid "Incorrect maintenance period"
 msgstr "不正なメンテナンス期間"
@@ -2395,9 +2308,6 @@ msgstr "IPMIポート"
 msgid "IPMI authentication algorithm"
 msgstr "IPMI認証アルゴリズム"
 
-msgid "Default"
-msgstr "デフォルト"
-
 msgid "None"
 msgstr "なし"
 
@@ -2422,17 +2332,11 @@ msgstr "IPMI特権レベル"
 msgid "Callback"
 msgstr "Callback"
 
-msgid "User"
-msgstr "User"
-
 msgid "Operator"
 msgstr "Operator"
 
 msgid "Admin"
 msgstr "Admin"
-
-msgid "OEM"
-msgstr "OEM"
 
 msgid "IPMI username"
 msgstr "IPMIユーザ名"
@@ -2935,9 +2839,6 @@ msgstr "ウェブ監視"
 msgid "WEB CHECKS"
 msgstr "ウェブチェック"
 
-msgid "Active"
-msgstr "有効"
-
 msgid "Not supported"
 msgstr "取得不可"
 
@@ -3196,15 +3097,6 @@ msgstr "イベントが見つかりません"
 msgid "Events since"
 msgstr "次からのイベント"
 
-msgid "d M Y H:i:s"
-msgstr "Y M d H:i:s"
-
-msgid "d M Y H:i:s"
-msgstr "Y.M.d H:i:s"
-
-msgid "d M Y H:i:s"
-msgstr "Y.M.d H:i:s"
-
 msgid "UP"
 msgstr "UP"
 
@@ -3217,26 +3109,11 @@ msgstr "DISCOVERED"
 msgid "LOST"
 msgstr "LOST"
 
-msgid "d M Y H:i:s"
-msgstr "Y.M.d H:i:s"
-
-msgid "d M Y H:i:s"
-msgstr "Y.M.d H:i:s"
-
-msgid "d M Y H:i:s"
-msgstr "Y M d H:i:s"
-
-msgid "d M Y H:i:s"
-msgstr "Y.M.d H:i:s"
-
 msgid "Last check"
 msgstr "最新のチェック"
 
 msgid "Last value"
 msgstr "最新の値"
-
-msgid "d M Y H:i:s"
-msgstr "Y M d H:i:s"
 
 msgid "Hidden"
 msgstr "非表示"
@@ -3589,9 +3466,6 @@ msgstr "最小化"
 msgid "Loading..."
 msgstr "読み込み中..."
 
-msgid "of"
-msgstr "of"
-
 msgid "Zabbix server ip or port is not set!"
 msgstr ""
 
@@ -3624,9 +3498,6 @@ msgstr "お気に入りのマップ"
 
 msgid "Favourite screens"
 msgstr "お気に入りのスクリーン"
-
-msgid "All"
-msgstr "全て"
 
 msgid "Unacknowledged only"
 msgstr "障害対応コメント未入力のみ"
@@ -3709,9 +3580,6 @@ msgstr "Truncated"
 msgid "Delayed by"
 msgstr "遅延時間"
 
-msgid "d M Y H:i:s"
-msgstr "Y M d H:i:s"
-
 msgid "REPORT"
 msgstr "レポート"
 
@@ -3793,9 +3661,6 @@ msgstr "ホストごと"
 msgid "By trigger template"
 msgstr "トリガーテンプレートごと"
 
-msgid ""
-msgstr ""
-
 msgid "(year"
 msgstr "(year"
 
@@ -3804,24 +3669,6 @@ msgstr ")"
 
 msgid "Y"
 msgstr "Y"
-
-msgid "d.M"
-msgstr "M.d"
-
-msgid ""
-msgstr ""
-
-msgid "(year"
-msgstr "(year"
-
-msgid ")"
-msgstr ")"
-
-msgid "Y"
-msgstr "Y"
-
-msgid "d.M"
-msgstr "M.d"
 
 msgid "Y.m.d H:i"
 msgstr "Y.m.d H:i"
@@ -3904,26 +3751,14 @@ msgstr "毎月"
 msgid "Yearly"
 msgstr "毎年"
 
-msgid "Y"
-msgstr "Y"
-
 msgid "M Y"
 msgstr "Y M"
 
-msgid "d M Y"
-msgstr "Y M d"
-
 msgid "d M Y H:i"
 msgstr "Y M d H:i"
 
 msgid "l H:i"
 msgstr "l H:i"
-
-msgid "l H:i"
-msgstr "l H:i"
-
-msgid "d M Y H:i"
-msgstr "Y M d H:i"
 
 msgid "add"
 msgstr "追加"
@@ -3967,37 +3802,31 @@ msgstr "作成するロケール"
 msgid "New entries"
 msgstr "新規の項目"
 
-msgid "Download newly created locale file by pressing "Download"."
+msgid "Download newly created locale file by pressing \"Download\"."
 msgstr ""
 
-msgid "Place it to "/PATH_TO_ZABBIX_FRONTEND/include/locales"."
+msgid "Place it to \"/PATH_TO_ZABBIX_FRONTEND/include/locales\"."
 msgstr ""
 
-msgid "The locale file name must be made of a prefix: "ISO 639-1 language code"_"ISO 3166-1 alpha-2 country code". Like "en_gb""
+msgid "The locale file name must be made of a prefix: \"ISO 639-1 language code\"_\"ISO 3166-1 alpha-2 country code\". Like \"en_gb\""
 msgstr ""
 
-msgid "and a postfix ".inc.php". Like "en_gb.inc.php"."
+msgid "and a postfix \".inc.php\". Like \"en_gb.inc.php\"."
 msgstr ""
 
-msgid "To make new locale visible by Zabbix frontend - extend the php script "/PATH_TO_ZABBIX_FRONTEND/include/locales.inc.php"."
+msgid "To make new locale visible by Zabbix frontend - extend the php script \"/PATH_TO_ZABBIX_FRONTEND/include/locales.inc.php\"."
 msgstr ""
 
-msgid "There You will find an array containing "keys" => "values"."
+msgid "There You will find an array containing \"keys\" => \"values\"."
 msgstr ""
 
-msgid "Extend this array with Your locale like "your_prefix" => "display_like"."
+msgid "Extend this array with Your locale like \"your_prefix\" => \"display_like\"."
 msgstr ""
 
-msgid "You can set "display_like" value in new locale file by adding it or You may leave it as hardcoded string."
+msgid "You can set \"display_like\" value in new locale file by adding it or You may leave it as hardcoded string."
 msgstr ""
 
 msgid "For example see implementation of other locales."
-msgstr ""
-
-msgid "Download newly created locale file by pressing "Download"."
-msgstr ""
-
-msgid "Place it to "/PATH_TO_ZABBIX_FRONTEND/include/locales"."
 msgstr ""
 
 msgid "Replace previous locale file with one you have downloaded."
@@ -4011,18 +3840,6 @@ msgstr "通知レポート"
 
 msgid "Notification report"
 msgstr "通知レポート"
-
-msgid "Y"
-msgstr "Y"
-
-msgid "M Y"
-msgstr "Y M"
-
-msgid "d M Y"
-msgstr "Y M d"
-
-msgid "d M Y H:i"
-msgstr "Y M d H:i"
 
 msgid "Most busy triggers top 100"
 msgstr "障害発生数上位100項目"
@@ -4071,9 +3888,6 @@ msgstr "暗く"
 
 msgid "Brighten"
 msgstr "明るく"
-
-msgid "d M Y H:i:s"
-msgstr "Y M d H:i:s"
 
 msgid "Screens"
 msgstr "スクリーン"
@@ -4333,10 +4147,10 @@ msgstr "スライドショーを削除できません"
 msgid "Delete slideshow?"
 msgstr "スライドショーを削除しますか?"
 
-msgid "Screen with name "%s" does not exist"
+msgid "Screen with name \"%s\" does not exist"
 msgstr ""
 
-msgid "Screen with id "%d" does not exist"
+msgid "Screen with id \"%d\" does not exist"
 msgstr ""
 
 msgid "Custom slides"
@@ -4393,9 +4207,6 @@ msgstr "ステータスの計算"
 msgid "Status calculation algorithm"
 msgstr "ステータス計算アルゴリズム"
 
-msgid "None"
-msgstr "なし"
-
 msgid "Problem, if at least one child has a problem"
 msgstr "子に一つでも障害があった場合に障害として検知"
 
@@ -4435,12 +4246,6 @@ msgstr "複製"
 msgid "Full clone"
 msgstr "すべて複製"
 
-msgid "Uptime"
-msgstr "アップタイム"
-
-msgid "Downtime"
-msgstr "ダウンタイム"
-
 msgid "One-time downtime"
 msgstr "一時的なダウンタイム"
 
@@ -4458,27 +4263,6 @@ msgstr "ノート"
 
 msgid "Remove"
 msgstr "削除"
-
-msgid "Sunday"
-msgstr "日曜"
-
-msgid "Monday"
-msgstr "月曜"
-
-msgid "Tuesday"
-msgstr "火曜"
-
-msgid "Wednesday"
-msgstr "水曜"
-
-msgid "Thursday"
-msgstr "木曜"
-
-msgid "Friday"
-msgstr "金曜"
-
-msgid "Saturday"
-msgstr "土曜"
 
 msgid "IT SERVICES"
 msgstr "ITサービス"
@@ -4915,9 +4699,6 @@ msgstr "メンバー"
 msgid "No user groups defined"
 msgstr "ユーザグループが設定されていません"
 
-msgid "Alias"
-msgstr "アカウント名"
-
 msgid "Name"
 msgstr "名前"
 
@@ -5131,11 +4912,11 @@ msgstr "コマンドを送信できません。コネクションを確認して
 msgid "Can't read script response, check connection"
 msgstr "スクリプトのレスポンスを受信できません。コネクションを確認してください"
 
-msgid "Defined in "include/defines.inc.php" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value"
-msgstr ""include/defines.inc.php"のZBX_SCRIPT_TIMEOUTに設定されたタイムアウトに達しました。設定値を確認してください"
+msgid "Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value"
+msgstr "\"include/defines.inc.php\"のZBX_SCRIPT_TIMEOUTに設定されたタイムアウトに達しました。設定値を確認してください"
 
-msgid "Defined in "include/defines.inc.php" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value"
-msgstr ""include/defines.inc.php"のZBX_SCRIPT_BYTES_LIMITに設定された読み込みバイト数に達しました。設定値を確認してください"
+msgid "Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value"
+msgstr "\"include/defines.inc.php\"のZBX_SCRIPT_BYTES_LIMITに設定された読み込みバイト数に達しました。設定値を確認してください"
 
 msgid "Unknown error happened reading script answer, please report to the developers"
 msgstr "スクリプトの結果の読み込み時に不明なエラーが発生しました。開発者に報告をお願いします"
@@ -5359,32 +5140,8 @@ msgstr "ホストとテンプレート"
 msgid "You can not switch hosts for current selection"
 msgstr "現在選択しているホストにスイッチできません"
 
-msgid "d M Y H:i:s"
-msgstr "Y M d H:i:s"
-
 msgid "H:i:s"
 msgstr "H:i:s"
-
-msgid "H:i:s"
-msgstr "H:i:s"
-
-msgid "H:i:s"
-msgstr "H:i:s"
-
-msgid "d M Y H:i:s"
-msgstr "Y M d H:i:s"
-
-msgid "H:i:s"
-msgstr "H:i:s"
-
-msgid "H:i:s"
-msgstr "H:i:s"
-
-msgid "H:i:s"
-msgstr "H:i:s"
-
-msgid "Error"
-msgstr "エラー"
 
 msgid "No errors found"
 msgstr "エラーはありません"
@@ -5503,8 +5260,8 @@ msgstr "リフレッシュ"
 msgid "Page received incorrect data"
 msgstr "誤ったデータを受信しました"
 
-msgid "Timezone for PHP is not set. Please set "date.timezone" option in php.ini."
-msgstr "PHPのタイムゾーンが設定されていません。php.iniに"date.timezone"オプションを設定してください"
+msgid "Timezone for PHP is not set. Please set \"date.timezone\" option in php.ini."
+msgstr "PHPのタイムゾーンが設定されていません。php.iniに\"date.timezone\"オプションを設定してください"
 
 msgid "Stats for"
 msgstr "Stats for"
@@ -5563,9 +5320,6 @@ msgstr "µ"
 msgid "Micro"
 msgstr "マイクロ"
 
-msgid "m"
-msgstr "m"
-
 msgid "Milli"
 msgstr "ミリ"
 
@@ -5610,9 +5364,6 @@ msgstr "Z"
 
 msgid "Zetta"
 msgstr "ゼタ"
-
-msgid "Y"
-msgstr "Y"
 
 msgid "Yotta"
 msgstr "ヨタ"
@@ -5734,7 +5485,7 @@ msgstr ""
 msgid "Key is too large: maximum %d characters"
 msgstr ""
 
-msgid "Item "%s" unlinked"
+msgid "Item \"%s\" unlinked"
 msgstr ""
 
 msgid "Scenario step number cannot be less than 1"
@@ -5761,13 +5512,13 @@ msgstr "追加"
 msgid "only printable characters"
 msgstr ""
 
-msgid "Download speed for step "%1$s" of scenario "%2$s""
+msgid "Download speed for step \"%1$s\" of scenario \"%2$s\""
 msgstr ""
 
-msgid "Response time for step "%1$s" of scenario "%2$s""
+msgid "Response time for step \"%1$s\" of scenario \"%2$s\""
 msgstr ""
 
-msgid "Response code for step "%1$s" of scenario "%2$s""
+msgid "Response code for step \"%1$s\" of scenario \"%2$s\""
 msgstr ""
 
 msgid "No media with"
@@ -5848,9 +5599,6 @@ msgstr "テンプレートのアプリケーション"
 msgid "already linked to host"
 msgstr "すでにホストにリンクされています"
 
-msgid "Host"
-msgstr "ホスト"
-
 msgid "has been deleted from the system"
 msgstr "はすでに削除されています"
 
@@ -5863,7 +5611,7 @@ msgstr ""
 msgid "and can't be deleted"
 msgstr ""
 
-msgid "Host group "%1$s" can not be deleted, because it is used in script "%2$s"."
+msgid "Host group \"%1$s\" can not be deleted, because it is used in script \"%2$s\"."
 msgstr ""
 
 msgid "Critical error"
@@ -6019,7 +5767,7 @@ msgstr "' は許可されていないパラメータです"
 msgid "Error adding dependencies. Following dependencies are not allowed: 1) from a host trigger to a template trigger; 2) from a template trigger to a host trigger; 3) between template triggers, where templates have links to other templates."
 msgstr ""
 
-msgid "Trigger "%s" unlinked"
+msgid "Trigger \"%s\" unlinked"
 msgstr ""
 
 msgid "Transaction has not been closed. Aborting.."
@@ -6049,9 +5797,6 @@ msgstr "スクリーンの行は空ではありません"
 msgid "This screen-column is not empty"
 msgstr "スクリーンの列は空ではありません"
 
-msgid "d M Y H:i:s"
-msgstr "Y M d H:i:s"
-
 msgid "[H:i:s]"
 msgstr "[H:i:s]"
 
@@ -6079,14 +5824,11 @@ msgstr "次のホストから更新"
 msgid "Skipped copying of graph"
 msgstr "グラフのコピーをスキップ"
 
-msgid "Graph ""
-msgstr "グラフ ""
+msgid "Graph \""
+msgstr "グラフ \""
 
-msgid "" deleted from host"
-msgstr "" をホスト"
-
-msgid ""
-msgstr "から削除しました"
+msgid "\" deleted from host"
+msgstr "\" をホスト"
 
 msgid "Unable to select configuration"
 msgstr "選択した設定は行えません"
@@ -6108,9 +5850,6 @@ msgstr "週"
 
 msgid "week"
 msgstr "週"
-
-msgid "d M Y"
-msgstr "Y M d"
 
 msgid "Service cannot be parent and child at the same time."
 msgstr "サービスは同時に親と子になることはできません"
@@ -6274,9 +6013,6 @@ msgstr "sessionモジュールが必要です"
 msgid "Account is blocked for"
 msgstr "アカウントは"
 
-msgid "seconds"
-msgstr "秒間ブロックされています"
-
 msgid "Login name or password is incorrect"
 msgstr "ログイン銘菓パスワードが間違っています"
 
@@ -6343,20 +6079,14 @@ msgstr "] はすでに存在しています"
 msgid "Cannot rename guest user"
 msgstr "ゲストユーザの名前は変更できません"
 
-msgid "User cannot restrict access to GUI for himself. Group ""
-msgstr "ユーザは自身でGUIへのアクセスを制限できません。グループ ""
+msgid "User cannot restrict access to GUI for himself. Group \""
+msgstr "ユーザは自身でGUIへのアクセスを制限できません。グループ \""
 
-msgid """
-msgstr """
+msgid "\""
+msgstr "\""
 
-msgid "User cannot disable himself. Group ""
-msgstr "ユーザは自身でアカウントを無効にできません。グループ ""
-
-msgid """
-msgstr """
-
-msgid "Incorrect time period"
-msgstr "誤った時間の間隔"
+msgid "User cannot disable himself. Group \""
+msgstr "ユーザは自身でアカウントを無効にできません。グループ \""
 
 msgid "Wrong period ["
 msgstr "誤った期間 ["
@@ -6415,14 +6145,8 @@ msgstr "エラー"
 msgid "[Wrong value for month:"
 msgstr "[誤った月の値:"
 
-msgid "]"
-msgstr "]"
-
 msgid "[Wrong value for day of week:"
 msgstr "[誤った週の値:"
-
-msgid "]"
-msgstr "]"
 
 msgid "Help"
 msgstr "ヘルプ"
@@ -6493,23 +6217,11 @@ msgstr "マップへの権限がありません"
 msgid "XML file contains errors"
 msgstr "XMLファイルにエラーが含まれています"
 
-msgid "M"
-msgstr "M"
-
-msgid "T"
-msgstr "T"
-
 msgid "W"
 msgstr "W"
 
-msgid "T"
-msgstr "T"
-
 msgid "F"
 msgstr "F"
-
-msgid "S"
-msgstr "S"
 
 msgid "S"
 msgstr "S"
@@ -6556,21 +6268,6 @@ msgstr "その他"
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr "要素を保存できる最大値に達しました"
 
-msgid "Last"
-msgstr ""
-
-msgid "First"
-msgstr ""
-
-msgid "Previous"
-msgstr ""
-
-msgid "Next"
-msgstr ""
-
-msgid "Previous"
-msgstr ""
-
 msgid "User group [%1$s] is used in script [%2$s]."
 msgstr ""
 
@@ -6580,7 +6277,7 @@ msgstr ""
 msgid "Only Super Admins can delete User Groups."
 msgstr ""
 
-msgid "Graph "%1$s" already exists on "%2$s"."
+msgid "Graph \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
 
 msgid "(inherited from another template)."
