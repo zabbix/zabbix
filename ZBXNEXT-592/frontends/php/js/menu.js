@@ -254,7 +254,8 @@ function menu_onmouseout (n_id) {
 	o_item.upstatus(7);
 
 	// run mouseover timer
-	this.o_hidetimer = setTimeout('A_MENUS['+ this.n_id +'].collapse();', o_item.getprop('hide_delay'));
+	this.o_hidetimer = setTimeout('if(typeof(A_MENUS['+ this.n_id +']) != "undefined") A_MENUS['+ this.n_id +'].collapse();',
+			o_item.getprop('hide_delay'));
 }
 
 // --------------------------------------------------------------------------------

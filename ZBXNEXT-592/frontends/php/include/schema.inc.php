@@ -3718,6 +3718,18 @@ return array(
 				'ref_table' => 'groups',
 				'ref_field' => '',
 			),
+			'description' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			),
+			'question' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			),
 		),
 	),
 	'screens' => array(
