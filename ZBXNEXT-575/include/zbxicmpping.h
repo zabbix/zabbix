@@ -20,29 +20,29 @@
 #include "common.h"
 #include "db.h"
 
-#define ZBX_FPING_HOST struct zbx_fping_host
-ZBX_FPING_HOST
+typedef struct
 {
 	char	*addr;
 	double	min, avg, max;
-	int	rcv;
-};
-
-int	do_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int interval, int size, int timeout, char *error, int max_error_len);
+	int	rcv, cnt;
+}
+ZBX_FPING_HOST;
 
 typedef enum
 {
 	ICMPPING = 0,
 	ICMPPINGSEC,
 	ICMPPINGLOSS
-} icmpping_t;
+}
+icmpping_t;
 
 typedef enum
 {
 	ICMPPINGSEC_MIN = 0,
 	ICMPPINGSEC_AVG,
 	ICMPPINGSEC_MAX
-} icmppingsec_type_t;
+}
+icmppingsec_type_t;
 
 typedef struct
 {
@@ -54,5 +54,7 @@ typedef struct
 	char			*addr;
 	icmpping_t		icmpping;
 	icmppingsec_type_t	type;
-} icmpitem_t;
+}
+icmpitem_t;
 
+int	do_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int interval, int size, int timeout, char *error, int max_error_len);

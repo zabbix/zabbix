@@ -779,7 +779,8 @@ void	main_discoverer_loop(unsigned char p, int num)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	for(;;) {
+	for (;;)
+	{
 		now = time(NULL);
 		sec = zbx_time();
 
@@ -800,7 +801,8 @@ void	main_discoverer_loop(unsigned char p, int num)
 		else
 			sleeptime = nextcheck - now;
 
-		if (sleeptime > 0) {
+		if (sleeptime > 0)
+		{
 			if (sleeptime > DISCOVERER_DELAY)
 				sleeptime = DISCOVERER_DELAY;
 
@@ -810,8 +812,9 @@ void	main_discoverer_loop(unsigned char p, int num)
 			zbx_setproctitle("discoverer [sleeping for %d seconds]",
 					sleeptime);
 
-			sleep( sleeptime );
-		} else
-			zabbix_log(LOG_LEVEL_DEBUG, "No sleeping" );
+			sleep(sleeptime);
+		}
+		else
+			zabbix_log(LOG_LEVEL_DEBUG, "No sleeping");
 	}
 }

@@ -108,6 +108,7 @@ include_once('include/page_header.php');
 		),
 		'groupid' => get_request('groupid', null),
 	);
+
 	$pageFilter = new CPageFilter($options);
 
 	$_REQUEST['groupid'] = $pageFilter->groupid;
@@ -192,6 +193,9 @@ include_once('include/page_header.php');
 		if($pageFilter->groupid > 0) $options['groupids'] = $pageFilter->groupid;
 
 		$hosts = CHost::get($options);
+	}
+	else{
+		$hosts = array();
 	}
 
 // sorting && paging

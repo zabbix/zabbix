@@ -1350,8 +1350,6 @@ int	num_param(const char *p)
 				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
 					return 0;	/* incorrect syntax */
 			}
-			else if (']' == *p && 0 == array)
-				return 0;		/* incorrect syntax */
 			else if (' ' != *p)
 				state = 2;
 			break;
@@ -1378,8 +1376,6 @@ int	num_param(const char *p)
 				p--;
 				state = 0;
 			}
-			else if (']' == *p && 0 == array)
-				return 0;		/* incorrect syntax */
 			break;
 		}
 	}
@@ -1460,8 +1456,6 @@ int	get_param(const char *p, int num, char *buf, int maxlen)
 				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
 					return 1;	/* incorrect syntax */
 			}
-			else if (']' == *p && 0 == array)
-				return 1;		/* incorrect syntax */
 			else if (' ' != *p)
 			{
 				if (idx == num)
@@ -1501,8 +1495,6 @@ int	get_param(const char *p, int num, char *buf, int maxlen)
 				p--;
 				state = 0;
 			}
-			else if (']' == *p && 0 == array)
-				return 1;		/* incorrect syntax */
 			else if (idx == num)
 				buf[buf_i++] = *p;
 			break;
@@ -1536,7 +1528,7 @@ int	get_param(const char *p, int num, char *buf, int maxlen)
  *          from parameter list (param)                                       *
  *                                                                            *
  * Parameters:                                                                *
- * 	p   - [IN]  parameter list                                            *
+ *      p   - [IN]  parameter list                                            *
  *      num - [IN]  requested parameter index                                 *
  *      sz  - [OUT] length of requested parameter                             *
  *                                                                            *
@@ -1594,8 +1586,6 @@ static int	get_param_len(const char *p, int num, size_t *sz)
 				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
 					return 1;	/* incorrect syntax */
 			}
-			else if (']' == *p && 0 == array)
-				return 1;		/* incorrect syntax */
 			else if (' ' != *p)
 			{
 				if (idx == num)
@@ -1635,8 +1625,6 @@ static int	get_param_len(const char *p, int num, size_t *sz)
 				p--;
 				state = 0;
 			}
-			else if (']' == *p && 0 == array)
-				return 1;		/* incorrect syntax */
 			else if (idx == num)
 				(*sz)++;
 			break;
@@ -1869,7 +1857,7 @@ const char	*get_string(const char *p, char *buf, size_t bufsize)
  ******************************************************************************/
 char	zbx_num2hex(u_char c)
 {
-	if(c >= 10)
+	if (c >= 10)
 		return c + 0x57; /* a-f */
 	else
 		return c + 0x30; /* 0-9 */
@@ -1894,7 +1882,7 @@ char	zbx_num2hex(u_char c)
  ******************************************************************************/
 u_char	zbx_hex2num(char c)
 {
-	if(c >= 'a')
+	if (c >= 'a')
 		return c - 0x57; /* a-f */
 	else
 		return c - 0x30; /* 0-9 */

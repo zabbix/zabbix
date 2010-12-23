@@ -8,6 +8,7 @@ New features:
  - [ZBXNEXT-512] redesign of unknown events (Aly,asaveljevs,Sasha)
 
 Bug fixes:
+ - [ZBX-2647] Made some of hard coded strings translatable (KB)
  - [ZBX-3300] fixed valuemapid not removed from items table when valuemap deleted (Vedmak)
  - [ZBXNEXT-588] improved template, host, proxy form view, dashboard screen (Aly,Vedmak)
  - [ZBX-3149] allow to translate more strings in screen element 'Server info'; add support for translator comments (Richlv)
@@ -34,6 +35,19 @@ Changes for 1.9.0
 
 Changes for 1.8.4rc3
 
+ - [ZBX-3256] added automatic detection of fping command line option to use for specifying source IP address (asaveljevs)
+ - [ZBX-3333] fixed icmppingloss[] returning bad values when NIC bonding is used (asaveljevs)
+ - [ZBX-1985,ZBX-2394] fixed icmppingloss[] returning bad values when fping is capable of pinging both address families (asaveljevs)
+ - [ZBX-2825] fix after saving the profile it stays in the profile page (Vlad)
+ - [ZBX-1294] disabled GUI interface action elements for editing a templated trigger
+ - [ZBX-3306] fixed minimal value limit for action escalation period (Vedmak)
+ - [ZBX-3320] fixed host.create, template.create permission error for admin users (Vedmak)
+ - [ZBX-266] made debugging output for Web scenarios more useful (Sasha)
+ - [ZBX-1181] fixed infinite looping when failing cURL initialization and showing of such errors in the GUI (asaveljevs,Sasha,Vedmak)
+ - [ZBX-1181] fixed download speed, response time, and response code not being saved for failed Web scenario steps (asaveljevs)
+ - [ZBX-2851] fixed apache hanging when frontend connects to empty database (Vedmak)
+ - [ZBX-2647] made some of hard coded strings translatable (KB)
+ - [ZBX-3294] fixed host status change confirmation dialog (Vedmak)
  - [ZBX-3301] fixed server crash after libssh2_userauth_list() when processing SSH checks (asaveljevs)
  - [ZBX-2395] fixed sending of the same message to the same user using different media types (asaveljevs)
  - [ZBXNEXT-586] added sensor[device,sensor,<mode>] check for Linux 2.4 (asaveljevs)

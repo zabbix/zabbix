@@ -615,7 +615,7 @@ class CPie extends CGraphDraw{
 		if($this->drawLegend == 1)	$this->drawLegend();
 
 		$str=sprintf('%0.2f',(getmicrotime()-$start_time));
-		imagestring($this->im, 0,$this->fullSizeX-210,$this->fullSizeY-12,'Data from '.$this->dataFrom.'. Generated in '.$str.' sec', $this->getColor('Gray'));
+		imagestring($this->im, 0,$this->fullSizeX-210,$this->fullSizeY-12, _s('Data from %1$s. Generated in %2$s sec', $this->dataFrom, $str), $this->getColor('Gray'));
 
 		unset($this->items, $this->data);
 

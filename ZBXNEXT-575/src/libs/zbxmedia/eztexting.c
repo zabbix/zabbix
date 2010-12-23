@@ -96,8 +96,8 @@ int	send_ez_texting(const char *username, const char *password, const char *send
 	const char	*__function_name = "send_ez_texting";
 
 	int		ret = FAIL;
-	int		i, len, err;
 	int		max_message_len;
+	int		i, len, opt, err;
 	char		*sendto_digits = NULL, *message_ascii = NULL;
 	char		*username_esc = NULL, *password_esc = NULL, *sendto_esc = NULL, *message_esc = NULL;
 	char		postfields[MAX_STRING_LEN];
@@ -200,19 +200,19 @@ int	send_ez_texting(const char *username, const char *password, const char *send
 	zbx_snprintf(postfields, sizeof(postfields), "user=%s&pass=%s&phonenumber=%s&subject=&message=%s",
 			username_esc, password_esc, sendto_esc, message_esc);
 
-	if (CURLE_OK != (err = curl_easy_setopt(easy_handle, CURLOPT_USERAGENT, "Zabbix " ZABBIX_VERSION)) ||
-			CURLE_OK != (err = curl_easy_setopt(easy_handle, CURLOPT_FOLLOWLOCATION, 1)) ||
-			CURLE_OK != (err = curl_easy_setopt(easy_handle, CURLOPT_WRITEFUNCTION, WRITEFUNCTION2)) ||
-			CURLE_OK != (err = curl_easy_setopt(easy_handle, CURLOPT_HEADERFUNCTION, HEADERFUNCTION2)) ||
-			CURLE_OK != (err = curl_easy_setopt(easy_handle, CURLOPT_SSL_VERIFYPEER, 1)) ||
-			CURLE_OK != (err = curl_easy_setopt(easy_handle, CURLOPT_SSL_VERIFYHOST, 1)) ||
-			CURLE_OK != (err = curl_easy_setopt(easy_handle, CURLOPT_POSTFIELDS, postfields)) ||
-			CURLE_OK != (err = curl_easy_setopt(easy_handle, CURLOPT_POST, 1)) ||
-			CURLE_OK != (err = curl_easy_setopt(easy_handle, CURLOPT_URL, EZ_TEXTING_API_URL)) ||
-			CURLE_OK != (err = curl_easy_setopt(easy_handle, CURLOPT_TIMEOUT, EZ_TEXTING_TIMEOUT)) ||
-			CURLE_OK != (err = curl_easy_setopt(easy_handle, CURLOPT_CONNECTTIMEOUT, EZ_TEXTING_TIMEOUT)))
+	if (CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_USERAGENT, "Zabbix " ZABBIX_VERSION)) ||
+			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_FOLLOWLOCATION, 1)) ||
+			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_WRITEFUNCTION, WRITEFUNCTION2)) ||
+			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_HEADERFUNCTION, HEADERFUNCTION2)) ||
+			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_SSL_VERIFYPEER, 1)) ||
+			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_SSL_VERIFYHOST, 1)) ||
+			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_POSTFIELDS, postfields)) ||
+			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_POST, 1)) ||
+			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_URL, EZ_TEXTING_API_URL)) ||
+			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_TIMEOUT, EZ_TEXTING_TIMEOUT)) ||
+			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_CONNECTTIMEOUT, EZ_TEXTING_TIMEOUT)))
 	{
-		zbx_snprintf(error, max_error_len, "Could not set one of cURL options: [%s]", curl_easy_strerror(err));
+		zbx_snprintf(error, max_error_len, "Could not set cURL option %d: [%s]", opt, curl_easy_strerror(err));
 		goto clean;
 	}
 
