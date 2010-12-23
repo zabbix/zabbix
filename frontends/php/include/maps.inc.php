@@ -589,12 +589,16 @@
 						zbx_strstr($label, '{HOST.CONN}'))
 				{
 					if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST){
-						$sql =' SELECT * FROM hosts WHERE hostid='.$db_element['elementid'];
+						  $sql =	'SELECT i.*, h.host '.
+							  ' FROM interface i,hosts h '.
+							  ' WHERE i.hostid=h.hostid '.
+							  	' AND i.hostid='.$db_element['elementid'];
 					}
 					else if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER)
-						$sql =	'SELECT h.* '.
-							' FROM hosts h,items i,functions f '.
-							' WHERE h.hostid=i.hostid '.
+						$sql =	'SELECT h.*, h2.host '.
+							' FROM interface h,items i,functions f,hosts h2 '.
+							' WHERE h2.hostid=h.hostid '.
+							  ' AND h.hostid=i.hostid '.
 								' AND i.itemid=f.itemid '.
 								' AND f.triggerid='.$db_element['elementid'];
 					else{

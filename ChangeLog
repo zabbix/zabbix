@@ -35,6 +35,7 @@ Changes for 1.9.0
 
 Changes for 1.8.4rc3
 
+ - [ZBX-2825] fix after saving the profile it stays in the profile page (Vlad)
  - [ZBX-1294] disabled GUI interface action elements for editing a templated trigger
  - [ZBX-3306] fixed minimal value limit for action escalation period (Vedmak)
  - [ZBX-3320] fixed host.create, template.create permission error for admin users (Vedmak)
