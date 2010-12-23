@@ -374,16 +374,13 @@ class CScript extends CZBXAPI{
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
 
-			$scripts = zbx_toArray($scripts);
-			$scriptids = array();
-
 			foreach($scripts as $snum => $script){
 				$script_db_fields = array(
 					'name' => null,
 					'command' => null,
 				);
 				if(!check_db_fields($script_db_fields, $script)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for script');
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for script'));
 				}
 			}
 
@@ -424,14 +421,13 @@ class CScript extends CZBXAPI{
 
 			$options = array(
 				'scriptids' => $scriptids,
-				'editable' => 1,
-				'output' => API_OUTPUT_EXTEND,
+				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => 1
 			);
 			$upd_scripts = self::get($options);
 			foreach($scripts as $snum => $script){
 				if(!isset($upd_scripts[$script['scriptid']])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script with scriptid [%s] does not exist.', $script['scriptid']));
 				}
 			}
 
