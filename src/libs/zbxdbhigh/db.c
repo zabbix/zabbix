@@ -1915,7 +1915,7 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 			DBexecute("insert into autoreg_host"
 					" (autoreg_hostid,proxy_hostid,host,listen_ip,listen_port)"
 					" values"
-					" (" ZBX_FS_UI64 ",'%s','%s','%s',%d)",
+					" (" ZBX_FS_UI64 ",%s,'%s','%s',%d)",
 					autoreg_hostid, DBsql_id_ins(proxy_hostid),
 					host_esc, ip_esc, (int)port);
 		}

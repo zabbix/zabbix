@@ -28,6 +28,8 @@
 #include "../operations.h"
 #include "../events.h"
 #include "../actions.h"
+#include "../poller/checks_agent.h"
+#include "../poller/checks_ipmi.h"
 
 #define CONFIG_ESCALATOR_FREQUENCY	3
 
@@ -179,8 +181,8 @@ static int	get_trigger_permission(zbx_uint64_t userid, zbx_uint64_t triggerid)
 	return perm;
 }
 
-static void	add_user_msg(int source, zbx_uint64_t userid, zbx_uint64_t mediatypeid,
-		zbx_uint64_t triggerid, ZBX_USER_MSG **user_msg, char *subject, char *message)
+static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER_MSG **user_msg,
+		char *subject, char *message, unsigned char source, zbx_uint64_t triggerid)
 {
 	const char	*__function_name = "add_user_msg";
 	ZBX_USER_MSG	*p;
@@ -220,70 +222,374 @@ static void	add_user_msg(int source, zbx_uint64_t userid, zbx_uint64_t mediatype
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	add_object_msg(int source, zbx_uint64_t triggerid, DB_OPERATION *operation, ZBX_USER_MSG **user_msg,
-		char *subject, char *message)
+static void	add_object_msg(zbx_uint64_t opmessageid, zbx_uint64_t mediatypeid, ZBX_USER_MSG **user_msg,
+		char *subject, char *message, unsigned char source, zbx_uint64_t triggerid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	userid;
 
-	switch (operation->object)
+	result = DBselect(
+			"select userid"
+			" from opmessage_usr"
+			" where opmessageid=" ZBX_FS_UI64
+			" union "
+			"select g.userid"
+			" from opmessage_grp m,users_groups g"
+			" where m.usrgrpid=g.usrgrpid"
+				" and m.opmessageid=" ZBX_FS_UI64,
+			opmessageid, opmessageid);
+
+	while (NULL != (row = DBfetch(result)))
 	{
-		case OPERATION_OBJECT_USER:
-			add_user_msg(source, operation->objectid, operation->mediatypeid, triggerid, user_msg, subject, message);
-			break;
-		case OPERATION_OBJECT_GROUP:
-			result = DBselect("select ug.userid from users_groups ug,usrgrp g"
-					" where ug.usrgrpid=" ZBX_FS_UI64 " and g.usrgrpid=ug.usrgrpid and g.users_status=%d",
-					operation->objectid,
-					GROUP_STATUS_ACTIVE);
-
-			while (NULL != (row = DBfetch(result)))
-			{
-				ZBX_STR2UINT64(userid, row[0]);
-				add_user_msg(source, userid, operation->mediatypeid, triggerid, user_msg, subject, message);
-			}
-
-			DBfree_result(result);
-			break;
-		default:
-			zabbix_log(LOG_LEVEL_WARNING, "Unknown object type [%d] for operationid [" ZBX_FS_UI64 "]",
-					operation->object,
-					operation->operationid);
-			zabbix_syslog("Unknown object type [%d] for operationid [" ZBX_FS_UI64 "]",
-					operation->object,
-					operation->operationid);
-			break;
+		ZBX_STR2UINT64(userid, row[0]);
+		add_user_msg(userid, mediatypeid, user_msg, subject, message, source, triggerid);
 	}
+
+	DBfree_result(result);
 }
 
-static void	add_command_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACTION *action, char *command)
+/******************************************************************************
+ *                                                                            *
+ * Function: run_remote_commands                                              *
+ *                                                                            *
+ * Purpose: run remote command on specific host                               *
+ *                                                                            *
+ * Parameters: host_name - host name                                          *
+ *             command - remote command                                       *
+ *                                                                            *
+ * Return value: nothing                                                      *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	run_remote_command(DC_ITEM *item, char *command, char *error, size_t max_error_len)
+{
+	const char	*__function_name = "run_remote_command";
+
+	int		ret = FAIL;
+	AGENT_RESULT	agent_result;
+	char		*param;
+#ifdef HAVE_OPENIPMI
+	int		val;
+	char		*port;
+#endif
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostname:'%s' command:'%s'",
+			__function_name, item->host.host, command);
+
+	*error = '\0';
+
+#ifdef HAVE_OPENIPMI
+	if (0 == strncmp(command, "IPMI", 4))
+	{
+		if (SUCCEED == (ret = DCconfig_get_interface_by_type(&item->interface, item->host.hostid,
+				INTERFACE_TYPE_IPMI, 1)))
+		{
+			item->interface.addr = strdup(item->interface.useip ? item->interface.ip_orig : item->interface.dns_orig);
+			substitute_simple_macros(NULL, NULL, &item->host, NULL,
+					&item->interface.addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
+
+			port = strdup(item->interface.port_orig);
+			substitute_simple_macros(NULL, &item->host.hostid, NULL, NULL,
+					&port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
+			if (SUCCEED == (ret = is_ushort(port, &item->interface.port)))
+			{
+				if (SUCCEED == (ret = parse_ipmi_command(command, item->ipmi_sensor, &val)))
+				{
+					item->key = item->ipmi_sensor;
+					ret = set_ipmi_control_value(item, val, error, max_error_len);
+				}
+				else
+					zbx_strlcpy(error, "Incorrect format of IPMI command", max_error_len);
+			}
+			else
+				zbx_snprintf(error, max_error_len, "Invalid port number [%s]",
+							item->interface.port_orig);
+
+			zbx_free(port);
+			zbx_free(item->interface.addr);
+		}
+		else
+			zbx_snprintf(error, max_error_len, "IPMI interface is not defined for host [%s]", item->host.host);
+	}
+	else
+	{
+#endif
+		zabbix_log(LOG_LEVEL_DEBUG, ZBX_FS_UI64, item->host.hostid);
+		if (SUCCEED == (ret = DCconfig_get_interface_by_type(&item->interface, item->host.hostid,
+				INTERFACE_TYPE_AGENT, 1)))
+		{
+			item->interface.addr = strdup(item->interface.useip ? item->interface.ip_orig : item->interface.dns_orig);
+			substitute_simple_macros(NULL, NULL, &item->host, NULL,
+					&item->interface.addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
+
+			port = strdup(item->interface.port_orig);
+			substitute_simple_macros(NULL, &item->host.hostid, NULL, NULL,
+					&port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
+			if (SUCCEED == (ret = is_ushort(port, &item->interface.port)))
+			{
+				param = dyn_escape_param(command);
+				item->key = zbx_dsprintf(NULL, "system.run[\"%s\",\"nowait\"]", param);
+				zbx_free(param);
+
+				init_result(&agent_result);
+
+				alarm(CONFIG_TIMEOUT);
+				if (SUCCEED != (ret = get_value_agent(item, &agent_result)) && GET_MSG_RESULT(&agent_result))
+					zbx_strlcpy(error, agent_result.msg, max_error_len);
+				alarm(0);
+
+				free_result(&agent_result);
+
+				zbx_free(item->key);
+			}
+
+			zbx_free(port);
+			zbx_free(item->interface.addr);
+		}
+		else
+			zbx_snprintf(error, max_error_len, "Zabbix Agent interface is not defined for host [%s]", item->host.host);
+#ifdef HAVE_OPENIPMI
+	}
+#endif
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+static void	add_command_alert(DC_ITEM *item, zbx_uint64_t eventid, zbx_uint64_t actionid,
+		int esc_step, const char *command, zbx_alert_status_t status, const char *error)
 {
 	const char	*__function_name = "add_command_alert";
 	zbx_uint64_t	alertid;
 	int		now;
-	char		*command_esc;
+	char		*tmp = NULL, *command_esc, *error_esc;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	alertid		= DBget_maxid("alerts");
-	now		= time(NULL);
-	command_esc	= DBdyn_escape_string(command);
+	alertid = DBget_maxid("alerts");
+	now = (int)time(NULL);
+	tmp = zbx_dsprintf(tmp, "%s:%s", item->host.host, command);
+	command_esc = DBdyn_escape_string_len(tmp, ALERT_MESSAGE_LEN);
+	error_esc = DBdyn_escape_string_len(error, ALERT_ERROR_LEN);
+	zbx_free(tmp);
 
-	DBexecute("insert into alerts (alertid,actionid,eventid,clock,message,status,alerttype,esc_step)"
-			" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s',%d,%d,%d)",
-			alertid,
-			action->actionid,
-			event->eventid,
-			now,
-			command_esc,
-			ALERT_STATUS_SENT,
-			ALERT_TYPE_COMMAND,
-			escalation->esc_step);
+	DBexecute("insert into alerts"
+			" (alertid,actionid,eventid,clock,message,status,error,alerttype,esc_step)"
+			" values "
+			"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s',%d,'%s',%d,%d)",
+			alertid, actionid, eventid, now, command_esc, (int)status,
+			error_esc, ALERT_TYPE_COMMAND, esc_step);
 
-	op_run_commands(command);
-
+	zbx_free(error_esc);
 	zbx_free(command_esc);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+static int	get_dynamic_hostid(DB_EVENT *event, DC_ITEM *item, char *error, size_t max_error_len)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		sql[512];
+	int		offset = 0, ret = SUCCEED;
+
+	item->host.hostid = 0;
+
+	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
+			"select distinct h.hostid,h.host"
+#ifdef HAVE_OPENIPMI
+				",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
+#endif
+			);
+
+	switch (event->source)
+	{
+		case EVENT_SOURCE_TRIGGERS:
+			zbx_snprintf(sql + offset, sizeof(sql) - offset,
+					" from functions f,items i,hosts h"
+					" where f.itemid=i.itemid"
+						" and i.hostid=h.hostid"
+						" and h.status=%d"
+						" and f.triggerid=" ZBX_FS_UI64,
+					HOST_STATUS_MONITORED, event->objectid);
+
+			break;
+		case EVENT_SOURCE_DISCOVERY:
+			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
+					" from hosts h,interface i,dservices ds"
+					" where h.hostid=i.hostid"
+						" and i.ip=ds.ip"
+						" and i.useip=1"
+						" and h.status=%d",
+						HOST_STATUS_MONITORED);
+
+			switch (event->object)
+			{
+				case EVENT_OBJECT_DHOST:
+					zbx_snprintf(sql + offset, sizeof(sql) - offset,
+							" and ds.dhostid=" ZBX_FS_UI64
+							DB_NODE,
+							event->objectid,
+							DBnode_local("h.hostid"));
+					break;
+				case EVENT_OBJECT_DSERVICE:
+					zbx_snprintf(sql + offset, sizeof(sql) - offset,
+							" and ds.dserviceid=" ZBX_FS_UI64
+							DB_NODE,
+							event->objectid,
+							DBnode_local("h.hostid"));
+					break;
+			}
+			break;
+		case EVENT_SOURCE_AUTO_REGISTRATION:
+			zbx_snprintf(sql + offset, sizeof(sql) - offset,
+					" from autoreg_host a,hosts h"
+					" where a.proxy_hostid=h.proxy_hostid"
+						" and a.host=h.host"
+						" and h.status=%d"
+						" and a.autoreg_hostid=" ZBX_FS_UI64
+						DB_NODE,
+					HOST_STATUS_MONITORED, event->objectid,
+					DBnode_local("h.hostid"));
+
+			break;
+		default:
+			zbx_snprintf(error, max_error_len, "Unsupported event source [%d]", event->source);
+			return FAIL;
+	}
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		if (0 != item->host.hostid)
+		{
+			switch (event->source)
+			{
+				case EVENT_SOURCE_TRIGGERS:
+					zbx_strlcpy(error, "Too many hosts in trigger expression", max_error_len);
+					break;
+				case EVENT_SOURCE_DISCOVERY:
+					zbx_strlcpy(error, "Too many hosts with same IP addreses", max_error_len);
+					break;
+			}
+			ret = FAIL;
+			break;
+		}
+		ZBX_STR2UINT64(item->host.hostid, row[0]);
+		strscpy(item->host.host, row[1]);
+#ifdef HAVE_OPENIPMI
+		item->host.ipmi_authtype = (signed char)atoi(row[2]);
+		item->host.ipmi_privilege = (unsigned char)atoi(row[3]);
+		strscpy(item->host.ipmi_username, row[4]);
+		strscpy(item->host.ipmi_password, row[5]);
+#endif
+	}
+
+	DBfree_result(result);
+
+	if (FAIL == ret)
+	{
+		item->host.hostid = 0;
+		*item->host.host = '\0';
+	}
+	else if (0 == item->host.hostid)
+	{
+		*item->host.host = '\0';
+
+		zbx_strlcpy(error, "Cannot find corresponding host", max_error_len);
+		ret = FAIL;
+	}
+
+	return ret;
+}
+
+static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_t operationid, int esc_step)
+{
+	const char		*__function_name = "execute_commands";
+	DB_RESULT		result;
+	DB_ROW			row;
+	DC_ITEM			item;
+	char			*command = NULL, error[ALERT_ERROR_LEN_MAX];
+	int			rc;
+	zbx_alert_status_t	status;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	memset(&item, 0, sizeof(item));
+
+	result = DBselect(
+			"select distinct h.hostid,h.host,o.command"
+#ifdef HAVE_OPENIPMI
+				",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
+#endif
+			" from opcommand_grp o,hosts_groups hg,hosts h"
+			" where o.groupid=hg.groupid"
+				" and hg.hostid=h.hostid"
+				" and o.operationid=" ZBX_FS_UI64
+				" and h.status=%d"
+			" union "
+			"select distinct h.hostid,h.host,o.command"
+#ifdef HAVE_OPENIPMI
+				",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
+#endif
+			" from opcommand_hst o,hosts h"
+			" where o.hostid=h.hostid"
+				" and o.operationid=" ZBX_FS_UI64
+				" and h.status=%d"
+			" union "
+			"select distinct NULL,NULL,command"
+#ifdef HAVE_OPENIPMI
+				",NULL,NULL,NULL,NULL"
+#endif
+			" from opcommand_hst"
+			" where operationid=" ZBX_FS_UI64
+				" and hostid is null",
+			operationid, HOST_STATUS_MONITORED,
+			operationid, HOST_STATUS_MONITORED,
+			operationid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		if (SUCCEED != DBis_null(row[0]))
+		{
+			ZBX_STR2UINT64(item.host.hostid, row[0]);
+			strscpy(item.host.host, row[1]);
+#ifdef HAVE_OPENIPMI
+			item.host.ipmi_authtype = (signed char)atoi(row[3]);
+			item.host.ipmi_privilege = (unsigned char)atoi(row[4]);
+			strscpy(item.host.ipmi_username, row[5]);
+			strscpy(item.host.ipmi_password, row[6]);
+#endif
+			rc = SUCCEED;
+		}
+		else
+			rc = get_dynamic_hostid(event, &item, error, sizeof(error));
+
+		command = zbx_strdup(command, row[2]);
+		substitute_macros(event, NULL, &command);
+
+		if (SUCCEED == rc)
+			rc = run_remote_command(&item, command, error, sizeof(error));
+
+		if (SUCCEED != rc && '\0' != error)
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot execute remote command [%s]: %s",
+					command, error);
+
+		status = (SUCCEED != rc ? ALERT_STATUS_FAILED : ALERT_STATUS_SENT);
+		if (ALERT_STATUS_SENT == status)
+			*error = '\0';
+
+		add_command_alert(&item, event->eventid, actionid, esc_step, command, status, error);
+	}
+	DBfree_result(result);
+
+	zbx_free(command);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -292,6 +598,7 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 		zbx_uint64_t userid, zbx_uint64_t mediatypeid, char *subject, char *message)
 {
 	const char	*__function_name = "add_message_alert";
+
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	alertid;
@@ -420,7 +727,7 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	check_operation_conditions(DB_EVENT *event, DB_OPERATION *operation)
+static int	check_operation_conditions(DB_EVENT *event, zbx_uint64_t operationid, unsigned char evaltype)
 {
 	const char	*__function_name = "check_operation_conditions";
 
@@ -431,13 +738,13 @@ static int	check_operation_conditions(DB_EVENT *event, DB_OPERATION *operation)
 	int	ret = SUCCEED; /* SUCCEED required for ACTION_EVAL_TYPE_AND_OR */
 	int	cond, old_type = -1, exit = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): operationid [" ZBX_FS_UI64 "]", __function_name, operation->operationid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operationid:" ZBX_FS_UI64, __function_name, operationid);
 
 	result = DBselect("select conditiontype,operator,value"
 				" from opconditions"
 				" where operationid=" ZBX_FS_UI64
 				" order by conditiontype",
-			operation->operationid);
+			operationid);
 
 	while (NULL != (row = DBfetch(result)) && 0 == exit)
 	{
@@ -446,7 +753,7 @@ static int	check_operation_conditions(DB_EVENT *event, DB_OPERATION *operation)
 		condition.operator	= atoi(row[1]);
 		condition.value		= row[2];
 
-		switch (operation->evaltype)
+		switch (evaltype)
 		{
 			case ACTION_EVAL_TYPE_AND_OR:
 				if (old_type == condition.conditiontype)	/* OR conditions */
@@ -501,36 +808,42 @@ static int	check_operation_conditions(DB_EVENT *event, DB_OPERATION *operation)
 
 static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACTION *action)
 {
+	const char	*__function_name = "execute_operations";
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_OPERATION	operation;
 	int		esc_period = 0, operations = 0;
 	ZBX_USER_MSG	*user_msg = NULL, *p;
-	char		*shortdata, *longdata;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In execute_operations()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (0 == action->esc_period)
 	{
 		result = DBselect(
-				"select operationid,operationtype,object,objectid,default_msg,"
-					"shortdata,longdata,esc_period,evaltype,mediatypeid"
-				" from operations"
-				" where actionid=" ZBX_FS_UI64
-					" and operationtype in (%d,%d)",
+				"select o.operationid,o.operationtype,o.esc_period,o.evaltype,"
+					"m.opmessageid,m.default_msg,subject,message,mediatypeid"
+				" from operations o"
+					" left join opmessage m"
+						" on m.operationid=o.operationid"
+				" where o.actionid=" ZBX_FS_UI64
+					" and o.operationtype in (%d,%d)",
 				action->actionid,
 				OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND);
 	}
 	else
 	{
 		escalation->esc_step++;
-
-		result = DBselect("select operationid,operationtype,object,objectid,default_msg,"
-					"shortdata,longdata,esc_period,evaltype,mediatypeid"
-				" from operations where actionid=" ZBX_FS_UI64
-					" and operationtype in (%d,%d)"
-					" and esc_step_from<=%d"
-					" and (esc_step_to=0 or esc_step_to>=%d)",
+ /* "object,objectid,default_msg,shortdata,longdata," ",mediatypeid"*/
+		result = DBselect(
+				"select o.operationid,o.operationtype,o.esc_period,o.evaltype,"
+					"m.opmessageid,m.default_msg,subject,message,mediatypeid"
+				" from operations o"
+					" left join opmessage m"
+						" on m.operationid=o.operationid"
+				" where o.actionid=" ZBX_FS_UI64
+					" and o.operationtype in (%d,%d)"
+					" and o.esc_step_from<=%d"
+					" and (o.esc_step_to=0 or o.esc_step_to>=%d)",
 				action->actionid,
 				OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND,
 				escalation->esc_step,
@@ -540,24 +853,20 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 	while (NULL != (row = DBfetch(result)))
 	{
 		memset(&operation, 0, sizeof(operation));
+
 		ZBX_STR2UINT64(operation.operationid, row[0]);
-		operation.actionid	= action->actionid;
-		operation.operationtype	= atoi(row[1]);
-		operation.object	= atoi(row[2]);
-		ZBX_STR2UINT64(operation.objectid, row[3]);
-		operation.default_msg	= atoi(row[4]);
-		operation.shortdata	= strdup(row[5]);
-		operation.longdata	= strdup(row[6]);
-		operation.esc_period	= atoi(row[7]);
-		operation.evaltype	= atoi(row[8]);
-		ZBX_DBROW2UINT64(operation.mediatypeid, row[9]);
+		operation.actionid = action->actionid;
+		operation.operationtype = atoi(row[1]);
+		operation.esc_period = atoi(row[2]);
+		operation.evaltype = (unsigned char)atoi(row[3]);
 
-		if (SUCCEED == check_operation_conditions(event, &operation))
+		if (SUCCEED == check_operation_conditions(event, operation.operationid, operation.evaltype))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Conditions match our event. Execute operation.");
+			unsigned char	default_msg = 1;
+			char		*subject = NULL, *message = NULL;
+			zbx_uint64_t	opmessageid, mediatypeid = 0;
 
-			substitute_macros(event, NULL, &operation.shortdata);
-			substitute_macros(event, NULL, &operation.longdata);
+			zabbix_log(LOG_LEVEL_DEBUG, "Conditions match our event. Execute operation.");
 
 			if (0 == esc_period || esc_period > operation.esc_period)
 				esc_period = operation.esc_period;
@@ -565,31 +874,45 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 			switch (operation.operationtype)
 			{
 				case OPERATION_TYPE_MESSAGE:
-					if (0 == operation.default_msg)
+					if (SUCCEED == DBis_null(row[4]))
+						break;
+
+					ZBX_STR2UINT64(opmessageid, row[4]);
+					default_msg = (unsigned char)atoi(row[5]);
+					ZBX_DBROW2UINT64(mediatypeid, row[8]);
+
+					if (0 == default_msg)
 					{
-						shortdata = operation.shortdata;
-						longdata = operation.longdata;
+						subject = strdup(row[6]);
+						message = strdup(row[7]);
+
+						substitute_macros(event, NULL, &subject);
+						substitute_macros(event, NULL, &message);
 					}
 					else
 					{
-						shortdata = action->shortdata;
-						longdata = action->longdata;
+						subject = action->shortdata;
+						message = action->longdata;
 					}
 
-					add_object_msg(event->source, escalation->triggerid, &operation, &user_msg, shortdata, longdata);
+					add_object_msg(opmessageid, mediatypeid, &user_msg, subject, message,
+							event->source, event->objectid);
+
+					if (0 == default_msg)
+					{
+						zbx_free(subject);
+						zbx_free(message);
+					}
 					break;
 				case OPERATION_TYPE_COMMAND:
-					add_command_alert(escalation, event, action, operation.longdata);
+					execute_commands(event, action->actionid, operation.operationid, escalation->esc_step);
 					break;
 				default:
-					break;
+					;
 			}
 		}
 		else
 			zabbix_log(LOG_LEVEL_DEBUG, "Conditions do not match our event. Do not execute operation.");
-
-		zbx_free(operation.shortdata);
-		zbx_free(operation.longdata);
 
 		operations = 1;
 	}
@@ -612,7 +935,7 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 	{
 		escalation->status = (action->recovery_msg == 1) ? ESCALATION_STATUS_SLEEP : ESCALATION_STATUS_COMPLETED;
 	}
-       	else
+	else
 	{
 		if (0 == operations)
 		{
@@ -635,7 +958,7 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 			escalation->status = (action->recovery_msg == 1) ? ESCALATION_STATUS_SLEEP : ESCALATION_STATUS_COMPLETED;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of execute_operations()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *r_event, DB_ACTION *action)

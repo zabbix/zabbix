@@ -171,6 +171,8 @@ typedef enum {
 #define ALERT_SENDTO_LEN_MAX		ALERT_SENDTO_LEN+1
 #define ALERT_SUBJECT_LEN		255
 #define ALERT_SUBJECT_LEN_MAX		ALERT_SUBJECT_LEN+1
+#define ALERT_MESSAGE_LEN		65535
+#define ALERT_MESSAGE_LEN_MAX		ALERT_MESSAGE_LEN+1
 #define ALERT_ERROR_LEN			128
 #define ALERT_ERROR_LEN_MAX		ALERT_ERROR_LEN+1
 
@@ -398,15 +400,9 @@ typedef struct
 {
 	zbx_uint64_t	operationid;
 	zbx_uint64_t	actionid;
-	zbx_uint64_t	objectid;
-	zbx_uint64_t	mediatypeid;
-	char		*shortdata;
-	char		*longdata;
 	int		operationtype;
-	int		object;
 	int		esc_period;
-	int		default_msg;
-	int		evaltype;
+	unsigned char	evaltype;
 }
 DB_OPERATION;
 

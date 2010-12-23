@@ -50,7 +50,7 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 	int		ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' key:'%s'",
-			__function_name, item->host.host, item->interface.addr, item->key_orig);
+			__function_name, item->host.host, item->interface.addr, item->key);
 
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, item->interface.addr, item->interface.port, 0)))
 	{
