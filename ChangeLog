@@ -35,6 +35,11 @@ Changes for 1.9.0
 
 Changes for 1.8.4rc3
 
+ - [ZBX-3256] added automatic detection of fping command line option to use for specifying source IP address (asaveljevs)
+ - [ZBX-3333] fixed icmppingloss[] returning bad values when NIC bonding is used (asaveljevs)
+ - [ZBX-1985,ZBX-2394] fixed icmppingloss[] returning bad values when fping is capable of pinging both address families (asaveljevs)
+ - [ZBX-2825] fix after saving the profile it stays in the profile page (Vlad)
+ - [ZBX-1294] disabled GUI interface action elements for editing a templated trigger
  - [ZBX-3306] fixed minimal value limit for action escalation period (Vedmak)
  - [ZBX-3320] fixed host.create, template.create permission error for admin users (Vedmak)
  - [ZBX-266] made debugging output for Web scenarios more useful (Sasha)

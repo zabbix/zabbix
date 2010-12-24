@@ -2730,6 +2730,11 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 				$exprfname = 'expr_temp';
 				$exprtxt = new CTextBox($exprfname, $expr_temp, 65, 'yes');
 				$macrobtn = new CSubmit('insert_macro', S_INSERT_MACRO, 'return call_ins_macro_menu(event);');
+				//disabling button, if this trigger is templated
+				if($limited=='yes'){
+					$macrobtn->setAttribute('disabled', 'disabled');
+				}
+
 				$exprparam = "this.form.elements['$exprfname'].value";
 			}
 			else{
@@ -2749,6 +2754,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 								 "return PopUp('popup_trexpr.php?dstfrm=".$frmTrig->getName().
 								 "&dstfld1=${exprfname}&srctbl=expression".url_param('parent_discoveryid').
 								 "&srcfld1=expression&expression=' + escape($exprparam),1000,700);");
+		//disabling button, if this trigger is templated
 		if($limited=='yes'){
 			$add_expr_button->setAttribute('disabled', 'disabled');
 		}
@@ -2760,19 +2766,38 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		if($input_method == IM_TREE){
 			array_push($row, BR());
 			if(empty($outline)){
-				array_push($row, new CSubmit('add_expression', S_ADD, ""));
+
+				$tmpbtn = new CButton('add_expression', S_ADD, "");
+				if($limited=='yes'){
+					$tmpbtn->setAttribute('disabled', 'disabled');
+				}
+				array_push($row, $tmpbtn);
 			}
 			else{
-				array_push($row, new CSubmit('and_expression', S_AND_BIG, ""));
-				array_push($row, new CSubmit('or_expression', S_OR_BIG, ""));
-				array_push($row, new CSubmit('replace_expression', S_REPLACE, ""));
+				$tmpbtn = new CButton('and_expression', S_AND_BIG, "");
+				if($limited=='yes'){
+					$tmpbtn->setAttribute('disabled', 'disabled');
+				}
+				array_push($row, $tmpbtn);
+
+				$tmpbtn = new CButton('or_expression', S_OR_BIG, "");
+				if($limited=='yes'){
+					$tmpbtn->setAttribute('disabled', 'disabled');
+				}
+				array_push($row, $tmpbtn);
+
+				$tmpbtn = new CButton('replace_expression', S_REPLACE, "");
+				if($limited=='yes'){
+					$tmpbtn->setAttribute('disabled', 'disabled');
+				}
+				array_push($row, $tmpbtn);
 			}
 		}
 		$frmTrig->addVar('input_method', $input_method);
 		$frmTrig->addVar('toggle_input_method', '');
 		$exprtitle = array(S_EXPRESSION);
 
-		if($input_method != IM_FORCED && $limited != 'yes'){
+		if($input_method != IM_FORCED){
 			$btn_im = new CSpan(S_TOGGLE_INPUT_METHOD,'link');
 			$btn_im->setAttribute('onclick','javascript: '.
 								"document.getElementById('toggle_input_method').value=1;".
@@ -2790,18 +2815,24 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			$exp_table->setOddRowClass('even_row');
 			$exp_table->setEvenRowClass('even_row');
 
-			$exp_table->setHeader(array(S_TARGET, S_EXPRESSION, S_EXPRESSION_PART_ERROR, S_DELETE));
+			$exp_table->setHeader(array(($limited == 'yes' ? null : S_TARGET), S_EXPRESSION, S_EXPRESSION_PART_ERROR, ($limited == 'yes' ? null : S_DELETE)));
 
 			$allowedTesting = true;
 			if($eHTMLTree != null){
 				foreach($eHTMLTree as $i => $e){
-					$tgt_chk = new CCheckbox('expr_target_single', ($i==0) ? 'yes':'no', 'check_target(this);', $e['id']);
-					$del_url = new CSpan(S_DELETE,'link');
 
-					$del_url->setAttribute('onclick', 'javascript: if(confirm("'.S_DELETE_EXPRESSION_Q.'")) {'.
-									' delete_expression(\''.$e['id'] .'\');'.
-									' document.forms["config_triggers.php"].submit(); '.
-								'}');
+					if($limited != 'yes'){
+						$del_url = new CSpan(S_DELETE,'link');
+
+						$del_url->setAttribute('onclick', 'javascript: if(confirm("'.S_DELETE_EXPRESSION_Q.'")) {'.
+										' delete_expression(\''.$e['id'] .'\');'.
+										' document.forms["config_triggers.php"].submit(); '.
+									'}');
+						$tgt_chk = new CCheckbox('expr_target_single', ($i==0) ? 'yes':'no', 'check_target(this);', $e['id']);
+					}
+					else{
+						$tgt_chk = null;
+					}
 
 					if(!isset($e['expression']['levelErrors'])) {
 						$errorImg = new CImg('images/general/ok_icon.png', 'expression_no_errors');
@@ -2821,8 +2852,19 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 						$errorImg->setHint($errorTexts, '', 'left', false);
 					}
 
+					//if it is a templated trigger
+					if($limited == 'yes'){
+						//make all links inside inactive
+						for($i = 0; $i < count($e['list']); $i++){
+							if(gettype($e['list'][$i]) == 'object' && get_class($e['list'][$i]) == 'CSpan' && $e['list'][$i]->getAttribute('class') == 'link'){
+								$e['list'][$i]->setClass('');
+								$e['list'][$i]->setAttribute('onclick', '');
+							}
+						}
+					}
+
 					$errorCell = new CCol($errorImg, 'center');
-					$row = new CRow(array($tgt_chk, $e['list'], $errorCell, $del_url));
+					$row = new CRow(array($tgt_chk, $e['list'], $errorCell, (isset($del_url) ? $del_url : null)));
 					$exp_table->addRow($row);
 				}
 			}
