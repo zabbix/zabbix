@@ -19,29 +19,24 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/testGeneric.php');
-require_once(dirname(__FILE__).'/testClicks.php');
-require_once(dirname(__FILE__).'/testFormHost.php');
-require_once(dirname(__FILE__).'/testFormHostGroup.php');
-require_once(dirname(__FILE__).'/testFormProfile.php');
-require_once(dirname(__FILE__).'/testFormScreen.php');
-// ...
+require_once(dirname(__FILE__).'/class.ctest.php');
 
-class SeleniumTests
+class testFormScreen extends CTest
 {
-	public static function suite()
+	public $testscreen = 'Test Screen';
+
+	public function testFormScreen_Create()
 	{
-		$suite = new PHPUnit_Framework_TestSuite('selenium');
+		$this->chooseOkOnNextConfirmation();
 
-//		$suite->addTestSuite('testGeneric');
-//		$suite->addTestSuite('testClicks');
-		$suite->addTestSuite('testFormHost');
-		$suite->addTestSuite('testFormHostGroup');
-		$suite->addTestSuite('testFormProfile');
-		$suite->addTestSuite('testFormScreen');
-		// ...
-
-		return $suite;
+		$this->login('screenconf.php');
+		$this->button_click('form');
+		$this->wait();
+		$this->input_type('name',$this->testscreen);
+		$this->button_click('save');
+		$this->wait();
+		$this->ok('Screen added');
+		$this->logout();
 	}
 }
 ?>

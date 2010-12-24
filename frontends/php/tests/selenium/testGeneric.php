@@ -19,46 +19,10 @@
 **/
 ?>
 <?php
-require_once 'PHPUnit/Extensions/SeleniumTestCase.php';
+require_once(dirname(__FILE__).'/class.ctest.php');
 
-class testGeneric extends PHPUnit_Extensions_SeleniumTestCase
+class testGeneric extends CTest
 {
-	protected $captureScreenshotOnFailure = TRUE;
-	protected $screenshotPath = '/home/hudson/public_html/screenshots';
-	protected $screenshotUrl = 'http://hudson/~hudson/screenshots';
-
-	// List of strings that should NOT appear on any page
-	public $failIfExists = array (
-		"ZABBIX_ERROR",
-		"pg_query",
-		"Error in",
-		"expects parameter",
-		"Undefined index",
-		"Undefined variable",
-		"Undefined offset",
-		"Fatal error",
-		"Call to undefined method",
-		"Invalid argument supplied",
-		"Warning:",
-		"PHP notice",
-		"PHP warning",
-		"Use of undefined",
-		"You must login",
-		"DEBUG INFO",
-		"Cannot modify header"
-	);
-
-	// List of strings that SHOULD appear on every page
-	public $failIfNotExists = array (
-		"Help",
-		"Get support",
-		"Print",
-		"Profile",
-		"Logout",
-		"Connected",
-		"Admin"
-	);
-
 	public static function provider()
 	{
 		// List of URLs to test
@@ -160,35 +124,6 @@ class testGeneric extends PHPUnit_Extensions_SeleniumTestCase
 			array('search.php?search=server',	'Search'),
 			array('profile.php',	'User profile')
 		);
-	}
-
-	protected function setUp()
-	{
-		$this->setHost('localhost');
-		$this->setBrowser('*firefox');
-		$this->setBrowserUrl('http://hudson/~hudson/'.PHPUNIT_URL.'/frontends/php/');
-	}
-
-	public function login()
-	{
-		$this->open('index.php');
-		$this->waitForPageToLoad();
-		// Login if not logged in already
-		if($this->isElementPresent('link=Login'))
-		{
-			$this->click('link=Login');
-			$this->waitForPageToLoad();
-			$this->type('name','Admin');
-			$this->type('password','zabbix');
-			$this->click('enter');
-			$this->waitForPageToLoad();
-		}
-	}
-
-	public function logout()
-	{
-		$this->click('link=Logout');
-		$this->waitForPageToLoad();
 	}
 
 	/**
