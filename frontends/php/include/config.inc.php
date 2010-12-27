@@ -222,6 +222,8 @@ function __autoload($class_name){
 			$locale_found = false;
 			foreach($locales as $locale){
 				putenv('LC_ALL='.$locale);
+				putenv('LANG='.$locale);
+				putenv('LANGUAGE='.$locale);
 
 				if(setlocale(LC_ALL, $locale)){
 					$locale_found = true;
