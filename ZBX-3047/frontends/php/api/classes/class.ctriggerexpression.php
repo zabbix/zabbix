@@ -13,7 +13,7 @@ private $allowed;
 
 	public function __construct($trigger){
 		$this->initializeVars();
-		$this->parseExpression(' '.$trigger['expression'].' ');
+		$this->parseExpression($trigger['expression']);
 	}
 
 	public function parseExpression($expression){
