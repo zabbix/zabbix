@@ -35,7 +35,6 @@ class testFormHost extends CTest
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('Host added');
-		$this->logout();
 	}
 
 	public function testFormHost_SimpleUpdate()
@@ -47,7 +46,6 @@ class testFormHost extends CTest
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('Host updated');
-		$this->logout();
 	}
 
 	public function testFormHost_UpdateHostName()
@@ -61,7 +59,6 @@ class testFormHost extends CTest
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('Host updated');
-		$this->logout();
 	}
 
 	public function testFormHost_Delete()
@@ -77,7 +74,6 @@ class testFormHost extends CTest
 		$this->wait();
 		$this->getConfirmation();
 		$this->ok('Host deleted');
-		$this->logout();
 	}
 
 	public function testFormHost_CloneHost()
@@ -93,7 +89,6 @@ class testFormHost extends CTest
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('Host added');
-		$this->logout();
 	}
 
 	public function testFormHost_DeleteClonedHost()
@@ -109,7 +104,6 @@ class testFormHost extends CTest
 		$this->wait();
 		$this->getConfirmation();
 		$this->ok('Host deleted');
-		$this->logout();
 	}
 }
 ?>

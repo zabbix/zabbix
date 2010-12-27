@@ -47,7 +47,6 @@ class testPageHosts extends CTest
 		$this->dropdown_select('go','Activate selected');
 		$this->dropdown_select('go','Disable selected');
 		$this->dropdown_select('go','Delete selected');
-		$this->logout();
 	}
 
 	public function testPageHosts_FilterZabbixServer()
@@ -60,7 +59,6 @@ class testPageHosts extends CTest
 		$this->click('filter');
 		$this->wait();
 		$this->ok('Zabbix server');
-		$this->logout();
 	}
 
 	// Filter returns nothing
@@ -72,7 +70,6 @@ class testPageHosts extends CTest
 		$this->click('filter');
 		$this->wait();
 		$this->ok('Displaying 0 of 0 found');
-		$this->logout();
 	}
 
 	// Filter reset
@@ -81,7 +78,6 @@ class testPageHosts extends CTest
 		$this->login('hosts.php');
 		$this->click('css=span.link_menu');
 		$this->ok('Zabbix server');
-		$this->logout();
 	}
 }
 ?>
