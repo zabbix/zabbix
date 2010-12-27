@@ -1984,7 +1984,7 @@
 		else {
 			return array(
 				false,   //is key valid?
-				sprintf(S_INVALID_CHARECTER_AT_POSITION, $characters[$current_char], $current_char) //result description
+				sprintf(S_INVALID_CHARACTER_AT_POSITION, $characters[$current_char], $current_char) //result description
 			);
 		}
 
