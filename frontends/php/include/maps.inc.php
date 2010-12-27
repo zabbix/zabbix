@@ -577,9 +577,9 @@
  *
  */
 	function expand_map_element_label_by_data($db_element, $link = null){
-		$label = (null != $db_element) ? $db_element['label'] : $link['label'];
+		$label = !is_null($db_element) ? $db_element['label'] : $link['label'];
 
-		if (null != $db_element){
+		if(!is_null($db_element)){
 			switch($db_element['elementtype']){
 			case SYSMAP_ELEMENT_TYPE_HOST:
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
@@ -589,16 +589,16 @@
 						zbx_strstr($label, '{HOST.CONN}'))
 				{
 					if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST){
-						  $sql =	'SELECT i.*, h.host '.
-							  ' FROM interface i,hosts h '.
-							  ' WHERE i.hostid=h.hostid '.
-							  	' AND i.hostid='.$db_element['elementid'];
+						  $sql = 'SELECT hi.*, h.host '.
+								' FROM interface hi,hosts h '.
+								' WHERE hi.hostid=h.hostid '.
+									' AND hi.hostid='.$db_element['elementid'];
 					}
 					else if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER)
-						$sql =	'SELECT h.*, h2.host '.
-							' FROM interface h,items i,functions f,hosts h2 '.
-							' WHERE h2.hostid=h.hostid '.
-							  ' AND h.hostid=i.hostid '.
+						$sql =	'SELECT hi.*, h.host '.
+							' FROM interface hi,items i,functions f,hosts h '.
+							' WHERE h.hostid=hi.hostid '.
+								' AND hi.hostid=i.hostid '.
 								' AND i.itemid=f.itemid '.
 								' AND f.triggerid='.$db_element['elementid'];
 					else{
@@ -715,16 +715,15 @@
 			$function = $matches['func'][$num];
 			$parameter = $matches['param'][$num];
 
-			$options = array(
+			$db_items = CItem::get(array(
 				'filter' => array(
 					'host' => $host,
 					'key_' => $key,
 					'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED),
 				),
 				'output' => API_OUTPUT_EXTEND
-			);
-			$db_item = CItem::get($options);
-			$db_item = reset($db_item);
+			));
+			$db_item = reset($db_items);
 
 			if(!$db_item){
 				$label = str_replace($expr, '???', $label);
