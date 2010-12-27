@@ -1,4 +1,4 @@
-<div id="scriptDialog" style="display:none; white-space: pre;"></div>
+<div id="scriptDialog" style="display:none; white-space: normal;"></div>
 
 <script type="text/javascript">
 function executeScript(hostid, scriptid, question){
