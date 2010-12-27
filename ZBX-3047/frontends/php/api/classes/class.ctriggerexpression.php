@@ -21,30 +21,27 @@ private $allowed;
 		$symbolNum = 0;
 
 		try{
-			if(zbx_empty($expression))
+			if(zbx_empty(trim($expression)))
 				throw new Exception('Empty expression.');
 
-			if(!$this->startExpression($expression))
+// Check expr start symbol
+			$startSymbol = zbx_substr(trim($expression), 0, 1);
+			if(($startSymbol != '(') && ($startSymbol != '{') && !zbx_ctype_digit($startSymbol))
 				throw new Exception('Incorrect trigger expression.');
+
 
 			for($symbolNum = 0; $symbolNum < $length; $symbolNum++){
 				$symbol = zbx_substr($expression, $symbolNum, 1);
 // SDI($symbol);
-
 				$this->detectOpenParts($this->previous['last']);
 				$this->detectCloseParts($symbol);
 // SDII($this->currExpr);
- 
 				if($this->inParameter($symbol)){
 					$this->setPreviousSymbol($symbol);
 					continue;
 				}
 
-				$this->checkSymbolPrevious($symbol);
-				$this->checkSymbolClose($symbol);
 				$this->checkSymbolSequence($symbol);
-
-// set sequence of symbols
 				$this->setPreviousSymbol($symbol);
 // SDII($this->symbols);
 			}
@@ -55,19 +52,12 @@ private $allowed;
 		catch(Exception $e){
 			$symbolNum = ($symbolNum > 0) ? --$symbolNum : $symbolNum;
 
-			$error = $e->getMessage();
-			$this->errors[] = $error;
+			$this->errors[] = $e->getMessage();
 			$this->errors[] = 'Check expression part starting from " '.zbx_substr($expression, $symbolNum).' "';
 		}
 	}
 
 // PRIVATE --------------------------------------------------------------------------------------------
-	private function startExpression($expression){
-		$expression = trim($expression);
-		$startSymbol = zbx_substr($expression, 0, 1);
-		return (($startSymbol == '(') || ($startSymbol == '{') || zbx_ctype_digit($startSymbol));
-	}
-
 	private function isSlashed($pre=false){
 		if($pre)
 			return (($this->previous['prelast'] == '\\') && ($this->previous['sequence'] % 2 == 1));
@@ -113,45 +103,23 @@ private $allowed;
 	return false;
 	}
 
-	private function checkSymbolClose($symbol){
-		if(!isset($this->symbols['close'][$symbol])) return true;
+	private function checkSymbolSequence($symbol){
+// Check close symbols
+		if(($symbol == '}') && ($this->symbols['open']['{'] <= $this->symbols['close']['}']))
+			throw new Exception('Incorrect closing curly braces in trigger expression.');
 
-		switch($symbol){
-			case '}':
-				if($this->symbols['open']['{'] <= $this->symbols['close']['}'])
-					throw new Exception('Incorrect closing curly braces in trigger expression.');
-				break;
-			case ')':
-				if($this->symbols['open']['('] <= $this->symbols['close'][')'])
-					throw new Exception('Incorrect closing parenthesis in trigger expression.');
-				break;
-			default:
-				return true;
-		}
-	}
+		if(($symbol == ')') && ($this->symbols['open']['('] <= $this->symbols['close'][')']))
+			throw new Exception('Incorrect closing parenthesis in trigger expression.');
 
-	private function checkSymbolPrevious($symbol){
-		if(!isset($this->symbols['linkage'][$symbol])) return;
-
-		if(isset($this->symbols['linkage'][$symbol]) &&
-			isset($this->symbols['linkage'][$this->previous['lastNoSpace']]))
-		{
+// check symbol sequence
+		if(isset($this->symbols['linkage'][$symbol]) && isset($this->symbols['linkage'][$this->previous['lastNoSpace']])){
 			throw new Exception('Incorrect symbol sequence in trigger expression.');
 		}
-	}
 
-	private function checkSymbolSequence($symbol){
-// watch for closing brakets
 		if(isset($this->symbols['close'][$symbol])) $this->symbols['close'][$symbol]++;
 		if(isset($this->symbols['open'][$symbol])) $this->symbols['open'][$symbol]++;
 		if(isset($this->symbols['expr'][$symbol])) $this->symbols['expr'][$symbol]++;
 		if(isset($this->symbols['linkage'][$symbol])) $this->symbols['linkage'][$symbol]++;
-
-		if($this->currExpr['part']['expression']){
-			if(($symbol == '"') && !$this->currExpr['part']['itemParam'] && !$this->currExpr['part']['functionParam']){
-				throw new Exception('Incorrect symbol sequence in trigger expression');
-			}
-		}
 	}
 
 	private function checkOverallExpression($expression){
