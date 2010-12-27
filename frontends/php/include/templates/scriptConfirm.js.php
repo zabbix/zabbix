@@ -11,6 +11,7 @@ function executeScript(hostid, scriptid, question){
 	}
 	else{
 		jQuery('#scriptDialog').html(question);
+		var w = jQuery('#scriptDialog').outerWidth()+20;
 
 		jQuery('#scriptDialog').dialog({
 			buttons: [
@@ -24,10 +25,9 @@ function executeScript(hostid, scriptid, question){
 			],
 			draggable: false,
 			modal: true,
-			width: jQuery('#scriptDialog').outerWidth()+20,
+			width: (w > 600 ? 600 : w),
 			resizable: false,
 			minWidth: 200,
-			maxWidth: 600,
 			minHeight: 100,
 			title: '<?php echo _('Execution confirmation');?>'
 		});
