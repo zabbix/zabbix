@@ -118,7 +118,7 @@
 	//whether we should use screen name to fetch a screen (if this is false, elementid is used)
 	$use_screen_name = isset($_REQUEST['screenname']);
 
-	//getiing element id from GET paramters
+	// getting element id from GET parameters
 	$elementid = $_REQUEST['elementid'] = get_request('elementid', false);
 	//if none is provided
 	if ($elementid === false && !$use_screen_name) {
