@@ -422,8 +422,8 @@ function menu_item (o_parent, n_order) {
 	eldiv.className = this.getstyle(1, 0);
 
 	//truncating long strings - they don't fit in the popup menu'
-	if(typeof(this.a_config[0])=='string' && this.a_config[0].length > 20){
-		eldiv.innerHTML = this.a_config[0].substring(0, 20) + '...';
+	if(typeof(this.a_config[0])=='string' && this.a_config[0].length > 40){
+		eldiv.innerHTML = this.a_config[0].substring(0, 40) + '...';
 		eldiv.setAttribute('title', this.a_config[0]);
 	}
 	else{
