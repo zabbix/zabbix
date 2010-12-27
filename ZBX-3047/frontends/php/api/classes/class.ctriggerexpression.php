@@ -38,7 +38,7 @@ private $allowed;
 					$this->setPreviousSymbol($symbol);
 					continue;
 				}
-
+ 
 				$this->checkSymbolPrevious($symbol);
 				$this->checkSymbolClose($symbol);
 				$this->checkSymbolSequence($symbol);
@@ -343,6 +343,12 @@ private $allowed;
 			$this->currExpr['part']['host'] = false;
 			$this->currExpr['part']['item'] = true;
 		}
+
+		if($symbol == ']'){
+			if(!$this->inParameter() && !$this->currExpr['part']['item'])
+				throw new Exception('Unexpected Square Bracket symbol in trigger expression.');
+		}
+
 	}
 
 	private function detectFunction($symbol){
@@ -351,6 +357,7 @@ private $allowed;
 			if(!$this->currExpr['part']['item']) return;
 
 			$this->currExpr['part']['item'] = false;
+			$this->currExpr['part']['itemParam'] = false;
 			$this->currExpr['part']['function'] = true;
 			$this->currExpr['part']['functionParam'] = true;
 
@@ -359,6 +366,13 @@ private $allowed;
 			$this->currExpr['object']['functionName'] = substr($this->currExpr['object']['item'],$lastDot+1);
 			$this->currExpr['object']['function'] = substr($this->currExpr['object']['item'],$lastDot+1);
 			$this->currExpr['object']['item'] = substr($this->currExpr['object']['item'],0,$lastDot);
+		}
+
+		if((($symbol != ' ') && ($symbol != ')')) &&
+			$this->currExpr['part']['function'] &&
+			!$this->currExpr['part']['functionParam'])
+		{
+			throw new Exception('Unexpected symbol "'.$symbol.'" in trigger function.');
 		}
 	}
 
@@ -524,6 +538,7 @@ private $allowed;
 // no need to close function part, it will be closed by expression end symbol
 //					$this->currExpr['part']['function'] = false;
 					$this->currExpr['part']['functionParam'] = false;
+
 					$this->currExpr['params']['count'] = 0;
 					$this->currExpr['params']['comma'] = 0;
 				}
@@ -534,12 +549,14 @@ private $allowed;
 	private function writeParts($symbol){
 		if($this->currExpr['part']['expression'])
 			$this->currExpr['object']['expression'] .= $symbol;
-
+		
 		if($this->currExpr['part']['usermacro'])
 			$this->currExpr['object']['usermacro'] .= $symbol;
 
 		if($this->currExpr['part']['host'])
 			$this->currExpr['object']['host'] .= $symbol;
+
+		if(($symbol == ' ') && !$this->inParameter()) return;
 
 		if($this->currExpr['part']['item'])
 			$this->currExpr['object']['item'] .= $symbol;
