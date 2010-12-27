@@ -165,6 +165,8 @@ src/zabbix_get/.deps
 src/zabbix_get/Makefile
 src/zabbix_get/Makefile.in
 src/zabbix_get/zabbix_get
+src/zabbix_java/cls
+src/zabbix_java/sbin/ZabbixJavaProxy.jar
 src/zabbix_proxy/.deps
 src/zabbix_proxy/Makefile
 src/zabbix_proxy/Makefile.in
