@@ -484,7 +484,7 @@ msgstr ""
 
 #: ../api/classes/class.chostinterface.php:528
 #, php-format
-msgid "Incorrect interface DNS paramter \" %1$s \" provided."
+msgid "Incorrect interface DNS parameter \" %1$s \" provided."
 msgstr ""
 
 #: ../api/classes/class.chostinterface.php:537
