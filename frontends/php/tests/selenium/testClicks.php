@@ -96,45 +96,6 @@ class testClicks extends CTest
 	/**
 	* @dataProvider provider
 	*/
-	public function atestTitles($a, $b)
-	{
-		$this->login();
-		$this->open($a);
-		$this->assertTitle($b);
-		$this->logout();
-	}
-
-	/**
-	* @dataProvider provider
-	*/
-	public function atestNotExists($a,$b)
-	{
-		$this->login();
-		$this->open($a);
-		foreach($this->failIfExists as $str)
-		{
-			$this->assertTextNotPresent($str,'assertTextNotPresent('.$a.','.$str.')');
-		}
-		$this->logout();
-	}
-
-	/**
-	* @dataProvider provider
-	*/
-	public function atestExists($a,$b)
-	{
-		$this->login();
-		$this->open($a);
-		foreach($this->failIfNotExists as $str)
-		{
-			$this->assertTextPresent($str,'assertTextPresent('.$a.','.$str.')');
-		}
-		$this->logout();
-	}
-
-	/**
-	* @dataProvider provider
-	*/
 	public function testClick($url,$clicks,$title,$expected)
 	{
 		$this->login();

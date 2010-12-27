@@ -39,7 +39,6 @@ class testPageDashboard extends CTest
 		$this->ok('Last 20 issues');
 		$this->ok('Web monitoring');
 		$this->ok('Updated:');
-		$this->logout();
 	}
 }
 ?>
