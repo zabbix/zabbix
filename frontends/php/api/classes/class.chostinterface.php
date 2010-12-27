@@ -525,7 +525,7 @@ Copt::memoryPick();
 					&& !preg_match('/^'.ZBX_PREG_MACRO_NAME_FORMAT.'$/u', $interface['dns'])
 					&& !preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/u', $interface['dns']))
 				{
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect interface DNS paramter " %1$s " provided.', $interface['dns']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect interface DNS parameter " %1$s " provided.', $interface['dns']));
 				}
 			}
 
