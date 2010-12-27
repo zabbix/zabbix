@@ -90,7 +90,7 @@ function __autoload($class_name){
 // ABC sorting
 	require_once('include/acknow.inc.php');
 	include_once('include/actions.inc.php');
-	include_once('include/discovery.inc.php');	
+	include_once('include/discovery.inc.php');
 	require_once('include/events.inc.php');
 	require_once('include/graphs.inc.php');
 	require_once('include/hosts.inc.php');
@@ -556,7 +556,7 @@ function __autoload($class_name){
 			if(isset($USER_DETAILS['debug_mode']) && !is_object($msg) && !$USER_DETAILS['debug_mode']){
 				$msg = preg_replace('/^\[.+?::.+?\]/', '', $msg);
 			}
-			array_push($ZBX_MESSAGES, array('type' => 'error', 'message' => '[ZABBIX_ERROR] '.$msg));
+			array_push($ZBX_MESSAGES, array('type' => 'error', 'message' => $msg));
 		}
 	}
 
