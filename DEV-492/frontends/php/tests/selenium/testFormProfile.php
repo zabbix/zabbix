@@ -23,6 +23,22 @@ require_once(dirname(__FILE__).'/class.ctest.php');
 
 class testFormProfile extends CTest
 {
+	public $oldHash;
+
+	public function hashUsersExcept($user)
+	{
+		$this->oldHash=$this->DBhash("select * from users where alias<>'$user'");
+	}
+
+	protected function assertPreConditions()
+	{
+		$this->oldHash=$this->hashUsersExcept('Admin');
+	}
+
+	protected function assertPostConditions()
+	{
+	}
+
 	public function testFormProfile_SimpleUpdate()
 	{
 		$this->login('profile.php');
@@ -32,6 +48,8 @@ class testFormProfile extends CTest
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('Copyright');
+
+		$this->assertEquals($this->oldHash,$this->hashUsersExcept('Admin'));
 	}
 
 	public function testFormProfile_Cancel()
@@ -43,7 +61,28 @@ class testFormProfile extends CTest
 		$this->ok('Copyright');
 	}
 
-	public function testFormProfile_PasswordChange()
+	public function testFormProfile_PasswordChange1()
+	{
+		$pwd="'\'$\"\"!$@$#^%$+-=~`\`\\";
+
+		$this->login('profile.php');
+
+		$this->button_click('change_password');
+		$this->wait();
+		$this->input_type('password1',$pwd);
+		$this->input_type('password2',$pwd);
+
+		$this->button_click('save');
+		$this->wait();
+		$this->ok('Copyright');
+
+		$row=DBfetch(DBselect("select passwd from users where alias='Admin'"));
+		$this->assertEquals(md5($pwd),$row['passwd']);
+
+		$this->assertEquals($this->oldHash,$this->hashUsersExcept('Admin'));
+	}
+
+	public function testFormProfile_PasswordChange2()
 	{
 		$this->login('profile.php');
 
@@ -55,6 +94,8 @@ class testFormProfile extends CTest
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('Copyright');
+
+		$this->assertEquals($this->oldHash,$this->hashUsersExcept('Admin'));
 	}
 
 	public function testFormProfile_EmptyPasswords()
@@ -70,6 +111,8 @@ class testFormProfile extends CTest
 		$this->wait();
 		$this->ok('ERROR: Password should not be empty');
 		$this->assertTitle('User profile');
+
+		$this->assertEquals($this->oldHash,$this->hashUsersExcept('Admin'));
 	}
 
 	public function testFormProfile_DifferentPasswords()
@@ -89,12 +132,19 @@ class testFormProfile extends CTest
 
 	public function testFormProfile_ThemeChange()
 	{
+		global $DB;
+
 		$this->login('profile.php');
 
 		$this->dropdown_select('theme','Original blue');
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('Copyright');
+
+		$row=DBfetch(DBselect("select theme from users where alias='Admin'"));
+		$this->assertEquals('css_ob.css',$row['theme']);
+
+		$this->assertEquals($this->oldHash,$this->hashUsersExcept('Admin'));
 	}
 
 	public function testFormProfile_AutologinSet()
@@ -105,6 +155,26 @@ class testFormProfile extends CTest
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('Copyright');
+
+		$row=DBfetch(DBselect("select autologin from users where alias='Admin'"));
+		$this->assertEquals(1,$row['autologin']);
+
+		$this->assertEquals($this->oldHash,$this->hashUsersExcept('Admin'));
+	}
+
+	public function testFormProfile_AutologinUnSet()
+	{
+		$this->login('profile.php');
+
+		$this->checkbox_unselect('autologin');
+		$this->button_click('save');
+		$this->wait();
+		$this->ok('Copyright');
+
+		$row=DBfetch(DBselect("select autologin from users where alias='Admin'"));
+		$this->assertEquals(0,$row['autologin']);
+
+		$this->assertEquals($this->oldHash,$this->hashUsersExcept('Admin'));
 	}
 }
 ?>

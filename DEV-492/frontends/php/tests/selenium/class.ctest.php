@@ -19,7 +19,14 @@
 **/
 ?>
 <?php
+
 require_once 'PHPUnit/Extensions/SeleniumTestCase.php';
+
+require_once '../../conf/zabbix.conf.php';
+
+require_once '../../include/copt.lib.php';
+require_once '../../include/func.inc.php';
+require_once '../../include/db.inc.php';
 
 class CTest extends PHPUnit_Extensions_SeleniumTestCase
 {
@@ -60,9 +67,58 @@ class CTest extends PHPUnit_Extensions_SeleniumTestCase
 
 	protected function setUp()
 	{
+		global $DB;
+
 		$this->setHost('localhost');
 		$this->setBrowser('*firefox');
 		$this->setBrowserUrl('http://hudson/~hudson/'.PHPUNIT_URL.'/frontends/php/');
+
+/*		if(!DBConnect($error))
+		{
+			$this->assertTrue(FALSE,'Unable to connect to the database:'.$error);
+			exit;
+		}*/
+
+		// Connect once, do not reconnect
+		if(!isset($DB['DB'])) DBConnect($error);
+	}
+
+	protected function tearDown()
+	{
+// Do not close DB for better performance
+//		DBclose();
+	}
+
+	protected function DBhash($sql)
+	{
+		global $DB;
+
+		$hash = '';
+
+		$result=DBselect($sql);
+		while($row = DBfetch($result))
+		{
+			foreach($row as $key => $value)
+			{
+				$hash = md5($hash.$value);
+			}
+		}
+
+		return $hash;
+	}
+
+	protected function DBcount($sql)
+	{
+		global $DB;
+		$cnt=0;
+
+		$result=DBselect($sql);
+		while($row = DBfetch($result))
+		{
+			$cnt++;
+		}
+
+		return $cnt;
 	}
 
 	public function login($url = NULL)
@@ -112,7 +168,12 @@ class CTest extends PHPUnit_Extensions_SeleniumTestCase
 
 	public function checkbox_select($a)
 	{
-		$this->click($a);
+		if(!$this->isChecked($a)) $this->click($a);
+	}
+
+	public function checkbox_unselect($a)
+	{
+		if($this->isChecked($a)) $this->click($a);
 	}
 
 	public function input_type($id,$str)

@@ -34,6 +34,7 @@ class testFormHost extends CTest
 		$this->input_type('host',$this->host);
 		$this->button_click('save');
 		$this->wait();
+		$this->assertTitle('Hosts');
 		$this->ok('Host added');
 	}
 
@@ -45,6 +46,7 @@ class testFormHost extends CTest
 		$this->wait();
 		$this->button_click('save');
 		$this->wait();
+		$this->assertTitle('Hosts');
 		$this->ok('Host updated');
 	}
 
@@ -58,6 +60,7 @@ class testFormHost extends CTest
 		$this->input_type('host',$this->host.'2');
 		$this->button_click('save');
 		$this->wait();
+		$this->assertTitle('Hosts');
 		$this->ok('Host updated');
 	}
 
@@ -73,6 +76,7 @@ class testFormHost extends CTest
 		$this->button_click('delete');
 		$this->wait();
 		$this->getConfirmation();
+		$this->assertTitle('Hosts');
 		$this->ok('Host deleted');
 	}
 
@@ -88,6 +92,7 @@ class testFormHost extends CTest
 		$this->input_type('host',$this->host.'2');
 		$this->button_click('save');
 		$this->wait();
+		$this->assertTitle('Hosts');
 		$this->ok('Host added');
 	}
 
@@ -103,6 +108,39 @@ class testFormHost extends CTest
 		$this->button_click('delete');
 		$this->wait();
 		$this->getConfirmation();
+		$this->assertTitle('Hosts');
+		$this->ok('Host deleted');
+	}
+
+	public function testFormHost_FullCloneHost()
+	{
+		// Update Host
+		$this->login('hosts.php');
+		$this->dropdown_select('groupid','all');
+		$this->click('link=Zabbix server');
+		$this->wait();
+		$this->button_click('full_clone');
+		$this->wait();
+		$this->input_type('host',$this->host.'_fullclone');
+		$this->button_click('save');
+		$this->wait();
+		$this->assertTitle('Hosts');
+		$this->ok('Host added');
+	}
+
+	public function testFormHost_DeleteFullClonedHost()
+	{
+		$this->chooseOkOnNextConfirmation();
+
+		// Delete Host
+		$this->login('hosts.php');
+		$this->dropdown_select('groupid','all');
+		$this->click('link='.$this->host.'_fullclone');
+		$this->wait();
+		$this->button_click('delete');
+		$this->wait();
+		$this->getConfirmation();
+		$this->assertTitle('Hosts');
 		$this->ok('Host deleted');
 	}
 }
