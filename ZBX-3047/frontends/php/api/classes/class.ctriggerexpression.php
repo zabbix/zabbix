@@ -243,11 +243,15 @@ private $allowed;
 	}
 
 	private function checkSimpleExpression(&$expression){
-		$expression = preg_replace('/([\-\+]?\d+\.\d+)/u', '{expression}', $expression);
-		$expression = preg_replace("/([\-\+]?\d+)/u", '{expression}', $expression);
-
-		$simpleExpr = str_replace('{expression}','1',$expression);
+		$expression = preg_replace("/(\d+(\.\d+)?[KMGTsmhdw]?)/u", '{expression}', $expression);
+		$expression = preg_replace("/(\([\-\+]?\{expression\}\))/u", '{expression}', $expression);
+// SDI($expression);
+		$simpleExpr = str_replace(' ','',$expression);
+		$simpleExpr = str_replace('{expression}','1',$simpleExpr);
 // SDI($simpleExpr);
+
+		if(strpos($simpleExpr,'11') !== false)
+			throw new Exception('Incorrect trigger expression format " '.$expression.' "');
 
 		$linkageCount = 0;
 		$linkageExpr = '';
