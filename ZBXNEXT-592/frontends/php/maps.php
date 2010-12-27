@@ -36,7 +36,7 @@
 include_once('include/page_header.php');
 
 // js templates
-require_once('include/templates/maps.js.php');
+require_once('include/templates/scriptConfirm.js.php');
 
 ?>
 <?php

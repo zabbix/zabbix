@@ -1,8 +1,6 @@
 <div id="scriptDialog" style="display:none; white-space: pre;"></div>
 
-
 <script type="text/javascript">
-
 function executeScript(hostid, scriptid, question){
 	var execute = function(){
 		openWinCentered('scripts_exec.php?execute=1&hostid='+hostid+'&scriptid='+scriptid, 'Tools', 760, 540, "titlebar=no, resizable=yes, scrollbars=yes, dialog=no");

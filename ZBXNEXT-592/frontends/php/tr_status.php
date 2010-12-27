@@ -36,6 +36,8 @@ if($page['type'] == PAGE_TYPE_HTML){
 
 include_once('include/page_header.php');
 
+// js templates
+require_once('include/templates/scriptConfirm.js.php');
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -432,7 +434,7 @@ include_once('include/page_header.php');
 			$used_hosts[$th['hostid']] = $th['host'];
 		}
 		$used_host_count = count($used_hosts);
-		
+
 		foreach($trigger['items'] as $inum => $item){
 			$item_description = item_description($item);
 
@@ -536,8 +538,14 @@ include_once('include/page_header.php');
 			if(isset($scripts_by_hosts[$trigger_host['hostid']])){
 				foreach($scripts_by_hosts[$trigger_host['hostid']] as $id => $script){
 					$script_nodeid = id2nodeid($script['scriptid']);
-					if( (bccomp($host_nodeid, $script_nodeid ) == 0))
-						$menus.= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$trigger_host['hostid']."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+					if( (bccomp($host_nodeid, $script_nodeid ) == 0)){
+						$str_tmp = zbx_jsvalue('javascript: executeScript('.$trigger_host['hostid'].', '.
+								$script['scriptid'].', '.
+								zbx_jsvalue($script['question']).
+								')');
+
+						$menus.= "[".zbx_jsvalue($script['name']).", ".$str_tmp.", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+					}
 				}
 			}
 			if(!empty($scripts_by_hosts)){
@@ -618,7 +626,7 @@ include_once('include/page_header.php');
 		$severity_col = new CCol(get_severity_description($trigger['priority']), get_severity_style($trigger['priority'], $trigger['value']));
 		if($show_event_col) $severity_col->setColSpan(2);
 
-		
+
 // Unknown triggers
 		$unknown = SPACE;
 		if($trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN){
