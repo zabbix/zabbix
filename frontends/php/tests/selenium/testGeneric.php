@@ -134,7 +134,6 @@ class testGeneric extends CTest
 		$this->login();
 		$this->open($a);
 		$this->assertTitle($b);
-		$this->logout();
 	}
 
 	/**
@@ -148,7 +147,6 @@ class testGeneric extends CTest
 		{
 			$this->assertTextNotPresent($str,'assertTextNotPresent('.$a.','.$str.')');
 		}
-		$this->logout();
 	}
 
 	/**
@@ -162,7 +160,6 @@ class testGeneric extends CTest
 		{
 			$this->assertTextPresent($str,'assertTextPresent('.$a.','.$str.')');
 		}
-		$this->logout();
 	}
 }
 ?>

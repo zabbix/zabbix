@@ -27,11 +27,11 @@ class testFormProfile extends CTest
 	{
 		$this->login('profile.php');
 
+		$this->assertTitle('User profile');
+
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('Copyright');
-
-		$this->logout();
 	}
 
 	public function testFormProfile_Cancel()
@@ -41,8 +41,6 @@ class testFormProfile extends CTest
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('Copyright');
-
-		$this->logout();
 	}
 
 	public function testFormProfile_PasswordChange()
@@ -57,8 +55,36 @@ class testFormProfile extends CTest
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('Copyright');
+	}
 
-		$this->logout();
+	public function testFormProfile_EmptyPasswords()
+	{
+		$this->login('profile.php');
+
+		$this->button_click('change_password');
+		$this->wait();
+		$this->input_type('password1','');
+		$this->input_type('password2','');
+
+		$this->button_click('save');
+		$this->wait();
+		$this->ok('ERROR: Password should not be empty');
+		$this->assertTitle('User profile');
+	}
+
+	public function testFormProfile_DifferentPasswords()
+	{
+		$this->login('profile.php');
+
+		$this->button_click('change_password');
+		$this->wait();
+		$this->input_type('password1','abc');
+		$this->input_type('password2','def');
+
+		$this->button_click('save');
+		$this->wait();
+		$this->ok('ERROR: Cannot update user. Both passwords must be equal.');
+		$this->assertTitle('User profile');
 	}
 
 	public function testFormProfile_ThemeChange()
@@ -69,8 +95,6 @@ class testFormProfile extends CTest
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('Copyright');
-
-		$this->logout();
 	}
 
 	public function testFormProfile_AutologinSet()
@@ -81,60 +105,6 @@ class testFormProfile extends CTest
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('Copyright');
-
-		$this->logout();
-	}
-
-	public function atestFormHostGroup()
-	{
-		$name='Test Group';
-
-		$this->chooseOkOnNextConfirmation();
-
-		$this->login();
-		// Create Host Group
-		$this->open('hostgroups.php');
-		$this->waitForPageToLoad();
-		$this->click('form');
-		$this->waitForPageToLoad();
-		$this->type('gname',$name);
-		$this->click('save');
-		$this->waitForPageToLoad();
-		// Update Host Group
-		$this->login();
-		$this->open('hostgroups.php');
-		$this->waitForPageToLoad();
-		$this->click("link=$name");
-		$this->waitForPageToLoad();
-		$this->type('gname',$name.'2');
-		$this->click('save');
-		$this->waitForPageToLoad();
-		// Delete Host Group
-		$this->open('hostgroups.php');
-		$this->waitForPageToLoad();
-		$this->click("link=$name".'2');
-		$this->waitForPageToLoad();
-		$this->click('delete');
-		$this->waitForPageToLoad();
-		$this->getConfirmation();
-		$this->logout();
-	}
-
-	public function atestFormScreen()
-	{
-		$name='Test Screen';
-
-		$this->chooseOkOnNextConfirmation();
-
-		$this->login();
-		// Create Screen
-		$this->open('screenconf.php');
-		$this->waitForPageToLoad();
-		$this->click('form');
-		$this->waitForPageToLoad();
-		$this->type('name',$name);
-		$this->click('save');
-		$this->waitForPageToLoad();
 	}
 }
 ?>

@@ -36,7 +36,6 @@ class testFormScreen extends CTest
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('Screen added');
-		$this->logout();
 	}
 }
 ?>
