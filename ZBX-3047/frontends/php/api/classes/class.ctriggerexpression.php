@@ -116,11 +116,11 @@ private $allowed;
 		switch($symbol){
 			case '}':
 				if($this->symbols['open']['{'] <= $this->symbols['close']['}'])
-					throw new Exception('Incorrect closing curly braces in trigger expression');
+					throw new Exception('Incorrect closing curly braces in trigger expression.');
 				break;
 			case ')':
 				if($this->symbols['open']['('] <= $this->symbols['close'][')'])
-					throw new Exception('Incorrect closing parenthesis in trigger expression');
+					throw new Exception('Incorrect closing parenthesis in trigger expression.');
 				break;
 			default:
 				return true;
@@ -130,9 +130,10 @@ private $allowed;
 	private function checkSymbolPrevious($symbol){
 		if(!isset($this->symbols['linkage'][$symbol])) return;
 
-		if(isset($this->symbols['linkage'][$symbol]) && ($this->previous['last'] == $symbol)){
-			if($symbol != '-' && $symbol != '+')
-				throw new Exception('Incorrect symbol sequence in trigger expression 2');
+		if(isset($this->symbols['linkage'][$symbol]) && 
+			isset($this->symbols['linkage'][$this->previous['lastNoSpace']]))
+		{
+			throw new Exception('Incorrect symbol sequence in trigger expression.');
 		}
 	}
 
@@ -242,9 +243,8 @@ private $allowed;
 	}
 
 	private function checkSimpleExpression(&$expression){
-		$expression = preg_replace('/(\-*\+*\d\.\d)/', '{expression}', $expression);
-		$expression = preg_replace("/([\-\+]*[0-9]+)/u", '{expression}', $expression);
-// SDI($expression);
+		$expression = preg_replace('/([\-\+]?\d+\.\d+)/u', '{expression}', $expression);
+		$expression = preg_replace("/([\-\+]?\d+)/u", '{expression}', $expression);
 
 		$simpleExpr = str_replace('{expression}','1',$expression);
 // SDI($simpleExpr);
@@ -282,20 +282,9 @@ private $allowed;
 			$this->previous['last'] = $symbol;
 		}
 
-		if(isset($this->symbols['open'][$symbol])){
-			$this->previous['open'] = $symbol;
-		}
-
-		if(isset($this->symbols['close'][$symbol])){
-			$this->previous['close'] = $symbol;
-		}
-
-		if(isset($this->symbols['linkage'][$symbol])){
-			$this->previous['linkage'] = $symbol;
-		}
-
-		if(isset($this->symbols['expr'][$symbol])){
-			$this->previous['expr'] = $symbol;
+		if($symbol != ' '){
+			$this->previous['preLastNoSpace'] = $this->previous['lastNoSpace'];
+			$this->previous['lastNoSpace'] = $symbol;
 		}
 	}
 
@@ -658,11 +647,8 @@ private $allowed;
 			'sequence' => '',
 			'last' => '',
 			'prelast' => '',
-			'open' => '',
-			'close' => '',
-			'linkage' => '',
-			'expr'=> '',
-			'part' => ''
+			'lastNoSpace' => '',
+			'preLastNoSpace' => ''
 		);
 	}
 }
