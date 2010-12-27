@@ -38,6 +38,20 @@ class testFormHost extends CTest
 		$this->ok('Host added');
 	}
 
+	public function testFormHost_CreateLongHostName()
+	{
+		$host="01234567890123456789012345678901234567890123456789012345678901234";
+		$this->login('hosts.php');
+		$this->dropdown_select('groupid','Zabbix servers');
+		$this->button_click('form');
+		$this->wait();
+		$this->input_type('host',$host);
+		$this->button_click('save');
+		$this->wait();
+		$this->assertTitle('Hosts');
+		$this->ok('ERROR');
+	}
+
 	public function testFormHost_SimpleUpdate()
 	{
 		$this->login('hosts.php');
