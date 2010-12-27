@@ -22,11 +22,10 @@
 
 require_once 'PHPUnit/Extensions/SeleniumTestCase.php';
 
-require_once '../../conf/zabbix.conf.php';
-
-require_once '../../include/copt.lib.php';
-require_once '../../include/func.inc.php';
-require_once '../../include/db.inc.php';
+require_once(dirname(__FILE__).'../../zabbix.conf.php');
+require_once(dirname(__FILE__).'../../include/copt.lib.php');
+require_once(dirname(__FILE__).'../../include/func.inc.php');
+require_once(dirname(__FILE__).'../../include/db.inc.php');
 
 class CTest extends PHPUnit_Extensions_SeleniumTestCase
 {
