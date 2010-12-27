@@ -10,6 +10,7 @@
 	background-color: #ECECFF;
 	border: black 1px solid;
 	margin: 0;
+	overflow: hidden;
 }
 .pum_o_item:hover {
 	cursor:pointer;
@@ -19,6 +20,7 @@
 .pum_i_item {
 	margin: 3px 0px 0px 8px;
 	white-space: nowrap;
+	overflow: hidden;
 }
 
 /* menu menu item with submenu */
