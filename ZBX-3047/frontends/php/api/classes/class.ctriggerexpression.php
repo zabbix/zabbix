@@ -244,7 +244,7 @@ private $allowed;
 
 	private function checkSimpleExpression(&$expression){
 		$expression = preg_replace("/(\d+(\.\d+)?[KMGTsmhdw]?)/u", '{expression}', $expression);
-		$expression = preg_replace("/(\([\-\+]?\{expression\}\))/u", '{expression}', $expression);
+		$expression = preg_replace("/(\(\-?\{expression\}\))/u", '{expression}', $expression);
 // SDI($expression);
 		$simpleExpr = str_replace(' ','',$expression);
 		$simpleExpr = str_replace('{expression}','1',$simpleExpr);
