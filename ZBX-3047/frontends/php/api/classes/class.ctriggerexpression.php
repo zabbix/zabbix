@@ -38,7 +38,7 @@ private $allowed;
 					$this->setPreviousSymbol($symbol);
 					continue;
 				}
- 
+
 				$this->checkSymbolPrevious($symbol);
 				$this->checkSymbolClose($symbol);
 				$this->checkSymbolSequence($symbol);
@@ -130,7 +130,7 @@ private $allowed;
 	private function checkSymbolPrevious($symbol){
 		if(!isset($this->symbols['linkage'][$symbol])) return;
 
-		if(isset($this->symbols['linkage'][$symbol]) && 
+		if(isset($this->symbols['linkage'][$symbol]) &&
 			isset($this->symbols['linkage'][$this->previous['lastNoSpace']]))
 		{
 			throw new Exception('Incorrect symbol sequence in trigger expression.');
@@ -191,13 +191,16 @@ private $allowed;
 				$this->data['usermacros'][] = $expr['usermacro'];
 			}
 			else{
+				if(zbx_empty($expr['host'])) throw new Exception('Incorrect host name provided in expression');
+				if(zbx_empty($expr['item'])) throw new Exception('Incorrect item key provided in expression');
+// host
 				if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $expr['host']))
 					throw new Exception('Incorrect host name is used in expression');
-
+// item
 				$checkResult = check_item_key($expr['item']);
 				if(!$checkResult['valid'])
 					throw new Exception('Incorrect item key "'.$expr['item'].'" is used in expression, '.$checkResult['description']);
-
+// function
 				$expr['functionName'] = strtolower($expr['functionName']);
 				if(!isset($this->allowed['functions'][$expr['functionName']]))
 					throw new Exception('Unknown trigger function is used in expression "'.$expr['functionName'].'"');
@@ -441,11 +444,13 @@ private $allowed;
 			if($this->currExpr['params']['count'] == 0){
 				if(($symbol == '[') && $this->currExpr['part']['item']){
 					$this->symbols['params'][$symbol]++;
+
 					$this->currExpr['part']['itemParam'] = true;
 					$this->writeParams();
 				}
 
 				if(($symbol == '(') && $this->currExpr['part']['function']){
+
 					$this->currExpr['part']['functionParam'] = true;
 					$this->writeParams();
 				}
@@ -525,6 +530,7 @@ private $allowed;
 // do not turn of item part, till function is started
 //					$this->currExpr['part']['item'] = false;
 					$this->currExpr['part']['itemParam'] = false;
+					$this->currExpr['params']['quoteClose'] = false;
 					$this->currExpr['params']['count'] = 0;
 					$this->currExpr['params']['comma'] = 0;
 				}
@@ -542,7 +548,7 @@ private $allowed;
 // no need to close function part, it will be closed by expression end symbol
 //					$this->currExpr['part']['function'] = false;
 					$this->currExpr['part']['functionParam'] = false;
-
+					$this->currExpr['params']['quoteClose'] = false;
 					$this->currExpr['params']['count'] = 0;
 					$this->currExpr['params']['comma'] = 0;
 				}
@@ -553,7 +559,7 @@ private $allowed;
 	private function writeParts($symbol){
 		if($this->currExpr['part']['expression'])
 			$this->currExpr['object']['expression'] .= $symbol;
-		
+
 		if($this->currExpr['part']['usermacro'])
 			$this->currExpr['object']['usermacro'] .= $symbol;
 
