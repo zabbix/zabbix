@@ -13,7 +13,7 @@ private $allowed;
 
 	public function __construct($trigger){
 		$this->initializeVars();
-		$this->parseExpression($trigger['expression']);
+		$this->parseExpression(' '.$trigger['expression'].' ');
 	}
 
 	public function parseExpression($expression){
@@ -34,6 +34,7 @@ private $allowed;
 				$this->detectOpenParts($this->previous['last']);
 				$this->detectCloseParts($symbol);
 // SDII($this->currExpr);
+ 
 				if($this->inParameter($symbol)){
 					$this->setPreviousSymbol($symbol);
 					continue;
@@ -45,6 +46,7 @@ private $allowed;
 
 // set sequence of symbols
 				$this->setPreviousSymbol($symbol);
+// SDII($this->symbols);
 			}
 
 			$symbolNum = 0;
@@ -61,6 +63,7 @@ private $allowed;
 
 // PRIVATE --------------------------------------------------------------------------------------------
 	private function startExpression($expression){
+		$expression = trim($expression);
 		$startSymbol = zbx_substr($expression, 0, 1);
 		return (($startSymbol == '(') || ($startSymbol == '{') || zbx_ctype_digit($startSymbol));
 	}
@@ -251,7 +254,6 @@ private $allowed;
 // SDI($expression);
 		$simpleExpr = str_replace(' ','',$expression);
 		$simpleExpr = str_replace('{expression}','1',$simpleExpr);
-// SDI($simpleExpr);
 
 		if(strpos($simpleExpr,'11') !== false)
 			throw new Exception('Incorrect trigger expression format " '.$expression.' "');
@@ -261,9 +263,11 @@ private $allowed;
 		foreach($this->symbols['linkage'] as $symb => $count){
 			if($symb == ' ') continue;
 
-//			$linkageCount += $count;
 			$linkageCount += substr_count($expression, $symb);
 			$linkageExpr .= '\\'.$symb;
+
+			if((strpos($simpleExpr, $symb.')') !== false) || (strpos($simpleExpr,'('.$symb.'1') !== false))
+				throw new Exception('Incorrect trigger expression format " '.$expression.' "');
 		}
 
 		if(!preg_match('/^([\(\)\d\s'.$linkageExpr.']+)$/i', $simpleExpr))
@@ -366,20 +370,12 @@ private $allowed;
 			$this->currExpr['part']['item'] = false;
 			$this->currExpr['part']['itemParam'] = false;
 			$this->currExpr['part']['function'] = true;
-			$this->currExpr['part']['functionParam'] = true;
 
 			$lastDot = strrpos($this->currExpr['object']['item'], '.');
 
 			$this->currExpr['object']['functionName'] = substr($this->currExpr['object']['item'],$lastDot+1);
 			$this->currExpr['object']['function'] = substr($this->currExpr['object']['item'],$lastDot+1);
 			$this->currExpr['object']['item'] = substr($this->currExpr['object']['item'],0,$lastDot);
-		}
-
-		if((($symbol != ' ') && ($symbol != ')')) &&
-			$this->currExpr['part']['function'] &&
-			!$this->currExpr['part']['functionParam'])
-		{
-			throw new Exception('Unexpected symbol "'.$symbol.'" in trigger function.');
 		}
 	}
 
@@ -402,11 +398,12 @@ private $allowed;
 				}
 				else{
 // SDI('Open.inParameter: '.$symbol.' ');
-
 					if(($symbol == ']') && $this->currExpr['part']['itemParam'])
 						$this->symbols['params'][$symbol]++;
-					else if(($symbol == ')') && $this->currExpr['part']['functionParam'])
+					else if(($symbol == ')') && $this->currExpr['part']['functionParam']){
 						$this->symbols['close'][$symbol]++;
+						$this->symbols['params'][$symbol]++;
+					}
 					else if($symbol == ','){
 						$this->currExpr['params']['count']++;
 						$this->currExpr['params']['comma']++;
@@ -450,6 +447,7 @@ private $allowed;
 				}
 
 				if(($symbol == '(') && $this->currExpr['part']['function']){
+					$this->symbols['params'][$symbol]++;
 
 					$this->currExpr['part']['functionParam'] = true;
 					$this->writeParams();
@@ -465,11 +463,7 @@ private $allowed;
 		if($symbol == '') return;
 
 		if(!$this->inQuotes($symbol)){
-			if(!$this->currExpr['part']['usermacro']){
-				$this->detectParamClose($symbol);
-			}
-
-			if(!$this->currExpr['part']['item']){
+			if(!$this->inParameter()){
 // close symbols
 				$this->detectExpressionClose($symbol);
 
@@ -477,6 +471,10 @@ private $allowed;
 					$this->expressions[] = $this->currExpr['object'];
 					return true;
 				}
+			}
+
+			if(!$this->currExpr['part']['usermacro']){
+				$this->detectParamClose($symbol);
 			}
 		}
 
@@ -511,6 +509,12 @@ private $allowed;
 		if(($symbol == '}') && !zbx_empty($this->currExpr['object']['usermacro'])){
 			$this->currExpr['object']['usermacro'] = '{'.$this->currExpr['object']['usermacro'].'}';
 		}
+
+		if($this->currExpr['part']['function'] && !$this->currExpr['part']['functionParam']){
+//SDII($this->currExpr['part']);
+			throw new Exception('Unexpected symbol "'.$symbol.'" in trigger function.');
+		}
+
 	}
 
 	private function detectParamClose($symbol){
@@ -518,10 +522,12 @@ private $allowed;
 // end params
 //		$this->writeParams();
 		if(!$this->inQuotes()){
-			if(($symbol == ']') && $this->currExpr['part']['item']){
+			if(($symbol == ']') && $this->currExpr['part']['itemParam']){
 // +1 because (detectParam is not counted this symbol yet)
 				if($this->symbols['params']['['] == ($this->symbols['params'][']'] + 1)){
 					$this->symbols['params'][$symbol]++;
+
+					$this->writeParams();
 // count points to the last param index
 					if($this->currExpr['params']['count'] != $this->currExpr['params']['comma']){
 						throw new Exception('Incorrect item parameters syntax is used');
@@ -536,9 +542,11 @@ private $allowed;
 				}
 			}
 
-			if(($symbol == ')') && $this->currExpr['part']['function']){
+			if(($symbol == ')') && $this->currExpr['part']['functionParam']){
 // +1 because (checkSequence is not counted this symbol yet)
-				if($this->symbols['open']['('] == ($this->symbols['close'][')'] + 1)){
+				if($this->symbols['params']['('] == ($this->symbols['params'][')'] + 1)){
+					$this->symbols['params'][$symbol]++;
+
 					$this->writeParams();
 // count points to the last param index
 					if($this->currExpr['params']['count'] != $this->currExpr['params']['comma']){
@@ -665,8 +673,10 @@ private $allowed;
 			),
 			'params' => array(
 				'"' => 0,		// quote
-				'[' => 0,		// open brace
-				']' => 0,		// closebrace
+				'[' => 0,		// open square brace
+				']' => 0,		// close square brace
+				'(' => 0,		// open brace
+				')' => 0		// clsoe brace
 			)
 		);
 
