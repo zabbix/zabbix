@@ -85,7 +85,7 @@ private $allowed;
 
 	public function checkFunction($expression){
 		if(!isset($this->allowed['functions'][$expression['functionName']])) return false;
-		if(!preg_match('/^'.ZBX_PREG_FUNCTION_FORMAT.'$/i', $expression['function'])) return false;
+		if(!preg_match('/^'.ZBX_PREG_FUNCTION_FORMAT.'$/u', $expression['function'])) return false;
 
 		if(is_null($this->allowed['functions'][$expression['functionName']]['args'])) return true;
 
@@ -111,8 +111,7 @@ private $allowed;
 
 	public function checkSimpleExpression(&$expression){
 		$expression = preg_replace("/(\d+(\.\d+)?[KMGTsmhdw]?)/u", '{expression}', $expression);
-// SDI($expression);
-// SDI('WHILE:');
+
 		$simpleExpr = str_replace(' ','',$expression);
 		$start = '';
 		while($start != $simpleExpr){
@@ -122,12 +121,10 @@ private $allowed;
 
 			$simpleExpr = preg_replace("/\{expression\}([\=\#\<\>\|\&\+\-\/\*]\-?)\{expression\}/u", '{expression}', $simpleExpr);
 		}
-// SDI($simpleExpr);
 
 		$simpleExpr = preg_replace('/^\-\{expression\}(.*)$/u', '{expression}$1', $simpleExpr);
 		$simpleExpr = str_replace('{expression}','1',$simpleExpr);
 
-// SDI($simpleExpr);
 		if(strpos($simpleExpr,'()') !== false)
 			throw new Exception('Incorrect trigger expression format " '.$expression.' "');
 		if(strpos($simpleExpr,'11') !== false)
