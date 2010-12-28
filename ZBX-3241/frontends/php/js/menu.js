@@ -422,13 +422,10 @@ function menu_item (o_parent, n_order) {
 	eldiv.className = this.getstyle(1, 0);
 
 	//truncating long strings - they don't fit in the popup menu'
-	if(typeof(this.a_config[0])=='string' && this.a_config[0].length > 35){
-		// eldiv.innerHTML = this.a_config[0].substring(0, 35) + '...';
+	if(typeof(this.a_config[0])=='string' && this.a_config[0].length > 35)
 		eldiv.setAttribute('title', this.a_config[0]);
-	}
-	else{
-		eldiv.innerHTML = this.a_config[0];
-	}
+
+	eldiv.innerHTML = this.a_config[0];
 
 	el.appendChild(eldiv);
 
@@ -443,7 +440,7 @@ function menu_item (o_parent, n_order) {
 	if ( !detectIE6() ){
 		var newResult = (this.e_oelement.firstChild.scrollWidth - this.e_oelement.firstChild.clientWidth);
 		if(newResult > 0){
-			//anti down
+			// anti down
 			var x=500;
 			while(x){
 				newResult = (this.e_oelement.firstChild.scrollWidth - this.e_oelement.firstChild.clientWidth);
@@ -472,7 +469,7 @@ function menu_item (o_parent, n_order) {
 }
 
 // -----------------------
-// Detect IE 6 
+// Detect IE 6
 // -----------------------
 function detectIE6(){
 	var browser = navigator.appName;
