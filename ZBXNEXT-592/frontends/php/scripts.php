@@ -47,7 +47,8 @@ $fields = array(
 	'access'=>			array(T_ZBX_INT, O_OPT,  NULL,			IN('0,1,2,3'),	'isset({save})'),
 	'groupid'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,			DB_ID,		'isset({save})'),
 	'usrgrpid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,			DB_ID,		'isset({save})'),
-	'question'=>		array(T_ZBX_STR, O_OPT,  NULL,			NULL,	'isset({save})'),
+	'question'=>		array(T_ZBX_STR, O_OPT,  NULL,			NULL,	null),
+	'enableQuestion'=>	array(T_ZBX_STR, O_OPT,  NULL,			NULL,	null),
 
 	'form'=>			array(T_ZBX_STR, O_OPT,  NULL,		  	NULL,		null),
 	'form_refresh'=>	array(T_ZBX_INT, O_OPT,	 NULL,			NULL,		null),
@@ -65,9 +66,16 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 		$cond = (isset($_REQUEST['scriptid']))?(' AND scriptid<>'.$_REQUEST['scriptid']):('');
 		$scripts = DBfetch(DBselect('SELECT count(scriptid) as cnt FROM scripts WHERE name='.zbx_dbstr($_REQUEST['name']).$cond.' and '.DBin_node('scriptid', get_current_nodeid(false)),1));
 
-		if($scripts && $scripts['cnt']>0){
-			error(S_SCRIPT.SPACE.'['.htmlspecialchars($_REQUEST['name']).']'.SPACE.S_ALREADY_EXISTS_SMALL);
-			show_messages(null,S_ERROR,S_CANNOT_ADD_SCRIPT);
+		$question = get_request('question', '');
+		$enableQuestion = get_request('enableQuestion', false);
+
+		if($scripts && $scripts['cnt'] > 0){
+			error(_s('Script [%s] already exists.', htmlspecialchars($_REQUEST['name'])));
+			show_messages(null, S_ERROR, S_CANNOT_ADD_SCRIPT);
+		}
+		else if($enableQuestion && zbx_empty($question)){
+			error(_('Please input question'));
+			show_messages(null, S_ERROR, S_CANNOT_ADD_SCRIPT);
 		}
 		else{
 			$script = array(
@@ -77,7 +85,7 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 				'usrgrpid' => $_REQUEST['usrgrpid'],
 				'groupid' => $_REQUEST['groupid'],
 				'host_access' => $_REQUEST['access'],
-				'question' => $_REQUEST['question'],
+				'question' => get_request('question', ''),
 			);
 
 			if(isset($_REQUEST['scriptid'])){
@@ -148,98 +156,9 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 <?php
 	$scripts_wdgt = new CWidget();
 
-	$frmForm = new CForm(null, 'get');
-	$frmForm->addItem(new CSubmit('form', _('Create script')));
-	$scripts_wdgt->addPageHeader(S_SCRIPTS_CONFIGURATION_BIG, $frmForm);
-
 	if(isset($_REQUEST['form'])){
-		$frmScr = new CFormTable(S_SCRIPT);
-		$frmScr->setAttribute('id', 'scripts');
-
-		if(isset($_REQUEST['scriptid'])) $frmScr->addVar('scriptid', $_REQUEST['scriptid']);
-
-		if(!isset($_REQUEST['scriptid']) || isset($_REQUEST['form_refresh'])){
-			$name = get_request('name', '');
-			$command  = get_request('command', '');
-			$description  = get_request('description', '');
-			$usrgrpid = get_request('usrgrpid',	0);
-			$groupid = get_request('groupid', 0);
-			$access = get_request('access',	PERM_READ_ONLY);
-			$question = get_request('question',	'');
-		}
-
-		if(isset($_REQUEST['scriptid']) && !isset($_REQUEST['form_refresh'])){
-			$frmScr->addVar('form_refresh', get_request('form_refresh',1));
-
-			$options = array(
-				'scriptids' => $_REQUEST['scriptid'],
-				'output' => API_OUTPUT_EXTEND,
-			);
-			$script = CScript::get($options);
-			$script = reset($script);
-
-			if($script){
-				$name = $script['name'];
-				$command  = $script['command'];
-				$description  = $script['description'];
-				$usrgrpid = $script['usrgrpid'];
-				$groupid = $script['groupid'];
-				$access = $script['host_access'];
-				$question = $script['question'];
-			}
-		}
-
-// NAME
-		$frmScr->addRow(S_NAME, new CTextBox('name', $name, 80));
-
-// COMMAND
-		$frmScr->addRow(S_COMMAND, new CTextBox('command', $command, 80));
-
-// DESCRIPTION
-		$frmScr->addRow(_('Description'), new CTextArea('description', $description));
-
-// USER GROUPS
-		$usr_groups = new CCombobox('usrgrpid', $usrgrpid);
-		$usr_groups->addItem(0, S_ALL_S);
-		$usrgrps = CUserGroup::get(array(
-			'output' => API_OUTPUT_EXTEND,
-		));
-		order_result($usrgrps, 'name');
-		foreach($usrgrps as $ugnum => $usr_group){
-			$usr_groups->addItem($usr_group['usrgrpid'], $usr_group['name']);
-		}
-		$frmScr->addRow(S_USER_GROUPS, $usr_groups);
-
-// HOST GROUPS
-		$host_groups = new CCombobox('groupid', $groupid);
-		$host_groups->addItem(0,S_ALL_S);
-		$groups = CHostGroup::get(array(
-			'output' => API_OUTPUT_EXTEND,
-		));
-		order_result($groups, 'name');
-		foreach($groups as $gnum => $group){
-			$host_groups->addItem($group['groupid'], $group['name']);
-		}
-		$frmScr->addRow(S_HOST_GROUPS, $host_groups);
-
-// PERMISSIONS
-		$access_radio = new CRadioButton('access', $access);
-		$access_radio->addValue(_('Read'), PERM_READ_ONLY);
-		$access_radio->addValue(_('Write'), PERM_READ_WRITE);
-		$access_radio->useJQueryStyle();
-		$frmScr->addRow(_('Required host permissions'), $access_radio);
-
-// QUESTION
-		$frmScr->addRow(_('Question'), new CTextArea('question', $question));
-
-
-		$frmScr->addItemToBottomRow(new CSubmit('save', S_SAVE));
-		if(isset($_REQUEST['scriptid'])){
-			$frmScr->addItemToBottomRow(new CButtonDelete(S_DELETE_SCRIPTS_Q));
-		}
-		$frmScr->addItemToBottomRow(new CButtonCancel());
-
-		$scripts_wdgt->addItem($frmScr);
+		$scriptForm = new CGetForm();
+		$scripts_wdgt->addItem($scriptForm->render('script.edit'));
 	}
 	else{
 		$form = new CForm();
@@ -249,7 +168,9 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
 
-		$scripts_wdgt->addHeader(S_SCRIPTS_BIG);
+		$frmForm = new CForm(null, 'get');
+		$frmForm->addItem(new CSubmit('form', _('Create script')));
+		$scripts_wdgt->addHeader(S_SCRIPTS_BIG, $frmForm);
 		$scripts_wdgt->addHeader($numrows);
 
 		$table = new CTableInfo(S_NO_SCRIPTS_DEFINED);

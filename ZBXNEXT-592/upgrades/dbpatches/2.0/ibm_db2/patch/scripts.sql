@@ -1,3 +1,7 @@
+ALTER TABLE scripts ADD description varchar(2048) WITH DEFAULT '' NOT NULL;
+REORG TABLE scripts;
+ALTER TABLE scripts ADD question varchar(255) WITH DEFAULT '' NOT NULL;
+REORG TABLE scripts;
 ALTER TABLE scripts ALTER COLUMN scriptid SET WITH DEFAULT NULL;
 REORG TABLE scripts;
 ALTER TABLE scripts ALTER COLUMN usrgrpid SET WITH DEFAULT NULL;
