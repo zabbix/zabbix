@@ -358,7 +358,7 @@ int zbx_mutex_destroy(ZBX_MUTEX *mutex)
 #define SYSVSEM_USAGE	1
 #define SYSVSEM_SETVAL	2
 
-int php_sem_get(PHP_MUTEX* sem_ptr, char* path_name)
+int	php_sem_get(PHP_MUTEX *sem_ptr, const char *path_name)
 {
 	int
 		max_acquire = 1,
@@ -467,7 +467,7 @@ int php_sem_get(PHP_MUTEX* sem_ptr, char* path_name)
 	return PHP_MUTEX_OK;
 }
 
-static int php_sysvsem_semop(PHP_MUTEX* sem_ptr, int acquire)
+static int	php_sysvsem_semop(PHP_MUTEX *sem_ptr, int acquire)
 {
 	struct sembuf sop;
 
@@ -496,17 +496,17 @@ static int php_sysvsem_semop(PHP_MUTEX* sem_ptr, int acquire)
 	return PHP_MUTEX_OK;
 }
 
-int php_sem_acquire(PHP_MUTEX* sem_ptr)
+int	php_sem_acquire(PHP_MUTEX *sem_ptr)
 {
 	return php_sysvsem_semop(sem_ptr, 1);
 }
 
-int php_sem_release(PHP_MUTEX* sem_ptr)
+int	php_sem_release(PHP_MUTEX *sem_ptr)
 {
 	return php_sysvsem_semop(sem_ptr, 0);
 }
 
-int php_sem_remove(PHP_MUTEX* sem_ptr)
+int	php_sem_remove(PHP_MUTEX *sem_ptr)
 {
 	union semun		un;
 	struct semid_ds	buf;

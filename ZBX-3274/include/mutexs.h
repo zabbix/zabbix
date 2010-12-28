@@ -86,10 +86,10 @@ typedef struct {
 
 #if defined(HAVE_SQLITE3) && !defined(_WINDOWS)
 
-int php_sem_get(PHP_MUTEX* sem_ptr, char* path_name);
-int php_sem_acquire(PHP_MUTEX* sem_ptr);
-int php_sem_release(PHP_MUTEX* sem_ptr);
-int php_sem_remove(PHP_MUTEX* sem_ptr);
+int	php_sem_get(PHP_MUTEX *sem_ptr, const char *path_name);
+int	php_sem_acquire(PHP_MUTEX *sem_ptr);
+int	php_sem_release(PHP_MUTEX *sem_ptr);
+int	php_sem_remove(PHP_MUTEX *sem_ptr);
 
 #else /* !HAVE_SQLITE3 || _WINDOWS */
 

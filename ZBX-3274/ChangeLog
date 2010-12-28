@@ -1,3 +1,7 @@
+Changes for 1.8.5
+
+ - [ZBX-3274] fixed SQLite3 semaphore errors while starting server or proxy (Sasha)
+
 Changes for 1.8.4rc3
 
  - [ZBX-3256] added automatic detection of fping command line option to use for specifying source IP address (asaveljevs)
