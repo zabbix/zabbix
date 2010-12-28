@@ -424,34 +424,40 @@ function menu_item (o_parent, n_order) {
 	//truncating long strings - they don't fit in the popup menu'
 	if(typeof(this.a_config[0])=='string' && this.a_config[0].length > 35)
 		eldiv.setAttribute('title', this.a_config[0]);
+		
+	
 
 	eldiv.innerHTML = this.a_config[0];
+	
 
 	el.appendChild(eldiv);
 
 //	console.log(el,el.innerHTML);
 	document.body.appendChild(el);
+	
+
 
 	this.e_ielement = document.getElementById('e' + o_root.n_id + '_' + this.n_id + 'i');
 	this.e_oelement = document.getElementById('e' + o_root.n_id + '_' + this.n_id + 'o');
 
 	this.b_visible = !this.n_depth;
 
-	if ( !detectIE6() ){
-		var newResult = (this.e_oelement.firstChild.scrollWidth - this.e_oelement.firstChild.clientWidth);
-		if(newResult > 0){
-			// anti down
-			var x=500;
-			while(x){
-				newResult = (this.e_oelement.firstChild.scrollWidth - this.e_oelement.firstChild.clientWidth);
-				var nText = this.e_oelement.firstChild.innerHTML;
-				this.e_oelement.firstChild.innerHTML =  nText.substring(0, nText.length-10);
-				x--;
-				if(newResult < 1) {
-					this.e_oelement.firstChild.innerHTML = nText+'...';
-					x=0;
-					break;
-				}
+	var newResult = 0;
+	var nText = '';
+	
+	newResult = (this.e_ielement.scrollWidth - this.getprop('width'));
+	if(newResult > 0){
+		// anti down
+		var x=500;
+		while(x){
+			newResult = (this.e_ielement.scrollWidth - this.getprop('width'));
+			nText = this.e_ielement.innerHTML;
+			this.e_ielement.innerHTML = nText.substring(0, nText.length-10);
+			x--;
+			if(newResult < 1) {
+				this.e_ielement.innerHTML = this.e_ielement.innerHTML + '...';
+				x=0;
+				break;
 			}
 		}
 	}
@@ -466,21 +472,6 @@ function menu_item (o_parent, n_order) {
 	// init downline recursively
 	for (var n_order = 0; n_order < this.a_config.length - item_offset; n_order++)
 		new menu_item(this, n_order);
-}
-
-// -----------------------
-// Detect IE 6
-// -----------------------
-function detectIE6(){
-	var browser = navigator.appName;
-	var b_version = navigator.appVersion;
-	var version = parseFloat(b_version);
-	if ((browser == "Microsoft Internet Explorer") && (version <= 6)){
-		return true;
-	}
-	else{
-		return false;
-	}
 }
 
 function A_MENUS_onclick(){	return A_MENUS[this.o_root_n_id].onclick(this.this_n_id); }
