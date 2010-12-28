@@ -3004,7 +3004,7 @@ return $caption;
 		}
 
 		$pasedData = parseTriggerExpressions($expression, true);
-
+//SDII($expr);
 		$next = array();
 		$nextletter = 'A';
 		$ret = build_expression_html_tree($expression, $pasedData[$expression]['tree'], 0, $next, $nextletter);
@@ -3927,114 +3927,26 @@ return $caption;
 	}
 
 $triggerExpressionRules['independent'] = Array(
-	'allowedSymbols' => "[0-9KMGTsmhdw. \/*+<>#=&|\-]+",
-	'notAllowedSymbols' => Array(
-					"[.\/*<>#&|=]{2,}",
-					"-{2,}",
-					"\+{2,}",
-					"[ .KMGTsmhdw]{2,}",
-					"(^\.|\.$)",
-					"\.\d+\.",
-					"[.\/*+<>#=&|\-]+[KMGTsmhdw]+",
-					"[KMGTsmhdw]+\d+[KMGTsmhdw]+",
-					"\d+[KMGTsmhdw]+\d+"
-				),
-	'customValidate' => Array(
-				'triggerExpressionValidateGroup',
-				'triggerExpressionValidateIndependent'
-				),
 	'levelIndex' => true,
 	'ignorSymbols' => ' +');
 $triggerExpressionRules['grouping'] = Array(
 	'openSymbol' => '(',
 	'closeSymbol' => ')',
-	'allowedSymbols' => "[0-9KMGTsmhdw. \/*+<>#=&|\-]+",
-	'notAllowedSymbols' => Array(
-					"[.\/*+<>#=&|\-]{2,}",
-					"[ .KMGTsmhdw]{2,}",
-					"(^\.|\.$)",
-					"\.\d+\.",
-					"[.\/*+<>#=&|\-]+[KMGTsmhdw]+",
-					"[KMGTsmhdw]+\d+[KMGTsmhdw]+",
-					"\d+[KMGTsmhdw]+\d+"
-				),
-	'customValidate' => 'triggerExpressionValidateGroup',
 	'ignorSymbols' => ' +',
 	'parent' => Array('independent', 'grouping'));
 $triggerExpressionRules['macro'] = Array(
 	'openSymbol' => Array('{' => 'valueDependent'),
 	'closeSymbol' => '}',
-	'allowedValues' => Array(
-		'DATE',
-		'DISCOVERY.DEVICE.IPADDRESS',
-		'DISCOVERY.DEVICE.STATUS',
-		'DISCOVERY.DEVICE.UPTIME',
-		'DISCOVERY.RULE.NAME',
-		'DISCOVERY.SERVICE.NAME',
-		'DISCOVERY.SERVICE.PORT',
-		'DISCOVERY.SERVICE.STATUS',
-		'DISCOVERY.SERVICE.UPTIME',
-		'ESC.HISTORY',
-		'EVENT.ACK.HISTORY',
-		'EVENT.ACK.STATUS',
-		'EVENT.AGE',
-		'EVENT.DATE',
-		'EVENT.ID',
-		'EVENT.TIME',
-		'STATUS',
-		'TIME',
-		'TRIGGER.COMMENT',
-		'TRIGGER.EVENTS.UNACK',
-		'TRIGGER.ID',
-		'TRIGGER.NAME',
-		'TRIGGER.NSEVERITY',
-		'TRIGGER.SEVERITY',
-		'TRIGGER.STATUS',
-		'STATUS',
-		'TRIGGER.URL',
-		'TRIGGER.VALUE',
-		'TRIGGERS.UNACK',
-		'TRIGGERS.PROBLEM.UNACK'),
 	'indexItem' => true,
 	'parent' => Array('independent','grouping','checkPort'));
 $triggerExpressionRules['macroNum'] = Array(
 	'openSymbol' => Array('{' => 'valueDependent'),
 	'closeSymbol' => '}',
-	'allowedSymbols' => Array(
-		'HOSTNAME[1-9]{1}',
-		'HOST\.CONN[1-9]{1}',
-		'HOST\.DNS[1-9]{1}',
-		'IPADDRESS[1-9]{1}',
-		'ITEM\.LASTVALUE[1-9]{1}',
-		'ITEM\.LOG\.AGE[1-9]{1}',
-		'ITEM\.LOG\.DATE[1-9]{1}',
-		'ITEM\.LOG\.EVENTID[1-9]{1}',
-		'ITEM\.LOG\.NSEVERITY[1-9]{1}',
-		'ITEM\.LOG\.SEVERITY[1-9]{1}',
-		'ITEM\.LOG\.SOURCE[1-9]{1}',
-		'ITEM\.LOG\.TIME[1-9]{1}',
-		'ITEM\.NAME[1-9]{1}',
-		'ITEM\.VALUE[1-9]{1}',
-		'NODE\.ID[1-9]{1}',
-		'NODE\.NAME[1-9]{1}',
-		'PROFILE\.CONTACT[1-9]{1}',
-		'PROFILE\.DEVICETYPE[1-9]{1}',
-		'PROFILE\.HARDWARE[1-9]{1}',
-		'PROFILE\.LOCATION[1-9]{1}',
-		'PROFILE\.MACADDRESS[1-9]{1}',
-		'PROFILE\.NAME[1-9]{1}',
-		'PROFILE\.NOTES[1-9]{1}',
-		'PROFILE\.OS[1-9]{1}',
-		'PROFILE\.SERIALNO[1-9]{1}',
-		'PROFILE\.SOFTWARE[1-9]{1}',
-		'PROFILE\.TAG[1-9]{1}',
-		'TRIGGER\.KEY[1-9]{1}'),
 	'indexItem' => true,
 	'parent' => Array('independent','grouping','checkPort'));
 $triggerExpressionRules['customMacro'] = Array(
 	'openSymbol' => Array('{' => 'valueDependent'),
 	'closeSymbol' => '}',
-	'allowedSymbols' => '\$[A-Z0-9_.]+',
 	'indexItem' => true,
 	'parent' => Array('independent','grouping','checkPort'));
 $triggerExpressionRules['expression'] = Array(
@@ -4047,29 +3959,23 @@ $triggerExpressionRules['expression'] = Array(
 $triggerExpressionRules['server'] = Array(
 	'openSymbol' => '{',
 	'closeSymbol' => ':',
-	'allowedSymbols' => '[0-9a-zA-Z_\. \-]+',
 	'indexItem' => true,
-	'customValidate' => 'triggerExpressionValidateHost',
 	'parent' => 'expression');
 $triggerExpressionRules['key'] = Array(
 	'openSymbol' => ':',
 	'closeSymbol' => ')',
 	'isEmpty' => true,
 	'levelIndex' => true,
-	'customValidate' => 'triggerExpressionValidateItemKey',
 	'parent' => 'expression');
 $triggerExpressionRules['keyName'] = Array(
 	'openSymbol' => ':',
 	'closeSymbol' => Array('[' => 'default', '.' => 'nextEnd'),
-	'allowedSymbols' => '[0-9a-zA-Z_.-]+',
 	'indexItem' => true,
 	'parent' => 'key');
 $triggerExpressionRules['checkPort'] = Array(
 	'openSymbol' => ',',
 	'closeSymbol' => '.',
-	'allowedSymbols' => '\d+',
-	'parent' => 'keyName'
-	);
+	'parent' => 'keyName');
 $triggerExpressionRules['keyParams'] = Array(
 	'openSymbol' => '[',
 	'closeSymbol' => ']',
@@ -4081,48 +3987,16 @@ $triggerExpressionRules['keyParam'] = Array(
 	'closeSymbol' => Array(',' => 'default', ']' => 'default'),
 	'escapeSymbol' => '\\',
 	'parent' => 'keyParams');
-/*$triggerExpressionRules['keyFunction'] = Array(
-	'openSymbol' => '.',
-	'closeSymbol' => ')',
-	'isEmpty' => true,
-	'customValidate' => 'triggerExpressionValidateItemKeyFunction',
-	'parent' => 'key');*/
 $triggerExpressionRules['keyFunctionName'] = Array(
 	'openSymbol' => '.',
 	'closeSymbol' => '(',
-	'allowedValues' => Array(
-		'abschange',
-		'avg',
-		'change',
-		'count',
-		'date',
-		'dayofweek',
-		'delta',
-		'diff',
-		'fuzzytime',
-		'iregexp',
-		'last',
-		'logseverity',
-		'logsource',
-		'max',
-		'min',
-		'nodata',
-		'now',
-		'prev',
-		'regexp',
-		'str',
-		'strlen',
-		'sum',
-		'time'),
 	'indexItem' => true,
-	'customValidate' => 'triggerExpressionValidateItemKeyFunction',
 	'parent' => 'key');
 $triggerExpressionRules['keyFunctionParams'] = Array(
 	'openSymbol' => '(',
 	'closeSymbol' => ')',
 	'isEmpty' => true,
 	'indexItem' => true,
-	'customValidate' => 'triggerExpressionValidateItemKeyFunctionParams',
 	'parent' => 'key');
 $triggerExpressionRules['keyFunctionParam'] = Array(
 	'openSymbol' => Array('(' => 'default', ',' => 'default'),
