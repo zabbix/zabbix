@@ -440,6 +440,24 @@ function menu_item (o_parent, n_order) {
 
 	this.b_visible = !this.n_depth;
 
+	if ( !detectIE6() ){
+      var newResult = (this.e_oelement.firstChild.scrollWidth - this.e_oelement.firstChild.clientWidth);
+      if(newResult > 0){
+      	var x=500; //anti down
+      	while(x){
+      		newResult = (this.e_oelement.firstChild.scrollWidth - this.e_oelement.firstChild.clientWidth);     		
+      		var nText = this.e_oelement.firstChild.innerHTML;
+      		this.e_oelement.firstChild.innerHTML =  nText.substring(0, nText.length-10);
+      		x--;
+      		if(newResult < 1) {
+      			this.e_oelement.firstChild.innerHTML = nText+'...';
+      			x=0;
+      			break;
+      		}
+      	}
+      }
+    }
+
 	// no more initialization if leaf
 	if (this.a_config.length < item_offset)
 		return;
