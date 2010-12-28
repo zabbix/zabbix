@@ -13,10 +13,10 @@ private $allowed;
 
 	public function __construct($trigger){
 		$this->initializeVars();
-		$this->parseExpression($trigger['expression']);
+		$this->checkExpression($trigger['expression']);
 	}
 
-	public function parseExpression($expression){
+	public function checkExpression($expression){
 		$length = zbx_strlen($expression);
 		$symbolNum = 0;
 
@@ -26,15 +26,15 @@ private $allowed;
 
 // Check expr start symbol
 			$startSymbol = zbx_substr(trim($expression), 0, 1);
-			if(($startSymbol != '(') && ($startSymbol != '{') && !zbx_ctype_digit($startSymbol))
+			if(($startSymbol != '(') && ($startSymbol != '{') && ($startSymbol != '-') && !zbx_ctype_digit($startSymbol))
 				throw new Exception('Incorrect trigger expression.');
 
 
 			for($symbolNum = 0; $symbolNum < $length; $symbolNum++){
 				$symbol = zbx_substr($expression, $symbolNum, 1);
 // SDI($symbol);
-				$this->detectOpenParts($this->previous['last']);
-				$this->detectCloseParts($symbol);
+				$this->parseOpenParts($this->previous['last']);
+				$this->parseCloseParts($symbol);
 // SDII($this->currExpr);
 				if($this->inParameter($symbol)){
 					$this->setPreviousSymbol($symbol);
@@ -47,7 +47,11 @@ private $allowed;
 			}
 
 			$symbolNum = 0;
-			$this->checkOverallExpression($expression);
+
+			$simpleExpression = $expression;
+			$this->checkBraces();
+			$this->checkParts($simpleExpression);
+			$this->checkSimpleExpression($simpleExpression);
 		}
 		catch(Exception $e){
 			$symbolNum = ($symbolNum > 0) ? --$symbolNum : $symbolNum;
@@ -57,7 +61,149 @@ private $allowed;
 		}
 	}
 
+
+	public function checkMacro($macro){
+		return preg_match('/^'.ZBX_PREG_EXPRESSION_SIMPLE_MACROS.'$/i', $macro);
+	}
+
+	public function checkUserMacro($usermacro){
+		return preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/i', $usermacro);
+	}
+
+	public function checkHost($host){
+		if(zbx_empty($host)) return false;
+
+		return preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $host);
+	}
+
+	public function checkItem($item){
+		if(zbx_empty($item)) return false;
+
+		$itemCheck = check_item_key($item);
+		return $itemCheck['valid'];
+	}
+
+	public function checkFunction($expression){
+		if(!isset($this->allowed['functions'][$expression['functionName']])) return false;
+		if(!preg_match('/^'.ZBX_PREG_FUNCTION_FORMAT.'$/i', $expression['function'])) return false;
+
+		if(is_null($this->allowed['functions'][$expression['functionName']]['args'])) return true;
+
+		foreach($this->allowed['functions'][$expression['functionName']]['args'] as $anum => $arg){
+// mandatory check
+			if(isset($arg['mandat']) && $arg['mandat'] && !isset($expression['functionParamList'][$anum]))
+				return false;
+// type check
+			if(isset($arg['type']) && isset($expr['functionParamList'][$anum])){
+				$typeFlag = true;
+				if($arg['type'] == 'str') $typeFlag = is_string($expression['functionParamList'][$anum]);
+				if($arg['type'] == 'sec') $typeFlag = (validate_float($expression['functionParamList'][$anum]) == 0);
+				if($arg['type'] == 'sec_num') $typeFlag = (validate_ticks($expression['functionParamList'][$anum]) == 0);
+				if($arg['type'] == 'num') $typeFlag = is_numeric($expression['functionParamList'][$anum]);
+
+				if(!$typeFlag)
+					return false;
+			}
+		}
+
+		return true;
+	}
+
+	public function checkSimpleExpression(&$expression){
+		$expression = preg_replace("/(\d+(\.\d+)?[KMGTsmhdw]?)/u", '{expression}', $expression);
+// SDI($expression);
+// SDI('WHILE:');
+		$simpleExpr = str_replace(' ','',$expression);
+		$start = '';
+		while($start != $simpleExpr){
+			$start = $simpleExpr;
+			$simpleExpr = str_replace('({expression})','{expression}',$simpleExpr);
+			$simpleExpr = str_replace('(-{expression})','{expression}',$simpleExpr);
+
+			$simpleExpr = preg_replace('/\{expression\}(([\=\#\<\>\|\&]\-)|(\-\-)|([\=\#\<\>\|\&\+\-\/\*]))\{expression\}/u', '{expression}', $simpleExpr);
+		}
+// SDI($simpleExpr);
+
+		$simpleExpr = preg_replace('/^\-\{expression\}(.*)$/u', '{expression}$1', $simpleExpr);
+		$simpleExpr = str_replace('{expression}','1',$simpleExpr);
+
+// SDI($simpleExpr);
+
+		if(strpos($simpleExpr,'()') !== false)
+			throw new Exception('Incorrect trigger expression format " '.$expression.' "');
+		if(strpos($simpleExpr,'11') !== false)
+			throw new Exception('Incorrect trigger expression format " '.$expression.' "');
+
+		$linkageCount = 0;
+		$linkageExpr = '';
+		foreach($this->symbols['linkage'] as $symb => $count){
+			if($symb == ' ') continue;
+
+			$linkageCount += substr_count($simpleExpr, $symb);
+			$linkageExpr .= '\\'.$symb;
+
+			if((strpos($simpleExpr, $symb.')') !== false) || (strpos($simpleExpr,'('.$symb.'1') !== false))
+				throw new Exception('Incorrect trigger expression format " '.$expression.' "');
+		}
+
+		if(!preg_match('/^([\d'.$linkageExpr.']+)$/ui', $simpleExpr))
+			throw new Exception('Incorrect trigger expression format " '.$expression.' "');
+
+		$exprCount = substr_count($simpleExpr, '1');
+
+		if($linkageCount != $exprCount-1)
+			throw new Exception('Incorrect usage of expression logic linking symbols');
+	}
+
 // PRIVATE --------------------------------------------------------------------------------------------
+	private function checkBraces(){
+		if($this->symbols['params']['"'] % 2 != 0)
+			throw new Exception('Incorrect count of quotes in expression');
+
+		if($this->symbols['open']['('] != $this->symbols['close'][')']){
+			throw new Exception('Incorrect parenthesis count in expression');
+		}
+
+		if($this->symbols['open']['{'] != $this->symbols['close']['}'])
+			throw new Exception('Incorrect curly braces count in expression');
+	}
+
+	private function checkParts(&$expression){
+		foreach($this->expressions as $enum => $expr){
+			if(!zbx_empty($expr['macro'])){
+				if(!$this->checkMacro($expr['macro']))
+					throw new Exception('Incorrect macro is used in expression');
+
+				$this->data['macros'][] = $expr['macro'];
+			}
+			else if(!zbx_empty($expr['usermacro'])){
+				if(!$this->checkUserMacro($expr['usermacro']))
+					throw new Exception('Incorrect user macro format is used in expression');
+
+				$this->data['usermacros'][] = $expr['usermacro'];
+			}
+			else{
+				if(!$this->checkHost($expr['host']))
+					throw new Exception('Incorrect host name provided in expression');
+
+				if(!$this->checkItem($expr['item']))
+					throw new Exception('Incorrect item key "'.$expr['item'].'" is used in expression.');
+
+				if(!$this->checkFunction($expr))
+					throw new Exception('Incorrect trigger function provided in expression');
+
+				$this->data['hosts'][] = $expr['host'];
+				$this->data['items'][] = $expr['item'];
+				$this->data['functions'][] = $expr['functionName'];
+				$this->data['functionParams'][] = $expr['functionParam'];
+			}
+
+			$expression = str_replace($expr['expression'], '{expression}', $expression);
+		}
+
+		if(empty($this->data['hosts']) || empty($this->data['items']))
+			throw new Exception('Trigger expression must contain at least one host:key reference');
+	}
 
 // STATE
 	private function isSlashed($pre=false){
@@ -111,22 +257,22 @@ private $allowed;
 
 // -----------------------------------------------------------------
 // OPEN
-	private function detectOpenParts($symbol){
+	private function parseOpenParts($symbol){
 		if(!$this->inQuotes($symbol)){
 
 			if(!$this->currExpr['part']['item']){
-				$this->detectExpression($symbol);
+				$this->parseExpression($symbol);
 			}
 
 			if(!$this->currExpr['part']['usermacro']){
-				$this->detectItem($symbol);
-				$this->detectFunction($symbol);
-				$this->detectParam($symbol);
+				$this->parseItem($symbol);
+				$this->parseFunction($symbol);
+				$this->parseParam($symbol);
 			}
 		}
 	}
 
-	private function detectExpression($symbol){
+	private function parseExpression($symbol){
 // start expression
 		if($symbol == '{'){
 			$this->currExpr = $this->newExpr;
@@ -147,14 +293,14 @@ private $allowed;
 		}
 	}
 
-	private function detectMacro($symbol){
+	private function parseMacro($symbol){
 		if(($symbol == '}') && isset($this->allowed['macros'][$this->currExpr['object']['expression']])){
 			$this->currExpr['object']['macro'] = '{'.$this->currExpr['object']['host'].'}';
 			$this->currExpr['object']['host'] = '';
 		}
 	}
 
-	private function detectItem($symbol){
+	private function parseItem($symbol){
 // start item
 		if($symbol == ':'){
 			$this->currExpr['part']['host'] = false;
@@ -168,7 +314,7 @@ private $allowed;
 
 	}
 
-	private function detectFunction($symbol){
+	private function parseFunction($symbol){
 // start function
 		if($symbol == '('){
 			if(!$this->currExpr['part']['item']) return;
@@ -185,7 +331,7 @@ private $allowed;
 		}
 	}
 
-	private function detectParam($symbol){
+	private function parseParam($symbol){
 		if($symbol == ' ') return;
 
 // start params
@@ -265,11 +411,11 @@ private $allowed;
 // -----------------------------------------------------------------
 // CLOSE
 
-	private function detectCloseParts($symbol){
+	private function parseCloseParts($symbol){
 		if(!$this->inQuotes($symbol)){
 			if(!$this->inParameter()){
 // close symbols
-				$this->detectExpressionClose($symbol);
+				$this->parseExpressionClose($symbol);
 
 				if($symbol == '}'){
 					$this->expressions[] = $this->currExpr['object'];
@@ -278,14 +424,14 @@ private $allowed;
 			}
 
 			if(!$this->currExpr['part']['usermacro']){
-				$this->detectParamClose($symbol);
+				$this->parseParamClose($symbol);
 			}
 		}
 
 		$this->writeParts($symbol);
 	}
 
-	private function detectExpressionClose($symbol){
+	private function parseExpressionClose($symbol){
 // end expression
 		if($symbol == '}'){
 			$this->currExpr['part']['expression'] = false;
@@ -321,13 +467,13 @@ private $allowed;
 
 	}
 
-	private function detectParamClose($symbol){
+	private function parseParamClose($symbol){
 		if($symbol == ' ') return;
 // end params
 //		$this->writeParams();
 		if(!$this->inQuotes()){
 			if(($symbol == ']') && $this->currExpr['part']['itemParam']){
-// +1 because (detectParam is not counted this symbol yet)
+// +1 because (parseParam is not counted this symbol yet)
 				if($this->symbols['params']['['] == ($this->symbols['params'][']'] + 1)){
 					$this->symbols['params'][$symbol]++;
 
@@ -419,7 +565,7 @@ private $allowed;
 			throw new Exception('Incorrect closing parenthesis in trigger expression.');
 
 // check symbol sequence
-		if(isset($this->symbols['linkage'][$symbol]) && isset($this->symbols['linkage'][$this->previous['lastNoSpace']])){
+		if(($symbol != '-') && isset($this->symbols['linkage'][$symbol]) && isset($this->symbols['linkage'][$this->previous['lastNoSpace']])){
 			throw new Exception('Incorrect symbol sequence in trigger expression.');
 		}
 
@@ -427,133 +573,6 @@ private $allowed;
 		if(isset($this->symbols['open'][$symbol])) $this->symbols['open'][$symbol]++;
 		if(isset($this->symbols['expr'][$symbol])) $this->symbols['expr'][$symbol]++;
 		if(isset($this->symbols['linkage'][$symbol])) $this->symbols['linkage'][$symbol]++;
-	}
-
-	private function checkOverallExpression($expression){
-		$simpleExpression = $expression;
-
-		$this->checkExpressionBrackets($simpleExpression);
-		$this->checkExpressionParts($simpleExpression);
-		$this->checkSimpleExpression($simpleExpression);
-//SDII($this->data);
-//SDII($this->expressions);
-	}
-
-	private function checkExpressionBrackets(&$expression){
-		if($this->symbols['params']['"'] % 2 != 0)
-			throw new Exception('Incorrect count of quotes in expression');
-
-		if($this->symbols['open']['('] != $this->symbols['close'][')']){
-			throw new Exception('Incorrect parenthesis count in expression');
-		}
-
-		if($this->symbols['open']['{'] != $this->symbols['close']['}'])
-			throw new Exception('Incorrect curly braces count in expression');
-	}
-
-	private function checkExpressionParts(&$expression){
-		foreach($this->expressions as $enum => $expr){
-			if($expr['expression']){}
-
-
-			if(!zbx_empty($expr['macro'])){
-				if(!preg_match('/^'.ZBX_PREG_EXPRESSION_SIMPLE_MACROS.'$/i', $expr['macro']))
-					throw new Exception('Incorrect macro is used in expression');
-
-				$this->data['macros'][] = $expr['macro'];
-			}
-			else if(!zbx_empty($expr['usermacro'])){
-				if(!preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/i', $expr['usermacro']))
-					throw new Exception('Incorrect user macro format is used in expression');
-
-				$this->data['usermacros'][] = $expr['usermacro'];
-			}
-			else{
-				if(zbx_empty($expr['host'])) throw new Exception('Incorrect host name provided in expression');
-				if(zbx_empty($expr['item'])) throw new Exception('Incorrect item key provided in expression');
-// host
-				if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $expr['host']))
-					throw new Exception('Incorrect host name is used in expression');
-// item
-				$checkResult = check_item_key($expr['item']);
-				if(!$checkResult['valid'])
-					throw new Exception('Incorrect item key "'.$expr['item'].'" is used in expression, '.$checkResult['description']);
-// function
-				$expr['functionName'] = strtolower($expr['functionName']);
-				if(!isset($this->allowed['functions'][$expr['functionName']]))
-					throw new Exception('Unknown trigger function is used in expression "'.$expr['functionName'].'"');
-
-				if(!preg_match('/^'.ZBX_PREG_FUNCTION_FORMAT.'$/i', $expr['function']))
-					throw new Exception('Incorrect trigger function format is used in expression');
-
-				$this->checkFunctionParams($expr);
-
-
-				$this->data['hosts'][] = $expr['host'];
-				$this->data['items'][] = $expr['item'];
-				$this->data['functions'][] = $expr['functionName'];
-				$this->data['functionParams'][] = $expr['functionParam'];
-			}
-
-			$expression = str_replace($expr['expression'], '{expression}', $expression);
-		}
-
-		if(empty($this->data['hosts']) || empty($this->data['items']))
-			throw new Exception('Trigger expression must contain at least one host:key reference');
-	}
-
-	private function checkFunctionParams($expr){
-		if(is_null($this->allowed['functions'][$expr['functionName']]['args'])) return;
-
-		foreach($this->allowed['functions'][$expr['functionName']]['args'] as $anum => $arg){
-// mandatory check
-			if(isset($arg['mandat']) && $arg['mandat'] && !isset($expr['functionParamList'][$anum]))
-				throw new Exception('Incorrect number of agruments passed to function "'.$expr['functionParamList'].'"');
-// type check
-			if(isset($arg['type']) && isset($expr['functionParamList'][$anum])){
-				$typeFlag = true;
-				if($arg['type'] == 'str') $typeFlag = is_string($expr['functionParamList'][$anum]);
-				if($arg['type'] == 'sec') $typeFlag = (validate_float($expr['functionParamList'][$anum]) == 0);
-				if($arg['type'] == 'sec_num') $typeFlag = (validate_ticks($expr['functionParamList'][$anum]) == 0);
-				if($arg['type'] == 'num') $typeFlag = is_numeric($expr['functionParamList'][$anum]);
-
-				if(!$typeFlag)
-					throw new Exception('Incorrect type of agruments passed to function "'.$expr['function'].'"');
-			}
-		}
-	}
-
-	private function checkSimpleExpression(&$expression){
-		$expression = preg_replace("/(\d+(\.\d+)?[KMGTsmhdw]?)/u", '{expression}', $expression);
-		$expression = preg_replace("/(\(\-?\{expression\}\))/u", '{expression}', $expression);
- 
-		$simpleExpr = str_replace(' ','',$expression);
-		$simpleExpr = str_replace('{expression}','1',$simpleExpr);
-
-		if(strpos($simpleExpr,'()') !== false)
-			throw new Exception('Incorrect trigger expression format " '.$expression.' "');
-		if(strpos($simpleExpr,'11') !== false)
-			throw new Exception('Incorrect trigger expression format " '.$expression.' "');
-
-		$linkageCount = 0;
-		$linkageExpr = '';
-		foreach($this->symbols['linkage'] as $symb => $count){
-			if($symb == ' ') continue;
-
-			$linkageCount += substr_count($expression, $symb);
-			$linkageExpr .= '\\'.$symb;
-
-			if((strpos($simpleExpr, $symb.')') !== false) || (strpos($simpleExpr,'('.$symb.'1') !== false))
-				throw new Exception('Incorrect trigger expression format " '.$expression.' "');
-		}
-
-		if(!preg_match('/^([\(\)\d\s'.$linkageExpr.']+)$/i', $simpleExpr))
-			throw new Exception('Incorrect trigger expression format " '.$expression.' "');
-
-		$exprCount = substr_count($expression, '{expression}');
-
-		if($linkageCount != $exprCount-1)
-			throw new Exception('Incorrect usage of expression logic linking symbols');
 	}
 
 	private function setPreviousSymbol($symbol){
