@@ -8,6 +8,7 @@ New features:
  - [ZBXNEXT-512] redesign of unknown events (Aly,asaveljevs,Sasha)
 
 Bug fixes:
+ - [ZBX-3241] fixed incorrectly shortened popup texts
  - [ZBX-2647] Made some of hard coded strings translatable (KB)
  - [ZBX-3300] fixed valuemapid not removed from items table when valuemap deleted (Vedmak)
  - [ZBXNEXT-588] improved template, host, proxy form view, dashboard screen (Aly,Vedmak)
