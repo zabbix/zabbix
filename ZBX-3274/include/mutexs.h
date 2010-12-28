@@ -51,14 +51,9 @@
 #	define ZBX_MUTEX_CACHE_IDS	4
 #	define ZBX_MUTEX_CONFIG		5
 #	define ZBX_MUTEX_STRPOOL	6
-/* This has to be the last MUTEX in the list with MAX number */
 #	define ZBX_MUTEX_COUNT		7
 
 #	define ZBX_MUTEX_MAX_TRIES	20 /* seconds */
-
-#	if defined(HAVE_SQLITE3)
-
-#	endif
 
 #endif /* _WINDOWS */
 
@@ -79,25 +74,27 @@ int	zbx_mutex_destroy(ZBX_MUTEX *mutex);
 #define PHP_MUTEX_OK	1
 #define PHP_MUTEX_ERROR	0
 
-typedef struct {
-	int semid;
-	int count;
-} PHP_MUTEX;
+typedef struct
+{
+	int	semid;
+	int	count;
+}
+PHP_MUTEX;
 
-#if defined(HAVE_SQLITE3) && !defined(_WINDOWS)
+#if defined(HAVE_SQLITE3)
 
 int	php_sem_get(PHP_MUTEX *sem_ptr, const char *path_name);
 int	php_sem_acquire(PHP_MUTEX *sem_ptr);
 int	php_sem_release(PHP_MUTEX *sem_ptr);
 int	php_sem_remove(PHP_MUTEX *sem_ptr);
 
-#else /* !HAVE_SQLITE3 || _WINDOWS */
+#else
 
 #	define php_sem_get(sem_ptr, path_name) PHP_MUTEX_OK
 #	define php_sem_acquire(sem_ptr)        PHP_MUTEX_OK
 #	define php_sem_release(sem_ptr)        PHP_MUTEX_OK
 #	define php_sem_remove(sem_ptr)         PHP_MUTEX_OK
 
-#endif  /* HAVE_SQLITE3 && !_WINDOWS */
+#endif	/* HAVE_SQLITE3 */
 
-#endif /* ZABBIX_MUTEXS_H */
+#endif	/* ZABBIX_MUTEXS_H */
