@@ -120,7 +120,7 @@ private $allowed;
 			$simpleExpr = str_replace('({expression})','{expression}',$simpleExpr);
 			$simpleExpr = str_replace('(-{expression})','{expression}',$simpleExpr);
 
-			$simpleExpr = preg_replace('/\{expression\}(([\=\#\<\>\|\&]\-)|(\-\-)|([\=\#\<\>\|\&\+\-\/\*]))\{expression\}/u', '{expression}', $simpleExpr);
+			$simpleExpr = preg_replace("/\{expression\}([\=\#\<\>\|\&\+\-\/\*]\-?)\{expression\}/u", '{expression}', $simpleExpr);
 		}
 // SDI($simpleExpr);
 
@@ -128,7 +128,6 @@ private $allowed;
 		$simpleExpr = str_replace('{expression}','1',$simpleExpr);
 
 // SDI($simpleExpr);
-
 		if(strpos($simpleExpr,'()') !== false)
 			throw new Exception('Incorrect trigger expression format " '.$expression.' "');
 		if(strpos($simpleExpr,'11') !== false)
