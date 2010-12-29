@@ -391,13 +391,13 @@ TABLE|opmessage_grp|opmessage_grpid|ZBX_SYNC
 FIELD		|opmessage_grpid|t_id		|	|NOT NULL	|0
 FIELD		|opmessageid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|opmessage
 FIELD		|usrgrpid	|t_id		|	|NOT NULL	|ZBX_SYNC		|2|usrgrp	|		|RESTRICT
-INDEX		|1		|opmessageid
+UNIQUE		|1		|opmessageid,usrgrpid
 
 TABLE|opmessage_usr|opmessage_usrid|ZBX_SYNC
 FIELD		|opmessage_usrid|t_id		|	|NOT NULL	|0
 FIELD		|opmessageid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|opmessage
 FIELD		|userid		|t_id		|	|NOT NULL	|ZBX_SYNC		|2|users	|		|RESTRICT
-INDEX		|1		|opmessageid
+UNIQUE		|1		|opmessageid,userid
 
 TABLE|opcommand_hst|opcommand_hstid|ZBX_SYNC
 FIELD		|opcommand_hstid|t_id		|	|NOT NULL	|0
@@ -417,13 +417,13 @@ TABLE|opgroup|opgroupid|ZBX_SYNC
 FIELD		|opgroupid	|t_id		|	|NOT NULL	|0
 FIELD		|operationid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|operations
 FIELD		|groupid	|t_id		|	|NOT NULL	|ZBX_SYNC		|2|groups	|		|RESTRICT
-INDEX		|1		|operationid
+UNIQUE		|1		|operationid,groupid
 
 TABLE|optemplate|optemplateid|ZBX_SYNC
 FIELD		|optemplateid	|t_id		|	|NOT NULL	|0
 FIELD		|operationid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|operations
 FIELD		|templateid	|t_id		|	|NOT NULL	|ZBX_SYNC		|2|hosts	|hostid		|RESTRICT
-INDEX		|1		|operationid
+UNIQUE		|1		|operationid,templateid
 
 TABLE|opconditions|opconditionid|ZBX_SYNC
 FIELD		|opconditionid	|t_id		|	|NOT NULL	|0

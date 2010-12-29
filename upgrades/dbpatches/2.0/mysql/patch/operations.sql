@@ -41,7 +41,7 @@ CREATE TABLE opmessage_grp (
 	usrgrpid                 bigint unsigned                           NOT NULL,
 	PRIMARY KEY (opmessage_grpid)
 ) ENGINE=InnoDB;
-CREATE INDEX opmessage_grp_1 ON opmessage_grp (opmessageid);
+CREATE UNIQUE INDEX opmessage_grp_1 ON opmessage_grp (opmessageid,usrgrpid);
 ALTER TABLE opmessage_grp ADD CONSTRAINT c_opmessage_grp_1 FOREIGN KEY (opmessageid) REFERENCES opmessage (opmessageid) ON DELETE CASCADE;
 ALTER TABLE opmessage_grp ADD CONSTRAINT c_opmessage_grp_2 FOREIGN KEY (usrgrpid) REFERENCES usrgrp (usrgrpid);
 
@@ -65,7 +65,7 @@ CREATE TABLE opmessage_usr (
 	userid                   bigint unsigned                           NOT NULL,
 	PRIMARY KEY (opmessage_usrid)
 ) ENGINE=InnoDB;
-CREATE INDEX opmessage_usr_1 ON opmessage_usr (opmessageid);
+CREATE UNIQUE INDEX opmessage_usr_1 ON opmessage_usr (opmessageid,userid);
 ALTER TABLE opmessage_usr ADD CONSTRAINT c_opmessage_usr_1 FOREIGN KEY (opmessageid) REFERENCES opmessage (opmessageid) ON DELETE CASCADE;
 ALTER TABLE opmessage_usr ADD CONSTRAINT c_opmessage_usr_2 FOREIGN KEY (userid) REFERENCES users (userid);
 
@@ -246,7 +246,7 @@ CREATE TABLE opgroup (
 	groupid                  bigint unsigned                           NOT NULL,
 	PRIMARY KEY (opgroupid)
 ) ENGINE=InnoDB;
-CREATE INDEX opgroup_1 ON opgroup (operationid);
+CREATE UNIQUE INDEX opgroup_1 ON opgroup (operationid,groupid);
 ALTER TABLE opgroup ADD CONSTRAINT c_opgroup_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE;
 ALTER TABLE opgroup ADD CONSTRAINT c_opgroup_2 FOREIGN KEY (groupid) REFERENCES groups (groupid);
 
@@ -269,7 +269,7 @@ CREATE TABLE optemplate (
 	templateid               bigint unsigned                           NOT NULL,
 	PRIMARY KEY (optemplateid)
 ) ENGINE=InnoDB;
-CREATE INDEX optemplate_1 ON optemplate (operationid);
+CREATE UNIQUE INDEX optemplate_1 ON optemplate (operationid,templateid);
 ALTER TABLE optemplate ADD CONSTRAINT c_optemplate_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE;
 ALTER TABLE optemplate ADD CONSTRAINT c_optemplate_2 FOREIGN KEY (templateid) REFERENCES hosts (hostid);
 
