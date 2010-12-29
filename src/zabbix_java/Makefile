@@ -1,7 +1,8 @@
 JAR = sbin/ZabbixJavaProxy.jar
 
 jar: build
-	javac -d build/src src/com/zabbix/proxy/*.java
+	javac -d build/src -source 1.4 src/org/json/*.java
+	javac -d build/src -classpath build/src src/com/zabbix/proxy/*.java
 	javac -d build/tests -classpath build/src:$(CLASSPATH) tests/com/zabbix/proxy/*.java
 	jar cfm $(JAR) MANIFEST.MF -C build/src .
 
