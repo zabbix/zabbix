@@ -32,7 +32,7 @@ class CFormTable extends CForm{
 
 	public function __construct($title=null, $action=null, $method=null, $enctype=null, $form_variable=null){
 		$method = is_null($method) ? 'post' : $method;
-		parent::__construct($action, $method, $enctype);
+		parent::__construct($method, $action, $enctype);
 
 		$this->setTitle($title);
 		$this->setHelp();

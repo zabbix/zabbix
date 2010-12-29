@@ -53,7 +53,7 @@
 
 			$this->EventHandler();
 
-			parent::__construct(null, 'post');
+			parent::__construct('post');
 		}
 
 		function getConfig($name, $default = null){
