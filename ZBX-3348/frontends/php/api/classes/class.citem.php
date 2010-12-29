@@ -945,6 +945,9 @@ COpt::memoryPick();
 				else if(!isset($item['interfaceid'])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 				}
+				else{
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Property "type" is required as INT');
+				}
 			}
 			else if($delete){
 				if(!isset($dbItems[$item['itemid']]))
