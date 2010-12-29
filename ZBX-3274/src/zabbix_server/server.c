@@ -776,9 +776,9 @@ void	zbx_on_exit()
 	free_ipmi_handler();
 #endif
 
-#ifdef  HAVE_SQLITE3
+#ifdef HAVE_SQLITE3
 	php_sem_remove(&sqlite_access);
-#endif /* HAVE_SQLITE3 */
+#endif	/* HAVE_SQLITE3 */
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Server stopped. Zabbix %s (revision %s).",
 			ZABBIX_VERSION,

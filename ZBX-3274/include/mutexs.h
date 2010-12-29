@@ -30,8 +30,8 @@
 
 #	define ZBX_MUTEX_NAME		wchar_t *
 
-#	define ZBX_MUTEX_LOG    	TEXT("ZBX_MUTEX_LOG")
-#	define ZBX_MUTEX_PERFSTAT  	TEXT("ZBX_MUTEX_PERFSTAT")
+#	define ZBX_MUTEX_LOG		TEXT("ZBX_MUTEX_LOG")
+#	define ZBX_MUTEX_PERFSTAT	TEXT("ZBX_MUTEX_PERFSTAT")
 
 #else /* not _WINDOWS */
 
@@ -67,6 +67,8 @@ void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex);
 void	__zbx_mutex_unlock(const char *filename, int line, ZBX_MUTEX *mutex);
 int	zbx_mutex_destroy(ZBX_MUTEX *mutex);
 
+#if defined(HAVE_SQLITE3)
+
 /*********************************************************/
 /*** PHP Semaphore functions using System V semaphores ***/
 /*********************************************************/
@@ -81,19 +83,10 @@ typedef struct
 }
 PHP_MUTEX;
 
-#if defined(HAVE_SQLITE3)
-
 int	php_sem_get(PHP_MUTEX *sem_ptr, const char *path_name);
 int	php_sem_acquire(PHP_MUTEX *sem_ptr);
 int	php_sem_release(PHP_MUTEX *sem_ptr);
 int	php_sem_remove(PHP_MUTEX *sem_ptr);
-
-#else
-
-#	define php_sem_get(sem_ptr, path_name) PHP_MUTEX_OK
-#	define php_sem_acquire(sem_ptr)        PHP_MUTEX_OK
-#	define php_sem_release(sem_ptr)        PHP_MUTEX_OK
-#	define php_sem_remove(sem_ptr)         PHP_MUTEX_OK
 
 #endif	/* HAVE_SQLITE3 */
 

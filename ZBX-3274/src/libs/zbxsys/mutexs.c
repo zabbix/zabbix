@@ -318,7 +318,7 @@ int zbx_mutex_destroy(ZBX_MUTEX *mutex)
 	return ZBX_MUTEX_OK;
 }
 
-#if defined(HAVE_SQLITE3) && !defined(_WINDOWS)
+#if defined(HAVE_SQLITE3)
 
 /*
    +----------------------------------------------------------------------+
@@ -552,4 +552,4 @@ int	php_sem_remove(PHP_MUTEX *sem_ptr)
 	return PHP_MUTEX_OK;
 }
 
-#endif /* HAVE_SQLITE3 && !_WINDOWS */
+#endif	/* HAVE_SQLITE3 */
