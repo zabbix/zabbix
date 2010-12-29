@@ -1071,15 +1071,10 @@ Copt::memoryPick();
 
 		try{
 			self::BeginTransaction(__METHOD__);
-// BASIC VALIDATION {{{
+// CHECK IF HOSTS HAVE AT LEAST 1 GROUP {{{
 			foreach($hosts as $hnum => $host){
-				// CHECK IF HOSTS HAVE AT LEAST 1 GROUP
 				if(empty($host['groups'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf(S_NO_GROUPS_FOR_HOST, $host['host']));
-				}
-				// Check if host name isn't longer then 64 chars
-				if(zbx_strlen($host['host']) > 64){
-					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf(S_HOST_NAME_MUST_BE_LONGER, 64, $host['host'], zbx_strlen($host['host'])));
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'No groups for host [ '.$host['host'].' ]');
 				}
 				$hosts[$hnum]['groups'] = zbx_toArray($hosts[$hnum]['groups']);
 
@@ -1087,7 +1082,7 @@ Copt::memoryPick();
 					$groupids[$group['groupid']] = $group['groupid'];
 				}
 			}
-// }}}
+// }}} CHECK IF HOSTS HAVE AT LEAST 1 GROUP
 
 
 // PERMISSIONS {{{
