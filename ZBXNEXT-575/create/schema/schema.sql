@@ -378,26 +378,24 @@ FIELD		|esc_step_to	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|evaltype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|actionid
 
-TABLE|opmessage|opmessageid|ZBX_SYNC
-FIELD		|opmessageid	|t_id		|	|NOT NULL	|0
-FIELD		|operationid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|operations
+TABLE|opmessage|operationid|ZBX_SYNC
+FIELD		|operationid	|t_id		|	|NOT NULL	|0			|1|operations
 FIELD		|default_msg	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|subject	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|message	|t_text		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|mediatypeid	|t_id		|	|NULL		|ZBX_SYNC		|2|media_type	|		|RESTRICT
-INDEX		|1		|operationid
 
 TABLE|opmessage_grp|opmessage_grpid|ZBX_SYNC
 FIELD		|opmessage_grpid|t_id		|	|NOT NULL	|0
-FIELD		|opmessageid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|opmessage
+FIELD		|operationid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|operations
 FIELD		|usrgrpid	|t_id		|	|NOT NULL	|ZBX_SYNC		|2|usrgrp	|		|RESTRICT
-UNIQUE		|1		|opmessageid,usrgrpid
+UNIQUE		|1		|operationid,usrgrpid
 
 TABLE|opmessage_usr|opmessage_usrid|ZBX_SYNC
 FIELD		|opmessage_usrid|t_id		|	|NOT NULL	|0
-FIELD		|opmessageid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|opmessage
+FIELD		|operationid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|operations
 FIELD		|userid		|t_id		|	|NOT NULL	|ZBX_SYNC		|2|users	|		|RESTRICT
-UNIQUE		|1		|opmessageid,userid
+UNIQUE		|1		|operationid,userid
 
 TABLE|opcommand_hst|opcommand_hstid|ZBX_SYNC
 FIELD		|opcommand_hstid|t_id		|	|NOT NULL	|0
