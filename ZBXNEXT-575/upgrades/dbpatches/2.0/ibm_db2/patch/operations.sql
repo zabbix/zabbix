@@ -54,7 +54,7 @@ CREATE TABLE opmessage_grp (
 	PRIMARY KEY (opmessage_grpid)
 )
 /
-CREATE INDEX opmessage_grp_1 on opmessage_grp (opmessageid)
+CREATE UNIQUE INDEX opmessage_grp_1 ON opmessage_grp (opmessageid,usrgrpid)
 /
 ALTER TABLE opmessage_grp ADD CONSTRAINT c_opmessage_grp_1 FOREIGN KEY (opmessageid) REFERENCES opmessage (opmessageid) ON DELETE CASCADE
 /
@@ -89,7 +89,7 @@ CREATE TABLE opmessage_usr (
 	PRIMARY KEY (opmessage_usrid)
 )
 /
-CREATE INDEX opmessage_usr_1 on opmessage_usr (opmessageid)
+CREATE UNIQUE INDEX opmessage_usr_1 ON opmessage_usr (opmessageid,userid)
 /
 ALTER TABLE opmessage_usr ADD CONSTRAINT c_opmessage_usr_1 FOREIGN KEY (opmessageid) REFERENCES opmessage (opmessageid) ON DELETE CASCADE
 /
@@ -339,7 +339,7 @@ CREATE TABLE opgroup (
 	PRIMARY KEY (opgroupid)
 )
 /
-CREATE INDEX opgroup_1 on opgroup (operationid)
+CREATE UNIQUE INDEX opgroup_1 ON opgroup (operationid,groupid)
 /
 ALTER TABLE opgroup ADD CONSTRAINT c_opgroup_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE
 /
@@ -373,7 +373,7 @@ CREATE TABLE optemplate (
 	PRIMARY KEY (optemplateid)
 )
 /
-CREATE INDEX optemplate_1 on optemplate (operationid)
+CREATE UNIQUE INDEX optemplate_1 ON optemplate (operationid,templateid)
 /
 ALTER TABLE optemplate ADD CONSTRAINT c_optemplate_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE
 /
