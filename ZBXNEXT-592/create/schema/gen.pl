@@ -54,6 +54,7 @@ local $uniq;
 	"t_history_log"	=>	"text",
 	"t_history_text"=>	"text",
 	"t_blob"	=>	"blob",
+	"t_text"	=>	"text",
 	"t_item_param"	=>	"text",
 	"t_cksum_text"	=>	"text"
 );
@@ -74,6 +75,7 @@ local $uniq;
 	"t_history_log"	=>	"ZBX_TYPE_TEXT",
 	"t_history_text"=>	"ZBX_TYPE_TEXT",
 	"t_blob"	=>	"ZBX_TYPE_BLOB",
+	"t_text"	=>	"ZBX_TYPE_TEXT",
 	"t_item_param"	=>	"ZBX_TYPE_TEXT",
 	"t_cksum_text"	=>	"ZBX_TYPE_TEXT"  
 );
@@ -120,6 +122,7 @@ const ZBX_TABLE	tables[]={
 	"t_history_log"	=>	"nclob",
 	"t_history_text"=>	"nclob",
 	"t_blob"	=>	"nvarchar2(2048)",
+	"t_text"	=>	"nvarchar2(2048)",
 	"t_item_param"	=>	"nvarchar2(2048)",
 	"t_cksum_text"	=>	"nclob"  
 );
@@ -142,6 +145,7 @@ const ZBX_TABLE	tables[]={
 	"t_time"	=>	"integer",
 	"t_nanosec"	=>	"integer",
 	"t_blob"	=>	"varchar(2048)",
+	"t_text"	=>	"varchar(2048)",
 	"t_item_param"	=>	"varchar(2048)",
 	"t_cksum_text"	=>	"varchar(2048)"
 );
@@ -164,6 +168,7 @@ const ZBX_TABLE	tables[]={
 	"t_time"	=>	"integer",
 	"t_nanosec"	=>	"integer",
 	"t_blob"	=>	"text",
+	"t_text"	=>	"text",
 	"t_item_param"	=>	"text",
 	"t_cksum_text"	=>	"text"  
 );
@@ -185,6 +190,7 @@ const ZBX_TABLE	tables[]={
 	"t_history_log"	=>	"text",
 	"t_history_text"=>	"text",
 	"t_blob"	=>	"blob",
+	"t_text"	=>	"text",
 	"t_item_param"	=>	"text",
 	"t_cksum_text"	=>	"text"  
 );
