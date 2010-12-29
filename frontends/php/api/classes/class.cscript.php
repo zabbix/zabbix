@@ -74,7 +74,7 @@ class CScript extends CZBXAPI{
 // filter
 			'filter'				=> null,
 			'search'				=> null,
-			'filterOperator'	=> API_FILTER_OPERATOR,
+			'filterByOR'			=> null,
 			'startSearch'				=> null,
 			'excludeSearch'			=> null,
 
