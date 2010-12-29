@@ -2,6 +2,8 @@
 
 jQuery(document).ready(function(){
 
+	jQuery("#name").focus();
+
 // question field typing
 	jQuery("#question").keyup(function(){
 		if(this.value != ''){
@@ -31,14 +33,14 @@ jQuery(document).ready(function(){
 		var question = jQuery('#question').val();
 
 		var buttons = [
-			{text: '<?php echo _('Execute');?>' },
+			{text: '<?php echo _('Execute');?>', click: function(){} },
 			{text: '<?php echo _('Cancel');?>', click: function(){
 				jQuery(this).dialog("destroy");
 			}}
 		];
 
 		var d = showScriptDialog(question, buttons);
-		jQuery(d).find('button:first span').css("color", "gray");
+		jQuery(d).find('button:first span').attr('disabled', 'disabled').addClass('ui-state-disabled');
 	});
 
 });

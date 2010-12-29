@@ -3,7 +3,8 @@
 <script type="text/javascript">
 
 function showScriptDialog(question, buttons){
-	question = question.toString();
+	question = jQuery.trim(question.toString());
+
 	if(question.charAt(question.length-1) != '?')
 		question += '?';
 
