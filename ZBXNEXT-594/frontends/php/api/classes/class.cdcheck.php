@@ -55,7 +55,7 @@ class CDCheck extends CZBXAPI{
 // filter
 			'filter'					=> null,
 			'search'					=> null,
-						'filterOperator'	=> API_FILTER_OPERATOR,
+			'filterOperator'	=> API_FILTER_OPERATOR,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 
