@@ -187,6 +187,7 @@ frontends/php/locale/es/LC_MESSAGES/frontend.po -text
 frontends/php/locale/fr/LC_MESSAGES/frontend.po -text
 frontends/php/locale/hu/LC_MESSAGES/frontend.po -text
 frontends/php/locale/it/LC_MESSAGES/frontend.po -text
+frontends/php/locale/ja/LC_MESSAGES/frontend.po -text
 frontends/php/locale/ko/LC_MESSAGES/frontend.po -text
 frontends/php/locale/lv/LC_MESSAGES/frontend.po -text
 frontends/php/locale/nl/LC_MESSAGES/frontend.po -text
@@ -241,8 +242,15 @@ frontends/php/styles/originalblue/images/ui-icons_f9bd01_256x240.png -text
 frontends/php/tests/api/classes/class.triggerexpressionTest.php -text
 frontends/php/tests/bootstrap.php.template -text
 frontends/php/tests/selenium/SeleniumTests.php -text
+frontends/php/tests/selenium/class.ctest.php -text
 frontends/php/tests/selenium/testClicks.php -text
+frontends/php/tests/selenium/testFormHost.php -text
+frontends/php/tests/selenium/testFormHostGroup.php -text
+frontends/php/tests/selenium/testFormProfile.php -text
+frontends/php/tests/selenium/testFormScreen.php -text
 frontends/php/tests/selenium/testGeneric.php -text
+frontends/php/tests/selenium/testPageDashboard.php -text
+frontends/php/tests/selenium/testPageHosts.php -text
 m4/ax_lib_ibm_db2.m4 -text
 m4/ax_lib_oracle_oci.m4 -text
 m4/iconv.m4 -text
@@ -263,7 +271,10 @@ misc/init.d/fedora/core5/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_server -text
 misc/init.d/tru64/zabbix_server -text
+tests/templates/sqlite3.init -text
 tests/templates/zabbix.conf.php.mysql -text
+tests/templates/zabbix.conf.php.postgresql -text
+tests/templates/zabbix.conf.php.sqlite3 -text
 upgrades/dbpatches/2.0/ibm_db2/patch/graph_discovery.sql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/item_discovery.sql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/trigger_discovery.sql -text

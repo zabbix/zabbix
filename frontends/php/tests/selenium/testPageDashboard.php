@@ -19,19 +19,26 @@
 **/
 ?>
 <?php
+require_once(dirname(__FILE__).'/class.ctest.php');
 
-class APIException extends Exception{
-	private $errors = array();
+class testPageDashboard extends CTest
+{
+	public $host = "Text host";
 
-	public function __construct($code = ZBX_API_ERROR_INTERNAL, $errors = array(), $message = ''){
-        parent::__construct($message, $code);
-
-		$errors = zbx_toArray($errors);
-		$this->errors = $errors;
-    }
-
-	public function getErrors(){
-		return $this->errors;
+	public function testPageDashboard_SimpleTest()
+	{
+		$this->login('dashboard.php');
+		$this->assertTitle('Dashboard');
+		$this->ok('PERSONAL DASHBOARD');
+		$this->ok('Favourite graphs');
+		$this->ok('Favourite screens');
+		$this->ok('Favourite maps');
+		$this->ok('Status of Zabbix');
+		$this->ok('System status');
+		$this->ok('Host status');
+		$this->ok('Last 20 issues');
+		$this->ok('Web monitoring');
+		$this->ok('Updated:');
 	}
 }
 ?>

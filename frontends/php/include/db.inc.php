@@ -224,16 +224,7 @@ if(!isset($DB)){
 			}
 		}
 
-		unset(
-			$GLOBALS['DB'],
-			$GLOBALS['DB_TYPE'],
-			$GLOBALS['DB_SERVER'],
-			$GLOBALS['DB_PORT'],
-			$GLOBALS['DB_DATABASE'],
-			$GLOBALS['DB_USER'],
-			$GLOBALS['DB_PASSWORD'],
-			$GLOBALS['SQLITE_TRANSACTION']
-			);
+		unset($DB['DB']);
 
 		return $result;
 	}

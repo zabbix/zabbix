@@ -25,6 +25,7 @@ dist-hook:
 	rm -rf `find $(top_distdir) -name ".svn"`
 	rm -f $(top_distdir)/include/config.h
 	rm -f $(top_distdir)/frontends/php/conf/zabbix.conf.php
+	rm -rf $(top_distdir)/frontends/php/tests
 
 dbschema:
 	create/schema/gen.pl ibm_db2 > create/schema/ibm_db2.sql
