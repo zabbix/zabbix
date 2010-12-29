@@ -796,6 +796,9 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	define('API_OUTPUT_COUNT', 'count');
 	define('API_OUTPUT_CUSTOM', 'custom');
 
+// Filter and Search default Operator
+	define('API_FILTER_OPERATOR', 'AND');
+
 	define('SEC_PER_MIN', 60);
 	define('SEC_PER_HOUR', 3600);
 	define('SEC_PER_DAY', 86400);

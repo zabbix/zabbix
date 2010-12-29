@@ -61,7 +61,8 @@ class CDiscoveryRule extends CZBXAPI{
 // filter
 			'filter'				=> null,
 			'search'				=> null,
-			'startSearch'			=> null,
+						'filterOperator'	=> API_FILTER_OPERATOR,
+			'startSearch'				=> null,
 			'excludeSearch'			=> null,
 
 // OutPut
