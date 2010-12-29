@@ -222,7 +222,7 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	add_object_msg(zbx_uint64_t opmessageid, zbx_uint64_t mediatypeid, ZBX_USER_MSG **user_msg,
+static void	add_object_msg(zbx_uint64_t operationid, zbx_uint64_t mediatypeid, ZBX_USER_MSG **user_msg,
 		char *subject, char *message, unsigned char source, zbx_uint64_t triggerid)
 {
 	DB_RESULT	result;
@@ -232,13 +232,13 @@ static void	add_object_msg(zbx_uint64_t opmessageid, zbx_uint64_t mediatypeid, Z
 	result = DBselect(
 			"select userid"
 			" from opmessage_usr"
-			" where opmessageid=" ZBX_FS_UI64
+			" where operationid=" ZBX_FS_UI64
 			" union "
 			"select g.userid"
 			" from opmessage_grp m,users_groups g"
 			" where m.usrgrpid=g.usrgrpid"
-				" and m.opmessageid=" ZBX_FS_UI64,
-			opmessageid, opmessageid);
+				" and m.operationid=" ZBX_FS_UI64,
+			operationid, operationid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -820,7 +820,7 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 	{
 		result = DBselect(
 				"select o.operationid,o.operationtype,o.esc_period,o.evaltype,"
-					"m.opmessageid,m.default_msg,subject,message,mediatypeid"
+					"m.operationid,m.default_msg,subject,message,mediatypeid"
 				" from operations o"
 					" left join opmessage m"
 						" on m.operationid=o.operationid"
@@ -835,7 +835,7 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 
 		result = DBselect(
 				"select o.operationid,o.operationtype,o.esc_period,o.evaltype,"
-					"m.opmessageid,m.default_msg,subject,message,mediatypeid"
+					"m.operationid,m.default_msg,subject,message,mediatypeid"
 				" from operations o"
 					" left join opmessage m"
 						" on m.operationid=o.operationid"
@@ -863,7 +863,7 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 		{
 			unsigned char	default_msg = 1;
 			char		*subject = NULL, *message = NULL;
-			zbx_uint64_t	opmessageid, mediatypeid = 0;
+			zbx_uint64_t	mediatypeid = 0;
 
 			zabbix_log(LOG_LEVEL_DEBUG, "Conditions match our event. Execute operation.");
 
@@ -876,7 +876,6 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 					if (SUCCEED == DBis_null(row[4]))
 						break;
 
-					ZBX_STR2UINT64(opmessageid, row[4]);
 					default_msg = (unsigned char)atoi(row[5]);
 					ZBX_DBROW2UINT64(mediatypeid, row[8]);
 
@@ -894,7 +893,7 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 						message = action->longdata;
 					}
 
-					add_object_msg(opmessageid, mediatypeid, &user_msg, subject, message,
+					add_object_msg(operation.operationid, mediatypeid, &user_msg, subject, message,
 							event->source, event->objectid);
 
 					if (0 == default_msg)
