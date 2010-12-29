@@ -21,6 +21,12 @@
 <?php
 require_once(dirname(__FILE__).'/testGeneric.php');
 require_once(dirname(__FILE__).'/testClicks.php');
+require_once(dirname(__FILE__).'/testPageDashboard.php');
+require_once(dirname(__FILE__).'/testPageHosts.php');
+require_once(dirname(__FILE__).'/testFormHost.php');
+require_once(dirname(__FILE__).'/testFormHostGroup.php');
+require_once(dirname(__FILE__).'/testFormProfile.php');
+require_once(dirname(__FILE__).'/testFormScreen.php');
 // ...
 
 class SeleniumTests
@@ -31,6 +37,12 @@ class SeleniumTests
 
 		$suite->addTestSuite('testGeneric');
 		$suite->addTestSuite('testClicks');
+		$suite->addTestSuite('testPageDashboard');
+		$suite->addTestSuite('testPageHosts');
+		$suite->addTestSuite('testFormHost');
+		$suite->addTestSuite('testFormHostGroup');
+		$suite->addTestSuite('testFormProfile');
+		$suite->addTestSuite('testFormScreen');
 		// ...
 
 		return $suite;

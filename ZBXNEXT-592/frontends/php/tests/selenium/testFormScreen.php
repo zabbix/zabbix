@@ -19,19 +19,23 @@
 **/
 ?>
 <?php
+require_once(dirname(__FILE__).'/class.ctest.php');
 
-class APIException extends Exception{
-	private $errors = array();
+class testFormScreen extends CTest
+{
+	public $testscreen = 'Test Screen';
 
-	public function __construct($code = ZBX_API_ERROR_INTERNAL, $errors = array(), $message = ''){
-        parent::__construct($message, $code);
+	public function testFormScreen_Create()
+	{
+		$this->chooseOkOnNextConfirmation();
 
-		$errors = zbx_toArray($errors);
-		$this->errors = $errors;
-    }
-
-	public function getErrors(){
-		return $this->errors;
+		$this->login('screenconf.php');
+		$this->button_click('form');
+		$this->wait();
+		$this->input_type('name',$this->testscreen);
+		$this->button_click('save');
+		$this->wait();
+		$this->ok('Screen added');
 	}
 }
 ?>

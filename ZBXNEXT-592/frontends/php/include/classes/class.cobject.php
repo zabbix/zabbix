@@ -107,3 +107,4 @@ function implode_objects($glue, &$pieces){
 
 return implode($glue, $pieces);
 }
+?>

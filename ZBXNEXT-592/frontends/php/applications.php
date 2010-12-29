@@ -92,26 +92,27 @@ include_once('include/page_header.php');
 			'name' => $_REQUEST['appname'],
 			'hostid' => $_REQUEST['apphostid']
 		);
+
 		if(isset($_REQUEST['applicationid'])){
 			$application['applicationid'] = $_REQUEST['applicationid'];
-			$applicationid = CApplication::update($application);
-			$applicationid = reset($applicationid['applicationids']);
+			$DBapplications = CApplication::update($application);
 
 			$action		= AUDIT_ACTION_UPDATE;
 			$msg_ok		= S_APPLICATION_UPDATED;
 			$msg_fail	= S_CANNOT_UPDATE_APPLICATION;
 		}
 		else{
-			$applicationid = CApplication::create($application);
-			$applicationid = reset($applicationid['applicationids']);
+			$DBapplications = CApplication::create($application);
+
 			$action		= AUDIT_ACTION_ADD;
 			$msg_ok		= S_APPLICATION_ADDED;
 			$msg_fail	= S_CANNOT_ADD_APPLICATION;
 		}
-		$result = DBend($applicationid);
+		$result = DBend($DBapplications);
 
 		show_messages($result, $msg_ok, $msg_fail);
 		if($result){
+			$applicationid = reset($DBapplications['applicationids']);
 			add_audit($action,AUDIT_RESOURCE_APPLICATION,S_APPLICATION.' ['.$_REQUEST['appname'].' ] ['.$applicationid.']');
 			unset($_REQUEST['form']);
 		}
