@@ -1,15 +1,21 @@
 JAR = sbin/ZabbixJavaProxy.jar
 
-jar: cls
-	javac -d cls src/com/zabbix/proxy/*.java
-	jar cfm $(JAR) MANIFEST.MF -C cls .
+jar: build
+	javac -d build/src src/com/zabbix/proxy/*.java
+	javac -d build/tests -classpath build/src:$(CLASSPATH) tests/com/zabbix/proxy/*.java
+	jar cfm $(JAR) MANIFEST.MF -C build/src .
 
-cls:
-	mkdir -p cls
+build:
+	mkdir -p build/src
+	mkdir -p build/tests
 
 run:
 	java -jar $(JAR)
 
+test:
+	java -classpath build/tests:$(JAR):$(CLASSPATH) com.zabbix.proxy.AllTestRunner
+
 clean:
 	rm -f $(JAR)
-	rm -f cls/com/zabbix/proxy/*.class
+	rm -rf build/src/*
+	rm -rf build/tests/*

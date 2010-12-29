@@ -102,7 +102,7 @@ class JMXProcessor
 			JMXServiceURL url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://" + host + ":" + port + "/jmxrmi");
 			JMXConnector jmxc = JMXConnectorFactory.connect(url, null);
 			MBeanServerConnection mbsc = jmxc.getMBeanServerConnection();
-			
+
 			String value = getPropertyValue(mbsc.getAttribute(objectName, propertyName), subproperties);
 
 			jmxc.close();
@@ -134,7 +134,7 @@ class JMXProcessor
 			return "null attribute";
 
 		int dot;
-		
+
 		if (subproperties.equals(""))
 			dot = -1;
 		else if (-1 != subproperties.indexOf('.'))
