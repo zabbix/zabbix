@@ -2550,6 +2550,8 @@
 // class.chost.php
 	'S_YOU_DO_NOT_HAVE_ENOUGH_RIGHTS' => 'You do not have enough rights for operation',
 	'S_HOST_UPDATE_FAILED' => 'Host update failed',
+	'S_NO_GROUPS_FOR_HOST' => 'No groups for host [ %s ]',
+	'S_HOST_NAME_MUST_BE_LONGER' => 'Host name must not be longer then %1$d characters, [ %2$s ] is %3$d',
 
 // discoveryconf.php
 	'S_SECOND_IN_PARENTHESES' => '(seconds)',
