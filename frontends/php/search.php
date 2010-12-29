@@ -110,6 +110,7 @@ include_once('include/page_header.php');
 		'select_graphs' => API_OUTPUT_COUNT,
 		'select_applications' => API_OUTPUT_COUNT,
 		'output' => array('host','status'),
+		'searchByAny' => true
 	);
 	$db_hosts = CHost::get($params);
 
@@ -121,7 +122,8 @@ include_once('include/page_header.php');
 	$params = array(
 		'nodeids'=> get_current_nodeid(true),
 		'hostids' => $hostids,
-		'editable' => 1
+		'editable' => 1,
+		'searchByAny' => true
 	);
 	$rw_hosts = CHost::get($params);
 	$rw_hosts = zbx_toHash($rw_hosts,'hostid');
@@ -134,6 +136,7 @@ include_once('include/page_header.php');
 			'ip' => $search
 		),
 		'countOutput' => 1,
+		'searchByAny' => true
 	);
 
 	$overalCount = CHost::get($params);
@@ -232,6 +235,7 @@ include_once('include/page_header.php');
 		'output' => API_OUTPUT_EXTEND,
 		'search' => array('name' => $search),
 		'limit' => $rows_per_page,
+		'searchByAny' => true
 	);
 
 	$db_hostGroups = CHostGroup::get($params);
@@ -243,7 +247,8 @@ include_once('include/page_header.php');
 	$params = array(
 		'nodeids'=> get_current_nodeid(true),
 		'groupids' => $groupids,
-		'editable' => 1
+		'editable' => 1,
+		'searchByAny' => true
 	);
 
 	$rw_hostGroups = CHostGroup::get($params);
@@ -252,7 +257,8 @@ include_once('include/page_header.php');
 	$params = array(
 		'nodeids'=> get_current_nodeid(true),
 		'search' => array('name' => $search),
-		'countOutput' => 1
+		'countOutput' => 1,
+		'searchByAny' => true
 	);
 	$overalCount = CHostGroup::get($params);
 	$viewCount = count($hostGroups);
@@ -319,7 +325,8 @@ include_once('include/page_header.php');
 			'select_triggers' => API_OUTPUT_COUNT,
 			'select_graphs' => API_OUTPUT_COUNT,
 			'select_applications' => API_OUTPUT_COUNT,
-			'limit' => $rows_per_page
+			'limit' => $rows_per_page,
+			'searchByAny' => true
 		);
 		$db_templates = CTemplate::get($params);
 		order_result($db_templates, 'host');
@@ -330,7 +337,8 @@ include_once('include/page_header.php');
 		$params = array(
 			'nodeids'=> get_current_nodeid(true),
 			'templateids' => $templateids,
-			'editable' => 1
+			'editable' => 1,
+			'searchByAny' => true
 		);
 		$rw_templates = CTemplate::get($params);
 		$rw_templates = zbx_toHash($rw_templates,'templateid');
@@ -339,7 +347,8 @@ include_once('include/page_header.php');
 			'nodeids'=> get_current_nodeid(true),
 			'search' => array('host' => $search),
 			'countOutput' => 1,
-			'editable' => 1
+			'editable' => 1,
+			'searchByAny' => true
 		);
 
 		$overalCount = CTemplate::get($params);
