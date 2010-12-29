@@ -271,10 +271,9 @@ static int	run_remote_command(DC_ITEM *item, char *command, char *error, size_t 
 
 	int		ret = FAIL;
 	AGENT_RESULT	agent_result;
-	char		*param;
+	char		*param, *port;
 #ifdef HAVE_OPENIPMI
 	int		val;
-	char		*port;
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostname:'%s' command:'%s'",
