@@ -49,16 +49,16 @@ form .thin .input{
 
 
 .link_menu{
-	border: 0;
+	height: 16px;
+
+	border: 0px;
+	border-bottom: 1px dotted #3C3089;
 	background: none;
 	color: #3C3089;
-
 	text-decoration: none;
-	border-bottom: 1px dotted #3C3089;
 
-	height: 16px;
-	padding: 0;
-	margin: 0;
+	padding: 1px 1px 0px 1px;
+	margin: 0px;
 }
 
 .link_menu:hover{ color: #6C80B9; border-bottom: 1px dotted #6C80B9;}
