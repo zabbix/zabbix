@@ -190,7 +190,7 @@ include_once('include/page_header.php');
 	}
 ?>
 <?php
-	$form = new CForm(null, 'get');
+	$form = new CForm('get');
 	$form->addItem(new CSubmit("form", S_CREATE_SLIDESHOW));
 
 	$slide_wdgt = new CWidget();

@@ -212,7 +212,7 @@
 
 
 // HEADER {{{
-		$form = new CForm(null, 'get');
+		$form = new CForm('get');
 		$form->addVar('fullscreen', $_REQUEST['fullscreen']);
 
 		$cmbElements = new CComboBox('elementid', $screen['screenid'], 'submit()');

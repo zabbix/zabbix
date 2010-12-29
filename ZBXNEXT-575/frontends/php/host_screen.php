@@ -190,7 +190,7 @@
 
 
 // HEADER {{{
-		$form = new CForm(null, 'get');
+		$form = new CForm('get');
 		$form->addVar('fullscreen', $_REQUEST['fullscreen']);
 		//$form->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB(true)));
 

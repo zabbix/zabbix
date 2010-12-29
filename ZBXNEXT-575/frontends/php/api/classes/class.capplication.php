@@ -217,7 +217,7 @@ class CApplication extends CZBXAPI{
 			}
 		}
 
-// extendoutput
+// output
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['apps'] = 'a.*';
 		}

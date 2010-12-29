@@ -45,7 +45,6 @@ class CMap extends CZBXAPI{
  * @param boolean $options['with_monitored_httptests'] only with monitored http tests
  * @param boolean $options['with_graphs'] only with graphs
  * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
- * @param int $options['extendoutput'] return all fields for Hosts
  * @param int $options['count'] count Hosts, returned column name is rowscount
  * @param string $options['pattern'] search hosts by pattern in host names
  * @param int $options['limit'] limit selection
@@ -83,7 +82,6 @@ class CMap extends CZBXAPI{
 			'excludeSearch'				=> null,
 
 // OutPut
-			'extendoutput'				=> null,
 			'output'					=> API_OUTPUT_REFER,
 			'select_selements'			=> null,
 			'select_links'				=> null,
@@ -97,19 +95,6 @@ class CMap extends CZBXAPI{
 		);
 
 		$options = zbx_array_merge($def_options, $options);
-
-
-		if(!is_null($options['extendoutput'])){
-			$options['output'] = API_OUTPUT_EXTEND;
-
-			if(!is_null($options['select_selements'])){
-				$options['select_selements'] = API_OUTPUT_EXTEND;
-			}
-			if(!is_null($options['select_links'])){
-				$options['select_links'] = API_OUTPUT_EXTEND;
-			}
-		}
-
 
 // editable + PERMISSION CHECK
 

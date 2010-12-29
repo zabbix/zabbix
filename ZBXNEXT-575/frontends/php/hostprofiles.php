@@ -64,7 +64,7 @@
 
 	$hostprof_wdgt = new CWidget();
 
-	$profile_form = new CForm(null, 'get');
+	$profile_form = new CForm('get');
 	$cmbProf = new CComboBox('prof_type', $_REQUEST['prof_type'], 'javascript: submit();');
 	$cmbProf->additem(0, S_NORMAL);
 	$cmbProf->additem(1, S_EXTENDED);
@@ -126,7 +126,7 @@
 			}
 		}
 
-		$r_form = new CForm(null, 'get');
+		$r_form = new CForm('get');
 		$r_form->addVar('prof_type', $_REQUEST['prof_type']);
 		$r_form->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB(true)));
 

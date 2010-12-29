@@ -112,7 +112,7 @@
 
 	$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST, null, null, false);
 
-	$frmForm = new CForm(null, 'get');
+	$frmForm = new CForm('get');
 	$cmbConf = new CComboBox('config', 'nodes.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
 		$cmbConf->addItem('nodes.php', S_NODES);
 		$cmbConf->addItem('proxies.php', S_PROXIES);

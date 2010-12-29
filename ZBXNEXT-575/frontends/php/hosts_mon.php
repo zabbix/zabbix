@@ -149,7 +149,7 @@ include_once('include/page_header.php');
 
 	$filter_table->addRow($footer_col);
 
-	$filter_form = new CForm(null, 'get');
+	$filter_form = new CForm('get');
 	$filter_form->setAttribute('name','zbx_filter');
 	$filter_form->setAttribute('id','zbx_filter');
 	$filter_form->addItem($filter_table);

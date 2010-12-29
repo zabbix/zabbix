@@ -333,7 +333,7 @@ include_once('include/page_header.php');
 <?php
 
 // Config
-	$frmForm = new CForm(null, 'get');
+	$frmForm = new CForm('get');
 
 	$cmbConf = new CComboBox('config','usergrps.php');
 	$cmbConf->setAttribute('onchange','javascript: redirect(this.options[this.selectedIndex].value);');

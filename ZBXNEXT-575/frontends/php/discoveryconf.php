@@ -206,7 +206,7 @@ include_once('include/page_header.php');
 ?>
 <?php
 /* header */
-	$form_button = new CForm(null, 'get');
+	$form_button = new CForm('get');
 	if(!isset($_REQUEST['form'])){
 		$form_button->addItem(new CSubmit('form', S_CREATE_RULE));
 	}

@@ -100,6 +100,7 @@ function __autoload($class_name){
 	require_once('include/items.inc.php');
 	require_once('include/maintenances.inc.php');
 	require_once('include/maps.inc.php');
+	require_once('include/media.inc.php');
 	require_once('include/nodes.inc.php');
 	require_once('include/services.inc.php');
 	require_once('include/sounds.inc.php');

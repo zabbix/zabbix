@@ -341,7 +341,7 @@ switch($itemType) {
 
 	$form = null;
 	if(!isset($_REQUEST['form'])){
-		$form = new CForm(null, 'get');
+		$form = new CForm('get');
 		$form->addVar('parent_discoveryid', $_REQUEST['parent_discoveryid']);
 		$form->addItem(new CSubmit('form', S_CREATE_PROTOTYPE));
 	}

@@ -40,7 +40,6 @@ class CScreen extends CZBXAPI{
  * @param array $options['nodeids'] Node IDs
  * @param boolean $options['with_items'] only with items
  * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
- * @param int $options['extendoutput'] return all fields for Hosts
  * @param int $options['count'] count Hosts, returned column name is rowscount
  * @param string $options['pattern'] search hosts by pattern in host names
  * @param int $options['limit'] limit selection
@@ -80,7 +79,6 @@ class CScreen extends CZBXAPI{
 			'excludeSearch'				=> null,
 
 // OutPut
-			'extendoutput'				=> null,
 			'output'					=> API_OUTPUT_REFER,
 			'select_screenitems'		=> null,
 			'countOutput'				=> null,
@@ -94,18 +92,13 @@ class CScreen extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
-		if(!is_null($options['extendoutput'])){
-			$options['output'] = API_OUTPUT_EXTEND;
-
-			if(!is_null($options['select_screenitems'])){
-				$options['select_screenitems'] = API_OUTPUT_EXTEND;
-			}
-		}
-
 		if(is_array($options['output'])){
 			unset($sql_parts['select']['screens']);
+
+			$dbTable = DB::getSchema('screens');
 			foreach($options['output'] as $key => $field){
-				$sql_parts['select'][$field] = ' s.'.$field;
+				if(isset($dbTable['fields'][$field]))
+					$sql_parts['select'][$field] = ' s.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;

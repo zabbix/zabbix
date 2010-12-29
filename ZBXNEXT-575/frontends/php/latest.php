@@ -108,7 +108,7 @@ include_once('include/page_header.php');
 	$latest_wdgt->addPageHeader(S_LATEST_DATA_BIG,$fs_icon);
 
 // 2nd header
-	$r_form = new CForm(null, 'get');
+	$r_form = new CForm('get');
 
 //	$cmbGroup = new CComboBox('groupid',$_REQUEST['groupid'],"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."',this.form);");
 //	$cmbHosts = new CComboBox('hostid',$_REQUEST['hostid'],"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."',this.form);");

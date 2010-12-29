@@ -51,7 +51,6 @@ class CHost extends CZBXAPI{
  * @param boolean $options['with_monitored_httptests'] only with monitored http tests
  * @param boolean $options['with_graphs'] only with graphs
  * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
- * @param int $options['extendoutput'] return all fields for Hosts
  * @param boolean $options['selectGroups'] select HostGroups
  * @param boolean $options['select_templates'] select Templates
  * @param boolean $options['selectItems'] select Items
@@ -153,9 +152,12 @@ class CHost extends CZBXAPI{
 
 		if(is_array($options['output'])){
 			unset($sql_parts['select']['hosts']);
+
+			$dbTable = DB::getSchema('hosts');
 			$sql_parts['select']['hostid'] = ' h.hostid';
 			foreach($options['output'] as $key => $field){
-				$sql_parts['select'][$field] = ' h.'.$field;
+				if(isset($dbTable['fields'][$field]))
+					$sql_parts['select'][$field] = ' h.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;

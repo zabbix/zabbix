@@ -780,7 +780,7 @@ switch($itemType) {
 <?php
 	$items_wdgt = new CWidget();
 
-	$form = new CForm(null, 'get');
+	$form = new CForm('get');
 	$form->setName('hdrform');
 	if(!isset($_REQUEST['form']))
 		$form->addVar('form_hostid', $hostid);

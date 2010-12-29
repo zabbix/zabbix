@@ -81,7 +81,6 @@ class CAction extends CZBXAPI{
 			'excludeSearch'			=> null,
 
 // OutPut
-			'extendoutput'			=> null,
 			'output'				=> API_OUTPUT_REFER,
 			'select_conditions'		=> null,
 			'select_operations'		=> null,
@@ -94,19 +93,6 @@ class CAction extends CZBXAPI{
 		);
 
 		$options = zbx_array_merge($def_options, $options);
-
-
-		if(!is_null($options['extendoutput'])){
-			$options['output'] = API_OUTPUT_EXTEND;
-
-			if(!is_null($options['select_conditions'])){
-				$options['select_conditions'] = API_OUTPUT_EXTEND;
-			}
-			if(!is_null($options['select_operations'])){
-				$options['select_operations'] = API_OUTPUT_EXTEND;
-			}
-		}
-
 
 // editable + PERMISSION CHECK
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || !is_null($options['nopermissions'])){

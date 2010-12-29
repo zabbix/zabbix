@@ -200,7 +200,7 @@ include_once('include/page_header.php');
 		}
 	}
 
-	$form = new CForm(null, 'get');
+	$form = new CForm('get');
 	$form->addVar('itemid',$_REQUEST['itemid']);
 
 	if(isset($_REQUEST['filter_task']))	$form->addVar('filter_task',$_REQUEST['filter_task']);

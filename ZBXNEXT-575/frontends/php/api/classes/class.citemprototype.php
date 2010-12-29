@@ -85,10 +85,12 @@ class CItemprototype extends CZBXAPI{
 
 		if(is_array($options['output'])){
 			unset($sql_parts['select']['items']);
-			$sql_parts['select']['itemid'] = ' i.itemid';
 
+			$dbTable = DB::getSchema('items');
+			$sql_parts['select']['itemid'] = ' i.itemid';
 			foreach($options['output'] as $key => $field){
-				$sql_parts['select'][$field] = ' i.'.$field;
+				if(isset($dbTable['fields'][$field]))
+					$sql_parts['select'][$field] = ' i.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;

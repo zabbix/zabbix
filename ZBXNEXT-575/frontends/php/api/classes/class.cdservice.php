@@ -51,7 +51,6 @@ class CDService extends CZBXAPI{
  * @param boolean $options['with_monitored_httptests'] only with monitored http tests
  * @param boolean $options['with_graphs'] only with graphs
  * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
- * @param int $options['extendoutput'] return all fields for Services
  * @param boolean $options['selectGroups'] select ServiceGroups
  * @param boolean $options['select_templates'] select Templates
  * @param boolean $options['selectItems'] select Items
@@ -123,8 +122,11 @@ class CDService extends CZBXAPI{
 
 		if(is_array($options['output'])){
 			unset($sql_parts['select']['dservices']);
+
+			$dbTable = DB::getSchema('dservices');
 			foreach($options['output'] as $key => $field){
-				$sql_parts['select'][$field] = ' ds.'.$field;
+				if(isset($dbTable['fields'][$field]))
+					$sql_parts['select'][$field] = ' ds.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;

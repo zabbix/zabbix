@@ -92,7 +92,7 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 	$_REQUEST['groupid'] = $pageFilter->groupid;
 
 
-	$form = new CForm(null, 'get');
+	$form = new CForm('get');
 	$form->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB(true)));
 
 	$cmbType = new CComboBox('type', $_REQUEST['type'], 'submit()');
@@ -136,7 +136,7 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 	$over_wdgt->addPageHeader(S_OVERVIEW_BIG, array($fs_icon, $help));
 
 // 2nd heder
-	$form_l = new CForm(null, 'get');
+	$form_l = new CForm('get');
 	$form_l->addVar('groupid',$_REQUEST['groupid']);
 
 	$cmbStyle = new CComboBox('view_style',$_REQUEST['view_style'],'submit()');

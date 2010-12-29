@@ -117,7 +117,7 @@
 
 
 // HEADER {{{
-	$r_form = new CForm(null, 'get');
+	$r_form = new CForm('get');
 	$r_form->addVar('fullscreen',$_REQUEST['fullscreen']);
 
 	if(EVENT_SOURCE_TRIGGERS == $source){

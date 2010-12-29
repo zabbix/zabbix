@@ -216,7 +216,7 @@ include_once('include/page_header.php');
 <?php
 	$app_wdgt = new CWidget();
 
-	$frmForm = new CForm(null, 'get');
+	$frmForm = new CForm('get');
 	if(!isset($_REQUEST['form'])){
 		$frmForm->addItem(SPACE);
 		$frmForm->addItem(new CSubmit('form', S_CREATE_APPLICATION));
@@ -288,7 +288,7 @@ include_once('include/page_header.php');
 	}
 	else{
 
-		$form = new CForm(null, 'get');
+		$form = new CForm('get');
 		$form->addItem(array(S_GROUP.SPACE,$pageFilter->getGroupsCB()));
 		$form->addItem(array(SPACE.S_HOST.SPACE,$pageFilter->getHostsCB()));
 

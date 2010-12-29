@@ -370,7 +370,7 @@ include_once('include/page_header.php');
 <?php
 	$triggers_wdgt = new CWidget();
 
-	$form = new CForm(null, 'get');
+	$form = new CForm('get');
 
 // Config
 	if(!isset($_REQUEST['form'])){
@@ -393,7 +393,7 @@ include_once('include/page_header.php');
 /* TABLE */
 
 // Triggers Header
-		$r_form = new CForm(null, 'get');
+		$r_form = new CForm('get');
 
 		$r_form->addItem(array(S_GROUP.SPACE,$pageFilter->getGroupsCB()));
 		$r_form->addItem(array(SPACE.S_HOST.SPACE,$pageFilter->getHostsCB()));
@@ -407,7 +407,7 @@ include_once('include/page_header.php');
 		$triggers_wdgt->addHeader($numrows, array('[ ',$tr_link,' ]'));
 // ----------------
 
-		$form = new CForm('triggers.php', 'post');
+		$form = new CForm();
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
 
 // Header Host

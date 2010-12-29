@@ -278,7 +278,7 @@ switch($itemType) {
 
 	$form = null;
 	if(!isset($_REQUEST['form'])){
-		$form = new CForm(null, 'get');
+		$form = new CForm('get');
 		$form->addVar('hostid', $_REQUEST['hostid']);
 		$form->addItem(new CSubmit('form', S_CREATE_RULE));
 	}

@@ -45,7 +45,6 @@ class CEvent extends CZBXAPI{
  * @param array $options['applicationids']
  * @param array $options['status']
  * @param array $options['editable']
- * @param array $options['extendoutput']
  * @param array $options['count']
  * @param array $options['pattern']
  * @param array $options['limit']
@@ -98,7 +97,6 @@ class CEvent extends CZBXAPI{
 
 // OutPut
 			'output'				=> API_OUTPUT_REFER,
-			'extendoutput'			=> null,
 			'selectHosts'			=> null,
 			'selectItems'			=> null,
 			'select_triggers'		=> null,
@@ -114,21 +112,6 @@ class CEvent extends CZBXAPI{
 		);
 
 		$options = zbx_array_merge($def_options, $options);
-
-
-		if(!is_null($options['extendoutput'])){
-			$options['output'] = API_OUTPUT_EXTEND;
-
-			if(!is_null($options['selectHosts'])){
-				$options['selectHosts'] = API_OUTPUT_EXTEND;
-			}
-			if(!is_null($options['select_triggers'])){
-				$options['select_triggers'] = API_OUTPUT_EXTEND;
-			}
-			if(!is_null($options['selectItems'])){
-				$options['selectItems'] = API_OUTPUT_EXTEND;
-			}
-		}
 
 // editable + PERMISSION CHECK
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){

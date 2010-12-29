@@ -95,8 +95,11 @@ class CGraph extends CZBXAPI{
 
 		if(is_array($options['output'])){
 			unset($sql_parts['select']['graphs']);
+
+			$dbTable = DB::getSchema('graphs');
 			foreach($options['output'] as $key => $field){
-				$sql_parts['select'][$field] = ' g.'.$field;
+				if(isset($dbTable['fields'][$field]))
+					$sql_parts['select'][$field] = ' g.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;
@@ -265,7 +268,7 @@ class CGraph extends CZBXAPI{
 			}
 		}
 
-// extendoutput
+// output
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['graphs'] = 'g.*';
 		}
