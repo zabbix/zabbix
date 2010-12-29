@@ -76,7 +76,7 @@ class CApplication extends CZBXAPI{
 // filter
 			'filter'				=> null,
 			'search'				=> null,
-			'filterByOR'			=> null,
+			'searchByAny'			=> null,
 			'startSearch'				=> null,
 			'exludeSearch'			=> null,
 

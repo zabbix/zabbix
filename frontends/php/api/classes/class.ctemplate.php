@@ -71,7 +71,7 @@ class CTemplate extends CZBXAPI{
 // filter
 			'filter'					=> null,
 			'search'					=> '',
-			'filterByOR'			=> null,
+			'searchByAny'			=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 
