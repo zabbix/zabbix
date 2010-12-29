@@ -1,6 +1,6 @@
 /* CSS Document */
 div.min-width{
-	min-width: 1000px;
+	min-width: 990px; /* 1024 */
 }
 
 div.disaster{

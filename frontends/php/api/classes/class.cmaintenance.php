@@ -81,7 +81,6 @@ class CMaintenance extends CZBXAPI{
 
 // OutPut
 			'output'				=> API_OUTPUT_REFER,
-			'extendoutput'			=> null,
 			'selectGroups'			=> null,
 			'selectHosts'			=> null,
 			'countOutput'			=> null,
@@ -95,16 +94,6 @@ class CMaintenance extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
-		if(!is_null($options['extendoutput'])){
-			$options['output'] = API_OUTPUT_EXTEND;
-
-			if(!is_null($options['selectGroups'])){
-				$options['selectGroups'] = API_OUTPUT_EXTEND;
-			}
-			if(!is_null($options['selectHosts'])){
-				$options['selectHosts'] = API_OUTPUT_EXTEND;
-			}
-		}
 // editable + PERMISSION CHECK
 
 		$maintenanceids = array();

@@ -270,7 +270,7 @@ include_once('include/page_header.php');
 <?php
 	$triggers_wdgt = new CWidget();
 
-	$form = new CForm(null, 'get');
+	$form = new CForm('get');
 	$form->addVar('parent_discoveryid', $_REQUEST['parent_discoveryid']);
 
 // Config

@@ -109,7 +109,7 @@ include_once('include/page_header.php');
 		CProfile::update('web.maps.sysmapid', $_REQUEST['sysmapid'], PROFILE_TYPE_ID);
 
 
-		$form = new CForm(null, 'get');
+		$form = new CForm('get');
 		$form->addVar('fullscreen', $_REQUEST['fullscreen']);
 		$cmbMaps = new CComboBox('sysmapid', get_request('sysmapid', 0), 'submit()');
 		order_result($maps, 'name');

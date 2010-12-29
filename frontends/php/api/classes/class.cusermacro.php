@@ -51,7 +51,6 @@ class CUserMacro extends CZBXAPI{
  * @param boolean $options['with_monitored_httptests'] only with monitored http tests
  * @param boolean $options['with_graphs'] only with graphs
  * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
- * @param int $options['extendoutput'] return all fields for UserMacros
  * @param int $options['count'] count UserMacros, returned column name is rowscount
  * @param string $options['pattern'] search macros by pattern in macro names
  * @param int $options['limit'] limit selection
@@ -99,7 +98,6 @@ class CUserMacro extends CZBXAPI{
 			'excludeSearch'				=> null,
 // OutPut
 			'output'					=> API_OUTPUT_REFER,
-			'extendoutput'				=> null,
 			'selectGroups'				=> null,
 			'selectHosts'				=> null,
 			'select_templates'			=> null,
@@ -112,22 +110,6 @@ class CUserMacro extends CZBXAPI{
 		);
 
 		$options = zbx_array_merge($def_options, $options);
-
-
-		if(!is_null($options['extendoutput'])){
-			$options['output'] = API_OUTPUT_EXTEND;
-
-			if(!is_null($options['selectGroups'])){
-				$options['selectGroups'] = API_OUTPUT_EXTEND;
-			}
-			if(!is_null($options['selectHosts'])){
-				$options['selectHosts'] = API_OUTPUT_EXTEND;
-			}
-			if(!is_null($options['select_templates'])){
-				$options['select_templates'] = API_OUTPUT_EXTEND;
-			}
-		}
-
 
 // editable + PERMISSION CHECK
 

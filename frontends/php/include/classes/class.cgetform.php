@@ -31,7 +31,7 @@ class CGetForm{
 		$this->data = $data;
 	}
 
-	public function render($file){
+	public function render($file, $data=array()){
 		if(!preg_match("/[a-z\.]+/", $file)){
 			error('Invalid form name given ['.$file.']');
 			return false;

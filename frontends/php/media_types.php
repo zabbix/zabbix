@@ -127,7 +127,7 @@ include_once('include/page_header.php');
 <?php
 	$medias_wdgt = new CWidget();
 
-	$form = new CForm(null, 'get');
+	$form = new CForm('get');
 
 	if(!isset($_REQUEST['form']))
 		$form->addItem(new CSubmit('form', S_CREATE_MEDIA_TYPE));

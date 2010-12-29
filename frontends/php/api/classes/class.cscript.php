@@ -78,7 +78,6 @@ class CScript extends CZBXAPI{
 			'excludeSearch'			=> null,
 
 // OutPut
-			'extendoutput'			=> null,
 			'output'				=> API_OUTPUT_REFER,
 			'selectGroups'			=> null,
 			'selectHosts'			=> null,
@@ -91,19 +90,6 @@ class CScript extends CZBXAPI{
 		);
 
 		$options = zbx_array_merge($def_options, $options);
-
-
-		if(!is_null($options['extendoutput'])){
-			$options['output'] = API_OUTPUT_EXTEND;
-
-			if(!is_null($options['selectGroups'])){
-				$options['selectGroups'] = API_OUTPUT_EXTEND;
-			}
-			if(!is_null($options['selectHosts'])){
-				$options['selectHosts'] = API_OUTPUT_EXTEND;
-			}
-		}
-
 
 // editable + PERMISSION CHECK
 		if(USER_TYPE_SUPER_ADMIN == $user_type){
@@ -162,7 +148,7 @@ class CScript extends CZBXAPI{
 			$sql_parts['where'][] = DBcondition('s.scriptid', $options['scriptids']);
 		}
 
-// extendoutput
+// output
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['scripts'] = 's.*';
 		}
@@ -302,7 +288,7 @@ class CScript extends CZBXAPI{
 		if(!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselects_allowed_outputs)){
 			foreach($result as $scriptid => $script){
 				$obj_params = array(
-					'extendoutput' => $options['selectHosts'],
+					'output' => $options['selectHosts'],
 				);
 
 				if($script['host_access'] == PERM_READ_WRITE){
@@ -350,7 +336,7 @@ class CScript extends CZBXAPI{
 		}
 
 		if(!empty($scriptids))
-			$result = self::get(array('scriptids'=>$scriptids, 'extendoutput'=>1));
+			$result = self::get(array('scriptids'=>$scriptids, 'output' => API_OUTPUT_EXTEND));
 
 	return $result;
 	}

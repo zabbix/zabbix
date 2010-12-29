@@ -350,7 +350,7 @@ include_once('include/page_header.php');
 	$_REQUEST['hostid'] = $pageFilter->hostid;
 ?>
 <?php
-	$form = new CForm(null, 'get');
+	$form = new CForm('get');
 
 // Config
 	if(!isset($_REQUEST['form'])){
@@ -392,7 +392,7 @@ include_once('include/page_header.php');
 			unset($_REQUEST['graphid']);
 		}
 
-		$r_form = new CForm(null, 'get');
+		$r_form = new CForm('get');
 		$r_form->addItem(array(S_GROUP.SPACE,$pageFilter->getGroupsCB()));
 		$r_form->addItem(array(SPACE.S_HOST.SPACE,$pageFilter->getHostsCB()));
 

@@ -20,14 +20,7 @@
 ?>
 <?php
 require_once('include/config.inc.php');
-require_once('include/actions.inc.php');
-require_once('include/hosts.inc.php');
-include_once('include/discovery.inc.php');
-require_once('include/triggers.inc.php');
-require_once('include/events.inc.php');
 require_once('include/forms.inc.php');
-require_once('include/media.inc.php');
-require_once('include/nodes.inc.php');
 
 $page['title']		= 'S_CONFIGURATION_OF_ACTIONS';
 $page['file']		= 'actionconf.php';
@@ -122,9 +115,6 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 	if(inarr_isset(array('clone','actionid'))){
 		unset($_REQUEST['actionid']);
 		$_REQUEST['form'] = 'clone';
-	}
-	else if(isset($_REQUEST['cancel_new_condition'])){
-		unset($_REQUEST['new_condition']);
 	}
 	else if(isset($_REQUEST['cancel_new_operation'])){
 		unset($_REQUEST['new_operation']);
@@ -323,8 +313,8 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 	$action_wdgt = new CWidget();
 
 /* header */
-	$form = new CForm(null, 'get');
-
+	$form = new CForm('get');
+	$form->cleanItems();
 	$form->addVar('eventsource', $_REQUEST['eventsource']);
 	if(!isset($_REQUEST['form'])){
 		$form->addItem(new CSubmit('form', S_CREATE_ACTION));
@@ -332,11 +322,6 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 	$action_wdgt->addPageHeader(S_CONFIGURATION_OF_ACTIONS_BIG, $form);
 
 	if(isset($_REQUEST['form'])){
-		$frmAction = new CForm('actionconf.php', 'post');
-		$frmAction->setName(S_ACTION);
-
-		$frmAction->addVar('form', get_request('form', 1));
-
 		$action = null;
 		if(isset($_REQUEST['actionid'])){
 			$options = array(
@@ -348,509 +333,38 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			$actions = CAction::get($options);
 			$action = reset($actions);
 
-			$frmAction->addVar('actionid', $_REQUEST['actionid']);
+			foreach($action['operations'] as $aorow => &$operation_data){
+				if($db_opmtype = reset($operation_data['opmediatypes']))
+					$operation_data['mediatypeid'] = $db_opmtype['mediatypeid'];
+			}
+			unset($operation_data);
 		}
 
-		$left_tab = new CTable();
-		$left_tab->setCellPadding(3);
-		$left_tab->setCellSpacing(3);
-
-// ACTION FORM {{{
-		$tblAct = new CTable(null, 'formElementTable');
-
-		if(isset($_REQUEST['actionid']) && !isset($_REQUEST['form_refresh'])){
-			$name = $action['name'];
-			$eventsource = $action['eventsource'];
-			$esc_period	= $action['esc_period'];
-			$status	= $action['status'];
-			$def_shortdata = $action['def_shortdata'];
-			$def_longdata = $action['def_longdata'];
-			$recovery_msg = $action['recovery_msg'];
-			$r_shortdata = $action['r_shortdata'];
-			$r_longdata	= $action['r_longdata'];
-
-			if($esc_period) $_REQUEST['escalation'] = 1;
+		if(isset($action['actionid']) && !isset($_REQUEST['form_refresh'])){
 		}
 		else{
 			if(isset($_REQUEST['escalation']) && (0 == $_REQUEST['esc_period']))
 				$_REQUEST['esc_period'] = 3600;
 
-			$name		= get_request('name');
-			$eventsource	= get_request('eventsource');
-			$esc_period	= get_request('esc_period',0);
-			$status		= get_request('status');
-			$def_shortdata	= get_request('def_shortdata', ACTION_DEFAULT_SUBJ);
-			$def_longdata	= get_request('def_longdata', ACTION_DEFAULT_MSG);
-			$recovery_msg	= get_request('recovery_msg',0);
-			$r_shortdata	= get_request('r_shortdata', ACTION_DEFAULT_SUBJ);
-			$r_longdata	= get_request('r_longdata', ACTION_DEFAULT_MSG);
+			$action['name']			= get_request('name');
+			$action['eventsource']	= get_request('eventsource');
+			$action['evaltype']		= get_request('evaltype');
+			$action['esc_period']	= get_request('esc_period',0);
+			$action['status']		= get_request('status', 1);
+			$action['def_shortdata']= get_request('def_shortdata', ACTION_DEFAULT_SUBJ);
+			$action['def_longdata']	= get_request('def_longdata', ACTION_DEFAULT_MSG);
+			$action['recovery_msg']	= get_request('recovery_msg',0);
+			$action['r_shortdata']	= get_request('r_shortdata', ACTION_DEFAULT_SUBJ);
+			$action['r_longdata']	= get_request('r_longdata', ACTION_DEFAULT_MSG);
 
-			if(!$esc_period) unset($_REQUEST['escalation']);
+			$action['conditions']	= get_request('conditions',array());
+			$action['operations']	= get_request('operations',array());
 		}
 
-		$tblAct->addRow(array(S_NAME, new CTextBox('name', $name, 50)));
+		$actionForm = new CGetForm();
+		$action_wdgt->addItem($actionForm->render('action.edit', $action));
 
-		$cmbSource =  new CComboBox('eventsource', $eventsource, 'submit()');
-		$cmbSource->addItem(EVENT_SOURCE_TRIGGERS, S_TRIGGERS);
-		$cmbSource->addItem(EVENT_SOURCE_DISCOVERY, S_DISCOVERY);
-		$cmbSource->addItem(EVENT_SOURCE_AUTO_REGISTRATION, S_AUTO_REGISTRATION);
-		$tblAct->addRow(array(S_EVENT_SOURCE, $cmbSource));
-
-
-		if(EVENT_SOURCE_TRIGGERS == $eventsource){
-			$tblAct->addRow(array(S_ENABLE_ESCALATIONS, new CCheckBox('escalation',isset($_REQUEST['escalation']),'javascript: submit();',1)));
-
-			if(isset($_REQUEST['escalation'])){
-				$tblAct->addRow(array(S_PERIOD.' ('.S_SECONDS_SMALL.')', array(new CNumericBox('esc_period', $esc_period, 6, 'no'), '['.S_MIN_SMALL.' 60]')));
-			}
-			else{
-				$tblAct->addItem(new CVar('esc_period',$esc_period));
-			}
-		}
-		else{
-			$tblAct->addItem(new CVar('esc_period',$esc_period));
-		}
-
-		if(!isset($_REQUEST['escalation'])){
-			unset($_REQUEST['new_opcondition']);
-		}
-
-		$tblAct->addRow(array(S_DEFAULT_SUBJECT, new CTextBox('def_shortdata', $def_shortdata, 50)));
-		$tblAct->addRow(array(S_DEFAULT_MESSAGE, new CTextArea('def_longdata', $def_longdata,50,5)));
-
-		if(EVENT_SOURCE_TRIGGERS == $eventsource){
-			$tblAct->addRow(array(S_RECOVERY_MESSAGE, new CCheckBox('recovery_msg',$recovery_msg,'javascript: submit();',1)));
-			if($recovery_msg){
-				$tblAct->addRow(array(S_RECOVERY_SUBJECT, new CTextBox('r_shortdata', $r_shortdata, 50)));
-				$tblAct->addRow(array(S_RECOVERY_MESSAGE, new CTextArea('r_longdata', $r_longdata,50,5)));
-			}
-			else{
-				$tblAct->addItem(new CVar('r_shortdata', $r_shortdata));
-				$tblAct->addItem(new CVar('r_longdata', $r_longdata));
-			}
-		}
-		else{
-			unset($_REQUEST['recovery_msg']);
-		}
-
-		$cmbStatus = new CComboBox('status',$status);
-		$cmbStatus->addItem(ACTION_STATUS_ENABLED,S_ENABLED);
-		$cmbStatus->addItem(ACTION_STATUS_DISABLED,S_DISABLED);
-		$tblAct->addRow(array(S_STATUS, $cmbStatus));
-
-		$footer = array(new CSubmit('save',S_SAVE));
-		if(isset($_REQUEST['actionid'])){
-			$footer[] = new CSubmit('clone',S_CLONE);
-			$footer[] = new CButtonDelete(S_DELETE_SELECTED_ACTION_Q,
-				url_param('form').url_param('eventsource').
-				url_param('actionid')
-			);
-		}
-		$footer[] = new CButtonCancel(url_param('actiontype'));
-
-		$left_tab->addRow(new CFormElement(S_ACTION, $tblAct, $footer));
-// }}} ACTION_FORM
-
-
-// CONDITIONS FORM {{{
-		$tblCond = new CTable(null, 'formElementTable');
-
-		$conditions	= get_request('conditions',array());
-
-		if(isset($_REQUEST['actionid']) && !isset($_REQUEST['form_refresh'])){
-			$eventsource = $action['eventsource'];
-			$evaltype = $action['evaltype'];
-
-			$conditions = $action['conditions'];
-			foreach($conditions as $acrow => &$condition_data){
-				$condition_data['type'] = $condition_data['conditiontype'];
-			}
-			unset($condition_data);
-		}
-		else{
-			$evaltype = get_request('evaltype');
-			$eventsource = get_request('eventsource');
-		}
-
-		$allowed_conditions = get_conditions_by_eventsource($eventsource);
-
-// show CONDITION LIST
-		zbx_rksort($conditions);
-
-// group conditions by type
-		$grouped_conditions = array();
-		$cond_el = new CTable(S_NO_CONDITIONS_DEFINED);
-		$i=0;
-
-		foreach($conditions as $id => $condition){
-			if(!isset($condition['type'])) $condition['type'] = 0;
-			if(!isset($condition['operator'])) $condition['operator'] = 0;
-			if(!isset($condition['value'])) $condition['value'] = 0;
-
-			if(!str_in_array($condition['type'], $allowed_conditions)) continue;
-
-			$label = chr(ord('A') + $i);
-			$cond_el->addRow(array('('.$label.')',array(
-				new CCheckBox('g_conditionid[]', 'no', null,$i),
-				get_condition_desc($condition['type'], $condition['operator'], $condition['value']))
-			));
-
-			$tblCond->addItem(new CVar("conditions[$i][type]", $condition['type']));
-			$tblCond->addItem(new CVar("conditions[$i][operator]", $condition['operator']));
-			$tblCond->addItem(new CVar("conditions[$i][value]", $condition['value']));
-
-			$grouped_conditions[$condition['type']][] = $label;
-
-			$i++;
-		}
-		unset($conditions);
-
-		$footer = array();
-		if(!isset($_REQUEST['new_condition'])){
-			$footer[] = new CSubmit('new_condition',S_NEW);
-		}
-
-		if($cond_el->ItemsCount() > 0){
-			$footer[] = new CSubmit('del_condition',S_DELETE_SELECTED);
-		}
-		if($cond_el->ItemsCount() > 1){
-			/* prepare condition calcuation type selector */
-			switch($evaltype){
-				case ACTION_EVAL_TYPE_AND: $group_op = $glog_op = S_AND; break;
-				case ACTION_EVAL_TYPE_OR: $group_op = $glog_op = S_OR; break;
-				default: $group_op = S_OR; $glog_op = S_AND; break;
-			}
-
-			foreach($grouped_conditions as $id => $condition)
-				$grouped_conditions[$id] = '('.implode(' '.$group_op.' ', $condition).')';
-
-			$grouped_conditions = implode(' '.$glog_op.' ', $grouped_conditions);
-
-			$cmb_calc_type = new CComboBox('evaltype', $evaltype, 'submit()');
-			$cmb_calc_type->addItem(ACTION_EVAL_TYPE_AND_OR, S_AND_OR_BIG);
-			$cmb_calc_type->addItem(ACTION_EVAL_TYPE_AND, S_AND_BIG);
-			$cmb_calc_type->addItem(ACTION_EVAL_TYPE_OR, S_OR_BIG);
-			$tblCond->addRow(array(S_TYPE_OF_CALCULATION, array($cmb_calc_type, new CTextBox('preview', $grouped_conditions, 60,'yes'))));
-			/* end of calculation type selector */
-		}
-		else{
-			$tblCond->addItem(new CVar('evaltype', ACTION_EVAL_TYPE_AND_OR));
-		}
-
-		$tblCond->addRow(array(S_CONDITIONS, $cond_el));
-
-		$left_tab->addRow(new CFormElement(S_ACTION_CONDITIONS, $tblCond, $footer));
-// }}} CONDITIONS FORM
-
-
-// NEW CONDITION FORM {{{
-		if(isset($_REQUEST['new_condition'])){
-			$tblNewCond = new CTable(null, 'formElementTable');
-
-			if(isset($_REQUEST['actionid']) && !isset($_REQUEST['form_refresh'])){
-				$eventsource = $action['eventsource'];
-				$evaltype = $action['evaltype'];
-		}
-			else{
-				$evaltype = get_request('evaltype');
-				$eventsource = get_request('eventsource');
-			}
-
-			$allowed_conditions = get_conditions_by_eventsource($eventsource);
-
-			$new_condition = get_request('new_condition', array());
-			$new_condition = array(
-				'type' => isset($new_condition['type']) ? $new_condition['type'] : CONDITION_TYPE_TRIGGER_NAME,
-				'operator' => isset($new_condition['operator']) ? $new_condition['operator'] : CONDITION_OPERATOR_LIKE,
-				'value' => isset($new_condition['value']) ? $new_condition['value'] : '',
-			);
-
-			if(!str_in_array($new_condition['type'], $allowed_conditions))
-				$new_condition['type'] = $allowed_conditions[0];
-
-			$rowCondition = array();
-			$cmbCondType = new CComboBox('new_condition[type]',$new_condition['type'],'submit()');
-			foreach($allowed_conditions as $cond)
-				$cmbCondType->addItem($cond, condition_type2str($cond));
-			$rowCondition[] = $cmbCondType;
-
-
-			$cmbCondOp = new CComboBox('new_condition[operator]');
-			foreach(get_operators_by_conditiontype($new_condition['type']) as $op)
-				$cmbCondOp->addItem($op, condition_operator2str($op));
-			$rowCondition[] = $cmbCondOp;
-
-			switch($new_condition['type']){
-				case CONDITION_TYPE_HOST_GROUP:
-					$tblNewCond->addItem(new CVar('new_condition[value]','0'));
-					$rowCondition[] = array(
-						new CTextBox('group','',20,'yes'),
-						new CSubmit('btn1',S_SELECT,
-							"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
-							"&dstfld1=new_condition%5Bvalue%5D&dstfld2=group&srctbl=host_group".
-							"&srcfld1=groupid&srcfld2=name',450,450);",
-							'T'));
-					break;
-				case CONDITION_TYPE_HOST_TEMPLATE:
-					$tblNewCond->addItem(new CVar('new_condition[value]','0'));
-					$rowCondition[] = array(
-						new CTextBox('host','',20,'yes'),
-						new CSubmit('btn1',S_SELECT,
-							"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
-							"&dstfld1=new_condition%5Bvalue%5D&dstfld2=host&srctbl=host_templates".
-							"&srcfld1=hostid&srcfld2=host',450,450);",
-							'T'));
-					break;
-				case CONDITION_TYPE_HOST:
-					$tblNewCond->addItem(new CVar('new_condition[value]','0'));
-					$rowCondition[] = array(
-						new CTextBox('host','',20,'yes'),
-						new CSubmit('btn1',S_SELECT,
-							"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
-							"&dstfld1=new_condition%5Bvalue%5D&dstfld2=host&srctbl=hosts".
-							"&srcfld1=hostid&srcfld2=host',450,450);",
-							'T'));
-					break;
-				case CONDITION_TYPE_TRIGGER:
-					$tblNewCond->addItem(new CVar('new_condition[value]','0'));
-
-					$rowCondition[] = array(
-						new CTextBox('trigger','',20,'yes'),
-						new CSubmit('btn1',S_SELECT,
-							"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
-							"&dstfld1=new_condition%5Bvalue%5D&dstfld2=trigger&srctbl=triggers".
-							"&srcfld1=triggerid&srcfld2=description');",
-							'T'));
-					break;
-				case CONDITION_TYPE_TRIGGER_NAME:
-					$rowCondition[] = new CTextBox('new_condition[value]', "", 40);
-					break;
-				case CONDITION_TYPE_TRIGGER_VALUE:
-					$cmbCondVal = new CComboBox('new_condition[value]');
-					foreach(array(TRIGGER_VALUE_FALSE, TRIGGER_VALUE_TRUE) as $tr_val)
-						$cmbCondVal->addItem($tr_val, trigger_value2str($tr_val));
-					$rowCondition[] = $cmbCondVal;
-					break;
-				case CONDITION_TYPE_TIME_PERIOD:
-					$rowCondition[] = new CTextBox('new_condition[value]', "1-7,00:00-23:59", 40);
-					break;
-				case CONDITION_TYPE_TRIGGER_SEVERITY:
-					$cmbCondVal = new CComboBox('new_condition[value]');
-					foreach(array(TRIGGER_SEVERITY_INFORMATION,
-						TRIGGER_SEVERITY_WARNING,
-						TRIGGER_SEVERITY_AVERAGE,
-						TRIGGER_SEVERITY_HIGH,
-						TRIGGER_SEVERITY_DISASTER) as $id)
-						$cmbCondVal->addItem($id,get_severity_description($id));
-					$rowCondition[] = $cmbCondVal;
-					break;
-				case CONDITION_TYPE_MAINTENANCE:
-					$rowCondition[] = new CCol(S_MAINTENANCE_SMALL);
-					break;
-				case CONDITION_TYPE_NODE:
-					$tblNewCond->addItem(new CVar('new_condition[value]','0'));
-					$rowCondition[] = array(
-						new CTextBox('node','',20,'yes'),
-						new CButton('btn1',S_SELECT,
-							"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
-							"&dstfld1=new_condition%5Bvalue%5D&dstfld2=node&srctbl=nodes".
-							"&srcfld1=nodeid&srcfld2=name',450,450);",
-							'T'));
-					break;
-				case CONDITION_TYPE_DRULE:
-					$tblNewCond->addItem(new CVar('new_condition[value]','0'));
-					$rowCondition[] = array(
-						new CTextBox('drule','',20,'yes'),
-						new CButton('btn1',S_SELECT,
-							"return PopUp('popup.php?dstfrm=".S_ACTION.
-							"&dstfld1=new_condition%5Bvalue%5D&dstfld2=drule&srctbl=drules".
-							"&srcfld1=druleid&srcfld2=name',450,450);",
-							'T'));
-					break;
-				case CONDITION_TYPE_DCHECK:
-					$tblNewCond->addItem(new CVar('new_condition[value]','0'));
-					$rowCondition[] = array(
-						new CTextBox('dcheck','',50,'yes'),
-						new CButton('btn1',S_SELECT,
-							"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
-							"&dstfld1=new_condition%5Bvalue%5D&dstfld2=dcheck&srctbl=dchecks".
-							"&srcfld1=dcheckid&srcfld2=name',450,450);",
-							'T'));
-					break;
-				case CONDITION_TYPE_PROXY:
-					$tblNewCond->addItem(new CVar('new_condition[value]','0'));
-					$rowCondition[] = array(
-						new CTextBox('proxy','',20,'yes'),
-						new CButton('btn1',S_SELECT,
-							"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
-							"&dstfld1=new_condition%5Bvalue%5D&dstfld2=proxy&srctbl=proxies".
-							"&srcfld1=hostid&srcfld2=host',450,450);",
-							'T'));
-					break;
-				case CONDITION_TYPE_DHOST_IP:
-					$rowCondition[] = new CTextBox('new_condition[value]', '192.168.0.1-127,192.168.2.1', 50);
-					break;
-				case CONDITION_TYPE_DSERVICE_TYPE:
-					$cmbCondVal = new CComboBox('new_condition[value]');
-					foreach(array(SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP,
-						SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP,SVC_AGENT,SVC_SNMPv1,SVC_SNMPv2,SVC_SNMPv3,
-						SVC_ICMPPING) as $svc)
-						$cmbCondVal->addItem($svc,discovery_check_type2str($svc));
-					$rowCondition[] = $cmbCondVal;
-					break;
-				case CONDITION_TYPE_DSERVICE_PORT:
-					$rowCondition[] = new CTextBox('new_condition[value]', '0-1023,1024-49151', 40);
-					break;
-				case CONDITION_TYPE_DSTATUS:
-					$cmbCondVal = new CComboBox('new_condition[value]');
-					foreach(array(DOBJECT_STATUS_UP, DOBJECT_STATUS_DOWN, DOBJECT_STATUS_DISCOVER,
-							DOBJECT_STATUS_LOST) as $stat)
-						$cmbCondVal->addItem($stat,discovery_object_status2str($stat));
-					$rowCondition[] = $cmbCondVal;
-					break;
-				case CONDITION_TYPE_DOBJECT:
-					$cmbCondVal = new CComboBox('new_condition[value]');
-					foreach(array(EVENT_OBJECT_DHOST, EVENT_OBJECT_DSERVICE) as $object)
-						$cmbCondVal->addItem($object, discovery_object2str($object));
-					$rowCondition[] = $cmbCondVal;
-					break;
-				case CONDITION_TYPE_DUPTIME:
-					$rowCondition[] = new CNumericBox('new_condition[value]','600',15);
-					break;
-				case CONDITION_TYPE_DVALUE:
-					$rowCondition[] = new CTextBox('new_condition[value]', "", 40);
-					break;
-				case CONDITION_TYPE_APPLICATION:
-					$rowCondition[] = new CTextBox('new_condition[value]', "", 40);
-					break;
-				case CONDITION_TYPE_HOST_NAME:
-					$rowCondition[] = new CTextBox('new_condition[value]', "", 40);
-					break;
-			}
-
-			$tblNewCond->addRow($rowCondition);
-
-			$footer = array(new CSubmit('add_condition',S_ADD),new CSubmit('cancel_new_condition',S_CANCEL));
-			$left_tab->addRow(new CFormElement(S_NEW_CONDITION, $tblNewCond, $footer));
-		}
-// }}} NEW CONDITION FORM
-
-
-		$right_tab = new CTable();
-		$right_tab->setCellPadding(3);
-		$right_tab->setCellSpacing(3);
-
-// ACTION OPERATIONS FORM {{{
-		$tblOper = new CTableInfo(S_NO_OPERATIONS_DEFINED);
-
-		$operations	= get_request('operations',array());
-		if(isset($_REQUEST['actionid']) && !isset($_REQUEST['form_refresh'])){
-			$eventsource = $action['eventsource'];
-			$evaltype	= $action['evaltype'];
-			$esc_period	= $action['esc_period'];
-
-			$operations	= $action['operations'];
-			foreach($operations as $aorow => &$operation_data){
-				if($db_opmtype = reset($operation_data['opmediatypes']))
-					$operation_data['mediatypeid'] = $db_opmtype['mediatypeid'];
-			}
-			unset($operation_data);
-
-			}
-		else{
-			$eventsource = get_request('eventsource');
-			$evaltype = get_request('evaltype');
-			$esc_period	= get_request('esc_period');
-		}
-
-		$esc_step_from = array();
-		$objects_tmp = array();
-		$objectids_tmp = array();
-		foreach($operations as $key => $operation) {
-			$esc_step_from[$key] = $operation['esc_step_from'];
-			$objects_tmp[$key] = $operation['object'];
-			$objectids_tmp[$key] = $operation['objectid'];
-		}
-
-		array_multisort($esc_step_from, SORT_ASC, SORT_NUMERIC, $objects_tmp, SORT_DESC, $objectids_tmp, SORT_ASC, $operations);
-
-		$tblOper->setHeader(array(
-			new CCheckBox('all_operations',null,'checkAll("'.S_ACTION.'","all_operations","g_operationid");'),
-			isset($_REQUEST['escalation'])?S_STEPS:null,
-			S_DETAILS,
-			isset($_REQUEST['escalation'])?S_PERIOD.' ('.S_SEC_SMALL.')':null,
-			isset($_REQUEST['escalation'])?S_DELAY:null,
-			S_ACTION
-			));
-
-		$allowed_operations = get_operations_by_eventsource($eventsource);
-
-		$delay = count_operations_delay($operations,$esc_period);
-		foreach($operations as $id => $condition){
-			if(!str_in_array($condition['operationtype'], $allowed_operations)) continue;
-
-			if(!isset($condition['default_msg'])) $condition['default_msg'] = 0;
-			if(!isset($condition['opconditions'])) $condition['opconditions'] = array();
-			if(!isset($condition['mediatypeid'])) $condition['mediatypeid'] = 0;
-
-			$oper_details = new CSpan(get_operation_desc(SHORT_DESCRITION, $condition));
-			$oper_details->setHint(nl2br(get_operation_desc(LONG_DESCRITION, $condition)));
-
-			$esc_steps_txt = null;
-			$esc_period_txt = null;
-			$esc_delay_txt = null;
-
-			if($condition['esc_step_from'] < 1) $condition['esc_step_from'] = 1;
-
-			if(isset($_REQUEST['escalation'])){
-				$esc_steps_txt = $condition['esc_step_from'].' - '.$condition['esc_step_to'];
-				/* Display N-N as N */
-				$esc_steps_txt = ($condition['esc_step_from']==$condition['esc_step_to'])?
-					$condition['esc_step_from']:$condition['esc_step_from'].' - '.$condition['esc_step_to'];
-
-				$esc_period_txt = $condition['esc_period']?$condition['esc_period']:S_DEFAULT;
-				$esc_delay_txt = $delay[$condition['esc_step_from']]?convert_units($delay[$condition['esc_step_from']],'uptime'):S_IMMEDIATELY;
-			}
-
-			$tblOper->addRow(array(
-				new CCheckBox("g_operationid[]", 'no', null,$id),
-				$esc_steps_txt,
-				$oper_details,
-				$esc_period_txt,
-				$esc_delay_txt,
-				new CSubmit('edit_operationid['.$id.']',S_EDIT)
-			));
-
-			$tblOper->addItem(new CVar('operations['.$id.'][operationtype]'	,$condition['operationtype']));
-			$tblOper->addItem(new CVar('operations['.$id.'][object]'	,$condition['object']	));
-			$tblOper->addItem(new CVar('operations['.$id.'][objectid]'	,$condition['objectid']));
-			$tblOper->addItem(new CVar('operations['.$id.'][mediatypeid]'	,$condition['mediatypeid']));
-			$tblOper->addItem(new CVar('operations['.$id.'][shortdata]'	,$condition['shortdata']));
-			$tblOper->addItem(new CVar('operations['.$id.'][longdata]'	,$condition['longdata']));
-			$tblOper->addItem(new CVar('operations['.$id.'][esc_period]'	,$condition['esc_period']	));
-			$tblOper->addItem(new CVar('operations['.$id.'][esc_step_from]'	,$condition['esc_step_from']));
-			$tblOper->addItem(new CVar('operations['.$id.'][esc_step_to]'	,$condition['esc_step_to']));
-			$tblOper->addItem(new CVar('operations['.$id.'][default_msg]'	,$condition['default_msg']));
-			$tblOper->addItem(new CVar('operations['.$id.'][evaltype]'	,$condition['evaltype']));
-
-			foreach($condition['opconditions'] as $opcondid => $opcond){
-				foreach($opcond as $field => $value)
-					$tblOper->addItem(new CVar('operations['.$id.'][opconditions]['.$opcondid.']['.$field.']',$value));
-			}
-		}
-
-		$footer = array();
-		if(!isset($_REQUEST['new_operation'])){
-			$footer[] = new CSubmit('new_operation',S_NEW);
-		}
-		if($tblOper->ItemsCount() > 0 ){
-			$footer[] = new CSubmit('del_operation',S_DELETE_SELECTED);
-		}
-
-		$right_tab->addRow(new CFormElement(S_ACTION_OPERATIONS, $tblOper, $footer));
-// }}} ACTION OPERATIONS FORM
-
-
+/*
 // NEW OPERATION FORM {{{
 		if(isset($_REQUEST['new_operation'])){
 			$tblOper = new CTable(null, 'formElementTable');
@@ -866,7 +380,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 
 			$allowed_operations = get_operations_by_eventsource($eventsource);
 
-			/* init new_operation variable */
+// init new_operation variable
 			$new_operation = get_request('new_operation', array());
 
 			if(!is_array($new_operation)){
@@ -919,7 +433,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 				));
 
 				$tblNewOperation->addRow(array(S_STEP, $tblStep));
-		}
+			}
 			else{
 				$tblOper->addItem(new CVar('new_operation[esc_period]', $new_operation['esc_period']));
 				$tblOper->addItem(new CVar('new_operation[esc_step_from]', $new_operation['esc_step_from']));
@@ -1018,8 +532,8 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 								new CSpan($db_media['sendto'], 'nowrap'),
 								new CSpan($db_media['period'], 'nowrap'),
 								media_severity2str($db_media['severity'])
-				));
-		}
+							));
+						}
 
 						$tblNewOperation->addRow(array(S_USER_MEDIAS, $media_table));
 					}
@@ -1138,7 +652,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 				}
 
 				if($cond_el->ItemsCount() > 1){
-					/* prepare opcondition calcuation type selector */
+// prepare opcondition calcuation type selector
 					switch($evaltype) {
 						case ACTION_EVAL_TYPE_AND:
 							$group_op = $glog_op = S_AND;
@@ -1252,13 +766,13 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		$outer_table = new CTable();
 		$outer_table->addRow(array($td_l, $td_r));
 		$frmAction->additem($outer_table);
-
+//*/
 		show_messages();
 
-		$action_wdgt->addItem($frmAction);
+//		$action_wdgt->addItem($frmAction);
 	}
 	else{
-		$form = new CForm(null, 'get');
+		$form = new CForm('get');
 
 		$cmbSource = new CComboBox('eventsource',$_REQUEST['eventsource'],'submit()');
 		$cmbSource->addItem(EVENT_SOURCE_TRIGGERS,S_TRIGGERS);

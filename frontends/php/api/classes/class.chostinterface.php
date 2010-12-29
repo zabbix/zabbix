@@ -40,7 +40,6 @@ class CHostInterface extends CZBXAPI{
  * @param array $options['nodeids'] Node IDs
  * @param array $options['hostids'] Interface IDs
  * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
- * @param int $options['extendoutput'] return all fields for Interfaces
  * @param boolean $options['selectHosts'] select Interface hosts
  * @param boolean $options['selectItems'] select Items
  * @param int $options['count'] count Interfaces, returned column name is rowscount
@@ -105,9 +104,12 @@ class CHostInterface extends CZBXAPI{
 
 		if(is_array($options['output'])){
 			unset($sql_parts['select']['interface']);
+
+			$dbTable = DB::getSchema('interface');
 			$sql_parts['select']['interfaceid'] = ' hi.interfaceid';
 			foreach($options['output'] as $key => $field){
-				$sql_parts['select'][$field] = ' hi.'.$field;
+				if(isset($dbTable['fields'][$field]))
+					$sql_parts['select'][$field] = ' hi.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;

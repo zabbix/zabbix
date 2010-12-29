@@ -86,7 +86,7 @@ include_once('include/page_header.php');
 	$alerts_wdgt = new CWidget();
 
 // HEADER
-	$frmForm = new CForm(null, 'get');
+	$frmForm = new CForm('get');
 
 	$cmbConf = new CComboBox('config','auditacts.php');
 	$cmbConf->setAttribute('onchange','javascript: redirect(this.options[this.selectedIndex].value);');

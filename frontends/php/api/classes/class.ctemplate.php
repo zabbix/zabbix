@@ -101,10 +101,12 @@ class CTemplate extends CZBXAPI{
 
 		if(is_array($options['output'])){
 			unset($sql_parts['select']['templates']);
-			$sql_parts['select']['hostid'] = ' h.hostid';
 
+			$dbTable = DB::getSchema('hosts');
+			$sql_parts['select']['hostid'] = ' h.hostid';
 			foreach($options['output'] as $key => $field){
-				$sql_parts['select'][$field] = ' h.'.$field;
+				if(isset($dbTable['fields'][$field]))
+					$sql_parts['select'][$field] = ' h.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;

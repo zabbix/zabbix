@@ -367,7 +367,7 @@ include_once('include/page_header.php');
 
 
 	if (!isset($_REQUEST['form'])){
-		$form_button = new CForm(null, 'get');
+		$form_button = new CForm('get');
 		$form_button->addVar('hostid', $_REQUEST['hostid']);
 		//if host is selected
 		if(!isset($_REQUEST['form']) && ($_REQUEST['hostid'] > 0)){
@@ -591,7 +591,7 @@ include_once('include/page_header.php');
 		$http_wdgt->addItem($form);
 	}
 	else{
-		$form = new CForm(null, 'get');
+		$form = new CForm('get');
 
 		$form->addItem(array(S_GROUP.SPACE,$pageFilter->getGroupsCB()));
 		$form->addItem(array(SPACE.S_HOST.SPACE,$pageFilter->getHostsCB()));

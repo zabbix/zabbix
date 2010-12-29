@@ -359,7 +359,7 @@ include_once('include/page_header.php');
 		$groups_wdgt->addHeader($numrows);
 
 // Host Groups table
-		$form = new CForm('hostgroups.php');
+		$form = new CForm();
 		$form->setName('form_groups');
 
 		$table = new CTableInfo(S_NO_HOST_GROUPS_DEFINED);

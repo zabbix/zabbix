@@ -35,12 +35,14 @@
 	border-color: #222222;
 }
 
+.hintbox{
+	color: #2f2f2f;
+}
 
-
-.unknown	{
+.unknown{
 	color: #999999;
 }
-.normal		{
+.normal{
 	background-color: #AADDDD;
 }
 
@@ -253,26 +255,6 @@ table.tableinfo tr.footer td{
 }
 /**************************************************/
 /**************************************************/
-
-table.tablestripped{
-	border: 1px solid #5A5A5A;;
-	border-top: 0px solid #AAAAAA;
-}
-
-table.tablestripped tr.form_odd_row td{
-	color: #DFDFDF;
-	background-color:#1F1F1F;
-}
-
-table.tablestripped tr.form_even_row td{
-	color: #DFDFDF;
-	background-color:#2F2F2F;
-}
-
-table.tablestripped tr.footer td {
-	background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left;
-}
-
 
 table.header{
 	background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left;

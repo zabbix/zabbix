@@ -31,7 +31,7 @@
 
 	$interfaces = get_request('interfaces',array());
 
-	$frmProxy = new CForm('proxies.php');
+	$frmProxy = new CForm();
 	$frmProxy->addVar('form', get_request('form', 1));
 	$frmProxy->addVar('form_refresh', get_request('form_refresh',0)+1);
 

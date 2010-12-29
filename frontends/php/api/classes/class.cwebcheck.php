@@ -133,7 +133,7 @@ class CWebCheck extends CZBXAPI{
 
 		}
 
-// extendoutput
+// output
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['httptests'] = 'ht.*';
 		}
@@ -486,7 +486,7 @@ COpt::memoryPick();
 				'webcheckids' => $webcheckids,
 				'output' => API_OUTPUT_EXTEND,
 				'editable' => 1,
-				'extendoutput' => 1,
+				'output' => API_OUTPUT_EXTEND,
 				'select_hosts' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1
 			);

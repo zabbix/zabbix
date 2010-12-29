@@ -44,7 +44,6 @@ class CUserGroup extends CZBXAPI{
  * @param boolean $options['with_gui_access']
  * @param boolean $options['with_api_access']
  * @param boolean $options['select_users']
- * @param int $options['extendoutput']
  * @param int $options['count']
  * @param string $options['pattern']
  * @param int $options['limit'] limit selection
@@ -82,7 +81,6 @@ class CUserGroup extends CZBXAPI{
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 // OutPut
-			'extendoutput'				=> null,
 			'editable'					=> null,
 			'output'					=> API_OUTPUT_REFER,
 			'select_users'				=> null,
@@ -95,15 +93,6 @@ class CUserGroup extends CZBXAPI{
 		);
 
 		$options = zbx_array_merge($def_options, $options);
-
-
-		if(!is_null($options['extendoutput'])){
-			$options['output'] = API_OUTPUT_EXTEND;
-
-			if(!is_null($options['select_users'])){
-				$options['select_users'] = API_OUTPUT_EXTEND;
-			}
-		}
 
 // PERMISSION CHECK
 		if(USER_TYPE_SUPER_ADMIN == $user_type){
@@ -157,7 +146,7 @@ class CUserGroup extends CZBXAPI{
 			$sql_parts['where'][] = 'g.api_access='.GROUP_API_ACCESS_ENABLED;
 		}
 
-// extendoutput
+// output
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['usrgrp'] = 'g.*';
 		}
@@ -304,7 +293,7 @@ class CUserGroup extends CZBXAPI{
 		}
 
 		if(!empty($usrgrpids))
-			$result = self::get(array('usrgrpids'=>$usrgrpids, 'extendoutput'=>1));
+			$result = self::get(array('usrgrpids'=>$usrgrpids, 'output' => API_OUTPUT_EXTEND));
 
 	return $result;
 	}

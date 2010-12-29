@@ -163,7 +163,7 @@ include_once('include/page_header.php');
 <?php
 	$trigg_wdgt = new CWidget();
 
-	$r_form = new CForm(null, 'get');
+	$r_form = new CForm('get');
 	$r_form->addItem(array(S_GROUP . SPACE, $pageFilter->getGroupsCB(true)));
 	$r_form->addItem(array(SPACE . S_HOST . SPACE, $pageFilter->getHostsCB(true)));
 	$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
@@ -253,7 +253,7 @@ include_once('include/page_header.php');
 		$triggerInfo->show();
 	}
 
-	$m_form = new CForm('acknow.php');
+	$m_form = new CForm('get','acknow.php');
 	$m_form->setName('tr_status');
 	$m_form->addVar('backurl', $page['file']);
 

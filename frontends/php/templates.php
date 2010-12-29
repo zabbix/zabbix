@@ -513,7 +513,7 @@ include_once('include/page_header.php');
 	else{
 // TABLE WITH TEMPLATES
 
-		$frmGroup = new CForm(null, 'get');
+		$frmGroup = new CForm('get');
 		$frmGroup->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB()));
 
 // table header

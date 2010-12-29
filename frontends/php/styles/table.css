@@ -155,52 +155,6 @@ table.formlongtable{
 	width: 99%;
 }
 
-/*----------------- <TABLESTRIPPED> ----------------*/
-
-table.tablestripped {
-	color: #000000;
-	border: 1px solid #AAAAAA;
-	width: 100%;
-	text-decoration: none;
-}
-
-table.tablestripped tr > td:first-child{
-	width: 1%;
-}
-table.tablestripped tr >/**/ td:first-child{
-	width: 1px;
-}
-
-table.tablestripped tr td {
-	padding-left: 5px;
-	padding-right: 5px;
-	height: 24px;
-	white-space: nowrap;
-	word-spacing: 0;
-}
-
-table.tablestripped tr.form_odd_row td{
-	background-color:#D8D8D8;
-}
-
-table.tablestripped tr.form_even_row td{
-	background-color:#DFDFDF;
-}
-
-table.tablestripped tr.header td{
-	color: #FFFFFF;
-	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
-	text-align: left;
-}
-
-table.tablestripped tr.footer td{
-	color: #FFFFFF;
-	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
-	text-align: right;
-}
-
-/*----------------- </TABLESTRIPPED> ----------------*/
-
 td.form_row_l_simple { /* left cell simple */
 	border-color: #AAAAAA;
 	text-align:	left;

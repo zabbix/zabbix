@@ -43,7 +43,6 @@ class CUser extends CZBXAPI{
  * @param boolean $options['type'] filter by User type [ USER_TYPE_ZABBIX_USER: 1, USER_TYPE_ZABBIX_ADMIN: 2, USER_TYPE_SUPER_ADMIN: 3 ]
  * @param boolean $options['select_usrgrps'] extend with UserGroups data for each User
  * @param boolean $options['get_access'] extend with access data for each User
- * @param boolean $options['extendoutput'] output only User IDs if not set.
  * @param boolean $options['count'] output only count of objects in result. ( result returned in property 'rowscount' )
  * @param string $options['pattern'] filter by Host name containing only give pattern
  * @param int $options['limit'] output will be limited to given number
@@ -83,7 +82,6 @@ class CUser extends CZBXAPI{
 			'excludeSearch'				=> null,
 
 // OutPut
-			'extendoutput'				=> null,
 			'output'					=> API_OUTPUT_REFER,
 			'editable'					=> null,
 			'select_usrgrps'			=> null,
@@ -99,16 +97,6 @@ class CUser extends CZBXAPI{
 		);
 
 		$options = zbx_array_merge($def_options, $options);
-
-
-		if(!is_null($options['extendoutput'])){
-			$options['output'] = API_OUTPUT_EXTEND;
-
-			if(!is_null($options['select_usrgrps'])){
-				$options['select_usrgrps'] = API_OUTPUT_EXTEND;
-			}
-		}
-
 
 // PERMISSION CHECK
 		if(USER_TYPE_SUPER_ADMIN == $user_type){
@@ -169,7 +157,7 @@ class CUser extends CZBXAPI{
 			$sql_parts['where']['mu'] = 'm.userid=u.userid';
 		}
 
-// extendoutput
+// output
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['users'] = 'u.*';
 		}
@@ -366,7 +354,7 @@ Copt::memoryPick();
 		}
 
 		if(!empty($userids))
-			$result = self::get(array('userids' => $userids, 'extendoutput' => 1));
+			$result = self::get(array('userids' => $userids, 'output' => API_OUTPUT_EXTEND));
 
 		return $result;
 	}

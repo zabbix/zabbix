@@ -196,7 +196,7 @@
 		$proxies_wdgt->addHeader(S_PROXIES_BIG);
 		$proxies_wdgt->addHeader($numrows);
 
-		$form = new CForm('proxies.php', 'get');
+		$form = new CForm('get');
 		$form->setName('hosts');
 
 		$table = new CTableInfo(S_NO_PROXIES_DEFINED);
