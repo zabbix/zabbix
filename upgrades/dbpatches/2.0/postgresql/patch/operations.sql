@@ -1,26 +1,20 @@
 ---- Patching table `opmessage`
 
 CREATE TABLE opmessage (
-	opmessageid              bigint                                    NOT NULL,
 	operationid              bigint                                    NOT NULL,
 	default_msg              integer         DEFAULT '0'               NOT NULL,
 	subject                  varchar(255)    DEFAULT ''                NOT NULL,
 	message                  text            DEFAULT ''                NOT NULL,
 	mediatypeid              bigint                                    NULL,
-	PRIMARY KEY (opmessageid)
+	PRIMARY KEY (operationid)
 ) with OIDS;
-CREATE INDEX opmessage_1 on opmessage (operationid);
 ALTER TABLE ONLY opmessage ADD CONSTRAINT c_opmessage_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE;
 ALTER TABLE ONLY opmessage ADD CONSTRAINT c_opmessage_2 FOREIGN KEY (mediatypeid) REFERENCES media_type (mediatypeid);
 
-CREATE SEQUENCE opmessage_seq;
-
-INSERT INTO opmessage (opmessageid, operationid, default_msg, subject, message)
-	SELECT NEXTVAL('opmessage_seq'), operationid, default_msg, shortdata, longdata
+INSERT INTO opmessage (operationid, default_msg, subject, message)
+	SELECT operationid, default_msg, shortdata, longdata
 		FROM operations
 		WHERE operationtype IN (0);	-- OPERATION_TYPE_MESSAGE
-
-DROP SEQUENCE opmessage_seq;
 
 UPDATE opmessage
 	SET mediatypeid = (
@@ -32,62 +26,56 @@ UPDATE opmessage
 			FROM opmediatypes omt, media_type mt
 			WHERE omt.mediatypeid = mt.mediatypeid);
 
-UPDATE opmessage
-	SET opmessageid = (operationid / 100000000000) * 100000000000 + opmessageid
-	WHERE operationid >= 100000000000;
-
 ---- Patching table `opmessage_grp`
 
 CREATE TABLE opmessage_grp (
 	opmessage_grpid          bigint                                    NOT NULL,
-	opmessageid              bigint                                    NOT NULL,
+	operationid              bigint                                    NOT NULL,
 	usrgrpid                 bigint                                    NOT NULL,
 	PRIMARY KEY (opmessage_grpid)
 ) with OIDS;
-CREATE UNIQUE INDEX opmessage_grp_1 ON opmessage_grp (opmessageid,usrgrpid);
-ALTER TABLE ONLY opmessage_grp ADD CONSTRAINT c_opmessage_grp_1 FOREIGN KEY (opmessageid) REFERENCES opmessage (opmessageid) ON DELETE CASCADE;
+CREATE UNIQUE INDEX opmessage_grp_1 ON opmessage_grp (operationid,usrgrpid);
+ALTER TABLE ONLY opmessage_grp ADD CONSTRAINT c_opmessage_grp_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE;
 ALTER TABLE ONLY opmessage_grp ADD CONSTRAINT c_opmessage_grp_2 FOREIGN KEY (usrgrpid) REFERENCES usrgrp (usrgrpid);
 
 CREATE SEQUENCE opmessage_grp_seq;
 
-INSERT INTO opmessage_grp (opmessage_grpid, opmessageid, usrgrpid)
-	SELECT NEXTVAL('opmessage_grp_seq'), m.opmessageid, o.objectid
-		FROM opmessage m, operations o, usrgrp g
-		WHERE m.operationid = o.operationid
-			AND o.objectid = g.usrgrpid
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid)
+	SELECT NEXTVAL('opmessage_grp_seq'), o.operationid, o.objectid
+		FROM operations o, usrgrp g
+		WHERE o.objectid = g.usrgrpid
 			AND o.object IN (1);	-- OPERATION_OBJECT_GROUP
 
 DROP SEQUENCE opmessage_grp_seq;
 
 UPDATE opmessage_grp
-	SET opmessage_grpid = (opmessageid / 100000000000) * 100000000000 + opmessage_grpid
+	SET opmessage_grpid = (operationid / 100000000000) * 100000000000 + opmessage_grpid
 	WHERE opmessage_grpid >= 100000000000;
 
 ---- Patching table `opmessage_usr`
 
 CREATE TABLE opmessage_usr (
 	opmessage_usrid          bigint                                    NOT NULL,
-	opmessageid              bigint                                    NOT NULL,
+	operationid              bigint                                    NOT NULL,
 	userid                   bigint                                    NOT NULL,
 	PRIMARY KEY (opmessage_usrid)
 ) with OIDS;
-CREATE UNIQUE INDEX opmessage_usr_1 ON opmessage_usr (opmessageid,userid);
-ALTER TABLE ONLY opmessage_usr ADD CONSTRAINT c_opmessage_usr_1 FOREIGN KEY (opmessageid) REFERENCES opmessage (opmessageid) ON DELETE CASCADE;
+CREATE UNIQUE INDEX opmessage_usr_1 ON opmessage_usr (operationid,userid);
+ALTER TABLE ONLY opmessage_usr ADD CONSTRAINT c_opmessage_usr_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE;
 ALTER TABLE ONLY opmessage_usr ADD CONSTRAINT c_opmessage_usr_2 FOREIGN KEY (userid) REFERENCES users (userid);
 
 CREATE SEQUENCE opmessage_usr_seq;
 
-INSERT INTO opmessage_usr (opmessage_usrid, opmessageid, userid)
-	SELECT NEXTVAL('opmessage_usr_seq'), m.opmessageid, o.objectid
-		FROM opmessage m, operations o, users u
-		WHERE m.operationid = o.operationid
-			AND o.objectid = u.userid
+INSERT INTO opmessage_usr (opmessage_usrid, operationid, userid)
+	SELECT NEXTVAL('opmessage_usr_seq'), o.operationid, o.objectid
+		FROM operations o, users u
+		WHERE o.objectid = u.userid
 			AND o.object IN (0);	-- OPERATION_OBJECT_USER
 
 DROP SEQUENCE opmessage_usr_seq;
 
 UPDATE opmessage_usr
-	SET opmessage_usrid = (opmessageid / 100000000000) * 100000000000 + opmessage_usrid
+	SET opmessage_usrid = (operationid / 100000000000) * 100000000000 + opmessage_usrid
 	WHERE opmessage_usrid >= 100000000000;
 
 ---- Patching tables `opcommand_hst` and `opcommand_grp`

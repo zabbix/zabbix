@@ -1,21 +1,18 @@
 ---- Patching table `opmessage`
 
 CREATE TABLE opmessage (
-	opmessageid              bigint unsigned                           NOT NULL,
 	operationid              bigint unsigned                           NOT NULL,
 	default_msg              integer         DEFAULT '0'               NOT NULL,
 	subject                  varchar(255)    DEFAULT ''                NOT NULL,
 	message                  text                                      NOT NULL,
 	mediatypeid              bigint unsigned                           NULL,
-	PRIMARY KEY (opmessageid)
+	PRIMARY KEY (operationid)
 ) ENGINE=InnoDB;
-CREATE INDEX opmessage_1 ON opmessage (operationid);
 ALTER TABLE opmessage ADD CONSTRAINT c_opmessage_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE;
 ALTER TABLE opmessage ADD CONSTRAINT c_opmessage_2 FOREIGN KEY (mediatypeid) REFERENCES media_type (mediatypeid);
 
-SET @opmessageid := 0;
-INSERT INTO opmessage (opmessageid, operationid, default_msg, subject, message)
-	SELECT @opmessageid := @opmessageid + 1, operationid, default_msg, shortdata, longdata
+INSERT INTO opmessage (operationid, default_msg, subject, message)
+	SELECT operationid, default_msg, shortdata, longdata
 		FROM operations
 		WHERE operationtype IN (0);	-- OPERATION_TYPE_MESSAGE
 
@@ -29,56 +26,50 @@ UPDATE opmessage
 			FROM opmediatypes omt, media_type mt
 			WHERE omt.mediatypeid = mt.mediatypeid);
 
-UPDATE opmessage
-	SET opmessageid = (operationid div 100000000000) * 100000000000 + opmessageid
-	WHERE operationid >= 100000000000;
-
 ---- Patching table `opmessage_grp`
 
 CREATE TABLE opmessage_grp (
 	opmessage_grpid          bigint unsigned                           NOT NULL,
-	opmessageid              bigint unsigned                           NOT NULL,
+	operationid              bigint unsigned                           NOT NULL,
 	usrgrpid                 bigint unsigned                           NOT NULL,
 	PRIMARY KEY (opmessage_grpid)
 ) ENGINE=InnoDB;
-CREATE UNIQUE INDEX opmessage_grp_1 ON opmessage_grp (opmessageid,usrgrpid);
-ALTER TABLE opmessage_grp ADD CONSTRAINT c_opmessage_grp_1 FOREIGN KEY (opmessageid) REFERENCES opmessage (opmessageid) ON DELETE CASCADE;
+CREATE UNIQUE INDEX opmessage_grp_1 ON opmessage_grp (operationid,usrgrpid);
+ALTER TABLE opmessage_grp ADD CONSTRAINT c_opmessage_grp_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE;
 ALTER TABLE opmessage_grp ADD CONSTRAINT c_opmessage_grp_2 FOREIGN KEY (usrgrpid) REFERENCES usrgrp (usrgrpid);
 
 SET @opmessage_grpid := 0;
-INSERT INTO opmessage_grp (opmessage_grpid, opmessageid, usrgrpid)
-	SELECT @opmessage_grpid := @opmessage_grpid + 1, m.opmessageid, o.objectid
-		FROM opmessage m, operations o, usrgrp g
-		WHERE m.operationid = o.operationid
-			AND o.objectid = g.usrgrpid
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid)
+	SELECT @opmessage_grpid := @opmessage_grpid + 1, o.operationid, o.objectid
+		FROM operations o, usrgrp g
+		WHERE o.objectid = g.usrgrpid
 			AND o.object IN (1);	-- OPERATION_OBJECT_GROUP
 
 UPDATE opmessage_grp
-	SET opmessage_grpid = (opmessageid div 100000000000) * 100000000000 + opmessage_grpid
+	SET opmessage_grpid = (operationid div 100000000000) * 100000000000 + opmessage_grpid
 	WHERE opmessage_grpid >= 100000000000;
 
 ---- Patching table `opmessage_usr`
 
 CREATE TABLE opmessage_usr (
 	opmessage_usrid          bigint unsigned                           NOT NULL,
-	opmessageid              bigint unsigned                           NOT NULL,
+	operationid              bigint unsigned                           NOT NULL,
 	userid                   bigint unsigned                           NOT NULL,
 	PRIMARY KEY (opmessage_usrid)
 ) ENGINE=InnoDB;
-CREATE UNIQUE INDEX opmessage_usr_1 ON opmessage_usr (opmessageid,userid);
-ALTER TABLE opmessage_usr ADD CONSTRAINT c_opmessage_usr_1 FOREIGN KEY (opmessageid) REFERENCES opmessage (opmessageid) ON DELETE CASCADE;
+CREATE UNIQUE INDEX opmessage_usr_1 ON opmessage_usr (operationid,userid);
+ALTER TABLE opmessage_usr ADD CONSTRAINT c_opmessage_usr_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE;
 ALTER TABLE opmessage_usr ADD CONSTRAINT c_opmessage_usr_2 FOREIGN KEY (userid) REFERENCES users (userid);
 
 SET @opmessage_usrid := 0;
-INSERT INTO opmessage_usr (opmessage_usrid, opmessageid, userid)
-	SELECT @opmessage_usrid := @opmessage_usrid + 1, m.opmessageid, o.objectid
-		FROM opmessage m, operations o, users u
-		WHERE m.operationid = o.operationid
-			AND o.objectid = u.userid
+INSERT INTO opmessage_usr (opmessage_usrid, operationid, userid)
+	SELECT @opmessage_usrid := @opmessage_usrid + 1, o.operationid, o.objectid
+		FROM operations o, users u
+		WHERE o.objectid = u.userid
 			AND o.object IN (0);	-- OPERATION_OBJECT_USER
 
 UPDATE opmessage_usr
-	SET opmessage_usrid = (opmessageid div 100000000000) * 100000000000 + opmessage_usrid
+	SET opmessage_usrid = (operationid div 100000000000) * 100000000000 + opmessage_usrid
 	WHERE opmessage_usrid >= 100000000000;
 
 ---- Patching tables `opcommand_hst` and `opcommand_grp`
