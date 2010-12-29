@@ -84,7 +84,7 @@ class CHostInterface extends CZBXAPI{
 // filter
 			'filter'					=> null,
 			'search'					=> null,
-			'filterByOR'			=> null,
+			'searchByAny'			=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 

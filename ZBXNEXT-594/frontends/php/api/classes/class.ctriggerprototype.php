@@ -98,7 +98,7 @@ class CTriggerPrototype extends CZBXAPI{
 
 			'filter'					=> null,
 			'search'					=> null,
-			'filterByOR'			=> null,
+			'searchByAny'			=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 

@@ -917,7 +917,8 @@ else {
 				$search[] = $sql_parts['where']['search'];
 			}
 
-			$sql_parts['where']['search'] = '( '.implode(' '.(!is_null($options['filterByOR'])?'OR':'AND').' ', $search).' )';
+			$glue = is_null($options['searchByAny']) ? ' AND ' : ' OR ';
+			$sql_parts['where']['search'] = '( '.implode($glue, $search).' )';
 			return true;
 		}
 
@@ -954,7 +955,9 @@ else {
 			if(isset($sql_parts['where']['filter'])){
 				$filter[] = $sql_parts['where']['filter'];
 			}
-			$sql_parts['where']['filter'] = '( '.implode(' '.(!is_null($options['filterByOR'])?'OR':'AND').' ', $filter).' )';
+
+			$glue = is_null($options['searchByAny']) ? ' AND ' : ' OR ';
+			$sql_parts['where']['filter'] = '( '.implode($glue, $filter).' )';
 			return true;
 		}
 
