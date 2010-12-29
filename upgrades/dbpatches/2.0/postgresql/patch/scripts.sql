@@ -3,7 +3,7 @@ ALTER TABLE ONLY scripts ALTER scriptid DROP DEFAULT,
 			 ALTER usrgrpid DROP NOT NULL,
 			 ALTER groupid DROP DEFAULT,
 			 ALTER groupid DROP NOT NULL,
-			 ADD description text NOT NULL,
+			 ADD description text DEFAULT '' NOT NULL,
 			 ADD question varchar(255) DEFAULT '' NOT NULL;
 UPDATE scripts SET usrgrpid=NULL WHERE usrgrpid=0;
 UPDATE scripts SET groupid=NULL WHERE groupid=0;

@@ -1,4 +1,4 @@
--- 
+--
 -- ZABBIX
 -- Copyright (C) 2000-2005 SIA Zabbix
 --
@@ -795,7 +795,7 @@ FIELD		|command	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|host_access	|t_integer	|'2'	|NOT NULL	|ZBX_SYNC
 FIELD		|usrgrpid	|t_id		|	|NULL		|ZBX_SYNC		|1|usrgrp	|		|RESTRICT
 FIELD		|groupid	|t_id		|	|NULL		|ZBX_SYNC		|2|groups	|		|RESTRICT
-FIELD		|description	|t_blob		|''	|NOT NULL	|ZBX_SYNC
+FIELD		|description	|t_text		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|question	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 
 TABLE|screens|screenid|ZBX_SYNC
