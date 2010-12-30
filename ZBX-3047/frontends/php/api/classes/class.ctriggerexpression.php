@@ -635,23 +635,23 @@ private $allowed;
 			'sequence' => 0,
 			'open' => array(
 				'(' => 0,		// parenthesis
-				'{' => 0		// curlyBrace
+				'{' => 0		// curly brace
 			),
 			'close' => array(
 				')' => 0,		// parenthesis
-				'}' => 0,		// curlyBrace
+				'}' => 0,		// curly brace
 			),
 			'linkage' => array(
-				'+' => 0,		// plus
-				'-' => 0,		// minus
+				'+' => 0,		// addition
+				'-' => 0,		// subtraction
 				'*' => 0,		// multiplication
 				'/' => 0,		// division
-				'#' => 0,		// hash
+				'#' => 0,		// not equals
 				'=' => 0,		// equals
-				'<' => 0,		// lower
-				'>' => 0,		// greater
-				'&' => 0,		// ampersand
-				'|' => 0,		// vertivalBar
+				'<' => 0,		// less than
+				'>' => 0,		// greater than
+				'&' => 0,		// logical and
+				'|' => 0,		// logical or
 			),
 			'expr' => array(
 				'$' => 0,		// dollar
@@ -664,7 +664,7 @@ private $allowed;
 				'[' => 0,		// open square brace
 				']' => 0,		// close square brace
 				'(' => 0,		// open brace
-				')' => 0		// clsoe brace
+				')' => 0		// close brace
 			)
 		);
 
