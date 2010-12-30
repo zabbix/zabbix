@@ -24,11 +24,8 @@
 	include('include/templates/scriptConfirm.js.php');
 ?>
 <?php
-	$divTabs = new CTabView(array('remember'=>1));
-	if(!isset($_REQUEST['form_refresh']))
-		$divTabs->setSelected(0);
-
 	$scriptTab = new CFormList('script');
+	$scriptTab->addClass('min-width ui-tabs ui-widget ui-widget-content ui-corner-all');
 
 	$frmScr = new CForm();
 	$frmScr->setName('scripts');
@@ -64,23 +61,34 @@
 		if($script){
 			$name = $script['name'];
 			$command  = $script['command'];
-			$description  = $script['description'];
+			$description = $script['description'];
 			$usrgrpid = $script['usrgrpid'];
 			$groupid = $script['groupid'];
 			$access = $script['host_access'];
 			$question = $script['question'];
 			$enableQuestion = !empty($question);
 		}
+		else{
+			$name = $command = $description = $usrgrpid = $groupid = $access = $question = $enableQuestion = '';
+		}
 	}
 
 // NAME
-	$scriptTab->addRow(S_NAME, new CTextBox('name', $name, 80));
+	$nameTB = new CTextBox('name', $name);
+	$nameTB->setAttribute('maxlength', 255);
+	$nameTB->addStyle('width: 425px');
+	$scriptTab->addRow(S_NAME, $nameTB);
 
 // COMMAND
-	$scriptTab->addRow(S_COMMAND, new CTextBox('command', $command, 80));
+	$commandTB = new CTextBox('command', $command);
+	$commandTB->setAttribute('maxlength', 255);
+	$commandTB->addStyle('width: 425px');
+	$scriptTab->addRow(S_COMMAND, $commandTB);
 
 // DESCRIPTION
-	$scriptTab->addRow(_('Description'), new CTextArea('description', $description));
+	$description_ta = new CTextArea('description', $description);
+	$description_ta->addStyle('width: 425px; padding: 0;');
+	$scriptTab->addRow(_('Description'), $description_ta);
 
 // USER GROUPS
 	$usr_groups = new CCombobox('usrgrpid', $usrgrpid);
@@ -121,16 +129,17 @@
 	$questionTB = new CTextBox('question', $question, 65);
 	$questionTB->setAttribute('id', 'question');
 	$questionTB->setAttribute('maxlength', 255);
+	$questionTB->setAttribute('autocomplete', 'off');
 
 	$testSpan = new CSpan(_('Test question'), 'link_menu');
 	$testSpan->setAttribute('id', 'testQuestion');
 
 	$scriptTab->addRow(SPACE, array($questionTB, SPACE, $testSpan));
 
+	$scriptTab->setHeader(_('Script'));
 
+	$frmScr->addItem($scriptTab);
 
-	$divTabs->addTab('scriptTab', S_SCRIPT, $scriptTab);
-	$frmScr->addItem($divTabs);
 
 // Footer
 	$main = array(new CSubmit('save', S_SAVE));
@@ -140,6 +149,7 @@
 	}
 	$others[] = new CButtonCancel();
 	$frmScr->addItem(makeFormFooter($main, $others));
+
 
 	return $frmScr;
 
