@@ -461,6 +461,7 @@ class CScript extends CZBXAPI{
  */
 	public static function delete($scriptids){
 		global $USER_DETAILS;
+		$scriptids = zbx_toArray($scriptids);
 
 		try{
 			self::BeginTransaction(__METHOD__);
