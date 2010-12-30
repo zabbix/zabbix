@@ -1131,7 +1131,7 @@ else {
 						continue;
 					}
 
-					//check the size of the value to fit data type
+					// check the size of the value to fit data type
 					if($table_schema['fields'][$field]['type'] == 'char'
 						&& zbx_strlen($value) > $table_schema['fields'][$field]['length']){
 						self::exception(self::SCHEMA_ERROR, _s('Value "%s" is too long for field "%s" - %d characters. Allowed length is %d characters.', $value, $field, zbx_strlen($value), $table_schema['fields'][$field]['length']));
@@ -1194,7 +1194,7 @@ else {
 						continue;
 					}
 
-					//check the size of the value to fit data type
+					// check the size of the value to fit data type
 					if($table_schema['fields'][$field]['type'] == 'char'
 						&& zbx_strlen($value) > $table_schema['fields'][$field]['length']){
 						self::exception(self::SCHEMA_ERROR, _s('Value "%s" is too long for field "%s" - %d characters. Allowed length is %d characters.', $value, $field, zbx_strlen($value), $table_schema['fields'][$field]['length']));
