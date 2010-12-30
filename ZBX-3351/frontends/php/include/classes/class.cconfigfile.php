@@ -47,22 +47,22 @@ class CConfigFile{
 			$this->setDefaults();
 
 			if(isset($DB['TYPE'])) $this->config['DB']['TYPE'] = $DB['TYPE'];
-			if(isset($DB_TYPE)) $this->config['DB']['TYPE'] = $DB_TYPE;
+			else if(isset($DB_TYPE)) $this->config['DB']['TYPE'] = $DB_TYPE;
 
 			if(isset($DB['DATABASE'])) $this->config['DB']['DATABASE'] = $DB['DATABASE'];
-			if(isset($DB_DATABASE)) $this->config['DB']['DATABASE'] = $DB_DATABASE;
+			else if(isset($DB_DATABASE)) $this->config['DB']['DATABASE'] = $DB_DATABASE;
 
 			if(isset($DB['SERVER'])) $this->config['DB']['SERVER'] = $DB['SERVER'];
-			if(isset($DB_SERVER)) $this->config['DB']['SERVER'] = $DB_SERVER;
+			else if(isset($DB_SERVER)) $this->config['DB']['SERVER'] = $DB_SERVER;
 
 			if(isset($DB['PORT'])) $this->config['DB']['PORT'] = $DB['PORT'];
-			if(isset($DB_PORT)) $this->config['DB']['PORT'] = $DB_PORT;
+			else if(isset($DB_PORT)) $this->config['DB']['PORT'] = $DB_PORT;
 
 			if(isset($DB['USER'])) $this->config['DB']['USER'] = $DB['USER'];
-			if(isset($DB_USER)) $this->config['DB']['USER'] = $DB_USER;
+			else if(isset($DB_USER)) $this->config['DB']['USER'] = $DB_USER;
 
 			if(isset($DB['PASSWORD'])) $this->config['DB']['PASSWORD'] = $DB['PASSWORD'];
-			if(isset($DB_PASSWORD)) $this->config['DB']['PASSWORD'] = $DB_PASSWORD;
+			else if(isset($DB_PASSWORD)) $this->config['DB']['PASSWORD'] = $DB_PASSWORD;
 
 			if(isset($DB['SCHEMA'])) $this->config['DB']['SCHEMA'] = $DB['SCHEMA'];
 
