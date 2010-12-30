@@ -175,21 +175,23 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 		$scripts_wdgt->addItem($scriptForm->render('script.edit'));
 	}
 	else{
+		$frmForm = new CForm(null, 'get');
+		$frmForm->addItem(new CSubmit('form', _('Create script')));
+		$scripts_wdgt->addPageHeader(S_SCRIPTS_CONFIGURATION_BIG, $frmForm);
+
+		$scripts_wdgt->addHeader(S_SCRIPTS_BIG);
+		$numrows = new CDiv();
+		$numrows->setAttribute('name','numrows');
+		$scripts_wdgt->addHeader($numrows);
+
+
 		$form = new CForm();
 		$form->setName('frm_scripts');
 		$form->setAttribute('id', 'scripts');
 
-		$numrows = new CDiv();
-		$numrows->setAttribute('name','numrows');
-
-		$frmForm = new CForm(null, 'get');
-		$frmForm->addItem(new CSubmit('form', _('Create script')));
-		$scripts_wdgt->addHeader(S_SCRIPTS_BIG, $frmForm);
-		$scripts_wdgt->addHeader($numrows);
-
 		$table = new CTableInfo(S_NO_SCRIPTS_DEFINED);
 		$table->setHeader(array(
-			new CCheckBox('all_scripts',null,"checkAll('".$form->getName()."','all_scripts','scripts');"),
+			new CCheckBox('all_scripts', null, "checkAll('".$form->getName()."','all_scripts','scripts');"),
 			make_sorting_header(S_NAME, 'name'),
 			make_sorting_header(S_COMMAND, 'command'),
 			S_USER_GROUP,

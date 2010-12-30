@@ -25,7 +25,7 @@
 ?>
 <?php
 	$scriptTab = new CFormList('script');
-	$scriptTab->addClass('min-width ui-tabs ui-widget ui-widget-content ui-corner-all widget');
+	$scriptTab->addClass('ui-tabs ui-widget ui-widget-content ui-corner-all widget');
 
 	$frmScr = new CForm();
 	$frmScr->setName('scripts');
