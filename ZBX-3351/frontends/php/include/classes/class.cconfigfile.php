@@ -34,11 +34,12 @@ class CConfigFile{
 
 // config file in plain php is bad
 // {{{
-
 			$dbs = array('MYSQL', 'POSTGRESQL', 'ORACLE', 'IBM_DB2', 'SQLITE3');
 			if(!isset($DB['TYPE']) && !isset($DB_TYPE))
 				self::exception('DB type is not set.');
-			else if((isset($DB['TYPE']) && !in_array($DB['TYPE'], $dbs)) || (isset($DB_TYPE) && !in_array($DB_TYPE, $dbs)))
+			else if(isset($DB['TYPE']) && !in_array($DB['TYPE'], $dbs))
+				self::exception('DB type has wrong value. Possible values '.implode(', ', $dbs));
+			else if(isset($DB_TYPE) && !isset($DB['TYPE']) && !in_array($DB_TYPE, $dbs))
 				self::exception('DB type has wrong value. Possible values '.implode(', ', $dbs));
 			else if(!isset($DB['DATABASE']) && !isset($DB_DATABASE))
 				self::exception('DB database is not set.');
