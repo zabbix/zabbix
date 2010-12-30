@@ -1605,14 +1605,14 @@ COpt::memoryPick();
 			if(isset($trigger['dependencies'])){
 				DB::delete('trigger_depends', array('triggerid_down' => $trigger['triggerid']));
 
-				self::validateDependencies($triggers);
-
 				foreach($trigger['dependencies'] as $triggerid_up){
 					DB::insert('trigger_depends', array(array(
 						'triggerid_down' => $trigger['triggerid'],
 						'triggerid_up' => $triggerid_up
 					)));
 				}
+
+				self::validateDependencies($triggers);
 			}
 		}
 	}
@@ -1811,7 +1811,7 @@ COpt::memoryPick();
 				$up_triggerids = array();
 				while($up_trigger = DBfetch($db_up_triggers)){
 					if($up_trigger['triggerid_up'] == $trigger['triggerid']){
-						self::exception(ZBX_API_ERROR_PARAMETESRS, S_INCORRECT_DEPENDENCY);
+						self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_DEPENDENCY);
 					}
 					$up_triggerids[] = $up_trigger['triggerid_up'];
 				}
@@ -1848,9 +1848,9 @@ COpt::memoryPick();
 
 				$db_lowlvltpl = DBselect($sql);
 				$map = array();
-				while($lovlvltpl = DBfetch($db_lowlvltpl)){
-					if(!isset($map[$lovlvltpl['hostid']])) $map[$lovlvltpl['hostid']] = array();
-					$map[$lovlvltpl['hostid']][$lovlvltpl['templateid']] = $lovlvltpl['host'];
+				while($lowlvltpl = DBfetch($db_lowlvltpl)){
+					if(!isset($map[$lowlvltpl['hostid']])) $map[$lowlvltpl['hostid']] = array();
+					$map[$lowlvltpl['hostid']][$lowlvltpl['templateid']] = $lowlvltpl['host'];
 				}
 
 				foreach($map as $hostid => $templates){
