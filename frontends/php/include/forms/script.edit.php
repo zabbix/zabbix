@@ -136,7 +136,7 @@
 	$main = array(new CSubmit('save', S_SAVE));
 	$others = array();
 	if(isset($_REQUEST['scriptid'])){
-		$others[] = new CButtonDelete(S_DELETE_SCRIPTS_Q);
+		$others[] = new CButtonDelete(S_DELETE_SCRIPTS_Q, url_param('form').url_param('scriptid'));
 	}
 	$others[] = new CButtonCancel();
 	$frmScr->addItem(makeFormFooter($main, $others));
