@@ -20,6 +20,7 @@
 ?>
 <?php
 class CFormList extends CDiv{
+	protected $header = null;
 	protected $formList = null;
 	protected $editable = true;
 	protected $formInputs = array('ctextbox','cnumericbox','ctextarea','ccombobox','ccheckbox','cpassbox','cipbox');
@@ -31,6 +32,12 @@ class CFormList extends CDiv{
 		parent::__construct();
 		$this->setAttribute('id', $id);
 		$this->setAttribute('class', $class);
+	}
+
+	public function setHeader($text){
+		$header = new CDiv($text);
+		$header->addClass('ui-corner-all ui-widget-header');
+		$this->header = $header;
 	}
 
 	public function addRow($term, $description=null){
@@ -49,6 +56,7 @@ class CFormList extends CDiv{
 	}
 
 	public function toString($destroy=true){
+		$this->addItem($this->header);
 		$this->addItem($this->formList);
 		return parent::toString($destroy);
 	}
