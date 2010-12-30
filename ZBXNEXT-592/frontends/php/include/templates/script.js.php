@@ -41,6 +41,7 @@ jQuery(document).ready(function(){
 
 		var d = showScriptDialog(question, buttons);
 		jQuery(d).find('button:first').attr('disabled', 'disabled').addClass('ui-state-disabled');
+		jQuery(d).find('button:last').focus();
 	});
 
 });

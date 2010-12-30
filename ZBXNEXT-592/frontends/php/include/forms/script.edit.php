@@ -25,7 +25,7 @@
 ?>
 <?php
 	$scriptTab = new CFormList('script');
-	$scriptTab->addClass('min-width ui-tabs ui-widget ui-widget-content ui-corner-all');
+	$scriptTab->addClass('min-width ui-tabs ui-widget ui-widget-content ui-corner-all widget');
 
 	$frmScr = new CForm();
 	$frmScr->setName('scripts');
@@ -129,9 +129,8 @@
 	$questionTB = new CTextBox('question', $question, 65);
 	$questionTB->setAttribute('id', 'question');
 	$questionTB->setAttribute('maxlength', 255);
-	$questionTB->setAttribute('autocomplete', 'off');
 
-	$testSpan = new CSpan(_('Test question'), 'link_menu');
+	$testSpan = new CLink(_('Test question'), '#', 'link_menu');
 	$testSpan->setAttribute('id', 'testQuestion');
 
 	$scriptTab->addRow(SPACE, array($questionTB, SPACE, $testSpan));
@@ -145,6 +144,7 @@
 	$main = array(new CSubmit('save', S_SAVE));
 	$others = array();
 	if(isset($_REQUEST['scriptid'])){
+		$others[] = new CSubmit('clone', S_CLONE);
 		$others[] = new CButtonDelete(S_DELETE_SCRIPTS_Q, url_param('form').url_param('scriptid'));
 	}
 	$others[] = new CButtonCancel();

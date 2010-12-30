@@ -483,13 +483,13 @@ class CScript extends CZBXAPI{
 			$del_scripts = self::get($options);
 			foreach($scriptids as $snum => $scriptid){
 				if(!isset($del_scripts[$scriptid])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Script with scriptid [%s] does not exist.', $script['scriptid']));
 				}
 			}
 
 			$sql = 'DELETE FROM scripts WHERE '.DBcondition('scriptid',$scriptids);
 			if(!$result = DBexecute($sql))
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete script');
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete script');
 
 			self::EndTransaction(true, __METHOD__);
 			return array('scriptids' => $scriptids);
