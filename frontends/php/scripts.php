@@ -40,6 +40,7 @@ $fields = array(
 	'action'=>			array(T_ZBX_INT, O_OPT,  P_ACT, 		IN('0,1'),	null),
 	'save'=>			array(T_ZBX_STR, O_OPT,	 P_SYS|P_ACT,	NULL,		null),
 	'delete'=>			array(T_ZBX_STR, O_OPT,  P_ACT, 		null,	null),
+	'clone'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 // form
 	'name'=>			array(T_ZBX_STR, O_OPT,  NULL,			NOT_EMPTY,	'isset({save})'),
 	'command'=>			array(T_ZBX_STR, O_OPT,  NULL,			NOT_EMPTY,	'isset({save})'),
@@ -60,9 +61,22 @@ $_REQUEST['go'] = get_request('go', 'none');
 
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
+	if(get_request('scriptid')){
+		$options = array(
+			'scriptids' => get_request('scriptid'),
+			'output' => API_OUTPUT_SHORTEN,
+		);
+		$scripts = CScript::get($options);
+		if(empty($scripts)) access_deny();
+	}
+
 ?>
 <?php
-	if(isset($_REQUEST['save'])){
+	if(isset($_REQUEST['clone']) && isset($_REQUEST['scriptid'])){
+		unset($_REQUEST['scriptid']);
+		$_REQUEST['form'] = 'clone';
+	}
+	else if(isset($_REQUEST['save'])){
 		$cond = (isset($_REQUEST['scriptid']))?(' AND scriptid<>'.$_REQUEST['scriptid']):('');
 		$scripts = DBfetch(DBselect('SELECT count(scriptid) as cnt FROM scripts WHERE name='.zbx_dbstr($_REQUEST['name']).$cond.' and '.DBin_node('scriptid', get_current_nodeid(false)),1));
 
@@ -188,7 +202,7 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 		$options = array(
 			'output' => API_OUTPUT_EXTEND,
-			'editable' => 1,
+			'editable' => true,
 			'selectGroups' => API_OUTPUT_EXTEND
 		);
 		$scripts = CScript::get($options);

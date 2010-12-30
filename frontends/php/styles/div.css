@@ -429,7 +429,7 @@ span.discoveryName{ color: #999900; }
 
 .column .widget{ padding: 2px; margin-bottom: 5px; overflow: hidden;}
 
-.column .widget .header{
+.column .widget .header, form .widget .header{
 	height: 18px;
 	line-height: 18px;
 	font-size: 1.1em;

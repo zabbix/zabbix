@@ -36,7 +36,7 @@ class CFormList extends CDiv{
 
 	public function setHeader($text){
 		$header = new CDiv($text);
-		$header->addClass('ui-corner-all ui-widget-header');
+		$header->addClass('ui-corner-all ui-widget-header header');
 		$this->header = $header;
 	}
 
