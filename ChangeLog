@@ -1,5 +1,8 @@
 Changes for 1.9.2
 
+New features:
+ - [ZBX-3338] updated Ukrainian translation; thanks to zalex_ua (Richlv)
+
 Bug fixes:
  - [ZBX-3326] sort po file contents (Richlv)
  - [ZBX-3054] fixed Cannot create or update Action with remote command; fix "reset() expects parameter 1 to be array, null given in /actionconf.php:754" (Vlad)
