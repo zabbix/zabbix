@@ -1,7 +1,8 @@
 Changes for 1.9.2
 
 Bug fixes:
-- [ZBX-3054] fixed Cannot create or update Action with remote command; fix "reset() expects parameter 1 to be array, null given in /actionconf.php:754" (Vlad)
+ - [ZBX-3326] sort po file contents (Richlv)
+ - [ZBX-3054] fixed Cannot create or update Action with remote command; fix "reset() expects parameter 1 to be array, null given in /actionconf.php:754" (Vlad)
 
 Changes for 1.9.1
 
