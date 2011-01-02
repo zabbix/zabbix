@@ -22,7 +22,8 @@ for i in */LC_MESSAGES/frontend.po; do
 	# fuzzy matching provides all kinds of interesting results, for example,
 	# "NTLM authentication" is translated as "LDAP-Authentifizierung" - thus
 	# it is disabled
-	msgmerge --no-fuzzy-matching --no-wrap --update --backup=off "$i" frontend.pot
+	msgmerge --no-fuzzy-matching --use-fuzzy --no-wrap --update \
+--backup=off "$i" frontend.pot
 done
 
 for i in */LC_MESSAGES/frontend.po; do
