@@ -2,15 +2,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-02 01:46+0200\n"
-"PO-Revision-Date: \n"
-"Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
-"Language-Team: Zabbix <info@zabbix.com>\n"
+"POT-Creation-Date: 2011-01-02 23:38+0200\n"
+"PO-Revision-Date: 2011-01-02 23:37+0300\n"
+"Last-Translator: Oleksiy Zagorskyi <zalex_ua@i.ua>\n"
+"Language-Team: Zabbix translation team\n"
+"Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Poedit-Basepath: ../../\n"
 
 #: ../include/locales/en_gb.inc.php:929
 msgid " - all groups - "
@@ -24,7 +25,7 @@ msgstr "\""
 msgid "\" deleted from host"
 msgstr "\" удален из узла сети"
 
-#: ../chart5.php:90 ../chart4.php:87
+#: ../chart4.php:87 ../chart5.php:90
 #, php-format
 msgid "%1$s (year %2$s)"
 msgstr ""
@@ -47,7 +48,7 @@ msgstr "(без прокси)"
 
 #: ../include/locales/en_gb.inc.php:217
 msgid "(select host first)"
-msgstr ""
+msgstr "(сначала выберите узел сети)"
 
 #: ../include/locales/en_gb.inc.php:652
 msgid "- all -"
@@ -262,8 +263,9 @@ msgid "Add link"
 msgstr "Добавить соединитель"
 
 #: ../include/locales/en_gb.inc.php:1227
+#, fuzzy
 msgid "Add prototype"
-msgstr ""
+msgstr "Добавить прототип"
 
 #: ../include/locales/en_gb.inc.php:1939
 msgid "Add to"
@@ -295,7 +297,7 @@ msgstr "Новый элемент данных добавлен"
 
 #: ../include/locales/en_gb.inc.php:513
 msgid "Added new media type"
-msgstr "Добавлен новый способ оповещений"
+msgstr "Добавлен новый способ оповещения"
 
 #: ../include/locales/en_gb.inc.php:2306
 msgid "Added trigger"
@@ -331,7 +333,7 @@ msgstr "Агрегированный"
 
 #: ../include/locales/en_gb.inc.php:695
 msgid "Aggregated periods count"
-msgstr "Количество аггрегированных периодов"
+msgstr "Количество агрегированных периодов"
 
 #: ../include/locales/en_gb.inc.php:1029 ../include/locales/en_gb.inc.php:1913
 msgid "Alias"
@@ -435,7 +437,7 @@ msgstr "Апрель"
 
 #: ../include/locales/en_gb.inc.php:2103
 msgid "Are you sure you want to delete"
-msgstr ""
+msgstr "Вы уверены, что хотите удалить"
 
 #: ../include/locales/en_gb.inc.php:1164
 msgid "As is"
@@ -495,11 +497,11 @@ msgstr "Авторегистрация"
 
 #: ../include/locales/en_gb.inc.php:1933
 msgid "Auto-login"
-msgstr "Авто-вход (1 месяц)"
+msgstr "Авто-вход"
 
 #: ../include/locales/en_gb.inc.php:1934
 msgid "Auto-logout (min 90 seconds)"
-msgstr "Авто-выход (0-откючено)"
+msgstr "Авто-выход (мин 90 секунд)"
 
 #: ../include/locales/en_gb.inc.php:960
 msgid "Availability"
@@ -611,15 +613,17 @@ msgstr "КОНФИГУРАЦИЯ ГРУПП ЭЛЕМЕНТОВ"
 
 #: ../include/locales/en_gb.inc.php:104
 msgid "CONFIGURATION OF DISCOVERY"
-msgstr "НАСТРОЙКИ ОБНАРУЖЕНИЯ"
+msgstr "НАСТРОЙКА ОБНАРУЖЕНИЯ"
 
 #: ../include/locales/en_gb.inc.php:1219
+#, fuzzy
 msgid "CONFIGURATION OF DISCOVERY RULES"
-msgstr ""
+msgstr "НАСТРОЙКА ПРАВИЛ ОБНАРУЖЕНИЯ"
 
 #: ../include/locales/en_gb.inc.php:1232
+#, fuzzy
 msgid "CONFIGURATION OF GRAPH PROTOTYPES"
-msgstr ""
+msgstr "НАСТРОЙКА ПРОТОТИПОВ ГРАФИКОВ"
 
 #: ../include/locales/en_gb.inc.php:702
 msgid "CONFIGURATION OF GRAPHS"
@@ -634,8 +638,9 @@ msgid "CONFIGURATION OF HOSTS"
 msgstr "КОНФИГУРАЦИЯ УЗЛОВ СЕТИ"
 
 #: ../include/locales/en_gb.inc.php:1225
+#, fuzzy
 msgid "CONFIGURATION OF ITEM PROTOTYPES"
-msgstr ""
+msgstr "НАСТРОЙКА ПРОТОТИПОВ ЭЛЕМЕНТОВ ДАННЫХ"
 
 #: ../include/locales/en_gb.inc.php:1103
 msgid "CONFIGURATION OF ITEMS"
@@ -682,8 +687,9 @@ msgid "CONFIGURATION OF TEMPLATES"
 msgstr "КОНФИГУРАЦИЯ ШАБЛОНОВ"
 
 #: ../include/locales/en_gb.inc.php:1235
+#, fuzzy
 msgid "CONFIGURATION OF TRIGGER PROTOTYPES"
-msgstr ""
+msgstr "НАСТРОЙКА ПРОТОТИПОВ ТРИГГЕРОВ"
 
 #: ../include/locales/en_gb.inc.php:1775
 msgid "CONFIGURATION OF TRIGGERS"
@@ -707,7 +713,7 @@ msgstr "Подсчитывать SLA"
 
 #: ../include/locales/en_gb.inc.php:718
 msgid "Calculated"
-msgstr "Подсчитываемое"
+msgstr "Вычисляемое"
 
 #: ../include/locales/en_gb.inc.php:946
 msgid "Callback"
@@ -798,7 +804,7 @@ msgstr "Не удалось обновить способы оповещений
 
 #: ../include/locales/en_gb.inc.php:561
 msgid "Canada (136 characters)"
-msgstr ""
+msgstr "Канада (136 символов)"
 
 #: ../include/locales/en_gb.inc.php:1385
 msgid "Cancel"
@@ -931,7 +937,7 @@ msgstr "Не удалось скопировать элементы"
 
 #: ../include/locales/en_gb.inc.php:2133
 msgid "Cannot create application"
-msgstr ""
+msgstr "Не удалось создать группу элементов данных"
 
 #: ../api/classes/class.chost.php:1917
 msgid "Cannot create extended profile"
@@ -963,8 +969,9 @@ msgid "Cannot delete graph"
 msgstr "Не удалось удалить график"
 
 #: ../api/classes/class.cgraphprototype.php:1048
+#, fuzzy
 msgid "Cannot delete graph prototype"
-msgstr ""
+msgstr "Не удалось удалить прототип графика"
 
 #: ../include/locales/en_gb.inc.php:709
 msgid "Cannot delete graphs"
@@ -1038,8 +1045,8 @@ msgstr "Не удалось удалить слайд-шоу"
 msgid "Cannot delete template"
 msgstr "Не удалось удалить шаблон"
 
-#: ../api/classes/class.cgraphprototype.php:1025
 #: ../api/classes/class.cgraph.php:1028
+#: ../api/classes/class.cgraphprototype.php:1025
 msgid "Cannot delete templated graphs"
 msgstr ""
 
@@ -1128,7 +1135,7 @@ msgstr "Не удается связать сервис с самим собой
 
 #: ../include/locales/en_gb.inc.php:1023
 msgid "Cannot link template"
-msgstr "Не удалось соединить шаблон"
+msgstr "Не удалось присоединить шаблон"
 
 #: ../api/classes/class.chost.php:1669
 msgid "Cannot mass update host name"
@@ -1142,7 +1149,7 @@ msgstr ""
 msgid "Cannot remove group"
 msgstr ""
 
-#: ../config.php:542 ../api/classes/class.chost.php:1824
+#: ../api/classes/class.chost.php:1824 ../config.php:542
 msgid "Cannot remove macro"
 msgstr ""
 
@@ -1155,28 +1162,32 @@ msgid "Cannot sync Triggers"
 msgstr ""
 
 #: ../api/classes/class.ctemplate.php:1823
+#, fuzzy
 msgid "Cannot sync Triggers prototypes"
-msgstr ""
+msgstr "Не удалось синхронизировать прототипы триггеров"
 
 #: ../api/classes/class.ctemplate.php:1793
 msgid "Cannot sync applications"
 msgstr ""
 
 #: ../api/classes/class.ctemplate.php:1799
+#, fuzzy
 msgid "Cannot sync discovery rules"
-msgstr ""
+msgstr "Не удалось синхронизировать правила обнаружения"
 
 #: ../api/classes/class.ctemplate.php:1829
+#, fuzzy
 msgid "Cannot sync graph prototypes"
-msgstr ""
+msgstr "Не удалось сихронизировать прототипы графиков"
 
 #: ../api/classes/class.ctemplate.php:1835
 msgid "Cannot sync graphs"
 msgstr ""
 
 #: ../api/classes/class.ctemplate.php:1805
+#, fuzzy
 msgid "Cannot sync item prototypes"
-msgstr ""
+msgstr "Не удалось синхронизировать прототипы элементов данных"
 
 #: ../api/classes/class.ctemplate.php:1811
 msgid "Cannot sync items"
@@ -1191,20 +1202,23 @@ msgid "Cannot unlink and clear applications"
 msgstr ""
 
 #: ../api/classes/class.ctemplate.php:1879
+#, fuzzy
 msgid "Cannot unlink and clear discovery rules"
-msgstr ""
+msgstr "Не удалось отсоединить и очистить правила обнаружения"
 
 #: ../api/classes/class.ctemplate.php:1963
+#, fuzzy
 msgid "Cannot unlink and clear graph prototypes"
-msgstr ""
+msgstr "Не удалось отсоединить и очистить прототипы графиков"
 
 #: ../api/classes/class.ctemplate.php:1981
 msgid "Cannot unlink and clear graphs."
 msgstr ""
 
 #: ../api/classes/class.ctemplate.php:1915
+#, fuzzy
 msgid "Cannot unlink and clear item prototypes"
-msgstr ""
+msgstr "Не удалось отсоединить и очистить прототипы элементов данных"
 
 #: ../api/classes/class.ctemplate.php:1897
 msgid "Cannot unlink and clear items"
@@ -1279,8 +1293,8 @@ msgstr "Не удалось обновить изображение"
 msgid "Cannot update item"
 msgstr "Не удалось обновить элемент данных"
 
-#: ../config.php:547 ../api/classes/class.chost.php:1831
-#: ../api/classes/class.ctemplate.php:1537
+#: ../api/classes/class.chost.php:1831 ../api/classes/class.ctemplate.php:1537
+#: ../config.php:547
 msgid "Cannot update macro"
 msgstr ""
 
@@ -1415,7 +1429,7 @@ msgstr "Chinese (CN)"
 #: ../api/classes/class.ctemplate.php:1773
 #: ../include/locales/en_gb.inc.php:2247
 msgid "Circular link can not be created"
-msgstr "Круговая ссылка не может быть создана"
+msgstr "Закольцованная ссылка не может быть создана"
 
 #: ../include/locales/en_gb.inc.php:2011
 msgid "Clear"
@@ -1483,7 +1497,7 @@ msgstr "Комментарии"
 
 #: ../include/locales/en_gb.inc.php:603
 msgid "Commercial"
-msgstr ""
+msgstr "Коммерческие"
 
 #: ../include/locales/en_gb.inc.php:1581
 msgid "Compare values for multiple periods"
@@ -1519,7 +1533,7 @@ msgstr "Настройка действий"
 
 #: ../include/locales/en_gb.inc.php:103
 msgid "Configuration of discovery"
-msgstr "Настройки обнаружения"
+msgstr "Настройка обнаружения"
 
 #: ../include/locales/en_gb.inc.php:701
 msgid "Configuration of graphs"
@@ -1647,7 +1661,7 @@ msgstr "Создать карту сети"
 
 #: ../include/locales/en_gb.inc.php:553
 msgid "Create Media Type"
-msgstr "Создать способ оповещений"
+msgstr "Создать способ оповещения"
 
 #: ../include/locales/en_gb.inc.php:966
 msgid "Create Proxy"
@@ -1682,8 +1696,9 @@ msgid "Create maintenance period"
 msgstr "Создать период обслуживания"
 
 #: ../include/locales/en_gb.inc.php:1229
+#, fuzzy
 msgid "Create prototype"
-msgstr ""
+msgstr "Создать прототип"
 
 #: ../include/locales/en_gb.inc.php:108
 msgid "Create rule"
@@ -1699,7 +1714,7 @@ msgstr "Создать скрипт"
 
 #: ../include/locales/en_gb.inc.php:2532
 msgid "Create trigger"
-msgstr ""
+msgstr "Создать триггер для журнала"
 
 #: ../include/locales/en_gb.inc.php:508
 msgid "Create value map"
@@ -1767,7 +1782,7 @@ msgstr "ПРАВИЛА ОБНАРУЖЕНИЯ"
 
 #: ../include/locales/en_gb.inc.php:608
 msgid "DM"
-msgstr "DM"
+msgstr "РМ"
 
 #: ../include/locales/en_gb.inc.php:919
 msgid "DNS"
@@ -1795,7 +1810,7 @@ msgstr "Темнее"
 
 #: ../include/locales/en_gb.inc.php:1390
 msgid "Dashboard"
-msgstr "Dashboard"
+msgstr "ПАНЕЛЬ"
 
 #: ../include/locales/en_gb.inc.php:1411
 msgid "Dashboard configuration"
@@ -1952,7 +1967,7 @@ msgstr "Внимание: это действие удалит выбранны�
 
 #: ../include/locales/en_gb.inc.php:999
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
-msgstr ""
+msgstr "Удалить и очистить шаблон? (Внимание: все присоединенные узлы сети будут очищены!)"
 
 #: ../include/locales/en_gb.inc.php:2115
 msgid "Delete expression?"
@@ -2084,7 +2099,7 @@ msgstr "Удалить выбранные способы оповещений?"
 
 #: ../include/locales/en_gb.inc.php:528
 msgid "Delete selected media?"
-msgstr "Удалить выбранный способ оповещений?"
+msgstr "Удалить выбранный способ оповещения?"
 
 #: ../include/locales/en_gb.inc.php:615
 msgid "Delete selected node?"
@@ -2144,11 +2159,10 @@ msgid "Delete selected value mapping? It is used for %d item!"
 msgid_plural "Delete selected value mapping? It is used for %d items!"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: ../include/locales/en_gb.inc.php:955
 msgid "Delete selected with linked elements"
-msgstr "Удалить выбранное с соединенными элементами"
+msgstr "Удалить выбранное с присоединенными элементами"
 
 #: ../include/locales/en_gb.inc.php:1695 ../include/locales/en_gb.inc.php:1696
 msgid "Delete slideshow?"
@@ -2160,7 +2174,7 @@ msgstr "Удалить системную карту?"
 
 #: ../include/locales/en_gb.inc.php:998
 msgid "Delete template?"
-msgstr ""
+msgstr "Удалить шаблон?"
 
 #: ../include/locales/en_gb.inc.php:2129
 msgid "Delete this application?"
@@ -2288,7 +2302,7 @@ msgstr ""
 
 #: ../include/locales/en_gb.inc.php:344
 msgid "Disable host"
-msgstr "Выключить узел сети"
+msgstr "Деактивировать узел сети"
 
 #: ../include/locales/en_gb.inc.php:619
 msgid "Disable hosts monitored by selected proxies?"
@@ -2375,27 +2389,28 @@ msgid "Discovery rule"
 msgstr "Правило обнаружения"
 
 #: ../api/classes/class.cdiscoveryrule.php:1007
-#, php-format
+#, fuzzy, php-format
 msgid "Discovery rule [%1$s:%2$s] deleted."
-msgstr ""
+msgstr "Правило обнаружения [%1$s:%2$s] удалено."
 
 #: ../api/classes/class.cdiscoveryrule.php:590
-#, php-format
+#, fuzzy, php-format
 msgid "Discovery rule [%1$s:%2$s] has no interface."
-msgstr ""
+msgstr "Правило обнаружения [%1$s:%2$s] не имеет интерфейса."
 
 #: ../api/classes/class.ctemplate.php:1888
-#, php-format
+#, fuzzy, php-format
 msgid "Discovery rule [%1$s:%2$s] unlinked."
-msgstr ""
+msgstr "Правило обнаружения [%1$s:%2$s] отсоединено."
 
 #: ../include/locales/en_gb.inc.php:135
 msgid "Discovery rule added"
 msgstr "Добавлено новое правило обнаружения"
 
 #: ../host_discovery.php:247
+#, fuzzy
 msgid "Discovery rule created"
-msgstr ""
+msgstr "Правило обнаружения создано"
 
 #: ../host_discovery.php:182 ../host_discovery.php:267
 #: ../include/locales/en_gb.inc.php:130
@@ -2408,20 +2423,23 @@ msgstr "Правило обнаружения обновлено"
 
 #: ../include/forms/host.edit.php:401 ../include/forms/template.edit.php:256
 #: ../include/locales/en_gb.inc.php:1222
+#, fuzzy
 msgid "Discovery rules"
-msgstr ""
+msgstr "Правила обнаружения"
 
 #: ../host_discovery.php:263
+#, fuzzy
 msgid "Discovery rules activated"
-msgstr ""
+msgstr "Правила обнаружения активированы"
 
 #: ../include/locales/en_gb.inc.php:129
 msgid "Discovery rules deleted"
 msgstr "Правила обнаружения удалены"
 
 #: ../host_discovery.php:263
+#, fuzzy
 msgid "Discovery rules disabled"
-msgstr ""
+msgstr "Правила обнаружения отключены"
 
 #: ../include/locales/en_gb.inc.php:132
 msgid "Discovery rules updated"
@@ -2445,7 +2463,7 @@ msgstr "Распределение значений для нескольких 
 
 #: ../include/locales/en_gb.inc.php:2197
 msgid "Do"
-msgstr "Сделать"
+msgstr "Выполнить"
 
 #: ../include/locales/en_gb.inc.php:1536
 msgid "Do not add"
@@ -2473,7 +2491,7 @@ msgstr "Не хранить тенденции более чем (в днях)"
 
 #: ../include/locales/en_gb.inc.php:2533
 msgid "Do you wish to replace the conditional expression?"
-msgstr ""
+msgstr "Вы хотите заменить условие выражения?"
 
 #: ../include/locales/en_gb.inc.php:451
 msgid "Dot"
@@ -2489,7 +2507,7 @@ msgstr "Загрузить"
 
 #: ../include/locales/en_gb.inc.php:1548 ../include/locales/en_gb.inc.php:1557
 msgid "Download newly created locale file by pressing \"Download\"."
-msgstr ""
+msgstr "Загрузите новый созданный файл локализации нажав \"Загрузить\"."
 
 #. GETTEXT: Legend below graph
 #: ../api/classes/class.cwebcheck.php:552
@@ -2556,7 +2574,7 @@ msgstr "Изменить сервис"
 
 #: ../include/locales/en_gb.inc.php:1208
 msgid "Edit Trigger"
-msgstr "Изменить триггер"
+msgstr ""
 
 #: ../include/locales/en_gb.inc.php:2108
 msgid "Edit connector"
@@ -2600,7 +2618,7 @@ msgstr "Пусто"
 
 #: ../include/locales/en_gb.inc.php:273 ../include/locales/en_gb.inc.php:971
 msgid "Empty input parameter"
-msgstr "Пустой параметр ввода"
+msgstr "Входной параметр пустой"
 
 #: ../include/locales/en_gb.inc.php:867
 msgid "Empty macro value"
@@ -2644,7 +2662,7 @@ msgstr ""
 
 #: ../include/locales/en_gb.inc.php:343
 msgid "Enable host"
-msgstr "Включить узел сети"
+msgstr "Активировать узел сети"
 
 #: ../include/locales/en_gb.inc.php:618
 msgid "Enable hosts monitored by selected proxies?"
@@ -2708,11 +2726,11 @@ msgstr "Описание скрипта"
 
 #: ../include/locales/en_gb.inc.php:2323
 msgid "Error adding dependencies. Following dependencies are not allowed: 1) from a host trigger to a template trigger; 2) from a template trigger to a host trigger; 3) between template triggers, where templates have links to other templates."
-msgstr ""
+msgstr "Ошибка при добавлении зависимостей. Не разрешены следующие зависимости: 1) с триггера узла сети к шаблонному триггеру; 2) с шаблонного триггера к триггеру узла сети; 3) между шаблонными триггерами, где шаблоны имеют связи с другими шаблонами."
 
 #: ../include/locales/en_gb.inc.php:1532
 msgid "Error adding service time"
-msgstr ""
+msgstr "Ошибка при добавлении времени сервиса"
 
 #: ../include/locales/en_gb.inc.php:2224
 msgid "Error in item key:"
@@ -2807,7 +2825,7 @@ msgstr "Выполняемый скрипт"
 
 #: ../include/locales/en_gb.inc.php:237
 msgid "Existing"
-msgstr "Существующий"
+msgstr "существующее"
 
 #: ../include/locales/en_gb.inc.php:1322
 msgid "Expand single problem"
@@ -2871,7 +2889,7 @@ msgstr "Выражения"
 
 #: ../include/locales/en_gb.inc.php:1554
 msgid "Extend this array with Your locale like \"your_prefix\" => \"display_like\"."
-msgstr ""
+msgstr "Добавьте в этот массив свою локализацию вот так \"ваш_префикс\" => \"имя_в_интерфейсе\"."
 
 #: ../include/locales/en_gb.inc.php:2059
 msgid "Extended"
@@ -2891,7 +2909,7 @@ msgstr "Внешняя проверка"
 
 #: ../include/locales/en_gb.inc.php:1143
 msgid "Ez Texting"
-msgstr ""
+msgstr "Ez Texting"
 
 #: ../include/locales/en_gb.inc.php:2521
 msgid "F"
@@ -2985,7 +3003,7 @@ msgstr "Фильтр по имени"
 
 #: ../include/locales/en_gb.inc.php:256
 msgid "Finish"
-msgstr "Финиш"
+msgstr "Завершить"
 
 #: ../include/locales/en_gb.inc.php:818 ../include/locales/en_gb.inc.php:2548
 msgid "First"
@@ -3001,7 +3019,7 @@ msgstr "Переменные интервалы (сек)"
 
 #: ../include/locales/en_gb.inc.php:1556
 msgid "For example see implementation of other locales."
-msgstr ""
+msgstr "Для примера смотрите на реализацию для других локализаций."
 
 #: ../include/locales/en_gb.inc.php:1877
 msgid "For guest, password must be empty"
@@ -3060,8 +3078,9 @@ msgid "GD PNG Support"
 msgstr "Поддержка GD PNG"
 
 #: ../include/locales/en_gb.inc.php:1239
+#, fuzzy
 msgid "GRAPH PROTOTYPES OF"
-msgstr ""
+msgstr "ПРОТОТИПЫ ГРАФИКОВ ДЛЯ"
 
 #: ../include/locales/en_gb.inc.php:457
 msgid "GRAPHS"
@@ -3141,39 +3160,39 @@ msgstr "График"
 msgid "Graph \""
 msgstr "График \""
 
-#: ../api/classes/class.cgraphprototype.php:857
 #: ../api/classes/class.cgraph.php:861
+#: ../api/classes/class.cgraphprototype.php:857
 #, php-format
 msgid "Graph [ %1$s ]: already exists on [ %2$s ]"
 msgstr ""
 
-#: ../api/classes/class.cgraphprototype.php:878
 #: ../api/classes/class.cgraph.php:882
+#: ../api/classes/class.cgraphprototype.php:878
 #, php-format
 msgid "Graph [ %1$s ]: already exists on [ %2$s ] (inherited from another template)"
 msgstr ""
 
+#: ../api/classes/class.cgraph.php:904 ../api/classes/class.cgraph.php:911
 #: ../api/classes/class.cgraphprototype.php:900
 #: ../api/classes/class.cgraphprototype.php:907
-#: ../api/classes/class.cgraph.php:904 ../api/classes/class.cgraph.php:911
 #, php-format
 msgid "Graph [ %1$s ]: already exists on [ %2$s ] (items are not identical)"
 msgstr ""
 
-#: ../api/classes/class.cgraphprototype.php:830
 #: ../api/classes/class.cgraph.php:834
+#: ../api/classes/class.cgraphprototype.php:830
 #, php-format
 msgid "Graph [ %1$s ]: cannot inherit. No required items on [ %2$s ]"
 msgstr ""
 
-#: ../api/classes/class.cgraphprototype.php:834
 #: ../api/classes/class.cgraph.php:838
+#: ../api/classes/class.cgraphprototype.php:834
 #, php-format
 msgid "Graph [ %1$s ]: cannot inherit. No required items on [ %2$s ] (Ymax value item)"
 msgstr ""
 
-#: ../api/classes/class.cgraphprototype.php:840
 #: ../api/classes/class.cgraph.php:844
+#: ../api/classes/class.cgraphprototype.php:840
 #, php-format
 msgid "Graph [ %1$s ]: cannot inherit. No required items on [ %2$s ] (Ymin value item)"
 msgstr ""
@@ -3209,22 +3228,24 @@ msgid "Graph name"
 msgstr "Название графика"
 
 #: ../api/classes/class.ctemplate.php:1972
-#, php-format
+#, fuzzy, php-format
 msgid "Graph prototype [%1$s] unlinked."
-msgstr ""
+msgstr "Прототип графика [%1$s] отсоединен."
 
 #: ../api/classes/class.cgraphprototype.php:1067
-#, php-format
+#, fuzzy, php-format
 msgid "Graph prototype [%s] deleted."
-msgstr ""
+msgstr "Прототип графика [%s] удален."
 
 #: ../api/classes/class.cgraphprototype.php:1169
+#, fuzzy
 msgid "Graph prototype must have at least one prototype"
-msgstr ""
+msgstr "Прототип графика должен иметь как минимум один прототип"
 
 #: ../include/forms/host.edit.php:468 ../include/forms/template.edit.php:319
+#, fuzzy
 msgid "Graph prototypes"
-msgstr ""
+msgstr "Прототипы графиков"
 
 #: ../include/locales/en_gb.inc.php:726
 msgid "Graph sum"
@@ -3243,9 +3264,9 @@ msgstr "График обновлен"
 msgid "Graph with name [ %1$s ] already exists"
 msgstr ""
 
+#: ../api/classes/class.cgraph.php:864 ../api/classes/class.cgraph.php:885
 #: ../api/classes/class.cgraphprototype.php:860
 #: ../api/classes/class.cgraphprototype.php:881
-#: ../api/classes/class.cgraph.php:864 ../api/classes/class.cgraph.php:885
 msgid "Graph with same name but other type exist"
 msgstr ""
 
@@ -3394,7 +3415,7 @@ msgstr "История"
 
 #: ../include/locales/en_gb.inc.php:1616
 msgid "History and simple graphs"
-msgstr ""
+msgstr "История и простые графики"
 
 #: ../include/locales/en_gb.inc.php:1098
 msgid "History cleared"
@@ -3431,7 +3452,7 @@ msgstr ""
 
 #: ../include/locales/en_gb.inc.php:92
 msgid "Host IP"
-msgstr "IP хоста"
+msgstr "IP адрес узла сети"
 
 #: ../include/locales/en_gb.inc.php:1055
 msgid "Host MAC Address"
@@ -3541,7 +3562,7 @@ msgstr "Узлы сети"
 
 #: ../include/locales/en_gb.inc.php:1472
 msgid "Hosts (m/n/t)"
-msgstr "Узлы сети (к/н/ш)"
+msgstr "Узлы сети (пн/бн/ш)"
 
 #: ../include/locales/en_gb.inc.php:2076
 msgid "Hosts and templates"
@@ -3664,8 +3685,9 @@ msgid "IT services availability report"
 msgstr "Отчет доступности IT услуг"
 
 #: ../include/locales/en_gb.inc.php:1226
+#, fuzzy
 msgid "ITEM PROTOTYPES OF"
-msgstr ""
+msgstr "ПРОТОТИПЫ ЭЛЕМЕНТОВ ДАННЫХ ДЛЯ"
 
 #: ../include/locales/en_gb.inc.php:893
 msgid "ITEMS"
@@ -3717,7 +3739,7 @@ msgstr "Id"
 
 #: ../include/locales/en_gb.inc.php:170
 msgid "Idle till"
-msgstr "Простой до"
+msgstr "Простаивает до"
 
 #: ../include/locales/en_gb.inc.php:2480
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
@@ -3765,7 +3787,7 @@ msgstr "Импорт узла сети"
 
 #: ../include/locales/en_gb.inc.php:1310
 msgid "Import Map"
-msgstr "Импорт карты"
+msgstr "Импорт карты сети"
 
 #: ../include/locales/en_gb.inc.php:858
 msgid "Import Template"
@@ -3908,7 +3930,7 @@ msgstr "Неверная зависимость"
 
 #: ../include/locales/en_gb.inc.php:2509
 msgid "Incorrect description"
-msgstr "Некорретное описание"
+msgstr "Некорректное описание"
 
 #: ../include/locales/en_gb.inc.php:360
 msgid "Incorrect discovery check"
@@ -3928,7 +3950,7 @@ msgstr "Некорректное выражение"
 
 #: ../include/locales/en_gb.inc.php:2134
 msgid "Incorrect fields for application"
-msgstr ""
+msgstr "Некорректные поля для группы элементов данных"
 
 #: ../include/locales/en_gb.inc.php:2309
 msgid "Incorrect function is used"
@@ -3952,8 +3974,8 @@ msgstr ""
 msgid "Incorrect interface IP parameter \" %1$s \" provided."
 msgstr ""
 
-#: ../api/classes/class.cgraphprototype.php:1203
 #: ../api/classes/class.cgraph.php:1184
+#: ../api/classes/class.cgraphprototype.php:1203
 msgid "Incorrect item for axis value item"
 msgstr ""
 
@@ -3995,7 +4017,7 @@ msgstr "Некорректный тип ноды"
 
 #: ../include/locales/en_gb.inc.php:364
 msgid "Incorrect object type"
-msgstr ""
+msgstr "Некорректный тип объекта"
 
 #: ../include/locales/en_gb.inc.php:366
 msgid "Incorrect operation type"
@@ -4003,15 +4025,15 @@ msgstr "Некорректный тип операции"
 
 #: ../include/locales/en_gb.inc.php:272
 msgid "Incorrect parameter used for Action"
-msgstr ""
+msgstr "Использован некорректный параметр для Действия"
 
 #: ../include/locales/en_gb.inc.php:270
 msgid "Incorrect parameter used for Conditions"
-msgstr ""
+msgstr "Использован некорректный параметр для Условий"
 
 #: ../include/locales/en_gb.inc.php:271
 msgid "Incorrect parameter used for Operations"
-msgstr ""
+msgstr "Использован некорректный параметр для Операций"
 
 #: ../include/locales/en_gb.inc.php:358
 msgid "Incorrect period"
@@ -4071,7 +4093,7 @@ msgstr "Неверный режим работы"
 
 #: ../include/locales/en_gb.inc.php:310
 msgid "Infinity"
-msgstr "Бесконечность"
+msgstr "Бесконечно"
 
 #: ../include/locales/en_gb.inc.php:744
 msgid "Info"
@@ -4206,22 +4228,24 @@ msgid "Item function"
 msgstr "Функция элемента данных"
 
 #: ../include/locales/en_gb.inc.php:1230
+#, fuzzy
 msgid "Item prototype"
-msgstr ""
+msgstr "Прототип элемента данных"
 
 #: ../api/classes/class.citemprototype.php:1001
-#, php-format
+#, fuzzy, php-format
 msgid "Item prototype [%1$s:%2$s] deleted."
-msgstr ""
+msgstr "Прототип элемета данных [%1$s:%2$s] удален."
 
 #: ../api/classes/class.ctemplate.php:1924
-#, php-format
+#, fuzzy, php-format
 msgid "Item prototype [%1$s:%2$s] unlinked."
-msgstr ""
+msgstr "Прототип элемента данных [%1$s:%2$s] отсоединен."
 
 #: ../include/forms/host.edit.php:422 ../include/forms/template.edit.php:276
+#, fuzzy
 msgid "Item prototypes"
-msgstr ""
+msgstr "Прототипы элементов данных"
 
 #: ../include/locales/en_gb.inc.php:668
 msgid "Item updated"
@@ -4248,7 +4272,7 @@ msgstr "Элементы данных"
 
 #: ../include/locales/en_gb.inc.php:1467
 msgid "Items (m/d/n)"
-msgstr "Элементы данных (а/н/нп)"
+msgstr "Элементы данных (а/д/нп)"
 
 #: ../include/locales/en_gb.inc.php:1112
 msgid "Items activated"
@@ -4443,7 +4467,7 @@ msgstr "График за последний месяц"
 
 #: ../include/locales/en_gb.inc.php:1800
 msgid "Last of"
-msgstr "Последний из"
+msgstr "За последние"
 
 #: ../include/locales/en_gb.inc.php:968
 msgid "Last seen (age)"
@@ -4515,7 +4539,7 @@ msgstr "Индикаторы состояния соединителя"
 
 #: ../include/locales/en_gb.inc.php:345
 msgid "Link to template"
-msgstr "Соединить с шаблоном"
+msgstr "Присоединить шаблон"
 
 #: ../include/locales/en_gb.inc.php:1730
 msgid "Link to trigger?"
@@ -4523,15 +4547,15 @@ msgstr "Связать с триггером?"
 
 #: ../include/locales/en_gb.inc.php:994
 msgid "Link with template"
-msgstr "Соединить с шаблоном"
+msgstr "Присоединить к шаблону"
 
 #: ../include/locales/en_gb.inc.php:990
 msgid "Linked templates"
-msgstr "Соединенные шаблоны"
+msgstr "Присоединенные шаблоны"
 
 #: ../include/locales/en_gb.inc.php:991
 msgid "Linked to"
-msgstr "Соединен с"
+msgstr "Присоединен к"
 
 #: ../include/locales/en_gb.inc.php:1273
 msgid "Links"
@@ -4643,7 +4667,7 @@ msgstr "MD5"
 
 #: ../include/locales/en_gb.inc.php:1377
 msgid "MEDIA TYPES"
-msgstr "ТИПЫ СПОСОБОВ ОПОВЕЩЕНИЙ"
+msgstr "СПОСОБЫ ОПОВЕЩЕНИЙ"
 
 #: ../include/locales/en_gb.inc.php:2160
 msgid "MEMORY LIMIT REACHED! Profiling was stopped to save memory for script processing."
@@ -4808,7 +4832,7 @@ msgstr "Май"
 
 #: ../include/locales/en_gb.inc.php:1378
 msgid "Media"
-msgstr "Способ оповещений"
+msgstr "Способ оповещения"
 
 #: ../include/locales/en_gb.inc.php:2004
 msgid "Media type"
@@ -4816,19 +4840,19 @@ msgstr "Тип способа оповещений"
 
 #: ../include/locales/en_gb.inc.php:517
 msgid "Media type deleted"
-msgstr "Способ оповещений удален"
+msgstr "Способ оповещения удален"
 
 #: ../include/locales/en_gb.inc.php:515
 msgid "Media type updated"
-msgstr "Способ оповещений обновлен"
+msgstr "Способ оповещения обновлен"
 
 #: ../include/locales/en_gb.inc.php:518
 msgid "Media type was not deleted"
-msgstr "Способ оповещений не удален"
+msgstr "Способ оповещения не удален"
 
 #: ../include/locales/en_gb.inc.php:516
 msgid "Media type was not updated"
-msgstr "Способ оповещений не обновлен"
+msgstr "Способ оповещения не обновлен"
 
 #: ../include/locales/en_gb.inc.php:531
 msgid "Media types"
@@ -4836,7 +4860,7 @@ msgstr "Способы оповещений"
 
 #: ../include/locales/en_gb.inc.php:2471
 msgid "Mediatype already exists:"
-msgstr "Способ оповещений уже существует:"
+msgstr "Способ оповещения уже существует:"
 
 #: ../include/locales/en_gb.inc.php:2472
 msgid "Mediatypes used by action:"
@@ -4876,7 +4900,7 @@ msgstr "Сообщение действий"
 
 #: ../include/locales/en_gb.inc.php:562
 msgid "Message text limit"
-msgstr ""
+msgstr "Лимит текста сообщения"
 
 #: ../include/locales/en_gb.inc.php:2022
 msgid "Message timeout"
@@ -4924,7 +4948,7 @@ msgstr "Минут"
 
 #: ../include/locales/en_gb.inc.php:238
 msgid "Missing"
-msgstr "Пропущенный"
+msgstr "отсутствующее"
 
 #: ../include/locales/en_gb.inc.php:2344
 msgid "Missing items for graph"
@@ -4956,7 +4980,7 @@ msgstr "Понедельник"
 
 #: ../include/locales/en_gb.inc.php:923
 msgid "Monitored"
-msgstr "Наблюдается"
+msgstr "Под наблюдением"
 
 #: ../include/locales/en_gb.inc.php:1025
 msgid "Monitored by proxy"
@@ -5028,7 +5052,7 @@ msgstr "УВЕДОМЛЕНИЯ"
 
 #: ../include/locales/en_gb.inc.php:212
 msgid "NTLM authentication"
-msgstr ""
+msgstr "Аутентификация NTLM"
 
 #: ../include/locales/en_gb.inc.php:1914
 msgid "Name"
@@ -5128,11 +5152,11 @@ msgstr "Новое преобразование"
 
 #: ../include/locales/en_gb.inc.php:1382
 msgid "New media"
-msgstr "Новый способ оповещений"
+msgstr "Новый способ оповещения"
 
 #: ../include/locales/en_gb.inc.php:514
 msgid "New media type was not added"
-msgstr "Новый способ оповещений не добавлен"
+msgstr "Новый способ оповещения не добавлен"
 
 #: ../include/locales/en_gb.inc.php:612
 msgid "New node"
@@ -5462,7 +5486,7 @@ msgstr "Шаблоны не заданы"
 
 #: ../include/locales/en_gb.inc.php:890
 msgid "No templates linked"
-msgstr "Без связанных шаблонов"
+msgstr "Нет присоединенных шаблонов"
 
 #: ../include/locales/en_gb.inc.php:1740
 msgid "No times defined"
@@ -5574,7 +5598,7 @@ msgstr "Не подключен"
 
 #: ../include/locales/en_gb.inc.php:924
 msgid "Not monitored"
-msgstr "Не наблюдается"
+msgstr "Без наблюдения"
 
 #: ../include/locales/en_gb.inc.php:1137
 msgid "Not supported"
@@ -5614,11 +5638,11 @@ msgstr "Ноябрь"
 
 #: ../include/locales/en_gb.inc.php:1471
 msgid "Number of hosts (monitored/not monitored/templates)"
-msgstr "Количество узлов сети (контролируется/не контролируется/шаблоны)"
+msgstr "Количество узлов сети (под наблюдением/без наблюдения/шаблоны)"
 
 #: ../include/locales/en_gb.inc.php:1466
 msgid "Number of items (monitored/disabled/not supported)"
-msgstr "Количество элементов данных (активных/неактивных/не поддерживается)"
+msgstr "Количество элементов данных (активных/деактивированых/не поддерживаются)"
 
 #: ../include/locales/en_gb.inc.php:1573
 msgid "Number of status changes"
@@ -5634,7 +5658,7 @@ msgstr "Количество триггеров (активированных/д
 
 #: ../include/locales/en_gb.inc.php:1469
 msgid "Number of users (online)"
-msgstr "Количество пользователей"
+msgstr "Количество пользователей (подключенных в данный момент)"
 
 #: ../include/locales/en_gb.inc.php:1159
 msgid "Numeric (float)"
@@ -5734,7 +5758,7 @@ msgstr "Однократная недоступность"
 
 #: ../include/locales/en_gb.inc.php:2440
 msgid "Only Super Admins can create Scripts"
-msgstr ""
+msgstr "Только Супер-Администраторы могут создавать скрипты"
 
 #: ../include/locales/en_gb.inc.php:2443
 msgid "Only Super Admins can create Users"
@@ -5746,7 +5770,7 @@ msgstr "Только Супер-Администраторы могут созд
 
 #: ../include/locales/en_gb.inc.php:2442
 msgid "Only Super Admins can delete Scripts"
-msgstr ""
+msgstr "Только Супер-Администраторы могут удалять скрипты"
 
 #. GETTEXT: Api exception
 #: ../api/classes/class.cusergroup.php:702
@@ -5763,7 +5787,7 @@ msgstr "Только Супер-Администраторы могут удал
 
 #: ../include/locales/en_gb.inc.php:2441
 msgid "Only Super Admins can update Scripts"
-msgstr ""
+msgstr "Только Супер-Администраторы могут обновлять скрипты"
 
 #: ../include/locales/en_gb.inc.php:2444
 msgid "Only Super Admins can update Users"
@@ -5795,11 +5819,11 @@ msgstr "Информация только о узле сети"
 
 #: ../include/locales/en_gb.inc.php:1468
 msgid "Only items assigned to enabled hosts are counted"
-msgstr "Считать только элементы у включенных хостов"
+msgstr "Подсчитываются только элементы данных у хостов Под наблюдением"
 
 #: ../include/locales/en_gb.inc.php:1465
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
-msgstr "Считать только триггеры у включенных хостов и зависящих от включенных элементов"
+msgstr "Подсчитываются только триггеры у узлов сети Под наблюдением и которые зависят от активных элементов данных"
 
 #: ../include/locales/en_gb.inc.php:2284
 msgid "Operation cannot be performed due to unauthorized request"
@@ -5834,7 +5858,7 @@ msgstr "Оригинальная синяя"
 
 #: ../include/locales/en_gb.inc.php:550
 msgid "Other"
-msgstr "Прочее"
+msgstr "Прочие"
 
 #: ../include/forms/host.massupdate.php:146
 #: ../include/locales/en_gb.inc.php:876
@@ -5859,7 +5883,7 @@ msgstr "P"
 
 #: ../include/locales/en_gb.inc.php:1391
 msgid "PERSONAL DASHBOARD"
-msgstr "ПЕРСОНАЛЬНЫЙ DASHBOARD"
+msgstr "ПЕРСОНАЛЬНАЯ ПАНЕЛЬ"
 
 #: ../include/locales/en_gb.inc.php:2426
 msgid "PHP Session"
@@ -5963,7 +5987,7 @@ msgstr "Пароль (подтверждение)"
 
 #: ../include/locales/en_gb.inc.php:2467
 msgid "Password required for mediatype"
-msgstr ""
+msgstr "Для способа оповещения требуется пароль"
 
 #: ../include/locales/en_gb.inc.php:1876
 msgid "Password should not be empty"
@@ -5999,7 +6023,7 @@ msgstr "Круговой"
 
 #: ../include/locales/en_gb.inc.php:1549 ../include/locales/en_gb.inc.php:1558
 msgid "Place it to \"/PATH_TO_ZABBIX_FRONTEND/include/locales\"."
-msgstr ""
+msgstr "Поместите в \"ПУТЬ_К_ZABBIX_ВЕБ_ИНТЕРФЕЙСУ/include/locales\"."
 
 #: ../include/locales/en_gb.inc.php:1651
 msgid "Plain text"
@@ -6052,7 +6076,7 @@ msgstr "Предпросмотр"
 #: ../include/locales/en_gb.inc.php:253 ../include/locales/en_gb.inc.php:2549
 #: ../include/locales/en_gb.inc.php:2551
 msgid "Previous"
-msgstr "Назад"
+msgstr "Предыдущие"
 
 #: ../include/locales/en_gb.inc.php:1076
 msgid "Primary POC Cell"
@@ -6131,8 +6155,9 @@ msgid "Profile for this host is missing"
 msgstr "Для этого узла сети профиль не найден"
 
 #: ../include/locales/en_gb.inc.php:1220
+#, fuzzy
 msgid "Prototypes"
-msgstr ""
+msgstr "Прототипы"
 
 #: ../include/locales/en_gb.inc.php:963
 msgid "Proxies"
@@ -6317,11 +6342,11 @@ msgstr "Заменить"
 
 #: ../include/locales/en_gb.inc.php:936
 msgid "Replace linked templates"
-msgstr "Заменить соединенные шаблоны"
+msgstr "Заменить присоединенные шаблоны на:"
 
 #: ../include/locales/en_gb.inc.php:1559
 msgid "Replace previous locale file with one you have downloaded."
-msgstr ""
+msgstr "Замените предыдущий файл локализации тем что загрузили."
 
 #: ../include/locales/en_gb.inc.php:2499
 msgid "Report"
@@ -6415,11 +6440,11 @@ msgstr "Результат"
 
 #: ../include/locales/en_gb.inc.php:574
 msgid "Result is FALSE"
-msgstr "Результат FALSE"
+msgstr "Результат ЛОЖЬ"
 
 #: ../include/locales/en_gb.inc.php:573
 msgid "Result is TRUE"
-msgstr "Результат TRUE"
+msgstr "Результат ИСТИНА"
 
 #: ../include/locales/en_gb.inc.php:2125
 msgid "Result type"
@@ -6458,8 +6483,9 @@ msgid "Rows per page"
 msgstr "Строк на странице"
 
 #: ../include/locales/en_gb.inc.php:1216
+#, fuzzy
 msgid "Rule"
-msgstr ""
+msgstr "Правило"
 
 #: ../include/locales/en_gb.inc.php:236
 msgid "Rules"
@@ -6483,7 +6509,7 @@ msgstr "СЦЕНАРИИ"
 
 #: ../include/locales/en_gb.inc.php:1686 ../screens.php:169 ../screens.php:209
 msgid "SCREENS"
-msgstr ""
+msgstr "КОМПЛЕКСНЫЕ ЭКРАНЫ"
 
 #: ../include/locales/en_gb.inc.php:1986
 msgid "SCRIPT ERROR"
@@ -6712,12 +6738,12 @@ msgstr "Комплексный экран обновлен"
 #: ../include/locales/en_gb.inc.php:1699
 #, php-format
 msgid "Screen with id \"%d\" does not exist"
-msgstr ""
+msgstr "Комплексный экран с id \"%d\" не существует"
 
 #: ../include/locales/en_gb.inc.php:1698
 #, php-format
 msgid "Screen with name \"%s\" does not exist"
-msgstr ""
+msgstr "Комплексный экран с именем \"%s\" не существует"
 
 #: ../include/locales/en_gb.inc.php:1595
 msgid "Screens"
@@ -6725,7 +6751,7 @@ msgstr "Комплексные экраны"
 
 #: ../include/locales/en_gb.inc.php:1142
 msgid "Script"
-msgstr "Сценарий"
+msgstr "Скрипт"
 
 #: ../include/locales/en_gb.inc.php:1974
 msgid "Script added"
@@ -6824,16 +6850,17 @@ msgid "Select image to download"
 msgstr "Выберите рисунок для загрузки"
 
 #: ../include/locales/en_gb.inc.php:1228
+#, fuzzy
 msgid "Select prototype"
-msgstr ""
+msgstr "Выбрать прототип"
 
 #: ../include/locales/en_gb.inc.php:736
 msgid "Select rows with value like"
-msgstr "Отображать элементы с описанием"
+msgstr "Выбрать строки, содержащие в описании"
 
 #: ../include/locales/en_gb.inc.php:1414
 msgid "Selected"
-msgstr "Выбрать"
+msgstr "Выбранные"
 
 #: ../include/locales/en_gb.inc.php:1584
 msgid "Selected groups"
@@ -6981,7 +7008,7 @@ msgstr "Отображать узлы сети в обслуживании"
 
 #: ../include/locales/en_gb.inc.php:1188
 msgid "Show items with description like"
-msgstr "Показать элементы данных с содержанием описания"
+msgstr "Отображать элементы данных, содержащие в названии"
 
 #: ../include/locales/en_gb.inc.php:1846
 msgid "Show last"
@@ -6989,7 +7016,7 @@ msgstr "Показывать последние"
 
 #: ../include/locales/en_gb.inc.php:725
 msgid "Show legend"
-msgstr "Показать легенду"
+msgstr "Показывать легенду"
 
 #: ../include/locales/en_gb.inc.php:1655
 msgid "Show lines"
@@ -7193,7 +7220,7 @@ msgstr "Источник"
 
 #: ../include/locales/en_gb.inc.php:2039
 msgid "Spanish (ES)"
-msgstr "Spanish (ES)"
+msgstr ""
 
 #: ../include/locales/en_gb.inc.php:2316
 msgid "Specify the conditional expression for the target."
@@ -7301,7 +7328,7 @@ msgstr "Тема"
 
 #: ../include/locales/en_gb.inc.php:2332
 msgid "Submap"
-msgstr ""
+msgstr "Подкарта"
 
 #: ../include/locales/en_gb.inc.php:760
 msgid "Success Audit"
@@ -7325,11 +7352,11 @@ msgstr "Swedish (SE)"
 
 #: ../include/locales/en_gb.inc.php:644
 msgid "Switching HTTP authentication will reset all current sessions! Continue?"
-msgstr "Переключение на HTTP аутентификацию сбросит все такущие сессии! Продолжить?"
+msgstr "Переключение на HTTP аутентификацию сбросит все текущие сессии! Продолжить?"
 
 #: ../include/locales/en_gb.inc.php:645
 msgid "Switching LDAP authentication will reset all current sessions! Continue?"
-msgstr "Переключение на LDAP аутентификацию сбросит все такущие сессии! Продолжить?"
+msgstr "Переключение на LDAP аутентификацию сбросит все текущие сессии! Продолжить?"
 
 #: ../include/locales/en_gb.inc.php:486
 msgid "System default"
@@ -7342,7 +7369,7 @@ msgstr "Состояние системы"
 #: ../include/locales/en_gb.inc.php:2179 ../include/locales/en_gb.inc.php:2518
 #: ../include/locales/en_gb.inc.php:2520
 msgid "T"
-msgstr "T"
+msgstr "Чт"
 
 #: ../include/locales/en_gb.inc.php:125
 msgid "TCP"
@@ -7365,8 +7392,9 @@ msgid "TRIGGER COMMENTS"
 msgstr "КОММЕНТАРИИ К ТРИГГЕРУ"
 
 #: ../include/locales/en_gb.inc.php:1236
+#, fuzzy
 msgid "TRIGGER PROTOTYPES OF"
-msgstr ""
+msgstr "ПРОТОТИПЫ ТРИГГЕРОВ ДЛЯ"
 
 #: ../include/locales/en_gb.inc.php:1849
 msgid "TRIGGERS"
@@ -7488,7 +7516,7 @@ msgstr "Ключ должен быть уникальным."
 
 #: ../include/locales/en_gb.inc.php:1550
 msgid "The locale file name must be made of a prefix: \"ISO 639-1 language code\"_\"ISO 3166-1 alpha-2 country code\". Like \"en_gb\""
-msgstr ""
+msgstr "Имя файла локали должно быть составлено из префикса: \"ISO 639-1 код языка\"_\"ISO 3166-1 alpha-2 код страны\". Например \"en_gb\""
 
 #: ../include/locales/en_gb.inc.php:1442
 msgid "The queue is empty"
@@ -7508,7 +7536,7 @@ msgstr "Темы"
 
 #: ../include/locales/en_gb.inc.php:1553
 msgid "There You will find an array containing \"keys\" => \"values\"."
-msgstr ""
+msgstr "Там вы найдете массив, содержащий \"ключи\" => \"значения\"."
 
 #: ../include/locales/en_gb.inc.php:820
 msgid "Third"
@@ -7556,7 +7584,7 @@ msgstr "Период времени"
 
 #: ../include/locales/en_gb.inc.php:1801
 msgid "Time shift"
-msgstr ""
+msgstr "Сдвиг по времени"
 
 #: ../include/locales/en_gb.inc.php:1665
 msgid "Time type"
@@ -7592,7 +7620,7 @@ msgstr "К"
 
 #: ../include/locales/en_gb.inc.php:1552
 msgid "To make new locale visible by Zabbix frontend - extend the php script \"/PATH_TO_ZABBIX_FRONTEND/include/locales.inc.php\"."
-msgstr ""
+msgstr "Для создания новой локализации, доступной в веб-интерфейсе Zabbix - отредактируйте php скрипт \"/ПУТЬ_К_ВЕБ_ИНТЕРФЕЙСУ_ZABBIX/include/locales.inc.php\"."
 
 #: ../include/locales/en_gb.inc.php:1759
 msgid "Today"
@@ -7637,11 +7665,11 @@ msgstr "Транзакция не была закрыта. Отмена..."
 
 #: ../include/locales/en_gb.inc.php:1119
 msgid "Trends"
-msgstr "Динамика изменений"
+msgstr "Динамика"
 
 #: ../include/locales/en_gb.inc.php:1462
 msgid "Trends stored"
-msgstr "Количество записей тенденций"
+msgstr "Сохраненных записей тенденций"
 
 #: ../include/locales/en_gb.inc.php:1732
 msgid "Trigger"
@@ -7665,9 +7693,9 @@ msgid "Trigger [%1$s:%2$s] deleted."
 msgstr ""
 
 #: ../api/classes/class.ctriggerprototype.php:1111
-#, php-format
+#, fuzzy, php-format
 msgid "Trigger [%1$s:%2$s] does not have item prototype."
-msgstr ""
+msgstr "Триггер [%1$s:%2$s] не имеет прототипа элемента данных."
 
 #: ../api/classes/class.ctemplate.php:2041
 #, php-format
@@ -7688,9 +7716,9 @@ msgid "Trigger [%1$s] already exists on [%2$s]"
 msgstr ""
 
 #: ../api/classes/class.ctriggerprototype.php:1200
-#, php-format
+#, fuzzy, php-format
 msgid "Trigger [%1$s] does not have item prototype."
-msgstr ""
+msgstr "Триггер [%1$s] не имеет прототипа элемента данных."
 
 #: ../include/locales/en_gb.inc.php:1780
 msgid "Trigger added"
@@ -7714,7 +7742,7 @@ msgstr "Описание триггера"
 
 #: ../include/locales/en_gb.inc.php:1826
 msgid "Trigger form"
-msgstr ""
+msgstr "Форма триггера для журнала"
 
 #: ../include/locales/en_gb.inc.php:2312
 msgid "Trigger in template"
@@ -7730,23 +7758,24 @@ msgid "Trigger just added. No status update so far."
 msgstr ""
 
 #: ../api/classes/class.ctriggerprototype.php:1322
-#, php-format
+#, fuzzy, php-format
 msgid "Trigger prototype [%1$s:%2$s] deleted."
-msgstr ""
+msgstr "Прототип триггера [%1$s:%2$s] удален."
 
 #: ../api/classes/class.ctemplate.php:2058
-#, php-format
+#, fuzzy, php-format
 msgid "Trigger prototype [%1$s:%2$s] unlinked."
-msgstr ""
+msgstr "Прототип триггера [%1$s:%2$s] отсоединен."
 
 #: ../api/classes/class.ctriggerprototype.php:1455
-#, php-format
+#, fuzzy, php-format
 msgid "Trigger prototype [%1$s:%2$s] updated."
-msgstr ""
+msgstr "Прототип триггера [%1$s:%2$s] обновлен."
 
 #: ../include/forms/host.edit.php:444 ../include/forms/template.edit.php:298
+#, fuzzy
 msgid "Trigger prototypes"
-msgstr ""
+msgstr "Прототипы триггеров"
 
 #: ../include/locales/en_gb.inc.php:319
 msgid "Trigger severity"
@@ -7826,7 +7855,7 @@ msgstr "Тип (ОК)"
 
 #: ../include/locales/en_gb.inc.php:413
 msgid "Type of calculation"
-msgstr "Тип калькуляции"
+msgstr "Тип вычисления"
 
 #: ../include/locales/en_gb.inc.php:1150
 msgid "Type of information"
@@ -7878,7 +7907,7 @@ msgstr "URL (после входа в систему)"
 
 #: ../include/locales/en_gb.inc.php:560
 msgid "USA (160 characters)"
-msgstr ""
+msgstr "США (160 символов)"
 
 #: ../include/locales/en_gb.inc.php:1908
 msgid "USER GROUPS"
@@ -8029,8 +8058,8 @@ msgid "Update item for the graph"
 msgstr "Обновление элемента данных для графика"
 
 #. GETTEXT: r is date format string as described in http://php.net/date
-#: ../include/locales/en_gb.inc.php:2003
 #: ../include/classes/class.cserverinfo.php:42
+#: ../include/locales/en_gb.inc.php:2003
 msgid "Updated"
 msgstr "Обновлено"
 
@@ -8166,7 +8195,7 @@ msgstr "Данные пользователя обновлены"
 
 #: ../include/forms/host.edit.php:522 ../include/locales/en_gb.inc.php:1144
 msgid "Username"
-msgstr ""
+msgstr "Имя пользователя"
 
 #: ../include/locales/en_gb.inc.php:1870
 msgid "Users"
@@ -8222,7 +8251,7 @@ msgstr "Карты значений используются для создан
 
 #: ../include/locales/en_gb.inc.php:2210
 msgid "Value type must be Float for aggregate items"
-msgstr "Тип значения должен быть установлен в Числовое (с плавающей точкой) для аггрегативных элементов данных"
+msgstr "Тип значения должен быть установлен в Числовой (с плавающей точкой) для агрегированных элементов данных"
 
 #: ../include/locales/en_gb.inc.php:1434
 msgid "Values"
@@ -8230,7 +8259,7 @@ msgstr "Значения"
 
 #: ../include/locales/en_gb.inc.php:1461
 msgid "Values stored"
-msgstr "Количество записей значений"
+msgstr "Сохраненных записей истории"
 
 #: ../include/locales/en_gb.inc.php:204
 msgid "Variables"
@@ -8348,8 +8377,8 @@ msgstr "Рабочее время"
 msgid "Write"
 msgstr "Запись"
 
-#: ../api/classes/class.cgraphprototype.php:1089
 #: ../api/classes/class.cgraph.php:1082
+#: ../api/classes/class.cgraphprototype.php:1089
 msgid "Wrong fields for graph"
 msgstr ""
 
@@ -8358,8 +8387,8 @@ msgstr ""
 msgid "Wrong fields for host [ %s ]"
 msgstr ""
 
-#: ../api/classes/class.cgraphprototype.php:1103
 #: ../api/classes/class.cgraph.php:1096
+#: ../api/classes/class.cgraphprototype.php:1103
 msgid "Wrong fields for items"
 msgstr ""
 
@@ -8431,12 +8460,12 @@ msgstr "Расположение оси Y"
 
 #: ../include/locales/en_gb.inc.php:764 ../include/locales/en_gb.inc.php:765
 msgid "Y-m-d H:i:s"
-msgstr "Y-m-d H:i:s"
+msgstr "d-m-Y H:i:s"
 
 #: ../include/locales/en_gb.inc.php:269 ../include/locales/en_gb.inc.php:763
 #: ../include/locales/en_gb.inc.php:766
 msgid "Y.M.d H:i:s"
-msgstr "d M Y H:i:s"
+msgstr "d.M.Y H:i:s"
 
 #: ../include/locales/en_gb.inc.php:1494
 msgid "Y.m.d"
@@ -8448,7 +8477,7 @@ msgstr "Y.m.d H:i"
 
 #: ../include/locales/en_gb.inc.php:2189
 msgid "Y.m.d H:i:s"
-msgstr "Y.m.d H:i:s"
+msgstr "d.m.Y H:i:s"
 
 #: ../include/locales/en_gb.inc.php:1515
 msgid "Year"
@@ -8484,11 +8513,11 @@ msgstr "Вы не можете использовать шаблонные уз�
 
 #: ../include/locales/en_gb.inc.php:1555
 msgid "You can set \"display_like\" value in new locale file by adding it or You may leave it as hardcoded string."
-msgstr ""
+msgstr "Вы можете установить значение \"имя_в_интерфейсе\" в новом файле локализации, добавив его туда или оставить здесь строкой."
 
 #: ../include/locales/en_gb.inc.php:2267
 msgid "You can't delete template for an application that is used in a web scenario"
-msgstr ""
+msgstr "Вы не можете удалить шаблон, группа элементов данных с которого используется в веб сценарии"
 
 #: ../include/locales/en_gb.inc.php:2478
 msgid "You cannot view this URL as a"
@@ -8556,7 +8585,7 @@ msgstr "Порт Zabbix агента"
 
 #: ../include/locales/en_gb.inc.php:1132
 msgid "Zabbix aggregate"
-msgstr "Аггрегативный Zabbix"
+msgstr "Zabbix агрегированный"
 
 #: ../include/locales/en_gb.inc.php:2008
 msgid "Zabbix config"
@@ -8580,7 +8609,7 @@ msgstr ""
 
 #: ../include/locales/en_gb.inc.php:1408
 msgid "Zabbix server ip or port is not set!"
-msgstr ""
+msgstr "Не указаны ip или порт Zabbix сервера!"
 
 #: ../include/locales/en_gb.inc.php:1460
 msgid "Zabbix server is running"
@@ -8612,7 +8641,7 @@ msgstr "[Неправильное значение месяца:"
 
 #: ../include/locales/en_gb.inc.php:762
 msgid "[Y.M.d H:i:s]"
-msgstr "[Y.M.d H:i:s]"
+msgstr "[d.M.Y H:i:s]"
 
 #: ../include/locales/en_gb.inc.php:2462 ../include/locales/en_gb.inc.php:2484
 #: ../include/locales/en_gb.inc.php:2486
@@ -8657,7 +8686,7 @@ msgstr "уже существует с присоединенными узлам
 
 #: ../include/locales/en_gb.inc.php:2264
 msgid "already linked to host"
-msgstr "уже соединен с узлом сети"
+msgstr "уже присоединен к узлу сети"
 
 #: ../include/locales/en_gb.inc.php:409
 msgid "and"
@@ -8665,11 +8694,11 @@ msgstr "и"
 
 #: ../include/locales/en_gb.inc.php:1551
 msgid "and a postfix \".inc.php\". Like \"en_gb.inc.php\"."
-msgstr ""
+msgstr "и постфикса \".inc.php\". Например \"en_gb.inc.php\"."
 
 #: ../include/locales/en_gb.inc.php:2268
 msgid "and can't be deleted"
-msgstr ""
+msgstr "и не может быть удален"
 
 #: ../include/locales/en_gb.inc.php:757
 msgid "as Blue"
@@ -8689,7 +8718,7 @@ msgstr "доступна только для элементов данных с 
 
 #: ../include/locales/en_gb.inc.php:684
 msgid "avg"
-msgstr "срд"
+msgstr "сред"
 
 #: ../include/locales/en_gb.inc.php:2251
 msgid "can not be deleted, due to inner hosts can not be unlinked"
@@ -8745,7 +8774,7 @@ msgstr "d M Y H:i"
 #: ../include/locales/en_gb.inc.php:1592 ../include/locales/en_gb.inc.php:2080
 #: ../include/locales/en_gb.inc.php:2086 ../include/locales/en_gb.inc.php:2339
 msgid "d M Y H:i:s"
-msgstr "d M H:i:s"
+msgstr "d M Y H:i:s"
 
 #: ../include/locales/en_gb.inc.php:28 ../include/locales/en_gb.inc.php:1487
 #: ../include/locales/en_gb.inc.php:1490
@@ -8783,7 +8812,7 @@ msgstr "удален"
 
 #: ../include/locales/en_gb.inc.php:2508
 msgid "does not exist"
-msgstr ""
+msgstr "не существует"
 
 #: ../include/locales/en_gb.inc.php:970
 msgid "doesn't exist"
@@ -8899,7 +8928,7 @@ msgstr "минимальное время на разбор входящих д�
 
 #: ../include/locales/en_gb.inc.php:1533
 msgid "is a wrong time format. Should be from 00:00 to 23:59."
-msgstr ""
+msgstr "это ошибочный формат времени. Должен быть с 00:00 до 23:59."
 
 #: ../include/locales/en_gb.inc.php:2250
 msgid "is internal and can not be deleted"
@@ -8992,11 +9021,11 @@ msgstr "м"
 
 #: ../include/locales/en_gb.inc.php:1373
 msgid "m.d.Y H:i:s"
-msgstr "m.d.Y H:i:s"
+msgstr "d.m.Y H:i:s"
 
 #: ../include/locales/en_gb.inc.php:2104
 msgid "macro(s)"
-msgstr ""
+msgstr "макрос(ы)"
 
 #: ../include/locales/en_gb.inc.php:323
 msgid "maintenance"
@@ -9028,7 +9057,7 @@ msgstr "ограничение мультибайтовых символов"
 
 #: ../include/locales/en_gb.inc.php:2248
 msgid "must be linked to at least one host group"
-msgstr "должен присоединяться по крайней мере к одной группе узлов сети"
+msgstr "должен быть присоединен по крайней мере к одной группе узлов сети"
 
 #: ../include/locales/en_gb.inc.php:2283
 msgid "must be missing"
@@ -9096,7 +9125,7 @@ msgstr "в"
 
 #: ../include/locales/en_gb.inc.php:2234
 msgid "only printable characters"
-msgstr ""
+msgstr "только печатные сивмолы"
 
 #: ../include/locales/en_gb.inc.php:2409
 msgid "option in"
@@ -9196,7 +9225,7 @@ msgstr "отсоединен"
 
 #: ../include/locales/en_gb.inc.php:1186
 msgid "update existing non linked items"
-msgstr "обновить существующие не соединенные элементы данных"
+msgstr "обновить существующие не присоединенные элементы данных"
 
 #: ../include/locales/en_gb.inc.php:2219
 msgid "updated"
@@ -9258,6 +9287,9 @@ msgstr "да"
 msgid "µ"
 msgstr "µ"
 
+#~ msgid "Hide unknown"
+#~ msgstr "Скрыть неизвестные"
+
 #~ msgid "Use IPMI"
 #~ msgstr "Использовать IPMI"
 
@@ -9267,17 +9299,17 @@ msgstr "µ"
 #~ msgid "IPMI port"
 #~ msgstr "Порт IPMI"
 
+#~ msgid "Edit trigger"
+#~ msgstr "Изменить триггер"
+
 #~ msgid "(year"
 #~ msgstr "(год"
 
 #~ msgid ")"
 #~ msgstr ")"
 
-#~ msgid "SCREENS 45645645"
-#~ msgstr "КОМПЛЕКСНЫЕ ЭКРАНЫ"
+#~ msgid "Spanish (SP)"
+#~ msgstr "Spanish (ES)"
 
-#~ msgid "Create Log Trigger"
-#~ msgstr "Создать триггер для журнала"
-
-#~ msgid "Do you replace the conditional expression?"
-#~ msgstr "Вы хотите заменить условие выражения?"
+#~ msgid "used in web scenario"
+#~ msgstr "используется в веб сценарии"
