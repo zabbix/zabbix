@@ -3,7 +3,7 @@
 echo "Generating translation template..."
 
 # xgettext will be used on all php files
-find .. -type f -name '*.php' > POTFILES.in
+find .. -type f -name '*.php' | sort -d -f > POTFILES.in
 
 # keyword "_n" is Zabbix frontend plural function
 # keyword "_s" is Zabbix frontend placeholder function
