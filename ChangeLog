@@ -1,6 +1,7 @@
 Changes for 1.9.2
 
 New features:
+ - [ZBX-3370] updated Russian translation; thanks to zalex_ua and dotneft (Richlv)
  - [ZBX-3338] updated Ukrainian translation; thanks to zalex_ua (Richlv)
 
 Bug fixes:
