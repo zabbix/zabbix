@@ -159,24 +159,37 @@ return S_UNKNOWN;
 function condition_value2str($conditiontype, $value){
 	switch($conditiontype){
 		case CONDITION_TYPE_HOST_GROUP:
-			$group = get_hostgroup_by_groupid($value);
+			$groups = CHostGroup::get(array(
+				'groupids' => $value,
+				'output' => API_OUTPUT_EXTEND,
+				'nodeids' => get_current_nodeid(true),
+				'limit' => 1
+			));
+
+			if(!$group = reset($groups))
+				error(S_NO_HOST_GROUPS_WITH.' groupid "'.$value.'"');
 
 			$str_val = '';
-			if(id2nodeid($value) != get_current_nodeid()) $str_val = get_node_name_by_elid($value, true, ': ');
+			if(id2nodeid($value) != get_current_nodeid())
+				$str_val = get_node_name_by_elid($value, true, ': ');
+
 			$str_val.= $group['name'];
 			break;
 		case CONDITION_TYPE_TRIGGER:
-			$trig = CTrigger::get(array(
+			$trigs = CTrigger::get(array(
 				'triggerids' => $value,
 				'expandTriggerDescriptions' => true,
 				'output' => API_OUTPUT_EXTEND,
-				'selectHosts' => API_OUTPUT_EXTEND,
+				'selectHosts' => array('host'),
 				'nodeids' => get_current_nodeid(true),
+				'limit' => 1
 			));
-			$trig = reset($trig);
+			$trig = reset($trigs);
 			$host = reset($trig['hosts']);
 			$str_val = '';
-			if(id2nodeid($value) != get_current_nodeid()) $str_val = get_node_name_by_elid($value, true, ': ');
+			if(id2nodeid($value) != get_current_nodeid())
+				$str_val = get_node_name_by_elid($value, true, ': ');
+
 			$str_val .= $host['host'].':'.$trig['description'];
 			break;
 		case CONDITION_TYPE_HOST:
@@ -211,8 +224,11 @@ function condition_value2str($conditiontype, $value){
 			$str_val = $drule['name'];
 			break;
 		case CONDITION_TYPE_DCHECK:
-			$row = DBfetch(DBselect('SELECT DISTINCT r.name,c.dcheckid,c.type,c.key_,c.snmp_community,c.ports'.
-					' FROM drules r,dchecks c WHERE r.druleid=c.druleid AND c.dcheckid='.$value));
+			$sql = 'SELECT DISTINCT dr.name,c.dcheckid,c.type,c.key_,c.snmp_community,c.ports'.
+					' FROM drules dr,dchecks c '.
+					' WHERE dr.druleid=c.druleid '.
+						' AND c.dcheckid='.$value;
+			$row = DBfetch(DBselect($sql));
 			$str_val = $row['name'].':'.discovery_check2str($row['type'],
 					$row['snmp_community'], $row['key_'], $row['ports']);
 			break;

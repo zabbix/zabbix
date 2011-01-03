@@ -129,10 +129,6 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		if(!isset($_REQUEST['escalation'])) $_REQUEST['esc_period'] = 0;
 
 		$conditions = get_request('conditions', array());
-		foreach($conditions as $cnum => &$condition){
-			$condition['conditiontype'] = $condition['type'];
-		}
-		unset($condition);
 
 		$action = array(
 			'name'				=> get_request('name'),
@@ -185,7 +181,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 
 		if(!isset($new_condition['value'])) $new_condition['value'] = '';
 
-		if(validate_condition($new_condition['type'], $new_condition['value'])){
+		if(validate_condition($new_condition['conditiontype'], $new_condition['value'])){
 			$_REQUEST['conditions'] = get_request('conditions',array());
 			if(!str_in_array($new_condition, $_REQUEST['conditions']))
 				array_push($_REQUEST['conditions'],$new_condition);
@@ -364,72 +360,6 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		$actionForm = new CGetForm();
 		$action_wdgt->addItem($actionForm->render('action.edit', $action));
 
-/*
-
-// NEW OPERATION CONDITION {{{
-		if(isset($_REQUEST['new_opcondition'])){
-			$tblCond = new CTable(null, 'formElementTable');
-
-			if(isset($_REQUEST['actionid']) && !isset($_REQUEST['form_refresh'])){
-				$eventsource = $action['eventsource'];
-				$evaltype = $action['evaltype'];
-			}
-			else{
-				$evaltype = get_request('evaltype');
-				$eventsource = get_request('eventsource');
-			}
-
-			$allowed_conditions = get_opconditions_by_eventsource($eventsource);
-			$new_opcondition = get_request('new_opcondition', array());
-			if(!is_array($new_opcondition))	$new_opcondition = array();
-
-			if(!isset($new_opcondition['conditiontype'])) $new_opcondition['conditiontype']	= CONDITION_TYPE_EVENT_ACKNOWLEDGED;
-			if(!isset($new_opcondition['operator'])) $new_opcondition['operator'] = CONDITION_OPERATOR_LIKE;
-			if(!isset($new_opcondition['value'])) $new_opcondition['value'] = 0;
-
-			if(!str_in_array($new_opcondition['conditiontype'], $allowed_conditions))
-				$new_opcondition['conditiontype'] = $allowed_conditions[0];
-
-			$rowCondition = array();
-
-			$cmbCondType = new CComboBox('new_opcondition[conditiontype]',$new_opcondition['conditiontype'],'submit()');
-			foreach($allowed_conditions as $cond)
-				$cmbCondType->addItem($cond, condition_type2str($cond));
-			array_push($rowCondition,$cmbCondType);
-
-			$cmbCondOp = new CComboBox('new_opcondition[operator]');
-			foreach(get_operators_by_conditiontype($new_opcondition['conditiontype']) as $op)
-				$cmbCondOp->addItem($op, condition_operator2str($op));
-			array_push($rowCondition,$cmbCondOp);
-
-			switch($new_opcondition['conditiontype']){
-				case CONDITION_TYPE_EVENT_ACKNOWLEDGED:
-					$cmbCondVal = new CComboBox('new_opcondition[value]',$new_opcondition['value']);
-					$cmbCondVal->addItem(0, S_NOT_ACK);
-					$cmbCondVal->addItem(1, S_ACK);
-					$rowCondition[] = $cmbCondVal;
-					break;
-			}
-			$tblCond->addRow($rowCondition);
-
-			$footer = array(
-				new CSubmit('add_opcondition', S_ADD),
-				new CSubmit('cancel_new_opcondition', S_CANCEL)
-			);
-			$right_tab->addRow(new CFormElement(S_NEW.SPACE.S_OPERATION_CONDITION, $tblCond, $footer));
-		}
-// }}} NEW OPERATION CONDITION
-
-		$td_l = new CCol($left_tab);
-		$td_l->setAttribute('valign','top');
-
-		$td_r = new CCol($right_tab);
-		$td_r->setAttribute('valign','top');
-
-		$outer_table = new CTable();
-		$outer_table->addRow(array($td_l, $td_r));
-		$frmAction->additem($outer_table);
-//*/
 		show_messages();
 
 //		$action_wdgt->addItem($frmAction);
