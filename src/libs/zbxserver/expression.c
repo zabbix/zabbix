@@ -1033,17 +1033,26 @@ static int	DBget_trigger_value_by_triggerid(zbx_uint64_t triggerid, char **repla
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_HOST_IPADDRESS:
-				*replace_to = zbx_dsprintf(*replace_to, "%s", row[5]);
-				ret = SUCCEED;
+				if (SUCCEED != DBis_null(row[5]))
+				{
+					*replace_to = zbx_dsprintf(*replace_to, "%s", row[5]);
+					ret = SUCCEED;
+				}
 				break;
 			case ZBX_REQUEST_HOST_DNS:
-				*replace_to = zbx_dsprintf(*replace_to, "%s", row[6]);
-				ret = SUCCEED;
+				if (SUCCEED != DBis_null(row[6]))
+				{
+					*replace_to = zbx_dsprintf(*replace_to, "%s", row[6]);
+					ret = SUCCEED;
+				}
 				break;
 			case ZBX_REQUEST_HOST_CONN:
-				*replace_to = zbx_dsprintf(*replace_to, "%s",
-						atoi(row[4]) ? row[5] : row[6]);
-				ret = SUCCEED;
+				if (SUCCEED != DBis_null(row[4]))
+				{
+					*replace_to = zbx_dsprintf(*replace_to, "%s",
+							atoi(row[4]) ? row[5] : row[6]);
+					ret = SUCCEED;
+				}
 				break;
 			case ZBX_REQUEST_ITEM_NAME:
 			case ZBX_REQUEST_ITEM_KEY:
