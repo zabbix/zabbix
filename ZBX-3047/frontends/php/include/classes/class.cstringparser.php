@@ -226,11 +226,13 @@ class CStringParser {
 								if(!is_array($this->ess[$ruleSetName]['allowedSymbols'])) {
 									$this->ess[$ruleSetName]['allowedSymbols'] = Array($this->ess[$ruleSetName]['allowedSymbols']);
 								}
+
 								foreach($this->ess[$ruleSetName]['allowedSymbols'] as $regexp) {
 									if(preg_match("/^".$regexp."$/", $compareValue)) {
 										$allowedSymbolsValid = true;
 										break;
-									}else{
+									}
+									else{
 										$allowedSymbolsValid = false;
 									}
 								}

@@ -357,14 +357,13 @@ private $allowed;
 						$this->currExpr['params']['comma']++;
 						$this->currExpr['params']['quoteClose'] = false;
 					}
-					else if($symbol == '"'){
-						if($this->emptyParameter())
+					else{
+						if(($symbol == '"') && $this->emptyParameter())
 							$this->symbols['params'][$symbol]++;
 
 						if($this->currExpr['params']['quoteClose'])
 							throw new Exception('Incorrect quote usage in trigger expression');
-					}
-					else{
+
 						$this->writeParams($symbol);
 					}
 				}
@@ -415,7 +414,7 @@ private $allowed;
 
 				if($symbol == '}'){
 					$this->expressions[] = $this->currExpr['object'];
-					return true;
+					return ;
 				}
 			}
 
