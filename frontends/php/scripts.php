@@ -61,9 +61,9 @@ $_REQUEST['go'] = get_request('go', 'none');
 
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
-	if(get_request('scriptid')){
+	if($sid = get_request('scriptid')){
 		$options = array(
-			'scriptids' => get_request('scriptid'),
+			'scriptids' => $sid,
 			'output' => API_OUTPUT_SHORTEN,
 		);
 		$scripts = CScript::get($options);
@@ -233,8 +233,8 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 
 			$table->addRow(array(
-				new CCheckBox('scripts['.$script['scriptid'].']','no',NULL,$script['scriptid']),
-				new CLink($script['name'],'scripts.php?form=1'.'&scriptid='.$script['scriptid']),
+				new CCheckBox('scripts['.$script['scriptid'].']', 'no', NULL, $script['scriptid']),
+				new CLink($script['name'], 'scripts.php?form=1'.'&scriptid='.$script['scriptid']),
 				htmlspecialchars($script['command'], ENT_COMPAT, 'UTF-8'),
 				$user_group_name,
 				$host_group_name,
