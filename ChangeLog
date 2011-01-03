@@ -1,3 +1,13 @@
+Changes for 1.9.2
+
+New features:
+ - [ZBX-3370] updated Russian translation; thanks to zalex_ua and dotneft (Richlv)
+ - [ZBX-3338] updated Ukrainian translation; thanks to zalex_ua (Richlv)
+
+Bug fixes:
+ - [ZBX-3326] sort po file contents and entries in POTFILES.in, include fuzzy entries in mo files (Richlv)
+ - [ZBX-3054] fixed Cannot create or update Action with remote command; fix "reset() expects parameter 1 to be array, null given in /actionconf.php:754" (Vlad)
+
 Changes for 1.9.1
 
 New features:
@@ -8,7 +18,7 @@ New features:
  - [ZBXNEXT-512] redesign of unknown events (Aly,asaveljevs,Sasha)
 
 Bug fixes:
- - [ZBX-3241] fixed incorrectly shortened popup texts
+ - [ZBX-3241] fixed incorrectly shortened popup texts (Vlad)
  - [ZBX-2647] Made some of hard coded strings translatable (KB)
  - [ZBX-3300] fixed valuemapid not removed from items table when valuemap deleted (Vedmak)
  - [ZBXNEXT-588] improved template, host, proxy form view, dashboard screen (Aly,Vedmak)
