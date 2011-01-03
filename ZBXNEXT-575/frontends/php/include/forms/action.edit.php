@@ -146,31 +146,31 @@
 
 	$new_condition = get_request('new_condition', array());
 	$new_condition = array(
-		'type' => isset($new_condition['type']) ? $new_condition['type'] : CONDITION_TYPE_TRIGGER_NAME,
+		'conditiontype' => isset($new_condition['conditiontype']) ? $new_condition['conditiontype'] : CONDITION_TYPE_TRIGGER_NAME,
 		'operator' => isset($new_condition['operator']) ? $new_condition['operator'] : CONDITION_OPERATOR_LIKE,
 		'value' => isset($new_condition['value']) ? $new_condition['value'] : '',
 	);
 
-	if(!str_in_array($new_condition['type'], $allowedConditions))
-		$new_condition['type'] = $allowedConditions[0];
+	if(!str_in_array($new_condition['conditiontype'], $allowedConditions))
+		$new_condition['conditiontype'] = $allowedConditions[0];
 
 	$rowCondition = array();
-	$cmbCondType = new CComboBox('new_condition[type]',$new_condition['type'],'submit()');
+	$cmbCondType = new CComboBox('new_condition[conditiontype]',$new_condition['conditiontype'],'submit()');
 	foreach($allowedConditions as $cond)
 		$cmbCondType->addItem($cond, condition_type2str($cond));
 	$rowCondition[] = $cmbCondType;
 
 
 	$cmbCondOp = new CComboBox('new_condition[operator]');
-	foreach(get_operators_by_conditiontype($new_condition['type']) as $op)
+	foreach(get_operators_by_conditiontype($new_condition['conditiontype']) as $op)
 		$cmbCondOp->addItem($op, condition_operator2str($op));
 	$rowCondition[] = $cmbCondOp;
 
-	switch($new_condition['type']){
+	switch($new_condition['conditiontype']){
 		case CONDITION_TYPE_HOST_GROUP:
-			$tblNewCond->addItem(new CVar('new_condition[value]','0'));
+			$conditionList->addItem(new CVar('new_condition[value]','0'));
 			$rowCondition[] = array(
-				new CTextBox('group','',20,'yes'),
+				new CTextBox('group','',40,'yes'),
 				new CSubmit('btn1',S_SELECT,
 					"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=group&srctbl=host_group".
@@ -178,9 +178,9 @@
 					'T'));
 			break;
 		case CONDITION_TYPE_HOST_TEMPLATE:
-			$tblNewCond->addItem(new CVar('new_condition[value]','0'));
+			$conditionList->addItem(new CVar('new_condition[value]','0'));
 			$rowCondition[] = array(
-				new CTextBox('host','',20,'yes'),
+				new CTextBox('host','',40,'yes'),
 				new CSubmit('btn1',S_SELECT,
 					"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=host&srctbl=host_templates".
@@ -188,9 +188,9 @@
 					'T'));
 			break;
 		case CONDITION_TYPE_HOST:
-			$tblNewCond->addItem(new CVar('new_condition[value]','0'));
+			$conditionList->addItem(new CVar('new_condition[value]','0'));
 			$rowCondition[] = array(
-				new CTextBox('host','',20,'yes'),
+				new CTextBox('host','',40,'yes'),
 				new CSubmit('btn1',S_SELECT,
 					"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=host&srctbl=hosts".
@@ -198,10 +198,10 @@
 					'T'));
 			break;
 		case CONDITION_TYPE_TRIGGER:
-			$tblNewCond->addItem(new CVar('new_condition[value]','0'));
+			$conditionList->addItem(new CVar('new_condition[value]','0'));
 
 			$rowCondition[] = array(
-				new CTextBox('trigger','',20,'yes'),
+				new CTextBox('trigger','',40,'yes'),
 				new CSubmit('btn1',S_SELECT,
 					"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=trigger&srctbl=triggers".
@@ -234,9 +234,9 @@
 			$rowCondition[] = new CCol(S_MAINTENANCE_SMALL);
 			break;
 		case CONDITION_TYPE_NODE:
-			$tblNewCond->addItem(new CVar('new_condition[value]','0'));
+			$conditionList->addItem(new CVar('new_condition[value]','0'));
 			$rowCondition[] = array(
-				new CTextBox('node','',20,'yes'),
+				new CTextBox('node','',40,'yes'),
 				new CButton('btn1',S_SELECT,
 					"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=node&srctbl=nodes".
@@ -244,9 +244,9 @@
 					'T'));
 			break;
 		case CONDITION_TYPE_DRULE:
-			$tblNewCond->addItem(new CVar('new_condition[value]','0'));
+			$conditionList->addItem(new CVar('new_condition[value]','0'));
 			$rowCondition[] = array(
-				new CTextBox('drule','',20,'yes'),
+				new CTextBox('drule','',40,'yes'),
 				new CButton('btn1',S_SELECT,
 					"return PopUp('popup.php?dstfrm=".S_ACTION.
 					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=drule&srctbl=drules".
@@ -254,9 +254,9 @@
 					'T'));
 			break;
 		case CONDITION_TYPE_DCHECK:
-			$tblNewCond->addItem(new CVar('new_condition[value]','0'));
+			$conditionList->addItem(new CVar('new_condition[value]','0'));
 			$rowCondition[] = array(
-				new CTextBox('dcheck','',50,'yes'),
+				new CTextBox('dcheck','',40,'yes'),
 				new CButton('btn1',S_SELECT,
 					"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=dcheck&srctbl=dchecks".
@@ -264,9 +264,9 @@
 					'T'));
 			break;
 		case CONDITION_TYPE_PROXY:
-			$tblNewCond->addItem(new CVar('new_condition[value]','0'));
+			$conditionList->addItem(new CVar('new_condition[value]','0'));
 			$rowCondition[] = array(
-				new CTextBox('proxy','',20,'yes'),
+				new CTextBox('proxy','',40,'yes'),
 				new CButton('btn1',S_SELECT,
 					"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=proxy&srctbl=proxies".
@@ -509,7 +509,7 @@
 							'&srcfld1=' . $object_srcfld1 .
 							'&srcfld2=' . $display_name .
 							'&submit=1' .
-							'",450,450)', 'T')
+							'",450,450)', 'link_menu')
 				)));
 
 				$cmbMediaType = new CComboBox('new_operation[mediatypeid]', $new_operation['mediatypeid'], 'submit()');
@@ -617,8 +617,8 @@
 				$tblOper->addItem(new CVar('new_operation[shortdata]', ''));
 				$tblOper->addItem(new CVar('new_operation[longdata]', ''));
 
-				if($object_name = DBfetch(DBselect('SELECT host FROM hosts ' .
-						' WHERE status=' . HOST_STATUS_TEMPLATE . ' AND hostid=' . $new_operation['objectid']))){
+				$sql = 'SELECT host FROM hosts WHERE status='.HOST_STATUS_TEMPLATE.' AND hostid='.$new_operation['objectid'];
+				if($object_name = DBfetch(DBselect($sql))){
 					$object_name = $object_name['host'];
 				}
 				$tblNewOperation->addRow(array(S_TEMPLATE, array(
@@ -718,18 +718,66 @@
 		$tblOper->addRow($tblNewOperation);
 
 		$footer = array(
-			new CSubmit('add_operation', $update_mode ? S_SAVE : S_ADD, null, 'link_menu'),
-			new CSubmit('cancel_new_operation', S_CANCEL, null, 'link_menu')
+			new CSubmit('add_operation', $update_mode ? _s('Save') : _s('Add'), null, 'link_menu'),
+			SPACE,
+			new CSubmit('cancel_new_operation', _s('Cancel'), null, 'link_menu')
 		);
 
-		$operationList->addRow(S_EDIT_OPERATION, new CDiv( array($tblOper, $footer), 'objectgroup inlineblock border_dotted ui-corner-all'));
+		$operationList->addRow(_s('Operation details'), new CDiv( array($tblOper, $footer), 'objectgroup inlineblock border_dotted ui-corner-all'));
+	}
+
+// NEW OPERATION CONDITION
+	if(isset($_REQUEST['new_opcondition'])){
+		$tblCond = new CTable(null, 'formElementTable');
+
+		$allowedOpConditions = get_opconditions_by_eventsource($data['eventsource']);
+
+		$new_opcondition = get_request('new_opcondition', array());
+		if(!is_array($new_opcondition))	$new_opcondition = array();
+
+		if(empty($new_opcondition)){
+			$new_opcondition['conditiontype'] = CONDITION_TYPE_EVENT_ACKNOWLEDGED;
+			$new_opcondition['operator'] = CONDITION_OPERATOR_LIKE;
+			$new_opcondition['value'] = 0;
+		}
+
+		if(!str_in_array($new_opcondition['conditiontype'], $allowedOpConditions))
+			$new_opcondition['conditiontype'] = $allowedopConditions[0];
+
+		$rowCondition = array();
+
+		$cmbCondType = new CComboBox('new_opcondition[conditiontype]',$new_opcondition['conditiontype'],'submit()');
+		foreach($allowedOpConditions as $cond)
+			$cmbCondType->addItem($cond, condition_type2str($cond));
+		array_push($rowCondition,$cmbCondType);
+
+		$cmbCondOp = new CComboBox('new_opcondition[operator]');
+		foreach(get_operators_by_conditiontype($new_opcondition['conditiontype']) as $op)
+			$cmbCondOp->addItem($op, condition_operator2str($op));
+		array_push($rowCondition,$cmbCondOp);
+SDII($new_opcondition);
+SDI(CONDITION_TYPE_EVENT_ACKNOWLEDGED);
+		switch($new_opcondition['conditiontype']){
+			case CONDITION_TYPE_EVENT_ACKNOWLEDGED:
+				$cmbCondVal = new CComboBox('new_opcondition[value]',$new_opcondition['value']);
+				$cmbCondVal->addItem(0, S_NOT_ACK);
+				$cmbCondVal->addItem(1, S_ACK);
+				$rowCondition[] = $cmbCondVal;
+				break;
+		}
+		$tblCond->addRow($rowCondition);
+
+		$footer = array(
+			new CSubmit('add_opcondition', S_ADD, null, 'link_menu'),
+			SPACE,
+			new CSubmit('cancel_new_opcondition', S_CANCEL, null, 'link_menu')
+		);
+
+		$operationList->addRow(_s('Operation condition'), new CDiv( array($tblCond, $footer), 'objectgroup inlineblock border_dotted ui-corner-all'));
 	}
 
 	$divTabs->addTab('operationTab', S_OPERATIONS, $operationList);
 // }}} ACTION OPERATIONS FORM
-
-
-
 
 	$frmAction->addItem($divTabs);
 
