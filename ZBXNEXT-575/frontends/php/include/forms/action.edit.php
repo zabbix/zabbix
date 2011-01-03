@@ -755,8 +755,7 @@
 		foreach(get_operators_by_conditiontype($new_opcondition['conditiontype']) as $op)
 			$cmbCondOp->addItem($op, condition_operator2str($op));
 		array_push($rowCondition,$cmbCondOp);
-SDII($new_opcondition);
-SDI(CONDITION_TYPE_EVENT_ACKNOWLEDGED);
+
 		switch($new_opcondition['conditiontype']){
 			case CONDITION_TYPE_EVENT_ACKNOWLEDGED:
 				$cmbCondVal = new CComboBox('new_opcondition[value]',$new_opcondition['value']);
