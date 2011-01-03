@@ -1969,7 +1969,6 @@
 	'S_WRITE'=>				_('Write'),
 	'S_NO_SCRIPTS_DEFINED'=>		_('No scripts defined'),
 	'S_HOST_ACCESS'=>			_('Host access'),
-	'S_DELETE_SCRIPTS_Q'=>			_('Delete script?'),
 	'S_CREATE_SCRIPT'=>			_('Create script'),
 	'S_SCRIPT_ADDED'=>			_('Script added'),
 	'S_CANNOT_ADD_SCRIPT'=>			_('Cannot add script'),

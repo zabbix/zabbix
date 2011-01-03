@@ -58,19 +58,14 @@
 		$script = CScript::get($options);
 		$script = reset($script);
 
-		if($script){
-			$name = $script['name'];
-			$command  = $script['command'];
-			$description = $script['description'];
-			$usrgrpid = $script['usrgrpid'];
-			$groupid = $script['groupid'];
-			$access = $script['host_access'];
-			$question = $script['question'];
-			$enableQuestion = !empty($question);
-		}
-		else{
-			$name = $command = $description = $usrgrpid = $groupid = $access = $question = $enableQuestion = '';
-		}
+		$name = $script['name'];
+		$command  = $script['command'];
+		$description = $script['description'];
+		$usrgrpid = $script['usrgrpid'];
+		$groupid = $script['groupid'];
+		$access = $script['host_access'];
+		$question = $script['question'];
+		$enableQuestion = !empty($question);
 	}
 
 // NAME
@@ -92,7 +87,7 @@
 
 // USER GROUPS
 	$usr_groups = new CCombobox('usrgrpid', $usrgrpid);
-	$usr_groups->addItem(0, S_ALL_S);
+	$usr_groups->addItem(0, _('All'));
 	$usrgrps = CUserGroup::get(array(
 		'output' => API_OUTPUT_EXTEND,
 	));
@@ -104,7 +99,7 @@
 
 // HOST GROUPS
 	$host_groups = new CCombobox('groupid', $groupid);
-	$host_groups->addItem(0,S_ALL_S);
+	$host_groups->addItem(0, _('All'));
 	$groups = CHostGroup::get(array(
 		'output' => API_OUTPUT_EXTEND,
 	));
@@ -112,28 +107,26 @@
 	foreach($groups as $gnum => $group){
 		$host_groups->addItem($group['groupid'], $group['name']);
 	}
-	$scriptTab->addRow(S_HOST_GROUPS, $host_groups);
+	$scriptTab->addRow(_('Host groups'), $host_groups);
 
 // PERMISSIONS
 	$select_acc = new CCombobox('access', $access);
-	$select_acc->addItem(PERM_READ_ONLY, S_READ);
-	$select_acc->addItem(PERM_READ_WRITE, S_WRITE);
+	$select_acc->addItem(PERM_READ_ONLY, _('Read'));
+	$select_acc->addItem(PERM_READ_WRITE, _('Write'));
 	$scriptTab->addRow(_('Required host permissions'), $select_acc);
 
 // QUESTION
 	$enableQuestCB = new CCheckBox('enableQuestion', $enableQuestion);
-	$enableQuestCB->setAttribute('id', 'enableQuestion');
 	// SPACE for layout bug in chrome8
 	$scriptTab->addRow(new CLabel(_('Enable question'), 'enableQuestion'), array($enableQuestCB, SPACE));
 
 	$questionTB = new CTextBox('question', $question, 65);
-	$questionTB->setAttribute('id', 'question');
 	$questionTB->setAttribute('maxlength', 255);
 
-	$testSpan = new CLink(_('Test question'), '#', 'link_menu');
-	$testSpan->setAttribute('id', 'testQuestion');
+	$testLink = new CLink(_('Test question'), '#', 'link_menu');
+	$testLink->setAttribute('id', 'testQuestion');
 
-	$scriptTab->addRow(SPACE, array($questionTB, SPACE, $testSpan));
+	$scriptTab->addRow(SPACE, array($questionTB, SPACE, $testLink));
 
 	$scriptTab->setHeader(_('Script'));
 
@@ -141,16 +134,15 @@
 
 
 // Footer
-	$main = array(new CSubmit('save', S_SAVE));
+	$main = array(new CSubmit('save', _('Save')));
 	$others = array();
 	if(isset($_REQUEST['scriptid'])){
-		$others[] = new CSubmit('clone', S_CLONE);
-		$others[] = new CButtonDelete(S_DELETE_SCRIPTS_Q, url_param('form').url_param('scriptid'));
+		$others[] = new CSubmit('clone', _('Clone'));
+		$others[] = new CButtonDelete(_('Delete script?'), url_param('form').url_param('scriptid'));
 	}
 	$others[] = new CButtonCancel();
 	$frmScr->addItem(makeFormFooter($main, $others));
 
 
 	return $frmScr;
-
 ?>
