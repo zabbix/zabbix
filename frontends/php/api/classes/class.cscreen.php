@@ -497,7 +497,7 @@ SDI('/////////////////////////////////');
 
 			if(isset($item['resourceid']) && ($item['resourceid'] == 0)){
 				if(uint_in_array($item['resourcetype'], $resources))
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('Incorrect resource provided for screen item'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect resource provided for screen item'));
 				else
 					continue;
 			}
