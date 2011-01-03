@@ -24,9 +24,7 @@
 	include('include/templates/scriptConfirm.js.php');
 ?>
 <?php
-	$scriptTab = new CFormList('script');
-	$scriptTab->addClass('ui-tabs ui-widget ui-widget-content ui-corner-all widget');
-
+	$scriptTab = new CFormList('scriptsTab');
 	$frmScr = new CForm();
 	$frmScr->setName('scripts');
 	$frmScr->addVar('form', get_request('form', 1));
@@ -128,9 +126,9 @@
 
 	$scriptTab->addRow(SPACE, array($questionTB, SPACE, $testLink));
 
-	$scriptTab->setHeader(_('Script'));
-
-	$frmScr->addItem($scriptTab);
+	$scriptView = new CTabView();
+	$scriptView->addTab('scripts', _('Script'), $scriptTab);
+	$frmScr->addItem($scriptView);
 
 
 // Footer
@@ -141,7 +139,9 @@
 		$others[] = new CButtonDelete(_('Delete script?'), url_param('form').url_param('scriptid'));
 	}
 	$others[] = new CButtonCancel();
-	$frmScr->addItem(makeFormFooter($main, $others));
+
+	$footer = makeFormFooter($main, $others);
+	$frmScr->addItem($footer);
 
 
 	return $frmScr;
