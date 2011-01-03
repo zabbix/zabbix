@@ -171,7 +171,7 @@ class CUser extends CZBXAPI{
 
 // extendoutput
 		if($options['output'] == API_OUTPUT_EXTEND){
-			$sql_parts['select']['users'] = 'u.userid,u.alias,u.name,u.surname,u.url,u.autologin,u.autologout,u.lang,u.refresh,u.type,u.theme,u.attempt_failed,u.attempt_ip,u.attempt_clock,u.rows_per_page';
+			$sql_parts['select']['users'] = 'u.*';
 		}
 
 // countOutput
@@ -183,6 +183,7 @@ class CUser extends CZBXAPI{
 
 // filter
 		if(is_array($options['filter'])){
+			unset($options['filter']['passwd']);
 			zbx_db_filter('users u', $options, $sql_parts);
 		}
 
@@ -200,7 +201,7 @@ class CUser extends CZBXAPI{
 
 			$sql_parts['order'][] = 'u.'.$options['sortfield'].' '.$sortorder;
 
-			if(!str_in_array('u.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('u.userid,u.alias,u.name,u.surname,u.url,u.autologin,u.autologout,u.lang,u.refresh,u.type,u.theme,u.attempt_failed,u.attempt_ip,u.attempt_clock,u.rows_per_page', $sql_parts['select'])){
+			if(!str_in_array('u.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('u.*', $sql_parts['select'])){
 				$sql_parts['select'][] = 'u.'.$options['sortfield'];
 			}
 		}
@@ -235,6 +236,7 @@ class CUser extends CZBXAPI{
 //SDI($sql);
 		$res = DBselect($sql, $sql_limit);
 		while($user = DBfetch($res)){
+			unset($user['passwd']);
 			if(!is_null($options['countOutput'])){
 				$result = $user['rowscount'];
 			}
@@ -1095,13 +1097,15 @@ Copt::memoryPick();
 		}
 
 		if($login){
-			$sql = 'SELECT u.userid,u.alias,u.name,u.surname,u.url,u.autologin,u.autologout,u.lang,u.refresh,u.type,u.theme,u.attempt_failed,u.attempt_ip,u.attempt_clock,u.rows_per_page '.
+			$sql = 'SELECT u.* '.
 					' FROM users u'.
 					' WHERE u.alias='.zbx_dbstr($name).
 						((ZBX_AUTH_INTERNAL==$auth_type)? ' AND u.passwd='.zbx_dbstr($password):'').
 						' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);
 
 			$login = $user = DBfetch(DBselect($sql));
+			unset($user['passwd']);
+			unset($login['passwd']);
 		}
 
 /* update internal pass if it's different
@@ -1167,7 +1171,7 @@ Copt::memoryPick();
 
 		if(is_null($sessionid)) return false;
 
-		$sql = 'SELECT u.userid,u.alias,u.name,u.surname,u.url,u.autologin,u.autologout,u.lang,u.refresh,u.type,u.theme,u.attempt_failed,u.attempt_ip,u.attempt_clock,u.rows_per_page,s.* '.
+		$sql = 'SELECT u.*,s.* '.
 			' FROM sessions s,users u'.
 			' WHERE '.DBin_node('u.userid', $ZBX_LOCALNODEID).
 				' AND s.sessionid='.zbx_dbstr($sessionid).
@@ -1175,6 +1179,8 @@ Copt::memoryPick();
 				' AND s.userid = u.userid';
 
 		$login = $USER_DETAILS = DBfetch(DBselect($sql));
+		unset($USER_DETAILS['passwd']);
+		unset($login['passwd']);
 
 		if($login){
 			$login = (check_perm2login($USER_DETAILS['userid']) && check_perm2system($USER_DETAILS['userid']));
@@ -1217,7 +1223,7 @@ Copt::memoryPick();
 		$login = FALSE;
 
 		if(!is_null($sessionid)){
-			$sql = 'SELECT u.userid,u.alias,u.name,u.surname,u.url,u.autologin,u.autologout,u.lang,u.refresh,u.type,u.theme,u.attempt_failed,u.attempt_ip,u.attempt_clock,u.rows_per_page,s.* '.
+			$sql = 'SELECT u.*,s.* '.
 					' FROM sessions s,users u'.
 					' WHERE s.sessionid='.zbx_dbstr($sessionid).
 						' AND s.status='.ZBX_SESSION_ACTIVE.
@@ -1226,6 +1232,8 @@ Copt::memoryPick();
 						' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);
 
 			$login = $USER_DETAILS = DBfetch(DBselect($sql));
+			unset($USER_DETAILS['passwd']);
+			unset($login['passwd']);
 
 			if(!$USER_DETAILS){
 				$incorrect_session = true;
@@ -1236,11 +1244,13 @@ Copt::memoryPick();
 		}
 
 		if(!$USER_DETAILS && !isset($_SERVER['PHP_AUTH_USER'])){
-			$sql = 'SELECT u.userid,u.alias,u.name,u.surname,u.url,u.autologin,u.autologout,u.lang,u.refresh,u.type,u.theme,u.attempt_failed,u.attempt_ip,u.attempt_clock,u.rows_per_page '.
+			$sql = 'SELECT u.* '.
 				' FROM users u '.
 				' WHERE u.alias='.zbx_dbstr(ZBX_GUEST_USER).
 					' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);
 			$login = $USER_DETAILS = DBfetch(DBselect($sql));
+			unset($USER_DETAILS['passwd']);
+			unset($login['passwd']);
 
 			if(!$USER_DETAILS){
 				$missed_user_guest = true;
