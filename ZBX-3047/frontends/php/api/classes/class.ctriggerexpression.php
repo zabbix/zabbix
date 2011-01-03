@@ -192,6 +192,17 @@ private $allowed;
 				$this->data['items'][] = $expr['item'];
 				$this->data['functions'][] = $expr['functionName'];
 				$this->data['functionParams'][] = $expr['functionParam'];
+
+// ading user macros from item & trigger params
+				foreach($expr['itemParamList'] as $itemParam){
+					if($this->checkUserMacro($itemParam))
+						$this->data['usermacros'][] = $itemParam;
+				}
+
+				foreach($expr['functionParamList'] as $funcParam){
+					if($this->checkUserMacro($funcParam))
+						$this->data['usermacros'][] = $funcParam;
+				}
 			}
 
 			$expression = str_replace($expr['expression'], '{expression}', $expression);
@@ -256,15 +267,18 @@ private $allowed;
 	private function parseOpenParts($symbol){
 		if(!$this->inQuotes($symbol)){
 
-			if(!$this->currExpr['part']['item']){
+			if(!$this->currExpr['part']['item'] && !$this->currExpr['part']['functionParam']){
 				$this->parseExpression($symbol);
 			}
 
 			if(!$this->currExpr['part']['usermacro']){
 				$this->parseItem($symbol);
 				$this->parseFunction($symbol);
-				$this->parseParam($symbol);
 			}
+		}
+
+		if(!$this->currExpr['part']['usermacro']){
+			$this->parseParam($symbol);
 		}
 	}
 
@@ -440,6 +454,7 @@ private $allowed;
 			$this->currExpr['object']['expression'] = '{'.$this->currExpr['object']['expression'].'}';
 			$this->currExpr['object']['host'] = rtrim($this->currExpr['object']['host'], ':');
 			$this->currExpr['object']['item'] = $this->currExpr['object']['item'];
+			$this->currExpr['object']['itemParamList'] = $this->currExpr['params']['item'];
 			$this->currExpr['object']['function'] = $this->currExpr['object']['function'];
 			$this->currExpr['object']['functionName'] = rtrim($this->currExpr['object']['functionName'], '(');
 			$this->currExpr['object']['functionParam'] = $this->currExpr['object']['functionParam'];
@@ -564,8 +579,11 @@ private $allowed;
 			throw new Exception('Incorrect symbol sequence in trigger expression.');
 		}
 
+// we shouldn't count open braces in params
+		if(!$this->currExpr['part']['itemParam'] && !$this->currExpr['part']['functionParam'])
+			if(isset($this->symbols['open'][$symbol])) $this->symbols['open'][$symbol]++;
+
 		if(isset($this->symbols['close'][$symbol])) $this->symbols['close'][$symbol]++;
-		if(isset($this->symbols['open'][$symbol])) $this->symbols['open'][$symbol]++;
 		if(isset($this->symbols['expr'][$symbol])) $this->symbols['expr'][$symbol]++;
 		if(isset($this->symbols['linkage'][$symbol])) $this->symbols['linkage'][$symbol]++;
 	}
@@ -615,6 +633,7 @@ private $allowed;
 				'host' => '',
 				'item' => '',
 				'itemParam' => '',
+				'itemParamList' => '',
 				'function' => '',
 				'functionName' => '',
 				'functionParam' => '',
