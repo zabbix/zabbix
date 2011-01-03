@@ -110,19 +110,37 @@ private $allowed;
 	}
 
 	public function checkSimpleExpression(&$expression){
-		$expression = preg_replace("/(\d+(\.\d+)?[KMGTsmhdw]?)/u", '{expression}', $expression);
+// <expression> = <expression> [=#<>|&+-/*] <expression>
+// <expression> = (<expression>)
+// <expression> =  - <space>(0,N) <constant> | <constant>
+// <constant> = <number> | function | macro | user macro
+// <number> = <integer> | <integer><suffix>| <integer>.<integer> | <integer>.<integer><suffix>
+// <suffix> = [KMGTsmhdw]
 
+		$expression = preg_replace("/(\d+(\.\d+)?[KMGTsmhdw]?)/u", '{constant}', $expression);
 		$simpleExpr = str_replace(' ','',$expression);
+
+// constant => expression
+		$start = '';
+		while($start != $simpleExpr){
+			$start = $simpleExpr;
+			$simpleExpr = str_replace('({constant})','{expression}',$simpleExpr);
+			$simpleExpr = str_replace('(-{constant})','{expression}',$simpleExpr);
+			$simpleExpr = preg_replace("/([\=\#\<\>\|\&\+\-\/\*])\-\{constant\}/u", '$1{expression}', $simpleExpr);
+		}
+
+		$simpleExpr = preg_replace('/^\-\{constant\}(.*)$/u', '{constant}$1', $simpleExpr);
+		$simpleExpr = str_replace('{constant}','{expression}',$simpleExpr);
+
+// expression => expression
 		$start = '';
 		while($start != $simpleExpr){
 			$start = $simpleExpr;
 			$simpleExpr = str_replace('({expression})','{expression}',$simpleExpr);
-			$simpleExpr = str_replace('(-{expression})','{expression}',$simpleExpr);
-
-			$simpleExpr = preg_replace("/\{expression\}([\=\#\<\>\|\&\+\-\/\*]\-?)\{expression\}/u", '{expression}', $simpleExpr);
+			$simpleExpr = preg_replace("/\{expression\}([\=\#\<\>\|\&\+\-\/\*])\{expression\}/u", '{expression}', $simpleExpr);
 		}
 
-		$simpleExpr = preg_replace('/^\-\{expression\}(.*)$/u', '{expression}$1', $simpleExpr);
+
 		$simpleExpr = str_replace('{expression}','1',$simpleExpr);
 
 		if(strpos($simpleExpr,'()') !== false)
@@ -205,7 +223,7 @@ private $allowed;
 				}
 			}
 
-			$expression = str_replace($expr['expression'], '{expression}', $expression);
+			$expression = str_replace($expr['expression'], '{constant}', $expression);
 		}
 
 		if(empty($this->data['hosts']) || empty($this->data['items']))
