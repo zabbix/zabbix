@@ -920,7 +920,7 @@
 	}
 
 	function format_lastvalue($db_item){
-		if(isset($db_item["lastvalue"])){
+		if(isset($db_item["lastvalue"]) && $db_item["lastclock"] != 0){
 			if($db_item["value_type"] == ITEM_VALUE_TYPE_FLOAT){
 				$lastvalue=convert_units($db_item["lastvalue"],$db_item["units"]);
 			}
