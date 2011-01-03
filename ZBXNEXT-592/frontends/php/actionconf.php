@@ -750,12 +750,6 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			$esc_period	= $action['esc_period'];
 
 			$operations	= $action['operations'];
-			foreach($operations as $aorow => &$operation_data){
-				if($db_opmtype = reset($operation_data['opmediatypes']))
-					$operation_data['mediatypeid'] = $db_opmtype['mediatypeid'];
-			}
-			unset($operation_data);
-
 			}
 		else{
 			$eventsource = get_request('eventsource');
