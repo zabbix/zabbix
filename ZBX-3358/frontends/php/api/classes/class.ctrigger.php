@@ -1499,11 +1499,13 @@ COpt::memoryPick();
 
 		self::validateDependencies($triggers);
 
-		foreach($triggers as $tnum => $trigger){
+		foreach($triggers as $trigger){
 			foreach($trigger['dependencies'] as $triggerid_up){
 				DB::insert('trigger_depends', array(
-					'triggerid_down' => $triggerid,
-					'triggerid_up' => $triggerid_up
+					array(
+						'triggerid_down' => $triggerid,
+						'triggerid_up' => $triggerid_up
+					)
 				));
 			}
 		}
@@ -1522,7 +1524,7 @@ COpt::memoryPick();
 		$dbTriggers = self::get($options);
 
 		$description_changed = $expression_changed = false;
-		foreach($triggers as $tnum => &$trigger){
+		foreach($triggers as &$trigger){
 			$dbTrigger = $dbTriggers[$trigger['triggerid']];
 
 			if(isset($trigger['description']) && (strcmp($dbTrigger['description'], $trigger['description']) != 0)){
@@ -1595,16 +1597,12 @@ COpt::memoryPick();
 				'where' => array('triggerid='.$trigger['triggerid'])
 			));
 
-			$description = isset($trigger['description']) ? $trigger['description'] : $dbTrigger['description'];
-			$expression = isset($trigger['expression']) ? $trigger['expression'] : explode_exp($dbTrigger['expression'], false);
-			info(_s('Trigger [%1$s:%2$s] updated.', $description, $expression));
-		}
-		unset($trigger);
-
-		foreach($triggers as $tnum => &$trigger){
+			// saving trigger dependencies if it has them
 			if(isset($trigger['dependencies'])){
+				// deleting existing ones
 				DB::delete('trigger_depends', array('triggerid_down' => $trigger['triggerid']));
 
+				// inserting new ones
 				foreach($trigger['dependencies'] as $triggerid_up){
 					DB::insert('trigger_depends', array(array(
 						'triggerid_down' => $trigger['triggerid'],
@@ -1612,9 +1610,16 @@ COpt::memoryPick();
 					)));
 				}
 
+				// now, check if current situation with dependencies is valid
 				self::validateDependencies($triggers);
 			}
+
+			$description = isset($trigger['description']) ? $trigger['description'] : $dbTrigger['description'];
+			$expression = isset($trigger['expression']) ? $trigger['expression'] : explode_exp($dbTrigger['expression'], false);
+			$trigger['expression'] = $expression;
+			info(_s('Trigger [%1$s:%2$s] updated.', $description, $expression));
 		}
+		unset($trigger);
 	}
 
 	protected static function inherit($trigger, $hostids=null){
