@@ -1131,6 +1131,12 @@ else {
 						continue;
 					}
 
+					// check the size of the value to fit data type
+					if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR
+						&& zbx_strlen($value) > $table_schema['fields'][$field]['length']){
+						self::exception(self::SCHEMA_ERROR, _s('Value "%1$s" is too long for field "%2$s" - %d characters. Allowed length is %3$d characters.', $value, $field, zbx_strlen($value), $table_schema['fields'][$field]['length']));
+					}
+
 					// TODO: decide  if we allow to pass null to NOT NULL field using default instead
 					if(is_null($value)){
 						if($table_schema['fields'][$field]['null'])
@@ -1186,6 +1192,12 @@ else {
 				foreach($row['values'] as $field => $value){
 					if(!isset($table_schema['fields'][$field])){
 						continue;
+					}
+
+					// check the size of the value to fit data type
+					if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR
+						&& zbx_strlen($value) > $table_schema['fields'][$field]['length']){
+						self::exception(self::SCHEMA_ERROR, _s('Value "%1$s" is too long for field "%2$s" - %d characters. Allowed length is %3$d characters.', $value, $field, zbx_strlen($value), $table_schema['fields'][$field]['length']));
 					}
 
 // TODO: decide  if we allow to pass null to NOT NULL field using default instead
@@ -1264,16 +1276,6 @@ else {
 			if(!DBexecute($sql)) {
 				self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
 			}
-			return true;
-		}
-
-
-		public static function old_delete($table, $where){
-			$where = zbx_toArray($where);
-
-			$sql = 'DELETE FROM '.$table.' WHERE '.implode(' AND ', $where);
-			if(!DBexecute($sql)) self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
-
 			return true;
 		}
 
