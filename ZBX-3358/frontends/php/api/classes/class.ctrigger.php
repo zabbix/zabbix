@@ -1493,13 +1493,6 @@ COpt::memoryPick();
 				'where' => array('triggerid='.$triggerid)
 			));
 
-			info(_s('Trigger [%1$s:%2$s] created.', $trigger['description'], $trigger['expression']));
-		}
-
-
-		self::validateDependencies($triggers);
-
-		foreach($triggers as $trigger){
 			foreach($trigger['dependencies'] as $triggerid_up){
 				DB::insert('trigger_depends', array(
 					array(
@@ -1508,6 +1501,10 @@ COpt::memoryPick();
 					)
 				));
 			}
+
+			self::validateDependencies($triggers);
+
+			info(_s('Trigger [%1$s:%2$s] created.', $trigger['description'], $trigger['expression']));
 		}
 
 	}
