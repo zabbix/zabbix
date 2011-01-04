@@ -42,8 +42,8 @@
 		$usrgrpid = get_request('usrgrpid',	0);
 		$groupid = get_request('groupid', 0);
 		$access = get_request('access',	PERM_READ_ONLY);
-		$question = get_request('question',	'');
-		$enableQuestion = get_request('enableQuestion', false);
+		$confirmation = get_request('confirmation',	'');
+		$enableConfirmation = get_request('enableConfirmation', false);
 	}
 
 	if(isset($_REQUEST['scriptid']) && !isset($_REQUEST['form_refresh'])){
@@ -62,8 +62,8 @@
 		$usrgrpid = $script['usrgrpid'];
 		$groupid = $script['groupid'];
 		$access = $script['host_access'];
-		$question = $script['question'];
-		$enableQuestion = !empty($question);
+		$confirmation = $script['confirmation'];
+		$enableConfirmation = !empty($confirmation);
 	}
 
 // NAME
@@ -113,18 +113,18 @@
 	$select_acc->addItem(PERM_READ_WRITE, _('Write'));
 	$scriptTab->addRow(_('Required host permissions'), $select_acc);
 
-// QUESTION
-	$enableQuestCB = new CCheckBox('enableQuestion', $enableQuestion);
+// CONFIRMATION
+	$enableQuestCB = new CCheckBox('enableConfirmation', $enableConfirmation);
 	// SPACE for layout bug in chrome8
-	$scriptTab->addRow(new CLabel(_('Enable question'), 'enableQuestion'), array($enableQuestCB, SPACE));
+	$scriptTab->addRow(new CLabel(_('Enable confirmation'), 'enableConfirmation'), array($enableQuestCB, SPACE));
 
-	$questionTB = new CTextBox('question', $question, 65);
-	$questionTB->setAttribute('maxlength', 255);
+	$confirmationTB = new CTextBox('confirmation', $confirmation, 65);
+	$confirmationTB->setAttribute('maxlength', 255);
 
-	$testLink = new CLink(_('Test question'), '#', 'link_menu');
-	$testLink->setAttribute('id', 'testQuestion');
+	$testLink = new CLink(_('Test confirmation'), '#', 'link_menu');
+	$testLink->setAttribute('id', 'testConfirmation');
 
-	$scriptTab->addRow(SPACE, array($questionTB, SPACE, $testLink));
+	$scriptTab->addRow(SPACE, array($confirmationTB, SPACE, $testLink));
 
 	$scriptView = new CTabView();
 	$scriptView->addTab('scripts', _('Script'), $scriptTab);

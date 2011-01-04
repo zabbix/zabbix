@@ -10,7 +10,7 @@ ALTER TABLE scripts ALTER COLUMN groupid DROP NOT NULL;
 REORG TABLE scripts;
 ALTER TABLE scripts ADD description varchar(2048) WITH DEFAULT '' NOT NULL;
 REORG TABLE scripts;
-ALTER TABLE scripts ADD question varchar(255) WITH DEFAULT '' NOT NULL;
+ALTER TABLE scripts ADD confirmation varchar(255) WITH DEFAULT '' NOT NULL;
 REORG TABLE scripts;
 UPDATE scripts SET usrgrpid=NULL WHERE usrgrpid=0;
 UPDATE scripts SET groupid=NULL WHERE groupid=0;
