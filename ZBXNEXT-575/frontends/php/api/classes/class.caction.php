@@ -78,8 +78,8 @@ class CAction extends CZBXAPI{
 
 // OutPut
 			'output'				=> API_OUTPUT_REFER,
-			'select_conditions'		=> null,
-			'select_operations'		=> null,
+			'selectConditions'		=> null,
+			'selectOperations'		=> null,
 			'countOutput'			=> null,
 			'preservekeys'			=> null,
 
@@ -377,11 +377,11 @@ class CAction extends CZBXAPI{
 				else{
 					if(!isset($result[$action['actionid']])) $result[$action['actionid']]= array();
 
-					if(!is_null($options['select_conditions']) && !isset($result[$action['actionid']]['conditions'])){
+					if(!is_null($options['selectConditions']) && !isset($result[$action['actionid']]['conditions'])){
 						$result[$action['actionid']]['conditions'] = array();
 					}
 
-					if(!is_null($options['select_operations']) && !isset($result[$action['actionid']]['operations'])){
+					if(!is_null($options['selectOperations']) && !isset($result[$action['actionid']]['operations'])){
 						$result[$action['actionid']]['operations'] = array();
 					}
 
@@ -398,7 +398,7 @@ COpt::memoryPick();
 
 // Adding Objects
 // Adding Conditions
-		if(!is_null($options['select_conditions']) && str_in_array($options['select_conditions'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectConditions']) && str_in_array($options['selectConditions'], $subselects_allowed_outputs)){
 			$sql = 'SELECT c.* FROM conditions c WHERE '.DBcondition('c.actionid', $actionids);
 			$res = DBselect($sql);
 			while($condition = DBfetch($res)){
@@ -407,7 +407,7 @@ COpt::memoryPick();
 		}
 
 // Adding Operations
-		if(!is_null($options['select_operations']) && str_in_array($options['select_operations'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectOperations']) && str_in_array($options['selectOperations'], $subselects_allowed_outputs)){
 			$operations = array();
 			$operationids = array();
 			$sql = 'SELECT o.* '.
@@ -460,29 +460,29 @@ COpt::memoryPick();
 				$sql = 'SELECT operationid, default_msg, subject, message, mediatypeid'.
 						' FROM opmessage'.
 						' WHERE '.DBcondition('operationid', $opmessage);
-				$db_result = DBselect($sql);
-				while($result = DBfetch($db_result)){
-					$operations[$result['operationid']]['opmessage'] = $result;
+				$db_opmessages = DBselect($sql);
+				while($db_opmessage = DBfetch($db_opmessages)){
+					$operations[$db_opmessage['operationid']]['opmessage'] = $db_opmessage;
 				}
 
 				$sql = 'SELECT operationid, usrgrpid'.
 						' FROM opmessage_grp'.
 						' WHERE '.DBcondition('operationid', $opmessage);
-				$db_result = DBselect($sql);
-				while($result = DBfetch($db_result)){
-					if(!isset($operation[$result['operationid']]['opmessage_grp']))
-						$operation[$result['operationid']]['opmessage_grp'] = array();
-					$operation[$result['operationid']]['opmessage_grp'][] = $result;
+				$db_opmessage_grp = DBselect($sql);
+				while($opmessage_grp = DBfetch($db_opmessage_grp)){
+					if(!isset($operation[$opmessage_grp['operationid']]['opmessage_grp']))
+						$operation[$opmessage_grp['operationid']]['opmessage_grp'] = array();
+					$operation[$opmessage_grp['operationid']]['opmessage_grp'][] = $opmessage_grp;
 				}
 
 				$sql = 'SELECT operationid, userid'.
 						' FROM opmessage_usr'.
 						' WHERE '.DBcondition('operationid', $opmessage);
-				$db_result = DBselect($sql);
-				while($result = DBfetch($db_result)){
-					if(!isset($operation[$result['operationid']]['opmessage_usr']))
-						$operation[$result['operationid']]['opmessage_usr'] = array();
-					$operation[$result['operationid']]['opmessage_usr'][] = $result;
+				$db_opmessage_usr = DBselect($sql);
+				while($opmessage_usr = DBfetch($db_opmessage_usr)){
+					if(!isset($operation[$opmessage_usr['operationid']]['opmessage_usr']))
+						$operation[$opmessage_usr['operationid']]['opmessage_usr'] = array();
+					$operation[$opmessage_usr['operationid']]['opmessage_usr'][] = $opmessage_usr;
 				}
 			}
 
@@ -490,22 +490,22 @@ COpt::memoryPick();
 			if(!empty($opcommand)){
 				$sql = 'SELECT operationid, hostid, command'.
 						' FROM opcommand_hst'.
-						' WHERE '.DBcondition('operationid', $opmessage);
-				$db_result = DBselect($sql);
-				while($result = DBfetch($db_result)){
-					if(!isset($operations[$result['operationid']]['opcommand_hst']))
-						$operations[$result['operationid']]['opcommand_hst'] = array();
-					$operations[$result['operationid']]['opcommand_hst'][] = $result;
+						' WHERE '.DBcondition('operationid', $opcommand);
+				$db_opcommand_hst = DBselect($sql);
+				while($opcommand_hst = DBfetch($db_opcommand_hst)){
+					if(!isset($operations[$opcommand_hst['operationid']]['opcommand_hst']))
+						$operations[$opcommand_hst['operationid']]['opcommand_hst'] = array();
+					$operations[$opcommand_hst['operationid']]['opcommand_hst'][] = $opcommand_hst;
 				}
 
 				$sql = 'SELECT operationid, groupid, command'.
 						' FROM opcommand_grp'.
-						' WHERE '.DBcondition('operationid', $opmessage);
-				$db_result = DBselect($sql);
-				while($result = DBfetch($db_result)){
-					if(!isset($operations[$result['operationid']]['opcommand_grp']))
-						$operations[$result['operationid']]['opcommand_grp'] = array();
-					$operations[$result['operationid']]['opcommand_grp'][] = $result;
+						' WHERE '.DBcondition('operationid', $opcommand);
+				$db_opcommand_grp = DBselect($sql);
+				while($opcommand_grp = DBfetch($db_opcommand_grp)){
+					if(!isset($operations[$opcommand_grp['operationid']]['opcommand_grp']))
+						$operations[$opcommand_grp['operationid']]['opcommand_grp'] = array();
+					$operations[$opcommand_grp['operationid']]['opcommand_grp'][] = $opcommand_grp;
 				}
 			}
 
@@ -514,11 +514,11 @@ COpt::memoryPick();
 				$sql = 'SELECT operationid, groupid'.
 						' FROM opgroup'.
 						' WHERE '.DBcondition('operationid', $opmessage);
-				$db_result = DBselect($sql);
-				while($result = DBfetch($db_result)){
-					if(!isset($operations[$result['operationid']]['opgroup']))
-						$operations[$result['operationid']]['opgroup'] = array();
-					$operations[$result['operationid']]['opgroup'][] = $result;
+				$db_opgroup = DBselect($sql);
+				while($opgroup = DBfetch($db_opgroup)){
+					if(!isset($operations[$opgroup['operationid']]['opgroup']))
+						$operations[$opgroup['operationid']]['opgroup'] = array();
+					$operations[$opgroup['operationid']]['opgroup'][] = $opgroup;
 				}
 			}
 
@@ -527,11 +527,11 @@ COpt::memoryPick();
 				$sql = 'SELECT operationid, templateid'.
 						' FROM optemplate'.
 						' WHERE '.DBcondition('operationid', $opmessage);
-				$db_result = DBselect($sql);
-				while($result = DBfetch($db_result)){
-					if(!isset($operations[$result['operationid']]['optemplate']))
-						$operations[$result['operationid']]['optemplate'] = array();
-					$operations[$result['operationid']]['optemplate'][] = $result;
+				$db_optemplate = DBselect($sql);
+				while($optemplate = DBfetch($db_optemplate)){
+					if(!isset($operations[$optemplate['operationid']]['optemplate']))
+						$operations[$optemplate['operationid']]['optemplate'] = array();
+					$operations[$optemplate['operationid']]['optemplate'][] = $optemplate;
 				}
 			}
 
