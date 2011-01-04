@@ -1,3 +1,4 @@
+--------------------------------------------------------------------------------
 Changes for 1.9.2
 
 New features:
@@ -12,6 +13,7 @@ Bug fixes:
  - [ZBX-3326] sort po file contents and entries in POTFILES.in, include fuzzy entries in mo files (Richlv)
  - [ZBX-3054] fixed Cannot create or update Action with remote command; fix "reset() expects parameter 1 to be array, null given in /actionconf.php:754" (Vlad)
 
+--------------------------------------------------------------------------------
 Changes for 1.9.1
 
 New features:
@@ -36,6 +38,7 @@ Bug fixes:
 --------------------------------------------------------------------------------
 Changes for 1.9.0
 
+New features:
  - [DEV-477] added support of low-level discovery of file systems, network interfaces and SNMP OID's (Sasha,Vedmak)
  - [DEV-490] made graph legend optional (Aly)
  - [DEV-483] added templated screens (Aly)
@@ -47,6 +50,19 @@ Changes for 1.9.0
  - [DEV-449] added display of host time in screens (Aly)
  - [DEV-449] added system.localtime[local] check (Sasha)
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 1.8.5
+
+ - [ZBX-1419] don't print an informative message during upgrade if no orphan hosts were found (Richlv)
+
+Changes for 1.8.4
+
+1.8.4rc4 was released as 1.8.4 without any changes
+
+Changes for 1.8.4rc4
+
+ - [ZBX-3351] fixed broken support of 1.4.x style configuration file format for WEB interface (Vedmak)
 
 Changes for 1.8.4rc3
 
