@@ -2,35 +2,30 @@
 
 <script type="text/javascript">
 
-function showScriptDialog(question, buttons){
-	question = jQuery.trim(question.toString());
+function showScriptDialog(confirmation, buttons){
+	jQuery('#scriptDialog').text(confirmation);
+	var w = jQuery('#scriptDialog').outerWidth()+20;
 
-	if(question.charAt(question.length-1) != '?')
-		question += '?';
-
-	jQuery('#scriptDialog').text(question);
-		var w = jQuery('#scriptDialog').outerWidth()+20;
-
-		jQuery('#scriptDialog').dialog({
-			buttons: buttons,
-			draggable: false,
-			modal: true,
-			width: (w > 600 ? 600 : w),
-			resizable: false,
-			minWidth: 200,
-			minHeight: 100,
-			title: '<?php echo _('Execution confirmation');?>'
-		});
+	jQuery('#scriptDialog').dialog({
+		buttons: buttons,
+		draggable: false,
+		modal: true,
+		width: (w > 600 ? 600 : w),
+		resizable: false,
+		minWidth: 200,
+		minHeight: 100,
+		title: '<?php echo _('Execution confirmation');?>'
+	});
 
 	return jQuery('#scriptDialog').dialog('widget');
 }
 
-function executeScript(hostid, scriptid, question){
+function executeScript(hostid, scriptid, confirmation){
 	var execute = function(){
 		openWinCentered('scripts_exec.php?execute=1&hostid='+hostid+'&scriptid='+scriptid, 'Tools', 760, 540, "titlebar=no, resizable=yes, scrollbars=yes, dialog=no");
 	};
 
-	if(question == ''){
+	if(confirmation == ''){
 		execute();
 	}
 	else{
@@ -43,7 +38,9 @@ function executeScript(hostid, scriptid, question){
 				jQuery(this).dialog("destroy");
 			}}
 		];
-		showScriptDialog(question, buttons);
+		var d = showScriptDialog(confirmation, buttons);
+
+		jQuery(d).find('button:first').css('border-color', '#FA3');
 	}
 }
 

@@ -48,8 +48,8 @@ $fields = array(
 	'access'=>			array(T_ZBX_INT, O_OPT,  NULL,			IN('0,1,2,3'),	'isset({save})'),
 	'groupid'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,			DB_ID,		'isset({save})'),
 	'usrgrpid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,			DB_ID,		'isset({save})'),
-	'question'=>		array(T_ZBX_STR, O_OPT,  NULL,			NULL,	null),
-	'enableQuestion'=>	array(T_ZBX_STR, O_OPT,  NULL,			NULL,	null),
+	'confirmation'=>		array(T_ZBX_STR, O_OPT,  NULL,			NULL,	null),
+	'enableConfirmation'=>	array(T_ZBX_STR, O_OPT,  NULL,			NULL,	null),
 
 	'form'=>			array(T_ZBX_STR, O_OPT,  NULL,		  	NULL,		null),
 	'form_refresh'=>	array(T_ZBX_INT, O_OPT,	 NULL,			NULL,		null),
@@ -80,15 +80,15 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 		$cond = (isset($_REQUEST['scriptid']))?(' AND scriptid<>'.$_REQUEST['scriptid']):('');
 		$scripts = DBfetch(DBselect('SELECT count(scriptid) as cnt FROM scripts WHERE name='.zbx_dbstr($_REQUEST['name']).$cond.' and '.DBin_node('scriptid', get_current_nodeid(false)),1));
 
-		$question = get_request('question', '');
-		$enableQuestion = get_request('enableQuestion', false);
+		$confirmation = get_request('confirmation', '');
+		$enableConfirmation = get_request('enableConfirmation', false);
 
 		if($scripts && $scripts['cnt'] > 0){
 			error(_s('Script [%s] already exists.', htmlspecialchars($_REQUEST['name'])));
 			show_messages(null, S_ERROR, S_CANNOT_ADD_SCRIPT);
 		}
-		else if($enableQuestion && zbx_empty($question)){
-			error(_('Please input question'));
+		else if($enableConfirmation && zbx_empty($confirmation)){
+			error(_('Please input confirmation'));
 			show_messages(null, S_ERROR, S_CANNOT_ADD_SCRIPT);
 		}
 		else{
@@ -99,7 +99,7 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 				'usrgrpid' => $_REQUEST['usrgrpid'],
 				'groupid' => $_REQUEST['groupid'],
 				'host_access' => $_REQUEST['access'],
-				'question' => get_request('question', ''),
+				'confirmation' => get_request('confirmation', ''),
 			);
 
 			if(isset($_REQUEST['scriptid'])){

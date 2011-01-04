@@ -541,7 +541,7 @@ require_once('include/templates/scriptConfirm.js.php');
 					if( (bccomp($host_nodeid, $script_nodeid ) == 0)){
 						$str_tmp = zbx_jsvalue('javascript: executeScript('.$trigger_host['hostid'].', '.
 								$script['scriptid'].', '.
-								zbx_jsvalue($script['question']).
+								zbx_jsvalue($script['confirmation']).
 								')');
 
 						$menus.= "[".zbx_jsvalue($script['name']).", ".$str_tmp.", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";

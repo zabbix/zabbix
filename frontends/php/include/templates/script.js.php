@@ -4,33 +4,33 @@ jQuery(document).ready(function(){
 
 	jQuery("#name").focus();
 
-// question field typing
-	jQuery("#question").keyup(function(){
+// confirmation field typing
+	jQuery("#confirmation").keyup(function(){
 		if(this.value != ''){
-			jQuery("#testQuestion").removeAttr("disabled");
+			jQuery("#testConfirmation").removeAttr("disabled");
 		}
 		else{
-			jQuery("#testQuestion").attr("disabled", "disabled");
+			jQuery("#testConfirmation").attr("disabled", "disabled");
 		}
 	}).keyup();
 
 // checkbox changing
-	jQuery("#enableQuestion").change(function(){
+	jQuery("#enableConfirmation").change(function(){
 		if(this.checked){
-			jQuery("#question").removeAttr("disabled");
-			jQuery("#question").keyup();
+			jQuery("#confirmation").removeAttr("disabled");
+			jQuery("#confirmation").keyup();
 		}
 		else{
-			jQuery("#question").attr("disabled", "disabled");
-			jQuery("#testQuestion").attr("disabled", "disabled");
+			jQuery("#confirmation").attr("disabled", "disabled");
+			jQuery("#testConfirmation").attr("disabled", "disabled");
 		}
 	}).change();
 
 
-	jQuery("#testQuestion").click(function(){
+	jQuery("#testConfirmation").click(function(){
 		if(this.getAttribute('disabled')) return false;
 
-		var question = jQuery('#question').val();
+		var confirmation = jQuery('#confirmation').val();
 
 		var buttons = [
 			{text: '<?php echo _('Execute');?>', click: function(){} },
@@ -39,7 +39,7 @@ jQuery(document).ready(function(){
 			}}
 		];
 
-		var d = showScriptDialog(question, buttons);
+		var d = showScriptDialog(confirmation, buttons);
 		jQuery(d).find('button:first').attr('disabled', 'disabled').addClass('ui-state-disabled');
 		jQuery(d).find('button:last').focus();
 	});
