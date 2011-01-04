@@ -322,8 +322,8 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		if(isset($_REQUEST['actionid'])){
 			$options = array(
 				'actionids' => $_REQUEST['actionid'],
-				'select_operations' => API_OUTPUT_EXTEND,
-				'select_conditions' => API_OUTPUT_EXTEND,
+				'selectOperations' => API_OUTPUT_EXTEND,
+				'selectConditions' => API_OUTPUT_EXTEND,
 				'output' => API_OUTPUT_EXTEND
 			);
 			$actions = CAction::get($options);
@@ -400,15 +400,15 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			'filter' => array(
 				'eventsource' => array($_REQUEST['eventsource'])
 			),
-			'select_conditions' => API_OUTPUT_EXTEND,
-			'select_operations' => API_OUTPUT_EXTEND,
+			'selectConditions' => API_OUTPUT_EXTEND,
+			'selectOperations' => API_OUTPUT_EXTEND,
 			'editable' => 1,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
 		$actions = CAction::get($options);
-
+//SDII($actions);
 // sorting && paging
 		order_result($actions, $sortfield, $sortorder);
 		$paging = getPagingLine($actions);
