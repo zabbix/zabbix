@@ -701,7 +701,7 @@ function create_mon_trigger_menu(e, args, items){
 		if(!isset(itemid, items)) continue;
 		if(!isset('value_type', items[itemid])) continue;
 
-		//1, 2, 4 - charecter types
+		//1, 2, 4 - character types
 		if (items[itemid].value_type == '1' || items[itemid].value_type == '2' || items[itemid].value_type == '4'){
 			has_char_items = true;
 		}
@@ -716,7 +716,7 @@ function create_mon_trigger_menu(e, args, items){
 	if (has_char_items == has_int_items) {
 		history_section_caption = locale['S_HISTORY_AND_SIMPLE_GRAPHS'];
 	}
-	//we have only charecter items, so 'history' should be shown
+	//we have only character items, so 'history' should be shown
 	else if (has_char_items) {
 		history_section_caption = locale['S_HISTORY'];
 	}
