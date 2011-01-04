@@ -282,7 +282,7 @@ define('SHORT_DESCRITION', 1);
 function get_operation_desc($type=SHORT_DESCRITION, $data){
 	$result = null;
 
-SDII($data);
+//SDII($data);
 	if($type == SHORT_DESCRITION){
 		switch($data['operationtype']){
 			case OPERATION_TYPE_MESSAGE:

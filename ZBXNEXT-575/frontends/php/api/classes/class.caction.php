@@ -471,8 +471,8 @@ COpt::memoryPick();
 				$db_opmessage_grp = DBselect($sql);
 				while($opmessage_grp = DBfetch($db_opmessage_grp)){
 					if(!isset($operation[$opmessage_grp['operationid']]['opmessage_grp']))
-						$operation[$opmessage_grp['operationid']]['opmessage_grp'] = array();
-					$operation[$opmessage_grp['operationid']]['opmessage_grp'][] = $opmessage_grp;
+						$operations[$opmessage_grp['operationid']]['opmessage_grp'] = array();
+					$operations[$opmessage_grp['operationid']]['opmessage_grp'][] = $opmessage_grp;
 				}
 
 				$sql = 'SELECT operationid, userid'.
@@ -481,8 +481,8 @@ COpt::memoryPick();
 				$db_opmessage_usr = DBselect($sql);
 				while($opmessage_usr = DBfetch($db_opmessage_usr)){
 					if(!isset($operation[$opmessage_usr['operationid']]['opmessage_usr']))
-						$operation[$opmessage_usr['operationid']]['opmessage_usr'] = array();
-					$operation[$opmessage_usr['operationid']]['opmessage_usr'][] = $opmessage_usr;
+						$operations[$opmessage_usr['operationid']]['opmessage_usr'] = array();
+					$operations[$opmessage_usr['operationid']]['opmessage_usr'][] = $opmessage_usr;
 				}
 			}
 
