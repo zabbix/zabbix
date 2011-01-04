@@ -1,3 +1,15 @@
+Changes for 1.8.5
+
+ - [ZBX-1419] don't print an informative message during upgrade if no orphan hosts were found (Richlv)
+
+Changes for 1.8.4
+
+1.8.4rc4 was released as 1.8.4 without any changes
+
+Changes for 1.8.4rc4
+
+ - [ZBX-3351] fixed broken support of 1.4.x style configuration file format for WEB interface (Vedmak)
+
 Changes for 1.8.4rc3
 
  - [ZBX-3256] added automatic detection of fping command line option to use for specifying source IP address (asaveljevs)
