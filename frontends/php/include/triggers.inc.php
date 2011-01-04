@@ -1957,7 +1957,6 @@ return $caption;
 						' WHERE '.DBcondition('triggerid_down',$triggerids));
 
 		while($db_dep = DBfetch($db_deps)){
-			DBexecute('UPDATE triggers SET dep_level=dep_level-1 WHERE triggerid='.$db_dep['triggerid_up']);
 			DBexecute('DELETE FROM trigger_depends'.
 				' WHERE triggerid_up='.$db_dep['triggerid_up'].
 					' AND triggerid_down='.$db_dep['triggerid_down']);
