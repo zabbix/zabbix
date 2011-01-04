@@ -122,8 +122,7 @@ include_once('include/page_header.php');
 	$params = array(
 		'nodeids'=> get_current_nodeid(true),
 		'hostids' => $hostids,
-		'editable' => 1,
-		'searchByAny' => true
+		'editable' => 1
 	);
 	$rw_hosts = CHost::get($params);
 	$rw_hosts = zbx_toHash($rw_hosts,'hostid');
@@ -234,8 +233,7 @@ include_once('include/page_header.php');
 		'nodeids'=> get_current_nodeid(true),
 		'output' => API_OUTPUT_EXTEND,
 		'search' => array('name' => $search),
-		'limit' => $rows_per_page,
-		'searchByAny' => true
+		'limit' => $rows_per_page
 	);
 
 	$db_hostGroups = CHostGroup::get($params);
@@ -247,8 +245,7 @@ include_once('include/page_header.php');
 	$params = array(
 		'nodeids'=> get_current_nodeid(true),
 		'groupids' => $groupids,
-		'editable' => 1,
-		'searchByAny' => true
+		'editable' => 1
 	);
 
 	$rw_hostGroups = CHostGroup::get($params);
@@ -257,8 +254,7 @@ include_once('include/page_header.php');
 	$params = array(
 		'nodeids'=> get_current_nodeid(true),
 		'search' => array('name' => $search),
-		'countOutput' => 1,
-		'searchByAny' => true
+		'countOutput' => 1
 	);
 	$overalCount = CHostGroup::get($params);
 	$viewCount = count($hostGroups);
@@ -325,8 +321,7 @@ include_once('include/page_header.php');
 			'select_triggers' => API_OUTPUT_COUNT,
 			'select_graphs' => API_OUTPUT_COUNT,
 			'select_applications' => API_OUTPUT_COUNT,
-			'limit' => $rows_per_page,
-			'searchByAny' => true
+			'limit' => $rows_per_page
 		);
 		$db_templates = CTemplate::get($params);
 		order_result($db_templates, 'host');
@@ -337,8 +332,7 @@ include_once('include/page_header.php');
 		$params = array(
 			'nodeids'=> get_current_nodeid(true),
 			'templateids' => $templateids,
-			'editable' => 1,
-			'searchByAny' => true
+			'editable' => 1
 		);
 		$rw_templates = CTemplate::get($params);
 		$rw_templates = zbx_toHash($rw_templates,'templateid');
@@ -347,8 +341,7 @@ include_once('include/page_header.php');
 			'nodeids'=> get_current_nodeid(true),
 			'search' => array('host' => $search),
 			'countOutput' => 1,
-			'editable' => 1,
-			'searchByAny' => true
+			'editable' => 1
 		);
 
 		$overalCount = CTemplate::get($params);
