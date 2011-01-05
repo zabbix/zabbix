@@ -53,7 +53,7 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
-Changes for 1.8.5
+Changes for 1.8.5rc1
 
  - [ZBX-954] fix minor typos (Richlv)
  - [ZBX-1419] don't print an informative message during upgrade if no orphan hosts were found (Richlv)
