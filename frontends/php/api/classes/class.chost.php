@@ -1292,7 +1292,7 @@ Copt::memoryPick();
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for host [ %s ]', $host['host']));
 			}
 			// Check if host name isn't longer then 64 chars
-			if(zbx_strlen($host['host']) > 64){
+			if(!$delete && zbx_strlen($host['host']) > 64){
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host name must not be longer than %1$d characters, [ %2$s ] is %3$d', 64, $host['host'], zbx_strlen($host['host'])));
 			}
 
