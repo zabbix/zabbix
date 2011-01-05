@@ -1099,7 +1099,7 @@ function zbx_toCSV($array){
 	$delimiter = ',';
 
 	// new line separated with CR LF
-	$newline = "\r\n";
+	$newline = "\n";
 
 	// specific symbols, as:
 	// comma, semicolon, newline - insert in (");

@@ -185,7 +185,7 @@ else{
 		if(isset($_REQUEST['source'])) $frmForm->addVar('source', $_REQUEST['source']);
 		if(isset($_REQUEST['start'])) $frmForm->addVar('start', $_REQUEST['start']);
 		$buttons = new CDiv(array(
-			new CSubmit('csv_export', S_CSV_EXPORT),
+			new CSubmit('csv_export', _('Export to CSV')),
 		));
 		$buttons->useJQueryStyle();
 		$frmForm->addItem($buttons);
@@ -398,7 +398,7 @@ else{
 						zbx_date2str(S_EVENTS_DISCOVERY_TIME_FORMAT,$event_data['clock']),
 						$event_data['object_data']['ip'],
 						$event_data['description'],
-						discovery_value($event_data['value']) . '(' . discovery_value_style($event_data['value']) . ')'
+						discovery_value($event_data['value'])
 					);
 					$csv_return .= zbx_toCSV($tbHeader);
 				}
@@ -556,8 +556,8 @@ else{
 						is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
 						$_REQUEST['hostid'] == 0 ? $host['host'] : null,
 						$description,
-						trigger_value2str($event['value']) . '(' . get_trigger_value_style($event['value']) . ')',
-						get_severity_description($trigger['priority']).'('.get_severity_style($trigger['priority'],$event['value']).')',
+						trigger_value2str($event['value']),
+						get_severity_description($trigger['priority']),
 						$event['duration'],
 						($config['event_ack_enable'])? ($event['acknowledges']?S_YES:S_NO) :NULL, // ($config['event_ack_enable'])? $ack :NULL,
 						strip_tags( (string)$actions )
