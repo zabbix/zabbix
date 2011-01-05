@@ -26,6 +26,19 @@
 	require_once('include/discovery.inc.php');
 	require_once('include/html.inc.php');
 
+
+
+if(isset($_REQUEST['csv_export'])){
+	$CSV_EXPORT = true;
+
+	$page['type'] = detect_page_type(PAGE_TYPE_CSV);
+	$page['file'] = 'zbx_events_export.csv';
+
+	require_once('include/csv.inc.php');
+}
+else{
+	$CSV_EXPORT = false;
+
 	$page['title'] = 'S_LATEST_EVENTS';
 	$page['file'] = 'events.php';
 	$page['hist_arg'] = array('groupid','hostid');
@@ -36,6 +49,10 @@
 	if(PAGE_TYPE_HTML == $page['type']){
 		define('ZBX_PAGE_DO_REFRESH', 1);
 	}
+}
+
+
+
 
 	include_once('include/page_header.php');
 ?>
@@ -61,6 +78,8 @@
 
 		'load'=>			array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
 		'fullscreen'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
+// Export
+		'csv_export'=>				array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 // filter
 		'filter_rst'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
 		'filter_set'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
@@ -156,9 +175,26 @@
 
 	$events_wdgt->addHeader(S_EVENTS_BIG, $r_form);
 
+
+
+	// allow CVS export button
+	$frmForm = new CForm();
+		$frmForm->cleanItems();
+		if(isset($_REQUEST['groupid'])) $frmForm->addVar('groupid', $_REQUEST['groupid']);
+		if(isset($_REQUEST['hostid'])) $frmForm->addVar('hostid', $_REQUEST['hostid']);
+		if(isset($_REQUEST['source'])) $frmForm->addVar('source', $_REQUEST['source']);
+		if(isset($_REQUEST['start'])) $frmForm->addVar('start', $_REQUEST['start']);
+		$buttons = new CDiv(array(
+			new CSubmit('csv_export', S_CSV_EXPORT),
+		));
+		$buttons->useJQueryStyle();
+		$frmForm->addItem($buttons);
+
+
 	$numrows = new CDiv();
 	$numrows->setAttribute('name', 'numrows');
-	$events_wdgt->addHeader($numrows);
+	$events_wdgt->addHeader($numrows, $frmForm);
+
 // }}} HEADER
 
 
@@ -169,7 +205,7 @@
 		$filterForm = new CFormTable(null, null, 'get');//,'events.php?filter_set=1','POST',null,'sform');
 		$filterForm->setAttribute('name', 'zbx_filter');
 		$filterForm->setAttribute('id', 'zbx_filter');
-	
+
 		$filterForm->addVar('triggerid', get_request('triggerid', 0));
 		$filterForm->addVar('stime', get_request('stime'));
 		$filterForm->addVar('period', get_request('period'));
@@ -309,6 +345,18 @@
 				S_STATUS
 			));
 
+			if($CSV_EXPORT){
+				$csv_return = '';
+
+				$tbHeader = array(
+					S_TIME,
+					S_IP,
+					S_DESCRIPTION,
+					S_STATUS
+				);
+				$csv_return .= array2csv($tbHeader);
+			}
+
 			foreach($dsc_events as $num => $event_data){
 				switch($event_data['object']){
 					case EVENT_OBJECT_DHOST:
@@ -344,9 +392,22 @@
 					$event_data['description'],
 					new CCol(discovery_value($event_data['value']), discovery_value_style($event_data['value']))
 				));
+
+				if($CSV_EXPORT){
+					$tbHeader = array(
+						zbx_date2str(S_EVENTS_DISCOVERY_TIME_FORMAT,$event_data['clock']),
+						$event_data['object_data']['ip'],
+						$event_data['description'],
+						discovery_value($event_data['value']) . '(' . discovery_value_style($event_data['value']) . ')'
+					);
+					$csv_return .= array2csv($tbHeader);
+				}
+
+
 			}
 		}
 		else{
+
 			$table->setHeader(array(
 				S_TIME,
 				is_show_all_nodes()?S_NODE:null,
@@ -358,6 +419,24 @@
 				($config['event_ack_enable'])?S_ACK:NULL,
 				S_ACTIONS
 			));
+
+
+			if($CSV_EXPORT){
+				$csv_return = '';
+
+				$tbHeader = array(
+					S_TIME,
+					is_show_all_nodes()?S_NODE:null,
+					($_REQUEST['hostid'] == 0)?S_HOST:null,
+					S_DESCRIPTION,
+					S_STATUS,
+					S_SEVERITY,
+					S_DURATION,
+					($config['event_ack_enable'])?S_ACK:NULL,
+					S_ACTIONS
+				);
+				$csv_return .= array2csv($tbHeader);
+			}
 
 			$triggers = array();
 			if(($pageFilter->hostid > 0) || ($pageFilter->groupid > 0)){
@@ -420,6 +499,7 @@
 			$triggers = CTrigger::get($triggersOptions);
 			$triggers = zbx_toHash($triggers, 'triggerid');
 
+			$xx = 0;
 			foreach($events as $enum => $event){
 				$trigger = $triggers[$event['objectid']];
 				$host = reset($trigger['hosts']);
@@ -453,7 +533,6 @@
 				else
 					$event['duration'] = zbx_date2age($event['clock']);
 
-
 				$table->addRow(array(
 					new CLink(zbx_date2str(S_EVENTS_ACTION_TIME_FORMAT,$event['clock']),
 						'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid'],
@@ -468,8 +547,29 @@
 					($config['event_ack_enable'])?$ack:NULL,
 					$actions
 				));
-			}
 
+
+
+				if($CSV_EXPORT) {
+					$tbRows = array(
+						zbx_date2str(S_EVENTS_ACTION_TIME_FORMAT,$event['clock']),
+						is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
+						$_REQUEST['hostid'] == 0 ? $host['host'] : null,
+						$description,
+						trigger_value2str($event['value']) . '(' . get_trigger_value_style($event['value']) . ')',
+						get_severity_description($trigger['priority']).'('.get_severity_style($trigger['priority'],$event['value']).')',
+						$event['duration'],
+						($config['event_ack_enable'])? ($event['acknowledges']?S_YES:S_NO) :NULL, // ($config['event_ack_enable'])? $ack :NULL,
+						strip_tags( (string)$actions )
+					);
+					$csv_return .= array2csv($tbRows);
+				}
+			}
+		}
+
+		if($CSV_EXPORT){
+			echo $csv_return;
+			exit();
 		}
 
 		$table = array($paging, $table, $paging);

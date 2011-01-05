@@ -92,6 +92,7 @@
 	define('PAGE_TYPE_JSON_RPC',		7);	// api call
 	define('PAGE_TYPE_TEXT_FILE',		8);	// api call
 	define('PAGE_TYPE_TEXT',			9); // simple text
+	define('PAGE_TYPE_CSV',			10); // CSV format
 
 
 	define('ZBX_SESSION_ACTIVE',		0);
