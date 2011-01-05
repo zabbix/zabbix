@@ -73,7 +73,6 @@
 		case PAGE_TYPE_CSV:
 			header('Content-Type: text/csv; charset=UTF-8');
 			header('Content-Disposition: attachment; filename="'.$page['file'].'"');
-			//header('Content-Type: text/plain; charset=UTF-8');
 			if(!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
 			break;
 		case PAGE_TYPE_HTML:

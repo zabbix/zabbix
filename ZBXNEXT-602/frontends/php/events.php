@@ -34,7 +34,7 @@ if(isset($_REQUEST['csv_export'])){
 	$page['type'] = detect_page_type(PAGE_TYPE_CSV);
 	$page['file'] = 'zbx_events_export.csv';
 
-	require_once('include/csv.inc.php');
+	require_once('include/func.inc.php');
 }
 else{
 	$CSV_EXPORT = false;
@@ -354,7 +354,7 @@ else{
 					S_DESCRIPTION,
 					S_STATUS
 				);
-				$csv_return .= array2csv($tbHeader);
+				$csv_return .= zbx_toCSV($tbHeader);
 			}
 
 			foreach($dsc_events as $num => $event_data){
@@ -400,7 +400,7 @@ else{
 						$event_data['description'],
 						discovery_value($event_data['value']) . '(' . discovery_value_style($event_data['value']) . ')'
 					);
-					$csv_return .= array2csv($tbHeader);
+					$csv_return .= zbx_toCSV($tbHeader);
 				}
 
 
@@ -435,7 +435,7 @@ else{
 					($config['event_ack_enable'])?S_ACK:NULL,
 					S_ACTIONS
 				);
-				$csv_return .= array2csv($tbHeader);
+				$csv_return .= zbx_toCSV($tbHeader);
 			}
 
 			$triggers = array();
@@ -562,7 +562,7 @@ else{
 						($config['event_ack_enable'])? ($event['acknowledges']?S_YES:S_NO) :NULL, // ($config['event_ack_enable'])? $ack :NULL,
 						strip_tags( (string)$actions )
 					);
-					$csv_return .= array2csv($tbRows);
+					$csv_return .= zbx_toCSV($tbRows);
 				}
 			}
 		}

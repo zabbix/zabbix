@@ -1090,6 +1090,41 @@ function zbx_cleanHashes(&$value){
 
 return $value;
 }
+
+function zbx_toCSV($array){
+	$array = zbx_toArray($array);
+	$csv_str = '';
+
+	// (delimiter) — in USA is (,) and in EU and RU (;)
+	$delimiter = ',';
+
+	// new line separated with CR LF
+	$newline = "\r\n";
+
+	// specific symbols, as:
+	// comma, semicolon, newline - insert in (");
+	$reserved_char = array(",", ";", "\r\n", "\n", "\r");
+	$escape_char = array('","', '";"', '"\r\n"', '"\n"', '"\r"');
+
+	// each of the embedded double-quote characters must be represented by a pair of double-quote characters (" -> "")
+	$quote = '"';
+
+
+	$delim = '';
+	foreach($array as $value){
+		if( !is_null($value) ){
+			$value = str_replace($quote, ($quote.$quote), $value);
+			// $csv_str .= $delim . '"' . str_replace($reserved_char, $escape_char, $value) . '"';
+			$csv_str .= $delim . '"' . $value . '"';
+			$delim = $delimiter;
+		}
+	}
+
+	$csv_str .= $newline;
+
+	return $csv_str;
+}
+
 // }}} ARRAY FUNCTION
 function zbx_array_mintersect($keys, $array){
 	$result = array();
