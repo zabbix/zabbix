@@ -183,13 +183,37 @@ class CUser extends CZBXAPI{
 
 // filter
 		if(is_array($options['filter'])){
-			unset($options['filter']['passwd']);
+			try{
+				if($options['filter']['passwd']){
+					unset($options['filter']['passwd']);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('It is not possible to filter by user password') );
+				}
+				return true;
+			}
+			catch(APIException $e){
+				$error = $e->getErrors();
+				$error = reset($error);
+				self::setError(__METHOD__, $e->getCode(), $error);
+				return false;
+			}
 			zbx_db_filter('users u', $options, $sql_parts);
 		}
 
 // search
 		if(is_array($options['search'])){
-			unset($options['search']['passwd']);
+			try{
+				if($options['search']['passwd']){
+					unset($options['search']['passwd']);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('It is not possible to search by user password') );
+				}
+				return true;
+			}
+			catch(APIException $e){
+				$error = $e->getErrors();
+				$error = reset($error);
+				self::setError(__METHOD__, $e->getCode(), $error);
+				return false;
+			}
 			zbx_db_search('users u', $options, $sql_parts);
 		}
 
@@ -1104,8 +1128,6 @@ Copt::memoryPick();
 						' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);
 
 			$login = $user = DBfetch(DBselect($sql));
-			unset($user['passwd']);
-			unset($login['passwd']);
 		}
 
 /* update internal pass if it's different
@@ -1179,8 +1201,6 @@ Copt::memoryPick();
 				' AND s.userid = u.userid';
 
 		$login = $USER_DETAILS = DBfetch(DBselect($sql));
-		unset($USER_DETAILS['passwd']);
-		unset($login['passwd']);
 
 		if($login){
 			$login = (check_perm2login($USER_DETAILS['userid']) && check_perm2system($USER_DETAILS['userid']));
@@ -1232,8 +1252,6 @@ Copt::memoryPick();
 						' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);
 
 			$login = $USER_DETAILS = DBfetch(DBselect($sql));
-			unset($USER_DETAILS['passwd']);
-			unset($login['passwd']);
 
 			if(!$USER_DETAILS){
 				$incorrect_session = true;
@@ -1249,8 +1267,6 @@ Copt::memoryPick();
 				' WHERE u.alias='.zbx_dbstr(ZBX_GUEST_USER).
 					' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);
 			$login = $USER_DETAILS = DBfetch(DBselect($sql));
-			unset($USER_DETAILS['passwd']);
-			unset($login['passwd']);
 
 			if(!$USER_DETAILS){
 				$missed_user_guest = true;
