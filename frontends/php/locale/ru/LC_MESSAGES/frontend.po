@@ -2,14 +2,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-02 23:38+0200\n"
+"POT-Creation-Date: 2011-01-05 14:47+0200\n"
 "PO-Revision-Date: 2011-01-02 23:37+0300\n"
 "Last-Translator: Oleksiy Zagorskyi <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
-"Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Poedit-Basepath: ../../\n"
 
@@ -830,7 +830,7 @@ msgstr "Не удалось добавить правило обнаружени
 msgid "Cannot add graph"
 msgstr "Не удалось добавить график"
 
-#: ../api/classes/class.chost.php:1722 ../include/locales/en_gb.inc.php:1882
+#: ../api/classes/class.chost.php:1726 ../include/locales/en_gb.inc.php:1882
 msgid "Cannot add group"
 msgstr "Не удалось добавить группу"
 
@@ -846,7 +846,7 @@ msgstr "Не удалось добавить изображение"
 msgid "Cannot add item"
 msgstr "Не удалось добавить элемент данных"
 
-#: ../api/classes/class.chost.php:1840 ../api/classes/class.ctemplate.php:1546
+#: ../api/classes/class.chost.php:1844 ../api/classes/class.ctemplate.php:1546
 #: ../include/locales/en_gb.inc.php:873
 msgid "Cannot add macro"
 msgstr "Не удалось добавить макрос"
@@ -939,7 +939,7 @@ msgstr "Не удалось скопировать элементы"
 msgid "Cannot create application"
 msgstr "Не удалось создать группу элементов данных"
 
-#: ../api/classes/class.chost.php:1917
+#: ../api/classes/class.chost.php:1921
 msgid "Cannot create extended profile"
 msgstr ""
 
@@ -960,7 +960,7 @@ msgstr "Невозможно удалить группу элементов да
 msgid "Cannot delete discovery rule"
 msgstr "Не удалось удалить правило обнаружения"
 
-#: ../api/classes/class.chost.php:1897
+#: ../api/classes/class.chost.php:1901
 msgid "Cannot delete extended profile"
 msgstr ""
 
@@ -1013,7 +1013,7 @@ msgstr "Не удалось удалить карту сети"
 msgid "Cannot delete node"
 msgstr "Не удалось удалить ноду"
 
-#: ../api/classes/class.chost.php:1852
+#: ../api/classes/class.chost.php:1856
 msgid "Cannot delete profile"
 msgstr ""
 
@@ -1137,7 +1137,7 @@ msgstr "Не удается связать сервис с самим собой
 msgid "Cannot link template"
 msgstr "Не удалось присоединить шаблон"
 
-#: ../api/classes/class.chost.php:1669
+#: ../api/classes/class.chost.php:1673
 msgid "Cannot mass update host name"
 msgstr ""
 
@@ -1145,13 +1145,13 @@ msgstr ""
 msgid "Cannot mass update template name"
 msgstr ""
 
-#: ../api/classes/class.chost.php:1731
+#: ../api/classes/class.chost.php:1735
 msgid "Cannot remove group"
 msgstr ""
 
-#: ../api/classes/class.chost.php:1824 ../config.php:542
+#: ../api/classes/class.chost.php:1828 ../config.php:542
 msgid "Cannot remove macro"
-msgstr ""
+msgstr "Не удалось удалить макрос"
 
 #: ../include/locales/en_gb.inc.php:2455
 msgid "Cannot rename guest user"
@@ -1265,7 +1265,7 @@ msgstr "Не удалось обновить режим отладки"
 msgid "Cannot update discovery rule"
 msgstr "Не удалось обновить правило обнаружения"
 
-#: ../api/classes/class.chost.php:1939
+#: ../api/classes/class.chost.php:1943
 msgid "Cannot update extended profile"
 msgstr ""
 
@@ -1293,10 +1293,10 @@ msgstr "Не удалось обновить изображение"
 msgid "Cannot update item"
 msgstr "Не удалось обновить элемент данных"
 
-#: ../api/classes/class.chost.php:1831 ../api/classes/class.ctemplate.php:1537
+#: ../api/classes/class.chost.php:1835 ../api/classes/class.ctemplate.php:1537
 #: ../config.php:547
 msgid "Cannot update macro"
-msgstr ""
+msgstr "Не удалось обновить макрос"
 
 #: ../include/locales/en_gb.inc.php:871
 msgid "Cannot update macros"
@@ -1314,7 +1314,7 @@ msgstr "Не удалось обновить карту сети"
 msgid "Cannot update node"
 msgstr "Не удалось обновить ноду"
 
-#: ../api/classes/class.chost.php:1885
+#: ../api/classes/class.chost.php:1889
 msgid "Cannot update profile"
 msgstr ""
 
@@ -2119,7 +2119,7 @@ msgstr "Удалить выбранные регулярные выражени�
 
 #: ../screenconf.php:360
 msgid "Delete selected screens?"
-msgstr ""
+msgstr "Удалить выбранные комплексные экраны?"
 
 #: ../include/locales/en_gb.inc.php:1984
 msgid "Delete selected scripts?"
@@ -2734,7 +2734,7 @@ msgstr "Ошибка при добавлении времени сервиса"
 
 #: ../include/locales/en_gb.inc.php:2224
 msgid "Error in item key:"
-msgstr ""
+msgstr "Ошибка в ключе элемента данных:"
 
 #: ../api/classes/class.cdiscoveryrule.php:574
 #: ../api/classes/class.citem.php:930
@@ -3466,7 +3466,7 @@ msgstr "Роутер хоста"
 msgid "Host Subnet Mask"
 msgstr "Маска подсети хоста"
 
-#: ../api/classes/class.chost.php:2161
+#: ../api/classes/class.chost.php:2165
 #, php-format
 msgid "Host [%1$s] deleted."
 msgstr ""
@@ -3519,6 +3519,11 @@ msgstr ""
 msgid "Host name"
 msgstr "Имя узла сети"
 
+#: ../api/classes/class.chost.php:1296
+#, php-format
+msgid "Host name must not be longer than %1$d characters, [ %2$s ] is %3$d"
+msgstr ""
+
 #: ../include/locales/en_gb.inc.php:1002
 msgid "Host profile"
 msgstr "Профиль узла сети"
@@ -3547,10 +3552,10 @@ msgstr "Шаблон узла сети"
 msgid "Host time"
 msgstr ""
 
-#: ../api/classes/class.chost.php:1501 ../api/classes/class.chost.php:1506
-#: ../api/classes/class.chost.php:1511 ../api/classes/class.chost.php:1520
+#: ../api/classes/class.chost.php:1505 ../api/classes/class.chost.php:1510
+#: ../api/classes/class.chost.php:1515 ../api/classes/class.chost.php:1524
 msgid "Host update failed"
-msgstr ""
+msgstr "Ошибка при обновлении узла сети"
 
 #: ../include/locales/en_gb.inc.php:900
 msgid "Host updated"
@@ -3888,7 +3893,7 @@ msgstr ""
 msgid "Incorrect characters used for DNS"
 msgstr "В DNS использованы некорректные символы"
 
-#: ../api/classes/class.chost.php:1329
+#: ../api/classes/class.chost.php:1333
 #, php-format
 msgid "Incorrect characters used for Host name [ %s ]"
 msgstr ""
@@ -3897,7 +3902,7 @@ msgstr ""
 msgid "Incorrect characters used for Hostname"
 msgstr "В имени узла сети использованы некорректные символы"
 
-#: ../api/classes/class.chost.php:1693 ../api/classes/class.ctemplate.php:1376
+#: ../api/classes/class.chost.php:1697 ../api/classes/class.ctemplate.php:1376
 #, php-format
 msgid "Incorrect characters used for Hostname [ %s ]"
 msgstr ""
@@ -3942,7 +3947,7 @@ msgstr "Некорректное состояние обнаружения"
 
 #: ../include/locales/en_gb.inc.php:422
 msgid "Incorrect escalation period"
-msgstr ""
+msgstr "Некорректный период эскалации"
 
 #: ../include/locales/en_gb.inc.php:582
 msgid "Incorrect expression"
@@ -4163,7 +4168,7 @@ msgstr "Ошибочный порт SNMP"
 
 #: ../include/items.inc.php:1503
 msgid "Invalid key format"
-msgstr ""
+msgstr "Ошибочный формат ключа"
 
 #: ../include/locales/en_gb.inc.php:2494
 msgid "Inventory"
@@ -4356,7 +4361,7 @@ msgstr "Ключ"
 
 #: ../include/items.inc.php:1320
 msgid "Key cannot be empty"
-msgstr ""
+msgstr "Ключ не может быть пустым"
 
 #: ../include/locales/en_gb.inc.php:2214
 msgid "Key does not match"
@@ -4365,13 +4370,13 @@ msgstr "Ключ не совпадает"
 #: ../include/items.inc.php:1328
 #, php-format
 msgid "Key is too large: maximum %d characters"
-msgstr ""
+msgstr "Ключ слишком большой: максимально %d символов"
 
 #: ../include/items.inc.php:1350 ../include/items.inc.php:1390
 #: ../include/items.inc.php:1412 ../include/items.inc.php:1443
 #: ../include/items.inc.php:1493
 msgid "Key is valid"
-msgstr ""
+msgstr "Ключ правильный"
 
 #: ../include/locales/en_gb.inc.php:2113
 msgid "Keyword"
@@ -5286,12 +5291,12 @@ msgstr "Графики не заданы"
 msgid "No groups defined"
 msgstr "Группы не заданы"
 
-#: ../api/classes/class.chost.php:1303 ../api/classes/class.chost.php:1313
+#: ../api/classes/class.chost.php:1307 ../api/classes/class.chost.php:1317
 #, php-format
 msgid "No groups for host [ %s ]"
 msgstr ""
 
-#: ../api/classes/class.chost.php:1661
+#: ../api/classes/class.chost.php:1665
 msgid "No groups for hosts"
 msgstr ""
 
@@ -5332,7 +5337,7 @@ msgstr "Нет рисунка"
 msgid "No images defined"
 msgstr "Изображения не заданы"
 
-#: ../api/classes/class.chost.php:1306 ../api/classes/class.chost.php:1324
+#: ../api/classes/class.chost.php:1310 ../api/classes/class.chost.php:1328
 #, php-format
 msgid "No interfaces for host [ %s ]"
 msgstr ""
@@ -5775,7 +5780,7 @@ msgstr "Только Супер-Администраторы могут удал
 #. GETTEXT: Api exception
 #: ../api/classes/class.cusergroup.php:702
 msgid "Only Super Admins can delete User Groups."
-msgstr ""
+msgstr "Только Супер-Администраторы могут удалять Группы Пользователей."
 
 #: ../include/locales/en_gb.inc.php:2445
 msgid "Only Super Admins can delete Users"
@@ -6709,7 +6714,7 @@ msgstr "Запланировать"
 
 #: ../include/locales/en_gb.inc.php:89
 msgid "Schema"
-msgstr ""
+msgstr "Схема"
 
 #: ../include/locales/en_gb.inc.php:1596
 msgid "Screen"
@@ -7702,13 +7707,13 @@ msgstr "Триггер [%1$s:%2$s] не имеет прототипа элеме
 msgid "Trigger [%1$s:%2$s] unlinked."
 msgstr ""
 
-#: ../api/classes/class.ctrigger.php:1600
+#: ../api/classes/class.ctrigger.php:1601
 #, php-format
 msgid "Trigger [%1$s:%2$s] updated."
 msgstr ""
 
-#: ../api/classes/class.ctrigger.php:1687
-#: ../api/classes/class.ctrigger.php:1722
+#: ../api/classes/class.ctrigger.php:1688
+#: ../api/classes/class.ctrigger.php:1723
 #: ../api/classes/class.ctriggerprototype.php:1523
 #: ../api/classes/class.ctriggerprototype.php:1558
 #, php-format
@@ -7789,8 +7794,8 @@ msgstr "Триггер обновлен"
 msgid "Trigger value"
 msgstr "Значение триггера"
 
-#: ../api/classes/class.ctrigger.php:1691
-#: ../api/classes/class.ctrigger.php:1725
+#: ../api/classes/class.ctrigger.php:1692
+#: ../api/classes/class.ctrigger.php:1726
 #: ../api/classes/class.ctriggerprototype.php:1527
 #: ../api/classes/class.ctriggerprototype.php:1561
 msgid "Trigger with same name but other type exists"
@@ -8159,7 +8164,7 @@ msgstr "Группе пользователей"
 #: ../api/classes/class.cusergroup.php:715
 #, php-format
 msgid "User group [%1$s] is used in script [%2$s]."
-msgstr ""
+msgstr "Группа пользователей [%1$s] используется в скрипте [%2$s]."
 
 #: ../include/locales/en_gb.inc.php:556
 msgid "User group for database down message"
@@ -8224,6 +8229,11 @@ msgstr "ПРЕОБРАЗОВАНИЕ ЗНАЧЕНИЙ"
 #: ../include/locales/en_gb.inc.php:1459
 msgid "Value"
 msgstr "Значение"
+
+#: ../include/db.inc.php:1137 ../include/db.inc.php:1200
+#, php-format
+msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
+msgstr ""
 
 #: ../include/locales/en_gb.inc.php:504
 msgid "Value map"
@@ -8367,7 +8377,7 @@ msgstr "Без триггерами"
 
 #: ../include/locales/en_gb.inc.php:1161
 msgid "Wizard"
-msgstr ""
+msgstr "Мастер"
 
 #: ../include/locales/en_gb.inc.php:555
 msgid "Working time"
@@ -8523,9 +8533,9 @@ msgstr "Вы не можете удалить шаблон, группа эле�
 msgid "You cannot view this URL as a"
 msgstr "Вы не можете просмотреть этот URL как"
 
-#: ../api/classes/class.chost.php:1558
+#: ../api/classes/class.chost.php:1562
 msgid "You do not have enough rights for operation"
-msgstr ""
+msgstr "У вас нет полномочий для этой операции"
 
 #: ../include/locales/en_gb.inc.php:2511
 msgid "You do not have permission to perform this operation"
@@ -8901,18 +8911,18 @@ msgstr "некорректные параметры для"
 #: ../include/items.inc.php:1398 ../include/items.inc.php:1458
 #, php-format
 msgid "incorrect syntax near '%1$s' at position %2$d"
-msgstr ""
+msgstr "некорректный синтаксис рядом с '%1$s' с позиции %2$d"
 
 #: ../include/items.inc.php:1406 ../include/items.inc.php:1449
 #: ../include/items.inc.php:1487
 #, php-format
 msgid "incorrect usage of bracket symbols. '%s' found after final bracket."
-msgstr ""
+msgstr "некорректное использование символов скобок. '%s' найдено после закрывающей скобки."
 
 #: ../include/items.inc.php:1510
 #, php-format
 msgid "invalid character '%1$s' at position %2$d"
-msgstr ""
+msgstr "некорректный символ '%1$s' с позиции %2$d"
 
 #: ../include/locales/en_gb.inc.php:2397
 msgid "is a minimal PHP memory limitation"
@@ -9287,20 +9297,44 @@ msgstr "да"
 msgid "µ"
 msgstr "µ"
 
-#~ msgid "Hide unknown"
-#~ msgstr "Скрыть неизвестные"
+#~ msgid "(inherited from another template)."
+#~ msgstr "(унаследован из другого шаблона)."
 
-#~ msgid "Use IPMI"
-#~ msgstr "Использовать IPMI"
+#~ msgid "(items are not identical)."
+#~ msgstr "(элементы не идентичны)."
 
-#~ msgid "IPMI IP address"
-#~ msgstr "IP адрес IPMI"
+#~ msgid "(seconds)"
+#~ msgstr "(секунд)"
 
-#~ msgid "IPMI port"
-#~ msgstr "Порт IPMI"
+#~ msgid "Cannot delete user group used in a script:"
+#~ msgstr "Не удалось удалить группу пользователей используемую в скрипте:"
 
-#~ msgid "Edit trigger"
-#~ msgstr "Изменить триггер"
+#~ msgid "Cannot sync template"
+#~ msgstr "Не удалось синхронизировать шаблон"
+
+#~ msgid "Download speed for step \"%1$s\" of scenario \"%2$s\""
+#~ msgstr "Скорость загрузки для шага \"%1$s\" в сценарии \"%2$s\""
+
+#~ msgid "Graph \"%1$s\" already exists on \"%2$s\"."
+#~ msgstr "График \"%1$s\" уже существует в \"%2$s\"."
+
+#~ msgid "Host group \"%1$s\" can not be deleted, because it is used in script \"%2$s\"."
+#~ msgstr "Группа узлов сети \"%1$s\" не может быть удалена, т.к. используется в скрипте \"%2$s\"."
+
+#~ msgid "Item \"%s\" unlinked"
+#~ msgstr "Элемент данных \"%s\" отсоединен"
+
+#~ msgid "Response code for step \"%1$s\" of scenario \"%2$s\""
+#~ msgstr "Код ответа для шага \"%1$s\" в сценарии \"%2$s\""
+
+#~ msgid "Response time for step \"%1$s\" of scenario \"%2$s\""
+#~ msgstr "Время отклика для шага \"%1$s\" в сценарии \"%2$s\""
+
+#~ msgid "Trigger \"%s\" unlinked"
+#~ msgstr "Триггер \"%s\" отсоединен"
+
+#~ msgid "sec at"
+#~ msgstr "сек. в"
 
 #~ msgid "(year"
 #~ msgstr "(год"
@@ -9308,8 +9342,23 @@ msgstr "µ"
 #~ msgid ")"
 #~ msgstr ")"
 
+#~ msgid "Edit trigger"
+#~ msgstr "Изменить триггер"
+
+#~ msgid "Hide unknown"
+#~ msgstr "Скрыть неизвестные"
+
+#~ msgid "IPMI IP address"
+#~ msgstr "IP адрес IPMI"
+
+#~ msgid "IPMI port"
+#~ msgstr "Порт IPMI"
+
 #~ msgid "Spanish (SP)"
 #~ msgstr "Spanish (ES)"
+
+#~ msgid "Use IPMI"
+#~ msgstr "Использовать IPMI"
 
 #~ msgid "used in web scenario"
 #~ msgstr "используется в веб сценарии"
