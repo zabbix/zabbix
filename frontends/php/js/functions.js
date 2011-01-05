@@ -673,36 +673,36 @@ function create_mon_trigger_menu(e, args, items){
 	if((args.length > 1) && !is_null(args[1])) tr_menu.push(args[1]);
 	if((args.length > 1) && !is_null(args[2])) tr_menu.push(args[2]);
 
-	//getting info about types of items that we have
+	// getting info about types of items that we have
 	var has_char_items = false;
 	var has_int_items = false;
 
-	//checking every item
+	// checking every item
 	for(var itemid in items){
-		//if no info about type is given
+		// if no info about type is given
 		if(!isset(itemid, items)) continue;
 		if(!isset('value_type', items[itemid])) continue;
 
-		//1, 2, 4 - character types
+		// 1, 2, 4 - character types
 		if (items[itemid].value_type == '1' || items[itemid].value_type == '2' || items[itemid].value_type == '4'){
 			has_char_items = true;
 		}
-		//0, 3 - numeric types
+		// 0, 3 - numeric types
 		if (items[itemid].value_type == '0' || items[itemid].value_type == '3'){
 			has_int_items = true;
 		}
 	}
 
 	var history_section_caption = '';
-	//we have chars and numbers, or we have none (probably 'value_type' key was not set)
+	// we have chars and numbers, or we have none (probably 'value_type' key was not set)
 	if (has_char_items == has_int_items) {
 		history_section_caption = locale['S_HISTORY_AND_SIMPLE_GRAPHS'];
 	}
-	//we have only character items, so 'history' should be shown
+	// we have only character items, so 'history' should be shown
 	else if (has_char_items) {
 		history_section_caption = locale['S_HISTORY'];
 	}
-	//we have only numeric items, so 'simple graphs' should be shown
+	// we have only numeric items, so 'simple graphs' should be shown
 	else {
 		history_section_caption = locale['S_SIMPLE_GRAPHS'];
 	}
@@ -710,7 +710,7 @@ function create_mon_trigger_menu(e, args, items){
 
 	tr_menu.push([history_section_caption,null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}]);
 
-//	for(var i=0; i < items.length; i++){
+	// for(var i=0; i < items.length; i++){
 	for(var itemid in items){
 		if(!isset(itemid, items)) continue;
 		tr_menu.push([items[itemid].description,'history.php?action='+items[itemid].action+'&itemid='+items[itemid].itemid,null]);
