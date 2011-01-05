@@ -7,6 +7,7 @@ New features:
  - [ZBX-3338] updated Ukrainian translation; thanks to zalex_ua (Richlv)
 
 Bug fixes:
+ - [ZBX-2825] Make profiles form redirect to the last visited page on save or cancel (Vlad)
  - [ZBX-3367] fixed PHP Fatal error when trying to create screen (Vlad)
  - [ZBX-3354] fixed history clearing (Vlad)
  - [ZBX-3360] fixed add simple graph to screen (Vlad)
