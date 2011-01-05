@@ -1253,6 +1253,7 @@
 	'S_DOWN_BIG'=>		_('DOWN'),
 	'S_DISCOVERED_BIG'=>		_('DISCOVERED'),
 	'S_LOST_BIG'=>		_('LOST'),
+	'S_CSV_EXPORT' => _('Export to CSV'),
 
 //	events.inc.php
 	'S_EVENTS_EVENT_DETAILS_DATE_FORMAT'=>			_('d M Y H:i:s'),
