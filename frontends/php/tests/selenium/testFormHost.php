@@ -89,8 +89,7 @@ class testFormHost extends CTest
 		$this->wait();
 		$this->button_click('delete');
 		$this->waitForConfirmation();
-		$this->chooseOkOnNextConfirmation();
-		$this->getConfirmation();
+		$this->wait();
 		$this->assertTitle('Hosts');
 		$this->ok('Host deleted');
 	}
@@ -121,8 +120,7 @@ class testFormHost extends CTest
 		$this->click('link='.$this->host.'2');
 		$this->wait();
 		$this->button_click('delete');
-		$this->waitForConfirmation();
-		$this->chooseOkOnNextConfirmation();
+		$this->wait();
 		$this->getConfirmation();
 		$this->assertTitle('Hosts');
 		$this->ok('Host deleted');
@@ -154,8 +152,7 @@ class testFormHost extends CTest
 		$this->click('link='.$this->host.'_fullclone');
 		$this->wait();
 		$this->button_click('delete');
-		$this->waitForConfirmation();
-		$this->chooseOkOnNextConfirmation();
+		$this->wait();
 		$this->getConfirmation();
 		$this->assertTitle('Hosts');
 		$this->ok('Host deleted');
