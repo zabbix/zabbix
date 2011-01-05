@@ -7,9 +7,10 @@ New features:
  - [ZBX-3338] updated Ukrainian translation; thanks to zalex_ua (Richlv)
 
 Bug fixes:
- - [ZBX-3354] history clearing does not work (Vlad)
- - [ZBX-3360] Cannot add simple graph to screen (Vlad)
- - [ZBX-3189] Trigger dependencies broken (Vlad)
+ - [ZBX-3367] fixed PHP Fatal error when trying to create screen (Vlad)
+ - [ZBX-3354] fixed history clearing (Vlad)
+ - [ZBX-3360] fixed add simple graph to screen (Vlad)
+ - [ZBX-3189] fixed trigger dependencies broken (Vlad)
  - [ZBX-3326] sort po file contents and entries in POTFILES.in, include fuzzy entries in mo files (Richlv)
  - [ZBX-3054] fixed Cannot create or update Action with remote command; fix "reset() expects parameter 1 to be array, null given in /actionconf.php:754" (Vlad)
 
