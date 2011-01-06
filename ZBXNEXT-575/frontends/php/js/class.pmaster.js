@@ -353,8 +353,9 @@ updateSortable: function(){
         forcePlaceholderSize: true,
         placeholder: 'widget ui-corner-all ui-sortable-placeholder',
         opacity: '0.8',
-		update: function(e, ui){ jQuery(".column").portletState("save", {"name": "dashboard"}); }
-	}).portletState("load", {"name": "dashboard"});
+		update: function(e, ui){jQuery(".column").portletState("save", {"name": "dashboard"});}
+	}).portletState("load", {"name": "dashboard"})
+	.children('div').children('div.header').addClass('move');
 
 	jQuery(".column").disableSelection();
 }
