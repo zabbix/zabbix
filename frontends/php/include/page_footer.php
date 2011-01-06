@@ -78,15 +78,14 @@
 		$post_script.= 'cookie.init();'."\n";
 		$post_script.= 'chkbxRange.init();'."\n";
 
-		$post_script.= 'var sizeCSS = "screen.normal.css"'."\n";
-		$post_script.= 'if(screen.width<1024) sizeCSS = "screen.tiny.css";'."\n";
-		$post_script.= 'else if(screen.width>1920) sizeCSS = "screen.huge.css";'."\n";
+		$post_script.= 'var sizeCSS = "screen.css"'."\n";
+		$post_script.= 'if(screen.width<1024) sizeCSS = "handheld.css";'."\n";
 		$post_script.= 'jQuery("head").append(\'<link rel="stylesheet" type="text/css" href="styles/\'+sizeCSS+\'" />\');';
 
 		$post_script.='});'."\n";
 
 		if(!defined('ZBX_PAGE_NO_MENU') && !defined('ZBX_PAGE_NO_FOOTER')){
-			$table = new CTable(NULL,"textwhite bold maxwidth page_footer");
+			$table = new CTable(NULL,"textwhite bold maxwidth ui-widget-header ui-corner-all page_footer");
 			$table->setCellSpacing(0);
 			$table->setCellPadding(1);
 			$table->addRow(array(

@@ -309,7 +309,7 @@ function make_system_status($filter){
 // Unknown triggers
 					$unknown = SPACE;
 					if($trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN){
-						$unknown = new CDiv(SPACE,'iconunknown');
+						$unknown = new CDiv(SPACE,'status_icon iconunknown');
 						$unknown->setHint($trigger['error'], '', 'on');
 					}
 //----
@@ -349,7 +349,7 @@ function make_system_status($filter){
 // Unknown triggers
 					$unknown = SPACE;
 					if($trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN){
-						$unknown = new CDiv(SPACE,'iconunknown');
+						$unknown = new CDiv(SPACE,'status_icon iconunknown');
 						$unknown->setHint($trigger['error'], '', 'on');
 					}
 //----
@@ -942,7 +942,7 @@ function make_latest_issues($filter = array()){
 // Unknown triggers
 		$unknown = SPACE;
 		if($trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN){
-			$unknown = new CDiv(SPACE,'iconunknown');
+			$unknown = new CDiv(SPACE,'status_icon iconunknown');
 			$unknown->setHint($trigger['error'], '', 'on');
 		}
 //----

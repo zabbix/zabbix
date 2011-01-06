@@ -412,16 +412,6 @@ $right_col = array();
 
 	add_doll_objects($refresh_tab);
 
-/*
-	$right_tab->addRow(create_hat(
-			S_GRAPH,
-			null,//make_webmon_overview(),
-			null,
-			'hat_custom',
-			CProfile::get('web.dashboard.hats.hat_custom.state',1)
-		));
-*/
-
 	$leftDiv = new CDiv($left_col, 'column');
 	$middleDiv = new CDiv($right_col, 'column');
 	$rightDiv = new CDiv(null, 'column');

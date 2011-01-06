@@ -243,40 +243,40 @@ include_once('include/page_header.php');
 
 		switch($host['available']){
 			case HOST_AVAILABLE_TRUE:
-				$zbx_available = new CDiv(SPACE, 'iconzbxavailable');
+				$zbx_available = new CDiv(SPACE, 'status_icon iconzbxavailable');
 				break;
 			case HOST_AVAILABLE_FALSE:
-				$zbx_available = new CDiv(SPACE, 'iconzbxunavailable');
+				$zbx_available = new CDiv(SPACE, 'status_icon iconzbxunavailable');
 				$zbx_available->setHint($host['error'], '', 'on');
 				break;
 			case HOST_AVAILABLE_UNKNOWN:
-				$zbx_available = new CDiv(SPACE, 'iconzbxunknown');
+				$zbx_available = new CDiv(SPACE, 'status_icon iconzbxunknown');
 				break;
 		}
 
 		switch($host['snmp_available']){
 			case HOST_AVAILABLE_TRUE:
-				$snmp_available = new CDiv(SPACE, 'iconsnmpavailable');
+				$snmp_available = new CDiv(SPACE, 'status_icon iconsnmpavailable');
 				break;
 			case HOST_AVAILABLE_FALSE:
-				$snmp_available = new CDiv(SPACE, 'iconsnmpunavailable');
+				$snmp_available = new CDiv(SPACE, 'status_icon iconsnmpunavailable');
 				$snmp_available->setHint($host['snmp_error'], '', 'on');
 				break;
 			case HOST_AVAILABLE_UNKNOWN:
-				$snmp_available = new CDiv(SPACE, 'iconsnmpunknown');
+				$snmp_available = new CDiv(SPACE, 'status_icon iconsnmpunknown');
 				break;
 		}
 
 		switch($host['ipmi_available']){
 			case HOST_AVAILABLE_TRUE:
-				$ipmi_available = new CDiv(SPACE, 'iconipmiavailable');
+				$ipmi_available = new CDiv(SPACE, 'status_icon iconipmiavailable');
 				break;
 			case HOST_AVAILABLE_FALSE:
-				$ipmi_available = new CDiv(SPACE, 'iconipmiunavailable');
+				$ipmi_available = new CDiv(SPACE, 'status_icon iconipmiunavailable');
 				$ipmi_available->setHint($host['ipmi_error'], '', 'on');
 				break;
 			case HOST_AVAILABLE_UNKNOWN:
-				$ipmi_available = new CDiv(SPACE, 'iconipmiunknown');
+				$ipmi_available = new CDiv(SPACE, 'status_icon iconipmiunknown');
 				break;
 		}
 
