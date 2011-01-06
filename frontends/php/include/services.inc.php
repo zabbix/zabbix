@@ -534,26 +534,6 @@ if($serviceid == 1 || $serviceid == 2){
 	return $sla_time;
 	}
 
-	// function get_service_status_description($status){
-		// $desc=new CSpan(S_OK_BIG,'green');
-		// if(TRIGGER_SEVERITY_DISASTER == $status){
-			// $desc=new CTag('div','yes',S_DISASTER,'disaster');
-		// }
-		// else if(TRIGGER_SEVERITY_HIGH == $status){
-			// $desc=new CTag('div','yes',S_SERIOUS_PROBLEM,'high');
-		// }
-		// else if(TRIGGER_SEVERITY_AVERAGE == $status){
-			// $desc=new CTag('div','yes',S_AVERAGE_PROBLEM,'average');
-		// }
-		// else if(TRIGGER_SEVERITY_WARNING == $status){
-			// $desc=new CTag('div','yes',S_MINOR_PROBLEM,'warning');
-		// }
-		// else if(TRIGGER_SEVERITY_INFORMATION == $status){
-			// $desc=new CSpan(S_OK_BIG,'green');
-		// }
-	// return $desc;
-	// }
-
 	function get_service_by_serviceid($serviceid){
 		$res = DBfetch(DBselect("SELECT * FROM services WHERE serviceid=".$serviceid));
 		if(!$res)

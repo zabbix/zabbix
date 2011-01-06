@@ -77,25 +77,29 @@
 
 		$post_script.= 'cookie.init();'."\n";
 		$post_script.= 'chkbxRange.init();'."\n";
-		$post_script.= 'if(IE6){ie6pngfix.run(false);}'."\n";
+
+		$post_script.= 'var sizeCSS = "screen.normal.css"'."\n";
+		$post_script.= 'if(screen.width<1024) sizeCSS = "screen.tiny.css";'."\n";
+		$post_script.= 'else if(screen.width>1920) sizeCSS = "screen.huge.css";'."\n";
+		$post_script.= 'jQuery("head").append(\'<link rel="stylesheet" type="text/css" href="styles/\'+sizeCSS+\'" />\');';
 
 		$post_script.='});'."\n";
 
 		if(!defined('ZBX_PAGE_NO_MENU') && !defined('ZBX_PAGE_NO_FOOTER')){
-			$table = new CTable(NULL,"page_footer");
+			$table = new CTable(NULL,"textwhite bold maxwidth page_footer");
 			$table->setCellSpacing(0);
 			$table->setCellPadding(1);
 			$table->addRow(array(
 				new CCol(new CLink(
 					S_ZABBIX.SPACE.ZABBIX_VERSION.SPACE.S_COPYRIGHT_BY.SPACE.S_SIA_ZABBIX,
 					'http://www.zabbix.com', 'highlight', null, true),
-					'page_footer_l'),
+					'center'),
 				new CCol(array(
 						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE,'divider'),
 						new CSpan(($USER_DETAILS['userid'] == 0)?S_NOT_CONNECTED:S_CONNECTED_AS.SPACE."'".$USER_DETAILS['alias']."'".
 						(ZBX_DISTRIBUTED ? SPACE.S_FROM_SMALL.SPACE."'".$USER_DETAILS['node']['name']."'" : ''),'footer_sign')
 					),
-					'page_footer_r')
+					'right')
 				));
 			$table->show();
 		}

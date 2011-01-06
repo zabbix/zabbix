@@ -334,6 +334,9 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 					$operation_data['mediatypeid'] = $db_opmtype['mediatypeid'];
 			}
 			unset($operation_data);
+
+SDII($action);
+SDII($_REQUEST);
 		}
 
 		if(isset($action['actionid']) && !isset($_REQUEST['form_refresh'])){

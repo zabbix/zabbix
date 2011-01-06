@@ -457,39 +457,37 @@ COpt::memoryPick();
 
 // get OPERATION_TYPE_MESSAGE data
 			if(!empty($opmessage)){
-				$sql = 'SELECT operationid, default_msg, subject, message, mediatypeid'.
-						' FROM opmessage'.
+				$sql = 'SELECT operationid, default_msg, subject, message, mediatypeid '.
+						' FROM opmessage '.
 						' WHERE '.DBcondition('operationid', $opmessage);
 				$db_opmessages = DBselect($sql);
 				while($db_opmessage = DBfetch($db_opmessages)){
+					$operations[$db_opmessage['operationid']]['opmessage_grp'] = array();
+					$operations[$db_opmessage['operationid']]['opmessage_usr'] = array();
 					$operations[$db_opmessage['operationid']]['opmessage'] = $db_opmessage;
 				}
 
-				$sql = 'SELECT operationid, usrgrpid'.
-						' FROM opmessage_grp'.
+				$sql = 'SELECT operationid, usrgrpid '.
+						' FROM opmessage_grp '.
 						' WHERE '.DBcondition('operationid', $opmessage);
 				$db_opmessage_grp = DBselect($sql);
 				while($opmessage_grp = DBfetch($db_opmessage_grp)){
-					if(!isset($operation[$opmessage_grp['operationid']]['opmessage_grp']))
-						$operations[$opmessage_grp['operationid']]['opmessage_grp'] = array();
 					$operations[$opmessage_grp['operationid']]['opmessage_grp'][] = $opmessage_grp;
 				}
 
-				$sql = 'SELECT operationid, userid'.
-						' FROM opmessage_usr'.
+				$sql = 'SELECT operationid, userid '.
+						' FROM opmessage_usr '.
 						' WHERE '.DBcondition('operationid', $opmessage);
 				$db_opmessage_usr = DBselect($sql);
 				while($opmessage_usr = DBfetch($db_opmessage_usr)){
-					if(!isset($operation[$opmessage_usr['operationid']]['opmessage_usr']))
-						$operations[$opmessage_usr['operationid']]['opmessage_usr'] = array();
 					$operations[$opmessage_usr['operationid']]['opmessage_usr'][] = $opmessage_usr;
 				}
 			}
 
 // get OPERATION_TYPE_COMMAND data
 			if(!empty($opcommand)){
-				$sql = 'SELECT operationid, hostid, command'.
-						' FROM opcommand_hst'.
+				$sql = 'SELECT operationid, hostid, command '.
+						' FROM opcommand_hst '.
 						' WHERE '.DBcondition('operationid', $opcommand);
 				$db_opcommand_hst = DBselect($sql);
 				while($opcommand_hst = DBfetch($db_opcommand_hst)){

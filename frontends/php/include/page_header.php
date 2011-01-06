@@ -134,7 +134,6 @@
 		$config=select_config();
 		if($css){
 			print('<link rel="stylesheet" type="text/css" href="styles/'.$css.'" />'."\n");
-			print('<!--[if IE 6]><link rel="stylesheet" type="text/css" href="styles/ie_'.$css.'" /><![endif]-->'."\n");
 		}
 
 		switch($css){
@@ -230,13 +229,12 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$logo = new CLink(new CDiv(SPACE,'zabbix_logo'),'http://www.zabbix.com/', 'image', null, 'nosid');
 		$logo->setTarget('_blank');
 
-		$td_r = new CCol($page_header_r_col, 'page_header_r');
-		$td_r->setAttribute('width','100%');
+		$td_r = new CCol($page_header_r_col, 'maxwidth page_header_r');
+		$top_page_row = array(new CCol($logo, 'page_header_l'), $td_r);
 
-		$top_page_row	= array(new CCol($logo, 'page_header_l'), $td_r);
 		unset($logo, $page_header_r_col, $help, $support);
 
-		$table = new CTable(NULL,'page_header');
+		$table = new CTable(NULL,'maxwidth page_header');
 		$table->setCellSpacing(0);
 		$table->setCellPadding(5);
 		$table->addRow($top_page_row);

@@ -551,7 +551,7 @@ include_once('include/page_header.php');
 				'");');
 
 			if(zbx_strlen($s['url']) > 70){
-				$url = new CTag('span','yes', substr($s['url'],0,35).SPACE.'...'.SPACE.substr($s['url'],zbx_strlen($s['url'])-25,25));
+				$url = new CSpan(substr($s['url'],0,35).SPACE.'...'.SPACE.substr($s['url'],zbx_strlen($s['url'])-25,25));
 				$url->setHint($s['url']);
 			}
 			else{

@@ -331,14 +331,14 @@
 
 // sorting
 	$esc_step_from = array();
-	$objects_tmp = array();
-	$objectids_tmp = array();
+	$esc_step_to = array();
+	$esc_period = array();
 	foreach($data['operations'] as $key => $operation) {
 		$esc_step_from[$key] = $operation['esc_step_from'];
-		$objects_tmp[$key] = $operation['object'];
-		$objectids_tmp[$key] = $operation['objectid'];
+		$esc_step_to[$key] = $operation['esc_step_to'];
+		$esc_period[$key] = $operation['esc_period'];
 	}
-	array_multisort($esc_step_from, SORT_ASC, SORT_NUMERIC, $objects_tmp, SORT_DESC, $objectids_tmp, SORT_ASC, $data['operations']);
+	array_multisort($esc_step_from, SORT_ASC, SORT_NUMERIC, $esc_step_to, SORT_ASC, $esc_period, SORT_ASC, $data['operations']);
 // --
 
 	$tblOper = new CTable(S_NO_OPERATIONS_DEFINED, 'formElementTable');
@@ -348,29 +348,29 @@
 	));
 
 	$delay = count_operations_delay($data['operations'],$data['esc_period']);
-	foreach($data['operations'] as $id => $condition){
-		if(!str_in_array($condition['operationtype'], $allowedOperations)) continue;
+	foreach($data['operations'] as $id => $operation){
+		if(!str_in_array($operation['operationtype'], $allowedOperations)) continue;
 
-		if(!isset($condition['default_msg'])) $condition['default_msg'] = 0;
-		if(!isset($condition['opconditions'])) $condition['opconditions'] = array();
-		if(!isset($condition['mediatypeid'])) $condition['mediatypeid'] = 0;
+		if(!isset($operation['default_msg'])) $operation['default_msg'] = 0;
+		if(!isset($operation['opconditions'])) $operation['opconditions'] = array();
+		if(!isset($operation['mediatypeid'])) $operation['mediatypeid'] = 0;
 
-		$oper_details = new CSpan(get_operation_desc(SHORT_DESCRITION, $condition));
-		$oper_details->setHint(nl2br(get_operation_desc(LONG_DESCRITION, $condition)));
+		$oper_details = new CSpan(get_operation_desc(SHORT_DESCRITION, $operation));
+		$oper_details->setHint(get_operation_desc(LONG_DESCRITION, $operation));
 
 		$esc_steps_txt = null;
 		$esc_period_txt = null;
 		$esc_delay_txt = null;
 
-		if($condition['esc_step_from'] < 1) $condition['esc_step_from'] = 1;
+		if($operation['esc_step_from'] < 1) $operation['esc_step_from'] = 1;
 
-		$esc_steps_txt = $condition['esc_step_from'].' - '.$condition['esc_step_to'];
+		$esc_steps_txt = $operation['esc_step_from'].' - '.$operation['esc_step_to'];
 // Display N-N as N
-		$esc_steps_txt = ($condition['esc_step_from']==$condition['esc_step_to'])?
-			$condition['esc_step_from']:$condition['esc_step_from'].' - '.$condition['esc_step_to'];
+		$esc_steps_txt = ($operation['esc_step_from']==$operation['esc_step_to'])?
+			$operation['esc_step_from']:$operation['esc_step_from'].' - '.$operation['esc_step_to'];
 
-		$esc_period_txt = $condition['esc_period']?$condition['esc_period']:S_DEFAULT;
-		$esc_delay_txt = $delay[$condition['esc_step_from']]?convert_units($delay[$condition['esc_step_from']],'uptime'):S_IMMEDIATELY;
+		$esc_period_txt = $operation['esc_period']?$operation['esc_period']:S_DEFAULT;
+		$esc_delay_txt = $delay[$operation['esc_step_from']]?convert_units($delay[$operation['esc_step_from']],'uptime'):S_IMMEDIATELY;
 
 		$tblOper->addRow(array(
 			new CCheckBox("g_operationid[]", 'no', null,$id),
@@ -381,19 +381,9 @@
 			new CSubmit('edit_operationid['.$id.']',S_EDIT, null, 'link_menu')
 		));
 
-		$tblOper->addItem(new CVar('operations['.$id.'][operationtype]'	,$condition['operationtype']));
-		$tblOper->addItem(new CVar('operations['.$id.'][object]'	,$condition['object']	));
-		$tblOper->addItem(new CVar('operations['.$id.'][objectid]'	,$condition['objectid']));
-		$tblOper->addItem(new CVar('operations['.$id.'][mediatypeid]'	,$condition['mediatypeid']));
-		$tblOper->addItem(new CVar('operations['.$id.'][shortdata]'	,$condition['shortdata']));
-		$tblOper->addItem(new CVar('operations['.$id.'][longdata]'	,$condition['longdata']));
-		$tblOper->addItem(new CVar('operations['.$id.'][esc_period]'	,$condition['esc_period']	));
-		$tblOper->addItem(new CVar('operations['.$id.'][esc_step_from]'	,$condition['esc_step_from']));
-		$tblOper->addItem(new CVar('operations['.$id.'][esc_step_to]'	,$condition['esc_step_to']));
-		$tblOper->addItem(new CVar('operations['.$id.'][default_msg]'	,$condition['default_msg']));
-		$tblOper->addItem(new CVar('operations['.$id.'][evaltype]'	,$condition['evaltype']));
+		$tblOper->addItem(new CVar('operations['.$id.']', $operation));
 
-		foreach($condition['opconditions'] as $opcondid => $opcond){
+		foreach($operation['opconditions'] as $opcondid => $opcond){
 			foreach($opcond as $field => $value)
 				$tblOper->addItem(new CVar('operations['.$id.'][opconditions]['.$opcondid.']['.$field.']',$value));
 		}

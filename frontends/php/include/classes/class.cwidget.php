@@ -119,7 +119,7 @@ private $flicker;
 			$icon_r->setAttribute('title',S_MAXIMIZE.'/'.S_MINIMIZE);
 			$icon_r->setAttribute('id','flicker_icon_r');
 
-			$icons_row = new CTable(null,'whitetext');
+			$icons_row = new CTable(null,'textwhite');
 			$icons_row->addRow(array($icon_l,new CSpan(SPACE.S_FILTER.SPACE),$icon_r));
 
 			$thin_tab = $this->createFlicker($icons_row);
