@@ -240,7 +240,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$table->addRow($top_page_row);
 		$table->show();
 
-		$menu_table = new CTable(NULL,'menu');
+		$menu_table = new CTable(NULL,'menu pointer');
 		$menu_table->setCellSpacing(0);
 		$menu_table->setCellPadding(5);
 		$menu_table->addRow($main_menu);
@@ -336,14 +336,10 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		}
 
 // 1st level menu
-		$table = new CTable();
-		$table->setCellSpacing(0);
-		$table->setCellPadding(0);
-		$table->setAttribute('style','width: 100%;');
+		$table = new CTable(null, 'maxwidth');
 
-		$r_col = new CCol($node_form);
-		$r_col->setAttribute('align','right');
-//		$r_col->setAttribute('style','text-align: right;');
+		$r_col = new CCol($node_form, 'right');
+		$r_col->setAttribute('style','line-height: 1.8em;');
 
 		$table->addRow(array($menu_table,$r_col));
 
@@ -354,9 +350,6 @@ COpt::compare_files_with_menu($ZBX_MENU);
 
 // 2nd level menu
 		$sub_menu_table = new CTable(NULL,'sub_menu maxwidth ui-widget-header');
-		$sub_menu_table->setCellSpacing(0);
-		$sub_menu_table->setCellPadding(5);
-
 		$menu_divs = array();
 		$menu_selected = false;
 		foreach($sub_menus as $label => $sub_menu){
@@ -406,9 +399,8 @@ COpt::compare_files_with_menu($ZBX_MENU);
 
 			$search_form->addItem(new CDiv(array(S_SEARCH_BIG.': ', $searchBox)));
 
-			$search_div = new CDiv($search_form);
+			$search_div = new CDiv($search_form, 'zbx_search');
 			$search_div->setAttribute('id','zbx_search');
-			$search_div->setAttribute('class','zbx_search');
 
 			zbx_add_post_js("var sid = createSuggest('search');");
 		}
@@ -423,7 +415,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 
 //------------------------------------- <HISTORY> ---------------------------------------
 	if(isset($page['hist_arg']) && ($USER_DETAILS['alias'] != ZBX_GUEST_USER) && ($page['type'] == PAGE_TYPE_HTML) && !defined('ZBX_PAGE_NO_MENU')){
-		$table = new CTable(null,'history');
+		$table = new CTable(null,'history left');
 		$table->setCellSpacing(0);
 		$table->setCellPadding(0);
 
