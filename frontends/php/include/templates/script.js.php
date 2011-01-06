@@ -8,9 +8,11 @@ jQuery(document).ready(function(){
 	jQuery("#confirmation").keyup(function(){
 		if(this.value != ''){
 			jQuery("#testConfirmation").removeAttr("disabled");
+			jQuery("#confirmationLabel").removeAttr("disabled");
 		}
 		else{
 			jQuery("#testConfirmation").attr("disabled", "disabled");
+			jQuery("#confirmationLabel").attr("disabled", "disabled");
 		}
 	}).keyup();
 
@@ -23,6 +25,7 @@ jQuery(document).ready(function(){
 		else{
 			jQuery("#confirmation").attr("disabled", "disabled");
 			jQuery("#testConfirmation").attr("disabled", "disabled");
+			jQuery("#confirmationLabel").attr("disabled", "disabled");
 		}
 	}).change();
 

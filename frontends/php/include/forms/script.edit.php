@@ -115,18 +115,17 @@
 
 // CONFIRMATION
 	$enableQuestCB = new CCheckBox('enableConfirmation', $enableConfirmation);
+	$scriptTab->addRow(new CLabel(_('Enable confirmation'), 'enableConfirmation'), array($enableQuestCB, SPACE));
 
 	$confirmationTB = new CTextBox('confirmation', $confirmation);
-	$confirmationTB->addStyle('width: 48em;');
+	$confirmationTB->addStyle('width: 50em;');
 	$confirmationTB->setAttribute('maxlength', 255);
 
 	$testLink = new CButton('testConfirmation', _('Test confirmation'), null, 'link_menu');
 
-	$scriptTab->addRow(new CLabel(_('Enable confirmation'), 'enableConfirmation'), array(
-		$enableQuestCB, SPACE,
-		$confirmationTB, SPACE,
-		$testLink
-	));
+	$confirmationLabel = new CLabel(_('Confirmation text'), 'confirmation');
+	$confirmationLabel->setAttribute('id', 'confirmationLabel');
+	$scriptTab->addRow($confirmationLabel, array($confirmationTB, SPACE, $testLink));
 
 	$scriptView = new CTabView();
 	$scriptView->addTab('scripts', _('Script'), $scriptTab);
