@@ -8,7 +8,7 @@ table { border-collapse:collapse; border-spacing:0; }
 body{
 	font-family: verdana, arial, helvetica, sans-serif;
 	font-size: 10px;
-	line-height: 2.2em;
+	line-height: 1.8em;
 	margin: 1px;
 	background-color: #E5E5E5;
 }
@@ -18,7 +18,7 @@ label{ cursor: pointer; }
 iframe { border: 0; }
 
 table{ border-spacing: 0;}
-td,tr{ color: inherit; text-decoration: none; }
+td,tr{ color: inherit; text-decoration: none; padding: 0;}
 
 a {text-decoration: underline;}
 a:link 		{	color:#3C3089;  }
@@ -52,7 +52,8 @@ form { margin: 0 }
 .min-width{ /* min-width: 770px; /* 1024 */ }
 
 /* MARGINS && PADDINGs */
-
+.paddingless {padding: 0;}
+.marginless {margin: 0;}
 /* COLOR */
 
 .img 		{	border-color:black; border-width:1px;		}
@@ -396,7 +397,7 @@ table.screen_view tr td.right_bttm {	text-align: right;	vertical-align: bottom;	
 /*************** Table Info **************/
 
 table.tableinfo{ empty-cells:show; color: #000000; width: 100%; background-color: #AAAAAA; border-spacing: 1px;}
-table.tableinfo tr td { white-space: nowrap; word-spacing: 0; font-weight: normal; text-decoration: none; text-align: left; border: 0; padding-top: 0; padding-bottom: 0; height: 22px;}
+table.tableinfo tr td { padding: 3px; white-space: nowrap; word-spacing: 0; font-weight: normal; text-decoration: none; text-align: left; border: 0; padding-top: 0; padding-bottom: 0; height: 22px;}
 table.tableinfo tr.header td { white-space: nowrap; word-spacing: 0; font-weight: bold; background-color:#CCCCCC; border-width: 0; }
 table.tableinfo tr.header td.hover_grey { white-space: nowrap; word-spacing: 0; font-weight: bold; background-color:#CCCCCC; border-width: 0; cursor: pointer;}
 table.tableinfo tr.header td.hover_grey:hover  { color: #EEEEEE; background-color:#999999;}
@@ -497,17 +498,15 @@ table.map{ text-align: left; border-width:0; padding-top: 1px; padding-bottom: 5
 
 /************* MENU ************/
 
-table.menu{ font-size: 1.1em; }
+table.menu{ height: 2.8em;}
 table.menu tr{ background: #AAAAAA url('../images/gradients/menu_not_active.gif') repeat-x top left; }
-table.menu td{ padding: 2px 5px 2px 5px;font-weight: bold; border: 1px solid #aaaaaa; }
-table.menu tr td:hover{ cursor: pointer; }
+table.menu td{ padding: 2px 5px 2px 5px; font-weight: bold; border: 1px solid #aaaaaa; }
 table.menu tr td.active{ background: #5c9ccc url(originalblue/images/ui-bg_highlight-hard_55_5c9ccc_1x100.png) 50% 50% repeat-x; border-color: #4c8cbc;}
 
 /************* SUB MENU ************/
 
-table.sub_menu{}
-table.sub_menu tr{ padding-right: 5px; padding-left: 5px;}
-table.sub_menu tr td{ padding-top: 0; padding-bottom: 0;}
+table.sub_menu{height: 1.8em;}
+table.sub_menu tr td{ padding-right: 5px; padding-left: 5px; padding-top: 0; padding-bottom: 0; height: 2.2em;}
 table.sub_menu tr td span.active a.highlight{ color: #ffcc00; }
 
 /**************** TRIGGERS INFORMATION MODULE ****************/
@@ -633,10 +632,8 @@ table.setup_wizard div.licence{
 table.setup_wizard div.text{ text-align: left; vertical-align:	text-top; height: 100%; width: 100%;overflow: hidden;}
 
 /***************** <HISTORY> *****************/
-table.history{ margin: 2px 0 0 2px; }
-table.history tr{ height: 16px;}
-table.history td{color:#448;text-align:left;}
-table.history td.caption{width: 48px;color:#448;font-weight:bold;text-align:left;}
+table.history{ color:#448; margin: 0 0 0 2px; }
+table.history td.caption{width: 48px; font-weight:bold; }
 
 /**************** </HISTORY> *****************/
 
