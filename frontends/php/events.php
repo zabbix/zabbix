@@ -184,12 +184,15 @@ else{
 		if(isset($_REQUEST['hostid'])) $frmForm->addVar('hostid', $_REQUEST['hostid']);
 		if(isset($_REQUEST['source'])) $frmForm->addVar('source', $_REQUEST['source']);
 		if(isset($_REQUEST['start'])) $frmForm->addVar('start', $_REQUEST['start']);
+		if(isset($_REQUEST['start'])) $frmForm->addVar('start', $_REQUEST['start']);
+		if(isset($_REQUEST['stime'])) $frmForm->addVar('stime', $_REQUEST['stime']);
+		if(isset($_REQUEST['period'])) $frmForm->addVar('period', $_REQUEST['period']);
+		//trigger=myPC+bob%3Atest+ZBX-3362&filter_set=Filter
 		$buttons = new CDiv(array(
 			new CSubmit('csv_export', _('Export to CSV')),
 		));
 		$buttons->useJQueryStyle();
 		$frmForm->addItem($buttons);
-
 
 	$numrows = new CDiv();
 	$numrows->setAttribute('name', 'numrows');
@@ -280,8 +283,10 @@ else{
 
 	if(empty($firstEvent)){
 		$starttime = null;
+		$csv_disabled = true;
 	}
 	else{
+		$csv_disabled = false;
 		$config = select_config();
 		$firstEvent = reset($firstEvent);
 		$starttime = $firstEvent['clock'];
@@ -601,6 +606,7 @@ else{
 	zbx_add_post_js('timeControl.processObjects();');
 
 	$events_wdgt->show();
+	if($csv_disabled) zbx_add_post_js('document.getElementById(\'csv_export\').disabled=true;');
 
 ?>
 <?php
