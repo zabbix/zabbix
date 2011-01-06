@@ -214,7 +214,7 @@
 				$screenList->addItem(new CLink($displayed_screen_name, 'host_screen.php?screenid='.$cbScreen['screenid'].'&hostid='.$_REQUEST['hostid']));
 		}
 
-		$screens_wdgt->addItem(new CDiv($screenList, 'objectlist'));
+		$screens_wdgt->addItem(new CDiv($screenList, 'ui-widget-content ui-corner-all objectgroup'));
 //-----
 		$element = get_screen($screen, 0, $effectiveperiod);
 
