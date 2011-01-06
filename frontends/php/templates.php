@@ -409,6 +409,7 @@ include_once('include/page_header.php');
 		show_messages($result, $msg_ok, $msg_fail);
 
 		if($result){
+			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TEMPLATE, $templateid, $template_name, 'hosts', NULL, NULL);
 			unset($_REQUEST['form']);
 			unset($_REQUEST['templateid']);
 		}
