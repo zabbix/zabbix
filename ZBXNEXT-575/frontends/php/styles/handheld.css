@@ -1,0 +1,7 @@
+/* Mobile screen CSS Document */
+
+.formrow .dt{ width: 10%; }
+.formrow .dd{ width: 87%; padding-left: 11%; }
+
+.formlist .text, .formlist textarea { padding: 3px; }
+.formlist select { padding: 2px; }

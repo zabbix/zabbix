@@ -84,6 +84,8 @@ div.messagecontainer .messagebox span.body a{
 /************************************************************/
 /*						SEARCH Suggest						*/
 /************************************************************/
+div input.search{ padding: 1px ; width: 16em; }
+
 div.suggest{
 	position: absolute;
 	border: 1px #5C7099 solid;

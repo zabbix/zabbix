@@ -22,7 +22,7 @@
 class CCheckBox extends CInput{
 /* public */
 	public function __construct($name='checkbox',$checked='no',$action=null,$value='yes'){
-		parent::__construct('checkbox', $name, $value);
+		parent::__construct('checkbox', $name, $value, 'checkbox pointer');
 
 		$this->setAttribute('onclick', $action);
 		$this->setChecked($checked);

@@ -347,13 +347,13 @@ COpt::compare_files_with_menu($ZBX_MENU);
 
 		$table->addRow(array($menu_table,$r_col));
 
-		$page_menu = new CDiv();
+		$page_menu = new CDiv(null,'textwhite');
 		$page_menu->setAttribute('id','mmenu');
 		$page_menu->addItem($table);
 //----
 
 // 2nd level menu
-		$sub_menu_table = new CTable(NULL,'sub_menu');
+		$sub_menu_table = new CTable(NULL,'sub_menu maxwidth ui-widget-header');
 		$sub_menu_table->setCellSpacing(0);
 		$sub_menu_table->setCellPadding(5);
 
@@ -370,6 +370,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 				$sub_menu_row[] = $sub_menu_item;
 				$sub_menu_row[] = new CSpan(SPACE.' | '.SPACE, 'divider');
 			}
+			array_pop($sub_menu_row);
 
 			$sub_menu_div = new CDiv($sub_menu_row);
 			$sub_menu_div->setAttribute('id', 'sub_'.$label);
@@ -399,9 +400,9 @@ COpt::compare_files_with_menu($ZBX_MENU);
 			$search_form = new CForm('get','search.php');
 			$search_form->setAttribute('class','thin');
 
-			$searchBox = new CTextBox('search', get_request('search',''));
+			$searchBox = new CTextBox('search', get_request('search'));
 			$searchBox->setAttribute('autocomplete', 'off');
-			$searchBox->setAttribute('style', 'width: 160px;');
+			$searchBox->addClass('search');
 
 			$search_form->addItem(new CDiv(array(S_SEARCH_BIG.': ', $searchBox)));
 

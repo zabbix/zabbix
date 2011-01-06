@@ -223,15 +223,15 @@
 
 		$right_tab->addRow($right_row);
 
-		$table = new CTable(NULL,'header');
+		$table = new CTable(NULL,'header maxwidth ui-widget-header ui-corner-all');
 //		$table->setAttribute('border',0);
 		$table->setCellSpacing(0);
 		$table->setCellPadding(1);
 
-		$td_r = new CCol($right_tab,'header_r');
+		$td_r = new CCol($right_tab,'header_r right');
 		$td_r->setAttribute('align','right');
 
-		$table->addRow(array(new CCol($col1,'header_l'), $td_r));
+		$table->addRow(array(new CCol($col1,'header_l left'), $td_r));
 	return $table;
 	}
 
@@ -410,16 +410,17 @@
 		foreach($main as $bttn){
 			$bttn->addClass('main');
 			$bttn->useJQueryStyle();
+
 			$mainBttns->addItem($bttn);
 		}
 
 		$otherBttns = new CDiv($other);
 		$otherBttns->useJQueryStyle();
 
-		$space = new CDiv($mainBttns, 'dt right');
+		$space = new CDiv($mainBttns, 'dt floatleft right');
 		$buttons = new CDiv(array($otherBttns), 'dd');
 
-		$footer = new CDiv(array($space, $buttons), 'objectgroup ui-widget-content ui-corner-all footer min-width');
+		$footer = new CDiv(new CDiv(array($space, $buttons),'formrow'), 'objectgroup footer min-width ui-widget-content ui-corner-all');
 
 	return $footer;
 	}

@@ -58,7 +58,7 @@
 	margin: 0px 1px;
 }
 
-.status_icon{ height: 14px; width: 14px; background-repeat:no-repeat; cursor:pointer;	}
+.status_icon{ height: 14px; width: 14px; background-repeat:no-repeat; cursor:pointer; margin: 0 1px 0 1px;	}
 
 .iconerror			{ background-image: url('../images/general/error_icon.png');}
 .iconok				{ background-image: url('../images/general/ok_icon.png');}

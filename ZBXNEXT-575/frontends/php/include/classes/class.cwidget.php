@@ -160,7 +160,7 @@ private $flicker;
 			$pageHeader[] = $this->createPageHeaderRow($header['left'], $header['right']);
 		}
 
-	return new CDiv($pageHeader, 'pageHeader');
+	return new CDiv($pageHeader, 'ui-widget-header ui-corner-all');
 	}
 
 	private function createPageHeaderRow($col1, $col2=SPACE){
@@ -188,14 +188,12 @@ private $flicker;
 
 		$right_tab->addRow($right_row);
 
-		$table = new CTable(NULL,'header bottom_space');
+		$table = new CTable(NULL,'header maxwidth');
 		$table->setCellSpacing(0);
 		$table->setCellPadding(1);
 
-		$td_r = new CCol($right_tab,'header_r');
-		$td_r->setAttribute('align','right');
-
-		$table->addRow(array(new CCol($col1,'header_l'), $td_r));
+		$td_r = new CCol($right_tab,'header_r right');
+		$table->addRow(array(new CCol($col1,'header_l left'), $td_r));
 
 	return $table;
 	}
@@ -228,7 +226,7 @@ private $flicker;
 
 		$header['right'] = $right_tab;
 
-		$header_tab = new CTable(null,$this->css_class);
+		$header_tab = new CTable(null,$this->css_class.' maxwidth');
 		$header_tab->setCellSpacing(0);
 		$header_tab->setCellPadding(1);
 
@@ -243,7 +241,10 @@ private $flicker;
 			$header_tab->addRow($this->createHeaderRow($header['left'],$header['right']), 'next');
 		}
 
-	return new CDiv($header_tab, 'header');
+		if($this->css_class == 'header_wide')
+			return new CDiv($header_tab);
+		else
+			return new CDiv($header_tab, 'ui-widget-header ui-corner-all');
 	}
 
 	private function createHeaderRow($col1, $col2=SPACE){
@@ -254,17 +255,15 @@ private $flicker;
 			if(($col1 === SPACE) && ($col2 === SPACE)) return new CJSscript('');
 		}
 
-		$td_r = new CCol($col2,'header_r');
-		$td_r->setAttribute('align','right');
-
-		$row = array(new CCol($col1,'header_l'), $td_r);
+		$td_r = new CCol($col2,'header_r right');
+		$row = array(new CCol($col1,'header_l left'), $td_r);
 
 	return $row;
 	}
 
 	private function createFlicker($col1, $col2=NULL){
 
-		$table = new CTable(NULL,'flicker');
+		$table = new CTable(NULL,'textwhite maxwidth middle flicker');
 //		$table->setAttribute('border',1);
 		$table->setCellSpacing(0);
 		$table->setCellPadding(1);
@@ -304,7 +303,7 @@ private $footer;
 		$this->header = null;
 		$this->body = array($body);
 		$this->footer = null;
-		
+
 		parent::__construct(null, 'ui-widget ui-widget-content ui-helper-clearfix ui-corner-all widget');
 		$this->setAttribute('id', $id.'_widget');
 	}
@@ -349,10 +348,10 @@ private $footer;
 		if(is_null($this->state)){
 			$this->state = true;
 		}
-		
+
 		$div = new CDiv($this->body, 'body');
 		$div->setAttribute('id',$this->domid);
-		
+
 		if(!$this->state){
 			$div->setAttribute('style','display: none;');
 			$this->footer->setAttribute('style','display: none;');
