@@ -306,18 +306,20 @@ static int	process_record(char **sql, int *sql_allocated, int *sql_offset, int s
 		}
 		else if (table->fields[f].type == ZBX_TYPE_BLOB)
 		{
-#ifdef HAVE_POSTGRESQL
-			len = zbx_hex2binary(buffer);
-			len = zbx_pg_escape_bytea((u_char *)buffer, len, &tmp, &tmp_allocated);
-
-			zbx_snprintf_alloc(sql, sql_allocated, sql_offset, len + 4, "'%s',");
-#else
 			if ('\0' == *buffer)
 				zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 4, "'',");
 			else
+			{
+#ifdef HAVE_POSTGRESQL
+				len = zbx_hex2binary(buffer);
+				len = zbx_pg_escape_bytea((u_char *)buffer, len, &tmp, &tmp_allocated);
+				zbx_snprintf_alloc(sql, sql_allocated, sql_offset, len + 4, "'%s',",
+						tmp);
+#else
 				zbx_snprintf_alloc(sql, sql_allocated, sql_offset, len + 4, "0x%s,",
 						buffer);
 #endif
+			}
 		}
 		else	/* ZBX_TYPE_TEXT, ZBX_TYPE_CHAR */
 		{
