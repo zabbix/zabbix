@@ -117,7 +117,7 @@
 	$enableQuestCB = new CCheckBox('enableConfirmation', $enableConfirmation);
 
 	$confirmationTB = new CTextBox('confirmation', $confirmation);
-	$confirmationTB->addStyle('width: 48em;');
+	$confirmationTB->addStyle('width: 50em;');
 	$confirmationTB->setAttribute('maxlength', 255);
 
 	$testLink = new CButton('testConfirmation', _('Test confirmation'), null, 'link_menu');
