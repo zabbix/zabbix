@@ -1098,7 +1098,7 @@ function zbx_toCSV($array){
 	// (delimiter) — in USA is (,) and in EU and RU (;)
 	$delimiter = ',';
 
-	// new line separated with CR LF
+	// new line separated with LF
 	$newline = "\n";
 
 	// specific symbols, as:
