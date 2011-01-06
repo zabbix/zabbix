@@ -37,6 +37,9 @@
 
 	include_once('include/page_header.php');
 
+// js templates
+require_once('include/templates/scriptConfirm.js.php');
+
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
