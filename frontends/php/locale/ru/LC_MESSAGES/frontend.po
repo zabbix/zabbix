@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-05 14:47+0200\n"
+"POT-Creation-Date: 2011-01-06 13:08+0200\n"
 "PO-Revision-Date: 2011-01-02 23:37+0300\n"
 "Last-Translator: Oleksiy Zagorskyi <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -1054,7 +1054,7 @@ msgstr ""
 msgid "Cannot delete templated items"
 msgstr ""
 
-#: ../api/classes/class.ctrigger.php:1325
+#: ../api/classes/class.ctrigger.php:1326
 #: ../api/classes/class.ctriggerprototype.php:1250
 #, php-format
 msgid "Cannot delete templated trigger [%1$s:%2$s]"
@@ -1120,7 +1120,7 @@ msgstr "Не удалось найти триггер"
 msgid "Cannot format Tree. Check logic structure in service links"
 msgstr "Не удалось сформировать дерево. Проверьте логическую структуру в связях сервиса"
 
-#: ../api/classes/class.ctrigger.php:1488
+#: ../api/classes/class.ctrigger.php:1489
 #: ../api/classes/class.ctriggerprototype.php:1356
 msgid "Cannot implode expression"
 msgstr ""
@@ -7686,13 +7686,13 @@ msgstr "Триггер"
 msgid "Trigger [%1$s:%2$s] already exists."
 msgstr ""
 
-#: ../api/classes/class.ctrigger.php:1496
+#: ../api/classes/class.ctrigger.php:1497
 #: ../api/classes/class.ctriggerprototype.php:1363
 #, php-format
 msgid "Trigger [%1$s:%2$s] created."
 msgstr ""
 
-#: ../api/classes/class.ctrigger.php:1387
+#: ../api/classes/class.ctrigger.php:1388
 #, php-format
 msgid "Trigger [%1$s:%2$s] deleted."
 msgstr ""
@@ -7707,13 +7707,13 @@ msgstr "Триггер [%1$s:%2$s] не имеет прототипа элеме
 msgid "Trigger [%1$s:%2$s] unlinked."
 msgstr ""
 
-#: ../api/classes/class.ctrigger.php:1601
+#: ../api/classes/class.ctrigger.php:1602
 #, php-format
 msgid "Trigger [%1$s:%2$s] updated."
 msgstr ""
 
-#: ../api/classes/class.ctrigger.php:1688
-#: ../api/classes/class.ctrigger.php:1723
+#: ../api/classes/class.ctrigger.php:1689
+#: ../api/classes/class.ctrigger.php:1724
 #: ../api/classes/class.ctriggerprototype.php:1523
 #: ../api/classes/class.ctriggerprototype.php:1558
 #, php-format
@@ -7794,8 +7794,8 @@ msgstr "Триггер обновлен"
 msgid "Trigger value"
 msgstr "Значение триггера"
 
-#: ../api/classes/class.ctrigger.php:1692
-#: ../api/classes/class.ctrigger.php:1726
+#: ../api/classes/class.ctrigger.php:1693
+#: ../api/classes/class.ctrigger.php:1727
 #: ../api/classes/class.ctriggerprototype.php:1527
 #: ../api/classes/class.ctriggerprototype.php:1561
 msgid "Trigger with same name but other type exists"
