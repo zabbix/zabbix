@@ -1134,7 +1134,20 @@ else {
 					// check the size of the value to fit data type
 					if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR
 						&& zbx_strlen($value) > $table_schema['fields'][$field]['length']){
-						self::exception(self::SCHEMA_ERROR, _s('Value "%1$s" is too long for field "%2$s" - %3$d characters. Allowed length is %4$d characters.', $value, $field, zbx_strlen($value), $table_schema['fields'][$field]['length']));
+						self::exception(
+							self::SCHEMA_ERROR,
+							_n(
+								'Value "%3$s" is too long for field "%2$s" - %1$d character.',
+								'Value "%3$s" is too long for field "%2$s" - %1$d characters.',
+								zbx_strlen($value), $field, $value
+							).
+							' '.
+							_n(
+								'Allowed length is %1$d character.',
+								'Allowed length is %1$d characters.',
+								$table_schema['fields'][$field]['length']
+							)
+						);
 					}
 
 					// TODO: decide  if we allow to pass null to NOT NULL field using default instead
@@ -1197,7 +1210,20 @@ else {
 					// check the size of the value to fit data type
 					if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR
 						&& zbx_strlen($value) > $table_schema['fields'][$field]['length']){
-						self::exception(self::SCHEMA_ERROR, _s('Value "%1$s" is too long for field "%2$s" - %3$d characters. Allowed length is %4$d characters.', $value, $field, zbx_strlen($value), $table_schema['fields'][$field]['length']));
+						self::exception(
+							self::SCHEMA_ERROR,
+							_n(
+								'Value "%3$s" is too long for field "%2$s" - %1$d character.',
+								'Value "%3$s" is too long for field "%2$s" - %1$d characters.',
+								zbx_strlen($value), $field, $value
+							).
+							' '.
+							_n(
+								'Allowed length is %1$d character.',
+								'Allowed length is %1$d characters.',
+								$table_schema['fields'][$field]['length']
+							)
+						);
 					}
 
 // TODO: decide  if we allow to pass null to NOT NULL field using default instead

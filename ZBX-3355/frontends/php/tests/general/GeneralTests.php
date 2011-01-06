@@ -20,6 +20,7 @@
 ?>
 <?php
 require_once(dirname(__FILE__).'/function_check_item_key.php');
+require_once(dirname(__FILE__).'/function_gettext.php');
 //require_once 'otherTest.php';
 
 class GeneralTests
@@ -29,6 +30,7 @@ class GeneralTests
 		$suite = new PHPUnit_Framework_TestSuite('general');
 
 		$suite->addTestSuite('function_check_item_key');
+		$suite->addTestSuite('function_gettext');
 //		$suite->addTestSuite('otherTest');
 //		...
 
