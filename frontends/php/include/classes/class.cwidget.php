@@ -160,7 +160,7 @@ private $flicker;
 			$pageHeader[] = $this->createPageHeaderRow($header['left'], $header['right']);
 		}
 
-	return new CDiv($pageHeader, 'ui-widget-header ui-corner-all');
+	return new CDiv($pageHeader);
 	}
 
 	private function createPageHeaderRow($col1, $col2=SPACE){
@@ -188,7 +188,7 @@ private $flicker;
 
 		$right_tab->addRow($right_row);
 
-		$table = new CTable(NULL,'header maxwidth');
+		$table = new CTable(NULL,'ui-widget-header ui-corner-all header maxwidth');
 		$table->setCellSpacing(0);
 		$table->setCellPadding(1);
 
@@ -226,7 +226,11 @@ private $flicker;
 
 		$header['right'] = $right_tab;
 
-		$header_tab = new CTable(null,$this->css_class.' maxwidth');
+
+		$header_tab = new CTable(null, $this->css_class.' maxwidth');
+		if($this->css_class != 'header_wide')
+			$header_tab->addClass('ui-widget-header ui-corner-all');
+
 		$header_tab->setCellSpacing(0);
 		$header_tab->setCellPadding(1);
 
@@ -241,10 +245,7 @@ private $flicker;
 			$header_tab->addRow($this->createHeaderRow($header['left'],$header['right']), 'next');
 		}
 
-		if($this->css_class == 'header_wide')
-			return new CDiv($header_tab);
-		else
-			return new CDiv($header_tab, 'ui-widget-header ui-corner-all');
+		return new CDiv($header_tab);
 	}
 
 	private function createHeaderRow($col1, $col2=SPACE){
