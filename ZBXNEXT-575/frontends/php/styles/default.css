@@ -210,18 +210,10 @@ div.footer .formrow .main:hover{ border-color: #DD7711; }
 .underline{ text-decoration: underline; }
 
 /* Sortable */
+.header{ height: 18px; line-height: 18px; font-size: 1.1em; font-weight: bold; padding: 3px; margin-bottom: 2px;}
 .column{ margin: 5px 0 5px 5px; min-width: 240px; padding-bottom: 100px; }
-
 .column .widget{ padding: 2px; margin-bottom: 5px; overflow: hidden;}
-
-.column .widget .header{
-	height: 18px;
-	line-height: 18px;
-	font-size: 1.1em;
-	font-weight: bold;
-	padding: 3px;
-	margin-bottom: 2px;
-}
+.column .widget .header{ }
 
 .widget .header .menu_icon{ float: right; margin-right: 2px; }
 
