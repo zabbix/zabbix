@@ -55,6 +55,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
 
+ - [ZBX-1357] updated Japanese translation
  - [ZBX-3385] fixed trigger status change record in audit log (Vedmak)
  - [ZBX-3383] fixed error in audit log when filter by Macro or Template (Vedmak)
  - [ZBX-2825] Make profiles form redirect to the last visited page on save or cancel (Vlad)
