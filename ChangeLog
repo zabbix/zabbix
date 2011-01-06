@@ -1,5 +1,6 @@
 Changes for 1.8.5rc1
 
+ - [ZBX-2825] Make profiles form redirect to the last visited page on save or cancel (Vlad)
  - [ZBX-3383] fixed error in audit log when filter by Macro or Template (Vedmak)
  - [ZBX-3378] updated Russian translation; thanks to dotneft and zalex_ua (Richlv)
  - [ZBX-3350] fixed minor interface bug and it is now not possible to add host name longer then 64 chars (KB)
