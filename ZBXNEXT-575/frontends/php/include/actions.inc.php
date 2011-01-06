@@ -280,58 +280,58 @@ define('LONG_DESCRITION', 0);
 define('SHORT_DESCRITION', 1);
 
 function get_operation_desc($type=SHORT_DESCRITION, $data){
-	$result = null;
+	$result = array();
 
-//SDII($data);
 	if($type == SHORT_DESCRITION){
 		switch($data['operationtype']){
 			case OPERATION_TYPE_MESSAGE:
-				switch($data['object']){
-					case OPERATION_OBJECT_USER:
-						$obj_data = CUser::get(array('userids' => $data['objectid'],  'output' => API_OUTPUT_EXTEND));
-						$obj_data = reset($obj_data);
+				if(!isset($data['opmessage_usr'])) $data['opmessage_usr'] = array();
+				if(!isset($data['opmessage_grp'])) $data['opmessage_grp'] = array();
 
-						$obj_data = S_USER.' "'.$obj_data['alias'].'"';
-						break;
-					case OPERATION_OBJECT_GROUP:
-						$obj_data = CUserGroup::get(array('usrgrpids' => $data['objectid'],  'output' => API_OUTPUT_EXTEND));
-						$obj_data = reset($obj_data);
+				foreach($data['opmessage_usr'] as $opmsgUser){
+					$users = CUser::get(array('userids' => $opmsgUser['userid'],  'output' => API_OUTPUT_EXTEND));
+					$user = reset($users);
 
-						$obj_data = S_GROUP.' "'.$obj_data['name'].'"';
-						break;
+					$result[] = S_SEND_MESSAGE_TO.' '.S_USER.' "'.$user['alias'].'"';
 				}
-				$result = S_SEND_MESSAGE_TO.' '.$obj_data;
+
+				foreach($data['opmessage_grp'] as $opmsgUsrgrp){
+					$usrgrps = CUserGroup::get(array('usrgrpids' => $opmsgUsrgrp['usrgrpid'],  'output' => API_OUTPUT_EXTEND));
+					$usrgrp = reset($usrgrps);
+
+					$result[] = S_SEND_MESSAGE_TO.' '.S_GROUP.' "'.$usrgrp['name'].'"';
+				}
 				break;
 			case OPERATION_TYPE_COMMAND:
-				$result = S_RUN_REMOTE_COMMANDS;
+				$result[] = S_RUN_REMOTE_COMMANDS;
 				break;
 			case OPERATION_TYPE_HOST_ADD:
-				$result = S_ADD_HOST;
+				$result[] = S_ADD_HOST;
 				break;
 			case OPERATION_TYPE_HOST_REMOVE:
-				$result = S_REMOVE_HOST;
+				$result[] = S_REMOVE_HOST;
 				break;
 			case OPERATION_TYPE_HOST_ENABLE:
-				$result = S_ENABLE_HOST;
+				$result[] = S_ENABLE_HOST;
 				break;
 			case OPERATION_TYPE_HOST_DISABLE:
-				$result = S_DISABLE_HOST;
+				$result[] = S_DISABLE_HOST;
 				break;
 			case OPERATION_TYPE_GROUP_ADD:
-				$obj_data = get_hostgroup_by_groupid($data['objectid']);
-				$result = S_ADD_TO_GROUP.' "'.$obj_data['name'].'"';
+				$obj_data = get_hostgroup_by_groupid($data['opgroup']['groupid']);
+				$result[] = S_ADD_TO_GROUP.' "'.$obj_data['name'].'"';
 				break;
 			case OPERATION_TYPE_GROUP_REMOVE:
-				$obj_data = get_hostgroup_by_groupid($data['objectid']);
-				$result = S_DELETE_FROM_GROUP.' "'.$obj_data['name'].'"';
+				$obj_data = get_hostgroup_by_groupid($data['opgroup']['groupid']);
+				$result[] = S_DELETE_FROM_GROUP.' "'.$obj_data['name'].'"';
 				break;
 			case OPERATION_TYPE_TEMPLATE_ADD:
-				$obj_data = get_host_by_hostid($data['objectid']);
-				$result = S_LINK_TO_TEMPLATE.' "'.$obj_data['host'].'"';
+				$obj_data = get_host_by_hostid($data['optemplate']['templateid']);
+				$result[] = S_LINK_TO_TEMPLATE.' "'.$obj_data['host'].'"';
 				break;
 			case OPERATION_TYPE_TEMPLATE_REMOVE:
-				$obj_data = get_host_by_hostid($data['objectid']);
-				$result = S_UNLINK_FROM_TEMPLATE.' "'.$obj_data['host'].'"';
+				$obj_data = get_host_by_hostid($data['optemplate']['templateid']);
+				$result[] = S_UNLINK_FROM_TEMPLATE.' "'.$obj_data['host'].'"';
 				break;
 			default: break;
 		}
@@ -340,37 +340,31 @@ function get_operation_desc($type=SHORT_DESCRITION, $data){
 		switch($data['operationtype']){
 			case OPERATION_TYPE_MESSAGE:
 				// for PHP4
-				if(isset($data['default_msg']) && !empty($data['default_msg'])){
+				if(isset($data['opmessage']['default_msg']) && !empty($data['opmessage']['default_msg'])){
 					if(isset($_REQUEST['def_shortdata']) && isset($_REQUEST['def_longdata'])){
-						$temp = bold(S_SUBJECT.': ');
-						$result = $temp->ToString()."\n".$_REQUEST['def_shortdata']."\n";
-						$temp = bold(S_MESSAGE.':');
-						$result .= $temp->ToString()."\n".$_REQUEST['def_longdata'];
+						$result[] = array(bold(S_SUBJECT.': '),BR(),$_REQUEST['def_shortdata'],BR());
+						$result[] = array(bold(S_MESSAGE.':'),BR(),$_REQUEST['def_longdata']);
 					}
-					else if(isset($data['operationid'])){
+					else if(isset($data['opmessage']['operationid'])){
 						$sql = 'SELECT a.def_shortdata,a.def_longdata '.
 								' FROM actions a, operations o '.
 								' WHERE a.actionid=o.actionid '.
 									' AND o.operationid='.$data['operationid'];
 						if($rows = DBfetch(DBselect($sql,1))){
-							$temp = bold(S_SUBJECT.': ');
-							$result = $temp->ToString()."\n".$rows['def_shortdata']."\n";
-							$temp = bold(S_MESSAGE.':');
-							$result .= $temp->ToString()."\n".$rows['def_longdata'];
+							$result[] = array(bold(S_SUBJECT.': '),BR(),$rows['def_shortdata'],BR());
+							$result[] = array(bold(S_MESSAGE.':'),BR(),$rows['def_longdata']);
 						}
 					}
 				}
 				else{
-					$temp = bold(S_SUBJECT.': ');
-					$result = $temp->ToString().$data['shortdata']."\n";
-					$temp = bold(S_MESSAGE.':');
-					$result .= $temp->ToString().$data['longdata'];
+					$result[] = array(bold(S_SUBJECT.': '),$data['opmessage']['subject'], BR());
+					$result[] = array(bold(S_MESSAGE.':'), $data['opmessage']['message']);
 				}
 
 				break;
 			case OPERATION_TYPE_COMMAND:
 				$temp = bold(S_REMOTE_COMMANDS.': ');
-				$result = $temp->ToString().$data['longdata'];
+				$result[] = $temp->ToString().$data['longdata'];
 				break;
 			default: break;
 		}

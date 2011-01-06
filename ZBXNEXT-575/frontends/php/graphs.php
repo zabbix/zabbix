@@ -497,7 +497,7 @@ include_once('include/page_header.php');
 			}
 			else if(!empty($graph['discoveryRule'])){
 				$name[] = new CLink($graph['discoveryRule']['description'], 'graph_prototypes.php?parent_discoveryid='.
-						$graph['discoveryRule']['itemid'],'discoveryName');
+						$graph['discoveryRule']['itemid'],'gold');
 				$name[] = ':'.$graph['name'];
 			}
 			else{

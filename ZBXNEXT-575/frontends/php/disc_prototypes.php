@@ -356,7 +356,7 @@ switch($itemType) {
 		$numrows = new CDiv();
 		$numrows->setAttribute('name', 'numrows');
 
-		$items_wdgt->addHeader(array(S_ITEM_PROTOTYPES_OF_BIG.SPACE, new CSpan($discovery_rule['description'], 'discoveryName')));
+		$items_wdgt->addHeader(array(S_ITEM_PROTOTYPES_OF_BIG.SPACE, new CSpan($discovery_rule['description'], 'gold')));
 		$items_wdgt->addHeader($numrows, SPACE);
 
 		$items_wdgt->addItem(get_header_host_table($_REQUEST['hostid']));
@@ -419,10 +419,10 @@ switch($itemType) {
 
 
 			if(zbx_empty($item['error'])){
-				$error = new CDiv(SPACE, 'iconok');
+				$error = new CDiv(SPACE, 'status_icon iconok');
 			}
 			else{
-				$error = new CDiv(SPACE, 'iconerror');
+				$error = new CDiv(SPACE, 'status_icon iconerror');
 				$error->setHint($item['error'], '', 'on');
 			}
 

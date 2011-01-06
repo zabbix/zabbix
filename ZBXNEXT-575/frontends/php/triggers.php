@@ -496,7 +496,7 @@ include_once('include/page_header.php');
 
 			if(!empty($trigger['discoveryRule'])){
 				$description[] = new CLink($trigger['discoveryRule']['description'], 'trigger_prototypes.php?parent_discoveryid='.
-					$trigger['discoveryRule']['itemid'],'discoveryName');
+					$trigger['discoveryRule']['itemid'],'gold');
 				$description[] = ':'.$trigger['description'];
 			}
 			else{
@@ -532,11 +532,11 @@ include_once('include/page_header.php');
 			}
 
 			if(!zbx_empty($trigger['error']) && !$templated){
-				$error = new CDiv(SPACE,'iconerror');
+				$error = new CDiv(SPACE,'status_icon iconerror');
 				$error->setHint($trigger['error'], '', 'on');
 			}
 			else{
-				$error = new CDiv(SPACE,'iconok');
+				$error = new CDiv(SPACE,'status_icon iconok');
 			}
 
 			switch($trigger['priority']){

@@ -296,7 +296,7 @@ include_once('include/page_header.php');
 				'trigger_prototypes.php?showdisabled='.($showdisabled?0:1).'&parent_discoveryid='.$_REQUEST['parent_discoveryid']);
 
 
-		$triggers_wdgt->addHeader(array(S_TRIGGER_PROTOTYPES_OF_BIG.SPACE, new CSpan($discovery_rule['description'], 'discoveryName')));
+		$triggers_wdgt->addHeader(array(S_TRIGGER_PROTOTYPES_OF_BIG.SPACE, new CSpan($discovery_rule['description'], 'gold')));
 		$triggers_wdgt->addHeader($numrows, array('[ ',$tr_link,' ]'));
 
 		$triggers_wdgt->addItem(get_header_host_table($_REQUEST['hostid']));

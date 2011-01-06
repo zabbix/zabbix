@@ -129,7 +129,7 @@
 		}
 
 		function stage0(){
-			return new CTag('div', 'yes', array('Welcome to the Zabbix frontend installation wizard.',BR(),BR(),
+			return new CDiv(array('Welcome to the Zabbix frontend installation wizard.',BR(),BR(),
 				'This installation wizard will guide you through the installation of Zabbix frontend',BR(),BR(),
 				'Click the "Next" button to proceed to the next screen. If you want to change something '.
 				'on a previous screen, click "Previous" button',BR(),BR(),
@@ -153,7 +153,7 @@ JS;
 			return array(
 				new CDiv(new CSpan($license), 'licence'),
 				BR(),
-				new CDiv(array(new CCheckBox('agree', 'no', $action), new CLabel('I agree', 'agree')), 'center')
+				new CDiv(array(new CCheckBox('agree', 'no', $action), new CLabel('I agree', 'agree')), 'maxwidth center')
 			);
 		}
 
