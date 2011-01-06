@@ -88,7 +88,7 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 			show_messages(null, S_ERROR, S_CANNOT_ADD_SCRIPT);
 		}
 		else if($enableConfirmation && zbx_empty($confirmation)){
-			error(_('Please input confirmation'));
+			error(_('Please enter confirmation text.'));
 			show_messages(null, S_ERROR, S_CANNOT_ADD_SCRIPT);
 		}
 		else{
