@@ -187,7 +187,6 @@ else{
 		if(isset($_REQUEST['start'])) $frmForm->addVar('start', $_REQUEST['start']);
 		if(isset($_REQUEST['stime'])) $frmForm->addVar('stime', $_REQUEST['stime']);
 		if(isset($_REQUEST['period'])) $frmForm->addVar('period', $_REQUEST['period']);
-		//trigger=myPC+bob%3Atest+ZBX-3362&filter_set=Filter
 		$buttons = new CDiv(array(
 			new CSubmit('csv_export', _('Export to CSV')),
 		));
