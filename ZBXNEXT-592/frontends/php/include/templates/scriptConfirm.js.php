@@ -14,9 +14,9 @@ function showScriptDialog(confirmation, buttons){
 		resizable: false,
 		minWidth: 200,
 		minHeight: 100,
-		title: '<?php echo _('Execution confirmation');?>'
+		title: '<?php echo _('Execution confirmation');?>',
+		close: function(){ jQuery(this).dialog('destroy'); }
 	});
-	jQuery('.ui-dialog-titlebar-close').remove();
 
 	return jQuery('#scriptDialog').dialog('widget');
 }
