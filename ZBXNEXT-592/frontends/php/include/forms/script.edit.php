@@ -69,18 +69,18 @@
 // NAME
 	$nameTB = new CTextBox('name', $name);
 	$nameTB->setAttribute('maxlength', 255);
-	$nameTB->addStyle('width: 425px');
+	$nameTB->addStyle('width: 50em');
 	$scriptTab->addRow(S_NAME, $nameTB);
 
 // COMMAND
 	$commandTB = new CTextBox('command', $command);
 	$commandTB->setAttribute('maxlength', 255);
-	$commandTB->addStyle('width: 425px');
+	$commandTB->addStyle('width: 50em');
 	$scriptTab->addRow(S_COMMAND, $commandTB);
 
 // DESCRIPTION
 	$description_ta = new CTextArea('description', $description);
-	$description_ta->addStyle('width: 425px; padding: 0;');
+	$description_ta->addStyle('width: 50em; padding: 0;');
 	$scriptTab->addRow(_('Description'), $description_ta);
 
 // USER GROUPS
@@ -115,16 +115,18 @@
 
 // CONFIRMATION
 	$enableQuestCB = new CCheckBox('enableConfirmation', $enableConfirmation);
-	// SPACE for layout bug in chrome8
-	$scriptTab->addRow(new CLabel(_('Enable confirmation'), 'enableConfirmation'), array($enableQuestCB, SPACE));
 
-	$confirmationTB = new CTextBox('confirmation', $confirmation, 65);
+	$confirmationTB = new CTextBox('confirmation', $confirmation);
+	$confirmationTB->addStyle('width: 48em;');
 	$confirmationTB->setAttribute('maxlength', 255);
 
-	$testLink = new CLink(_('Test confirmation'), '#', 'link_menu');
-	$testLink->setAttribute('id', 'testConfirmation');
+	$testLink = new CButton('testConfirmation', _('Test confirmation'), null, 'link_menu');
 
-	$scriptTab->addRow(SPACE, array($confirmationTB, SPACE, $testLink));
+	$scriptTab->addRow(new CLabel(_('Enable confirmation'), 'enableConfirmation'), array(
+		$enableQuestCB, SPACE,
+		$confirmationTB, SPACE,
+		$testLink
+	));
 
 	$scriptView = new CTabView();
 	$scriptView->addTab('scripts', _('Script'), $scriptTab);
