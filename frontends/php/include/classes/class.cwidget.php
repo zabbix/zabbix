@@ -317,7 +317,7 @@ private $footer;
 
 		if(is_null($caption) && !is_null($icons)) $caption = SPACE;
 
-		$this->header = new CDiv(null, 'nowrap ui-corner-all ui-widget-header move '.$this->css_class);
+		$this->header = new CDiv(null, 'nowrap ui-corner-all ui-widget-header '.$this->css_class);
 
 		if(!is_null($this->state)){
 			$icon = new CIcon(

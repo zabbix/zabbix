@@ -82,17 +82,8 @@ include_once('include/page_header.php');
 	$search_wdgt->addHeader(array(S_SEARCH_BIG.': ',bold($search)), SPACE);
 
 //-------------
-	$left_tab = new CTable();
-	$left_tab->setCellPadding(3);
-	$left_tab->setCellSpacing(3);
-
-	$left_tab->setAttribute('border',0);
-
-	$right_tab = new CTable();
-	$right_tab->setCellPadding(3);
-	$right_tab->setCellSpacing(3);
-
-	$right_tab->setAttribute('border',0);
+	$left_col[] = array();
+	$right_col[] = array();
 
 // FIND Hosts
 	$params = array(
@@ -215,14 +206,14 @@ include_once('include/page_header.php');
 			$graphs_link,
 		));
 	}
-	$table->setFooter(new CCol(S_DISPLAYING.SPACE.$viewCount.SPACE.S_OF_SMALL.SPACE.$overalCount.SPACE.S_FOUND_SMALL));
 
+	$sysmap_menu = get_icon('menu', array('menu' => 'sysmaps'));
 
-	$wdgt_hosts = new CWidget('search_hosts',$table);
-	$wdgt_hosts->setClass('header');
-	$wdgt_hosts->addHeader(S_HOSTS, SPACE);
+	$wdgt_hosts = new CUIWidget('search_hosts',$table);
+	$wdgt_hosts->setHeader(S_HOSTS, SPACE);
+	$wdgt_hosts->setFooter(S_DISPLAYING.SPACE.$viewCount.SPACE.S_OF_SMALL.SPACE.$overalCount.SPACE.S_FOUND_SMALL);
 
-	$left_tab->addRow($wdgt_hosts);
+	$left_col[] = $wdgt_hosts;
 //----------------
 
 
@@ -299,12 +290,11 @@ include_once('include/page_header.php');
 			$admin_link,
 		));
 	}
-	$table->setFooter(new CCol(S_DISPLAYING.SPACE.$viewCount.SPACE.S_OF_SMALL.SPACE.$overalCount.SPACE.S_FOUND_SMALL));
 
-	$wdgt_hgroups = new CWidget('search_hostgroup',$table);
-	$wdgt_hgroups->setClass('header');
-	$wdgt_hgroups->addHeader(S_HOST_GROUPS, SPACE);
-	$right_tab->addRow($wdgt_hgroups);
+	$wdgt_hgroups = new CUIWidget('search_hostgroup',$table);
+	$wdgt_hgroups->setHeader(S_HOST_GROUPS, SPACE);
+	$wdgt_hgroups->setFooter(S_DISPLAYING.SPACE.$viewCount.SPACE.S_OF_SMALL.SPACE.$overalCount.SPACE.S_FOUND_SMALL);
+	$right_col[] = $wdgt_hgroups;
 //----------------
 
 // FIND Templates
@@ -389,30 +379,21 @@ include_once('include/page_header.php');
 				$graphs_link
 			));
 		}
-		$table->setFooter(new CCol(S_DISPLAYING.SPACE.$viewCount.SPACE.S_OF_SMALL.SPACE.$overalCount.SPACE.S_FOUND_SMALL));
 
-
-		$wdgt_templates = new CWidget('search_templates',$table);
-		$wdgt_templates->setClass('header');
-		$wdgt_templates->addHeader(S_TEMPLATES, SPACE);
-		$right_tab->addRow($wdgt_templates);
+		$wdgt_templates = new CUIWidget('search_templates',$table);
+		$wdgt_templates->setHeader(S_TEMPLATES, SPACE);
+		$wdgt_templates->setFooter(S_DISPLAYING.SPACE.$viewCount.SPACE.S_OF_SMALL.SPACE.$overalCount.SPACE.S_FOUND_SMALL);
+		$right_col[] = $wdgt_templates;
 	}
 //----------------
 
-	$td_l = new CCol($left_tab);
-	$td_l->setAttribute('valign','top');
+	$leftDiv = new CDiv($left_col, 'column');
+	$rightDiv = new CDiv($right_col, 'column');
 
-	$td_r = new CCol($right_tab);
-	$td_r->setAttribute('valign','top');
+	$ieTab = new CTable();
+	$ieTab->addRow(array($leftDiv,$rightDiv), 'top');
 
-	$outer_table = new CTable();
-	$outer_table->setAttribute('border',0);
-	$outer_table->setCellPadding(1);
-	$outer_table->setCellSpacing(1);
-	$outer_table->addRow(array($td_l,$td_r));
-
-	$search_wdgt->addItem($outer_table);
-
+	$search_wdgt->addItem($ieTab);
 	$search_wdgt->show();
 
 ?>
