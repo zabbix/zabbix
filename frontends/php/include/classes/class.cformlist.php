@@ -20,7 +20,6 @@
 ?>
 <?php
 class CFormList extends CDiv{
-	protected $header = null;
 	protected $formList = null;
 	protected $editable = true;
 	protected $formInputs = array('ctextbox','cnumericbox','ctextarea','ccombobox','ccheckbox','cpassbox','cipbox');
@@ -50,7 +49,6 @@ class CFormList extends CDiv{
 	}
 
 	public function toString($destroy=true){
-		$this->addItem($this->header);
 		$this->addItem($this->formList);
 		return parent::toString($destroy);
 	}
