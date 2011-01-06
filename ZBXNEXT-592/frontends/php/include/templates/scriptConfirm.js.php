@@ -16,6 +16,7 @@ function showScriptDialog(confirmation, buttons){
 		minHeight: 100,
 		title: '<?php echo _('Execution confirmation');?>'
 	});
+	jQuery('.ui-dialog-titlebar-close').remove();
 
 	return jQuery('#scriptDialog').dialog('widget');
 }

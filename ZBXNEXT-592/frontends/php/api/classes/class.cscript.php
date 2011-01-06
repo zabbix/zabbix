@@ -483,7 +483,7 @@ class CScript extends CZBXAPI{
 			$del_scripts = self::get($options);
 			foreach($scriptids as $snum => $scriptid){
 				if(!isset($del_scripts[$scriptid])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Script with scriptid [%s] does not exist.', $script['scriptid']));
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Script with scriptid [%s] does not exist.', $scriptid));
 				}
 			}
 

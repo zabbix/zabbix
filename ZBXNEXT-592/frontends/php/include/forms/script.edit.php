@@ -70,13 +70,13 @@
 	$nameTB = new CTextBox('name', $name);
 	$nameTB->setAttribute('maxlength', 255);
 	$nameTB->addStyle('width: 50em');
-	$scriptTab->addRow(S_NAME, $nameTB);
+	$scriptTab->addRow(_('Name'), $nameTB);
 
 // COMMAND
 	$commandTB = new CTextBox('command', $command);
 	$commandTB->setAttribute('maxlength', 255);
 	$commandTB->addStyle('width: 50em');
-	$scriptTab->addRow(S_COMMAND, $commandTB);
+	$scriptTab->addRow(_('Command'), $commandTB);
 
 // DESCRIPTION
 	$description_ta = new CTextArea('description', $description);
@@ -93,7 +93,7 @@
 	foreach($usrgrps as $ugnum => $usr_group){
 		$usr_groups->addItem($usr_group['usrgrpid'], $usr_group['name']);
 	}
-	$scriptTab->addRow(S_USER_GROUPS, $usr_groups);
+	$scriptTab->addRow(_('User groups'), $usr_groups);
 
 // HOST GROUPS
 	$host_groups = new CCombobox('groupid', $groupid);
@@ -136,7 +136,7 @@
 	$main = array(new CSubmit('save', _('Save')));
 	$others = array();
 	if(isset($_REQUEST['scriptid'])){
-		$others[] = new CSubmit('clone', _('Clone'));
+		$others[] = new CButton('clone', _('Clone'));
 		$others[] = new CButtonDelete(_('Delete script?'), url_param('form').url_param('scriptid'));
 	}
 	$others[] = new CButtonCancel();

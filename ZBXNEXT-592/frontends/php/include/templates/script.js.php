@@ -4,41 +4,43 @@ jQuery(document).ready(function(){
 
 	jQuery("#name").focus();
 
-// confirmation field typing
+// Clone button
+	jQuery("#clone").click(function(){
+		jQuery("#scriptid, #delete, #clone").remove();
+
+		jQuery("#cancel").addClass('ui-corner-left');
+		jQuery("#name").focus();
+	});
+
+// Confirmation text input
 	jQuery("#confirmation").keyup(function(){
 		if(this.value != ''){
-			jQuery("#testConfirmation").removeAttr("disabled");
-			jQuery("#confirmationLabel").removeAttr("disabled");
+			jQuery("#testConfirmation, #confirmationLabel").removeAttr("disabled");
 		}
 		else{
-			jQuery("#testConfirmation").attr("disabled", "disabled");
-			jQuery("#confirmationLabel").attr("disabled", "disabled");
+			jQuery("#testConfirmation, #confirmationLabel").attr("disabled", "disabled");
 		}
 	}).keyup();
 
-// checkbox changing
+// Enable confirmation checkbox
 	jQuery("#enableConfirmation").change(function(){
 		if(this.checked){
-			jQuery("#confirmation").removeAttr("disabled");
-			jQuery("#confirmation").keyup();
+			jQuery("#confirmation").removeAttr("disabled").keyup();
 		}
 		else{
-			jQuery("#confirmation").attr("disabled", "disabled");
-			jQuery("#testConfirmation").attr("disabled", "disabled");
-			jQuery("#confirmationLabel").attr("disabled", "disabled");
+			jQuery("#confirmation, #testConfirmation, #confirmationLabel").attr("disabled", "disabled");
 		}
 	}).change();
 
-
+// Test confirmation button
 	jQuery("#testConfirmation").click(function(){
-		if(this.getAttribute('disabled')) return false;
-
 		var confirmation = jQuery('#confirmation').val();
 
 		var buttons = [
 			{text: '<?php echo _('Execute');?>', click: function(){} },
 			{text: '<?php echo _('Cancel');?>', click: function(){
 				jQuery(this).dialog("destroy");
+				jQuery("#testConfirmation").focus();
 			}}
 		];
 
