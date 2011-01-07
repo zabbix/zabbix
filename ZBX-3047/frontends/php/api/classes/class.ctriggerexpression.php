@@ -126,8 +126,7 @@ private $allowed;
 			$start = $simpleExpr;
 			$simpleExpr = str_replace('({constant})','{expression}',$simpleExpr);
 			$simpleExpr = str_replace('(-{constant})','{expression}',$simpleExpr);
-			$simpleExpr = str_replace('(-{constant}','({expression}',$simpleExpr);
-			$simpleExpr = preg_replace("/([\=\#\<\>\|\&\+\-\/\*])\-\{constant\}/u", '$1{expression}', $simpleExpr);
+			$simpleExpr = preg_replace("/([\(\=\#\<\>\|\&\+\-\/\*])\-\{constant\}/u", '$1{expression}', $simpleExpr);
 		}
 
 		$simpleExpr = preg_replace('/^\-\{constant\}(.*)$/u', '{constant}$1', $simpleExpr);
