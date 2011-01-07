@@ -1,6 +1,8 @@
 package com.zabbix.proxy;
 
+import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.util.concurrent.*;
 
 public class JavaProxy
 {
@@ -8,14 +10,28 @@ public class JavaProxy
 	{
 		try
 		{
-			ServerSocket socket = new ServerSocket(10052);
+			ConfigurationManager.parseConfiguration();
+
+			InetAddress listenIP = (InetAddress)ConfigurationManager.getParameter(ConfigurationManager.LISTEN_IP).getValue();
+			int listenPort = ConfigurationManager.getIntegerParameterValue(ConfigurationManager.LISTEN_PORT);
+
+			ServerSocket socket = new ServerSocket(listenPort, 0, listenIP);
+
+			int startPollers = ConfigurationManager.getIntegerParameterValue(ConfigurationManager.START_POLLERS);
+
+			ExecutorService threadPool = new ThreadPoolExecutor(
+					startPollers,
+					startPollers,
+					30L, TimeUnit.SECONDS,
+					new ArrayBlockingQueue<Runnable>(startPollers),
+					new ThreadPoolExecutor.CallerRunsPolicy());
 
 			while (true)
-				new Thread(new RequestProcessor(socket.accept())).start();
+				threadPool.execute(new RequestProcessor(socket.accept()));
 		}
-		catch (Exception e)
+		catch (Exception exception)
 		{
-			e.printStackTrace();
+			exception.printStackTrace();
 		}
 	}
 }
