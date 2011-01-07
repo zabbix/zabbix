@@ -10,7 +10,7 @@ function showScriptDialog(confirmation, buttons){
 		buttons: buttons,
 		draggable: false,
 		modal: true,
-		width: (w > 600 ? 600 : w),
+		width: (w > 600 ? 600 : 'auto'),
 		resizable: false,
 		minWidth: 200,
 		minHeight: 100,
