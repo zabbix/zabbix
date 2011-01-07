@@ -6,11 +6,12 @@ public class AllTestRunner
 	{
 		String[] testClasses = new String[]
 		{
+			"IntegerValidatorTest",
 			"ZabbixItemTest"
 		};
 
 		for (int i = 0; i < testClasses.length; i++)
-			testClasses[i] = "com.zabbix.proxy." + testClasses[i];
+			testClasses[i] = ConfigurationManager.getPackage() + "." + testClasses[i];
 
 		org.junit.runner.JUnitCore.main(testClasses);
 	}
