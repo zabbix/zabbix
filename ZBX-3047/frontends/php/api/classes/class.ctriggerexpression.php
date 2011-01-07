@@ -126,6 +126,7 @@ private $allowed;
 			$start = $simpleExpr;
 			$simpleExpr = str_replace('({constant})','{expression}',$simpleExpr);
 			$simpleExpr = str_replace('(-{constant})','{expression}',$simpleExpr);
+			$simpleExpr = str_replace('(-{constant}','({expression}',$simpleExpr);
 			$simpleExpr = preg_replace("/([\=\#\<\>\|\&\+\-\/\*])\-\{constant\}/u", '$1{expression}', $simpleExpr);
 		}
 
@@ -139,7 +140,6 @@ private $allowed;
 			$simpleExpr = str_replace('({expression})','{expression}',$simpleExpr);
 			$simpleExpr = preg_replace("/\{expression\}([\=\#\<\>\|\&\+\-\/\*])\{expression\}/u", '{expression}', $simpleExpr);
 		}
-
 
 		$simpleExpr = str_replace('{expression}','1',$simpleExpr);
 
@@ -289,7 +289,10 @@ private $allowed;
 				$this->parseExpression($symbol);
 			}
 
-			if(!$this->currExpr['part']['usermacro']){
+			if(!$this->currExpr['part']['usermacro'] &&
+				!$this->currExpr['part']['itemParam'] &&
+				!$this->currExpr['part']['functionParam']
+			){
 				$this->parseItem($symbol);
 				$this->parseFunction($symbol);
 			}
