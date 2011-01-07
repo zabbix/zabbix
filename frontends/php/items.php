@@ -70,6 +70,7 @@ switch($itemType) {
 		'interfaceid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,				null, S_INTERFACE),
 
 
+
 		'add_groupid'=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			'(isset({register})&&({register}=="go"))'),
 		'action'=>			array(T_ZBX_STR, O_OPT,	 P_SYS,	NOT_EMPTY,		'(isset({register})&&({register}=="go"))'),
 
@@ -146,7 +147,7 @@ switch($itemType) {
 		'multiplier'=>		array(T_ZBX_INT, O_OPT,  null,  null,		null),
 		'delta'=>		array(T_ZBX_INT, O_OPT,  null,  IN('0,1,2'),	'isset({save})&&isset({value_type})&&'.IN('0,3','value_type')),
 
-		'formula'=>		array(T_ZBX_DBL, O_OPT,  null,  NOT_ZERO,	'isset({save})&&isset({multiplier})&&({multiplier}==1)&&'.IN('0,3','value_type'), S_CUSTOM_MULTIPLIER),
+		'formula'=>		array(T_ZBX_DBL, O_OPT,  null,  '({value_type}==0&&{}!=0)||({value_type}==3&&{}>0)',	'isset({save})&&isset({multiplier})&&({multiplier}==1)', S_CUSTOM_MULTIPLIER),
 		'logtimefmt'=>		array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({value_type})&&({value_type}==2))'),
 
 		'group_itemid'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID, null),
@@ -219,7 +220,6 @@ switch($itemType) {
 
 	check_fields($fields);
 	validate_sort_and_sortorder('description', ZBX_SORT_UP);
-
 	$_REQUEST['go'] = get_request('go', 'none');
 
 // PERMISSIONS
