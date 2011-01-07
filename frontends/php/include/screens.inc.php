@@ -480,7 +480,7 @@ require_once('include/js.inc.php');
 				order_result($graph['hosts'], 'host');
 				$graph['host'] = reset($graph['hosts']);
 
-				$caption = ( $graph['host']['host']? $graph['host']['host'].':' : '') .$graph['name'];
+				$caption = $graph['host']['host'].':'.$graph['name'];
 
 				$nodeName = get_node_name_by_elid($graph['host']['hostid']);
 				if(!zbx_empty($nodeName))
