@@ -121,6 +121,7 @@ class CHost extends CZBXAPI{
 // filter
 			'filter'					=> null,
 			'search'					=> null,
+			'searchByAny'				=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 
@@ -129,7 +130,7 @@ class CHost extends CZBXAPI{
 			'selectGroups'				=> null,
 			'selectParentTemplates'		=> null,
 			'selectItems'				=> null,
-			'selectDiscoveries'		=> null,
+			'selectDiscoveries'			=> null,
 			'select_triggers'			=> null,
 			'select_graphs'				=> null,
 			'select_dhosts'				=> null,
@@ -1290,6 +1291,10 @@ Copt::memoryPick();
 		foreach($hosts as $inum => &$host){
 			if(!check_db_fields($hostDBfields, $host)){
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for host [ %s ]', $host['host']));
+			}
+			// Check if host name isn't longer then 64 chars
+			if(!$delete && zbx_strlen($host['host']) > 64){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host name must not be longer than %1$d characters, [ %2$s ] is %3$d', 64, $host['host'], zbx_strlen($host['host'])));
 			}
 
 			if($update || $delete){

@@ -1,4 +1,4 @@
-if(typeof(zbx_templates) == 'undefined'){
+if(typeof(ZBX_TPL) == 'undefined'){
 	var ZBX_TPL = {};
 }
 

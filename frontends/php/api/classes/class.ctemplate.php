@@ -71,6 +71,7 @@ class CTemplate extends CZBXAPI{
 // filter
 			'filter'					=> null,
 			'search'					=> '',
+			'searchByAny'			=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 
@@ -1826,7 +1827,7 @@ COpt::memoryPick();
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot sync graph prptotypes'));
+				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot sync graph prototypes'));
 
 				$result = CGraph::syncTemplates(array(
 					'hostids' => $targetid,

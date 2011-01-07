@@ -341,8 +341,15 @@
 					$tools_menus = '';
 					foreach($scripts_by_hosts[$db_element['elementid']] as $id => $script){
 						$script_nodeid = id2nodeid($script['scriptid']);
-						if((bccomp($host_nodeid ,$script_nodeid ) == 0))
-							$tools_menus.= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$db_element["elementid"]."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+
+						if((bccomp($host_nodeid ,$script_nodeid ) == 0)){
+							$str_tmp = zbx_jsvalue('javascript: executeScript('.$db_element['elementid'].', '.
+									$script['scriptid'].', '.
+									zbx_jsvalue($script['confirmation']).')'
+							);
+
+							$tools_menus.= "[".zbx_jsvalue($script['name']).", ".$str_tmp.", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+						}
 					}
 
 					if(!empty($tools_menus)){
@@ -589,7 +596,7 @@
 						zbx_strstr($label, '{HOST.CONN}'))
 				{
 					if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST){
-						  $sql = 'SELECT hi.*, h.host '.
+						$sql = 'SELECT hi.*, h.host '.
 								' FROM interface hi,hosts h '.
 								' WHERE hi.hostid=h.hostid '.
 									' AND hi.hostid='.$db_element['elementid'];

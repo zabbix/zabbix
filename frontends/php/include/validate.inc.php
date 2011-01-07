@@ -258,7 +258,7 @@
 
 	define('NOT_EMPTY',"({}!='')&&");
 	define('DB_ID',"({}>=0&&bccomp('{}',\"10000000000000000000\")<0)&&");
-	define('NOT_ZERO',"({}>0)&&");
+	define('NOT_ZERO',"({}!=0)&&");
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 

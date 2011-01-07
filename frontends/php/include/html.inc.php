@@ -412,15 +412,18 @@
 			$bttn->useJQueryStyle();
 			$mainBttns->addItem($bttn);
 		}
+		$space = new CDiv($mainBttns, 'dt right');
 
 		$otherBttns = new CDiv($other);
 		$otherBttns->useJQueryStyle();
-
-		$space = new CDiv($mainBttns, 'dt right');
 		$buttons = new CDiv(array($otherBttns), 'dd');
 
-		$footer = new CDiv(array($space, $buttons), 'objectgroup ui-widget-content ui-corner-all footer min-width');
+		$footer = new CDiv(array($space, $buttons), 'footer');
 
-	return $footer;
+		$footer = new CDiv($footer);
+		$footer->addClass('min-width objectgroup ui-widget-content ui-corner-all');
+		$footer->addStyle('padding: 2px;');
+
+		return $footer;
 	}
 ?>

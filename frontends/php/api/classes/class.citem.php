@@ -100,7 +100,8 @@ class CItem extends CZBXAPI{
 // filter
 			'filter'				=> null,
 			'search'				=> null,
-			'startSearch'			=> null,
+			'searchByAny'			=> null,
+			'startSearch'				=> null,
 			'excludeSearch'			=> null,
 
 // OutPut

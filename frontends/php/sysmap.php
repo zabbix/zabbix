@@ -26,7 +26,7 @@ require_once('include/forms.inc.php');
 $page['title'] = 'S_CONFIGURATION_OF_NETWORK_MAPS';
 $page['file'] = 'sysmap.php';
 $page['hist_arg'] = array('sysmapid');
-$page['scripts'] = array('effects.js', 'dragdrop.js','sysmap.tpl.js','class.cmap.js');
+$page['scripts'] = array('sysmap.tpl.js','class.cmap.js');
 $page['type'] = detect_page_type();
 
 include_once('include/page_header.php');
