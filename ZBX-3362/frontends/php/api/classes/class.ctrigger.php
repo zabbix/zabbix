@@ -1262,7 +1262,7 @@ COpt::memoryPick();
 					}
 				}
 
-				if(isset($trigger['description']) && ($trigger['description'] == $dbTrigger['description']))
+				if(isset($trigger['description']) && ($trigger['description'] === $dbTrigger['description']))
 					unset($triggers[$tnum]['description']);
 				if(isset($trigger['priority']) && ($trigger['priority'] == $dbTrigger['priority']))
 					unset($triggers[$tnum]['priority']);
