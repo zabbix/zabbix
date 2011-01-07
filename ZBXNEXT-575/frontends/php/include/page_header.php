@@ -126,22 +126,20 @@
 	<link rel="shortcut icon" href="images/general/zabbix.ico" />
 	<link rel="stylesheet" type="text/css" href="css.css" />
 <?php
+	$css = 'css_ob.css';
 	$bodyCSS = 'originalblue';
 	if(isset($DB['DB']) && !is_null($DB['DB'])){
 		$config = select_config();
 
 		$css = getUserTheme($USER_DETAILS);
-		$config=select_config();
-		if($css){
-			print('<link rel="stylesheet" type="text/css" href="styles/'.$css.'" />'."\n");
-		}
-
 		switch($css){
 			case "css_od.css": $bodyCSS = 'darkorange'; break;
 			case "css_bb.css": $bodyCSS = 'darkblue'; break;
 			default: $bodyCSS = 'originalblue'; break;
 		}
 	}
+
+	print('<link rel="stylesheet" type="text/css" href="styles/'.$css.'" />'."\n");
 
 	if($page['file'] == 'sysmap.php')
 		print('<link rel="stylesheet" type="text/css" href="imgstore.php?css=1&output=css" />');
