@@ -121,6 +121,7 @@ class CHost extends CZBXAPI{
 // filter
 			'filter'					=> null,
 			'search'					=> null,
+			'searchByAny'				=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 
@@ -129,7 +130,7 @@ class CHost extends CZBXAPI{
 			'selectGroups'				=> null,
 			'selectParentTemplates'		=> null,
 			'selectItems'				=> null,
-			'selectDiscoveries'		=> null,
+			'selectDiscoveries'			=> null,
 			'select_triggers'			=> null,
 			'select_graphs'				=> null,
 			'select_dhosts'				=> null,

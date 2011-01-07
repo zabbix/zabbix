@@ -78,6 +78,7 @@ class CTemplateScreen extends CScreen{
 // filter
 			'filter'					=> null,
 			'search'					=> null,
+			'searchByAny'			=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 // OutPut
