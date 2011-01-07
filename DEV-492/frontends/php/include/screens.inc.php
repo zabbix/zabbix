@@ -545,7 +545,7 @@ require_once('include/js.inc.php');
 				$selectbtn = new CButton('select', S_SELECT,
 					"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName().
 							"&real_hosts=1&dstfld1=resourceid&dstfld2=caption&srctbl=simple_graph&srcfld1=itemid".
-							"&srcflCButtond2=description',800,450);");
+							"&srcfld2=description',800,450);");
 			}
 
 			$form->addRow(S_PARAMETER, array($textfield, SPACE, $selectbtn));

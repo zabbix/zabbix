@@ -88,8 +88,8 @@ class testFormHost extends CTest
 		$this->click('link='.$this->host.'2');
 		$this->wait();
 		$this->button_click('delete');
+		$this->waitForConfirmation();
 		$this->wait();
-		$this->getConfirmation();
 		$this->assertTitle('Hosts');
 		$this->ok('Host deleted');
 	}
