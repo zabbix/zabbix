@@ -38,11 +38,11 @@ class SeleniumTests
 		$suite->addTestSuite('testGeneric');
 		$suite->addTestSuite('testClicks');
 		$suite->addTestSuite('testPageDashboard');
-		$suite->addTestSuite('testPageHosts');
 		$suite->addTestSuite('testFormHost');
 		$suite->addTestSuite('testFormHostGroup');
 		$suite->addTestSuite('testFormProfile');
 		$suite->addTestSuite('testFormScreen');
+		$suite->addTestSuite('testPageHosts');
 		// ...
 
 		return $suite;
