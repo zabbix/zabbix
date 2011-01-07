@@ -729,7 +729,7 @@ SDI('/////////////////////////////////');
 			DB::update('screens', $update);
 
 			self::EndTransaction(true, __METHOD__);
-			return true;
+			return array('screenids' => zbx_objectValues($screens, 'screenid'));
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
