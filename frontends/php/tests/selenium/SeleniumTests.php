@@ -22,6 +22,7 @@
 require_once(dirname(__FILE__).'/testGeneric.php');
 require_once(dirname(__FILE__).'/testClicks.php');
 require_once(dirname(__FILE__).'/testPageDashboard.php');
+require_once(dirname(__FILE__).'/testPageEvents.php');
 require_once(dirname(__FILE__).'/testPageHosts.php');
 require_once(dirname(__FILE__).'/testPageMediaTypes.php');
 require_once(dirname(__FILE__).'/testPageScripts.php');
