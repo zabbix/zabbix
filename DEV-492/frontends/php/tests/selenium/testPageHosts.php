@@ -52,7 +52,7 @@ class testPageHosts extends CTest
 	public function testPageHosts_FilterZabbixServer()
 	{
 		$this->login('hosts.php');
-		$this->click('filter_icon');
+		$this->click('flicker_icon_l');
 		$this->input_type('filter_host','Zabbix ser');
 		$this->input_type('filter_ip','127.0.0.1');
 		$this->input_type('filter_port','10050');
@@ -66,7 +66,36 @@ class testPageHosts extends CTest
 	{
 		$this->login('hosts.php');
 
+		// Reset filter
+		$this->click('css=span.link_menu');
+
 		$this->input_type('filter_host','1928379128ksdhksdjfh');
+		$this->click('filter');
+		$this->wait();
+		$this->ok('Displaying 0 of 0 found');
+	}
+
+	public function testPageHosts_FilterNone1()
+	{
+		$this->login('hosts.php');
+
+		// Reset filter
+		$this->click('css=span.link_menu');
+
+		$this->input_type('filter_host','_');
+		$this->click('filter');
+		$this->wait();
+		$this->ok('Displaying 0 of 0 found');
+	}
+
+	public function testPageHosts_FilterNone2()
+	{
+		$this->login('hosts.php');
+
+		// Reset filter
+		$this->click('css=span.link_menu');
+
+		$this->input_type('filter_host','%');
 		$this->click('filter');
 		$this->wait();
 		$this->ok('Displaying 0 of 0 found');
@@ -77,6 +106,8 @@ class testPageHosts extends CTest
 	{
 		$this->login('hosts.php');
 		$this->click('css=span.link_menu');
+		$this->click('filter');
+		$this->wait();
 		$this->ok('Zabbix server');
 	}
 }
