@@ -275,6 +275,8 @@ misc/init.d/fedora/core5/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_server -text
 misc/init.d/tru64/zabbix_server -text
+misc/init.d/ubuntu/zabbix-agent.conf -text
+misc/init.d/ubuntu/zabbix-server.conf -text
 tests/templates/sqlite3.init -text
 tests/templates/zabbix.conf.php.mysql -text
 tests/templates/zabbix.conf.php.postgresql -text
