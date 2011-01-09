@@ -23,25 +23,36 @@ require_once(dirname(__FILE__).'/class.ctest.php');
 
 class testPageHosts extends CTest
 {
-	public function testPageHosts_SimpleTest()
+	// Returns all hosts
+	public static function allHosts()
+	{
+		DBconnect($error);
+
+		$hosts=array();
+
+		$result=DBselect('select * from hosts where status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')');
+		while($host=DBfetch($result))
+		{
+			$hosts[]=array($host);
+		}
+		return $hosts;
+	}
+
+	/**
+	* @dataProvider allHosts
+	*/
+	public function testPageHosts_SimpleTest($host)
 	{
 		$this->login('hosts.php');
 		$this->dropdown_select('groupid','Zabbix servers');
 //		$this->wait();
 		$this->assertTitle('Hosts');
-		$this->ok('Zabbix server');
 		$this->ok('CONFIGURATION OF HOSTS');
 		$this->ok('Displaying');
-		$this->ok('Name');
-		$this->ok('Applications');
-		$this->ok('Items');
-		$this->ok('Triggers');
-		$this->ok('Graphs');
-		$this->ok('Discovery');
-		$this->ok('Interface');
-		$this->ok('Templates');
-		$this->ok('Status');
-		$this->ok('Availability');
+		// Header
+		$this->ok(array('Name','Applications','Items','Triggers','Graphs','Discovery','Interface','Templates','Status','Availability'));
+		// Data
+		$this->ok(array($host['host']));
 		$this->dropdown_select('go','Export selected');
 		$this->dropdown_select('go','Mass update');
 		$this->dropdown_select('go','Activate selected');
@@ -49,16 +60,19 @@ class testPageHosts extends CTest
 		$this->dropdown_select('go','Delete selected');
 	}
 
-	public function testPageHosts_FilterZabbixServer()
+	/**
+	* @dataProvider allHosts
+	*/
+	public function testPageHosts_FilterHost($host)
 	{
 		$this->login('hosts.php');
 		$this->click('flicker_icon_l');
-		$this->input_type('filter_host','Zabbix ser');
-		$this->input_type('filter_ip','127.0.0.1');
-		$this->input_type('filter_port','10050');
+		$this->input_type('filter_host',$host['host']);
+		$this->input_type('filter_ip','');
+		$this->input_type('filter_port','');
 		$this->click('filter');
 		$this->wait();
-		$this->ok('Zabbix server');
+		$this->ok($host['host']);
 	}
 
 	// Filter returns nothing
@@ -102,13 +116,47 @@ class testPageHosts extends CTest
 	}
 
 	// Filter reset
-	public function testPageHosts_FilterReset()
+
+	/**
+	* @dataProvider allHosts
+	*/
+	public function testPageHosts_FilterReset($host)
 	{
 		$this->login('hosts.php');
 		$this->click('css=span.link_menu');
 		$this->click('filter');
 		$this->wait();
-		$this->ok('Zabbix server');
+		$this->ok($host['host']);
+	}
+
+	public function testPageHosts_MassExport()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
+	public function testPageHosts_MassUpdate()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
+	public function testPageHosts_MassActivate()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
+	public function testPageHosts_MassDisable()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
+	public function testPageHosts_MassDelete()
+	{
+// TODO
+		$this->markTestIncomplete();
 	}
 }
 ?>
