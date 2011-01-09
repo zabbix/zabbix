@@ -47,7 +47,6 @@ class testPageHosts extends CTest
 		$this->dropdown_select('groupid','Zabbix servers');
 //		$this->wait();
 		$this->assertTitle('Hosts');
-		$this->ok('Zabbix server');
 		$this->ok('CONFIGURATION OF HOSTS');
 		$this->ok('Displaying');
 		// Header
@@ -130,31 +129,31 @@ class testPageHosts extends CTest
 		$this->ok($host['host']);
 	}
 
-	public function testPageUsers_MassExport()
+	public function testPageHosts_MassExport()
 	{
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageUsers_MassUpdate()
+	public function testPageHosts_MassUpdate()
 	{
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageUsers_MassActivate()
+	public function testPageHosts_MassActivate()
 	{
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageUsers_MassDisable()
+	public function testPageHosts_MassDisable()
 	{
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageUsers_MassDelete()
+	public function testPageHosts_MassDelete()
 	{
 // TODO
 		$this->markTestIncomplete();

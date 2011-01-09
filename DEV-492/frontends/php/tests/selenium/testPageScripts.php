@@ -63,7 +63,7 @@ class testPageScripts extends CTest
 	{
 		$name=$script['name'];
 
-		$sql="select * from scripts where name='$name'";
+		$sql="select * from scripts where name='$name' order by scriptid";
 		$oldHash=$this->DBhash($sql);
 
 		$this->login('scripts.php');

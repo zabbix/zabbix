@@ -75,11 +75,11 @@ class testPageUsers extends CTest
 	{
 		$alias=$user['alias'];
 
-		$sql1="select * from users where alias='$alias'";
+		$sql1="select * from users where alias='$alias' order by userid";
 		$oldHashUser=$this->DBhash($sql1);
-		$sql2="select * from users,users_groups where users.userid=users_groups.userid and users.alias='$alias'";
+		$sql2="select * from users,users_groups where users.userid=users_groups.userid and users.alias='$alias' order by users_groups.id";
 		$oldHashGroup=$this->DBhash($sql2);
-		$sql3="select * from users,media where users.userid=media.userid and users.alias='$alias'";
+		$sql3="select * from users,media where users.userid=media.userid and users.alias='$alias' order by media.mediaid";
 		$oldHashMedia=$this->DBhash($sql3);
 
 		$this->login('users.php');

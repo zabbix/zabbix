@@ -64,7 +64,7 @@ class testPageMediaTypes extends CTest
 	{
 		$name=$mediatype['description'];
 
-		$sql="select * from media_type where description='$name'";
+		$sql="select * from media_type where description='$name' order by mediatypeid";
 		$oldHash=$this->DBhash($sql);
 
 		$this->login('media_types.php');
