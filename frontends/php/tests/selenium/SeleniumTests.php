@@ -22,10 +22,13 @@
 require_once(dirname(__FILE__).'/testGeneric.php');
 require_once(dirname(__FILE__).'/testClicks.php');
 require_once(dirname(__FILE__).'/testPageDashboard.php');
+require_once(dirname(__FILE__).'/testPageDiscovery.php');
+require_once(dirname(__FILE__).'/testPageEvents.php');
 require_once(dirname(__FILE__).'/testPageHosts.php');
 require_once(dirname(__FILE__).'/testPageMediaTypes.php');
 require_once(dirname(__FILE__).'/testPageScripts.php');
 require_once(dirname(__FILE__).'/testPageSearch.php');
+require_once(dirname(__FILE__).'/testPageTemplates.php');
 require_once(dirname(__FILE__).'/testPageUsers.php');
 require_once(dirname(__FILE__).'/testFormHost.php');
 require_once(dirname(__FILE__).'/testFormHostGroup.php');
@@ -42,9 +45,11 @@ class SeleniumTests
 		$suite->addTestSuite('testGeneric');
 		$suite->addTestSuite('testClicks');
 		$suite->addTestSuite('testPageDashboard');
+		$suite->addTestSuite('testPageDiscovery');
 		$suite->addTestSuite('testPageScripts');
 		$suite->addTestSuite('testPageMediaTypes');
 		$suite->addTestSuite('testPageSearch');
+		$suite->addTestSuite('testPageTemplates');
 		$suite->addTestSuite('testPageUsers');
 		$suite->addTestSuite('testFormHost');
 		$suite->addTestSuite('testFormHostGroup');

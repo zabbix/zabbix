@@ -23,7 +23,25 @@ require_once(dirname(__FILE__).'/class.ctest.php');
 
 class testPageScripts extends CTest
 {
-	public function testPageScripts_SimpleTest()
+	// Returns all scripts
+	public static function allScripts()
+	{
+		DBconnect($error);
+
+		$scripts=array();
+
+		$result=DBselect('select * from scripts');
+		while($script=DBfetch($result))
+		{
+			$scripts[]=array($script);
+		}
+		return $scripts;
+	}
+
+	/**
+	* @dataProvider allScripts
+	*/
+	public function testPageScripts_SimpleTest($script)
 	{
 		$this->login('scripts.php');
 		$this->assertTitle('Scripts');
@@ -31,44 +49,50 @@ class testPageScripts extends CTest
 		$this->ok('Scripts');
 		$this->ok('CONFIGURATION OF SCRIPTS');
 		$this->ok('Displaying');
-		$this->ok('Name');
-		$this->ok('Command');
-		$this->ok('User group');
-		$this->ok('Host group');
-		$this->ok('Host access');
-		$this->ok('Ping');
-		$this->ok('Traceroute');
-		$this->ok('All');
-		$this->ok('Read');
+		// Header
+		$this->ok(array('Name','Command','User group','Host group','Host access'));
+		// Data
+		$this->ok(array($script['name'],$script['command'],'Read'));
 		$this->dropdown_select('go','Delete selected');
 	}
 
-	public function testPageScripts_SimpleUpdate()
+	/**
+	* @dataProvider allScripts
+	*/
+	public function testPageScripts_SimpleUpdate($script)
 	{
-		$sql="select * from scripts where name='Traceroute'";
+		$name=$script['name'];
+
+		$sql="select * from scripts where name='$name' order by scriptid";
 		$oldHash=$this->DBhash($sql);
 
 		$this->login('scripts.php');
 		$this->assertTitle('Scripts');
-		$this->click('link=Traceroute');
+		$this->click("link=$name");
 		$this->wait();
 		$this->button_click('save');
 		$this->wait();
 		$this->assertTitle('Scripts');
 		$this->ok('Script updated');
-		$this->ok('Traceroute');
+		$this->ok($name);
 		$this->ok('CONFIGURATION OF SCRIPTS');
 
 		$this->assertEquals($oldHash,$this->DBhash($sql));
 	}
 
-	public function testPageScripts_MassDelete()
+	/**
+	* @dataProvider allScripts
+	*/
+	public function testPageScripts_MassDelete($script)
 	{
+		$scriptid=$script['scriptid'];
+
+		$this->DBsave_tables('scripts');
 		$this->chooseOkOnNextConfirmation();
 
 		$this->login('scripts.php');
 		$this->assertTitle('Scripts');
-		$this->checkbox_select('scripts[2]');
+		$this->checkbox_select("scripts[$scriptid]");
 		$this->dropdown_select('go','Delete selected');
 		$this->button_click('goButton');
 		$this->wait();
@@ -77,8 +101,10 @@ class testPageScripts extends CTest
 		$this->assertTitle('Scripts');
 		$this->ok('Script deleted');
 
-		$sql="select * from scripts where name='Traceroute'";
+		$sql="select * from scripts where scriptid='$scriptid'";
 		$this->assertEquals(0,$this->DBcount($sql));
+
+		$this->DBrestore_tables('scripts');
 	}
 }
 ?>

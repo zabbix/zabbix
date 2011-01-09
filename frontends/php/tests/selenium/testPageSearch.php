@@ -53,8 +53,8 @@ class testPageSearch extends CTest
 		$this->keyPress('search',"\\13");
 		$this->wait();
 		$this->assertTitle('Search');
-		$this->assertTextNotPresent('Displaying 1 of 1 found');
-		$this->assertTextNotPresent('Zabbix server');
+		$this->nok('Displaying 1 of 1 found');
+		$this->nok('Zabbix server');
 		$this->ok('Displaying 0 of 0 found');
 		$this->ok('...');
 	}
@@ -66,8 +66,8 @@ class testPageSearch extends CTest
 		$this->keyPress('search',"\\13");
 		$this->wait();
 		$this->assertTitle('Search');
-		$this->assertTextNotPresent('Displaying 1 of 1 found');
-		$this->assertTextNotPresent('Zabbix server');
+		$this->nok('Displaying 1 of 1 found');
+		$this->nok('Zabbix server');
 		$this->ok('Displaying 0 of 0 found');
 		$this->ok('...');
 	}
