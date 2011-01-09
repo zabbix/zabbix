@@ -101,7 +101,7 @@ void	help()
  *                                                                            *
  * Purpose: Print error text to the stderr                                    *
  *                                                                            *
- * Parameters: fmt - format of mesage                                         *
+ * Parameters: fmt - format of message                                        *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
@@ -141,7 +141,7 @@ void	__zbx_zbx_error(const char *fmt, ...)
  * Purpose: Secure version of snprintf function.                              *
  *          Add zero character at the end of string.                          *
  *                                                                            *
- * Parameters: str - destination buffer poiner                                *
+ * Parameters: str - destination buffer pointer                               *
  *             count - size of destination buffer                             *
  *             fmt - format                                                   *
  *                                                                            *
@@ -177,7 +177,7 @@ int	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...)
  * Purpose: Secure version of vsnprintf function.                             *
  *          Add zero character at the end of string.                          *
  *                                                                            *
- * Parameters: str - destination buffer poiner                                *
+ * Parameters: str - destination buffer pointer                               *
  *             count - size of destination buffer                             *
  *             fmt - format                                                   *
  *                                                                            *
@@ -322,27 +322,27 @@ void	zbx_chrcpy_alloc(char **str, int *alloc_len, int *offset, const char src)
 /* Has to be rewritten to avoid malloc */
 char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2)
 {
-        char *new_str = NULL;
-        const char *p;
-        const char *q;
-        const char *r;
-        char *t;
-        long len;
-        long diff;
-        unsigned long count = 0;
+	char *new_str = NULL;
+	const char *p;
+	const char *q;
+	const char *r;
+	char *t;
+	long len;
+	long diff;
+	unsigned long count = 0;
 
 	assert(str);
 	assert(sub_str1);
 	assert(sub_str2);
 
-        len = (long)strlen(sub_str1);
+	len = (long)strlen(sub_str1);
 
-        /* count the number of occurrences of sub_str1 */
-        for ( p=str; (p = strstr(p, sub_str1)); p+=len, count++ );
+	/* count the number of occurrences of sub_str1 */
+	for ( p=str; (p = strstr(p, sub_str1)); p+=len, count++ );
 
 	if ( 0 == count )	return strdup(str);
 
-        diff = (long)strlen(sub_str2) - len;
+	diff = (long)strlen(sub_str2) - len;
 
         /* allocate new memory */
         new_str = zbx_malloc(new_str, (size_t)(strlen(str) + count*diff + 1)*sizeof(char));
@@ -361,7 +361,7 @@ char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2
 
 	*t = '\0';
 
-        return new_str;
+	return new_str;
 }
 
 /******************************************************************************
