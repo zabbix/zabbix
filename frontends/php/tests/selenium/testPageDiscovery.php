@@ -21,7 +21,7 @@
 <?php
 require_once(dirname(__FILE__).'/class.ctest.php');
 
-class testPageMediaTypes extends CTest
+class testPageDiscovery extends CTest
 {
 	// Returns all discovery rules
 	public static function allRules()
