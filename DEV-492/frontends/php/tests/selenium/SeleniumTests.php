@@ -29,6 +29,7 @@ require_once(dirname(__FILE__).'/testPageMediaTypes.php');
 require_once(dirname(__FILE__).'/testPageScripts.php');
 require_once(dirname(__FILE__).'/testPageSearch.php');
 require_once(dirname(__FILE__).'/testPageTemplates.php');
+require_once(dirname(__FILE__).'/testPageUserGroups.php');
 require_once(dirname(__FILE__).'/testPageUsers.php');
 require_once(dirname(__FILE__).'/testFormHost.php');
 require_once(dirname(__FILE__).'/testFormHostGroup.php');
@@ -50,6 +51,7 @@ class SeleniumTests
 		$suite->addTestSuite('testPageMediaTypes');
 		$suite->addTestSuite('testPageSearch');
 		$suite->addTestSuite('testPageTemplates');
+		$suite->addTestSuite('testPageUserGroups');
 		$suite->addTestSuite('testPageUsers');
 		$suite->addTestSuite('testFormHost');
 		$suite->addTestSuite('testFormHostGroup');
