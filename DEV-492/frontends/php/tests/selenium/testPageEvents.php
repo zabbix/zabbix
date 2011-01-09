@@ -24,9 +24,11 @@ require_once(dirname(__FILE__).'/class.ctest.php');
 class testPageEvents extends CTest
 {
 
-	public function testPageEvents_SimpleTest()
+	public function testPageEvents_Triggers_SimpleTest()
 	{
 		$this->login('events.php');
+		$this->dropdown_select('source','Trigger');
+
 		$this->assertTitle('Latest events');
 		$this->ok('HISTORY OF EVENTS');
 		$this->ok('Group');
@@ -35,13 +37,7 @@ class testPageEvents extends CTest
 		$this->ok('Filter');
 		$this->ok('Displaying 0 of 0 found');
 		// table header
-		$this->ok('Time');
-		$this->ok('Description');
-		$this->ok('Status');
-		$this->ok('Severity');
-		$this->ok('Duration');
-		$this->ok('Ack');
-		$this->ok('Actions');
+		$this->ok(array('Time','Description','Status','Severity','Duration','Ack','Actions'));
 	}
 }
 ?>
