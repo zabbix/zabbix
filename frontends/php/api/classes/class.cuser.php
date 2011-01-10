@@ -188,7 +188,6 @@ class CUser extends CZBXAPI{
 					unset($options['filter']['passwd']);
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('It is not possible to filter by user password') );
 				}
-				return true;
 			}
 			catch(APIException $e){
 				$error = $e->getErrors();
@@ -206,7 +205,6 @@ class CUser extends CZBXAPI{
 					unset($options['search']['passwd']);
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('It is not possible to search by user password') );
 				}
-				return true;
 			}
 			catch(APIException $e){
 				$error = $e->getErrors();
