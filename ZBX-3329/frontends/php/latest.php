@@ -279,7 +279,11 @@ include_once('include/page_header.php');
 		else
 			$lastclock = ' - ';
 
-		$lastvalue = format_lastvalue($db_item);
+		if(isset($db_item["lastclock"]) && $db_item["lastclock"] != 0){
+			$lastvalue = format_lastvalue($db_item);
+		}else{
+			$lastvalue = ' - ';
+		}
 
 		if(isset($db_item['lastvalue']) && isset($db_item['prevvalue'])
 				&& in_array($db_item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
