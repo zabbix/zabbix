@@ -10,7 +10,7 @@ function showScriptDialog(confirmation, buttons){
 		buttons: buttons,
 		draggable: false,
 		modal: true,
-		width: (w > 600 ? 600 : 'auto'),
+		width: (w > 600 ? 600 : 'inherit'),
 		resizable: false,
 		minWidth: 200,
 		minHeight: 100,
@@ -19,6 +19,7 @@ function showScriptDialog(confirmation, buttons){
 	});
 
 	return jQuery('#scriptDialog').dialog('widget');
+
 }
 
 function executeScript(hostid, scriptid, confirmation){
