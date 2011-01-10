@@ -486,7 +486,13 @@ function insert_js_function($fnct_name){
 					var chkBoxes = form.getInputs("checkbox");
 					for(var i=0; i < chkBoxes.length; i++){
 						if(chkBoxes[i].checked && (chkBoxes[i].name.indexOf("all_") < 0)){
-							items["values"].push(chkBoxes[i].value);
+							var value = {};
+							if(isset(chkBoxes[i].value, popupReference))
+								value = popupReference[chkBoxes[i].value];
+							else
+								value[object] = chkBoxes[i].value;
+
+							items["values"].push(value);
 						}
 					}
 
@@ -500,7 +506,13 @@ function insert_js_function($fnct_name){
 					var parent = window.opener;
 					if(!parent) return close_window();
 
-					var items = { "object": object, "values": new Array(singleValue) };
+					var value = {};
+					if(isset(singleValue, popupReference))
+						value = popupReference[singleValue];
+					else
+						value[object] = singleValue;
+
+					var items = { "object": object, "values": new Array(value) };
 
 					parent.addPopupValues(items);
 					close_window();

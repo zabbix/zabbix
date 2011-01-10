@@ -20,6 +20,7 @@
 ?>
 <?php
 // include JS + templates
+require_once('include/templates/action.js.php');
 ?>
 <?php
 // TODO
@@ -411,17 +412,6 @@
 			$new_operation['default_msg'] = 1;
 		}
 
-		if(!isset($new_operation['operationtype']))	$new_operation['operationtype']	= OPERATION_TYPE_MESSAGE;
-		if(!isset($new_operation['object']))		$new_operation['object']	= OPERATION_OBJECT_GROUP;
-		if(!isset($new_operation['objectid']))		$new_operation['objectid']	= 0;
-		if(!isset($new_operation['mediatypeid']))	$new_operation['mediatypeid']	= 0;
-		if(!isset($new_operation['shortdata']))		$new_operation['shortdata']	= ACTION_DEFAULT_SUBJ;
-		if(!isset($new_operation['longdata']))		$new_operation['longdata']	= ACTION_DEFAULT_MSG;
-		if(!isset($new_operation['esc_step_from']))	$new_operation['esc_step_from'] = 1;
-		if(!isset($new_operation['esc_step_to']))	$new_operation['esc_step_to'] = 1;
-		if(!isset($new_operation['esc_period']))	$new_operation['esc_period'] = 0;
-		if(!isset($new_operation['evaltype']))		$new_operation['evaltype']	= 0;
-		if(!isset($new_operation['opconditions']))	$new_operation['opconditions'] = array();
 		if(!isset($new_operation['default_msg']))	$new_operation['default_msg'] = 0;
 
 
@@ -432,8 +422,6 @@
 			$tblOper->addItem(new CVar('new_operation[id]', $new_operation['id']));
 			$update_mode = true;
 		}
-
-		$tblNewOperation = new CTable();
 
 		$tblStep = new CTable();
 
@@ -455,113 +443,100 @@
 				' ['.S_MIN_SMALL.' 60, 0-' . S_DEFAULT . ']'))
 		));
 
-		$tblNewOperation->addRow(array(S_STEP, $tblStep));
+		$tblOper->addRow(array(S_STEP, $tblStep));
 
 		$cmbOpType = new CComboBox('new_operation[operationtype]', $new_operation['operationtype'], 'submit()');
 		foreach($allowedOperations as $oper)
 			$cmbOpType->addItem($oper, operation_type2str($oper));
 
-		$tblNewOperation->addRow(array(S_OPERATION_TYPE, $cmbOpType));
+		$tblOper->addRow(array(S_OPERATION_TYPE, $cmbOpType));
 
 		switch($new_operation['operationtype']) {
 			case OPERATION_TYPE_MESSAGE:
-				if($new_operation['object'] == OPERATION_OBJECT_GROUP) {
-					$object_srctbl = 'usrgrp';
-					$object_srcfld1 = 'usrgrpid';
-					$object_name = CUserGroup::get(array('usrgrpids' => $new_operation['objectid'], 'output' => API_OUTPUT_EXTEND));
-					$object_name = reset($object_name);
-					$display_name = 'name';
-				}
-				else {
-					$object_srctbl = 'users';
-					$object_srcfld1 = 'userid';
-					$object_name = CUser::get(array('userids' => $new_operation['objectid'], 'output' => API_OUTPUT_EXTEND));
-					$object_name = reset($object_name);
-					$display_name = 'alias';
-				}
+				$usrgrpList = new CTable();
+				$usrgrpList->setAttribute('id', 'opmsgUsrgrpList');
 
-				$tblOper->addItem(new CVar('new_operation[objectid]', $new_operation['objectid']));
+				$addUsrgrpBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm='.S_ACTION.
+							'&srctbl=usrgrp'.
+							'&srcfld1=usrgrpid'.
+							'&srcfld2=name'.
+							'&multiselect=1'.
+							'",450,450)','link_menu');
 
-				if($object_name) $object_name = $object_name[$display_name];
+				$col = new CCol($addUsrgrpBtn);
+				$col->setAttribute('colspan', 2);
 
-				$cmbObject = new CComboBox('new_operation[object]', $new_operation['object'], 'submit()');
-				$cmbObject->addItem(OPERATION_OBJECT_USER, S_SINGLE_USER);
-				$cmbObject->addItem(OPERATION_OBJECT_GROUP, S_USER_GROUP);
+				$buttonRow = new CRow($col);
+				$buttonRow->setAttribute('id', 'opmsgUsrgrpListFooter');
 
-				$tblNewOperation->addRow(array(S_SEND_MESSAGE_TO, array(
-					$cmbObject,
-					new CTextBox('object_name', $object_name, 40, 'yes'),
-					new CButton('select_object', S_SELECT,
-						'return PopUp("popup.php?dstfrm=' . S_ACTION .
-							'&dstfld1=new_operation%5Bobjectid%5D' .
-							'&dstfld2=object_name' .
-							'&srctbl=' . $object_srctbl .
-							'&srcfld1=' . $object_srcfld1 .
-							'&srcfld2=' . $display_name .
-							'&submit=1' .
-							'",450,450)', 'link_menu')
-				)));
+				$usrgrpList->addRow($buttonRow);
+
+
+				$userList = new CTable();
+				$userList->setAttribute('id', 'opmsgUserList');
+
+				$addUserBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm='.S_ACTION.
+							'&srctbl=users'.
+							'&srcfld1=userid'.
+							'&srcfld2=alias'.
+							'&multiselect=1'.
+							'",450,450)','link_menu');
+
+				$col = new CCol($addUserBtn);
+				$col->setAttribute('colspan', 2);
+
+				$buttonRow = new CRow($col);
+				$buttonRow->setAttribute('id', 'opmsgUserListFooter');
+
+				$userList->addRow($buttonRow);
+
+// Add Participations
+				$usrgrpids = isset($new_operation['opmessage_grp']) ?
+					zbx_objectValues($new_operation['opmessage_grp'], 'usrgrpid') :
+					array();
+
+				$userids = isset($new_operation['opmessage_usr']) ?
+					zbx_objectValues($new_operation['opmessage_usr'], 'userid') :
+					array();
+
+				$usrgrps = CUserGroup::get(array('usrgrpids' => $usrgrpids, 'output' => array('name')));
+				order_result($usrgrps, 'name');
+
+				$users = CUser::get(array('userids' => $userids, 'output' => array('alias')));
+				order_result($users, 'alias');
+
+				$jsInsert = '';
+				$jsInsert.= 'addPopupValues('.zbx_jsvalue(array('object'=>'usrgrpid', 'values'=>$usrgrps)).');';
+				$jsInsert.= 'addPopupValues('.zbx_jsvalue(array('object'=>'userid', 'values'=>$users)).');';
+
+				zbx_add_post_js('setTimeout(function(){'.$jsInsert.'}, 20);');
+
+				$tblOper->addRow(array(_('Send to User groups'), new CDiv($usrgrpList, 'objectgroup inlineblock border_dotted ui-corner-all')));
+				$tblOper->addRow(array(_('Send to Users'), new CDiv($userList, 'objectgroup inlineblock border_dotted ui-corner-all')));
 
 				$cmbMediaType = new CComboBox('new_operation[mediatypeid]', $new_operation['mediatypeid'], 'submit()');
 				$cmbMediaType->addItem(0, S_MINUS_ALL_MINUS);
 
-				if(OPERATION_OBJECT_USER == $new_operation['object']){
-					$sql = 'SELECT DISTINCT mt.mediatypeid,mt.description,m.userid ' .
-							' FROM media_type mt, media m ' .
-							' WHERE ' . DBin_node('mt.mediatypeid') .
-							' AND m.mediatypeid=mt.mediatypeid ' .
-							' AND m.userid=' . $new_operation['objectid'] .
-							' AND m.active=' . ACTION_STATUS_ENABLED .
-							' ORDER BY mt.description';
-					$db_mediatypes = DBselect($sql);
-					while($db_mediatype = DBfetch($db_mediatypes)){
-						$cmbMediaType->addItem($db_mediatype['mediatypeid'], $db_mediatype['description']);
-					}
+				$sql = 'SELECT mt.mediatypeid, mt.description' .
+						' FROM media_type mt ' .
+						' WHERE ' . DBin_node('mt.mediatypeid') .
+						' ORDER BY mt.description';
+				$db_mediatypes = DBselect($sql);
+				while($db_mediatype = DBfetch($db_mediatypes)){
+					$cmbMediaType->addItem($db_mediatype['mediatypeid'], $db_mediatype['description']);
+				}
+
+				$tblOper->addRow(array(S_SEND_ONLY_TO, $cmbMediaType));
+
+				$tblOper->addRow(array(S_DEFAULT_MESSAGE, new CCheckBox('new_operation[default_msg]', $new_operation['default_msg'], 'javascript: submit();', 1)));
+
+				if(!$new_operation['opmessage']['default_msg']){
+					$tblOper->addRow(array(S_SUBJECT, new CTextBox('new_operation[opmessage][subject]', $new_operation['opmessage']['subject'], 77)));
+					$tblOper->addRow(array(S_MESSAGE, new CTextArea('new_operation[opmessage][message]', $new_operation['opmessage']['message'], 77, 7)));
 				}
 				else{
-					$sql = 'SELECT mt.mediatypeid, mt.description' .
-							' FROM media_type mt ' .
-							' WHERE ' . DBin_node('mt.mediatypeid') .
-							' ORDER BY mt.description';
-					$db_mediatypes = DBselect($sql);
-					while($db_mediatype = DBfetch($db_mediatypes)){
-						$cmbMediaType->addItem($db_mediatype['mediatypeid'], $db_mediatype['description']);
-					}
-				}
-				$tblNewOperation->addRow(array(S_SEND_ONLY_TO, $cmbMediaType));
-
-				if(OPERATION_OBJECT_USER == $new_operation['object']){
-					$media_table = new CTable(S_NO_MEDIA_DEFINED,'tablestripped');
-
-					$sql = 'SELECT mt.description,m.sendto,m.period,m.severity ' .
-							' FROM media_type mt,media m ' .
-							' WHERE ' . DBin_node('mt.mediatypeid') .
-								' AND mt.mediatypeid=m.mediatypeid ' .
-								' AND m.userid=' . $new_operation['objectid'] .
-								($new_operation['mediatypeid'] ? ' AND m.mediatypeid=' . $new_operation['mediatypeid'] : '') .
-								' AND m.active=' . ACTION_STATUS_ENABLED .
-							' ORDER BY mt.description,m.sendto';
-					$db_medias = DBselect($sql);
-					while($db_media = DBfetch($db_medias)) {
-						$media_table->addRow(array(
-							new CSpan($db_media['description'], 'nowrap'),
-							new CSpan($db_media['sendto'], 'nowrap'),
-							new CSpan($db_media['period'], 'nowrap'),
-							media_severity2str($db_media['severity'])
-						));
-					}
-
-					$tblNewOperation->addRow(array(S_USER_MEDIAS, $media_table));
-				}
-				$tblNewOperation->addRow(array(S_DEFAULT_MESSAGE, new CCheckBox('new_operation[default_msg]', $new_operation['default_msg'], 'javascript: submit();', 1)));
-
-				if(!$new_operation['default_msg']){
-					$tblNewOperation->addRow(array(S_SUBJECT, new CTextBox('new_operation[shortdata]', $new_operation['shortdata'], 77)));
-					$tblNewOperation->addRow(array(S_MESSAGE, new CTextArea('new_operation[longdata]', $new_operation['longdata'], 77, 7)));
-				}
-				else{
-					$tblOper->addItem(new CVar('new_operation[shortdata]', $new_operation['shortdata']));
-					$tblOper->addItem(new CVar('new_operation[longdata]', $new_operation['longdata']));
+					$tblOper->addItem(new CVar('new_operation[opmessage][subject]', $new_operation['opmessage']['subject']));
+					$tblOper->addItem(new CVar('new_operation[opmessage][message]', $new_operation['opmessage']['message']));
 				}
 				break;
 			case OPERATION_TYPE_COMMAND:
@@ -569,7 +544,7 @@
 				$tblOper->addItem(new CVar('new_operation[objectid]', 0));
 				$tblOper->addItem(new CVar('new_operation[shortdata]', ''));
 
-				$tblNewOperation->addRow(array(S_REMOTE_COMMAND,
+				$tblOper->addRow(array(S_REMOTE_COMMAND,
 					new CTextArea('new_operation[longdata]', $new_operation['longdata'], 77, 7)));
 				break;
 			case OPERATION_TYPE_HOST_ADD:
@@ -591,7 +566,7 @@
 				if($object_name = DBfetch(DBselect('select name FROM groups WHERE groupid=' . $new_operation['objectid']))) {
 					$object_name = $object_name['name'];
 				}
-				$tblNewOperation->addRow(array(S_GROUP, array(
+				$tblOper->addRow(array(S_GROUP, array(
 					new CTextBox('object_name', $object_name, 40, 'yes'),
 					new CButton('select_object', S_SELECT,
 						'return PopUp("popup.php?dstfrm=' . S_ACTION .
@@ -611,7 +586,7 @@
 				if($object_name = DBfetch(DBselect($sql))){
 					$object_name = $object_name['host'];
 				}
-				$tblNewOperation->addRow(array(S_TEMPLATE, array(
+				$tblOper->addRow(array(S_TEMPLATE, array(
 					new CTextBox('object_name', $object_name, 40, 'yes'),
 					new CButton('select_object', S_SELECT,
 							'return PopUp("popup.php?dstfrm=' . S_ACTION .
@@ -690,7 +665,7 @@
 			$cmb_calc_type->addItem(ACTION_EVAL_TYPE_AND, S_AND_BIG);
 			$cmb_calc_type->addItem(ACTION_EVAL_TYPE_OR, S_OR_BIG);
 
-			$tblNewOperation->addRow(array(
+			$tblOper->addRow(array(
 				S_TYPE_OF_CALCULATION,
 				array($cmb_calc_type, new CTextBox('preview', $grouped_opconditions, 60, 'yes'))
 			));
@@ -702,10 +677,8 @@
 		$tblCond->addRow($cond_el);
 		$tblCond->addRow(new CCol($cond_buttons));
 
-		$tblNewOperation->addRow(array(S_CONDITIONS, $tblCond));
+		$tblOper->addRow(array(S_CONDITIONS, $tblCond));
 		unset($grouped_opconditions, $cond_el, $cond_buttons, $tblCond);
-
-		$tblOper->addRow($tblNewOperation);
 
 		$footer = array(
 			new CSubmit('add_operation', $update_mode ? _s('Save') : _s('Add'), null, 'link_menu'),

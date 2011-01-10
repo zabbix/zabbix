@@ -34,7 +34,6 @@ if(isset($_REQUEST['plaintext'])) define('ZBX_PAGE_NO_MENU', 1);
 else if(PAGE_TYPE_HTML == $page['type']) define('ZBX_PAGE_DO_REFRESH', 1);
 
 include_once('include/page_header.php');
-
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -379,7 +378,7 @@ include_once('include/page_header.php');
 
 				$data['value'] = trim($data['value'],"\r\n");
 				$data['value'] = encode_log($data['value']);
-				
+
 //				$data['value'] = str_replace(' ', '&nbsp;', $data['value']);
 //				$data['value'] = str_replace("\t", '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', $data['value']);
 //				$data['value'] = zbx_nl2br($data['value']);
@@ -556,7 +555,7 @@ function addPopupValues(list){
 		for(var i=0; i < list.values.length; i++){
 			if(!isset(i, list.values) || empty(list.values[i])) continue;
 
-			create_var('zbx_filter', 'itemid['+list.values[i]+']', list.values[i], false);
+			create_var('zbx_filter', 'itemid['+list.values[i].itemid+']', list.values[i].itemid, false);
 		}
 
 		$('zbx_filter').submit();

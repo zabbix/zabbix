@@ -1,18 +1,18 @@
 /* Color CSS Document */
 .ok{ color: #00AA00; }
-.fail{ color: #AA0000; }
+.fail{ color: #D40000; }
 .info{ color: #444444; }
 
 .footer 	{ 	color: #CCCCCC;	}
 .enabled	{	color: #00AA00;	}
-.disabled	{	color: #AA0000;	}
+.disabled	{	color: #D40000;	}
 .unknown	{	color: #AAAAAA;	}
-.on			{	color: #AA0000;	}
+.on			{	color: #D40000;	}
 .off		{	color: #00AA00;	}
 .hidden		{	display: none;	}
 
 .green	{ color: #00AA00; }
-.red	{ color: #AA0000; }
+.red	{ color: #D40000; }
 .orange	{ color: #EE6000; }
 .blue	{ color: #0033FF; }
 .gold	{ color: #999900; }
@@ -34,10 +34,10 @@ a.enabled:visited 	{	color:#00AA00;	}
 a.enabled:hover 	{	color:#44CC44;	}
 a.enabled:active 	{	color:#00AA00;	}
 
-a.disabled:link		{	color:#AA0000;	}
-a.disabled:visited 	{	color:#AA0000;	}
+a.disabled:link		{	color:#D40000;	}
+a.disabled:visited 	{	color:#D40000;	}
 a.disabled:hover 	{	color:#CC4444;	}
-a.disabled:active 	{	color:#AA0000;	}
+a.disabled:active 	{	color:#D40000;	}
 
 a.orange:link		{	color:#EE7000;	}
 a.orange:visited 	{	color:#EE7000;	}
@@ -54,7 +54,7 @@ a.off:visited 	{	color:#00AA00;	}
 a.off:hover 	{	color:#44CC44;	}
 a.off:active 	{	color:#00AA00;	}
 
-a.on:link		{	color:#AA0000;	}
-a.on:visited 	{	color:#AA0000;	}
+a.on:link		{	color:#D40000;	}
+a.on:visited 	{	color:#D40000;	}
 a.on:hover 		{	color:#CC7777;	}
-a.on:active 	{	color:#AA0000;	}
+a.on:active 	{	color:#D40000;	}

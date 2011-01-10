@@ -39,11 +39,6 @@
 </tr>
 </script>
 
-<script type="text/x-jquery-tmpl" id="hostInterfaceRowRemove">
-
-</script>
-
-
 
 <script type="text/javascript">
 function addInterfaceRow(hostInterface){
@@ -117,7 +112,6 @@ function addInterfaceRow(hostInterface){
 
 function removeInterfaceRow(hostInterfaceId){
 	jQuery('#hostInterfaceRow_'+hostInterfaceId).remove();
-	jQuery("#hostIterfaces").accordion('resize');
 }
 
 jQuery(document).ready(function(){
