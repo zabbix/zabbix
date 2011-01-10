@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-	define('ZABBIX_VERSION','1.8.4rc3');
+	define('ZABBIX_VERSION','1.8.5rc1');
 	define('ZABBIX_API_VERSION','1.3');
 /* USER DEFINES */
 
@@ -180,7 +180,7 @@
 	define('AUDIT_RESOURCE_MAINTENANCE',	27);
 	define('AUDIT_RESOURCE_REGEXP',			28);
 	define('AUDIT_RESOURCE_MACRO',			29);
-	define('AUDIT_RESOURCE_TEMPLATE',			30);
+	define('AUDIT_RESOURCE_TEMPLATE',		30);
 
 	define('CONDITION_TYPE_HOST_GROUP',			0);
 	define('CONDITION_TYPE_HOST',				1);

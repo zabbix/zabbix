@@ -264,7 +264,7 @@
 
 	define('NOT_EMPTY',"({}!='')&&");
 	define('DB_ID',"({}>=0&&bccomp('{}',\"10000000000000000000\")<0)&&");
-	define('NOT_ZERO',"({}>0)&&");
+	define('NOT_ZERO',"({}!=0)&&");
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 
@@ -494,7 +494,7 @@
 	function check_field(&$fields, &$field, $checks){
 		if(!isset($checks[5])) $checks[5] = $field;
 		list($type,$opt,$flags,$validation,$exception,$caption)=$checks;
-                                                            	
+
 		if($flags&P_UNSET_EMPTY && isset($_REQUEST[$field]) && $_REQUEST[$field]==''){
 			unset_request($field,'P_UNSET_EMPTY');
 		}
