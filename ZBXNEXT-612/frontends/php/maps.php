@@ -33,6 +33,8 @@
 		define('ZBX_PAGE_DO_REFRESH', 1);
 	}
 
+	define('GET_PARAM_NAME', 'mapname');
+
 include_once('include/page_header.php');
 
 ?>
@@ -40,7 +42,7 @@ include_once('include/page_header.php');
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'sysmapid'=>	array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,		NULL),
-		'name'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,		null),
+		GET_PARAM_NAME=>		array(T_ZBX_STR, O_OPT,	P_SYS,		null,		null),
 		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,		IN('0,1'),	NULL),
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
@@ -94,7 +96,7 @@ include_once('include/page_header.php');
 	$maps = CMap::get($options);
 	$maps = zbx_toHash($maps, 'sysmapid');
 
-	if($name = get_request('name')){
+	if($name = get_request(GET_PARAM_NAME)){
 		unset($_REQUEST['sysmapid']);
 
 		foreach($maps as $map){
@@ -111,69 +113,70 @@ include_once('include/page_header.php');
 		}
 	}
 
+
 	if(!(isset($_REQUEST['sysmapid']) && isset($maps[$_REQUEST['sysmapid']]))){
-		access_deny();
+		show_error_message(_('No permissions or map does not exist.'));
 	}
+	else{
+		$map_wdgt = new CWidget('hat_maps');
+		$table = new CTable(S_NO_MAPS_DEFINED, 'map');
 
+		$icon = $fs_icon = null;
 
-	$map_wdgt = new CWidget('hat_maps');
-	$table = new CTable(S_NO_MAPS_DEFINED, 'map');
+		if(!empty($maps)){
+	// no profile record when get by name
+			if(!isset($_REQUEST[GET_PARAM_NAME]))
+				CProfile::update('web.maps.sysmapid', $_REQUEST['sysmapid'], PROFILE_TYPE_ID);
 
-	$icon = $fs_icon = null;
+			$form = new CForm(null, 'get');
+			$form->addVar('fullscreen', $_REQUEST['fullscreen']);
+			$cmbMaps = new CComboBox('sysmapid', get_request('sysmapid', 0), 'submit()');
+			order_result($maps, 'name');
+			foreach($maps as $sysmapid => $map){
+				$cmbMaps->addItem($sysmapid, get_node_name_by_elid($sysmapid, null, ': ').$map['name']);
+			}
+			$form->addItem($cmbMaps);
 
-	if(!empty($maps)){
-// no profile record when get by name
-		if(!isset($_REQUEST['name']))
-			CProfile::update('web.maps.sysmapid', $_REQUEST['sysmapid'], PROFILE_TYPE_ID);
+			$map_wdgt->addHeader($maps[$_REQUEST['sysmapid']]['name'], $form);
 
-		$form = new CForm(null, 'get');
-		$form->addVar('fullscreen', $_REQUEST['fullscreen']);
-		$cmbMaps = new CComboBox('sysmapid', get_request('sysmapid', 0), 'submit()');
-		order_result($maps, 'name');
-		foreach($maps as $sysmapid => $map){
-			$cmbMaps->addItem($sysmapid, get_node_name_by_elid($sysmapid, null, ': ').$map['name']);
-		}
-		$form->addItem($cmbMaps);
-
-		$map_wdgt->addHeader($maps[$_REQUEST['sysmapid']]['name'], $form);
-
-// GET MAP PARENT MAPS {{{
-		$parent_maps = array();
-		foreach($maps as $sysmapid => $map){
-			foreach($map['selements'] as $enum => $selement){
-				if(($selement['elementid'] == $_REQUEST['sysmapid']) && ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP)){
-					$parent_maps[] = SPACE.SPACE;
-					$parent_maps[] = new Clink($map['name'], 'maps.php?sysmapid='.$map['sysmapid'].'&fullscreen='.$_REQUEST['fullscreen']);
-					break;
+	// GET MAP PARENT MAPS {{{
+			$parent_maps = array();
+			foreach($maps as $sysmapid => $map){
+				foreach($map['selements'] as $enum => $selement){
+					if(($selement['elementid'] == $_REQUEST['sysmapid']) && ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP)){
+						$parent_maps[] = SPACE.SPACE;
+						$parent_maps[] = new Clink($map['name'], 'maps.php?sysmapid='.$map['sysmapid'].'&fullscreen='.$_REQUEST['fullscreen']);
+						break;
+					}
 				}
 			}
+
+			if(!empty($parent_maps)){
+				array_unshift($parent_maps, S_UPPER_LEVEL_MAPS.':');
+				$map_wdgt->addHeader($parent_maps);
+			}
+	// }}} GET MAP PARENT MAPS
+
+			$action_map = getActionMapBySysmap($maps[$_REQUEST['sysmapid']]);
+
+			$table->addRow($action_map);
+
+			$imgMap = new CImg('map.php?sysmapid='.$_REQUEST['sysmapid']);
+			$imgMap->setMap($action_map->getName());
+			$table->addRow($imgMap);
+
+			$icon = get_icon('favourite', array(
+				'fav' => 'web.favorite.sysmapids',
+				'elname' => 'sysmapid',
+				'elid' => $_REQUEST['sysmapid'],
+			));
+			$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 		}
 
-		if(!empty($parent_maps)){
-			array_unshift($parent_maps, S_UPPER_LEVEL_MAPS.':');
-			$map_wdgt->addHeader($parent_maps);
-		}
-// }}} GET MAP PARENT MAPS
-
-		$action_map = getActionMapBySysmap($maps[$_REQUEST['sysmapid']]);
-
-		$table->addRow($action_map);
-
-		$imgMap = new CImg('map.php?sysmapid='.$_REQUEST['sysmapid']);
-		$imgMap->setMap($action_map->getName());
-		$table->addRow($imgMap);
-
-		$icon = get_icon('favourite', array(
-			'fav' => 'web.favorite.sysmapids',
-			'elname' => 'sysmapid',
-			'elid' => $_REQUEST['sysmapid'],
-		));
-		$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
+		$map_wdgt->addItem($table);
+		$map_wdgt->addPageHeader(S_NETWORK_MAPS_BIG, array($icon, $fs_icon));
+		$map_wdgt->show();
 	}
-
-	$map_wdgt->addItem($table);
-	$map_wdgt->addPageHeader(S_NETWORK_MAPS_BIG, array($icon, $fs_icon));
-	$map_wdgt->show();
 ?>
 <?php
 include_once('include/page_footer.php');
