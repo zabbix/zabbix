@@ -266,7 +266,6 @@
 	'S_INCORRECT_PARAMETER_USED_FOR_CONDITIONS'=>	'Incorrect parameter used for Conditions',
 	'S_INCORRECT_PARAMETER_USED_FOR_OPERATIONS'=>	'Incorrect parameter used for Operations',
 	'S_INCORRECT_PARAMETER_USED_FOR_ACTION'=>	'Incorrect parameter used for Action',
-	'S_EMPTY_INPUT_PARAMETER'=>	'Empty input parameter',
 
 //	node.php
 	'S_TIME_ZONE'=>				'Time zone',
@@ -597,7 +596,6 @@
 
 	'S_CANNOT_REMOVE_MACRO' => 'Cannot remove macro',
 	'S_CANNOT_UPDATE_MACRO' => 'Cannot update macro',
-	'S_CANNOT_ADD_MACRO' => 'Cannot add macro',
 
 // media_types.php
 	'S_DELETE_SELECTED_MEDIATYPES_Q'=>		'Delete selected media types?',
@@ -2105,8 +2103,6 @@
 	'S_DELETE_SELECTED_APPLICATIONS'  => 'Delete selected applications?',
 	'S_CANNOT_CREATE_APPLICATION'  => 'Cannot create application',
 	'S_INCORRECT_FIELDS_FOR_APPLICATIONS'  => 'Incorrect fields for application',
-	'S_CANNOT_UPDATE_APPLICATION'  => 'Cannot update application',
-	'S_CANNOT_DELETE_APPLICATION'  => 'Cannot delete application',
 
 // popup_media.php
 	'S_INCORRECT_TIME_PERIOD'=>	'Incorrect time period',

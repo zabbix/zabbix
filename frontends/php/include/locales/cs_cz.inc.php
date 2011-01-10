@@ -1911,7 +1911,6 @@
 	'S_AUDIT_LOGS_BIG'=>			'ZÁZNAMY AUDITU',
 	'S_AUDIT_ACTIONS_BIG'=>			'AKCE AUDITU',
 	'S_ACTION'=>				'Akce',
-	'S_ACTIONS_BIG'=>				'AKCE',
 	'S_DETAILS'=>				'Detaily',
 	'S_UNKNOWN_ACTION'=>			'Neznámá akce',
 	'S_ADDED'=>				'Přidáno',
