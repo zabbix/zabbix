@@ -35,6 +35,7 @@ class testPageTemplates extends CTest
 		{
 			$templates[]=array($template);
 		}
+		DBclose();
 		return $templates;
 	}
 

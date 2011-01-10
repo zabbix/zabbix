@@ -35,6 +35,7 @@ class testPageDiscovery extends CTest
 		{
 			$rules[]=array($rule);
 		}
+		DBclose();
 		return $rules;
 	}
 

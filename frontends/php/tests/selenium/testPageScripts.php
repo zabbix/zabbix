@@ -35,6 +35,7 @@ class testPageScripts extends CTest
 		{
 			$scripts[]=array($script);
 		}
+		DBclose();
 		return $scripts;
 	}
 

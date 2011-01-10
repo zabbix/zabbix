@@ -84,14 +84,12 @@ class CTest extends PHPUnit_Extensions_SeleniumTestCase
 			exit;
 		}*/
 
-		// Connect once, do not reconnect
 		if(!isset($DB['DB'])) DBConnect($error);
 	}
 
 	protected function tearDown()
 	{
-// Do not close DB for better performance
-//		DBclose();
+		DBclose();
 	}
 
 	protected function DBsave_tables($tables)
@@ -192,7 +190,7 @@ class CTest extends PHPUnit_Extensions_SeleniumTestCase
 	{
 		foreach($this->failIfExists as $str)
 		{
-			$this->assertTextNotPresent($str);
+			$this->assertTextNotPresent($str,"Chuck Norris: I do not expect string '$str' here.");
 		}
 	}
 

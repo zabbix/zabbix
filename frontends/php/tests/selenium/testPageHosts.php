@@ -35,6 +35,7 @@ class testPageHosts extends CTest
 		{
 			$hosts[]=array($host);
 		}
+		DBclose();
 		return $hosts;
 	}
 
