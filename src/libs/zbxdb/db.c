@@ -309,10 +309,20 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	return ret;
 }
 
+#if defined(HAVE_SQLITE3)
+void	zbx_create_sqlite3_mutex(const char *dbname)
+{
+	if (ZBX_MUTEX_ERROR == php_sem_get(&sqlite_access, dbname))
+	{
+		zbx_error("Unable to create mutex for sqlite");
+		exit(FAIL);
+	}
+}
+#endif	/* HAVE_SQLITE3 */
+
 void	zbx_db_init(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port)
 {
 #if defined(HAVE_SQLITE3)
-	int		ret;
 	struct stat	buf;
 
 	if (0 != stat(dbname, &buf))
@@ -320,16 +330,20 @@ void	zbx_db_init(char *host, char *user, char *password, char *dbname, char *dbs
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot open database file \"%s\": %s", dbname, strerror(errno));
 		zabbix_log(LOG_LEVEL_WARNING, "Creating database ...");
 
-		ret = sqlite3_open(dbname, &conn);
-		if (SQLITE_OK != ret)
+		if (SQLITE_OK != sqlite3_open(dbname, &conn))
 		{
 			zabbix_errlog(ERR_Z3002, dbname, 0, sqlite3_errmsg(conn));
 			exit(FAIL);
 		}
 
+		zbx_create_sqlite3_mutex(dbname);
+
 		DBexecute("%s", db_schema);
 		DBclose();
 	}
+	else
+		zbx_create_sqlite3_mutex(dbname);
+
 #endif	/* HAVE_SQLITE3 */
 }
 
