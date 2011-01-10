@@ -9,6 +9,7 @@ New features:
  - [ZBX-3338] updated Ukrainian translation; thanks to zalex_ua (Richlv)
 
 Bug fixes:
+ - [ZBX-1341] fixed permissions not enforced on api (Vlad)
  - [ZBX-3367] fixed PHP Fatal error when trying to create screen (Vlad)
  - [ZBX-3354] fixed history clearing (Vlad)
  - [ZBX-3360] fixed add simple graph to screen (Vlad)
