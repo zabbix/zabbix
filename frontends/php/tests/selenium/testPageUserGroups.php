@@ -35,6 +35,7 @@ class testPageUserGroups extends CTest
 		{
 			$groups[]=array($group);
 		}
+		DBclose();
 		return $groups;
 	}
 
