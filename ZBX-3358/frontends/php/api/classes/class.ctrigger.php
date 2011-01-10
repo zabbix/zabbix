@@ -1623,7 +1623,6 @@ COpt::memoryPick();
 		}
 
 		// now, check if current situation with dependencies is valid
-
 		self::validateDependencies($triggers);
 		foreach($messages as $message){
 			info($message);
@@ -1836,12 +1835,10 @@ COpt::memoryPick();
 // }}} check circular dependency
 
 
-			$templates = array();
 			$templateids = array();
 			$db_triggerhosts = get_hosts_by_expression($trigger['expression']);
 			while($triggerhost = DBfetch($db_triggerhosts)){
 				if($triggerhost['status'] == HOST_STATUS_TEMPLATE){ //template
-					$templates[$triggerhost['hostid']] = $triggerhost;
 					$templateids[$triggerhost['hostid']] = $triggerhost['hostid'];
 				}
 			}
@@ -1850,7 +1847,6 @@ COpt::memoryPick();
 			$db_dephosts = get_hosts_by_triggerid($trigger['dependencies']);
 			while($dephost = DBfetch($db_dephosts)) {
 				if($dephost['status'] == HOST_STATUS_TEMPLATE){ //template
-					$templates[$dephost['hostid']] = $dephost;
 					$dep_templateids[$dephost['hostid']] = $dephost['hostid'];
 				}
 			}
