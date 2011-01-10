@@ -184,7 +184,6 @@ else{
 		if(isset($_REQUEST['hostid'])) $frmForm->addVar('hostid', $_REQUEST['hostid']);
 		if(isset($_REQUEST['source'])) $frmForm->addVar('source', $_REQUEST['source']);
 		if(isset($_REQUEST['start'])) $frmForm->addVar('start', $_REQUEST['start']);
-		if(isset($_REQUEST['start'])) $frmForm->addVar('start', $_REQUEST['start']);
 		if(isset($_REQUEST['stime'])) $frmForm->addVar('stime', $_REQUEST['stime']);
 		if(isset($_REQUEST['period'])) $frmForm->addVar('period', $_REQUEST['period']);
 		$buttons = new CDiv(array(
