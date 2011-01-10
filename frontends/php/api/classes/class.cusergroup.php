@@ -94,6 +94,19 @@ class CUserGroup extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
+		if(is_array($options['output'])){
+			unset($sql_parts['select']['usrgrp']);
+
+			$dbTable = DB::getSchema('usrgrp');
+			$sql_parts['select']['usrgrpid'] = ' g.usrgrpid';
+			foreach($options['output'] as $key => $field){
+				if(isset($dbTable['fields'][$field]))
+					$sql_parts['select'][$field] = ' g.'.$field;
+			}
+
+			$options['output'] = API_OUTPUT_CUSTOM;
+		}
+
 // PERMISSION CHECK
 		if(USER_TYPE_SUPER_ADMIN == $user_type){
 

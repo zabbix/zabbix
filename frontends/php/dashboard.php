@@ -158,7 +158,7 @@ include_once('include/page_header.php');
 			if('add' == $_REQUEST['action']){
 				zbx_value2array($_REQUEST['favid']);
 
-				foreach($_REQUEST['favid'] as  $num => $sourceid){
+				foreach($_REQUEST['favid'] as $num => $sourceid){
 					$result = add2favorites('web.favorite.graphids',$sourceid,$_REQUEST['favobj']);
 				}
 			}
@@ -443,9 +443,14 @@ function addPopupValues(list){
 
 	var favorites = {'graphid': 1,'itemid': 1,'screenid': 1,'slideshowid': 1,'sysmapid': 1};
 	if(isset(list.object, favorites)){
+		var favid = new Array();
+		for(var i=0; i < list.values.length; i++){
+			favid.push(list.values[i][list.object]);
+		}
+
 		var params = {
 			'favobj': 	list.object,
-			'favid[]': 	list.values,
+			'favid[]': 	favid,
 			'action':	'add'
 		}
 

@@ -175,7 +175,7 @@ function addPopupValues(list){
 
 	if(list.object == 'linktrigger'){
 		for(var i=0; i < list.values.length; i++){
-			create_var('connector_form', 'new_linktriggers['+i+']', list.values[i], false);
+			create_var('connector_form', 'new_linktriggers['+i+']', list.values[i].triggerid, false);
 		}
 
 		create_var('connector_form','add_dependence', 1, true);

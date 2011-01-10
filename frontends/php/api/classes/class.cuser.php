@@ -98,6 +98,19 @@ class CUser extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
+		if(is_array($options['output'])){
+			unset($sql_parts['select']['users']);
+
+			$dbTable = DB::getSchema('users');
+			$sql_parts['select']['userid'] = ' u.userid';
+			foreach($options['output'] as $key => $field){
+				if(isset($dbTable['fields'][$field]))
+					$sql_parts['select'][$field] = ' u.'.$field;
+			}
+
+			$options['output'] = API_OUTPUT_CUSTOM;
+		}
+
 // PERMISSION CHECK
 		if(USER_TYPE_SUPER_ADMIN == $user_type){
 

@@ -2601,7 +2601,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 								$dep_div
 							);
 		}
-/* end new dependency */
+// end new dependency
 
 		$frmMTrig->addItemToBottomRow(new CSubmit('mass_save',S_SAVE));
 		$frmMTrig->addItemToBottomRow(SPACE);
@@ -2612,7 +2612,9 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 						if(list.object == 'deptrigger'){
 							for(var i=0; i < list.values.length; i++){
-								create_var('".$frmMTrig->getName()."', 'new_dependence['+i+']', list.values[i], false);
+								var trigger = list.values[i];
+
+								create_var('".$frmMTrig->getName()."', 'new_dependence['+i+']', list.values[i].triggerid, false);
 							}
 
 							create_var('".$frmMTrig->getName()."','add_dependence', 1, true);
@@ -2960,10 +2962,9 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 		$script = "function addPopupValues(list){
 						if(!isset('object', list)) return false;
-
 						if(list.object == 'deptrigger'){
 							for(var i=0; i < list.values.length; i++){
-								create_var('".$frmTrig->getName()."', 'new_dependence['+i+']', list.values[i], false);
+								create_var('".$frmTrig->getName()."', 'new_dependence['+i+']', list.values[i].triggerid, false);
 							}
 
 							create_var('".$frmTrig->getName()."','add_dependence', 1, true);

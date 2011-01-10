@@ -1029,13 +1029,13 @@ function send_params(params){
 	url.setQuery('?output=ajax');
 
 	new Ajax.Request(url.getUrl(),
-					{
-						'method': 'post',
-						'parameters':params,
-						'onSuccess': function(resp){ },
-//						'onSuccess': function(resp){ SDI(resp.responseText); },
-						'onFailure': function(){document.location = url.getPath()+'?'+Object.toQueryString(params);}
-					}
+		{
+			'method': 'post',
+			'parameters':params,
+			'onSuccess': function(resp){ },
+//			'onSuccess': function(resp){ SDI(resp.responseText); },
+			'onFailure': function(){document.location = url.getPath()+'?'+Object.toQueryString(params);}
+		}
 	);
 }
 
