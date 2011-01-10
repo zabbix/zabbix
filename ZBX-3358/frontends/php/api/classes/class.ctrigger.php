@@ -139,6 +139,7 @@ class CTrigger extends CZBXAPI{
 
 			'filter'					=> null,
 			'search'					=> null,
+			'searchByAny'			=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 
@@ -1262,7 +1263,8 @@ COpt::memoryPick();
 					}
 				}
 
-				if(isset($trigger['description']) && strcmp($trigger['description'], $dbTrigger['description']))
+				// if some of the properties are unchanged, no need to update them in DB
+				if(isset($trigger['description']) && strcmp($trigger['description'], $dbTrigger['description']) != 0)
 					unset($triggers[$tnum]['description']);
 				if(isset($trigger['priority']) && ($trigger['priority'] == $dbTrigger['priority']))
 					unset($triggers[$tnum]['priority']);
@@ -1594,7 +1596,11 @@ COpt::memoryPick();
 				'where' => array('triggerid='.$trigger['triggerid'])
 			));
 
-			// saving trigger dependencies if it has them
+		}
+		unset($trigger);
+
+		$messages = array();
+		foreach($triggers as $tnum => &$trigger){
 			if(isset($trigger['dependencies'])){
 				// deleting existing ones
 				DB::delete('trigger_depends', array('triggerid_down' => $trigger['triggerid']));
@@ -1607,15 +1613,23 @@ COpt::memoryPick();
 					)));
 				}
 
-				// now, check if current situation with dependencies is valid
-				self::validateDependencies($triggers);
+
 			}
 
 			$description = isset($trigger['description']) ? $trigger['description'] : $dbTrigger['description'];
 			$expression = isset($trigger['expression']) ? $trigger['expression'] : explode_exp($dbTrigger['expression'], false);
 			$trigger['expression'] = $expression;
-			info(_s('Trigger [%1$s:%2$s] updated.', $description, $expression));
+			$messages[] = _s('Trigger [%1$s:%2$s] updated.', $description, $expression);
 		}
+
+		// now, check if current situation with dependencies is valid
+
+		self::validateDependencies($triggers);
+		foreach($messages as $message){
+			info($message);
+		}
+
+
 		unset($trigger);
 	}
 
@@ -1803,7 +1817,7 @@ COpt::memoryPick();
 		foreach($triggers as $trigger){
 			if(!isset($trigger['dependencies']) || empty($trigger['dependencies'])) continue;
 
-// check circelar dependency {{{
+// check circular dependency {{{
 			$triggerid_down = $trigger['dependencies'];
 			do{
 				$sql = 'SELECT triggerid_up '.
@@ -1817,8 +1831,9 @@ COpt::memoryPick();
 					}
 					$up_triggerids[] = $up_trigger['triggerid_up'];
 				}
+				$triggerid_down = $up_triggerids;
 			} while(!empty($up_triggerids));
-// }}} check circelar dependency
+// }}} check circular dependency
 
 
 			$templates = array();

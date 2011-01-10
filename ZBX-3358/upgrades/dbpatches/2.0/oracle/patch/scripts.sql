@@ -3,6 +3,8 @@ ALTER TABLE scripts MODIFY usrgrpid DEFAULT NULL;
 ALTER TABLE scripts MODIFY usrgrpid NULL;
 ALTER TABLE scripts MODIFY groupid DEFAULT NULL;
 ALTER TABLE scripts MODIFY groupid NULL;
+ALTER TABLE scripts ADD description nvarchar2(2048) DEFAULT '';
+ALTER TABLE scripts ADD confirmation nvarchar2(255) DEFAULT '';
 UPDATE scripts SET usrgrpid=NULL WHERE usrgrpid=0;
 UPDATE scripts SET groupid=NULL WHERE groupid=0;
 DELETE FROM scripts WHERE NOT usrgrpid IS NULL AND NOT usrgrpid IN (SELECT usrgrpid FROM usrgrp);

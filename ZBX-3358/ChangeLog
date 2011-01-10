@@ -1,8 +1,22 @@
+--------------------------------------------------------------------------------
 Changes for 1.9.2
 
-Bug fixes:
-- [ZBX-3054] fixed Cannot create or update Action with remote command; fix "reset() expects parameter 1 to be array, null given in /actionconf.php:754" (Vlad)
+New features:
+ - [ZBXNEXT-594] Add to zabbix API support for search and filter by rules "ALL" or "ANY" (Vlad)
+ - [ZBXNEXT-592] confirmation dialog for scripts (Vedmak)
+ - [ZBX-3355] added character field length validation on inserts and updates (KB)
+ - [ZBX-3370] updated Russian translation; thanks to zalex_ua and dotneft (Richlv)
+ - [ZBX-3338] updated Ukrainian translation; thanks to zalex_ua (Richlv)
 
+Bug fixes:
+ - [ZBX-3367] fixed PHP Fatal error when trying to create screen (Vlad)
+ - [ZBX-3354] fixed history clearing (Vlad)
+ - [ZBX-3360] fixed add simple graph to screen (Vlad)
+ - [ZBX-3189] fixed trigger dependencies broken (Vlad)
+ - [ZBX-3326] sort po file contents and entries in POTFILES.in, include fuzzy entries in mo files (Richlv)
+ - [ZBX-3054] fixed Cannot create or update Action with remote command; fix "reset() expects parameter 1 to be array, null given in /actionconf.php:754" (Vlad)
+
+--------------------------------------------------------------------------------
 Changes for 1.9.1
 
 New features:
@@ -27,6 +41,7 @@ Bug fixes:
 --------------------------------------------------------------------------------
 Changes for 1.9.0
 
+New features:
  - [DEV-477] added support of low-level discovery of file systems, network interfaces and SNMP OID's (Sasha,Vedmak)
  - [DEV-490] made graph legend optional (Aly)
  - [DEV-483] added templated screens (Aly)
@@ -38,6 +53,32 @@ Changes for 1.9.0
  - [DEV-449] added display of host time in screens (Aly)
  - [DEV-449] added system.localtime[local] check (Sasha)
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 1.8.5rc1
+
+ - [ZBX-3384] fixed server crash in a distributed monitoring setup with PostgreSQL (asaveljevs)
+ - [ZBX-3274] fixed SQLite3 semaphore errors while starting server or proxy (Sasha)
+ - [ZBX-2914] add Ubuntu upstart files; thanks to S. Canchon (Richlv)
+ - [ZBX-3381] negative multipliers for items with value type "numeric (float)" are now allowed (KB)
+ - [ZBX-1357] updated Japanese translation (Richlv)
+ - [ZBX-3385] fixed trigger status change record in audit log (Vedmak)
+ - [ZBX-2825] make profiles form redirect to the last visited page on save or cancel (Vlad)
+ - [ZBX-3383] fixed error in audit log when filter by Macro or Template (Vedmak)
+ - [ZBX-3378] updated Russian translation; thanks to dotneft and zalex_ua (Richlv)
+ - [ZBX-3350] fixed minor interface bug and it is now not possible to add host name longer than 64 chars (KB)
+ - [ZBX-3341] fixed host export - valuemap property is now exported as expected (KB)
+ - [ZBX-3338] updated Ukrainian translation; thanks to zalex_ua (Richlv)
+ - [ZBX-954] fix minor typos (Richlv)
+ - [ZBX-1419] don't print an informative message during upgrade if no orphan hosts were found (Richlv)
+
+Changes for 1.8.4
+
+1.8.4rc4 was released as 1.8.4 without any changes
+
+Changes for 1.8.4rc4
+
+ - [ZBX-3351] fixed broken support of 1.4.x style configuration file format for WEB interface (Vedmak)
 
 Changes for 1.8.4rc3
 
@@ -51,7 +92,7 @@ Changes for 1.8.4rc3
  - [ZBX-266] made debugging output for Web scenarios more useful (Sasha)
  - [ZBX-1181] fixed infinite looping when failing cURL initialization and showing of such errors in the GUI (asaveljevs,Sasha,Vedmak)
  - [ZBX-1181] fixed download speed, response time, and response code not being saved for failed Web scenario steps (asaveljevs)
- - [ZBX-2851] fixed apache hanging when frontend connects to empty database (Vedmak)
+ - [ZBX-2851] fixed Apache hanging when frontend connects to empty database (Vedmak)
  - [ZBX-2647] made some of hard coded strings translatable (KB)
  - [ZBX-3294] fixed host status change confirmation dialog (Vedmak)
  - [ZBX-3301] fixed server crash after libssh2_userauth_list() when processing SSH checks (asaveljevs)
@@ -64,7 +105,7 @@ Changes for 1.8.4rc3
  - [ZBX-2862] it is now not possible to delete host group or user group used in scripts (KB)
  - [ZBX-3281] fixed system.cpu.util[] for all processors combined on NetBSD (asaveljevs)
  - [ZBX-3006] fixed some forms <input> elements are put inside <table> tag (Vedmak)
- - [ZBXNEXT-176] added zabbix server name input during setup (Vedmak)
+ - [ZBXNEXT-176] added Zabbix server name input during setup (Vedmak)
  - [ZBX-3253] added schema selection for db2 setup and a configuration file parameter on the server (asaveljevs,Vedmak)
  - [ZBX-3239] fixed error in Proxies screen on Oracle, when no proxy defined (Vedmak)
  - [ZBX-3273] removed renewed auto registration notifications for already created hosts (Sasha)
@@ -896,7 +937,7 @@ Changes for 1.8.1
  - [ZBX-1528] fixed map permissions (Aly)
  - [ZBX-1569] fix incorrect state reference in map connector definition (Richlv)
  - [ZBX-1568] make 'Parent service' string translatable; patch by Kodai (Richlv)
- - [ZBX-1457] hosts in export file is now sorted by hostname (Vedmak)
+ - [ZBX-1457] hosts in export file are now sorted by hostname (Vedmak)
  - [ZBX-1462] fixed "Add host" operation for "Discovery" module for trying to add a host name which is already used (Dmitry)
  - [ZBX-1547] fixed SQL error while executing discovery action 'remove host' (Sasha)
  - [ZBX-1324] replaced more user visible strings ZABBIX with Zabbix (Richlv)
