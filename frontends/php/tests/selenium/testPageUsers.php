@@ -35,6 +35,7 @@ class testPageUsers extends CTest
 		{
 			$users[]=array($user);
 		}
+		DBclose();
 		return $users;
 	}
 

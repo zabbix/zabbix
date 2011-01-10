@@ -18,6 +18,7 @@ create/data/create_data_sql/create_data_sql.sh svneol=native#text/x-sh
 create/data/create_data_sql/data_sql_blacklist.txt svneol=native#text/plain
 create/data/create_data_sql/data_sql_filter.txt svneol=native#text/plain
 create/data/create_data_sql/data_sql_predumphooks.txt svneol=native#text/plain
+create/data/data_test.sql -text
 create/data/images/Hub.png -text svneol=unset#unset
 create/data/images/Hub_small.png -text svneol=unset#unset
 create/data/images/Network.png -text svneol=unset#unset
@@ -250,6 +251,9 @@ frontends/php/tests/selenium/testFormHostGroup.php -text
 frontends/php/tests/selenium/testFormProfile.php -text
 frontends/php/tests/selenium/testFormScreen.php -text
 frontends/php/tests/selenium/testGeneric.php -text
+frontends/php/tests/selenium/testPageActionsAutoregistration.php -text
+frontends/php/tests/selenium/testPageActionsDiscovery.php -text
+frontends/php/tests/selenium/testPageActionsTriggers.php -text
 frontends/php/tests/selenium/testPageDashboard.php -text
 frontends/php/tests/selenium/testPageDiscovery.php -text
 frontends/php/tests/selenium/testPageEvents.php -text

@@ -35,6 +35,8 @@ class testPageMediaTypes extends CTest
 		{
 			$mediatypes[]=array($mediatype);
 		}
+
+		DBclose();
 		return $mediatypes;
 	}
 
