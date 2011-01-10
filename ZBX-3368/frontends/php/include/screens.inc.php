@@ -465,7 +465,7 @@ require_once('include/js.inc.php');
 // User-defined graph
 			$options = array(
 				'graphids' => $resourceid,
-				'selectHosts' => array('hostid', 'host'),
+				'selectHosts' => array('hostid', 'host', 'status'),
 				'output' => API_OUTPUT_EXTEND
 			);
 			$graphs = CGraph::get($options);
@@ -480,7 +480,10 @@ require_once('include/js.inc.php');
 				order_result($graph['hosts'], 'host');
 				$graph['host'] = reset($graph['hosts']);
 
-				$caption = $graph['host']['host'].':'.$graph['name'];
+				if($graph['host']['status'] != HOST_STATUS_TEMPLATE)
+					$caption = $graph['host']['host'].':'.$graph['name'];
+				else
+					$caption = $graph['name'];
 
 				$nodeName = get_node_name_by_elid($graph['host']['hostid']);
 				if(!zbx_empty($nodeName))
@@ -539,7 +542,7 @@ require_once('include/js.inc.php');
 				$selectbtn = new CButton('select', S_SELECT,
 					"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName().
 							"&templated_hosts=1&only_hostid=".$screen['templateid']."&dstfld1=resourceid&".
-							"dstfld2=caption&srctbl=simple_graph&srcfld1=itemid&srcfld2=description',800,450);");
+							"dstfld2=caption&srctbl=simple_graph&srcfld1=itemid&srcfld2=description_only',800,450);");
 			}
 			else{
 				$selectbtn = new CButton('select', S_SELECT,

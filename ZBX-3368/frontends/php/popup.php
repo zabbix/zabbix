@@ -1164,7 +1164,7 @@ include_once('include/page_header.php');
 			$host = reset($row['hosts']);
 			$row['host'] = $host['host'];
 
-			$row['description'] = item_description($row);
+			$row['description_only'] = $row['description'] = item_description($row);
 			$description = new CLink($row['description'],'#');
 
 			$row['description'] = $row['host'].':'.$row['description'];
