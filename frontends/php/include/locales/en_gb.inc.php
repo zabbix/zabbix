@@ -2007,6 +2007,7 @@
 	'S_LATVIAN_LV'=>			'Latvian (LV)',
 	'S_RUSSIAN_RU'=>			'Russian (RU)',
 	'S_PORTUGUESE_PT'=>			'Portuguese (PT)',
+	'S_SLOVAK_SK'=>				'Slovak (SK)',
 	'S_SPANISH_SP'=>			'Spanish (SP)',
 	'S_SWEDISH_SE'=>			'Swedish (SE)',
 	'S_JAPANESE_JP'=>			'Japanese (JP)',

@@ -1,5 +1,6 @@
 Changes for 1.8.5rc1
 
+ - [ZBXNEXT-614] add Slovak translation; thanks to Marcel Hecko (Richlv)
  - [ZBX-2914] add Ubuntu upstart files; thanks to S. Canchon (Richlv)
  - [ZBX-3381] negative multipliers for items with value type "numeric (float)" are now allowed (KB)
  - [ZBX-1357] updated Japanese translation (Richlv)
