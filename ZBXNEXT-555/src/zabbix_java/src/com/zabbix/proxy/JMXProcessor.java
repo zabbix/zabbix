@@ -7,9 +7,12 @@ import javax.management.MBeanInfo;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 import javax.management.openmbean.CompositeData;
+import javax.management.openmbean.TabularDataSupport;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
+
+import org.json.*;
 
 class JMXProcessor
 {
@@ -31,55 +34,34 @@ class JMXProcessor
 			JMXConnector jmxc = JMXConnectorFactory.connect(url, null);
 			MBeanServerConnection mbsc = jmxc.getMBeanServerConnection();
 
-			value.append("Domains:\n");
+			JSONArray counters = new JSONArray();
 
-			for (String domain: mbsc.getDomains())
+			for (ObjectName name : mbsc.queryNames(null, null))
 			{
-				value.append("\tDomain = " + domain + "\n");
-			}
-
-			value.append("\nMBeanServer default domain = " + mbsc.getDefaultDomain() + "\n");
-
-			value.append("\nMBean count = " + mbsc.getMBeanCount() + "\n");
-
-			value.append("\nQuery MBeanServer MBeans:\n\n");
-
-			for (ObjectName name: new TreeSet<ObjectName>(mbsc.queryNames(null, null)))
-			{
-				value.append("  ***  ObjectName = " + name + "\n\n");
-
-				MBeanInfo info = mbsc.getMBeanInfo(name);
-				MBeanAttributeInfo[] attrInfo = info.getAttributes();
-
-				for (int i = 0; i < attrInfo.length; i++)
+				for (MBeanAttributeInfo attrInfo : mbsc.getMBeanInfo(name).getAttributes())
 				{
-					value.append("\tNAME: " + attrInfo[i].getName() + "\n");
-					value.append("\tDESC: " + attrInfo[i].getDescription() + "\n");
-					value.append("\tTYPE: " + attrInfo[i].getType().toString() + "\n");
-					value.append("\tREAD: " + attrInfo[i].isReadable() + "\n");
-					value.append("\tWRITE: " + attrInfo[i].isWritable() + "\n");
+					if (!attrInfo.isReadable())
+					{
+						System.out.printf("attribute '%s,%s' is not readable\n", name, attrInfo.getName());
+						continue;
+					}
 
 					try
 					{
-						if (attrInfo[i].getType().equals("javax.management.openmbean.CompositeData"))
-						{
-							appendFields(value, "\tVALUE: ", (CompositeData)mbsc.getAttribute(name, attrInfo[i].getName()));
-						}
-						else
-							value.append("\tVALUE: " + mbsc.getAttribute(name, attrInfo[i].getName()) + "\n");
+						String descr = (attrInfo.getName().equals(attrInfo.getDescription()) ? null : attrInfo.getDescription());
+						findPrimitiveAttributes(counters, name, descr, attrInfo.getName(), mbsc.getAttribute(name, attrInfo.getName()));
 					}
-					catch (Exception e)
+					catch (Exception exception)
 					{
-						value.append("\tVALUE: caught exception: " + e + "\n");
+						System.out.printf("processing '%s,%s' failed with:\n",  name, attrInfo.getName());
+						System.out.println(exception.getClass().getName() + " " + exception.getMessage());
 					}
-
-					value.append("\n");
 				}
 			}
 
 			jmxc.close();
 
-			return value.toString();
+			return counters.toString(2);
 		}
 		else if (item.getKeyId().equals("jmx"))
 		{
@@ -113,19 +95,33 @@ class JMXProcessor
 			return "ZBX_NOTSUPPORTED";
 	}
 
-	private static void appendFields(StringBuilder value, String prefix, CompositeData attribute)
+	private static void findPrimitiveAttributes(JSONArray counters, ObjectName name, String descr, String attrPath, Object attribute) throws Exception
 	{
-		for (String key: attribute.getCompositeType().keySet())
+		if (isPrimitiveAttributeType(attribute.getClass()))
 		{
-			Object object = attribute.get(key);
+			JSONObject counter = new JSONObject();
 
-			if (object instanceof CompositeData)
-			{
-				appendFields(value, prefix + "." + key, (CompositeData)object);
-			}
-			else
-				value.append(prefix + "." + key + " = " + attribute.get(key) + "\n");
+			counter.put("{#JMXDESC}", null == descr ? name + "," + attrPath : descr);
+			counter.put("{#JMXOBJ}", name);
+			counter.put("{#JMXATTR}", attrPath);
+			counter.put("{#JMXTYPE}", attribute.getClass().getName());
+			counter.put("{#JMXVALUE}", attribute.toString());
+
+			counters.put(counter);
 		}
+		else if (attribute instanceof CompositeData)
+		{
+			CompositeData comp = (CompositeData)attribute;
+
+			for (String key : comp.getCompositeType().keySet())
+				findPrimitiveAttributes(counters, name, descr, attrPath + "." + key, comp.get(key));
+		}
+		else if (attribute instanceof TabularDataSupport || attribute.getClass().isArray())
+		{
+			// not supported
+		}
+		else
+			System.out.println("unknown type: " + attribute.getClass().getName());
 	}
 
 	private static String getPropertyValue(Object attribute, String subproperties)
@@ -147,5 +143,12 @@ class JMXProcessor
 					subproperties.substring(dot == subproperties.length() ? dot : dot + 1));
 		else
 			return attribute.toString();
+	}
+
+	public static boolean isPrimitiveAttributeType(Class<?> clazz)
+	{
+		Class<?>[] clazzez = { Boolean.class, Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, String.class };
+
+		return HelperFunctionChest.arrayContains(clazzez, clazz);
 	}
 }
