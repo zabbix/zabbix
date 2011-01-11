@@ -179,7 +179,7 @@ class testPageActionsDiscovery extends CTest
 
 		$this->chooseOkOnNextConfirmation();
 
-		$this->DBsave_tables('actions','operations','conditions');
+		$this->DBsave_tables(array('actions','operations','conditions'));
 
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_DISCOVERY);
 		$this->assertTitle('Configuration of actions');
@@ -201,7 +201,7 @@ class testPageActionsDiscovery extends CTest
 		$sql="select * from conditions where actionid=$actionid";
 		$this->assertEquals(0,$this->DBcount($sql));
 
-		$this->DBrestore_tables('actions','operations','conditions');
+		$this->DBrestore_tables(array('actions','operations','conditions'));
 	}
 }
 ?>
