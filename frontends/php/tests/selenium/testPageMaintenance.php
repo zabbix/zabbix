@@ -21,7 +21,7 @@
 <?php
 require_once(dirname(__FILE__).'/class.ctest.php');
 
-class testPageMediaMaintenance extends CTest
+class testPageMaintenance extends CTest
 {
 	// Returns all maintenances
 	public static function allMaintenances()
