@@ -1000,7 +1000,17 @@ else {
 			default:
 				$items = array_chunk($array, 950);
 				foreach($items as $id => $values){
-					if($string) $values = zbx_dbstr($values);
+					if($string){
+						$values = zbx_dbstr($values);
+					}
+					else{
+						foreach($values as $value){
+							if(!is_numeric($value)){
+								info('DBcondition Error: ['.$values.'] icnorrect value fo numeric field');
+								return ' 1=0 ';
+							}
+						}
+					}
 
 					$condition.=!empty($condition) ? ')'.$concat.$fieldname.$in.'(':'';
 					$condition.= implode(',',$values);
@@ -1120,6 +1130,13 @@ else {
 					else if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR){
 						$row[$field] = zbx_dbstr($value);
 					}
+					else if(in_array($table_schema['fields'][$field]['type'], array(self::FIELD_TYPE_INT, self::FIELD_TYPE_ID,
+							self::FIELD_TYPE_UINT)) && !ctype_digit($value)){
+						self::exception(self::DBEXECUTE_ERROR, 'Incorrect value for int field');
+					}
+					else if(($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_FLOAT) && !is_float($value)){
+						self::exception(self::DBEXECUTE_ERROR, 'Incorrect value for float field');
+					}
 				}
 
 				if($getids){
@@ -1159,6 +1176,13 @@ else {
 					if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR){
 						$value = zbx_dbstr($value);
 					}
+					else if(in_array($table_schema['fields'][$field]['type'], array(self::FIELD_TYPE_INT, self::FIELD_TYPE_ID,
+							self::FIELD_TYPE_UINT)) && !ctype_digit($value)){
+						self::exception(self::DBEXECUTE_ERROR, 'Incorrect value for int field');
+					}
+					else if(($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_FLOAT) && !is_float($value)){
+						self::exception(self::DBEXECUTE_ERROR, 'Incorrect value for float field');
+					}
 
 					$sql_set .= $field.'='.$value.',';
 				}
@@ -1166,6 +1190,7 @@ else {
 
 				if(!empty($sql_set)){
 					$sql = 'UPDATE '.$table.' SET '.$sql_set.' WHERE '.implode(' AND ', $row['where']);
+
 					if(!DBexecute($sql)) self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
 				}
 			}
