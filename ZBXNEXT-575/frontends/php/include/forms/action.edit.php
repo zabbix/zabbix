@@ -405,15 +405,26 @@ require_once('include/templates/action.js.php');
 		$tblOper = new CTable(null, 'formElementTable');
 
 // init new_operation variable
-		$new_operation = get_request('new_operation', array());
+		$new_operation = get_request('new_operation', null);
+
 		if(!is_array($new_operation)){
-			$new_operation = array();
-			$new_operation['default_msg'] = 1;
+			$new_operation = array(
+				'operationtype' => 0,
+				'esc_period' => 0,
+				'esc_step_from' => 1,
+				'esc_step_to' => 1,
+				'evaltype' => 0,
+				'opmessage_usr' => array(),
+				'opconditions' => array(),
+				'opmessage' => array(
+					'default_msg' => 1,
+					'subject' => '{TRIGGER.NAME}: {STATUS}',
+					'message' => '{TRIGGER.NAME}: {STATUS}',
+					'mediatypeid' => 0,
+				)
+			);
 		}
-
-		if(!isset($new_operation['default_msg']))	$new_operation['default_msg'] = 0;
-
-
+SDII($new_operation);
 		$evaltype = $new_operation['evaltype'];
 
 		$update_mode = false;
@@ -449,9 +460,12 @@ require_once('include/templates/action.js.php');
 			$cmbOpType->addItem($oper, operation_type2str($oper));
 
 		$tblOper->addRow(array(S_OPERATION_TYPE, $cmbOpType));
-SDII($data['operations']);
+//SDII($data['operations']);
 		switch($new_operation['operationtype']) {
 			case OPERATION_TYPE_MESSAGE:
+				if(!isset($new_operation['opmessage']['default_msg']))
+					$new_operation['opmessage']['default_msg'] = 0;
+
 				$usrgrpList = new CTable();
 				$usrgrpList->setAttribute('id', 'opmsgUsrgrpList');
 
@@ -503,7 +517,7 @@ SDII($data['operations']);
 				$tblOper->addRow(array(_('Send to User groups'), new CDiv($usrgrpList, 'objectgroup inlineblock border_dotted ui-corner-all')));
 				$tblOper->addRow(array(_('Send to Users'), new CDiv($userList, 'objectgroup inlineblock border_dotted ui-corner-all')));
 
-				$cmbMediaType = new CComboBox('new_operation[mediatypeid]', $new_operation['mediatypeid'], 'submit()');
+				$cmbMediaType = new CComboBox('new_operation[opmessage][mediatypeid]', $new_operation['opmessage']['mediatypeid'], 'submit()');
 				$cmbMediaType->addItem(0, S_MINUS_ALL_MINUS);
 
 				$sql = 'SELECT mt.mediatypeid, mt.description' .
@@ -517,7 +531,7 @@ SDII($data['operations']);
 
 				$tblOper->addRow(array(S_SEND_ONLY_TO, $cmbMediaType));
 
-				$tblOper->addRow(array(S_DEFAULT_MESSAGE, new CCheckBox('new_operation[default_msg]', $new_operation['default_msg'], 'javascript: submit();', 1)));
+				$tblOper->addRow(array(S_DEFAULT_MESSAGE, new CCheckBox('new_operation[opmessage][default_msg]', $new_operation['opmessage']['default_msg'], 'javascript: submit();', 1)));
 
 				if(!$new_operation['opmessage']['default_msg']){
 					$tblOper->addRow(array(S_SUBJECT, new CTextBox('new_operation[opmessage][subject]', $new_operation['opmessage']['subject'], 77)));

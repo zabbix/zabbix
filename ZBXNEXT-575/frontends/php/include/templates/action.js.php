@@ -29,7 +29,7 @@
 	<input name="new_operation[opcommand_grp][#{opcommand_grpid}][groupid]" type="hidden" value="#{groupid}" />
 	<input name="new_operation[opcommand_grp][#{opcommand_grpid}][name]" type="hidden" value="#{name}" />
 	<?php print(_('Host group').': '); ?>
-	<span style="font-size: 1.1em; font-weight: bold;"> #{name} </span>
+	<span class="bold"> #{name} </span>
 </td>
 <td>
 	<input name="new_operation[opcommand_grp][#{opcommand_grpid}][command]" type="hidden" value="#{command}" />
@@ -50,7 +50,7 @@
 	<input name="new_operation[opcommand_hst][#{opcommand_hstid}][hostid]" type="hidden" value="#{hostid}" />
 	<input name="new_operation[opcommand_hst][#{opcommand_hstid}][host]" type="hidden" value="#{host}" />
 	<?php print(_('Host').': '); ?>
-	<span style="font-size: 1.1em; font-weight: bold;"> #{host} </span>
+	<span class="bold"> #{host} </span>
 </td>
 <td>
 	<input name="new_operation[opcommand_hst][#{opcommand_hstid}][command]" type="hidden" value="#{command}" />
@@ -101,7 +101,6 @@ function addPopupValues(list){
 		if(empty(list.values[i])) continue;
 		var value = list.values[i];
 
-SDI(value);
 		switch(list.object){
 			case 'userid':
 				if(jQuery("#opmsgUserRow_"+value.userid).length) continue;
@@ -118,18 +117,36 @@ SDI(value);
 			case 'groupid':
 				var tpl = new Template(jQuery('#opCmdGroupRowTPL').html());
 
-				if(jQuery("#opCmdGroupRow_"+value.opcommand_grpid).length)
-					jQuery("#opCmdGroupRow_"+value.opcommand_grpid).replace(tpl.evaluate(value));
-				else
+				if(jQuery("#opCmdGroupRow_"+value.opcommand_grpid).length){
+					value.newValue = "update";
+					jQuery("#opCmdGroupRow_"+value.opcommand_grpid).replaceWith(tpl.evaluate(value));
+				}
+				else{
+					value.opcommand_grpid = jQuery("#opCmdList tr[id^=opCmdGroupRow_]").length;
+					while(jQuery("#opCmdGroupRow_"+value.opcommand_grpid).length){
+						value.opcommand_grpid++;
+					}
+
+					value.newValue = "create";
 					jQuery("#opCmdListFooter").before(tpl.evaluate(value));
+				}
 				break;
 			case 'hostid':
 				var tpl = new Template(jQuery('#opCmdHostRowTPL').html());
 
-				if(jQuery("#opCmdHostRow_"+value.opcommand_hstid).length)
-					jQuery("#opCmdHostRow_"+value.opcommand_hstid).replace(tpl.evaluate(value));
-				else
+				if(jQuery("#opCmdHostRow_"+value.opcommand_hstid).length){
+					value.newValue = "update";
+					jQuery("#opCmdHostRow_"+value.opcommand_hstid).replaceWith(tpl.evaluate(value));
+				}
+				else{
+					value.opcommand_hstid = jQuery("#opCmdList tr[id^=opCmdHostRow_]").length;
+					while(jQuery("#opCmdHostRow_"+value.opcommand_hstid).length){
+						value.opcommand_hstid++;
+					}
+
+					value.newValue = "create";
 					jQuery("#opCmdListFooter").before(tpl.evaluate(value));
+				}
 				break;
 		}
 	}
@@ -158,10 +175,10 @@ function showOpCmdForm(opCmdId, object){
 //#new_operation[opcommand_hst][#{opcommand_hstid}][opcommand_hstid]')
 
 		objectTPL.opcmdid = opCmdId;
-		objectTPL.objectid = jQuery(objectRow).find('#new_operation[opcommand_hst]['+opCmdObjectId+'][hostid]').val();
-		objectTPL.name = jQuery(objectRow).find('#new_operation[opcommand_hst]['+opCmdObjectId+'][host]').val();
+		objectTPL.objectid = jQuery(objectRow).find('input[name="new_operation[opcommand_hst]['+opCmdId+'][hostid]"]').val();
+		objectTPL.name = jQuery(objectRow).find('input[name="new_operation[opcommand_hst]['+opCmdId+'][host]"]').val();
 		objectTPL.target = (objectTPL.objectid == 0) ? 0 : 1;
-		objectTPL.comamnd = jQuery(objectRow).find('#new_operation[opcommand_hst]['+opCmdObjectId+'][command]').val();
+		objectTPL.command = jQuery(objectRow).find('input[name="new_operation[opcommand_hst]['+opCmdId+'][command]"]').val();
 		objectTPL.operationName = '<?php print(_('Update'));?>';
 	}
 	else if(object == 'groupid'){
@@ -169,10 +186,10 @@ function showOpCmdForm(opCmdId, object){
 //#new_operation[opcommand_hst][#{opcommand_hstid}][opcommand_hstid]')
 
 		objectTPL.opcmdid = opCmdId;
-		objectTPL.objectid = jQuery(objectRow).find('#new_operation[opcommand_grp]['+opCmdObjectId+'][groupid]').val();
-		objectTPL.name = jQuery(objectRow).find('#new_operation[opcommand_grp]['+opCmdObjectId+'][name]').val();
+		objectTPL.objectid = jQuery(objectRow).find('input[name="new_operation[opcommand_grp]['+opCmdId+'][groupid]"]').val();
+		objectTPL.name = jQuery(objectRow).find('input[name="new_operation[opcommand_grp]['+opCmdId+'][name]"]').val();
 		objectTPL.target = 2;
-		objectTPL.comamnd = jQuery(objectRow).find('#new_operation[opcommand_grp]['+opCmdObjectId+'][command]').val();
+		objectTPL.command = jQuery(objectRow).find('input[name="new_operation[opcommand_grp]['+opCmdId+'][command]"]').val();
 		objectTPL.operationName = '<?php print(_('Update'));?>';
 	}
 	else{
@@ -181,10 +198,10 @@ function showOpCmdForm(opCmdId, object){
 		objectTPL.objectid = 0;
 		objectTPL.name = '';
 		objectTPL.target = 0;
-		objectTPL.comamnd = '';
+		objectTPL.command = '';
 		objectTPL.operationName = '<?php print(_('Add'));?>';
 	}
-
+SDJ(objectTPL);
 	var tpl = new Template(jQuery('#opcmdEditFormTPL').html());
 	jQuery("#opCmdList").after(tpl.evaluate(objectTPL));
 
@@ -193,7 +210,7 @@ function showOpCmdForm(opCmdId, object){
 		.find('#opCmdTargetSelect').toggle((objectTPL.target != 0)).end()
 		.find('input[name="save"]').click(saveOpCmdForm).end()
 		.find('input[name="select"]').click(selectOpCmdTarget).end()
-		.find('select[name="opCmdTarget"]').change(changeOpCmdTarget);
+		.find('select[name="opCmdTarget"]').val(objectTPL.target).change(changeOpCmdTarget);
 }
 
 
@@ -218,8 +235,8 @@ function saveOpCmdForm(){
 		object.host = jQuery(objectForm).find('input[name="opCmdTargetObjectName"]').val();
 	}
 
-SDJ(object);
 	addPopupValues({'object': object.object, 'values': [object]});
+	jQuery(objectForm).remove();
 }
 
 function selectOpCmdTarget(){
