@@ -579,6 +579,7 @@ Copt::memoryPick();
 	// unset if not changed passwd
 				if(isset($user['passwd']) && !is_null($user['passwd'])){
 					$user['passwd'] = md5($user['passwd']);
+					$user_db_fields['passwd'] = '';
 				}
 				else{
 					unset($user['passwd']);
@@ -599,21 +600,8 @@ Copt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_USER_EXISTS_FIRST_PART.' '.$user['alias'].' '.S_CUSER_ERROR_USER_EXISTS_SECOND_PART);
 				}
 
-				$sql = 'UPDATE users SET '.
-							' name='.zbx_dbstr($user['name']).', '.
-							' surname='.zbx_dbstr($user['surname']).', '.
-							' alias='.zbx_dbstr($user['alias']).', '.
-							' passwd='.zbx_dbstr($user['passwd']).', '.
-							' url='.zbx_dbstr($user['url']).', '.
-							' autologin='.$user['autologin'].', '.
-							' autologout='.$user['autologout'].', '.
-							' lang='.zbx_dbstr($user['lang']).', '.
-							' theme='.zbx_dbstr($user['theme']).', '.
-							' refresh='.$user['refresh'].', '.
-							' rows_per_page='.$user['rows_per_page'].', '.
-							' type='.$user['type'].
-						' WHERE userid='.$user['userid'];
-				if(!DBexecute($sql))
+				$result = DB::update('users', array(array('values'=>$user,'where'=>array('userid='.$user['userid']))));
+				if(!$result)
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 
 				// if(isset($user['usrgrps']) && !is_null($user['usrgrps'])){
@@ -677,7 +665,7 @@ Copt::memoryPick();
 			}
 
 			self::EndTransaction(true, __METHOD__);
-			return true;
+			return array('userid' => $user['userid']);
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
