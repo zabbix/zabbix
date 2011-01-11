@@ -22,6 +22,7 @@
 
 require_once 'PHPUnit/Extensions/SeleniumTestCase.php';
 
+require_once(dirname(__FILE__).'/../../include/defines.inc.php');
 require_once(dirname(__FILE__).'/../../conf/zabbix.conf.php');
 require_once(dirname(__FILE__).'/../../include/copt.lib.php');
 require_once(dirname(__FILE__).'/../../include/func.inc.php');
@@ -70,7 +71,12 @@ class CTest extends PHPUnit_Extensions_SeleniumTestCase
 
 		$this->setHost('localhost');
 		$this->setBrowser('*firefox');
-		$this->setBrowserUrl('http://hudson/~hudson/'.PHPUNIT_URL.'/frontends/php/');
+		if(strstr(PHPUNIT_URL,'http://'))
+		{
+			$this->setBrowserUrl(PHPUNIT_URL);
+		} else {
+			$this->setBrowserUrl('http://hudson/~hudson/'.PHPUNIT_URL.'/frontends/php/');
+		}
 
 /*		if(!DBConnect($error))
 		{
@@ -78,14 +84,47 @@ class CTest extends PHPUnit_Extensions_SeleniumTestCase
 			exit;
 		}*/
 
-		// Connect once, do not reconnect
 		if(!isset($DB['DB'])) DBConnect($error);
 	}
 
 	protected function tearDown()
 	{
-// Do not close DB for better performance
-//		DBclose();
+		DBclose();
+	}
+
+	protected function DBsave_tables($tables)
+	{
+		global $DB;
+
+		if(!is_array($tables))	$tables=array($tables);
+
+		foreach($tables as $table)
+		{
+			switch($DB['TYPE']) {
+			case 'MYSQL':
+				DBexecute("drop table if exists ${table}_tmp");
+				DBexecute("create table ${table}_tmp like $table");
+				DBexecute("insert into ${table}_tmp select * from $table");
+				break;
+			default:
+				DBexecute("drop table if exists ${table}_tmp");
+				DBexecute("select * into temp table ${table}_tmp from $table");
+			}
+		}
+	}
+
+	protected function DBrestore_tables($tables)
+	{
+		global $DB;
+
+		if(!is_array($tables))	$tables=array($tables);
+
+		foreach($tables as $table)
+		{
+			DBexecute("delete from $table");
+			DBexecute("insert into $table select * from ${table}_tmp");
+			DBexecute("drop table ${table}_tmp");
+		}
 	}
 
 	protected function DBhash($sql)
@@ -151,13 +190,20 @@ class CTest extends PHPUnit_Extensions_SeleniumTestCase
 	{
 		foreach($this->failIfExists as $str)
 		{
-			$this->assertTextNotPresent($str);
+			$this->assertTextNotPresent($str,"Chuck Norris: I do not expect string '$str' here.");
 		}
 	}
 
-	public function ok($str)
+	public function ok($strings)
 	{
-		$this->assertTextPresent($str);
+		if(!is_array($strings))	$strings=array($strings);
+		foreach($strings as $string) $this->assertTextPresent($string,"Chuck Norris: I expect string '$string' here");
+	}
+
+	public function nok($strings)
+	{
+		if(!is_array($strings))	$strings=array($strings);
+		foreach($strings as $string) $this->assertTextNotPresent($string,"Chuck Norris: I do not expect string '$string' here");
 	}
 
 	public function button_click($a)

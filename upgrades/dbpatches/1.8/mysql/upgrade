@@ -160,9 +160,9 @@ HOSTSWOGROUP=$(echo "select hosts.hostid from hosts left join hosts_groups on ho
 		echo "insert into hosts_groups (hostgroupid,hostid,groupid) select nextid,'$ORPHANHOST','$GROUPFORHOSTSID' from ids where table_name='hosts_groups' and field_name='hostgroupid';" | $MYSQL $MYSQLPARAMS
 		((HOSTSADDED++))
 	done
+	echo "Added $HOSTSADDED hosts to group '$GROUPFORHOSTS'. Move them to correct groups manually."
 } || {
 	echo "not found any"
 }
-echo "Added $HOSTSADDED hosts to group '$GROUPFORHOSTS'. Move them to correct groups manually."
 echo -n " ... "
 timer stop checking for hosts not belonging to any group

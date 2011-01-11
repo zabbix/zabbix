@@ -35,6 +35,9 @@
 
 include_once('include/page_header.php');
 
+// js templates
+require_once('include/templates/scriptConfirm.js.php');
+
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -159,7 +162,5 @@ include_once('include/page_header.php');
 	$map_wdgt->show();
 ?>
 <?php
-
 include_once('include/page_footer.php');
-
 ?>

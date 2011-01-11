@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-02 01:46+0200\n"
+"POT-Creation-Date: 2011-01-06 13:08+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -25,7 +25,7 @@ msgstr ""
 msgid "\" deleted from host"
 msgstr ""
 
-#: ../chart5.php:90 ../chart4.php:87
+#: ../chart4.php:87 ../chart5.php:90
 #, php-format
 msgid "%1$s (year %2$s)"
 msgstr ""
@@ -825,7 +825,7 @@ msgstr "无法添加自动发现的规则"
 msgid "Cannot add graph"
 msgstr "无法添加图表"
 
-#: ../api/classes/class.chost.php:1722 ../include/locales/en_gb.inc.php:1882
+#: ../api/classes/class.chost.php:1726 ../include/locales/en_gb.inc.php:1882
 msgid "Cannot add group"
 msgstr "Cannot add group"
 
@@ -841,7 +841,7 @@ msgstr "无法添加图片"
 msgid "Cannot add item"
 msgstr "Cannot add item"
 
-#: ../api/classes/class.chost.php:1840 ../api/classes/class.ctemplate.php:1546
+#: ../api/classes/class.chost.php:1844 ../api/classes/class.ctemplate.php:1546
 #: ../include/locales/en_gb.inc.php:873
 msgid "Cannot add macro"
 msgstr "Cannot add macro"
@@ -934,7 +934,7 @@ msgstr "Cannot copy items"
 msgid "Cannot create application"
 msgstr ""
 
-#: ../api/classes/class.chost.php:1917
+#: ../api/classes/class.chost.php:1921
 msgid "Cannot create extended profile"
 msgstr ""
 
@@ -955,7 +955,7 @@ msgstr "无法删除应用程序"
 msgid "Cannot delete discovery rule"
 msgstr "无法删除自动发现的规则"
 
-#: ../api/classes/class.chost.php:1897
+#: ../api/classes/class.chost.php:1901
 msgid "Cannot delete extended profile"
 msgstr ""
 
@@ -1007,7 +1007,7 @@ msgstr "Cannot delete network map"
 msgid "Cannot delete node"
 msgstr "Cannot delete node"
 
-#: ../api/classes/class.chost.php:1852
+#: ../api/classes/class.chost.php:1856
 msgid "Cannot delete profile"
 msgstr ""
 
@@ -1039,8 +1039,8 @@ msgstr "Cannot delete slideshow"
 msgid "Cannot delete template"
 msgstr "Cannot delete template"
 
-#: ../api/classes/class.cgraphprototype.php:1025
 #: ../api/classes/class.cgraph.php:1028
+#: ../api/classes/class.cgraphprototype.php:1025
 msgid "Cannot delete templated graphs"
 msgstr ""
 
@@ -1048,7 +1048,7 @@ msgstr ""
 msgid "Cannot delete templated items"
 msgstr ""
 
-#: ../api/classes/class.ctrigger.php:1325
+#: ../api/classes/class.ctrigger.php:1326
 #: ../api/classes/class.ctriggerprototype.php:1250
 #, php-format
 msgid "Cannot delete templated trigger [%1$s:%2$s]"
@@ -1114,7 +1114,7 @@ msgstr "Cannot find trigger"
 msgid "Cannot format Tree. Check logic structure in service links"
 msgstr "Cannot format Tree. Check logic structure in service links"
 
-#: ../api/classes/class.ctrigger.php:1488
+#: ../api/classes/class.ctrigger.php:1489
 #: ../api/classes/class.ctriggerprototype.php:1356
 msgid "Cannot implode expression"
 msgstr ""
@@ -1131,7 +1131,7 @@ msgstr "Cannot link service to itself."
 msgid "Cannot link template"
 msgstr "无法与模板关联"
 
-#: ../api/classes/class.chost.php:1669
+#: ../api/classes/class.chost.php:1673
 msgid "Cannot mass update host name"
 msgstr ""
 
@@ -1139,11 +1139,11 @@ msgstr ""
 msgid "Cannot mass update template name"
 msgstr ""
 
-#: ../api/classes/class.chost.php:1731
+#: ../api/classes/class.chost.php:1735
 msgid "Cannot remove group"
 msgstr ""
 
-#: ../config.php:542 ../api/classes/class.chost.php:1824
+#: ../api/classes/class.chost.php:1828 ../config.php:542
 msgid "Cannot remove macro"
 msgstr ""
 
@@ -1252,7 +1252,7 @@ msgstr "无法更新调试模式"
 msgid "Cannot update discovery rule"
 msgstr "无法更新自动发现的规则"
 
-#: ../api/classes/class.chost.php:1939
+#: ../api/classes/class.chost.php:1943
 msgid "Cannot update extended profile"
 msgstr ""
 
@@ -1280,8 +1280,8 @@ msgstr "无法更新图片"
 msgid "Cannot update item"
 msgstr "Cannot update item"
 
-#: ../config.php:547 ../api/classes/class.chost.php:1831
-#: ../api/classes/class.ctemplate.php:1537
+#: ../api/classes/class.chost.php:1835 ../api/classes/class.ctemplate.php:1537
+#: ../config.php:547
 msgid "Cannot update macro"
 msgstr ""
 
@@ -1301,7 +1301,7 @@ msgstr "Cannot update network map"
 msgid "Cannot update node"
 msgstr "Cannot update node"
 
-#: ../api/classes/class.chost.php:1885
+#: ../api/classes/class.chost.php:1889
 msgid "Cannot update profile"
 msgstr ""
 
@@ -3140,39 +3140,39 @@ msgstr "图形显示"
 msgid "Graph \""
 msgstr ""
 
-#: ../api/classes/class.cgraphprototype.php:857
 #: ../api/classes/class.cgraph.php:861
+#: ../api/classes/class.cgraphprototype.php:857
 #, php-format
 msgid "Graph [ %1$s ]: already exists on [ %2$s ]"
 msgstr ""
 
-#: ../api/classes/class.cgraphprototype.php:878
 #: ../api/classes/class.cgraph.php:882
+#: ../api/classes/class.cgraphprototype.php:878
 #, php-format
 msgid "Graph [ %1$s ]: already exists on [ %2$s ] (inherited from another template)"
 msgstr ""
 
+#: ../api/classes/class.cgraph.php:904 ../api/classes/class.cgraph.php:911
 #: ../api/classes/class.cgraphprototype.php:900
 #: ../api/classes/class.cgraphprototype.php:907
-#: ../api/classes/class.cgraph.php:904 ../api/classes/class.cgraph.php:911
 #, php-format
 msgid "Graph [ %1$s ]: already exists on [ %2$s ] (items are not identical)"
 msgstr ""
 
-#: ../api/classes/class.cgraphprototype.php:830
 #: ../api/classes/class.cgraph.php:834
+#: ../api/classes/class.cgraphprototype.php:830
 #, php-format
 msgid "Graph [ %1$s ]: cannot inherit. No required items on [ %2$s ]"
 msgstr ""
 
-#: ../api/classes/class.cgraphprototype.php:834
 #: ../api/classes/class.cgraph.php:838
+#: ../api/classes/class.cgraphprototype.php:834
 #, php-format
 msgid "Graph [ %1$s ]: cannot inherit. No required items on [ %2$s ] (Ymax value item)"
 msgstr ""
 
-#: ../api/classes/class.cgraphprototype.php:840
 #: ../api/classes/class.cgraph.php:844
+#: ../api/classes/class.cgraphprototype.php:840
 #, php-format
 msgid "Graph [ %1$s ]: cannot inherit. No required items on [ %2$s ] (Ymin value item)"
 msgstr ""
@@ -3242,9 +3242,9 @@ msgstr "图表已更新"
 msgid "Graph with name [ %1$s ] already exists"
 msgstr ""
 
+#: ../api/classes/class.cgraph.php:864 ../api/classes/class.cgraph.php:885
 #: ../api/classes/class.cgraphprototype.php:860
 #: ../api/classes/class.cgraphprototype.php:881
-#: ../api/classes/class.cgraph.php:864 ../api/classes/class.cgraph.php:885
 msgid "Graph with same name but other type exist"
 msgstr ""
 
@@ -3444,7 +3444,7 @@ msgstr "Host Router"
 msgid "Host Subnet Mask"
 msgstr "Host Subnet Mask"
 
-#: ../api/classes/class.chost.php:2161
+#: ../api/classes/class.chost.php:2165
 #, php-format
 msgid "Host [%1$s] deleted."
 msgstr ""
@@ -3497,6 +3497,11 @@ msgstr ""
 msgid "Host name"
 msgstr "主机名"
 
+#: ../api/classes/class.chost.php:1296
+#, php-format
+msgid "Host name must not be longer than %1$d characters, [ %2$s ] is %3$d"
+msgstr ""
+
 #: ../include/locales/en_gb.inc.php:1002
 msgid "Host profile"
 msgstr "主机配置"
@@ -3525,8 +3530,8 @@ msgstr "Host template"
 msgid "Host time"
 msgstr ""
 
-#: ../api/classes/class.chost.php:1501 ../api/classes/class.chost.php:1506
-#: ../api/classes/class.chost.php:1511 ../api/classes/class.chost.php:1520
+#: ../api/classes/class.chost.php:1505 ../api/classes/class.chost.php:1510
+#: ../api/classes/class.chost.php:1515 ../api/classes/class.chost.php:1524
 msgid "Host update failed"
 msgstr ""
 
@@ -3865,7 +3870,7 @@ msgstr ""
 msgid "Incorrect characters used for DNS"
 msgstr "Incorrect characters used for DNS"
 
-#: ../api/classes/class.chost.php:1329
+#: ../api/classes/class.chost.php:1333
 #, php-format
 msgid "Incorrect characters used for Host name [ %s ]"
 msgstr ""
@@ -3874,7 +3879,7 @@ msgstr ""
 msgid "Incorrect characters used for Hostname"
 msgstr "Incorrect characters used for Hostname"
 
-#: ../api/classes/class.chost.php:1693 ../api/classes/class.ctemplate.php:1376
+#: ../api/classes/class.chost.php:1697 ../api/classes/class.ctemplate.php:1376
 #, php-format
 msgid "Incorrect characters used for Hostname [ %s ]"
 msgstr ""
@@ -3951,8 +3956,8 @@ msgstr ""
 msgid "Incorrect interface IP parameter \" %1$s \" provided."
 msgstr ""
 
-#: ../api/classes/class.cgraphprototype.php:1203
 #: ../api/classes/class.cgraph.php:1184
+#: ../api/classes/class.cgraphprototype.php:1203
 msgid "Incorrect item for axis value item"
 msgstr ""
 
@@ -5261,12 +5266,12 @@ msgstr "No graphs defined"
 msgid "No groups defined"
 msgstr "No groups defined"
 
-#: ../api/classes/class.chost.php:1303 ../api/classes/class.chost.php:1313
+#: ../api/classes/class.chost.php:1307 ../api/classes/class.chost.php:1317
 #, php-format
 msgid "No groups for host [ %s ]"
 msgstr ""
 
-#: ../api/classes/class.chost.php:1661
+#: ../api/classes/class.chost.php:1665
 msgid "No groups for hosts"
 msgstr ""
 
@@ -5307,7 +5312,7 @@ msgstr "No image"
 msgid "No images defined"
 msgstr "未定义图片"
 
-#: ../api/classes/class.chost.php:1306 ../api/classes/class.chost.php:1324
+#: ../api/classes/class.chost.php:1310 ../api/classes/class.chost.php:1328
 #, php-format
 msgid "No interfaces for host [ %s ]"
 msgstr ""
@@ -7652,13 +7657,13 @@ msgstr "Trigger"
 msgid "Trigger [%1$s:%2$s] already exists."
 msgstr ""
 
-#: ../api/classes/class.ctrigger.php:1496
+#: ../api/classes/class.ctrigger.php:1497
 #: ../api/classes/class.ctriggerprototype.php:1363
 #, php-format
 msgid "Trigger [%1$s:%2$s] created."
 msgstr ""
 
-#: ../api/classes/class.ctrigger.php:1387
+#: ../api/classes/class.ctrigger.php:1388
 #, php-format
 msgid "Trigger [%1$s:%2$s] deleted."
 msgstr ""
@@ -7673,13 +7678,13 @@ msgstr ""
 msgid "Trigger [%1$s:%2$s] unlinked."
 msgstr ""
 
-#: ../api/classes/class.ctrigger.php:1600
+#: ../api/classes/class.ctrigger.php:1602
 #, php-format
 msgid "Trigger [%1$s:%2$s] updated."
 msgstr ""
 
-#: ../api/classes/class.ctrigger.php:1687
-#: ../api/classes/class.ctrigger.php:1722
+#: ../api/classes/class.ctrigger.php:1689
+#: ../api/classes/class.ctrigger.php:1724
 #: ../api/classes/class.ctriggerprototype.php:1523
 #: ../api/classes/class.ctriggerprototype.php:1558
 #, php-format
@@ -7759,8 +7764,8 @@ msgstr "触发器已更新"
 msgid "Trigger value"
 msgstr "Trigger value"
 
-#: ../api/classes/class.ctrigger.php:1691
-#: ../api/classes/class.ctrigger.php:1725
+#: ../api/classes/class.ctrigger.php:1693
+#: ../api/classes/class.ctrigger.php:1727
 #: ../api/classes/class.ctriggerprototype.php:1527
 #: ../api/classes/class.ctriggerprototype.php:1561
 msgid "Trigger with same name but other type exists"
@@ -8028,8 +8033,8 @@ msgid "Update item for the graph"
 msgstr "Update item for the graph"
 
 #. GETTEXT: r is date format string as described in http://php.net/date
-#: ../include/locales/en_gb.inc.php:2003
 #: ../include/classes/class.cserverinfo.php:42
+#: ../include/locales/en_gb.inc.php:2003
 msgid "Updated"
 msgstr "更新"
 
@@ -8195,6 +8200,11 @@ msgstr "VALUE MAPPING"
 msgid "Value"
 msgstr "ֵ"
 
+#: ../include/db.inc.php:1137 ../include/db.inc.php:1200
+#, php-format
+msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
+msgstr ""
+
 #: ../include/locales/en_gb.inc.php:504
 msgid "Value map"
 msgstr "Value map"
@@ -8347,8 +8357,8 @@ msgstr "工作时间"
 msgid "Write"
 msgstr "写"
 
-#: ../api/classes/class.cgraphprototype.php:1089
 #: ../api/classes/class.cgraph.php:1082
+#: ../api/classes/class.cgraphprototype.php:1089
 msgid "Wrong fields for graph"
 msgstr ""
 
@@ -8357,8 +8367,8 @@ msgstr ""
 msgid "Wrong fields for host [ %s ]"
 msgstr ""
 
-#: ../api/classes/class.cgraphprototype.php:1103
 #: ../api/classes/class.cgraph.php:1096
+#: ../api/classes/class.cgraphprototype.php:1103
 msgid "Wrong fields for items"
 msgstr ""
 
@@ -8493,7 +8503,7 @@ msgstr ""
 msgid "You cannot view this URL as a"
 msgstr ""
 
-#: ../api/classes/class.chost.php:1558
+#: ../api/classes/class.chost.php:1562
 msgid "You do not have enough rights for operation"
 msgstr ""
 

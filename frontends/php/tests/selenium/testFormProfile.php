@@ -27,7 +27,7 @@ class testFormProfile extends CTest
 
 	public function hashUsersExcept($user)
 	{
-		$this->oldHash=$this->DBhash("select * from users where alias<>'$user'");
+		$this->oldHash=$this->DBhash("select * from users where alias<>'$user' order by userid");
 	}
 
 	protected function assertPreConditions()
