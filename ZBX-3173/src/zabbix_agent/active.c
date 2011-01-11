@@ -94,7 +94,7 @@ static int	get_min_nextcheck()
 {
 	int	i, min = -1;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In get_min_nextcheck()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In get_min_nextcheck()");
 
 	for (i = 0; NULL != active_metrics[i].key; i++)
 	{
@@ -115,7 +115,7 @@ static void	add_check(const char *key, const char *key_orig, int refresh, long l
 {
 	int	i;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In add_check('%s', %i, %li, %i)", key, refresh, lastlogsize, mtime);
+	zabbix_log(LOG_LEVEL_DEBUG, "In add_check('%s', %i, %li, %i)", key, refresh, lastlogsize, mtime);
 
 	for (i = 0; NULL != active_metrics[i].key; i++)
 	{
