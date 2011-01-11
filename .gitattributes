@@ -258,6 +258,7 @@ frontends/php/tests/selenium/testPageDiscovery.php -text
 frontends/php/tests/selenium/testPageEvents.php -text
 frontends/php/tests/selenium/testPageHosts.php -text
 frontends/php/tests/selenium/testPageMaintenance.php -text
+frontends/php/tests/selenium/testPageMaps.php -text
 frontends/php/tests/selenium/testPageMediaTypes.php -text
 frontends/php/tests/selenium/testPageScreens.php -text
 frontends/php/tests/selenium/testPageScripts.php -text
