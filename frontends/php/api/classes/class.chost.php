@@ -2052,13 +2052,14 @@ Copt::memoryPick();
  * @return array|boolean
  */
 	public static function delete($hosts){
-		if(empty($hosts)) return true;
-
-		$hosts = zbx_toArray($hosts);
-		$hostids = zbx_objectValues($hosts, 'hostid');
 
 		try{
 			self::BeginTransaction(__METHOD__);
+
+			if(empty($hosts)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+
+			$hosts = zbx_toArray($hosts);
+			$hostids = zbx_objectValues($hosts, 'hostid');
 
 			self::checkInput($hosts, __FUNCTION__);
 
