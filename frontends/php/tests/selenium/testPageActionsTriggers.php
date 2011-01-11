@@ -27,18 +27,7 @@ class testPageActionsTriggers extends CTest
 	// Returns all trigger actions
 	public static function allActions()
 	{
-		DBConnect($error);
-
-		$actions=array();
-
-		$result=DBselect("select * from actions where eventsource=".EVENT_SOURCE_TRIGGERS." order by actionid");
-		while($action=DBfetch($result))
-		{
-			$actions[]=array($action);
-		}
-		DBclose();
-
-		return $actions;
+		return DBdata("select * from actions where eventsource=".EVENT_SOURCE_TRIGGERS." order by actionid");
 	}
 
 	/**

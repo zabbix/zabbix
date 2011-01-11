@@ -26,17 +26,7 @@ class testPageDiscovery extends CTest
 	// Returns all discovery rules
 	public static function allRules()
 	{
-		DBconnect($error);
-
-		$meditypes=array();
-
-		$result=DBselect('select * from drules');
-		while($rule=DBfetch($result))
-		{
-			$rules[]=array($rule);
-		}
-		DBclose();
-		return $rules;
+		return DBdata('select * from drules');
 	}
 
 	/**

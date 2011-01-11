@@ -26,17 +26,7 @@ class testPageUserGroups extends CTest
 	// Returns all user groups
 	public static function allGroups()
 	{
-		DBconnect($error);
-
-		$groups=array();
-
-		$result=DBselect("select * from usrgrp where name<>'Disabled' order by usrgrpid");
-		while($group=DBfetch($result))
-		{
-			$groups[]=array($group);
-		}
-		DBclose();
-		return $groups;
+		return DBdata("select * from usrgrp where name<>'Disabled' order by usrgrpid");
 	}
 
 	/**

@@ -26,18 +26,7 @@ class testPageMediaTypes extends CTest
 	// Returns all media types
 	public static function allMediaTypes()
 	{
-		DBconnect($error);
-
-		$meditypes=array();
-
-		$result=DBselect('select * from media_type');
-		while($mediatype=DBfetch($result))
-		{
-			$mediatypes[]=array($mediatype);
-		}
-
-		DBclose();
-		return $mediatypes;
+		return DBdata('select * from media_type');
 	}
 
 	/**

@@ -26,17 +26,7 @@ class testPageScripts extends CTest
 	// Returns all scripts
 	public static function allScripts()
 	{
-		DBconnect($error);
-
-		$scripts=array();
-
-		$result=DBselect('select * from scripts');
-		while($script=DBfetch($result))
-		{
-			$scripts[]=array($script);
-		}
-		DBclose();
-		return $scripts;
+		return DBdata('select * from scripts');
 	}
 
 	/**

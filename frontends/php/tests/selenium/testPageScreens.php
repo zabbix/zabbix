@@ -27,18 +27,7 @@ class testPageScreens extends CTest
 	// Returns all screens
 	public static function allScreens()
 	{
-		DBConnect($error);
-
-		$actions=array();
-
-		$result=DBselect("select * from screens order by screenid");
-		while($screen=DBfetch($result))
-		{
-			$screens[]=array($screen);
-		}
-		DBclose();
-
-		return $screens;
+		return DBdata("select * from screens order by screenid");
 	}
 
 	/**
