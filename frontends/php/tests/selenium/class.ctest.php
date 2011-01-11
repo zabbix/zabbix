@@ -178,6 +178,8 @@ class CTest extends PHPUnit_Extensions_SeleniumTestCase
 			$this->open($url);
 			$this->wait();
 		}
+		$this->ok('Admin');
+		$this->nok('Login name or password is incorrect');
 	}
 
 	public function logout()
