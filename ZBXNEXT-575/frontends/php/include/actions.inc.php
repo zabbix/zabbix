@@ -279,7 +279,7 @@ function get_condition_desc($conditiontype, $operator, $value){
 define('LONG_DESCRITION', 0);
 define('SHORT_DESCRITION', 1);
 
-function get_operation_desc($type=SHORT_DESCRITION, $data){
+function get_operation_desc($type, $data){
 	$result = array();
 
 	if($type == SHORT_DESCRITION){
@@ -289,7 +289,10 @@ function get_operation_desc($type=SHORT_DESCRITION, $data){
 				if(!isset($data['opmessage_grp'])) $data['opmessage_grp'] = array();
 
 				foreach($data['opmessage_usr'] as $opmsgUser){
-					$users = CUser::get(array('userids' => $opmsgUser['userid'],  'output' => API_OUTPUT_EXTEND));
+					$users = CUser::get(array(
+						'userids' => $opmsgUser['userid'],
+						'output' => API_OUTPUT_EXTEND
+					));
 					$user = reset($users);
 
 					$result[] = S_SEND_MESSAGE_TO.' '.S_USER.' "'.$user['alias'].'"';
@@ -339,7 +342,6 @@ function get_operation_desc($type=SHORT_DESCRITION, $data){
 	else{
 		switch($data['operationtype']){
 			case OPERATION_TYPE_MESSAGE:
-				// for PHP4
 				if(isset($data['opmessage']['default_msg']) && !empty($data['opmessage']['default_msg'])){
 					if(isset($_REQUEST['def_shortdata']) && isset($_REQUEST['def_longdata'])){
 						$result[] = array(bold(S_SUBJECT.': '),BR(),$_REQUEST['def_shortdata'],BR());
@@ -366,7 +368,7 @@ function get_operation_desc($type=SHORT_DESCRITION, $data){
 				$temp = bold(S_REMOTE_COMMANDS.': ');
 				$result[] = $temp->ToString().$data['longdata'];
 				break;
-			default: break;
+			default:
 		}
 	}
 
@@ -689,98 +691,6 @@ function validate_condition($conditiontype, $value){
 			break;
 	}
 	return true;
-}
-
-function validate_operation($operation){
-	if(isset($operation['esc_period']) && (($operation['esc_period'] > 0) && ($operation['esc_period'] < 60))){
-		error(S_INCORRECT_ESCALATION_PERIOD);
-		return false;
-	}
-
-	switch($operation['operationtype']){
-		case OPERATION_TYPE_MESSAGE:
-			switch($operation['object']){
-				case OPERATION_OBJECT_USER:
-					$users = CUser::get(array('userids' => $operation['objectid'],  'output' => API_OUTPUT_EXTEND));
-					if(empty($users)){
-						error(S_INCORRECT_USER);
-						return false;
-					}
-					break;
-				case OPERATION_OBJECT_GROUP:
-					$usrgrps = CUserGroup::get(array('usrgrpids' => $operation['objectid'],  'output' => API_OUTPUT_EXTEND));
-					if(empty($usrgrps)){
-						error(S_INCORRECT_GROUP);
-						return false;
-					}
-					break;
-				default:
-					error(S_INCORRECT_OBJECT_TYPE);
-					return false;
-			}
-			break;
-		case OPERATION_TYPE_COMMAND:
-			return validate_commands($operation['longdata']);
-		case OPERATION_TYPE_HOST_ADD:
-		case OPERATION_TYPE_HOST_REMOVE:
-		case OPERATION_TYPE_HOST_ENABLE:
-		case OPERATION_TYPE_HOST_DISABLE:
-			break;
-		case OPERATION_TYPE_GROUP_ADD:
-		case OPERATION_TYPE_GROUP_REMOVE:
-			$groups = CHostGroup::get(array(
-				'groupids' => $operation['objectid'],
-				'output' => API_OUTPUT_SHORTEN,
-				'editable' => 1,
-			));
-			if(empty($groups)){
-				error(S_INCORRECT_GROUP);
-				return false;
-			}
-			break;
-		case OPERATION_TYPE_TEMPLATE_ADD:
-		case OPERATION_TYPE_TEMPLATE_REMOVE:
-			$tpls = CTemplate::get(array(
-				'templateids' => $operation['objectid'],
-				'output' => API_OUTPUT_SHORTEN,
-				'editable' => 1,
-			));
-			if(empty($tpls)){
-				error(S_INCORRECT_HOST);
-				return false;
-			}
-			break;
-		default:
-			error(S_INCORRECT_OPERATION_TYPE);
-			return false;
-	}
-return true;
-}
-
-function validate_commands($commands){
-	$cmd_list = explode("\n",$commands);
-	foreach($cmd_list as $cmd){
-		$cmd = trim($cmd, "\x00..\x1F");
-//		if(!ereg("^(({HOSTNAME})|".ZBX_EREG_INTERNAL_NAMES.")(:|#)[[:print:]]*$",$cmd,$cmd_items)){
-		if(!preg_match("/^(({HOSTNAME})|".ZBX_PREG_INTERNAL_NAMES.")(:|#)[".ZBX_PREG_PRINT."]*$/", $cmd, $cmd_items)){
-			error(S_INCORRECT_COMMAND.": '$cmd'");
-			return FALSE;
-		}
-
-		if($cmd_items[4] == '#'){ // group
-			if(!DBfetch(DBselect('select groupid from groups where name='.zbx_dbstr($cmd_items[1])))){
-				error(S_UNKNOWN_GROUP_NAME.": '".$cmd_items[1]."' ".S_IN_COMMAND_SMALL." '".$cmd."'");
-				return FALSE;
-			}
-		}
-		else if($cmd_items[4] == ':'){ // host
-			if(($cmd_items[1] != '{HOSTNAME}') && !DBfetch(DBselect('select hostid from hosts where host='.zbx_dbstr($cmd_items[1])))){
-				error(S_UNKNOWN_HOST_NAME.": '".$cmd_items[1]."' ".S_IN_COMMAND_SMALL." '".$cmd."'");
-				return FALSE;
-			}
-		}
-	}
-	return TRUE;
 }
 
 function count_operations_delay($operations, $def_period=0){

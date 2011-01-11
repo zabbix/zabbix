@@ -220,31 +220,25 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		$_REQUEST['new_operation'] = $new_operation;
 	}
 	else if(inarr_isset(array('add_operation','new_operation'))){
-		$new_operation = $_REQUEST['new_operation'];
+		try{
+			$new_operation = $_REQUEST['new_operation'];
+			CAction::validateOperations($new_operation);
 
-		if(validate_operation($new_operation)){
-			zbx_rksort($new_operation);
+			$_REQUEST['operations'] = get_request('operations', array());
 
-			$_REQUEST['operations'] = get_request('operations',array());
-
-
-			if(($new_operation['esc_step_from'] <= $new_operation['esc_step_to']) || ($new_operation['esc_step_to']==0)) {
-
-				if(!isset($new_operation['id'])){
-					if(!str_in_array($new_operation,$_REQUEST['operations']))
-						array_push($_REQUEST['operations'],$new_operation);
-				}
-				else{
-					$id = $new_operation['id'];
-					unset($new_operation['id']);
-					$_REQUEST['operations'][$id] = $new_operation;
-				}
-
-				unset($_REQUEST['new_operation']);
+			if(!isset($new_operation['id']) && !str_in_array($new_operation, $_REQUEST['operations'])){
+				array_push($_REQUEST['operations'], $new_operation);
 			}
 			else{
-				info(S_INCORRECT_STEPS);
+				$id = $new_operation['id'];
+				unset($new_operation['id']);
+				$_REQUEST['operations'][$id] = $new_operation;
 			}
+
+			unset($_REQUEST['new_operation']);
+		}
+		catch(APIException $e){
+			error($e->getErrors());
 		}
 	}
 	else if(inarr_isset(array('del_operation','g_operationid'))){
