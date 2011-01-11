@@ -122,6 +122,10 @@ class CTest extends PHPUnit_Extensions_SeleniumTestCase
 		foreach($tables as $table)
 		{
 			DBexecute("delete from $table");
+		}
+
+		foreach($tables as $table)
+		{
 			DBexecute("insert into $table select * from ${table}_tmp");
 			DBexecute("drop table ${table}_tmp");
 		}
