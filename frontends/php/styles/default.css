@@ -65,6 +65,7 @@ img.borderless	{	border-width: 0; vertical-align: bottom;	}
 .vert{ width:1px;}
 .rarr{ font-size: 16px; }
 .bold { font-weight: bold; }
+.italic { font-style: italic; }
 .nowrap { white-space: nowrap; word-spacing: 0; }
 .delimiter{ font-weight:bold; color:#000; }
 .pointer{}
@@ -180,7 +181,7 @@ div.footer .formrow .main:hover{ border-color: #DD7711; }
 .link_menu[disabled]{ color: #DDD; text-decoration: none; corsor: default; border: 0; }
 
 .checkbox{ padding: 0; border: 0; background: none;}
-
+.textarea{ }
 
 /**** SCREEN DRAG & DROP ****/
 .draggable { cursor: move; }

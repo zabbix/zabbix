@@ -32,7 +32,7 @@ require_once('include/templates/action.js.php');
 	if(!isset($_REQUEST['form_refresh'])) $divTabs->setSelected(0);
 
 	$frmAction = new CForm();
-	$frmAction->setName('web.action.edit.php.');
+	$frmAction->setName('web.action.edit.php');
 	$frmAction->addVar('form', get_request('form', 1));
 
 	$from_rfr = get_request('form_refresh',0);
@@ -449,18 +449,13 @@ require_once('include/templates/action.js.php');
 			$cmbOpType->addItem($oper, operation_type2str($oper));
 
 		$tblOper->addRow(array(S_OPERATION_TYPE, $cmbOpType));
-
+SDII($data['operations']);
 		switch($new_operation['operationtype']) {
 			case OPERATION_TYPE_MESSAGE:
 				$usrgrpList = new CTable();
 				$usrgrpList->setAttribute('id', 'opmsgUsrgrpList');
 
-				$addUsrgrpBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm='.S_ACTION.
-							'&srctbl=usrgrp'.
-							'&srcfld1=usrgrpid'.
-							'&srcfld2=name'.
-							'&multiselect=1'.
-							'",450,450)','link_menu');
+				$addUsrgrpBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm='.S_ACTION.'&srctbl=usrgrp'.'&srcfld1=usrgrpid'.'&srcfld2=name'.'&multiselect=1'.'",450,450)','link_menu');
 
 				$col = new CCol($addUsrgrpBtn);
 				$col->setAttribute('colspan', 2);
@@ -474,12 +469,7 @@ require_once('include/templates/action.js.php');
 				$userList = new CTable();
 				$userList->setAttribute('id', 'opmsgUserList');
 
-				$addUserBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm='.S_ACTION.
-							'&srctbl=users'.
-							'&srcfld1=userid'.
-							'&srcfld2=alias'.
-							'&multiselect=1'.
-							'",450,450)','link_menu');
+				$addUserBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm='.S_ACTION.'&srctbl=users'.'&srcfld1=userid'.'&srcfld2=alias'.'&multiselect=1'.'",450,450)','link_menu');
 
 				$col = new CCol($addUserBtn);
 				$col->setAttribute('colspan', 2);
@@ -508,7 +498,7 @@ require_once('include/templates/action.js.php');
 				$jsInsert.= 'addPopupValues('.zbx_jsvalue(array('object'=>'usrgrpid', 'values'=>$usrgrps)).');';
 				$jsInsert.= 'addPopupValues('.zbx_jsvalue(array('object'=>'userid', 'values'=>$users)).');';
 
-				zbx_add_post_js('setTimeout(function(){'.$jsInsert.'}, 20);');
+				zbx_add_post_js($jsInsert);
 
 				$tblOper->addRow(array(_('Send to User groups'), new CDiv($usrgrpList, 'objectgroup inlineblock border_dotted ui-corner-all')));
 				$tblOper->addRow(array(_('Send to Users'), new CDiv($userList, 'objectgroup inlineblock border_dotted ui-corner-all')));
@@ -539,12 +529,45 @@ require_once('include/templates/action.js.php');
 				}
 				break;
 			case OPERATION_TYPE_COMMAND:
-				$tblOper->addItem(new CVar('new_operation[object]', 0));
-				$tblOper->addItem(new CVar('new_operation[objectid]', 0));
-				$tblOper->addItem(new CVar('new_operation[shortdata]', ''));
+				$cmdList = new CTable();
+				$cmdList->addRow(array(_('Target'), _('Command'), SPACE));
 
-				$tblOper->addRow(array(S_REMOTE_COMMAND,
-					new CTextArea('new_operation[longdata]', $new_operation['longdata'], 77, 7)));
+				$addCmdBtn = new CButton('add', _('Add'), "javascript: showOpCmdForm(0,'new');",'link_menu');
+
+				$col = new CCol($addCmdBtn);
+				$col->setAttribute('colspan', 3);
+
+				$buttonRow = new CRow($col);
+				$buttonRow->setAttribute('id', 'opCmdListFooter');
+
+				$cmdList->addRow($buttonRow);
+
+
+// Add Participations
+				$groupids = isset($new_operation['opcommand_grp']) ?
+					zbx_objectValues($new_operation['opcommand_grp'], 'groupid') :
+					array();
+
+				$hostids = isset($new_operation['opcommand_hst']) ?
+					zbx_objectValues($new_operation['opcommand_hst'], 'hostid') :
+					array();
+
+				$groups = CHostGroup::get(array('groupids' => $groupids, 'output' => array('name')));
+				order_result($groups, 'name');
+
+				$hosts = CHost::get(array('hostids' => $hostids, 'output' => array('host')));
+				order_result($hosts, 'host');
+
+				$jsInsert = '';
+				$jsInsert.= 'addPopupValues('.zbx_jsvalue(array('object'=>'groupid', 'values'=>$groups)).');';
+				$jsInsert.= 'addPopupValues('.zbx_jsvalue(array('object'=>'hostid', 'values'=>$hosts)).');';
+
+				zbx_add_post_js($jsInsert);
+
+				$cmdList = new CDiv($cmdList, 'objectgroup border_dotted ui-corner-all');
+				$cmdList->setAttribute('id', 'opCmdList');
+
+				$tblOper->addRow(array(_('Remote commands'), $cmdList));
 				break;
 			case OPERATION_TYPE_HOST_ADD:
 			case OPERATION_TYPE_HOST_REMOVE:

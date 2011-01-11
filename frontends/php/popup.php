@@ -300,7 +300,7 @@ include_once('include/page_header.php');
 	}
 
 	$options = array(
-		'config' => array('select_latest' => true),
+		'config' => array('select_latest' => true, 'deny_all' => true),
 		'groups' => array('nodeids' => get_request('nodeid', get_current_nodeid(false))),
 		'hosts' => array('nodeids' => get_request('nodeid', get_current_nodeid(false))),
 		'groupid' => get_request('groupid', null),
