@@ -829,6 +829,9 @@ SDI('/////////////////////////////////');
 		);
 		$screens = self::get($options);
 
+		$templateScreens = CTemplateScreen::get($options);
+
+		$screens = array_merge($screens, $templateScreens);
 
 		foreach($data['screenitems'] as $new_item){
 			$items_db_fields = array(
