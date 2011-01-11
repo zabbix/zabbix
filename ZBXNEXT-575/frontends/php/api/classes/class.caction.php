@@ -945,12 +945,12 @@ COpt::memoryPick();
 
 		foreach($operations as $operation){
 
-			if(($operation['esc_step_from'] <= $operation['esc_step_to']) || ($operation['esc_step_to']==0)){
-				self::exception(API_ERROR_PARAMETERS, _('Incorrect operation escalation step values.'));
+			if(($operation['esc_step_from'] >= $operation['esc_step_to']) && ($operation['esc_step_to'] != 0)){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect operation escalation step values.'));
 			}
 
 			if(isset($operation['esc_period']) && (($operation['esc_period'] > 0) && ($operation['esc_period'] < 60))){
-				self::exception(API_ERROR_PARAMETERS, _('Incorrect operation escalation period.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect operation escalation period.'));
 			}
 
 			switch($operation['operationtype']){
@@ -992,7 +992,7 @@ COpt::memoryPick();
 							&& (!isset($operation['opcommand_grp']) || empty($operation['opcommand_grp']))){
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('No targets for operation command.'));
 					}
-// TODO: command validation
+
 					// self::validateCommands($operation['longdata']);
 					break;
 				case OPERATION_TYPE_GROUP_ADD:
