@@ -26,17 +26,7 @@ class testPageHosts extends CTest
 	// Returns all hosts
 	public static function allHosts()
 	{
-		DBconnect($error);
-
-		$hosts=array();
-
-		$result=DBselect('select * from hosts where status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')');
-		while($host=DBfetch($result))
-		{
-			$hosts[]=array($host);
-		}
-		DBclose();
-		return $hosts;
+		return DBdata('select * from hosts where status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')');
 	}
 
 	/**

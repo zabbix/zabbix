@@ -27,18 +27,7 @@ class testPageSlideShows extends CTest
 	// Returns all slide shows
 	public static function allSlideShows()
 	{
-		DBConnect($error);
-
-		$slideshows=array();
-
-		$result=DBselect("select * from slideshows order by slideshowid");
-		while($slideshow=DBfetch($result))
-		{
-			$slideshows[]=array($slideshow);
-		}
-		DBclose();
-
-		return $slideshows;
+		return DBdata("select * from slideshows order by slideshowid");
 	}
 
 	/**

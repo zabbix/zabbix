@@ -26,17 +26,7 @@ class testPageTemplates extends CTest
 	// Returns all templates
 	public static function allTemplates()
 	{
-		DBconnect($error);
-
-		$templates=array();
-
-		$result=DBselect("select * from hosts where status in (".HOST_STATUS_TEMPLATE.')');
-		while($template=DBfetch($result))
-		{
-			$templates[]=array($template);
-		}
-		DBclose();
-		return $templates;
+		return DBdata("select * from hosts where status in (".HOST_STATUS_TEMPLATE.')');
 	}
 
 	/**
