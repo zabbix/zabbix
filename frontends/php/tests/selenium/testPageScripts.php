@@ -88,7 +88,7 @@ class testPageScripts extends CTest
 	{
 		$scriptid=$script['scriptid'];
 
-		$this->DBsave_tables('scripts');
+		$this->DBsave_tables(array('scripts'));
 		$this->chooseOkOnNextConfirmation();
 
 		$this->login('scripts.php');
@@ -105,7 +105,7 @@ class testPageScripts extends CTest
 		$sql="select * from scripts where scriptid='$scriptid'";
 		$this->assertEquals(0,$this->DBcount($sql));
 
-		$this->DBrestore_tables('scripts');
+		$this->DBrestore_tables(array('scripts'));
 	}
 }
 ?>

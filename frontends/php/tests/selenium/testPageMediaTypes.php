@@ -91,7 +91,7 @@ class testPageMediaTypes extends CTest
 	{
 		$id=$mediatype['mediatypeid'];
 
-		$this->DBsave_tables('media_type');
+		$this->DBsave_tables(array('media_type'));
 
 		$this->chooseOkOnNextConfirmation();
 
@@ -109,7 +109,7 @@ class testPageMediaTypes extends CTest
 		$sql="select * from media_type where mediatypeid=$id";
 		$this->assertEquals(0,$this->DBcount($sql));
 
-		$this->DBrestore_tables('media_type');
+		$this->DBrestore_tables(array('media_type'));
 	}
 }
 ?>
