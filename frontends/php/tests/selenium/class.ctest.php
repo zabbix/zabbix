@@ -28,6 +28,23 @@ require_once(dirname(__FILE__).'/../../include/copt.lib.php');
 require_once(dirname(__FILE__).'/../../include/func.inc.php');
 require_once(dirname(__FILE__).'/../../include/db.inc.php');
 
+// Returns database data suitable for PHPUbit data provider functions
+function DBdata($query)
+{
+	DBconnect($error);
+
+	$objects=array();
+
+	$result=DBselect($query);
+	while($object=DBfetch($result))
+	{
+		$objects[]=array($object);
+	}
+
+	DBclose();
+	return $objects;
+}
+
 class CTest extends PHPUnit_Extensions_SeleniumTestCase
 {
 	protected $captureScreenshotOnFailure = TRUE;
@@ -243,7 +260,5 @@ class CTest extends PHPUnit_Extensions_SeleniumTestCase
 		$this->waitForPageToLoad();
 		$this->checkFatalErrors();
 	}
-
-
 }
 ?>

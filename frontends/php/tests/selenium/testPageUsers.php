@@ -26,17 +26,7 @@ class testPageUsers extends CTest
 	// Returns all users
 	public static function allUsers()
 	{
-		DBconnect($error);
-
-		$users=array();
-
-		$result=DBselect('select * from users');
-		while($user=DBfetch($result))
-		{
-			$users[]=array($user);
-		}
-		DBclose();
-		return $users;
+		return DBdata('select * from users');
 	}
 
 	/**

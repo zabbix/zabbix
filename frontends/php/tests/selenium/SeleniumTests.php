@@ -28,6 +28,7 @@ require_once(dirname(__FILE__).'/testPageDashboard.php');
 require_once(dirname(__FILE__).'/testPageDiscovery.php');
 require_once(dirname(__FILE__).'/testPageEvents.php');
 require_once(dirname(__FILE__).'/testPageHosts.php');
+require_once(dirname(__FILE__).'/testPageMaintenance.php');
 require_once(dirname(__FILE__).'/testPageMediaTypes.php');
 require_once(dirname(__FILE__).'/testPageScreens.php');
 require_once(dirname(__FILE__).'/testPageScripts.php');
@@ -55,9 +56,12 @@ class SeleniumTests
 		$suite->addTestSuite('testPageActionsTriggers');
 		$suite->addTestSuite('testPageDashboard');
 		$suite->addTestSuite('testPageDiscovery');
-		$suite->addTestSuite('testPageScripts');
+		$suite->addTestSuite('testPageEvents');
+		$suite->addTestSuite('testPageHosts');
+		$suite->addTestSuite('testPageMaintenance');
 		$suite->addTestSuite('testPageMediaTypes');
 		$suite->addTestSuite('testPageScreens');
+		$suite->addTestSuite('testPageScripts');
 		$suite->addTestSuite('testPageSearch');
 		$suite->addTestSuite('testPageSlideShows');
 		$suite->addTestSuite('testPageTemplates');
@@ -67,7 +71,6 @@ class SeleniumTests
 		$suite->addTestSuite('testFormHostGroup');
 		$suite->addTestSuite('testFormProfile');
 		$suite->addTestSuite('testFormScreen');
-		$suite->addTestSuite('testPageHosts');
 		// ...
 
 		return $suite;
