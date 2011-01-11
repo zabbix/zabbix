@@ -793,13 +793,8 @@ COpt::memoryPick();
 
 	protected static function addOperations($operations){
 		$operations = zbx_toArray($operations);
-		$opcondition_inserts = array();
 
-		foreach($operations as $operation){
-			if(!validate_operation($operation)){
-				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-			}
-		}
+		self::validateOperations($operations);
 
 		foreach($operations as $operation){
 			$operation_db_fields = array(
@@ -824,12 +819,6 @@ COpt::memoryPick();
 						$opmessage[] = $operation['opmessage'];
 					}
 
-// check for at least one recipient
-					if((!isset($operation['userids']) || empty($operation['userids']))
-							&& (!isset($operation['usrgrpid']) || empty($operation['usrgrpid']))){
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('No recipients for operation message.'));
-					}
-
 					if(isset($operation['userids'])){
 						foreach($operation['userids'] as $userid){
 							$opmessage_usr[] = array(
@@ -849,13 +838,7 @@ COpt::memoryPick();
 					}
 
 					break;
-
 				case OPERATION_TYPE_COMMAND:
-					if((!isset($operation['opcommand_hst']) || empty($operation['opcommand_hst']))
-							&& (!isset($operation['opcommand_grp']) || empty($operation['opcommand_grp']))){
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('No targets for operation command.'));
-					}
-
 					if(isset($operation['opcommand_hst'])){
 						foreach($operation['opcommand_hst'] as $hst){
 							$opcommand_hst[] = array(
@@ -877,44 +860,31 @@ COpt::memoryPick();
 					}
 
 					break;
-
 				case OPERATION_TYPE_GROUP_ADD:
 				case OPERATION_TYPE_GROUP_REMOVE:
-					if(isset($operation['opgroup'])){
-						foreach($operation['opgroup'] as $grp){
-							$opgroup[] = array(
-								'operationid' => $operationid,
-								'groupid' => $grp['groupid'],
-							);
-						}
-					}
-					else{
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Operation has no groups to operate.'));
+					foreach($operation['opgroup'] as $grp){
+						$opgroup[] = array(
+							'operationid' => $operationid,
+							'groupid' => $grp['groupid'],
+						);
 					}
 					break;
-
 				case OPERATION_TYPE_TEMPLATE_ADD:
 				case OPERATION_TYPE_TEMPLATE_REMOVE:
-					if(isset($operation['optemplate'])){
-						foreach($operation['optemplate'] as $tpl){
-							$optemplate[] = array(
-								'operationid' => $operationid,
-								'templateid' => $tpl['templateid'],
-							);
-						}
+					foreach($operation['optemplate'] as $tpl){
+						$optemplate[] = array(
+							'operationid' => $operationid,
+							'templateid' => $tpl['templateid'],
+						);
 					}
-					else{
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Operation has no templates to operate.'));
-					}
-
 					break;
-
 				case OPERATION_TYPE_HOST_ADD:
 				case OPERATION_TYPE_HOST_REMOVE:
 				case OPERATION_TYPE_HOST_ENABLE:
 				case OPERATION_TYPE_HOST_DISABLE:
 			}
 
+			$opcondition_inserts = array();
 			if(isset($operation['opconditions'])){
 				foreach($operation['opconditions'] as $opcondition){
 					$opcondition['operationid'] = $operationid;
@@ -969,5 +939,132 @@ COpt::memoryPick();
 			return false;
 		}
 	}
+
+	public static function validateOperations($operations){
+		$operations = zbx_toArray($operations);
+
+		foreach($operations as $operation){
+
+			if(($operation['esc_step_from'] <= $operation['esc_step_to']) || ($operation['esc_step_to']==0)){
+				self::exception(API_ERROR_PARAMETERS, _('Incorrect operation escalation step values.'));
+			}
+
+			if(isset($operation['esc_period']) && (($operation['esc_period'] > 0) && ($operation['esc_period'] < 60))){
+				self::exception(API_ERROR_PARAMETERS, _('Incorrect operation escalation period.'));
+			}
+
+			switch($operation['operationtype']){
+				case OPERATION_TYPE_MESSAGE:
+					if((!isset($operation['userids']) || empty($operation['userids']))
+							&& (!isset($operation['usrgrpid']) || empty($operation['usrgrpid']))){
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('No recipients for operation message.'));
+					}
+
+					if(isset($operation['userids'])){
+						$count = count(array_unique($operation['userids']));
+
+						$users = CUser::get(array(
+							'userids' => $operation['userids'],
+							'output' => API_OUTPUT_SHORTEN
+						));
+
+						if($count != count($users)){
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect operation user.'));
+						}
+					}
+
+					if(isset($operation['usrgrpid'])){
+						$count = count(array_unique($operation['usrgrpid']));
+
+						$usrgrps = CUserGroup::get(array(
+							'usrgrpids' => $operation['objectid'],
+							'output' => API_OUTPUT_SHORTEN
+						));
+
+						if($count != count($usrgrps)){
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect operation group.'));
+						}
+					}
+
+					break;
+				case OPERATION_TYPE_COMMAND:
+					if((!isset($operation['opcommand_hst']) || empty($operation['opcommand_hst']))
+							&& (!isset($operation['opcommand_grp']) || empty($operation['opcommand_grp']))){
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('No targets for operation command.'));
+					}
+// TODO: command validation
+					// self::validateCommands($operation['longdata']);
+					break;
+				case OPERATION_TYPE_GROUP_ADD:
+				case OPERATION_TYPE_GROUP_REMOVE:
+					if(!isset($operation['opgroup']) || empty($operation['opgroup'])){
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Operation has no group to operate.'));
+					}
+
+					$group = CHostGroup::get(array(
+						'groupids' => $operation['opgroup'],
+						'output' => API_OUTPUT_SHORTEN,
+						'editable' => 1,
+					));
+					if(empty($group)){
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect operation group.'));
+					}
+					break;
+				case OPERATION_TYPE_TEMPLATE_ADD:
+				case OPERATION_TYPE_TEMPLATE_REMOVE:
+					if(!isset($operation['optemplate']) || empty($operation['optemplate'])){
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Operation has no template to operate.'));
+					}
+
+					$tpl = CTemplate::get(array(
+						'templateids' => $operation['optemplate'],
+						'output' => API_OUTPUT_SHORTEN,
+						'editable' => 1,
+					));
+					if(empty($tpl)){
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect operation template.'));
+					}
+					break;
+				case OPERATION_TYPE_HOST_ADD:
+				case OPERATION_TYPE_HOST_REMOVE:
+				case OPERATION_TYPE_HOST_ENABLE:
+				case OPERATION_TYPE_HOST_DISABLE:
+					break;
+				default:
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect operation type.'));
+			}
+		}
+
+		return true;
+	}
+
+	public static function validateCommands($commands){
+
+		return true;
+
+		$cmd_list = explode("\n",$commands);
+		foreach($cmd_list as $cmd){
+			$cmd = trim($cmd, "\x00..\x1F");
+	//		if(!ereg("^(({HOSTNAME})|".ZBX_EREG_INTERNAL_NAMES.")(:|#)[[:print:]]*$",$cmd,$cmd_items)){
+			if(!preg_match("/^(({HOSTNAME})|".ZBX_PREG_INTERNAL_NAMES.")(:|#)[".ZBX_PREG_PRINT."]*$/", $cmd, $cmd_items)){
+				error(S_INCORRECT_COMMAND.": '$cmd'");
+				return FALSE;
+			}
+
+			if($cmd_items[4] == '#'){ // group
+				if(!DBfetch(DBselect('select groupid from groups where name='.zbx_dbstr($cmd_items[1])))){
+					error(S_UNKNOWN_GROUP_NAME.": '".$cmd_items[1]."' ".S_IN_COMMAND_SMALL." '".$cmd."'");
+					return FALSE;
+				}
+			}
+			else if($cmd_items[4] == ':'){ // host
+				if(($cmd_items[1] != '{HOSTNAME}') && !DBfetch(DBselect('select hostid from hosts where host='.zbx_dbstr($cmd_items[1])))){
+					error(S_UNKNOWN_HOST_NAME.": '".$cmd_items[1]."' ".S_IN_COMMAND_SMALL." '".$cmd."'");
+					return FALSE;
+				}
+			}
+		}
+	}
+
 }
 ?>
