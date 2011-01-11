@@ -20,8 +20,6 @@
 #include "common.h"
 #include "zbxjson.h"
 
-#define ZBX_JSON_READABLE
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_json_strerror                                                *
@@ -259,20 +257,16 @@ static void	__zbx_json_addobject(struct zbx_json *j, const char *name, int objec
 {
 	size_t	len = 2; /* brackets */
 	char	*p, *psrc, *pdst;
-#ifdef ZBX_JSON_READABLE
 	int	i;
-#endif
 
 	assert(j);
 
-#ifdef ZBX_JSON_READABLE
-	len += j->level;
-	if (0 != j->level)
-		len++;
-#endif
-
 	if (ZBX_JSON_COMMA == j->status)
 		len++; /* , */
+
+	if (0 != j->level)
+		len++;
+	len += j->level;
 
 	if (NULL != name)
 	{
@@ -292,12 +286,11 @@ static void	__zbx_json_addobject(struct zbx_json *j, const char *name, int objec
 	if (ZBX_JSON_COMMA == j->status)
 		*p++ = ',';
 
-#ifdef ZBX_JSON_READABLE
 	if (0 != j->level)
 		*p++ = '\n';
 	for (i = 0; i < j->level; i++)
 		*p++ = '\t';
-#endif
+
 	if (NULL != name)
 	{
 		p = __zbx_json_insstring(p, name, ZBX_JSON_TYPE_STRING);
@@ -327,9 +320,7 @@ void	zbx_json_addstring(struct zbx_json *j, const char *name, const char *string
 {
 	size_t	len = 0;
 	char	*p, *psrc, *pdst;
-#ifdef ZBX_JSON_READABLE
 	int	i;
-#endif
 
 	assert(j);
 
@@ -338,11 +329,9 @@ void	zbx_json_addstring(struct zbx_json *j, const char *name, const char *string
 
 	if (NULL != name)
 	{
+		len += 1 + j->level;
 		len += __zbx_json_stringsize(name, ZBX_JSON_TYPE_STRING);
 		len += 1; /* : */
-#ifdef ZBX_JSON_READABLE
-		len += j->level + 1;
-#endif
 	}
 	len += __zbx_json_stringsize(string, type);
 
@@ -360,11 +349,9 @@ void	zbx_json_addstring(struct zbx_json *j, const char *name, const char *string
 
 	if (NULL != name)
 	{
-#ifdef ZBX_JSON_READABLE
 		*p++ = '\n';
 		for (i = 0; i < j->level; i++)
 			*p++ = '\t';
-#endif
 		p = __zbx_json_insstring(p, name, ZBX_JSON_TYPE_STRING);
 		*p++ = ':';
 	}
@@ -400,6 +387,39 @@ int	zbx_json_close(struct zbx_json *j)
 
 /******************************************************************************
  *                                                                            *
+ * Function: __zbx_json_type                                                  *
+ *                                                                            *
+ * Purpose: return type of pointed value                                      *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: type of pointed value                                        *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_json_type_t	__zbx_json_type(const char *p)
+{
+	if ('"' == *p)
+		return ZBX_JSON_TYPE_STRING;
+	if (('0' <= *p && *p <= '9') || '-' == *p)
+		return ZBX_JSON_TYPE_INT;
+	if ('[' == *p)
+		return ZBX_JSON_TYPE_ARRAY;
+	if ('{' == *p)
+		return ZBX_JSON_TYPE_OBJECT;
+	if ('n' == p[0] && 'u' == p[1] && 'l' == p[2] && 'l' == p[3])
+		return ZBX_JSON_TYPE_NULL;
+
+	zbx_set_json_strerror("Invalid type of JSON value \"%.64s\"", p);
+
+	return ZBX_JSON_TYPE_UNKNOWN;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: __zbx_json_rbracket                                              *
  *                                                                            *
  * Purpose: return position of right bracket                                  *
@@ -424,21 +444,22 @@ static const char	*__zbx_json_rbracket(const char *p)
 
 	lbracket = *p;
 
-	if (lbracket != '{' && lbracket != '[')
+	if ('{' != lbracket && '[' != lbracket)
 		return NULL;
 
-	rbracket = (lbracket == '{') ? '}' : ']';
+	rbracket = ('{' == lbracket ? '}' : ']');
 
-	while (*p != '\0')
+	while ('\0' != *p)
 	{
 		switch (*p)
 		{
 			case '"':
-				state = (0 == state) ? 1 : 0;
+				state = (0 == state ? 1 : 0);
 				break;
 			case '\\':
 				if (1 == state)
-					p++;
+					if ('\0' == *++p)
+						return NULL;
 				break;
 			case '[':
 			case '{':
@@ -451,7 +472,7 @@ static const char	*__zbx_json_rbracket(const char *p)
 				{
 					level--;
 					if (0 == level)
-						return (rbracket == *p) ? p : NULL;
+						return (rbracket == *p ? p : NULL);
 				}
 				break;
 		}
@@ -479,27 +500,39 @@ static const char	*__zbx_json_rbracket(const char *p)
  ******************************************************************************/
 int	zbx_json_open(char *buffer, struct zbx_json_parse *jp)
 {
-#ifdef ZBX_JSON_READABLE
 	char	*o, *i;
-#endif
+	int	state = 0; /* 0 - outside string; 1 - inside string */
+
 	jp->start = NULL;
 	jp->end = NULL;
 
-	if (*buffer == '{')
+	while ('\0' != *buffer && NULL != strchr(ZBX_WHITESPACE, *buffer))
+		buffer++;
+
+	if ('{' == *buffer)
 		jp->start = buffer;
 	else
 		goto error;
 
-#ifdef ZBX_JSON_READABLE
 	o = buffer;
 	i = buffer;
 	do
 	{
-		if (*i != '\t' && *i != '\n')
+		switch (*i)
+		{
+			case '"':
+				state = (0 == state ? 1 : 0);
+				break;
+			case '\\':
+				*o++ = *i++;
+				break;
+		}
+
+		if ('\0' == *i || !(0 == state && NULL != strchr(ZBX_WHITESPACE, *i)))
 			*o++ = *i;
 	}
 	while ('\0' != *i++);
-#endif
+
 	if (NULL == (jp->end = __zbx_json_rbracket(buffer)))
 		goto error;
 
@@ -533,7 +566,7 @@ const char	*zbx_json_next(struct zbx_json_parse *jp, const char *p)
 	int	level = 0;
 	int	state = 0; /* 0 - outside string; 1 - inside string */
 
-	if (jp->end - jp->start == 1) /* empty object or array */
+	if (1 == jp->end - jp->start) /* empty object or array */
 		return NULL;
 
 	if (NULL == p)
@@ -676,11 +709,7 @@ static const char	*zbx_json_decodeint(const char *p, char *string, size_t len)
 
 const char	*zbx_json_decodevalue(const char *p, char *string, size_t len)
 {
-	zbx_json_type_t	jt;
-
-	jt = zbx_json_type(p);
-
-	switch (jt)
+	switch (__zbx_json_type(p))
 	{
 		case ZBX_JSON_TYPE_STRING:
 			return zbx_json_decodestring(p, string, len);
@@ -696,13 +725,13 @@ const char	*zbx_json_pair_next(struct zbx_json_parse *jp, const char *p, char *n
 	if (NULL == (p = zbx_json_next(jp, p)))
 		return NULL;
 
-	if (ZBX_JSON_TYPE_STRING != zbx_json_type(p))
+	if (ZBX_JSON_TYPE_STRING != __zbx_json_type(p))
 		goto error;
 
 	if (NULL == (p = zbx_json_decodestring(p, name, len)))
 		goto error;
 
-	if (*p != ':')
+	if (':' != *p)
 		goto error;
 
 	return ++p;
@@ -874,37 +903,4 @@ int	zbx_json_count(struct zbx_json_parse *jp)
 		num++;
 
 	return num;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_json_type                                                    *
- *                                                                            *
- * Purpose: return type of pointed value                                      *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value: type of pointed value                                        *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-zbx_json_type_t	zbx_json_type(const char *p)
-{
-	if (*p == '"')
-		return ZBX_JSON_TYPE_STRING;
-	if ((*p >= '0' && *p <= '9') || *p == '-')
-		return ZBX_JSON_TYPE_INT;
-	if (*p == '[')
-		return ZBX_JSON_TYPE_ARRAY;
-	if (*p == '{')
-		return ZBX_JSON_TYPE_OBJECT;
-	if (p[0] == 'n' && p[1] == 'u' && p[2] == 'l' && p[3] == 'l')
-		return ZBX_JSON_TYPE_NULL;
-
-	zbx_set_json_strerror("Invalid type of JSON value \"%.64s\"", p);
-
-	return ZBX_JSON_TYPE_UNKNOWN;
 }

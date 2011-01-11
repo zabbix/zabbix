@@ -129,6 +129,5 @@ int		zbx_json_brackets_open(const char *p, struct zbx_json_parse *jp);
 int		zbx_json_brackets_by_name(struct zbx_json_parse *jp, const char *name, struct zbx_json_parse *out);
 int		zbx_json_object_is_empty(struct zbx_json_parse *jp);
 int		zbx_json_count(struct zbx_json_parse *jp);
-zbx_json_type_t	zbx_json_type(const char *p);
 
 #endif /* ZABBIX_ZJSON_H */
