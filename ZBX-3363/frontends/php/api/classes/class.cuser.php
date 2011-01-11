@@ -79,6 +79,7 @@ class CUser extends CZBXAPI{
 // filter
 			'filter'					=> null,
 			'search'					=> null,
+			'searchByAny'			=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 
@@ -183,12 +184,35 @@ class CUser extends CZBXAPI{
 
 // filter
 		if(is_array($options['filter'])){
+			try{
+				if($options['filter']['passwd']){
+					unset($options['filter']['passwd']);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('It is not possible to filter by user password') );
+				}
+			}
+			catch(APIException $e){
+				$error = $e->getErrors();
+				$error = reset($error);
+				self::setError(__METHOD__, $e->getCode(), $error);
+				return false;
+			}
 			zbx_db_filter('users u', $options, $sql_parts);
 		}
 
 // search
 		if(is_array($options['search'])){
-			unset($options['search']['passwd']);
+			try{
+				if($options['search']['passwd']){
+					unset($options['search']['passwd']);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('It is not possible to search by user password') );
+				}
+			}
+			catch(APIException $e){
+				$error = $e->getErrors();
+				$error = reset($error);
+				self::setError(__METHOD__, $e->getCode(), $error);
+				return false;
+			}
 			zbx_db_search('users u', $options, $sql_parts);
 		}
 
@@ -235,6 +259,7 @@ class CUser extends CZBXAPI{
 //SDI($sql);
 		$res = DBselect($sql, $sql_limit);
 		while($user = DBfetch($res)){
+			unset($user['passwd']);
 			if(!is_null($options['countOutput'])){
 				$result = $user['rowscount'];
 			}
@@ -683,7 +708,7 @@ Copt::memoryPick();
 
 // unset if not changed passwd
 			if(isset($user['passwd']) && !is_null($user['passwd'])){
-				$user['passwd'] = md5($user['passwd']);
+				$user['passwd'] = md5($user['Passwd']);
 			}
 			else{
 				unset($user['passwd']);

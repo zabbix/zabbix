@@ -139,6 +139,7 @@ class CTrigger extends CZBXAPI{
 
 			'filter'					=> null,
 			'search'					=> null,
+			'searchByAny'			=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 
@@ -1262,7 +1263,8 @@ COpt::memoryPick();
 					}
 				}
 
-				if(isset($trigger['description']) && strcmp($trigger['description'], $dbTrigger['description']))
+				// if some of the properties are unchanged, no need to update them in DB
+				if(isset($trigger['description']) && strcmp($trigger['description'], $dbTrigger['description']) == 0)
 					unset($triggers[$tnum]['description']);
 				if(isset($trigger['priority']) && ($trigger['priority'] == $dbTrigger['priority']))
 					unset($triggers[$tnum]['priority']);
@@ -1597,6 +1599,7 @@ COpt::memoryPick();
 
 			$description = isset($trigger['description']) ? $trigger['description'] : $dbTrigger['description'];
 			$expression = isset($trigger['expression']) ? $trigger['expression'] : explode_exp($dbTrigger['expression'], false);
+			$trigger['expression'] = $expression;
 			info(_s('Trigger [%1$s:%2$s] updated.', $description, $expression));
 		}
 		unset($trigger);

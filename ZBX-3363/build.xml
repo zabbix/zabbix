@@ -69,6 +69,10 @@
 			<arg line="-init ${builddir}/tests/templates/sqlite3.init"/>
 			<arg line="/tmp/${dbname}.db"/>
 		</exec>
+		<exec executable="sqlite3" input="${builddir}/create/data/data_test.sql" failonerror="on">
+			<arg line="-init ${builddir}/tests/templates/sqlite3.init"/>
+			<arg line="/tmp/${dbname}.db"/>
+		</exec>
 		<exec executable="sqlite3" input="${builddir}/create/data/images_sqlite3.sql" failonerror="on">
 			<arg line="-init ${builddir}/tests/templates/sqlite3.init"/>
 			<arg line="/tmp/${dbname}.db"/>
@@ -103,6 +107,9 @@
 		<exec executable="psql" input="${builddir}/create/data/data.sql" failonerror="on">
 			<arg line="${dbname}"/>
 		</exec>
+		<exec executable="psql" input="${builddir}/create/data/data_test.sql" failonerror="on">
+			<arg line="${dbname}"/>
+		</exec>
 
 		<!-- Create PHP config file -->
 		<exec executable="sed" failonerror="on" output="${builddir}/frontends/php/conf/zabbix.conf.php">
@@ -131,6 +138,9 @@
 			<arg line="-uroot ${dbname}"/>
 		</exec>
 		<exec executable="mysql" input="${builddir}/create/data/data.sql" failonerror="on">
+			<arg line="-uroot ${dbname}"/>
+		</exec>
+		<exec executable="mysql" input="${builddir}/create/data/data_test.sql" failonerror="on">
 			<arg line="-uroot ${dbname}"/>
 		</exec>
 
