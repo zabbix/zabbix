@@ -1166,7 +1166,7 @@ COpt::memoryPick();
 					}
 				}
 
-				if(isset($trigger['description']) && strcmp($trigger['description'], $dbTrigger['description']))
+				if(isset($trigger['description']) && strcmp($trigger['description'], $dbTrigger['description']) == 0)
 					unset($triggers[$tnum]['description']);
 				if(isset($trigger['priority']) && ($trigger['priority'] == $dbTrigger['priority']))
 					unset($triggers[$tnum]['priority']);
