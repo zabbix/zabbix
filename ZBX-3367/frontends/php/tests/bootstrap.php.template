@@ -1,3 +1,0 @@
-<?php
-	define('PHPUNIT_URL','{URL}');
-?>
