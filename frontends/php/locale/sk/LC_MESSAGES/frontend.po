@@ -2,14 +2,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-10 15:39+0200\n"
+"POT-Creation-Date: 2011-01-12 19:48+0200\n"
 "PO-Revision-Date: 2011-01-06 13:17+0200\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: Zabbix translation team\n"
+"Language: sk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: sk\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
 #: ../include/locales/en_gb.inc.php:929
@@ -719,7 +719,7 @@ msgstr "Callback"
 msgid "Can not create new element"
 msgstr "Nebolo možné vytvoriť nový element"
 
-#: ../api/classes/class.cuser.php:754
+#: ../api/classes/class.cuser.php:756
 #, php-format
 msgid "Can not delete %1$s internal user \" %2$s \", try disabling that user."
 msgstr ""
@@ -803,7 +803,7 @@ msgid "Canada (136 characters)"
 msgstr ""
 
 #: ../include/locales/en_gb.inc.php:1385
-#: ../include/templates/scriptConfirm.js.php:38
+#: ../include/templates/scriptConfirm.js.php:39
 #: ../include/templates/script.js.php:41
 msgid "Cancel"
 msgstr "Cancel"
@@ -962,11 +962,11 @@ msgstr "Nie je možné vymazať pátračové pravidlo"
 msgid "Cannot delete extended profile"
 msgstr ""
 
-#: ../api/classes/class.citem.php:1337 ../include/locales/en_gb.inc.php:707
+#: ../api/classes/class.citem.php:1338 ../include/locales/en_gb.inc.php:707
 msgid "Cannot delete graph"
 msgstr "Cannot delete graph"
 
-#: ../api/classes/class.cgraphprototype.php:1049
+#: ../api/classes/class.cgraphprototype.php:1051
 msgid "Cannot delete graph prototype"
 msgstr ""
 
@@ -1042,17 +1042,17 @@ msgstr "Cannot delete slideshow"
 msgid "Cannot delete template"
 msgstr "Nebolo možné vymazať šablónu"
 
-#: ../api/classes/class.cgraph.php:1029
-#: ../api/classes/class.cgraphprototype.php:1026
+#: ../api/classes/class.cgraph.php:1032
+#: ../api/classes/class.cgraphprototype.php:1028
 msgid "Cannot delete templated graphs"
 msgstr ""
 
-#: ../api/classes/class.cdiscoveryrule.php:938
+#: ../api/classes/class.cdiscoveryrule.php:939
 msgid "Cannot delete templated items"
 msgstr ""
 
-#: ../api/classes/class.ctrigger.php:1327
-#: ../api/classes/class.ctriggerprototype.php:1251
+#: ../api/classes/class.ctrigger.php:1329
+#: ../api/classes/class.ctriggerprototype.php:1252
 #, php-format
 msgid "Cannot delete templated trigger [%1$s:%2$s]"
 msgstr ""
@@ -1117,8 +1117,8 @@ msgstr "Nebolo možné nájsť spušťač"
 msgid "Cannot format Tree. Check logic structure in service links"
 msgstr "Cannot format Tree. Check logic structure in service links"
 
-#: ../api/classes/class.ctrigger.php:1490
-#: ../api/classes/class.ctriggerprototype.php:1357
+#: ../api/classes/class.ctrigger.php:1492
+#: ../api/classes/class.ctriggerprototype.php:1358
 msgid "Cannot implode expression"
 msgstr ""
 
@@ -2143,8 +2143,9 @@ msgid "Delete selected users?"
 msgstr "Delete selected users?"
 
 #: ../config.php:887
+msgctxt "popup"
 msgid "Delete selected value mapping?"
-msgstr "Delete selected value mapping?"
+msgstr ""
 
 #: ../config.php:883
 #, php-format
@@ -2382,7 +2383,7 @@ msgstr "Discovery check"
 msgid "Discovery rule"
 msgstr "Pravidlo pátrača"
 
-#: ../api/classes/class.cdiscoveryrule.php:1008
+#: ../api/classes/class.cdiscoveryrule.php:1009
 #, php-format
 msgid "Discovery rule [%1$s:%2$s] deleted."
 msgstr ""
@@ -2607,6 +2608,18 @@ msgstr "Email"
 msgid "Empty"
 msgstr "Empty"
 
+#: ../api/classes/class.caction.php:793
+#: ../api/classes/class.capplication.php:701
+#: ../api/classes/class.cdiscoveryrule.php:920
+#: ../api/classes/class.cgraph.php:1014
+#: ../api/classes/class.cgraphprototype.php:1010
+#: ../api/classes/class.chostgroup.php:719
+#: ../api/classes/class.chostinterface.php:700
+#: ../api/classes/class.chost.php:2060 ../api/classes/class.citem.php:1285
+#: ../api/classes/class.citemprototype.php:892
+#: ../api/classes/class.cproxy.php:507 ../api/classes/class.ctemplate.php:1139
+#: ../api/classes/class.ctrigger.php:1310
+#: ../api/classes/class.cusergroup.php:699
 #: ../include/locales/en_gb.inc.php:273 ../include/locales/en_gb.inc.php:971
 msgid "Empty input parameter"
 msgstr "Empty input parameter"
@@ -2811,7 +2824,7 @@ msgstr "Exa"
 msgid "Exclude"
 msgstr "Exclude"
 
-#: ../include/templates/scriptConfirm.js.php:34
+#: ../include/templates/scriptConfirm.js.php:35
 #: ../include/templates/script.js.php:40
 msgid "Execute"
 msgstr ""
@@ -3164,38 +3177,38 @@ msgstr "Graf"
 msgid "Graph \""
 msgstr "Graph \""
 
-#: ../api/classes/class.cgraph.php:862
+#: ../api/classes/class.cgraph.php:863
 #: ../api/classes/class.cgraphprototype.php:858
 #, php-format
 msgid "Graph [ %1$s ]: already exists on [ %2$s ]"
 msgstr ""
 
-#: ../api/classes/class.cgraph.php:883
+#: ../api/classes/class.cgraph.php:884
 #: ../api/classes/class.cgraphprototype.php:879
 #, php-format
 msgid "Graph [ %1$s ]: already exists on [ %2$s ] (inherited from another template)"
 msgstr ""
 
-#: ../api/classes/class.cgraph.php:905 ../api/classes/class.cgraph.php:912
+#: ../api/classes/class.cgraph.php:906 ../api/classes/class.cgraph.php:913
 #: ../api/classes/class.cgraphprototype.php:901
 #: ../api/classes/class.cgraphprototype.php:908
 #, php-format
 msgid "Graph [ %1$s ]: already exists on [ %2$s ] (items are not identical)"
 msgstr ""
 
-#: ../api/classes/class.cgraph.php:835
+#: ../api/classes/class.cgraph.php:836
 #: ../api/classes/class.cgraphprototype.php:831
 #, php-format
 msgid "Graph [ %1$s ]: cannot inherit. No required items on [ %2$s ]"
 msgstr ""
 
-#: ../api/classes/class.cgraph.php:839
+#: ../api/classes/class.cgraph.php:840
 #: ../api/classes/class.cgraphprototype.php:835
 #, php-format
 msgid "Graph [ %1$s ]: cannot inherit. No required items on [ %2$s ] (Ymax value item)"
 msgstr ""
 
-#: ../api/classes/class.cgraph.php:845
+#: ../api/classes/class.cgraph.php:846
 #: ../api/classes/class.cgraphprototype.php:841
 #, php-format
 msgid "Graph [ %1$s ]: cannot inherit. No required items on [ %2$s ] (Ymin value item)"
@@ -3206,7 +3219,7 @@ msgstr ""
 msgid "Graph [%1$s] unlinked."
 msgstr ""
 
-#: ../api/classes/class.cgraph.php:1061
+#: ../api/classes/class.cgraph.php:1064
 #, php-format
 msgid "Graph [%s] deleted."
 msgstr ""
@@ -3236,12 +3249,12 @@ msgstr "Meno grafu"
 msgid "Graph prototype [%1$s] unlinked."
 msgstr ""
 
-#: ../api/classes/class.cgraphprototype.php:1068
+#: ../api/classes/class.cgraphprototype.php:1070
 #, php-format
 msgid "Graph prototype [%s] deleted."
 msgstr ""
 
-#: ../api/classes/class.cgraphprototype.php:1170
+#: ../api/classes/class.cgraphprototype.php:1172
 msgid "Graph prototype must have at least one prototype"
 msgstr ""
 
@@ -3261,12 +3274,12 @@ msgstr "Graph type"
 msgid "Graph updated"
 msgstr "Graph updated"
 
-#: ../api/classes/class.cgraph.php:1150
+#: ../api/classes/class.cgraph.php:1153
 #, php-format
 msgid "Graph with name [ %1$s ] already exists"
 msgstr ""
 
-#: ../api/classes/class.cgraph.php:865 ../api/classes/class.cgraph.php:886
+#: ../api/classes/class.cgraph.php:866 ../api/classes/class.cgraph.php:887
 #: ../api/classes/class.cgraphprototype.php:861
 #: ../api/classes/class.cgraphprototype.php:882
 msgid "Graph with same name but other type exist"
@@ -3468,7 +3481,7 @@ msgstr "Host Router"
 msgid "Host Subnet Mask"
 msgstr "Host Subnet Mask"
 
-#: ../api/classes/class.chost.php:2166
+#: ../api/classes/class.chost.php:2167
 #, php-format
 msgid "Host [%1$s] deleted."
 msgstr ""
@@ -3980,8 +3993,8 @@ msgstr ""
 msgid "Incorrect interface IP parameter \" %1$s \" provided."
 msgstr ""
 
-#: ../api/classes/class.cgraph.php:1185
-#: ../api/classes/class.cgraphprototype.php:1204
+#: ../api/classes/class.cgraph.php:1188
+#: ../api/classes/class.cgraphprototype.php:1206
 msgid "Incorrect item for axis value item"
 msgstr ""
 
@@ -4183,6 +4196,14 @@ msgstr "Is online?"
 msgid "Issue"
 msgstr "Issue"
 
+#: ../api/classes/class.cuser.php:190
+msgid "It is not possible to filter by user password"
+msgstr ""
+
+#: ../api/classes/class.cuser.php:207
+msgid "It is not possible to search by user password"
+msgstr ""
+
 #: ../include/locales/en_gb.inc.php:2033
 msgid "Italian (IT)"
 msgstr "Italian (IT)"
@@ -4196,7 +4217,7 @@ msgstr "Item"
 msgid "Item [%1$s:%2$s] cannot find interface on host [%3$s]"
 msgstr ""
 
-#: ../api/classes/class.citem.php:1387
+#: ../api/classes/class.citem.php:1388
 #, php-format
 msgid "Item [%1$s:%2$s] deleted."
 msgstr ""
@@ -4237,7 +4258,7 @@ msgstr "Item function"
 msgid "Item prototype"
 msgstr ""
 
-#: ../api/classes/class.citemprototype.php:1002
+#: ../api/classes/class.citemprototype.php:1003
 #, php-format
 msgid "Item prototype [%1$s:%2$s] deleted."
 msgstr ""
@@ -5423,6 +5444,10 @@ msgstr "No permissions for map"
 #: ../include/locales/en_gb.inc.php:2511
 msgid "No permissions for screen"
 msgstr "No permissions for screen"
+
+#: ../maps.php:122
+msgid "No permissions or map does not exist."
+msgstr ""
 
 #: ../include/locales/en_gb.inc.php:915
 msgid "No proxies defined"
@@ -7710,13 +7735,13 @@ msgstr "Trigger"
 msgid "Trigger [%1$s:%2$s] already exists."
 msgstr ""
 
-#: ../api/classes/class.ctrigger.php:1498
-#: ../api/classes/class.ctriggerprototype.php:1364
+#: ../api/classes/class.ctrigger.php:1500
+#: ../api/classes/class.ctriggerprototype.php:1365
 #, php-format
 msgid "Trigger [%1$s:%2$s] created."
 msgstr ""
 
-#: ../api/classes/class.ctrigger.php:1389
+#: ../api/classes/class.ctrigger.php:1391
 #, php-format
 msgid "Trigger [%1$s:%2$s] deleted."
 msgstr ""
@@ -7731,15 +7756,15 @@ msgstr ""
 msgid "Trigger [%1$s:%2$s] unlinked."
 msgstr ""
 
-#: ../api/classes/class.ctrigger.php:1603
+#: ../api/classes/class.ctrigger.php:1605
 #, php-format
 msgid "Trigger [%1$s:%2$s] updated."
 msgstr ""
 
-#: ../api/classes/class.ctrigger.php:1690
-#: ../api/classes/class.ctrigger.php:1725
-#: ../api/classes/class.ctriggerprototype.php:1524
-#: ../api/classes/class.ctriggerprototype.php:1559
+#: ../api/classes/class.ctrigger.php:1692
+#: ../api/classes/class.ctrigger.php:1727
+#: ../api/classes/class.ctriggerprototype.php:1525
+#: ../api/classes/class.ctriggerprototype.php:1560
 #, php-format
 msgid "Trigger [%1$s] already exists on [%2$s]"
 msgstr ""
@@ -7786,7 +7811,7 @@ msgstr ""
 msgid "Trigger just added. No status update so far."
 msgstr ""
 
-#: ../api/classes/class.ctriggerprototype.php:1323
+#: ../api/classes/class.ctriggerprototype.php:1324
 #, php-format
 msgid "Trigger prototype [%1$s:%2$s] deleted."
 msgstr ""
@@ -7796,7 +7821,7 @@ msgstr ""
 msgid "Trigger prototype [%1$s:%2$s] unlinked."
 msgstr ""
 
-#: ../api/classes/class.ctriggerprototype.php:1456
+#: ../api/classes/class.ctriggerprototype.php:1457
 #, php-format
 msgid "Trigger prototype [%1$s:%2$s] updated."
 msgstr ""
@@ -7817,10 +7842,10 @@ msgstr "Trigger updated"
 msgid "Trigger value"
 msgstr "Trigger value"
 
-#: ../api/classes/class.ctrigger.php:1694
-#: ../api/classes/class.ctrigger.php:1728
-#: ../api/classes/class.ctriggerprototype.php:1528
-#: ../api/classes/class.ctriggerprototype.php:1562
+#: ../api/classes/class.ctrigger.php:1696
+#: ../api/classes/class.ctrigger.php:1730
+#: ../api/classes/class.ctriggerprototype.php:1529
+#: ../api/classes/class.ctriggerprototype.php:1563
 msgid "Trigger with same name but other type exists"
 msgstr ""
 
@@ -8411,8 +8436,8 @@ msgstr "Working time"
 msgid "Write"
 msgstr "Write"
 
-#: ../api/classes/class.cgraph.php:1083
-#: ../api/classes/class.cgraphprototype.php:1090
+#: ../api/classes/class.cgraph.php:1086
+#: ../api/classes/class.cgraphprototype.php:1092
 msgid "Wrong fields for graph"
 msgstr ""
 
@@ -8421,8 +8446,8 @@ msgstr ""
 msgid "Wrong fields for host [ %s ]"
 msgstr ""
 
-#: ../api/classes/class.cgraph.php:1097
-#: ../api/classes/class.cgraphprototype.php:1104
+#: ../api/classes/class.cgraph.php:1100
+#: ../api/classes/class.cgraphprototype.php:1106
 msgid "Wrong fields for items"
 msgstr ""
 
@@ -8435,8 +8460,8 @@ msgstr "Wrong fields for media type"
 msgid "Wrong fields for screen [ %s ]"
 msgstr ""
 
-#: ../api/classes/class.cscreen.php:804 ../api/classes/class.cscreen.php:840
-#: ../api/classes/class.cscreen.php:877
+#: ../api/classes/class.cscreen.php:804 ../api/classes/class.cscreen.php:843
+#: ../api/classes/class.cscreen.php:880
 msgid "Wrong fields for screen items"
 msgstr ""
 
@@ -9325,6 +9350,9 @@ msgstr "yes"
 #: ../include/locales/en_gb.inc.php:2168
 msgid "µ"
 msgstr "µ"
+
+#~ msgid "Delete selected value mapping?"
+#~ msgstr "Delete selected value mapping?"
 
 #~ msgid "Hide unknown"
 #~ msgstr "Schovať neznáme"
