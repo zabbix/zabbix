@@ -413,18 +413,10 @@ require_once('include/templates/action.js.php');
 				'esc_period' => 0,
 				'esc_step_from' => 1,
 				'esc_step_to' => 1,
-				'evaltype' => 0,
-				'opmessage_usr' => array(),
-				'opconditions' => array(),
-				'opmessage' => array(
-					'default_msg' => 1,
-					'subject' => '{TRIGGER.NAME}: {STATUS}',
-					'message' => '{TRIGGER.NAME}: {STATUS}',
-					'mediatypeid' => 0,
-				)
+				'evaltype' => 0
 			);
 		}
-SDII($new_operation);
+//SDII($_REQUEST);
 		$evaltype = $new_operation['evaltype'];
 
 		$update_mode = false;
@@ -463,6 +455,16 @@ SDII($new_operation);
 //SDII($data['operations']);
 		switch($new_operation['operationtype']) {
 			case OPERATION_TYPE_MESSAGE:
+				if(!isset($new_operation['opmessage'])){
+					$new_operation['opmessage_usr'] = array();
+					$new_operation['opmessage'] = array(
+						'default_msg' => 1,
+						'subject' => '{TRIGGER.NAME}: {STATUS}',
+						'message' => '{TRIGGER.NAME}: {STATUS}',
+						'mediatypeid' => 0,
+					);
+				}
+
 				if(!isset($new_operation['opmessage']['default_msg']))
 					$new_operation['opmessage']['default_msg'] = 0;
 
@@ -635,6 +637,9 @@ SDII($new_operation);
 
 // new Operation conditions
 		$tblCond = new CTable();
+
+		if(!isset($new_operation['opconditions']))
+			$new_operation['opconditions'] = array();
 
 		$opconditions = $new_operation['opconditions'];
 		$allowed_opconditions = get_opconditions_by_eventsource($data['eventsource']);
