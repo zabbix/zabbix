@@ -1167,19 +1167,14 @@ else {
 			if(empty($data)) return true;
 
 			$data = zbx_toArray($data);
-			$table_schema = self::getSchema($table);
 
-			$varTypeInt = array(
-				self::FIELD_TYPE_INT => 1,
-				self::FIELD_TYPE_ID => 1,
-				self::FIELD_TYPE_UINT => 1
-			);
 			foreach($data as $dnum => $row){
 				$sql_set = '';
 
-				self::checkValueTypes($table, $row);
+				$values = $row['values'];
+				self::checkValueTypes($table, $values);
 
-				foreach($row['values'] as $field => $value){
+				foreach($values as $field => $value){
 					$sql_set .= $field.'='.$value.',';
 				}
 				$sql_set = rtrim($sql_set, ',');
