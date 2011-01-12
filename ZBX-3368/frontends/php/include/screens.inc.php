@@ -497,7 +497,7 @@ require_once('include/js.inc.php');
 				$selectbtn = new CButton('select', S_SELECT,
 					"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName().
 							"&templated_hosts=1&only_hostid=".$screen['templateid']."&dstfld1=resourceid&".
-							"dstfld2=caption&srctbl=graphs&srcfld1=graphid&srcfld2=name',800,450);");
+							"dstfld2=caption&srctbl=graphs&srcfld1=graphid&srcfld2=name&simpleName=1',800,450);");
 			}
 			else{
 				$selectbtn = new CButton('select', S_SELECT,
@@ -514,7 +514,7 @@ require_once('include/js.inc.php');
 // Simple graph
 			$options = array(
 				'itemids' => $resourceid,
-				'selectHosts' => array('hostid', 'host'),
+				'selectHosts' => array('hostid', 'host', 'status'),
 				'output' => API_OUTPUT_EXTEND
 			);
 			$items = CItem::get($options);
@@ -528,7 +528,10 @@ require_once('include/js.inc.php');
 				$item = reset($items);
 				$item['host'] = reset($item['hosts']);
 
-				$caption = item_description($item);
+				if($item['host']['status'] != HOST_STATUS_TEMPLATE)
+					$caption = $item['host']['host'].':'.item_description($item);
+				else
+					$caption = item_description($item);
 
 				$nodeName = get_node_name_by_elid($item['itemid']);
 				if(!zbx_empty($nodeName))
@@ -542,7 +545,7 @@ require_once('include/js.inc.php');
 				$selectbtn = new CButton('select', S_SELECT,
 					"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName().
 							"&templated_hosts=1&only_hostid=".$screen['templateid']."&dstfld1=resourceid&".
-							"dstfld2=caption&srctbl=simple_graph&srcfld1=itemid&srcfld2=description_only',800,450);");
+							"dstfld2=caption&srctbl=simple_graph&srcfld1=itemid&srcfld2=description&simpleName=1',800,450);");
 			}
 			else{
 				$selectbtn = new CButton('select', S_SELECT,
