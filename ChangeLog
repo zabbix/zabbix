@@ -1,6 +1,5 @@
 Changes for 1.8.5rc1
 
- - [ZBX-3406] better validation for api parameters (Vemdak)
  - [ZBXNEXT-612] added mapname url parameter for monitoring->maps (Vedmak)
  - [ZBX-886] remove duplicate translation strings (Richlv)
  - [ZBX-3384] fixed server crash in a distributed monitoring setup with PostgreSQL (asaveljevs)
