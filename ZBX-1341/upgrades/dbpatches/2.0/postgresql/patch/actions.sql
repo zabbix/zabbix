@@ -1,1 +1,0 @@
-ALTER TABLE ONLY actions ALTER actionid DROP DEFAULT;
