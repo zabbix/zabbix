@@ -422,7 +422,7 @@ if(!isset($DB)){
 //SDI('SQL['.$DB['SELECT_COUNT'].']: '.$query);
 			switch($DB['TYPE']){
 				case 'MYSQL':
-					if(zbx_numeric($limit)){
+					if(zbx_ctype_digit($limit)){
 						$query .= ' LIMIT '.intval($limit).' OFFSET '.intval($offset);
 					}
 
@@ -432,7 +432,7 @@ if(!isset($DB)){
 					}
 					break;
 				case 'POSTGRESQL':
-					if(zbx_numeric($limit)){
+					if(zbx_ctype_digit($limit)){
 						$query .= ' LIMIT '.intval($limit).' OFFSET '.intval($offset);
 					}
 
@@ -442,7 +442,7 @@ if(!isset($DB)){
 					}
 					break;
 				case 'ORACLE':
-					if(zbx_numeric($limit)){
+					if(zbx_ctype_digit($limit)){
 						$till = $offset + $limit;
 						$query = 'SELECT * FROM ('.$query.') WHERE rownum BETWEEN '.intval($offset).' AND '.intval($till);
 					}
@@ -458,7 +458,7 @@ if(!isset($DB)){
 					}
 				break;
 				case 'IBM_DB2':
-					if(zbx_numeric($limit)){
+					if(zbx_ctype_digit($limit)){
 						$till = $offset + $limit;
 						$query = 'SELECT * FROM ('.$query.') WHERE rownum BETWEEN '.intval($offset).' AND '.intval($till);
 					}
@@ -481,7 +481,7 @@ if(!isset($DB)){
 						lock_db_access();
 					}
 
-					if(zbx_numeric($limit)){
+					if(zbx_ctype_digit($limit)){
 						$query .= ' LIMIT '.intval($limit).' OFFSET '.intval($offset);
 					}
 
@@ -805,7 +805,7 @@ else {
 		if(empty($nodes))
 			$nodes = 0;
 
-		if(zbx_numeric($nodes)){
+		if(zbx_ctype_digit($nodes)){
 			$nodes = array($nodes);
 		}
 		else if(is_string($nodes)){
@@ -1091,6 +1091,36 @@ else {
 			else return false;
 		}
 
+		public static function checkValueTypes($table, &$values){
+			$table_schema = self::getSchema($table);
+
+			foreach($values as $field => $value){
+				if(!isset($table_schema['fields'][$field])){
+					unset($values[$field]);
+				}
+
+				switch($table_schema['fields'][$field]['type']){
+					case self::FIELD_TYPE_CHAR:
+						$values[$field] = zbx_dbstr($value);
+						break;
+					case self::FIELD_TYPE_ID:
+					case self::FIELD_TYPE_UINT:
+						if(!zbx_ctype_digit($value))
+							self::exception(self::DBEXECUTE_ERROR, 'Incorrect value for unsigned int field');
+						break;
+					case self::FIELD_TYPE_INT:
+						if(strcmp(intval($value), $value) != 0)
+							self::exception(self::DBEXECUTE_ERROR, 'Incorrect value for int field');
+						break;
+					case self::FIELD_TYPE_FLOAT:
+						if(!is_numeric($value))
+							self::exception(self::DBEXECUTE_ERROR, 'Incorrect value for float field');
+						break;
+				}
+			}
+
+		}
+
 /**
  * Insert data into DB
  *
@@ -1107,27 +1137,8 @@ else {
 
 			$table_schema = self::getSchema($table);
 
-			$varTypeInt = array(
-				self::FIELD_TYPE_INT => 1,
-				self::FIELD_TYPE_ID => 1,
-				self::FIELD_TYPE_UINT => 1
-			);
-
 			foreach($values as $key => $row){
-				foreach($row as $field => $value){
-					if(!isset($table_schema['fields'][$field])){
-						unset($row[$field]);
-					}
-					else if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR){
-						$row[$field] = zbx_dbstr($value);
-					}
-					else if(isset($varTypeInt[$table_schema['fields'][$field]['type']]) && !ctype_digit($value)){
-						self::exception(self::DBEXECUTE_ERROR, 'Incorrect value for int field');
-					}
-					else if(($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_FLOAT) && !is_numeric($value)){
-						self::exception(self::DBEXECUTE_ERROR, 'Incorrect value for float field');
-					}
-				}
+				self::checkValueTypes($table, $row);
 
 				if($getids){
 					$result_ids[$key] = $id;
@@ -1165,19 +1176,10 @@ else {
 			);
 			foreach($data as $dnum => $row){
 				$sql_set = '';
+
+				self::checkValueTypes($table, $row);
+
 				foreach($row['values'] as $field => $value){
-					if(!isset($table_schema['fields'][$field])) continue;
-
-					if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR){
-						$value = zbx_dbstr($value);
-					}
-					else if(isset($varTypeInt[$table_schema['fields'][$field]['type']]) && !ctype_digit($value)){
-						self::exception(self::DBEXECUTE_ERROR, 'Incorrect value for int field');
-					}
-					else if(($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_FLOAT) && !is_numeric($value)){
-						self::exception(self::DBEXECUTE_ERROR, 'Incorrect value for float field');
-					}
-
 					$sql_set .= $field.'='.$value.',';
 				}
 				$sql_set = rtrim($sql_set, ',');
