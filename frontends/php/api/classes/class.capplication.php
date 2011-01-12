@@ -695,15 +695,15 @@ COpt::memoryPick();
  * @return boolean
  */
 	public static function massAdd($data){
-		if(empty($data['applications'])) return true;
+		try{
+			self::BeginTransaction(__METHOD__);
+
+		if(empty($data['applications'])) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
 
 		$applications = zbx_toArray($data['applications']);
 		$items = zbx_toArray($data['items']);
 		$applicationids = zbx_objectValues($applications, 'applicationid');
 		$itemids = zbx_objectValues($items, 'itemid');
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 // PERMISSIONS {{{
 			$app_options = array(
@@ -780,7 +780,7 @@ COpt::memoryPick();
 			}
 
 			self::EndTransaction(true, __METHOD__);
-			return true;
+			return array('applicationids'=> $applicationids);
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
