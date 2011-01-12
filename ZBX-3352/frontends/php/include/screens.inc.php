@@ -940,6 +940,16 @@ require_once('include/js.inc.php');
 
 						$new_items = get_same_graphitems_for_host($def_items, $_REQUEST['hostid'], false);
 
+						if($graph['ymax_type'] == 2 && $graph['ymax_itemid'] ){
+							$new_dinamic = get_same_graphitems_for_host(array( array('itemid' => $graph['ymax_itemid'])), $_REQUEST['hostid'], false);
+							$graph['ymax_itemid'] = $new_dinamic[0]['itemid'];
+						}
+
+						if($graph['ymin_type'] == 2 && $graph['ymin_itemid'] ){
+							$new_dinamic = get_same_graphitems_for_host(array( array('itemid' => $graph['ymin_itemid'])), $_REQUEST['hostid'], false);
+							$graph['ymin_itemid'] = $new_dinamic[0]['itemid'];
+						}
+
 						if(($graph['graphtype']==GRAPH_TYPE_PIE) || ($graph['graphtype']==GRAPH_TYPE_EXPLODED))
 							$url = 'chart7.php';
 						else
