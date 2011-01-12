@@ -9,6 +9,7 @@ New features:
  - [ZBX-3338] updated Ukrainian translation; thanks to zalex_ua (Richlv)
 
 Bug fixes:
+ - [ZBX-3368] fixed custom graphs in screens form prefixed with ':' (Vedmak)
  - [ZBX-3329] fixed cannot rename trigger (Vlad)
  - [ZBX-3362] fixed cannot rename trigger (Vlad)
  - [ZBX-1341] fixed permissions not enforced on api (Vlad)
