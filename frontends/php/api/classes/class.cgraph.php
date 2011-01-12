@@ -481,6 +481,7 @@ COpt::memoryPick();
 					'nodeids' => $nodeids,
 					'output' => $options['selectHosts'],
 					'graphids' => $graphids,
+					'templated_hosts' => true,
 					'nopermissions' => 1,
 					'preservekeys' => 1
 				);
