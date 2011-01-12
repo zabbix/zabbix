@@ -176,7 +176,7 @@ class Curl{
 			foreach($args as $id => $arg){
 				if(empty($arg)) continue;
 
-				if(strpos($arg, '=')){
+				if(strpos($arg, '=') !== false){
 					list($name, $value) = explode('=', $arg);
 					$this->arguments[$name] = isset($value) ? urldecode($value):'';
 				}
