@@ -40,7 +40,7 @@ class testPageActionsDiscovery extends CTest
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_DISCOVERY);
 		$this->assertTitle('Configuration of actions');
 
-// eventsource is used for a hiddn field, so it does not work. See above: ?eventsource=0 is used instead
+// eventsource is used for a hidden field, so it does not work. See above: ?eventsource=0 is used instead
 //		$this->dropdown_select('eventsource','Discovery');
 
 		$this->ok('CONFIGURATION OF ACTIONS');
