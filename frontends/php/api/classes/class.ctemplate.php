@@ -1133,12 +1133,12 @@ COpt::memoryPick();
  * @return boolean
  */
 	public static function delete($templateids){
-		if(empty($templateids)) return true;
-
-		$templateids = zbx_toArray($templateids);
-
 		try{
 			self::BeginTransaction(__METHOD__);
+
+			if(empty($templateids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+
+			$templateids = zbx_toArray($templateids);
 
 			$options = array(
 				'templateids' => $templateids,
