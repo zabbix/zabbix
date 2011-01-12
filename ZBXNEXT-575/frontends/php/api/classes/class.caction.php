@@ -819,20 +819,20 @@ COpt::memoryPick();
 						$opmessage[] = $operation['opmessage'];
 					}
 
-					if(isset($operation['userids'])){
-						foreach($operation['userids'] as $userid){
+					if(isset($operation['opmessage_usr'])){
+						foreach($operation['opmessage_usr'] as $user){
 							$opmessage_usr[] = array(
 								'operationid' => $operationid,
-								'userid' => $userid
+								'userid' => $user['userid']
 							);
 						}
 					}
 
-					if(isset($operation['usrgrpid'])){
-						foreach($operation['usrgrpid'] as $usrgrpid){
+					if(isset($operation['opmessage_grp'])){
+						foreach($operation['opmessage_grp'] as $usrgrp){
 							$opmessage_grp[] = array(
 								'operationid' => $operationid,
-								'usrgrpid' => $usrgrpid
+								'usrgrpid' => $usrgrp['usrgrpid']
 							);
 						}
 					}
@@ -955,33 +955,33 @@ COpt::memoryPick();
 
 			switch($operation['operationtype']){
 				case OPERATION_TYPE_MESSAGE:
-					if((!isset($operation['userids']) || empty($operation['userids']))
-							&& (!isset($operation['usrgrpid']) || empty($operation['usrgrpid']))){
+					if((!isset($operation['opmessage_usr']) || empty($operation['opmessage_usr']))
+							&& (!isset($operation['opmessage_grp']) || empty($operation['opmessage_grp']))){
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('No recipients for operation message.'));
 					}
 
-					if(isset($operation['userids'])){
-						$count = count(array_unique($operation['userids']));
+					if(isset($operation['opmessage_usr'])){
+						$userids = array_unique(zbx_objectValues($operation['opmessage_usr'], 'userid'));
 
-						$users = CUser::get(array(
-							'userids' => $operation['userids'],
+						$users_db = CUser::get(array(
+							'userids' => $userids,
 							'output' => API_OUTPUT_SHORTEN
 						));
 
-						if($count != count($users)){
+						if(count($userids) != count($users_db)){
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect operation user.'));
 						}
 					}
 
-					if(isset($operation['usrgrpid'])){
-						$count = count(array_unique($operation['usrgrpid']));
+					if(isset($operation['opmessage_grp'])){
+						$usrgrpids = array_unique(zbx_objectValues($operation['opmessage_grp'], 'usrgrpid'));
 
-						$usrgrps = CUserGroup::get(array(
-							'usrgrpids' => $operation['objectid'],
+						$usrgrps_db = CUserGroup::get(array(
+							'usrgrpids' => $usrgrpids,
 							'output' => API_OUTPUT_SHORTEN
 						));
 
-						if($count != count($usrgrps)){
+						if(count($usrgrpids) != count($usrgrps_db)){
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect operation group.'));
 						}
 					}
