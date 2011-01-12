@@ -991,8 +991,8 @@ else {
 
 		$items = array_chunk($array, 950);
 		foreach($items as $id => $values){
-			if($string) $array = zbx_dbstr($array);
-			else foreach($array as $value){
+			if($string) $values = zbx_dbstr($values);
+			else foreach($values as $value){
 				if(!is_numeric($value)){
 					info('DBcondition Error: ['.$value.'] incorrect value for numeric field');
 					return ' 1=0 ';
