@@ -337,28 +337,31 @@ static zbx_uint64_t	select_discovered_host(DB_EVENT *event)
 	switch (event->object) {
 	case EVENT_OBJECT_DHOST:
 		result = DBselect(
-				"select h.hostid"
-				" from hosts h,dservices ds"
-				" where ds.ip=h.ip"
-					" and ds.dhostid=" ZBX_FS_UI64,
-				event->objectid);
+				"select distinct i.hostid"
+				" from interface i,dservices ds"
+				" where ds.ip=i.ip"
+					" and ds.dhostid=" ZBX_FS_UI64
+					DB_NODE,
+				event->objectid, DBnode_local("i.interfaceid"));
 		break;
 	case EVENT_OBJECT_DSERVICE:
 		result = DBselect(
-				"select h.hostid"
-				" from hosts h,dservices ds"
-				" where ds.ip=h.ip"
-					" and ds.dserviceid =" ZBX_FS_UI64,
-				event->objectid);
+				"select distinct i.hostid"
+				" from interface i,dservices ds"
+				" where ds.ip=i.ip"
+					" and ds.dserviceid=" ZBX_FS_UI64
+					DB_NODE,
+				event->objectid, DBnode_local("i.interfaceid"));
 		break;
 	case EVENT_OBJECT_ZABBIX_ACTIVE:
 		result = DBselect(
 				"select h.hostid"
 				" from hosts h,autoreg_host a"
-				" where a.proxy_hostid=h.proxy_hostid"
+				" where " ZBX_SQL_NULLCMP("a.proxy_hostid", "h.proxy_hostid")
 					" and a.host=h.host"
-					" and a.autoreg_hostid=" ZBX_FS_UI64,
-				event->objectid);
+					" and a.autoreg_hostid=" ZBX_FS_UI64
+					DB_NODE,
+				event->objectid, DBnode_local("h.hostid"));
 		break;
 	default:
 		return 0;
