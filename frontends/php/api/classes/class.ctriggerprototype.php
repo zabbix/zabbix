@@ -1225,11 +1225,12 @@ COpt::memoryPick();
  * @return array
  */
 	public static function delete($triggerids, $nopermissions=false){
-		if(empty($triggerids)) return true;
 		$triggerids = zbx_toArray($triggerids);
 
 		try{
 			self::BeginTransaction(__METHOD__);
+
+			if(empty($triggerids)) self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter');
 
 			$options = array(
 				'triggerids' => $triggerids,

@@ -1007,11 +1007,13 @@ COpt::memoryPick();
  * @return boolean
  */
 	public static function delete($graphids, $nopermissions=false){
-		$graphids = zbx_toArray($graphids);
-		if(empty($graphids)) return true;
 
 		try{
 			self::BeginTransaction(__METHOD__);
+
+			if(empty($graphids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+
+			$graphids = zbx_toArray($graphids);
 
 // TODO: remove $nopermissions hack
 			$options = array(
@@ -1063,7 +1065,7 @@ COpt::memoryPick();
 			}
 
 			self::EndTransaction(true, __METHOD__);
-			return true;
+			return array('graphids'=> $graphids);
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
