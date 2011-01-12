@@ -91,7 +91,7 @@ include_once('include/page_header.php');
 	$options = array(
 		'output' => API_OUTPUT_EXTEND,
 		'nodeids' => get_current_nodeid(),
-		'select_selements' => true
+		'select_selements' => API_OUTPUT_EXTEND
 	);
 	$maps = CMap::get($options);
 	$maps = zbx_toHash($maps, 'sysmapid');
