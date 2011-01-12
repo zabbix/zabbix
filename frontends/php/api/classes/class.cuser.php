@@ -666,7 +666,7 @@ Copt::memoryPick();
 			}
 
 			self::EndTransaction(true, __METHOD__);
-			return array('userid' => $user['userid']);
+			return array('userids' => $user['userid']);
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
@@ -696,7 +696,8 @@ Copt::memoryPick();
 
 // unset if not changed passwd
 			if(isset($user['passwd']) && !is_null($user['passwd'])){
-				$user['passwd'] = md5($user['Passwd']);
+				$user['passwd'] = md5($user['passwd']);
+				$user_db_fields['passwd'] = '';
 			}
 			else{
 				unset($user['passwd']);
@@ -707,12 +708,13 @@ Copt::memoryPick();
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_WRONG_FIELD_FOR_USER);
 			}
 
-				$result = DB::update('users', array(array('values'=>$user,'where'=>array('userid='.$user['userid']))));
-				if(!$result)
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+			$result = DB::update('users', array(array('values'=>$user,'where'=>array('userid='.$user['userid']))));
+			if(!$result)
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 
 			self::EndTransaction(true, __METHOD__);
-			return true;
+
+			return $user;
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
