@@ -979,33 +979,28 @@ else {
 	}
 
 	function DBcondition($fieldname, $array, $notin=false, $string=false){
-		global $DB;
 		$condition = '';
 
 		if(!is_array($array)){
 			info('DBcondition Error: ['.$fieldname.'] = '.$array);
-			$array = explode(',',$array);
-			if(empty($array))
-				return ' 1=0 ';
+			return ' 1=0 ';
 		}
 
 		$in = 		$notin ? ' NOT IN ':' IN ';
 		$concat = 	$notin ? ' AND ':' OR ';
 
-		switch($DB['TYPE']) {
-			case 'SQLITE3':
-			case 'MYSQL':
-			case 'POSTGRESQL':
-			case 'ORACLE':
-			default:
-				$items = array_chunk($array, 950);
-				foreach($items as $id => $values){
-					if($string) $values = zbx_dbstr($values);
-
-					$condition.=!empty($condition) ? ')'.$concat.$fieldname.$in.'(':'';
-					$condition.= implode(',',$values);
+		$items = array_chunk($array, 950);
+		foreach($items as $id => $values){
+			if($string) $values = zbx_dbstr($values);
+			else foreach($values as $value){
+				if(!is_numeric($value)){
+					info('DBcondition Error: ['.$value.'] incorrect value for numeric field');
+					return ' 1=0 ';
 				}
-				break;
+			}
+
+			$condition.=!empty($condition) ? ')'.$concat.$fieldname.$in.'(':'';
+			$condition.= implode(',',$values);
 		}
 
 		if(zbx_empty($condition)) $condition = $string ? "'-1'":'-1';
@@ -1112,6 +1107,12 @@ else {
 
 			$table_schema = self::getSchema($table);
 
+			$varTypeInt = array(
+				self::FIELD_TYPE_INT => 1,
+				self::FIELD_TYPE_ID => 1,
+				self::FIELD_TYPE_UINT => 1
+			);
+
 			foreach($values as $key => $row){
 				foreach($row as $field => $value){
 					if(!isset($table_schema['fields'][$field])){
@@ -1119,6 +1120,12 @@ else {
 					}
 					else if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR){
 						$row[$field] = zbx_dbstr($value);
+					}
+					else if(isset($varTypeInt[$table_schema['fields'][$field]['type']]) && !ctype_digit($value)){
+						self::exception(self::DBEXECUTE_ERROR, 'Incorrect value for int field');
+					}
+					else if(($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_FLOAT) && !is_numeric($value)){
+						self::exception(self::DBEXECUTE_ERROR, 'Incorrect value for float field');
 					}
 				}
 
@@ -1151,6 +1158,11 @@ else {
 			$data = zbx_toArray($data);
 			$table_schema = self::getSchema($table);
 
+			$varTypeInt = array(
+				self::FIELD_TYPE_INT => 1,
+				self::FIELD_TYPE_ID => 1,
+				self::FIELD_TYPE_UINT => 1
+			);
 			foreach($data as $dnum => $row){
 				$sql_set = '';
 				foreach($row['values'] as $field => $value){
@@ -1159,6 +1171,12 @@ else {
 					if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR){
 						$value = zbx_dbstr($value);
 					}
+					else if(isset($varTypeInt[$table_schema['fields'][$field]['type']]) && !ctype_digit($value)){
+						self::exception(self::DBEXECUTE_ERROR, 'Incorrect value for int field');
+					}
+					else if(($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_FLOAT) && !is_numeric($value)){
+						self::exception(self::DBEXECUTE_ERROR, 'Incorrect value for float field');
+					}
 
 					$sql_set .= $field.'='.$value.',';
 				}
@@ -1166,6 +1184,7 @@ else {
 
 				if(!empty($sql_set)){
 					$sql = 'UPDATE '.$table.' SET '.$sql_set.' WHERE '.implode(' AND ', $row['where']);
+
 					if(!DBexecute($sql)) self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
 				}
 			}
