@@ -866,39 +866,34 @@ return $caption;
 
 		$expression = implode_exp($expression,$triggerid);
 		if(is_null($expression)){
-			error('Incorrect item keys provided for trigger expression');
-			$result = false;
+			return false;
 		}
 
-		if($result){
-			DBexecute('update triggers set expression='.zbx_dbstr($expression).' where triggerid='.$triggerid);
+		DBexecute('update triggers set expression='.zbx_dbstr($expression).' where triggerid='.$triggerid);
 
-			foreach($deps as $id => $triggerid_up){
-				if(!$result2=add_trigger_dependency($triggerid, $triggerid_up)){
-					error(S_INCORRECT_DEPENDENCY.' ['.expand_trigger_description($triggerid_up).']');
-				}
-
-				$result &= $result2;
+		foreach($deps as $id => $triggerid_up){
+			if(!$result2=add_trigger_dependency($triggerid, $triggerid_up)){
+				error(S_INCORRECT_DEPENDENCY.' ['.expand_trigger_description($triggerid_up).']');
+				return false;
 			}
 		}
 
 		$trig_hosts = get_hosts_by_triggerid($triggerid);
 		$trig_host = DBfetch($trig_hosts);
 
-		if($result){
-			$msg = S_ADDED_TRIGGER.SPACE.'"'.$description.'"';
-			if($trig_host){
-				$msg .= SPACE.S_TO_HOST_SMALL.SPACE.'"'.$trig_host['host'].'"';
-			}
-			info($msg);
+		$msg = S_ADDED_TRIGGER.SPACE.'"'.$description.'"';
+		if($trig_host){
+			$msg .= SPACE.S_TO_HOST_SMALL.SPACE.'"'.$trig_host['host'].'"';
 		}
+		info($msg);
 
 		if($trig_host){
 // create trigger for childs
 			$child_hosts = get_hosts_by_templateid($trig_host['hostid']);
 			while($child_host = DBfetch($child_hosts)){
-				if(!$result = copy_trigger_to_host($triggerid, $child_host['hostid']))
-					break;
+				if(!$result = copy_trigger_to_host($triggerid, $child_host['hostid'])){
+					return false;
+				}
 			}
 		}
 
@@ -1410,7 +1405,10 @@ return $caption;
 					' AND h.host='.zbx_dbstr($exprPart['host']).
 					' AND h.hostid=i.hostid'.
 					' AND '.DBin_node('i.itemid');
-			if(!$item = DBfetch(DBselect($sql))) return null;
+			if(!$item = DBfetch(DBselect($sql))){
+				error('Incorrect item key "'.$exprPart['host'].':'.$exprPart['item'].'" provided for trigger expression.');
+				return null;
+			}
 
 			if(!isset($usedItems[$exprPart['expression']])) {
 				$functionid = get_dbid('functions','functionid');
@@ -1870,7 +1868,6 @@ return $caption;
 
 		$expression = implode_exp($expression,$triggerid);
 		if(is_null($expression)){
-			error('Incorrect item keys provided for trigger expression');
 			return false;
 		}
 
