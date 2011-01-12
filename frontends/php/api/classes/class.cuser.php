@@ -707,19 +707,9 @@ Copt::memoryPick();
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_WRONG_FIELD_FOR_USER);
 			}
 
-			$sql = 'UPDATE users SET '.
-						' passwd='.zbx_dbstr($user['passwd']).', '.
-						' url='.zbx_dbstr($user['url']).', '.
-						' autologin='.$user['autologin'].', '.
-						' autologout='.$user['autologout'].', '.
-						' lang='.zbx_dbstr($user['lang']).', '.
-						' theme='.zbx_dbstr($user['theme']).', '.
-						' refresh='.$user['refresh'].', '.
-						' rows_per_page='.$user['rows_per_page'].
-					' WHERE userid='.$user['userid'];
-			if(!DBexecute($sql))
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-
+				$result = DB::update('users', array(array('values'=>$user,'where'=>array('userid='.$user['userid']))));
+				if(!$result)
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 
 			self::EndTransaction(true, __METHOD__);
 			return true;
