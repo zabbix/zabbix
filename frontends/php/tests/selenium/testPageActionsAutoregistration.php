@@ -19,10 +19,9 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/class.ctest.php');
+require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-
-class testPageActionsAutoregistration extends CTest
+class testPageActionsAutoregistration extends CWebTest
 {
 	// Returns all trigger actions
 	public static function allActions()
@@ -64,11 +63,11 @@ class testPageActionsAutoregistration extends CTest
 		$name=$action['name'];
 
 		$sql1="select * from actions where actionid=$actionid order by actionid";
-		$oldHashAction=$this->DBhash($sql1);
+		$oldHashAction=DBhash($sql1);
 		$sql2="select * from operations where actionid=$actionid order by operationid";
-		$oldHashOperations=$this->DBhash($sql2);
+		$oldHashOperations=DBhash($sql2);
 		$sql3="select * from conditions where actionid=$actionid order by conditionid";
-		$oldHashConditions=$this->DBhash($sql3);
+		$oldHashConditions=DBhash($sql3);
 
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_AUTO_REGISTRATION);
 		$this->assertTitle('Configuration of actions');
@@ -81,9 +80,9 @@ class testPageActionsAutoregistration extends CTest
 		$this->ok("$name");
 		$this->ok('CONFIGURATION OF ACTIONS');
 
-		$this->assertEquals($oldHashAction,$this->DBhash($sql1),"Chuck Norris: Action update changed data in table 'actions'.");
-		$this->assertEquals($oldHashOperations,$this->DBhash($sql2),"Chuck Norris: Action update changed data in table 'operations'");
-		$this->assertEquals($oldHashConditions,$this->DBhash($sql3),"Chuck Norris: Action update changed data in table 'conditions'");
+		$this->assertEquals($oldHashAction,DBhash($sql1),"Chuck Norris: Action update changed data in table 'actions'.");
+		$this->assertEquals($oldHashOperations,DBhash($sql2),"Chuck Norris: Action update changed data in table 'operations'");
+		$this->assertEquals($oldHashConditions,DBhash($sql3),"Chuck Norris: Action update changed data in table 'conditions'");
 	}
 
 	/**
@@ -127,7 +126,7 @@ class testPageActionsAutoregistration extends CTest
 		$this->ok('CONFIGURATION OF ACTIONS');
 
 		$sql="select * from actions where actionid=$actionid and status=1";
-		$this->assertEquals(1,$this->DBcount($sql));
+		$this->assertEquals(1,DBcount($sql));
 	}
 
 	/**
@@ -155,7 +154,7 @@ class testPageActionsAutoregistration extends CTest
 		$this->ok('CONFIGURATION OF ACTIONS');
 
 		$sql="select * from actions where actionid=$actionid and status=0";
-		$this->assertEquals(1,$this->DBcount($sql));
+		$this->assertEquals(1,DBcount($sql));
 	}
 
 	/**
@@ -168,7 +167,7 @@ class testPageActionsAutoregistration extends CTest
 
 		$this->chooseOkOnNextConfirmation();
 
-		$this->DBsave_tables(array('actions','operations','conditions'));
+		DBsave_tables(array('actions','operations','conditions'));
 
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_AUTO_REGISTRATION);
 		$this->assertTitle('Configuration of actions');
@@ -184,13 +183,13 @@ class testPageActionsAutoregistration extends CTest
 		$this->ok('CONFIGURATION OF ACTIONS');
 
 		$sql="select * from actions where actionid=$actionid";
-		$this->assertEquals(0,$this->DBcount($sql));
+		$this->assertEquals(0,DBcount($sql));
 		$sql="select * from operations where actionid=$actionid";
-		$this->assertEquals(0,$this->DBcount($sql));
+		$this->assertEquals(0,DBcount($sql));
 		$sql="select * from conditions where actionid=$actionid";
-		$this->assertEquals(0,$this->DBcount($sql));
+		$this->assertEquals(0,DBcount($sql));
 
-		$this->DBrestore_tables(array('actions','operations','conditions'));
+		DBrestore_tables(array('actions','operations','conditions'));
 	}
 }
 ?>

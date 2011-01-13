@@ -19,10 +19,9 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/class.ctest.php');
+require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-
-class testPageSlideShows extends CTest
+class testPageSlideShows extends CWebTest
 {
 	// Returns all slide shows
 	public static function allSlideShows()
@@ -58,9 +57,9 @@ class testPageSlideShows extends CTest
 		$slideshowid=$slideshow['slideshowid'];
 
 		$sql1="select * from slideshows where name='$name' order by slideshowid";
-		$oldHashSlideShow=$this->DBhash($sql1);
+		$oldHashSlideShow=DBhash($sql1);
 		$sql2="select * from slides where slideshowid=$slideshowid order by slideid";
-		$oldHashSlide=$this->DBhash($sql2);
+		$oldHashSlide=DBhash($sql2);
 
 		$this->login('slideconf.php');
 		$this->assertTitle('Configuration of slideshows');
@@ -73,8 +72,8 @@ class testPageSlideShows extends CTest
 		$this->ok("$name");
 		$this->ok('CONFIGURATION OF SLIDE SHOWS');
 
-		$this->assertEquals($oldHashSlideShow,$this->DBhash($sql1),"Chuck Norris: Slide show update changed data in table 'slideshows'");
-		$this->assertEquals($oldHashSlide,$this->DBhash($sql2),"Chuck Norris: Slide show update changed data in table 'slides'");
+		$this->assertEquals($oldHashSlideShow,DBhash($sql1),"Chuck Norris: Slide show update changed data in table 'slideshows'");
+		$this->assertEquals($oldHashSlide,DBhash($sql2),"Chuck Norris: Slide show update changed data in table 'slides'");
 	}
 
 	public function testPageSlideShows_Create()
@@ -93,7 +92,7 @@ class testPageSlideShows extends CTest
 
 		$this->chooseOkOnNextConfirmation();
 
-		$this->DBsave_tables(array('slideshows','slides'));
+		DBsave_tables(array('slideshows','slides'));
 
 		$this->login('slideconf.php');
 		$this->assertTitle('Configuration of slideshows');
@@ -109,11 +108,11 @@ class testPageSlideShows extends CTest
 		$this->ok('CONFIGURATION OF SLIDE SHOWS');
 
 		$sql="select * from slideshows where slideshowid=$slideshowid";
-		$this->assertEquals(0,$this->DBcount($sql));
+		$this->assertEquals(0,DBcount($sql));
 		$sql="select * from slides where slideshowid=$slideshowid";
-		$this->assertEquals(0,$this->DBcount($sql));
+		$this->assertEquals(0,DBcount($sql));
 
-		$this->DBrestore_tables(array('slides','slideshows'));
+		DBrestore_tables(array('slides','slideshows'));
 	}
 }
 ?>

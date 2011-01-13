@@ -19,9 +19,9 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/class.ctest.php');
+require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageHosts extends CTest
+class testPageHosts extends CWebTest
 {
 	// Returns all hosts
 	public static function allHosts()
