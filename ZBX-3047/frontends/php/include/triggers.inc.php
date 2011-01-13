@@ -847,7 +847,7 @@ return $caption;
 		}
 
 		if(CTrigger::exists(array('description' => $description, 'expression' => $expression))){
-			error('Trigger '.$description.' already exists');
+			error('Trigger with name "'.$description.'" and expression "'.$expression.'" already exists.');
 			return false;
 		}
 
@@ -1817,7 +1817,7 @@ return $caption;
 				}
 			}
 			if($trigger_exist && ($trigger_exist['triggerid'] != $trigger['triggerid'])){
-				error('Trigger [ '.$trigger['description'].' ] already exists');
+				error('Trigger with name "'.$trigger['description'].'" and expression "'.$expression.'" already exists.');
 				return false;
 			}
 			else if(!$trigger_exist){

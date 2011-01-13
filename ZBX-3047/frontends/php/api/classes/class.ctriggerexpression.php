@@ -63,7 +63,8 @@ private $allowed;
 
 
 	public function checkMacro($macro){
-		return preg_match('/^'.ZBX_PREG_EXPRESSION_SIMPLE_MACROS.'$/i', $macro);
+		if(!preg_match('/^'.ZBX_PREG_EXPRESSION_SIMPLE_MACROS.'$/i', $macro))
+			throw new Exception('Incorrect macro "'.$macro.'" is used in expression.');
 	}
 
 	public function checkUserMacro($usermacro){
@@ -71,42 +72,55 @@ private $allowed;
 	}
 
 	public function checkHost($host){
-		if(zbx_empty($host)) return false;
+		if(zbx_empty($host))
+			throw new Exception('Empty host name "'.$host.'" provided in expression.');
 
-		return preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $host);
+		if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $host))
+			throw new Exception('Incorrect host name "'.$host.'" provided in expression.');
 	}
 
 	public function checkItem($item){
-		if(zbx_empty($item)) return false;
+		if(zbx_empty($item))
+			throw new Exception('Empty item key "'.$item.'" is used in expression.');
 
 		$itemCheck = check_item_key($item);
-		return $itemCheck['valid'];
+		if(!$itemCheck['valid'])
+			throw new Exception('Incorrect item key "'.$expr['item'].'" is used in expression.'.$itemCheck['description']);
 	}
 
 	public function checkFunction($expression){
-		if(!isset($this->allowed['functions'][$expression['functionName']])) return false;
-		if(!preg_match('/^'.ZBX_PREG_FUNCTION_FORMAT.'$/u', $expression['function'])) return false;
+		if(!isset($this->allowed['functions'][$expression['functionName']]))
+			throw new Exception('Incorrect trigger function "'.$expression['function'].'" provided in expression.');
+
+		if(!preg_match('/^'.ZBX_PREG_FUNCTION_FORMAT.'$/u', $expression['function']))
+			throw new Exception('Incorrect trigger function "'.$expression['function'].'" provided in expression.');
 
 		if(is_null($this->allowed['functions'][$expression['functionName']]['args'])) return true;
 
 		foreach($this->allowed['functions'][$expression['functionName']]['args'] as $anum => $arg){
-// mandatory check
-			if(isset($arg['mandat']) && $arg['mandat'] && !isset($expression['functionParamList'][$anum]))
-				return false;
-// type check
-			if(isset($arg['type']) && isset($expr['functionParamList'][$anum])){
-				$typeFlag = true;
-				if($arg['type'] == 'str') $typeFlag = is_string($expression['functionParamList'][$anum]);
-				if($arg['type'] == 'sec') $typeFlag = (validate_float($expression['functionParamList'][$anum]) == 0);
-				if($arg['type'] == 'sec_num') $typeFlag = (validate_ticks($expression['functionParamList'][$anum]) == 0);
-				if($arg['type'] == 'num') $typeFlag = is_numeric($expression['functionParamList'][$anum]);
 
-				if(!$typeFlag)
-					return false;
+// mandatory check
+			if(isset($arg['mandat']) && $arg['mandat'] && (!isset($expression['functionParamList'][$anum]) || empty($expression['functionParamList'][$anum])))
+				throw new Exception('Incorrect trigger function parameters count "'.$expression['function'].'" provided in expression.');
+
+
+// type check
+			if(isset($arg['type']) && isset($expression['functionParamList'][$anum])){
+				if(($arg['type'] == 'str') && !is_string($expression['functionParamList'][$anum]))
+					throw new Exception('Expected string for trigger function parameter in function "'.$expression['function'].'" provided in expression.');
+
+				if(($arg['type'] == 'sec') && (validate_float($expression['functionParamList'][$anum]) != 0))
+					throw new Exception('Expected counter or macro for trigger function parameter in function "'.$expression['function'].'" provided in expression.');
+
+				if(($arg['type'] == 'sec_num') && (validate_ticks($expression['functionParamList'][$anum]) != 0))
+					throw new Exception('Expected numeric or counter or macro for trigger function parameter in function "'.$expression['function'].'" provided in expression.');
+
+				if(($arg['type'] == 'num') && !is_numeric($expression['functionParamList'][$anum]))
+					throw new Exception('Expected numeric or macro for trigger function parameter in function "'.$expression['function'].'" provided in expression.');
 			}
 		}
 
-		return true;
+		return 1;
 	}
 
 	public function checkSimpleExpression(&$expression){
@@ -174,36 +188,33 @@ private $allowed;
 			throw new Exception('Incorrect count of quotes in expression');
 
 		if($this->symbols['open']['('] != $this->symbols['close'][')']){
-			throw new Exception('Incorrect parenthesis count in expression');
+			throw new Exception('Incorrect parenthesis count in expression.');
 		}
 
 		if($this->symbols['open']['{'] != $this->symbols['close']['}'])
-			throw new Exception('Incorrect curly braces count in expression');
+			throw new Exception('Incorrect curly braces count in expression.');
 	}
 
 	private function checkParts(&$expression){
 		foreach($this->expressions as $enum => $expr){
 			if(!zbx_empty($expr['macro'])){
-				if(!$this->checkMacro($expr['macro']))
-					throw new Exception('Incorrect macro is used in expression');
+				$this->checkMacro($expr['macro']);
+
 
 				$this->data['macros'][] = $expr['macro'];
 			}
 			else if(!zbx_empty($expr['usermacro'])){
 				if(!$this->checkUserMacro($expr['usermacro']))
-					throw new Exception('Incorrect user macro format is used in expression');
+					throw new Exception('Incorrect user macro "'.$expr['usermacro'].'" format is used in expression.');
 
 				$this->data['usermacros'][] = $expr['usermacro'];
 			}
 			else{
-				if(!$this->checkHost($expr['host']))
-					throw new Exception('Incorrect host name provided in expression');
+				$this->checkHost($expr['host']);
+				$this->checkItem($expr['item']);
 
-				if(!$this->checkItem($expr['item']))
-					throw new Exception('Incorrect item key "'.$expr['item'].'" is used in expression.');
 
-				if(!$this->checkFunction($expr))
-					throw new Exception('Incorrect trigger function provided in expression');
+				$this->checkFunction($expr);
 
 				$this->data['hosts'][] = $expr['host'];
 				$this->data['items'][] = $expr['item'];
@@ -226,7 +237,7 @@ private $allowed;
 		}
 
 		if(empty($this->data['hosts']) || empty($this->data['items']))
-			throw new Exception('Trigger expression must contain at least one host:key reference');
+			throw new Exception('Trigger expression must contain at least one host:key reference.');
 	}
 
 // STATE
