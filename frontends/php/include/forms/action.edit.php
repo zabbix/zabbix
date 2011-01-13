@@ -381,7 +381,6 @@ require_once('include/templates/action.js.php');
 		));
 
 		$tblOper->addItem(new CVar('operations['.$id.']', $operation));
-		$tblOper->addItem(new CVar('operations['.$id.'][opconditions]',$operation['opconditions']));
 	}
 
 	$footer = array();
@@ -407,7 +406,7 @@ require_once('include/templates/action.js.php');
 				'operationtype' => 0,
 				'esc_period' => 0,
 				'esc_step_from' => 1,
-				'esc_step_to' => 1,
+				'esc_step_to' => 0,
 				'evaltype' => 0
 			);
 		}
