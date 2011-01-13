@@ -1,5 +1,6 @@
 Changes for 1.8.5rc1
 
+ - [ZBX-3413] added escaping of parameters used in LIKE SQL statements (KB)
  - [ZBX-3391] fixed wrong comparison operators used for strings (Vlad)
  - [ZBX-1346] document LogSlowQueries configuration parameter (Richlv)
  - [ZBXNEXT-612] added mapname url parameter for monitoring->maps (Vedmak)
