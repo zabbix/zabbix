@@ -840,7 +840,6 @@ include_once('include/page_header.php');
 			'select_applications' => API_OUTPUT_COUNT
 		);
 		$hosts = CHost::get($options);
-
 // sorting && paging
 		order_result($hosts, $sortfield, $sortorder);
 //---------
