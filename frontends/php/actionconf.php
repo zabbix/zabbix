@@ -39,7 +39,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		'evaltype'=>		array(T_ZBX_INT, O_OPT, null, IN(array(ACTION_EVAL_TYPE_AND_OR,ACTION_EVAL_TYPE_AND,ACTION_EVAL_TYPE_OR)),	'isset({save})'),
 		'esc_period'=>		array(T_ZBX_INT, O_OPT, null, BETWEEN(60,999999), 'isset({save})&&isset({escalation})'),
 		'escalation'=>		array(T_ZBX_INT, O_OPT, null, IN("0,1"), null),
-		'status'=>			array(T_ZBX_INT, O_OPT, null, IN(array(ACTION_STATUS_ENABLED,ACTION_STATUS_DISABLED)), 'isset({save})'),
+		'status'=>			array(T_ZBX_INT, O_OPT, null, IN(array(ACTION_STATUS_ENABLED,ACTION_STATUS_DISABLED)), null),
 		'def_shortdata'=>	array(T_ZBX_STR, O_OPT,	null, null, 'isset({save})'),
 		'def_longdata'=>	array(T_ZBX_STR, O_OPT,	null, null, 'isset({save})'),
 		'recovery_msg'=>	array(T_ZBX_INT, O_OPT,	null, null, null),
@@ -222,6 +222,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 	else if(inarr_isset(array('add_operation','new_operation'))){
 		try{
 			$new_operation = $_REQUEST['new_operation'];
+
 			CAction::validateOperations($new_operation);
 
 			$_REQUEST['operations'] = get_request('operations', array());
@@ -234,7 +235,8 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 				unset($new_operation['id']);
 				$_REQUEST['operations'][$id] = $new_operation;
 			}
-
+SDII($new_operation);
+SDII($_REQUEST['operations'][$id]);
 			unset($_REQUEST['new_operation']);
 		}
 		catch(APIException $e){

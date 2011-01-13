@@ -642,7 +642,7 @@ include_once('include/page_header.php');
 
 		$table = new CTableInfo(S_NO_GROUPS_DEFINED);
 		$table->setHeader(array(
-			($multiselect ? new CCheckBox("all_usrgrps", NULL, "javascript: checkAll('".$form->getName()."', 'all_usgrps','usrgrps');") : null),
+			($multiselect ? new CCheckBox("all_usrgrps", NULL, "javascript: checkAll('".$form->getName()."', 'all_usrgrps','usrgrps');") : null),
 			S_NAME
 		));
 

@@ -560,23 +560,32 @@ require_once('include/templates/action.js.php');
 
 
 // Add Participations
-				$groupids = isset($new_operation['opcommand_grp']) ?
-					zbx_objectValues($new_operation['opcommand_grp'], 'groupid') :
-					array();
+				if(!isset($new_operation['opcommand_grp'])) $new_operation['opcommand_grp'] = array();
+				if(!isset($new_operation['opcommand_hst'])) $new_operation['opcommand_hst'] = array();
 
-				$hostids = isset($new_operation['opcommand_hst']) ?
-					zbx_objectValues($new_operation['opcommand_hst'], 'hostid') :
-					array();
+				$groups = CHostGroup::get(array(
+					'groupids' => zbx_objectValues($new_operation['opcommand_grp'], 'groupid'),
+					'output' => array('groupid','name'),
+					'preservekeys' => true
+				));
 
-				$groups = CHostGroup::get(array('groupids' => $groupids, 'output' => array('name')));
-				order_result($groups, 'name');
+				foreach($new_operation['opcommand_grp'] as $ognum => $cmd)
+					$new_operation['opcommand_grp'][$ognum]['name'] = $groups[$cmd['groupid']]['name'];
+				order_result($new_operation['opcommand_grp'], 'name');
 
-				$hosts = CHost::get(array('hostids' => $hostids, 'output' => array('host')));
-				order_result($hosts, 'host');
+				$hosts = CHost::get(array(
+					'hostids' => zbx_objectValues($new_operation['opcommand_hst'], 'hostid'),
+					'output' => array('hostid','host'),
+					'preservekeys' => true
+				));
+				foreach($new_operation['opcommand_hst'] as $ohnum => $cmd)
+					$new_operation['opcommand_hst'][$ohnum]['host'] = ($cmd['hostid'] > 0) ? $hosts[$cmd['hostid']]['host'] : '';
+				order_result($new_operation['opcommand_hst'], 'host');
 
+// JS Add commands
 				$jsInsert = '';
-				$jsInsert.= 'addPopupValues('.zbx_jsvalue(array('object'=>'groupid', 'values'=>$groups)).');';
-				$jsInsert.= 'addPopupValues('.zbx_jsvalue(array('object'=>'hostid', 'values'=>$hosts)).');';
+				$jsInsert.= 'addPopupValues('.zbx_jsvalue(array('object'=>'groupid', 'values'=>$new_operation['opcommand_grp'])).');';
+				$jsInsert.= 'addPopupValues('.zbx_jsvalue(array('object'=>'hostid', 'values'=>$new_operation['opcommand_hst'])).');';
 
 				zbx_add_post_js($jsInsert);
 
