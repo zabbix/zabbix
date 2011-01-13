@@ -32,8 +32,8 @@
 	<span class="bold"> #{name} </span>
 </td>
 <td>
-	<input name="new_operation[opcommand_grp][#{opcommand_grpid}][command]" type="hidden" value="#{command}" />
-	<span class="italic"> #{commandLine} </span>
+	<textarea name="new_operation[opcommand_grp][#{opcommand_grpid}][command]" class="hidden"> #{command} </textarea>
+	<span class="italic" title="#{command}"> #{commandLine} </span>
 </td>
 <td>
 	<input type="button" class="input link_menu" name="edit" value="<?php print(_('Edit'));?>" onclick="javascript: showOpCmdForm(#{opcommand_grpid}, 'groupid');" />
@@ -53,8 +53,8 @@
 	<span class="bold"> #{host} </span>
 </td>
 <td>
-	<input name="new_operation[opcommand_hst][#{opcommand_hstid}][command]" type="hidden" value="#{command}" />
-	<span class="italic"> #{commandLine} </span>
+	<textarea name="new_operation[opcommand_hst][#{opcommand_hstid}][command]" class="hidden"> #{command} </textarea>
+	<span class="italic" title="#{command}"> #{commandLine} </span>
 </td>
 <td>
 	<input type="button" class="input link_menu" name="edit" value="<?php print(_('Edit'));?>" onclick="javascript: showOpCmdForm(#{opcommand_hstid}, 'hostid');" />
@@ -119,6 +119,9 @@ function addPopupValues(list){
 			case 'groupid':
 				var tpl = new Template(jQuery('#opCmdGroupRowTPL').html());
 
+				value.commandLine = value.command.split("\n")[0].toString();
+				if(value.commandLine.length > 48) value.commandLine = value.commandLine.substr(0,45) + '...';
+
 				if(jQuery("#opCmdDraft").length){
 					value.newValue = "update";
 					jQuery("#opCmdDraft").replaceWith(tpl.evaluate(value));
@@ -135,6 +138,9 @@ function addPopupValues(list){
 				break;
 			case 'hostid':
 				var tpl = new Template(jQuery('#opCmdHostRowTPL').html());
+
+				value.commandLine = value.command.split("\n")[0].toString();
+				if(value.commandLine.length > 48) value.commandLine = value.commandLine.substr(0,45) + '...';
 
 				if(jQuery("#opCmdDraft").length){
 					value.newValue = "update";
@@ -186,7 +192,7 @@ function showOpCmdForm(opCmdId, object){
 		objectTPL.objectid = jQuery(objectRow).find('input[name="new_operation[opcommand_hst]['+opCmdId+'][hostid]"]').val();
 		objectTPL.name = jQuery(objectRow).find('input[name="new_operation[opcommand_hst]['+opCmdId+'][host]"]').val();
 		objectTPL.target = (objectTPL.objectid == 0) ? 0 : 1;
-		objectTPL.command = jQuery(objectRow).find('input[name="new_operation[opcommand_hst]['+opCmdId+'][command]"]').val();
+		objectTPL.command = jQuery(objectRow).find('textarea[name="new_operation[opcommand_hst]['+opCmdId+'][command]"]').val();
 		objectTPL.operationName = '<?php print(_('Update'));?>';
 	}
 	else if(object == 'groupid'){
@@ -199,7 +205,7 @@ function showOpCmdForm(opCmdId, object){
 		objectTPL.objectid = jQuery(objectRow).find('input[name="new_operation[opcommand_grp]['+opCmdId+'][groupid]"]').val();
 		objectTPL.name = jQuery(objectRow).find('input[name="new_operation[opcommand_grp]['+opCmdId+'][name]"]').val();
 		objectTPL.target = 2;
-		objectTPL.command = jQuery(objectRow).find('input[name="new_operation[opcommand_grp]['+opCmdId+'][command]"]').val();
+		objectTPL.command = jQuery(objectRow).find('textarea[name="new_operation[opcommand_grp]['+opCmdId+'][command]"]').val();
 		objectTPL.operationName = '<?php print(_('Update'));?>';
 	}
 	else{
@@ -231,7 +237,6 @@ function saveOpCmdForm(){
 	var object = {};
 	object.target = jQuery(objectForm).find('select[name="opCmdTarget"]').val();
 	object.command = jQuery(objectForm).find('textarea[name="opCmdTargetObjectCommand"]').val();
-	object.commandLine = object.command.split("\n")[0];
 
 	if(empty(object.command)){
 		alert("<?php print(_('Command field is empty. Please provide some extructions for operation.')); ?>");

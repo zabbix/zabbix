@@ -288,21 +288,27 @@ function get_operation_desc($type, $data){
 				if(!isset($data['opmessage_usr'])) $data['opmessage_usr'] = array();
 				if(!isset($data['opmessage_grp'])) $data['opmessage_grp'] = array();
 
-				foreach($data['opmessage_usr'] as $opmsgUser){
-					$users = CUser::get(array(
-						'userids' => $opmsgUser['userid'],
-						'output' => API_OUTPUT_EXTEND
-					));
-					$user = reset($users);
+				$users = CUser::get(array(
+					'userids' => zbx_objectValues($data['opmessage_usr'],'userid'),
+					'output' => array('userid', 'alias')
+				));
+				if(!empty($users)){
+					order_result($users, 'alias');
 
-					$result[] = S_SEND_MESSAGE_TO.' '.S_USER.' "'.$user['alias'].'"';
+					$result[] = bold(array(S_SEND_MESSAGE_TO,SPACE,S_USERS,': ' ));
+					$result[] = array(implode(', ', zbx_objectValues($users,'alias')), BR());
 				}
 
-				foreach($data['opmessage_grp'] as $opmsgUsrgrp){
-					$usrgrps = CUserGroup::get(array('usrgrpids' => $opmsgUsrgrp['usrgrpid'],  'output' => API_OUTPUT_EXTEND));
-					$usrgrp = reset($usrgrps);
 
-					$result[] = S_SEND_MESSAGE_TO.' '.S_GROUP.' "'.$usrgrp['name'].'"';
+				$usrgrps = CUserGroup::get(array(
+					'usrgrpids' => zbx_objectValues($data['opmessage_grp'],'usrgrpid'),
+					'output' => API_OUTPUT_EXTEND
+				));
+				if(!empty($usrgrps)){
+					order_result($usrgrps, 'name');
+
+					$result[] = bold(array(S_SEND_MESSAGE_TO,SPACE,S_GROUP,': ' ));
+					$result[] = array(implode(', ', zbx_objectValues($usrgrps,'name')), BR());
 				}
 				break;
 			case OPERATION_TYPE_COMMAND:
@@ -365,8 +371,16 @@ function get_operation_desc($type, $data){
 
 				break;
 			case OPERATION_TYPE_COMMAND:
-				$temp = bold(S_REMOTE_COMMANDS.': ');
-				$result[] = $temp->ToString().$data['longdata'];
+				if(!isset($data['opcommand_grp'])) $data['opcommand_grp'] = array();
+				if(!isset($data['opcommand_hst'])) $data['opcommand_hst'] = array();
+
+				foreach($data['opcommand_hst'] as $cnum => $command){
+					$result[] = array(bold(S_REMOTE_COMMANDS.': '), $command['command']);
+				}
+
+				foreach($data['opcommand_grp'] as $cnum => $command){
+					$result[] = array(bold(S_REMOTE_COMMANDS.': '), $command['command']);
+				}
 				break;
 			default:
 		}
