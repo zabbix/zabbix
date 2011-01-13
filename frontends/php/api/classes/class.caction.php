@@ -190,12 +190,12 @@ class CAction extends CZBXAPI{
 			$sql_parts['where'][] =
 				' NOT EXISTS('.
 					' SELECT o.operationid '.
-					' FROM operations o '.
+					' FROM operations o, opmessage_usr omu, opmessage_grp omg'.
 					' WHERE o.operationtype='.OPERATION_TYPE_MESSAGE.
 						' AND o.actionid=a.actionid'.
 						' AND (('.
-								' o.object='.OPERATION_OBJECT_USER.
-								' AND o.objectid NOT IN ('.
+								' omu.operationid=o.operationid'.
+								' AND omu.userid NOT IN ('.
 									' SELECT DISTINCT ug.userid'.
 									' FROM users_groups ug'.
 									' WHERE ug.usrgrpid IN ('.
@@ -205,8 +205,8 @@ class CAction extends CZBXAPI{
 										' )'.
 									' )'.
 							' ) OR ('.
-								' o.object='.OPERATION_OBJECT_GROUP.
-								' AND o.objectid NOT IN ('.
+								' omg.operationid=o.operationid'.
+								' AND omg.usrgrpid NOT IN ('.
 									' SELECT ug.usrgrpid'.
 									' FROM users_groups ug'.
 									' WHERE ug.userid='.$USER_DETAILS['userid'].
