@@ -1166,17 +1166,19 @@ COpt::memoryPick();
 					}
 				}
 
-				if(isset($trigger['description']) && strcmp($trigger['description'], $dbTrigger['description']) == 0)
+				if(isset($trigger['description']) && strcmp($trigger['description'], $dbTrigger['comments']) == 0)
 					unset($triggers[$tnum]['description']);
 				if(isset($trigger['priority']) && ($trigger['priority'] == $dbTrigger['priority']))
 					unset($triggers[$tnum]['priority']);
-				if(isset($trigger['priority']) && ($trigger['priority'] == $dbTriggers[$trigger['triggerid']]['priority']))
+				if(isset($trigger['priority']) && ($trigger['priority'] == $dbTrigger['priority']))
 					unset($triggers[$tnum]['priority']);
-				if(isset($trigger['type']) && ($trigger['type'] == $dbTriggers[$trigger['triggerid']]['type']))
+				if(isset($trigger['type']) && ($trigger['type'] == $dbTrigger['type']))
 					unset($triggers[$tnum]['type']);
-				if(isset($trigger['url']) && strcmp($trigger['url'], $dbTriggers[$trigger['triggerid']]['url']) == 0)
+				if(isset($trigger['comments']) && strcmp($trigger['comments'], $dbTrigger['comments']) == 0)
+					unset($triggers[$tnum]['comments']);
+				if(isset($trigger['url']) && strcmp($trigger['url'], $dbTrigger['url']) == 0)
 					unset($triggers[$tnum]['url']);
-				if(isset($trigger['status']) && ($trigger['status'] == $dbTriggers[$trigger['triggerid']]['status']))
+				if(isset($trigger['status']) && ($trigger['status'] == $dbTrigger['status']))
 					unset($triggers[$tnum]['status']);
 			}
 
