@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-01-12 19:48+0200\n"
-"PO-Revision-Date: 2011-01-12 22:04+0200\n"
+"PO-Revision-Date: 2011-01-13 15:09+0200\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: lv\n"
@@ -693,7 +693,7 @@ msgstr ""
 
 #: ../include/locales/en_gb.inc.php:1907
 msgid "CONFIGURATION OF USERS AND USER GROUPS"
-msgstr ""
+msgstr "LIETOTĀJU UN LIETOTĀJU GRUPU KONFIGURĀCIJA"
 
 #: ../include/locales/en_gb.inc.php:186
 msgid "CONFIGURATION OF WEB MONITORING"
@@ -734,7 +734,7 @@ msgstr ""
 
 #: ../api/classes/class.ctemplate.php:1405
 msgid "Can't add group"
-msgstr ""
+msgstr "Grupu nav iespējams pievienot"
 
 #: ../include/locales/en_gb.inc.php:2467
 msgid "Can't delete media types"
@@ -767,7 +767,7 @@ msgstr "Nav iespējams saņemt skripta rezultātus, pārbaudiet savienojumu"
 
 #: ../api/classes/class.ctemplate.php:1416
 msgid "Can't remove group"
-msgstr ""
+msgstr "Grupu nav iespējams dzēst"
 
 #: ../api/classes/class.ctemplate.php:1531
 msgid "Can't remove macro"
@@ -976,7 +976,7 @@ msgstr ""
 
 #: ../include/locales/en_gb.inc.php:1886
 msgid "Cannot delete group"
-msgstr "Grupu nav iespējams pievienot"
+msgstr "Grupu nav iespējams dzēst"
 
 #: ../include/locales/en_gb.inc.php:906
 msgid "Cannot delete host"
@@ -2048,11 +2048,11 @@ msgstr ""
 
 #: ../include/locales/en_gb.inc.php:847
 msgid "Delete selected group?"
-msgstr ""
+msgstr "Vai dzēst izvēlēto grupu?"
 
 #: ../include/locales/en_gb.inc.php:851
 msgid "Delete selected groups"
-msgstr ""
+msgstr "Dzēst izvēlētās grupas"
 
 #: ../include/locales/en_gb.inc.php:1959
 msgid "Delete selected groups?"
@@ -2277,7 +2277,7 @@ msgstr ""
 
 #: ../include/locales/en_gb.inc.php:1956
 msgid "Disable API access in selected groups?"
-msgstr ""
+msgstr "Vai atslēgt piekļuvi API izvēlētajām grupām?"
 
 #: ../include/locales/en_gb.inc.php:1946
 msgid "Disable DEBUG"
@@ -2641,7 +2641,7 @@ msgstr ""
 
 #: ../include/locales/en_gb.inc.php:1955
 msgid "Enable API access in selected groups?"
-msgstr ""
+msgstr "Vai atļaut API piekļuvi izvēlētajām grupām?"
 
 #: ../include/locales/en_gb.inc.php:1945
 msgid "Enable DEBUG"
@@ -7206,7 +7206,7 @@ msgstr ""
 
 #: ../include/locales.inc.php:80
 msgid "Slovak (SK)"
-msgstr ""
+msgstr "Slovāku (SK)"
 
 #: ../include/locales/en_gb.inc.php:2015
 msgid "Snooze"

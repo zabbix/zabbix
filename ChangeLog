@@ -2,6 +2,7 @@
 Changes for 1.9.2
 
 New features:
+ - [ZBX-1357] updated Latvian translation (Richlv)
  - [ZBXNEXT-594] Add to zabbix API support for search and filter by rules "ALL" or "ANY" (Vlad)
  - [ZBXNEXT-592] confirmation dialog for scripts (Vedmak)
  - [ZBX-3355] added character field length validation on inserts and updates (KB)
