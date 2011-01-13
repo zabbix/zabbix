@@ -997,33 +997,41 @@ static int	DBget_interface_value_by_hostid(zbx_uint64_t hostid, char **replace_t
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		sql[128];
+	unsigned char	type, useip, pr, last_pr = 0xff,
+			priority[] = {INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_IPMI, 0xff};
 	int		ret = FAIL;
 
-	zbx_snprintf(sql, sizeof(sql),
-			"select useip,ip,dns"
+	result = DBselect(
+			"select type,useip,ip,dns"
 			" from interface"
 			" where hostid=" ZBX_FS_UI64
 				" and type in (%d,%d,%d)"
-				" and main=1"
-			" order by type",
+				" and main=1",
 			hostid, INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_IPMI);
 
-	result = DBselectN(sql, 1);
-
-	if (NULL != (row = DBfetch(result)))
+	while (NULL != (row = DBfetch(result)))
 	{
+		type = (unsigned char)atoi(row[0]);
+
+		for (pr = 0; priority[pr] != 0xff && priority[pr] != type; pr++)
+			;
+
+		if (pr >= last_pr)
+			continue;
+
+		last_pr = pr;
+
 		switch (request)
 		{
 			case ZBX_REQUEST_HOST_IPADDRESS:
-				*replace_to = zbx_dsprintf(*replace_to, "%s", row[1]);
+				*replace_to = zbx_strdup(*replace_to, row[2]);
 				break;
 			case ZBX_REQUEST_HOST_DNS:
-				*replace_to = zbx_dsprintf(*replace_to, "%s", row[2]);
+				*replace_to = zbx_strdup(*replace_to, row[3]);
 				break;
 			case ZBX_REQUEST_HOST_CONN:
-				*replace_to = zbx_dsprintf(*replace_to, "%s",
-						atoi(row[0]) ? row[1] : row[2]);
+				useip = (unsigned char)atoi(row[1]);
+				*replace_to = zbx_strdup(*replace_to, useip ? row[2] : row[3]);
 				break;
 		}
 		ret = SUCCEED;
