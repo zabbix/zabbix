@@ -19,9 +19,9 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/class.ctest.php');
+require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageMaintenance extends CTest
+class testPageMaintenance extends CWebTest
 {
 	// Returns all maintenances
 	public static function allMaintenances()
@@ -61,15 +61,15 @@ class testPageMaintenance extends CTest
 		$maintenanceid=$maintenance['maintenanceid'];
 
 		$sql1="select * from maintenances where name='$name' order by maintenanceid";
-		$oldHashMaintenance=$this->DBhash($sql1);
+		$oldHashMaintenance=DBhash($sql1);
 		$sql2="select * from maintenances_hosts where maintenanceid=$maintenanceid order by maintenance_hostid";
-		$oldHashHosts=$this->DBhash($sql2);
+		$oldHashHosts=DBhash($sql2);
 		$sql3="select * from maintenances_groups where maintenanceid=$maintenanceid order by maintenance_groupid";
-		$oldHashGroups=$this->DBhash($sql3);
+		$oldHashGroups=DBhash($sql3);
 		$sql4="select * from maintenances_windows where maintenanceid=$maintenanceid order by maintenance_timeperiodid";
-		$oldHashWindows=$this->DBhash($sql4);
+		$oldHashWindows=DBhash($sql4);
 		$sql5="select * from timeperiods where timeperiodid in (select timeperiodid from maintenances_windows where maintenanceid=$maintenanceid) order by timeperiodid";
-		$oldHashTimeperiods=$this->DBhash($sql5);
+		$oldHashTimeperiods=DBhash($sql5);
 
 		$this->login('maintenance.php');
 		$this->dropdown_select('groupid','all');
@@ -83,11 +83,11 @@ class testPageMaintenance extends CTest
 		$this->ok("$name");
 		$this->ok('CONFIGURATION OF MAINTENANCE PERIODS');
 
-		$this->assertEquals($oldHashMaintenance,$this->DBhash($sql1),"Chuck Norris: Maintenance update changed data in table 'maintenances'");
-		$this->assertEquals($oldHashHosts,$this->DBhash($sql2),"Chuck Norris: Maintenance update changed data in table 'maintenances_hosts'");
-		$this->assertEquals($oldHashGroups,$this->DBhash($sql3),"Chuck Norris: Maintenance update changed data in table 'maintenances_groups'");
-		$this->assertEquals($oldHashWindows,$this->DBhash($sql4),"Chuck Norris: Maintenance update changed data in table 'maintenances_windows'");
-		$this->assertEquals($oldHashTimeperiods,$this->DBhash($sql5),"Chuck Norris: Maintenance update changed data in table 'timeperiods'");
+		$this->assertEquals($oldHashMaintenance,DBhash($sql1),"Chuck Norris: Maintenance update changed data in table 'maintenances'");
+		$this->assertEquals($oldHashHosts,DBhash($sql2),"Chuck Norris: Maintenance update changed data in table 'maintenances_hosts'");
+		$this->assertEquals($oldHashGroups,DBhash($sql3),"Chuck Norris: Maintenance update changed data in table 'maintenances_groups'");
+		$this->assertEquals($oldHashWindows,DBhash($sql4),"Chuck Norris: Maintenance update changed data in table 'maintenances_windows'");
+		$this->assertEquals($oldHashTimeperiods,DBhash($sql5),"Chuck Norris: Maintenance update changed data in table 'timeperiods'");
 	}
 
 	/**
@@ -97,7 +97,7 @@ class testPageMaintenance extends CTest
 	{
 		$maintenanceid=$maintenance['maintenanceid'];
 
-		$this->DBsave_tables(array('maintenances','maintenances_hosts','maintenances_groups','maintenances_windows','timeperiods'));
+		DBsave_tables(array('maintenances','maintenances_hosts','maintenances_groups','maintenances_windows','timeperiods'));
 
 		$this->chooseOkOnNextConfirmation();
 
@@ -114,17 +114,17 @@ class testPageMaintenance extends CTest
 		$this->ok('Maintenance deleted');
 
 		$sql="select * from maintenances where maintenanceid=$maintenanceid";
-		$this->assertEquals(0,$this->DBcount($sql));
+		$this->assertEquals(0,DBcount($sql));
 		$sql="select * from maintenances_hosts where maintenanceid=$maintenanceid";
-		$this->assertEquals(0,$this->DBcount($sql));
+		$this->assertEquals(0,DBcount($sql));
 		$sql="select * from maintenances_groups where maintenanceid=$maintenanceid";
-		$this->assertEquals(0,$this->DBcount($sql));
+		$this->assertEquals(0,DBcount($sql));
 		$sql="select * from maintenances_windows where maintenanceid=$maintenanceid";
-		$this->assertEquals(0,$this->DBcount($sql));
+		$this->assertEquals(0,DBcount($sql));
 		$sql="select * from timeperiods where timeperiodid in (select timeperiodid from maintenances_windows where maintenanceid=$maintenanceid)";
-		$this->assertEquals(0,$this->DBcount($sql));
+		$this->assertEquals(0,DBcount($sql));
 
-		$this->DBrestore_tables(array('maintenances','maintenances_hosts','maintenances_groups','maintenances_windows','timeperiods'));
+		DBrestore_tables(array('maintenances','maintenances_hosts','maintenances_groups','maintenances_windows','timeperiods'));
 	}
 
 	public function testPageMaintenance_SingleEnable()

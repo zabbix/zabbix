@@ -19,9 +19,9 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/class.ctest.php');
+require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testFormHostGroup extends CTest
+class testFormHostGroup extends CWebTest
 {
 	public $hostgroup = 'Test Group';
 
