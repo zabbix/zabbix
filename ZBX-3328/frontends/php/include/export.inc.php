@@ -167,6 +167,7 @@ class zbxXML{
 				'snmp_community'	=> '',
 				'snmp_oid'			=> '',
 				'port'			=> '',
+				'snmp_port' => '',
 				'snmpv3_securityname'	=> '',
 				'snmpv3_securitylevel'	=> '',
 				'snmpv3_authpassphrase'	=> '',
@@ -819,6 +820,7 @@ class zbxXML{
 		$triggers_for_dependencies = array();
 
 		try{
+
 			if(isset($rules['host']['exist']) || isset($rules['host']['missed'])){
 				$xpath = new DOMXPath(self::$xml);
 
@@ -826,6 +828,64 @@ class zbxXML{
 
 				foreach($hosts as $hnum => $host){
 					$host_db = self::mapXML2arr($host, XML_TAG_HOST);
+
+					// it is possible, that data is imported from 1.8, where there was only one network interface per host
+					/**
+					 * @todo when new XML format will be introduced, this check should be changed to XML version check
+					 */
+					$old_version_input = isset($host_db['ip']) || $host_db['ip'] == '';
+					if($old_version_input){
+						// rearranging host structure, so it would look more like 2.0 host
+
+						// creating interfaces
+						$host_db['interfaces'] = array();
+
+						// the main interface is always agent type
+						$host_db['interfaces'][] = array(
+							'main' => INTERFACE_PRIMARY,
+							'type' => INTERFACE_TYPE_AGENT,
+							'useip' => $host_db['useip'],
+							'ip' =>  $host_db['ip'],
+							'dns' => $host_db['dns'],
+							'port' => $host_db['port']
+						);
+
+						// did host use impi? if so, adding another interface of ipmi type
+						if($host_db['useipmi']){
+							$host_db['interfaces'][] = array(
+								'main' => INTERFACE_SECONDARY,
+								'type' => INTERFACE_TYPE_IPMI,
+								'useip' => INTERFACE_USE_IP,
+								'ip' =>  $host_db['ipmi_ip'],
+								'dns' => '',
+								'port' => $host_db['ipmi_port']
+							);
+						}
+
+
+						// now we need to check if host had SNMP items. If it had, we need and SNPM interface for every different port.
+						$items = $xpath->query('items/item', $host);
+						$snmp_interface_ports_created = array();
+						foreach($items as $item){
+							$item_db = self::mapXML2arr($item, XML_TAG_ITEM);
+							if(($item_db['type'] == ITEM_TYPE_SNMPV1
+								|| $item_db['type'] == ITEM_TYPE_SNMPV2C
+								|| $item_db['type'] == ITEM_TYPE_SNMPV3)
+								&& !in_array($item_db['snmp_port'], $snmp_interface_ports_created)){
+
+								$host_db['interfaces'][] = array(
+									'main' => INTERFACE_SECONDARY,
+									'type' => INTERFACE_TYPE_SNMP,
+									'useip' => $host_db['useip'],
+									'ip' =>  $host_db['ip'],
+									'dns' => $host_db['dns'],
+									'port' => $item_db['snmp_port']
+								);
+								$snmp_interface_ports_created[] = $item_db['snmp_port'];
+							}
+						}
+						unset($snmp_interface_ports_created); // it was a temporary variable
+					}
 
 					if(!isset($host_db['status'])) $host_db['status'] = HOST_STATUS_TEMPLATE;
 					$current_host = ($host_db['status'] == HOST_STATUS_TEMPLATE) ? CTemplate::exists($host_db) : CHost::exists($host_db);
@@ -1006,14 +1066,85 @@ class zbxXML{
 					}
 					$current_hostname = $host_db['host'];
 
-
 // ITEMS {{{
 					if(isset($rules['item']['exist']) || isset($rules['item']['missed'])){
 						$items = $xpath->query('items/item', $host);
 
+						// if this is an export from 1.8, we need to make some adjustments to items
+						if($old_version_input){
+							// getting just created interface ids
+							$inserted_host = CHost::get(array(
+								'filter' => array('hostid'=>$current_hostid),
+								'output' => API_OUTPUT_EXTEND,
+								'selectInterfaces' => API_OUTPUT_EXTEND
+							));
+
+							// we must know interface ids to assign them to items
+							$agent_interface_id = null;
+							$ipmi_interface_id = null;
+							$snmp_interfaces = array(); //hash 'port' => 'iterfaceid'
+
+							foreach($inserted_host[0]['interfaces'] as $interface){
+								switch($interface['type']){
+									case INTERFACE_TYPE_AGENT:
+										$agent_interface_id = $interface['interfaceid'];
+									break;
+									case INTERFACE_TYPE_IPMI:
+										$ipmi_interface_id = $interface['interfaceid'];
+									break;
+									case INTERFACE_TYPE_SNMP:
+										$snmp_interfaces[$interface['port']] = $interface['interfaceid'];
+									break;
+								}
+							}
+						}
+
 						foreach($items as $inum => $item){
 							$item_db = self::mapXML2arr($item, XML_TAG_ITEM);
 							$item_db['hostid'] = $current_hostid;
+
+							// item needs interfaces
+							if($old_version_input){
+
+								// 'snmp_port' column was renamed to 'port'
+								$item_db['port'] = $item_db['snmp_port'];
+								unset($item_db['snmp_port']);
+
+								// assigning appropriate interface depending on item type
+								switch($item_db['type']){
+									// zabbix agent interface
+									case ITEM_TYPE_ZABBIX:
+									case ITEM_TYPE_SIMPLE:
+									case ITEM_TYPE_EXTERNAL:
+									case ITEM_TYPE_DB_MONITOR:
+									case ITEM_TYPE_SSH:
+									case ITEM_TYPE_TELNET:
+										$item_db['interfaceid'] = $agent_interface_id;
+									break;
+
+									// snmp interface
+									case ITEM_TYPE_SNMPV1:
+									case ITEM_TYPE_SNMPV2C:
+									case ITEM_TYPE_SNMPV3:
+										// for an item with different port - different interface
+										$item_db['interfaceid'] = $snmp_interfaces[$item_db['port']];
+									break;
+
+									case ITEM_TYPE_IPMI:
+										$item_db['interfaceid'] = $ipmi_interface_id;
+									break;
+
+									// no interfaces required for these item types
+									case ITEM_TYPE_HTTPTEST:
+									case ITEM_TYPE_CALCULATED:
+									case ITEM_TYPE_AGGREGATE:
+									case ITEM_TYPE_INTERNAL:
+									case ITEM_TYPE_ZABBIX_ACTIVE:
+									case ITEM_TYPE_TRAPPER:
+										$item_db['interfaceid'] = null;
+									break;
+								}
+							}
 
 							$options = array(
 								'filter' => array(
@@ -1330,81 +1461,83 @@ class zbxXML{
 					if(isset($rules['screens']['exist']) || isset($rules['screens']['missed'])){
 						$screens_node = $xpath->query('screens', $host);
 
-						$importScreens = self::XMLtoArray($screens_node->item(0));
+						if($screens_node->length > 0){
+							$importScreens = self::XMLtoArray($screens_node->item(0));
 
-						foreach($importScreens as $mnum => $screen){
+							foreach($importScreens as $mnum => $screen){
 
-							$current_screen = CTemplateScreen::get(array(
-								'filter' => array('name' => $screen['name']),
-								'templateids' => $current_hostid,
-								'output' => API_OUTPUT_EXTEND,
-								'editable' => 1,
-							));
-							$current_screen = reset($current_screen);
+								$current_screen = CTemplateScreen::get(array(
+									'filter' => array('name' => $screen['name']),
+									'templateids' => $current_hostid,
+									'output' => API_OUTPUT_EXTEND,
+									'editable' => 1,
+								));
+								$current_screen = reset($current_screen);
 
-							if(!$current_screen && !isset($rules['screens']['missed'])){
-								info('Screen ['.$screen['name'].'] skipped - user rule');
-								continue;
-							}
-							if($current_screen && !isset($rules['screens']['exist'])){
-								info('Screen ['.$screen['name'].'] skipped - user rule');
-								continue;
-							}
+								if(!$current_screen && !isset($rules['screens']['missed'])){
+									info('Screen ['.$screen['name'].'] skipped - user rule');
+									continue;
+								}
+								if($current_screen && !isset($rules['screens']['exist'])){
+									info('Screen ['.$screen['name'].'] skipped - user rule');
+									continue;
+								}
 
-							if(isset($screen['screenitems'])){
-								foreach($screen['screenitems'] as $snum => &$screenitem){
-									$nodeCaption = isset($screenitem['resourceid']['node'])?$screenitem['resourceid']['node'].':':'';
+								if(isset($screen['screenitems'])){
+									foreach($screen['screenitems'] as $snum => &$screenitem){
+										$nodeCaption = isset($screenitem['resourceid']['node'])?$screenitem['resourceid']['node'].':':'';
 
-									if(!isset($screenitem['resourceid']))
-										$screenitem['resourceid'] = 0;
+										if(!isset($screenitem['resourceid']))
+											$screenitem['resourceid'] = 0;
 
-									if(is_array($screenitem['resourceid'])){
-										switch($screenitem['resourcetype']){
-											case SCREEN_RESOURCE_GRAPH:
-												$db_graphs = CGraph::getObjects($screenitem['resourceid']);
+										if(is_array($screenitem['resourceid'])){
+											switch($screenitem['resourcetype']){
+												case SCREEN_RESOURCE_GRAPH:
+													$db_graphs = CGraph::getObjects($screenitem['resourceid']);
 
-												if(empty($db_graphs)){
-													$error = S_CANNOT_FIND_GRAPH.' "'.$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['name'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
-													throw new Exception($error);
-												}
+													if(empty($db_graphs)){
+														$error = S_CANNOT_FIND_GRAPH.' "'.$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['name'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
+														throw new Exception($error);
+													}
 
-												$tmp = reset($db_graphs);
-												$screenitem['resourceid'] = $tmp['graphid'];
-											break;
-											case SCREEN_RESOURCE_SIMPLE_GRAPH:
-											case SCREEN_RESOURCE_PLAIN_TEXT:
-												$db_items = CItem::getObjects($screenitem['resourceid']);
+													$tmp = reset($db_graphs);
+													$screenitem['resourceid'] = $tmp['graphid'];
+												break;
+												case SCREEN_RESOURCE_SIMPLE_GRAPH:
+												case SCREEN_RESOURCE_PLAIN_TEXT:
+													$db_items = CItem::getObjects($screenitem['resourceid']);
 
-												if(empty($db_items)){
-													$error = S_CANNOT_FIND_ITEM.' "'.$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['key_'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
-													throw new Exception($error);
-												}
+													if(empty($db_items)){
+														$error = S_CANNOT_FIND_ITEM.' "'.$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['key_'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
+														throw new Exception($error);
+													}
 
-												$tmp = reset($db_items);
-												$screenitem['resourceid'] = $tmp['itemid'];
-											break;
-											default:
-												$screenitem['resourceid'] = 0;
-											break;
+													$tmp = reset($db_items);
+													$screenitem['resourceid'] = $tmp['itemid'];
+												break;
+												default:
+													$screenitem['resourceid'] = 0;
+												break;
+											}
 										}
 									}
 								}
-							}
 
-							$screen['templateid'] = $current_hostid;
-							if($current_screen){
-								$screen['screenid'] = $current_screen['screenid'];
+								$screen['templateid'] = $current_hostid;
+								if($current_screen){
+									$screen['screenid'] = $current_screen['screenid'];
 
-								$result = CTemplateScreen::update($screen);
-								if(!$result) throw new Exception('Cannot update screen');
+									$result = CTemplateScreen::update($screen);
+									if(!$result) throw new Exception('Cannot update screen');
 
-								info('['.$current_hostname.'] '.S_SCREEN.' ['.$screen['name'].'] '.S_UPDATED_SMALL);
-							}
-							else{
-								$result = CTemplateScreen::create($screen);
-								if(!$result) throw new Exception('Cannot create screen');
+									info('['.$current_hostname.'] '.S_SCREEN.' ['.$screen['name'].'] '.S_UPDATED_SMALL);
+								}
+								else{
+									$result = CTemplateScreen::create($screen);
+									if(!$result) throw new Exception('Cannot create screen');
 
-								info('['.$current_hostname.'] '.S_SCREEN.' ['.$screen['name'].'] '.S_ADDED_SMALL);
+									info('['.$current_hostname.'] '.S_SCREEN.' ['.$screen['name'].'] '.S_ADDED_SMALL);
+								}
 							}
 						}
 					}
@@ -1626,6 +1759,8 @@ class zbxXML{
 
 		return self::outputXML($root);
 	}
+
+
 }
 
 ?>

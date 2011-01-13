@@ -487,7 +487,7 @@ Copt::memoryPick();
 
 				$dbInterface = $dbInterfaces[$interface['interfaceid']];
 				if(isset($interface['hostid']) && (bccomp($dbInterface['hostid'], $interface['hostid']) !=0))
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Can not switch host for interface');
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Can not switch host for interface'));
 
 				$interface['hostid'] = $dbInterface['hostid'];
 
@@ -545,7 +545,7 @@ Copt::memoryPick();
 			if(isset($interface['port'])){
 				if(zbx_ctype_digit($interface['port'])){
 					if($interface['port'] > 65535 || $interface['port'] < 0)
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect interface PORT "'.$interface['port'].'" provided');
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect interface PORT "%s" provided', $interface['port']));
 				}
 				else if(!preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $interface['port'])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect interface PORT "'.$interface['port'].'". '.S_WRONG_MACRO);
@@ -570,7 +570,7 @@ Copt::memoryPick();
 
 			foreach($items as $item){
 				$host = reset($item['hosts']);
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Interface is linked to "'.$host['host'].':'.$item['key_'].' item');
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface is linked to item "%s"', $host['host'].':'.$item['key_']));
 			}
 		}
 	}
