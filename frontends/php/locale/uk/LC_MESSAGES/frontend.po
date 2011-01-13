@@ -3,14 +3,15 @@ msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-01-12 19:48+0200\n"
-"PO-Revision-Date: 2010-12-26 22:54+0300\n"
-"Last-Translator: Oleksiy Zagorskyi <zalex_ua@i.ua>\n"
+"PO-Revision-Date: 2011-01-13 03:38+0200\n"
+"Last-Translator: zalex_ua <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Pootle 2.1.4\n"
 "X-Poedit-Basepath: ../../\n"
 
 #: ../include/locales/en_gb.inc.php:929
@@ -1172,7 +1173,7 @@ msgstr "Не вдалося синхронізувати правила вияв
 
 #: ../api/classes/class.ctemplate.php:1830
 msgid "Cannot sync graph prototypes"
-msgstr ""
+msgstr "Не вдалося синхронізувати прототипи графіків"
 
 #: ../api/classes/class.ctemplate.php:1836
 msgid "Cannot sync graphs"
@@ -1563,7 +1564,7 @@ msgstr "Конфігурувати"
 
 #: ../include/forms/script.edit.php:126
 msgid "Confirmation text"
-msgstr ""
+msgstr "Текст підтвердження"
 
 #: ../include/locales/en_gb.inc.php:918
 msgid "Connect to"
@@ -2145,7 +2146,7 @@ msgstr "Видалити вибраних користувачів?"
 #: ../config.php:887
 msgctxt "popup"
 msgid "Delete selected value mapping?"
-msgstr ""
+msgstr "Видалити обране перетворення значень?"
 
 #: ../config.php:883
 #, php-format
@@ -2653,7 +2654,7 @@ msgstr "Активувати IPMI"
 
 #: ../include/forms/script.edit.php:118
 msgid "Enable confirmation"
-msgstr ""
+msgstr "Задіяти підтвердження"
 
 #: ../include/locales/en_gb.inc.php:1957
 msgid "Enable debug mode in selected groups?"
@@ -2825,7 +2826,7 @@ msgstr "Виключено"
 #: ../include/templates/scriptConfirm.js.php:35
 #: ../include/templates/script.js.php:40
 msgid "Execute"
-msgstr ""
+msgstr "Виконати"
 
 #: ../include/locales/en_gb.inc.php:2378
 msgid "Execute SQL error"
@@ -2837,7 +2838,7 @@ msgstr "Скрипт для виконання"
 
 #: ../include/templates/scriptConfirm.js.php:17
 msgid "Execution confirmation"
-msgstr ""
+msgstr "Підтвердження виконання"
 
 #: ../include/locales/en_gb.inc.php:237
 msgid "Existing"
@@ -3984,7 +3985,7 @@ msgstr "Некоректний вузел мережі"
 #: ../api/classes/class.chostinterface.php:529
 #, php-format
 msgid "Incorrect interface DNS parameter \" %1$s \" provided."
-msgstr ""
+msgstr "Надано некоректний DNS параметр інтерфейсу \" %1$s \""
 
 #: ../api/classes/class.chostinterface.php:538
 #, php-format
@@ -4196,11 +4197,11 @@ msgstr "Проблема"
 
 #: ../api/classes/class.cuser.php:190
 msgid "It is not possible to filter by user password"
-msgstr ""
+msgstr "Неможливо фільтрувати по паролю користувача"
 
 #: ../api/classes/class.cuser.php:207
 msgid "It is not possible to search by user password"
-msgstr ""
+msgstr "Неможливо шукати по паролю користувача"
 
 #: ../include/locales/en_gb.inc.php:2033
 msgid "Italian (IT)"
@@ -5445,7 +5446,7 @@ msgstr "Не має прав доступу до комплексного екр
 
 #: ../maps.php:122
 msgid "No permissions or map does not exist."
-msgstr ""
+msgstr "Не має прав на карту мережі або вона не існує."
 
 #: ../include/locales/en_gb.inc.php:915
 msgid "No proxies defined"
@@ -6070,7 +6071,7 @@ msgstr "Будь ласка будьте уважні, бо в базі дани
 
 #: ../scripts.php:91
 msgid "Please enter confirmation text."
-msgstr ""
+msgstr "Будь-ласка введіть текст підтвердження."
 
 #: ../include/locales/en_gb.inc.php:1327
 msgid "Please select two elements"
@@ -6408,7 +6409,7 @@ msgstr "До вузла мережі Необхідо мати"
 
 #: ../include/forms/script.edit.php:114
 msgid "Required host permissions"
-msgstr ""
+msgstr "Необхідні права на вузел мережі"
 
 #: ../include/locales/en_gb.inc.php:625
 msgid "Required performance (vps)"
@@ -6789,7 +6790,7 @@ msgstr "Скрипт"
 #: ../scripts.php:87
 #, php-format
 msgid "Script [%s] already exists."
-msgstr ""
+msgstr "Скрипт [%s] вже існує."
 
 #: ../include/locales/en_gb.inc.php:1973
 msgid "Script added"
@@ -6810,7 +6811,7 @@ msgstr "Скрипт оновлено"
 #: ../api/classes/class.cscript.php:431 ../api/classes/class.cscript.php:487
 #, php-format
 msgid "Script with scriptid [%s] does not exist."
-msgstr ""
+msgstr "Скрипт зі scriptid [%s] не існує."
 
 #: ../include/locales/en_gb.inc.php:1963
 msgid "Scripts"
@@ -7206,7 +7207,7 @@ msgstr "Слайдшоу оновлено"
 
 #: ../include/locales.inc.php:80
 msgid "Slovak (SK)"
-msgstr ""
+msgstr "Словацька (SK)"
 
 #: ../include/locales/en_gb.inc.php:2015
 msgid "Snooze"
@@ -7541,7 +7542,7 @@ msgstr "Тест"
 
 #: ../include/forms/script.edit.php:124
 msgid "Test confirmation"
-msgstr ""
+msgstr "Тест підтвердження"
 
 #: ../include/locales/en_gb.inc.php:2118
 msgid "Test data"
@@ -7804,7 +7805,7 @@ msgstr "Тригер в шаблоні [ %1$s ] має залежність ві
 
 #: ../api/classes/class.ctriggerprototype.php:1072
 msgid "Trigger just added. No status update so far."
-msgstr ""
+msgstr "Трігер щойно було додано. Статус поки що не оновлювався."
 
 #: ../api/classes/class.ctriggerprototype.php:1324
 #, php-format
@@ -8461,7 +8462,7 @@ msgstr "Невірні поля для елемента комплексного
 
 #: ../api/classes/class.cscript.php:384
 msgid "Wrong fields for script"
-msgstr ""
+msgstr "Помилкові поля для скрипта"
 
 #: ../api/classes/class.ctrigger.php:1193
 #: ../api/classes/class.ctrigger.php:1251
