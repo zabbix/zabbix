@@ -36,6 +36,9 @@ $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 include_once('include/page_header.php');
 
+// js templates
+require_once('include/templates/scriptConfirm.js.php');
+
 //		VAR				TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'groupid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,			NULL),

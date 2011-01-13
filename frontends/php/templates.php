@@ -361,6 +361,7 @@ include_once('include/page_header.php');
 
 // CREATE/UPDATE TEMPLATE {{{
 		if($templateid){
+			$created = 0;
 			$template['templateid'] = $templateid;
 			$template['templates_clear'] = $templates_clear;
 
@@ -374,6 +375,7 @@ include_once('include/page_header.php');
 			$msg_fail = S_CANNOT_UPDATE_TEMPLATE;
 		}
 		else{
+			$created = 1;
 			$result = CTemplate::create($template);
 
 			if($result){
@@ -415,6 +417,9 @@ include_once('include/page_header.php');
 		show_messages($result, $msg_ok, $msg_fail);
 
 		if($result){
+			if($created){
+				add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TEMPLATE, $templateid, $template_name, 'hosts', NULL, NULL);
+			}
 			unset($_REQUEST['form']);
 			unset($_REQUEST['templateid']);
 		}

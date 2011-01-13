@@ -880,14 +880,14 @@ include_once('include/page_header.php');
 				$sql = 'SELECT COUNT(itemid) as cnt FROM items WHERE valuemapid='.$_REQUEST['valuemapid'];
 				$count = DBfetch(DBselect($sql));
 				if($count['cnt']){
-					$confirmMesage = _n('Delete selected value mapping? It is used for %d item!',
+					$confirmMessage = _n('Delete selected value mapping? It is used for %d item!',
 						'Delete selected value mapping? It is used for %d items!', $count['cnt']);
 				}
 				else{
-					$confirmMesage = _s('Delete selected value mapping?');
+					$confirmMessage = _s('Delete selected value mapping?');
 				}
 
-				$buttons[] = new CButtonDelete($confirmMesage,
+				$buttons[] = new CButtonDelete($confirmMessage,
 					url_param("form").url_param("valuemapid").url_param("config"));
 			}
 			$buttons[] = new CButtonCancel(url_param("config"));

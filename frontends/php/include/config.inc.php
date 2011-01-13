@@ -90,7 +90,7 @@ function __autoload($class_name){
 // ABC sorting
 	require_once('include/acknow.inc.php');
 	include_once('include/actions.inc.php');
-	include_once('include/discovery.inc.php');	
+	include_once('include/discovery.inc.php');
 	require_once('include/events.inc.php');
 	require_once('include/graphs.inc.php');
 	require_once('include/hosts.inc.php');
@@ -165,39 +165,43 @@ function __autoload($class_name){
 			$config->makeGlobal();
 		}
 		else{
-			unset($DB);
+			$show_warning = true;
+			define('ZBX_DISTRIBUTED', false);
+			define('ZBX_PAGE_NO_AUTHORIZATION', true);
 			error($config->error);
 		}
 
 		require_once('include/db.inc.php');
 
-		$error = '';
-		if(!DBconnect($error)){
-			$_REQUEST['message'] = $error;
+		if(!isset($show_warning)){
+			$error = '';
+			if(!DBconnect($error)){
+				$_REQUEST['message'] = $error;
 
-			define('ZBX_DISTRIBUTED', false);
-			define('ZBX_PAGE_NO_AUTHORIZATION', true);
+				define('ZBX_DISTRIBUTED', false);
+				define('ZBX_PAGE_NO_AUTHORIZATION', true);
 
-			$show_warning = true;
-		}
-		else{
-			global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID;
-
-// Init LOCAL NODE ID
-			if($local_node_data = DBfetch(DBselect('SELECT * FROM nodes WHERE nodetype=1 ORDER BY nodeid'))){
-				$ZBX_LOCALNODEID = $local_node_data['nodeid'];
-				$ZBX_LOCMASTERID = $local_node_data['masterid'];
-
-				$ZBX_NODES[$local_node_data['nodeid']] = $local_node_data;
-
-				define('ZBX_DISTRIBUTED', true);
+				$show_warning = true;
 			}
 			else{
-				define('ZBX_DISTRIBUTED', false);
+				global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID;
+
+// Init LOCAL NODE ID
+				if($local_node_data = DBfetch(DBselect('SELECT * FROM nodes WHERE nodetype=1 ORDER BY nodeid'))){
+					$ZBX_LOCALNODEID = $local_node_data['nodeid'];
+					$ZBX_LOCMASTERID = $local_node_data['masterid'];
+
+					$ZBX_NODES[$local_node_data['nodeid']] = $local_node_data;
+
+					define('ZBX_DISTRIBUTED', true);
+				}
+				else{
+					define('ZBX_DISTRIBUTED', false);
+				}
+				unset($local_node_data);
 			}
-			unset($local_node_data);
+			unset($error);
 		}
-		unset($error);
 	}
 	else{
 		if(file_exists($ZBX_CONFIGURATION_FILE)){
@@ -223,6 +227,8 @@ function __autoload($class_name){
 			$locale_found = false;
 			foreach($locales as $locale){
 				putenv('LC_ALL='.$locale);
+				putenv('LANG='.$locale);
+				putenv('LANGUAGE='.$locale);
 
 				if(setlocale(LC_ALL, $locale)){
 					$locale_found = true;
@@ -557,7 +563,7 @@ function __autoload($class_name){
 			if(isset($USER_DETAILS['debug_mode']) && !is_object($msg) && !$USER_DETAILS['debug_mode']){
 				$msg = preg_replace('/^\[.+?::.+?\]/', '', $msg);
 			}
-			array_push($ZBX_MESSAGES, array('type' => 'error', 'message' => '[ZABBIX_ERROR] '.$msg));
+			array_push($ZBX_MESSAGES, array('type' => 'error', 'message' => $msg));
 		}
 	}
 

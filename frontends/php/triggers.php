@@ -260,13 +260,13 @@ include_once('include/page_header.php');
 
 		if(($_REQUEST['go'] == 'activate')){
 			$status = TRIGGER_STATUS_ENABLED;
-			$status_old = array('status'=>0);
-			$status_new = array('status'=>1);
+			$status_old = array('status'=>1);
+			$status_new = array('status'=>0);
 		}
 		else {
 			$status = TRIGGER_STATUS_DISABLED;
-			$status_old = array('status'=>1);
-			$status_new = array('status'=>0);
+			$status_old = array('status'=>0);
+			$status_new = array('status'=>1);
 		}
 
 		DBstart();

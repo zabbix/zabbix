@@ -83,6 +83,7 @@ class CHostInterface extends CZBXAPI{
 // filter
 			'filter'					=> null,
 			'search'					=> null,
+			'searchByAny'			=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 
@@ -527,7 +528,7 @@ Copt::memoryPick();
 					&& !preg_match('/^'.ZBX_PREG_MACRO_NAME_FORMAT.'$/u', $interface['dns'])
 					&& !preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/u', $interface['dns']))
 				{
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect interface DNS paramter " %1$s " provided.', $interface['dns']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect interface DNS parameter " %1$s " provided.', $interface['dns']));
 				}
 			}
 
@@ -694,13 +695,14 @@ Copt::memoryPick();
  * @return array|boolean
  */
 	public static function delete($interfaceids){
-		if(empty($interfaceids)) return true;
-
-		$interfaceids = zbx_toArray($interfaceids);
-		$interfaces = zbx_toObject($interfaceids, 'interfaceid');
 
 		try{
 			self::BeginTransaction(__METHOD__);
+
+			if(empty($interfaceids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+
+			$interfaceids = zbx_toArray($interfaceids);
+			$interfaces = zbx_toObject($interfaceids, 'interfaceid');
 
 			self::checkInput($interfaces,__FUNCTION__);
 

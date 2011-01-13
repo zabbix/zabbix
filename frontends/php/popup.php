@@ -176,6 +176,7 @@ include_once('include/page_header.php');
 		'templated_hosts'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
 		'real_hosts'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
 		'normal_only'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
+		'simpleName'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
 
 		'itemtype'=>		array(T_ZBX_INT, O_OPT, null,   null,		null),
 		'value_types'=>		array(T_ZBX_INT, O_OPT, null,   BETWEEN(0,15),	null),
@@ -204,6 +205,7 @@ include_once('include/page_header.php');
 	$multiselect= get_request('multiselect', 0); //if create popup with checkboxes
 	$dstact 	= get_request('dstact', '');
 	$writeonly	= get_request('writeonly');
+	$simpleName	= get_request('simpleName');
 
 	$existed_templates = get_request('existed_templates', null);
 	$excludeids = get_request('excludeids', null);
@@ -1146,7 +1148,9 @@ include_once('include/page_header.php');
 			$row['host'] = $host['host'];
 
 			$row['node_name'] = get_node_name_by_elid($row['graphid'], null, ': ');
-			$name = $row['node_name'].$row['host'].':'.$row['name'];
+
+			if(!$simpleName)
+				$row['name'] = $row['node_name'].$row['host'].':'.$row['name'];
 
 			$description = new CSpan($row['name'],'link');
 
@@ -1258,7 +1262,8 @@ include_once('include/page_header.php');
 			$row['description'] = item_description($row);
 			$description = new CLink($row['description'],'#');
 
-			$row['description'] = $row['host'].':'.$row['description'];
+			if(!$simpleName)
+				$row['description'] = $row['host'].':'.$row['description'];
 
 			if($multiselect){
 				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", ".zbx_jsvalue($row['itemid']).");";

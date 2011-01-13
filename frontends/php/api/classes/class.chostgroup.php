@@ -78,6 +78,7 @@ class CHostGroup extends CZBXAPI{
 // filter
 			'filter'					=> null,
 			'search'					=> null,
+			'searchByAny'			=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 
@@ -723,12 +724,13 @@ COpt::memoryPick();
  * @return boolean
  */
 	public static function delete($groupids){
-		if(empty($groupids)) return true;
-
-		$groupids = zbx_toArray($groupids);
 
 		try{
 			self::BeginTransaction(__METHOD__);
+
+			if(empty($groupids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+
+			$groupids = zbx_toArray($groupids);
 
 			$options = array(
 				'groupids' => $groupids,

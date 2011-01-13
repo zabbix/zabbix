@@ -224,16 +224,7 @@ if(!isset($DB)){
 			}
 		}
 
-		unset(
-			$GLOBALS['DB'],
-			$GLOBALS['DB_TYPE'],
-			$GLOBALS['DB_SERVER'],
-			$GLOBALS['DB_PORT'],
-			$GLOBALS['DB_DATABASE'],
-			$GLOBALS['DB_USER'],
-			$GLOBALS['DB_PASSWORD'],
-			$GLOBALS['SQLITE_TRANSACTION']
-			);
+		unset($DB['DB']);
 
 		return $result;
 	}
@@ -926,7 +917,8 @@ else {
 				$search[] = $sql_parts['where']['search'];
 			}
 
-			$sql_parts['where']['search'] = '( '.implode(' OR ', $search).' )';
+			$glue = is_null($options['searchByAny']) || $options['searchByAny'] === false ? ' AND ' : ' OR ';
+			$sql_parts['where']['search'] = '( '.implode($glue, $search).' )';
 			return true;
 		}
 
@@ -963,7 +955,9 @@ else {
 			if(isset($sql_parts['where']['filter'])){
 				$filter[] = $sql_parts['where']['filter'];
 			}
-			$sql_parts['where']['filter'] = '( '.implode(' AND ', $filter).' )';
+
+			$glue = is_null($options['searchByAny']) || $options['searchByAny'] === false ? ' AND ' : ' OR ';
+			$sql_parts['where']['filter'] = '( '.implode($glue, $filter).' )';
 			return true;
 		}
 
@@ -1140,6 +1134,12 @@ else {
 						continue;
 					}
 
+					// check the size of the value to fit data type
+					if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR
+						&& zbx_strlen($value) > $table_schema['fields'][$field]['length']){
+						self::exception(self::SCHEMA_ERROR, _s('Value "%1$s" is too long for field "%2$s" - %3$d characters. Allowed length is %4$d characters.', $value, $field, zbx_strlen($value), $table_schema['fields'][$field]['length']));
+					}
+
 					// TODO: decide  if we allow to pass null to NOT NULL field using default instead
 					if(is_null($value)){
 						if($table_schema['fields'][$field]['null'])
@@ -1195,6 +1195,12 @@ else {
 				foreach($row['values'] as $field => $value){
 					if(!isset($table_schema['fields'][$field])){
 						continue;
+					}
+
+					// check the size of the value to fit data type
+					if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR
+						&& zbx_strlen($value) > $table_schema['fields'][$field]['length']){
+						self::exception(self::SCHEMA_ERROR, _s('Value "%1$s" is too long for field "%2$s" - %3$d characters. Allowed length is %4$d characters.', $value, $field, zbx_strlen($value), $table_schema['fields'][$field]['length']));
 					}
 
 // TODO: decide  if we allow to pass null to NOT NULL field using default instead
@@ -1273,16 +1279,6 @@ else {
 			if(!DBexecute($sql)) {
 				self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
 			}
-			return true;
-		}
-
-
-		public static function old_delete($table, $where){
-			$where = zbx_toArray($where);
-
-			$sql = 'DELETE FROM '.$table.' WHERE '.implode(' AND ', $where);
-			if(!DBexecute($sql)) self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
-
 			return true;
 		}
 

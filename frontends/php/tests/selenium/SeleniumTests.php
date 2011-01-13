@@ -21,6 +21,27 @@
 <?php
 require_once(dirname(__FILE__).'/testGeneric.php');
 require_once(dirname(__FILE__).'/testClicks.php');
+require_once(dirname(__FILE__).'/testPageActionsAutoregistration.php');
+require_once(dirname(__FILE__).'/testPageActionsDiscovery.php');
+require_once(dirname(__FILE__).'/testPageActionsTriggers.php');
+require_once(dirname(__FILE__).'/testPageDashboard.php');
+require_once(dirname(__FILE__).'/testPageDiscovery.php');
+require_once(dirname(__FILE__).'/testPageEvents.php');
+require_once(dirname(__FILE__).'/testPageHosts.php');
+require_once(dirname(__FILE__).'/testPageMaintenance.php');
+require_once(dirname(__FILE__).'/testPageMaps.php');
+require_once(dirname(__FILE__).'/testPageMediaTypes.php');
+require_once(dirname(__FILE__).'/testPageScreens.php');
+require_once(dirname(__FILE__).'/testPageScripts.php');
+require_once(dirname(__FILE__).'/testPageSearch.php');
+require_once(dirname(__FILE__).'/testPageSlideShows.php');
+require_once(dirname(__FILE__).'/testPageTemplates.php');
+require_once(dirname(__FILE__).'/testPageUserGroups.php');
+require_once(dirname(__FILE__).'/testPageUsers.php');
+require_once(dirname(__FILE__).'/testFormHost.php');
+require_once(dirname(__FILE__).'/testFormHostGroup.php');
+require_once(dirname(__FILE__).'/testFormProfile.php');
+require_once(dirname(__FILE__).'/testFormScreen.php');
 // ...
 
 class SeleniumTests
@@ -31,6 +52,27 @@ class SeleniumTests
 
 		$suite->addTestSuite('testGeneric');
 		$suite->addTestSuite('testClicks');
+		$suite->addTestSuite('testPageActionsAutoregistration');
+		$suite->addTestSuite('testPageActionsDiscovery');
+		$suite->addTestSuite('testPageActionsTriggers');
+		$suite->addTestSuite('testPageDashboard');
+		$suite->addTestSuite('testPageDiscovery');
+		$suite->addTestSuite('testPageEvents');
+		$suite->addTestSuite('testPageHosts');
+		$suite->addTestSuite('testPageMaintenance');
+		$suite->addTestSuite('testPageMaps');
+		$suite->addTestSuite('testPageMediaTypes');
+		$suite->addTestSuite('testPageScreens');
+		$suite->addTestSuite('testPageScripts');
+		$suite->addTestSuite('testPageSearch');
+		$suite->addTestSuite('testPageSlideShows');
+		$suite->addTestSuite('testPageTemplates');
+		$suite->addTestSuite('testPageUserGroups');
+		$suite->addTestSuite('testPageUsers');
+		$suite->addTestSuite('testFormHost');
+		$suite->addTestSuite('testFormHostGroup');
+		$suite->addTestSuite('testFormProfile');
+		$suite->addTestSuite('testFormScreen');
 		// ...
 
 		return $suite;

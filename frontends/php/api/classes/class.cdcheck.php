@@ -55,6 +55,7 @@ class CDCheck extends CZBXAPI{
 // filter
 			'filter'					=> null,
 			'search'					=> null,
+			'searchByAny'			=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 
