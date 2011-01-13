@@ -375,11 +375,11 @@ function get_operation_desc($type, $data){
 				if(!isset($data['opcommand_hst'])) $data['opcommand_hst'] = array();
 
 				foreach($data['opcommand_hst'] as $cnum => $command){
-					$result[] = array(bold(S_REMOTE_COMMANDS.': '), $command['command']);
+					$result[] = array(bold(S_REMOTE_COMMANDS.': '), BR(), zbx_nl2br($command['command']));
 				}
 
 				foreach($data['opcommand_grp'] as $cnum => $command){
-					$result[] = array(bold(S_REMOTE_COMMANDS.': '), $command['command']);
+					$result[] = array(bold(S_REMOTE_COMMANDS.': '), BR(), zbx_nl2br($command['command']));
 				}
 				break;
 			default:

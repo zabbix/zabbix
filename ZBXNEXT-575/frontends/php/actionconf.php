@@ -235,8 +235,6 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 				unset($new_operation['id']);
 				$_REQUEST['operations'][$id] = $new_operation;
 			}
-SDII($new_operation);
-SDII($_REQUEST['operations'][$id]);
 			unset($_REQUEST['new_operation']);
 		}
 		catch(APIException $e){
@@ -343,8 +341,8 @@ SDII($_REQUEST['operations'][$id]);
 
 			$action['name']			= get_request('name');
 			$action['eventsource']	= get_request('eventsource');
-			$action['evaltype']		= get_request('evaltype');
-			$action['esc_period']	= get_request('esc_period',0);
+			$action['evaltype']		= get_request('evaltype', 0);
+			$action['esc_period']	= get_request('esc_period', 0);
 			$action['status']		= get_request('status', 1);
 			$action['def_shortdata']= get_request('def_shortdata', ACTION_DEFAULT_SUBJ);
 			$action['def_longdata']	= get_request('def_longdata', ACTION_DEFAULT_MSG);
