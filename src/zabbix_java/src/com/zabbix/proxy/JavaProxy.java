@@ -27,7 +27,7 @@ public class JavaProxy
 					new ThreadPoolExecutor.CallerRunsPolicy());
 
 			while (true)
-				threadPool.execute(new RequestProcessor(socket.accept()));
+				threadPool.execute(new SocketProcessor(socket.accept()));
 		}
 		catch (Exception exception)
 		{
