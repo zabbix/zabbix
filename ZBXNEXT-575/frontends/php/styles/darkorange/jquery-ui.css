@@ -447,7 +447,7 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 .darkorange .ui-dialog .ui-dialog-content { position: relative; border: 0; padding: .5em 1em; background: none; overflow: auto; zoom: 1; }
 .darkorange .ui-dialog .ui-dialog-buttonpane { text-align: left; border-width: 1px 0 0 0; background-image: none; margin: .5em 0 0 0; padding: .3em 1em .5em .4em; }
 .darkorange .ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset { float: right; }
-.darkorange .ui-dialog .ui-dialog-buttonpane button { margin: .5em .4em .5em 0; cursor: pointer; }
+.darkorange .ui-dialog .ui-dialog-buttonpane button { margin: .5em .8em .5em 0; cursor: pointer; }
 .darkorange .ui-dialog .ui-resizable-se { width: 14px; height: 14px; right: 3px; bottom: 3px; }
 .darkorange .ui-draggable .ui-dialog-titlebar { cursor: move; }
 .darkorange .ui-sortable-placeholder { border: 1px dotted #dfdfdf;}

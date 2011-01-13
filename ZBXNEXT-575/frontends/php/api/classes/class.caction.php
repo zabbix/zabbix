@@ -73,7 +73,8 @@ class CAction extends CZBXAPI{
 // filter
 			'filter'				=> null,
 			'search'				=> null,
-			'startSearch'			=> null,
+			'searchByAny'			=> null,
+			'startSearch'				=> null,
 			'excludeSearch'			=> null,
 
 // OutPut
@@ -907,11 +908,13 @@ COpt::memoryPick();
 	}
 
 	public static function delete($actionids){
-		if(empty($actionids)) return true;
-		$actionids = zbx_toArray($actionids);
 
 		try{
 			self::BeginTransaction(__METHOD__);
+
+		if(empty($actionids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+
+		$actionids = zbx_toArray($actionids);
 
 			$options = array(
 				'actionids' => $actionids,

@@ -101,6 +101,7 @@ include_once('include/page_header.php');
 		'select_graphs' => API_OUTPUT_COUNT,
 		'select_applications' => API_OUTPUT_COUNT,
 		'output' => array('host','status'),
+		'searchByAny' => true
 	);
 	$db_hosts = CHost::get($params);
 
@@ -125,6 +126,7 @@ include_once('include/page_header.php');
 			'ip' => $search
 		),
 		'countOutput' => 1,
+		'searchByAny' => true
 	);
 
 	$overalCount = CHost::get($params);
@@ -222,7 +224,7 @@ include_once('include/page_header.php');
 		'nodeids'=> get_current_nodeid(true),
 		'output' => API_OUTPUT_EXTEND,
 		'search' => array('name' => $search),
-		'limit' => $rows_per_page,
+		'limit' => $rows_per_page
 	);
 
 	$db_hostGroups = CHostGroup::get($params);

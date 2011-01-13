@@ -413,6 +413,7 @@
 
 			$mainBttns->addItem($bttn);
 		}
+		$space = new CDiv($mainBttns, 'dt right');
 
 		$otherBttns = new CDiv($other);
 		$otherBttns->useJQueryStyle();
@@ -422,6 +423,6 @@
 
 		$footer = new CDiv(new CDiv(array($space, $buttons),'formrow'), 'objectgroup footer min-width ui-widget-content ui-corner-all');
 
-	return $footer;
+		return $footer;
 	}
 ?>

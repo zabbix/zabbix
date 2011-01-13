@@ -61,7 +61,8 @@ class CDiscoveryRule extends CZBXAPI{
 // filter
 			'filter'				=> null,
 			'search'				=> null,
-			'startSearch'			=> null,
+			'searchByAny'			=> null,
+			'startSearch'				=> null,
 			'excludeSearch'			=> null,
 
 // OutPut
@@ -914,12 +915,13 @@ COpt::memoryPick();
  * @return
  */
 	public static function delete($ruleids, $nopermissions=false){
-		if(empty($ruleids)) return true;
-
-		$ruleids = zbx_toHash($ruleids);
 
 		try{
 			self::BeginTransaction(__METHOD__);
+
+			if(empty($ruleids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+
+			$ruleids = zbx_toHash($ruleids);
 
 			$options = array(
 				'output' => API_OUTPUT_EXTEND,

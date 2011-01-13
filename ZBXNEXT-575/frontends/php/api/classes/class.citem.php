@@ -100,7 +100,8 @@ class CItem extends CZBXAPI{
 // filter
 			'filter'				=> null,
 			'search'				=> null,
-			'startSearch'			=> null,
+			'searchByAny'			=> null,
+			'startSearch'				=> null,
 			'excludeSearch'			=> null,
 
 // OutPut
@@ -1280,12 +1281,13 @@ COpt::memoryPick();
  * @return
  */
 	public static function delete($itemids, $nopermissions=false){
-		if(empty($itemids)) return true;
-
-		$itemids = zbx_toHash($itemids);
 
 		try{
 			self::BeginTransaction(__METHOD__);
+
+			if(empty($itemids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+
+			$itemids = zbx_toHash($itemids);
 
 			$options = array(
 				'itemids' => $itemids,

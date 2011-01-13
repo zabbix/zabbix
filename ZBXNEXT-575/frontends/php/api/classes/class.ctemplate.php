@@ -71,6 +71,7 @@ class CTemplate extends CZBXAPI{
 // filter
 			'filter'					=> null,
 			'search'					=> '',
+			'searchByAny'			=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 
@@ -1134,12 +1135,12 @@ COpt::memoryPick();
  * @return boolean
  */
 	public static function delete($templateids){
-		if(empty($templateids)) return true;
-
-		$templateids = zbx_toArray($templateids);
-
 		try{
 			self::BeginTransaction(__METHOD__);
+
+			if(empty($templateids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+
+			$templateids = zbx_toArray($templateids);
 
 			$options = array(
 				'templateids' => $templateids,
@@ -1828,7 +1829,7 @@ COpt::memoryPick();
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot sync graph prptotypes'));
+				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot sync graph prototypes'));
 
 				$result = CGraph::syncTemplates(array(
 					'hostids' => $targetid,

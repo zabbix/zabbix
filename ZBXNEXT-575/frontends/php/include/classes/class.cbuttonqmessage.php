@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-class CButtonQMessage extends CButton{
+class CButtonQMessage extends CSubmit{
  public $vars;
  public $msg;
  public $name;

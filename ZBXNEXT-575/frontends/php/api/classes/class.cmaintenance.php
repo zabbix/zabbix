@@ -75,6 +75,7 @@ class CMaintenance extends CZBXAPI{
 // filter
 			'filter'					=> null,
 			'search'					=> null,
+			'searchByAny'			=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 			'filter'				=> null,
@@ -138,7 +139,7 @@ class CMaintenance extends CZBXAPI{
 		else{
 			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
 
-			
+
 
 			$sql =
 				'SELECT DISTINCT m.maintenanceid'.
@@ -740,7 +741,7 @@ Copt::memoryPick();
 
 
 			self::EndTransaction(true, __METHOD__);
-			return true;
+			return array('maintenanceids'=> $maintenanceids);
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
@@ -801,7 +802,7 @@ Copt::memoryPick();
 			DB::delete('maintenances', $mid_cond);
 
 			self::EndTransaction(true, __METHOD__);
-			return true;
+			return array('maintenanceids'=> $maintenanceids);
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);

@@ -80,6 +80,7 @@ class CAlert extends CZBXAPI{
 // filter
 			'filter'					=> null,
 			'search'					=> null,
+			'searchByAny'			=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 			'time_from'				=> null,
@@ -550,7 +551,7 @@ COpt::memoryPick();
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 
 			self::EndTransaction(true, __METHOD__);
-			return true;
+			return array('alertids'=> $alertids);
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);

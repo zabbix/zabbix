@@ -72,6 +72,7 @@ class CProxy extends CZBXAPI{
 // filter
 			'filter'					=> null,
 			'search'					=> null,
+			'searchByAny'			=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 
@@ -501,13 +502,14 @@ class CProxy extends CZBXAPI{
  * @return array|boolean
  */
 	public static function delete($proxies){
-		if(empty($proxies)) return true;
-
-		$proxies = zbx_toArray($proxies);
-		$proxyids = zbx_objectValues($proxies, 'proxyid');
 
 		try{
 			self::BeginTransaction(__METHOD__);
+
+			if(empty($proxies)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+
+			$proxies = zbx_toArray($proxies);
+			$proxyids = zbx_objectValues($proxies, 'proxyid');
 
 			self::checkInput($proxies, __FUNCTION__);
 
