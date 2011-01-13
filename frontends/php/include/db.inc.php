@@ -892,6 +892,7 @@ else {
 		else return ' ';
 	}
 
+
 	function zbx_db_search($table, $options, &$sql_parts){
 		list($table, $tableShort) = explode(' ', $table);
 
@@ -906,10 +907,16 @@ else {
 			if(!isset($tableSchema['fields'][$field]) || zbx_empty($pattern)) continue;
 			if($tableSchema['fields'][$field]['type'] != DB::FIELD_TYPE_CHAR) continue;
 
+			// escaping parameter that is about to be used in LIKE statement
+			$pattern = str_replace("!", "!!", $pattern);
+			$pattern = str_replace("%", "!%", $pattern);
+			$pattern = str_replace("_", "!_", $pattern);
+
 			$search[$field] =
 				' UPPER('.$tableShort.'.'.$field.') '.
 				$exclude.' LIKE '.
-				zbx_dbstr($start.zbx_strtoupper($pattern).'%');
+				zbx_dbstr($start.zbx_strtoupper($pattern).'%').
+				" ESCAPE '!'";
 		}
 
 		if(!empty($search)){
