@@ -903,7 +903,8 @@ class zbxXML{
 						$options = array(
 							'filter' => array('host' => $host_db['host']),
 							'output' => API_OUTPUT_EXTEND,
-							'editable' => 1
+							'editable' => 1,
+							'selectInterfaces' => API_OUTPUT_EXTEND
 						);
 						if($host_db['status'] == HOST_STATUS_TEMPLATE)
 							$current_host = CTemplate::get($options);
@@ -916,6 +917,32 @@ class zbxXML{
 						else{
 							$current_host = reset($current_host);
 						}
+					}
+
+					// checking if host already exists - then some of the interfaces may need to be updated, but not created
+					// we can tell API that, by adding interfaceid to interface parameters
+					if($current_host){
+
+						// for every interface we got based on XML
+						for($i = 0; $i < count($host_db['interfaces']); $i++){
+							// checking every interface of current host
+							foreach($current_host['interfaces'] as $interface){
+								// if all parameters of interface are identical
+								if(
+									!isset($host_db['interfaces'][$i]['interfaceid'])
+									&& $interface['type'] == $host_db['interfaces'][$i]['type']
+									&& $interface['ip'] == $host_db['interfaces'][$i]['ip']
+									&& $interface['dns'] == $host_db['interfaces'][$i]['dns']
+									&& $interface['port'] == $host_db['interfaces'][$i]['port']
+									&& $interface['useip'] == $host_db['interfaces'][$i]['useip']
+								){
+									// this interface is the same as existing one!
+									$host_db['interfaces'][$i]['interfaceid'] = $interface['interfaceid'];
+									break;
+								}
+							}
+						}
+
 					}
 
 // HOST GROUPS {{{
@@ -1072,29 +1099,35 @@ class zbxXML{
 
 						// if this is an export from 1.8, we need to make some adjustments to items
 						if($old_version_input){
-							// getting just created interface ids
-							$inserted_host = CHost::get(array(
-								'filter' => array('hostid'=>$current_hostid),
-								'output' => API_OUTPUT_EXTEND,
-								'selectInterfaces' => API_OUTPUT_EXTEND
-							));
+							if ($host_db['status'] == HOST_STATUS_TEMPLATE){
+								// template has no interfaces
+								$host_db['interfaces'] == null;
+							}
+							else{
+								// getting just created interface ids
+								$inserted_host = CHost::get(array(
+									'filter' => array('hostid'=>$current_hostid),
+									'output' => API_OUTPUT_EXTEND,
+									'selectInterfaces' => API_OUTPUT_EXTEND
+								));
 
-							// we must know interface ids to assign them to items
-							$agent_interface_id = null;
-							$ipmi_interface_id = null;
-							$snmp_interfaces = array(); //hash 'port' => 'iterfaceid'
+								// we must know interface ids to assign them to items
+								$agent_interface_id = null;
+								$ipmi_interface_id = null;
+								$snmp_interfaces = array(); //hash 'port' => 'iterfaceid'
 
-							foreach($inserted_host[0]['interfaces'] as $interface){
-								switch($interface['type']){
-									case INTERFACE_TYPE_AGENT:
-										$agent_interface_id = $interface['interfaceid'];
-									break;
-									case INTERFACE_TYPE_IPMI:
-										$ipmi_interface_id = $interface['interfaceid'];
-									break;
-									case INTERFACE_TYPE_SNMP:
-										$snmp_interfaces[$interface['port']] = $interface['interfaceid'];
-									break;
+								foreach($inserted_host[0]['interfaces'] as $interface){
+									switch($interface['type']){
+										case INTERFACE_TYPE_AGENT:
+											$agent_interface_id = $interface['interfaceid'];
+										break;
+										case INTERFACE_TYPE_IPMI:
+											$ipmi_interface_id = $interface['interfaceid'];
+										break;
+										case INTERFACE_TYPE_SNMP:
+											$snmp_interfaces[$interface['port']] = $interface['interfaceid'];
+										break;
+									}
 								}
 							}
 						}
@@ -1110,39 +1143,46 @@ class zbxXML{
 								$item_db['port'] = $item_db['snmp_port'];
 								unset($item_db['snmp_port']);
 
-								// assigning appropriate interface depending on item type
-								switch($item_db['type']){
-									// zabbix agent interface
-									case ITEM_TYPE_ZABBIX:
-									case ITEM_TYPE_SIMPLE:
-									case ITEM_TYPE_EXTERNAL:
-									case ITEM_TYPE_DB_MONITOR:
-									case ITEM_TYPE_SSH:
-									case ITEM_TYPE_TELNET:
-										$item_db['interfaceid'] = $agent_interface_id;
-									break;
+								if ($host_db['status'] == HOST_STATUS_TEMPLATE){
+									// template has no interfaces
+									$item_db['interfaceid'] = null;
+								}
+								else{
 
-									// snmp interface
-									case ITEM_TYPE_SNMPV1:
-									case ITEM_TYPE_SNMPV2C:
-									case ITEM_TYPE_SNMPV3:
-										// for an item with different port - different interface
-										$item_db['interfaceid'] = $snmp_interfaces[$item_db['port']];
-									break;
+									// assigning appropriate interface depending on item type
+									switch($item_db['type']){
+										// zabbix agent interface
+										case ITEM_TYPE_ZABBIX:
+										case ITEM_TYPE_SIMPLE:
+										case ITEM_TYPE_EXTERNAL:
+										case ITEM_TYPE_DB_MONITOR:
+										case ITEM_TYPE_SSH:
+										case ITEM_TYPE_TELNET:
+											$item_db['interfaceid'] = $agent_interface_id;
+										break;
 
-									case ITEM_TYPE_IPMI:
-										$item_db['interfaceid'] = $ipmi_interface_id;
-									break;
+										// snmp interface
+										case ITEM_TYPE_SNMPV1:
+										case ITEM_TYPE_SNMPV2C:
+										case ITEM_TYPE_SNMPV3:
+											// for an item with different port - different interface
+											$item_db['interfaceid'] = $snmp_interfaces[$item_db['port']];
+										break;
 
-									// no interfaces required for these item types
-									case ITEM_TYPE_HTTPTEST:
-									case ITEM_TYPE_CALCULATED:
-									case ITEM_TYPE_AGGREGATE:
-									case ITEM_TYPE_INTERNAL:
-									case ITEM_TYPE_ZABBIX_ACTIVE:
-									case ITEM_TYPE_TRAPPER:
-										$item_db['interfaceid'] = null;
-									break;
+										case ITEM_TYPE_IPMI:
+											$item_db['interfaceid'] = $ipmi_interface_id;
+										break;
+
+										// no interfaces required for these item types
+										case ITEM_TYPE_HTTPTEST:
+										case ITEM_TYPE_CALCULATED:
+										case ITEM_TYPE_AGGREGATE:
+										case ITEM_TYPE_INTERNAL:
+										case ITEM_TYPE_ZABBIX_ACTIVE:
+										case ITEM_TYPE_TRAPPER:
+											$item_db['interfaceid'] = null;
+										break;
+									}
 								}
 							}
 
@@ -1280,7 +1320,7 @@ class zbxXML{
 									}
 								}
 								if(!$current_trigger){
-									throw new Exception('No permission for Trigger ['.$trigger_db['description'].']');
+									throw new Exception(_s('No permission for trigger "%s"', $trigger_db['description']));
 								}
 							}
 

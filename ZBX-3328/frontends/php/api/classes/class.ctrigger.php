@@ -1501,11 +1501,13 @@ COpt::memoryPick();
 		self::validateDependencies($triggers);
 
 		foreach($triggers as $tnum => $trigger){
-			foreach($trigger['dependencies'] as $triggerid_up){
-				DB::insert('trigger_depends', array(
-					'triggerid_down' => $triggerid,
-					'triggerid_up' => $triggerid_up
-				));
+			if(isset($trigger['dependencies'])){
+				foreach($trigger['dependencies'] as $triggerid_up){
+					DB::insert('trigger_depends', array(
+						'triggerid_down' => $triggerid,
+						'triggerid_up' => $triggerid_up
+					));
+				}
 			}
 		}
 
