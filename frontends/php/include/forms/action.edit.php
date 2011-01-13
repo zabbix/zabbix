@@ -351,7 +351,6 @@ require_once('include/templates/action.js.php');
 	$delay = count_operations_delay($data['operations'],$data['esc_period']);
 	foreach($data['operations'] as $id => $operation){
 		if(!str_in_array($operation['operationtype'], $allowedOperations)) continue;
-		if(!isset($operation['default_msg'])) $operation['default_msg'] = 0;
 		if(!isset($operation['opconditions'])) $operation['opconditions'] = array();
 		if(!isset($operation['mediatypeid'])) $operation['mediatypeid'] = 0;
 
