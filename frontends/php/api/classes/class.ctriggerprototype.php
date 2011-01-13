@@ -1174,7 +1174,7 @@ COpt::memoryPick();
 					unset($triggers[$tnum]['priority']);
 				if(isset($trigger['type']) && ($trigger['type'] == $dbTriggers[$trigger['triggerid']]['type']))
 					unset($triggers[$tnum]['type']);
-				if(isset($trigger['url']) && ($trigger['url'] == $dbTriggers[$trigger['triggerid']]['url']))
+				if(isset($trigger['url']) && strcmp($trigger['url'], $dbTriggers[$trigger['triggerid']]['url']) == 0)
 					unset($triggers[$tnum]['url']);
 				if(isset($trigger['status']) && ($trigger['status'] == $dbTriggers[$trigger['triggerid']]['status']))
 					unset($triggers[$tnum]['status']);
