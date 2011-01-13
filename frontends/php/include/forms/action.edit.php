@@ -347,7 +347,7 @@ require_once('include/templates/action.js.php');
 		new CCheckBox('all_operations',null,'checkAll("'.S_ACTION.'","all_operations","g_operationid");'),
 		S_STEPS, S_DETAILS, S_PERIOD.' ('.S_SEC_SMALL.')', S_DELAY, S_ACTION
 	));
-
+//SDII($data['operations']);
 	$delay = count_operations_delay($data['operations'],$data['esc_period']);
 	foreach($data['operations'] as $id => $operation){
 		if(!str_in_array($operation['operationtype'], $allowedOperations)) continue;
@@ -382,11 +382,7 @@ require_once('include/templates/action.js.php');
 		));
 
 		$tblOper->addItem(new CVar('operations['.$id.']', $operation));
-
-		foreach($operation['opconditions'] as $opcondid => $opcond){
-			foreach($opcond as $field => $value)
-				$tblOper->addItem(new CVar('operations['.$id.'][opconditions]['.$opcondid.']['.$field.']',$value));
-		}
+		$tblOper->addItem(new CVar('operations['.$id.'][opconditions]',$operation['opconditions']));
 	}
 
 	$footer = array();
@@ -557,7 +553,6 @@ require_once('include/templates/action.js.php');
 				$buttonRow->setAttribute('id', 'opCmdListFooter');
 
 				$cmdList->addRow($buttonRow);
-
 
 // Add Participations
 				if(!isset($new_operation['opcommand_grp'])) $new_operation['opcommand_grp'] = array();

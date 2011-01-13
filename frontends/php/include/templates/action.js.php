@@ -32,7 +32,7 @@
 	<span class="bold"> #{name} </span>
 </td>
 <td>
-	<textarea name="new_operation[opcommand_grp][#{opcommand_grpid}][command]" class="hidden"> #{command} </textarea>
+	<textarea name="new_operation[opcommand_grp][#{opcommand_grpid}][command]" class="hidden">#{command}</textarea>
 	<span class="italic" title="#{command}"> #{commandLine} </span>
 </td>
 <td>
@@ -53,7 +53,7 @@
 	<span class="bold"> #{host} </span>
 </td>
 <td>
-	<textarea name="new_operation[opcommand_hst][#{opcommand_hstid}][command]" class="hidden"> #{command} </textarea>
+	<textarea name="new_operation[opcommand_hst][#{opcommand_hstid}][command]" class="hidden">#{command}</textarea>
 	<span class="italic" title="#{command}"> #{commandLine} </span>
 </td>
 <td>

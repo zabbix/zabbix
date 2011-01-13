@@ -47,8 +47,15 @@ class CVar{
 			return;
 		}
 
-		$hiddenVar = new CInput('hidden', $name, zbx_htmlstr($value));
-		$hiddenVar->removeAttribute('class');
+		if(strpos($value, "\n") === false){
+			$hiddenVar = new CInput('hidden', $name, zbx_htmlstr($value));
+			$hiddenVar->removeAttribute('class');
+		}
+		else{
+			$hiddenVar = new CTextArea($name, $value);
+			$hiddenVar->setAttribute('class','hidden');
+		}
+
 		$this->var_container[] = $hiddenVar;
 	}
 
