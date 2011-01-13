@@ -68,16 +68,20 @@ class testFormLogin extends CWebTest
 
 	public function testFormLogin_LoginAfterIncorrectLogin()
 	{
+		// TODO
+		// Make sure to check for 'N  failed login attempts logged. Last failed attempt was from';
 		$this->markTestIncomplete();
 	}
 
 	public function testFormLogin_BlockAccount()
 	{
+		// TODO
 		$this->markTestIncomplete();
 	}
 
 	public function testFormLogin_BlockAccountAndRecoverAfter30Seconds()
 	{
+		// TODO
 		$this->markTestIncomplete();
 	}
 }
