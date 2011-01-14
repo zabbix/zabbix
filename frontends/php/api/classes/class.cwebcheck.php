@@ -260,8 +260,8 @@ COpt::memoryPick();
 			$obj_params = array(
 				'output' => $options['select_hosts'],
 				'webcheckids' => $webcheckids,
-				'nopermissions' => 1,
-				'preservekeys' => 1
+				'nopermissions' => true,
+				'preservekeys' => true
 			);
 			$hosts = CHost::get($obj_params);
 
@@ -306,18 +306,18 @@ COpt::memoryPick();
 			$webcheck_names = zbx_objectValues($webchecks, 'name');
 
 			if(!preg_grep('/^(['.ZBX_PREG_PRINT.'])+$/u', $webcheck_names)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_ONLY_CHARACTERS_ARE_ALLOWED);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Only characters are allowed'));
 			}
 
 			$options = array(
 				'filter' => array('name' => $webcheck_names),
 				'output' => API_OUTPUT_EXTEND,
-				'nopermissions' => 1,
-				'preservekeys' => 1,
+				'nopermissions' => true,
+				'preservekeys' => true,
 			);
 			$db_webchecks = self::get($options);
 			foreach($db_webchecks as $webcheck){
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_SCENARIO.' ['.$webcheck['name'].'] '.S_ALREADY_EXISTS_SMALL);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenarion [%s] already exists.', $webcheck['name']));
 			}
 
 
@@ -356,8 +356,8 @@ COpt::memoryPick();
 				'output' => API_OUTPUT_EXTEND,
 				'webcheckids' => $webcheckids,
 				'selectSteps' => API_OUTPUT_EXTEND,
-				'editable' => 1,
-				'preservekeys' => 1
+				'editable' => true,
+				'preservekeys' => true
 			));
 
 
@@ -367,25 +367,25 @@ COpt::memoryPick();
 				}
 
 				if(!check_db_fields(array('webcheckid' => null), $webcheck)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function'));
 				}
 
 				if(isset($webcheck['name'])){
 					if(!preg_match('/^(['.ZBX_PREG_PRINT.'])+$/u', $webcheck['name'])){
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_ONLY_CHARACTERS_ARE_ALLOWED);
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Only characters are allowed'));
 					}
 
 					$options = array(
 						'filter' => array('name' => $webcheck['name']),
-						'preservekeys' => 1,
-						'nopermissions' => 1,
+						'preservekeys' => true,
+						'nopermissions' => true,
 						'output' => API_OUTPUT_SHORTEN,
 					);
 					$webcheck_exist = self::get($options);
 					$webcheck_exist = reset($webcheck_exist);
 
 					if($webcheck_exist && ($webcheck_exist['webcheckid'] != $webcheck_exist['webcheckid']))
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_SCENARIO.' ['.$webcheck['name'].'] '.S_ALREADY_EXISTS_SMALL);
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario [%s] already exists.', $webcheck['name']));
 				}
 
 				$webcheck['curstate'] = HTTPTEST_STATE_UNKNOWN;
@@ -432,13 +432,12 @@ COpt::memoryPick();
 				DB::update('items', $checkitems_update);
 
 // update application
-			if(isset($webcheck['applicationid'])){
-				DB::update('items_applications', array(
-					'values' => array('applicationid' => $webcheck['applicationid']),
-					'where' => array(DBcondition('itemid', $itemids))
-				));
-			}
-
+				if(isset($webcheck['applicationid'])){
+					DB::update('items_applications', array(
+						'values' => array('applicationid' => $webcheck['applicationid']),
+						'where' => array(DBcondition('itemid', $itemids))
+					));
+				}
 
 
 // UPDATE STEPS
@@ -486,10 +485,9 @@ COpt::memoryPick();
 			$options = array(
 				'webcheckids' => $webcheckids,
 				'output' => API_OUTPUT_EXTEND,
-				'editable' => 1,
-				'extendoutput' => 1,
+				'editable' => true,
 				'select_hosts' => API_OUTPUT_EXTEND,
-				'preservekeys' => 1
+				'preservekeys' => true
 			);
 			$del_webchecks = self::get($options);
 
@@ -523,14 +521,14 @@ COpt::memoryPick();
 
 // TODO: REMOVE info
 			foreach($del_webchecks as $webcheck){
-				info(S_SCENARIO.' ['.$webcheck['name'].'] '.S_DELETED_SMALL);
+				info(_s('Scenario [%s] deleted.', $webcheck['name']));
 			}
 
 // TODO: REMOVE audit
 			foreach($del_webchecks as $webcheck){
 				$host = reset($webcheck['hosts']);
 				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCENARIO,
-					S_SCENARIO.' ['.$webcheck['name'].'] ['.$webcheck['webcheckid'].'] '.S_HOST.' ['.$host['host'].']');
+					_s('Scenario [%1$s] [%2$s] host [%3$s]', $webcheck['name'], $webcheck['webcheckid'], $host['host']));
 			}
 
 			self::EndTransaction(true, __METHOD__);
@@ -550,19 +548,19 @@ COpt::memoryPick();
 		$checkitems = array(
 			array(
 				// GETTEXT: Legend below graph
-				'description'	=> _s('Download speed for scenario \'%s\'', '$1'),
-				'key_'		=> 'web.test.in['.$webcheck['name'].',,bps]',
-				'type'		=> ITEM_VALUE_TYPE_FLOAT,
-				'units'		=> 'Bps',
-				'httptestitemtype'=> HTTPSTEP_ITEM_TYPE_IN
+				'description'		=> _s('Download speed for scenario \'%s\'', '$1'),
+				'key_'				=> 'web.test.in['.$webcheck['name'].',,bps]',
+				'value_type'		=> ITEM_VALUE_TYPE_FLOAT,
+				'units'				=> 'Bps',
+				'httptestitemtype'	=> HTTPSTEP_ITEM_TYPE_IN
 			),
 			array(
 				// GETTEXT: Legend below graph
-				'description'	=> _s('Failed step of scenario \'%s\'', '$1'),
-				'key_'		=> 'web.test.fail['.$webcheck['name'].']',
-				'type'		=> ITEM_VALUE_TYPE_UINT64,
-				'units'		=> '',
-				'httptestitemtype'=> HTTPSTEP_ITEM_TYPE_LASTSTEP
+				'description'		=> _s('Failed step of scenario \'%s\'', '$1'),
+				'key_'				=> 'web.test.fail['.$webcheck['name'].']',
+				'value_type'		=> ITEM_VALUE_TYPE_UINT64,
+				'units'				=> '',
+				'httptestitemtype'	=> HTTPSTEP_ITEM_TYPE_LASTSTEP
 			)
 		);
 
@@ -582,7 +580,6 @@ COpt::memoryPick();
 			$item['history'] = self::$history;
 			$item['trends'] = self::$trends;
 			$item['status'] = $webcheck['status'];
-			$item['applications'] = array($webcheck['applicationid']);
 		}
 		unset($item);
 
@@ -608,7 +605,7 @@ COpt::memoryPick();
 		DB::insert('httptestitem', $webcheckitems);
 
 		foreach($checkitems as $stepitem)
-			info(S_ITEM.' ['.$stepitem['key_'].'] '.S_CREATED_SMALL);
+			info(_s('Web item [%s] created.', $stepitem['key_']));
 	}
 
 	protected static function createStepsReal($webcheck, $websteps){
@@ -616,22 +613,21 @@ COpt::memoryPick();
 		$websteps_names = zbx_objectValues($websteps, 'name');
 
 		if(!preg_grep('/'.ZBX_PREG_PARAMS.'/i', $websteps_names))
-			self::exception(ZBX_API_ERROR_PARAMETERS, S_SCENARIO_STEP_NAME_SHOULD_CONTAIN.SPACE.S_PRINTABLE_ONLY);
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Scenario step name should contain only printable characters.'));
 
 		$sql = 'SELECT httpstepid, name'.
 				' FROM httpstep '.
 				' WHERE httptestid='.$webcheck['webcheckid'].
 					' AND '.DBcondition('name', $websteps_names, false, true);
 		if($httpstep_data = DBfetch(DBselect($sql))){
-			self::exception(ZBX_API_ERROR_PARAMETERS, S_STEP.' ['.$httpstep_data['name'].'] '.S_ALREADY_EXISTS_SMALL);
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Step [%s] already exists.', $httpstep_data['name']));
 		}
 
 		foreach($websteps as $snum=>$webstep){
 			$websteps[$snum]['httptestid'] = $webcheck['webcheckid'];
 			if($webstep['no'] <= 0)
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_SCENARIO_STEP_NUMBER_CANNOT_BE_LESS_ONE);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Scenario step number cannot be less than 1'));
 		}
-
 
 		$webstepids = DB::insert('httpstep', $websteps);
 
@@ -641,25 +637,25 @@ COpt::memoryPick();
 
 			$stepitems = array(
 				array(
-					'description'	=> _s('Download speed for step \'%1$s\' of scenario \'%2$s\'', '$2', '$1'),
-					'key_'		=> 'web.test.in['.$webcheck['name'].','.$webstep['name'].',bps]',
-					'type'		=> ITEM_VALUE_TYPE_FLOAT,
-					'units'		=> 'Bps',
-					'httpstepitemtype' => HTTPSTEP_ITEM_TYPE_IN
+					'description'		=> _s('Download speed for step \'%1$s\' of scenario \'%2$s\'', '$2', '$1'),
+					'key_'				=> 'web.test.in['.$webcheck['name'].','.$webstep['name'].',bps]',
+					'value_type'		=> ITEM_VALUE_TYPE_FLOAT,
+					'units'				=> 'Bps',
+					'httpstepitemtype'	 => HTTPSTEP_ITEM_TYPE_IN
 				),
 				array(
-					'description'	=> _s('Response time for step \'%1$s\' of scenario \'%2$s\'', '$2', '$1'),
-					'key_'		=> 'web.test.time['.$webcheck['name'].','.$webstep['name'].',resp]',
-					'type'		=> ITEM_VALUE_TYPE_FLOAT,
-					'units'		=> 's',
-					'httpstepitemtype' => HTTPSTEP_ITEM_TYPE_TIME
+					'description'		=> _s('Response time for step \'%1$s\' of scenario \'%2$s\'', '$2', '$1'),
+					'key_'				=> 'web.test.time['.$webcheck['name'].','.$webstep['name'].',resp]',
+					'value_type'		=> ITEM_VALUE_TYPE_FLOAT,
+					'units'				=> 's',
+					'httpstepitemtype' 	=> HTTPSTEP_ITEM_TYPE_TIME
 				),
 				array(
-					'description'	=> _s('Response code for step \'%1$s\' of scenario \'%2$s\'', '$2', '$1'),
-					'key_'		=> 'web.test.rspcode['.$webcheck['name'].','.$webstep['name'].']',
-					'type'		=> ITEM_VALUE_TYPE_UINT64,
-					'units'		=> '',
-					'httpstepitemtype' => HTTPSTEP_ITEM_TYPE_RSPCODE
+					'description'		=> _s('Response code for step \'%1$s\' of scenario \'%2$s\'', '$2', '$1'),
+					'key_'				=> 'web.test.rspcode['.$webcheck['name'].','.$webstep['name'].']',
+					'value_type'		=> ITEM_VALUE_TYPE_UINT64,
+					'units'				=> '',
+					'httpstepitemtype' 	=> HTTPSTEP_ITEM_TYPE_RSPCODE
 				)
 			);
 			foreach($stepitems as &$item){
@@ -668,23 +664,21 @@ COpt::memoryPick();
 					'hostid' => $webcheck['hostid']
 				));
 				if($items_exist)
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Item with key ['.$item['key_'].'] '.S_ALREADY_EXISTS_SMALL);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web item with key [%s] already exists.', $item['key_']));
 
 				$item['hostid'] = $webcheck['hostid'];
 				$item['delay'] = $webcheck['delay'];
 				$item['type'] = ITEM_TYPE_HTTPTEST;
 				$item['data_type'] = ITEM_DATA_TYPE_DECIMAL;
 				$item['trapper_hosts'] = 'localhost';
-				$item['data_type'] = ITEM_DATA_TYPE_DECIMAL;
 				$item['history'] = self::$history;
 				$item['trends'] = self::$trends;
 				$item['status'] = $webcheck['status'];
-				$item['applications'] = array($webcheck['applicationid']);
 			}
 			unset($item);
 
-
 			$step_itemids = DB::insert('items', $stepitems);
+
 
 			$itemApplications = array();
 			foreach($step_itemids as $itemid){
@@ -707,7 +701,7 @@ COpt::memoryPick();
 			DB::insert('httpstepitem', $webstepitems);
 
 			foreach($stepitems as $stepitem)
-				info(S_ITEM.' ['.$stepitem['key_'].'] '.S_CREATED_SMALL);
+				info(_s('Web item [%s] created.', $stepitem['key_']));
 		}
 	}
 
@@ -716,12 +710,12 @@ COpt::memoryPick();
 		$websteps_names = zbx_objectValues($websteps, 'name');
 
 		if(!preg_grep('/'.ZBX_PREG_PARAMS.'/i', $websteps_names))
-			self::exception(ZBX_API_ERROR_PARAMETERS, S_SCENARIO_STEP_NAME_SHOULD_CONTAIN.SPACE.S_PRINTABLE_ONLY);
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Scenario step name should contain only printable characters.'));
 
 
 		foreach($websteps as $snum => $webstep){
 			if($webstep['no'] <= 0)
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_SCENARIO_STEP_NUMBER_CANNOT_BE_LESS_ONE);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Scenario step number cannot be less than 1'));
 
 			$update = array(
 				'values' => $webstep,

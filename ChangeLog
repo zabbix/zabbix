@@ -10,6 +10,7 @@ New features:
  - [ZBX-3338] updated Ukrainian translation; thanks to zalex_ua (Richlv)
 
 Bug fixes:
+ - [ZBX-3405] fixed value_type for response code and failed step items when create webcheck (Vedmak)
  - [ZBX-3363] fixed possible crash of server while processing of {HOST.CONN}, {IPADDRESS} and {HOST.DNS} macros (Sasha)
  - [ZBX-3326] add X-Poedit-Basepath header to all locales (Richlv)
  - [ZBX-3369] fixed API return: true in more Classes methods *.update and *.delete (Vlad)
