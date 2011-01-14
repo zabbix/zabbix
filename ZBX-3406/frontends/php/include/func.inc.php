@@ -549,6 +549,17 @@ function zbx_empty($value){
 return false;
 }
 
+function zbx_isint($var){
+	if(is_int($var)) return true;
+
+	if(is_string($var))
+		if(ctype_digit($var) || (strcmp(intval($var), $var) == 0)) return true;
+	else
+		if(($var>0) && ctype_digit(strval($var))) return true;
+
+return preg_match("/^\-?[0-9]+$/", $var);
+}
+
 
 // STRING FUNCTIONS {{{
 if(!function_exists('zbx_stripslashes')){
