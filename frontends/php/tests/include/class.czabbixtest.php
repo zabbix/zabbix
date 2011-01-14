@@ -28,14 +28,14 @@ class CZabbixTest extends PHPUnit_Framework_TestCase
 {
 	public $ID=0;
 
-	function do_post_request($data,&$raw){
+	function do_post_request($data,&$debug){
 		global $URL;
 
-		$data = json_encode($data);
+		if(is_array($data)) $data = json_encode($data);
 
 //print("Request:\n".$data."\n");
 
-		$raw="----DATA FLOW-------\nRequest:\n$data\n\n";
+		$debug="\n----DATA FLOW-------\nRequest:\n$data\n\n";
 
 		$params = array(
 				'http' => array(
@@ -65,12 +65,19 @@ class CZabbixTest extends PHPUnit_Framework_TestCase
 
 		$this->ID++;
 //print("Response:\n".$response."\n\n");
-		$raw=$raw."Response:\n$response\n--------------------\n\n";
+		$debug=$debug."Response:\n$response\n--------------------\n\n";
 
 		return $response;
 	}
 
-	function call_api($method, $params, &$raw){
+	function api_call_raw($json, &$debug){
+		$response = $this->do_post_request($json,$debug);
+		$decoded = json_decode($response, true);
+
+		return $decoded;
+	}
+
+	function api_call($method, $params, &$debug){
 		global $ID;
 
 		$data = array(
@@ -80,11 +87,40 @@ class CZabbixTest extends PHPUnit_Framework_TestCase
 			'id'=> $this->ID
 		);
 
-		$response = $this->do_post_request($data,$raw);
+		$response = $this->do_post_request($data,$debug);
 		$decoded = json_decode($response, true);
 
 		return $decoded;
 	}
+
+	function api_acall($method, $params, &$debug){
+		global $ID;
+
+		$data = array(
+			'jsonrpc' => '2.0',
+			'method' => 'user.authenticate',
+			'params' => array('user'=>'Admin', 'password'=>'zabbix'),
+			'id'=> $this->ID
+		);
+
+		$response = $this->do_post_request($data,$debug);
+		$decoded = json_decode($response, true);
+		$auth=$decoded["result"];
+
+		$data = array(
+			'jsonrpc' => '2.0',
+			'method' => $method,
+			'params' => $params,
+			'auth' => $auth,
+			'id'=> $this->ID
+		);
+
+		$response = $this->do_post_request($data,$debug);
+		$decoded = json_decode($response, true);
+
+		return $decoded;
+	}
+
 
 	protected function setUp()
 	{
