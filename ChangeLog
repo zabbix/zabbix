@@ -66,6 +66,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
 
+ - [ZBX-3414] expressions for triggers with web items are marked as error in trigger wizard (Vedmak)
  - [ZBX-3406] better api validation (Vedmak)
  - [ZBX-3413] added escaping of parameters used in LIKE SQL statements (KB)
  - [ZBX-3391] fixed wrong comparison operators used for strings (Vlad)
