@@ -3,52 +3,53 @@ msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-01-14 09:28+0200\n"
-"PO-Revision-Date: \n"
-"Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
+"PO-Revision-Date: 2011-01-14 15:52+0200\n"
+"Last-Translator: qix <qix@the-wired.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
+"Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: nl\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Pootle 2.1.4\n"
 "X-Poedit-Basepath: ../../\n"
 
 #: include/locales/en_gb.inc.php:929
 msgid " - all groups - "
-msgstr ""
+msgstr " - alle groepen - "
 
 #: include/locales/en_gb.inc.php:2456 include/locales/en_gb.inc.php:2458
 msgid "\""
-msgstr ""
+msgstr "\""
 
 #: include/locales/en_gb.inc.php:2351
 msgid "\" deleted from host"
-msgstr ""
+msgstr "\" verwijderd van host"
 
 #: chart4.php:87 chart5.php:90
 #, php-format
 msgid "%1$s (year %2$s)"
-msgstr ""
+msgstr "%1$s (jaar %2$s)"
 
 #: include/locales/en_gb.inc.php:410
 msgid "&"
-msgstr ""
+msgstr "&"
 
 #: include/locales/en_gb.inc.php:2096
 msgid "'"
-msgstr ""
+msgstr "'"
 
 #: include/locales/en_gb.inc.php:2321
 msgid "' does not accept parameters."
-msgstr ""
+msgstr "' accepteert geen parameters."
 
 #: include/locales/en_gb.inc.php:111
 msgid "(no proxy)"
-msgstr ""
+msgstr "(geen proxy)"
 
 #: include/locales/en_gb.inc.php:217
 msgid "(select host first)"
-msgstr ""
+msgstr "(selecteer eerst een host)"
 
 #: include/locales/en_gb.inc.php:652
 msgid "- all -"
@@ -60,11 +61,11 @@ msgstr "- andere -"
 
 #: include/locales/en_gb.inc.php:301
 msgid "----[BULK ACKNOWLEDGE]----"
-msgstr ""
+msgstr "----[BEVESTIG IN BULK]----"
 
 #: include/locales/en_gb.inc.php:2316
 msgid "0 or 1"
-msgstr ""
+msgstr "0 of 1"
 
 #: include/locales/en_gb.inc.php:1448
 msgid "1 minute"
@@ -76,7 +77,7 @@ msgstr "10 seconden"
 
 #: include/locales/en_gb.inc.php:1436
 msgid "15 min"
-msgstr ""
+msgstr "15 min"
 
 #: include/locales/en_gb.inc.php:1447
 msgid "30 seconds"
@@ -84,11 +85,11 @@ msgstr "30 seconden"
 
 #: include/locales/en_gb.inc.php:723
 msgid "3D view"
-msgstr ""
+msgstr "3D aanzicht"
 
 #: include/locales/en_gb.inc.php:1435
 msgid "5 min"
-msgstr ""
+msgstr "5 min"
 
 #: include/locales/en_gb.inc.php:1449
 msgid "5 minutes"
@@ -108,23 +109,23 @@ msgstr "ACTIES"
 
 #: include/locales/en_gb.inc.php:298
 msgid "ALARM ACKNOWLEDGES"
-msgstr "ALARM HERKENNINGEN"
+msgstr "MELDING BEVESTIGINGEN"
 
 #: include/locales/en_gb.inc.php:408
 msgid "AND"
-msgstr ""
+msgstr "EN"
 
 #: include/locales/en_gb.inc.php:407
 msgid "AND / OR"
-msgstr ""
+msgstr "EN / OF"
 
 #: include/locales/en_gb.inc.php:1920
 msgid "API access"
-msgstr ""
+msgstr "API toegang"
 
 #: include/locales/en_gb.inc.php:1899
 msgid "API access updated"
-msgstr ""
+msgstr "API toegang bijgewerkt"
 
 #: include/locales/en_gb.inc.php:881
 msgid "APPLICATIONS"
@@ -132,11 +133,11 @@ msgstr "APPLICATIES"
 
 #: include/locales/en_gb.inc.php:1997
 msgid "AUDIT ACTIONS"
-msgstr ""
+msgstr "CONTROLEER ACTIES"
 
 #: include/locales/en_gb.inc.php:1996
 msgid "AUDIT LOGS"
-msgstr ""
+msgstr "CONTROLEER LOGBOEK"
 
 #: include/locales/en_gb.inc.php:1481
 msgid "AVAILABILITY REPORT"
@@ -148,35 +149,35 @@ msgstr "Accepteerbare SLA (in %)"
 
 #: include/locales/en_gb.inc.php:2431
 msgid "Account is blocked for"
-msgstr ""
+msgstr "Account is geblokkeerd voor"
 
 #: include/locales/en_gb.inc.php:1853
 msgid "Ack"
-msgstr "Hng"
+msgstr "Bvst"
 
 #: include/locales/en_gb.inc.php:294
 msgid "Acknowledge"
-msgstr "Herkenning"
+msgstr "Bevestigen"
 
 #: include/locales/en_gb.inc.php:299
 msgid "Acknowledge added"
-msgstr ""
+msgstr "Bevestiging toegevoegd"
 
 #: include/locales/en_gb.inc.php:296
 msgid "Acknowledge alarm by"
-msgstr "Bevesting Herkenning"
+msgstr "Melding bevestigd door"
 
 #: include/locales/en_gb.inc.php:1857
 msgid "Acknowledge status"
-msgstr ""
+msgstr "Bevestiging status"
 
 #: include/locales/en_gb.inc.php:1852
 msgid "Acknowledged"
-msgstr "Herkenning"
+msgstr "Bevestiging"
 
 #: include/locales/en_gb.inc.php:293
 msgid "Acknowledges"
-msgstr "Herkenningen"
+msgstr "Bevestigingen"
 
 #: include/locales/en_gb.inc.php:1998
 msgid "Action"
@@ -188,7 +189,7 @@ msgstr "Actie toegevoegd"
 
 #: include/locales/en_gb.inc.php:328
 msgid "Action conditions"
-msgstr ""
+msgstr "Actie voorwaarden"
 
 #: include/locales/en_gb.inc.php:382
 msgid "Action deleted"
@@ -196,7 +197,7 @@ msgstr "Actie verwijderd"
 
 #: include/locales/en_gb.inc.php:333
 msgid "Action operations"
-msgstr ""
+msgstr "Actie handelingen"
 
 #: include/locales/en_gb.inc.php:380
 msgid "Action updated"
@@ -212,19 +213,19 @@ msgstr "Acties verwijderd"
 
 #: include/locales/en_gb.inc.php:421
 msgid "Actions since"
-msgstr ""
+msgstr "Acties sinds"
 
 #: include/locales/en_gb.inc.php:82
 msgid "Activate selected"
-msgstr ""
+msgstr "Selectie activeren"
 
 #: include/locales/en_gb.inc.php:2129
 msgid "Activate selected applications?"
-msgstr ""
+msgstr "Geselecteerde applicaties activeren?"
 
 #: include/locales/en_gb.inc.php:84
 msgid "Activate selected hosts"
-msgstr ""
+msgstr "Geselecteerde hosts activeren"
 
 #: include/locales/en_gb.inc.php:628 include/locales/en_gb.inc.php:1136
 msgid "Active"
@@ -232,11 +233,11 @@ msgstr "Actief"
 
 #: include/locales/en_gb.inc.php:802
 msgid "Active since"
-msgstr ""
+msgstr "Actief sinds"
 
 #: include/locales/en_gb.inc.php:803
 msgid "Active till"
-msgstr ""
+msgstr "Actief tot"
 
 #: include/locales/en_gb.inc.php:1833
 msgid "Add"
@@ -244,31 +245,31 @@ msgstr "Toevoegen"
 
 #: include/locales/en_gb.inc.php:2533
 msgid "Add Service"
-msgstr ""
+msgstr "Service Toevoegen"
 
 #: include/locales/en_gb.inc.php:297
 msgid "Add comment by"
-msgstr "Voeg opmerking toe"
+msgstr "Opmerking toegevoegd door"
 
 #: include/locales/en_gb.inc.php:1291
 msgid "Add element"
-msgstr ""
+msgstr "Element toevoegen"
 
 #: include/locales/en_gb.inc.php:341
 msgid "Add host"
-msgstr ""
+msgstr "Host toevoegen"
 
 #: include/locales/en_gb.inc.php:1339
 msgid "Add link"
-msgstr ""
+msgstr "Koppeling toevoegen"
 
 #: include/locales/en_gb.inc.php:1227
 msgid "Add prototype"
-msgstr ""
+msgstr "Prototype toevoegen"
 
 #: include/locales/en_gb.inc.php:1939
 msgid "Add to"
-msgstr ""
+msgstr "Toevoegen aan"
 
 #: include/locales/en_gb.inc.php:1013
 msgid "Add to group"
@@ -280,19 +281,19 @@ msgstr "Toegevoegd"
 
 #: include/locales/en_gb.inc.php:2242
 msgid "Added host group"
-msgstr ""
+msgstr "Host groep toegevoegd"
 
 #: include/locales/en_gb.inc.php:2255
 msgid "Added new application"
-msgstr ""
+msgstr "Nieuwe applicatie toegevoegd"
 
 #: include/locales/en_gb.inc.php:2248
 msgid "Added new host"
-msgstr ""
+msgstr "Nieuwe host toegevoegd"
 
 #: include/locales/en_gb.inc.php:2217
 msgid "Added new item"
-msgstr ""
+msgstr "Nieuw item toegevoegd"
 
 #: include/locales/en_gb.inc.php:513
 msgid "Added new media type"
@@ -300,39 +301,39 @@ msgstr "Nieuw media type toegevoegd"
 
 #: include/locales/en_gb.inc.php:2305
 msgid "Added trigger"
-msgstr ""
+msgstr "Trigger toegevoegd"
 
 #: include/locales/en_gb.inc.php:1196
 msgid "Additional parameters"
-msgstr ""
+msgstr "Additionele parameters"
 
 #: include/locales/en_gb.inc.php:949
 msgid "Admin"
-msgstr ""
+msgstr "Beheerder"
 
 #: include/locales/en_gb.inc.php:520
 msgid "Administration"
-msgstr ""
+msgstr "Beheer"
 
 #: include/locales/en_gb.inc.php:1392
 msgid "Age"
-msgstr ""
+msgstr "Leeftijd"
 
 #: include/locales/en_gb.inc.php:1862
 msgid "Age less than"
-msgstr ""
+msgstr "Leeftijd minder dan"
 
 #: include/locales/en_gb.inc.php:203
 msgid "Agent"
-msgstr ""
+msgstr "Agent"
 
 #: include/locales/en_gb.inc.php:694
 msgid "Aggregated"
-msgstr "Aggregatie"
+msgstr "Geaggregeerd"
 
 #: include/locales/en_gb.inc.php:695
 msgid "Aggregated periods count"
-msgstr "Aggregatie periode telling"
+msgstr "Geaggregeerd periode telling"
 
 #: include/locales/en_gb.inc.php:1029 include/locales/en_gb.inc.php:1913
 msgid "Alias"
@@ -340,48 +341,48 @@ msgstr "Alias"
 
 #: include/locales/en_gb.inc.php:1271
 msgid "Align icons"
-msgstr ""
+msgstr "Iconen uitlijnen"
 
 #: include/forms/script.edit.php:88 include/forms/script.edit.php:100
 #: include/locales/en_gb.inc.php:650 include/locales/en_gb.inc.php:1421
 msgid "All"
-msgstr ""
+msgstr "Alle"
 
 #: include/locales/en_gb.inc.php:930
 msgid "All groups"
-msgstr ""
+msgstr "Alle groepen"
 
 #: include/locales/en_gb.inc.php:1354
 msgid "All links should have \"Name\" and \"URL\" specified"
-msgstr ""
+msgstr "Bij alle koppelingen moeten \"Naam\" en \"URL\" gespecificeerd zijn."
 
 #: include/locales/en_gb.inc.php:614
 msgid "All nodes"
-msgstr ""
+msgstr "Alle nodes"
 
 #: include/locales/en_gb.inc.php:1171
 msgid "Allowed hosts"
-msgstr "Toegestane gastheren"
+msgstr "Toegestane hosts"
 
 #: include/locales/en_gb.inc.php:2238
 msgid "An action type with description"
-msgstr ""
+msgstr "Een actie type met omschrijving"
 
 #: include/locales/en_gb.inc.php:2302
 msgid "An item key must be used in trigger expression"
-msgstr ""
+msgstr "In een Trigger formulering moet een Item key aanwezig zijn,"
 
 #: include/locales/en_gb.inc.php:2214
 msgid "An item with the Key"
-msgstr ""
+msgstr "Een Item met Key"
 
 #: include/locales/en_gb.inc.php:1858
 msgid "Any"
-msgstr ""
+msgstr "Iedere"
 
 #: include/locales/en_gb.inc.php:571
 msgid "Any character string included"
-msgstr ""
+msgstr "Iedere karakter string meegenomen"
 
 #: include/locales/en_gb.inc.php:879
 msgid "Application"
@@ -391,17 +392,17 @@ msgstr "Applicatie"
 #: api/classes/class.capplication.php:601
 #, php-format
 msgid "Application [%1$s:%2$s] updated."
-msgstr ""
+msgstr "Applicatie [%1$s:%2$s] bijgewerkt."
 
 #: api/classes/class.capplication.php:674
 #, php-format
 msgid "Application [%1$s] deleted"
-msgstr ""
+msgstr "Applicatie [%1$s] verwijderd."
 
 #: api/classes/class.ctemplate.php:2094
 #, php-format
 msgid "Application [%1$s] unlinked."
-msgstr ""
+msgstr "Applicatie [%1$s] ontkoppeld."
 
 #: include/locales/en_gb.inc.php:885
 msgid "Application added"
@@ -421,47 +422,47 @@ msgstr "Applicaties"
 
 #: include/locales/en_gb.inc.php:1303
 msgid "Apply"
-msgstr ""
+msgstr "Toepassen"
 
 #: include/locales/en_gb.inc.php:792
 msgid "Approach"
-msgstr ""
+msgstr "Benaderen"
 
 #: include/locales/en_gb.inc.php:59
 msgid "Apr"
-msgstr ""
+msgstr "Apr"
 
 #: include/locales/en_gb.inc.php:72 include/locales/en_gb.inc.php:828
 msgid "April"
-msgstr ""
+msgstr "April"
 
 #: include/locales/en_gb.inc.php:2102
 msgid "Are you sure you want to delete"
-msgstr ""
+msgstr "Bevestig om te verwijderen"
 
 #: include/locales/en_gb.inc.php:1164
 msgid "As is"
-msgstr "Als is"
+msgstr "Ongewijzigd"
 
 #: include/locales/en_gb.inc.php:1650
 msgid "As plain text"
-msgstr "Als platte teskst"
+msgstr "Als platte tekst"
 
 #: include/locales/en_gb.inc.php:1036
 msgid "Asset Tag"
-msgstr ""
+msgstr "Asset Tag"
 
 #: include/locales/en_gb.inc.php:823
 msgid "At"
-msgstr ""
+msgstr "Op"
 
 #: include/locales/en_gb.inc.php:774
 msgid "At least one host or group should be selected"
-msgstr ""
+msgstr "Er moet minstens één host of groep worden geselecteerd"
 
 #: include/locales/en_gb.inc.php:2317
 msgid "At least one item must be present in the trigger expression."
-msgstr ""
+msgstr "Er moet minstens één item aanwezig zijn in de Trigger formulering."
 
 #: include/locales/en_gb.inc.php:1995
 msgid "Audit"
@@ -469,39 +470,39 @@ msgstr "Controle"
 
 #: include/locales/en_gb.inc.php:63
 msgid "Aug"
-msgstr ""
+msgstr "Aug"
 
 #: include/locales/en_gb.inc.php:76 include/locales/en_gb.inc.php:832
 msgid "August"
-msgstr ""
+msgstr "Augustus"
 
 #: include/locales/en_gb.inc.php:631
 msgid "Authentication"
-msgstr ""
+msgstr "Authenticatie"
 
 #: include/forms/host.edit.php:510
 msgid "Authentication algorithm"
-msgstr ""
+msgstr "Authenticatie algoritme"
 
 #: include/locales/en_gb.inc.php:1206
 msgid "Authentication method"
-msgstr ""
+msgstr "Authenticatie methode"
 
 #: include/locales/en_gb.inc.php:632
 msgid "Authentication to Zabbix"
-msgstr ""
+msgstr "Authenticatie bij Zabbix"
 
 #: include/locales/en_gb.inc.php:354
 msgid "Auto registration"
-msgstr ""
+msgstr "Automatische registratie"
 
 #: include/locales/en_gb.inc.php:1933
 msgid "Auto-login"
-msgstr ""
+msgstr "Automatisch aanmelden"
 
 #: include/locales/en_gb.inc.php:1934
 msgid "Auto-logout (min 90 seconds)"
-msgstr ""
+msgstr "Automatisch afmelden (min. 90 seconden)"
 
 #: include/locales/en_gb.inc.php:960
 msgid "Availability"
@@ -509,7 +510,7 @@ msgstr "Beschikbaarheid"
 
 #: include/locales/en_gb.inc.php:1480
 msgid "Availability report"
-msgstr "Beschikbaarheids report"
+msgstr "Beschikbaarheids rapportage"
 
 #: include/locales/en_gb.inc.php:961
 msgid "Available"
@@ -517,31 +518,31 @@ msgstr "Beschikbaar"
 
 #: include/locales/en_gb.inc.php:404
 msgid "Average"
-msgstr "Gemiddelde"
+msgstr "Gemiddeld"
 
 #: include/locales/en_gb.inc.php:1586
 msgid "Average by"
-msgstr ""
+msgstr "Gemiddeld met"
 
 #: include/locales/en_gb.inc.php:1706
 msgid "Average problem"
-msgstr ""
+msgstr "Gemiddeld probleem"
 
 #: include/locales/en_gb.inc.php:680
 msgid "Axis side"
-msgstr ""
+msgstr "As positie"
 
 #: include/locales/en_gb.inc.php:2165
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: include/locales/en_gb.inc.php:232
 msgid "BACK"
-msgstr ""
+msgstr "TERUG"
 
 #: include/locales/en_gb.inc.php:231
 msgid "Back"
-msgstr ""
+msgstr "Terug"
 
 #: include/locales/en_gb.inc.php:542
 msgid "Background"
@@ -553,55 +554,55 @@ msgstr "Achtergrond afbeelding"
 
 #: include/locales/en_gb.inc.php:1578
 msgid "Bar reports"
-msgstr ""
+msgstr "Staafdiagram rapportages"
 
 #: include/locales/en_gb.inc.php:633
 msgid "Base DN"
-msgstr ""
+msgstr "Base DN"
 
 #: include/locales/en_gb.inc.php:211
 msgid "Basic authentication"
-msgstr ""
+msgstr "Basic authentication"
 
 #: include/locales/en_gb.inc.php:634
 msgid "Bind DN"
-msgstr ""
+msgstr "Bind DN"
 
 #: include/locales/en_gb.inc.php:635
 msgid "Bind Password"
-msgstr ""
+msgstr "Bind Password"
 
 #: include/locales/en_gb.inc.php:487
 msgid "Black & Blue"
-msgstr ""
+msgstr "Zwart en Blauw"
 
 #: include/locales/en_gb.inc.php:1947
 msgid "Blocked"
-msgstr ""
+msgstr "Geblokkeerd"
 
 #: include/locales/en_gb.inc.php:450
 msgid "Bold line"
-msgstr ""
+msgstr "Vette lijn"
 
 #: include/locales/en_gb.inc.php:1334
 msgid "Bottom"
-msgstr "onder"
+msgstr "Onderzijde"
 
 #: include/locales/en_gb.inc.php:1589
 msgid "Brighten"
-msgstr ""
+msgstr "Lichter maken"
 
 #: include/locales/en_gb.inc.php:302
 msgid "Bulk acknowledge"
-msgstr ""
+msgstr "Bulk bevestigen"
 
 #: include/locales/en_gb.inc.php:1483
 msgid "By host"
-msgstr ""
+msgstr "Op host"
 
 #: include/locales/en_gb.inc.php:1484
 msgid "By trigger template"
-msgstr ""
+msgstr "Op trigger sjabloon"
 
 #: include/locales/en_gb.inc.php:313
 msgid "CONFIGURATION OF ACTIONS"
@@ -609,19 +610,19 @@ msgstr "CONFIGURATIE VAN ACTIES"
 
 #: include/locales/en_gb.inc.php:909
 msgid "CONFIGURATION OF APPLICATIONS"
-msgstr ""
+msgstr "CONFIGURATIE VAN APPLICATIES"
 
 #: include/locales/en_gb.inc.php:104
 msgid "CONFIGURATION OF DISCOVERY"
-msgstr ""
+msgstr "CONFIGURATIE VAN DISCOVERY"
 
 #: include/locales/en_gb.inc.php:1219
 msgid "CONFIGURATION OF DISCOVERY RULES"
-msgstr ""
+msgstr "CONFIGURATIE VAN DISCOVERY REGELS"
 
 #: include/locales/en_gb.inc.php:1232
 msgid "CONFIGURATION OF GRAPH PROTOTYPES"
-msgstr ""
+msgstr "CONFIGURATIE VAN GRAFIEK PROTOTYPES"
 
 #: include/locales/en_gb.inc.php:702
 msgid "CONFIGURATION OF GRAPHS"
@@ -629,15 +630,15 @@ msgstr "CONFIGURATIE VAN GRAFIEKEN"
 
 #: include/locales/en_gb.inc.php:846
 msgid "CONFIGURATION OF HOST GROUPS"
-msgstr ""
+msgstr "CONFIGURATIE VAN HOST GROEPEN"
 
 #: include/locales/en_gb.inc.php:907
 msgid "CONFIGURATION OF HOSTS"
-msgstr ""
+msgstr "CONFIGURATIE VAN HOSTS"
 
 #: include/locales/en_gb.inc.php:1225
 msgid "CONFIGURATION OF ITEM PROTOTYPES"
-msgstr ""
+msgstr "CONFIGURATIE VAN ITEM PROTOTYPES"
 
 #: include/locales/en_gb.inc.php:1103
 msgid "CONFIGURATION OF ITEMS"
@@ -645,19 +646,19 @@ msgstr "CONFIGURATIE VAN ITEMS"
 
 #: include/locales/en_gb.inc.php:910
 msgid "CONFIGURATION OF MAINTENANCE PERIODS"
-msgstr ""
+msgstr "CONFIGURATIE VAN ONDERHOUDS PERIODEN"
 
 #: include/locales/en_gb.inc.php:1376
 msgid "CONFIGURATION OF MEDIA TYPES"
-msgstr ""
+msgstr "CONFIGURATIE VAN MEDIA TYPEN"
 
 #: include/locales/en_gb.inc.php:1286
 msgid "CONFIGURATION OF NETWORK MAPS"
-msgstr ""
+msgstr "CONFIGURATIE VAN NETWERK KAARTEN"
 
 #: include/locales/en_gb.inc.php:607
 msgid "CONFIGURATION OF NODES"
-msgstr ""
+msgstr "CONFIGURATIE VAN NODES"
 
 #: include/locales/en_gb.inc.php:621
 msgid "CONFIGURATION OF PROXIES"
