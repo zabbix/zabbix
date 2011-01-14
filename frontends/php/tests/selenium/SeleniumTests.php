@@ -31,6 +31,7 @@ require_once(dirname(__FILE__).'/testPageHosts.php');
 require_once(dirname(__FILE__).'/testPageMaintenance.php');
 require_once(dirname(__FILE__).'/testPageMaps.php');
 require_once(dirname(__FILE__).'/testPageMediaTypes.php');
+require_once(dirname(__FILE__).'/testPageNodes.php');
 require_once(dirname(__FILE__).'/testPageProxies.php');
 require_once(dirname(__FILE__).'/testPageScreens.php');
 require_once(dirname(__FILE__).'/testPageScripts.php');
@@ -64,6 +65,7 @@ class SeleniumTests
 		$suite->addTestSuite('testPageMaintenance');
 		$suite->addTestSuite('testPageMaps');
 		$suite->addTestSuite('testPageMediaTypes');
+		$suite->addTestSuite('testPageNodes');
 		$suite->addTestSuite('testPageProxies');
 		$suite->addTestSuite('testPageScreens');
 		$suite->addTestSuite('testPageScripts');
