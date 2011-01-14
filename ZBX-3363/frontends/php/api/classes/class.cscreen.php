@@ -730,7 +730,7 @@ SDI('/////////////////////////////////');
 			DB::update('screens', $update);
 
 			self::EndTransaction(true, __METHOD__);
-			return true;
+			return array('screenids' => zbx_objectValues($screens, 'screenid'));
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
@@ -830,6 +830,9 @@ SDI('/////////////////////////////////');
 		);
 		$screens = self::get($options);
 
+		$templateScreens = CTemplateScreen::get($options);
+
+		$screens = array_merge($screens, $templateScreens);
 
 		foreach($data['screenitems'] as $new_item){
 			$items_db_fields = array(

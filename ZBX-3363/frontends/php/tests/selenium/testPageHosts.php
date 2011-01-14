@@ -19,24 +19,14 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/class.ctest.php');
+require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageHosts extends CTest
+class testPageHosts extends CWebTest
 {
 	// Returns all hosts
 	public static function allHosts()
 	{
-		DBconnect($error);
-
-		$hosts=array();
-
-		$result=DBselect('select * from hosts where status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')');
-		while($host=DBfetch($result))
-		{
-			$hosts[]=array($host);
-		}
-		DBclose();
-		return $hosts;
+		return DBdata('select * from hosts where status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')');
 	}
 
 	/**

@@ -885,12 +885,13 @@ COpt::memoryPick();
  * @return
  */
 	public static function delete($prototypeids, $nopermissions=false){
-		if(empty($prototypeids)) return true;
-
-		$prototypeids = zbx_toHash($prototypeids);
 
 		try{
 			self::BeginTransaction(__METHOD__);
+
+			if(empty($prototypeids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+
+			$prototypeids = zbx_toHash($prototypeids);
 
 			$options = array(
 				'itemids' => $prototypeids,

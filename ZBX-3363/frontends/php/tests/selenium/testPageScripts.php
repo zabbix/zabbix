@@ -19,24 +19,14 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/class.ctest.php');
+require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageScripts extends CTest
+class testPageScripts extends CWebTest
 {
 	// Returns all scripts
 	public static function allScripts()
 	{
-		DBconnect($error);
-
-		$scripts=array();
-
-		$result=DBselect('select * from scripts');
-		while($script=DBfetch($result))
-		{
-			$scripts[]=array($script);
-		}
-		DBclose();
-		return $scripts;
+		return DBdata('select * from scripts');
 	}
 
 	/**
@@ -65,7 +55,7 @@ class testPageScripts extends CTest
 		$name=$script['name'];
 
 		$sql="select * from scripts where name='$name' order by scriptid";
-		$oldHash=$this->DBhash($sql);
+		$oldHash=DBhash($sql);
 
 		$this->login('scripts.php');
 		$this->assertTitle('Scripts');
@@ -78,7 +68,7 @@ class testPageScripts extends CTest
 		$this->ok($name);
 		$this->ok('CONFIGURATION OF SCRIPTS');
 
-		$this->assertEquals($oldHash,$this->DBhash($sql));
+		$this->assertEquals($oldHash,DBhash($sql));
 	}
 
 	/**
@@ -88,7 +78,7 @@ class testPageScripts extends CTest
 	{
 		$scriptid=$script['scriptid'];
 
-		$this->DBsave_tables('scripts');
+		DBsave_tables(array('scripts'));
 		$this->chooseOkOnNextConfirmation();
 
 		$this->login('scripts.php');
@@ -103,9 +93,9 @@ class testPageScripts extends CTest
 		$this->ok('Script deleted');
 
 		$sql="select * from scripts where scriptid='$scriptid'";
-		$this->assertEquals(0,$this->DBcount($sql));
+		$this->assertEquals(0,DBcount($sql));
 
-		$this->DBrestore_tables('scripts');
+		DBrestore_tables(array('scripts'));
 	}
 }
 ?>
