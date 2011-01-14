@@ -49,7 +49,7 @@ class API_JSON_User extends CZabbixTest
 	*/
 	public function testUser_Authenticate($data,$expect)
 	{
-		$result = $this->call_api(
+		$result = $this->api_call(
 			'user.authenticate',
 			$data,
 			&$debug);
@@ -63,13 +63,11 @@ class API_JSON_User extends CZabbixTest
 		}
 	}
 
-	/**
-	* @dataProvider allUsers
-	*/
-	public function testPageUsers_SimpleTest($user)
+	public function testUser_Authenticate_ResetAttemptsAfterSuccesfullAuth()
 	{
+		// TODO
+		$this->markTestIncomplete();
 	}
-
 
 	public function testUser_Authenticate_Documented()
 	{

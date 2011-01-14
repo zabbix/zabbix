@@ -19,21 +19,32 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/APIInfo.php');
-require_once(dirname(__FILE__).'/General.php');
-require_once(dirname(__FILE__).'/User.php');
+require_once 'PHPUnit/Framework.php';
 
-class ApiJsonTests
+require_once(dirname(__FILE__).'/../include/class.czabbixtest.php');
+
+class API_JSON_General extends CZabbixTest
 {
-	public static function suite()
+	public function testGeneral_IncorrectAuthForNonAuthMethod()
 	{
-		$suite = new PHPUnit_Framework_TestSuite('API_JSON');
+		$json='{
+			"jsonrpc":"2.0",
+			"method":"apiinfo.version",
+			"params":[],
+			"auth":"<incorrect auth>",
+			"id":2
+		}';
+		$result = $this->api_call_raw($json, &$debug);
 
-		$suite->addTestSuite('API_JSON_APIInfo');
-		$suite->addTestSuite('API_JSON_General');
-		$suite->addTestSuite('API_JSON_User');
+		echo $debug;
+		print_r($result);
+		$this->assertTrue(isset($result['error']),"Chuck Norris: 'auth' must be verified if given. Always! $debug");
+		$this->assertTrue(false,"Chuck Norris: It should be documented!");
+	}
 
-		return $suite;
+	public function testGeneral_IncorrectMethodName()
+	{
+		$this->markTestIncomplete();
 	}
 }
 ?>
