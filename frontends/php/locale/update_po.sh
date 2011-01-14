@@ -3,16 +3,21 @@
 echo "Generating translation template..."
 
 # xgettext will be used on all php files
-find .. -type f -name '*.php' | sort -d -f > POTFILES.in
+
+cd $(dirname $0)/..
+directory=$PWD
+find ./ -type f -name '*.php' | sort -d -f > locale/POTFILES.in
 
 # keyword "_n" is Zabbix frontend plural function
 # keyword "_s" is Zabbix frontend placeholder function
 # keyword "_x" is Zabbix frontend context function
-xgettext --files-from=POTFILES.in --from-code=UTF-8 --output=frontend.pot \
+xgettext --files-from=locale/POTFILES.in --from-code=UTF-8 \
+--output=locale/frontend.pot \
 --copyright-holder="SIA Zabbix" --no-wrap --sort-output \
 --add-comments="GETTEXT:" --keyword=_n:1,2 --keyword=_s \
 --keyword=_x:1,2c || exit 1
 
+cd $directory/locale
 #--sort-by-file
 
 echo "Merging new strings in po files..."
