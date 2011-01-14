@@ -549,7 +549,7 @@ function zbx_empty($value){
 return false;
 }
 
-function zbx_isint($var){
+function zbx_is_int($var){
 	if(is_int($var)) return true;
 
 	if(is_string($var))

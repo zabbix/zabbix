@@ -186,7 +186,7 @@ class CProfile{
 				$result = zbx_ctype_digit($value);
 				break;
 			case PROFILE_TYPE_INT:
-				$result = zbx_isint($value);
+				$result = zbx_is_int($value);
 				break;
 			default:
 				$result = true;
