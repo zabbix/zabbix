@@ -243,9 +243,9 @@ frontends/php/styles/originalblue/images/ui-icons_f9bd01_256x240.png -text
 frontends/php/tests/api/classes/class.triggerexpressionTest.php -text
 frontends/php/tests/api_json/ApiJsonTests.php -text
 frontends/php/tests/api_json/User.php -text
-frontends/php/tests/api_json/api.php -text
 frontends/php/tests/bootstrap.php.template -text
 frontends/php/tests/include/class.cwebtest.php -text
+frontends/php/tests/include/class.czabbixtest.php -text
 frontends/php/tests/include/dbfunc.php -text
 frontends/php/tests/selenium/SeleniumTests.php -text
 frontends/php/tests/selenium/testClicks.php -text
