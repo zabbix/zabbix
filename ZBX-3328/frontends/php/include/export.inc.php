@@ -851,7 +851,7 @@ class zbxXML{
 						);
 
 						// did host use impi? if so, adding another interface of ipmi type
-						if($host_db['useipmi']){
+						if(isset($host_db['useipmi']) && $host_db['useipmi']){
 							$host_db['interfaces'][] = array(
 								'main' => INTERFACE_SECONDARY,
 								'type' => INTERFACE_TYPE_IPMI,
