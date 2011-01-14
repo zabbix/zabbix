@@ -10,6 +10,7 @@ New features:
  - [ZBX-3338] updated Ukrainian translation; thanks to zalex_ua (Richlv)
 
 Bug fixes:
+ - [ZBX-3326] add X-Poedit-Basepath header to all locales (Richlv)
  - [ZBX-3369] fixed API return: true in more Classes methods *.update and *.delete (Vlad)
  - [ZBX-3368] fixed custom graphs in screens form prefixed with ':' (Vedmak)
  - [ZBX-3329] fixed last value in latest data, status of triggers, and web monitoring (Vlad)
