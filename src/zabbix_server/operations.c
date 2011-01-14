@@ -330,50 +330,46 @@ static zbx_uint64_t	select_discovered_host(DB_EVENT *event)
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	hostid = 0;
+	char		sql[512];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(eventid:" ZBX_FS_UI64 ")",
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64,
 			__function_name, event->eventid);
 
-	switch (event->object) {
-	case EVENT_OBJECT_DHOST:
-		result = DBselect(
-				"select distinct i.hostid"
-				" from interface i,dservices ds"
-				" where ds.ip=i.ip"
-					" and ds.dhostid=" ZBX_FS_UI64
-					DB_NODE,
-				event->objectid, DBnode_local("i.interfaceid"));
-		break;
-	case EVENT_OBJECT_DSERVICE:
-		result = DBselect(
-				"select distinct i.hostid"
-				" from interface i,dservices ds"
-				" where ds.ip=i.ip"
-					" and ds.dserviceid=" ZBX_FS_UI64
-					DB_NODE,
-				event->objectid, DBnode_local("i.interfaceid"));
-		break;
-	case EVENT_OBJECT_ZABBIX_ACTIVE:
-		result = DBselect(
-				"select h.hostid"
-				" from hosts h,autoreg_host a"
-				" where " ZBX_SQL_NULLCMP("a.proxy_hostid", "h.proxy_hostid")
-					" and a.host=h.host"
-					" and a.autoreg_hostid=" ZBX_FS_UI64
-					DB_NODE,
-				event->objectid, DBnode_local("h.hostid"));
-		break;
-	default:
-		return 0;
+	switch (event->object)
+	{
+		case EVENT_OBJECT_DHOST:
+			zbx_snprintf(sql, sizeof(sql),
+					"select i.hostid"
+					" from interface i,dservices ds"
+					" where ds.ip=i.ip"
+						" and ds.dhostid=" ZBX_FS_UI64
+						DB_NODE
+					" order by i.hostid",
+					event->objectid, DBnode_local("i.interfaceid"));
+			break;
+		case EVENT_OBJECT_DSERVICE:
+			zbx_snprintf(sql, sizeof(sql),
+					"select i.hostid"
+					" from interface i,dservices ds"
+					" where ds.ip=i.ip"
+						" and ds.dserviceid=" ZBX_FS_UI64
+						DB_NODE
+					" order by i.hostid",
+					event->objectid, DBnode_local("i.interfaceid"));
+			break;
+		default:
+			goto exit;
 	}
+
+	result = DBselectN(sql, 1);
 
 	if (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(hostid, row[0]);
 	}
 	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End %s()", __function_name);
+exit:
+	zabbix_log(LOG_LEVEL_DEBUG, "End %s():" ZBX_FS_UI64, __function_name, hostid);
 
 	return hostid;
 }
@@ -599,17 +595,22 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 
 		if (NULL != (row = DBfetch(result)))
 		{
+			char	sql[512];
+
 			ZBX_DBROW2UINT64(proxy_hostid, row[0]);
 			host_esc = DBdyn_escape_string_len(row[1], HOST_HOST_LEN);
 			port = (unsigned short)atoi(row[3]);
 
-			result2 = DBselect(
+			zbx_snprintf(sql, sizeof(sql),
 					"select hostid,proxy_hostid"
 					" from hosts"
 					" where host='%s'"
-						DB_NODE,
+						DB_NODE
+					" order by hostid",
 					host_esc,
 					DBnode_local("hostid"));
+
+			result2 = DBselectN(sql, 1);
 
 			if (NULL == (row2 = DBfetch(result2)))
 			{
