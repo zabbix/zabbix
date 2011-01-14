@@ -180,7 +180,7 @@ class testPageActionsDiscovery extends CWebTest
 		$this->getConfirmation();
 
 		$this->assertTitle('Configuration of actions');
-		$this->ok('Action deleted');
+		$this->ok('Selected actions deleted.');
 		$this->ok('CONFIGURATION OF ACTIONS');
 
 		$sql="select * from actions where actionid=$actionid";
