@@ -115,13 +115,13 @@ class testPageMaps extends CWebTest
 		$this->ok('Network map deleted');
 
 		$sql="select * from sysmaps where sysmapid=$sysmapid";
-		$this->assertEquals(0,DBcount($sql));
+		$this->assertEquals(0,DBcount($sql),'Data from sysmaps table was not deleted');
 		$sql="select * from sysmaps_elements where sysmapid=$sysmapid";
-		$this->assertEquals(0,DBcount($sql));
+		$this->assertEquals(0,DBcount($sql),'Data from sysmaps_elements table was not deleted');
 		$sql="select * from sysmaps_links where sysmapid=$sysmapid";
-		$this->assertEquals(0,DBcount($sql));
+		$this->assertEquals(0,DBcount($sql),'Data from sysmaps_links table was not deleted');
 		$sql="select * from sysmaps_link_triggers where linkid in (select linkid from sysmaps_links where sysmapid=$sysmapid) order by linktriggerid";
-		$this->assertEquals(0,DBcount($sql));
+		$this->assertEquals(0,DBcount($sql),'Data from sysmaps_link_triggers table was not deleted');
 
 		DBsave_tables(array('sysmaps','sysmaps_elements','sysmaps_links','sysmaps_link_triggers'));
 	}
