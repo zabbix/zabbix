@@ -363,6 +363,9 @@
 	'S_INCORRECT_STEPS'=>			'Incorrect steps',
 	'S_SELECTED_ACTIONS'=>			'selected actions?',
 
+	'S_SELECTED_ACTIONS_DELETED' => 'Selected actions deleted.',
+	'S_CANNOT_DELETE_SELECTED_ACTIONS' => 'Cannot delete selected actions.',
+
 //	actions.php
 	'S_ACTIONS'=>				'Actions',
 	'S_INCORRECT_ESCALATION_PERIOD' => 'Incorrect escalation period',
