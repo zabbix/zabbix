@@ -274,6 +274,7 @@ frontends/php/tests/selenium/testPageScreens.php -text
 frontends/php/tests/selenium/testPageScripts.php -text
 frontends/php/tests/selenium/testPageSearch.php -text
 frontends/php/tests/selenium/testPageSlideShows.php -text
+frontends/php/tests/selenium/testPageStatusOfZabbix.php -text
 frontends/php/tests/selenium/testPageTemplates.php -text
 frontends/php/tests/selenium/testPageUserGroups.php -text
 frontends/php/tests/selenium/testPageUsers.php -text
