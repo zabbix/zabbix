@@ -65,14 +65,6 @@
 			),
 		);
 
-		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['delta']	= array(
-			'args' => array( array('type' => 'sec_num','mandat' => true) ),
-			'item_types' => array(
-				ITEM_VALUE_TYPE_FLOAT,
-				ITEM_VALUE_TYPE_UINT64
-			),
-		);
-
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['change']	= array('args' => null,
 			'item_types' => array(
 				ITEM_VALUE_TYPE_FLOAT,
@@ -100,6 +92,14 @@
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['date']	= array('args' => null, 'item_types' => null );
 
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['dayofweek']= array('args' => null,	'item_types' => null );
+
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['delta']	= array(
+			'args' => array( array('type' => 'sec_num','mandat' => true) ),
+			'item_types' => array(
+				ITEM_VALUE_TYPE_FLOAT,
+				ITEM_VALUE_TYPE_UINT64
+			),
+		);
 
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['diff']	= array('args' => null,
 			'item_types' => array(
@@ -138,6 +138,18 @@
 			)
 		);
 
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['logseverity']= array('args' => null,
+			'item_types' => array(
+				ITEM_VALUE_TYPE_LOG
+			)
+		);
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['logsource']= array(
+			'args' => array( array('type' => 'str','mandat' => true) ),
+			'item_types' => array(
+				ITEM_VALUE_TYPE_LOG
+			)
+		);
+
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['max']	= array(
 			'args' => array( array('type' => 'sec_num','mandat' => true) ),
 			'item_types' => array(
@@ -171,8 +183,26 @@
 			)
 		);
 
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['regexp']= array(
+			'args' => array( array('type' => 'str','mandat' => true) ),
+			'item_types' => array(
+				ITEM_VALUE_TYPE_STR,
+				ITEM_VALUE_TYPE_TEXT,
+				ITEM_VALUE_TYPE_LOG
+			)
+		);
+
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['str']	= array(
 			'args' => array( array('type' => 'str','mandat' => false) ),
+			'item_types' => array(
+				ITEM_VALUE_TYPE_STR,
+				ITEM_VALUE_TYPE_TEXT,
+				ITEM_VALUE_TYPE_LOG
+			)
+		);
+
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['strlen']= array(
+			'args' => array( array('type' => 'sec_num','mandat' => true) ),
 			'item_types' => array(
 				ITEM_VALUE_TYPE_STR,
 				ITEM_VALUE_TYPE_TEXT,
@@ -187,26 +217,7 @@
 				ITEM_VALUE_TYPE_UINT64
 			)
 		);
-		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['logseverity']= array('args' => null,
-			'item_types' => array(
-				ITEM_VALUE_TYPE_LOG
-			)
-		);
-		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['logsource']= array(
-			'args' => array( array('type' => 'str','mandat' => true) ),
-			'item_types' => array(
-				ITEM_VALUE_TYPE_LOG
-			)
-		);
 
-		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['regexp']= array(
-			'args' => array( array('type' => 'str','mandat' => true) ),
-			'item_types' => array(
-				ITEM_VALUE_TYPE_STR,
-				ITEM_VALUE_TYPE_TEXT,
-				ITEM_VALUE_TYPE_LOG
-			)
-		);
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['time']	= array('args' => null, 'item_types' => null );
 	}
 
