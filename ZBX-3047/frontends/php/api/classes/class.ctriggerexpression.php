@@ -100,7 +100,7 @@ private $allowed;
 		foreach($this->allowed['functions'][$expression['functionName']]['args'] as $anum => $arg){
 
 // mandatory check
-			if(isset($arg['mandat']) && $arg['mandat'] && (!isset($expression['functionParamList'][$anum]) || empty($expression['functionParamList'][$anum])))
+			if(isset($arg['mandat']) && $arg['mandat'] && (!isset($expression['functionParamList'][$anum]) || zbx_empty($expression['functionParamList'][$anum])))
 				throw new Exception('Incorrect trigger function parameters count "'.$expression['function'].'" provided in expression.');
 
 
