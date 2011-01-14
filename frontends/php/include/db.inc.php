@@ -422,7 +422,7 @@ if(!isset($DB)){
 //SDI('SQL['.$DB['SELECT_COUNT'].']: '.$query);
 			switch($DB['TYPE']){
 				case 'MYSQL':
-					if(zbx_numeric($limit)){
+					if(zbx_ctype_digit($limit)){
 						$query .= ' LIMIT '.intval($limit).' OFFSET '.intval($offset);
 					}
 
@@ -432,7 +432,7 @@ if(!isset($DB)){
 					}
 					break;
 				case 'POSTGRESQL':
-					if(zbx_numeric($limit)){
+					if(zbx_ctype_digit($limit)){
 						$query .= ' LIMIT '.intval($limit).' OFFSET '.intval($offset);
 					}
 
@@ -442,7 +442,7 @@ if(!isset($DB)){
 					}
 					break;
 				case 'ORACLE':
-					if(zbx_numeric($limit)){
+					if(zbx_ctype_digit($limit)){
 						$till = $offset + $limit;
 						$query = 'SELECT * FROM ('.$query.') WHERE rownum BETWEEN '.intval($offset).' AND '.intval($till);
 					}
@@ -458,7 +458,7 @@ if(!isset($DB)){
 					}
 				break;
 				case 'IBM_DB2':
-					if(zbx_numeric($limit)){
+					if(zbx_ctype_digit($limit)){
 						$till = $offset + $limit;
 						$query = 'SELECT * FROM ('.$query.') WHERE rownum BETWEEN '.intval($offset).' AND '.intval($till);
 					}
@@ -481,7 +481,7 @@ if(!isset($DB)){
 						lock_db_access();
 					}
 
-					if(zbx_numeric($limit)){
+					if(zbx_ctype_digit($limit)){
 						$query .= ' LIMIT '.intval($limit).' OFFSET '.intval($offset);
 					}
 
@@ -805,7 +805,7 @@ else {
 		if(empty($nodes))
 			$nodes = 0;
 
-		if(zbx_numeric($nodes)){
+		if(zbx_ctype_digit($nodes)){
 			$nodes = array($nodes);
 		}
 		else if(is_string($nodes)){
@@ -986,33 +986,28 @@ else {
 	}
 
 	function DBcondition($fieldname, $array, $notin=false, $string=false){
-		global $DB;
 		$condition = '';
 
 		if(!is_array($array)){
 			info('DBcondition Error: ['.$fieldname.'] = '.$array);
-			$array = explode(',',$array);
-			if(empty($array))
-				return ' 1=0 ';
+			return ' 1=0 ';
 		}
 
 		$in = 		$notin ? ' NOT IN ':' IN ';
 		$concat = 	$notin ? ' AND ':' OR ';
 
-		switch($DB['TYPE']) {
-			case 'SQLITE3':
-			case 'MYSQL':
-			case 'POSTGRESQL':
-			case 'ORACLE':
-			default:
-				$items = array_chunk($array, 950);
-				foreach($items as $id => $values){
-					if($string) $values = zbx_dbstr($values);
-
-					$condition.=!empty($condition) ? ')'.$concat.$fieldname.$in.'(':'';
-					$condition.= implode(',',$values);
+		$items = array_chunk($array, 950);
+		foreach($items as $id => $values){
+			if($string) $values = zbx_dbstr($values);
+			else foreach($values as $value){
+				if(!is_numeric($value)){
+					info('DBcondition Error: ['.$value.'] incorrect value for numeric field');
+					return ' 1=0 ';
 				}
-				break;
+			}
+
+			$condition.=!empty($condition) ? ')'.$concat.$fieldname.$in.'(':'';
+			$condition.= implode(',',$values);
 		}
 
 		if(zbx_empty($condition)) $condition = $string ? "'-1'":'-1';
@@ -1103,6 +1098,36 @@ else {
 			else return false;
 		}
 
+		public static function checkValueTypes($table, &$values){
+			$table_schema = self::getSchema($table);
+
+			foreach($values as $field => $value){
+				if(!isset($table_schema['fields'][$field])){
+					unset($values[$field]);
+				}
+
+				switch($table_schema['fields'][$field]['type']){
+					case self::FIELD_TYPE_CHAR:
+						$values[$field] = zbx_dbstr($value);
+						break;
+					case self::FIELD_TYPE_ID:
+					case self::FIELD_TYPE_UINT:
+						if(!zbx_ctype_digit($value))
+							self::exception(self::DBEXECUTE_ERROR, 'Incorrect value for unsigned int field');
+						break;
+					case self::FIELD_TYPE_INT:
+						if(strcmp(intval($value), $value) != 0)
+							self::exception(self::DBEXECUTE_ERROR, 'Incorrect value for int field');
+						break;
+					case self::FIELD_TYPE_FLOAT:
+						if(!is_numeric($value))
+							self::exception(self::DBEXECUTE_ERROR, 'Incorrect value for float field');
+						break;
+				}
+			}
+
+		}
+
 /**
  * Insert data into DB
  *
@@ -1120,14 +1145,7 @@ else {
 			$table_schema = self::getSchema($table);
 
 			foreach($values as $key => $row){
-				foreach($row as $field => $value){
-					if(!isset($table_schema['fields'][$field])){
-						unset($row[$field]);
-					}
-					else if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR){
-						$row[$field] = zbx_dbstr($value);
-					}
-				}
+				self::checkValueTypes($table, $row);
 
 				if($getids){
 					$result_ids[$key] = $id;
@@ -1156,23 +1174,21 @@ else {
 			if(empty($data)) return true;
 
 			$data = zbx_toArray($data);
-			$table_schema = self::getSchema($table);
 
 			foreach($data as $dnum => $row){
 				$sql_set = '';
-				foreach($row['values'] as $field => $value){
-					if(!isset($table_schema['fields'][$field])) continue;
 
-					if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR){
-						$value = zbx_dbstr($value);
-					}
+				$values = $row['values'];
+				self::checkValueTypes($table, $values);
 
+				foreach($values as $field => $value){
 					$sql_set .= $field.'='.$value.',';
 				}
 				$sql_set = rtrim($sql_set, ',');
 
 				if(!empty($sql_set)){
 					$sql = 'UPDATE '.$table.' SET '.$sql_set.' WHERE '.implode(' AND ', $row['where']);
+
 					if(!DBexecute($sql)) self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
 				}
 			}
