@@ -111,7 +111,8 @@
 			)
 		);
 
-		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['fuzzytime']	= array('args' => null,
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['fuzzytime']	= array(
+			'args' => array(array('type' => 'sec', 'mandat' => true)),
 			'item_types' => array(
 				ITEM_VALUE_TYPE_FLOAT,
 				ITEM_VALUE_TYPE_UINT64
