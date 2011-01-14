@@ -3,20 +3,20 @@ msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-01-14 09:28+0200\n"
-"PO-Revision-Date: 2011-01-13 03:38+0200\n"
-"Last-Translator: zalex_ua <zalex_ua@i.ua>\n"
+"PO-Revision-Date: 2011-01-14 09:25+0200\n"
+"Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
+"Language: uk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: uk\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.1.4\n"
 "X-Poedit-Basepath: ../../\n"
 
 #: include/locales/en_gb.inc.php:929
 msgid " - all groups - "
-msgstr "- всі групи -"
+msgstr " - всі групи - "
 
 #: include/locales/en_gb.inc.php:2456 include/locales/en_gb.inc.php:2458
 msgid "\""
@@ -498,11 +498,11 @@ msgstr "Автоматична реєстрація"
 
 #: include/locales/en_gb.inc.php:1933
 msgid "Auto-login"
-msgstr "Авто-вхід (1 місяць)"
+msgstr "Авто-вхід"
 
 #: include/locales/en_gb.inc.php:1934
 msgid "Auto-logout (min 90 seconds)"
-msgstr "Авто-вихід (0-відключено)"
+msgstr "Авто-вихід (мін. 90 секунд)"
 
 #: include/locales/en_gb.inc.php:960
 msgid "Availability"
@@ -1247,7 +1247,7 @@ msgstr "Не вдалося оновити коментарій"
 
 #: include/locales/en_gb.inc.php:1902
 msgid "Cannot update debug mode"
-msgstr "Не вдалося оновити режим ДЕБАГ"
+msgstr "Не вдалося оновити режим дебаг"
 
 #: host_discovery.php:243 include/locales/en_gb.inc.php:134
 msgid "Cannot update discovery rule"
@@ -1596,7 +1596,7 @@ msgstr "Скопіювати вибрані елементи даних?"
 
 #: include/locales/en_gb.inc.php:87
 msgid "Copy selected to ..."
-msgstr "Копіювати в..."
+msgstr "Копіювати вибране в ..."
 
 #: include/locales/en_gb.inc.php:1823
 msgid "Copy selected triggers?"
@@ -1989,7 +1989,7 @@ msgstr "Видалити ключове слово?"
 
 #: include/locales/en_gb.inc.php:800
 msgid "Delete maintenance period?"
-msgstr "Видалити період сервісу"
+msgstr "Видалити період сервісу?"
 
 #: include/locales/en_gb.inc.php:594
 msgid "Delete regular expression?"
@@ -2041,7 +2041,7 @@ msgstr "Видалити обрані елементи?"
 
 #: include/locales/en_gb.inc.php:731
 msgid "Delete selected graphs?"
-msgstr "Видалити вибрані графіки"
+msgstr "Видалити вибрані графіки?"
 
 #: include/locales/en_gb.inc.php:847
 msgid "Delete selected group?"
@@ -2117,7 +2117,7 @@ msgstr "Видалити вибрані скрипти?"
 
 #: include/locales/en_gb.inc.php:2536
 msgid "Delete selected services?"
-msgstr "Видалити вибрані ІТ послуги"
+msgstr "Видалити вибрані ІТ послуги?"
 
 #: include/locales/en_gb.inc.php:1626
 msgid "Delete selected slideshows?"
@@ -2139,9 +2139,8 @@ msgstr "Видалити обраного користувача?"
 msgid "Delete selected users?"
 msgstr "Видалити вибраних користувачів?"
 
-#: config.php:887
-msgid "Delete selected value mapping?"
-msgstr "Видалити вибране перетворення значень?"
+#~ msgid "Delete selected value mapping?"
+#~ msgstr "Видалити обрані перетворення значень?"
 
 #: config.php:883
 #, php-format
@@ -2392,7 +2391,7 @@ msgstr "Правило виявлення [%1$s:%2$s] не має інтерфе
 #: api/classes/class.ctemplate.php:1889
 #, php-format
 msgid "Discovery rule [%1$s:%2$s] unlinked."
-msgstr "Правило виявлення [%1$s:%2$s]  від'єднано."
+msgstr "Правило виявлення [%1$s:%2$s] від'єднано."
 
 #: include/locales/en_gb.inc.php:135
 msgid "Discovery rule added"
@@ -2418,7 +2417,7 @@ msgstr "Правила виявлення"
 
 #: host_discovery.php:263
 msgid "Discovery rules activated"
-msgstr "Правило виявлення активовано"
+msgstr "Правила виявлення активовано"
 
 #: include/locales/en_gb.inc.php:129
 msgid "Discovery rules deleted"
@@ -2505,7 +2504,7 @@ msgstr "Швидкість завантаження для сценарія '%s'
 #: api/classes/class.cwebcheck.php:644
 #, php-format
 msgid "Download speed for step '%1$s' of scenario '%2$s'"
-msgstr "ооШвидкість завантаження для кроку '%1$s' зі сценарію '%2$s'"
+msgstr "Швидкість завантаження для кроку '%1$s' зі сценарію '%2$s'"
 
 #: include/locales/en_gb.inc.php:148 include/locales/en_gb.inc.php:1738
 msgid "Downtime"
@@ -2958,7 +2957,7 @@ msgstr "Аудит відмов"
 
 #: include/locales/en_gb.inc.php:1399
 msgid "Favourite"
-msgstr "ОБРАНЕ:"
+msgstr "Обране"
 
 #: include/locales/en_gb.inc.php:1418
 msgid "Favourite graphs"
@@ -3131,7 +3130,7 @@ msgstr "Отримання Img: Дані по елементу не знайде
 
 #: include/locales/en_gb.inc.php:1324
 msgid "Get selected elements FAILED."
-msgstr "НЕ ВДАЛОСЬ отримати елементи"
+msgstr "НЕ ВДАЛОСЬ отримати елементи."
 
 #: include/locales/en_gb.inc.php:2491
 msgid "Get support"
@@ -3168,7 +3167,7 @@ msgstr "Графік \""
 #: api/classes/class.cgraph.php:863 api/classes/class.cgraphprototype.php:858
 #, php-format
 msgid "Graph [ %1$s ]: already exists on [ %2$s ]"
-msgstr "Графік [ %1$s ]:  вже існує у [ %2$s\" ]"
+msgstr "Графік [ %1$s ]: вже існує у [ %2$s ]"
 
 #: api/classes/class.cgraph.php:884 api/classes/class.cgraphprototype.php:879
 #, php-format
@@ -3569,7 +3568,7 @@ msgstr "Вузли мережі (Пс/Бс/ш)"
 
 #: include/locales/en_gb.inc.php:2075
 msgid "Hosts and templates"
-msgstr "ВУЗЛИ ТА ШАБЛОНИ"
+msgstr "Вузли мережі та шаблони"
 
 #: include/locales/en_gb.inc.php:777
 msgid "Hosts in maintenance"
@@ -3915,7 +3914,7 @@ msgstr "Використано некоректні символи в імені
 #: api/classes/class.ctemplate.php:1027
 #, php-format
 msgid "Incorrect characters used for Template name [ %1$s ]"
-msgstr "Використано некоректні символи в імені Шаблону [ %s ]"
+msgstr "Використано некоректні символи в імені Шаблону [ %1$s ]"
 
 #: include/locales/en_gb.inc.php:442
 msgid "Incorrect command"
@@ -3986,7 +3985,7 @@ msgstr "Некоректний формат ключа"
 
 #: include/locales/en_gb.inc.php:2197
 msgid "Incorrect list of items."
-msgstr "Некоректний список елементів даних"
+msgstr "Некоректний список елементів даних."
 
 #: include/locales/en_gb.inc.php:839
 msgid "Incorrect maintenance date"
@@ -4046,7 +4045,7 @@ msgstr "Некоректний порт"
 
 #: api/classes/class.cscreen.php:501
 msgid "Incorrect resource provided for screen item"
-msgstr "Некоректний ресурс надано для Комплексного екрану"
+msgstr "Некоректний ресурс надано для налаштувань Комплексного екрану"
 
 #: include/locales/en_gb.inc.php:368
 msgid "Incorrect steps"
@@ -4172,7 +4171,7 @@ msgstr "Інвентаризація"
 
 #: include/locales/en_gb.inc.php:1916
 msgid "Is online?"
-msgstr "В системі? (остання активність)"
+msgstr "В системі?"
 
 #: include/locales/en_gb.inc.php:1393
 msgid "Issue"
@@ -4233,7 +4232,7 @@ msgstr "Елемент не існує"
 
 #: include/locales/en_gb.inc.php:2212
 msgid "Item function"
-msgstr "Елемент даних / Функція"
+msgstr "Функція елемента даних"
 
 #: include/locales/en_gb.inc.php:1230
 msgid "Item prototype"
@@ -4476,7 +4475,7 @@ msgstr "За останні"
 
 #: include/locales/en_gb.inc.php:968
 msgid "Last seen (age)"
-msgstr "Останній помічений вік"
+msgstr "Востаннє помітний (вік)"
 
 #: include/locales/en_gb.inc.php:1265
 msgid "Last value"
@@ -4528,11 +4527,11 @@ msgstr "Індикатори лінка"
 
 #: api/classes/class.cmap.php:574 api/classes/class.cmap.php:681
 msgid "Link name should be unique."
-msgstr "Ім'я лінка повинно бути унікальним"
+msgstr "Ім'я лінка повинно бути унікальним."
 
 #: api/classes/class.cmap.php:571 api/classes/class.cmap.php:678
 msgid "Link should have both \"name\" and \"url\" fields."
-msgstr "Лінк повинен мати обидва поля \"Ім'я\" та \"URL-запит\""
+msgstr "Лінк повинен мати обидва поля \"Ім'я\" та \"URL-запит\"."
 
 #: include/locales/en_gb.inc.php:1284
 msgid "Link status indicator"
@@ -4548,7 +4547,7 @@ msgstr "Приєднати до шаблону"
 
 #: include/locales/en_gb.inc.php:1730
 msgid "Link to trigger?"
-msgstr "Приєднати до тригера"
+msgstr "Приєднати до тригера?"
 
 #: include/locales/en_gb.inc.php:994
 msgid "Link with template"
@@ -4696,11 +4695,11 @@ msgstr "Макрос вже існує"
 
 #: include/locales/en_gb.inc.php:863
 msgid "Macro name is too long, should not exceed 64 chars."
-msgstr "Ім'я макросу занадто довге, воно має бути не більше 64 символів"
+msgstr "Ім'я макросу занадто довге, воно має бути не більше 64 символів."
 
 #: include/locales/en_gb.inc.php:864
 msgid "Macro value is too long, should not exceed 255 chars."
-msgstr "Значення макросу занадто довге, воно має бути не більше 255 символів"
+msgstr "Значення макросу занадто довге, воно має бути не більше 255 символів."
 
 #: include/locales/en_gb.inc.php:860
 msgid "Macros"
@@ -4820,7 +4819,7 @@ msgstr "Майстер нода вже існує"
 
 #: include/locales/en_gb.inc.php:483
 msgid "Max count of elements to show inside table cell"
-msgstr "Макс. кількість елементів в таблиці"
+msgstr "Макс. кількість елементів для відображення в комірці таблиці"
 
 #: include/locales/en_gb.inc.php:495
 msgid "Max count of events per trigger to show"
@@ -4881,7 +4880,7 @@ msgstr "Члени групи"
 
 #: include/locales/en_gb.inc.php:2153
 msgid "Memory leak"
-msgstr "Втекло пам'яті (leak)"
+msgstr "Витік пам'яті"
 
 #: include/locales/en_gb.inc.php:2151
 msgid "Memory limit"
@@ -5029,7 +5028,7 @@ msgstr "Багатократні події ПРОБЛЕМА"
 
 #: include/locales/en_gb.inc.php:2014
 msgid "Mute"
-msgstr "ВИМКM звук"
+msgstr "Вимкнути звук"
 
 #: include/locales/en_gb.inc.php:1366
 msgid "NETWORK MAPS"
@@ -5081,7 +5080,7 @@ msgstr "Карту мережі оновлено"
 
 #: include/locales/en_gb.inc.php:1365
 msgid "Network maps"
-msgstr "карти мереж"
+msgstr "Карти мереж"
 
 #: include/locales/en_gb.inc.php:1855
 msgid "Never"
@@ -5350,7 +5349,7 @@ msgstr "Немає інтерфейсів для проксі \"%s\""
 #: api/classes/class.cproxy.php:351
 #, php-format
 msgid "No interfaces provided for proxy \"%s\""
-msgstr "Не надано інтерфейсів для проксі \"%s\"."
+msgstr "Не надано інтерфейсів для проксі \"%s\""
 
 #: api/classes/class.cproxy.php:341
 #, php-format
@@ -5763,7 +5762,7 @@ msgstr "Одноразово"
 
 #: include/locales/en_gb.inc.php:1739
 msgid "One-time downtime"
-msgstr "Одноразово часу ВИМКНЕНО"
+msgstr "Однократна недоступність"
 
 #: include/locales/en_gb.inc.php:2439
 msgid "Only Super Admins can create Scripts"
@@ -5828,11 +5827,11 @@ msgstr "Інформація тільки про вузел мережі"
 
 #: include/locales/en_gb.inc.php:1468
 msgid "Only items assigned to enabled hosts are counted"
-msgstr "Підраховуються  елементи даних тільки у вузлів Під спостереженням"
+msgstr "Підраховуються елементи даних тільки у вузлів мережі Під спостереженням"
 
 #: include/locales/en_gb.inc.php:1465
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
-msgstr "Підраховуються тригери тільки у вузлів Під спостереженням та які залежать від активних елементів даних"
+msgstr "Підраховуються тригери тільки у вузлів мережі Під спостереженням та які залежать від активних елементів даних"
 
 #: include/locales/en_gb.inc.php:2283
 msgid "Operation cannot be performed due to unauthorized request"
@@ -6569,7 +6568,7 @@ msgstr "SMTP адрес електронної пошти"
 
 #: include/locales/en_gb.inc.php:525
 msgid "SMTP helo"
-msgstr "SMTP привітання (HELO)"
+msgstr "SMTP привітання (helo)"
 
 #: include/locales/en_gb.inc.php:524
 msgid "SMTP server"
@@ -6750,12 +6749,12 @@ msgstr "Комплексний екран оновлено"
 #: include/locales/en_gb.inc.php:1699
 #, php-format
 msgid "Screen with id \"%d\" does not exist"
-msgstr "Комплексний екран з id \"%d\" не існує."
+msgstr "Комплексний екран з id \"%d\" не існує"
 
 #: include/locales/en_gb.inc.php:1698
 #, php-format
 msgid "Screen with name \"%s\" does not exist"
-msgstr "Комплексний екран з іменем \"%s\" не існує."
+msgstr "Комплексний екран з іменем \"%s\" не існує"
 
 #: include/locales/en_gb.inc.php:1595
 msgid "Screens"
@@ -7430,7 +7429,7 @@ msgstr "ПРАВДА"
 
 #: include/locales/en_gb.inc.php:2435
 msgid "Table users is empty. Possible database corruption."
-msgstr "Таблиця користувачів пуста. Можливо причина в в пошкодженні бази даних."
+msgstr "Таблиця користувачів пуста. Можливо причина в пошкодженні бази даних."
 
 #: include/locales/en_gb.inc.php:1006
 msgid "Tag"
@@ -7740,7 +7739,7 @@ msgstr "Тригер [%1$s:%2$s] оновлено."
 #: api/classes/class.ctriggerprototype.php:1560
 #, php-format
 msgid "Trigger [%1$s] already exists on [%2$s]"
-msgstr "Тригер [%1$s]:  вже існує у [%2$s\"]"
+msgstr "Тригер [%1$s] вже існує у [%2$s]"
 
 #: api/classes/class.ctriggerprototype.php:1201
 #, php-format
@@ -7888,7 +7887,7 @@ msgstr "Тип інформації"
 
 #: include/locales/en_gb.inc.php:2208
 msgid "Type of information must be Log for log key"
-msgstr "Тип інформації має бути Журнал (лог) для ключа журналів."
+msgstr "Тип інформації має бути Лог для ключа журналів"
 
 #: include/locales/en_gb.inc.php:1095
 msgid "Types"
@@ -8414,7 +8413,7 @@ msgstr "Помилкові поля для графіка"
 #: api/classes/class.chost.php:1293
 #, php-format
 msgid "Wrong fields for host [ %s ]"
-msgstr "Невірні поля для вузла мережі  [ %s ]"
+msgstr "Невірні поля для вузла мережі [ %s ]"
 
 #: api/classes/class.cgraph.php:1100
 #: api/classes/class.cgraphprototype.php:1106
@@ -8529,7 +8528,7 @@ msgstr "Йота"
 
 #: include/forms.inc.php:392
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
-msgstr "Ви не можете вибрати деякі з мов, тому що їх локалі не встановлено на веб-сервері. "
+msgstr "Ви не можете вибрати деякі з мов, тому що їх локалі не встановлено на веб-сервері."
 
 #: include/locales/en_gb.inc.php:2480
 msgid "You are not logged in."
@@ -8617,7 +8616,7 @@ msgstr "Порт Zabbix агента"
 
 #: include/locales/en_gb.inc.php:1132
 msgid "Zabbix aggregate"
-msgstr "Zabbix aggregate"
+msgstr "Zabbix агрегований"
 
 #: include/locales/en_gb.inc.php:2007
 msgid "Zabbix config"
@@ -8698,7 +8697,7 @@ msgstr "додано"
 
 #: include/locales/en_gb.inc.php:2193
 msgid "affects only filtered data!"
-msgstr "впливає тільки на відфільтровані дані"
+msgstr "впливає тільки на відфільтровані дані!"
 
 #: include/locales/en_gb.inc.php:651
 msgid "all"
@@ -8758,7 +8757,7 @@ msgstr "не може бути видалено, відповідно як вн�
 
 #: include/locales/en_gb.inc.php:2241
 msgid "can not exist without group"
-msgstr "Не може існувати без групи"
+msgstr "не може існувати без групи"
 
 #: include/locales/en_gb.inc.php:2228
 msgid "characters only"
@@ -8806,7 +8805,7 @@ msgstr "d.m.Y H:i"
 #: include/locales/en_gb.inc.php:1592 include/locales/en_gb.inc.php:2079
 #: include/locales/en_gb.inc.php:2085 include/locales/en_gb.inc.php:2338
 msgid "d M Y H:i:s"
-msgstr "d.m.Y  H:i:s"
+msgstr "d.m.Y H:i:s"
 
 #: include/locales/en_gb.inc.php:28 include/locales/en_gb.inc.php:1487
 #: include/locales/en_gb.inc.php:1490
@@ -9073,7 +9072,7 @@ msgstr "макс. значення"
 
 #: include/locales/en_gb.inc.php:683
 msgid "min"
-msgstr "мінім."
+msgstr "мін."
 
 #: include/locales/en_gb.inc.php:325
 msgid "min value"
