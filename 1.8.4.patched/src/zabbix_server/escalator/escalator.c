@@ -694,7 +694,7 @@ static int	get_event_info(zbx_uint64_t eventid, DB_EVENT *event)
 
 	memset(event, 0, sizeof(DB_EVENT));
 
-	result = DBselect("select eventid,source,object,objectid,clock,value,acknowledged"
+	result = DBselect("select eventid,source,object,objectid,clock,value,acknowledged,ns"
 			" from events where eventid=" ZBX_FS_UI64,
 			eventid);
 
@@ -707,6 +707,7 @@ static int	get_event_info(zbx_uint64_t eventid, DB_EVENT *event)
 		event->clock		= atoi(row[4]);
 		event->value		= atoi(row[5]);
 		event->acknowledged	= atoi(row[6]);
+		event->ns		= atoi(row[7]);
 
 		res = SUCCEED;
 	}

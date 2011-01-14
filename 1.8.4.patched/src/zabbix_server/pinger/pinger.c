@@ -59,7 +59,7 @@ static int	poller_num;
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double *value_dbl,	int now,
+static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double *value_dbl,	zbx_timespec_t *ts,
 		int ping_result, char *error)
 {
 	const char	*__function_name = "process_value";
@@ -76,8 +76,8 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 
 	if (NOTSUPPORTED == ping_result)
 	{
-		DCadd_nextcheck(item.itemid, now, error);
-		DCrequeue_reachable_item(item.itemid, ITEM_STATUS_NOTSUPPORTED, now);
+		DCadd_nextcheck(item.itemid, ts->sec, error);
+		DCrequeue_reachable_item(item.itemid, ITEM_STATUS_NOTSUPPORTED, ts->sec);
 	}
 	else
 	{
@@ -88,9 +88,9 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 		else
 			SET_DBL_RESULT(&value, *value_dbl);
 
-		dc_add_history(item.itemid, item.value_type, &value, now, 0, NULL, 0, 0, 0, 0);
+		dc_add_history(item.itemid, item.value_type, &value, ts, 0, NULL, 0, 0, 0, 0);
 
-		DCrequeue_reachable_item(item.itemid, ITEM_STATUS_ACTIVE, now);
+		DCrequeue_reachable_item(item.itemid, ITEM_STATUS_ACTIVE, ts->sec);
 
 		free_result(&value);
 	}
@@ -114,7 +114,7 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
  *                                                                            *
  ******************************************************************************/
 static void	process_values(icmpitem_t *items, int first_index, int last_index, ZBX_FPING_HOST *hosts,
-		int hosts_count, int now, int ping_result, char *error)
+		int hosts_count, zbx_timespec_t *ts, int ping_result, char *error)
 {
 	const char	*__function_name = "process_values";
 	int		i, h;
@@ -142,7 +142,7 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 				{
 					case ICMPPING:
 						value_uint64 = hosts[h].rcv ? 1 : 0;
-						process_value(items[i].itemid, &value_uint64, NULL, now, ping_result, error);
+						process_value(items[i].itemid, &value_uint64, NULL, ts, ping_result, error);
 						break;
 					case ICMPPINGSEC:
 						switch (items[i].type)
@@ -151,14 +151,14 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 							case ICMPPINGSEC_MAX : value_dbl = hosts[h].max; break;
 							case ICMPPINGSEC_AVG : value_dbl = hosts[h].avg; break;
 						}
-						process_value(items[i].itemid, NULL, &value_dbl, now, ping_result, error);
+						process_value(items[i].itemid, NULL, &value_dbl, ts, ping_result, error);
 						break;
 					case ICMPPINGLOSS:
 						if (0 == hosts[h].cnt)
 							value_dbl = 0;
 						else
 							value_dbl = 100 * (1 - (double)hosts[h].rcv / (double)hosts[h].cnt);
-						process_value(items[i].itemid, NULL, &value_dbl, now, ping_result, error);
+						process_value(items[i].itemid, NULL, &value_dbl, ts, ping_result, error);
 						break;
 				}
 			}
@@ -451,7 +451,7 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count)
 	static ZBX_FPING_HOST	*hosts = NULL;
 	static int		hosts_alloc = 4;
 	int			hosts_count = 0;
-	int			now;
+	zbx_timespec_t		ts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -467,12 +467,12 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count)
 		{
 			zbx_setproctitle("pinger [pinging hosts]");
 
-			now = time(NULL);
+			zbx_timespec(&ts);
 			ping_result = do_ping(hosts, hosts_count,
 						items[i].count, items[i].interval, items[i].size, items[i].timeout,
 						error, sizeof(error));
 
-			process_values(items, first_index, i + 1, hosts, hosts_count, now, ping_result, error);
+			process_values(items, first_index, i + 1, hosts, hosts_count, &ts, ping_result, error);
 
 			hosts_count = 0;
 			first_index = i + 1;

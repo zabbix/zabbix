@@ -1501,7 +1501,7 @@
  * Comments:
  *
  */
-	function item_get_history($db_item, $last = 1, $clock = 0){
+	function item_get_history($db_item, $last = 1, $clock = 0, $ns = 0){
 		$value = NULL;
 
 		switch($db_item["value_type"]){
@@ -1523,19 +1523,79 @@
 				break;
 		}
 
+		$config = select_config();
+
 		if($last == 0){
-			$sql = 'select value from '.$table.' where itemid='.$db_item['itemid'].' and clock<='.$clock.
-					' order by itemid,clock desc';
-			$row = DBfetch(DBselect($sql, 1));
-			if($row)
-				$value = $row["value"];
+			if (0 != $config['ns_support']){
+				$sql = 'select value'.
+					' from '.$table.
+					' where itemid='.$db_item['itemid'].
+						' and clock='.$clock.
+						' and ns='.$ns;
+				if(NULL != ($row = DBfetch(DBselect($sql, 1))))
+					$value = $row["value"];
+
+				if(NULL != $value)
+					return $value;
+
+				$max_clock = 0;
+
+				$sql = 'select distinct clock'.
+					' from '.$table.
+					' where itemid='.$db_item['itemid'].
+						' and clock='.$clock.
+						' and ns<'.$ns;
+				if(NULL != ($row = DBfetch(DBselect($sql))))
+					$max_clock = $row['clock'];
+
+				if(0 == $max_clock){
+					$sql = 'select max(clock) as clock'.
+						' from '.$table.
+						' where itemid='.$db_item['itemid'].
+							' and clock<'.$clock;
+					if(NULL != ($row = DBfetch(DBselect($sql))))
+						$max_clock = $row['clock'];
+				}
+
+				if (0 == $max_clock)
+					return $value;
+
+				if ($clock == $max_clock){
+					$sql = 'select value'.
+						' from '.$table.
+						' where itemid='.$db_item['itemid'].
+							' and clock='.$clock.
+							' and ns<'.$ns;
+				}
+				else{
+					$sql = 'select value'.
+						' from '.$table.
+						' where itemid='.$db_item['itemid'].
+							' and clock='.$max_clock.
+						' order by itemid,clock desc,ns desc';
+				}
+
+				if(NULL != ($row = DBfetch(DBselect($sql, 1))))
+					$value = $row["value"];
+			}
+			else{
+				$sql = 'select value from '.$table.' where itemid='.$db_item['itemid'].' and clock<='.$clock.
+						' order by itemid,clock desc';
+				if(NULL != ($row = DBfetch(DBselect($sql, 1))))
+					$value = $row["value"];
+			}
 		}
 		else{
 			$sql = "select max(clock) as clock from $table where itemid=".$db_item["itemid"];
 			$row = DBfetch(DBselect($sql));
 			if($row && !is_null($row["clock"])){
 				$clock = $row["clock"];
-				$sql = "select value from $table where itemid=".$db_item["itemid"]." and clock=$clock";
+				if (0 != $config['ns_support']){
+					$sql = "select value from $table where itemid=".$db_item["itemid"]." and clock=$clock order by ns desc";
+				}
+				else{
+					$sql = "select value from $table where itemid=".$db_item["itemid"]." and clock=$clock";
+				}
 				$row = DBfetch(DBselect($sql, 1));
 				if($row)
 					$value = $row["value"];

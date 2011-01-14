@@ -193,6 +193,7 @@ TABLE|history||0
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|0			|items
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|value		|t_double	|'0.0000'|NOT NULL	|0
+FIELD		|ns		|t_nanosec	|'0'	|NOT NULL	|0
 INDEX		|1		|itemid,clock
 
 TABLE|history_sync|id|ZBX_HISTORY_SYNC
@@ -201,12 +202,14 @@ FIELD		|nodeid		|t_id		|'0'	|NOT NULL	|0			|nodes
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_HISTORY_SYNC	|items
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_HISTORY_SYNC
 FIELD		|value		|t_double	|'0.0000'|NOT NULL	|ZBX_HISTORY_SYNC
+FIELD		|ns		|t_nanosec	|'0'	|NOT NULL	|ZBX_HISTORY_SYNC
 INDEX		|1		|nodeid,id
 
 TABLE|history_uint||0
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|0			|items
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|value		|t_bigint	|'0'	|NOT NULL	|0
+FIELD		|ns		|t_nanosec	|'0'	|NOT NULL	|0
 INDEX		|1		|itemid,clock
 
 TABLE|history_uint_sync|id|ZBX_HISTORY_SYNC
@@ -215,12 +218,14 @@ FIELD		|nodeid		|t_id		|'0'	|NOT NULL	|0			|nodes
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_HISTORY_SYNC	|items
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_HISTORY_SYNC
 FIELD		|value		|t_bigint	|'0'	|NOT NULL	|ZBX_HISTORY_SYNC
+FIELD		|ns		|t_nanosec	|'0'	|NOT NULL	|ZBX_HISTORY_SYNC
 INDEX		|1		|nodeid,id
 
 TABLE|history_str||0
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|0			|items
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|ns		|t_nanosec	|'0'	|NOT NULL	|0
 INDEX		|1		|itemid,clock
 
 TABLE|history_str_sync|id|ZBX_HISTORY_SYNC
@@ -229,6 +234,7 @@ FIELD		|nodeid		|t_id		|'0'	|NOT NULL	|0			|nodes
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_HISTORY_SYNC	|items
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_HISTORY_SYNC
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|ZBX_HISTORY_SYNC
+FIELD		|ns		|t_nanosec	|'0'	|NOT NULL	|ZBX_HISTORY_SYNC
 INDEX		|1		|nodeid,id
 
 TABLE|history_log|id|ZBX_HISTORY
@@ -240,6 +246,7 @@ FIELD		|source		|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|severity	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|value		|t_history_log	|''	|NOT NULL	|0
 FIELD		|logeventid	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|ns		|t_nanosec	|'0'	|NOT NULL	|0
 INDEX		|1		|itemid,clock
 UNIQUE		|2		|itemid,id
 
@@ -248,6 +255,7 @@ FIELD		|id		|t_id		|'0'	|NOT NULL	|0
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|0			|items
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|value		|t_history_text	|''	|NOT NULL	|0
+FIELD		|ns		|t_nanosec	|'0'	|NOT NULL	|0
 INDEX		|1		|itemid,clock
 UNIQUE		|2		|itemid,id
 
@@ -260,6 +268,7 @@ FIELD		|source		|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|severity	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|value		|t_history_log	|''	|NOT NULL	|0
 FIELD		|logeventid	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|ns		|t_nanosec	|'0'	|NOT NULL	|0
 INDEX		|1		|clock
 
 TABLE|proxy_dhistory|id|0
@@ -283,6 +292,7 @@ FIELD		|objectid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|value		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|acknowledged	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|ns		|t_nanosec	|'0'	|NOT NULL	|0
 INDEX		|1		|object,objectid,eventid
 INDEX		|2		|clock
 
@@ -438,6 +448,7 @@ FIELD		|dropdown_first_remember|t_integer|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|discovery_groupid|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|groups
 FIELD		|max_in_table	|t_integer	|'50'	|NOT NULL	|ZBX_SYNC
 FIELD		|search_limit	|t_integer	|'1000'	|NOT NULL	|ZBX_SYNC
+FIELD		|ns_support	|t_integer	|'0'	|NOT NULL	|0
 
 TABLE|functions|functionid|ZBX_SYNC
 FIELD		|functionid	|t_id		|'0'	|NOT NULL	|0
@@ -711,6 +722,7 @@ FIELD		|password	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|publickey	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|privatekey	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|mtime		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|lastns		|t_nanosec	|	|NULL		|0
 UNIQUE		|1		|hostid,key_
 INDEX		|3		|status
 INDEX		|4		|templateid

@@ -401,7 +401,7 @@
 			);
 
 			$events = CEvent::get($options);
-			order_result($events, 'clock', ZBX_SORT_DOWN);
+			morder_result($events, array('clock','ns'), ZBX_SORT_DOWN);
 
 			$triggersOptions = array(
 				'triggerids' => zbx_objectValues($events, 'objectid'),
@@ -440,7 +440,7 @@
 					}
 				}
 
-				$description = expand_trigger_description_by_data(zbx_array_merge($trigger, array('clock'=>$event['clock'])), ZBX_FLAG_EVENT);
+				$description = expand_trigger_description_by_data(zbx_array_merge($trigger, array('clock'=>$event['clock'], 'ns'=>$event['ns'])), ZBX_FLAG_EVENT);
 				$tr_desc = new CSpan($description,'pointer');
 				$tr_desc->addAction('onclick',"create_mon_trigger_menu(event, ".
 										" new Array({'triggerid': '".$trigger['triggerid']."', 'lastchange': '".$event['clock']."'}),".

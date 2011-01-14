@@ -461,6 +461,7 @@ static int	send_buffer(const char *host, unsigned short port)
 	zbx_sock_t			s;
 	char				*buf = NULL;
 	int				ret = SUCCEED, i, now;
+	zbx_timespec_t			ts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' port:%d values:%d/%d",
 			__function_name, host, port, buffer.count,
@@ -504,12 +505,16 @@ static int	send_buffer(const char *host, unsigned short port)
 			zbx_json_adduint64(&json, ZBX_PROTO_TAG_LOGSEVERITY, el->severity);
 		if (el->logeventid)
 			zbx_json_adduint64(&json, ZBX_PROTO_TAG_LOGEVENTID, el->logeventid);
-		zbx_json_adduint64(&json, ZBX_PROTO_TAG_CLOCK, el->clock);
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_CLOCK, el->ts.sec);
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_NS, el->ts.ns);
 		zbx_json_close(&json);
 	}
 
 	zbx_json_close(&json);
-	zbx_json_adduint64(&json, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
+
+	zbx_timespec(&ts);
+	zbx_json_adduint64(&json, ZBX_PROTO_TAG_CLOCK, ts.sec);
+	zbx_json_adduint64(&json, ZBX_PROTO_TAG_NS, ts.ns);
 
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port,
 					MIN(buffer.count * CONFIG_TIMEOUT, 60))))
@@ -689,7 +694,7 @@ static int	process_value(
 		el->timestamp	= *timestamp;
 	if (logeventid)
 		el->logeventid	= (int)*logeventid;
-	el->clock	= (int)time(NULL);
+	zbx_timespec(&el->ts);
 	el->persistent	= persistent;
 
 	if (0 != persistent)

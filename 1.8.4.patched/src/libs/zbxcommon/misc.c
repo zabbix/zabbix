@@ -73,6 +73,85 @@ int	get_nodeid_by_id(zbx_uint64_t id)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_timespec                                                     *
+ *                                                                            *
+ * Purpose: Gets the current time.                                            *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments: Time in seconds since midnight (00:00:00),                       *
+ *           January 1, 1970, coordinated universal time (UTC).               *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_timespec(zbx_timespec_t *ts)
+{
+#ifdef _WINDOWS
+
+	LARGE_INTEGER	tickPerSecond, tick;
+	static int	boottime = 0;
+	BOOL		rc = FALSE;
+
+	if (TRUE == (rc = QueryPerformanceFrequency(&tickPerSecond)))
+	{
+		if (TRUE == (rc = QueryPerformanceCounter(&tick)))
+		{
+			ts->ns = (int)(1000000000 * (tick.QuadPart % tickPerSecond.QuadPart) / tickPerSecond.QuadPart);
+
+			tick.QuadPart = tick.QuadPart / tickPerSecond.QuadPart;
+
+			if (0 == boottime)
+				boottime = (int)(time(NULL) - tick.QuadPart);
+
+			ts->sec = (int)(tick.QuadPart + boottime);
+		}
+	}
+
+	if (TRUE != rc)
+	{
+		struct _timeb   tb;
+
+		_ftime(&tb);
+
+		ts->sec = (int)tb.time;
+		ts->ns = tb.millitm * 1000000;
+	}
+
+#else	/* not _WINDOWS */
+
+	struct timeval	tv;
+	int		rc = -1;
+#ifdef HAVE_TIME_CLOCK_GETTIME
+	struct timespec	tp;
+
+	if (0 == (rc = clock_gettime(CLOCK_REALTIME, &tp)))
+	{
+		ts->sec = (int)tp.tv_sec;
+		ts->ns = (int)tp.tv_nsec;
+	}
+
+#endif	/* HAVE_TIME_CLOCK_GETTIME */
+
+	if (0 != rc && 0 == (rc = gettimeofday(&tv, NULL)))
+	{
+		ts->sec = (int)tv.tv_sec;
+		ts->ns = (int)tv.tv_usec * 1000;
+	}
+
+	if (0 != rc)
+	{
+		ts->sec = (int)time(NULL);
+		ts->ns = 0;
+	}
+
+#endif	/* not _WINDOWS */
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_time                                                         *
  *                                                                            *
  * Purpose: Gets the current time.                                            *
@@ -87,27 +166,13 @@ int	get_nodeid_by_id(zbx_uint64_t id)
  *           January 1, 1970, coordinated universal time (UTC).               *
  *                                                                            *
  ******************************************************************************/
-double	zbx_time()
+double	zbx_time(void)
 {
+	zbx_timespec_t	ts;
 
-#if defined(_WINDOWS)
+	zbx_timespec(&ts);
 
-	struct _timeb current;
-
-	_ftime(&current);
-
-	return (((double)current.time) + 1.0e-3 * ((double)current.millitm));
-
-#else /* not _WINDOWS */
-
-	struct timeval current;
-
-	gettimeofday(&current, NULL);
-
-	return (((double)current.tv_sec) + 1.0e-6 * ((double)current.tv_usec));
-
-#endif /* _WINDOWS */
-
+	return (double)ts.sec + 1.0e-9 * (double)ts.ns;
 }
 
 /******************************************************************************

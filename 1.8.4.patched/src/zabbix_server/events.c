@@ -334,13 +334,14 @@ int	process_event(DB_EVENT *event, int force_actions)
 	if (0 == event->eventid)
 		event->eventid = DBget_maxid("events");
 
-	DBexecute("insert into events (eventid,source,object,objectid,clock,value)"
-			" values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 ",%d,%d)",
+	DBexecute("insert into events (eventid,source,object,objectid,clock,ns,value)"
+			" values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 ",%d,%d,%d)",
 			event->eventid,
 			event->source,
 			event->object,
 			event->objectid,
 			event->clock,
+			event->ns,
 			event->value);
 
 	if (0 != event->ack_eventid)

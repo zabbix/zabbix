@@ -163,6 +163,7 @@ int	CONFIG_LOG_SLOW_QUERIES		= 0;	/* ms; 0 - disable */
 int	CONFIG_ENABLE_LOG		= 1;
 
 int	CONFIG_REFRESH_UNSUPPORTED	= 600;
+int	CONFIG_NS_SUPPORT		= 0;
 
 /* Zabbix server startup time */
 int     CONFIG_SERVER_STARTUP_TIME      = 0;

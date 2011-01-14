@@ -906,10 +906,10 @@ Index: src/libs/zbxserver/expression.c
 -		}
 -		DBfree_result(h_result);
 +		if (SUCCEED == (ret = DBget_history_value(itemid, value, table, "value", clock, ns)))
-+  		{
-+  			if (ITEM_VALUE_TYPE_FLOAT == value_type)
++		{
++			if (ITEM_VALUE_TYPE_FLOAT == value_type)
 +				del_zeroes(*value);
-+  		}
++		}
  	}
  	DBfree_result(result);
  
@@ -1019,7 +1019,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  			{
 -				if (tr_last->clock < history[i].clock)
 -					tr_last->clock = history[i].clock;
-+				if (tr_last->ts.sec < history[i].clock || 
++				if (tr_last->ts.sec < history[i].clock ||
 +						(tr_last->ts.sec == history[i].clock && tr_last->ts.ns < history[i].ns))
 +				{
 +					tr_last->ts.sec = history[i].clock;
@@ -2166,11 +2166,11 @@ Index: src/libs/zbxcommon/misc.c
 -	return (((double)current.time) + 1.0e-3 * ((double)current.millitm));
 +			if (0 == boottime)
 +				boottime = (int)(time(NULL) - tick.QuadPart);
-+	
++
 +			ts->sec = (int)(tick.QuadPart + boottime);
 +		}
 +	}
-+	
++
 +	if (TRUE != rc)
 +	{
 +		struct _timeb   tb;

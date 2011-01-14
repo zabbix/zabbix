@@ -156,6 +156,13 @@ const char	*zbx_result_string(int result);
 
 #define ZBX_DM_DELIMITER	'\255'
 
+typedef struct zbx_timespec
+{
+	int	sec;	/* seconds */
+	int	ns;	/* nanoseconds */
+}
+zbx_timespec_t;
+
 /* Item types */
 typedef enum
 {
@@ -783,6 +790,7 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 #define SEC_PER_YEAR (365 * SEC_PER_DAY)
 #define ZBX_JAN_1970_IN_SEC   2208988800.0        /* 1970 - 1900 in seconds */
 double	zbx_time();
+void	zbx_timespec(zbx_timespec_t *ts);
 double	zbx_current_time();
 
 #ifdef HAVE___VA_ARGS__
