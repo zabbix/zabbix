@@ -411,7 +411,7 @@ if(!isset($DB)){
 //SDI('SQL['.$DB['SELECT_COUNT'].']: '.$query);
 			switch($DB['TYPE']){
 				case 'MYSQL':
-					if(zbx_numeric($limit)){
+					if(zbx_ctype_digit($limit)){
 						$query .= ' LIMIT '.intval($limit).' OFFSET '.intval($offset);
 					}
 
@@ -421,7 +421,7 @@ if(!isset($DB)){
 					}
 					break;
 				case 'POSTGRESQL':
-					if(zbx_numeric($limit)){
+					if(zbx_ctype_digit($limit)){
 						$query .= ' LIMIT '.intval($limit).' OFFSET '.intval($offset);
 					}
 
@@ -431,7 +431,7 @@ if(!isset($DB)){
 					}
 					break;
 				case 'ORACLE':
-					if(zbx_numeric($limit)){
+					if(zbx_ctype_digit($limit)){
 						$till = $offset + $limit;
 						$query = 'SELECT * FROM ('.$query.') WHERE rownum BETWEEN '.intval($offset).' AND '.intval($till);
 					}
@@ -447,7 +447,7 @@ if(!isset($DB)){
 					}
 				break;
 				case 'IBM_DB2':
-					if(zbx_numeric($limit)){
+					if(zbx_ctype_digit($limit)){
 						$till = $offset + $limit;
 						$query = 'SELECT * FROM ('.$query.') WHERE rownum BETWEEN '.intval($offset).' AND '.intval($till);
 					}
@@ -470,7 +470,7 @@ if(!isset($DB)){
 						lock_db_access();
 					}
 
-					if(zbx_numeric($limit)){
+					if(zbx_ctype_digit($limit)){
 						$query .= ' LIMIT '.intval($limit).' OFFSET '.intval($offset);
 					}
 
@@ -801,7 +801,7 @@ else {
 		if(empty($nodes))
 			$nodes = 0;
 
-		if(zbx_numeric($nodes)){
+		if(zbx_ctype_digit($nodes)){
 			$nodes = array($nodes);
 		}
 		else if(is_string($nodes)){
@@ -892,6 +892,7 @@ else {
 		else return ' ';
 	}
 
+
 	function zbx_db_search($table, $options, &$sql_parts){
 		list($table, $tableShort) = explode(' ', $table);
 
@@ -906,10 +907,16 @@ else {
 			if(!isset($tableSchema['fields'][$field]) || zbx_empty($pattern)) continue;
 			if($tableSchema['fields'][$field]['type'] != DB::FIELD_TYPE_CHAR) continue;
 
+			// escaping parameter that is about to be used in LIKE statement
+			$pattern = str_replace("!", "!!", $pattern);
+			$pattern = str_replace("%", "!%", $pattern);
+			$pattern = str_replace("_", "!_", $pattern);
+
 			$search[$field] =
 				' UPPER('.$tableShort.'.'.$field.') '.
 				$exclude.' LIKE '.
-				zbx_dbstr($start.zbx_strtoupper($pattern).'%');
+				zbx_dbstr($start.zbx_strtoupper($pattern).'%').
+				" ESCAPE '!'";
 		}
 
 		if(!empty($search)){
@@ -986,33 +993,28 @@ else {
 	}
 
 	function DBcondition($fieldname, $array, $notin=false, $string=false){
-		global $DB;
 		$condition = '';
 
 		if(!is_array($array)){
 			info('DBcondition Error: ['.$fieldname.'] = '.$array);
-			$array = explode(',',$array);
-			if(empty($array))
-				return ' 1=0 ';
+			return ' 1=0 ';
 		}
 
 		$in = 		$notin ? ' NOT IN ':' IN ';
 		$concat = 	$notin ? ' AND ':' OR ';
 
-		switch($DB['TYPE']) {
-			case 'SQLITE3':
-			case 'MYSQL':
-			case 'POSTGRESQL':
-			case 'ORACLE':
-			default:
-				$items = array_chunk($array, 950);
-				foreach($items as $id => $values){
-					if($string) $values = zbx_dbstr($values);
-
-					$condition.=!empty($condition) ? ')'.$concat.$fieldname.$in.'(':'';
-					$condition.= implode(',',$values);
+		$items = array_chunk($array, 950);
+		foreach($items as $id => $values){
+			if($string) $values = zbx_dbstr($values);
+			else foreach($values as $value){
+				if(!is_numeric($value)){
+					info('DBcondition Error: ['.$value.'] incorrect value for numeric field');
+					return ' 1=0 ';
 				}
-				break;
+			}
+
+			$condition.=!empty($condition) ? ')'.$concat.$fieldname.$in.'(':'';
+			$condition.= implode(',',$values);
 		}
 
 		if(zbx_empty($condition)) $condition = $string ? "'-1'":'-1';
@@ -1021,7 +1023,8 @@ else {
 	}
 
 	function zero2null($val){
-		if($val == 0){
+// string 0 beacause ('any string' == 0) = true
+		if($val == '0'){
 			return 'NULL';
 		}
 		else return $val;
@@ -1108,7 +1111,63 @@ else {
 			else if(isset(self::$schema[$table]))
 				return self::$schema[$table];
 			else
-				self::exception(self::SCHEMA_ERROR, 'Table '. $table .' does not exist.');
+				self::exception(self::SCHEMA_ERROR, _s('Table "%s" does not exist.', $table));
+		}
+
+		public static function checkValueTypes($table, &$values){
+			$table_schema = self::getSchema($table);
+
+			foreach($values as $field => $value){
+				if(!isset($table_schema['fields'][$field])){
+					unset($values[$field]);
+					continue;
+				}
+
+				if(is_null($values[$field])){
+					if($table_schema['fields'][$field]['null'])
+						$values[$field] = 'NULL';
+					else if(isset($table_schema['fields'][$field]['default']))
+						$values[$field] = $table_schema['fields'][$field]['default'];
+					else
+						self::exception(self::DBEXECUTE_ERROR, _s('Mandatory field "%1$s" is missing in table "%2$s".', $field, $table));
+				}
+
+				if(isset($table_schema['fields'][$field]['ref_table'])){
+					if($table_schema['fields'][$field]['null'])
+						$values[$field] = zero2null($values[$field]);
+				}
+
+
+				if($values[$field] == 'NULL'){
+					if(!$table_schema['fields'][$field]['null'])
+						self::exception(self::DBEXECUTE_ERROR, _s('Incorrect value "NULL" for NOT NULL field "%s".', $field));
+				}
+				else{
+					switch($table_schema['fields'][$field]['type']){
+						case self::FIELD_TYPE_CHAR:
+							if(zbx_strlen($values[$field]) > $table_schema['fields'][$field]['length']){
+								self::exception(self::SCHEMA_ERROR, _s('Value "%1$s" is too long for field "%2$s" - %3$d characters. Allowed length is %4$d characters.',
+									$values[$field], $field, zbx_strlen($values[$field]), $table_schema['fields'][$field]['length']));
+							}
+
+							$values[$field] = zbx_dbstr($values[$field]);
+							break;
+						case self::FIELD_TYPE_ID:
+						case self::FIELD_TYPE_UINT:
+							if(!zbx_ctype_digit($values[$field]))
+								self::exception(self::DBEXECUTE_ERROR, _s('Incorrect value "%1$s" for unsigned int field "%2$s".', $values[$field], $field));
+							break;
+						case self::FIELD_TYPE_INT:
+							if(strcmp(intval($values[$field]), $values[$field]) != 0)
+								self::exception(self::DBEXECUTE_ERROR, _s('Incorrect value "%1$s" for int field "%2$s".', $values[$field], $field));
+							break;
+						case self::FIELD_TYPE_FLOAT:
+							if(!is_numeric($values[$field]))
+								self::exception(self::DBEXECUTE_ERROR, _s('Incorrect value "%1$s" for float field "%2$s".', $values[$field], $field));
+							break;
+					}
+				}
+			}
 		}
 
 /**
@@ -1128,37 +1187,7 @@ else {
 			$table_schema = self::getSchema($table);
 
 			foreach($values as $key => $row){
-				foreach($row as $field => $value){
-					if(!isset($table_schema['fields'][$field])){
-						unset($row[$field]);
-						continue;
-					}
-
-					// check the size of the value to fit data type
-					if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR
-						&& zbx_strlen($value) > $table_schema['fields'][$field]['length']){
-						self::exception(self::SCHEMA_ERROR, _s('Value "%1$s" is too long for field "%2$s" - %3$d characters. Allowed length is %4$d characters.', $value, $field, zbx_strlen($value), $table_schema['fields'][$field]['length']));
-					}
-
-					// TODO: decide  if we allow to pass null to NOT NULL field using default instead
-					if(is_null($value)){
-						if($table_schema['fields'][$field]['null'])
-							$value = 'NULL';
-						else if(isset($table_schema['fields'][$field]['default']))
-							$value = $table_schema['fields'][$field]['default'];
-					}
-
-					if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR){
-						if($value != 'NULL')
-							$value = zbx_dbstr($value);
-					}
-					else if(isset($table_schema['fields'][$field]['ref_table'])){
-						if($table_schema['fields'][$field]['null'])
-							$value = zero2null($value);
-					}
-
-					$row[$field] = $value;
-				}
+				self::checkValueTypes($table, $row);
 
 				if($getids){
 					$resultIds[$key] = $id;
@@ -1188,38 +1217,13 @@ else {
 			if(empty($data)) return true;
 
 			$data = zbx_toArray($data);
-			$table_schema = self::getSchema($table);
 
 			foreach($data as $dnum => $row){
 				$sql_set = '';
+
+				self::checkValueTypes($table, $row['values']);
+
 				foreach($row['values'] as $field => $value){
-					if(!isset($table_schema['fields'][$field])){
-						continue;
-					}
-
-					// check the size of the value to fit data type
-					if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR
-						&& zbx_strlen($value) > $table_schema['fields'][$field]['length']){
-						self::exception(self::SCHEMA_ERROR, _s('Value "%1$s" is too long for field "%2$s" - %3$d characters. Allowed length is %4$d characters.', $value, $field, zbx_strlen($value), $table_schema['fields'][$field]['length']));
-					}
-
-// TODO: decide  if we allow to pass null to NOT NULL field using default instead
-					if(is_null($value)){
-						if($table_schema['fields'][$field]['null'])
-							$value = 'NULL';
-						else if(isset($table_schema['fields'][$field]['default']))
-							$value = $table_schema['fields'][$field]['default'];
-					}
-
-					if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR){
-						if($value != 'NULL')
-							$value = zbx_dbstr($value);
-					}
-					else if(isset($table_schema['fields'][$field]['ref_table'])){
-						if($table_schema['fields'][$field]['null'])
-							$value = zero2null($value);
-					}
-
 					$sql_set .= $field.'='.$value.',';
 				}
 
@@ -1227,6 +1231,7 @@ else {
 
 				if(!empty($sql_set)){
 					$sql = 'UPDATE '.$table.' SET '.$sql_set.' WHERE '.implode(' AND ', $row['where']);
+
 					if(!DBexecute($sql)) self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
 				}
 			}

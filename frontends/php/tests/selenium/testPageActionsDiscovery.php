@@ -19,26 +19,15 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/class.ctest.php');
+require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
 
-class testPageActionsDiscovery extends CTest
+class testPageActionsDiscovery extends CWebTest
 {
 	// Returns all trigger actions
 	public static function allActions()
 	{
-		DBConnect($error);
-
-		$actions=array();
-
-		$result=DBselect("select * from actions where eventsource=".EVENT_SOURCE_DISCOVERY." order by actionid");
-		while($action=DBfetch($result))
-		{
-			$actions[]=array($action);
-		}
-		DBclose();
-
-		return $actions;
+		return DBdata("select * from actions where eventsource=".EVENT_SOURCE_DISCOVERY." order by actionid");
 	}
 
 	/**
@@ -51,7 +40,7 @@ class testPageActionsDiscovery extends CTest
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_DISCOVERY);
 		$this->assertTitle('Configuration of actions');
 
-// eventsource is used for a hiddn field, so it does not work. See above: ?eventsource=0 is used instead
+// eventsource is used for a hidden field, so it does not work. See above: ?eventsource=0 is used instead
 //		$this->dropdown_select('eventsource','Discovery');
 
 		$this->ok('CONFIGURATION OF ACTIONS');
@@ -75,11 +64,11 @@ class testPageActionsDiscovery extends CTest
 		$name=$action['name'];
 
 		$sql1="select * from actions where actionid=$actionid order by actionid";
-		$oldHashAction=$this->DBhash($sql1);
+		$oldHashAction=DBhash($sql1);
 		$sql2="select * from operations where actionid=$actionid order by operationid";
-		$oldHashOperations=$this->DBhash($sql2);
+		$oldHashOperations=DBhash($sql2);
 		$sql3="select * from conditions where actionid=$actionid order by conditionid";
-		$oldHashConditions=$this->DBhash($sql3);
+		$oldHashConditions=DBhash($sql3);
 
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_DISCOVERY);
 		$this->assertTitle('Configuration of actions');
@@ -92,9 +81,9 @@ class testPageActionsDiscovery extends CTest
 		$this->ok("$name");
 		$this->ok('CONFIGURATION OF ACTIONS');
 
-		$this->assertEquals($oldHashAction,$this->DBhash($sql1),"Chuck Norris: Action update changed data in table 'actions'.");
-		$this->assertEquals($oldHashOperations,$this->DBhash($sql2),"Chuck Norris: Action update changed data in table 'operations'");
-		$this->assertEquals($oldHashConditions,$this->DBhash($sql3),"Chuck Norris: Action update changed data in table 'conditions'");
+		$this->assertEquals($oldHashAction,DBhash($sql1),"Chuck Norris: Action update changed data in table 'actions'.");
+		$this->assertEquals($oldHashOperations,DBhash($sql2),"Chuck Norris: Action update changed data in table 'operations'");
+		$this->assertEquals($oldHashConditions,DBhash($sql3),"Chuck Norris: Action update changed data in table 'conditions'");
 	}
 
 	/**
@@ -138,7 +127,7 @@ class testPageActionsDiscovery extends CTest
 		$this->ok('CONFIGURATION OF ACTIONS');
 
 		$sql="select * from actions where actionid=$actionid and status=1";
-		$this->assertEquals(1,$this->DBcount($sql));
+		$this->assertEquals(1,DBcount($sql));
 	}
 
 	/**
@@ -166,7 +155,7 @@ class testPageActionsDiscovery extends CTest
 		$this->ok('CONFIGURATION OF ACTIONS');
 
 		$sql="select * from actions where actionid=$actionid and status=0";
-		$this->assertEquals(1,$this->DBcount($sql));
+		$this->assertEquals(1,DBcount($sql));
 	}
 
 	/**
@@ -179,7 +168,7 @@ class testPageActionsDiscovery extends CTest
 
 		$this->chooseOkOnNextConfirmation();
 
-		$this->DBsave_tables('actions','operations','conditions');
+		DBsave_tables(array('actions','operations','conditions'));
 
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_DISCOVERY);
 		$this->assertTitle('Configuration of actions');
@@ -195,13 +184,13 @@ class testPageActionsDiscovery extends CTest
 		$this->ok('CONFIGURATION OF ACTIONS');
 
 		$sql="select * from actions where actionid=$actionid";
-		$this->assertEquals(0,$this->DBcount($sql));
+		$this->assertEquals(0,DBcount($sql));
 		$sql="select * from operations where actionid=$actionid";
-		$this->assertEquals(0,$this->DBcount($sql));
+		$this->assertEquals(0,DBcount($sql));
 		$sql="select * from conditions where actionid=$actionid";
-		$this->assertEquals(0,$this->DBcount($sql));
+		$this->assertEquals(0,DBcount($sql));
 
-		$this->DBrestore_tables('actions','operations','conditions');
+		DBrestore_tables(array('actions','operations','conditions'));
 	}
 }
 ?>

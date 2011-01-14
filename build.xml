@@ -69,7 +69,7 @@
 			<arg line="-init ${builddir}/tests/templates/sqlite3.init"/>
 			<arg line="/tmp/${dbname}.db"/>
 		</exec>
-		<exec executable="sqlite3" input="${builddir}/create/data/data_test.sql" failonerror="on">
+		<exec executable="sqlite3" input="${builddir}/tests/data/data_test.sql" failonerror="on">
 			<arg line="-init ${builddir}/tests/templates/sqlite3.init"/>
 			<arg line="/tmp/${dbname}.db"/>
 		</exec>
@@ -107,7 +107,7 @@
 		<exec executable="psql" input="${builddir}/create/data/data.sql" failonerror="on">
 			<arg line="${dbname}"/>
 		</exec>
-		<exec executable="psql" input="${builddir}/create/data/data_test.sql" failonerror="on">
+		<exec executable="psql" input="${builddir}/tests/data/data_test.sql" failonerror="on">
 			<arg line="${dbname}"/>
 		</exec>
 
@@ -140,7 +140,7 @@
 		<exec executable="mysql" input="${builddir}/create/data/data.sql" failonerror="on">
 			<arg line="-uroot ${dbname}"/>
 		</exec>
-		<exec executable="mysql" input="${builddir}/create/data/data_test.sql" failonerror="on">
+		<exec executable="mysql" input="${builddir}/tests/data/data_test.sql" failonerror="on">
 			<arg line="-uroot ${dbname}"/>
 		</exec>
 

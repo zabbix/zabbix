@@ -18,7 +18,6 @@ create/data/create_data_sql/create_data_sql.sh svneol=native#text/x-sh
 create/data/create_data_sql/data_sql_blacklist.txt svneol=native#text/plain
 create/data/create_data_sql/data_sql_filter.txt svneol=native#text/plain
 create/data/create_data_sql/data_sql_predumphooks.txt svneol=native#text/plain
-create/data/data_test.sql -text
 create/data/images/Hub.png -text svneol=unset#unset
 create/data/images/Hub_small.png -text svneol=unset#unset
 create/data/images/Network.png -text svneol=unset#unset
@@ -242,12 +241,17 @@ frontends/php/styles/originalblue/images/ui-icons_cd0a0a_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_d8e7f3_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_f9bd01_256x240.png -text
 frontends/php/tests/api/classes/class.triggerexpressionTest.php -text
+frontends/php/tests/api_json/ApiJsonTests.php -text
+frontends/php/tests/api_json/User.php -text
+frontends/php/tests/api_json/api.php -text
 frontends/php/tests/bootstrap.php.template -text
+frontends/php/tests/include/class.cwebtest.php -text
+frontends/php/tests/include/dbfunc.php -text
 frontends/php/tests/selenium/SeleniumTests.php -text
-frontends/php/tests/selenium/class.ctest.php -text
 frontends/php/tests/selenium/testClicks.php -text
 frontends/php/tests/selenium/testFormHost.php -text
 frontends/php/tests/selenium/testFormHostGroup.php -text
+frontends/php/tests/selenium/testFormLogin.php -text
 frontends/php/tests/selenium/testFormProfile.php -text
 frontends/php/tests/selenium/testFormScreen.php -text
 frontends/php/tests/selenium/testGeneric.php -text
@@ -258,9 +262,19 @@ frontends/php/tests/selenium/testPageDashboard.php -text
 frontends/php/tests/selenium/testPageDiscovery.php -text
 frontends/php/tests/selenium/testPageEvents.php -text
 frontends/php/tests/selenium/testPageHosts.php -text
+frontends/php/tests/selenium/testPageMaintenance.php -text
+frontends/php/tests/selenium/testPageMaps.php -text
 frontends/php/tests/selenium/testPageMediaTypes.php -text
+frontends/php/tests/selenium/testPageNodes.php -text
+frontends/php/tests/selenium/testPageProxies.php -text
+frontends/php/tests/selenium/testPageQueueDetails.php -text
+frontends/php/tests/selenium/testPageQueueOverview.php -text
+frontends/php/tests/selenium/testPageQueueOverviewByProxy.php -text
+frontends/php/tests/selenium/testPageScreens.php -text
 frontends/php/tests/selenium/testPageScripts.php -text
 frontends/php/tests/selenium/testPageSearch.php -text
+frontends/php/tests/selenium/testPageSlideShows.php -text
+frontends/php/tests/selenium/testPageStatusOfZabbix.php -text
 frontends/php/tests/selenium/testPageTemplates.php -text
 frontends/php/tests/selenium/testPageUserGroups.php -text
 frontends/php/tests/selenium/testPageUsers.php -text
@@ -286,6 +300,8 @@ misc/init.d/freebsd/zabbix_server -text
 misc/init.d/tru64/zabbix_server -text
 misc/init.d/ubuntu/zabbix-agent.conf -text
 misc/init.d/ubuntu/zabbix-server.conf -text
+tests/data/README -text
+tests/data/data_test.sql -text
 tests/templates/sqlite3.init -text
 tests/templates/zabbix.conf.php.mysql -text
 tests/templates/zabbix.conf.php.postgresql -text

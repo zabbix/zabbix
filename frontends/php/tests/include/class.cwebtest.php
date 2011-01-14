@@ -23,12 +23,9 @@
 require_once 'PHPUnit/Extensions/SeleniumTestCase.php';
 
 require_once(dirname(__FILE__).'/../../include/defines.inc.php');
-require_once(dirname(__FILE__).'/../../conf/zabbix.conf.php');
-require_once(dirname(__FILE__).'/../../include/copt.lib.php');
-require_once(dirname(__FILE__).'/../../include/func.inc.php');
-require_once(dirname(__FILE__).'/../../include/db.inc.php');
+require_once(dirname(__FILE__).'/dbfunc.php');
 
-class CTest extends PHPUnit_Extensions_SeleniumTestCase
+class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 {
 	protected $captureScreenshotOnFailure = TRUE;
 	protected $screenshotPath = '/home/hudson/public_html/screenshots';
@@ -90,73 +87,6 @@ class CTest extends PHPUnit_Extensions_SeleniumTestCase
 	protected function tearDown()
 	{
 		DBclose();
-	}
-
-	protected function DBsave_tables($tables)
-	{
-		global $DB;
-
-		if(!is_array($tables))	$tables=array($tables);
-
-		foreach($tables as $table)
-		{
-			switch($DB['TYPE']) {
-			case 'MYSQL':
-				DBexecute("drop table if exists ${table}_tmp");
-				DBexecute("create table ${table}_tmp like $table");
-				DBexecute("insert into ${table}_tmp select * from $table");
-				break;
-			default:
-				DBexecute("drop table if exists ${table}_tmp");
-				DBexecute("select * into temp table ${table}_tmp from $table");
-			}
-		}
-	}
-
-	protected function DBrestore_tables($tables)
-	{
-		global $DB;
-
-		if(!is_array($tables))	$tables=array($tables);
-
-		foreach($tables as $table)
-		{
-			DBexecute("delete from $table");
-			DBexecute("insert into $table select * from ${table}_tmp");
-			DBexecute("drop table ${table}_tmp");
-		}
-	}
-
-	protected function DBhash($sql)
-	{
-		global $DB;
-
-		$hash = '';
-
-		$result=DBselect($sql);
-		while($row = DBfetch($result))
-		{
-			foreach($row as $key => $value)
-			{
-				$hash = md5($hash.$value);
-			}
-		}
-
-		return $hash;
-	}
-
-	protected function DBcount($sql)
-	{
-		global $DB;
-		$cnt=0;
-
-		$result=DBselect($sql);
-		while($row = DBfetch($result))
-		{
-			$cnt++;
-		}
-
-		return $cnt;
 	}
 
 	public function login($url = NULL)
@@ -239,7 +169,5 @@ class CTest extends PHPUnit_Extensions_SeleniumTestCase
 		$this->waitForPageToLoad();
 		$this->checkFatalErrors();
 	}
-
-
 }
 ?>
