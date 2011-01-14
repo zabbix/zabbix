@@ -790,7 +790,7 @@ require_once('include/templates/action.js.php');
 	$main = array(new CSubmit('save', S_SAVE));
 	$others = array();
 	if(isset($data['actionid'])){
-		$others[] = new CSubmit('clone', S_CLONE);
+		$others[] = new CButton('clone', S_CLONE);
 		$others[] = new CButtonDelete(S_DELETE_SELECTED_ACTION_Q,url_param('form').url_param('eventsource').url_param('actionid'));
 	}
 	$others[] = new CButtonCancel(url_param('actiontype'));

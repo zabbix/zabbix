@@ -21,23 +21,34 @@
 <?php
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageEvents extends CWebTest
+class testPageQueueOverviewByProxy extends CWebTest
 {
-
-	public function testPageEvents_Triggers_SimpleTest()
+	// Returns all proxies
+	public static function allProxies()
 	{
-		$this->login('events.php');
-		$this->dropdown_select('source','Trigger');
+		return DBdata("select * from hosts where status in (".HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.") order by hostid");
+	}
 
-		$this->assertTitle('Latest events');
-		$this->ok('HISTORY OF EVENTS');
-		$this->ok('Group');
-		$this->ok('Host');
-		$this->ok('Source');
-		$this->ok('Filter');
-		$this->ok('Displaying 0 of 0 found');
-		// table header
-		$this->ok(array('Time','Description','Status','Severity','Duration','Ack','Actions'));
+	/**
+	* @dataProvider allProxies
+	*/
+	public function testPageQueueOverviewByProxy_SimpleTest($proxy)
+	{
+		$this->login('queue.php?config=1');
+		$this->assertTitle('Queue \[refreshed every 30 sec\]');
+		$this->ok('Queue');
+		$this->ok('QUEUE OF ITEMS TO BE UPDATED');
+		// Header
+		$this->ok(array('Proxy','5 seconds','10 seconds','30 seconds','1 minute','5 minutes','More than 10 minutes'));
+		// Data
+		$this->ok($proxy['host']);
+		$this->ok('Server');
+	}
+
+	public function testPageQueueOverviewByProxy_VerifyDisplayedNumbers()
+	{
+// TODO
+		$this->markTestIncomplete();
 	}
 }
 ?>

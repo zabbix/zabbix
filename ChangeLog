@@ -10,15 +10,18 @@ New features:
  - [ZBX-3338] updated Ukrainian translation; thanks to zalex_ua (Richlv)
 
 Bug fixes:
+ - [ZBX-3405] fixed value_type for response code and failed step items when create webcheck (Vedmak)
+ - [ZBX-3363] fixed possible crash of server while processing of {HOST.CONN}, {IPADDRESS} and {HOST.DNS} macros (Sasha)
+ - [ZBX-3326] add X-Poedit-Basepath header to all locales (Richlv)
  - [ZBX-3369] fixed API return: true in more Classes methods *.update and *.delete (Vlad)
  - [ZBX-3368] fixed custom graphs in screens form prefixed with ':' (Vedmak)
- - [ZBX-3329] fixed last value, in latest date, trigers, web (Vlad)
- - [ZBX-3362] fixed cannot rename trigger (Vlad)
- - [ZBX-1341] fixed permissions not enforced on api (Vlad)
+ - [ZBX-3329] fixed last value in latest data, status of triggers, and web monitoring (Vlad)
+ - [ZBX-3362] fixed inability to rename trigger (Vlad)
+ - [ZBX-1341] fixed password hashes returned over API (Vlad)
  - [ZBX-3367] fixed PHP Fatal error when trying to create screen (Vlad)
  - [ZBX-3354] fixed history clearing (Vlad)
- - [ZBX-3360] fixed add simple graph to screen (Vlad)
- - [ZBX-3189] fixed trigger dependencies broken (Vlad)
+ - [ZBX-3360] fixed simple graph adding to a screen (Vlad)
+ - [ZBX-3189] fixed broken trigger dependencies (Vlad)
  - [ZBX-3326] sort po file contents and entries in POTFILES.in, include fuzzy entries in mo files (Richlv)
  - [ZBX-3054] fixed Cannot create or update Action with remote command; fix "reset() expects parameter 1 to be array, null given in /actionconf.php:754" (Vlad)
 
@@ -63,6 +66,9 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
 
+ - [ZBX-3414] expressions for triggers with web items are marked as error in trigger wizard (Vedmak)
+ - [ZBX-3406] better api validation (Vedmak)
+ - [ZBX-3413] added escaping of parameters used in LIKE SQL statements (KB)
  - [ZBX-3391] fixed wrong comparison operators used for strings (Vlad)
  - [ZBX-1346] document LogSlowQueries configuration parameter (Richlv)
  - [ZBXNEXT-612] added mapname url parameter for monitoring->maps (Vedmak)

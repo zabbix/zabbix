@@ -19,9 +19,9 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/class.ctest.php');
+require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageTemplates extends CTest
+class testPageTemplates extends CWebTest
 {
 	// Returns all templates
 	public static function allTemplates()
@@ -57,19 +57,20 @@ class testPageTemplates extends CTest
 		$name=$template['host'];
 
 		$sql1="select * from hosts where host='$name'";
-		$oldHashTemplate=$this->DBhash($sql1);
+		$oldHashTemplate=DBhash($sql1);
 		$sql2="select * from hosts order by hostid";
-		$oldHashHosts=$this->DBhash($sql2);
+		$oldHashHosts=DBhash($sql2);
 		$sql3="select * from items order by itemid";
-		$oldHashItems=$this->DBhash($sql3);
+		$oldHashItems=DBhash($sql3);
 		$sql4="select * from triggers order by triggerid";
-		$oldHashTriggers=$this->DBhash($sql4);
+		$oldHashTriggers=DBhash($sql4);
 
 		$this->login('templates.php');
 		$this->dropdown_select('groupid','all');
 
 		$this->assertTitle('Templates');
 
+		$this->ok($name); //link is present on the screen?
 		$this->click("link=$name");
 		$this->wait();
 		$this->button_click('save');
@@ -79,10 +80,10 @@ class testPageTemplates extends CTest
 		$this->ok("$name");
 		$this->ok('CONFIGURATION OF TEMPLATES');
 
-		$this->assertEquals($oldHashTemplate,$this->DBhash($sql1));
-		$this->assertEquals($oldHashHosts,$this->DBhash($sql2));
-		$this->assertEquals($oldHashItems,$this->DBhash($sql3));
-		$this->assertEquals($oldHashTriggers,$this->DBhash($sql4));
+		$this->assertEquals($oldHashTemplate,DBhash($sql1));
+		$this->assertEquals($oldHashHosts,DBhash($sql2));
+		$this->assertEquals($oldHashItems,DBhash($sql3));
+		$this->assertEquals($oldHashTriggers,DBhash($sql4));
 	}
 
 	public function testPageTemplates_Create()

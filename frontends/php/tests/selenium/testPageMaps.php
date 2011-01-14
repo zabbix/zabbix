@@ -19,9 +19,9 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/class.ctest.php');
+require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageMaps extends CTest
+class testPageMaps extends CWebTest
 {
 	// Returns all maps
 	public static function allMaps()
@@ -64,13 +64,13 @@ class testPageMaps extends CTest
 		$this->chooseOkOnNextConfirmation();
 
 		$sql1="select * from sysmaps where name='$name' order by sysmapid";
-		$oldHashMap=$this->DBhash($sql1);
+		$oldHashMap=DBhash($sql1);
 		$sql2="select * from sysmaps_elements where sysmapid=$sysmapid order by selementid";
-		$oldHashElements=$this->DBhash($sql2);
+		$oldHashElements=DBhash($sql2);
 		$sql3="select * from sysmaps_links where sysmapid=$sysmapid order by linkid";
-		$oldHashLinks=$this->DBhash($sql3);
+		$oldHashLinks=DBhash($sql3);
 		$sql4="select * from sysmaps_link_triggers where linkid in (select linkid from sysmaps_links where sysmapid=$sysmapid) order by linktriggerid";
-		$oldHashLinkTriggers=$this->DBhash($sql4);
+		$oldHashLinkTriggers=DBhash($sql4);
 
 		$this->login('sysmaps.php');
 		$this->assertTitle('Network maps');
@@ -85,10 +85,10 @@ class testPageMaps extends CTest
 		$this->ok("$name");
 		$this->ok('Configuration of network maps');
 
-		$this->assertEquals($oldHashMap,$this->DBhash($sql1),"Chuck Norris: Map update changed data in table 'sysmaps'");
-		$this->assertEquals($oldHashElements,$this->DBhash($sql2),"Chuck Norris: Map update changed data in table 'sysmaps_elements'");
-		$this->assertEquals($oldHashLinks,$this->DBhash($sql3),"Chuck Norris: Map update changed data in table 'sysmaps_links'");
-		$this->assertEquals($oldHashLinkTriggers,$this->DBhash($sql4),"Chuck Norris: Map update changed data in table 'sysmaps_link_triggers'");
+		$this->assertEquals($oldHashMap,DBhash($sql1),"Chuck Norris: Map update changed data in table 'sysmaps'");
+		$this->assertEquals($oldHashElements,DBhash($sql2),"Chuck Norris: Map update changed data in table 'sysmaps_elements'");
+		$this->assertEquals($oldHashLinks,DBhash($sql3),"Chuck Norris: Map update changed data in table 'sysmaps_links'");
+		$this->assertEquals($oldHashLinkTriggers,DBhash($sql4),"Chuck Norris: Map update changed data in table 'sysmaps_link_triggers'");
 */
 	}
 
@@ -99,7 +99,7 @@ class testPageMaps extends CTest
 	{
 		$sysmapid=$map['sysmapid'];
 
-		$this->DBsave_tables(array('sysmaps','sysmaps_elements','sysmaps_links','sysmaps_link_triggers'));
+		DBsave_tables(array('sysmaps','sysmaps_elements','sysmaps_links','sysmaps_link_triggers'));
 
 		$this->chooseOkOnNextConfirmation();
 
@@ -115,15 +115,15 @@ class testPageMaps extends CTest
 		$this->ok('Network map deleted');
 
 		$sql="select * from sysmaps where sysmapid=$sysmapid";
-		$this->assertEquals(0,$this->DBcount($sql));
+		$this->assertEquals(0,DBcount($sql),'Data from sysmaps table was not deleted');
 		$sql="select * from sysmaps_elements where sysmapid=$sysmapid";
-		$this->assertEquals(0,$this->DBcount($sql));
+		$this->assertEquals(0,DBcount($sql),'Data from sysmaps_elements table was not deleted');
 		$sql="select * from sysmaps_links where sysmapid=$sysmapid";
-		$this->assertEquals(0,$this->DBcount($sql));
+		$this->assertEquals(0,DBcount($sql),'Data from sysmaps_links table was not deleted');
 		$sql="select * from sysmaps_link_triggers where linkid in (select linkid from sysmaps_links where sysmapid=$sysmapid) order by linktriggerid";
-		$this->assertEquals(0,$this->DBcount($sql));
+		$this->assertEquals(0,DBcount($sql),'Data from sysmaps_link_triggers table was not deleted');
 
-		$this->DBsave_tables(array('sysmaps','sysmaps_elements','sysmaps_links','sysmaps_link_triggers'));
+		DBsave_tables(array('sysmaps','sysmaps_elements','sysmaps_links','sysmaps_link_triggers'));
 	}
 
 	/**
