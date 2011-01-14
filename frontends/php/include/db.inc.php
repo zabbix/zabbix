@@ -1104,6 +1104,7 @@ else {
 			foreach($values as $field => $value){
 				if(!isset($table_schema['fields'][$field])){
 					unset($values[$field]);
+					continue;
 				}
 
 				switch($table_schema['fields'][$field]['type']){
