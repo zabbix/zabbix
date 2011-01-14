@@ -1117,7 +1117,7 @@ else {
 							self::exception(self::DBEXECUTE_ERROR, 'Incorrect value for unsigned int field');
 						break;
 					case self::FIELD_TYPE_INT:
-						if(strcmp(intval($value), $value) != 0)
+						if(!zbx_is_int($value))
 							self::exception(self::DBEXECUTE_ERROR, 'Incorrect value for int field');
 						break;
 					case self::FIELD_TYPE_FLOAT:
