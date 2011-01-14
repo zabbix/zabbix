@@ -1130,6 +1130,7 @@ else {
 						$values[$field] = $table_schema['fields'][$field]['default'];
 					else
 						self::exception(self::DBEXECUTE_ERROR, _s('Mandatory field "%1$s" is missing in table "%2$s".', $field, $table));
+
 				}
 
 				if(isset($table_schema['fields'][$field]['ref_table'])){
@@ -1138,7 +1139,7 @@ else {
 				}
 
 
-				if($values[$field] == 'NULL'){
+				if($values[$field] === 'NULL'){
 					if(!$table_schema['fields'][$field]['null'])
 						self::exception(self::DBEXECUTE_ERROR, _s('Incorrect value "NULL" for NOT NULL field "%s".', $field));
 				}
@@ -1158,7 +1159,7 @@ else {
 								self::exception(self::DBEXECUTE_ERROR, _s('Incorrect value "%1$s" for unsigned int field "%2$s".', $values[$field], $field));
 							break;
 						case self::FIELD_TYPE_INT:
-							if(strcmp(intval($values[$field]), $values[$field]) != 0)
+							if(!zbx_is_int($values[$field]))
 								self::exception(self::DBEXECUTE_ERROR, _s('Incorrect value "%1$s" for int field "%2$s".', $values[$field], $field));
 							break;
 						case self::FIELD_TYPE_FLOAT:
