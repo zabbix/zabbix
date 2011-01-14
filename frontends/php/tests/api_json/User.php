@@ -21,9 +21,9 @@
 <?php
 require_once 'PHPUnit/Framework.php';
 
-require_once(dirname(__FILE__).'/api.php');
+require_once(dirname(__FILE__).'/../include/class.czabbixtest.php');
 
-class API_JSON_User extends PHPUnit_Framework_TestCase
+class API_JSON_User extends CZabbixTest
 {
 	public static function authenticate_data()
 	{
@@ -38,13 +38,18 @@ class API_JSON_User extends PHPUnit_Framework_TestCase
 			array(array('password'=>'!@#$%^&\\\'\"""\;:', 'Admin'=>'zabbix'), false)
 		);
 	}
+	// Returns all users
+	public static function allUsers()
+	{
+		return DBdata('select * from users');
+	}
 
 	/**
 	* @dataProvider authenticate_data
 	*/
-	public function test_User_Authenticate($data,$expect)
+	public function testUser_Authenticate($data,$expect)
 	{
-		$result = call_api(
+		$result = $this->call_api(
 			'user.authenticate',
 			$data,
 			&$debug);
@@ -58,7 +63,15 @@ class API_JSON_User extends PHPUnit_Framework_TestCase
 		}
 	}
 
-	public function test_User_Authenticate_Documented()
+	/**
+	* @dataProvider allUsers
+	*/
+	public function testPageUsers_SimpleTest($user)
+	{
+	}
+
+
+	public function testUser_Authenticate_Documented()
 	{
 		$this->assertTrue(false,"Chuck Norris: API method 'user.authenticate' is not documented");
 	}
