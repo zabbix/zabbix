@@ -19,9 +19,9 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/class.ctest.php');
+require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageEvents extends CTest
+class testPageEvents extends CWebTest
 {
 
 	public function testPageEvents_Triggers_SimpleTest()

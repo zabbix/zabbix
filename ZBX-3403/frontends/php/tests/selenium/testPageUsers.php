@@ -19,24 +19,14 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/class.ctest.php');
+require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageUsers extends CTest
+class testPageUsers extends CWebTest
 {
 	// Returns all users
 	public static function allUsers()
 	{
-		DBconnect($error);
-
-		$users=array();
-
-		$result=DBselect('select * from users');
-		while($user=DBfetch($result))
-		{
-			$users[]=array($user);
-		}
-		DBclose();
-		return $users;
+		return DBdata('select * from users');
 	}
 
 	/**
@@ -77,11 +67,11 @@ class testPageUsers extends CTest
 		$alias=$user['alias'];
 
 		$sql1="select * from users where alias='$alias' order by userid";
-		$oldHashUser=$this->DBhash($sql1);
+		$oldHashUser=DBhash($sql1);
 		$sql2="select * from users,users_groups where users.userid=users_groups.userid and users.alias='$alias' order by users_groups.id";
-		$oldHashGroup=$this->DBhash($sql2);
+		$oldHashGroup=DBhash($sql2);
 		$sql3="select * from users,media where users.userid=media.userid and users.alias='$alias' order by media.mediaid";
-		$oldHashMedia=$this->DBhash($sql3);
+		$oldHashMedia=DBhash($sql3);
 
 		$this->login('users.php');
 		$this->assertTitle('Users');
@@ -96,14 +86,14 @@ class testPageUsers extends CTest
 		$this->ok("$alias");
 		$this->ok('CONFIGURATION OF USERS AND USER GROUPS');
 
-		$this->assertEquals($oldHashUser,$this->DBhash($sql1));
-		$this->assertEquals($oldHashGroup,$this->DBhash($sql2),"Chuck Norris: User update changed data in table users_groups");
-		$this->assertEquals($oldHashMedia,$this->DBhash($sql3),"Chuck Norris: User update changed data in table medias");
+		$this->assertEquals($oldHashUser,DBhash($sql1));
+		$this->assertEquals($oldHashGroup,DBhash($sql2),"Chuck Norris: User update changed data in table users_groups");
+		$this->assertEquals($oldHashMedia,DBhash($sql3),"Chuck Norris: User update changed data in table medias");
 	}
 
 	public function testPageUsers_MassDelete()
 	{
-		$this->DBsave_tables(array('users','users_groups','media'));
+		DBsave_tables(array('users','users_groups','media'));
 
 		$this->chooseOkOnNextConfirmation();
 
@@ -127,19 +117,19 @@ class testPageUsers extends CTest
 			$this->ok('User deleted');
 
 			$sql="select * from users where userid=$id";
-			$this->assertEquals(0,$this->DBcount($sql),"Chuck Norris: user $id deleted by still exists in table users");
+			$this->assertEquals(0,DBcount($sql),"Chuck Norris: user $id deleted but still exists in table users");
 			$sql="select * from users_groups where userid=$id";
-			$this->assertEquals(0,$this->DBcount($sql),"Chuck Norris: user $id deleted by still exists in table users_groups");
+			$this->assertEquals(0,DBcount($sql),"Chuck Norris: user $id deleted but still exists in table users_groups");
 			$sql="select * from media where userid=$id";
-			$this->assertEquals(0,$this->DBcount($sql),"Chuck Norris: user $id deleted by still exists in table media");
+			$this->assertEquals(0,DBcount($sql),"Chuck Norris: user $id deleted but still exists in table media");
 		}
 
-		$this->DBrestore_tables(array('users','users_groups','media'));
+		DBrestore_tables(array('users','users_groups','media'));
 	}
 
 	public function testPageUsers_MassDeleteSpecialUsers()
 	{
-		$this->DBsave_tables(array('users','users_groups','media'));
+		DBsave_tables(array('users','users_groups','media'));
 
 		$this->chooseOkOnNextConfirmation();
 
@@ -163,15 +153,15 @@ class testPageUsers extends CTest
 			$this->ok('Cannot delete user');
 
 			$sql="select * from users where userid=$id";
-			$this->assertNotEquals(0,$this->DBcount($sql));
+			$this->assertNotEquals(0,DBcount($sql));
 			$sql="select * from users_groups where userid=$id";
-			$this->assertNotEquals(0,$this->DBcount($sql));
+			$this->assertNotEquals(0,DBcount($sql));
 // No media types by default for guest and Admin
 //			$sql="select * from media where userid=$id";
-//			$this->assertNotEquals(0,$this->DBcount($sql));
+//			$this->assertNotEquals(0,DBcount($sql));
 		}
 
-		$this->DBrestore_tables(array('users','users_groups','media'));
+		DBrestore_tables(array('users','users_groups','media'));
 	}
 
 	public function testPageUsers_MassUnblock()
