@@ -70,6 +70,7 @@ class testPageTemplates extends CWebTest
 
 		$this->assertTitle('Templates');
 
+		$this->ok($name); //link is present on the screen?
 		$this->click("link=$name");
 		$this->wait();
 		$this->button_click('save');
