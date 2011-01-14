@@ -67,6 +67,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
 
+ - [ZBX-3425] updated Brazilian Portuguese translation; thanks to Murilo Moreira de Oliveira (Richlv)
  - [ZBX-3403] fixed SQL statements for auto registration and discovery operations (Sasha)
  - [ZBX-3403] removed UNIQUE constraint for autoreg_host_1 index (Sasha)
  - [ZBX-3414] expressions for triggers with web items are marked as error in trigger wizard (Vedmak)
