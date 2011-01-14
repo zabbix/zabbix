@@ -117,11 +117,11 @@ class testPageUsers extends CWebTest
 			$this->ok('User deleted');
 
 			$sql="select * from users where userid=$id";
-			$this->assertEquals(0,DBcount($sql),"Chuck Norris: user $id deleted by still exists in table users");
+			$this->assertEquals(0,DBcount($sql),"Chuck Norris: user $id deleted but still exists in table users");
 			$sql="select * from users_groups where userid=$id";
-			$this->assertEquals(0,DBcount($sql),"Chuck Norris: user $id deleted by still exists in table users_groups");
+			$this->assertEquals(0,DBcount($sql),"Chuck Norris: user $id deleted but still exists in table users_groups");
 			$sql="select * from media where userid=$id";
-			$this->assertEquals(0,DBcount($sql),"Chuck Norris: user $id deleted by still exists in table media");
+			$this->assertEquals(0,DBcount($sql),"Chuck Norris: user $id deleted but still exists in table media");
 		}
 
 		DBrestore_tables(array('users','users_groups','media'));
