@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,24 +21,23 @@
 <?php
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageDashboard extends CWebTest
+class testPageQueueDetails extends CWebTest
 {
-	public $host = "Text host";
-
-	public function testPageDashboard_SimpleTest()
+	public function testPageQueueDetails_SimpleTest()
 	{
-		$this->login('dashboard.php');
-		$this->assertTitle('Dashboard');
-		$this->ok('PERSONAL DASHBOARD');
-		$this->ok('Favourite graphs');
-		$this->ok('Favourite screens');
-		$this->ok('Favourite maps');
-		$this->ok('Status of Zabbix');
-		$this->ok('System status');
-		$this->ok('Host status');
-		$this->ok('Last 20 issues');
-		$this->ok('Web monitoring');
-		$this->ok('Updated:');
+		$this->login('queue.php?config=2');
+		$this->assertTitle('Queue \[refreshed every 30 sec\]');
+		$this->ok('Queue');
+		$this->ok('QUEUE OF ITEMS TO BE UPDATED');
+		// Header
+		$this->ok(array('Next check','Delayed by','Host','Description'));
+		$this->ok('Total:');
+	}
+
+	public function testPageQeueOverviewDetails_VerifyDisplayedNumbers()
+	{
+// TODO
+		$this->markTestIncomplete();
 	}
 }
 ?>

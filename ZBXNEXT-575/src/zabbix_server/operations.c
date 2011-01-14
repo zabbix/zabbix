@@ -45,51 +45,50 @@ static zbx_uint64_t	select_discovered_host(DB_EVENT *event)
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	hostid = 0;
+	char		sql[512];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(eventid:" ZBX_FS_UI64 ")",
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64,
 			__function_name, event->eventid);
 
-	switch (event->object) {
-	case EVENT_OBJECT_DHOST:
-		result = DBselect(
+	switch (event->object)
+	{
+		case EVENT_OBJECT_DHOST:
+			zbx_snprintf(sql, sizeof(sql),
 				"select h.hostid"
 				" from hosts h,interface i,dservices ds"
 				" where h.hostid=i.hostid"
 					" and i.useip=1"
 					" and i.ip=ds.ip"
-					" and ds.dhostid=" ZBX_FS_UI64,
-				event->objectid);
+					" and ds.dhostid=" ZBX_FS_UI64
+					DB_NODE
+				" order by i.hostid",
+				event->objectid, DBnode_local("i.interfaceid"));
 		break;
 	case EVENT_OBJECT_DSERVICE:
-		result = DBselect(
+		zbx_snprintf(sql, sizeof(sql),
 				"select h.hostid"
 				" from hosts h,interface i,dservices ds"
 				" where h.hostid=i.hostid"
 					" and i.useip=1"
 					" and i.ip=ds.ip"
-					" and ds.dserviceid =" ZBX_FS_UI64,
-				event->objectid);
-		break;
-	case EVENT_OBJECT_ZABBIX_ACTIVE:
-		result = DBselect(
-				"select h.hostid"
-				" from hosts h,autoreg_host a"
-				" where a.proxy_hostid=h.proxy_hostid"
-					" and a.host=h.host"
-					" and a.autoreg_hostid=" ZBX_FS_UI64,
-				event->objectid);
+					" and ds.dserviceid =" ZBX_FS_UI64
+					DB_NODE
+				" order by i.hostid",
+				event->objectid, DBnode_local("i.interfaceid"));
 		break;
 	default:
-		return 0;
+		goto exit;
 	}
+
+	result = DBselectN(sql, 1);
 
 	if (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(hostid, row[0]);
 	}
 	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End %s()", __function_name);
+exit:
+	zabbix_log(LOG_LEVEL_DEBUG, "End %s():" ZBX_FS_UI64, __function_name, hostid);
 
 	return hostid;
 }
@@ -274,7 +273,7 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 					/* by ip */
 					make_hostname(row[2]); /* replace not-allowed symbols */
 					host_unique = DBget_unique_hostname_by_sample(row[2]);
-				}				
+				}
 
 				host_unique_esc = DBdyn_escape_string(host_unique);
 
@@ -315,17 +314,22 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 
 		if (NULL != (row = DBfetch(result)))
 		{
+			char	sql[512];
+
 			ZBX_DBROW2UINT64(proxy_hostid, row[0]);
 			host_esc = DBdyn_escape_string_len(row[1], HOST_HOST_LEN);
 			port = (unsigned short)atoi(row[3]);
 
-			result2 = DBselect(
+			zbx_snprintf(sql, sizeof(sql),
 					"select hostid,proxy_hostid"
 					" from hosts"
 					" where host='%s'"
-						DB_NODE,
+						DB_NODE
+					" order by hostid",
 					host_esc,
 					DBnode_local("hostid"));
+
+			result2 = DBselectN(sql, 1);
 
 			if (NULL == (row2 = DBfetch(result2)))
 			{

@@ -19,9 +19,9 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/class.ctest.php');
+require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageDiscovery extends CTest
+class testPageDiscovery extends CWebTest
 {
 	// Returns all discovery rules
 	public static function allRules()
@@ -58,9 +58,9 @@ class testPageDiscovery extends CTest
 		$druleid=$rule['druleid'];
 
 		$sql1="select * from drules where name='$name' order by druleid";
-		$oldHashRules=$this->DBhash($sql1);
+		$oldHashRules=DBhash($sql1);
 		$sql2="select * from dchecks where druleid=$druleid order by dcheckid";
-		$oldHashChecks=$this->DBhash($sql2);
+		$oldHashChecks=DBhash($sql2);
 
 		$this->login('discoveryconf.php');
 		$this->assertTitle('Configuration of discovery');
@@ -73,8 +73,8 @@ class testPageDiscovery extends CTest
 		$this->ok("$name");
 		$this->ok('CONFIGURATION OF DISCOVERY');
 
-		$this->assertEquals($oldHashRules,$this->DBhash($sql1));
-		$this->assertEquals($oldHashChecks,$this->DBhash($sql2));
+		$this->assertEquals($oldHashRules,DBhash($sql1));
+		$this->assertEquals($oldHashChecks,DBhash($sql2));
 	}
 
 	/**
@@ -84,7 +84,7 @@ class testPageDiscovery extends CTest
 	{
 		$druleid=$rule['druleid'];
 
-		$this->DBsave_tables(array('drules','dchecks'));
+		DBsave_tables(array('drules','dchecks'));
 
 		$this->chooseOkOnNextConfirmation();
 
@@ -100,11 +100,11 @@ class testPageDiscovery extends CTest
 		$this->ok('Discovery rules deleted');
 
 		$sql="select * from drules where druleid=$druleid";
-		$this->assertEquals(0,$this->DBcount($sql));
+		$this->assertEquals(0,DBcount($sql));
 		$sql="select * from dchecks where druleid=$druleid";
-		$this->assertEquals(0,$this->DBcount($sql));
+		$this->assertEquals(0,DBcount($sql));
 
-		$this->DBrestore_tables(array('drules','dchecks'));
+		DBrestore_tables(array('drules','dchecks'));
 	}
 
 	/**

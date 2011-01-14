@@ -29,7 +29,7 @@ class CCheckBox extends CInput{
 	}
 
 	public function setChecked($value='yes'){
-		if(($value === true) || (zbx_numeric($value) && ($value!=0)) || (is_string($value) && ($value=='yes' || $value=='checked' || $value=='on') || $value=='1'))
+		if(($value === true) || (is_numeric($value) && ($value!=0)) || (is_string($value) && ($value=='yes' || $value=='checked' || $value=='on') || $value=='1'))
 			return $this->attributes['checked'] = 'checked';
 
 		$this->removeAttribute('checked');

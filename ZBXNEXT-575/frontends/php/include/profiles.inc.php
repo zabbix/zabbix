@@ -126,6 +126,7 @@ class CProfile{
 	}
 
 	private static function insertDB($idx, $value, $type, $idx2){
+
 		$value_type = self::getFieldByType($type);
 
 		$values = array(
@@ -185,7 +186,7 @@ class CProfile{
 				$result = zbx_ctype_digit($value);
 				break;
 			case PROFILE_TYPE_INT:
-				$result = zbx_numeric($value);
+				$result = (strcmp(intval($value), $value) == 0);
 				break;
 			default:
 				$result = true;

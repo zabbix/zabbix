@@ -19,10 +19,10 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/class.ctest.php');
+require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
 
-class testPageScreens extends CTest
+class testPageScreens extends CWebTest
 {
 	// Returns all screens
 	public static function allScreens()
@@ -118,7 +118,7 @@ class testPageScreens extends CTest
 
 		$this->chooseOkOnNextConfirmation();
 
-		$this->DBsave_tables(array('screens','screens_items'));
+		DBsave_tables(array('screens','screens_items'));
 
 		$this->login('screenconf.php');
 		$this->assertTitle('Configuration of screens');
@@ -134,11 +134,11 @@ class testPageScreens extends CTest
 		$this->ok('CONFIGURATION OF SCREENS');
 
 		$sql="select * from screens where screenid=$screenid";
-		$this->assertEquals(0,$this->DBcount($sql));
+		$this->assertEquals(0,DBcount($sql));
 		$sql="select * from screens_items where screenid=$screenid";
-		$this->assertEquals(0,$this->DBcount($sql));
+		$this->assertEquals(0,DBcount($sql));
 
-		$this->DBrestore_tables(array('screens','screens_items'));
+		DBrestore_tables(array('screens','screens_items'));
 	}
 }
 ?>

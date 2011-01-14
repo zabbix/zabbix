@@ -301,5 +301,19 @@ function closeOpCmdForm(){
 	}
 	return false;
 }
+
+jQuery(document).ready(function(){
+
+	jQuery("#name").focus();
+
+// Clone button
+	jQuery("#clone").click(function(){
+		jQuery("#actionid, #delete, #clone").remove();
+
+		jQuery("#cancel").addClass('ui-corner-left');
+		jQuery("#name").focus();
+	});
+});
+
 //]]> -->
 </script>
