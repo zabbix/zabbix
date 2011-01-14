@@ -536,16 +536,7 @@ return bcdiv($sum, count($values));
 
 // accepts parametr as integer either
 function zbx_ctype_digit($x){
-	return preg_match('/^\\d+$/',$x);
-}
-
-function zbx_numeric($value){
-	if(is_array($value)) return false;
-	if(zbx_empty($value)) return false;
-
-	$value = strval($value);
-
-return preg_match('/^[-|+]?\\d+$/',$value);
+	return ctype_digit(strval($x));
 }
 
 function zbx_empty($value){
