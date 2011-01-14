@@ -3393,9 +3393,9 @@ return $caption;
 						'filter' => array(
 							'hostid' => $hostId,
 							'key_' => $hostKey.$hostKeyParams,
-							'webitems' => true,
 							'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED),
-						)
+						),
+						'webitems' => true,
 					));
 					if(count($itemFound) > 0) {
 						$itemFound = array_shift($itemFound);
