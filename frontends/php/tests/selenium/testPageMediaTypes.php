@@ -19,25 +19,14 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/class.ctest.php');
+require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageMediaTypes extends CTest
+class testPageMediaTypes extends CWebTest
 {
 	// Returns all media types
 	public static function allMediaTypes()
 	{
-		DBconnect($error);
-
-		$meditypes=array();
-
-		$result=DBselect('select * from media_type');
-		while($mediatype=DBfetch($result))
-		{
-			$mediatypes[]=array($mediatype);
-		}
-
-		DBclose();
-		return $mediatypes;
+		return DBdata('select * from media_type');
 	}
 
 	/**
@@ -56,6 +45,7 @@ class testPageMediaTypes extends CTest
 		if($mediatype['type'] == MEDIA_TYPE_EMAIL)	$this->ok('Email');
 		if($mediatype['type'] == MEDIA_TYPE_JABBER)	$this->ok('Jabber');
 		if($mediatype['type'] == MEDIA_TYPE_SMS)	$this->ok('SMS');
+		if($mediatype['type'] == MEDIA_TYPE_EZ_TEXTING)	$this->ok('Ez Texting');
 		$this->dropdown_select('go','Delete selected');
 	}
 
@@ -67,7 +57,7 @@ class testPageMediaTypes extends CTest
 		$name=$mediatype['description'];
 
 		$sql="select * from media_type where description='$name' order by mediatypeid";
-		$oldHash=$this->DBhash($sql);
+		$oldHash=DBhash($sql);
 
 		$this->login('media_types.php');
 		$this->assertTitle('Media types');
@@ -80,7 +70,7 @@ class testPageMediaTypes extends CTest
 		$this->ok("$name");
 		$this->ok('CONFIGURATION OF MEDIA TYPES');
 
-		$this->assertEquals($oldHash,$this->DBhash($sql));
+		$this->assertEquals($oldHash,DBhash($sql));
 	}
 
 	/**
@@ -90,7 +80,7 @@ class testPageMediaTypes extends CTest
 	{
 		$id=$mediatype['mediatypeid'];
 
-		$this->DBsave_tables('media_type');
+		DBsave_tables(array('media_type'));
 
 		$this->chooseOkOnNextConfirmation();
 
@@ -106,9 +96,9 @@ class testPageMediaTypes extends CTest
 		$this->ok('Media type deleted');
 
 		$sql="select * from media_type where mediatypeid=$id";
-		$this->assertEquals(0,$this->DBcount($sql));
+		$this->assertEquals(0,DBcount($sql));
 
-		$this->DBrestore_tables('media_type');
+		DBrestore_tables(array('media_type'));
 	}
 }
 ?>

@@ -693,13 +693,14 @@ Copt::memoryPick();
  * @return array|boolean
  */
 	public static function delete($interfaceids){
-		if(empty($interfaceids)) return true;
-
-		$interfaceids = zbx_toArray($interfaceids);
-		$interfaces = zbx_toObject($interfaceids, 'interfaceid');
 
 		try{
 			self::BeginTransaction(__METHOD__);
+
+			if(empty($interfaceids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+
+			$interfaceids = zbx_toArray($interfaceids);
+			$interfaces = zbx_toObject($interfaceids, 'interfaceid');
 
 			self::checkInput($interfaces,__FUNCTION__);
 
