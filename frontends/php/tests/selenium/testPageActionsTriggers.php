@@ -40,7 +40,7 @@ class testPageActionsTriggers extends CWebTest
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS);
 		$this->assertTitle('Configuration of actions');
 
-// eventsource is used for a hiddn field, so it does not work. See above: ?eventsource=0 is used instead
+// eventsource is used for a hidden field, so it does not work. See above: ?eventsource=0 is used instead
 //		$this->dropdown_select('eventsource','Triggers');
 
 		$this->ok('CONFIGURATION OF ACTIONS');
