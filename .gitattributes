@@ -246,6 +246,7 @@ frontends/php/tests/api_json/ApiJsonTests.php -text
 frontends/php/tests/api_json/General.php -text
 frontends/php/tests/api_json/User.php -text
 frontends/php/tests/bootstrap.php.template -text
+frontends/php/tests/general/db_test.php -text
 frontends/php/tests/include/class.cwebtest.php -text
 frontends/php/tests/include/class.czabbixtest.php -text
 frontends/php/tests/include/dbfunc.php -text
