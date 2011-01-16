@@ -19,6 +19,7 @@
 **/
 ?>
 <?php
+require_once(dirname(__FILE__).'/db_test.php');
 require_once(dirname(__FILE__).'/function_check_item_key.php');
 //require_once 'otherTest.php';
 
@@ -28,6 +29,7 @@ class GeneralTests
 	{
 		$suite = new PHPUnit_Framework_TestSuite('general');
 
+		$suite->addTestSuite('db_test');
 		$suite->addTestSuite('function_check_item_key');
 //		$suite->addTestSuite('otherTest');
 //		...
