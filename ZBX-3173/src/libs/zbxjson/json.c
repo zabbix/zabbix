@@ -528,12 +528,15 @@ int	zbx_json_open(char *buffer, struct zbx_json_parse *jp)
 				break;
 		}
 
-		if ('\0' == *i || !(0 == state && NULL != strchr(ZBX_WHITESPACE, *i)))
+		if (1 == state || NULL == strchr(ZBX_WHITESPACE, *i) || '\0' == *i)
 			*o++ = *i;
 	}
 	while ('\0' != *i++);
 
 	if (NULL == (jp->end = __zbx_json_rbracket(buffer)))
+		goto error;
+
+	if ('\0' != jp->end[1])
 		goto error;
 
 	return SUCCEED;
