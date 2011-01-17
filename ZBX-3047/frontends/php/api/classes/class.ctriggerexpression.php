@@ -73,7 +73,7 @@ private $allowed;
 
 	public function checkHost($host){
 		if(zbx_empty($host))
-			throw new Exception('Empty host name "'.$host.'" provided in expression.');
+			throw new Exception('Empty host name provided in expression.');
 
 		if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $host))
 			throw new Exception('Incorrect host name "'.$host.'" provided in expression.');
@@ -89,40 +89,53 @@ private $allowed;
 	}
 
 	public function checkFunction($expression){
-		if(!isset($this->allowed['functions'][$expression['functionName']]))
-			throw new Exception('Incorrect trigger function "'.$expression['function'].'" provided in expression.');
+		try{
+			if(!isset($this->allowed['functions'][$expression['functionName']]))
+				throw new Exception('Unknown function.');
 
-		if(!preg_match('/^'.ZBX_PREG_FUNCTION_FORMAT.'$/u', $expression['function']))
-			throw new Exception('Incorrect trigger function "'.$expression['function'].'" provided in expression.');
+			if(!preg_match('/^'.ZBX_PREG_FUNCTION_FORMAT.'$/u', $expression['function']))
+				throw new Exception('Incorrect function format.');
 
-		if(is_null($this->allowed['functions'][$expression['functionName']]['args'])) return true;
+			if(is_null($this->allowed['functions'][$expression['functionName']]['args'])){
+				if(!empty($expression['functionParamList']))
+					throw new Exception('Function does not expext parameters.');
+				else
+					return true;
+			}
 
-		foreach($this->allowed['functions'][$expression['functionName']]['args'] as $anum => $arg){
+			if(count($this->allowed['functions'][$expression['functionName']]['args']) < count($expression['functionParamList']))
+				throw new Exception('Function support '.count($this->allowed['functions'][$expression['functionName']]['args']).' parameters.');
 
-// mandatory check
-			if(isset($arg['mandat']) && $arg['mandat'] && (!isset($expression['functionParamList'][$anum]) || zbx_empty($expression['functionParamList'][$anum])))
-				throw new Exception('Incorrect trigger function parameters count "'.$expression['function'].'" provided in expression.');
+			foreach($this->allowed['functions'][$expression['functionName']]['args'] as $anum => $arg){
 
+	// mandatory check
+				if(isset($arg['mandat']) && $arg['mandat'] && (!isset($expression['functionParamList'][$anum]) || zbx_empty($expression['functionParamList'][$anum])))
+					throw new Exception('Mandatory parameter is missing.');
 
-// type check
-			if(isset($arg['type']) && isset($expression['functionParamList'][$anum])){
-				$userMacro = preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $expression['functionParamList'][$anum]);
+	// type check
+				if(isset($arg['type']) && isset($expression['functionParamList'][$anum])){
+					$userMacro = preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $expression['functionParamList'][$anum]);
 
-				if(($arg['type'] == 'str') && !is_string($expression['functionParamList'][$anum]) && !$userMacro)
-					throw new Exception('Expected string for trigger function parameter in function "'.$expression['function'].'" provided in expression.');
+					if(($arg['type'] == 'str') && !is_string($expression['functionParamList'][$anum]) && !$userMacro)
+						throw new Exception('Parameter of type string or user macro expected, "'.$expression['functionParamList'][$anum].'" given.');
 
-				if(($arg['type'] == 'sec') && (validate_float($expression['functionParamList'][$anum]) != 0) && !$userMacro)
-					throw new Exception('Expected counter or macro for trigger function parameter in function "'.$expression['function'].'" provided in expression.');
+					if(($arg['type'] == 'sec') && (validate_float($expression['functionParamList'][$anum]) != 0) && !$userMacro)
+						throw new Exception('Parameter counter or user macro expected, "'.$expression['functionParamList'][$anum].'" given.');
 
-				if(($arg['type'] == 'sec_num') && (validate_ticks($expression['functionParamList'][$anum]) != 0) && !$userMacro)
-					throw new Exception('Expected numeric or counter or macro for trigger function parameter in function "'.$expression['function'].'" provided in expression.');
+					if(($arg['type'] == 'sec_num') && (validate_ticks($expression['functionParamList'][$anum]) != 0) && !$userMacro)
+						throw new Exception('Parameter of type integer or counter or user macro expected, "'.$expression['functionParamList'][$anum].'" given.');
 
-				if(($arg['type'] == 'num') && !is_numeric($expression['functionParamList'][$anum]) && !$userMacro)
-					throw new Exception('Expected numeric or macro for trigger function parameter in function "'.$expression['function'].'" provided in expression.');
+					if(($arg['type'] == 'num') && !is_numeric($expression['functionParamList'][$anum]) && !$userMacro)
+						throw new Exception('Parameter of type integer or user macro expected, "'.$expression['functionParamList'][$anum].'" given.');
+				}
 			}
 		}
+		catch(Exception $e){
+			$error = 'Incorrect trigger function "'.$expression['function'].'" provided in expression. ';
+			$error .= $e->getMessage();
 
-		return 1;
+			throw new Exception($error);
+		}
 	}
 
 	public function checkSimpleExpression(&$expression){
