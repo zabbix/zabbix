@@ -279,7 +279,13 @@ include_once('include/page_header.php');
 		else
 			$lastclock = ' - ';
 
+
+		if(isset($db_item['lastclock']) && $db_item['lastclock'] != 0){
 			$lastvalue = format_lastvalue($db_item);
+		}else{
+			$lastvalue = ' - ';
+		}
+
 
 		if(isset($db_item['lastvalue']) && isset($db_item['prevvalue'])
 				&& in_array($db_item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
@@ -426,14 +432,16 @@ include_once('include/page_header.php');
 		if(isset($showAll) && !empty($apps) && !isset($apps[0])) continue;
 		else if(isset($hideAll) && (empty($apps) || isset($apps[0]))) continue;
 
-
-
 		if(isset($db_item['lastclock']))
 			$lastclock=zbx_date2str(S_LATEST_ITEMS_TRIGGERS_DATE_FORMAT,$db_item['lastclock']);
 		else
 			$lastclock = new CCol(' - ');
 
-		$lastvalue=format_lastvalue($db_item);
+		if(isset($db_item['lastclock']) && $db_item['lastclock'] != 0){
+			$lastvalue = format_lastvalue($db_item);
+		}else{
+			$lastvalue = ' - ';
+		}
 
 		if( isset($db_item['lastvalue']) && isset($db_item['prevvalue']) &&
 			($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $db_item['value_type'] == ITEM_VALUE_TYPE_UINT64) &&

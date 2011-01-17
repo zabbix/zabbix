@@ -1506,7 +1506,7 @@ return $caption;
 								' WHERE i.itemid=f.itemid '.
 									' AND f.functionid='.$functionid;
 						$row2=DBfetch(DBselect($sql));
-						$description = str_replace($macro, format_lastvalue($row2), $description);
+						$description = str_replace($macro, ($row2['lastclock'] != 0 ? format_lastvalue($row2) : ' - '), $description);
 
 					}
 				}
