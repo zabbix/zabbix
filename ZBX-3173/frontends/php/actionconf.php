@@ -310,6 +310,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			access_deny();
 
 		$go_result = CAction::delete($_REQUEST['g_actionid']);
+		show_messages($go_result, S_SELECTED_ACTIONS_DELETED, S_CANNOT_DELETE_SELECTED_ACTIONS);
 	}
 
 	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){

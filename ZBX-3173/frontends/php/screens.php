@@ -121,35 +121,33 @@
 	//getiing element id from GET paramters
 	$elementid = $_REQUEST['elementid'] = get_request('elementid', false);
 	//if none is provided
-	if ($elementid === false && !$use_screen_name) {
+	if($elementid === false && !$use_screen_name){
 		//get element id saved in profile from the last visit
 		$elementid = CProfile::get('web.screens.elementid', null);
 		//this flag will be used in case this element does not exist
 		$id_has_been_fetched_from_profile = true;
 	}
-	else {
+	else{
 		$id_has_been_fetched_from_profile = false;
 	}
 
 	$screens_wdgt = new CWidget();
 
 	$scroll_div = new CDiv();
-	$scroll_div->setAttribute('id','scrollbar_cntr');
+	$scroll_div->setAttribute('id', 'scrollbar_cntr');
 	$screens_wdgt->addFlicker($scroll_div, CProfile::get('web.screens.filter.state',1));
 
 	$formHeader = new CForm();
 	$cmbConfig = new CComboBox('config', 'screens.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
-		$cmbConfig->addItem('screens.php', S_SCREENS);
-		$cmbConfig->addItem('slides.php', S_SLIDESHOWS);
+	$cmbConfig->addItem('screens.php', S_SCREENS);
+	$cmbConfig->addItem('slides.php', S_SLIDESHOWS);
 	$formHeader->addItem($cmbConfig);
 
 
 	$screens = CScreen::get(array(
 		'nodeids' => get_current_nodeid(),
-		'extendoutput' => 1
+		'output' => API_OUTPUT_EXTEND
 	));
-
-	
 
 	//if screen name is provided it takes priority over elementid
 	if ($use_screen_name) {
@@ -204,7 +202,7 @@
 			'elid' => $screen['screenid'],
 		));
 		$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
-		
+
 		$screens_wdgt->addPageHeader(S_SCREENS_BIG, array($formHeader, SPACE, $icon, $fs_icon));
 		$screens_wdgt->addItem(BR());
 // }}} PAGE HEADER

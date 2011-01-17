@@ -1,5 +1,15 @@
 Changes for 1.8.5rc1
 
+ - [ZBX-3173] made server-side JSON parser ignore whitespace better (asaveljevs)
+ - [ZBX-3425] updated Brazilian Portuguese translation; thanks to Murilo Moreira de Oliveira (Richlv)
+ - [ZBX-3403] fixed SQL statements for auto registration and discovery operations (Sasha)
+ - [ZBX-3403] removed UNIQUE constraint for autoreg_host_1 index (Sasha)
+ - [ZBX-3414] expressions for triggers with web items are marked as error in trigger wizard (Vedmak)
+ - [ZBX-3406] better api validation (Vedmak)
+ - [ZBX-3413] added escaping of parameters used in LIKE SQL statements (KB)
+ - [ZBX-3391] fixed wrong comparison operators used for strings (Vlad)
+ - [ZBX-1346] document LogSlowQueries configuration parameter (Richlv)
+ - [ZBXNEXT-612] added mapname url parameter for monitoring->maps (Vedmak)
  - [ZBX-886] remove duplicate translation strings (Richlv)
  - [ZBX-3384] fixed server crash in a distributed monitoring setup with PostgreSQL (asaveljevs)
  - [ZBX-3274] fixed SQLite3 semaphore errors while starting server or proxy (Sasha)

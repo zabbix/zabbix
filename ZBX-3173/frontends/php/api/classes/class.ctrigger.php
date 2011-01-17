@@ -1170,8 +1170,8 @@ COpt::memoryPick();
 
 				if($trigger_db_fields['type'] == $trigger['type']) $trigger['type'] = null;
 				if($trigger_db_fields['priority'] == $trigger['priority']) $trigger['priority'] = null;
-				if($trigger_db_fields['comments'] == $trigger['comments']) $trigger['comments'] = null;
-				if($trigger_db_fields['url'] == $trigger['url']) $trigger['url'] = null;
+				if(strcmp($trigger_db_fields['comments'], $trigger['comments']) == 0) $trigger['comments'] = null;
+				if(strcmp($trigger_db_fields['url'] == $trigger['url']) == 0) $trigger['url'] = null;
 
 				$result = update_trigger(
 					$trigger['triggerid'],
