@@ -804,7 +804,7 @@ static const char	*zbx_json_decodevalue_dyn(const char *p, char **string, size_t
 	zbx_json_type_t	jt;
 	size_t		sz;
 
-	jt = zbx_json_type(p);
+	jt = __zbx_json_type(p);
 
 	if ((size_t)(-1) == (sz = zbx_json_value_size(p, jt)))
 		return NULL;
