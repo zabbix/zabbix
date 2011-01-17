@@ -156,8 +156,6 @@ include_once('include/page_header.php');
 		show_messages();
 
 		if(!check_right_on_trigger_by_expression(PERM_READ_WRITE, $_REQUEST['expression'])){
-			error('Incorrect trigger expression. Host does not exist or you have no access to this host.');
-
 			if(isset($_REQUEST['triggerid']))
 				show_messages(false, null, S_CANNOT_UPDATE_TRIGGER);
 			else

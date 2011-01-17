@@ -1957,7 +1957,10 @@ return $caption;
 		$hosts = zbx_toHash($hosts, 'host');
 
 		foreach($expr->data['hosts'] as $host){
-			if(!isset($hosts[$host])) return false;
+			if(!isset($hosts[$host])){
+				error('Incorrect trigger expression. Host "'.$host.'" does not exist or you have no access to this host.');
+				return false;
+			}
 		}
 
 	return true;
