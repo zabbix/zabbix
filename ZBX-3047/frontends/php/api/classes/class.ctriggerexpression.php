@@ -68,7 +68,7 @@ private $allowed;
 	}
 
 	public function checkUserMacro($usermacro){
-		return preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/i', $usermacro);
+		return preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $usermacro);
 	}
 
 	public function checkHost($host){
@@ -106,16 +106,18 @@ private $allowed;
 
 // type check
 			if(isset($arg['type']) && isset($expression['functionParamList'][$anum])){
-				if(($arg['type'] == 'str') && !is_string($expression['functionParamList'][$anum]))
+				$userMacro = preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $expression['functionParamList'][$anum]);
+
+				if(($arg['type'] == 'str') && !is_string($expression['functionParamList'][$anum]) && !$userMacro)
 					throw new Exception('Expected string for trigger function parameter in function "'.$expression['function'].'" provided in expression.');
 
-				if(($arg['type'] == 'sec') && (validate_float($expression['functionParamList'][$anum]) != 0))
+				if(($arg['type'] == 'sec') && (validate_float($expression['functionParamList'][$anum]) != 0) && !$userMacro)
 					throw new Exception('Expected counter or macro for trigger function parameter in function "'.$expression['function'].'" provided in expression.');
 
-				if(($arg['type'] == 'sec_num') && (validate_ticks($expression['functionParamList'][$anum]) != 0))
+				if(($arg['type'] == 'sec_num') && (validate_ticks($expression['functionParamList'][$anum]) != 0) && !$userMacro)
 					throw new Exception('Expected numeric or counter or macro for trigger function parameter in function "'.$expression['function'].'" provided in expression.');
 
-				if(($arg['type'] == 'num') && !is_numeric($expression['functionParamList'][$anum]))
+				if(($arg['type'] == 'num') && !is_numeric($expression['functionParamList'][$anum]) && !$userMacro)
 					throw new Exception('Expected numeric or macro for trigger function parameter in function "'.$expression['function'].'" provided in expression.');
 			}
 		}
