@@ -124,7 +124,7 @@ class CMap extends CZBXAPI{
 
 			if(isset($options['filter']['name']) && !is_null($options['filter']['name'])){
 				zbx_value2array($options['filter']['name']);
-				$sql_parts['where']['name'] = DBcondition('s.name', $options['filter']['name'], false, true);
+				$sql_parts['where']['name'] = DBcondition('s.name', $options['filter']['name']);
 			}
 		}
 

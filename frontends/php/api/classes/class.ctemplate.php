@@ -1180,7 +1180,7 @@ COpt::memoryPick();
 			$sql = 'SELECT DISTINCT actionid '.
 					' FROM conditions '.
 					' WHERE conditiontype='.CONDITION_TYPE_HOST.
-						' AND '.DBcondition('value', $templateids, false, true);
+						' AND '.DBcondition('value', $templateids);
 			$db_actions = DBselect($sql);
 			while($db_action = DBfetch($db_actions)){
 				$actionids[$db_action['actionid']] = $db_action['actionid'];
@@ -1209,7 +1209,7 @@ COpt::memoryPick();
 // delete action conditions
 			DBexecute('DELETE FROM conditions '.
 						' WHERE conditiontype='.CONDITION_TYPE_HOST.
-							' AND '.DBcondition('value',$templateids, false, true));	// FIXED[POSIBLE value type violation]!!!
+							' AND '.DBcondition('value',$templateids));
 
 
 // delete action operations

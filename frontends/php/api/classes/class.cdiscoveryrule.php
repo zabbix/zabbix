@@ -206,7 +206,7 @@ class CDiscoveryRule extends CZBXAPI{
 
 				$sql_parts['from']['hosts'] = 'hosts h';
 				$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
-				$sql_parts['where']['h'] = DBcondition('h.host', $options['filter']['host'], false, true);
+				$sql_parts['where']['h'] = DBcondition('h.host', $options['filter']['host']);
 			}
 		}
 

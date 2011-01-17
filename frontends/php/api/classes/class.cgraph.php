@@ -312,7 +312,7 @@ class CGraph extends CZBXAPI{
 				$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
 
 				$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
-				$sql_parts['where']['host'] = DBcondition('h.host', $options['filter']['host'], false, true);
+				$sql_parts['where']['host'] = DBcondition('h.host', $options['filter']['host']);
 			}
 
 			if(isset($options['filter']['hostid'])){

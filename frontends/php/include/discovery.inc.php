@@ -227,7 +227,7 @@
 		$sql = 'SELECT DISTINCT actionid '.
 				' FROM conditions '.
 				' WHERE conditiontype='.CONDITION_TYPE_DCHECK.
-					' AND '.DBcondition('value', $dcheckids, false, true);	// FIXED[POSIBLE value type violation]!!!
+					' AND '.DBcondition('value', $dcheckids);
 
 		$db_actions = DBselect($sql);
 		while($db_action = DBfetch($db_actions))
@@ -242,7 +242,7 @@
 // delete action conditions
 			DBexecute('DELETE FROM conditions '.
 					' WHERE conditiontype='.CONDITION_TYPE_DCHECK.
-					' AND '.DBcondition('value', $dcheckids, false, true));	// FIXED[POSIBLE value type violation]!!!
+					' AND '.DBcondition('value', $dcheckids));
 		}
 
 		DBexecute('DELETE FROM dchecks WHERE '.DBcondition('dcheckid', $dcheckids));
