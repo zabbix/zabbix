@@ -234,7 +234,7 @@ class CMap extends CZBXAPI{
 					$all_triggers = CTrigger::get($trig_options);
 					foreach($link_triggers as $id => $triggerid){
 						if(!isset($all_triggers[$triggerid])){
-								unset($result[$id], $sysmapids[$id]);
+							unset($result[$id], $sysmapids[$id]);
 						}
 					}
 				}
@@ -276,21 +276,21 @@ class CMap extends CZBXAPI{
 				if(!empty($hosts_to_check)){
 					$host_options = array(
 						'hostids' => $hosts_to_check,
-									'nodeids' => $nodeids,
-									'editable' => $options['editable'],
+						'nodeids' => $nodeids,
+						'editable' => $options['editable'],
 						'preservekeys' => 1,
 						'output' => API_OUTPUT_SHORTEN,
 					);
-				$allowed_hosts = CHost::get($host_options);
+					$allowed_hosts = CHost::get($host_options);
 
 					foreach($hosts_to_check as $elementid){
 						if(!isset($allowed_hosts[$elementid])){
-					foreach($selements as $selementid => $selement){
-						if(($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) && ($selement['elementid'] == $elementid)){
+							foreach($selements as $selementid => $selement){
+								if(($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) && ($selement['elementid'] == $elementid)){
 									unset($result[$selement['sysmapid']], $selements[$selementid]);
+								}
+							}
 						}
-					}
-				}
 					}
 				}
 
@@ -306,12 +306,12 @@ class CMap extends CZBXAPI{
 
 					foreach($maps_to_check as $elementid){
 						if(!isset($allowed_maps[$elementid])){
-					foreach($selements as $selementid => $selement){
-						if(($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP) && ($selement['elementid'] == $elementid)){
+							foreach($selements as $selementid => $selement){
+								if(($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP) && ($selement['elementid'] == $elementid)){
 									unset($result[$selement['sysmapid']], $selements[$selementid]);
+								}
+							}
 						}
-					}
-				}
 					}
 				}
 
@@ -327,12 +327,12 @@ class CMap extends CZBXAPI{
 
 					foreach($triggers_to_check as $elementid){
 						if(!isset($allowed_triggers[$elementid])){
-					foreach($selements as $selementid => $selement){
-						if(($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) && ($selement['elementid'] == $elementid)){
+							foreach($selements as $selementid => $selement){
+								if(($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) && ($selement['elementid'] == $elementid)){
 									unset($result[$selement['sysmapid']], $selements[$selementid]);
+								}
+							}
 						}
-					}
-				}
 					}
 				}
 
@@ -348,14 +348,14 @@ class CMap extends CZBXAPI{
 
 					foreach($host_groups_to_check as $elementid){
 						if(!isset($allowed_host_groups[$elementid])){
-					foreach($selements as $selementid => $selement){
-						if(($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP) && ($selement['elementid'] == $elementid)){
+							foreach($selements as $selementid => $selement){
+								if(($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP) && ($selement['elementid'] == $elementid)){
 									unset($result[$selement['sysmapid']], $selements[$selementid]);
+								}
+							}
 						}
 					}
 				}
-			}
-		}
 
 			}
 		}
