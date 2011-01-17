@@ -95,10 +95,8 @@ class CAction extends CZBXAPI{
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || !is_null($options['nopermissions'])){
 		}
 		else{
+// conditions are checked here by sql, operations after, by api queries
 			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
-
-			$sql_parts['from']['conditions'] = 'conditions c';
-			$sql_parts['where']['ac'] = 'a.actionid=c.actionid';
 
 // condition hostgroup
 			$sql_parts['where'][] =
@@ -106,7 +104,7 @@ class CAction extends CZBXAPI{
 					' SELECT cc.conditionid'.
 					' FROM conditions cc'.
 					' WHERE cc.conditiontype='.CONDITION_TYPE_HOST_GROUP.
-						' AND cc.actionid=c.actionid'.
+						' AND cc.actionid=a.actionid'.
 						' AND ('.
 							' NOT EXISTS('.
 								' SELECT rr.id'.
@@ -133,7 +131,7 @@ class CAction extends CZBXAPI{
 					' SELECT cc.conditionid'.
 					' FROM conditions cc'.
 					' WHERE (cc.conditiontype='.CONDITION_TYPE_HOST.' OR cc.conditiontype='.CONDITION_TYPE_HOST_TEMPLATE.')'.
-						' AND cc.actionid=c.actionid'.
+						' AND cc.actionid=a.actionid'.
 						' AND ('.
 							' NOT EXISTS('.
 								' SELECT hgg.hostid'.
@@ -160,7 +158,7 @@ class CAction extends CZBXAPI{
 					' SELECT cc.conditionid '.
 					' FROM conditions cc '.
 					' WHERE cc.conditiontype='.CONDITION_TYPE_TRIGGER.
-						' AND cc.actionid=c.actionid'.
+						' AND cc.actionid=a.actionid'.
 						' AND ('.
 							' NOT EXISTS('.
 								' SELECT f.triggerid'.
@@ -187,36 +185,6 @@ class CAction extends CZBXAPI{
 											' AND rr.permission<'.$permission.'))'.
 					  ' )'.
 				' )';
-// operation users
-			$sql_parts['where'][] =
-				' NOT EXISTS('.
-					' SELECT o.operationid '.
-					' FROM operations o, opmessage_usr omu, opmessage_grp omg'.
-					' WHERE o.operationtype='.OPERATION_TYPE_MESSAGE.
-						' AND o.actionid=a.actionid'.
-						' AND (('.
-								' omu.operationid=o.operationid'.
-								' AND omu.userid NOT IN ('.
-									' SELECT DISTINCT ug.userid'.
-									' FROM users_groups ug'.
-									' WHERE ug.usrgrpid IN ('.
-										' SELECT uug.usrgrpid'.
-										' FROM users_groups uug'.
-										' WHERE uug.userid='.$USER_DETAILS['userid'].
-										' )'.
-									' )'.
-							' ) OR ('.
-								' omg.operationid=o.operationid'.
-								' AND omg.usrgrpid NOT IN ('.
-									' SELECT ug.usrgrpid'.
-									' FROM users_groups ug'.
-									' WHERE ug.userid='.$USER_DETAILS['userid'].
-									' )'.
-								' )'.
-						' )'.
-				' )';
-
-
 		}
 
 // nodeids
@@ -387,6 +355,141 @@ class CAction extends CZBXAPI{
 					}
 
 					$result[$action['actionid']] += $action;
+				}
+			}
+		}
+
+		if((USER_TYPE_SUPER_ADMIN == $user_type) || !is_null($options['nopermissions'])){
+		}
+		else{
+// check hosts, templates
+			$hosts = $hostids = array();
+			$sql = 'SELECT o.actionid, och.hostid'.
+					' FROM operations o, opcommand_hst och'.
+					' WHERE o.operationid=och.operationid'.
+						' AND '.DBcondition('o.actionid', $actionids);
+			$db_hosts = DBselect($sql);
+			while($host = DBfetch($db_hosts)){
+				if(!isset($hosts[$host['hostid']])) $hosts[$host['hostid']] = array();
+				$hosts[$host['hostid']][$host['actionid']] = $host['actionid'];
+				$hostids[$host['hostid']] = $host['hostid'];
+			}
+
+			$sql = 'SELECT o.actionid, ot.templateid'.
+					' FROM operations o, optemplate ot'.
+					' WHERE o.operationid=ot.operationid'.
+						' AND '.DBcondition('o.actionid', $actionids);
+			$db_templates = DBselect($sql);
+			while($template = DBfetch($db_templates)){
+				if(!isset($hosts[$template['templateid']])) $hosts[$template['templateid']] = array();
+				$hosts[$template['templateid']][$template['actionid']] = $template['actionid'];
+				$hostids[$template['templateid']] = $template['templateid'];
+			}
+
+			$allowed_hosts = CHost::get(array(
+				'hostids' => $hostids,
+				'output' => API_OUTPUT_SHORTEN,
+				'editable' => $options['editable'],
+				'preservekeys' => true,
+			));
+			foreach($hostids as $hostid){
+				if(!isset($allowed_hosts[$hostid])){
+					foreach($hosts[$hostid] as $actionid){
+						unset($result[$actionid], $actionids[$actionid]);
+					}
+				}
+			}
+
+
+// check hostgroups
+			$groups = $groupids = array();
+			$sql = 'SELECT o.actionid, ocg.groupid'.
+					' FROM operations o, opcommand_grp ocg'.
+					' WHERE o.operationid=ocg.operationid'.
+						' AND '.DBcondition('o.actionid', $actionids);
+			$db_groups = DBselect($sql);
+			while($group = DBfetch($db_groups)){
+				if(!isset($groups[$group['groupid']])) $groups[$group['groupid']] = array();
+				$groups[$group['groupid']][$group['actionid']] = $group['actionid'];
+				$groupids[$group['groupid']] = $group['groupid'];
+			}
+
+			$sql = 'SELECT o.actionid, og.groupid'.
+					' FROM operations o, opgroup og'.
+					' WHERE o.operationid=og.operationid'.
+						' AND '.DBcondition('o.actionid', $actionids);
+			$db_groups = DBselect($sql);
+			while($group = DBfetch($db_groups)){
+				if(!isset($groups[$group['groupid']])) $groups[$group['groupid']] = array();
+				$groups[$group['groupid']][$group['actionid']] = $group['actionid'];
+				$groupids[$group['groupid']] = $group['groupid'];
+			}
+
+			$allowed_groups = CHostGroup::get(array(
+				'groupids' => $groupids,
+				'output' => API_OUTPUT_SHORTEN,
+				'editable' => $options['editable'],
+				'preservekeys' => true,
+			));
+			foreach($groupids as $groupid){
+				if(!isset($allowed_groups[$groupid])){
+					foreach($groups[$groupid] as $actionid){
+						unset($result[$actionid], $actionids[$actionid]);
+					}
+				}
+			}
+
+// check users
+			$users = $userids = array();
+			$sql = 'SELECT o.actionid, omu.userid'.
+					' FROM operations o, opmessage_usr omu'.
+					' WHERE o.operationid=omu.operationid'.
+						' AND '.DBcondition('o.actionid', $actionids);
+			$db_users = DBselect($sql);
+			while($user = DBfetch($db_users)){
+				if(!isset($users[$user['userid']])) $users[$user['userid']] = array();
+				$users[$user['userid']][$user['actionid']] = $user['actionid'];
+				$userids[$user['userid']] = $user['userid'];
+			}
+
+			$allowed_users = CUser::get(array(
+				'userids' => $userids,
+				'output' => API_OUTPUT_SHORTEN,
+				'preservekeys' => true,
+			));
+			foreach($userids as $userid){
+				if(!isset($allowed_users[$userid])){
+					foreach($users[$userid] as $actionid){
+						unset($result[$actionid], $actionids[$actionid]);
+					}
+				}
+			}
+
+// check usergroups
+			$usrgrps = $usrgrpids = array();
+			$sql = 'SELECT o.actionid, omg.usrgrpid'.
+					' FROM operations o, opmessage_grp omg'.
+					' WHERE o.operationid=omg.operationid'.
+						' AND '.DBcondition('o.actionid', $actionids);
+
+			$db_usergroups = DBselect($sql);
+			while($usrgrp = DBfetch($db_usergroups)){
+				if(!isset($usrgrps[$usrgrp['usrgrpid']])) $usrgrps[$usrgrp['usrgrpid']] = array();
+				$usrgrps[$usrgrp['usrgrpid']][$usrgrp['actionid']] = $usrgrp['actionid'];
+				$usrgrpids[$usrgrp['usrgrpid']] = $usrgrp['usrgrpid'];
+			}
+
+			$allowed_usrgrps = CUserGroup::get(array(
+				'usrgrpids' => $usrgrpids,
+				'output' => API_OUTPUT_SHORTEN,
+				'preservekeys' => true,
+			));
+
+			foreach($usrgrpids as $usrgrpid){
+				if(!isset($allowed_usrgrps[$usrgrpid])){
+					foreach($usrgrps[$usrgrpid] as $actionid){
+						unset($result[$actionid], $actionids[$actionid]);
+					}
 				}
 			}
 		}
@@ -996,7 +1099,7 @@ COpt::memoryPick();
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('No targets for operation command.'));
 					}
 
-					// self::validateCommands($operation['longdata']);
+					self::validateCommands($operation['longdata']);
 					break;
 				case OPERATION_TYPE_GROUP_ADD:
 				case OPERATION_TYPE_GROUP_REMOVE:
