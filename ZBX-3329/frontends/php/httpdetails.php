@@ -170,14 +170,35 @@
 			$itemids[] = $item_data['itemid'];
 		}
 
-		$speed = format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_IN]);
+		if(isset($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_IN]['lastclock']) &&
+		$httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_IN]['lastclock'] != 0 ){
+			$speed = format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_IN]);
+		}else{
+			$speed = 0;
+		}
+
+		if(isset($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_RSPCODE]['lastclock']) &&
+		$httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_RSPCODE]['lastclock'] != 0 ){
+			$resp = format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_RSPCODE]);
+		}else{
+			$resp = 0;
+		}
+
 		$respTime = $httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME]['lastvalue'];
-		$resp = format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_RSPCODE]);
+		if(isset($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME]['lastclock']) &&
+		$httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME]['lastclock'] != 0){
+			$respItemTime = format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME]);
+		}else{
+			$respItemTime = ' - ';
+		}
+
+echo '<h2>bDBG_speed: <pre>'.print_r($speed, 1).'</pre></h2>';// bob debuger
+
 		$table->addRow(array(
 			$httpstep_data['name'],
 			($speed == 0 ? '-' : $speed),
-			($respTime == 0 ? '-' : format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME])),
-			($resp == 0 ? '-' : $resp),
+			($respTime == 0 ? '-' : $respItemTime),
+			($resp == 0 ? '-' : $resp ),
 			new CSpan($status['msg'], $status['style'])
 		));
 	}
