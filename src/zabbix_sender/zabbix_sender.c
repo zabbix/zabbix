@@ -153,7 +153,7 @@ typedef struct zbx_active_metric_type
  *                                                                            *
  * Function: check_response                                                   *
  *                                                                            *
- * Purpose: Check if json response is SUCCEED                                 *
+ * Purpose: Check whether JSON response is SUCCEED                            *
  *                                                                            *
  * Parameters: result SUCCEED or FAIL                                         *
  *                                                                            *
@@ -162,43 +162,26 @@ typedef struct zbx_active_metric_type
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
+ * Comments: active agent has almost the same function!                       *
  *                                                                            *
  ******************************************************************************/
 static int	check_response(char *response)
 {
-	struct		zbx_json_parse jp;
-	const char 	*p;
-	char		value[MAX_STRING_LEN];
-	char		info[MAX_STRING_LEN];
-
-	int	ret = SUCCEED;
+	struct zbx_json_parse	jp;
+	char			value[MAX_STRING_LEN];
+	char			info[MAX_STRING_LEN];
+	int			ret = SUCCEED;
 
 	ret = zbx_json_open(response, &jp);
 
-	if(SUCCEED == ret)
-	{
-		if (NULL == (p = zbx_json_pair_by_name(&jp, ZBX_PROTO_TAG_RESPONSE))
-				|| NULL == zbx_json_decodevalue(p, value, sizeof(value)))
-		{
-			ret = FAIL;
-		}
-	}
+	if (SUCCEED == ret)
+		ret = zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, value, sizeof(value));
 
-	if(SUCCEED == ret)
-	{
-		if(strcmp(value, ZBX_PROTO_VALUE_SUCCESS) != 0)
-		{
-			ret = FAIL;
-		}
-	}
+	if (SUCCEED == ret && 0 != strcmp(value, ZBX_PROTO_VALUE_SUCCESS))
+		ret = FAIL;
 
-	if (NULL != (p = zbx_json_pair_by_name(&jp, ZBX_PROTO_TAG_INFO))
-			&& NULL != zbx_json_decodevalue(p, info, sizeof(info)))
-	{
-		printf("Info from server: \"%s\"\n",
-			info);
-	}
+	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_INFO, info, sizeof(info)))
+		printf("Info from server: \"%s\"\n", info);
 
 	return ret;
 }
