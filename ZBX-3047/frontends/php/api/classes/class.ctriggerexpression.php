@@ -97,8 +97,9 @@ private $allowed;
 				throw new Exception('Incorrect function format.');
 
 			if(is_null($this->allowed['functions'][$expression['functionName']]['args'])){
-				if(!empty($expression['functionParamList']))
-					throw new Exception('Function does not expext parameters.');
+				if(!zbx_empty($expression['functionParamList'][0])){
+					throw new Exception('Function does not expect parameters.');
+				}
 				else
 					return true;
 			}
