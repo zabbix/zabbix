@@ -126,10 +126,6 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 			access_deny();
 
-		if(!isset($_REQUEST['escalation'])) $_REQUEST['esc_period'] = 0;
-
-		$conditions = get_request('conditions', array());
-
 		$action = array(
 			'name'				=> get_request('name'),
 			'eventsource'		=> get_request('eventsource',0),
@@ -141,10 +137,11 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			'recovery_msg'		=> get_request('recovery_msg',0),
 			'r_shortdata'		=> get_request('r_shortdata',''),
 			'r_longdata'		=> get_request('r_longdata',''),
-			'conditions'		=> $conditions,
+			'conditions'		=> get_request('conditions', array()),
 			'operations'		=> get_request('operations', array()),
 		);
-
+SDII($action);
+SDII($_REQUEST);
 		if(isset($_REQUEST['actionid'])){
 			$action['actionid']= $_REQUEST['actionid'];
 

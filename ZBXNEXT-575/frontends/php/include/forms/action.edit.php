@@ -98,9 +98,7 @@ require_once('include/templates/action.js.php');
 			get_condition_desc($condition['conditiontype'], $condition['operator'], $condition['value']))
 		));
 
-		$frmAction->addVar('conditions['.$i.'][conditiontype]', $condition['conditiontype']);
-		$frmAction->addVar('conditions['.$i.'][operator]', $condition['operator']);
-		$frmAction->addVar('conditions['.$i.'][value]', $condition['value']);
+		$frmAction->addVar('conditions['.$i.']', $condition);
 
 		$grouped_conditions[$condition['conditiontype']][] = $label;
 

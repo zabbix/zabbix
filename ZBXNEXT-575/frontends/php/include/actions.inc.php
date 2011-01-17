@@ -307,12 +307,45 @@ function get_operation_desc($type, $data){
 				if(!empty($usrgrps)){
 					order_result($usrgrps, 'name');
 
-					$result[] = bold(array(S_SEND_MESSAGE_TO,SPACE,S_GROUP,': ' ));
+					$result[] = bold(array(S_SEND_MESSAGE_TO,SPACE,S_GROUPS,': ' ));
 					$result[] = array(implode(', ', zbx_objectValues($usrgrps,'name')), BR());
 				}
 				break;
 			case OPERATION_TYPE_COMMAND:
-				$result[] = S_RUN_REMOTE_COMMANDS;
+				if(!isset($data['opcommand_grp'])) $data['opcommand_grp'] = array();
+				if(!isset($data['opcommand_hst'])) $data['opcommand_hst'] = array();
+
+				$groups = CHostgroup::get(array(
+					'groupids' => zbx_objectValues($data['opcommand_grp'],'groupid'),
+					'output' => array('groupid', 'name')
+				));
+
+				if(!empty($groups)){
+					order_result($groups, 'name');
+
+					$result[] = bold(_('Run remote command on host groups: '));
+					$result[] = array(implode(', ', zbx_objectValues($groups,'name')), BR());
+				}
+
+
+				$hosts = CHost::get(array(
+					'hostids' => zbx_objectValues($data['opcommand_hst'],'hostid'),
+					'output' => array('hostid', 'host')
+				));
+				if(!empty($hosts)){
+					order_result($hosts, 'host');
+
+					$result[] = bold(_('Run remote command on hosts: '));
+					$result[] = array(implode(', ', zbx_objectValues($hosts,'host')), BR());
+				}
+
+				foreach($data['opcommand_hst'] as $num => $cmd){
+					if($cmd['hostid'] == 0){
+						$result[] = array(bold(_('Run remote command on current host')), BR());
+						break;
+					}
+
+				}
 				break;
 			case OPERATION_TYPE_HOST_ADD:
 				$result[] = S_ADD_HOST;
