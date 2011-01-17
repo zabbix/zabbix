@@ -250,12 +250,7 @@
 
 // Check if str has format #<float> or <float>
 	function validate_ticks($str){
-//		echo "Validating float:$str<br>";
-//		if (eregi('^[ ]*#([0-9]+)((\.)?)([0-9]*)[ ]*$', $str, $arr)) {
-		if(preg_match('/^[ ]*#([0-9]+)((\.)?)([0-9]*)[ ]*$/i', $str, $arr))
-			return 0;
-		else
-			return validate_float($str);
+		return preg_match('/^[ ]*#?\d+[ ]*$/i', $str, $arr) ? 0 : -1;
 	}
 
 	define('NOT_EMPTY',"({}!='')&&");
@@ -267,16 +262,16 @@
 	function calc_exp2($fields,$field,$expression){
 		foreach($fields as $f => $checks){
 /*
-			// If an unset variable used in expression, return FALSE
-			if(zbx_strstr($expression,'{'.$f.'}')&&!isset($_REQUEST[$f])){
-//SDI("Variable [$f] is not set. $expression is FALSE");
-//info('Variable ['.$f.'] is not set. '.$expression.' is FALSE');
-//				return FALSE;
-			}
+	if an unset variable used in expression, return FALSE
+	if(zbx_strstr($expression,'{'.$f.'}')&&!isset($_REQUEST[$f])){
+		SDI("Variable [$f] is not set. $expression is FALSE");
+		info('Variable ['.$f.'] is not set. '.$expression.' is FALSE');
+	return FALSE;
+	}
 //*/
-//echo $f,":",$expression,"<br>";
+// echo $f,":",$expression,"<br>";
 			$expression = str_replace('{'.$f.'}','$_REQUEST["'.$f.'"]',$expression);
-//$debug .= $f." = ".$_REQUEST[$f].SBR;
+// $debug .= $f." = ".$_REQUEST[$f].SBR;
 		}
 
 		$expression = trim($expression,'& ');
