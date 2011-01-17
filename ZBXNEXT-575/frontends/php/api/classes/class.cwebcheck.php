@@ -618,7 +618,7 @@ COpt::memoryPick();
 		$sql = 'SELECT httpstepid, name'.
 				' FROM httpstep '.
 				' WHERE httptestid='.$webcheck['webcheckid'].
-					' AND '.DBcondition('name', $websteps_names, false, true);
+					' AND '.DBcondition('name', $websteps_names);
 		if($httpstep_data = DBfetch(DBselect($sql))){
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Step [%s] already exists.', $httpstep_data['name']));
 		}

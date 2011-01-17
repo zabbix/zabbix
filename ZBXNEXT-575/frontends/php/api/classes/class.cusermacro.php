@@ -210,8 +210,8 @@ class CUserMacro extends CZBXAPI{
 			if(isset($options['filter']['macro'])){
 				zbx_value2array($options['filter']['macro']);
 
-				$sql_parts['where'][] = DBcondition('hm.macro', $options['filter']['macro'], null, true);
-				$sql_parts_global['where'][] = DBcondition('gm.macro', $options['filter']['macro'], null, true);
+				$sql_parts['where'][] = DBcondition('hm.macro', $options['filter']['macro']);
+				$sql_parts_global['where'][] = DBcondition('gm.macro', $options['filter']['macro']);
 			}
 		}
 
@@ -669,7 +669,7 @@ class CUserMacro extends CZBXAPI{
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
 //--------
-			$sql = 'DELETE FROM globalmacro WHERE '.DBcondition('macro', $globalmacros, false, true);
+			$sql = 'DELETE FROM globalmacro WHERE '.DBcondition('macro', $globalmacros);
 			if(!DBExecute($sql))
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 

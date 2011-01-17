@@ -907,16 +907,10 @@ else {
 			if(!isset($tableSchema['fields'][$field]) || zbx_empty($pattern)) continue;
 			if($tableSchema['fields'][$field]['type'] != DB::FIELD_TYPE_CHAR) continue;
 
-			// escaping parameter that is about to be used in LIKE statement
-			$pattern = str_replace("!", "!!", $pattern);
-			$pattern = str_replace("%", "!%", $pattern);
-			$pattern = str_replace("_", "!_", $pattern);
+// escaping parameter that is about to be used in LIKE statement
+			$pattern = str_replace(array("!","%","_"),  array("!!","!%","!_"), $pattern);
 
-			$search[$field] =
-				' UPPER('.$tableShort.'.'.$field.') '.
-				$exclude.' LIKE '.
-				zbx_dbstr($start.zbx_strtoupper($pattern).'%').
-				" ESCAPE '!'";
+			$search[$field] = ' UPPER('.$tableShort.'.'.$field.') '.$exclude.' LIKE '.zbx_dbstr($start.zbx_strtoupper($pattern).'%')." ESCAPE '!' ";
 		}
 
 		if(!empty($search)){
@@ -944,18 +938,7 @@ else {
 			if(!isset($tableSchema['fields'][$field]) || zbx_empty($value)) continue;
 
 			zbx_value2array($value);
-			switch($tableSchema['fields'][$field]['type']){
-				case DB::FIELD_TYPE_CHAR:
-					$filter[$field] = DBcondition($tableShort.'.'.$field, $value, false, true);
-					break;
-				case DB::FIELD_TYPE_INT:
-				case DB::FIELD_TYPE_FLOAT:
-				case DB::FIELD_TYPE_ID:
-					$filter[$field] = DBcondition($tableShort.'.'.$field, $value);
-					break;
-				default:
-					continue;
-			}
+			$filter[$field] = DBcondition($tableShort.'.'.$field, $value);
 		}
 
 		if(!empty($filter)){
@@ -992,7 +975,7 @@ else {
 	return true;
 	}
 
-	function DBcondition($fieldname, $array, $notin=false, $string=false){
+	function DBcondition($fieldname, $array, $notin=false){
 		$condition = '';
 
 		if(!is_array($array)){
@@ -1005,19 +988,11 @@ else {
 
 		$items = array_chunk($array, 950);
 		foreach($items as $id => $values){
-			if($string) $values = zbx_dbstr($values);
-			else foreach($values as $value){
-				if(!is_numeric($value)){
-					info('DBcondition Error: ['.$value.'] incorrect value for numeric field');
-					return ' 1=0 ';
-				}
-			}
-
 			$condition.=!empty($condition) ? ')'.$concat.$fieldname.$in.'(':'';
-			$condition.= implode(',',$values);
+			$condition.= implode(',',zbx_dbstr($values));
 		}
 
-		if(zbx_empty($condition)) $condition = $string ? "'-1'":'-1';
+		if(zbx_empty($condition))  return ' 1=0 ';
 
 	return ' ('.$fieldname.$in.'('.$condition.')) ';
 	}

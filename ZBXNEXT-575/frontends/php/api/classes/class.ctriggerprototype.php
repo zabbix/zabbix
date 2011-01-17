@@ -321,7 +321,7 @@ class CTriggerPrototype extends CZBXAPI{
 
 			$sql_parts['from']['functions'] = 'functions f';
 			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
-			$sql_parts['where'][] = DBcondition('f.function', $options['functions'], false, true);
+			$sql_parts['where'][] = DBcondition('f.function', $options['functions']);
 		}
 
 // monitored
@@ -460,7 +460,7 @@ class CTriggerPrototype extends CZBXAPI{
 
 				$sql_parts['from']['hosts'] = 'hosts h';
 				$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
-				$sql_parts['where']['host'] = DBcondition('h.host', $options['filter']['host'], false, true);
+				$sql_parts['where']['host'] = DBcondition('h.host', $options['filter']['host']);
 			}
 
 			if(isset($options['filter']['hostid']) && !is_null($options['filter']['hostid'])){
