@@ -367,6 +367,7 @@ class CAction extends CZBXAPI{
 			$sql = 'SELECT o.actionid, och.hostid'.
 					' FROM operations o, opcommand_hst och'.
 					' WHERE o.operationid=och.operationid'.
+						' AND och.hostid<>0'.
 						' AND '.DBcondition('o.actionid', $actionids);
 			$db_hosts = DBselect($sql);
 			while($host = DBfetch($db_hosts)){
@@ -471,7 +472,6 @@ class CAction extends CZBXAPI{
 					' FROM operations o, opmessage_grp omg'.
 					' WHERE o.operationid=omg.operationid'.
 						' AND '.DBcondition('o.actionid', $actionids);
-
 			$db_usergroups = DBselect($sql);
 			while($usrgrp = DBfetch($db_usergroups)){
 				if(!isset($usrgrps[$usrgrp['usrgrpid']])) $usrgrps[$usrgrp['usrgrpid']] = array();
