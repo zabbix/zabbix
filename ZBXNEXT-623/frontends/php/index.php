@@ -22,6 +22,18 @@
 require_once('include/config.inc.php');
 require_once('include/forms.inc.php');
 
+/*
+echo 'Users:<br>';
+$result=DBselect("SELECT nextid FROM ids WHERE nodeid=0 AND table_name='profiles' AND field_name='profileid'");
+while($row=DBfetch($result))
+{
+	echo "User:".$row['alias'],"<br>";
+}
+print_r($row);
+
+echo '-End-';
+exit;*/
+
 define('ZBX_NOT_ALLOW_ALL_NODES', 1);
 define('ZBX_HIDE_NODE_SELECTION', 1);
 
@@ -125,7 +137,5 @@ include_once('include/page_header.php');
 	}
 ?>
 <?php
-
 include_once('include/page_footer.php');
-
 ?>

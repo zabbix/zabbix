@@ -257,13 +257,12 @@
 			$current[] = BR();
 		}
 
-		if(function_exists('sqlite3_open') &&
-			function_exists('sqlite3_close') &&
-			function_exists('sqlite3_query') &&
-			function_exists('sqlite3_error') &&
-			function_exists('sqlite3_fetch_array') &&
-			function_exists('sqlite3_query_close') &&
-			function_exists('sqlite3_exec')){
+	if(class_exists('SQLite3') && zbx_is_callable(array('ftok', 'sem_acquire', 'sem_release', 'sem_get'))){
+		if(class_exists('SQLite3') &&
+			function_exists('ftok') &&
+			function_exists('sem_acquire') &&
+			function_exists('sem_release') &&
+			function_exists('sem_get')){
 
 			$current[] = 'SQLite3';
 			$current[] = BR();

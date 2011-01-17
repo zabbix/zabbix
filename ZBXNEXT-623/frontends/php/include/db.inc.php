@@ -37,6 +37,8 @@ if(!isset($DB)){
 
 		$DB['DB'] = null;
 		$DB['TRANSACTIONS'] = 0;
+// True - we are in transation, False - not in transaction, i.e. standalone queries
+		$DB['IN_TRANSACTION'] = false;
 
 //Stats
 		$DB['SELECT_COUNT'] = 0;
@@ -144,6 +146,7 @@ if(!isset($DB)){
 					if(!function_exists('lock_db_access')){
 						function lock_db_access(){
 							global $ZBX_SEM_ID;
+//echo "lock_db_access<br>";
 
 							if($ZBX_SEM_ID && function_exists('sem_acquire')){
 								sem_acquire($ZBX_SEM_ID);
@@ -155,25 +158,16 @@ if(!isset($DB)){
 						function unlock_db_access(){
 							global $ZBX_SEM_ID;
 
+//echo "unlock_db_access<br>";
 							if($ZBX_SEM_ID && function_exists('sem_release'))
+							{
 								sem_release($ZBX_SEM_ID);
+							}
 						}
 					}
-
-					if(!function_exists('free_db_access')){
-						function free_db_access(){
-							global $ZBX_SEM_ID;
-
-							if($ZBX_SEM_ID && function_exists('sem_remove'))
-								sem_remove($ZBX_SEM_ID);
-
-							$ZBX_SEM_ID = false;
-						}
-					}
-
 
 					if(file_exists($DB['DATABASE'])){
-						$DB['DB']= sqlite3_open($DB['DATABASE']);
+						$DB['DB']= new SQLite3($DB['DATABASE'],SQLITE3_OPEN_READWRITE);
 						if(!$DB['DB']){
 							$error = 'Error connecting to database';
 							$result = false;
@@ -216,9 +210,8 @@ if(!isset($DB)){
 					$result = db2_close($DB['DB']);
 					break;
 				case 'SQLITE3':
+					$DB['DB']->close();
 					$result = true;
-					sqlite3_close($DB['DB']);
-					free_db_access();
 					break;
 				default:		break;
 			}
@@ -262,10 +255,10 @@ if(!isset($DB)){
 
 		if($DB['TRANSACTIONS']>1){
 			info('POSSIBLE ERROR: Used incorrect logic in database processing, started subtransaction!');
-		return $DB['TRANSACTION_STATE'];
+		return $DB['IN_TRANSACTION'];
 		}
 
-		$DB['TRANSACTION_STATE'] = true;
+		$DB['IN_TRANSACTION'] = true;
 
 		$result = false;
 		if(isset($DB['DB']) && !empty($DB['DB']))
@@ -284,10 +277,8 @@ if(!isset($DB)){
 				$result = db2_autocommit($DB['DB'], DB2_AUTOCOMMIT_OFF);
 				break;
 			case 'SQLITE3':
-				if(1 == $DB['TRANSACTIONS']){
-					lock_db_access();
-					$result = DBexecute('begin');
-				}
+				lock_db_access();
+				$result = DBexecute('begin');
 				break;
 		}
 	return $result;
@@ -302,19 +293,17 @@ if(!isset($DB)){
 
 			if($DB['TRANSACTIONS'] < 1){
 				$DB['TRANSACTIONS'] = 0;
-				$DB['TRANSACTION_STATE'] = false;
+				$DB['IN_TRANSACTION'] = false;
 				info('POSSIBLE ERROR: Used incorrect logic in database processing, transaction not started!');
 			}
 
-			$DB['TRANSACTION_STATE'] = $result && $DB['TRANSACTION_STATE'];
+			$DB['IN_TRANSACTION'] = $result && $DB['IN_TRANSACTION'];
 
-		return $DB['TRANSACTION_STATE'];
+		return $DB['IN_TRANSACTION'];
 		}
 
 		$DB['TRANSACTIONS'] = 0;
-		$DBresult = $result && $DB['TRANSACTION_STATE'];
-
-//SDI('Result: '.$result);
+		$DBresult = $result && $DB['IN_TRANSACTION'];
 
 		if($DBresult){ // OK
 			$DBresult = DBcommit();
@@ -399,9 +388,22 @@ if(!isset($DB)){
 		SELECT a FROM tbe WHERE ROWNUM < 15 // ONLY < 15
 		SELECT * FROM (SELECT ROWNUM as RN, * FROM tbl) WHERE RN BETWEEN 6 AND 15
 //*/
-
+/**
+ * Select data from DB. Use function DBexecute for non-selects.
+ *
+ * Example:
+ * DBselect('select * from users')
+ * DBselect('select * from users',50,200)
+ *
+ * @param string $query
+ * @param integer $limit max number of record to return
+ * @param integer $offset return starting from $offset record
+ * @return resource or False if failed
+ */
 	function &DBselect($query, $limit='NO', $offset=0){
 		global $DB;
+
+//		echo "DBselect:",$query."<br>";
 
 		$time_start=microtime(true);
 		$result = false;
@@ -466,7 +468,7 @@ if(!isset($DB)){
 					}
 				break;
 				case 'SQLITE3':
-					if(!$DB['TRANSACTIONS']){
+					if(!$DB['IN_TRANSACTION']){
 						lock_db_access();
 					}
 
@@ -474,44 +476,33 @@ if(!isset($DB)){
 						$query .= ' LIMIT '.intval($limit).' OFFSET '.intval($offset);
 					}
 
-					if(!$result = sqlite3_query($DB['DB'],$query)){
-						error('Error in query ['.$query.'] ['.sqlite3_error($DB['DB']).']');
+					if(!$result = $DB['DB']->query($query)){
+						error('Error in query ['.$query.'] Error code ['.$DB['DB']->lastErrorCode().'] Message ['.$DB['DB']->lastErrorMsg().']');
 					}
-					else{
-						$data = array();
 
-						while($row = sqlite3_fetch_array($result)){
-							foreach($row as $id => $name){
-								if(!zbx_strstr($id,'.')) continue;
-								$ids = explode('.',$id);
-								$row[array_pop($ids)] = $row[$id];
-								unset($row[$id]);
-							}
-							$data[] = $row;
-						}
-
-						sqlite3_query_close($result);
-
-						$result = &$data;
-					}
-					if(!$DB['TRANSACTIONS']){
+					if(!$DB['IN_TRANSACTION']){
 						unlock_db_access();
 					}
 				break;
 			}
+//SDI($result);
 
-			if($DB['TRANSACTIONS'] && !$result){
-				$DB['TRANSACTION_STATE'] &= $result;
+			// $result is false only if an error occured
+			if($DB['IN_TRANSACTION'] && !$result){
+				$DB['IN_TRANSACTION'] = false;
 			}
 		}
 COpt::savesqlrequest(microtime(true)-$time_start,$query);
 
+//		echo "DBselect end:",$query."<br>";
 	return $result;
 	}
 
 	function DBexecute($query, $skip_error_messages=0){
 		global $DB;
 		$result = false;
+
+//		echo "DBexecute:",$query."<br>";
 
 		$time_start=microtime(true);
 		if( isset($DB['DB']) && !empty($DB['DB']) ){
@@ -561,26 +552,26 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 					}
 				break;
 				case 'SQLITE3':
-					if(!$DB['TRANSACTIONS']){
+					if(!$DB['IN_TRANSACTION']){
 						lock_db_access();
 					}
 
-					$result = sqlite3_exec($DB['DB'], $query);
+					$result = $DB['DB']->exec($query);
 					if(!$result){
-						error('Error in query ['.$query.'] ['.sqlite3_error($DB['DB']).']');
+						error('Error in query ['.$query.'] Error code ['.$DB['DB']->lastErrorCode().'] Message ['.$DB['DB']->lastErrorMsg().']');
 					}
 
-					if(!$DB['TRANSACTIONS']){
+					if(!$DB['IN_TRANSACTION']){
 						unlock_db_access();
 					}
 					break;
 			}
-
 			if($DB['TRANSACTIONS'] && !$result){
-				$DB['TRANSACTION_STATE'] &= $result;
+				$DB['IN_TRANSACTION'] &= $result;
 			}
 		}
 COpt::savesqlrequest(microtime(true)-$time_start,$query);
+//		echo "DBexecute End:",$query."<br>";
 	return (bool) $result;
 	}
 
@@ -625,9 +616,9 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 				}
 				break;
 			case 'SQLITE3':
-				if($cursor){
-					$result = array_shift($cursor);
-					if(is_null($result)) $result = false;
+				$result = $cursor->fetchArray(SQLITE3_ASSOC);
+				if(!$result){
+					unset($cursor);
 				}
 				break;
 		}
@@ -820,7 +811,7 @@ else {
 	function get_dbid($table,$field){
 // PGSQL on transaction failure on all queries returns false..
 		global $DB, $ZBX_LOCALNODEID;
-		if(($DB['TYPE'] == 'POSTGRESQL') && $DB['TRANSACTIONS'] && !$DB['TRANSACTION_STATE']) return 0;
+		if(($DB['TYPE'] == 'POSTGRESQL') && $DB['TRANSACTIONS'] && !$DB['IN_TRANSACTION']) return 0;
 //------
 		$nodeid = get_current_nodeid(false);
 
@@ -829,7 +820,9 @@ else {
 			$min=bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000'), 0);
 			$max=bcadd(bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000')),'99999999999', 0);
 			$db_select = DBselect('SELECT nextid FROM ids WHERE nodeid='.$nodeid .' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field));
-			if(!is_resource($db_select)) return false;
+
+			if(!$db_select) return false;
+
 			$row = DBfetch($db_select);
 
 			if(!$row){
@@ -1051,7 +1044,7 @@ else {
 		}
 
 		protected static function reserveIds($table, $count){
-			global $ZBX_LOCALNODEID;
+			global $ZBX_LOCALNODEID,$DB;
 
 			$nodeid = get_current_nodeid(false);
 			$id_name = self::getSchema($table);
@@ -1064,8 +1057,14 @@ else {
 				' FROM ids '.
 				' WHERE nodeid='.$nodeid .
 					' AND table_name='.zbx_dbstr($table).
-					' AND field_name='.zbx_dbstr($id_name).
-				' FOR UPDATE';
+					' AND field_name='.zbx_dbstr($id_name);
+
+			// SQLite3 does not support this syntax. Since we are in transation, it can be ignored.
+			if($DB['TYPE'] != 'SQLITE3')
+			{
+				$sql  = $sql.' FOR UPDATE';
+			}
+
 			$res = DBfetch(DBselect($sql));
 			if($res){
 				$nextid = bcadd($res['nextid'], 1, 0);

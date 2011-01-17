@@ -755,8 +755,9 @@ int	is_ascii_string(const char *str);
 int	zbx_rtrim(char *str, const char *charlist);
 void	zbx_ltrim(char *str, const char *charlist);
 void	zbx_remove_chars(register char *str, const char *charlist);
-#define zbx_remove_spaces(str)		zbx_remove_chars(str, " ");
-#define zbx_remove_whitespace(str)	zbx_remove_chars(str, " \t\r\n");
+#define ZBX_WHITESPACE			" \t\r\n"
+#define zbx_remove_spaces(str)		zbx_remove_chars(str, " ")
+#define zbx_remove_whitespace(str)	zbx_remove_chars(str, ZBX_WHITESPACE)
 void	compress_signs(char *str);
 void	ltrim_spaces(char *c);
 void	rtrim_spaces(char *c);

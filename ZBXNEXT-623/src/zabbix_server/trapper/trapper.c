@@ -354,7 +354,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 			}
 			return ret;
 		}
-		/* New XML protocol? */
+		/* XML protocol? */
 		else if (*s == '<')
 		{
 			comms_parse_response(s, av.host_name, sizeof(av.host_name), av.key, sizeof(av.key), value_dec, sizeof(value_dec),
