@@ -40,13 +40,9 @@
 
 ZBX_COLLECTOR_DATA	*collector = NULL;
 
-#define ZBX_GET_SHM_KEY(shm_key)						\
-										\
-	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_COLLECTOR_ID)))	\
-	{									\
-		zbx_error("Cannot create IPC key for agent collector");		\
-		exit(1);							\
-	}
+#ifndef _WINDOWS
+static int	shm_id;
+#endif /* _WINDOWS */
 
 /******************************************************************************
  *                                                                            *
@@ -157,8 +153,6 @@ void	init_collector_data()
 	int	cpu_count;
 	size_t	sz, sz_cpu;
 #ifndef _WINDOWS
-#define ZBX_MAX_ATTEMPTS 10
-	int	attempts = 0, shm_id;
 	key_t	shm_key;
 #endif
 
@@ -179,42 +173,21 @@ void	init_collector_data()
 
 #else /* not _WINDOWS */
 
-	ZBX_GET_SHM_KEY(shm_key);
-
-lbl_create:
-	if ( -1 == (shm_id = shmget(shm_key, sz + sz_cpu, IPC_CREAT | IPC_EXCL | 0666 /* 0022 */)) )
+	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_COLLECTOR_ID)))
 	{
-		if( EEXIST == errno )
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Shared memory already exists for collector, trying to recreate.");
-
-			shm_id = shmget(shm_key, 0 /* get reference */, 0666 /* 0022 */);
-
-			shmctl(shm_id, IPC_RMID, 0);
-			if ( ++attempts > ZBX_MAX_ATTEMPTS )
-			{
-				zabbix_log(LOG_LEVEL_CRIT, "Can't recreate shared memory for collector. [too many attempts]");
-				exit(1);
-			}
-			if ( attempts > (ZBX_MAX_ATTEMPTS / 2) )
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "Wait 1 sec for next attempt of collector shared memory allocation.");
-				zbx_sleep(1);
-			}
-			goto lbl_create;
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "Can't allocate shared memory for collector. [%s]",strerror(errno));
-			exit(1);
-		}
+		zabbix_log(LOG_LEVEL_CRIT, "Cannot create IPC key for collector");
+		exit(FAIL);
 	}
 
-	collector = shmat(shm_id, NULL, 0);
-
-	if ((void*)(-1) == collector)
+	if (-1 == (shm_id = zbx_shmget(shm_key, sz + sz_cpu)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Can't attach shared memory for collector. [%s]",strerror(errno));
+		zabbix_log(LOG_LEVEL_CRIT, "Could not allocate shared memory for collector");
+		exit(FAIL);
+	}
+
+	if ((void*)(-1) == (collector = shmat(shm_id, NULL, 0)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Can't attach shared memory for collector [%s]", strerror(errno));
 		exit(1);
 	}
 
@@ -222,7 +195,7 @@ lbl_create:
 	collector->cpus.count = cpu_count;
 #ifdef _AIX
 	memset(&collector->vmstat, 0, sizeof(collector->vmstat));
-#endif
+#endif /* _AIX */
 
 #endif /* _WINDOWS */
 }
@@ -251,23 +224,11 @@ void	free_collector_data()
 
 #else /* not _WINDOWS */
 
-	key_t	shm_key;
-	int	shm_id;
-
 	if (NULL == collector)
 		return;
 
-	ZBX_GET_SHM_KEY(shm_key);
-
-	shm_id = shmget(shm_key, sizeof(ZBX_COLLECTOR_DATA), 0);
-
-	if (-1 == shm_id)
-	{
-		zabbix_log(LOG_LEVEL_ERR, "Can't find shared memory for collector. [%s]",strerror(errno));
-		exit(1);
-	}
-
-	shmctl(shm_id, IPC_RMID, 0);
+	if (-1 == shmctl(shm_id, IPC_RMID, 0))
+		zabbix_log(LOG_LEVEL_WARNING, "Could not remove shared memory for collector [%s]", strerror(errno));
 
 #endif /* _WINDOWS */
 
