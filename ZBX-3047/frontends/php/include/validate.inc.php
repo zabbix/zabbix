@@ -250,7 +250,12 @@
 
 // Check if str has format #<float> or <float>
 	function validate_ticks($str){
-		return preg_match('/^[ ]*#?\d+[ ]*$/i', $str, $arr) ? 0 : -1;
+		if(preg_match('/^[ ]*#\d+[ ]*$/i', $str, $arr))
+			return 0;
+		else if(preg_match('/^[ ]*\d+[KMGTsmhdw]{0,1}[ ]*$/i', $str, $arr))
+			return 0;
+
+	return -1;
 	}
 
 	define('NOT_EMPTY',"({}!='')&&");
