@@ -1,5 +1,6 @@
 Changes for 1.8.5rc1
 
+ - [ZBX-416] fixed PostgreSQL errors in configuration sender module when using DM setup (Sasha)
  - [ZBX-886] remove duplicate translation strings (Richlv)
  - [ZBX-3384] fixed server crash in a distributed monitoring setup with PostgreSQL (asaveljevs)
  - [ZBX-3274] fixed SQLite3 semaphore errors while starting server or proxy (Sasha)
