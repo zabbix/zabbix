@@ -106,6 +106,8 @@ class CTemplate extends CZBXAPI{
 			$dbTable = DB::getSchema('hosts');
 			$sql_parts['select']['hostid'] = ' h.hostid';
 			foreach($options['output'] as $key => $field){
+				if($field == 'templateid') continue;
+
 				if(isset($dbTable['fields'][$field]))
 					$sql_parts['select'][$field] = ' h.'.$field;
 			}

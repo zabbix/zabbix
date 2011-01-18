@@ -605,7 +605,6 @@ require_once('include/templates/action.js.php');
 				break;
 			case OPERATION_TYPE_GROUP_ADD:
 			case OPERATION_TYPE_GROUP_REMOVE:
-SDII($new_operation);
 				if(!isset($new_operation['opgroup'])){
 					$new_operation['opgroup'] = array();
 				}
@@ -624,15 +623,15 @@ SDII($new_operation);
 				$groupList->addRow($buttonRow);
 
 // Add Participations
-				$groupids = isset($new_operation['opmessage_grp']) ?
-					zbx_objectValues($new_operation['opmessage_grp'], 'groupid') :
+				$groupids = isset($new_operation['opgroup']) ?
+					zbx_objectValues($new_operation['opgroup'], 'groupid') :
 					array();
 
 				$groups = CHostGroup::get(array('groupids' => $groupids, 'output' => array('name')));
 				order_result($groups, 'name');
 
 				$jsInsert = '';
-				$jsInsert.= 'addPopupValues('.zbx_jsvalue(array('object'=>'add_groupid', 'values'=>$groups)).');';
+				$jsInsert.= 'addPopupValues('.zbx_jsvalue(array('object'=>'dsc_groupid', 'values'=>$groups)).');';
 
 				zbx_add_post_js($jsInsert);
 
@@ -641,23 +640,38 @@ SDII($new_operation);
 				break;
 			case OPERATION_TYPE_TEMPLATE_ADD:
 			case OPERATION_TYPE_TEMPLATE_REMOVE:
-				$tblOper->addItem(new CVar('new_operation[object]', 0));
-				$tblOper->addItem(new CVar('new_operation[objectid]', $new_operation['objectid']));
-				$tblOper->addItem(new CVar('new_operation[shortdata]', ''));
-				$tblOper->addItem(new CVar('new_operation[longdata]', ''));
-
-				$sql = 'SELECT host FROM hosts WHERE status='.HOST_STATUS_TEMPLATE.' AND hostid='.$new_operation['objectid'];
-				if($object_name = DBfetch(DBselect($sql))){
-					$object_name = $object_name['host'];
+				if(!isset($new_operation['optemplate'])){
+					$new_operation['optemplate'] = array();
 				}
-				$tblOper->addRow(array(S_TEMPLATE, array(
-					new CTextBox('object_name', $object_name, 40, 'yes'),
-					new CButton('select_object', S_SELECT,
-							'return PopUp("popup.php?dstfrm=' . S_ACTION .
-									'&dstfld1=new_operation%5Bobjectid%5D&dstfld2=object_name' .
-									'&srctbl=host_templates&srcfld1=hostid&srcfld2=host' .
-									'",450,450)','T')
-				)));
+
+				$templateList = new CTable();
+				$templateList->setAttribute('id', 'opTemplateList');
+
+				$addUsrgrpBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm='.S_ACTION.'&srctbl=host_templates&srcfld1=templateid&srcfld2=host&multiselect=1&reference=dsc_templateid'.'",450,450)','link_menu');
+
+				$col = new CCol($addUsrgrpBtn);
+				$col->setAttribute('colspan', 2);
+
+				$buttonRow = new CRow($col);
+				$buttonRow->setAttribute('id', 'opTemplateListFooter');
+
+				$templateList->addRow($buttonRow);
+
+// Add Participations
+				$templateids = isset($new_operation['optemplate']) ?
+					zbx_objectValues($new_operation['optemplate'], 'templateid') :
+					array();
+
+				$templates = CTemplate::get(array('templateids' => $templateids, 'output' => array('templateid','host')));
+				order_result($templates, 'host');
+
+				$jsInsert = '';
+				$jsInsert.= 'addPopupValues('.zbx_jsvalue(array('object'=>'dsc_templateid', 'values'=>$templates)).');';
+
+				zbx_add_post_js($jsInsert);
+
+				$caption = (OPERATION_TYPE_TEMPLATE_ADD == $new_operation['operationtype']) ? _('Link with templates') : _('Unlink from templates');
+				$tblOper->addRow(array($caption, new CDiv($templateList, 'objectgroup inlineblock border_dotted ui-corner-all')));
 				break;
 		}
 

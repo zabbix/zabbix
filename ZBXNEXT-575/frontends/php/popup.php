@@ -613,29 +613,62 @@ include_once('include/page_header.php');
 		$form->show();
 	}
 	else if($srctbl == 'host_templates'){
+		$form = new CForm();
+		$form->setName('tplform');
+		$form->setAttribute('id', 'templates');
+
+		insert_js_function('addSelectedValues');
+		insert_js_function('addValues');
+		insert_js_function('addValue');
+
 		$table = new CTableInfo(S_NO_TEMPLATES_DEFINED);
-		$table->setHeader(array(S_NAME));
+		$table->setHeader(array(
+			($multiselect ? new CCheckBox("all_templates", NULL, "javascript: checkAll('".$form->getName()."', 'all_templates','templates');") : null),
+			S_NAME
+		));
 
 		$options = array(
 			'nodeids' => $nodeid,
-			'groupids' => $groupid,
-			'output' => API_OUTPUT_EXTEND,
-			'sortfield' => 'host'
-			);
+			'output' => array('templateid', 'host'),
+			'preservekeys' => true
+		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 
 		$templates = CTemplate::get($options);
+		order_result($templates, 'host');
 
-		foreach($templates as $tnum => $row){
-			$name = new CSpan($row['host'],'link');
-			$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
-				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
+		foreach($templates as $tnum => $template){
+			$name = new CSpan(get_node_name_by_elid($template['templateid'], null, ': ').$template['host'],'link');
 
-			$name->setAttribute('onclick',$action." close_window(); return false;");
+			if($multiselect){
+				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", ".zbx_jsvalue($template['templateid']).");";
+			}
+			else{
+				$values = array(
+					$dstfld1 => $template[$srcfld1],
+					$dstfld2 => $template[$srcfld2],
+				);
 
-			$table->addRow($name);
+				$js_action = 'javascript: addValues('.zbx_jsvalue($reference).','.zbx_jsvalue($values).'); close_window(); return false;';
+			}
+
+			$name->setAttribute('onclick', $js_action);
+
+			$table->addRow(array(
+				($multiselect ? new CCheckBox('templates['.zbx_jsValue($template[$srcfld1]).']', NULL, NULL, $template['templateid']) : null),
+				$name
+			));
 		}
-		$table->show();
+
+		if($multiselect){
+			$button = new CButton('select', S_SELECT, "javascript: addSelectedValues('templates', ".zbx_jsvalue($reference).");");
+			$table->setFooter(new CCol($button, 'right'));
+
+			insert_js('var popupReference = '.zbx_jsvalue($templates, true).';');
+		}
+
+		$form->addItem($table);
+		$form->show();
 	}
 	else if($srctbl == 'hosts_and_templates'){
 		$table = new CTableInfo(S_NO_TEMPLATES_DEFINED);

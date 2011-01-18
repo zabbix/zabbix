@@ -1239,7 +1239,7 @@ COpt::memoryPick();
 		DB::delete('optemplate', array('operationid' => $optemplateDelete_by_opid));
 
 		DB::insert('opmessage', $opmessageCreate, false);
-sdii($opmessage_grpCreate);
+
 		DB::insert('opmessage_grp', $opmessage_grpCreate);
 		DB::insert('opmessage_usr', $opmessage_usrCreate);
 		DB::insert('opcommand_grp', $opcommand_grpCreate);
@@ -1370,7 +1370,7 @@ sdii($opmessage_grpCreate);
 					}
 
 					$tpl = CTemplate::get(array(
-						'templateids' => $operation['optemplate'],
+						'templateids' => zbx_objectValues($operation['optemplate'],'templateid'),
 						'output' => API_OUTPUT_SHORTEN,
 						'editable' => 1,
 						'preservekeys' => true,
