@@ -328,7 +328,8 @@ class CImage extends CZBXAPI{
 					'imagetype' => $image['imagetype'],
 				);
 
-				if($DB['TYPE'] == 'ORACLE'){
+				switch($DB['TYPE']){
+				case ZBX_DB_ORACLE:
 					$values['image'] = 'EMPTY_BLOB()';
 
 					$lob = oci_new_descriptor($DB['DB'], OCI_D_LOB);
@@ -347,9 +348,8 @@ class CImage extends CZBXAPI{
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_EXECUTE_SQL_ERROR.' ['.$e['message'].'] '.S_IN_SMALL.' ['.$e['sqltext'].']');
 					}
 					oci_free_statement($stmt);
-
-				}
-				else if($DB['TYPE'] == 'IBM_DB2'){
+				break;
+				case ZBX_DB_DB2:
 					$stmt = db2_prepare($DB['DB'], 'INSERT INTO images ('.implode(' ,', array_keys($values)).',image)'.
 						' VALUES ('.implode(',', $values).', ?)');
 					
@@ -364,19 +364,28 @@ class CImage extends CZBXAPI{
 					if(!db2_execute($stmt)){
 						self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
 					}
-				}
-				else if(($DB['TYPE'] == 'SQLITE3') || $DB['TYPE'] == 'MYSQL' || $DB['TYPE'] == 'POSTGRESQL'){
-					if($DB['TYPE'] == 'SQLITE3')
+				break;
+				case ZBX_DB_SQLITE3:
 						$values['image'] = zbx_dbstr(bin2hex($image['image']));
-					else if($DB['TYPE'] == 'POSTGRESQL')
-						$values['image'] = "'".pg_escape_bytea($image['image'])."'";
-					else if($DB['TYPE'] == 'MYSQL')
+						$sql = 'INSERT INTO images ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
+						if(!DBexecute($sql)){
+							self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+						}
+				break;
+				case ZBX_DB_MYSQL:
 						$values['image'] = zbx_dbstr($image['image']);
-
-					$sql = 'INSERT INTO images ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
-					if(!DBexecute($sql)){
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-					}
+						$sql = 'INSERT INTO images ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
+						if(!DBexecute($sql)){
+							self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+						}
+				break;
+				case ZBX_DB_POSTGRESQL:
+						$values['image'] = "'".pg_escape_bytea($image['image'])."'";
+						$sql = 'INSERT INTO images ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
+						if(!DBexecute($sql)){
+							self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+						}
+				break;
 				}
 
 				$imageids[] = $imageid;
@@ -437,16 +446,17 @@ class CImage extends CZBXAPI{
 // Decode BASE64
 					$image['image'] = base64_decode($image['image']);
 
-					if($DB['TYPE'] == 'POSTGRESQL'){
+					switch($DB['TYPE']){
+					case ZBX_DB_POSTGRESQL:
 						$values['image'] = "'".pg_escape_bytea($image['image'])."'";
-					}
-					else if($DB['TYPE'] == 'SQLITE3'){
+					break;
+					case ZBX_DB_SQLITE3:
 						$values['image'] = zbx_dbstr(bin2hex($image['image']));
-					}
-					else if($DB['TYPE'] == 'MYSQL'){
+					break;
+					case ZBX_DB_MYSQL:
 						$values['image'] = zbx_dbstr($image['image']);
-					}
-					else if($DB['TYPE'] == 'ORACLE'){
+					break;
+					case ZBX_DB_ORACLE:
 						$sql = 'SELECT image FROM images WHERE imageid = '.$image['imageid'].' FOR UPDATE';
 
 						if(!$stmt = oci_parse($DB['DB'], $sql)){
@@ -466,8 +476,8 @@ class CImage extends CZBXAPI{
 						$row['IMAGE']->truncate();
 						$row['IMAGE']->save($image['image']);
 						$row['IMAGE']->free();
-					}
-					else if($DB['TYPE'] == 'IBM_DB2'){
+					break;
+					case ZBX_DB_DB2:
 						$stmt = db2_prepare($DB['DB'], 'UPDATE images SET image=? WHERE imageid='.$image['imageid']);
 						
 						if(!$stmt){
@@ -481,6 +491,7 @@ class CImage extends CZBXAPI{
 						if(!db2_execute($stmt)){
 							self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
 						}
+					break;
 					}
 				}
 

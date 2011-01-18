@@ -19,9 +19,20 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/db_test.php');
 require_once(dirname(__FILE__).'/function_check_item_key.php');
-//require_once 'otherTest.php';
+require_once(dirname(__FILE__).'/function_DBcommit.php');
+require_once(dirname(__FILE__).'/function_DBcondition.php');
+require_once(dirname(__FILE__).'/function_DBconnect.php');
+require_once(dirname(__FILE__).'/function_DBclose.php');
+require_once(dirname(__FILE__).'/function_DBend.php');
+require_once(dirname(__FILE__).'/function_DBexecute.php');
+require_once(dirname(__FILE__).'/function_DBfetch.php');
+require_once(dirname(__FILE__).'/function_DBid2nodeid.php');
+require_once(dirname(__FILE__).'/function_DBin_node.php');
+require_once(dirname(__FILE__).'/function_DBloadfile.php');
+require_once(dirname(__FILE__).'/function_DBrollback.php');
+require_once(dirname(__FILE__).'/function_DBselect.php');
+require_once(dirname(__FILE__).'/function_DBstart.php');
 
 class GeneralTests
 {
@@ -29,10 +40,20 @@ class GeneralTests
 	{
 		$suite = new PHPUnit_Framework_TestSuite('general');
 
-		$suite->addTestSuite('db_test');
 		$suite->addTestSuite('function_check_item_key');
-//		$suite->addTestSuite('otherTest');
-//		...
+		$suite->addTestSuite('function_DBcommit');
+		$suite->addTestSuite('function_DBcondition');
+		$suite->addTestSuite('function_DBconnect');
+		$suite->addTestSuite('function_DBclose');
+		$suite->addTestSuite('function_DBend');
+		$suite->addTestSuite('function_DBexecute');
+		$suite->addTestSuite('function_DBfetch');
+		$suite->addTestSuite('function_DBid2nodeid');
+		$suite->addTestSuite('function_DBin_node');
+		$suite->addTestSuite('function_DBloadfile');
+		$suite->addTestSuite('function_DBrollback');
+		$suite->addTestSuite('function_DBselect');
+		$suite->addTestSuite('function_DBstart');
 
 		return $suite;
 	}
