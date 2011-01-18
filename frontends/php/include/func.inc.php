@@ -557,6 +557,51 @@ function zbx_is_int($var){
 return preg_match("/^\-?\d{1,20}+$/", $var);
 }
 
+function zbx_array_diff($array1, $array2, $field){
+
+	$fields1 = zbx_objectValues($array1, $field);
+	$fields2 = zbx_objectValues($array2, $field);
+
+	$only1 = array_diff($fields1, $fields2);
+	$only1 = zbx_toHash($only1);
+
+	$only2 = array_diff($fields2, $fields1);
+	$only2 = zbx_toHash($only2);
+
+	$result = array(
+		'only1' => array(),
+		'only2' => array(),
+		'both' => array()
+	);
+
+	foreach($array1 as $array){
+		if(!isset($array[$field]))
+			$result['only1'][] = $array;
+		else if(isset($only1[$array[$field]]))
+			$result['only1'][] = $array;
+		else
+			$result['both'][] = $array;
+	}
+
+	foreach($array2 as $array){
+		if(!isset($array[$field]))
+			$result['only2'][] = $array;
+		else if(isset($only2[$array[$field]]))
+			$result['only2'][] = $array;
+		else
+			$result['both'][] = $array;
+	}
+
+	return $result;
+}
+
+function zbx_array_push(&$array, $add){
+	foreach($array as $key => $value){
+		foreach($add as $newKey => $newValue){
+			$array[$key][$newKey] = $newValue;
+		}
+	}
+}
 
 // STRING FUNCTIONS {{{
 if(!function_exists('zbx_stripslashes')){
