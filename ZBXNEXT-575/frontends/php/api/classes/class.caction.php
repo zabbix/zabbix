@@ -590,7 +590,7 @@ COpt::memoryPick();
 
 // get OPERATION_TYPE_COMMAND data
 			if(!empty($opcommand)){
-				$sql = 'SELECT operationid, hostid, command '.
+				$sql = 'SELECT opcommand_hstid, operationid, hostid, command '.
 						' FROM opcommand_hst '.
 						' WHERE '.DBcondition('operationid', $opcommand);
 				$db_opcommand_hst = DBselect($sql);
@@ -600,7 +600,7 @@ COpt::memoryPick();
 					$operations[$opcommand_hst['operationid']]['opcommand_hst'][] = $opcommand_hst;
 				}
 
-				$sql = 'SELECT operationid, groupid, command'.
+				$sql = 'SELECT opcommand_grpid, operationid, groupid, command'.
 						' FROM opcommand_grp'.
 						' WHERE '.DBcondition('operationid', $opcommand);
 				$db_opcommand_grp = DBselect($sql);
@@ -1056,7 +1056,7 @@ COpt::memoryPick();
 
 	protected static function updateOperations($operations, $actions_db){
 		$operationsUpdate = array();
-
+//sdii($operations);
 		$opmessageCreate = array();
 		$opmessageUpdate = array();
 		$opmessageDelete_by_opid = array();
@@ -1122,11 +1122,12 @@ COpt::memoryPick();
 
 					if(!isset($operation_db['opmessage_usr']))
 						$operation_db['opmessage_usr'] = array();
-					if(!isset($operation_db['opmessage_usr']))
-						$operation_db['opmessage_usr'] = array();
+					if(!isset($operation_db['opmessage_grp']))
+						$operation_db['opmessage_grp'] = array();
 
 
 					if($type_changed){
+						$operation['opmessage']['operationid'] = $operation['operationid'];
 						$opmessageCreate[] = $operation['opmessage'];
 
 						$opmessage_grpCreate = array_merge($opmessage_grpCreate, $operation['opmessage_grp']);
@@ -1162,16 +1163,22 @@ COpt::memoryPick();
 				case OPERATION_TYPE_COMMAND:
 					if(!isset($operation['opcommand_grp']))
 						$operation['opcommand_grp'] = array();
-					if(!isset($operation['opmessage_hst']))
-						$operation['opmessage_hst'] = array();
+					else
+						zbx_array_push($operation['opcommand_grp'], array('operationid' => $operation['operationid']));
+
+					if(!isset($operation['opcommand_hst']))
+						$operation['opcommand_hst'] = array();
+					else
+						zbx_array_push($operation['opcommand_hst'], array('operationid' => $operation['operationid']));
+
 					if(!isset($operation_db['opcommand_grp']))
 						$operation_db['opcommand_grp'] = array();
-					if(!isset($operation_db['opmessage_hst']))
-						$operation_db['opmessage_hst'] = array();
+					if(!isset($operation_db['opcommand_hst']))
+						$operation_db['opcommand_hst'] = array();
 
 					if($type_changed){
 						$opcommand_grpCreate = array_merge($opcommand_grpCreate, $operation['opcommand_grp']);
-						$opcommand_hstCreate = array_merge($opcommand_hstCreate, $operation['opmessage_hst']);
+						$opcommand_hstCreate = array_merge($opcommand_hstCreate, $operation['opcommand_hst']);
 					}
 					else{
 						$diff = zbx_array_diff($operation_db['opcommand_grp'], $operation['opcommand_grp'], 'opcommand_grpid');
@@ -1183,7 +1190,7 @@ COpt::memoryPick();
 							));
 						}
 
-						$diff = zbx_array_diff($operation_db['opmessage_hst'], $operation['opmessage_hst'], 'opcommand_hstid');
+						$diff = zbx_array_diff($operation_db['opcommand_hst'], $operation['opcommand_hst'], 'opcommand_hstid');
 						$opcommand_hstCreate = array_merge($opcommand_hstCreate, $diff['only2']);
 						foreach($diff['only1'] as $ochst){
 							DB::delete('opcommand_hst', array(
