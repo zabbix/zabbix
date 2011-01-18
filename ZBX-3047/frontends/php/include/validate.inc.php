@@ -71,14 +71,13 @@
 		return 'preg_match("/'.ZBX_PREG_PARAMS.'/",{'.$var.'})&&';
 	}
 
-	function validate_float($str){
-//		echo "Validating float:$str<br>";
-		if(preg_match('/^[ ]*([0-9]+)((\.)?)([0-9]*[KMGTsmhdw]{0,1})[ ]*$/i', $str, $arr)) {
-			return 0;
-		}
-		else{
-			return -1;
-		}
+	function validate_sec($str){
+		return (preg_match('/^[ ]*\d+[KMGTsmhdw]{0,1}[ ]*$/', $str, $arr) ? 0 : -1);
+	}
+
+	function validate_secnum($str){
+		if(preg_match('/^[ ]*#\d+[ ]*$/', $str, $arr)) return 0;
+	return validate_sec($str);
 	}
 
 	function validate_ipv4($str,&$arr){
@@ -244,18 +243,8 @@
 			$out .= sprintf('%d-%d,%02d:%02d-%02d:%02d',$arr[1],$arr[2],$arr[3],$arr[4],$arr[5],$arr[6]).';';
 		}
 		$str = $out;
-//parse_period($str);
+// parse_period($str);
 		return true;
-	}
-
-// Check if str has format #<float> or <float>
-	function validate_ticks($str){
-		if(preg_match('/^[ ]*#\d+[ ]*$/i', $str, $arr))
-			return 0;
-		else if(preg_match('/^[ ]*\d+[KMGTsmhdw]{0,1}[ ]*$/i', $str, $arr))
-			return 0;
-
-	return -1;
 	}
 
 	define('NOT_EMPTY',"({}!='')&&");
@@ -490,7 +479,7 @@
 	function check_field(&$fields, &$field, $checks){
 		if(!isset($checks[5])) $checks[5] = $field;
 		list($type,$opt,$flags,$validation,$exception,$caption)=$checks;
-                                                            	
+
 		if($flags&P_UNSET_EMPTY && isset($_REQUEST[$field]) && $_REQUEST[$field]==''){
 			unset_request($field,'P_UNSET_EMPTY');
 		}

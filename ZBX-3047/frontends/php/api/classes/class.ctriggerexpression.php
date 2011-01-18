@@ -63,7 +63,7 @@ private $allowed;
 
 
 	public function checkMacro($macro){
-		if(!preg_match('/^'.ZBX_PREG_EXPRESSION_SIMPLE_MACROS.'$/i', $macro))
+		if(!preg_match('/^'.ZBX_PREG_EXPRESSION_SIMPLE_MACROS.'$/', $macro))
 			throw new Exception('Incorrect macro "'.$macro.'" is used in expression.');
 	}
 
@@ -97,37 +97,36 @@ private $allowed;
 				throw new Exception('Incorrect function format.');
 
 			if(is_null($this->allowed['functions'][$expression['functionName']]['args'])){
-				if(!zbx_empty($expression['functionParamList'][0])){
+				if(!zbx_empty($expression['functionParamList'][0]))
 					throw new Exception('Function does not expect parameters.');
-				}
 				else
 					return true;
 			}
 
 			if(count($this->allowed['functions'][$expression['functionName']]['args']) < count($expression['functionParamList']))
-				throw new Exception('Function support '.count($this->allowed['functions'][$expression['functionName']]['args']).' parameters.');
+				throw new Exception('Function supports '.count($this->allowed['functions'][$expression['functionName']]['args']).' parameters.');
 
 			foreach($this->allowed['functions'][$expression['functionName']]['args'] as $anum => $arg){
 
-	// mandatory check
+// mandatory check
 				if(isset($arg['mandat']) && $arg['mandat'] && (!isset($expression['functionParamList'][$anum]) || zbx_empty($expression['functionParamList'][$anum])))
 					throw new Exception('Mandatory parameter is missing.');
 
-	// type check
+// type check
 				if(isset($arg['type']) && isset($expression['functionParamList'][$anum])){
 					$userMacro = preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $expression['functionParamList'][$anum]);
 
 					if(($arg['type'] == 'str') && !is_string($expression['functionParamList'][$anum]) && !$userMacro)
 						throw new Exception('Parameter of type string or user macro expected, "'.$expression['functionParamList'][$anum].'" given.');
 
-					if(($arg['type'] == 'sec') && (validate_float($expression['functionParamList'][$anum]) != 0) && !$userMacro)
-						throw new Exception('Parameter counter or user macro expected, "'.$expression['functionParamList'][$anum].'" given.');
+					if(($arg['type'] == 'sec') && (validate_sec($expression['functionParamList'][$anum]) != 0) && !$userMacro)
+						throw new Exception('Parameter sec or user macro expected, "'.$expression['functionParamList'][$anum].'" given.');
 
-					if(($arg['type'] == 'sec_num') && (validate_ticks($expression['functionParamList'][$anum]) != 0) && !$userMacro)
-						throw new Exception('Parameter of type integer or counter or user macro expected, "'.$expression['functionParamList'][$anum].'" given.');
+					if(($arg['type'] == 'sec_num') && (validate_secnum($expression['functionParamList'][$anum]) != 0) && !$userMacro)
+						throw new Exception('Parameter sec or #num or user macro expected, "'.$expression['functionParamList'][$anum].'" given.');
 
 					if(($arg['type'] == 'num') && !is_numeric($expression['functionParamList'][$anum]) && !$userMacro)
-						throw new Exception('Parameter of type integer or user macro expected, "'.$expression['functionParamList'][$anum].'" given.');
+						throw new Exception('Parameter sec or user macro expected, "'.$expression['functionParamList'][$anum].'" given.');
 				}
 			}
 		}

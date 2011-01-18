@@ -78,6 +78,8 @@
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['count']	= array(
 			'args' => array(
 				array('type' => 'sec_num','mandat' => true),
+				array('type' => 'str'),
+				array('type' => 'str'),
 				array('type' => 'str')
 			),
 			'item_types' => array(
@@ -129,7 +131,10 @@
 		);
 
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['last']	= array(
-			'args' => array( array('type' => 'sec_num','mandat' => true) ),
+			'args' => array(
+				array('type' => 'sec_num','mandat' => true),
+				array('type' => 'sec')
+			),
 			'item_types' => array(
 				ITEM_VALUE_TYPE_FLOAT => true,
 				ITEM_VALUE_TYPE_UINT64 => true,
@@ -203,7 +208,10 @@
 		);
 
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['strlen']= array(
-			'args' => array( array('type' => 'sec_num','mandat' => true) ),
+			'args' => array(
+				array('type' => 'sec_num','mandat' => true),
+				array('type' => 'sec')
+			),
 			'item_types' => array(
 				ITEM_VALUE_TYPE_STR => true,
 				ITEM_VALUE_TYPE_TEXT => true,
@@ -787,12 +795,12 @@ return $caption;
 
 						if(preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $parameter[$pid])) continue;
 
-						if(('sec' == $params['type']) && (validate_float($parameter[$pid])!=0) ){
+						if(('sec' == $params['type']) && (validate_sec($parameter[$pid])!=0) ){
 							error('['.$parameter[$pid].'] '.S_NOT_FLOAT_OR_MACRO_FOR_FUNCTION_SMALL.' ('.$function.')');
 							return false;
 						}
 
-						if(('sec_num' == $params['type']) && (validate_ticks($parameter[$pid])!=0) ){
+						if(('sec_num' == $params['type']) && (validate_secnum($parameter[$pid])!=0) ){
 							error('['.$parameter[$pid].'] '.S_NOT_FLOAT_OR_MACRO_OR_COUNTER_FOR_FUNCTION_SMALL.' ('.$function.')');
 							return false;
 						}
