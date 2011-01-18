@@ -1055,7 +1055,6 @@ COpt::memoryPick();
 	}
 
 	protected static function updateOperations($operations, $actions_db){
-sdii($operations);
 		$operationsUpdate = array();
 
 		$opmessageCreate = array();
