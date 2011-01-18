@@ -19,73 +19,6 @@
 **/
 ?>
 <?php
-function check_permission_for_action_conditions($conditions){
-	global $USER_DETAILS;
-
-	if(USER_TYPE_SUPER_ADMIN == $USER_DETAILS['type']) return true;
-
-	$groupids = array();
-	$hostids = array();
-	$triggerids = array();
-
-	foreach($conditions as $ac_data){
-		if($ac_data['operator'] != 0) continue;
-
-		switch($ac_data['type']){
-			case CONDITION_TYPE_HOST_GROUP:
-				$groupids[$ac_data['value']] = $ac_data['value'];
-				break;
-			case CONDITION_TYPE_HOST:
-			case CONDITION_TYPE_HOST_TEMPLATE:
-				$hostids[$ac_data['value']] = $ac_data['value'];
-				break;
-			case CONDITION_TYPE_TRIGGER:
-				$triggerids[$ac_data['value']] = $ac_data['value'];
-				break;
-		}
-	}
-
-	$options = array(
-		'groupids' => $groupids,
-		'editable' => 1
-	);
-
-	try{
-		$groups = CHostgroup::get($options);
-		$groups = zbx_toHash($groups, 'groupid');
-		foreach($groupids as $hgnum => $groupid){
-			if(!isset($groups[$groupid])) throw new Exception(S_INCORRECT_GROUP);
-		}
-
-		$options = array(
-			'hostids' => $hostids,
-			'editable' => 1
-		);
-		$hosts = CHost::get($options);
-		$hosts = zbx_toHash($hosts, 'hostid');
-		foreach($hostids as $hnum => $hostid){
-			if(!isset($hosts[$hostid])) throw new Exception(S_INCORRECT_HOST);
-		}
-
-		$options = array(
-			'triggerids' => $triggerids,
-			'editable' => 1
-		);
-		$triggers = CTrigger::get($options);
-		$triggers = zbx_toHash($triggers, 'triggerid');
-		foreach($triggerids as $hnum => $triggerid){
-			if(!isset($triggers[$triggerid])) throw new Exception(S_INCORRECT_TRIGGER);
-		}
-	}
-	catch(Exception $e){
-//		throw new Exception($e->getMessage());
-//		error($e->getMessage());
-		return false;
-	}
-
-return true;
-}
-
 function get_action_by_actionid($actionid){
 	$sql='select * from actions where actionid='.$actionid;
 	$result=DBselect($sql);
@@ -417,13 +350,13 @@ function get_operation_desc($type, $data){
 								' WHERE a.actionid=o.actionid '.
 									' AND o.operationid='.$data['operationid'];
 						if($rows = DBfetch(DBselect($sql,1))){
-							$result[] = array(bold(S_SUBJECT.': '),BR(),$rows['def_shortdata'],BR());
-							$result[] = array(bold(S_MESSAGE.':'),BR(),$rows['def_longdata']);
+							$result[] = array(bold(S_SUBJECT.': '), BR(),$rows['def_shortdata'],BR());
+							$result[] = array(bold(S_MESSAGE.':'), BR(),$rows['def_longdata']);
 						}
 					}
 				}
 				else{
-					$result[] = array(bold(S_SUBJECT.': '),$data['opmessage']['subject'], BR());
+					$result[] = array(bold(S_SUBJECT.': '), $data['opmessage']['subject'], BR());
 					$result[] = array(bold(S_MESSAGE.':'), $data['opmessage']['message']);
 				}
 
