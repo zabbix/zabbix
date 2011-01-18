@@ -106,17 +106,17 @@ int calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id
 			{
 				switch (field->type)
 				{
-					case ZBX_TYPE_ID :
-					case ZBX_TYPE_INT :
-					case ZBX_TYPE_UINT :
-						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset,
-								ZBX_FIELDNAME_LEN + 1, "%s", field->name);
+					case ZBX_TYPE_ID:
+					case ZBX_TYPE_INT:
+					case ZBX_TYPE_UINT:
+						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, ZBX_FIELDNAME_LEN + 1,
+								"%s", field->name);
 						break;
-					case ZBX_TYPE_FLOAT :
+					case ZBX_TYPE_FLOAT:
 						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, ZBX_FIELDNAME_LEN + 6,
 								"md5(cast(%s as char))", field->name);
 						break;
-					default :
+					default:
 						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, ZBX_FIELDNAME_LEN + 6,
 								"md5(%s)", field->name);
 						break;
@@ -129,17 +129,17 @@ int calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id
 
 				switch (field->type)
 				{
-					case ZBX_TYPE_ID :
-					case ZBX_TYPE_INT :
-					case ZBX_TYPE_UINT :
+					case ZBX_TYPE_ID:
+					case ZBX_TYPE_INT:
+					case ZBX_TYPE_UINT:
 						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
 								" else cast(%s as char) end", field->name);
 						break;
-					case ZBX_TYPE_FLOAT :
+					case ZBX_TYPE_FLOAT:
 						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
 								" else md5(cast(%s as char)) end", field->name);
 						break;
-					default :
+					default:
 						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
 								" else md5(%s) end", field->name);
 						break;
@@ -360,7 +360,8 @@ char	*get_config_data(int nodeid, int dest_nodetype)
 		f = 0;
 		j = 0;
 
-		do {
+		do
+		{
 			while ((table->fields[f].flags & ZBX_SYNC) == 0)
 				f++;
 
@@ -398,7 +399,7 @@ char	*get_config_data(int nodeid, int dest_nodetype)
 					else
 						rowlen = strlen(row2[j]);
 					zbx_binary2hex((u_char *)row2[j], rowlen, &hex, &hex_allocated);
-					zbx_snprintf_alloc(&data, &data_allocated, &data_offset, strlen(hex)+128, "%s", hex);
+					zbx_snprintf_alloc(&data, &data_allocated, &data_offset, strlen(hex) + 128, "%s", hex);
 				}
 
 				if (ZBX_TYPE_BLOB == table->fields[f].type)
