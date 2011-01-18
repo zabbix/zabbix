@@ -15,7 +15,7 @@
 <tr id="opTemplateRow_#{templateid}">
 <td>
 	<input name="new_operation[optemplate][#{templateid}][templateid]" type="hidden" value="#{templateid}" />
-	<span style="font-size: 1.1em; font-weight: bold;"> #{name} </span>
+	<span style="font-size: 1.1em; font-weight: bold;"> #{host} </span>
 </td>
 <td>
 	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="javascript: removeOpTemplateRow(#{templateid});" />
@@ -150,6 +150,7 @@ function addPopupValues(list){
 				jQuery("#opGroupListFooter").before(tpl.evaluate(value));
 				break;
 			case 'dsc_templateid':
+SDJ(value);
 				if(jQuery("#opTemplateRow_"+value.templateid).length) continue;
 
 				var tpl = new Template(jQuery('#opTemplateRowTPL').html());
