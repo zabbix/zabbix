@@ -1844,6 +1844,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max
 			DCincrease_disable_until(dc_item, dc_host, now);
 		}
 
+		dc_item->location = ZBX_LOC_POLLER;
 		DCget_host(&items[num].host, dc_host);
 		DCget_item(&items[num], dc_item);
 		num++;
@@ -2240,7 +2241,7 @@ int	DCconfig_get_proxypoller_hosts(DC_HOST *hosts, int max_hosts)
 			break;
 
 		zbx_binary_heap_remove_min(queue);
-		dc_host->location = ZBX_LOC_NOWHERE;
+		dc_host->location = ZBX_LOC_POLLER;
 
 		DCget_host(&hosts[num], dc_host);
 
