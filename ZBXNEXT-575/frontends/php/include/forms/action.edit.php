@@ -352,6 +352,9 @@ require_once('include/templates/action.js.php');
 		if(!isset($operation['opconditions'])) $operation['opconditions'] = array();
 		if(!isset($operation['mediatypeid'])) $operation['mediatypeid'] = 0;
 
+		$opid = isset($operation['operationid']) ? $operation['operationid'] : $id;
+		$operation['id'] = $opid;
+
 		$oper_details = new CSpan(get_operation_desc(SHORT_DESCRITION, $operation));
 		$oper_details->setHint(get_operation_desc(LONG_DESCRITION, $operation));
 
@@ -375,10 +378,15 @@ require_once('include/templates/action.js.php');
 			$oper_details,
 			$esc_period_txt,
 			$esc_delay_txt,
-			new CSubmit('edit_operationid['.$id.']',S_EDIT, null, 'link_menu')
+			new CSubmit('edit_operationid['.$opid.']',S_EDIT, null, 'link_menu')
 		));
 
-		$tblOper->addItem(new CVar('operations['.$id.']', $operation));
+		$operation['opmessage_grp'] = zbx_toHash($operation['opmessage_grp'], 'usrgrpid');
+		$operation['opmessage_usr'] = zbx_toHash($operation['opmessage_usr'], 'userid');
+		$operation['opcommand_grp'] = zbx_toHash($operation['opcommand_grp'], 'opcommand_grpid');
+		$operation['opcommand_hst'] = zbx_toHash($operation['opcommand_hst'], 'opcommand_hstid');
+
+		$tblOper->addItem(new CVar('operations['.$opid.']', $operation));
 	}
 
 	$footer = array();
@@ -401,6 +409,7 @@ require_once('include/templates/action.js.php');
 
 		if(!is_array($new_operation)){
 			$new_operation = array(
+				'action' => 'create',
 				'operationtype' => 0,
 				'esc_period' => 0,
 				'esc_step_from' => 1,
@@ -410,12 +419,14 @@ require_once('include/templates/action.js.php');
 		}
 //SDII($_REQUEST);
 		$evaltype = $new_operation['evaltype'];
+		$update_mode = ($new_operation['action'] == 'update');
 
-		$update_mode = false;
-		if(isset($new_operation['id'])){
+		$tblOper->addItem(new CVar('new_operation[action]', $new_operation['action']));
+
+		if(isset($new_operation['id']))
 			$tblOper->addItem(new CVar('new_operation[id]', $new_operation['id']));
-			$update_mode = true;
-		}
+		if(isset($new_operation['operationid']))
+			$tblOper->addItem(new CVar('new_operation[operationid]', $new_operation['operationid']));
 
 		$tblStep = new CTable();
 
@@ -554,6 +565,15 @@ require_once('include/templates/action.js.php');
 				if(!isset($new_operation['opcommand_grp'])) $new_operation['opcommand_grp'] = array();
 				if(!isset($new_operation['opcommand_hst'])) $new_operation['opcommand_hst'] = array();
 
+				$hosts = CHost::get(array(
+					'hostids' => zbx_objectValues($new_operation['opcommand_hst'], 'hostid'),
+					'output' => array('hostid','host'),
+					'preservekeys' => true
+				));
+				foreach($new_operation['opcommand_hst'] as $ohnum => $cmd)
+					$new_operation['opcommand_hst'][$ohnum]['host'] = ($cmd['hostid'] > 0) ? $hosts[$cmd['hostid']]['host'] : '';
+				morder_result($new_operation['opcommand_hst'], array('host', 'opcommand_hstid'));
+
 				$groups = CHostGroup::get(array(
 					'groupids' => zbx_objectValues($new_operation['opcommand_grp'], 'groupid'),
 					'output' => array('groupid','name'),
@@ -562,21 +582,11 @@ require_once('include/templates/action.js.php');
 
 				foreach($new_operation['opcommand_grp'] as $ognum => $cmd)
 					$new_operation['opcommand_grp'][$ognum]['name'] = $groups[$cmd['groupid']]['name'];
-				order_result($new_operation['opcommand_grp'], 'name');
-
-				$hosts = CHost::get(array(
-					'hostids' => zbx_objectValues($new_operation['opcommand_hst'], 'hostid'),
-					'output' => array('hostid','host'),
-					'preservekeys' => true
-				));
-				foreach($new_operation['opcommand_hst'] as $ohnum => $cmd)
-					$new_operation['opcommand_hst'][$ohnum]['host'] = ($cmd['hostid'] > 0) ? $hosts[$cmd['hostid']]['host'] : '';
-				order_result($new_operation['opcommand_hst'], 'host');
-
+				morder_result($new_operation['opcommand_grp'], array('name', 'opcommand_grpid'));
 // JS Add commands
 				$jsInsert = '';
-				$jsInsert.= 'addPopupValues('.zbx_jsvalue(array('object'=>'groupid', 'values'=>$new_operation['opcommand_grp'])).');';
 				$jsInsert.= 'addPopupValues('.zbx_jsvalue(array('object'=>'hostid', 'values'=>$new_operation['opcommand_hst'])).');';
+				$jsInsert.= 'addPopupValues('.zbx_jsvalue(array('object'=>'groupid', 'values'=>$new_operation['opcommand_grp'])).');';
 
 				zbx_add_post_js($jsInsert);
 
