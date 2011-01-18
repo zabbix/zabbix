@@ -1,6 +1,7 @@
 Changes for 1.8.5rc1
 
  - [ZBX-3346] fixed more frequent item data acquiring than actually required (Sasha)
+ - [ZBX-3409] fixed semaphore and shared memory access permissions (Sasha)
  - [ZBX-3173] made server-side JSON parser ignore whitespace better (asaveljevs)
  - [ZBX-3425] updated Brazilian Portuguese translation; thanks to Murilo Moreira de Oliveira (Richlv)
  - [ZBX-3403] fixed SQL statements for auto registration and discovery operations (Sasha)
