@@ -113,7 +113,7 @@ int calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id
 								"%s", field->name);
 						break;
 					case ZBX_TYPE_FLOAT:
-						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, ZBX_FIELDNAME_LEN + 6,
+						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, ZBX_FIELDNAME_LEN + 20,
 								"md5(cast(%s as char))", field->name);
 						break;
 					default:
@@ -124,7 +124,7 @@ int calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id
 			}
 			else
 			{
-				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
+				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, ZBX_FIELDNAME_LEN + 31,
 						"case when %s is null then 'NULL'", field->name);
 
 				switch (field->type)
@@ -132,15 +132,15 @@ int calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id
 					case ZBX_TYPE_ID:
 					case ZBX_TYPE_INT:
 					case ZBX_TYPE_UINT:
-						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
+						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, ZBX_FIELDNAME_LEN + 25,
 								" else cast(%s as char) end", field->name);
 						break;
 					case ZBX_TYPE_FLOAT:
-						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
+						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, ZBX_FIELDNAME_LEN + 30,
 								" else md5(cast(%s as char)) end", field->name);
 						break;
 					default:
-						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
+						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, ZBX_FIELDNAME_LEN + 16,
 								" else md5(%s) end", field->name);
 						break;
 				}
