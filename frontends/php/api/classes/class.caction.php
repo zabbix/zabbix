@@ -1094,12 +1094,13 @@ COpt::memoryPick();
 
 					break;
 				case OPERATION_TYPE_COMMAND:
-					if((!isset($operation['opcommand_hst']) || empty($operation['opcommand_hst']))
-							&& (!isset($operation['opcommand_grp']) || empty($operation['opcommand_grp']))){
+					if((!isset($operation['opcommand_hst']) || empty($operation['opcommand_hst'])) &&
+						(!isset($operation['opcommand_grp']) || empty($operation['opcommand_grp'])))
+					{
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('No targets for operation command.'));
 					}
 
-					self::validateCommands($operation['longdata']);
+					self::validateCommands($operation);
 					break;
 				case OPERATION_TYPE_GROUP_ADD:
 				case OPERATION_TYPE_GROUP_REMOVE:

@@ -24,7 +24,7 @@
 
 <script type="text/x-jquery-tmpl" id="opCmdGroupRowTPL">
 <tr id="opCmdGroupRow_#{opcommand_grpid}">
-<td>
+<td><input name="new_operation[opcommand_grp][#{opcommand_grpid}][action]" type="hidden" value="#{action}" />
 	<input name="new_operation[opcommand_grp][#{opcommand_grpid}][opcommand_grpid]" type="hidden" value="#{opcommand_grpid}" />
 	<input name="new_operation[opcommand_grp][#{opcommand_grpid}][groupid]" type="hidden" value="#{groupid}" />
 	<input name="new_operation[opcommand_grp][#{opcommand_grpid}][name]" type="hidden" value="#{name}" />
@@ -46,6 +46,7 @@
 <script type="text/x-jquery-tmpl" id="opCmdHostRowTPL">
 <tr id="opCmdHostRow_#{opcommand_hstid}">
 <td>
+	<input name="new_operation[opcommand_hst][#{opcommand_hstid}][action]" type="hidden" value="#{action}" />
 	<input name="new_operation[opcommand_hst][#{opcommand_hstid}][opcommand_hstid]" type="hidden" value="#{opcommand_hstid}" />
 	<input name="new_operation[opcommand_hst][#{opcommand_hstid}][hostid]" type="hidden" value="#{hostid}" />
 	<input name="new_operation[opcommand_hst][#{opcommand_hstid}][host]" type="hidden" value="#{host}" />
@@ -76,6 +77,7 @@
 			<option value="2"><?php print(_('Host group')); ?></option>
 		</select>
 		<div id="opCmdTargetSelect" class="inlineblock">
+			<input name="action" type="hidden" value="#{action}" />
 			<input name="opCmdId" type="hidden" value="#{opcmdid}" />
 			<input name="opCmdTargetObjectId" id="opCmdTargetObjectId" type="hidden" value="#{objectid}" />
 			<input name="opCmdTargetObjectName" id="opCmdTargetObjectName" type="text" class="input text" value="#{name}" readonly="readonly" size="30"/>
@@ -119,11 +121,16 @@ function addPopupValues(list){
 			case 'groupid':
 				var tpl = new Template(jQuery('#opCmdGroupRowTPL').html());
 
+				value.objectCaption = "<?php print(_('Host group').': '); ?>";
+
+				if(!isset('action', value))
+					value.action = isset('opcommand_grpid', value) ? 'update' : 'create';
+
+
 				value.commandLine = value.command.split("\n")[0].toString();
 				if(value.commandLine.length > 48) value.commandLine = value.commandLine.substr(0,45) + '...';
 
 				if(jQuery("#opCmdDraft").length){
-					value.newValue = "update";
 					jQuery("#opCmdDraft").replaceWith(tpl.evaluate(value));
 				}
 				else{
@@ -139,11 +146,18 @@ function addPopupValues(list){
 			case 'hostid':
 				var tpl = new Template(jQuery('#opCmdHostRowTPL').html());
 
+				if(value.hostid.toString() != '0')
+					value.objectCaption = "<?php print(_('Host').': '); ?>";
+				else
+					value.host = "<?php print(_('Current host')); ?>";
+
+				if(!isset('action', value))
+					value.action = isset('opcommand_hstid', value) ? 'update' : 'create';
+
 				value.commandLine = value.command.split("\n")[0].toString();
 				if(value.commandLine.length > 48) value.commandLine = value.commandLine.substr(0,45) + '...';
 
 				if(jQuery("#opCmdDraft").length){
-					value.newValue = "update";
 					jQuery("#opCmdDraft").replaceWith(tpl.evaluate(value));
 				}
 				else{
@@ -186,7 +200,9 @@ function showOpCmdForm(opCmdId, object){
 		var objectRow = jQuery('#opCmdHostRow_'+opCmdId);
 		objectRow.attr('origid', objectRow.attr('id'));
 		objectRow.attr('id', 'opCmdDraft');
+
 //#new_operation[opcommand_hst][#{opcommand_hstid}][opcommand_hstid]')
+		objectTPL.action = jQuery(objectRow).find('input[name="new_operation[opcommand_hst]['+opCmdId+'][action]"]').val();
 
 		objectTPL.opcmdid = opCmdId;
 		objectTPL.objectid = jQuery(objectRow).find('input[name="new_operation[opcommand_hst]['+opCmdId+'][hostid]"]').val();
@@ -196,6 +212,8 @@ function showOpCmdForm(opCmdId, object){
 		objectTPL.operationName = '<?php print(_('Update'));?>';
 	}
 	else if(object == 'groupid'){
+		objectTPL.action = jQuery(objectRow).find('input[name="new_operation[opcommand_hst]['+opCmdId+'][action]"]').val();
+
 		var objectRow = jQuery('#opCmdGroupRow_'+opCmdId);
 		objectRow.attr('origid', objectRow.attr('id'));
 		objectRow.attr('id', 'opCmdDraft');
@@ -210,6 +228,7 @@ function showOpCmdForm(opCmdId, object){
 	}
 	else{
 // new
+		objectTPL.action = 'create';
 		objectTPL.opcmdid = 'new';
 		objectTPL.objectid = 0;
 		objectTPL.name = '';
@@ -235,6 +254,7 @@ function saveOpCmdForm(){
 	var objectForm = jQuery('#opcmdEditForm');
 
 	var object = {};
+	object.action = jQuery(objectForm).find('input[name="action"]').val();
 	object.target = jQuery(objectForm).find('select[name="opCmdTarget"]').val();
 	object.command = jQuery(objectForm).find('textarea[name="opCmdTargetObjectCommand"]').val();
 
@@ -244,7 +264,6 @@ function saveOpCmdForm(){
 	}
 
 	if(object.target.toString() == '2'){
-		object.objectCaption = "<?php print(_('Host group').': '); ?>";
 		object.object = 'groupid';
 		object.opcommand_grpid = jQuery(objectForm).find('input[name="opCmdId"]').val();
 		object.groupid = jQuery(objectForm).find('input[name="opCmdTargetObjectId"]').val();
@@ -261,16 +280,9 @@ function saveOpCmdForm(){
 		object.hostid = jQuery(objectForm).find('input[name="opCmdTargetObjectId"]').val();
 		object.host = jQuery(objectForm).find('input[name="opCmdTargetObjectName"]').val();
 
-		if(object.target.toString() != '0'){
-			object.objectCaption = "<?php print(_('Host').': '); ?>";
-
-			if(empty(object.host)){
-				alert("<?php print(_('You did not specified host for operation.')); ?>");
-				return true;
-			}
-		}
-		else{
-			object.objectCaption = "<?php print(_('Current host')); ?>";
+		if((object.target.toString() != '0') && empty(object.host)){
+			alert("<?php print(_('You did not specified host for operation.')); ?>");
+			return true;
 		}
 	}
 
