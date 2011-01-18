@@ -341,7 +341,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			}
 			unset($operation_data);
 
-			}
+		}
 		else{
 			$eventsource = get_request('eventsource');
 			$evaltype = get_request('evaltype');

@@ -551,32 +551,66 @@ include_once('include/page_header.php');
 		$form->show();
 	}
 	else if($srctbl == 'host_group'){
+		$form = new CForm();
+		$form->setName('groupform');
+		$form->setAttribute('id', 'groups');
+
+		insert_js_function('addSelectedValues');
+		insert_js_function('addValues');
+		insert_js_function('addValue');
+
 		$table = new CTableInfo(S_NO_GROUPS_DEFINED);
-		$table->setHeader(array(S_NAME));
+		$table->setHeader(array(
+			($multiselect ? new CCheckBox("all_groups", NULL, "javascript: checkAll('".$form->getName()."', 'all_groups','groups');") : null),
+			S_NAME
+		));
 
 		$options = array(
-				'nodeids' => $nodeid,
-				'output' => API_OUTPUT_EXTEND
-			);
+			'nodeids' => $nodeid,
+			'output' => array('groupid', 'name'),
+			'preservekeys' => true
+		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 
 		$hostgroups = CHostGroup::get($options);
 		order_result($hostgroups, 'name');
 
-		foreach($hostgroups as $gnum => $row){
-			$row['node_name'] = get_node_name_by_elid($row['groupid'], true);
-			$name = new CSpan($row['name'],'link');
+		foreach($hostgroups as $gnum => $group){
+			$nodeName = get_node_name_by_elid($group['groupid'], true);
+			$group['node_name'] = isset($nodeName) ? '('.$nodeName.') ' : '';
+			$hostgroups[$gnum]['node_name'] = $group['node_name'];
 
-			$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
+			$name = new CSpan(get_node_name_by_elid($group['groupid'], null, ': ').$group['name'],'link');
 
-			$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
-				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
+			if($multiselect){
+				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", ".zbx_jsvalue($group['groupid']).");";
+			}
+			else{
+				$values = array(
+					$dstfld1 => $group[$srcfld1],
+					$dstfld2 => $group[$srcfld2],
+				);
 
-			$name->setAttribute('onclick',$action." close_window(); return false;");
+				$js_action = 'javascript: addValues('.zbx_jsvalue($reference).','.zbx_jsvalue($values).'); close_window(); return false;';
+			}
 
-			$table->addRow($name);
+			$name->setAttribute('onclick', $js_action);
+
+			$table->addRow(array(
+				($multiselect ? new CCheckBox('groups['.zbx_jsValue($group[$srcfld1]).']', NULL, NULL, $group['groupid']) : null),
+				$name
+			));
 		}
-		$table->show();
+
+		if($multiselect){
+			$button = new CButton('select', S_SELECT, "javascript: addSelectedValues('groups', ".zbx_jsvalue($reference).");");
+			$table->setFooter(new CCol($button, 'right'));
+
+			insert_js('var popupReference = '.zbx_jsvalue($hostgroups, true).';');
+		}
+
+		$form->addItem($table);
+		$form->show();
 	}
 	else if($srctbl == 'host_templates'){
 		$table = new CTableInfo(S_NO_TEMPLATES_DEFINED);
@@ -653,6 +687,7 @@ include_once('include/page_header.php');
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		);
+		if(!is_null($writeonly)) $options['editable'] = 1;
 
 		$usergroups = CUserGroup::get($options);
 		order_result($usergroups, 'name');

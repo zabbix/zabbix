@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -360,22 +360,47 @@ function get_operation_desc($type, $data){
 				$result[] = S_DISABLE_HOST;
 				break;
 			case OPERATION_TYPE_GROUP_ADD:
-				$obj_data = get_hostgroup_by_groupid($data['opgroup']['groupid']);
-				$result[] = S_ADD_TO_GROUP.' "'.$obj_data['name'].'"';
-				break;
 			case OPERATION_TYPE_GROUP_REMOVE:
-				$obj_data = get_hostgroup_by_groupid($data['opgroup']['groupid']);
-				$result[] = S_DELETE_FROM_GROUP.' "'.$obj_data['name'].'"';
+				if(!isset($data['opgroup'])) $data['opgroup'] = array();
+
+				$groups = CHostgroup::get(array(
+					'groupids' => zbx_objectValues($data['opgroup'],'groupid'),
+					'output' => array('groupid', 'name')
+				));
+
+				if(!empty($groups)){
+					order_result($groups, 'name');
+
+					if(OPERATION_TYPE_GROUP_ADD == $data['operationtype'])
+						$result[] = bold(_('Add to host groups: '));
+					else
+						$result[] = bold(_('Remove from host groups: '));
+
+					$result[] = array(implode(', ', zbx_objectValues($groups,'name')), BR());
+				}
 				break;
 			case OPERATION_TYPE_TEMPLATE_ADD:
-				$obj_data = get_host_by_hostid($data['optemplate']['templateid']);
-				$result[] = S_LINK_TO_TEMPLATE.' "'.$obj_data['host'].'"';
-				break;
 			case OPERATION_TYPE_TEMPLATE_REMOVE:
-				$obj_data = get_host_by_hostid($data['optemplate']['templateid']);
-				$result[] = S_UNLINK_FROM_TEMPLATE.' "'.$obj_data['host'].'"';
+				if(!isset($data['optemplate'])) $data['optemplate'] = array();
+
+				$templates = CTemplate::get(array(
+					'templateids' => zbx_objectValues($data['optemplate'],'templateid'),
+					'output' => array('hostid', 'host')
+				));
+
+				if(!empty($templates)){
+					order_result($templates, 'host');
+
+					if(OPERATION_TYPE_TEMPLATE_ADD == $data['operationtype'])
+						$result[] = bold(_('Link to templates: '));
+					else
+						$result[] = bold(_('Unlink from templates: '));
+
+					$result[] = array(implode(', ', zbx_objectValues($templates,'host')), BR());
+				}
 				break;
-			default: break;
+			default:
+				break;
 		}
 	}
 	else{

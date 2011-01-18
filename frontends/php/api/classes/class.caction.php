@@ -1109,7 +1109,7 @@ COpt::memoryPick();
 					}
 
 					$group = CHostGroup::get(array(
-						'groupids' => $operation['opgroup'],
+						'groupids' => zbx_objectValues($operation['opgroup'],'groupid'),
 						'output' => API_OUTPUT_SHORTEN,
 						'editable' => 1,
 					));

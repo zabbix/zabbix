@@ -1,3 +1,28 @@
+<!-- Discovery Actions-->
+<script type="text/x-jquery-tmpl" id="opGroupRowTPL">
+<tr id="opGroupRow_#{groupid}">
+<td>
+	<input name="new_operation[opgroup][#{groupid}][groupid]" type="hidden" value="#{groupid}" />
+	<span style="font-size: 1.1em; font-weight: bold;"> #{name} </span>
+</td>
+<td>
+	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="javascript: removeOpGroupRow(#{groupid});" />
+</td>
+</tr>
+</script>
+
+<script type="text/x-jquery-tmpl" id="opTemplateRowTPL">
+<tr id="opTemplateRow_#{templateid}">
+<td>
+	<input name="new_operation[optemplate][#{templateid}][templateid]" type="hidden" value="#{templateid}" />
+	<span style="font-size: 1.1em; font-weight: bold;"> #{name} </span>
+</td>
+<td>
+	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="javascript: removeOpTemplateRow(#{templateid});" />
+</td>
+</tr>
+</script>
+<!-- Trigger Actions-->
 <script type="text/x-jquery-tmpl" id="opmsgUsrgrpRowTPL">
 <tr id="opmsgUsrgrpRow_#{usrgrpid}">
 <td>
@@ -118,6 +143,18 @@ function addPopupValues(list){
 				var tpl = new Template(jQuery('#opmsgUsrgrpRowTPL').html());
 				jQuery("#opmsgUsrgrpListFooter").before(tpl.evaluate(value));
 				break;
+			case 'dsc_groupid':
+				if(jQuery("#opGroupRow_"+value.groupid).length) continue;
+
+				var tpl = new Template(jQuery('#opGroupRowTPL').html());
+				jQuery("#opGroupListFooter").before(tpl.evaluate(value));
+				break;
+			case 'dsc_templateid':
+				if(jQuery("#opTemplateRow_"+value.templateid).length) continue;
+
+				var tpl = new Template(jQuery('#opTemplateRowTPL').html());
+				jQuery("#opTemplateListFooter").before(tpl.evaluate(value));
+				break;
 			case 'groupid':
 				var tpl = new Template(jQuery('#opCmdGroupRowTPL').html());
 
@@ -179,6 +216,9 @@ function removeOpmsgUsrgrpRow(usrgrpid){
 }
 function removeOpmsgUserRow(userid){
 	jQuery('#opmsgUserRow_'+userid).remove();
+}
+function removeOpGroupRow(groupid){
+	jQuery('#opGroupRow_'+groupid).remove();
 }
 
 function removeOpCmdHostRow(opCmdRowId, object){

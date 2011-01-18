@@ -418,7 +418,6 @@ require_once('include/templates/action.js.php');
 			);
 		}
 //SDII($_REQUEST);
-		$evaltype = $new_operation['evaltype'];
 		$update_mode = ($new_operation['action'] == 'update');
 
 		$tblOper->addItem(new CVar('new_operation[action]', $new_operation['action']));
@@ -606,22 +605,39 @@ require_once('include/templates/action.js.php');
 				break;
 			case OPERATION_TYPE_GROUP_ADD:
 			case OPERATION_TYPE_GROUP_REMOVE:
-				$tblOper->addItem(new CVar('new_operation[object]', 0));
-				$tblOper->addItem(new CVar('new_operation[objectid]', $new_operation['objectid']));
-				$tblOper->addItem(new CVar('new_operation[shortdata]', ''));
-				$tblOper->addItem(new CVar('new_operation[longdata]', ''));
-
-				if($object_name = DBfetch(DBselect('select name FROM groups WHERE groupid=' . $new_operation['objectid']))) {
-					$object_name = $object_name['name'];
+SDII($new_operation);
+				if(!isset($new_operation['opgroup'])){
+					$new_operation['opgroup'] = array();
 				}
-				$tblOper->addRow(array(S_GROUP, array(
-					new CTextBox('object_name', $object_name, 40, 'yes'),
-					new CButton('select_object', S_SELECT,
-						'return PopUp("popup.php?dstfrm=' . S_ACTION .
-							'&dstfld1=new_operation%5Bobjectid%5D&dstfld2=object_name' .
-							'&srctbl=host_group&srcfld1=groupid&srcfld2=name' .
-							'",450,450)','T')
-				)));
+
+				$groupList = new CTable();
+				$groupList->setAttribute('id', 'opGroupList');
+
+				$addUsrgrpBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm='.S_ACTION.'&srctbl=host_group&srcfld1=groupid&srcfld2=name&multiselect=1&reference=dsc_groupid'.'",450,450)','link_menu');
+
+				$col = new CCol($addUsrgrpBtn);
+				$col->setAttribute('colspan', 2);
+
+				$buttonRow = new CRow($col);
+				$buttonRow->setAttribute('id', 'opGroupListFooter');
+
+				$groupList->addRow($buttonRow);
+
+// Add Participations
+				$groupids = isset($new_operation['opmessage_grp']) ?
+					zbx_objectValues($new_operation['opmessage_grp'], 'groupid') :
+					array();
+
+				$groups = CHostGroup::get(array('groupids' => $groupids, 'output' => array('name')));
+				order_result($groups, 'name');
+
+				$jsInsert = '';
+				$jsInsert.= 'addPopupValues('.zbx_jsvalue(array('object'=>'add_groupid', 'values'=>$groups)).');';
+
+				zbx_add_post_js($jsInsert);
+
+				$caption = (OPERATION_TYPE_GROUP_ADD == $new_operation['operationtype']) ? _('Add to host groups') : _('Remove from host groups');
+				$tblOper->addRow(array($caption, new CDiv($groupList, 'objectgroup inlineblock border_dotted ui-corner-all')));
 				break;
 			case OPERATION_TYPE_TEMPLATE_ADD:
 			case OPERATION_TYPE_TEMPLATE_REMOVE:
@@ -646,90 +662,94 @@ require_once('include/templates/action.js.php');
 		}
 
 // new Operation conditions
-		$tblCond = new CTable();
+		if($data['eventsource'] == 0){
+			$evaltype = $new_operation['evaltype'];
 
-		if(!isset($new_operation['opconditions']))
-			$new_operation['opconditions'] = array();
+			$tblCond = new CTable();
 
-		$opconditions = $new_operation['opconditions'];
-		$allowed_opconditions = get_opconditions_by_eventsource($data['eventsource']);
+			if(!isset($new_operation['opconditions']))
+				$new_operation['opconditions'] = array();
 
-		zbx_rksort($opconditions);
+			$opconditions = $new_operation['opconditions'];
+			$allowed_opconditions = get_opconditions_by_eventsource($data['eventsource']);
 
-		$grouped_opconditions = array();
-		$cond_el = new CTable(S_NO_CONDITIONS_DEFINED);
-		$i = 0;
+			zbx_rksort($opconditions);
 
-		foreach($opconditions as $condition){
-			if(!isset($condition['conditiontype'])) $condition['conditiontype'] = 0;
-			if(!isset($condition['operator'])) $condition['operator'] = 0;
-			if(!isset($condition['value'])) $condition['value'] = 0;
+			$grouped_opconditions = array();
+			$cond_el = new CTable(S_NO_CONDITIONS_DEFINED);
+			$i = 0;
 
-			if(!str_in_array($condition['conditiontype'], $allowed_opconditions)) continue;
+			foreach($opconditions as $condition){
+				if(!isset($condition['conditiontype'])) $condition['conditiontype'] = 0;
+				if(!isset($condition['operator'])) $condition['operator'] = 0;
+				if(!isset($condition['value'])) $condition['value'] = 0;
 
-			$label = chr(ord('A') + $i);
-			$cond_el->addRow(array('(' . $label . ')', array(
-				new CCheckBox('g_opconditionid[]', 'no', null, $i),
-				get_condition_desc($condition['conditiontype'], $condition['operator'], $condition['value']))
-			));
+				if(!str_in_array($condition['conditiontype'], $allowed_opconditions)) continue;
 
-			$tblCond->addItem(new CVar("new_operation[opconditions][$i][conditiontype]", $condition["conditiontype"]));
-			$tblCond->addItem(new CVar("new_operation[opconditions][$i][operator]", $condition["operator"]));
-			$tblCond->addItem(new CVar("new_operation[opconditions][$i][value]", $condition["value"]));
+				$label = chr(ord('A') + $i);
+				$cond_el->addRow(array('(' . $label . ')', array(
+					new CCheckBox('g_opconditionid[]', 'no', null, $i),
+					get_condition_desc($condition['conditiontype'], $condition['operator'], $condition['value']))
+				));
 
-			$grouped_opconditions[$condition["conditiontype"]][] = $label;
+				$tblCond->addItem(new CVar("new_operation[opconditions][$i][conditiontype]", $condition["conditiontype"]));
+				$tblCond->addItem(new CVar("new_operation[opconditions][$i][operator]", $condition["operator"]));
+				$tblCond->addItem(new CVar("new_operation[opconditions][$i][value]", $condition["value"]));
 
-			$i++;
-		}
+				$grouped_opconditions[$condition["conditiontype"]][] = $label;
 
-		$cond_buttons = array();
-		if(!isset($_REQUEST['new_opcondition'])) {
-			$cond_buttons[] = new CSubmit('new_opcondition', S_NEW, null, 'link_menu');
-		}
-		if($cond_el->ItemsCount() > 0){
-			$cond_buttons[] = SPACE;
-			$cond_buttons[] = new CSubmit('del_opcondition', S_DELETE_SELECTED, null, 'link_menu');
-		}
-
-		if($cond_el->ItemsCount() > 1){
-// prepare opcondition calcuation type selector
-			switch($evaltype) {
-				case ACTION_EVAL_TYPE_AND:
-					$group_op = $glog_op = S_AND;
-					break;
-				case ACTION_EVAL_TYPE_OR:
-					$group_op = $glog_op = S_OR;
-					break;
-				default:
-					$group_op = S_OR;
-					$glog_op = S_AND;
-					break;
+				$i++;
 			}
 
-			foreach($grouped_opconditions as $id => $condition)
-				$grouped_opconditions[$id] = '(' . implode(' ' . $group_op . ' ', $condition) . ')';
+			$cond_buttons = array();
+			if(!isset($_REQUEST['new_opcondition'])) {
+				$cond_buttons[] = new CSubmit('new_opcondition', S_NEW, null, 'link_menu');
+			}
+			if($cond_el->ItemsCount() > 0){
+				$cond_buttons[] = SPACE;
+				$cond_buttons[] = new CSubmit('del_opcondition', S_DELETE_SELECTED, null, 'link_menu');
+			}
 
-			$grouped_opconditions = implode(' ' . $glog_op . ' ', $grouped_opconditions);
+			if($cond_el->ItemsCount() > 1){
+// prepare opcondition calcuation type selector
+				switch($evaltype) {
+					case ACTION_EVAL_TYPE_AND:
+						$group_op = $glog_op = S_AND;
+						break;
+					case ACTION_EVAL_TYPE_OR:
+						$group_op = $glog_op = S_OR;
+						break;
+					default:
+						$group_op = S_OR;
+						$glog_op = S_AND;
+						break;
+				}
 
-			$cmb_calc_type = new CComboBox('new_operation[evaltype]', $evaltype, 'submit()');
-			$cmb_calc_type->addItem(ACTION_EVAL_TYPE_AND_OR, S_AND_OR_BIG);
-			$cmb_calc_type->addItem(ACTION_EVAL_TYPE_AND, S_AND_BIG);
-			$cmb_calc_type->addItem(ACTION_EVAL_TYPE_OR, S_OR_BIG);
+				foreach($grouped_opconditions as $id => $condition)
+					$grouped_opconditions[$id] = '(' . implode(' ' . $group_op . ' ', $condition) . ')';
 
-			$tblOper->addRow(array(
-				S_TYPE_OF_CALCULATION,
-				array($cmb_calc_type, new CTextBox('preview', $grouped_opconditions, 60, 'yes'))
-			));
+				$grouped_opconditions = implode(' ' . $glog_op . ' ', $grouped_opconditions);
+
+				$cmb_calc_type = new CComboBox('new_operation[evaltype]', $evaltype, 'submit()');
+				$cmb_calc_type->addItem(ACTION_EVAL_TYPE_AND_OR, S_AND_OR_BIG);
+				$cmb_calc_type->addItem(ACTION_EVAL_TYPE_AND, S_AND_BIG);
+				$cmb_calc_type->addItem(ACTION_EVAL_TYPE_OR, S_OR_BIG);
+
+				$tblOper->addRow(array(
+					S_TYPE_OF_CALCULATION,
+					array($cmb_calc_type, new CTextBox('preview', $grouped_opconditions, 60, 'yes'))
+				));
+			}
+			else{
+				$tblCond->addItem(new CVar('new_operation[evaltype]', ACTION_EVAL_TYPE_AND_OR));
+			}
+
+			$tblCond->addRow($cond_el);
+			$tblCond->addRow(new CCol($cond_buttons));
+
+			$tblOper->addRow(array(S_CONDITIONS, $tblCond));
+			unset($grouped_opconditions, $cond_el, $cond_buttons, $tblCond);
 		}
-		else{
-			$tblCond->addItem(new CVar('new_operation[evaltype]', ACTION_EVAL_TYPE_AND_OR));
-		}
-
-		$tblCond->addRow($cond_el);
-		$tblCond->addRow(new CCol($cond_buttons));
-
-		$tblOper->addRow(array(S_CONDITIONS, $tblCond));
-		unset($grouped_opconditions, $cond_el, $cond_buttons, $tblCond);
 
 		$footer = array(
 			new CSubmit('add_operation', $update_mode ? _s('Save') : _s('Add'), null, 'link_menu'),
@@ -738,55 +758,55 @@ require_once('include/templates/action.js.php');
 		);
 
 		$operationList->addRow(_s('Operation details'), new CDiv( array($tblOper, $footer), 'objectgroup inlineblock border_dotted ui-corner-all'));
-	}
 
 // NEW OPERATION CONDITION
-	if(isset($_REQUEST['new_opcondition'])){
-		$tblCond = new CTable(null, 'formElementTable');
+		if(isset($_REQUEST['new_opcondition'])){
+			$tblCond = new CTable(null, 'formElementTable');
 
-		$allowedOpConditions = get_opconditions_by_eventsource($data['eventsource']);
+			$allowedOpConditions = get_opconditions_by_eventsource($data['eventsource']);
 
-		$new_opcondition = get_request('new_opcondition', array());
-		if(!is_array($new_opcondition))	$new_opcondition = array();
+			$new_opcondition = get_request('new_opcondition', array());
+			if(!is_array($new_opcondition))	$new_opcondition = array();
 
-		if(empty($new_opcondition)){
-			$new_opcondition['conditiontype'] = CONDITION_TYPE_EVENT_ACKNOWLEDGED;
-			$new_opcondition['operator'] = CONDITION_OPERATOR_LIKE;
-			$new_opcondition['value'] = 0;
+			if(empty($new_opcondition)){
+				$new_opcondition['conditiontype'] = CONDITION_TYPE_EVENT_ACKNOWLEDGED;
+				$new_opcondition['operator'] = CONDITION_OPERATOR_LIKE;
+				$new_opcondition['value'] = 0;
+			}
+
+			if(!str_in_array($new_opcondition['conditiontype'], $allowedOpConditions))
+				$new_opcondition['conditiontype'] = $allowedOpConditions[0];
+
+			$rowCondition = array();
+
+			$cmbCondType = new CComboBox('new_opcondition[conditiontype]',$new_opcondition['conditiontype'],'submit()');
+			foreach($allowedOpConditions as $cond)
+				$cmbCondType->addItem($cond, condition_type2str($cond));
+			array_push($rowCondition,$cmbCondType);
+
+			$cmbCondOp = new CComboBox('new_opcondition[operator]');
+			foreach(get_operators_by_conditiontype($new_opcondition['conditiontype']) as $op)
+				$cmbCondOp->addItem($op, condition_operator2str($op));
+			array_push($rowCondition,$cmbCondOp);
+
+			switch($new_opcondition['conditiontype']){
+				case CONDITION_TYPE_EVENT_ACKNOWLEDGED:
+					$cmbCondVal = new CComboBox('new_opcondition[value]',$new_opcondition['value']);
+					$cmbCondVal->addItem(0, S_NOT_ACK);
+					$cmbCondVal->addItem(1, S_ACK);
+					$rowCondition[] = $cmbCondVal;
+					break;
+			}
+			$tblCond->addRow($rowCondition);
+
+			$footer = array(
+				new CSubmit('add_opcondition', S_ADD, null, 'link_menu'),
+				SPACE,
+				new CSubmit('cancel_new_opcondition', S_CANCEL, null, 'link_menu')
+			);
+
+			$operationList->addRow(_s('Operation condition'), new CDiv( array($tblCond, $footer), 'objectgroup inlineblock border_dotted ui-corner-all'));
 		}
-
-		if(!str_in_array($new_opcondition['conditiontype'], $allowedOpConditions))
-			$new_opcondition['conditiontype'] = $allowedopConditions[0];
-
-		$rowCondition = array();
-
-		$cmbCondType = new CComboBox('new_opcondition[conditiontype]',$new_opcondition['conditiontype'],'submit()');
-		foreach($allowedOpConditions as $cond)
-			$cmbCondType->addItem($cond, condition_type2str($cond));
-		array_push($rowCondition,$cmbCondType);
-
-		$cmbCondOp = new CComboBox('new_opcondition[operator]');
-		foreach(get_operators_by_conditiontype($new_opcondition['conditiontype']) as $op)
-			$cmbCondOp->addItem($op, condition_operator2str($op));
-		array_push($rowCondition,$cmbCondOp);
-
-		switch($new_opcondition['conditiontype']){
-			case CONDITION_TYPE_EVENT_ACKNOWLEDGED:
-				$cmbCondVal = new CComboBox('new_opcondition[value]',$new_opcondition['value']);
-				$cmbCondVal->addItem(0, S_NOT_ACK);
-				$cmbCondVal->addItem(1, S_ACK);
-				$rowCondition[] = $cmbCondVal;
-				break;
-		}
-		$tblCond->addRow($rowCondition);
-
-		$footer = array(
-			new CSubmit('add_opcondition', S_ADD, null, 'link_menu'),
-			SPACE,
-			new CSubmit('cancel_new_opcondition', S_CANCEL, null, 'link_menu')
-		);
-
-		$operationList->addRow(_s('Operation condition'), new CDiv( array($tblCond, $footer), 'objectgroup inlineblock border_dotted ui-corner-all'));
 	}
 
 	$divTabs->addTab('operationTab', S_OPERATIONS, $operationList);
