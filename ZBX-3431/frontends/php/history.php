@@ -308,6 +308,7 @@ include_once('include/page_header.php');
 		}
 
 // TEXT LOG
+
 		if(isset($iv_string[$item['value_type']])){
 			$logItem = ($item['value_type'] == ITEM_VALUE_TYPE_LOG);
 
@@ -363,13 +364,15 @@ include_once('include/page_header.php');
 				if($fewItems) $row[] = $host['host'].':'.item_description($item);
 
 				if($logItem){
+
 					if($data['timestamp'] == 0) $row[] = new CCol(' - ');
 					else $row[] = zbx_date2str(S_HISTORY_LOG_LOCALTIME_DATE_FORMAT,$data['timestamp']);
 
 					if(zbx_empty($data['source'])) $row[] = new CCol(' - ');
 					else $row[] = $data['source'];
 
-					$row[] = new CCol(get_item_logtype_description($data['severity']),get_item_logtype_style($data['severity']));
+					if($data['severity'] != 0) $row[] = new CCol(get_item_logtype_description($data['severity']),get_item_logtype_style($data['severity']));
+					else $row[] = new CCol(' - ');
 
 					if(zbx_empty($data['source']) && ($data['logeventid'] == '0'))
 						$row[] = new CCol(' - ');
@@ -379,7 +382,7 @@ include_once('include/page_header.php');
 
 				$data['value'] = trim($data['value'],"\r\n");
 				$data['value'] = encode_log($data['value']);
-				
+
 //				$data['value'] = str_replace(' ', '&nbsp;', $data['value']);
 //				$data['value'] = str_replace("\t", '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', $data['value']);
 //				$data['value'] = zbx_nl2br($data['value']);
