@@ -580,7 +580,7 @@ function zbx_array_diff($array1, $array2, $field){
 		else if(isset($only1[$array[$field]]))
 			$result['only1'][] = $array;
 		else
-			$result['both'][] = $array;
+			$result['both'][$array[$field]] = $array;
 	}
 
 	foreach($array2 as $array){
@@ -589,7 +589,7 @@ function zbx_array_diff($array1, $array2, $field){
 		else if(isset($only2[$array[$field]]))
 			$result['only2'][] = $array;
 		else
-			$result['both'][] = $array;
+			$result['both'][$array[$field]] = $array;
 	}
 
 	return $result;

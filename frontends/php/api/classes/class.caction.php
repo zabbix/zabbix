@@ -1066,7 +1066,11 @@ COpt::memoryPick();
 		$opmessage_usrCreate = array();
 
 		$opcommand_grpCreate = array();
+		$opcommand_grpDelete = array();
+		$opcommand_grpUpdate = array();
 		$opcommand_hstCreate = array();
+		$opcommand_hstDelete = array();
+		$opcommand_hstUpdate = array();
 		$opcommand_hstDelete_by_opid = array();
 		$opcommand_grpDelete_by_opid = array();
 
@@ -1183,25 +1187,30 @@ COpt::memoryPick();
 						$opcommand_hstCreate = array_merge($opcommand_hstCreate, $operation['opcommand_hst']);
 					}
 					else{
-// TODO: peredelatj na delete po opcommand_grpid
-// TODO: ne rabotaet update commandi skoree vsego
 						$diff = zbx_array_diff($operation_db['opcommand_grp'], $operation['opcommand_grp'], 'opcommand_grpid');
 						$opcommand_grpCreate = array_merge($opcommand_grpCreate, $diff['only2']);
-						foreach($diff['only1'] as $ocgrp){
-							DB::delete('opcommand_grp', array(
-								'groupid' => $ocgrp['groupid'],
-								'operationid' => $operation['operationid'],
-							));
+						$opcommand_grpDelete = array_merge($opcommand_grpDelete, zbx_objectValues($diff['only1'], 'opcommand_grpid'));
+						foreach($diff['both'] as $opcommand_grp){
+							$opcommand_grpid = $opcommand_grp['opcommand_grpid'];
+							unset($opcommand_grp['opcommand_grpid']);
+							$opcommand_grpUpdate[] = array(
+								'values' => $opcommand_grp,
+								'where' => array('opcommand_grpid='.$opcommand_grpid),
+							);
 						}
 
 						$diff = zbx_array_diff($operation_db['opcommand_hst'], $operation['opcommand_hst'], 'opcommand_hstid');
 						$opcommand_hstCreate = array_merge($opcommand_hstCreate, $diff['only2']);
-						foreach($diff['only1'] as $ochst){
-							DB::delete('opcommand_hst', array(
-								'hostid' => $ochst['hostid'],
-								'operationid' => $operation['operationid'],
-							));
+						$opcommand_hstDelete = array_merge($opcommand_hstDelete, zbx_objectValues($diff['only1'], 'opcommand_hstid'));
+						foreach($diff['both'] as $opcommand_hst){
+							$opcommand_hstid = $opcommand_hst['opcommand_hstid'];
+							unset($opcommand_hst['opcommand_hstid']);
+							$opcommand_hstUpdate[] = array(
+								'values' => $opcommand_hst,
+								'where' => array('opcommand_hstid='.$opcommand_hstid),
+							);
 						}
+
 					}
 					break;
 				case OPERATION_TYPE_GROUP_ADD:
@@ -1256,6 +1265,8 @@ COpt::memoryPick();
 		DB::delete('opmessage_usr', array('operationid' => $opmessage_usrDelete_by_opid));
 		DB::delete('opcommand_hst', array('operationid' => $opcommand_hstDelete_by_opid));
 		DB::delete('opcommand_grp', array('operationid' => $opcommand_grpDelete_by_opid));
+		DB::delete('opcommand_grp', array('opcommand_grpid' => $opcommand_grpDelete));
+		DB::delete('opcommand_hst', array('opcommand_hstid' => $opcommand_hstDelete));
 		DB::delete('opgroup', array('operationid' => $opgroupDelete_by_opid));
 		DB::delete('optemplate', array('operationid' => $optemplateDelete_by_opid));
 
@@ -1265,10 +1276,14 @@ COpt::memoryPick();
 		DB::insert('opmessage_usr', $opmessage_usrCreate);
 		DB::insert('opcommand_grp', $opcommand_grpCreate);
 		DB::insert('opcommand_hst', $opcommand_hstCreate);
+
 		DB::insert('opgroup', $opgroupCreate);
 		DB::insert('optemplate', $optemplateCreate);
 
 		DB::update('opmessage', $opmessageUpdate);
+		DB::update('opcommand_grp', $opcommand_grpUpdate);
+		DB::update('opcommand_hst', $opcommand_hstUpdate);
+
 
 		DB::insert('opconditions', $opconditionsCreate);
 	}
