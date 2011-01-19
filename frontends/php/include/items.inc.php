@@ -657,7 +657,7 @@
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
 
 // COpt::profiling_start('prepare_data');
-		$result = DBselect('SELECT DISTINCT h.hostid, h.host,i.itemid, i.key_, i.value_type, i.lastvalue, i.units, '.
+		$result = DBselect('SELECT DISTINCT h.hostid, h.host,i.itemid, i.key_, i.value_type, i.lastvalue, i.units, i.lastclock,'.
 				' i.description, t.priority, i.valuemapid, t.value as tr_value, t.triggerid '.
 			' FROM hosts h, items i '.
 				' LEFT JOIN functions f on f.itemid=i.itemid '.
@@ -694,6 +694,7 @@
 					'itemid'	=> $row['itemid'],
 					'value_type'=> $row['value_type'],
 					'lastvalue'	=> $row['lastvalue'],
+					'lastclock'	=> $row['lastclock'],
 					'units'		=> $row['units'],
 					'description'=> $row['description'],
 					'valuemapid' => $row['valuemapid'],
@@ -920,20 +921,20 @@
 	}
 
 	function format_lastvalue($db_item){
-		if(!isset($db_item["lastvalue"]) || (isset($db_item["lastclock"]) && ($db_item["lastclock"] == 0))){
+		if(!isset($db_item["lastvalue"]) || ($db_item["lastclock"] == 0)){
 			return '-';
 		}
 
-		if($db_item["value_type"] == ITEM_VALUE_TYPE_FLOAT){
-			$lastvalue=convert_units($db_item["lastvalue"],$db_item["units"]);
-		}
-		else if($db_item["value_type"] == ITEM_VALUE_TYPE_UINT64){
+		if(($db_item["value_type"] == ITEM_VALUE_TYPE_FLOAT) ||
+				($db_item["value_type"] == ITEM_VALUE_TYPE_UINT64))
+		{
 			$lastvalue=convert_units($db_item["lastvalue"],$db_item["units"]);
 		}
 		else if($db_item["value_type"] == ITEM_VALUE_TYPE_STR ||
 				$db_item["value_type"] == ITEM_VALUE_TYPE_TEXT ||
-				$db_item["value_type"] == ITEM_VALUE_TYPE_LOG){
-			$lastvalue=$db_item["lastvalue"];
+				$db_item["value_type"] == ITEM_VALUE_TYPE_LOG)
+		{
+			$lastvalue = $db_item["lastvalue"];
 			if(zbx_strlen($lastvalue) > 20)
 				$lastvalue = zbx_substr($lastvalue,0,20)." ...";
 			$lastvalue = nbsp(htmlspecialchars($lastvalue));
