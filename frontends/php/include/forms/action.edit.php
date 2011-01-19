@@ -342,7 +342,7 @@ require_once('include/templates/action.js.php');
 
 	$tblOper = new CTable(S_NO_OPERATIONS_DEFINED, 'formElementTable');
 	$tblOper->setHeader(array(
-		new CCheckBox('all_operations',null,'checkAll("'.S_ACTION.'","all_operations","g_operationid");'),
+		new CCheckBox('all_operations',null,'checkAll("'.$frmAction->getName().'","all_operations","g_operationid");'),
 		S_STEPS, S_DETAILS, S_PERIOD.' ('.S_SEC_SMALL.')', S_DELAY, S_ACTION
 	));
 //SDII($data['operations']);

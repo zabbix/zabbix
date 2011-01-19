@@ -63,7 +63,7 @@
 <td>
 	<input type="button" class="input link_menu" name="edit" value="<?php print(_('Edit'));?>" onclick="javascript: showOpCmdForm(#{opcommand_grpid}, 'groupid');" />
 	&nbsp;
-	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="javascript: removeOpCmdGroupRow(#{opcommand_grpid}, 'groupid');" />
+	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="javascript: removeOpCmdRow(#{opcommand_grpid}, 'groupid');" />
 </td>
 </tr>
 </script>
@@ -85,7 +85,7 @@
 <td>
 	<input type="button" class="input link_menu" name="edit" value="<?php print(_('Edit'));?>" onclick="javascript: showOpCmdForm(#{opcommand_hstid}, 'hostid');" />
 	&nbsp;
-	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="javascript: removeOpCmdHostRow(#{opcommand_hstid}, 'hostid');" />
+	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="javascript: removeOpCmdRow(#{opcommand_hstid}, 'hostid');" />
 </td>
 </tr>
 </script>
@@ -150,7 +150,6 @@ function addPopupValues(list){
 				jQuery("#opGroupListFooter").before(tpl.evaluate(value));
 				break;
 			case 'dsc_templateid':
-SDJ(value);
 				if(jQuery("#opTemplateRow_"+value.templateid).length) continue;
 
 				var tpl = new Template(jQuery('#opTemplateRowTPL').html());
@@ -221,13 +220,16 @@ function removeOpmsgUserRow(userid){
 function removeOpGroupRow(groupid){
 	jQuery('#opGroupRow_'+groupid).remove();
 }
+function removeOpTemplateRow(tplid){
+	jQuery('#opTemplateRow_'+tplid).remove();
+}
 
-function removeOpCmdHostRow(opCmdRowId, object){
+function removeOpCmdRow(opCmdRowId, object){
 	if(object == 'groupid'){
-		jQuery('#opCmdGroupRow_'+opCmdId).remove();
+		jQuery('#opCmdGroupRow_'+opCmdRowId).remove();
 	}
 	else{
-		jQuery('#opCmdHostRow_'+opCmdId).remove();
+		jQuery('#opCmdHostRow_'+opCmdRowId).remove();
 	}
 }
 
@@ -356,8 +358,8 @@ function closeOpCmdForm(){
 }
 
 jQuery(document).ready(function(){
-
-	jQuery("#name").focus();
+	setTimeout(function(){jQuery("#name").focus()}, 10);
+//	jQuery("#name").focus();
 
 // Clone button
 	jQuery("#clone").click(function(){
