@@ -98,48 +98,37 @@
 	$_REQUEST['triggerid'] = get_request('triggerid',CProfile::get('web.events.filter.triggerid',0));
 	$_REQUEST['hide_unknown'] = get_request('hide_unknown',CProfile::get('web.events.filter.hide_unknown',0));
 
-// Change triggerId filter if change hostId
+	// Change triggerId filter if change hostId
 	if($_REQUEST['triggerid'] > 0 && !isset($_REQUEST['filter_set'])){
 		$options = array(
-		'triggerids' => $_REQUEST['triggerid'],
-		'nodeids' => get_current_nodeid(),
-		'groupids' => get_request('groupid', null),
-		'output' => API_OUTPUT_EXTEND,
-		'select_hosts' => API_OUTPUT_EXTEND,
-		'select_dependencies' => API_OUTPUT_EXTEND,
-		'expandDescription' => 1
+			'triggerids' => $_REQUEST['triggerid'],
+			'output' => API_OUTPUT_EXTEND,
+			'limit' => 1
 		);
+		// get description
+		$old_trigger = CTrigger::get($options);
+		if(isset($old_trigger[0]['description']) ){
+			$options = array(
+				'filter' => array('description' => $old_trigger[0]['description']),
+				'hostids' => get_request('hostid', null),
+				'output' => API_OUTPUT_SHORTEN,
+				'limit' => 1
+			);
+			// get new trigger id
+			$new_trigger = CTrigger::get($options);
+		}
 
-		// get templateId
-		$template_id = CTrigger::get($options);
-
-		$options = array(
-		'filter' => array('templateid' => $template_id[$_REQUEST['triggerid']]['templateid']),
-		'nodeids' => get_current_nodeid(),
-		'hostids' => get_request('hostid', null),
-		'groupids' => get_request('groupid', null),
-		'output' => API_OUTPUT_EXTEND,
-		'select_hosts' => API_OUTPUT_EXTEND,
-		'select_dependencies' => API_OUTPUT_EXTEND,
-		//'expandDescription' => 1
-		);
-
-		// get New triggerId
-		$triggers_id = CTrigger::get($options);
-
-		if(isset($triggers_id[0]['triggerid']) && $triggers_id[0]['triggerid'] > 0 ) {
-			$_REQUEST['triggerid'] = $triggers_id[0]['triggerid'];
-			CProfile::update('web.events.filter.triggerid',$_REQUEST['triggerid'], PROFILE_TYPE_ID);
-			CProfile::update('web.events.filter.hide_unknown',$_REQUEST['hide_unknown'], PROFILE_TYPE_INT);
-		}else{
+		if(isset($new_trigger[0]['triggerid']) && $new_trigger[0]['triggerid'] > 0 ) {
+			$_REQUEST['triggerid'] = $new_trigger[0]['triggerid'];
+		}
+		else{
 			$_REQUEST['triggerid'] = 0;
-			// web.events.filter.triggerid Not update = there is features, not bug
 		}
 
 	}
 // --------
-
-	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
+	// Not update triggerid = 0, there is features, not bug
+	if((isset($_REQUEST['triggerid']) && $_REQUEST['triggerid'] > 0) || isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
 		CProfile::update('web.events.filter.triggerid',$_REQUEST['triggerid'], PROFILE_TYPE_ID);
 		CProfile::update('web.events.filter.hide_unknown',$_REQUEST['hide_unknown'], PROFILE_TYPE_INT);
 	}
