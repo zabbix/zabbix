@@ -506,7 +506,7 @@ COpt::memoryPick();
 			$sql = 'SELECT c.* FROM conditions c WHERE '.DBcondition('c.actionid', $actionids);
 			$res = DBselect($sql);
 			while($condition = DBfetch($res)){
-				$result[$condition['actionid']]['conditions'][] = $condition;
+				$result[$condition['actionid']]['conditions'][$condition['conditionid']] = $condition;
 			}
 		}
 
@@ -1076,6 +1076,8 @@ COpt::memoryPick();
 		$optemplateCreate = array();
 		$optemplateDelete_by_opid = array();
 
+		$opconditionsCreate = array();
+
 		foreach($operations as $operation){
 			$operation_db = $actions_db[$operation['actionid']]['operations'][$operation['operationid']];
 
@@ -1181,6 +1183,8 @@ COpt::memoryPick();
 						$opcommand_hstCreate = array_merge($opcommand_hstCreate, $operation['opcommand_hst']);
 					}
 					else{
+// TODO: peredelatj na delete po opcommand_grpid
+// TODO: ne rabotaet update commandi skoree vsego
 						$diff = zbx_array_diff($operation_db['opcommand_grp'], $operation['opcommand_grp'], 'opcommand_grpid');
 						$opcommand_grpCreate = array_merge($opcommand_grpCreate, $diff['only2']);
 						foreach($diff['only1'] as $ocgrp){
@@ -1225,6 +1229,16 @@ COpt::memoryPick();
 			}
 
 
+			if(!isset($operation['opconditions']))
+				$operation['opconditions'] = array();
+			else
+				zbx_array_push($operation['opconditions'], array('operationid' => $operation['operationid']));
+
+			$diff = zbx_array_diff($operation_db['opconditions'], $operation['opconditions'], 'opconditionid');
+			$opconditionsCreate = array_merge($opconditionsCreate, $diff['only2']);
+			DB::delete('opconditions', array('opconditionid' => zbx_objectValues($diff['only1'], 'opconditionid')));
+
+
 			$operationid = $operation['operationid'];
 			unset($operation['operationid']);
 			if(!empty($operation)){
@@ -1255,11 +1269,14 @@ COpt::memoryPick();
 		DB::insert('optemplate', $optemplateCreate);
 
 		DB::update('opmessage', $opmessageUpdate);
+
+		DB::insert('opconditions', $opconditionsCreate);
 	}
 
 	protected static function deleteOperations($operationids){
 		DB::delete('operations', array(DBcondition('operationid', $operationids)));
 	}
+
 
 	public static function delete($actionids){
 		try{
@@ -1428,12 +1445,11 @@ COpt::memoryPick();
 	}
 
 	public static function validateConditions($conditions){
-
 		$groupids = $hostids = $triggerids = array();
 		foreach($conditions as $ac_data){
 			if($ac_data['operator'] != 0) continue;
 
-			switch($ac_data['type']){
+			switch($ac_data['conditiontype']){
 				case CONDITION_TYPE_HOST_GROUP:
 					$groupids[$ac_data['value']] = $ac_data['value'];
 					break;
