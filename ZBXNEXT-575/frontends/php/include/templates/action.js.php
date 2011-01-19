@@ -171,9 +171,11 @@ function addPopupValues(list){
 					jQuery("#opCmdDraft").replaceWith(tpl.evaluate(value));
 				}
 				else{
-					value.opcommand_grpid = jQuery("#opCmdList tr[id^=opCmdGroupRow_]").length;
-					while(jQuery("#opCmdGroupRow_"+value.opcommand_grpid).length){
-						value.opcommand_grpid++;
+					if(!isset('opcommand_grpid', value)){
+						value.opcommand_grpid = jQuery("#opCmdList tr[id^=opCmdGroupRow_]").length;
+						while(jQuery("#opCmdGroupRow_"+value.opcommand_grpid).length){
+							value.opcommand_grpid++;
+						}
 					}
 
 					value.newValue = "create";
@@ -198,9 +200,11 @@ function addPopupValues(list){
 					jQuery("#opCmdDraft").replaceWith(tpl.evaluate(value));
 				}
 				else{
-					value.opcommand_hstid = jQuery("#opCmdList tr[id^=opCmdHostRow_]").length;
-					while(jQuery("#opCmdHostRow_"+value.opcommand_hstid).length){
-						value.opcommand_hstid++;
+					if(!isset('opcommand_hstid', value)){
+						value.opcommand_hstid = jQuery("#opCmdList tr[id^=opCmdHostRow_]").length;
+						while(jQuery("#opCmdHostRow_"+value.opcommand_hstid).length){
+							value.opcommand_hstid++;
+						}
 					}
 
 					value.newValue = "create";

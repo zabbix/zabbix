@@ -569,6 +569,8 @@ require_once('include/templates/action.js.php');
 					'output' => array('hostid','host'),
 					'preservekeys' => true
 				));
+
+				$new_operation['opcommand_hst'] = array_values($new_operation['opcommand_hst']);
 				foreach($new_operation['opcommand_hst'] as $ohnum => $cmd)
 					$new_operation['opcommand_hst'][$ohnum]['host'] = ($cmd['hostid'] > 0) ? $hosts[$cmd['hostid']]['host'] : '';
 				morder_result($new_operation['opcommand_hst'], array('host', 'opcommand_hstid'));
@@ -579,6 +581,7 @@ require_once('include/templates/action.js.php');
 					'preservekeys' => true
 				));
 
+				$new_operation['opcommand_grp'] = array_values($new_operation['opcommand_grp']);
 				foreach($new_operation['opcommand_grp'] as $ognum => $cmd)
 					$new_operation['opcommand_grp'][$ognum]['name'] = $groups[$cmd['groupid']]['name'];
 				morder_result($new_operation['opcommand_grp'], array('name', 'opcommand_grpid'));
