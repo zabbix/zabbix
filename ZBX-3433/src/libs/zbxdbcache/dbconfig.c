@@ -957,6 +957,7 @@ static void	DCsync_hosts(DB_RESULT result)
 
 		host->hostid = hostid;
 		host->proxy_hostid = proxy_hostid;
+
 		DCstrpool_replace(found, &host->host, row[2]);
 		host->useip = (unsigned char)atoi(row[3]);
 		DCstrpool_replace(found, &host->ip, row[4]);
@@ -1043,33 +1044,41 @@ static void	DCsync_hosts(DB_RESULT result)
 	{
 		hostid = host->hostid;
 
-		if (FAIL == zbx_vector_uint64_bsearch(&ids, hostid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		if (FAIL != zbx_vector_uint64_bsearch(&ids, hostid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			continue;
+
+		/* IPMI hosts */
+
+		if (NULL != (ipmihost = zbx_hashset_search(&config->ipmihosts, &hostid)))
 		{
-			/* IPMI hosts */
+			zbx_strpool_release(ipmihost->ipmi_ip);
+			zbx_strpool_release(ipmihost->ipmi_username);
+			zbx_strpool_release(ipmihost->ipmi_password);
 
-			if (NULL != (ipmihost = zbx_hashset_search(&config->ipmihosts, &hostid)))
-			{
-				zbx_strpool_release(ipmihost->ipmi_ip);
-				zbx_strpool_release(ipmihost->ipmi_username);
-				zbx_strpool_release(ipmihost->ipmi_password);
-
-				zbx_hashset_remove(&config->ipmihosts, &hostid);
-			}
-
-			/* hosts */
-
-			host_ph.proxy_hostid = host->proxy_hostid;
-			host_ph.status = host->status;
-			host_ph.host = host->host;
-			zbx_strpool_release(host_ph.host);
-			zbx_hashset_remove(&config->hosts_ph, &host_ph);
-
-			zbx_strpool_release(host->host);
-			zbx_strpool_release(host->ip);
-			zbx_strpool_release(host->dns);
-
-			zbx_hashset_iter_remove(&iter);
+			zbx_hashset_remove(&config->ipmihosts, &hostid);
 		}
+
+		/* Passive proxies */
+
+		if (ZBX_LOC_QUEUE == host->location)
+		{
+			host->location = ZBX_LOC_NOWHERE;
+			zbx_binary_heap_remove_direct(&config->pqueue, host->hostid);
+		}
+
+		/* hosts */
+
+		host_ph.proxy_hostid = host->proxy_hostid;
+		host_ph.status = host->status;
+		host_ph.host = host->host;
+		zbx_strpool_release(host_ph.host);
+		zbx_hashset_remove(&config->hosts_ph, &host_ph);
+
+		zbx_strpool_release(host->host);
+		zbx_strpool_release(host->ip);
+		zbx_strpool_release(host->dns);
+
+		zbx_hashset_iter_remove(&iter);
 	}
 
 	zbx_vector_uint64_destroy(&ids);
