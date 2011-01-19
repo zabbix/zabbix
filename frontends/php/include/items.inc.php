@@ -920,31 +920,30 @@
 	}
 
 	function format_lastvalue($db_item){
-		if(isset($db_item["lastvalue"])){
-			if($db_item["value_type"] == ITEM_VALUE_TYPE_FLOAT){
-				$lastvalue=convert_units($db_item["lastvalue"],$db_item["units"]);
-			}
-			else if($db_item["value_type"] == ITEM_VALUE_TYPE_UINT64){
-				$lastvalue=convert_units($db_item["lastvalue"],$db_item["units"]);
-			}
-			else if($db_item["value_type"] == ITEM_VALUE_TYPE_STR ||
-					$db_item["value_type"] == ITEM_VALUE_TYPE_TEXT ||
-					$db_item["value_type"] == ITEM_VALUE_TYPE_LOG){
-				$lastvalue=$db_item["lastvalue"];
-				if(zbx_strlen($lastvalue) > 20)
-					$lastvalue = zbx_substr($lastvalue,0,20)." ...";
-				$lastvalue = nbsp(htmlspecialchars($lastvalue));
-			}
-			else{
-				$lastvalue=S_UNKNOWN_VALUE_TYPE;
-			}
-			if($db_item["valuemapid"] > 0);
-				$lastvalue = replace_value_by_map($lastvalue, $db_item["valuemapid"]);
+		if(!isset($db_item["lastvalue"]) || (isset($db_item["lastclock"]) && ($db_item["lastclock"] == 0))){
+			return '-';
+		}
 
+		if($db_item["value_type"] == ITEM_VALUE_TYPE_FLOAT){
+			$lastvalue=convert_units($db_item["lastvalue"],$db_item["units"]);
+		}
+		else if($db_item["value_type"] == ITEM_VALUE_TYPE_UINT64){
+			$lastvalue=convert_units($db_item["lastvalue"],$db_item["units"]);
+		}
+		else if($db_item["value_type"] == ITEM_VALUE_TYPE_STR ||
+				$db_item["value_type"] == ITEM_VALUE_TYPE_TEXT ||
+				$db_item["value_type"] == ITEM_VALUE_TYPE_LOG){
+			$lastvalue=$db_item["lastvalue"];
+			if(zbx_strlen($lastvalue) > 20)
+				$lastvalue = zbx_substr($lastvalue,0,20)." ...";
+			$lastvalue = nbsp(htmlspecialchars($lastvalue));
 		}
 		else{
-			$lastvalue = "-";
+			$lastvalue=S_UNKNOWN_VALUE_TYPE;
 		}
+		if($db_item["valuemapid"] > 0);
+			$lastvalue = replace_value_by_map($lastvalue, $db_item["valuemapid"]);
+
 	return $lastvalue;
 	}
 

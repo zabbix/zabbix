@@ -170,37 +170,17 @@
 			$itemids[] = $item_data['itemid'];
 		}
 
-		if(isset($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_IN]['lastclock']) &&
-			$httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_IN]['lastclock'] != 0 )
-		{
-			$speed = format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_IN]);
-		}
-		else{
-			$speed = 0;
-		}
-
-		if(isset($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_RSPCODE]['lastclock']) &&
-		$httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_RSPCODE]['lastclock'] != 0 ){
-			$resp = format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_RSPCODE]);
-		}else{
-			$resp = 0;
-		}
+		$speed = format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_IN]);
+		$resp = format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_RSPCODE]);
 
 		$respTime = $httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME]['lastvalue'];
-		if(isset($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME]['lastclock']) &&
-		$httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME]['lastclock'] != 0){
-			$respItemTime = format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME]);
-		}else{
-			$respItemTime = ' - ';
-		}
-
-echo '<h2>bDBG_speed: <pre>'.print_r($speed, 1).'</pre></h2>';// bob debuger
+		$respItemTime = format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME]);
 
 		$table->addRow(array(
 			$httpstep_data['name'],
-			($speed == 0 ? '-' : $speed),
+			$speed,
 			($respTime == 0 ? '-' : $respItemTime),
-			($resp == 0 ? '-' : $resp ),
+			$resp,
 			new CSpan($status['msg'], $status['style'])
 		));
 	}
@@ -220,10 +200,11 @@ echo '<h2>bDBG_speed: <pre>'.print_r($speed, 1).'</pre></h2>';// bob debuger
 		$status['msg'] = S_FAIL.' - '.S_ERROR.': '.$httptest_data['error'];
 		$status['style'] = 'disabled';
 	}
+
 	$table->addRow(array(
-		new CSpan(S_TOTAL_BIG, 'bold'),
+		bold(S_TOTAL_BIG),
 		SPACE,
-		new CSpan(  ($item_data['lastclock'] ? format_lastvalue($totalTime) : '-'), 'bold'),
+		bold(format_lastvalue($totalTime)),
 		SPACE,
 		new CSpan($status['msg'], $status['style'].' bold')
 	));
