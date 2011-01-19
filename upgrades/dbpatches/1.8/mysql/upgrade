@@ -28,7 +28,7 @@ read -n 1 -p "Continue ? (y/n) " RESPONSE
 GROUPFORHOSTS="none"
 
 # uncomment the following line to skip converting biggest tables to utf8
-# skiptables="history\|history_log\|history_str\|history_text\|history_uint\|trends\|trends_uint
+# skiptables="history$\|history_uint$\|trends$\|trends_uint$"
 
 MYSQL="$(which mysql)"
 MYSQLPARAMS="$@"
