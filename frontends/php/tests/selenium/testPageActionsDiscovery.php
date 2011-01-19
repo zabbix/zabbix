@@ -91,8 +91,12 @@ class testPageActionsDiscovery extends CWebTest
 	*/
 	public function testPageActionsDiscovery_SingleEnable($action)
 	{
-// TODO
-		$this->markTestIncomplete();
+		$actionid=$action['actionid'];
+
+		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_DISCOVERY);
+		$this->assertTitle('Configuration of actions');
+
+		$this->click("xpath=//a[contains(@href,'activate&g_actionid%5B%5D=$actionid')]");
 	}
 
 	public function testPageActionsDiscovery_Create()
