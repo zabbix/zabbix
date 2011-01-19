@@ -126,7 +126,7 @@ private $allowed;
 						throw new Exception('Parameter sec or #num or user macro expected, "'.$expression['functionParamList'][$anum].'" given.');
 
 					if(($arg['type'] == 'num') && !is_numeric($expression['functionParamList'][$anum]) && !$userMacro)
-						throw new Exception('Parameter sec or user macro expected, "'.$expression['functionParamList'][$anum].'" given.');
+						throw new Exception('Parameter num or user macro expected, "'.$expression['functionParamList'][$anum].'" given.');
 				}
 			}
 		}
