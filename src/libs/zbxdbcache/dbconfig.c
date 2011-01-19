@@ -781,119 +781,119 @@ static void	DCsync_items(DB_RESULT result)
 	{
 		itemid = item->itemid;
 
-		if (FAIL == zbx_vector_uint64_bsearch(&ids, itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		if (FAIL != zbx_vector_uint64_bsearch(&ids, itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			continue;
+
+		/* SNMP items */
+
+		if (ITEM_TYPE_SNMPv1 == item->type ||
+				ITEM_TYPE_SNMPv2c == item->type ||
+				ITEM_TYPE_SNMPv3 == item->type)
 		{
-			/* SNMP items */
+			snmpitem = zbx_hashset_search(&config->snmpitems, &itemid);
 
-			if (ITEM_TYPE_SNMPv1 == item->type ||
-					ITEM_TYPE_SNMPv2c == item->type ||
-					ITEM_TYPE_SNMPv3 == item->type)
-			{
-				snmpitem = zbx_hashset_search(&config->snmpitems, &itemid);
+			zbx_strpool_release(snmpitem->snmp_community);
+			zbx_strpool_release(snmpitem->snmp_oid);
+			zbx_strpool_release(snmpitem->snmpv3_securityname);
+			zbx_strpool_release(snmpitem->snmpv3_authpassphrase);
+			zbx_strpool_release(snmpitem->snmpv3_privpassphrase);
 
-				zbx_strpool_release(snmpitem->snmp_community);
-				zbx_strpool_release(snmpitem->snmp_oid);
-				zbx_strpool_release(snmpitem->snmpv3_securityname);
-				zbx_strpool_release(snmpitem->snmpv3_authpassphrase);
-				zbx_strpool_release(snmpitem->snmpv3_privpassphrase);
-
-				zbx_hashset_remove(&config->snmpitems, &itemid);
-			}
-
-			/* IPMI items */
-
-			if (ITEM_TYPE_IPMI == item->type)
-			{
-				ipmiitem = zbx_hashset_search(&config->ipmiitems, &itemid);
-				zbx_strpool_release(ipmiitem->ipmi_sensor);
-				zbx_hashset_remove(&config->ipmiitems, &itemid);
-			}
-
-			/* items with flexible intervals */
-
-			if (NULL != (flexitem = zbx_hashset_search(&config->flexitems, &itemid)))
-			{
-				zbx_strpool_release(flexitem->delay_flex);
-				zbx_hashset_remove(&config->flexitems, &itemid);
-			}
-
-			/* trapper items */
-
-			if (ITEM_TYPE_TRAPPER == item->type &&
-					NULL != (trapitem = zbx_hashset_search(&config->trapitems, &itemid)))
-			{
-				zbx_strpool_release(trapitem->trapper_hosts);
-				zbx_hashset_remove(&config->trapitems, &itemid);
-			}
-
-			/* log items */
-
-			if (ITEM_VALUE_TYPE_LOG == item->value_type &&
-					NULL != (logitem = zbx_hashset_search(&config->logitems, &itemid)))
-			{
-				zbx_strpool_release(logitem->logtimefmt);
-				zbx_hashset_remove(&config->logitems, &itemid);
-			}
-
-			/* db items */
-
-			if (ITEM_TYPE_DB_MONITOR == item->type &&
-					NULL != (dbitem = zbx_hashset_search(&config->dbitems, &itemid)))
-			{
-				zbx_strpool_release(dbitem->params);
-				zbx_hashset_remove(&config->dbitems, &itemid);
-			}
-
-			/* SSH items */
-
-			if (ITEM_TYPE_SSH == item->type)
-			{
-				sshitem = zbx_hashset_search(&config->sshitems, &itemid);
-
-				zbx_strpool_release(sshitem->username);
-				zbx_strpool_release(sshitem->password);
-				zbx_strpool_release(sshitem->publickey);
-				zbx_strpool_release(sshitem->privatekey);
-				zbx_strpool_release(sshitem->params);
-
-				zbx_hashset_remove(&config->sshitems, &itemid);
-			}
-
-			/* TELNET items */
-
-			if (ITEM_TYPE_TELNET == item->type)
-			{
-				telnetitem = zbx_hashset_search(&config->telnetitems, &itemid);
-
-				zbx_strpool_release(telnetitem->username);
-				zbx_strpool_release(telnetitem->password);
-				zbx_strpool_release(telnetitem->params);
-
-				zbx_hashset_remove(&config->telnetitems, &itemid);
-			}
-
-			/* calculated items */
-
-			if (ITEM_TYPE_CALCULATED == item->type)
-			{
-				calcitem = zbx_hashset_search(&config->calcitems, &itemid);
-				zbx_strpool_release(calcitem->params);
-				zbx_hashset_remove(&config->calcitems, &itemid);
-			}
-
-			/* items */
-
-			item_hk.hostid = item->hostid;
-			item_hk.key = item->key;
-			zbx_strpool_release(item_hk.key);
-			zbx_hashset_remove(&config->items_hk, &item_hk);
-
-			if (ZBX_LOC_QUEUE == item->location)
-				zbx_binary_heap_remove_direct(&config->queues[item->poller_type], item->itemid);
-
-			zbx_strpool_release(item->key);
-			zbx_hashset_iter_remove(&iter);
+			zbx_hashset_remove(&config->snmpitems, &itemid);
 		}
+
+		/* IPMI items */
+
+		if (ITEM_TYPE_IPMI == item->type)
+		{
+			ipmiitem = zbx_hashset_search(&config->ipmiitems, &itemid);
+			zbx_strpool_release(ipmiitem->ipmi_sensor);
+			zbx_hashset_remove(&config->ipmiitems, &itemid);
+		}
+
+		/* items with flexible intervals */
+
+		if (NULL != (flexitem = zbx_hashset_search(&config->flexitems, &itemid)))
+		{
+			zbx_strpool_release(flexitem->delay_flex);
+			zbx_hashset_remove(&config->flexitems, &itemid);
+		}
+
+		/* trapper items */
+
+		if (ITEM_TYPE_TRAPPER == item->type &&
+				NULL != (trapitem = zbx_hashset_search(&config->trapitems, &itemid)))
+		{
+			zbx_strpool_release(trapitem->trapper_hosts);
+			zbx_hashset_remove(&config->trapitems, &itemid);
+		}
+
+		/* log items */
+
+		if (ITEM_VALUE_TYPE_LOG == item->value_type &&
+				NULL != (logitem = zbx_hashset_search(&config->logitems, &itemid)))
+		{
+			zbx_strpool_release(logitem->logtimefmt);
+			zbx_hashset_remove(&config->logitems, &itemid);
+		}
+
+		/* db items */
+
+		if (ITEM_TYPE_DB_MONITOR == item->type &&
+				NULL != (dbitem = zbx_hashset_search(&config->dbitems, &itemid)))
+		{
+			zbx_strpool_release(dbitem->params);
+			zbx_hashset_remove(&config->dbitems, &itemid);
+		}
+
+		/* SSH items */
+
+		if (ITEM_TYPE_SSH == item->type)
+		{
+			sshitem = zbx_hashset_search(&config->sshitems, &itemid);
+
+			zbx_strpool_release(sshitem->username);
+			zbx_strpool_release(sshitem->password);
+			zbx_strpool_release(sshitem->publickey);
+			zbx_strpool_release(sshitem->privatekey);
+			zbx_strpool_release(sshitem->params);
+
+			zbx_hashset_remove(&config->sshitems, &itemid);
+		}
+
+		/* TELNET items */
+
+		if (ITEM_TYPE_TELNET == item->type)
+		{
+			telnetitem = zbx_hashset_search(&config->telnetitems, &itemid);
+
+			zbx_strpool_release(telnetitem->username);
+			zbx_strpool_release(telnetitem->password);
+			zbx_strpool_release(telnetitem->params);
+
+			zbx_hashset_remove(&config->telnetitems, &itemid);
+		}
+
+		/* calculated items */
+
+		if (ITEM_TYPE_CALCULATED == item->type)
+		{
+			calcitem = zbx_hashset_search(&config->calcitems, &itemid);
+			zbx_strpool_release(calcitem->params);
+			zbx_hashset_remove(&config->calcitems, &itemid);
+		}
+
+		/* items */
+
+		item_hk.hostid = item->hostid;
+		item_hk.key = item->key;
+		zbx_strpool_release(item_hk.key);
+		zbx_hashset_remove(&config->items_hk, &item_hk);
+
+		if (ZBX_LOC_QUEUE == item->location)
+			zbx_binary_heap_remove_direct(&config->queues[item->poller_type], item->itemid);
+
+		zbx_strpool_release(item->key);
+		zbx_hashset_iter_remove(&iter);
 	}
 
 	zbx_vector_uint64_destroy(&ids);
@@ -957,6 +957,7 @@ static void	DCsync_hosts(DB_RESULT result)
 
 		host->hostid = hostid;
 		host->proxy_hostid = proxy_hostid;
+
 		DCstrpool_replace(found, &host->host, row[2]);
 		host->useip = (unsigned char)atoi(row[3]);
 		DCstrpool_replace(found, &host->ip, row[4]);
@@ -1043,33 +1044,41 @@ static void	DCsync_hosts(DB_RESULT result)
 	{
 		hostid = host->hostid;
 
-		if (FAIL == zbx_vector_uint64_bsearch(&ids, hostid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		if (FAIL != zbx_vector_uint64_bsearch(&ids, hostid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			continue;
+
+		/* IPMI hosts */
+
+		if (NULL != (ipmihost = zbx_hashset_search(&config->ipmihosts, &hostid)))
 		{
-			/* IPMI hosts */
+			zbx_strpool_release(ipmihost->ipmi_ip);
+			zbx_strpool_release(ipmihost->ipmi_username);
+			zbx_strpool_release(ipmihost->ipmi_password);
 
-			if (NULL != (ipmihost = zbx_hashset_search(&config->ipmihosts, &hostid)))
-			{
-				zbx_strpool_release(ipmihost->ipmi_ip);
-				zbx_strpool_release(ipmihost->ipmi_username);
-				zbx_strpool_release(ipmihost->ipmi_password);
-
-				zbx_hashset_remove(&config->ipmihosts, &hostid);
-			}
-
-			/* hosts */
-
-			host_ph.proxy_hostid = host->proxy_hostid;
-			host_ph.status = host->status;
-			host_ph.host = host->host;
-			zbx_strpool_release(host_ph.host);
-			zbx_hashset_remove(&config->hosts_ph, &host_ph);
-
-			zbx_strpool_release(host->host);
-			zbx_strpool_release(host->ip);
-			zbx_strpool_release(host->dns);
-
-			zbx_hashset_iter_remove(&iter);
+			zbx_hashset_remove(&config->ipmihosts, &hostid);
 		}
+
+		/* passive proxies */
+
+		if (ZBX_LOC_QUEUE == host->location)
+		{
+			host->location = ZBX_LOC_NOWHERE;
+			zbx_binary_heap_remove_direct(&config->pqueue, host->hostid);
+		}
+
+		/* hosts */
+
+		host_ph.proxy_hostid = host->proxy_hostid;
+		host_ph.status = host->status;
+		host_ph.host = host->host;
+		zbx_strpool_release(host_ph.host);
+		zbx_hashset_remove(&config->hosts_ph, &host_ph);
+
+		zbx_strpool_release(host->host);
+		zbx_strpool_release(host->ip);
+		zbx_strpool_release(host->dns);
+
+		zbx_hashset_iter_remove(&iter);
 	}
 
 	zbx_vector_uint64_destroy(&ids);
