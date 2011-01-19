@@ -106,7 +106,7 @@
 			'item_types' =>	$item_types_all
 		);
 
-		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['delta']	= $ZBX_TR_EXPR_ALLOWED_FUNCTION['avg'];
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['delta']	= $ZBX_TR_EXPR_ALLOWED_FUNCTIONS['avg'];
 
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['diff'] = array(
 			'args' => $args_ignored,
@@ -151,9 +151,9 @@
 			)
 		);
 
-		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['max'] = $ZBX_TR_EXPR_ALLOWED_FUNCTION['avg'];
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['max'] = $ZBX_TR_EXPR_ALLOWED_FUNCTIONS['avg'];
 
-		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['min'] = $ZBX_TR_EXPR_ALLOWED_FUNCTION['avg'];
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['min'] = $ZBX_TR_EXPR_ALLOWED_FUNCTIONS['avg'];
 
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['nodata']= array(
 			'args' => array(
@@ -172,7 +172,7 @@
 			'item_types' =>	$item_types_all
 		);
 
-		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['regexp'] = $ZBX_TR_EXPR_ALLOWED_FUNCTION['iregexp'];
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['regexp'] = $ZBX_TR_EXPR_ALLOWED_FUNCTIONS['iregexp'];
 
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['str'] = array(
 			'args' => array(
@@ -190,7 +190,7 @@
 			'item_types' =>	$item_types_char
 		);
 
-		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['sum'] = $ZBX_TR_EXPR_ALLOWED_FUNCTION['avg'];
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['sum'] = $ZBX_TR_EXPR_ALLOWED_FUNCTIONS['avg'];
 
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['time'] = array(
 			'args' => $args_ignored,
