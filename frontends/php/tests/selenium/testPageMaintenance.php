@@ -35,7 +35,6 @@ class testPageMaintenance extends CWebTest
 	public function testPageMaintenance_SimpleTest($maintenance)
 	{
 		$this->login('maintenance.php');
-		$this->wait();
 		$this->dropdown_select('groupid','all');
 		$this->wait();
 		$this->assertTitle('Maintenance');
