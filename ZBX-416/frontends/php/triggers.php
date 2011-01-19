@@ -180,10 +180,11 @@ include_once('include/page_header.php');
 			$priority = get_request('priority');
 			$comments = get_request('comments');
 			$url = get_request('url');
+
 			if($triggerData['type'] == $_REQUEST['type']) $type = null;
 			if($triggerData['priority'] == $_REQUEST['priority']) $priority = null;
-			if($triggerData['comments'] == $_REQUEST['comments']) $comments = null;
-			if($triggerData['url'] == $_REQUEST['url']) $url = null;
+			if(strcmp($triggerData['comments'], $_REQUEST['comments']) == 0) $comments = null;
+			if(strcmp($triggerData['url'], $_REQUEST['url']) == 0) $url = null;
 			if($triggerData['status'] == $status) $status = null;
 
 			DBstart();
