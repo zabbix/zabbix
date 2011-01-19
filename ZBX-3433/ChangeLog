@@ -1,6 +1,7 @@
 Changes for 1.8.5rc1
 
  - [ZBX-3433] fixed removing deleted passive proxies from queue (Sasha)
+ - [ZBX-416] fixed PostgreSQL errors in configuration sender module when using DM setup (Sasha)
  - [ZBX-3346] fixed items being polled more frequently than necessary (Sasha)
  - [ZBX-3409] fixed semaphore and shared memory access permissions (Sasha)
  - [ZBX-3173] made server-side JSON parser ignore whitespace better (asaveljevs)
