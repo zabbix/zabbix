@@ -171,9 +171,11 @@
 		}
 
 		if(isset($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_IN]['lastclock']) &&
-		$httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_IN]['lastclock'] != 0 ){
+			$httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_IN]['lastclock'] != 0 )
+		{
 			$speed = format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_IN]);
-		}else{
+		}
+		else{
 			$speed = 0;
 		}
 

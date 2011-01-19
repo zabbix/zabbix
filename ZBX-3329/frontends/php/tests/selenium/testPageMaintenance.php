@@ -36,6 +36,7 @@ class testPageMaintenance extends CWebTest
 	{
 		$this->login('maintenance.php');
 		$this->dropdown_select('groupid','all');
+		$this->wait();
 		$this->assertTitle('Maintenance');
 
 		$this->ok('Maintenance');
