@@ -55,11 +55,10 @@
 	$_REQUEST['hostid'] = get_request('hostid', 0);
 // permission check, imo should be removed in future.
 	if($_REQUEST['hostid'] > 0){
-		$res = CHost::get(
-			array('real_hosts' => 1,
-				'hostids' => $_REQUEST['hostid']
-			)
-		);
+		$res = CHost::get(array(
+			'real_hosts' => 1,
+			'hostids' => $_REQUEST['hostid']
+		));
 		if(empty($res)) access_deny();
 	}
 
