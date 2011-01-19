@@ -2,6 +2,7 @@
 Changes for 1.9.2
 
 New features:
+ - [ZBX-1357] updated Dutch translation; thanks to qix (Richlv)
  - [ZBX-1357] updated Latvian translation (Richlv)
  - [ZBXNEXT-594] Add to zabbix API support for search and filter by rules "ALL" or "ANY" (Vlad)
  - [ZBXNEXT-592] confirmation dialog for scripts (Vedmak)
@@ -66,6 +67,12 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
 
+ - [ZBX-3346] fixed items being polled more frequently than necessary (Sasha)
+ - [ZBX-3409] fixed semaphore and shared memory access permissions (Sasha)
+ - [ZBX-3173] made server-side JSON parser ignore whitespace better (asaveljevs)
+ - [ZBX-3425] updated Brazilian Portuguese translation; thanks to Murilo Moreira de Oliveira (Richlv)
+ - [ZBX-3403] fixed SQL statements for auto registration and discovery operations (Sasha)
+ - [ZBX-3403] removed UNIQUE constraint for autoreg_host_1 index (Sasha)
  - [ZBX-3414] expressions for triggers with web items are marked as error in trigger wizard (Vedmak)
  - [ZBX-3406] better api validation (Vedmak)
  - [ZBX-3413] added escaping of parameters used in LIKE SQL statements (KB)

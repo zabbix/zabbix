@@ -34,6 +34,10 @@
 #define	LOCK_CACHE	zbx_mutex_lock(&config_lock)
 #define	UNLOCK_CACHE	zbx_mutex_unlock(&config_lock)
 
+#define ZBX_LOC_NOWHERE	0
+#define ZBX_LOC_QUEUE	1
+#define ZBX_LOC_POLLER	2
+
 typedef struct
 {
 	zbx_uint64_t	itemid;
@@ -43,12 +47,12 @@ typedef struct
 	const char	*port;
 	int		delay;
 	int		nextcheck;
-	unsigned char 	type;
+	unsigned char	type;
 	unsigned char	data_type;
 	unsigned char	value_type;
-	unsigned char 	poller_type;
+	unsigned char	poller_type;
 	unsigned char	status;
-	unsigned char	in_queue;
+	unsigned char	location;
 	unsigned char	flags;
 }
 ZBX_DC_ITEM;
@@ -171,7 +175,7 @@ typedef struct
 	zbx_uint64_t	hostid;
 	int		proxy_config_nextcheck;
 	int		proxy_data_nextcheck;
-	unsigned char	in_queue;
+	unsigned char	location;
 }
 ZBX_DC_PROXY;
 
@@ -359,12 +363,12 @@ static int	DCget_reachable_nextcheck(const ZBX_DC_ITEM *item, int now)
 	else
 	{
 		const ZBX_DC_FLEXITEM	*flexitem;
-		
+
 		flexitem = zbx_hashset_search(&config->flexitems, &item->itemid);
 		nextcheck = calculate_item_nextcheck(item->itemid, item->type,
 				item->delay, flexitem ? flexitem->delay_flex : NULL, now, NULL);
 	}
-	
+
 	return nextcheck;
 }
 
@@ -503,26 +507,29 @@ static void	DCupdate_item_queue(ZBX_DC_ITEM *item, unsigned char old_poller_type
 {
 	zbx_binary_heap_elem_t	elem;
 
-	if (item->in_queue && old_poller_type != item->poller_type)
+	if (ZBX_LOC_POLLER == item->location)
+		return;
+
+	if (ZBX_LOC_QUEUE == item->location && old_poller_type != item->poller_type)
 	{
-		item->in_queue = 0;
+		item->location = ZBX_LOC_NOWHERE;
 		zbx_binary_heap_remove_direct(&config->queues[old_poller_type], item->itemid);
 	}
 
 	if (item->poller_type >= ZBX_POLLER_TYPE_COUNT)
 		return;
 
-	if (item->in_queue && old_nextcheck == item->nextcheck)
+	if (ZBX_LOC_QUEUE == item->location && old_nextcheck == item->nextcheck)
 		return;
 
 	elem.key = item->itemid;
 	elem.data = (const void *)item;
 
-	if (item->in_queue)
+	if (ZBX_LOC_QUEUE == item->location)
 		zbx_binary_heap_update_direct(&config->queues[item->poller_type], &elem);
 	else
 	{
-		item->in_queue = 1;
+		item->location = ZBX_LOC_QUEUE;
 		zbx_binary_heap_insert(&config->queues[item->poller_type], &elem);
 	}
 }
@@ -531,14 +538,17 @@ static void	DCupdate_proxy_queue(ZBX_DC_PROXY *proxy)
 {
 	zbx_binary_heap_elem_t	elem;
 
+	if (ZBX_LOC_POLLER == proxy->location)
+		return;
+
 	elem.key = proxy->hostid;
 	elem.data = (const void *)proxy;
 
-	if (proxy->in_queue)
+	if (ZBX_LOC_QUEUE == proxy->location)
 		zbx_binary_heap_update_direct(&config->pqueue, &elem);
 	else
 	{
-		proxy->in_queue = 1;
+		proxy->location = ZBX_LOC_QUEUE;
 		zbx_binary_heap_insert(&config->pqueue, &elem);
 	}
 }
@@ -626,7 +636,7 @@ static void	DCsync_items(DB_RESULT result)
 
 		if (!found)
 		{
-			item->in_queue = 0;
+			item->location = ZBX_LOC_NOWHERE;
 			item->poller_type = ZBX_NO_POLLER;
 			old_nextcheck = 0;
 
@@ -652,13 +662,13 @@ static void	DCsync_items(DB_RESULT result)
 		item->status = status;
 		item->delay = delay;
 
- 		old_poller_type = item->poller_type;
- 		poller_by_item(itemid, proxy_hostid, item->type, item->key, item->flags, &item->poller_type);
+		old_poller_type = item->poller_type;
+		poller_by_item(itemid, proxy_hostid, item->type, item->key, item->flags, &item->poller_type);
 		if (ZBX_POLLER_TYPE_UNREACHABLE == old_poller_type &&
 				(ZBX_POLLER_TYPE_NORMAL == item->poller_type || ZBX_POLLER_TYPE_IPMI == item->poller_type))
 			item->poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
 
- 		DCupdate_item_queue(item, old_poller_type, old_nextcheck);
+		DCupdate_item_queue(item, old_poller_type, old_nextcheck);
 
 		/* SNMP items */
 
@@ -721,7 +731,7 @@ static void	DCsync_items(DB_RESULT result)
 		if (ITEM_TYPE_TRAPPER == item->type && SUCCEED != DBis_null(row[17]) && '\0' != *row[17])
 		{
 			trapitem = DCfind_id(&config->trapitems, itemid, sizeof(ZBX_DC_TRAPITEM), &found);
-			
+
 			DCstrpool_replace(found, &trapitem->trapper_hosts, row[17]);
 		}
 		else if (NULL != (trapitem = zbx_hashset_search(&config->trapitems, &itemid)))
@@ -941,7 +951,7 @@ static void	DCsync_items(DB_RESULT result)
 			zbx_strpool_release(item_hk.key);
 			zbx_hashset_remove(&config->items_hk, &item_hk);
 
-			if (item->in_queue)
+			if (ZBX_LOC_QUEUE == item->location)
 				zbx_binary_heap_remove_direct(&config->queues[item->poller_type], item->itemid);
 
 			zbx_strpool_release(item->key);
@@ -1075,17 +1085,17 @@ static void	DCsync_hosts(DB_RESULT result)
 						hostid, CONFIG_PROXYCONFIG_FREQUENCY, now);
 				proxy->proxy_data_nextcheck = (int)calculate_proxy_nextcheck(
 						hostid, CONFIG_PROXYDATA_FREQUENCY, now);
-				proxy->in_queue = 0;
+				proxy->location = ZBX_LOC_NOWHERE;
 
 				DCupdate_proxy_queue(proxy);
 			}
 		}
 		else if (NULL != (proxy = zbx_hashset_search(&config->proxies, &hostid)))
 		{
-			if (proxy->in_queue)
+			if (ZBX_LOC_QUEUE == proxy->location)
 			{
 				zbx_binary_heap_remove_direct(&config->pqueue, proxy->hostid);
-				proxy->in_queue = 0;
+				proxy->location = ZBX_LOC_NOWHERE;
 			}
 
 			zbx_hashset_remove(&config->proxies, &hostid);
@@ -1110,7 +1120,7 @@ static void	DCsync_hosts(DB_RESULT result)
 			{
 				zbx_strpool_release(ipmihost->ipmi_username);
 				zbx_strpool_release(ipmihost->ipmi_password);
-				
+
 				zbx_hashset_remove(&config->ipmihosts, &hostid);
 			}
 
@@ -1118,10 +1128,10 @@ static void	DCsync_hosts(DB_RESULT result)
 
 			if (NULL != (proxy = zbx_hashset_search(&config->proxies, &hostid)))
 			{
-				if (proxy->in_queue)
+				if (ZBX_LOC_QUEUE == proxy->location)
 				{
 					zbx_binary_heap_remove_direct(&config->pqueue, proxy->hostid);
-					proxy->in_queue = 0;
+					proxy->location = ZBX_LOC_NOWHERE;
 				}
 
 				zbx_hashset_remove(&config->proxies, &hostid);
@@ -2403,7 +2413,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max
 			break;
 
 		zbx_binary_heap_remove_min(queue);
-		dc_item->in_queue = 0;
+		dc_item->location = ZBX_LOC_NOWHERE;
 
 		if (CONFIG_REFRESH_UNSUPPORTED == 0 && ITEM_STATUS_NOTSUPPORTED == dc_item->status)
 			continue;
@@ -2414,10 +2424,10 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max
 		if (HOST_MAINTENANCE_STATUS_ON == dc_host->maintenance_status &&
 				MAINTENANCE_TYPE_NODATA == dc_host->maintenance_type)
 		{
- 			old_nextcheck = dc_item->nextcheck;
+			old_nextcheck = dc_item->nextcheck;
 			dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, now);
 
- 			DCupdate_item_queue(dc_item, dc_item->poller_type, old_nextcheck);
+			DCupdate_item_queue(dc_item, dc_item->poller_type, old_nextcheck);
 			continue;
 		}
 
@@ -2426,10 +2436,10 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max
 			if (ZBX_POLLER_TYPE_UNREACHABLE == poller_type)
 			{
 				old_poller_type = dc_item->poller_type;
- 				poller_by_item(dc_item->itemid, dc_host->proxy_hostid, dc_item->type, dc_item->key,
+				poller_by_item(dc_item->itemid, dc_host->proxy_hostid, dc_item->type, dc_item->key,
 						dc_item->flags, &dc_item->poller_type);
 
-	 			old_nextcheck = dc_item->nextcheck;
+				old_nextcheck = dc_item->nextcheck;
 				dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, now);
 
 				DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
@@ -2443,7 +2453,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max
 				old_poller_type = dc_item->poller_type;
 				dc_item->poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
 
-	 			old_nextcheck = dc_item->nextcheck;
+				old_nextcheck = dc_item->nextcheck;
 				if (disable_until > now)
 					dc_item->nextcheck = DCget_unreachable_nextcheck(dc_item, dc_host);
 
@@ -2452,7 +2462,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max
 			}
 			else if (disable_until > now)
 			{
-	 			old_nextcheck = dc_item->nextcheck;
+				old_nextcheck = dc_item->nextcheck;
 				dc_item->nextcheck = DCget_unreachable_nextcheck(dc_item, dc_host);
 
 				DCupdate_item_queue(dc_item, dc_item->poller_type, old_nextcheck);
@@ -2462,6 +2472,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max
 			DCincrease_disable_until(dc_item, dc_host, now);
 		}
 
+		dc_item->location = ZBX_LOC_POLLER;
 		DCget_host(&items[num].host, dc_host);
 		DCget_item(&items[num], dc_item);
 		num++;
@@ -2563,7 +2574,7 @@ void	DCrequeue_reachable_item(zbx_uint64_t itemid, unsigned char status, int now
 	ZBX_DC_ITEM	*dc_item;
 	ZBX_DC_HOST	*dc_host;
 	unsigned char	old_poller_type;
- 	int		old_nextcheck;
+	int		old_nextcheck;
 
 	LOCK_CACHE;
 
@@ -2574,13 +2585,16 @@ void	DCrequeue_reachable_item(zbx_uint64_t itemid, unsigned char status, int now
 		old_poller_type = dc_item->poller_type;
 		if (ZBX_POLLER_TYPE_UNREACHABLE == dc_item->poller_type)
 			if (NULL != (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
- 				poller_by_item(dc_item->itemid, dc_host->proxy_hostid, dc_item->type,
+				poller_by_item(dc_item->itemid, dc_host->proxy_hostid, dc_item->type,
 						dc_item->key, dc_item->flags, &dc_item->poller_type);
 
- 		old_nextcheck = dc_item->nextcheck;
+		old_nextcheck = dc_item->nextcheck;
 		dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, now);
 
- 		DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
+		if (ZBX_LOC_POLLER == dc_item->location)
+			dc_item->location = ZBX_LOC_NOWHERE;
+
+		DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
 	}
 
 	UNLOCK_CACHE;
@@ -2591,7 +2605,7 @@ void	DCrequeue_unreachable_item(zbx_uint64_t itemid)
 	ZBX_DC_ITEM	*dc_item;
 	ZBX_DC_HOST	*dc_host;
 	unsigned char	old_poller_type;
- 	int		old_nextcheck;
+	int		old_nextcheck;
 
 	LOCK_CACHE;
 
@@ -2602,10 +2616,13 @@ void	DCrequeue_unreachable_item(zbx_uint64_t itemid)
 		if (ZBX_POLLER_TYPE_NORMAL == dc_item->poller_type || ZBX_POLLER_TYPE_IPMI == dc_item->poller_type)
 			dc_item->poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
 
- 		old_nextcheck = dc_item->nextcheck;
+		old_nextcheck = dc_item->nextcheck;
 		dc_item->nextcheck = DCget_unreachable_nextcheck(dc_item, dc_host);
 
- 		DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
+		if (ZBX_LOC_POLLER == dc_item->location)
+			dc_item->location = ZBX_LOC_NOWHERE;
+
+		DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
 	}
 
 	UNLOCK_CACHE;
@@ -2890,7 +2907,7 @@ int	DCconfig_get_proxypoller_hosts(DC_PROXY *proxies, int max_hosts)
 			break;
 
 		zbx_binary_heap_remove_min(queue);
-		dc_proxy->in_queue = 0;
+		dc_proxy->location = ZBX_LOC_POLLER;
 
 		DCget_proxy(&proxies[num], dc_proxy);
 		num++;
@@ -2958,8 +2975,7 @@ void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck)
 	time_t		now;
 	ZBX_DC_PROXY	*dc_proxy;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() update_nextcheck:%d",
-		       __function_name, (int)update_nextcheck);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() update_nextcheck:%d", __function_name, (int)update_nextcheck);
 
 	now = time(NULL);
 
@@ -2977,6 +2993,9 @@ void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck)
 			dc_proxy->proxy_data_nextcheck = (int)calculate_proxy_nextcheck(
 					hostid, CONFIG_PROXYDATA_FREQUENCY, now);
 		}
+
+		if (ZBX_LOC_POLLER == dc_proxy->location)
+			dc_proxy->location = ZBX_LOC_NOWHERE;
 
 		DCupdate_proxy_queue(dc_proxy);
 	}

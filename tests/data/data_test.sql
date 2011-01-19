@@ -227,17 +227,6 @@ INSERT INTO maintenances_hosts (maintenance_hostid, maintenanceid, hostid) VALUE
 INSERT INTO maintenances_groups (maintenance_groupid, maintenanceid, groupid) VALUES (1,1,4);
 INSERT INTO maintenances_groups (maintenance_groupid, maintenanceid, groupid) VALUES (2,2,4);
 
-INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (1,1,1);
-INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (2,1,2);
-INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (3,1,3);
-INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (4,1,4);
-INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (5,1,5);
-INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (6,2,6);
-INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (7,2,7);
-INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (8,2,8);
-INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (9,2,9);
-INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (10,2,10);
-
 INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (1,0,1,0,0,1,43200,184200,1294760386);
 INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (2,2,2,0,0,1,43200,93780,1294760409);
 INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (3,3,2,0,85,1,85800,300,1294760438);
@@ -248,6 +237,17 @@ INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek,
 INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (8,3,2,0,85,1,85800,300,1294760438);
 INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (9,4,0,1365,0,15,37500,183840,1294760473);
 INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (10,4,1,2730,85,0,84600,1800,1294760575);
+
+INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (1,1,1);
+INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (2,1,2);
+INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (3,1,3);
+INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (4,1,4);
+INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (5,1,5);
+INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (6,2,6);
+INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (7,2,7);
+INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (8,2,8);
+INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (9,2,9);
+INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (10,2,10);
 
 -- Add maps
 INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, label_location, highlight, expandproblem, markelements, show_unack) VALUES (3,'Test map 1',800,600,NULL,0,0,1,1,1,2);
@@ -271,3 +271,8 @@ INSERT INTO sysmaps_link_triggers (linktriggerid, linkid, triggerid, drawtype, c
 
 INSERT INTO sysmap_element_url (sysmapelementurlid, selementid, name, url) VALUES (1,4,'Zabbix home','www.zabbix.com');
 INSERT INTO sysmap_element_url (sysmapelementurlid, selementid, name, url) VALUES (2,5,'www.wikipedia.org','www.wikipedia.org');
+
+-- Host profiles
+INSERT INTO hosts_profiles (hostid, devicetype, name, os, serialno, tag, macaddress, hardware, software, contact, location, notes) VALUES (10017,'Device type #1','Name #2','OS #3','SerialNo #4','Tag #5','MAC Address #6','Hardware #7','Software #7','Contact #8','Location #9','Notes #10');
+
+INSERT INTO hosts_profiles_ext (hostid, device_alias, device_type, device_chassis, device_os, device_os_short, device_hw_arch, device_serial, device_model, device_tag, device_vendor, device_contract, device_who, device_status, device_app_01, device_app_02, device_app_03, device_app_04, device_app_05, device_url_1, device_url_2, device_url_3, device_networks, device_notes, device_hardware, device_software, ip_subnet_mask, ip_router, ip_macaddress, oob_ip, oob_subnet_mask, oob_router, date_hw_buy, date_hw_install, date_hw_expiry, date_hw_decomm, site_street_1, site_street_2, site_street_3, site_city, site_state, site_country, site_zip, site_rack, site_notes, poc_1_name, poc_1_email, poc_1_phone_1, poc_1_phone_2, poc_1_cell, poc_1_screen, poc_1_notes, poc_2_name, poc_2_email, poc_2_phone_1, poc_2_phone_2, poc_2_cell, poc_2_screen, poc_2_notes) VALUES (10017,'Alias','Device type','Device Chassis','OS (Full Details)','OS (Short)','HW Architecture','Serial Number','Model Number','Asset Tag','Device Vendor','Device Contract Number','Installer Name','Device Deployment Status','Software Application #1','Software Application #2','Software Application #3','Software Application #4','Software Application #5','URL #1','URL #2','URL #3','Device Port Connections','Device Notes','Device Hardware','Device Software','Host Subnet Mask','Host Router','Host MAC Address','OOB IP Address','OOB Subnet Mask','OOB Router','Date HW Purchased','Date HW Installed','Date HW Maintenance Expires','Date HW Decommissioned','Site Address 1','Site Address 2','Site Address 3','Site City','Site State / Province','Site Country','Site Zip / Postal','Site Rack Location','Site Notes','Primary POC Name','Primary POC Email','Primary POC Phone 1','Primary POC Phone 2','Primary POC Cell','Primary POC Screen Name','Primary POC Comments','Secondary POC Name','Secondary POC Email','Secondary POC Phone 1','Secondary POC Phone 2','Secondary POC Cell','Secondary POC Screen Name','Secondary POC Comments');

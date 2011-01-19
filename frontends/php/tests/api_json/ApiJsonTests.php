@@ -19,6 +19,8 @@
 **/
 ?>
 <?php
+require_once(dirname(__FILE__).'/APIInfo.php');
+require_once(dirname(__FILE__).'/General.php');
 require_once(dirname(__FILE__).'/User.php');
 
 class ApiJsonTests
@@ -27,6 +29,8 @@ class ApiJsonTests
 	{
 		$suite = new PHPUnit_Framework_TestSuite('API_JSON');
 
+		$suite->addTestSuite('API_JSON_APIInfo');
+		$suite->addTestSuite('API_JSON_General');
 		$suite->addTestSuite('API_JSON_User');
 
 		return $suite;
