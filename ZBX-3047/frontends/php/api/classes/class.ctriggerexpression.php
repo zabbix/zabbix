@@ -109,7 +109,7 @@ private $allowed;
 			foreach($this->allowed['functions'][$expression['functionName']]['args'] as $anum => $arg){
 
 // mandatory check
-				if(isset($arg['mandat']) && $arg['mandat'] && (!isset($expression['functionParamList'][$anum]) || zbx_empty($expression['functionParamList'][$anum])))
+				if(isset($arg['mandat']) && $arg['mandat'] && (!isset($expression['functionParamList'][$anum])))
 					throw new Exception('Mandatory parameter is missing.');
 
 // type check
