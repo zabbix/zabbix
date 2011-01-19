@@ -26,6 +26,12 @@ require_once(dirname(__FILE__).'/../../include/copt.lib.php');
 require_once(dirname(__FILE__).'/../../include/func.inc.php');
 require_once(dirname(__FILE__).'/../../include/db.inc.php');
 
+function error($error)
+{
+	echo "\nError reported: $error\n";
+	return true;
+}
+
 /**
  * Returns database data suitable for PHPUnit data provider functions
  */
