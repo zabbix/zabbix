@@ -54,10 +54,6 @@ class testPageMaps extends CWebTest
 	*/
 	public function testPageMaps_SimpleEdit($map)
 	{
-// TODO
-// It is not clear how to confirm dialog after pressing Save button
-		$this->markTestIncomplete();
-/*
 		$name=$map['name'];
 		$sysmapid=$map['sysmapid'];
 
@@ -77,7 +73,8 @@ class testPageMaps extends CWebTest
 		$this->click("link=$name");
 		$this->wait();
 		$this->button_click('sysmap_save');
-		$this->wait();
+// TODO There must be a better solution
+		sleep(2);
 		$this->getConfirmation();
 
 		$this->wait();
@@ -89,7 +86,42 @@ class testPageMaps extends CWebTest
 		$this->assertEquals($oldHashElements,DBhash($sql2),"Chuck Norris: Map update changed data in table 'sysmaps_elements'");
 		$this->assertEquals($oldHashLinks,DBhash($sql3),"Chuck Norris: Map update changed data in table 'sysmaps_links'");
 		$this->assertEquals($oldHashLinkTriggers,DBhash($sql4),"Chuck Norris: Map update changed data in table 'sysmaps_link_triggers'");
-*/
+	}
+
+	/**
+	* @dataProvider allMaps
+	*/
+	public function testPageMaps_SimpleUpdate($map)
+	{
+		$name=$map['name'];
+		$sysmapid=$map['sysmapid'];
+
+		$this->chooseOkOnNextConfirmation();
+
+		$sql1="select * from sysmaps where name='$name' order by sysmapid";
+		$oldHashMap=DBhash($sql1);
+		$sql2="select * from sysmaps_elements where sysmapid=$sysmapid order by selementid";
+		$oldHashElements=DBhash($sql2);
+		$sql3="select * from sysmaps_links where sysmapid=$sysmapid order by linkid";
+		$oldHashLinks=DBhash($sql3);
+		$sql4="select * from sysmaps_link_triggers where linkid in (select linkid from sysmaps_links where sysmapid=$sysmapid) order by linktriggerid";
+		$oldHashLinkTriggers=DBhash($sql4);
+
+		$this->login('sysmaps.php');
+		$this->assertTitle('Network maps');
+		$this->click("xpath=//a[contains(@href,'sysmaps.php?form=update&sysmapid=$sysmapid#form&sid=')]");
+		$this->wait();
+		$this->button_click('save');
+		$this->wait();
+		$this->assertTitle('Network maps');
+		$this->ok("Network map updated");
+		$this->ok("$name");
+		$this->ok('Configuration of network maps');
+
+		$this->assertEquals($oldHashMap,DBhash($sql1),"Chuck Norris: Map update changed data in table 'sysmaps'");
+		$this->assertEquals($oldHashElements,DBhash($sql2),"Chuck Norris: Map update changed data in table 'sysmaps_elements'");
+		$this->assertEquals($oldHashLinks,DBhash($sql3),"Chuck Norris: Map update changed data in table 'sysmaps_links'");
+		$this->assertEquals($oldHashLinkTriggers,DBhash($sql4),"Chuck Norris: Map update changed data in table 'sysmaps_link_triggers'");
 	}
 
 	/**
