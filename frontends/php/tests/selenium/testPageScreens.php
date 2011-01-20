@@ -71,10 +71,8 @@ class testPageScreens extends CWebTest
 	/**
 	* @dataProvider allScreens
 	*/
-	public function testPageActionsTriggers_SimpleUpdate($screen)
+	public function testPageScreens_SimpleUpdate($screen)
 	{
-// It is not clear how to click on Edit link per screen
-// TODO
 		$screenid=$screen['screenid'];
 		$name=$screen['name'];
 
