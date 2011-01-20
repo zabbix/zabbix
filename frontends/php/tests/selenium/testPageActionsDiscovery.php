@@ -89,14 +89,35 @@ class testPageActionsDiscovery extends CWebTest
 	/**
 	* @dataProvider allActions
 	*/
-	public function testPageActionsDiscovery_SingleEnable($action)
+	public function testPageActionsDiscovery_SingleEnableDisable($action)
 	{
 		$actionid=$action['actionid'];
+		$name=$action['name'];
 
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_DISCOVERY);
 		$this->assertTitle('Configuration of actions');
+		switch($action['status']){
+			case ACTION_STATUS_ENABLED:
+				$this->click("xpath=//a[contains(@href,'actionconf.php?go=disable&g_actionid%5B%5D=$actionid&')]");
+			break;
+			case ACTION_STATUS_DISABLED:
+				$this->click("xpath=//a[contains(@href,'actionconf.php?go=activate&g_actionid%5B%5D=$actionid&')]");
+			break;
+		}
+		$this->wait();
 
-		$this->click("xpath=//a[contains(@href,'activate&g_actionid%5B%5D=$actionid')]");
+		$this->assertTitle('Configuration of actions');
+		$this->ok('Status updated');
+
+		switch($action['status']){
+			case ACTION_STATUS_ENABLED:
+				$sql="select * from actions where actionid=$actionid and status=".ACTION_STATUS_DISABLED;
+			break;
+			case ACTION_STATUS_DISABLED:
+				$sql="select * from actions where actionid=$actionid and status=".ACTION_STATUS_ENABLED;
+			break;
+		}
+		$this->assertEquals(1,DBcount($sql));
 	}
 
 	public function testPageActionsDiscovery_Create()
