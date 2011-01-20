@@ -38,34 +38,40 @@ if(!isset($DB)){
  *
  * @return bool
  */
+if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
 	function init_sqlite3_access(){
 		global $DB, $ZBX_SEM_ID;
 
 		$ZBX_SEM_ID = sem_get(ftok($DB['DATABASE'], 'z'), 1, 0660);
 		return $ZBX_SEM_ID;
 	}
+}
 
 /**
  * Get exclusive lock on SQLite3 database
  *
  * @return bool
  */
+if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
 	function lock_sqlite3_access(){
-		global $ZBX_SEM_ID;
+		global $ZBX_SEM_ID,$DB;
 
 		return sem_acquire($ZBX_SEM_ID);
 	}
+}
 
 /**
  * Release exclusive lock on SQLite3 database
  *
  * @return bool
  */
+if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
 	function unlock_sqlite3_access(){
 		global $ZBX_SEM_ID;
 
 		return sem_release($ZBX_SEM_ID);
 	}
+}
 
 /**
  * Creates global database connection
@@ -88,9 +94,8 @@ if(!isset($DB)){
 		$DB['DB'] = null;
 // Level of a nested transation
 		$DB['TRANSACTIONS'] = 0;
-// True - we are in transation, False - not in transaction, i.e. standalone queries
-		$DB['IN_TRANSACTION'] = false;
-
+// True - if no statements failed in transaction, False - there are failed statements
+		$DB['TRANSACTION_NO_FAILED_SQLS'] = true;
 //Stats
 		$DB['SELECT_COUNT'] = 0;
 		$DB['EXECUTE_COUNT'] = 0;
@@ -182,8 +187,6 @@ if(!isset($DB)){
 
 					break;
 				case ZBX_DB_SQLITE3:
-					$DB['TRANSACTIONS'] = 0;
-
 					if(file_exists($DB['DATABASE'])){
 						try{
 							$DB['DB']= new SQLite3($DB['DATABASE'],SQLITE3_OPEN_READWRITE);
@@ -235,7 +238,6 @@ if(!isset($DB)){
 					$DB['DB']->close();
 					$result = true;
 					break;
-				default:		break;
 			}
 		}
 
@@ -277,10 +279,10 @@ if(!isset($DB)){
 
 		if($DB['TRANSACTIONS']>1){
 			info('POSSIBLE ERROR: Used incorrect logic in database processing, started subtransaction!');
-		return $DB['IN_TRANSACTION'];
+			return false;
 		}
 
-		$DB['IN_TRANSACTION'] = true;
+		$DB['TRANSACTION_NO_FAILED_SQLS'] = true;
 
 		$result = false;
 		if(isset($DB['DB']) && !empty($DB['DB']))
@@ -308,35 +310,43 @@ if(!isset($DB)){
 	}
 
 
-	function DBend($result=true){
+/**
+ * Closes transaction
+ *
+ * @param string $do_commit True - do commit, rollback otherwise. Rollback is also always performed if a sql failed within this transaction.
+ * @return bool True - successful commit, False - otherwise
+ */
+	function DBend($do_commit=true){
 		global $DB;
-//SDI('DBend(): '.$DB['TRANSACTIONS']);
+
 		if($DB['TRANSACTIONS'] != 1){
 			$DB['TRANSACTIONS']--;
 
 			if($DB['TRANSACTIONS'] < 1){
 				$DB['TRANSACTIONS'] = 0;
-				$DB['IN_TRANSACTION'] = false;
+				$DB['TRANSACTION_NO_FAILED_SQLS'] = false;
 				info('POSSIBLE ERROR: Used incorrect logic in database processing, transaction not started!');
 			}
 
-			$DB['IN_TRANSACTION'] = $result && $DB['IN_TRANSACTION'];
+			$DB['TRANSACTION_NO_FAILED_SQLS'] = $do_commit && $DB['TRANSACTION_NO_FAILED_SQLS'];
 
-		return $DB['IN_TRANSACTION'];
+			$result =  $DB['TRANSACTION_NO_FAILED_SQLS'];
 		}
+		else{
+			$DBresult = $do_commit && $DB['TRANSACTION_NO_FAILED_SQLS'];
 
-		$DB['TRANSACTIONS'] = 0;
-		$DBresult = $result && $DB['IN_TRANSACTION'];
+			$DB['TRANSACTIONS'] = 0;
 
-		if($DBresult){ // OK
-			$DBresult = DBcommit();
+			if($DBresult){ // OK
+				$DBresult = DBcommit();
+			}
+
+			if(!$DBresult){ // FAIL
+				DBrollback();
+			}
+
+			$result = (!is_null($do_commit) && $DBresult)?$do_commit:$DBresult;
 		}
-
-		if(!$DBresult){ // FAIL
-			DBrollback();
-		}
-
-		$result = (!is_null($result) && $DBresult)?$result:$DBresult;
 
 	return $result;
 	}
@@ -361,9 +371,8 @@ if(!isset($DB)){
 				if($result) db2_autocommit($DB['DB'], DB2_AUTOCOMMIT_ON);
 				break;
 			case ZBX_DB_SQLITE3:
-				$result = DBexecute('commit');
-				if(!unlock_sqlite3_access()){
-					$result=false;
+				if(unlock_sqlite3_access()){
+					$result = DBexecute('commit');
 				}
 				break;
 		}
@@ -391,9 +400,8 @@ if(!isset($DB)){
 				db2_autocommit($DB['DB'], DB2_AUTOCOMMIT_ON);
 				break;
 			case ZBX_DB_SQLITE3:
-				$result = DBexecute('rollback');
-				if(!unlock_sqlite3_access()){
-					$result = false;
+				if(unlock_sqlite3_access()){
+					$result = DBexecute('rollback');
 				}
 				break;
 		}
@@ -503,7 +511,7 @@ if(!isset($DB)){
 				break;
 				case ZBX_DB_SQLITE3:
 					$lock=true;
-					if(!$DB['IN_TRANSACTION']){
+					if(0 == $DB['TRANSACTIONS']){
 						$lock = lock_sqlite3_access();
 					}
 
@@ -511,7 +519,7 @@ if(!isset($DB)){
 						error('Error in query ['.$query.'] Error code ['.$DB['DB']->lastErrorCode().'] Message ['.$DB['DB']->lastErrorMsg().']');
 					}
 
-					if($lock && !$DB['IN_TRANSACTION']){
+					if($lock && (0 == $DB['TRANSACTIONS'])){
 						$lock = unlock_sqlite3_access();
 					}
 
@@ -523,8 +531,8 @@ if(!isset($DB)){
 //SDI($result);
 
 			// $result is false only if an error occured
-			if($DB['IN_TRANSACTION'] && !$result){
-				$DB['IN_TRANSACTION'] = false;
+			if($DB['TRANSACTION_NO_FAILED_SQLS'] && !$result){
+				$DB['TRANSACTION_NO_FAILED_SQLS'] = false;
 			}
 		}
 COpt::savesqlrequest(microtime(true)-$time_start,$query);
@@ -585,7 +593,7 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 				break;
 				case ZBX_DB_SQLITE3:
 					$lock = true;
-					if(!$DB['IN_TRANSACTION']){
+					if(0 == $DB['TRANSACTIONS']){
 						$lock = lock_sqlite3_access();
 					}
 
@@ -593,7 +601,7 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 						error('Error in query ['.$query.'] Error code ['.$DB['DB']->lastErrorCode().'] Message ['.$DB['DB']->lastErrorMsg().']');
 					}
 
-					if($lock && !$DB['IN_TRANSACTION']){
+					if($lock && (0 == $DB['TRANSACTIONS'])){
 						$lock = unlock_sqlite3_access();
 					}
 
@@ -603,7 +611,7 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 					break;
 			}
 			if($DB['TRANSACTIONS'] && !$result){
-				$DB['IN_TRANSACTION'] &= $result;
+				$DB['TRANSACTION_NO_FAILED_SQLS']  = false;
 			}
 		}
 COpt::savesqlrequest(microtime(true)-$time_start,$query);
@@ -838,7 +846,8 @@ else {
 	function get_dbid($table,$field){
 // PGSQL on transaction failure on all queries returns false..
 		global $DB, $ZBX_LOCALNODEID;
-		if(($DB['TYPE'] == ZBX_DB_POSTGRESQL) && $DB['TRANSACTIONS'] && !$DB['IN_TRANSACTION']) return 0;
+
+		if(($DB['TYPE'] == ZBX_DB_POSTGRESQL) && $DB['TRANSACTIONS'] && !$DB['TRANSACTION_NO_FAILED_SQLS']) return 0;
 //------
 		$nodeid = get_current_nodeid(false);
 
