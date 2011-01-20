@@ -69,7 +69,7 @@ require_once('include/templates/action.js.php');
 		}
 	}
 
-	$actionList->addRow(S_ENABLED, new CCheckBox('status',!$data['status'], null, 0));
+	$actionList->addRow(S_ENABLED, new CCheckBox('status', !$data['status'], null, ACTION_STATUS_ENABLED));
 
 	$divTabs->addTab('actionTab', S_ACTION, $actionList);
 // }}} ACTION_FORM
