@@ -6808,7 +6808,7 @@ msgstr "Tela atualizada"
 #: include/locales/en_gb.inc.php:1699
 #, fuzzy, php-format
 msgid "Screen with id \"%d\" does not exist"
-msgstr "Tela com o ID \"%s\" não existe"
+msgstr "Tela com o ID \"%d\" não existe"
 
 #: include/locales/en_gb.inc.php:1698
 #, php-format
