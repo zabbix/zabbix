@@ -78,8 +78,18 @@ class testPageSlideShows extends CWebTest
 
 	public function testPageSlideShows_Create()
 	{
-// TODO
-		$this->markTestIncomplete();
+		$this->login('slideconf.php');
+		$this->assertTitle('Configuration of slideshows');
+		$this->button_click('form');
+		$this->wait();
+
+		$this->ok('Slide show');
+		$this->ok('Name');
+		$this->ok('Update interval');
+		$this->ok('Slides');
+		$this->button_click('cancel');
+		$this->wait();
+		$this->ok('SLIDE SHOWS');
 	}
 
 	/**
