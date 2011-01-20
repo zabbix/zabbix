@@ -71,11 +71,42 @@ class testPageScreens extends CWebTest
 	/**
 	* @dataProvider allScreens
 	*/
-	public function testPageActionsTriggers_SimpleUpdate($action)
+	public function testPageActionsTriggers_SimpleUpdate($screen)
 	{
 // It is not clear how to click on Edit link per screen
 // TODO
-		$this->markTestIncomplete();
+		$screenid=$screen['screenid'];
+		$name=$screen['name'];
+
+		$sql1="select * from screens where screenid=$screenid order by screenid";
+		$oldHashScreen=DBhash($sql1);
+		$sql2="select * from screens_items where screenid=$screenid order by screenitemid";
+		$oldHashScreenItems=DBhash($sql2);
+
+		DBsave_tables(array('screens','screens_items'));
+
+		$this->login('screenconf.php');
+		$this->assertTitle('Configuration of screens');
+		$this->click("xpath=//a[contains(@href,'?form=update&screenid=$screenid&sid=')]");
+		$this->wait();
+
+		$this->assertTitle('Configuration of screens');
+		$this->ok($name);
+		$this->ok('Screens');
+		$this->ok('Name');
+		$this->ok('Columns');
+		$this->ok('Rows');
+
+		$this->button_click('save');
+		$this->wait();
+
+		$this->assertTitle('Configuration of screens');
+		$this->ok('Screen updated');
+
+		$this->assertEquals($oldHashScreen,DBhash($sql1));
+		$this->assertEquals($oldHashScreenItems,DBhash($sql2));
+
+		DBrestore_tables(array('screens','screens_items'));
 	}
 
 	/**
