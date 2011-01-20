@@ -80,7 +80,11 @@ class testPageMediaTypes extends CWebTest
 	{
 		$id=$mediatype['mediatypeid'];
 
-		DBsave_tables(array('media_type'));
+		$row=DBfetch(DBselect("select count(*) as cnt from media_type where mediatypeid=$id"));
+		$row=DBfetch(DBselect("select count(*) as cnt from operations where mediatypeid=$id"));
+		$used_by_operations = ($row['cnt'] > 0);
+
+		DBsave_tables(array('media_type','media','operations'));
 
 		$this->chooseOkOnNextConfirmation();
 
@@ -89,16 +93,24 @@ class testPageMediaTypes extends CWebTest
 		$this->checkbox_select("media_types[$id]");
 		$this->dropdown_select('go','Delete selected');
 		$this->button_click('goButton');
-		$this->wait();
 
 		$this->getConfirmation();
+		$this->wait();
 		$this->assertTitle('Media types');
-		$this->ok('Media type deleted');
+		switch($used_by_operations){
+			case true:
+				$this->nok('Media type deleted');
+				$this->ok('Media type was not deleted');
+				$this->ok('Mediatypes used by action');
+			break;
+			case false:
+				$this->ok('Media type deleted');
+				$sql="select * from media_type where mediatypeid=$id";
+				$this->assertEquals(0,DBcount($sql));
+			break;
+		}
 
-		$sql="select * from media_type where mediatypeid=$id";
-		$this->assertEquals(0,DBcount($sql));
-
-		DBrestore_tables(array('media_type'));
+		DBrestore_tables(array('media_type','media','operations'));
 	}
 }
 ?>
