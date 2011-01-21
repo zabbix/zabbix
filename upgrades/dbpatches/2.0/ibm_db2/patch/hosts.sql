@@ -160,3 +160,9 @@ ALTER TABLE hosts ADD CONSTRAINT c_hosts_1 FOREIGN KEY (proxy_hostid) REFERENCES
 REORG TABLE hosts;
 ALTER TABLE hosts ADD CONSTRAINT c_hosts_2 FOREIGN KEY (maintenanceid) REFERENCES maintenances (maintenanceid);
 REORG TABLE hosts;
+
+-- added column for visible name
+ALTER TABLE hosts ADD name varchar(64) WITH DEFAULT '' NOT NULL;
+REORG TABLE hosts;
+CREATE INDEX hosts_4 on hosts (name);
+REORG TABLE hosts;
