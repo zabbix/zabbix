@@ -615,7 +615,7 @@ COpt::memoryPick();
 			if(!empty($opgroup)){
 				$sql = 'SELECT operationid, groupid'.
 						' FROM opgroup'.
-						' WHERE '.DBcondition('operationid', $opmessage);
+						' WHERE '.DBcondition('operationid', $opgroup);
 				$db_opgroup = DBselect($sql);
 				while($opgroup = DBfetch($db_opgroup)){
 					if(!isset($operations[$opgroup['operationid']]['opgroup']))
@@ -628,7 +628,7 @@ COpt::memoryPick();
 			if(!empty($optemplate)){
 				$sql = 'SELECT operationid, templateid'.
 						' FROM optemplate'.
-						' WHERE '.DBcondition('operationid', $opmessage);
+						' WHERE '.DBcondition('operationid', $optemplate);
 				$db_optemplate = DBselect($sql);
 				while($optemplate = DBfetch($db_optemplate)){
 					if(!isset($operations[$optemplate['operationid']]['optemplate']))
@@ -833,6 +833,7 @@ COpt::memoryPick();
 				$conditions_db = isset($upd_actions[$action['actionid']]['conditions'])
 						? $upd_actions[$action['actionid']]['conditions']
 						: array();
+
 				$conditionsCreate = $conditionsUpdate = $conditionidsDelete = array();
 				if(isset($action['conditions']) && !empty($action['conditions'])){
 					self::validateConditions($action['conditions']);
@@ -851,6 +852,7 @@ COpt::memoryPick();
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect conditionid'));
 						}
 					}
+
 					$conditionidsDelete = array_merge($conditionidsDelete, array_keys($conditions_db));
 				}
 
@@ -939,7 +941,7 @@ COpt::memoryPick();
 	}
 
 	protected static function deleteConditions($conditionids){
-		DB::delete('conditions', array(DBcondition('conditionid', $conditionids)));
+		DB::delete('conditions', array('conditionid' => $conditionids));
 	}
 
 
@@ -1215,6 +1217,9 @@ COpt::memoryPick();
 					break;
 				case OPERATION_TYPE_GROUP_ADD:
 				case OPERATION_TYPE_GROUP_REMOVE:
+					if(!isset($operation['opgroup'])) $operation['opgroup'] = array();
+					else zbx_array_push($operation['opgroup'], array('operationid' => $operation['operationid']));
+
 					$diff = zbx_array_diff($operation_db['opgroup'], $operation['opgroup'], 'groupid');
 					$opgroupCreate = array_merge($opgroupCreate, $diff['only2']);
 					foreach($diff['only1'] as $ogrp){
@@ -1226,6 +1231,9 @@ COpt::memoryPick();
 					break;
 				case OPERATION_TYPE_TEMPLATE_ADD:
 				case OPERATION_TYPE_TEMPLATE_REMOVE:
+					if(!isset($operation['optemplate'])) $operation['optemplate'] = array();
+					else zbx_array_push($operation['optemplate'], array('operationid' => $operation['operationid']));
+
 					$diff = zbx_array_diff($operation_db['optemplate'], $operation['optemplate'], 'templateid');
 					$optemplateCreate = array_merge($optemplateCreate, $diff['only2']);
 					foreach($diff['only1'] as $otpl){
@@ -1260,15 +1268,24 @@ COpt::memoryPick();
 
 		DB::update('operations', $operationsUpdate);
 
-		DB::delete('opmessage', array('operationid' => $opmessageDelete_by_opid));
-		DB::delete('opmessage_grp', array('operationid' => $opmessage_grpDelete_by_opid));
-		DB::delete('opmessage_usr', array('operationid' => $opmessage_usrDelete_by_opid));
-		DB::delete('opcommand_hst', array('operationid' => $opcommand_hstDelete_by_opid));
-		DB::delete('opcommand_grp', array('operationid' => $opcommand_grpDelete_by_opid));
-		DB::delete('opcommand_grp', array('opcommand_grpid' => $opcommand_grpDelete));
-		DB::delete('opcommand_hst', array('opcommand_hstid' => $opcommand_hstDelete));
-		DB::delete('opgroup', array('operationid' => $opgroupDelete_by_opid));
-		DB::delete('optemplate', array('operationid' => $optemplateDelete_by_opid));
+		if(!empty($opmessageDelete_by_opid))
+			DB::delete('opmessage', array('operationid' => $opmessageDelete_by_opid));
+		if(!empty($opmessage_grpDelete_by_opid))
+			DB::delete('opmessage_grp', array('operationid' => $opmessage_grpDelete_by_opid));
+		if(!empty($opmessage_usrDelete_by_opid))
+			DB::delete('opmessage_usr', array('operationid' => $opmessage_usrDelete_by_opid));
+		if(!empty($opcommand_hstDelete_by_opid))
+			DB::delete('opcommand_hst', array('operationid' => $opcommand_hstDelete_by_opid));
+		if(!empty($opcommand_grpDelete_by_opid))
+			DB::delete('opcommand_grp', array('operationid' => $opcommand_grpDelete_by_opid));
+		if(!empty($opcommand_grpDelete))
+			DB::delete('opcommand_grp', array('opcommand_grpid' => $opcommand_grpDelete));
+		if(!empty($opcommand_hstDelete))
+			DB::delete('opcommand_hst', array('opcommand_hstid' => $opcommand_hstDelete));
+		if(!empty($opgroupDelete_by_opid))
+			DB::delete('opgroup', array('operationid' => $opgroupDelete_by_opid));
+		if(!empty($optemplateDelete_by_opid))
+			DB::delete('optemplate', array('operationid' => $optemplateDelete_by_opid));
 
 		DB::insert('opmessage', $opmessageCreate, false);
 
