@@ -85,5 +85,11 @@ class testPageInventory extends CWebTest
 		$this->ok($name);
 		$this->ok('HOST PROFILES');
 	}
+
+	public function testPageUserProfile_Sorting()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
 }
 ?>

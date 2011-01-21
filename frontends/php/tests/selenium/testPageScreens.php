@@ -107,22 +107,33 @@ class testPageScreens extends CWebTest
 		DBrestore_tables(array('screens','screens_items'));
 	}
 
-	/**
-	* @dataProvider allScreens
-	*/
-	public function testPageScreens_SingleEnable($action)
-	{
-// TODO
-		$this->markTestIncomplete();
-	}
-
 	public function testPageScreens_Create()
 	{
-// TODO
-		$this->markTestIncomplete();
+		$this->login('screenconf.php');
+		$this->assertTitle('Configuration of screens');
+		$this->button_click('form');
+		$this->wait();
+
+		$this->assertTitle('Configuration of screens');
+		$this->ok('Screens');
+		$this->ok('Name');
+		$this->ok('Columns');
+		$this->ok('Rows');
+
+		$this->button_click('cancel');
+		$this->wait();
+
+		$this->assertTitle('Configuration of screens');
+		$this->nok('Columns');
 	}
 
 	public function testPageScreens_Import()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
+	public function testPageScreens_MassExportAll()
 	{
 // TODO
 		$this->markTestIncomplete();
@@ -132,6 +143,12 @@ class testPageScreens extends CWebTest
 	* @dataProvider allScreens
 	*/
 	public function testPageScreens_MassExport($action)
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
+	public function testPageScreens_MassDeleteAll()
 	{
 // TODO
 		$this->markTestIncomplete();
@@ -168,6 +185,12 @@ class testPageScreens extends CWebTest
 		$this->assertEquals(0,DBcount($sql));
 
 		DBrestore_tables(array('screens','screens_items'));
+	}
+
+	public function testPageScreens_Sorting()
+	{
+// TODO
+		$this->markTestIncomplete();
 	}
 }
 ?>

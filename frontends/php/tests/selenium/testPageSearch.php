@@ -71,5 +71,11 @@ class testPageSearch extends CWebTest
 		$this->ok('Displaying 0 of 0 found');
 		$this->ok('...');
 	}
+
+	public function testPageHosts_Sorting()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
 }
 ?>
