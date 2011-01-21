@@ -285,7 +285,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 
 		$go_result=DBselect($sql);
 		while($row=DBfetch($go_result)){
-			$res = update_action_status($row['actionid'],$status);
+			$res = DBexecute("update actions set status=$status where actionid={$row['actionid']}");
 			if($res)
 				$actionids[] = $row['actionid'];
 		}
@@ -467,7 +467,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 				$conditions,
 				$operations,
 				$status
-				));
+			));
 		}
 
 //----- GO ------

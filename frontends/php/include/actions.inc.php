@@ -19,19 +19,6 @@
 **/
 ?>
 <?php
-function get_action_by_actionid($actionid){
-	$sql='select * from actions where actionid='.$actionid;
-	$result=DBselect($sql);
-
-	if($row=DBfetch($result)){
-		return	$row;
-	}
-	else{
-		error('No action with actionid=['.$actionid.']');
-	}
-return	$result;
-}
-
 function condition_operator2str($operator){
 	$str_op[CONDITION_OPERATOR_EQUAL] 	= '=';
 	$str_op[CONDITION_OPERATOR_NOT_EQUAL]	= '<>';
@@ -484,27 +471,28 @@ function get_operations_by_eventsource($eventsource){
 	return $operations[EVENT_SOURCE_TRIGGERS];
 }
 
-function	operation_type2str($type)
-{
-	$str_type[OPERATION_TYPE_MESSAGE]		= S_SEND_MESSAGE;
-	$str_type[OPERATION_TYPE_COMMAND]		= S_REMOTE_COMMAND;
-	$str_type[OPERATION_TYPE_HOST_ADD]		= S_ADD_HOST;
-	$str_type[OPERATION_TYPE_HOST_REMOVE]		= S_REMOVE_HOST;
-	$str_type[OPERATION_TYPE_HOST_ENABLE]		= S_ENABLE_HOST;
-	$str_type[OPERATION_TYPE_HOST_DISABLE]		= S_DISABLE_HOST;
-	$str_type[OPERATION_TYPE_GROUP_ADD]		= S_ADD_TO_GROUP;
-	$str_type[OPERATION_TYPE_GROUP_REMOVE]		= S_DELETE_FROM_GROUP;
-	$str_type[OPERATION_TYPE_TEMPLATE_ADD]		= S_LINK_TO_TEMPLATE;
-	$str_type[OPERATION_TYPE_TEMPLATE_REMOVE]	= S_UNLINK_FROM_TEMPLATE;
+function operation_type2str($type=null){
+	$types = array(
+		OPERATION_TYPE_MESSAGE => S_SEND_MESSAGE,
+		OPERATION_TYPE_COMMAND => S_REMOTE_COMMAND,
+		OPERATION_TYPE_HOST_ADD => S_ADD_HOST,
+		OPERATION_TYPE_HOST_REMOVE => S_REMOVE_HOST,
+		OPERATION_TYPE_HOST_ENABLE => S_ENABLE_HOST,
+		OPERATION_TYPE_HOST_DISABLE => S_DISABLE_HOST,
+		OPERATION_TYPE_GROUP_ADD => S_ADD_TO_GROUP,
+		OPERATION_TYPE_GROUP_REMOVE => S_DELETE_FROM_GROUP,
+		OPERATION_TYPE_TEMPLATE_ADD => S_LINK_TO_TEMPLATE,
+		OPERATION_TYPE_TEMPLATE_REMOVE => S_UNLINK_FROM_TEMPLATE,
+	);
 
-	if(isset($str_type[$type]))
-		return $str_type[$type];
-
-	return S_UNKNOWN;
+	if(is_null($type))
+		return order_result($types);
+	else if(isset($types[$type]))
+		return $types[$type];
+	else return S_UNKNOWN;
 }
 
-function	get_operators_by_conditiontype($conditiontype)
-{
+function get_operators_by_conditiontype($conditiontype){
 	$operators[CONDITION_TYPE_HOST_GROUP] = array(
 			CONDITION_OPERATOR_EQUAL,
 			CONDITION_OPERATOR_NOT_EQUAL
@@ -605,11 +593,6 @@ function	get_operators_by_conditiontype($conditiontype)
 		return $operators[$conditiontype];
 
 	return array();
-}
-
-function	update_action_status($actionid, $status)
-{
-	return DBexecute("update actions set status=$status where actionid=$actionid");
 }
 
 function validate_condition($conditiontype, $value){
@@ -1167,4 +1150,5 @@ function get_event_actions_stat_hints($eventid){
 	}
 return $actions;
 }
+
 ?>

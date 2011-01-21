@@ -743,7 +743,6 @@ class CHost extends CZBXAPI{
 
 Copt::memoryPick();
 		if(!is_null($options['countOutput'])){
-			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 
@@ -2180,6 +2179,41 @@ Copt::memoryPick();
 			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
+	}
+
+	public static function isReadable($ids){
+		if(!is_array($ids)) return false;
+		if(empty($ids)) return true;
+
+		$ids = array_unique($ids);
+
+		$count = self::get(array(
+			'nodeids' => get_current_nodeid(true),
+			'hostids' => $ids,
+			'output' => API_OUTPUT_SHORTEN,
+			'templated_hosts' => true,
+			'countOutput' => true
+		));
+
+		return (count($ids) == $count);
+	}
+
+	public static function isWritable($ids){
+		if(!is_array($ids)) return false;
+		if(empty($ids)) return true;
+
+		$ids = array_unique($ids);
+
+		$count = self::get(array(
+			'nodeids' => get_current_nodeid(true),
+			'hostids' => $ids,
+			'output' => API_OUTPUT_SHORTEN,
+			'editable' => true,
+			'templated_hosts' => true,
+			'countOutput' => true
+		));
+
+		return (count($ids) == $count);
 	}
 }
 ?>
