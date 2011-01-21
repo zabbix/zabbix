@@ -592,17 +592,19 @@
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
 				while(zbx_strstr($label, '{HOSTNAME}') ||
 						zbx_strstr($label, '{HOST.DNS}') ||
+						zbx_strstr($label, '{HOST.HOST}') ||
+						zbx_strstr($label, '{HOST.NAME}') ||
 						zbx_strstr($label, '{IPADDRESS}') ||
 						zbx_strstr($label, '{HOST.CONN}'))
 				{
 					if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST){
-						$sql = 'SELECT hi.*, h.host '.
+						$sql = 'SELECT hi.*, h.host, h.name '.
 								' FROM interface hi,hosts h '.
 								' WHERE hi.hostid=h.hostid '.
 									' AND hi.hostid='.$db_element['elementid'];
 					}
 					else if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER)
-						$sql =	'SELECT hi.*, h.host '.
+						$sql =	'SELECT hi.*, h.host, h.name '.
 							' FROM interface hi,items i,functions f,hosts h '.
 							' WHERE h.hostid=hi.hostid '.
 								' AND hi.hostid=i.hostid '.
@@ -615,8 +617,16 @@
 					$db_hosts = DBselect($sql);
 
 					if($db_host = DBfetch($db_hosts)){
+						if(zbx_strstr($label, '{HOST.HOST}')){
+							$label = str_replace('{HOST.HOST}', $db_host['host'], $label);
+						}
+
 						if(zbx_strstr($label, '{HOSTNAME}')){
-							$label = str_replace('{HOSTNAME}', $db_host['host'], $label);
+							$label = str_replace('{HOSTNAME}', $db_host['name'], $label);
+						}
+
+						if(zbx_strstr($label, '{HOST.NAME}')){
+							$label = str_replace('{HOST.NAME}', $db_host['name'], $label);
 						}
 
 						if(zbx_strstr($label, '{HOST.DNS}')){

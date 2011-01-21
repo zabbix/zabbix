@@ -1092,7 +1092,7 @@ return $caption;
 					else array_push($exp,'{'.$functionid.'}');
 				}
 				else if(is_numeric($functionid) && $function_data = DBfetch(DBselect($sql))){
-					if($template) $function_data['host'] = '{HOSTNAME}';
+					if($template) $function_data['host'] = '{HOST.HOST}';
 
 					if($resolve_macro){
 						$trigger = $function_data;
@@ -1216,7 +1216,7 @@ return $caption;
 					$function_data+= $trigger['items'][$function_data['itemid']];
 					$function_data+= $trigger['hosts'][$function_data['hostid']];
 
-					if($template) $function_data['host'] = '{HOSTNAME}';
+					if($template) $function_data['host'] = '{HOST.HOST}';
 
 					if($resolve_macro){
 						CUserMacro::resolveItem($function_data);
@@ -1476,8 +1476,9 @@ return $caption;
 		if($row){
 			$description = expand_trigger_description_constants($row['description'], $row);
 
+			// Processing of macros {HOST.HOST1..9}
 			for($i=0; $i<10; $i++){
-				$macro = '{HOSTNAME'.($i ? $i : '').'}';
+				$macro = '{HOST.HOST'.($i ? $i : '').'}';
 				if(zbx_strstr($description, $macro)) {
 					$functionid = trigger_get_N_functionid($row['expression'], $i ? $i : 1);
 
@@ -1491,6 +1492,46 @@ return $caption;
 						if(is_null($host['host']))
 							$host['host'] = $macro;
 						$description = str_replace($macro, $host['host'], $description);
+					}
+				}
+			}
+
+			// Processing of macros {HOSTNAME1..9}
+			for($i=0; $i<10; $i++){
+				$macro = '{HOSTNAME'.($i ? $i : '').'}';
+				if(zbx_strstr($description, $macro)) {
+					$functionid = trigger_get_N_functionid($row['expression'], $i ? $i : 1);
+
+					if(isset($functionid)) {
+						$sql = 'SELECT DISTINCT h.name'.
+								' FROM functions f,items i,hosts h'.
+								' WHERE f.itemid=i.itemid'.
+									' AND i.hostid=h.hostid'.
+									' AND f.functionid='.$functionid;
+						$host = DBfetch(DBselect($sql));
+						if(is_null($host['name']))
+							$host['name'] = $macro;
+						$description = str_replace($macro, $host['name'], $description);
+					}
+				}
+			}
+
+			// Processing of macros {HOST.NAME1..9}
+			for($i=0; $i<10; $i++){
+				$macro = '{HOST.NAME'.($i ? $i : '').'}';
+				if(zbx_strstr($description, $macro)) {
+					$functionid = trigger_get_N_functionid($row['expression'], $i ? $i : 1);
+
+					if(isset($functionid)) {
+						$sql = 'SELECT DISTINCT h.name'.
+								' FROM functions f,items i,hosts h'.
+								' WHERE f.itemid=i.itemid'.
+									' AND i.hostid=h.hostid'.
+									' AND f.functionid='.$functionid;
+						$host = DBfetch(DBselect($sql));
+						if(is_null($host['name']))
+							$host['name'] = $macro;
+						$description = str_replace($macro, $host['name'], $description);
 					}
 				}
 			}
@@ -3665,6 +3706,8 @@ $triggerExpressionRules['macroNum'] = Array(
 		'HOSTNAME[1-9]{1}',
 		'HOST\.CONN[1-9]{1}',
 		'HOST\.DNS[1-9]{1}',
+		'HOST\.HOST[1-9]{1}',
+		'HOST\.NAME[1-9]{1}',
 		'IPADDRESS[1-9]{1}',
 		'ITEM\.LASTVALUE[1-9]{1}',
 		'ITEM\.LOG\.AGE[1-9]{1}',

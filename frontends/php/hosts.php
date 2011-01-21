@@ -521,6 +521,7 @@ include_once('include/page_header.php');
 			}
 			$groups = zbx_toObject($groups, 'groupid');
 
+/*
 			$profile = array();
 			if(get_request('useprofile', 'no') == 'yes'){
 				$profile = array(
@@ -536,7 +537,7 @@ include_once('include/page_header.php');
 					'location' => $_REQUEST['location'],
 					'notes' => $_REQUEST['notes']
 				);
-			}
+			}*/
 
 			$host = array(
 				'host' => $_REQUEST['host'],
@@ -550,7 +551,8 @@ include_once('include/page_header.php');
 				'templates' => $templates,
 				'interfaces' => $interfaces,
 				'macros' => $macros,
-				'profile' => $profile,
+//				'profile' => $profile,
+				'profile' => (get_request('useprofile', 'no') == 'yes') ? get_request('host_profile', array()) : array(),
 				'extendedProfile' => (get_request('useprofile_ext', 'no') == 'yes') ? get_request('ext_host_profiles', array()) : array(),
 			);
 
