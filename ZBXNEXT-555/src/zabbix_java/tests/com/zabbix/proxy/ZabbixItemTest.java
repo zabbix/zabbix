@@ -100,8 +100,11 @@ public class ZabbixItemTest
 					"name[ 'single quotes' remain,'single quotes' ]",
 					"name", new String[] {"'single quotes' remain", "'single quotes' "}),
 			new CorrectParsingHelper(
-					"jmx[127.0.0.1,12345,java.lang:type=Memory,HeapMemoryUsage]",
-					"jmx", new String[] {"127.0.0.1", "12345", "java.lang:type=Memory", "HeapMemoryUsage"}),
+					"jmx[java.lang:type=Memory,HeapMemoryUsage]",
+					"jmx", new String[] {"java.lang:type=Memory", "HeapMemoryUsage"}),
+			new CorrectParsingHelper(
+					"jmx[\"java.lang:type=Memory\",\"HeapMemoryUsage\"]",
+					"jmx", new String[] {"java.lang:type=Memory", "HeapMemoryUsage"}),
 			new CorrectParsingHelper(
 					"arrays.are.not.supported.yet[[arg1]",
 					"arrays.are.not.supported.yet", new String[] {"[arg1"}),

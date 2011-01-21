@@ -59,7 +59,8 @@ class SocketProcessor implements Runnable
 			for (int i = 0; i < keys.length(); i++)
 				items.add(new ZabbixItem(keys.getString(i)));
 
-			JSONArray values = new ItemProcessor(json.getString("conn"), json.getInt("port")).processAll(items);
+			JSONArray values = new ItemProcessor(json.getString("conn"), json.getInt("port"),
+													json.optString("username", null), json.optString("password", null)).processAll(items);
 
 			JSONObject response = new JSONObject();
 			response.put("response", "success");
