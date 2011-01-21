@@ -755,7 +755,9 @@ function validate_commands($commands){
 	foreach($cmd_list as $cmd){
 		$cmd = trim($cmd, "\x00..\x1F");
 //		if(!ereg("^(({HOSTNAME})|".ZBX_EREG_INTERNAL_NAMES.")(:|#)[[:print:]]*$",$cmd,$cmd_items)){
-		if(!preg_match("/^(({HOSTNAME})|".ZBX_PREG_INTERNAL_NAMES.")(:|#)[".ZBX_PREG_PRINT."]*$/", $cmd, $cmd_items)){
+// {HOSTNAME} is supported for backward compatibility
+		if(!preg_match("/^(({HOSTNAME})|".ZBX_PREG_INTERNAL_NAMES.")(:|#)[".ZBX_PREG_PRINT."]*$/", $cmd, $cmd_items) &&
+		!preg_match("/^(({HOST\.HOST})|".ZBX_PREG_INTERNAL_NAMES.")(:|#)[".ZBX_PREG_PRINT."]*$/", $cmd, $cmd_items)){
 			error(S_INCORRECT_COMMAND.": '$cmd'");
 			return FALSE;
 		}
@@ -767,7 +769,9 @@ function validate_commands($commands){
 			}
 		}
 		else if($cmd_items[4] == ':'){ // host
-			if(($cmd_items[1] != '{HOSTNAME}') && !DBfetch(DBselect('select hostid from hosts where host='.zbx_dbstr($cmd_items[1])))){
+			if(($cmd_items[1] != '{HOSTNAME}') && ($cmd_items[1] != '{HOST.HOST}') &&
+				!DBfetch(DBselect('select hostid from hosts where host='.zbx_dbstr($cmd_items[1]))))
+			{
 				error(S_UNKNOWN_HOST_NAME.": '".$cmd_items[1]."' ".S_IN_COMMAND_SMALL." '".$cmd."'");
 				return FALSE;
 			}

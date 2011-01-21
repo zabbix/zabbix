@@ -36,6 +36,7 @@
 	$newgroup	= get_request('newgroup','');
 
 	$host 		= get_request('host',	'');
+	$name 		= get_request('name',	'');
 	$status		= get_request('status',	HOST_STATUS_MONITORED);
 	$proxy_hostid	= get_request('proxy_hostid','');
 
@@ -44,8 +45,7 @@
 	$ipmi_username	= get_request('ipmi_username','');
 	$ipmi_password	= get_request('ipmi_password','');
 
-	$useprofile = get_request('useprofile','no');
-
+/*
 	$devicetype	= get_request('devicetype','');
 	$name		= get_request('name','');
 	$os			= get_request('os','');
@@ -57,8 +57,15 @@
 	$contact	= get_request('contact','');
 	$location	= get_request('location','');
 	$notes		= get_request('notes','');
+*/
 
 	$_REQUEST['hostid'] = get_request('hostid', 0);
+
+// BEGIN: HOSTS PROFILE Section
+	$useprofile	= get_request('useprofile','no');
+	$host_profile	= get_request('host_profile',array());
+// END:   HOSTS PROFILE Section
+
 // BEGIN: HOSTS PROFILE EXTENDED Section
 	$useprofile_ext		= get_request('useprofile_ext','no');
 	$ext_host_profiles	= get_request('ext_host_profiles',array());
@@ -122,6 +129,7 @@
 		$host_groups = zbx_objectValues($dbHost['groups'], 'groupid');
 
 // read profile
+/*
 		$useprofile = 'no';
 		$db_profile = $dbHost['profile'];
 		if(!empty($db_profile)){
@@ -139,6 +147,11 @@
 			$location	= $db_profile['location'];
 			$notes		= $db_profile['notes'];
 		}
+*/
+// BEGIN: HOSTS PROFILE Section
+		$host_profile = $dbHost['profile'];
+		$useprofile = empty($host_profile) ? 'no' : 'yes';
+// END:   HOSTS PROFILE Section
 
 // BEGIN: HOSTS PROFILE EXTENDED Section
 		$ext_host_profiles = $dbHost['profile_ext'];
@@ -150,6 +163,20 @@
 			$templates[$tpl['templateid']] = $tpl['host'];
 		}
 	}
+
+	$profile_fields = array(
+		'devicetype'	=> S_DEVICE_TYPE,
+		'name'		=> S_NAME,
+		'os'		=> S_OS,
+		'serialno'	=> S_SERIALNO,
+		'tag'		=> S_TAG,
+		'macaddress'	=> S_MACADDRESS,
+		'hardware'	=> S_HARDWARE,
+		'software'	=> S_SOFTWARE,
+		'contact'	=> S_CONTACT,
+		'location'	=> S_LOCATION,
+		'notes'		=> S_NOTES
+	);
 
 	$ext_profiles_fields = array(
 		'device_alias'=>S_DEVICE_ALIAS,
@@ -210,7 +237,13 @@
 		'poc_2_cell'=>S_POC_2_CELL,
 		'poc_2_screen'=>S_POC_2_SCREEN,
 		'poc_2_notes'=>S_POC_2_NOTES
-	);
+	)
+;
+	foreach($profile_fields as $field => $caption){
+		if(!isset($host_profile[$field])){
+			$host_profile[$field] = '';
+		}
+	}
 
 	foreach($ext_profiles_fields as $field => $caption){
 		if(!isset($ext_host_profiles[$field])){
@@ -237,7 +270,13 @@
 	if($_REQUEST['hostid']>0) $frmHost->addVar('hostid', $_REQUEST['hostid']);
 	if($_REQUEST['groupid']>0) $frmHost->addVar('groupid', $_REQUEST['groupid']);
 
-	$hostList->addRow(S_NAME, new CTextBox('host',$host,54));
+	$hostTB = new CTextBox('host',$host,54);
+	$hostTB->setAttribute('maxlength', 64);
+	$hostList->addRow(S_NAME, $hostTB);
+
+	$nameTB = new CTextBox('name',$name,54);
+	$nameTB->setAttribute('maxlength', 64);
+	$hostList->addRow(S_NAME, $nameTB);
 
 	$grp_tb = new CTweenBox($frmHost, 'groups', $host_groups, 10);
 	$all_groups = CHostGroup::get(array(
@@ -569,6 +608,7 @@
 
 
 // PROFILE WIDGET {
+/*
 	$profileList = new CFormList('profilelist');
 	$profileList->addRow(array(new CLabel(SPACE, 'useprofile'), new CCheckBox('useprofile', $useprofile)));
 
@@ -585,6 +625,18 @@
 	$profileList->addRow(S_NOTES,new CTextArea('notes',$notes,60,4));
 
 	$divTabs->addTab('profileTab', S_HOST_PROFILE, $profileList);
+*/
+// } PROFILE WIDGET
+
+// PROFILE WIDGET {
+	$profilelist =  new CFormList('profilelist');
+	$profilelist->addRow(array(new CLabel(SPACE, 'useprofile'), new CCheckBox('useprofile', $useprofile)));
+
+	foreach($profile_fields as $prof_field => $caption){
+		$profilelist->addRow($caption, new CTextBox('host_profile['.$prof_field.']',$host_profile[$prof_field],80));
+	}
+
+	$divTabs->addTab('profileTab', S_HOST_PROFILE, $profilelist);
 // } PROFILE WIDGET
 
 // EXT PROFILE WIDGET {
