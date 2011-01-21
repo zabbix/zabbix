@@ -73,6 +73,12 @@ class testPageMediaTypes extends CWebTest
 		$this->assertEquals($oldHash,DBhash($sql));
 	}
 
+	public function testPageMediaTypes_MassDeleteAll()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
 	/**
 	* @dataProvider allMediaTypes
 	*/
@@ -111,6 +117,12 @@ class testPageMediaTypes extends CWebTest
 		}
 
 		DBrestore_tables(array('media_type','media','operations'));
+	}
+
+	public function testPageMediaTypes_Sorting()
+	{
+// TODO
+		$this->markTestIncomplete();
 	}
 }
 ?>

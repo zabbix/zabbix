@@ -116,6 +116,12 @@ class testPageDiscovery extends CWebTest
 		$this->markTestIncomplete();
 	}
 
+	public function testPageDiscovery_MassEnableAll()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
 	/**
 	* @dataProvider allRules
 	*/
@@ -125,10 +131,22 @@ class testPageDiscovery extends CWebTest
 		$this->markTestIncomplete();
 	}
 
+	public function testPageDiscovery_MassDisableAll()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
 	/**
 	* @dataProvider allRules
 	*/
 	public function testPageDiscovery_MassDisable($rule)
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
+	public function testPageDiscovery_Sorting()
 	{
 // TODO
 		$this->markTestIncomplete();

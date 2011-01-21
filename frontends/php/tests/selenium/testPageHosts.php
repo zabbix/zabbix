@@ -120,7 +120,19 @@ class testPageHosts extends CWebTest
 		$this->ok($host['host']);
 	}
 
+	public function testPageHosts_MassExportAll()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
 	public function testPageHosts_MassExport()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
+	public function testPageHosts_MassUpdateAll()
 	{
 // TODO
 		$this->markTestIncomplete();
@@ -132,7 +144,19 @@ class testPageHosts extends CWebTest
 		$this->markTestIncomplete();
 	}
 
+	public function testPageHosts_MassActivateAll()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
 	public function testPageHosts_MassActivate()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
+	public function testPageHosts_MassDisableAll()
 	{
 // TODO
 		$this->markTestIncomplete();
@@ -144,7 +168,19 @@ class testPageHosts extends CWebTest
 		$this->markTestIncomplete();
 	}
 
+	public function testPageHosts_MassDeleteAll()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
 	public function testPageHosts_MassDelete()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
+	public function testPageHosts_Sorting()
 	{
 // TODO
 		$this->markTestIncomplete();

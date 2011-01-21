@@ -79,13 +79,31 @@ class testPageUserGroups extends CWebTest
 		$this->assertEquals($oldHashUsersGroups,DBhash($sql2));
 	}
 
+	public function testPageUserGroups_MassEnableAll()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
 	public function testPageUserGroups_MassEnable()
 	{
 // TODO
 		$this->markTestIncomplete();
 	}
 
+	public function testPageUserGroups_MassDisableAll()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
 	public function testPageUserGroups_MassDisable()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
+	public function testPageUserGroups_MassEnableAPIAll()
 	{
 // TODO
 		$this->markTestIncomplete();
@@ -120,6 +138,12 @@ class testPageUserGroups extends CWebTest
 		$this->assertEquals($oldHashGroups,DBhash($sql1));
 	}
 
+	public function testPageUserGroups_MassDisableAPIAll()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
 	/**
 	* @dataProvider allGroups
 	*/
@@ -147,6 +171,12 @@ class testPageUserGroups extends CWebTest
 		$this->assertEquals(1,DBcount($sql));
 
 		$this->assertEquals($oldHashGroups,DBhash($sql1));
+	}
+
+	public function testPageUserGroups_MassEnableDEBUGAll()
+	{
+// TODO
+		$this->markTestIncomplete();
 	}
 
 	/**
@@ -178,6 +208,12 @@ class testPageUserGroups extends CWebTest
 		$this->assertEquals($oldHashGroups,DBhash($sql1));
 	}
 
+	public function testPageUserGroups_MassDisableDEBUGAll()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
 	/**
 	* @dataProvider allGroups
 	*/
@@ -207,7 +243,19 @@ class testPageUserGroups extends CWebTest
 		$this->assertEquals($oldHashGroups,DBhash($sql1));
 	}
 
+	public function testPageUserGroups_MassDeleteAll()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
 	public function testPageUserGroups_MassDelete()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
+	public function testPageUserGroups_Sorting()
 	{
 // TODO
 		$this->markTestIncomplete();

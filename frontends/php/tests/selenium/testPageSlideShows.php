@@ -92,6 +92,12 @@ class testPageSlideShows extends CWebTest
 		$this->ok('SLIDE SHOWS');
 	}
 
+	public function testPageSlideShows_MassDeleteAll()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
 	/**
 	* @dataProvider allSlideShows
 	*/
@@ -123,6 +129,12 @@ class testPageSlideShows extends CWebTest
 		$this->assertEquals(0,DBcount($sql));
 
 		DBrestore_tables(array('slides','slideshows'));
+	}
+
+	public function testPageSlideShows_Sorting()
+	{
+// TODO
+		$this->markTestIncomplete();
 	}
 }
 ?>
