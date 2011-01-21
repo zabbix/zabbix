@@ -829,28 +829,36 @@ class zbxXML{
 				foreach($hosts as $hnum => $host){
 					$host_db = self::mapXML2arr($host, XML_TAG_HOST);
 
+					// creating interfaces
+					$host_db['interfaces'] = array();
+
 					// it is possible, that data is imported from 1.8, where there was only one network interface per host
 					/**
 					 * @todo when new XML format will be introduced, this check should be changed to XML version check
 					 */
-					$old_version_input = isset($host_db['ip']) || $host_db['ip'] == '';
+					$old_version_input = isset($host_db['ip']) || (isset($host_db['ip']) && $host_db['ip'] == '');
 					if($old_version_input){
+
+						// in some situations, some of the values may not be present
+						if (!isset($host_db['ip'])) $host_db['ip'] = null;
+
+
 						// rearranging host structure, so it would look more like 2.0 host
 
-						// creating interfaces
-						$host_db['interfaces'] = array();
 
-						// the main interface is always agent type
-						$host_db['interfaces'][] = array(
-							'main' => INTERFACE_PRIMARY,
-							'type' => INTERFACE_TYPE_AGENT,
-							'useip' => $host_db['useip'],
-							'ip' =>  $host_db['ip'],
-							'dns' => $host_db['dns'],
-							'port' => $host_db['port']
-						);
+						// the main interface is always "agent" type
+						if (!is_null($host_db['ip'])){
+							$host_db['interfaces'][] = array(
+								'main' => INTERFACE_PRIMARY,
+								'type' => INTERFACE_TYPE_AGENT,
+								'useip' => $host_db['useip'],
+								'ip' =>  $host_db['ip'],
+								'dns' => $host_db['dns'],
+								'port' => $host_db['port']
+							);
+						}
 
-						// did host use impi? if so, adding another interface of ipmi type
+						// did host use impi? if so, adding another interface of "ipmi" type
 						if(isset($host_db['useipmi']) && $host_db['useipmi']){
 							$host_db['interfaces'][] = array(
 								'main' => INTERFACE_SECONDARY,
@@ -863,7 +871,7 @@ class zbxXML{
 						}
 
 
-						// now we need to check if host had SNMP items. If it had, we need and SNPM interface for every different port.
+						// now we need to check if host had SNMP items. If it had, we need and SNMP interface for every different port.
 						$items = $xpath->query('items/item', $host);
 						$snmp_interface_ports_created = array();
 						foreach($items as $item){
@@ -1444,6 +1452,10 @@ class zbxXML{
 							if($current_graph && !isset($rules['graph']['exist'])){
 								info('Graph ['.$graph_db['name'].'] skipped - user rule');
 								continue; // break if not update exist
+							}
+
+							if (!isset($graph_db['ymin_type'])) {
+								throw new APIException(1, _s('No "ymin_type" field for graph "%s"', $graph_db['name']));
 							}
 
 							if($graph_db['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE){
