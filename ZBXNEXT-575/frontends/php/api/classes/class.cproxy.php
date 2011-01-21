@@ -225,7 +225,6 @@ class CProxy extends CZBXAPI{
 		}
 
 		if(!is_null($options['countOutput']) || empty($proxyids)){
-			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 

@@ -496,7 +496,6 @@ class CAction extends CZBXAPI{
 
 COpt::memoryPick();
 		if(!is_null($options['countOutput'])){
-			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 
@@ -932,9 +931,11 @@ COpt::memoryPick();
 	protected static function updateConditions($conditions){
 		$update = array();
 		foreach($conditions as $condition){
+			$conditionid = $condition['conditionid'];
+			unset($condition['conditionid']);
 			$update = array(
 				'values' => $condition,
-				'where' => array('conditionid='.$condition['conditionid'])
+				'where' => array('conditionid='.$conditionid)
 			);
 		}
 		DB::update('conditions', $update);
@@ -1253,6 +1254,8 @@ COpt::memoryPick();
 			else
 				zbx_array_push($operation['opconditions'], array('operationid' => $operation['operationid']));
 
+			self::validateOperationConditions($operation['opconditions']);
+
 			$diff = zbx_array_diff($operation_db['opconditions'], $operation['opconditions'], 'opconditionid');
 			$opconditionsCreate = array_merge($opconditionsCreate, $diff['only2']);
 			DB::delete('opconditions', array('opconditionid' => zbx_objectValues($diff['only1'], 'opconditionid')));
@@ -1313,12 +1316,11 @@ COpt::memoryPick();
 
 
 	public static function delete($actionids){
+		$actionids = zbx_toArray($actionids);
 		try{
 			self::BeginTransaction(__METHOD__);
 
 			if(empty($actionids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
-
-			$actionids = zbx_toArray($actionids);
 
 			$options = array(
 				'actionids' => $actionids,
@@ -1360,82 +1362,57 @@ COpt::memoryPick();
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect operation escalation period.'));
 			}
 
+			$hostIdsAll = $hostGroupIdsAll = $userIdsAll = $userGroupIdsAll = array();
 			switch($operation['operationtype']){
 				case OPERATION_TYPE_MESSAGE:
-					if((!isset($operation['opmessage_usr']) || empty($operation['opmessage_usr']))
-							&& (!isset($operation['opmessage_grp']) || empty($operation['opmessage_grp']))){
+					$userids = isset($operation['opmessage_usr'])
+							? zbx_objectValues($operation['opmessage_usr'], 'userid')
+							: array();
+					$usergroupids = isset($operation['opmessage_grp'])
+							? zbx_objectValues($operation['opmessage_grp'], 'usrgrpid')
+							: array();
+
+					if(empty($userids) && empty($usergroupids))
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('No recipients for operation message.'));
-					}
 
-					if(isset($operation['opmessage_usr'])){
-						$userids = array_unique(zbx_objectValues($operation['opmessage_usr'], 'userid'));
-
-						$users_db = CUser::get(array(
-							'userids' => $userids,
-							'output' => API_OUTPUT_SHORTEN,
-							'preservekeys' => true,
-						));
-
-						if(count($userids) != count($users_db)){
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect operation user.'));
-						}
-					}
-
-					if(isset($operation['opmessage_grp'])){
-						$usrgrpids = array_unique(zbx_objectValues($operation['opmessage_grp'], 'usrgrpid'));
-
-						$usrgrps_db = CUserGroup::get(array(
-							'usrgrpids' => $usrgrpids,
-							'output' => API_OUTPUT_SHORTEN,
-							'preservekeys' => true,
-						));
-
-						if(count($usrgrpids) != count($usrgrps_db)){
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect operation group.'));
-						}
-					}
-
+					$userIdsAll = array_merge($userIdsAll, $userids);
+					$userGroupIdsAll = array_merge($userGroupIdsAll, $usergroupids);
 					break;
 				case OPERATION_TYPE_COMMAND:
-					if((!isset($operation['opcommand_hst']) || empty($operation['opcommand_hst'])) &&
-						(!isset($operation['opcommand_grp']) || empty($operation['opcommand_grp'])))
-					{
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('No targets for operation command.'));
-					}
+					$groupids = isset($operation['opcommand_grp'])
+							? zbx_objectValues($operation['opcommand_grp'], 'groupid')
+							: array();
+					$hostids = isset($operation['opcommand_hst'])
+							? zbx_objectValues($operation['opcommand_hst'], 'hostid')
+							: array();
 
-					self::validateCommands($operation);
+					if(empty($groupids) && empty($hostids))
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('No targets for operation command.'));
+
+					$hostIdsAll = array_merge($hostIdsAll, $hostids);
+					$hostGroupIdsAll = array_merge($hostGroupIdsAll, $groupids);
 					break;
 				case OPERATION_TYPE_GROUP_ADD:
 				case OPERATION_TYPE_GROUP_REMOVE:
-					if(!isset($operation['opgroup']) || empty($operation['opgroup'])){
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Operation has no group to operate.'));
-					}
+					$groupids = isset($operation['opgroup'])
+							? zbx_objectValues($operation['opgroup'], 'groupid')
+							: array();
 
-					$group = CHostGroup::get(array(
-						'groupids' => zbx_objectValues($operation['opgroup'],'groupid'),
-						'output' => API_OUTPUT_SHORTEN,
-						'editable' => 1,
-						'preservekeys' => true,
-					));
-					if(empty($group)){
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect operation group.'));
-					}
+					if(empty($groupids))
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Operation has no group to operate.'));
+
+					$hostGroupIdsAll = array_merge($hostGroupIdsAll, $groupids);
 					break;
 				case OPERATION_TYPE_TEMPLATE_ADD:
 				case OPERATION_TYPE_TEMPLATE_REMOVE:
-					if(!isset($operation['optemplate']) || empty($operation['optemplate'])){
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Operation has no template to operate.'));
-					}
+					$templateids = isset($operation['optemplate'])
+							? zbx_objectValues($operation['optemplate'], 'templateid')
+							: array();
 
-					$tpl = CTemplate::get(array(
-						'templateids' => zbx_objectValues($operation['optemplate'],'templateid'),
-						'output' => API_OUTPUT_SHORTEN,
-						'editable' => 1,
-						'preservekeys' => true,
-					));
-					if(empty($tpl)){
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect operation template.'));
-					}
+					if(empty($templateids))
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Operation has no template to operate.'));
+
+					$hostIdsAll = array_merge($hostIdsAll, $templateids);
 					break;
 				case OPERATION_TYPE_HOST_ADD:
 				case OPERATION_TYPE_HOST_REMOVE:
@@ -1447,92 +1424,120 @@ COpt::memoryPick();
 			}
 		}
 
+		if(!CHostGroup::isWritable($hostGroupIdsAll))
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect operation group.'));
+		if(!CHost::isWritable($hostIdsAll))
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect operation host.'));
+		if(!CUser::isWritable($userIdsAll))
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect operation user.'));
+		if(!CUserGroup::isWritable($userGroupIdsAll))
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect operation user group.'));
+
 		return true;
-	}
-
-	public static function validateCommands($commands){
-
-		return true;
-
-		$cmd_list = explode("\n",$commands);
-		foreach($cmd_list as $cmd){
-			$cmd = trim($cmd, "\x00..\x1F");
-	//		if(!ereg("^(({HOSTNAME})|".ZBX_EREG_INTERNAL_NAMES.")(:|#)[[:print:]]*$",$cmd,$cmd_items)){
-			if(!preg_match("/^(({HOSTNAME})|".ZBX_PREG_INTERNAL_NAMES.")(:|#)[".ZBX_PREG_PRINT."]*$/", $cmd, $cmd_items)){
-				error(S_INCORRECT_COMMAND.": '$cmd'");
-				return FALSE;
-			}
-
-			if($cmd_items[4] == '#'){ // group
-				if(!DBfetch(DBselect('select groupid from groups where name='.zbx_dbstr($cmd_items[1])))){
-					error(S_UNKNOWN_GROUP_NAME.": '".$cmd_items[1]."' ".S_IN_COMMAND_SMALL." '".$cmd."'");
-					return FALSE;
-				}
-			}
-			else if($cmd_items[4] == ':'){ // host
-				if(($cmd_items[1] != '{HOSTNAME}') && !DBfetch(DBselect('select hostid from hosts where host='.zbx_dbstr($cmd_items[1])))){
-					error(S_UNKNOWN_HOST_NAME.": '".$cmd_items[1]."' ".S_IN_COMMAND_SMALL." '".$cmd."'");
-					return FALSE;
-				}
-			}
-		}
 	}
 
 	public static function validateConditions($conditions){
-		$groupids = $hostids = $triggerids = array();
-		foreach($conditions as $ac_data){
-			if($ac_data['operator'] != 0) continue;
+		$conditions = zbx_toArray($conditions);
 
-			switch($ac_data['conditiontype']){
+		$hostGroupIdsAll = array();
+		$templateIdsAll = array();
+		$triggerIdsAll = array();
+		$hostIdsAll = array();
+
+		$discoveryCheckTypes = discovery_check_type2str();
+		$discoveryObjectStatuses = discovery_object_status2str();
+
+		foreach($conditions as $condition){
+			switch($condition['conditiontype']){
 				case CONDITION_TYPE_HOST_GROUP:
-					$groupids[$ac_data['value']] = $ac_data['value'];
+					$hostGroupIdsAll[$condition['value']] = $condition['value'];
 					break;
-				case CONDITION_TYPE_HOST:
 				case CONDITION_TYPE_HOST_TEMPLATE:
-					$hostids[$ac_data['value']] = $ac_data['value'];
+					$templateIdsAll[$condition['value']] = $condition['value'];
 					break;
 				case CONDITION_TYPE_TRIGGER:
-					$triggerids[$ac_data['value']] = $ac_data['value'];
+					$triggerIdsAll[$condition['value']] = $condition['value'];
 					break;
+				case CONDITION_TYPE_HOST:
+					$hostIdsAll[$condition['value']] = $condition['value'];
+					break;
+				case CONDITION_TYPE_TIME_PERIOD:
+					if(!validate_period($condition['value'])){
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect condition period "%s".', $condition['value']));
+					}
+					break;
+				case CONDITION_TYPE_DHOST_IP:
+					if(!validate_ip_range($condition['value']) ){
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect condition ip "%s".', $condition['value']));
+					}
+					break;
+				case CONDITION_TYPE_DSERVICE_TYPE:
+					if(!isset($discoveryCheckTypes[$condition['value']])){
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect condition discovery check.'));
+					}
+					break;
+				case CONDITION_TYPE_DSERVICE_PORT:
+					if(!validate_port_list($condition['value'])){
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect condition port "%s".', $condition['value']));
+					}
+					break;
+				case CONDITION_TYPE_DSTATUS:
+					if(isset($discoveryObjectStatuses[$condition['value']])){
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect condition discovery status.'));
+					}
+					break;
+				case CONDITION_TYPE_TRIGGER_NAME:
+				case CONDITION_TYPE_TRIGGER_VALUE:
+				case CONDITION_TYPE_TRIGGER_SEVERITY:
+				case CONDITION_TYPE_MAINTENANCE:
+				case CONDITION_TYPE_NODE:
+				case CONDITION_TYPE_DRULE:
+				case CONDITION_TYPE_DCHECK:
+				case CONDITION_TYPE_DOBJECT:
+				case CONDITION_TYPE_PROXY:
+				case CONDITION_TYPE_DUPTIME:
+				case CONDITION_TYPE_DVALUE:
+				case CONDITION_TYPE_APPLICATION:
+				case CONDITION_TYPE_HOST_NAME:
+					break;
+				default:
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect condition type'));
 			}
 		}
 
-		$options = array(
-			'groupids' => $groupids,
-			'editable' => true,
-			'preservekeys' => true,
-		);
-		$groups = CHostgroup::get($options);
-		foreach($groupids as $groupid){
-			if(!isset($groups[$groupid])) self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect group'));
-		}
+		if(!CHostGroup::isWritable($hostGroupIdsAll))
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect condition host group.'));
+		if(!CHost::isWritable($hostIdsAll))
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect condition host.'));
+		if(!CTemplate::isWritable($templateIdsAll))
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect condition template.'));
+		if(!CTrigger::isWritable($triggerIdsAll))
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect condition trigger.'));
 
-		$options = array(
-			'hostids' => $hostids,
-			'editable' => true,
-			'preservekeys' => true,
-		);
-		$hosts = CHost::get($options);
-		foreach($hostids as $hnum => $hostid){
-			if(!isset($hosts[$hostid])) self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect host'));
-		}
+		return true;
+	}
 
-		$options = array(
-			'triggerids' => $triggerids,
-			'editable' => true,
-			'preservekeys' => true,
-		);
-		$triggers = CTrigger::get($options);
-		foreach($triggerids as $hnum => $triggerid){
-			if(!isset($triggers[$triggerid])) self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect trigger'));
-		}
+	public static function validateoperationConditions($conditions){
+		$conditions = zbx_toArray($conditions);
 
-// TODO: peredelatj
-		foreach($conditions as $cnum => $condition){
-			if(!validate_condition($condition['conditiontype'], $condition['value'])){
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_PARAMETER_USED_FOR_CONDITIONS);
+		$ackStatuses = array(
+			S_ACK => 1,
+			S_NOT_ACK => 1
+		);
+
+		foreach($conditions as $condition){
+			switch($condition['conditiontype']){
+				case CONDITION_TYPE_EVENT_ACKNOWLEDGED:
+					if(!isset($ackStatuses[$condition['value']])){
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect operation condition acknowledge type.'));
+					}
+					break;
+				default:
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect operation condition type'));
 			}
 		}
+
+		return true;
 	}
 
 }

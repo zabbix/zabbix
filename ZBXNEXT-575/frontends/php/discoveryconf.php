@@ -176,7 +176,7 @@ include_once('include/page_header.php');
 
 		$go_result = false;
 		foreach($_REQUEST['g_druleid'] as $drid){
-			if(set_discovery_rule_status($drid,$status)){
+			if(DBexecute('update drules set status='.$status.' where druleid='.$drid)){
 				$rule_data = get_discovery_rule_by_druleid($drid);
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_DISCOVERY_RULE,
 					'['.$drid.'] '.$rule_data['name']);

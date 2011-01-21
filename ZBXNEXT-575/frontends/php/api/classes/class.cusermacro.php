@@ -381,7 +381,6 @@ class CUserMacro extends CZBXAPI{
 		}
 
 		if(!is_null($options['countOutput'])){
-			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 
@@ -972,7 +971,7 @@ class CUserMacro extends CZBXAPI{
 			);
 			$db_macros = self::get($options);
 //--
-			
+
 			$updateMacros = zbx_toHash($data['macros'], 'macro');
 
 			$hostmacroids = array();
@@ -1004,7 +1003,7 @@ class CUserMacro extends CZBXAPI{
 	public static function getMacros($macros, $options){
 		zbx_value2array($macros);
 		$macros = array_unique($macros);
-		
+
 		$result = array();
 
 		$obj_options = array(
@@ -1016,8 +1015,8 @@ class CUserMacro extends CZBXAPI{
 			'templated_hosts' => true,
 		);
 		$hosts = CHost::get($obj_options);
-		$hostids = array_keys($hosts);	
-		
+		$hostids = array_keys($hosts);
+
 		do{
 			$obj_options = array(
 				'hostids' => $hostids,
