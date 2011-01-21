@@ -1219,6 +1219,7 @@ COpt::memoryPick();
 				case OPERATION_TYPE_GROUP_REMOVE:
 					if(!isset($operation['opgroup'])) $operation['opgroup'] = array();
 					else zbx_array_push($operation['opgroup'], array('operationid' => $operation['operationid']));
+					if(!isset($operation_db['opgroup'])) $operation_db['opgroup'] = array();
 
 					$diff = zbx_array_diff($operation_db['opgroup'], $operation['opgroup'], 'groupid');
 					$opgroupCreate = array_merge($opgroupCreate, $diff['only2']);
@@ -1233,6 +1234,7 @@ COpt::memoryPick();
 				case OPERATION_TYPE_TEMPLATE_REMOVE:
 					if(!isset($operation['optemplate'])) $operation['optemplate'] = array();
 					else zbx_array_push($operation['optemplate'], array('operationid' => $operation['operationid']));
+					if(!isset($operation_db['optemplate'])) $operation_db['optemplate'] = array();
 
 					$diff = zbx_array_diff($operation_db['optemplate'], $operation['optemplate'], 'templateid');
 					$optemplateCreate = array_merge($optemplateCreate, $diff['only2']);
