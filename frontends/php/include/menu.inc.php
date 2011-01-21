@@ -317,10 +317,8 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page) {
 				$page['menu'] = $label;
 				$row['selected'] = true;
 
-				if(!defined('ZBX_PAGE_NO_MENU')){
+				if(!defined('ZBX_PAGE_NO_MENU'))
 					CProfile::update('web.menu.'.$label.'.last', $sub_page['url'], PROFILE_TYPE_STR);
-					if($page['file'] != 'profile.php') CProfile::update('web.paging.lastpage', $page['file'], PROFILE_TYPE_STR);
-				}
 			}
 
 			if($show_sub_menu) $sub_menus[$label][] = $row;
