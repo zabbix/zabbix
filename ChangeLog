@@ -68,6 +68,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
 
+ - [ZBX-3440] Added pagination to slide and discovery configuration (KB)
  - [ZBX-3433] fixed removing deleted passive proxies from queue (Sasha)
  - [ZBX-416] fixed PostgreSQL errors in configuration sender module when using DM setup (Sasha)
  - [ZBX-3346] fixed items being polled more frequently than necessary (Sasha)
