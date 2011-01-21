@@ -1,5 +1,7 @@
 ALTER TABLE users ALTER COLUMN userid SET WITH DEFAULT NULL;
 REORG TABLE users;
+ALTER TABLE users ALTER COLUMN lang SET WITH DEFAULT 'en_GB';
+REORG TABLE users;
 UPDATE users SET lang = 'zh_CN' WHERE lang = 'cn_zh';
 UPDATE users SET lang = 'es_ES' WHERE lang = 'sp_sp';
 UPDATE users SET lang = 'en_GB' WHERE lang = 'en_gb';

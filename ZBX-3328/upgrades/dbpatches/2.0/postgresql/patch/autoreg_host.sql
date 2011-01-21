@@ -1,3 +1,5 @@
+DROP INDEX autoreg_host_1;
+CREATE INDEX autoreg_host_1 ON autoreg_host (proxy_hostid,host);
 ALTER TABLE ONLY autoreg_host ALTER autoreg_hostid DROP DEFAULT,
 			      ALTER proxy_hostid DROP DEFAULT,
 			      ALTER proxy_hostid DROP NOT NULL,

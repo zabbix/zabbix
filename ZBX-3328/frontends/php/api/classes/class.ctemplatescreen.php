@@ -78,6 +78,7 @@ class CTemplateScreen extends CScreen{
 // filter
 			'filter'					=> null,
 			'search'					=> null,
+			'searchByAny'			=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 // OutPut
@@ -643,7 +644,7 @@ class CTemplateScreen extends CScreen{
 			DB::update('screens', $update);
 
 			self::EndTransaction(true, __METHOD__);
-			return true;
+			return  array('screenids' => zbx_objectValues($screens, 'screenid'));
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);

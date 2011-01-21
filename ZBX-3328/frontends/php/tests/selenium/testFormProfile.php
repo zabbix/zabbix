@@ -19,15 +19,15 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/class.ctest.php');
+require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testFormProfile extends CTest
+class testFormProfile extends CWebTest
 {
 	public $oldHash;
 
 	public function hashUsersExcept($user)
 	{
-		$this->oldHash=$this->DBhash("select * from users where alias<>'$user'");
+		$this->oldHash=DBhash("select * from users where alias<>'$user' order by userid");
 	}
 
 	protected function assertPreConditions()

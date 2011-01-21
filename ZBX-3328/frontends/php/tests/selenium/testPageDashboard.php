@@ -19,9 +19,9 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/class.ctest.php');
+require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageDashboard extends CTest
+class testPageDashboard extends CWebTest
 {
 	public $host = "Text host";
 

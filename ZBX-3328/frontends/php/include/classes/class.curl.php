@@ -176,8 +176,14 @@ class Curl{
 			foreach($args as $id => $arg){
 				if(empty($arg)) continue;
 
-				list($name, $value) = explode('=',$arg);
-				$this->arguments[$name] = isset($value) ? urldecode($value):'';
+				if(strpos($arg, '=') !== false){
+					list($name, $value) = explode('=', $arg);
+					$this->arguments[$name] = isset($value) ? urldecode($value):'';
+				}
+				else{
+					$this->arguments[$arg] = '';
+				}
+
 			}
 		}
 		$this->formatQuery();
