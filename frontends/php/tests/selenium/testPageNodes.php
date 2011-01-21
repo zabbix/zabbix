@@ -94,10 +94,22 @@ class testPageNodes extends CWebTest
 */
 	}
 
+	public function testPageNodes_MassDeleteAll()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
 	/**
 	* @dataProvider allNodes
 	*/
 	public function testPageNodes_MassDelete($node)
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
+	public function testPageNodes_Sorting()
 	{
 // TODO
 		$this->markTestIncomplete();

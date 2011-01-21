@@ -39,5 +39,11 @@ class testPageEvents extends CWebTest
 		// table header
 		$this->ok(array('Time','Description','Status','Severity','Duration','Ack','Actions'));
 	}
+
+	public function testPageEvents_Triggers_Sorting()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
 }
 ?>

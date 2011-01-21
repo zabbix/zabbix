@@ -124,6 +124,12 @@ class testPageMaps extends CWebTest
 		$this->assertEquals($oldHashLinkTriggers,DBhash($sql4),"Chuck Norris: Map update changed data in table 'sysmaps_link_triggers'");
 	}
 
+	public function testPageMaps_MassDeleteAll()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
 	/**
 	* @dataProvider allMaps
 	*/
@@ -158,6 +164,12 @@ class testPageMaps extends CWebTest
 		DBsave_tables(array('sysmaps','sysmaps_elements','sysmaps_links','sysmaps_link_triggers'));
 	}
 
+	public function testPageMaps_MassExportAll()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
 	/**
 	* @dataProvider allMaps
 	*/
@@ -169,11 +181,24 @@ class testPageMaps extends CWebTest
 
 	public function testPageMaps_Create()
 	{
+		$this->login('sysmaps.php');
+		$this->assertTitle('Network maps');
+		$this->button_click('form');
+		$this->wait();
+		$this->ok('New system map');
+		$this->button_click('cancel');
+		$this->wait();
+		$this->assertTitle('Network maps');
+		$this->ok('Configuration of network maps');
+	}
+
+	public function testPageMaps_Import()
+	{
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageMaps_Import()
+	public function testPageMaps_Sorting()
 	{
 // TODO
 		$this->markTestIncomplete();
