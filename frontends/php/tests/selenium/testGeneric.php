@@ -19,9 +19,9 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/class.ctest.php');
+require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testGeneric extends CTest
+class testGeneric extends CWebTest
 {
 	public static function provider()
 	{
@@ -145,7 +145,7 @@ class testGeneric extends CTest
 		$this->open($a);
 		foreach($this->failIfExists as $str)
 		{
-			$this->assertTextNotPresent($str,'assertTextNotPresent('.$a.','.$str.')');
+			$this->nok($str,'assertTextNotPresent('.$a.','.$str.')');
 		}
 	}
 
@@ -158,7 +158,7 @@ class testGeneric extends CTest
 		$this->open($a);
 		foreach($this->failIfNotExists as $str)
 		{
-			$this->assertTextPresent($str,'assertTextPresent('.$a.','.$str.')');
+			$this->ok($str,'assertTextPresent('.$a.','.$str.')');
 		}
 	}
 }

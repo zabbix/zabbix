@@ -139,6 +139,7 @@ class CTrigger extends CZBXAPI{
 
 			'filter'					=> null,
 			'search'					=> null,
+			'searchByAny'			=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 
@@ -1263,16 +1264,19 @@ COpt::memoryPick();
 				}
 
 				// if some of the properties are unchanged, no need to update them in DB
-				if(isset($trigger['description']) && strcmp($trigger['description'], $dbTrigger['description']) != 0)
+				if(isset($trigger['description']) && strcmp($trigger['description'], $dbTrigger['description']) == 0)
 					unset($triggers[$tnum]['description']);
 				if(isset($trigger['priority']) && ($trigger['priority'] == $dbTrigger['priority']))
 					unset($triggers[$tnum]['priority']);
 				if(isset($trigger['type']) && ($trigger['type'] == $dbTrigger['type']))
 					unset($triggers[$tnum]['type']);
-				if(isset($trigger['url']) && ($trigger['url'] == $dbTrigger['url']))
+				if(isset($trigger['comments']) && strcmp($trigger['comments'], $dbTrigger['comments']) == 0)
+					unset($triggers[$tnum]['comments']);
+				if(isset($trigger['url']) && strcmp($trigger['url'], $dbTrigger['url']) == 0)
 					unset($triggers[$tnum]['url']);
 				if(isset($trigger['status']) && ($trigger['status'] == $dbTrigger['status']))
 					unset($triggers[$tnum]['status']);
+
 			}
 
 			self::updateReal($triggers);
@@ -1300,11 +1304,13 @@ COpt::memoryPick();
  * @return array
  */
 	public static function delete($triggerids, $nopermissions=false){
-		if(empty($triggerids)) return true;
+
 		$triggerids = zbx_toArray($triggerids);
 
 		try{
 			self::BeginTransaction(__METHOD__);
+
+			if(empty($triggerids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
 
 			$options = array(
 				'triggerids' => $triggerids,
@@ -1486,7 +1492,7 @@ COpt::memoryPick();
 
 			$expression = implode_exp($trigger['expression'], $triggerid);
 			if(is_null($expression)){
-				self::exception(_s('Cannot implode expression'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot implode expression "%s".', $trigger['expression']));
 			}
 
 			DB::update('triggers', array(
@@ -1878,120 +1884,4 @@ COpt::memoryPick();
 
 }
 
-/*
-interface IValidator{
-	public static function validate($value, $params, $context=array());
-}
-
-abstract class CValidator{
-
-	protected static function validateContext($hash, $rules){
-		foreach($rules as $field => $filters){
-			$value = isset($hash[$field]) ? $hash[$field] : null;
-
-			foreach($filters as $filter){
-				$validator = array_shift($filter);
-				$result = call_user_func_array(array('C'.$validator.'Validator', 'validate'), array($value, $filter));
-
-				return $result['valid'];
-			}
-		}
-
-		return true;
-	}
-}
-
-class CStringValidator extends CValidator implements IValidator{
-	public static function validate($value, $params, $context=array()){
-		if(isset($params['condition']) && !self::validateContext($context, $params['condition'])){
-			return array('valid' => true);
-		}
-
-		if(is_null($value) || is_string($value)){
-			$result = array('valid' => true);
-		}
-		else{
-			$result = array('valid' => false, 'error' => $value.' is not string');
-		}
-		return $result;
-	}
-}
-
-class CArrayValidator extends CValidator implements IValidator{
-	public static function validate($value, $params, $context=array()){
-		$value = zbx_toArray($value);
-
-		foreach($value as $num => $hash){
-			$result = CHashValidator::validate($hash, $params);
-			if(!$result['valid'])
-				return array('valid' => false, 'error' => 'Element ['.$num.']: '.$result['error']);
-		}
-
-		return array('valid' => true);
-	}
-}
-
-class CRequiredValidator extends CValidator implements IValidator{
-	public static function validate($value, $params, $context=array()){
-		if(isset($params['condition']) && !self::validateContext($context, $params['condition'])){
-			return array('valid' => true);
-		}
-
-		if(empty($value)){
-			$result = array('valid' => false, 'error' => $value.' is empty');
-		}
-		else{
-			$result = array('valid' => true);
-		}
-		return $result;
-	}
-}
-
-class CHashValidator extends CValidator implements IValidator{
-	public static function validate($value, $params, $context=array()){
-		if(!isset($params['rules'])) echo 'no rules';
-		$rules = $params['rules'];
-
-		$rules_fields = array_keys($rules);
-		$input_fields = array_keys($value);
-		$diff = array_diff($input_fields, $rules_fields);
-
-		if(!empty($diff)){
-			return array('valid' => false, 'error' => 'Unknown elements: ['.implode(', ', $diff).']');
-		}
-
-		foreach($rules as $field => $filters){
-			$fieldValue = isset($value[$field]) ? $value[$field] : null;
-
-			foreach($filters as $filter){
-				$validator = array_shift($filter);
-				$validator = array('C'.$validator.'Validator', 'validate');
-
-				$result = call_user_func_array($validator, array($fieldValue, $filter, $value));
-				if(!$result['valid'])
-					return array('valid' => false, 'error' => 'Field ['.$field.']: '.$result['error']);
-			}
-		}
-
-		return array('valid' => true);
-	}
-}
-
-class CRangeValidator extends CValidator implements IValidator{
-	public static function validate($value, $params, $context=array()){
-		if(isset($params['rules']) && !self::validateContext($context, $params['rules'])){
-			return array('valid' => true);
-		}
-
-		if(is_null($value) || in_array($value, $params['range'])){
-			$result = array('valid' => true);
-		}
-		else{
-			$result = array('valid' => false, 'error' => $value.' not in range ('.implode(', ',$params['range']).')');
-		}
-		return $result;
-	}
-}
-
-*/
 ?>

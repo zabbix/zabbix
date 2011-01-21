@@ -22,16 +22,14 @@
 
 require_once 'PHPUnit/Extensions/SeleniumTestCase.php';
 
-require_once(dirname(__FILE__).'/../../conf/zabbix.conf.php');
-require_once(dirname(__FILE__).'/../../include/copt.lib.php');
-require_once(dirname(__FILE__).'/../../include/func.inc.php');
-require_once(dirname(__FILE__).'/../../include/db.inc.php');
+require_once(dirname(__FILE__).'/../../include/defines.inc.php');
+require_once(dirname(__FILE__).'/dbfunc.php');
 
-class CTest extends PHPUnit_Extensions_SeleniumTestCase
+class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 {
 	protected $captureScreenshotOnFailure = TRUE;
 	protected $screenshotPath = '/home/hudson/public_html/screenshots';
-	protected $screenshotUrl = 'http://hudson/~hudson/screenshots';
+	protected $screenshotUrl = 'http://192.168.3.32/~hudson/screenshots';
 
 	// List of strings that should NOT appear on any page
 	public $failIfExists = array (
@@ -70,7 +68,12 @@ class CTest extends PHPUnit_Extensions_SeleniumTestCase
 
 		$this->setHost('localhost');
 		$this->setBrowser('*firefox');
-		$this->setBrowserUrl('http://hudson/~hudson/'.PHPUNIT_URL.'/frontends/php/');
+		if(strstr(PHPUNIT_URL,'http://'))
+		{
+			$this->setBrowserUrl(PHPUNIT_URL);
+		} else {
+			$this->setBrowserUrl('http://hudson/~hudson/'.PHPUNIT_URL.'/frontends/php/');
+		}
 
 /*		if(!DBConnect($error))
 		{
@@ -78,46 +81,12 @@ class CTest extends PHPUnit_Extensions_SeleniumTestCase
 			exit;
 		}*/
 
-		// Connect once, do not reconnect
 		if(!isset($DB['DB'])) DBConnect($error);
 	}
 
 	protected function tearDown()
 	{
-// Do not close DB for better performance
-//		DBclose();
-	}
-
-	protected function DBhash($sql)
-	{
-		global $DB;
-
-		$hash = '';
-
-		$result=DBselect($sql);
-		while($row = DBfetch($result))
-		{
-			foreach($row as $key => $value)
-			{
-				$hash = md5($hash.$value);
-			}
-		}
-
-		return $hash;
-	}
-
-	protected function DBcount($sql)
-	{
-		global $DB;
-		$cnt=0;
-
-		$result=DBselect($sql);
-		while($row = DBfetch($result))
-		{
-			$cnt++;
-		}
-
-		return $cnt;
+		DBclose();
 	}
 
 	public function login($url = NULL)
@@ -139,6 +108,8 @@ class CTest extends PHPUnit_Extensions_SeleniumTestCase
 			$this->open($url);
 			$this->wait();
 		}
+		$this->ok('Admin');
+		$this->nok('Login name or password is incorrect');
 	}
 
 	public function logout()
@@ -151,13 +122,20 @@ class CTest extends PHPUnit_Extensions_SeleniumTestCase
 	{
 		foreach($this->failIfExists as $str)
 		{
-			$this->assertTextNotPresent($str);
+			$this->assertTextNotPresent($str,"Chuck Norris: I do not expect string '$str' here.");
 		}
 	}
 
-	public function ok($str)
+	public function ok($strings)
 	{
-		$this->assertTextPresent($str);
+		if(!is_array($strings))	$strings=array($strings);
+		foreach($strings as $string) $this->assertTextPresent($string,"Chuck Norris: I expect string '$string' here");
+	}
+
+	public function nok($strings)
+	{
+		if(!is_array($strings))	$strings=array($strings);
+		foreach($strings as $string) $this->assertTextNotPresent($string,"Chuck Norris: I do not expect string '$string' here");
 	}
 
 	public function button_click($a)
@@ -191,7 +169,5 @@ class CTest extends PHPUnit_Extensions_SeleniumTestCase
 		$this->waitForPageToLoad();
 		$this->checkFatalErrors();
 	}
-
-
 }
 ?>

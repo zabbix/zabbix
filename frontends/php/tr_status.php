@@ -365,7 +365,7 @@ require_once('include/templates/scriptConfirm.js.php');
 				'filter' => array(
 					'object' => EVENT_OBJECT_TRIGGER,
 					'value_changed' => TRIGGER_VALUE_CHANGED_YES,
-					'acknowledged' => false,
+					'acknowledged' => 0,
 					'value' => TRIGGER_VALUE_TRUE,
 				),
 				'nopermissions' => true
