@@ -1521,8 +1521,8 @@ COpt::memoryPick();
 		$conditions = zbx_toArray($conditions);
 
 		$ackStatuses = array(
-			S_ACK => 1,
-			S_NOT_ACK => 1
+			EVENT_ACKNOWLEDGED => 1,
+			EVENT_NOT_ACKNOWLEDGED => 1
 		);
 
 		foreach($conditions as $condition){
