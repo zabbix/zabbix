@@ -121,3 +121,7 @@ UPDATE hosts SET proxy_hostid=NULL WHERE proxy_hostid=0;
 UPDATE hosts SET maintenanceid=NULL WHERE maintenanceid=0;
 ALTER TABLE hosts ADD CONSTRAINT c_hosts_1 FOREIGN KEY (proxy_hostid) REFERENCES hosts (hostid);
 ALTER TABLE hosts ADD CONSTRAINT c_hosts_2 FOREIGN KEY (maintenanceid) REFERENCES maintenances (maintenanceid);
+
+-- added column for visible name
+ALTER TABLE hosts ADD name varchar(64) DEFAULT '' NOT NULL;
+CREATE INDEX hosts_4 on hosts (name);
