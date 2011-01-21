@@ -1,5 +1,6 @@
 package com.zabbix.proxy;
 
+import java.util.HashMap;
 import java.util.Vector;
 
 import javax.management.MBeanAttributeInfo;
@@ -23,18 +24,35 @@ class ItemProcessor
 	private JMXConnector jmxc;
 	private MBeanServerConnection mbsc;
 
-	public ItemProcessor(String conn, int port) throws java.net.MalformedURLException
+	private String username;
+	private String password;
+
+	public ItemProcessor(String conn, int port, String username, String password) throws java.net.MalformedURLException
 	{
 		url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://" + conn + ":" + port + "/jmxrmi");
 		jmxc = null;
 		mbsc = null;
+
+		this.username = username;
+		this.password = password;
+
+		if (null != username && null == password || null == username && null != password)
+			throw new IllegalArgumentException("invalid 'username' and 'password' null-ness combination");
 	}
 
 	public JSONArray processAll(Vector<ZabbixItem> items) throws java.io.IOException
 	{
 		JSONArray values = new JSONArray();
 
-		jmxc = JMXConnectorFactory.connect(url, null);
+		HashMap<String, String[]> env = null;
+
+		if (null != username && null != password)
+		{
+			env = new HashMap<String, String[]>();
+			env.put(JMXConnector.CREDENTIALS, new String[] {username, password});
+		}
+
+		jmxc = JMXConnectorFactory.connect(url, env);
 		mbsc = jmxc.getMBeanServerConnection();
 
 		for (ZabbixItem item : items)

@@ -13,7 +13,7 @@ my $help = 0;
 
 my %options =
 (
-	'host=s' => \$host,
+	'host|h=s' => \$host,
 	'port=i' => \$port,
 	'input=s' => \$input,
 	'output=s' => \$output,
@@ -37,7 +37,7 @@ do { print $socket chr($length % 256); $length /= 256 } for 1..8;
 print $socket $send;
 
 open OUTPUT, "> $output";
-print OUTPUT while (<$socket>);
+print OUTPUT while <$socket>;
 close OUTPUT;
 
 close $socket;
