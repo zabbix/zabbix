@@ -164,5 +164,7 @@ REORG TABLE hosts;
 -- added column for visible name
 ALTER TABLE hosts ADD name varchar(64) WITH DEFAULT '' NOT NULL;
 REORG TABLE hosts;
+UPDATE hosts SET name=host WHERE status in (0,1,3);
+REORG TABLE hosts;
 CREATE INDEX hosts_4 on hosts (name);
 REORG TABLE hosts;
