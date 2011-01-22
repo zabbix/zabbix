@@ -121,4 +121,5 @@ ALTER TABLE ONLY hosts ADD CONSTRAINT c_hosts_2 FOREIGN KEY (maintenanceid) REFE
 
 -- added column for visible name
 ALTER TABLE hosts ADD name varchar(64) DEFAULT '' NOT NULL;
+UPDATE hosts SET name=host WHERE status in (0,1,3);
 CREATE INDEX hosts_4 on hosts (name);
