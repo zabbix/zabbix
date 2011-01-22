@@ -236,18 +236,18 @@ JS;
 			}
 			$table->addRow(array(new CCol(_('Database type'),'header'), $cmbType));
 			switch($DB['TYPE']){
-			case ZBX_DB_SQLITE3:
-				$table->addRow(array(new CCol(_('Database file'),'header'), new CTextBox('database', $this->getConfig('DB_DATABASE', 'zabbix'))));
-			break;
-			default:
-				$table->addRow(array(new CCol(_('Database host'),'header'), new CTextBox('server', $this->getConfig('DB_SERVER', 'localhost'))));
-				$table->addRow(array(new CCol(_('Database port'),'header'), array(new CNumericBox('port', $this->getConfig('DB_PORT', '0'),5),' 0 - use default port')));
-				$table->addRow(array(new CCol(_('Database name'),'header'), new CTextBox('database', $this->getConfig('DB_DATABASE', 'zabbix'))));
-				if($DB['TYPE'] == ZBX_DB_DB2)
-					$table->addRow(array(new CCol(_('Database schema'),'header'), new CTextBox('schema', $this->getConfig('DB_SCHEMA', ''))));
-				$table->addRow(array(new CCol(_('User'),'header'), new CTextBox('user', $this->getConfig('DB_USER',	'root'))));
-				$table->addRow(array(new CCol(_('Password'),'header'), new CPassBox('password', $this->getConfig('DB_PASSWORD', ''))));
-			break;
+				case ZBX_DB_SQLITE3:
+					$table->addRow(array(new CCol(_('Database file'),'header'), new CTextBox('database', $this->getConfig('DB_DATABASE', 'zabbix'))));
+				break;
+				default:
+					$table->addRow(array(new CCol(_('Database host'),'header'), new CTextBox('server', $this->getConfig('DB_SERVER', 'localhost'))));
+					$table->addRow(array(new CCol(_('Database port'),'header'), array(new CNumericBox('port', $this->getConfig('DB_PORT', '0'),5),' 0 - use default port')));
+					$table->addRow(array(new CCol(_('Database name'),'header'), new CTextBox('database', $this->getConfig('DB_DATABASE', 'zabbix'))));
+					if($DB['TYPE'] == ZBX_DB_DB2)
+						$table->addRow(array(new CCol(_('Database schema'),'header'), new CTextBox('schema', $this->getConfig('DB_SCHEMA', ''))));
+					$table->addRow(array(new CCol(_('User'),'header'), new CTextBox('user', $this->getConfig('DB_USER',	'root'))));
+					$table->addRow(array(new CCol(_('Password'),'header'), new CPassBox('password', $this->getConfig('DB_PASSWORD', ''))));
+				break;
 			}
 
 			return array(
@@ -290,21 +290,21 @@ JS;
 			$table->addRow(array(new CCol(_('Database type'),'header'), $allowed_db[$this->getConfig('DB_TYPE')]));
 
 			switch($DB['TYPE']){
-			case ZBX_DB_SQLITE3:
-				$table->addRow(array(new CCol(_('Database file'),'header'), $this->getConfig('DB_DATABASE')));
-			break;
-			default:
-				$table->addRow(array(new CCol(_('Database server'),'header'), $this->getConfig('DB_SERVER')));
-				if($this->getConfig('DB_PORT') == 0)
-					$table->addRow(array(new CCol(_('Database port'),'header'), _('default')));
-				else
-					$table->addRow(array(new CCol(_('Database port'),'header'), $this->getConfig('DB_PORT')));
-				$table->addRow(array(new CCol(_('Database name'),'header'), $this->getConfig('DB_DATABASE')));
-				$table->addRow(array(new CCol(_('Database user'),'header'), $this->getConfig('DB_USER')));
-				$table->addRow(array(new CCol(_('Database password'),'header'),	preg_replace('/./','*',$this->getConfig('DB_PASSWORD'))));
-				if($this->getConfig('DB_TYPE', '') == ZBX_DB_DB2)
-					$table->addRow(array(new CCol(_('Database schema'),'header'),	$this->getConfig('DB_SCHEMA')));
-			break;
+				case ZBX_DB_SQLITE3:
+					$table->addRow(array(new CCol(_('Database file'),'header'), $this->getConfig('DB_DATABASE')));
+				break;
+				default:
+					$table->addRow(array(new CCol(_('Database server'),'header'), $this->getConfig('DB_SERVER')));
+					if($this->getConfig('DB_PORT') == 0)
+						$table->addRow(array(new CCol(_('Database port'),'header'), _('default')));
+					else
+						$table->addRow(array(new CCol(_('Database port'),'header'), $this->getConfig('DB_PORT')));
+					$table->addRow(array(new CCol(_('Database name'),'header'), $this->getConfig('DB_DATABASE')));
+					$table->addRow(array(new CCol(_('Database user'),'header'), $this->getConfig('DB_USER')));
+					$table->addRow(array(new CCol(_('Database password'),'header'),	preg_replace('/./','*',$this->getConfig('DB_PASSWORD'))));
+					if($this->getConfig('DB_TYPE', '') == ZBX_DB_DB2)
+						$table->addRow(array(new CCol(_('Database schema'),'header'),	$this->getConfig('DB_SCHEMA')));
+				break;
 			}
 
 			$table->addRow(BR());

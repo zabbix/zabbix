@@ -30,48 +30,6 @@ if(!isset($DB)){
 	if(isset($DB_PASSWORD))	$DB['PASSWORD'] = $DB_PASSWORD;
 }
 
-/**
- * Initialize access to SQLite3 database
- *
- * The function creates a semaphore for exclusive SQLite3 access. It is
- * shared between Zabbix front-end and Zabbix Server.
- *
- * @return bool
- */
-if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
-	function init_sqlite3_access(){
-		global $DB, $ZBX_SEM_ID;
-
-		$ZBX_SEM_ID = sem_get(ftok($DB['DATABASE'], 'z'), 1, 0660);
-		return $ZBX_SEM_ID;
-	}
-}
-
-/**
- * Get exclusive lock on SQLite3 database
- *
- * @return bool
- */
-if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
-	function lock_sqlite3_access(){
-		global $ZBX_SEM_ID,$DB;
-
-		return sem_acquire($ZBX_SEM_ID);
-	}
-}
-
-/**
- * Release exclusive lock on SQLite3 database
- *
- * @return bool
- */
-if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
-	function unlock_sqlite3_access(){
-		global $ZBX_SEM_ID;
-
-		return sem_release($ZBX_SEM_ID);
-	}
-}
 
 /**
  * Creates global database connection
@@ -127,7 +85,7 @@ if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
 							DBexecute('SET CHARACTER SET utf8');
 						}
 					}
-					break;
+				break;
 				case ZBX_DB_POSTGRESQL:
 					$pg_connection_string =
 						( !empty($DB['SERVER']) ? 'host=\''.$DB['SERVER'].'\' ' : '').
@@ -141,7 +99,7 @@ if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
 						$error = 'Error connecting to database';
 						$result = false;
 					}
-					break;
+				break;
 				case ZBX_DB_ORACLE:
 					$connect = '';
 					if (!empty($DB['SERVER'])){
@@ -160,7 +118,7 @@ if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
 						$error = 'Error connecting to database';
 						$result = false;
 					}
-					break;
+				break;
 				case ZBX_DB_DB2:
 					$connect = '';
 					$connect .= 'DATABASE='.$DB['DATABASE'].';';
@@ -185,7 +143,7 @@ if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
 						}
 					}
 
-					break;
+				break;
 				case ZBX_DB_SQLITE3:
 					if(file_exists($DB['DATABASE'])){
 						try{
@@ -204,7 +162,7 @@ if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
 					if($result){
 						$result = init_sqlite3_access();
 					}
-					break;
+				break;
 				default:
 					$error = 'Unsupported database';
 					$result = false;
@@ -313,10 +271,10 @@ if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
 /**
  * Closes transaction
  *
- * @param string $do_commit True - do commit, rollback otherwise. Rollback is also always performed if a sql failed within this transaction.
+ * @param string $doCommit True - do commit, rollback otherwise. Rollback is also always performed if a sql failed within this transaction.
  * @return bool True - successful commit, False - otherwise
  */
-	function DBend($do_commit=true){
+	function DBend($doCommit=true){
 		global $DB;
 
 		if($DB['TRANSACTIONS'] != 1){
@@ -328,12 +286,12 @@ if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
 				info('POSSIBLE ERROR: Used incorrect logic in database processing, transaction not started!');
 			}
 
-			$DB['TRANSACTION_NO_FAILED_SQLS'] = $do_commit && $DB['TRANSACTION_NO_FAILED_SQLS'];
+			$DB['TRANSACTION_NO_FAILED_SQLS'] = $doCommit && $DB['TRANSACTION_NO_FAILED_SQLS'];
 
 			$result =  $DB['TRANSACTION_NO_FAILED_SQLS'];
 		}
 		else{
-			$DBresult = $do_commit && $DB['TRANSACTION_NO_FAILED_SQLS'];
+			$DBresult = $doCommit && $DB['TRANSACTION_NO_FAILED_SQLS'];
 
 			$DB['TRANSACTIONS'] = 0;
 
@@ -345,7 +303,7 @@ if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
 				DBrollback();
 			}
 
-			$result = (!is_null($do_commit) && $DBresult)?$do_commit:$DBresult;
+			$result = (!is_null($doCommit) && $DBresult)?$doCommit:$DBresult;
 		}
 
 	return $result;
@@ -855,11 +813,11 @@ else {
 		do{
 			$min=bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000'), 0);
 			$max=bcadd(bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000')),'99999999999', 0);
-			$db_select = DBselect('SELECT nextid FROM ids WHERE nodeid='.$nodeid .' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field));
+			$dbSelect = DBselect('SELECT nextid FROM ids WHERE nodeid='.$nodeid .' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field));
 
-			if(!$db_select) return false;
+			if(!$dbSelect) return false;
 
-			$row = DBfetch($db_select);
+			$row = DBfetch($dbSelect);
 
 			if(!$row){
 				$row = DBfetch(DBselect('SELECT max('.$field.') AS id FROM '.$table.' WHERE '.$field.'>='.$min.' AND '.$field.'<='.$max));
@@ -1059,6 +1017,48 @@ else {
 		else return $val;
 	}
 
+/**
+ * Initialize access to SQLite3 database
+ *
+ * The function creates a semaphore for exclusive SQLite3 access. It is
+ * shared between Zabbix front-end and Zabbix Server.
+ *
+ * @return bool
+ */
+if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
+	function init_sqlite3_access(){
+		global $DB, $ZBX_SEM_ID;
+
+		$ZBX_SEM_ID = sem_get(ftok($DB['DATABASE'], 'z'), 1, 0660);
+		return $ZBX_SEM_ID;
+	}
+}
+
+/**
+ * Get exclusive lock on SQLite3 database
+ *
+ * @return bool
+ */
+if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
+	function lock_sqlite3_access(){
+		global $ZBX_SEM_ID,$DB;
+
+		return sem_acquire($ZBX_SEM_ID);
+	}
+}
+
+/**
+ * Release exclusive lock on SQLite3 database
+ *
+ * @return bool
+ */
+if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
+	function unlock_sqlite3_access(){
+		global $ZBX_SEM_ID;
+
+		return sem_release($ZBX_SEM_ID);
+	}
+}
 
 	class DB{
 		const SCHEMA_FILE = 'schema.inc.php';
