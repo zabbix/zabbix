@@ -167,7 +167,7 @@
 		<delete failonerror="off">
 			<fileset dir="${basedir}/build/logs" includes="**.*" />
 			<fileset dir="${builddir}" includes="**.*" />
-			<fileset dir="/tmp" includes="sqlite3.db" />
+			<fileset dir="/tmp" includes="trunk.db" />
 		</delete>
 	</target>
 
