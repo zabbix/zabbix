@@ -109,7 +109,7 @@ class testPageMaps extends CWebTest
 
 		$this->login('sysmaps.php');
 		$this->assertTitle('Network maps');
-		$this->click("xpath=//a[contains(@href,'sysmaps.php?form=update&sysmapid=$sysmapid#form&sid=')]");
+		$this->href_click('sysmaps.php?form=update&sysmapid=$sysmapid#form&sid=');
 		$this->wait();
 		$this->button_click('save');
 		$this->wait();
