@@ -154,17 +154,14 @@ ALTER TABLE hosts DROP COLUMN inbytes;
 REORG TABLE hosts;
 ALTER TABLE hosts DROP COLUMN outbytes;
 REORG TABLE hosts;
+ALTER TABLE hosts ADD name varchar(64) WITH DEFAULT '' NOT NULL;
+REORG TABLE hosts;
 UPDATE hosts SET proxy_hostid=NULL WHERE proxy_hostid=0;
 UPDATE hosts SET maintenanceid=NULL WHERE maintenanceid=0;
+UPDATE hosts SET name=host WHERE status in (0,1,3);	-- MONITORED, NOT_MONITORED, TEMPLATE
+CREATE INDEX hosts_4 on hosts (name);
+REORG TABLE hosts;
 ALTER TABLE hosts ADD CONSTRAINT c_hosts_1 FOREIGN KEY (proxy_hostid) REFERENCES hosts (hostid);
 REORG TABLE hosts;
 ALTER TABLE hosts ADD CONSTRAINT c_hosts_2 FOREIGN KEY (maintenanceid) REFERENCES maintenances (maintenanceid);
-REORG TABLE hosts;
-
--- added column for visible name
-ALTER TABLE hosts ADD name varchar(64) WITH DEFAULT '' NOT NULL;
-REORG TABLE hosts;
-UPDATE hosts SET name=host WHERE status in (0,1,3);
-REORG TABLE hosts;
-CREATE INDEX hosts_4 on hosts (name);
 REORG TABLE hosts;
