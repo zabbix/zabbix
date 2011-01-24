@@ -1,5 +1,6 @@
 Changes for 1.8.5rc1
 
+ - [ZBX-2912] added check for valid UTF-8 characters in the incoming data (Sasha)
  - [ZBX-1346] add more user parameter examples (Richlv)
  - [ZBX-2922] changed log level from warning to debug for some messages (Sasha)
  - [ZBX-3440] Added pagination to slide and discovery configuration (KB)
