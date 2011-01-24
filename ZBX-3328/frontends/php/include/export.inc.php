@@ -928,8 +928,8 @@ class zbxXML{
 					}
 
 					// checking if host already exists - then some of the interfaces may need to be updated, but not created
-					// we can tell API that, by adding interfaceid to interface parameters
-					if($current_host){
+					//   we can tell API that, by adding interfaceid to interface parameters
+					if($current_host && isset($current_host['interfaces'])){
 
 						// for every interface we got based on XML
 						for($i = 0; $i < count($host_db['interfaces']); $i++){
