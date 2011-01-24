@@ -65,7 +65,7 @@
 			<arg line="-init ${builddir}/tests/templates/sqlite3.init"/>
 			<arg line="/tmp/${dbname}.db"/>
 		</exec>
-		<exec executable="chown" dir="/tmp" failonerror="on">
+		<exec executable="chmod" dir="/tmp" failonerror="on">
 			<arg line="go+rw"/>
 			<arg line="/tmp/${dbname}.db"/>
 		</exec>
