@@ -2924,13 +2924,18 @@ bad:
  ******************************************************************************/
 void	zbx_replace_invalid_utf8(char *text)
 {
+	char	*out = text;
+
 	while ('\0' != *text)
 	{
 		if (0 == (*text & 0x80))			/* single ASCII character */
-			text++;
+			*out++ = *text++;
 		else if (0x80 == (*text & 0xc0) ||		/* unexpected continuation byte */
 				0xfe == (*text & 0xfe))		/* invalid UTF-8 bytes '\xfe' & '\xff' */
-			*text++ = ZBX_UTF8_REPLACE_CHAR;
+		{
+			*out++ = ZBX_UTF8_REPLACE_CHAR;
+			text++;
+		}
 		else						/* multibyte sequence */
 		{
 			unsigned int	utf32;
@@ -2949,6 +2954,7 @@ void	zbx_replace_invalid_utf8(char *text)
 			else if (0xfc == (*text & 0xfe))	/* 6-bytes multibyte sequence */
 				expecting_bytes = 5;
 
+			*out++ = *text;
 			utf8[mb_len++] = *text++;
 
 			for (; 0 != expecting_bytes; expecting_bytes--)
@@ -2959,6 +2965,7 @@ void	zbx_replace_invalid_utf8(char *text)
 					break;
 				}
 
+				*out++ = *text;
 				utf8[mb_len++] = *text++;
 			}
 
@@ -3007,16 +3014,13 @@ void	zbx_replace_invalid_utf8(char *text)
 
 			if (SUCCEED != ret)
 			{
-				*(text - mb_len) = ZBX_UTF8_REPLACE_CHAR;
-
-				if (mb_len > 1)
-				{
-					memmove(text - (mb_len - 1), text, strlen(text) + 1);
-					text -= mb_len - 1;
-				}
+				out -= mb_len;
+				*out++ = ZBX_UTF8_REPLACE_CHAR;
 			}
 		}
 	}
+
+	*out = '\0';
 }
 
 void	win2unix_eol(char *text)
