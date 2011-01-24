@@ -2561,9 +2561,9 @@ int	evaluate_expression(int *result, char **expression, time_t now,
 	{
 		/* Evaluate expression */
 		zbx_remove_spaces(*expression);
-		if (substitute_functions(expression, now, error, maxerrlen) == SUCCEED)
+		if (SUCCEED == substitute_functions(expression, now, error, maxerrlen))
 		{
-			if (evaluate(&value, *expression, error, maxerrlen) == SUCCEED)
+			if (SUCCEED == evaluate(&value, *expression, error, maxerrlen))
 			{
 				if (0 == cmp_double(value, 0))
 					*result = TRIGGER_VALUE_FALSE;
