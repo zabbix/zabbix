@@ -60,7 +60,11 @@
 	</target>
 
 	<target name="init-sqlite3" depends="init-common">
-		<!-- Create PostgreSQL database -->
+		<!-- Remove old SQLite3 database if exists -->
+		<delete failonerror="off">
+			<fileset dir="/tmp" includes="${dbname}.db" />
+		</delete>
+		<!-- Create SQLite3 database -->
 		<exec executable="sqlite3" input="${builddir}/create/schema/sqlite3.sql" failonerror="on">
 			<arg line="-init ${builddir}/tests/templates/sqlite3.init"/>
 			<arg line="/tmp/${dbname}.db"/>
@@ -171,7 +175,6 @@
 		<delete failonerror="off">
 			<fileset dir="${basedir}/build/logs" includes="**.*" />
 			<fileset dir="${builddir}" includes="**.*" />
-			<fileset dir="/tmp" includes="trunk.db" />
 		</delete>
 	</target>
 
