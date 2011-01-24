@@ -1825,6 +1825,7 @@ COpt::memoryPick();
 					}
 					$up_triggerids[] = $up_trigger['triggerid_up'];
 				}
+				$triggerid_down = $up_triggerids;
 			} while(!empty($up_triggerids));
 // }}} check circelar dependency
 
