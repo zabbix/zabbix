@@ -1382,11 +1382,21 @@ COpt::memoryPick();
 					$groupids = isset($operation['opcommand_grp'])
 							? zbx_objectValues($operation['opcommand_grp'], 'groupid')
 							: array();
-					$hostids = isset($operation['opcommand_hst'])
-							? zbx_objectValues($operation['opcommand_hst'], 'hostid')
-							: array();
 
-					if(empty($groupids) && empty($hostids))
+					$hostids = array();
+					$without_current = true;
+					if(isset($operation['opcommand_hst'])){
+						foreach($operation['opcommand_hst'] as $hid){
+							if($hid['hostid'] == 0){
+								$without_current = false;
+							}
+							else{
+								$hostids[$hid['hostid']] = $hid['hostid'];
+							}
+						}
+					}
+
+					if(empty($groupids) && empty($hostids) && $without_current)
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('No targets for operation command.'));
 
 					$hostIdsAll = array_merge($hostIdsAll, $hostids);
@@ -1517,7 +1527,7 @@ COpt::memoryPick();
 		return true;
 	}
 
-	public static function validateoperationConditions($conditions){
+	public static function validateOperationConditions($conditions){
 		$conditions = zbx_toArray($conditions);
 
 		$ackStatuses = array(
