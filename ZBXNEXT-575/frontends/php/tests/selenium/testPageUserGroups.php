@@ -79,7 +79,19 @@ class testPageUserGroups extends CWebTest
 		$this->assertEquals($oldHashUsersGroups,DBhash($sql2));
 	}
 
+	public function testPageUserGroups_MassEnableAll()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
 	public function testPageUserGroups_MassEnable()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
+	public function testPageUserGroups_MassDisableAll()
 	{
 // TODO
 		$this->markTestIncomplete();
@@ -91,31 +103,159 @@ class testPageUserGroups extends CWebTest
 		$this->markTestIncomplete();
 	}
 
-	public function testPageUserGroups_MassEnableAPI()
+	public function testPageUserGroups_MassEnableAPIAll()
 	{
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageUserGroups_MassDisableAPI()
+	/**
+	* @dataProvider allGroups
+	*/
+	public function testPageUserGroups_MassEnableAPI($group)
+	{
+		$usrgrpid=$group['usrgrpid'];
+		$name=$group['name'];
+
+		$sql1="select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
+		$oldHashGroups=DBhash($sql1);
+
+		$this->login('usergrps.php');
+		$this->assertTitle('User groups');
+
+		$this->checkbox_select("group_groupid[$usrgrpid]");
+		$this->dropdown_select('go','Enable API');
+		$this->button_click('goButton');
+
+		$this->getConfirmation();
+		$this->wait();
+		$this->assertTitle('User groups');
+		$this->ok('API access updated');
+
+		$sql="select * from usrgrp where usrgrpid=$usrgrpid and api_access=".GROUP_API_ACCESS_ENABLED;
+		$this->assertEquals(1,DBcount($sql));
+
+		$this->assertEquals($oldHashGroups,DBhash($sql1));
+	}
+
+	public function testPageUserGroups_MassDisableAPIAll()
 	{
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageUserGroups_MassEnableDEBUG()
+	/**
+	* @dataProvider allGroups
+	*/
+	public function testPageUserGroups_MassDisableAPI($group)
+	{
+		$usrgrpid=$group['usrgrpid'];
+		$name=$group['name'];
+
+		$sql1="select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
+		$oldHashGroups=DBhash($sql1);
+
+		$this->login('usergrps.php');
+		$this->assertTitle('User groups');
+
+		$this->checkbox_select("group_groupid[$usrgrpid]");
+		$this->dropdown_select('go','Disable API');
+		$this->button_click('goButton');
+
+		$this->getConfirmation();
+		$this->wait();
+		$this->assertTitle('User groups');
+		$this->ok('API access updated');
+
+		$sql="select * from usrgrp where usrgrpid=$usrgrpid and api_access=".GROUP_API_ACCESS_DISABLED;
+		$this->assertEquals(1,DBcount($sql));
+
+		$this->assertEquals($oldHashGroups,DBhash($sql1));
+	}
+
+	public function testPageUserGroups_MassEnableDEBUGAll()
 	{
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageUserGroups_MassDisableDEBUG()
+	/**
+	* @dataProvider allGroups
+	*/
+	public function testPageUserGroups_MassEnableDEBUG($group)
+	{
+		$usrgrpid=$group['usrgrpid'];
+		$name=$group['name'];
+
+		$sql1="select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
+		$oldHashGroups=DBhash($sql1);
+
+		$this->login('usergrps.php');
+		$this->assertTitle('User groups');
+
+		$this->checkbox_select("group_groupid[$usrgrpid]");
+		$this->dropdown_select('go','Enable DEBUG');
+		$this->button_click('goButton');
+
+		$this->getConfirmation();
+		$this->wait();
+		$this->assertTitle('User groups');
+		$this->ok('Debug mode updated');
+
+		$sql="select * from usrgrp where usrgrpid=$usrgrpid and debug_mode=".GROUP_DEBUG_MODE_ENABLED;
+		$this->assertEquals(1,DBcount($sql));
+
+		$this->assertEquals($oldHashGroups,DBhash($sql1));
+	}
+
+	public function testPageUserGroups_MassDisableDEBUGAll()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
+	/**
+	* @dataProvider allGroups
+	*/
+	public function testPageUserGroups_MassDisableDEBUG($group)
+	{
+		$usrgrpid=$group['usrgrpid'];
+		$name=$group['name'];
+
+		$sql1="select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
+		$oldHashGroups=DBhash($sql1);
+
+		$this->login('usergrps.php');
+		$this->assertTitle('User groups');
+
+		$this->checkbox_select("group_groupid[$usrgrpid]");
+		$this->dropdown_select('go','Disable DEBUG');
+		$this->button_click('goButton');
+
+		$this->getConfirmation();
+		$this->wait();
+		$this->assertTitle('User groups');
+		$this->ok('Debug mode updated');
+
+		$sql="select * from usrgrp where usrgrpid=$usrgrpid and debug_mode=".GROUP_DEBUG_MODE_DISABLED;
+		$this->assertEquals(1,DBcount($sql));
+
+		$this->assertEquals($oldHashGroups,DBhash($sql1));
+	}
+
+	public function testPageUserGroups_MassDeleteAll()
 	{
 // TODO
 		$this->markTestIncomplete();
 	}
 
 	public function testPageUserGroups_MassDelete()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
+	public function testPageUserGroups_Sorting()
 	{
 // TODO
 		$this->markTestIncomplete();

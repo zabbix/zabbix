@@ -53,9 +53,12 @@
 
 
 	$_REQUEST['hostid'] = get_request('hostid', 0);
-// permission check, imo should be remuved in future.
+// permission check, imo should be removed in future.
 	if($_REQUEST['hostid'] > 0){
-		$res = CHost::get(array('real_hosts' => 1, 'hostids' => $_REQUEST['hostid']));
+		$res = CHost::get(array(
+			'real_hosts' => 1,
+			'hostids' => $_REQUEST['hostid']
+		));
 		if(empty($res)) access_deny();
 	}
 
@@ -101,8 +104,7 @@
 		}
 		$hosts = CHost::get($options);
 
-
-// unset hosts without profiles, and copy some profile fileds to the uppers array level for sorting
+// unset hosts without profiles, and copy some profile fields to the uppers array level for sorting
 		$pr = ($_REQUEST['prof_type'] == 0) ? 'profile' : 'profile_ext';
 		$profile = array();
 		foreach($hosts as $num => $host){

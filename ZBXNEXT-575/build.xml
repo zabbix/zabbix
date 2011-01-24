@@ -93,21 +93,27 @@
 	<target name="init-postgresql" depends="init-common">
 		<!-- Create PostgreSQL database -->
 		<exec executable="psql" failonerror="on">
+			<arg line="-1"/>
 			<arg line="template1 -c 'drop database if exists ${dbname};'"/>
 		</exec>
 		<exec executable="psql" failonerror="on">
+			<arg line="-1"/>
 			<arg line="template1 -c 'create database ${dbname};'"/>
 		</exec>
 		<exec executable="psql" input="${builddir}/create/schema/postgresql.sql" failonerror="on">
+			<arg line="-1"/>
 			<arg line="${dbname}"/>
 		</exec>
 		<exec executable="psql" input="${builddir}/create/data/images_postgresql.sql" failonerror="on">
+			<arg line="-1"/>
 			<arg line="${dbname}"/>
 		</exec>
 		<exec executable="psql" input="${builddir}/create/data/data.sql" failonerror="on">
+			<arg line="-1"/>
 			<arg line="${dbname}"/>
 		</exec>
 		<exec executable="psql" input="${builddir}/tests/data/data_test.sql" failonerror="on">
+			<arg line="-1"/>
 			<arg line="${dbname}"/>
 		</exec>
 

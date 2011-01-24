@@ -989,7 +989,7 @@ FIELD		|passwd		|t_char(32)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|url		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|autologin	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|autologout	|t_integer	|'900'	|NOT NULL	|ZBX_SYNC
-FIELD		|lang		|t_varchar(5)	|'en_gb'|NOT NULL	|ZBX_SYNC
+FIELD		|lang		|t_varchar(5)	|'en_GB'|NOT NULL	|ZBX_SYNC
 FIELD		|refresh	|t_integer	|'30'	|NOT NULL	|ZBX_SYNC
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|theme		|t_varchar(128)	|'default.css'|NOT NULL	|ZBX_SYNC

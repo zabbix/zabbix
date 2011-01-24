@@ -94,7 +94,7 @@ static int	get_min_nextcheck()
 {
 	int	i, min = -1;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In get_min_nextcheck()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In get_min_nextcheck()");
 
 	for (i = 0; NULL != active_metrics[i].key; i++)
 	{
@@ -115,7 +115,7 @@ static void	add_check(const char *key, const char *key_orig, int refresh, long l
 {
 	int	i;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In add_check('%s', %i, %li, %i)", key, refresh, lastlogsize, mtime);
+	zabbix_log(LOG_LEVEL_DEBUG, "In add_check('%s', %i, %li, %i)", key, refresh, lastlogsize, mtime);
 
 	for (i = 0; NULL != active_metrics[i].key; i++)
 	{
@@ -405,7 +405,7 @@ static int	refresh_active_checks(const char *host, unsigned short port)
  *                                                                            *
  * Function: check_response                                                   *
  *                                                                            *
- * Purpose: Check if json response is SUCCEED                                 *
+ * Purpose: Check whether JSON response is SUCCEED                            *
  *                                                                            *
  * Parameters: result SUCCEED or FAIL                                         *
  *                                                                            *
@@ -414,42 +414,32 @@ static int	refresh_active_checks(const char *host, unsigned short port)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments: zabbix_sender has exactly the same function!                     *
+ * Comments: zabbix_sender has almost the same function!                      *
  *                                                                            *
  ******************************************************************************/
 static int	check_response(char *response)
 {
-	struct 		zbx_json_parse jp;
-	char		value[MAX_STRING_LEN];
-	char		info[MAX_STRING_LEN];
+	const char		*__function_name = "check_response";
 
-	int	ret = SUCCEED;
+	struct zbx_json_parse	jp;
+	char			value[MAX_STRING_LEN];
+	char			info[MAX_STRING_LEN];
+	int			ret = SUCCEED;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In check_response(%s)", response);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() response:'%s'", __function_name, response);
 
 	ret = zbx_json_open(response, &jp);
 
 	if (SUCCEED == ret)
-	{
-		ret = zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE,value, sizeof(value));
-	}
+		ret = zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, value, sizeof(value));
 
-	if(SUCCEED == ret)
-	{
-		if(strcmp(value, ZBX_PROTO_VALUE_SUCCESS) != 0)
-		{
-			ret = FAIL;
-		}
-	}
+	if (SUCCEED == ret && 0 != strcmp(value, ZBX_PROTO_VALUE_SUCCESS))
+		ret = FAIL;
 
-	if (SUCCEED == ret)
-	{
-		if(SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_INFO, info, sizeof(info)))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Info from server: %s",
-				info);
-		}
-	}
+	if (SUCCEED == ret && SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_INFO, info, sizeof(info)))
+		zabbix_log(LOG_LEVEL_DEBUG, "Info from server: %s", info);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
