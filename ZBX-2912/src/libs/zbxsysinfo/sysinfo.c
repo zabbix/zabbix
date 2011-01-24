@@ -605,10 +605,12 @@ int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c
 		break;
 	case ITEM_VALUE_TYPE_STR:
 	case ITEM_VALUE_TYPE_LOG:
+		zbx_utf8_replace_invalid_bytes(c);
 		SET_STR_RESULT(result, strdup(c));
 		ret = SUCCEED;
 		break;
 	case ITEM_VALUE_TYPE_TEXT:
+		zbx_utf8_replace_invalid_bytes(c);
 		SET_TEXT_RESULT(result, strdup(c));
 		ret = SUCCEED;
 		break;

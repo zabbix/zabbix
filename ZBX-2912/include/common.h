@@ -909,6 +909,8 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);
 #endif	/* HAVE_ICONV */
 char	*zbx_replace_utf8(const char *text, char replacement);
 int	zbx_strlen_utf8(const char *text);
+void	zbx_utf8_replace_invalid_bytes(char *s);
+int	zbx_check_hostname(const char *hostname);
 
 void	win2unix_eol(char *text);
 int	str2uint(const char *str);

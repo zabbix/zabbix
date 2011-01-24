@@ -2861,6 +2861,149 @@ int	zbx_strlen_utf8(const char *text)
 	return n;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_check_hostname                                               *
+ *                                                                            *
+ * Purpose: check a byte stream for valid hostname                            *
+ *                                                                            *
+ * Parameters: hostname - pointer to the first char of hostname               *
+ *                                                                            *
+ * Return value: return SUCCEED if hostname is valid                          *
+ *               or FAIL for hostname contains invalid chars                  *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_check_hostname(const char *hostname)
+{
+	if ('\0' == *hostname)
+		return FAIL;
+
+	do
+	{
+		if (SUCCEED != is_hostname_char(*hostname))
+			return FAIL;
+	}
+	while ('\0' != *++hostname);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_utf8_replace_invalid_bytes                                   *
+ *                                                                            *
+ * Purpose: replace invalid UTF8 sequences of bytes on '?' character          *
+ *                                                                            *
+ * Parameters: s - [IN/OUT] pointer to the first char                         *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_utf8_replace_invalid_bytes(char *s)
+{
+	while ('\0' != *s)
+	{
+		if (0 == (*s & 0x80))	/* single ASCII character */
+			s++;
+		else if (0x80 == (*s & 0xC0) ||		/* unexpected continuation byte */
+				0xFE == (*s & 0xFE))	/* invalid UTF8 bytes '\xFE' & '\xFF' */
+			*s++ = '?';
+		else	/* multibyte sequence */
+		{
+			unsigned int	utf32;
+			unsigned char	utf8[6];
+			size_t		expecting_bytes = 0, i, mb_len = 0;
+			int		ret = SUCCEED;
+
+			if (0xC0 == (*s & 0xE0))	/* 2-bytes multibyte sequence */
+				expecting_bytes = 1;
+			else if (0xE0 == (*s & 0xF0))	/* 3-bytes multibyte sequence */
+				expecting_bytes = 2;
+			else if (0xF0 == (*s & 0xF8))	/* 4-bytes multibyte sequence */
+				expecting_bytes = 3;
+			else if (0xF8 == (*s & 0xFC))	/* 5-bytes multibyte sequence */
+				expecting_bytes = 4;
+			else if (0xFC == (*s & 0xFE))	/* 6-bytes multibyte sequence */
+				expecting_bytes = 5;
+
+			utf8[mb_len++] = *s++;
+
+			for (; 0 != expecting_bytes; expecting_bytes--)
+			{
+				if (0x80 != (*s & 0xC0))	/* not a continuation byte */
+				{
+					ret = FAIL;
+					break;
+				}
+
+				utf8[mb_len++] = *s++;
+			}
+
+			if (SUCCEED == ret)
+			{
+				if (0xC0 == (utf8[0] & 0xFE) ||	/* overlong sequence */
+						(0xE0 == utf8[0] && 0x00 == (utf8[1] & 0x20)) ||
+						(0xF0 == utf8[0] && 0x00 == (utf8[1] & 0x30)) ||
+						(0xF8 == utf8[0] && 0x00 == (utf8[1] & 0x38)) ||
+						(0xFC == utf8[0] && 0x00 == (utf8[1] & 0x3C)))
+				{
+					ret = FAIL;
+				}
+			}
+
+			if (SUCCEED == ret)
+			{
+				utf32 = 0;
+
+				if (0xC0 == (utf8[0] & 0xE0))
+					utf32 = utf8[0] & 0x1F;
+				else if (0xE0 == (utf8[0] & 0xF0))
+					utf32 = utf8[0] & 0x0F;
+				else if (0xF0 == (utf8[0] & 0xF8))
+					utf32 = utf8[0] & 0x07;
+				else if (0xF8 == (utf8[0] & 0xFC))
+					utf32 = utf8[0] & 0x03;
+				else if (0xFC == (utf8[0] & 0xFE))
+					utf32 = utf8[0] & 0x01;
+
+				for (i = 1; i < mb_len; i++)
+				{
+					utf32 <<= 6;
+					utf32 += utf8[i] & 0x3F;
+				}
+
+				/* according to the Unicode standard the high and low
+				 * surrogate halves used by UTF-16 (U+D800 through U+DFFF)
+				 * and values above U+10FFFF are not legal
+				 */
+				if (utf32 > 0x10FFFF || 0xD800 == (utf32 & 0xF800))
+				{
+					ret = FAIL;
+				}
+			}
+
+			if (SUCCEED != ret)
+			{
+				*(s - mb_len) = '?';
+
+				if (mb_len > 1)
+				{
+					memmove(s - (mb_len - 1), s, strlen(s) + 1);
+					s -= mb_len - 1;
+				}
+			}
+		}
+	}
+}
+
 void	win2unix_eol(char *text)
 {
 	size_t	i, sz;
