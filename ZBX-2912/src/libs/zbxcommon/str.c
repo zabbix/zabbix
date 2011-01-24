@@ -2939,7 +2939,7 @@ void	zbx_replace_invalid_utf8(char *text)
 		else						/* multibyte sequence */
 		{
 			unsigned int	utf32;
-			unsigned char	utf8[6];
+			char		*utf8 = out;
 			size_t		expecting_bytes = 0, i, mb_len = 0;
 			int		ret = SUCCEED;
 
@@ -2954,8 +2954,7 @@ void	zbx_replace_invalid_utf8(char *text)
 			else if (0xfc == (*text & 0xfe))	/* 6-bytes multibyte sequence */
 				expecting_bytes = 5;
 
-			*out++ = *text;
-			utf8[mb_len++] = *text++;
+			*out++ = *text++;
 
 			for (; 0 != expecting_bytes; expecting_bytes--)
 			{
@@ -2965,17 +2964,18 @@ void	zbx_replace_invalid_utf8(char *text)
 					break;
 				}
 
-				*out++ = *text;
-				utf8[mb_len++] = *text++;
+				*out++ = *text++;
 			}
+
+			mb_len = out - utf8;
 
 			if (SUCCEED == ret)
 			{
 				if (0xc0 == (utf8[0] & 0xfe) ||	/* overlong sequence */
-						(0xe0 == utf8[0] && 0x00 == (utf8[1] & 0x20)) ||
-						(0xf0 == utf8[0] && 0x00 == (utf8[1] & 0x30)) ||
-						(0xf8 == utf8[0] && 0x00 == (utf8[1] & 0x38)) ||
-						(0xfc == utf8[0] && 0x00 == (utf8[1] & 0x3c)))
+						(0xe0 == (unsigned char)utf8[0] && 0x00 == (utf8[1] & 0x20)) ||
+						(0xf0 == (unsigned char)utf8[0] && 0x00 == (utf8[1] & 0x30)) ||
+						(0xf8 == (unsigned char)utf8[0] && 0x00 == (utf8[1] & 0x38)) ||
+						(0xfc == (unsigned char)utf8[0] && 0x00 == (utf8[1] & 0x3c)))
 				{
 					ret = FAIL;
 				}
