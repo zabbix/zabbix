@@ -1385,7 +1385,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 			}
 			else if (GET_MSG_RESULT(&agent))
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] error: %s",
+				zabbix_log(LOG_LEVEL_DEBUG, "Item [%s:%s] error: %s",
 						item.host.host, item.key_orig, agent.msg);
 				DCadd_nextcheck(item.itemid, (time_t)values[i].ts.sec, agent.msg);
 			}
