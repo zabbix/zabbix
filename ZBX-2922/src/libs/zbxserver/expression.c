@@ -2511,7 +2511,7 @@ error:
 	if (NULL != out)
 		zbx_free(out);
 
-	zabbix_log(LOG_LEVEL_WARNING, "%s", error);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
 	zabbix_syslog("%s", error);
 
 	return FAIL;
