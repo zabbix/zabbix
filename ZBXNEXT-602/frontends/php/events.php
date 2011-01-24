@@ -19,14 +19,12 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/hosts.inc.php');
-	require_once('include/events.inc.php');
-	require_once('include/actions.inc.php');
-	require_once('include/discovery.inc.php');
-	require_once('include/html.inc.php');
-
-
+require_once('include/config.inc.php');
+require_once('include/hosts.inc.php');
+require_once('include/events.inc.php');
+require_once('include/actions.inc.php');
+require_once('include/discovery.inc.php');
+require_once('include/html.inc.php');
 
 if(isset($_REQUEST['csv_export'])){
 	$CSV_EXPORT = true;
@@ -51,10 +49,7 @@ else{
 	}
 }
 
-
-
-
-	include_once('include/page_header.php');
+include_once('include/page_header.php');
 ?>
 <?php
 	$allow_discovery = check_right_on_discovery(PERM_READ_ONLY);
@@ -69,26 +64,26 @@ else{
 		'hostid'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
 		'triggerid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
 
-		'period'=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
-		'dec'=>		array(T_ZBX_INT, O_OPT,	 null,	null, null),
-		'inc'=>		array(T_ZBX_INT, O_OPT,	 null,	null, null),
-		'left'=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
-		'right'=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
-		'stime'=>	array(T_ZBX_STR, O_OPT,	 null,	null, null),
+		'period'=>			array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'dec'=>				array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'inc'=>				array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'left'=>			array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'right'=>			array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'stime'=>			array(T_ZBX_STR, O_OPT,	 null,	null, null),
 
 		'load'=>			array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
 		'fullscreen'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
 // Export
-		'csv_export'=>				array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		'csv_export'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 // filter
 		'filter_rst'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
 		'filter_set'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
 
-		'showUnknown'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
+		'showUnknown'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
 //ajax
-		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+		'favobj'=>			array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
+		'favref'=>			array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+		'state'=>			array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 	);
 
 	check_fields($fields);
@@ -425,9 +420,9 @@ else{
 
 
 			if($CSV_EXPORT){
-				$csv_return = '';
+				$csvRows = array();
 
-				$tbHeader = array(
+				$csvRows[] = array(
 					S_TIME,
 					is_show_all_nodes()?S_NODE:null,
 					($_REQUEST['hostid'] == 0)?S_HOST:null,
@@ -438,7 +433,6 @@ else{
 					($config['event_ack_enable'])?S_ACK:NULL,
 					S_ACTIONS
 				);
-				$csv_return .= zbx_toCSV($tbHeader);
 			}
 
 			$triggers = array();
@@ -502,7 +496,6 @@ else{
 			$triggers = CTrigger::get($triggersOptions);
 			$triggers = zbx_toHash($triggers, 'triggerid');
 
-			$xx = 0;
 			foreach($events as $enum => $event){
 				$trigger = $triggers[$event['objectid']];
 				$host = reset($trigger['hosts']);
@@ -551,10 +544,8 @@ else{
 					$actions
 				));
 
-
-
 				if($CSV_EXPORT) {
-					$tbRows = array(
+					$csvRows[] = array(
 						zbx_date2str(S_EVENTS_ACTION_TIME_FORMAT,$event['clock']),
 						is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
 						$_REQUEST['hostid'] == 0 ? $host['host'] : null,
@@ -565,13 +556,12 @@ else{
 						($config['event_ack_enable'])? ($event['acknowledges']?S_YES:S_NO) :NULL, // ($config['event_ack_enable'])? $ack :NULL,
 						strip_tags( (string)$actions )
 					);
-					$csv_return .= zbx_toCSV($tbRows);
 				}
 			}
 		}
 
 		if($CSV_EXPORT){
-			echo $csv_return;
+			print(zbx_toCSV($csvRows));
 			exit();
 		}
 

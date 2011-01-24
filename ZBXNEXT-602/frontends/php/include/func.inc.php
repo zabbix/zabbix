@@ -1091,20 +1091,21 @@ function zbx_cleanHashes(&$value){
 return $value;
 }
 
-function zbx_toCSV($array){
-	$array = zbx_toArray($array);
-	$csv_str = '';
+function zbx_toCSV($values){
+	$csv = '';
 
-	$delim = '';
-	foreach($array as $value){
-		if( !is_null($value) ){
-			$value = str_replace('"', '""', $value);
-			$csv_str .= $delim . '"' . $value . '"';
-			$delim = ',';
+	$glue = '","';
+	foreach($values as $row){
+		if(!is_array($row)) $row = array($row);
+		foreach($row as $num => $value){
+			if(is_null($value)) unset($row[$num]);
+			else $row[$num] = str_replace('"', '""', $value);
 		}
+
+		$csv .= '"'.implode($glue, $row).'"'."\n";
 	}
 
-	return $csv_str . "\n";
+return $csv;
 }
 
 // }}} ARRAY FUNCTION
