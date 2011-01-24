@@ -2,6 +2,7 @@
 Changes for 1.9.2
 
 New features:
+ - [ZBXNEXT-623] restored support of SQLite3 for use with Zabbix Server and front-end (Alexei)
  - [ZBX-1357] updated Dutch translation; thanks to qix (Richlv)
  - [ZBX-1357] updated Latvian translation (Richlv)
  - [ZBXNEXT-594] Add to zabbix API support for search and filter by rules "ALL" or "ANY" (Vlad)
