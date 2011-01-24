@@ -1284,12 +1284,14 @@ class zbxXML{
 								$current_item = CItem::get($options);
 							}
 
-							$r = CApplication::massAdd(array(
-								'applications' => $item_applications,
-								'items' => $current_item
-							));
-							if($r === false){
-								throw new Exception();
+							if (isset($item_applications) && is_array($item_applications) && count($item_applications) > 0){
+								$r = CApplication::massAdd(array(
+									'applications' => $item_applications,
+									'items' => $current_item
+								));
+								if($r === false){
+									throw new Exception();
+								}
 							}
 						}
 					}
