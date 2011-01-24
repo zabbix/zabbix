@@ -160,7 +160,7 @@ require_once('include/templates/action.js.php');
 	$rowCondition[] = $cmbCondType;
 
 
-	$cmbCondOp = new CComboBox('new_condition[operator]');
+	$cmbCondOp = new CComboBox('new_condition[operator]', $new_condition['operator']);
 	foreach(get_operators_by_conditiontype($new_condition['conditiontype']) as $op)
 		$cmbCondOp->addItem($op, condition_operator2str($op));
 	$rowCondition[] = $cmbCondOp;
@@ -170,42 +170,42 @@ require_once('include/templates/action.js.php');
 			$conditionList->addItem(new CVar('new_condition[value]','0'));
 			$rowCondition[] = array(
 				new CTextBox('group','',40,'yes'),
-				new CSubmit('btn1',S_SELECT,
+				new CButton('btn1',S_SELECT,
 					"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=group&srctbl=host_group".
 					"&srcfld1=groupid&srcfld2=name',450,450);",
-					'T'));
+					'link_menu'));
 			break;
 		case CONDITION_TYPE_HOST_TEMPLATE:
 			$conditionList->addItem(new CVar('new_condition[value]','0'));
 			$rowCondition[] = array(
 				new CTextBox('host','',40,'yes'),
-				new CSubmit('btn1',S_SELECT,
+				new CButton('btn1',S_SELECT,
 					"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=host&srctbl=host_templates".
 					"&srcfld1=hostid&srcfld2=host',450,450);",
-					'T'));
+					'link_menu'));
 			break;
 		case CONDITION_TYPE_HOST:
 			$conditionList->addItem(new CVar('new_condition[value]','0'));
 			$rowCondition[] = array(
 				new CTextBox('host','',40,'yes'),
-				new CSubmit('btn1',S_SELECT,
+				new CButton('btn1',S_SELECT,
 					"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=host&srctbl=hosts".
 					"&srcfld1=hostid&srcfld2=host',450,450);",
-					'T'));
+					'link_menu'));
 			break;
 		case CONDITION_TYPE_TRIGGER:
 			$conditionList->addItem(new CVar('new_condition[value]','0'));
 
 			$rowCondition[] = array(
 				new CTextBox('trigger','',40,'yes'),
-				new CSubmit('btn1',S_SELECT,
+				new CButton('btn1',S_SELECT,
 					"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=trigger&srctbl=triggers".
 					"&srcfld1=triggerid&srcfld2=description');",
-					'T'));
+					'link_menu'));
 			break;
 		case CONDITION_TYPE_TRIGGER_NAME:
 			$rowCondition[] = new CTextBox('new_condition[value]', "", 40);
@@ -240,7 +240,7 @@ require_once('include/templates/action.js.php');
 					"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=node&srctbl=nodes".
 					"&srcfld1=nodeid&srcfld2=name',450,450);",
-					'T'));
+					'link_menu'));
 			break;
 		case CONDITION_TYPE_DRULE:
 			$conditionList->addItem(new CVar('new_condition[value]','0'));
@@ -250,7 +250,7 @@ require_once('include/templates/action.js.php');
 					"return PopUp('popup.php?dstfrm=".S_ACTION.
 					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=drule&srctbl=drules".
 					"&srcfld1=druleid&srcfld2=name',450,450);",
-					'T'));
+					'link_menu'));
 			break;
 		case CONDITION_TYPE_DCHECK:
 			$conditionList->addItem(new CVar('new_condition[value]','0'));
@@ -260,7 +260,7 @@ require_once('include/templates/action.js.php');
 					"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=dcheck&srctbl=dchecks".
 					"&srcfld1=dcheckid&srcfld2=name',450,450);",
-					'T'));
+					'link_menu'));
 			break;
 		case CONDITION_TYPE_PROXY:
 			$conditionList->addItem(new CVar('new_condition[value]','0'));
@@ -270,7 +270,7 @@ require_once('include/templates/action.js.php');
 					"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=proxy&srctbl=proxies".
 					"&srcfld1=hostid&srcfld2=host',450,450);",
-					'T'));
+					'link_menu'));
 			break;
 		case CONDITION_TYPE_DHOST_IP:
 			$rowCondition[] = new CTextBox('new_condition[value]', '192.168.0.1-127,192.168.2.1', 50);
