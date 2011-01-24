@@ -352,7 +352,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page) {
 		array_push($main_menu, $mmenu_entry);
 	}
 
-	if(!$page_exists && ($page['type']!=PAGE_TYPE_XML)&&($page['type']!=PAGE_TYPE_TEXT_FILE)){
+	if(!$page_exists && ($page['type']!=PAGE_TYPE_XML)&&($page['type']!=PAGE_TYPE_CSV)&&($page['type']!=PAGE_TYPE_TEXT_FILE)){
 		$denyed_page_requested = true;
 	}
 

@@ -1092,6 +1092,24 @@ function zbx_cleanHashes(&$value){
 
 return $value;
 }
+
+function zbx_toCSV($values){
+	$csv = '';
+
+	$glue = '","';
+	foreach($values as $row){
+		if(!is_array($row)) $row = array($row);
+		foreach($row as $num => $value){
+			if(is_null($value)) unset($row[$num]);
+			else $row[$num] = str_replace('"', '""', $value);
+		}
+
+		$csv .= '"'.implode($glue, $row).'"'."\n";
+	}
+
+return $csv;
+}
+
 // }}} ARRAY FUNCTION
 function zbx_array_mintersect($keys, $array){
 	$result = array();
