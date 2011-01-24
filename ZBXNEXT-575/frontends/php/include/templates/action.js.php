@@ -306,7 +306,7 @@ function saveOpCmdForm(){
 	object.command = jQuery(objectForm).find('textarea[name="opCmdTargetObjectCommand"]').val();
 
 	if(empty(object.command)){
-		alert("<?php print(_('Command field is empty. Please provide some extructions for operation.')); ?>");
+		alert("<?php print(_('Command field is empty. Please provide some instructions for operation.')); ?>");
 		return true;
 	}
 
@@ -320,6 +320,8 @@ function saveOpCmdForm(){
 			alert("<?php print(_('You did not specified host group for operation.')); ?>");
 			return true;
 		}
+
+		if(object.opcommand_grpid == 'new') delete(object["opcommand_grpid"]);
 	}
 	else{
 		object.object = 'hostid';
@@ -331,6 +333,8 @@ function saveOpCmdForm(){
 			alert("<?php print(_('You did not specified host for operation.')); ?>");
 			return true;
 		}
+
+		if(object.opcommand_hstid == 'new') delete(object["opcommand_hstid"]);
 	}
 
 	addPopupValues({'object': object.object, 'values': [object]});

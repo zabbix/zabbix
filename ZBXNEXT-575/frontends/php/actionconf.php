@@ -195,8 +195,6 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			$_REQUEST['conditions'] = get_request('conditions',array());
 			if(!str_in_array($new_condition, $_REQUEST['conditions']))
 				array_push($_REQUEST['conditions'],$new_condition);
-
-			unset($_REQUEST['new_condition']);
 		}
 	}
 	else if(inarr_isset(array('del_condition','g_conditionid'))){
@@ -362,7 +360,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			$action['eventsource']	= get_request('eventsource');
 			$action['evaltype']		= get_request('evaltype', 0);
 			$action['esc_period']	= get_request('esc_period', 0);
-			$action['status']		= get_request('status', 1);
+			$action['status']		= get_request('status', isset($_REQUEST['form_refresh']) ? 1 : 0);
 			$action['def_shortdata']= get_request('def_shortdata', ACTION_DEFAULT_SUBJ);
 			$action['def_longdata']	= get_request('def_longdata', ACTION_DEFAULT_MSG);
 			$action['recovery_msg']	= get_request('recovery_msg',0);
@@ -444,10 +442,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			$operations=array();
 			order_result($action['operations'], 'operationtype', ZBX_SORT_DOWN);
 			foreach($action['operations'] as $onum => $operation){
-				$operations[] = array(
-					get_operation_desc(SHORT_DESCRITION, $operation),
-					BR()
-				);
+				$operations[] = get_operation_desc(SHORT_DESCRITION, $operation);
 			}
 
 			if($action['status'] == ACTION_STATUS_DISABLED){
