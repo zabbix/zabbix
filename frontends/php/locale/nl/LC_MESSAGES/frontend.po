@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-01-14 09:28+0200\n"
-"PO-Revision-Date: 2011-01-14 15:52+0200\n"
+"PO-Revision-Date: 2011-01-16 23:23+0200\n"
 "Last-Translator: qix <qix@the-wired.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: nl\n"
@@ -662,7 +662,7 @@ msgstr "CONFIGURATIE VAN NODES"
 
 #: include/locales/en_gb.inc.php:621
 msgid "CONFIGURATION OF PROXIES"
-msgstr ""
+msgstr "CONFIGURATIE VAN PROXIES"
 
 #: include/locales/en_gb.inc.php:1609
 msgid "CONFIGURATION OF SCREEN"
@@ -674,23 +674,23 @@ msgstr "CONFIGURATIE VAN SCHERMEN"
 
 #: include/locales/en_gb.inc.php:1962
 msgid "CONFIGURATION OF SCRIPTS"
-msgstr ""
+msgstr "CONFIGURATIE VAN SCRIPTS"
 
 #: include/locales/en_gb.inc.php:1631
 msgid "CONFIGURATION OF SLIDE SHOWS"
-msgstr ""
+msgstr "CONFIGURATIE VAN DIA VOORSTELLINGEN"
 
 #: include/locales/en_gb.inc.php:908
 msgid "CONFIGURATION OF TEMPLATES"
-msgstr ""
+msgstr "CONFIGURATIE VAN SJABLONEN"
 
 #: include/locales/en_gb.inc.php:1235
 msgid "CONFIGURATION OF TRIGGER PROTOTYPES"
-msgstr ""
+msgstr "CONFIGURATIE VAN TRIGGER PROTOTYPES"
 
 #: include/locales/en_gb.inc.php:1775
 msgid "CONFIGURATION OF TRIGGERS"
-msgstr "CONFIGURATIE VAN TREKKERS"
+msgstr "CONFIGURATIE VAN TRIGGERS"
 
 #: include/locales/en_gb.inc.php:1907
 msgid "CONFIGURATION OF USERS AND USER GROUPS"
@@ -698,7 +698,7 @@ msgstr "CONFIGURATIE VAN GEBRUIKERS AND GROEPEN"
 
 #: include/locales/en_gb.inc.php:186
 msgid "CONFIGURATION OF WEB MONITORING"
-msgstr ""
+msgstr "CONFIGURATIE VAN WEB MONITORING"
 
 #: include/locales/en_gb.inc.php:510
 msgid "CONFIGURATION OF ZABBIX"
@@ -706,100 +706,103 @@ msgstr "CONFIGURATIE VAN ZABBIX"
 
 #: include/locales/en_gb.inc.php:1728
 msgid "Calculate SLA"
-msgstr ""
+msgstr "Bereken SLA"
 
 #: include/locales/en_gb.inc.php:718
 msgid "Calculated"
-msgstr "Gecalculeerd"
+msgstr "Berekend"
 
 #: include/locales/en_gb.inc.php:946
 msgid "Callback"
-msgstr ""
+msgstr "Terugbellen"
 
 #: include/locales/en_gb.inc.php:2540
 msgid "Can not create new element"
-msgstr ""
+msgstr "Kan geen nieuw element maken"
 
 #: api/classes/class.cuser.php:758
 #, php-format
 msgid "Can not delete %1$s internal user \" %2$s \", try disabling that user."
 msgstr ""
+"Kan interne gebruiker %1$s niet verwijderen \" %2$s \", Probeer de gebruiker "
+"uit te schakelen."
 
 #: include/locales/en_gb.inc.php:2539
 msgid "Can not find objects with name"
-msgstr ""
+msgstr "Kan geen objecten vinden met dezelfde naam"
 
 #: include/locales/en_gb.inc.php:2345
 msgid "Can not use multiple host items for template graph"
 msgstr ""
+"In een sjabloon grafiek kunnen geen items van meerdere hosts gebruikt worden"
 
 #: api/classes/class.ctemplate.php:1405
 msgid "Can't add group"
-msgstr ""
+msgstr "Kan groep niet toevoegen"
 
 #: include/locales/en_gb.inc.php:2467
 msgid "Can't delete media types"
-msgstr ""
+msgstr "Kan media types niet verwijderen"
 
 #: include/locales/en_gb.inc.php:2448
 msgid "Can't delete user medias"
-msgstr ""
+msgstr "Kan gebruikers media niet verwijderen"
 
 #: include/locales/en_gb.inc.php:2509
 msgid "Can't format Tree"
-msgstr ""
+msgstr "Kan boom niet formatteren"
 
 #: include/locales/en_gb.inc.php:2469
 msgid "Can't insert media types"
-msgstr ""
+msgstr "Kan media type niet invoegen"
 
 #: include/locales/en_gb.inc.php:2450
 msgid "Can't insert user medias"
-msgstr ""
+msgstr "Kan gebruikers media niet invoeren"
 
 #: api/classes/class.ctemplate.php:1481 api/classes/class.ctemplate.php:1491
 msgid "Can't link template"
-msgstr ""
+msgstr "Kan sjabloon niet koppelen"
 
 #: include/locales/en_gb.inc.php:1988
 msgid "Can't read script response, check connection"
-msgstr ""
+msgstr "Kan script response niet lezen. Controleer de verbinding."
 
 #: api/classes/class.ctemplate.php:1416
 msgid "Can't remove group"
-msgstr ""
+msgstr "Kan groep niet verwijderen"
 
 #: api/classes/class.ctemplate.php:1531
 msgid "Can't remove macro"
-msgstr ""
+msgstr "Kan macro niet verwijderen"
 
 #: api/classes/class.ctemplate.php:1625
 msgid "Can't remove macros"
-msgstr ""
+msgstr "Kan macros niet verwijderen"
 
 #: include/locales/en_gb.inc.php:1987
 msgid "Can't send command, check connection"
-msgstr ""
+msgstr "Kan commando niet sturen. Controleer de verbinding."
 
 #: api/classes/class.ctemplate.php:1601
 msgid "Can't unlink groups"
-msgstr ""
+msgstr "Kan groepen niet ontkoppelen"
 
 #: api/classes/class.ctemplate.php:1452 api/classes/class.ctemplate.php:1470
 msgid "Can't unlink template"
-msgstr ""
+msgstr "Kan sjabloon niet ontkoppelen"
 
 #: include/locales/en_gb.inc.php:2468
 msgid "Can't update media types"
-msgstr ""
+msgstr "Kan media types niet bijwerken"
 
 #: include/locales/en_gb.inc.php:2449
 msgid "Can't update user medias"
-msgstr ""
+msgstr "Kan gebruikers media niet bijwerken"
 
 #: include/locales/en_gb.inc.php:561
 msgid "Canada (136 characters)"
-msgstr ""
+msgstr "Canada (136 karakter)"
 
 #: include/locales/en_gb.inc.php:1385
 #: include/templates/scriptConfirm.js.php:39
@@ -809,7 +812,7 @@ msgstr "Annuleer"
 
 #: include/locales/en_gb.inc.php:300
 msgid "Cannot acknowledge event"
-msgstr ""
+msgstr "Kan gebeurtenis niet bevestigen"
 
 #: include/locales/en_gb.inc.php:379
 msgid "Cannot add action"
@@ -821,11 +824,11 @@ msgstr "Kan applicatie niet toevoegen"
 
 #: host_discovery.php:247 include/locales/en_gb.inc.php:136
 msgid "Cannot add discovery rule"
-msgstr ""
+msgstr "Kan discovery regel niet toevoegen"
 
 #: include/locales/en_gb.inc.php:710
 msgid "Cannot add graph"
-msgstr "Kan grefiek niet toevoegen"
+msgstr "Kan grafiek niet toevoegen"
 
 #: api/classes/class.chost.php:1727 include/locales/en_gb.inc.php:1882
 msgid "Cannot add group"
@@ -833,7 +836,7 @@ msgstr "Kan groep niet toevoegen"
 
 #: include/locales/en_gb.inc.php:897
 msgid "Cannot add host"
-msgstr "kan gastheer niet toevoegen"
+msgstr "Kan host niet toevoegen"
 
 #: include/locales/en_gb.inc.php:545
 msgid "Cannot add image"

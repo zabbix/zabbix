@@ -11,6 +11,7 @@ New features:
  - [ZBX-3338] updated Ukrainian translation; thanks to zalex_ua (Richlv)
 
 Bug fixes:
+ - [ZBX-3436] added missing "Primary POC Screen Name" to Inventory->Hosts (KB)
  - [ZBX-3405] fixed value_type for response code and failed step items when create webcheck (Vedmak)
  - [ZBX-3363] fixed possible crash of server while processing of {HOST.CONN}, {IPADDRESS} and {HOST.DNS} macros (Sasha)
  - [ZBX-3326] add X-Poedit-Basepath header to all locales (Richlv)
@@ -67,6 +68,11 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
 
+ - [ZBX-2922] changed log level from warning to debug for some messages (Sasha)
+ - [ZBX-3440] Added pagination to slide and discovery configuration (KB)
+ - [ZBX-3433] fixed removing deleted passive proxies from queue (Sasha)
+ - [ZBX-416] fixed PostgreSQL errors in configuration sender module when using DM setup (Sasha)
+ - [ZBX-3346] fixed items being polled more frequently than necessary (Sasha)
  - [ZBX-3409] fixed semaphore and shared memory access permissions (Sasha)
  - [ZBX-3173] made server-side JSON parser ignore whitespace better (asaveljevs)
  - [ZBX-3425] updated Brazilian Portuguese translation; thanks to Murilo Moreira de Oliveira (Richlv)

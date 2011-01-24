@@ -78,6 +78,22 @@ class testPageSlideShows extends CWebTest
 
 	public function testPageSlideShows_Create()
 	{
+		$this->login('slideconf.php');
+		$this->assertTitle('Configuration of slideshows');
+		$this->button_click('form');
+		$this->wait();
+
+		$this->ok('Slide show');
+		$this->ok('Name');
+		$this->ok('Update interval');
+		$this->ok('Slides');
+		$this->button_click('cancel');
+		$this->wait();
+		$this->ok('SLIDE SHOWS');
+	}
+
+	public function testPageSlideShows_MassDeleteAll()
+	{
 // TODO
 		$this->markTestIncomplete();
 	}
@@ -113,6 +129,12 @@ class testPageSlideShows extends CWebTest
 		$this->assertEquals(0,DBcount($sql));
 
 		DBrestore_tables(array('slides','slideshows'));
+	}
+
+	public function testPageSlideShows_Sorting()
+	{
+// TODO
+		$this->markTestIncomplete();
 	}
 }
 ?>

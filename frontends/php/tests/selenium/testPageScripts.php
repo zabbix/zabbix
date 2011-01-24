@@ -71,6 +71,12 @@ class testPageScripts extends CWebTest
 		$this->assertEquals($oldHash,DBhash($sql));
 	}
 
+	public function testPageScripts_MassDeleteAll()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
 	/**
 	* @dataProvider allScripts
 	*/
@@ -96,6 +102,12 @@ class testPageScripts extends CWebTest
 		$this->assertEquals(0,DBcount($sql));
 
 		DBrestore_tables(array('scripts'));
+	}
+
+	public function testPageScripts_Sorting()
+	{
+// TODO
+		$this->markTestIncomplete();
 	}
 }
 ?>

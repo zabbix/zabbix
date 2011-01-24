@@ -21,7 +21,7 @@
 <?php
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageMediaTypes extends CWebTest
+class testFormMediaType extends CWebTest
 {
 	// Returns all media types
 	public static function allMediaTypes()
@@ -29,61 +29,54 @@ class testPageMediaTypes extends CWebTest
 		return DBdata('select * from media_type');
 	}
 
-	/**
-	* @dataProvider allMediaTypes
-	*/
-	public function testPageMediaTypes_SimpleTest($mediatype)
+	public function testFormMediaType_SimpleTest()
 	{
 		$this->login('media_types.php');
 		$this->assertTitle('Media types');
 
+		$this->click('form');
+		$this->wait();
+
 		$this->ok('Media types');
 		$this->ok('CONFIGURATION OF MEDIA TYPES');
-		$this->ok('Displaying');
-		$this->ok(array('Description','Type','Details'));
-		$this->ok($mediatype['description']);
-		if($mediatype['type'] == MEDIA_TYPE_EMAIL)	$this->ok('Email');
-		if($mediatype['type'] == MEDIA_TYPE_JABBER)	$this->ok('Jabber');
-		if($mediatype['type'] == MEDIA_TYPE_SMS)	$this->ok('SMS');
-		if($mediatype['type'] == MEDIA_TYPE_EZ_TEXTING)	$this->ok('Ez Texting');
-		$this->dropdown_select('go','Delete selected');
+		$this->nok('Displaying');
+		$this->ok(array('Description','Type','SMTP server','SMTP helo','SMTP email'));
+
+		$this->click('cancel');
+		$this->wait();
+
+		$this->assertTitle('Media types');
 	}
 
 	/**
 	* @dataProvider allMediaTypes
 	*/
-	public function testPageMediaTypes_SimpleUpdate($mediatype)
+	public function testFormMediaType_SimpleCancel($mediatype)
 	{
 		$name=$mediatype['description'];
 
-		$sql="select * from media_type where description='$name' order by mediatypeid";
+		$sql="select * from media_type order by mediatypeid";
 		$oldHash=DBhash($sql);
 
 		$this->login('media_types.php');
 		$this->assertTitle('Media types');
 		$this->click("link=$name");
 		$this->wait();
-		$this->button_click('save');
+		$this->button_click('cancel');
 		$this->wait();
 		$this->assertTitle('Media types');
-		$this->ok('Media type updated');
 		$this->ok("$name");
 		$this->ok('CONFIGURATION OF MEDIA TYPES');
 
 		$this->assertEquals($oldHash,DBhash($sql));
 	}
 
-	public function testPageMediaTypes_MassDeleteAll()
-	{
-// TODO
-		$this->markTestIncomplete();
-	}
-
 	/**
 	* @dataProvider allMediaTypes
 	*/
-	public function testPageMediaTypes_MassDelete($mediatype)
+	public function testFormMediaType_SimpleDelete($mediatype)
 	{
+		$name=$mediatype['description'];
 		$id=$mediatype['mediatypeid'];
 
 		$row=DBfetch(DBselect("select count(*) as cnt from media_type where mediatypeid=$id"));
@@ -96,9 +89,10 @@ class testPageMediaTypes extends CWebTest
 
 		$this->login('media_types.php');
 		$this->assertTitle('Media types');
-		$this->checkbox_select("media_types[$id]");
-		$this->dropdown_select('go','Delete selected');
-		$this->button_click('goButton');
+		$this->click("link=$name");
+		$this->wait();
+
+		$this->button_click('delete');
 
 		$this->getConfirmation();
 		$this->wait();
@@ -117,12 +111,6 @@ class testPageMediaTypes extends CWebTest
 		}
 
 		DBrestore_tables(array('media_type','media','operations'));
-	}
-
-	public function testPageMediaTypes_Sorting()
-	{
-// TODO
-		$this->markTestIncomplete();
 	}
 }
 ?>

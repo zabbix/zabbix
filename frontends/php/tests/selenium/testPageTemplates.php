@@ -98,7 +98,19 @@ class testPageTemplates extends CWebTest
 		$this->markTestIncomplete();
 	}
 
+	public function testPageTemplates_MassExportAll()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
 	public function testPageTemplates_MassExport()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
+	public function testPageTemplates_MassDeleteAll()
 	{
 // TODO
 		$this->markTestIncomplete();
@@ -110,7 +122,19 @@ class testPageTemplates extends CWebTest
 		$this->markTestIncomplete();
 	}
 
+	public function testPageTemplates_MassDeleteWithLinkedElementsAll()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
 	public function testPageTemplates_MassDeleteWithLinkedElements()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
+	public function testPageTemplates_Sorting()
 	{
 // TODO
 		$this->markTestIncomplete();
