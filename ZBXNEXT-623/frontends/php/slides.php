@@ -293,7 +293,7 @@ include_once('include/page_header.php');
 			$menu = array();
 			$submenu = array();
 			$refresh_multipl = CProfile::get('web.slides.rf_rate.hat_slides', 1, $elementid);
-			
+
 // workaround for 1.8.2 upgrade, earlier value was integer type, now str
 			if(empty($refresh_multipl)){
 				$refresh_multipl = 1;

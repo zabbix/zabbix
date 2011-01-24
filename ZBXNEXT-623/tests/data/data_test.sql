@@ -1,5 +1,5 @@
 -- Activate Zabbix Server
-UPDATE hosts SET status=0 WHERE host='Zabbix Server';
+UPDATE hosts SET status=0 WHERE host='Zabbix server';
 
 -- New media types
 INSERT INTO media_type (mediatypeid, type, description, smtp_server, smtp_helo, smtp_email, exec_path, gsm_modem, username, passwd) VALUES (4,100,'SMS via IP','','','','0','','test','test');

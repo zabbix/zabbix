@@ -91,6 +91,12 @@ class testPageUsers extends CWebTest
 		$this->assertEquals($oldHashMedia,DBhash($sql3),"Chuck Norris: User update changed data in table medias");
 	}
 
+	public function testPageUsers_MassDeleteAll()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
 	public function testPageUsers_MassDelete()
 	{
 		DBsave_tables(array('users','users_groups','media'));
@@ -162,6 +168,12 @@ class testPageUsers extends CWebTest
 		}
 
 		DBrestore_tables(array('users','users_groups','media'));
+	}
+
+	public function testPageUsers_MassUnblockAll()
+	{
+// TODO
+		$this->markTestIncomplete();
 	}
 
 	public function testPageUsers_MassUnblock()

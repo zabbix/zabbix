@@ -28,6 +28,7 @@ require_once(dirname(__FILE__).'/../../include/db.inc.php');
 
 function error($error)
 {
+	echo "\nError reported: $error\n";
 	return true;
 }
 

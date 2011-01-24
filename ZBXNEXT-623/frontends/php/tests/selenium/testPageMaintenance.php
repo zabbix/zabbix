@@ -36,6 +36,7 @@ class testPageMaintenance extends CWebTest
 	{
 		$this->login('maintenance.php');
 		$this->dropdown_select('groupid','all');
+		$this->wait();
 		$this->assertTitle('Maintenance');
 
 		$this->ok('Maintenance');
@@ -90,6 +91,12 @@ class testPageMaintenance extends CWebTest
 		$this->assertEquals($oldHashTimeperiods,DBhash($sql5),"Chuck Norris: Maintenance update changed data in table 'timeperiods'");
 	}
 
+	public function testPageMaintenance_MassDeleteAll()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
 	/**
 	* @dataProvider allMaintenances
 	*/
@@ -139,7 +146,19 @@ class testPageMaintenance extends CWebTest
 		$this->markTestIncomplete();
 	}
 
+	public function testPageMaintenance_MassEnableAll()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
 	public function testPageMaintenance_MassEnable()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
+	public function testPageMaintenance_MassDisableAll()
 	{
 // TODO
 		$this->markTestIncomplete();
@@ -151,5 +170,10 @@ class testPageMaintenance extends CWebTest
 		$this->markTestIncomplete();
 	}
 
+	public function testPageMaintenance_Sorting()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
 }
 ?>

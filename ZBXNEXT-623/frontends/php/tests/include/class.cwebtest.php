@@ -29,7 +29,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 {
 	protected $captureScreenshotOnFailure = TRUE;
 	protected $screenshotPath = '/home/hudson/public_html/screenshots';
-	protected $screenshotUrl = 'http://hudson/~hudson/screenshots';
+	protected $screenshotUrl = 'http://192.168.3.32/~hudson/screenshots';
 
 	// List of strings that should NOT appear on any page
 	public $failIfExists = array (

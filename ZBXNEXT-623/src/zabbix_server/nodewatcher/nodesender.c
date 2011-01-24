@@ -48,6 +48,7 @@
 int calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id)
 {
 	const char	*__function_name = "calculate_checksums";
+
 	char	*sql = NULL;
 	int	sql_allocated = 2048, sql_offset;
 	int	t, f, res = SUCCEED;
@@ -61,8 +62,7 @@ int calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id
 			"delete from node_cksum"
 			" where nodeid=%d"
 				" and cksumtype=%d",
-			nodeid,
-			NODE_CKSUM_TYPE_NEW);
+			nodeid, NODE_CKSUM_TYPE_NEW);
 
 	if (NULL != tablename)
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
@@ -77,9 +77,10 @@ int calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id
 	if (ZBX_DB_OK > DBexecute("%s", sql))
 		res = FAIL;
 
-	for (t = 0; 0 != tables[t].table && SUCCEED == res; t++) {
+	for (t = 0; 0 != tables[t].table && SUCCEED == res; t++)
+	{
 		/* Do not sync some of tables */
-		if ((tables[t].flags & ZBX_SYNC) == 0)
+		if (0 == (tables[t].flags & ZBX_SYNC))
 			continue;
 
 		if (NULL != tablename && 0 != strcmp(tablename, tables[t].table))
@@ -87,64 +88,75 @@ int calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id
 
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 256,
-			"insert into node_cksum (nodeid,tablename,recordid,cksumtype,cksum)"
-			" select %d,'%s',%s,%d,",
-			nodeid,
-			tables[t].table,
-			tables[t].recid,
-			NODE_CKSUM_TYPE_NEW);
+				"insert into node_cksum (nodeid,tablename,recordid,cksumtype,cksum)"
+				" select %d,'%s',%s,%d,",
+				nodeid, tables[t].table, tables[t].recid, NODE_CKSUM_TYPE_NEW);
 #ifdef HAVE_MYSQL
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 16, "concat_ws(',',");
 #endif
 
-		for (f = 0; tables[t].fields[f].name != 0; f ++) {
-			if ((tables[t].fields[f].flags & ZBX_SYNC) == 0)
+		for (f = 0; NULL != tables[t].fields[f].name; f++)
+		{
+			const ZBX_FIELD	*field = &tables[t].fields[f];
+
+			if (0 == (field->flags & ZBX_SYNC))
 				continue;
 
-			if (tables[t].fields[f].flags & ZBX_NOTNULL) {
-				switch ( tables[t].fields[f].type ) {
-				case ZBX_TYPE_ID	:
-				case ZBX_TYPE_INT	:
-				case ZBX_TYPE_UINT	:
-					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, ZBX_FIELDNAME_LEN + 1, "%s",
-							tables[t].fields[f].name);
-					break;
-				default	:
-					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, ZBX_FIELDNAME_LEN + 6, "md5(%s)",
-							tables[t].fields[f].name);
-					break;
+			if (field->flags & ZBX_NOTNULL)
+			{
+				switch (field->type)
+				{
+					case ZBX_TYPE_ID:
+					case ZBX_TYPE_INT:
+					case ZBX_TYPE_UINT:
+						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, ZBX_FIELDNAME_LEN + 1,
+								"%s", field->name);
+						break;
+					case ZBX_TYPE_FLOAT:
+						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, ZBX_FIELDNAME_LEN + 20,
+								"md5(cast(%s as char))", field->name);
+						break;
+					default:
+						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, ZBX_FIELDNAME_LEN + 6,
+								"md5(%s)", field->name);
+						break;
 				}
-			} else {
-				switch ( tables[t].fields[f].type ) {
-				case ZBX_TYPE_ID	:
-				case ZBX_TYPE_INT	:
-				case ZBX_TYPE_UINT	:
-					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 192,
-							"case when %s is null then 'NULL' else cast(%s as char) end",
-							tables[t].fields[f].name,
-							tables[t].fields[f].name);
-					break;
-				default	:
-					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 192,
-							"case when %s is null then 'NULL' else md5(%s) end",
-							tables[t].fields[f].name,
-							tables[t].fields[f].name);
-					break;
+			}
+			else
+			{
+				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, ZBX_FIELDNAME_LEN + 31,
+						"case when %s is null then 'NULL'", field->name);
+
+				switch (field->type)
+				{
+					case ZBX_TYPE_ID:
+					case ZBX_TYPE_INT:
+					case ZBX_TYPE_UINT:
+						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, ZBX_FIELDNAME_LEN + 25,
+								" else cast(%s as char) end", field->name);
+						break;
+					case ZBX_TYPE_FLOAT:
+						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, ZBX_FIELDNAME_LEN + 30,
+								" else md5(cast(%s as char)) end", field->name);
+						break;
+					default:
+						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, ZBX_FIELDNAME_LEN + 16,
+								" else md5(%s) end", field->name);
+						break;
 				}
 			}
 #ifdef HAVE_MYSQL
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 2,
-					",");
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 2, ",");
 #else
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8,
-					"||','||");
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "||','||");
 #endif
 		}
 
 		/* remove last delimiter */
-		if (f > 0) {
+		if (f > 0)
+		{
 #ifdef HAVE_MYSQL
-			sql_offset --;
+			sql_offset--;
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 2, ")");
 #else
 			sql_offset -= 7;
@@ -153,14 +165,13 @@ int calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id
 
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 256,
 				" from %s where 1=1" DB_NODE,
-				tables[t].table,
-				DBnode(tables[t].recid, nodeid));
+				tables[t].table, DBnode(tables[t].recid, nodeid));
 
-		if (0 != id) {
+		if (0 != id)
+		{
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
 					" and %s=" ZBX_FS_UI64,
-					tables[t].recid,
-					id);
+					tables[t].recid, id);
 		}
 
 		if (ZBX_DB_OK > DBexecute("%s", sql))
@@ -273,7 +284,7 @@ static void	DMcollect_table_data(int nodeid, int dest_nodetype, const ZBX_TABLE 
 			continue;
 		}
 
-		prev_cksum = DBis_null(row[1]) == SUCCEED ? NULL : row[1];
+		prev_cksum = (SUCCEED == DBis_null(row[1]) ? NULL : row[1]);
 		curr_cksum = row[2];
 		s = sync;
 		f = 0;
@@ -327,7 +338,7 @@ static void	DMcollect_table_data(int nodeid, int dest_nodetype, const ZBX_TABLE 
 			else
 				curr_cksum = NULL;
 		}
-		while (d_prev_cksum != NULL || d_curr_cksum != NULL);
+		while (NULL != d_prev_cksum || NULL != d_curr_cksum);
 
 		if (sql[sql_offset - 1] != ',')
 			continue;
@@ -419,7 +430,7 @@ static void	DMcollect_table_data(int nodeid, int dest_nodetype, const ZBX_TABLE 
 			else
 				curr_cksum = NULL;
 		}
-		while (d_prev_cksum != NULL || d_curr_cksum != NULL);
+		while (NULL != d_prev_cksum || NULL != d_curr_cksum);
 out:
 		DBfree_result(result2);
 	}

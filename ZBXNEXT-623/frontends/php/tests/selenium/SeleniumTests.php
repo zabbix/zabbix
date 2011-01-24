@@ -49,9 +49,9 @@ require_once(dirname(__FILE__).'/testPageUsers.php');
 require_once(dirname(__FILE__).'/testFormHost.php');
 require_once(dirname(__FILE__).'/testFormHostGroup.php');
 require_once(dirname(__FILE__).'/testFormLogin.php');
+require_once(dirname(__FILE__).'/testFormMediaType.php');
 require_once(dirname(__FILE__).'/testFormProfile.php');
 require_once(dirname(__FILE__).'/testFormScreen.php');
-// ...
 
 class SeleniumTests
 {
@@ -89,9 +89,9 @@ class SeleniumTests
 		$suite->addTestSuite('testFormHost');
 		$suite->addTestSuite('testFormHostGroup');
 		$suite->addTestSuite('testFormLogin');
+		$suite->addTestSuite('testFormMediaType');
 		$suite->addTestSuite('testFormProfile');
 		$suite->addTestSuite('testFormScreen');
-		// ...
 
 		return $suite;
 	}

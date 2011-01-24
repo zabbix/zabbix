@@ -1,4 +1,5 @@
 ALTER TABLE ONLY users ALTER userid DROP DEFAULT;
+ALTER TABLE ONLY users ALTER COLUMN lang SET DEFAULT 'en_GB';
 UPDATE users SET lang = 'zh_CN' WHERE lang = 'cn_zh';
 UPDATE users SET lang = 'es_ES' WHERE lang = 'sp_sp';
 UPDATE users SET lang = 'en_GB' WHERE lang = 'en_gb';
