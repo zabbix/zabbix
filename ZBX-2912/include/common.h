@@ -907,10 +907,11 @@ void	zbx_strupper(char *str);
 #if defined(_WINDOWS) || defined(HAVE_ICONV)
 char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);
 #endif	/* HAVE_ICONV */
-char	*zbx_replace_utf8(const char *text, char replacement);
 int	zbx_strlen_utf8(const char *text);
-void	zbx_utf8_replace_invalid_bytes(char *s);
-int	zbx_check_hostname(const char *hostname);
+
+#define ZBX_UTF8_REPLACE_CHAR	'?'
+char	*zbx_replace_utf8(const char *text);
+void	zbx_replace_invalid_utf8(char *text);
 
 void	win2unix_eol(char *text);
 int	str2uint(const char *str);
@@ -927,6 +928,8 @@ int	MAIN_ZABBIX_ENTRY(void);
 
 zbx_uint64_t	zbx_letoh_uint64(zbx_uint64_t data);
 zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data);
+
+int	zbx_check_hostname(const char *hostname);
 
 int	is_hostname_char(char c);
 int	is_key_char(char c);

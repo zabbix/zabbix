@@ -1316,7 +1316,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 					calc_timestamp(values[i].value, &values[i].timestamp, item.logtimefmt);
 
 				if (NULL != values[i].source)
-					zbx_utf8_replace_invalid_bytes(values[i].source);
+					zbx_replace_invalid_utf8(values[i].source);
 				dc_add_history(item.itemid, item.value_type, &agent, values[i].clock,
 						values[i].timestamp, values[i].source, values[i].severity,
 						values[i].logeventid, values[i].lastlogsize, values[i].mtime);
