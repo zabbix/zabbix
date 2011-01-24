@@ -82,6 +82,12 @@
 	define('ZBX_AUTH_LDAP',		1);
 	define('ZBX_AUTH_HTTP',		2);
 
+	define('ZBX_DB_DB2',		'IBM_DB2');
+	define('ZBX_DB_MYSQL',		'MYSQL');
+	define('ZBX_DB_ORACLE',		'ORACLE');
+	define('ZBX_DB_POSTGRESQL',		'POSTGRESQL');
+	define('ZBX_DB_SQLITE3',		'SQLITE3');
+
 	define('PAGE_TYPE_HTML',			0);
 	define('PAGE_TYPE_IMAGE',			1);
 	define('PAGE_TYPE_XML',				2);

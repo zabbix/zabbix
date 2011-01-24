@@ -246,6 +246,19 @@ frontends/php/tests/api_json/ApiJsonTests.php -text
 frontends/php/tests/api_json/General.php -text
 frontends/php/tests/api_json/User.php -text
 frontends/php/tests/bootstrap.php.template -text
+frontends/php/tests/general/function_DBclose.php -text
+frontends/php/tests/general/function_DBcommit.php -text
+frontends/php/tests/general/function_DBcondition.php -text
+frontends/php/tests/general/function_DBconnect.php -text
+frontends/php/tests/general/function_DBend.php -text
+frontends/php/tests/general/function_DBexecute.php -text
+frontends/php/tests/general/function_DBfetch.php -text
+frontends/php/tests/general/function_DBid2nodeid.php -text
+frontends/php/tests/general/function_DBin_node.php -text
+frontends/php/tests/general/function_DBloadfile.php -text
+frontends/php/tests/general/function_DBrollback.php -text
+frontends/php/tests/general/function_DBselect.php -text
+frontends/php/tests/general/function_DBstart.php -text
 frontends/php/tests/include/class.cwebtest.php -text
 frontends/php/tests/include/class.czabbixtest.php -text
 frontends/php/tests/include/dbfunc.php -text
@@ -254,6 +267,7 @@ frontends/php/tests/selenium/testClicks.php -text
 frontends/php/tests/selenium/testFormHost.php -text
 frontends/php/tests/selenium/testFormHostGroup.php -text
 frontends/php/tests/selenium/testFormLogin.php -text
+frontends/php/tests/selenium/testFormMediaType.php -text
 frontends/php/tests/selenium/testFormProfile.php -text
 frontends/php/tests/selenium/testFormScreen.php -text
 frontends/php/tests/selenium/testGeneric.php -text
@@ -264,6 +278,8 @@ frontends/php/tests/selenium/testPageDashboard.php -text
 frontends/php/tests/selenium/testPageDiscovery.php -text
 frontends/php/tests/selenium/testPageEvents.php -text
 frontends/php/tests/selenium/testPageHosts.php -text
+frontends/php/tests/selenium/testPageInventory.php -text
+frontends/php/tests/selenium/testPageInventoryExtended.php -text
 frontends/php/tests/selenium/testPageMaintenance.php -text
 frontends/php/tests/selenium/testPageMaps.php -text
 frontends/php/tests/selenium/testPageMediaTypes.php -text

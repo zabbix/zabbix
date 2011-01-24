@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-01-14 09:28+0200\n"
-"PO-Revision-Date: 2011-01-14 09:25+0200\n"
+"PO-Revision-Date: 2011-01-14 10:22+0200\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
@@ -293,7 +293,7 @@ msgstr "Додано новий вузол мережі"
 
 #: include/locales/en_gb.inc.php:2217
 msgid "Added new item"
-msgstr "Додано новий елемент"
+msgstr "Додано новий елемент даних"
 
 #: include/locales/en_gb.inc.php:513
 msgid "Added new media type"
@@ -374,7 +374,7 @@ msgstr "Ключ елемента даних має бути використа�
 
 #: include/locales/en_gb.inc.php:2214
 msgid "An item with the Key"
-msgstr "Елемент з ключем"
+msgstr "Елемент даних з Ключем"
 
 #: include/locales/en_gb.inc.php:1858
 msgid "Any"

@@ -212,9 +212,10 @@
 		'poc_2_notes'=>S_POC_2_NOTES
 	);
 
-
 	foreach($ext_profiles_fields as $field => $caption){
-		if(!isset($ext_host_profiles[$field])) $ext_host_profiles[$field] = '';
+		if(!isset($ext_host_profiles[$field])){
+			$ext_host_profiles[$field] = '';
+		}
 	}
 
 	$clear_templates = array_intersect($clear_templates, array_keys($original_templates));

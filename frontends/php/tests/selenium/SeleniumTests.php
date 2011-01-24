@@ -28,6 +28,8 @@ require_once(dirname(__FILE__).'/testPageDashboard.php');
 require_once(dirname(__FILE__).'/testPageDiscovery.php');
 require_once(dirname(__FILE__).'/testPageEvents.php');
 require_once(dirname(__FILE__).'/testPageHosts.php');
+require_once(dirname(__FILE__).'/testPageInventory.php');
+require_once(dirname(__FILE__).'/testPageInventoryExtended.php');
 require_once(dirname(__FILE__).'/testPageMaintenance.php');
 require_once(dirname(__FILE__).'/testPageMaps.php');
 require_once(dirname(__FILE__).'/testPageMediaTypes.php');
@@ -47,9 +49,9 @@ require_once(dirname(__FILE__).'/testPageUsers.php');
 require_once(dirname(__FILE__).'/testFormHost.php');
 require_once(dirname(__FILE__).'/testFormHostGroup.php');
 require_once(dirname(__FILE__).'/testFormLogin.php');
+require_once(dirname(__FILE__).'/testFormMediaType.php');
 require_once(dirname(__FILE__).'/testFormProfile.php');
 require_once(dirname(__FILE__).'/testFormScreen.php');
-// ...
 
 class SeleniumTests
 {
@@ -66,6 +68,8 @@ class SeleniumTests
 		$suite->addTestSuite('testPageDiscovery');
 		$suite->addTestSuite('testPageEvents');
 		$suite->addTestSuite('testPageHosts');
+		$suite->addTestSuite('testPageInventory');
+		$suite->addTestSuite('testPageInventoryExtended');
 		$suite->addTestSuite('testPageMaintenance');
 		$suite->addTestSuite('testPageMaps');
 		$suite->addTestSuite('testPageMediaTypes');
@@ -85,9 +89,9 @@ class SeleniumTests
 		$suite->addTestSuite('testFormHost');
 		$suite->addTestSuite('testFormHostGroup');
 		$suite->addTestSuite('testFormLogin');
+		$suite->addTestSuite('testFormMediaType');
 		$suite->addTestSuite('testFormProfile');
 		$suite->addTestSuite('testFormScreen');
-		// ...
 
 		return $suite;
 	}

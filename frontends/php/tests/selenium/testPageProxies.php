@@ -76,10 +76,22 @@ class testPageProxies extends CWebTest
 		$this->assertEquals($oldHashHosts,DBhash($sql2),"Chuck Norris: no-change proxy update should not update 'hosts.proxy_hostid'");
 	}
 
+	public function testPageProxies_MassActivateAll()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
 	/**
 	* @dataProvider allProxies
 	*/
 	public function testPageProxies_MassActivate($proxy)
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
+	public function testPageProxies_MassDisableAll()
 	{
 // TODO
 		$this->markTestIncomplete();
@@ -94,10 +106,22 @@ class testPageProxies extends CWebTest
 		$this->markTestIncomplete();
 	}
 
+	public function testPageProxies_MassDeleteAll()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
 	/**
 	* @dataProvider allProxies
 	*/
 	public function testPageProxies_MassDelete($proxy)
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
+	public function testPageProxies_Sorting()
 	{
 // TODO
 		$this->markTestIncomplete();
