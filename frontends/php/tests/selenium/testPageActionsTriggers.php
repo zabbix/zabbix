@@ -98,10 +98,10 @@ class testPageActionsTriggers extends CWebTest
 		$this->assertTitle('Configuration of actions');
 		switch($action['status']){
 			case ACTION_STATUS_ENABLED:
-				$this->click("xpath=//a[contains(@href,'actionconf.php?go=disable&g_actionid%5B%5D=$actionid&')]");
+				$this->href_click('actionconf.php?go=disable&g_actionid%5B%5D=$actionid&');
 			break;
 			case ACTION_STATUS_DISABLED:
-				$this->click("xpath=//a[contains(@href,'actionconf.php?go=activate&g_actionid%5B%5D=$actionid&')]");
+				$this->href_click('actionconf.php?go=activate&g_actionid%5B%5D=$actionid&');
 			break;
 		}
 		$this->wait();

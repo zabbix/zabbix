@@ -79,7 +79,6 @@ class testFormMediaType extends CWebTest
 		$name=$mediatype['description'];
 		$id=$mediatype['mediatypeid'];
 
-		$row=DBfetch(DBselect("select count(*) as cnt from media_type where mediatypeid=$id"));
 		$row=DBfetch(DBselect("select count(*) as cnt from operations where mediatypeid=$id"));
 		$used_by_operations = ($row['cnt'] > 0);
 
