@@ -164,6 +164,7 @@ function zbx_locale_variants_win($language){
 		'pl_pl'=>  'polish',
 		'pt_br'=>  'portuguese',
 		'ru_ru'=>  'russian',
+		'sk_sk'=>  'slovak',
 		'es_es'=>  'spanish',
 		'sv_se'=>  'swedish',
 		'uk_ua'=>  'ukrainian'

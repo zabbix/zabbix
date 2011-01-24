@@ -453,7 +453,7 @@ table.tableinfo tr.blue:hover 				{	background-color: #AAAAEE; border: 1px #AAAA
 .header .header_r{ padding-right: 5px; }
 
 /****** FLICKER *********/
-table.flicker{ background: #5c9ccc url(originalblue_v2/images/ui-bg_highlight-hard_45_6699dd_1x100.png) 50% 50% repeat-x;  border: 0;}
+table.flicker{ background: #5c9ccc url(originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x;  border: 0;}
 table.flicker tr td.flicker_c{ height: 16px; padding-left: 4px; padding-right: 4px; line-height: 12px;}
 table.flicker tr td.flicker_l{ text-align: left; height: 16px; padding-left: 4px; line-height: 12px;}
 table.flicker tr td.flicker_r{text-align: right; height: 16px; padding-right: 4px; line-height: 12px;}
@@ -494,7 +494,7 @@ table.map{ text-align: left; border-width:0; padding-top: 1px; padding-bottom: 5
 table.menu{ height: 2.8em; }
 table.menu tr{ background: #AAAAAA url('../images/gradients/menu_not_active.gif') repeat-x top left; }
 table.menu td{ padding: 2px 5px 2px 5px; font-weight: bold; border: 1px solid #aaaaaa; margin: 0;}
-table.menu tr td.active{ background: #5c9ccc url(originalblue_v2/images/ui-bg_highlight-hard_45_6699dd_1x100.png) 50% 50% repeat-x; border-color: #4c8cbc;}
+table.menu tr td.active{ background: #5c9ccc url(originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x; border-color: #4c8cbc;}
 
 /************* SUB MENU ************/
 
