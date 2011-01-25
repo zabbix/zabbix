@@ -19,9 +19,9 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/class.ctest.php');
+require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testGeneric extends CTest
+class testGeneric extends CWebTest
 {
 	public static function provider()
 	{
@@ -79,10 +79,11 @@ class testGeneric extends CTest
 			array('hostprofiles.php?prof_type=1','Host profiles'),
 
 			// Reports
-			array('report2.php',	'Availability report'),
+			// TODO Does not work under SQLite well. Extremely slow!
+//			array('report2.php',	'Availability report'),
 
-			array('report2.php?config=0',	'Availability report'),
-			array('report2.php?config=1',	'Availability report'),
+//			array('report2.php?config=0',	'Availability report'),
+//			array('report2.php?config=1',	'Availability report'),
 
 			array('report5.php',	'Most busy triggers top 100'),
 			array('report5.php?period=day',	'Most busy triggers top 100'),
@@ -134,7 +135,6 @@ class testGeneric extends CTest
 		$this->login();
 		$this->open($a);
 		$this->assertTitle($b);
-		$this->logout();
 	}
 
 	/**
@@ -146,9 +146,8 @@ class testGeneric extends CTest
 		$this->open($a);
 		foreach($this->failIfExists as $str)
 		{
-			$this->assertTextNotPresent($str,'assertTextNotPresent('.$a.','.$str.')');
+			$this->nok($str,'assertTextNotPresent('.$a.','.$str.')');
 		}
-		$this->logout();
 	}
 
 	/**
@@ -160,9 +159,8 @@ class testGeneric extends CTest
 		$this->open($a);
 		foreach($this->failIfNotExists as $str)
 		{
-			$this->assertTextPresent($str,'assertTextPresent('.$a.','.$str.')');
+			$this->ok($str,'assertTextPresent('.$a.','.$str.')');
 		}
-		$this->logout();
 	}
 }
 ?>

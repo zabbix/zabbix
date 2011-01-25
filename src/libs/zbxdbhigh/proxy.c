@@ -111,18 +111,28 @@ int	get_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, ch
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		host_esc[MAX_STRING_LEN];
+	char		*host_esc;
 	int		ret = FAIL;
 
 	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, HOST_HOST_LEN_MAX))
 	{
-		DBescape_string(host, host_esc, sizeof(host_esc));
+		if (FAIL == zbx_check_hostname(host))
+		{
+			zbx_snprintf(error, error_max_len, "proxy name [%s] contains invalid characters", host);
+			return ret;
+		}
 
-		result = DBselect("select hostid from hosts where host='%s'"
-				" and status in (%d)" DB_NODE,
-				host_esc,
-				HOST_STATUS_PROXY_ACTIVE,
-				DBnode_local("hostid"));
+		host_esc = DBdyn_escape_string(host);
+
+		result = DBselect(
+				"select hostid"
+				" from hosts"
+				" where host='%s'"
+					" and status in (%d)"
+					DB_NODE,
+				host_esc, HOST_STATUS_PROXY_ACTIVE, DBnode_local("hostid"));
+
+		zbx_free(host_esc);
 
 		if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
 		{
@@ -1376,6 +1386,8 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 				if (ITEM_VALUE_TYPE_LOG == item.value_type)
 					calc_timestamp(values[i].value, &values[i].timestamp, item.logtimefmt);
 
+				if (NULL != values[i].source)
+					zbx_replace_invalid_utf8(values[i].source);
 				dc_add_history(item.itemid, item.value_type, item.flags, &agent, &values[i].ts,
 						values[i].timestamp, values[i].source, values[i].severity,
 						values[i].logeventid, values[i].lastlogsize, values[i].mtime);
@@ -1385,7 +1397,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 			}
 			else if (GET_MSG_RESULT(&agent))
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] error: %s",
+				zabbix_log(LOG_LEVEL_DEBUG, "Item [%s:%s] error: %s",
 						item.host.host, item.key_orig, agent.msg);
 				DCadd_nextcheck(item.itemid, (time_t)values[i].ts.sec, agent.msg);
 			}
@@ -1873,14 +1885,14 @@ static char	*DBlld_expand_trigger_expression(zbx_uint64_t triggerid, const char 
 
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		search[23], *expr, *old_expr,
+	char		search[23], *expr = NULL, *old_expr,
 			*key = NULL, *replace = NULL;
 	size_t		sz_h, sz_k, sz_f, sz_p;
 	int		replace_alloc = 1024, replace_offset;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, expression);
 
-	expr = strdup(expression);
+	expr = zbx_strdup(expr, expression);
 	replace = zbx_malloc(replace, replace_alloc);
 
 	result = DBselect(
@@ -1893,7 +1905,7 @@ static char	*DBlld_expand_trigger_expression(zbx_uint64_t triggerid, const char 
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		key = strdup(row[2]);
+		key = zbx_strdup(key, row[2]);
 
 		if (NULL != jp_row && 0 != (ZBX_FLAG_DISCOVERY_CHILD & (unsigned char)atoi(row[5])))
 			substitute_discovery_macros(&key, jp_row);
@@ -1911,11 +1923,10 @@ static char	*DBlld_expand_trigger_expression(zbx_uint64_t triggerid, const char 
 		old_expr = expr;
 		expr = string_replace(old_expr, search, replace);
 		zbx_free(old_expr);
-
-		zbx_free(key);
 	}
 	DBfree_result(result);
 
+	zbx_free(key);
 	zbx_free(replace);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() expr:'%s'", __function_name, expr);
@@ -1970,6 +1981,7 @@ static int	DBlld_compare_trigger_items(zbx_uint64_t triggerid, struct zbx_json_p
 	const char	*__function_name = "DBlld_compare_trigger_items";
 	DB_RESULT	result;
 	DB_ROW		row;
+	char		*old_key = NULL;
 	int		res = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -1984,20 +1996,18 @@ static int	DBlld_compare_trigger_items(zbx_uint64_t triggerid, struct zbx_json_p
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		char	*old_key;
-
-		old_key = strdup(row[0]);
+		old_key = zbx_strdup(old_key, row[0]);
 		substitute_discovery_macros(&old_key, jp_row);
 
 		if (0 == strcmp(old_key, row[1]))
+		{
 			res = SUCCEED;
-
-		zbx_free(old_key);
-
-		if (SUCCEED == res)
 			break;
+		}
 	}
 	DBfree_result(result);
+
+	zbx_free(old_key);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
@@ -2031,7 +2041,7 @@ static int	DBlld_get_item(zbx_uint64_t hostid, const char *tmpl_key,
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	key = strdup(tmpl_key);
+	key = zbx_strdup(key, tmpl_key);
 	substitute_discovery_macros(&key, jp_row);
 	key_esc = DBdyn_escape_string(key);
 
@@ -2093,7 +2103,7 @@ static int	DBlld_update_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_trigger
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	new_triggerid = 0, h_itemid, h_triggerid, functionid, triggerdiscoveryid;
-	char		search[23], replace[23], *description,
+	char		search[23], replace[23], *description = NULL,
 			*description_esc, *comments_esc, *url_esc,
 			*description_proto_esc, *error_esc;
 	int		update_expression = 1, res = SUCCEED;
@@ -2103,7 +2113,7 @@ static int	DBlld_update_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_trigger
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() jp_row:'%.*s'", __function_name,
 			jp_row->end - jp_row->start + 1, jp_row->start);
 
-	description = strdup(description_proto);
+	description = zbx_strdup(description, description_proto);
 	substitute_discovery_macros(&description, jp_row);
 	description_esc = DBdyn_escape_string(description);
 	description_proto_esc = DBdyn_escape_string(description_proto);
@@ -2143,11 +2153,11 @@ static int	DBlld_update_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_trigger
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			char	*old_name;
+			char	*old_name = NULL;
 
 			ZBX_STR2UINT64(h_triggerid, row[0]);
 
-			old_name = strdup(row[1]);
+			old_name = zbx_strdup(old_name, row[1]);
 			substitute_discovery_macros(&old_name, jp_row);
 
 			if (0 == strcmp(old_name, row[2]))
@@ -2277,9 +2287,9 @@ static int	DBlld_update_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_trigger
 
 	if (1 == update_expression)
 	{
-		char	*new_expression;
+		char	*new_expression = NULL;
 
-		new_expression = strdup(expression);
+		new_expression = zbx_strdup(new_expression, expression);
 
 		result = DBselect(
 				"select f.itemid,f.functionid,f.function,f.parameter,i.key_,i.flags"
@@ -2361,6 +2371,31 @@ out:
 	return res;
 }
 
+static int	DBlld_check_record(struct zbx_json_parse *jp_row, const char *f_macro,
+		const char *f_regexp, ZBX_REGEXP *regexps, int regexps_num)
+{
+	const char	*__function_name = "DBlld_check_record";
+
+	char		*value = NULL;
+	size_t		value_alloc = 0;
+	int		res = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() jp_row:'%.*s'", __function_name,
+			jp_row->end - jp_row->start + 1, jp_row->start);
+
+	if (NULL == f_macro || NULL == f_regexp)
+		goto out;
+
+	if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, f_macro, &value, &value_alloc))
+		res = regexp_match_ex(regexps, regexps_num, value, f_regexp, ZBX_CASE_SENSITIVE);
+
+	zbx_free(value);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+
+	return res;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: DBlld_update_triggers                                            *
@@ -2377,7 +2412,8 @@ out:
  *                                                                            *
  ******************************************************************************/
 static void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_itemid,
-		struct zbx_json_parse *jp_data, char **error)
+		struct zbx_json_parse *jp_data, char **error, const char *f_macro,
+		const char *f_regexp, ZBX_REGEXP *regexps, int regexps_num)
 {
 	const char		*__function_name = "DBlld_update_triggers";
 
@@ -2411,6 +2447,9 @@ static void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_it
 /* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]}
  *                      ^------------------^
  */			if (FAIL == zbx_json_brackets_open(p, &jp_row))
+				continue;
+
+			if (SUCCEED != DBlld_check_record(&jp_row, f_macro, f_regexp, regexps, regexps_num))
 				continue;
 
 			DBlld_update_trigger(hostid, triggerid,
@@ -2463,9 +2502,9 @@ static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, co
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	new_itemid = 0, itemdiscoveryid, itemappid;
-	char		*key, *key_esc, *key_proto_esc,
-			*description, *description_esc,
-			*snmp_oid, *snmp_oid_esc,
+	char		*key = NULL, *key_esc, *key_proto_esc,
+			*description = NULL, *description_esc,
+			*snmp_oid = NULL, *snmp_oid_esc,
 			*sql = NULL;
 	int		sql_offset = 0, sql_alloc = 16384,
 			i, res = SUCCEED;
@@ -2476,16 +2515,16 @@ static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, co
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() jp_row:'%.*s'", __function_name,
 			jp_row->end - jp_row->start + 1, jp_row->start);
 
-	key = strdup(key_proto);
+	key = zbx_strdup(key, key_proto);
 	substitute_discovery_macros(&key, jp_row);
 	key_esc = DBdyn_escape_string(key);
 	key_proto_esc = DBdyn_escape_string(key_proto);
 
-	description = strdup(description_proto);
+	description = zbx_strdup(description, description_proto);
 	substitute_discovery_macros(&description, jp_row);
 	description_esc = DBdyn_escape_string(description);
 
-	snmp_oid = strdup(snmp_oid_proto);
+	snmp_oid = zbx_strdup(snmp_oid, snmp_oid_proto);
 	substitute_discovery_macros(&snmp_oid, jp_row);
 	snmp_oid_esc = DBdyn_escape_string(snmp_oid);
 
@@ -2516,9 +2555,9 @@ static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, co
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			char	*old_key;
+			char	*old_key = NULL;
 
-			old_key = strdup(row[1]);
+			old_key = zbx_strdup(old_key, row[1]);
 			substitute_discovery_macros(&old_key, jp_row);
 
 			if (0 == strcmp(old_key, row[2]))
@@ -2715,31 +2754,6 @@ out:
 	return res;
 }
 
-static int	DBlld_check_record(struct zbx_json_parse *jp_row, const char *macro,
-		const char *filter, ZBX_REGEXP *regexps, int regexps_num)
-{
-	const char	*__function_name = "DBlld_check_record";
-
-	char		*value = NULL;
-	size_t		value_alloc = 0;
-	int		res = SUCCEED;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() jp_row:'%.*s'", __function_name,
-			jp_row->end - jp_row->start + 1, jp_row->start);
-
-	if (NULL == macro || NULL == filter)
-		goto out;
-
-	if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, macro, &value, &value_alloc))
-		res = regexp_match_ex(regexps, regexps_num, value, filter, ZBX_CASE_SENSITIVE);
-
-	zbx_free(value);
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
-
-	return res;
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: DBlld_update_items                                               *
@@ -2751,7 +2765,6 @@ out:
  *             key_orig      - [IN] original template item key                *
  *             key_last      - [IN] previous original template item key       *
  *             jp_data       - [IN] received discovery data                   *
- *             filter        - [IN] optional filter                           *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
@@ -2761,7 +2774,8 @@ out:
  *                                                                            *
  ******************************************************************************/
 static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemid,
-		struct zbx_json_parse *jp_data, char **error, char *filter,
+		struct zbx_json_parse *jp_data, char **error, const char *f_macro,
+		const char *f_regexp, ZBX_REGEXP *regexps, int regexps_num,
 		const char *snmp_community_esc, const char *port_esc,
 		const char *snmpv3_securityname_esc, unsigned char snmpv3_securitylevel,
 		const char *snmpv3_authpassphrase_esc, const char *snmpv3_privpassphrase_esc,
@@ -2769,42 +2783,12 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 {
 	const char		*__function_name = "DBlld_update_items";
 
-	char			*f_macro = NULL, *f_filter = NULL, *f_filter_esc;
 	struct zbx_json_parse	jp_row;
 	const char		*p;
-	ZBX_REGEXP		*regexps = NULL;
-	int			regexps_alloc = 0, regexps_num = 0;
 	DB_RESULT		result;
 	DB_ROW			row;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filter:'%s'", __function_name, filter);
-
-	if (NULL != (f_filter = strchr(filter, ':')))
-	{
-		f_macro = filter;
-		*f_filter++ = '\0';
-
-		if ('@' == *f_filter)
-		{
-			DB_RESULT	result;
-			DB_ROW		row;
-
-			f_filter_esc = DBdyn_escape_string(f_filter + 1);
-
-			result = DBselect("select r.name,e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
-					" from regexps r,expressions e"
-					" where r.regexpid=e.regexpid"
-						" and r.name='%s'",
-					f_filter_esc);
-
-			zbx_free(f_filter_esc);
-
-			while (NULL != (row = DBfetch(result)))
-				add_regexp_ex(&regexps, &regexps_alloc, &regexps_num,
-						row[0], row[1], atoi(row[2]), row[3][0], atoi(row[4]));
-			DBfree_result(result);
-		}
-	}
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect(
 			"select i.itemid,i.description,i.key_,i.lastvalue,i.type,"
@@ -2814,10 +2798,9 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 				"i.logtimefmt,i.valuemapid,i.params,"
 				"i.ipmi_sensor,i.snmp_oid,"
 				"i.authtype,i.username,"
-				"i.password,i.publickey,i.privatekey,di.filter"
-			" from items i,item_discovery d,items di"
+				"i.password,i.publickey,i.privatekey"
+			" from items i,item_discovery d"
 			" where i.itemid=d.itemid"
-				" and d.parent_itemid=di.itemid"
 				" and i.hostid=" ZBX_FS_UI64
 				" and d.parent_itemid=" ZBX_FS_UI64,
 			hostid, discovery_itemid);
@@ -2854,7 +2837,7 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
  */			if (FAIL == zbx_json_brackets_open(p, &jp_row))
 				continue;
 
-			if (SUCCEED != DBlld_check_record(&jp_row, f_macro, f_filter, regexps, regexps_num))
+			if (SUCCEED != DBlld_check_record(&jp_row, f_macro, f_regexp, regexps, regexps_num))
 				continue;
 
 			DBlld_update_item(hostid, itemid,
@@ -2908,8 +2891,6 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 	}
 	DBfree_result(result);
 
-	zbx_free(regexps);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
@@ -2949,12 +2930,12 @@ static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid,
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_uint64_t		new_graphid = 0, graphdiscoveryid;
-	char			*name, *name_esc, *name_proto_esc;
+	char			*name = NULL, *name_esc, *name_proto_esc;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() jp_row:'%.*s'", __function_name,
 			jp_row->end - jp_row->start + 1, jp_row->start);
 
-	name = strdup(name_proto);
+	name = zbx_strdup(name, name_proto);
 	substitute_discovery_macros(&name, jp_row);
 	name_esc = DBdyn_escape_string(name);
 	name_proto_esc = DBdyn_escape_string(name_proto);
@@ -2986,9 +2967,9 @@ static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid,
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			char	*old_name;
+			char	*old_name = NULL;
 
-			old_name = strdup(row[1]);
+			old_name = zbx_strdup(old_name, row[1]);
 			substitute_discovery_macros(&old_name, jp_row);
 
 			if (0 == strcmp(old_name, row[2]))
@@ -3248,7 +3229,8 @@ out:
  *                                                                            *
  ******************************************************************************/
 static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_itemid,
-		struct zbx_json_parse *jp_data, char **error)
+		struct zbx_json_parse *jp_data, char **error, const char *f_macro,
+		const char *f_regexp, ZBX_REGEXP *regexps, int regexps_num)
 {
 	const char		*__function_name = "DBlld_update_graphs";
 
@@ -3287,6 +3269,9 @@ static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_item
 /* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]}
  *                      ^------------------^
  */			if (FAIL == zbx_json_brackets_open(p, &jp_row))
+				continue;
+
+			if (SUCCEED != DBlld_check_record(&jp_row, f_macro, f_regexp, regexps, regexps_num))
 				continue;
 
 			DBlld_update_graph(hostid, graphid,
@@ -3345,6 +3330,9 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 				*discovery_key = NULL, *filter = NULL, *error = NULL, *db_error = NULL,
 				*error_esc, *port_esc = NULL;
 	unsigned char		status = 0, snmpv3_securitylevel = 0;
+	char			*f_macro = NULL, *f_regexp = NULL;
+	ZBX_REGEXP		*regexps = NULL;
+	int			regexps_alloc = 0, regexps_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, discovery_itemid);
 
@@ -3359,16 +3347,16 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 	if (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(hostid, row[0]);
-		discovery_key = strdup(row[1]);
+		discovery_key = zbx_strdup(discovery_key, row[1]);
 		status = (unsigned char)atoi(row[2]);
-		filter = strdup(row[3]);
+		filter = zbx_strdup(filter, row[3]);
 		snmp_community_esc = DBdyn_escape_string(row[4]);
 		port_esc = DBdyn_escape_string(row[5]);
 		snmpv3_securityname_esc = DBdyn_escape_string(row[6]);
 		snmpv3_securitylevel = (unsigned char)atoi(row[7]);
 		snmpv3_authpassphrase_esc = DBdyn_escape_string(row[8]);
 		snmpv3_privpassphrase_esc = DBdyn_escape_string(row[9]);
-		db_error = strdup(row[10]);
+		db_error = zbx_strdup(db_error, row[10]);
 		ZBX_DBROW2UINT64(interfaceid, row[11]);
 	}
 	else
@@ -3380,7 +3368,7 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 
 	DBbegin();
 
-	error = strdup("");
+	error = zbx_strdup(error, "");
 
 	if (SUCCEED != zbx_json_open(value, &jp))
 	{
@@ -3396,12 +3384,48 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 		goto error;
 	}
 
-	DBlld_update_items(hostid, discovery_itemid, &jp_data, &error, filter,
+	if (NULL != (f_regexp = strchr(filter, ':')))
+	{
+		f_macro = filter;
+		*f_regexp++ = '\0';
+
+		if ('@' == *f_regexp)
+		{
+			DB_RESULT	result;
+			DB_ROW		row;
+			char		*f_regexp_esc;
+
+			f_regexp_esc = DBdyn_escape_string(f_regexp + 1);
+
+			result = DBselect("select r.name,e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
+					" from regexps r,expressions e"
+					" where r.regexpid=e.regexpid"
+						" and r.name='%s'",
+					f_regexp_esc);
+
+			zbx_free(f_regexp_esc);
+
+			while (NULL != (row = DBfetch(result)))
+				add_regexp_ex(&regexps, &regexps_alloc, &regexps_num,
+						row[0], row[1], atoi(row[2]), row[3][0], atoi(row[4]));
+			DBfree_result(result);
+		}
+
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() f_macro:'%s' f_regexp:'%s'",
+				__function_name, f_macro, f_regexp);
+	}
+
+	DBlld_update_items(hostid, discovery_itemid, &jp_data, &error,
+			f_macro, f_regexp, regexps, regexps_num,
 			snmp_community_esc, port_esc, snmpv3_securityname_esc,
 			snmpv3_securitylevel, snmpv3_authpassphrase_esc,
 			snmpv3_privpassphrase_esc, interfaceid);
-	DBlld_update_triggers(hostid, discovery_itemid, &jp_data, &error);
-	DBlld_update_graphs(hostid, discovery_itemid, &jp_data, &error);
+	DBlld_update_triggers(hostid, discovery_itemid, &jp_data, &error,
+			f_macro, f_regexp, regexps, regexps_num);
+	DBlld_update_graphs(hostid, discovery_itemid, &jp_data, &error,
+			f_macro, f_regexp, regexps, regexps_num);
+
+	zbx_free(regexps);
 
 	if (ITEM_STATUS_NOTSUPPORTED == status)
 	{

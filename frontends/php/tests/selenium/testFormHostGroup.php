@@ -19,9 +19,9 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/class.ctest.php');
+require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testFormHostGroup extends CTest
+class testFormHostGroup extends CWebTest
 {
 	public $hostgroup = 'Test Group';
 
@@ -35,7 +35,6 @@ class testFormHostGroup extends CTest
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('Group added');
-		$this->logout();
 	}
 
 	public function testFormHostGroup_Update()
@@ -47,7 +46,6 @@ class testFormHostGroup extends CTest
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('Group updated');
-		$this->logout();
 	}
 
 	public function testFormHostGroup_Delete()
@@ -61,24 +59,6 @@ class testFormHostGroup extends CTest
 		$this->wait();
 		$this->getConfirmation();
 		$this->ok('Group deleted');
-		$this->logout();
-	}
-
-	public function atestFormScreen()
-	{
-		$name='Test Screen';
-
-		$this->chooseOkOnNextConfirmation();
-
-		$this->login();
-		// Create Screen
-		$this->open('screenconf.php');
-		$this->waitForPageToLoad();
-		$this->click('form');
-		$this->waitForPageToLoad();
-		$this->type('name',$name);
-		$this->click('save');
-		$this->waitForPageToLoad();
 	}
 }
 ?>

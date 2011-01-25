@@ -1,4 +1,4 @@
--- 
+--
 -- ZABBIX
 -- Copyright (C) 2000-2005 SIA Zabbix
 --
@@ -811,6 +811,8 @@ FIELD		|command	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|host_access	|t_integer	|'2'	|NOT NULL	|ZBX_SYNC
 FIELD		|usrgrpid	|t_id		|	|NULL		|ZBX_SYNC		|1|usrgrp	|		|RESTRICT
 FIELD		|groupid	|t_id		|	|NULL		|ZBX_SYNC		|2|groups	|		|RESTRICT
+FIELD		|description	|t_text		|''	|NOT NULL	|ZBX_SYNC
+FIELD		|confirmation	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 
 TABLE|screens|screenid|ZBX_SYNC
 FIELD		|screenid	|t_id		|	|NOT NULL	|0
@@ -964,7 +966,7 @@ FIELD		|passwd		|t_char(32)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|url		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|autologin	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|autologout	|t_integer	|'900'	|NOT NULL	|ZBX_SYNC
-FIELD		|lang		|t_varchar(5)	|'en_gb'|NOT NULL	|ZBX_SYNC
+FIELD		|lang		|t_varchar(5)	|'en_GB'|NOT NULL	|ZBX_SYNC
 FIELD		|refresh	|t_integer	|'30'	|NOT NULL	|ZBX_SYNC
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|theme		|t_varchar(128)	|'default.css'|NOT NULL	|ZBX_SYNC
@@ -1068,7 +1070,7 @@ FIELD		|proxy_hostid	|t_id		|	|NULL		|ZBX_SYNC		|1|hosts		|hostid
 FIELD		|host		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|listen_ip	|t_varchar(39)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|listen_port	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-UNIQUE		|1		|proxy_hostid,host
+INDEX		|1		|proxy_hostid,host
 
 TABLE|proxy_autoreg_host|id|0
 FIELD		|id		|t_serial	|	|NOT NULL	|0

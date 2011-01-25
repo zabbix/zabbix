@@ -36,8 +36,8 @@ INSERT INTO usrgrp VALUES (10,'API access',0,0,1,0);
 -- Dumping data for table `users`
 --
 
-INSERT INTO users VALUES (1,'Admin','Zabbix','Administrator','5fce1b3e34b520afeffb37ce08c7cd66','',0, 900,'en_gb',30,3,'default.css',0,'',0,50);
-INSERT INTO users VALUES (2,'guest','Default','User','d41d8cd98f00b204e9800998ecf8427e','',0,900,'en_gb',30,1,'default.css',0,'',0,50);
+INSERT INTO users VALUES (1,'Admin','Zabbix','Administrator','5fce1b3e34b520afeffb37ce08c7cd66','',0, 900,'en_GB',30,3,'default.css',0,'',0,50);
+INSERT INTO users VALUES (2,'guest','Default','User','d41d8cd98f00b204e9800998ecf8427e','',0,900,'en_GB',30,1,'default.css',0,'',0,50);
 
 --
 -- Dumping data for table `users_groups`
@@ -50,8 +50,8 @@ INSERT INTO users_groups VALUES (2,8,2);
 -- Dumping data for table `scripts`
 --
 
-INSERT INTO scripts VALUES (1,'Ping','/bin/ping -c 3 {HOST.CONN}',2,NULL,NULL);
-INSERT INTO scripts VALUES (2,'Traceroute','/usr/bin/traceroute {HOST.CONN}',2,NULL,NULL);
+INSERT INTO scripts VALUES (1,'Ping','/bin/ping -c 3 {HOST.CONN}',2,NULL,NULL,'','');
+INSERT INTO scripts VALUES (2,'Traceroute','/usr/bin/traceroute {HOST.CONN}',2,NULL,NULL,'','');
 
 --
 -- Dumping data for table `media_type`

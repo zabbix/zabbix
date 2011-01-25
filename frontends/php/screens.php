@@ -37,6 +37,9 @@
 
 	include_once('include/page_header.php');
 
+// js templates
+require_once('include/templates/scriptConfirm.js.php');
+
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -121,26 +124,26 @@
 	// getting element id from GET parameters
 	$elementid = $_REQUEST['elementid'] = get_request('elementid', false);
 	//if none is provided
-	if ($elementid === false && !$use_screen_name) {
+	if($elementid === false && !$use_screen_name){
 		//get element id saved in profile from the last visit
 		$elementid = CProfile::get('web.screens.elementid', null);
 		//this flag will be used in case this element does not exist
 		$id_has_been_fetched_from_profile = true;
 	}
-	else {
+	else{
 		$id_has_been_fetched_from_profile = false;
 	}
 
 	$screens_wdgt = new CWidget();
 
 	$scroll_div = new CDiv();
-	$scroll_div->setAttribute('id','scrollbar_cntr');
+	$scroll_div->setAttribute('id', 'scrollbar_cntr');
 	$screens_wdgt->addFlicker($scroll_div, CProfile::get('web.screens.filter.state',1));
 
 	$formHeader = new CForm();
 	$cmbConfig = new CComboBox('config', 'screens.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
-		$cmbConfig->addItem('screens.php', S_SCREENS);
-		$cmbConfig->addItem('slides.php', S_SLIDESHOWS);
+	$cmbConfig->addItem('screens.php', S_SCREENS);
+	$cmbConfig->addItem('slides.php', S_SLIDESHOWS);
 	$formHeader->addItem($cmbConfig);
 
 

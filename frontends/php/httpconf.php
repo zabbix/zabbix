@@ -217,7 +217,7 @@ include_once('include/page_header.php');
 				'status' => $_REQUEST['status'],
 				'agent' => $_REQUEST['agent'],
 				'macros' => $_REQUEST['macros'],
-				'steps' => get_request('steps',array()),
+				'steps' => get_request('steps', array()),
 			);
 
 

@@ -19,19 +19,37 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/class.ctest.php');
+require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testFormProfile extends CTest
+class testFormProfile extends CWebTest
 {
+	public $oldHash;
+
+	public function hashUsersExcept($user)
+	{
+		$this->oldHash=DBhash("select * from users where alias<>'$user' order by userid");
+	}
+
+	protected function assertPreConditions()
+	{
+		$this->oldHash=$this->hashUsersExcept('Admin');
+	}
+
+	protected function assertPostConditions()
+	{
+	}
+
 	public function testFormProfile_SimpleUpdate()
 	{
 		$this->login('profile.php');
+
+		$this->assertTitle('User profile');
 
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('Copyright');
 
-		$this->logout();
+		$this->assertEquals($this->oldHash,$this->hashUsersExcept('Admin'));
 	}
 
 	public function testFormProfile_Cancel()
@@ -41,11 +59,30 @@ class testFormProfile extends CTest
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('Copyright');
-
-		$this->logout();
 	}
 
-	public function testFormProfile_PasswordChange()
+	public function testFormProfile_PasswordChange1()
+	{
+		$pwd="'\'$\"\"!$@$#^%$+-=~`\`\\";
+
+		$this->login('profile.php');
+
+		$this->button_click('change_password');
+		$this->wait();
+		$this->input_type('password1',$pwd);
+		$this->input_type('password2',$pwd);
+
+		$this->button_click('save');
+		$this->wait();
+		$this->ok('Copyright');
+
+		$row=DBfetch(DBselect("select passwd from users where alias='Admin'"));
+		$this->assertEquals(md5($pwd),$row['passwd']);
+
+		$this->assertEquals($this->oldHash,$this->hashUsersExcept('Admin'));
+	}
+
+	public function testFormProfile_PasswordChange2()
 	{
 		$this->login('profile.php');
 
@@ -58,11 +95,45 @@ class testFormProfile extends CTest
 		$this->wait();
 		$this->ok('Copyright');
 
-		$this->logout();
+		$this->assertEquals($this->oldHash,$this->hashUsersExcept('Admin'));
+	}
+
+	public function testFormProfile_EmptyPasswords()
+	{
+		$this->login('profile.php');
+
+		$this->button_click('change_password');
+		$this->wait();
+		$this->input_type('password1','');
+		$this->input_type('password2','');
+
+		$this->button_click('save');
+		$this->wait();
+		$this->ok('ERROR: Password should not be empty');
+		$this->assertTitle('User profile');
+
+		$this->assertEquals($this->oldHash,$this->hashUsersExcept('Admin'));
+	}
+
+	public function testFormProfile_DifferentPasswords()
+	{
+		$this->login('profile.php');
+
+		$this->button_click('change_password');
+		$this->wait();
+		$this->input_type('password1','abc');
+		$this->input_type('password2','def');
+
+		$this->button_click('save');
+		$this->wait();
+		$this->ok('ERROR: Cannot update user. Both passwords must be equal.');
+		$this->assertTitle('User profile');
 	}
 
 	public function testFormProfile_ThemeChange()
 	{
+		global $DB;
+
 		$this->login('profile.php');
 
 		$this->dropdown_select('theme','Original blue');
@@ -70,7 +141,10 @@ class testFormProfile extends CTest
 		$this->wait();
 		$this->ok('Copyright');
 
-		$this->logout();
+		$row=DBfetch(DBselect("select theme from users where alias='Admin'"));
+		$this->assertEquals('css_ob.css',$row['theme']);
+
+		$this->assertEquals($this->oldHash,$this->hashUsersExcept('Admin'));
 	}
 
 	public function testFormProfile_AutologinSet()
@@ -82,59 +156,25 @@ class testFormProfile extends CTest
 		$this->wait();
 		$this->ok('Copyright');
 
-		$this->logout();
+		$row=DBfetch(DBselect("select autologin from users where alias='Admin'"));
+		$this->assertEquals(1,$row['autologin']);
+
+		$this->assertEquals($this->oldHash,$this->hashUsersExcept('Admin'));
 	}
 
-	public function atestFormHostGroup()
+	public function testFormProfile_AutologinUnSet()
 	{
-		$name='Test Group';
+		$this->login('profile.php');
 
-		$this->chooseOkOnNextConfirmation();
+		$this->checkbox_unselect('autologin');
+		$this->button_click('save');
+		$this->wait();
+		$this->ok('Copyright');
 
-		$this->login();
-		// Create Host Group
-		$this->open('hostgroups.php');
-		$this->waitForPageToLoad();
-		$this->click('form');
-		$this->waitForPageToLoad();
-		$this->type('gname',$name);
-		$this->click('save');
-		$this->waitForPageToLoad();
-		// Update Host Group
-		$this->login();
-		$this->open('hostgroups.php');
-		$this->waitForPageToLoad();
-		$this->click("link=$name");
-		$this->waitForPageToLoad();
-		$this->type('gname',$name.'2');
-		$this->click('save');
-		$this->waitForPageToLoad();
-		// Delete Host Group
-		$this->open('hostgroups.php');
-		$this->waitForPageToLoad();
-		$this->click("link=$name".'2');
-		$this->waitForPageToLoad();
-		$this->click('delete');
-		$this->waitForPageToLoad();
-		$this->getConfirmation();
-		$this->logout();
-	}
+		$row=DBfetch(DBselect("select autologin from users where alias='Admin'"));
+		$this->assertEquals(0,$row['autologin']);
 
-	public function atestFormScreen()
-	{
-		$name='Test Screen';
-
-		$this->chooseOkOnNextConfirmation();
-
-		$this->login();
-		// Create Screen
-		$this->open('screenconf.php');
-		$this->waitForPageToLoad();
-		$this->click('form');
-		$this->waitForPageToLoad();
-		$this->type('name',$name);
-		$this->click('save');
-		$this->waitForPageToLoad();
+		$this->assertEquals($this->oldHash,$this->hashUsersExcept('Admin'));
 	}
 }
 ?>

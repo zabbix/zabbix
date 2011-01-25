@@ -57,10 +57,10 @@
 		global $DB;
 
 		$result = ($image)?$image:0;
-		if($DB['TYPE'] == "POSTGRESQL"){
+		if($DB['TYPE'] == ZBX_DB_POSTGRESQL){
 			$result = pg_unescape_bytea($image);
 		}
-		else if($DB['TYPE'] == "SQLITE3"){
+		else if($DB['TYPE'] == ZBX_DB_SQLITE3){
 			$result = pack('H*', $image);
 		}
 

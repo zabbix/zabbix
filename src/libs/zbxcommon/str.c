@@ -101,7 +101,7 @@ void	help()
  *                                                                            *
  * Purpose: Print error text to the stderr                                    *
  *                                                                            *
- * Parameters: fmt - format of mesage                                         *
+ * Parameters: fmt - format of message                                        *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
@@ -141,7 +141,7 @@ void	__zbx_zbx_error(const char *fmt, ...)
  * Purpose: Secure version of snprintf function.                              *
  *          Add zero character at the end of string.                          *
  *                                                                            *
- * Parameters: str - destination buffer poiner                                *
+ * Parameters: str - destination buffer pointer                               *
  *             count - size of destination buffer                             *
  *             fmt - format                                                   *
  *                                                                            *
@@ -177,7 +177,7 @@ int	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...)
  * Purpose: Secure version of vsnprintf function.                             *
  *          Add zero character at the end of string.                          *
  *                                                                            *
- * Parameters: str - destination buffer poiner                                *
+ * Parameters: str - destination buffer pointer                               *
  *             count - size of destination buffer                             *
  *             fmt - format                                                   *
  *                                                                            *
@@ -323,27 +323,27 @@ void	zbx_chrcpy_alloc(char **str, int *alloc_len, int *offset, const char src)
 /* Has to be rewritten to avoid malloc */
 char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2)
 {
-        char *new_str = NULL;
-        const char *p;
-        const char *q;
-        const char *r;
-        char *t;
-        long len;
-        long diff;
-        unsigned long count = 0;
+	char *new_str = NULL;
+	const char *p;
+	const char *q;
+	const char *r;
+	char *t;
+	long len;
+	long diff;
+	unsigned long count = 0;
 
 	assert(str);
 	assert(sub_str1);
 	assert(sub_str2);
 
-        len = (long)strlen(sub_str1);
+	len = (long)strlen(sub_str1);
 
-        /* count the number of occurrences of sub_str1 */
-        for ( p=str; (p = strstr(p, sub_str1)); p+=len, count++ );
+	/* count the number of occurrences of sub_str1 */
+	for ( p=str; (p = strstr(p, sub_str1)); p+=len, count++ );
 
 	if ( 0 == count )	return strdup(str);
 
-        diff = (long)strlen(sub_str2) - len;
+	diff = (long)strlen(sub_str2) - len;
 
         /* allocate new memory */
         new_str = zbx_malloc(new_str, (size_t)(strlen(str) + count*diff + 1)*sizeof(char));
@@ -362,7 +362,7 @@ char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2
 
 	*t = '\0';
 
-        return new_str;
+	return new_str;
 }
 
 /******************************************************************************
@@ -918,6 +918,37 @@ char	*__zbx_zbx_strdcatf(char *dest, const char *f, ...)
 	zbx_free(string);
 
 	return result;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_check_hostname                                               *
+ *                                                                            *
+ * Purpose: check a byte stream for valid hostname                            *
+ *                                                                            *
+ * Parameters: hostname - pointer to the first char of hostname               *
+ *                                                                            *
+ * Return value: return SUCCEED if hostname is valid                          *
+ *               or FAIL if hostname contains invalid chars                   *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_check_hostname(const char *hostname)
+{
+	if ('\0' == *hostname)
+		return FAIL;
+
+	do
+	{
+		if (SUCCEED != is_hostname_char(*hostname))
+			return FAIL;
+	}
+	while ('\0' != *++hostname);
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -2832,7 +2863,35 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 }
 #endif	/* HAVE_ICONV */
 
-char	*zbx_replace_utf8(const char *text, char replacement)
+int	zbx_strlen_utf8(const char *text)
+{
+	int	n = 0;
+
+	while ('\0' != *text)
+	{
+		if (0x80 != (0xc0 & *text++))
+			n++;
+	}
+
+	return n;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_replace_utf8                                                 *
+ *                                                                            *
+ * Purpose: replace non-ASCII UTF-8 characters with '?' character             *
+ *                                                                            *
+ * Parameters: text - [IN] pointer to the first char                          *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Aleksandrs Saveljevs                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_replace_utf8(const char *text)
 {
 	int	n;
 	char	*out, *p;
@@ -2841,14 +2900,14 @@ char	*zbx_replace_utf8(const char *text, char replacement)
 
 	while ('\0' != *text)
 	{
-		if (0 == (0x80 & *text))		/* ASCII */
+		if (0 == (*text & 0x80))		/* ASCII */
 			n = 1;
-		else if (0xf0 == (0xf0 & *text))	/* 11110000-11110100 is a start of 4-byte sequence */
-			n = 4;
-		else if (0xe0 == (0xe0 & *text))	/* 11100000-11101111 is a start of 3-byte sequence */
-			n = 3;
-		else if (0xc0 == (0xc0 & *text))	/* 11000010-11011111 is a start of 2-byte sequence */
+		else if (0xc0 == (*text & 0xe0))	/* 11000010-11011111 is a start of 2-byte sequence */
 			n = 2;
+		else if (0xe0 == (*text & 0xf0))	/* 11100000-11101111 is a start of 3-byte sequence */
+			n = 3;
+		else if (0xf0 == (*text & 0xf8))	/* 11110000-11110100 is a start of 4-byte sequence */
+			n = 4;
 		else
 			goto bad;
 
@@ -2856,7 +2915,7 @@ char	*zbx_replace_utf8(const char *text, char replacement)
 			*p++ = *text++;
 		else
 		{
-			*p++ = replacement;
+			*p++ = ZBX_UTF8_REPLACE_CHAR;
 
 			while (0 != n)
 			{
@@ -2875,17 +2934,120 @@ bad:
 	return NULL;
 }
 
-int	zbx_strlen_utf8(const char *text)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_replace_invalid_utf8                                         *
+ *                                                                            *
+ * Purpose: replace invalid UTF-8 sequences of bytes with '?' character       *
+ *                                                                            *
+ * Parameters: text - [IN/OUT] pointer to the first char                      *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_replace_invalid_utf8(char *text)
 {
-	int	n = 0;
+	char	*out = text;
 
 	while ('\0' != *text)
 	{
-		if (0x80 != (0xc0 & *text++))
-			n++;
+		if (0 == (*text & 0x80))			/* single ASCII character */
+			*out++ = *text++;
+		else if (0x80 == (*text & 0xc0) ||		/* unexpected continuation byte */
+				0xfe == (*text & 0xfe))		/* invalid UTF-8 bytes '\xfe' & '\xff' */
+		{
+			*out++ = ZBX_UTF8_REPLACE_CHAR;
+			text++;
+		}
+		else						/* multibyte sequence */
+		{
+			unsigned int	utf32;
+			unsigned char	*utf8 = (unsigned char *)out;
+			size_t		i, mb_len, expecting_bytes = 0;
+			int		ret = SUCCEED;
+
+			if (0xc0 == (*text & 0xe0))		/* 2-bytes multibyte sequence */
+				expecting_bytes = 1;
+			else if (0xe0 == (*text & 0xf0))	/* 3-bytes multibyte sequence */
+				expecting_bytes = 2;
+			else if (0xf0 == (*text & 0xf8))	/* 4-bytes multibyte sequence */
+				expecting_bytes = 3;
+			else if (0xf8 == (*text & 0xfc))	/* 5-bytes multibyte sequence */
+				expecting_bytes = 4;
+			else if (0xfc == (*text & 0xfe))	/* 6-bytes multibyte sequence */
+				expecting_bytes = 5;
+
+			*out++ = *text++;
+
+			for (; 0 != expecting_bytes; expecting_bytes--)
+			{
+				if (0x80 != (*text & 0xc0))	/* not a continuation byte */
+				{
+					ret = FAIL;
+					break;
+				}
+
+				*out++ = *text++;
+			}
+
+			mb_len = out - (char *)utf8;
+
+			if (SUCCEED == ret)
+			{
+				if (0xc0 == (utf8[0] & 0xfe) ||	/* overlong sequence */
+						(0xe0 == utf8[0] && 0x00 == (utf8[1] & 0x20)) ||
+						(0xf0 == utf8[0] && 0x00 == (utf8[1] & 0x30)) ||
+						(0xf8 == utf8[0] && 0x00 == (utf8[1] & 0x38)) ||
+						(0xfc == utf8[0] && 0x00 == (utf8[1] & 0x3c)))
+				{
+					ret = FAIL;
+				}
+			}
+
+			if (SUCCEED == ret)
+			{
+				utf32 = 0;
+
+				if (0xc0 == (utf8[0] & 0xe0))
+					utf32 = utf8[0] & 0x1f;
+				else if (0xe0 == (utf8[0] & 0xf0))
+					utf32 = utf8[0] & 0x0f;
+				else if (0xf0 == (utf8[0] & 0xf8))
+					utf32 = utf8[0] & 0x07;
+				else if (0xf8 == (utf8[0] & 0xfc))
+					utf32 = utf8[0] & 0x03;
+				else if (0xfc == (utf8[0] & 0xfe))
+					utf32 = utf8[0] & 0x01;
+
+				for (i = 1; i < mb_len; i++)
+				{
+					utf32 <<= 6;
+					utf32 += utf8[i] & 0x3f;
+				}
+
+				/* according to the Unicode standard the high and low
+				 * surrogate halves used by UTF-16 (U+D800 through U+DFFF)
+				 * and values above U+10FFFF are not legal
+				 */
+				if (utf32 > 0x10ffff || 0xd800 == (utf32 & 0xf800))
+				{
+					ret = FAIL;
+				}
+			}
+
+			if (SUCCEED != ret)
+			{
+				out -= mb_len;
+				*out++ = ZBX_UTF8_REPLACE_CHAR;
+			}
+		}
 	}
 
-	return n;
+	*out = '\0';
 }
 
 void	win2unix_eol(char *text)

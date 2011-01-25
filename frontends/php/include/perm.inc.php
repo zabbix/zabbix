@@ -251,7 +251,7 @@ COpt::counter_up('perm');
 	else
 		$where = '';
 
-//		$sortorder = (isset($DB['TYPE']) && (($DB['TYPE'] == 'MYSQL') || ($DB['TYPE'] == 'SQLITE3')))?' DESC ':'';
+//		$sortorder = (isset($DB['TYPE']) && (($DB['TYPE'] == ZBX_DB_MYSQL) || ($DB['TYPE'] == ZBX_DB_SQLITE3)))?' DESC ':'';
 //SDI($sql);
 	$sql = 'SELECT DISTINCT n.nodeid, n.name as node_name, h.hostid, h.host, min(r.permission) as permission, ug.userid '.
 		' FROM hosts h '.

@@ -257,14 +257,8 @@
 			$current[] = BR();
 		}
 
-		if(function_exists('sqlite3_open') &&
-			function_exists('sqlite3_close') &&
-			function_exists('sqlite3_query') &&
-			function_exists('sqlite3_error') &&
-			function_exists('sqlite3_fetch_array') &&
-			function_exists('sqlite3_query_close') &&
-			function_exists('sqlite3_exec')){
-
+// Semaphore related functions are checked elsewhere
+		if(class_exists('SQLite3')){
 			$current[] = 'SQLite3';
 			$current[] = BR();
 		}

@@ -19,13 +19,17 @@
 **/
 ?>
 <?php
+
 require_once 'PHPUnit/Extensions/SeleniumTestCase.php';
 
-class CTest extends PHPUnit_Extensions_SeleniumTestCase
+require_once(dirname(__FILE__).'/../../include/defines.inc.php');
+require_once(dirname(__FILE__).'/dbfunc.php');
+
+class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 {
 	protected $captureScreenshotOnFailure = TRUE;
 	protected $screenshotPath = '/home/hudson/public_html/screenshots';
-	protected $screenshotUrl = 'http://hudson/~hudson/screenshots';
+	protected $screenshotUrl = 'http://192.168.3.32/~hudson/screenshots';
 
 	// List of strings that should NOT appear on any page
 	public $failIfExists = array (
@@ -60,9 +64,29 @@ class CTest extends PHPUnit_Extensions_SeleniumTestCase
 
 	protected function setUp()
 	{
+		global $DB;
+
 		$this->setHost('localhost');
 		$this->setBrowser('*firefox');
-		$this->setBrowserUrl('http://hudson/~hudson/'.PHPUNIT_URL.'/frontends/php/');
+		if(strstr(PHPUNIT_URL,'http://'))
+		{
+			$this->setBrowserUrl(PHPUNIT_URL);
+		} else {
+			$this->setBrowserUrl('http://hudson/~hudson/'.PHPUNIT_URL.'/frontends/php/');
+		}
+
+/*		if(!DBConnect($error))
+		{
+			$this->assertTrue(FALSE,'Unable to connect to the database:'.$error);
+			exit;
+		}*/
+
+		if(!isset($DB['DB'])) DBConnect($error);
+	}
+
+	protected function tearDown()
+	{
+		DBclose();
 	}
 
 	public function login($url = NULL)
@@ -84,6 +108,8 @@ class CTest extends PHPUnit_Extensions_SeleniumTestCase
 			$this->open($url);
 			$this->wait();
 		}
+		$this->ok('Admin');
+		$this->nok('Login name or password is incorrect');
 	}
 
 	public function logout()
@@ -96,13 +122,20 @@ class CTest extends PHPUnit_Extensions_SeleniumTestCase
 	{
 		foreach($this->failIfExists as $str)
 		{
-			$this->assertTextNotPresent($str);
+			$this->assertTextNotPresent($str,"Chuck Norris: I do not expect string '$str' here.");
 		}
 	}
 
-	public function ok($str)
+	public function ok($strings)
 	{
-		$this->assertTextPresent($str);
+		if(!is_array($strings))	$strings=array($strings);
+		foreach($strings as $string) $this->assertTextPresent($string,"Chuck Norris: I expect string '$string' here");
+	}
+
+	public function nok($strings)
+	{
+		if(!is_array($strings))	$strings=array($strings);
+		foreach($strings as $string) $this->assertTextNotPresent($string,"Chuck Norris: I do not expect string '$string' here");
 	}
 
 	public function button_click($a)
@@ -110,9 +143,19 @@ class CTest extends PHPUnit_Extensions_SeleniumTestCase
 		$this->click($a);
 	}
 
+	public function href_click($a)
+	{
+		$this->click("xpath=//a[contains(@href,'$a')]");
+	}
+
 	public function checkbox_select($a)
 	{
-		$this->click($a);
+		if(!$this->isChecked($a)) $this->click($a);
+	}
+
+	public function checkbox_unselect($a)
+	{
+		if($this->isChecked($a)) $this->click($a);
 	}
 
 	public function input_type($id,$str)
@@ -131,7 +174,5 @@ class CTest extends PHPUnit_Extensions_SeleniumTestCase
 		$this->waitForPageToLoad();
 		$this->checkFatalErrors();
 	}
-
-
 }
 ?>

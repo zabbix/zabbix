@@ -49,7 +49,13 @@ static int	get_hostid_by_host(const char *host, const char *ip, unsigned short p
 	DB_ROW		row;
 	int		res = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In get_hostid_by_host(host:'%s')", host);
+	zabbix_log(LOG_LEVEL_DEBUG, "In get_hostid_by_host() host:'%s'", host);
+
+	if (FAIL == zbx_check_hostname(host))
+	{
+		zbx_snprintf(error, MAX_STRING_LEN, "host name [%s] contains invalid characters", host);
+		return res;
+	}
 
 	host_esc = DBdyn_escape_string(host);
 
@@ -248,7 +254,7 @@ static void	add_regexp_name(char ***regexp, int *regexp_alloc, int *regexp_num, 
  * Return value:  SUCCEED - list of active checks sent successfully           *
  *                FAIL - an error occurred                                    *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -328,13 +334,13 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp,
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		if (FAIL == DCconfig_get_item_by_key(&dc_item, (zbx_uint64_t)0, host, row[1]))
+		if (FAIL == DCconfig_get_item_by_key(&dc_item, (zbx_uint64_t)0, host, row[0]))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Item '%s' was not found in the server cache. Not sending now.", row[1]);
+			zabbix_log(LOG_LEVEL_DEBUG, "Item '%s' was not found in the server cache. Not sending now.", row[0]);
 			continue;
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Item '%s' was successfully found in the server cache. Sending.", row[1]);
+		zabbix_log(LOG_LEVEL_DEBUG, "Item '%s' was successfully found in the server cache. Sending.", row[0]);
 
 		key = strdup(row[0]);
 		substitute_simple_macros(NULL, NULL, &dc_item.host, NULL,
