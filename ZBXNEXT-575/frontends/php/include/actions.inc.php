@@ -641,6 +641,17 @@ function validate_condition($conditiontype, $value){
 				return false;
 			}
 			break;
+		case CONDITION_TYPE_PROXY:
+			$proxyes = CProxy::get(array(
+				'proxyids' => $value,
+				'output' => API_OUTPUT_SHORTEN,
+				'nodeids' => get_current_nodeid(true),
+			));
+			if(empty($proxyes)){
+				error(_('Incorrect proxy.'));
+				return false;
+			}
+			break;
 		case CONDITION_TYPE_TIME_PERIOD:
 			if( !validate_period($value) ){
 				error(S_INCORRECT_PERIOD.' ['.$value.']');
@@ -686,7 +697,6 @@ function validate_condition($conditiontype, $value){
 		case CONDITION_TYPE_DRULE:
 		case CONDITION_TYPE_DCHECK:
 		case CONDITION_TYPE_DOBJECT:
-		case CONDITION_TYPE_PROXY:
 		case CONDITION_TYPE_DUPTIME:
 		case CONDITION_TYPE_DVALUE:
 		case CONDITION_TYPE_APPLICATION:

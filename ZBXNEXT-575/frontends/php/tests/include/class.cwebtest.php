@@ -99,7 +99,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 			$this->click('link=Login');
 			$this->wait();
 			$this->input_type('name','Admin');
-			$this->input_type('password','asd');
+			$this->input_type('password','zabbix');
 			$this->click('enter');
 			$this->wait();
 		}
