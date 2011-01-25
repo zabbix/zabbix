@@ -1235,8 +1235,9 @@ class zbxXML{
 								));
 
 
-								if($current_application)
-									$item_applications = array_merge($item_applications, $current_application);
+								if($current_application){
+									$item_applications = array_unique(array_merge($item_applications, $current_application));
+								}
 								else
 									$applications_to_add[] = $application_db;
 							}
