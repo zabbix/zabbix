@@ -180,7 +180,7 @@ class CUser extends CZBXAPI{
 		if(!is_null($options['countOutput'])){
 			$options['sortfield'] = '';
 
-			$sql_parts['select'] = array('count(u.userid) as rowscount');
+			$sql_parts['select'] = array('count(DISTINCT u.userid) as rowscount');
 		}
 
 // filter

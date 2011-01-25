@@ -226,7 +226,7 @@ class CApplication extends CZBXAPI{
 // countOutput
 		if(!is_null($options['countOutput'])){
 			$options['sortfield'] = '';
-			$sql_parts['select'] = array('count(a.applicationid) as rowscount');
+			$sql_parts['select'] = array('count(DISTINCT a.applicationid) as rowscount');
 
 //groupCount
 			if(!is_null($options['groupCount'])){

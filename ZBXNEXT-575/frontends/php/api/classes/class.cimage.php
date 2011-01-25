@@ -129,7 +129,7 @@ class CImage extends CZBXAPI{
 // count
 		if(!is_null($options['countOutput'])){
 			$options['sortfield'] = '';
-			$sql_parts['select'] = array('count(i.imageid) as rowscount');
+			$sql_parts['select'] = array('count(DISTINCT i.imageid) as rowscount');
 		}
 
 
@@ -356,7 +356,7 @@ class CImage extends CZBXAPI{
 						if(!$stmt){
 							self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
 						}
-					
+
 						$variable = $image['image'];
 						if(!db2_bind_param($stmt, 1, "variable", DB2_PARAM_IN, DB2_BINARY)){
 							self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
@@ -479,11 +479,11 @@ class CImage extends CZBXAPI{
 						break;
 						case ZBX_DB_DB2:
 							$stmt = db2_prepare($DB['DB'], 'UPDATE images SET image=? WHERE imageid='.$image['imageid']);
-						
+
 							if(!$stmt){
 								self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
 							}
-						
+
 							$variable = $image['image'];
 							if(!db2_bind_param($stmt, 1, "variable", DB2_PARAM_IN, DB2_BINARY)){
 								self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));

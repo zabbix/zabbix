@@ -168,7 +168,7 @@ class CScript extends CZBXAPI{
 		if(!is_null($options['countOutput'])){
 			$options['sortfield'] = '';
 
-			$sql_parts['select'] = array('count(s.scriptid) as rowscount');
+			$sql_parts['select'] = array('count(DISTINCT s.scriptid) as rowscount');
 		}
 
 // order
