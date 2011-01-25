@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-25 14:27+0200\n"
-"PO-Revision-Date: 2011-01-16 23:23+0200\n"
+"POT-Creation-Date: 2011-01-25 14:31+0200\n"
+"PO-Revision-Date: 2011-01-25 00:12+0200\n"
 "Last-Translator: qix <qix@the-wired.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: nl\n"
@@ -846,39 +846,39 @@ msgstr "Kan item niet toevoegen"
 #: api/classes/class.chost.php:1845 api/classes/class.ctemplate.php:1547
 #: include/locales/en_gb.inc.php:873
 msgid "Cannot add macro"
-msgstr ""
+msgstr "Kan macro niet toevoegen"
 
 #: include/locales/en_gb.inc.php:780
 msgid "Cannot add maintenance"
-msgstr ""
+msgstr "Kan onderhoud niet toeveoegen"
 
 #: include/locales/en_gb.inc.php:711
 msgid "Cannot add more than one item with type \"Graph sum\""
-msgstr ""
+msgstr "Er kan maar één item van het type \"Grafiek som\" toegevoegd worden"
 
 #: include/locales/en_gb.inc.php:1319
 msgid "Cannot add network map"
-msgstr ""
+msgstr "Kan netwerk kaart niet toevoegen"
 
 #: include/locales/en_gb.inc.php:2229
 msgid "Cannot add new application"
-msgstr ""
+msgstr "Kan nieuwe applicatie niet toevoegen"
 
 #: include/locales/en_gb.inc.php:285
 msgid "Cannot add node"
-msgstr ""
+msgstr "Kan node niet toevoegen"
 
 #: include/locales/en_gb.inc.php:1887
 msgid "Cannot add proxy"
-msgstr ""
+msgstr "Kan proxy niet toevoegen"
 
 #: include/locales/en_gb.inc.php:586
 msgid "Cannot add regular expression"
-msgstr ""
+msgstr "Kan reguliere expressie niet toevoegen"
 
 #: include/locales/en_gb.inc.php:201
 msgid "Cannot add scenario"
-msgstr ""
+msgstr "Kan scenario niet toevoegen"
 
 #: include/locales/en_gb.inc.php:1600
 msgid "Cannot add screen"
@@ -886,7 +886,7 @@ msgstr "Kan scherm niet toevoegen"
 
 #: include/locales/en_gb.inc.php:1973
 msgid "Cannot add script"
-msgstr ""
+msgstr "Kan script niet toevoegen"
 
 #: include/locales/en_gb.inc.php:1716
 msgid "Cannot add service"
@@ -894,11 +894,11 @@ msgstr "kan dienst niet toevoegen"
 
 #: include/locales/en_gb.inc.php:1692
 msgid "Cannot add slideshow"
-msgstr ""
+msgstr "Kan slideshow niet toevoegen"
 
 #: include/locales/en_gb.inc.php:987
 msgid "Cannot add template"
-msgstr ""
+msgstr "Kan template niet toevoegen"
 
 #: include/locales/en_gb.inc.php:1780
 msgid "Cannot add trigger"
@@ -922,15 +922,15 @@ msgstr "Kan geschiedenis niet opschonen"
 
 #: include/locales/en_gb.inc.php:1981
 msgid "Cannot connect to Zabbix server"
-msgstr ""
+msgstr "Kan niet met de Zabbix server verbinden"
 
 #: include/locales/en_gb.inc.php:666
 msgid "Cannot copy graphs"
-msgstr ""
+msgstr "Kan de grafieken niet kopieren"
 
 #: include/locales/en_gb.inc.php:899
 msgid "Cannot copy items"
-msgstr ""
+msgstr "Kan de items niet kopieren"
 
 #: include/db.inc.php:45
 msgid "Cannot create another database connection."
@@ -938,11 +938,11 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:2131
 msgid "Cannot create application"
-msgstr ""
+msgstr "Kan applicatie niet aanmaken"
 
 #: api/classes/class.chost.php:1922
 msgid "Cannot create extended profile"
-msgstr ""
+msgstr "Kan uitgebreid profiel niet aanmaken"
 
 #: include/locales/en_gb.inc.php:383
 msgid "Cannot delete action"
@@ -959,11 +959,11 @@ msgstr "Kan applicatie niet verwijderen"
 #: host_discovery.php:182 host_discovery.php:267
 #: include/locales/en_gb.inc.php:131
 msgid "Cannot delete discovery rule"
-msgstr ""
+msgstr "Kan discovery regel niet verwijderen"
 
 #: api/classes/class.chost.php:1902
 msgid "Cannot delete extended profile"
-msgstr ""
+msgstr "Kan uitgebreid profiel niet verwijderen"
 
 #: api/classes/class.citem.php:1338 include/locales/en_gb.inc.php:707
 msgid "Cannot delete graph"
@@ -971,11 +971,11 @@ msgstr "Kan grafiek niet verwijderen"
 
 #: api/classes/class.cgraphprototype.php:1051
 msgid "Cannot delete graph prototype"
-msgstr ""
+msgstr "Kan grafiek prototype niet verwijderen"
 
 #: include/locales/en_gb.inc.php:709
 msgid "Cannot delete graphs"
-msgstr ""
+msgstr "Kan grafieken niet verwijderen"
 
 #: include/locales/en_gb.inc.php:1885
 msgid "Cannot delete group"
@@ -983,11 +983,11 @@ msgstr "Kan groep niet verwijderen"
 
 #: include/locales/en_gb.inc.php:906
 msgid "Cannot delete host"
-msgstr "Kan gastheer niet verwijderen"
+msgstr "Kan host niet verwijderen"
 
 #: include/locales/en_gb.inc.php:547
 msgid "Cannot delete image"
-msgstr "Kan niet afbeelding verwijderen"
+msgstr "Kan afbeelding niet verwijderen"
 
 #: include/locales/en_gb.inc.php:1109
 msgid "Cannot delete item"
@@ -999,39 +999,39 @@ msgstr "Kan items niet verwijderen"
 
 #: include/locales/en_gb.inc.php:874
 msgid "Cannot delete macros"
-msgstr ""
+msgstr "Kan macro niet verwijderen"
 
 #: include/locales/en_gb.inc.php:782
 msgid "Cannot delete maintenance"
-msgstr ""
+msgstr "Kan onderhoud niet verwijderen"
 
 #: include/locales/en_gb.inc.php:1306
 msgid "Cannot delete network map"
-msgstr ""
+msgstr "Kan netwerk kaart niet verwijderen"
 
 #: include/locales/en_gb.inc.php:287
 msgid "Cannot delete node"
-msgstr ""
+msgstr "Kan node niet verwijderen"
 
 #: api/classes/class.chost.php:1857
 msgid "Cannot delete profile"
-msgstr ""
+msgstr "Kan profiel niet verwijderen"
 
 #: include/locales/en_gb.inc.php:1891
 msgid "Cannot delete proxy"
-msgstr ""
+msgstr "Kan proxy niet verwijderen"
 
 #: include/locales/en_gb.inc.php:592
 msgid "Cannot delete regular expression"
-msgstr ""
+msgstr "Kan reguliere expressie niet verwijderen"
 
 #: include/locales/en_gb.inc.php:202
 msgid "Cannot delete scenario"
-msgstr ""
+msgstr "Kan scenario niet verwijderen"
 
 #: include/locales/en_gb.inc.php:1977
 msgid "Cannot delete script"
-msgstr ""
+msgstr "Kan script niet verwijderen"
 
 #: actionconf.php:313
 msgid "Cannot delete selected actions."
@@ -1039,46 +1039,46 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1718
 msgid "Cannot delete service"
-msgstr "kan dienst niet verwijderen"
+msgstr "Kan dienst niet verwijderen"
 
 #: include/locales/en_gb.inc.php:1694
 msgid "Cannot delete slideshow"
-msgstr ""
+msgstr "Kan diavoorstelling niet verwijderen"
 
 #: include/locales/en_gb.inc.php:993
 msgid "Cannot delete template"
-msgstr ""
+msgstr "Kan sjabloon niet verwijderen"
 
 #: api/classes/class.cgraph.php:1032
 #: api/classes/class.cgraphprototype.php:1028
 msgid "Cannot delete templated graphs"
-msgstr ""
+msgstr "Kan sjabloon grafieken niet verwijderen"
 
 #: api/classes/class.cdiscoveryrule.php:939
 msgid "Cannot delete templated items"
-msgstr ""
+msgstr "Kan sjabloon items niet verwijderen"
 
 #: api/classes/class.ctrigger.php:1332
 #: api/classes/class.ctriggerprototype.php:1252
 #, php-format
 msgid "Cannot delete templated trigger [%1$s:%2$s]"
-msgstr ""
+msgstr "Kan sjabloon trigger [%1$s:%2$s] niet verwijderen"
 
 #: include/locales/en_gb.inc.php:1778
 msgid "Cannot delete trigger"
-msgstr "Kan trekker niet verwijderen"
+msgstr "Kan trigger niet verwijderen"
 
 #: include/locales/en_gb.inc.php:1776
 msgid "Cannot delete triggers"
-msgstr "Kan trekkers niet verwijderen"
+msgstr "Kan triggers niet verwijderen"
 
 #: include/locales/en_gb.inc.php:1874
 msgid "Cannot delete user"
-msgstr "Kan gebruikers niet verwijderen"
+msgstr "Kan gebruiker niet verwijderen"
 
 #: include/locales/en_gb.inc.php:500
 msgid "Cannot delete value map"
-msgstr "Kan niet map waarde verwijderen"
+msgstr "Kan waarde relaties niet verwijderen"
 
 #: include/locales/en_gb.inc.php:1604
 msgid "Cannot deleted screen"
@@ -1086,47 +1086,47 @@ msgstr "Kan scherm niet verwijderen"
 
 #: include/locales/en_gb.inc.php:1343
 msgid "Cannot find background image"
-msgstr ""
+msgstr "Kan achtergrond afbeelding niet verwijderen"
 
 #: include/locales/en_gb.inc.php:1643
 msgid "Cannot find graph"
-msgstr ""
+msgstr "Kan grafiek niet vinden"
 
 #: include/locales/en_gb.inc.php:1345
 msgid "Cannot find host"
-msgstr ""
+msgstr "Kan host niet vinden"
 
 #: include/locales/en_gb.inc.php:1346
 msgid "Cannot find hostgroup"
-msgstr ""
+msgstr "Kan de host groep niet vinden"
 
 #: include/locales/en_gb.inc.php:1342
 msgid "Cannot find image"
-msgstr ""
+msgstr "Kan afbeelding niet vinden"
 
 #: include/locales/en_gb.inc.php:1644
 msgid "Cannot find item"
-msgstr ""
+msgstr "Kan item niet vinden"
 
 #: include/locales/en_gb.inc.php:1347
 msgid "Cannot find map"
-msgstr ""
+msgstr "Kan netwerk kaart niet vinden"
 
 #: include/locales/en_gb.inc.php:1348
 msgid "Cannot find screen"
-msgstr ""
+msgstr "Kan scherm niet vinden"
 
 #: include/locales/en_gb.inc.php:1344
 msgid "Cannot find trigger"
-msgstr ""
+msgstr "Kan trigger niet vinden"
 
 #: include/locales/en_gb.inc.php:1766
 msgid "Cannot format Tree. Check logic structure in service links"
-msgstr ""
+msgstr "Kan boom niet opbouwen. Bekijk de logische structuur van de dienst koppelingen"
 
 #: api/classes/class.ctriggerprototype.php:1358
 msgid "Cannot implode expression"
-msgstr ""
+msgstr "Kan expressie niet inkrimpen"
 
 #: api/classes/class.ctrigger.php:1495
 #, php-format
@@ -1135,115 +1135,115 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:2366
 msgid "Cannot link hardlinked service."
-msgstr ""
+msgstr "Kan vast gekoppelde service niet koppelen"
 
 #: include/locales/en_gb.inc.php:2367
 msgid "Cannot link service to itself."
-msgstr ""
+msgstr "Kan dienst niet aan zichzelf koppelen"
 
 #: include/locales/en_gb.inc.php:1023
 msgid "Cannot link template"
-msgstr ""
+msgstr "Kan template niet ontkoppelen"
 
 #: api/classes/class.chost.php:1674
 msgid "Cannot mass update host name"
-msgstr ""
+msgstr "Kan de hostnaam niet in bulk bijwerken"
 
 #: api/classes/class.ctemplate.php:1351
 msgid "Cannot mass update template name"
-msgstr ""
+msgstr "Kan de sjabloon naam niet in bulk bijwerken"
 
 #: api/classes/class.chost.php:1736
 msgid "Cannot remove group"
-msgstr ""
+msgstr "Kan de groep niet verwijderen"
 
 #: api/classes/class.chost.php:1829 config.php:542
 msgid "Cannot remove macro"
-msgstr ""
+msgstr "Kan macro niet verwijderen"
 
 #: include/locales/en_gb.inc.php:2453
 msgid "Cannot rename guest user"
-msgstr ""
+msgstr "Kan gast gebruiker niet hernoemen"
 
 #: api/classes/class.ctemplate.php:1818
 msgid "Cannot sync Triggers"
-msgstr ""
+msgstr "Kan triggers niet synchroniseren"
 
 #: api/classes/class.ctemplate.php:1824
 msgid "Cannot sync Triggers prototypes"
-msgstr ""
+msgstr "Kan trigger prototypes niet synchroniseren"
 
 #: api/classes/class.ctemplate.php:1794
 msgid "Cannot sync applications"
-msgstr ""
+msgstr "Kan applicaties niet synchroniseren"
 
 #: api/classes/class.ctemplate.php:1800
 msgid "Cannot sync discovery rules"
-msgstr ""
+msgstr "Kan discovery regels niet synchroniseren"
 
 #: api/classes/class.ctemplate.php:1830
 msgid "Cannot sync graph prototypes"
-msgstr ""
+msgstr "Kan grafiek prototypes niet synchroniseren"
 
 #: api/classes/class.ctemplate.php:1836
 msgid "Cannot sync graphs"
-msgstr ""
+msgstr "Kan grafieken niet synchroniseren"
 
 #: api/classes/class.ctemplate.php:1806
 msgid "Cannot sync item prototypes"
-msgstr ""
+msgstr "Kan item prototypes niet synchroniseren"
 
 #: api/classes/class.ctemplate.php:1812
 msgid "Cannot sync items"
-msgstr ""
+msgstr "Kan items niet synchroniseren"
 
 #: include/locales/en_gb.inc.php:1895
 msgid "Cannot unblock users"
-msgstr ""
+msgstr "Kan gebruikers niet deblokkeren"
 
 #: api/classes/class.ctemplate.php:2085
 msgid "Cannot unlink and clear applications"
-msgstr ""
+msgstr "Kan applicaties niet ontkoppelen en opschonen"
 
 #: api/classes/class.ctemplate.php:1880
 msgid "Cannot unlink and clear discovery rules"
-msgstr ""
+msgstr "Kan discovery regels niet onkoppelen en opschonen"
 
 #: api/classes/class.ctemplate.php:1964
 msgid "Cannot unlink and clear graph prototypes"
-msgstr ""
+msgstr "Kan grafiek prototypes niet ontkoppelen en opschonen"
 
 #: api/classes/class.ctemplate.php:1982
 msgid "Cannot unlink and clear graphs."
-msgstr ""
+msgstr "Kan grafieken niet ontkoppelen en opschonen"
 
 #: api/classes/class.ctemplate.php:1916
 msgid "Cannot unlink and clear item prototypes"
-msgstr ""
+msgstr "Kan prototypes niet ontkoppelen en opschonen"
 
 #: api/classes/class.ctemplate.php:1898
 msgid "Cannot unlink and clear items"
-msgstr ""
+msgstr "Kan items niet ontkoppelen en opschonen"
 
 #: api/classes/class.ctemplate.php:2033 api/classes/class.ctemplate.php:2050
 msgid "Cannot unlink and clear triggers"
-msgstr ""
+msgstr "Kan triggers niet ontkoppelen en opschonen"
 
 #: include/locales/en_gb.inc.php:1022
 msgid "Cannot unlink template"
-msgstr ""
+msgstr "Kan sjabloon niet ontkoppelen"
 
 #: include/locales/en_gb.inc.php:902
 msgid "Cannot update"
-msgstr ""
+msgstr "Kan niet bijwerken"
 
 #: include/locales/en_gb.inc.php:1899
 msgid "Cannot update API access"
-msgstr ""
+msgstr "Kan API toegang niet bijwerken"
 
 #: include/locales/en_gb.inc.php:1897
 msgid "Cannot update GUI access"
-msgstr ""
+msgstr "Kan GUI toegang niet bijwerken"
 
 #: include/locales/en_gb.inc.php:381
 msgid "Cannot update action"
@@ -1259,15 +1259,15 @@ msgstr "Kan opmerkingen niet bijwerken"
 
 #: include/locales/en_gb.inc.php:1901
 msgid "Cannot update debug mode"
-msgstr ""
+msgstr "Kan debug modus niet bijwerken"
 
 #: host_discovery.php:243 include/locales/en_gb.inc.php:134
 msgid "Cannot update discovery rule"
-msgstr ""
+msgstr "Kan discovery rule niet bijwerken"
 
 #: api/classes/class.chost.php:1944
 msgid "Cannot update extended profile"
-msgstr ""
+msgstr "Kan uitgebreid profiel niet bijwerken"
 
 #: include/locales/en_gb.inc.php:705
 msgid "Cannot update graph"
@@ -1279,15 +1279,15 @@ msgstr "Kan groep niet bijwerken"
 
 #: include/locales/en_gb.inc.php:901
 msgid "Cannot update host"
-msgstr "kan gastheer niet bijwerken"
+msgstr "Kan host niet bijwerken"
 
 #: include/locales/en_gb.inc.php:904
 msgid "Cannot update host status"
-msgstr "Kan gastheer status niet bijwerken"
+msgstr "Kan host status niet bijwerken"
 
 #: include/locales/en_gb.inc.php:549
 msgid "Cannot update image"
-msgstr "Kan niet afbeelding bijwerken"
+msgstr "Kan afbeelding niet bijwerken"
 
 #: include/locales/en_gb.inc.php:1104
 msgid "Cannot update item"
@@ -1296,39 +1296,39 @@ msgstr "Kan item niet bijwerken"
 #: api/classes/class.chost.php:1836 api/classes/class.ctemplate.php:1538
 #: config.php:547
 msgid "Cannot update macro"
-msgstr ""
+msgstr "Kan macro niet bijwerken"
 
 #: include/locales/en_gb.inc.php:871
 msgid "Cannot update macros"
-msgstr ""
+msgstr "Kan macros niet bijwerken"
 
 #: include/locales/en_gb.inc.php:781
 msgid "Cannot update maintenance"
-msgstr ""
+msgstr "Kan onderhoud niet bijwerken"
 
 #: include/locales/en_gb.inc.php:1321
 msgid "Cannot update network map"
-msgstr ""
+msgstr "Kan netwerk kaart niet bijwerken"
 
 #: include/locales/en_gb.inc.php:283
 msgid "Cannot update node"
-msgstr ""
+msgstr "Kan node niet bijwerken"
 
 #: api/classes/class.chost.php:1890
 msgid "Cannot update profile"
-msgstr ""
+msgstr "Kan profiel niet bijwerken"
 
 #: include/locales/en_gb.inc.php:1889
 msgid "Cannot update proxy"
-msgstr ""
+msgstr "Kan proxy niet bijwerken"
 
 #: include/locales/en_gb.inc.php:589
 msgid "Cannot update regular expression"
-msgstr ""
+msgstr "Kan reguliere expressie niet bijwerken"
 
 #: include/locales/en_gb.inc.php:199
 msgid "Cannot update scenario"
-msgstr ""
+msgstr "Kan scenario niet bijwerken"
 
 #: include/locales/en_gb.inc.php:1602
 msgid "Cannot update screen"
@@ -1336,7 +1336,7 @@ msgstr "Kan scherm niet bijwerken"
 
 #: include/locales/en_gb.inc.php:1975
 msgid "Cannot update script"
-msgstr ""
+msgstr "Kan script niet bijwerken"
 
 #: include/locales/en_gb.inc.php:1714
 msgid "Cannot update service"
