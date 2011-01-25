@@ -1666,7 +1666,7 @@ COpt::memoryPick();
 		foreach($chd_hosts as $chd_host){
 			$newTrigger = $trigger;
 
-			if(!is_null($trigger['dependencies']))
+			if(isset($trigger['dependencies']) && !is_null($trigger['dependencies']))
 				$newTrigger['dependencies'] = replace_template_dependencies($trigger['dependencies'], $chd_host['hostid']);
 
 			$newTrigger['templateid'] = $trigger['triggerid'];
