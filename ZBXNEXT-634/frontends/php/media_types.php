@@ -295,7 +295,7 @@ include_once('include/page_header.php');
 		}
 
 		foreach($actions as $actionid => $action){
-			if(isset($mediatypes[$action['mediatypeid']]['listOfActions']))	$mediatypes[$action['mediatypeid']]['listOfActions'] = array();
+			if(!isset($mediatypes[$action['mediatypeid']]['listOfActions']))	$mediatypes[$action['mediatypeid']]['listOfActions'] = array();
 			$mediatypes[$action['mediatypeid']]['listOfActions'][] = array('actionid' => $actionid,'name' => $action['name']);
 		}
 
@@ -332,7 +332,7 @@ include_once('include/page_header.php');
 				order_result($mediatype['listOfActions'], 'name');
 				foreach($mediatype['listOfActions'] as $mediaaction){
 					$actionLinks[] = new CLink($mediaaction['name'],'actionconf.php?form=update&actionid='.$mediaaction['actionid']);
-					$actionLinks[] = ',';
+					$actionLinks[] = ', ';
 				}
 				array_pop($actionLinks);
 			}
