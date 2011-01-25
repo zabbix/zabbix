@@ -942,12 +942,24 @@ require_once('include/js.inc.php');
 
 						if($graph['ymax_type'] == 2 && $graph['ymax_itemid'] ){
 							$new_dinamic = get_same_graphitems_for_host(array( array('itemid' => $graph['ymax_itemid'])), $_REQUEST['hostid'], false);
-							$graph['ymax_itemid'] = $new_dinamic[0]['itemid'];
+							$new_dinamic = reset($new_dinamic);
+							if(isset($new_dinamic['itemid']) && $new_dinamic['itemid'] > 0){
+								$graph['ymax_itemid'] = $new_dinamic['itemid'];
+							}
+							else{
+								$graph['ymax_type'] = GRAPH_YAXIS_TYPE_CALCULATED;
+							}
 						}
 
 						if($graph['ymin_type'] == 2 && $graph['ymin_itemid'] ){
 							$new_dinamic = get_same_graphitems_for_host(array( array('itemid' => $graph['ymin_itemid'])), $_REQUEST['hostid'], false);
-							$graph['ymin_itemid'] = $new_dinamic[0]['itemid'];
+							$new_dinamic = reset($new_dinamic);
+							if(isset($new_dinamic['itemid']) && $new_dinamic['itemid'] > 0){
+								$graph['ymin_itemid'] = $new_dinamic['itemid'];
+							}
+							else{
+								$graph['ymin_type'] = GRAPH_YAXIS_TYPE_CALCULATED;
+							}
 						}
 
 						if(($graph['graphtype']==GRAPH_TYPE_PIE) || ($graph['graphtype']==GRAPH_TYPE_EXPLODED))
