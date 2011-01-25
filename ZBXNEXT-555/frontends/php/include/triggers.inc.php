@@ -1501,7 +1501,7 @@ return $caption;
 					$functionid = trigger_get_N_functionid($row['expression'], $i ? $i : 1);
 
 					if(isset($functionid)){
-						$sql = 'SELECT i.lastvalue, i.value_type, i.itemid, i.valuemapid, i.units '.
+						$sql = 'SELECT i.lastvalue, i.lastclock, i.value_type, i.itemid, i.valuemapid, i.units '.
 								' FROM items i, functions f '.
 								' WHERE i.itemid=f.itemid '.
 									' AND f.functionid='.$functionid;
@@ -1957,7 +1957,6 @@ return $caption;
 						' WHERE '.DBcondition('triggerid_down',$triggerids));
 
 		while($db_dep = DBfetch($db_deps)){
-			DBexecute('UPDATE triggers SET dep_level=dep_level-1 WHERE triggerid='.$db_dep['triggerid_up']);
 			DBexecute('DELETE FROM trigger_depends'.
 				' WHERE triggerid_up='.$db_dep['triggerid_up'].
 					' AND triggerid_down='.$db_dep['triggerid_down']);
@@ -3394,9 +3393,9 @@ return $caption;
 						'filter' => array(
 							'hostid' => $hostId,
 							'key_' => $hostKey.$hostKeyParams,
-							'webitems' => true,
 							'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED),
-						)
+						),
+						'webitems' => true,
 					));
 					if(count($itemFound) > 0) {
 						$itemFound = array_shift($itemFound);

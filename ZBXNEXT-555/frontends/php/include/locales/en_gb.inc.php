@@ -1687,12 +1687,11 @@
 	'S_HOST_SCREENS'=>				_('Host screens'),
 
 	'S_SLIDESHOW_UPDATED'=>			_('Slideshow updated'),
-	'S_CANNOT_UPDATE_SLIDESHOW'=>	_('Cannot_update slideshow'),
+	'S_CANNOT_UPDATE_SLIDESHOW'=>	_('Cannot update slideshow'),
 	'S_SLIDESHOW_ADDED'=>			_('Slideshow added'),
 	'S_CANNOT_ADD_SLIDESHOW'=>		_('Cannot add slideshow'),
 	'S_SLIDESHOW_DELETED'=>			_('Slideshow deleted'),
 	'S_CANNOT_DELETE_SLIDESHOW'=>	_('Cannot delete slideshow'),
-	'S_DELETE_SLIDESHOW_Q'=>		_('Delete slideshow?'),
 	'S_DELETE_SLIDESHOW_Q'=>		_('Delete slideshow?'),
 
 	'S_ERROR_SCREEN_WITH_NAME_DOES_NOT_EXIST' => _('Screen with name "%s" does not exist'),
@@ -1969,7 +1968,6 @@
 	'S_WRITE'=>				_('Write'),
 	'S_NO_SCRIPTS_DEFINED'=>		_('No scripts defined'),
 	'S_HOST_ACCESS'=>			_('Host access'),
-	'S_DELETE_SCRIPTS_Q'=>			_('Delete script?'),
 	'S_CREATE_SCRIPT'=>			_('Create script'),
 	'S_SCRIPT_ADDED'=>			_('Script added'),
 	'S_CANNOT_ADD_SCRIPT'=>			_('Cannot add script'),

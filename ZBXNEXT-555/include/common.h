@@ -117,8 +117,8 @@
 #define OFF	0
 
 #define	APPLICATION_NAME	"Zabbix Agent"
-#define	ZABBIX_REVDATE		"26 October 2010"
-#define	ZABBIX_VERSION		"1.9.1"
+#define	ZABBIX_REVDATE		"28 December 2010"
+#define	ZABBIX_VERSION		"1.9.2"
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
 #if defined(_WINDOWS)
@@ -755,8 +755,9 @@ int	is_ascii_string(const char *str);
 int	zbx_rtrim(char *str, const char *charlist);
 void	zbx_ltrim(char *str, const char *charlist);
 void	zbx_remove_chars(register char *str, const char *charlist);
-#define zbx_remove_spaces(str)		zbx_remove_chars(str, " ");
-#define zbx_remove_whitespace(str)	zbx_remove_chars(str, " \t\r\n");
+#define ZBX_WHITESPACE			" \t\r\n"
+#define zbx_remove_spaces(str)		zbx_remove_chars(str, " ")
+#define zbx_remove_whitespace(str)	zbx_remove_chars(str, ZBX_WHITESPACE)
 void	compress_signs(char *str);
 void	ltrim_spaces(char *c);
 void	rtrim_spaces(char *c);
@@ -926,8 +927,11 @@ void	zbx_strupper(char *str);
 #if defined(_WINDOWS) || defined(HAVE_ICONV)
 char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);
 #endif	/* HAVE_ICONV */
-char	*zbx_replace_utf8(const char *text, char replacement);
 int	zbx_strlen_utf8(const char *text);
+
+#define ZBX_UTF8_REPLACE_CHAR	'?'
+char	*zbx_replace_utf8(const char *text);
+void	zbx_replace_invalid_utf8(char *text);
 
 void	win2unix_eol(char *text);
 int	str2uint(const char *str);
@@ -944,6 +948,8 @@ int	MAIN_ZABBIX_ENTRY(void);
 
 zbx_uint64_t	zbx_letoh_uint64(zbx_uint64_t data);
 zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data);
+
+int	zbx_check_hostname(const char *hostname);
 
 int	is_hostname_char(char c);
 int	is_key_char(char c);

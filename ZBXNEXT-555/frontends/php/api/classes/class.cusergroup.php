@@ -79,6 +79,7 @@ class CUserGroup extends CZBXAPI{
 // filter
 			'filter'					=> null,
 			'search'					=> null,
+			'searchByAny'			=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 // OutPut
@@ -692,10 +693,10 @@ class CUserGroup extends CZBXAPI{
 
 		$usrgrpids = zbx_toArray($usrgrpids);
 
-		if(empty($usrgrpids)) return true;
-
 		try{
 			self::BeginTransaction(__METHOD__);
+
+		if(empty($usrgrpids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
 
 			if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 				//GETTEXT: Api exception

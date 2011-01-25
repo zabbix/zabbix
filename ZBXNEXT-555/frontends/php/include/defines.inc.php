@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-	define('ZABBIX_VERSION','1.9.1');
+	define('ZABBIX_VERSION','1.9.2');
 	define('ZABBIX_API_VERSION','1.2');
 /* USER DEFINES */
 
@@ -82,6 +82,12 @@
 	define('ZBX_AUTH_LDAP',		1);
 	define('ZBX_AUTH_HTTP',		2);
 
+	define('ZBX_DB_DB2',		'IBM_DB2');
+	define('ZBX_DB_MYSQL',		'MYSQL');
+	define('ZBX_DB_ORACLE',		'ORACLE');
+	define('ZBX_DB_POSTGRESQL',		'POSTGRESQL');
+	define('ZBX_DB_SQLITE3',		'SQLITE3');
+
 	define('PAGE_TYPE_HTML',			0);
 	define('PAGE_TYPE_IMAGE',			1);
 	define('PAGE_TYPE_XML',				2);
@@ -92,6 +98,7 @@
 	define('PAGE_TYPE_JSON_RPC',		7);	// api call
 	define('PAGE_TYPE_TEXT_FILE',		8);	// api call
 	define('PAGE_TYPE_TEXT',			9); // simple text
+	define('PAGE_TYPE_CSV',				10); // CSV format
 
 
 	define('ZBX_SESSION_ACTIVE',		0);
@@ -179,7 +186,7 @@
 	define('AUDIT_RESOURCE_MAINTENANCE',	27);
 	define('AUDIT_RESOURCE_REGEXP',			28);
 	define('AUDIT_RESOURCE_MACRO',			29);
-	define('AUDIT_RESOURCE_TEMPLATE',			30);
+	define('AUDIT_RESOURCE_TEMPLATE',		30);
 
 	define('CONDITION_TYPE_HOST_GROUP',			0);
 	define('CONDITION_TYPE_HOST',				1);

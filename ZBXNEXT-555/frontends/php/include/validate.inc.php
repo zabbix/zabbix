@@ -258,7 +258,7 @@
 
 	define('NOT_EMPTY',"({}!='')&&");
 	define('DB_ID',"({}>=0&&bccomp('{}',\"10000000000000000000\")<0)&&");
-	define('NOT_ZERO',"({}>0)&&");
+	define('NOT_ZERO',"({}!=0)&&");
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 
@@ -416,7 +416,7 @@
 			return ZBX_VALID_OK;
 		}
 
-		if(($type == T_ZBX_INT) && !zbx_numeric($var)) {
+		if(($type == T_ZBX_INT) && !zbx_is_int($var)){
 			if($flags&P_SYS){
 				info(S_CRITICAL_ERROR.'.'.SPACE.S_FIELD.SPACE.'['.$field.']'.SPACE.S_IS_NOT_INTEGER_SMALL);
 				return ZBX_VALID_ERROR;

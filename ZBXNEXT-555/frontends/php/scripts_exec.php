@@ -21,10 +21,9 @@
 <?php
 	include_once "include/config.inc.php";
 	require_once "include/hosts.inc.php";
-	require_once "include/scripts.inc.php";
 	require_once "include/forms.inc.php";
 
-	$page['title'] = "S_SCRIPTS";
+	$page['title'] = 'S_SCRIPTS';
 	$page['file'] = 'scripts_exec.php';
 
 	define('ZBX_PAGE_NO_MENU', 1);

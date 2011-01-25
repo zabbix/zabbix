@@ -19,9 +19,9 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/class.ctest.php');
+require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testClicks extends CTest
+class testClicks extends CWebTest
 {
 	public static function provider()
 	{
@@ -91,45 +91,6 @@ class testClicks extends CTest
 				'Scripts',
 				'Script updated')
 			);
-	}
-
-	/**
-	* @dataProvider provider
-	*/
-	public function atestTitles($a, $b)
-	{
-		$this->login();
-		$this->open($a);
-		$this->assertTitle($b);
-		$this->logout();
-	}
-
-	/**
-	* @dataProvider provider
-	*/
-	public function atestNotExists($a,$b)
-	{
-		$this->login();
-		$this->open($a);
-		foreach($this->failIfExists as $str)
-		{
-			$this->assertTextNotPresent($str,'assertTextNotPresent('.$a.','.$str.')');
-		}
-		$this->logout();
-	}
-
-	/**
-	* @dataProvider provider
-	*/
-	public function atestExists($a,$b)
-	{
-		$this->login();
-		$this->open($a);
-		foreach($this->failIfNotExists as $str)
-		{
-			$this->assertTextPresent($str,'assertTextPresent('.$a.','.$str.')');
-		}
-		$this->logout();
 	}
 
 	/**

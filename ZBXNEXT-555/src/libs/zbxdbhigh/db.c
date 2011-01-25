@@ -1073,7 +1073,7 @@ int	DBremove_escalation(zbx_uint64_t escalationid)
  *           and 'DBdyn_escape_string_len'                                    *
  *                                                                            *
  ******************************************************************************/
-int	DBget_escape_string_len(const char *src)
+static int	DBget_escape_string_len(const char *src)
 {
 	const char	*s;
 	int		len = 0;
@@ -1115,7 +1115,7 @@ int	DBget_escape_string_len(const char *src)
  *           and 'DBdyn_escape_string_len'                                    *
  *                                                                            *
  ******************************************************************************/
-void	DBescape_string(const char *src, char *dst, int len)
+static void	DBescape_string(const char *src, char *dst, int len)
 {
 	const char	*s;
 	char		*d;
@@ -1248,7 +1248,7 @@ char	*DBdyn_escape_string_len(const char *src, int max_src_len)
  * Comments: sync changes with 'DBescape_like_pattern'                        *
  *                                                                            *
  ******************************************************************************/
-int	DBget_escape_like_pattern_len(const char *src)
+static int	DBget_escape_like_pattern_len(const char *src)
 {
 	int		len;
 	const char	*s;
@@ -1297,7 +1297,7 @@ int	DBget_escape_like_pattern_len(const char *src)
  *           Hence '!' instead of backslash.                                  *
  *                                                                            *
  ******************************************************************************/
-void	DBescape_like_pattern(const char *src, char *dst, int len)
+static void	DBescape_like_pattern(const char *src, char *dst, int len)
 {
 	char		*d;
 	char		*tmp = NULL;
@@ -1915,7 +1915,7 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 			DBexecute("insert into autoreg_host"
 					" (autoreg_hostid,proxy_hostid,host,listen_ip,listen_port)"
 					" values"
-					" (" ZBX_FS_UI64 ",'%s','%s','%s',%d)",
+					" (" ZBX_FS_UI64 ",%s,'%s','%s',%d)",
 					autoreg_hostid, DBsql_id_ins(proxy_hostid),
 					host_esc, ip_esc, (int)port);
 		}

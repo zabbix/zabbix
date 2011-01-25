@@ -76,6 +76,7 @@ class CMediatype extends CZBXAPI{
 // filter
 			'filter'					=> null,
 			'search'					=> null,
+			'searchByAny'			=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 // OutPut
@@ -489,7 +490,7 @@ Copt::memoryPick();
 
 			$options = array(
 				'mediatypeids' => $mediatypeids,
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1,
 			);
 			$actions = CAction::get($options);

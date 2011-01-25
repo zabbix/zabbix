@@ -1,3 +1,36 @@
+--------------------------------------------------------------------------------
+Changes for 1.9.2
+
+New features:
+ - [ZBXNEXT-602] Export events to CSV (Vlad,Aly)
+ - [ZBXNEXT-623] restored support of SQLite3 for use with Zabbix Server and front-end (Alexei)
+ - [ZBX-1357] updated Dutch translation; thanks to qix (Richlv)
+ - [ZBX-1357] updated Latvian translation (Richlv)
+ - [ZBXNEXT-594] Add to zabbix API support for search and filter by rules "ALL" or "ANY" (Vlad)
+ - [ZBXNEXT-592] confirmation dialog for scripts (Vedmak)
+ - [ZBX-3355] added character field length validation on inserts and updates (KB)
+ - [ZBX-3370] updated Russian translation; thanks to zalex_ua and dotneft (Richlv)
+ - [ZBX-3338] updated Ukrainian translation; thanks to zalex_ua (Richlv)
+
+Bug fixes:
+ - [ZBX-3329] fixed shown last value as "0" in frontend for items that have never been updated (Aly)
+ - [ZBX-3436] added missing "Primary POC Screen Name" to Inventory->Hosts (KB)
+ - [ZBX-3405] fixed value_type for response code and failed step items when create webcheck (Vedmak)
+ - [ZBX-3363] fixed possible crash of server while processing of {HOST.CONN}, {IPADDRESS} and {HOST.DNS} macros (Sasha)
+ - [ZBX-3326] add X-Poedit-Basepath header to all locales (Richlv)
+ - [ZBX-3369] fixed API return: true in more Classes methods *.update and *.delete (Vlad)
+ - [ZBX-3368] fixed custom graphs in screens form prefixed with ':' (Vedmak)
+ - [ZBX-3329] fixed last value in latest data, status of triggers, and web monitoring (Vlad)
+ - [ZBX-3362] fixed inability to rename trigger (Vlad)
+ - [ZBX-1341] fixed password hashes returned over API (Vlad)
+ - [ZBX-3367] fixed PHP Fatal error when trying to create screen (Vlad)
+ - [ZBX-3354] fixed history clearing (Vlad)
+ - [ZBX-3360] fixed simple graph adding to a screen (Vlad)
+ - [ZBX-3189] fixed broken trigger dependencies (Vlad)
+ - [ZBX-3326] sort po file contents and entries in POTFILES.in, include fuzzy entries in mo files (Richlv)
+ - [ZBX-3054] fixed Cannot create or update Action with remote command; fix "reset() expects parameter 1 to be array, null given in /actionconf.php:754" (Vlad)
+
+--------------------------------------------------------------------------------
 Changes for 1.9.1
 
 New features:
@@ -8,6 +41,7 @@ New features:
  - [ZBXNEXT-512] redesign of unknown events (Aly,asaveljevs,Sasha)
 
 Bug fixes:
+ - [ZBX-3241] fixed incorrectly shortened popup texts (Vlad)
  - [ZBX-2647] Made some of hard coded strings translatable (KB)
  - [ZBX-3300] fixed valuemapid not removed from items table when valuemap deleted (Vedmak)
  - [ZBXNEXT-588] improved template, host, proxy form view, dashboard screen (Aly,Vedmak)
@@ -21,6 +55,7 @@ Bug fixes:
 --------------------------------------------------------------------------------
 Changes for 1.9.0
 
+New features:
  - [DEV-477] added support of low-level discovery of file systems, network interfaces and SNMP OID's (Sasha,Vedmak)
  - [DEV-490] made graph legend optional (Aly)
  - [DEV-483] added templated screens (Aly)
@@ -32,6 +67,52 @@ Changes for 1.9.0
  - [DEV-449] added display of host time in screens (Aly)
  - [DEV-449] added system.localtime[local] check (Sasha)
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 1.8.5rc1
+
+ - [ZBX-2912] added check for valid UTF-8 characters in the incoming data (Sasha)
+ - [ZBX-1346] add more user parameter examples (Richlv)
+ - [ZBX-2922] changed log level from warning to debug for some messages (Sasha)
+ - [ZBX-3440] Added pagination to slide and discovery configuration (KB)
+ - [ZBX-3433] fixed removing deleted passive proxies from queue (Sasha)
+ - [ZBX-416] fixed PostgreSQL errors in configuration sender module when using DM setup (Sasha)
+ - [ZBX-3346] fixed items being polled more frequently than necessary (Sasha)
+ - [ZBX-3409] fixed semaphore and shared memory access permissions (Sasha)
+ - [ZBX-3173] made server-side JSON parser ignore whitespace better (asaveljevs)
+ - [ZBX-3425] updated Brazilian Portuguese translation; thanks to Murilo Moreira de Oliveira (Richlv)
+ - [ZBX-3403] fixed SQL statements for auto registration and discovery operations (Sasha)
+ - [ZBX-3403] removed UNIQUE constraint for autoreg_host_1 index (Sasha)
+ - [ZBX-3414] expressions for triggers with web items are marked as error in trigger wizard (Vedmak)
+ - [ZBX-3406] better api validation (Vedmak)
+ - [ZBX-3413] added escaping of parameters used in LIKE SQL statements (KB)
+ - [ZBX-3391] fixed wrong comparison operators used for strings (Vlad)
+ - [ZBX-1346] document LogSlowQueries configuration parameter (Richlv)
+ - [ZBXNEXT-612] added mapname url parameter for monitoring->maps (Vedmak)
+ - [ZBX-886] remove duplicate translation strings (Richlv)
+ - [ZBX-3384] fixed server crash in a distributed monitoring setup with PostgreSQL (asaveljevs)
+ - [ZBX-3274] fixed SQLite3 semaphore errors while starting server or proxy (Sasha)
+ - [ZBXNEXT-614] add Slovak translation; thanks to Marcel Hecko (Richlv)
+ - [ZBX-2914] add Ubuntu upstart files; thanks to S. Canchon (Richlv)
+ - [ZBX-3381] negative multipliers for items with value type "numeric (float)" are now allowed (KB)
+ - [ZBX-1357] updated Japanese translation (Richlv)
+ - [ZBX-3385] fixed trigger status change record in audit log (Vedmak)
+ - [ZBX-2825] make profiles form redirect to the last visited page on save or cancel (Vlad)
+ - [ZBX-3383] fixed error in audit log when filter by Macro or Template (Vedmak)
+ - [ZBX-3378] updated Russian translation; thanks to dotneft and zalex_ua (Richlv)
+ - [ZBX-3350] fixed minor interface bug and it is now not possible to add host name longer than 64 chars (KB)
+ - [ZBX-3341] fixed host export - valuemap property is now exported as expected (KB)
+ - [ZBX-3338] updated Ukrainian translation; thanks to zalex_ua (Richlv)
+ - [ZBX-954] fix minor typos (Richlv)
+ - [ZBX-1419] don't print an informative message during upgrade if no orphan hosts were found (Richlv)
+
+Changes for 1.8.4
+
+1.8.4rc4 was released as 1.8.4 without any changes
+
+Changes for 1.8.4rc4
+
+ - [ZBX-3351] fixed broken support of 1.4.x style configuration file format for WEB interface (Vedmak)
 
 Changes for 1.8.4rc3
 
@@ -45,7 +126,7 @@ Changes for 1.8.4rc3
  - [ZBX-266] made debugging output for Web scenarios more useful (Sasha)
  - [ZBX-1181] fixed infinite looping when failing cURL initialization and showing of such errors in the GUI (asaveljevs,Sasha,Vedmak)
  - [ZBX-1181] fixed download speed, response time, and response code not being saved for failed Web scenario steps (asaveljevs)
- - [ZBX-2851] fixed apache hanging when frontend connects to empty database (Vedmak)
+ - [ZBX-2851] fixed Apache hanging when frontend connects to empty database (Vedmak)
  - [ZBX-2647] made some of hard coded strings translatable (KB)
  - [ZBX-3294] fixed host status change confirmation dialog (Vedmak)
  - [ZBX-3301] fixed server crash after libssh2_userauth_list() when processing SSH checks (asaveljevs)
@@ -58,7 +139,7 @@ Changes for 1.8.4rc3
  - [ZBX-2862] it is now not possible to delete host group or user group used in scripts (KB)
  - [ZBX-3281] fixed system.cpu.util[] for all processors combined on NetBSD (asaveljevs)
  - [ZBX-3006] fixed some forms <input> elements are put inside <table> tag (Vedmak)
- - [ZBXNEXT-176] added zabbix server name input during setup (Vedmak)
+ - [ZBXNEXT-176] added Zabbix server name input during setup (Vedmak)
  - [ZBX-3253] added schema selection for db2 setup and a configuration file parameter on the server (asaveljevs,Vedmak)
  - [ZBX-3239] fixed error in Proxies screen on Oracle, when no proxy defined (Vedmak)
  - [ZBX-3273] removed renewed auto registration notifications for already created hosts (Sasha)
@@ -890,7 +971,7 @@ Changes for 1.8.1
  - [ZBX-1528] fixed map permissions (Aly)
  - [ZBX-1569] fix incorrect state reference in map connector definition (Richlv)
  - [ZBX-1568] make 'Parent service' string translatable; patch by Kodai (Richlv)
- - [ZBX-1457] hosts in export file is now sorted by hostname (Vedmak)
+ - [ZBX-1457] hosts in export file are now sorted by hostname (Vedmak)
  - [ZBX-1462] fixed "Add host" operation for "Discovery" module for trying to add a host name which is already used (Dmitry)
  - [ZBX-1547] fixed SQL error while executing discovery action 'remove host' (Sasha)
  - [ZBX-1324] replaced more user visible strings ZABBIX with Zabbix (Richlv)

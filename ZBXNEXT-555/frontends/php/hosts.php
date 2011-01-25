@@ -465,7 +465,7 @@ include_once('include/page_header.php');
 			$templates_clear = get_request('clear_templates', array());
 			$groups = get_request('groups', array());
 
-			if(isset($_REQUEST['hostid'])){
+			if(isset($_REQUEST['hostid']) && $_REQUEST['form'] != 'full_clone'){
 				$create_new = false;
 				$msg_ok = S_HOST_UPDATED;
 				$msg_fail = S_CANNOT_UPDATE_HOST;
@@ -818,10 +818,12 @@ include_once('include/page_header.php');
 			if($pageFilter->groupid > 0) $options['groupids'] = $pageFilter->groupid;
 
 			$hosts = CHost::get($options);
+
 		}
 		else{
 			$hosts = array();
 		}
+
 
 // sorting && paging
 		order_result($hosts, $sortfield, $sortorder);

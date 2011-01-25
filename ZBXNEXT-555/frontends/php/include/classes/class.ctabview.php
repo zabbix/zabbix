@@ -26,8 +26,8 @@
  */
 class CTabView extends CDiv{
 	protected $id = 'tabs';
-	protected $tabs = null;
-	protected $headers = null;
+	protected $tabs = array();
+	protected $headers = array();
 
 	protected $selectedTab = null;
 	protected $rememberTab = false;
@@ -37,12 +37,9 @@ class CTabView extends CDiv{
 		if(isset($data['remember'])) $this->setRemember($data['remember']);
 		if(isset($data['selected'])) $this->setSelected($data['selected']);
 
-		$this->headers = new CList();
-		$this->tabs = array();
-
 		parent::__construct();
-		$this->setAttribute('id',$this->id);
-		$this->setAttribute('class','min-width hidden');
+		$this->setAttribute('id', $this->id);
+		$this->setAttribute('class', 'min-width hidden');
 	}
 
 	public function setRemember($remember){
@@ -52,25 +49,50 @@ class CTabView extends CDiv{
 	public function setSelected($selected){
 		$this->selectedTab = $selected;
 	}
-	
+
 	public function addTab($id, $header, $body){
-		$this->headers->addItem(new CLink($header, '#'.$id, null, null, false));
-		
+		$this->headers[$id] = $header;
+
 		$this->tabs[$id] = new CDiv($body);
 		$this->tabs[$id]->setAttribute('id', $id);
 	}
 
+	public static function setFooter($main, $others){
+
+	}
+
 	public function toString($destroy=true){
-		$this->addItem($this->headers);
-		$this->addItem($this->tabs);
+		if(count($this->tabs) == 1){
+			$this->setAttribute('class', 'min-width ui-tabs ui-widget ui-widget-content ui-corner-all widget');
 
-		$options = array();
-		if(!is_null($this->selectedTab)) 
-			$options['selected'] = $this->selectedTab;
-		if(!is_null($this->rememberTab) && ($this->rememberTab > 0))
-			$options['cookie'] = array('expires' => $this->rememberTab);
+			$header = reset($this->headers);
+			$header = new CDiv($header);
+			$header->addClass('ui-corner-all ui-widget-header header');
+			$this->addItem($header);
 
-		zbx_add_post_js('jQuery(function() { jQuery( "#'.$this->id.'" ).tabs('.zbx_jsvalue($options, true).').show(); });');
+
+			$tab = reset($this->tabs);
+			$tab->addClass('ui-tabs ui-tabs-panel ui-widget ui-widget-content ui-corner-all widget');
+			$this->addItem($tab);
+		}
+		else{
+			$headersList = new CList();
+			foreach($this->headers as $id => $header){
+				$headersList->addItem(new CLink($header, '#'.$id, null, null, false));
+			}
+
+			$this->addItem($headersList);
+			$this->addItem($this->tabs);
+
+			$options = array();
+			if(!is_null($this->selectedTab))
+				$options['selected'] = $this->selectedTab;
+			if(!is_null($this->rememberTab) && ($this->rememberTab > 0))
+				$options['cookie'] = array('expires' => $this->rememberTab);
+
+			zbx_add_post_js('jQuery(function() { jQuery( "#'.$this->id.'" ).tabs('.zbx_jsvalue($options, true).').show(); });');
+		}
+
 		return parent::toString($destroy);
 	}
 }

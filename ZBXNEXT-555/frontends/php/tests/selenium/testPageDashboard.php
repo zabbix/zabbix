@@ -19,9 +19,9 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/class.ctest.php');
+require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageDashboard extends CTest
+class testPageDashboard extends CWebTest
 {
 	public $host = "Text host";
 
@@ -39,7 +39,6 @@ class testPageDashboard extends CTest
 		$this->ok('Last 20 issues');
 		$this->ok('Web monitoring');
 		$this->ok('Updated:');
-		$this->logout();
 	}
 }
 ?>

@@ -19,9 +19,9 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/class.ctest.php');
+require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testFormScreen extends CTest
+class testFormScreen extends CWebTest
 {
 	public $testscreen = 'Test Screen';
 
@@ -36,7 +36,6 @@ class testFormScreen extends CTest
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('Screen added');
-		$this->logout();
 	}
 }
 ?>

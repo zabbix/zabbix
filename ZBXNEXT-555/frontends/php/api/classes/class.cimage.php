@@ -67,7 +67,8 @@ class CImage extends CZBXAPI{
 // filter
 			'filter'				=> null,
 			'search'				=> null,
-			'startSearch'			=> null,
+			'searchByAny'			=> null,
+			'startSearch'				=> null,
 			'excludeSearch'			=> null,
 
 // OutPut
@@ -327,55 +328,64 @@ class CImage extends CZBXAPI{
 					'imagetype' => $image['imagetype'],
 				);
 
-				if($DB['TYPE'] == 'ORACLE'){
-					$values['image'] = 'EMPTY_BLOB()';
+				switch($DB['TYPE']){
+					case ZBX_DB_ORACLE:
+						$values['image'] = 'EMPTY_BLOB()';
 
-					$lob = oci_new_descriptor($DB['DB'], OCI_D_LOB);
+						$lob = oci_new_descriptor($DB['DB'], OCI_D_LOB);
 
-					$sql = 'INSERT INTO images ('.implode(' ,', array_keys($values)).') VALUES ('.implode(',', $values).')'.
-						' returning image into :imgdata';
-					$stmt = oci_parse($DB['DB'], $sql);
-					if(!$stmt){
-						$e = oci_error($stmt);
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_PARSE_SQL_ERROR.' ['.$e['message'].'] '.S_IN_SMALL.' ['.$e['sqltext'].']');
-					}
+						$sql = 'INSERT INTO images ('.implode(' ,', array_keys($values)).') VALUES ('.implode(',', $values).')'.
+							' returning image into :imgdata';
+						$stmt = oci_parse($DB['DB'], $sql);
+						if(!$stmt){
+							$e = oci_error($stmt);
+							self::exception(ZBX_API_ERROR_PARAMETERS, S_PARSE_SQL_ERROR.' ['.$e['message'].'] '.S_IN_SMALL.' ['.$e['sqltext'].']');
+						}
 
-					oci_bind_by_name($stmt, ':imgdata', $lob, -1, OCI_B_BLOB);
-					if(!oci_execute($stmt)){
-						$e = oci_error($stid);
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_EXECUTE_SQL_ERROR.' ['.$e['message'].'] '.S_IN_SMALL.' ['.$e['sqltext'].']');
-					}
-					oci_free_statement($stmt);
+						oci_bind_by_name($stmt, ':imgdata', $lob, -1, OCI_B_BLOB);
+						if(!oci_execute($stmt)){
+							$e = oci_error($stid);
+							self::exception(ZBX_API_ERROR_PARAMETERS, S_EXECUTE_SQL_ERROR.' ['.$e['message'].'] '.S_IN_SMALL.' ['.$e['sqltext'].']');
+						}
+						oci_free_statement($stmt);
+					break;
+					case ZBX_DB_DB2:
+						$stmt = db2_prepare($DB['DB'], 'INSERT INTO images ('.implode(' ,', array_keys($values)).',image)'.
+							' VALUES ('.implode(',', $values).', ?)');
 
-				}
-				else if($DB['TYPE'] == 'IBM_DB2'){
-					$stmt = db2_prepare($DB['DB'], 'INSERT INTO images ('.implode(' ,', array_keys($values)).',image)'.
-						' VALUES ('.implode(',', $values).', ?)');
+						if(!$stmt){
+							self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
+						}
 					
-					if(!$stmt){
-						self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
-					}
-					
-					$variable = $image['image'];
-					if(!db2_bind_param($stmt, 1, "variable", DB2_PARAM_IN, DB2_BINARY)){
-						self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
-					}
-					if(!db2_execute($stmt)){
-						self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
-					}
-				}
-				else if(($DB['TYPE'] == 'SQLITE3') || $DB['TYPE'] == 'MYSQL' || $DB['TYPE'] == 'POSTGRESQL'){
-					if($DB['TYPE'] == 'SQLITE3')
+						$variable = $image['image'];
+						if(!db2_bind_param($stmt, 1, "variable", DB2_PARAM_IN, DB2_BINARY)){
+							self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
+						}
+						if(!db2_execute($stmt)){
+							self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
+						}
+					break;
+					case ZBX_DB_SQLITE3:
 						$values['image'] = zbx_dbstr(bin2hex($image['image']));
-					else if($DB['TYPE'] == 'POSTGRESQL')
+						$sql = 'INSERT INTO images ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
+						if(!DBexecute($sql)){
+							self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+						}
+					break;
+					case ZBX_DB_MYSQL:
+							$values['image'] = zbx_dbstr($image['image']);
+							$sql = 'INSERT INTO images ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
+							if(!DBexecute($sql)){
+								self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+							}
+					break;
+					case ZBX_DB_POSTGRESQL:
 						$values['image'] = "'".pg_escape_bytea($image['image'])."'";
-					else if($DB['TYPE'] == 'MYSQL')
-						$values['image'] = zbx_dbstr($image['image']);
-
-					$sql = 'INSERT INTO images ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
-					if(!DBexecute($sql)){
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-					}
+						$sql = 'INSERT INTO images ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
+						if(!DBexecute($sql)){
+							self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+						}
+					break;
 				}
 
 				$imageids[] = $imageid;
@@ -436,50 +446,52 @@ class CImage extends CZBXAPI{
 // Decode BASE64
 					$image['image'] = base64_decode($image['image']);
 
-					if($DB['TYPE'] == 'POSTGRESQL'){
-						$values['image'] = "'".pg_escape_bytea($image['image'])."'";
-					}
-					else if($DB['TYPE'] == 'SQLITE3'){
-						$values['image'] = zbx_dbstr(bin2hex($image['image']));
-					}
-					else if($DB['TYPE'] == 'MYSQL'){
-						$values['image'] = zbx_dbstr($image['image']);
-					}
-					else if($DB['TYPE'] == 'ORACLE'){
-						$sql = 'SELECT image FROM images WHERE imageid = '.$image['imageid'].' FOR UPDATE';
+					switch($DB['TYPE']){
+						case ZBX_DB_POSTGRESQL:
+							$values['image'] = "'".pg_escape_bytea($image['image'])."'";
+						break;
+						case ZBX_DB_SQLITE3:
+							$values['image'] = zbx_dbstr(bin2hex($image['image']));
+						break;
+						case ZBX_DB_MYSQL:
+							$values['image'] = zbx_dbstr($image['image']);
+						break;
+						case ZBX_DB_ORACLE:
+							$sql = 'SELECT image FROM images WHERE imageid = '.$image['imageid'].' FOR UPDATE';
 
-						if(!$stmt = oci_parse($DB['DB'], $sql)){
-							$e = oci_error();
-							self::exception(ZBX_API_ERROR_PARAMETERS, 'SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
-						}
+							if(!$stmt = oci_parse($DB['DB'], $sql)){
+								$e = oci_error();
+								self::exception(ZBX_API_ERROR_PARAMETERS, 'SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
+							}
 
-						if(!oci_execute($stmt, OCI_DEFAULT)){
-							$e = oci_error();
-							self::exception(ZBX_API_ERROR_PARAMETERS, 'SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
-						}
+							if(!oci_execute($stmt, OCI_DEFAULT)){
+								$e = oci_error();
+								self::exception(ZBX_API_ERROR_PARAMETERS, 'SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
+							}
 
-						if(FALSE === ($row = oci_fetch_assoc($stmt))){
-							self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-						}
+							if(FALSE === ($row = oci_fetch_assoc($stmt))){
+								self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+							}
 
-						$row['IMAGE']->truncate();
-						$row['IMAGE']->save($image['image']);
-						$row['IMAGE']->free();
-					}
-					else if($DB['TYPE'] == 'IBM_DB2'){
-						$stmt = db2_prepare($DB['DB'], 'UPDATE images SET image=? WHERE imageid='.$image['imageid']);
+							$row['IMAGE']->truncate();
+							$row['IMAGE']->save($image['image']);
+							$row['IMAGE']->free();
+						break;
+						case ZBX_DB_DB2:
+							$stmt = db2_prepare($DB['DB'], 'UPDATE images SET image=? WHERE imageid='.$image['imageid']);
 						
-						if(!$stmt){
-							self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
-						}
+							if(!$stmt){
+								self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
+							}
 						
-						$variable = $image['image'];
-						if(!db2_bind_param($stmt, 1, "variable", DB2_PARAM_IN, DB2_BINARY)){
-							self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
-						}
-						if(!db2_execute($stmt)){
-							self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
-						}
+							$variable = $image['image'];
+							if(!db2_bind_param($stmt, 1, "variable", DB2_PARAM_IN, DB2_BINARY)){
+								self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
+							}
+							if(!db2_execute($stmt)){
+								self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
+							}
+						break;
 					}
 				}
 

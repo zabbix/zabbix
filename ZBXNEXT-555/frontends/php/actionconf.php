@@ -310,6 +310,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			access_deny();
 
 		$go_result = CAction::delete($_REQUEST['g_actionid']);
+		show_messages($go_result,_('Selected actions deleted.'),_('Cannot delete selected actions.'));
 	}
 
 	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
@@ -750,12 +751,6 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			$esc_period	= $action['esc_period'];
 
 			$operations	= $action['operations'];
-			foreach($operations as $aorow => &$operation_data){
-				if($db_opmtype = reset($operation_data['opmediatypes']))
-					$operation_data['mediatypeid'] = $db_opmtype['mediatypeid'];
-			}
-			unset($operation_data);
-
 			}
 		else{
 			$eventsource = get_request('eventsource');

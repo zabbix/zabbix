@@ -110,7 +110,7 @@ class CTag extends CObject{
 	}
 
 	public function addClass($cssClass){
-		if(!isset($this->attributes['class']) || zbx_empty($this->attributes['class'])) 
+		if(!isset($this->attributes['class']) || zbx_empty($this->attributes['class']))
 				$this->attributes['class'] = $cssClass;
 		else
 			$this->attributes['class'] .= ' '.$cssClass;
@@ -131,7 +131,7 @@ class CTag extends CObject{
 			$this->attributes[$name] = unpack_object($value);
 		}
 		else if(isset($value))
-			$this->attributes[$name] = htmlspecialchars(str_replace(array("\r", "\n"), '', strval($value)));
+			$this->attributes[$name] = htmlspecialchars(str_replace(array("\r", "\n"), '', strval($value)), ENT_COMPAT, 'UTF-8');
 		else
 			unset($this->attributes[$name]);
 	}

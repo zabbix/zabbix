@@ -77,6 +77,7 @@ function set_zbx_locales(){
 		'pl_PL'=>  S_POLISH_PL,
 		'pt_BR'=>  S_PORTUGUESE_PT,
 		'ru_RU'=>  S_RUSSIAN_RU,
+		'sk_SK'=>  _('Slovak (SK)'),
 		'es_ES'=>  S_SPANISH_ES,
 		'sv_SE'=>  S_SWEDISH_SE,
 		'uk_UA'=>  S_UKRAINIAN_UA,
@@ -147,7 +148,7 @@ return $result;
 }
 
 function zbx_locale_variants_win($language){
-// windows locales are written like language[_country][.charset]
+// windows locales are written like language[_country[.charset]]
 	$winLanguageName = array(
 		'en_gb'=>  'english',
 		'zh_cn'=>  'chinese',
@@ -168,46 +169,10 @@ function zbx_locale_variants_win($language){
 		'uk_ua'=>  'ukrainian'
 	);
 
-	$winCountries = array(
-// most common
-		'united states', 'us',
-		'united kingdom', 'england',
-
-// abc
-		'america', 'australia', 'austria',
-		'belgium', 'brazil',
-		'czech', 'canada', 'china',
-		'denmark',	
-		'finland', 'france',
-		'germany', 'great britain', 'greece',
-		'hong kong',
-		'ireland', 'italy',
-		'japan',
-		'korea',
-		'latvia',
-		'mexico',
-		'netherlands', 'norway',
-		'poland', 'portugal',
-		'russia',
-		'slovak', 'spain', 'sweden', 'switzerland',
-		'taiwan',
-		'usa',
-	);
-
-	$winCodepages = array(
-// common
-		'utf8', 'UTF-8', '1252', '1251', '1250',
-		'932', '936',
-// other
-		'1253','1254','1255','1256','1257','1258','874','936','949', '950', 
-	);
-
 	$winLang = $winLanguageName[strtolower($language)];
 
-	$result = array();
-	foreach($winCountries as $country){
-		foreach($winCodepages as $codepage) $result[] = $winLang.'_'.$country.'.'.$codepage;
-	}
+	$result = array($winLang);
+
 return $result;
 }
 ?>
