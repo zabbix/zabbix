@@ -282,13 +282,13 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'mediatypeids' => $mediatypeids,
-			'output' => API_OUTPUT_EXTEND,
+			'output' => API_OUTPUT_REFER,
 			'preservekeys' => 1,
 		);
 		$actions = CAction::get($options);
 
 // Media type IDs used for actions
-		$usedMediatypeids = zbx_objectValues($actions, 'mediatypeid');
+		$usedMediatypeids = zbx_toHash($actions, 'mediatypeid');
 
 		$paging = getPagingLine($mediatypes);
 
@@ -320,7 +320,7 @@ include_once('include/page_header.php');
 				new CCheckBox('media_types['.$mediatype['mediatypeid'].']',NULL,NULL,$mediatype['mediatypeid']),
 				new CLink($mediatype['description'],'?form=update&mediatypeid='.$mediatype['mediatypeid']),
 				media_type2str($mediatype['type']),
-				in_array($mediatype['mediatypeid'],$usedMediatypeids)?new CSpan(_('Yes'),'off'):new CSpan(_('No'),'on'),
+				isset($usedMediatypeids[$mediatype['mediatypeid']]) ? new CSpan(_('Yes'),'off') : new CSpan(_('No'),'on'),
 				$details
 			));
 		}
