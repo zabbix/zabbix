@@ -1278,7 +1278,6 @@ COpt::memoryPick();
 					unset($triggers[$tnum]['status']);
 
 			}
-
 			self::updateReal($triggers);
 
 			foreach($triggers as $trigger)
@@ -1536,6 +1535,9 @@ COpt::memoryPick();
 
 			if(isset($trigger['description']) && (strcmp($dbTrigger['description'], $trigger['description']) != 0)){
 				$description_changed = true;
+			}
+			else{
+				$trigger['description'] = $dbTrigger['description'];
 			}
 
 
