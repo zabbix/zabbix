@@ -391,6 +391,7 @@ class CAction extends CZBXAPI{
 				'hostids' => $hostids,
 				'output' => API_OUTPUT_SHORTEN,
 				'editable' => $options['editable'],
+				'templated_hosts' => true,
 				'preservekeys' => true,
 			));
 			foreach($hostids as $hostid){
@@ -709,7 +710,7 @@ COpt::memoryPick();
 
 			$options = array(
 				'filter' => array('name' => $duplicates),
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => API_OUTPUT_EXTEND,
 				'editable' => 1,
 				'nopermissions' => 1
 			);
@@ -814,6 +815,7 @@ COpt::memoryPick();
 			}
 //------
 
+			$operationsCreate = $operationsUpdate = $operationidsDelete = array();
 			foreach($actions as $anum => $action){
 // Existance
 				$options = array(
@@ -832,29 +834,27 @@ COpt::memoryPick();
 				$conditions_db = isset($upd_actions[$action['actionid']]['conditions'])
 						? $upd_actions[$action['actionid']]['conditions']
 						: array();
+				if(!isset($action['conditions'])) $action['conditions'] = array();
 
 				$conditionsCreate = $conditionsUpdate = $conditionidsDelete = array();
-				if(isset($action['conditions']) && !empty($action['conditions'])){
-					self::validateConditions($action['conditions']);
+				self::validateConditions($action['conditions']);
 
-					foreach($action['conditions'] as $condition){
-						$condition['actionid'] = $action['actionid'];
+				foreach($action['conditions'] as $condition){
+					$condition['actionid'] = $action['actionid'];
 
-						if(!isset($condition['conditionid'])){
-							$conditionsCreate[] = $condition;
-						}
-						else if(isset($conditions_db[$condition['conditionid']])){
-							$conditionsUpdate[] = $condition;
-							unset($conditions_db[$condition['conditionid']]);
-						}
-						else{
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect conditionid'));
-						}
+					if(!isset($condition['conditionid'])){
+						$conditionsCreate[] = $condition;
 					}
-
-					$conditionidsDelete = array_merge($conditionidsDelete, array_keys($conditions_db));
+					else if(isset($conditions_db[$condition['conditionid']])){
+						$conditionsUpdate[] = $condition;
+						unset($conditions_db[$condition['conditionid']]);
+					}
+					else{
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect conditionid'));
+					}
 				}
 
+				$conditionidsDelete = array_merge($conditionidsDelete, array_keys($conditions_db));
 
 				if(!isset($action['operations']) || empty($action['operations'])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action [%s] no operations defined.', $action['name']));
@@ -863,7 +863,6 @@ COpt::memoryPick();
 					self::validateOperations($action['operations']);
 
 					$operations_db = $upd_actions[$action['actionid']]['operations'];
-					$operationsCreate = $operationsUpdate = $operationidsDelete = array();
 					foreach($action['operations'] as $operation){
 						$operation['actionid'] = $action['actionid'];
 
@@ -881,7 +880,6 @@ COpt::memoryPick();
 					$operationidsDelete = array_merge($operationidsDelete, array_keys($operations_db));
 				}
 
-
 				$actionid = $action['actionid'];
 				unset($action['actionid']);
 				if(!empty($action)){
@@ -896,11 +894,13 @@ COpt::memoryPick();
 
 			self::addConditions($conditionsCreate);
 			self::updateConditions($conditionsUpdate);
-			self::deleteConditions($conditionidsDelete);
+			if(!empty($conditionidsDelete))
+				self::deleteConditions($conditionidsDelete);
 
 			self::addOperations($operationsCreate);
 			self::updateOperations($operationsUpdate, $upd_actions);
-			self::deleteOperations($operationidsDelete);
+			if(!empty($operationidsDelete))
+				self::deleteOperations($operationidsDelete);
 
 			self::EndTransaction(true, __METHOD__);
 			return array('actionids' => $actionids);
@@ -1258,7 +1258,10 @@ COpt::memoryPick();
 
 			$diff = zbx_array_diff($operation_db['opconditions'], $operation['opconditions'], 'opconditionid');
 			$opconditionsCreate = array_merge($opconditionsCreate, $diff['only2']);
-			DB::delete('opconditions', array('opconditionid' => zbx_objectValues($diff['only1'], 'opconditionid')));
+
+			$opconditionsidDelete = zbx_objectValues($diff['only1'], 'opconditionid');
+			if(!empty($opconditionsidDelete))
+				DB::delete('opconditions', array('opconditionid' => $opconditionsidDelete));
 
 
 			$operationid = $operation['operationid'];
@@ -1311,7 +1314,7 @@ COpt::memoryPick();
 	}
 
 	protected static function deleteOperations($operationids){
-		DB::delete('operations', array(DBcondition('operationid', $operationids)));
+		DB::delete('operations', array('operationid' => $operationids));
 	}
 
 
@@ -1434,13 +1437,13 @@ COpt::memoryPick();
 			}
 		}
 
-		if(!CHostGroup::isWritable($hostGroupIdsAll))
+		if(!CHostGroup::isReadable($hostGroupIdsAll))
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect operation group.'));
-		if(!CHost::isWritable($hostIdsAll))
+		if(!CHost::isReadable($hostIdsAll))
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect operation host.'));
-		if(!CUser::isWritable($userIdsAll))
+		if(!CUser::isReadable($userIdsAll))
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect operation user.'));
-		if(!CUserGroup::isWritable($userGroupIdsAll))
+		if(!CUserGroup::isReadable($userGroupIdsAll))
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect operation user group.'));
 
 		return true;
