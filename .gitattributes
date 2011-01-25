@@ -271,6 +271,10 @@ misc/init.d/fedora/core5/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_server -text
 misc/init.d/tru64/zabbix_server -text
+src/zabbix_java/lib/logback-classic-0.9.27.jar -text
+src/zabbix_java/lib/logback-core-0.9.27.jar -text
+src/zabbix_java/lib/org-json-2010-12-28.jar -text
+src/zabbix_java/lib/slf4j-api-1.6.1.jar -text
 tests/templates/sqlite3.init -text
 tests/templates/zabbix.conf.php.mysql -text
 tests/templates/zabbix.conf.php.postgresql -text
