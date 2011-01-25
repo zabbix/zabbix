@@ -1687,12 +1687,11 @@
 	'S_HOST_SCREENS'=>				_('Host screens'),
 
 	'S_SLIDESHOW_UPDATED'=>			_('Slideshow updated'),
-	'S_CANNOT_UPDATE_SLIDESHOW'=>	_('Cannot_update slideshow'),
+	'S_CANNOT_UPDATE_SLIDESHOW'=>	_('Cannot update slideshow'),
 	'S_SLIDESHOW_ADDED'=>			_('Slideshow added'),
 	'S_CANNOT_ADD_SLIDESHOW'=>		_('Cannot add slideshow'),
 	'S_SLIDESHOW_DELETED'=>			_('Slideshow deleted'),
 	'S_CANNOT_DELETE_SLIDESHOW'=>	_('Cannot delete slideshow'),
-	'S_DELETE_SLIDESHOW_Q'=>		_('Delete slideshow?'),
 	'S_DELETE_SLIDESHOW_Q'=>		_('Delete slideshow?'),
 
 	'S_ERROR_SCREEN_WITH_NAME_DOES_NOT_EXIST' => _('Screen with name "%s" does not exist'),

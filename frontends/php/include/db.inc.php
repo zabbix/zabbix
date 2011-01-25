@@ -402,7 +402,8 @@ if(!isset($DB)){
 			$offset<0 ||
 			!zbx_ctype_digit($offset))
 		{
-			error('Incorrect parameters');
+			$moreDetails=isset($limit)?" Limit [$limit] Offset [$offset]":" Offset [$offset]";
+			error("Incorrect parameters for limit and/or offset. Query [$query]".$moreDetails);
 			return $result;
 		}
 
