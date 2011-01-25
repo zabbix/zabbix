@@ -3341,17 +3341,23 @@ return $caption;
 
 		if($letterLevel) {
 			if(!$nextletter) $nextletter = 'A';
-			array_push($expr, SPACE, bold($nextletter), SPACE);
+
+			if ($nextletter > 'Z')
+				$newch = chr(floor((ord($nextletter) - ord('A')) / 26) + ord('A') - 1) . chr(((ord($nextletter) - ord('A')) % 26) + ord('A'));
+			else
+				$newch = $nextletter;
+
+			array_push($expr, SPACE, bold($newch), SPACE);
 			$expValue = trim(zbx_substr($expression, $treeLevel['openSymbolNum'], $treeLevel['closeSymbolNum']-$treeLevel['openSymbolNum']+1));
 			if(!defined('NO_LINK_IN_TESTING')) {
 				$url =  new CSpan($expValue, 'link');
 				$url->setAttribute('id', 'expr_'.$treeLevel['openSymbolNum'].'_'.$treeLevel['closeSymbolNum']);
 				$url->setAttribute('onclick', 'javascript: copy_expression("expr_'.$treeLevel['openSymbolNum'].'_'.$treeLevel['closeSymbolNum'].'");');
 			}else{
-				$url =  new CSpan($expValue);
+				$url = new CSpan($expValue);
 			}
 			$expr[] = $url;
-			$outline = ' '.$nextletter.' ';
+			$outline = ' '.$newch.' ';
 			$nextletter = chr(ord($nextletter)+1);
 
 			$levelDetails = Array(
