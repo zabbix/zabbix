@@ -143,6 +143,11 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 		$this->click($a);
 	}
 
+	public function href_click($a)
+	{
+		$this->click("xpath=//a[contains(@href,'$a')]");
+	}
+
 	public function checkbox_select($a)
 	{
 		if(!$this->isChecked($a)) $this->click($a);

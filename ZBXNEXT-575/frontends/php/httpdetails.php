@@ -171,13 +171,16 @@
 		}
 
 		$speed = format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_IN]);
-		$respTime = $httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME]['lastvalue'];
 		$resp = format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_RSPCODE]);
+
+		$respTime = $httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME]['lastvalue'];
+		$respItemTime = format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME]);
+
 		$table->addRow(array(
 			$httpstep_data['name'],
-			($speed == 0 ? '-' : $speed),
-			($respTime == 0 ? '-' : format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME])),
-			($resp == 0 ? '-' : $resp),
+			$speed,
+			($respTime == 0 ? '-' : $respItemTime),
+			$resp,
 			new CSpan($status['msg'], $status['style'])
 		));
 	}
@@ -197,10 +200,11 @@
 		$status['msg'] = S_FAIL.' - '.S_ERROR.': '.$httptest_data['error'];
 		$status['style'] = 'disabled';
 	}
+
 	$table->addRow(array(
-		new CSpan(S_TOTAL_BIG, 'bold'),
+		bold(S_TOTAL_BIG),
 		SPACE,
-		new CSpan(  ($item_data['lastclock'] ? format_lastvalue($totalTime) : '-'), 'bold'),
+		bold(format_lastvalue($totalTime)),
 		SPACE,
 		new CSpan($status['msg'], $status['style'].' bold')
 	));
