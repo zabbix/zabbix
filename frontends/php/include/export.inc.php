@@ -1071,6 +1071,8 @@ class zbxXML{
 							$host_db['proxy_hostid'] = 0;
 					}
 
+
+
 					if($current_host && isset($rules['host']['exist'])){
 						if($host_db['status'] == HOST_STATUS_TEMPLATE){
 							$host_db['templateid'] = $current_host['hostid'];
@@ -1150,6 +1152,9 @@ class zbxXML{
 								// 'snmp_port' column was renamed to 'port'
 								$item_db['port'] = $item_db['snmp_port'];
 								unset($item_db['snmp_port']);
+								if ($item_db['port'] == 0){
+									unset($item_db['port']); // zabbix agent items have no ports
+								}
 
 								if ($host_db['status'] == HOST_STATUS_TEMPLATE){
 									// template has no interfaces
@@ -1257,6 +1262,7 @@ class zbxXML{
 								$item_applications = array_merge($item_applications, $new_applications);
 							}
 // }}} ITEM APPLICATIONS
+
 							if($current_item && isset($rules['item']['exist'])){
 								$item_db['itemid'] = $current_item['itemid'];
 								$result = CItem::update($item_db);
@@ -1271,6 +1277,8 @@ class zbxXML{
 								);
 								$current_item = CItem::get($options);
 							}
+
+
 							if(!$current_item && isset($rules['item']['missed'])){
 								$result = CItem::create($item_db);
 								if(!$result){
@@ -1434,7 +1442,9 @@ class zbxXML{
 							$graph_db = self::mapXML2arr($graph, XML_TAG_GRAPH);
 							$graph_db['hostids'] = $graph_hostids;
 
-							if($current_graph = CGraph::exists($graph_db)){
+							$current_graph = CGraph::exists($graph_db);
+
+							if($current_graph){
 								$current_graph = CGraph::get(array(
 									'filter' => array('name' => $graph_db['name']),
 									'hostids' => $graph_db['hostids'],
@@ -1497,6 +1507,7 @@ class zbxXML{
 								$graphs_to_add[] = $graph_db;
 							}
 						}
+
 
 						if(!empty($graphs_to_add)){
 							$r = CGraph::create($graphs_to_add);
