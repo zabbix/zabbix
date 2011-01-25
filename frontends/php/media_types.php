@@ -254,11 +254,12 @@ include_once('include/page_header.php');
 		$form = new CForm();
 		$form->setName('frm_media_types');
 
-		$table=new CTableInfo(S_NO_MEDIA_TYPES_DEFINED);
+		$table=new CTableInfo(_('No media types defined'));
 		$table->setHeader(array(
 			new CCheckBox('all_media_types', NULL, "checkAll('".$form->getName()."','all_media_types','media_types');"),
-			make_sorting_header(S_DESCRIPTION,'description'),
-			make_sorting_header(S_TYPE,'type'),
+			make_sorting_header(_('Description'),'description'),
+			make_sorting_header(_('Type'),'type'),
+			_('Used in actions'),
 			S_DETAILS
 		));
 
@@ -275,6 +276,19 @@ include_once('include/page_header.php');
 		);
 		$mediatypes = CMediatype::get($options);
 		order_result($mediatypes, $sortfield, $sortorder);
+
+// Check if media type are used by existing actions
+		$mediatypeids = zbx_objectValues($mediatypes, 'mediatypeid');
+
+		$options = array(
+			'mediatypeids' => $mediatypeids,
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => 1,
+		);
+		$actions = CAction::get($options);
+
+// Media type IDs used for actions
+		$usedMediatypeids = zbx_objectValues($actions, 'mediatypeid');
 
 		$paging = getPagingLine($mediatypes);
 
@@ -306,6 +320,7 @@ include_once('include/page_header.php');
 				new CCheckBox('media_types['.$mediatype['mediatypeid'].']',NULL,NULL,$mediatype['mediatypeid']),
 				new CLink($mediatype['description'],'?form=update&mediatypeid='.$mediatype['mediatypeid']),
 				media_type2str($mediatype['type']),
+				in_array($mediatype['mediatypeid'],$usedMediatypeids)?new CSpan(_('Yes'),'off'):new CSpan(_('No'),'on'),
 				$details
 			));
 		}
