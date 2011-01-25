@@ -259,7 +259,7 @@ include_once('include/page_header.php');
 			new CCheckBox('all_media_types', NULL, "checkAll('".$form->getName()."','all_media_types','media_types');"),
 			make_sorting_header(_('Description'),'description'),
 			make_sorting_header(_('Type'),'type'),
-			_('Used in actions'),
+			make_sorting_header(_('Used in actions'),'usedInActions'),
 			S_DETAILS
 		));
 
@@ -269,19 +269,17 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'output' => API_OUTPUT_EXTEND,
-			'editable' => 1,
+			'editable' => true,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
 		$mediatypes = CMediatype::get($options);
-		order_result($mediatypes, $sortfield, $sortorder);
 
 // Check if media type are used by existing actions
-		$mediatypeids = zbx_objectValues($mediatypes, 'mediatypeid');
 
 		$options = array(
-			'mediatypeids' => $mediatypeids,
+			'mediatypeids' => zbx_objectValues($mediatypes, 'mediatypeid'),
 			'output' => API_OUTPUT_REFER,
 			'preservekeys' => 1,
 		);
@@ -289,6 +287,12 @@ include_once('include/page_header.php');
 
 // Media type IDs used for actions
 		$usedMediatypeids = zbx_toHash($actions, 'mediatypeid');
+
+		foreach($mediatypes as $mnum => $mediatype){
+			$mediatypes[$mnum]['usedInActions'] = isset($usedMediatypeids[$mediatype['mediatypeid']]) ? _('Yes') : _('No');
+		}
+
+		order_result($mediatypes, $sortfield, $sortorder);
 
 		$paging = getPagingLine($mediatypes);
 
