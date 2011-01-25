@@ -37,7 +37,10 @@ class testFormMediaType extends CWebTest
 				'SMTP helo'=>'zabbix.com','SMTP email'=>'zabbix@zabbix.com')),
 			array('Email',array('Description'=>'Email3','SMTP server'=>'mail2.zabbix.com',
 				'SMTP helo'=>'zabbix.com','SMTP email'=>'zabbix2@zabbix.com')),
-			array('Script',array('Description'=>'Skype message','Script'=>'/usr/local/bin/skype.sh'))
+			array('Script',array('Description'=>'Skype message','Script'=>'/usr/local/bin/skype.sh')),
+			array('Script',array('Description'=>'Skype message2','Script'=>'/usr/local/bin/skyp2.sh')),
+			array('SMS',array('Description'=>'Direct SMS messaging','GSM modem'=>'/dev/ttyS3')),
+			array('Jabber',array('Description'=>'Jabber messages','Jabber identifier'=>'zabbix@jabber.com','Password'=>'Secret password')),
 		);
 		return $data;
 	}
@@ -86,9 +89,24 @@ class testFormMediaType extends CWebTest
 				$this->input_type('exec_path',$data['Script']);
 			break;
 			case 'SMS':
+				$this->dropdown_select('type',$type);
+				$this->wait();
+				$this->input_type('description',$data['Description']);
+				$this->input_type('gsm_modem',$data['GSM modem']);
+			break;
 			case 'Jabber':
+				$this->dropdown_select('type',$type);
+				$this->wait();
+				$this->input_type('description',$data['Description']);
+				$this->input_type('username',$data['Jabber identifier']);
+				$this->input_type('password',$data['Password']);
+			break;
 			case 'Ez Texting':
-				$this->markTestIncomplete();
+				$this->dropdown_select('type',$type);
+				$this->wait();
+				$this->input_type('description',$data['Description']);
+				$this->input_type('username',$data['Username']);
+				$this->input_type('password',$data['Password']);
 			break;
 		}
 
