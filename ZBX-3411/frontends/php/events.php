@@ -99,45 +99,68 @@
 	$_REQUEST['hide_unknown'] = get_request('hide_unknown',CProfile::get('web.events.filter.hide_unknown',0));
 
 	// Change triggerId filter if change hostId
-	if($_REQUEST['triggerid'] > 0 && !isset($_REQUEST['filter_set'])){
-		$options = array(
+	if(($_REQUEST['triggerid'] > 0) && isset($_REQUEST['hostid'])){
+		$hostid = get_request('hostid');
+		$oldTriggers = CTrigger::get(array(
+			'output' => array('triggerid', 'description', 'expression'),
+			'select_hosts' => array('hostid', 'host'),
+			'select_items' => API_OUTPUT_EXTEND,
+			'select_functions' => API_OUTPUT_EXTEND,
 			'triggerids' => $_REQUEST['triggerid'],
-			'output' => array('triggerid', 'description')
-		);
+		));
 
-		$oldTrigger = CTrigger::get($options);
-		$oldTrigger = reset($oldTrigger);
+		foreach($oldTriggers as $oldTrigger){
+			$_REQUEST['triggerid'] = 0;
+			$oldExpression = triggerExpression($oldTrigger,false);
+			$oldTrigger['hosts'] = zbx_toHash($oldTrigger['hosts'],'hostid');
+			$oldTrigger['items'] = zbx_toHash($oldTrigger['items'],'itemid');
 
-		if(isset($oldTrigger['description']) ){
-			$options = array(
+			if(isset($oldTrigger['hosts'][$hostid])) break;
+
+			$newTriggers = CTrigger::get(array(
+				'output' => array('triggerid', 'description', 'expression'),
+				'select_hosts' => array('hostid', 'host'),
+				'select_items' => API_OUTPUT_EXTEND,
+				'select_functions' => API_OUTPUT_EXTEND,
 				'filter' => array('description' => $oldTrigger['description']),
-				'hostids' => get_request('hostid', null),
-				'expandData' => 1,
-				'output' => API_OUTPUT_SHORTEN,
-				'limit' => 1
-			);
-			$newTrigger = CTrigger::get($options);
-			$newTrigger = reset($newTrigger);
-		}
+				'hostids' => $hostid,
+			));
 
-		if(isset($newTrigger['triggerid']) && $newTrigger['triggerid'] > 0 ) {
-			$_REQUEST['triggerid'] = $newTrigger['triggerid'];
-			$_REQUEST['filter_set'] = 1;
-		}
-		else{
-			$newTriggerId = getTriggerIdByExpression($_REQUEST['triggerid'], get_request('hostid', null));
-			if(isset($newTriggerId) && $newTriggerId > 0 ) {
-				$_REQUEST['triggerid'] = $newTriggerId;
-				$_REQUEST['filter_set'] = 1;
-			}
-			else{
-				$_REQUEST['triggerid'] = 0;
-			}
-		}
+			foreach($newTriggers as $tnum => $newTrigger){
+				if(count($oldTrigger['items']) != count($newTrigger['items'])) continue;
+				$newTrigger['items'] = zbx_toHash($newTrigger['items'],'itemid');
 
+				$found = false;
+				foreach($newTrigger['functions'] as $fnum => $function){
+					foreach($oldTrigger['functions'] as $ofnum => $oldFunction){;
+						if(($function['function'] != $oldFunction['function']) || ($function['parameter'] != $oldFunction['parameter'])) continue;
+						if($newTrigger['items'][$function['itemid']]['key_'] != $oldTrigger['items'][$oldFunction['itemid']]['key_']) continue;
+
+						$newTrigger['functions'][$fnum]['itemid'] = $oldFunction['itemid'];
+						$found = true;
+
+						unset($oldTrigger['functions'][$ofnum]);
+						break;
+					}
+					if(!$found) break;
+				}
+				if(!$found) continue;
+
+				$newTrigger['hosts'] = $oldTrigger['hosts'];
+				$newTrigger['items'] = $oldTrigger['items'];
+
+				$newExpression = triggerExpression($newTrigger,false);
+
+				if(strcmp($oldExpression, $newExpression) == 0){
+					$_REQUEST['triggerid'] = $newTrigger['triggerid'];
+					$_REQUEST['filter_set'] = 1;
+					break;
+				}
+			}
+		}
 	}
 // --------
-	// Not update triggerid = 0, there is features, not bug
+
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
 		CProfile::update('web.events.filter.triggerid',$_REQUEST['triggerid'], PROFILE_TYPE_ID);
 		CProfile::update('web.events.filter.hide_unknown',$_REQUEST['hide_unknown'], PROFILE_TYPE_INT);
@@ -159,6 +182,9 @@
 // HEADER {{{
 	$r_form = new CForm(null, 'get');
 	$r_form->addVar('fullscreen',$_REQUEST['fullscreen']);
+	$r_form->addVar('triggerid', get_request('triggerid'));
+	$r_form->addVar('stime', get_request('stime'));
+	$r_form->addVar('period', get_request('period'));
 
 	if(EVENT_SOURCE_TRIGGERS == $source){
 
@@ -211,6 +237,8 @@
 		$filterForm->setAttribute('id', 'zbx_filter');
 
 		$filterForm->addVar('triggerid', get_request('triggerid', 0));
+		$filterForm->addVar('stime', get_request('stime'));
+		$filterForm->addVar('period', get_request('period'));
 
 		if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)){
 			$trigger = expand_trigger_description($_REQUEST['triggerid']);
