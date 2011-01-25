@@ -21,9 +21,11 @@
 <?php
 	require_once('include/config.inc.php');
 
-	global $USER_DETAILS;
-	global $page;
-	global $ZBX_PAGE_POST_JS;
+// if we include footer in some function
+	if(!isset($USER_DETAILS)) global $USER_DETAILS;
+	if(!isset($page)) global $page;
+	if(!isset($ZBX_PAGE_POST_JS)) global $ZBX_PAGE_POST_JS;
+// ---
 
 	if(!defined('PAGE_HEADER_LOADED')){
 		define ('PAGE_HEADER_LOADED', 1);
