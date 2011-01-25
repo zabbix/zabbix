@@ -269,6 +269,7 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => 1,
 			'editable' => true,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
@@ -280,16 +281,22 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'mediatypeids' => zbx_objectValues($mediatypes, 'mediatypeid'),
-			'output' => API_OUTPUT_REFER,
+			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => 1,
 		);
 		$actions = CAction::get($options);
 
-// Media type IDs used for actions
-		$usedMediatypeids = zbx_toHash($actions, 'mediatypeid');
+// Media types used for actions
+		$usedMediatypes = zbx_toHash($actions, 'mediatypeid');
 
 		foreach($mediatypes as $mnum => $mediatype){
-			$mediatypes[$mnum]['usedInActions'] = isset($usedMediatypeids[$mediatype['mediatypeid']]) ? _('Yes') : _('No');
+// !isset() for better default sorting
+			$mediatypes[$mnum]['usedInActions'] =  !isset($usedMediatypes[$mediatype['mediatypeid']]);
+		}
+
+		foreach($actions as $actionid => $action){
+			if(isset($mediatypes[$action['mediatypeid']]['listOfActions']))	$mediatypes[$action['mediatypeid']]['listOfActions'] = array();
+			$mediatypes[$action['mediatypeid']]['listOfActions'][] = array('actionid' => $actionid,'name' => $action['name']);
 		}
 
 		order_result($mediatypes, $sortfield, $sortorder);
@@ -320,11 +327,25 @@ include_once('include/page_header.php');
 					$details = '';
 			}
 
+			$actionLinks = array();
+			if(isset($mediatype['listOfActions'])){
+				order_result($mediatype['listOfActions'], 'name');
+				foreach($mediatype['listOfActions'] as $mediaaction){
+					$actionLinks[] = new CLink($mediaaction['name'],'actionconf.php?form=update&actionid='.$mediaaction['actionid']);
+					$actionLinks[] = ',';
+				}
+				array_pop($actionLinks);
+			}
+			else{
+				$actionLinks = '-';
+			}
+
+
 			$table->addRow(array(
 				new CCheckBox('media_types['.$mediatype['mediatypeid'].']',NULL,NULL,$mediatype['mediatypeid']),
 				new CLink($mediatype['description'],'?form=update&mediatypeid='.$mediatype['mediatypeid']),
 				media_type2str($mediatype['type']),
-				isset($usedMediatypeids[$mediatype['mediatypeid']]) ? new CSpan(_('Yes'),'off') : new CSpan(_('No'),'on'),
+				$actionLinks,
 				$details
 			));
 		}
