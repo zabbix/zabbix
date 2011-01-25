@@ -373,7 +373,7 @@ require_once('include/templates/action.js.php');
 		$esc_delay_txt = $delay[$operation['esc_step_from']]?convert_units($delay[$operation['esc_step_from']],'uptime'):S_IMMEDIATELY;
 
 		$tblOper->addRow(array(
-			new CCheckBox("g_operationid[]", 'no', null,$id),
+			new CCheckBox('g_operationid['.$opid.']', 'no', null, $opid),
 			$esc_steps_txt,
 			$oper_details,
 			$esc_period_txt,
