@@ -332,20 +332,11 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			);
 			$actions = CAction::get($options);
 			$action = reset($actions);
-
-			foreach($action['operations'] as $aorow => &$operation_data){
-				if($db_opmtype = reset($operation_data['opmediatypes']))
-					$operation_data['mediatypeid'] = $db_opmtype['mediatypeid'];
-			}
-			unset($operation_data);
-
 		}
 		else{
 			$eventsource = get_request('eventsource');
 			$evaltype = get_request('evaltype');
 			$esc_period	= get_request('esc_period');
-			unset($operation_data);
-
 //SDII($action);
 //SDII($_REQUEST);
 		}
