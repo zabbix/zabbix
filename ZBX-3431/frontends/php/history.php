@@ -150,6 +150,11 @@ include_once('include/page_header.php');
 	$items = CItem::get($options);
 	$items = zbx_toHash($items, 'itemid');
 
+	$eventlogExist = false;
+	foreach($items as $key => $value){
+		if( strpos($items[$key]['key_'], 'eventlog[') !== false) $eventlogExist = true;
+	}
+
 	foreach($_REQUEST['itemid'] as $inum =>  $itemid){
 		if(!isset($items[$itemid])) access_deny();
 	}
@@ -308,7 +313,6 @@ include_once('include/page_header.php');
 		}
 
 // TEXT LOG
-
 		if(isset($iv_string[$item['value_type']])){
 			$logItem = ($item['value_type'] == ITEM_VALUE_TYPE_LOG);
 
@@ -318,8 +322,8 @@ include_once('include/page_header.php');
 					$fewItems?S_ITEM:null,
 					$logItem?S_LOCAL_TIME:null,
 					$logItem?S_SOURCE:null,
-					$logItem?S_SEVERITY:null,
-					$logItem?S_EVENT_ID:null,
+					($eventlogExist ? $logItem?S_SEVERITY:null : null),
+					($eventlogExist ? $logItem?S_EVENT_ID:null : null),
 					S_VALUE),'header');
 
 			if(isset($_REQUEST['filter']) && !zbx_empty($_REQUEST['filter']) && in_array($_REQUEST['filter_task'], array(FILTER_TASK_SHOW, FILTER_TASK_HIDE))){
@@ -371,13 +375,15 @@ include_once('include/page_header.php');
 					if(zbx_empty($data['source'])) $row[] = new CCol(' - ');
 					else $row[] = $data['source'];
 
-					if($data['severity'] != 0) $row[] = new CCol(get_item_logtype_description($data['severity']),get_item_logtype_style($data['severity']));
-					else $row[] = new CCol(' - ');
+					if($eventlogExist){
+						if($data['severity'] != 0) $row[] = new CCol(get_item_logtype_description($data['severity']),get_item_logtype_style($data['severity']));
+						else $row[] = new CCol(' - ');
+					}
 
-					if(zbx_empty($data['source']) && ($data['logeventid'] == '0'))
-						$row[] = new CCol(' - ');
-					else
-						$row[] = $data['logeventid'];
+					if($eventlogExist){
+						if(zbx_empty($data['source']) && ($data['logeventid'] == '0')) $row[] = new CCol(' - ');
+						else $row[] = $data['logeventid'];
+					}
 				}
 
 				$data['value'] = trim($data['value'],"\r\n");
