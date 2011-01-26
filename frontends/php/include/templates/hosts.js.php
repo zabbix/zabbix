@@ -31,6 +31,9 @@
 
 		<input type="radio" id="radio_ipmi_#{interfaceid}" name="interfaces[#{interfaceid}][type]" value="<?php print(INTERFACE_TYPE_IPMI);?>" #{*checked_ipmi} />
 		<label for="radio_ipmi_#{interfaceid}"><?php print(S_IPMI);?></label>
+
+		<input type="radio" id="radio_jmx_#{interfaceid}" name="interfaces[#{interfaceid}][type]" value="<?php print(INTERFACE_TYPE_JMX);?>" #{*checked_jmx} />
+		<label for="radio_jmx_#{interfaceid}"><?php print(S_JMX);?></label>
 	</div>
 </td>
 <td>
@@ -93,6 +96,7 @@ function addInterfaceRow(hostInterface){
 		switch(hostInterface.type.toString()){
 			case '<?php print(INTERFACE_TYPE_SNMP);?>': hostInterface.checked_snmp = 'checked="checked"'; break;
 			case '<?php print(INTERFACE_TYPE_IPMI);?>': hostInterface.checked_ipmi = 'checked="checked"'; break;
+			case '<?php print(INTERFACE_TYPE_JMX);?>': hostInterface.checked_jmx = 'checked="checked"'; break;
 			case '<?php print(INTERFACE_TYPE_AGENT);?>':
 			default: hostInterface.checked_agent = 'checked="checked"'; break;
 		}
@@ -104,13 +108,15 @@ function addInterfaceRow(hostInterface){
 		.find("#interface_type_"+hostInterface.interfaceid).find("label")
 			.click({"hostInterface": hostInterface}, function(event){
 				var portInput = jQuery("#port_"+event.data.hostInterface.interfaceid)[0];
-				if(empty(portInput.value) || !(portInput.value == "10050" || portInput.value == "161" || portInput.value == "623")) return true;
+
+				if(empty(portInput.value) || !(portInput.value == "10050" || portInput.value == "161" || portInput.value == "623" || portInput.value == "12345")) return true;
 
 				var interfaceTypeId = event.currentTarget.htmlFor.toLowerCase();
 				switch(true){
 					case (interfaceTypeId.indexOf('agent') > -1): portInput.value = "10050"; break;
 					case (interfaceTypeId.indexOf('snmp') > -1): portInput.value = "161"; break;
 					case (interfaceTypeId.indexOf('ipmi') > -1): portInput.value = "623"; break;
+					case (interfaceTypeId.indexOf('jmx') > -1): portInput.value = "12345"; break;
 				}
 			}).end();
 }

@@ -322,6 +322,27 @@ div.zabbix_logo{
 	background-repeat:no-repeat;
 	margin: 0 1px;
 }
+.iconjmxunknown{
+	height: 14px;
+	width: 14px;
+	background-image: url('../images/general/jmx_unknown.png');
+	background-repeat:no-repeat;
+	margin: 0 1px;
+}
+.iconjmxavailable{
+	height: 14px;
+	width: 14px;
+	background-image: url('../images/general/jmx_available.png');
+	background-repeat:no-repeat;
+	margin: 0 1px;
+}
+.iconjmxunavailable{
+	height: 14px;
+	width: 14px;
+	background-image: url('../images/general/jmx_unavailable.png');
+	background-repeat:no-repeat;
+	margin: 0 1px;
+}
 /* </status icons> */
 
 
