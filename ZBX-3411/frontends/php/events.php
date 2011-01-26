@@ -133,9 +133,12 @@
 				$found = false;
 				foreach($newTrigger['functions'] as $fnum => $function){
 					foreach($oldTrigger['functions'] as $ofnum => $oldFunction){;
+// compare functions
 						if(($function['function'] != $oldFunction['function']) || ($function['parameter'] != $oldFunction['parameter'])) continue;
+// compare that functions uses same item keys
 						if($newTrigger['items'][$function['itemid']]['key_'] != $oldTrigger['items'][$oldFunction['itemid']]['key_']) continue;
-
+// rewrite itemid so we could compare expressions
+// of two triggers form different hosts
 						$newTrigger['functions'][$fnum]['itemid'] = $oldFunction['itemid'];
 						$found = true;
 
@@ -146,6 +149,7 @@
 				}
 				if(!$found) continue;
 
+// if we found same trigger we overwriting it's hosts and items for expression compare
 				$newTrigger['hosts'] = $oldTrigger['hosts'];
 				$newTrigger['items'] = $oldTrigger['items'];
 
