@@ -1,5 +1,6 @@
 Changes for 1.8.5rc1
 
+ - [ZBX-2951] made interval hidden for trapper items (Vedmak)
  - [ZBX-2867] changed order of "Discovery" and "IT services" in configuration menu (Vemdak)
  - [ZBX-3460] forbid saving host with enabled ipmi but without ipmi address (Vedmak)
  - [ZBX-3047] fixed zapcat compatibility for trigger expressions (Aly,Sasha,asaveljevs)

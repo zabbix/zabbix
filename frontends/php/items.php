@@ -1165,7 +1165,7 @@ switch($itemType) {
 				$description,
 				$trigger_info,
 				$item['key_'],
-				$item['delay'],
+				($item['type'] == ITEM_TYPE_TRAPPER ? '' : $item['delay']),
 				$item['history'],
 				(in_array($item['value_type'], array(ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT)) ? '' : $item['trends']),
 				item_type2str($item['type']),
