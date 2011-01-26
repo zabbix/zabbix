@@ -1289,14 +1289,14 @@ return $caption;
 		foreach($trigExpr->expressions as $exprPart){
 			if(zbx_empty($exprPart['item'])) continue;
 
-			$sql = 'SELECT i.itemid, i.type '.
+			$sql = 'SELECT i.itemid, i.type, i.value_type '.
 				' FROM items i,hosts h'.
 				' WHERE i.key_='.zbx_dbstr($exprPart['item']).
 					' AND h.host='.zbx_dbstr($exprPart['host']).
 					' AND h.hostid=i.hostid'.
 					' AND '.DBin_node('i.itemid');
 			if($item = DBfetch(DBselect($sql))){
-				if(!isset($ZBX_TR_EXPR_ALLOWED_FUNCTIONS[$exprPart['functionName']]['item_types'][$item['type']])){
+				if(!isset($ZBX_TR_EXPR_ALLOWED_FUNCTIONS[$exprPart['functionName']]['item_types'][$item['value_type']])){
 					error('Incorrect item type "'.$exprPart['host'].':'.$exprPart['item'].'" provided for trigger function "'.$exprPart['function'].'".');
 					return null;
 				}
