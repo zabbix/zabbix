@@ -1559,6 +1559,9 @@ COpt::memoryPick();
 			if(isset($trigger['description']) && (strcmp($dbTrigger['description'], $trigger['description']) != 0)){
 				$description_changed = true;
 			}
+			else{
+				$trigger['description'] = $dbTrigger['description'];
+			}
 
 			$expression_full = explode_exp($dbTrigger['expression'], 0);
 			if(isset($trigger['expression']) && (strcmp($expression_full, $trigger['expression']) != 0)){
