@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-25 14:27+0200\n"
+"POT-Creation-Date: 2011-01-26 13:06+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Konstantin \n"
 "Language-Team: Zabbix \n"
@@ -48,7 +48,7 @@ msgstr "(プロキシなし)"
 
 #: include/locales/en_gb.inc.php:217
 msgid "(select host first)"
-msgstr ""
+msgstr "(先にホストを選択)"
 
 #: include/locales/en_gb.inc.php:652
 msgid "- all -"
@@ -220,7 +220,7 @@ msgstr "選択を有効"
 
 #: include/locales/en_gb.inc.php:2128
 msgid "Activate selected applications?"
-msgstr "選択したアプリケーションを有効にしますか?"
+msgstr "選択したアプリケーションを有効にしますか？"
 
 #: include/locales/en_gb.inc.php:84
 msgid "Activate selected hosts"
@@ -437,7 +437,7 @@ msgstr "4月"
 
 #: include/locales/en_gb.inc.php:2101
 msgid "Are you sure you want to delete"
-msgstr ""
+msgstr "次の件数のマクロを削除します"
 
 #: include/locales/en_gb.inc.php:1164
 msgid "As is"
@@ -798,7 +798,7 @@ msgstr "ユーザのメディアを更新できません"
 
 #: include/locales/en_gb.inc.php:561
 msgid "Canada (136 characters)"
-msgstr ""
+msgstr "カナダ (136文字)"
 
 #: include/locales/en_gb.inc.php:1385
 #: include/templates/scriptConfirm.js.php:39
@@ -937,7 +937,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:2131
 msgid "Cannot create application"
-msgstr ""
+msgstr "アプリケーションを削除できません"
 
 #: api/classes/class.chost.php:1922
 msgid "Cannot create extended profile"
@@ -1158,7 +1158,7 @@ msgstr ""
 
 #: api/classes/class.chost.php:1829 config.php:542
 msgid "Cannot remove macro"
-msgstr ""
+msgstr "マクロを削除できません"
 
 #: include/locales/en_gb.inc.php:2453
 msgid "Cannot rename guest user"
@@ -1295,7 +1295,7 @@ msgstr "アイテムを更新できません"
 #: api/classes/class.chost.php:1836 api/classes/class.ctemplate.php:1538
 #: config.php:547
 msgid "Cannot update macro"
-msgstr ""
+msgstr "マクロを更新できません"
 
 #: include/locales/en_gb.inc.php:871
 msgid "Cannot update macros"
@@ -1495,7 +1495,7 @@ msgstr "コメント"
 
 #: include/locales/en_gb.inc.php:603
 msgid "Commercial"
-msgstr ""
+msgstr "商用サービス"
 
 #: include/locales/en_gb.inc.php:1581
 msgid "Compare values for multiple periods"
@@ -1603,7 +1603,7 @@ msgstr "コピー"
 
 #: include/locales/en_gb.inc.php:1212
 msgid "Copy selected items?"
-msgstr "選択したアイテムをコピーしますか?"
+msgstr "選択したアイテムをコピーしますか？"
 
 #: include/locales/en_gb.inc.php:87
 msgid "Copy selected to ..."
@@ -1611,7 +1611,7 @@ msgstr "選択をコピー..."
 
 #: include/locales/en_gb.inc.php:1822
 msgid "Copy selected triggers?"
-msgstr "選択したトリガーをコピーしますか?"
+msgstr "選択したトリガーをコピーしますか？"
 
 #: include/locales/en_gb.inc.php:659
 msgid "Copyright 2001-2010 by"
@@ -1989,7 +1989,7 @@ msgstr "削除"
 
 #: include/locales/en_gb.inc.php:1328
 msgid "Delete Links between selected elements?"
-msgstr "選択した要素間のりんくを削除しますか？"
+msgstr "選択した要素間のリンクを削除しますか？"
 
 #: include/locales/en_gb.inc.php:2534
 msgid "Delete Service"
@@ -2005,11 +2005,11 @@ msgstr "注意: 選択したテンプレートとホストとのリンクをク�
 
 #: include/locales/en_gb.inc.php:999
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
-msgstr ""
+msgstr "テンプレートを削除しリンクをクリアしますか？(注意: リンクされたホストがすべてクリアされます！)"
 
 #: include/locales/en_gb.inc.php:2113
 msgid "Delete expression?"
-msgstr "条件式を削除しますか?"
+msgstr "条件式を削除しますか？"
 
 #: include/locales/en_gb.inc.php:1014
 msgid "Delete from group"
@@ -2017,47 +2017,47 @@ msgstr "グループから削除"
 
 #: include/locales/en_gb.inc.php:715
 msgid "Delete graph?"
-msgstr "グラフを削除しますか?"
+msgstr "グラフを削除しますか？"
 
 #: include/locales/en_gb.inc.php:215
 msgid "Delete history of selected WEB scenarios?"
-msgstr "選択したウェブシナリオのヒストリを削除しますか?"
+msgstr "選択したウェブシナリオのヒストリを削除しますか？"
 
 #: include/locales/en_gb.inc.php:1213
 msgid "Delete history of selected items?"
-msgstr "選択したアイテムのヒストリを削除しますか?"
+msgstr "選択したアイテムのヒストリを削除しますか？"
 
 #: include/locales/en_gb.inc.php:2334
 msgid "Delete it?"
-msgstr "削除しますか?"
+msgstr "削除しますか？"
 
 #: include/locales/en_gb.inc.php:2114
 msgid "Delete keyword?"
-msgstr "キーワードを削除しますか?"
+msgstr "キーワードを削除しますか？"
 
 #: include/locales/en_gb.inc.php:800
 msgid "Delete maintenance period?"
-msgstr "メンテナンス期間を削除しますか?"
+msgstr "メンテナンス期間を削除しますか？"
 
 #: include/locales/en_gb.inc.php:594
 msgid "Delete regular expression?"
-msgstr "正規表現を削除しますか?"
+msgstr "正規表現を削除しますか？"
 
 #: include/locales/en_gb.inc.php:109
 msgid "Delete rule?"
-msgstr "ルールを削除しますか?"
+msgstr "ルールを削除しますか？"
 
 #: include/locales/en_gb.inc.php:197
 msgid "Delete scenario?"
-msgstr "シナリオを削除しますか?"
+msgstr "シナリオを削除しますか？"
 
 #: include/locales/en_gb.inc.php:1608
 msgid "Delete screen?"
-msgstr "スクリーンを削除しますか?"
+msgstr "スクリーンを削除しますか？"
 
 #: include/forms/script.edit.php:140
 msgid "Delete script?"
-msgstr "スクリプトを削除しますか?"
+msgstr "スクリプトを削除しますか？"
 
 #: include/locales/en_gb.inc.php:86
 msgid "Delete selected"
@@ -2065,23 +2065,23 @@ msgstr "選択を削除"
 
 #: include/locales/en_gb.inc.php:850
 msgid "Delete selected Host Groups?"
-msgstr "選択したホストグループを削除しますか?"
+msgstr "選択したホストグループを削除しますか？"
 
 #: include/locales/en_gb.inc.php:216
 msgid "Delete selected WEB scenarios?"
-msgstr "選択したウェブシナリオを削除しますか?"
+msgstr "選択したウェブシナリオを削除しますか？"
 
 #: include/locales/en_gb.inc.php:415
 msgid "Delete selected action?"
-msgstr "選択したアクションを削除しますか?"
+msgstr "選択したアクションを削除しますか？"
 
 #: include/locales/en_gb.inc.php:2130
 msgid "Delete selected applications?"
-msgstr "選択したアプリケーションを削除しますか?"
+msgstr "選択したアプリケーションを削除しますか？"
 
 #: host_discovery.php:638 include/locales/en_gb.inc.php:141
 msgid "Delete selected discovery rules?"
-msgstr "選択したディスカバリルールを削除しますか?"
+msgstr "選択したディスカバリルールを削除しますか？"
 
 #: include/locales/en_gb.inc.php:1326
 msgid "Delete selected elements?"
@@ -2089,11 +2089,11 @@ msgstr "選択した要素を削除しますか？"
 
 #: include/locales/en_gb.inc.php:731
 msgid "Delete selected graphs?"
-msgstr "選択したグラフを削除しますか?"
+msgstr "選択したグラフを削除しますか？"
 
 #: include/locales/en_gb.inc.php:847
 msgid "Delete selected group?"
-msgstr "選択したグループを削除しますか?"
+msgstr "選択したグループを削除しますか？"
 
 #: include/locales/en_gb.inc.php:851
 msgid "Delete selected groups"
@@ -2101,95 +2101,95 @@ msgstr "選択したグループを削除"
 
 #: include/locales/en_gb.inc.php:1958
 msgid "Delete selected groups?"
-msgstr "選択したグループを削除しますか?"
+msgstr "選択したグループを削除しますか？"
 
 #: include/locales/en_gb.inc.php:954
 msgid "Delete selected host?"
-msgstr "選択したホストを削除しますか?"
+msgstr "選択したホストを削除しますか？"
 
 #: include/locales/en_gb.inc.php:974
 msgid "Delete selected hosts?"
-msgstr "選択したホストを削除しますか?"
+msgstr "選択したホストを削除しますか？"
 
 #: include/locales/en_gb.inc.php:529
 msgid "Delete selected image?"
-msgstr "選択したイメージを削除しますか?"
+msgstr "選択したイメージを削除しますか？"
 
 #: include/locales/en_gb.inc.php:2194
 msgid "Delete selected item?"
-msgstr "選択したアイテムを削除しますか?"
+msgstr "選択したアイテムを削除しますか？"
 
 #: include/locales/en_gb.inc.php:1214
 msgid "Delete selected items?"
-msgstr "選択したアイテムを削除しますか?"
+msgstr "選択したアイテムを削除しますか？"
 
 #: include/locales/en_gb.inc.php:773
 msgid "Delete selected maintenance periods?"
-msgstr "選択したメンテナンス期間を削除しますか?"
+msgstr "選択したメンテナンス期間を削除しますか？"
 
 #: include/locales/en_gb.inc.php:1317
 msgid "Delete selected maps?"
-msgstr "選択したマップを削除しますか?"
+msgstr "選択したマップを削除しますか？"
 
 #: include/locales/en_gb.inc.php:602
 msgid "Delete selected media types?"
-msgstr "選択したメディアタイプを削除しますか?"
+msgstr "選択したメディアタイプを削除しますか？"
 
 #: include/locales/en_gb.inc.php:528
 msgid "Delete selected media?"
-msgstr "選択したメディアを削除しますか?"
+msgstr "選択したメディアを削除しますか？"
 
 #: include/locales/en_gb.inc.php:615
 msgid "Delete selected node?"
-msgstr "選択したノードを削除しますか?"
+msgstr "選択したノードを削除しますか？"
 
 #: include/locales/en_gb.inc.php:620
 msgid "Delete selected proxies?"
-msgstr "選択したプロキシを削除しますか?"
+msgstr "選択したプロキシを削除しますか？"
 
 #: include/locales/en_gb.inc.php:622
 msgid "Delete selected proxy?"
-msgstr "選択したプロキシを削除しますか?"
+msgstr "選択したプロキシを削除しますか？"
 
 #: include/locales/en_gb.inc.php:595
 msgid "Delete selected regular expressions?"
-msgstr "選択した正規表現を削除しますか?"
+msgstr "選択した正規表現を削除しますか？"
 
 #: screenconf.php:360
 msgid "Delete selected screens?"
-msgstr ""
+msgstr "選択したスクリーンを削除しますか？"
 
 #: include/locales/en_gb.inc.php:1982
 msgid "Delete selected scripts?"
-msgstr "選択したスクリプトを削除しますか?"
+msgstr "選択したスクリプトを削除しますか？"
 
 #: include/locales/en_gb.inc.php:2535
 msgid "Delete selected services?"
-msgstr "選択したサービスを削除しますか?"
+msgstr "選択したサービスを削除しますか？"
 
 #: include/locales/en_gb.inc.php:1626
 msgid "Delete selected slideshows?"
-msgstr "選択したスライドショーを削除しますか?"
+msgstr "選択したスライドショーを削除しますか？"
 
 #: include/locales/en_gb.inc.php:996
 msgid "Delete selected templates?"
-msgstr "選択したテンプレートを削除しますか?"
+msgstr "選択したテンプレートを削除しますか？"
 
 #: include/locales/en_gb.inc.php:1823
 msgid "Delete selected triggers?"
-msgstr "選択したトリガーを削除しますか?"
+msgstr "選択したトリガーを削除しますか？"
 
 #: include/locales/en_gb.inc.php:2190
 msgid "Delete selected user?"
-msgstr "選択したユーザを削除しますか?"
+msgstr "選択したユーザを削除しますか？"
 
 #: include/locales/en_gb.inc.php:1949
 msgid "Delete selected users?"
-msgstr "選択したユーザを削除しますか?"
+msgstr "選択したユーザを削除しますか？"
 
 #: config.php:887
 msgid "Delete selected value mapping?"
-msgstr "選択した値のマッピングを削除しますか?"
+msgstr "選択した値のマッピングを削除しますか？"
 
 #: config.php:883
 #, php-format
@@ -2199,27 +2199,27 @@ msgstr[0] ""
 
 #: include/locales/en_gb.inc.php:955
 msgid "Delete selected with linked elements"
-msgstr "選択とリンクした要素も一緒に削除しますか?"
+msgstr "選択とリンクした要素も一緒に削除しますか？"
 
 #: include/locales/en_gb.inc.php:1695
 msgid "Delete slideshow?"
-msgstr "スライドショーを削除しますか?"
+msgstr "スライドショーを削除しますか？"
 
 #: include/locales/en_gb.inc.php:2200
 msgid "Delete system map?"
-msgstr "システムマップを削除しますか?"
+msgstr "システムマップを削除しますか？"
 
 #: include/locales/en_gb.inc.php:998
 msgid "Delete template?"
-msgstr ""
+msgstr "テンプレートを削除しますか？"
 
 #: include/locales/en_gb.inc.php:2127
 msgid "Delete this application?"
-msgstr "アプリケーションを削除しますか?"
+msgstr "アプリケーションを削除しますか？"
 
 #: include/locales/en_gb.inc.php:2197
 msgid "Delete trigger?"
-msgstr "トリガーを削除しますか?"
+msgstr "トリガーを削除しますか？"
 
 #: include/locales/en_gb.inc.php:926
 msgid "Deleted"
@@ -2250,6 +2250,7 @@ msgid "Depends on"
 msgstr "依存先"
 
 #: include/forms/script.edit.php:84 include/locales/en_gb.inc.php:1115
+#: media_types.php:260
 msgid "Description"
 msgstr "説明"
 
@@ -2319,7 +2320,7 @@ msgstr "APIを無効"
 
 #: include/locales/en_gb.inc.php:1955
 msgid "Disable API access in selected groups?"
-msgstr "選択したグループを無効にしますか?"
+msgstr "選択したグループを無効にしますか？"
 
 #: include/locales/en_gb.inc.php:1945
 msgid "Disable DEBUG"
@@ -2331,7 +2332,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1957
 msgid "Disable debug mode in selected groups?"
-msgstr "選択したグループのデバッグモードを無効にしますか?"
+msgstr "選択したグループのデバッグモードを無効にしますか？"
 
 #: include/templates/hosts.js.php:140
 msgid "Disable extended profile"
@@ -2343,7 +2344,7 @@ msgstr "ホストを無効"
 
 #: include/locales/en_gb.inc.php:619
 msgid "Disable hosts monitored by selected proxies?"
-msgstr "選択したプロキシによるホストの監視を無効にしますか?"
+msgstr "選択したプロキシによるホストの監視を無効にしますか？"
 
 #: include/templates/hosts.js.php:127
 msgid "Disable profile"
@@ -2355,23 +2356,23 @@ msgstr "選択を無効"
 
 #: include/locales/en_gb.inc.php:849
 msgid "Disable selected Host Groups?"
-msgstr "選択したホストグループを無効にしますか?"
+msgstr "選択したホストグループを無効にしますか？"
 
 #: include/locales/en_gb.inc.php:214
 msgid "Disable selected WEB scenarios?"
-msgstr "選択したウェブシナリオを無効にしますか?"
+msgstr "選択したウェブシナリオを無効にしますか？"
 
 #: include/locales/en_gb.inc.php:2129
 msgid "Disable selected applications?"
-msgstr "選択したアプリケーションを無効にしますか?"
+msgstr "選択したアプリケーションを無効にしますか？"
 
 #: include/locales/en_gb.inc.php:140
 msgid "Disable selected discovery rules?"
-msgstr "選択したディスカバリルールを無効にしますか?"
+msgstr "選択したディスカバリルールを無効にしますか？"
 
 #: include/locales/en_gb.inc.php:1953
 msgid "Disable selected groups?"
-msgstr "選択したグループを無効にしますか?"
+msgstr "選択したグループを無効にしますか？"
 
 #: include/locales/en_gb.inc.php:85
 msgid "Disable selected hosts"
@@ -2379,15 +2380,15 @@ msgstr "選択したホストを無効"
 
 #: include/locales/en_gb.inc.php:973
 msgid "Disable selected hosts?"
-msgstr "選択したホストを無効にしますか?"
+msgstr "選択したホストを無効にしますか？"
 
 #: include/locales/en_gb.inc.php:1210
 msgid "Disable selected items?"
-msgstr "選択したアイテムを無効にしますか?"
+msgstr "選択したアイテムを無効にしますか？"
 
 #: include/locales/en_gb.inc.php:1820
 msgid "Disable selected triggers?"
-msgstr "選択したトリガーを無効にしますか?"
+msgstr "選択したトリガーを無効にしますか？"
 
 #: include/locales/en_gb.inc.php:1783
 msgid "Disabled"
@@ -2524,7 +2525,7 @@ msgstr "トレンドの保存期間(日)"
 
 #: include/locales/en_gb.inc.php:2531
 msgid "Do you wish to replace the conditional expression?"
-msgstr "条件式を置き換えますか?"
+msgstr "条件式を置き換えますか？"
 
 #: include/locales/en_gb.inc.php:451
 msgid "Dot"
@@ -2540,7 +2541,7 @@ msgstr "ダウンロード"
 
 #: include/locales/en_gb.inc.php:1548 include/locales/en_gb.inc.php:1557
 msgid "Download newly created locale file by pressing \"Download\"."
-msgstr ""
+msgstr "\"ダウンロード\"をクリックして新規作成したロケールファイルをダウンロードしてください。"
 
 #. GETTEXT: Legend below graph
 #: api/classes/class.cwebcheck.php:551
@@ -2679,7 +2680,7 @@ msgstr "APIを有効"
 
 #: include/locales/en_gb.inc.php:1954
 msgid "Enable API access in selected groups?"
-msgstr "選択したグループのAPIアクセスを有効にしますか?"
+msgstr "選択したグループのAPIアクセスを有効にしますか？"
 
 #: include/locales/en_gb.inc.php:1944
 msgid "Enable DEBUG"
@@ -2695,7 +2696,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1956
 msgid "Enable debug mode in selected groups?"
-msgstr "選択したグループのデバッグモードを有効にしますか?"
+msgstr "選択したグループのデバッグモードを有効にしますか？"
 
 #: include/locales/en_gb.inc.php:533
 msgid "Enable escalations"
@@ -2711,7 +2712,7 @@ msgstr "ホストを有効"
 
 #: include/locales/en_gb.inc.php:618
 msgid "Enable hosts monitored by selected proxies?"
-msgstr "選択したプロキシによるホストの監視を有効にしますか?"
+msgstr "選択したプロキシによるホストの監視を有効にしますか？"
 
 #: include/templates/hosts.js.php:131
 msgid "Enable profile"
@@ -2723,31 +2724,31 @@ msgstr "選択を有効"
 
 #: include/locales/en_gb.inc.php:848
 msgid "Enable selected Host Groups?"
-msgstr "選択したホストグループを有効にしますか?"
+msgstr "選択したホストグループを有効にしますか？"
 
 #: include/locales/en_gb.inc.php:213
 msgid "Enable selected WEB scenarios?"
-msgstr "選択したウェブシナリオを有効にしますか?"
+msgstr "選択したウェブシナリオを有効にしますか？"
 
 #: include/locales/en_gb.inc.php:139
 msgid "Enable selected discovery rules?"
-msgstr "選択したディスカバリルールを有効にしますか?"
+msgstr "選択したディスカバリルールを有効にしますか？"
 
 #: include/locales/en_gb.inc.php:1952
 msgid "Enable selected groups?"
-msgstr "選択したグループを有効にしますか?"
+msgstr "選択したグループを有効にしますか？"
 
 #: include/locales/en_gb.inc.php:972
 msgid "Enable selected hosts?"
-msgstr "選択したホストを有効にしますか?"
+msgstr "選択したホストを有効にしますか？"
 
 #: include/locales/en_gb.inc.php:1209
 msgid "Enable selected items?"
-msgstr "選択したアイテムを有効にしますか?"
+msgstr "選択したアイテムを有効にしますか？"
 
 #: include/locales/en_gb.inc.php:1819
 msgid "Enable selected triggers?"
-msgstr "選択したトリガーを有効にしますか?"
+msgstr "選択したトリガーを有効にしますか？"
 
 #: include/locales/en_gb.inc.php:1785
 msgid "Enabled"
@@ -2771,15 +2772,15 @@ msgstr "名前のエラー"
 
 #: include/locales/en_gb.inc.php:2321
 msgid "Error adding dependencies. Following dependencies are not allowed: 1) from a host trigger to a template trigger; 2) from a template trigger to a host trigger; 3) between template triggers, where templates have links to other templates."
-msgstr ""
+msgstr "依存関係の追加エラー。次の依存関係は作成できません: 1) ホストのトリガーからテンプレートのトリガー; 2) テンプレートのトリガーからホストのトリガー; 3) テンプレートのトリガーからテンプレートのトリガー"
 
 #: include/locales/en_gb.inc.php:1532
 msgid "Error adding service time"
-msgstr ""
+msgstr "サービス時間のエラー"
 
 #: include/locales/en_gb.inc.php:2222
 msgid "Error in item key:"
-msgstr ""
+msgstr "アイテムキーのエラー:"
 
 #: api/classes/class.cdiscoveryrule.php:575 api/classes/class.citem.php:931
 #: api/classes/class.citemprototype.php:576
@@ -2946,7 +2947,7 @@ msgstr "条件式"
 
 #: include/locales/en_gb.inc.php:1554
 msgid "Extend this array with Your locale like \"your_prefix\" => \"display_like\"."
-msgstr ""
+msgstr "この配列に作成したロケールファイルを追加してください\"your_prefix\" => \"display_like\".。"
 
 #: include/locales/en_gb.inc.php:2057
 msgid "Extended"
@@ -2966,7 +2967,7 @@ msgstr "外部チェック"
 
 #: include/locales/en_gb.inc.php:1143
 msgid "Ez Texting"
-msgstr ""
+msgstr "Ez Texting"
 
 #: include/locales/en_gb.inc.php:2519
 msgid "F"
@@ -3076,7 +3077,7 @@ msgstr "例外の更新間隔(秒)"
 
 #: include/locales/en_gb.inc.php:1556
 msgid "For example see implementation of other locales."
-msgstr ""
+msgstr "例としては他のロケールファイルを参照してください。"
 
 #: include/locales/en_gb.inc.php:1876
 msgid "For guest, password must be empty"
@@ -3463,7 +3464,7 @@ msgstr "ヒストリ"
 
 #: include/locales/en_gb.inc.php:1616
 msgid "History and simple graphs"
-msgstr ""
+msgstr "ヒストリとシンプルグラフ"
 
 #: include/locales/en_gb.inc.php:1098
 msgid "History cleared"
@@ -3603,7 +3604,7 @@ msgstr ""
 #: api/classes/class.chost.php:1506 api/classes/class.chost.php:1511
 #: api/classes/class.chost.php:1516 api/classes/class.chost.php:1525
 msgid "Host update failed"
-msgstr ""
+msgstr "ホストの更新に失敗しました"
 
 #: include/locales/en_gb.inc.php:900
 msgid "Host updated"
@@ -3993,7 +3994,7 @@ msgstr "不正なディスカバリステータス"
 
 #: include/locales/en_gb.inc.php:422
 msgid "Incorrect escalation period"
-msgstr ""
+msgstr "不正なエスカレーション期間"
 
 #: include/locales/en_gb.inc.php:582
 msgid "Incorrect expression"
@@ -4001,7 +4002,7 @@ msgstr "誤った正規表現"
 
 #: include/locales/en_gb.inc.php:2132
 msgid "Incorrect fields for application"
-msgstr ""
+msgstr "アプリケーションの設定が間違っています"
 
 #: include/locales/en_gb.inc.php:2307
 msgid "Incorrect function is used"
@@ -4068,7 +4069,7 @@ msgstr "間違ったノードタイプ"
 
 #: include/locales/en_gb.inc.php:364
 msgid "Incorrect object type"
-msgstr ""
+msgstr "不正なオブジェクトタイプ"
 
 #: include/locales/en_gb.inc.php:366
 msgid "Incorrect operation type"
@@ -4076,15 +4077,15 @@ msgstr "不正なオペレーションタイプ"
 
 #: include/locales/en_gb.inc.php:272
 msgid "Incorrect parameter used for Action"
-msgstr ""
+msgstr "アクションに誤ったパラメータが使用されています"
 
 #: include/locales/en_gb.inc.php:270
 msgid "Incorrect parameter used for Conditions"
-msgstr ""
+msgstr "コンディションに誤ったパラメータが使用されています"
 
 #: include/locales/en_gb.inc.php:271
 msgid "Incorrect parameter used for Operations"
-msgstr ""
+msgstr "オペレーションに誤ったパラメータが使用されています"
 
 #: include/locales/en_gb.inc.php:358
 msgid "Incorrect period"
@@ -4234,7 +4235,7 @@ msgstr "SNMPポートが間違っています"
 
 #: include/items.inc.php:1503
 msgid "Invalid key format"
-msgstr ""
+msgstr "キーのフォーマットが間違っています"
 
 #: include/locales/en_gb.inc.php:2492
 msgid "Inventory"
@@ -4431,7 +4432,7 @@ msgstr "キー"
 
 #: include/items.inc.php:1320
 msgid "Key cannot be empty"
-msgstr ""
+msgstr "キーは必須の設定項目です"
 
 #: include/locales/en_gb.inc.php:2212
 msgid "Key does not match"
@@ -4440,13 +4441,13 @@ msgstr "キーが一致しません"
 #: include/items.inc.php:1328
 #, php-format
 msgid "Key is too large: maximum %d characters"
-msgstr ""
+msgstr "キーが長すぎます: 最大%d文字で設定してください"
 
 #: include/items.inc.php:1350 include/items.inc.php:1390
 #: include/items.inc.php:1412 include/items.inc.php:1443
 #: include/items.inc.php:1493
 msgid "Key is valid"
-msgstr ""
+msgstr "Key is valid"
 
 #: include/locales/en_gb.inc.php:2111
 msgid "Keyword"
@@ -4835,7 +4836,7 @@ msgstr "マップのアイコン"
 
 #: include/locales/en_gb.inc.php:1287
 msgid "Map is saved! Return?"
-msgstr "マップを保存しました! 戻りますか?"
+msgstr "マップを保存しました! 戻りますか？"
 
 #: include/locales/en_gb.inc.php:1288
 msgid "Map save operation failed."
@@ -4875,11 +4876,11 @@ msgstr "一括更新"
 
 #: include/locales/en_gb.inc.php:1211
 msgid "Mass update selected items?"
-msgstr "選択したアイテムを一括更新しますか?"
+msgstr "選択したアイテムを一括更新しますか？"
 
 #: include/locales/en_gb.inc.php:1821
 msgid "Mass update selected triggers?"
-msgstr "選択したトリガーを一括更新しますか?"
+msgstr "選択したトリガーを一括更新しますか？"
 
 #: include/locales/en_gb.inc.php:281
 msgid "Master"
@@ -4980,7 +4981,7 @@ msgstr "メッセージアクション"
 
 #: include/locales/en_gb.inc.php:562
 msgid "Message text limit"
-msgstr ""
+msgstr "メッセージの上限文字数"
 
 #: include/locales/en_gb.inc.php:2020
 msgid "Message timeout"
@@ -5132,7 +5133,7 @@ msgstr "通知レポート"
 
 #: include/locales/en_gb.inc.php:212
 msgid "NTLM authentication"
-msgstr ""
+msgstr "NTLM authentication"
 
 #: include/forms/script.edit.php:73 include/locales/en_gb.inc.php:1913
 msgid "Name"
@@ -5328,7 +5329,7 @@ msgstr "ディスカバリのルールが設定されていません"
 
 #: include/locales/en_gb.inc.php:2140
 msgid "No elements selected!"
-msgstr "要素が選択されていません!"
+msgstr "要素が選択されていません！"
 
 #: include/locales/en_gb.inc.php:2091
 msgid "No errors found"
@@ -5472,7 +5473,7 @@ msgstr "メディアが設定されていません"
 msgid "No media type with"
 msgstr "メディアタイプが存在しません"
 
-#: include/locales/en_gb.inc.php:523
+#: include/locales/en_gb.inc.php:523 media_types.php:257
 msgid "No media types defined"
 msgstr "メディアタイプが設定されていません"
 
@@ -5842,7 +5843,7 @@ msgstr "一時的なダウンタイム"
 
 #: include/locales/en_gb.inc.php:2438
 msgid "Only Super Admins can create Scripts"
-msgstr ""
+msgstr "特権管理者のみがスクリプトを作成できます"
 
 #: include/locales/en_gb.inc.php:2441
 msgid "Only Super Admins can create Users"
@@ -5854,12 +5855,12 @@ msgstr "Zabbix特権管理者のみがメディアタイプを作成できます
 
 #: include/locales/en_gb.inc.php:2440
 msgid "Only Super Admins can delete Scripts"
-msgstr ""
+msgstr "特権管理者のみがスクリプトを削除できます"
 
 #. GETTEXT: Api exception
 #: api/classes/class.cusergroup.php:703
 msgid "Only Super Admins can delete User Groups."
-msgstr ""
+msgstr "特権管理者のみがユーザグループを削除できます。"
 
 #: include/locales/en_gb.inc.php:2443
 msgid "Only Super Admins can delete Users"
@@ -5871,7 +5872,7 @@ msgstr "Zabbix特権管理者のみがメディアタイプを削除できます
 
 #: include/locales/en_gb.inc.php:2439
 msgid "Only Super Admins can update Scripts"
-msgstr ""
+msgstr "特権管理者のみがスクリプトを更新できます"
 
 #: include/locales/en_gb.inc.php:2442
 msgid "Only Super Admins can update Users"
@@ -6070,7 +6071,7 @@ msgstr "パスワード(確認)"
 
 #: include/locales/en_gb.inc.php:2465
 msgid "Password required for mediatype"
-msgstr ""
+msgstr "メディアタイプにはパスワードが必要です"
 
 #: include/locales/en_gb.inc.php:1875
 msgid "Password should not be empty"
@@ -6106,7 +6107,7 @@ msgstr "円グラフ"
 
 #: include/locales/en_gb.inc.php:1549 include/locales/en_gb.inc.php:1558
 msgid "Place it to \"/PATH_TO_ZABBIX_FRONTEND/include/locales\"."
-msgstr ""
+msgstr "ロケールファイルは\"/PATH_TO_ZABBIX_FRONTEND/include/locales\"に置いてください。"
 
 #: include/locales/en_gb.inc.php:1651
 msgid "Plain text"
@@ -6163,7 +6164,7 @@ msgstr "プレビュー"
 #: include/locales/en_gb.inc.php:253 include/locales/en_gb.inc.php:2547
 #: include/locales/en_gb.inc.php:2549
 msgid "Previous"
-msgstr "戻る"
+msgstr "前"
 
 #: include/locales/en_gb.inc.php:1076
 msgid "Primary POC Cell"
@@ -6432,7 +6433,7 @@ msgstr "リンクされているテンプレートを置換"
 
 #: include/locales/en_gb.inc.php:1559
 msgid "Replace previous locale file with one you have downloaded."
-msgstr ""
+msgstr "既存のファイルをダウンロードしたファイルで上書きしてください。"
 
 #: include/locales/en_gb.inc.php:2497
 msgid "Report"
@@ -6508,7 +6509,7 @@ msgstr "リソース"
 
 #: include/locales/en_gb.inc.php:163
 msgid "Response code"
-msgstr "レスポンスのコード"
+msgstr "レスポンスコード"
 
 #: api/classes/class.cwebcheck.php:654
 #, php-format
@@ -6823,7 +6824,7 @@ msgstr "スケジュール"
 
 #: include/locales/en_gb.inc.php:89
 msgid "Schema"
-msgstr ""
+msgstr "スキーマ"
 
 #: include/locales/en_gb.inc.php:1596
 msgid "Screen"
@@ -6852,12 +6853,12 @@ msgstr "スクリーンを更新しました"
 #: include/locales/en_gb.inc.php:1698
 #, php-format
 msgid "Screen with id \"%d\" does not exist"
-msgstr ""
+msgstr "スクリーンID\"%d\"は存在しません"
 
 #: include/locales/en_gb.inc.php:1697
 #, php-format
 msgid "Screen with name \"%s\" does not exist"
-msgstr ""
+msgstr "スクリーン\"%s\"は存在しません"
 
 #: include/locales/en_gb.inc.php:1595
 msgid "Screens"
@@ -7464,7 +7465,7 @@ msgstr "件名"
 
 #: include/locales/en_gb.inc.php:2330
 msgid "Submap"
-msgstr ""
+msgstr "サブマップ"
 
 #: include/locales/en_gb.inc.php:760
 msgid "Success Audit"
@@ -7488,11 +7489,11 @@ msgstr "スウェーデン語 (SE)"
 
 #: include/locales/en_gb.inc.php:644
 msgid "Switching HTTP authentication will reset all current sessions! Continue?"
-msgstr "HTTP認証に変更し現在のすべてのセッションがリセットされます。続けますか?"
+msgstr "HTTP認証に変更し現在のすべてのセッションがリセットされます。続けますか？"
 
 #: include/locales/en_gb.inc.php:645
 msgid "Switching LDAP authentication will reset all current sessions! Continue?"
-msgstr "LDAP認証に変更し現在のすべてのセッションがリセットされます。続けますか?"
+msgstr "LDAP認証に変更し現在のすべてのセッションがリセットされます。続けますか？"
 
 #: include/locales/en_gb.inc.php:486
 msgid "System default"
@@ -7660,7 +7661,7 @@ msgstr "キーはユニークに設定してください"
 
 #: include/locales/en_gb.inc.php:1550
 msgid "The locale file name must be made of a prefix: \"ISO 639-1 language code\"_\"ISO 3166-1 alpha-2 country code\". Like \"en_gb\""
-msgstr ""
+msgstr "ロケールファイル名の先頭は\"ISO 639-1 language code\"_\"ISO 3166-1 alpha-2 country code\". Like \"en_gb\"の形式である必要があります。例:\"en_gb\""
 
 #: include/locales/en_gb.inc.php:1442
 msgid "The queue is empty"
@@ -7680,7 +7681,7 @@ msgstr "テーマ"
 
 #: include/locales/en_gb.inc.php:1553
 msgid "There You will find an array containing \"keys\" => \"values\"."
-msgstr ""
+msgstr "このファイルに\"keys\" => \"values\"の形式で設定が行われています。"
 
 #: include/locales/en_gb.inc.php:820
 msgid "Third"
@@ -7728,7 +7729,7 @@ msgstr "期間"
 
 #: include/locales/en_gb.inc.php:1800
 msgid "Time shift"
-msgstr ""
+msgstr "タイムシフト"
 
 #: include/locales/en_gb.inc.php:1665
 msgid "Time type"
@@ -7764,7 +7765,7 @@ msgstr "終了"
 
 #: include/locales/en_gb.inc.php:1552
 msgid "To make new locale visible by Zabbix frontend - extend the php script \"/PATH_TO_ZABBIX_FRONTEND/include/locales.inc.php\"."
-msgstr ""
+msgstr "新規ロケールファイルをWebインターフェースに表示するためには、\"/PATH_TO_ZABBIX_FRONTEND/include/locales.inc.php\"のphpスクリプトを修正します。"
 
 #: include/locales/en_gb.inc.php:1758
 msgid "Today"
@@ -7885,7 +7886,7 @@ msgstr "トリガーの名前"
 
 #: include/locales/en_gb.inc.php:1825
 msgid "Trigger form"
-msgstr ""
+msgstr "トリガーフォーム"
 
 #: include/locales/en_gb.inc.php:2310
 msgid "Trigger in template"
@@ -7986,7 +7987,7 @@ msgstr "火曜"
 msgid "Two elements should be selected"
 msgstr "2つの要素を選択する必要があります"
 
-#: include/locales/en_gb.inc.php:434
+#: include/locales/en_gb.inc.php:434 media_types.php:261
 msgid "Type"
 msgstr "タイプ"
 
@@ -8048,7 +8049,7 @@ msgstr "ログイン後のURL"
 
 #: include/locales/en_gb.inc.php:560
 msgid "USA (160 characters)"
-msgstr ""
+msgstr "USA (160文字)"
 
 #: include/locales/en_gb.inc.php:1907
 msgid "USER GROUPS"
@@ -8092,7 +8093,7 @@ msgstr "選択したユーザのブロックを解除"
 
 #: include/locales/en_gb.inc.php:1948
 msgid "Unblock selected users?"
-msgstr "選択したユーザのブロックを解除しますか?"
+msgstr "選択したユーザのブロックを解除しますか？"
 
 #: include/locales/en_gb.inc.php:2093
 msgid "Unexpected end of element"
@@ -8251,6 +8252,10 @@ msgstr "指定した深刻度のときに使用"
 msgid "Use profile"
 msgstr "プロファイルを使用"
 
+#: media_types.php:262
+msgid "Used in actions"
+msgstr ""
+
 #: include/locales/en_gb.inc.php:400 include/locales/en_gb.inc.php:947
 #: include/setup.inc.php:248
 msgid "User"
@@ -8300,7 +8305,7 @@ msgstr "ユーザグループ"
 #: api/classes/class.cusergroup.php:716
 #, php-format
 msgid "User group [%1$s] is used in script [%2$s]."
-msgstr ""
+msgstr "ユーザグループ[%1$s]はスクリプト[%2$s]に利用されています。"
 
 #: include/locales/en_gb.inc.php:556
 msgid "User group for database down message"
@@ -8336,7 +8341,7 @@ msgstr "ユーザを更新しました"
 
 #: include/forms/host.edit.php:523 include/locales/en_gb.inc.php:1144
 msgid "Username"
-msgstr ""
+msgstr "ユーザ名"
 
 #: include/locales/en_gb.inc.php:1869
 msgid "Users"
@@ -8523,7 +8528,7 @@ msgstr "トリガーなし"
 
 #: include/locales/en_gb.inc.php:1161
 msgid "Wizard"
-msgstr ""
+msgstr "ウィザード"
 
 #: include/locales/en_gb.inc.php:555
 msgid "Working time"
@@ -8672,11 +8677,11 @@ msgstr "同じトリガー条件式が含まれるテンプレートを同時に
 
 #: include/locales/en_gb.inc.php:1555
 msgid "You can set \"display_like\" value in new locale file by adding it or You may leave it as hardcoded string."
-msgstr ""
+msgstr "\"display_like\"には新規作成したロケールファイルの名前を付けることができます。"
 
 #: include/locales/en_gb.inc.php:2265
 msgid "You can't delete template for an application that is used in a web scenario"
-msgstr ""
+msgstr "Webシナリオに利用されているアプリケーションがあるためテンプレートを削除できません"
 
 #: include/locales/en_gb.inc.php:2476
 msgid "You cannot view this URL as a"
@@ -8684,7 +8689,7 @@ msgstr "このURLは表示できません"
 
 #: api/classes/class.chost.php:1563
 msgid "You do not have enough rights for operation"
-msgstr ""
+msgstr "操作に対して十分な権限を有していません"
 
 #: include/locales/en_gb.inc.php:2509
 msgid "You do not have permission to perform this operation"
@@ -8768,7 +8773,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1408
 msgid "Zabbix server ip or port is not set!"
-msgstr ""
+msgstr "ZabbixサーバのIPまたはポートが設定されていません！"
 
 #: include/locales/en_gb.inc.php:1460
 msgid "Zabbix server is running"
@@ -8861,11 +8866,11 @@ msgstr "and"
 
 #: include/locales/en_gb.inc.php:1551
 msgid "and a postfix \".inc.php\". Like \"en_gb.inc.php\"."
-msgstr ""
+msgstr "また、末尾は\".inc.php\"である必要があります。例:\"en_gb.inc.php\""
 
 #: include/locales/en_gb.inc.php:2266
 msgid "and can't be deleted"
-msgstr ""
+msgstr "削除できません"
 
 #: include/locales/en_gb.inc.php:757
 msgid "as Blue"
@@ -8963,7 +8968,7 @@ msgstr "Y.m.d H:i"
 
 #: include/locales/en_gb.inc.php:249
 msgid "d.m.y"
-msgstr "d.m.y"
+msgstr "y.m.d"
 
 #: include/locales/en_gb.inc.php:2358
 msgid "day"
@@ -8983,7 +8988,7 @@ msgstr "削除"
 
 #: include/locales/en_gb.inc.php:2506
 msgid "does not exist"
-msgstr ""
+msgstr "存在しません"
 
 #: include/locales/en_gb.inc.php:970
 msgid "doesn't exist"
@@ -9072,18 +9077,18 @@ msgstr "パラメータが間違っています"
 #: include/items.inc.php:1398 include/items.inc.php:1458
 #, php-format
 msgid "incorrect syntax near '%1$s' at position %2$d"
-msgstr ""
+msgstr "間違った書式 '%1$s' が %2$d 付近に見つかりました"
 
 #: include/items.inc.php:1406 include/items.inc.php:1449
 #: include/items.inc.php:1487
 #, php-format
 msgid "incorrect usage of bracket symbols. '%s' found after final bracket."
-msgstr ""
+msgstr "ブラケットの使い方が誤っています。最後のブラケットの後に'%s'が存在しています。"
 
 #: include/items.inc.php:1510
 #, php-format
 msgid "invalid character '%1$s' at position %2$d"
-msgstr ""
+msgstr "間違った文字 '%1$s' が %2$d 付近に見つかりました"
 
 #: include/locales/en_gb.inc.php:2395
 msgid "is a minimal PHP memory limitation"
@@ -9099,7 +9104,7 @@ msgstr "はPHPスクリプトの入力のパース時間の最小の設定値で
 
 #: include/locales/en_gb.inc.php:1533
 msgid "is a wrong time format. Should be from 00:00 to 23:59."
-msgstr ""
+msgstr "は誤った時間の形式です。00:00から24:00の間で設定してください。"
 
 #: include/locales/en_gb.inc.php:2248
 msgid "is internal and can not be deleted"
@@ -9196,7 +9201,7 @@ msgstr "Y.m.d H:i:s"
 
 #: include/locales/en_gb.inc.php:2102
 msgid "macro(s)"
-msgstr ""
+msgstr "マクロ"
 
 #: include/locales/en_gb.inc.php:323
 msgid "maintenance"
@@ -9296,7 +9301,7 @@ msgstr "on"
 
 #: include/locales/en_gb.inc.php:2232
 msgid "only printable characters"
-msgstr ""
+msgstr "表示可能な文字のみ"
 
 #: include/locales/en_gb.inc.php:2407
 msgid "option in"
@@ -9360,7 +9365,7 @@ msgstr "秒"
 
 #: include/locales/en_gb.inc.php:369
 msgid "selected actions?"
-msgstr "選択したアクション?"
+msgstr "選択したアクション？"
 
 #: include/locales/en_gb.inc.php:438
 msgid "sent"
@@ -9458,8 +9463,14 @@ msgstr "yes"
 msgid "µ"
 msgstr "µ"
 
-#~ msgid "Cannot_update slideshow"
-#~ msgstr "スライドショーを更新できません"
+#~ msgid "(inherited from another template)."
+#~ msgstr "(他のテンプレートから継承)"
+
+#~ msgid "(items are not identical)."
+#~ msgstr "(アイテムが同一ではありません)."
+
+#~ msgid "(seconds)"
+#~ msgstr "(秒)"
 
 #~ msgid "(year"
 #~ msgstr "(year"
@@ -9467,11 +9478,29 @@ msgstr "µ"
 #~ msgid ")"
 #~ msgstr ")"
 
+#~ msgid "Cannot delete user group used in a script:"
+#~ msgstr "スクリプトに利用されているためユーザグループを削除できません:"
+
+#~ msgid "Cannot sync template"
+#~ msgstr "テンプレートを同期できません"
+
+#~ msgid "Cannot_update slideshow"
+#~ msgstr "スライドショーを更新できません"
+
+#~ msgid "Download speed for step \"%1$s\" of scenario \"%2$s\""
+#~ msgstr "シナリオ\"%2$s\"のステップ\"%1$s\"のダウンロード速度"
+
 #~ msgid "Edit trigger"
 #~ msgstr "トリガーを編集"
 
+#~ msgid "Graph \"%1$s\" already exists on \"%2$s\"."
+#~ msgstr "\"%2$s\"にはすでにグラフ\"%1$s\"が存在しています。"
+
 #~ msgid "Hide unknown"
 #~ msgstr "不明を隠す"
+
+#~ msgid "Host group \"%1$s\" can not be deleted, because it is used in script \"%2$s\"."
+#~ msgstr "スクリプト\"%2$s\"で利用されているためホストグループ\"%1$s\"は削除できません。"
 
 #~ msgid "IPMI IP address"
 #~ msgstr "IPMI IPアドレス"
@@ -9479,11 +9508,29 @@ msgstr "µ"
 #~ msgid "IPMI port"
 #~ msgstr "IPMIポート"
 
+#~ msgid "Item \"%s\" unlinked"
+#~ msgstr "アイテム \"%s\" をリンクから外しました"
+
+#~ msgid "Response code for step \"%1$s\" of scenario \"%2$s\""
+#~ msgstr "シナリオ\"%2$s\"のステップ\"%1$s\"のレスポンスコード"
+
+#~ msgid "Response time for step \"%1$s\" of scenario \"%2$s\""
+#~ msgstr "シナリオ\"%2$s\"のステップ\"%1$s\"のレスポンスタイム"
+
 #~ msgid "Spanish (SP)"
 #~ msgstr "スペイン語 (SP)"
+
+#~ msgid "Trigger \"%s\" unlinked"
+#~ msgstr "トリガー\"%s\"をリンクから外しました"
 
 #~ msgid "Use IPMI"
 #~ msgstr "IPMIを使用"
 
 #~ msgid "_: $TRANSLATION->'S_GRAPH_DELETED_FROM_HOSTS_PART3'\n"
 #~ msgstr "から削除しました"
+
+#~ msgid "sec at"
+#~ msgstr "sec at"
+
+#~ msgid "used in web scenario"
+#~ msgstr "Webシナリオで利用されています"
