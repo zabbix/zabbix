@@ -189,7 +189,7 @@
 // HEADER {{{
 	$r_form = new CForm(null, 'get');
 	$r_form->addVar('fullscreen',$_REQUEST['fullscreen']);
-//	$r_form->addVar('triggerid', get_request('triggerid'));
+	$r_form->addVar('triggerid', get_request('triggerid'));
 	$r_form->addVar('stime', get_request('stime'));
 	$r_form->addVar('period', get_request('period'));
 
@@ -258,7 +258,7 @@
 			new CCol(S_TRIGGER,'form_row_l'),
 			new CCol(array(
 				new CTextBox('trigger',$trigger,96,'yes'),
-				new CButton("btn1",S_SELECT,"return PopUp('popup.php?"."dstfrm=".$filterForm->GetName()."&dstfld1=triggerid&dstfld2=trigger"."&srctbl=triggers&srcfld1=triggerid&srcfld2=description&real_hosts=1');",'T')
+				new CButton("btn1",S_SELECT,"return PopUp('popup.php?"."dstfrm=".$filterForm->getName()."&dstfld1=triggerid&dstfld2=trigger"."&srctbl=triggers&srcfld1=triggerid&srcfld2=description&real_hosts=1');",'T')
 			),'form_row_r')
 		));
 		$filterForm->addRow($row);
