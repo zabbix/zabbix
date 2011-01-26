@@ -510,7 +510,7 @@ Copt::memoryPick();
 			}
 
 			if(zbx_empty($interface['ip']) && zbx_empty($interface['dns'])){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('IP and DNS can not be empty for host interface.');
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('IP and DNS can not be empty for host interface.'));
 			}
 
 			if(($interface['useip'] == INTERFACE_USE_IP) && zbx_empty($interface['ip'])){
