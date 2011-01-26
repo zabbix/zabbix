@@ -73,6 +73,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
 
+ - [ZBX-3100] fixed messages in popup when no proxies or discovery checks defined (Vedmak)
  - [ZBX-3138] fixed bug when disabling application, webitems were disabled too (Vedmak)
  - [ZBX-2951] made interval hidden for trapper items (Vedmak)
  - [ZBX-2867] changed order of "Discovery" and "IT services" in configuration menu (Vemdak)
