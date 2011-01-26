@@ -111,9 +111,10 @@
 
 		foreach($oldTriggers as $oldTrigger){
 			$_REQUEST['triggerid'] = 0;
-			$oldExpression = triggerExpression($oldTrigger,false);
 			$oldTrigger['hosts'] = zbx_toHash($oldTrigger['hosts'],'hostid');
 			$oldTrigger['items'] = zbx_toHash($oldTrigger['items'],'itemid');
+			$oldTrigger['functions'] = zbx_toHash($oldTrigger['functions'],'functionid');
+			$oldExpression = triggerExpression($oldTrigger,false);
 
 			if(isset($oldTrigger['hosts'][$hostid])) break;
 
@@ -129,6 +130,8 @@
 			foreach($newTriggers as $tnum => $newTrigger){
 				if(count($oldTrigger['items']) != count($newTrigger['items'])) continue;
 				$newTrigger['items'] = zbx_toHash($newTrigger['items'],'itemid');
+				$newTrigger['hosts'] = zbx_toHash($newTrigger['hosts'],'hostid');
+				$newTrigger['functions'] = zbx_toHash($newTrigger['functions'],'functionid');
 
 				$found = false;
 				foreach($newTrigger['functions'] as $fnum => $function){
@@ -186,7 +189,7 @@
 // HEADER {{{
 	$r_form = new CForm(null, 'get');
 	$r_form->addVar('fullscreen',$_REQUEST['fullscreen']);
-	$r_form->addVar('triggerid', get_request('triggerid'));
+//	$r_form->addVar('triggerid', get_request('triggerid'));
 	$r_form->addVar('stime', get_request('stime'));
 	$r_form->addVar('period', get_request('period'));
 
@@ -240,7 +243,7 @@
 		$filterForm->setAttribute('name', 'zbx_filter');
 		$filterForm->setAttribute('id', 'zbx_filter');
 
-		$filterForm->addVar('triggerid', get_request('triggerid', 0));
+		$filterForm->addVar('triggerid', get_request('triggerid'));
 		$filterForm->addVar('stime', get_request('stime'));
 		$filterForm->addVar('period', get_request('period'));
 
