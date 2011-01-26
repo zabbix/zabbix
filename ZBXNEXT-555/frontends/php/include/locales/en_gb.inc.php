@@ -980,6 +980,7 @@
 	'S_INTERFACE' =>				_('Interface'),
 	'S_DISABLE_IPMI' => _('Disable IPMI'),
 	'S_ENABLE_IPMI' => _('Enable IPMI'),
+	'S_JMX' =>						_('JMX'),
 
 // templates.php
 	'S_TEMPLATE_LIST'=>			_('Templates list'),
@@ -1129,6 +1130,7 @@
 	'S_IPMI_AGENT'=>					_('IPMI agent'),
 	'S_SSH_AGENT'=>						_('SSH agent'),
 	'S_TELNET_AGENT'=>					_('TELNET agent'),
+	'S_JMX_AGENT'=>					_('JMX agent'),
 	'S_ZABBIX_AGGREGATE'=>					_('Zabbix aggregate'),
 	'S_EXTERNAL_CHECK'=>					_('External check'),
 	'S_WEB_MONITORING'=>					_('Web monitoring'),

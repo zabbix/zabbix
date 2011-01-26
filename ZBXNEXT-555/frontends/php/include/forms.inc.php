@@ -1078,6 +1078,7 @@
 			ITEM_TYPE_IPMI,
 			ITEM_TYPE_SSH,
 			ITEM_TYPE_TELNET,
+			ITEM_TYPE_JMX,
 			ITEM_TYPE_CALCULATED);
 
 		foreach($itemTypes as $it){
@@ -1581,6 +1582,7 @@
 			ITEM_TYPE_IPMI,
 			ITEM_TYPE_SSH,
 			ITEM_TYPE_TELNET,
+			ITEM_TYPE_JMX,
 			ITEM_TYPE_CALCULATED
 		);
 
@@ -1786,6 +1788,9 @@
 				zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'interfaceid');
 				zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'interface_row');
 				zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'interfaceid');
+				zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'interface_row');
+				zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'interfaceid');
+
 			}
 		}
 
@@ -1884,6 +1889,8 @@
 				break;
 				case ITEM_TYPE_TELNET:
 					zbx_subarray_push($typeVisibility, $it, array('id'=>'key', 'defaultValue'=> 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]'));
+				case ITEM_TYPE_JMX:
+					zbx_subarray_push($typeVisibility, $it, array('id'=>'key', 'defaultValue'=> 'jmx.run[<unique short description>,<ip>,<port>,<encoding>]'));
 				break;
 				default:
 					zbx_subarray_push($typeVisibility, $it, 'key');
@@ -1914,6 +1921,9 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'row_username');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'username');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'row_username');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'username');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'row_username');
+
 
 		$row = new CRow(array(new CCol(S_PUBLIC_KEY_FILE,'form_row_l'), new CCol(new CTextBox('publickey',$publickey,16),'form_row_r')));
 		$row->setAttribute('id', 'row_publickey');
@@ -1934,11 +1944,14 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'row_password');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'password');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'row_password');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'password');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'row_password');
 
 		$spanEC = new CSpan(S_EXECUTED_SCRIPT);
 		$spanEC->setAttribute('id', 'label_executed_script');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'label_executed_script');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'label_executed_script');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'label_executed_script');
 
 		$spanP = new CSpan(S_PARAMS);
 		$spanP->setAttribute('id', 'label_params');
@@ -1966,6 +1979,8 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'row_params');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'params_script');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'row_params');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'params_script');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'row_params');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_DB_MONITOR, 'params_dbmonitor');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_DB_MONITOR, 'row_params');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_CALCULATED, 'params_calculted');
