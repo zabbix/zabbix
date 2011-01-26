@@ -49,8 +49,9 @@ class CWebCheck extends CZBXAPI{
 		);
 
 		$def_options = array(
+			'webcheckids'			=> null,
 			'nodeids'				=> null,
-			'applicationids'				=> null,
+			'applicationids'		=> null,
 			'hostids'				=> null,
 			'editable'				=> null,
 			'nopermissions'			=> null,
@@ -58,7 +59,7 @@ class CWebCheck extends CZBXAPI{
 			'filter'				=> null,
 			'search'				=> null,
 			'searchByAny'			=> null,
-			'startSearch'				=> null,
+			'startSearch'			=> null,
 			'exludeSearch'			=> null,
 
 // OutPut
@@ -106,6 +107,12 @@ class CWebCheck extends CZBXAPI{
 // nodeids
 		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
+// webcheckids
+		if(!is_null($options['webcheckids'])){
+			zbx_value2array($options['webcheckids']);
+
+			$sql_parts['where']['httptestid'] = DBcondition('ht.httptestid', $options['webcheckids']);
+		}
 // hostids
 		if(!is_null($options['hostids'])){
 			zbx_value2array($options['hostids']);
@@ -122,7 +129,6 @@ class CWebCheck extends CZBXAPI{
 				$sql_parts['group']['hostid'] = 'a.hostid';
 			}
 		}
-
 // applicationids
 		if(!is_null($options['applicationids'])){
 			zbx_value2array($options['applicationids']);
