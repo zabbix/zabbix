@@ -645,7 +645,7 @@
 	'S_SWITCHING_LDAP'=>			_('Switching LDAP authentication will reset all current sessions! Continue?'),
 
 //	Latest values
-	'S_NO_PERMISSIONS'=>			_('No permissions !'),
+	'S_NO_PERMISSIONS'=>			_('No permissions to refered object or it does not exist!'),
 	'S_LATEST_DATA_BIG'=>			_('LATEST DATA'),
 	'S_ALL_S'=>						_('All'),
 	'S_ALL_SMALL'=>					_('all'),
