@@ -277,8 +277,8 @@ include_once('include/page_header.php');
 		);
 		$mediatypes = CMediatype::get($options);
 
-// Check if media type are used by existing actions
 
+// Check if media type are used by existing actions
 		$options = array(
 			'mediatypeids' => zbx_objectValues($mediatypes, 'mediatypeid'),
 			'output' => API_OUTPUT_EXTEND,
@@ -286,17 +286,15 @@ include_once('include/page_header.php');
 		);
 		$actions = CAction::get($options);
 
-// Media types used for actions
-		$usedMediatypes = zbx_toHash($actions, 'mediatypeid');
+		foreach($actions as $actionid => $action){
+			if(!isset($mediatypes[$action['mediatypeid']]['listOfActions']))
+				$mediatypes[$action['mediatypeid']]['listOfActions'] = array();
+			$mediatypes[$action['mediatypeid']]['listOfActions'][] = array('actionid' => $actionid, 'name' => $action['name']);
+		}
 
 		foreach($mediatypes as $mnum => $mediatype){
 // !isset() for better default sorting
-			$mediatypes[$mnum]['usedInActions'] =  !isset($usedMediatypes[$mediatype['mediatypeid']]);
-		}
-
-		foreach($actions as $actionid => $action){
-			if(!isset($mediatypes[$action['mediatypeid']]['listOfActions']))	$mediatypes[$action['mediatypeid']]['listOfActions'] = array();
-			$mediatypes[$action['mediatypeid']]['listOfActions'][] = array('actionid' => $actionid,'name' => $action['name']);
+			$mediatypes[$mnum]['usedInActions'] = !isset($mediatype['listOfActions']);
 		}
 
 		order_result($mediatypes, $sortfield, $sortorder);
