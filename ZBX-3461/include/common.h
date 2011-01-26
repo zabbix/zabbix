@@ -632,6 +632,7 @@ const char	*zbx_permission_string(int perm);
 #define	ZBX_POLLER_TYPE_IPMI		2
 #define	ZBX_POLLER_TYPE_PINGER		3
 #define	ZBX_POLLER_TYPE_COUNT		4	/* number of poller types */
+const char	*zbx_poller_type_string(int poller_type);
 
 #define	GET_SENDER_TIMEOUT	60
 
@@ -776,13 +777,13 @@ int	str_in_list(const char *list, const char *value, char delimiter);
 #endif /* HAVE___VA_ARGS__ */
 void	__zbx_zbx_setproctitle(const char *fmt, ...);
 
-#define SEC_PER_MIN 60
-#define SEC_PER_HOUR 3600
-#define SEC_PER_DAY 86400
-#define SEC_PER_WEEK (7 * SEC_PER_DAY)
-#define SEC_PER_MONTH (30 * SEC_PER_DAY)
-#define SEC_PER_YEAR (365 * SEC_PER_DAY)
-#define ZBX_JAN_1970_IN_SEC   2208988800.0        /* 1970 - 1900 in seconds */
+#define SEC_PER_MIN		60
+#define SEC_PER_HOUR		3600
+#define SEC_PER_DAY		86400
+#define SEC_PER_WEEK		(7 * SEC_PER_DAY)
+#define SEC_PER_MONTH		(30 * SEC_PER_DAY)
+#define SEC_PER_YEAR		(365 * SEC_PER_DAY)
+#define ZBX_JAN_1970_IN_SEC	2208988800.0        /* 1970 - 1900 in seconds */
 double	zbx_time();
 double	zbx_current_time();
 

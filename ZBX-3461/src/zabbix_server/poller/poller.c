@@ -42,14 +42,12 @@
 #include "checks_telnet.h"
 #include "checks_calculated.h"
 
-#define MAX_NORMAL_ITEMS	64
-#define MAX_UNREACHABLE_ITEMS	1	/* must not be greater than MAX_NORMAL_ITEMS to avoid buffer overflow */
-
-AGENT_RESULT    result;
+#define MAX_REACHABLE_ITEMS	64
+#define MAX_UNREACHABLE_ITEMS	1	/* must not be greater than MAX_REACHABLE_ITEMS to avoid buffer overflow */
 
 static unsigned char	zbx_process;
-int			poller_type;
-int			poller_num;
+static int		poller_type;
+static int		poller_num;
 
 static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 {
@@ -159,7 +157,6 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 	return res;
 }
 
-/* Update special host's item - "status" */
 static void	update_key_status(zbx_uint64_t hostid, int host_status, time_t now)
 {
 	const char	*__function_name = "update_key_status";
@@ -182,92 +179,6 @@ static void	update_key_status(zbx_uint64_t hostid, int host_status, time_t now)
 	}
 
 	zbx_free(items);
-}
-
-static void	activate_host(DC_ITEM *item, int now)
-{
-	char		sql[MAX_STRING_LEN], error_msg[MAX_STRING_LEN];
-	int		offset = 0, *errors_from, *disable_until;
-	unsigned char	*available;
-	const char	*fld_errors_from, *fld_available, *fld_disable_until,
-			*fld_error, *type;
-
-	switch (item->type) {
-	case ITEM_TYPE_ZABBIX:
-		errors_from = &item->host.errors_from;
-		available = &item->host.available;
-		disable_until = &item->host.disable_until;
-
-		fld_errors_from = "errors_from";
-		fld_available = "available";
-		fld_disable_until = "disable_until";
-		fld_error = "error";
-		type = "Zabbix";
-		break;
-	case ITEM_TYPE_SNMPv1:
-	case ITEM_TYPE_SNMPv2c:
-	case ITEM_TYPE_SNMPv3:
-		errors_from = &item->host.snmp_errors_from;
-		available = &item->host.snmp_available;
-		disable_until = &item->host.snmp_disable_until;
-
-		fld_errors_from = "snmp_errors_from";
-		fld_available = "snmp_available";
-		fld_disable_until = "snmp_disable_until";
-		fld_error = "snmp_error";
-		type = "SNMP";
-		break;
-	case ITEM_TYPE_IPMI:
-		errors_from = &item->host.ipmi_errors_from;
-		available = &item->host.ipmi_available;
-		disable_until = &item->host.ipmi_disable_until;
-
-		fld_errors_from = "ipmi_errors_from";
-		fld_available = "ipmi_available";
-		fld_disable_until = "ipmi_disable_until";
-		fld_error = "ipmi_error";
-		type = "IPMI";
-		break;
-	default:
-		return;
-	}
-
-	if (0 == *errors_from && HOST_AVAILABLE_TRUE == *available)
-		return;
-
-	if (SUCCEED != DCconfig_activate_host(item))
-		return;
-
-	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "update hosts set ");
-
-	if (HOST_AVAILABLE_TRUE != *available)
-	{
-		zbx_snprintf(error_msg, sizeof(error_msg), "Enabling %s host [%s]",
-				type, item->host.host);
-
-		zabbix_log(LOG_LEVEL_WARNING, "%s", error_msg);
-		zabbix_syslog("%s", error_msg);
-
-		*available = HOST_AVAILABLE_TRUE;
-		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s=%d,",
-				fld_available, *available);
-
-		if (available == &item->host.available)
-			update_key_status(item->host.hostid, HOST_STATUS_MONITORED, now); /* 0 */
-	}
-
-	*errors_from = 0;
-	*disable_until = 0;
-	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
-			"%s=%d,%s=%d,%s='' where hostid=" ZBX_FS_UI64,
-			fld_errors_from, *errors_from,
-			fld_disable_until, *disable_until,
-			fld_error,
-			item->host.hostid);
-
-	DBbegin();
-	DBexecute("%s", sql);
-	DBcommit();
 }
 
 static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, int now, char *reason)
@@ -314,52 +225,138 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, int now, char
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+static void	activate_host(DC_ITEM *item, int now)
+{
+	char		sql[MAX_STRING_LEN], error_msg[MAX_STRING_LEN];
+	int		offset = 0, *errors_from, *disable_until;
+	unsigned char	*available;
+	const char	*fld_errors_from, *fld_available, *fld_disable_until, *fld_error, *type;
+
+	switch (item->type)
+	{
+		case ITEM_TYPE_ZABBIX:
+			errors_from = &item->host.errors_from;
+			available = &item->host.available;
+			disable_until = &item->host.disable_until;
+
+			fld_errors_from = "errors_from";
+			fld_available = "available";
+			fld_disable_until = "disable_until";
+			fld_error = "error";
+			type = "Zabbix";
+			break;
+		case ITEM_TYPE_SNMPv1:
+		case ITEM_TYPE_SNMPv2c:
+		case ITEM_TYPE_SNMPv3:
+			errors_from = &item->host.snmp_errors_from;
+			available = &item->host.snmp_available;
+			disable_until = &item->host.snmp_disable_until;
+
+			fld_errors_from = "snmp_errors_from";
+			fld_available = "snmp_available";
+			fld_disable_until = "snmp_disable_until";
+			fld_error = "snmp_error";
+			type = "SNMP";
+			break;
+		case ITEM_TYPE_IPMI:
+			errors_from = &item->host.ipmi_errors_from;
+			available = &item->host.ipmi_available;
+			disable_until = &item->host.ipmi_disable_until;
+
+			fld_errors_from = "ipmi_errors_from";
+			fld_available = "ipmi_available";
+			fld_disable_until = "ipmi_disable_until";
+			fld_error = "ipmi_error";
+			type = "IPMI";
+			break;
+		default:
+			return;
+	}
+
+	if (0 == *errors_from && HOST_AVAILABLE_TRUE == *available)
+		return;
+
+	if (SUCCEED != DCconfig_activate_host(item))
+		return;
+
+	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "update hosts set ");
+
+	if (HOST_AVAILABLE_TRUE != *available)
+	{
+		zbx_snprintf(error_msg, sizeof(error_msg), "Enabling %s host [%s]",
+				type, item->host.host);
+
+		zabbix_log(LOG_LEVEL_WARNING, "%s", error_msg);
+		zabbix_syslog("%s", error_msg);
+
+		*available = HOST_AVAILABLE_TRUE;
+		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s=%d,",
+				fld_available, *available);
+
+		if (available == &item->host.available)
+			update_key_status(item->host.hostid, HOST_STATUS_MONITORED, now); /* 0 */
+	}
+
+	*errors_from = 0;
+	*disable_until = 0;
+	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
+			"%s=%d,%s=%d,%s='' where hostid=" ZBX_FS_UI64,
+			fld_errors_from, *errors_from,
+			fld_disable_until, *disable_until,
+			fld_error,
+			item->host.hostid);
+
+	DBbegin();
+	DBexecute("%s", sql);
+	DBcommit();
+}
+
 static void	deactivate_host(DC_ITEM *item, int now, const char *error)
 {
 	char		sql[MAX_STRING_LEN], *error_esc, error_msg[MAX_STRING_LEN];
 	int		offset = 0, *errors_from, *disable_until;
 	unsigned char	*available;
-	const char	*fld_errors_from, *fld_available, *fld_disable_until,
-			*fld_error, *type;
+	const char	*fld_errors_from, *fld_available, *fld_disable_until, *fld_error, *type;
 
-	switch (item->type) {
-	case ITEM_TYPE_ZABBIX:
-		errors_from = &item->host.errors_from;
-		available = &item->host.available;
-		disable_until = &item->host.disable_until;
+	switch (item->type)
+	{
+		case ITEM_TYPE_ZABBIX:
+			errors_from = &item->host.errors_from;
+			available = &item->host.available;
+			disable_until = &item->host.disable_until;
 
-		fld_errors_from = "errors_from";
-		fld_available = "available";
-		fld_disable_until = "disable_until";
-		fld_error = "error";
-		type = "Zabbix";
-		break;
-	case ITEM_TYPE_SNMPv1:
-	case ITEM_TYPE_SNMPv2c:
-	case ITEM_TYPE_SNMPv3:
-		errors_from = &item->host.snmp_errors_from;
-		available = &item->host.snmp_available;
-		disable_until = &item->host.snmp_disable_until;
+			fld_errors_from = "errors_from";
+			fld_available = "available";
+			fld_disable_until = "disable_until";
+			fld_error = "error";
+			type = "Zabbix";
+			break;
+		case ITEM_TYPE_SNMPv1:
+		case ITEM_TYPE_SNMPv2c:
+		case ITEM_TYPE_SNMPv3:
+			errors_from = &item->host.snmp_errors_from;
+			available = &item->host.snmp_available;
+			disable_until = &item->host.snmp_disable_until;
 
-		fld_errors_from = "snmp_errors_from";
-		fld_available = "snmp_available";
-		fld_disable_until = "snmp_disable_until";
-		fld_error = "snmp_error";
-		type = "SNMP";
-		break;
-	case ITEM_TYPE_IPMI:
-		errors_from = &item->host.ipmi_errors_from;
-		available = &item->host.ipmi_available;
-		disable_until = &item->host.ipmi_disable_until;
+			fld_errors_from = "snmp_errors_from";
+			fld_available = "snmp_available";
+			fld_disable_until = "snmp_disable_until";
+			fld_error = "snmp_error";
+			type = "SNMP";
+			break;
+		case ITEM_TYPE_IPMI:
+			errors_from = &item->host.ipmi_errors_from;
+			available = &item->host.ipmi_available;
+			disable_until = &item->host.ipmi_disable_until;
 
-		fld_errors_from = "ipmi_errors_from";
-		fld_available = "ipmi_available";
-		fld_disable_until = "ipmi_disable_until";
-		fld_error = "ipmi_error";
-		type = "IPMI";
-		break;
-	default:
-		return;
+			fld_errors_from = "ipmi_errors_from";
+			fld_available = "ipmi_available";
+			fld_disable_until = "ipmi_disable_until";
+			fld_error = "ipmi_error";
+			type = "IPMI";
+			break;
+		default:
+			return;
 	}
 
 	if (SUCCEED != DCconfig_deactivate_host(item, now))
@@ -449,7 +446,7 @@ static void	deactivate_host(DC_ITEM *item, int now, const char *error)
 static int	get_values()
 {
 	const char	*__function_name = "get_values";
-	DC_ITEM		items[MAX_NORMAL_ITEMS];
+	DC_ITEM		items[MAX_REACHABLE_ITEMS];
 	AGENT_RESULT	agent;
 	zbx_uint64_t	*ids = NULL, *snmpids = NULL, *ipmiids = NULL;
 	int		ids_alloc = 0, snmpids_alloc = 0, ipmiids_alloc = 0,
@@ -465,8 +462,8 @@ static int	get_values()
 
 	DCinit_nextchecks();
 
-	num = DCconfig_get_poller_items(poller_type, items, ZBX_POLLER_TYPE_NORMAL == poller_type
-								? MAX_NORMAL_ITEMS : MAX_UNREACHABLE_ITEMS);
+	num = DCconfig_get_poller_items(poller_type, items, ZBX_POLLER_TYPE_UNREACHABLE != poller_type
+								? MAX_REACHABLE_ITEMS : MAX_UNREACHABLE_ITEMS);
 
 	for (i = 0; i < num; i++)
 	{
@@ -720,8 +717,7 @@ void	main_poller_loop(unsigned char p, int type, int num)
 
 	for (;;)
 	{
-		zbx_setproctitle("poller %s[getting values]",
-				ZBX_POLLER_TYPE_NORMAL == poller_type ? "" : "for unreachable hosts ");
+		zbx_setproctitle("%s [getting values]", zbx_poller_type_string(poller_type));
 
 		sec = zbx_time();
 		processed = get_values();
@@ -738,15 +734,14 @@ void	main_poller_loop(unsigned char p, int type, int num)
 				sleeptime = POLLER_DELAY;
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Poller %s#%d spent " ZBX_FS_DBL " seconds while updating %3d values."
+		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while updating %d values."
 				" Sleeping for %d seconds",
-				ZBX_POLLER_TYPE_NORMAL == poller_type ? "" : "for unreachable hosts ", poller_num,
-				sec, processed, sleeptime);
+				zbx_poller_type_string(poller_type), poller_num, sec, processed, sleeptime);
 
 		if (sleeptime > 0)
 		{
-			zbx_setproctitle("poller %s[sleeping for %d seconds]",
-					ZBX_POLLER_TYPE_NORMAL == poller_type ? "" : "for unreachable hosts ", sleeptime);
+			zbx_setproctitle("%s [sleeping for %d seconds]",
+					zbx_poller_type_string(poller_type), sleeptime);
 			sleep(sleeptime);
 		}
 	}
