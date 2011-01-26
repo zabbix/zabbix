@@ -860,11 +860,20 @@ class zbxXML{
 
 						// did host use impi? if so, adding another interface of "ipmi" type
 						if(isset($host_db['useipmi']) && $host_db['useipmi']){
+							// when saving host in 1.8, it's possible to set use_ipmi=1 and not to fill an IP address
+							//  we were not really sure what to do with this host, and decided to take host ip address instead and show info message about this
+							if ($host_db['ipmi_ip'] == ''){
+								$impi_ip = $host_db['ip'];
+								info(_s('Host "%s" has "use_ipmi" parameter checked, but has no "impi_ip" parameter! Using host ip address as an address for impi interface.', $host_db['host']));
+							}
+							else{
+								$impi_ip = $host_db['ipmi_ip'];
+							}
 							$host_db['interfaces'][] = array(
 								'main' => INTERFACE_SECONDARY,
 								'type' => INTERFACE_TYPE_IPMI,
 								'useip' => INTERFACE_USE_IP,
-								'ip' =>  $host_db['ipmi_ip'],
+								'ip' =>  $impi_ip,
 								'dns' => '',
 								'port' => $host_db['ipmi_port']
 							);
@@ -931,6 +940,7 @@ class zbxXML{
 					//   we can tell API that, by adding interfaceid to interface parameters
 					if($current_host && isset($current_host['interfaces'])){
 
+						$matched_interfaces = array();
 						// for every interface we got based on XML
 						for($i = 0; $i < count($host_db['interfaces']); $i++){
 							// checking every interface of current host
@@ -946,8 +956,16 @@ class zbxXML{
 								){
 									// this interface is the same as existing one!
 									$host_db['interfaces'][$i]['interfaceid'] = $interface['interfaceid'];
+									$matched_interfaces[] = $interface['interfaceid'];
 									break;
 								}
+							}
+						}
+
+						// if host had another interfaces, we are not touching them: they remain as is
+						foreach($current_host['interfaces'] as $interface){
+							if (!in_array($interface['interfaceid'], $matched_interfaces)){
+								$host_db['interfaces'][] = $interface;
 							}
 						}
 
@@ -1070,6 +1088,8 @@ class zbxXML{
 						if(empty($proxy_exists))
 							$host_db['proxy_hostid'] = 0;
 					}
+
+					//sdi($host_db);
 
 
 

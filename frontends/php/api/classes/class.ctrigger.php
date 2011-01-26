@@ -1196,7 +1196,7 @@ COpt::memoryPick();
 				$expressionData = parseTriggerExpressions($trigger['expression'], true);
 
 				if(isset($expressionData[$trigger['expression']]['errors'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData[$trigger['expression']]['errors']);
+					self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData[$trigger['expression']]['errors'][0]['errorMsg']);
 				}
 
 				if(CTrigger::exists(array(
