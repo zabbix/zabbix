@@ -2681,6 +2681,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 		if((isset($_REQUEST['triggerid']) && !isset($_REQUEST['form_refresh']))  || isset($limited)){
 			$description	= $trigger['description'];
+
 			$expression	= explode_exp($trigger['expression'],0);
 
 			if(!isset($limited) || !isset($_REQUEST['form_refresh'])){
@@ -2857,7 +2858,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 						//make all links inside inactive
 						for($i = 0; $i < count($e['list']); $i++){
 							if(gettype($e['list'][$i]) == 'object' && get_class($e['list'][$i]) == 'CSpan' && $e['list'][$i]->getAttribute('class') == 'link'){
-								$e['list'][$i]->setClass('');
+								$e['list'][$i]->removeAttribute('class');
 								$e['list'][$i]->setAttribute('onclick', '');
 							}
 						}

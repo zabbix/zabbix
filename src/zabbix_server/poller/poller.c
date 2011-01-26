@@ -136,7 +136,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 
 	if (SUCCEED != res && GET_MSG_RESULT(result))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] error: %s",
+		zabbix_log(LOG_LEVEL_DEBUG, "Item [%s:%s] error: %s",
 				item->host.host, item->key_orig, result->msg);
 		zabbix_syslog("Item [%s:%s] error: %s",
 				item->host.host, item->key_orig, result->msg);
