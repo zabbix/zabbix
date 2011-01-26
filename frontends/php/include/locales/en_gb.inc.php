@@ -102,6 +102,7 @@
 	'S_CONFIGURATION_OF_DISCOVERY'=>	'Configuration of discovery',
 	'S_CONFIGURATION_OF_DISCOVERY_BIG'=>	'CONFIGURATION OF DISCOVERY',
 	'S_NO_DISCOVERY_RULES_DEFINED'=>	'No discovery rules defined',
+	'S_NO_DISCOVERY_CHECKS_DEFINED'=>	'No discovery checks defined',
 	'S_IP_RANGE'=>				'IP range',
 	'S_CHECKS'=>				'Checks',
 	'S_CREATE_RULE'=>			'Create rule',
