@@ -61,7 +61,7 @@
 				'M' => $metrics		/* metrcis */
 			     )
 	);
-	
+
 	$param1_sec = array(
 			array(
 				'C' => S_LAST_OF.' (T)',	/* caption */
@@ -266,6 +266,27 @@
 
 	check_fields($fields);
 
+
+
+	if($_REQUEST['expression'] && $_REQUEST['dstfld1'] == 'expr_temp'){
+		preg_match('/\{([a-zA-Z_0-9-]+):(.*)\.([a-z]+)\(([0-9]+)([,]{0,1})([0-9]{0,})\)\}([=><#]{1})([0-9]+)/', $_REQUEST['expression'], $match);
+		if($match[3] && $match[7]) $_REQUEST['expr_type'] = $match[3].'['.$match[7].']';
+		if($match[4] && $match[6]) $_REQUEST['param'] = array($match[4], $match[6]);
+		if($match[4]) $_REQUEST['paramtype'] = 0;
+		if($match[8]) $_REQUEST['value'] = $match[8];
+
+		if($match[1] && $match[2]){
+			$_REQUEST['description'] = $match[1] .':'. $match[2];
+			$options = array(
+				'output' => API_OUTPUT_SHORTEN,
+			);
+			$myItem = CItem::getObjects(array('host' => $match[1], 'key_' => $match[2]));
+			$myItem = reset($myItem);
+			if(isset($myItem['itemid'])) $_REQUEST['itemid'] = $myItem['itemid'];
+		}
+	}
+
+
 	$expr_type	= get_request('expr_type', 'last[=]');
 	if(preg_match('/^([a-z]+)\[(['.implode('',array_keys($operators)).'])\]$/i', $expr_type, $expr_res)){
 		$function = $expr_res[1];
@@ -273,20 +294,19 @@
 
 		if(!isset($functions[$function])) unset($function);
 	}
-	
-	
+
 	$dstfrm = get_request('dstfrm', 0);
 	$dstfld1 = get_request('dstfld1', '');
 	$itemid = get_request('itemid', 0);
 	$value = get_request('value', 0);
 	$param = get_request('param', 0);
 	$paramtype = get_request('paramtype');
-	
+
 	if(!isset($function)) $function = 'last';
 	if(!isset($functions[$function]['operators'][$operator])) $operator = '=';
 
 	$expr_type = $function.'['.$operator.']';
-	
+
 	if($itemid){
 		$options = array(
 			'output' => API_OUTPUT_EXTEND,
@@ -300,7 +320,7 @@
 
 		$item_host = reset($item_data['hosts']);
 		$item_host = $item_host['host'];
-		
+
 		$description = $item_host.':'.item_description($item_data);
 	}
 	else{
@@ -309,14 +329,14 @@
 
 
 	if(is_null($paramtype) && isset($functions[$function]['params']['M'])){
-		$paramtype = is_array($functions[$function]['params']['M'])  
+		$paramtype = is_array($functions[$function]['params']['M'])
 				? reset($functions[$function]['params']['M'])
 				: $functions[$function]['params']['M'];
 	}
 	else if(is_null($paramtype)){
 		$paramtype = PARAM_TYPE_SECONDS;
 	}
-		
+
 	if(!is_array($param)){
 		if(isset($functions[$function]['params'])){
 			$param = explode(',', $param, count($functions[$function]['params']));
