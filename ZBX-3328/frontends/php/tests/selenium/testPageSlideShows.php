@@ -128,7 +128,7 @@ class testPageSlideShows extends CWebTest
 		$sql="select * from slides where slideshowid=$slideshowid";
 		$this->assertEquals(0,DBcount($sql));
 
-		DBrestore_tables(array('slides','slideshows'));
+		DBrestore_tables(array('slideshows','slides'));
 	}
 
 	public function testPageSlideShows_Sorting()

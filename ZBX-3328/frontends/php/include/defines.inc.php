@@ -50,12 +50,10 @@
 	define('ZBX_UNITS_ROUNDOFF_UPPER_LIMIT', 2);
 	define('ZBX_UNITS_ROUNDOFF_LOWER_LIMIT', 6);
 
-// this define made for partitioned DB installs!!
+// for partitioned DB installs!!
 	define('ZBX_HISTORY_DATA_UPKEEP',		-1); // in days; -1: disabled, 0: always use trends
 
 /* END OF USERS DEFINES */
-	define('ZAPCAT_COMPATIBILITY', false);
-
 	define('ZBX_FLAG_DISCOVERY_NORMAL', 0x0);
 	define('ZBX_FLAG_DISCOVERY', 0x1);
 	define('ZBX_FLAG_DISCOVERY_CHILD', 0x2);
@@ -82,6 +80,12 @@
 	define('ZBX_AUTH_LDAP',		1);
 	define('ZBX_AUTH_HTTP',		2);
 
+	define('ZBX_DB_DB2',		'IBM_DB2');
+	define('ZBX_DB_MYSQL',		'MYSQL');
+	define('ZBX_DB_ORACLE',		'ORACLE');
+	define('ZBX_DB_POSTGRESQL',		'POSTGRESQL');
+	define('ZBX_DB_SQLITE3',		'SQLITE3');
+
 	define('PAGE_TYPE_HTML',			0);
 	define('PAGE_TYPE_IMAGE',			1);
 	define('PAGE_TYPE_XML',				2);
@@ -92,6 +96,7 @@
 	define('PAGE_TYPE_JSON_RPC',		7);	// api call
 	define('PAGE_TYPE_TEXT_FILE',		8);	// api call
 	define('PAGE_TYPE_TEXT',			9); // simple text
+	define('PAGE_TYPE_CSV',				10); // CSV format
 
 
 	define('ZBX_SESSION_ACTIVE',		0);
@@ -689,7 +694,7 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	// define('ZBX_PREG_ITEM_KEY_FORMAT', '('.ZBX_PREG_KEY_NAME.'(\['.ZBX_PREG_PARAMS.'\]){0,1})');
 
 
-	define('ZBX_PREG_FUNCTION_FORMAT', '('.ZBX_PREG_INTERNAL_NAMES.'(\('.ZBX_PREG_PARAMS.'\)))');
+	define('ZBX_PREG_FUNCTION_FORMAT', '([a-z]+(\('.ZBX_PREG_PARAMS.'\)))');
 
 	define('ZBX_PREG_SIMPLE_EXPRESSION_FORMAT','(\{'.ZBX_PREG_HOST_FORMAT.'\:'.ZBX_PREG_ITEM_KEY_FORMAT.'\.'.ZBX_PREG_FUNCTION_FORMAT.'\})');
 	define('ZBX_PREG_MACRO_NAME_FORMAT', '(\{[A-Z\.]+\})');

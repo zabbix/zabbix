@@ -311,8 +311,8 @@
 
 		$result = CItem::create($db_tmp_item);
 
-		return $result;
-	}
+	return $result;
+}
 
 	function copyItems($srcid, $destid){
 		$result = true;
@@ -657,7 +657,7 @@
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
 
 // COpt::profiling_start('prepare_data');
-		$result = DBselect('SELECT DISTINCT h.hostid, h.host,i.itemid, i.key_, i.value_type, i.lastvalue, i.units, '.
+		$result = DBselect('SELECT DISTINCT h.hostid, h.host,i.itemid, i.key_, i.value_type, i.lastvalue, i.units, i.lastclock,'.
 				' i.description, t.priority, i.valuemapid, t.value as tr_value, t.triggerid '.
 			' FROM hosts h, items i '.
 				' LEFT JOIN functions f on f.itemid=i.itemid '.
@@ -694,6 +694,7 @@
 					'itemid'	=> $row['itemid'],
 					'value_type'=> $row['value_type'],
 					'lastvalue'	=> $row['lastvalue'],
+					'lastclock'	=> $row['lastclock'],
 					'units'		=> $row['units'],
 					'description'=> $row['description'],
 					'valuemapid' => $row['valuemapid'],
@@ -920,31 +921,30 @@
 	}
 
 	function format_lastvalue($db_item){
-		if(isset($db_item["lastvalue"]) && $db_item["lastclock"] != 0){
-			if($db_item["value_type"] == ITEM_VALUE_TYPE_FLOAT){
-				$lastvalue=convert_units($db_item["lastvalue"],$db_item["units"]);
-			}
-			else if($db_item["value_type"] == ITEM_VALUE_TYPE_UINT64){
-				$lastvalue=convert_units($db_item["lastvalue"],$db_item["units"]);
-			}
-			else if($db_item["value_type"] == ITEM_VALUE_TYPE_STR ||
-					$db_item["value_type"] == ITEM_VALUE_TYPE_TEXT ||
-					$db_item["value_type"] == ITEM_VALUE_TYPE_LOG){
-				$lastvalue=$db_item["lastvalue"];
-				if(zbx_strlen($lastvalue) > 20)
-					$lastvalue = zbx_substr($lastvalue,0,20)." ...";
-				$lastvalue = nbsp(htmlspecialchars($lastvalue));
-			}
-			else{
-				$lastvalue=S_UNKNOWN_VALUE_TYPE;
-			}
-			if($db_item["valuemapid"] > 0);
-				$lastvalue = replace_value_by_map($lastvalue, $db_item["valuemapid"]);
+		if(!isset($db_item["lastvalue"]) || ($db_item["lastclock"] == 0)){
+			return '-';
+		}
 
+		if(($db_item["value_type"] == ITEM_VALUE_TYPE_FLOAT) ||
+				($db_item["value_type"] == ITEM_VALUE_TYPE_UINT64))
+		{
+			$lastvalue=convert_units($db_item["lastvalue"],$db_item["units"]);
+		}
+		else if($db_item["value_type"] == ITEM_VALUE_TYPE_STR ||
+				$db_item["value_type"] == ITEM_VALUE_TYPE_TEXT ||
+				$db_item["value_type"] == ITEM_VALUE_TYPE_LOG)
+		{
+			$lastvalue = $db_item["lastvalue"];
+			if(zbx_strlen($lastvalue) > 20)
+				$lastvalue = zbx_substr($lastvalue,0,20)." ...";
+			$lastvalue = nbsp(htmlspecialchars($lastvalue));
 		}
 		else{
-			$lastvalue = "-";
+			$lastvalue=S_UNKNOWN_VALUE_TYPE;
 		}
+		if($db_item["valuemapid"] > 0);
+			$lastvalue = replace_value_by_map($lastvalue, $db_item["valuemapid"]);
+
 	return $lastvalue;
 	}
 
@@ -1303,29 +1303,29 @@
 	}
 
 
-	/**
-	 * Check item key and return info about an error if one is present
-	 *
-	 * @param string $key item key, e.g. system.run[cat /etc/passwd | awk -F: '{ print $1 }']
-	 * @return array
-	 *
-	 */
+/**
+ * Check item key and return info about an error if one is present
+ *
+ * @param string $key item key, e.g. system.run[cat /etc/passwd | awk -F: '{ print $1 }']
+ * @return array
+ *
+ */
 	function check_item_key($key){
 		$key_strlen = zbx_strlen($key);
 
 		//empty string
 		if($key_strlen == 0){
 			return array(
-				false,   //is key valid?
-				_("Key cannot be empty") //result description
+				'valid' => false,   //is key valid?
+				'description' => _("Key cannot be empty") //result description
 			);
 		}
 
 		//key is larger then 255 chars
 		if($key_strlen > 255){
 			return array(
-				false,   //is key valid?
-				sprintf(_("Key is too large: maximum %d characters"), 255) //result description
+				'valid' => false,   //is key valid?
+				'description' => sprintf(_("Key is too large: maximum %d characters"), 255) //result description
 			);
 		}
 
@@ -1346,12 +1346,12 @@
 		//no function specified?
 		if ($current_char == $key_strlen) {
 			return array(
-				true,   //is key valid?
-				_("Key is valid") //result description
+				'valid' => true,   //is key valid?
+				'description' => _("Key is valid") //result description
 			);
 		}
 		//function with parameter, e.g. system.run[...]
-		elseif($characters[$current_char] == '[') {
+		else if($characters[$current_char] == '[') {
 
 			$state = 0; //0 - initial, 1 - inside quoted param, 2 - inside unquoted param
 			$nest_level = 0;
@@ -1365,19 +1365,19 @@
 							//do nothing
 						}
 						//Zapcat: '][' is treated as ','
-						elseif($characters[$i] == ']' && isset($characters[$i+1]) && $characters[$i+1] == '[' && $nest_level == 0) {
+						else if($characters[$i] == ']' && isset($characters[$i+1]) && $characters[$i+1] == '[' && $nest_level == 0) {
 							$i++;
 						}
 						//entering quotes
-						elseif($characters[$i] == '"') {
+						else if($characters[$i] == '"') {
 							$state = 1;
 						}
 						//next nesting level
-						elseif($characters[$i] == '[') {
+						else if($characters[$i] == '[') {
 							$nest_level++;
 						}
 						//one of the nested sets ended
-						elseif($characters[$i] == ']' && $nest_level != 0) {
+						else if($characters[$i] == ']' && $nest_level != 0) {
 							$nest_level--;
 							//skipping spaces
 							while(isset($characters[$i+1]) && $characters[$i+1] == ' ') {
@@ -1386,34 +1386,34 @@
 							//all nestings are closed correctly
 							if ($nest_level == 0 && isset($characters[$i+1]) && $characters[$i+1] == ']' && !isset($characters[$i+2])) {
 								return array(
-									true,   //is key valid?
-									_("Key is valid") //result description
+									'valid' => true,   //is key valid?
+									'description' => _("Key is valid") //result description
 								);
 							}
 
 							if((!isset($characters[$i+1]) || $characters[$i+1] != ',')
 								&& !($nest_level !=0 && isset($characters[$i+1]) && $characters[$i+1] == ']')) {
 								return array(
-									false,   //is key valid?
-									sprintf(_('incorrect syntax near \'%1$s\' at position %2$d'), $characters[$current_char], $current_char) //result description
+									'valid' => false,   //is key valid?
+									'description' => sprintf(_('incorrect syntax near \'%1$s\' at position %2$d'), $characters[$current_char], $current_char) //result description
 								);
 							}
 						}
-						elseif($characters[$i] == ']' && $nest_level == 0) {
+						else if($characters[$i] == ']' && $nest_level == 0) {
 							if (isset($characters[$i+1])){
 								return array(
-									false,   //is key valid?
-									sprintf(_('incorrect usage of bracket symbols. \'%s\' found after final bracket.'), $characters[$i+1]) //result description
+									'valid' => false,   //is key valid?
+									'description' => sprintf(_('incorrect usage of bracket symbols. \'%s\' found after final bracket.'), $characters[$i+1]) //result description
 								);
 							}
 							else {
 								return array(
-									true,   //is key valid?
-									_("Key is valid") //result description
+									'valid' => true,   //is key valid?
+									'description' => _("Key is valid") //result description
 								);
 							}
 						}
-						elseif($characters[$i] != ' ') {
+						else if($characters[$i] != ' ') {
 							$state = 2;
 						}
 
@@ -1422,31 +1422,28 @@
 					//quoted
 					case 1:
 						//ending quote is reached
-						if($characters[$i] == '"')
-						{
+						if($characters[$i] == '"'){
 							//skipping spaces
 							while(isset($characters[$i+1]) && $characters[$i+1] == ' ') {
 								$i++;
 							}
 
 							//Zapcat
-							if ($nest_level == 0 && isset($characters[$i+1]) && isset($characters[$i+2]) && $characters[$i+1] == ']' && $characters[$i+2] == '[')
-							{
+							if($nest_level == 0 && isset($characters[$i+1]) && isset($characters[$i+2]) && $characters[$i+1] == ']' && $characters[$i+2] == '['){
 								$state = 0;
 								break;
 							}
 
-							if ($nest_level == 0 && isset($characters[$i+1]) && $characters[$i+1] == ']' && !isset($characters[$i+2]))
-							{
+							if ($nest_level == 0 && isset($characters[$i+1]) && $characters[$i+1] == ']' && !isset($characters[$i+2])){
 								return array(
-									true,   //is key valid?
-									_("Key is valid") //result description
+									'valid' => true,   //is key valid?
+									'description' => _("Key is valid") //result description
 								);
 							}
-							elseif($nest_level == 0 && $characters[$i+1] == ']' && isset($characters[$i+2])){
+							else if($nest_level == 0 && $characters[$i+1] == ']' && isset($characters[$i+2])){
 								return array(
-									false,   //is key valid?
-									sprintf(_('incorrect usage of bracket symbols. \'%s\' found after final bracket.'), $characters[$i+2]) //result description
+									'valid' => false,   //is key valid?
+									'description' => sprintf(_('incorrect usage of bracket symbols. \'%s\' found after final bracket.'), $characters[$i+2]) //result description
 								);
 							}
 
@@ -1454,15 +1451,15 @@
 								&& !($nest_level != 0 && isset($characters[$i+1]) && $characters[$i+1] == ']'))
 							{
 								return array(
-									false,   //is key valid?
-									sprintf(_('incorrect syntax near \'%1$s\' at position %2$d'), $characters[$current_char], $current_char) //result description
+									'valid' => false,   //is key valid?
+									'description' => sprintf(_('incorrect syntax near \'%1$s\' at position %2$d'), $characters[$current_char], $current_char) //result description
 								);
 							}
 
 							$state = 0;
 						}
 						//escaped quote (\")
-						elseif($characters[$i] == '\\' && isset($characters[$i+1]) && $characters[$i+1] == '"') {
+						else if($characters[$i] == '\\' && isset($characters[$i+1]) && $characters[$i+1] == '"') {
 							$i++;
 						}
 
@@ -1471,26 +1468,25 @@
 					//unquoted
 					case 2:
 						//Zapcat
-						if($nest_level == 0 && $characters[$i] == ']' && isset($characters[$i+1]) && $characters[$i+1] =='[' )
-						{
+						if($nest_level == 0 && $characters[$i] == ']' && isset($characters[$i+1]) && $characters[$i+1] =='[' ){
 							$i--;
 							$state = 0;
 						}
-						elseif($characters[$i] == ',' || ($characters[$i] == ']' && $nest_level != 0)) {
+						else if($characters[$i] == ',' || ($characters[$i] == ']' && $nest_level != 0)) {
 							$i--;
 							$state = 0;
 						}
-						elseif($characters[$i] == ']' && $nest_level == 0) {
+						else if($characters[$i] == ']' && $nest_level == 0) {
 							if (isset($characters[$i+1])){
 								return array(
-									false,   //is key valid?
-									sprintf(_('incorrect usage of bracket symbols. \'%s\' found after final bracket.'), $characters[$i+1]) //result description
+									'valid' => false,   //is key valid?
+									'description' => sprintf(_('incorrect usage of bracket symbols. \'%s\' found after final bracket.'), $characters[$i+1]) //result description
 								);
 							}
 							else {
 								return array(
-									true,   //is key valid?
-									_("Key is valid") //result description
+									'valid' => true,   //is key valid?
+									'description' => _("Key is valid") //result description
 								);
 							}
 						}
@@ -1499,15 +1495,15 @@
 			}
 
 			return array(
-				false,   //is key valid?
-				_('Invalid key format') //result description
+				'valid' => false,   //is key valid?
+				'description' => _('Invalid key format') //result description
 			);
 
 		}
 		else {
 			return array(
-				false,   //is key valid?
-				sprintf(_('invalid character \'%1$s\' at position %2$d'), $characters[$current_char], $current_char) //result description
+				'valid' => false,   //is key valid?
+				'description' => sprintf(_('invalid character \'%1$s\' at position %2$d'), $characters[$current_char], $current_char) //result description
 			);
 		}
 

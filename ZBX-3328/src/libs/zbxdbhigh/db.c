@@ -1073,7 +1073,7 @@ int	DBremove_escalation(zbx_uint64_t escalationid)
  *           and 'DBdyn_escape_string_len'                                    *
  *                                                                            *
  ******************************************************************************/
-int	DBget_escape_string_len(const char *src)
+static int	DBget_escape_string_len(const char *src)
 {
 	const char	*s;
 	int		len = 0;
@@ -1115,7 +1115,7 @@ int	DBget_escape_string_len(const char *src)
  *           and 'DBdyn_escape_string_len'                                    *
  *                                                                            *
  ******************************************************************************/
-void	DBescape_string(const char *src, char *dst, int len)
+static void	DBescape_string(const char *src, char *dst, int len)
 {
 	const char	*s;
 	char		*d;
@@ -1248,7 +1248,7 @@ char	*DBdyn_escape_string_len(const char *src, int max_src_len)
  * Comments: sync changes with 'DBescape_like_pattern'                        *
  *                                                                            *
  ******************************************************************************/
-int	DBget_escape_like_pattern_len(const char *src)
+static int	DBget_escape_like_pattern_len(const char *src)
 {
 	int		len;
 	const char	*s;
@@ -1297,7 +1297,7 @@ int	DBget_escape_like_pattern_len(const char *src)
  *           Hence '!' instead of backslash.                                  *
  *                                                                            *
  ******************************************************************************/
-void	DBescape_like_pattern(const char *src, char *dst, int len)
+static void	DBescape_like_pattern(const char *src, char *dst, int len)
 {
 	char		*d;
 	char		*tmp = NULL;

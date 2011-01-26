@@ -85,7 +85,7 @@ class testPageScreens extends CWebTest
 
 		$this->login('screenconf.php');
 		$this->assertTitle('Configuration of screens');
-		$this->click("xpath=//a[contains(@href,'?form=update&screenid=$screenid&sid=')]");
+		$this->href_click("?form=update&screenid=$screenid&sid=");
 		$this->wait();
 
 		$this->assertTitle('Configuration of screens');

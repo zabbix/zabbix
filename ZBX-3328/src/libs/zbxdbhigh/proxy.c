@@ -111,18 +111,28 @@ int	get_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, ch
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		host_esc[MAX_STRING_LEN];
+	char		*host_esc;
 	int		ret = FAIL;
 
 	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, HOST_HOST_LEN_MAX))
 	{
-		DBescape_string(host, host_esc, sizeof(host_esc));
+		if (FAIL == zbx_check_hostname(host))
+		{
+			zbx_snprintf(error, error_max_len, "proxy name [%s] contains invalid characters", host);
+			return ret;
+		}
 
-		result = DBselect("select hostid from hosts where host='%s'"
-				" and status in (%d)" DB_NODE,
-				host_esc,
-				HOST_STATUS_PROXY_ACTIVE,
-				DBnode_local("hostid"));
+		host_esc = DBdyn_escape_string(host);
+
+		result = DBselect(
+				"select hostid"
+				" from hosts"
+				" where host='%s'"
+					" and status in (%d)"
+					DB_NODE,
+				host_esc, HOST_STATUS_PROXY_ACTIVE, DBnode_local("hostid"));
+
+		zbx_free(host_esc);
 
 		if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
 		{
@@ -1376,6 +1386,8 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 				if (ITEM_VALUE_TYPE_LOG == item.value_type)
 					calc_timestamp(values[i].value, &values[i].timestamp, item.logtimefmt);
 
+				if (NULL != values[i].source)
+					zbx_replace_invalid_utf8(values[i].source);
 				dc_add_history(item.itemid, item.value_type, item.flags, &agent, &values[i].ts,
 						values[i].timestamp, values[i].source, values[i].severity,
 						values[i].logeventid, values[i].lastlogsize, values[i].mtime);
@@ -1385,7 +1397,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 			}
 			else if (GET_MSG_RESULT(&agent))
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] error: %s",
+				zabbix_log(LOG_LEVEL_DEBUG, "Item [%s:%s] error: %s",
 						item.host.host, item.key_orig, agent.msg);
 				DCadd_nextcheck(item.itemid, (time_t)values[i].ts.sec, agent.msg);
 			}

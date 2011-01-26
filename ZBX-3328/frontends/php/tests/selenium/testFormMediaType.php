@@ -29,6 +29,22 @@ class testFormMediaType extends CWebTest
 		return DBdata('select * from media_type');
 	}
 
+	// Data for media type creation
+	public static function newMediaTypes()
+	{
+		$data=array(
+			array('Email', array('Description'=>'Email2','SMTP server'=>'mail.zabbix.com',
+				'SMTP helo'=>'zabbix.com','SMTP email'=>'zabbix@zabbix.com')),
+			array('Email',array('Description'=>'Email3','SMTP server'=>'mail2.zabbix.com',
+				'SMTP helo'=>'zabbix.com','SMTP email'=>'zabbix2@zabbix.com')),
+			array('Script',array('Description'=>'Skype message','Script'=>'/usr/local/bin/skype.sh')),
+			array('Script',array('Description'=>'Skype message2','Script'=>'/usr/local/bin/skyp2.sh')),
+			array('SMS',array('Description'=>'Direct SMS messaging','GSM modem'=>'/dev/ttyS3')),
+			array('Jabber',array('Description'=>'Jabber messages','Jabber identifier'=>'zabbix@jabber.com','Password'=>'Secret password')),
+		);
+		return $data;
+	}
+
 	public function testFormMediaType_SimpleTest()
 	{
 		$this->login('media_types.php');
@@ -46,6 +62,61 @@ class testFormMediaType extends CWebTest
 		$this->wait();
 
 		$this->assertTitle('Media types');
+	}
+
+	/**
+	* @dataProvider newMediaTypes
+	*/
+	public function testFormMediaType_Create($type,$data)
+	{
+		$this->login('media_types.php');
+		$this->assertTitle('Media types');
+		$this->button_click('form');
+		$this->wait();
+
+		switch($type) {
+			case 'Email':
+				$this->dropdown_select('type',$type);
+				$this->input_type('description',$data['Description']);
+				$this->input_type('smtp_server',$data['SMTP server']);
+				$this->input_type('smtp_helo',$data['SMTP helo']);
+				$this->input_type('smtp_email',$data['SMTP email']);
+			break;
+			case 'Script':
+				$this->dropdown_select('type',$type);
+				$this->wait();
+				$this->input_type('description',$data['Description']);
+				$this->input_type('exec_path',$data['Script']);
+			break;
+			case 'SMS':
+				$this->dropdown_select('type',$type);
+				$this->wait();
+				$this->input_type('description',$data['Description']);
+				$this->input_type('gsm_modem',$data['GSM modem']);
+			break;
+			case 'Jabber':
+				$this->dropdown_select('type',$type);
+				$this->wait();
+				$this->input_type('description',$data['Description']);
+				$this->input_type('username',$data['Jabber identifier']);
+				$this->input_type('password',$data['Password']);
+			break;
+			case 'Ez Texting':
+				$this->dropdown_select('type',$type);
+				$this->wait();
+				$this->input_type('description',$data['Description']);
+				$this->input_type('username',$data['Username']);
+				$this->input_type('password',$data['Password']);
+			break;
+		}
+
+		$this->click('save');
+		$this->wait();
+
+		$this->assertTitle('Media types');
+		$this->nok('ERROR');
+		$this->ok($data['Description']);
+		$this->ok('CONFIGURATION OF MEDIA TYPES');
 	}
 
 	/**
@@ -79,7 +150,6 @@ class testFormMediaType extends CWebTest
 		$name=$mediatype['description'];
 		$id=$mediatype['mediatypeid'];
 
-		$row=DBfetch(DBselect("select count(*) as cnt from media_type where mediatypeid=$id"));
 		$row=DBfetch(DBselect("select count(*) as cnt from operations where mediatypeid=$id"));
 		$used_by_operations = ($row['cnt'] > 0);
 

@@ -63,10 +63,14 @@ function DBsave_tables($tables)
 	foreach($tables as $table)
 	{
 		switch($DB['TYPE']) {
-		case 'MYSQL':
+		case ZBX_DB_MYSQL:
 			DBexecute("drop table if exists ${table}_tmp");
 			DBexecute("create table ${table}_tmp like $table");
 			DBexecute("insert into ${table}_tmp select * from $table");
+			break;
+		case ZBX_DB_SQLITE3:
+			DBexecute("drop table if exists ${table}_tmp");
+			DBexecute("create table if not exists ${table}_tmp as select * from ${table}");
 			break;
 		default:
 			DBexecute("drop table if exists ${table}_tmp");
@@ -120,12 +124,23 @@ function DBhash($sql)
 /**
  * Returns number of records in database result.
  */
-function DBcount($sql)
+function DBcount($sql,$limit = null,$offset = null)
 {
 	global $DB;
 	$cnt=0;
 
-	$result=DBselect($sql);
+	if(isset($limit) && isset($offset))
+	{
+		$result=DBselect($sql,$limit,$offset);
+	}
+	else if(isset($limit))
+	{
+		$result=DBselect($sql,$limit);
+	}
+	else
+	{
+		$result=DBselect($sql);
+	}
 	while($row = DBfetch($result))
 	{
 		$cnt++;
