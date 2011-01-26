@@ -815,6 +815,7 @@ COpt::memoryPick();
 //------
 
 			$operationsCreate = $operationsUpdate = $operationidsDelete = array();
+			$conditionsCreate = $conditionsUpdate = $conditionidsDelete = array();
 			foreach($actions as $anum => $action){
 // Existance
 				$options = array(
@@ -830,35 +831,35 @@ COpt::memoryPick();
 				}
 //----
 
-				$conditions_db = isset($upd_actions[$action['actionid']]['conditions'])
-						? $upd_actions[$action['actionid']]['conditions']
-						: array();
-				if(!isset($action['conditions'])) $action['conditions'] = array();
+				if(isset($action['conditions'])){
+					$conditions_db = isset($upd_actions[$action['actionid']]['conditions'])
+							? $upd_actions[$action['actionid']]['conditions']
+							: array();
 
-				$conditionsCreate = $conditionsUpdate = $conditionidsDelete = array();
-				self::validateConditions($action['conditions']);
+					self::validateConditions($action['conditions']);
 
-				foreach($action['conditions'] as $condition){
-					$condition['actionid'] = $action['actionid'];
+					foreach($action['conditions'] as $condition){
+						$condition['actionid'] = $action['actionid'];
 
-					if(!isset($condition['conditionid'])){
-						$conditionsCreate[] = $condition;
+						if(!isset($condition['conditionid'])){
+							$conditionsCreate[] = $condition;
+						}
+						else if(isset($conditions_db[$condition['conditionid']])){
+							$conditionsUpdate[] = $condition;
+							unset($conditions_db[$condition['conditionid']]);
+						}
+						else{
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect conditionid'));
+						}
 					}
-					else if(isset($conditions_db[$condition['conditionid']])){
-						$conditionsUpdate[] = $condition;
-						unset($conditions_db[$condition['conditionid']]);
-					}
-					else{
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect conditionid'));
-					}
+
+					$conditionidsDelete = array_merge($conditionidsDelete, array_keys($conditions_db));
 				}
 
-				$conditionidsDelete = array_merge($conditionidsDelete, array_keys($conditions_db));
-
-				if(!isset($action['operations']) || empty($action['operations'])){
+				if(isset($action['operations']) && empty($action['operations'])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action [%s] no operations defined.', $action['name']));
 				}
-				else{
+				else if(isset($action['operations'])){
 					self::validateOperations($action['operations']);
 
 					$operations_db = $upd_actions[$action['actionid']]['operations'];
