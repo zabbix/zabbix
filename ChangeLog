@@ -2,6 +2,7 @@
 Changes for 1.9.2
 
 New features:
+ - [ZBXNEXT-634] added information about usage of media types for actions in the list of media types (Alexei)
  - [ZBXNEXT-602] Export events to CSV (Vlad,Aly)
  - [ZBXNEXT-623] restored support of SQLite3 for use with Zabbix Server and front-end (Alexei)
  - [ZBX-1357] updated Dutch translation; thanks to qix (Richlv)
