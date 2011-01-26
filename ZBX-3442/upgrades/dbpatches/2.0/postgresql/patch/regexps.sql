@@ -1,1 +1,0 @@
-ALTER TABLE ONLY regexps ALTER regexpid DROP DEFAULT;
