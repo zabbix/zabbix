@@ -14,6 +14,7 @@ New features:
  - [ZBX-3338] updated Ukrainian translation; thanks to zalex_ua (Richlv)
 
 Bug fixes:
+ - [ZBX-1819] fixed templated listed twice for graphs if host filter is set to all (Vedmak)
  - [ZBX-3442] fixed gui config "first selected" and "event ack" dropdowns (Vedmak)
  - [ZBX-3329] fixed shown last value as "0" in frontend for items that have never been updated (Aly)
  - [ZBX-3436] added missing "Primary POC Screen Name" to Inventory->Hosts (KB)
