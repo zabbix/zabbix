@@ -105,8 +105,8 @@ if(!defined('PAGE_HEADER_LOADED'))
 		$ZBX_CONFIG['allowed_db']['IBM_DB2'] = 'IBM DB2';
 	}
 
-// SQLITE3
-	if(class_exists('SQLite3') && zbx_is_callable(array('ftok', 'sem_acquire', 'sem_release', 'sem_get'))){
+// SQLITE3. The false is here to avoid autoloading of the class.
+	if(class_exists('SQLite3', false) && zbx_is_callable(array('ftok', 'sem_acquire', 'sem_release', 'sem_get'))){
 		$ZBX_CONFIG['allowed_db']['SQLITE3'] = 'SQLite3';
 	}
 
