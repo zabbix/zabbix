@@ -24,6 +24,7 @@
 #include "db.h"
 #include "log.h"
 #include "zlog.h"
+#include "zbxexec.h"
 #include "../poller/checks_ipmi.h"
 
 /******************************************************************************
@@ -78,18 +79,15 @@ static char	*get_command_by_scriptid(zbx_uint64_t scriptid)
  ******************************************************************************/
 static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, char **result)
 {
-	char		*p, buffer[MAX_STRING_LEN],
-			*command;
-	int		result_alloc = 256, result_offset = 0,
-			ret = FAIL;
-	FILE		*f;
+	char		*p,
+			*command, error[MAX_STRING_LEN];
+	int		ret = FAIL;
 	DC_HOST		host;
 #ifdef HAVE_OPENIPMI
 	DB_RESULT	db_result;
 	DB_ROW		db_row;
 	DC_ITEM		item;
 	int		val;
-	char		error[MAX_STRING_LEN];
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In execute_script() scriptid:" ZBX_FS_UI64
@@ -176,22 +174,13 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, char **res
 	else
 	{
 #endif
-		if(0 != (f = popen(p, "r")))
-		{
-			*result = zbx_malloc(*result, result_alloc);
-			**result = '\0';
+		alarm(CONFIG_TRAPPER_TIMEOUT);
 
-			while (NULL != fgets(buffer, sizeof(buffer), f))
-				zbx_snprintf_alloc(result, &result_alloc, &result_offset,
-						strlen(buffer) + 1, "%s", buffer);
-
-			pclose(f);
-
-			ret = SUCCEED;
-		}
-		else
+		if (SUCCEED != (ret = zbx_execute(p, result, error, sizeof(error))))
 			*result = zbx_dsprintf(*result, "NODE %d: Cannot execute command: %s",
-					CONFIG_NODEID, strerror(errno));
+					CONFIG_NODEID, error);
+
+		alarm(0);
 #ifdef HAVE_OPENIPMI
 	}
 #endif
