@@ -518,7 +518,13 @@ Copt::memoryPick();
 			}
 
 			if(($interface['useip'] == INTERFACE_USE_DNS) && zbx_empty($interface['dns'])){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface with IP " %1$s " can not have empty DNS name.', $interface['ip']));
+				$dbHosts = CHost::get(array(
+					'output' => array('host'),
+					'hostids' => zbx_objectValues($interface, 'hostid'),
+					'editable' => 1,
+					'preservekeys' => 1
+				));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface with IP "%1$s" can not have empty DNS name while having "use DSN" property on host "%2$s".', $interface['ip'], $dbHosts[$interface['hostid']]['host']));
 			}
 
 			if(isset($interface['dns']) && !zbx_empty($interface['dns'])){
