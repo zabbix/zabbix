@@ -526,8 +526,8 @@ COpt::memoryPick();
 			}
 
 			$options = array(
-				'filter' => array( 'name' => $duplicates ),
-				'output' => API_OUTPUT_SHORTEN,
+				'filter' => array('name' => $duplicates),
+				'output' => API_OUTPUT_EXTEND,
 				'editable' => 1,
 				'nopermissions' => 1
 			);

@@ -1,6 +1,8 @@
 Changes for 1.8.5rc1
 
  - [ZBX-3446] added timeout handler for external scripts (Sasha)
+ - [ZBX-1690] fixed undefined index when create action with name that already exist (Vedmak)
+ - [ZBX-3461] fixed names of IPMI pollers in debug output and the number of items they take (asaveljevs)
  - [ZBX-3100] fixed messages in popup when no proxies or discovery checks defined (Vedmak)
  - [ZBX-3138] fixed bug when disabling application, webitems were disabled too (Vedmak)
  - [ZBX-2951] made interval hidden for trapper items (Vedmak)
