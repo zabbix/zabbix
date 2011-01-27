@@ -1,5 +1,12 @@
 Changes for 1.8.5rc1
 
+ - [ZBX-3461] fixed names of IPMI pollers in debug output and the number of items they take (asaveljevs)
+ - [ZBX-3100] fixed messages in popup when no proxies or discovery checks defined (Vedmak)
+ - [ZBX-3138] fixed bug when disabling application, webitems were disabled too (Vedmak)
+ - [ZBX-2951] made interval hidden for trapper items (Vedmak)
+ - [ZBX-2867] changed order of "Discovery" and "IT services" in configuration menu (Vemdak)
+ - [ZBX-3460] forbid saving host with enabled ipmi but without ipmi address (Vedmak)
+ - [ZBX-3047] fixed zapcat compatibility for trigger expressions (Aly,Sasha,asaveljevs)
  - [ZBX-2912] added check for valid UTF-8 characters in the incoming data (Sasha)
  - [ZBX-1346] add more user parameter examples (Richlv)
  - [ZBX-2922] changed log level from warning to debug for some messages (Sasha)
@@ -24,7 +31,7 @@ Changes for 1.8.5rc1
  - [ZBXNEXT-614] add Slovak translation; thanks to Marcel Hecko (Richlv)
  - [ZBX-2914] add Ubuntu upstart files; thanks to S. Canchon (Richlv)
  - [ZBX-3381] negative multipliers for items with value type "numeric (float)" are now allowed (KB)
- - [ZBX-1357] updated Japanese translation (Richlv)
+ - [ZBX-1357,ZBX-3462] updated Japanese translation; thanks to Kodai Terashima (Richlv)
  - [ZBX-3385] fixed trigger status change record in audit log (Vedmak)
  - [ZBX-2825] make profiles form redirect to the last visited page on save or cancel (Vlad)
  - [ZBX-3383] fixed error in audit log when filter by Macro or Template (Vedmak)

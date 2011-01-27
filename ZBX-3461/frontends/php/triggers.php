@@ -155,61 +155,65 @@ include_once('include/page_header.php');
 	else if(isset($_REQUEST['save'])){
 		show_messages();
 
-		if(!check_right_on_trigger_by_expression(PERM_READ_WRITE, $_REQUEST['expression']))
-			access_deny();
-
-		$status = isset($_REQUEST['status'])?TRIGGER_STATUS_DISABLED:TRIGGER_STATUS_ENABLED;
-
-		$deps = get_request('dependencies',array());
-
-		if(isset($_REQUEST['triggerid'])){
-			$triggerData = get_trigger_by_triggerid($_REQUEST['triggerid']);
-			if($triggerData['templateid']){
-				$_REQUEST['description'] = $triggerData['description'];
-				$_REQUEST['expression'] = explode_exp($triggerData['expression'],0);
-			}
-
-			$current_deps = get_trigger_dependencies_by_triggerid($_REQUEST['triggerid']);
-			sort($deps);
-			sort($current_deps);
-			if($deps == $current_deps){
-				$deps = null;
-			}
-
-			$type = get_request('type');
-			$priority = get_request('priority');
-			$comments = get_request('comments');
-			$url = get_request('url');
-
-			if($triggerData['type'] == $_REQUEST['type']) $type = null;
-			if($triggerData['priority'] == $_REQUEST['priority']) $priority = null;
-			if(strcmp($triggerData['comments'], $_REQUEST['comments']) == 0) $comments = null;
-			if(strcmp($triggerData['url'], $_REQUEST['url']) == 0) $url = null;
-			if($triggerData['status'] == $status) $status = null;
-
-			DBstart();
-
-			$result = update_trigger($_REQUEST['triggerid'],
-				$_REQUEST['expression'],$_REQUEST['description'],$type,
-				$priority,$status,$comments,$url,
-				$deps, $triggerData['templateid']);
-			$result = DBend($result);
-
-			$triggerid = $_REQUEST['triggerid'];
-
-			show_messages($result, S_TRIGGER_UPDATED, S_CANNOT_UPDATE_TRIGGER);
+		if(!check_right_on_trigger_by_expression(PERM_READ_WRITE, $_REQUEST['expression'])){
+			if(isset($_REQUEST['triggerid']))
+				show_messages(false, null, S_CANNOT_UPDATE_TRIGGER);
+			else
+				show_messages(false, null, S_CANNOT_ADD_TRIGGER);
 		}
 		else{
-			DBstart();
-			$triggerid = add_trigger($_REQUEST['expression'],$_REQUEST['description'],$_REQUEST['type'],
-				$_REQUEST['priority'],$status,$_REQUEST['comments'],$_REQUEST['url'],
-				$deps);
-			$result = DBend($triggerid);
-			show_messages($result, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
-			if($result) $_REQUEST['triggerid'] = $triggerid;
+			$status = isset($_REQUEST['status'])?TRIGGER_STATUS_DISABLED:TRIGGER_STATUS_ENABLED;
+			$deps = get_request('dependencies',array());
+
+			if(isset($_REQUEST['triggerid'])){
+				$triggerData = get_trigger_by_triggerid($_REQUEST['triggerid']);
+				if($triggerData['templateid']){
+					$_REQUEST['description'] = $triggerData['description'];
+					$_REQUEST['expression'] = explode_exp($triggerData['expression'],0);
+				}
+
+				$current_deps = get_trigger_dependencies_by_triggerid($_REQUEST['triggerid']);
+				sort($deps);
+				sort($current_deps);
+				if($deps == $current_deps){
+					$deps = null;
+				}
+
+				$type = get_request('type');
+				$priority = get_request('priority');
+				$comments = get_request('comments');
+				$url = get_request('url');
+				if($triggerData['type'] == $_REQUEST['type']) $type = null;
+				if($triggerData['priority'] == $_REQUEST['priority']) $priority = null;
+				if(strcmp($triggerData['comments'], $_REQUEST['comments']) == 0) $comments = null;
+				if(strcmp($triggerData['url'], $_REQUEST['url']) == 0) $url = null;
+				if($triggerData['status'] == $status) $status = null;
+
+				DBstart();
+
+				$result = update_trigger($_REQUEST['triggerid'],
+					$_REQUEST['expression'],$_REQUEST['description'],$type,
+					$priority,$status,$comments,$url,
+					$deps, $triggerData['templateid']);
+				$result = DBend($result);
+
+				$triggerid = $_REQUEST['triggerid'];
+
+				show_messages($result, S_TRIGGER_UPDATED, S_CANNOT_UPDATE_TRIGGER);
+			}
+			else {
+				DBstart();
+				$triggerid = add_trigger($_REQUEST['expression'],$_REQUEST['description'],$_REQUEST['type'],
+					$_REQUEST['priority'],$status,$_REQUEST['comments'],$_REQUEST['url'],
+					$deps);
+				$result = DBend($triggerid);
+				show_messages($result, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
+				if($result) $_REQUEST['triggerid'] = $triggerid;
+			}
+
+			if($result)
+				unset($_REQUEST['form']);
 		}
-		if($result)
-			unset($_REQUEST['form']);
 	}
 	else if(isset($_REQUEST['delete'])&&isset($_REQUEST['triggerid'])){
 		$result = false;
