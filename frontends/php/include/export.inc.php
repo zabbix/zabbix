@@ -754,7 +754,7 @@ class zbxXML{
 					$result = CMap::update($importMap);
 					$sysmapids = $result['sysmapids'];
 
-// Deleteing all selements (with links)
+// Deleting all selements (with links)
 					$db_selementids = array();
 					$res = DBselect('SELECT selementid FROM sysmaps_elements WHERE sysmapid='.$sysmap['sysmapid']);
 					while($db_selement = DBfetch($res)){
@@ -864,7 +864,7 @@ class zbxXML{
 							//  we were not really sure what to do with this host, and decided to take host ip address instead and show info message about this
 							if ($host_db['ipmi_ip'] == ''){
 								$ipmi_ip = $host_db['ip'];
-								info(_s('Host "%s" has "use_ipmi" parameter checked, but has no "ipmi_ip" parameter! Using host ip address as an address for ipmi interface.', $host_db['host']));
+								info(_s('Host "%s" has "use_ipmi" parameter checked, but has no "ipmi_ip" parameter! Using host IP address as an address for IPMI interface.', $host_db['host']));
 							}
 							else{
 								$ipmi_ip = $host_db['ipmi_ip'];
