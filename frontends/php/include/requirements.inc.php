@@ -257,8 +257,8 @@
 			$current[] = BR();
 		}
 
-// Semaphore related functions are checked elsewhere
-		if(class_exists('SQLite3')){
+// Semaphore related functions are checked elsewhere. The 'false' is to prevent autoloading of the SQLite3 class.
+		if(class_exists('SQLite3', false)){
 			$current[] = 'SQLite3';
 			$current[] = BR();
 		}

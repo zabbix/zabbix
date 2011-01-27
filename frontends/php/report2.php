@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,45 +19,46 @@
 **/
 ?>
 <?php
+
 require_once('include/config.inc.php');
 require_once('include/hosts.inc.php');
 require_once('include/reports.inc.php');
 
-$page['title']	= 'S_AVAILABILITY_REPORT';
-$page['file']	= 'report2.php';
+$page['title'] = 'S_AVAILABILITY_REPORT';
+$page['file'] = 'report2.php';
 $page['hist_arg'] = array('config', 'groupid', 'hostid', 'tpl_triggerid');
 $page['scripts'] = array('class.calendar.js', 'effects.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 include_once('include/page_header.php');
-
 ?>
 <?php
+
 //		VAR				TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	$fields=array(
-		'config'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
-		'filter_groupid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,			NULL),
-		'hostgroupid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,			NULL),
-		'filter_hostid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,			NULL),
-		'tpl_triggerid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,			NULL),
-		'triggerid'=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,		NULL),
+	$fields = array(
+		'config' => array(T_ZBX_INT, O_OPT, P_SYS, IN('0,1'), NULL),
+		'filter_groupid' => array(T_ZBX_INT, O_OPT, P_SYS, DB_ID, NULL),
+		'hostgroupid' => array(T_ZBX_INT, O_OPT, P_SYS, DB_ID, NULL),
+		'filter_hostid' => array(T_ZBX_INT, O_OPT, P_SYS, DB_ID, NULL),
+		'tpl_triggerid' => array(T_ZBX_INT, O_OPT, P_SYS, DB_ID, NULL),
+		'triggerid' => array(T_ZBX_INT, O_OPT, P_SYS | P_NZERO, DB_ID, NULL),
 // filter
-		'filter_rst'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
-		'filter_set'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
-		'filter_timesince'=>	array(T_ZBX_STR, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
-		'filter_timetill'=>		array(T_ZBX_STR, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
+		'filter_rst' => array(T_ZBX_INT, O_OPT, P_SYS, IN(array(0, 1)), NULL),
+		'filter_set' => array(T_ZBX_STR, O_OPT, P_SYS, null, NULL),
+		'filter_timesince' => array(T_ZBX_STR, O_OPT, P_UNSET_EMPTY, null, NULL),
+		'filter_timetill' => array(T_ZBX_STR, O_OPT, P_UNSET_EMPTY, null, NULL),
 //ajax
-		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,		'isset({favobj})'),
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,		'isset({favobj}) && ("filter"=={favobj})'),
+		'favobj' => array(T_ZBX_STR, O_OPT, P_ACT, NULL, NULL),
+		'favref' => array(T_ZBX_STR, O_OPT, P_ACT, NOT_EMPTY, 'isset({favobj})'),
+		'state' => array(T_ZBX_INT, O_OPT, P_ACT, NOT_EMPTY, 'isset({favobj}) && ("filter"=={favobj})'),
 	);
 
 	check_fields($fields);
 
-/* AJAX */
+// AJAX
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
-			CProfile::update('web.avail_report.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.avail_report.filter.state', $_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 	}
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
@@ -66,7 +67,7 @@ include_once('include/page_header.php');
 	}
 
 //--------
-/* FILTER */
+// FILTER
 	if(isset($_REQUEST['filter_rst'])){
 		$_REQUEST['filter_groupid'] = 0;
 		$_REQUEST['filter_hostid'] = 0;
@@ -104,19 +105,24 @@ include_once('include/page_header.php');
 	$params = array();
 	$options = array('allow_all_hosts', 'with_items');
 
-	if(0 == $config) array_push($options, 'monitored_hosts');
-	else array_push($options, 'templated_hosts');
+	if(0 == $config)
+		array_push($options, 'monitored_hosts');
+	else
+		array_push($options, 'templated_hosts');
 
-	if(!$ZBX_WITH_ALL_NODES)	array_push($options,'only_current_node');
-	foreach($options as $option) $params[$option] = 1;
+	if(!$ZBX_WITH_ALL_NODES) array_push($options, 'only_current_node');
+
+	foreach($options as $option)
+		$params[$option] = 1;
 
 	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
 	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
 
-	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
-//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
+	validate_group_with_host($PAGE_GROUPS, $PAGE_HOSTS);
+// SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
 ?>
 <?php
+
 	$rep2_wdgt = new CWidget();
 
 // HEADER
@@ -128,7 +134,7 @@ include_once('include/page_header.php');
 		$available_groups = get_accessible_groups_by_user($USER_DETAILS, PERM_READ_ONLY);
 
 		if($PAGE_HOSTS['selected'] != 0)
-			$PAGE_HOSTS['hostids'] = $available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+			$PAGE_HOSTS['hostids'] = $available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY);
 		else
 			$available_hosts = $PAGE_HOSTS['hostids'];
 	}
@@ -160,13 +166,13 @@ include_once('include/page_header.php');
 
 	if(isset($_REQUEST['triggerid'])){
 		$rep2_wdgt->addHeader(array(
-			new CLink($trigger_data['host'],'?filter_groupid='.$_REQUEST['groupid'].'&filter_hostid='.$trigger_data['hostid']),
+			new CLink($trigger_data['host'], '?filter_groupid=' . $_REQUEST['groupid'] . '&filter_hostid=' . $trigger_data['hostid']),
 			' : ',
 			expand_trigger_description_by_data($trigger_data)
-			),SPACE);
+				), SPACE);
 
-		$table = new CTableInfo(null,'graph');
-		$table->addRow(new CImg('chart4.php?triggerid='.$_REQUEST['triggerid']));
+		$table = new CTableInfo(null, 'graph');
+		$table->addRow(new CImg('chart4.php?triggerid=' . $_REQUEST['triggerid']));
 
 		$rep2_wdgt->addItem($table);
 		$rep2_wdgt->show();
@@ -176,59 +182,53 @@ include_once('include/page_header.php');
 		$r_form = new CForm();
 		$r_form->setMethod('get');
 
-		$cmbConf = new CComboBox('config',$config,'submit()');
+		$cmbConf = new CComboBox('config', $config, 'submit()');
 		$cmbConf->addItem(0, S_BY_HOST);
 		$cmbConf->addItem(1, S_BY_TRIGGER_TEMPLATE);
 		$r_form->addItem($cmbConf);
 
-		$rep2_wdgt->addHeader(S_REPORT_BIG, array(S_MODE.SPACE, $r_form));
-		//$rep2_wdgt->addItem(BR());
-
+		$rep2_wdgt->addHeader(S_REPORT_BIG, array(S_MODE . SPACE, $r_form));
 // FILTER
 		$filterForm = get_report2_filter($config, $PAGE_GROUPS, $PAGE_HOSTS);
 		$rep2_wdgt->addFlicker($filterForm, CProfile::get('web.avail_report.filter.state', 0));
 //-------
 
-		$sql_from = '';
-		$sql_where = '';
+		$options = array(
+			'output' => array('triggerid', 'description', 'expression', 'value'),
+			'expandDescription' => true,
+			'expandData' => true,
+			'monitored' => true,
+			'filter' => array()
+		);
 
 		if(0 == $config){
 			if($_REQUEST['groupid'] > 0){
-				$sql_from .= ',hosts_groups hg ';
-				$sql_where.= ' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid'];
+				$options['groupids'] = $_REQUEST['groupid'];
 			}
 
 			if($_REQUEST['hostid'] > 0){
-				$sql_where.= ' AND h.hostid='.$_REQUEST['hostid'];
+				$options['hostids'] = $_REQUEST['hostid'];
 			}
 		}
 		else{
 			if($_REQUEST['hostid'] > 0){
-				$sql_from.=',hosts_templates ht ';
-				$sql_where.=' AND ht.hostid=h.hostid AND ht.templateid='.$_REQUEST['hostid'];
+				$hosts = CHost::get(array('templateids' => $_REQUEST['hostid']));
+				$options['hostids'] = zbx_objectValues($hosts, 'hostid');
 			}
 
-			if(isset($_REQUEST['tpl_triggerid']) && ($_REQUEST['tpl_triggerid'] > 0))
-				$sql_where.= ' AND t.templateid='.$_REQUEST['tpl_triggerid'];
+			if(isset($_REQUEST['tpl_triggerid']) && ($_REQUEST['tpl_triggerid'] > 0)){
+				$options['filter']['templateid'] = $_REQUEST['tpl_triggerid'];
+			}
 		}
 
-		$sql = 'SELECT DISTINCT h.hostid,h.host,t.triggerid,t.expression,t.description,t.value '.
-			' FROM triggers t,hosts h,items i,functions f '.$sql_from.
-			' WHERE h.status='.HOST_STATUS_MONITORED.
-				' AND '.DBcondition('h.hostid',$available_hosts).
-				' AND i.hostid=h.hostid '.
-				' AND i.status='.ITEM_STATUS_ACTIVE.
-				' AND f.itemid=i.itemid '.
-				' AND t.triggerid=f.triggerid '.
-				' AND t.status='.TRIGGER_STATUS_ENABLED.
-				$sql_where.
-			' ORDER BY h.host, t.description';
-		$result = DBselect($sql);
+
+		$triggers = CTrigger::get($options);
+		morder_result($triggers, array('host', 'description'));
 
 		$table = new CTableInfo();
-		$table->setHeader(
-			array(is_show_all_nodes() ? S_NODE : null,
-			(($_REQUEST['hostid'] == 0) || (1 == $config))? S_HOST : NULL,
+		$table->setHeader(array(
+			is_show_all_nodes() ? S_NODE : null,
+			(($_REQUEST['hostid'] == 0) || (1 == $config)) ? S_HOST : NULL,
 			S_NAME,
 			S_PROBLEMS,
 			S_OK,
@@ -236,20 +236,18 @@ include_once('include/page_header.php');
 			S_GRAPH
 		));
 
-		while($row = DBfetch($result)){
-			if(!check_right_on_trigger_by_triggerid(null, $row['triggerid'])) continue;
+		foreach($triggers as $trigger){
+			$availability = calculate_availability($trigger['triggerid'], $_REQUEST['filter_timesince'], $_REQUEST['filter_timetill']);
 
-			$availability = calculate_availability($row['triggerid'], $_REQUEST['filter_timesince'], $_REQUEST['filter_timetill']);
-
-			$true	= new CSpan(sprintf('%.4f%%', $availability['true']), 'on');
-			$false	= new CSpan(sprintf('%.4f%%', $availability['false']), 'off');
-			$unknown= new CSpan(sprintf('%.4f%%', $availability['unknown']), 'unknown');
-			$actions= new CLink(S_SHOW, 'report2.php?filter_groupid='.$_REQUEST['groupid'].'&filter_hostid='.$_REQUEST['hostid'].'&triggerid='.$row['triggerid']);
+			$true = new CSpan(sprintf('%.4f%%', $availability['true']), 'on');
+			$false = new CSpan(sprintf('%.4f%%', $availability['false']), 'off');
+			$unknown = new CSpan(sprintf('%.4f%%', $availability['unknown']), 'unknown');
+			$actions = new CLink(S_SHOW, 'report2.php?filter_groupid=' . $_REQUEST['groupid'] . '&filter_hostid=' . $_REQUEST['hostid'] . '&triggerid=' . $trigger['triggerid']);
 
 			$table->addRow(array(
-				get_node_name_by_elid($row['hostid']),
-				(($_REQUEST['hostid'] == 0) || (1 == $config)) ? $row['host'] : NULL,
-				new CLink(expand_trigger_description_by_data($row), 'events.php?triggerid='.$row['triggerid']),
+				get_node_name_by_elid($trigger['hostid']),
+				(($_REQUEST['hostid'] == 0) || (1 == $config)) ? $trigger['host'] : NULL,
+				new CLink($trigger['description'], 'events.php?triggerid=' . $trigger['triggerid']),
 				$true,
 				$false,
 				$unknown,
@@ -262,7 +260,5 @@ include_once('include/page_header.php');
 	}
 ?>
 <?php
-
-include_once('include/page_footer.php');
-
+	include_once('include/page_footer.php');
 ?>

@@ -2,14 +2,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-14 09:28+0200\n"
+"POT-Creation-Date: 2011-01-25 14:27+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
+"Language: zh\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: zh\n"
 "X-Poedit-Country: CHINA\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Poedit-Basepath: ../../\n"
@@ -18,11 +18,11 @@ msgstr ""
 msgid " - all groups - "
 msgstr "- all groups -"
 
-#: include/locales/en_gb.inc.php:2456 include/locales/en_gb.inc.php:2458
+#: include/locales/en_gb.inc.php:2455 include/locales/en_gb.inc.php:2457
 msgid "\""
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2351
+#: include/locales/en_gb.inc.php:2350
 msgid "\" deleted from host"
 msgstr ""
 
@@ -35,11 +35,11 @@ msgstr ""
 msgid "&"
 msgstr "&"
 
-#: include/locales/en_gb.inc.php:2096
+#: include/locales/en_gb.inc.php:2095
 msgid "'"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2321
+#: include/locales/en_gb.inc.php:2320
 msgid "' does not accept parameters."
 msgstr ""
 
@@ -63,7 +63,7 @@ msgstr "- other -"
 msgid "----[BULK ACKNOWLEDGE]----"
 msgstr "----[BULK ACKNOWLEDGE]----"
 
-#: include/locales/en_gb.inc.php:2316
+#: include/locales/en_gb.inc.php:2315
 msgid "0 or 1"
 msgstr "0 或者 1"
 
@@ -119,11 +119,11 @@ msgstr "AND"
 msgid "AND / OR"
 msgstr "AND / OR"
 
-#: include/locales/en_gb.inc.php:1920
+#: include/locales/en_gb.inc.php:1919
 msgid "API access"
 msgstr "API访问"
 
-#: include/locales/en_gb.inc.php:1899
+#: include/locales/en_gb.inc.php:1898
 msgid "API access updated"
 msgstr "API access updated"
 
@@ -131,11 +131,11 @@ msgstr "API access updated"
 msgid "APPLICATIONS"
 msgstr "应用程序"
 
-#: include/locales/en_gb.inc.php:1997
+#: include/locales/en_gb.inc.php:1996
 msgid "AUDIT ACTIONS"
 msgstr "AUDIT ACTIONS"
 
-#: include/locales/en_gb.inc.php:1996
+#: include/locales/en_gb.inc.php:1995
 msgid "AUDIT LOGS"
 msgstr "审计日志"
 
@@ -143,15 +143,15 @@ msgstr "审计日志"
 msgid "AVAILABILITY REPORT"
 msgstr "系统可用性统计"
 
-#: include/locales/en_gb.inc.php:1729
+#: include/locales/en_gb.inc.php:1728
 msgid "Acceptable SLA (in %)"
 msgstr "可接受的 SLA (in %)"
 
-#: include/locales/en_gb.inc.php:2431
+#: include/locales/en_gb.inc.php:2430
 msgid "Account is blocked for"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1853
+#: include/locales/en_gb.inc.php:1852
 msgid "Ack"
 msgstr "Ack"
 
@@ -167,11 +167,11 @@ msgstr "Acknowledge added"
 msgid "Acknowledge alarm by"
 msgstr "Acknowledge alarm by"
 
-#: include/locales/en_gb.inc.php:1857
+#: include/locales/en_gb.inc.php:1856
 msgid "Acknowledge status"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1852
+#: include/locales/en_gb.inc.php:1851
 msgid "Acknowledged"
 msgstr "已确认"
 
@@ -179,7 +179,7 @@ msgstr "已确认"
 msgid "Acknowledges"
 msgstr "Acknowledges"
 
-#: include/locales/en_gb.inc.php:1998
+#: include/locales/en_gb.inc.php:1997
 msgid "Action"
 msgstr "操作"
 
@@ -219,7 +219,7 @@ msgstr "Actions since"
 msgid "Activate selected"
 msgstr "激活所选"
 
-#: include/locales/en_gb.inc.php:2129
+#: include/locales/en_gb.inc.php:2128
 msgid "Activate selected applications?"
 msgstr "激活所选的应用程序?"
 
@@ -239,11 +239,11 @@ msgstr "Active since"
 msgid "Active till"
 msgstr "Active till"
 
-#: include/locales/en_gb.inc.php:1833
+#: include/locales/en_gb.inc.php:1832
 msgid "Add"
 msgstr "添加"
 
-#: include/locales/en_gb.inc.php:2533
+#: include/locales/en_gb.inc.php:2532
 msgid "Add Service"
 msgstr ""
 
@@ -267,7 +267,7 @@ msgstr "添加链接"
 msgid "Add prototype"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1939
+#: include/locales/en_gb.inc.php:1938
 msgid "Add to"
 msgstr "添加至"
 
@@ -275,23 +275,23 @@ msgstr "添加至"
 msgid "Add to group"
 msgstr "添加到组"
 
-#: include/locales/en_gb.inc.php:2001
+#: include/locales/en_gb.inc.php:2000
 msgid "Added"
 msgstr "添加"
 
-#: include/locales/en_gb.inc.php:2242
+#: include/locales/en_gb.inc.php:2241
 msgid "Added host group"
 msgstr "Added host group"
 
-#: include/locales/en_gb.inc.php:2255
+#: include/locales/en_gb.inc.php:2254
 msgid "Added new application"
 msgstr "Added new application"
 
-#: include/locales/en_gb.inc.php:2248
+#: include/locales/en_gb.inc.php:2247
 msgid "Added new host"
 msgstr "Added new host"
 
-#: include/locales/en_gb.inc.php:2217
+#: include/locales/en_gb.inc.php:2216
 msgid "Added new item"
 msgstr "Added new item"
 
@@ -299,7 +299,7 @@ msgstr "Added new item"
 msgid "Added new media type"
 msgstr "Added new media type"
 
-#: include/locales/en_gb.inc.php:2305
+#: include/locales/en_gb.inc.php:2304
 msgid "Added trigger"
 msgstr "Added trigger"
 
@@ -319,7 +319,7 @@ msgstr "高级配置"
 msgid "Age"
 msgstr "Age"
 
-#: include/locales/en_gb.inc.php:1862
+#: include/locales/en_gb.inc.php:1861
 msgid "Age less than"
 msgstr ""
 
@@ -335,7 +335,7 @@ msgstr "Aggregated"
 msgid "Aggregated periods count"
 msgstr "Aggregated periods count"
 
-#: include/locales/en_gb.inc.php:1029 include/locales/en_gb.inc.php:1913
+#: include/locales/en_gb.inc.php:1029 include/locales/en_gb.inc.php:1912
 msgid "Alias"
 msgstr "Alias"
 
@@ -364,19 +364,19 @@ msgstr "所有节点"
 msgid "Allowed hosts"
 msgstr "Allowed hosts"
 
-#: include/locales/en_gb.inc.php:2238
+#: include/locales/en_gb.inc.php:2237
 msgid "An action type with description"
 msgstr "An action type with description"
 
-#: include/locales/en_gb.inc.php:2302
+#: include/locales/en_gb.inc.php:2301
 msgid "An item key must be used in trigger expression"
 msgstr "An item key must be used in trigger expression"
 
-#: include/locales/en_gb.inc.php:2214
+#: include/locales/en_gb.inc.php:2213
 msgid "An item with the Key"
 msgstr "An item with the Key"
 
-#: include/locales/en_gb.inc.php:1858
+#: include/locales/en_gb.inc.php:1857
 msgid "Any"
 msgstr ""
 
@@ -436,7 +436,7 @@ msgstr ""
 msgid "April"
 msgstr "April"
 
-#: include/locales/en_gb.inc.php:2102
+#: include/locales/en_gb.inc.php:2101
 msgid "Are you sure you want to delete"
 msgstr ""
 
@@ -460,11 +460,11 @@ msgstr "At"
 msgid "At least one host or group should be selected"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2317
+#: include/locales/en_gb.inc.php:2316
 msgid "At least one item must be present in the trigger expression."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1995
+#: include/locales/en_gb.inc.php:1994
 msgid "Audit"
 msgstr "审计"
 
@@ -480,7 +480,7 @@ msgstr "August"
 msgid "Authentication"
 msgstr "认证"
 
-#: include/forms/host.edit.php:510
+#: include/forms/host.edit.php:511
 msgid "Authentication algorithm"
 msgstr ""
 
@@ -496,11 +496,11 @@ msgstr "Zabbix 的认证方式"
 msgid "Auto registration"
 msgstr "Auto registration"
 
-#: include/locales/en_gb.inc.php:1933
+#: include/locales/en_gb.inc.php:1932
 msgid "Auto-login"
 msgstr "自动登录"
 
-#: include/locales/en_gb.inc.php:1934
+#: include/locales/en_gb.inc.php:1933
 msgid "Auto-logout (min 90 seconds)"
 msgstr "自动退出(90秒)"
 
@@ -524,7 +524,7 @@ msgstr "Average"
 msgid "Average by"
 msgstr "Average by"
 
-#: include/locales/en_gb.inc.php:1706
+#: include/locales/en_gb.inc.php:1705
 msgid "Average problem"
 msgstr "Average problem"
 
@@ -532,7 +532,7 @@ msgstr "Average problem"
 msgid "Axis side"
 msgstr "Axis side"
 
-#: include/locales/en_gb.inc.php:2165
+#: include/locales/en_gb.inc.php:2164
 msgid "B"
 msgstr "B"
 
@@ -576,7 +576,7 @@ msgstr "绑定密码"
 msgid "Black & Blue"
 msgstr "黑&蓝"
 
-#: include/locales/en_gb.inc.php:1947
+#: include/locales/en_gb.inc.php:1946
 msgid "Blocked"
 msgstr "Blocked"
 
@@ -672,7 +672,7 @@ msgstr "图表的配置"
 msgid "CONFIGURATION OF SCREENS"
 msgstr "用户显示图表配置"
 
-#: include/locales/en_gb.inc.php:1962
+#: include/locales/en_gb.inc.php:1961
 msgid "CONFIGURATION OF SCRIPTS"
 msgstr "脚本的配置"
 
@@ -688,11 +688,11 @@ msgstr "模板的配置"
 msgid "CONFIGURATION OF TRIGGER PROTOTYPES"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1775
+#: include/locales/en_gb.inc.php:1774
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "触发器配置"
 
-#: include/locales/en_gb.inc.php:1907
+#: include/locales/en_gb.inc.php:1906
 msgid "CONFIGURATION OF USERS AND USER GROUPS"
 msgstr "用户及用户组配置"
 
@@ -704,7 +704,7 @@ msgstr "WEB监控的配置"
 msgid "CONFIGURATION OF ZABBIX"
 msgstr "ZABBIX配置类型"
 
-#: include/locales/en_gb.inc.php:1728
+#: include/locales/en_gb.inc.php:1727
 msgid "Calculate SLA"
 msgstr "Calculate SLA"
 
@@ -716,7 +716,7 @@ msgstr "Calculated"
 msgid "Callback"
 msgstr "Callback"
 
-#: include/locales/en_gb.inc.php:2540
+#: include/locales/en_gb.inc.php:2539
 msgid "Can not create new element"
 msgstr ""
 
@@ -725,11 +725,11 @@ msgstr ""
 msgid "Can not delete %1$s internal user \" %2$s \", try disabling that user."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2539
+#: include/locales/en_gb.inc.php:2538
 msgid "Can not find objects with name"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2345
+#: include/locales/en_gb.inc.php:2344
 msgid "Can not use multiple host items for template graph"
 msgstr "Can not use multiple host items for template graph"
 
@@ -737,23 +737,23 @@ msgstr "Can not use multiple host items for template graph"
 msgid "Can't add group"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2467
+#: include/locales/en_gb.inc.php:2466
 msgid "Can't delete media types"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2448
+#: include/locales/en_gb.inc.php:2447
 msgid "Can't delete user medias"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2509
+#: include/locales/en_gb.inc.php:2508
 msgid "Can't format Tree"
 msgstr "Can't format Tree"
 
-#: include/locales/en_gb.inc.php:2469
+#: include/locales/en_gb.inc.php:2468
 msgid "Can't insert media types"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2450
+#: include/locales/en_gb.inc.php:2449
 msgid "Can't insert user medias"
 msgstr ""
 
@@ -761,7 +761,7 @@ msgstr ""
 msgid "Can't link template"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1988
+#: include/locales/en_gb.inc.php:1987
 msgid "Can't read script response, check connection"
 msgstr "无法读取脚本返回,请检查连接"
 
@@ -777,7 +777,7 @@ msgstr ""
 msgid "Can't remove macros"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1987
+#: include/locales/en_gb.inc.php:1986
 msgid "Can't send command, check connection"
 msgstr "无法发送命令,请检查连接"
 
@@ -789,11 +789,11 @@ msgstr ""
 msgid "Can't unlink template"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2468
+#: include/locales/en_gb.inc.php:2467
 msgid "Can't update media types"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2449
+#: include/locales/en_gb.inc.php:2448
 msgid "Can't update user medias"
 msgstr ""
 
@@ -827,7 +827,7 @@ msgstr "无法添加自动发现的规则"
 msgid "Cannot add graph"
 msgstr "无法添加图表"
 
-#: api/classes/class.chost.php:1727 include/locales/en_gb.inc.php:1882
+#: api/classes/class.chost.php:1727 include/locales/en_gb.inc.php:1881
 msgid "Cannot add group"
 msgstr "Cannot add group"
 
@@ -860,7 +860,7 @@ msgstr "Cannot add another item with type \"Graph sum\""
 msgid "Cannot add network map"
 msgstr "Cannot add network map"
 
-#: include/locales/en_gb.inc.php:2230
+#: include/locales/en_gb.inc.php:2229
 msgid "Cannot add new application"
 msgstr "Cannot add new application"
 
@@ -868,7 +868,7 @@ msgstr "Cannot add new application"
 msgid "Cannot add node"
 msgstr "Cannot add node"
 
-#: include/locales/en_gb.inc.php:1888
+#: include/locales/en_gb.inc.php:1887
 msgid "Cannot add proxy"
 msgstr "Cannot add proxy"
 
@@ -884,11 +884,11 @@ msgstr "Cannot add scenario"
 msgid "Cannot add screen"
 msgstr "无法添加图表"
 
-#: include/locales/en_gb.inc.php:1974
+#: include/locales/en_gb.inc.php:1973
 msgid "Cannot add script"
 msgstr "无法添加脚本"
 
-#: include/locales/en_gb.inc.php:1717
+#: include/locales/en_gb.inc.php:1716
 msgid "Cannot add service"
 msgstr "无法添加服务"
 
@@ -900,15 +900,15 @@ msgstr "Cannot add slideshow"
 msgid "Cannot add template"
 msgstr "Cannot add template"
 
-#: include/locales/en_gb.inc.php:1781
+#: include/locales/en_gb.inc.php:1780
 msgid "Cannot add trigger"
 msgstr "无法添加触发器"
 
-#: include/locales/en_gb.inc.php:1872
+#: include/locales/en_gb.inc.php:1871
 msgid "Cannot add user"
 msgstr "无法添加用户"
 
-#: include/locales/en_gb.inc.php:1873
+#: include/locales/en_gb.inc.php:1872
 msgid "Cannot add user. Both passwords must be equal."
 msgstr "无法添加用户. 两次输入的密码必须一致."
 
@@ -920,7 +920,7 @@ msgstr "Cannot add value map"
 msgid "Cannot clear history"
 msgstr "Cannot clear history"
 
-#: include/locales/en_gb.inc.php:1982
+#: include/locales/en_gb.inc.php:1981
 msgid "Cannot connect to Zabbix server"
 msgstr "无法链接到 Zabbix 服务器端"
 
@@ -932,7 +932,11 @@ msgstr "Cannot copy graphs"
 msgid "Cannot copy items"
 msgstr "Cannot copy items"
 
-#: include/locales/en_gb.inc.php:2132
+#: include/db.inc.php:45
+msgid "Cannot create another database connection."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2131
 msgid "Cannot create application"
 msgstr ""
 
@@ -948,7 +952,7 @@ msgstr "无法删除操作Cannot delete action"
 msgid "Cannot delete actions"
 msgstr "Cannot delete actions"
 
-#: include/locales/en_gb.inc.php:888 include/locales/en_gb.inc.php:2135
+#: include/locales/en_gb.inc.php:888 include/locales/en_gb.inc.php:2134
 msgid "Cannot delete application"
 msgstr "无法删除应用程序"
 
@@ -973,7 +977,7 @@ msgstr ""
 msgid "Cannot delete graphs"
 msgstr "无法删除图表"
 
-#: include/locales/en_gb.inc.php:1886
+#: include/locales/en_gb.inc.php:1885
 msgid "Cannot delete group"
 msgstr "Cannot delete group"
 
@@ -1013,7 +1017,7 @@ msgstr "Cannot delete node"
 msgid "Cannot delete profile"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1892
+#: include/locales/en_gb.inc.php:1891
 msgid "Cannot delete proxy"
 msgstr "Cannot delete proxy"
 
@@ -1025,11 +1029,15 @@ msgstr "无法删除表达式"
 msgid "Cannot delete scenario"
 msgstr "Cannot delete scenario"
 
-#: include/locales/en_gb.inc.php:1978
+#: include/locales/en_gb.inc.php:1977
 msgid "Cannot delete script"
 msgstr "无法删除脚本"
 
-#: include/locales/en_gb.inc.php:1719
+#: actionconf.php:313
+msgid "Cannot delete selected actions."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1718
 msgid "Cannot delete service"
 msgstr "无法删除服务"
 
@@ -1056,15 +1064,15 @@ msgstr ""
 msgid "Cannot delete templated trigger [%1$s:%2$s]"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1779
+#: include/locales/en_gb.inc.php:1778
 msgid "Cannot delete trigger"
 msgstr "无法删除触发器"
 
-#: include/locales/en_gb.inc.php:1777
+#: include/locales/en_gb.inc.php:1776
 msgid "Cannot delete triggers"
 msgstr "无法删除触发器"
 
-#: include/locales/en_gb.inc.php:1875
+#: include/locales/en_gb.inc.php:1874
 msgid "Cannot delete user"
 msgstr "无法删除用户"
 
@@ -1112,20 +1120,24 @@ msgstr "Cannot find screen"
 msgid "Cannot find trigger"
 msgstr "Cannot find trigger"
 
-#: include/locales/en_gb.inc.php:1767
+#: include/locales/en_gb.inc.php:1766
 msgid "Cannot format Tree. Check logic structure in service links"
 msgstr "Cannot format Tree. Check logic structure in service links"
 
-#: api/classes/class.ctrigger.php:1495
 #: api/classes/class.ctriggerprototype.php:1358
 msgid "Cannot implode expression"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2367
+#: api/classes/class.ctrigger.php:1495
+#, php-format
+msgid "Cannot implode expression \"%s\"."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2366
 msgid "Cannot link hardlinked service."
 msgstr "Cannot link hardlinked service."
 
-#: include/locales/en_gb.inc.php:2368
+#: include/locales/en_gb.inc.php:2367
 msgid "Cannot link service to itself."
 msgstr "Cannot link service to itself."
 
@@ -1149,7 +1161,7 @@ msgstr ""
 msgid "Cannot remove macro"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2454
+#: include/locales/en_gb.inc.php:2453
 msgid "Cannot rename guest user"
 msgstr ""
 
@@ -1185,7 +1197,7 @@ msgstr ""
 msgid "Cannot sync items"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1896
+#: include/locales/en_gb.inc.php:1895
 msgid "Cannot unblock users"
 msgstr "Cannot unblock users"
 
@@ -1225,11 +1237,11 @@ msgstr "无法关联模板"
 msgid "Cannot update"
 msgstr "Cannot update"
 
-#: include/locales/en_gb.inc.php:1900
+#: include/locales/en_gb.inc.php:1899
 msgid "Cannot update API access"
 msgstr "Cannot update API access"
 
-#: include/locales/en_gb.inc.php:1898
+#: include/locales/en_gb.inc.php:1897
 msgid "Cannot update GUI access"
 msgstr "Cannot update GUI access"
 
@@ -1237,15 +1249,15 @@ msgstr "Cannot update GUI access"
 msgid "Cannot update action"
 msgstr "无法更新操作Cannot update action"
 
-#: include/locales/en_gb.inc.php:884 include/locales/en_gb.inc.php:2134
+#: include/locales/en_gb.inc.php:884 include/locales/en_gb.inc.php:2133
 msgid "Cannot update application"
 msgstr "无法更新应用程序"
 
-#: include/locales/en_gb.inc.php:1832
+#: include/locales/en_gb.inc.php:1831
 msgid "Cannot update comment"
 msgstr "Cannot update comment"
 
-#: include/locales/en_gb.inc.php:1902
+#: include/locales/en_gb.inc.php:1901
 msgid "Cannot update debug mode"
 msgstr "无法更新调试模式"
 
@@ -1261,7 +1273,7 @@ msgstr ""
 msgid "Cannot update graph"
 msgstr "无法更新图表"
 
-#: include/locales/en_gb.inc.php:1884
+#: include/locales/en_gb.inc.php:1883
 msgid "Cannot update group"
 msgstr "Cannot update group"
 
@@ -1306,7 +1318,7 @@ msgstr "Cannot update node"
 msgid "Cannot update profile"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1890
+#: include/locales/en_gb.inc.php:1889
 msgid "Cannot update proxy"
 msgstr "Cannot update proxy"
 
@@ -1322,13 +1334,17 @@ msgstr "Cannot update scenario"
 msgid "Cannot update screen"
 msgstr "无法更新图表"
 
-#: include/locales/en_gb.inc.php:1976
+#: include/locales/en_gb.inc.php:1975
 msgid "Cannot update script"
 msgstr "无法更新脚本"
 
-#: include/locales/en_gb.inc.php:1715
+#: include/locales/en_gb.inc.php:1714
 msgid "Cannot update service"
 msgstr "无法更新服务"
+
+#: include/locales/en_gb.inc.php:1690
+msgid "Cannot update slideshow"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1106
 msgid "Cannot update status"
@@ -1338,19 +1354,19 @@ msgstr "Cannot update status"
 msgid "Cannot update template"
 msgstr "Cannot update template"
 
-#: include/locales/en_gb.inc.php:1792
+#: include/locales/en_gb.inc.php:1791
 msgid "Cannot update trigger"
 msgstr "无法更新触发器"
 
-#: include/locales/en_gb.inc.php:1879
+#: include/locales/en_gb.inc.php:1878
 msgid "Cannot update user"
 msgstr "无法更新用户"
 
-#: include/locales/en_gb.inc.php:1880
+#: include/locales/en_gb.inc.php:1879
 msgid "Cannot update user. Both passwords must be equal."
 msgstr "无法更新用户. 两次输入的密码必须一致."
 
-#: include/locales/en_gb.inc.php:1894
+#: include/locales/en_gb.inc.php:1893
 msgid "Cannot update users status"
 msgstr "Cannot update users status"
 
@@ -1358,11 +1374,7 @@ msgstr "Cannot update users status"
 msgid "Cannot update value map"
 msgstr "Cannot update value map"
 
-#: include/locales/en_gb.inc.php:1690
-msgid "Cannot_update slideshow"
-msgstr "Cannot_update slideshow"
-
-#: include/locales/en_gb.inc.php:2069
+#: include/locales/en_gb.inc.php:2068
 msgid "Caption"
 msgstr "Caption"
 
@@ -1374,11 +1386,11 @@ msgstr "Case sensitive"
 msgid "Centre"
 msgstr "居中"
 
-#: include/locales/en_gb.inc.php:1790
+#: include/locales/en_gb.inc.php:1789
 msgid "Change"
 msgstr "更改"
 
-#: include/locales/en_gb.inc.php:1930
+#: include/locales/en_gb.inc.php:1929
 msgid "Change password"
 msgstr "修改密码"
 
@@ -1394,11 +1406,11 @@ msgstr "Character string included"
 msgid "Character string not included"
 msgstr "Character string not included"
 
-#: include/locales/en_gb.inc.php:2095
+#: include/locales/en_gb.inc.php:2094
 msgid "Check expression part starting from '"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2222
+#: include/locales/en_gb.inc.php:2221
 msgid "Check the key, please. Default example was passed"
 msgstr ""
 
@@ -1410,15 +1422,15 @@ msgstr "Checks"
 msgid "Child"
 msgstr "Child"
 
-#: include/locales/en_gb.inc.php:2041
+#: include/locales/en_gb.inc.php:2040
 msgid "Chinese (CN)"
 msgstr "中文 (CN)"
 
-#: api/classes/class.ctemplate.php:1774 include/locales/en_gb.inc.php:2246
+#: api/classes/class.ctemplate.php:1774 include/locales/en_gb.inc.php:2245
 msgid "Circular link can not be created"
 msgstr "Circular link can not be created"
 
-#: include/locales/en_gb.inc.php:2010
+#: include/locales/en_gb.inc.php:2009
 msgid "Clear"
 msgstr ""
 
@@ -1438,11 +1450,11 @@ msgstr ""
 msgid "Clock"
 msgstr "Clock"
 
-#: include/forms/script.edit.php:139 include/locales/en_gb.inc.php:1735
+#: include/forms/script.edit.php:139 include/locales/en_gb.inc.php:1734
 msgid "Clone"
 msgstr "复制"
 
-#: include/locales/en_gb.inc.php:1981
+#: include/locales/en_gb.inc.php:1980
 msgid "Close"
 msgstr "Close"
 
@@ -1462,11 +1474,11 @@ msgstr "列宽度"
 msgid "Columns"
 msgstr "列数"
 
-#: include/locales/en_gb.inc.php:2125
+#: include/locales/en_gb.inc.php:2124
 msgid "Combined result"
 msgstr "Combined result"
 
-#: include/forms/script.edit.php:79 include/locales/en_gb.inc.php:1965
+#: include/forms/script.edit.php:79 include/locales/en_gb.inc.php:1964
 msgid "Command"
 msgstr "命令"
 
@@ -1474,11 +1486,11 @@ msgstr "命令"
 msgid "Command actions"
 msgstr "Command actions"
 
-#: include/locales/en_gb.inc.php:1831
+#: include/locales/en_gb.inc.php:1830
 msgid "Comment updated"
 msgstr "Comment updated"
 
-#: include/locales/en_gb.inc.php:1851
+#: include/locales/en_gb.inc.php:1850
 msgid "Comments"
 msgstr "备注"
 
@@ -1502,7 +1514,7 @@ msgstr "触发条件"
 msgid "Configuration"
 msgstr "系统配置"
 
-#: include/locales/en_gb.inc.php:1712
+#: include/locales/en_gb.inc.php:1711
 msgid "Configuration of IT services"
 msgstr "配置 IT 服务"
 
@@ -1542,7 +1554,7 @@ msgstr "显示图表配置"
 msgid "Configuration of slideshows"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1774
+#: include/locales/en_gb.inc.php:1773
 msgid "Configuration of triggers"
 msgstr "配置触发器"
 
@@ -1598,7 +1610,7 @@ msgstr "Copy selected items?"
 msgid "Copy selected to ..."
 msgstr "拷贝所选到 ..."
 
-#: include/locales/en_gb.inc.php:1823
+#: include/locales/en_gb.inc.php:1822
 msgid "Copy selected triggers?"
 msgstr "Copy selected triggers?"
 
@@ -1606,7 +1618,7 @@ msgstr "Copy selected triggers?"
 msgid "Copyright 2001-2010 by"
 msgstr "Copyright 2001-2006 by"
 
-#: include/locales/en_gb.inc.php:2377
+#: include/locales/en_gb.inc.php:2376
 msgid "Could not save image!"
 msgstr "Could not save image!"
 
@@ -1630,7 +1642,7 @@ msgstr "Create Action"
 msgid "Create Graph"
 msgstr "创建图表"
 
-#: include/locales/en_gb.inc.php:1937
+#: include/locales/en_gb.inc.php:1936
 msgid "Create Group"
 msgstr "创建组"
 
@@ -1670,11 +1682,11 @@ msgstr ""
 msgid "Create Template"
 msgstr "创建模板"
 
-#: include/locales/en_gb.inc.php:1797
+#: include/locales/en_gb.inc.php:1796
 msgid "Create Trigger"
 msgstr "Create Trigger"
 
-#: include/locales/en_gb.inc.php:1936
+#: include/locales/en_gb.inc.php:1935
 msgid "Create User"
 msgstr "创建用户"
 
@@ -1698,11 +1710,11 @@ msgstr "Create rule"
 msgid "Create scenario"
 msgstr "Create scenario"
 
-#: include/locales/en_gb.inc.php:1972 scripts.php:179
+#: include/locales/en_gb.inc.php:1971 scripts.php:179
 msgid "Create script"
 msgstr "创建脚本"
 
-#: include/locales/en_gb.inc.php:2531
+#: include/locales/en_gb.inc.php:2530
 msgid "Create trigger"
 msgstr ""
 
@@ -1710,7 +1722,7 @@ msgstr ""
 msgid "Create value map"
 msgstr "Create value map"
 
-#: include/locales/en_gb.inc.php:2270
+#: include/locales/en_gb.inc.php:2269
 msgid "Critical error"
 msgstr "Critical error"
 
@@ -1730,11 +1742,11 @@ msgstr "Custom multiplier"
 msgid "Custom screens"
 msgstr "用户图表"
 
-#: include/locales/en_gb.inc.php:1702
+#: include/locales/en_gb.inc.php:1701
 msgid "Custom slides"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2046
+#: include/locales/en_gb.inc.php:2045
 msgid "Czech (CZ)"
 msgstr ""
 
@@ -1750,7 +1762,7 @@ msgstr "DASHBOARD CONFIGURATION"
 msgid "DETAILS OF SCENARIO"
 msgstr "DETAILS OF SCENARIO"
 
-#: include/locales/en_gb.inc.php:1785
+#: include/locales/en_gb.inc.php:1784
 msgid "DISABLED"
 msgstr "关闭"
 
@@ -1762,11 +1774,11 @@ msgstr ""
 msgid "DISCOVERY"
 msgstr "自动发现"
 
-#: include/locales/en_gb.inc.php:2074
+#: include/locales/en_gb.inc.php:2073
 msgid "DISCOVERY CHECKS"
 msgstr "DISCOVERY CHECKS"
 
-#: include/locales/en_gb.inc.php:2073
+#: include/locales/en_gb.inc.php:2072
 msgid "DISCOVERY RULES"
 msgstr "DISCOVERY RULES"
 
@@ -1831,9 +1843,46 @@ msgstr "Data overview"
 msgid "Data type"
 msgstr "Data type"
 
+#: include/setup.inc.php:240 include/setup.inc.php:294
+msgid "Database file"
+msgstr ""
+
+#: include/setup.inc.php:243
+msgid "Database host"
+msgstr ""
+
 #: include/locales/en_gb.inc.php:1128
 msgid "Database monitor"
 msgstr "Database monitor"
+
+#: include/setup.inc.php:245 include/setup.inc.php:302
+msgid "Database name"
+msgstr ""
+
+#: include/setup.inc.php:304
+msgid "Database password"
+msgstr ""
+
+#: include/setup.inc.php:244 include/setup.inc.php:299
+#: include/setup.inc.php:301
+msgid "Database port"
+msgstr ""
+
+#: include/setup.inc.php:247 include/setup.inc.php:306
+msgid "Database schema"
+msgstr ""
+
+#: include/setup.inc.php:297
+msgid "Database server"
+msgstr ""
+
+#: include/setup.inc.php:237 include/setup.inc.php:290
+msgid "Database type"
+msgstr ""
+
+#: include/setup.inc.php:303
+msgid "Database user"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:809
 msgid "Date"
@@ -1871,15 +1920,15 @@ msgstr "Day of week"
 msgid "Days"
 msgstr "天数"
 
-#: include/locales/en_gb.inc.php:1921
+#: include/locales/en_gb.inc.php:1920
 msgid "Debug"
 msgstr "调试"
 
-#: include/locales/en_gb.inc.php:1922
+#: include/locales/en_gb.inc.php:1921
 msgid "Debug mode"
 msgstr "调试模式"
 
-#: include/locales/en_gb.inc.php:1901
+#: include/locales/en_gb.inc.php:1900
 msgid "Debug mode updated"
 msgstr "调试模式已更新"
 
@@ -1915,11 +1964,11 @@ msgstr "默认主题"
 msgid "Default theme"
 msgstr "默认风格"
 
-#: include/locales/en_gb.inc.php:1990
+#: include/locales/en_gb.inc.php:1989
 msgid "Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value"
 msgstr "Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value"
 
-#: include/locales/en_gb.inc.php:1989
+#: include/locales/en_gb.inc.php:1988
 msgid "Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value"
 msgstr "Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value"
 
@@ -1935,7 +1984,7 @@ msgstr ""
 msgid "Delayed by"
 msgstr "Delayed by"
 
-#: include/locales/en_gb.inc.php:1734
+#: include/locales/en_gb.inc.php:1733
 msgid "Delete"
 msgstr "删除"
 
@@ -1943,7 +1992,7 @@ msgstr "删除"
 msgid "Delete Links between selected elements?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2535
+#: include/locales/en_gb.inc.php:2534
 msgid "Delete Service"
 msgstr ""
 
@@ -1959,7 +2008,7 @@ msgstr "Warning: this will delete selected templates and clear all linked hosts"
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2114
+#: include/locales/en_gb.inc.php:2113
 msgid "Delete expression?"
 msgstr "删除表达式?"
 
@@ -1979,11 +2028,11 @@ msgstr "Delete history of selected WEB scenarios?"
 msgid "Delete history of selected items?"
 msgstr "Delete history of selected items?"
 
-#: include/locales/en_gb.inc.php:2335
+#: include/locales/en_gb.inc.php:2334
 msgid "Delete it?"
 msgstr "删除它?"
 
-#: include/locales/en_gb.inc.php:2115
+#: include/locales/en_gb.inc.php:2114
 msgid "Delete keyword?"
 msgstr "删除关键字?"
 
@@ -2027,7 +2076,7 @@ msgstr "Delete selected WEB scenarios?"
 msgid "Delete selected action?"
 msgstr "Delete selected action?"
 
-#: include/locales/en_gb.inc.php:2131
+#: include/locales/en_gb.inc.php:2130
 msgid "Delete selected applications?"
 msgstr "删除所选的程序?"
 
@@ -2051,7 +2100,7 @@ msgstr "删除所选组?"
 msgid "Delete selected groups"
 msgstr "Delete selected groups"
 
-#: include/locales/en_gb.inc.php:1959
+#: include/locales/en_gb.inc.php:1958
 msgid "Delete selected groups?"
 msgstr "删除所选脚本?"
 
@@ -2067,7 +2116,7 @@ msgstr "删除选中主机?"
 msgid "Delete selected image?"
 msgstr "Delete selected image?"
 
-#: include/locales/en_gb.inc.php:2195
+#: include/locales/en_gb.inc.php:2194
 msgid "Delete selected item?"
 msgstr "Delete selected item?"
 
@@ -2111,11 +2160,11 @@ msgstr "删除所选表达式?"
 msgid "Delete selected screens?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1983
+#: include/locales/en_gb.inc.php:1982
 msgid "Delete selected scripts?"
 msgstr "删除所选脚本?"
 
-#: include/locales/en_gb.inc.php:2536
+#: include/locales/en_gb.inc.php:2535
 msgid "Delete selected services?"
 msgstr ""
 
@@ -2127,15 +2176,15 @@ msgstr "Delete selected slideshows?"
 msgid "Delete selected templates?"
 msgstr "Delete selected templates?"
 
-#: include/locales/en_gb.inc.php:1824
+#: include/locales/en_gb.inc.php:1823
 msgid "Delete selected triggers?"
 msgstr "Delete selected triggers?"
 
-#: include/locales/en_gb.inc.php:2191
+#: include/locales/en_gb.inc.php:2190
 msgid "Delete selected user?"
 msgstr "Delete selected user?"
 
-#: include/locales/en_gb.inc.php:1950
+#: include/locales/en_gb.inc.php:1949
 msgid "Delete selected users?"
 msgstr "Delete selected users?"
 
@@ -2153,11 +2202,11 @@ msgstr[0] ""
 msgid "Delete selected with linked elements"
 msgstr "Delete selected with linked elements"
 
-#: include/locales/en_gb.inc.php:1695 include/locales/en_gb.inc.php:1696
+#: include/locales/en_gb.inc.php:1695
 msgid "Delete slideshow?"
 msgstr "Delete slideshow?"
 
-#: include/locales/en_gb.inc.php:2201
+#: include/locales/en_gb.inc.php:2200
 msgid "Delete system map?"
 msgstr "Delete system map?"
 
@@ -2165,11 +2214,11 @@ msgstr "Delete system map?"
 msgid "Delete template?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2128
+#: include/locales/en_gb.inc.php:2127
 msgid "Delete this application?"
 msgstr "删除这个应用程序?"
 
-#: include/locales/en_gb.inc.php:2198
+#: include/locales/en_gb.inc.php:2197
 msgid "Delete trigger?"
 msgstr "Delete trigger?"
 
@@ -2189,15 +2238,15 @@ msgstr "Delta (simple change)"
 msgid "Delta (speed per second)"
 msgstr "Delta (speed per second)"
 
-#: include/locales/en_gb.inc.php:1927
+#: include/locales/en_gb.inc.php:1926
 msgid "Deny"
 msgstr "禁止"
 
-#: include/locales/en_gb.inc.php:1794
+#: include/locales/en_gb.inc.php:1793
 msgid "Dependent"
 msgstr "Dependent"
 
-#: include/locales/en_gb.inc.php:1793
+#: include/locales/en_gb.inc.php:1792
 msgid "Depends on"
 msgstr "Depends on"
 
@@ -2205,7 +2254,7 @@ msgstr "Depends on"
 msgid "Description"
 msgstr "检测内容"
 
-#: include/locales/en_gb.inc.php:1999
+#: include/locales/en_gb.inc.php:1998
 msgid "Details"
 msgstr "详细内容"
 
@@ -2261,19 +2310,19 @@ msgstr "Device uniqueness criteria"
 msgid "Dimension (cols x rows)"
 msgstr "图表规格 (列 x 行)"
 
-#: include/locales/en_gb.inc.php:1787
+#: include/locales/en_gb.inc.php:1786
 msgid "Disable"
 msgstr "关闭"
 
-#: include/locales/en_gb.inc.php:1944
+#: include/locales/en_gb.inc.php:1943
 msgid "Disable API"
 msgstr "关闭 API"
 
-#: include/locales/en_gb.inc.php:1956
+#: include/locales/en_gb.inc.php:1955
 msgid "Disable API access in selected groups?"
 msgstr "Disable API access in selected groups?"
 
-#: include/locales/en_gb.inc.php:1946
+#: include/locales/en_gb.inc.php:1945
 msgid "Disable DEBUG"
 msgstr "关闭DEBUG"
 
@@ -2281,7 +2330,7 @@ msgstr "关闭DEBUG"
 msgid "Disable IPMI"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1958
+#: include/locales/en_gb.inc.php:1957
 msgid "Disable debug mode in selected groups?"
 msgstr "Disable debug mode in selected groups?"
 
@@ -2313,7 +2362,7 @@ msgstr "Disable selected Host Groups?"
 msgid "Disable selected WEB scenarios?"
 msgstr "Disable selected WEB scenarios?"
 
-#: include/locales/en_gb.inc.php:2130
+#: include/locales/en_gb.inc.php:2129
 msgid "Disable selected applications?"
 msgstr "禁用所选的程序?"
 
@@ -2321,7 +2370,7 @@ msgstr "禁用所选的程序?"
 msgid "Disable selected discovery rules?"
 msgstr "关闭所选的自发现规则?"
 
-#: include/locales/en_gb.inc.php:1954
+#: include/locales/en_gb.inc.php:1953
 msgid "Disable selected groups?"
 msgstr "Disable selected groups?"
 
@@ -2337,11 +2386,11 @@ msgstr "Disable selected hosts?"
 msgid "Disable selected items?"
 msgstr "Disable selected items?"
 
-#: include/locales/en_gb.inc.php:1821
+#: include/locales/en_gb.inc.php:1820
 msgid "Disable selected triggers?"
 msgstr "Disable selected triggers?"
 
-#: include/locales/en_gb.inc.php:1784
+#: include/locales/en_gb.inc.php:1783
 msgid "Disabled"
 msgstr "不活跃"
 
@@ -2409,7 +2458,7 @@ msgstr "自发现规则已删除"
 msgid "Discovery rule updated"
 msgstr "自动发现的规则已更新"
 
-#: include/forms/host.edit.php:401 include/forms/template.edit.php:256
+#: include/forms/host.edit.php:402 include/forms/template.edit.php:256
 #: include/locales/en_gb.inc.php:1222
 msgid "Discovery rules"
 msgstr ""
@@ -2434,7 +2483,7 @@ msgstr "自动发现的规则已更新"
 msgid "Discovery status"
 msgstr "自动发现状态"
 
-#: include/locales/en_gb.inc.php:2065
+#: include/locales/en_gb.inc.php:2064
 msgid "Displaying"
 msgstr "显示"
 
@@ -2446,7 +2495,7 @@ msgstr "Distribution of values for multiple items"
 msgid "Distribution of values for multiple periods"
 msgstr "Distribution of values for multiple periods"
 
-#: include/locales/en_gb.inc.php:2196
+#: include/locales/en_gb.inc.php:2195
 msgid "Do"
 msgstr ""
 
@@ -2454,7 +2503,7 @@ msgstr ""
 msgid "Do not add"
 msgstr "Do not add"
 
-#: include/locales/en_gb.inc.php:1727
+#: include/locales/en_gb.inc.php:1726
 msgid "Do not calculate"
 msgstr "Do not calculate"
 
@@ -2474,7 +2523,7 @@ msgstr "Do not keep history older than (in days)"
 msgid "Do not keep trends older than (in days)"
 msgstr "Do not keep trends older than (in days)"
 
-#: include/locales/en_gb.inc.php:2532
+#: include/locales/en_gb.inc.php:2531
 msgid "Do you wish to replace the conditional expression?"
 msgstr ""
 
@@ -2495,17 +2544,17 @@ msgid "Download newly created locale file by pressing \"Download\"."
 msgstr ""
 
 #. GETTEXT: Legend below graph
-#: api/classes/class.cwebcheck.php:553
+#: api/classes/class.cwebcheck.php:551
 #, php-format
 msgid "Download speed for scenario '%s'"
 msgstr ""
 
-#: api/classes/class.cwebcheck.php:644
+#: api/classes/class.cwebcheck.php:640
 #, php-format
 msgid "Download speed for step '%1$s' of scenario '%2$s'"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:148 include/locales/en_gb.inc.php:1738
+#: include/locales/en_gb.inc.php:148 include/locales/en_gb.inc.php:1737
 msgid "Downtime"
 msgstr "下线时间"
 
@@ -2521,7 +2570,7 @@ msgstr "Dropdown first entry"
 msgid "Duration"
 msgstr "持续时间"
 
-#: include/locales/en_gb.inc.php:2042
+#: include/locales/en_gb.inc.php:2041
 msgid "Dutch (NL)"
 msgstr "Dutch (NL)"
 
@@ -2529,15 +2578,15 @@ msgstr "Dutch (NL)"
 msgid "Dynamic item"
 msgstr "动态监控项"
 
-#: include/locales/en_gb.inc.php:2182
+#: include/locales/en_gb.inc.php:2181
 msgid "E"
 msgstr "E"
 
-#: include/locales/en_gb.inc.php:2481
+#: include/locales/en_gb.inc.php:2480
 msgid "ERROR"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2496
+#: include/locales/en_gb.inc.php:2495
 msgid "EVENTS"
 msgstr "事件"
 
@@ -2553,7 +2602,7 @@ msgstr ""
 msgid "Edit"
 msgstr "编辑"
 
-#: include/locales/en_gb.inc.php:2534
+#: include/locales/en_gb.inc.php:2533
 msgid "Edit Service"
 msgstr ""
 
@@ -2561,11 +2610,11 @@ msgstr ""
 msgid "Edit Trigger"
 msgstr "Edit Trigger"
 
-#: include/locales/en_gb.inc.php:2107
+#: include/locales/en_gb.inc.php:2106
 msgid "Edit connector"
 msgstr "Edit connector"
 
-#: include/locales/en_gb.inc.php:2061
+#: include/locales/en_gb.inc.php:2060
 msgid "Edit hosts"
 msgstr ""
 
@@ -2597,7 +2646,7 @@ msgstr "Elements"
 msgid "Email"
 msgstr "邮件"
 
-#: include/locales/en_gb.inc.php:2070
+#: include/locales/en_gb.inc.php:2069
 msgid "Empty"
 msgstr "Empty"
 
@@ -2617,23 +2666,23 @@ msgstr "Empty input parameter"
 msgid "Empty macro value"
 msgstr "Empty macro value"
 
-#: include/locales/en_gb.inc.php:1992
+#: include/locales/en_gb.inc.php:1991
 msgid "Empty response received"
 msgstr "Empty response received"
 
-#: include/locales/en_gb.inc.php:1788
+#: include/locales/en_gb.inc.php:1787
 msgid "Enable"
 msgstr "开启"
 
-#: include/locales/en_gb.inc.php:1943
+#: include/locales/en_gb.inc.php:1942
 msgid "Enable API"
 msgstr "打开 API"
 
-#: include/locales/en_gb.inc.php:1955
+#: include/locales/en_gb.inc.php:1954
 msgid "Enable API access in selected groups?"
 msgstr "Enable API access in selected groups?"
 
-#: include/locales/en_gb.inc.php:1945
+#: include/locales/en_gb.inc.php:1944
 msgid "Enable DEBUG"
 msgstr "打开DEBUG"
 
@@ -2645,7 +2694,7 @@ msgstr ""
 msgid "Enable confirmation"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1957
+#: include/locales/en_gb.inc.php:1956
 msgid "Enable debug mode in selected groups?"
 msgstr "Enable debug mode in selected groups?"
 
@@ -2669,7 +2718,7 @@ msgstr "Enable hosts monitored by selected proxies?"
 msgid "Enable profile"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1789
+#: include/locales/en_gb.inc.php:1788
 msgid "Enable selected"
 msgstr "启用所选"
 
@@ -2685,7 +2734,7 @@ msgstr "Enable selected WEB scenarios?"
 msgid "Enable selected discovery rules?"
 msgstr "启用所选的自发现规则?"
 
-#: include/locales/en_gb.inc.php:1953
+#: include/locales/en_gb.inc.php:1952
 msgid "Enable selected groups?"
 msgstr "Enable selected groups?"
 
@@ -2697,31 +2746,31 @@ msgstr "Enable selected hosts?"
 msgid "Enable selected items?"
 msgstr "Enable selected items?"
 
-#: include/locales/en_gb.inc.php:1820
+#: include/locales/en_gb.inc.php:1819
 msgid "Enable selected triggers?"
 msgstr "Enable selected triggers?"
 
-#: include/locales/en_gb.inc.php:1786
+#: include/locales/en_gb.inc.php:1785
 msgid "Enabled"
 msgstr "活跃"
 
-#: include/locales/en_gb.inc.php:2158
+#: include/locales/en_gb.inc.php:2157
 msgid "End of"
 msgstr "End of"
 
-#: include/locales/en_gb.inc.php:2030
+#: include/locales/en_gb.inc.php:2029
 msgid "English (GB)"
 msgstr "英语 (GB)"
 
-#: include/locales/en_gb.inc.php:437 include/locales/en_gb.inc.php:2091
+#: include/locales/en_gb.inc.php:437 include/locales/en_gb.inc.php:2090
 msgid "Error"
 msgstr "错误"
 
-#: include/locales/en_gb.inc.php:1986
+#: include/locales/en_gb.inc.php:1985
 msgid "Error Description"
 msgstr "Error Description"
 
-#: include/locales/en_gb.inc.php:2322
+#: include/locales/en_gb.inc.php:2321
 msgid "Error adding dependencies. Following dependencies are not allowed: 1) from a host trigger to a template trigger; 2) from a template trigger to a host trigger; 3) between template triggers, where templates have links to other templates."
 msgstr ""
 
@@ -2729,7 +2778,7 @@ msgstr ""
 msgid "Error adding service time"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2223
+#: include/locales/en_gb.inc.php:2222
 msgid "Error in item key:"
 msgstr ""
 
@@ -2775,7 +2824,7 @@ msgstr ""
 msgid "Event details"
 msgstr "Event details"
 
-#: include/locales/en_gb.inc.php:1809
+#: include/locales/en_gb.inc.php:1808
 msgid "Event generation"
 msgstr "Event generation"
 
@@ -2783,7 +2832,7 @@ msgstr "Event generation"
 msgid "Event source"
 msgstr "事件源"
 
-#: include/locales/en_gb.inc.php:2495
+#: include/locales/en_gb.inc.php:2494
 msgid "Events"
 msgstr "事件"
 
@@ -2803,11 +2852,11 @@ msgstr "Every day(s)"
 msgid "Every week(s)"
 msgstr "Every week(s)"
 
-#: include/locales/en_gb.inc.php:2183
+#: include/locales/en_gb.inc.php:2182
 msgid "Exa"
 msgstr "Exa"
 
-#: include/locales/en_gb.inc.php:2111
+#: include/locales/en_gb.inc.php:2110
 msgid "Exclude"
 msgstr "Exclude"
 
@@ -2816,7 +2865,7 @@ msgstr "Exclude"
 msgid "Execute"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2378
+#: include/locales/en_gb.inc.php:2377
 msgid "Execute SQL error"
 msgstr "SQL执行错误"
 
@@ -2864,6 +2913,10 @@ msgstr "Export does not contain Zabbix screens"
 msgid "Export selected"
 msgstr "导出所选"
 
+#: events.php:185
+msgid "Export to CSV"
+msgstr ""
+
 #: include/locales/en_gb.inc.php:223
 msgid "Export/Import"
 msgstr "导入/导出"
@@ -2872,15 +2925,15 @@ msgstr "导入/导出"
 msgid "Expression"
 msgstr "表达式"
 
-#: include/locales/en_gb.inc.php:2093
+#: include/locales/en_gb.inc.php:2092
 msgid "Expression Syntax Error"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2119
+#: include/locales/en_gb.inc.php:2118
 msgid "Expression Variable Elements"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2289
+#: include/locales/en_gb.inc.php:2288
 msgid "Expression cannot be empty"
 msgstr "Expression cannot be empty"
 
@@ -2896,15 +2949,15 @@ msgstr "表达式"
 msgid "Extend this array with Your locale like \"your_prefix\" => \"display_like\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2058
+#: include/locales/en_gb.inc.php:2057
 msgid "Extended"
 msgstr "Extended"
 
-#: include/locales/en_gb.inc.php:2056
+#: include/locales/en_gb.inc.php:2055
 msgid "Extended host profile"
 msgstr "Extended host profile"
 
-#: include/locales/en_gb.inc.php:2057
+#: include/locales/en_gb.inc.php:2056
 msgid "Extended profile"
 msgstr ""
 
@@ -2916,7 +2969,7 @@ msgstr "External check"
 msgid "Ez Texting"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2520
+#: include/locales/en_gb.inc.php:2519
 msgid "F"
 msgstr ""
 
@@ -2941,7 +2994,7 @@ msgid "Failed on"
 msgstr "Failed on"
 
 #. GETTEXT: Legend below graph
-#: api/classes/class.cwebcheck.php:561
+#: api/classes/class.cwebcheck.php:559
 #, php-format
 msgid "Failed step of scenario '%s'"
 msgstr ""
@@ -2982,7 +3035,7 @@ msgstr ""
 msgid "February"
 msgstr "February"
 
-#: include/locales/en_gb.inc.php:2271
+#: include/locales/en_gb.inc.php:2270
 msgid "Field"
 msgstr "Field"
 
@@ -3002,7 +3055,7 @@ msgstr "Filled region"
 msgid "Filter"
 msgstr "Filter"
 
-#: include/locales/en_gb.inc.php:1848
+#: include/locales/en_gb.inc.php:1847
 msgid "Filter by name"
 msgstr ""
 
@@ -3010,7 +3063,7 @@ msgstr ""
 msgid "Finish"
 msgstr "Finish"
 
-#: include/locales/en_gb.inc.php:818 include/locales/en_gb.inc.php:2547
+#: include/locales/en_gb.inc.php:818 include/locales/en_gb.inc.php:2546
 msgid "First"
 msgstr "First"
 
@@ -3026,7 +3079,7 @@ msgstr "Flexible intervals (sec)"
 msgid "For example see implementation of other locales."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1877
+#: include/locales/en_gb.inc.php:1876
 msgid "For guest, password must be empty"
 msgstr "访客的密码必须为空"
 
@@ -3034,7 +3087,7 @@ msgstr "访客的密码必须为空"
 msgid "Formula"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1856
+#: include/locales/en_gb.inc.php:1855
 msgid "Found"
 msgstr "Found"
 
@@ -3042,7 +3095,7 @@ msgstr "Found"
 msgid "Fourth"
 msgstr "Fourth"
 
-#: include/locales/en_gb.inc.php:2031
+#: include/locales/en_gb.inc.php:2030
 msgid "French (FR)"
 msgstr "法语 (FR)"
 
@@ -3050,7 +3103,7 @@ msgstr "法语 (FR)"
 msgid "Fri"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:53 include/locales/en_gb.inc.php:1751
+#: include/locales/en_gb.inc.php:53 include/locales/en_gb.inc.php:1750
 msgid "Friday"
 msgstr "Friday"
 
@@ -3058,7 +3111,7 @@ msgstr "Friday"
 msgid "From"
 msgstr "起始"
 
-#: include/locales/en_gb.inc.php:1736
+#: include/locales/en_gb.inc.php:1735
 msgid "Full clone"
 msgstr "全复制"
 
@@ -3070,15 +3123,15 @@ msgstr "全屏"
 msgid "Function"
 msgstr "Function"
 
-#: include/locales/en_gb.inc.php:2320
+#: include/locales/en_gb.inc.php:2319
 msgid "Function '"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2176
+#: include/locales/en_gb.inc.php:2175
 msgid "G"
 msgstr "G"
 
-#: include/locales/en_gb.inc.php:2417
+#: include/locales/en_gb.inc.php:2416
 msgid "GD PNG Support"
 msgstr "GD PNG Support"
 
@@ -3098,19 +3151,19 @@ msgstr "GSM Modem"
 msgid "GUI"
 msgstr "GUI"
 
-#: include/locales/en_gb.inc.php:2019
+#: include/locales/en_gb.inc.php:2018
 msgid "GUI Messaging"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1919
+#: include/locales/en_gb.inc.php:1918
 msgid "GUI access"
 msgstr "Web访问"
 
-#: include/locales/en_gb.inc.php:1897
+#: include/locales/en_gb.inc.php:1896
 msgid "GUI access updated"
 msgstr "GUI access updated"
 
-#: include/locales/en_gb.inc.php:2500
+#: include/locales/en_gb.inc.php:2499
 msgid "General"
 msgstr "总览"
 
@@ -3119,7 +3172,7 @@ msgstr "总览"
 msgid "Generated in %s sec"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2032
+#: include/locales/en_gb.inc.php:2031
 msgid "German (DE)"
 msgstr "德语 (DE)"
 
@@ -3131,19 +3184,19 @@ msgstr "Get Img: Element data not found!"
 msgid "Get selected elements FAILED."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2491
+#: include/locales/en_gb.inc.php:2490
 msgid "Get support"
 msgstr "获取帮助"
 
-#: include/locales/en_gb.inc.php:2177
+#: include/locales/en_gb.inc.php:2176
 msgid "Giga"
 msgstr "Giga"
 
-#: include/locales/en_gb.inc.php:2123
+#: include/locales/en_gb.inc.php:2122
 msgid "Given expression is not a macro"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2063
+#: include/locales/en_gb.inc.php:2062
 msgid "Go"
 msgstr "确认"
 
@@ -3159,7 +3212,7 @@ msgstr "Gradient line"
 msgid "Graph"
 msgstr "图形显示"
 
-#: include/locales/en_gb.inc.php:2350
+#: include/locales/en_gb.inc.php:2349
 msgid "Graph \""
 msgstr ""
 
@@ -3213,7 +3266,7 @@ msgstr "图表已添加"
 msgid "Graph deleted"
 msgstr "图表已删除"
 
-#: include/locales/en_gb.inc.php:2004
+#: include/locales/en_gb.inc.php:2003
 msgid "Graph element"
 msgstr "Graph element"
 
@@ -3239,7 +3292,7 @@ msgstr ""
 msgid "Graph prototype must have at least one prototype"
 msgstr ""
 
-#: include/forms/host.edit.php:468 include/forms/template.edit.php:319
+#: include/forms/host.edit.php:469 include/forms/template.edit.php:319
 msgid "Graph prototypes"
 msgstr ""
 
@@ -3266,7 +3319,7 @@ msgstr ""
 msgid "Graph with same name but other type exist"
 msgstr ""
 
-#: include/forms/host.edit.php:378 include/forms/template.edit.php:235
+#: include/forms/host.edit.php:379 include/forms/template.edit.php:235
 #: include/locales/en_gb.inc.php:895
 msgid "Graphs"
 msgstr "图形显示"
@@ -3287,11 +3340,11 @@ msgstr ""
 msgid "Group"
 msgstr "组名"
 
-#: include/locales/en_gb.inc.php:1881
+#: include/locales/en_gb.inc.php:1880
 msgid "Group added"
 msgstr "Group added"
 
-#: include/locales/en_gb.inc.php:1885
+#: include/locales/en_gb.inc.php:1884
 msgid "Group deleted"
 msgstr "Group deleted"
 
@@ -3299,7 +3352,7 @@ msgstr "Group deleted"
 msgid "Group for discovered hosts"
 msgstr "Group for discovered hosts"
 
-#: include/locales/en_gb.inc.php:2210
+#: include/locales/en_gb.inc.php:2209
 msgid "Group function"
 msgstr "Group function"
 
@@ -3307,7 +3360,7 @@ msgstr "Group function"
 msgid "Group name"
 msgstr "用户组"
 
-#: include/locales/en_gb.inc.php:1883
+#: include/locales/en_gb.inc.php:1882
 msgid "Group updated"
 msgstr "Group updated"
 
@@ -3327,9 +3380,9 @@ msgstr ""
 msgid "H:i"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2082 include/locales/en_gb.inc.php:2083
-#: include/locales/en_gb.inc.php:2084 include/locales/en_gb.inc.php:2086
-#: include/locales/en_gb.inc.php:2087 include/locales/en_gb.inc.php:2088
+#: include/locales/en_gb.inc.php:2081 include/locales/en_gb.inc.php:2082
+#: include/locales/en_gb.inc.php:2083 include/locales/en_gb.inc.php:2085
+#: include/locales/en_gb.inc.php:2086 include/locales/en_gb.inc.php:2087
 msgid "H:i:s"
 msgstr ""
 
@@ -3341,7 +3394,7 @@ msgstr "系统警告信息"
 msgid "HOST GROUPS"
 msgstr "主机组"
 
-#: include/locales/en_gb.inc.php:2055
+#: include/locales/en_gb.inc.php:2054
 msgid "HOST PROFILES"
 msgstr "请选择主机所在位置=>"
 
@@ -3369,7 +3422,7 @@ msgstr "硬件环境"
 msgid "Height"
 msgstr "高"
 
-#: include/locales/en_gb.inc.php:2489
+#: include/locales/en_gb.inc.php:2488
 msgid "Help"
 msgstr "帮助"
 
@@ -3381,11 +3434,11 @@ msgstr "Hexadecimal"
 msgid "Hidden"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1928
+#: include/locales/en_gb.inc.php:1927
 msgid "Hide"
 msgstr "隐藏"
 
-#: include/locales/en_gb.inc.php:1841
+#: include/locales/en_gb.inc.php:1840
 msgid "Hide all"
 msgstr "Hide all"
 
@@ -3393,7 +3446,7 @@ msgstr "Hide all"
 msgid "Hide disabled scenarios"
 msgstr "Hide disabled scenarios"
 
-#: include/locales/en_gb.inc.php:1804
+#: include/locales/en_gb.inc.php:1803
 msgid "Hide disabled triggers"
 msgstr "Hide disabled triggers"
 
@@ -3437,7 +3490,7 @@ msgstr "横向"
 msgid "Horizontal align"
 msgstr "横向对齐"
 
-#: include/locales/en_gb.inc.php:917 include/locales/en_gb.inc.php:2264
+#: include/locales/en_gb.inc.php:917 include/locales/en_gb.inc.php:2263
 msgid "Host"
 msgstr "主机"
 
@@ -3467,7 +3520,7 @@ msgstr "Host Subnet Mask"
 msgid "Host [%1$s] deleted."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1971
+#: include/locales/en_gb.inc.php:1970
 msgid "Host access"
 msgstr "Host access"
 
@@ -3483,7 +3536,7 @@ msgstr ""
 msgid "Host deleted"
 msgstr "已删除主机"
 
-#: include/locales/en_gb.inc.php:2318
+#: include/locales/en_gb.inc.php:2317
 msgid "Host does not exist."
 msgstr ""
 
@@ -3499,7 +3552,7 @@ msgstr "主机组"
 msgid "Host interface"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2319
+#: include/locales/en_gb.inc.php:2318
 msgid "Host key does not exist."
 msgstr ""
 
@@ -3524,7 +3577,7 @@ msgstr ""
 msgid "Host profile"
 msgstr "主机配置"
 
-#: include/locales/en_gb.inc.php:2054
+#: include/locales/en_gb.inc.php:2053
 msgid "Host profiles"
 msgstr "主机配置"
 
@@ -3565,7 +3618,7 @@ msgstr "主机"
 msgid "Hosts (m/n/t)"
 msgstr "主机 (m/n/t)"
 
-#: include/locales/en_gb.inc.php:2075
+#: include/locales/en_gb.inc.php:2074
 msgid "Hosts and templates"
 msgstr "Hosts and templates"
 
@@ -3601,7 +3654,7 @@ msgstr "Hours"
 msgid "Housekeeper"
 msgstr "Housekeeper"
 
-#: include/locales/en_gb.inc.php:2043
+#: include/locales/en_gb.inc.php:2042
 msgid "Hungarian (HU)"
 msgstr "Hungary (HU)"
 
@@ -3665,7 +3718,7 @@ msgstr "IPMI sensor"
 msgid "IPMI username"
 msgstr "IPMI username"
 
-#: include/locales/en_gb.inc.php:1755
+#: include/locales/en_gb.inc.php:1754
 msgid "IT SERVICES"
 msgstr "IT服务"
 
@@ -3673,11 +3726,11 @@ msgstr "IT服务"
 msgid "IT SERVICES AVAILABILITY REPORT"
 msgstr "IT服务可用性报告"
 
-#: include/locales/en_gb.inc.php:1710
+#: include/locales/en_gb.inc.php:1709
 msgid "IT service"
 msgstr "IT 服务"
 
-#: include/locales/en_gb.inc.php:1711
+#: include/locales/en_gb.inc.php:1710
 msgid "IT services"
 msgstr "服务"
 
@@ -3741,7 +3794,7 @@ msgstr "ID"
 msgid "Idle till"
 msgstr "Idle till"
 
-#: include/locales/en_gb.inc.php:2479
+#: include/locales/en_gb.inc.php:2478
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr ""
 
@@ -3761,7 +3814,7 @@ msgstr "图片已删除"
 msgid "Image is used in Zabbix map"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2380
+#: include/locales/en_gb.inc.php:2379
 msgid "Image size must be less than 1MB"
 msgstr "图片大小必须小于 1MB"
 
@@ -3829,7 +3882,7 @@ msgstr ""
 msgid "In progress"
 msgstr "In progress"
 
-#: include/locales/en_gb.inc.php:2110
+#: include/locales/en_gb.inc.php:2109
 msgid "Include"
 msgstr "Include"
 
@@ -3856,7 +3909,7 @@ msgstr "错误的IP"
 msgid "Incorrect IP range."
 msgstr "错误的IP地址段"
 
-#: include/locales/en_gb.inc.php:2382
+#: include/locales/en_gb.inc.php:2381
 msgid "Incorrect Image"
 msgstr "错误的图片"
 
@@ -3875,7 +3928,7 @@ msgstr ""
 msgid "Incorrect Screen identity \"%s\" provided for Screens item resource"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2204
+#: api/classes/class.cwebcheck.php:370 include/locales/en_gb.inc.php:2203
 msgid "Incorrect arguments passed to function"
 msgstr "Incorrect arguments passed to function"
 
@@ -3883,7 +3936,7 @@ msgstr "Incorrect arguments passed to function"
 msgid "Incorrect arguments passed to method."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2245
+#: include/locales/en_gb.inc.php:2244
 msgid "Incorrect characters used for DNS"
 msgstr "Incorrect characters used for DNS"
 
@@ -3892,7 +3945,7 @@ msgstr "Incorrect characters used for DNS"
 msgid "Incorrect characters used for Host name [ %s ]"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2244
+#: include/locales/en_gb.inc.php:2243
 msgid "Incorrect characters used for Hostname"
 msgstr "Incorrect characters used for Hostname"
 
@@ -3901,7 +3954,7 @@ msgstr "Incorrect characters used for Hostname"
 msgid "Incorrect characters used for Hostname [ %s ]"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2385
+#: include/locales/en_gb.inc.php:2384
 msgid "Incorrect characters used for Node name"
 msgstr "节点名不支持某些字符"
 
@@ -3923,11 +3976,11 @@ msgstr "Incorrect command"
 msgid "Incorrect condition type"
 msgstr "Incorrect condition type"
 
-#: include/locales/en_gb.inc.php:1813
+#: include/locales/en_gb.inc.php:1812
 msgid "Incorrect dependency"
 msgstr "Incorrect dependency"
 
-#: include/locales/en_gb.inc.php:2508
+#: include/locales/en_gb.inc.php:2507
 msgid "Incorrect description"
 msgstr "错误的描述"
 
@@ -3947,11 +4000,11 @@ msgstr ""
 msgid "Incorrect expression"
 msgstr "错误的表达式"
 
-#: include/locales/en_gb.inc.php:2133
+#: include/locales/en_gb.inc.php:2132
 msgid "Incorrect fields for application"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2308
+#: include/locales/en_gb.inc.php:2307
 msgid "Incorrect function is used"
 msgstr "Incorrect function is used"
 
@@ -3978,11 +4031,11 @@ msgstr ""
 msgid "Incorrect item for axis value item"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2205
+#: include/locales/en_gb.inc.php:2204
 msgid "Incorrect key format"
 msgstr "Incorrect key format"
 
-#: include/locales/en_gb.inc.php:2197
+#: include/locales/en_gb.inc.php:2196
 msgid "Incorrect list of items."
 msgstr "Incorrect list of items."
 
@@ -4010,7 +4063,7 @@ msgstr "Incorrect maintenance period"
 msgid "Incorrect maintenance week period"
 msgstr "Incorrect maintenance week period"
 
-#: include/locales/en_gb.inc.php:2387
+#: include/locales/en_gb.inc.php:2386
 msgid "Incorrect node type"
 msgstr "Incorrect node type"
 
@@ -4050,7 +4103,7 @@ msgstr ""
 msgid "Incorrect steps"
 msgstr "Incorrect steps"
 
-#: include/locales/en_gb.inc.php:2138 include/locales/en_gb.inc.php:2459
+#: include/locales/en_gb.inc.php:2137 include/locales/en_gb.inc.php:2458
 msgid "Incorrect time period"
 msgstr "日期格式不正确"
 
@@ -4058,15 +4111,15 @@ msgstr "日期格式不正确"
 msgid "Incorrect trigger"
 msgstr "错误的触发器"
 
-#: include/locales/en_gb.inc.php:2303
+#: include/locales/en_gb.inc.php:2302
 msgid "Incorrect trigger expression"
 msgstr "Incorrect trigger expression"
 
-#: include/locales/en_gb.inc.php:2163
+#: include/locales/en_gb.inc.php:2162
 msgid "Incorrect type of asort_by_key"
 msgstr "Incorrect type of asort_by_key"
 
-#: include/locales/en_gb.inc.php:2288
+#: include/locales/en_gb.inc.php:2287
 msgid "Incorrect usage of quotes"
 msgstr "Incorrect usage of quotes"
 
@@ -4074,15 +4127,35 @@ msgstr "Incorrect usage of quotes"
 msgid "Incorrect user"
 msgstr "错误的用户"
 
-#: include/locales/en_gb.inc.php:2374
+#: include/locales/en_gb.inc.php:2373
 msgid "Incorrect user data in"
 msgstr "Incorrect user data in"
 
-#: include/locales/en_gb.inc.php:2284
+#: include/db.inc.php:1203
+#, php-format
+msgid "Incorrect value \"%1$s\" for float field \"%2$s\"."
+msgstr ""
+
+#: include/db.inc.php:1199
+#, php-format
+msgid "Incorrect value \"%1$s\" for int field \"%2$s\"."
+msgstr ""
+
+#: include/db.inc.php:1195
+#, php-format
+msgid "Incorrect value \"%1$s\" for unsigned int field \"%2$s\"."
+msgstr ""
+
+#: include/db.inc.php:1180
+#, php-format
+msgid "Incorrect value \"NULL\" for NOT NULL field \"%s\"."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2283
 msgid "Incorrect value for"
 msgstr "错误的取值类型"
 
-#: include/locales/en_gb.inc.php:2295
+#: include/locales/en_gb.inc.php:2294
 msgid "Incorrect value type"
 msgstr "数据类型错误"
 
@@ -4102,11 +4175,11 @@ msgstr ""
 msgid "Information"
 msgstr "信息"
 
-#: include/locales/en_gb.inc.php:1798
+#: include/locales/en_gb.inc.php:1797
 msgid "Insert"
 msgstr "Insert"
 
-#: include/locales/en_gb.inc.php:1816
+#: include/locales/en_gb.inc.php:1815
 msgid "Insert macro"
 msgstr "Insert macro"
 
@@ -4144,11 +4217,11 @@ msgstr ""
 msgid "Interfaces"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1941
+#: include/locales/en_gb.inc.php:1940
 msgid "Internal"
 msgstr "Internal"
 
-#: include/locales/en_gb.inc.php:2462
+#: include/locales/en_gb.inc.php:2461
 msgid "Internal Zabbix error"
 msgstr ""
 
@@ -4156,7 +4229,7 @@ msgstr ""
 msgid "Interval"
 msgstr "间隔"
 
-#: include/locales/en_gb.inc.php:2207
+#: include/locales/en_gb.inc.php:2206
 msgid "Invalid SNMP port"
 msgstr "Invalid SNMP port"
 
@@ -4164,11 +4237,11 @@ msgstr "Invalid SNMP port"
 msgid "Invalid key format"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2493
+#: include/locales/en_gb.inc.php:2492
 msgid "Inventory"
 msgstr "资产记录"
 
-#: include/locales/en_gb.inc.php:1916
+#: include/locales/en_gb.inc.php:1915
 msgid "Is online?"
 msgstr "是否在线?"
 
@@ -4184,7 +4257,7 @@ msgstr ""
 msgid "It is not possible to search by user password"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2033
+#: include/locales/en_gb.inc.php:2032
 msgid "Italian (IT)"
 msgstr "意大利语 (IT)"
 
@@ -4229,7 +4302,7 @@ msgstr "Item deleted"
 msgid "Item does not exist"
 msgstr "监控项不存在"
 
-#: include/locales/en_gb.inc.php:2212
+#: include/locales/en_gb.inc.php:2211
 msgid "Item function"
 msgstr "监控项的函数"
 
@@ -4247,7 +4320,7 @@ msgstr ""
 msgid "Item prototype [%1$s:%2$s] unlinked."
 msgstr ""
 
-#: include/forms/host.edit.php:422 include/forms/template.edit.php:276
+#: include/forms/host.edit.php:423 include/forms/template.edit.php:276
 msgid "Item prototypes"
 msgstr ""
 
@@ -4259,16 +4332,16 @@ msgstr "监控项已更新"
 msgid "Item uses Host interface from non parent host"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2206
+#: include/locales/en_gb.inc.php:2205
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "Item will not be refreshed. Please enter a correct update interval."
 
-#: api/classes/class.cwebcheck.php:575
+#: api/classes/class.cwebcheck.php:573
 #, php-format
 msgid "Item with key [%s] already exists"
 msgstr ""
 
-#: include/forms/host.edit.php:332 include/forms/template.edit.php:192
+#: include/forms/host.edit.php:333 include/forms/template.edit.php:192
 #: include/locales/en_gb.inc.php:892
 msgid "Items"
 msgstr "监控项"
@@ -4321,7 +4394,7 @@ msgstr ""
 msgid "January"
 msgstr "January"
 
-#: include/locales/en_gb.inc.php:2040
+#: include/locales/en_gb.inc.php:2039
 msgid "Japanese (JP)"
 msgstr "日语 (JP)"
 
@@ -4341,7 +4414,7 @@ msgstr ""
 msgid "June"
 msgstr "June"
 
-#: include/locales/en_gb.inc.php:2172
+#: include/locales/en_gb.inc.php:2171
 msgid "K"
 msgstr "K"
 
@@ -4361,7 +4434,7 @@ msgstr "Keyֵ"
 msgid "Key cannot be empty"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2213
+#: include/locales/en_gb.inc.php:2212
 msgid "Key does not match"
 msgstr "Key does not match"
 
@@ -4376,15 +4449,15 @@ msgstr ""
 msgid "Key is valid"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2112
+#: include/locales/en_gb.inc.php:2111
 msgid "Keyword"
 msgstr "Keyword"
 
-#: include/locales/en_gb.inc.php:2173
+#: include/locales/en_gb.inc.php:2172
 msgid "Kilo"
 msgstr "Kilo"
 
-#: include/locales/en_gb.inc.php:2034
+#: include/locales/en_gb.inc.php:2033
 msgid "Korean (KO)"
 msgstr "韩语 (KO)"
 
@@ -4420,11 +4493,11 @@ msgstr "Label"
 msgid "Label location"
 msgstr "Label location"
 
-#: include/locales/en_gb.inc.php:2028
+#: include/locales/en_gb.inc.php:2027
 msgid "Language"
 msgstr "Language"
 
-#: include/locales/en_gb.inc.php:1575 include/locales/en_gb.inc.php:2546
+#: include/locales/en_gb.inc.php:1575 include/locales/en_gb.inc.php:2545
 msgid "Last"
 msgstr "Last"
 
@@ -4432,23 +4505,23 @@ msgstr "Last"
 msgid "Last 20 issues"
 msgstr "Last 20 issues"
 
-#: include/locales/en_gb.inc.php:1763
+#: include/locales/en_gb.inc.php:1762
 msgid "Last 24 hours"
 msgstr "最近24小时"
 
-#: include/locales/en_gb.inc.php:1765
+#: include/locales/en_gb.inc.php:1764
 msgid "Last 30 days"
 msgstr "最近30天"
 
-#: include/locales/en_gb.inc.php:1766
+#: include/locales/en_gb.inc.php:1765
 msgid "Last 365 days"
 msgstr "最近365天"
 
-#: include/locales/en_gb.inc.php:1764
+#: include/locales/en_gb.inc.php:1763
 msgid "Last 7 days"
 msgstr "最近7天"
 
-#: include/locales/en_gb.inc.php:1850
+#: include/locales/en_gb.inc.php:1849
 msgid "Last change"
 msgstr "上次修改于"
 
@@ -4456,7 +4529,7 @@ msgstr "上次修改于"
 msgid "Last check"
 msgstr "最近检查记录"
 
-#: include/locales/en_gb.inc.php:2438
+#: include/locales/en_gb.inc.php:2437
 msgid "Last failed attempt was from"
 msgstr ""
 
@@ -4468,7 +4541,7 @@ msgstr "最近一小时"
 msgid "Last month graph"
 msgstr "Last month graph"
 
-#: include/locales/en_gb.inc.php:1800
+#: include/locales/en_gb.inc.php:1799
 msgid "Last of"
 msgstr "Last of"
 
@@ -4484,7 +4557,7 @@ msgstr "最新数据"
 msgid "Last week graph"
 msgstr "Last week graph"
 
-#: include/locales/en_gb.inc.php:2504
+#: include/locales/en_gb.inc.php:2503
 msgid "Latest data"
 msgstr "最新数据"
 
@@ -4492,7 +4565,7 @@ msgstr "最新数据"
 msgid "Latest events"
 msgstr "最新报警"
 
-#: include/locales/en_gb.inc.php:2035
+#: include/locales/en_gb.inc.php:2034
 msgid "Latvian (LV)"
 msgstr "拉脱维亚语(LV)"
 
@@ -4544,7 +4617,7 @@ msgstr "Link status indicators"
 msgid "Link to template"
 msgstr "与模板关联"
 
-#: include/locales/en_gb.inc.php:1730
+#: include/locales/en_gb.inc.php:1729
 msgid "Link to trigger?"
 msgstr "Link to trigger?"
 
@@ -4608,19 +4681,19 @@ msgstr "Log time format"
 msgid "Logged in as"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2501
+#: include/locales/en_gb.inc.php:2500
 msgid "Login"
 msgstr "登录"
 
-#: include/locales/en_gb.inc.php:2051
+#: include/locales/en_gb.inc.php:2050
 msgid "Login name"
 msgstr "登录名"
 
-#: include/locales/en_gb.inc.php:2433
+#: include/locales/en_gb.inc.php:2432
 msgid "Login name or password is incorrect"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2502
+#: include/locales/en_gb.inc.php:2501
 msgid "Logout"
 msgstr "退出"
 
@@ -4628,7 +4701,7 @@ msgstr "退出"
 msgid "Logs"
 msgstr "日志"
 
-#: include/locales/en_gb.inc.php:2025
+#: include/locales/en_gb.inc.php:2024
 msgid "Loop"
 msgstr ""
 
@@ -4636,7 +4709,7 @@ msgstr ""
 msgid "Lost"
 msgstr "Lost"
 
-#: include/locales/en_gb.inc.php:2174 include/locales/en_gb.inc.php:2516
+#: include/locales/en_gb.inc.php:2173 include/locales/en_gb.inc.php:2515
 msgid "M"
 msgstr "M"
 
@@ -4672,7 +4745,7 @@ msgstr "MD5"
 msgid "MEDIA TYPES"
 msgstr "处理方法"
 
-#: include/locales/en_gb.inc.php:2159
+#: include/locales/en_gb.inc.php:2158
 msgid "MEMORY LIMIT REACHED! Profiling was stopped to save memory for script processing."
 msgstr "MEMORY LIMIT REACHED! Profiling was stopped to save memory for script processing."
 
@@ -4748,6 +4821,11 @@ msgstr "Maintenance type"
 msgid "Maintenance updated"
 msgstr "Maintenance updated"
 
+#: include/db.inc.php:1168
+#, php-format
+msgid "Mandatory field \"%1$s\" is missing in table \"%2$s\"."
+msgstr ""
+
 #: include/locales/en_gb.inc.php:1649
 msgid "Map"
 msgstr "Map"
@@ -4768,7 +4846,7 @@ msgstr "Map save operation failed."
 msgid "Mapping"
 msgstr "Mapping"
 
-#: include/locales/en_gb.inc.php:2497
+#: include/locales/en_gb.inc.php:2496
 msgid "Maps"
 msgstr "拓扑图"
 
@@ -4800,7 +4878,7 @@ msgstr "批量更新"
 msgid "Mass update selected items?"
 msgstr "Mass update selected items?"
 
-#: include/locales/en_gb.inc.php:1822
+#: include/locales/en_gb.inc.php:1821
 msgid "Mass update selected triggers?"
 msgstr "Mass update selected triggers?"
 
@@ -4812,7 +4890,7 @@ msgstr "Master"
 msgid "Master node"
 msgstr "Master node"
 
-#: include/locales/en_gb.inc.php:2386
+#: include/locales/en_gb.inc.php:2385
 msgid "Master node already exists"
 msgstr "Master node already exists"
 
@@ -4837,7 +4915,7 @@ msgstr "May"
 msgid "Media"
 msgstr "报警介质"
 
-#: include/locales/en_gb.inc.php:2003
+#: include/locales/en_gb.inc.php:2002
 msgid "Media type"
 msgstr "介质类型"
 
@@ -4861,31 +4939,31 @@ msgstr "Media type was not updated"
 msgid "Media types"
 msgstr "处理方法"
 
-#: include/locales/en_gb.inc.php:2470
+#: include/locales/en_gb.inc.php:2469
 msgid "Mediatype already exists:"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2471
+#: include/locales/en_gb.inc.php:2470
 msgid "Mediatypes used by action:"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2175
+#: include/locales/en_gb.inc.php:2174
 msgid "Mega"
 msgstr "Mega"
 
-#: include/locales/en_gb.inc.php:1911
+#: include/locales/en_gb.inc.php:1910
 msgid "Members"
 msgstr "成员"
 
-#: include/locales/en_gb.inc.php:2153
+#: include/locales/en_gb.inc.php:2152
 msgid "Memory leak"
 msgstr "Memory leak"
 
-#: include/locales/en_gb.inc.php:2151
+#: include/locales/en_gb.inc.php:2150
 msgid "Memory limit"
 msgstr "Memory limit"
 
-#: include/locales/en_gb.inc.php:2152
+#: include/locales/en_gb.inc.php:2151
 msgid "Memory usage"
 msgstr "Memory usage"
 
@@ -4905,15 +4983,15 @@ msgstr "Message actions"
 msgid "Message text limit"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2021
+#: include/locales/en_gb.inc.php:2020
 msgid "Message timeout"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2016
+#: include/locales/en_gb.inc.php:2015
 msgid "Messages"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2169
+#: include/locales/en_gb.inc.php:2168
 msgid "Micro"
 msgstr ""
 
@@ -4921,15 +4999,15 @@ msgstr ""
 msgid "Middle"
 msgstr "居中"
 
-#: include/locales/en_gb.inc.php:2171
+#: include/locales/en_gb.inc.php:2170
 msgid "Milli"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1783
+#: include/locales/en_gb.inc.php:1782
 msgid "Min severity"
 msgstr "Min severity"
 
-#: include/locales/en_gb.inc.php:2394
+#: include/locales/en_gb.inc.php:2393
 msgid "Minimal version of PHP is"
 msgstr "Minimal version of PHP is"
 
@@ -4937,7 +5015,7 @@ msgstr "Minimal version of PHP is"
 msgid "Minimize"
 msgstr "Minimize"
 
-#: include/locales/en_gb.inc.php:1708
+#: include/locales/en_gb.inc.php:1707
 msgid "Minor problem"
 msgstr "Minor problem"
 
@@ -4953,15 +5031,15 @@ msgstr "Minutes"
 msgid "Missing"
 msgstr "Missing"
 
-#: include/locales/en_gb.inc.php:2343
+#: include/locales/en_gb.inc.php:2342
 msgid "Missing items for graph"
 msgstr "Missing items for graph"
 
-#: include/locales/en_gb.inc.php:2307
+#: include/locales/en_gb.inc.php:2306
 msgid "Missing key"
 msgstr "Missing key"
 
-#: include/locales/en_gb.inc.php:2299
+#: include/locales/en_gb.inc.php:2298
 msgid "Missing mandatory parameter for function"
 msgstr "Missing mandatory parameter for function"
 
@@ -4977,7 +5055,7 @@ msgstr "Model Number"
 msgid "Mon"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:49 include/locales/en_gb.inc.php:1747
+#: include/locales/en_gb.inc.php:49 include/locales/en_gb.inc.php:1746
 msgid "Monday"
 msgstr "Monday"
 
@@ -4993,7 +5071,7 @@ msgstr "由代理监控"
 msgid "Monitored host"
 msgstr "已监控的主机"
 
-#: include/locales/en_gb.inc.php:2492
+#: include/locales/en_gb.inc.php:2491
 msgid "Monitoring"
 msgstr "状态统计"
 
@@ -5013,7 +5091,7 @@ msgstr "10分钟以上"
 msgid "Most busy triggers top 100"
 msgstr "最繁忙的100条触发器"
 
-#: include/locales/en_gb.inc.php:2012
+#: include/locales/en_gb.inc.php:2011
 msgid "Move"
 msgstr ""
 
@@ -5021,11 +5099,11 @@ msgstr ""
 msgid "Multibyte String module required to run FrontEnd"
 msgstr "Multibyte String module required to run FrontEnd"
 
-#: include/locales/en_gb.inc.php:1802
+#: include/locales/en_gb.inc.php:1801
 msgid "Multiple PROBLEM events"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2014
+#: include/locales/en_gb.inc.php:2013
 msgid "Mute"
 msgstr ""
 
@@ -5057,11 +5135,11 @@ msgstr "警报"
 msgid "NTLM authentication"
 msgstr ""
 
-#: include/forms/script.edit.php:73 include/locales/en_gb.inc.php:1914
+#: include/forms/script.edit.php:73 include/locales/en_gb.inc.php:1913
 msgid "Name"
 msgstr "名称"
 
-#: include/locales/en_gb.inc.php:2167
+#: include/locales/en_gb.inc.php:2166
 msgid "Nano"
 msgstr ""
 
@@ -5081,7 +5159,7 @@ msgstr "Network map updated"
 msgid "Network maps"
 msgstr "网络结构图"
 
-#: include/locales/en_gb.inc.php:1855
+#: include/locales/en_gb.inc.php:1854
 msgid "Never"
 msgstr "Never"
 
@@ -5101,7 +5179,7 @@ msgstr "New check"
 msgid "New condition"
 msgstr "新的触发条件"
 
-#: include/locales/en_gb.inc.php:1807
+#: include/locales/en_gb.inc.php:1806
 msgid "New dependency"
 msgstr "New dependency"
 
@@ -5129,7 +5207,7 @@ msgstr "新主机组"
 msgid "New host"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2106
+#: include/locales/en_gb.inc.php:2105
 msgid "New indicators"
 msgstr ""
 
@@ -5169,7 +5247,7 @@ msgstr "新节点"
 msgid "New regular expression"
 msgstr "新表达式"
 
-#: include/locales/en_gb.inc.php:1742
+#: include/locales/en_gb.inc.php:1741
 msgid "New service time"
 msgstr "New service time"
 
@@ -5185,7 +5263,7 @@ msgstr ""
 msgid "New template added"
 msgstr "New template added"
 
-#: include/locales/en_gb.inc.php:254 include/locales/en_gb.inc.php:2549
+#: include/locales/en_gb.inc.php:254 include/locales/en_gb.inc.php:2548
 msgid "Next"
 msgstr "Next"
 
@@ -5201,11 +5279,11 @@ msgstr "Next run"
 msgid "No"
 msgstr "No"
 
-#: include/locales/en_gb.inc.php:1714
+#: include/locales/en_gb.inc.php:1713
 msgid "No IT service defined"
 msgstr "没有定义 IT 服务"
 
-#: include/locales/en_gb.inc.php:1938
+#: include/locales/en_gb.inc.php:1937
 msgid "No accessible resources"
 msgstr "没有允许访问的资源"
 
@@ -5217,7 +5295,7 @@ msgstr "没有定义操作"
 msgid "No actions found"
 msgstr "No actions found"
 
-#: include/locales/en_gb.inc.php:2259
+#: include/locales/en_gb.inc.php:2258
 msgid "No application with"
 msgstr "No application with"
 
@@ -5241,7 +5319,7 @@ msgstr "没有可导出的数据"
 msgid "No data maintenance"
 msgstr "No data maintenance"
 
-#: include/locales/en_gb.inc.php:1806
+#: include/locales/en_gb.inc.php:1805
 msgid "No dependencies defined"
 msgstr "No dependencies defined"
 
@@ -5249,11 +5327,11 @@ msgstr "No dependencies defined"
 msgid "No discovery rules defined"
 msgstr "没有定义自动发现规则"
 
-#: include/locales/en_gb.inc.php:2141
+#: include/locales/en_gb.inc.php:2140
 msgid "No elements selected!"
 msgstr "没有选取组件!"
 
-#: include/locales/en_gb.inc.php:2092
+#: include/locales/en_gb.inc.php:2091
 msgid "No errors found"
 msgstr ""
 
@@ -5269,7 +5347,7 @@ msgstr "No events to acknowledge"
 msgid "No flexible intervals"
 msgstr "No flexible intervals"
 
-#: include/locales/en_gb.inc.php:2314
+#: include/locales/en_gb.inc.php:2313
 msgid "No function with"
 msgstr "No function with"
 
@@ -5277,7 +5355,7 @@ msgstr "No function with"
 msgid "No graph defined"
 msgstr "No graph defined"
 
-#: include/locales/en_gb.inc.php:2342
+#: include/locales/en_gb.inc.php:2341
 msgid "No graph item with"
 msgstr "No graph item with"
 
@@ -5311,11 +5389,11 @@ msgstr ""
 msgid "No host groups defined"
 msgstr "没有定义主机组"
 
-#: include/locales/en_gb.inc.php:2251
+#: include/locales/en_gb.inc.php:2250
 msgid "No host groups with"
 msgstr "No host groups with"
 
-#: include/locales/en_gb.inc.php:2253
+#: include/locales/en_gb.inc.php:2252
 msgid "No host with"
 msgstr "No host with"
 
@@ -5327,7 +5405,7 @@ msgstr "没有定义主机"
 msgid "No icon for map element"
 msgstr "No icon for map element"
 
-#: include/locales/en_gb.inc.php:2200
+#: include/locales/en_gb.inc.php:2199
 msgid "No image"
 msgstr "No image"
 
@@ -5359,11 +5437,11 @@ msgstr ""
 msgid "No item defined"
 msgstr "No item defined"
 
-#: include/locales/en_gb.inc.php:2219
+#: include/locales/en_gb.inc.php:2218
 msgid "No item with"
 msgstr "No item with"
 
-#: include/locales/en_gb.inc.php:2072
+#: include/locales/en_gb.inc.php:2071
 msgid "No items"
 msgstr "No items"
 
@@ -5391,7 +5469,7 @@ msgstr "没有定义拓扑图"
 msgid "No media defined"
 msgstr "没有定义介质"
 
-#: include/locales/en_gb.inc.php:2237
+#: include/locales/en_gb.inc.php:2236
 msgid "No media type with"
 msgstr "No media type with"
 
@@ -5399,7 +5477,7 @@ msgstr "No media type with"
 msgid "No media types defined"
 msgstr "未定义介质类型"
 
-#: include/locales/en_gb.inc.php:2236
+#: include/locales/en_gb.inc.php:2235
 msgid "No media with"
 msgstr "No media with"
 
@@ -5415,11 +5493,11 @@ msgstr "No operations defined"
 msgid "No permissions !"
 msgstr "权限不足!"
 
-#: include/locales/en_gb.inc.php:2512
+#: include/locales/en_gb.inc.php:2511
 msgid "No permissions for map"
 msgstr "No permissions for map"
 
-#: include/locales/en_gb.inc.php:2511
+#: include/locales/en_gb.inc.php:2510
 msgid "No permissions for screen"
 msgstr "No permissions for screen"
 
@@ -5435,11 +5513,11 @@ msgstr "没有定义代理主机"
 msgid "No resources defined"
 msgstr "没有定义资源"
 
-#: include/locales/en_gb.inc.php:1924
+#: include/locales/en_gb.inc.php:1923
 msgid "No rights defined"
 msgstr "未定义权限"
 
-#: include/locales/en_gb.inc.php:2334
+#: include/locales/en_gb.inc.php:2333
 msgid "No rows in screen"
 msgstr "No rows in screen"
 
@@ -5447,15 +5525,15 @@ msgstr "No rows in screen"
 msgid "No screens defined"
 msgstr "没有定义图表"
 
-#: include/locales/en_gb.inc.php:1970
+#: include/locales/en_gb.inc.php:1969
 msgid "No scripts defined"
 msgstr "未定义脚本"
 
-#: include/locales/en_gb.inc.php:2370
+#: include/locales/en_gb.inc.php:2369
 msgid "No service linkage with"
 msgstr "No service linkage with"
 
-#: include/locales/en_gb.inc.php:2369
+#: include/locales/en_gb.inc.php:2368
 msgid "No service with"
 msgstr "No service with"
 
@@ -5467,19 +5545,19 @@ msgstr "No slide shows defined"
 msgid "No slides defined"
 msgstr "No slides defined"
 
-#: include/locales/en_gb.inc.php:2290
+#: include/locales/en_gb.inc.php:2289
 msgid "No such host"
 msgstr "没有该主机"
 
-#: include/locales/en_gb.inc.php:2292
+#: include/locales/en_gb.inc.php:2291
 msgid "No such monitored parameter"
 msgstr "没有该监控参数"
 
-#: include/locales/en_gb.inc.php:2329
+#: include/locales/en_gb.inc.php:2328
 msgid "No sysmap element with"
 msgstr "No sysmap element with"
 
-#: include/locales/en_gb.inc.php:2328
+#: include/locales/en_gb.inc.php:2327
 msgid "No system map with"
 msgstr "No system map with"
 
@@ -5495,31 +5573,31 @@ msgstr "没有定义模板"
 msgid "No templates linked"
 msgstr "没有与模板关联"
 
-#: include/locales/en_gb.inc.php:1740
+#: include/locales/en_gb.inc.php:1739
 msgid "No times defined"
 msgstr "No times defined"
 
-#: include/locales/en_gb.inc.php:1771
+#: include/locales/en_gb.inc.php:1770
 msgid "No trigger"
 msgstr "No trigger"
 
-#: include/locales/en_gb.inc.php:1773
+#: include/locales/en_gb.inc.php:1772
 msgid "No trigger defined"
 msgstr "No trigger defined"
 
-#: include/locales/en_gb.inc.php:2287
+#: include/locales/en_gb.inc.php:2286
 msgid "No trigger with"
 msgstr "No trigger with"
 
-#: include/locales/en_gb.inc.php:1772
+#: include/locales/en_gb.inc.php:1771
 msgid "No triggers defined"
 msgstr "No triggers defined"
 
-#: include/locales/en_gb.inc.php:1912
+#: include/locales/en_gb.inc.php:1911
 msgid "No user groups defined"
 msgstr "未定义用户组"
 
-#: include/locales/en_gb.inc.php:1917
+#: include/locales/en_gb.inc.php:1916
 msgid "No users defined"
 msgstr "没有定义用户"
 
@@ -5539,7 +5617,7 @@ msgstr "Node deleted"
 msgid "Node updated"
 msgstr "Node updated"
 
-#: include/locales/en_gb.inc.php:2388
+#: include/locales/en_gb.inc.php:2387
 msgid "Node with same ID already exists"
 msgstr "Node with same ID already exists"
 
@@ -5547,7 +5625,7 @@ msgstr "Node with same ID already exists"
 msgid "Nodes"
 msgstr "节点"
 
-#: include/locales/en_gb.inc.php:939 include/locales/en_gb.inc.php:1723
+#: include/locales/en_gb.inc.php:939 include/locales/en_gb.inc.php:1722
 msgid "None"
 msgstr "None"
 
@@ -5563,7 +5641,7 @@ msgstr ""
 msgid "Normal maintenance"
 msgstr "Normal maintenance"
 
-#: include/locales/en_gb.inc.php:1854
+#: include/locales/en_gb.inc.php:1853
 msgid "Not Ack"
 msgstr "Not Ack"
 
@@ -5571,23 +5649,23 @@ msgstr "Not Ack"
 msgid "Not Templated items"
 msgstr "Not Templated items"
 
-#: include/locales/en_gb.inc.php:1845
+#: include/locales/en_gb.inc.php:1844
 msgid "Not acknowledged"
 msgstr "Not acknowledged"
 
-#: include/locales/en_gb.inc.php:2100
+#: include/locales/en_gb.inc.php:2099
 msgid "Not allowed symbols detected after element"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2101
+#: include/locales/en_gb.inc.php:2100
 msgid "Not allowed symbols detected before element"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2097
+#: include/locales/en_gb.inc.php:2096
 msgid "Not allowed symbols or sequence of symbols in expression element detected"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2098
+#: include/locales/en_gb.inc.php:2097
 msgid "Not allowed value detected in element"
 msgstr ""
 
@@ -5611,7 +5689,7 @@ msgstr "未被检测"
 msgid "Not supported"
 msgstr "不支持"
 
-#: include/locales/en_gb.inc.php:1743
+#: include/locales/en_gb.inc.php:1742
 msgid "Note"
 msgstr "Note"
 
@@ -5751,7 +5829,7 @@ msgstr "Ok"
 msgid "On"
 msgstr "开"
 
-#: include/locales/en_gb.inc.php:2011
+#: include/locales/en_gb.inc.php:2010
 msgid "Once"
 msgstr ""
 
@@ -5759,23 +5837,23 @@ msgstr ""
 msgid "One time only"
 msgstr "One time only"
 
-#: include/locales/en_gb.inc.php:1739
+#: include/locales/en_gb.inc.php:1738
 msgid "One-time downtime"
 msgstr "One-time downtime"
 
-#: include/locales/en_gb.inc.php:2439
+#: include/locales/en_gb.inc.php:2438
 msgid "Only Super Admins can create Scripts"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2442
+#: include/locales/en_gb.inc.php:2441
 msgid "Only Super Admins can create Users"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2472
+#: include/locales/en_gb.inc.php:2471
 msgid "Only Super Admins can create media types"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2441
+#: include/locales/en_gb.inc.php:2440
 msgid "Only Super Admins can delete Scripts"
 msgstr ""
 
@@ -5784,39 +5862,40 @@ msgstr ""
 msgid "Only Super Admins can delete User Groups."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2444
+#: include/locales/en_gb.inc.php:2443
 msgid "Only Super Admins can delete Users"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2474
+#: include/locales/en_gb.inc.php:2473
 msgid "Only Super Admins can delete media types"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2440
+#: include/locales/en_gb.inc.php:2439
 msgid "Only Super Admins can update Scripts"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2443
+#: include/locales/en_gb.inc.php:2442
 msgid "Only Super Admins can update Users"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2473
+#: include/locales/en_gb.inc.php:2472
 msgid "Only Super Admins can update media types"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2445
+#: include/locales/en_gb.inc.php:2444
 msgid "Only Zabbix Admins can add user Medias"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2447
+#: include/locales/en_gb.inc.php:2446
 msgid "Only Zabbix Admins can change user Medias"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2446
+#: include/locales/en_gb.inc.php:2445
 msgid "Only Zabbix Admins can remove user Medias"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2229
+#: api/classes/class.cwebcheck.php:309 api/classes/class.cwebcheck.php:375
+#: include/locales/en_gb.inc.php:2228
 msgid "Only characters are allowed"
 msgstr "Only characters are allowed"
 
@@ -5832,7 +5911,7 @@ msgstr "Only items assigned to enabled hosts are counted"
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 
-#: include/locales/en_gb.inc.php:2283
+#: include/locales/en_gb.inc.php:2282
 msgid "Operation cannot be performed due to unauthorized request"
 msgstr "Operation cannot be performed due to unauthorized request"
 
@@ -5881,7 +5960,7 @@ msgstr "总览"
 msgid "Overview by proxy"
 msgstr "Overview by proxy"
 
-#: include/locales/en_gb.inc.php:2180
+#: include/locales/en_gb.inc.php:2179
 msgid "P"
 msgstr "P"
 
@@ -5889,47 +5968,47 @@ msgstr "P"
 msgid "PERSONAL DASHBOARD"
 msgstr "PERSONAL DASHBOARD"
 
-#: include/locales/en_gb.inc.php:2425
+#: include/locales/en_gb.inc.php:2424
 msgid "PHP Session"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2414
+#: include/locales/en_gb.inc.php:2413
 msgid "PHP Sockets"
 msgstr "PHP 的 Sockets"
 
-#: include/locales/en_gb.inc.php:2409
+#: include/locales/en_gb.inc.php:2408
 msgid "PHP databases support"
 msgstr "PHP支持的数据库"
 
-#: include/locales/en_gb.inc.php:2427
+#: include/locales/en_gb.inc.php:2426
 msgid "PHP gettext"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2399
+#: include/locales/en_gb.inc.php:2398
 msgid "PHP max execution time"
 msgstr "PHP max execution time"
 
-#: include/locales/en_gb.inc.php:2400
+#: include/locales/en_gb.inc.php:2399
 msgid "PHP max input time"
 msgstr "PHP max input time"
 
-#: include/locales/en_gb.inc.php:2395
+#: include/locales/en_gb.inc.php:2394
 msgid "PHP memory limit"
 msgstr "PHP memory limit"
 
-#: include/locales/en_gb.inc.php:2397
+#: include/locales/en_gb.inc.php:2396
 msgid "PHP post max size"
 msgstr "PHP post max size"
 
-#: include/locales/en_gb.inc.php:2403
+#: include/locales/en_gb.inc.php:2402
 msgid "PHP timezone"
 msgstr "PHP的时区设置"
 
-#: include/locales/en_gb.inc.php:2423
+#: include/locales/en_gb.inc.php:2422
 msgid "PHP upload max filesize"
 msgstr "PHP最大上传文件大小"
 
-#: include/locales/en_gb.inc.php:2393
+#: include/locales/en_gb.inc.php:2392
 msgid "PHP version"
 msgstr "PHP version"
 
@@ -5953,7 +6032,7 @@ msgstr "PROBLEM"
 msgid "PROXIES"
 msgstr "代理主机"
 
-#: include/locales/en_gb.inc.php:2145
+#: include/locales/en_gb.inc.php:2144
 msgid "Page received incorrect data"
 msgstr "Page received incorrect data"
 
@@ -5965,11 +6044,11 @@ msgstr "Palette"
 msgid "Parameter"
 msgstr "参数"
 
-#: include/locales/en_gb.inc.php:1720
+#: include/locales/en_gb.inc.php:1719
 msgid "Parent service"
 msgstr "上一级服务"
 
-#: include/locales/en_gb.inc.php:2379
+#: include/locales/en_gb.inc.php:2378
 msgid "Parse SQL error"
 msgstr "解析 SQL 语句出错"
 
@@ -5981,23 +6060,24 @@ msgstr ""
 msgid "Passphrase"
 msgstr "Passphrase"
 
-#: include/forms/host.edit.php:523 include/locales/en_gb.inc.php:1929
+#: include/forms/host.edit.php:524 include/locales/en_gb.inc.php:1928
+#: include/setup.inc.php:249
 msgid "Password"
 msgstr "密码"
 
-#: include/locales/en_gb.inc.php:1931
+#: include/locales/en_gb.inc.php:1930
 msgid "Password (once again)"
 msgstr "确认密码"
 
-#: include/locales/en_gb.inc.php:2466
+#: include/locales/en_gb.inc.php:2465
 msgid "Password required for mediatype"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1876
+#: include/locales/en_gb.inc.php:1875
 msgid "Password should not be empty"
 msgstr "密码不能为空"
 
-#: include/locales/en_gb.inc.php:2023
+#: include/locales/en_gb.inc.php:2022
 msgid "Pause"
 msgstr ""
 
@@ -6017,7 +6097,7 @@ msgstr "时期"
 msgid "Period type"
 msgstr "Period type"
 
-#: include/locales/en_gb.inc.php:2181
+#: include/locales/en_gb.inc.php:2180
 msgid "Peta"
 msgstr "Peta"
 
@@ -6033,15 +6113,15 @@ msgstr ""
 msgid "Plain text"
 msgstr "文本"
 
-#: include/locales/en_gb.inc.php:2022
+#: include/locales/en_gb.inc.php:2021
 msgid "Play"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2020
+#: include/locales/en_gb.inc.php:2019
 msgid "Play sound"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2390
+#: include/locales/en_gb.inc.php:2389
 msgid "Please be aware that database still contains data related to the deleted Node"
 msgstr "Please be aware that database still contains data related to the deleted Node"
 
@@ -6053,11 +6133,11 @@ msgstr ""
 msgid "Please select two elements"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2407
+#: include/locales/en_gb.inc.php:2406
 msgid "Please set"
 msgstr "请设置"
 
-#: include/locales/en_gb.inc.php:2044
+#: include/locales/en_gb.inc.php:2043
 msgid "Polish (PL)"
 msgstr "Polish (PL)"
 
@@ -6065,11 +6145,11 @@ msgstr "Polish (PL)"
 msgid "Port"
 msgstr "端口"
 
-#: include/locales/en_gb.inc.php:2037
+#: include/locales/en_gb.inc.php:2036
 msgid "Portuguese (PT)"
 msgstr "波兰语 (PT)"
 
-#: include/locales/en_gb.inc.php:2113
+#: include/locales/en_gb.inc.php:2112
 msgid "Position"
 msgstr "Position"
 
@@ -6081,8 +6161,8 @@ msgstr "Post"
 msgid "Preview"
 msgstr "Preview"
 
-#: include/locales/en_gb.inc.php:253 include/locales/en_gb.inc.php:2548
-#: include/locales/en_gb.inc.php:2550
+#: include/locales/en_gb.inc.php:253 include/locales/en_gb.inc.php:2547
+#: include/locales/en_gb.inc.php:2549
 msgid "Previous"
 msgstr "Previous"
 
@@ -6114,7 +6194,7 @@ msgstr "Primary POC Phone 2"
 msgid "Primary POC Screen Name"
 msgstr "Primary POC Screen Name"
 
-#: include/locales/en_gb.inc.php:2503
+#: include/locales/en_gb.inc.php:2502
 msgid "Print"
 msgstr "打印"
 
@@ -6122,11 +6202,11 @@ msgstr "打印"
 msgid "Private key file"
 msgstr "Private key file"
 
-#: include/forms/host.edit.php:520
+#: include/forms/host.edit.php:521
 msgid "Privilege level"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2436
+#: include/locales/en_gb.inc.php:2435
 msgid "Probably php-ldap module is missing"
 msgstr ""
 
@@ -6138,15 +6218,15 @@ msgstr "Problem"
 msgid "Problem display"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2017
+#: include/locales/en_gb.inc.php:2016
 msgid "Problem on"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1725
+#: include/locales/en_gb.inc.php:1724
 msgid "Problem, if all children have problems"
 msgstr "Problem, if all children have problems"
 
-#: include/locales/en_gb.inc.php:1724
+#: include/locales/en_gb.inc.php:1723
 msgid "Problem, if at least one child has a problem"
 msgstr "Problem, if at least one child has a problem"
 
@@ -6154,11 +6234,11 @@ msgstr "Problem, if at least one child has a problem"
 msgid "Problems"
 msgstr "Problems"
 
-#: include/locales/en_gb.inc.php:2490
+#: include/locales/en_gb.inc.php:2489
 msgid "Profile"
 msgstr "配置"
 
-#: include/locales/en_gb.inc.php:2199
+#: include/locales/en_gb.inc.php:2198
 msgid "Profile for this host is missing"
 msgstr "Profile for this host is missing"
 
@@ -6174,11 +6254,11 @@ msgstr "代理主机"
 msgid "Proxy"
 msgstr "代理主机"
 
-#: include/locales/en_gb.inc.php:1887
+#: include/locales/en_gb.inc.php:1886
 msgid "Proxy added"
 msgstr "Proxy added"
 
-#: include/locales/en_gb.inc.php:1891
+#: include/locales/en_gb.inc.php:1890
 msgid "Proxy deleted"
 msgstr "Proxy deleted"
 
@@ -6190,7 +6270,7 @@ msgstr ""
 msgid "Proxy name"
 msgstr "代理主机名"
 
-#: include/locales/en_gb.inc.php:1889
+#: include/locales/en_gb.inc.php:1888
 msgid "Proxy updated"
 msgstr "Proxy updated"
 
@@ -6210,7 +6290,7 @@ msgstr "队列"
 msgid "QUEUE OF ITEMS TO BE UPDATED"
 msgstr "已经更新的队列"
 
-#: include/locales/en_gb.inc.php:2494
+#: include/locales/en_gb.inc.php:2493
 msgid "Queue"
 msgstr "队列"
 
@@ -6222,19 +6302,19 @@ msgstr "REPORT"
 msgid "RMCP+"
 msgstr "RMCP+"
 
-#: include/forms/script.edit.php:112 include/locales/en_gb.inc.php:1968
+#: include/forms/script.edit.php:112 include/locales/en_gb.inc.php:1967
 msgid "Read"
 msgstr "读"
 
-#: include/locales/en_gb.inc.php:1925
+#: include/locales/en_gb.inc.php:1924
 msgid "Read only"
 msgstr "只读"
 
-#: include/locales/en_gb.inc.php:1926
+#: include/locales/en_gb.inc.php:1925
 msgid "Read-write"
 msgstr "读写"
 
-#: include/locales/en_gb.inc.php:1758
+#: include/locales/en_gb.inc.php:1757
 msgid "Reason"
 msgstr "Reason"
 
@@ -6250,7 +6330,7 @@ msgstr "Recipient"
 msgid "Recipient(s)"
 msgstr "收件人"
 
-#: include/locales/en_gb.inc.php:2018
+#: include/locales/en_gb.inc.php:2017
 msgid "Recovery"
 msgstr ""
 
@@ -6266,7 +6346,7 @@ msgstr "Recovery subject"
 msgid "Refresh"
 msgstr "Refresh"
 
-#: include/locales/en_gb.inc.php:1935
+#: include/locales/en_gb.inc.php:1934
 msgid "Refresh (in seconds)"
 msgstr "自动刷行间隔(s)"
 
@@ -6319,7 +6399,7 @@ msgstr "Remote command"
 msgid "Remote commands"
 msgstr "Remote commands"
 
-#: include/locales/en_gb.inc.php:1744
+#: include/locales/en_gb.inc.php:1743
 msgid "Remove"
 msgstr "Remove"
 
@@ -6327,7 +6407,7 @@ msgstr "Remove"
 msgid "Remove element"
 msgstr "删除组建"
 
-#: include/locales/en_gb.inc.php:1940
+#: include/locales/en_gb.inc.php:1939
 msgid "Remove from"
 msgstr "删除从"
 
@@ -6343,7 +6423,7 @@ msgstr "Remove link"
 msgid "Remove selected"
 msgstr "Remove selected"
 
-#: include/locales/en_gb.inc.php:1817
+#: include/locales/en_gb.inc.php:1816
 msgid "Replace"
 msgstr "Replace"
 
@@ -6355,11 +6435,11 @@ msgstr "Replace linked templates"
 msgid "Replace previous locale file with one you have downloaded."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2498
+#: include/locales/en_gb.inc.php:2497
 msgid "Report"
 msgstr "报告"
 
-#: include/locales/en_gb.inc.php:2499
+#: include/locales/en_gb.inc.php:2498
 msgid "Reports"
 msgstr "系统评估"
 
@@ -6367,19 +6447,19 @@ msgstr "系统评估"
 msgid "Required"
 msgstr "Required"
 
-#: include/locales/en_gb.inc.php:2426
+#: include/locales/en_gb.inc.php:2425
 msgid "Required Session module"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2415
+#: include/locales/en_gb.inc.php:2414
 msgid "Required Sockets module"
 msgstr "需要 Sockets 模块"
 
-#: include/locales/en_gb.inc.php:2428
+#: include/locales/en_gb.inc.php:2427
 msgid "Required gettext module"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1967
+#: include/locales/en_gb.inc.php:1966
 msgid "Required host"
 msgstr "Required host"
 
@@ -6395,23 +6475,23 @@ msgstr ""
 msgid "Required server performance, new values per second"
 msgstr "Required server performance, new values per second"
 
-#: include/locales/en_gb.inc.php:2410
+#: include/locales/en_gb.inc.php:2409
 msgid "Requires any database support [MySQL or PostgreSQL or Oracle or SQLite3]"
 msgstr "需要支持至少以下一种数据库 [MySQL, PostgreSQL, Oracle 或者 SQLite3]"
 
-#: include/locales/en_gb.inc.php:2411
+#: include/locales/en_gb.inc.php:2410
 msgid "Requires bcmath module"
 msgstr "需要 bcmath 模块"
 
-#: include/locales/en_gb.inc.php:2422
+#: include/locales/en_gb.inc.php:2421
 msgid "Requires ctype module"
 msgstr "Requires ctype module"
 
-#: include/locales/en_gb.inc.php:2418
+#: include/locales/en_gb.inc.php:2417
 msgid "Requires images generation support"
 msgstr "Requires images generation support"
 
-#: include/locales/en_gb.inc.php:2413
+#: include/locales/en_gb.inc.php:2412
 msgid "Requires mb string module"
 msgstr "需要 mbstring 模块"
 
@@ -6431,7 +6511,7 @@ msgstr "资源"
 msgid "Response code"
 msgstr "Response code"
 
-#: api/classes/class.cwebcheck.php:658
+#: api/classes/class.cwebcheck.php:654
 #, php-format
 msgid "Response code for step '%1$s' of scenario '%2$s'"
 msgstr ""
@@ -6440,12 +6520,12 @@ msgstr ""
 msgid "Response time"
 msgstr "Response time"
 
-#: api/classes/class.cwebcheck.php:651
+#: api/classes/class.cwebcheck.php:647
 #, php-format
 msgid "Response time for step '%1$s' of scenario '%2$s'"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1980
+#: include/locales/en_gb.inc.php:1979
 msgid "Result"
 msgstr "Result"
 
@@ -6457,7 +6537,7 @@ msgstr "Result is FALSE"
 msgid "Result is TRUE"
 msgstr "Result is TRUE"
 
-#: include/locales/en_gb.inc.php:2124
+#: include/locales/en_gb.inc.php:2123
 msgid "Result type"
 msgstr "结果类型"
 
@@ -6477,7 +6557,7 @@ msgstr "Return"
 msgid "Right"
 msgstr "右侧"
 
-#: include/locales/en_gb.inc.php:1918
+#: include/locales/en_gb.inc.php:1917
 msgid "Rights"
 msgstr "权限"
 
@@ -6489,7 +6569,7 @@ msgstr "行宽度"
 msgid "Rows"
 msgstr "函数"
 
-#: include/locales/en_gb.inc.php:1942
+#: include/locales/en_gb.inc.php:1941
 msgid "Rows per page"
 msgstr "每页显示行数"
 
@@ -6505,11 +6585,11 @@ msgstr "Rules"
 msgid "Run remote commands"
 msgstr "Run remote commands"
 
-#: include/locales/en_gb.inc.php:2036
+#: include/locales/en_gb.inc.php:2035
 msgid "Russian (RU)"
 msgstr "俄语 (RU)"
 
-#: include/locales/en_gb.inc.php:2521 include/locales/en_gb.inc.php:2522
+#: include/locales/en_gb.inc.php:2520 include/locales/en_gb.inc.php:2521
 msgid "S"
 msgstr ""
 
@@ -6521,15 +6601,15 @@ msgstr "SCENARIOS"
 msgid "SCREENS"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1985
+#: include/locales/en_gb.inc.php:1984
 msgid "SCRIPT ERROR"
 msgstr "SCRIPT ERROR"
 
-#: include/locales/en_gb.inc.php:1964
+#: include/locales/en_gb.inc.php:1963
 msgid "SCRIPTS"
 msgstr "脚本"
 
-#: include/locales/en_gb.inc.php:2062
+#: include/locales/en_gb.inc.php:2061
 msgid "SEARCH"
 msgstr "搜索"
 
@@ -6617,15 +6697,15 @@ msgstr "SNMPv3 security level"
 msgid "SNMPv3 security name"
 msgstr "SNMPv3 security name"
 
-#: include/locales/en_gb.inc.php:2155
+#: include/locales/en_gb.inc.php:2154
 msgid "SQL executes count"
 msgstr "SQL executes count"
 
-#: include/locales/en_gb.inc.php:2156
+#: include/locales/en_gb.inc.php:2155
 msgid "SQL requests count"
 msgstr "SQL requests count"
 
-#: include/locales/en_gb.inc.php:2154
+#: include/locales/en_gb.inc.php:2153
 msgid "SQL selects count"
 msgstr "SQL selects count"
 
@@ -6637,7 +6717,7 @@ msgstr "SSH"
 msgid "SSH agent"
 msgstr "SSH agent"
 
-#: include/locales/en_gb.inc.php:2071
+#: include/locales/en_gb.inc.php:2070
 msgid "STANDARD ITEMS"
 msgstr "STANDARD ITEMS"
 
@@ -6645,7 +6725,7 @@ msgstr "STANDARD ITEMS"
 msgid "STATUS OF DISCOVERY"
 msgstr "自动发现的状态"
 
-#: include/locales/en_gb.inc.php:1838
+#: include/locales/en_gb.inc.php:1837
 msgid "STATUS OF TRIGGERS"
 msgstr "触发器的状态"
 
@@ -6661,7 +6741,7 @@ msgstr "ZABBIX 状态"
 msgid "Sat"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:54 include/locales/en_gb.inc.php:1752
+#: include/locales/en_gb.inc.php:54 include/locales/en_gb.inc.php:1751
 msgid "Saturday"
 msgstr "Saturday"
 
@@ -6676,6 +6756,21 @@ msgstr "Scale"
 #: include/locales/en_gb.inc.php:187
 msgid "Scenario"
 msgstr "Scenario"
+
+#: api/classes/class.cwebcheck.php:531
+#, php-format
+msgid "Scenario [%1$s] [%2$s] host [%3$s]"
+msgstr ""
+
+#: api/classes/class.cwebcheck.php:388
+#, php-format
+msgid "Scenario [%s] already exists."
+msgstr ""
+
+#: api/classes/class.cwebcheck.php:524
+#, php-format
+msgid "Scenario [%s] deleted."
+msgstr ""
 
 #: include/locales/en_gb.inc.php:195
 msgid "Scenario activated"
@@ -6693,11 +6788,16 @@ msgstr "Scenario deleted"
 msgid "Scenario disabled"
 msgstr "Scenario disabled"
 
-#: include/locales/en_gb.inc.php:2227
+#: include/locales/en_gb.inc.php:2226
 msgid "Scenario step name should contain"
 msgstr "Scenario step name should contain"
 
-#: include/locales/en_gb.inc.php:2226
+#: api/classes/class.cwebcheck.php:616 api/classes/class.cwebcheck.php:713
+msgid "Scenario step name should contain only printable characters."
+msgstr ""
+
+#: api/classes/class.cwebcheck.php:629 api/classes/class.cwebcheck.php:718
+#: include/locales/en_gb.inc.php:2225
 msgid "Scenario step number cannot be less than 1"
 msgstr "Scenario step number cannot be less than 1"
 
@@ -6705,9 +6805,14 @@ msgstr "Scenario step number cannot be less than 1"
 msgid "Scenario updated"
 msgstr "Scenario updated"
 
-#: include/locales/en_gb.inc.php:2231
+#: include/locales/en_gb.inc.php:2230
 msgid "Scenario with name"
 msgstr "Scenario with name"
+
+#: api/classes/class.cwebcheck.php:320
+#, php-format
+msgid "Scenarion [%s] already exists."
+msgstr ""
 
 #: include/locales/en_gb.inc.php:188
 msgid "Scenarios"
@@ -6745,12 +6850,12 @@ msgstr "Screen should contain at least one row and column"
 msgid "Screen updated"
 msgstr "图表已更新"
 
-#: include/locales/en_gb.inc.php:1699
+#: include/locales/en_gb.inc.php:1698
 #, php-format
 msgid "Screen with id \"%d\" does not exist"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1698
+#: include/locales/en_gb.inc.php:1697
 #, php-format
 msgid "Screen with name \"%s\" does not exist"
 msgstr ""
@@ -6768,11 +6873,11 @@ msgstr "脚本"
 msgid "Script [%s] already exists."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1973
+#: include/locales/en_gb.inc.php:1972
 msgid "Script added"
 msgstr "脚本已添加"
 
-#: include/locales/en_gb.inc.php:1977
+#: include/locales/en_gb.inc.php:1976
 msgid "Script deleted"
 msgstr "脚本已删除"
 
@@ -6780,7 +6885,7 @@ msgstr "脚本已删除"
 msgid "Script name"
 msgstr "脚本名称"
 
-#: include/locales/en_gb.inc.php:1975
+#: include/locales/en_gb.inc.php:1974
 msgid "Script updated"
 msgstr "脚本已更新"
 
@@ -6789,7 +6894,7 @@ msgstr "脚本已更新"
 msgid "Script with scriptid [%s] does not exist."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1963
+#: include/locales/en_gb.inc.php:1962
 msgid "Scripts"
 msgstr "脚本"
 
@@ -6801,7 +6906,7 @@ msgstr "查找"
 msgid "Search attribute"
 msgstr "定位属性"
 
-#: include/locales/en_gb.inc.php:2066
+#: include/locales/en_gb.inc.php:2065
 msgid "Search pattern is empty"
 msgstr "搜索规则为空"
 
@@ -6841,11 +6946,11 @@ msgstr "Secondary POC Phone 2"
 msgid "Secondary POC Screen Name"
 msgstr "Secondary POC Screen Name"
 
-#: include/locales/en_gb.inc.php:1799
+#: include/locales/en_gb.inc.php:1798
 msgid "Seconds"
 msgstr "Seconds"
 
-#: include/locales/en_gb.inc.php:1863
+#: include/locales/en_gb.inc.php:1862
 msgid "Select"
 msgstr "搜索"
 
@@ -6865,7 +6970,7 @@ msgstr "选择图表..."
 msgid "Select host..."
 msgstr "选择主机..."
 
-#: include/locales/en_gb.inc.php:2381
+#: include/locales/en_gb.inc.php:2380
 msgid "Select image to download"
 msgstr "选择需要图片下载"
 
@@ -6880,6 +6985,10 @@ msgstr "Select rows with value like"
 #: include/locales/en_gb.inc.php:1414
 msgid "Selected"
 msgstr "Selected"
+
+#: actionconf.php:313
+msgid "Selected actions deleted."
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1584
 msgid "Selected groups"
@@ -6925,11 +7034,11 @@ msgstr "Serial Number"
 msgid "SerialNo"
 msgstr "SerialNo"
 
-#: include/locales/en_gb.inc.php:1707
+#: include/locales/en_gb.inc.php:1706
 msgid "Serious problem"
 msgstr "Serious problem"
 
-#: include/locales/en_gb.inc.php:1733
+#: include/locales/en_gb.inc.php:1732
 msgid "Server"
 msgstr "Server"
 
@@ -6941,19 +7050,19 @@ msgstr "Server info"
 msgid "Server time"
 msgstr "Server time"
 
-#: include/locales/en_gb.inc.php:1756
+#: include/locales/en_gb.inc.php:1755
 msgid "Service"
 msgstr "服务"
 
-#: include/locales/en_gb.inc.php:1716
+#: include/locales/en_gb.inc.php:1715
 msgid "Service added"
 msgstr "服务已经添加"
 
-#: include/locales/en_gb.inc.php:2366
+#: include/locales/en_gb.inc.php:2365
 msgid "Service cannot be parent and child at the same time."
 msgstr "Service cannot be parent and child at the same time."
 
-#: include/locales/en_gb.inc.php:1718
+#: include/locales/en_gb.inc.php:1717
 msgid "Service deleted"
 msgstr "服务已经删除"
 
@@ -6961,7 +7070,7 @@ msgstr "服务已经删除"
 msgid "Service port"
 msgstr "服务端口"
 
-#: include/locales/en_gb.inc.php:1741
+#: include/locales/en_gb.inc.php:1740
 msgid "Service times"
 msgstr "Service times"
 
@@ -6969,15 +7078,15 @@ msgstr "Service times"
 msgid "Service type"
 msgstr "服务类型"
 
-#: include/locales/en_gb.inc.php:1713
+#: include/locales/en_gb.inc.php:1712
 msgid "Service updated"
 msgstr "服务已更新"
 
-#: include/locales/en_gb.inc.php:1757
+#: include/locales/en_gb.inc.php:1756
 msgid "Services"
 msgstr "Services"
 
-#: include/locales/en_gb.inc.php:2434
+#: include/locales/en_gb.inc.php:2433
 msgid "Session terminated, please re-login!"
 msgstr ""
 
@@ -6985,7 +7094,7 @@ msgstr ""
 msgid "Set trigger"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1782
+#: include/locales/en_gb.inc.php:1781
 msgid "Severity"
 msgstr "示警度"
 
@@ -6997,7 +7106,7 @@ msgstr "显示"
 msgid "Show all"
 msgstr "显示所有"
 
-#: include/locales/en_gb.inc.php:1847
+#: include/locales/en_gb.inc.php:1846
 msgid "Show details"
 msgstr "显示细节"
 
@@ -7005,7 +7114,7 @@ msgstr "显示细节"
 msgid "Show disabled scenarios"
 msgstr "Show disabled scenarios"
 
-#: include/locales/en_gb.inc.php:1803
+#: include/locales/en_gb.inc.php:1802
 msgid "Show disabled triggers"
 msgstr "Show disabled triggers"
 
@@ -7029,7 +7138,7 @@ msgstr "Show hosts in maintenance"
 msgid "Show items with description like"
 msgstr "Show items with description like"
 
-#: include/locales/en_gb.inc.php:1846
+#: include/locales/en_gb.inc.php:1845
 msgid "Show last"
 msgstr "Show last"
 
@@ -7041,11 +7150,11 @@ msgstr ""
 msgid "Show lines"
 msgstr "Show lines"
 
-#: include/locales/en_gb.inc.php:1842
+#: include/locales/en_gb.inc.php:1841
 msgid "Show only problems"
 msgstr "Show only problems"
 
-#: include/locales/en_gb.inc.php:1844
+#: include/locales/en_gb.inc.php:1843
 msgid "Show problem-unacknowledged"
 msgstr "Show problem-unacknowledged"
 
@@ -7061,11 +7170,11 @@ msgstr "Show text as HTML"
 msgid "Show triggers"
 msgstr "Show triggers"
 
-#: include/locales/en_gb.inc.php:1770
+#: include/locales/en_gb.inc.php:1769
 msgid "Show triggers with unacknowledged events"
 msgstr "Show triggers with unacknowledged events"
 
-#: include/locales/en_gb.inc.php:1843
+#: include/locales/en_gb.inc.php:1842
 msgid "Show unacknowledged"
 msgstr "Show unacknowledged"
 
@@ -7149,7 +7258,7 @@ msgstr "Site Zip / Postal"
 msgid "Skip existing items"
 msgstr "Skip existing items"
 
-#: include/locales/en_gb.inc.php:2349
+#: include/locales/en_gb.inc.php:2348
 msgid "Skipped copying of graph"
 msgstr "Skipped copying of graph"
 
@@ -7185,11 +7294,11 @@ msgstr "Slideshow updated"
 msgid "Slovak (SK)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2015
+#: include/locales/en_gb.inc.php:2014
 msgid "Snooze"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1726
+#: include/locales/en_gb.inc.php:1725
 msgid "Soft"
 msgstr "Soft"
 
@@ -7229,11 +7338,11 @@ msgstr "排序方式"
 msgid "Sort order (0->100)"
 msgstr "Sort order (0->100)"
 
-#: include/locales/en_gb.inc.php:1731
+#: include/locales/en_gb.inc.php:1730
 msgid "Sort order (0->999)"
 msgstr "Sort order (0->999)"
 
-#: include/locales/en_gb.inc.php:1836
+#: include/locales/en_gb.inc.php:1835
 msgid "Sound"
 msgstr "Sound"
 
@@ -7241,11 +7350,11 @@ msgstr "Sound"
 msgid "Source"
 msgstr "Source"
 
-#: include/locales/en_gb.inc.php:2038
+#: include/locales/en_gb.inc.php:2037
 msgid "Spanish (ES)"
 msgstr "西班牙语 (ES)"
 
-#: include/locales/en_gb.inc.php:2315
+#: include/locales/en_gb.inc.php:2314
 msgid "Specify the conditional expression for the target."
 msgstr "Specify the conditional expression for the target."
 
@@ -7261,7 +7370,7 @@ msgstr "Stacked"
 msgid "State"
 msgstr "State"
 
-#: include/locales/en_gb.inc.php:2149
+#: include/locales/en_gb.inc.php:2148
 msgid "Stats for"
 msgstr "Stats for"
 
@@ -7269,11 +7378,11 @@ msgstr "Stats for"
 msgid "Status"
 msgstr "状态"
 
-#: include/locales/en_gb.inc.php:1721
+#: include/locales/en_gb.inc.php:1720
 msgid "Status calculation"
 msgstr "状态统计"
 
-#: include/locales/en_gb.inc.php:1722
+#: include/locales/en_gb.inc.php:1721
 msgid "Status calculation algorithm"
 msgstr "Status calculation algorithm"
 
@@ -7293,15 +7402,15 @@ msgstr "ZABBIX 状态"
 msgid "Status of discovery"
 msgstr "自动发现的状态"
 
-#: include/locales/en_gb.inc.php:1840
+#: include/locales/en_gb.inc.php:1839
 msgid "Status of host triggers"
 msgstr "Status of host triggers"
 
-#: include/locales/en_gb.inc.php:1839
+#: include/locales/en_gb.inc.php:1838
 msgid "Status of hostgroup triggers"
 msgstr "Status of hostgroup triggers"
 
-#: include/locales/en_gb.inc.php:1837
+#: include/locales/en_gb.inc.php:1836
 msgid "Status of triggers"
 msgstr "触发器状态"
 
@@ -7317,6 +7426,11 @@ msgstr "状态已更新"
 msgid "Step"
 msgstr "Step"
 
+#: api/classes/class.cwebcheck.php:623
+#, php-format
+msgid "Step [%s] already exists."
+msgstr ""
+
 #: include/locales/en_gb.inc.php:210
 msgid "Step of scenario"
 msgstr "Step of scenario"
@@ -7325,7 +7439,7 @@ msgstr "Step of scenario"
 msgid "Steps"
 msgstr "Steps"
 
-#: include/locales/en_gb.inc.php:2024
+#: include/locales/en_gb.inc.php:2023
 msgid "Stop"
 msgstr ""
 
@@ -7341,7 +7455,7 @@ msgstr "Straight"
 msgid "Style"
 msgstr "Style"
 
-#: include/locales/en_gb.inc.php:2192
+#: include/locales/en_gb.inc.php:2191
 msgid "Subfilter"
 msgstr "Subfilter"
 
@@ -7349,7 +7463,7 @@ msgstr "Subfilter"
 msgid "Subject"
 msgstr "主题"
 
-#: include/locales/en_gb.inc.php:2331
+#: include/locales/en_gb.inc.php:2330
 msgid "Submap"
 msgstr ""
 
@@ -7361,15 +7475,15 @@ msgstr "Success Audit"
 msgid "Sun"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:48 include/locales/en_gb.inc.php:1746
+#: include/locales/en_gb.inc.php:48 include/locales/en_gb.inc.php:1745
 msgid "Sunday"
 msgstr "Sunday"
 
-#: include/locales/en_gb.inc.php:1915
+#: include/locales/en_gb.inc.php:1914
 msgid "Surname"
 msgstr "姓氏"
 
-#: include/locales/en_gb.inc.php:2039
+#: include/locales/en_gb.inc.php:2038
 msgid "Swedish (SE)"
 msgstr "Swedish (SE)"
 
@@ -7389,8 +7503,8 @@ msgstr "默认"
 msgid "System status"
 msgstr "System status"
 
-#: include/locales/en_gb.inc.php:2178 include/locales/en_gb.inc.php:2517
-#: include/locales/en_gb.inc.php:2519
+#: include/locales/en_gb.inc.php:2177 include/locales/en_gb.inc.php:2516
+#: include/locales/en_gb.inc.php:2518
 msgid "T"
 msgstr "T"
 
@@ -7410,7 +7524,7 @@ msgstr "模板"
 msgid "TOTAL"
 msgstr "TOTAL"
 
-#: include/locales/en_gb.inc.php:1830
+#: include/locales/en_gb.inc.php:1829
 msgid "TRIGGER COMMENTS"
 msgstr "TRIGGER COMMENTS"
 
@@ -7418,7 +7532,7 @@ msgstr "TRIGGER COMMENTS"
 msgid "TRIGGER PROTOTYPES OF"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1849
+#: include/locales/en_gb.inc.php:1848
 msgid "TRIGGERS"
 msgstr "触发器"
 
@@ -7426,7 +7540,12 @@ msgstr "触发器"
 msgid "TRUE"
 msgstr "TRUE"
 
-#: include/locales/en_gb.inc.php:2435
+#: include/db.inc.php:1150
+#, php-format
+msgid "Table \"%s\" does not exist."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2434
 msgid "Table users is empty. Possible database corruption."
 msgstr ""
 
@@ -7467,11 +7586,11 @@ msgstr "模板间的关联"
 msgid "Template updated"
 msgstr "Template updated"
 
-#: include/locales/en_gb.inc.php:2262
+#: include/locales/en_gb.inc.php:2261
 msgid "Template with application"
 msgstr "Template with application"
 
-#: include/locales/en_gb.inc.php:2261
+#: include/locales/en_gb.inc.php:2260
 msgid "Template with item key"
 msgstr "Template with item key"
 
@@ -7491,7 +7610,7 @@ msgstr "Templated item"
 msgid "Templated items"
 msgstr "Templated items"
 
-#: include/locales/en_gb.inc.php:1819
+#: include/locales/en_gb.inc.php:1818
 msgid "Templated trigger"
 msgstr "Templated trigger"
 
@@ -7508,7 +7627,7 @@ msgstr ""
 msgid "Templates list"
 msgstr "Templates list"
 
-#: include/locales/en_gb.inc.php:2179
+#: include/locales/en_gb.inc.php:2178
 msgid "Tera"
 msgstr "Tera"
 
@@ -7520,7 +7639,7 @@ msgstr "测试"
 msgid "Test confirmation"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2118
+#: include/locales/en_gb.inc.php:2117
 msgid "Test data"
 msgstr "测试数据"
 
@@ -7532,11 +7651,11 @@ msgstr "Test string"
 msgid "Text"
 msgstr "Text"
 
-#: include/locales/en_gb.inc.php:2416
+#: include/locales/en_gb.inc.php:2415
 msgid "The GD extension is not loaded."
 msgstr "The GD extension is not loaded."
 
-#: include/locales/en_gb.inc.php:2216
+#: include/locales/en_gb.inc.php:2215
 msgid "The key must be unique."
 msgstr "The key must be unique."
 
@@ -7548,11 +7667,11 @@ msgstr ""
 msgid "The queue is empty"
 msgstr "The queue is empty"
 
-#: include/locales/en_gb.inc.php:1805
+#: include/locales/en_gb.inc.php:1804
 msgid "The trigger depends on"
 msgstr "The trigger depends on"
 
-#: include/locales/en_gb.inc.php:2029
+#: include/locales/en_gb.inc.php:2028
 msgid "Theme"
 msgstr "Theme"
 
@@ -7568,23 +7687,23 @@ msgstr ""
 msgid "Third"
 msgstr "Third"
 
-#: include/locales/en_gb.inc.php:1762
+#: include/locales/en_gb.inc.php:1761
 msgid "This month"
 msgstr "本月"
 
-#: include/locales/en_gb.inc.php:2337
+#: include/locales/en_gb.inc.php:2336
 msgid "This screen-column is not empty"
 msgstr "This screen-column is not empty"
 
-#: include/locales/en_gb.inc.php:2336
+#: include/locales/en_gb.inc.php:2335
 msgid "This screen-row is not empty"
 msgstr "This screen-row is not empty"
 
-#: include/locales/en_gb.inc.php:1760
+#: include/locales/en_gb.inc.php:1759
 msgid "This week"
 msgstr "本周"
 
-#: include/locales/en_gb.inc.php:1761
+#: include/locales/en_gb.inc.php:1760
 msgid "This year"
 msgstr "本年"
 
@@ -7592,7 +7711,7 @@ msgstr "本年"
 msgid "Thu"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:52 include/locales/en_gb.inc.php:1750
+#: include/locales/en_gb.inc.php:52 include/locales/en_gb.inc.php:1749
 msgid "Thursday"
 msgstr "Thursday"
 
@@ -7608,7 +7727,7 @@ msgstr "时间"
 msgid "Time period"
 msgstr "时间范围"
 
-#: include/locales/en_gb.inc.php:1801
+#: include/locales/en_gb.inc.php:1800
 msgid "Time shift"
 msgstr ""
 
@@ -7628,11 +7747,11 @@ msgstr "Timeout"
 msgid "Timestamp"
 msgstr "时间戳"
 
-#: include/locales/en_gb.inc.php:2406
+#: include/locales/en_gb.inc.php:2405
 msgid "Timezone for PHP is not set"
 msgstr "PHP未设置时区"
 
-#: include/locales/en_gb.inc.php:2146
+#: include/locales/en_gb.inc.php:2145
 msgid "Timezone for PHP is not set. Please set \"date.timezone\" option in php.ini."
 msgstr "Timezone for PHP is not set. Please set \"date.timezone\" option in php.ini."
 
@@ -7648,15 +7767,15 @@ msgstr "To"
 msgid "To make new locale visible by Zabbix frontend - extend the php script \"/PATH_TO_ZABBIX_FRONTEND/include/locales.inc.php\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1759
+#: include/locales/en_gb.inc.php:1758
 msgid "Today"
 msgstr "今天"
 
-#: include/locales/en_gb.inc.php:1815
+#: include/locales/en_gb.inc.php:1814
 msgid "Toggle input method"
 msgstr "Toggle input method"
 
-#: include/locales/en_gb.inc.php:2291
+#: include/locales/en_gb.inc.php:2290
 msgid "Too many hosts"
 msgstr "太多的主机"
 
@@ -7665,7 +7784,7 @@ msgstr "太多的主机"
 msgid "Too many interfaces provided for proxy \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1979
+#: include/locales/en_gb.inc.php:1978
 msgid "Tools"
 msgstr "Tools"
 
@@ -7677,15 +7796,15 @@ msgstr "顶部"
 msgid "Total"
 msgstr "合计"
 
-#: include/locales/en_gb.inc.php:2150
+#: include/locales/en_gb.inc.php:2149
 msgid "Total time"
 msgstr "Total time"
 
-#: include/locales/en_gb.inc.php:2157
+#: include/locales/en_gb.inc.php:2156
 msgid "Total time spent on SQL"
 msgstr "Total time spent on SQL"
 
-#: include/locales/en_gb.inc.php:2325
+#: include/locales/en_gb.inc.php:2324
 msgid "Transaction has not been closed. Aborting.."
 msgstr "Transaction has not been closed. Aborting.."
 
@@ -7697,7 +7816,7 @@ msgstr "Trends"
 msgid "Trends stored"
 msgstr "Trends stored"
 
-#: include/locales/en_gb.inc.php:1732
+#: include/locales/en_gb.inc.php:1731
 msgid "Trigger"
 msgstr "Trigger"
 
@@ -7745,19 +7864,19 @@ msgstr ""
 msgid "Trigger [%1$s] does not have item prototype."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1780
+#: include/locales/en_gb.inc.php:1779
 msgid "Trigger added"
 msgstr "触发器已添加"
 
-#: include/locales/en_gb.inc.php:1829
+#: include/locales/en_gb.inc.php:1828
 msgid "Trigger comments"
 msgstr "Trigger comments"
 
-#: include/locales/en_gb.inc.php:1778
+#: include/locales/en_gb.inc.php:1777
 msgid "Trigger deleted"
 msgstr "触发器已删除"
 
-#: include/locales/en_gb.inc.php:1812
+#: include/locales/en_gb.inc.php:1811
 msgid "Trigger dependencies"
 msgstr "Trigger dependencies"
 
@@ -7765,11 +7884,11 @@ msgstr "Trigger dependencies"
 msgid "Trigger description"
 msgstr "触发器描述"
 
-#: include/locales/en_gb.inc.php:1826
+#: include/locales/en_gb.inc.php:1825
 msgid "Trigger form"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2311
+#: include/locales/en_gb.inc.php:2310
 msgid "Trigger in template"
 msgstr "Trigger in template"
 
@@ -7797,7 +7916,7 @@ msgstr ""
 msgid "Trigger prototype [%1$s:%2$s] updated."
 msgstr ""
 
-#: include/forms/host.edit.php:444 include/forms/template.edit.php:298
+#: include/forms/host.edit.php:445 include/forms/template.edit.php:298
 msgid "Trigger prototypes"
 msgstr ""
 
@@ -7805,7 +7924,7 @@ msgstr ""
 msgid "Trigger severity"
 msgstr "Trigger severity"
 
-#: include/locales/en_gb.inc.php:1791
+#: include/locales/en_gb.inc.php:1790
 msgid "Trigger updated"
 msgstr "触发器已更新"
 
@@ -7819,7 +7938,7 @@ msgstr "Trigger value"
 msgid "Trigger with same name but other type exists"
 msgstr ""
 
-#: include/forms/host.edit.php:354 include/forms/template.edit.php:214
+#: include/forms/host.edit.php:355 include/forms/template.edit.php:214
 #: include/locales/en_gb.inc.php:894
 msgid "Triggers"
 msgstr "触发器"
@@ -7828,7 +7947,7 @@ msgstr "触发器"
 msgid "Triggers (e/d)[p/u/o]"
 msgstr "Triggers (e/d)[p/u/o]"
 
-#: include/locales/en_gb.inc.php:1776
+#: include/locales/en_gb.inc.php:1775
 msgid "Triggers deleted"
 msgstr "触发器已删除"
 
@@ -7836,7 +7955,7 @@ msgstr "触发器已删除"
 msgid "Triggers info"
 msgstr "Triggers info"
 
-#: include/locales/en_gb.inc.php:1811
+#: include/locales/en_gb.inc.php:1810
 msgid "Triggers massupdate"
 msgstr "Triggers massupdate"
 
@@ -7844,7 +7963,7 @@ msgstr "Triggers massupdate"
 msgid "Triggers overview"
 msgstr "Triggers overview"
 
-#: include/locales/en_gb.inc.php:1861
+#: include/locales/en_gb.inc.php:1860
 msgid "Triggers status"
 msgstr ""
 
@@ -7860,7 +7979,7 @@ msgstr "Truncated"
 msgid "Tue"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:50 include/locales/en_gb.inc.php:1748
+#: include/locales/en_gb.inc.php:50 include/locales/en_gb.inc.php:1747
 msgid "Tuesday"
 msgstr "Tuesday"
 
@@ -7884,7 +8003,7 @@ msgstr "计算方式"
 msgid "Type of information"
 msgstr "数据类型"
 
-#: include/locales/en_gb.inc.php:2208
+#: include/locales/en_gb.inc.php:2207
 msgid "Type of information must be Log for log key"
 msgstr "Type of information must be Log for log key"
 
@@ -7908,7 +8027,7 @@ msgstr ""
 msgid "UPDATE"
 msgstr "UPDATE"
 
-#: include/locales/en_gb.inc.php:1795
+#: include/locales/en_gb.inc.php:1794
 msgid "URL"
 msgstr "URL"
 
@@ -7924,7 +8043,7 @@ msgstr "URL #2"
 msgid "URL #3"
 msgstr "URL #3"
 
-#: include/locales/en_gb.inc.php:1932
+#: include/locales/en_gb.inc.php:1931
 msgid "URL (after login)"
 msgstr "登录后定向到"
 
@@ -7932,15 +8051,15 @@ msgstr "登录后定向到"
 msgid "USA (160 characters)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1908
+#: include/locales/en_gb.inc.php:1907
 msgid "USER GROUPS"
 msgstr "用户组"
 
-#: include/locales/en_gb.inc.php:2026
+#: include/locales/en_gb.inc.php:2025
 msgid "USER PROFILE"
 msgstr "个人信息"
 
-#: include/locales/en_gb.inc.php:1909
+#: include/locales/en_gb.inc.php:1908
 msgid "USERS"
 msgstr "用户"
 
@@ -7948,15 +8067,15 @@ msgstr "用户"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales/en_gb.inc.php:2045
+#: include/locales/en_gb.inc.php:2044
 msgid "Ukrainian (UA)"
 msgstr "Ukrainian (UA)"
 
-#: include/locales/en_gb.inc.php:2389
+#: include/locales/en_gb.inc.php:2388
 msgid "Unable to remove local node"
 msgstr "Unable to remove local node"
 
-#: include/locales/en_gb.inc.php:2354
+#: include/locales/en_gb.inc.php:2353
 msgid "Unable to select configuration"
 msgstr "Unable to select configuration"
 
@@ -7968,15 +8087,15 @@ msgstr ""
 msgid "Unacknowledged only"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1948
+#: include/locales/en_gb.inc.php:1947
 msgid "Unblock selected"
 msgstr "Unblock selected"
 
-#: include/locales/en_gb.inc.php:1949
+#: include/locales/en_gb.inc.php:1948
 msgid "Unblock selected users?"
 msgstr "Unblock selected users?"
 
-#: include/locales/en_gb.inc.php:2094
+#: include/locales/en_gb.inc.php:2093
 msgid "Unexpected end of element"
 msgstr ""
 
@@ -7988,19 +8107,19 @@ msgstr "单位Units"
 msgid "Unknown"
 msgstr "未知"
 
-#: include/locales/en_gb.inc.php:2000
+#: include/locales/en_gb.inc.php:1999
 msgid "Unknown action"
 msgstr "未知操作"
 
-#: include/locales/en_gb.inc.php:2371
+#: include/locales/en_gb.inc.php:2370
 msgid "Unknown calculation algorithm of service status"
 msgstr "Unknown calculation algorithm of service status"
 
-#: include/locales/en_gb.inc.php:1991
+#: include/locales/en_gb.inc.php:1990
 msgid "Unknown error happened reading script answer, please report to the developers"
 msgstr "Unknown error happend reading script answer, report to the developers, please"
 
-#: include/locales/en_gb.inc.php:2294
+#: include/locales/en_gb.inc.php:2293
 msgid "Unknown function"
 msgstr "没有此函数"
 
@@ -8008,7 +8127,7 @@ msgstr "没有此函数"
 msgid "Unknown group name"
 msgstr "Unknown group name"
 
-#: include/locales/en_gb.inc.php:2122
+#: include/locales/en_gb.inc.php:2121
 msgid "Unknown host item, no such item in selected host"
 msgstr ""
 
@@ -8016,23 +8135,23 @@ msgstr ""
 msgid "Unknown host name"
 msgstr "Unknown host name"
 
-#: include/locales/en_gb.inc.php:2121
+#: include/locales/en_gb.inc.php:2120
 msgid "Unknown host, no such host present in system"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2309
+#: include/locales/en_gb.inc.php:2308
 msgid "Unknown macro"
 msgstr "Unknown macro"
 
-#: include/locales/en_gb.inc.php:2005
+#: include/locales/en_gb.inc.php:2004
 msgid "Unknown resource"
 msgstr "未知资源"
 
-#: include/locales/en_gb.inc.php:2221
+#: include/locales/en_gb.inc.php:2220
 msgid "Unknown value type"
 msgstr "Unknown value type"
 
-#: include/locales/en_gb.inc.php:2120
+#: include/locales/en_gb.inc.php:2119
 msgid "Unknown variable type, testing not available"
 msgstr ""
 
@@ -8048,11 +8167,11 @@ msgstr "取消关联并清理"
 msgid "Unlink from template"
 msgstr "Unlink from template"
 
-#: include/locales/en_gb.inc.php:2013
+#: include/locales/en_gb.inc.php:2012
 msgid "Unmute"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2099
+#: include/locales/en_gb.inc.php:2098
 msgid "Unnecessary symbols detected"
 msgstr ""
 
@@ -8081,15 +8200,15 @@ msgid "Update item for the graph"
 msgstr "Update item for the graph"
 
 #. GETTEXT: r is date format string as described in http://php.net/date
-#: include/classes/class.cserverinfo.php:42 include/locales/en_gb.inc.php:2002
+#: include/classes/class.cserverinfo.php:42 include/locales/en_gb.inc.php:2001
 msgid "Updated"
 msgstr "更新"
 
-#: include/locales/en_gb.inc.php:2256
+#: include/locales/en_gb.inc.php:2255
 msgid "Updated application"
 msgstr "Updated application"
 
-#: include/locales/en_gb.inc.php:2243
+#: include/locales/en_gb.inc.php:2242
 msgid "Updated host group"
 msgstr "Updated host group"
 
@@ -8105,7 +8224,7 @@ msgstr "上传"
 msgid "Upper level maps"
 msgstr "Upper level maps"
 
-#: include/locales/en_gb.inc.php:147 include/locales/en_gb.inc.php:1737
+#: include/locales/en_gb.inc.php:147 include/locales/en_gb.inc.php:1736
 msgid "Uptime"
 msgstr "在线时间"
 
@@ -8134,42 +8253,43 @@ msgid "Use profile"
 msgstr "Use profile"
 
 #: include/locales/en_gb.inc.php:400 include/locales/en_gb.inc.php:947
+#: include/setup.inc.php:248
 msgid "User"
 msgstr "用户"
 
-#: include/locales/en_gb.inc.php:2452
+#: include/locales/en_gb.inc.php:2451
 msgid "User ["
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1871
+#: include/locales/en_gb.inc.php:1870
 msgid "User added"
 msgstr "添加用户"
 
-#: include/locales/en_gb.inc.php:1905
+#: include/locales/en_gb.inc.php:1904
 msgid "User cannot change GUI access for himself"
 msgstr "User cannot change GUI access to itself"
 
-#: include/locales/en_gb.inc.php:1904
+#: include/locales/en_gb.inc.php:1903
 msgid "User cannot change status of himself"
 msgstr "User cannot change status to itself"
 
-#: include/locales/en_gb.inc.php:1906
+#: include/locales/en_gb.inc.php:1905
 msgid "User cannot delete himself"
 msgstr "User cannot delete itself"
 
-#: include/locales/en_gb.inc.php:1903
+#: include/locales/en_gb.inc.php:1902
 msgid "User cannot disable himself"
 msgstr "User cannot disable itself"
 
-#: include/locales/en_gb.inc.php:2457
+#: include/locales/en_gb.inc.php:2456
 msgid "User cannot disable himself. Group \""
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2455
+#: include/locales/en_gb.inc.php:2454
 msgid "User cannot restrict access to GUI for himself. Group \""
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1874
+#: include/locales/en_gb.inc.php:1873
 msgid "User deleted"
 msgstr "用户已删除"
 
@@ -8187,7 +8307,7 @@ msgstr ""
 msgid "User group for database down message"
 msgstr "User group for database down message"
 
-#: include/forms/script.edit.php:96 include/locales/en_gb.inc.php:1910
+#: include/forms/script.edit.php:96 include/locales/en_gb.inc.php:1909
 msgid "User groups"
 msgstr "用户组"
 
@@ -8199,7 +8319,7 @@ msgstr "User medias"
 msgid "User name"
 msgstr "User name"
 
-#: include/locales/en_gb.inc.php:2027
+#: include/locales/en_gb.inc.php:2026
 msgid "User profile"
 msgstr "个人信息"
 
@@ -8207,19 +8327,19 @@ msgstr "个人信息"
 msgid "User rights"
 msgstr "用户权限"
 
-#: include/locales/en_gb.inc.php:1869
+#: include/locales/en_gb.inc.php:1868
 msgid "User type"
 msgstr "User type"
 
-#: include/locales/en_gb.inc.php:1878
+#: include/locales/en_gb.inc.php:1877
 msgid "User updated"
 msgstr "用户已更新"
 
-#: include/forms/host.edit.php:522 include/locales/en_gb.inc.php:1144
+#: include/forms/host.edit.php:523 include/locales/en_gb.inc.php:1144
 msgid "Username"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1870
+#: include/locales/en_gb.inc.php:1869
 msgid "Users"
 msgstr "用户"
 
@@ -8227,15 +8347,15 @@ msgstr "用户"
 msgid "Users (online)"
 msgstr "Users (online)"
 
-#: include/locales/en_gb.inc.php:1923
+#: include/locales/en_gb.inc.php:1922
 msgid "Users status"
 msgstr "用户状态"
 
-#: include/locales/en_gb.inc.php:1893
+#: include/locales/en_gb.inc.php:1892
 msgid "Users status updated"
 msgstr "用户状态已更新"
 
-#: include/locales/en_gb.inc.php:1895
+#: include/locales/en_gb.inc.php:1894
 msgid "Users unblocked"
 msgstr "Users unblocked"
 
@@ -8247,7 +8367,7 @@ msgstr "VALUE MAPPING"
 msgid "Value"
 msgstr "ֵ"
 
-#: include/db.inc.php:1147 include/db.inc.php:1210
+#: include/db.inc.php:1186
 #, php-format
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
 msgstr ""
@@ -8276,7 +8396,7 @@ msgstr "Value mapping"
 msgid "Value maps are used to create a mapping between numeric values and string representations"
 msgstr "Value maps are used to create a mapping between numeric values and string representations"
 
-#: include/locales/en_gb.inc.php:2209
+#: include/locales/en_gb.inc.php:2208
 msgid "Value type must be Float for aggregate items"
 msgstr "Value type must be Float for aggregate items"
 
@@ -8304,7 +8424,7 @@ msgstr "纵向对齐"
 msgid "View"
 msgstr "View"
 
-#: include/locales/en_gb.inc.php:2518
+#: include/locales/en_gb.inc.php:2517
 msgid "W"
 msgstr ""
 
@@ -8316,7 +8436,7 @@ msgstr "WEB CHECKS"
 msgid "Warning"
 msgstr "警告"
 
-#: include/locales/en_gb.inc.php:2544
+#: include/locales/en_gb.inc.php:2543
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr ""
 
@@ -8327,6 +8447,16 @@ msgstr "Web"
 #: include/locales/en_gb.inc.php:1200
 msgid "Web item"
 msgstr "Web item"
+
+#: api/classes/class.cwebcheck.php:608 api/classes/class.cwebcheck.php:704
+#, php-format
+msgid "Web item [%s] created."
+msgstr ""
+
+#: api/classes/class.cwebcheck.php:667
+#, php-format
+msgid "Web item with key [%s] already exists."
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1134
 msgid "Web monitoring"
@@ -8340,7 +8470,7 @@ msgstr ""
 msgid "Wed"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:51 include/locales/en_gb.inc.php:1749
+#: include/locales/en_gb.inc.php:51 include/locales/en_gb.inc.php:1748
 msgid "Wednesday"
 msgstr "Wednesday"
 
@@ -8352,7 +8482,7 @@ msgstr "Week"
 msgid "Weekly"
 msgstr "每周"
 
-#: include/locales/en_gb.inc.php:2050
+#: include/locales/en_gb.inc.php:2049
 msgid "Welcome to Zabbix! You are connected as"
 msgstr "欢迎使用Zabbix! 您的登录名为"
 
@@ -8368,7 +8498,7 @@ msgstr "宽"
 msgid "With data collection"
 msgstr "With data collection"
 
-#: include/locales/en_gb.inc.php:1860
+#: include/locales/en_gb.inc.php:1859
 msgid "With last event unacknowledged"
 msgstr ""
 
@@ -8380,7 +8510,7 @@ msgstr "With problems"
 msgid "With triggers"
 msgstr "With triggers"
 
-#: include/locales/en_gb.inc.php:1859
+#: include/locales/en_gb.inc.php:1858
 msgid "With unacknowledged events"
 msgstr ""
 
@@ -8400,7 +8530,7 @@ msgstr ""
 msgid "Working time"
 msgstr "工作时间"
 
-#: include/forms/script.edit.php:113 include/locales/en_gb.inc.php:1969
+#: include/forms/script.edit.php:113 include/locales/en_gb.inc.php:1968
 msgid "Write"
 msgstr "写"
 
@@ -8419,7 +8549,7 @@ msgstr ""
 msgid "Wrong fields for items"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2465
+#: include/locales/en_gb.inc.php:2464
 msgid "Wrong fields for media type"
 msgstr ""
 
@@ -8443,7 +8573,7 @@ msgstr ""
 msgid "Wrong fields for trigger"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2451
+#: include/locales/en_gb.inc.php:2450
 msgid "Wrong fields for user"
 msgstr ""
 
@@ -8451,11 +8581,11 @@ msgstr ""
 msgid "Wrong macro"
 msgstr "Wrong macro"
 
-#: include/locales/en_gb.inc.php:2460
+#: include/locales/en_gb.inc.php:2459
 msgid "Wrong period ["
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2162
+#: include/locales/en_gb.inc.php:2161
 msgid "Wrong type"
 msgstr "Wrong type"
 
@@ -8467,12 +8597,12 @@ msgstr ""
 msgid "X"
 msgstr "X"
 
-#: include/locales/en_gb.inc.php:2513
+#: include/locales/en_gb.inc.php:2512
 msgid "XML file contains errors"
 msgstr "XML file contains errors"
 
 #: include/locales/en_gb.inc.php:1522 include/locales/en_gb.inc.php:1565
-#: include/locales/en_gb.inc.php:2186
+#: include/locales/en_gb.inc.php:2185
 msgid "Y"
 msgstr "Y"
 
@@ -8505,7 +8635,7 @@ msgstr ""
 msgid "Y.m.d H:i"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2188
+#: include/locales/en_gb.inc.php:2187
 msgid "Y.m.d H:i:s"
 msgstr ""
 
@@ -8521,7 +8651,7 @@ msgstr "每年"
 msgid "Yes"
 msgstr "Yes"
 
-#: include/locales/en_gb.inc.php:2187
+#: include/locales/en_gb.inc.php:2186
 msgid "Yotta"
 msgstr "Yotta"
 
@@ -8529,15 +8659,15 @@ msgstr "Yotta"
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2480
+#: include/locales/en_gb.inc.php:2479
 msgid "You are not logged in."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2076
+#: include/locales/en_gb.inc.php:2075
 msgid "You can not switch hosts for current selection"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2304
+#: include/locales/en_gb.inc.php:2303
 msgid "You can not use template hosts in mixed expressions."
 msgstr "You can not use template hosts in mixed expressions."
 
@@ -8545,11 +8675,11 @@ msgstr "You can not use template hosts in mixed expressions."
 msgid "You can set \"display_like\" value in new locale file by adding it or You may leave it as hardcoded string."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2266
+#: include/locales/en_gb.inc.php:2265
 msgid "You can't delete template for an application that is used in a web scenario"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2477
+#: include/locales/en_gb.inc.php:2476
 msgid "You cannot view this URL as a"
 msgstr ""
 
@@ -8557,15 +8687,15 @@ msgstr ""
 msgid "You do not have enough rights for operation"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2510
+#: include/locales/en_gb.inc.php:2509
 msgid "You do not have permission to perform this operation"
 msgstr "You do not have permission to perform this operation"
 
-#: include/locales/en_gb.inc.php:2478
+#: include/locales/en_gb.inc.php:2477
 msgid "You must login to view this page."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2346
+#: include/locales/en_gb.inc.php:2345
 msgid "You must use items only from host"
 msgstr "You must use items only from host"
 
@@ -8573,11 +8703,11 @@ msgstr "You must use items only from host"
 msgid "Your setup is not configured for distributed monitoring"
 msgstr "当前配置没有启用分布式监控"
 
-#: include/locales/en_gb.inc.php:2184
+#: include/locales/en_gb.inc.php:2183
 msgid "Z"
 msgstr "Z"
 
-#: include/locales/en_gb.inc.php:2049
+#: include/locales/en_gb.inc.php:2048
 msgid "ZABBIX"
 msgstr "ZABBIX"
 
@@ -8585,7 +8715,7 @@ msgstr "ZABBIX"
 msgid "Zabbix"
 msgstr "Zabbix"
 
-#: include/locales/en_gb.inc.php:1867
+#: include/locales/en_gb.inc.php:1866
 msgid "Zabbix Admin"
 msgstr "Zabbix Admin"
 
@@ -8593,11 +8723,11 @@ msgstr "Zabbix Admin"
 msgid "Zabbix Internal authentication"
 msgstr "Zabbix 的内部验证方式"
 
-#: include/locales/en_gb.inc.php:1868
+#: include/locales/en_gb.inc.php:1867
 msgid "Zabbix Super Admin"
 msgstr "Zabbix Super Admin"
 
-#: include/locales/en_gb.inc.php:1866
+#: include/locales/en_gb.inc.php:1865
 msgid "Zabbix User"
 msgstr "Zabbix User"
 
@@ -8617,11 +8747,11 @@ msgstr "Zabbix客户端端口"
 msgid "Zabbix aggregate"
 msgstr "Zabbix aggregate"
 
-#: include/locales/en_gb.inc.php:2007
+#: include/locales/en_gb.inc.php:2006
 msgid "Zabbix config"
 msgstr "Zabbix config"
 
-#: include/locales/en_gb.inc.php:1796
+#: include/locales/en_gb.inc.php:1795
 msgid "Zabbix has received an incorrect request"
 msgstr "Zabbix收到错误的请求"
 
@@ -8633,7 +8763,7 @@ msgstr "Zabbix internal"
 msgid "Zabbix is temporarily unavailable"
 msgstr "Zabbix is temporarily unavailable"
 
-#: include/classes/class.cserverinfo.php:47
+#: include/classes/class.cserverinfo.php:47 include/setup.inc.php:312
 msgid "Zabbix server"
 msgstr ""
 
@@ -8645,27 +8775,35 @@ msgstr ""
 msgid "Zabbix server is running"
 msgstr "Zabbix 服务器端运行中"
 
+#: include/setup.inc.php:314
+msgid "Zabbix server name"
+msgstr ""
+
+#: include/setup.inc.php:313
+msgid "Zabbix server port"
+msgstr ""
+
 #: include/locales/en_gb.inc.php:1123
 msgid "Zabbix trapper"
 msgstr "Zabbix trapper"
 
-#: include/locales/en_gb.inc.php:2185
+#: include/locales/en_gb.inc.php:2184
 msgid "Zetta"
 msgstr "Zetta"
 
-#: include/locales/en_gb.inc.php:2525
+#: include/locales/en_gb.inc.php:2524
 msgid "Zoom"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2339
+#: include/locales/en_gb.inc.php:2338
 msgid "[H:i:s]"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2484
+#: include/locales/en_gb.inc.php:2483
 msgid "[Wrong value for day of week:"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2482
+#: include/locales/en_gb.inc.php:2481
 msgid "[Wrong value for month:"
 msgstr ""
 
@@ -8673,12 +8811,12 @@ msgstr ""
 msgid "[Y.M.d H:i:s]"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2461 include/locales/en_gb.inc.php:2483
-#: include/locales/en_gb.inc.php:2485
+#: include/locales/en_gb.inc.php:2460 include/locales/en_gb.inc.php:2482
+#: include/locales/en_gb.inc.php:2484
 msgid "]"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2453
+#: include/locales/en_gb.inc.php:2452
 msgid "] already exists"
 msgstr ""
 
@@ -8690,11 +8828,11 @@ msgstr ""
 msgid "add graph items first"
 msgstr "add graph items first"
 
-#: include/locales/en_gb.inc.php:2232
+#: include/locales/en_gb.inc.php:2231
 msgid "added"
 msgstr "已添加"
 
-#: include/locales/en_gb.inc.php:2193
+#: include/locales/en_gb.inc.php:2192
 msgid "affects only filtered data!"
 msgstr "affects only filtered data!"
 
@@ -8702,19 +8840,19 @@ msgstr "affects only filtered data!"
 msgid "all"
 msgstr "all"
 
-#: include/locales/en_gb.inc.php:2006
+#: include/locales/en_gb.inc.php:2005
 msgid "already exists"
 msgstr "already exists"
 
-#: include/locales/en_gb.inc.php:2215
+#: include/locales/en_gb.inc.php:2214
 msgid "already exists for host"
 msgstr "already exists for host"
 
-#: include/locales/en_gb.inc.php:2254
+#: include/locales/en_gb.inc.php:2253
 msgid "already exists in linked hosts"
 msgstr "already exists in linked hosts"
 
-#: include/locales/en_gb.inc.php:2263
+#: include/locales/en_gb.inc.php:2262
 msgid "already linked to host"
 msgstr "already linked to host"
 
@@ -8726,7 +8864,7 @@ msgstr "and"
 msgid "and a postfix \".inc.php\". Like \"en_gb.inc.php\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2267
+#: include/locales/en_gb.inc.php:2266
 msgid "and can't be deleted"
 msgstr ""
 
@@ -8742,7 +8880,7 @@ msgstr "as Green"
 msgid "as Red"
 msgstr "as Red"
 
-#: include/locales/en_gb.inc.php:2298
+#: include/locales/en_gb.inc.php:2297
 msgid "available only for items with value types"
 msgstr "available only for items with value types"
 
@@ -8750,23 +8888,23 @@ msgstr "available only for items with value types"
 msgid "avg"
 msgstr "平均"
 
-#: include/locales/en_gb.inc.php:2250
+#: include/locales/en_gb.inc.php:2249
 msgid "can not be deleted, due to inner hosts can not be unlinked"
 msgstr "can not be deleted, due to inner hosts can not be unlinked"
 
-#: include/locales/en_gb.inc.php:2241
+#: include/locales/en_gb.inc.php:2240
 msgid "can not exist without group"
 msgstr "can not exist without group"
 
-#: include/locales/en_gb.inc.php:2228
+#: include/locales/en_gb.inc.php:2227
 msgid "characters only"
 msgstr "characters only"
 
-#: include/locales/en_gb.inc.php:2412
+#: include/locales/en_gb.inc.php:2411
 msgid "configure PHP with"
 msgstr "编译 PHP 添加"
 
-#: include/locales/en_gb.inc.php:2278
+#: include/locales/en_gb.inc.php:2277
 msgid "contains Multibyte chars"
 msgstr "contains Multibyte chars"
 
@@ -8774,7 +8912,7 @@ msgstr "contains Multibyte chars"
 msgid "created"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2421
+#: include/locales/en_gb.inc.php:2420
 msgid "ctype module"
 msgstr "ctype module"
 
@@ -8783,7 +8921,7 @@ msgid "d"
 msgstr "d"
 
 #: include/locales/en_gb.inc.php:27 include/locales/en_gb.inc.php:1524
-#: include/locales/en_gb.inc.php:1567 include/locales/en_gb.inc.php:2363
+#: include/locales/en_gb.inc.php:1567 include/locales/en_gb.inc.php:2362
 msgid "d M Y"
 msgstr "d M Y"
 
@@ -8801,8 +8939,8 @@ msgstr ""
 #: include/locales/en_gb.inc.php:1258 include/locales/en_gb.inc.php:1259
 #: include/locales/en_gb.inc.php:1260 include/locales/en_gb.inc.php:1261
 #: include/locales/en_gb.inc.php:1266 include/locales/en_gb.inc.php:1453
-#: include/locales/en_gb.inc.php:1592 include/locales/en_gb.inc.php:2079
-#: include/locales/en_gb.inc.php:2085 include/locales/en_gb.inc.php:2338
+#: include/locales/en_gb.inc.php:1592 include/locales/en_gb.inc.php:2078
+#: include/locales/en_gb.inc.php:2084 include/locales/en_gb.inc.php:2337
 msgid "d M Y H:i:s"
 msgstr "d M H:i:s"
 
@@ -8828,19 +8966,23 @@ msgstr ""
 msgid "d.m.y"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2359
+#: include/locales/en_gb.inc.php:2358
 msgid "day"
 msgstr "day"
 
-#: include/locales/en_gb.inc.php:2164
+#: include/locales/en_gb.inc.php:2163
 msgid "days"
 msgstr "days"
 
-#: include/locales/en_gb.inc.php:2220
+#: include/setup.inc.php:299
+msgid "default"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2219
 msgid "deleted"
 msgstr "已删除"
 
-#: include/locales/en_gb.inc.php:2507
+#: include/locales/en_gb.inc.php:2506
 msgid "does not exist"
 msgstr ""
 
@@ -8848,7 +8990,7 @@ msgstr ""
 msgid "doesn't exist"
 msgstr "doesn't exist"
 
-#: include/locales/en_gb.inc.php:2527
+#: include/locales/en_gb.inc.php:2526
 msgid "dynamic"
 msgstr ""
 
@@ -8856,7 +8998,7 @@ msgstr ""
 msgid "elements copy to ..."
 msgstr "elements copy to ..."
 
-#: include/locales/en_gb.inc.php:2358
+#: include/locales/en_gb.inc.php:2357
 msgid "every"
 msgstr "every"
 
@@ -8868,27 +9010,27 @@ msgstr "executed"
 msgid "failed"
 msgstr "failed"
 
-#: include/locales/en_gb.inc.php:2437
+#: include/locales/en_gb.inc.php:2436
 msgid "failed login attempts logged."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2526
+#: include/locales/en_gb.inc.php:2525
 msgid "fixed"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2296
+#: include/locales/en_gb.inc.php:2295
 msgid "for function"
 msgstr "for function"
 
-#: include/locales/en_gb.inc.php:2293
+#: include/locales/en_gb.inc.php:2292
 msgid "for host"
 msgstr "for host"
 
-#: include/locales/en_gb.inc.php:2347
+#: include/locales/en_gb.inc.php:2346
 msgid "for template graph"
 msgstr "for template graph"
 
-#: include/locales/en_gb.inc.php:2064
+#: include/locales/en_gb.inc.php:2063
 msgid "found"
 msgstr "found"
 
@@ -8896,7 +9038,7 @@ msgstr "found"
 msgid "from"
 msgstr "起始"
 
-#: include/locales/en_gb.inc.php:2310
+#: include/locales/en_gb.inc.php:2309
 msgid "from host"
 msgstr "from host"
 
@@ -8904,11 +9046,11 @@ msgstr "from host"
 msgid "h"
 msgstr "h"
 
-#: include/locales/en_gb.inc.php:2265
+#: include/locales/en_gb.inc.php:2264
 msgid "has been deleted from the system"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2312
+#: include/locales/en_gb.inc.php:2311
 msgid "has dependency with trigger in template"
 msgstr "has dependency with trigger in template"
 
@@ -8924,7 +9066,7 @@ msgstr "in"
 msgid "in command"
 msgstr "in command"
 
-#: include/locales/en_gb.inc.php:2252
+#: include/locales/en_gb.inc.php:2251
 msgid "incorrect parameters for"
 msgstr "incorrect parameters for"
 
@@ -8944,15 +9086,15 @@ msgstr ""
 msgid "invalid character '%1$s' at position %2$d"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2396
+#: include/locales/en_gb.inc.php:2395
 msgid "is a minimal PHP memory limitation"
 msgstr "is a minimal PHP memory limitation"
 
-#: include/locales/en_gb.inc.php:2401
+#: include/locales/en_gb.inc.php:2400
 msgid "is a minimal limitation on execution time of PHP scripts"
 msgstr "is a minimal limitation on execution time of PHP scripts"
 
-#: include/locales/en_gb.inc.php:2402
+#: include/locales/en_gb.inc.php:2401
 msgid "is a minimal limitation on input parse time for PHP scripts"
 msgstr "is a minimal limitation on input parse time for PHP scripts"
 
@@ -8960,63 +9102,63 @@ msgstr "is a minimal limitation on input parse time for PHP scripts"
 msgid "is a wrong time format. Should be from 00:00 to 23:59."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2249
+#: include/locales/en_gb.inc.php:2248
 msgid "is internal and can not be deleted"
 msgstr "is internal and can not be deleted"
 
-#: include/locales/en_gb.inc.php:2281
+#: include/locales/en_gb.inc.php:2280
 msgid "is mandatory"
 msgstr "is mandatory"
 
-#: include/locales/en_gb.inc.php:2424
+#: include/locales/en_gb.inc.php:2423
 msgid "is minimum for PHP upload filesize"
 msgstr "is minimum for PHP upload filesize"
 
-#: include/locales/en_gb.inc.php:2398
+#: include/locales/en_gb.inc.php:2397
 msgid "is minimum size of PHP post"
 msgstr "is minimum size of PHP post"
 
-#: include/locales/en_gb.inc.php:2272
+#: include/locales/en_gb.inc.php:2271
 msgid "is not IP range"
 msgstr "不是IP地址段"
 
-#: include/locales/en_gb.inc.php:2273
+#: include/locales/en_gb.inc.php:2272
 msgid "is not PORT range"
 msgstr "is not PORT range"
 
-#: include/locales/en_gb.inc.php:2280
+#: include/locales/en_gb.inc.php:2279
 msgid "is not a colour"
 msgstr "is not a colour"
 
-#: include/locales/en_gb.inc.php:2301
+#: include/locales/en_gb.inc.php:2300
 msgid "is not a float or counter or macro for function"
 msgstr "is not a float or counter or macro for function"
 
-#: include/locales/en_gb.inc.php:2300
+#: include/locales/en_gb.inc.php:2299
 msgid "is not a float or macro for function"
 msgstr "is not a float or macro for function"
 
-#: include/locales/en_gb.inc.php:2276
+#: include/locales/en_gb.inc.php:2275
 msgid "is not double"
 msgstr "is not double"
 
-#: include/locales/en_gb.inc.php:2275
+#: include/locales/en_gb.inc.php:2274
 msgid "is not integer"
 msgstr "不是整型数据"
 
-#: include/locales/en_gb.inc.php:2274
+#: include/locales/en_gb.inc.php:2273
 msgid "is not integer range"
 msgstr "不是整型数据"
 
-#: include/locales/en_gb.inc.php:2211
+#: include/locales/en_gb.inc.php:2210
 msgid "is not one of"
 msgstr "is not one of"
 
-#: include/locales/en_gb.inc.php:2277
+#: include/locales/en_gb.inc.php:2276
 msgid "is not string"
 msgstr "is not string"
 
-#: include/locales/en_gb.inc.php:2313
+#: include/locales/en_gb.inc.php:2312
 msgid "is not the highest level template"
 msgstr "is not the highest level template"
 
@@ -9028,7 +9170,7 @@ msgstr ""
 msgid "last"
 msgstr "最新"
 
-#: include/locales/en_gb.inc.php:2419
+#: include/locales/en_gb.inc.php:2418
 msgid "libxml module"
 msgstr "libxml 模块"
 
@@ -9045,7 +9187,7 @@ msgid "log files"
 msgstr "log files"
 
 #: include/locales/en_gb.inc.php:32 include/locales/en_gb.inc.php:36
-#: include/locales/en_gb.inc.php:2170
+#: include/locales/en_gb.inc.php:2169
 msgid "m"
 msgstr "m"
 
@@ -9053,7 +9195,7 @@ msgstr "m"
 msgid "m.d.Y H:i:s"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2103
+#: include/locales/en_gb.inc.php:2102
 msgid "macro(s)"
 msgstr ""
 
@@ -9081,15 +9223,15 @@ msgstr "最小值"
 msgid "ms"
 msgstr "ms"
 
-#: include/locales/en_gb.inc.php:2279
+#: include/locales/en_gb.inc.php:2278
 msgid "multibyte chars are restricted"
 msgstr "multibyte chars are restricted"
 
-#: include/locales/en_gb.inc.php:2247
+#: include/locales/en_gb.inc.php:2246
 msgid "must be linked to at least one host group"
 msgstr "must be linked to at least one host group"
 
-#: include/locales/en_gb.inc.php:2282
+#: include/locales/en_gb.inc.php:2281
 msgid "must be missing"
 msgstr "must be missing"
 
@@ -9097,7 +9239,7 @@ msgstr "must be missing"
 msgid "must be valid"
 msgstr "必须为有效/"
 
-#: include/locales/en_gb.inc.php:2166
+#: include/locales/en_gb.inc.php:2165
 msgid "n"
 msgstr ""
 
@@ -9105,7 +9247,7 @@ msgstr ""
 msgid "new"
 msgstr "new"
 
-#: include/locales/en_gb.inc.php:2404
+#: include/locales/en_gb.inc.php:2403
 msgid "no"
 msgstr "非"
 
@@ -9133,7 +9275,7 @@ msgstr "not selected"
 msgid "not sent"
 msgstr "未发送"
 
-#: include/locales/en_gb.inc.php:2528
+#: include/locales/en_gb.inc.php:2527
 msgid "now"
 msgstr ""
 
@@ -9141,23 +9283,23 @@ msgstr ""
 msgid "of"
 msgstr "of"
 
-#: include/locales/en_gb.inc.php:2360
+#: include/locales/en_gb.inc.php:2359
 msgid "of every"
 msgstr "of every"
 
-#: include/locales/en_gb.inc.php:2297
+#: include/locales/en_gb.inc.php:2296
 msgid "of key"
 msgstr "of key"
 
-#: include/locales/en_gb.inc.php:2357
+#: include/locales/en_gb.inc.php:2356
 msgid "on"
 msgstr "on"
 
-#: include/locales/en_gb.inc.php:2233
+#: include/locales/en_gb.inc.php:2232
 msgid "only printable characters"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2408
+#: include/locales/en_gb.inc.php:2407
 msgid "option in"
 msgstr "option in"
 
@@ -9165,15 +9307,15 @@ msgstr "option in"
 msgid "or"
 msgstr "or"
 
-#: include/locales/en_gb.inc.php:2541
+#: include/locales/en_gb.inc.php:2540
 msgid "other"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1966
+#: include/locales/en_gb.inc.php:1965
 msgid "permissions"
 msgstr "命令"
 
-#: include/locales/en_gb.inc.php:2420
+#: include/locales/en_gb.inc.php:2419
 msgid "php-xml module is not installed"
 msgstr "php-xml module is not installed"
 
@@ -9189,7 +9331,7 @@ msgstr ""
 msgid "refresh now"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2144
+#: include/locales/en_gb.inc.php:2143
 msgid "refreshed every"
 msgstr "refreshed every"
 
@@ -9197,7 +9339,7 @@ msgstr "refreshed every"
 msgid "remember selected"
 msgstr "remember selected"
 
-#: include/locales/en_gb.inc.php:1709
+#: include/locales/en_gb.inc.php:1708
 msgid "root"
 msgstr "root"
 
@@ -9213,7 +9355,7 @@ msgstr "s"
 msgid "sec"
 msgstr "sec"
 
-#: include/locales/en_gb.inc.php:734 include/locales/en_gb.inc.php:2432
+#: include/locales/en_gb.inc.php:734 include/locales/en_gb.inc.php:2431
 msgid "seconds"
 msgstr "seconds"
 
@@ -9225,7 +9367,7 @@ msgstr "selected actions?"
 msgid "sent"
 msgstr "已发送"
 
-#: include/locales/en_gb.inc.php:2194
+#: include/locales/en_gb.inc.php:2193
 msgid "show value mappings"
 msgstr ""
 
@@ -9237,7 +9379,7 @@ msgstr "successful"
 msgid "successfully"
 msgstr "successfully"
 
-#: include/locales/en_gb.inc.php:2330
+#: include/locales/en_gb.inc.php:2329
 msgid "template"
 msgstr "模板"
 
@@ -9245,11 +9387,11 @@ msgstr "模板"
 msgid "to"
 msgstr "to"
 
-#: include/locales/en_gb.inc.php:2306
+#: include/locales/en_gb.inc.php:2305
 msgid "to host"
 msgstr "to host"
 
-#: include/locales/en_gb.inc.php:2260
+#: include/locales/en_gb.inc.php:2259
 msgid "unlinked"
 msgstr "unlinked"
 
@@ -9257,19 +9399,19 @@ msgstr "unlinked"
 msgid "update existing non linked items"
 msgstr "update existing non linked items"
 
-#: include/locales/en_gb.inc.php:2218
+#: include/locales/en_gb.inc.php:2217
 msgid "updated"
 msgstr "已更新"
 
-#: include/locales/en_gb.inc.php:2348
+#: include/locales/en_gb.inc.php:2347
 msgid "updated for hosts"
 msgstr "updated for hosts"
 
-#: include/locales/en_gb.inc.php:2257
+#: include/locales/en_gb.inc.php:2256
 msgid "used by item"
 msgstr "used by item"
 
-#: include/locales/en_gb.inc.php:2258
+#: include/locales/en_gb.inc.php:2257
 msgid "used by scenario"
 msgstr "used by scenario"
 
@@ -9289,15 +9431,15 @@ msgstr "w"
 msgid "was not"
 msgstr "was not"
 
-#: include/locales/en_gb.inc.php:2362
+#: include/locales/en_gb.inc.php:2361
 msgid "week"
 msgstr "week"
 
-#: include/locales/en_gb.inc.php:2361
+#: include/locales/en_gb.inc.php:2360
 msgid "weeks"
 msgstr "weeks"
 
-#: include/locales/en_gb.inc.php:2344
+#: include/locales/en_gb.inc.php:2343
 msgid "with template host can not contain items from other hosts."
 msgstr "with template host can not contain items from other hosts."
 
@@ -9309,13 +9451,16 @@ msgstr "y"
 msgid "year"
 msgstr "year"
 
-#: include/locales/en_gb.inc.php:2405
+#: include/locales/en_gb.inc.php:2404
 msgid "yes"
 msgstr "是"
 
-#: include/locales/en_gb.inc.php:2168
+#: include/locales/en_gb.inc.php:2167
 msgid "µ"
 msgstr ""
+
+#~ msgid "Cannot_update slideshow"
+#~ msgstr "Cannot_update slideshow"
 
 #~ msgid "Use IPMI"
 #~ msgstr "Use IPMI"
