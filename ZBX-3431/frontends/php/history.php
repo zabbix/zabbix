@@ -150,13 +150,13 @@ include_once('include/page_header.php');
 	$items = CItem::get($options);
 	$items = zbx_toHash($items, 'itemid');
 
-	$eventlogExist = false;
-	foreach($items as $key => $value){
-		if( strpos($items[$key]['key_'], 'eventlog[') !== false) $eventlogExist = true;
-	}
-
 	foreach($_REQUEST['itemid'] as $inum =>  $itemid){
 		if(!isset($items[$itemid])) access_deny();
+	}
+
+	$eventlogExist = false;
+	foreach($items as $itm){
+		if(strpos($itm['key_'], 'eventlog[') === 0) $eventlogExist = true;
 	}
 
 	$item = reset($items);
@@ -206,7 +206,7 @@ include_once('include/page_header.php');
 	}
 
 	$form = new CForm(null, 'get');
-	$form->addVar('itemid',$_REQUEST['itemid']);
+	$form->addVar('itemid', $_REQUEST['itemid']);
 
 	if(isset($_REQUEST['filter_task']))	$form->addVar('filter_task',$_REQUEST['filter_task']);
 	if(isset($_REQUEST['filter']))		$form->addVar('filter',$_REQUEST['filter']);
@@ -231,7 +231,6 @@ include_once('include/page_header.php');
 	$itemid = $item['itemid'];
 
 	if($_REQUEST['action']=='showvalues' || $_REQUEST['action']=='showlatest'){
-
 // Filter
 		if(isset($iv_string[$item['value_type']])){
 			$filter_task = get_request('filter_task',0);
@@ -318,13 +317,14 @@ include_once('include/page_header.php');
 
 			$table = new CTableInfo('...');
 			$table->setHeader(array(
-					S_TIMESTAMP,
-					$fewItems?S_ITEM:null,
-					$logItem?S_LOCAL_TIME:null,
-					$logItem?S_SOURCE:null,
-					($eventlogExist ? $logItem?S_SEVERITY:null : null),
-					($eventlogExist ? $logItem?S_EVENT_ID:null : null),
-					S_VALUE),'header');
+				S_TIMESTAMP,
+				$fewItems ? S_ITEM : null,
+				$logItem ? S_LOCAL_TIME : null,
+				(($eventlogExist && $logItem) ? S_SOURCE : null),
+				(($eventlogExist && $logItem) ? S_SEVERITY : null),
+				(($eventlogExist && $logItem) ? S_EVENT_ID : null),
+				S_VALUE
+			), 'header');
 
 			if(isset($_REQUEST['filter']) && !zbx_empty($_REQUEST['filter']) && in_array($_REQUEST['filter_task'], array(FILTER_TASK_SHOW, FILTER_TASK_HIDE))){
 				$options['search'] = array('value' => $_REQUEST['filter']);
@@ -343,10 +343,7 @@ include_once('include/page_header.php');
 				$host = reset($item['hosts']);
 
 				if(isset($_REQUEST['filter']) && !zbx_empty($_REQUEST['filter'])){
-					$contain = zbx_stristr($data['value'],$_REQUEST['filter']) ? TRUE : FALSE;
-
-//					if($_REQUEST['filter_task'] == FILTER_TASK_SHOW && !$contain) continue;
-//					if($_REQUEST['filter_task'] == FILTER_TASK_HIDE && $contain) continue;
+					$contain = zbx_stristr($data['value'], $_REQUEST['filter']);
 
 					if(!isset($_REQUEST['mark_color'])) $_REQUEST['mark_color'] = MARK_COLOR_RED;
 
@@ -363,36 +360,26 @@ include_once('include/page_header.php');
 					}
 				}
 
-				$row = array(nbsp(zbx_date2str(S_HISTORY_LOG_ITEM_DATE_FORMAT,$data['clock'])));
+				$row = array(nbsp(zbx_date2str(S_HISTORY_LOG_ITEM_DATE_FORMAT, $data['clock'])));
 
-				if($fewItems) $row[] = $host['host'].':'.item_description($item);
+				if($fewItems)
+					$row[] = $host['host'].':'.item_description($item);
 
 				if($logItem){
-
-					if($data['timestamp'] == 0) $row[] = new CCol(' - ');
-					else $row[] = zbx_date2str(S_HISTORY_LOG_LOCALTIME_DATE_FORMAT,$data['timestamp']);
-
-					if(zbx_empty($data['source'])) $row[] = new CCol(' - ');
-					else $row[] = $data['source'];
+					$row[] = ($data['timestamp'] == 0) ? '-' : zbx_date2str(S_HISTORY_LOG_LOCALTIME_DATE_FORMAT, $data['timestamp']);
 
 					if($eventlogExist){
-						if($data['severity'] != 0) $row[] = new CCol(get_item_logtype_description($data['severity']),get_item_logtype_style($data['severity']));
-						else $row[] = new CCol(' - ');
-					}
-
-					if($eventlogExist){
-						if(zbx_empty($data['source']) && ($data['logeventid'] == '0')) $row[] = new CCol(' - ');
-						else $row[] = $data['logeventid'];
+						$row[] = zbx_empty($data['source']) ? '-' : $data['source'];
+						$row[] = ($data['severity'] == 0)
+								? '-'
+								: new CCol(get_item_logtype_description($data['severity']), get_item_logtype_style($data['severity']));
+						$row[] = ($data['logeventid'] == 0) ? '-' : $data['logeventid'];
 					}
 				}
 
-				$data['value'] = trim($data['value'],"\r\n");
-				$data['value'] = encode_log($data['value']);
+				$data['value'] = encode_log(trim($data['value'], "\r\n"));
+				$row[] = new CCol($data['value'], 'pre');
 
-//				$data['value'] = str_replace(' ', '&nbsp;', $data['value']);
-//				$data['value'] = str_replace("\t", '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', $data['value']);
-//				$data['value'] = zbx_nl2br($data['value']);
-				array_push($row, new CCol($data['value'], 'pre'));
 
 				$crow = new CRow($row);
 				if(is_null($color_style)){
