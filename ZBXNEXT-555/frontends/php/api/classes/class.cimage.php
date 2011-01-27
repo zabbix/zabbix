@@ -115,7 +115,6 @@ class CImage extends CZBXAPI{
 			$sql_parts['where']['se'] = '('.
 				'se.iconid_off=i.imageid'.
 				' OR se.iconid_on=i.imageid'.
-				' OR se.iconid_unknown=i.imageid'.
 				' OR se.iconid_disabled=i.imageid'.
 				' OR se.iconid_maintenance=i.imageid'.
 				' OR sm.backgroundid=i.imageid)';
@@ -546,7 +545,6 @@ class CImage extends CZBXAPI{
 					' AND ('.
 						DBCondition('se.iconid_off',$imageids).
 						' OR '.DBCondition('se.iconid_on',$imageids).
-						' OR '.DBCondition('se.iconid_unknown',$imageids).
 						' OR '.DBCondition('se.iconid_disabled',$imageids).
 						' OR '.DBCondition('se.iconid_maintenance',$imageids).
 						' OR '.DBCondition('sm.backgroundid',$imageids).
