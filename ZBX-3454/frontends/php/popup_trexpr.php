@@ -268,14 +268,14 @@
 
 
 
-	if($_REQUEST['expression'] && $_REQUEST['dstfld1'] == 'expr_temp'){
-		preg_match('/\{([a-zA-Z_0-9-]+):(.*)\.([a-z]+)\(([0-9]+)([,]{0,1})([0-9]{0,})\)\}([=><#]{1})([0-9]+)/', $_REQUEST['expression'], $match);
-		if($match[3] && $match[7]) $_REQUEST['expr_type'] = $match[3].'['.$match[7].']';
-		if($match[4] && $match[6]) $_REQUEST['param'] = array($match[4], $match[6]);
-		if($match[4]) $_REQUEST['paramtype'] = 0;
-		if($match[8]) $_REQUEST['value'] = $match[8];
+	if(isset($_REQUEST['expression']) && $_REQUEST['dstfld1'] == 'expr_temp'){
+		preg_match('/\{([a-zA-Z_0-9- ]+):(.*)\.([a-z]+)\(([0-9]+)([,]{0,1})([0-9]{0,})\)\}([=><#]{1})([0-9]+)/', $_REQUEST['expression'], $match);
+		if(isset($match[3]) && isset($match[7])) $_REQUEST['expr_type'] = $match[3].'['.$match[7].']';
+		if(isset($match[4]) && isset($match[6])) $_REQUEST['param'] = array($match[4], $match[6]);
+		if(isset($match[4])) $_REQUEST['paramtype'] = 0;
+		if(isset($match[8])) $_REQUEST['value'] = $match[8];
 
-		if($match[1] && $match[2]){
+		if(isset($match[1]) && isset($match[2])){
 			$_REQUEST['description'] = $match[1] .':'. $match[2];
 			$options = array(
 				'output' => API_OUTPUT_SHORTEN,
