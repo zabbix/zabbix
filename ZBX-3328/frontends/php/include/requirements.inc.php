@@ -101,7 +101,7 @@
 
 		return $result;
 	}
-	
+
 	function check_php_upload_max_filesize(){
 		$required = 2*1024*1024;
 		$recommended = 16*1024*1024;
@@ -136,7 +136,7 @@
 
 		$current = ini_get('max_execution_time');
 
-		if($current >= $recommended){
+		if($current >= $recommended || $current == 0){
 			$req = 2;
 		}
 		else if($current >= $required){
@@ -157,7 +157,7 @@
 
 		return $result;
 	}
-	
+
 	function check_php_max_input_time(){
 		$required = 300;
 		$recommended = 600;
@@ -257,8 +257,8 @@
 			$current[] = BR();
 		}
 
-// Semaphore related functions are checked elsewhere
-		if(class_exists('SQLite3')){
+// Semaphore related functions are checked elsewhere. The 'false' is to prevent autoloading of the SQLite3 class.
+		if(class_exists('SQLite3', false)){
 			$current[] = 'SQLite3';
 			$current[] = BR();
 		}
@@ -454,13 +454,13 @@
 
 		return $result;
 	}
-	
+
 	function check_php_session() {
 		$current = function_exists('session_start') &&
 			function_exists('session_write_close');
-		
+
 		$req = $current ? 1 : 0;
-		
+
 		return array(
 			'name' => S_SESSION_MODULE,
 			'current' => $req ? S_YES_SMALL : S_NO_SMALL,
@@ -469,7 +469,7 @@
 			'result' => $req,
 			'error' => S_REQUIRED_SESSION_MODULE.SPACE.'['.S_CONFIGURE_PHP_WITH_SMALL.SPACE.'--enable-session]'
 			);
-			
+
 	}
 
 	function check_php_gettext() {
@@ -508,7 +508,7 @@
 		$result[] = check_php_gd_png();
 		$result[] = check_php_xml();
 		$result[] = check_php_ctype();
-		
+
 		return $result;
 	}
 

@@ -50,7 +50,8 @@ class CWebCheck extends CZBXAPI{
 
 		$def_options = array(
 			'nodeids'				=> null,
-			'applicationids'				=> null,
+			'httptestids'			=> null,
+			'applicationids'		=> null,
 			'hostids'				=> null,
 			'editable'				=> null,
 			'nopermissions'			=> null,
@@ -105,6 +106,17 @@ class CWebCheck extends CZBXAPI{
 
 // nodeids
 		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
+
+// httptestids
+		if(!is_null($options['httptestids'])){
+			zbx_value2array($options['httptestids']);
+
+			if($options['output'] != API_OUTPUT_SHORTEN){
+				$sql_parts['select']['httptestid'] = 'ht.httptestid';
+			}
+
+			$sql_parts['where']['httptestid'] = DBcondition('ht.httptestid', $options['httptestids']);
+		}
 
 // hostids
 		if(!is_null($options['hostids'])){
@@ -317,7 +329,7 @@ COpt::memoryPick();
 			);
 			$db_webchecks = self::get($options);
 			foreach($db_webchecks as $webcheck){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenarion [%s] already exists.', $webcheck['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario [%s] already exists.', $webcheck['name']));
 			}
 
 
@@ -354,7 +366,7 @@ COpt::memoryPick();
 
 			$dbWebchecks = self::get(array(
 				'output' => API_OUTPUT_EXTEND,
-				'webcheckids' => $webcheckids,
+				'httptestids' => $webcheckids,
 				'selectSteps' => API_OUTPUT_EXTEND,
 				'editable' => true,
 				'preservekeys' => true
@@ -483,14 +495,13 @@ COpt::memoryPick();
 			self::BeginTransaction(__METHOD__);
 
 			$options = array(
-				'webcheckids' => $webcheckids,
+				'httptestids' => $webcheckids,
 				'output' => API_OUTPUT_EXTEND,
 				'editable' => true,
 				'select_hosts' => API_OUTPUT_EXTEND,
 				'preservekeys' => true
 			);
 			$del_webchecks = self::get($options);
-
 			foreach($webcheckids as $webcheckid){
 				if(!isset($del_webchecks[$webcheckid])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);

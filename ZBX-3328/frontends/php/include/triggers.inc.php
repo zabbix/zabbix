@@ -1297,7 +1297,7 @@ return $caption;
 					' AND '.DBin_node('i.itemid');
 			if($item = DBfetch(DBselect($sql))){
 				if(!isset($ZBX_TR_EXPR_ALLOWED_FUNCTIONS[$exprPart['functionName']]['item_types'][$item['value_type']])){
-					error('Incorrect item type "'.$exprPart['host'].':'.$exprPart['item'].'" provided for trigger function "'.$exprPart['function'].'".');
+					error('Incorrect item value type "'.$exprPart['host'].':'.$exprPart['item'].'" provided for trigger function "'.$exprPart['function'].'".');
 					return null;
 				}
 			}
