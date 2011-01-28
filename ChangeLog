@@ -1,5 +1,6 @@
 Changes for 1.8.5rc1
 
+ - [ZBX-3446] fixed possible hang of pollers - added timeout handler for external scripts (Sasha)
  - [ZBX-1690] fixed undefined index when create action with name that already exist (Vedmak)
  - [ZBX-3461] fixed names of IPMI pollers in debug output and the number of items they take (asaveljevs)
  - [ZBX-3100] fixed messages in popup when no proxies or discovery checks defined (Vedmak)
