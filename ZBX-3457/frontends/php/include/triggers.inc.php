@@ -3339,13 +3339,22 @@ return $caption;
 			}
 		}
 
-		if($letterLevel) {
+		if($letterLevel){
 			if(!$nextletter) $nextletter = 'A';
 
-			if ($nextletter > 'Z')
-				$newch = chr(floor((ord($nextletter) - ord('A')) / 26) + ord('A') - 1) . chr(((ord($nextletter) - ord('A')) % 26) + ord('A'));
-			else
+			if ($nextletter > 'Z'){
+				global $secondLetters;
+				if(!$secondLetters) $secondLetters = 'AA';
+				if($secondLetters[1] > 'Z'){
+					$secondLetters[1] = 'A';
+					$secondLetters[0] = chr(ord($secondLetters[0])+1);
+				}
+				if($secondLetters[0] > 'Z') $secondLetters[0] = 'A';
+				$newch = $secondLetters;
+			}
+			else{
 				$newch = $nextletter;
+			}
 
 			array_push($expr, SPACE, bold($newch), SPACE);
 			$expValue = trim(zbx_substr($expression, $treeLevel['openSymbolNum'], $treeLevel['closeSymbolNum']-$treeLevel['openSymbolNum']+1));
@@ -3357,8 +3366,13 @@ return $caption;
 				$url = new CSpan($expValue);
 			}
 			$expr[] = $url;
-			$outline = ' '.$newch.' ';
-			$nextletter = chr(ord($nextletter)+1);
+			$outline = ($secondLetters[1] == 'A'?"&nbsp;\r\n":' ').$newch.' ';
+			if(isset($secondLetters)){
+				$secondLetters[1] = chr(ord($secondLetters[1])+1);
+			}
+			else{
+				$nextletter = chr(ord($nextletter)+1);
+			}
 
 			$levelDetails = Array(
 					'start' => $treeLevel['openSymbolNum'],
