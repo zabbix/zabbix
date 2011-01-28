@@ -462,6 +462,11 @@ require_once('include/templates/action.js.php');
 
 			$tblOper->addRow(array(S_STEP, $tblStep));
 		}
+		else{
+			$tblOper->addItem(new CVar('new_operation[esc_step_from]', 1));
+			$tblOper->addItem(new CVar('new_operation[esc_step_to]', 1));
+			$tblOper->addItem(new CVar('new_operation[esc_period]', 0));
+		}
 
 		$cmbOpType = new CComboBox('new_operation[operationtype]', $new_operation['operationtype'], 'submit()');
 		foreach($allowedOperations as $oper)
