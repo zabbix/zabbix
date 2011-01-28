@@ -103,7 +103,11 @@ static int	zbx_waitpid(pid_t pid)
 
 	do
 	{
+#ifdef KERNEL_2_4
+		if (-1 == (rc = waitpid(pid, &status, WUNTRACED)))
+#else
 		if (-1 == (rc = waitpid(pid, &status, WUNTRACED | WCONTINUED)))
+#endif
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() waitpid failure: %s", __function_name, strerror(errno));
 			goto exit;
@@ -115,8 +119,10 @@ static int	zbx_waitpid(pid_t pid)
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() killed by signal %d", __function_name, WTERMSIG(status));
 		else if (WIFSTOPPED(status))
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() stopped by signal %d", __function_name, WSTOPSIG(status));
+#ifndef KERNEL_2_4
 		else if (WIFCONTINUED(status))
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() continued", __function_name);
+#endif
 	}
 	while (!WIFEXITED(status) && !WIFSIGNALED(status));
 exit:
