@@ -841,8 +841,8 @@ class zbxXML{
 					}
 
 
-					// creating interfaces
-					$host_db['interfaces'] = array();
+					// host will have no interfaces - we will be creating them seperatly
+					$host_db['interfaces'] = null;
 
 					// it is possible, that data is imported from 1.8, where there was only one network interface per host
 					/**
@@ -851,10 +851,11 @@ class zbxXML{
 					$old_version_input = $host_db['status'] != HOST_STATUS_TEMPLATE;
 					if($old_version_input){
 						// rearranging host structure, so it would look more like 2.0 host
+						$interfaces = array();
 
 						// the main interface is always "agent" type
 						if(!is_null($host_db['ip'])){
-							$host_db['interfaces'][] = array(
+							$interfaces[] = array(
 								'main' => INTERFACE_PRIMARY,
 								'type' => INTERFACE_TYPE_AGENT,
 								'useip' => $host_db['useip'],
@@ -875,7 +876,7 @@ class zbxXML{
 							else{
 								$ipmi_ip = $host_db['ipmi_ip'];
 							}
-							$host_db['interfaces'][] = array(
+							$interfaces[] = array(
 								'main' => INTERFACE_SECONDARY,
 								'type' => INTERFACE_TYPE_IPMI,
 								'useip' => INTERFACE_USE_IP,
@@ -897,7 +898,7 @@ class zbxXML{
 								&& !isset($snmp_interface_ports_created[$item_db['snmp_port']])
 							){
 
-								$host_db['interfaces'][] = array(
+								$interfaces[] = array(
 									'main' => INTERFACE_SECONDARY,
 									'type' => INTERFACE_TYPE_SNMP,
 									'useip' => $host_db['useip'],
@@ -932,12 +933,10 @@ class zbxXML{
 						}
 
 
-						// checking if host already exists - then some of the interfaces may need to be updated, but not created
-						//   we can tell API that, by adding interfaceid to interface parameters
+						// checking if host already exists - then some of the interfaces may not need to be created
 						if($host_db['status'] != HOST_STATUS_TEMPLATE){
-							$matched_interfaces = array();
 							// for every interface we got based on XML
-							foreach($host_db['interfaces'] as $i => $interface_db){
+							foreach($interfaces as $i => $interface_db){
 								// checking every interface of current host
 								foreach($current_host['interfaces'] as $interface){
 									// if all parameters of interface are identical
@@ -949,17 +948,9 @@ class zbxXML{
 										&& $interface['useip'] == $interface_db['useip']
 									){
 										// this interface is the same as existing one!
-										$host_db['interfaces'][$i]['interfaceid'] = $interface['interfaceid'];
-										$matched_interfaces[$interface['interfaceid']] = $interface['interfaceid'];
+										$interfaces[$i]['interfaceid'] = $interface['interfaceid'];
 										break;
 									}
-								}
-							}
-
-							// if host had another interfaces, we are not touching them: they remain as is
-							foreach($current_host['interfaces'] as $interface){
-								if(!isset($matched_interfaces[$interface['interfaceid']])){
-									$host_db['interfaces'][] = $interface;
 								}
 							}
 
@@ -1128,12 +1119,23 @@ class zbxXML{
 							));
 							$inserted_host = reset($inserted_host);
 
+							// if host had another interfaces, we are not touching them: they remain as is
+							foreach($interfaces as $i=>$interface){
+								// interface was not already created
+								if(!isset($interface['interfaceid'])){
+									// creating interface
+									$ids = CHostInterface::massAdd(array($interface));
+									$interface[$i]['interfaceid'] = reset($ids);
+								}
+							}
+
+
 							// we must know interface ids to assign them to items
 							$agent_interface_id = null;
 							$ipmi_interface_id = null;
 							$snmp_interfaces = array(); //hash 'port' => 'iterfaceid'
 
-							foreach($inserted_host['interfaces'] as $interface){
+							foreach($interfaces as $interface){
 								switch($interface['type']){
 									case INTERFACE_TYPE_AGENT:
 										$agent_interface_id = $interface['interfaceid'];
@@ -1155,13 +1157,11 @@ class zbxXML{
 							// item needs interfaces
 							if($old_version_input){
 								// 'snmp_port' column was renamed to 'port'
-								if($item_db['snmp_port'] == 0){
+								if($item_db['snmp_port'] != 0){
 									// zabbix agent items have no ports
-									unset($item_db['snmp_port']);
-								}
-								else{
 									$item_db['port'] = $item_db['snmp_port'];
 								}
+								unset($item_db['snmp_port']);
 
 								// assigning appropriate interface depending on item type
 								switch($item_db['type']){
@@ -1467,6 +1467,10 @@ class zbxXML{
 
 							if(!isset($graph_db['ymin_type'])) {
 								throw new APIException(1, _s('No "ymin_type" field for graph "%s"', $graph_db['name']));
+							}
+
+							if(!isset($graph_db['ymax_type'])) {
+								throw new APIException(1, _s('No "ymax_type" field for graph "%s"', $graph_db['name']));
 							}
 
 							if($graph_db['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE){
