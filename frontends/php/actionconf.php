@@ -350,7 +350,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			$action['name']			= get_request('name');
 			$action['eventsource']	= get_request('eventsource');
 			$action['evaltype']		= get_request('evaltype', 0);
-			$action['esc_period']	= get_request('esc_period', 0);
+			$action['esc_period']	= get_request('esc_period', 60);
 			$action['status']		= get_request('status', isset($_REQUEST['form_refresh']) ? 1 : 0);
 			$action['def_shortdata']= get_request('def_shortdata', ACTION_DEFAULT_SUBJ);
 			$action['def_longdata']	= get_request('def_longdata', ACTION_DEFAULT_MSG);
@@ -430,8 +430,17 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 				);
 			}
 
+			$esc_step_from = array();
+			$esc_step_to = array();
+			$esc_period = array();
+			foreach($action['operations'] as $key => $operation) {
+				$esc_step_from[$key] = $operation['esc_step_from'];
+				$esc_step_to[$key] = $operation['esc_step_to'];
+				$esc_period[$key] = $operation['esc_period'];
+			}
+			array_multisort($esc_step_from, SORT_ASC, SORT_NUMERIC, $esc_step_to, SORT_ASC, $esc_period, SORT_ASC, $action['operations']);
+
 			$operations=array();
-			order_result($action['operations'], 'operationtype', ZBX_SORT_DOWN);
 			foreach($action['operations'] as $onum => $operation){
 				$operations[] = get_operation_desc(SHORT_DESCRITION, $operation);
 			}

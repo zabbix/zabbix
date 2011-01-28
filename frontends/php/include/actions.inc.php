@@ -268,16 +268,16 @@ function get_operation_desc($type, $data){
 				}
 				break;
 			case OPERATION_TYPE_HOST_ADD:
-				$result[] = S_ADD_HOST;
+				$result[] = array(bold(_('Add host')), BR());
 				break;
 			case OPERATION_TYPE_HOST_REMOVE:
-				$result[] = S_REMOVE_HOST;
+				$result[] = array(bold(_('Remove host')), BR());
 				break;
 			case OPERATION_TYPE_HOST_ENABLE:
-				$result[] = S_ENABLE_HOST;
+				$result[] = array(bold(_('Enable host')), BR());
 				break;
 			case OPERATION_TYPE_HOST_DISABLE:
-				$result[] = S_DISABLE_HOST;
+				$result[] = array(bold(_('Disable host')), BR());
 				break;
 			case OPERATION_TYPE_GROUP_ADD:
 			case OPERATION_TYPE_GROUP_REMOVE:
