@@ -879,9 +879,9 @@ class zbxXML{
 							$interfaces[] = array(
 								'main' => INTERFACE_SECONDARY,
 								'type' => INTERFACE_TYPE_IPMI,
-								'useip' => INTERFACE_USE_IP,
-								'ip' =>  $ipmi_ip,
-								'dns' => '',
+								'useip' => INTERFACE_USE_DNS,
+								'ip' =>  '',
+								'dns' => $ipmi_ip,
 								'port' => $host_db['ipmi_port']
 							);
 						}
@@ -955,6 +955,11 @@ class zbxXML{
 							}
 
 						}
+						$interfaces_created_with_host = false;
+					}
+					else{
+						$host_db['interfaces'] = $interfaces;
+						$interfaces_created_with_host = true;
 					}
 
 // HOST GROUPS {{{
@@ -1111,15 +1116,27 @@ class zbxXML{
 
 						// if this is an export from 1.8, we need to make some adjustments to items
 						if($old_version_input){
-							// if host had another interfaces, we are not touching them: they remain as is
-							foreach($interfaces as $i => $interface){
-								// interface was not already created
-								if(!isset($interface['interfaceid'])){
-									// creating interface
-									$ids = CHostInterface::create($interface);
-									$interface[$i]['interfaceid'] = reset($ids);
+							if(!$interfaces_created_with_host){
+								// if host had another interfaces, we are not touching them: they remain as is
+								foreach($interfaces as $i => $interface){
+									// interface was not already created
+									if(!isset($interface['interfaceid'])){
+										// creating interface
+										$interface['hostid'] = $current_hostid;
+										$ids = CHostInterface::create($interface);
+										if($ids === false) throw new Exception();
+										$interfaces[$i]['interfaceid'] = reset($ids['interfaceids']);
+									}
 								}
 							}
+							else{
+								$options = array(
+									'hostids' => $current_hostid,
+									'output' => API_OUTPUT_EXTEND
+								);
+								$interfaces = CHostInterface::get($options);
+							}
+
 
 
 							// we must know interface ids to assign them to items
