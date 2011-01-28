@@ -120,7 +120,7 @@ static int	zbx_waitpid(pid_t pid)
 		else if (WIFSTOPPED(status))
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() stopped by signal %d", __function_name, WSTOPSIG(status));
 #ifdef WIFCONTINUED
-		if (WIFCONTINUED(status))
+		else if (WIFCONTINUED(status))
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() continued", __function_name);
 #endif
 	}
@@ -190,7 +190,6 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "'%s'", *buffer);
 			if (-1 == zbx_waitpid(pid))
 			{
 				if (EINTR == errno)
