@@ -154,12 +154,19 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 
 		if (NULL != buffer)
 		{
-			const size_t	buf_alloc = MAX_BUFFER_LEN;
+			char	*p;
+			size_t	buf_size = MAX_BUFFER_LEN;
 
-			*buffer = zbx_realloc(*buffer, buf_alloc);
+			*buffer = p = zbx_realloc(*buffer, buf_size);
+			buf_size--;	/* '\0' */
 
-			if (0 < (rc = read(fd, *buffer, buf_alloc - 1)))
-				(*buffer)[rc] = '\0';
+			while (0 < (rc = read(fd, p, buf_size)))
+			{
+				p += rc;
+				buf_size -= rc;
+			}
+
+			*p = '\0';
 		}
 
 		close(fd);
@@ -177,6 +184,7 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 		}
 		else
 		{
+			zabbix_log(LOG_LEVEL_DEBUG, "'%s'", *buffer);
 			if (-1 == zbx_waitpid(pid))
 			{
 				if (EINTR == errno)
