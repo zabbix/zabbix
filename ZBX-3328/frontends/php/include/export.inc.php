@@ -1291,7 +1291,7 @@ class zbxXML{
 								$current_item = CItem::get($options);
 							}
 
-							if (isset($item_applications) && is_array($item_applications) && count($item_applications) > 0){
+							if(!empty($item_applications)){
 								$r = CApplication::massAdd(array(
 									'applications' => $item_applications,
 									'items' => $current_item
@@ -1465,7 +1465,7 @@ class zbxXML{
 								continue; // break if not update exist
 							}
 
-							if (!isset($graph_db['ymin_type'])) {
+							if(!isset($graph_db['ymin_type'])) {
 								throw new APIException(1, _s('No "ymin_type" field for graph "%s"', $graph_db['name']));
 							}
 
