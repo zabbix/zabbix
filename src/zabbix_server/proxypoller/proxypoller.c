@@ -374,7 +374,7 @@ void	main_proxypoller_loop()
 
 		if (sleeptime > 0)
 		{
-			zbx_setproctitle("poller [sleeping for %d seconds]", sleeptime);
+			zbx_setproctitle("proxy poller [sleeping for %d seconds]", sleeptime);
 			sleep(sleeptime);
 		}
 	}

@@ -14,6 +14,8 @@ New features:
  - [ZBX-3338] updated Ukrainian translation; thanks to zalex_ua (Richlv)
 
 Bug fixes:
+ - [ZBX-3470] table user_groups is now updated only if necessary, when user details are saved (KB)
+ - [ZBX-1819] fixed templated listed twice for graphs if host filter is set to all (Vedmak)
  - [ZBX-3442] fixed gui config "first selected" and "event ack" dropdowns (Vedmak)
  - [ZBX-3329] fixed shown last value as "0" in frontend for items that have never been updated (Aly)
  - [ZBX-3436] added missing "Primary POC Screen Name" to Inventory->Hosts (KB)
@@ -73,6 +75,12 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
 
+ - [ZBX-3446] fixed possible hang of pollers - added timeout handler for external scripts (Sasha)
+ - [ZBX-3461] fixed names of IPMI pollers in debug output and the number of items they take (asaveljevs)
+ - [ZBX-3100] fixed messages in popup when no proxies or discovery checks defined (Vedmak)
+ - [ZBX-3138] fixed bug when disabling application, webitems were disabled too (Vedmak)
+ - [ZBX-2951] made interval hidden for trapper items (Vedmak)
+ - [ZBX-2867] changed order of "Discovery" and "IT services" in configuration menu (Vemdak)
  - [ZBX-3047] fixed zapcat compatibility for trigger expressions (Aly,Sasha,asaveljevs)
  - [ZBX-2912] added check for valid UTF-8 characters in the incoming data (Sasha)
  - [ZBX-1346] add more user parameter examples (Richlv)

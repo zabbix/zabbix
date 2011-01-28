@@ -155,7 +155,7 @@ static void	run_remote_command(char *host_name, char *command)
 		}
 #endif
 
-		if (ret != SUCCEED && '\0' != error)
+		if (ret != SUCCEED && '\0' != *error)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Cannot execute remote command [%s]: %s",
 					p, error);
