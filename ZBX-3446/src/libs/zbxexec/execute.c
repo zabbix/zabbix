@@ -18,6 +18,7 @@
 **/
 
 #include "common.h"
+#include "threads.h"
 #include "log.h"
 
 /******************************************************************************
@@ -49,7 +50,7 @@ static int	zbx_popen(pid_t *pid, const char *command)
 	if (-1 == pipe(fd))
 		return -1;
 
-	if (-1 == (*pid = fork()))
+	if (-1 == (*pid = zbx_fork()))
 	{
 		close(fd[0]);
 		close(fd[1]);
@@ -67,9 +68,10 @@ static int	zbx_popen(pid_t *pid, const char *command)
 
 	/* child process */
 	close(fd[0]);
-	dup2(fd[1], 1);
+	dup2(fd[1], STDOUT_FILENO);
+	close(fd[1]);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() executing script", __function_name, fd[0]);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() executing script", __function_name);
 
 	execl("/bin/sh", "sh", "-c", command, NULL);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot execute script [%s]: %s", __function_name, command, strerror(errno));
@@ -152,19 +154,12 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 
 		if (NULL != buffer)
 		{
-			char	c, *p;
+			const size_t	buf_alloc = MAX_BUFFER_LEN;
 
-			*buffer = p = zbx_realloc(*buffer, MAX_BUFFER_LEN);
+			*buffer = zbx_realloc(*buffer, buf_alloc);
 
-			while (1 == (rc = read(fd, &c, 1)))
-			{
-				*p++ = c;
-
-				if (p - *buffer == MAX_BUFFER_LEN - 1)
-					break;
-			}
-
-			*p = '\0';
+			if (0 < (rc = read(fd, *buffer, buf_alloc - 1)))
+				(*buffer)[rc] = '\0';
 		}
 
 		close(fd);

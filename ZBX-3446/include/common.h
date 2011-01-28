@@ -646,7 +646,6 @@ const char	*zbx_poller_type_string(int poller_type);
 
 /* Secure string copy */
 #define strscpy(x, y)		zbx_strlcpy(x, y, sizeof(x))
-#define strnscpy(x, y, n)	zbx_strlcpy(x, y, n);
 
 #define zbx_malloc(old, size)	zbx_malloc2(__FILE__, __LINE__, old, size)
 #define zbx_realloc(src, size)	zbx_realloc2(__FILE__, __LINE__, src, size)
