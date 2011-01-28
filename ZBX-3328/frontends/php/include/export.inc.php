@@ -853,7 +853,7 @@ class zbxXML{
 						// rearranging host structure, so it would look more like 2.0 host
 
 						// the main interface is always "agent" type
-						if (!is_null($host_db['ip'])){
+						if(!is_null($host_db['ip'])){
 							$host_db['interfaces'][] = array(
 								'main' => INTERFACE_PRIMARY,
 								'type' => INTERFACE_TYPE_AGENT,
@@ -868,7 +868,7 @@ class zbxXML{
 						if(isset($host_db['useipmi']) && $host_db['useipmi']){
 							// when saving host in 1.8, it's possible to set use_ipmi=1 and not to fill an IP address
 							//  we were not really sure what to do with this host, and decided to take host ip address instead and show info message about this
-							if ($host_db['ipmi_ip'] == ''){
+							if($host_db['ipmi_ip'] == ''){
 								$ipmi_ip = $host_db['ip'];
 								info(_s('Host "%s" has "use_ipmi" parameter checked, but has no "ipmi_ip" parameter! Using host IP address as an address for IPMI interface.', $host_db['host']));
 							}
@@ -894,7 +894,8 @@ class zbxXML{
 							if(($item_db['type'] == ITEM_TYPE_SNMPV1
 								|| $item_db['type'] == ITEM_TYPE_SNMPV2C
 								|| $item_db['type'] == ITEM_TYPE_SNMPV3)
-								&& !in_array($item_db['snmp_port'], $snmp_interface_ports_created)){
+								&& !isset($snmp_interface_ports_created[$item_db['snmp_port']])
+							){
 
 								$host_db['interfaces'][] = array(
 									'main' => INTERFACE_SECONDARY,
@@ -904,7 +905,7 @@ class zbxXML{
 									'dns' => $host_db['dns'],
 									'port' => $item_db['snmp_port']
 								);
-								$snmp_interface_ports_created[] = $item_db['snmp_port'];
+								$snmp_interface_ports_created[$item_db['snmp_port']] = 1;
 							}
 						}
 						unset($snmp_interface_ports_created); // it was a temporary variable
@@ -929,41 +930,40 @@ class zbxXML{
 						else{
 							$current_host = reset($current_host);
 						}
-					}
 
-					// checking if host already exists - then some of the interfaces may need to be updated, but not created
-					//   we can tell API that, by adding interfaceid to interface parameters
-					if($current_host && isset($current_host['interfaces'])){
 
-						$matched_interfaces = array();
-						// for every interface we got based on XML
-						for($i = 0; $i < count($host_db['interfaces']); $i++){
-							// checking every interface of current host
-							foreach($current_host['interfaces'] as $interface){
-								// if all parameters of interface are identical
-								if(
-									!isset($host_db['interfaces'][$i]['interfaceid'])
-									&& $interface['type'] == $host_db['interfaces'][$i]['type']
-									&& $interface['ip'] == $host_db['interfaces'][$i]['ip']
-									&& $interface['dns'] == $host_db['interfaces'][$i]['dns']
-									&& $interface['port'] == $host_db['interfaces'][$i]['port']
-									&& $interface['useip'] == $host_db['interfaces'][$i]['useip']
-								){
-									// this interface is the same as existing one!
-									$host_db['interfaces'][$i]['interfaceid'] = $interface['interfaceid'];
-									$matched_interfaces[] = $interface['interfaceid'];
-									break;
+						// checking if host already exists - then some of the interfaces may need to be updated, but not created
+						//   we can tell API that, by adding interfaceid to interface parameters
+						if($host_db['status'] != HOST_STATUS_TEMPLATE){
+							$matched_interfaces = array();
+							// for every interface we got based on XML
+							foreach($host_db['interfaces'] as $i => $interface_db){
+								// checking every interface of current host
+								foreach($current_host['interfaces'] as $interface){
+									// if all parameters of interface are identical
+									if(
+										$interface['type'] == $interface_db['type']
+										&& $interface['ip'] == $interface_db['ip']
+										&& $interface['dns'] == $interface_db['dns']
+										&& $interface['port'] == $interface_db['port']
+										&& $interface['useip'] == $interface_db['useip']
+									){
+										// this interface is the same as existing one!
+										$host_db['interfaces'][$i]['interfaceid'] = $interface['interfaceid'];
+										$matched_interfaces[$interface['interfaceid']] = $interface['interfaceid'];
+										break;
+									}
 								}
 							}
-						}
 
-						// if host had another interfaces, we are not touching them: they remain as is
-						foreach($current_host['interfaces'] as $interface){
-							if (!in_array($interface['interfaceid'], $matched_interfaces)){
-								$host_db['interfaces'][] = $interface;
+							// if host had another interfaces, we are not touching them: they remain as is
+							foreach($current_host['interfaces'] as $interface){
+								if(!isset($matched_interfaces[$interface['interfaceid']])){
+									$host_db['interfaces'][] = $interface;
+								}
 							}
-						}
 
+						}
 					}
 
 // HOST GROUPS {{{
