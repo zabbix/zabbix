@@ -79,8 +79,7 @@ static char	*get_command_by_scriptid(zbx_uint64_t scriptid)
  ******************************************************************************/
 static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, char **result)
 {
-	char		*p,
-			*command, error[MAX_STRING_LEN];
+	char		*p, *command, error[MAX_STRING_LEN];
 	int		ret = FAIL;
 	DC_HOST		host;
 #ifdef HAVE_OPENIPMI

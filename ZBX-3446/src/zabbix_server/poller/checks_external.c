@@ -23,7 +23,7 @@
 
 #include "checks_external.h"
 
-extern  char	*CONFIG_EXTERNALSCRIPTS;
+extern char	*CONFIG_EXTERNALSCRIPTS;
 
 /******************************************************************************
  *                                                                            *
@@ -53,8 +53,6 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, item->key_orig);
 
 	conn = item->host.useip == 1 ? item->host.ip : item->host.dns;
-
-	init_result(result);
 
 	if (NULL != (pl = strchr(item->key, '[')))
 	{

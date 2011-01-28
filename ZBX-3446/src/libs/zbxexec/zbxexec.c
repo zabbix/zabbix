@@ -80,9 +80,9 @@ static int	zbx_popen(pid_t *pid, const char *command)
  *                                                                            *
  * Function: zbx_waitpid                                                      *
  *                                                                            *
- * Purpose: this function wait for process to change state                    *
+ * Purpose: this function waits for process to change state                   *
  *                                                                            *
- * Parameters: pid     - [OUT] child process PID                              *
+ * Parameters: pid     - [IN] child process PID                               *
  *                                                                            *
  * Return value: on success, PID is returned. On error,                       *
  *               -1 is returned, and errno is set appropriately               *
@@ -127,9 +127,9 @@ exit:
  *                                                                            *
  * Function: zbx_execute                                                      *
  *                                                                            *
- * Purpose: this function execute script and return result from stdout        *
+ * Purpose: this function executes a script and returns result from stdout    *
  *                                                                            *
- * Parameters: command       - [IN] commanf for execution                     *
+ * Parameters: command       - [IN] command for execution                     *
  *             buffer        - [OUT] buffer for output, if NULL - ignored     *
  *             error         - [OUT] error string if function fails           *
  *             max_error_len - [IN] length of error buffer                    *
