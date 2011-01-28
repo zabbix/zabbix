@@ -148,7 +148,6 @@ function __autoload($class_name){
 
 	unset($show_setup);
 
-
 	if(defined('ZBX_DENY_GUI_ACCESS')){
 		if(isset($ZBX_GUI_ACCESS_IP_RANGE) && is_array($ZBX_GUI_ACCESS_IP_RANGE)){
 			$user_ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))?($_SERVER['HTTP_X_FORWARDED_FOR']):($_SERVER['REMOTE_ADDR']);
@@ -218,7 +217,7 @@ function __autoload($class_name){
 	}
 
 	if(!defined('ZBX_PAGE_NO_AUTHORIZATION') && !defined('ZBX_RPC_REQUEST')){
-		check_authorisation();
+		check_authorisation($USER_DETAILS);
 
 		if(function_exists('bindtextdomain')){
 			//initializing gettext translations depending on language selected by user

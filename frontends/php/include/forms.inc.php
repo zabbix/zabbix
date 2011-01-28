@@ -411,37 +411,17 @@
 		$frmUser->addRow(S_THEME, $cmbTheme);
 
 		$script = "javascript:
-			var autologout_visible = document.getElementById('autologout_visible');
 			var autologout = document.getElementById('autologout');
-			if(this.checked){
-				if(autologout_visible.checked){
-					autologout_visible.checked = false;
-					autologout_visible.onclick();
-				}
-				autologout_visible.disabled = true;
-			}
-			else{
-				autologout_visible.disabled = false;
-			}";
-		$chkbx_autologin = new CCheckBox("autologin", $autologin, $script, 1);
+			if(this.checked) autologout.disabled = false;
+			else autologout.disabled = true;";
 
-		$chkbx_autologin->setAttribute('autocomplete','off');
-		$frmUser->addRow(S_AUTO_LOGIN,	$chkbx_autologin);
-
-		$script = "javascript: var autologout = document.getElementById('autologout');
-					if(this.checked) autologout.disabled = false;
-					else autologout.disabled = true;";
 		$autologoutCheckBox = new CCheckBox('autologout_visible', ($autologout == 0) ? 'no' : 'yes', $script);
 
 		$autologoutTextBox = new CNumericBox("autologout", ($autologout == 0) ? '90' : $autologout, 4);
 // if autologout is disabled
-		if($autologout == 0) {
+		if($autologout == 0)
 			$autologoutTextBox->setAttribute('disabled','disabled');
-		}
 
-		if($autologin != 0) {
-			$autologoutCheckBox->setAttribute('disabled','disabled');
-		}
 
 		$frmUser->addRow(S_AUTO_LOGOUT, array($autologoutCheckBox, $autologoutTextBox));
 		$frmUser->addRow(S_SCREEN_REFRESH,	new CNumericBox('refresh',$refresh,4));

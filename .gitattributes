@@ -97,6 +97,9 @@ frontends/php/images/general/ipmi_available.png -text
 frontends/php/images/general/ipmi_available_bb.png -text
 frontends/php/images/general/ipmi_unavailable.png -text
 frontends/php/images/general/ipmi_unknown.png -text
+frontends/php/images/general/login/background.png -text
+frontends/php/images/general/login/logo.png -text
+frontends/php/images/general/login/username_pass_field.png -text
 frontends/php/images/general/no_icon.png -text
 frontends/php/images/general/ok.png -text
 frontends/php/images/general/ok_bb.png -text
@@ -155,6 +158,7 @@ frontends/php/images/gradients/table_head.gif -text svneol=unset#unset
 frontends/php/images/gradients/table_head2.gif -text svneol=unset#unset
 frontends/php/images/gradients/table_head2_bb.gif -text
 frontends/php/images/gradients/table_head_bb.gif -text
+frontends/php/images/gradients/texture_diagonal.gif -text
 frontends/php/images/sysmaps/Hub.png -text svneol=unset#unset
 frontends/php/images/sysmaps/Hub_small.png -text svneol=unset#unset
 frontends/php/images/sysmaps/Network.png -text svneol=unset#unset

@@ -45,17 +45,10 @@ function permission2str($group_permission){
 *****************************************/
 
 function check_authorisation(){
-	global $USER_DETAILS;
 	$sessionid = get_cookie('zbx_sessionid');
 
-	$user = array('sessionid'=>$sessionid);
-	if(!$auth = CUser::checkAuthentication($user)){
-
-		include_once('include/locales/en_gb.inc.php');
-		process_locales();
-
-		include('index.php');
-		exit();
+	if(!$auth = CUser::checkAuthentication(array('sessionid'=>$sessionid))){
+		require('login.php');
 	}
 
 return $auth;
