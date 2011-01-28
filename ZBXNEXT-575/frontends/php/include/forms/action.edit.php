@@ -47,10 +47,10 @@ require_once('include/templates/action.js.php');
 	$actionList->addRow(S_NAME, new CTextBox('name', $data['name'], $inputLength));
 
 	if(EVENT_SOURCE_TRIGGERS == $data['eventsource']){
-		$actionList->addRow(S_PERIOD.' ('.S_MIN_SMALL.' 60 '.S_SECONDS_SMALL.')', array(new CNumericBox('esc_period', $data['esc_period'], 6, 'no'), ' ('.S_SECONDS_SMALL.')'));
+		$actionList->addRow(_('Period (minimal 60 seconds)'), array(new CNumericBox('esc_period', $data['esc_period'], 6, 'no'), ' ('.S_SECONDS_SMALL.')'));
 	}
 	else{
-		$frmAction->addVar('esc_period',$data['esc_period']);
+		$frmAction->addVar('esc_period', 0);
 	}
 
 
@@ -78,7 +78,7 @@ require_once('include/templates/action.js.php');
 	$conditionList = new CFormList('conditionlist');
 	$allowedConditions = get_conditions_by_eventsource($data['eventsource']);
 
-	zbx_rksort($data['conditions']);
+	order_result($data['conditions'], 'conditiontype', ZBX_SORT_DOWN);
 
 // group conditions by type
 	$condElements = new CTable(S_NO_CONDITIONS_DEFINED);
@@ -170,8 +170,8 @@ require_once('include/templates/action.js.php');
 			$conditionList->addItem(new CVar('new_condition[value]','0'));
 			$rowCondition[] = array(
 				new CTextBox('group','',40,'yes'),
-				new CButton('btn1',S_SELECT,
-					"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
+				new CButton('btn1',_('Select'),
+					"return PopUp('popup.php?writeonly=1&dstfrm=".$frmAction->getName().
 					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=group&srctbl=host_group".
 					"&srcfld1=groupid&srcfld2=name',450,450);",
 					'link_menu'));
@@ -180,8 +180,8 @@ require_once('include/templates/action.js.php');
 			$conditionList->addItem(new CVar('new_condition[value]','0'));
 			$rowCondition[] = array(
 				new CTextBox('host','',40,'yes'),
-				new CButton('btn1',S_SELECT,
-					"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
+				new CButton('btn1',_('Select'),
+					"return PopUp('popup.php?writeonly=1&dstfrm=".$frmAction->getName().
 					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=host&srctbl=host_templates".
 					"&srcfld1=hostid&srcfld2=host',450,450);",
 					'link_menu'));
@@ -190,8 +190,8 @@ require_once('include/templates/action.js.php');
 			$conditionList->addItem(new CVar('new_condition[value]','0'));
 			$rowCondition[] = array(
 				new CTextBox('host','',40,'yes'),
-				new CButton('btn1',S_SELECT,
-					"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
+				new CButton('btn1',_('Select'),
+					"return PopUp('popup.php?writeonly=1&dstfrm=".$frmAction->getName().
 					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=host&srctbl=hosts".
 					"&srcfld1=hostid&srcfld2=host',450,450);",
 					'link_menu'));
@@ -201,8 +201,8 @@ require_once('include/templates/action.js.php');
 
 			$rowCondition[] = array(
 				new CTextBox('trigger','',40,'yes'),
-				new CButton('btn1',S_SELECT,
-					"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
+				new CButton('btn1',_('Select'),
+					"return PopUp('popup.php?writeonly=1&dstfrm=".$frmAction->getName().
 					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=trigger&srctbl=triggers".
 					"&srcfld1=triggerid&srcfld2=description');",
 					'link_menu'));
@@ -236,8 +236,8 @@ require_once('include/templates/action.js.php');
 			$conditionList->addItem(new CVar('new_condition[value]','0'));
 			$rowCondition[] = array(
 				new CTextBox('node','',40,'yes'),
-				new CButton('btn1',S_SELECT,
-					"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
+				new CButton('btn1',_('Select'),
+					"return PopUp('popup.php?writeonly=1&dstfrm=".$frmAction->getName().
 					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=node&srctbl=nodes".
 					"&srcfld1=nodeid&srcfld2=name',450,450);",
 					'link_menu'));
@@ -246,8 +246,8 @@ require_once('include/templates/action.js.php');
 			$conditionList->addItem(new CVar('new_condition[value]','0'));
 			$rowCondition[] = array(
 				new CTextBox('drule','',40,'yes'),
-				new CButton('btn1',S_SELECT,
-					"return PopUp('popup.php?dstfrm=".S_ACTION.
+				new CButton('btn1',_('Select'),
+					"return PopUp('popup.php?dstfrm=".$frmAction->getName().
 					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=drule&srctbl=drules".
 					"&srcfld1=druleid&srcfld2=name',450,450);",
 					'link_menu'));
@@ -256,8 +256,8 @@ require_once('include/templates/action.js.php');
 			$conditionList->addItem(new CVar('new_condition[value]','0'));
 			$rowCondition[] = array(
 				new CTextBox('dcheck','',40,'yes'),
-				new CButton('btn1',S_SELECT,
-					"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
+				new CButton('btn1',_('Select'),
+					"return PopUp('popup.php?writeonly=1&dstfrm=".$frmAction->getName().
 					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=dcheck&srctbl=dchecks".
 					"&srcfld1=dcheckid&srcfld2=name',450,450);",
 					'link_menu'));
@@ -266,8 +266,8 @@ require_once('include/templates/action.js.php');
 			$conditionList->addItem(new CVar('new_condition[value]','0'));
 			$rowCondition[] = array(
 				new CTextBox('proxy','',40,'yes'),
-				new CButton('btn1',S_SELECT,
-					"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
+				new CButton('btn1',_('Select'),
+					"return PopUp('popup.php?writeonly=1&dstfrm=".$frmAction->getName().
 					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=proxy&srctbl=proxies".
 					"&srcfld1=hostid&srcfld2=host',450,450);",
 					'link_menu'));
@@ -314,13 +314,13 @@ require_once('include/templates/action.js.php');
 	}
 
 	$newCond = new CDiv(
-		array(new CDiv($rowCondition), new CSubmit('add_condition',S_ADD, null, 'link_menu')),
+		array(new CDiv($rowCondition), new CSubmit('add_condition',_('Add'), null, 'link_menu')),
 		'objectgroup inlineblock border_dotted ui-corner-all'
 	);
 
 	$conditionList->addRow(S_NEW_CONDITION, $newCond);
 
-	$divTabs->addTab('conditionTab', S_CONDITIONS, $conditionList);
+	$divTabs->addTab('conditionTab', _('Conditions'), $conditionList);
 // }}} CONDITION FORM
 
 // ACTION OPERATIONS FORM {{{
@@ -340,12 +340,16 @@ require_once('include/templates/action.js.php');
 	array_multisort($esc_step_from, SORT_ASC, SORT_NUMERIC, $esc_step_to, SORT_ASC, $esc_period, SORT_ASC, $data['operations']);
 // --
 
-	$tblOper = new CTable(S_NO_OPERATIONS_DEFINED, 'formElementTable');
-	$tblOper->setHeader(array(
-		new CCheckBox('all_operations',null,'checkAll("'.$frmAction->getName().'","all_operations","g_operationid");'),
-		S_STEPS, S_DETAILS, S_PERIOD.' ('.S_SEC_SMALL.')', S_DELAY, S_ACTION
-	));
-//SDII($data['operations']);
+	if(EVENT_SOURCE_TRIGGERS == $data['eventsource'])
+		$operationsHeader = array(new CCheckBox('all_operations',null,'checkAll("'.$frmAction->getName().'","all_operations","g_operationid");'),
+			_('Steps'), _('Details'), _('Period (sec)'), _('Delay'), _('Action'));
+	else
+		$operationsHeader = array(new CCheckBox('all_operations',null,'checkAll("'.$frmAction->getName().'","all_operations","g_operationid");'),
+			_('Details'), _('Action'));
+
+	$tblOper = new CTable(_('Ne oparations defined'), 'formElementTable');
+	$tblOper->setHeader($operationsHeader);
+
 	$delay = count_operations_delay($data['operations'],$data['esc_period']);
 	foreach($data['operations'] as $id => $operation){
 		if(!str_in_array($operation['operationtype'], $allowedOperations)) continue;
@@ -372,14 +376,22 @@ require_once('include/templates/action.js.php');
 		$esc_period_txt = $operation['esc_period']?$operation['esc_period']:S_DEFAULT;
 		$esc_delay_txt = $delay[$operation['esc_step_from']]?convert_units($delay[$operation['esc_step_from']],'uptime'):S_IMMEDIATELY;
 
-		$tblOper->addRow(array(
-			new CCheckBox('g_operationid['.$opid.']', 'no', null, $opid),
-			$esc_steps_txt,
-			$oper_details,
-			$esc_period_txt,
-			$esc_delay_txt,
-			new CSubmit('edit_operationid['.$opid.']',S_EDIT, null, 'link_menu')
-		));
+		if(EVENT_SOURCE_TRIGGERS == $data['eventsource'])
+			$operationRow = array(
+				new CCheckBox('g_operationid['.$opid.']', 'no', null, $opid),
+				$esc_steps_txt,
+				$oper_details,
+				$esc_period_txt,
+				$esc_delay_txt,
+				new CSubmit('edit_operationid['.$opid.']',_('Edit'), null, 'link_menu')
+			);
+		else
+			$operationRow = array(
+				new CCheckBox('g_operationid['.$opid.']', 'no', null, $opid),
+				$oper_details,
+				new CSubmit('edit_operationid['.$opid.']',_('Edit'), null, 'link_menu')
+			);
+		$tblOper->addRow($operationRow);
 
 		$operation['opmessage_grp'] = zbx_toHash($operation['opmessage_grp'], 'usrgrpid');
 		$operation['opmessage_usr'] = zbx_toHash($operation['opmessage_usr'], 'userid');
@@ -391,14 +403,14 @@ require_once('include/templates/action.js.php');
 
 	$footer = array();
 	if(!isset($_REQUEST['new_operation']))
-		$footer[] = new CSubmit('new_operation',S_NEW,null,'link_menu');
+		$footer[] = new CSubmit('new_operation',_('New'),null,'link_menu');
 
 	if($tblOper->ItemsCount() > 0 ){
 		$footer[] = SPACE;
-		$footer[] = new CSubmit('del_operation',S_DELETE_SELECTED, null, 'link_menu');
+		$footer[] = new CSubmit('del_operation',_('Remove selected'), null, 'link_menu');
 	}
 
-	$operationList->addRow(S_ACTION_OPERATIONS, new CDiv( array($tblOper, $footer), 'objectgroup inlineblock border_dotted ui-corner-all'));
+	$operationList->addRow(_('Action operations'), new CDiv( array($tblOper, $footer), 'objectgroup inlineblock border_dotted ui-corner-all'));
 
 // NEW OPERATION FORM {{{
 	if(isset($_REQUEST['new_operation'])){
@@ -427,27 +439,29 @@ require_once('include/templates/action.js.php');
 		if(isset($new_operation['operationid']))
 			$tblOper->addItem(new CVar('new_operation[operationid]', $new_operation['operationid']));
 
-		$tblStep = new CTable();
+		if(EVENT_SOURCE_TRIGGERS == $data['eventsource']){
+			$tblStep = new CTable();
 
-		$step_from = new CNumericBox('new_operation[esc_step_from]', $new_operation['esc_step_from'],4);
-		$step_from->addAction('onchange','javascript:'.$step_from->getAttribute('onchange').' if(this.value == 0) this.value=1;');
+			$step_from = new CNumericBox('new_operation[esc_step_from]', $new_operation['esc_step_from'],4);
+			$step_from->addAction('onchange','javascript:'.$step_from->getAttribute('onchange').' if(this.value == 0) this.value=1;');
 
-		$tblStep->addRow(array(S_FROM, $step_from));
-		$tblStep->addRow(array(
-			S_TO,
-			new CCol(array(
-				new CNumericBox('new_operation[esc_step_to]', $new_operation['esc_step_to'], 4),
-				' [0-' . S_INFINITY.']'))
-		));
+			$tblStep->addRow(array(S_FROM, $step_from));
+			$tblStep->addRow(array(
+				S_TO,
+				new CCol(array(
+					new CNumericBox('new_operation[esc_step_to]', $new_operation['esc_step_to'], 4),
+					_('(0 - infinitely)')))
+			));
 
-		$tblStep->addRow(array(
-			S_PERIOD,
-			new CCol(array(
-				new CNumericBox('new_operation[esc_period]', $new_operation['esc_period'], 5),
-				' ['.S_MIN_SMALL.' 60, 0-' . S_DEFAULT . ']'))
-		));
+			$tblStep->addRow(array(
+				_('Period'),
+				new CCol(array(
+					new CNumericBox('new_operation[esc_period]', $new_operation['esc_period'], 5),
+					_('( mininum 60, 0 - use action default)')))
+			));
 
-		$tblOper->addRow(array(S_STEP, $tblStep));
+			$tblOper->addRow(array(S_STEP, $tblStep));
+		}
 
 		$cmbOpType = new CComboBox('new_operation[operationtype]', $new_operation['operationtype'], 'submit()');
 		foreach($allowedOperations as $oper)
@@ -521,8 +535,8 @@ require_once('include/templates/action.js.php');
 				$tblOper->addRow(array(_('Send to User groups'), new CDiv($usrgrpList, 'objectgroup inlineblock border_dotted ui-corner-all')));
 				$tblOper->addRow(array(_('Send to Users'), new CDiv($userList, 'objectgroup inlineblock border_dotted ui-corner-all')));
 
-				$cmbMediaType = new CComboBox('new_operation[opmessage][mediatypeid]', $new_operation['opmessage']['mediatypeid'], 'submit()');
-				$cmbMediaType->addItem(0, S_MINUS_ALL_MINUS);
+				$cmbMediaType = new CComboBox('new_operation[opmessage][mediatypeid]', $new_operation['opmessage']['mediatypeid']);
+				$cmbMediaType->addItem(0, '- '._('All').' -');
 
 				$sql = 'SELECT mt.mediatypeid, mt.description' .
 						' FROM media_type mt ' .
@@ -533,13 +547,13 @@ require_once('include/templates/action.js.php');
 					$cmbMediaType->addItem($db_mediatype['mediatypeid'], $db_mediatype['description']);
 				}
 
-				$tblOper->addRow(array(S_SEND_ONLY_TO, $cmbMediaType));
+				$tblOper->addRow(array(_('Send only to'), $cmbMediaType));
 
 				$tblOper->addRow(array(S_DEFAULT_MESSAGE, new CCheckBox('new_operation[opmessage][default_msg]', $new_operation['opmessage']['default_msg'], 'javascript: submit();', 1)));
 
 				if(!$new_operation['opmessage']['default_msg']){
-					$tblOper->addRow(array(S_SUBJECT, new CTextBox('new_operation[opmessage][subject]', $new_operation['opmessage']['subject'], 77)));
-					$tblOper->addRow(array(S_MESSAGE, new CTextArea('new_operation[opmessage][message]', $new_operation['opmessage']['message'], 77, 7)));
+					$tblOper->addRow(array(_('Subject'), new CTextBox('new_operation[opmessage][subject]', $new_operation['opmessage']['subject'], 77)));
+					$tblOper->addRow(array(_('Message'), new CTextArea('new_operation[opmessage][message]', $new_operation['opmessage']['message'], 77, 7)));
 				}
 				else{
 					$tblOper->addItem(new CVar('new_operation[opmessage][subject]', $new_operation['opmessage']['subject']));
@@ -693,7 +707,7 @@ require_once('include/templates/action.js.php');
 			zbx_rksort($opconditions);
 
 			$grouped_opconditions = array();
-			$cond_el = new CTable(S_NO_CONDITIONS_DEFINED);
+			$cond_el = new CTable(_('No conditions defined'));
 			$i = 0;
 
 			foreach($opconditions as $condition){
@@ -720,25 +734,25 @@ require_once('include/templates/action.js.php');
 
 			$cond_buttons = array();
 			if(!isset($_REQUEST['new_opcondition'])) {
-				$cond_buttons[] = new CSubmit('new_opcondition', S_NEW, null, 'link_menu');
+				$cond_buttons[] = new CSubmit('new_opcondition', _('New'), null, 'link_menu');
 			}
 			if($cond_el->ItemsCount() > 0){
 				$cond_buttons[] = SPACE;
-				$cond_buttons[] = new CSubmit('del_opcondition', S_DELETE_SELECTED, null, 'link_menu');
+				$cond_buttons[] = new CSubmit('del_opcondition', _('Remove selected'), null, 'link_menu');
 			}
 
 			if($cond_el->ItemsCount() > 1){
 // prepare opcondition calcuation type selector
 				switch($evaltype) {
 					case ACTION_EVAL_TYPE_AND:
-						$group_op = $glog_op = S_AND;
+						$group_op = $glog_op = _('and');
 						break;
 					case ACTION_EVAL_TYPE_OR:
-						$group_op = $glog_op = S_OR;
+						$group_op = $glog_op = _('or');
 						break;
 					default:
-						$group_op = S_OR;
-						$glog_op = S_AND;
+						$group_op = _('or');
+						$glog_op = _('and');
 						break;
 				}
 
@@ -769,9 +783,9 @@ require_once('include/templates/action.js.php');
 		}
 
 		$footer = array(
-			new CSubmit('add_operation', $update_mode ? _s('Save') : _s('Add'), null, 'link_menu'),
+			new CSubmit('add_operation', $update_mode ? _('Save') : _('Add'), null, 'link_menu'),
 			SPACE,
-			new CSubmit('cancel_new_operation', _s('Cancel'), null, 'link_menu')
+			new CSubmit('cancel_new_operation', _('Cancel'), null, 'link_menu')
 		);
 
 		$operationList->addRow(_s('Operation details'), new CDiv( array($tblOper, $footer), 'objectgroup inlineblock border_dotted ui-corner-all'));
@@ -817,26 +831,26 @@ require_once('include/templates/action.js.php');
 			$tblCond->addRow($rowCondition);
 
 			$footer = array(
-				new CSubmit('add_opcondition', S_ADD, null, 'link_menu'),
+				new CSubmit('add_opcondition', _('Add'), null, 'link_menu'),
 				SPACE,
-				new CSubmit('cancel_new_opcondition', S_CANCEL, null, 'link_menu')
+				new CSubmit('cancel_new_opcondition', _('Cancel'), null, 'link_menu')
 			);
 
-			$operationList->addRow(_s('Operation condition'), new CDiv( array($tblCond, $footer), 'objectgroup inlineblock border_dotted ui-corner-all'));
+			$operationList->addRow(_('Operation condition'), new CDiv( array($tblCond, $footer), 'objectgroup inlineblock border_dotted ui-corner-all'));
 		}
 	}
 
-	$divTabs->addTab('operationTab', S_OPERATIONS, $operationList);
+	$divTabs->addTab('operationTab', _('Operations'), $operationList);
 // }}} ACTION OPERATIONS FORM
 
 	$frmAction->addItem($divTabs);
 
 // Footer
-	$main = array(new CSubmit('save', S_SAVE));
+	$main = array(new CSubmit('save', _('Save')));
 	$others = array();
 	if(isset($data['actionid'])){
-		$others[] = new CButton('clone', S_CLONE);
-		$others[] = new CButtonDelete(S_DELETE_SELECTED_ACTION_Q,url_param('form').url_param('eventsource').url_param('actionid'));
+		$others[] = new CButton('clone', _('Clone'));
+		$others[] = new CButtonDelete(_('Delete selected actions?'),url_param('form').url_param('eventsource').url_param('actionid'));
 	}
 	$others[] = new CButtonCancel(url_param('actiontype'));
 

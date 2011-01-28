@@ -1357,7 +1357,7 @@ COpt::memoryPick();
 
 		foreach($operations as $operation){
 
-			if(($operation['esc_step_from'] >= $operation['esc_step_to']) && ($operation['esc_step_to'] != 0)){
+			if(($operation['esc_step_from'] > $operation['esc_step_to']) && ($operation['esc_step_to'] != 0)){
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect operation escalation step values.'));
 			}
 
