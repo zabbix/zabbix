@@ -1111,20 +1111,12 @@ class zbxXML{
 
 						// if this is an export from 1.8, we need to make some adjustments to items
 						if($old_version_input){
-							// getting just created interface ids
-							$inserted_host = CHost::get(array(
-								'hostids' => $current_hostid,
-								'output' => API_OUTPUT_SHORTEN,
-								'selectInterfaces' => API_OUTPUT_EXTEND
-							));
-							$inserted_host = reset($inserted_host);
-
 							// if host had another interfaces, we are not touching them: they remain as is
-							foreach($interfaces as $i=>$interface){
+							foreach($interfaces as $i => $interface){
 								// interface was not already created
 								if(!isset($interface['interfaceid'])){
 									// creating interface
-									$ids = CHostInterface::massAdd(array($interface));
+									$ids = CHostInterface::create($interface);
 									$interface[$i]['interfaceid'] = reset($ids);
 								}
 							}
