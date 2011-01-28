@@ -93,6 +93,9 @@ src/libs/zbxdbhigh/.deps
 src/libs/zbxdbhigh/Makefile
 src/libs/zbxdbhigh/Makefile.in
 src/libs/zbxdbhigh/dbschema.c
+src/libs/zbxexec/.deps
+src/libs/zbxexec/Makefile
+src/libs/zbxexec/Makefile.in
 src/libs/zbxicmpping/.deps
 src/libs/zbxicmpping/Makefile
 src/libs/zbxicmpping/Makefile.in
