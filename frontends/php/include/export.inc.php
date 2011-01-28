@@ -1350,7 +1350,7 @@ class zbxXML{
 								}
 
 								if(!$item = get_item_by_key($item_data[1], $item_data[0])){
-									throw new APIException(1, 'Missed item ['.$graph_db['ymin_item_key'].'] for host ['.$host_db['host'].']');
+									throw new APIException(1, 'Missing item ['.$graph_db['ymin_item_key'].'] for host ['.$host_db['host'].']');
 								}
 
 								$graph_db['ymin_itemid'] = $item['itemid'];
@@ -1363,7 +1363,7 @@ class zbxXML{
 								}
 
 								if(!$item = get_item_by_key($item_data[1], $item_data[0])){
-									throw new APIException(1, 'Missed item ['.$graph_db['ymax_item_key'].'] for host ['.$host_db['host'].']');
+									throw new APIException(1, 'Missing item ['.$graph_db['ymax_item_key'].'] for host ['.$host_db['host'].']');
 								}
 
 								$graph_db['ymax_itemid'] = $item['itemid'];
