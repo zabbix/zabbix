@@ -1084,10 +1084,6 @@ class zbxXML{
 							$host_db['proxy_hostid'] = 0;
 					}
 
-					//sdi($host_db);
-
-
-
 					if($current_host && isset($rules['host']['exist'])){
 						if($host_db['status'] == HOST_STATUS_TEMPLATE){
 							$host_db['templateid'] = $current_host['hostid'];
@@ -1124,35 +1120,30 @@ class zbxXML{
 
 						// if this is an export from 1.8, we need to make some adjustments to items
 						if($old_version_input){
-							if ($host_db['status'] == HOST_STATUS_TEMPLATE){
-								// template has no interfaces
-								$host_db['interfaces'] == null;
-							}
-							else{
-								// getting just created interface ids
-								$inserted_host = CHost::get(array(
-									'filter' => array('hostid'=>$current_hostid),
-									'output' => API_OUTPUT_EXTEND,
-									'selectInterfaces' => API_OUTPUT_EXTEND
-								));
+							// getting just created interface ids
+							$inserted_host = CHost::get(array(
+								'hostids' => $current_hostid,
+								'output' => API_OUTPUT_SHORTEN,
+								'selectInterfaces' => API_OUTPUT_EXTEND
+							));
+							$inserted_host = reset($inserted_host);
 
-								// we must know interface ids to assign them to items
-								$agent_interface_id = null;
-								$ipmi_interface_id = null;
-								$snmp_interfaces = array(); //hash 'port' => 'iterfaceid'
+							// we must know interface ids to assign them to items
+							$agent_interface_id = null;
+							$ipmi_interface_id = null;
+							$snmp_interfaces = array(); //hash 'port' => 'iterfaceid'
 
-								foreach($inserted_host[0]['interfaces'] as $interface){
-									switch($interface['type']){
-										case INTERFACE_TYPE_AGENT:
-											$agent_interface_id = $interface['interfaceid'];
-										break;
-										case INTERFACE_TYPE_IPMI:
-											$ipmi_interface_id = $interface['interfaceid'];
-										break;
-										case INTERFACE_TYPE_SNMP:
-											$snmp_interfaces[$interface['port']] = $interface['interfaceid'];
-										break;
-									}
+							foreach($inserted_host['interfaces'] as $interface){
+								switch($interface['type']){
+									case INTERFACE_TYPE_AGENT:
+										$agent_interface_id = $interface['interfaceid'];
+									break;
+									case INTERFACE_TYPE_IPMI:
+										$ipmi_interface_id = $interface['interfaceid'];
+									break;
+									case INTERFACE_TYPE_SNMP:
+										$snmp_interfaces[$interface['port']] = $interface['interfaceid'];
+									break;
 								}
 							}
 						}
@@ -1163,55 +1154,47 @@ class zbxXML{
 
 							// item needs interfaces
 							if($old_version_input){
-
 								// 'snmp_port' column was renamed to 'port'
-								$item_db['port'] = $item_db['snmp_port'];
-								unset($item_db['snmp_port']);
-								if ($item_db['port'] == 0){
-									unset($item_db['port']); // zabbix agent items have no ports
-								}
-
-								if ($host_db['status'] == HOST_STATUS_TEMPLATE){
-									// template has no interfaces
-									$item_db['interfaceid'] = null;
+								if($item_db['snmp_port'] == 0){
+									// zabbix agent items have no ports
+									unset($item_db['snmp_port']);
 								}
 								else{
-
-									// assigning appropriate interface depending on item type
-									switch($item_db['type']){
-										// zabbix agent interface
-										case ITEM_TYPE_ZABBIX:
-										case ITEM_TYPE_SIMPLE:
-										case ITEM_TYPE_EXTERNAL:
-										case ITEM_TYPE_DB_MONITOR:
-										case ITEM_TYPE_SSH:
-										case ITEM_TYPE_TELNET:
-											$item_db['interfaceid'] = $agent_interface_id;
-										break;
-
-										// snmp interface
-										case ITEM_TYPE_SNMPV1:
-										case ITEM_TYPE_SNMPV2C:
-										case ITEM_TYPE_SNMPV3:
-											// for an item with different port - different interface
-											$item_db['interfaceid'] = $snmp_interfaces[$item_db['port']];
-										break;
-
-										case ITEM_TYPE_IPMI:
-											$item_db['interfaceid'] = $ipmi_interface_id;
-										break;
-
-										// no interfaces required for these item types
-										case ITEM_TYPE_HTTPTEST:
-										case ITEM_TYPE_CALCULATED:
-										case ITEM_TYPE_AGGREGATE:
-										case ITEM_TYPE_INTERNAL:
-										case ITEM_TYPE_ZABBIX_ACTIVE:
-										case ITEM_TYPE_TRAPPER:
-											$item_db['interfaceid'] = null;
-										break;
-									}
+									$item_db['port'] = $item_db['snmp_port'];
 								}
+
+								// assigning appropriate interface depending on item type
+								switch($item_db['type']){
+									// zabbix agent interface
+									case ITEM_TYPE_ZABBIX:
+									case ITEM_TYPE_SIMPLE:
+									case ITEM_TYPE_EXTERNAL:
+									case ITEM_TYPE_DB_MONITOR:
+									case ITEM_TYPE_SSH:
+									case ITEM_TYPE_TELNET:
+										$item_db['interfaceid'] = $agent_interface_id;
+										break;
+									// snmp interface
+									case ITEM_TYPE_SNMPV1:
+									case ITEM_TYPE_SNMPV2C:
+									case ITEM_TYPE_SNMPV3:
+										// for an item with different port - different interface
+										$item_db['interfaceid'] = $snmp_interfaces[$item_db['port']];
+										break;
+									case ITEM_TYPE_IPMI:
+										$item_db['interfaceid'] = $ipmi_interface_id;
+										break;
+									// no interfaces required for these item types
+									case ITEM_TYPE_HTTPTEST:
+									case ITEM_TYPE_CALCULATED:
+									case ITEM_TYPE_AGGREGATE:
+									case ITEM_TYPE_INTERNAL:
+									case ITEM_TYPE_ZABBIX_ACTIVE:
+									case ITEM_TYPE_TRAPPER:
+										$item_db['interfaceid'] = null;
+										break;
+								}
+
 							}
 
 							$options = array(
