@@ -66,3 +66,11 @@ form .thin .input{
 
 /******************* CHECKBOX *********************/
 .checkbox{ cursor: pointer;}
+
+.transparent{
+	border: 0;
+	background-color: transparent;
+}
+.transparent:focus {
+	outline-width: 0;
+}

@@ -21,7 +21,7 @@
 root { display: block; }
 
 body{
-	background-color: #E5E5E5;
+	background-color:  #F0F5FF;
 	margin: 1px;
 	padding: 0px;
 	color:black;
@@ -94,6 +94,12 @@ img.borderless	{	border-width: 0px; vertical-align: bottom;	}
 .move{}
 
 .move:hover{ cursor: move; }
+
+.underline			{	text-decoration: underline; }
+.underline:link 	{ 	text-decoration: underline; }
+.underline:visited	{	text-decoration: underline; }
+.underline:hover	{	text-decoration: underline; }
+
 /**************** HINT BOX *****************/
 
 #hint_box {
@@ -136,3 +142,7 @@ img.borderless	{	border-width: 0px; vertical-align: bottom;	}
 .dservice_active { background: #0FA00F; }
 .dservice_disabled { background: #A00F0F; }
 /********** END OF DISCOVERY STATUS *********/
+
+.loginBG{ background-color: #AABBCC; background-image: url(../images/gradients/texture_diagonal.gif); }
+.loginForm{ padding: 15px; height: 260px; width: 582px; background-image: url(../images/general/login/background.png); background-repeat: no-repeat; }
+.loginLogo{ height: 53px; width: 163px; background-image: url(../images/general/login/logo.png); background-repeat: no-repeat; }

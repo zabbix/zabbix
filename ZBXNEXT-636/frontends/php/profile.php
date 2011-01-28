@@ -128,7 +128,6 @@ $fields=array(
 			$user['alias'] = $USER_DETAILS['alias'];
 			$user['passwd'] = get_request('password1');
 			$user['url'] = get_request('url');
-			$user['autologin'] = get_request('autologin', 0);
 			$user['autologout'] = get_request('autologout', 0);
 			$user['lang'] = get_request('lang');
 			$user['theme'] = get_request('theme');
@@ -146,7 +145,7 @@ $fields=array(
 
 			DBstart();
 			updateMessageSettings($messages);
-			
+
 			$result = CUser::updateProfile($user);
 			if($result && ($USER_DETAILS['type'] > USER_TYPE_ZABBIX_USER)){
 				$data = array(

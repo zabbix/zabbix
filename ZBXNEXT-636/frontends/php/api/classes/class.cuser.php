@@ -686,7 +686,7 @@ Copt::memoryPick();
 			$options = array(
 				'nodeids' => id2nodeid($USER_DETAILS['userid']),
 				'userids' => $USER_DETAILS['userid'],
-			'output' => API_OUTPUT_EXTEND,
+				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1
 			);
 			$upd_users = self::get($options);
@@ -1066,7 +1066,7 @@ Copt::memoryPick();
 		if($login){
 			if($login['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS){
 				if((time() - $login['attempt_clock']) < ZBX_LOGIN_BLOCK){
-					$_REQUEST['message'] = S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_SECONDS_FIRST_PART.' '.(ZBX_LOGIN_BLOCK - (time() - $login['attempt_clock'])).' '.S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_SECONDS_SECOND_PART;
+					$_REQUEST['message'] = _s('Account is blocked for %s seconds', (ZBX_LOGIN_BLOCK - (time() - $login['attempt_clock'])));
 					return false;
 				}
 				else{
@@ -1132,7 +1132,7 @@ Copt::memoryPick();
 		else{
 			$user = NULL;
 
-			$_REQUEST['message'] = S_CUSER_ERROR_LOGIN_OR_PASSWORD_INCORRECT;
+			$_REQUEST['message'] = _('Login name or password is incorrect');
 			add_audit(AUDIT_ACTION_LOGIN,AUDIT_RESOURCE_USER,'Login failed ['.$name.']');
 
 			if($attempt){
