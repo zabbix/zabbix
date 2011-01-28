@@ -2,4 +2,4 @@
 
 noinst_LIBRARIES = libzbxexec.a
 
-libzbxexec_a_SOURCES = zbxexec.c
+libzbxexec_a_SOURCES = execute.c
