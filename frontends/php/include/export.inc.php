@@ -829,6 +829,18 @@ class zbxXML{
 				foreach($hosts as $hnum => $host){
 					$host_db = self::mapXML2arr($host, XML_TAG_HOST);
 
+					if(!isset($host_db['status'])) $host_db['status'] = HOST_STATUS_TEMPLATE;
+					$current_host = ($host_db['status'] == HOST_STATUS_TEMPLATE) ? CTemplate::exists($host_db) : CHost::exists($host_db);
+					if(!$current_host && !isset($rules['host']['missed'])){
+						info('Host ['.$host_db['host'].'] skipped - user rule');
+						continue; // break if update nonexist
+					}
+					if($current_host && !isset($rules['host']['exist'])){
+						info('Host ['.$host_db['host'].'] skipped - user rule');
+						continue; // break if not update exist
+					}
+
+
 					// creating interfaces
 					$host_db['interfaces'] = array();
 
@@ -836,15 +848,9 @@ class zbxXML{
 					/**
 					 * @todo when new XML format will be introduced, this check should be changed to XML version check
 					 */
-					$old_version_input = isset($host_db['ip']) || (isset($host_db['ip']) && $host_db['ip'] == '');
+					$old_version_input = $host_db['status'] == HOST_STATUS_TEMPLATE;
 					if($old_version_input){
-
-						// in some situations, some of the values may not be present
-						if (!isset($host_db['ip'])) $host_db['ip'] = null;
-
-
 						// rearranging host structure, so it would look more like 2.0 host
-
 
 						// the main interface is always "agent" type
 						if (!is_null($host_db['ip'])){
@@ -902,17 +908,6 @@ class zbxXML{
 							}
 						}
 						unset($snmp_interface_ports_created); // it was a temporary variable
-					}
-
-					if(!isset($host_db['status'])) $host_db['status'] = HOST_STATUS_TEMPLATE;
-					$current_host = ($host_db['status'] == HOST_STATUS_TEMPLATE) ? CTemplate::exists($host_db) : CHost::exists($host_db);
-					if(!$current_host && !isset($rules['host']['missed'])){
-						info('Host ['.$host_db['host'].'] skipped - user rule');
-						continue; // break if update nonexist
-					}
-					if($current_host && !isset($rules['host']['exist'])){
-						info('Host ['.$host_db['host'].'] skipped - user rule');
-						continue; // break if not update exist
 					}
 
 
