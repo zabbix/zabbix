@@ -14,6 +14,7 @@ New features:
  - [ZBX-3338] updated Ukrainian translation; thanks to zalex_ua (Richlv)
 
 Bug fixes:
+ - [ZBX-3328] data exported from 1.8.x now can be successfully imported to 2.0 (KB)
  - [ZBX-3470] table user_groups is now updated only if necessary, when user details are saved (KB)
  - [ZBX-1819] fixed templated listed twice for graphs if host filter is set to all (Vedmak)
  - [ZBX-3442] fixed gui config "first selected" and "event ack" dropdowns (Vedmak)

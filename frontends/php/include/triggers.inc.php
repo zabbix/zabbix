@@ -1289,7 +1289,7 @@ return $caption;
 		foreach($trigExpr->expressions as $exprPart){
 			if(zbx_empty($exprPart['item'])) continue;
 
-			$sql = 'SELECT i.itemid, i.value_type '.
+			$sql = 'SELECT i.itemid, i.type, i.value_type '.
 				' FROM items i,hosts h'.
 				' WHERE i.key_='.zbx_dbstr($exprPart['item']).
 					' AND h.host='.zbx_dbstr($exprPart['host']).

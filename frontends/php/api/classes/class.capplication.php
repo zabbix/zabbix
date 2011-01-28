@@ -698,12 +698,12 @@ COpt::memoryPick();
 		try{
 			self::BeginTransaction(__METHOD__);
 
-		if(empty($data['applications'])) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+			if(empty($data['applications'])) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
 
-		$applications = zbx_toArray($data['applications']);
-		$items = zbx_toArray($data['items']);
-		$applicationids = zbx_objectValues($applications, 'applicationid');
-		$itemids = zbx_objectValues($items, 'itemid');
+			$applications = zbx_toArray($data['applications']);
+			$items = zbx_toArray($data['items']);
+			$applicationids = zbx_objectValues($applications, 'applicationid');
+			$itemids = zbx_objectValues($items, 'itemid');
 
 // PERMISSIONS {{{
 			$app_options = array(
@@ -742,10 +742,14 @@ COpt::memoryPick();
 				$linked[$pair['applicationid']] = array($pair['itemid'] => $pair['itemid']);
 			}
 
+
+
 			$apps_insert = array();
 			foreach($applicationids as $anum => $applicationid){
 				foreach($itemids as $inum => $itemid){
-					if(isset($linked[$applicationid]) && isset($linked[$applicationid][$itemid])) continue;
+					if(isset($linked[$applicationid]) && isset($linked[$applicationid][$itemid])) {
+						continue;
+					}
 
 					$apps_insert[] = array(
 						'itemid' => $itemid,
