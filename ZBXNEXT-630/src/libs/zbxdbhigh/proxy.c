@@ -72,6 +72,7 @@ static ZBX_HISTORY_TABLE dht = {
 		{"p.dcheckid",	ZBX_PROTO_TAG_DCHECK,		ZBX_JSON_TYPE_INT,	NULL},
 		{"p.type",	ZBX_PROTO_TAG_TYPE,		ZBX_JSON_TYPE_INT,	NULL},
 		{"p.ip",	ZBX_PROTO_TAG_IP,		ZBX_JSON_TYPE_STRING,	NULL},
+		{"p.dns",	ZBX_PROTO_TAG_DNS,		ZBX_JSON_TYPE_STRING,	NULL},
 		{"p.port",	ZBX_PROTO_TAG_PORT,	 	ZBX_JSON_TYPE_INT,	"0"},
 		{"p.key_",	ZBX_PROTO_TAG_KEY,		ZBX_JSON_TYPE_STRING,	""},
 		{"p.value",	ZBX_PROTO_TAG_VALUE,		ZBX_JSON_TYPE_STRING,	""},
@@ -86,6 +87,7 @@ static ZBX_HISTORY_TABLE areg = {
 		{"p.clock",	ZBX_PROTO_TAG_CLOCK,		ZBX_JSON_TYPE_INT,	NULL},
 		{"p.host",	ZBX_PROTO_TAG_HOST,		ZBX_JSON_TYPE_STRING,	NULL},
 		{"p.listen_ip",	ZBX_PROTO_TAG_IP,		ZBX_JSON_TYPE_STRING,	""},
+		{"p.listen_dns",ZBX_PROTO_TAG_DNS,		ZBX_JSON_TYPE_STRING,	""},
 		{"p.listen_port",ZBX_PROTO_TAG_PORT,		ZBX_JSON_TYPE_STRING,	"0"},
 		{NULL}
 		}
@@ -1625,7 +1627,7 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 	const char		*p = NULL;
 	char			last_ip[INTERFACE_IP_LEN_MAX], ip[INTERFACE_IP_LEN_MAX],
 				key_[ITEM_KEY_LEN_MAX], tmp[MAX_STRING_LEN],
-				value[DSERVICE_VALUE_LEN_MAX];
+				value[DSERVICE_VALUE_LEN_MAX], dns[INTERFACE_DNS_LEN_MAX];
 	time_t			now, hosttime, itemtime;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -1651,6 +1653,7 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 		memset(&dcheck, 0, sizeof(dcheck));
 		*key_ = '\0';
 		*value = '\0';
+		*dns = '\0';
 		port = 0;
 		status = 0;
 		dcheck.key_ = key_;
@@ -1679,6 +1682,7 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 
 		zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_KEY, key_, sizeof(key_));
 		zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_VALUE, value, sizeof(value));
+		zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DNS, dns, sizeof(dns));
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_STATUS, tmp, sizeof(tmp)))
 			status = atoi(tmp);
@@ -1707,17 +1711,18 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 			strscpy(last_ip, ip);
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() druleid:" ZBX_FS_UI64 " dcheckid:" ZBX_FS_UI64  " unique_dcheckid:" ZBX_FS_UI64
-				" type:%d time:'%s %s' ip:'%s' port:%d key:'%s' value:'%s'",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() druleid:" ZBX_FS_UI64 " dcheckid:" ZBX_FS_UI64
+				" unique_dcheckid:" ZBX_FS_UI64 " type:%d time:'%s %s' ip:'%s'"
+				" dns:'%s' port:%d key:'%s' value:'%s'",
 				__function_name, drule.druleid, dcheck.dcheckid, drule.unique_dcheckid, dcheck.type,
 				zbx_date2str(itemtime), zbx_time2str(itemtime),
-				ip, port, dcheck.key_, value);
+				ip, dns, port, dcheck.key_, value);
 
 		DBbegin();
 		if (dcheck.type == -1)
 			discovery_update_host(&dhost, ip, status, itemtime);
 		else
-			discovery_update_service(&drule, &dcheck, &dhost, ip, port, status, value, itemtime);
+			discovery_update_service(&drule, &dcheck, &dhost, ip, dns, port, status, value, itemtime);
 		DBcommit();
 
 		continue;
@@ -1759,12 +1764,12 @@ void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
 {
 	const char		*__function_name = "process_areg_data";
 
-	char			tmp[MAX_STRING_LEN];
 	struct zbx_json_parse	jp_data, jp_row;
 	int			ret;
 	const char		*p = NULL;
 	time_t			now, hosttime, itemtime;
-	char			host[HOST_HOST_LEN_MAX], ip[INTERFACE_IP_LEN_MAX];
+	char			host[HOST_HOST_LEN_MAX], ip[INTERFACE_IP_LEN_MAX],
+				dns[INTERFACE_DNS_LEN_MAX], tmp[MAX_STRING_LEN];
 	unsigned short		port;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -1794,6 +1799,9 @@ void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IP, ip, sizeof(ip)))
 			*ip = '\0';
 
+		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DNS, dns, sizeof(dns)))
+			*dns = '\0';
+
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_PORT, tmp, sizeof(tmp)))
 			*tmp = '\0';
 
@@ -1801,7 +1809,7 @@ void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
 			port = ZBX_DEFAULT_AGENT_PORT;
 
 		DBbegin();
-		DBregister_host(proxy_hostid, host, ip, port, itemtime);
+		DBregister_host(proxy_hostid, host, ip, dns, port, itemtime);
 		DBcommit();
 
 		continue;
