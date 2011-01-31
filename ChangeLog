@@ -1,5 +1,6 @@
 Changes for 1.8.5rc1
 
+ - [ZBX-3457] in triggers Wizard, add more that 26 symbols with symbols dublicate (Vlad)
  - [ZBX-983] fixed error when update trigger (Vedmak)
  - [ZBX-974] recompress some images with pngcrush (Richlv)
  - [ZBX-3446] fixed possible hang of pollers - added timeout handler for external scripts (Sasha)
