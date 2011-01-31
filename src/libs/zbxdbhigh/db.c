@@ -2049,7 +2049,7 @@ char	*DBget_unique_hostname_by_sample(char *host_name_sample)
 			" from hosts"
 			" where host like '%s%%' escape '%c'"
 				DB_NODE
-			" group by host",
+			" order by host",
 			host_name_sample_esc,
 			ZBX_SQL_LIKE_ESCAPE_CHAR,
 			DBnode_local("hostid"));

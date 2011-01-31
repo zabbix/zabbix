@@ -267,7 +267,8 @@ static void	discovery_register_service(DB_DRULE *drule, DB_DCHECK *dcheck,
 
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		*key_esc, *ip_esc;
+	char		*key_esc, *ip_esc, *dns_esc;
+
 	zbx_uint64_t	dhostid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s' port:%d key:'%s'",
@@ -300,16 +301,21 @@ static void	discovery_register_service(DB_DRULE *drule, DB_DCHECK *dcheck,
 			dservice->dserviceid = DBget_maxid("dservices");
 			dservice->status = DOBJECT_STATUS_DOWN;
 
-			DBexecute("insert into dservices (dserviceid,dhostid,dcheckid,type,key_,ip,port,status)"
-					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s','%s',%d,%d)",
+			dns_esc = DBdyn_escape_string_len(dns, INTERFACE_DNS_LEN);
+
+			DBexecute("insert into dservices (dserviceid,dhostid,dcheckid,type,key_,ip,dns,port,status)"
+					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s','%s','%s',%d,%d)",
 					dservice->dserviceid,
 					dhost->dhostid,
 					dcheck->dcheckid,
 					dcheck->type,
 					key_esc,
 					ip_esc,
+					dns_esc,
 					port,
 					dservice->status);
+
+			zbx_free(dns_esc);
 		}
 	}
 	else
@@ -337,8 +343,6 @@ static void	discovery_register_service(DB_DRULE *drule, DB_DCHECK *dcheck,
 
 		if (0 != strcmp(row[6], dns))
 		{
-			char	*dns_esc;
-
 			dns_esc = DBdyn_escape_string_len(dns, INTERFACE_DNS_LEN);
 
 			DBexecute("update dservices"
