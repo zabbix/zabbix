@@ -2683,6 +2683,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 		if((isset($_REQUEST['triggerid']) && !isset($_REQUEST['form_refresh']))  || isset($limited)){
 			$description	= $trigger['description'];
+
 			$expression	= explode_exp($trigger['expression'],0);
 
 			if(!isset($limited) || !isset($_REQUEST['form_refresh'])){

@@ -571,9 +571,9 @@ COpt::memoryPick();
 
 			//validating item key
 			if(isset($item['key_'])){
-				list($item_key_is_valid, $check_result) = check_item_key($item['key_']);
-				if(!$item_key_is_valid){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Error in item key: %s', $check_result));
+				$itemCheck = check_item_key($item['key_']);
+				if(!$itemCheck['valid']){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Error in item key: %s', $itemCheck['description']));
 				}
 			}
 
@@ -975,9 +975,10 @@ COpt::memoryPick();
 			while($item = DBfetch($db_items)){
 				$iprototypeids[$item['itemid']] = $item['itemid'];
 			}
-			if(!CItemPrototype::delete($iprototypeids, true))
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete discovery rule');
-
+			if(!empty($iprototypeids)){
+				if(!CItemPrototype::delete($iprototypeids, true))
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete discovery rule');
+			}
 
 			DB::delete('items', array('itemid'=>$ruleids));
 

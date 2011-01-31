@@ -825,7 +825,7 @@ Copt::memoryPick();
 
 			self::EndTransaction(true, __METHOD__);
 
-			return array('eventids' => $eventids);
+			return array('eventids' => array_values($eventids));
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);

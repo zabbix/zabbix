@@ -964,20 +964,20 @@ include_once('include/page_header.php');
 	else if($_REQUEST['config']==8){ // GUI
 
 		$frmGUI = new CFormTable(S_GUI, "config.php");
-		$frmGUI->addVar("config",get_request("config",8));
+		$frmGUI->addVar("config", get_request("config",8));
 
-		$combo_theme = new CComboBox('default_theme',$config['default_theme']);
+		$combo_theme = new CComboBox('default_theme', $config['default_theme']);
 		$combo_theme->addItem('css_ob.css',S_ORIGINAL_BLUE);
 		$combo_theme->addItem('css_bb.css',S_BLACK_AND_BLUE);
 		$combo_theme->addItem('css_od.css',S_DARK_ORANGE);
 
-		$exp_select = new CComboBox('event_ack_enable');
-		$exp_select->addItem(EVENT_ACK_ENABLED,S_ENABLED,$config['event_ack_enable']?'yes':'no');
-		$exp_select->addItem(EVENT_ACK_DISABLED,S_DISABLED,$config['event_ack_enable']?'no':'yes');
+		$exp_select = new CComboBox('event_ack_enable', $config['event_ack_enable']);
+		$exp_select->addItem(EVENT_ACK_ENABLED,S_ENABLED);
+		$exp_select->addItem(EVENT_ACK_DISABLED,S_DISABLED);
 
-		$combo_dd_first_entry = new CComboBox('dropdown_first_entry');
-		$combo_dd_first_entry->addItem(ZBX_DROPDOWN_FIRST_NONE, S_NONE, ($config['dropdown_first_entry'] == ZBX_DROPDOWN_FIRST_NONE)?'yes':'no');
-		$combo_dd_first_entry->addItem(ZBX_DROPDOWN_FIRST_ALL, S_ALL_S, ($config['dropdown_first_entry'] == ZBX_DROPDOWN_FIRST_ALL)?'yes':'no');
+		$combo_dd_first_entry = new CComboBox('dropdown_first_entry', $config['dropdown_first_entry']);
+		$combo_dd_first_entry->addItem(ZBX_DROPDOWN_FIRST_NONE, S_NONE);
+		$combo_dd_first_entry->addItem(ZBX_DROPDOWN_FIRST_ALL, S_ALL_S);
 
 		$check_dd_first_remember = new CCheckBox('dropdown_first_remember', $config['dropdown_first_remember'], null, 1);
 
