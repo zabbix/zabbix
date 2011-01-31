@@ -23,7 +23,7 @@ require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
 class testFormHost extends CWebTest
 {
-	public $host = "Text host";
+	public $host = "Test host";
 
 	public function testFormHost_Create()
 	{
@@ -36,6 +36,7 @@ class testFormHost extends CWebTest
 		$this->wait();
 		$this->assertTitle('Hosts');
 		$this->ok('Host added');
+		$this->ok($this->host);
 	}
 
 	public function testFormHost_CreateLongHostName()
@@ -62,6 +63,7 @@ class testFormHost extends CWebTest
 		$this->wait();
 		$this->assertTitle('Hosts');
 		$this->ok('Host updated');
+		$this->ok($this->host);
 	}
 
 	public function testFormHost_UpdateHostName()
