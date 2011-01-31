@@ -562,32 +562,32 @@ function zbx_array_diff($array1, $array2, $field){
 	$fields1 = zbx_objectValues($array1, $field);
 	$fields2 = zbx_objectValues($array2, $field);
 
-	$only1 = array_diff($fields1, $fields2);
-	$only1 = zbx_toHash($only1);
+	$first = array_diff($fields1, $fields2);
+	$first = zbx_toHash($first);
 
-	$only2 = array_diff($fields2, $fields1);
-	$only2 = zbx_toHash($only2);
+	$second = array_diff($fields2, $fields1);
+	$second = zbx_toHash($second);
 
 	$result = array(
-		'only1' => array(),
-		'only2' => array(),
+		'first' => array(),
+		'second' => array(),
 		'both' => array()
 	);
 
 	foreach($array1 as $array){
 		if(!isset($array[$field]))
-			$result['only1'][] = $array;
-		else if(isset($only1[$array[$field]]))
-			$result['only1'][] = $array;
+			$result['first'][] = $array;
+		else if(isset($first[$array[$field]]))
+			$result['first'][] = $array;
 		else
 			$result['both'][$array[$field]] = $array;
 	}
 
 	foreach($array2 as $array){
 		if(!isset($array[$field]))
-			$result['only2'][] = $array;
-		else if(isset($only2[$array[$field]]))
-			$result['only2'][] = $array;
+			$result['second'][] = $array;
+		else if(isset($second[$array[$field]]))
+			$result['second'][] = $array;
 		else
 			$result['both'][$array[$field]] = $array;
 	}
