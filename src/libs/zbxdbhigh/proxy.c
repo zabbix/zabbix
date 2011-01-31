@@ -396,7 +396,7 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 						" and r.proxy_hostid=" ZBX_FS_UI64
 						" and r.status=%d"
 						" and t.status in (%d,%d)"
-						" and t.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)",
+						" and t.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)",
 					proxy_hostid,
 					HOST_STATUS_MONITORED,
 					ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED,
@@ -404,7 +404,7 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 					ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3,
 					ITEM_TYPE_IPMI, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
 					ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
-					ITEM_TYPE_SSH, ITEM_TYPE_TELNET);
+					ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX);
 		}
 		else if (0 == strcmp(pt[i].table, "hosts_templates"))
 		{
@@ -779,22 +779,24 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
  ******************************************************************************/
 int	get_host_availability_data(struct zbx_json *j)
 {
-	typedef struct zbx_host_available {
+	typedef struct
+	{
 		zbx_uint64_t	hostid;
-		char		*error, *snmp_error, *ipmi_error;
-		unsigned char	available, snmp_available, ipmi_available;
-	} t_zbx_host_available;
+		char		*error, *snmp_error, *ipmi_error, *jmx_error;
+		unsigned char	available, snmp_available, ipmi_available, jmx_available;
+	}
+	zbx_host_availability_t;
 
 	const char			*__function_name = "get_host_availability_data";
 	zbx_uint64_t			hostid;
 	size_t				sz;
 	DB_RESULT			result;
 	DB_ROW				row;
-	static t_zbx_host_available	*ha = NULL;
+	static zbx_host_availability_t	*ha = NULL;
 	static int			ha_alloc = 0, ha_num = 0;
 	int				index, new, ret = FAIL;
-	unsigned char			available, snmp_available, ipmi_available;
-	char				*error, *snmp_error, *ipmi_error;
+	unsigned char			available, snmp_available, ipmi_available, jmx_available;
+	char				*error, *snmp_error, *ipmi_error, *jmx_error;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -802,7 +804,7 @@ int	get_host_availability_data(struct zbx_json *j)
 
 	result = DBselect(
 			"select hostid,available,error,snmp_available,snmp_error,"
-				"ipmi_available,ipmi_error"
+				"ipmi_available,ipmi_error,jmx_available,jmx_error"
 			" from hosts");
 
 	while (NULL != (row = DBfetch(result)))
@@ -811,17 +813,17 @@ int	get_host_availability_data(struct zbx_json *j)
 
 		new = 0;
 
-		index = get_nearestindex(ha, sizeof(t_zbx_host_available), ha_num, hostid);
+		index = get_nearestindex(ha, sizeof(zbx_host_availability_t), ha_num, hostid);
 
 		if (index == ha_num || ha[index].hostid != hostid)
 		{
 			if (ha_num == ha_alloc)
 			{
 				ha_alloc += 8;
-				ha = zbx_realloc(ha, sizeof(t_zbx_host_available) * ha_alloc);
+				ha = zbx_realloc(ha, sizeof(zbx_host_availability_t) * ha_alloc);
 			}
 
-			if (0 != (sz = sizeof(t_zbx_host_available) * (ha_num - index)))
+			if (0 != (sz = sizeof(zbx_host_availability_t) * (ha_num - index)))
 				memmove(&ha[index + 1], &ha[index], sz);
 			ha_num++;
 
@@ -829,9 +831,11 @@ int	get_host_availability_data(struct zbx_json *j)
 			ha[index].available = HOST_AVAILABLE_UNKNOWN;
 			ha[index].snmp_available = HOST_AVAILABLE_UNKNOWN;
 			ha[index].ipmi_available = HOST_AVAILABLE_UNKNOWN;
+			ha[index].jmx_available = HOST_AVAILABLE_UNKNOWN;
 			ha[index].error = NULL;
 			ha[index].snmp_error = NULL;
 			ha[index].ipmi_error = NULL;
+			ha[index].jmx_error = NULL;
 
 			new = 1;
 		}
@@ -842,13 +846,17 @@ int	get_host_availability_data(struct zbx_json *j)
 		snmp_error = row[4];
 		ipmi_available = (unsigned char)atoi(row[5]);
 		ipmi_error = row[6];
+		jmx_available = (unsigned char)atoi(row[7]);
+		jmx_error = row[8];
 
 		if (0 == new && ha[index].available == available &&
 				ha[index].snmp_available == snmp_available &&
 				ha[index].ipmi_available == ipmi_available &&
+				ha[index].jmx_available == jmx_available &&
 				0 == strcmp(ha[index].error, error) &&
 				0 == strcmp(ha[index].snmp_error, snmp_error) &&
-				0 == strcmp(ha[index].ipmi_error, ipmi_error))
+				0 == strcmp(ha[index].ipmi_error, ipmi_error) &&
+				0 == strcmp(ha[index].jmx_error, jmx_error))
 			continue;
 
 		zbx_json_addobject(j, NULL);
@@ -873,6 +881,12 @@ int	get_host_availability_data(struct zbx_json *j)
 			ha[index].ipmi_available = ipmi_available;
 		}
 
+		if (1 == new || ha[index].jmx_available != jmx_available)
+		{
+			zbx_json_adduint64(j, ZBX_PROTO_TAG_JMX_AVAILABLE, jmx_available);
+			ha[index].jmx_available = jmx_available;
+		}
+
 		if (1 == new || 0 != strcmp(ha[index].error, error))
 		{
 			zbx_json_addstring(j, ZBX_PROTO_TAG_ERROR, error, ZBX_JSON_TYPE_STRING);
@@ -892,6 +906,13 @@ int	get_host_availability_data(struct zbx_json *j)
 			zbx_json_addstring(j, ZBX_PROTO_TAG_IPMI_ERROR, ipmi_error, ZBX_JSON_TYPE_STRING);
 			zbx_free(ha[index].ipmi_error);
 			ha[index].ipmi_error = strdup(ipmi_error);
+		}
+
+		if (1 == new || 0 != strcmp(ha[index].jmx_error, jmx_error))
+		{
+			zbx_json_addstring(j, ZBX_PROTO_TAG_JMX_ERROR, jmx_error, ZBX_JSON_TYPE_STRING);
+			zbx_free(ha[index].jmx_error);
+			ha[index].jmx_error = strdup(jmx_error);
 		}
 
 		zbx_json_close(j);
@@ -989,6 +1010,12 @@ void	process_host_availability(struct zbx_json_parse *jp)
 			no_data = 0;
 		}
 
+		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_JMX_AVAILABLE, tmp, sizeof(tmp)))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 32, "jmx_available=%d,", atoi(tmp));
+			no_data = 0;
+		}
+
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_ERROR, tmp, sizeof(tmp)))
 		{
 			error_esc = DBdyn_escape_string_len(tmp, HOST_ERROR_LEN);
@@ -1012,6 +1039,15 @@ void	process_host_availability(struct zbx_json_parse *jp)
 			error_esc = DBdyn_escape_string_len(tmp, HOST_ERROR_LEN);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, strlen(error_esc) + 16,
 					"ipmi_error='%s',", error_esc);
+			zbx_free(error_esc);
+			no_data = 0;
+		}
+
+		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_JMX_ERROR, tmp, sizeof(tmp)))
+		{
+			error_esc = DBdyn_escape_string_len(tmp, HOST_ERROR_LEN);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, strlen(error_esc) + 16,
+					"jmx_error='%s',", error_esc);
 			zbx_free(error_esc);
 			no_data = 0;
 		}
@@ -1492,7 +1528,7 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 		ret = FAIL;
 	}
 
-	if(SUCCEED == ret)
+	if (SUCCEED == ret)
 	{
 /* {"request":"ZBX_SENDER_DATA","data":[{"key":"system.cpu.num",...,...},{...},...]}
  *                                     ^------------------------------------------^

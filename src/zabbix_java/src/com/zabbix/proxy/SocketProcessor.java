@@ -60,14 +60,16 @@ class SocketProcessor implements Runnable
 			JSONArray values = checker.getValues();
 
 			JSONObject response = new JSONObject();
-			response.put("response", "success");
-			response.put("values", values);
+			response.put(ItemChecker.JSON_TAG_RESPONSE, ItemChecker.JSON_RESPONSE_SUCCESS);
+			response.put(ItemChecker.JSON_TAG_DATA, values);
 			
 			out.println(response.toString(2));
 		}
 		catch (Exception exception)
 		{
-			out.printf("{ \"response\" : \"failed\", \"exception\" : %s }\n", JSONObject.quote(exception.getMessage()));
+			out.printf("{ \"%s\" : \"%s\", \"%s\" : %s }\n",
+					ItemChecker.JSON_TAG_RESPONSE, ItemChecker.JSON_RESPONSE_FAILED,
+					ItemChecker.JSON_TAG_DATA, JSONObject.quote(exception.getMessage()));
 			System.out.println(exception.getMessage());
 			exception.printStackTrace();
 		}

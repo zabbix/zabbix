@@ -181,16 +181,19 @@ typedef enum
 	ITEM_TYPE_IPMI,
 	ITEM_TYPE_SSH,
 	ITEM_TYPE_TELNET,
-	ITEM_TYPE_CALCULATED
+	ITEM_TYPE_CALCULATED,
+	ITEM_TYPE_JMX
 }
 zbx_item_type_t;
+const char	*zbx_host_type_string(zbx_item_type_t item_type);
 
 typedef enum
 {
 	INTERFACE_TYPE_UNKNOWN = 0,
 	INTERFACE_TYPE_AGENT,
 	INTERFACE_TYPE_SNMP,
-	INTERFACE_TYPE_IPMI
+	INTERFACE_TYPE_IPMI,
+	INTERFACE_TYPE_JMX
 }
 zbx_interface_type_t;
 const char	*zbx_interface_type_string(zbx_interface_type_t type);
@@ -649,7 +652,8 @@ const char	*zbx_nodetype_string(unsigned char nodetype);
 #define	ZBX_POLLER_TYPE_UNREACHABLE	1
 #define	ZBX_POLLER_TYPE_IPMI		2
 #define	ZBX_POLLER_TYPE_PINGER		3
-#define	ZBX_POLLER_TYPE_COUNT		4	/* number of poller types */
+#define	ZBX_POLLER_TYPE_JAVA		4
+#define	ZBX_POLLER_TYPE_COUNT		5	/* number of poller types */
 const char	*zbx_poller_type_string(int poller_type);
 
 #define	GET_SENDER_TIMEOUT	60
@@ -667,11 +671,13 @@ const char	*zbx_poller_type_string(int poller_type);
 #define strnscpy(x, y, n)	zbx_strlcpy(x, y, n);
 
 #define zbx_malloc(old, size)	zbx_malloc2(__FILE__, __LINE__, old, size)
-#define zbx_realloc(src, size)	zbx_realloc2(__FILE__, __LINE__, src, size)
+#define zbx_realloc(old, size)	zbx_realloc2(__FILE__, __LINE__, old, size)
 #define zbx_strdup(old, str)	zbx_strdup2(__FILE__, __LINE__, old, str)
 
+#define ZBX_STRDUP(var, str)	(var = zbx_strdup(var, str))
+
 void    *zbx_malloc2(const char *filename, int line, void *old, size_t size);
-void    *zbx_realloc2(const char *filename, int line, void *src, size_t size);
+void    *zbx_realloc2(const char *filename, int line, void *old, size_t size);
 char    *zbx_strdup2(const char *filename, int line, char *old, const char *str);
 
 #define zbx_free(ptr)		\
@@ -945,7 +951,7 @@ int	__zbx_open(const char *pathname, int flags);
 #endif	/* _WINDOWS && _UNICODE */
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
 
-int	MAIN_ZABBIX_ENTRY(void);
+int	MAIN_ZABBIX_ENTRY();
 
 zbx_uint64_t	zbx_letoh_uint64(zbx_uint64_t data);
 zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data);

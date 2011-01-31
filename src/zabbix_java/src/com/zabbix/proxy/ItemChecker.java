@@ -12,14 +12,15 @@ abstract class ItemChecker
 	private static final Logger logger = LoggerFactory.getLogger(ItemChecker.class);
 
 	public static final String JSON_TAG_CONN = "conn";
+	public static final String JSON_TAG_DATA = "data";
 	public static final String JSON_TAG_ERROR = "error";
 	public static final String JSON_TAG_KEYS = "keys";
 	public static final String JSON_TAG_PASSWORD = "password";
 	public static final String JSON_TAG_PORT = "port";
 	public static final String JSON_TAG_REQUEST = "request";
+	public static final String JSON_TAG_RESPONSE = "response";
 	public static final String JSON_TAG_USERNAME = "username";
 	public static final String JSON_TAG_VALUE = "value";
-	public static final String JSON_TAG_VALUES = "values";
 
 	public static final String JSON_REQUEST_INTERNAL = "java proxy internal items";
 	public static final String JSON_REQUEST_JMX = "java proxy jmx items";

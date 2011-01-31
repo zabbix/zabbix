@@ -855,6 +855,7 @@ int	DBget_queue_count(int from, int to)
 					" or (h.available<>%d and i.type in (%d))"
 					" or (h.snmp_available<>%d and i.type in (%d,%d,%d))"
 					" or (h.ipmi_available<>%d and i.type in (%d))"
+					" or (h.jmx_available<>%d and i.type in (%d))"
 					")"
 				DB_NODE,
 			HOST_STATUS_MONITORED,
@@ -870,7 +871,10 @@ int	DBget_queue_count(int from, int to)
 				ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3,
 			HOST_AVAILABLE_FALSE,
 				ITEM_TYPE_IPMI,
+			HOST_AVAILABLE_FALSE,
+				ITEM_TYPE_JMX,
 			DBnode_local("i.itemid"));
+
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(itemid, row[0]);

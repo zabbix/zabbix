@@ -2513,6 +2513,25 @@ const char	*zbx_permission_string(int perm)
 	}
 }
 
+const char	*zbx_host_type_string(zbx_item_type_t item_type)
+{
+	switch (item_type)
+	{
+		case ITEM_TYPE_ZABBIX:
+			return "Zabbix";
+		case ITEM_TYPE_SNMPv1:
+		case ITEM_TYPE_SNMPv2c:
+		case ITEM_TYPE_SNMPv3:
+			return "SNMP";
+		case ITEM_TYPE_IPMI:
+			return "IPMI";
+		case ITEM_TYPE_JMX:
+			return "JMX";
+		default:
+			return "generic";
+	}
+}
+
 const char	*zbx_poller_type_string(int poller_type)
 {
 	switch (poller_type)
@@ -2525,6 +2544,8 @@ const char	*zbx_poller_type_string(int poller_type)
 			return "ipmi poller";
 		case ZBX_POLLER_TYPE_PINGER:
 			return "pinger";
+		case ZBX_POLLER_TYPE_JAVA:
+			return "java poller";
 		default:
 			return "unknown";
 	}
@@ -2559,6 +2580,8 @@ const char	*zbx_interface_type_string(zbx_interface_type_t type)
 			return "SNMP";
 		case INTERFACE_TYPE_IPMI:
 			return "IPMI";
+		case INTERFACE_TYPE_JMX:
+			return "JMX";
 		case INTERFACE_TYPE_UNKNOWN:
 		default:
 			return "unknown";

@@ -76,7 +76,7 @@ void	child_signal_handler( int sig )
 
 static char	DEFAULT_CONFIG_FILE[] = "/etc/zabbix/zabbix_agent.conf";
 
-void    init_config(void)
+static void    init_config()
 {
 	struct cfg_line cfg[] =
 	{

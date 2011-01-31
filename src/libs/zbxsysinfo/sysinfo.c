@@ -554,66 +554,68 @@ int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c
 
 	assert(result);
 
-	switch (value_type) {
-	case ITEM_VALUE_TYPE_UINT64:
-		zbx_rtrim(c, " \"");
-		zbx_ltrim(c, " \"+");
-		del_zeroes(c);
+	switch (value_type)
+	{
+		case ITEM_VALUE_TYPE_UINT64:
+			zbx_rtrim(c, " \"");
+			zbx_ltrim(c, " \"+");
+			del_zeroes(c);
 
-		switch (data_type) {
-		case ITEM_DATA_TYPE_OCTAL:
-			if (SUCCEED == is_uoct(c))
+			switch (data_type)
 			{
-				ZBX_OCT2UINT64(value_uint64, c);
-				SET_UI64_RESULT(result, value_uint64);
-				ret = SUCCEED;
+				case ITEM_DATA_TYPE_OCTAL:
+					if (SUCCEED == is_uoct(c))
+					{
+						ZBX_OCT2UINT64(value_uint64, c);
+						SET_UI64_RESULT(result, value_uint64);
+						ret = SUCCEED;
+					}
+					break;
+				case ITEM_DATA_TYPE_HEXADECIMAL:
+					if (SUCCEED == is_uhex(c))
+					{
+						ZBX_HEX2UINT64(value_uint64, c);
+						SET_UI64_RESULT(result, value_uint64);
+						ret = SUCCEED;
+					}
+					else if (SUCCEED == is_hex_string(c))
+					{
+						zbx_remove_whitespace(c);
+						ZBX_HEX2UINT64(value_uint64, c);
+						SET_UI64_RESULT(result, value_uint64);
+						ret = SUCCEED;
+					}
+					break;
+				default:	/* ITEM_DATA_TYPE_DECIMAL */
+					if (SUCCEED == is_uint64(c, &value_uint64))
+					{
+						SET_UI64_RESULT(result, value_uint64);
+						ret = SUCCEED;
+					}
 			}
 			break;
-		case ITEM_DATA_TYPE_HEXADECIMAL:
-			if (SUCCEED == is_uhex(c))
-			{
-				ZBX_HEX2UINT64(value_uint64, c);
-				SET_UI64_RESULT(result, value_uint64);
-				ret = SUCCEED;
-			}
-			else if (SUCCEED == is_hex_string(c))
-			{
-				zbx_remove_whitespace(c);
-				ZBX_HEX2UINT64(value_uint64, c);
-				SET_UI64_RESULT(result, value_uint64);
-				ret = SUCCEED;
-			}
-			break;
-		default:	/* ITEM_DATA_TYPE_DECIMAL */
-			if (SUCCEED == is_uint64(c, &value_uint64))
-			{
-				SET_UI64_RESULT(result, value_uint64);
-				ret = SUCCEED;
-			}
-		}
-		break;
-	case ITEM_VALUE_TYPE_FLOAT:
-		zbx_rtrim(c, " \"");
-		zbx_ltrim(c, " \"+");
+		case ITEM_VALUE_TYPE_FLOAT:
+			zbx_rtrim(c, " \"");
+			zbx_ltrim(c, " \"+");
 
-		if (SUCCEED != is_double(c))
-			break;
-		value_double = atof(c);
+			if (SUCCEED != is_double(c))
+				break;
+			value_double = atof(c);
 
-		SET_DBL_RESULT(result, value_double);
-		ret = SUCCEED;
-		break;
-	case ITEM_VALUE_TYPE_STR:
-	case ITEM_VALUE_TYPE_LOG:
-		zbx_replace_invalid_utf8(c);
-		SET_STR_RESULT(result, strdup(c));
-		ret = SUCCEED;
-		break;
-	case ITEM_VALUE_TYPE_TEXT:
-		zbx_replace_invalid_utf8(c);
-		SET_TEXT_RESULT(result, strdup(c));
-		ret = SUCCEED;
-		break;
+			SET_DBL_RESULT(result, value_double);
+			ret = SUCCEED;
+			break;
+		case ITEM_VALUE_TYPE_STR:
+		case ITEM_VALUE_TYPE_LOG:
+			zbx_replace_invalid_utf8(c);
+			SET_STR_RESULT(result, strdup(c));
+			ret = SUCCEED;
+			break;
+		case ITEM_VALUE_TYPE_TEXT:
+			zbx_replace_invalid_utf8(c);
+			SET_TEXT_RESULT(result, strdup(c));
+			ret = SUCCEED;
+			break;
 	}
 
 	if (SUCCEED != ret)

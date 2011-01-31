@@ -995,13 +995,14 @@ static int	DBget_host_name_by_hostid(zbx_uint64_t hostid, char **replace_to)
 #define ZBX_REQUEST_HOST_CONN		3
 static int	DBget_interface_value_by_hostid(zbx_uint64_t hostid, char **replace_to, int request)
 {
-#define MAX_INTERFACE_COUNT	3
+#define MAX_INTERFACE_COUNT	4
 	DB_RESULT	result;
 	DB_ROW		row;
 	unsigned char	type, useip, pr, last_pr = MAX_INTERFACE_COUNT,
 			priority[MAX_INTERFACE_COUNT] = {
 					INTERFACE_TYPE_AGENT,
 					INTERFACE_TYPE_SNMP,
+					INTERFACE_TYPE_JMX,
 					INTERFACE_TYPE_IPMI};
 	int		ret = FAIL;
 
@@ -1009,9 +1010,9 @@ static int	DBget_interface_value_by_hostid(zbx_uint64_t hostid, char **replace_t
 			"select type,useip,ip,dns"
 			" from interface"
 			" where hostid=" ZBX_FS_UI64
-				" and type in (%d,%d,%d)"
+				" and type in (%d,%d,%d,%d)"
 				" and main=1",
-			hostid, INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_IPMI);
+			hostid, INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_IPMI, INTERFACE_TYPE_JMX);
 
 	while (NULL != (row = DBfetch(result)))
 	{
