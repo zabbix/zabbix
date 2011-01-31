@@ -1452,9 +1452,9 @@ COpt::memoryPick();
 			}
 		}
 
-		if(!CHostGroup::isWriteable($hostGroupIdsAll))
+		if(!CHostGroup::isWritable($hostGroupIdsAll))
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation group. Host group does not exist or you have no access to this host group.'));
-		if(!CHost::isWriteable($hostIdsAll))
+		if(!CHost::isWritable($hostIdsAll))
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation host. Host does not exist or you have no access to this host.'));
 		if(!CUser::isReadable($userIdsAll))
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation user. User does not exist or you have no access to this user.'));
