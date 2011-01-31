@@ -974,9 +974,10 @@ COpt::memoryPick();
 			while($item = DBfetch($db_items)){
 				$iprototypeids[$item['itemid']] = $item['itemid'];
 			}
-			if(!CItemPrototype::delete($iprototypeids, true))
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete discovery rule');
-
+			if(!empty($iprototypeids)){
+				if(!CItemPrototype::delete($iprototypeids, true))
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete discovery rule');
+			}
 
 			DB::delete('items', array('itemid'=>$ruleids));
 
