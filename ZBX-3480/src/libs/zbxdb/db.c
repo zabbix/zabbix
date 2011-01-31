@@ -1193,10 +1193,12 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 		return NULL;
 	}
 
-	if (3114 == errcode)	/* ORA-03114 not connected to ORACLE */
+	switch (errcode)
 	{
-		zabbix_errlog(ERR_Z3006, errcode, errbuf);
-		return NULL;
+		case 3113:	/* ORA-03113: end-of-file on communication channel */
+		case 3114:	/* ORA-03114: not connected to ORACLE */
+			zabbix_errlog(ERR_Z3006, errcode, errbuf);
+			return NULL;
 	}
 
 	return result->values;
