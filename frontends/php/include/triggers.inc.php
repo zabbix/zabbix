@@ -51,18 +51,18 @@
 			array('type' => 'str')
 		);
 
-		$item_types_all = array(
+		$value_types_all = array(
 			ITEM_VALUE_TYPE_FLOAT => true,
 			ITEM_VALUE_TYPE_UINT64 => true,
 			ITEM_VALUE_TYPE_STR => true,
 			ITEM_VALUE_TYPE_TEXT => true,
 			ITEM_VALUE_TYPE_LOG => true,
 		);
-		$item_types_num = array(
+		$value_types_num = array(
 			ITEM_VALUE_TYPE_FLOAT => true,
 			ITEM_VALUE_TYPE_UINT64 => true,
 		);
-		$item_types_char = array(
+		$value_types_char = array(
 			ITEM_VALUE_TYPE_STR => true,
 			ITEM_VALUE_TYPE_TEXT => true,
 			ITEM_VALUE_TYPE_LOG => true,
@@ -70,7 +70,7 @@
 
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['abschange']	= array(
 			'args' => $args_ignored,
-			'item_types' =>	$item_types_all
+			'value_types' =>	$value_types_all
 		);
 
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['avg'] = array(
@@ -78,12 +78,12 @@
 				array('type' => 'sec_num', 'mandat' => true),
 				array('type' => 'sec')
 			),
-			'item_types' => $item_types_num
+			'value_types' => $value_types_num
 		);
 
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['change'] = array(
 			'args' => $args_ignored,
-			'item_types' =>	$item_types_all
+			'value_types' =>	$value_types_all
 		);
 
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['count']	= array(
@@ -93,31 +93,31 @@
 				array('type' => 'str'),
 				array('type' => 'sec')
 			),
-			'item_types' =>	$item_types_all
+			'value_types' =>	$value_types_all
 		);
 
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['date'] = array(
 			'args' => $args_ignored,
-			'item_types' =>	$item_types_all
+			'value_types' =>	$value_types_all
 		);
 
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['dayofweek'] = array(
 			'args' => $args_ignored,
-			'item_types' =>	$item_types_all
+			'value_types' =>	$value_types_all
 		);
 
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['delta']	= $ZBX_TR_EXPR_ALLOWED_FUNCTIONS['avg'];
 
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['diff'] = array(
 			'args' => $args_ignored,
-			'item_types' =>	$item_types_all
+			'value_types' =>	$value_types_all
 		);
 
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['fuzzytime']	= array(
 			'args' => array(
 				array('type' => 'sec', 'mandat' => true)
 			),
-			'item_types' =>	$item_types_num
+			'value_types' =>	$value_types_num
 		);
 
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['iregexp'] = array(
@@ -125,7 +125,7 @@
 				array('type' => 'str', 'mandat' => true),
 				array('type' => 'sec_num')
 			),
-			'item_types' =>	$item_types_char
+			'value_types' =>	$value_types_char
 		);
 
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['last'] = array(
@@ -133,12 +133,12 @@
 				array('type' => 'sec_num', 'mandat' => true),
 				array('type' => 'sec')
 			),
-			'item_types' =>	$item_types_all
+			'value_types' =>	$value_types_all
 		);
 
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['logseverity'] = array(
 			'args' => $args_ignored,
-			'item_types' => array(
+			'value_types' => array(
 				ITEM_VALUE_TYPE_LOG => true,
 			)
 		);
@@ -146,7 +146,7 @@
 			'args' => array(
 				array('type' => 'str', 'mandat' => true)
 			),
-			'item_types' => array(
+			'value_types' => array(
 				ITEM_VALUE_TYPE_LOG => true,
 			)
 		);
@@ -159,17 +159,17 @@
 			'args' => array(
 				array('type' => 'sec', 'mandat' => true)
 			),
-			'item_types' => $item_types_all
+			'value_types' => $value_types_all
 		);
 
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['now'] = array(
 			'args' => $args_ignored,
-			'item_types' =>	$item_types_all
+			'value_types' =>	$value_types_all
 		);
 
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['prev'] = array(
 			'args' => $args_ignored,
-			'item_types' =>	$item_types_all
+			'value_types' =>	$value_types_all
 		);
 
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['regexp'] = $ZBX_TR_EXPR_ALLOWED_FUNCTIONS['iregexp'];
@@ -181,14 +181,14 @@
 				array('type' => 'sec_num', 'mandat' => true),
 				array('type' => 'sec')
 			),
-			'item_types' =>	$item_types_char
+			'value_types' =>	$value_types_char
 		);
 
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['sum'] = $ZBX_TR_EXPR_ALLOWED_FUNCTIONS['avg'];
 
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['time'] = array(
 			'args' => $args_ignored,
-			'item_types' =>	$item_types_all
+			'value_types' =>	$value_types_all
 		);
 	}
 
@@ -706,10 +706,10 @@ return $caption;
 
 				$fnc_valid = &$ZBX_TR_EXPR_ALLOWED_FUNCTIONS[$function];
 
-				if(is_array($fnc_valid['item_types']) &&
-					!uint_in_array($item['value_type'], $fnc_valid['item_types'])){
+				if(is_array($fnc_valid['value_types']) &&
+					!uint_in_array($item['value_type'], $fnc_valid['value_types'])){
 					$allowed_types = array();
-					foreach($fnc_valid['item_types'] as $type)
+					foreach($fnc_valid['value_types'] as $type)
 						$allowed_types[] = item_value_type2str($type);
 					info(S_FUNCTION.' ('.$function.') '.S_AVAILABLE_ONLY_FOR_ITEMS_WITH_VALUE_TYPES_SMALL.' ['.implode(',',$allowed_types).']');
 					error(S_INCORRECT_VALUE_TYPE.' ['.item_value_type2str($item['value_type']).'] '.S_FOR_FUNCTION_SMALL.' ('.$function.') '.S_OF_KEY_SMALL.' ('.$host.':'.$key.')');
@@ -1289,14 +1289,14 @@ return $caption;
 		foreach($trigExpr->expressions as $exprPart){
 			if(zbx_empty($exprPart['item'])) continue;
 
-			$sql = 'SELECT i.itemid, i.type, i.value_type '.
+			$sql = 'SELECT i.itemid, i.value_type '.
 				' FROM items i,hosts h'.
 				' WHERE i.key_='.zbx_dbstr($exprPart['item']).
 					' AND h.host='.zbx_dbstr($exprPart['host']).
 					' AND h.hostid=i.hostid'.
 					' AND '.DBin_node('i.itemid');
 			if($item = DBfetch(DBselect($sql))){
-				if(!isset($ZBX_TR_EXPR_ALLOWED_FUNCTIONS[$exprPart['functionName']]['item_types'][$item['value_type']])){
+				if(!isset($ZBX_TR_EXPR_ALLOWED_FUNCTIONS[$exprPart['functionName']]['value_types'][$item['value_type']])){
 					error('Incorrect item value type "'.$exprPart['host'].':'.$exprPart['item'].'" provided for trigger function "'.$exprPart['function'].'".');
 					return null;
 				}
