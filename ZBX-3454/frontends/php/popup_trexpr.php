@@ -267,8 +267,8 @@
 	check_fields($fields);
 
 
-
 	if(isset($_REQUEST['expression']) && $_REQUEST['dstfld1'] == 'expr_temp'){
+		$_REQUEST['expression'] = utf8RawUrlDecode($_REQUEST['expression']);
 		preg_match('/\{([a-zA-Z_0-9- ]+):(.*)\.([a-z]+)\(([0-9]+)([,]{0,1})([0-9]{0,})\)\}([=><#]{1})([0-9]+)/', $_REQUEST['expression'], $match);
 		if(isset($match[3]) && isset($match[7])) $_REQUEST['expr_type'] = $match[3].'['.$match[7].']';
 		if(isset($match[4]) && isset($match[6])) $_REQUEST['param'] = array($match[4], $match[6]);
