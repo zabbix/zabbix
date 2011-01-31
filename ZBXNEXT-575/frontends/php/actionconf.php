@@ -333,7 +333,8 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 				'actionids' => $_REQUEST['actionid'],
 				'selectOperations' => API_OUTPUT_EXTEND,
 				'selectConditions' => API_OUTPUT_EXTEND,
-				'output' => API_OUTPUT_EXTEND
+				'output' => API_OUTPUT_EXTEND,
+				'editable' => true
 			);
 			$actions = CAction::get($options);
 			$action = reset($actions);
