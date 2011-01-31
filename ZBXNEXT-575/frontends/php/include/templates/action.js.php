@@ -344,9 +344,9 @@ function saveOpCmdForm(){
 function selectOpCmdTarget(){
 	var target = jQuery('#opcmdEditForm select[name="opCmdTarget"]').val();
 	if(target.toString() == '2')
-		PopUp("popup.php?dstfrm=web.action.edit.php&srctbl=host_group&srcfld1=groupid&srcfld2=name&dstfld1=opCmdTargetObjectId&dstfld2=opCmdTargetObjectName",480,480);
+		PopUp("popup.php?dstfrm=web.action.edit.php&srctbl=host_group&srcfld1=groupid&srcfld2=name&dstfld1=opCmdTargetObjectId&dstfld2=opCmdTargetObjectName&writeonly=1",480,480);
 	else
-		PopUp("popup.php?dstfrm=web.action.edit.php&srctbl=hosts&srcfld1=hostid&srcfld2=host&dstfld1=opCmdTargetObjectId&dstfld2=opCmdTargetObjectName",780,480);
+		PopUp("popup.php?dstfrm=web.action.edit.php&srctbl=hosts&srcfld1=hostid&srcfld2=host&dstfld1=opCmdTargetObjectId&dstfld2=opCmdTargetObjectName&writeonly=1",780,480);
 }
 
 function changeOpCmdTarget(){

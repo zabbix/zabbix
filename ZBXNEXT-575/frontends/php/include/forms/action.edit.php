@@ -586,7 +586,8 @@ require_once('include/templates/action.js.php');
 				$hosts = CHost::get(array(
 					'hostids' => zbx_objectValues($new_operation['opcommand_hst'], 'hostid'),
 					'output' => array('hostid','host'),
-					'preservekeys' => true
+					'preservekeys' => true,
+					'editable' => true,
 				));
 
 				$new_operation['opcommand_hst'] = array_values($new_operation['opcommand_hst']);
@@ -597,7 +598,8 @@ require_once('include/templates/action.js.php');
 				$groups = CHostGroup::get(array(
 					'groupids' => zbx_objectValues($new_operation['opcommand_grp'], 'groupid'),
 					'output' => array('groupid','name'),
-					'preservekeys' => true
+					'preservekeys' => true,
+					'editable' => true,
 				));
 
 				$new_operation['opcommand_grp'] = array_values($new_operation['opcommand_grp']);
