@@ -169,11 +169,11 @@ $ZBX_MENU = array(
 						'label' => S_MAPS,
 						'sub_pages' => array('image.php','sysmap.php','popup_link_tr.php')
 					),
+				array('url' => 'discoveryconf.php', 'label' => S_DISCOVERY),
 				array('url'=>'services.php',
 						'label'=>S_IT_SERVICES,
 						'sub_pages'=>array('services_form.php')
 					),
-				array('url' => 'discoveryconf.php', 'label' => S_DISCOVERY),
 			)
 	),
 	'admin'=>array(

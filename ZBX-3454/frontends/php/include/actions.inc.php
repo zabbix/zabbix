@@ -323,7 +323,6 @@ function get_operation_desc($type=SHORT_DESCRITION, $data){
 		case LONG_DESCRITION:
 			switch($data['operationtype']){
 				case OPERATION_TYPE_MESSAGE:
-					// for PHP4
 					if(isset($data['default_msg']) && !empty($data['default_msg'])){
 						if(isset($_REQUEST['def_shortdata']) && isset($_REQUEST['def_longdata'])){
 							$temp = bold(S_SUBJECT.': ');

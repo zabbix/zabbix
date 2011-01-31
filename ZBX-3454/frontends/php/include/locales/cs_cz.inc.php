@@ -24,8 +24,6 @@
 	$TRANSLATION=array(
 
 	'S_DATE_FORMAT_YMDHMS'=>		'j. M Y G:i:s',
-	'S_DATE_FORMAT_YMD'=>			'j. M Y',
-	'S_TIMELINE_DATE_FORMAT'=>		'j. M',
 	'S_HTML_CHARSET'=>			'UTF-8',
 
 	'S_YEAR_SHORT'=>			'r',
@@ -214,24 +212,15 @@
 
 //	exp_imp.php
 	'S_ELEMENT'=>				'Prvek',
-	'S_ELEMENTS'=>				'Prvky',
-	'S_ONLY_HOST_INFO'=>			'Pouze informace o hostiteli',
-	'S_EXPORT_IMPORT'=>			'Export/Import',
 	'S_IMPORT_FILE'=>			'Importovat soubor',
 	'S_IMPORT'=>				'Import',
-	'S_IMPORT_BIG'=>			'IMPORT',
-	'S_EXPORT'=>				'Export',
 	'S_EXPORT_SELECTED'=>		'Exportovat vybrané',
-	'S_EXPORT_BIG'=>			'EXPORT',
 	'S_PREVIEW'=>				'Náhled',
-	'S_BACK'=>				'Zpět',
 	'S_BACK_BIG'=>				'ZPĚT',
-	'S_NO_DATA_FOR_EXPORT'=>		'Nejsou žádná data pro export',
 	'S_NO_DATA_SMALL'=>			'žádná data',
 	'S_RULES'=>				'Pravidla',
 	'S_EXISTING'=>				'Existující',
 	'S_MISSING'=>				'Chybějící',
-	'S_REFRESH'=>				'Aktualizovat',
 	'S_REFRESH_TIME_IN_SECONDS'=> 'Automatická aktualizace v sekundách',
 	'S_REFRESH_TIME_MULTIPLIER'=> 'Multiplikátor času aktualizace',
 	'S_IMPORTED'=>				'Importováno',
@@ -323,8 +312,6 @@
 	'S_OPERATIONS'=>			'Operace',
 	'S_EDIT_OPERATION'=>			'Upravit operaci',
 	'S_NO_CONDITIONS_DEFINED'=>		'Nejsou definovány žádné podmínky',
-	'S_ACTIONS_DELETED'=>			'Akce byly smazány',
-	'S_CANNOT_DELETE_ACTIONS'=>		'Nelze smazat akce',
 	'S_NO_OPERATIONS_DEFINED'=>		'Nejsou definovány žádné operace',
 	'S_NEW'=>				'Nová',
 	'S_ADD_HOST'=>				'Přidat hostitele',
@@ -378,7 +365,6 @@
 	'S_DEFAULT_SUBJECT'=>			'Výchozí předmět',
 	'S_MESSAGE'=>				'Zpráva',
 	'S_ON_BIG'=>				'ON',
-	'S_OFF_BIG'=>				'OFF',
 	'S_ON'=>					'On',
 	'S_OFF'=>					'Off',
 	'S_NO_ACTIONS_DEFINED'=>		'Nejsou definovány žádné akce',
@@ -406,7 +392,6 @@
 	'S_IN_SMALL'=>				'mezi',
 	'S_NOT_IN_SMALL'=>			'mimo',
 	'S_RETRIES_LEFT'=>			'Zbývá pokusů',
-	'S_ACTIONS_SINCE'=>			'Akce od',
 
 //	alarms.php
 	'S_SHOW_ALL'=>				'Zobrazit vše',
@@ -442,9 +427,7 @@
 //	charts.php
 	'S_CUSTOM_GRAPHS'=>			'Vlastní grafy',
 	'S_GRAPHS_BIG'=>			'GRAFY',
-	'S_SELECT_GRAPH_TO_DISPLAY'=>		'Vybrat graf k zobrazení',
 	'S_PERIOD'=>				'Období',
-	'S_SELECT_GRAPH_DOT_DOT_DOT'=>		'Vybrat graf...',
 	'S_FULLSCREEN'=>			'Celá obrazovka',
 	'S_VIEW'=>				'pohled',
 
@@ -517,8 +500,6 @@
 	'S_MEDIA_TYPES'=>				'Typy médií',
 	'S_ESCALATION_RULES'=>				'Pravidla eskalace',
 	'S_ENABLE_ESCALATIONS'=>			'Povolit eskalace',
-	'S_ESCALATION'=>				'Eskalace',
-	'S_ESCALATION_RULE'=>				'Pravidlo eskalace',
 	'S_DEFAULT'=>					'Výchozí',
 	'S_IMAGES'=>					'Obrázky',
 	'S_IMAGE'=>					'Obrázek',
@@ -709,7 +690,6 @@
 	'S_GRAPH_SUM'=>				'Souhrn grafu',
 	'S_GRAPH_ITEM'=>			'Položka grafu',
 	'S_REQUIRED_ITEMS_FOR_GRAPH'=>		'Graf musí obsahovat alespoň jednu položku',
-	'S_TEMPLATED_GRAPH'=>			'Graf ze šablony',
 	'S_NO_TARGET_SELECTED'=>		'Není vybrán cíl',
 	'S_DELETE_SELECTED_GRAPHS'=>		'Smazat vybrané grafy?',
 
@@ -726,7 +706,6 @@
 	'S_SOURCE'=>				'Zdroj',
 	'S_EVENT_ID'=>				'ID události',
 	'S_HIDE_UNKNOWN'=>			'Skrýt neznámé',
-	'S_LOG_FILES_SMALL'=>			'logovací soubory',
 	'S_REMOVE_SELECTED'=>			'Odstranit vybrané',
 	'S_ITEMS_LIST'=>				'Seznam položek',
 	'S_SHOW_SELECTED'=>			'Zobrazit vybrané',
@@ -763,7 +742,6 @@
 	'S_CANNOT_DELETE_MAINTENANCE'=>		'Nelze smazat servisní okno',
 
 	'S_MAINTENANCE_PERIOD_LENGTH'=>		'Délka servisního okna',
-	'S_MAINTENANCE_PERIODS'=>		'Servisní okna',
 	'S_MAINTENANCE_PERIODS_BIG'=>		'SERVISNÍ OKNA',
 	'S_NEW_MAINTENANCE_PERIOD'=>		'Nové servisní okno',
 	'S_EDIT_MAINTENANCE_PERIOD'=>		'Upravit servisní okno',
@@ -785,7 +763,6 @@
 	'S_PERIOD_TYPE'=>			'Opakování',
 
 	'S_SCHEDULE'=>				'Termín',
-	'S_NEXT_RUN'=>				'Next run',
 
 	'S_DATE'=>				'Datum',
 	'S_ONE_TIME_ONLY'=>			'pouze jednou',
@@ -839,16 +816,10 @@
 	'S_WRONG_MACRO'=>				'Neplatné makro',
 	'S_MACRO_TOO_LONG'=>				'Název makra je příliš dlouhý, mesmí přesáhnout 64 znaků.',
 	'S_MACRO_VALUE_TOO_LONG'=>			'Hodnota makra je příliš dlouhá, nesmí přesáhnout 255 znaků.',
-	'S_MACRO_EXISTS'=>				'Makro již existuje',
-	'S_NEW_MACRO'=>					'Nové makro',
 	'S_EMPTY_MACRO_VALUE'=>				'Prázdná hodnota makra',
-	'S_NO_MACROS_DEFINED'=>				'Nejsou definována žádná makra',
-	'S_MACRO_ADDED'=>				'Makro bylo přidáno',
 	'S_MACROS_UPDATED'=>				'Makra byla aktualizována',
 	'S_CANNOT_UPDATE_MACROS'=>				'Nelze upravit makra',
-	'S_MACROS_DELETED'=>				'Makro bylo smazáno',
 	'S_CANNOT_ADD_MACRO'=>				'Nelze přidat makro',
-	'S_CANNOT_DELETE_MACROS'=>			'Nelze smazat makra',
 	'S_HOST_LIST'=>					'Seznam hostitelů',
 	'S_OTHER_GROUPS'=> 'Další skupiny',
 	'S_IN_GROUPS'=> 'Ve skupinách',
@@ -946,8 +917,6 @@
 	'S_CREATE_PROXY'=>				'Vytvořit proxy',
 	'S_PROXY_NAME'=>				'Název proxy',
 	'S_LASTSEEN_AGE'=>				'Poslední kontakt (stáří)',
-	'S_HOST_MACRO'=>				'Hostitelovo makro',
-	'S_DOESNT_EXIST'=>				'neexistuje',
 	'S_EMPTY_INPUT_PARAMETER'=>			'Prázdný vstupní parametr',
 	'S_ENABLE_SELECTED_HOSTS'=>			'Povolit vybrané hostitele?',
 	'S_DISABLE_SELECTED_HOSTS_Q'=>			'Zakázat vybrané hostitele?',
@@ -1144,7 +1113,6 @@
 	'S_SNMPV3_PRIV_PASSPHRASE'=>				'SNMPv3 priv passphrase',
 	'S_CUSTOM_MULTIPLIER'=>					'Vlastní multiplikátor',
 	'S_USE_CUSTOM_MULTIPLIER'=>				'Použít vlastní multiplikátor',
-	'S_SELECT_HOST_DOT_DOT_DOT'=>				'Vybrat hostitele ...',
 	'S_LOG_TIME_FORMAT'=>					'Formát času pro logování',
 	'S_CREATE_ITEM'=>					'Vytvořit položku',
 	'S_X_ELEMENTS_COPY_TO_DOT_DOT_DOT'=>			'prvků kopírovat do ...',
@@ -1173,7 +1141,6 @@
 	'S_PRIVATE_KEY_FILE'=>					'Soubor se soukromým klíčem',
 	'S_PUBLIC_KEY'=>					'Veřejný klíč',
 	'S_AUTHENTICATION_METHOD'=>				'Autentizační metoda',
-	'S_PASSPHRASE'=>					'Heslo',
 	'S_EDIT_TRIGGER'=>					'Upravit spouštěč',
 	'S_ENABLE_SELECTED_ITEMS_Q'=>				'Povolit vybrané položky?',
 	'S_DISABLE_SELECTED_ITEMS_Q'=>				'Zakázat vybrané položky?',
@@ -1190,7 +1157,6 @@
 	'S_LATEST_EVENTS'=>			'Poslední události',
 	'S_HISTORY_OF_EVENTS_BIG'=>		'HISTORIE UDÁLOSTÍ',
 	'S_NO_EVENTS_FOUND'=>			'Nenalezeny žádné události',
-	'S_EVENTS_SINCE'=>			'Události od',
 	'S_EVENTS_DATE_FORMAT'=>		'j. M Y G:i:s',
 	'S_EVENTS_DISCOVERY_TIME_FORMAT'=>	'j. M Y G:i:s',
 	'S_EVENTS_ACTION_TIME_FORMAT'=>		'j. M Y G:i:s',
@@ -1233,7 +1199,6 @@
 	'S_COORDINATE_Y'=>			'Souřadnice Y',
 
 	'S_CONNECTORS'=>			'Spojnice',
-	'S_UNAVAILABLE_BIG'=>			'NEDOSTUPNÝ',
 	'S_MAINTENANCE_BIG'=>			'ÚDRŽBA',
 
 //	sysmaps.php
@@ -1287,8 +1252,6 @@
 	'S_CANNOT_FIND_SCREEN'=>		'Nelze najít obrazovku',
 	'S_USED_IN_EXPORTED_MAP_SMALL'=>' - použito v exportované mapě',
 	'S_NO_ICON_FOR_MAP_ELEMENT'=>	'Prvek mapy nemá žádnou ikonu',
-	'S_EXPORT_HAVE_NO_MAPS'=>		'Export neobsahuje mapy Zabbixu',
-	'S_EXPORT_HAVE_NO_SCREENS'=>	'Export neobsahuje obrazovky Zabbixu',
 
 //	map.php
 	'S_OK_BIG'=>			'OK',
@@ -1332,9 +1295,7 @@
 	'S_WITHOUT_PROBLEMS'=>				'Bez problémů',
 	'S_WITH_PROBLEMS'=>				'S problémy',
 	'S_LAST_20_ISSUES'=>			'Posledních 20 problémů',
-	'S_FAVOURITE'=>				'Oblíbené',
 	'S_FAVOURITES'=>			'Oblíbené',
-	'S_EVERY'=>				'Každých',
 	'S_MENU'=>				'Menu',
 	'S_RESET'=>				'Reset',
 	'S_MAXIMIZE'=>				'Maximalizovat',
@@ -1371,7 +1332,6 @@
 	'S_15_MIN'=>				'15 min',
 
 //	queue.php
-	'S_QUEUE_BIG'=>				'FRONTA',
 	'S_QUEUE_OF_ITEMS_TO_BE_UPDATED_BIG'=>	'FRONTA POLOŽEK K AKTUALIZACI',
 	'S_NEXT_CHECK'=>			'Příští kontrola',
 	'S_THE_QUEUE_IS_EMPTY'=>		'Fronta je prázdná',
@@ -1455,7 +1415,6 @@
 	'S_DAY'=>					'Den',
 	'S_MONTH'=>					'Měsíc',
 	'S_YEAR'=>					'Rok',
-	'S_YEAR_SMALL'=>				'rok',
 	'S_HOURLY'=>					'hodinově',
 	'S_DAILY'=>					'denně',
 	'S_WEEKLY'=>					'týdně',
@@ -1684,7 +1643,6 @@
 	'S_CANNOT_FORMAT_TREE_CHECK_LOGIC'=> 'Nelze naformátovat navigační strom. Zkontrolujte logiku propojení služeb',
 
 //	triggers.php
-	'S_SHOW_ALL_WITH_UNACKNOWLEDGED'=> 'Zobrazit spouštěče s nepotvrzenými událostmi',
 	'S_NO_TRIGGER'=>			'Není spouštěč',
 	'S_NO_TRIGGERS_DEFINED'=>		'Nejsou definovány žádné spouštěče',
 	'S_NO_TRIGGER_DEFINED'=>		'Není definován žádný spouštěč',
@@ -1747,17 +1705,13 @@
 	'S_ADD'=>						'Přidat',
 
 //	tr_status.php
-	'S_SOUND'=>							'Zvuk',
 	'S_STATUS_OF_TRIGGERS'=>			'Stav spouštěčů',
 	'S_STATUS_OF_TRIGGERS_BIG'=>		'STAV SPOUŠTĚČŮ',
 	'S_STATUS_OF_HOSTGROUP_TRIGGERS'=>	'Stav spouštěčů skupiny',
 	'S_STATUS_OF_HOST_TRIGGERS'=>		'Stav spouštěčů hostitele',
 	'S_HIDE_ALL'=>				'Skrýt vše',
-	'S_SHOW_ONLY_PROBLEMS'=>		'Zobrazit pouze problémy',
 	'S_SHOW_UNACKNOWLEDGED'=>		'Zobrazit nepotvrzené',
-	'S_SHOW_PROBLEM_UNACKNOWLEDGED'=>	'Show problem-unacknowledged',
 	'S_NOT_ACKNOWLEDGED'=>			'Nepotvrzeno',
-	'S_SHOW_LAST'=>				'Zobrazit poslední',
 	'S_SHOW_DETAILS'=>			'Zobrazit detaily',
 	'S_FILTER_BY_NAME'=>				'Filtrovat podle jména',
 	'S_TRIGGERS_BIG'=>			'SPOUŠTĚČE',
@@ -1814,7 +1768,6 @@
 	'S_CANNOT_UPDATE_API_ACCESS'=>			'Nelze upravit přístup k API',
 	'S_DEBUG_MODE_UPDATED'=>			'Ladící mód byl aktualizován',
 	'S_CANNOT_UPDATE_DEBUG_MODE'=>			'Nelze upravit ladící mód',
-	'S_USER_CANNOT_DISABLE_ITSELF'=>		'Uživatel nemůže zakázat sám sebe',
 	'S_USER_CANNOT_CHANGE_STATUS'=>			'Uživatel nemůže měnit svůj stav',
 	'S_USER_CANNOT_CHANGE_GUI_ACCESS'=>		'Uživatel nemůže upravit přístup ke grafickému rozhraní sám sobě',
 	'S_USER_CANNOT_DELETE_ITSELF'=>			'Uživatel nemůže smazat sám sebe',
@@ -1894,7 +1847,6 @@
 	'S_TOOLS'=>				'Nástroje',
 	'S_RESULT'=>				'Výsledek',
 	'S_CLOSE'=>				'Zavřít',
-	'S_CONNECT_TO_SERVER_ERROR'=>		'Nelze se připojit k ZABBIX serveru',
 	'S_DELETE_SELECTED_SCRIPTS_Q'=>		'Smazat vybrané skripty?',
 
 	'S_SCRIPT_ERROR'=>			'CHYBA SKRIPTU',
@@ -1903,7 +1855,6 @@
 	'S_SCRIPT_READ_ERROR'=>			'Nepodařilo se přečíst odpověď skriptu, zkontrolujte spojení',
 	'S_SCRIPT_TIMEOUT_ERROR'=>		'Vypršel čas definovaný konstantou ZBX_SCRIPT_TIMEOUT (v "include/defines.inc.php"). Můžete zkusit tuto hodnotu zzvětšit.',
 	'S_SCRIPT_BYTES_LIMIT_ERROR'=>		'Byl dosažen limit čtení definovaný konstantou ZBX_SCRIPT_BYTES_LIMIT (v "include/defines.inc.php"). Můžete zkusit tuto hodnotu zvětšit.',
-	'S_SCRIPT_UNKNOWN_ERROR'=>		'Došlo k neznámé chybě při čtení odpovědi skriptu. Prosím, reportujte tuto chybu vývojářům.',
 	'S_SCRIPT_ERROR_EMPTY_RESPONSE'=>	'Byla přijata prázdná odpověď',
 
 //	audit.php
@@ -1919,7 +1870,6 @@
 	'S_GRAPH_ELEMENT'=>			'Prvek grafu',
 	'S_UNKNOWN_RESOURCE'=>			'Neznámý zdroj',
 	'S_ALREADY_EXISTS_SMALL'=>		'již existuje',
-	'S_ZABBIX_CONFIG'=>			'Nastavení Zabbix',
 
 //	profile.php
 	'S_USER_PROFILE_BIG'=>			'PROFIL UŽIVATELE',
@@ -2035,14 +1985,12 @@
 // page_header.php
 	'S_REFRESHED_EVERY_SMALL'=>		'aktualizováno každých',
 	'S_PAGE_RECEIVED_INCORRECT_DATA'=>	'Byla přijata neplatná data',
-	'S_TIMEZONE_FOR_PHP_IS_NOT_SET_PLEASE_SET'=>'Časová zóna pro PHP není nastavena. Nastavte, prosím, volbu "date.timezone" v php.ini.',
 
 //	copt.inc.php
 	'S_STATS_FOR'=>			'Statistika pro',
 	'S_TOTAL_TIME'=>		'Celkový čas',
 	'S_MEMORY_LIMIT'=>		'Omezení paměti',
 	'S_MEMORY_USAGE'=>		'Využití paměti',
-	'S_MEMORY_LEAK'=>		'Únik paměti',
 	'S_SQL_SELECTS_COUNT'=>		'Počet SQL select',
 	'S_SQL_EXECUTES_COUNT'=>	'Počet SQL execute',
 	'S_SQL_REQUESTS_COUNT'=>	'Počet SQL požadavků',
@@ -2051,7 +1999,6 @@
 	'S_MEMORY_LIMIT_REACHED'=>	'OMEZENÍ PAMĚTI DOSAŽENO! Profilování bylo zastaveno, aby se ušetřila paměť pro zpracování skriptů.',
 
 // 	func.inc.php
-	'S_WRONG_TYPE'=>			'Neplatný typ',
 	'S_INCORRECT_TYPE_OF_ASORT_BY_KEY'=>	'Neplatný typ asort_by_key',
 	'S_DAYS_SMALL'=>			'dní',
 	'S_B'=>			'B',
@@ -2116,26 +2063,15 @@
 //	httptest.inc.php
 	'S_SCENARIO_STEP_NUMBER_CANNOT_BE_LESS_ONE'=>	'Číslo kroku scénáře nesmí být menší než 1',
 	'S_SCENARIO_STEP_NAME_SHOULD_CONTAIN'=>		'Krok scénáře může obsahovat',
-	'S_CHARACTERS_ONLY_SMALL'=>			'znaky pouze',
 	'S_ONLY_CHARACTERS_ARE_ALLOWED'=>		'Povoleny jsou pouze tisknutelné znaky',
 	'S_CANNOT_ADD_NEW_APPLICATION'=>		'Nelze přidat novou aplikaci',
 	'S_SCENARIO_WITH_NAME'=>			'Scénář se jménem',
 	'S_ADDED_SMALL'=>				'přidáno',
 
 //	media.inc.php
-	'S_NO_MEDIA_WITH'=>			'Neexistuje médium s',
-	'S_NO_MEDIA_TYPE_WITH'=>		'Neexistuje typ média s',
-	'S_AN_ACTION_TYPE_WITH_DESCRIPTION'=>	'Typ akce s popisem',
 
 //	hosts.inc.php
-	'S_CANNOT_EXIST_WITHOUT_GROUP'=>		'nemůže existovat bez skupiny',
-	'S_ADDED_HOST_GROUP'=>				'Přidána skupina hostitelů',
-	'S_UPDATED_HOST_GROUP'=>			'Aktualizována skupina hostitelů',
-	'S_INCORRECT_CHARACTERS_USED_FOR_HOSTNAME'=>	'Pro název hostitele jsou použity neplatné znaky',
-	'S_INCORRECT_CHARACTERS_USED_FOR_DNS'=>		'Pro DNS jsou použity neplatné znaky',
 	'S_CIRCULAR_LINK_CANNOT_BE_CREATED'=>		'Nelze připojit do smyčky',
-	'S_MUST_LINKED_LEAST_ONE_HOST_GROUP_SMALL'=>	'musí být připojen alespoň do jedné skupiny hostitelů',
-	'S_ADDED_NEW_HOST'=>				'Přidán nový hostitel',
 	'S_INTERNAL_AND_CANNOT_DELETED_SMALL'=>		'je interní a nemůže být smazána',
 	'S_CANNOT_DELETED_INNER_HOSTS_CANNOT_UNLINKED_SMALL'=>'nemůže být smazána, protože hostitelé v ní nemohou být odpojeni',
 	'S_NO_HOST_GROUPS_WITH'=>			'Neexistuje skupina hostitelů s',
@@ -2145,7 +2081,6 @@
 	'S_ADDED_NEW_APPLICATION'=>			'Přidána nová aplikace',
 	'S_UPDATED_APPLICATION'=>			'Aktualizována aplikace',
 	'S_USED_BY_ITEM_SMALL'=>			'použita položkou',
-	'S_USED_BY_SCENARIO_SMALL'=>			'použita scénářem',
 	'S_NO_APPLICATION_WITH'=>			'Neexistuje aplikace s',
 	'S_UNLINKED_SMALL'=>				'odpojený',
 	'S_TEMPLATE_WITH_ITEM_KEY'=>			'Šablona s klíčem položky',
@@ -2194,13 +2129,7 @@
 	'S_TO_HOST_SMALL'=>					'k hostiteli',
 	'S_MISSING_KEY'=>					'Chybí klíč',
 	'S_INCORRECT_FUNCTION_IS_USED'=>			'Není použita platná funkce',
-	'S_UNKNOWN_MACRO'=>					'Neznámé makro',
 	'S_FROM_HOST_SMALL'=>					'od hostitele',
-	'S_TRIGGER_IN_TEMPLATE'=>				'Spouštěč v šabloně',
-	'S_HAS_DEPENDENCY_WITH_TRIGGER_IN_TEMPLATE'=>		'má závislosti na spouštěči v šabloně',
-	'S_IS_NOT_THE_HIGHEST_LEVEL_TEMPLATE'=>			'není šablona na nejvyšší úrovni',
-	'S_NO_FUNCTION_WITH'=>					'Neexistuje funkce s',
-	'S_SPECIFY_THE_CONDITIONAL_EXPR_FOR_THE_TARGET'=>	'Určete podmínku pro cíl.',
 	'S_0_OR_1'=>						'0 nebo 1',
 	'S_TRIGGER_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR'=>	'Výraz spouštěče musí obsahovat alespoň jednu položku.',
 	'S_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR'=>		'Hostitel neexistuje.',
@@ -2213,8 +2142,6 @@
 
 //	maps.inc.php
 	'S_NO_SYSTEM_MAP_WITH'=>		'Není definována mapa s',
-	'S_NO_SYSMAP_ELEMENT_WITH'=>		'Není definován prvek mapy s',
-	'S_TEMPLATE_SMALL'=>			'šablona',
 
 //	screens.inc.php
 	'S_NO_ROWS_IN_SCREEN'=>				'Neexistují žádné řádky pro obrazovku',
@@ -2345,13 +2272,9 @@
 
 // class.cmediatype.php
 	'S_CMEDIATYPE_ERROR_WRONG_FIELD_FOR_MEDIATYPE'=>	'Nesprávně zadaná pole pro typ média',
-	'S_CMEDIATYPE_ERROR_CANT_DELETE_MEDIATYPES'=>		'Nelze smazat typy médií',
-	'S_CMEDIATYPE_ERROR_CANT_UPDATE_MEDIATYPES'=>		'Nelze aktualizovat typy médií',
-	'S_CMEDIATYPE_ERROR_CANT_INSERT_MEDIATYPES'=>		'Nelze přidat typy médií',
 	'S_MEDIATYPE_ALREADY_EXISTS'=>				'Typ média již existuje:',
 	'S_MEDIATYPE_USED_BY_ACTIONS'=>	'Typ média je použitý v akci:',
 	'S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_CREATE_MEDIATYPES'=>'Pouze Super Admini můžou vytvářet typy médií',
-	'S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_UPDATE_MEDIATYPES'=>'Pouze Super Admini můžou aktualizovat typy médií',
 	'S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_DELETE_MEDIATYPES'=>'Pouze Super Admini můžou mazat typy médií',
 
 //	config.inc.php
@@ -2385,7 +2308,6 @@
 	'S_LATEST_DATA'=>			'Poslední hodnoty',
 
 //	Errors
-	'S_INCORRECT_DESCRIPTION'=>		'Neplatný popis',
 	'S_CANT_FORMAT_TREE'=>			'Nelze naformátovat navigační strom',
 	'S_NO_PERMISSION'=>				'Nemáte oprávnění k provedení této operace',
 	'S_NO_PERMISSIONS_FOR_SCREEN'=>	'Nemáte oprávnění k obrazovce',

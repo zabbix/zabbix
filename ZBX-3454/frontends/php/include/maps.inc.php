@@ -684,7 +684,8 @@
 
 			$parameter = substr($parameter, 0, $pos);
 */
-		$pattern = "/{(?P<host>.+?):(?P<key>.+?)\.(?P<func>[^.]+?)\((?P<param>.+?)\)}/u";
+//		$pattern = "/{(?P<host>.+?):(?P<key>.+?)\.(?P<func>[^.]+?)\((?P<param>.+?)\)}/u";
+		$pattern="/{(?P<host>.[^}]*):(?P<key>.[^}]*)\.(?P<func>.[^}]*)\((?P<param>.[^}]*)\)*}/u";
 		preg_match_all($pattern, $label, $matches);
 		foreach($matches[0] as $num => $expr){
 			$host = $matches['host'][$num];

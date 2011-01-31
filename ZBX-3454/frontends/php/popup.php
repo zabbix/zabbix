@@ -1477,7 +1477,7 @@ include_once('include/page_header.php');
 		$table->show();
 	}
 	else if($srctbl == 'dchecks'){
-		$table = new CTableInfo(S_NO_DISCOVERY_RULES_DEFINED);
+		$table = new CTableInfo(S_NO_DISCOVERY_CHECKS_DEFINED);
 		$table->setHeader(S_NAME);
 
 		$result = DBselect('SELECT DISTINCT r.name,c.dcheckid,c.type,c.key_,c.snmp_community,c.ports FROM drules r,dchecks c'.
@@ -1497,7 +1497,7 @@ include_once('include/page_header.php');
 		$table->show();
 	}
 	else if($srctbl == 'proxies'){
-		$table = new CTableInfo(S_NO_DISCOVERY_RULES_DEFINED);
+		$table = new CTableInfo(S_NO_PROXIES_DEFINED);
 		$table->setHeader(S_NAME);
 
 		$sql = 'SELECT DISTINCT hostid,host '.

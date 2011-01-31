@@ -2629,6 +2629,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 		if((isset($_REQUEST['triggerid']) && !isset($_REQUEST['form_refresh']))  || isset($limited)){
 			$description	= $trigger['description'];
+
 			$expression	= explode_exp($trigger['expression'],0);
 
 			if(!isset($limited) || !isset($_REQUEST['form_refresh'])){
@@ -2831,7 +2832,9 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			if(!isset($allowedTesting) || !$allowedTesting) $btn_test->setAttribute('disabled', 'disabled');
 			if (empty($outline)) $btn_test->setAttribute('disabled', 'yes');
 			//SDI($outline);
-			$frmTrig->addRow(SPACE, array($outline,
+			$wrapOutline = new CSpan(array($outline));
+			$wrapOutline->addStyle('white-space: pre;');
+			$frmTrig->addRow(SPACE, array($wrapOutline,
 										  BR(),BR(),
 										  $exp_table,
 										  $btn_test));

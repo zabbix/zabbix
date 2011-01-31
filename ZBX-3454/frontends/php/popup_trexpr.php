@@ -269,6 +269,12 @@
 
 	if(isset($_REQUEST['expression']) && $_REQUEST['dstfld1'] == 'expr_temp'){
 		$_REQUEST['expression'] = utf8RawUrlDecode($_REQUEST['expression']);
+
+		// Code review: try to get maximum info using trigger expression parser (it is tested and works)
+		// the rest of the info can be fetched using regexp
+		$expr = new CTriggerExpression(array('expression' => $_REQUEST['expression']));
+		SDII($expr);
+
 		preg_match('/\{([a-zA-Z_0-9- ]+):(.*)\.([a-z]+)\(([0-9]+)([,]{0,1})([0-9]{0,})\)\}([=><#]{1})([0-9]+)/', $_REQUEST['expression'], $match);
 		if(isset($match[3]) && isset($match[7])) $_REQUEST['expr_type'] = $match[3].'['.$match[7].']';
 		if(isset($match[4]) && isset($match[6])) $_REQUEST['param'] = array($match[4], $match[6]);
@@ -280,6 +286,8 @@
 			$options = array(
 				'output' => API_OUTPUT_SHORTEN,
 			);
+
+			// Code review: this function is depricated! Use  CItem::get() instead
 			$myItem = CItem::getObjects(array('host' => $match[1], 'key_' => $match[2]));
 			$myItem = reset($myItem);
 			if(isset($myItem['itemid'])) $_REQUEST['itemid'] = $myItem['itemid'];
