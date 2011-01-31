@@ -373,7 +373,7 @@ FIELD		|operationid	|t_id		|	|NOT NULL	|0
 FIELD		|actionid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|actions
 FIELD		|operationtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|esc_period	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|esc_step_from	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|esc_step_from	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|esc_step_to	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|evaltype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|actionid

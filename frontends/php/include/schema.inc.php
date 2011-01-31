@@ -1620,7 +1620,7 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0',
+				'default' => '1',
 			),
 			'esc_step_to' => array(
 				'null' => false,
@@ -4631,7 +4631,7 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 5,
-				'default' => 'en_gb',
+				'default' => 'en_GB',
 			),
 			'refresh' => array(
 				'null' => false,

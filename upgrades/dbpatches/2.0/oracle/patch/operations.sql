@@ -309,6 +309,7 @@ UPDATE optemplate
 
 ALTER TABLE operations MODIFY operationid DEFAULT NULL;
 ALTER TABLE operations MODIFY actionid DEFAULT NULL;
+ALTER TABLE operations MODIFY esc_step_from DEFAULT '1';
 ALTER TABLE operations DROP COLUMN object;
 ALTER TABLE operations DROP COLUMN objectid;
 ALTER TABLE operations DROP COLUMN shortdata;

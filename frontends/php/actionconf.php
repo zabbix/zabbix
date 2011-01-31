@@ -141,6 +141,11 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			'operations'		=> get_request('operations', array()),
 		);
 
+		foreach($action['operations'] as $anum => $op){
+			if(isset($op['opmessage']) && !isset($op['opmessage']['default_msg']))
+				$action['operations'][$anum]['opmessage']['default_msg'] = 0;
+		}
+
 		if(isset($_REQUEST['actionid'])){
 			foreach($action['operations'] as $opnum => $operation){
 				if(isset($operation['opcommand_grp']))
