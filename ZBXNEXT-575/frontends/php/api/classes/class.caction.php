@@ -701,8 +701,11 @@ COpt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_PARAMETER_USED_FOR_ACTION.' [ '.$action['name'].' ]');
 				}
 
+				if(isset($action['esc_period']) && ($action['esc_period'] < 60) && ($action['esc_period'] != 0))
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" has incorrect value for "esc_period" (minimal: 60, infinitely: 0).', $action['name']));
+
 				if(isset($duplicates[$action['name']]))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action [%s] already exists.', $action['name']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" already exists.', $action['name']));
 				else
 					$duplicates[$action['name']] = $action['name'];
 			}
@@ -715,7 +718,7 @@ COpt::memoryPick();
 			);
 			$dbActions = self::get($options);
 			foreach($dbActions as $anum => $dbAction){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action [%s] already exists.', $dbAction['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" already exists.', $dbAction['name']));
 			}
 //------
 
@@ -804,6 +807,8 @@ COpt::memoryPick();
 				if(!check_db_fields(array('actionid' => null), $action)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_PARAMETER_USED_FOR_ACTION.' [ '.$action['name'].' ]');
 				}
+				if(isset($action['esc_period']) && ($action['esc_period'] < 60) && ($action['esc_period'] != 0))
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" has incorrect value for "esc_period" (minimal: 60, infinitely: 0).', $action['name']));
 
 				if(!isset($action['name'])) continue;
 
@@ -1357,12 +1362,22 @@ COpt::memoryPick();
 
 		foreach($operations as $operation){
 
-			if(($operation['esc_step_from'] > $operation['esc_step_to']) && ($operation['esc_step_to'] != 0)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect operation escalation step values.'));
+			if((isset($operation['esc_step_from']) || isset($operation['esc_step_to']))
+					&& !isset($operation['esc_step_from'], $operation['esc_step_to'])
+			){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('esc_step_from and esc_step_to must be set together.'));
 			}
 
-			if(isset($operation['esc_period']) && (($operation['esc_period'] > 0) && ($operation['esc_period'] < 60))){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect operation escalation period.'));
+			if(isset($operation['esc_step_from'], $operation['esc_step_to'])){
+				if(($operation['esc_step_from'] > $operation['esc_step_to']) && ($operation['esc_step_to'] != 0)){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect operation escalation step values.'));
+				}
+			}
+
+			if(isset($operation['esc_period'])){
+				if(isset($operation['esc_period']) && (($operation['esc_period'] > 0) && ($operation['esc_period'] < 60))){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect operation escalation period.'));
+				}
 			}
 
 			$hostIdsAll = $hostGroupIdsAll = $userIdsAll = $userGroupIdsAll = array();
@@ -1495,7 +1510,7 @@ COpt::memoryPick();
 					}
 					break;
 				case CONDITION_TYPE_DSTATUS:
-					if(isset($discoveryObjectStatuses[$condition['value']])){
+					if(!isset($discoveryObjectStatuses[$condition['value']])){
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect condition discovery status.'));
 					}
 					break;

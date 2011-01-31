@@ -275,6 +275,7 @@ UPDATE optemplate
 
 ALTER TABLE operations ALTER operationid DROP DEFAULT,
 		       ALTER actionid DROP DEFAULT,
+		       ALTER esc_step_from SET DEFAULT '1',
 		       DROP COLUMN object,
 		       DROP COLUMN objectid,
 		       DROP COLUMN shortdata,

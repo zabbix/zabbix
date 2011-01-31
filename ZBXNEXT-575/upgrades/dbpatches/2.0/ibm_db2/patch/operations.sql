@@ -392,6 +392,10 @@ ALTER TABLE operations ALTER COLUMN actionid SET WITH DEFAULT NULL
 /
 REORG TABLE operations
 /
+ALTER TABLE operations ALTER COLUMN esc_step_from SET DEFAULT '1'
+/
+REORG TABLE operations
+/
 ALTER TABLE operations DROP COLUMN object
 /
 REORG TABLE operations
