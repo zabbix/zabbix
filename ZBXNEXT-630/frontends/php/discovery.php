@@ -205,6 +205,7 @@ include_once('include/page_header.php');
 				if(!isset($discovery_info[$dservice['ip']])){
 					$discovery_info[$dservice['ip']] = array(
 						'ip' => $dservice['ip'],
+						'dns' => $dservice['dns'],
 						'type' => $htype,
 						'class' => $hclass,
 						'host' => $hostName,
@@ -247,9 +248,10 @@ include_once('include/page_header.php');
 		order_result($discovery_info, $_REQUEST['sort'], $_REQUEST['sortorder']);
 
 		foreach($discovery_info as $ip => $h_data){
+			$dns = $h_data['dns'] == '' ? '' : ' ('.$h_data['dns'].')';
 			$table_row = array(
 				get_node_name_by_elid($h_data['druleid']),
-				$h_data['type'] == 'primary' ? new CSpan($ip, $h_data['class']) : new CSpan(SPACE.SPACE.$ip),
+				$h_data['type'] == 'primary' ? new CSpan($ip.$dns, $h_data['class']) : new CSpan(SPACE.SPACE.$ip.$dns),
 				new CSpan(empty($h_data['host']) ? '-' : $h_data['host']),
 				new CSpan((($h_data['time'] == 0 || $h_data['type'] === 'slave') ?
 						'' : convert_units(time() - $h_data['time'], 'uptime')), $h_data['class'])

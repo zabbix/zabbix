@@ -438,7 +438,7 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 	DB_ROW		row;
 	DB_ROW		row2;
 	zbx_uint64_t	dhostid, hostid = 0, proxy_hostid, host_proxy_hostid;
-	char		*host, *host_esc, *host_unique;
+	char		*host = NULL, *host_esc, *host_unique;
 	unsigned short	port;
 	zbx_uint64_t	groupid = 0;
 	unsigned char	svc_type, interface_type;
@@ -539,10 +539,13 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 				hostid = DBget_maxid("hosts");
 
 				/* for host uniqueness purposes */
-				host = ('\0' != *row[3] ? row[3] : row[2]);
+				host = zbx_strdup(host, '\0' != *row[3] ? row[3] : row[2]);
+
 				make_hostname(host);	/* replace not-allowed symbols */
 				host_unique = DBget_unique_hostname_by_sample(host);
 				host_esc = DBdyn_escape_string(host_unique);
+
+				zbx_free(host);
 
 				DBexecute("insert into hosts"
 							" (hostid,proxy_hostid,host)"
