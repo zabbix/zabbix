@@ -92,7 +92,7 @@ static int	get_hostid_by_host(const char *host, const char *ip, unsigned short p
 		alarm(CONFIG_TIMEOUT);
 		zbx_gethost_by_ip(ip, dns, sizeof(dns));
 		alarm(0);
-zabbix_log(LOG_LEVEL_DEBUG, ">>>>>>>>>>>> '%s' '%s'", ip, dns);
+
 		DBbegin();
 
 		if (0 != (zbx_process & ZBX_PROCESS_SERVER))

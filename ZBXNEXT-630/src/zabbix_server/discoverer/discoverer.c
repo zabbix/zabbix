@@ -434,7 +434,8 @@ static void	process_checks(DB_DRULE *drule, DB_DHOST *dhost, int *host_status,
 
 	result = DBselect("%s", sql);
 
-	while (NULL != (row = DBfetch(result))) {
+	while (NULL != (row = DBfetch(result)))
+	{
 		memset(&dcheck, 0, sizeof(dcheck));
 
 		ZBX_STR2UINT64(dcheck.dcheckid, row[0]);
@@ -634,29 +635,31 @@ static void	process_rule(DB_DRULE *drule)
 			continue;
 		}
 
-		for (i = first; i <= last; i++) {
+		for (i = first; i <= last; i++)
+		{
 			memset(&dhost, 0, sizeof(dhost));
-			host_status	= -1;
+			host_status = -1;
 
 			now = time(NULL);
 
 #if defined(HAVE_IPV6)
-			switch(ipv6) {
-			case 0 :
+			switch (ipv6)
+			{
+				case 0:
 #endif /* HAVE_IPV6 */
-				zbx_snprintf(ip, sizeof(ip), "%u.%u.%u.%u",
-						(i & 0xff000000) >> 24,
-						(i & 0x00ff0000) >> 16,
-						(i & 0x0000ff00) >> 8,
-						(i & 0x000000ff));
+					zbx_snprintf(ip, sizeof(ip), "%u.%u.%u.%u",
+							(i & 0xff000000) >> 24,
+							(i & 0x00ff0000) >> 16,
+							(i & 0x0000ff00) >> 8,
+							(i & 0x000000ff));
 #if defined(HAVE_IPV6)
-				break;
-			case 1 :
-				zbx_snprintf(ip, sizeof(ip), "%x:%x:%x:%x:%x:%x:%x:%x",
-						j[0], j[1], j[2], j[3], j[4], j[5],
-						(i & 0xffff0000) >> 16, (i & 0x0000ffff));
-				collapse_ipv6(ip, sizeof(ip));
-				break;
+					break;
+				case 1:
+					zbx_snprintf(ip, sizeof(ip), "%x:%x:%x:%x:%x:%x:%x:%x",
+							j[0], j[1], j[2], j[3], j[4], j[5],
+							(i & 0xffff0000) >> 16, (i & 0x0000ffff));
+					collapse_ipv6(ip, sizeof(ip));
+					break;
 			}
 #endif /* HAVE_IPV6 */
 
