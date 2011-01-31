@@ -1173,11 +1173,31 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 
 	return mysql_fetch_row(result);
 #elif defined(HAVE_ORACLE)
+	sword		rc;
+	static char	errbuf[512];
+	sb4		errcode;
+
 	if (NULL == result)
 		return NULL;
 
-	if (OCI_NO_DATA == OCIStmtFetch(result->stmthp, oracle.errhp, 1, OCI_FETCH_NEXT, OCI_DEFAULT))
+	if (OCI_NO_DATA == (rc = OCIStmtFetch2(result->stmthp, oracle.errhp, 1, OCI_FETCH_NEXT, 0, OCI_DEFAULT)))
 		return NULL;
+
+	if (OCI_SUCCESS == rc)
+		return result->values;
+
+	if (OCI_SUCCESS != (rc = OCIErrorGet((dvoid *)oracle.errhp, (ub4)1, (text *)NULL,
+			&errcode, (text *)errbuf, (ub4)sizeof(errbuf), OCI_HTYPE_ERROR)))
+	{
+		zabbix_errlog(ERR_Z3006, rc, zbx_oci_error(rc));
+		return NULL;
+	}
+
+	if (3114 == errcode)	/* ORA-03114 not connected to ORACLE */
+	{
+		zabbix_errlog(ERR_Z3006, errcode, errbuf);
+		return NULL;
+	}
 
 	return result->values;
 #elif defined(HAVE_POSTGRESQL)

@@ -1,5 +1,6 @@
 Changes for 1.8.5rc1
 
+ - [ZBX-3480] fixed possible crash of server after shutdown of ORACLE server (Sasha)
  - [ZBX-3457] in triggers Wizard, add more that 26 symbols with symbols dublicate (Vlad)
  - [ZBX-983] fixed error when update trigger (Vedmak)
  - [ZBX-974] recompress some images with pngcrush (Richlv)
