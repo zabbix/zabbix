@@ -19,8 +19,11 @@
 
 #include "common.h"
 #include "log.h"
+#include "zbxexec.h"
 
 #include "checks_external.h"
+
+extern char	*CONFIG_EXTERNALSCRIPTS;
 
 /******************************************************************************
  *                                                                            *
@@ -34,102 +37,76 @@
  *                         and result_str (as string)                         *
  *               NOTSUPPORTED - requested item is not supported               *
  *                                                                            *
- * Author: Mike Nestor                                                        *
+ * Author: Mike Nestor, rewritten by Alexander Vladishev                      *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int     get_value_external(DC_ITEM *item, AGENT_RESULT *result)
+int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 {
-	FILE	*fp;
-	char	scriptname[MAX_STRING_LEN];
-	char	key[MAX_STRING_LEN];
-	char	params[MAX_STRING_LEN];
-	char	error[MAX_STRING_LEN];
-	char	cmd[MAX_STRING_LEN];
-	char	msg[MAX_STRING_LEN];
-	char	*p, *p2;
-	int	i;
+	const char	*__function_name = "get_value_external";
+	char		*params = NULL, *command = NULL,
+			*p, *pl, *pr = NULL, error[ITEM_ERROR_LEN_MAX],
+			*buf = NULL;
+	int		ret = SUCCEED;
 
-	int	ret = SUCCEED;
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, item->key_orig);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In get_value_external() key:'%s'", item->key_orig);
-
-	init_result(result);
-
-	strscpy(params, "");
-	strscpy(key, item->key);
-	if((p2=strchr(key,'[')) != NULL)
+	if (NULL != (pl = strchr(item->key, '[')))
 	{
-		*p2=0;
-		strscpy(scriptname,key);
-		zabbix_log( LOG_LEVEL_DEBUG, "DEBUG [%s]",scriptname);
-		*p2='[';
-		p2++;
+		*pl = '\0';
+		params = pl + 1;
 
-		if((p=strchr(p2,']')) != NULL)
-		{
-			*p=0;
-			strscpy(params,p2);
-			zabbix_log( LOG_LEVEL_DEBUG, "params [%s]",params);
-			*p=']';
-			p++;
-		}
+		if (NULL != (pr = strchr(params, ']')))
+			*pr = '\0';
 		else
 		{
-			zbx_snprintf(error, sizeof(error), "External check is not supported. No closing bracket ']' found.");
-			SET_MSG_RESULT(result, strdup(error));
-			return NOTSUPPORTED;
-		}
-	}
-	else
-	{
-		strscpy(scriptname,key);
-	}
-
-	zbx_snprintf(cmd, sizeof(cmd), "%s/%s %s %s",
-			CONFIG_EXTERNALSCRIPTS,
-			scriptname,
-			item->interface.addr,
-			params);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "%s", cmd);
-
-	if (NULL == (fp = popen(cmd, "r")))
-	{
-		zbx_snprintf(error, sizeof(error), "External check is not supported, failed execution");
-		SET_MSG_RESULT(result, strdup(error));
-		return NOTSUPPORTED;
-	}
-
-	/* we only care about the first line */
-	memset(msg,0,sizeof(msg));
-	if(NULL != fgets(msg, sizeof(msg)-1, fp))
-	{
-		for (i = 0; i < MAX_STRING_LEN && msg[i] != 0; ++i)
-		{
-			if (msg[i] == '\n')
-			{
-				msg[i] = 0;
-				break;
-			}
-		}
-		zabbix_log( LOG_LEVEL_DEBUG, "Result [%s]", msg);
-
-		if (SUCCEED != set_result_type(result, item->value_type, item->data_type, msg))
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "External check is not supported."
+						" No closing bracket ']' found."));
 			ret = NOTSUPPORTED;
+			goto exit;
+		}
+	}
+
+	if (NULL != params)
+		command = zbx_dsprintf(command, "%s/%s %s %s",
+				CONFIG_EXTERNALSCRIPTS, item->key, item->interface.addr, params);
+	else
+		command = zbx_dsprintf(command, "%s/%s %s",
+				CONFIG_EXTERNALSCRIPTS, item->key, item->interface.addr);
+
+	if (SUCCEED == zbx_execute(command, &buf, error, sizeof(error)))
+	{
+		/* we only care about the first line */
+		if (NULL != (p = strchr(buf, '\n')))
+			*p = '\0';
+
+		zbx_rtrim(buf, ZBX_WHITESPACE);
+
+		if ('\0' == *buf)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Script returned nothing"));
+			ret = NOTSUPPORTED;
+		}
+		else
+			ret = set_result_type(result, item->value_type, item->data_type, buf);
 	}
 	else
 	{
-		zbx_snprintf(error, sizeof(error), "Script %s/%s returned nothing.",
-			CONFIG_EXTERNALSCRIPTS,
-			scriptname);
-		SET_MSG_RESULT(result, strdup(error));
+		zabbix_log(LOG_LEVEL_DEBUG, "Cannot execute script: %s", error);
+		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
 		ret = NOTSUPPORTED;
 	}
 
-	/* cleanup */
-	pclose(fp);
+	zbx_free(buf);
+	zbx_free(command);
+exit:
+	if (NULL != pl)
+		*pl = '[';
+	if (NULL != pr)
+		*pr = ']';
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }

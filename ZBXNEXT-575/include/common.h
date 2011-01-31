@@ -650,6 +650,7 @@ const char	*zbx_nodetype_string(unsigned char nodetype);
 #define	ZBX_POLLER_TYPE_IPMI		2
 #define	ZBX_POLLER_TYPE_PINGER		3
 #define	ZBX_POLLER_TYPE_COUNT		4	/* number of poller types */
+const char	*zbx_poller_type_string(int poller_type);
 
 #define	GET_SENDER_TIMEOUT	60
 
@@ -660,10 +661,6 @@ const char	*zbx_nodetype_string(unsigned char nodetype);
 #ifndef MIN
 #	define MIN(a, b) ((a) < (b) ? (a) : (b))
 #endif
-
-/* Secure string copy */
-#define strscpy(x, y)		zbx_strlcpy(x, y, sizeof(x))
-#define strnscpy(x, y, n)	zbx_strlcpy(x, y, n);
 
 #define zbx_malloc(old, size)	zbx_malloc2(__FILE__, __LINE__, old, size)
 #define zbx_realloc(src, size)	zbx_realloc2(__FILE__, __LINE__, src, size)
@@ -794,13 +791,13 @@ int	str_in_list(const char *list, const char *value, char delimiter);
 #endif /* HAVE___VA_ARGS__ */
 void	__zbx_zbx_setproctitle(const char *fmt, ...);
 
-#define SEC_PER_MIN 60
-#define SEC_PER_HOUR 3600
-#define SEC_PER_DAY 86400
-#define SEC_PER_WEEK (7 * SEC_PER_DAY)
-#define SEC_PER_MONTH (30 * SEC_PER_DAY)
-#define SEC_PER_YEAR (365 * SEC_PER_DAY)
-#define ZBX_JAN_1970_IN_SEC   2208988800.0        /* 1970 - 1900 in seconds */
+#define SEC_PER_MIN		60
+#define SEC_PER_HOUR		3600
+#define SEC_PER_DAY		86400
+#define SEC_PER_WEEK		(7 * SEC_PER_DAY)
+#define SEC_PER_MONTH		(30 * SEC_PER_DAY)
+#define SEC_PER_YEAR		(365 * SEC_PER_DAY)
+#define ZBX_JAN_1970_IN_SEC	2208988800.0        /* 1970 - 1900 in seconds */
 double	zbx_time();
 void	zbx_timespec(zbx_timespec_t *ts);
 double	zbx_current_time();
@@ -831,6 +828,8 @@ void	__zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_l
 void	zbx_strcpy_alloc(char **str, int *alloc_len, int *offset, const char *src);
 void	zbx_chrcpy_alloc(char **str, int *alloc_len, int *offset, const char src);
 
+/* Secure string copy */
+#define strscpy(x, y)	zbx_strlcpy(x, y, sizeof(x))
 size_t	zbx_strlcpy(char *dst, const char *src, size_t siz);
 size_t	zbx_strlcat(char *dst, const char *src, size_t siz);
 

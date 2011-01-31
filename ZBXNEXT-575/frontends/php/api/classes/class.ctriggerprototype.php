@@ -1010,22 +1010,12 @@ COpt::memoryPick();
 		$result = false;
 
 		if(!isset($object['hostid']) && !isset($object['host'])){
-			$expression = $object['expression'];
-			$expressionData = parseTriggerExpressions($expression, true);
+			$expr = new CTriggerExpression($object);
 
-			if( isset($expressionData[$expression]['errors']) ) {
-				//showExpressionErrors($expression, $expressionData[$expression]['errors']);
-				return false;
-			}
+			if(!empty($expr->errors)) return false;
+			if(empty($expr->data['hosts'])) return false;
 
-			if(!isset($expressionData[$expression]['hosts']) || !is_array($expressionData[$expression]['hosts']) || !count($expressionData[$expression]['hosts'])) {
-				//error(S_TRIGGER_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR);
-				return false;
-			}
-
-			reset($expressionData[$expression]['hosts']);
-			$hData =& $expressionData[$expression]['hosts'][key($expressionData[$expression]['hosts'])];
-			$object['host'] = zbx_substr($expression, $hData['openSymbolNum']+1, $hData['closeSymbolNum']-($hData['openSymbolNum']+1));
+			$object['host'] = reset($expr->data['hosts']);
 		}
 
 		$options = array(
@@ -1077,10 +1067,10 @@ COpt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for trigger'));
 				}
 
-				$expressionData = parseTriggerExpressions($trigger['expression'], true);
+				$expressionData = new CTriggerExpression(array('expression' => $expression));
 
-				if(isset($expressionData[$trigger['expression']]['errors'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData[$trigger['expression']]['errors']);
+				if(!empty($expressionData->errors)){
+					self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->errors);
 				}
 
 				if(CTrigger::exists(array(
@@ -1397,14 +1387,13 @@ COpt::memoryPick();
 
 
 			if($description_changed || $expression_changed){
-				$expressionData = parseTriggerExpressions($expression_full, true);
-				if(isset($expressionData[$expression_full]['errors'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData[$expression_full]['errors']);
+				$expressionData = new CTriggerExpression(array('expression' => $expression_full));
+
+				if(!empty($expressionData->errors)){
+					self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->errors);
 				}
 
-				reset($expressionData[$expression_full]['hosts']);
-				$hData =& $expressionData[$expression_full]['hosts'][key($expressionData[$expression_full]['hosts'])];
-				$host = zbx_substr($expression_full, $hData['openSymbolNum']+1, $hData['closeSymbolNum']-($hData['openSymbolNum']+1));
+				$host = reset($expressionData->data['hosts']);
 
 				$options = array(
 					'filter' => array('description' => $trigger['description'], 'host' => $host),

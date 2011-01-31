@@ -50,12 +50,10 @@
 	define('ZBX_UNITS_ROUNDOFF_UPPER_LIMIT', 2);
 	define('ZBX_UNITS_ROUNDOFF_LOWER_LIMIT', 6);
 
-// this define made for partitioned DB installs!!
+// for partitioned DB installs!!
 	define('ZBX_HISTORY_DATA_UPKEEP',		-1); // in days; -1: disabled, 0: always use trends
 
 /* END OF USERS DEFINES */
-	define('ZAPCAT_COMPATIBILITY', false);
-
 	define('ZBX_FLAG_DISCOVERY_NORMAL', 0x0);
 	define('ZBX_FLAG_DISCOVERY', 0x1);
 	define('ZBX_FLAG_DISCOVERY_CHILD', 0x2);
@@ -699,7 +697,7 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	// define('ZBX_PREG_ITEM_KEY_FORMAT', '('.ZBX_PREG_KEY_NAME.'(\['.ZBX_PREG_PARAMS.'\]){0,1})');
 
 
-	define('ZBX_PREG_FUNCTION_FORMAT', '('.ZBX_PREG_INTERNAL_NAMES.'(\('.ZBX_PREG_PARAMS.'\)))');
+	define('ZBX_PREG_FUNCTION_FORMAT', '([a-z]+(\('.ZBX_PREG_PARAMS.'\)))');
 
 	define('ZBX_PREG_SIMPLE_EXPRESSION_FORMAT','(\{'.ZBX_PREG_HOST_FORMAT.'\:'.ZBX_PREG_ITEM_KEY_FORMAT.'\.'.ZBX_PREG_FUNCTION_FORMAT.'\})');
 	define('ZBX_PREG_MACRO_NAME_FORMAT', '(\{[A-Z\.]+\})');

@@ -479,11 +479,11 @@ include_once('include/page_header.php');
 			if($_REQUEST['hostid'] == 0){
 				$host_list = array();
 				foreach($graph['hosts'] as $host){
-					$host_list[] = $host['host'];
+					$host_list[$host['host']] = $host['host'];
 				}
 
 				foreach($graph['templates'] as $template){
-					$host_list[] = $template['host'];
+					$host_list[$template['host']] = $template['host'];
 				}
 				$host_list = implode(', ', $host_list);
 			}
