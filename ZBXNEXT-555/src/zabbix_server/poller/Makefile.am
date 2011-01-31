@@ -13,5 +13,6 @@ libzbxpoller_a_SOURCES = \
 	checks_ipmi.c checks_ipmi.h \
 	checks_ssh.c checks_ssh.h \
 	checks_telnet.c checks_telnet.h \
+	checks_jmx.c checks_jmx.h \
 	checks_calculated.c checks_calculated.h \
 	poller.c poller.h

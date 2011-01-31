@@ -102,6 +102,7 @@ int	CONFIG_UNREACHABLE_POLLER_FORKS	= 1;
 int	CONFIG_HTTPPOLLER_FORKS		= 1;
 int	CONFIG_IPMIPOLLER_FORKS		= 0;
 int	CONFIG_TRAPPER_FORKS		= 5;
+int	CONFIG_JAVAPOLLER_FORKS		= 0;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
@@ -155,6 +156,9 @@ int	CONFIG_NODEID			= -1;
 int	CONFIG_MASTER_NODEID		= 0;
 int	CONFIG_NODE_NOHISTORY		= 0;
 
+char	*CONFIG_JAVA_PROXY		= NULL;
+int	CONFIG_JAVA_PROXY_PORT		= ZBX_DEFAULT_SERVER_PORT;
+
 char	*CONFIG_SSH_KEY_LOCATION	= NULL;
 
 int	CONFIG_LOG_SLOW_QUERIES		= 0;	/* ms; 0 - disable */
@@ -186,12 +190,12 @@ ZBX_MUTEX	node_sync_access;
  * Comments: will terminate process if parsing fails                          *
  *                                                                            *
  ******************************************************************************/
-void	init_config(void)
+static void	init_config()
 {
 	AGENT_RESULT	result;
 	char		**value = NULL;
 
-	static struct cfg_line cfg[]=
+	static struct cfg_line cfg[] =
 	{
 /*		 PARAMETER	,VAR	,FUNC,	TYPE(0i,1s),MANDATORY,MIN,MAX	*/
 		{"ProxyMode",&CONFIG_PROXYMODE,0,TYPE_INT,PARM_OPT,ZBX_PROXYMODE_ACTIVE,ZBX_PROXYMODE_PASSIVE},
@@ -207,6 +211,10 @@ void	init_config(void)
 		{"StartPollersUnreachable",&CONFIG_UNREACHABLE_POLLER_FORKS,0,TYPE_INT,PARM_OPT,0,255},
 		{"StartIPMIPollers",&CONFIG_IPMIPOLLER_FORKS,0,TYPE_INT,PARM_OPT,0,255},
 		{"StartTrappers",&CONFIG_TRAPPER_FORKS,0,TYPE_INT,PARM_OPT,0,255},
+		{"StartJavaPollers",&CONFIG_JAVAPOLLER_FORKS,0,TYPE_INT,PARM_OPT,0,255},
+
+		{"JavaProxy",&CONFIG_JAVA_PROXY,0,TYPE_STRING,PARM_OPT,0,0},
+		{"JavaProxyPort",&CONFIG_JAVA_PROXY_PORT,0,TYPE_INT,PARM_OPT,1024,32767},
 
 		{"CacheSize",&CONFIG_DBCONFIG_SIZE,0,TYPE_INT,PARM_OPT,128*1024,1024*1024*1024},
 		{"HistoryCacheSize",&CONFIG_HISTORY_CACHE_SIZE,0,TYPE_INT,PARM_OPT,128*1024,1024*1024*1024},
@@ -272,63 +280,65 @@ void	init_config(void)
 	else
 		zbx_process = ZBX_PROCESS_PROXY_ACTIVE;
 
-	if(CONFIG_HOSTNAME == NULL || *CONFIG_HOSTNAME == '\0')
+	if (NULL == CONFIG_HOSTNAME || '\0' == *CONFIG_HOSTNAME)
 	{
-		if(CONFIG_HOSTNAME != NULL)
+		if (NULL != CONFIG_HOSTNAME)
 			zbx_free(CONFIG_HOSTNAME);
 
-	  	if(SUCCEED == process("system.hostname", 0, &result))
+		if (SUCCEED == process("system.hostname", 0, &result))
 		{
-			if( NULL != (value = GET_STR_RESULT(&result)) )
+			if (NULL != (value = GET_STR_RESULT(&result)))
 			{
-				CONFIG_HOSTNAME = strdup(*value);
+				CONFIG_HOSTNAME = zbx_strdup(CONFIG_HOSTNAME, *value);
 				if (strlen(CONFIG_HOSTNAME) > HOST_HOST_LEN)
 					CONFIG_HOSTNAME[HOST_HOST_LEN] = '\0';
 			}
 		}
 	        free_result(&result);
 
-		if(CONFIG_HOSTNAME == NULL)
+		if (NULL == CONFIG_HOSTNAME)
 		{
-			zabbix_log( LOG_LEVEL_CRIT, "Hostname is not defined");
+			zabbix_log(LOG_LEVEL_CRIT, "Hostname is not defined");
 			exit(1);
 		}
 	}
 	else
 	{
-		if(strlen(CONFIG_HOSTNAME) > HOST_HOST_LEN)
+		if (strlen(CONFIG_HOSTNAME) > HOST_HOST_LEN)
 		{
-			zabbix_log( LOG_LEVEL_CRIT, "Hostname too long");
+			zabbix_log(LOG_LEVEL_CRIT, "Hostname too long");
 			exit(1);
 		}
 	}
-	if(CONFIG_DBNAME == NULL)
+
+	if (NULL == CONFIG_DBNAME)
 	{
-		zabbix_log( LOG_LEVEL_CRIT, "DBName not in config file");
+		zabbix_log(LOG_LEVEL_CRIT, "DBName not in config file");
 		exit(1);
 	}
-	if(CONFIG_PID_FILE == NULL)
+
+	if ((NULL == CONFIG_JAVA_PROXY || '\0' == *CONFIG_JAVA_PROXY) && CONFIG_JAVAPOLLER_FORKS > 0)
 	{
-		CONFIG_PID_FILE=strdup("/tmp/zabbix_proxy.pid");
+		zabbix_log(LOG_LEVEL_CRIT, "JavaProxy not in config file or empty");
+		exit(1);
 	}
-	if(CONFIG_TMPDIR == NULL)
-	{
-		CONFIG_TMPDIR=strdup("/tmp");
-	}
-	if(CONFIG_FPING_LOCATION == NULL)
-	{
-		CONFIG_FPING_LOCATION=strdup("/usr/sbin/fping");
-	}
+
+	if (NULL == CONFIG_PID_FILE)
+		CONFIG_PID_FILE = zbx_strdup(CONFIG_PID_FILE, "/tmp/zabbix_proxy.pid");
+
+	if (NULL == CONFIG_TMPDIR)
+		CONFIG_TMPDIR = zbx_strdup(CONFIG_TMPDIR, "/tmp");
+
+	if (NULL == CONFIG_FPING_LOCATION)
+		CONFIG_FPING_LOCATION = zbx_strdup(CONFIG_FPING_LOCATION, "/usr/sbin/fping");
+
 #ifdef HAVE_IPV6
-	if(CONFIG_FPING6_LOCATION == NULL)
-	{
-		CONFIG_FPING6_LOCATION=strdup("/usr/sbin/fping6");
-	}
+	if (NULL == CONFIG_FPING6_LOCATION)
+		CONFIG_FPING6_LOCATION = zbx_strdup(CONFIG_FPING6_LOCATION, "/usr/sbin/fping6");
 #endif /* HAVE_IPV6 */
-	if(CONFIG_EXTERNALSCRIPTS == NULL)
-	{
-		CONFIG_EXTERNALSCRIPTS=strdup("/etc/zabbix/externalscripts");
-	}
+
+	if (NULL == CONFIG_EXTERNALSCRIPTS)
+		CONFIG_EXTERNALSCRIPTS = zbx_strdup(CONFIG_EXTERNALSCRIPTS, "/etc/zabbix/externalscripts");
 }
 
 /******************************************************************************
@@ -376,9 +386,7 @@ int	main(int argc, char **argv)
 	}
 
 	if (NULL == CONFIG_FILE)
-	{
-		CONFIG_FILE=strdup("/etc/zabbix/zabbix_proxy.conf");
-	}
+		CONFIG_FILE = zbx_strdup(CONFIG_FILE, "/etc/zabbix/zabbix_proxy.conf");
 
 	/* Required for simple checks */
 	init_metrics();
@@ -392,7 +400,7 @@ int	main(int argc, char **argv)
 	return daemon_start(CONFIG_ALLOW_ROOT);
 }
 
-int MAIN_ZABBIX_ENTRY(void)
+int	MAIN_ZABBIX_ENTRY()
 {
 	int	i;
 	pid_t	pid;
@@ -465,7 +473,7 @@ int MAIN_ZABBIX_ENTRY(void)
 	threads_num = 1 + CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS + CONFIG_POLLER_FORKS
 			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS
 			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS
-			+ CONFIG_DBSYNCER_FORKS + CONFIG_IPMIPOLLER_FORKS;
+			+ CONFIG_DBSYNCER_FORKS + CONFIG_IPMIPOLLER_FORKS + CONFIG_JAVAPOLLER_FORKS;
 	threads = calloc(threads_num, sizeof(pid_t));
 
 	if (CONFIG_TRAPPER_FORKS > 0)
@@ -480,7 +488,7 @@ int MAIN_ZABBIX_ENTRY(void)
 	for (i = 1; i <= CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS + CONFIG_POLLER_FORKS
 			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS
 			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS
-			+ CONFIG_DBSYNCER_FORKS + CONFIG_IPMIPOLLER_FORKS;
+			+ CONFIG_DBSYNCER_FORKS + CONFIG_IPMIPOLLER_FORKS + CONFIG_JAVAPOLLER_FORKS;
 		i++)
 	{
 		if (0 == (pid = zbx_fork()))
@@ -644,6 +652,24 @@ int MAIN_ZABBIX_ENTRY(void)
 				- CONFIG_TRAPPER_FORKS - CONFIG_PINGER_FORKS
 				- CONFIG_HOUSEKEEPER_FORKS - CONFIG_HTTPPOLLER_FORKS
 				- CONFIG_DISCOVERER_FORKS - CONFIG_DBSYNCER_FORKS);
+	}
+	else if (server_num <= CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS
+			+ CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
+			+ CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS
+			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_HTTPPOLLER_FORKS
+			+ CONFIG_DISCOVERER_FORKS + CONFIG_DBSYNCER_FORKS
+			+ CONFIG_IPMIPOLLER_FORKS + CONFIG_JAVAPOLLER_FORKS)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [Java Poller]",
+				server_num);
+
+		main_poller_loop(zbx_process, ZBX_POLLER_TYPE_JAVA, server_num
+				- CONFIG_CONFSYNCER_FORKS - CONFIG_DATASENDER_FORKS
+				- CONFIG_POLLER_FORKS - CONFIG_UNREACHABLE_POLLER_FORKS
+				- CONFIG_TRAPPER_FORKS - CONFIG_PINGER_FORKS
+				- CONFIG_HOUSEKEEPER_FORKS - CONFIG_HTTPPOLLER_FORKS
+				- CONFIG_DISCOVERER_FORKS - CONFIG_DBSYNCER_FORKS
+				- CONFIG_IPMIPOLLER_FORKS);
 	}
 
 	return SUCCEED;

@@ -136,6 +136,14 @@ ZBX_DC_TELNETITEM;
 typedef struct
 {
 	zbx_uint64_t	itemid;
+	const char	*username;
+	const char	*password;
+}
+ZBX_DC_JMXITEM;
+
+typedef struct
+{
+	zbx_uint64_t	itemid;
 	const char	*params;
 }
 ZBX_DC_CALCITEM;
@@ -152,11 +160,14 @@ typedef struct
 	int		snmp_disable_until;
 	int		ipmi_errors_from;
 	int		ipmi_disable_until;
+	int		jmx_errors_from;
+	int		jmx_disable_until;
 	unsigned char	maintenance_status;
 	unsigned char	maintenance_type;
 	unsigned char	available;
 	unsigned char	snmp_available;
 	unsigned char	ipmi_available;
+	unsigned char	jmx_available;
 	unsigned char	status;
 }
 ZBX_DC_HOST;
@@ -262,6 +273,7 @@ typedef struct
 	zbx_hashset_t		dbitems;
 	zbx_hashset_t		sshitems;
 	zbx_hashset_t		telnetitems;
+	zbx_hashset_t		jmxitems;
 	zbx_hashset_t		calcitems;
 	zbx_hashset_t		hosts;
 	zbx_hashset_t		hosts_ph;	/* proxy_hostid, host */
@@ -348,6 +360,11 @@ static void	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t proxy_hostid,
 				break;
 			*poller_type = ZBX_POLLER_TYPE_IPMI;
 			return;
+		case ITEM_TYPE_JMX:
+			if (0 == CONFIG_JAVAPOLLER_FORKS)
+				break;
+			*poller_type = ZBX_POLLER_TYPE_JAVA;
+			return;
 	}
 
 	*poller_type = ZBX_NO_POLLER;
@@ -390,6 +407,10 @@ static int	DCget_unreachable_nextcheck(const ZBX_DC_ITEM *item, const ZBX_DC_HOS
 			if (0 != host->ipmi_errors_from)
 				return host->ipmi_disable_until;
 			break;
+		case ITEM_TYPE_JMX:
+			if (0 != host->jmx_errors_from)
+				return host->jmx_disable_until;
+			break;
 		default:
 			/* nothing to do */;
 	}
@@ -415,6 +436,10 @@ static int	DCget_disable_until(const ZBX_DC_ITEM *item, const ZBX_DC_HOST *host)
 			if (0 != host->ipmi_errors_from)
 				return host->ipmi_disable_until;
 			break;
+		case ITEM_TYPE_JMX:
+			if (0 != host->jmx_errors_from)
+				return host->jmx_disable_until;
+			break;
 		default:
 			/* nothing to do */;
 	}
@@ -439,6 +464,10 @@ static void	DCincrease_disable_until(const ZBX_DC_ITEM *item, ZBX_DC_HOST *host,
 		case ITEM_TYPE_IPMI:
 			if (0 != host->ipmi_errors_from)
 				host->ipmi_disable_until = now + CONFIG_TIMEOUT;
+			break;
+		case ITEM_TYPE_JMX:
+			if (0 != host->jmx_errors_from)
+				host->jmx_disable_until = now + CONFIG_TIMEOUT;
 			break;
 		default:
 			/* nothing to do */;
@@ -568,6 +597,7 @@ static void	DCsync_items(DB_RESULT result)
 	ZBX_DC_DBITEM		*dbitem;
 	ZBX_DC_SSHITEM		*sshitem;
 	ZBX_DC_TELNETITEM	*telnetitem;
+	ZBX_DC_JMXITEM		*jmxitem;
 	ZBX_DC_CALCITEM		*calcitem;
 
 	ZBX_DC_ITEM_HK		item_hk;
@@ -665,7 +695,9 @@ static void	DCsync_items(DB_RESULT result)
 		old_poller_type = item->poller_type;
 		poller_by_item(itemid, proxy_hostid, item->type, item->key, item->flags, &item->poller_type);
 		if (ZBX_POLLER_TYPE_UNREACHABLE == old_poller_type &&
-				(ZBX_POLLER_TYPE_NORMAL == item->poller_type || ZBX_POLLER_TYPE_IPMI == item->poller_type))
+				(ZBX_POLLER_TYPE_NORMAL == item->poller_type ||
+				ZBX_POLLER_TYPE_IPMI == item->poller_type ||
+				ZBX_POLLER_TYPE_JAVA == item->poller_type))
 			item->poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
 
 		DCupdate_item_queue(item, old_poller_type, old_nextcheck);
@@ -818,6 +850,25 @@ static void	DCsync_items(DB_RESULT result)
 			zbx_hashset_remove(&config->telnetitems, &itemid);
 		}
 
+		/* JMX items */
+
+		if (ITEM_TYPE_JMX == item->type)
+		{
+			jmxitem = DCfind_id(&config->jmxitems, itemid, sizeof(ZBX_DC_JMXITEM), &found);
+
+			DCstrpool_replace(found, &jmxitem->username, row[22]);
+			DCstrpool_replace(found, &jmxitem->password, row[23]);
+		}
+		else if (NULL != (jmxitem = zbx_hashset_search(&config->jmxitems, &itemid)))
+		{
+			/* remove JMX item parameters */
+
+			zbx_strpool_release(jmxitem->username);
+			zbx_strpool_release(jmxitem->password);
+
+			zbx_hashset_remove(&config->jmxitems, &itemid);
+		}
+
 		/* calculated items */
 
 		if (ITEM_TYPE_CALCULATED == item->type)
@@ -936,6 +987,18 @@ static void	DCsync_items(DB_RESULT result)
 			zbx_hashset_remove(&config->telnetitems, &itemid);
 		}
 
+		/* JMX items */
+
+		if (ITEM_TYPE_JMX == item->type)
+		{
+			jmxitem = zbx_hashset_search(&config->jmxitems, &itemid);
+
+			zbx_strpool_release(jmxitem->username);
+			zbx_strpool_release(jmxitem->password);
+
+			zbx_hashset_remove(&config->jmxitems, &itemid);
+		}
+
 		/* calculated items */
 
 		if (ITEM_TYPE_CALCULATED == item->type)
@@ -998,7 +1061,7 @@ static void	DCsync_hosts(DB_RESULT result)
 	{
 		ZBX_STR2UINT64(hostid, row[0]);
 		ZBX_DBROW2UINT64(proxy_hostid, row[1]);
-		status = (unsigned char)atoi(row[19]);
+		status = (unsigned char)atoi(row[22]);
 
 		/* array of selected hosts */
 		zbx_vector_uint64_append(&ids, hostid);
@@ -1037,6 +1100,9 @@ static void	DCsync_hosts(DB_RESULT result)
 			host->ipmi_errors_from = atoi(row[16]);
 			host->ipmi_available = (unsigned char)atoi(row[17]);
 			host->ipmi_disable_until = atoi(row[18]);
+			host->jmx_errors_from = atoi(row[19]);
+			host->jmx_available = (unsigned char)atoi(row[20]);
+			host->jmx_disable_until = atoi(row[21]);
 		}
 
 		/* update host_ph index, if needed */
@@ -1526,7 +1592,8 @@ void	DCsync_configuration()
 				"ipmi_password,maintenance_status,maintenance_type,maintenance_from,"
 				"errors_from,available,disable_until,snmp_errors_from,"
 				"snmp_available,snmp_disable_until,ipmi_errors_from,ipmi_available,"
-				"ipmi_disable_until,status"
+				"ipmi_disable_until,jmx_errors_from,jmx_available,jmx_disable_until,"
+				"status"
 			" from hosts"
 			" where status in (%d,%d,%d)"
 				DB_NODE,
@@ -1621,6 +1688,8 @@ void	DCsync_configuration()
 			config->sshitems.num_data, config->sshitems.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() telnetitems: %d (%d slots)", __function_name,
 			config->telnetitems.num_data, config->telnetitems.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() jmxitems   : %d (%d slots)", __function_name,
+			config->jmxitems.num_data, config->jmxitems.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() calcitems  : %d (%d slots)", __function_name,
 			config->calcitems.num_data, config->calcitems.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts      : %d (%d slots)", __function_name,
@@ -1893,6 +1962,7 @@ void	init_configuration_cache()
 	CREATE_HASHSET(config->dbitems);
 	CREATE_HASHSET(config->sshitems);
 	CREATE_HASHSET(config->telnetitems);
+	CREATE_HASHSET(config->jmxitems);
 	CREATE_HASHSET(config->calcitems);
 	CREATE_HASHSET(config->hosts);
 	CREATE_HASHSET(config->proxies);
@@ -1992,6 +2062,9 @@ static void	DCget_host(DC_HOST *dst_host, const ZBX_DC_HOST *src_host)
 	dst_host->ipmi_errors_from = src_host->ipmi_errors_from;
 	dst_host->ipmi_available = src_host->ipmi_available;
 	dst_host->ipmi_disable_until = src_host->ipmi_disable_until;
+	dst_host->jmx_errors_from = src_host->jmx_errors_from;
+	dst_host->jmx_available = src_host->jmx_available;
+	dst_host->jmx_disable_until = src_host->jmx_disable_until;
 
 	if (NULL != (ipmihost = zbx_hashset_search(&config->ipmihosts, &src_host->hostid)))
 	{
@@ -2078,6 +2151,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 	const ZBX_DC_FLEXITEM		*flexitem;
 	const ZBX_DC_SSHITEM		*sshitem;
 	const ZBX_DC_TELNETITEM		*telnetitem;
+	const ZBX_DC_JMXITEM		*jmxitem;
 	const ZBX_DC_CALCITEM		*calcitem;
 	const ZBX_DC_INTERFACE		*dc_interface;
 
@@ -2104,71 +2178,81 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 		strscpy(dst_item->logtimefmt, logitem->logtimefmt);
 	}
 
-	switch (src_item->type) {
-	case ITEM_TYPE_SNMPv1:
-	case ITEM_TYPE_SNMPv2c:
-	case ITEM_TYPE_SNMPv3:
-		if (NULL != (snmpitem = zbx_hashset_search(&config->snmpitems, &src_item->itemid)))
-		{
-			strscpy(dst_item->snmp_community_orig, snmpitem->snmp_community);
-			strscpy(dst_item->snmp_oid_orig, snmpitem->snmp_oid);
-			strscpy(dst_item->snmpv3_securityname_orig, snmpitem->snmpv3_securityname);
-			dst_item->snmpv3_securitylevel = snmpitem->snmpv3_securitylevel;
-			strscpy(dst_item->snmpv3_authpassphrase_orig, snmpitem->snmpv3_authpassphrase);
-			strscpy(dst_item->snmpv3_privpassphrase_orig, snmpitem->snmpv3_privpassphrase);
-		}
-		break;
-	case ITEM_TYPE_TRAPPER:
-		if (NULL != (trapitem = zbx_hashset_search(&config->trapitems, &src_item->itemid)))
-			strscpy(dst_item->trapper_hosts, trapitem->trapper_hosts);
-		break;
-	case ITEM_TYPE_IPMI:
-		if (NULL != (ipmiitem = zbx_hashset_search(&config->ipmiitems, &src_item->itemid)))
-			strscpy(dst_item->ipmi_sensor, ipmiitem->ipmi_sensor);
-		break;
-	case ITEM_TYPE_DB_MONITOR:
-		if (NULL != (dbitem = zbx_hashset_search(&config->dbitems, &src_item->itemid)))
-		{
-			strscpy(dst_item->params_orig, dbitem->params);
-			dst_item->params = NULL;
-		}
-		break;
-	case ITEM_TYPE_SSH:
-		if (NULL != (sshitem = zbx_hashset_search(&config->sshitems, &src_item->itemid)))
-		{
-			dst_item->authtype = sshitem->authtype;
-			strscpy(dst_item->username_orig, sshitem->username);
-			strscpy(dst_item->publickey_orig, sshitem->publickey);
-			strscpy(dst_item->privatekey_orig, sshitem->privatekey);
-			strscpy(dst_item->password_orig, sshitem->password);
-			strscpy(dst_item->params_orig, sshitem->params);
-			dst_item->username = NULL;
-			dst_item->publickey = NULL;
-			dst_item->privatekey = NULL;
-			dst_item->password = NULL;
-			dst_item->params = NULL;
-		}
-		break;
-	case ITEM_TYPE_TELNET:
-		if (NULL != (telnetitem = zbx_hashset_search(&config->telnetitems, &src_item->itemid)))
-		{
-			strscpy(dst_item->username_orig, telnetitem->username);
-			strscpy(dst_item->password_orig, telnetitem->password);
-			strscpy(dst_item->params_orig, telnetitem->params);
-			dst_item->username = NULL;
-			dst_item->password = NULL;
-			dst_item->params = NULL;
-		}
-		break;
-	case ITEM_TYPE_CALCULATED:
-		if (NULL != (calcitem = zbx_hashset_search(&config->calcitems, &src_item->itemid)))
-		{
-			strscpy(dst_item->params_orig, calcitem->params);
-			dst_item->params = NULL;
-		}
-		break;
-	default:
-		/* nothing to do */;
+	switch (src_item->type)
+	{
+		case ITEM_TYPE_SNMPv1:
+		case ITEM_TYPE_SNMPv2c:
+		case ITEM_TYPE_SNMPv3:
+			if (NULL != (snmpitem = zbx_hashset_search(&config->snmpitems, &src_item->itemid)))
+			{
+				strscpy(dst_item->snmp_community_orig, snmpitem->snmp_community);
+				strscpy(dst_item->snmp_oid_orig, snmpitem->snmp_oid);
+				strscpy(dst_item->snmpv3_securityname_orig, snmpitem->snmpv3_securityname);
+				dst_item->snmpv3_securitylevel = snmpitem->snmpv3_securitylevel;
+				strscpy(dst_item->snmpv3_authpassphrase_orig, snmpitem->snmpv3_authpassphrase);
+				strscpy(dst_item->snmpv3_privpassphrase_orig, snmpitem->snmpv3_privpassphrase);
+			}
+			break;
+		case ITEM_TYPE_TRAPPER:
+			if (NULL != (trapitem = zbx_hashset_search(&config->trapitems, &src_item->itemid)))
+				strscpy(dst_item->trapper_hosts, trapitem->trapper_hosts);
+			break;
+		case ITEM_TYPE_IPMI:
+			if (NULL != (ipmiitem = zbx_hashset_search(&config->ipmiitems, &src_item->itemid)))
+				strscpy(dst_item->ipmi_sensor, ipmiitem->ipmi_sensor);
+			break;
+		case ITEM_TYPE_DB_MONITOR:
+			if (NULL != (dbitem = zbx_hashset_search(&config->dbitems, &src_item->itemid)))
+			{
+				strscpy(dst_item->params_orig, dbitem->params);
+				dst_item->params = NULL;
+			}
+			break;
+		case ITEM_TYPE_SSH:
+			if (NULL != (sshitem = zbx_hashset_search(&config->sshitems, &src_item->itemid)))
+			{
+				dst_item->authtype = sshitem->authtype;
+				strscpy(dst_item->username_orig, sshitem->username);
+				strscpy(dst_item->publickey_orig, sshitem->publickey);
+				strscpy(dst_item->privatekey_orig, sshitem->privatekey);
+				strscpy(dst_item->password_orig, sshitem->password);
+				strscpy(dst_item->params_orig, sshitem->params);
+				dst_item->username = NULL;
+				dst_item->publickey = NULL;
+				dst_item->privatekey = NULL;
+				dst_item->password = NULL;
+				dst_item->params = NULL;
+			}
+			break;
+		case ITEM_TYPE_TELNET:
+			if (NULL != (telnetitem = zbx_hashset_search(&config->telnetitems, &src_item->itemid)))
+			{
+				strscpy(dst_item->username_orig, telnetitem->username);
+				strscpy(dst_item->password_orig, telnetitem->password);
+				strscpy(dst_item->params_orig, telnetitem->params);
+				dst_item->username = NULL;
+				dst_item->password = NULL;
+				dst_item->params = NULL;
+			}
+			break;
+		case ITEM_TYPE_JMX:
+			if (NULL != (jmxitem = zbx_hashset_search(&config->jmxitems, &src_item->itemid)))
+			{
+				strscpy(dst_item->username_orig, jmxitem->username);
+				strscpy(dst_item->password_orig, jmxitem->password);
+				dst_item->username = NULL;
+				dst_item->password = NULL;
+			}
+			break;
+		case ITEM_TYPE_CALCULATED:
+			if (NULL != (calcitem = zbx_hashset_search(&config->calcitems, &src_item->itemid)))
+			{
+				strscpy(dst_item->params_orig, calcitem->params);
+				dst_item->params = NULL;
+			}
+			break;
+		default:
+			/* nothing to do */;
 	}
 
 	dc_interface = zbx_hashset_search(&config->interfaces, &src_item->interfaceid);
@@ -2448,7 +2532,9 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max
 		}
 		else
 		{
-			if (ZBX_POLLER_TYPE_NORMAL == poller_type || ZBX_POLLER_TYPE_IPMI == poller_type)
+			if (ZBX_POLLER_TYPE_NORMAL == poller_type ||
+					ZBX_POLLER_TYPE_IPMI == poller_type ||
+					ZBX_POLLER_TYPE_JAVA == poller_type)
 			{
 				old_poller_type = dc_item->poller_type;
 				dc_item->poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
@@ -2613,7 +2699,9 @@ void	DCrequeue_unreachable_item(zbx_uint64_t itemid)
 			NULL != (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
 	{
 		old_poller_type = dc_item->poller_type;
-		if (ZBX_POLLER_TYPE_NORMAL == dc_item->poller_type || ZBX_POLLER_TYPE_IPMI == dc_item->poller_type)
+		if (ZBX_POLLER_TYPE_NORMAL == dc_item->poller_type ||
+				ZBX_POLLER_TYPE_IPMI == dc_item->poller_type ||
+				ZBX_POLLER_TYPE_JAVA == dc_item->poller_type)
 			dc_item->poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
 
 		old_nextcheck = dc_item->nextcheck;
@@ -2666,6 +2754,14 @@ int	DCconfig_activate_host(DC_ITEM *item)
 			dc_host->ipmi_available = HOST_AVAILABLE_TRUE;
 			dc_host->ipmi_disable_until = 0;
 			break;
+		case ITEM_TYPE_JMX:
+			item->host.jmx_errors_from = dc_host->jmx_errors_from;
+			item->host.jmx_available = dc_host->jmx_available;
+			item->host.jmx_disable_until = dc_host->jmx_disable_until;
+			dc_host->jmx_errors_from = 0;
+			dc_host->jmx_available = HOST_AVAILABLE_TRUE;
+			dc_host->jmx_disable_until = 0;
+			break;
 		default:
 			goto unlock;
 	}
@@ -2717,6 +2813,14 @@ int	DCconfig_deactivate_host(DC_ITEM *item, int now)
 			errors_from = &dc_host->ipmi_errors_from;
 			available = &dc_host->ipmi_available;
 			disable_until = &dc_host->ipmi_disable_until;
+			break;
+		case ITEM_TYPE_JMX:
+			item->host.jmx_errors_from = dc_host->jmx_errors_from;
+			item->host.jmx_available = dc_host->jmx_available;
+			item->host.jmx_disable_until = dc_host->jmx_disable_until;
+			errors_from = &dc_host->jmx_errors_from;
+			available = &dc_host->jmx_available;
+			disable_until = &dc_host->jmx_disable_until;
 			break;
 		default:
 			goto unlock;

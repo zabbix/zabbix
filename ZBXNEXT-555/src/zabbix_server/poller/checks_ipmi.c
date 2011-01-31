@@ -29,19 +29,24 @@
 #include <OpenIPMI/ipmi_sdr.h>
 #include <OpenIPMI/ipmi_msgbits.h>
 
-typedef struct zbx_ipmi_sensor {
+typedef struct
+{
 	ipmi_sensor_t		*sensor;
 	char			*s_name;
 	double			value;
-} zbx_ipmi_sensor_t;
+}
+zbx_ipmi_sensor_t;
 
-typedef struct zbx_ipmi_control {
+typedef struct
+{
 	ipmi_control_t		*control;
 	char			*c_name;
 	int			*val, num_values;
-} zbx_ipmi_control_t;
+}
+zbx_ipmi_control_t;
 
-typedef struct zbx_ipmi_host {
+typedef struct zbx_ipmi_host_s
+{
 	char			*ip;
 	int			port;
 	int			authtype;
@@ -56,8 +61,9 @@ typedef struct zbx_ipmi_host {
 	int			domain_up, done;
 	char			*err;
 	int			ret;
-	struct zbx_ipmi_host	*next;
-} zbx_ipmi_host_t;
+	struct zbx_ipmi_host_s	*next;
+}
+zbx_ipmi_host_t;
 
 static zbx_ipmi_host_t	*hosts = NULL;
 static os_handler_t	*os_hnd;
@@ -1098,7 +1104,8 @@ int	set_ipmi_control_value(DC_ITEM *item, int value, char *error, size_t error_m
 	h = init_ipmi_host(item->interface.addr, item->interface.port, item->host.ipmi_authtype,
 			item->host.ipmi_privilege, item->host.ipmi_username, item->host.ipmi_password);
 
-	if (0 == h->domain_up) {
+	if (0 == h->domain_up)
+	{
 		if (NULL != h->err)
 		{
 			zbx_strlcpy(error, h->err, error_max_len);

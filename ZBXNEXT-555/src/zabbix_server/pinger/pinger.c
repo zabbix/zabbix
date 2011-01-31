@@ -34,12 +34,12 @@ static int	poller_type;
 static int	poller_num;
 
 /*some defines so the `fping' and `fping6' could successfully process pings*/
-#define 	MIN_COUNT		1
-#define 	MAX_COUNT		10000
-#define 	MIN_INTERVAL		20
-#define		MIN_SIZE		24
-#define		MAX_SIZE		65507
-#define		MIN_TIMEOUT		50
+#define MIN_COUNT	1
+#define MAX_COUNT	10000
+#define MIN_INTERVAL	20
+#define MIN_SIZE	24
+#define MAX_SIZE	65507
+#define MIN_TIMEOUT	50
 /*end some defines*/
 
 #define MAX_ITEMS	128
@@ -147,9 +147,9 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 					case ICMPPINGSEC:
 						switch (items[i].type)
 						{
-							case ICMPPINGSEC_MIN : value_dbl = hosts[h].min; break;
-							case ICMPPINGSEC_MAX : value_dbl = hosts[h].max; break;
-							case ICMPPINGSEC_AVG : value_dbl = hosts[h].avg; break;
+							case ICMPPINGSEC_MIN: value_dbl = hosts[h].min; break;
+							case ICMPPINGSEC_MAX: value_dbl = hosts[h].max; break;
+							case ICMPPINGSEC_AVG: value_dbl = hosts[h].avg; break;
 						}
 						process_value(items[i].itemid, NULL, &value_dbl, ts, ping_result, error);
 						break;

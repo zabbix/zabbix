@@ -242,7 +242,7 @@ void    *zbx_malloc2(const char *filename, int line, void *old, size_t size)
  *                                                                            *
  * Function: zbx_realloc2                                                     *
  *                                                                            *
- * Purpose: changes the size of the memory block pointed to by src            *
+ * Purpose: changes the size of the memory block pointed to by old            *
  *          to size bytes                                                     *
  *                                                                            *
  * Parameters:                                                                *
@@ -254,7 +254,7 @@ void    *zbx_malloc2(const char *filename, int line, void *old, size_t size)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void    *zbx_realloc2(const char *filename, int line, void *src, size_t size)
+void    *zbx_realloc2(const char *filename, int line, void *old, size_t size)
 {
 	int	max_attempts;
 	void	*ptr = NULL;
@@ -262,7 +262,7 @@ void    *zbx_realloc2(const char *filename, int line, void *src, size_t size)
 	for (
 		max_attempts = 10, size = MAX(size, 1);
 		max_attempts > 0 && NULL == ptr;
-		ptr = realloc(src, size), max_attempts--
+		ptr = realloc(old, size), max_attempts--
 	);
 
 	if (NULL != ptr)
@@ -2242,13 +2242,16 @@ unsigned char	get_interface_type_by_item_type(unsigned char type)
 {
 	switch (type)
 	{
+		case ITEM_TYPE_ZABBIX:
+			return INTERFACE_TYPE_AGENT;
 		case ITEM_TYPE_SNMPv1:
 		case ITEM_TYPE_SNMPv2c:
 		case ITEM_TYPE_SNMPv3:
 			return INTERFACE_TYPE_SNMP;
 		case ITEM_TYPE_IPMI:
 			return INTERFACE_TYPE_IPMI;
-		case ITEM_TYPE_ZABBIX:
+		case ITEM_TYPE_JMX:
+			return INTERFACE_TYPE_JMX;
 		default:
 			return INTERFACE_TYPE_AGENT;
 	}
