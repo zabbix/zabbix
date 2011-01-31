@@ -3245,7 +3245,7 @@ return $caption;
  * Comments:
  *
  */
-	function build_expression_html_tree($expression, &$treeLevel, $level, &$next, &$nextletter) {
+	function build_expression_html_tree($expression, &$treeLevel, $level, &$next, &$nextletter, &$secondLetters=null) {
 		$treeList = Array();
 		$outline = '';
 		$expr = Array();
@@ -3263,7 +3263,7 @@ return $caption;
 
 			if(count($parts) == 1 && $sStart == $fPart['openSymbolNum'] && $sEnd == $fPart['closeSymbolNum']) {
 				$next[$level] = false;
-				list($outline, $treeList) = build_expression_html_tree($expression, $fPart, $level, $next, $nextletter);
+				list($outline, $treeList) = build_expression_html_tree($expression, $fPart, $level, $next, $nextletter, $secondLetters);
 				$outline = (isset($treeLevel['openSymbol']) && $treeLevel['levelType'] == 'grouping' ? $treeLevel['openSymbol'].' ' : '').$outline.(isset($treeLevel['closeSymbol'])  && $treeLevel['levelType'] == 'grouping' ? ' '.$treeLevel['closeSymbol'] : '');
 				return Array($outline, $treeList);
 			}
@@ -3330,7 +3330,7 @@ return $caption;
 
 //					SDI('>>>>>>>>>>>>>>>>>>>newTreeLevel parts count:'.(isset($newTreeLevel['parts']) ? count($newTreeLevel['parts']) : 0));
 					$next[$level] = is_int($prev) && $prev < $sEnd ? true : false;
-					list($outln, $treeLst) = build_expression_html_tree($expression, $newTreeLevel, $level+1, $next, $nextletter);
+					list($outln, $treeLst) = build_expression_html_tree($expression, $newTreeLevel, $level+1, $next, $nextletter, $secondLetters);
 					$treeList = array_merge($treeList, $treeLst);
 					$levelOutline .= trim($outln).(is_int($prev) && $prev < $sEnd ? ' '.$operand.' ':'');
 //					SDI("After {$treeLevel['levelType']} parts:".(isset($treeLevel['parts']) ? count($treeLevel['parts']): 0));
@@ -3343,7 +3343,6 @@ return $caption;
 			if(!$nextletter) $nextletter = 'A';
 
 			if ($nextletter > 'Z'){
-				global $secondLetters;
 				if(!$secondLetters) $secondLetters = 'AA';
 				if($secondLetters[1] > 'Z'){
 					$secondLetters[1] = 'A';
@@ -3366,13 +3365,15 @@ return $caption;
 				$url = new CSpan($expValue);
 			}
 			$expr[] = $url;
-			$outline = ($secondLetters[1] == 'A'?"&nbsp;\r\n":' ').$newch.' ';
-			if(isset($secondLetters)){
+			$glue = '';
+			if(isset($secondLetters[1])){
+				$glue = ($secondLetters[1] == 'A'?"&nbsp;\r\n":' ');
 				$secondLetters[1] = chr(ord($secondLetters[1])+1);
 			}
 			else{
 				$nextletter = chr(ord($nextletter)+1);
 			}
+			$outline = $glue.$newch.' ';
 
 			$levelDetails = Array(
 					'start' => $treeLevel['openSymbolNum'],
