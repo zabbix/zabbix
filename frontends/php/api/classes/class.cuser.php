@@ -316,10 +316,10 @@ Copt::memoryPick();
 // Adding Objects
 		if(!is_null($options['get_access'])){
 			foreach($result as $userid => $user){
-				$result[$userid] += array('api_access' => 0, 'gui_access' => 0, 'debug_mode' => 0, 'users_status' => 0);
+				$result[$userid] += array('gui_access' => 0, 'debug_mode' => 0, 'users_status' => 0);
 			}
 
-			$sql = 'SELECT ug.userid, MAX(g.api_access) as api_access,  MAX(g.gui_access) as gui_access,
+			$sql = 'SELECT ug.userid,  MAX(g.gui_access) as gui_access,
 						MAX(g.debug_mode) as debug_mode, MAX(g.users_status) as users_status'.
 					' FROM usrgrp g, users_groups ug '.
 					' WHERE '.DBcondition('ug.userid', $userids).
