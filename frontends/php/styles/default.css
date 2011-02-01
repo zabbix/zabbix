@@ -85,7 +85,7 @@ img.borderless	{	border-width: 0; vertical-align: bottom;	}
 a.highlight 		{	font-weight: bold; }
 a.highlight:link 	{ 	color: #ffffff; text-decoration: none; }
 a.highlight:visited {	color: #ffffff; text-decoration: none; }
-a.highlight:hover	{	color: #ffcc00; }
+a.highlight:hover	{	color: #ffcc00 !important; }
 
 a.small_font:link	{	color: #000000;	text-decoration: none; }
 a.small_font:visited{	color: #000000;	text-decoration: none; }
