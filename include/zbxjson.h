@@ -32,6 +32,7 @@
 #define ZBX_PROTO_TAG_HOST		"host"
 #define ZBX_PROTO_TAG_INFO		"info"
 #define ZBX_PROTO_TAG_IP		"ip"
+#define ZBX_PROTO_TAG_DNS		"dns"
 #define ZBX_PROTO_TAG_KEY		"key"
 #define ZBX_PROTO_TAG_KEY_ORIG		"key_orig"
 #define ZBX_PROTO_TAG_LOGLASTSIZE	"lastlogsize"
