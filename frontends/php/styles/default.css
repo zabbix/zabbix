@@ -145,7 +145,7 @@ form .thin .input{ height: 14px; }
 	font-family: Verdana, arial, helvetica, sans-serif;
 	border: 1px solid gray;
 	background-color: white;
-	margin: 1px 2px 0 2px;
+	margin: 0px 2px 0 2px;
 }
 .input:focus { border-color: black; }
 .input:hover { border-color: black; }
