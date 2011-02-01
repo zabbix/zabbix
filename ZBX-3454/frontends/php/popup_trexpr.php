@@ -266,34 +266,35 @@
 
 	check_fields($fields);
 
-
 	if(isset($_REQUEST['expression']) && $_REQUEST['dstfld1'] == 'expr_temp'){
 		$_REQUEST['expression'] = utf8RawUrlDecode($_REQUEST['expression']);
 
-		// Code review: try to get maximum info using trigger expression parser (it is tested and works)
-		// the rest of the info can be fetched using regexp
-		$expr = new CTriggerExpression(array('expression' => $_REQUEST['expression']));
-		SDII($expr);
+		$trigExpr = new CTriggerExpression(array('expression' => $_REQUEST['expression']));
 
-		preg_match('/\{([a-zA-Z_0-9- ]+):(.*)\.([a-z]+)\(([0-9]+)([,]{0,1})([0-9]{0,})\)\}([=><#]{1})([0-9]+)/', $_REQUEST['expression'], $match);
-		if(isset($match[3]) && isset($match[7])) $_REQUEST['expr_type'] = $match[3].'['.$match[7].']';
-		if(isset($match[4]) && isset($match[6])) $_REQUEST['param'] = array($match[4], $match[6]);
-		if(isset($match[4])) $_REQUEST['paramtype'] = 0;
-		if(isset($match[8])) $_REQUEST['value'] = $match[8];
+		if(empty($trigExpr->errors) && !empty($trigExpr->expressions)){
+			preg_match('/\}([=><#]{1})([0-9]+)$/', $_REQUEST['expression'], $match);
+			$exprSymbols = $match;
+			$expr = reset($trigExpr->expressions);
+			if(isset($expr['functionName']) && isset($exprSymbols[1])) $_REQUEST['expr_type'] = $expr.'['.$exprSymbols[1].']';
+			if(isset($expr['functionParamList'])){
+				$_REQUEST['param'] = $expr['functionParamList'];
+				$_REQUEST['paramtype'] = 0;
+			}
+			if(isset($exprSymbols[2])) $_REQUEST['value'] = $exprSymbols[2];
+			if(isset($expr['host']) && isset($expr['item'])){
+				$_REQUEST['description'] = $expr['host'] .':'. $expr['item'];
+				$options = array(
+						'filter' => array('host' => $expr['host'], 'key_' => $expr['item']),
+						'output'=>API_OUTPUT_EXTEND,
+						'webitems' => 1,
+				);
 
-		if(isset($match[1]) && isset($match[2])){
-			$_REQUEST['description'] = $match[1] .':'. $match[2];
-			$options = array(
-				'output' => API_OUTPUT_SHORTEN,
-			);
-
-			// Code review: this function is depricated! Use  CItem::get() instead
-			$myItem = CItem::getObjects(array('host' => $match[1], 'key_' => $match[2]));
-			$myItem = reset($myItem);
-			if(isset($myItem['itemid'])) $_REQUEST['itemid'] = $myItem['itemid'];
+				$myItem = CItem::get($options);
+				$myItem = reset($myItem);
+				if(isset($myItem['itemid'])) $_REQUEST['itemid'] = $myItem['itemid'];
+			}
 		}
 	}
-
 
 	$expr_type	= get_request('expr_type', 'last[=]');
 	if(preg_match('/^([a-z]+)\[(['.implode('',array_keys($operators)).'])\]$/i', $expr_type, $expr_res)){
