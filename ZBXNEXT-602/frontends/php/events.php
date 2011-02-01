@@ -28,6 +28,7 @@ require_once('include/html.inc.php');
 
 if(isset($_REQUEST['csv_export'])){
 	$CSV_EXPORT = true;
+	$csvRows = array();
 
 	$page['type'] = detect_page_type(PAGE_TYPE_CSV);
 	$page['file'] = 'zbx_events_export.csv';
@@ -344,15 +345,13 @@ include_once('include/page_header.php');
 			));
 
 			if($CSV_EXPORT){
-				$csv_return = '';
 
-				$tbHeader = array(
+				$csvRows[] = array(
 					S_TIME,
 					S_IP,
 					S_DESCRIPTION,
 					S_STATUS
 				);
-				$csv_return .= zbx_toCSV($tbHeader);
 			}
 
 			foreach($dsc_events as $num => $event_data){
@@ -392,13 +391,12 @@ include_once('include/page_header.php');
 				));
 
 				if($CSV_EXPORT){
-					$tbHeader = array(
+					$csvRows[] = array(
 						zbx_date2str(S_EVENTS_DISCOVERY_TIME_FORMAT,$event_data['clock']),
 						$event_data['object_data']['ip'],
 						$event_data['description'],
 						discovery_value($event_data['value'])
 					);
-					$csv_return .= zbx_toCSV($tbHeader);
 				}
 
 
@@ -420,8 +418,6 @@ include_once('include/page_header.php');
 
 
 			if($CSV_EXPORT){
-				$csvRows = array();
-
 				$csvRows[] = array(
 					S_TIME,
 					is_show_all_nodes()?S_NODE:null,
