@@ -698,7 +698,7 @@ COpt::memoryPick();
 			$duplicates = array();
 			foreach($actions as $anum => $action){
 				if(!check_db_fields($action_db_fields, $action))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorret parameter is used for action "%s"', $action['name']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect parameter is used for action "%s"', $action['name']));
 
 				if(isset($action['esc_period']) && ($action['esc_period'] < 60) && ($action['esc_period'] != 0))
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" has incorrect value for "esc_period" (minimal: 60, infinitely: 0).', $action['name']));

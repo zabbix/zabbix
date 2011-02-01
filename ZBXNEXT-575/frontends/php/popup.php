@@ -426,6 +426,10 @@ include_once('include/page_header.php');
 ?>
 <?php
 
+	insert_js_function('addSelectedValues');
+	insert_js_function('addValues');
+	insert_js_function('addValue');
+
 	if($srctbl == 'hosts'){
 		$table = new CTableInfo(S_NO_HOSTS_DEFINED);
 		$table->setHeader(array(S_HOST,S_DNS,S_IP,S_PORT,S_STATUS,S_AVAILABILITY));
@@ -555,10 +559,6 @@ include_once('include/page_header.php');
 		$form->setName('groupform');
 		$form->setAttribute('id', 'groups');
 
-		insert_js_function('addSelectedValues');
-		insert_js_function('addValues');
-		insert_js_function('addValue');
-
 		$table = new CTableInfo(S_NO_GROUPS_DEFINED);
 		$table->setHeader(array(
 			($multiselect ? new CCheckBox("all_groups", NULL, "javascript: checkAll('".$form->getName()."', 'all_groups','groups');") : null),
@@ -616,10 +616,6 @@ include_once('include/page_header.php');
 		$form = new CForm();
 		$form->setName('tplform');
 		$form->setAttribute('id', 'templates');
-
-		insert_js_function('addSelectedValues');
-		insert_js_function('addValues');
-		insert_js_function('addValue');
 
 		$table = new CTableInfo(S_NO_TEMPLATES_DEFINED);
 		$table->setHeader(array(
@@ -705,10 +701,6 @@ include_once('include/page_header.php');
 		$form->setName('usrgrpform');
 		$form->setAttribute('id', 'usrgrps');
 
-		insert_js_function('addSelectedValues');
-		insert_js_function('addValues');
-		insert_js_function('addValue');
-
 		$table = new CTableInfo(S_NO_GROUPS_DEFINED);
 		$table->setHeader(array(
 			($multiselect ? new CCheckBox("all_usrgrps", NULL, "javascript: checkAll('".$form->getName()."', 'all_usrgrps','usrgrps');") : null),
@@ -762,10 +754,6 @@ include_once('include/page_header.php');
 		$form = new CForm();
 		$form->setName('userform');
 		$form->setAttribute('id', 'users');
-
-		insert_js_function('addSelectedValues');
-		insert_js_function('addValues');
-		insert_js_function('addValue');
 
 		$table = new CTableInfo(S_NO_USERS_DEFINED);
 		$table->setHeader(array(
@@ -847,10 +835,6 @@ include_once('include/page_header.php');
 		$form->setAttribute('id', 'triggers');
 
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
-
-		insert_js_function('addSelectedValues');
-		insert_js_function('addValues');
-		insert_js_function('addValue');
 
 		$table->setHeader(array(
 			($multiselect ? new CCheckBox("all_triggers", NULL, "javascript: checkAll('".$form->getName()."', 'all_triggers','triggers');") : null),
@@ -950,10 +934,6 @@ include_once('include/page_header.php');
 
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
 
-		insert_js_function('addSelectedValues');
-		insert_js_function('addValues');
-		insert_js_function('addValue');
-
 		$header = array(
 			($hostid>0)?null:S_HOST,
 			($multiselect ? new CCheckBox("all_items", NULL, "javascript: checkAll('".$form->getName()."', 'all_items','items');") : null),
@@ -1049,10 +1029,6 @@ include_once('include/page_header.php');
 		$form->setAttribute('id', 'items');
 
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
-
-		insert_js_function('addSelectedValues');
-		insert_js_function('addValues');
-		insert_js_function('addValue');
 
 		if($multiselect)
 			$header = array(
@@ -1181,10 +1157,6 @@ include_once('include/page_header.php');
 
 		$table = new CTableInfo(S_NO_GRAPHS_DEFINED);
 
-		insert_js_function('addSelectedValues');
-		insert_js_function('addValues');
-		insert_js_function('addValue');
-
 		if($multiselect)
 			$header = array(
 				array(new CCheckBox("all_graphs", NULL, "javascript: checkAll('".$form->getName()."', 'all_graphs','graphs');"), S_DESCRIPTION),
@@ -1280,10 +1252,6 @@ include_once('include/page_header.php');
 
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
 
-		insert_js_function('addSelectedValues');
-		insert_js_function('addValues');
-		insert_js_function('addValue');
-
 		if($multiselect)
 			$header = array(
 				($hostid>0)?null:S_HOST,
@@ -1376,10 +1344,6 @@ include_once('include/page_header.php');
 		$form->setAttribute('id', 'sysmaps');
 
 		$table = new CTableInfo(S_NO_MAPS_DEFINED);
-
-		insert_js_function('addSelectedValues');
-		insert_js_function('addValues');
-		insert_js_function('addValue');
 
 		if($multiselect)
 			$header = array(array(new CCheckBox("all_sysmaps", NULL, "javascript: checkAll('".$form->getName()."', 'all_sysmaps','sysmaps');"), S_NAME));
@@ -1502,10 +1466,6 @@ include_once('include/page_header.php');
 
 		$table = new CTableInfo(S_NO_SLIDES_DEFINED);
 
-		insert_js_function('addSelectedValues');
-		insert_js_function('addValues');
-		insert_js_function('addValue');
-
 		if($multiselect)
 			$header = array(
 				array(new CCheckBox("all_slides", NULL, "javascript: checkAll('".$form->getName()."', 'all_slides','slides');"), S_NAME),
@@ -1566,10 +1526,6 @@ include_once('include/page_header.php');
 		$form->setAttribute('id', 'screens');
 
 		$table = new CTableInfo(S_NO_SCREENS_DEFINED);
-
-		insert_js_function('addSelectedValues');
-		insert_js_function('addValues');
-		insert_js_function('addValue');
 
 		if($multiselect)
 			$header = array(
