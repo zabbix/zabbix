@@ -1531,11 +1531,13 @@ COpt::memoryPick();
 		self::validateDependencies($triggers);
 
 		foreach($triggers as $tnum => $trigger){
-			foreach($trigger['dependencies'] as $triggerid_up){
-				DB::insert('trigger_depends', array(
-					'triggerid_down' => $triggerid,
-					'triggerid_up' => $triggerid_up
-				));
+			if (isset($trigger['dependencies'])){
+				foreach($trigger['dependencies'] as $triggerid_up){
+					DB::insert('trigger_depends', array(
+						'triggerid_down' => $triggerid,
+						'triggerid_up' => $triggerid_up
+					));
+				}
 			}
 		}
 
@@ -1558,6 +1560,9 @@ COpt::memoryPick();
 
 			if(isset($trigger['description']) && (strcmp($dbTrigger['description'], $trigger['description']) != 0)){
 				$description_changed = true;
+			}
+			else{
+				$trigger['description'] = $dbTrigger['description'];
 			}
 
 			$expression_full = explode_exp($dbTrigger['expression'], 0);
@@ -1623,10 +1628,9 @@ COpt::memoryPick();
 				'where' => array('triggerid='.$trigger['triggerid'])
 			));
 
-			$description = isset($trigger['description']) ? $trigger['description'] : $dbTrigger['description'];
 			$expression = isset($trigger['expression']) ? $trigger['expression'] : explode_exp($dbTrigger['expression'], false);
 			$trigger['expression'] = $expression;
-			info(_s('Trigger [%1$s:%2$s] updated.', $description, $expression));
+			info(_s('Trigger [%1$s:%2$s] updated.', $trigger['description'], $expression));
 		}
 		unset($trigger);
 
@@ -1685,7 +1689,7 @@ COpt::memoryPick();
 		foreach($chd_hosts as $chd_host){
 			$newTrigger = $trigger;
 
-			if(!is_null($trigger['dependencies']))
+			if(isset($trigger['dependencies']) && !is_null($trigger['dependencies']))
 				$newTrigger['dependencies'] = replace_template_dependencies($trigger['dependencies'], $chd_host['hostid']);
 
 			$newTrigger['templateid'] = $trigger['triggerid'];
@@ -1844,6 +1848,7 @@ COpt::memoryPick();
 					}
 					$up_triggerids[] = $up_trigger['triggerid_up'];
 				}
+				$triggerid_down = $up_triggerids;
 			} while(!empty($up_triggerids));
 // }}} check circelar dependency
 

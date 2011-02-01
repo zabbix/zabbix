@@ -14,6 +14,9 @@ New features:
  - [ZBX-3338] updated Ukrainian translation; thanks to zalex_ua (Richlv)
 
 Bug fixes:
+ - [ZBX-3477] fixed deletion of discovery rules without item prototypes (Vemdak)
+ - [ZBX-3328] data exported from 1.8.x now can be successfully imported to 2.0 (KB)
+ - [ZBX-3470] table user_groups is now updated only if necessary, when user details are saved (KB)
  - [ZBX-1819] fixed templated listed twice for graphs if host filter is set to all (Vedmak)
  - [ZBX-3442] fixed gui config "first selected" and "event ack" dropdowns (Vedmak)
  - [ZBX-3329] fixed shown last value as "0" in frontend for items that have never been updated (Aly)
@@ -74,6 +77,10 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
 
+ - [ZBX-3480] fixed possible crash of server after shutdown of ORACLE server (Sasha)
+ - [ZBX-3457] in triggers Wizard, add more that 26 symbols with symbols dublicate (Vlad)
+ - [ZBX-3446] fixed possible hang of pollers - added timeout handler for external scripts (Sasha)
+ - [ZBX-3461] fixed names of IPMI pollers in debug output and the number of items they take (asaveljevs)
  - [ZBX-3100] fixed messages in popup when no proxies or discovery checks defined (Vedmak)
  - [ZBX-3138] fixed bug when disabling application, webitems were disabled too (Vedmak)
  - [ZBX-2951] made interval hidden for trapper items (Vedmak)

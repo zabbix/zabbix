@@ -2,6 +2,7 @@ ALTER TABLE config MODIFY configid DEFAULT NULL;
 ALTER TABLE config MODIFY alert_usrgrpid DEFAULT NULL;
 ALTER TABLE config MODIFY alert_usrgrpid NULL;
 ALTER TABLE config MODIFY discovery_groupid DEFAULT NULL;
+ALTER TABLE config MODIFY default_theme nvarchar2(128) DEFAULT 'css_ob.css' NOT NULL;
 ALTER TABLE config ADD ns_support number(10) DEFAULT '0' NOT NULL;
 UPDATE config SET alert_usrgrpid=NULL WHERE NOT alert_usrgrpid IN (SELECT usrgrpid FROM usrgrp);
 UPDATE config SET discovery_groupid=NULL WHERE NOT discovery_groupid IN (SELECT groupid FROM groups);

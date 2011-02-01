@@ -329,7 +329,7 @@ COpt::memoryPick();
 			);
 			$db_webchecks = self::get($options);
 			foreach($db_webchecks as $webcheck){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenarion [%s] already exists.', $webcheck['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario [%s] already exists.', $webcheck['name']));
 			}
 
 
