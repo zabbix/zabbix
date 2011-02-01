@@ -407,7 +407,7 @@ button.ui-button-icon-only { width: 2.4em; } /* button elements seem to need a l
 button.ui-button-icons-only { width: 3.7em; } 
 
 /*button text element */
-.darkorange .ui-button .ui-button-text { display: block; line-height: 0.9;  }
+.darkorange .ui-button .ui-button-text { display: block; line-height: 1.0; }
 .darkorange .ui-button-text-only .ui-button-text { padding: .4em 1em; }
 .darkorange .ui-button-icon-only .ui-button-text, .darkorange .ui-button-icons-only .ui-button-text { padding: .4em; text-indent: -9999999px; }
 .darkorange .ui-button-text-icon-primary .ui-button-text, .darkorange .ui-button-text-icons .ui-button-text { padding: .4em 1em .4em 2.1em; }
