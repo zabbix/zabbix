@@ -24,6 +24,6 @@
 
 extern int	CONFIG_PINGER_FORKS;
 
-void	main_pinger_loop(int num);
+void	main_pinger_loop(unsigned char poller_num);
 
 #endif

@@ -552,7 +552,7 @@ int	MAIN_ZABBIX_ENTRY(void)
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [Poller. SNMP:"SNMP_FEATURE_STATUS"]",
 				server_num);
 
-		main_poller_loop(ZBX_PROCESS_SERVER, ZBX_POLLER_TYPE_NORMAL, server_num
+		main_poller_loop(ZBX_POLLER_TYPE_NORMAL, server_num
 				- CONFIG_DBCONFIG_FORKS);
 	}
 	else if (server_num <= CONFIG_DBCONFIG_FORKS + CONFIG_POLLER_FORKS
@@ -565,7 +565,7 @@ int	MAIN_ZABBIX_ENTRY(void)
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [Poller for unreachable hosts. SNMP:"SNMP_FEATURE_STATUS"]",
 				server_num);
 
-		main_poller_loop(ZBX_PROCESS_SERVER, ZBX_POLLER_TYPE_UNREACHABLE, server_num
+		main_poller_loop(ZBX_POLLER_TYPE_UNREACHABLE, server_num
 				- CONFIG_DBCONFIG_FORKS - CONFIG_POLLER_FORKS);
 	}
 	else if (server_num <= CONFIG_DBCONFIG_FORKS + CONFIG_POLLER_FORKS
@@ -701,7 +701,7 @@ int	MAIN_ZABBIX_ENTRY(void)
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [IPMI Poller]",
 				server_num);
 
-		main_poller_loop(ZBX_PROCESS_SERVER, ZBX_POLLER_TYPE_IPMI, server_num
+		main_poller_loop(ZBX_POLLER_TYPE_IPMI, server_num
 				- CONFIG_DBCONFIG_FORKS - CONFIG_POLLER_FORKS
 				- CONFIG_UNREACHABLE_POLLER_FORKS - CONFIG_TRAPPER_FORKS
 				- CONFIG_PINGER_FORKS - CONFIG_ALERTER_FORKS

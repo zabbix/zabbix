@@ -30,8 +30,7 @@
 #include "pinger.h"
 #include "dbcache.h"
 
-static int	poller_type;
-static int	poller_num;
+static unsigned char	poller_type;
 
 /*some defines so the `fping' and `fping6' could successfully process pings*/
 #define 	MIN_COUNT		1
@@ -497,18 +496,17 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count)
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-void	main_pinger_loop(int num)
+void	main_pinger_loop(unsigned char poller_num)
 {
-	int			now, nextcheck, sleeptime;
+	int			now, sleeptime;
 	double			sec;
 	static icmpitem_t	*items = NULL;
 	static int		items_alloc = 4;
 	int			items_count = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In main_pinger_loop() num:%d", num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In main_pinger_loop() poller_num:%d", (int)poller_num);
 
 	poller_type = ZBX_POLLER_TYPE_PINGER;
-	poller_num = num - 1;
 
 	if (NULL == items)
 		items = zbx_malloc(items, sizeof(icmpitem_t) * items_alloc);
@@ -525,22 +523,11 @@ void	main_pinger_loop(int num)
 		process_pinger_hosts(items, items_count);
 		sec = zbx_time() - sec;
 
-		if (FAIL == (nextcheck = DCconfig_get_poller_nextcheck(poller_type)))
-			sleeptime = POLLER_DELAY;
-		else
-		{
-			sleeptime = nextcheck - time(NULL);
-			if (sleeptime < 0)
-				sleeptime = 0;
-			else if (sleeptime > POLLER_DELAY)
-				sleeptime = POLLER_DELAY;
-		}
+		sleeptime = DCconfig_get_poller_sleeptime(poller_type);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Pinger spent " ZBX_FS_DBL " seconds while processing %d items."
-				" Nextcheck after %d sec.",
-				sec,
-				items_count,
-				sleeptime);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while updating %d values."
+				" Sleeping for %d seconds",
+				zbx_poller_type_string(poller_type), (int)poller_num, sec, items_count, sleeptime);
 
 		free_hosts(&items, &items_count);
 

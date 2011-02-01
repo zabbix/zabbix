@@ -632,7 +632,7 @@ const char	*zbx_permission_string(int perm);
 #define	ZBX_POLLER_TYPE_IPMI		2
 #define	ZBX_POLLER_TYPE_PINGER		3
 #define	ZBX_POLLER_TYPE_COUNT		4	/* number of poller types */
-const char	*zbx_poller_type_string(int poller_type);
+const char	*zbx_poller_type_string(unsigned char poller_type);
 
 #define	GET_SENDER_TIMEOUT	60
 

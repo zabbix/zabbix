@@ -2512,7 +2512,7 @@ const char	*zbx_permission_string(int perm)
 	}
 }
 
-const char	*zbx_poller_type_string(int poller_type)
+const char	*zbx_poller_type_string(unsigned char poller_type)
 {
 	switch (poller_type)
 	{
