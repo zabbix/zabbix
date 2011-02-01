@@ -51,7 +51,7 @@ include_once 'include/page_header.php';
 			'nodeids' => get_current_nodeid(true)
 		);
 
-		$db_data = CTrigger::get($options);
+		$db_data = API::Trigger()->get($options);
 		if(empty($db_data)) access_deny();
 	}
 ?>

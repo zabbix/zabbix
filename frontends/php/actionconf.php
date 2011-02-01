@@ -110,7 +110,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 //--------
 
 	if(isset($_REQUEST['actionid'])){
-		$aa = CAction::get(array('actionids' => $_REQUEST['actionid'], 'editable' => 1));
+		$aa = API::Action()->get(array('actionids' => $_REQUEST['actionid'], 'editable' => 1));
 		if(empty($aa)){
 			access_deny();
 		}
@@ -162,11 +162,11 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		if(isset($_REQUEST['actionid'])){
 			$action['actionid']= $_REQUEST['actionid'];
 
-			$result = CAction::update($action);
+			$result = API::Action()->update($action);
 			show_messages($result,S_ACTION_UPDATED,S_CANNOT_UPDATE_ACTION);
 		}
 		else{
-			$result = CAction::create($action);
+			$result = API::Action()->create($action);
 			show_messages($result,S_ACTION_ADDED,S_CANNOT_ADD_ACTION);
 		}
 
@@ -182,7 +182,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 			access_deny();
 
-		$result = CAction::delete($_REQUEST['actionid']);
+		$result = API::Action()->delete($_REQUEST['actionid']);
 
 		show_messages($result,S_ACTION_DELETED,S_CANNOT_DELETE_ACTION);
 		if($result){
@@ -309,7 +309,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		if(!count($nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 			access_deny();
 
-		$go_result = CAction::delete($_REQUEST['g_actionid']);
+		$go_result = API::Action()->delete($_REQUEST['g_actionid']);
 		show_messages($go_result,_('Selected actions deleted.'),_('Cannot delete selected actions.'));
 	}
 
@@ -346,7 +346,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 				'select_conditions' => API_OUTPUT_EXTEND,
 				'output' => API_OUTPUT_EXTEND
 			);
-			$actions = CAction::get($options);
+			$actions = API::Action()->get($options);
 			$action = reset($actions);
 
 			$frmAction->addVar('actionid', $_REQUEST['actionid']);
@@ -933,14 +933,14 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 					if($new_operation['object'] == OPERATION_OBJECT_GROUP) {
 						$object_srctbl = 'usrgrp';
 						$object_srcfld1 = 'usrgrpid';
-						$object_name = CUserGroup::get(array('usrgrpids' => $new_operation['objectid'], 'output' => API_OUTPUT_EXTEND));
+						$object_name = API::UserGroup()->get(array('usrgrpids' => $new_operation['objectid'], 'output' => API_OUTPUT_EXTEND));
 						$object_name = reset($object_name);
 						$display_name = 'name';
 					}
 					else {
 						$object_srctbl = 'users';
 						$object_srcfld1 = 'userid';
-						$object_name = CUser::get(array('userids' => $new_operation['objectid'], 'output' => API_OUTPUT_EXTEND));
+						$object_name = API::User()->get(array('userids' => $new_operation['objectid'], 'output' => API_OUTPUT_EXTEND));
 						$object_name = reset($object_name);
 						$display_name = 'alias';
 					}
@@ -1295,7 +1295,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
-		$actions = CAction::get($options);
+		$actions = API::Action()->get($options);
 
 // sorting && paging
 		order_result($actions, $sortfield, $sortorder);

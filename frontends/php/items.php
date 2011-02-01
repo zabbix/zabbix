@@ -230,7 +230,7 @@ switch($itemType) {
 			'output' => API_OUTPUT_SHORTEN,
 			'editable' => 1
 		);
-		$item = CItem::get($options);
+		$item = API::Item()->get($options);
 		if(empty($item)) access_deny();
 	}
 	else if(get_request('hostid', 0) > 0){
@@ -240,7 +240,7 @@ switch($itemType) {
 			'templated_hosts' => 1,
 			'editable' => 1
 		);
-		$hosts = CHost::get($options);
+		$hosts = API::Host()->get($options);
 		if(empty($hosts)) access_deny();
 	}
 ?>
@@ -330,9 +330,9 @@ switch($itemType) {
 	}
 
 	if(isset($_REQUEST['filter_host']) && !zbx_empty($_REQUEST['filter_host'])){
-		$hostid = CHost::getObjects(array('host' => $_REQUEST['filter_host']));
+		$hostid = API::Host()->getObjects(array('host' => $_REQUEST['filter_host']));
 		if(empty($hostid))
-			$hostid = CTemplate::getObjects(array('host' => $_REQUEST['filter_host']));
+			$hostid = API::Template()->getObjects(array('host' => $_REQUEST['filter_host']));
 
 		$hostid = reset($hostid);
 
@@ -369,7 +369,7 @@ switch($itemType) {
 	else if(isset($_REQUEST['delete'])&&isset($_REQUEST['itemid'])){
 		$result = false;
 		if($item = get_item_by_itemid($_REQUEST['itemid'])){
-			$result = CItem::delete($_REQUEST['itemid']);
+			$result = API::Item()->delete($_REQUEST['itemid']);
 		}
 
 		show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
@@ -397,7 +397,7 @@ switch($itemType) {
 		DBstart();
 
 		if(!zbx_empty($_REQUEST['new_application'])){
-			$new_appid = CApplication::create(array(
+			$new_appid = API::Application()->create(array(
 				'name' => $_REQUEST['new_application'],
 				'hostid' => $_REQUEST['form_hostid']
 			));
@@ -453,12 +453,12 @@ switch($itemType) {
 			}
 
 			$item['itemid'] = $_REQUEST['itemid'];
-			$result = CItem::update($item);
+			$result = API::Item()->update($item);
 
 			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 		}
 		else{
-			$result = CItem::create($item);
+			$result = API::Item()->create($item);
 			show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 		}
 
@@ -548,7 +548,7 @@ switch($itemType) {
 		DBstart();
 		foreach($_REQUEST['group_itemid'] as $id){
 			$item['itemid'] = $id;
-			$result = CItem::update($item);
+			$result = API::Item()->update($item);
 			if(!$result) break;
 		}
 		$result = DBend($result);
@@ -766,7 +766,7 @@ switch($itemType) {
 
 		$go_result &= !empty($group_itemid);
 		if($go_result) {
-			$go_result = CItem::delete($group_itemid);
+			$go_result = API::Item()->delete($group_itemid);
 		}
 		show_messages($go_result, S_ITEMS_DELETED, S_CANNOT_DELETE_ITEMS);
 	}
@@ -904,7 +904,7 @@ switch($itemType) {
 		if($preFilter == $afterFilter)
 			$items = array();
 		else
-			$items = CItem::get($options);
+			$items = API::Item()->get($options);
 
 // Header Host
 		if($hostid > 0){

@@ -246,7 +246,7 @@ class CMap extends CZBXAPI{
 						'output' => API_OUTPUT_SHORTEN,
 						'preservekeys' => 1,
 					);
-					$all_triggers = CTrigger::get($trig_options);
+					$all_triggers = API::Trigger()->get($trig_options);
 					foreach($link_triggers as $id => $triggerid){
 						if(!isset($all_triggers[$triggerid])){
 								unset($result[$id], $sysmapids[$id]);
@@ -296,7 +296,7 @@ class CMap extends CZBXAPI{
 						'preservekeys' => 1,
 						'output' => API_OUTPUT_SHORTEN,
 					);
-				$allowed_hosts = CHost::get($host_options);
+				$allowed_hosts = API::Host()->get($host_options);
 
 					foreach($hosts_to_check as $elementid){
 						if(!isset($allowed_hosts[$elementid])){
@@ -317,7 +317,7 @@ class CMap extends CZBXAPI{
 						'preservekeys' => 1,
 						'output' => API_OUTPUT_SHORTEN,
 					);
-					$allowed_maps = self::get($map_options);
+					$allowed_maps = $this->get($map_options);
 
 					foreach($maps_to_check as $elementid){
 						if(!isset($allowed_maps[$elementid])){
@@ -338,7 +338,7 @@ class CMap extends CZBXAPI{
 						'preservekeys' => 1,
 						'output' => API_OUTPUT_SHORTEN,
 					);
-					$allowed_triggers = CTrigger::get($trigger_options);
+					$allowed_triggers = API::Trigger()->get($trigger_options);
 
 					foreach($triggers_to_check as $elementid){
 						if(!isset($allowed_triggers[$elementid])){
@@ -359,7 +359,7 @@ class CMap extends CZBXAPI{
 						'preservekeys' => 1,
 						'output' => API_OUTPUT_SHORTEN,
 					);
-					$allowed_host_groups = CHostGroup::get($hostgroup_options);
+					$allowed_host_groups = API::HostGroup()->get($hostgroup_options);
 
 					foreach($host_groups_to_check as $elementid){
 						if(!isset($allowed_host_groups[$elementid])){
@@ -404,7 +404,7 @@ COpt::memoryPick();
 				while($map_url = DBfetch($db_map_urls)){
 					foreach($selements as $snum => $selement){
 						if(($selement['sysmapid'] == $map_url['sysmapid']) && ($selement['elementtype'] == $map_url['elementtype'])){
-							$selements[$snum]['urls'][] = self::expandUrlMacro($map_url, $selement);
+							$selements[$snum]['urls'][] = $this->expandUrlMacro($map_url, $selement);
 						}
 					}
 				}
@@ -418,7 +418,7 @@ COpt::memoryPick();
 				if(is_null($options['expand_urls']))
 					$selements[$selement_url['selementid']]['urls'][] = $selement_url;
 				else
-				$selements[$selement_url['selementid']]['urls'][] = self::expandUrlMacro($selement_url, $selements[$selement_url['selementid']]);
+				$selements[$selement_url['selementid']]['urls'][] = $this->expandUrlMacro($selement_url, $selements[$selement_url['selementid']]);
 			}
 
 			foreach($selements as $num => $selement){
@@ -497,7 +497,7 @@ COpt::memoryPick();
 		else if(isset($sysmapData['nodeids']))
 			$options['nodeids'] = $sysmapData['nodeids'];
 
-		$result = self::get($options);
+		$result = $this->get($options);
 
 	return $result;
 	}
@@ -516,7 +516,7 @@ COpt::memoryPick();
 		else if(isset($object['nodeids']))
 			$options['nodeids'] = $object['nodeids'];
 
-		$objs = self::get($options);
+		$objs = $this->get($options);
 
 	return !empty($objs);
 	}
@@ -544,7 +544,7 @@ COpt::memoryPick();
 				'output' => 'extend',
 				'nopermissions' => 1
 			);
-			$db_maps = self::get($options);
+			$db_maps = $this->get($options);
 			foreach($db_maps as $dbmnum => $db_map){
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_MAP.' [ '.$db_map['name'].' ] '.S_ALREADY_EXISTS_SMALL);
 			}
@@ -558,7 +558,7 @@ COpt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for map');
 				}
 
-				if(self::exists(array('name' => $map['name']))){
+				if($this->exists(array('name' => $map['name']))){
 					self::exception(ZBX_API_ERROR_PARAMETERS,'Map [ '.$map['name'].' ] already exists.');
 				}
 
@@ -595,7 +595,7 @@ COpt::memoryPick();
 			DB::insert('sysmap_url', $insert_urls);
 
 			if(!empty($data_elements))
-				self::addElements($data_elements);
+				$this->addElements($data_elements);
 
 			return array('sysmapids' => $sysmapids);
 	}
@@ -622,7 +622,7 @@ COpt::memoryPick();
 				'preservekeys' => 1,
 				'output' => API_OUTPUT_EXTEND,
 			);
-			$db_sysmaps = self::get($options);
+			$db_sysmaps = $this->get($options);
 			foreach($maps as $map){
 				if(!isset($db_sysmaps[$map['sysmapid']])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Map with ID ['.$map['sysmapid'].'] does not exist');
@@ -641,7 +641,7 @@ COpt::memoryPick();
 						'editable' => 1,
 						'nopermissions' => 1
 					);
-					$map_exists = self::get($options);
+					$map_exists = $this->get($options);
 					$map_exist = reset($map_exists);
 
 					if($map_exist && ($map_exist['sysmapid'] != $map['sysmapid'])){
@@ -724,7 +724,7 @@ COpt::memoryPick();
 				'editable' => 1,
 				'preservekeys' => 1
 			);
-			$del_sysmaps = self::get($options);
+			$del_sysmaps = $this->get($options);
 			foreach($sysmapids as $snum => $sysmapid){
 				if(!isset($del_sysmaps[$sysmapid]))
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -806,7 +806,7 @@ COpt::memoryPick();
 				'preservekeys' => 1,
 				'output' => API_OUTPUT_SHORTEN,
 			);
-			$upd_maps = self::get($options);
+			$upd_maps = $this->get($options);
 
 			foreach($selements as $snumm => $selement){
 				if(!isset($upd_maps[$selement['sysmapid']])){
@@ -876,7 +876,7 @@ COpt::memoryPick();
 				'select_selements' => API_OUTPUT_EXTEND,
 				'output' => API_OUTPUT_SHORTEN,
 			);
-			$upd_maps = self::get($options);
+			$upd_maps = $this->get($options);
 
 			foreach($selements as $snumm => $selement){
 				if(!isset($upd_maps[$selement['sysmapid']])){
@@ -964,7 +964,7 @@ COpt::memoryPick();
 				'preservekeys' => 1,
 				'output' => API_OUTPUT_SHORTEN,
 			);
-			$upd_maps = self::get($options);
+			$upd_maps = $this->get($options);
 
 			foreach($selements as $snumm => $selement){
 				if(!isset($upd_maps[$selement['sysmapid']])){

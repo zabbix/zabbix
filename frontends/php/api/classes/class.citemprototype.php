@@ -376,7 +376,7 @@ COpt::memoryPick();
 					'nopermissions' => 1,
 					'preservekeys' => 1
 				);
-				$hosts = CHost::get($obj_params);
+				$hosts = API::Host()->get($obj_params);
 
 				foreach($hosts as $hostid => $host){
 					$hitems = $host['items'];
@@ -386,7 +386,7 @@ COpt::memoryPick();
 					}
 				}
 
-				$templates = CTemplate::get($obj_params);
+				$templates = API::Template()->get($obj_params);
 				foreach($templates as $templateid => $template){
 					$titems = $template['items'];
 					unset($template['items']);
@@ -408,7 +408,7 @@ COpt::memoryPick();
 
 			if(in_array($options['select_triggers'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['select_triggers'];
-				$triggers = CTrigger::get($obj_params);
+				$triggers = API::Trigger()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($triggers, 'name');
 				foreach($triggers as $triggerid => $trigger){
@@ -430,7 +430,7 @@ COpt::memoryPick();
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$triggers = CTrigger::get($obj_params);
+				$triggers = API::Trigger()->get($obj_params);
 
 				$triggers = zbx_toHash($triggers, 'parent_itemid');
 				foreach($result as $itemid => $item){
@@ -450,7 +450,7 @@ COpt::memoryPick();
 				'itemids' => $itemids,
 				'preservekeys' => 1
 			);
-			$applications = CApplication::get($obj_params);
+			$applications = API::Application()->get($obj_params);
 			foreach($applications as $applicationid => $application){
 				$aitems = $application['items'];
 				unset($application['items']);
@@ -471,7 +471,7 @@ COpt::memoryPick();
 
 			if(in_array($options['select_graphs'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['select_graphs'];
-				$graphs = CGraph::get($obj_params);
+				$graphs = API::Graph()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($graphs, 'name');
 				foreach($graphs as $graphid => $graph){
@@ -493,7 +493,7 @@ COpt::memoryPick();
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$graphs = CGraph::get($obj_params);
+				$graphs = API::Graph()->get($obj_params);
 
 				$graphs = zbx_toHash($graphs, 'parent_itemid');
 				foreach($result as $itemid => $item){
@@ -529,7 +529,7 @@ COpt::memoryPick();
 		else if(isset($object['nodeids']))
 			$options['nodeids'] = $object['nodeids'];
 
-		$objs = self::get($options);
+		$objs = $this->get($options);
 
 		return !empty($objs);
 	}
@@ -538,7 +538,7 @@ COpt::memoryPick();
 // permissions
 		if($update){
 			$item_db_fields = array('itemid'=> null);
-			$dbItems = self::get(array(
+			$dbItems = $this->get(array(
 				'output' => API_OUTPUT_EXTEND,
 				'itemids' => zbx_objectValues($items, 'itemid'),
 				'editable' => 1,
@@ -547,7 +547,7 @@ COpt::memoryPick();
 		}
 		else{
 			$item_db_fields = array('description'=>null, 'key_'=>null, 'hostid'=>null);
-			$dbHosts = CHost::get(array(
+			$dbHosts = API::Host()->get(array(
 				'hostids' => zbx_objectValues($items, 'hostid'),
 				'templated_hosts' => 1,
 				'editable' => 1,
@@ -712,18 +712,18 @@ COpt::memoryPick();
 	public function create($items){
 		$items = zbx_toArray($items);
 
-			self::checkInput($items);
+			$this->checkInput($items);
 
-			self::createReal($items);
+			$this->createReal($items);
 
-			self::inherit($items);
+			$this->inherit($items);
 
 			return array('itemids' => zbx_objectValues($items, 'itemid'));
 	}
 
 	protected function createReal(&$items){
 		foreach($items as $key => $item){
-			$itemsExists = CItem::get(array(
+			$itemsExists = API::Item()->get(array(
 				'output' => API_OUTPUT_SHORTEN,
 				'filter' => array(
 					'hostid' => $item['hostid'],
@@ -766,7 +766,7 @@ COpt::memoryPick();
 		}
 
 // TODO: REMOVE info
-		$itemHosts = self::get(array(
+		$itemHosts = $this->get(array(
 			'itemids' => $itemids,
 			'output' => array('key_'),
 			'selectHosts' => array('host'),
@@ -783,7 +783,7 @@ COpt::memoryPick();
 
 		$data = array();
 		foreach($items as $inum => $item){
-			$itemsExists = CItem::get(array(
+			$itemsExists = API::Item()->get(array(
 				'output' => API_OUTPUT_SHORTEN,
 				'filter' => array(
 					'hostid' => $item['hostid'],
@@ -822,7 +822,7 @@ COpt::memoryPick();
 		}
 
 // TODO: REMOVE info
-		$itemHosts = self::get(array(
+		$itemHosts = $this->get(array(
 			'itemids' => $itemids,
 			'output' => array('key_'),
 			'selectHosts' => array('host'),
@@ -843,11 +843,11 @@ COpt::memoryPick();
 	public function update($items){
 		$items = zbx_toArray($items);
 
-			self::checkInput($items, true);
+			$this->checkInput($items, true);
 
-			self::updateReal($items);
+			$this->updateReal($items);
 
-			self::inherit($items);
+			$this->inherit($items);
 
 			return array('itemids' => zbx_objectValues($items, 'itemid'));
 	}
@@ -870,7 +870,7 @@ COpt::memoryPick();
 				'preservekeys' => 1,
 				'output' => API_OUTPUT_EXTEND,
 			);
-			$del_itemPrototypes = self::get($options);
+			$del_itemPrototypes = $this->get($options);
 
 // TODO: remove $nopermissions hack
 			if(!$nopermissions){
@@ -902,7 +902,7 @@ COpt::memoryPick();
 				'nopermissions' => true,
 				'preservekeys' => true,
 			);
-			$del_itemPrototypes_childs = self::get($options);
+			$del_itemPrototypes_childs = $this->get($options);
 
 			$del_itemPrototypes = array_merge($del_itemPrototypes, $del_itemPrototypes_childs);
 			$prototypeids = array_merge($prototypeids, $child_prototypeids);
@@ -915,29 +915,29 @@ COpt::memoryPick();
 			while($item = DBfetch($db_items)){
 				$created_items[$item['itemid']] = $item['itemid'];
 			}
-			$result = CItem::delete($created_items, true);
+			$result = API::Item()->delete($created_items, true);
 			if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete item prototype');
 
 
 // GRAPH PROTOTYPES
-			$del_graphPrototypes = CGraphPrototype::get(array(
+			$del_graphPrototypes = API::GraphPrototype()->get(array(
 				'itemids' => $prototypeids,
 				'output' => API_OUTPUT_SHORTEN,
 				'nopermissions' => true,
 				'preservekeys' => true,
 			));
-			$result = CGraphPrototype::delete(zbx_objectValues($del_graphPrototypes, 'graphid'), true);
+			$result = API::GraphPrototype()->delete(zbx_objectValues($del_graphPrototypes, 'graphid'), true);
 			if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete graph prototype');
 
 
 // TRIGGER PROTOTYPES
-			$del_triggerPrototypes = CTriggerPrototype::get(array(
+			$del_triggerPrototypes = API::TriggerPrototype()->get(array(
 				'itemids' => $prototypeids,
 				'output' => API_OUTPUT_SHORTEN,
 				'nopermissions' => true,
 				'preservekeys' => true,
 			));
-			$result = CTriggerPrototype::delete(zbx_objectValues($del_triggerPrototypes, 'triggerid'), true);
+			$result = API::TriggerPrototype()->delete(zbx_objectValues($del_triggerPrototypes, 'triggerid'), true);
 			if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete trigger prototype');
 
 
@@ -990,7 +990,7 @@ COpt::memoryPick();
 				'templated_hosts' => 1,
 				'output' => API_OUTPUT_SHORTEN
 			);
-			$allowedHosts = CHost::get($options);
+			$allowedHosts = API::Host()->get($options);
 			foreach($data['hostids'] as $hostid){
 				if(!isset($allowedHosts[$hostid])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -1001,7 +1001,7 @@ COpt::memoryPick();
 				'preservekeys' => 1,
 				'output' => API_OUTPUT_SHORTEN
 			);
-			$allowedTemplates = CTemplate::get($options);
+			$allowedTemplates = API::Template()->get($options);
 			foreach($data['templateids'] as $templateid){
 				if(!isset($allowedTemplates[$templateid])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -1014,13 +1014,13 @@ COpt::memoryPick();
 				'select_applications' => API_OUTPUT_REFER,
 				'output' => API_OUTPUT_EXTEND,
 			);
-			$items = self::get($options);
+			$items = $this->get($options);
 
 			foreach($items as $inum => $item){
 				$items[$inum]['applications'] = zbx_objectValues($item['applications'], 'applicationid');
 			}
 
-			self::inherit($items, $data['hostids']);
+			$this->inherit($items, $data['hostids']);
 
 			return true;
 	}
@@ -1030,7 +1030,7 @@ COpt::memoryPick();
 
 		$items = zbx_toHash($items, 'itemid');
 
-		$chdHosts = CHost::get(array(
+		$chdHosts = API::Host()->get(array(
 			'templateids' => zbx_objectValues($items, 'hostid'),
 			'hostids' => $hostids,
 			'output' => array('hostid', 'host'),
@@ -1054,7 +1054,7 @@ COpt::memoryPick();
 //----
 
 // check existing items to decide insert or update
-			$exItems = self::get(array(
+			$exItems = $this->get(array(
 				'output' => array('itemid', 'key_', 'flags', 'templateid'),
 				'hostids' => $hostid,
 				'filter' => array('flags' => null),
@@ -1114,12 +1114,12 @@ COpt::memoryPick();
 			$insertItems[$rule['itemid']]['ruleid'] = $rule['ruleid'];
 		}
 
-		self::createReal($insertItems);
-		self::updateReal($updateItems);
+		$this->createReal($insertItems);
+		$this->updateReal($updateItems);
 
 		$inheritedItems = array_merge($insertItems, $updateItems);
 
-		self::inherit($inheritedItems);
+		$this->inherit($inheritedItems);
 	}
 }
 ?>

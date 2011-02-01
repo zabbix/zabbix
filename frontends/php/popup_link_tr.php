@@ -63,7 +63,7 @@ include_once('include/page_header.php');
 					'output' => API_OUTPUT_EXTEND
 				);
 
-			$dbTriggers = CTrigger::get($options);
+			$dbTriggers = API::Trigger()->get($options);
 			order_result($dbTriggers, 'description');
 
 			foreach($dbTriggers as $tnum => $trigger){
@@ -110,7 +110,7 @@ include_once('include/page_header.php');
 					'output' => API_OUTPUT_EXTEND
 				);
 
-			$triggers = CTrigger::get($options);
+			$triggers = API::Trigger()->get($options);
 			order_result($triggers, 'description');
 		}
 		$triggerids = zbx_objectValues($triggers, 'triggerid');
@@ -149,7 +149,7 @@ include_once('include/page_header.php');
 		if(empty($triggers)) $trList->setAttribute('style', 'width: 300px;');
 
 		foreach($triggers as $tnum => $trigger){
-			$dbTriggers = CTrigger::get($options);
+			$dbTriggers = API::Trigger()->get($options);
 			order_result($dbTriggers, 'description');
 
 			$host = reset($trigger['hosts']);
@@ -202,7 +202,7 @@ function addLinkTriggers(mapid,triggers,drawtype,color){
 
 		window.opener.ZBX_SYSMAPS[mapid].map.form_link_addLinktrigger(linktrigger);
 	}
-	
+
 	window.close();
 
 return true;

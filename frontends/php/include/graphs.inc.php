@@ -346,7 +346,7 @@
  *
  */
 	function copy_graph_to_host($graphid, $hostid){
-		$graphs = CGraph::get(array(
+		$graphs = API::Graph()->get(array(
 			'graphids' => $graphid,
 			'output' => API_OUTPUT_EXTEND,
 			'select_graph_items' => API_OUTPUT_EXTEND
@@ -363,7 +363,7 @@
 
 		$graph['gitems'] = $new_gitems;
 
-		$result = CGraph::create($graph);
+		$result = API::Graph()->create($graph);
 
 	return $result;
 	}

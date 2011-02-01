@@ -54,7 +54,7 @@ set_time_limit(10);
 		'select_links' => API_OUTPUT_EXTEND,
 		'output' => API_OUTPUT_EXTEND
 	);
-	$maps = CMap::get($options);
+	$maps = API::Map()->get($options);
 
 	if(empty($maps)) access_deny();
 	else $map = reset($maps);

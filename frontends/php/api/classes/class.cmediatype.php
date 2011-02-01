@@ -296,7 +296,7 @@ Copt::memoryPick();
 				'mediatypeids' => $mediatypeids,
 				'preservekeys' => 1
 			);
-			$users = CUser::get($obj_params);
+			$users = API::User()->get($obj_params);
 			foreach($users as $userid => $user){
 				$umediatypes = $user['mediatypes'];
 				unset($user['mediatypes']);
@@ -358,7 +358,7 @@ Copt::memoryPick();
 					'filter' => array('description' => $mediatype['description']),
 					'output' => API_OUTPUT_EXTEND
 				);
-				$mediatype_exist = self::get($options);
+				$mediatype_exist = $this->get($options);
 				if(!empty($mediatype_exist)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_MEDIATYPE_ALREADY_EXISTS . ' ' . $mediatype_exist[0]['description']);
 				}
@@ -408,7 +408,7 @@ Copt::memoryPick();
 						'preservekeys' => 1,
 						'output' => API_OUTPUT_SHORTEN,
 					);
-					$exist_mediatypes = self::get($options);
+					$exist_mediatypes = $this->get($options);
 					$exist_mediatype = reset($exist_mediatypes);
 
 					if($exist_mediatype && ($exist_mediatype['mediatypeid'] != $mediatype['mediatypeid']))
@@ -465,7 +465,7 @@ Copt::memoryPick();
 				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1,
 			);
-			$actions = CAction::get($options);
+			$actions = API::Action()->get($options);
 			if(!empty($actions)){
 				$action = reset($actions);
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_MEDIATYPE_USED_BY_ACTIONS . ' ' . $action['name']);

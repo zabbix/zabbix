@@ -81,7 +81,7 @@ include_once('include/page_header.php');
 			'editable' => 1,
 			'output' => API_OUTPUT_EXTEND,
 		);
-		$maps = CMap::get($options);
+		$maps = API::Map()->get($options);
 
 		if(empty($maps)) access_deny();
 		else $sysmap = reset($maps);
@@ -99,14 +99,14 @@ include_once('include/page_header.php');
 			'select_links' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND
 		);
-		$sysmaps = CMap::get($options);
+		$sysmaps = API::Map()->get($options);
 
 		$options = array(
 			'sysmapids' => zbx_objectValues($sysmaps, 'sysmapid'),
 			'output' => API_OUTPUT_EXTEND,
 			'select_image' => 1
 		);
-		$images = CImage::get($options);
+		$images = API::Image()->get($options);
 
 
 		prepareMapExport($sysmaps);
@@ -169,7 +169,7 @@ include_once('include/page_header.php');
 		if(isset($_REQUEST['sysmapid'])){
 // TODO check permission by new value.
 			$map['sysmapid'] = $_REQUEST['sysmapid'];
-			$result = CMap::update($map);
+			$result = API::Map()->update($map);
 
 			add_audit_if($result, AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP, 'Name ['.$_REQUEST['name'].']');
 			show_messages($result, S_MAP_UPDATED, S_CANNOT_UPDATE_MAP);
@@ -178,7 +178,7 @@ include_once('include/page_header.php');
 			if(!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY)))
 				access_deny();
 
-			$result = CMap::create($map);
+			$result = API::Map()->create($map);
 
 			add_audit_if($result, AUDIT_ACTION_ADD,AUDIT_RESOURCE_MAP, 'Name ['.$_REQUEST['name'].']');
 			show_messages($result, S_MAP_ADDED,S_CANNOT_ADD_MAP);
@@ -193,8 +193,8 @@ include_once('include/page_header.php');
 			$sysmapids[] = $_REQUEST['sysmapid'];
 		}
 
-		$maps = CMap::get(array('sysmapids' => $sysmapids, 'output' => API_OUTPUT_EXTEND, 'editable => 1'));
-		$go_result = CMap::delete($sysmapids);
+		$maps = API::Map()->get(array('sysmapids' => $sysmapids, 'output' => API_OUTPUT_EXTEND, 'editable => 1'));
+		$go_result = API::Map()->delete($sysmapids);
 
 		show_messages($go_result, S_MAP_DELETED, S_CANNOT_DELETE_MAP);
 		if($go_result){
@@ -236,7 +236,7 @@ include_once('include/page_header.php');
 					'sysmapids' => $_REQUEST['sysmapid'],
 					'output' => API_OUTPUT_EXTEND
 				);
-				$sysmaps = CMap::get($options);
+				$sysmaps = API::Map()->get($options);
 				$row = reset($sysmaps);
 
 				$table_map->setTitle('System map: "'.$row['name'].'"');
@@ -281,7 +281,7 @@ include_once('include/page_header.php');
 			$cmbImg = new CComboBox('backgroundid', $backgroundid);
 			$cmbImg->addItem(0, S_NO_IMAGE . '...');
 
-			$images = CImage::get(array(
+			$images = API::Image()->get(array(
 				'filter' => array('imagetype' => 2),
 				'output' => API_OUTPUT_EXTEND,
 			));
@@ -417,7 +417,7 @@ include_once('include/page_header.php');
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
-		$maps = CMap::get($options);
+		$maps = API::Map()->get($options);
 
 		order_result($maps, $sortfield, $sortorder);
 		$paging = getPagingLine($maps);

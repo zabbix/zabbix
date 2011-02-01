@@ -173,7 +173,7 @@ include_once('include/page_header.php');
 			'groupids' => $groupids,
 			'output' => API_OUTPUT_EXTEND
 		);
-		$groups = CHostGroup::get($options);
+		$groups = API::HostGroup()->get($options);
 		order_result($groups, 'name');
 
 		$lstGroups = new CListBox('del_groups[]', null, 15);

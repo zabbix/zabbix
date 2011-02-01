@@ -48,7 +48,7 @@ function make_favorite_graphs(){
 			'selectHosts' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND,
 		);
-	$graphs = CGraph::get($options);
+	$graphs = API::Graph()->get($options);
 	$graphs = zbx_toHash($graphs, 'graphid');
 
 	$options = array(
@@ -58,7 +58,7 @@ function make_favorite_graphs(){
 			'output' => API_OUTPUT_EXTEND,
 			'webitems' => 1,
 		);
-	$items = CItem::get($options);
+	$items = API::Item()->get($options);
 	$items = zbx_toHash($items, 'itemid');
 
 	foreach($fav_graphs as $key => $favorite){
@@ -108,7 +108,7 @@ function make_favorite_screens(){
 		'screenids' => $screenids,
 		'output' => API_OUTPUT_EXTEND,
 	);
-	$screens = CScreen::get($options);
+	$screens = API::Screen()->get($options);
 	$screens = zbx_toHash($screens, 'screenid');
 
 	foreach($fav_screens as $key => $favorite){
@@ -152,7 +152,7 @@ function make_favorite_maps(){
 			'sysmapids' => $sysmapids,
 			'output' => API_OUTPUT_EXTEND,
 		);
-	$sysmaps = CMap::get($options);
+	$sysmaps = API::Map()->get($options);
 
 	foreach($sysmaps as $snum => $sysmap){
 		$sysmapid = $sysmap['sysmapid'];
@@ -189,7 +189,7 @@ function make_system_status($filter){
 		'groupids' => $filter['groupids'],
 		'output' => API_OUTPUT_EXTEND,
 	);
-	$groups = CHostGroup::get($options);
+	$groups = API::HostGroup()->get($options);
 	$groups = zbx_toHash($groups, 'groupid');
 	order_result($groups, 'name');
 
@@ -224,7 +224,7 @@ function make_system_status($filter){
 		'output' => API_OUTPUT_EXTEND,
 	);
 	if($filter['extAck'] == EXTACK_OPTION_UNACK) $options['withLastEventUnacknowledged'] = 1;
-	$triggers = CTrigger::get($options);
+	$triggers = API::Trigger()->get($options);
 	order_result($triggers, 'lastchange', ZBX_SORT_DOWN);
 
 	foreach($triggers as $tnum => $trigger){
@@ -243,7 +243,7 @@ function make_system_status($filter){
 			'sortorder' => ZBX_SORT_DOWN,
 			'limit' => 1
 		);
-		$events = CEvent::get($options);
+		$events = API::Event()->get($options);
 		if(empty($events)){
 			$trigger['event'] = array(
 				'value_changed' => 0,
@@ -428,7 +428,7 @@ function make_hoststat_summary($filter){
 		'monitored_hosts' => 1,
 		'output' => API_OUTPUT_EXTEND
 	);
-	$groups = CHostGroup::get($options);
+	$groups = API::HostGroup()->get($options);
 	$groups = zbx_toHash($groups, 'groupid');
 	order_result($groups, 'name');
 // }}} SELECT HOST GROUPS
@@ -441,7 +441,7 @@ function make_hoststat_summary($filter){
 		'filter' => array('maintenance_status' => $filter['maintenance']),
 		'output' => array('hostid', 'host')
 	);
-	$hosts = CHost::get($options);
+	$hosts = API::Host()->get($options);
 	$hosts = zbx_toHash($hosts, 'hostid');
 // }}} SELECT HOSTS
 
@@ -457,7 +457,7 @@ function make_hoststat_summary($filter){
 		),
 		'output' => API_OUTPUT_EXTEND,
 	);
-	$triggers = CTrigger::get($options);
+	$triggers = API::Trigger()->get($options);
 
 	if($filter['extAck']){
 		$options = array(
@@ -472,7 +472,7 @@ function make_hoststat_summary($filter){
 			),
 			'output' => API_OUTPUT_REFER,
 		);
-		$triggers_unack = CTrigger::get($options);
+		$triggers_unack = API::Trigger()->get($options);
 		$triggers_unack = zbx_toHash($triggers_unack, 'triggerid');
 
 		foreach($triggers_unack as $tunack){
@@ -831,7 +831,7 @@ function make_latest_issues($filter = array()){
 	);
 
 	if(isset($filter['hostids'])) $options['hostids'] = $filter['hostids'];
-	$triggers = CTrigger::get($options);
+	$triggers = API::Trigger()->get($options);
 
 // GATHER HOSTS FOR SELECTED TRIGGERS {{{
 	$triggers_hosts = array();
@@ -849,7 +849,7 @@ function make_latest_issues($filter = array()){
 	$triggers_hostids = array_keys($triggers_hosts);
 // }}} GATHER HOSTS FOR SELECTED TRIGGERS
 
-	$scripts_by_hosts = CScript::getScriptsByHosts($triggers_hostids);
+	$scripts_by_hosts = API::Script()->getScriptsByHosts($triggers_hostids);
 
 	$table  = new CTableInfo();
 	$table->setHeader(array(
@@ -898,7 +898,7 @@ function make_latest_issues($filter = array()){
 			$hprofile = $thosts_cache[$trigger['hostid']];
 		}
 		else{
-			$hprofile = CHost::get(array(
+			$hprofile = API::Host()->get(array(
 				'hostids' => $trigger['hostid'],
 				'output' => API_OUTPUT_SHORTEN,
 				'select_profile' => API_OUTPUT_EXTEND,
@@ -935,7 +935,7 @@ function make_latest_issues($filter = array()){
 				'maintenanceids' => $trigger_host['maintenanceid'],
 				'output' => API_OUTPUT_EXTEND
 			);
-			$maintenances = CMaintenance::get($options);
+			$maintenances = API::Maintenance()->get($options);
 			$maintenance = reset($maintenances);
 
 			$text = $maintenance['name'];
@@ -966,7 +966,7 @@ function make_latest_issues($filter = array()){
 			'sortorder' => ZBX_SORT_DOWN,
 			'limit' => 1
 		);
-		$events = CEvent::get($options);
+		$events = API::Event()->get($options);
 		if($event = reset($events)){
 			$ack = getEventAckState($event);
 
@@ -1017,7 +1017,7 @@ function make_webmon_overview($filter){
 		'filter' => array('maintenance_status' => $filter['maintenance'])
 	);
 
-	$available_hosts = CHost::get($options);
+	$available_hosts = API::Host()->get($options);
 	$available_hosts = zbx_objectValues($available_hosts,'hostid');
 
 	$table  = new CTableInfo();
@@ -1035,7 +1035,7 @@ function make_webmon_overview($filter){
 		'with_monitored_httptests' => 1,
 		'output' => API_OUTPUT_EXTEND
 	);
-	$groups = CHostGroup::get($options);
+	$groups = API::HostGroup()->get($options);
 	foreach($groups as $gnum => $group){
 		$showGroup = false;
 		$apps['ok'] = 0;
@@ -1096,7 +1096,7 @@ function make_discovery_status(){
 		'selectDHosts' => API_OUTPUT_EXTEND,
 		'output' => API_OUTPUT_EXTEND
 	);
-	$drules = CDRule::get($options);
+	$drules = API::DRule()->get($options);
 	order_result($drules, 'name');
 
 	foreach($drules as $drnum => $drule){
@@ -1198,7 +1198,7 @@ function make_graph_submenu(){
 			'selectHosts' => array('hostid', 'host'),
 			'output' => API_OUTPUT_EXTEND
 		);
-	$graphs = CGraph::get($options);
+	$graphs = API::Graph()->get($options);
 	$graphs = zbx_toHash($graphs, 'graphid');
 
 	$options = array(
@@ -1208,7 +1208,7 @@ function make_graph_submenu(){
 			'output' => API_OUTPUT_EXTEND,
 			'webitems' => 1,
 		);
-	$items = CItem::get($options);
+	$items = API::Item()->get($options);
 	$items = zbx_toHash($items, 'itemid');
 
 	$favGraphs = array();
@@ -1301,7 +1301,7 @@ function make_sysmap_submenu(){
 			'sysmapids' => $sysmapids,
 			'output' => API_OUTPUT_EXTEND,
 		);
-	$sysmaps = CMap::get($options);
+	$sysmaps = API::Map()->get($options);
 
 	foreach($sysmaps as $snum => $sysmap){
 		$favMaps[] = array(
@@ -1367,7 +1367,7 @@ function make_screen_submenu(){
 		'screenids' => $screenids,
 		'output' => API_OUTPUT_EXTEND,
 	);
-	$screens = CScreen::get($options);
+	$screens = API::Screen()->get($options);
 	$screens = zbx_toHash($screens, 'screenid');
 
 	$favScreens = array();

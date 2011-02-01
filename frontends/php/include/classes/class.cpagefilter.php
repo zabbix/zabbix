@@ -156,7 +156,7 @@ options = array(
 	}
 
 	private function _updateByGraph(&$options){
-		$graphs = CGraph::get(array(
+		$graphs = API::Graph()->get(array(
 			'graphids' => $options['graphid'],
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => API_OUTPUT_REFER,
@@ -198,7 +198,7 @@ options = array(
 	}
 
 	private function _updateByHost(&$options){
-		$hosts = CHost::get(array(
+		$hosts = API::Host()->get(array(
 			'hostids' => $options['hostid'],
 			'templated_hosts' => 1,
 			'output' => array('hostid', 'host'),
@@ -219,7 +219,7 @@ options = array(
 	}
 
 	private function _updateByTrigger(&$options){
-		$triggers = CTrigger::get(array(
+		$triggers = API::Trigger()->get(array(
 			'triggerids' => $options['triggerid'],
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => API_OUTPUT_REFER,
@@ -266,7 +266,7 @@ options = array(
 			'output' => API_OUTPUT_EXTEND,
 		);
 		$options = zbx_array_merge($def_options, $options);
-		$groups = CHostGroup::get($options);
+		$groups = API::HostGroup()->get($options);
 		order_result($groups, 'name');
 
 		$this->data['groups'] = array();
@@ -310,7 +310,7 @@ options = array(
 				'groupids' => (($this->groupid > 0) ? $this->groupid : null),
 			);
 			$options = zbx_array_merge($def_options, $options);
-			$hosts = CHost::get($options);
+			$hosts = API::Host()->get($options);
 			order_result($hosts, 'host');
 
 			foreach($hosts as $host){
@@ -355,7 +355,7 @@ options = array(
 				'hostids' => (($this->hostid > 0) ? $this->hostid : null),
 			);
 			$options = zbx_array_merge($def_ptions, $options);
-			$graphs = CGraph::get($options);
+			$graphs = API::Graph()->get($options);
 			order_result($graphs, 'name');
 
 			foreach($graphs as $graph){
@@ -390,7 +390,7 @@ options = array(
 				'hostids' => (($this->hostid > 0) ? $this->hostid : null),
 			);
 			$options = zbx_array_merge($def_ptions, $options);
-			$triggers = Ctrigger::get($options);
+			$triggers = API::Trigger()->get($options);
 			order_result($triggers, 'description');
 
 			foreach($triggers as $trigger){

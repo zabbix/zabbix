@@ -421,7 +421,7 @@ COpt::memoryPick();
 				'hostids' => $hostids,
 				'preservekeys' => 1
 			);
-			$hosts = CHost::get($obj_params);
+			$hosts = API::Host()->get($obj_params);
 		}
 
 // Adding Users
@@ -431,7 +431,7 @@ COpt::memoryPick();
 				'userids' => $userids,
 				'preservekeys' => 1
 			);
-			$users = CUser::get($obj_params);
+			$users = API::User()->get($obj_params);
 		}
 
 // Adding MediaTypes
@@ -535,7 +535,7 @@ COpt::memoryPick();
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => 1
 			);
-			$del_alerts = self::get($options);
+			$del_alerts = $this->get($options);
 			foreach($alertids as $snum => $alertid){
 				if(!isset($del_alerts[$alertid])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);

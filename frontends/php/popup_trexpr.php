@@ -295,7 +295,7 @@
 			'webitems' => 1,
 			'selectHosts' => API_OUTPUT_EXTEND
 		);
-		$items_data = CItem::get($options);
+		$items_data = API::Item()->get($options);
 		$item_data = reset($items_data);
 		$item_key = $item_data['key_'];
 
@@ -432,7 +432,7 @@ if(form){
 			'itemids' => array($_REQUEST['itemid']),
 			'output' => API_OUTPUT_EXTEND
 		);
-		$selectedItems = CItem::get($options);
+		$selectedItems = API::Item()->get($options);
 		if($selectedItem = reset($selectedItems)){
 			$itemValueType = $selectedItem['value_type'];
 		}

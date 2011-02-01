@@ -53,7 +53,7 @@
 			'scriptids' => $_REQUEST['scriptid'],
 			'output' => API_OUTPUT_EXTEND,
 		);
-		$script = CScript::get($options);
+		$script = API::Script()->get($options);
 		$script = reset($script);
 
 		$name = $script['name'];
@@ -86,7 +86,7 @@
 // USER GROUPS
 	$usr_groups = new CCombobox('usrgrpid', $usrgrpid);
 	$usr_groups->addItem(0, _('All'));
-	$usrgrps = CUserGroup::get(array(
+	$usrgrps = API::UserGroup()->get(array(
 		'output' => API_OUTPUT_EXTEND,
 	));
 	order_result($usrgrps, 'name');
@@ -98,7 +98,7 @@
 // HOST GROUPS
 	$host_groups = new CCombobox('groupid', $groupid);
 	$host_groups->addItem(0, _('All'));
-	$groups = CHostGroup::get(array(
+	$groups = API::HostGroup()->get(array(
 		'output' => API_OUTPUT_EXTEND,
 	));
 	order_result($groups, 'name');

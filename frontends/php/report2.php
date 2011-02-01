@@ -150,7 +150,7 @@ include_once('include/page_header.php');
 			'nodeids' => get_current_nodeid(true)
 		);
 
-		$trigger_data = CTrigger::get($options);
+		$trigger_data = API::Trigger()->get($options);
 		if(empty($trigger_data)){
 			unset($_REQUEST['triggerid']);
 		}
@@ -212,7 +212,7 @@ include_once('include/page_header.php');
 		}
 		else{
 			if($_REQUEST['hostid'] > 0){
-				$hosts = CHost::get(array('templateids' => $_REQUEST['hostid']));
+				$hosts = API::Host()->get(array('templateids' => $_REQUEST['hostid']));
 				$options['hostids'] = zbx_objectValues($hosts, 'hostid');
 			}
 
@@ -222,7 +222,7 @@ include_once('include/page_header.php');
 		}
 
 
-		$triggers = CTrigger::get($options);
+		$triggers = API::Trigger()->get($options);
 		morder_result($triggers, array('host', 'description'));
 
 		$table = new CTableInfo();

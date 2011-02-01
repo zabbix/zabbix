@@ -71,14 +71,14 @@
 		if(isset($_REQUEST['hostid'])){
 			$proxy['proxyid'] = $_REQUEST['hostid'];
 
-			$proxyids 	= CProxy::update($proxy);
+			$proxyids 	= API::Proxy()->update($proxy);
 
 			$action		= AUDIT_ACTION_UPDATE;
 			$msg_ok		= S_PROXY_UPDATED;
 			$msg_fail	= S_CANNOT_UPDATE_PROXY;
 		}
 		else {
-			$proxyids = CProxy::create($proxy);
+			$proxyids = API::Proxy()->create($proxy);
 
 			$action		= AUDIT_ACTION_ADD;
 			$msg_ok		= S_PROXY_ADDED;
@@ -97,13 +97,13 @@
 		$result = false;
 
 		if(isset($_REQUEST['hostid'])){
-			$proxies = CProxy::get(array(
+			$proxies = API::Proxy()->get(array(
 				'proxyids' => $_REQUEST['hostid'],
 				'output' => API_OUTPUT_EXTEND
 			));
 
 			DBstart();
-			$result = CProxy::delete(array('proxyid' => $_REQUEST['hostid']));
+			$result = API::Proxy()->delete(array('proxyid' => $_REQUEST['hostid']));
 			$result = DBend($result);
 
 			if($result){
@@ -157,7 +157,7 @@
 		$hosts = get_request('hosts',array());
 
 		DBstart();
-		$go_result = CProxy::delete(zbx_toObject($hosts, 'proxyid'));
+		$go_result = API::Proxy()->delete(zbx_toObject($hosts, 'proxyid'));
 		$go_result = DBend($go_result);
 
 		show_messages($go_result, S_PROXY_DELETED, S_CANNOT_DELETE_PROXY);
@@ -222,7 +222,7 @@
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
-		$proxies = CProxy::get($options);
+		$proxies = API::Proxy()->get($options);
 		$proxies = zbx_toHash($proxies, 'proxyid');
 
 // ordering && paging
@@ -256,7 +256,7 @@
 			'webitems' => 1,
 			'monitored' => 1,
 		);
-		$proxy_items = CItem::get($options);
+		$proxy_items = API::Item()->get($options);
 		foreach($proxy_items as $pitems){
 			if(!isset($proxies[$pitems['proxy_hostid']]['item_count'])) $proxies[$pitems['proxy_hostid']]['item_count'] = 0;
 			$proxies[$pitems['proxy_hostid']]['item_count'] += $pitems['rowscount'];

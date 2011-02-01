@@ -49,7 +49,7 @@ function check_authorisation(){
 	$sessionid = get_cookie('zbx_sessionid');
 
 	$user = array('sessionid'=>$sessionid);
-	if(!$auth = CUser::checkAuthentication($user)){
+	if(!$auth = API::User()->checkAuthentication($user)){
 
 		include_once('include/locales/en_gb.inc.php');
 		process_locales();
@@ -190,7 +190,7 @@ function available_groups($groupids, $editable=null){
 	$options['groupids'] = $groupids;
 	$options['editable'] = $editable;
 
-	$groups = CHostGroup::get($options);
+	$groups = API::HostGroup()->get($options);
 return zbx_objectValues($groups, 'groupid');
 }
 function available_hosts($hostids, $editable=null){
@@ -199,7 +199,7 @@ function available_hosts($hostids, $editable=null){
 	$options['editable'] = $editable;
 	$options['templated_hosts'] = 1;
 
-	$hosts = CHost::get($options);
+	$hosts = API::Host()->get($options);
 
 return zbx_objectValues($hosts, 'hostid');
 }
@@ -211,7 +211,7 @@ function available_triggers($triggerids, $editable=null){
 		'nodes' => get_current_nodeid(true)
 	);
 
-	$triggers = CTrigger::get($options);
+	$triggers = API::Trigger()->get($options);
 
 return zbx_objectValues($triggers, 'triggerid');
 }

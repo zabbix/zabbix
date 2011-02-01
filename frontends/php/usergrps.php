@@ -145,13 +145,13 @@ include_once('include/page_header.php');
 
 			$usrgrp['usrgrpid'] = $_REQUEST['usrgrpid'];
 
-			$result = CUserGroup::update($usrgrp);
+			$result = API::UserGroup()->update($usrgrp);
 			show_messages($result, S_GROUP_UPDATED, S_CANNOT_UPDATE_GROUP);
 		}
 		else{
 			$action = AUDIT_ACTION_ADD;
 
-			$result = CUserGroup::create($usrgrp);
+			$result = API::UserGroup()->create($usrgrp);
 			show_messages($result, S_GROUP_ADDED, S_CANNOT_ADD_GROUP);
 		}
 
@@ -161,10 +161,10 @@ include_once('include/page_header.php');
 		}
 	}
 	else if(isset($_REQUEST['delete'])){
-		$group = CUserGroup::get(array('usrgrpids' => $_REQUEST['usrgrpid'], 'output' => API_OUTPUT_EXTEND));
+		$group = API::UserGroup()->get(array('usrgrpids' => $_REQUEST['usrgrpid'], 'output' => API_OUTPUT_EXTEND));
 		$group = reset($group);
 
-		$result = CUserGroup::delete($_REQUEST['usrgrpid']);
+		$result = API::UserGroup()->delete($_REQUEST['usrgrpid']);
 
 		show_messages($result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
 		if($result){
@@ -189,7 +189,7 @@ include_once('include/page_header.php');
 		}
 
 		if(!empty($groups)){
-			$go_result = CUserGroup::delete($groupids);
+			$go_result = API::UserGroup()->delete($groupids);
 
 			if($go_result){
 				foreach($groups as $groupid => $group){
@@ -382,7 +382,7 @@ include_once('include/page_header.php');
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
-		$usrgrps = CUserGroup::get($options);
+		$usrgrps = API::UserGroup()->get($options);
 
 // sorting
 		order_result($usrgrps, $sortfield, $sortorder);

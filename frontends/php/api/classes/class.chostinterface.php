@@ -339,7 +339,7 @@ Copt::memoryPick();
 
 			if(is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['selectHosts'];
-				$hosts = CHost::get($obj_params);
+				$hosts = API::Host()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($hosts, 'host');
 
@@ -363,7 +363,7 @@ Copt::memoryPick();
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$hosts = CHost::get($obj_params);
+				$hosts = API::Host()->get($obj_params);
 				$hosts = zbx_toHash($hosts, 'hostid');
 				foreach($result as $templateid => $template){
 					if(isset($hosts[$templateid]))
@@ -385,7 +385,7 @@ Copt::memoryPick();
 			);
 			if(is_array($options['selectItems']) || str_in_array($options['selectItems'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['selectItems'];
-				$items = CItem::get($obj_params);
+				$items = API::Item()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($items, 'description');
 
@@ -405,7 +405,7 @@ Copt::memoryPick();
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$items = CItem::get($obj_params);
+				$items = API::Item()->get($obj_params);
 				$items = zbx_toHash($items, 'interfaceid');
 				foreach($result as $interfaceid => $interface){
 					if(isset($items[$interfaceid]))
@@ -440,7 +440,7 @@ Copt::memoryPick();
 		else if(isset($object['nodeids']))
 			$options['nodeids'] = $object['nodeids'];
 
-		$objs = self::get($options);
+		$objs = $this->get($options);
 
 	return !empty($objs);
 	}
@@ -453,7 +453,7 @@ Copt::memoryPick();
 // permissions
 		if($update || $delete){
 			$interfaceDBfields = array('interfaceid'=> null);
-			$dbInterfaces = self::get(array(
+			$dbInterfaces = $this->get(array(
 				'output' => API_OUTPUT_EXTEND,
 				'interfaceids' => zbx_objectValues($interfaces, 'interfaceid'),
 				'editable' => 1,
@@ -462,14 +462,14 @@ Copt::memoryPick();
 		}
 		else{
 			$interfaceDBfields = array('hostid'=>null,'ip'=>null,'dns'=>null,'useip'=>null,'port'=>null);
-			$dbHosts = CHost::get(array(
+			$dbHosts = API::Host()->get(array(
 				'output' => array('host', 'status'),
 				'hostids' => zbx_objectValues($interfaces, 'hostid'),
 				'editable' => 1,
 				'preservekeys' => 1
 			));
 
-			$dbProxies = CProxy::get(array(
+			$dbProxies = API::Proxy()->get(array(
 				'output' => array('host', 'status'),
 				'proxyids' => zbx_objectValues($interfaces, 'hostid'),
 				'editable' => 1,
@@ -518,7 +518,7 @@ Copt::memoryPick();
 			}
 
 			if(($interface['useip'] == INTERFACE_USE_DNS) && zbx_empty($interface['dns'])){
-				$dbHosts = CHost::get(array(
+				$dbHosts = API::Host()->get(array(
 					'output' => array('host'),
 					'hostids' => $interface['hostid'],
 					'nopermissions' => 1,
@@ -566,7 +566,7 @@ Copt::memoryPick();
 		unset($interface);
 
 		if($delete){
-			$items = CItem::get(array(
+			$items = API::Item()->get(array(
 				'output' => array('key_'),
 				'selectHosts' => array('host'),
 				'interfaceids' => zbx_objectValues($interfaces, 'interfaceid'),
@@ -588,7 +588,7 @@ Copt::memoryPick();
 
 		$updateData = array();
 		foreach($hostids as $hnum => $hostid){
-			$interfaces = self::get(array(
+			$interfaces = $this->get(array(
 				'output' => API_OUTPUT_EXTEND,
 				'hostids' => $hostid,
 				'nopermissions' => 1,
@@ -633,12 +633,12 @@ Copt::memoryPick();
 	public function create($interfaces){
 		$interfaces = zbx_toArray($interfaces);
 
-			self::checkInput($interfaces, __FUNCTION__);
+			$this->checkInput($interfaces, __FUNCTION__);
 
 			$interfaceids = DB::insert('interface', $interfaces);
 
 // auto seting main interfaces
-			self::setMainInterfaces($interfaces);
+			$this->setMainInterfaces($interfaces);
 
 			return array('interfaceids' => $interfaceids);
 	}
@@ -652,7 +652,7 @@ Copt::memoryPick();
 	public function update($interfaces){
 		$interfaces = zbx_toArray($interfaces);
 
-			self::checkInput($interfaces, __FUNCTION__);
+			$this->checkInput($interfaces, __FUNCTION__);
 
 			$data = array();
 			foreach($interfaces as $inum => $interface){
@@ -661,7 +661,7 @@ Copt::memoryPick();
 			$result = DB::update('interface', $data);
 
 // auto seting main interfaces
-			self::setMainInterfaces($interfaces);
+			$this->setMainInterfaces($interfaces);
 
 			return array('interfaceids' => zbx_objectValues($interfaces, 'interfaceid'));
 	}
@@ -680,12 +680,12 @@ Copt::memoryPick();
 			$interfaceids = zbx_toArray($interfaceids);
 			$interfaces = zbx_toObject($interfaceids, 'interfaceid');
 
-			self::checkInput($interfaces,__FUNCTION__);
+			$this->checkInput($interfaces,__FUNCTION__);
 
 			DB::delete('interface', array('interfaceid'=>$interfaceids));
 
 // auto seting main interfaces
-			self::setMainInterfaces($interfaces);
+			$this->setMainInterfaces($interfaces);
 
 			return array('interfaceids' => $interfaceids);
 	}
@@ -704,7 +704,7 @@ Copt::memoryPick();
 				}
 			}
 
-			$interfaceids = self::create($insertData);
+			$interfaceids = $this->create($insertData);
 
 			return array('interfaceids' => $interfaceids);
 	}
@@ -724,7 +724,7 @@ Copt::memoryPick();
 
 		$hostids = zbx_toArray($data['hostids']);
 
-			self::checkInput($interfaces, __FUNCTION__);
+			$this->checkInput($interfaces, __FUNCTION__);
 
 			foreach($interfaces as $inum => $interface){
 				DB::delete('interface', array(

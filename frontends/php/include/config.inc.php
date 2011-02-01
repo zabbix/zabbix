@@ -79,6 +79,7 @@ function __autoload($class_name){
 }
 ?>
 <?php
+	require_once('include/api.inc.php');
 
 	require_once('include/gettextwrapper.inc.php');
 	require_once('include/defines.inc.php');
@@ -394,9 +395,6 @@ function __autoload($class_name){
 
 		if(!$bool && !is_null($errmsg))		$msg=S_CONFIG_ERROR_HEAD.': '.$errmsg;
 		else if($bool && !is_null($okmsg))	$msg=$okmsg;
-
-		$api_errors = CZBXAPI::resetErrors();
-		if(!empty($api_errors)) error($api_errors);
 
 		if(isset($msg)){
 			switch($page['type']){

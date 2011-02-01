@@ -29,7 +29,7 @@ function screenIdents($screenids){
 		'nodeids'=> get_current_nodeid(true)
 	);
 
-	$screens = CScreen::get($options);
+	$screens = API::Screen()->get($options);
 	foreach($screens as $inum => $screen){
 		$idents[$screen['screenid']] = array(
 			'node' => get_node_name_by_elid($screen['screenid'], true),
@@ -49,7 +49,7 @@ function sysmapIdents($sysmapids){
 		'nodeids'=> get_current_nodeid(true)
 	);
 
-	$sysmaps = CMap::get($options);
+	$sysmaps = API::Map()->get($options);
 	foreach($sysmaps as $snum => $sysmap){
 		$idents[$sysmap['sysmapid']] = array(
 			'node' => get_node_name_by_elid($sysmap['sysmapid'], true),
@@ -69,7 +69,7 @@ function hostgroupIdents($groupids){
 		'nodeids'=> get_current_nodeid(true)
 	);
 
-	$groups = CHostgroup::get($options);
+	$groups = API::HostGroup()->get($options);
 	foreach($groups as $gnum => $group){
 		$idents[$group['groupid']] = array(
 			'node' => get_node_name_by_elid($group['groupid'], true),
@@ -89,7 +89,7 @@ function hostIdents($hostids){
 		'nodeids'=> get_current_nodeid(true)
 	);
 
-	$hosts = CHost::get($options);
+	$hosts = API::Host()->get($options);
 	foreach($hosts as $hnum => $host){
 		$idents[$host['hostid']] = array(
 			'node' => get_node_name_by_elid($host['hostid'], true),
@@ -111,7 +111,7 @@ function itemIdents($itemids){
 		'webitems' => 1,
 	);
 
-	$items = CItem::get($options);
+	$items = API::Item()->get($options);
 	foreach($items as $inum => $item){
 		$host = reset($item['hosts']);
 
@@ -135,7 +135,7 @@ function triggerIdents($triggerids){
 		'nodeids'=> get_current_nodeid(true)
 	);
 
-	$triggers = CTrigger::get($options);
+	$triggers = API::Trigger()->get($options);
 	foreach($triggers as $tnum => $trigger){
 		$host = reset($trigger['hosts']);
 
@@ -160,7 +160,7 @@ function graphIdents($graphids){
 		'nodeids'=> get_current_nodeid(true)
 	);
 
-	$graphs = CGraph::get($options);
+	$graphs = API::Graph()->get($options);
 	foreach($graphs as $inum => $graph){
 		$host = reset($graph['hosts']);
 
@@ -183,7 +183,7 @@ function imageIdents($imageids){
 		'nodeids'=> get_current_nodeid(true)
 	);
 
-	$images = CImage::get($options);
+	$images = API::Image()->get($options);
 	foreach($images as $inum => $image){
 		$idents[$image['imageid']] = array(
 			'node' => get_node_name_by_elid($image['imageid'], true),
@@ -208,7 +208,7 @@ function getImageByIdent($ident){
 			'nodeids' => get_current_nodeid(true)
 		);
 
-		$dbImages = CImage::get($options);
+		$dbImages = API::Image()->get($options);
 		foreach($dbImages as $inum => $img){
 			if(!isset($images[$img['name']])) $images[$img['name']] = array();
 

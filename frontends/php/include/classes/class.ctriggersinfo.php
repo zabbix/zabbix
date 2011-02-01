@@ -68,7 +68,7 @@ class CTriggersInfo extends CTable{
 			$options['groupids'] = $this->groupid;
 
 
-		$triggers = CTrigger::get($options);
+		$triggers = API::Trigger()->get($options);
 		$triggers = zbx_objectValues($triggers, 'triggerid');
 
 		$sql = 'SELECT t.priority,t.value,count(DISTINCT t.triggerid) as cnt '.

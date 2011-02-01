@@ -53,7 +53,7 @@ include_once('include/page_header.php');
 		'nodeids' => get_current_nodeid(true)
 	);
 
-	$db_data = CItem::get($options);
+	$db_data = API::Item()->get($options);
 	if(empty($db_data)) access_deny();
 
 	$graph = new CChart();

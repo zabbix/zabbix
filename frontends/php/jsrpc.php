@@ -58,7 +58,7 @@ include_once('include/page_header.php');
 				'limit' => 15
 			);
 
-			$result = CHost::get($options);
+			$result = API::Host()->get($options);
 			break;
 		case 'message.mute':
 			$msgsettings = getMessageSettings();

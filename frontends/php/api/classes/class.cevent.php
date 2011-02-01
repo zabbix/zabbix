@@ -146,7 +146,7 @@ class CEvent extends CZBXAPI{
 						'editable' => $options['editable']
 					);
 
-					$triggers = CTrigger::get($triggerOptions);
+					$triggers = API::Trigger()->get($triggerOptions);
 					$options['triggerids'] = zbx_objectValues($triggers, 'triggerid');
 				}
 				else{
@@ -469,7 +469,7 @@ Copt::memoryPick();
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
-			$hosts = CHost::get($obj_params);
+			$hosts = API::Host()->get($obj_params);
 
 			$triggers = array();
 			foreach($hosts as $hostid => $host){
@@ -502,7 +502,7 @@ Copt::memoryPick();
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
-			$triggers = CTrigger::get($obj_params);
+			$triggers = API::Trigger()->get($obj_params);
 			foreach($result as $eventid => $event){
 				if(isset($triggers[$event['objectid']])){
 					$result[$eventid]['triggers'][] = $triggers[$event['objectid']];
@@ -524,7 +524,7 @@ Copt::memoryPick();
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
-			$db_items = CItem::get($obj_params);
+			$db_items = API::Item()->get($obj_params);
 			$items = array();
 
 			foreach($db_items as $itemid => $item){
@@ -559,7 +559,7 @@ Copt::memoryPick();
 				'sortfield' => 'clock',
 				'sortorder' => ZBX_SORT_DOWN
 			);
-			$dbAlerts = CAlert::get($obj_params);
+			$dbAlerts = API::Alert()->get($obj_params);
 			foreach($dbAlerts as $anum => $alert){
 				$result[$alert['eventid']]['alerts'][] = $alert;
 			}
@@ -627,7 +627,7 @@ Copt::memoryPick();
 				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1
 			);
-			$triggers = CTrigger::get($options);
+			$triggers = API::Trigger()->get($options);
 
 			foreach($events as $num => $event){
 				if($event['object'] != EVENT_OBJECT_TRIGGER) continue;
@@ -676,7 +676,7 @@ Copt::memoryPick();
 			}
 
 // This will create looping (Trigger->Event->Trigger->Event)
-//			$result = CTrigger::update($triggers);
+//			$result = API::Trigger()->update($triggers);
 
 			return $eventids;
 	}
@@ -697,7 +697,7 @@ Copt::memoryPick();
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => 1
 			);
-			$del_events = self::get($options);
+			$del_events = $this->get($options);
 			foreach($eventids as $enum => $eventid){
 				if(!isset($del_events[$eventid])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -739,7 +739,7 @@ Copt::memoryPick();
 				'select_triggers' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1
 			);
-			$allowedEvents = self::get($options);
+			$allowedEvents = $this->get($options);
 			foreach($eventids as $num => $eventid){
 				if(!isset($allowedEvents[$eventid])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);

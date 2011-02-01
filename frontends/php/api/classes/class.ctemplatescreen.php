@@ -117,14 +117,14 @@ class CTemplateScreen extends CScreen{
 			if(!is_null($options['templateids'])){
 				unset($options['hostids']);
 
-				$options['templateids'] = CTemplate::get(array(
+				$options['templateids'] = API::Template()->get(array(
 					'templateids' => $options['templateids'],
 					'editable' => $options['editable'],
 					'preservekeys' => 1
 				));
 			}
 			else if(!is_null($options['hostids'])){
-				$options['templateids'] = CHost::get(array(
+				$options['templateids'] = API::Host()->get(array(
 					'hostids' => $options['hostids'],
 					'editable' => $options['editable'],
 					'preservekeys' => 1
@@ -368,14 +368,14 @@ class CTemplateScreen extends CScreen{
 		if(!is_null($options['select_screenitems']) && !is_null($options['hostids'])){
 // prepare Graphs
 			if(!empty($graphids)){
-				$tplGraphs = CGraph::get(array(
+				$tplGraphs = API::Graph()->get(array(
 					'output' => array('graphid', 'name'),
 					'graphids' => $graphids,
 					'nopermissions' => 1,
 					'preservekeys' => 1
 				));
 
-				$dbGraphs = CGraph::get(array(
+				$dbGraphs = API::Graph()->get(array(
 					'output' => array('graphid', 'name'),
 					'hostids' => $options['hostids'],
 					'filter' => array('name' => zbx_objectValues($tplGraphs, 'name')),
@@ -394,14 +394,14 @@ class CTemplateScreen extends CScreen{
 
 // prepare Items
 			if(!empty($itemids)){
-				$tplItems = CItem::get(array(
+				$tplItems = API::Item()->get(array(
 					'output' => array('itemid', 'key_'),
 					'itemids' => $itemids,
 					'nopermissions' => 1,
 					'preservekeys' => 1
 				));
 
-				$dbItems = CItem::get(array(
+				$dbItems = API::Item()->get(array(
 					'output' => array('itemid', 'key_'),
 					'hostids' => $options['hostids'],
 					'filter' => array('key_' => zbx_objectValues($tplItems, 'key_')),
@@ -495,7 +495,7 @@ class CTemplateScreen extends CScreen{
 		else if(isset($data['nodeids']))
 			$options['nodeids'] = $data['nodeids'];
 
-		$screens = self::get($options);
+		$screens = $this->get($options);
 
 	return !empty($screens);
 	}
@@ -524,7 +524,7 @@ class CTemplateScreen extends CScreen{
 				'output' => API_OUTPUT_EXTEND,
 				'nopermissions' => 1
 			);
-			$db_screens = self::get($options);
+			$db_screens = $this->get($options);
 //---
 
 			foreach($screens as $snum => $screen){
@@ -549,7 +549,7 @@ class CTemplateScreen extends CScreen{
 					}
 				}
 			}
-			self::addItems($insert_screen_items);
+			$this->addItems($insert_screen_items);
 
 			return array('screenids' => $screenids);
 	}
@@ -574,7 +574,7 @@ class CTemplateScreen extends CScreen{
 				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1,
 			);
-			$updScreens = self::get($options);
+			$updScreens = $this->get($options);
 			foreach($screens as $gnum => $screen){
 				if(!isset($screen['screenid'], $updScreens[$screen['screenid']])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -602,7 +602,7 @@ class CTemplateScreen extends CScreen{
 						'nopermissions' => 1,
 						'output' => API_OUTPUT_SHORTEN
 					);
-					$exist_screens = self::get($options);
+					$exist_screens = $this->get($options);
 					$exist_screen = reset($exist_screens);
 
 					if($exist_screen && ($exist_screen['screenid'] != $screen['screenid']))
@@ -623,7 +623,7 @@ class CTemplateScreen extends CScreen{
 						'screenids' => $screenid,
 						'screenitems' => $screen['screenitems'],
 					);
-					self::updateItems($update_items);
+					$this->updateItems($update_items);
 				}
 			}
 			DB::update('screens', $update);
@@ -645,7 +645,7 @@ class CTemplateScreen extends CScreen{
 					'editable' => 1,
 					'preservekeys' => 1
 			);
-			$del_screens = self::get($options);
+			$del_screens = $this->get($options);
 			foreach($screenids as $screenid){
 				if(!isset($del_screens[$screenid])) self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}

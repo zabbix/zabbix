@@ -80,7 +80,7 @@ include_once('include/page_header.php');
 
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
-	$scripts_by_hosts = CScript::getScriptsByHosts($available_hosts);
+	$scripts_by_hosts = API::Script()->getScriptsByHosts($available_hosts);
 
 	$triggers = array();
 	$triggerids = array();
