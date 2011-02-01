@@ -317,7 +317,7 @@ include_once('include/page_header.php');
 
 // OBJECT DHOST
 			$dhosts = array();
-			$sql = 'SELECT s.dserviceid, s.dhostid, s.ip '.
+			$sql = 'SELECT s.dserviceid,s.dhostid,s.ip,s.dns '.
 					' FROM dservices s '.
 					' WHERE '.DBcondition('s.dhostid', $objectids);
 			$res = DBselect($sql);
@@ -327,7 +327,7 @@ include_once('include/page_header.php');
 
 // OBJECT DSERVICE
 			$dservices = array();
-			$sql = 'SELECT s.dserviceid,s.ip,s.type,s.port '.
+			$sql = 'SELECT s.dserviceid,s.ip,s.dns,s.type,s.port '.
 					' FROM dservices s '.
 					' WHERE '.DBcondition('s.dserviceid', $objectids);
 			$res = DBselect($sql);
@@ -339,6 +339,7 @@ include_once('include/page_header.php');
 			$table->setHeader(array(
 				S_TIME,
 				S_IP,
+				S_DNS,
 				S_DESCRIPTION,
 				S_STATUS
 			));
@@ -349,6 +350,7 @@ include_once('include/page_header.php');
 				$tbHeader = array(
 					S_TIME,
 					S_IP,
+					S_DNS,
 					S_DESCRIPTION,
 					S_STATUS
 				);
@@ -363,6 +365,7 @@ include_once('include/page_header.php');
 						}
 						else{
 							$event_data['object_data']['ip'] = S_UNKNOWN;
+							$event_data['object_data']['dns'] = S_UNKNOWN;
 						}
 						$event_data['description'] = S_HOST;
 						break;
@@ -372,6 +375,7 @@ include_once('include/page_header.php');
 						}
 						else{
 							$event_data['object_data']['ip'] = S_UNKNOWN;
+							$event_data['object_data']['dns'] = S_UNKNOWN;
 							$event_data['object_data']['type'] = S_UNKNOWN;
 							$event_data['object_data']['port'] = S_UNKNOWN;
 						}
@@ -387,6 +391,7 @@ include_once('include/page_header.php');
 				$table->addRow(array(
 					zbx_date2str(S_EVENTS_DISCOVERY_TIME_FORMAT,$event_data['clock']),
 					$event_data['object_data']['ip'],
+					$event_data['object_data']['dns'],
 					$event_data['description'],
 					new CCol(discovery_value($event_data['value']), discovery_value_style($event_data['value']))
 				));
@@ -395,6 +400,7 @@ include_once('include/page_header.php');
 					$tbHeader = array(
 						zbx_date2str(S_EVENTS_DISCOVERY_TIME_FORMAT,$event_data['clock']),
 						$event_data['object_data']['ip'],
+						$event_data['object_data']['dns'],
 						$event_data['description'],
 						discovery_value($event_data['value'])
 					);
