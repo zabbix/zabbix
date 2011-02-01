@@ -77,6 +77,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
 
+ - [ZBX-3481] fixed massAdd for applications (KB)
  - [ZBX-3480] fixed possible crash of server after shutdown of ORACLE server (Sasha)
  - [ZBX-3457] in triggers Wizard, add more that 26 symbols with symbols dublicate (Vlad)
  - [ZBX-3446] fixed possible hang of pollers - added timeout handler for external scripts (Sasha)
