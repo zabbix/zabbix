@@ -85,7 +85,7 @@ private $allowed;
 
 		$itemCheck = check_item_key($item);
 		if(!$itemCheck['valid'])
-			throw new Exception('Incorrect item key "'.$expr['item'].'" is used in expression.'.$itemCheck['description']);
+			throw new Exception('Incorrect item key "'.$item.'" is used in expression. '.$itemCheck['description']);
 	}
 
 	public function checkFunction($expression){
@@ -246,6 +246,12 @@ private $allowed;
 					if($this->checkUserMacro($funcParam))
 						$this->data['usermacros'][] = $funcParam;
 				}
+
+				$this->expressions[$enum]['itemParam'] = $this->expressions[$enum]['itemParamReal'];
+				unset($this->expressions[$enum]['itemParamReal']);
+
+				$this->expressions[$enum]['functionParam'] = $this->expressions[$enum]['functionParamReal'];
+				unset($this->expressions[$enum]['functionParamReal']);
 			}
 
 			$expression = str_replace($expr['expression'], '{constant}', $expression);
@@ -400,9 +406,8 @@ private $allowed;
 						$this->symbols['params'][$symbol]++;
 						$this->currExpr['params']['quoteClose'] = true;
 					}
-					else{
-						$this->writeParams($symbol);
-					}
+
+					$this->writeParams($symbol);
 				}
 				else{
 // SDI('Open.inParameter: '.$symbol.' ');
@@ -581,16 +586,23 @@ private $allowed;
 		if($this->currExpr['part']['host'])
 			$this->currExpr['object']['host'] .= $symbol;
 
-		if(($symbol == ' ') && !$this->inParameter()) return;
-
 		if($this->currExpr['part']['item'])
 			$this->currExpr['object']['item'] .= $symbol;
 
-		if($this->currExpr['part']['itemParam'])
-			$this->currExpr['object']['itemParam'] .= $symbol;
-
 		if($this->currExpr['part']['function'])
 			$this->currExpr['object']['function'] .= $symbol;
+
+		if($this->currExpr['part']['itemParam'])
+			$this->currExpr['object']['itemParamReal'] .= $symbol;
+
+		if($this->currExpr['part']['functionParam'])
+			$this->currExpr['object']['functionParamReal'] .= $symbol;
+
+
+		if(($symbol == ' ') && !$this->inParameter()) return;
+
+		if($this->currExpr['part']['itemParam'])
+			$this->currExpr['object']['itemParam'] .= $symbol;
 
 		if($this->currExpr['part']['functionParam'])
 			$this->currExpr['object']['functionParam'] .= $symbol;
@@ -679,10 +691,12 @@ private $allowed;
 				'host' => '',
 				'item' => '',
 				'itemParam' => '',
+				'itemParamReal' => '',
 				'itemParamList' => '',
 				'function' => '',
 				'functionName' => '',
 				'functionParam' => '',
+				'functionParamReal' => '',
 				'functionParamList' => ''
 			),
 			'params' => array(

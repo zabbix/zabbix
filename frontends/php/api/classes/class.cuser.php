@@ -625,14 +625,27 @@ Copt::memoryPick();
 
 
 				if(isset($user['usrgrps']) && !is_null($user['usrgrps'])){
-					DBexecute('DELETE FROM users_groups WHERE userid='.$user['userid']);
 
-				$options = array(
-						'usrgrpids' => zbx_objectValues($user['usrgrps'], 'usrgrpid'),
-					'output' => API_OUTPUT_EXTEND,
-					'preservekeys' => 1
-				);
-				$usrgrps = CUserGroup::get($options);
+					// list with group id's where user must be after update
+					$user_must_be_in_groups = zbx_objectValues($user['usrgrps'], 'usrgrpid');
+
+					// deleting all relations with groups, but not touching those, where user still must be after update
+					$sql = 'DELETE FROM users_groups WHERE userid='.$user['userid'].' AND '.DBcondition('usrgrpid', $user_must_be_in_groups, true);  // true - NOT IN
+					DBexecute($sql);
+
+					// getting the list of groups user is currently in
+					$db_groups_user_is_in = DBSelect('SELECT usrgrpid FROM users_groups WHERE userid='.$user['userid']);
+					$groups_user_is_in = array();
+					while($grp = DBfetch($db_groups_user_is_in)){
+						$groups_user_is_in[] = $grp['usrgrpid'];
+					}
+
+					$options = array(
+						'usrgrpids' => $user_must_be_in_groups,
+						'output' => API_OUTPUT_EXTEND,
+						'preservekeys' => 1
+					);
+					$usrgrps = CUserGroup::get($options);
 
 					foreach($usrgrps as $groupid => $group){
 						if(($group['gui_access'] == GROUP_GUI_ACCESS_DISABLED) && $self){
@@ -643,11 +656,14 @@ Copt::memoryPick();
 							self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_USER_CANT_DISABLE_SELF_PART1);
 						}
 
-						$users_groups_id = get_dbid('users_groups', 'id');
-						$sql = 'INSERT INTO users_groups (id, usrgrpid, userid)'.
-								' VALUES ('.$users_groups_id.','.$groupid.','.$user['userid'].')';
-						if(!DBexecute($sql))
-							self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+						// if user is not already in a given group
+						if (!in_array($groupid, $groups_user_is_in)){
+							$users_groups_id = get_dbid('users_groups', 'id');
+							$sql = 'INSERT INTO users_groups (id, usrgrpid, userid)'.
+									' VALUES ('.$users_groups_id.','.$groupid.','.$user['userid'].')';
+							if(!DBexecute($sql))
+								self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+						}
 					}
 				}
 	/*

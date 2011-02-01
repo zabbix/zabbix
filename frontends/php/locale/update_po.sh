@@ -31,6 +31,8 @@ for i in */LC_MESSAGES/frontend.po; do
 --backup=off "$i" frontend.pot
 done
 
+# 'msgattrib --no-obsolete' could be used to automatically drop obsolete strings
+
 for i in */LC_MESSAGES/frontend.po; do
 	echo -ne "$i\t"
 	# setting output file to /dev/null so that unneeded messages.mo file
