@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1027,6 +1027,7 @@ COpt::memoryPick();
 			else{
 				$item['interfaceid'] = 0;
 			}
+
 
 			if((isset($item['port']) && !zbx_empty($item['port']))
 				&& !((zbx_ctype_digit($item['port']) && ($item['port']>0) && ($item['port']<=65535))

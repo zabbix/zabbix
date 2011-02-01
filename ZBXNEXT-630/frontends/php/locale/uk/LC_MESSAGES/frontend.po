@@ -2,14 +2,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-27 14:02+0200\n"
-"PO-Revision-Date: 2011-01-14 10:22+0200\n"
+"POT-Creation-Date: 2011-01-28 22:05+0200\n"
+"PO-Revision-Date: 2011-01-28 14:59+0200\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
+"Language: uk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: uk\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.1.4\n"
 "X-Poedit-Basepath: ../../\n"
@@ -680,7 +680,7 @@ msgstr "Зворотній виклик"
 msgid "Can not create new element"
 msgstr "Не вдалося створити новий елемент"
 
-#: api/classes/class.cuser.php:758
+#: api/classes/class.cuser.php:774
 #, php-format
 msgid "Can not delete %1$s internal user \" %2$s \", try disabling that user."
 msgstr "Не вдалося видалити %1$s внутрішнього користувача \" %2$s \", спробуйте дезактивувати цього користувача."
@@ -688,6 +688,10 @@ msgstr "Не вдалося видалити %1$s внутрішнього ко�
 #: include/locales/en_gb.inc.php:2372
 msgid "Can not find objects with name"
 msgstr "Не вдалося знайти об'єкт з іменем"
+
+#: api/classes/class.chostinterface.php:491
+msgid "Can not switch host for interface"
+msgstr ""
 
 #: api/classes/class.ctemplate.php:1405
 msgid "Can't add group"
@@ -873,7 +877,7 @@ msgstr "Не вдалося скопіювати елементи даних"
 
 #: include/db.inc.php:45
 msgid "Cannot create another database connection."
-msgstr ""
+msgstr "Не вдалося сворити інше з'єднання з базою даних."
 
 #: api/classes/class.chost.php:1922
 msgid "Cannot create extended profile"
@@ -896,7 +900,7 @@ msgstr "Не вдалося видалити правило виявлення"
 msgid "Cannot delete extended profile"
 msgstr "Не вдалося видалити розширений профіль"
 
-#: api/classes/class.citem.php:1339 include/locales/en_gb.inc.php:685
+#: api/classes/class.citem.php:1340 include/locales/en_gb.inc.php:685
 msgid "Cannot delete graph"
 msgstr "Не вдалося видалити графік"
 
@@ -962,7 +966,7 @@ msgstr "Не вдалося видалити скрипт"
 
 #: actionconf.php:313
 msgid "Cannot delete selected actions."
-msgstr ""
+msgstr "Не вдалося видалити вибрані дії."
 
 #: include/locales/en_gb.inc.php:1633
 msgid "Cannot delete service"
@@ -1058,7 +1062,7 @@ msgstr "Не вдалося розкрити вираз"
 #: api/classes/class.ctrigger.php:1519
 #, php-format
 msgid "Cannot implode expression \"%s\"."
-msgstr ""
+msgstr "Не вдалося розкрити вираз \"%s\"."
 
 #: include/locales/en_gb.inc.php:2212
 msgid "Cannot link hardlinked service."
@@ -1271,7 +1275,7 @@ msgstr "Не вдалося оновити послугу"
 
 #: include/locales/en_gb.inc.php:1605
 msgid "Cannot update slideshow"
-msgstr ""
+msgstr "Не вдалося оновити слайдшоу"
 
 #: include/locales/en_gb.inc.php:1059
 msgid "Cannot update status"
@@ -1764,11 +1768,11 @@ msgstr "Тип даних"
 
 #: include/setup.inc.php:240 include/setup.inc.php:294
 msgid "Database file"
-msgstr ""
+msgstr "Файл бази даних"
 
 #: include/setup.inc.php:243
 msgid "Database host"
-msgstr ""
+msgstr "Хост бази даних"
 
 #: include/locales/en_gb.inc.php:1081
 msgid "Database monitor"
@@ -1776,32 +1780,32 @@ msgstr "Монітор бази даних"
 
 #: include/setup.inc.php:245 include/setup.inc.php:302
 msgid "Database name"
-msgstr ""
+msgstr "Ім'я бази даних"
 
 #: include/setup.inc.php:304
 msgid "Database password"
-msgstr ""
+msgstr "Пароль до бази даних"
 
 #: include/setup.inc.php:244 include/setup.inc.php:299
 #: include/setup.inc.php:301
 msgid "Database port"
-msgstr ""
+msgstr "Порт бази даних"
 
 #: include/setup.inc.php:247 include/setup.inc.php:306
 msgid "Database schema"
-msgstr ""
+msgstr "Схема бази даних"
 
 #: include/setup.inc.php:297
 msgid "Database server"
-msgstr ""
+msgstr "Сервер бази даних"
 
 #: include/setup.inc.php:237 include/setup.inc.php:290
 msgid "Database type"
-msgstr ""
+msgstr "Тип бази даних"
 
 #: include/setup.inc.php:303
 msgid "Database user"
-msgstr ""
+msgstr "Користувач бази даних"
 
 #: include/locales/en_gb.inc.php:783
 msgid "Date"
@@ -2551,8 +2555,8 @@ msgstr "Пусто"
 #: api/classes/class.cdiscoveryrule.php:920 api/classes/class.cgraph.php:1014
 #: api/classes/class.cgraphprototype.php:1010
 #: api/classes/class.chostgroup.php:719
-#: api/classes/class.chostinterface.php:700 api/classes/class.chost.php:2060
-#: api/classes/class.citem.php:1286 api/classes/class.citemprototype.php:892
+#: api/classes/class.chostinterface.php:706 api/classes/class.chost.php:2060
+#: api/classes/class.citem.php:1287 api/classes/class.citemprototype.php:892
 #: api/classes/class.cproxy.php:507 api/classes/class.ctemplate.php:1139
 #: api/classes/class.ctrigger.php:1357 api/classes/class.cusergroup.php:699
 msgid "Empty input parameter"
@@ -2775,7 +2779,7 @@ msgstr "Експортувати вибране"
 
 #: events.php:185
 msgid "Export to CSV"
-msgstr ""
+msgstr "Експортувати в CSV"
 
 #: include/locales/en_gb.inc.php:545
 msgid "Expression"
@@ -3140,7 +3144,7 @@ msgstr "Тип графіка"
 msgid "Graph updated"
 msgstr "Графік оновлено"
 
-#: api/classes/class.cgraph.php:1153
+#: api/classes/class.cgraph.php:1152
 #, php-format
 msgid "Graph with name [ %1$s ] already exists"
 msgstr "Графік з іменем [ %1$s ] вже існує"
@@ -3328,6 +3332,11 @@ msgstr "Вузел мережі"
 #, php-format
 msgid "Host \"%s\" already exists."
 msgstr "Вузел мережі \"%s\" вже існує."
+
+#: include/export.inc.php:874
+#, php-format
+msgid "Host \"%s\" has \"use_ipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
+msgstr ""
 
 #: include/locales/en_gb.inc.php:89
 msgid "Host IP"
@@ -3804,7 +3813,7 @@ msgstr "Некоректний вираз"
 
 #: api/classes/class.ctrigger.php:1189
 msgid "Incorrect fields for trigger"
-msgstr ""
+msgstr "Некоректні поля для триге"
 
 #: include/locales/en_gb.inc.php:2168
 msgid "Incorrect function is used"
@@ -3818,15 +3827,20 @@ msgstr "Некоректна група"
 msgid "Incorrect host"
 msgstr "Некоректний вузел мережі"
 
-#: api/classes/class.chostinterface.php:529
+#: api/classes/class.chostinterface.php:535
 #, php-format
 msgid "Incorrect interface DNS parameter \" %1$s \" provided."
 msgstr "Надано некоректний DNS параметр інтерфейсу \" %1$s \""
 
-#: api/classes/class.chostinterface.php:538
+#: api/classes/class.chostinterface.php:544
 #, php-format
 msgid "Incorrect interface IP parameter \" %1$s \" provided."
 msgstr "Надано некоректний IP параметр \" %1$s \" інтерфейса."
+
+#: api/classes/class.chostinterface.php:555
+#, php-format
+msgid "Incorrect interface PORT \"%s\" provided"
+msgstr ""
 
 #: api/classes/class.cgraph.php:1188
 #: api/classes/class.cgraphprototype.php:1206
@@ -3920,7 +3934,7 @@ msgstr "Некоректний вираз тригера"
 #: api/classes/class.ctrigger.php:1259
 #, php-format
 msgid "Incorrect trigger expression. Host \"%s\" does not exist or you have no access to this host."
-msgstr ""
+msgstr "Некоректний вираз тригера. Вузел мережі \"%s\" не існує або ви не маєте до нього доступу."
 
 #: include/locales/en_gb.inc.php:2050
 msgid "Incorrect type of asort_by_key"
@@ -3941,22 +3955,22 @@ msgstr "Некоректні дані користувача в"
 #: include/db.inc.php:1203
 #, php-format
 msgid "Incorrect value \"%1$s\" for float field \"%2$s\"."
-msgstr ""
+msgstr "Значення \"%1$s\" є некоректним для поля дробового числа \"%2$s\"."
 
 #: include/db.inc.php:1199
 #, php-format
 msgid "Incorrect value \"%1$s\" for int field \"%2$s\"."
-msgstr ""
+msgstr "Значення \"%1$s\" є некоректним для поля цілого числа \"%2$s\"."
 
 #: include/db.inc.php:1195
 #, php-format
 msgid "Incorrect value \"%1$s\" for unsigned int field \"%2$s\"."
-msgstr ""
+msgstr "Значення \"%1$s\" є некоректним для поля числа без знаку \"%2$s\"."
 
 #: include/db.inc.php:1180
 #, php-format
 msgid "Incorrect value \"NULL\" for NOT NULL field \"%s\"."
-msgstr ""
+msgstr "Значення \"NULL\" є некоректним для NOT NULL поля \"%s\"."
 
 #: include/locales/en_gb.inc.php:2144
 msgid "Incorrect value for"
@@ -4006,15 +4020,20 @@ msgstr "Ім'я інсталятора"
 msgid "Interface"
 msgstr "Інтерфейс"
 
+#: api/classes/class.chostinterface.php:580
+#, php-format
+msgid "Interface is linked to item \"%s\""
+msgstr ""
+
 #: api/classes/class.chostinterface.php:517
 #, php-format
 msgid "Interface with DNS \" %1$s \" can not have empty IP address."
 msgstr "Інтерфейс із DNS \" %1$s \" не може мати пусту IP адресу."
 
-#: api/classes/class.chostinterface.php:521
+#: api/classes/class.chostinterface.php:527
 #, php-format
-msgid "Interface with IP \" %1$s \" can not have empty DNS name."
-msgstr "Інтерфейс із IP \" %1$s \" не може мати пусте DNS ім'я."
+msgid "Interface with IP \"%1$s\" can not have empty DNS name while having \"Use DNS\" property on host \"%2$s\"."
+msgstr ""
 
 #: include/locales/en_gb.inc.php:937
 msgid "Interfaces"
@@ -4065,12 +4084,12 @@ msgstr "Елемент даних"
 msgid "Item [%1$s:%2$s] cannot find interface on host [%3$s]"
 msgstr "Елемент даних [%1$s:%2$s] не може знайти інтерфейс на вузлі мережі [%3$s]"
 
-#: api/classes/class.citem.php:1389
+#: api/classes/class.citem.php:1390
 #, php-format
 msgid "Item [%1$s:%2$s] deleted."
 msgstr "Елемент даних [%1$s:%2$s] видалено."
 
-#: api/classes/class.cdiscoveryrule.php:674 api/classes/class.citem.php:1036
+#: api/classes/class.cdiscoveryrule.php:674 api/classes/class.citem.php:1037
 #: api/classes/class.citemprototype.php:640
 #, php-format
 msgid "Item [%1$s:%2$s] has invalid port: \"%3$s\"."
@@ -4579,7 +4598,7 @@ msgstr "Сервіс оновлено"
 #: include/db.inc.php:1168
 #, php-format
 msgid "Mandatory field \"%1$s\" is missing in table \"%2$s\"."
-msgstr ""
+msgstr "Обов'язкове поле \"%1$s\" відсутнє в таблиці \"%2$s\"."
 
 #: include/locales/en_gb.inc.php:1564
 msgid "Map"
@@ -5018,6 +5037,16 @@ msgstr "Наступна перевірка"
 msgid "No"
 msgstr "Ні"
 
+#: include/export.inc.php:1482
+#, php-format
+msgid "No \"ymax_type\" field for graph \"%s\""
+msgstr ""
+
+#: include/export.inc.php:1478
+#, php-format
+msgid "No \"ymin_type\" field for graph \"%s\""
+msgstr ""
+
 #: include/locales/en_gb.inc.php:1628
 msgid "No IT service defined"
 msgstr "Не має визначених IT послуг"
@@ -5060,7 +5089,7 @@ msgstr "Не має призначених залежностей"
 
 #: popup.php:1581
 msgid "No discovery checks defined"
-msgstr ""
+msgstr "Перевірок для виявлення не визначено"
 
 #: include/locales/en_gb.inc.php:102
 msgid "No discovery rules defined"
@@ -5212,6 +5241,11 @@ msgstr "Не має доданих нод"
 msgid "No operations defined"
 msgstr "Не має визначених операцій"
 
+#: include/export.inc.php:1349
+#, php-format
+msgid "No permission for trigger \"%s\""
+msgstr ""
+
 #: include/locales/en_gb.inc.php:2345
 msgid "No permissions for map"
 msgstr "Не має прав доступу до карти мережі"
@@ -5226,7 +5260,7 @@ msgstr "Не має прав на карту мережі або вона не �
 
 #: include/locales/en_gb.inc.php:626
 msgid "No permissions to referred object or it does not exist!"
-msgstr ""
+msgstr "Не має прав доступу до запитуваного об'єкту або він не існує!"
 
 #: include/locales/en_gb.inc.php:878
 msgid "No proxies defined"
@@ -5702,7 +5736,7 @@ msgstr "ТЕКСТ"
 msgid "POP"
 msgstr "POP"
 
-#: api/classes/class.chostinterface.php:543
+#: api/classes/class.chostinterface.php:549
 msgid "PORT can not be empty for host interface"
 msgstr "ПОРТ не може бути пустим для інтерфейса вузла мережі"
 
@@ -6253,7 +6287,7 @@ msgstr "КОМПЛЕКСНІ ЕКРАНИ"
 
 #: include/locales/en_gb.inc.php:1886
 msgid "SCRIPT ERROR"
-msgstr "Помилка скрипта"
+msgstr "ПОМИЛКА СКРИПТА"
 
 #: include/locales/en_gb.inc.php:1869
 msgid "SCRIPTS"
@@ -6406,17 +6440,17 @@ msgstr "Сценарій"
 #: api/classes/class.cwebcheck.php:542
 #, php-format
 msgid "Scenario [%1$s] [%2$s] host [%3$s]"
-msgstr ""
+msgstr "Сценарій [%1$s] [%2$s] вузел мережі [%3$s]"
 
-#: api/classes/class.cwebcheck.php:400
+#: api/classes/class.cwebcheck.php:332 api/classes/class.cwebcheck.php:400
 #, php-format
 msgid "Scenario [%s] already exists."
-msgstr ""
+msgstr "Сценарій [%s] вже існує."
 
 #: api/classes/class.cwebcheck.php:535
 #, php-format
 msgid "Scenario [%s] deleted."
-msgstr ""
+msgstr "Сценарій [%s] видалено."
 
 #: include/locales/en_gb.inc.php:192
 msgid "Scenario activated"
@@ -6436,7 +6470,7 @@ msgstr "Сценарій дезактивовано"
 
 #: api/classes/class.cwebcheck.php:627 api/classes/class.cwebcheck.php:724
 msgid "Scenario step name should contain only printable characters."
-msgstr ""
+msgstr "Ім'я кроку сценарію повинно містити тільки друковані символи."
 
 #: api/classes/class.cwebcheck.php:640 api/classes/class.cwebcheck.php:729
 msgid "Scenario step number cannot be less than 1"
@@ -6445,11 +6479,6 @@ msgstr "Номер кроку сценарію не може бути менши
 #: include/locales/en_gb.inc.php:195
 msgid "Scenario updated"
 msgstr "Сценарій оновлено"
-
-#: api/classes/class.cwebcheck.php:332
-#, php-format
-msgid "Scenarion [%s] already exists."
-msgstr ""
 
 #: include/locales/en_gb.inc.php:185
 msgid "Scenarios"
@@ -6609,7 +6638,7 @@ msgstr "Відібрані"
 
 #: actionconf.php:313
 msgid "Selected actions deleted."
-msgstr ""
+msgstr "Обрані дії видалено."
 
 #: include/locales/en_gb.inc.php:1500
 msgid "Selected groups"
@@ -7022,7 +7051,7 @@ msgstr "Крок"
 #: api/classes/class.cwebcheck.php:634
 #, php-format
 msgid "Step [%s] already exists."
-msgstr ""
+msgstr "Крок [%s] вже існує."
 
 #: include/locales/en_gb.inc.php:207
 msgid "Step of scenario"
@@ -7136,7 +7165,7 @@ msgstr "ПРАВДА"
 #: include/db.inc.php:1150
 #, php-format
 msgid "Table \"%s\" does not exist."
-msgstr ""
+msgstr "Таблиця \"%s\" не існує."
 
 #: include/locales/en_gb.inc.php:2280
 msgid "Table users is empty. Possible database corruption."
@@ -7408,12 +7437,12 @@ msgstr "Тригер [%1$s:%2$s] не має прототипу елемента
 msgid "Trigger [%1$s:%2$s] unlinked."
 msgstr "Тригер [%1$s:%2$s] від'єднано."
 
-#: api/classes/class.ctrigger.php:1629
+#: api/classes/class.ctrigger.php:1633
 #, php-format
 msgid "Trigger [%1$s:%2$s] updated."
 msgstr "Тригер [%1$s:%2$s] оновлено."
 
-#: api/classes/class.ctrigger.php:1716 api/classes/class.ctrigger.php:1751
+#: api/classes/class.ctrigger.php:1720 api/classes/class.ctrigger.php:1755
 #: api/classes/class.ctriggerprototype.php:1514
 #: api/classes/class.ctriggerprototype.php:1549
 #, php-format
@@ -7489,7 +7518,7 @@ msgstr "Тригер оновлено"
 msgid "Trigger value"
 msgstr "Значення тригера"
 
-#: api/classes/class.ctrigger.php:1720 api/classes/class.ctrigger.php:1754
+#: api/classes/class.ctrigger.php:1724 api/classes/class.ctrigger.php:1758
 #: api/classes/class.ctriggerprototype.php:1518
 #: api/classes/class.ctriggerprototype.php:1552
 msgid "Trigger with same name but other type exists"
@@ -7791,7 +7820,7 @@ msgstr "Використовувати профіль"
 
 #: media_types.php:262
 msgid "Used in actions"
-msgstr ""
+msgstr "Використовується в діях"
 
 #: include/locales/en_gb.inc.php:384 include/locales/en_gb.inc.php:909
 #: include/setup.inc.php:248
@@ -7988,12 +8017,12 @@ msgstr "Веб елемент"
 #: api/classes/class.cwebcheck.php:619 api/classes/class.cwebcheck.php:715
 #, php-format
 msgid "Web item [%s] created."
-msgstr ""
+msgstr "Елемент даних Веб [%s] створено."
 
 #: api/classes/class.cwebcheck.php:678
 #, php-format
 msgid "Web item with key [%s] already exists."
-msgstr ""
+msgstr "Елемент даних Веб з ключем [%s] вже існує."
 
 #: include/locales/en_gb.inc.php:1087
 msgid "Web monitoring"
@@ -8289,11 +8318,11 @@ msgstr "Zabbix сервер в запущеному стані"
 
 #: include/setup.inc.php:314
 msgid "Zabbix server name"
-msgstr ""
+msgstr "Ім'я Zabbix сервера"
 
 #: include/setup.inc.php:313
 msgid "Zabbix server port"
-msgstr ""
+msgstr "Порт Zabbix сервера"
 
 #: include/locales/en_gb.inc.php:1076
 msgid "Zabbix trapper"
@@ -8471,7 +8500,7 @@ msgstr "днів"
 
 #: include/setup.inc.php:299
 msgid "default"
-msgstr ""
+msgstr "по замовчуванню"
 
 #: include/locales/en_gb.inc.php:2341
 msgid "does not exist"
@@ -8877,490 +8906,3 @@ msgstr "так"
 #: include/locales/en_gb.inc.php:2055
 msgid "µ"
 msgstr "µ"
-
-#~ msgid "\""
-#~ msgstr "\""
-
-#~ msgid "\" deleted from host"
-#~ msgstr "\" видалено з вузла мережі"
-
-#~ msgid "Actions deleted"
-#~ msgstr "Дії видалено"
-
-#~ msgid "Actions since"
-#~ msgstr "Дії з"
-
-#~ msgid "Added host group"
-#~ msgstr "Додано групу вузлів"
-
-#~ msgid "Added new application"
-#~ msgstr "Додано нову групу елементів даних"
-
-#~ msgid "Added new host"
-#~ msgstr "Додано новий вузол мережі"
-
-#~ msgid "Added new item"
-#~ msgstr "Додано новий елемент даних"
-
-#~ msgid "An action type with description"
-#~ msgstr "Тип дії з описом"
-
-#~ msgid "Back"
-#~ msgstr "Назад"
-
-#~ msgid "Can not use multiple host items for template graph"
-#~ msgstr "Не можна використовувати елементи багатьох вузлів мережі для графіків з шаблону"
-
-#~ msgid "Can't delete media types"
-#~ msgstr "Не вдалось видалити метод повідомлення"
-
-#~ msgid "Can't insert media types"
-#~ msgstr "Не вдалось додати метод повідомлення"
-
-#~ msgid "Can't update media types"
-#~ msgstr "Не вдалось оновити метод повідомлення"
-
-#~ msgid "Cannot connect to Zabbix server"
-#~ msgstr "Не вдалося підключитись до сервера Zabbix"
-
-#~ msgid "Cannot create application"
-#~ msgstr "Не вдалося створити групу елементів даних"
-
-#~ msgid "Cannot delete actions"
-#~ msgstr "Не вдалося видалити дії"
-
-#~ msgid "Cannot delete macros"
-#~ msgstr "Не вдалося видалити макроси"
-
-#~ msgid "Create Host"
-#~ msgstr "Створити вузел мережі"
-
-#~ msgid "Create Template"
-#~ msgstr "Створити шаблон"
-
-#~ msgid "Disable IPMI"
-#~ msgstr "Дезактивувати IPMI"
-
-#~ msgid "Do not add"
-#~ msgstr "Не додавати"
-
-#~ msgid "Download"
-#~ msgstr "Завантажити"
-
-#~ msgid "Download newly created locale file by pressing \"Download\"."
-#~ msgstr "Завантажте ново-створений файл локалізації натиснувши \"Завантажити\"."
-
-#~ msgid "EXPORT"
-#~ msgstr "ЕКСПОРТ"
-
-#~ msgid "Elements"
-#~ msgstr "Елементи"
-
-#~ msgid "Enable IPMI"
-#~ msgstr "Активувати IPMI"
-
-#~ msgid "Error in item key:"
-#~ msgstr "Помилка в ключі елемента даних:"
-
-#~ msgid "Escalation"
-#~ msgstr "Ескалація"
-
-#~ msgid "Escalation rule"
-#~ msgstr "Правило ескалації"
-
-#~ msgid "Events since"
-#~ msgstr "Події із"
-
-#~ msgid "Every"
-#~ msgstr "Кожні"
-
-#~ msgid "Export"
-#~ msgstr "Експорт"
-
-#~ msgid "Export does not contain Zabbix maps"
-#~ msgstr "Експорт не містить карт мереж Zabbix"
-
-#~ msgid "Export does not contain Zabbix screens"
-#~ msgstr "Експорт не містить комплексних екранів Zabbix"
-
-#~ msgid "Export/Import"
-#~ msgstr "Експорт/Імпорт"
-
-#~ msgid "Extend this array with Your locale like \"your_prefix\" => \"display_like\"."
-#~ msgstr "Додайте в цей масив вашу локалізацію ось так \"ваш_префікс\" => \"ім'я_в_інтерфейсі\"."
-
-#~ msgid "Favourite"
-#~ msgstr "Обране"
-
-#~ msgid "Fill with default value"
-#~ msgstr "Заповнити значенням по замовчуванню"
-
-#~ msgid "For example see implementation of other locales."
-#~ msgstr "Для прикладу дивіться на реалізацію для інших мов."
-
-#~ msgid "Found"
-#~ msgstr "Знайдено"
-
-#~ msgid "Graph \""
-#~ msgstr "Графік \""
-
-#~ msgid "Host macro"
-#~ msgstr "Макрос вузла мережі"
-
-#~ msgid "IMPORT"
-#~ msgstr "ІМПОРТ"
-
-#~ msgid "Import Host"
-#~ msgstr "Імпортувати вузел мережі"
-
-#~ msgid "Import Template"
-#~ msgstr "Імпортувати шаблон"
-
-#~ msgid "Incorrect characters used for DNS"
-#~ msgstr "Використано некоректні символи в DNS імені вузла мережі"
-
-#~ msgid "Incorrect characters used for Hostname"
-#~ msgstr "Використано некоректні символи в імені вузла мережі"
-
-#~ msgid "Incorrect description"
-#~ msgstr "Невірний опис"
-
-#~ msgid "Incorrect fields for application"
-#~ msgstr "Некоректні поля для групи елементів даних"
-
-#~ msgid "Interface used in item"
-#~ msgstr "Інтерфейс, використаний в елементі даних"
-
-#~ msgid "Internal Zabbix error"
-#~ msgstr "Внутрішня помилка Zabbix"
-
-#~ msgid "Invalid SNMP port"
-#~ msgstr "Некоректний порт SNMP"
-
-#~ msgid "Leave empty"
-#~ msgstr "Залишити пустим"
-
-#~ msgid "Link with template"
-#~ msgstr "Приєднати шаблон"
-
-#~ msgid "Locale to extend"
-#~ msgstr "Мова для розширення"
-
-#~ msgid "Locales"
-#~ msgstr "Локалізації"
-
-#~ msgid "Loop"
-#~ msgstr "Циклічно"
-
-#~ msgid "Macro added"
-#~ msgstr "Макрос додано"
-
-#~ msgid "Macro already exists"
-#~ msgstr "Макрос вже існує"
-
-#~ msgid "Macros deleted"
-#~ msgstr "Макроси видалено"
-
-#~ msgid "Main"
-#~ msgstr "Головний"
-
-#~ msgid "Maintenance periods"
-#~ msgstr "Періоди сервісу"
-
-#~ msgid "Memory leak"
-#~ msgstr "Витік пам'яті"
-
-#~ msgid "New entries"
-#~ msgstr "Нові записи"
-
-#~ msgid "New macro"
-#~ msgstr "Новий макрос"
-
-#~ msgid "Next run"
-#~ msgstr "Наступний запуск"
-
-#~ msgid "No data for export"
-#~ msgstr "Не має даних для експорту"
-
-#~ msgid "No function with"
-#~ msgstr "Не має функції з"
-
-#~ msgid "No macros defined"
-#~ msgstr "Не має визначених макросів"
-
-#~ msgid "No media type with"
-#~ msgstr "Не має типів методів повідомлень з"
-
-#~ msgid "No media with"
-#~ msgstr "Не має методів повідомлень з"
-
-#~ msgid "No permissions !"
-#~ msgstr "Не має прав !"
-
-#~ msgid "No sysmap element with"
-#~ msgstr "Не має елемента карти мережі з"
-
-#~ msgid "No templates linked"
-#~ msgstr "Не має приєднаних шаблонів"
-
-#~ msgid "Not acknowledged"
-#~ msgstr "Не підтверджено"
-
-#~ msgid "OFF"
-#~ msgstr "ВИМКН"
-
-#~ msgid "Only Super Admins can create Scripts"
-#~ msgstr "Тільки Zabbix Супер-адміністратор може створювати Скрипти"
-
-#~ msgid "Only Super Admins can create Users"
-#~ msgstr "Тільки Zabbix Супер-адміністратор може створювати користувачів"
-
-#~ msgid "Only Super Admins can delete Scripts"
-#~ msgstr "Тільки Zabbix Супер-адміністратор може видаляти Скрипти"
-
-#~ msgid "Only Super Admins can update Scripts"
-#~ msgstr "Тільки Zabbix Супер-адміністратор може оновлювати Скрипти"
-
-#~ msgid "Only Super Admins can update media types"
-#~ msgstr "Тільки Zabbix Супер-адміністратор може оновлювати методи повідомлень"
-
-#~ msgid "Only host info"
-#~ msgstr "Інформація тільки про вузел мережі"
-
-#~ msgid "Passphrase"
-#~ msgstr "Ключове слово"
-
-#~ msgid "Pause"
-#~ msgstr "Пауза"
-
-#~ msgid "Place it to \"/PATH_TO_ZABBIX_FRONTEND/include/locales\"."
-#~ msgstr "Помістіть його до \"/ШЛЯХ_ДО_ІНТЕРФЕЙСУ_ZABBIX/include/locales\"."
-
-#~ msgid "Prototypes"
-#~ msgstr "Прототипи"
-
-#~ msgid "QUEUE"
-#~ msgstr "ЧЕРГА"
-
-#~ msgid "Refresh"
-#~ msgstr "Оновити"
-
-#~ msgid "Replace previous locale file with one you have downloaded."
-#~ msgstr "Замініть попередній файл локалізації тим що завантажили."
-
-#~ msgid "Required host"
-#~ msgstr "До вузла мережі Необхідо мати"
-
-#~ msgid "SNMP port"
-#~ msgstr "SNMP порт"
-
-#~ msgid "Scenario step name should contain"
-#~ msgstr "Ім'я кроку сценарію має містити"
-
-#~ msgid "Scenario with name"
-#~ msgstr "Сценарій з ім'ям"
-
-#~ msgid "Schema"
-#~ msgstr "Схема"
-
-#~ msgid "Select graph to display"
-#~ msgstr "Оберіть графік для відображення"
-
-#~ msgid "Select graph..."
-#~ msgstr "Оберіть графік..."
-
-#~ msgid "Select host..."
-#~ msgstr "Виберіть вузел мережі..."
-
-#~ msgid "Show last"
-#~ msgstr "Відображувати останні"
-
-#~ msgid "Show only problems"
-#~ msgstr "Відображувати тільки проблеми"
-
-#~ msgid "Show problem-unacknowledged"
-#~ msgstr "Відображувати тільки не підтверджені проблеми"
-
-#~ msgid "Show triggers with unacknowledged events"
-#~ msgstr "Відображувати тригери з непідтвердженими подіями"
-
-#~ msgid "Skip existing items"
-#~ msgstr "Пропустити існуючі елементи"
-
-#~ msgid "Sound"
-#~ msgstr "Звук"
-
-#~ msgid "Specify the conditional expression for the target."
-#~ msgstr "Вкажіть умовний вираз для цілі."
-
-#~ msgid "Take for default locale"
-#~ msgstr "Взяти за мову по замовчуванню"
-
-#~ msgid "Templated"
-#~ msgstr "Шаблонний"
-
-#~ msgid "Templated graph"
-#~ msgstr "Графік з шаблону"
-
-#~ msgid "Templated trigger"
-#~ msgstr "Тригер з шаблону"
-
-#~ msgid "The locale file name must be made of a prefix: \"ISO 639-1 language code\"_\"ISO 3166-1 alpha-2 country code\". Like \"en_gb\""
-#~ msgstr "Ім'я файлу локалізації повинно складатись з префікса: \"код мови по ISO 639-1\"_\"дві бувки коду країни по ISO 3166-1\". Наприклад \"en_gb\""
-
-#~ msgid "There You will find an array containing \"keys\" => \"values\"."
-#~ msgstr "Знайдіть масив, який містить \"ключі\" => \"значення\"."
-
-#~ msgid "Timezone for PHP is not set. Please set \"date.timezone\" option in php.ini."
-#~ msgstr "Часовий пояс для PHP не встановлено. Будь ласка встановіть параметр \"date.timezone\" в php.ini."
-
-#~ msgid "To make new locale visible by Zabbix frontend - extend the php script \"/PATH_TO_ZABBIX_FRONTEND/include/locales.inc.php\"."
-#~ msgstr "Щоб нову локалізацію було видно у веб-інтерфейсі Zabbix потрібно відредагувати php скрипт \"/PATH_TO_ZABBIX_FRONTEND/include/locales.inc.php\"."
-
-#~ msgid "Trigger in template"
-#~ msgstr "Тригер в шаблоні"
-
-#~ msgid "UNAVAILABLE"
-#~ msgstr "НЕДОСТУПНИЙ"
-
-#~ msgid "Unknown error happened reading script answer, please report to the developers"
-#~ msgstr "Невідома помилка при зчитуванні відповіді скрипта, будь-ласка повідомте розробникам"
-
-#~ msgid "Unknown macro"
-#~ msgstr "Невідомий макрос"
-
-#~ msgid "Updated application"
-#~ msgstr "Оновлено групу елементів даних"
-
-#~ msgid "Updated host group"
-#~ msgstr "Оновлено групу вузлів мережі"
-
-#~ msgid "User cannot disable himself"
-#~ msgstr "Користувач не може відключити себе"
-
-#~ msgid "Wrong type"
-#~ msgstr "Невірний тип"
-
-#~ msgid "You can set \"display_like\" value in new locale file by adding it or You may leave it as hardcoded string."
-#~ msgstr "Ви можете задати \"ім'я_в_інтерфейсі\" в новому файлі локалізації, додавши його туди або залишити його жостко заданим рядком."
-
-#~ msgid "You can't delete template for an application that is used in a web scenario"
-#~ msgstr "Ви не можете видалити шаблон для групи елементів даних, які використовуються у веб сценарії"
-
-#~ msgid "You must use items only from host"
-#~ msgstr "Ви маєте використовувати елементи даних тільки із вузла мережі"
-
-#~ msgid "Zabbix agent port"
-#~ msgstr "Порт Zabbix агента"
-
-#~ msgid "Zabbix config"
-#~ msgstr "Налаштування Zabbix"
-
-#~ msgid "already exists in linked hosts"
-#~ msgstr "вже існує в приєднаному вузлі мережі"
-
-#~ msgid "and a postfix \".inc.php\". Like \"en_gb.inc.php\"."
-#~ msgstr "та суфікса \".inc.php\". Наприклад в результаті \"en_gb.inc.php\"."
-
-#~ msgid "can not exist without group"
-#~ msgstr "не може існувати без групи"
-
-#~ msgid "characters only"
-#~ msgstr "тільки символи"
-
-#~ msgid "deleted"
-#~ msgstr "видалено"
-
-#~ msgid "doesn't exist"
-#~ msgstr "не існує"
-
-#~ msgid "for template graph"
-#~ msgstr "для графіку з шаблону"
-
-#~ msgid "from host"
-#~ msgstr "із вузла"
-
-#~ msgid "has dependency with trigger in template"
-#~ msgstr "має залежність з тригером в шаблоні"
-
-#~ msgid "incorrect parameters for"
-#~ msgstr "некоректний параметр для"
-
-#~ msgid "is not the highest level template"
-#~ msgstr "це шаблон не найвищого рівня"
-
-#~ msgid "locale"
-#~ msgstr "локалізацію"
-
-#~ msgid "log files"
-#~ msgstr "журнали"
-
-#~ msgid "must be linked to at least one host group"
-#~ msgstr "має бути приєднано мінімум до однієї групи вузлів мережі"
-
-#~ msgid "new"
-#~ msgstr "нову"
-
-#~ msgid "only printable characters"
-#~ msgstr "тільки друковані символи"
-
-#~ msgid "permissions"
-#~ msgstr "права доступу"
-
-#~ msgid "template"
-#~ msgstr "шаблон"
-
-#~ msgid "unlinked"
-#~ msgstr "від'єднано"
-
-#~ msgid "update existing non linked items"
-#~ msgstr "оновити існуючі не приєднані елементи даних"
-
-#~ msgid "updated for hosts"
-#~ msgstr "оновлено для вузлів мережі"
-
-#~ msgid "used by item"
-#~ msgstr "використовується елементом даних"
-
-#~ msgid "year"
-#~ msgstr "рік"
-
-#~ msgid "Cannot_update slideshow"
-#~ msgstr "Не вдалося оновити слайдшоу"
-
-#~ msgctxt "popup"
-#~ msgid "Delete selected value mapping?"
-#~ msgstr "Видалити обране перетворення значень?"
-
-#~ msgid "Cannot sync graph prptotypes"
-#~ msgstr "Не вдалося синхронізувати прототипи графіків"
-
-#~ msgid "Incorrect interface DNS paramter \" %1$s \" provided."
-#~ msgstr "Надано некоректний DNS параметр \" %1$s \" інтерфейса."
-
-#~ msgid "Use IPMI"
-#~ msgstr "Використовувати IPMI"
-
-#~ msgid "IPMI IP address"
-#~ msgstr "IPMI IP-адрес"
-
-#~ msgid "IPMI port"
-#~ msgstr "IPMI порт"
-
-#~ msgid "(year"
-#~ msgstr "(рік"
-
-#~ msgid ")"
-#~ msgstr ")"
-
-#~ msgid "SCREENS 45645645"
-#~ msgstr "КОМПЛЕКСНІ ЕКРАНИ"
-
-#~ msgid "Log trigger form"
-#~ msgstr "Форма тригера для Логів"
-
-#~ msgid "Create Log Trigger"
-#~ msgstr "Створити тригер журналу"
-
-#~ msgid "Do you replace the conditional expression?"
-#~ msgstr "Ви хочете замінити умову виразу?"
