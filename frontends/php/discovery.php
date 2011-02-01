@@ -239,7 +239,7 @@ include_once('include/page_header.php');
 		}
 
 		if($druleid == 0 && !empty($discovery_info)){
-			$col = new CCol(array(bold($drule['name']),	SPACE.'('.count($discovery_info).SPACE.S_ITEMS.')'));
+			$col = new CCol(array(bold($drule['name']),	SPACE.'('._n('%d device', '%d devices', count($discovery_info)).')'));
 			$col->setColSpan(count($services) + 3);
 
 			$table->addRow(array(get_node_name_by_elid($drule['druleid']),$col));

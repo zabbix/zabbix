@@ -380,8 +380,10 @@ include_once('include/page_header.php');
 							$event_data['object_data']['port'] = S_UNKNOWN;
 						}
 
-						$event_data['description'] = S_SERVICE.': '.discovery_check_type2str($event_data['object_data']['type']).'; '.
-							S_PORT.': '.$event_data['object_data']['port'];
+						$event_data['description'] = S_SERVICE.': '.
+								discovery_check_type2str($event_data['object_data']['type']).
+								discovery_port2str($event_data['object_data']['type'], $event_data['object_data']['port']);
+
 						break;
 					default:
 						continue;
@@ -391,7 +393,7 @@ include_once('include/page_header.php');
 				$table->addRow(array(
 					zbx_date2str(S_EVENTS_DISCOVERY_TIME_FORMAT,$event_data['clock']),
 					$event_data['object_data']['ip'],
-					$event_data['object_data']['dns'],
+					zbx_empty($event_data['object_data']['dns']) ? SPACE : $event_data['object_data']['dns'],
 					$event_data['description'],
 					new CCol(discovery_value($event_data['value']), discovery_value_style($event_data['value']))
 				));
