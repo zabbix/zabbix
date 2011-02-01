@@ -347,7 +347,7 @@ require_once('include/templates/action.js.php');
 		$operationsHeader = array(new CCheckBox('all_operations',null,'checkAll("'.$frmAction->getName().'","all_operations","g_operationid");'),
 			_('Details'), _('Action'));
 
-	$tblOper = new CTable(_('Ne oparations defined'), 'formElementTable');
+	$tblOper = new CTable(_('No oparations defined'), 'formElementTable');
 	$tblOper->setHeader($operationsHeader);
 
 	$delay = count_operations_delay($data['operations'],$data['esc_period']);
