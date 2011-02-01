@@ -81,7 +81,7 @@ include_once('include/page_header.php');
 		),
 		'output' => API_OUTPUT_EXTEND
 	);
-	$drules = CDRule::get($options);
+	$drules = API::DRule()->get($options);
 
 	order_result($drules, 'name');
 	foreach($drules as $dnum => $drule){
@@ -104,9 +104,9 @@ include_once('include/page_header.php');
 	);
 	if($druleid > 0) $options['druleids'] = $druleid;
 	else $options['druleids'] = zbx_objectValues($drules, 'druleid');
-	$dservices = CDService::get($options);
+	$dservices = API::DService()->get($options);
 
-	$gMacros = CUserMacro::get(array(
+	$gMacros = API::UserMacro()->get(array(
 		'output' => API_OUTPUT_EXTEND,
 		'globalmacro' => 1
 	));
@@ -153,7 +153,7 @@ include_once('include/page_header.php');
 	);
 	if($druleid>0) $options['druleids'] = $druleid;
 
-	$drules = CDRule::get($options);
+	$drules = API::DRule()->get($options);
 	order_result($drules, 'name');
 
 	$options = array(
@@ -161,7 +161,7 @@ include_once('include/page_header.php');
 		'selectDServices' => API_OUTPUT_REFER,
 		'output' => API_OUTPUT_REFER
 	);
-	$db_dhosts = CDHost::get($options);
+	$db_dhosts = API::DHost()->get($options);
 	$db_dhosts = zbx_toHash($db_dhosts, 'dhostid');
 
 	$db_dservices = zbx_toHash($dservices, 'dserviceid');

@@ -357,7 +357,7 @@ COpt::memoryPick();
 				'templated_hosts' => true,
 				'preservekeys' => 1
 			);
-			$hosts = CHost::get($obj_params);
+			$hosts = API::Host()->get($obj_params);
 			foreach($hosts as $hostid => $host){
 				$iapplications = $host['applications'];
 				unset($host['applications']);
@@ -377,7 +377,7 @@ COpt::memoryPick();
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
-			$items = CItem::get($obj_params);
+			$items = API::Item()->get($obj_params);
 			foreach($items as $itemid => $item){
 				$iapplications = $item['applications'];
 				unset($item['applications']);
@@ -409,7 +409,7 @@ COpt::memoryPick();
 		else if(isset($object['nodeids']))
 			$options['nodeids'] = $object['nodeids'];
 
-		$objs = self::get($options);
+		$objs = $this->get($options);
 
 	return !empty($objs);
 	}
@@ -422,7 +422,7 @@ COpt::memoryPick();
 // permissions
 		if($update || $delete){
 			$item_db_fields = array('applicationid' => null);
-			$dbApplications = self::get(array(
+			$dbApplications = $this->get(array(
 				'output' => API_OUTPUT_EXTEND,
 				'applicationids' => zbx_objectValues($applications, 'applicationid'),
 				'editable' => 1,
@@ -431,7 +431,7 @@ COpt::memoryPick();
 		}
 		else{
 			$item_db_fields = array('name' => null, 'hostid' => null);
-			$dbHosts = CHost::get(array(
+			$dbHosts = API::Host()->get(array(
 				'output' => array('hostid', 'host', 'status'),
 				'hostids' => zbx_objectValues($applications, 'hostid'),
 				'templated_hosts' => 1,
@@ -474,7 +474,7 @@ COpt::memoryPick();
 
 // check existance
 			if($update || $create){
-				$applicationsExists = self::get(array(
+				$applicationsExists = $this->get(array(
 					'output' => API_OUTPUT_EXTEND,
 					'filter' => array(
 						'hostid' => $application['hostid'],
@@ -503,11 +503,11 @@ COpt::memoryPick();
 	public function create($applications){
 		$applications = zbx_toArray($applications);
 
-			self::checkInput($applications, __FUNCTION__);
+			$this->checkInput($applications, __FUNCTION__);
 
-			self::createReal($applications);
+			$this->createReal($applications);
 
-			self::inherit($applications);
+			$this->inherit($applications);
 
 			return array('applicationids' => zbx_objectValues($applications, 'applicationid'));
 	}
@@ -523,11 +523,11 @@ COpt::memoryPick();
 	public function update($applications){
 		$applications = zbx_toArray($applications);
 
-			self::checkInput($applications, __FUNCTION__);
+			$this->checkInput($applications, __FUNCTION__);
 
-			self::updateReal($applications);
+			$this->updateReal($applications);
 
-			self::inherit($applications);
+			$this->inherit($applications);
 
 			return array('applicationids' => zbx_objectValues($applications, 'applicationids'));
 	}
@@ -542,7 +542,7 @@ COpt::memoryPick();
 		}
 
 // TODO: REMOVE info
-		$applications_created = self::get(array(
+		$applications_created = $this->get(array(
 			'applicationids' => $applicationids,
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => API_OUTPUT_EXTEND,
@@ -566,7 +566,7 @@ COpt::memoryPick();
 
 
 // TODO: REMOVE info
-		$applications_upd = self::get(array(
+		$applications_upd = $this->get(array(
 			'applicationids' => zbx_objectValues($applications, 'applicationid'),
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => API_OUTPUT_EXTEND,
@@ -594,7 +594,7 @@ COpt::memoryPick();
 				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => true,
 			);
-			$del_applications = self::get($options);
+			$del_applications = $this->get($options);
 
 			if(!$nopermissions){
 				foreach($applicationids as $applicationid){
@@ -625,7 +625,7 @@ COpt::memoryPick();
 				'nopermissions' => true,
 				'preservekeys' => true,
 			);
-			$del_application_childs = self::get($options);
+			$del_application_childs = $this->get($options);
 
 			$del_applications = array_merge($del_applications, $del_application_childs);
 			$applicationids = array_merge($applicationids, $child_applicationids);
@@ -675,7 +675,7 @@ COpt::memoryPick();
 				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1,
 			);
-			$allowed_applications = self::get($app_options);
+			$allowed_applications = $this->get($app_options);
 			foreach($applications as $anum => $application){
 				if(!isset($allowed_applications[$application['applicationid']])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
@@ -688,7 +688,7 @@ COpt::memoryPick();
 				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1
 			);
-			$allowed_items = CItem::get($item_options);
+			$allowed_items = API::Item()->get($item_options);
 			foreach($items as $num => $item){
 				if(!isset($allowed_items[$item['itemid']])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
@@ -739,7 +739,7 @@ COpt::memoryPick();
 						$child_applications[] = $app;
 					}
 
-					$result = self::massAdd(array('items' => $child, 'applications' => $child_applications));
+					$result = $this->massAdd(array('items' => $child, 'applications' => $child_applications));
 					if(!$result){
 						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot add items');
 					}
@@ -754,7 +754,7 @@ COpt::memoryPick();
 
 		$applications = zbx_toHash($applications, 'applicationid');
 
-		$chdHosts = CHost::get(array(
+		$chdHosts = API::Host()->get(array(
 			'output' => array('hostid', 'host'),
 			'templateids' => zbx_objectValues($applications, 'hostid'),
 			'hostids' => $hostids,
@@ -778,7 +778,7 @@ COpt::memoryPick();
 			}
 
 // check existing items to decide insert or update
-			$exApplications = self::get(array(
+			$exApplications = $this->get(array(
 				'output' => API_OUTPUT_EXTEND,
 				'hostids' => $hostid,
 				'preservekeys' => true,
@@ -821,12 +821,12 @@ COpt::memoryPick();
 			}
 		}
 
-		self::createReal($insertApplications);
-		self::updateReal($updateApplications);
+		$this->createReal($insertApplications);
+		$this->updateReal($updateApplications);
 
 		$inheritedApplications = array_merge($insertApplications, $updateApplications);
 
-		self::inherit($inheritedApplications);
+		$this->inherit($inheritedApplications);
 
 		return true;
 	}
@@ -843,7 +843,7 @@ COpt::memoryPick();
 				'templated_hosts' => 1,
 				'output' => API_OUTPUT_SHORTEN
 			);
-			$allowedHosts = CHost::get($options);
+			$allowedHosts = API::Host()->get($options);
 			foreach($data['hostids'] as $hostid){
 				if(!isset($allowedHosts[$hostid])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -854,7 +854,7 @@ COpt::memoryPick();
 				'preservekeys' => 1,
 				'output' => API_OUTPUT_SHORTEN
 			);
-			$allowedTemplates = CTemplate::get($options);
+			$allowedTemplates = API::Template()->get($options);
 			foreach($data['templateids'] as $templateid){
 				if(!isset($allowedTemplates[$templateid])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -866,9 +866,9 @@ COpt::memoryPick();
 				'preservekeys' => 1,
 				'output' => API_OUTPUT_EXTEND,
 			);
-			$applications = self::get($options);
+			$applications = $this->get($options);
 
-			self::inherit($applications, $data['hostids']);
+			$this->inherit($applications, $data['hostids']);
 
 			return true;
 	}

@@ -315,7 +315,7 @@ COpt::memoryPick();
 
 			if(is_array($options['selectDChecks']) || str_in_array($options['selectDChecks'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['selectDChecks'];
-				$dchecks = CDCheck::get($obj_params);
+				$dchecks = API::DCheck()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($dchecks, 'name');
 				foreach($dchecks as $dcheckid => $dcheck){
@@ -337,7 +337,7 @@ COpt::memoryPick();
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$dchecks = CDCheck::get($obj_params);
+				$dchecks = API::DCheck()->get($obj_params);
 				$dchecks = zbx_toHash($dchecks, 'druleid');
 				foreach($result as $dhostid => $dhost){
 					if(isset($dchecks[$druleid]))
@@ -358,7 +358,7 @@ COpt::memoryPick();
 
 			if(is_array($options['selectDHosts']) || str_in_array($options['selectDHosts'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['selectDHosts'];
-				$dhosts = CDHost::get($obj_params);
+				$dhosts = API::DHost()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($dhosts, 'name');
 				foreach($dhosts as $dhostid => $dhost){
@@ -380,7 +380,7 @@ COpt::memoryPick();
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$dhosts = CDHost::get($obj_params);
+				$dhosts = API::DHost()->get($obj_params);
 				$dhosts = zbx_toHash($dhosts, 'druleid');
 				foreach($result as $druleid => $drule){
 					if(isset($dhosts[$druleid]))
@@ -417,7 +417,7 @@ COpt::memoryPick();
 		else if(isset($object['nodeids']))
 			$options['nodeids'] = $object['nodeids'];
 
-		$objs = self::get($options);
+		$objs = $this->get($options);
 
 	return !empty($objs);
 	}
@@ -464,7 +464,7 @@ COpt::memoryPick();
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => 1
 			);
-			$del_drules = self::get($options);
+			$del_drules = $this->get($options);
 			foreach($drules as $gnum => $drule){
 				if(!isset($del_drules[$drule['druleid']]))
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -525,7 +525,7 @@ COpt::memoryPick();
 			);
 
 			if(!check_db_fields($drule_db_fields, $check)){
-				self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Wrong fields for check [ '.$check['checkid'].' ]');
+				$this->$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Wrong fields for check [ '.$check['checkid'].' ]');
 				return false;
 			}
 			$checks[$check['checkid']] = $check;
@@ -533,11 +533,11 @@ COpt::memoryPick();
 		}
 
 // check if drule is templated drule, then checks cannot be added
-		$drule = self::get(array('druleids' => $druleid,  'extendoutput' => 1));
+		$drule = $this->get(array('druleids' => $druleid,  'extendoutput' => 1));
 		$drule = reset($drule);
 
 		if($drule['templateid'] != 0){
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Cannot edit templated drule : '.$drule['name']);
+			$this->$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Cannot edit templated drule : '.$drule['name']);
 			return false;
 		}
 
@@ -553,21 +553,19 @@ COpt::memoryPick();
 
 			$host_count = DBfetch(DBselect($sql));
 			if ($host_count['count']){
-				self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'You must use checks only from host : '.$host['host'].' for template drule : '.$drule['name']);
+				$this->$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'You must use checks only from host : '.$host['host'].' for template drule : '.$drule['name']);
 				return false;
 			}
 			$tpl_drule = true;
 		}
 
-		self::BeginTransaction(__METHOD__);
-		$result = self::addchecks_rec($druleid, $checks, $tpl_drule);
-		$result = self::EndTransaction($result, __METHOD__);
+		$result = $this->addchecks_rec($druleid, $checks, $tpl_drule);
 
 		if($result){
 			return $result;
 		}
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);//'Internal Zabbix error');
+			$this->$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);//'Internal Zabbix error');
 			return false;
 		}
 	}
@@ -581,11 +579,11 @@ COpt::memoryPick();
 
 		if(!$force){
 			// check if drule is templated drule, then checks cannot be deleted
-			$drule = self::get(array('druleids' => $druleid,  'extendoutput' => 1));
+			$drule = $this->get(array('druleids' => $druleid,  'extendoutput' => 1));
 			$drule = reset($drule);
 
 			if($drule['templateid'] != 0){
-				self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Cannot edit templated drule : '.$drule['name']);
+				$this->$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Cannot edit templated drule : '.$drule['name']);
 				return false;
 			}
 		}
@@ -593,7 +591,7 @@ COpt::memoryPick();
 		$chd_drules = get_drules_by_templateid($druleid);
 		while($chd_drule = DBfetch($chd_drules)){
 			$check_list['druleid'] = $chd_drule['druleid'];
-			$result = self::deletechecks($check_list, true);
+			$result = $this->deletechecks($check_list, true);
 			if(!$result) return false;
 		}
 

@@ -54,7 +54,7 @@ include_once 'include/page_header.php';
 		'selectHosts' => API_OUTPUT_EXTEND,
 		'output' => API_OUTPUT_EXTEND
 	);
-	$db_data = CGraph::get($options);
+	$db_data = API::Graph()->get($options);
 	if(empty($db_data)) access_deny();
 	else $db_data = reset($db_data);
 

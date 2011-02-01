@@ -31,12 +31,13 @@ class CAPIObject{
 		global $USER_DETAILS;
 
 		$result = czbxrpc::call($this->_name.'.'.$method, $params[0], $USER_DETAILS['sessionid']);
+
 		if(isset($result['result'])){
 			return $result['result'];
 		}
 		else{
-			error($result['data']);
-			error($result['trace']);
+			error($result['message']);
+//			error($result['data']);
 			return false;
 		}
 	}

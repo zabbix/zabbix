@@ -171,7 +171,7 @@
 		$result=DBSelect($sql);
 		while($row=DBfetch($result)){
 			$item['hostid'] = $row['hostid'];
-			CItem::update($row['itemid'],$item);
+			API::Item()->update($row['itemid'],$item);
 		}
 	return true;
 	}
@@ -212,7 +212,7 @@
 			$del_items[$row['itemid']] = $row['itemid'];
 		}
 		if(!empty($del_items)){
-			CItem::delete($del_items);
+			API::Item()->delete($del_items);
 		}
 	return 1;
 	}
@@ -226,7 +226,7 @@
 		$result=DBSelect($sql);
 		while($row=DBfetch($result)){
 			$item['hostid'] = $row['hostid'];
-			CItem::create($item);
+			API::Item()->create($item);
 		}
 	return true;
 	}
@@ -279,7 +279,7 @@
 		$db_tmp_item = get_item_by_itemid_limited($itemid);
 		$applications = get_same_applications_for_host(get_applications_by_itemid($db_tmp_item['itemid']),$hostid);
 
-		$hosts = CHost::get(array(
+		$hosts = API::Host()->get(array(
 			'output' => array('hostid', 'host', 'status'),
 			'selectInterfaces' => API_OUTPUT_EXTEND,
 			'hostids' => $hostid,
@@ -309,7 +309,7 @@
 		$db_tmp_item['applications'] = $applications;
 		$db_tmp_item['templateid'] = 0;
 
-		$result = CItem::create($db_tmp_item);
+		$result = API::Item()->create($db_tmp_item);
 
 	return $result;
 }
@@ -324,11 +324,11 @@
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 			'select_applications' => API_OUTPUT_REFER,
 		);
-		$srcItems = CItem::get($options);
+		$srcItems = API::Item()->get($options);
 
 		foreach($srcItems as $item){
 
-			$hosts = CHost::get(array(
+			$hosts = API::Host()->get(array(
 				'output' => array('hostid', 'host', 'status'),
 				'selectInterfaces' => API_OUTPUT_EXTEND,
 				'hostids' => $destid,
@@ -357,7 +357,7 @@
 			$item['applications'] = get_same_applications_for_host(zbx_objectValues($item['applications'], 'applicationid'), $destid);
 			$item['templateid'] = 0;
 
-			$result = CItem::create($item);
+			$result = API::Item()->create($item);
 			if(!$result) break;
 		}
 
@@ -370,14 +370,14 @@
 			'output' => API_OUTPUT_EXTEND,
 			'inherited' => false,
 		);
-		$apps_to_clone = CApplication::get($options);
+		$apps_to_clone = API::Application()->get($options);
 		foreach($apps_to_clone as $num => $app){
 			$app['hostid'] = $destid;
 			unset($app['applicationid']);
 			$apps_to_clone[$num] = $app;
 		}
 
-		return CApplication::create($apps_to_clone);
+		return API::Application()->create($apps_to_clone);
 	}
 
 
@@ -563,7 +563,7 @@
 		}
 
 		if(!empty($macStack)){
-			$dbItems = CItem::get(array(
+			$dbItems = API::Item()->get(array(
 				'itemids' => $item['itemid'],
 				'selectInterfaces' => API_OUTPUT_EXTEND,
 				'selectHosts' => array('host'),
@@ -592,7 +592,7 @@
 			}
 		}
 
-		CUserMacro::resolveItem($item);
+		API::UserMacro()->resolveItem($item);
 
 	return $item['key_'];
 	}
@@ -606,7 +606,7 @@
         }
 
 		if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $descr, $arr)){
-			$macros = CuserMacro::getMacros($arr[1], array('itemid' => $item['itemid']));
+			$macros = API::UserMacro()->getMacros($arr[1], array('itemid' => $item['itemid']));
 
 			$search = array_keys($macros);
 			$values = array_values($macros);

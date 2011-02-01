@@ -502,7 +502,7 @@ Copt::memoryPick();
 				'hostids' => $templateids,
 				'preservekeys' => 1
 			);
-			$groups = CHostgroup::get($obj_params);
+			$groups = API::HostGroup()->get($obj_params);
 			foreach($groups as $groupid => $group){
 				$ghosts = $group['hosts'];
 				unset($group['hosts']);
@@ -522,7 +522,7 @@ Copt::memoryPick();
 
 			if(is_array($options['select_templates']) || str_in_array($options['select_templates'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['select_templates'];
-				$templates = CTemplate::get($obj_params);
+				$templates = API::Template()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($templates, 'host');
 				foreach($templates as $templateid => $template){
@@ -547,7 +547,7 @@ Copt::memoryPick();
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$templates = CTemplate::get($obj_params);
+				$templates = API::Template()->get($obj_params);
 				$templates = zbx_toHash($templates, 'hostid');
 				foreach($result as $templateid => $template){
 					if(isset($templates[$groupid]))
@@ -568,7 +568,7 @@ Copt::memoryPick();
 
 			if(is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['selectHosts'];
-				$hosts = CHost::get($obj_params);
+				$hosts = API::Host()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($hosts, 'host');
 				foreach($hosts as $hostid => $host){
@@ -590,7 +590,7 @@ Copt::memoryPick();
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$hosts = CHost::get($obj_params);
+				$hosts = API::Host()->get($obj_params);
 				$hosts = zbx_toHash($hosts, 'hostid');
 				foreach($result as $templateid => $template){
 					if(isset($hosts[$templateid]))
@@ -611,7 +611,7 @@ Copt::memoryPick();
 
 			if(is_array($options['selectParentTemplates']) || str_in_array($options['selectParentTemplates'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['selectParentTemplates'];
-				$templates = CTemplate::get($obj_params);
+				$templates = API::Template()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($templates, 'host');
 				foreach($templates as $templateid => $template){
@@ -633,7 +633,7 @@ Copt::memoryPick();
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$templates = CTemplate::get($obj_params);
+				$templates = API::Template()->get($obj_params);
 				$templates = zbx_toHash($templates, 'hostid');
 				foreach($result as $templateid => $template){
 					if(isset($templates[$groupid]))
@@ -656,7 +656,7 @@ Copt::memoryPick();
 
 			if(is_array($options['selectItems']) || str_in_array($options['selectItems'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['selectItems'];
-				$items = CItem::get($obj_params);
+				$items = API::Item()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($items, 'description');
 
@@ -676,7 +676,7 @@ Copt::memoryPick();
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$items = CItem::get($obj_params);
+				$items = API::Item()->get($obj_params);
 				$items = zbx_toHash($items, 'hostid');
 				foreach($result as $templateid => $template){
 					if(isset($items[$templateid]))
@@ -699,7 +699,7 @@ Copt::memoryPick();
 
 			if(is_array($options['selectDiscoveries']) || str_in_array($options['selectDiscoveries'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['selectDiscoveries'];
-				$items = CItem::get($obj_params);
+				$items = API::Item()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($items, 'description');
 				foreach($items as $itemid => $item){
@@ -720,7 +720,7 @@ Copt::memoryPick();
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$items = CItem::get($obj_params);
+				$items = API::Item()->get($obj_params);
 				$items = zbx_toHash($items, 'hostid');
 				foreach($result as $hostid => $host){
 					if(isset($items[$hostid]))
@@ -742,7 +742,7 @@ Copt::memoryPick();
 
 			if(is_array($options['select_triggers']) || str_in_array($options['select_triggers'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['select_triggers'];
-				$triggers = CTrigger::get($obj_params);
+				$triggers = API::Trigger()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($triggers, 'description');
 				foreach($triggers as $triggerid => $trigger){
@@ -764,7 +764,7 @@ Copt::memoryPick();
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$triggers = CTrigger::get($obj_params);
+				$triggers = API::Trigger()->get($obj_params);
 				$triggers = zbx_toHash($triggers, 'hostid');
 				foreach($result as $templateid => $template){
 					if(isset($triggers[$templateid]))
@@ -786,7 +786,7 @@ Copt::memoryPick();
 
 			if(is_array($options['select_graphs']) || str_in_array($options['select_graphs'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['select_graphs'];
-				$graphs = CGraph::get($obj_params);
+				$graphs = API::Graph()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($graphs, 'name');
 				foreach($graphs as $graphid => $graph){
@@ -808,7 +808,7 @@ Copt::memoryPick();
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$graphs = CGraph::get($obj_params);
+				$graphs = API::Graph()->get($obj_params);
 				$graphs = zbx_toHash($graphs, 'hostid');
 				foreach($result as $templateid => $template){
 					if(isset($graphs[$templateid]))
@@ -830,7 +830,7 @@ Copt::memoryPick();
 
 			if(is_array($options['select_applications']) || str_in_array($options['select_applications'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['select_applications'];
-				$applications = CApplication::get($obj_params);
+				$applications = API::Application()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($applications, 'name');
 				foreach($applications as $applicationid => $application){
@@ -852,7 +852,7 @@ Copt::memoryPick();
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$applications = CApplication::get($obj_params);
+				$applications = API::Application()->get($obj_params);
 				$applications = zbx_toHash($applications, 'hostid');
 				foreach($result as $templateid => $template){
 					if(isset($applications[$templateid]))
@@ -876,7 +876,7 @@ Copt::memoryPick();
 			if(is_array($options['selectScreens']) || str_in_array($options['selectScreens'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['selectScreens'];
 
-				$screens = CTemplateScreen::get($obj_params);
+				$screens = API::TemplateScreen()->get($obj_params);
 				if(!is_null($options['limitSelects'])) order_result($screens, 'name');
 
 				foreach($screens as $screenid => $screen){
@@ -892,7 +892,7 @@ Copt::memoryPick();
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$screens = CTemplateScreen::get($obj_params);
+				$screens = API::TemplateScreen()->get($obj_params);
 				$screens = zbx_toHash($screens, 'hostid');
 				foreach($result as $templateid => $template){
 					if(isset($screens[$templateid]))
@@ -911,7 +911,7 @@ Copt::memoryPick();
 				'hostids' => $templateids,
 				'preservekeys' => 1
 			);
-			$macros = CUserMacro::get($obj_params);
+			$macros = API::UserMacro()->get($obj_params);
 			foreach($macros as $macroid => $macro){
 				unset($macros[$macroid]['hosts']);
 
@@ -949,7 +949,7 @@ COpt::memoryPick();
 		else if(isset($templateData['nodeids']))
 			$options['nodeids'] = $templateData['nodeids'];
 
-		$result = self::get($options);
+		$result = $this->get($options);
 
 	return $result;
 	}
@@ -968,7 +968,7 @@ COpt::memoryPick();
 		else if(isset($object['nodeids']))
 			$options['nodeids'] = $object['nodeids'];
 
-		$objs = self::get($options);
+		$objs = $this->get($options);
 
 	return !empty($objs);
 	}
@@ -1004,7 +1004,7 @@ COpt::memoryPick();
 				'editable' => 1,
 				'preservekeys' => 1
 			);
-			$upd_groups = CHostGroup::get($options);
+			$upd_groups = API::HostGroup()->get($options);
 			foreach($groupids as $gnum => $groupid){
 				if(!isset($upd_groups[$groupid])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -1025,10 +1025,10 @@ COpt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Template name [ %1$s ]'));
 				}
 
-				if(self::exists(array('host' => $template['host']))){
+				if($this->exists(array('host' => $template['host']))){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$template['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
-				if(CHost::exists(array('host' => $template['host']))){
+				if(API::Host()->exists(array('host' => $template['host']))){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$template['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 
@@ -1054,7 +1054,7 @@ COpt::memoryPick();
 				if(isset($template['hosts']) && !is_null($template['hosts']))
 					$options['hosts'] = $template['hosts'];
 
-				$result = self::massAdd($options);
+				$result = $this->massAdd($options);
 				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS);
 			}
 
@@ -1071,7 +1071,7 @@ COpt::memoryPick();
 		$templates = zbx_toArray($templates);
 		$templateids = zbx_objectValues($templates, 'templateid');
 
-			$upd_templates = self::get(array(
+			$upd_templates = $this->get(array(
 				'templateids' => $templateids,
 				'editable' => 1,
 				'output' => API_OUTPUT_EXTEND,
@@ -1095,7 +1095,7 @@ COpt::memoryPick();
 
 				$template['templates'] = array($tpl_tmp);
 
-				$result = self::massUpdate($template);
+				$result = $this->massUpdate($template);
 				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Failed to update template'));
 			}
 
@@ -1121,23 +1121,23 @@ COpt::memoryPick();
 				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1
 			);
-			$del_templates = self::get($options);
+			$del_templates = $this->get($options);
 			foreach($templateids as $templateid){
 				if(!isset($del_templates[$templateid])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				}
 			}
 
-			CTemplate::unlink($templateids, null, true);
+			API::Template()->unlink($templateids, null, true);
 
-			$delItems = CItem::get(array(
+			$delItems = API::Item()->get(array(
 				'templateids' => $templateids,
 				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 				'output' => API_OUTPUT_SHORTEN,
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			));
-			CItem::delete(array_keys($delItems), true);
+			API::Item()->delete(array_keys($delItems), true);
 
 
 // delete screen items
@@ -1191,13 +1191,13 @@ COpt::memoryPick();
 							' AND '.DBcondition('objectid',$templateids));
 
 
-			$delApplications = CApplication::get(array(
+			$delApplications = API::Application()->get(array(
 				'templateids' => $templateids,
 				'output' => API_OUTPUT_SHORTEN,
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			));
-			CApplication::delete(array_keys($delApplications), true);
+			API::Application()->delete(array_keys($delApplications), true);
 
 
 			DB::delete('hosts', array('hostid' => $templateids));
@@ -1226,7 +1226,7 @@ COpt::memoryPick();
 		$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : null;
 		$templateids = is_null($templates) ? array() : zbx_objectValues($templates, 'templateid');
 
-			$upd_templates = self::get(array(
+			$upd_templates = $this->get(array(
 				'templateids' => $templateids,
 				'editable' => 1,
 				'preservekeys' => 1
@@ -1240,23 +1240,23 @@ COpt::memoryPick();
 
 			if(isset($data['groups']) && !empty($data['groups'])){
 				$options = array('groups' => $data['groups'], 'templates' => $templates);
-				$result = CHostGroup::massAdd($options);
+				$result = API::HostGroup()->massAdd($options);
 				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Can\'t link groups');
 			}
 
 			if(isset($data['hosts']) && !empty($data['hosts'])){
 				$hostids = zbx_objectValues($data['hosts'], 'hostid');
-				self::link($templateids, $hostids);
+				$this->link($templateids, $hostids);
 			}
 
 			if(isset($data['templates_link']) && !empty($data['templates_link'])){
 				$templates_linkids = zbx_objectValues($data['templates_link'], 'templateid');
-				self::link($templates_linkids, $templateids);
+				$this->link($templates_linkids, $templateids);
 			}
 
 			if(isset($data['macros']) && !empty($data['macros'])){
 				$options = array('templates' => zbx_toArray($data['templates']), 'macros' => $data['macros']);
-				$result = CUserMacro::massAdd($options);
+				$result = API::UserMacro()->massAdd($options);
 				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Can\'t link macros');
 			}
 
@@ -1282,7 +1282,7 @@ COpt::memoryPick();
 				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => true,
 			);
-			$upd_templates = self::get($options);
+			$upd_templates = $this->get($options);
 			foreach($templates as $tnum => $template){
 				if(!isset($upd_templates[$template['templateid']])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -1294,8 +1294,6 @@ COpt::memoryPick();
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No groups for template'));
 			}
 // }}} CHECK IF TEMPLATES HAVE AT LEAST 1 GROUP
-
-			$transaction = self::BeginTransaction(__METHOD__);
 
 
 // UPDATE TEMPLATES PROPERTIES {{{
@@ -1313,7 +1311,7 @@ COpt::memoryPick();
 					'editable' => 1,
 					'nopermissions' => 1
 				);
-				$template_exists = self::get($options);
+				$template_exists = $this->get($options);
 				$template_exist = reset($template_exists);
 
 				if($template_exist && ($template_exist['templateid'] != $cur_template['templateid'])){
@@ -1321,7 +1319,7 @@ COpt::memoryPick();
 				}
 
 //can't set the same name as existing host
-				if(CHost::exists(array('host' => $cur_template['host']))){
+				if(API::Host()->exists(array('host' => $cur_template['host']))){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$template['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 			}
@@ -1343,14 +1341,14 @@ COpt::memoryPick();
 // UPDATE HOSTGROUPS LINKAGE {{{
 			if(isset($data['groups']) && !is_null($data['groups'])){
 				$data['groups'] = zbx_toArray($data['groups']);
-				$template_groups = CHostGroup::get(array('hostids' => $templateids));
+				$template_groups = API::HostGroup()->get(array('hostids' => $templateids));
 				$template_groupids = zbx_objectValues($template_groups, 'groupid');
 				$new_groupids = zbx_objectValues($data['groups'], 'groupid');
 
 				$groups_to_add = array_diff($new_groupids, $template_groupids);
 
 				if(!empty($groups_to_add)){
-					$result = self::massAdd(array(
+					$result = $this->massAdd(array(
 						'templates' => $templates,
 						'groups' => zbx_toObject($groups_to_add, 'groupid')
 					));
@@ -1361,7 +1359,7 @@ COpt::memoryPick();
 
 				$groupids_to_del = array_diff($template_groupids, $new_groupids);
 				if(!empty($groupids_to_del)){
-					$result = self::massRemove(array(
+					$result = $this->massRemove(array(
 						'templateids' => $templateids,
 						'groupids' => $groupids_to_del
 					));
@@ -1376,7 +1374,7 @@ COpt::memoryPick();
 			$templateids_clear = zbx_objectValues($data['templates_clear'], 'templateid');
 
 			if(!empty($data['templates_clear'])){
-				$result = self::massRemove(array(
+				$result = $this->massRemove(array(
 					'templateids' => $templateids,
 					'templateids_clear' => $templateids_clear,
 				));
@@ -1386,7 +1384,7 @@ COpt::memoryPick();
 // firstly need to unlink all things, to correctly check circulars
 
 			if(isset($data['hosts']) && !is_null($data['hosts'])){
-				$template_hosts = CHost::get(array(
+				$template_hosts = API::Host()->get(array(
 					'templateids' => $templateids,
 					'templated_hosts' => 1
 				));
@@ -1397,7 +1395,7 @@ COpt::memoryPick();
 				$hostids_to_del = array_diff($hosts_to_del, $templateids_clear);
 
 				if(!empty($hostids_to_del)){
-					$result = self::massRemove(array(
+					$result = $this->massRemove(array(
 						'hostids' => $hostids_to_del,
 						'templateids' => $templateids
 					));
@@ -1408,14 +1406,14 @@ COpt::memoryPick();
 			}
 
 			if(isset($data['templates_link']) && !is_null($data['templates_link'])){
-				$template_templates = CTemplate::get(array('hostids' => $templateids));
+				$template_templates = API::Template()->get(array('hostids' => $templateids));
 				$template_templateids = zbx_objectValues($template_templates, 'templateid');
 				$new_templateids = zbx_objectValues($data['templates_link'], 'templateid');
 
 				$templates_to_del = array_diff($template_templateids, $new_templateids);
 				$templateids_to_del = array_diff($templates_to_del, $templateids_clear);
 				if(!empty($templateids_to_del)){
-					$result = self::massRemove(array(
+					$result = $this->massRemove(array(
 						'templateids' => $templateids,
 						'templateids_link' => $templateids_to_del
 					));
@@ -1429,7 +1427,7 @@ COpt::memoryPick();
 
 				$hosts_to_add = array_diff($new_hostids, $template_hostids);
 				if(!empty($hosts_to_add)){
-					$result = self::massAdd(array('templates' => $templates, 'hosts' => $hosts_to_add));
+					$result = $this->massAdd(array('templates' => $templates, 'hosts' => $hosts_to_add));
 					if(!$result){
 						self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't link template"));
 					}
@@ -1439,7 +1437,7 @@ COpt::memoryPick();
 			if(isset($data['templates_link']) && !is_null($data['templates_link'])){
 				$templates_to_add = array_diff($new_templateids, $template_templateids);
 				if(!empty($templates_to_add)){
-					$result = self::massAdd(array('templates' => $templates, 'templates_link' => $templates_to_add));
+					$result = $this->massAdd(array('templates' => $templates, 'templates_link' => $templates_to_add));
 					if(!$result){
 						self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't link template"));
 					}
@@ -1452,7 +1450,7 @@ COpt::memoryPick();
 			if(isset($data['macros']) && !is_null($data['macros'])){
 				$macrosToAdd = zbx_toHash($data['macros'], 'macro');
 
-				$templateMacros = CUserMacro::get(array(
+				$templateMacros = API::UserMacro()->get(array(
 					'hostids' => $templateids,
 					'output' => API_OUTPUT_EXTEND
 				));
@@ -1476,7 +1474,7 @@ COpt::memoryPick();
 				}
 //----
 				if(!empty($macrosToDelete)){
-					$result = self::massRemove(array(
+					$result = $this->massRemove(array(
 						'templateids' => $templateids,
 						'macros' => $macrosToDelete
 					));
@@ -1486,7 +1484,7 @@ COpt::memoryPick();
 				}
 
 				if(!empty($macrosToUpdate)){
-					$result = CUsermacro::massUpdate(array('templates' => $templates, 'macros' => $macrosToUpdate));
+					$result = API::UserMacro()->massUpdate(array('templates' => $templates, 'macros' => $macrosToUpdate));
 					if(!$result){
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update macro'));
 					}
@@ -1495,7 +1493,7 @@ COpt::memoryPick();
 				if(!empty($macrosToAdd)){
 					$macrosToAdd = array_values($macrosToAdd);
 
-					$result = self::massAdd(array('templates' => $templates, 'macros' => $macrosToAdd));
+					$result = $this->massAdd(array('templates' => $templates, 'macros' => $macrosToAdd));
 					if(!$result){
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot add macro'));
 					}
@@ -1519,7 +1517,7 @@ COpt::memoryPick();
 	public function massRemove($data){
 		$templateids = zbx_toArray($data['templateids']);
 
-			$upd_templates = CHost::get(array(
+			$upd_templates = API::Host()->get(array(
 				'hostids' => $templateids,
 				'editable' => 1,
 				'preservekeys' => 1,
@@ -1537,23 +1535,23 @@ COpt::memoryPick();
 					'groupids' => zbx_toArray($data['groupids']),
 					'templateids' => $templateids
 				);
-				$result = CHostGroup::massRemove($options);
+				$result = API::HostGroup()->massRemove($options);
 				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't unlink groups"));
 			}
 
 			if(isset($data['templateids_clear'])){
 				$templateids_clear = zbx_toArray($data['templateids_clear']);
-				$result = CTemplate::unlink($templateids_clear, $data['templateids'], true);
+				$result = API::Template()->unlink($templateids_clear, $data['templateids'], true);
 			}
 
 			if(isset($data['hostids'])){
 				$hostids = zbx_toArray($data['hostids']);
-				$result = CTemplate::unlink($templateids, $hostids);
+				$result = API::Template()->unlink($templateids, $hostids);
 			}
 
 			if(isset($data['templateids_link'])){
 				$templateids_link = zbx_toArray($data['templateids_link']);
-				$result = CTemplate::unlink($templateids_link, $templateids);
+				$result = API::Template()->unlink($templateids_link, $templateids);
 			}
 
 			if(isset($data['macros'])){
@@ -1561,7 +1559,7 @@ COpt::memoryPick();
 					'templateids' => $templateids,
 					'macros' => zbx_toArray($data['macros'])
 				);
-				$result = CUserMacro::massRemove($options);
+				$result = API::UserMacro()->massRemove($options);
 				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't remove macros"));
 			}
 
@@ -1574,7 +1572,7 @@ COpt::memoryPick();
 
 // check if any templates linked to targets have more than one unique item key\application {{{
 		foreach($targetids as $targetid){
-			$linkedTpls = self::get(array(
+			$linkedTpls = $this->get(array(
 				'nopermissions' => 1,
 				'output' => API_OUTPUT_SHORTEN,
 				'hostids' => $targetid
@@ -1628,7 +1626,7 @@ COpt::memoryPick();
 					'output'=> API_OUTPUT_EXTEND
 				);
 
-				$tmp_tpls = self::get($options);
+				$tmp_tpls = $this->get($options);
 				$tmp_tpl = reset($tmp_tpls);
 
 				self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -1701,7 +1699,7 @@ COpt::memoryPick();
 
 		foreach($start_points as $spnum => $start){
 			$path = array();
-			if(!self::checkCircularLink($graph, $start, $path)){
+			if(!$this->checkCircularLink($graph, $start, $path)){
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Circular link can not be created'));
 			}
 		}
@@ -1718,49 +1716,49 @@ COpt::memoryPick();
 					}
 				}
 
-				$result = CApplication::syncTemplates(array(
+				$result = API::Application()->syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
 				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot sync applications'));
 
-				$result = CDiscoveryRule::syncTemplates(array(
+				$result = API::DiscoveryRule()->syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
 				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot sync discovery rules'));
 
-				$result = CItemPrototype::syncTemplates(array(
+				$result = API::Itemprototype()->syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
 				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot sync item prototypes'));
 
-				$result = CItem::syncTemplates(array(
+				$result = API::Item()->syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
 				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot sync items'));
 
-				$result = CTrigger::syncTemplates(array(
+				$result = API::Trigger()->syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
 				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot sync Triggers'));
 
-				$result = CTriggerPrototype::syncTemplates(array(
+				$result = API::TriggerPrototype()->syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
 				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot sync Triggers prototypes'));
 
-				$result = CGraphPrototype::syncTemplates(array(
+				$result = API::GraphPrototype()->syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
 				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot sync graph prototypes'));
 
-				$result = CGraph::syncTemplates(array(
+				$result = API::Graph()->syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
@@ -1807,7 +1805,7 @@ COpt::memoryPick();
 
 		if(!empty($items[ZBX_FLAG_DISCOVERY])){
 			if($clear){
-				$result = CDiscoveryRule::delete(array_keys($items[ZBX_FLAG_DISCOVERY]), true);
+				$result = API::DiscoveryRule()->delete(array_keys($items[ZBX_FLAG_DISCOVERY]), true);
 				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear discovery rules'));
 			}
 			else{
@@ -1825,7 +1823,7 @@ COpt::memoryPick();
 
 		if(!empty($items[ZBX_FLAG_DISCOVERY_NORMAL])){
 			if($clear){
-				$result = CItem::delete(array_keys($items[ZBX_FLAG_DISCOVERY_NORMAL]), true);
+				$result = API::Item()->delete(array_keys($items[ZBX_FLAG_DISCOVERY_NORMAL]), true);
 				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear items'));
 			}
 			else{
@@ -1843,7 +1841,7 @@ COpt::memoryPick();
 
 		if(!empty($items[ZBX_FLAG_DISCOVERY_CHILD])){
 			if($clear){
-				$result = CItemPrototype::delete(array_keys($items[ZBX_FLAG_DISCOVERY_CHILD]), true);
+				$result = API::Itemprototype()->delete(array_keys($items[ZBX_FLAG_DISCOVERY_CHILD]), true);
 				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear item prototypes'));
 			}
 			else{
@@ -1891,7 +1889,7 @@ COpt::memoryPick();
 
 		if(!empty($graphs[ZBX_FLAG_DISCOVERY_CHILD])){
 			if($clear){
-				$result = CGraphPrototype::delete(array_keys($graphs[ZBX_FLAG_DISCOVERY_CHILD]), true);
+				$result = API::GraphPrototype()->delete(array_keys($graphs[ZBX_FLAG_DISCOVERY_CHILD]), true);
 				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear graph prototypes'));
 			}
 			else{
@@ -1909,7 +1907,7 @@ COpt::memoryPick();
 
 		if(!empty($graphs[ZBX_FLAG_DISCOVERY_NORMAL])){
 			if($clear){
-				$result = CGraph::delete(array_keys($graphs[ZBX_FLAG_DISCOVERY_NORMAL]), true);
+				$result = API::Graph()->delete(array_keys($graphs[ZBX_FLAG_DISCOVERY_NORMAL]), true);
 				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear graphs.'));
 			}
 			else{
@@ -1960,7 +1958,7 @@ COpt::memoryPick();
 
 		if(!empty($triggers[ZBX_FLAG_DISCOVERY_NORMAL])){
 			if($clear){
-				$result = CTrigger::delete(array_keys($triggers), true);
+				$result = API::Trigger()->delete(array_keys($triggers), true);
 				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear triggers'));
 			}
 			else{
@@ -1977,7 +1975,7 @@ COpt::memoryPick();
 
 		if(!empty($triggers[ZBX_FLAG_DISCOVERY_CHILD])){
 			if($clear){
-				$result = CTriggerPrototype::delete(array_keys($triggers[ZBX_FLAG_DISCOVERY_CHILD]), true);
+				$result = API::TriggerPrototype()->delete(array_keys($triggers[ZBX_FLAG_DISCOVERY_CHILD]), true);
 				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear triggers'));
 			}
 			else{
@@ -2012,7 +2010,7 @@ COpt::memoryPick();
 
 		if(!empty($applications)){
 			if($clear){
-				$result = CApplication::delete(array_keys($applications), true);
+				$result = API::Application()->delete(array_keys($applications), true);
 				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear applications'));
 			}
 			else{
@@ -2035,14 +2033,14 @@ COpt::memoryPick();
 		));
 
 		if(!is_null($targetids)){
-			$hosts = CHost::get(array(
+			$hosts = API::Host()->get(array(
 				'hostids' => $targetids,
 				'output' => array('hostid, host'),
 				'nopermissions' => true,
 			));
 		}
 		else{
-			$hosts = CHost::get(array(
+			$hosts = API::Host()->get(array(
 				'templateids' => $templateids,
 				'output' => array('hostid, host'),
 				'nopermissions' => true,
@@ -2050,7 +2048,7 @@ COpt::memoryPick();
 		}
 
 		if(!empty($hosts)){
-			$templates = CTemplate::get(array(
+			$templates = API::Template()->get(array(
 				'templateids' => $templateids,
 				'output' => array('hostid, host'),
 				'nopermissions' => true,
@@ -2072,7 +2070,7 @@ COpt::memoryPick();
 		if(!isset($graph[$current])) return true;
 
 		foreach($graph[$current] as $step){
-			if(!self::checkCircularLink($graph, $step, $path)) return false;
+			if(!$this->checkCircularLink($graph, $step, $path)) return false;
 		}
 
 		return true;

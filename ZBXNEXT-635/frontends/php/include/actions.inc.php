@@ -51,7 +51,7 @@ function check_permission_for_action_conditions($conditions){
 	);
 
 	try{
-		$groups = CHostgroup::get($options);
+		$groups = API::HostGroup()->get($options);
 		$groups = zbx_toHash($groups, 'groupid');
 		foreach($groupids as $hgnum => $groupid){
 			if(!isset($groups[$groupid])) throw new Exception(S_INCORRECT_GROUP);
@@ -61,7 +61,7 @@ function check_permission_for_action_conditions($conditions){
 			'hostids' => $hostids,
 			'editable' => 1
 		);
-		$hosts = CHost::get($options);
+		$hosts = API::Host()->get($options);
 		$hosts = zbx_toHash($hosts, 'hostid');
 		foreach($hostids as $hnum => $hostid){
 			if(!isset($hosts[$hostid])) throw new Exception(S_INCORRECT_HOST);
@@ -71,7 +71,7 @@ function check_permission_for_action_conditions($conditions){
 			'triggerids' => $triggerids,
 			'editable' => 1
 		);
-		$triggers = CTrigger::get($options);
+		$triggers = API::Trigger()->get($options);
 		$triggers = zbx_toHash($triggers, 'triggerid');
 		foreach($triggerids as $hnum => $triggerid){
 			if(!isset($triggers[$triggerid])) throw new Exception(S_INCORRECT_TRIGGER);
@@ -166,7 +166,7 @@ function condition_value2str($conditiontype, $value){
 			$str_val.= $group['name'];
 			break;
 		case CONDITION_TYPE_TRIGGER:
-			$trig = CTrigger::get(array(
+			$trig = API::Trigger()->get(array(
 				'triggerids' => $value,
 				'expandTriggerDescriptions' => true,
 				'output' => API_OUTPUT_EXTEND,
@@ -272,13 +272,13 @@ function get_operation_desc($type=SHORT_DESCRITION, $data){
 				case OPERATION_TYPE_MESSAGE:
 					switch($data['object']){
 						case OPERATION_OBJECT_USER:
-							$obj_data = CUser::get(array('userids' => $data['objectid'],  'output' => API_OUTPUT_EXTEND));
+							$obj_data = API::User()->get(array('userids' => $data['objectid'],  'output' => API_OUTPUT_EXTEND));
 							$obj_data = reset($obj_data);
 
 							$obj_data = S_USER.' "'.$obj_data['alias'].'"';
 							break;
 						case OPERATION_OBJECT_GROUP:
-							$obj_data = CUserGroup::get(array('usrgrpids' => $data['objectid'],  'output' => API_OUTPUT_EXTEND));
+							$obj_data = API::UserGroup()->get(array('usrgrpids' => $data['objectid'],  'output' => API_OUTPUT_EXTEND));
 							$obj_data = reset($obj_data);
 
 							$obj_data = S_GROUP.' "'.$obj_data['name'].'"';
@@ -582,7 +582,7 @@ function	update_action_status($actionid, $status)
 function validate_condition($conditiontype, $value){
 	switch($conditiontype){
 		case CONDITION_TYPE_HOST_GROUP:
-			$groups = CHostGroup::get(array(
+			$groups = API::HostGroup()->get(array(
 				'groupids' => $value,
 				'output' => API_OUTPUT_SHORTEN,
 				'nodeids' => get_current_nodeid(true),
@@ -593,7 +593,7 @@ function validate_condition($conditiontype, $value){
 			}
 			break;
 		case CONDITION_TYPE_HOST_TEMPLATE:
-			$templates = CTemplate::get(array(
+			$templates = API::Template()->get(array(
 				'templateids' => $value,
 				'output' => API_OUTPUT_SHORTEN,
 				'nodeids' => get_current_nodeid(true),
@@ -604,7 +604,7 @@ function validate_condition($conditiontype, $value){
 			}
 			break;
 		case CONDITION_TYPE_TRIGGER:
-			$triggers = CTrigger::get(array(
+			$triggers = API::Trigger()->get(array(
 				'triggerids' => $value,
 				'output' => API_OUTPUT_SHORTEN,
 				'nodeids' => get_current_nodeid(true),
@@ -615,7 +615,7 @@ function validate_condition($conditiontype, $value){
 			}
 			break;
 		case CONDITION_TYPE_HOST:
-			$hosts = CHost::get(array(
+			$hosts = API::Host()->get(array(
 				'hostids' => $value,
 				'output' => API_OUTPUT_SHORTEN,
 				'nodeids' => get_current_nodeid(true),
@@ -694,14 +694,14 @@ function validate_operation($operation){
 		case OPERATION_TYPE_MESSAGE:
 			switch($operation['object']){
 				case OPERATION_OBJECT_USER:
-					$users = CUser::get(array('userids' => $operation['objectid'],  'output' => API_OUTPUT_EXTEND));
+					$users = API::User()->get(array('userids' => $operation['objectid'],  'output' => API_OUTPUT_EXTEND));
 					if(empty($users)){
 						error(S_INCORRECT_USER);
 						return false;
 					}
 					break;
 				case OPERATION_OBJECT_GROUP:
-					$usrgrps = CUserGroup::get(array('usrgrpids' => $operation['objectid'],  'output' => API_OUTPUT_EXTEND));
+					$usrgrps = API::UserGroup()->get(array('usrgrpids' => $operation['objectid'],  'output' => API_OUTPUT_EXTEND));
 					if(empty($usrgrps)){
 						error(S_INCORRECT_GROUP);
 						return false;
@@ -721,7 +721,7 @@ function validate_operation($operation){
 			break;
 		case OPERATION_TYPE_GROUP_ADD:
 		case OPERATION_TYPE_GROUP_REMOVE:
-			$groups = CHostGroup::get(array(
+			$groups = API::HostGroup()->get(array(
 				'groupids' => $operation['objectid'],
 				'output' => API_OUTPUT_SHORTEN,
 				'editable' => 1,
@@ -733,7 +733,7 @@ function validate_operation($operation){
 			break;
 		case OPERATION_TYPE_TEMPLATE_ADD:
 		case OPERATION_TYPE_TEMPLATE_REMOVE:
-			$tpls = CTemplate::get(array(
+			$tpls = API::Template()->get(array(
 				'templateids' => $operation['objectid'],
 				'output' => API_OUTPUT_SHORTEN,
 				'editable' => 1,

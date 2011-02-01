@@ -147,7 +147,7 @@ require_once('include/templates/scriptConfirm.js.php');
 	$formHeader->addItem($cmbConfig);
 
 
-	$screens = CScreen::get(array(
+	$screens = API::Screen()->get(array(
 		'nodeids' => get_current_nodeid(),
 		'output' => API_OUTPUT_EXTEND,
 		'select_screenitems' => API_OUTPUT_EXTEND

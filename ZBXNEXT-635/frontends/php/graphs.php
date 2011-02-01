@@ -99,7 +99,7 @@ include_once('include/page_header.php');
 			'graphids' => $_REQUEST['graphid'],
 			'editable' => 1
 		);
-		$graphs = CGraph::get($options);
+		$graphs = API::Graph()->get($options);
 		if(empty($graphs)) access_deny();
 	}
 	else if(get_request('hostid', 0) > 0){
@@ -109,7 +109,7 @@ include_once('include/page_header.php');
 			'templated_hosts' => 1,
 			'editable' => 1
 		);
-		$hosts = CHost::get($options);
+		$hosts = API::Host()->get($options);
 		if(empty($hosts)) access_deny();
 	}
 ?>
@@ -140,7 +140,7 @@ include_once('include/page_header.php');
 				'webitems'=>1,
 				'editable'=>1,
 			);
-			$db_items = CItem::get($options);
+			$db_items = API::Item()->get($options);
 			$db_items = zbx_toHash($db_items, 'itemid');
 
 			foreach($itemids as $inum => $itemid){
@@ -202,14 +202,14 @@ include_once('include/page_header.php');
 			if(isset($_REQUEST['graphid'])){
 				$graph['graphid'] = $_REQUEST['graphid'];
 
-				$result = CGraph::update($graph);
+				$result = API::Graph()->update($graph);
 
 				if($result){
 					add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_GRAPH,'Graph ID ['.$_REQUEST['graphid'].'] Graph ['.$_REQUEST['name'].']');
 				}
 			}
 			else{
-				$result = CGraph::create($graph);
+				$result = API::Graph()->create($graph);
 
 				if($result){
 					add_audit(AUDIT_ACTION_ADD, AUDIT_RESOURCE_GRAPH, 'Graph ['.$_REQUEST['name'].']');
@@ -227,7 +227,7 @@ include_once('include/page_header.php');
 		}
 	}
 	else if(isset($_REQUEST['delete']) && isset($_REQUEST['graphid'])){
-		$result = CGraph::delete($_REQUEST['graphid']);
+		$result = API::Graph()->delete($_REQUEST['graphid']);
 		if($result){
 			unset($_REQUEST['form']);
 		}
@@ -278,7 +278,7 @@ include_once('include/page_header.php');
 	}
 //------ GO -------
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_graphid'])){
-		$go_result = CGraph::delete($_REQUEST['group_graphid']);
+		$go_result = API::Graph()->delete($_REQUEST['group_graphid']);
 		show_messages($go_result, S_GRAPHS_DELETED, S_CANNOT_DELETE_GRAPHS);
 	}
 	else if(($_REQUEST['go'] == 'copy_to') && isset($_REQUEST['copy'])&&isset($_REQUEST['group_graphid'])){
@@ -298,7 +298,7 @@ include_once('include/page_header.php');
 				zbx_value2array($_REQUEST['copy_targetid']);
 
 				$opt = array('groupids'=>$_REQUEST['copy_targetid'], 'editable'=>1, 'nodes'=>get_current_nodeid(true));
-				$db_groups = CHostGroup::get($opt);
+				$db_groups = API::HostGroup()->get($opt);
 				$db_groups = zbx_toHash($db_groups, 'groupid');
 
 				foreach($_REQUEST['copy_targetid'] as $gnum => $groupid){
@@ -310,7 +310,7 @@ include_once('include/page_header.php');
 				$options['groupids'] = $_REQUEST['copy_targetid'];
 			}
 
-			$db_hosts = CHost::get($options);
+			$db_hosts = API::Host()->get($options);
 
 			DBstart();
 			foreach($_REQUEST['group_graphid'] as $gnum => $graph_id){
@@ -442,7 +442,7 @@ include_once('include/page_header.php');
 			else if($pageFilter->groupid > 0)
 				$options['groupids'] = $pageFilter->groupid;
 
-			$graphs = CGraph::get($options);
+			$graphs = API::Graph()->get($options);
 		}
 
 // Change graphtype from numbers to names, for correct sorting
@@ -464,7 +464,7 @@ include_once('include/page_header.php');
 			'select_templates' => API_OUTPUT_EXTEND,
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 		);
-		$graphs = CGraph::get($options);
+		$graphs = API::Graph()->get($options);
 
 // Change graphtype from numbers to names, for correct sorting
 		foreach($graphs as $gnum => $graph){

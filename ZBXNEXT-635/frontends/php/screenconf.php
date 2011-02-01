@@ -85,9 +85,9 @@ include_once('include/page_header.php');
 			'select_screenitems' => API_OUTPUT_EXTEND
 		);
 		if(isset($_REQUEST['templateid']))
-			$screens = CTemplateScreen::get($options);
+			$screens = API::TemplateScreen()->get($options);
 		else
-			$screens = CScreen::get($options);
+			$screens = API::Screen()->get($options);
 
 		if(empty($screens)){
 			if(empty($screens)) access_deny();
@@ -104,7 +104,7 @@ include_once('include/page_header.php');
 			'select_screenitems' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND
 		);
-		$screens = CScreen::get($options);
+		$screens = API::Screen()->get($options);
 
 		prepareScreenExport($screens);
 
@@ -152,9 +152,9 @@ include_once('include/page_header.php');
 				'templateid' => get_request('templateid')
 			);
 			if(isset($_REQUEST['templateid']))
-				$result = CTemplateScreen::update($screen);
+				$result = API::TemplateScreen()->update($screen);
 			else
-				$result = CScreen::update($screen);
+				$result = API::Screen()->update($screen);
 
 			$audit_action = AUDIT_ACTION_UPDATE;
 			show_messages($result, S_SCREEN_UPDATED, S_CANNOT_UPDATE_SCREEN);
@@ -171,9 +171,9 @@ include_once('include/page_header.php');
 			);
 
 			if(isset($_REQUEST['templateid']))
-				$result = CTemplateScreen::create($screen);
+				$result = API::TemplateScreen()->create($screen);
 			else
-				$result = CScreen::create($screen);
+				$result = API::Screen()->create($screen);
 
 			$audit_action = AUDIT_ACTION_ADD;
 			show_messages($result, S_SCREEN_ADDED, S_CANNOT_ADD_SCREEN);
@@ -196,13 +196,13 @@ include_once('include/page_header.php');
 			'editable => 1'
 		);
 
-		$screens = CScreen::get($options);
-		$templatedScreens = CTemplateScreen::get($options);
+		$screens = API::Screen()->get($options);
+		$templatedScreens = API::TemplateScreen()->get($options);
 
 		if(!empty($screens))
-			$go_result = CScreen::delete($screenids);
+			$go_result = API::Screen()->delete($screenids);
 		else
-			$go_result = CTemplateScreen::delete($screenids);
+			$go_result = API::TemplateScreen()->delete($screenids);
 
 		if($go_result){
 			unset($_REQUEST['screenid'], $_REQUEST['form']);
@@ -253,9 +253,9 @@ include_once('include/page_header.php');
 					'output' => API_OUTPUT_EXTEND
 				);
 				if(isset($_REQUEST['templateid']))
-					$screens = CTemplateScreen::get($options);
+					$screens = API::TemplateScreen()->get($options);
 				else
-					$screens = CScreen::get($options);
+					$screens = API::Screen()->get($options);
 
 				$screen = reset($screens);
 
@@ -334,9 +334,9 @@ include_once('include/page_header.php');
 			'limit' => ($config['search_limit']+1)
 		);
 		if($templateid)
-			$screens = CTemplateScreen::get($options);
+			$screens = API::TemplateScreen()->get($options);
 		else
-			$screens = CScreen::get($options);
+			$screens = API::Screen()->get($options);
 
 		order_result($screens, $sortfield, $sortorder);
 		$paging = getPagingLine($screens);

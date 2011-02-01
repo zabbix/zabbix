@@ -52,7 +52,7 @@ include_once('include/page_header.php');
 			'output'=> API_OUTPUT_EXTEND,
 			'select_image'=> 1
 		);
-		$images = CImage::get($options);
+		$images = API::Image()->get($options);
 		foreach($images as $inum => $image){
 //SDI($image['image']);
 			$image['image'] = zbx_unescape_image(base64_decode($image['image']));

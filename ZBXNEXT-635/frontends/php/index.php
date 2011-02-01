@@ -48,7 +48,7 @@ $page['file']	= 'index.php';
 	if(isset($_REQUEST['reconnect']) && isset($sessionid)){
 		add_audit(AUDIT_ACTION_LOGOUT,AUDIT_RESOURCE_USER,'Manual Logout');
 
-		CUser::logout($sessionid);
+		API::User()->logout($sessionid);
 
 		jsRedirect('index.php');
 		exit();
@@ -77,7 +77,7 @@ $page['file']	= 'index.php';
 		$passwd = get_request('password','');
 
 
-		$login = CUser::authenticate(array('user'=>$name, 'password'=>$passwd, 'auth_type'=>$authentication_type));
+		$login = API::User()->authenticate(array('user'=>$name, 'password'=>$passwd, 'auth_type'=>$authentication_type));
 
 		if($login){
 			$url = is_null($request)?$USER_DETAILS['url']:$request;

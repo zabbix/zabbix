@@ -181,7 +181,7 @@ include_once('include/page_header.php');
 		}
 
 		//getting data throung API
-		$alert_info = CAlert::get($options);
+		$alert_info = API::Alert()->get($options);
 
 		//counting alert count for each user and media type
 		$summary = array();
@@ -190,7 +190,7 @@ include_once('include/page_header.php');
 			$summary[$userid]['total'] = 0;
 			$summary[$userid]['medias'] = array('1'=>0, '2'=>0, '3'=>0, '4'=>0);
 		}
-		
+
 		foreach($alert_info as $ai){
 			if( !isset($summary[$ai['userid']]) ) continue;
 
@@ -202,7 +202,7 @@ include_once('include/page_header.php');
 				$summary[$ai['userid']]['medias'][$ai['mediatypeid']] = 1;
 			}
 		}
-		
+
 		foreach($summary as $s){
 			array_push($table_row, array($s['total'], ($media_type == 0 ? SPACE.'('.implode('/',$s['medias']).')' : '' )));
 		}

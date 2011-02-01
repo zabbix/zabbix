@@ -241,7 +241,7 @@ class CGraphItem extends CZBXAPI{
 				'gitemids' => $gitemids,
 				'preservekeys' => 1
 			);
-			$graphs = CGraph::get($obj_params);
+			$graphs = API::Graph()->get($obj_params);
 			foreach($graphs as $graphid => $graph){
 				$gitems = $graph['gitems'];
 				unset($graph['gitems']);
@@ -282,7 +282,7 @@ class CGraphItem extends CZBXAPI{
 		}
 
 		if(!empty($gitemids))
-			$result = self::get(array('gitemids'=>$gitemids, 'extendoutput'=>1));
+			$result = $this->get(array('gitemids'=>$gitemids, 'extendoutput'=>1));
 
 	return $result;
 	}

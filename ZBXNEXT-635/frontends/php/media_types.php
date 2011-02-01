@@ -76,19 +76,19 @@ include_once('include/page_header.php');
 			'username' => get_request('username'),
 			'passwd' => get_request('password')
 		);
-		
+
 		if(is_null($mediatype['passwd'])) unset($mediatype['passwd']);
 
 		if(isset($_REQUEST['mediatypeid'])){
 			$action = AUDIT_ACTION_UPDATE;
 			$mediatype['mediatypeid'] = $_REQUEST['mediatypeid'];
 
-			$result = CMediatype::update($mediatype);
+			$result = API::Mediatype()->update($mediatype);
 			show_messages($result, S_MEDIA_TYPE_UPDATED, S_MEDIA_TYPE_WAS_NOT_UPDATED);
 		}
 		else{
 			$action = AUDIT_ACTION_ADD;
-			$result = CMediatype::create($mediatype);
+			$result = API::Mediatype()->create($mediatype);
 			show_messages($result, S_ADDED_NEW_MEDIA_TYPE, S_NEW_MEDIA_TYPE_WAS_NOT_ADDED);
 		}
 
@@ -98,7 +98,7 @@ include_once('include/page_header.php');
 		}
 	}
 	else if(isset($_REQUEST['delete'])&&isset($_REQUEST['mediatypeid'])){
-		$result = CMediatype::delete($_REQUEST['mediatypeid']);
+		$result = API::Mediatype()->delete($_REQUEST['mediatypeid']);
 		show_messages($result, S_MEDIA_TYPE_DELETED, S_MEDIA_TYPE_WAS_NOT_DELETED);
 
 		if($result){
@@ -111,7 +111,7 @@ include_once('include/page_header.php');
 		$go_result = true;
 		$media_types = get_request('media_types', array());
 
-		$go_result = CMediatype::delete($media_types);
+		$go_result = API::Mediatype()->delete($media_types);
 
 		if($go_result) unset($_REQUEST['form']);
 		show_messages($go_result, S_MEDIA_TYPE_DELETED, S_MEDIA_TYPE_WAS_NOT_DELETED);
@@ -142,11 +142,11 @@ include_once('include/page_header.php');
 				'mediatypeids' => $_REQUEST['mediatypeid'],
 				'output' => API_OUTPUT_EXTEND,
 			);
-			$mediatypes = CMediatype::get($options);
+			$mediatypes = API::Mediatype()->get($options);
 			$mediatype = reset($mediatypes);
 			$password = $mediatype['passwd'];
 		}
-		
+
 		if(isset($_REQUEST['mediatypeid']) && !isset($_REQUEST['form_refresh'])){
 			$mediatypeid = $mediatype['mediatypeid'];
 			$type = $mediatype['type'];
@@ -188,7 +188,7 @@ include_once('include/page_header.php');
 			MEDIA_TYPE_JABBER => S_JABBER,
 		));
 		$cmbType->addItemsInGroup(S_COMMERCIAL, array(MEDIA_TYPE_EZ_TEXTING => S_EZ_TEXTING));
-		
+
 		$row = array($cmbType);
 		if($type == MEDIA_TYPE_EZ_TEXTING){
 			$ez_texting_link = new CLink('https://app.eztexting.com', 'https://app.eztexting.com/', null, null, 'nosid');
@@ -229,7 +229,7 @@ include_once('include/page_header.php');
 				$frmMedia->addRow(S_PASSWORD, $pass_fields);
 				$limit_cb = new CComboBox('exec_path', $exec_path);
 				$limit_cb->addItems(array(
-					EZ_TEXTING_LIMIT_USA => S_EZ_TEXTING_USA, 
+					EZ_TEXTING_LIMIT_USA => S_EZ_TEXTING_USA,
 					EZ_TEXTING_LIMIT_CANADA => S_EZ_TEXTING_CANADA,
 				));
 				$frmMedia->addRow(S_MESSAGE_TEXT_LIMIT, $limit_cb);
@@ -275,7 +275,7 @@ include_once('include/page_header.php');
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
-		$mediatypes = CMediatype::get($options);
+		$mediatypes = API::Mediatype()->get($options);
 
 
 // Check if media type are used by existing actions
@@ -284,7 +284,7 @@ include_once('include/page_header.php');
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => 1,
 		);
-		$actions = CAction::get($options);
+		$actions = API::Action()->get($options);
 
 		foreach($actions as $actionid => $action){
 			if(!isset($mediatypes[$action['mediatypeid']]['listOfActions']))

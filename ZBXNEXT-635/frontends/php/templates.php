@@ -115,7 +115,7 @@ include_once('include/page_header.php');
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => 1
 		);
-		$templates = CTemplate::get($params);
+		$templates = API::Template()->get($params);
 		order_result($templates, 'host');
 
 // SELECT HOST GROUPS
@@ -124,7 +124,7 @@ include_once('include/page_header.php');
 			'preservekeys' => 1,
 			'output' => API_OUTPUT_EXTEND
 		);
-		$groups = CHostGroup::get($params);
+		$groups = API::HostGroup()->get($params);
 
 // SELECT GRAPHS
 		$params = array(
@@ -132,7 +132,7 @@ include_once('include/page_header.php');
 			'preservekeys' => 1,
 			'output' => API_OUTPUT_EXTEND
 		);
-		$graphs = CGraph::get($params);
+		$graphs = API::Graph()->get($params);
 
 // SELECT GRAPH ITEMS
 		$graphids = zbx_objectValues($graphs, 'graphid');
@@ -142,7 +142,7 @@ include_once('include/page_header.php');
 			'preservekeys' => 1,
 			'expandData' => 1
 		);
-		$gitems = CGraphItem::get($params);
+		$gitems = API::GraphItem()->get($params);
 
 		foreach($gitems as $gnum => $gitem){
 			$gitems[$gitem['gitemid']]['host_key_'] = $gitem['host'].':'.$gitem['key_'];
@@ -153,7 +153,7 @@ include_once('include/page_header.php');
 			'preservekeys' => 1,
 			'output' => API_OUTPUT_EXTEND
 		);
-		$parentTemplates = CTemplate::get($params);
+		$parentTemplates = API::Template()->get($params);
 
 // SELECT MACROS
 		$params = array(
@@ -161,7 +161,7 @@ include_once('include/page_header.php');
 			'preservekeys' => 1,
 			'output' => API_OUTPUT_EXTEND
 		);
-		$macros = CUserMacro::get($params);
+		$macros = API::UserMacro()->get($params);
 
 // SELECT SCREENS
 		$params = array(
@@ -170,7 +170,7 @@ include_once('include/page_header.php');
 			'output' => API_OUTPUT_EXTEND,
 			'noInheritance' => true
 		);
-		$screens = CTemplateScreen::get($params);
+		$screens = API::TemplateScreen()->get($params);
 
 		prepareScreenExport($screens);
 
@@ -181,7 +181,7 @@ include_once('include/page_header.php');
 			'preservekeys' => 1,
 			'output' => API_OUTPUT_EXTEND
 		);
-		$items = CItem::get($params);
+		$items = API::Item()->get($params);
 
 // SELECT APPLICATIONS
 		$itemids = zbx_objectValues($items, 'itemid');
@@ -191,7 +191,7 @@ include_once('include/page_header.php');
 			'preservekeys' => 1,
 			'output' => API_OUTPUT_EXTEND
 		);
-		$applications = Capplication::get($params);
+		$applications = API::Application()->get($params);
 //sdii($applications);
 
 // SELECT TRIGGERS
@@ -202,7 +202,7 @@ include_once('include/page_header.php');
 			'select_dependencies' => API_OUTPUT_EXTEND,
 			'expandData' => 1
 		);
-		$triggers = CTrigger::get($params);
+		$triggers = API::Trigger()->get($params);
 		foreach($triggers as $tnum => $trigger){
 			$triggers[$trigger['triggerid']]['expression'] = explode_exp($trigger['expression'], false);
 		}
@@ -331,12 +331,12 @@ include_once('include/page_header.php');
 // CREATE NEW GROUP
 		$groups = zbx_toObject($groups, 'groupid');
 		if(!empty($newgroup)){
-			$result = CHostGroup::create(array('name' => $newgroup));
+			$result = API::HostGroup()->create(array('name' => $newgroup));
 			$options = array(
 				'groupids' => $result['groupids'],
 				'output' => API_OUTPUT_EXTEND
 			);
-			$newgroup = CHostGroup::get($options);
+			$newgroup = API::HostGroup()->get($options);
 			if($newgroup){
 				$groups = array_merge($groups, $newgroup);
 			}
@@ -365,9 +365,9 @@ include_once('include/page_header.php');
 			$template['templateid'] = $templateid;
 			$template['templates_clear'] = $templates_clear;
 
-			$result = CTemplate::update($template);
+			$result = API::Template()->update($template);
 			if(!$result){
-				error(CTemplate::resetErrors());
+				error(API::Template()->resetErrors());
 				$result = false;
 			}
 
@@ -376,13 +376,13 @@ include_once('include/page_header.php');
 		}
 		else{
 			$created = 1;
-			$result = CTemplate::create($template);
+			$result = API::Template()->create($template);
 
 			if($result){
 				$templateid = reset($result['templateids']);
 			}
 			else{
-				error(CTemplate::resetErrors());
+				error(API::Template()->resetErrors());
 				$result = false;
 			}
 			$msg_ok = S_TEMPLATE_ADDED;
@@ -405,7 +405,7 @@ include_once('include/page_header.php');
 				'inherited' => 0,
 				'output' => API_OUTPUT_REFER
 			);
-			$db_graphs = CGraph::get($options);
+			$db_graphs = API::Graph()->get($options);
 			foreach($db_graphs as $gnum => $db_graph){
 				$result &= (bool) copy_graph_to_host($db_graph['graphid'], $templateid);
 			}
@@ -431,13 +431,13 @@ include_once('include/page_header.php');
 
 		$go_result = true;
 		if(isset($_REQUEST['delete'])){
-			$result = CTemplate::massUpdate(array(
+			$result = API::Template()->massUpdate(array(
 				'templates' => zbx_toObject($_REQUEST['templateid'], 'templateid'),
 				'hosts' => array()
 			));
 		}
 		if($result)
-			$result = CTemplate::delete($_REQUEST['templateid']);
+			$result = API::Template()->delete($_REQUEST['templateid']);
 
 		$result = DBend($result);
 
@@ -457,13 +457,13 @@ include_once('include/page_header.php');
 
 		$go_result = true;
 		if(isset($_REQUEST['delete'])){
-			$go_result = CTemplate::massUpdate(array(
+			$go_result = API::Template()->massUpdate(array(
 				'templateids' => $templates,
 				'hosts' => array()
 			));
 		}
 		if($go_result)
-			$go_result = CTemplate::delete($templates);
+			$go_result = API::Template()->delete($templates);
 
 		$go_result = DBend($go_result);
 
@@ -564,7 +564,7 @@ include_once('include/page_header.php');
 
 			if($pageFilter->groupid > 0) $options['groupids'] = $pageFilter->groupid;
 
-			$templates = CTemplate::get($options);
+			$templates = API::Template()->get($options);
 		}
 
 // sorting && paging
@@ -588,7 +588,7 @@ include_once('include/page_header.php');
 			'nopermissions' => 1,
 		);
 
-		$templates = CTemplate::get($options);
+		$templates = API::Template()->get($options);
 		order_result($templates, $sortfield, $sortorder);
 //-----
 

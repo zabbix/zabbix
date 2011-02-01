@@ -337,7 +337,7 @@ require_once('include/templates/scriptConfirm.js.php');
 		$options['lastChangeSince'] = time() - ($_REQUEST['status_change_days'] * 86400);
 	}
 
-	$triggers = CTrigger::get($options);
+	$triggers = API::Trigger()->get($options);
 
 // sorting && paging
 	order_result($triggers, $sortfield, $sortorder);
@@ -351,7 +351,7 @@ require_once('include/templates/scriptConfirm.js.php');
 		'selectItems' => API_OUTPUT_EXTEND,
 		'select_dependencies' => API_OUTPUT_EXTEND
 	);
-	$triggers = CTrigger::get($options);
+	$triggers = API::Trigger()->get($options);
 	$triggers = zbx_toHash($triggers, 'triggerid');
 
 	order_result($triggers, $sortfield, $sortorder);
@@ -370,7 +370,7 @@ require_once('include/templates/scriptConfirm.js.php');
 				),
 				'nopermissions' => true
 			);
-			$triggers[$tnum]['event_count'] = CEvent::get($options);
+			$triggers[$tnum]['event_count'] = API::Event()->get($options);
 		}
 	}
 
@@ -386,7 +386,7 @@ require_once('include/templates/scriptConfirm.js.php');
 	}
 
 
-	$scripts_by_hosts = Cscript::getScriptsByHosts($tr_hostids);
+	$scripts_by_hosts = API::Script()->getScriptsByHosts($tr_hostids);
 
 	if($show_events != EVENTS_OPTION_NOEVENT){
 		$ev_options = array(
@@ -414,7 +414,7 @@ require_once('include/templates/scriptConfirm.js.php');
 			break;
 		}
 
-		$events = CEvent::get($ev_options);
+		$events = API::Event()->get($ev_options);
 		order_result($events, 'clock', ZBX_SORT_DOWN);
 
 		foreach($events as $enum => $event){
@@ -570,7 +570,7 @@ require_once('include/templates/scriptConfirm.js.php');
 					'maintenanceids' => $trigger_host['maintenanceid'],
 					'output' => API_OUTPUT_EXTEND
 				);
-				$maintenances = CMaintenance::get($maintenanceOptions);
+				$maintenances = API::Maintenance()->get($maintenanceOptions);
 				$maintenance = reset($maintenances);
 
 				$maint_hint = new CSpan($maintenance['name'].($maintenance['description']=='' ? '' : ': '.$maintenance['description']));

@@ -320,7 +320,7 @@ Copt::memoryPick();
 				'userids' => $userids,
 				'preservekeys' => 1
 			);
-			$usrgrps = CUserGroup::get($obj_params);
+			$usrgrps = API::UserGroup()->get($obj_params);
 			foreach($usrgrps as $usrgrpid => $usrgrp){
 				$uusers = $usrgrp['users'];
 				unset($usrgrp['users']);
@@ -373,7 +373,7 @@ Copt::memoryPick();
 		}
 
 		if(!empty($userids))
-			$result = self::get(array('userids' => $userids, 'extendoutput' => 1));
+			$result = $this->get(array('userids' => $userids, 'extendoutput' => 1));
 
 		return $result;
 	}
@@ -435,7 +435,7 @@ Copt::memoryPick();
 				}
 
 
-				$user_exist = self::getObjects(array('alias' => $user['alias']));
+				$user_exist = $this->getObjects(array('alias' => $user['alias']));
 				if(!empty($user_exist)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_USER_EXISTS_FIRST_PART);
 				}
@@ -526,7 +526,7 @@ Copt::memoryPick();
 			'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1
 			);
-			$upd_users = self::get($options);
+			$upd_users = $this->get($options);
 			foreach($users as $gnum => $user){
 				//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER, 'User ['.$user['alias'].']');
 			}
@@ -573,19 +573,19 @@ Copt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 
 				// if(isset($user['usrgrps']) && !is_null($user['usrgrps'])){
-					// $user_groups = CHostGroup::get(array('userids' => $user['userid']));
+					// $user_groups = API::HostGroup()->get(array('userids' => $user['userid']));
 					// $user_groupids = zbx_objectValues($user_groups, 'usrgrpid');
 					// $new_groupids = zbx_objectValues($user['usrgrps'], 'usrgrpid');
 
 					// $groups_to_add = array_diff($new_groupids, $user_groupids);
 
 					// if(!empty($groups_to_add)){
-						// $result &= self::massAdd(array('users' => $user, 'usrgrps' => $groups_to_add));
+						// $result &= $this->massAdd(array('users' => $user, 'usrgrps' => $groups_to_add));
 					// }
 
 					// $groups_to_del = array_diff($user_groupids, $new_groupids);
 					// if(!empty($groups_to_del)){
-						// $result &= self::massRemove(array('users' => $user, 'usrgrps' => $groups_to_del));
+						// $result &= $this->massRemove(array('users' => $user, 'usrgrps' => $groups_to_del));
 					// }
 				// }
 
@@ -612,7 +612,7 @@ Copt::memoryPick();
 						'output' => API_OUTPUT_EXTEND,
 						'preservekeys' => 1
 					);
-					$usrgrps = CUserGroup::get($options);
+					$usrgrps = API::UserGroup()->get($options);
 
 					foreach($usrgrps as $groupid => $group){
 						if(($group['gui_access'] == GROUP_GUI_ACCESS_DISABLED) && $self){
@@ -660,7 +660,7 @@ Copt::memoryPick();
 			'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1
 			);
-			$upd_users = self::get($options);
+			$upd_users = $this->get($options);
 			$upd_user = reset($upd_users);
 
 			$user_db_fields = $upd_user;
@@ -707,7 +707,7 @@ Copt::memoryPick();
 				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1
 			);
-			$del_users = self::get($options);
+			$del_users = $this->get($options);
 			foreach($del_users as $gnum => $user){
 				if(bccomp($USER_DETAILS['userid'], $user['userid']) == 0){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_USER_CANNOT_DELETE_ITSELF);
@@ -848,7 +848,7 @@ Copt::memoryPick();
 // DELETE
 			if(!empty($del_medias)){
 				$mediaids = zbx_objectValues($del_medias, 'mediaid');
-				$result = self::deleteMedia($mediaids);
+				$result = $this->deleteMedia($mediaids);
 				if(!$result){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_CANT_DELETE_USER_MEDIAS);
 				}
@@ -875,7 +875,7 @@ Copt::memoryPick();
 
 // CREATE
 			if(!empty($new_medias)){
-				$result = self::addMedia(array('users' => $users, 'medias' => $new_medias));
+				$result = $this->addMedia(array('users' => $users, 'medias' => $new_medias));
 				if(!$result){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_CANT_INSERT_USER_MEDIAS);
 				}
@@ -892,16 +892,15 @@ Copt::memoryPick();
 		$config = select_config();
 		$user['auth_type'] = $config['authentication_type'];
 
-		$login = self::authenticate($user);
+		$login = $this->authenticate($user);
 
 		if($login){
 // TODO: why we need to recheck authentication???
-			self::checkAuthentication($login);
+			$this->checkAuthentication($login);
 			return $login;
 		}
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => $_REQUEST['message']);
-			return false;
+			self::exception(ZBX_API_ERROR_PARAMETERS, $_REQUEST['message']);
 		}
 	}
 
@@ -1003,7 +1002,7 @@ Copt::memoryPick();
 
 			switch($auth_type){
 				case ZBX_AUTH_LDAP:
-					$login = self::ldapLogin($user);
+					$login = $this->ldapLogin($user);
 					break;
 				case ZBX_AUTH_HTTP:
 					$login = true;
@@ -1188,7 +1187,7 @@ Copt::memoryPick();
 			}
 		}
 		else{
-			self::logout($sessionid);
+			$this->logout($sessionid);
 		}
 
 		if($USER_DETAILS){

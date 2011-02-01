@@ -97,7 +97,7 @@ require_once('include/templates/scriptConfirm.js.php');
 		'expand_urls' => true,
 		'select_selements' => API_OUTPUT_EXTEND,
 	);
-	$maps = CMap::get($options);
+	$maps = API::Map()->get($options);
 	$maps = zbx_toHash($maps, 'sysmapid');
 
 	if($name = get_request(GET_PARAM_NAME)){

@@ -409,7 +409,7 @@ Copt::memoryPick();
 
 			if(is_array($options['selectDRules']) || str_in_array($options['selectDRules'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['selectDRules'];
-				$drules = CDRule::get($obj_params);
+				$drules = API::DRule()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($drules, 'name');
 				foreach($drules as $druleid => $drule){
@@ -431,7 +431,7 @@ Copt::memoryPick();
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$drules = CDRule::get($obj_params);
+				$drules = API::DRule()->get($obj_params);
 				$drules = zbx_toHash($drules, 'dhostid');
 				foreach($result as $dhostid => $dhost){
 					if(isset($drules[$dhostid]))
@@ -452,7 +452,7 @@ Copt::memoryPick();
 
 			if(is_array($options['selectDServices']) || str_in_array($options['selectDServices'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['selectDServices'];
-				$dservices = CDService::get($obj_params);
+				$dservices = API::DService()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($dservices, 'name');
 				foreach($dservices as $dserviceid => $dservice){
@@ -473,7 +473,7 @@ Copt::memoryPick();
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$dservices = CDService::get($obj_params);
+				$dservices = API::DService()->get($obj_params);
 				$dservices = zbx_toHash($dservices, 'dhostid');
 				foreach($result as $dhostid => $dhost){
 					if(isset($dservices[$dhostid]))
@@ -492,7 +492,7 @@ Copt::memoryPick();
 					'hostids' => $dhostids,
 					'preservekeys' => 1
 				);
-			$groups = CHostgroup::get($obj_params);
+			$groups = API::HostGroup()->get($obj_params);
 
 			foreach($groups as $groupid => $group){
 				$ghosts = $group['hosts'];
@@ -513,7 +513,7 @@ Copt::memoryPick();
 
 			if(is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['selectHosts'];
-				$hosts = CHost::get($obj_params);
+				$hosts = API::Host()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($hosts, 'host');
 
@@ -535,7 +535,7 @@ Copt::memoryPick();
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$hosts = CHost::get($obj_params);
+				$hosts = API::Host()->get($obj_params);
 				$hosts = zbx_toHash($hosts, 'hostid');
 				foreach($result as $dhostid => $dhost){
 					if(isset($hosts[$dhostid]))
@@ -569,7 +569,7 @@ Copt::memoryPick();
 		else if(isset($object['nodeids']))
 			$options['nodeids'] = $object['nodeids'];
 
-		$objs = self::get($options);
+		$objs = $this->get($options);
 
 	return !empty($objs);
 	}

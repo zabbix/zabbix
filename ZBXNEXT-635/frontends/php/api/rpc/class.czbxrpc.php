@@ -21,7 +21,23 @@
 <?php
 
 class czbxrpc{
-	public static $result;
+	public static $transactionStarted = false;
+
+	private static function transactionBegin(){
+		global $DB;
+
+		if($DB['TRANSACTIONS'] == 0){
+			DBstart();
+			self::$transactionStarted = true;
+		}
+	}
+
+	private static function transactionEnd($result){
+		if(self::$transactionStarted){
+			self::$transactionStarted = false;
+			DBend($result);
+		}
+	}
 
 	private static function callJSON($method, $params){
 		// http bla bla
@@ -34,27 +50,26 @@ class czbxrpc{
 
 		$class_name = 'C'.$resource;
 		if(!class_exists($class_name)){
-			return array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Resource ('.$resource.') does not exist');
+			return array('error' => ZBX_API_ERROR_PARAMETERS, 'message' => 'Resource ('.$resource.') does not exist');
 		}
 
 		if(!method_exists($class_name, $action)){
-			return array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Action ('.$action.') does not exist');
+			return array('error' => ZBX_API_ERROR_PARAMETERS, 'message' => 'Action ('.$action.') does not exist');
 		}
 
 		try{
-			DBstart();
+			self::transactionBegin();
 			API::setReturnAPI();
 
-			$obj = call_user_func(array('API', $resource), array());
-			$result = call_user_func(array($obj, $action), $params);
+			$result = call_user_func(array(API::getObject($resource), $action), $params);
 
 			API::setReturnRPC();
-			DBend(true);
+			self::transactionEnd(true);
 
 			return array('result' => $result);
 		}
 		catch(APIException $e){
-			DBend(false);
+			self::transactionEnd(false);
 			return array('error' => $e->getCode(), 'message' => $e->getMessage(), 'data' => $e->getTrace());
 		}
 	}
@@ -86,11 +101,11 @@ class czbxrpc{
 //----------
 
 			if(empty($sessionid) && (($resource != 'user') || ($action != 'login'))){
-				return array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'Not authorized');
+				return array('error' => ZBX_API_ERROR_NO_AUTH, 'message' => 'Not authorized');
 			}
 			else if(!empty($sessionid)){
-				if(!CUser::simpleAuth($sessionid)){
-					return array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'Not authorized');
+				if(!API::User()->simpleAuth($sessionid)){
+					return array('error' => ZBX_API_ERROR_NO_AUTH, 'message' => 'Not authorized');
 				}
 			}
 // }}} Authentication

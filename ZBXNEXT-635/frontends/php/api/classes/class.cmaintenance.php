@@ -396,7 +396,7 @@ Copt::memoryPick();
 				'preservekeys' => 1,
 				'output' => $options['selectGroups'],
 			);
-			$groups = CHostGroup::get($obj_params);
+			$groups = API::HostGroup()->get($obj_params);
 
 			foreach($groups as $groupid => $group){
 				$gmaintenances = $group['maintenances'];
@@ -416,7 +416,7 @@ Copt::memoryPick();
 				'preservekeys' => 1,
 				'output' => $options['selectHosts'],
 			);
-			$hosts = CHost::get($obj_params);
+			$hosts = API::Host()->get($obj_params);
 
 			foreach($hosts as $hostid => $host){
 				$hmaintenances = $host['maintenances'];
@@ -453,7 +453,7 @@ Copt::memoryPick();
 			'limit' => 1
 		);
 
-		$objs = self::get($options);
+		$objs = $this->get($options);
 
 	return !empty($objs);
 	}
@@ -490,7 +490,7 @@ Copt::memoryPick();
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => 1,
 			);
-			$upd_hosts = CHost::get($options);
+			$upd_hosts = API::Host()->get($options);
 			foreach($hostids as $hostid){
 				if(!isset($upd_hosts[$hostid])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -503,7 +503,7 @@ Copt::memoryPick();
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => 1,
 			);
-			$upd_groups = CHostGroup::get($options);
+			$upd_groups = API::HostGroup()->get($options);
 			foreach($groupids as $groupid){
 				if(!isset($upd_groups[$groupid])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -525,7 +525,7 @@ Copt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect parameters used for Maintenance');
 				}
 				//checkig wheter a maintence with this name already exists
-				if(self::exists(array('name' => $maintenance['name']))){
+				if($this->exists(array('name' => $maintenance['name']))){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_MAINTENANCE.' [ '.$maintenance['name'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 
@@ -605,7 +605,7 @@ Copt::memoryPick();
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => 1,
 			);
-			$upd_maintenances = self::get($options);
+			$upd_maintenances = $this->get($options);
 			foreach($maintenances as $maintenance){
 				if(!isset($upd_maintenances[$maintenance['maintenanceid']])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -618,7 +618,7 @@ Copt::memoryPick();
 									'name'=>$maintenance['name']
 								)
 				);
-				$recieved_maintenaces = CMaintenance::get($options);
+				$recieved_maintenaces = API::Maintenance()->get($options);
 				//now going though a result, to find records with different id, then our object
 				foreach($recieved_maintenaces as $r_maintenace){
 					if ($r_maintenace['maintenanceid'] != $maintenance['maintenanceid']) {
@@ -641,7 +641,7 @@ Copt::memoryPick();
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => 1,
 			);
-			$upd_hosts = CHost::get($options);
+			$upd_hosts = API::Host()->get($options);
 			foreach($hostids as $hostid){
 				if(!isset($upd_hosts[$hostid])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -654,7 +654,7 @@ Copt::memoryPick();
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => 1,
 			);
-			$upd_groups = CHostGroup::get($options);
+			$upd_groups = API::HostGroup()->get($options);
 			foreach($groupids as $groupid){
 				if(!isset($upd_groups[$groupid])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -760,7 +760,7 @@ Copt::memoryPick();
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => 1
 			);
-			$del_maintenances = self::get($options);
+			$del_maintenances = $this->get($options);
 
 			foreach($maintenanceids as $snum => $maintenanceid){
 				if(!isset($del_maintenances[$maintenanceid])){

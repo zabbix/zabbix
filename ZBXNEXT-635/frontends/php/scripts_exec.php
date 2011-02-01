@@ -47,7 +47,7 @@ if(isset($_REQUEST['execute'])){
 			' WHERE scriptid='.$scriptid;
 	$script_info = DBfetch(DBselect($sql));
 
-	$result = CScript::execute(array('hostid' => $hostid, 'scriptid' => $scriptid));
+	$result = API::Script()->execute(array('hostid' => $hostid, 'scriptid' => $scriptid));
 	if($result === false){
 		show_messages(false, '', S_SCRIPT_ERROR);
 	}

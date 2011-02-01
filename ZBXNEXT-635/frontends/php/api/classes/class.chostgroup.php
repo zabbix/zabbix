@@ -457,7 +457,7 @@ COpt::memoryPick();
 
 			if(is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['selectHosts'];
-				$hosts = CHost::get($obj_params);
+				$hosts = API::Host()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($hosts, 'host');
 
@@ -481,7 +481,7 @@ COpt::memoryPick();
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$hosts = CHost::get($obj_params);
+				$hosts = API::Host()->get($obj_params);
 				$hosts = zbx_toHash($hosts, 'groupid');
 				foreach($result as $groupid => $group){
 					if(isset($hosts[$groupid]))
@@ -502,7 +502,7 @@ COpt::memoryPick();
 
 			if(is_array($options['select_templates']) || str_in_array($options['select_templates'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['select_templates'];
-				$templates = CTemplate::get($obj_params);
+				$templates = API::Template()->get($obj_params);
 				if(!is_null($options['limitSelects'])) order_result($templates, 'host');
 
 				$count = array();
@@ -525,7 +525,7 @@ COpt::memoryPick();
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$templates = CTemplate::get($obj_params);
+				$templates = API::Template()->get($obj_params);
 				$templates = zbx_toHash($templates, 'groupid');
 				foreach($result as $groupid => $group){
 					if(isset($templates[$groupid]))
@@ -565,7 +565,7 @@ COpt::memoryPick();
 			$options['nodeids'] = get_current_nodeid(false);
 
 
-		$result = self::get($options);
+		$result = $this->get($options);
 
 	return $result;
 	}
@@ -584,7 +584,7 @@ COpt::memoryPick();
 		else if(isset($object['nodeids']))
 			$options['nodeids'] = $object['nodeids'];
 
-		$objs = self::get($options);
+		$objs = $this->get($options);
 
 	return !empty($objs);
 	}
@@ -609,7 +609,7 @@ COpt::memoryPick();
 				if(!is_array($group) || !isset($group['name']) || empty($group['name'])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ name ]');
 				}
-				if(self::exists(array('name' => $group['name']))){
+				if($this->exists(array('name' => $group['name']))){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'HostGroup [ '.$group['name'].' ] already exists');
 				}
 
@@ -643,7 +643,7 @@ COpt::memoryPick();
 				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1
 			);
-			$upd_groups = self::get($options);
+			$upd_groups = $this->get($options);
 			foreach($groups as $gnum => $group){
 				if(!isset($upd_groups[$group['groupid']])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -659,7 +659,7 @@ COpt::memoryPick();
 				'editable' => 1,
 				'nopermissions' => 1
 			);
-			$groupsNames = self::get($options);
+			$groupsNames = $this->get($options);
 			$groupsNames = zbx_toHash($groupsNames, 'name');
 
 			foreach($groups as $num => $group){
@@ -699,7 +699,7 @@ COpt::memoryPick();
 				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1
 			);
-			$del_groups = self::get($options);
+			$del_groups = $this->get($options);
 			foreach($groupids as $groupid){
 				if(!isset($del_groups[$groupid])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -812,7 +812,7 @@ COpt::memoryPick();
 				'editable' => 1,
 				'preservekeys' => 1
 			);
-			$upd_groups = self::get($options);
+			$upd_groups = $this->get($options);
 			foreach($groups as $gnum => $group){
 				if(!isset($upd_groups[$group['groupid']])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -869,7 +869,7 @@ COpt::memoryPick();
 				'preservekeys' => 1,
 				'output' => API_OUTPUT_SHORTEN
 			);
-			$upd_groups = self::get($options);
+			$upd_groups = $this->get($options);
 			foreach($groupids as $groupid){
 				if(!isset($upd_groups[$groupid])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -919,14 +919,14 @@ COpt::memoryPick();
 				'preservekeys' => 1,
 			);
 			if(!is_null($hosts)){
-				$groups_hosts = CHost::get($options);
+				$groups_hosts = API::Host()->get($options);
 				$hosts_to_unlink = array_diff(array_keys($groups_hosts), $hostids);
 				$hosts_to_link = array_diff($hostids, array_keys($groups_hosts));
 			}
 
 			$templates_to_unlink = $templates_to_link = array();
 			if(!is_null($templates)){
-				$groups_templates = CTemplate::get($options);
+				$groups_templates = API::Template()->get($options);
 				$templates_to_unlink = array_diff(array_keys($groups_templates), $templateids);
 				$templates_to_link = array_diff($templateids, array_keys($groups_templates));
 			}
@@ -940,7 +940,7 @@ COpt::memoryPick();
 				'editable' => 1,
 				'preservekeys' => 1
 			);
-			$allowed_groups = self::get($options);
+			$allowed_groups = $this->get($options);
 			foreach($groups as $num => $group){
 				if(!isset($allowed_groups[$group['groupid']])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -954,7 +954,7 @@ COpt::memoryPick();
 					'editable' => 1,
 					'preservekeys' => 1
 				);
-				$allowed_hosts = CHost::get($options);
+				$allowed_hosts = API::Host()->get($options);
 				foreach($hosts_to_check as $num => $hostid){
 					if(!isset($allowed_hosts[$hostid])){
 						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -969,7 +969,7 @@ COpt::memoryPick();
 					'editable' => 1,
 					'preservekeys' => 1
 				);
-				$allowed_templates = CTemplate::get($options);
+				$allowed_templates = API::Template()->get($options);
 				foreach($templates_to_check as $num => $templateid){
 					if(!isset($allowed_templates[$templateid])){
 						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);

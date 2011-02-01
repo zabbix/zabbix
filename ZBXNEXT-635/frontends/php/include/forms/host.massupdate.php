@@ -134,7 +134,7 @@ $options = array(
 	'output' => API_OUTPUT_EXTEND,
 	'editable' => 1,
 );
-$all_groups = CHostGroup::get($options);
+$all_groups = API::HostGroup()->get($options);
 order_result($all_groups, 'name');
 foreach($all_groups as $grp){
 	$grp_tb->addItem($grp['groupid'], $grp['name']);

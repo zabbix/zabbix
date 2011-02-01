@@ -267,7 +267,7 @@ class CUserGroup extends CZBXAPI{
 				'get_access' => ($options['select_users'] == API_OUTPUT_EXTEND)?true:null,
 				'preservekeys' => 1
 			);
-			$users = CUser::get($obj_params);
+			$users = API::User()->get($obj_params);
 			foreach($users as $userid => $user){
 				$uusrgrps = $user['usrgrps'];
 				unset($user['usrgrps']);
@@ -305,7 +305,7 @@ class CUserGroup extends CZBXAPI{
 		}
 
 		if(!empty($usrgrpids))
-			$result = self::get(array('usrgrpids'=>$usrgrpids, 'extendoutput'=>1));
+			$result = $this->get(array('usrgrpids'=>$usrgrpids, 'extendoutput'=>1));
 
 	return $result;
 	}
@@ -322,7 +322,7 @@ class CUserGroup extends CZBXAPI{
 		else if(isset($object['nodeids']))
 			$options['nodeids'] = $object['nodeids'];
 
-		$objs = self::get($options);
+		$objs = $this->get($options);
 
 		return !empty($objs);
 	}
@@ -351,7 +351,7 @@ class CUserGroup extends CZBXAPI{
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect parameters used for UserGroup');
 				}
 
-				if(self::exists(array('name' => $usrgrp['name'], 'nodeids' => get_current_nodeid(false)))){
+				if($this->exists(array('name' => $usrgrp['name'], 'nodeids' => get_current_nodeid(false)))){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_USER_GROUP.' [ '.$usrgrp['name'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 				$insert[$gnum] = $usrgrp;
@@ -369,7 +369,7 @@ class CUserGroup extends CZBXAPI{
 				}
 				if(!empty($mass_add)){
 					$mass_add['usrgrpids'] = $usrgrpids[$gnum];
-					if(!self::massAdd($mass_add))
+					if(!$this->massAdd($mass_add))
 						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot add users');
 				}
 			}
@@ -401,7 +401,7 @@ class CUserGroup extends CZBXAPI{
 				$mass_update = $usrgrp;
 				$mass_update['usrgrpids'] = $usrgrp['usrgrpid'];
 				unset($mass_update['usrgrpid']);
-				if(!self::massUpdate($mass_update))
+				if(!$this->massUpdate($mass_update))
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot update group');
 			}
 
@@ -423,7 +423,7 @@ class CUserGroup extends CZBXAPI{
 					'usrgrpids' => $usrgrpids,
 					'output' => API_OUTPUT_EXTEND,
 				);
-				$usrgrps = self::get($options);
+				$usrgrps = $this->get($options);
 				foreach($usrgrps as $usrgrp){
 					if((($usrgrp['gui_access'] == GROUP_GUI_ACCESS_DISABLED)
 							|| ($usrgrp['users_status'] == GROUP_STATUS_DISABLED))
@@ -505,7 +505,7 @@ class CUserGroup extends CZBXAPI{
 
 			foreach($usrgrpids as $ugnum => $usrgrpid){
 				if(isset($data['name'])){
-					$group_exists = self::get(array(
+					$group_exists = $this->get(array(
 						'filter' => array('name' => $data['name']),
 						'output' => API_OUTPUT_SHORTEN,
 					));
@@ -525,7 +525,7 @@ class CUserGroup extends CZBXAPI{
 			DB::update('usrgrp', $update);
 
 			if(!is_null($userids)){
-				$usrgrps = self::get(array(
+				$usrgrps = $this->get(array(
 					'usrgrpids' => $usrgrpids,
 					'output' => API_OUTPUT_EXTEND,
 				));

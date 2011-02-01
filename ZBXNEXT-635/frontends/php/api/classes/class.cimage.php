@@ -247,7 +247,7 @@ class CImage extends CZBXAPI{
 			$options['nodeids'] = get_current_nodeid(true);
 
 
-		$result = self::get($options);
+		$result = $this->get($options);
 
 	return $result;
 	}
@@ -274,7 +274,7 @@ class CImage extends CZBXAPI{
 		else if(isset($object['nodeids']))
 			$options['nodeids'] = $object['nodeids'];
 
-		$objs = self::get($options);
+		$objs = $this->get($options);
 
 	return !empty($objs);
 	}
@@ -307,7 +307,7 @@ class CImage extends CZBXAPI{
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for image [ '.$image['name'].' ]');
 				}
 
-				if(self::exists(array('name' => $image['name']))){
+				if($this->exists(array('name' => $image['name']))){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_IMAGE.' [ '.$image['name'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 
@@ -414,7 +414,7 @@ class CImage extends CZBXAPI{
 					'output' => API_OUTPUT_SHORTEN,
 					'nopermissions' => 1
 				);
-				$image_exists = self::get($options);
+				$image_exists = $this->get($options);
 				$image_exists = reset($image_exists);
 
 				if($image_exists && ($image_exists['imageid'] != $image['imageid'])){

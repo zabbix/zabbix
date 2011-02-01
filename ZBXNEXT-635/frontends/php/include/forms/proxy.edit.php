@@ -39,7 +39,7 @@
 	$proxyList = new CFormList('proxylist');
 
 	if($_REQUEST['hostid'] > 0){
-		$proxies = CProxy::get(array(
+		$proxies = API::Proxy()->get(array(
 			'proxyids' => $_REQUEST['hostid'],
 			'selectInterfaces' => API_OUTPUT_EXTEND,
 			'selectHosts' => array('hostid', 'host'),
@@ -66,7 +66,7 @@
 	$statusBox = new CComboBox('status', $status, 'submit()');
 	$statusBox->addItem(HOST_STATUS_PROXY_ACTIVE, S_PROXY_ACTIVE);
 	$statusBox->addItem(HOST_STATUS_PROXY_PASSIVE, S_PROXY_PASSIVE);
-	
+
 	$proxyList->addRow(S_PROXY_MODE, $statusBox);
 
 	if($status == HOST_STATUS_PROXY_PASSIVE){
@@ -85,7 +85,7 @@
 
 		$ifTab = new CTable();
 		$ifTab->addRow(array(
-			S_IP_ADDRESS, 
+			S_IP_ADDRESS,
 			S_DNS_NAME,
 			S_CONNECT_TO,
 			S_PORT
@@ -136,6 +136,6 @@
 
 	$frmProxy->addItem(makeFormFooter($main, $others));
 
-	
+
 return $frmProxy;
 ?>

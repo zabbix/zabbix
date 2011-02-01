@@ -474,7 +474,7 @@ COpt::memoryPick();
 		else if(isset($object['nodeids']))
 			$options['nodeids'] = $object['nodeids'];
 
-		$objs = self::get($options);
+		$objs = $this->get($options);
 
 	return !empty($objs);
 	}
@@ -520,7 +520,7 @@ COpt::memoryPick();
 				'editable' => 1,
 				'nopermissions' => 1
 			);
-			$dbActions = self::get($options);
+			$dbActions = $this->get($options);
 			foreach($dbActions as $anum => $dbAction){
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_ACTION.' [ '.$dbAction['name'].' ] '.S_ALREADY_EXISTS_SMALL);
 			}
@@ -545,8 +545,8 @@ COpt::memoryPick();
 				}
 			}
 
-			self::addOperations($operations);
-			self::addConditions($conditions);
+			$this->addOperations($operations);
+			$this->addConditions($conditions);
 
 			return array('actionids' => $actionids);
 	}
@@ -579,7 +579,7 @@ COpt::memoryPick();
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => 1
 			);
-			$upd_actions = self::get($options);
+			$upd_actions = $this->get($options);
 			foreach($actions as $anum => $action){
 				if(!isset($upd_actions[$action['actionid']])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
@@ -614,7 +614,7 @@ COpt::memoryPick();
 					'editable' => 1,
 					'nopermissions' => 1
 				);
-				$action_exists = self::get($options);
+				$action_exists = $this->get($options);
 				if(($action_exist = reset($action_exists)) && ($action_exist['actionid'] != $action['actionid'])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_ACTION.' [ '.$action['name'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
@@ -658,8 +658,8 @@ COpt::memoryPick();
 			DB::delete('opconditions', array('operationid'=>$operationids));
 			DB::delete('operations',   array('actionid'=>$actionids));
 
-			self::addOperations($operations);
-			self::addConditions($conditions);
+			$this->addOperations($operations);
+			$this->addConditions($conditions);
 
 			return array('actionids' => $actionids);
 	}
@@ -774,7 +774,7 @@ COpt::memoryPick();
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => 1
 			);
-			$del_actions = self::get($options);
+			$del_actions = $this->get($options);
 			foreach($actionids as $actionid){
 				if(!isset($del_actions[$actionid])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);

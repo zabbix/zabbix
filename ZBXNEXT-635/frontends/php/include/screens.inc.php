@@ -161,7 +161,7 @@ require_once('include/js.inc.php');
 				);
 			if($perm == PERM_READ_WRITE) $options['editable'] = 1;
 
-			$screens = CScreen::get($options);
+			$screens = API::Screen()->get($options);
 			$screens = zbx_toHash($screens, 'screenid');
 
 			foreach($screenids as $snum => $screenid){
@@ -183,7 +183,7 @@ require_once('include/js.inc.php');
 		}
 
 		$screenids = zbx_objectValues($slides, 'screenid');
-		$screens = CScreen::get(array(
+		$screens = API::Screen()->get(array(
 			'screenids' => $screenids,
 			'output' => API_OUTPUT_SHORTEN,
 		));
@@ -220,7 +220,7 @@ require_once('include/js.inc.php');
 		}
 
 		$screenids = zbx_objectValues($slides, 'screenid');
-		$screens = CScreen::get(array(
+		$screens = API::Screen()->get(array(
 			'screenids' => $screenids,
 			'output' => API_OUTPUT_SHORTEN,
 		));
@@ -297,7 +297,7 @@ require_once('include/js.inc.php');
 			'limit' => $elements
 		);
 
-		$hData = CHistory::get($options);
+		$hData = API::History()->get($options);
 		foreach($hData as $hnum => $data){
 			switch($item['value_type']){
 				case ITEM_VALUE_TYPE_TEXT:
@@ -376,7 +376,7 @@ require_once('include/js.inc.php');
 				break;
 			}
 			else if($sitem['resourcetype'] == SCREEN_RESOURCE_GRAPH){
-				$tpl = CTemplate::get(array(
+				$tpl = API::Template()->get(array(
 					'graphids' => $sitem['resourceid'],
 					'output' => API_OUTPUT_SHORTEN,
 					'editable' => 1,
@@ -386,7 +386,7 @@ require_once('include/js.inc.php');
 				break;
 			}
 			else if($sitem['resourcetype'] == SCREEN_RESOURCE_SIMPLE_GRAPH){
-				$tpl = CTemplate::get(array(
+				$tpl = API::Template()->get(array(
 					'itemids' => $sitem['resourceid'],
 					'output' => API_OUTPUT_SHORTEN,
 					'editable' => 1,
@@ -468,7 +468,7 @@ require_once('include/js.inc.php');
 				'selectHosts' => array('hostid', 'host', 'status'),
 				'output' => API_OUTPUT_EXTEND
 			);
-			$graphs = CGraph::get($options);
+			$graphs = API::Graph()->get($options);
 
 			$caption = '';
 			$id=0;
@@ -517,7 +517,7 @@ require_once('include/js.inc.php');
 				'selectHosts' => array('hostid', 'host', 'status'),
 				'output' => API_OUTPUT_EXTEND
 			);
-			$items = CItem::get($options);
+			$items = API::Item()->get($options);
 
 			$caption = '';
 			$id = 0;
@@ -562,7 +562,7 @@ require_once('include/js.inc.php');
 				'sysmapids' => $resourceid,
 				'output' => API_OUTPUT_EXTEND
 			);
-			$maps = CMap::get($options);
+			$maps = API::Map()->get($options);
 
 			$caption = '';
 			$id=0;
@@ -592,7 +592,7 @@ require_once('include/js.inc.php');
 				'selectHosts' => array('hostid', 'host'),
 				'output' => API_OUTPUT_EXTEND
 			);
-			$items = CItem::get($options);
+			$items = API::Item()->get($options);
 
 			$caption = '';
 			$id=0;
@@ -644,7 +644,7 @@ require_once('include/js.inc.php');
 						'editable' => 1
 					);
 
-					$groups = CHostgroup::get($options);
+					$groups = API::HostGroup()->get($options);
 					foreach($groups as $gnum => $group){
 						$caption = get_node_name_by_elid($group['groupid'], true, ':').$group['name'];
 						$id = $resourceid;
@@ -666,7 +666,7 @@ require_once('include/js.inc.php');
 						'editable' => 1
 					);
 
-					$hosts = CHost::get($options);
+					$hosts = API::Host()->get($options);
 					foreach($hosts as $hnum => $host){
 						$caption = get_node_name_by_elid($host['hostid'], true, ':').$host['host'];
 						$id = $resourceid;
@@ -701,7 +701,7 @@ require_once('include/js.inc.php');
 					'editable' => 1
 				);
 
-				$groups = CHostgroup::get($options);
+				$groups = API::HostGroup()->get($options);
 				foreach($groups as $gnum => $group){
 					$caption = get_node_name_by_elid($group['groupid'], true, ':').$group['name'];
 					$id = $resourceid;
@@ -728,7 +728,7 @@ require_once('include/js.inc.php');
 				$result=DBselect($sql);
 
 				while($row=DBfetch($result)){
-					$r = CScreen::get(array(
+					$r = API::Screen()->get(array(
 						'screenids' => $row['screenid'],
 						'output' => API_OUTPUT_SHORTEN
 					));
@@ -794,7 +794,7 @@ require_once('include/js.inc.php');
 					'itemids' => $resourceid,
 					'output' => API_OUTPUT_EXTEND
 				);
-				$items = CItem::get($options);
+				$items = API::Item()->get($options);
 				$item = reset($items);
 
 				$caption = $item['description'];
@@ -1032,7 +1032,7 @@ require_once('include/js.inc.php');
 							'hostids' => $_REQUEST['hostid'],
 							'output' => API_OUTPUT_EXTEND
 						);
-						$hosts = CHost::get($options);
+						$hosts = API::Host()->get($options);
 						$host = reset($hosts);
 
 						$def_items = array();
@@ -1235,7 +1235,7 @@ require_once('include/js.inc.php');
 							'select_selements' => API_OUTPUT_EXTEND,
 							'nopermissions' => 1
 						);
-						$sysmaps = CMap::get($options);
+						$sysmaps = API::Map()->get($options);
 						$sysmap = reset($sysmaps);
 
 						$action_map = getActionMapBySysmap($sysmap);
@@ -1276,7 +1276,7 @@ require_once('include/js.inc.php');
 							'groupids' => $resourceid,
 							'output' => API_OUTPUT_EXTEND
 						);
-						$hostgroups = CHostgroup::get($options);
+						$hostgroups = API::HostGroup()->get($options);
 						$hostgroup = reset($hostgroups);
 
 						$tr_form = new CSpan(S_GROUP.': '.$hostgroup['name'], 'white');
@@ -1294,7 +1294,7 @@ require_once('include/js.inc.php');
 							'monitored_hosts' => 1,
 							'output' => API_OUTPUT_EXTEND
 						);
-						$groups = CHostGroup::get($options);
+						$groups = API::HostGroup()->get($options);
 						order_result($groups, 'name');
 
 						$options = array(
@@ -1303,7 +1303,7 @@ require_once('include/js.inc.php');
 						);
 						if($groupid > 0) $options['groupids'] = $groupid;
 
-						$hosts = CHost::get($options);
+						$hosts = API::Host()->get($options);
 						$hosts = zbx_toHash($hosts, 'hostid');
 						order_result($hosts, 'host');
 
@@ -1359,7 +1359,7 @@ require_once('include/js.inc.php');
 							'hostids' => $resourceid,
 							'output' => API_OUTPUT_EXTEND
 						);
-						$hosts = CHost::get($options);
+						$hosts = API::Host()->get($options);
 						$host = reset($hosts);
 
 						$tr_form = new CSpan(S_HOST.': '.$host['host'], 'white');
@@ -1377,7 +1377,7 @@ require_once('include/js.inc.php');
 							'monitored_hosts' => 1,
 							'output' => API_OUTPUT_EXTEND
 						);
-						$groups = CHostGroup::get($options);
+						$groups = API::HostGroup()->get($options);
 						order_result($groups, 'name');
 
 						$options = array(
@@ -1386,7 +1386,7 @@ require_once('include/js.inc.php');
 						);
 						if($groupid > 0) $options['groupids'] = $groupid;
 
-						$hosts = CHost::get($options);
+						$hosts = API::Host()->get($options);
 						$hosts = zbx_toHash($hosts, 'hostid');
 						order_result($hosts, 'host');
 
@@ -1469,7 +1469,7 @@ require_once('include/js.inc.php');
 							'output' => API_OUTPUT_EXTEND
 						);
 
-						$items = CItem::get($options);
+						$items = API::Item()->get($options);
 						$item = reset($items);
 						$host = reset($item['hosts']);
 
@@ -1515,7 +1515,7 @@ require_once('include/js.inc.php');
 
 				}
 				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_SCREEN) ){
-					$subScreens = CScreen::get(array(
+					$subScreens = API::Screen()->get(array(
 						'screenids' => $screen['screenid'],
 						'output' => API_OUTPUT_EXTEND,
 						'select_screenitems' => API_OUTPUT_EXTEND

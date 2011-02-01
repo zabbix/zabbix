@@ -137,7 +137,7 @@ include_once('include/page_header.php');
 					'imagetype' => $_REQUEST['imagetype'],
 					'image' => is_null($file) ? null : $image
 				);
-				$result = CImage::update($val);
+				$result = API::Image()->update($val);
 
 				$msg_ok = S_IMAGE_UPDATED;
 				$msg_fail = S_CANNOT_UPDATE_IMAGE;
@@ -158,7 +158,7 @@ include_once('include/page_header.php');
 					'imagetype' => $_REQUEST['imagetype'],
 					'image' => $image
 				);
-				$result = CImage::create($val);
+				$result = API::Image()->create($val);
 
 				$msg_ok = S_IMAGE_ADDED;
 				$msg_fail = S_CANNOT_ADD_IMAGE;
@@ -174,7 +174,7 @@ include_once('include/page_header.php');
 		else if(isset($_REQUEST['delete'])&&isset($_REQUEST['imageid'])) {
 			$image = get_image_by_imageid($_REQUEST['imageid']);
 
-			$result = CImage::delete($_REQUEST['imageid']);
+			$result = API::Image()->delete($_REQUEST['imageid']);
 
 			show_messages($result, S_IMAGE_DELETED, S_CANNOT_DELETE_IMAGE);
 			if($result){
@@ -251,7 +251,7 @@ include_once('include/page_header.php');
 			if(!is_null($val = get_request('work_period')))
 				$msg[] = S_WORKING_TIME.' ['.$val.']';
 			if(!is_null($val = get_request('discovery_groupid'))){
-				$val = CHostGroup::get(array(
+				$val = API::HostGroup()->get(array(
 					'groupids' => $val,
 					'editable' => 1,
 					'output' => API_OUTPUT_EXTEND
@@ -511,7 +511,7 @@ include_once('include/page_header.php');
 					if(zbx_empty($nmacro['value'])) unset($newMacros[$mnum]);
 				}
 
-				$global_macros = CUserMacro::get(array(
+				$global_macros = API::UserMacro()->get(array(
 					'globalmacro' => 1,
 					'output' => API_OUTPUT_EXTEND
 				));
@@ -538,24 +538,24 @@ include_once('include/page_header.php');
 				}
 //----
 				if(!empty($macrosToDelete)){
-					if(!CUserMacro::deleteGlobal($macrosToDelete))
+					if(!API::UserMacro()->deleteGlobal($macrosToDelete))
 						throw new Exception(_('Cannot remove macro'));
 				}
 
 				if(!empty($macrosToUpdate)){
-					if(!CUsermacro::updateGlobal($macrosToUpdate))
+					if(!API::UserMacro()->updateGlobal($macrosToUpdate))
 						throw new Exception(_('Cannot update macro'));
 				}
 
 				if(!empty($newMacros)){
 					$macrosToAdd = array_values($newMacros);
-					$new_macroids = CUsermacro::createGlobal($macrosToAdd);
+					$new_macroids = API::UserMacro()->createGlobal($macrosToAdd);
 					if(!$new_macroids)
 						throw new Exception('Cannot add macro');
 				}
 
 				if(!empty($macrosToAdd)){
-					$new_macros = CUserMacro::get(array(
+					$new_macros = API::UserMacro()->get(array(
 						'globalmacroids' => $new_macroids['globalmacroids'],
 						'globalmacro' => 1,
 						'output' => API_OUTPUT_EXTEND
@@ -729,7 +729,7 @@ include_once('include/page_header.php');
 				'output'=> API_OUTPUT_EXTEND,
 				'sortfield'=> 'name'
 			);
-			$images = CImage::get($options);
+			$images = API::Image()->get($options);
 			foreach($images as $inum => $image){
 				switch($image['imagetype']){
 					case IMAGE_TYPE_ICON:
@@ -779,7 +779,7 @@ include_once('include/page_header.php');
 			new CNumericBox('refresh_unsupported', $config['refresh_unsupported'], 5));
 
 		$cmbGrp = new CComboBox('discovery_groupid', $config['discovery_groupid']);
-		$groups = CHostGroup::get(array(
+		$groups = API::HostGroup()->get(array(
 			'sortfield'=>'name',
 			'editable' => 1,
 			'output' => API_OUTPUT_EXTEND

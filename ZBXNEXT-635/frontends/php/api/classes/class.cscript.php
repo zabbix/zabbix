@@ -293,7 +293,7 @@ class CScript extends CZBXAPI{
 					$obj_params['groupids'] = $script['groupid'];
 				}
 
-				$groups = CHostGroup::get($obj_params);
+				$groups = API::HostGroup()->get($obj_params);
 
 				$result[$scriptid]['groups'] = $groups;
 			}
@@ -314,7 +314,7 @@ class CScript extends CZBXAPI{
 					$obj_params['groupids'] = $script['groupid'];
 				}
 
-				$hosts = CHost::get($obj_params);
+				$hosts = API::Host()->get($obj_params);
 
 				$result[$scriptid]['hosts'] = $hosts;
 
@@ -351,7 +351,7 @@ class CScript extends CZBXAPI{
 		}
 
 		if(!empty($scriptids))
-			$result = self::get(array('scriptids'=>$scriptids, 'extendoutput'=>1));
+			$result = $this->get(array('scriptids'=>$scriptids, 'extendoutput'=>1));
 
 	return $result;
 	}
@@ -410,7 +410,7 @@ class CScript extends CZBXAPI{
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => 1
 			);
-			$upd_scripts = self::get($options);
+			$upd_scripts = $this->get($options);
 			foreach($scripts as $snum => $script){
 				if(!isset($upd_scripts[$script['scriptid']])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script with scriptid [%s] does not exist.', $script['scriptid']));
@@ -454,7 +454,7 @@ class CScript extends CZBXAPI{
 				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1
 			);
-			$del_scripts = self::get($options);
+			$del_scripts = $this->get($options);
 			foreach($scriptids as $snum => $scriptid){
 				if(!isset($del_scripts[$scriptid])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Script with scriptid [%s] does not exist.', $scriptid));
@@ -480,7 +480,7 @@ class CScript extends CZBXAPI{
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => true,
 			);
-			$alowedScripts = self::get($options);
+			$alowedScripts = $this->get($options);
 			if(!isset($alowedScripts[$scriptid])){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
@@ -580,7 +580,7 @@ class CScript extends CZBXAPI{
 			'hostids' => $hostids,
 			'preservekeys' => 1
 		);
-		$hosts_read_only  = CHost::get($obj_params);
+		$hosts_read_only  = API::Host()->get($obj_params);
 		$hosts_read_only = zbx_objectValues($hosts_read_only, 'hostid');
 
 		$obj_params = array(
@@ -588,7 +588,7 @@ class CScript extends CZBXAPI{
 			'hostids' => $hostids,
 			'preservekeys' => 1
 		);
-		$hosts_read_write = CHost::get($obj_params);
+		$hosts_read_write = API::Host()->get($obj_params);
 		$hosts_read_write = zbx_objectValues($hosts_read_write, 'hostid');
 
 // initialize array
@@ -604,7 +604,7 @@ class CScript extends CZBXAPI{
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => 1
 		);
-		$groups = CHostGroup::get($options);
+		$groups = API::HostGroup()->get($options);
 
 		$obj_params = array(
 			'groupids' => zbx_objectValues($groups, 'groupid'),
@@ -612,7 +612,7 @@ class CScript extends CZBXAPI{
 			'sortfield' => 'name',
 			'preservekeys' => 1
 		);
-		$scripts  = CScript::get($obj_params);
+		$scripts  = API::Script()->get($obj_params);
 
 		foreach($scripts as $num => $script){
 			$add_to_hosts = array();

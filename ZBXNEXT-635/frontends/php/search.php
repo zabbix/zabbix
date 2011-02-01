@@ -112,7 +112,7 @@ include_once('include/page_header.php');
 		'output' => array('host','status'),
 		'searchByAny' => true
 	);
-	$db_hosts = CHost::get($params);
+	$db_hosts = API::Host()->get($params);
 
 	order_result($db_hosts, 'host');
 
@@ -124,7 +124,7 @@ include_once('include/page_header.php');
 		'hostids' => $hostids,
 		'editable' => 1
 	);
-	$rw_hosts = CHost::get($params);
+	$rw_hosts = API::Host()->get($params);
 	$rw_hosts = zbx_toHash($rw_hosts,'hostid');
 
 	$params = array(
@@ -138,7 +138,7 @@ include_once('include/page_header.php');
 		'searchByAny' => true
 	);
 
-	$overalCount = CHost::get($params);
+	$overalCount = API::Host()->get($params);
 	$viewCount = count($hosts);
 
 	$header = array(
@@ -236,7 +236,7 @@ include_once('include/page_header.php');
 		'limit' => $rows_per_page
 	);
 
-	$db_hostGroups = CHostGroup::get($params);
+	$db_hostGroups = API::HostGroup()->get($params);
 	order_result($db_hostGroups, 'name');
 
 	$hostGroups = selectByPattern($db_hostGroups, 'name', $search, $rows_per_page);
@@ -248,7 +248,7 @@ include_once('include/page_header.php');
 		'editable' => 1
 	);
 
-	$rw_hostGroups = CHostGroup::get($params);
+	$rw_hostGroups = API::HostGroup()->get($params);
 	$rw_hostGroups = zbx_toHash($rw_hostGroups, 'groupid');
 
 	$params = array(
@@ -256,7 +256,7 @@ include_once('include/page_header.php');
 		'search' => array('name' => $search),
 		'countOutput' => 1
 	);
-	$overalCount = CHostGroup::get($params);
+	$overalCount = API::HostGroup()->get($params);
 	$viewCount = count($hostGroups);
 
 	$header = array(
@@ -323,7 +323,7 @@ include_once('include/page_header.php');
 			'select_applications' => API_OUTPUT_COUNT,
 			'limit' => $rows_per_page
 		);
-		$db_templates = CTemplate::get($params);
+		$db_templates = API::Template()->get($params);
 		order_result($db_templates, 'host');
 
 		$templates = selectByPattern($db_templates, 'host', $search, $rows_per_page);
@@ -334,7 +334,7 @@ include_once('include/page_header.php');
 			'templateids' => $templateids,
 			'editable' => 1
 		);
-		$rw_templates = CTemplate::get($params);
+		$rw_templates = API::Template()->get($params);
 		$rw_templates = zbx_toHash($rw_templates,'templateid');
 
 		$params = array(
@@ -344,7 +344,7 @@ include_once('include/page_header.php');
 			'editable' => 1
 		);
 
-		$overalCount = CTemplate::get($params);
+		$overalCount = API::Template()->get($params);
 		$viewCount = count($templates);
 
 		$header = array(
