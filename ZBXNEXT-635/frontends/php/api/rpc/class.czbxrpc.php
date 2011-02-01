@@ -33,7 +33,6 @@ class czbxrpc{
 		list($resource, $action) = explode('.', $method);
 
 		$class_name = 'C'.$resource;
-
 		if(!class_exists($class_name)){
 			return array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Resource ('.$resource.') does not exist');
 		}
@@ -44,16 +43,22 @@ class czbxrpc{
 
 		try{
 			DBstart();
-			$result = call_user_func(array($class_name, $action), $params);
+			API::setReturnAPI();
+
+			$obj = call_user_func(array('API', $resource), array());
+			$result = call_user_func(array($obj, $action), $params);
+
+			API::setReturnRPC();
 			DBend(true);
 
 			return array('result' => $result);
 		}
 		catch(APIException $e){
 			DBend(false);
-			return array('error' => $e->getCode(), 'data' => $e->getErrors(), 'trace' => $e->getTrace());
+			return array('error' => $e->getCode(), 'message' => $e->getMessage(), 'data' => $e->getTrace());
 		}
 	}
+
 
 	public static function call($method, $params, $sessionid=null){
 // List of methods without params
@@ -91,15 +96,7 @@ class czbxrpc{
 // }}} Authentication
 		}
 
-
-		switch($source){
-			case DATA_SOURCE_API:
-				return self::callAPI($method, $params);
-			break;
-			case DATA_SOURCE_JSON:
-				return self::callJSON($method, $params);
-			break;
-		}
+		return self::callAPI($method, $params);
 	}
 }
 ?>

@@ -27,7 +27,7 @@
 
 class CTrigger extends CZBXAPI{
 
-	protected static function get_rules($method){
+	protected function get_rules($method){
 		$rules = array();
 
 		$rules['create'] = array(
@@ -85,7 +85,7 @@ class CTrigger extends CZBXAPI{
  * @param array $options['order']
  * @return array|int item data as array or false if error
  */
-	public static function get($options=array()){
+	public function get($options=array()){
 		global $USER_DETAILS;
 
 		$result = array();
@@ -1094,7 +1094,7 @@ COpt::memoryPick();
  * @param array $triggers[0,...]['hostid'] OPTIONAL
  * @param array $triggers[0,...]['description'] OPTIONAL
  */
-	public static function getObjects($triggerData){
+	public function getObjects($triggerData){
 		$options = array(
 			'filter' => $triggerData,
 			'output'=>API_OUTPUT_EXTEND
@@ -1121,7 +1121,7 @@ COpt::memoryPick();
 	return $result;
 	}
 
-	public static function exists($object){
+	public function exists($object){
 		$keyFields = array(array('hostid', 'host'), 'description');
 
 		$result = false;
@@ -1158,7 +1158,7 @@ COpt::memoryPick();
 	return $result;
 	}
 
-	public static function checkInput(&$triggers, $method){
+	public function checkInput(&$triggers, $method){
 		$create = ($method == 'create');
 		$update = ($method == 'update');
 		$delete = ($method == 'delete');
@@ -1283,11 +1283,8 @@ COpt::memoryPick();
  * @param array $triggers
  * @return boolean
  */
-	public static function create($triggers){
+	public function create($triggers){
 		$triggers = zbx_toArray($triggers);
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			self::checkInput($triggers, __FUNCTION__);
 
@@ -1296,16 +1293,7 @@ COpt::memoryPick();
 			foreach($triggers as $trigger)
 				self::inherit($trigger);
 
-			self::EndTransaction(true, __METHOD__);
 			return array('triggerids' => zbx_objectValues($triggers, 'triggerid'));
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, $error);
-			return false;
-		}
 	}
 
 /**
@@ -1314,12 +1302,9 @@ COpt::memoryPick();
  * @param array $triggers
  * @return boolean
  */
-	public static function update($triggers){
+	public function update($triggers){
 		$triggers = zbx_toArray($triggers);
 		$triggerids = zbx_objectValues($triggers, 'triggerid');
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			self::checkInput($triggers, __FUNCTION__);
 
@@ -1328,17 +1313,7 @@ COpt::memoryPick();
 			foreach($triggers as $trigger)
 				self::inherit($trigger);
 
-
-			self::EndTransaction(true, __METHOD__);
 			return array('triggerids' => $triggerids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, $error);
-			return false;
-		}
 	}
 
 /**
@@ -1347,12 +1322,9 @@ COpt::memoryPick();
  * @param array $triggerids array with trigger ids
  * @return array
  */
-	public static function delete($triggerids, $nopermissions=false){
+	public function delete($triggerids, $nopermissions=false){
 
 		$triggerids = zbx_toArray($triggerids);
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			if(empty($triggerids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
 
@@ -1424,16 +1396,7 @@ COpt::memoryPick();
 
 			update_services_status_all();
 
-			self::EndTransaction(true, __METHOD__);
 			return array('triggerids' => $triggerids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -1444,11 +1407,9 @@ COpt::memoryPick();
  * @param array $triggers_data['dependsOnTriggerid']
  * @return boolean
  */
-	public static function addDependencies($triggersData){
+	public function addDependencies($triggersData){
 		$triggersData = zbx_toArray($triggersData);
 		$triggerids = array();
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			foreach($triggersData as $num => $dep){
 				$triggerids[$dep['triggerid']] = $dep['triggerid'];
@@ -1458,16 +1419,7 @@ COpt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot create dependency');
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('triggerids' => $triggerids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -1477,7 +1429,7 @@ COpt::memoryPick();
  * @param array $triggers[0,...]['triggerid']
  * @return boolean
  */
-	public static function deleteDependencies($triggersData){
+	public function deleteDependencies($triggersData){
 		$triggersData = zbx_toArray($triggersData);
 
 		$triggerids = array();
@@ -1485,26 +1437,14 @@ COpt::memoryPick();
 			$triggerids[] = $trigger['triggerid'];
 		}
 
-		try{
-			self::BeginTransaction(__METHOD__);
-
 			$result = delete_dependencies_by_triggerid($triggerids);
 			if(!$result)
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete dependency');
 
-			self::EndTransaction(true, __METHOD__);
 			return array('triggerids' => zbx_objectValues($triggersData, 'triggerid'));
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
-	protected static function createReal(&$triggers){
+	protected function createReal(&$triggers){
 		$triggers = zbx_toArray($triggers);
 
 		$triggerids = DB::insert('triggers', $triggers);
@@ -1543,7 +1483,7 @@ COpt::memoryPick();
 
 	}
 
-	protected static function updateReal($triggers){
+	protected function updateReal($triggers){
 		$triggers = zbx_toArray($triggers);
 
 		$options = array(
@@ -1650,7 +1590,7 @@ COpt::memoryPick();
 		}
 	}
 
-	protected static function inherit($trigger, $hostids=null){
+	protected function inherit($trigger, $hostids=null){
 		$triggerTemplate = CTemplate::get(array(
 			'triggerids' => $trigger['triggerid'],
 			'output' => API_OUTPUT_EXTEND,
@@ -1770,9 +1710,7 @@ COpt::memoryPick();
 		}
 	}
 
-	public static function syncTemplates($data){
-		try{
-			self::BeginTransaction(__METHOD__);
+	public function syncTemplates($data){
 
 			$data['templateids'] = zbx_toArray($data['templateids']);
 			$data['hostids'] = zbx_toArray($data['hostids']);
@@ -1816,20 +1754,10 @@ COpt::memoryPick();
 				self::inherit($trigger, $data['hostids']);
 			}
 
-
-			self::EndTransaction(true, __METHOD__);
 			return true;
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
-	protected static function validateDependencies($triggers){
+	protected function validateDependencies($triggers){
 
 		foreach($triggers as $trigger){
 			if(!isset($trigger['dependencies']) || empty($trigger['dependencies'])) continue;

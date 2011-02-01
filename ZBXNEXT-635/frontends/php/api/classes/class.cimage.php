@@ -45,7 +45,7 @@ class CImage extends CZBXAPI{
  * @param string $options['order']
  * @return array|boolean image data as array or false if error
  */
-	public static function get($options = array()){
+	public function get($options = array()){
 		global $USER_DETAILS;
 
 		$result = array();
@@ -233,7 +233,7 @@ class CImage extends CZBXAPI{
  * @param array $image['hostid']
  * @return array|boolean
  */
-	public static function getObjects($imageData){
+	public function getObjects($imageData){
 		$options = array(
 			'filter' => $imageData,
 			'output' => API_OUTPUT_EXTEND
@@ -259,7 +259,7 @@ class CImage extends CZBXAPI{
  * @param array $images['name']
  * @return boolean
  */
-	public static function exists($object){
+	public function exists($object){
 		$keyFields = array(array('imageid', 'name'), 'imagetype');
 
 		$options = array(
@@ -285,14 +285,11 @@ class CImage extends CZBXAPI{
  * @param array $images ['name' => string, 'image' => string, 'imagetype' => int]
  * @return array
  */
-	public static function create($images){
+	public function create($images){
 		global $DB, $USER_DETAILS;
 
 		$images = zbx_toArray($images);
 		$imageids = array();
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			if($USER_DETAILS['type'] < USER_TYPE_ZABBIX_ADMIN){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
@@ -355,7 +352,7 @@ class CImage extends CZBXAPI{
 						if(!$stmt){
 							self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
 						}
-					
+
 						$variable = $image['image'];
 						if(!db2_bind_param($stmt, 1, "variable", DB2_PARAM_IN, DB2_BINARY)){
 							self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
@@ -390,17 +387,7 @@ class CImage extends CZBXAPI{
 				$imageids[] = $imageid;
 			}
 
-			self::EndTransaction(true, __METHOD__);
-
 			return array('imageids' => $imageids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -409,13 +396,10 @@ class CImage extends CZBXAPI{
  * @param array $images
  * @return array (updated images)
  */
-	public static function update($images){
+	public function update($images){
 		global $DB, $USER_DETAILS;
 
-		try{
 			$images = zbx_toArray($images);
-
-			self::BeginTransaction(__METHOD__);
 
 			if($USER_DETAILS['type'] < USER_TYPE_ZABBIX_ADMIN){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
@@ -478,11 +462,11 @@ class CImage extends CZBXAPI{
 						break;
 						case ZBX_DB_DB2:
 							$stmt = db2_prepare($DB['DB'], 'UPDATE images SET image=? WHERE imageid='.$image['imageid']);
-						
+
 							if(!$stmt){
 								self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
 							}
-						
+
 							$variable = $image['image'];
 							if(!db2_bind_param($stmt, 1, "variable", DB2_PARAM_IN, DB2_BINARY)){
 								self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
@@ -506,18 +490,7 @@ class CImage extends CZBXAPI{
 				}
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('imageids' => zbx_objectValues($images, 'imageid'));
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-
-			$error = $e->getErrors();
-			$error = reset($error);
-
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -526,12 +499,10 @@ class CImage extends CZBXAPI{
  * @param array $imageids
  * @return boolean
  */
-	public static function delete($imageids){
+	public function delete($imageids){
 		global $USER_DETAILS;
 
 		$imageids = zbx_toArray($imageids);
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			if(empty($imageids)) self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty parameters');
 
@@ -563,18 +534,7 @@ class CImage extends CZBXAPI{
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 			}
 
-			self::EndTransaction(true, __METHOD__);
-
 			return array('imageids' => $imageids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 }
 ?>

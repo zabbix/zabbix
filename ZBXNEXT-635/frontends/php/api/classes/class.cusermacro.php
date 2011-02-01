@@ -58,7 +58,7 @@ class CUserMacro extends CZBXAPI{
  * @param string $options['order'] deprecated parameter (for now)
  * @return array|boolean UserMacros data as array or false if error
  */
-	public static function get($options=array()){
+	public function get($options=array()){
 		global $USER_DETAILS;
 
 		$result = array();
@@ -484,11 +484,8 @@ class CUserMacro extends CZBXAPI{
  * @param array $hostmacroids['hostmacroids']
  * @return boolean
  */
-	public static function deleteHostMacro($hostmacroids){
+	public function deleteHostMacro($hostmacroids){
 		$hostmacroids = zbx_toArray($hostmacroids);
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			if(empty($hostmacroids))
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ hostmacroids ]');
@@ -512,16 +509,7 @@ class CUserMacro extends CZBXAPI{
 			if(!DBExecute($sql))
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 
-			self::EndTransaction(true, __METHOD__);
 			return array('hostmacroids' => $hostmacroids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -537,15 +525,12 @@ class CUserMacro extends CZBXAPI{
  * @param string $macros[0..]['value']
  * @return array|boolean
  */
-	public static function createGlobal($macros){
+	public function createGlobal($macros){
 		global $USER_DETAILS;
 
 		$macros = zbx_toArray($macros);
 		$macros_macros = zbx_objectValues($macros, 'macro');
 		$globalmacroids = array();
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 // permission check
 			if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
@@ -580,28 +565,16 @@ class CUserMacro extends CZBXAPI{
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('globalmacroids' => $globalmacroids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
-	public static function updateGlobal($globalmacros){
+	public function updateGlobal($globalmacros){
 		global $USER_DETAILS;
 
 		$globalmacros = zbx_toArray($globalmacros);
 		$globalmacros = zbx_toHash($globalmacros, 'macro');
 
 		$globalmacroids = array();
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 // permission check
 			if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
@@ -639,16 +612,7 @@ class CUserMacro extends CZBXAPI{
 			$result = DB::update('globalmacro', $data);
 			if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 
-			self::EndTransaction(true, __METHOD__);
 			return array('globalmacroids' => $globalmacroids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 /**
  * Delete UserMacros
@@ -663,11 +627,8 @@ class CUserMacro extends CZBXAPI{
  * @param array $globalmacroids['globalmacroids']
  * @return boolean
  */
-	public static function deleteGlobal($globalmacros){
+	public function deleteGlobal($globalmacros){
 		$globalmacros = zbx_toArray($globalmacros);
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			if(empty($globalmacros))
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter');
@@ -691,16 +652,7 @@ class CUserMacro extends CZBXAPI{
 			if(!DBExecute($sql))
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 
-			self::EndTransaction(true, __METHOD__);
 			return array('globalmacroids' => zbx_objectValues($db_gmacros, 'globalmacroid'));
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -715,7 +667,7 @@ class CUserMacro extends CZBXAPI{
  * @param _array $macros array with macros expressions
  * @return array|boolean
  */
-	private static function validate($macros){
+	private function validate($macros){
 		$tmp = array();
 		foreach($macros as $mnum => $macro){
 			if(isset($tmp[$macro['macro']]))
@@ -759,15 +711,12 @@ class CUserMacro extends CZBXAPI{
  * @param array $data['macros']
  * @return boolean
  */
-	public static function massAdd($data){
+	public function massAdd($data){
 		$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : array();
 		$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : array();
 
 		$hostids = zbx_objectValues($hosts, 'hostid');
 		$templateids = zbx_objectValues($templates, 'templateid');
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			if(!isset($data['macros']) || empty($data['macros']))
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Not set input parameter [ macros ]');
@@ -838,17 +787,7 @@ class CUserMacro extends CZBXAPI{
 
 			$hostmacroids = DB::insert('hostmacro', $insertData);
 
-			self::EndTransaction(true, __METHOD__);
-
 			return array('hostmacroids' => $hostmacroids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -865,9 +804,7 @@ class CUserMacro extends CZBXAPI{
  * @param array $data['templateids']
  * @return boolean
  */
-	public static function massRemove($data){
-		try{
-			self::BeginTransaction(__METHOD__);
+	public function massRemove($data){
 
 			$macros = zbx_toArray($data['macros'], 'macro');
 
@@ -902,16 +839,7 @@ class CUserMacro extends CZBXAPI{
 
 			DB::delete('hostmacro', array('hostmacroid'=>$hostmacroids));
 
-			self::EndTransaction(true, __METHOD__);
 			return array('hostmacroids' => $hostmacroids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -929,15 +857,12 @@ class CUserMacro extends CZBXAPI{
  * @param array $data['templates']
  * @return boolean
  */
-	public static function massUpdate($data){
+	public function massUpdate($data){
 		$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : array();
 		$hostids = zbx_objectValues($hosts, 'hostid');
 
 		$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : array();
 		$templateids = zbx_objectValues($templates, 'templateid');
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			if(!isset($data['macros']) || empty($data['macros']))
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Not set input parameter [ macros ]');
@@ -990,7 +915,7 @@ class CUserMacro extends CZBXAPI{
 			);
 			$db_macros = self::get($options);
 //--
-			
+
 			$updateMacros = zbx_toHash($data['macros'], 'macro');
 
 			$hostmacroids = array();
@@ -1006,23 +931,14 @@ class CUserMacro extends CZBXAPI{
 
 			DB::update('hostmacro', $data_update);
 
-			self::EndTransaction(true, __METHOD__);
 			return array('hostmacroids' => $hostmacroids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 // TODO: should be private
-	public static function getMacros($macros, $options){
+	public function getMacros($macros, $options){
 		zbx_value2array($macros);
 		$macros = array_unique($macros);
-		
+
 		$result = array();
 
 		$obj_options = array(
@@ -1034,8 +950,8 @@ class CUserMacro extends CZBXAPI{
 			'templated_hosts' => true,
 		);
 		$hosts = CHost::get($obj_options);
-		$hostids = array_keys($hosts);	
-		
+		$hostids = array_keys($hosts);
+
 		do{
 			$obj_options = array(
 				'hostids' => $hostids,
@@ -1093,7 +1009,7 @@ class CUserMacro extends CZBXAPI{
 		return $result;
 	}
 
-	public static function resolveTrigger(&$triggers){
+	public function resolveTrigger(&$triggers){
 		$single = false;
 		if(isset($triggers['triggerid'])){
 			$single = true;
@@ -1117,7 +1033,7 @@ class CUserMacro extends CZBXAPI{
 	}
 
 
-	public static function resolveItem(&$items){
+	public function resolveItem(&$items){
 		$single = false;
 		if(isset($items['itemid'])){
 			$single = true;

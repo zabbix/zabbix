@@ -28,7 +28,7 @@ class CDiscoveryRule extends CZBXAPI{
 /**
  * Get DiscoveryRule data
  */
-	public static function get($options=array()){
+	public function get($options=array()){
 		global $USER_DETAILS;
 
 		$result = array();
@@ -498,7 +498,7 @@ COpt::memoryPick();
 		return $result;
 	}
 
-	public static function exists($object){
+	public function exists($object){
 		$options = array(
 			'filter' => array('key_' => $object['key_']),
 			'output' => API_OUTPUT_SHORTEN,
@@ -519,7 +519,7 @@ COpt::memoryPick();
 		return !empty($objs);
 	}
 
-	public static function checkInput(&$items, $method){
+	public function checkInput(&$items, $method){
 		$create = ($method == 'create');
 		$update = ($method == 'update');
 		$delete = ($method == 'delete');
@@ -743,11 +743,8 @@ COpt::memoryPick();
  * @param array $items
  * @return array|boolean
  */
-	public static function create($items){
+	public function create($items){
 		$items = zbx_toArray($items);
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			self::checkInput($items, __FUNCTION__);
 
@@ -755,20 +752,10 @@ COpt::memoryPick();
 
 			self::inherit($items);
 
-			self::EndTransaction(true, __METHOD__);
-
 			return array('itemids' => zbx_objectValues($items, 'itemid'));
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
-	protected static function createReal(&$items){
+	protected function createReal(&$items){
 		foreach($items as $key => $item){
 			$itemsExists = CItem::get(array(
 				'output' => API_OUTPUT_SHORTEN,
@@ -818,7 +805,7 @@ COpt::memoryPick();
 		}
 	}
 
-	protected static function updateReal($items){
+	protected function updateReal($items){
 		$items = zbx_toArray($items);
 
 		$data = array();
@@ -881,11 +868,8 @@ COpt::memoryPick();
  * @param array $items
  * @return boolean
  */
-	public static function update($items){
+	public function update($items){
 		$items = zbx_toArray($items);
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			self::checkInput($items, __FUNCTION__);
 
@@ -893,17 +877,7 @@ COpt::memoryPick();
 
 			self::inherit($items);
 
-			self::EndTransaction(true, __METHOD__);
-
 			return array('itemids' => zbx_objectValues($items, 'itemid'));
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -912,10 +886,7 @@ COpt::memoryPick();
  * @param array $ruleids
  * @return
  */
-	public static function delete($ruleids, $nopermissions=false){
-
-		try{
-			self::BeginTransaction(__METHOD__);
+	public function delete($ruleids, $nopermissions=false){
 
 			if(empty($ruleids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
 
@@ -1010,22 +981,11 @@ COpt::memoryPick();
 				info(_s('Discovery rule [%1$s:%2$s] deleted.', $item['description'], $item['key_']));
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('ruleids' => $ruleids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 
-	public static function syncTemplates($data){
-		try{
-			self::BeginTransaction(__METHOD__);
+	public function syncTemplates($data){
 
 			$data['templateids'] = zbx_toArray($data['templateids']);
 			$data['hostids'] = zbx_toArray($data['hostids']);
@@ -1064,19 +1024,10 @@ COpt::memoryPick();
 
 			self::inherit($items, $data['hostids']);
 
-			self::EndTransaction(true, __METHOD__);
 			return true;
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
-	protected static function inherit($items, $hostids=null){
+	protected function inherit($items, $hostids=null){
 		if(empty($items)) return $items;
 
 		$items = zbx_toHash($items, 'itemid');

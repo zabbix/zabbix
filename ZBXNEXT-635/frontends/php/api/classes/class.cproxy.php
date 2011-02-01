@@ -48,7 +48,7 @@ class CProxy extends CZBXAPI{
  * @param string $options['sortorder']
  * @return array|boolean
  */
-	public static function get($options=array()){
+	public function get($options=array()){
 		global $USER_DETAILS;
 
 		$result = array();
@@ -297,7 +297,7 @@ class CProxy extends CZBXAPI{
 	return $result;
 	}
 
-	protected static function checkInput(&$proxies, $method){
+	protected function checkInput(&$proxies, $method){
 		global $USER_DETAILS;
 
 		$create = ($method == 'create');
@@ -379,12 +379,9 @@ class CProxy extends CZBXAPI{
 	}
 
 
-	public static function create($proxies){
+	public function create($proxies){
 		$proxies = zbx_toArray($proxies);
 		$proxyids = array();
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			self::checkInput($proxies, __FUNCTION__);
 
@@ -414,25 +411,13 @@ class CProxy extends CZBXAPI{
 
 			DB::update('hosts', $hostUpdate);
 
-			self::EndTransaction(true, __METHOD__);
 			return array('proxyids' => $proxyids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 
-	public static function update($proxies){
+	public function update($proxies){
 		$proxies = zbx_toArray($proxies);
 		$proxyids = array();
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			self::checkInput($proxies, __FUNCTION__);
 
@@ -480,16 +465,7 @@ class CProxy extends CZBXAPI{
 			DB::update('hosts', $proxyUpdate);
 			DB::update('hosts', $hostUpdate);
 
-			self::EndTransaction(true, __METHOD__);
 			return array('proxyids' => $proxyids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -499,10 +475,7 @@ class CProxy extends CZBXAPI{
  * @param array $proxies[0, ...]['hostid'] Host ID to delete
  * @return array|boolean
  */
-	public static function delete($proxies){
-
-		try{
-			self::BeginTransaction(__METHOD__);
+	public function delete($proxies){
 
 			if(empty($proxies)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
 
@@ -561,16 +534,7 @@ class CProxy extends CZBXAPI{
 				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_PROXY,'['.$proxy['host'].' ] ['.$proxy['hostid'].']');
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('proxyids' => $proxyids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 }
 ?>

@@ -47,7 +47,7 @@ class CTemplateScreen extends CScreen{
  * @param string $options['order'] deprecated parameter (for now)
  * @return array|boolean Host data as array or false if error
  */
-	public static function get($options=array()){
+	public function get($options=array()){
 		global $USER_DETAILS;
 
 		$result = array();
@@ -479,7 +479,7 @@ class CTemplateScreen extends CScreen{
 	return $result;
 	}
 
-	public static function exists($data){
+	public function exists($data){
 		$keyFields = array(array('screenid', 'name'), 'templateid');
 
 		$options = array(
@@ -509,12 +509,9 @@ class CTemplateScreen extends CScreen{
  * @param int $screens['vsize']
  * @return array
  */
-	public static function create($screens){
+	public function create($screens){
 		$screens = zbx_toArray($screens);
 		$insert_screen_items = array();
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			$screenNames = zbx_objectValues($screens, 'name');
 			$templateids = zbx_objectValues($screens, 'templateid');
@@ -554,16 +551,7 @@ class CTemplateScreen extends CScreen{
 			}
 			self::addItems($insert_screen_items);
 
-			self::EndTransaction(true, __METHOD__);
 			return array('screenids' => $screenids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -576,12 +564,9 @@ class CTemplateScreen extends CScreen{
  * @param int $screens['vsize']
  * @return boolean
  */
-	public static function update($screens){
+	public function update($screens){
 		$screens = zbx_toArray($screens);
 		$update = array();
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			$options = array(
 				'screenids' => zbx_objectValues($screens, 'screenid'),
@@ -643,16 +628,7 @@ class CTemplateScreen extends CScreen{
 			}
 			DB::update('screens', $update);
 
-			self::EndTransaction(true, __METHOD__);
 			return  array('screenids' => zbx_objectValues($screens, 'screenid'));
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -661,11 +637,8 @@ class CTemplateScreen extends CScreen{
  * @param array $screenids
  * @return boolean
  */
-	public static function delete($screenids){
+	public function delete($screenids){
 		$screenids = zbx_toArray($screenids);
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			$options = array(
 					'screenids' => $screenids,
@@ -682,16 +655,7 @@ class CTemplateScreen extends CScreen{
 			DB::delete('slides', array('screenid'=>$screenids));
 			DB::delete('screens', array('screenid'=>$screenids));
 
-			self::EndTransaction(true, __METHOD__);
 			return array('screenids' => $screenids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 }
 ?>

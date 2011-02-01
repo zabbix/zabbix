@@ -45,7 +45,7 @@ class CHistory extends CZBXAPI{
  * @param string $options['order']
  * @return array|int item data as array or false if error
  */
-	public static function get($options=array()){
+	public function get($options=array()){
 		global $USER_DETAILS;
 
 		$nodeCheck = false;
@@ -317,10 +317,10 @@ COpt::memoryPick();
 	return $result;
 	}
 
-	public static function create($items=array()){
+	public function create($items=array()){
 	}
 
-	public static function delete($itemids=array()){
+	public function delete($itemids=array()){
 	}
 }
 ?>

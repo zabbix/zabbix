@@ -25,7 +25,7 @@ public static $error = array();
 private static $transaction = array('counter' => 0);
 
 // TRANSACTION METHODS{
-	protected static function BeginTransaction($caller = 'CZBXAPI'){
+	protected function BeginTransaction($caller = 'CZBXAPI'){
 		global $DB;
 
 		if(!isset(self::$transaction[$caller])) self::$transaction[$caller] = 0;
@@ -52,7 +52,7 @@ private static $transaction = array('counter' => 0);
 	return true;
 	}
 
-	protected static function EndTransaction($result = true, $caller = 'CZBXAPI'){
+	protected function EndTransaction($result = true, $caller = 'CZBXAPI'){
 		$result = $result;
 
 		if(!isset(self::$transaction[$caller])){
@@ -88,7 +88,7 @@ private static $transaction = array('counter' => 0);
 	return $result;
 	}
 
-	protected static function endAPITransactions($result){
+	protected function endAPITransactions($result){
 		if((self::$transaction['counter'] > 0) && (self::$transaction['owner'] != 'DB_CLASS')){
 			unset(self::$transaction['owner']);
 			self::$transaction['counter'] = 0;
@@ -99,11 +99,11 @@ private static $transaction = array('counter' => 0);
 // TRANSACTION METHODS}
 
 // ERROR METHODS{
-	protected static function setError($method, $errno=ZBX_API_ERROR_INTERNAL, $error='Unknown Zabbix internal error'){
+	protected function setError($method, $errno=ZBX_API_ERROR_INTERNAL, $error='Unknown Zabbix internal error'){
 		CZBXAPI::$error[] = array('error' => $errno, 'data' => '[ '.$method.' ] '.$error);
 	}
 
-	protected static function setMethodErrors($method, $errors){
+	protected function setMethodErrors($method, $errors){
 		global $ZBX_MESSAGES;
 
 		if(empty($errors)){
@@ -129,11 +129,11 @@ private static $transaction = array('counter' => 0);
 
 	}
 
-	public static function clearErrors(){
+	public function clearErrors(){
 		self::$error = array();
 	}
 
-	public static function getErrorMessages(){
+	public function getErrorMessages(){
 		$return = array();
 		foreach(self::$error as $error){
 			$return[] = $error['data'];
@@ -142,7 +142,7 @@ private static $transaction = array('counter' => 0);
 	return $return;
 	}
 
-	public static function resetErrors(){
+	public function resetErrors(){
 		$errors = self::getErrorMessages();
 		self::clearErrors();
 
@@ -151,7 +151,7 @@ private static $transaction = array('counter' => 0);
 
 // ERROR METHODS}
 
-	protected static function exception($code=ZBX_API_ERROR_INTERNAL, $errors=array()){
+	protected function exception($code=ZBX_API_ERROR_INTERNAL, $errors=array()){
 		throw new APIException($code, $errors);
 	}
 

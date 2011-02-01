@@ -45,7 +45,7 @@ class CMaintenance extends CZBXAPI{
  * @param string $options['order']
  * @return array|int item data as array or false if error
  */
-	public static function get($options=array()){
+	public function get($options=array()){
 		global $USER_DETAILS;
 
 		$result = array();
@@ -443,7 +443,7 @@ Copt::memoryPick();
 	 * @param array $object
 	 * @return bool
 	 */
-	public static function exists($object){
+	public function exists($object){
 		$keyFields = array(array('maintenanceid', 'name'));
 
 		$options = array(
@@ -465,12 +465,9 @@ Copt::memoryPick();
  * @param array $maintenances
  * @return boolean
  */
-	public static function create($maintenances){
+	public function create($maintenances){
 		global $USER_DETAILS;
 		$maintenances = zbx_toArray($maintenances);
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			if($USER_DETAILS['type'] == USER_TYPE_ZABBIX_USER){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -581,16 +578,7 @@ Copt::memoryPick();
 			DB::insert('maintenances_groups', $insert_groups);
 
 
-			self::EndTransaction(true, __METHOD__);
 			return array('maintenanceids'=>$maintenanceids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -599,13 +587,10 @@ Copt::memoryPick();
  * @param _array $maintenances
  * @return boolean
  */
-	public static function update($maintenances){
+	public function update($maintenances){
 		global $USER_DETAILS;
 		$maintenances = zbx_toArray($maintenances);
 		$maintenanceids = zbx_objectValues($maintenances, 'maintenanceid');
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			if($USER_DETAILS['type'] == USER_TYPE_ZABBIX_USER){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -751,16 +736,7 @@ Copt::memoryPick();
 			DB::insert('maintenances_groups', $insert_groups);
 
 
-			self::EndTransaction(true, __METHOD__);
 			return array('maintenanceids'=> $maintenanceids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -770,12 +746,9 @@ Copt::memoryPick();
  * @param _array $maintenanceids['maintenanceids']
  * @return boolean
  */
-	public static function delete($maintenanceids){
+	public function delete($maintenanceids){
 		global $USER_DETAILS;
 		$maintenanceids = zbx_toArray($maintenanceids);
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			if($USER_DETAILS['type'] == USER_TYPE_ZABBIX_USER){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -812,20 +785,9 @@ Copt::memoryPick();
 			DB::delete('maintenances_groups', $mid_cond);
 			DB::delete('maintenances', $mid_cond);
 
-			self::EndTransaction(true, __METHOD__);
 			return array('maintenanceids'=> $maintenanceids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
-
-
-
 }
+
 ?>

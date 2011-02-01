@@ -46,7 +46,7 @@ class CAction extends CZBXAPI{
  * @param array $options['order']
  * @return array|int item data as array or false if error
  */
-	public static function get($options=array()){
+	public function get($options=array()){
 		global $USER_DETAILS;
 
 		$result = array();
@@ -459,7 +459,7 @@ COpt::memoryPick();
 	return $result;
 	}
 
-	public static function exists($object){
+	public function exists($object){
 		$keyFields = array(array('actionid', 'name'));
 
 		$options = array(
@@ -491,13 +491,10 @@ COpt::memoryPick();
  * @param array $actions[0,...]['url'] OPTIONAL
  * @return boolean
  */
-	public static function create($actions){
+	public function create($actions){
 		$actions = zbx_toArray($actions);
 		$conditions = array();
 		$operations = array();
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 // Check fields
 			$action_db_fields = array(
@@ -551,16 +548,7 @@ COpt::memoryPick();
 			self::addOperations($operations);
 			self::addConditions($conditions);
 
-			self::EndTransaction(true, __METHOD__);
 			return array('actionids' => $actionids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -577,15 +565,13 @@ COpt::memoryPick();
  * @param array $actions[0,...]['url'] OPTIONAL
  * @return boolean
  */
-	public static function update($actions){
+	public function update($actions){
 		$actions = zbx_toArray($actions);
 		$actionids = zbx_objectValues($actions, 'actionid');
 
 		$update = array();
 		$operations = array();
 		$conditions = array();
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			$options = array(
 				'actionids' => $actionids,
@@ -675,16 +661,7 @@ COpt::memoryPick();
 			self::addOperations($operations);
 			self::addConditions($conditions);
 
-			self::EndTransaction(true, __METHOD__);
 			return array('actionids' => $actionids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -697,7 +674,7 @@ COpt::memoryPick();
  * @param array $conditions[0,...]['operator']
  * @return boolean
  */
-	protected static function addConditions($conditions){
+	protected function addConditions($conditions){
 		$conditions = zbx_toArray($conditions);
 		$conditions_insert = array();
 
@@ -739,7 +716,7 @@ COpt::memoryPick();
  * @param array $operations[0,...]['opconditions']['value']
  * @return boolean
  */
-	protected static function addOperations($operations){
+	protected function addOperations($operations){
 		$operations = zbx_toArray($operations);
 		$operation_inserts = array();
 		$opcondition_inserts = array();
@@ -785,10 +762,7 @@ COpt::memoryPick();
  * @param array $actionids['actionids']
  * @return boolean
  */
-	public static function delete($actionids){
-
-		try{
-			self::BeginTransaction(__METHOD__);
+	public function delete($actionids){
 
 		if(empty($actionids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
 
@@ -809,16 +783,7 @@ COpt::memoryPick();
 
 			DB::delete('actions', array('actionid'=>$actionids));
 
-			self::EndTransaction(true, __METHOD__);
 			return array('actionids' => $actionids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 }
 ?>

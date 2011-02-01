@@ -28,7 +28,7 @@ class CWebCheck extends CZBXAPI{
 	private static $history = 30;
 	private static $trends = 90;
 
-	public static function get($options=array()){
+	public function get($options=array()){
 		global $USER_DETAILS;
 
 		$result = array();
@@ -309,11 +309,8 @@ COpt::memoryPick();
 		return $result;
 	}
 
-	public static function create($webchecks){
+	public function create($webchecks){
 		$webchecks = zbx_toArray($webchecks);
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			$webcheck_names = zbx_objectValues($webchecks, 'name');
 
@@ -345,24 +342,12 @@ COpt::memoryPick();
 				self::createStepsReal($webcheck, $webcheck['steps']);
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('webcheckids' => $webcheckids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, $error);
-			return false;
-		}
 	}
 
-	public static function update($webchecks){
+	public function update($webchecks){
 		$webchecks = zbx_toArray($webchecks);
 		$webcheckids = zbx_objectValues($webchecks, 'webcheckid');
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			$dbWebchecks = self::get(array(
 				'output' => API_OUTPUT_EXTEND,
@@ -476,23 +461,12 @@ COpt::memoryPick();
 			}
 
 			return array('webchekids' => $webcheckids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, $error);
-			return false;
-		}
 	}
 
-	public static function delete($webcheckids){
+	public function delete($webcheckids){
 		if(empty($webcheckids)) return true;
 
 		$webcheckids = zbx_toArray($webcheckids);
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			$options = array(
 				'httptestids' => $webcheckids,
@@ -542,20 +516,11 @@ COpt::memoryPick();
 					_s('Scenario [%1$s] [%2$s] host [%3$s]', $webcheck['name'], $webcheck['webcheckid'], $host['host']));
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('webcheckids' => $webcheckids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 
-	protected static function createCheckItems($webcheck){
+	protected function createCheckItems($webcheck){
 		$checkitems = array(
 			array(
 				// GETTEXT: Legend below graph
@@ -619,7 +584,7 @@ COpt::memoryPick();
 			info(_s('Web item [%s] created.', $stepitem['key_']));
 	}
 
-	protected static function createStepsReal($webcheck, $websteps){
+	protected function createStepsReal($webcheck, $websteps){
 
 		$websteps_names = zbx_objectValues($websteps, 'name');
 
@@ -716,7 +681,7 @@ COpt::memoryPick();
 		}
 	}
 
-	protected static function updateStepsReal($webcheck, $websteps){
+	protected function updateStepsReal($webcheck, $websteps){
 
 		$websteps_names = zbx_objectValues($websteps, 'name');
 
@@ -783,7 +748,7 @@ COpt::memoryPick();
 		}
 	}
 
-	protected static function deleteStepsReal($webstepids){
+	protected function deleteStepsReal($webstepids){
 
 		$itemids = array();
 		$sql = 'SELECT i.itemid'.

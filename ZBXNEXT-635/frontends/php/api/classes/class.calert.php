@@ -46,7 +46,7 @@ class CAlert extends CZBXAPI{
  * @param array $options['order']
  * @return array|int item data as array or false if error
  */
-	public static function get($options=array()){
+	public function get($options=array()){
 		global $USER_DETAILS;
 
 		$result = array();
@@ -479,12 +479,9 @@ COpt::memoryPick();
  * @param array $alerts[0,...]['url'] OPTIONAL
  * @return boolean
  */
-	public static function create($alerts){
+	public function create($alerts){
 		$alerts = zbx_toArray($alerts);
 		$alertids = array();
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			foreach($alerts as $anum => $alert){
 				$alert_db_fields = array(
@@ -521,16 +518,7 @@ COpt::memoryPick();
 				$alertids[] = $alertid;
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('alertids'=>$alertids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -539,10 +527,7 @@ COpt::memoryPick();
  * @param array $alertids
  * @return boolean
  */
-	public static function delete($alertids){
-
-		try{
-			self::BeginTransaction(__METHOD__);
+	public function delete($alertids){
 
 			$options = array(
 			'alertids' => zbx_objectValues($alerts, 'alertid'),
@@ -561,16 +546,7 @@ COpt::memoryPick();
 			if(!DBexecute($sql))
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 
-			self::EndTransaction(true, __METHOD__);
 			return array('alertids'=> $alertids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 }
 ?>

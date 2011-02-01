@@ -52,7 +52,7 @@ class CItem extends CZBXAPI{
  * @param string $options['order']
  * @return array|int item data as array or false if error
  */
-	public static function get($options=array()){
+	public function get($options=array()){
 		global $USER_DETAILS;
 
 		$result = array();
@@ -810,7 +810,6 @@ COpt::memoryPick();
 	return $result;
 	}
 
-
 /**
  * Get itemid by host.name and item.key
  *
@@ -826,7 +825,7 @@ COpt::memoryPick();
  * @return int|boolean
  */
 
-	public static function getObjects($itemData){
+	public function getObjects($itemData){
 		$options = array(
 			'filter' => $itemData,
 			'output'=>API_OUTPUT_EXTEND,
@@ -843,7 +842,7 @@ COpt::memoryPick();
 	return $result;
 	}
 
-	public static function exists($object){
+	public function exists($object){
 		$options = array(
 			'filter' => array('key_' => $object['key_']),
 			'webitems' => 1,
@@ -866,7 +865,7 @@ COpt::memoryPick();
 	}
 
 
-	public static function checkInput(&$items, $method){
+	public function checkInput(&$items, $method){
 		$create = ($method == 'create');
 		$update = ($method == 'update');
 		$delete = ($method == 'delete');
@@ -1108,11 +1107,8 @@ COpt::memoryPick();
  * @param array $items
  * @return array|boolean
  */
-	public static function create($items){
+	public function create($items){
 		$items = zbx_toArray($items);
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			self::checkInput($items, __FUNCTION__);
 
@@ -1120,20 +1116,10 @@ COpt::memoryPick();
 
 			self::inherit($items);
 
-			self::EndTransaction(true, __METHOD__);
-
 			return array('itemids' => zbx_objectValues($items, 'itemid'));
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
-	protected static function createReal(&$items){
+	protected function createReal(&$items){
 		foreach($items as $key => $item){
 			$itemsExists = CItem::get(array(
 				'output' => API_OUTPUT_SHORTEN,
@@ -1183,7 +1169,7 @@ COpt::memoryPick();
 		}
 	}
 
-	protected static function updateReal($items){
+	protected function updateReal($items){
 		$items = zbx_toArray($items);
 
 		$itemids = array();
@@ -1248,11 +1234,8 @@ COpt::memoryPick();
  * @param array $items
  * @return boolean
  */
-	public static function update($items){
+	public function update($items){
 		$items = zbx_toArray($items);
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			self::checkInput($items, __FUNCTION__);
 
@@ -1260,17 +1243,7 @@ COpt::memoryPick();
 
 			self::inherit($items);
 
-			self::EndTransaction(true, __METHOD__);
-
 			return array('itemids' => zbx_objectValues($items, 'itemid'));
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -1279,10 +1252,7 @@ COpt::memoryPick();
  * @param array $itemids
  * @return
  */
-	public static function delete($itemids, $nopermissions=false){
-
-		try{
-			self::BeginTransaction(__METHOD__);
+	public function delete($itemids, $nopermissions=false){
 
 			if(empty($itemids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
 
@@ -1390,22 +1360,11 @@ COpt::memoryPick();
 				info(_s('Item [%1$s:%2$s] deleted.', $item['description'], $item['key_']));
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('itemids' => $itemids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 
-	public static function syncTemplates($data){
-		try{
-			self::BeginTransaction(__METHOD__);
+	public function syncTemplates($data){
 
 			$data['templateids'] = zbx_toArray($data['templateids']);
 			$data['hostids'] = zbx_toArray($data['hostids']);
@@ -1450,19 +1409,10 @@ COpt::memoryPick();
 
 			self::inherit($items, $data['hostids']);
 
-			self::EndTransaction(true, __METHOD__);
 			return true;
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
-	protected static function inherit($items, $hostids=null){
+	protected function inherit($items, $hostids=null){
 		if(empty($items)) return $items;
 
 		$items = zbx_toHash($items, 'itemid');

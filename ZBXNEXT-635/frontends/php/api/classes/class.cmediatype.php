@@ -48,7 +48,7 @@ class CMediatype extends CZBXAPI{
  * @param string $options['sortorder'] output will be sorted in given order [ 'ASC', 'DESC' ]
  * @return array
  */
-	public static function get($options=array()){
+	public function get($options=array()){
 		global $USER_DETAILS;
 
 		$result = array();
@@ -331,11 +331,8 @@ Copt::memoryPick();
  * @param string $mediatypes['passwd']
  * @return array|boolean
  */
-	public static function create($mediatypes){
+	public function create($mediatypes){
 		global $USER_DETAILS;
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_CREATE_MEDIATYPES);
@@ -369,16 +366,7 @@ Copt::memoryPick();
 			}
 			$mediatypeids = DB::insert('media_type', $mediatypes);
 
-			self::EndTransaction(true, __METHOD__);
 			return array('mediatypeids' => $mediatypeids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -396,11 +384,8 @@ Copt::memoryPick();
  * @param string $mediatypes['passwd']
  * @return boolean
  */
-	public static function update($mediatypes){
+	public function update($mediatypes){
 		global $USER_DETAILS;
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
@@ -450,17 +435,7 @@ Copt::memoryPick();
 			}
 			$mediatypeids = DB::update('media_type', $update);
 
-			self::EndTransaction(true, __METHOD__);
 			return array('mediatypeids' => $mediatypeids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -476,7 +451,7 @@ Copt::memoryPick();
  * @param array $mediatypes[0,...]['mediatypeids']
  * @return boolean
  */
-	public static function delete($mediatypeids){
+	public function delete($mediatypeids){
 		global $USER_DETAILS;
 
 		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
@@ -484,9 +459,6 @@ Copt::memoryPick();
 		}
 
 		$mediatypeids = zbx_toArray($mediatypeids);
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			$options = array(
 				'mediatypeids' => $mediatypeids,
@@ -501,16 +473,7 @@ Copt::memoryPick();
 
 			DB::delete('media_type', array('mediatypeid'=>$mediatypeids));
 
-			self::EndTransaction(true, __METHOD__);
 			return array('mediatypeids' => $mediatypeids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 }
 ?>
