@@ -52,7 +52,7 @@ class CEvent extends CZBXAPI{
  * @param array $options['order']
  * @return array|int item data as array or false if error
  */
-	public static function get($options=array()){
+	public function get($options=array()){
 		global $USER_DETAILS;
 
 		$result = array();
@@ -618,12 +618,9 @@ Copt::memoryPick();
  * @param array $events[0,...]['acknowledged'] OPTIONAL
  * @return boolean
  */
-	public static function create($events){
+	public function create($events){
 		$events = zbx_toArray($events);
 		$eventids = array();
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			$options = array(
 				'triggerids' => zbx_objectValues($events, 'objectid'),
@@ -681,16 +678,7 @@ Copt::memoryPick();
 // This will create looping (Trigger->Event->Trigger->Event)
 //			$result = CTrigger::update($triggers);
 
-			self::EndTransaction(true, __METHOD__);
 			return $eventids;
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -700,11 +688,8 @@ Copt::memoryPick();
  * @param array $eventids['eventids']
  * @return boolean
  */
-	public static function delete($eventids){
+	public function delete($eventids){
 		$eventids = zbx_toArray($eventids);
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			$options = array(
 				'eventids' => $eventids,
@@ -724,16 +709,7 @@ Copt::memoryPick();
 
 			if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Can not delete event');
 
-			self::EndTransaction(true, __METHOD__);
 			return array('eventids' => $eventids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 	/**
@@ -742,31 +718,19 @@ Copt::memoryPick();
 	 * @param array $triggerids
 	 * @return boolean
 	 */
-	public static function deleteByTriggerIDs($triggerids){
+	public function deleteByTriggerIDs($triggerids){
 		zbx_value2array($triggerids);
 
-		try{
 			$sql = 'DELETE FROM events e WHERE e.object='.EVENT_OBJECT_TRIGGER.' AND '.DBcondition('e.objectid', $triggerids);
 			if(!DBexecute($sql))
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
-	public static function acknowledge($data){
+	public function acknowledge($data){
 		global $USER_DETAILS;
 
 		$eventids = isset($data['eventids']) ? zbx_toArray($data['eventids']) : array();
 		$eventids = zbx_toHash($eventids);
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 // PERMISSIONS {{{
 			$options = array(
@@ -841,19 +805,7 @@ Copt::memoryPick();
 
 			DB::insert('acknowledges', $dataInsert);
 
-			self::EndTransaction(true, __METHOD__);
-
 			return array('eventids' => array_values($eventids));
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-
-			$error = $e->getErrors();
-			$error = reset($error);
-
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 }

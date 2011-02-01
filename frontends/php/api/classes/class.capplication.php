@@ -41,7 +41,7 @@ class CApplication extends CZBXAPI{
  * @param string $options['order']
  * @return array|int item data as array or false if error
  */
-	public static function get($options=array()){
+	public function get($options=array()){
 		global $USER_DETAILS;
 
 		$result = array();
@@ -395,7 +395,7 @@ COpt::memoryPick();
 	return $result;
 	}
 
-	public static function exists($object){
+	public function exists($object){
 		$keyFields = array(array('hostid', 'host'), 'name');
 
 		$options = array(
@@ -414,7 +414,7 @@ COpt::memoryPick();
 	return !empty($objs);
 	}
 
-	public static function checkInput(&$applications, $method){
+	public function checkInput(&$applications, $method){
 		$create = ($method == 'create');
 		$update = ($method == 'update');
 		$delete = ($method == 'delete');
@@ -500,11 +500,8 @@ COpt::memoryPick();
  * @param array $app_data['hostid']
  * @return array
  */
-	public static function create($applications){
+	public function create($applications){
 		$applications = zbx_toArray($applications);
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			self::checkInput($applications, __FUNCTION__);
 
@@ -512,16 +509,7 @@ COpt::memoryPick();
 
 			self::inherit($applications);
 
-			self::EndTransaction(true, __METHOD__);
 			return array('applicationids' => zbx_objectValues($applications, 'applicationid'));
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -532,11 +520,8 @@ COpt::memoryPick();
  * @param array $app_data['hostid']
  * @return array
  */
-	public static function update($applications){
+	public function update($applications){
 		$applications = zbx_toArray($applications);
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			self::checkInput($applications, __FUNCTION__);
 
@@ -544,19 +529,10 @@ COpt::memoryPick();
 
 			self::inherit($applications);
 
-			self::EndTransaction(true, __METHOD__);
 			return array('applicationids' => zbx_objectValues($applications, 'applicationids'));
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
-	protected static function createReal(&$applications){
+	protected function createReal(&$applications){
 		if(empty($applications)) return true;
 
 		$applicationids = DB::insert('applications', $applications);
@@ -578,7 +554,7 @@ COpt::memoryPick();
 		}
 	}
 
-	protected static function updateReal($applications){
+	protected function updateReal($applications){
 		$update = array();
 		foreach($applications as $application){
 			$update[] = array(
@@ -608,10 +584,8 @@ COpt::memoryPick();
  * @param array $applicationids
  * @return array
  */
-	public static function delete($applicationids, $nopermissions=false){
+	public function delete($applicationids, $nopermissions=false){
 		$applicationids = zbx_toArray($applicationids);
-		try{
-			self::BeginTransaction(__METHOD__);
 
 // TODO: remove $nopermissions hack
 			$options = array(
@@ -674,16 +648,7 @@ COpt::memoryPick();
 				info(_s('Application [%1$s] deleted', $del_application['name']));
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('applicationids' => $applicationids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -694,9 +659,7 @@ COpt::memoryPick();
  * @param array $data['items']
  * @return boolean
  */
-	public static function massAdd($data){
-		try{
-			self::BeginTransaction(__METHOD__);
+	public function massAdd($data){
 
 			if(empty($data['applications'])) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
 
@@ -783,19 +746,10 @@ COpt::memoryPick();
 				}
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('applicationids'=> $applicationids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
-	protected static function inherit($applications, $hostids=null){
+	protected function inherit($applications, $hostids=null){
 		if(empty($applications)) return $applications;
 
 		$applications = zbx_toHash($applications, 'applicationid');
@@ -877,9 +831,7 @@ COpt::memoryPick();
 		return true;
 	}
 
-	public static function syncTemplates($data){
-		try{
-			self::BeginTransaction(__METHOD__);
+	public function syncTemplates($data){
 
 			$data['templateids'] = zbx_toArray($data['templateids']);
 			$data['hostids'] = zbx_toArray($data['hostids']);
@@ -918,16 +870,7 @@ COpt::memoryPick();
 
 			self::inherit($applications, $data['hostids']);
 
-			self::EndTransaction(true, __METHOD__);
 			return true;
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 }
 

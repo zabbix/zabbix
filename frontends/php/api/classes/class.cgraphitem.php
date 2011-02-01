@@ -34,7 +34,7 @@ class CGraphItem extends CZBXAPI{
 * @param array $options
 * @return array|boolean
 */
-	public static function get($options = array()){
+	public function get($options = array()){
 		global $USER_DETAILS;
 
 		$result = array();
@@ -268,7 +268,7 @@ class CGraphItem extends CZBXAPI{
  * @param array $gitem_data['graphid']
  * @return string|boolean graphid
  */
-	public static function getObjects($gitem_data){
+	public function getObjects($gitem_data){
 		$result = array();
 		$gitemids = array();
 

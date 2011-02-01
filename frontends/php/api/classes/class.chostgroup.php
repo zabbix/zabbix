@@ -33,7 +33,7 @@ class CHostGroup extends CZBXAPI{
  * @param array $params
  * @return array
  */
-	public static function get($params){
+	public function get($params){
 		global $USER_DETAILS;
 
 		$result = array();
@@ -551,7 +551,7 @@ COpt::memoryPick();
  * @param array $data['name']
  * @return string|boolean HostGroup ID or false if error
  */
-	public static function getObjects($hostgroupData){
+	public function getObjects($hostgroupData){
 		$options = array(
 			'filter' => $hostgroupData,
 			'output' => API_OUTPUT_EXTEND
@@ -570,7 +570,7 @@ COpt::memoryPick();
 	return $result;
 	}
 
-	public static function exists($object){
+	public function exists($object){
 		$keyFields = array('name', 'groupid');
 
 		$options = array(
@@ -596,13 +596,10 @@ COpt::memoryPick();
  * @param array $groups['name']
  * @return array
  */
-	public static function create($groups){
+	public function create($groups){
 		global $USER_DETAILS;
 		$groups = zbx_toArray($groups);
 		$insert = array();
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can create HostGroups');
@@ -620,16 +617,7 @@ COpt::memoryPick();
 			}
 			$groupids = DB::insert('groups', $insert);
 
-			self::EndTransaction(true, __METHOD__);
 			return array('groupids' => $groupids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -640,12 +628,9 @@ COpt::memoryPick();
  * @param array $groups[0]['groupid'], ...
  * @return boolean
  */
-	public static function update($groups){
+	public function update($groups){
 		$groups = zbx_toArray($groups);
 		$groupids = zbx_objectValues($groups, 'groupid');
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			if(empty($groups)){
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter');
@@ -693,16 +678,7 @@ COpt::memoryPick();
 
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('groupids' => $groupids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -711,10 +687,7 @@ COpt::memoryPick();
  * @param array $groupids
  * @return boolean
  */
-	public static function delete($groupids){
-
-		try{
-			self::BeginTransaction(__METHOD__);
+	public function delete($groupids){
 
 			if(empty($groupids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
 
@@ -818,16 +791,7 @@ COpt::memoryPick();
 			}
 
 
-			self::EndTransaction(true, __METHOD__);
 			return array('groupids' => $groupids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -839,12 +803,9 @@ COpt::memoryPick();
  * @param array $data['templates']
  * @return boolean
  */
-	public static function massAdd($data){
+	public function massAdd($data){
 		$groups = zbx_toArray($data['groups']);
 		$groupids = zbx_objectValues($groups, 'groupid');
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			$options = array(
 				'groupids' => $groupids,
@@ -887,16 +848,7 @@ COpt::memoryPick();
 				}
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('groupids' => $groupids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -908,10 +860,8 @@ COpt::memoryPick();
  * @param array $data['templateids']
  * @return boolean
  */
-	public static function massRemove($data){
+	public function massRemove($data){
 		$groupids = zbx_toArray($data['groupids'], 'groupid');
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			$options = array(
 				'groupids' => $groupids,
@@ -942,16 +892,7 @@ COpt::memoryPick();
 				));
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('groupids' => $groupids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -963,7 +904,7 @@ COpt::memoryPick();
  * @param array $data['templates']
  * @return boolean
  */
-	public static function massUpdate($data){
+	public function massUpdate($data){
 		$groups = zbx_toArray($data['groups']);
 		$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : null;
 		$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : null;
@@ -971,9 +912,6 @@ COpt::memoryPick();
 		$groupids = zbx_objectValues($groups, 'groupid');
 		$hostids = zbx_objectValues($hosts, 'hostid');
 		$templateids = zbx_objectValues($templates, 'templateid');
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			$hosts_to_unlink = $hosts_to_link = array();
 			$options = array(
@@ -1059,16 +997,7 @@ COpt::memoryPick();
 				}
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('groupids' => $groupids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 }
 

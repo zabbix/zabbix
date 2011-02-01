@@ -34,7 +34,7 @@ class CDRule extends CZBXAPI{
 * @param array $options
 * @return array
 */
-	public static function get($options=array()){
+	public function get($options=array()){
 		global $USER_DETAILS;
 
 		$result = array();
@@ -402,7 +402,7 @@ COpt::memoryPick();
 	}
 
 
-	public static function exists($object){
+	public function exists($object){
 		$options = array(
 			'filter' => array(),
 			'output' => API_OUTPUT_SHORTEN,
@@ -429,23 +429,9 @@ COpt::memoryPick();
  * @param array $drules
  * @return boolean
  */
-	public static function create($drules){
-		$drules = zbx_toArray($drules);
-		$druleids = array();
+	public function create($drules){
 
-		try{
-			self::BeginTransaction(__METHOD__);
-			self::EndTransaction(true, __METHOD__);
 
-			return array('druleids' => $druleids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, $error);
-			return false;
-		}
 	}
 
 /**
@@ -455,23 +441,9 @@ COpt::memoryPick();
  * @param array $drules
  * @return boolean
  */
-	public static function update($drules){
-		$drules = zbx_toArray($drules);
-		$druleids = array();
+	public function update($drules){
 
-		try{
-			self::BeginTransaction(__METHOD__);
 
-			self::EndTransaction(true, __METHOD__);
-			return array('druleids' => $druleids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, $error);
-			return false;
-		}
 	}
 
 /**
@@ -482,11 +454,9 @@ COpt::memoryPick();
  * @param array $drules['druleids']
  * @return boolean
  */
-	public static function delete($druleids){
+	public function delete($druleids){
 		$druleids = zbx_toArray($druleids);
 
-		try{
-			self::BeginTransaction(__METHOD__);
 // permissions
 			$options = array(
 				'druleids' => $druleids,
@@ -526,20 +496,11 @@ COpt::memoryPick();
 			DBexecute('DELETE FROM dchecks WHERE '.DBcondition('druleid',$druleids));
 			DBexecute('DELETE FROM drules WHERE '.DBcondition('druleid',$druleids));
 
-			self::EndTransaction(true, __METHOD__);
 			return array('druleids' => $druleids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 // DEPRECATED
-	public static function addChecks($checks){
+	public function addChecks($checks){
 
 		$error = 'Unknown Zabbix internal error';
 		$result = false;
@@ -612,7 +573,7 @@ COpt::memoryPick();
 	}
 
 // DEPRECATED
-	public static function deleteChecks($check_list, $force=false){
+	public function deleteChecks($check_list, $force=false){
 		$result = true;
 
 		$druleid = $check_list['druleid'];

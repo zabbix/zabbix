@@ -68,7 +68,7 @@ class CDService extends CZBXAPI{
  * @param string $options['sortorder'] sort order
  * @return array|boolean Service data as array or false if error
  */
-	public static function get($options=array()){
+	public function get($options=array()){
 		global $USER_DETAILS;
 
 		$result = array();
@@ -501,7 +501,7 @@ Copt::memoryPick();
 	return $result;
 	}
 
-	public static function exists($object){
+	public function exists($object){
 		$keyFields = array(array('dserviceid'));
 
 		$options = array(
@@ -522,83 +522,23 @@ Copt::memoryPick();
 
 /**
  * Add Service
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $dservices multidimensional array with Services data
  */
-	public static function create($dservices){
-		$errors = array();
-		$dservices = zbx_toArray($dservices);
-		$dserviceids = array();
-		$result = false;
+	public function create($dservices){
 
-		if($result){
-			return array('dserviceids' => $dserviceids);
-		}
-		else{
-			self::setMethodErrors(__METHOD__, $errors);
-			return false;
-		}
 	}
 
 /**
  * Update DService
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $dservices multidimensional array with Services data
  */
-	public static function update($dservices){
-		$dservices = zbx_toArray($dservices);
-		$dserviceids = zbx_objectValues($dservices, 'hostid');
+	public function update($dservices){
 
-		try{
-			return array('dserviceids' => $dserviceids);
-		}
-		catch(APIException $e){
-			if(isset($transaction)) self::EndTransaction(false, __METHOD__);
-
-			$error = $e->getErrors();
-			$error = reset($error);
-
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
  * Delete Discovered Service
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param array $dservices
- * @param array $dservices[0, ...]['hostid'] Service ID to delete
- * @return array|boolean
  */
-	public static function delete($dservices){
-		$dservices = zbx_toArray($dservices);
-		$dserviceids = array();
+	public function delete($dservices){
 
-		if($result){
-			return array('hostids' => $dserviceids);
-		}
-		else{
-			self::setError(__METHOD__);
-			return false;
-		}
 	}
 
 }

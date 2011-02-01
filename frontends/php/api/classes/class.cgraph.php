@@ -33,7 +33,7 @@ class CGraph extends CZBXAPI{
 * @param array $options
 * @return array
 */
-	public static function get($options=array()){
+	public function get($options=array()){
 		global $USER_DETAILS;
 
 		$result = array();
@@ -586,7 +586,7 @@ COpt::memoryPick();
  * @param array $graphData
  * @return string|boolean
  */
-	public static function getObjects($graphData){
+	public function getObjects($graphData){
 		$options = array(
 			'filter' => $graphData,
 			'output'=>API_OUTPUT_EXTEND
@@ -602,7 +602,7 @@ COpt::memoryPick();
 	return $result;
 	}
 
-	public static function exists($object){
+	public function exists($object){
 		$options = array(
 			'filter' => array('flags' => null),
 			'output' => API_OUTPUT_SHORTEN,
@@ -629,12 +629,9 @@ COpt::memoryPick();
  * @param array $graphs
  * @return boolean
  */
-	public static function create($graphs){
+	public function create($graphs){
 		$graphs = zbx_toArray($graphs);
 		$graphids = array();
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			self::checkInput($graphs, false);
 
@@ -673,16 +670,7 @@ COpt::memoryPick();
 				$graphids[] = $graphid;
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('graphids' => $graphids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, $error);
-			return false;
-		}
 	}
 
 /**
@@ -691,12 +679,9 @@ COpt::memoryPick();
  * @param array $graphs
  * @return boolean
  */
-	public static function update($graphs){
+	public function update($graphs){
 		$graphs = zbx_toArray($graphs);
 		$graphids = zbx_objectValues($graphs, 'graphid');
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 // GRAPHS PERMISSIONS {{{
 			$options = array(
@@ -754,19 +739,10 @@ COpt::memoryPick();
 				if($templated_graph) self::inherit($graph);
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('graphids' => $graphids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, $error);
-			return false;
-		}
 	}
 
-	protected static function createReal($graph){
+	protected function createReal($graph){
 		$graphids = DB::insert('graphs', array($graph));
 		$graphid = reset($graphids);
 
@@ -779,7 +755,7 @@ COpt::memoryPick();
 		return $graphid;
 	}
 
-	protected static function updateReal($graph){
+	protected function updateReal($graph){
 		$data = array(array('values' => $graph, 'where'=> array('graphid='.$graph['graphid'])));
 		DB::update('graphs', $data);
 
@@ -796,7 +772,7 @@ COpt::memoryPick();
 		return $graph['graphid'];
 	}
 
-	protected static function inherit($graph, $hostids=null){
+	protected function inherit($graph, $hostids=null){
 		$options = array(
 			'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
 			'output' => API_OUTPUT_SHORTEN,
@@ -928,9 +904,7 @@ COpt::memoryPick();
  * @param array $data
  * @return boolean
  */
-	public static function syncTemplates($data){
-		try{
-			self::BeginTransaction(__METHOD__);
+	public function syncTemplates($data){
 
 			$data['templateids'] = zbx_toArray($data['templateids']);
 			$data['hostids'] = zbx_toArray($data['hostids']);
@@ -987,16 +961,7 @@ COpt::memoryPick();
 				}
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return true;
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -1006,10 +971,7 @@ COpt::memoryPick();
  * @param array $graphs['graphids']
  * @return boolean
  */
-	public static function delete($graphids, $nopermissions=false){
-
-		try{
-			self::BeginTransaction(__METHOD__);
+	public function delete($graphids, $nopermissions=false){
 
 			if(empty($graphids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
 
@@ -1064,19 +1026,10 @@ COpt::memoryPick();
 				info(_s('Graph [%s] deleted.', $graph['name']));
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('graphids'=> $graphids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
-	private static function checkInput($graphs, $update=false){
+	private function checkInput($graphs, $update=false){
 		$itemids = array();
 
 		foreach($graphs as $gnum => $graph){
@@ -1155,11 +1108,10 @@ COpt::memoryPick();
 // }}} EXCEPTION: GRAPH EXISTS
 		}
 
-
 		return true;
 	}
 
-	protected static function checkAxisItems($graph, $tpl=false){
+	protected function checkAxisItems($graph, $tpl=false){
 
 		$axis_items = array();
 		if(isset($graph['ymin_type']) && ($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE)){

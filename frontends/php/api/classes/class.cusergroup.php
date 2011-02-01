@@ -51,7 +51,7 @@ class CUserGroup extends CZBXAPI{
  * @param string $options['order']
  * @return array
  */
-	public static function get($options=array()){
+	public function get($options=array()){
 		global $USER_DETAILS;
 
 		$result = array();
@@ -291,7 +291,7 @@ class CUserGroup extends CZBXAPI{
  * @param array $group_data
  * @return string|boolean
  */
-	public static function getObjects($group_data){
+	public function getObjects($group_data){
 		$result = array();
 		$usrgrpids = array();
 
@@ -310,7 +310,7 @@ class CUserGroup extends CZBXAPI{
 	return $result;
 	}
 
-	public static function exists($object){
+	public function exists($object){
 		$options = array(
 			'filter' => array('name' => $object['name']),
 			'output' => API_OUTPUT_SHORTEN,
@@ -333,7 +333,7 @@ class CUserGroup extends CZBXAPI{
  * @param array $usrgrps
  * @return boolean
  */
-	public static function create($usrgrps){
+	public function create($usrgrps){
 		global $USER_DETAILS;
 
 		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
@@ -342,9 +342,6 @@ class CUserGroup extends CZBXAPI{
 
 		$usrgrps = zbx_toArray($usrgrps);
 		$insert = array();
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			foreach($usrgrps as $gnum => $usrgrp){
 				$usrgrp_db_fields = array(
@@ -377,16 +374,7 @@ class CUserGroup extends CZBXAPI{
 				}
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('usrgrpids' => $usrgrpids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -395,7 +383,7 @@ class CUserGroup extends CZBXAPI{
  * @param array $usrgrps
  * @return boolean
  */
-	public static function update($usrgrps){
+	public function update($usrgrps){
 		global $USER_DETAILS;
 		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 			self::exception(ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can add User Groups');
@@ -403,9 +391,6 @@ class CUserGroup extends CZBXAPI{
 
 		$usrgrps = zbx_toArray($usrgrps);
 		$usrgrpids = zbx_objectValues($usrgrps, 'usrgrpid');
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			foreach($usrgrps as $ugnum => $usrgrp){
 				$group_db_fields = array('usrgrpid' => null);
@@ -420,19 +405,10 @@ class CUserGroup extends CZBXAPI{
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot update group');
 			}
 
-			self::EndTransaction(true, __METHOD__);
 		return array('usrgrpids'=> $usrgrpids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
-	public static function massAdd($data){
+	public function massAdd($data){
 		global $USER_DETAILS;
 		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 			self::exception(ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can add User Groups');
@@ -441,9 +417,6 @@ class CUserGroup extends CZBXAPI{
 		$usrgrpids = zbx_toArray($data['usrgrpids']);
 		$userids = (isset($data['userids']) && !is_null($data['userids'])) ? zbx_toArray($data['userids']) : null;
 		$rights = (isset($data['rights']) && !is_null($data['rights'])) ? zbx_toArray($data['rights']) : null;
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			if(!is_null($userids)){
 				$options = array(
@@ -511,19 +484,10 @@ class CUserGroup extends CZBXAPI{
 				DB::insert('rights', $rights_insert);
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('usrgrpids' => $usrgrpids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
-	public static function massUpdate($data){
+	public function massUpdate($data){
 		global $USER_DETAILS;
 		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 			self::exception(ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can add User Groups');
@@ -534,9 +498,6 @@ class CUserGroup extends CZBXAPI{
 		$rights = zbx_toArray($data['rights']);
 
 		$update = array();
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			if(isset($data['name']) && count($usrgrpids)>1){
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Multiple Name column');
@@ -666,19 +627,10 @@ class CUserGroup extends CZBXAPI{
 			}
 
 
-			self::EndTransaction(true, __METHOD__);
 			return array('usrgrpids' => $usrgrpids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
-	public static function massRemove($data){
+	public function massRemove($data){
 
 	}
 
@@ -688,13 +640,11 @@ class CUserGroup extends CZBXAPI{
  * @param array $usrgrpids
  * @return boolean
  */
-	public static function delete($usrgrpids){
+	public function delete($usrgrpids){
 		global $USER_DETAILS;
 
 		$usrgrpids = zbx_toArray($usrgrpids);
 
-		try{
-			self::BeginTransaction(__METHOD__);
 
 		if(empty($usrgrpids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
 
@@ -722,16 +672,7 @@ class CUserGroup extends CZBXAPI{
 			DB::delete('users_groups', array('usrgrpid'=>$usrgrpids));
 			DB::delete('usrgrp', array('usrgrpid'=>$usrgrpids));
 
-			self::EndTransaction(true, __METHOD__);
 			return array('usrgrpids' => $usrgrpids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 }

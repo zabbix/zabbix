@@ -43,113 +43,106 @@ class CAPIObject{
 }
 
 class API{
-	private static $action = null;
-	private static $alert = null;
-	private static $application = null;
-	private static $event = null;
-	private static $graph = null;
-	private static $graphitem = null;
-	private static $host = null;
-	private static $hostgroup = null;
-	private static $item = null;
-	private static $maintenance = null;
-	private static $map = null;
-	private static $screen = null;
-	private static $script = null;
-	private static $template = null;
-	private static $trigger = null;
-	private static $user = null;
-	private static $usergroup = null;
-	private static $usermacro = null;
+	const RETURN_TYPE_API = 'api';
+	const RETURN_TYPE_RPC = 'rpc';
+
+	private static $APIobjects = array();
+	private static $RPCobjects = array();
+	private static $return = self::RETURN_TYPE_RPC;
+
+
+	public static function setReturnAPI(){
+		self::$return = self::RETURN_TYPE_API;
+	}
+
+	public static function setReturnRPC(){
+		self::$return = self::RETURN_TYPE_RPC;
+	}
+
+	private static function getAPIObject($className){
+		if(!isset(self::$APIobjects[$className])) self::$APIobjects[$className] = new CAPIObject($className);
+			return self::$APIobjects[$className];
+	}
+
+	private static function getRPCObject($className){
+		if(!isset(self::$RPCobjects[$className])) self::$RPCobjects[$className] = new CAPIObject($className);
+			return self::$RPCobjects[$className];
+	}
+
+	public static function getObject($className){
+		return self::$return == self::RETURN_TYPE_API ? self::getAPIObject($className) : self::getAPIObject($className);
+	}
 
 	public static function Action(){
-		if(is_null(self::$action)) self::$action = new CAPIObject('action');
-		return self::$action;
+		return self::getObject('action');
 	}
 
 	public static function Alert(){
-		if(is_null(self::$alert)) self::$alert = new CAPIObject('alert');
-		return self::$alert;
+		return self::getObject('alert');
 	}
 
 	public static function Application(){
-		if(is_null(self::$application)) self::$application = new CAPIObject('application');
-		return self::$application;
+		return self::getObject('application');
 	}
 
 	public static function Event(){
-		if(is_null(self::$event)) self::$event = new CAPIObject('event');
-		return self::$event;
+		return self::getObject('event');
 	}
 
 	public static function Graph(){
-		if(is_null(self::$graph)) self::$graph = new CAPIObject('graph');
-		return self::$graph;
+		return self::getObject('graph');
 	}
 
 	public static function GraphItem(){
-		if(is_null(self::$graphitem)) self::$graphitem = new CAPIObject('graphitem');
-		return self::$graphitem;
+		return self::getObject('graphitem');
 	}
 
 	public static function Host(){
-		if(is_null(self::$host)) self::$host = new CAPIObject('host');
-		return self::$host;
+		return self::getObject('host');
 	}
 
 	public static function HostGroup(){
-		if(is_null(self::$hostgroup)) self::$hostgroup = new CAPIObject('hostgroup');
-		return self::$hostgroup;
+		return self::getObject('hostgroup');
 	}
 
 	public static function Item(){
-		if(is_null(self::$item)) self::$item = new CAPIObject('item');
-		return self::$item;
+		return self::getObject('item');
 	}
 
 	public static function Maintenance(){
-		if(is_null(self::$maintenance)) self::$maintenance = new CAPIObject('maintenance');
-		return self::$maintenance;
+		return self::getObject('maintenance');
 	}
 
 	public static function Map(){
-		if(is_null(self::$map)) self::$map = new CAPIObject('map');
-		return self::$map;
+		return self::getObject('map');
 	}
 
 	public static function Screen(){
-		if(is_null(self::$screen)) self::$screen = new CAPIObject('screen');
-		return self::$screen;
+		return self::getObject('screen');
 	}
 
 	public static function Script(){
-		if(is_null(self::$script)) self::$script = new CAPIObject('script');
-		return self::$script;
+		return self::getObject('script');
 	}
 
 	public static function Template(){
-		if(is_null(self::$template)) self::$template = new CAPIObject('template');
-		return self::$template;
+		return self::getObject('template');
 	}
 
 	public static function Trigger(){
-		if(is_null(self::$trigger)) self::$trigger = new CAPIObject('trigger');
-		return self::$trigger;
+		return self::getObject('trigger');
 	}
 
 	public static function User(){
-		if(is_null(self::$user)) self::$user = new CAPIObject('user');
-		return self::$user;
+		return self::getObject('user');
 	}
 
 	public static function UserGroup(){
-		if(is_null(self::$usergroup)) self::$usergroup = new CAPIObject('usergroup');
-		return self::$usergroup;
+		return self::getObject('usergroup');
 	}
 
 	public static function UserMacro(){
-		if(is_null(self::$usermacro)) self::$usermacro = new CAPIObject('usermacro');
-		return self::$usermacro;
+		return self::getObject('usermacro');
 	}
 
 }

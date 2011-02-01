@@ -34,7 +34,7 @@ class CTemplate extends CZBXAPI{
  * @param array $options
  * @return array|boolean Template data as array or false if error
  */
-	public static function get($options = array()) {
+	public function get($options = array()) {
 		global $USER_DETAILS;
 
 		$result = array();
@@ -938,7 +938,7 @@ COpt::memoryPick();
  * @param array $template_data['templateid']
  * @return string templateid
  */
-	public static function getObjects($templateData){
+	public function getObjects($templateData){
 		$options = array(
 			'filter' => $templateData,
 			'output'=>API_OUTPUT_EXTEND
@@ -954,7 +954,7 @@ COpt::memoryPick();
 	return $result;
 	}
 
-	public static function exists($object){
+	public function exists($object){
 		$keyFields = array(array('templateid', 'host'));
 
 		$options = array(
@@ -980,12 +980,10 @@ COpt::memoryPick();
  * @param string $templates['host']
  * @return boolean
  */
-	public static function create($templates){
+	public function create($templates){
 		$templates = zbx_toArray($templates);
 		$templateids = array();
 
-		try{
-			self::BeginTransaction(__METHOD__);
 // CHECK IF HOSTS HAVE AT LEAST 1 GROUP {{{
 			foreach($templates as $tnum => $template){
 				if(empty($template['groups'])){
@@ -1060,16 +1058,7 @@ COpt::memoryPick();
 				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS);
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('templateids' => $templateids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -1078,12 +1067,9 @@ COpt::memoryPick();
  * @param array $templates multidimensional array with templates data
  * @return boolean
  */
-	public static function update($templates){
+	public function update($templates){
 		$templates = zbx_toArray($templates);
 		$templateids = zbx_objectValues($templates, 'templateid');
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			$upd_templates = self::get(array(
 				'templateids' => $templateids,
@@ -1113,16 +1099,7 @@ COpt::memoryPick();
 				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Failed to update template'));
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('templateids' => $templateids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -1132,9 +1109,7 @@ COpt::memoryPick();
  * @param array $templateids['templateids']
  * @return boolean
  */
-	public static function delete($templateids){
-		try{
-			self::BeginTransaction(__METHOD__);
+	public function delete($templateids){
 
 			if(empty($templateids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
 
@@ -1233,16 +1208,7 @@ COpt::memoryPick();
 				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $template['hostid'], $template['host'], 'hosts', NULL, NULL);
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('templateids' => $templateids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 
@@ -1256,12 +1222,9 @@ COpt::memoryPick();
  * @param string $data['templates_link']
  * @return boolean
  */
-	public static function massAdd($data){
+	public function massAdd($data){
 		$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : null;
 		$templateids = is_null($templates) ? array() : zbx_objectValues($templates, 'templateid');
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			$upd_templates = self::get(array(
 				'templateids' => $templateids,
@@ -1297,16 +1260,7 @@ COpt::memoryPick();
 				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Can\'t link macros');
 			}
 
-			$result = self::EndTransaction(true, __METHOD__);
 			return array('templateids' => zbx_objectValues($data['templates'], 'templateid'));
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -1316,13 +1270,12 @@ COpt::memoryPick();
  * @param array $hosts['hosts'] Array of Host objects to update
  * @return boolean
  */
-	public static function massUpdate($data){
+	public function massUpdate($data){
 		$transaction = false;
 
 		$templates = zbx_toArray($data['templates']);
 		$templateids = zbx_objectValues($templates, 'templateid');
 
-		try{
 			$options = array(
 				'templateids' => $templateids,
 				'editable' => true,
@@ -1550,17 +1503,7 @@ COpt::memoryPick();
 			}
 // }}} UPDATE MACROS
 
-			self::EndTransaction(true, __METHOD__);
 			return array('templateids' => $templateids);
-		}
-		catch(APIException $e){
-			if($transaction) self::EndTransaction(false, __METHOD__);
-
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -1573,11 +1516,8 @@ COpt::memoryPick();
  * @param array $data['macroids']
  * @return boolean
  */
-	public static function massRemove($data){
+	public function massRemove($data){
 		$templateids = zbx_toArray($data['templateids']);
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			$upd_templates = CHost::get(array(
 				'hostids' => $templateids,
@@ -1625,20 +1565,11 @@ COpt::memoryPick();
 				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't remove macros"));
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('templateids' => $templateids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 
-	private static function link($templateids, $targetids){
+	private function link($templateids, $targetids){
 		if(empty($templateids)) return true;
 
 // check if any templates linked to targets have more than one unique item key\application {{{
@@ -1840,7 +1771,7 @@ COpt::memoryPick();
 		return true;
 	}
 
-	private static function unlink($templateids, $targetids=null, $clear=false){
+	private function unlink($templateids, $targetids=null, $clear=false){
 
 		if($clear){
 			$flags = array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY);
@@ -2134,7 +2065,7 @@ COpt::memoryPick();
 		return true;
 	}
 
-	private static function checkCircularLink(&$graph, $current, &$path){
+	private function checkCircularLink(&$graph, $current, &$path){
 
 		if(isset($path[$current])) return false;
 		$path[$current] = $current;

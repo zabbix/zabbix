@@ -47,7 +47,7 @@ class CScreen extends CZBXAPI{
  * @param string $options['order'] deprecated parameter (for now)
  * @return array|boolean Host data as array or false if error
  */
-	public static function get($options=array()){
+	public function get($options=array()){
 		global $USER_DETAILS;
 
 		$result = array();
@@ -456,7 +456,7 @@ SDI('/////////////////////////////////');
 	return $result;
 	}
 
-	public static function exists($data){
+	public function exists($data){
 		$keyFields = array(array('screenid', 'name'));
 
 		$options = array(
@@ -477,7 +477,7 @@ SDI('/////////////////////////////////');
 		return !empty($screens);
 	}
 
-	protected static function checkItems($screenitems){
+	protected function checkItems($screenitems){
 		$hostgroups = array();
 		$hosts = array();
 		$graphs = array();
@@ -608,12 +608,9 @@ SDI('/////////////////////////////////');
  * @param int $screens['vsize']
  * @return array
  */
-	public static function create($screens){
+	public function create($screens){
 		$screens = zbx_toArray($screens);
 		$insert_screen_items = array();
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			$newScreenNames = zbx_objectValues($screens, 'name');
 // Exists
@@ -651,16 +648,7 @@ SDI('/////////////////////////////////');
 			}
 			self::addItems($insert_screen_items);
 
-			self::EndTransaction(true, __METHOD__);
 			return array('screenids' => $screenids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -673,12 +661,9 @@ SDI('/////////////////////////////////');
  * @param int $screens['vsize']
  * @return boolean
  */
-	public static function update($screens){
+	public function update($screens){
 		$screens = zbx_toArray($screens);
 		$update = array();
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			$options = array(
 				'screenids' => zbx_objectValues($screens, 'screenid'),
@@ -729,16 +714,7 @@ SDI('/////////////////////////////////');
 			}
 			DB::update('screens', $update);
 
-			self::EndTransaction(true, __METHOD__);
 			return array('screenids' => zbx_objectValues($screens, 'screenid'));
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -747,11 +723,8 @@ SDI('/////////////////////////////////');
  * @param array $screenids
  * @return boolean
  */
-	public static function delete($screenids){
+	public function delete($screenids){
 		$screenids = zbx_toArray($screenids);
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 		$options = array(
 				'screenids' => $screenids,
@@ -770,14 +743,6 @@ SDI('/////////////////////////////////');
 
 			self::EndTransaction(true, __METHOD__);
 			return array('screenids' => $screenids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -786,7 +751,7 @@ SDI('/////////////////////////////////');
  * @param array $screenitems
  * @return boolean
  */
-	protected static function addItems($screenitems){
+	protected function addItems($screenitems){
 		$insert = array();
 
 		self::checkItems($screenitems);
@@ -812,7 +777,7 @@ SDI('/////////////////////////////////');
 	return true;
 	}
 
-	protected static function updateItems($data){
+	protected function updateItems($data){
 		$screenids = zbx_toArray($data['screenids']);
 		$insert = array();
 		$update = array();

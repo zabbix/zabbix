@@ -50,7 +50,7 @@ class CHostInterface extends CZBXAPI{
  * @param string $options['sortorder'] sort order
  * @return array|boolean Interface data as array or false if error
  */
-	public static function get($options=array()){
+	public function get($options=array()){
 		global $USER_DETAILS;
 
 		$result = array();
@@ -425,7 +425,7 @@ Copt::memoryPick();
 	return $result;
 	}
 
-	public static function exists($object){
+	public function exists($object){
 		$keyFields = array('interfaceid', 'hostid', 'ip', 'dns');
 
 		$options = array(
@@ -445,7 +445,7 @@ Copt::memoryPick();
 	return !empty($objs);
 	}
 
-	protected static function checkInput(&$interfaces, $method){
+	protected function checkInput(&$interfaces, $method){
 		$create = ($method == 'create');
 		$update = ($method == 'update');
 		$delete = ($method == 'delete');
@@ -582,7 +582,7 @@ Copt::memoryPick();
 		}
 	}
 
-	protected static function setMainInterfaces($interfaces){
+	protected function setMainInterfaces($interfaces){
 		$interfaces = zbx_toHash($interfaces, 'hostid');
 		$hostids = array_keys($interfaces);
 
@@ -630,10 +630,8 @@ Copt::memoryPick();
  * @param _array $Interfaces multidimensional array with Interfaces data
  * @return array
  */
-	public static function create($interfaces){
+	public function create($interfaces){
 		$interfaces = zbx_toArray($interfaces);
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			self::checkInput($interfaces, __FUNCTION__);
 
@@ -642,16 +640,7 @@ Copt::memoryPick();
 // auto seting main interfaces
 			self::setMainInterfaces($interfaces);
 
-			self::EndTransaction(true, __METHOD__);
 			return array('interfaceids' => $interfaceids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -660,11 +649,8 @@ Copt::memoryPick();
  * @param _array $interfaces multidimensional array with Interfaces data
  * @return array
  */
-	public static function update($interfaces){
+	public function update($interfaces){
 		$interfaces = zbx_toArray($interfaces);
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			self::checkInput($interfaces, __FUNCTION__);
 
@@ -677,19 +663,8 @@ Copt::memoryPick();
 // auto seting main interfaces
 			self::setMainInterfaces($interfaces);
 
-			self::EndTransaction($result, __METHOD__);
 			return array('interfaceids' => zbx_objectValues($interfaces, 'interfaceid'));
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
-
-
 
 /**
  * Delete Interface
@@ -698,10 +673,7 @@ Copt::memoryPick();
  * @param array $Interfaceids[1, ...] Interface ID to delete
  * @return array|boolean
  */
-	public static function delete($interfaceids){
-
-		try{
-			self::BeginTransaction(__METHOD__);
+	public function delete($interfaceids){
 
 			if(empty($interfaceids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
 
@@ -715,24 +687,12 @@ Copt::memoryPick();
 // auto seting main interfaces
 			self::setMainInterfaces($interfaces);
 
-			self::EndTransaction(true, __METHOD__);
 			return array('interfaceids' => $interfaceids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
-	public static function massAdd($data){
+	public function massAdd($data){
 		$interfaces = zbx_toArray($data['interfaces']);
 		$hosts = zbx_toArray($data['hosts']);
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			$insertData = array();
 			foreach($interfaces as $inum => $interface){
@@ -746,16 +706,7 @@ Copt::memoryPick();
 
 			$interfaceids = self::create($insertData);
 
-			self::EndTransaction(true, __METHOD__);
 			return array('interfaceids' => $interfaceids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -767,14 +718,11 @@ Copt::memoryPick();
  * @param array $data['templateids']
  * @return boolean
  */
-	public static function massRemove($data){
+	public function massRemove($data){
 		$interfaces = zbx_toArray($data['interfaces']);
 		$interfaceids = zbx_objectValues($interfaces, 'interfaceid');
 
 		$hostids = zbx_toArray($data['hostids']);
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			self::checkInput($interfaces, __FUNCTION__);
 
@@ -787,16 +735,7 @@ Copt::memoryPick();
 				));
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('interfaceids' => $interfaceids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 }
 ?>

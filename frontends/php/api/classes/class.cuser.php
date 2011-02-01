@@ -51,7 +51,7 @@ class CUser extends CZBXAPI{
  * @param string $options['sortorder'] output will be sorted in given order [ 'ASC', 'DESC' ]
  * @return array
  */
-	public static function get($options=array()){
+	public function get($options=array()){
 		global $USER_DETAILS;
 
 		$result = array();
@@ -184,34 +184,16 @@ class CUser extends CZBXAPI{
 
 // filter
 		if(is_array($options['filter'])){
-			try{
-				if($options['filter']['passwd']){
-					unset($options['filter']['passwd']);
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('It is not possible to filter by user password') );
-				}
-			}
-			catch(APIException $e){
-				$error = $e->getErrors();
-				$error = reset($error);
-				self::setError(__METHOD__, $e->getCode(), $error);
-				return false;
+			if($options['filter']['passwd']){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('It is not possible to filter by user password'));
 			}
 			zbx_db_filter('users u', $options, $sql_parts);
 		}
 
 // search
 		if(is_array($options['search'])){
-			try{
-				if($options['search']['passwd']){
-					unset($options['search']['passwd']);
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('It is not possible to search by user password') );
-				}
-			}
-			catch(APIException $e){
-				$error = $e->getErrors();
-				$error = reset($error);
-				self::setError(__METHOD__, $e->getCode(), $error);
-				return false;
+			if($options['search']['passwd']){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('It is not possible to search by user password'));
 			}
 			zbx_db_search('users u', $options, $sql_parts);
 		}
@@ -377,7 +359,7 @@ Copt::memoryPick();
  * @param array $user_data['alias'] User alias
  * @return string|boolean
  */
-	public static function getObjects($user_data){
+	public function getObjects($user_data){
 		$result = array();
 		$userids = array();
 
@@ -420,11 +402,8 @@ Copt::memoryPick();
  * @param string $users['user_medias']['period']
  * @return array|boolean
  */
-	public static function create($users){
+	public function create($users){
 		global $USER_DETAILS;
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
@@ -504,16 +483,7 @@ Copt::memoryPick();
 				$userids[] = $userid;
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('userids' => $userids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -541,12 +511,9 @@ Copt::memoryPick();
  * @param string $users['user_medias']['period']
  * @return boolean
  */
-	public static function update($users){
+	public function update($users){
 		global $USER_DETAILS;
 		$self = false;
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_UPDATE_USERS);
@@ -681,23 +648,11 @@ Copt::memoryPick();
 	//*/
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('userids' => $user['userid']);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
-	public static function updateProfile($user){
+	public function updateProfile($user){
 		global $USER_DETAILS;
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			$options = array(
 				'nodeids' => id2nodeid($USER_DETAILS['userid']),
@@ -728,17 +683,7 @@ Copt::memoryPick();
 			if(!$result)
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 
-			self::EndTransaction(true, __METHOD__);
-
 			return $user;
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 /**
  * Delete Users
@@ -747,13 +692,11 @@ Copt::memoryPick();
  * @param array $users[0,...]['userids']
  * @return boolean
  */
-	public static function delete($users){
+	public function delete($users){
 		global $USER_DETAILS;
 
 		$users = zbx_toArray($users);
 		$userids = zbx_objectValues($users, 'userid');
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_DELETE_USERS);
@@ -781,17 +724,7 @@ Copt::memoryPick();
 			DBexecute('DELETE FROM users_groups WHERE '.DBcondition('userid', $userids));
 			DBexecute('DELETE FROM users WHERE '.DBcondition('userid', $userids));
 
-
-			self::EndTransaction(true, __METHOD__);
 			return true;
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -806,11 +739,8 @@ Copt::memoryPick();
  * @param string $media_data['medias']['period']
  * @return boolean
  */
-	public static function addMedia($media_data){
+	public function addMedia($media_data){
 		global $USER_DETAILS;
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			$medias = zbx_toArray($media_data['medias']);
 			$users = zbx_toArray($media_data['users']);
@@ -842,16 +772,7 @@ Copt::memoryPick();
 				}
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('mediaids' => $mediaids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -860,10 +781,9 @@ Copt::memoryPick();
  * @param array $mediaids
  * @return boolean
  */
-	public static function deleteMedia($mediaids){
+	public function deleteMedia($mediaids){
 		global $USER_DETAILS;
 
-		try{
 			$mediaids = zbx_toArray($mediaids);
 
 			if($USER_DETAILS['type'] < USER_TYPE_ZABBIX_ADMIN){
@@ -875,14 +795,6 @@ Copt::memoryPick();
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 
 			return array('mediaids'=>$mediaids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -899,15 +811,12 @@ Copt::memoryPick();
  * @param string $media_data['medias']['period']
  * @return boolean
  */
-	public static function updateMedia($media_data){
+	public function updateMedia($media_data){
 		global $USER_DETAILS;
 
 
 		$new_medias = zbx_toArray($media_data['medias']);
 		$users = zbx_toArray($media_data['users']);
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			if($USER_DETAILS['type'] < USER_TYPE_ZABBIX_ADMIN){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_CUSER_ERROR_ONLY_ADMIN_CAN_CHANGE_USER_MEDIAS);
@@ -972,24 +881,14 @@ Copt::memoryPick();
 				}
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('userids'=>$userids);
-			return true;
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 // ******************************************************************************
 //  LOGIN Methods
 // ******************************************************************************
 
-	public static function login($user){
+	public function login($user){
 		$config = select_config();
 		$user['auth_type'] = $config['authentication_type'];
 
@@ -1006,7 +905,7 @@ Copt::memoryPick();
 		}
 	}
 
-	public static function ldapLogin($user){
+	public function ldapLogin($user){
 		$name = $user['user'];
 		$passwd = $user['password'];
 		$cnf = isset($user['cnf'])?$user['cnf']:null;
@@ -1033,7 +932,7 @@ Copt::memoryPick();
 	return $result;
 	}
 
-	public static function logout($sessionid){
+	public function logout($sessionid){
 		global $ZBX_LOCALNODEID;
 
 		$sql = 'SELECT s.* '.
@@ -1059,7 +958,7 @@ Copt::memoryPick();
  * @param array $user['password'] User password
  * @return string session ID
  */
-	public static function authenticate($user){
+	public function authenticate($user){
 		global $USER_DETAILS, $ZBX_LOCALNODEID;
 
 		$name = $user['user'];
@@ -1178,7 +1077,7 @@ Copt::memoryPick();
  * @param string $sessionid Session ID
  * @return boolean
  */
-	public static function simpleAuth($sessionid){
+	public function simpleAuth($sessionid){
 		global	$USER_DETAILS;
 		global	$ZBX_LOCALNODEID;
 		global	$ZBX_NODES;
@@ -1227,7 +1126,7 @@ Copt::memoryPick();
  * @param array $session['sessionid'] Session ID
  * @return boolean
  */
-	public static function checkAuthentication($user=null){
+	public function checkAuthentication($user=null){
 		global	$USER_DETAILS;
 		global	$ZBX_LOCALNODEID;
 		global	$ZBX_NODES;

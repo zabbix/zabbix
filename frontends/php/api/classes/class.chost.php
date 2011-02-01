@@ -68,7 +68,7 @@ class CHost extends CZBXAPI{
  * @param string $options['sortorder'] sort order
  * @return array|boolean Host data as array or false if error
  */
-	public static function get($options=array()){
+	public function get($options=array()){
 		global $USER_DETAILS;
 
 		$result = array();
@@ -1217,7 +1217,7 @@ Copt::memoryPick();
  * @param string $host_data['host']
  * @return int|boolean
  */
-	public static function getObjects($hostData){
+	public function getObjects($hostData){
 		$options = array(
 			'filter' => $hostData,
 			'output'=>API_OUTPUT_EXTEND
@@ -1233,7 +1233,7 @@ Copt::memoryPick();
 	return $result;
 	}
 
-	public static function exists($object){
+	public function exists($object){
 		$keyFields = array(array('hostid', 'host'));
 
 		$options = array(
@@ -1253,7 +1253,7 @@ Copt::memoryPick();
 	return !empty($objs);
 	}
 
-	protected static function checkInput(&$hosts, $method){
+	protected function checkInput(&$hosts, $method){
 		$create = ($method == 'create');
 		$update = ($method == 'update');
 		$delete = ($method == 'delete');
@@ -1374,12 +1374,9 @@ Copt::memoryPick();
  * @param string $hosts['ipmi_password'] IPMI password. OPTIONAL
  * @return boolean
  */
-	public static function create($hosts){
+	public function create($hosts){
 		$hosts = zbx_toArray($hosts);
 		$hostids = array();
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			self::checkInput($hosts, __FUNCTION__);
 
@@ -1437,16 +1434,7 @@ Copt::memoryPick();
 				}
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('hostids' => $hostids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -1467,12 +1455,9 @@ Copt::memoryPick();
  * @param string $hosts['groups'] groups
  * @return boolean
  */
-	public static function update($hosts){
+	public function update($hosts){
 		$hosts = zbx_toArray($hosts);
 		$hostids = zbx_objectValues($hosts, 'hostid');
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			self::checkInput($hosts, __FUNCTION__);
 
@@ -1525,16 +1510,7 @@ Copt::memoryPick();
 				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed'));
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('hostids' => $hostids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -1546,11 +1522,9 @@ Copt::memoryPick();
  * @param array $data['macros']
  * @return array
  */
-	public static function massAdd($data){
+	public function massAdd($data){
 		$data['hosts'] = zbx_toArray($data['hosts']);
 
-		try{
-			self::BeginTransaction(__METHOD__);
 			$options = array(
 				'hostids' => zbx_objectValues($data['hosts'], 'hostid'),
 				'editable' => 1,
@@ -1610,16 +1584,7 @@ Copt::memoryPick();
 				if(!$result) self::exception();
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('hostids' => zbx_objectValues($data['hosts'], 'hostid'));
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -1641,12 +1606,9 @@ Copt::memoryPick();
  * @param string $hosts['fields']['ipmi_password'] IPMI password. OPTIONAL
  * @return boolean
  */
-	public static function massUpdate($data){
+	public function massUpdate($data){
 		$hosts = zbx_toArray($data['hosts']);
 		$hostids = zbx_objectValues($hosts, 'hostid');
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			$options = array(
 				'hostids' => $hostids,
@@ -1947,16 +1909,7 @@ Copt::memoryPick();
 			}
 // }}} EXTENDED PROFILE
 
-			self::EndTransaction(true, __METHOD__);
 			return array('hostids' => $hostids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -1969,11 +1922,8 @@ Copt::memoryPick();
  * @param array $data['macroids']
  * @return array
  */
-	public static function massRemove($data){
+	public function massRemove($data){
 		$hostids = zbx_toArray($data['hostids']);
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			$options = array(
 				'hostids' => $hostids,
@@ -2033,16 +1983,7 @@ Copt::memoryPick();
 				if(!$result) self::exception();
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('hostids' => $hostids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -2052,10 +1993,7 @@ Copt::memoryPick();
  * @param array $hosts[0, ...]['hostid'] Host ID to delete
  * @return array|boolean
  */
-	public static function delete($hosts){
-
-		try{
-			self::BeginTransaction(__METHOD__);
+	public function delete($hosts){
 
 			if(empty($hosts)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
 
@@ -2168,16 +2106,7 @@ Copt::memoryPick();
 				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $host['hostid'], $host['host'], 'hosts', NULL, NULL);
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('hostids' => $hostids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 }
 ?>

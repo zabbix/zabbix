@@ -68,7 +68,7 @@ class CDHost extends CZBXAPI{
  * @param string $options['sortorder'] sort order
  * @return array|boolean Host data as array or false if error
  */
-	public static function get($options=array()){
+	public function get($options=array()){
 		global $USER_DETAILS;
 
 		$result = array();
@@ -555,7 +555,7 @@ Copt::memoryPick();
 	return $result;
 	}
 
-	public static function exists($object){
+	public function exists($object){
 		$keyFields = array(array('dhostid'));
 
 		$options = array(
@@ -585,19 +585,8 @@ Copt::memoryPick();
  *
  * @param _array $dhosts multidimensional array with Hosts data
  */
-	public static function create($dhosts){
-		$errors = array();
-		$dhosts = zbx_toArray($dhosts);
-		$dhostids = array();
-		$result = false;
+	public function create($dhosts){
 
-		if($result){
-			return array('dhostids' => $dhostids);
-		}
-		else{
-			self::setMethodErrors(__METHOD__, $errors);
-			return false;
-		}
 	}
 
 /**
@@ -611,22 +600,8 @@ Copt::memoryPick();
  *
  * @param _array $dhosts multidimensional array with Hosts data
  */
-	public static function update($dhosts){
-		$dhosts = zbx_toArray($dhosts);
-		$dhostids = zbx_objectValues($dhosts, 'hostid');
+	public function update($dhosts){
 
-		try{
-			return array('dhostids' => $dhostids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-
-			$error = $e->getErrors();
-			$error = reset($error);
-
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -642,17 +617,8 @@ Copt::memoryPick();
  * @param array $dhosts[0, ...]['hostid'] Host ID to delete
  * @return array|boolean
  */
-	public static function delete($dhostids){
-		$result = false;
-		$dhostids = zbx_toArray($dhostids);
+	public function delete($dhostids){
 
-		if($result){
-			return array('hostids' => $dhostids);
-		}
-		else{
-			self::setError(__METHOD__);
-			return false;
-		}
 	}
 }
 ?>
