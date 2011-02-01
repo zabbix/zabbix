@@ -275,7 +275,7 @@
 			preg_match('/\}([=><#]{1})([0-9]+)$/', $_REQUEST['expression'], $match);
 			$exprSymbols = $match;
 			$expr = reset($trigExpr->expressions);
-			if(isset($expr['functionName']) && isset($exprSymbols[1])) $_REQUEST['expr_type'] = $expr.'['.$exprSymbols[1].']';
+			if(isset($expr['functionName']) && isset($exprSymbols[1])) $_REQUEST['expr_type'] = $expr['functionName'].'['.$exprSymbols[1].']';
 			if(isset($expr['functionParamList'])){
 				$_REQUEST['param'] = $expr['functionParamList'];
 				$_REQUEST['paramtype'] = 0;
