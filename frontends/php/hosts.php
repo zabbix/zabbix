@@ -974,7 +974,7 @@ include_once('include/page_header.php');
 			}
 
 			$av_table = new CTable(null, 'invisible');
-			$av_table->addRow(array($zbx_available, $snmp_available, $ipmi_available, $jmx_available));
+			$av_table->addRow(array($zbx_available, $snmp_available, $jmx_available, $ipmi_available));
 
 			if(empty($host['parentTemplates'])){
 				$hostTemplates = '-';

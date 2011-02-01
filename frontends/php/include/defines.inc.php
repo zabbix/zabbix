@@ -318,6 +318,7 @@
 	define('ITEM_DATA_TYPE_DECIMAL',		0);
 	define('ITEM_DATA_TYPE_OCTAL',			1);
 	define('ITEM_DATA_TYPE_HEXADECIMAL',	2);
+	define('ITEM_DATA_TYPE_BOOLEAN',	3);
 
 	define('ITEM_STATUS_ACTIVE',		0);
 	define('ITEM_STATUS_DISABLED',		1);
