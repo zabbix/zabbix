@@ -29,11 +29,11 @@
 		<input type="radio" id="radio_snmp_#{interfaceid}" name="interfaces[#{interfaceid}][type]" value="<?php print(INTERFACE_TYPE_SNMP);?>" #{*checked_snmp} />
 		<label for="radio_snmp_#{interfaceid}"><?php print(S_SNMP);?></label>
 
-		<input type="radio" id="radio_ipmi_#{interfaceid}" name="interfaces[#{interfaceid}][type]" value="<?php print(INTERFACE_TYPE_IPMI);?>" #{*checked_ipmi} />
-		<label for="radio_ipmi_#{interfaceid}"><?php print(S_IPMI);?></label>
-
 		<input type="radio" id="radio_jmx_#{interfaceid}" name="interfaces[#{interfaceid}][type]" value="<?php print(INTERFACE_TYPE_JMX);?>" #{*checked_jmx} />
 		<label for="radio_jmx_#{interfaceid}"><?php print(S_JMX);?></label>
+
+		<input type="radio" id="radio_ipmi_#{interfaceid}" name="interfaces[#{interfaceid}][type]" value="<?php print(INTERFACE_TYPE_IPMI);?>" #{*checked_ipmi} />
+		<label for="radio_ipmi_#{interfaceid}"><?php print(S_IPMI);?></label>
 	</div>
 </td>
 <td>

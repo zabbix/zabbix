@@ -1154,6 +1154,7 @@
 	'S_DECIMAL'=>						_('Decimal'),
 	'S_OCTAL'=>						_('Octal'),
 	'S_HEXADECIMAL'=>					_('Hexadecimal'),
+	'S_BOOLEAN'=>					_('Boolean'),
 	'S_STORE_VALUE'=>					_('Store value'),
 	'S_SHOW_VALUE'=>					_('Show value'),
 	'S_NUMERIC_UINT64'=>					_('Numeric (integer 64bit)'),
