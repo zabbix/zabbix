@@ -1789,9 +1789,6 @@
 				zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'interfaceid');
 				zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'interface_row');
 				zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'interfaceid');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'interface_row');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'interfaceid');
-
 			}
 		}
 
@@ -1891,7 +1888,7 @@
 				case ITEM_TYPE_TELNET:
 					zbx_subarray_push($typeVisibility, $it, array('id'=>'key', 'defaultValue'=> 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]'));
 				case ITEM_TYPE_JMX:
-					zbx_subarray_push($typeVisibility, $it, array('id'=>'key', 'defaultValue'=> 'jmx.run[<unique short description>,<ip>,<port>,<encoding>]'));
+					zbx_subarray_push($typeVisibility, $it, array('id'=>'key', 'defaultValue'=> 'jmx[<object name>,<attribute name>]'));
 				break;
 				default:
 					zbx_subarray_push($typeVisibility, $it, 'key');
@@ -1952,7 +1949,6 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$spanEC->setAttribute('id', 'label_executed_script');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'label_executed_script');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'label_executed_script');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'label_executed_script');
 
 		$spanP = new CSpan(S_PARAMS);
 		$spanP->setAttribute('id', 'label_params');
@@ -1980,8 +1976,6 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'row_params');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'params_script');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'row_params');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'params_script');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'row_params');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_DB_MONITOR, 'params_dbmonitor');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_DB_MONITOR, 'row_params');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_CALCULATED, 'params_calculted');
