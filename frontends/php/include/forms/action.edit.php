@@ -406,7 +406,7 @@ require_once('include/templates/action.js.php');
 		$footer[] = new CSubmit('new_operation',_('New'),null,'link_menu');
 
 	if($tblOper->ItemsCount() > 0 ){
-		$footer[] = SPACE;
+		$footer[] = SPACE.SPACE;
 		$footer[] = new CSubmit('del_operation',_('Remove selected'), null, 'link_menu');
 	}
 
@@ -473,7 +473,6 @@ require_once('include/templates/action.js.php');
 			$cmbOpType->addItem($oper, operation_type2str($oper));
 
 		$tblOper->addRow(array(S_OPERATION_TYPE, $cmbOpType));
-//SDII($data['operations']);
 		switch($new_operation['operationtype']) {
 			case OPERATION_TYPE_MESSAGE:
 				if(!isset($new_operation['opmessage'])){
@@ -569,7 +568,7 @@ require_once('include/templates/action.js.php');
 				$cmdList = new CTable();
 				$cmdList->addRow(array(_('Target'), _('Command'), SPACE));
 
-				$addCmdBtn = new CButton('add', _('Add'), "javascript: showOpCmdForm(0,'new');",'link_menu');
+				$addCmdBtn = new CButton('add', _('New'), "javascript: showOpCmdForm(0,'new');",'link_menu');
 
 				$col = new CCol($addCmdBtn);
 				$col->setAttribute('colspan', 3);
@@ -744,7 +743,7 @@ require_once('include/templates/action.js.php');
 				$cond_buttons[] = new CSubmit('new_opcondition', _('New'), null, 'link_menu');
 			}
 			if($cond_el->ItemsCount() > 0){
-				$cond_buttons[] = SPACE;
+				$cond_buttons[] = SPACE.SPACE;
 				$cond_buttons[] = new CSubmit('del_opcondition', _('Remove selected'), null, 'link_menu');
 			}
 
@@ -790,8 +789,8 @@ require_once('include/templates/action.js.php');
 		}
 
 		$footer = array(
-			new CSubmit('add_operation', $update_mode ? _('Save') : _('Add'), null, 'link_menu'),
-			SPACE,
+			new CSubmit('add_operation', $update_mode ? _('Update') : _('Add'), null, 'link_menu'),
+			SPACE.SPACE,
 			new CSubmit('cancel_new_operation', _('Cancel'), null, 'link_menu')
 		);
 

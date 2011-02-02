@@ -117,8 +117,7 @@
 </tbody></table>
 <div>
 	<input type="button" class="input link_menu" name="save" value="#{operationName}" />
-	&nbsp;
-	<input type="button" class="input link_menu" name="cancel" value="<?php print(_('Cancel')); ?>" />
+	&nbsp;<input type="button" class="input link_menu" name="cancel" value="<?php print(_('Cancel')); ?>" />
 </div>
 </div>
 </script>
@@ -357,11 +356,11 @@ function changeOpCmdTarget(){
 }
 
 function closeOpCmdForm(){
-	if(Confirm("<?php print(_('Close currently opened remote command details without saving?')); ?>")){
+//	if(Confirm("<?php print(_('Close currently opened remote command details without saving?')); ?>")){
 		jQuery('#opCmdDraft').attr('id', jQuery('#opCmdDraft').attr('origid'));
 		jQuery("#opcmdEditForm").remove();
 		return true;
-	}
+//	}
 	return false;
 }
 
