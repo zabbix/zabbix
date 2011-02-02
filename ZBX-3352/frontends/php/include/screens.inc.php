@@ -925,8 +925,23 @@ require_once('include/js.inc.php');
 					}
 //-------------
 
+		$diffHosts = false;
+		if($resourceid && $dynamic == SCREEN_DYNAMIC_ITEM && isset($_REQUEST['hostid']) && $_REQUEST['hostid'] > 0){
+			$options = array(
+					'graphids' => $resourceid,
+					'select_hosts' => array('hostid')
+			);
+			$graphs = CGraph::get($options);
+			$graphs = reset($graphs);
+			if(isset($graphs['hosts']) && count($graphs['hosts']) > 1){
+				$diffHosts = true;
+			}
+		}
+
+
 // Host feature
-					if(($dynamic == SCREEN_DYNAMIC_ITEM) && isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0)){
+					if($diffHosts && ($dynamic == SCREEN_DYNAMIC_ITEM) && isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0)){
+
 						$options = array(
 							'hostids' => $_REQUEST['hostid'],
 							'output' => API_OUTPUT_EXTEND
