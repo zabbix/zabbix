@@ -345,7 +345,6 @@ include_once('include/page_header.php');
 			));
 
 			if($CSV_EXPORT){
-
 				$csvRows[] = array(
 					S_TIME,
 					S_IP,
