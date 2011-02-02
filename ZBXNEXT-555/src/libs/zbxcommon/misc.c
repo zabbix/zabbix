@@ -589,26 +589,27 @@ static int	get_next_delay_interval(const char *flex_intervals, time_t now, time_
  *           !!! Don't forget to sync code with PHP !!!                       *
  *                                                                            *
  ******************************************************************************/
-int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay,
-		const char *flex_intervals, time_t now, int *effective_delay)
+int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int item_type,
+		int delay, const char *flex_intervals, time_t now, int *effective_delay)
 {
 	int	nextcheck;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In calculate_item_nextcheck (" ZBX_FS_UI64 ",%d,\"%s\",%d)",
-			itemid, delay, NULL == flex_intervals ? "" : flex_intervals, now);
+	zabbix_log(LOG_LEVEL_DEBUG, "In calculate_item_nextcheck(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,\"%s\",%d)",
+			interfaceid, itemid, delay, NULL == flex_intervals ? "" : flex_intervals, now);
 
 	if (0 == delay)
 		delay = SEC_PER_YEAR;
 
-	/* Special processing of active items to see better view in queue */
-	if (item_type == ITEM_TYPE_ZABBIX_ACTIVE)
+	/* special processing of active items to see better view in queue */
+	if (ITEM_TYPE_ZABBIX_ACTIVE == item_type)
 	{
 		nextcheck = (int)now + delay;
 	}
 	else
 	{
-		int	current_delay;
-		time_t	next_interval;
+		int		current_delay;
+		time_t		next_interval;
+		zbx_uint64_t	shift;
 
 		current_delay = get_current_delay(delay, flex_intervals, now);
 
@@ -631,7 +632,8 @@ int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay,
 		}
 
 		delay = current_delay;
-		nextcheck = delay * (int)(now / (time_t)delay) + (int)(itemid % (zbx_uint64_t)delay);
+		shift = (ITEM_TYPE_JMX == item_type ? interfaceid : itemid);
+		nextcheck = delay * (int)(now / (time_t)delay) + (int)(shift % (zbx_uint64_t)delay);
 
 		while (nextcheck <= now)
 			nextcheck += delay;
@@ -640,7 +642,7 @@ int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay,
 	if (NULL != effective_delay)
 		*effective_delay = delay;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End calculate_item_nextcheck (nextcheck:%d delay:%d)", nextcheck, delay);
+	zabbix_log(LOG_LEVEL_DEBUG, "End calculate_item_nextcheck(nextcheck:%d delay:%d)", nextcheck, delay);
 
 	return nextcheck;
 }

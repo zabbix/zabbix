@@ -36,6 +36,11 @@ class ZabbixItem
 		this.key = key;
 	}
 
+	public String getKey()
+	{
+		return key;
+	}
+
 	public String getKeyId()
 	{
 		return keyId;

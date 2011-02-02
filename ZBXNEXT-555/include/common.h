@@ -149,6 +149,7 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #define	NETWORK_ERROR	(-3)
 #define	TIMEOUT_ERROR	(-4)
 #define	AGENT_ERROR	(-5)
+#define	PROXY_ERROR	(-6)
 const char	*zbx_result_string(int result);
 
 #define MAX_STRING_LEN	2048
@@ -156,7 +157,7 @@ const char	*zbx_result_string(int result);
 
 #define ZBX_DM_DELIMITER	'\255'
 
-typedef struct zbx_timespec
+typedef struct
 {
 	int	sec;	/* seconds */
 	int	ns;	/* nanoseconds */
@@ -778,8 +779,8 @@ const char	*get_string(const char *p, char *buf, size_t bufsize);
 int	get_key_param(char *param, int num, char *buf, int maxlen);
 int	num_key_param(char *param);
 char	*dyn_escape_param(const char *src);
-int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay,
-		const char *delay_flex, time_t now, int *effective_delay);
+int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int item_type,
+		int delay, const char *flex_intervals, time_t now, int *effective_delay);
 time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t now);
 int	check_time_period(const char *period, time_t now);
 char	zbx_num2hex(u_char c);

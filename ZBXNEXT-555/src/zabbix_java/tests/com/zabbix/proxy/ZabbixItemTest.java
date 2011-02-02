@@ -123,6 +123,7 @@ public class ZabbixItemTest
 		{
 			ZabbixItem item = new ZabbixItem(testCases[i].key);
 
+			assertEquals("bad key back for key '" + testCases[i].key + "'", testCases[i].key, item.getKey());
 			assertEquals("bad key id for key '" + testCases[i].key + "'", testCases[i].keyId, item.getKeyId());
 			assertEquals("bad number of arguments for key '" + testCases[i].key + "'", testCases[i].args.length, item.getArgumentCount());
 

@@ -324,12 +324,17 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 	clock = trends[0].clock;
 	value_type = trends[0].value_type;
 
-	switch (value_type) {
-	case ITEM_VALUE_TYPE_FLOAT: table_name = "trends"; break;
-	case ITEM_VALUE_TYPE_UINT64: table_name = "trends_uint"; break;
-	default:
-		zbx_error("Unsupported value type for trends");
-		assert(0 == 1);
+	switch (value_type)
+	{
+		case ITEM_VALUE_TYPE_FLOAT:
+			table_name = "trends";
+			break;
+		case ITEM_VALUE_TYPE_UINT64:
+			table_name = "trends_uint";
+			break;
+		default:
+			zbx_error("Unsupported value type for trends: %d", (int)value_type);
+			assert(0);
 	}
 
 	ids = zbx_malloc(ids, ids_alloc * sizeof(zbx_uint64_t));
