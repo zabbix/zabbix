@@ -219,7 +219,13 @@ function __autoload($class_name){
 	}
 
 	if(!defined('ZBX_PAGE_NO_AUTHORIZATION') && !defined('ZBX_RPC_REQUEST')){
-		check_authorisation();
+		if(!CWebUser::checkAuthentication(get_cookie('zbx_sessionid'))){
+			include_once('include/locales/en_gb.inc.php');
+			process_locales();
+
+			include('index.php');
+			exit();
+		}
 
 		if(function_exists('bindtextdomain')){
 			//initializing gettext translations depending on language selected by user

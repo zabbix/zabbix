@@ -2273,12 +2273,8 @@
 	'S_REQUIRED_GETTEXT_MODULE' => _('Required gettext module'),
 
 //	class.cuser.php
-	'S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_SECONDS_FIRST_PART'=> _('Account is blocked for'),
-	'S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_SECONDS_SECOND_PART'=>	_('seconds'),
-	'S_CUSER_ERROR_LOGIN_OR_PASSWORD_INCORRECT'=>		_('Login name or password is incorrect'),
 	'S_CUSER_ERROR_SESSION_TERMINATED'=>			_('Session terminated, please re-login!'),
 	'S_CUSER_ERROR_TABLE_USERS_EMPTY'=>			_('Table users is empty. Possible database corruption.'),
-	'S_CUSER_ERROR_LDAP_MODULE_MISSING'=>			_('Probably php-ldap module is missing'),
 	'S_CUSER_ERROR_FAILED_LOGIN_ATTEMPTS'=>				_('failed login attempts logged.'),
 	'S_CUSER_ERROR_LAST_FAILED_ATTEMPTS'=>				_('Last failed attempt was from'),
 	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_UPDATE_USERS'=>		_('Only Super Admins can update Users'),

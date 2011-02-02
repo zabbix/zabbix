@@ -43,19 +43,18 @@ $page['file']	= 'index.php';
 	check_fields($fields);
 ?>
 <?php
-	$sessionid = get_cookie('zbx_sessionid', null);
+	$sessionid = get_cookie('zbx_sessionid');
 
 	if(isset($_REQUEST['reconnect']) && isset($sessionid)){
-		add_audit(AUDIT_ACTION_LOGOUT,AUDIT_RESOURCE_USER,'Manual Logout');
+		add_audit(AUDIT_ACTION_LOGOUT,AUDIT_RESOURCE_USER, 'Manual Logout');
 
-		API::User()->logout($sessionid);
+		CWebUser::logout($sessionid);
 
 		jsRedirect('index.php');
 		exit();
 	}
 
 	$config = select_config();
-
 	$authentication_type = $config['authentication_type'];
 
 	if($authentication_type == ZBX_AUTH_HTTP){
@@ -71,18 +70,13 @@ $page['file']	= 'index.php';
 	}
 
 	$request = get_request('request');
-	if(isset($_REQUEST['enter'])&&($_REQUEST['enter']=='Enter')){
+	if(isset($_REQUEST['enter']) && ($_REQUEST['enter'] == 'Enter')){
 		global $USER_DETAILS;
-		$name = get_request('name','');
-		$passwd = get_request('password','');
 
-
-		$login = API::User()->authenticate(array('user'=>$name, 'password'=>$passwd, 'auth_type'=>$authentication_type));
+		$login = CWebUser::login(get_request('name', ''), get_request('password', ''));
 
 		if($login){
-			$url = is_null($request)?$USER_DETAILS['url']:$request;
-
-			add_audit_ext(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, $USER_DETAILS['userid'], '', null,null,null);
+			$url = is_null($request) ? $USER_DETAILS['url'] : $request;
 
 			jsRedirect($url);
 			exit();
