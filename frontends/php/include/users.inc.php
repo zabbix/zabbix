@@ -186,13 +186,6 @@
 	return $res;
 	}
 
-	function change_group_api_access($usrgrpids, $api_access){
-		zbx_value2array($usrgrpids);
-		$res = false;
-		$res = DBexecute('UPDATE usrgrp SET api_access='.$api_access.' WHERE '.DBcondition('usrgrpid',$usrgrpids));
-	return $res;
-	}
-
 	function change_group_debug_mode($usrgrpids, $debug_mode){
 		zbx_value2array($usrgrpids);
 		$res = false;
