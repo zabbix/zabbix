@@ -700,8 +700,8 @@ COpt::memoryPick();
 				if(!check_db_fields($action_db_fields, $action))
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect parameter is used for action "%s"', $action['name']));
 
-				if(isset($action['esc_period']) && ($action['esc_period'] < 60) && ($action['esc_period'] != 0))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" has incorrect value for "esc_period" (minimal: 60, infinitely: 0).', $action['name']));
+				if(isset($action['esc_period']) && ($action['esc_period'] < 60) && (EVENT_SOURCE_TRIGGERS == $action['eventsource']))
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" has incorrect value for "esc_period" (minimal 60 seconds).', $action['name']));
 
 				if(isset($duplicates[$action['name']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" already exists.', $action['name']));
@@ -788,14 +788,14 @@ COpt::memoryPick();
 			$options = array(
 				'actionids' => $actionids,
 				'editable' => true,
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => true,
 				'selectOperations' => API_OUTPUT_EXTEND,
 				'selectConditions' => API_OUTPUT_EXTEND,
 			);
 			$updActions = self::get($options);
 			foreach($actions as $anum => $action){
-				if(!isset($updActions[$action['actionid']])){
+				if(isset($action['actionid']) && !isset($updActions[$action['actionid']])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
 				}
 			}
@@ -804,11 +804,18 @@ COpt::memoryPick();
 			$duplicates = array();
 			foreach($actions as $anum => $action){
 				if(!check_db_fields(array('actionid' => null), $action)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_PARAMETER_USED_FOR_ACTION.' [ '.$action['name'].' ]');
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect parameters are used for action update method "%s"',$action['name']));
 				}
-				if(isset($action['esc_period']) && ($action['esc_period'] < 60) && ($action['esc_period'] != 0))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" has incorrect value for "esc_period" (minimal: 60, infinitely: 0).', $action['name']));
 
+// check if user change esc_period or eventsource
+				if(isset($action['esc_period']) || isset($action['eventsource'])){
+					$eventsource = isset($action['eventsource']) ? $action['eventsource']: $updActions[$action['actionid']]['eventsource'];
+					$esc_period = isset($action['esc_period']) ? $action['esc_period']: $updActions[$action['actionid']]['esc_period'];
+
+					if(($esc_period < 60) && (EVENT_SOURCE_TRIGGERS == $eventsource))
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" has incorrect value for "esc_period" (minimal 60 seconds).', $action['name']));
+				}
+//--
 				if(!isset($action['name'])) continue;
 
 				if(isset($duplicates[$action['name']]))
@@ -1108,11 +1115,15 @@ COpt::memoryPick();
 						$opcommand_grpDeleteByOpId[] = $operationDb['operationid'];
 						break;
 					case OPERATION_TYPE_GROUP_ADD:
+						if($operation['operationtype'] == OPERATION_TYPE_GROUP_REMOVE) break;
 					case OPERATION_TYPE_GROUP_REMOVE:
+						if($operation['operationtype'] == OPERATION_TYPE_GROUP_ADD) break;
 						$opgroupDeleteByOpId[] = $operationDb['operationid'];
 						break;
 					case OPERATION_TYPE_TEMPLATE_ADD:
+						if($operation['operationtype'] == OPERATION_TYPE_TEMPLATE_REMOVE) break;
 					case OPERATION_TYPE_TEMPLATE_REMOVE:
+						if($operation['operationtype'] == OPERATION_TYPE_TEMPLATE_ADD) break;
 						$optemplateDeleteByOpId[] = $operationDb['operationid'];
 						break;
 				}
@@ -1225,6 +1236,7 @@ COpt::memoryPick();
 				case OPERATION_TYPE_GROUP_REMOVE:
 					if(!isset($operation['opgroup'])) $operation['opgroup'] = array();
 					else zbx_array_push($operation['opgroup'], array('operationid' => $operation['operationid']));
+
 					if(!isset($operationDb['opgroup'])) $operationDb['opgroup'] = array();
 
 					$diff = zbx_array_diff($operationDb['opgroup'], $operation['opgroup'], 'groupid');
@@ -1240,6 +1252,7 @@ COpt::memoryPick();
 				case OPERATION_TYPE_TEMPLATE_REMOVE:
 					if(!isset($operation['optemplate'])) $operation['optemplate'] = array();
 					else zbx_array_push($operation['optemplate'], array('operationid' => $operation['operationid']));
+
 					if(!isset($operationDb['optemplate'])) $operationDb['optemplate'] = array();
 
 					$diff = zbx_array_diff($operationDb['optemplate'], $operation['optemplate'], 'templateid');
@@ -1369,6 +1382,10 @@ COpt::memoryPick();
 			}
 
 			if(isset($operation['esc_step_from'], $operation['esc_step_to'])){
+				if(($operation['esc_step_from'] < 1) || ($operation['esc_step_to'] < 0)){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation escalation step values.'));
+				}
+
 				if(($operation['esc_step_from'] > $operation['esc_step_to']) && ($operation['esc_step_to'] != 0)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation escalation step values.'));
 				}

@@ -145,7 +145,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			if(isset($op['opmessage']) && !isset($op['opmessage']['default_msg']))
 				$action['operations'][$anum]['opmessage']['default_msg'] = 0;
 		}
-
+		DBstart();
 		if(isset($_REQUEST['actionid'])){
 			foreach($action['operations'] as $opnum => $operation){
 				if(isset($operation['opcommand_grp']))
@@ -171,6 +171,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			show_messages($result,S_ACTION_ADDED,S_CANNOT_ADD_ACTION);
 		}
 
+		$result = DBend($result);
 		if($result){
 			add_audit(!isset($_REQUEST['actionid'])?AUDIT_ACTION_ADD:AUDIT_ACTION_UPDATE,
 				AUDIT_RESOURCE_ACTION,
@@ -356,7 +357,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			$action['name']			= get_request('name');
 			$action['eventsource']	= get_request('eventsource');
 			$action['evaltype']		= get_request('evaltype', 0);
-			$action['esc_period']	= get_request('esc_period', 60);
+			$action['esc_period']	= get_request('esc_period', 3600);
 			$action['status']		= get_request('status', isset($_REQUEST['form_refresh']) ? 1 : 0);
 			$action['def_shortdata']= get_request('def_shortdata', ACTION_DEFAULT_SUBJ);
 			$action['def_longdata']	= get_request('def_longdata', ACTION_DEFAULT_MSG);
