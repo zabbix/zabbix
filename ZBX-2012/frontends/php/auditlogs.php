@@ -41,7 +41,7 @@ include_once('include/page_header.php');
 		'hostid'=>			array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,	NULL),
 // filter
 		'action'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(-1,6),	NULL),
-		'resourcetype'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(-1,28),	NULL),
+		'resourcetype'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(-1,30),	NULL),
 		'filter_rst'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
 		'filter_set'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
 		'alias' =>			array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),

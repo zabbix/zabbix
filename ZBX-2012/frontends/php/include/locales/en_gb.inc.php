@@ -24,8 +24,6 @@
 	$TRANSLATION=array(
 
 	'S_DATE_FORMAT_YMDHMS'=>		'd M Y H:i:s',
-	'S_DATE_FORMAT_YMD'=>			'd M Y',
-	'S_TIMELINE_DATE_FORMAT'=>		'd.M',
 	'S_HTML_CHARSET'=>			'UTF-8',
 
 	'S_YEAR_SHORT'=>			'y',
@@ -102,6 +100,7 @@
 	'S_CONFIGURATION_OF_DISCOVERY'=>	'Configuration of discovery',
 	'S_CONFIGURATION_OF_DISCOVERY_BIG'=>	'CONFIGURATION OF DISCOVERY',
 	'S_NO_DISCOVERY_RULES_DEFINED'=>	'No discovery rules defined',
+	'S_NO_DISCOVERY_CHECKS_DEFINED'=>	'No discovery checks defined',
 	'S_IP_RANGE'=>				'IP range',
 	'S_CHECKS'=>				'Checks',
 	'S_CREATE_RULE'=>			'Create rule',
@@ -217,24 +216,15 @@
 
 //	exp_imp.php
 	'S_ELEMENT'=>				'Element',
-	'S_ELEMENTS'=>				'Elements',
-	'S_ONLY_HOST_INFO'=>			'Only host info',
-	'S_EXPORT_IMPORT'=>			'Export/Import',
 	'S_IMPORT_FILE'=>			'Import file',
 	'S_IMPORT'=>				'Import',
-	'S_IMPORT_BIG'=>			'IMPORT',
-	'S_EXPORT'=>				'Export',
 	'S_EXPORT_SELECTED'=>		'Export selected',
-	'S_EXPORT_BIG'=>			'EXPORT',
 	'S_PREVIEW'=>				'Preview',
-	'S_BACK'=>				'Back',
 	'S_BACK_BIG'=>				'BACK',
-	'S_NO_DATA_FOR_EXPORT'=>		'No data for export',
 	'S_NO_DATA_SMALL'=>			'no data',
 	'S_RULES'=>				'Rules',
 	'S_EXISTING'=>				'Existing',
 	'S_MISSING'=>				'Missing',
-	'S_REFRESH'=>				'Refresh',
 	'S_REFRESH_TIME_IN_SECONDS'=> 'Refresh time in seconds',
 	'S_REFRESH_TIME_MULTIPLIER' => 'Refresh time multiplier',
 	'S_IMPORTED'=>				'Imported',
@@ -266,7 +256,6 @@
 	'S_INCORRECT_PARAMETER_USED_FOR_CONDITIONS'=>	'Incorrect parameter used for Conditions',
 	'S_INCORRECT_PARAMETER_USED_FOR_OPERATIONS'=>	'Incorrect parameter used for Operations',
 	'S_INCORRECT_PARAMETER_USED_FOR_ACTION'=>	'Incorrect parameter used for Action',
-	'S_EMPTY_INPUT_PARAMETER'=>	'Empty input parameter',
 
 //	node.php
 	'S_TIME_ZONE'=>				'Time zone',
@@ -330,8 +319,6 @@
 	'S_OPERATIONS'=>			'Operations',
 	'S_EDIT_OPERATION'=>			'Edit operation',
 	'S_NO_CONDITIONS_DEFINED'=>		'No conditions defined',
-	'S_ACTIONS_DELETED'=>			'Actions deleted',
-	'S_CANNOT_DELETE_ACTIONS'=>		'Cannot delete actions',
 	'S_NO_OPERATIONS_DEFINED'=>		'No operations defined',
 	'S_NEW'=>				'New',
 	'S_ADD_HOST'=>				'Add host',
@@ -364,8 +351,12 @@
 	'S_INCORRECT_STEPS'=>			'Incorrect steps',
 	'S_SELECTED_ACTIONS'=>			'selected actions?',
 
+	'S_SELECTED_ACTIONS_DELETED' => 'Selected actions deleted.',
+	'S_CANNOT_DELETE_SELECTED_ACTIONS' => 'Cannot delete selected actions.',
+
 //	actions.php
 	'S_ACTIONS'=>				'Actions',
+	'S_INCORRECT_ESCALATION_PERIOD' => 'Incorrect escalation period',
 	'S_LOGS'=>				'Logs',
 	'S_LOGS_BIG'=>				'LOGS',
 	'S_ACTIONS_BIG'=>			'ACTIONS',
@@ -386,7 +377,6 @@
 	'S_DEFAULT_SUBJECT'=>			'Default subject',
 	'S_MESSAGE'=>				'Message',
 	'S_ON_BIG'=>				'ON',
-	'S_OFF_BIG'=>				'OFF',
 	'S_ON'=>					'On',
 	'S_OFF'=>					'Off',
 	'S_NO_ACTIONS_DEFINED'=>		'No actions defined',
@@ -414,7 +404,6 @@
 	'S_IN_SMALL'=>				'in',
 	'S_NOT_IN_SMALL'=>			'not in',
 	'S_RETRIES_LEFT'=>			'Retries left',
-	'S_ACTIONS_SINCE'=>			'Actions since',
 
 //	alarms.php
 	'S_SHOW_ALL'=>				'Show all',
@@ -450,9 +439,7 @@
 //	charts.php
 	'S_CUSTOM_GRAPHS'=>			'Custom graphs',
 	'S_GRAPHS_BIG'=>			'GRAPHS',
-	'S_SELECT_GRAPH_TO_DISPLAY'=>		'Select graph to display',
 	'S_PERIOD'=>				'Period',
-	'S_SELECT_GRAPH_DOT_DOT_DOT'=>		'Select graph...',
 	'S_FULLSCREEN'=>			'Fullscreen',
 	'S_VIEW'=>				'View',
 
@@ -526,8 +513,6 @@
 	'S_MEDIA_TYPES'=>				'Media types',
 	'S_ESCALATION_RULES'=>				'Escalation rules',
 	'S_ENABLE_ESCALATIONS'=>			'Enable escalations',
-	'S_ESCALATION'=>				'Escalation',
-	'S_ESCALATION_RULE'=>				'Escalation rule',
 	'S_DEFAULT'=>					'Default',
 	'S_IMAGES'=>					'Images',
 	'S_IMAGE'=>					'Image',
@@ -593,6 +578,9 @@
 
 	'S_VALUE_MAPS_CREATE_NUM_STRING'=>		'Value maps are used to create a mapping between numeric values and string representations',
 	'S_DELETE_SELECTED_VALUE_MAPPING'=>		'Delete selected value mapping?',
+
+	'S_CANNOT_REMOVE_MACRO' => 'Cannot remove macro',
+	'S_CANNOT_UPDATE_MACRO' => 'Cannot update macro',
 
 // media_types.php
 	'S_DELETE_SELECTED_MEDIATYPES_Q'=>		'Delete selected media types?',
@@ -722,7 +710,6 @@
 	'S_GRAPH_SUM'=>				'Graph sum',
 	'S_GRAPH_ITEM'=>			'Graph item',
 	'S_REQUIRED_ITEMS_FOR_GRAPH'=>		'Items required for graph',
-	'S_TEMPLATED_GRAPH'=>			'Templated graph',
 	'S_NO_TARGET_SELECTED'=>		'No target selected',
 	'S_DELETE_SELECTED_GRAPHS'=>		'Delete selected graphs?',
 
@@ -739,7 +726,6 @@
 	'S_SOURCE'=>				'Source',
 	'S_EVENT_ID'=>				'Event ID',
 	'S_HIDE_UNKNOWN'=>			'Hide unknown',
-	'S_LOG_FILES_SMALL'=>			'log files',
 	'S_REMOVE_SELECTED'=>			'Remove selected',
 	'S_ITEMS_LIST'=>				'Items list',
 	'S_SHOW_SELECTED'=>			'Show selected',
@@ -777,7 +763,6 @@
 	'S_CANNOT_DELETE_MAINTENANCE'=>		'Cannot delete maintenance',
 
 	'S_MAINTENANCE_PERIOD_LENGTH'=>		'Maintenance period length',
-	'S_MAINTENANCE_PERIODS'=>		'Maintenance periods',
 	'S_MAINTENANCE_PERIODS_BIG'=>		'MAINTENANCE PERIODS',
 	'S_NEW_MAINTENANCE_PERIOD'=>		'New maintenance period',
 	'S_EDIT_MAINTENANCE_PERIOD'=>		'Edit maintenance period',
@@ -799,7 +784,6 @@
 	'S_PERIOD_TYPE'=>			'Period type',
 
 	'S_SCHEDULE'=>				'Schedule',
-	'S_NEXT_RUN'=>				'Next run',
 
 	'S_DATE'=>				'Date',
 	'S_ONE_TIME_ONLY'=>			'One time only',
@@ -853,16 +837,10 @@
 	'S_WRONG_MACRO'=>				'Wrong macro',
 	'S_MACRO_TOO_LONG'=>				'Macro name is too long, should not exceed 64 chars.',
 	'S_MACRO_VALUE_TOO_LONG'=>			'Macro value is too long, should not exceed 255 chars.',
-	'S_MACRO_EXISTS'=>				'Macro already exists',
-	'S_NEW_MACRO'=>					'New macro',
 	'S_EMPTY_MACRO_VALUE'=>				'Empty macro value',
-	'S_NO_MACROS_DEFINED'=>				'No macros defined',
-	'S_MACRO_ADDED'=>				'Macro added',
 	'S_MACROS_UPDATED'=>				'Macros updated',
 	'S_CANNOT_UPDATE_MACROS'=>				'Cannot update macros',
-	'S_MACROS_DELETED' =>				'Macros deleted',
 	'S_CANNOT_ADD_MACRO'=>				'Cannot add macro',
-	'S_CANNOT_DELETE_MACROS'=>			'Cannot delete macros',
 	'S_HOST_LIST'=>					'Hosts list',
 	'S_OTHER_GROUPS' => 'Other groups',
 	'S_IN_GROUPS' => 'In groups',
@@ -960,8 +938,6 @@
 	'S_CREATE_PROXY'=>				'Create Proxy',
 	'S_PROXY_NAME'=>				'Proxy name',
 	'S_LASTSEEN_AGE'=>				'Last seen (age)',
-	'S_HOST_MACRO'=>				'Host macro',
-	'S_DOESNT_EXIST'=>				'doesn\'t exist',
 	'S_EMPTY_INPUT_PARAMETER'=>			'Empty input parameter',
 	'S_ENABLE_SELECTED_HOSTS'=>			'Enable selected hosts?',
 	'S_DISABLE_SELECTED_HOSTS_Q'=>			'Disable selected hosts?',
@@ -1163,7 +1139,6 @@
 	'S_SNMPV3_PRIV_PASSPHRASE'=>				'SNMPv3 priv passphrase',
 	'S_CUSTOM_MULTIPLIER'=>					'Custom multiplier',
 	'S_USE_CUSTOM_MULTIPLIER'=>				'Use custom multiplier',
-	'S_SELECT_HOST_DOT_DOT_DOT'=>				'Select host...',
 	'S_LOG_TIME_FORMAT'=>					'Log time format',
 	'S_CREATE_ITEM'=>					'Create Item',
 	'S_X_ELEMENTS_COPY_TO_DOT_DOT_DOT'=>			'elements copy to ...',
@@ -1192,7 +1167,6 @@
 	'S_PRIVATE_KEY_FILE'=>					'Private key file',
 	'S_PUBLIC_KEY'=>					'Public key',
 	'S_AUTHENTICATION_METHOD'=>				'Authentication method',
-	'S_PASSPHRASE'=>					'Passphrase',
 	'S_EDIT_TRIGGER'=>					'Edit trigger',
 	'S_ENABLE_SELECTED_ITEMS_Q'=>				'Enable selected items?',
 	'S_DISABLE_SELECTED_ITEMS_Q'=>				'Disable selected items?',
@@ -1209,7 +1183,6 @@
 	'S_LATEST_EVENTS'=>			'Latest events',
 	'S_HISTORY_OF_EVENTS_BIG'=>		'HISTORY OF EVENTS',
 	'S_NO_EVENTS_FOUND'=>			'No events found',
-	'S_EVENTS_SINCE'=>			'Events since',
 	'S_EVENTS_DATE_FORMAT'=>		'd M Y H:i:s',
 	'S_EVENTS_DISCOVERY_TIME_FORMAT'=>	'd M Y H:i:s',
 	'S_EVENTS_ACTION_TIME_FORMAT'=>		'd M Y H:i:s',
@@ -1256,7 +1229,6 @@
 	'S_COORDINATE_Y'=>			'Coordinate Y',
 
 	'S_CONNECTORS'=>			'Connectors',
-	'S_UNAVAILABLE_BIG'=>			'UNAVAILABLE',
 	'S_MAINTENANCE_BIG'=>			'MAINTENANCE',
 
 //	sysmaps.php
@@ -1311,8 +1283,6 @@
 	'S_CANNOT_FIND_SCREEN'=>		'Cannot find screen',
 	'S_USED_IN_EXPORTED_MAP_SMALL'=>'used in exported map',
 	'S_NO_ICON_FOR_MAP_ELEMENT'=>	'No icon for map element',
-	'S_EXPORT_HAVE_NO_MAPS'=>		'Export does not contain Zabbix maps',
-	'S_EXPORT_HAVE_NO_SCREENS'=>	'Export does not contain Zabbix screens',
 
 //	map.php
 	'S_OK_BIG'=>			'OK',
@@ -1356,9 +1326,7 @@
 	'S_WITHOUT_PROBLEMS' =>				'Without problems',
 	'S_WITH_PROBLEMS' =>				'With problems',
 	'S_LAST_20_ISSUES'=>			'Last 20 issues',
-	'S_FAVOURITE'=>				'Favourite',
 	'S_FAVOURITES'=>			'Favourites',
-	'S_EVERY'=>				'Every',
 	'S_MENU'=>				'Menu',
 	'S_RESET'=>				'Reset',
 	'S_MAXIMIZE'=>				'Maximize',
@@ -1396,7 +1364,6 @@
 	'S_15_MIN'=>				'15 min',
 
 //	queue.php
-	'S_QUEUE_BIG'=>				'QUEUE',
 	'S_QUEUE_OF_ITEMS_TO_BE_UPDATED_BIG'=>	'QUEUE OF ITEMS TO BE UPDATED',
 	'S_NEXT_CHECK'=>			'Next check',
 	'S_THE_QUEUE_IS_EMPTY'=>		'The queue is empty',
@@ -1481,7 +1448,6 @@
 	'S_DAY'=>					'Day',
 	'S_MONTH'=>					'Month',
 	'S_YEAR'=>					'Year',
-	'S_YEAR_SMALL'=>				'year',
 	'S_HOURLY'=>					'Hourly',
 	'S_DAILY'=>					'Daily',
 	'S_WEEKLY'=>					'Weekly',
@@ -1592,6 +1558,7 @@
 	'S_DYNAMIC_ITEM'=>				'Dynamic item',
 	'S_DIMENSION_COLS_ROWS'=>		'Dimension (cols x rows)',
 	'S_DELETE_SELECTED_SLIDESHOWS_Q'=>	'Delete selected slideshows?',
+	'S_DELETE_SELECTED_SCREENS_Q' => 'Delete selected screens?',
 
 	'S_SLIDESHOW_MUST_CONTAIN_SLIDES' => 'Slideshow must contain slides',
 	'S_SLIDESHOWS'=>				'Slide shows',
@@ -1732,7 +1699,6 @@
 	'S_CANNOT_FORMAT_TREE_CHECK_LOGIC'=> 'Cannot format Tree. Check logic structure in service links',
 
 //	triggers.php
-	'S_SHOW_ALL_WITH_UNACKNOWLEDGED' => 'Show triggers with unacknowledged events',
 	'S_NO_TRIGGER'=>			'No trigger',
 	'S_NO_TRIGGERS_DEFINED'=>		'No triggers defined',
 	'S_NO_TRIGGER_DEFINED'=>		'No trigger defined',
@@ -1798,17 +1764,13 @@
 	'S_ADD'=>						'Add',
 
 //	tr_status.php
-	'S_SOUND'=>							'Sound',
 	'S_STATUS_OF_TRIGGERS'=>			'Status of triggers',
 	'S_STATUS_OF_TRIGGERS_BIG'=>		'STATUS OF TRIGGERS',
 	'S_STATUS_OF_HOSTGROUP_TRIGGERS'=>	'Status of hostgroup triggers',
 	'S_STATUS_OF_HOST_TRIGGERS'=>		'Status of host triggers',
 	'S_HIDE_ALL'=>				'Hide all',
-	'S_SHOW_ONLY_PROBLEMS'=>		'Show only problems',
 	'S_SHOW_UNACKNOWLEDGED'=>		'Show unacknowledged',
-	'S_SHOW_PROBLEM_UNACKNOWLEDGED'=>	'Show problem-unacknowledged',
 	'S_NOT_ACKNOWLEDGED'=>			'Not acknowledged',
-	'S_SHOW_LAST'=>				'Show last',
 	'S_SHOW_DETAILS'=>			'Show details',
 	'S_FILTER_BY_NAME'=>				'Filter by name',
 	'S_TRIGGERS_BIG'=>			'TRIGGERS',
@@ -1865,7 +1827,6 @@
 	'S_CANNOT_UPDATE_API_ACCESS'=>			'Cannot update API access',
 	'S_DEBUG_MODE_UPDATED'=>			'Debug mode updated',
 	'S_CANNOT_UPDATE_DEBUG_MODE'=>			'Cannot update debug mode',
-	'S_USER_CANNOT_DISABLE_ITSELF'=>		'User cannot disable himself',
 	'S_USER_CANNOT_CHANGE_STATUS'=>			'User cannot change status of himself',
 	'S_USER_CANNOT_CHANGE_GUI_ACCESS'=>		'User cannot change GUI access for himself',
 	'S_USER_CANNOT_DELETE_ITSELF'=>			'User cannot delete himself',
@@ -1945,7 +1906,6 @@
 	'S_TOOLS'=>				'Tools',
 	'S_RESULT'=>				'Result',
 	'S_CLOSE'=>				'Close',
-	'S_CONNECT_TO_SERVER_ERROR'=>		'Cannot connect to Zabbix server',
 	'S_DELETE_SELECTED_SCRIPTS_Q'=>		'Delete selected scripts?',
 
 	'S_SCRIPT_ERROR'=>			'SCRIPT ERROR',
@@ -1954,7 +1914,6 @@
 	'S_SCRIPT_READ_ERROR'=>			'Can\'t read script response, check connection',
 	'S_SCRIPT_TIMEOUT_ERROR'=>		'Defined in "include/defines.inc.php" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value',
 	'S_SCRIPT_BYTES_LIMIT_ERROR'=>		'Defined in "include/defines.inc.php" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value',
-	'S_SCRIPT_UNKNOWN_ERROR'=>		'Unknown error happened reading script answer, please report to the developers',
 	'S_SCRIPT_ERROR_EMPTY_RESPONSE' =>	'Empty response received',
 
 //	audit.php
@@ -1970,7 +1929,6 @@
 	'S_GRAPH_ELEMENT'=>			'Graph element',
 	'S_UNKNOWN_RESOURCE'=>			'Unknown resource',
 	'S_ALREADY_EXISTS_SMALL'=>		'already exists',
-	'S_ZABBIX_CONFIG'=>			'Zabbix config',
 
 //	profile.php
 	'S_CLEAR' =>				'Clear',
@@ -1986,9 +1944,7 @@
 	'S_PLAY_SOUND'=>			'Play sound',
 	'S_MESSAGE_TIMEOUT'=>		'Message timeout',
 	'S_PLAY'=>					'Play',
-	'S_PAUSE'=>					'Pause',
 	'S_STOP'=>					'Stop',
-	'S_LOOP'=>					'Loop',
 	'S_USER_PROFILE_BIG'=>		'USER PROFILE',
 	'S_USER_PROFILE'=>			'User profile',
 	'S_LANGUAGE'=>				'Language',
@@ -2001,6 +1957,7 @@
 	'S_LATVIAN_LV'=>			'Latvian (LV)',
 	'S_RUSSIAN_RU'=>			'Russian (RU)',
 	'S_PORTUGUESE_PT'=>			'Portuguese (PT)',
+	'S_SLOVAK_SK'=>				'Slovak (SK)',
 	'S_SPANISH_SP'=>			'Spanish (SP)',
 	'S_SWEDISH_SE'=>			'Swedish (SE)',
 	'S_JAPANESE_JP'=>			'Japanese (JP)',
@@ -2066,7 +2023,8 @@
 	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_AFTER_ERROR'=>'Not allowed symbols detected after element',
 	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_BEFORE_ERROR'=>'Not allowed symbols detected before element',
 	'S_ARE_YOU_SURE_YOU_WANT_TO_DELETE'=>'Are you sure you want to delete',
-	'S_MACROS_ES'=>'macro(s)',
+	'S_MACROS_ES' => 'macro(s)',
+	'S_SEC_AT' => 'sec at',
 
 //	popup_link_tr.php
 	'S_NEW_INDICATORS'=>			'New indicators',
@@ -2097,8 +2055,6 @@
 	'S_DELETE_SELECTED_APPLICATIONS'  => 'Delete selected applications?',
 	'S_CANNOT_CREATE_APPLICATION'  => 'Cannot create application',
 	'S_INCORRECT_FIELDS_FOR_APPLICATIONS'  => 'Incorrect fields for application',
-	'S_CANNOT_UPDATE_APPLICATION'  => 'Cannot update application',
-	'S_CANNOT_DELETE_APPLICATION'  => 'Cannot delete application',
 
 // popup_media.php
 	'S_INCORRECT_TIME_PERIOD'=>	'Incorrect time period',
@@ -2109,14 +2065,12 @@
 // page_header.php
 	'S_REFRESHED_EVERY_SMALL'=>		'refreshed every',
 	'S_PAGE_RECEIVED_INCORRECT_DATA'=>	'Page received incorrect data',
-	'S_TIMEZONE_FOR_PHP_IS_NOT_SET_PLEASE_SET'=>'Timezone for PHP is not set. Please set "date.timezone" option in php.ini.',
 
 //	copt.inc.php
 	'S_STATS_FOR'=>			'Stats for',
 	'S_TOTAL_TIME'=>		'Total time',
 	'S_MEMORY_LIMIT'=>		'Memory limit',
 	'S_MEMORY_USAGE'=>		'Memory usage',
-	'S_MEMORY_LEAK'=>		'Memory leak',
 	'S_SQL_SELECTS_COUNT'=>		'SQL selects count',
 	'S_SQL_EXECUTES_COUNT'=>	'SQL executes count',
 	'S_SQL_REQUESTS_COUNT'=>	'SQL requests count',
@@ -2125,7 +2079,6 @@
 	'S_MEMORY_LIMIT_REACHED'=>	'MEMORY LIMIT REACHED! Profiling was stopped to save memory for script processing.',
 
 // 	func.inc.php
-	'S_WRONG_TYPE'=>			'Wrong type',
 	'S_INCORRECT_TYPE_OF_ASORT_BY_KEY'=>	'Incorrect type of asort_by_key',
 	'S_DAYS_SMALL'=>			'days',
 	'S_B'=>			'B',
@@ -2190,35 +2143,28 @@
 	'S_KEY_IS_VALID' => 'Key is valid',
 	'S_INCORRECT_SYNTAX_NEAR' => 'incorrect syntax near \'%1$s\' at position %2$d',
 	'S_INCORRECT_USAGE_OF_BRACKETS' => 'incorrect usage of bracket symbols. \'%s\' found after final bracket.',
-	'S_INVALID_CHARECTER_AT_POSITION' => 'ivalid charecter \'%1$s\' at position %2$d',
+	'S_INVALID_CHARACTER_AT_POSITION' => 'invalid character \'%1$s\' at position %2$d',
 	'S_INVALID_KEY_FORMAT' => 'Invalid key format',
 	'S_KEY_CANNOT_BE_EMPTY' => 'Key cannot be empty',
 	'S_KEY_TOO_LARGE' => 'Key is too large: maximum %d characters',
+	'S_ITEM_UNLINKED' => 'Item "%s" unlinked',
 
 //	httptest.inc.php
 	'S_SCENARIO_STEP_NUMBER_CANNOT_BE_LESS_ONE'=>	'Scenario step number cannot be less than 1',
 	'S_SCENARIO_STEP_NAME_SHOULD_CONTAIN'=>		'Scenario step name should contain',
-	'S_CHARACTERS_ONLY_SMALL'=>			'characters only',
 	'S_ONLY_CHARACTERS_ARE_ALLOWED'=>		'Only characters are allowed',
 	'S_CANNOT_ADD_NEW_APPLICATION'=>		'Cannot add new application',
 	'S_SCENARIO_WITH_NAME'=>			'Scenario with name',
 	'S_ADDED_SMALL'=>				'added',
-	'S_PRINTABLE_ONLY'=>'only printable characters',
+	'S_PRINTABLE_ONLY' => 'only printable characters',
+	'S_DOWNLOAD_SPEED_FOR_STEP' => 'Download speed for step "%1$s" of scenario "%2$s"',
+	'S_RESPONSE_TIME_FOR_STEP' => 'Response time for step "%1$s" of scenario "%2$s"',
+	'S_RESPONSE_CODE_FOR_STEP' => 'Response code for step "%1$s" of scenario "%2$s"',
 
 //	media.inc.php
-	'S_NO_MEDIA_WITH'=>			'No media with',
-	'S_NO_MEDIA_TYPE_WITH'=>		'No media type with',
-	'S_AN_ACTION_TYPE_WITH_DESCRIPTION'=>	'An action type with description',
 
 //	hosts.inc.php
-	'S_CANNOT_EXIST_WITHOUT_GROUP'=>		'can not exist without group',
-	'S_ADDED_HOST_GROUP'=>				'Added host group',
-	'S_UPDATED_HOST_GROUP'=>			'Updated host group',
-	'S_INCORRECT_CHARACTERS_USED_FOR_HOSTNAME'=>	'Incorrect characters used for Hostname',
-	'S_INCORRECT_CHARACTERS_USED_FOR_DNS'=>		'Incorrect characters used for DNS',
 	'S_CIRCULAR_LINK_CANNOT_BE_CREATED'=>		'Circular link can not be created',
-	'S_MUST_LINKED_LEAST_ONE_HOST_GROUP_SMALL'=>	'must be linked to at least one host group',
-	'S_ADDED_NEW_HOST'=>				'Added new host',
 	'S_INTERNAL_AND_CANNOT_DELETED_SMALL'=>		'is internal and can not be deleted',
 	'S_CANNOT_DELETED_INNER_HOSTS_CANNOT_UNLINKED_SMALL'=>'can not be deleted, due to inner hosts can not be unlinked',
 	'S_NO_HOST_GROUPS_WITH'=>			'No host groups with',
@@ -2228,7 +2174,6 @@
 	'S_ADDED_NEW_APPLICATION'=>			'Added new application',
 	'S_UPDATED_APPLICATION'=>			'Updated application',
 	'S_USED_BY_ITEM_SMALL'=>			'used by item',
-	'S_USED_BY_SCENARIO_SMALL'=>			'used by scenario',
 	'S_NO_APPLICATION_WITH'=>			'No application with',
 	'S_UNLINKED_SMALL'=>				'unlinked',
 	'S_TEMPLATE_WITH_ITEM_KEY'=>			'Template with item key',
@@ -2236,9 +2181,7 @@
 	'S_ALREADY_LINKED_TO_HOST_SMALL'=>		'already linked to host',
 	'S_HOST_HAS_BEEN_DELETED_MSG_PART1'=>		'Host',
 	'S_HOST_HAS_BEEN_DELETED_MSG_PART2'=>		'has been deleted from the system',
-	'S_YOU_CANT_DELETE_TEMPLATE_FOR_APP_USED_IN_SCENARIO'=>'You can\'t delete template for an application that is used in a web scenario',
 	'S_USED_IN_WEB_SCENARIO' => 'used in web scenario',
-	'S_AND_CANT_BE_DELETED' => 'and can\'t be deleted',
 	'S_HOSTGROUP_CANNOT_BE_DELETED_USED_IN_SCRIPT' => 'Host group "%1$s" can not be deleted, because it is used in script "%2$s".',
 //	validate.inc.php
 	'S_CRITICAL_ERROR'=>				'Critical error',
@@ -2280,13 +2223,7 @@
 	'S_TO_HOST_SMALL'=>					'to host',
 	'S_MISSING_KEY'=>					'Missing key',
 	'S_INCORRECT_FUNCTION_IS_USED'=>			'Incorrect function is used',
-	'S_UNKNOWN_MACRO'=>					'Unknown macro',
 	'S_FROM_HOST_SMALL'=>					'from host',
-	'S_TRIGGER_IN_TEMPLATE'=>				'Trigger in template',
-	'S_HAS_DEPENDENCY_WITH_TRIGGER_IN_TEMPLATE'=>		'has dependency with trigger in template',
-	'S_IS_NOT_THE_HIGHEST_LEVEL_TEMPLATE'=>			'is not the highest level template',
-	'S_NO_FUNCTION_WITH'=>					'No function with',
-	'S_SPECIFY_THE_CONDITIONAL_EXPR_FOR_THE_TARGET'=>	'Specify the conditional expression for the target.',
 	'S_0_OR_1'=>						'0 or 1',
 	'S_TRIGGER_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR'=>	'At least one item must be present in the trigger expression.',
 	'S_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR'=>		'Host does not exist.',
@@ -2294,14 +2231,13 @@
 	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART1'=>	'Function \'',
 	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART2'=>	'\' does not accept parameters.',
     'S_WRONG_DEPENDENCY_ERROR'=>	'Error adding dependencies. Following dependencies are not allowed: 1) from a host trigger to a template trigger; 2) from a template trigger to a host trigger; 3) between template triggers, where templates have links to other templates.',
+	'S_TRIGGER_UNLINKED' => 'Trigger "%s" unlinked',
 
 //	page_footer.php
 	'S_TRANSACTION_HAVE_NOT_BEEN_CLOSED_ABORTING'=>	'Transaction has not been closed. Aborting..',
 
 //	maps.inc.php
 	'S_NO_SYSTEM_MAP_WITH'=>		'No system map with',
-	'S_NO_SYSMAP_ELEMENT_WITH'=>		'No sysmap element with',
-	'S_TEMPLATE_SMALL'=>			'template',
 	'S_SUBMAP'=>			'Submap',
 
 //	screens.inc.php
@@ -2409,9 +2345,6 @@
 	'S_CUSER_ERROR_LDAP_MODULE_MISSING'=>			'Probably php-ldap module is missing',
 	'S_CUSER_ERROR_FAILED_LOGIN_ATTEMPTS'=>				'failed login attempts logged.',
 	'S_CUSER_ERROR_LAST_FAILED_ATTEMPTS'=>				'Last failed attempt was from',
-	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_CREATE_SCRIPTS'=>		'Only Super Admins can create Scripts',
-	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_UPDATE_SCRIPTS'=>		'Only Super Admins can update Scripts',
-	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_DELETE_SCRIPTS'=>		'Only Super Admins can delete Scripts',
 	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_CREATE_USERS'=>		'Only Super Admins can create Users',
 	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_UPDATE_USERS'=>		'Only Super Admins can update Users',
 	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_DELETE_USERS'=>		'Only Super Admins can delete Users',
@@ -2437,13 +2370,9 @@
 // class.cmediatype.php
 	'S_CMEDIATYPE_ERROR_WRONG_FIELD_FOR_MEDIATYPE' =>	'Wrong fields for media type',
 	'S_CMEDIATYPE_ERROR_PASSWORD_REQUIRED' =>	'Password required for mediatype',
-	'S_CMEDIATYPE_ERROR_CANT_DELETE_MEDIATYPES'=>		'Can\'t delete media types',
-	'S_CMEDIATYPE_ERROR_CANT_UPDATE_MEDIATYPES'=>		'Can\'t update media types',
-	'S_CMEDIATYPE_ERROR_CANT_INSERT_MEDIATYPES'=>		'Can\'t insert media types',
 	'S_MEDIATYPE_ALREADY_EXISTS'=>				'Mediatype already exists:',
 	'S_MEDIATYPE_USED_BY_ACTIONS'=>	'Mediatypes used by action:',
 	'S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_CREATE_MEDIATYPES'=>'Only Super Admins can create media types',
-	'S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_UPDATE_MEDIATYPES'=>'Only Super Admins can update media types',
 	'S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_DELETE_MEDIATYPES'=>'Only Super Admins can delete media types',
 
 //	config.inc.php
@@ -2478,7 +2407,6 @@
 
 //	Errors
 	'S_DOES_NOT_EXIST_SMALL'=>		'does not exist',
-	'S_INCORRECT_DESCRIPTION'=>		'Incorrect description',
 	'S_CANT_FORMAT_TREE'=>			'Can\'t format Tree',
 	'S_NO_PERMISSION'=>				'You do not have permission to perform this operation',
 	'S_NO_PERMISSIONS_FOR_SCREEN'=>	'No permissions for screen',
@@ -2524,7 +2452,27 @@
 
 // class.cusergroup
 	'S_GROUP_IS_USED_IN_SCRIPT' =>	'User group [%1$s] is used in script [%2$s].',
-	'S_YOU_CANNOT_DELETE_GROUP_USED_IN_SCRIPT' => 'Cannot delete user group used in a script:',
-	'S_ONLY_SUPERADMIN_CAN_DELETE_USERGROUP' => 'Only Super Admins can delete User Groups',
+	'S_ONLY_SUPERADMIN_CAN_DELETE_USERGROUP' => 'Only Super Admins can delete User Groups.',
+
+// class.cgraph.php
+	'S_GRAPH_ALREADY_EXISTS_ON' => 'Graph "%1$s" already exists on "%2$s".',
+	'S_INHERITED_FROM_ANOTHER_TEMPLATE' => '(inherited from another template).',
+	'S_ITEMS_ARE_NOT_IDENTICAL' => '(items are not identical).',
+
+// class.ctemplate.php
+	'S_CANNOT_SYNC_TEMPLATE' => 'Cannot sync template',
+
+// class.chost.php
+	'S_YOU_DO_NOT_HAVE_ENOUGH_RIGHTS' => 'You do not have enough rights for operation',
+	'S_HOST_UPDATE_FAILED' => 'Host update failed',
+	'S_NO_GROUPS_FOR_HOST' => 'No groups for host [ %s ]',
+	'S_HOST_NAME_MUST_BE_LONGER' => 'Host name must not be longer than %1$d characters, [ %2$s ] is %3$d',
+
+// discoveryconf.php
+	'S_SECOND_IN_PARENTHESES' => '(seconds)',
+
+// class.cscreen.php
+	'S_INCORRECT_RESOURCE_PROVIDED_FOR_SCREEN_ITEM' => 'Incorrect resource provided for screen item'
+
 );
 ?>

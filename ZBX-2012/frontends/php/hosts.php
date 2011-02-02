@@ -69,7 +69,7 @@ include_once('include/page_header.php');
 		'clear_templates'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,	null),
 
 		'useipmi'=>			array(T_ZBX_STR, O_OPT,	NULL, NULL,				NULL),
-		'ipmi_ip'=>			array(T_ZBX_STR, O_OPT,	NULL, NULL,				NULL),
+		'ipmi_ip'=>			array(T_ZBX_STR, O_OPT,	NULL, NOT_EMPTY,				'isset({useipmi})&&isset({save})'),
 		'ipmi_port'=>		array(T_ZBX_INT, O_OPT,	NULL, BETWEEN(0,65535),	NULL),
 		'ipmi_authtype'=>	array(T_ZBX_INT, O_OPT,	NULL, BETWEEN(-1,6),	NULL),
 		'ipmi_privilege'=>	array(T_ZBX_INT, O_OPT,	NULL, BETWEEN(0,5),		NULL),
@@ -470,7 +470,7 @@ include_once('include/page_header.php');
 
 		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY))) access_deny();
 
-		if(isset($_REQUEST['hostid'])){
+		if(isset($_REQUEST['hostid']) && $_REQUEST['form'] != 'full_clone'){
 			$create_new = false;
 			$msg_ok = S_HOST_UPDATED;
 			$msg_fail = S_CANNOT_UPDATE_HOST;
@@ -879,18 +879,18 @@ include_once('include/page_header.php');
 						$status_class = 'enabled';
 					}
 
-					$status_script = 'javascript: if(!Confirm('.zbx_jsvalue(S_DISABLE_HOST.'?').')) cancelEvent();';
+					$status_script = 'return Confirm('.zbx_jsvalue(S_DISABLE_HOST.'?').');';
 					$status_url = 'hosts.php?hosts%5B%5D='.$host['hostid'].'&go=disable'.url_param('groupid');
 					break;
 				case HOST_STATUS_NOT_MONITORED:
 					$status_caption = S_NOT_MONITORED;
 					$status_url = 'hosts.php?hosts%5B%5D='.$host['hostid'].'&go=activate'.url_param('groupid');
-					$status_script = 'javascript: if(!Confirm('.zbx_jsvalue(S_ENABLE_HOST.'?').')) cancelEvent();';
+					$status_script = 'return Confirm('.zbx_jsvalue(S_ENABLE_HOST.'?').');';
 					$status_class = 'disabled';
 					break;
 				default:
 					$status_caption = S_UNKNOWN;
-					$status_script = 'javascript: if(!Confirm('.zbx_jsvalue(S_DISABLE_HOST.'?').')) cancelEvent();';
+					$status_script = 'return Confirm('.zbx_jsvalue(S_DISABLE_HOST.'?').');';
 					$status_url = 'hosts.php?hosts%5B%5D='.$host['hostid'].'&go=disable'.url_param('groupid');
 					$status_class = 'unknown';
 			}

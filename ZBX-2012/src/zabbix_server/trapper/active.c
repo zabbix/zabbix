@@ -24,7 +24,6 @@
 
 #include "active.h"
 
-
 /******************************************************************************
  *                                                                            *
  * Function: get_hostid_by_host                                               *
@@ -48,7 +47,13 @@ static int	get_hostid_by_host(const char *host, zbx_uint64_t *hostid, char *erro
 	DB_ROW		row;
 	int		res = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In get_hostid_by_host(host:'%s')", host);
+	zabbix_log(LOG_LEVEL_DEBUG, "In get_hostid_by_host() host:'%s'", host);
+
+	if (FAIL == zbx_check_hostname(host))
+	{
+		zbx_snprintf(error, MAX_STRING_LEN, "host name [%s] contains invalid characters", host);
+		return res;
+	}
 
 	host_esc = DBdyn_escape_string(host);
 

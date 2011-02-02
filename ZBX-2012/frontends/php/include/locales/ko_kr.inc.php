@@ -24,7 +24,6 @@
 	$TRANSLATION=array(
 
 	'S_DATE_FORMAT_YMDHMS'=>		'd M H:i:s',
-	'S_DATE_FORMAT_YMD'=>			'd M Y',
 	'S_HTML_CHARSET'=>			'UTF-8',
 
 	'S_ACTIVATE_SELECTED'=>			'선택 항목 활성화',
@@ -127,21 +126,12 @@
 
 //	exp_imp.php
 	'S_ELEMENT'=>				'항목',
-	'S_ELEMENTS'=>				'항목',
-	'S_ONLY_HOST_INFO'=>			'호스트 정보만',
-	'S_EXPORT_IMPORT'=>			'내보내기/가져오기',
 	'S_IMPORT_FILE'=>			'파일 가져오기',
 	'S_IMPORT'=>				'가져오기',
-	'S_IMPORT_BIG'=>			'가져오기',
-	'S_EXPORT'=>				'내보내기',
-	'S_EXPORT_BIG'=>			'내보내기',
 	'S_PREVIEW'=>				'미리보기',
-	'S_BACK'=>				'뒤로',
-	'S_NO_DATA_FOR_EXPORT'=>		'내보낼 데이터가 없습니다',
 	'S_RULES'=>				'규칙',
 	'S_EXISTING'=>				'존재하는 경우',
 	'S_MISSING'=>				'존재하지 않는 경우',
-	'S_REFRESH'=>				'갱신',
 
 //	admin.php
 	'S_PREVIOUS'=>				'이전',
@@ -197,8 +187,6 @@
 	'S_OPERATIONS'=>			'오퍼레이션',
 	'S_EDIT_OPERATION'=>			'오퍼레이션 편집',
 	'S_NO_CONDITIONS_DEFINED'=>		'조건이 정의되어 있지 않습니다',
-	'S_ACTIONS_DELETED'=>			'액션을 삭제하였습니다',
-	'S_CANNOT_DELETE_ACTIONS'=>		'액션을 삭제할 수 없습니다',
 	'S_NO_OPERATIONS_DEFINED'=>		'오퍼레이션이 정의되어 있지 않습니다',
 	'S_NEW'=>				'새로 만들기',
 	'S_ADD_HOST'=>				'호스트 추가',
@@ -280,9 +268,7 @@
 //	charts.php
 	'S_CUSTOM_GRAPHS'=>			'커스텀 그래프',
 	'S_GRAPHS_BIG'=>			'그래프',
-	'S_SELECT_GRAPH_TO_DISPLAY'=>		'표시할 그래프를 선택하십시오',
 	'S_PERIOD'=>				'기간',
-	'S_SELECT_GRAPH_DOT_DOT_DOT'=>		'그래프 선택...',
 
 // Colors
 
@@ -331,8 +317,6 @@
 	'S_HOUSEKEEPER'=>			'데이터 보존 기간',
 	'S_MEDIA_TYPES'=>			'연락 방법',
 	'S_ESCALATION_RULES'=>			'에스컬레이션 규칙',
-	'S_ESCALATION'=>			'에스컬레이션',
-	'S_ESCALATION_RULE'=>			'에스컬레이션 규칙',
 	'S_DEFAULT'=>				'Default',
 	'S_IMAGES'=>				'이미지',
 	'S_IMAGE'=>				'이미지',
@@ -590,9 +574,6 @@
 	'S_SNMPV3_AUTH_PASSPHRASE'=>		'SNMPv3 auth passphrase',
 	'S_SNMPV3_PRIV_PASSPHRASE'=>		'SNMPv3 priv passphrase',
 	'S_CUSTOM_MULTIPLIER'=>			'승수',
-	'S_DO_NOT_USE'=>			'사용 안함',
-	'S_USE_MULTIPLIER'=>			'승수 사용',
-	'S_SELECT_HOST_DOT_DOT_DOT'=>		'호스트 선택...',
 	'S_LOG_TIME_FORMAT'=>			'로그 시간 형식',
 	'S_CREATE_ITEM'=>			'아이템 작성',
 	'S_X_ELEMENTS_COPY_TO_DOT_DOT_DOT'=>	'아이템 복사 대상...',
@@ -683,7 +664,6 @@
 	'S_15_MIN'=>				'15분',
 
 //	queue.php
-	'S_QUEUE_BIG'=>				'큐',
 	'S_QUEUE_OF_ITEMS_TO_BE_UPDATED_BIG'=>	'갱신 아이템 큐',
 	'S_NEXT_CHECK'=>			'다음 검사',
 	'S_THE_QUEUE_IS_EMPTY'=>		'큐가 비어 있습니다',
@@ -1038,7 +1018,6 @@
 	'S_LATEST_DATA'=>			'최근 데이터',
 
 //	Errors
-	'S_INCORRECT_DESCRIPTION'=>		'이름이 적절하지 않습니다',
 	'S_CANT_FORMAT_TREE'=>			'트리를 표시할 수 없습니다'
 	);
 ?>

@@ -78,17 +78,20 @@ typedef enum
 	ZBX_JSON_TYPE_ARRAY,
 	ZBX_JSON_TYPE_OBJECT,
 	ZBX_JSON_TYPE_NULL
-} zbx_json_type_t;
+}
+zbx_json_type_t;
 
 typedef enum
 {
 	ZBX_JSON_EMPTY = 0,
 	ZBX_JSON_COMMA
-} zbx_json_status_t;
+}
+zbx_json_status_t;
 
 #define ZBX_JSON_STAT_BUF_LEN 4096
 
-struct zbx_json {
+struct zbx_json
+{
 	char			*buffer;
 	char			buf_stat[ZBX_JSON_STAT_BUF_LEN];
 	size_t			buffer_allocated;
@@ -98,12 +101,13 @@ struct zbx_json {
 	int			level;
 };
 
-struct zbx_json_parse {
+struct zbx_json_parse
+{
 	const char		*start;
 	const char		*end;
 };
 
-char	*zbx_json_strerror(void);
+const char	*zbx_json_strerror();
 
 void	zbx_json_init(struct zbx_json *j, size_t allocate);
 void	zbx_json_clean(struct zbx_json *j);
@@ -125,6 +129,5 @@ int		zbx_json_brackets_open(const char *p, struct zbx_json_parse *jp);
 int		zbx_json_brackets_by_name(struct zbx_json_parse *jp, const char *name, struct zbx_json_parse *out);
 int		zbx_json_object_is_empty(struct zbx_json_parse *jp);
 int		zbx_json_count(struct zbx_json_parse *jp);
-zbx_json_type_t	zbx_json_type(const char *p);
 
 #endif /* ZABBIX_ZJSON_H */

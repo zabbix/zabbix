@@ -27,6 +27,9 @@ read -n 1 -p "Continue ? (y/n) " RESPONSE
 # if missing, will be added, if existing, hosts will be added to it
 GROUPFORHOSTS="none"
 
+# uncomment the following line to skip converting biggest tables to utf8
+# skiptables="history$\|history_uint$\|trends$\|trends_uint$"
+
 MYSQL="$(which mysql)"
 MYSQLPARAMS="$@"
 echo
@@ -101,7 +104,7 @@ echo "Converting database to UTF8"
 
 timer start conversion to UTF8
 echo "ALTER DATABASE CHARACTER SET utf8;" | $MYSQL $MYSQLPARAMS
-for i in $(echo "show tables;" | $MYSQL -N $MYSQLPARAMS); do
+for i in $(echo "show tables;" | $MYSQL -N $MYSQLPARAMS | grep -v "${skiptables:-not_skipping_any_tables}"); do
 	echo "... converting table $i"
 	echo "ALTER TABLE $i CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;" | $MYSQL $MYSQLPARAMS
 done
@@ -160,9 +163,9 @@ HOSTSWOGROUP=$(echo "select hosts.hostid from hosts left join hosts_groups on ho
 		echo "insert into hosts_groups (hostgroupid,hostid,groupid) select nextid,'$ORPHANHOST','$GROUPFORHOSTSID' from ids where table_name='hosts_groups' and field_name='hostgroupid';" | $MYSQL $MYSQLPARAMS
 		((HOSTSADDED++))
 	done
+	echo "Added $HOSTSADDED hosts to group '$GROUPFORHOSTS'. Move them to correct groups manually."
 } || {
 	echo "not found any"
 }
-echo "Added $HOSTSADDED hosts to group '$GROUPFORHOSTS'. Move them to correct groups manually."
 echo -n " ... "
 timer stop checking for hosts not belonging to any group

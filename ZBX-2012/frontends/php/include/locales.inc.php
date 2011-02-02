@@ -75,6 +75,7 @@ function set_zbx_locales(){
 		'pl_pl'=>  S_POLISH_PL,
 		'pt_br'=>  S_PORTUGUESE_PT,
 		'ru_ru'=>  S_RUSSIAN_RU,
+		'sk_sk'=>  S_SLOVAK_SK,
 		'sp_sp'=>  S_SPANISH_SP,
 		'sv_se'=>  S_SWEDISH_SE,
 		'ua_ua'=>  S_UKRAINIAN_UA,

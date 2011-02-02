@@ -64,28 +64,23 @@
 	}
 
 	function HEX($var=NULL){
-//		return "ereg(\"^[a-zA-Z0-9]{1,}$\",{".$var."})&&";
 		return 'preg_match("/^([a-zA-Z0-9]+)$/",{'.$var.'})&&';
 	}
 
 	function KEY_PARAM($var=NULL){
-//		return 'ereg(\'^([0-9a-zA-Z\_\.[.'.ZBX_EREG_MINUS_SYMB.'.]\$ ]+)$\',{'.$var.'})&&';
 		return 'preg_match("/'.ZBX_PREG_PARAMS.'/",{'.$var.'})&&';
 	}
 
-	function validate_float($str){
-//		echo "Validating float:$str<br>";
-//		if (eregi('^[ ]*([0-9]+)((\.)?)([0-9]*[KMG]{0,1})[ ]*$', $str, $arr)) {
-		if(preg_match('/^[ ]*([0-9]+)((\.)?)([0-9]*[KMGTsmhdw]{0,1})[ ]*$/i', $str, $arr)) {
-			return 0;
-		}
-		else{
-			return -1;
-		}
+	function validate_sec($str){
+		return (preg_match('/^[ ]*\d+[KMGTsmhdw]{0,1}[ ]*$/', $str, $arr) ? 0 : -1);
+	}
+
+	function validate_secnum($str){
+		if(preg_match('/^[ ]*#\d+[ ]*$/', $str, $arr)) return 0;
+	return validate_sec($str);
 	}
 
 	function validate_ipv4($str,&$arr){
-//		if( !ereg('^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$', $str, $arr) )	return false;
 		if( !preg_match('/^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/', $str, $arr) )	return false;
 		for($i=1; $i<=4; $i++)	if( !is_numeric($arr[$i]) || $arr[$i] > 255 || $arr[$i] < 0 )	return false;
 		return true;
@@ -248,39 +243,29 @@
 			$out .= sprintf('%d-%d,%02d:%02d-%02d:%02d',$arr[1],$arr[2],$arr[3],$arr[4],$arr[5],$arr[6]).';';
 		}
 		$str = $out;
-//parse_period($str);
+// parse_period($str);
 		return true;
-	}
-
-// Check if str has format #<float> or <float>
-	function validate_ticks($str){
-//		echo "Validating float:$str<br>";
-//		if (eregi('^[ ]*#([0-9]+)((\.)?)([0-9]*)[ ]*$', $str, $arr)) {
-		if (preg_match('/^[ ]*#([0-9]+)((\.)?)([0-9]*)[ ]*$/i', $str, $arr)) {
-			return 0;
-		}
-		else return validate_float($str);
 	}
 
 	define('NOT_EMPTY',"({}!='')&&");
 	define('DB_ID',"({}>=0&&bccomp('{}',\"10000000000000000000\")<0)&&");
-	define('NOT_ZERO',"({}>0)&&");
+	define('NOT_ZERO',"({}!=0)&&");
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 
 	function calc_exp2($fields,$field,$expression){
 		foreach($fields as $f => $checks){
 /*
-			// If an unset variable used in expression, return FALSE
-			if(zbx_strstr($expression,'{'.$f.'}')&&!isset($_REQUEST[$f])){
-//SDI("Variable [$f] is not set. $expression is FALSE");
-//info('Variable ['.$f.'] is not set. '.$expression.' is FALSE');
-//				return FALSE;
-			}
+	if an unset variable used in expression, return FALSE
+	if(zbx_strstr($expression,'{'.$f.'}')&&!isset($_REQUEST[$f])){
+		SDI("Variable [$f] is not set. $expression is FALSE");
+		info('Variable ['.$f.'] is not set. '.$expression.' is FALSE');
+	return FALSE;
+	}
 //*/
-//echo $f,":",$expression,"<br>";
+// echo $f,":",$expression,"<br>";
 			$expression = str_replace('{'.$f.'}','$_REQUEST["'.$f.'"]',$expression);
-//$debug .= $f." = ".$_REQUEST[$f].SBR;
+// $debug .= $f." = ".$_REQUEST[$f].SBR;
 		}
 
 		$expression = trim($expression,'& ');
@@ -422,7 +407,7 @@
 			return ZBX_VALID_OK;
 		}
 
-		if(($type == T_ZBX_INT) && !zbx_numeric($var)) {
+		if(($type == T_ZBX_INT) && !zbx_is_int($var)){
 			if($flags&P_SYS){
 				info(S_CRITICAL_ERROR.'.'.SPACE.S_FIELD.SPACE.'['.$field.']'.SPACE.S_IS_NOT_INTEGER_SMALL);
 				return ZBX_VALID_ERROR;
@@ -494,7 +479,7 @@
 	function check_field(&$fields, &$field, $checks){
 		if(!isset($checks[5])) $checks[5] = $field;
 		list($type,$opt,$flags,$validation,$exception,$caption)=$checks;
-                                                            	
+
 		if($flags&P_UNSET_EMPTY && isset($_REQUEST[$field]) && $_REQUEST[$field]==''){
 			unset_request($field,'P_UNSET_EMPTY');
 		}

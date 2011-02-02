@@ -20,32 +20,28 @@
 #ifndef ZABBIX_HTTPTEST_H
 #define ZABBIX_HTTPTEST_H
 
-#define S_ZBX_HTTPPAGE	struct s_zbx_httppage_t
-S_ZBX_HTTPPAGE
+typedef struct
 {
-	char		*data;
-	int		allocated;
-	int		offset;
-};
+	char	*data;
+	int	allocated;
+	int	offset;
+}
+ZBX_HTTPPAGE;
 
-#define S_ZBX_HTTPSTAT	struct s_zbx_httpstat_t
-S_ZBX_HTTPSTAT
+typedef struct
 {
-	long    	rspcode;
-	double  	total_time;
-	double  	speed_download;
-	double		test_total_time;
-	int		test_last_step;
-};
+	long   	rspcode;
+	double 	total_time;
+	double 	speed_download;
+	double	test_total_time;
+	int	test_last_step;
+}
+ZBX_HTTPSTAT;
 
-#ifdef	HAVE_LIBCURL
-	void process_httptests(int now);
-#else
-#	define process_httptests(now)
-#endif /* HAVE_LIBCURL */
+extern int	httppoller_num;
 
-extern	int	httppoller_num;
+extern int	CONFIG_HTTPPOLLER_FORKS;
 
-extern  int     CONFIG_HTTPPOLLER_FORKS;
+void	process_httptests(int now);
 
 #endif

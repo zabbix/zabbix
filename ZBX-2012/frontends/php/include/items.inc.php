@@ -400,9 +400,9 @@
 		}
 
 		//validating item key
-		list($item_key_is_valid, $check_result) = check_item_key($item['key_']);
-		if(!$item_key_is_valid){
-			error(S_ERROR_IN_ITEM_KEY.SPACE.$check_result);
+		$checkResult = check_item_key($item['key_']);
+		if(!$checkResult['valid']){
+			error(S_ERROR_IN_ITEM_KEY.SPACE.$checkResult['description']);
 			return false;
 		}
 
@@ -614,15 +614,14 @@
 		}
 
 		//validating item key
-		list($item_key_is_valid, $check_result) = check_item_key($item['key_']);
-		if(!$item_key_is_valid){
-			error(S_ERROR_IN_ITEM_KEY.SPACE.$check_result);
+		$checkResult = check_item_key($item['key_']);
+		if(!$checkResult['valid']){
+			error(S_ERROR_IN_ITEM_KEY.SPACE.$checkResult['description']);
 			return false;
 		}
 
 		$item_old = get_item_by_itemid($itemid);
 		DBexecute('UPDATE items SET lastlogsize=0, mtime=0 WHERE itemid='.$itemid.' AND key_<>'.zbx_dbstr($item['key_']));
-
 
 		if($upd_app){
 			$result = DBexecute('DELETE FROM items_applications WHERE itemid='.$itemid);
@@ -782,7 +781,7 @@
 
 			if($unlink_mode){
 				if(DBexecute('UPDATE items SET templateid=0 WHERE itemid='.$db_item["itemid"])){
-					info("Item '".$db_item["key_"]."' unlinked");
+					info(sprintf(S_ITEM_UNLINKED, $db_item["key_"]));
 				}
 			}
 			else{
@@ -1780,13 +1779,13 @@
 	}
 
 
-	/**
-	 * Check item key and return info about an error if one is present
-	 *
-	 * @param string $key item key, e.g. system.run[cat /etc/passwd | awk -F: '{ print $1 }']
-	 * @return array
-	 *
-	 */
+/**
+ * Check item key and return info about an error if one is present
+ *
+ * @param string $key item key, e.g. system.run[cat /etc/passwd | awk -F: '{ print $1 }']
+ * @return array
+ *
+ */
 	function check_item_key($key){
 		$key_strlen = zbx_strlen($key);
 
@@ -1823,12 +1822,12 @@
 		//no function specified?
 		if ($current_char == $key_strlen) {
 			return array(
-				true,   //is key valid?
-				S_KEY_IS_VALID //result description
+				'valid' => true,   //is key valid?
+				'description' => S_KEY_IS_VALID //result description
 			);
 		}
 		//function with parameter, e.g. system.run[...]
-		elseif($characters[$current_char] == '[') {
+		else if($characters[$current_char] == '[') {
 
 			$state = 0; //0 - initial, 1 - inside quoted param, 2 - inside unquoted param
 			$nest_level = 0;
@@ -1842,19 +1841,19 @@
 							//do nothing
 						}
 						//Zapcat: '][' is treated as ','
-						elseif($characters[$i] == ']' && isset($characters[$i+1]) && $characters[$i+1] == '[' && $nest_level == 0) {
+						else if($characters[$i] == ']' && isset($characters[$i+1]) && $characters[$i+1] == '[' && $nest_level == 0) {
 							$i++;
 						}
 						//entering quotes
-						elseif($characters[$i] == '"') {
+						else if($characters[$i] == '"') {
 							$state = 1;
 						}
 						//next nesting level
-						elseif($characters[$i] == '[') {
+						else if($characters[$i] == '[') {
 							$nest_level++;
 						}
 						//one of the nested sets ended
-						elseif($characters[$i] == ']' && $nest_level != 0) {
+						else if($characters[$i] == ']' && $nest_level != 0) {
 							$nest_level--;
 							//skipping spaces
 							while(isset($characters[$i+1]) && $characters[$i+1] == ' ') {
@@ -1863,34 +1862,34 @@
 							//all nestings are closed correctly
 							if ($nest_level == 0 && isset($characters[$i+1]) && $characters[$i+1] == ']' && !isset($characters[$i+2])) {
 								return array(
-									true,   //is key valid?
-									S_KEY_IS_VALID //result description
+									'valid' => true,   //is key valid?
+									'description' => S_KEY_IS_VALID //result description
 								);
 							}
 
 							if((!isset($characters[$i+1]) || $characters[$i+1] != ',')
 								&& !($nest_level !=0 && isset($characters[$i+1]) && $characters[$i+1] == ']')) {
 								return array(
-									false,   //is key valid?
-									sprintf(S_INCORRECT_SYNTAX_NEAR, $characters[$current_char], $current_char) //result description
+									'valid' => false,   //is key valid?
+									'description' => sprintf(S_INCORRECT_SYNTAX_NEAR, $characters[$current_char], $current_char) //result description
 								);
 							}
 						}
-						elseif($characters[$i] == ']' && $nest_level == 0) {
+						else if($characters[$i] == ']' && $nest_level == 0) {
 							if (isset($characters[$i+1])){
 								return array(
-									false,   //is key valid?
-									sprintf(S_INCORRECT_USAGE_OF_BRACKETS, $characters[$i+1]) //result description
+									'valid' => false,   //is key valid?
+									'description' => sprintf(S_INCORRECT_USAGE_OF_BRACKETS, $characters[$i+1]) //result description
 								);
 							}
 							else {
 								return array(
-									true,   //is key valid?
-									S_KEY_IS_VALID //result description
+									'valid' => true,   //is key valid?
+									'description' => S_KEY_IS_VALID //result description
 								);
 							}
 						}
-						elseif($characters[$i] != ' ') {
+						else if($characters[$i] != ' ') {
 							$state = 2;
 						}
 
@@ -1899,31 +1898,28 @@
 					//quoted
 					case 1:
 						//ending quote is reached
-						if($characters[$i] == '"')
-						{
+						if($characters[$i] == '"'){
 							//skipping spaces
 							while(isset($characters[$i+1]) && $characters[$i+1] == ' ') {
 								$i++;
 							}
 
 							//Zapcat
-							if ($nest_level == 0 && isset($characters[$i+1]) && isset($characters[$i+2]) && $characters[$i+1] == ']' && $characters[$i+2] == '[')
-							{
+							if($nest_level == 0 && isset($characters[$i+1]) && isset($characters[$i+2]) && $characters[$i+1] == ']' && $characters[$i+2] == '['){
 								$state = 0;
 								break;
 							}
 
-							if ($nest_level == 0 && isset($characters[$i+1]) && $characters[$i+1] == ']' && !isset($characters[$i+2]))
-							{
+							if ($nest_level == 0 && isset($characters[$i+1]) && $characters[$i+1] == ']' && !isset($characters[$i+2])){
 								return array(
-									true,   //is key valid?
-									S_KEY_IS_VALID //result description
+									'valid' => true,   //is key valid?
+									'description' => S_KEY_IS_VALID //result description
 								);
 							}
-							elseif($nest_level == 0 && $characters[$i+1] == ']' && isset($characters[$i+2])){
+							else if($nest_level == 0 && $characters[$i+1] == ']' && isset($characters[$i+2])){
 								return array(
-									false,   //is key valid?
-									sprintf(S_INCORRECT_USAGE_OF_BRACKETS, $characters[$i+2]) //result description
+									'valid' => false,   //is key valid?
+									'description' => sprintf(S_INCORRECT_USAGE_OF_BRACKETS, $characters[$i+2]) //result description
 								);
 							}
 
@@ -1931,15 +1927,15 @@
 								&& !($nest_level != 0 && isset($characters[$i+1]) && $characters[$i+1] == ']'))
 							{
 								return array(
-									false,   //is key valid?
-									sprintf(S_INCORRECT_SYNTAX_NEAR, $characters[$current_char], $current_char) //result description
+									'valid' => false,   //is key valid?
+									'description' => sprintf(S_INCORRECT_SYNTAX_NEAR, $characters[$current_char], $current_char) //result description
 								);
 							}
 
 							$state = 0;
 						}
 						//escaped quote (\")
-						elseif($characters[$i] == '\\' && isset($characters[$i+1]) && $characters[$i+1] == '"') {
+						else if($characters[$i] == '\\' && isset($characters[$i+1]) && $characters[$i+1] == '"') {
 							$i++;
 						}
 
@@ -1948,26 +1944,25 @@
 					//unquoted
 					case 2:
 						//Zapcat
-						if($nest_level == 0 && $characters[$i] == ']' && isset($characters[$i+1]) && $characters[$i+1] =='[' )
-						{
+						if($nest_level == 0 && $characters[$i] == ']' && isset($characters[$i+1]) && $characters[$i+1] =='[' ){
 							$i--;
 							$state = 0;
 						}
-						elseif($characters[$i] == ',' || ($characters[$i] == ']' && $nest_level != 0)) {
+						else if($characters[$i] == ',' || ($characters[$i] == ']' && $nest_level != 0)) {
 							$i--;
 							$state = 0;
 						}
-						elseif($characters[$i] == ']' && $nest_level == 0) {
+						else if($characters[$i] == ']' && $nest_level == 0) {
 							if (isset($characters[$i+1])){
 								return array(
-									false,   //is key valid?
-									sprintf(S_INCORRECT_USAGE_OF_BRACKETS, $characters[$i+1]) //result description
+									'valid' => false,   //is key valid?
+									'description' => sprintf(S_INCORRECT_USAGE_OF_BRACKETS, $characters[$i+1]) //result description
 								);
 							}
 							else {
 								return array(
-									true,   //is key valid?
-									S_KEY_IS_VALID //result description
+									'valid' => true,   //is key valid?
+									'description' => S_KEY_IS_VALID //result description
 								);
 							}
 						}
@@ -1976,15 +1971,15 @@
 			}
 
 			return array(
-				false,   //is key valid?
-				S_INVALID_KEY_FORMAT //result description
+				'valid' => false,   //is key valid?
+				'description' => S_INVALID_KEY_FORMAT //result description
 			);
 
 		}
 		else {
 			return array(
-				false,   //is key valid?
-				sprintf(S_INVALID_CHARECTER_AT_POSITION, $characters[$current_char], $current_char) //result description
+				'valid' => false,   //is key valid?
+				'description' => sprintf(S_INVALID_CHARACTER_AT_POSITION, $characters[$current_char], $current_char) //result description
 			);
 		}
 

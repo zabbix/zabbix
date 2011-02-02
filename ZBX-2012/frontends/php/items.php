@@ -66,7 +66,7 @@ switch($itemType) {
 
 		'groupid'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			null),
 		'hostid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,			null),
-		'form_hostid'=>			array(T_ZBX_INT, O_OPT,  null,	DB_ID.NOT_ZERO,		'isset({save})', S_HOST),
+		'form_hostid'=>			array(T_ZBX_INT, O_OPT,  null,	DB_ID,		'isset({save})', S_HOST),
 
 
 		'add_groupid'=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			'(isset({register})&&({register}=="go"))'),
@@ -145,7 +145,7 @@ switch($itemType) {
 		'multiplier'=>		array(T_ZBX_INT, O_OPT,  null,  null,		null),
 		'delta'=>		array(T_ZBX_INT, O_OPT,  null,  IN('0,1,2'),	'isset({save})&&isset({value_type})&&'.IN('0,3','value_type')),
 
-		'formula'=>		array(T_ZBX_DBL, O_OPT,  null,  NOT_ZERO,	'isset({save})&&isset({multiplier})&&({multiplier}==1)&&'.IN('0,3','value_type'), S_CUSTOM_MULTIPLIER),
+		'formula'=>		array(T_ZBX_DBL, O_OPT,  null,  '({value_type}==0&&{}!=0)||({value_type}==3&&{}>0)',	'isset({save})&&isset({multiplier})&&({multiplier}==1)', S_CUSTOM_MULTIPLIER),
 		'logtimefmt'=>		array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({value_type})&&({value_type}==2))'),
 
 		'group_itemid'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID, null),
@@ -218,7 +218,6 @@ switch($itemType) {
 
 	check_fields($fields);
 	validate_sort_and_sortorder('description', ZBX_SORT_UP);
-
 	$_REQUEST['go'] = get_request('go', 'none');
 
 // PERMISSIONS
@@ -1166,7 +1165,7 @@ switch($itemType) {
 				$description,
 				$trigger_info,
 				$item['key_'],
-				$item['delay'],
+				($item['type'] == ITEM_TYPE_TRAPPER ? '' : $item['delay']),
 				$item['history'],
 				(in_array($item['value_type'], array(ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT)) ? '' : $item['trends']),
 				item_type2str($item['type']),
