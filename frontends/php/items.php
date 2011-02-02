@@ -35,7 +35,7 @@ include_once('include/page_header.php');
 // needed type to know which field name to use
 $itemType = get_request('type', 0);
 switch($itemType) {
-	case ITEM_TYPE_SSH: case ITEM_TYPE_TELNET: case ITEM_TYPE_JMX: $paramsFieldName = S_EXECUTED_SCRIPT; break;
+	case ITEM_TYPE_SSH: case ITEM_TYPE_TELNET: $paramsFieldName = S_EXECUTED_SCRIPT; break;
 	case ITEM_TYPE_DB_MONITOR: $paramsFieldName = S_PARAMS; break;
 	case ITEM_TYPE_CALCULATED: $paramsFieldName = S_FORMULA; break;
 	default: $paramsFieldName = 'params';
@@ -119,7 +119,6 @@ switch($itemType) {
 												ITEM_TYPE_SSH.','.
 												ITEM_TYPE_DB_MONITOR.','.
 												ITEM_TYPE_TELNET.','.
-												ITEM_TYPE_JMX.','.
 												ITEM_TYPE_CALCULATED,'type'), $paramsFieldName),
 		//hidden fields for better gui
 		'params_script'=>	array(T_ZBX_STR, O_OPT, NULL, NULL, NULL),
