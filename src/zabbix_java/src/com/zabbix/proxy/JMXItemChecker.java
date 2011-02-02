@@ -142,9 +142,9 @@ class JMXItemChecker extends ItemChecker
 				}
 			}
 
-			jmxc.close();
-
-			return counters.toString(2);
+			JSONObject mapping = new JSONObject();
+			mapping.put(item.getKey(), counters);
+			return mapping.toString(2);
 		}
 		else
 			throw new ZabbixException("Key ID '%s' is not supported", item.getKeyId());

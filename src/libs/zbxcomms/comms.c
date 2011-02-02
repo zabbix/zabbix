@@ -1053,7 +1053,7 @@ void	zbx_tcp_free(zbx_sock_t *s)
  ******************************************************************************/
 int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeout)
 {
-#define ZBX_BUF_LEN	ZBX_STAT_BUF_LEN*8
+#define ZBX_BUF_LEN	ZBX_STAT_BUF_LEN * 8
 
 	ssize_t		nbytes, left;
 	ssize_t		read_bytes;

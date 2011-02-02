@@ -375,14 +375,14 @@ static int	DCget_reachable_nextcheck(const ZBX_DC_ITEM *item, int now)
 	int	nextcheck;
 
 	if (ITEM_STATUS_NOTSUPPORTED == item->status)
-		nextcheck = calculate_item_nextcheck(item->itemid, item->type,
+		nextcheck = calculate_item_nextcheck(item->interfaceid, item->itemid, item->type,
 				CONFIG_REFRESH_UNSUPPORTED, NULL, now, NULL);
 	else
 	{
 		const ZBX_DC_FLEXITEM	*flexitem;
 
 		flexitem = zbx_hashset_search(&config->flexitems, &item->itemid);
-		nextcheck = calculate_item_nextcheck(item->itemid, item->type,
+		nextcheck = calculate_item_nextcheck(item->interfaceid, item->itemid, item->type,
 				item->delay, flexitem ? flexitem->delay_flex : NULL, now, NULL);
 	}
 
@@ -671,22 +671,22 @@ static void	DCsync_items(DB_RESULT result)
 			old_nextcheck = 0;
 
 			if (ITEM_STATUS_NOTSUPPORTED == status)
-				item->nextcheck = calculate_item_nextcheck(itemid, item->type,
-						CONFIG_REFRESH_UNSUPPORTED, NULL, now, NULL);
+				item->nextcheck = calculate_item_nextcheck(item->interfaceid, itemid,
+						item->type, CONFIG_REFRESH_UNSUPPORTED, NULL, now, NULL);
 			else
-				item->nextcheck = calculate_item_nextcheck(itemid, item->type,
-						delay, row[16], now, NULL);
+				item->nextcheck = calculate_item_nextcheck(item->interfaceid, itemid,
+						item->type, delay, row[16], now, NULL);
 		}
 		else
 		{
 			old_nextcheck = item->nextcheck;
 
 			if (ITEM_STATUS_ACTIVE == status && (status != item->status || delay != item->delay))
-				item->nextcheck = calculate_item_nextcheck(itemid, item->type,
-						delay, row[16], now, NULL);
+				item->nextcheck = calculate_item_nextcheck(item->interfaceid, itemid,
+						item->type, delay, row[16], now, NULL);
 			else if (ITEM_STATUS_NOTSUPPORTED == status && status != item->status)
-				item->nextcheck = calculate_item_nextcheck(itemid, item->type,
-						CONFIG_REFRESH_UNSUPPORTED, NULL, now, NULL);
+				item->nextcheck = calculate_item_nextcheck(item->interfaceid, itemid,
+						item->type, CONFIG_REFRESH_UNSUPPORTED, NULL, now, NULL);
 		}
 
 		item->status = status;
@@ -699,8 +699,6 @@ static void	DCsync_items(DB_RESULT result)
 				ZBX_POLLER_TYPE_IPMI == item->poller_type ||
 				ZBX_POLLER_TYPE_JAVA == item->poller_type))
 			item->poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
-
-		DCupdate_item_queue(item, old_poller_type, old_nextcheck);
 
 		/* SNMP items */
 
@@ -883,6 +881,8 @@ static void	DCsync_items(DB_RESULT result)
 			zbx_strpool_release(calcitem->params);
 			zbx_hashset_remove(&config->calcitems, &itemid);
 		}
+
+		DCupdate_item_queue(item, old_poller_type, old_nextcheck);
 	}
 
 	/* remove deleted or disabled items from buffer */
@@ -1891,6 +1891,37 @@ static int	__config_nextcheck_compare(const void *d1, const void *d2)
 	return 0;
 }
 
+static int	__config_java_item_compare(const ZBX_DC_ITEM *i1, const ZBX_DC_ITEM *i2)
+{
+	const ZBX_DC_JMXITEM	*j1;
+	const ZBX_DC_JMXITEM	*j2;
+
+	if (i1->nextcheck < i2->nextcheck) return -1;
+	if (i1->nextcheck > i2->nextcheck) return +1;
+
+	if (i1->interfaceid < i2->interfaceid) return -1;
+	if (i1->interfaceid > i2->interfaceid) return +1;
+
+	j1 = zbx_hashset_search(&config->jmxitems, &i1->itemid);
+	j2 = zbx_hashset_search(&config->jmxitems, &i2->itemid);
+
+	if (j1->username < j2->username) return -1;
+	if (j1->username > j2->username) return +1;
+
+	if (j1->password < j2->password) return -1;
+	if (j1->password > j2->password) return +1;
+
+	return 0;
+}
+
+static int	__config_java_elem_compare(const void *d1, const void *d2)
+{
+	const zbx_binary_heap_elem_t	*e1 = (const zbx_binary_heap_elem_t *)d1;
+	const zbx_binary_heap_elem_t	*e2 = (const zbx_binary_heap_elem_t *)d2;
+
+	return __config_java_item_compare((const ZBX_DC_ITEM *)e1->data, (const ZBX_DC_ITEM *)e2->data);
+}
+
 static int	__config_proxy_compare(const void *d1, const void *d2)
 {
 	const zbx_binary_heap_elem_t	*e1 = (const zbx_binary_heap_elem_t *)d1;
@@ -1980,13 +2011,23 @@ void	init_configuration_cache()
 
 	for (i = 0; i < ZBX_POLLER_TYPE_COUNT; i++)
 	{
-		zbx_binary_heap_create_ext(&config->queues[i],
-						__config_nextcheck_compare,
-						ZBX_BINARY_HEAP_OPTION_DIRECT,
-						__config_mem_malloc_func,
-						__config_mem_realloc_func,
-						__config_mem_free_func);
+		if (ZBX_POLLER_TYPE_JAVA != i)
+		{
+			zbx_binary_heap_create_ext(&config->queues[i],
+					__config_nextcheck_compare,
+					ZBX_BINARY_HEAP_OPTION_DIRECT,
+					__config_mem_malloc_func,
+					__config_mem_realloc_func,
+					__config_mem_free_func);
+		}
 	}
+
+	zbx_binary_heap_create_ext(&config->queues[ZBX_POLLER_TYPE_JAVA],
+			__config_java_elem_compare,
+			ZBX_BINARY_HEAP_OPTION_DIRECT,
+			__config_mem_malloc_func,
+			__config_mem_realloc_func,
+			__config_mem_free_func);
 
 	zbx_binary_heap_create_ext(&config->pqueue,
 					__config_proxy_compare,
@@ -2487,8 +2528,9 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max
 		int				disable_until, old_nextcheck;
 		unsigned char			old_poller_type;
 		const zbx_binary_heap_elem_t	*min;
-		ZBX_DC_ITEM			*dc_item;
 		ZBX_DC_HOST			*dc_host;
+		ZBX_DC_ITEM			*dc_item;
+		static const ZBX_DC_ITEM	*dc_item_prev = NULL;
 
 		min = zbx_binary_heap_find_min(queue);
 		dc_item = (ZBX_DC_ITEM *)min->data;
@@ -2496,10 +2538,14 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max
 		if (dc_item->nextcheck > now)
 			break;
 
+		if (ZBX_POLLER_TYPE_JAVA == poller_type)
+			if (0 != num && 0 != __config_java_item_compare(dc_item_prev, dc_item))
+				break;
+
 		zbx_binary_heap_remove_min(queue);
 		dc_item->location = ZBX_LOC_NOWHERE;
 
-		if (CONFIG_REFRESH_UNSUPPORTED == 0 && ITEM_STATUS_NOTSUPPORTED == dc_item->status)
+		if (0 == CONFIG_REFRESH_UNSUPPORTED && ITEM_STATUS_NOTSUPPORTED == dc_item->status)
 			continue;
 
 		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
@@ -2558,6 +2604,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max
 			DCincrease_disable_until(dc_item, dc_host, now);
 		}
 
+		dc_item_prev = dc_item;
 		dc_item->location = ZBX_LOC_POLLER;
 		DCget_host(&items[num].host, dc_host);
 		DCget_item(&items[num], dc_item);

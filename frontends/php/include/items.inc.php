@@ -1268,7 +1268,7 @@
  * Comments:
  *     !!! Don't forget sync code with C !!!
  */
-	function calculate_item_nextcheck($itemid, $item_type, $delay, $flex_intervals, $now){
+	function calculate_item_nextcheck($interfaceid, $itemid, $item_type, $delay, $flex_intervals, $now){
 		if(0 == $delay) $delay = SEC_PER_YEAR;
 
 // Special processing of active items to see better view in queue
@@ -1296,7 +1296,8 @@
 			}
 
 			$delay = $current_delay;
-			$nextcheck = $delay * floor($now / $delay) + ($itemid % $delay);
+			$shift = ($item_type == ITEM_TYPE_JMX ? $interfaceid : $itemid);
+			$nextcheck = $delay * floor($now / $delay) + ($shift % $delay);
 
 			while($nextcheck <= $now) $nextcheck += $delay;
 		}

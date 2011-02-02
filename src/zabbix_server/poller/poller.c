@@ -43,116 +43,15 @@
 #include "checks_jmx.h"
 #include "checks_calculated.h"
 
-#define MAX_REACHABLE_ITEMS	64
-#define MAX_UNREACHABLE_ITEMS	1	/* must not be greater than MAX_REACHABLE_ITEMS to avoid buffer overflow */
+#define MAX_BUNCH_ITEMS	32
 
 static unsigned char	zbx_process;
 static int		poller_type;
 static int		poller_num;
 
-static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
+static int	is_bunch_poller(int poller_type)
 {
-	const char	*__function_name = "get_value";
-	int		res = FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, item->key_orig);
-
-	switch (item->type)
-	{
-		case ITEM_TYPE_ZABBIX:
-			alarm(CONFIG_TIMEOUT);
-			res = get_value_agent(item, result);
-			alarm(0);
-			break;
-		case ITEM_TYPE_SNMPv1:
-		case ITEM_TYPE_SNMPv2c:
-		case ITEM_TYPE_SNMPv3:
-#ifdef HAVE_SNMP
-			alarm(CONFIG_TIMEOUT);
-			res = get_value_snmp(item, result);
-			alarm(0);
-#else
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support of SNMP parameters was not compiled in"));
-			res = NOTSUPPORTED;
-#endif
-			break;
-		case ITEM_TYPE_IPMI:
-#ifdef HAVE_OPENIPMI
-			res = get_value_ipmi(item, result);
-#else
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support of IPMI parameters was not compiled in"));
-			res = NOTSUPPORTED;
-#endif
-			break;
-		case ITEM_TYPE_SIMPLE:
-			alarm(CONFIG_TIMEOUT);
-			res = get_value_simple(item, result);
-			alarm(0);
-			break;
-		case ITEM_TYPE_INTERNAL:
-			res = get_value_internal(item, result);
-			break;
-		case ITEM_TYPE_DB_MONITOR:
-			alarm(CONFIG_TIMEOUT);
-			res = get_value_db(item, result);
-			alarm(0);
-			break;
-		case ITEM_TYPE_AGGREGATE:
-			res = get_value_aggregate(item, result);
-			break;
-		case ITEM_TYPE_EXTERNAL:
-			alarm(CONFIG_TIMEOUT);
-			res = get_value_external(item, result);
-			alarm(0);
-			break;
-		case ITEM_TYPE_SSH:
-#ifdef HAVE_SSH2
-			/* Cannot use "alarming" since it breaks down libssh2 and our process terminates. */
-			/* libssh2 has its own default timeout == 60 and it should not hang on under usual circumstances. */
-			/* alarm(CONFIG_TIMEOUT); */
-			res = get_value_ssh(item, result);
-			/* alarm(0); */
-#else
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support of SSH parameters was not compiled in"));
-			res = NOTSUPPORTED;
-#endif	/* HAVE_SSH2 */
-			break;
-		case ITEM_TYPE_TELNET:
-			alarm(CONFIG_TIMEOUT);
-			res = get_value_telnet(item, result);
-			alarm(0);
-			break;
-		case ITEM_TYPE_JMX:
-			alarm(CONFIG_TIMEOUT);
-			res = get_value_jmx(item, result);
-			alarm(0);
-			break;
-		case ITEM_TYPE_CALCULATED:
-			res = get_value_calculated(item, result);
-			break;
-		default:
-			zabbix_log(LOG_LEVEL_WARNING, "Not supported item type:%d", item->type);
-			zabbix_syslog("Not supported item type:%d", item->type);
-			res = NOTSUPPORTED;
-	}
-
-	if (SUCCEED != res && GET_MSG_RESULT(result))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Item [%s:%s] error: %s", item->host.host, item->key_orig, result->msg);
-		zabbix_syslog("Item [%s:%s] error: %s", item->host.host, item->key_orig, result->msg);
-	}
-
-	/* remove formatting symbols from the end of the result */
-	/* so it could be checked by "is_uint64" and "is_double" functions */
-	/* when we try to get "int" or "float" values from "string" result */
-	if (ISSET_STR(result))
-		zbx_rtrim(result->str, ZBX_WHITESPACE);
-	if (ISSET_TEXT(result))
-		zbx_rtrim(result->text, ZBX_WHITESPACE);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
-
-	return res;
+	return ZBX_POLLER_TYPE_JAVA == poller_type ? SUCCEED : FAIL;
 }
 
 static void	update_key_status(zbx_uint64_t hostid, int host_status, zbx_timespec_t *ts)
@@ -300,7 +199,7 @@ static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 				fld_available, *available);
 
 		if (available == &item->host.available)
-			update_key_status(item->host.hostid, HOST_STATUS_MONITORED, ts); /* 0 */
+			update_key_status(item->host.hostid, HOST_STATUS_MONITORED, ts);
 	}
 
 	*errors_from = 0;
@@ -379,7 +278,6 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "update hosts set ");
 
-	/* First error */
 	if (0 == *errors_from)
 	{
 		zbx_snprintf(error_msg, sizeof(error_msg), "%s host [%s]: first network error, wait for %d seconds",
@@ -394,7 +292,6 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 	{
 		if (ts->sec - *errors_from <= CONFIG_UNREACHABLE_PERIOD)
 		{
-			/* Still unavailable, but won't change status to UNAVAILABLE yet */
 			zbx_snprintf(error_msg, sizeof(error_msg), "%s host [%s]: another network error, wait for %d seconds",
 					zbx_host_type_string(item->type), item->host.host, CONFIG_UNREACHABLE_DELAY);
 
@@ -415,7 +312,7 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 						fld_available, *available);
 
 				if (available == &item->host.available)
-					update_key_status(item->host.hostid, HOST_AVAILABLE_FALSE, ts); /* 2 */
+					update_key_status(item->host.hostid, HOST_AVAILABLE_FALSE, ts);
 
 				update_triggers_status_to_unknown(item->host.hostid, ts, "Host is unavailable.");
 			}
@@ -441,6 +338,111 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 	}
 }
 
+static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
+{
+	const char	*__function_name = "get_value";
+	int		res = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, item->key_orig);
+
+	switch (item->type)
+	{
+		case ITEM_TYPE_ZABBIX:
+			alarm(CONFIG_TIMEOUT);
+			res = get_value_agent(item, result);
+			alarm(0);
+			break;
+		case ITEM_TYPE_SNMPv1:
+		case ITEM_TYPE_SNMPv2c:
+		case ITEM_TYPE_SNMPv3:
+#ifdef HAVE_SNMP
+			alarm(CONFIG_TIMEOUT);
+			res = get_value_snmp(item, result);
+			alarm(0);
+#else
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support of SNMP parameters was not compiled in"));
+			res = NOTSUPPORTED;
+#endif
+			break;
+		case ITEM_TYPE_IPMI:
+#ifdef HAVE_OPENIPMI
+			res = get_value_ipmi(item, result);
+#else
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support of IPMI parameters was not compiled in"));
+			res = NOTSUPPORTED;
+#endif
+			break;
+		case ITEM_TYPE_SIMPLE:
+			alarm(CONFIG_TIMEOUT);
+			res = get_value_simple(item, result);
+			alarm(0);
+			break;
+		case ITEM_TYPE_INTERNAL:
+			res = get_value_internal(item, result);
+			break;
+		case ITEM_TYPE_DB_MONITOR:
+			alarm(CONFIG_TIMEOUT);
+			res = get_value_db(item, result);
+			alarm(0);
+			break;
+		case ITEM_TYPE_AGGREGATE:
+			res = get_value_aggregate(item, result);
+			break;
+		case ITEM_TYPE_EXTERNAL:
+			alarm(CONFIG_TIMEOUT);
+			res = get_value_external(item, result);
+			alarm(0);
+			break;
+		case ITEM_TYPE_SSH:
+#ifdef HAVE_SSH2
+			/* Cannot use "alarming" since it breaks down libssh2 and our process terminates. */
+			/* libssh2 has its own default timeout == 60 and it should not hang on under usual circumstances. */
+			/* alarm(CONFIG_TIMEOUT); */
+			res = get_value_ssh(item, result);
+			/* alarm(0); */
+#else
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support of SSH parameters was not compiled in"));
+			res = NOTSUPPORTED;
+#endif	/* HAVE_SSH2 */
+			break;
+		case ITEM_TYPE_TELNET:
+			alarm(CONFIG_TIMEOUT);
+			res = get_value_telnet(item, result);
+			alarm(0);
+			break;
+		case ITEM_TYPE_JMX:
+			alarm(CONFIG_TIMEOUT);
+			res = get_value_jmx(item, result);
+			alarm(0);
+			break;
+		case ITEM_TYPE_CALCULATED:
+			res = get_value_calculated(item, result);
+			break;
+		default:
+			zabbix_log(LOG_LEVEL_WARNING, "Not supported item type:%d", item->type);
+			zabbix_syslog("Not supported item type:%d", item->type);
+			res = NOTSUPPORTED;
+	}
+
+	if (SUCCEED != res && GET_MSG_RESULT(result))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Item [%s:%s] error: %s", item->host.host, item->key_orig, result->msg);
+		zabbix_syslog("Item [%s:%s] error: %s", item->host.host, item->key_orig, result->msg);
+	}
+
+	/* remove formatting symbols from the end of the result */
+	/* so it could be checked by "is_uint64" and "is_double" functions */
+	/* when we try to get "int" or "float" values from "string" result */
+	if (ISSET_STR(result))
+		zbx_rtrim(result->str, ZBX_WHITESPACE);
+	if (ISSET_TEXT(result))
+		zbx_rtrim(result->text, ZBX_WHITESPACE);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+
+	return res;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: get_values                                                       *
@@ -449,81 +451,48 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value:                                                              *
+ * Return value: number of items processed                                    *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments: always SUCCEED                                                   *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	get_values()
 {
 	const char	*__function_name = "get_values";
-	DC_ITEM		items[MAX_REACHABLE_ITEMS];
-	AGENT_RESULT	agent;
-	zbx_uint64_t	*ids = NULL, *snmpids = NULL, *ipmiids = NULL, *jmxids = NULL;
-	int		ids_alloc = 0, snmpids_alloc = 0, ipmiids_alloc = 0, jmxids_alloc = 0,
-			ids_num = 0, snmpids_num = 0, ipmiids_num = 0, jmxids_num = 0,
-			i, num, res;
-	static char	*key = NULL, *addr = NULL, *port = NULL,
-			*params = NULL, *username = NULL, *publickey = NULL,
-			*privatekey = NULL, *password = NULL,
-			*snmp_community = NULL, *snmp_oid = NULL,
-			*snmpv3_securityname = NULL,
-			*snmpv3_authpassphrase = NULL,
-			*snmpv3_privpassphrase = NULL;
-	const char	*type;
-	zbx_timespec_t	ts;
+	DC_ITEM		items[MAX_BUNCH_ITEMS];
+	AGENT_RESULT	results[MAX_BUNCH_ITEMS];
+	int		errcodes[MAX_BUNCH_ITEMS];
+	zbx_timespec_t	timespecs[MAX_BUNCH_ITEMS];
+	int		i, num, res;
+	char		*addr = NULL, *port = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	num = (SUCCEED == is_bunch_poller(poller_type) ? MAX_BUNCH_ITEMS : 1);
+	num = DCconfig_get_poller_items(poller_type, items, num);
+
+	if (0 == num)
+		goto exit;
+
 	DCinit_nextchecks();
 
-	num = DCconfig_get_poller_items(poller_type, items, ZBX_POLLER_TYPE_UNREACHABLE != poller_type
-								? MAX_REACHABLE_ITEMS : MAX_UNREACHABLE_ITEMS);
+	/* prepare items */
 
 	for (i = 0; i < num; i++)
 	{
-		switch (items[i].type)
-		{
-			case ITEM_TYPE_ZABBIX:
-				res = uint64_array_exists(ids, ids_num, items[i].host.hostid);
-				break;
-			case ITEM_TYPE_SNMPv1:
-			case ITEM_TYPE_SNMPv2c:
-			case ITEM_TYPE_SNMPv3:
-				res = uint64_array_exists(snmpids, snmpids_num, items[i].host.hostid);
-				break;
-			case ITEM_TYPE_IPMI:
-				res = uint64_array_exists(ipmiids, ipmiids_num, items[i].host.hostid);
-				break;
-			case ITEM_TYPE_JMX:
-				res = uint64_array_exists(jmxids, jmxids_num, items[i].host.hostid);
-				break;
-			default:
-				res = FAIL;
-				break;
-		}
+		init_result(&results[i]);
+		errcodes[i] = SUCCEED;
 
-		if (SUCCEED == res)
-		{
-			DCrequeue_unreachable_item(items[i].itemid);
-			zabbix_log(LOG_LEVEL_DEBUG, "%s host " ZBX_FS_UI64 " is unreachable. Skipping [%s]",
-					zbx_host_type_string(items[i].type), items[i].host.hostid, items[i].key_orig);
-			continue;
-		}
+		ZBX_STRDUP(items[i].key, items[i].key_orig);
+		substitute_simple_macros(NULL, NULL, &items[i].host, NULL, &items[i].key, MACRO_TYPE_ITEM_KEY, NULL, 0);
 
-		init_result(&agent);
-
-		ZBX_STRDUP(key, items[i].key_orig);
-		substitute_simple_macros(NULL, NULL, &items[i].host, NULL, &key, MACRO_TYPE_ITEM_KEY, NULL, 0);
-		items[i].key = key;
-
-		items[i].interface.addr = items[i].interface.useip ? items[i].interface.ip_orig : items[i].interface.dns_orig;
+		items[i].interface.addr = (items[i].interface.useip ? items[i].interface.ip_orig : items[i].interface.dns_orig);
 
 		if (INTERFACE_TYPE_AGENT != items[i].interface.type || 1 != items[i].interface.main)
 		{
-			ZBX_STRDUP(addr, items[i].interface.addr);
+			addr = zbx_strdup(NULL, items[i].interface.addr);
 			substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
 					&addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
 			items[i].interface.addr = addr;
@@ -537,135 +506,135 @@ static int	get_values()
 			case ITEM_TYPE_SNMPv3:
 			case ITEM_TYPE_IPMI:
 			case ITEM_TYPE_JMX:
-				ZBX_STRDUP(port, items[i].interface.port_orig);
+				port = zbx_strdup(NULL, items[i].interface.port_orig);
 				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL,
 						&port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
 				if (FAIL == is_ushort(port, &items[i].interface.port))
 				{
-					SET_MSG_RESULT(&agent, zbx_dsprintf(NULL, "Invalid port number [%s]",
+					SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "Invalid port number [%s]",
 								items[i].interface.port_orig));
-					res = NETWORK_ERROR;
-					goto update;
+					errcodes[i] = NETWORK_ERROR;
+					zbx_timespec(&timespecs[i]);
 				}
+				zbx_free(port);
 				break;
 		}
 
 		switch (items[i].type)
 		{
 			case ITEM_TYPE_SNMPv3:
-				ZBX_STRDUP(snmpv3_securityname, items[i].snmpv3_securityname_orig);
-				ZBX_STRDUP(snmpv3_authpassphrase, items[i].snmpv3_authpassphrase_orig);
-				ZBX_STRDUP(snmpv3_privpassphrase, items[i].snmpv3_privpassphrase_orig);
+				ZBX_STRDUP(items[i].snmpv3_securityname, items[i].snmpv3_securityname_orig);
+				ZBX_STRDUP(items[i].snmpv3_authpassphrase, items[i].snmpv3_authpassphrase_orig);
+				ZBX_STRDUP(items[i].snmpv3_privpassphrase, items[i].snmpv3_privpassphrase_orig);
 
 				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
-						&snmpv3_securityname, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+						&items[i].snmpv3_securityname, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
-						&snmpv3_authpassphrase, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+						&items[i].snmpv3_authpassphrase, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
-						&snmpv3_privpassphrase, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-
-				items[i].snmpv3_securityname = snmpv3_securityname;
-				items[i].snmpv3_authpassphrase = snmpv3_authpassphrase;
-				items[i].snmpv3_privpassphrase = snmpv3_privpassphrase;
+						&items[i].snmpv3_privpassphrase, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 			case ITEM_TYPE_SNMPv1:
 			case ITEM_TYPE_SNMPv2c:
-				ZBX_STRDUP(snmp_community, items[i].snmp_community_orig);
-				ZBX_STRDUP(snmp_oid, items[i].snmp_oid_orig);
+				ZBX_STRDUP(items[i].snmp_community, items[i].snmp_community_orig);
+				ZBX_STRDUP(items[i].snmp_oid, items[i].snmp_oid_orig);
 
 				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
-						&snmp_community, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+						&items[i].snmp_community, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
-						&snmp_oid, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-
-				items[i].snmp_community = snmp_community;
-				items[i].snmp_oid = snmp_oid;
+						&items[i].snmp_oid, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 				break;
 			case ITEM_TYPE_DB_MONITOR:
-				ZBX_STRDUP(params, items[i].params_orig);
+				ZBX_STRDUP(items[i].params, items[i].params_orig);
 				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
-						&params, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-				items[i].params = params;
+						&items[i].params, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 				break;
 			case ITEM_TYPE_SSH:
-				ZBX_STRDUP(username, items[i].username_orig);
-				ZBX_STRDUP(publickey, items[i].publickey_orig);
-				ZBX_STRDUP(privatekey, items[i].privatekey_orig);
-				ZBX_STRDUP(password, items[i].password_orig);
-				ZBX_STRDUP(params, items[i].params_orig);
+				ZBX_STRDUP(items[i].username, items[i].username_orig);
+				ZBX_STRDUP(items[i].publickey, items[i].publickey_orig);
+				ZBX_STRDUP(items[i].privatekey, items[i].privatekey_orig);
+				ZBX_STRDUP(items[i].password, items[i].password_orig);
+				ZBX_STRDUP(items[i].params, items[i].params_orig);
 
 				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
-						&username, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+						&items[i].username, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
-						&publickey, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+						&items[i].publickey, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
-						&privatekey, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+						&items[i].privatekey, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
-						&password, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+						&items[i].password, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
-						&params, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-
-				items[i].username = username;
-				items[i].publickey = publickey;
-				items[i].privatekey = privatekey;
-				items[i].password = password;
-				items[i].params = params;
+						&items[i].params, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 				break;
 			case ITEM_TYPE_TELNET:
-				ZBX_STRDUP(username, items[i].username_orig);
-				ZBX_STRDUP(password, items[i].password_orig);
-				ZBX_STRDUP(params, items[i].params_orig);
+				ZBX_STRDUP(items[i].username, items[i].username_orig);
+				ZBX_STRDUP(items[i].password, items[i].password_orig);
+				ZBX_STRDUP(items[i].params, items[i].params_orig);
 
 				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
-						&username, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+						&items[i].username, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
-						&password, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+						&items[i].password, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
-						&params, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-
-				items[i].username = username;
-				items[i].password = password;
-				items[i].params = params;
+						&items[i].params, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 				break;
 			case ITEM_TYPE_JMX:
-				ZBX_STRDUP(username, items[i].username_orig);
-				ZBX_STRDUP(password, items[i].password_orig);
+				ZBX_STRDUP(items[i].username, items[i].username_orig);
+				ZBX_STRDUP(items[i].password, items[i].password_orig);
 
 				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
-						&username, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+						&items[i].username, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
-						&password, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-
-				items[i].username = username;
-				items[i].password = password;
+						&items[i].password, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 				break;
 		}
+	}
 
-		res = get_value(&items[i], &agent);
-update:
-		zbx_timespec(&ts);
+	/* retrieve item values */
 
-		switch (res)
+	if (SUCCEED != is_bunch_poller(poller_type))
+	{
+		if (SUCCEED == errcodes[0])
+		{
+			errcodes[0] = get_value(&items[0], &results[0]);
+			zbx_timespec(&timespecs[0]);
+		}
+	}
+	else if (ZBX_POLLER_TYPE_JAVA == poller_type)
+	{
+		alarm(CONFIG_TIMEOUT);
+		get_values_jmx(items, results, errcodes, timespecs, num);
+		alarm(0);
+	}
+
+	/* process item values */
+
+	for (i = 0; i < num; i++)
+	{
+		switch (errcodes[i])
 		{
 			case SUCCEED:
 			case NOTSUPPORTED:
 			case AGENT_ERROR:
-				activate_host(&items[i], &ts);
+				activate_host(&items[i], &timespecs[i]);
 				break;
 			case NETWORK_ERROR:
-				deactivate_host(&items[i], &ts, agent.msg);
+			case PROXY_ERROR:
+				deactivate_host(&items[i], &timespecs[i], results[i].msg);
 				break;
 			default:
-				zbx_error("Unknown response code returned.");
-				assert(0 == 1);
+				zbx_error("Unknown response code returned: %d", errcodes[i]);
+				assert(0);
 		}
 
-		if (res == SUCCEED)
+		if (SUCCEED == errcodes[i])
 		{
-			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &agent, &ts, 0, NULL, 0, 0, 0, 0);
+			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &results[i],
+					&timespecs[i], 0, NULL, 0, 0, 0, 0);
 
-			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_ACTIVE, ts.sec);
+			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_ACTIVE, timespecs[i].sec);
 		}
-		else if (res == NOTSUPPORTED || res == AGENT_ERROR)
+		else if (NOTSUPPORTED == errcodes[i] || AGENT_ERROR == errcodes[i])
 		{
 			if (ITEM_STATUS_NOTSUPPORTED != items[i].status)
 			{
@@ -675,58 +644,56 @@ update:
 						items[i].host.host, items[i].key_orig);
 			}
 
-			DCadd_nextcheck(items[i].itemid, ts.sec, agent.msg);	/* update error & status field in items table */
-			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_NOTSUPPORTED, ts.sec);
+			DCadd_nextcheck(items[i].itemid, timespecs[i].sec, results[i].msg);
+			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_NOTSUPPORTED, timespecs[i].sec);
 		}
-		else if (res == NETWORK_ERROR)
+		else if (NETWORK_ERROR == errcodes[i] || PROXY_ERROR == errcodes[i])
 		{
-			switch (items[i].type)
-			{
-				case ITEM_TYPE_ZABBIX:
-					uint64_array_add(&ids, &ids_alloc, &ids_num, items[i].host.hostid, 1);
-					break;
-				case ITEM_TYPE_SNMPv1:
-				case ITEM_TYPE_SNMPv2c:
-				case ITEM_TYPE_SNMPv3:
-					uint64_array_add(&snmpids, &snmpids_alloc, &snmpids_num, items[i].host.hostid, 1);
-					break;
-				case ITEM_TYPE_IPMI:
-					uint64_array_add(&ipmiids, &ipmiids_alloc, &ipmiids_num, items[i].host.hostid, 1);
-					break;
-				case ITEM_TYPE_JMX:
-					uint64_array_add(&jmxids, &jmxids_alloc, &jmxids_num, items[i].host.hostid, 1);
-					break;
-				default:
-					/* nothing to do */;
-			}
-
 			DCrequeue_unreachable_item(items[i].itemid);
 		}
 
-		free_result(&agent);
+		if (items[i].interface.ip_orig != items[i].interface.addr &&
+				items[i].interface.dns_orig != items[i].interface.addr)
+			zbx_free(items[i].interface.addr);
+
+		switch (items[i].type)
+		{
+			case ITEM_TYPE_SNMPv3:
+				zbx_free(items[i].snmpv3_securityname);
+				zbx_free(items[i].snmpv3_authpassphrase);
+				zbx_free(items[i].snmpv3_privpassphrase);
+			case ITEM_TYPE_SNMPv1:
+			case ITEM_TYPE_SNMPv2c:
+				zbx_free(items[i].snmp_community);
+				zbx_free(items[i].snmp_oid);
+				break;
+			case ITEM_TYPE_DB_MONITOR:
+				zbx_free(items[i].params);
+				break;
+			case ITEM_TYPE_SSH:
+				zbx_free(items[i].username);
+				zbx_free(items[i].publickey);
+				zbx_free(items[i].privatekey);
+				zbx_free(items[i].password);
+				zbx_free(items[i].params);
+				break;
+			case ITEM_TYPE_TELNET:
+				zbx_free(items[i].username);
+				zbx_free(items[i].password);
+				zbx_free(items[i].params);
+				break;
+			case ITEM_TYPE_JMX:
+				zbx_free(items[i].username);
+				zbx_free(items[i].password);
+				break;
+		}
+
+		free_result(&results[i]);
 	}
 
-	zbx_free(key);
-	zbx_free(addr);
-	zbx_free(port);
-	zbx_free(params);
-	zbx_free(username);
-	zbx_free(publickey);
-	zbx_free(privatekey);
-	zbx_free(password);
-	zbx_free(snmp_community);
-	zbx_free(snmp_oid);
-	zbx_free(snmpv3_securityname);
-	zbx_free(snmpv3_authpassphrase);
-	zbx_free(snmpv3_privpassphrase);
-
-	zbx_free(ids);
-	zbx_free(snmpids);
-	zbx_free(ipmiids);
-
 	DCflush_nextchecks();
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+exit:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, num);
 
 	return num;
 }

@@ -73,6 +73,8 @@ include_once 'include/page_header.php';
 			ITEM_TYPE_SNMPV3);
 	$ipmi_item_types = array(
 			ITEM_TYPE_IPMI);
+	$jmx_item_types = array(
+			ITEM_TYPE_JMX);
 
 	$item_types = array(
 			ITEM_TYPE_ZABBIX,
@@ -87,21 +89,24 @@ include_once 'include/page_header.php';
 			ITEM_TYPE_INTERNAL,
 			ITEM_TYPE_AGGREGATE,
 			ITEM_TYPE_EXTERNAL,
+			ITEM_TYPE_JMX,
 			ITEM_TYPE_CALCULATED);
 
-	$sql = 'SELECT i.itemid,i.lastclock,i.description,i.key_,i.type,h.host,h.hostid,h.proxy_hostid,i.delay,i.delay_flex'.
+	$sql = 'SELECT i.itemid,i.lastclock,i.description,i.key_,i.type,'.
+			'h.host,h.hostid,h.proxy_hostid,i.delay,i.delay_flex,i.interfaceid'.
 		' FROM items i,hosts h'.
 		' WHERE i.hostid=h.hostid'.
 			' AND h.status='.HOST_STATUS_MONITORED.
 			' AND i.status='.ITEM_STATUS_ACTIVE.
-			' AND i.value_type not in ('.ITEM_VALUE_TYPE_LOG.')'.
+			' AND i.value_type NOT IN ('.ITEM_VALUE_TYPE_LOG.')'.
 			' AND i.key_ NOT IN ('.zbx_dbstr('status').','.zbx_dbstr('zabbix[log]').')'.
 			' AND NOT i.lastclock IS NULL'.
 			' AND ('.
-				' i.type in ('.implode(',',$norm_item_types).')'.
-				' OR (h.available<>'.HOST_AVAILABLE_FALSE.' AND i.type in ('.implode(',',$zbx_item_types).'))'.
-				' OR (h.snmp_available<>'.HOST_AVAILABLE_FALSE.' AND i.type in ('.implode(',',$snmp_item_types).'))'.
-				' OR (h.ipmi_available<>'.HOST_AVAILABLE_FALSE.' AND i.type in ('.implode(',',$ipmi_item_types).'))'.
+				' i.type IN ('.implode(',',$norm_item_types).')'.
+				' OR (h.available<>'.HOST_AVAILABLE_FALSE.' AND i.type IN ('.implode(',',$zbx_item_types).'))'.
+				' OR (h.snmp_available<>'.HOST_AVAILABLE_FALSE.' AND i.type IN ('.implode(',',$snmp_item_types).'))'.
+				' OR (h.ipmi_available<>'.HOST_AVAILABLE_FALSE.' AND i.type IN ('.implode(',',$ipmi_item_types).'))'.
+				' OR (h.jmx_available<>'.HOST_AVAILABLE_FALSE.' AND i.type IN ('.implode(',',$jmx_item_types).'))'.
 				')'.
 			' AND '.DBin_node('i.itemid', get_current_nodeid()).
 		' ORDER BY i.lastclock,h.host,i.description,i.key_';
@@ -122,7 +127,7 @@ include_once 'include/page_header.php';
 		}
 
 		while($row=DBfetch($result)){
-			$res = calculate_item_nextcheck($row['itemid'], $row['type'], $row['delay'], $row['delay_flex'], $row['lastclock']);
+			$res = calculate_item_nextcheck($row['interfaceid'], $row['itemid'], $row['type'], $row['delay'], $row['delay_flex'], $row['lastclock']);
 			if (0 != $row['proxy_hostid'])
 				$res['nextcheck'] = $row['lastclock'] + $res['delay'];
 
@@ -174,7 +179,7 @@ include_once 'include/page_header.php';
 		$sec_rest[0]	= 0;
 
 		while ($row = DBfetch($result)){
-			$res = calculate_item_nextcheck($row['itemid'], $row['type'], $row['delay'], $row['delay_flex'], $row['lastclock']);
+			$res = calculate_item_nextcheck($row['interfaceid'], $row['itemid'], $row['type'], $row['delay'], $row['delay_flex'], $row['lastclock']);
 			if (0 != $row['proxy_hostid'])
 				$res['nextcheck'] = $row['lastclock'] + $res['delay'];
 
@@ -229,7 +234,7 @@ include_once 'include/page_header.php';
 				S_DESCRIPTION
 				));
 		while($row=DBfetch($result)){
-			$res = calculate_item_nextcheck($row['itemid'], $row['type'], $row['delay'], $row['delay_flex'], $row['lastclock']);
+			$res = calculate_item_nextcheck($row['interfaceid'], $row['itemid'], $row['type'], $row['delay'], $row['delay_flex'], $row['lastclock']);
 			if (0 != $row['proxy_hostid'])
 				$res['nextcheck'] = $row['lastclock'] + $res['delay'];
 

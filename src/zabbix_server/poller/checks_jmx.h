@@ -28,5 +28,6 @@ extern char	*CONFIG_JAVA_PROXY;
 extern int	CONFIG_JAVA_PROXY_PORT;
 
 int	get_value_jmx(DC_ITEM *item, AGENT_RESULT *result);
+void	get_values_jmx(DC_ITEM *items, AGENT_RESULT *results, int *errcodes, zbx_timespec_t *timespecs, int num);
 
 #endif

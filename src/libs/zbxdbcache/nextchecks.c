@@ -23,15 +23,13 @@
 #include "db.h"
 #include "dbcache.h"
 
-#define ZBX_DC_NEXTCHECK struct zbx_dc_nextcheck_type
-
-ZBX_DC_NEXTCHECK
+typedef struct
 {
 	zbx_uint64_t	itemid;
-	time_t		now;/*, nextcheck;*/
-	/* for not supported items */
-	char		*error_msg;
-};
+	time_t		now;
+	char		*error_msg; /* for not supported items */
+}
+ZBX_DC_NEXTCHECK;
 
 static ZBX_DC_NEXTCHECK	*nextchecks = NULL;
 static int		nextcheck_allocated = 64;
@@ -47,19 +45,23 @@ static int		nextcheck_num;
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	DCinit_nextchecks()
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "In DCinit_nextchecks()");
+	const char	*__function_name = "DCinit_nextchecks";
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (NULL == nextchecks)
 		nextchecks = zbx_malloc(nextchecks, nextcheck_allocated * sizeof(ZBX_DC_NEXTCHECK));
 
 	nextcheck_num = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -79,15 +81,19 @@ void	DCinit_nextchecks()
  ******************************************************************************/
 static void	DCrelease_nextchecks()
 {
+	const char	*__function_name = "DCrelease_nextchecks";
+
 	int	i;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In DCrelease_nextchecks()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	for (i = 0; i < nextcheck_num; i++)
 	{
 		if (nextchecks[i].error_msg != NULL)
 			zbx_free(nextchecks[i].error_msg);
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -100,7 +106,7 @@ static void	DCrelease_nextchecks()
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -143,18 +149,12 @@ void	DCadd_nextcheck(zbx_uint64_t itemid, time_t now, const char *error_msg)
 
 	nextchecks[i].itemid = itemid;
 	nextchecks[i].now = now;
-	nextchecks[i].error_msg = (NULL != error_msg) ? strdup(error_msg) : NULL;
+	nextchecks[i].error_msg = (NULL != error_msg ? strdup(error_msg) : NULL);
 
 	nextcheck_num++;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
-
-struct event_objectid_clock
-{
-	zbx_uint64_t	objectid;/*triggerid*/
-	time_t		clock;/*`now' from items*/
-};/*the structure is for local use only in `DCflush_nextchecks' function*/
 
 /******************************************************************************
  *                                                                            *
@@ -173,6 +173,12 @@ struct event_objectid_clock
  ******************************************************************************/
 void	DCflush_nextchecks()
 {
+	struct event_objectid_clock
+	{
+		zbx_uint64_t	objectid;	/* triggerid */
+		time_t		clock;		/* `now' from items */
+	};
+
 	const char	*__function_name = "DCflush_nextchecks";
 
 	int		i, sql_offset = 0, sql_allocated = 4096;
@@ -196,11 +202,11 @@ void	DCflush_nextchecks()
 	int		triggerids_allocated = 0, triggerids_num = 0;
 
 	struct event_objectid_clock 	*events = NULL;
-	int		events_num = 0, events_allocated = 32;
+	int				events_num = 0, events_allocated = 32;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (nextcheck_num == 0)
+	if (0 == nextcheck_num)
 		return;
 
 	sql = zbx_malloc(sql, sql_allocated);
