@@ -1999,8 +1999,6 @@ class CChart extends CGraphDraw{
 
 		set_image_header();
 
-		check_authorisation();
-
 		$this->selectData();
 
 		$this->m_minY[GRAPH_YAXIS_SIDE_LEFT]	= $this->calculateMinY(GRAPH_YAXIS_SIDE_LEFT);

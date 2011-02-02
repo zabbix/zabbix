@@ -21,7 +21,48 @@
 <?php
 
 class czbxrpc{
-	public static $transactionStarted = false;
+
+	private static $transactionStarted = false;
+
+
+	public static function call($method, $params, $sessionid=null){
+// List of methods without params
+		$notifications = array(
+			'apiinfo.version' => 1
+		);
+//-----
+
+// list of methods which does not require authentication
+		$without_auth = array(
+			'apiinfo.version' => 1
+		);
+//-----
+
+		if(is_null($params) && !isset($notifications[$method])){
+			return array('error' => ZBX_API_ERROR_PARAMETERS, 'message' => _('Empty parameters'));
+		}
+
+		list($resource, $action) = explode('.', $method);
+
+// Authentication {{{
+		if(!isset($without_auth[$method])){
+
+// compatibility mode
+			if(($resource == 'user') && ($action == 'authenticate')) $action = 'login';
+
+			if(empty($sessionid) && (($resource != 'user') || ($action != 'login'))){
+				return array('error' => ZBX_API_ERROR_NO_AUTH, 'message' => 'Not authorized');
+			}
+			else if(!empty($sessionid)){
+				if(!self::callAPI('user.simpleAuth', array('sessionid' => $sessionid))){
+					return array('error' => ZBX_API_ERROR_NO_AUTH, 'message' => 'Not authorized');
+				}
+			}
+		}
+// }}} Authentication
+
+		return self::callAPI($method, $params);
+	}
 
 	private static function transactionBegin(){
 		global $DB;
@@ -44,7 +85,8 @@ class czbxrpc{
 	}
 
 	private static function callAPI($method, $params){
-		unset($params['nopermissions']);
+		if(is_array($params))
+			unset($params['nopermissions']);
 
 		list($resource, $action) = explode('.', $method);
 
@@ -74,44 +116,5 @@ class czbxrpc{
 		}
 	}
 
-
-	public static function call($method, $params, $sessionid=null){
-// List of methods without params
-		$notifications = array(
-			'apiinfo.version' => 1
-		);
-//-----
-
-// list of methods which does not require athentication
-		$without_auth = array(
-			'apiinfo.version' => 1
-		);
-//-----
-
-		if(is_null($params) && !isset($notifications[$method])){
-			return array('error' => ZBX_API_ERROR_PARAMETERS);
-		}
-
-		list($resource, $action) = explode('.', $method);
-		if(!isset($without_auth[$method])){
-// Authentication {{{
-
-// compatibility mode
-			if(($resource == 'user') && ($action == 'authenticate')) $action = 'login';
-//----------
-
-			if(empty($sessionid) && (($resource != 'user') || ($action != 'login'))){
-				return array('error' => ZBX_API_ERROR_NO_AUTH, 'message' => 'Not authorized');
-			}
-			else if(!empty($sessionid)){
-				if(!API::User()->simpleAuth($sessionid)){
-					return array('error' => ZBX_API_ERROR_NO_AUTH, 'message' => 'Not authorized');
-				}
-			}
-// }}} Authentication
-		}
-
-		return self::callAPI($method, $params);
-	}
 }
 ?>

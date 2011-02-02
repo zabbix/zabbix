@@ -40,28 +40,6 @@ function permission2str($group_permission){
 	return S_UNKNOWN;
 }
 
-/*****************************************
-	CHECK USER AUTHORISATION
-*****************************************/
-
-function check_authorisation(){
-	global $USER_DETAILS;
-	$sessionid = get_cookie('zbx_sessionid');
-
-	$user = array('sessionid'=>$sessionid);
-	if(!$auth = API::User()->checkAuthentication($user)){
-
-		include_once('include/locales/en_gb.inc.php');
-		process_locales();
-
-		include('index.php');
-		exit();
-	}
-
-return $auth;
-}
-
-
 /***********************************************
 	CHECK USER ACCESS TO SYSTEM STATUS
 ************************************************/
@@ -131,18 +109,6 @@ function get_user_auth($userid){
 	}
 
 return $result;
-}
-
-function get_user_debug_mode($userid){
-	$sql = 'SELECT g.usrgrpid '.
-			' FROM usrgrp g, users_groups ug '.
-			' WHERE ug.userid = '.$userid.
-				' AND g.usrgrpid = ug.usrgrpid '.
-				' AND g.debug_mode = '.GROUP_DEBUG_MODE_ENABLED;
-	if($res = DBfetch(DBselect($sql,1))){
-		return true;
-	}
-return false;
 }
 
 /* Function: get_user_system_auth()

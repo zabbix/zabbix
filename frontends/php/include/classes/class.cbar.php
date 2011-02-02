@@ -627,7 +627,6 @@ class CBar extends CGraphDraw{
 	public function draw(){
 		$start_time=getmicrotime();
 		set_image_header();
-		check_authorisation();
 
 		$this->column = uint_in_array($this->type, array(GRAPH_TYPE_COLUMN, GRAPH_TYPE_COLUMN_STACKED));
 

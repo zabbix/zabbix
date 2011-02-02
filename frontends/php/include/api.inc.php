@@ -29,8 +29,9 @@ class CAPIObject{
 
 	public function __call($method, $params){
 		global $USER_DETAILS;
-
-		$result = czbxrpc::call($this->_name.'.'.$method, $params[0], $USER_DETAILS['sessionid']);
+		if(!isset($USER_DETAILS['sessionid'])) $USER_DETAILS['sessionid'] = null;
+		$sessionid = get_cookie('zbx_sessionid');
+		$result = czbxrpc::call($this->_name.'.'.$method, $params[0], $sessionid);
 
 		if(isset($result['result'])){
 			return $result['result'];
@@ -61,7 +62,8 @@ class API{
 	}
 
 	private static function getAPIObject($className){
-		if(!isset(self::$APIobjects[$className])) self::$APIobjects[$className] = new CAPIObject($className);
+		$c = 'C'.$className;
+		if(!isset(self::$APIobjects[$className])) self::$APIobjects[$className] = new $c;
 			return self::$APIobjects[$className];
 	}
 
@@ -71,77 +73,72 @@ class API{
 	}
 
 	public static function getObject($className){
-		return self::$return == self::RETURN_TYPE_API ? self::getAPIObject($className) : self::getAPIObject($className);
+		return self::$return == self::RETURN_TYPE_API ? self::getAPIObject($className) : self::getRPCObject($className);
 	}
 
 	public static function Action(){
 		return self::getObject('action');
 	}
-
 	public static function Alert(){
 		return self::getObject('alert');
 	}
-
 	public static function Application(){
 		return self::getObject('application');
 	}
-
+	public static function DiscoveryRule(){
+		return self::getObject('discoveryrule');
+	}
 	public static function Event(){
 		return self::getObject('event');
 	}
-
 	public static function Graph(){
 		return self::getObject('graph');
 	}
-
 	public static function GraphItem(){
 		return self::getObject('graphitem');
 	}
-
 	public static function Host(){
 		return self::getObject('host');
 	}
-
 	public static function HostGroup(){
 		return self::getObject('hostgroup');
 	}
-
+	public static function HostInterface(){
+		return self::getObject('hostinterface');
+	}
 	public static function Item(){
 		return self::getObject('item');
 	}
-
 	public static function Maintenance(){
 		return self::getObject('maintenance');
 	}
-
 	public static function Map(){
 		return self::getObject('map');
 	}
-
+	public static function Proxy(){
+		return self::getObject('proxy');
+	}
 	public static function Screen(){
 		return self::getObject('screen');
 	}
-
 	public static function Script(){
 		return self::getObject('script');
 	}
-
 	public static function Template(){
 		return self::getObject('template');
 	}
-
+	public static function TemplateScreen(){
+		return self::getObject('templatescreen');
+	}
 	public static function Trigger(){
 		return self::getObject('trigger');
 	}
-
 	public static function User(){
 		return self::getObject('user');
 	}
-
 	public static function UserGroup(){
 		return self::getObject('usergroup');
 	}
-
 	public static function UserMacro(){
 		return self::getObject('usermacro');
 	}
