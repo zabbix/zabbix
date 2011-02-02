@@ -1,13 +1,24 @@
 ALTER TABLE ONLY sysmaps ALTER sysmapid DROP DEFAULT,
-			 ALTER width SET DEFAULT '600',
-			 ALTER height SET DEFAULT '400',
-			 ALTER backgroundid DROP DEFAULT,
-			 ALTER backgroundid DROP NOT NULL,
-			 ALTER label_type SET DEFAULT '2',
-			 ALTER label_location SET DEFAULT '3',
-			 ADD expandproblem INTEGER DEFAULT '1' NOT NULL,
-			 ADD markelements INTEGER DEFAULT '0' NOT NULL,
-			 ADD show_unack INTEGER DEFAULT '0' NOT NULL;
+			ALTER width SET DEFAULT '600',
+			ALTER height SET DEFAULT '400',
+			ALTER backgroundid DROP DEFAULT,
+			ALTER backgroundid DROP NOT NULL,
+			ALTER label_type SET DEFAULT '2',
+			ALTER label_location SET DEFAULT '3',
+			ADD expandproblem INTEGER DEFAULT '1' NOT NULL,
+			ADD markelements INTEGER DEFAULT '0' NOT NULL,
+			ADD show_unack INTEGER DEFAULT '0' NOT NULL,
+			ADD label_format INTEGER DEFAULT '0' NOT NULL,
+			ADD label_type_host INTEGER DEFAULT '2' NOT NULL,
+			ADD label_type_hostgroup INTEGER DEFAULT '2' NOT NULL,
+			ADD label_type_trigger INTEGER DEFAULT '2' NOT NULL,
+			ADD label_type_map INTEGER DEFAULT '2' NOT NULL,
+			ADD label_type_image INTEGER DEFAULT '2' NOT NULL,
+			ADD label_string_host varchar(255) DEFAULT '' NOT NULL,
+			ADD label_string_hostgroup varchar(255) DEFAULT '' NOT NULL,
+			ADD label_string_trigger varchar(255) DEFAULT '' NOT NULL,
+			ADD label_string_map varchar(255) DEFAULT '' NOT NULL,
+			ADD label_string_image varchar(255) DEFAULT '' NOT NULL;
 UPDATE sysmaps SET backgroundid=NULL WHERE backgroundid=0;
 UPDATE sysmaps SET show_unack=1 WHERE highlight>7 AND highlight<16;
 UPDATE sysmaps SET show_unack=2 WHERE highlight>23;
