@@ -48,7 +48,6 @@ include_once('include/page_header.php');
 		'users'=>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,			null),
 		'users_status'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),		'isset({save})'),
 		'gui_access'=>			array(T_ZBX_INT, O_OPT,	null,	IN('0,1,2'),	'isset({save})'),
-		'api_access'=>			array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),		'isset({save})'),
 		'debug_mode'=>			array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),		'isset({save})'),
 		'new_right'=>			array(T_ZBX_STR, O_OPT,	null,	null,			null),
 		'right_to_del'=>		array(T_ZBX_STR, O_OPT,	null,	null,			null),
@@ -58,7 +57,6 @@ include_once('include/page_header.php');
 
 		'set_users_status'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'), null),
 		'set_gui_access'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1,2'), null),
-		'set_api_access'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'), null),
 		'set_debug_mode'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'), null),
 // Actions
 		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
@@ -134,7 +132,6 @@ include_once('include/page_header.php');
 			'name' => $_REQUEST['gname'],
 			'users_status' => $_REQUEST['users_status'],
 			'gui_access' => $_REQUEST['gui_access'],
-			'api_access' => $_REQUEST['api_access'],
 			'debug_mode' => $_REQUEST['debug_mode'],
 			'userids' => get_request('group_users', array()),
 			'rights' => array_values(get_request('group_rights', array())),
@@ -227,37 +224,6 @@ include_once('include/page_header.php');
 			}
 
 			show_messages($go_result, S_GUI_ACCESS_UPDATED, S_CANNOT_UPDATE_GUI_ACCESS);
-		}
-	}
-	else if(str_in_array($_REQUEST['go'], array('enable_api', 'disable_api'))){
-		$groupids = get_request('group_groupid', get_request('usrgrpid'));
-		zbx_value2array($groupids);
-
-		$set_api_access = ($_REQUEST['go'] == 'enable_api')?GROUP_API_ACCESS_ENABLED:GROUP_API_ACCESS_DISABLED;
-
-		$groups = array();
-		$sql = 'SELECT ug.usrgrpid, ug.name '.
-				' FROM usrgrp ug '.
-				' WHERE '.DBin_node('ug.usrgrpid').
-					' AND '.DBcondition('ug.usrgrpid',$groupids);
-		$res = DBselect($sql);
-		while($group = DBfetch($res)){
-			$groups[$group['usrgrpid']] = $group;
-		}
-
-		if(!empty($groups)){
-			DBstart();
-			$go_result = change_group_api_access($groupids,$set_api_access);
-			$go_result = DBend($go_result);
-
-			if($go_result){
-				$audit_action = ($set_api_access == GROUP_API_ACCESS_DISABLED)?AUDIT_ACTION_DISABLE:AUDIT_ACTION_ENABLE;
-				foreach($groups as $groupid => $group){
-					add_audit($audit_action,AUDIT_RESOURCE_USER_GROUP,'API access for group name ['.$group['name'].']');
-				}
-			}
-
-			show_messages($go_result, S_API_ACCESS_UPDATED, S_CANNOT_UPDATE_API_ACCESS);
 		}
 	}
 	else if(str_in_array($_REQUEST['go'], array('enable_debug', 'disable_debug'))){
@@ -368,7 +334,6 @@ include_once('include/page_header.php');
 			S_MEMBERS,
 			S_USERS_STATUS,
 			S_GUI_ACCESS,
-			S_API_ACCESS,
 			S_DEBUG_MODE
 		));
 
@@ -391,10 +356,6 @@ include_once('include/page_header.php');
 
 		foreach($usrgrps as $ugnum => $usrgrp){
 			$usrgrpid = $usrgrp['usrgrpid'];
-
-			$api_access = ($usrgrp['api_access'] == GROUP_API_ACCESS_ENABLED)
-				? new CLink(S_ENABLED, 'usergrps.php?go=disable_api&usrgrpid='.$usrgrpid, 'orange')
-				: new CLink(S_DISABLED, 'usergrps.php?go=enable_api&usrgrpid='.$usrgrpid, 'enabled');
 
 			$debug_mode = ($usrgrp['debug_mode'] == GROUP_DEBUG_MODE_ENABLED)
 				? new CLink(S_ENABLED, 'usergrps.php?go=disable_debug&usrgrpid='.$usrgrpid, 'orange')
@@ -455,7 +416,6 @@ include_once('include/page_header.php');
 				new CCol($users, 'wraptext'),
 				$users_status,
 				$gui_access,
-				$api_access,
 				$debug_mode
 			));
 		}
@@ -469,14 +429,6 @@ include_once('include/page_header.php');
 
 		$goOption = new CComboItem('disable_status',S_DISABLE_SELECTED);
 		$goOption->setAttribute('confirm',S_DISABLE_SELECTED_GROUPS_Q);
-		$goBox->addItem($goOption);
-
-		$goOption = new CComboItem('enable_api',S_ENABLE_API);
-		$goOption->setAttribute('confirm',S_ENABLE_API_SELECTED_GROUPS_Q);
-		$goBox->addItem($goOption);
-
-		$goOption = new CComboItem('disable_api',S_DISABLE_API);
-		$goOption->setAttribute('confirm',S_DISABLE_API_SELECTED_GROUPS_Q);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('enable_debug',S_ENABLE_DEBUG);

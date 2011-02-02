@@ -17,8 +17,10 @@ class CWebUser {
 			$userData = API::User()->checkAuthentication($sessionid);
 			if(!$userData) throw new Exception();
 
+			if(!check_perm2login($userData['userid'])) throw new Exception();
+
 			if(empty($userData['url'])){
-				$userData['url'] = CProfile::get('web.menu.view.last','index.php');
+				$userData['url'] = CProfile::get('web.menu.view.last', 'index.php');
 			}
 
 			zbx_setcookie('zbx_sessionid', $sessionid, $userData['autologin'] ? (time()+86400*31) : 0);	//1 month
@@ -60,6 +62,7 @@ class CWebUser {
 
 	private static function setDefault(){
 		global $USER_DETAILS;
+
 		self::$data = $USER_DETAILS = array(
 			'alias'	=> ZBX_GUEST_USER,
 			'userid'=> 0,

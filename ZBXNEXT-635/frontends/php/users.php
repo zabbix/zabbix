@@ -164,10 +164,12 @@ include_once('include/page_header.php');
 
 				DBstart();
 				$result = API::User()->update($user);
-				if(!$result)
-					error(API::User()->resetErrors());
 
-				if($result !== false) $result = API::User()->updateMedia(array('users' => $user, 'medias' => $user['user_medias']));
+				if($result !== false)
+					$result = API::User()->updateMedia(array(
+						'users' => $user,
+						'medias' => $user['user_medias']
+					));
 				$result = ($result === false) ? false : true;
 				$result = DBend($result);
 
@@ -178,8 +180,6 @@ include_once('include/page_header.php');
 
 				DBstart();
 				$result = API::User()->create($user);
-				if(!$result)
-					error(API::User()->resetErrors());
 
 				$result = ($result === false) ? false : true;
 				$result = DBend($result);
@@ -213,7 +213,6 @@ include_once('include/page_header.php');
 		$user = reset($users);
 
 		$result = API::User()->delete($users);
-		if(!$result) error(API::User()->resetErrors());
 
 		show_messages($result, S_USER_DELETED, S_CANNOT_DELETE_USER);
 		if($result){
@@ -307,7 +306,6 @@ include_once('include/page_header.php');
 			$user_data = $db_users[$userid];
 
 			$go_result |= (bool) API::User()->delete($user_data);
-			if(!$go_result) error(API::User()->resetErrors());
 
 			if($go_result){
 				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_USER,
@@ -384,7 +382,6 @@ include_once('include/page_header.php');
 			S_IS_ONLINE_Q,
 			S_LOGIN,
 			S_GUI_ACCESS,
-			S_API_ACCESS,
 			S_DEBUG_MODE,
 			S_STATUS
 		));
@@ -467,7 +464,6 @@ include_once('include/page_header.php');
 
 			$gui_access = new CSpan($gui_access, $gui_access_style);
 			$users_status = ($user['users_status'] == 1) ? new CSpan(S_DISABLED, 'red') : new CSpan(S_ENABLED, 'green');
-			$api_access = ($user['api_access'] == GROUP_API_ACCESS_ENABLED) ? new CSpan(S_ENABLED, 'orange') : new CSpan(S_DISABLED, 'green');
 			$debug_mode = ($user['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) ? new CSpan(S_ENABLED, 'orange') : new CSpan(S_DISABLED, 'green');
 
 			$table->addRow(array(
@@ -480,7 +476,6 @@ include_once('include/page_header.php');
 				$online,
 				$blocked,
 				$gui_access,
-				$api_access,
 				$debug_mode,
 				$users_status
 			));
