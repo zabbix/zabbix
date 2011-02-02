@@ -849,7 +849,6 @@ class zbxXML{
 					 * @todo when new XML format will be introduced, this check should be changed to XML version check
 					 */
 					$old_version_input = $host_db['status'] != HOST_STATUS_TEMPLATE;
-					sdi($host_db);
 					if($old_version_input){
 						// rearranging host structure, so it would look more like 2.0 host
 						$interfaces = array();
