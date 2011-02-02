@@ -681,11 +681,6 @@ function utf8RawUrlDecode($source){
 			$prev_char = $char;
 		}
 
-		if( $quoted ){
-			error(S_INCORRECT_USAGE_OF_QUOTES.'. ['.$string.']');
-			return null;
-		}
-
 		if($i > $param_s){
 			$params[] = str_replace('\\"', '"', zbx_unquote_param(zbx_substr($string, $param_s, $i - $param_s)));
 		}
