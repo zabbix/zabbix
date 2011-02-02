@@ -18,6 +18,28 @@ ALTER TABLE sysmaps ADD markelements INTEGER DEFAULT '0' NOT NULL;
 REORG TABLE sysmaps;
 ALTER TABLE sysmaps ADD show_unack INTEGER DEFAULT '0' NOT NULL;
 REORG TABLE sysmaps;
+ALTER TABLE sysmaps ADD label_format integer WITH DEFAULT '0' NOT NULL,
+REORG TABLE sysmaps;
+ALTER TABLE sysmaps ADD label_type_host integer WITH DEFAULT '2' NOT NULL,
+REORG TABLE sysmaps;
+ALTER TABLE sysmaps ADD label_type_hostgroup integer WITH DEFAULT '2' NOT NULL,
+REORG TABLE sysmaps;
+ALTER TABLE sysmaps ADD label_type_trigger integer WITH DEFAULT '2' NOT NULL,
+REORG TABLE sysmaps;
+ALTER TABLE sysmaps ADD label_type_map integer WITH DEFAULT '2' NOT NULL,
+REORG TABLE sysmaps;
+ALTER TABLE sysmaps ADD label_type_image integer WITH DEFAULT '2' NOT NULL,
+REORG TABLE sysmaps;
+ALTER TABLE sysmaps ADD label_string_host varchar(255) WITH DEFAULT '' NOT NULL,
+REORG TABLE sysmaps;
+ALTER TABLE sysmaps ADD label_string_hostgroup varchar(255) WITH DEFAULT '' NOT NULL,
+REORG TABLE sysmaps;
+ALTER TABLE sysmaps ADD label_string_trigger varchar(255) WITH DEFAULT '' NOT NULL,
+REORG TABLE sysmaps;
+ALTER TABLE sysmaps ADD label_string_map varchar(255) WITH DEFAULT '' NOT NULL,
+REORG TABLE sysmaps;
+ALTER TABLE sysmaps ADD label_string_image varchar(255) WITH DEFAULT '' NOT NULL,
+REORG TABLE sysmaps;
 UPDATE sysmaps SET backgroundid=NULL WHERE backgroundid=0;
 UPDATE sysmaps SET show_unack=1 WHERE highlight>7 AND highlight<16;
 UPDATE sysmaps SET show_unack=2 WHERE highlight>23;
