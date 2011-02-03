@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2900,7 +2900,9 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			if(!isset($allowedTesting) || !$allowedTesting) $btn_test->setAttribute('disabled', 'disabled');
 			if (empty($outline)) $btn_test->setAttribute('disabled', 'yes');
 			//SDI($outline);
-			$frmTrig->addRow(SPACE, array($outline,
+			$wrapOutline = new CSpan(array($outline));
+			$wrapOutline->addStyle('white-space: pre;');
+			$frmTrig->addRow(SPACE, array($wrapOutline,
 										  BR(),BR(),
 										  $exp_table,
 										  $btn_test));

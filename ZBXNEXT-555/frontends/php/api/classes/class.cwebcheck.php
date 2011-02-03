@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -329,7 +329,7 @@ COpt::memoryPick();
 			);
 			$db_webchecks = self::get($options);
 			foreach($db_webchecks as $webcheck){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenarion [%s] already exists.', $webcheck['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario [%s] already exists.', $webcheck['name']));
 			}
 
 

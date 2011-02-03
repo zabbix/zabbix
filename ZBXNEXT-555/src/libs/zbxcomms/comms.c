@@ -133,7 +133,6 @@ static void __zbx_zbx_set_tcp_strerror(const char *fmt, ...)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-
 #if defined(HAVE_IPV6)
 void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
 {
@@ -143,12 +142,14 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
 
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = PF_UNSPEC;
-	if(0 != getaddrinfo(ip, NULL, &hints, &ai))
+
+	if (0 != getaddrinfo(ip, NULL, &hints, &ai))
 	{
 		host[0] = '\0';
 		goto out;
 	}
-	if(0 != getnameinfo(ai->ai_addr, ai->ai_addrlen, host, hostlen, NULL, 0, NI_NAMEREQD))
+
+	if (0 != getnameinfo(ai->ai_addr, ai->ai_addrlen, host, hostlen, NULL, 0, NI_NAMEREQD))
 	{
 		host[0] = '\0';
 		goto out;
@@ -165,13 +166,13 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
 
 	assert(ip);
 
-	if(inet_aton(ip, &addr) == 0)
+	if (0 == inet_aton(ip, &addr))
 	{
 		host[0] = '\0';
 		return;
 	}
 
-	if(NULL == (hst = gethostbyaddr((char *)&addr, sizeof(addr), AF_INET)))
+	if (NULL == (hst = gethostbyaddr((char *)&addr, sizeof(addr), AF_INET)))
 	{
 		host[0] = '\0';
 		return;
