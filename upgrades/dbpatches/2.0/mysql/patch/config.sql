@@ -3,12 +3,12 @@ ALTER TABLE config MODIFY configid bigint unsigned NOT NULL,
 		   MODIFY discovery_groupid bigint unsigned NOT NULL,
 		   MODIFY default_theme varchar(128) DEFAULT 'css_ob.css' NOT NULL,
 		   ADD ns_support integer DEFAULT '0' NOT NULL;
-			 ADD severity_color_0 varchar(6) DEFAULT '<see below>' NOT NULL;
-			 ADD severity_color_1 varchar(6) DEFAULT '<see below>' NOT NULL;
-			 ADD severity_color_2 varchar(6) DEFAULT '<see below>' NOT NULL;
-			 ADD severity_color_3 varchar(6) DEFAULT '<see below>' NOT NULL;
-			 ADD severity_color_4 varchar(6) DEFAULT '<see below>' NOT NULL;
-			 ADD severity_color_5 varchar(6) DEFAULT '<see below>' NOT NULL;
+			 ADD severity_color_0 varchar(6) DEFAULT 'information' NOT NULL;
+			 ADD severity_color_1 varchar(6) DEFAULT 'information' NOT NULL;
+			 ADD severity_color_2 varchar(6) DEFAULT 'warning' NOT NULL;
+			 ADD severity_color_3 varchar(6) DEFAULT 'average' NOT NULL;
+			 ADD severity_color_4 varchar(6) DEFAULT 'high' NOT NULL;
+			 ADD severity_color_5 varchar(6) DEFAULT 'disaster' NOT NULL;
 			 ADD severity_name_0 varchar(6) DEFAULT 'Not classified' NOT NULL;
 			 ADD severity_name_1 varchar(6) DEFAULT 'Information' NOT NULL;
 			 ADD severity_name_2 varchar(6) DEFAULT 'Warning' NOT NULL;
