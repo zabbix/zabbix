@@ -37,9 +37,6 @@
 
 	include_once('include/page_header.php');
 
-// js templates
-require_once('include/templates/scriptConfirm.js.php');
-
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -117,17 +114,19 @@ require_once('include/templates/scriptConfirm.js.php');
 	}
 ?>
 <?php
+// js templates
+	require_once('include/templates/scriptConfirm.js.php');
 
-	//whether we should use screen name to fetch a screen (if this is false, elementid is used)
+// whether we should use screen name to fetch a screen (if this is false, elementid is used)
 	$use_screen_name = isset($_REQUEST['screenname']);
 
-	// getting element id from GET parameters
+// getting element id from GET parameters
 	$elementid = $_REQUEST['elementid'] = get_request('elementid', false);
-	//if none is provided
+// if none is provided
 	if($elementid === false && !$use_screen_name){
-		//get element id saved in profile from the last visit
+// get element id saved in profile from the last visit
 		$elementid = CProfile::get('web.screens.elementid', null);
-		//this flag will be used in case this element does not exist
+// this flag will be used in case this element does not exist
 		$id_has_been_fetched_from_profile = true;
 	}
 	else{
