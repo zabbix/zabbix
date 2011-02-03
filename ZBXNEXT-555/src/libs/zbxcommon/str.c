@@ -2570,6 +2570,23 @@ const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type)
 	}
 }
 
+const char	*zbx_item_data_type_string(zbx_item_data_type_t data_type)
+{
+	switch (data_type)
+	{
+		case ITEM_DATA_TYPE_DECIMAL:
+			return "Decimal";
+		case ITEM_DATA_TYPE_OCTAL:
+			return "Octal";
+		case ITEM_DATA_TYPE_HEXADECIMAL:
+			return "Hexadecimal";
+		case ITEM_DATA_TYPE_BOOLEAN:
+			return "Boolean";
+		default:
+			return "unknown";
+	}
+}
+
 const char	*zbx_interface_type_string(zbx_interface_type_t type)
 {
 	switch (type)
@@ -2853,10 +2870,16 @@ int	zbx_unicode_to_utf8_static(LPCTSTR wide_string, LPSTR utf8_string, int utf8_
 }
 #endif
 
+void	zbx_strlower(char *str)
+{
+	for (; '\0' != *str; str++)
+		*str = tolower(*str);
+}
+
 void	zbx_strupper(char *str)
 {
 	for (; '\0' != *str; str++)
-		*str = toupper((int)*str);
+		*str = toupper(*str);
 }
 
 #if defined(_WINDOWS)
