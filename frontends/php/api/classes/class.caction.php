@@ -255,6 +255,7 @@ class CAction extends CZBXAPI{
 			}
 
 			$sql_parts['from']['opmessage'] = 'opmessage om';
+			$sql_parts['from']['operations'] = 'operations o';
 
 			$sql_parts['where'][] = DBcondition('om.mediatypeid', $options['mediatypeids']);
 			$sql_parts['where']['ao'] = 'a.actionid=o.actionid';
