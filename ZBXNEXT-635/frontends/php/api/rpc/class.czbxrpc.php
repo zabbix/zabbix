@@ -45,7 +45,7 @@ class czbxrpc{
 		list($resource, $action) = explode('.', $method);
 
 // Authentication {{{
-		if(!isset($without_auth[$method])){
+		if(!isset($without_auth[$method]) && empty($sessionid)){
 
 // compatibility mode
 			if(($resource == 'user') && ($action == 'authenticate')) $action = 'login';
@@ -54,7 +54,7 @@ class czbxrpc{
 				return array('error' => ZBX_API_ERROR_NO_AUTH, 'message' => 'Not authorized');
 			}
 			else if(!empty($sessionid)){
-				if(!self::callAPI('user.simpleAuth', array('sessionid' => $sessionid))){
+				if(!self::callAPI('user.checkAuthentication', $sessionid)){
 					return array('error' => ZBX_API_ERROR_NO_AUTH, 'message' => 'Not authorized');
 				}
 			}
@@ -111,7 +111,9 @@ class czbxrpc{
 			return array('result' => $result);
 		}
 		catch(APIException $e){
-			self::transactionEnd(false);
+			$result = ($method === 'user.login');
+			self::transactionEnd($result);
+
 			return array('error' => $e->getCode(), 'message' => $e->getMessage(), 'data' => $e->getTrace());
 		}
 	}

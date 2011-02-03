@@ -943,6 +943,7 @@ Copt::memoryPick();
 
 	return true;
 	}
+
 /**
  * Login user
  *
@@ -953,6 +954,7 @@ Copt::memoryPick();
  */
 	public function login($user){
 		global $ZBX_LOCALNODEID;
+		global $ZBX_NODES;
 
 		$config = select_config();
 
@@ -968,28 +970,28 @@ Copt::memoryPick();
 //					.' AND ( attempt_failed<'.ZBX_LOGIN_ATTEMPTS.
 //							' OR (attempt_failed>'.(ZBX_LOGIN_ATTEMPTS-1).
 //									' AND ('.time().'-attempt_clock)>'.ZBX_LOGIN_BLOCK.'))';
-		$userData = DBfetch(DBselect($sql));
+		$userInfo = DBfetch(DBselect($sql));
 
-		if(!$userData){
+		if(!$userInfo){
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Login name or password is incorrect'));
 		}
 
-		if($userData['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS){
-			if((time() - $userData['attempt_clock']) < ZBX_LOGIN_BLOCK){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Account is blocked for %s seconds', (ZBX_LOGIN_BLOCK - (time() - $userData['attempt_clock']))));
+		if($userInfo['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS){
+			if((time() - $userInfo['attempt_clock']) < ZBX_LOGIN_BLOCK){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Account is blocked for %s seconds', (ZBX_LOGIN_BLOCK - (time() - $userInfo['attempt_clock']))));
 			}
 			else{
 				DBexecute('UPDATE users SET attempt_clock='.time().' WHERE alias='.zbx_dbstr($name));
 			}
 		}
 
-		if(!check_perm2system($userData['userid']))
+		if(!check_perm2system($userInfo['userid']))
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions for system access.'));
 
 
 
 		if($auth_type != ZBX_AUTH_HTTP){
-			switch(get_user_auth($userData['userid'])){
+			switch(get_user_auth($userInfo['userid'])){
 				case GROUP_GUI_ACCESS_INTERNAL:
 					$auth_type = ZBX_AUTH_INTERNAL;
 					break;
@@ -1013,25 +1015,57 @@ Copt::memoryPick();
 			$ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))
 					? $_SERVER['HTTP_X_FORWARDED_FOR']
 					: $_SERVER['REMOTE_ADDR'];
+			$userInfo['attempt_failed']++;
 
-			$userData['attempt_failed']++;
 			$sql = 'UPDATE users '.
-					' SET attempt_failed='.$userData['attempt_failed'].','.
+					' SET attempt_failed='.$userInfo['attempt_failed'].','.
 						' attempt_clock='.time().','.
 						' attempt_ip='.zbx_dbstr($ip).
-					' WHERE userid='.$userData['userid'];
+					' WHERE userid='.$userInfo['userid'];
 			DBexecute($sql);
 
 			add_audit(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, _s('Login failed [%s]', $name));
 			self::exception(ZBX_API_ERROR_PARAMETERS, $e->getMessage());
 		}
 
+		$sessionid = zbx_session_start($userInfo['userid'], $name, $password);
 
-		$sessionid = zbx_session_start($userData['userid'], $name, $password);
+		$sql = 'SELECT u.userid, u.alias, u.name, u.surname, u.url, u.autologin, u.autologout, u.lang, u.refresh, u.type,'.
+			' u.theme, u.attempt_failed, u.attempt_ip, u.attempt_clock, u.rows_per_page, s.sessionid, s.lastaccess,'.
+			' s.status'.
+			' FROM sessions s,users u'.
+			' WHERE s.sessionid='.zbx_dbstr($sessionid).
+				' AND s.status='.ZBX_SESSION_ACTIVE.
+				' AND s.userid=u.userid'.
+				' AND ((s.lastaccess+u.autologout>'.time().') OR (u.autologout=0))'.
+				' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);
+		$userData = DBfetch(DBselect($sql));
+
+		$userData['sessionid'] = $sessionid;
+
+		$sql = 'SELECT ug.userid '.
+			' FROM usrgrp g, users_groups ug '.
+			' WHERE ug.userid = '.$userData['userid'].
+				' AND g.usrgrpid = ug.usrgrpid '.
+				' AND g.debug_mode = '.GROUP_DEBUG_MODE_ENABLED;
+		$userData['debug_mode'] = (bool) DBfetch(DBselect($sql));
+
+		if(isset($ZBX_NODES[$ZBX_LOCALNODEID])){
+			$userData['node'] = $ZBX_NODES[$ZBX_LOCALNODEID];
+		}
+		else{
+			$userData['node'] = array();
+			$userData['node']['name'] = '- unknown -';
+			$userData['node']['nodeid'] = $ZBX_LOCALNODEID;
+		}
+
+		if($userInfo['attempt_failed']){
+			DBexecute('UPDATE users SET attempt_failed=0 WHERE userid='.$userInfo['userid']);
+		}
+
 		add_audit(AUDIT_ACTION_LOGIN,AUDIT_RESOURCE_USER, _s('Correct login [%s]', $name));
 
-
-		return $sessionid;
+		return $userData;
 	}
 
 /**
@@ -1043,14 +1077,15 @@ Copt::memoryPick();
 		global $ZBX_LOCALNODEID;
 		global $ZBX_NODES;
 
-		$sql = 'SELECT u.*,s.* '.
+		$sql = 'SELECT u.userid, u.alias, u.name, u.surname, u.url, u.autologin, u.autologout, u.lang, u.refresh, u.type,'.
+				' u.theme, u.attempt_failed, u.attempt_ip, u.attempt_clock, u.rows_per_page, s.sessionid, s.lastaccess,'.
+				' s.status'.
 				' FROM sessions s,users u'.
 				' WHERE s.sessionid='.zbx_dbstr($sessionid).
 					' AND s.status='.ZBX_SESSION_ACTIVE.
 					' AND s.userid=u.userid'.
 					' AND ((s.lastaccess+u.autologout>'.time().') OR (u.autologout=0))'.
 					' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);
-
 		$userData = DBfetch(DBselect($sql));
 
 		if(!$userData)
@@ -1061,10 +1096,6 @@ Copt::memoryPick();
 
 
 		DBexecute('UPDATE sessions SET lastaccess='.time().' WHERE sessionid='.zbx_dbstr($sessionid));
-
-		if($userData['attempt_failed']){
-			DBexecute('UPDATE users SET attempt_failed=0 WHERE userid='.$userData['userid']);
-		}
 
 		if($userData['autologout'] > 0){
 			DBexecute('DELETE FROM sessions WHERE userid='.$userData['userid'].' AND status='.ZBX_SESSION_ACTIVE.' AND lastaccess<'.(time() - $userData['autologout']));

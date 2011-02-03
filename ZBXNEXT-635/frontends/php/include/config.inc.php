@@ -244,14 +244,14 @@ function __autoload($class_name){
 				}
 			}
 
-			if (!$locale_found && $USER_DETAILS['lang'] != 'en_GB' && $USER_DETAILS['lang'] != 'en_gb'){
+			if(!$locale_found && $USER_DETAILS['lang'] != 'en_GB' && $USER_DETAILS['lang'] != 'en_gb'){
 				error('Locale for language "'.$USER_DETAILS['lang'].'" is not found on the web server. Tried to set: '.implode(', ', $locales).'. Unable to translate zabbix interface.');
 			}
 			bindtextdomain('frontend', 'locale');
 			bind_textdomain_codeset('frontend', 'UTF-8');
 			textdomain('frontend');
 		}
-		else {
+		else{
 			error('Your PHP has no gettext support. Zabbix translations are not available.');
 		}
 // Numeric Locale to default
@@ -261,19 +261,20 @@ function __autoload($class_name){
 		include_once('include/locales/en_gb.inc.php');
 		process_locales();
 
-		if($USER_DETAILS['attempt_failed']) {
-			$attemps = bold($USER_DETAILS['attempt_failed']);
-			$attempip = bold($USER_DETAILS['attempt_ip']);
-			$attempdate = bold(zbx_date2str(S_CUSER_ERROR_DATE_FORMAT,$USER_DETAILS['attempt_clock']));
+		if($failed_attempt = CProfile::get('web.login.attempt.failed', 0)){
+			$attempip = CProfile::get('web.login.attempt.ip', '');
+			$attempdate = CProfile::get('web.login.attempt.clock', 0);
 
 			$error_msg = array(
-				$attemps,
-				SPACE.S_CUSER_ERROR_FAILED_LOGIN_ATTEMPTS,SPACE.S_CUSER_ERROR_LAST_FAILED_ATTEMPTS.SPACE,
-				$attempip,
-				SPACE.S_ON_SMALL.SPACE,
-				$attempdate
+				new CSpan($failed_attempt, 'bold'),
+				_(' failed login attempts logged. Last failed attempt was from '),
+				new CSpan($attempip, 'bold'),
+				_(' on '),
+				new CSpan(zbx_date2str(S_CUSER_ERROR_DATE_FORMAT, $attempdate), 'bold'),
 			);
 			error(new CSpan($error_msg));
+
+			CProfile::update('web.login.attempt.failed', 0, PROFILE_TYPE_INT);
 		}
 	}
 	else{
@@ -286,7 +287,6 @@ function __autoload($class_name){
 				'name'  =>'- unknown -',
 				'nodeid'=>0)
 			);
-
 	}
 
 	include_once('include/locales/en_gb.inc.php');

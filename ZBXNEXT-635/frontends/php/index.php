@@ -33,7 +33,6 @@ $page['file']	= 'index.php';
 		'name'=>			array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'isset({enter})', S_LOGIN_NAME),
 		'password'=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({enter})'),
 		'sessionid'=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		NULL),
-		'message'=>			array(T_ZBX_STR, O_OPT,	NULL,	NULL,		NULL),
 		'reconnect'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(0,65535),NULL),
 		'enter'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,		NULL),
 		'form'=>			array(T_ZBX_STR, O_OPT, P_SYS,  NULL,   	NULL),
@@ -55,9 +54,8 @@ $page['file']	= 'index.php';
 	}
 
 	$config = select_config();
-	$authentication_type = $config['authentication_type'];
 
-	if($authentication_type == ZBX_AUTH_HTTP){
+	if($config['authentication_type'] == ZBX_AUTH_HTTP){
 		if(isset($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_USER'])){
 			if(!isset($sessionid)) $_REQUEST['enter'] = 'Enter';
 
@@ -71,12 +69,10 @@ $page['file']	= 'index.php';
 
 	$request = get_request('request');
 	if(isset($_REQUEST['enter']) && ($_REQUEST['enter'] == 'Enter')){
-		global $USER_DETAILS;
-
 		$login = CWebUser::login(get_request('name', ''), get_request('password', ''));
 
 		if($login){
-			$url = is_null($request) ? $USER_DETAILS['url'] : $request;
+			$url = is_null($request) ? CWebUser::$data['url'] : $request;
 
 			jsRedirect($url);
 			exit();
@@ -84,16 +80,14 @@ $page['file']	= 'index.php';
 	}
 
 include_once('include/page_header.php');
-
-	if(isset($_REQUEST['message'])) show_error_message($_REQUEST['message']);
+	show_messages();
 
 	if(!isset($sessionid) || ($USER_DETAILS['alias'] == ZBX_GUEST_USER)){
-		switch($authentication_type){
+		switch($config['authentication_type']){
 			case ZBX_AUTH_HTTP:
 				break;
 			case ZBX_AUTH_LDAP:
 			case ZBX_AUTH_INTERNAL:
-			default:
 //	konqueror bug #138024; adding useless param(login=1) to the form's action path to avoid bug!!
 				$frmLogin = new CFormTable(S_LOGIN,'index.php?login=1','post','multipart/form-data');
 				$frmLogin->setHelp('web.index.login');
@@ -109,10 +103,7 @@ include_once('include/page_header.php');
 				$frmLogin->show(false);
 
 				setFocus($frmLogin->getName(),'name');
-
-				$frmLogin->destroy();
 		}
-
 	}
 	else{
 		echo '<div align="center" class="textcolorstyles">'.S_WELCOME.' <b>'.$USER_DETAILS['alias'].'</b>.</div>';
