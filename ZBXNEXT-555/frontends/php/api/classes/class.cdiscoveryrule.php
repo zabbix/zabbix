@@ -693,7 +693,8 @@ COpt::memoryPick();
 					}
 
 					if(isset($item['delay']) && isset($item['delay_flex'])){
-						$res = calculate_item_nextcheck(0, 0, $item['type'], $item['delay'], $item['delay_flex'], time());
+						if(!isset($item['interfaceid'])) $item['interfaceid'] = 0;
+						$res = calculate_item_nextcheck($item['interfaceid'], $item['itemid'], $item['type'], $item['delay'], $item['delay_flex'], time());
 						if($res['delay'] == SEC_PER_YEAR && $item['type'] != ITEM_TYPE_ZABBIX_ACTIVE && $item['type'] != ITEM_TYPE_TRAPPER){
 							self::exception(ZBX_API_ERROR_PARAMETERS, S_ITEM_WILL_NOT_BE_REFRESHED_PLEASE_ENTER_A_CORRECT_UPDATE_INTERVAL);
 						}
