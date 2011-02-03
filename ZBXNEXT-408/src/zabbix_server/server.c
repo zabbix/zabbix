@@ -376,21 +376,17 @@ int	MAIN_ZABBIX_ENTRY(void)
 {
         DB_RESULT       result;
         DB_ROW          row;
-
-	int	i;
-	pid_t	pid;
-
+	pid_t		pid;
 	zbx_sock_t	listen_sock;
+	int		i, server_num = 0;
 
-	int		server_num = 0;
-
-	if(CONFIG_LOG_FILE == NULL || ('\0' == *CONFIG_LOG_FILE))
+	if (NULL == CONFIG_LOG_FILE || '\0' == *CONFIG_LOG_FILE)
 	{
-		zabbix_open_log(LOG_TYPE_SYSLOG,CONFIG_LOG_LEVEL,NULL);
+		zabbix_open_log(LOG_TYPE_SYSLOG, CONFIG_LOG_LEVEL, NULL);
 	}
 	else
 	{
-		zabbix_open_log(LOG_TYPE_FILE,CONFIG_LOG_LEVEL,CONFIG_LOG_FILE);
+		zabbix_open_log(LOG_TYPE_FILE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
 	}
 
 #ifdef  HAVE_SNMP
@@ -451,38 +447,26 @@ int	MAIN_ZABBIX_ENTRY(void)
 	DBconnect(ZBX_DB_CONNECT_EXIT);
 
 	result = DBselect("select refresh_unsupported from config where 1=1" DB_NODE,
-		DBnode_local("configid"));
-	row = DBfetch(result);
+			DBnode_local("configid"));
 
-	if( (row != NULL) && DBis_null(row[0]) != SUCCEED)
-	{
+	if (NULL != (row = DBfetch(result)))
 		CONFIG_REFRESH_UNSUPPORTED = atoi(row[0]);
-	}
 	DBfree_result(result);
 
 	result = DBselect("select masterid from nodes where nodeid=%d",
-		CONFIG_NODEID);
-	row = DBfetch(result);
+			CONFIG_NODEID);
 
-	if( (row != NULL) && DBis_null(row[0]) != SUCCEED)
-	{
+	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
 		CONFIG_MASTER_NODEID = atoi(row[0]);
-	}
 	DBfree_result(result);
 
 	init_database_cache(ZBX_PROCESS_SERVER);
 	init_configuration_cache();
 
-/* Need to set trigger status to UNKNOWN since last run */
-/* DBconnect() already made in init_config() */
-/*	DBconnect();*/
+	/* Need to set trigger status to UNKNOWN since last run */
 	DBupdate_triggers_status_after_restart();
-	DBclose();
 
-/* To make sure that we can connect to the database before forking new processes */
-/*	DBconnect(ZBX_DB_CONNECT_EXIT);*/
-/* Do not close database. It is required for database cache */
-/*	DBclose();*/
+	DBclose();
 
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&node_sync_access, ZBX_MUTEX_NODE_SYNC))
 	{
@@ -490,12 +474,6 @@ int	MAIN_ZABBIX_ENTRY(void)
 		exit(FAIL);
 	}
 
-/*#define CALC_TREND*/
-
-#ifdef CALC_TREND
-	trend();
-	return 0;
-#endif
 	threads_num = 1 + CONFIG_DBCONFIG_FORKS + CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
 			+ CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS
 			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS + CONFIG_NODEWATCHER_FORKS
