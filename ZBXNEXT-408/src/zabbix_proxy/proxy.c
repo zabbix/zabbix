@@ -260,7 +260,7 @@ void	init_config(void)
 	if (ZBX_PROXYMODE_ACTIVE == CONFIG_PROXYMODE &&
 			(NULL == CONFIG_SERVER || '\0' == *CONFIG_SERVER))
 	{
-		 zbx_error("Missing mandatory parameter [Server].");
+		zbx_error("Missing mandatory parameter [Server].");
 	}
 
 	if (ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE)
@@ -276,7 +276,7 @@ void	init_config(void)
 		if(CONFIG_HOSTNAME != NULL)
 			zbx_free(CONFIG_HOSTNAME);
 
-	  	if(SUCCEED == process("system.hostname", 0, &result))
+		if(SUCCEED == process("system.hostname", 0, &result))
 		{
 			if( NULL != (value = GET_STR_RESULT(&result)) )
 			{
@@ -285,7 +285,7 @@ void	init_config(void)
 					CONFIG_HOSTNAME[HOST_HOST_LEN] = '\0';
 			}
 		}
-	        free_result(&result);
+		free_result(&result);
 
 		if(CONFIG_HOSTNAME == NULL)
 		{
@@ -391,22 +391,19 @@ int	main(int argc, char **argv)
 	return daemon_start(CONFIG_ALLOW_ROOT);
 }
 
-int MAIN_ZABBIX_ENTRY(void)
+int	MAIN_ZABBIX_ENTRY()
 {
-	int	i;
-	pid_t	pid;
-
+	pid_t		pid;
 	zbx_sock_t	listen_sock;
+	int		i, server_num = 0;
 
-	int		server_num = 0;
-
-	if(CONFIG_LOG_FILE == NULL || '\0' == *CONFIG_LOG_FILE)
+	if (NULL == CONFIG_LOG_FILE || '\0' == *CONFIG_LOG_FILE)
 	{
-		zabbix_open_log(LOG_TYPE_SYSLOG,CONFIG_LOG_LEVEL,NULL);
+		zabbix_open_log(LOG_TYPE_SYSLOG, CONFIG_LOG_LEVEL, NULL);
 	}
 	else
 	{
-		zabbix_open_log(LOG_TYPE_FILE,CONFIG_LOG_LEVEL,CONFIG_LOG_FILE);
+		zabbix_open_log(LOG_TYPE_FILE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
 	}
 
 #ifdef  HAVE_SNMP
@@ -651,7 +648,7 @@ int MAIN_ZABBIX_ENTRY(void)
 void	zbx_on_exit()
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called");
-		
+
 	if (threads != NULL)
 	{
 		int	i;

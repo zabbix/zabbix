@@ -2123,3 +2123,59 @@ void	make_hostname(char *host)
 		if (FAIL == is_hostname_char(*c))
 			*c = '_';
 }
+
+
+
+
+
+
+
+
+static zbx_times_t	zbx_times;
+
+void	update_counters(unsigned char mode)
+{
+	static unsigned char	old_mode = ZBX_TIME_UNUSED;
+	static clock_t		old_t;
+	clock_t			new_t;
+
+	if (0 != (ZBX_TIME_INIT & mode))
+	{
+		memset(&zbx_times, 0, sizeof(zbx_times));
+		mode ^= ZBX_TIME_INIT;
+	}
+	else if (ZBX_TIME_UNUSED == old_mode)
+		return;
+
+	new_t = times(NULL);
+
+	switch (old_mode)
+	{
+		case ZBX_TIME_BUSY:
+			zbx_times.busy += new_t - old_t;
+			break;
+		case ZBX_TIME_WAIT:
+			zbx_times.wait += new_t - old_t;
+			break;
+		case ZBX_TIME_LOCK:
+			zbx_times.lock += new_t - old_t;
+			break;
+		case ZBX_TIME_IDLE:
+			zbx_times.idle += new_t - old_t;
+			break;
+	}
+
+	{
+		double p_busy, p_wait, p_lock, p_idle;
+
+		p_busy = (double)zbx_times.busy / (double)(zbx_times.busy + zbx_times.wait + zbx_times.lock + zbx_times.idle);
+		p_wait = (double)zbx_times.wait / (double)(zbx_times.busy + zbx_times.wait + zbx_times.lock + zbx_times.idle);
+		p_lock = (double)zbx_times.lock / (double)(zbx_times.busy + zbx_times.wait + zbx_times.lock + zbx_times.idle);
+		p_idle = (double)zbx_times.idle / (double)(zbx_times.busy + zbx_times.wait + zbx_times.lock + zbx_times.idle);
+
+		zabbix_log(LOG_LEVEL_CRIT, ">>>>>> busy: " ZBX_FS_DBL "%% wait: " ZBX_FS_DBL "%% lock: " ZBX_FS_DBL "%% idle: " ZBX_FS_DBL "%%", p_busy, p_wait, p_lock, p_idle);
+	}
+exit:
+	old_t = new_t;
+	old_mode = mode;
+}
