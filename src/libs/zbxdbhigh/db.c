@@ -851,7 +851,7 @@ int	DBget_queue_count(int from, int to)
 					" and i.lastclock<%d"
 					")"
 				" and ("
-					"i.type in (%d,%d,%d,%d,%d,%d,%d,%d)"
+					"i.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d)"
 					" or (h.available<>%d and i.type in (%d))"
 					" or (h.snmp_available<>%d and i.type in (%d,%d,%d))"
 					" or (h.ipmi_available<>%d and i.type in (%d))"
@@ -862,8 +862,9 @@ int	DBget_queue_count(int from, int to)
 			ITEM_VALUE_TYPE_LOG,
 			SERVER_STATUS_KEY, SERVER_ZABBIXLOG_KEY,
 			now - from,
-				ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SIMPLE,
-				ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_CALCULATED,
+				ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+				ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_DB_MONITOR,
+				ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_CALCULATED,
 			HOST_AVAILABLE_FALSE,
 				ITEM_TYPE_ZABBIX,
 			HOST_AVAILABLE_FALSE,

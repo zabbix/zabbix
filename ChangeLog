@@ -78,6 +78,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
 
+ - [ZBX-3494] added database monitor items to the queue calculation (asaveljevs)
  - [ZBX-3454] fixed clearing item edited using by Trigger-wizard (Vlad)
  - [ZBX-3481] fixed massAdd for applications (KB)
  - [ZBX-3480] fixed possible crash of server after shutdown of ORACLE server (Sasha)
