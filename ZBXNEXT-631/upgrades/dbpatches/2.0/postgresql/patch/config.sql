@@ -4,12 +4,12 @@ ALTER TABLE ONLY config ALTER configid DROP DEFAULT,
 			ALTER discovery_groupid DROP DEFAULT,
 			ALTER default_theme SET DEFAULT 'css_ob.css',
 			ADD ns_support integer DEFAULT '0' NOT NULL;
-			ADD severity_color_0 varchar(6) DEFAULT '<see below>' NOT NULL;
-			ADD severity_color_1 varchar(6) DEFAULT '<see below>' NOT NULL;
-			ADD severity_color_2 varchar(6) DEFAULT '<see below>' NOT NULL;
-			ADD severity_color_3 varchar(6) DEFAULT '<see below>' NOT NULL;
-			ADD severity_color_4 varchar(6) DEFAULT '<see below>' NOT NULL;
-			ADD severity_color_5 varchar(6) DEFAULT '<see below>' NOT NULL;
+			ADD severity_color_0 varchar(6) DEFAULT 'information' NOT NULL;
+			ADD severity_color_1 varchar(6) DEFAULT 'information' NOT NULL;
+			ADD severity_color_2 varchar(6) DEFAULT 'warning' NOT NULL;
+			ADD severity_color_3 varchar(6) DEFAULT 'average' NOT NULL;
+			ADD severity_color_4 varchar(6) DEFAULT 'high' NOT NULL;
+			ADD severity_color_5 varchar(6) DEFAULT 'disaster' NOT NULL;
 			ADD severity_name_0 varchar(6) DEFAULT 'Not classified' NOT NULL;
 			ADD severity_name_1 varchar(6) DEFAULT 'Information' NOT NULL;
 			ADD severity_name_2 varchar(6) DEFAULT 'Warning' NOT NULL;

@@ -446,18 +446,26 @@ FIELD		|discovery_groupid|t_id		|	|NOT NULL	|ZBX_SYNC		|2|groups	|groupid	|RESTR
 FIELD		|max_in_table	|t_integer	|'50'	|NOT NULL	|ZBX_SYNC
 FIELD		|search_limit	|t_integer	|'1000'	|NOT NULL	|ZBX_SYNC
 FIELD		|ns_support	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|severity_color_0	|t_varchar(6)	|'<see below>'	|NOT NULL	|ZBX_SYNC
-FIELD		|severity_color_1	|t_varchar(6)	|'<see below>'	|NOT NULL	|ZBX_SYNC
-FIELD		|severity_color_2	|t_varchar(6)	|'<see below>'	|NOT NULL	|ZBX_SYNC
-FIELD		|severity_color_3	|t_varchar(6)	|'<see below>'	|NOT NULL	|ZBX_SYNC
-FIELD		|severity_color_4	|t_varchar(6)	|'<see below>'	|NOT NULL	|ZBX_SYNC
-FIELD		|severity_color_5	|t_varchar(6)	|'<see below>'	|NOT NULL	|ZBX_SYNC
+FIELD		|severity_color_0	|t_varchar(6)	|'information'	|NOT NULL	|ZBX_SYNC
+FIELD		|severity_color_1	|t_varchar(6)	|'information'	|NOT NULL	|ZBX_SYNC
+FIELD		|severity_color_2	|t_varchar(6)	|'warning'	|NOT NULL	|ZBX_SYNC
+FIELD		|severity_color_3	|t_varchar(6)	|'average'	|NOT NULL	|ZBX_SYNC
+FIELD		|severity_color_4	|t_varchar(6)	|'high'	|NOT NULL	|ZBX_SYNC
+FIELD		|severity_color_5	|t_varchar(6)	|'disaster'	|NOT NULL	|ZBX_SYNC
 FIELD		|severity_name_0	|t_varchar(32)	|'Not classified'	|NOT NULL	|ZBX_SYNC
 FIELD		|severity_name_1	|t_varchar(32)	|'Information'	|NOT NULL	|ZBX_SYNC
 FIELD		|severity_name_2	|t_varchar(32)	|'Warning'	|NOT NULL	|ZBX_SYNC
 FIELD		|severity_name_3	|t_varchar(32)	|'Average'	|NOT NULL	|ZBX_SYNC
 FIELD		|severity_name_4	|t_varchar(32)	|'High'	|NOT NULL	|ZBX_SYNC
 FIELD		|severity_name_5	|t_varchar(32)	|'Disaster'	|NOT NULL	|ZBX_SYNC
+
+		case TRIGGER_SEVERITY_DISASTER: $style='disaster'; break;
+		case TRIGGER_SEVERITY_HIGH: $style='high'; break;
+		case TRIGGER_SEVERITY_AVERAGE: $style='average'; break;
+		case TRIGGER_SEVERITY_WARNING: $style='warning'; break;
+		case TRIGGER_SEVERITY_INFORMATION:
+		default: $style='information';
+
 
 TABLE|functions|functionid|ZBX_SYNC
 FIELD		|functionid	|t_id		|	|NOT NULL	|0
