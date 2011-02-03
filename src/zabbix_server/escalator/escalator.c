@@ -576,7 +576,7 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 		if (SUCCEED == rc)
 			rc = run_remote_command(&item, command, error, sizeof(error));
 
-		if (SUCCEED != rc && '\0' != error)
+		if (SUCCEED != rc && '\0' != *error)
 			zabbix_log(LOG_LEVEL_WARNING, "Cannot execute remote command [%s]: %s",
 					command, error);
 
