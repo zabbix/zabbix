@@ -4,6 +4,8 @@ ALTER TABLE dservices ALTER COLUMN dhostid SET WITH DEFAULT NULL;
 REORG TABLE dservices;
 ALTER TABLE dservices ALTER COLUMN dcheckid SET WITH DEFAULT NULL;
 REORG TABLE dservices;
+ALTER TABLE dservices ADD dns varchar(64) WITH DEFAULT '' NOT NULL;
+REORG TABLE dservices;
 DELETE FROM dservices WHERE NOT dhostid IN (SELECT dhostid FROM dhosts);
 DELETE FROM dservices WHERE NOT dcheckid IN (SELECT dcheckid FROM dchecks);
 ALTER TABLE dservices ADD CONSTRAINT c_dservices_1 FOREIGN KEY (dhostid) REFERENCES dhosts (dhostid) ON DELETE CASCADE;

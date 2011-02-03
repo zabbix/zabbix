@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -698,12 +698,12 @@ COpt::memoryPick();
 		try{
 			self::BeginTransaction(__METHOD__);
 
-		if(empty($data['applications'])) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+			if(empty($data['applications'])) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
 
-		$applications = zbx_toArray($data['applications']);
-		$items = zbx_toArray($data['items']);
-		$applicationids = zbx_objectValues($applications, 'applicationid');
-		$itemids = zbx_objectValues($items, 'itemid');
+			$applications = zbx_toArray($data['applications']);
+			$items = zbx_toArray($data['items']);
+			$applicationids = zbx_objectValues($applications, 'applicationid');
+			$itemids = zbx_objectValues($items, 'itemid');
 
 // PERMISSIONS {{{
 			$app_options = array(
@@ -742,10 +742,14 @@ COpt::memoryPick();
 				$linked[$pair['applicationid']] = array($pair['itemid'] => $pair['itemid']);
 			}
 
+
+
 			$apps_insert = array();
 			foreach($applicationids as $anum => $applicationid){
 				foreach($itemids as $inum => $itemid){
-					if(isset($linked[$applicationid]) && isset($linked[$applicationid][$itemid])) continue;
+					if(isset($linked[$applicationid]) && isset($linked[$applicationid][$itemid])) {
+						continue;
+					}
 
 					$apps_insert[] = array(
 						'itemid' => $itemid,
@@ -756,18 +760,19 @@ COpt::memoryPick();
 
 			DB::insert('items_applications', $apps_insert);
 
-
-			$child_applications = array();
 			foreach($itemids as $inum => $itemid){
 				$db_childs = DBselect('SELECT itemid, hostid FROM items WHERE templateid=' . $itemid);
 
-				if($child = DBfetch($db_childs)){
+				while($child = DBfetch($db_childs)){
 					$sql = 'SELECT a1.applicationid ' .
 							' FROM applications a1, applications a2 ' .
 							' WHERE a1.name=a2.name ' .
 								' AND a1.hostid=' . $child['hostid'] .
 								' AND ' . DBcondition('a2.applicationid', $applicationids);
 					$db_apps = DBselect($sql);
+
+					$child_applications = array();
+
 					while($app = DBfetch($db_apps)){
 						$child_applications[] = $app;
 					}

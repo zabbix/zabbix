@@ -669,10 +669,6 @@ const char	*zbx_poller_type_string(int poller_type);
 #	define MIN(a, b) ((a) < (b) ? (a) : (b))
 #endif
 
-/* Secure string copy */
-#define strscpy(x, y)		zbx_strlcpy(x, y, sizeof(x))
-#define strnscpy(x, y, n)	zbx_strlcpy(x, y, n);
-
 #define zbx_malloc(old, size)	zbx_malloc2(__FILE__, __LINE__, old, size)
 #define zbx_realloc(old, size)	zbx_realloc2(__FILE__, __LINE__, old, size)
 #define zbx_strdup(old, str)	zbx_strdup2(__FILE__, __LINE__, old, str)
@@ -842,6 +838,8 @@ void	__zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_l
 void	zbx_strcpy_alloc(char **str, int *alloc_len, int *offset, const char *src);
 void	zbx_chrcpy_alloc(char **str, int *alloc_len, int *offset, const char src);
 
+/* Secure string copy */
+#define strscpy(x, y)	zbx_strlcpy(x, y, sizeof(x))
 size_t	zbx_strlcpy(char *dst, const char *src, size_t siz);
 size_t	zbx_strlcat(char *dst, const char *src, size_t siz);
 
