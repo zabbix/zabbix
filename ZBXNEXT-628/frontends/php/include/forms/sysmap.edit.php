@@ -20,7 +20,7 @@
 ?>
 <?php
 // include JS + templates
-//	include('include/templates/maps.js.php');
+	include('include/templates/sysmap.js.php');
 ?>
 <?php
 	$config = select_config();
@@ -69,16 +69,53 @@
 	$sysmapList->addRow(_('Mark elements on trigger status change'), new CCheckBox('markelements', $data['markelements'], null, 1));
 	$sysmapList->addRow(_('Expand single problem'), new CCheckBox('expandproblem', $data['expandproblem'], null, 1));
 
+	$sysmapList->addRow(_('Advanced labels'), new CCheckBox('label_format', $data['label_format'], null, 1));
+	$labelTypes = array(
+		MAP_LABEL_TYPE_LABEL => _('Label'),
+		MAP_LABEL_TYPE_IP => _('IP address'),
+		MAP_LABEL_TYPE_NAME => _('Element name'),
+		MAP_LABEL_TYPE_STATUS => _('Status only'),
+		MAP_LABEL_TYPE_NOTHING => _('Nothing'),
+		MAP_LABEL_TYPE_CUSTOM => _('Custom label')
+	);
+// Advnaced Labels
+	$labelTypesLimited = $labelTypes;
+	unset($labelTypesLimited[MAP_LABEL_TYPE_IP]);
 
-	$cmbLabel = new CComboBox('label_type', $data['label_type']);
-	$cmbLabel->addItems(array(
-		0 => _('Label'),
-		1 => _('IP address'),
-		2 => _('Element name'),
-		3 => _('Status only'),
-		4 => _('Nothing')
-	));
-	$sysmapList->addRow(_('Icon label type'), $cmbLabel);
+	$labelTypesImage = $labelTypesLimited;
+	unset($labelTypesImage[MAP_LABEL_TYPE_STATUS]);
+// hostgroup
+	$labelTypeHostgroup = new CComboBox('label_type_hostgroup', $data['label_type_hostgroup'], null, $labelTypesLimited);
+	$customLabelHostgroup = new CTextarea('label_string_hostgroup', $data['label_string_hostgroup']);
+	if($data['label_type_hostgroup'] != MAP_LABEL_TYPE_CUSTOM) $customLabelHostgroup->addClass('hidden');
+	$sysmapList->addRow(_('Host Group label type'), array($labelTypeHostgroup, BR(), $customLabelHostgroup));
+
+// host
+	$labelTypeHost = new CComboBox('label_type_host', $data['label_type_host'], null, $labelTypes);
+	$customLabelHost = new CTextarea('label_string_host', $data['label_string_host']);
+	if($data['label_type_host'] != MAP_LABEL_TYPE_CUSTOM) $customLabelHost->addClass('hidden');
+	$sysmapList->addRow(_('Host label type'), array($labelTypeHost, BR(), $customLabelHost));
+
+// trigger
+	$labelTypeTrigger = new CComboBox('label_type_trigger', $data['label_type_trigger'], null, $labelTypesLimited);
+	$customLabelTrigger = new CTextarea('label_string_trigger', $data['label_string_trigger']);
+	if($data['label_type_trigger'] != MAP_LABEL_TYPE_CUSTOM) $customLabelTrigger->addClass('hidden');
+	$sysmapList->addRow(_('Trigger label type'), array($labelTypeTrigger, BR(), $customLabelTrigger));
+
+// map
+	$labelTypeMap = new CComboBox('label_type_map', $data['label_type_map'], null, $labelTypesLimited);
+	$customLabelMap = new CTextarea('label_string_map', $data['label_string_map']);
+	if($data['label_type_map'] != MAP_LABEL_TYPE_CUSTOM) $customLabelMap->addClass('hidden');
+	$sysmapList->addRow(_('Map label type'), array($labelTypeMap, BR(), $customLabelMap));
+
+// image
+	$labelTypeImage = new CComboBox('label_type_image', $data['label_type_image'], null, $labelTypesImage);
+	$customLabelImage = new CTextarea('label_string_image', $data['label_string_image']);
+	if($data['label_type_image'] != MAP_LABEL_TYPE_CUSTOM) $customLabelImage->addClass('hidden');
+	$sysmapList->addRow(_('Image label type'), array($labelTypeImage, BR(), $customLabelImage));
+// --
+
+	$sysmapList->addRow(_('Icon label type'), new CComboBox('label_type', $data['label_type'], null, $labelTypes));
 
 	$cmbLocation = new CComboBox('label_location', $data['label_location']);
 	$cmbLocation->addItems(array(0=> _('Bottom'),1=> _('Left'),2=> _('Right'),3=> _('Top')));
