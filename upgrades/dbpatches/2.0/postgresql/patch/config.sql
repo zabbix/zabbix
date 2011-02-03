@@ -4,6 +4,18 @@ ALTER TABLE ONLY config ALTER configid DROP DEFAULT,
 			ALTER discovery_groupid DROP DEFAULT,
 			ALTER default_theme SET DEFAULT 'css_ob.css',
 			ADD ns_support integer DEFAULT '0' NOT NULL;
+			ADD severity_color_0 varchar(6) DEFAULT '<see below>' NOT NULL;
+			ADD severity_color_1 varchar(6) DEFAULT '<see below>' NOT NULL;
+			ADD severity_color_2 varchar(6) DEFAULT '<see below>' NOT NULL;
+			ADD severity_color_3 varchar(6) DEFAULT '<see below>' NOT NULL;
+			ADD severity_color_4 varchar(6) DEFAULT '<see below>' NOT NULL;
+			ADD severity_color_5 varchar(6) DEFAULT '<see below>' NOT NULL;
+			ADD severity_name_0 varchar(6) DEFAULT 'Not classified' NOT NULL;
+			ADD severity_name_1 varchar(6) DEFAULT 'Information' NOT NULL;
+			ADD severity_name_2 varchar(6) DEFAULT 'Warning' NOT NULL;
+			ADD severity_name_3 varchar(6) DEFAULT 'Average' NOT NULL;
+			ADD severity_name_4 varchar(6) DEFAULT 'High' NOT NULL;
+			ADD severity_name_5 varchar(6) DEFAULT 'Disaster' NOT NULL;
 UPDATE config SET alert_usrgrpid=NULL WHERE NOT EXISTS (SELECT 1 FROM usrgrp WHERE usrgrp.usrgrpid=config.alert_usrgrpid);
 UPDATE config SET discovery_groupid=NULL WHERE NOT EXISTS (SELECT 1 FROM groups WHERE groups.groupid=config.discovery_groupid);
 UPDATE config SET default_theme='css_ob.css' WHERE default_theme='default.css';
