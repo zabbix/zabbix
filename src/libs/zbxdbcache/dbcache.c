@@ -1232,8 +1232,8 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 
 				hostkey_name = zbx_host_key_string(h->itemid);
 
-				message = zbx_dsprintf(message, "Type of received value"
-						" [" ZBX_FS_DBL "] is not suitable for value type [%s]",
+				message = zbx_dsprintf(message, "Received value [" ZBX_FS_DBL "]"
+						" is not suitable for value type [%s]",
 						h->value.value_float,
 						zbx_item_value_type_string(h->value_type));
 

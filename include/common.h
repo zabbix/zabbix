@@ -253,8 +253,10 @@ typedef enum
 {
 	ITEM_DATA_TYPE_DECIMAL = 0,
 	ITEM_DATA_TYPE_OCTAL,
-	ITEM_DATA_TYPE_HEXADECIMAL
+	ITEM_DATA_TYPE_HEXADECIMAL,
+	ITEM_DATA_TYPE_BOOLEAN
 } zbx_item_data_type_t;
+const char	*zbx_item_data_type_string(zbx_item_data_type_t data_type);
 
 /* HTTP test states */
 typedef enum
@@ -756,6 +758,7 @@ int	is_uint(const char *c);
 int	is_int_prefix(const char *c);
 int	is_uint64(const char *str, zbx_uint64_t *value);
 int	is_ushort(const char *str, unsigned short *value);
+int	is_boolean(const char *str, zbx_uint64_t *value);
 int	is_uoct(const char *str);
 int	is_uhex(const char *str);
 int	is_hex_string(const char *str);
@@ -869,18 +872,18 @@ int	comms_parse_response(char *xml, char *host, int host_len, char *key, int key
 
 int 	parse_command(const char *command, char *cmd, int cmd_max_len, char *param, int param_max_len);
 
-typedef struct zbx_regexp_s
+typedef struct
 {
 	char			*name;
 	char			*expression;
 	int			expression_type;
 	char			exp_delimiter;
 	zbx_case_sensitive_t	case_sensitive;
-} ZBX_REGEXP;
+}
+ZBX_REGEXP;
 
 /* Regular expressions */
 char    *zbx_regexp_match(const char *string, const char *pattern, int *len);
-/* Non case sensitive */
 char    *zbx_iregexp_match(const char *string, const char *pattern, int *len);
 
 void	clean_regexps_ex(ZBX_REGEXP *regexps, int *regexps_num);
@@ -931,6 +934,7 @@ LPSTR	zbx_unicode_to_utf8(LPCTSTR wide_string);
 int	zbx_unicode_to_utf8_static(LPCTSTR wide_string, LPSTR utf8_string, int utf8_size);
 int	_wis_uint(LPCTSTR wide_string);
 #endif
+void	zbx_strlower(char *str);
 void	zbx_strupper(char *str);
 #if defined(_WINDOWS) || defined(HAVE_ICONV)
 char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);

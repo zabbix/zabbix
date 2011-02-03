@@ -687,7 +687,7 @@ time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t
  * Return value: SUCCEED - is IPv4 address                                    *
  *               FAIL - otherwise                                             *
  *                                                                            *
- * Author: Alexei Vladishev, Aleksander Vladishev                             *
+ * Author: Alexei Vladishev, Alexander Vladishev                              *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -737,7 +737,7 @@ int	is_ip4(const char *ip)
  * Return value: SUCCEED - is IPv6 address                                    *
  *               FAIL - otherwise                                             *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: could be improved (not supported x:x:x:x:x:x:d.d.d.d addresses)  *
  *                                                                            *
@@ -792,7 +792,7 @@ static int	is_ip6(const char *ip)
  * Return value: SUCCEED - is IP address                                      *
  *               FAIL - otherwise                                             *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -823,7 +823,7 @@ int	is_ip(const char *ip)
  *                                                                            *
  * Return value: FAIL - invalid IP address, SUCCEED - conversion OK           *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -906,7 +906,7 @@ int	expand_ipv6(const char *ip, char *str, size_t str_len )
  *                                                                            *
  * Return value: pointer to result buffer                                     *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1598,6 +1598,40 @@ int	is_ushort(const char *str, unsigned short *value)
 
 /******************************************************************************
  *                                                                            *
+ * Function: is_boolean                                                       *
+ *                                                                            *
+ * Purpose: check if the string is boolean                                    *
+ *                                                                            *
+ * Parameters: str - string to check                                          *
+ *                                                                            *
+ * Return value:  SUCCEED - the string is boolean                             *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ * Author: Aleksandrs Saveljevs                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	is_boolean(const char *str, zbx_uint64_t *value)
+{
+	int	res;
+	char	tmp[8];
+
+	strscpy(tmp, str);
+	zbx_strlower(tmp);
+
+	if (SUCCEED == (res = str_in_list("true,t,yes,y,on,up", tmp, ',')))
+		*value = 1;
+	else if (SUCCEED == (res = str_in_list("false,f,no,n,off,down", tmp, ',')))
+		*value = 0;
+	else if (SUCCEED == (res = is_double(str)))
+		*value = (0 != atof(str));
+
+	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: is_uoct                                                          *
  *                                                                            *
  * Purpose: check if the string is unsigned octal                             *
@@ -1607,7 +1641,7 @@ int	is_ushort(const char *str, unsigned short *value)
  * Return value:  SUCCEED - the string is unsigned octal                      *
  *                FAIL - otherwise                                            *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1647,7 +1681,7 @@ int	is_uoct(const char *str)
  * Return value:  SUCCEED - the string is unsigned hexadecimal                *
  *                FAIL - otherwise                                            *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1720,7 +1754,7 @@ int	is_hex_string(const char *str)
  *                                                                            *
  * Purpose: check if uin64 integer matches a list of integers                 *
  *                                                                            *
- * Parameters: list -  integers [i1-i2,i3,i4,i5-i6] (10-25,45,67-699          *
+ * Parameters: list -  integers [i1-i2,i3,i4,i5-i6] (10-25,45,67-699)         *
  *             value-  value                                                  *
  *                                                                            *
  * Return value: FAIL - out of period, SUCCEED - within the list              *
@@ -1835,7 +1869,7 @@ int	get_nearestindex(void *p, size_t sz, int num, zbx_uint64_t id)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1877,7 +1911,7 @@ int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t v
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1900,7 +1934,7 @@ void	uint64_array_merge(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1926,7 +1960,7 @@ int	uint64_array_exists(zbx_uint64_t *values, int num, zbx_uint64_t value)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1998,7 +2032,8 @@ int	str2uint(const char *str)
 	size_t	sz = strlen(str) - 1;
 	int	factor = 1;
 
-	switch (str[sz]) {
+	switch (str[sz])
+	{
 		case 's': factor = 1;         break;
 		case 'm': factor = 60;        break;
 		case 'h': factor = 3600;      break;
@@ -2021,7 +2056,7 @@ int	str2uint(const char *str)
  * Return value:  SUCCEED - the string is unsigned integer                    *
  *                FAIL - otherwise                                            *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: the function automatically processes suffixes 'K','M','G','T'    *
  *                                                                            *
