@@ -701,8 +701,6 @@ void	main_poller_loop(unsigned char poller_type, unsigned char poller_num)
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_poller_loop() poller_type:%d poller_num:%d",
 			(int)poller_type, (int)poller_num);
 
-	update_counters(ZBX_TIME_INIT | ZBX_TIME_BUSY);
-
 	phan.sa_sigaction = child_signal_handler;
 	sigemptyset(&phan.sa_mask);
 	phan.sa_flags = SA_SIGINFO;
@@ -728,9 +726,7 @@ void	main_poller_loop(unsigned char poller_type, unsigned char poller_num)
 		{
 			zbx_setproctitle("%s [sleeping for %d seconds]",
 					zbx_poller_type_string(poller_type), sleeptime);
-			update_counters(ZBX_TIME_IDLE);
 			sleep(sleeptime);
-			update_counters(ZBX_TIME_BUSY);
 		}
 	}
 }

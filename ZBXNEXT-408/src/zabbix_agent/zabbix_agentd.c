@@ -223,7 +223,7 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	}
 }
 
-int	MAIN_ZABBIX_ENTRY()
+int MAIN_ZABBIX_ENTRY(void)
 {
 	ZBX_THREAD_ACTIVECHK_ARGS	activechk_args;
 

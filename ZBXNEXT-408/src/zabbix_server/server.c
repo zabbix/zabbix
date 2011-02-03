@@ -372,7 +372,7 @@ int	main(int argc, char **argv)
 	return daemon_start(CONFIG_ALLOW_ROOT);
 }
 
-int	MAIN_ZABBIX_ENTRY()
+int	MAIN_ZABBIX_ENTRY(void)
 {
         DB_RESULT       result;
         DB_ROW          row;

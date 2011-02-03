@@ -216,8 +216,6 @@ void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex)
 	if (!*mutex)
 		return;
 
-	update_counters(ZBX_TIME_WAIT);
-
 	while (-1 == semop(ZBX_SEM_LIST_ID, &sem_lock, 1))
 	{
 		if (EINTR != errno)
@@ -227,8 +225,6 @@ void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex)
 			exit(FAIL);
 		}
 	}
-
-	update_counters(ZBX_TIME_LOCK);
 
 #endif /* _WINDOWS */
 }
@@ -278,8 +274,6 @@ void	__zbx_mutex_unlock(const char *filename, int line, ZBX_MUTEX *mutex)
 			exit(FAIL);
 		}
 	}
-
-	update_counters(ZBX_TIME_BUSY);
 
 #endif /* _WINDOWS */
 }
