@@ -1451,6 +1451,14 @@ class zbxXML{
 							$graph_db = self::mapXML2arr($graph, XML_TAG_GRAPH);
 							$graph_db['hostids'] = $graph_hostids;
 
+
+							// do we need to show the graph legend, after it is imported?
+							// in 1.8, this setting was present only for pie and exploded graphs
+							// for other graph types we are always showing the legend
+							if ($graph_db['graphtype'] != GRAPH_TYPE_PIE && $graph_db['graphtype'] != GRAPH_TYPE_EXPLODED){
+								$graph_db['show_legend'] = 1;
+							}
+
 							$current_graph = CGraph::exists($graph_db);
 
 							if($current_graph){
@@ -1520,7 +1528,6 @@ class zbxXML{
 								$graphs_to_add[] = $graph_db;
 							}
 						}
-
 
 						if(!empty($graphs_to_add)){
 							$r = CGraph::create($graphs_to_add);
