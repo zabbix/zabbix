@@ -938,7 +938,7 @@ COpt::memoryPick();
 
 				if(!in_array($current_item['type'], array(ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV1,
 						ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI,
-						ITEM_TYPE_SSH, ITEM_TYPE_TELNET))
+						ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX))
 					|| ($dbHosts[$item['hostid']]['status'] == HOST_STATUS_TEMPLATE)
 				){
 					unset($item['interfaceid']);
@@ -1017,7 +1017,7 @@ COpt::memoryPick();
 
 			if(in_array($current_item['type'], array(ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV1,
 				ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI,
-				ITEM_TYPE_SSH, ITEM_TYPE_TELNET))
+				ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX))
 			){
 				if(isset($item['interfaceid'])){
 					if(!isset($interfaces[$item['interfaceid']]) || ($interfaces[$item['interfaceid']]['hostid'] != $item['hostid']))
@@ -1535,7 +1535,7 @@ COpt::memoryPick();
 				else if(isset($item['type']) && ($item['type'] != $exItem['type'])){
 					if(in_array($item['type'], array(ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV1,
 						ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI,
-						ITEM_TYPE_SSH, ITEM_TYPE_TELNET))
+						ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX))
 					){
 						$type = getInterfaceTypeByItem($item);
 						if(!isset($interfaces[$type])){
