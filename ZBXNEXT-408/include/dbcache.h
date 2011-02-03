@@ -149,7 +149,7 @@ void	free_configuration_cache();
 int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid);
 int	DCconfig_get_item_by_key(DC_ITEM *item, zbx_uint64_t proxy_hostid, const char *hostname, const char *key);
 int	DCconfig_get_item_by_itemid(DC_ITEM *item, zbx_uint64_t itemid);
-int	DCconfig_get_poller_nextcheck(unsigned char poller_type);
+int	DCconfig_get_poller_sleeptime(unsigned char poller_type);
 int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max_items);
 int	DCconfig_get_items(zbx_uint64_t hostid, const char *key, DC_ITEM **items);
 

@@ -499,7 +499,7 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count)
  ******************************************************************************/
 void	main_pinger_loop(int num)
 {
-	int			now, nextcheck, sleeptime;
+	int			now, sleeptime;
 	double			sec;
 	static icmpitem_t	*items = NULL;
 	static int		items_alloc = 4;
@@ -525,16 +525,7 @@ void	main_pinger_loop(int num)
 		process_pinger_hosts(items, items_count);
 		sec = zbx_time() - sec;
 
-		if (FAIL == (nextcheck = DCconfig_get_poller_nextcheck(poller_type)))
-			sleeptime = POLLER_DELAY;
-		else
-		{
-			sleeptime = nextcheck - time(NULL);
-			if (sleeptime < 0)
-				sleeptime = 0;
-			else if (sleeptime > POLLER_DELAY)
-				sleeptime = POLLER_DELAY;
-		}
+		sleeptime = DCconfig_get_poller_sleeptime(poller_type);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Pinger spent " ZBX_FS_DBL " seconds while processing %d items."
 				" Nextcheck after %d sec.",

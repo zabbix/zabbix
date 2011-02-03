@@ -699,7 +699,7 @@ static int	get_values()
 void	main_poller_loop(unsigned char p, int type, int num)
 {
 	struct	sigaction phan;
-	int	nextcheck, sleeptime, processed;
+	int	sleeptime, processed;
 	double	sec;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_poller_loop() poller_type:%d poller_num:%d", type, num);
@@ -723,16 +723,7 @@ void	main_poller_loop(unsigned char p, int type, int num)
 		processed = get_values();
 		sec = zbx_time() - sec;
 
-		if (FAIL == (nextcheck = DCconfig_get_poller_nextcheck(poller_type)))
-			sleeptime = POLLER_DELAY;
-		else
-		{
-			sleeptime = nextcheck - time(NULL);
-			if (sleeptime < 0)
-				sleeptime = 0;
-			if (sleeptime > POLLER_DELAY)
-				sleeptime = POLLER_DELAY;
-		}
+		sleeptime = DCconfig_get_poller_sleeptime(poller_type);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while updating %d values."
 				" Sleeping for %d seconds",
