@@ -56,21 +56,21 @@ const char	usage_message[] = "[-hV] [-c <file>] [-n <nodeid>]";
 
 #ifndef HAVE_GETOPT_LONG
 const char	*help_message[] = {
-        "Options:",
-        "  -c <file>       Specify configuration file",
-        "  -h              give this help",
-        "  -n <nodeid>     convert database data to new nodeid",
-        "  -V              display version number",
-        0 /* end of text */
+	"Options:",
+	"  -c <file>       Specify configuration file",
+	"  -h              give this help",
+	"  -n <nodeid>     convert database data to new nodeid",
+	"  -V              display version number",
+	0 /* end of text */
 };
 #else
 const char	*help_message[] = {
-        "Options:",
-        "  -c --config <file>       Specify configuration file",
-        "  -h --help                give this help",
-        "  -n --new-nodeid <nodeid> convert database data to new nodeid",
-        "  -V --version             display version number",
-        0 /* end of text */
+	"Options:",
+	"  -c --config <file>       Specify configuration file",
+	"  -h --help                give this help",
+	"  -n --new-nodeid <nodeid> convert database data to new nodeid",
+	"  -V --version             display version number",
+	0 /* end of text */
 };
 #endif
 
@@ -164,7 +164,7 @@ int	CONFIG_ENABLE_LOG		= 1;
 int	CONFIG_REFRESH_UNSUPPORTED	= 0;
 
 /* Zabbix server startup time */
-int     CONFIG_SERVER_STARTUP_TIME      = 0;
+int	CONFIG_SERVER_STARTUP_TIME	= 0;
 
 /* Parameters for passive proxies */
 int	CONFIG_PROXYPOLLER_FORKS	= 1;
@@ -190,7 +190,7 @@ ZBX_MUTEX	node_sync_access;
  * Comments: will terminate process if parsing fails                          *
  *                                                                            *
  ******************************************************************************/
-void	init_config(void)
+static void	init_config()
 {
 	static struct cfg_line cfg[]=
 	{
@@ -253,38 +253,43 @@ void	init_config(void)
 
 	parse_cfg_file(CONFIG_FILE, cfg);
 
-	if(CONFIG_DBNAME == NULL)
+	if (NULL == CONFIG_DBNAME)
 	{
-		zabbix_log( LOG_LEVEL_CRIT, "DBName not in config file");
+		zabbix_log(LOG_LEVEL_CRIT, "DBName not in config file");
 		exit(1);
 	}
-	if(CONFIG_PID_FILE == NULL)
+
+	if (NULL == CONFIG_PID_FILE)
 	{
-		CONFIG_PID_FILE=strdup("/tmp/zabbix_server.pid");
+		CONFIG_PID_FILE = zbx_strdup(CONFIG_PID_FILE, "/tmp/zabbix_server.pid");
 	}
-	if(CONFIG_ALERT_SCRIPTS_PATH == NULL)
+
+	if (NULL == CONFIG_ALERT_SCRIPTS_PATH)
 	{
-		CONFIG_ALERT_SCRIPTS_PATH=strdup("/home/zabbix/bin");
+		CONFIG_ALERT_SCRIPTS_PATH = zbx_strdup(CONFIG_ALERT_SCRIPTS_PATH, "/home/zabbix/bin");
 	}
-	if(CONFIG_TMPDIR == NULL)
+
+	if (NULL == CONFIG_TMPDIR)
 	{
-		CONFIG_TMPDIR=strdup("/tmp");
+		CONFIG_TMPDIR = zbx_strdup(CONFIG_TMPDIR, "/tmp");
 	}
-	if(CONFIG_FPING_LOCATION == NULL)
+
+	if (NULL == CONFIG_FPING_LOCATION)
 	{
-		CONFIG_FPING_LOCATION=strdup("/usr/sbin/fping");
+		CONFIG_FPING_LOCATION = zbx_strdup(CONFIG_FPING_LOCATION, "/usr/sbin/fping");
 	}
 #ifdef HAVE_IPV6
-	if(CONFIG_FPING6_LOCATION == NULL)
+	if (NULL == CONFIG_FPING6_LOCATION)
 	{
-		CONFIG_FPING6_LOCATION=strdup("/usr/sbin/fping6");
+		CONFIG_FPING6_LOCATION = zbx_strdup(CONFIG_FPING6_LOCATION, "/usr/sbin/fping6");
 	}
 #endif /* HAVE_IPV6 */
-	if(CONFIG_EXTERNALSCRIPTS == NULL)
+	if (NULL == CONFIG_EXTERNALSCRIPTS)
 	{
-		CONFIG_EXTERNALSCRIPTS=strdup("/etc/zabbix/externalscripts");
+		CONFIG_EXTERNALSCRIPTS = zbx_strdup(CONFIG_EXTERNALSCRIPTS, "/etc/zabbix/externalscripts");
 	}
-	if (CONFIG_NODEID == 0)
+
+	if (0 == CONFIG_NODEID)
 	{
 		CONFIG_NODEWATCHER_FORKS = 0;
 	}
@@ -312,18 +317,17 @@ int	main(int argc, char **argv)
 {
 	zbx_task_t	task = ZBX_TASK_START;
 	char		ch = '\0';
-
-	int	nodeid = 0;
+	int		nodeid = 0;
 
 	progname = get_program_name(argv[0]);
 
 	/* Parse the command-line. */
-	while ((ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts,NULL)) != (char)EOF)
+	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
 	{
 		switch (ch)
 		{
 			case 'c':
-				CONFIG_FILE = strdup(zbx_optarg);
+				CONFIG_FILE = zbx_strdup(CONFIG_FILE, zbx_optarg);
 				break;
 			case 'h':
 				help();
@@ -345,10 +349,8 @@ int	main(int argc, char **argv)
 		}
 	}
 
-	if(CONFIG_FILE == NULL)
-	{
-		CONFIG_FILE=strdup("/etc/zabbix/zabbix_server.conf");
-	}
+	if (NULL == CONFIG_FILE)
+		CONFIG_FILE = zbx_strdup(CONFIG_FILE, "/etc/zabbix/zabbix_server.conf");
 
 	/* Required for simple checks */
 	init_metrics();
@@ -362,7 +364,7 @@ int	main(int argc, char **argv)
 	switch (task)
 	{
 		case ZBX_TASK_CHANGE_NODEID:
-			change_nodeid(0,nodeid);
+			change_nodeid(0, nodeid);
 			exit(-1);
 			break;
 		default:
@@ -372,28 +374,24 @@ int	main(int argc, char **argv)
 	return daemon_start(CONFIG_ALLOW_ROOT);
 }
 
-int	MAIN_ZABBIX_ENTRY(void)
+int	MAIN_ZABBIX_ENTRY()
 {
-        DB_RESULT       result;
-        DB_ROW          row;
-
-	int	i;
-	pid_t	pid;
-
+	DB_RESULT	result;
+	DB_ROW		row;
+	pid_t		pid;
 	zbx_sock_t	listen_sock;
+	int		i, server_num = 0;
 
-	int		server_num = 0;
-
-	if(CONFIG_LOG_FILE == NULL || ('\0' == *CONFIG_LOG_FILE))
+	if (NULL == CONFIG_LOG_FILE || '\0' == *CONFIG_LOG_FILE)
 	{
-		zabbix_open_log(LOG_TYPE_SYSLOG,CONFIG_LOG_LEVEL,NULL);
+		zabbix_open_log(LOG_TYPE_SYSLOG, CONFIG_LOG_LEVEL, NULL);
 	}
 	else
 	{
-		zabbix_open_log(LOG_TYPE_FILE,CONFIG_LOG_LEVEL,CONFIG_LOG_FILE);
+		zabbix_open_log(LOG_TYPE_FILE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
 	}
 
-#ifdef  HAVE_SNMP
+#ifdef	HAVE_SNMP
 #	define SNMP_FEATURE_STATUS "YES"
 #else
 #	define SNMP_FEATURE_STATUS " NO"
@@ -403,27 +401,27 @@ int	MAIN_ZABBIX_ENTRY(void)
 #else
 #	define IPMI_FEATURE_STATUS " NO"
 #endif
-#ifdef  HAVE_LIBCURL
+#ifdef	HAVE_LIBCURL
 #	define LIBCURL_FEATURE_STATUS "YES"
 #else
 #	define LIBCURL_FEATURE_STATUS " NO"
 #endif
-#ifdef  HAVE_JABBER
+#ifdef	HAVE_JABBER
 #	define JABBER_FEATURE_STATUS "YES"
 #else
 #	define JABBER_FEATURE_STATUS " NO"
 #endif
-#ifdef  HAVE_ODBC
+#ifdef	HAVE_ODBC
 #	define ODBC_FEATURE_STATUS "YES"
 #else
 #	define ODBC_FEATURE_STATUS " NO"
 #endif
 #ifdef	HAVE_SSH2
-#       define SSH2_FEATURE_STATUS "YES"
+#	define SSH2_FEATURE_STATUS "YES"
 #else
-#       define SSH2_FEATURE_STATUS " NO"
+#	define SSH2_FEATURE_STATUS " NO"
 #endif
-#ifdef  HAVE_IPV6
+#ifdef	HAVE_IPV6
 #	define IPV6_FEATURE_STATUS "YES"
 #else
 #	define IPV6_FEATURE_STATUS " NO"
@@ -444,45 +442,32 @@ int	MAIN_ZABBIX_ENTRY(void)
 	zabbix_log(LOG_LEVEL_WARNING, "IPv6 support:              " IPV6_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_WARNING, "******************************");
 
-#ifdef  HAVE_SQLITE3
+#ifdef	HAVE_SQLITE3
 	zbx_create_sqlite3_mutex(CONFIG_DBNAME);
 #endif /* HAVE_SQLITE3 */
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
 
 	result = DBselect("select refresh_unsupported from config where 1=1" DB_NODE,
-		DBnode_local("configid"));
-	row = DBfetch(result);
+			DBnode_local("configid"));
 
-	if( (row != NULL) && DBis_null(row[0]) != SUCCEED)
-	{
+	if (NULL != (row = DBfetch(result)))
 		CONFIG_REFRESH_UNSUPPORTED = atoi(row[0]);
-	}
 	DBfree_result(result);
 
 	result = DBselect("select masterid from nodes where nodeid=%d",
-		CONFIG_NODEID);
-	row = DBfetch(result);
+			CONFIG_NODEID);
 
-	if( (row != NULL) && DBis_null(row[0]) != SUCCEED)
-	{
+	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
 		CONFIG_MASTER_NODEID = atoi(row[0]);
-	}
 	DBfree_result(result);
 
 	init_database_cache(ZBX_PROCESS_SERVER);
 	init_configuration_cache();
 
-/* Need to set trigger status to UNKNOWN since last run */
-/* DBconnect() already made in init_config() */
-/*	DBconnect();*/
+	/* Need to set trigger status to UNKNOWN since last run */
 	DBupdate_triggers_status_after_restart();
 	DBclose();
-
-/* To make sure that we can connect to the database before forking new processes */
-/*	DBconnect(ZBX_DB_CONNECT_EXIT);*/
-/* Do not close database. It is required for database cache */
-/*	DBclose();*/
 
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&node_sync_access, ZBX_MUTEX_NODE_SYNC))
 	{
@@ -490,12 +475,6 @@ int	MAIN_ZABBIX_ENTRY(void)
 		exit(FAIL);
 	}
 
-/*#define CALC_TREND*/
-
-#ifdef CALC_TREND
-	trend();
-	return 0;
-#endif
 	threads_num = 1 + CONFIG_DBCONFIG_FORKS + CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
 			+ CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS
 			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS + CONFIG_NODEWATCHER_FORKS

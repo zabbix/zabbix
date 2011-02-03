@@ -76,20 +76,6 @@ void	child_signal_handler( int sig )
 
 static char	DEFAULT_CONFIG_FILE[] = "/etc/zabbix/zabbix_agent.conf";
 
-void    init_config(void)
-{
-	struct cfg_line cfg[] =
-	{
-/*               PARAMETER      ,VAR    ,FUNC,  TYPE(0i,1s),MANDATORY,MIN,MAX
-*/
-		{"Server",&CONFIG_HOSTS_ALLOWED,0,TYPE_STRING,PARM_MAND,0,0},
-		{"Timeout",&CONFIG_TIMEOUT,0,TYPE_INT,PARM_OPT,1,30},
-		{0}
-	};
-
-	parse_cfg_file(CONFIG_FILE, cfg);
-}
-
 int	main(int argc, char **argv)
 {
 	char		ch;
@@ -144,7 +130,7 @@ int	main(int argc, char **argv)
 	if (CONFIG_FILE == NULL)
 		CONFIG_FILE = DEFAULT_CONFIG_FILE;
 
-	init_metrics(); /* Must be before init_config() */
+	init_metrics();
 
 	if (ZBX_TASK_START == task)
 	{

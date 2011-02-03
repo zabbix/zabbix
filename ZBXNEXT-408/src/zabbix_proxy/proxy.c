@@ -52,19 +52,19 @@ const char	usage_message[] = "[-hV] [-c <file>]";
 
 #ifndef HAVE_GETOPT_LONG
 const char	*help_message[] = {
-        "Options:",
-        "  -c <file>       Specify configuration file",
-        "  -h              give this help",
-        "  -V              display version number",
-        0 /* end of text */
+	"Options:",
+	"  -c <file>       Specify configuration file",
+	"  -h              give this help",
+	"  -V              display version number",
+	0 /* end of text */
 };
 #else
 const char	*help_message[] = {
-        "Options:",
-        "  -c --config <file>       Specify configuration file",
-        "  -h --help                give this help",
-        "  -V --version             display version number",
-        0 /* end of text */
+	"Options:",
+	"  -c --config <file>       Specify configuration file",
+	"  -h --help                give this help",
+	"  -V --version             display version number",
+	0 /* end of text */
 };
 #endif
 
@@ -113,9 +113,9 @@ int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1; /* h */
 int	CONFIG_PROXY_LOCAL_BUFFER	= 0; /* 24h */
 int	CONFIG_PROXY_OFFLINE_BUFFER	= 1; /* 720h */
 
-int	CONFIG_HEARTBEAT_FREQUENCY      = 60;
+int	CONFIG_HEARTBEAT_FREQUENCY	= 60;
 
-int	CONFIG_PROXYCONFIG_FREQUENCY    = 3600; /* 1h */
+int	CONFIG_PROXYCONFIG_FREQUENCY	= 3600; /* 1h */
 int	CONFIG_PROXYDATA_FREQUENCY	= 1;
 
 int	CONFIG_SENDER_FREQUENCY		= 30;
@@ -165,7 +165,7 @@ int	CONFIG_ENABLE_LOG		= 1;
 int	CONFIG_REFRESH_UNSUPPORTED	= 600;
 
 /* Zabbix server startup time */
-int     CONFIG_SERVER_STARTUP_TIME      = 0;
+int	CONFIG_SERVER_STARTUP_TIME	= 0;
 
 /* Mutex for node syncs; not used in proxy */
 ZBX_MUTEX	node_sync_access;
@@ -185,7 +185,7 @@ ZBX_MUTEX	node_sync_access;
  * Comments: will terminate process if parsing fails                          *
  *                                                                            *
  ******************************************************************************/
-void	init_config(void)
+static void	init_config()
 {
 	AGENT_RESULT	result;
 	char		**value = NULL;
@@ -260,7 +260,7 @@ void	init_config(void)
 	if (ZBX_PROXYMODE_ACTIVE == CONFIG_PROXYMODE &&
 			(NULL == CONFIG_SERVER || '\0' == *CONFIG_SERVER))
 	{
-		 zbx_error("Missing mandatory parameter [Server].");
+		zbx_error("Missing mandatory parameter [Server].");
 	}
 
 	if (ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE)
@@ -271,62 +271,66 @@ void	init_config(void)
 	else
 		zbx_process = ZBX_PROCESS_PROXY_ACTIVE;
 
-	if(CONFIG_HOSTNAME == NULL || *CONFIG_HOSTNAME == '\0')
+	if (NULL == CONFIG_HOSTNAME || '\0' == *CONFIG_HOSTNAME)
 	{
-		if(CONFIG_HOSTNAME != NULL)
+		if (NULL != CONFIG_HOSTNAME)
 			zbx_free(CONFIG_HOSTNAME);
 
-	  	if(SUCCEED == process("system.hostname", 0, &result))
+		if (SUCCEED == process("system.hostname", 0, &result))
 		{
-			if( NULL != (value = GET_STR_RESULT(&result)) )
+			if (NULL != (value = GET_STR_RESULT(&result)))
 			{
-				CONFIG_HOSTNAME = strdup(*value);
+				CONFIG_HOSTNAME = zbx_strdup(CONFIG_HOSTNAME, *value);
 				if (strlen(CONFIG_HOSTNAME) > HOST_HOST_LEN)
 					CONFIG_HOSTNAME[HOST_HOST_LEN] = '\0';
 			}
 		}
-	        free_result(&result);
+		free_result(&result);
 
-		if(CONFIG_HOSTNAME == NULL)
+		if (NULL == CONFIG_HOSTNAME)
 		{
-			zabbix_log( LOG_LEVEL_CRIT, "Hostname is not defined");
+			zabbix_log(LOG_LEVEL_CRIT, "Hostname is not defined");
 			exit(1);
 		}
 	}
 	else
 	{
-		if(strlen(CONFIG_HOSTNAME) > HOST_HOST_LEN)
+		if (strlen(CONFIG_HOSTNAME) > HOST_HOST_LEN)
 		{
-			zabbix_log( LOG_LEVEL_CRIT, "Hostname too long");
+			zabbix_log(LOG_LEVEL_CRIT, "Hostname too long");
 			exit(1);
 		}
 	}
-	if(CONFIG_DBNAME == NULL)
+
+	if (NULL == CONFIG_DBNAME)
 	{
-		zabbix_log( LOG_LEVEL_CRIT, "DBName not in config file");
+		zabbix_log(LOG_LEVEL_CRIT, "DBName not in config file");
 		exit(1);
 	}
-	if(CONFIG_PID_FILE == NULL)
+
+	if (NULL == CONFIG_PID_FILE)
 	{
-		CONFIG_PID_FILE=strdup("/tmp/zabbix_proxy.pid");
+		CONFIG_PID_FILE = zbx_strdup(CONFIG_PID_FILE, "/tmp/zabbix_proxy.pid");
 	}
-	if(CONFIG_TMPDIR == NULL)
+
+	if (NULL == CONFIG_TMPDIR)
 	{
-		CONFIG_TMPDIR=strdup("/tmp");
+		CONFIG_TMPDIR = zbx_strdup(CONFIG_TMPDIR, "/tmp");
 	}
-	if(CONFIG_FPING_LOCATION == NULL)
+
+	if (NULL == CONFIG_FPING_LOCATION)
 	{
-		CONFIG_FPING_LOCATION=strdup("/usr/sbin/fping");
+		CONFIG_FPING_LOCATION = zbx_strdup(CONFIG_FPING_LOCATION, "/usr/sbin/fping");
 	}
 #ifdef HAVE_IPV6
-	if(CONFIG_FPING6_LOCATION == NULL)
+	if (NULL == CONFIG_FPING6_LOCATION)
 	{
-		CONFIG_FPING6_LOCATION=strdup("/usr/sbin/fping6");
+		CONFIG_FPING6_LOCATION = zbx_strdup(CONFIG_FPING6_LOCATION, "/usr/sbin/fping6");
 	}
 #endif /* HAVE_IPV6 */
-	if(CONFIG_EXTERNALSCRIPTS == NULL)
+	if (NULL == CONFIG_EXTERNALSCRIPTS)
 	{
-		CONFIG_EXTERNALSCRIPTS=strdup("/etc/zabbix/externalscripts");
+		CONFIG_EXTERNALSCRIPTS = zbx_strdup(CONFIG_EXTERNALSCRIPTS, "/etc/zabbix/externalscripts");
 	}
 }
 
@@ -357,7 +361,7 @@ int	main(int argc, char **argv)
 		switch (ch)
 		{
 			case 'c':
-				CONFIG_FILE = strdup(zbx_optarg);
+				CONFIG_FILE = zbx_strdup(CONFIG_FILE, zbx_optarg);
 				break;
 			case 'h':
 				help();
@@ -375,9 +379,7 @@ int	main(int argc, char **argv)
 	}
 
 	if (NULL == CONFIG_FILE)
-	{
-		CONFIG_FILE=strdup("/etc/zabbix/zabbix_proxy.conf");
-	}
+		CONFIG_FILE = zbx_strdup(CONFIG_FILE, "/etc/zabbix/zabbix_proxy.conf");
 
 	/* Required for simple checks */
 	init_metrics();
@@ -391,7 +393,7 @@ int	main(int argc, char **argv)
 	return daemon_start(CONFIG_ALLOW_ROOT);
 }
 
-int MAIN_ZABBIX_ENTRY(void)
+int	MAIN_ZABBIX_ENTRY()
 {
 	int	i;
 	pid_t	pid;
@@ -409,7 +411,7 @@ int MAIN_ZABBIX_ENTRY(void)
 		zabbix_open_log(LOG_TYPE_FILE,CONFIG_LOG_LEVEL,CONFIG_LOG_FILE);
 	}
 
-#ifdef  HAVE_SNMP
+#ifdef	HAVE_SNMP
 #	define SNMP_FEATURE_STATUS "YES"
 #else
 #	define SNMP_FEATURE_STATUS " NO"
@@ -419,12 +421,12 @@ int MAIN_ZABBIX_ENTRY(void)
 #else
 #	define IPMI_FEATURE_STATUS " NO"
 #endif
-#ifdef  HAVE_LIBCURL
+#ifdef	HAVE_LIBCURL
 #	define LIBCURL_FEATURE_STATUS "YES"
 #else
 #	define LIBCURL_FEATURE_STATUS " NO"
 #endif
-#ifdef  HAVE_ODBC
+#ifdef	HAVE_ODBC
 #	define ODBC_FEATURE_STATUS "YES"
 #else
 #	define ODBC_FEATURE_STATUS " NO"
@@ -434,10 +436,10 @@ int MAIN_ZABBIX_ENTRY(void)
 #else
 #	define SSH2_FEATURE_STATUS " NO"
 #endif
-#ifdef  HAVE_IPV6
-#       define IPV6_FEATURE_STATUS "YES"
+#ifdef	HAVE_IPV6
+#	define IPV6_FEATURE_STATUS "YES"
 #else
-#       define IPV6_FEATURE_STATUS " NO"
+#	define IPV6_FEATURE_STATUS " NO"
 #endif
 
 	zabbix_log(LOG_LEVEL_WARNING, "Starting Zabbix Proxy. Zabbix %s (revision %s).",
@@ -651,8 +653,8 @@ int MAIN_ZABBIX_ENTRY(void)
 void	zbx_on_exit()
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called");
-		
-	if (threads != NULL)
+
+	if (NULL != threads)
 	{
 		int	i;
 
