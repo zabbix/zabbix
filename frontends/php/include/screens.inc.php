@@ -1437,8 +1437,11 @@ require_once('include/js.inc.php');
 						'extAck' => 0,
 					);
 
-					$item = array(get_table_header(array(S_SYSTEM_STATUS,SPACE,zbx_date2str(S_SCREENS_TRIGGER_FORM_DATE_FORMAT))));
-					$item[] = make_system_status($params);
+					$item = new CUIWidget('hat_syssum',make_system_status($params));
+					$item->setHeader(S_STATUS_OF_ZABBIX, SPACE);
+					$item->setFooter(_s('Updated: %s',zbx_date2str(S_BLOCKS_SYSTEM_SUMMARY_TIME_FORMAT)));
+
+					$item = array($item);
 
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}

@@ -405,10 +405,9 @@ function make_system_status($filter){
 		$table->addRow($group_row);
 	}
 
-	$footer = new CDiv(S_UPDATED.': '.zbx_date2str(S_BLOCKS_SYSTEM_SUMMARY_TIME_FORMAT), 'textwhite');
-	$footer->setAttribute('style', 'height: 0px; position: relative; padding-left: 4px; top: 5px;');
+	$script = new CJSScript(get_js("jQuery('#hat_syssum_footer').html('"._s('Updated: %s',zbx_date2str(S_BLOCKS_SYSTEM_SUMMARY_TIME_FORMAT))."')"));
 
-return new CDiv(array($table, $footer));
+return new CDiv(array($table, $script));
 }
 
 function make_hoststat_summary($filter){
@@ -722,10 +721,9 @@ function make_hoststat_summary($filter){
 		$table->addRow($group_row);
 	}
 
-	$footer = new CDiv(S_UPDATED.': '.zbx_date2str(S_BLOCKS_SYSTEM_SUMMARY_TIME_FORMAT), 'textwhite');
-	$footer->setAttribute('style', 'height: 0px; position: relative; padding-left: 4px; top: 5px;');
+	$script = new CJSScript(get_js("jQuery('#hat_hoststat_footer').html('"._s('Updated: %s',zbx_date2str(S_BLOCKS_SYSTEM_SUMMARY_TIME_FORMAT))."')"));
 
-return new CDiv(array($table, $footer));
+return new CDiv(array($table, $script));
 }
 
 // Author: Aly
@@ -801,10 +799,9 @@ function make_status_of_zbx(){
 	}
 // }}}CHECK REQUIREMENTS
 
-	$footer = new CDiv(S_UPDATED.': '.zbx_date2str(S_BLOCKS_SYSTEM_SUMMARY_TIME_FORMAT), 'textwhite');
-	$footer->setAttribute('style', 'height: 0px; position: relative; padding-left: 4px; top: 5px;');
+	$script = new CJSScript(get_js("jQuery('#hat_stszbx_footer').html('"._s('Updated: %s',zbx_date2str(S_BLOCKS_SYSTEM_SUMMARY_TIME_FORMAT))."')"));
 
-return new CDiv(array($table, $footer));
+return new CDiv(array($table, $script));
 }
 
 
@@ -1003,10 +1000,9 @@ function make_latest_issues($filter = array()){
 		unset($trigger,$description,$actions);
 	}
 
-	$footer = new CDiv(S_UPDATED.': '.zbx_date2str(S_BLOCKS_SYSTEM_SUMMARY_TIME_FORMAT), 'textwhite');
-	$footer->setAttribute('style', 'height: 0px; position: relative; padding-left: 4px; top: 5px;');
+	$script = new CJSScript(get_js("jQuery('#hat_lastiss_footer').html('"._s('Updated: %s',zbx_date2str(S_BLOCKS_SYSTEM_SUMMARY_TIME_FORMAT))."')"));
 
-return new CDiv(array($table, $footer));
+return new CDiv(array($table, $script));
 }
 
 // author Aly
@@ -1082,10 +1078,9 @@ function make_webmon_overview($filter){
 		));
 	}
 
-	$footer = new CDiv(S_UPDATED.': '.zbx_date2str(S_BLOCKS_SYSTEM_SUMMARY_TIME_FORMAT), 'textwhite');
-	$footer->setAttribute('style', 'height: 0px; position: relative; padding-left: 4px; top: 5px;');
+	$script = new CJSScript(get_js("jQuery('#hat_webovr_footer').html('"._s('Updated: %s',zbx_date2str(S_BLOCKS_SYSTEM_SUMMARY_TIME_FORMAT))."')"));
 
-return new CDiv(array($table, $footer));
+return new CDiv(array($table, $script));
 }
 
 // Author: Aly
@@ -1131,10 +1126,9 @@ function make_discovery_status(){
 		));
 	}
 
-	$footer = new CDiv(S_UPDATED.': '.zbx_date2str(S_BLOCKS_SYSTEM_SUMMARY_TIME_FORMAT), 'textwhite');
-	$footer->setAttribute('style', 'height: 0px; position: relative; padding-left: 4px; top: 5px;');
+	$script = new CJSScript(get_js("jQuery('#hat_dscvry_footer').html('"._s('Updated: %s',zbx_date2str(S_BLOCKS_SYSTEM_SUMMARY_TIME_FORMAT))."')"));
 
-return new CDiv(array($table, $footer));
+return new CDiv(array($table, $script));
 }
 
 function make_graph_menu(&$menu,&$submenu){

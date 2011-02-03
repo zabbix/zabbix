@@ -19,12 +19,6 @@
 **/
 
 require_once('include/config.inc.php');
-require_once('include/hosts.inc.php');
-require_once('include/triggers.inc.php');
-require_once('include/items.inc.php');
-require_once('include/actions.inc.php');
-require_once('include/discovery.inc.php');
-require_once('include/html.inc.php');
 require_once('include/blocks.inc.php');
 
 $page['title'] = 'S_DASHBOARD';
@@ -35,9 +29,6 @@ $page['scripts'] = array('class.pmaster.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 include_once('include/page_header.php');
-
-// js templates
-require_once('include/templates/scriptConfirm.js.php');
 
 //		VAR				TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
@@ -234,6 +225,9 @@ require_once('include/templates/scriptConfirm.js.php');
 		exit();
 	}
 
+// js templates
+	require_once('include/templates/scriptConfirm.js.php');
+
 //	$time = new CSpan(date("[H:i:s]",time()));
 //	$time->setAttribute('id','refreshed');
 
@@ -335,13 +329,13 @@ $right_col = array();
 // Status of ZBX
 	if(USER_TYPE_SUPER_ADMIN == $USER_DETAILS['type']){
 		$refresh_menu = get_icon('menu', array('menu' => 'hat_stszbx'));
-		$zbx_stat = new CUIWidget('hat_stszbx',
-							new CSpan(S_LOADING_P,'textcolorstyles'),//make_status_of_zbx()
-							CProfile::get('web.dashboard.hats.hat_stszbx.state',1)
-							);
-		$zbx_stat->setHeader(S_STATUS_OF_ZABBIX,array($refresh_menu));
-		$zbx_stat->setFooter(SPACE);
-		$right_col[] = $zbx_stat;
+		$zbxStatus = new CUIWidget('hat_stszbx',
+			new CSpan(S_LOADING_P,'textcolorstyles'),//make_status_of_zbx()
+			CProfile::get('web.dashboard.hats.hat_stszbx.state',1)
+		);
+		$zbxStatus->setHeader(S_STATUS_OF_ZABBIX,array($refresh_menu));
+		$zbxStatus->setFooter(new CDiv(SPACE, 'textwhite', 'hat_stszbx_footer'));
+		$right_col[] = $zbxStatus;
 	}
 
 //----------------
@@ -353,7 +347,7 @@ $right_col = array();
 						CProfile::get('web.dashboard.hats.hat_syssum.state',1)
 						);
 	$sys_stat->setHeader(S_SYSTEM_STATUS,array($refresh_menu));
-	$sys_stat->setFooter(SPACE);
+	$sys_stat->setFooter(new CDiv(SPACE, 'textwhite', 'hat_syssum_footer'));
 
 	$right_col[] = $sys_stat;
 //----------------
@@ -365,7 +359,7 @@ $right_col = array();
 						CProfile::get('web.dashboard.hats.hat_hoststat.state',1)
 						);
 	$hoststat->setHeader(S_HOST_STATUS_STATUS,array($refresh_menu));
-	$hoststat->setFooter(SPACE);
+	$hoststat->setFooter(new CDiv(SPACE, 'textwhite', 'hat_hoststat_footer'));
 
 	$right_col[] = $hoststat;
 //----------------
@@ -377,7 +371,7 @@ $right_col = array();
 						CProfile::get('web.dashboard.hats.hat_lastiss.state',1)
 						);
 	$lastiss->setHeader(S_LAST_20_ISSUES,array($refresh_menu));
-	$lastiss->setFooter(SPACE);
+	$lastiss->setFooter(new CDiv(SPACE, 'textwhite', 'hat_lastiss_footer'));
 	$right_col[] = $lastiss;
 //----------------
 
@@ -389,7 +383,7 @@ $right_col = array();
 						CProfile::get('web.dashboard.hats.hat_webovr.state',1)
 						);
 	$web_mon->setHeader(S_WEB_MONITORING,array($refresh_menu));
-	$web_mon->setFooter(SPACE);
+	$web_mon->setFooter(new CDiv(SPACE, 'textwhite', 'hat_webovr_footer'));
 
 	$right_col[] = $web_mon;
 //----------------
@@ -407,7 +401,7 @@ $right_col = array();
 							CProfile::get('web.dashboard.hats.hat_dscvry.state',1)
 							);
 		$dcvr_mon->setHeader(S_DISCOVERY_STATUS,array($refresh_menu));
-		$dcvr_mon->setFooter(SPACE);
+		$dcvr_mon->setFooter(new CDiv(SPACE, 'textwhite', 'hat_dscvry_footer'));
 
 		$right_col[] = $dcvr_mon;
 //----------------
