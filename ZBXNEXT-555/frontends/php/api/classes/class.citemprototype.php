@@ -653,14 +653,14 @@ COpt::memoryPick();
 				if(isset($item['type'])){
 					if(($item['type'] == ITEM_TYPE_DB_MONITOR && $item['key_'] == 'db.odbc.select[<unique short description>]') ||
 					   ($item['type'] == ITEM_TYPE_SSH && $item['key_'] == 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]') ||
-					   ($item['type'] == ITEM_TYPE_TELNET && $item['key_'] == 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]'))
+						($item['type'] == ITEM_TYPE_TELNET && $item['key_'] == 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]') ||
+						($item['type'] == ITEM_TYPE_JMX && $item['key_'] == 'jmx[<object name>,<attribute name>]'))
 					{
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_ITEMS_CHECK_KEY_DEFAULT_EXAMPLE_PASSED);
 					}
 
 					if(isset($item['delay']) && isset($item['delay_flex'])){
-						if(!isset($item['interfaceid'])) $item['interfaceid'] = 0;
-						$res = calculate_item_nextcheck($item['interfaceid'], $item['itemid'], $item['type'], $item['delay'], $item['delay_flex'], time());
+						$res = calculate_item_nextcheck(0, 0, $item['type'], $item['delay'], $item['delay_flex'], time());
 						if($res['delay'] == SEC_PER_YEAR && $item['type'] != ITEM_TYPE_ZABBIX_ACTIVE && $item['type'] != ITEM_TYPE_TRAPPER){
 							self::exception(ZBX_API_ERROR_PARAMETERS, S_ITEM_WILL_NOT_BE_REFRESHED_PLEASE_ENTER_A_CORRECT_UPDATE_INTERVAL);
 						}
