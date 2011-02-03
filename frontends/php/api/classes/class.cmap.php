@@ -713,6 +713,7 @@ COpt::memoryPick();
 					}
 				}
 			}
+
 			DB::update('sysmaps', $update);
 
 			if(!empty($urlidsToDelete))

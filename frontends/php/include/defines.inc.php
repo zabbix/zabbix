@@ -264,6 +264,7 @@
 	define('MAP_LABEL_TYPE_NAME',		2);
 	define('MAP_LABEL_TYPE_STATUS',		3);
 	define('MAP_LABEL_TYPE_NOTHING',	4);
+	define('MAP_LABEL_TYPE_CUSTOM',		5);
 
 	define('MAP_LABEL_LOC_BOTTOM',		0);
 	define('MAP_LABEL_LOC_LEFT',		1);

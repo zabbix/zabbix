@@ -54,9 +54,20 @@ include_once('include/page_header.php');
 		'backgroundid'=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,				'isset({save})'),
 		'expandproblem'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,1),		null),
 		'markelements'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,1),		null),
-		'show_unack'=>	        array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,2),		null),
+		'show_unack'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,2),		null),
 		'highlight'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,1),		null),
-		'label_type'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,4),		'isset({save})'),
+		'label_format'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,1),		null),
+		'label_type_host'=>			array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(MAP_LABEL_TYPE_LABEL,MAP_LABEL_TYPE_CUSTOM),		'isset({save})'),
+		'label_type_hostgroup'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(MAP_LABEL_TYPE_LABEL,MAP_LABEL_TYPE_CUSTOM),		'isset({save})'),
+		'label_type_trigger'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(MAP_LABEL_TYPE_LABEL,MAP_LABEL_TYPE_CUSTOM),		'isset({save})'),
+		'label_type_map'=>			array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(MAP_LABEL_TYPE_LABEL,MAP_LABEL_TYPE_CUSTOM),		'isset({save})'),
+		'label_type_image'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(MAP_LABEL_TYPE_LABEL,MAP_LABEL_TYPE_CUSTOM),		'isset({save})'),
+		'label_string_host'=>		array(T_ZBX_STR, O_OPT,	 NULL,	null,		'isset({save})'),
+		'label_string_hostgroup'=>	array(T_ZBX_STR, O_OPT,	 NULL,	null,		'isset({save})'),
+		'label_string_trigger'=>	array(T_ZBX_STR, O_OPT,	 NULL,	null,		'isset({save})'),
+		'label_string_map'=>		array(T_ZBX_STR, O_OPT,	 NULL,	null,		'isset({save})'),
+		'label_string_image'=>		array(T_ZBX_STR, O_OPT,	 NULL,	null,		'isset({save})'),
+		'label_type'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(MAP_LABEL_TYPE_LABEL,MAP_LABEL_TYPE_CUSTOM),		'isset({save})'),
 		'label_location'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,3),		'isset({save})'),
 		'urls'=>			array(T_ZBX_STR, O_OPT,	 NULL,	null,		null),
 // Actions
@@ -160,6 +171,17 @@ include_once('include/page_header.php');
 			'highlight' => get_request('highlight', 0),
 			'markelements' => get_request('markelements', 0),
 			'expandproblem' => get_request('expandproblem', 0),
+			'label_format' => get_request('label_format',0),
+			'label_type_host' => get_request('label_type_host',2),
+			'label_type_hostgroup' => get_request('label_type_hostgroup',2),
+			'label_type_trigger' => get_request('label_type_trigger',2),
+			'label_type_map' => get_request('label_type_map',2),
+			'label_type_image' => get_request('label_type_image',2),
+			'label_string_host' => get_request('label_string_host',''),
+			'label_string_hostgroup' => get_request('label_string_hostgroup',''),
+			'label_string_trigger' => get_request('label_string_trigger',''),
+			'label_string_map' => get_request('label_string_map',''),
+			'label_string_image' => get_request('label_string_image',''),
 			'label_type' => $_REQUEST['label_type'],
 			'label_location' => $_REQUEST['label_location'],
 			'show_unack' => get_request('show_unack', 0),
@@ -248,7 +270,6 @@ include_once('include/page_header.php');
 				$sysmap['width'] = get_request('width', 800);
 				$sysmap['height'] = get_request('height', 600);
 				$sysmap['backgroundid'] = get_request('backgroundid', 0);
-				$sysmap['label_type'] = get_request('label_type', 0);
 				$sysmap['label_format'] = get_request('label_format',0);
 				$sysmap['label_type_host'] = get_request('label_type_host',2);
 				$sysmap['label_type_hostgroup'] = get_request('label_type_hostgroup',2);
@@ -260,6 +281,7 @@ include_once('include/page_header.php');
 				$sysmap['label_string_trigger'] = get_request('label_string_trigger','');
 				$sysmap['label_string_map'] = get_request('label_string_map','');
 				$sysmap['label_string_image'] = get_request('label_string_image','');
+				$sysmap['label_type'] = get_request('label_type', 0);
 				$sysmap['label_location'] = get_request('label_location', 0);
 				$sysmap['highlight'] = get_request('highlight', 0);
 				$sysmap['markelements'] = get_request('markelements', 0);
@@ -271,7 +293,7 @@ include_once('include/page_header.php');
 //SDII($_REQUEST);
 			}
 
-			$formLoad = new CGetForm('map.edit', $sysmap);
+			$formLoad = new CGetForm('sysmap.edit', $sysmap);
 			$map_wdgt->addItem($formLoad->render());
 		}
 	}
