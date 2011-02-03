@@ -923,7 +923,7 @@ int	__zbx_open(const char *pathname, int flags);
 #endif	/* _WINDOWS && _UNICODE */
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
 
-int	MAIN_ZABBIX_ENTRY(void);
+int	MAIN_ZABBIX_ENTRY();
 
 zbx_uint64_t	zbx_letoh_uint64(zbx_uint64_t data);
 zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data);
@@ -941,5 +941,27 @@ int	parse_function(char **exp, char **func, char **params);
 int	parse_host_key(char *exp, char **host, char **key);
 
 void	make_hostname(char *host);
+
+
+
+
+
+#define	ZBX_TIME_UNUSED	0x00
+#define	ZBX_TIME_INIT	0x01
+#define ZBX_TIME_BUSY	0x02
+#define ZBX_TIME_WAIT	0x04
+#define ZBX_TIME_LOCK	0x08
+#define ZBX_TIME_IDLE	0x10
+
+typedef struct
+{
+	zbx_uint64_t	busy;
+	zbx_uint64_t	wait;
+	zbx_uint64_t	lock;
+	zbx_uint64_t	idle;
+}
+zbx_times_t;
+
+void	update_counters(unsigned char mode);
 
 #endif
