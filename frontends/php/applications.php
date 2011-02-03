@@ -211,6 +211,7 @@ include_once('include/page_header.php');
 	$app_wdgt = new CWidget();
 
 	$frmForm = new CForm(null, 'get');
+	$frmForm->addVar('hostid',get_request('hostid', 0));
 
 	if(!isset($_REQUEST['form'])){
 		$frmForm->addItem(new CButton('form', S_CREATE_APPLICATION));
