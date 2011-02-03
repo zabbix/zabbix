@@ -5,36 +5,37 @@ class CWebUser {
 	public static $data = null;
 
 	public static function login($login, $password){
-		global $USER_DETAILS;
-
 		try{
-			$sessionid = API::User()->login(array(
+			self::$data = API::User()->login(array(
 				'user' => $login,
 				'password' => $password
 			));
-			if(!$sessionid) throw new Exception();
+			if(!self::$data) throw new Exception();
 
-			$userData = API::User()->checkAuthentication($sessionid);
-			if(!$userData) throw new Exception();
+			self::makeGlobal();
 
-			if(!check_perm2login($userData['userid'])) throw new Exception();
+			if(!check_perm2login(self::$data['userid'])) throw new Exception();
 
-			if(empty($userData['url'])){
-				$userData['url'] = CProfile::get('web.menu.view.last', 'index.php');
+			if(empty(self::$data['url'])){
+				self::$data['url'] = CProfile::get('web.menu.view.last', 'index.php');
 			}
 
-			zbx_setcookie('zbx_sessionid', $sessionid, $userData['autologin'] ? (time()+86400*31) : 0);	//1 month
+			zbx_setcookie('zbx_sessionid', self::$data['sessionid'], self::$data['autologin'] ? (time()+86400*31) : 0);
 
-			self::$data = $USER_DETAILS = $userData;
+			if(self::$data['attempt_failed']){
+				CProfile::update('web.login.attempt.failed', self::$data['attempt_failed'], PROFILE_TYPE_INT);
+				CProfile::update('web.login.attempt.ip', self::$data['attempt_ip'], PROFILE_TYPE_STR);
+				CProfile::update('web.login.attempt.clock', self::$data['attempt_clock'], PROFILE_TYPE_INT);
+				CProfile::flush();
+			}
 
+			self::makeGlobal();
 			return true;
 		}
 		catch(Exception $e){
 			self::setDefault();
 			return false;
 		}
-
-		return self::$data;
 	}
 
 	public static function logout($sessionid){
@@ -43,33 +44,41 @@ class CWebUser {
 	}
 
 	public static function checkAuthentication($sessionid){
-		global $USER_DETAILS;
+		try{
+			if($sessionid === null) throw new Exception();
 
-		if($sessionid === null){
-			self::setDefault();
-			return false;
-		}
+			self::$data = API::User()->checkAuthentication($sessionid);
+			if(!self::$data){
+				if(!self::login(ZBX_GUEST_USER, '')) throw new Exception();
+			}
+			self::makeGlobal();
 
-		if($result = API::User()->checkAuthentication($sessionid)){
-			self::$data = $USER_DETAILS = $result;
+			if(!check_perm2login(self::$data['userid'])) throw new Exception();
+
+			self::makeGlobal();
 			return true;
 		}
-		else{
+		catch(Exception $e){
 			self::setDefault();
 			return false;
 		}
 	}
 
 	private static function setDefault(){
-		global $USER_DETAILS;
-
-		self::$data = $USER_DETAILS = array(
+		self::$data = array(
 			'alias'	=> ZBX_GUEST_USER,
 			'userid'=> 0,
 			'lang'	=> 'en_gb',
 			'type'	=> '0',
 			'node'	=> array( 'name'=>'- unknown -', 'nodeid'=>0 )
 		);
+
+		self::makeGlobal();
+	}
+
+	private static function makeGlobal(){
+		global $USER_DETAILS;
+		$USER_DETAILS = self::$data;
 	}
 }
 
