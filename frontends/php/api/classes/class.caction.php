@@ -1392,7 +1392,7 @@ COpt::memoryPick();
 			}
 
 			if(isset($operation['esc_period'])){
-				if(isset($operation['esc_period']) && (($operation['esc_period'] > 0) && ($operation['esc_period'] < 60))){
+				if(isset($operation['esc_period']) && (($operation['esc_period'] != 0) && ($operation['esc_period'] < 60))){
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation escalation period.'));
 				}
 			}
