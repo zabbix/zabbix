@@ -901,6 +901,9 @@ FIELD		|highlight	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|expandproblem	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|markelements	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|show_unack	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|grid_size	|t_integer	|'50'	|NOT NULL	|ZBX_SYNC
+FIELD		|grid_show	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
+FIELD		|grid_align	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|name
 
 TABLE|sysmap_url|sysmapurlid|ZBX_SYNC
