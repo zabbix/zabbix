@@ -1675,6 +1675,7 @@
 		}
 
 		$valueTypeVisibility = array();
+		$dataTypeVisibility = array();
 		$authTypeVisibility = array();
 		$typeVisibility = array();
 		$delay_flex_el = array();
@@ -2025,6 +2026,12 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'row_units');
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'units');
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_units');
+		zbx_subarray_push($dataTypeVisibility, ITEM_DATA_TYPE_OCTAL, 'units');
+		zbx_subarray_push($dataTypeVisibility, ITEM_DATA_TYPE_OCTAL, 'row_units');
+		zbx_subarray_push($dataTypeVisibility, ITEM_DATA_TYPE_DECIMAL, 'units');
+		zbx_subarray_push($dataTypeVisibility, ITEM_DATA_TYPE_DECIMAL, 'row_units');
+		zbx_subarray_push($dataTypeVisibility, ITEM_DATA_TYPE_HEXADECIMAL, 'units');
+		zbx_subarray_push($dataTypeVisibility, ITEM_DATA_TYPE_HEXADECIMAL, 'row_units');
 
 		$mltpbox = Array();
 		if($limited){
@@ -2059,6 +2066,12 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'row_multiplier');
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'multiplier');
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_multiplier');
+		zbx_subarray_push($dataTypeVisibility, ITEM_DATA_TYPE_OCTAL, 'multiplier');
+		zbx_subarray_push($dataTypeVisibility, ITEM_DATA_TYPE_OCTAL, 'row_multiplier');
+		zbx_subarray_push($dataTypeVisibility, ITEM_DATA_TYPE_DECIMAL, 'multiplier');
+		zbx_subarray_push($dataTypeVisibility, ITEM_DATA_TYPE_DECIMAL, 'row_multiplier');
+		zbx_subarray_push($dataTypeVisibility, ITEM_DATA_TYPE_HEXADECIMAL, 'multiplier');
+		zbx_subarray_push($dataTypeVisibility, ITEM_DATA_TYPE_HEXADECIMAL, 'row_multiplier');
 
 
 		$row = new CRow(array(new CCol(S_UPDATE_INTERVAL_IN_SEC,'form_row_l'), new CCol(new CNumericBox('delay',$delay,5),'form_row_r')));
@@ -2131,6 +2144,12 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'row_delta');
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'delta');
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_delta');
+		zbx_subarray_push($dataTypeVisibility, ITEM_DATA_TYPE_OCTAL, 'delta');
+		zbx_subarray_push($dataTypeVisibility, ITEM_DATA_TYPE_OCTAL, 'row_delta');
+		zbx_subarray_push($dataTypeVisibility, ITEM_DATA_TYPE_DECIMAL, 'delta');
+		zbx_subarray_push($dataTypeVisibility, ITEM_DATA_TYPE_DECIMAL, 'row_delta');
+		zbx_subarray_push($dataTypeVisibility, ITEM_DATA_TYPE_HEXADECIMAL, 'delta');
+		zbx_subarray_push($dataTypeVisibility, ITEM_DATA_TYPE_HEXADECIMAL, 'row_delta');
 
 		if($limited){
 			$frmItem->addVar('valuemapid', $valuemapid);
@@ -2237,6 +2256,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		}
 
 		zbx_add_post_js("var valueTypeSwitcher = new CViewSwitcher('value_type', 'change', ".zbx_jsvalue($valueTypeVisibility, true).");");
+		zbx_add_post_js("var dataTypeSwitcher = new CViewSwitcher('data_type', 'change', ".zbx_jsvalue($dataTypeVisibility, true).");");
 		zbx_add_post_js("var authTypeSwitcher = new CViewSwitcher('authtype', 'change', ".zbx_jsvalue($authTypeVisibility, true).");");
 		zbx_add_post_js("var typeSwitcher = new CViewSwitcher('type', 'change', ".zbx_jsvalue($typeVisibility, true).(isset($_REQUEST['itemid'])? ', true': '').');');
 		zbx_add_post_js("var multpStat = document.getElementById('multiplier'); if(multpStat && multpStat.onclick) multpStat.onclick();");
