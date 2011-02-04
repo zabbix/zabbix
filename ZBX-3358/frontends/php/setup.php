@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ if(!defined('PAGE_HEADER_LOADED'))
 		'distributed'=>		array(T_ZBX_STR, O_OPT,	null,	null,			null),
 		'trouble'=>		array(T_ZBX_STR, O_OPT,	null,	null,			null),
 
-		'type'=>		array(T_ZBX_STR, O_OPT,	null,	IN('"MYSQL","POSTGRESQL","ORACLE","IBM_DB2","SQLITE3"'),	null),
+		'type'=>		array(T_ZBX_STR, O_OPT,	null,	IN('"'.ZBX_DB_MYSQL.'","'.ZBX_DB_POSTGRESQL.'","'.ZBX_DB_ORACLE.'","'.ZBX_DB_DB2.'","'.ZBX_DB_SQLITE3.'"'),	null),
 		'server'=>		array(T_ZBX_STR, O_OPT,	null,	null,			null),
 		'port'=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,65535),	null),
 		'database'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		null),
@@ -105,8 +105,8 @@ if(!defined('PAGE_HEADER_LOADED'))
 		$ZBX_CONFIG['allowed_db']['IBM_DB2'] = 'IBM DB2';
 	}
 
-// SQLITE3
-	if(zbx_is_callable(array('sqlite3_open', 'sqlite3_close', 'sqlite3_query', 'sqlite3_error', 'sqlite3_fetch_array', 'sqlite3_query_close', 'sqlite3_exec'))){
+// SQLITE3. The false is here to avoid autoloading of the class.
+	if(class_exists('SQLite3', false) && zbx_is_callable(array('ftok', 'sem_acquire', 'sem_release', 'sem_get'))){
 		$ZBX_CONFIG['allowed_db']['SQLITE3'] = 'SQLite3';
 	}
 

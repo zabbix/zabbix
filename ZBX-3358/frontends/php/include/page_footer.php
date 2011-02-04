@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,19 +21,26 @@
 <?php
 	require_once('include/config.inc.php');
 
-	global $USER_DETAILS;
-	global $page;
-	global $ZBX_PAGE_POST_JS;
+// if we include footer in some function
+	if(!isset($USER_DETAILS)) global $USER_DETAILS;
+	if(!isset($page)) global $page;
+	if(!isset($ZBX_PAGE_POST_JS)) global $ZBX_PAGE_POST_JS;
+// ---
 
 	if(!defined('PAGE_HEADER_LOADED')){
 		define ('PAGE_HEADER_LOADED', 1);
 	}
 
-//------------------------------------- <HISTORY> ---------------------------------------
+// HISTORY{
 	if(isset($page['hist_arg']) && ($USER_DETAILS['alias'] != ZBX_GUEST_USER) && ($page['type'] == PAGE_TYPE_HTML) && !defined('ZBX_PAGE_NO_MENU')){
 		add_user_history($page);
 	}
-//------------------------------------- </HISTORY> --------------------------------------
+// HISTORY}
+
+// last page
+	if(!defined('ZBX_PAGE_NO_MENU') && ($page['file'] != 'profile.php')){
+		CProfile::update('web.paging.lastpage', $page['file'], PROFILE_TYPE_STR);
+	}
 
 	CProfile::flush();
 

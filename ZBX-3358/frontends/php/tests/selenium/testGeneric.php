@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,9 +19,9 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/class.ctest.php');
+require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testGeneric extends CTest
+class testGeneric extends CWebTest
 {
 	public static function provider()
 	{
@@ -79,10 +79,11 @@ class testGeneric extends CTest
 			array('hostprofiles.php?prof_type=1','Host profiles'),
 
 			// Reports
-			array('report2.php',	'Availability report'),
+			// TODO Does not work under SQLite well. Extremely slow!
+//			array('report2.php',	'Availability report'),
 
-			array('report2.php?config=0',	'Availability report'),
-			array('report2.php?config=1',	'Availability report'),
+//			array('report2.php?config=0',	'Availability report'),
+//			array('report2.php?config=1',	'Availability report'),
 
 			array('report5.php',	'Most busy triggers top 100'),
 			array('report5.php?period=day',	'Most busy triggers top 100'),

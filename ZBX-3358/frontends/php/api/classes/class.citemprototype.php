@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -571,9 +571,9 @@ COpt::memoryPick();
 
 			//validating item key
 			if(isset($item['key_'])){
-				list($item_key_is_valid, $check_result) = check_item_key($item['key_']);
-				if(!$item_key_is_valid){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Error in item key: %s', $check_result));
+				$itemCheck = check_item_key($item['key_']);
+				if(!$itemCheck['valid']){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Error in item key: %s', $itemCheck['description']));
 				}
 			}
 
@@ -885,12 +885,13 @@ COpt::memoryPick();
  * @return
  */
 	public static function delete($prototypeids, $nopermissions=false){
-		if(empty($prototypeids)) return true;
-
-		$prototypeids = zbx_toHash($prototypeids);
 
 		try{
 			self::BeginTransaction(__METHOD__);
+
+			if(empty($prototypeids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+
+			$prototypeids = zbx_toHash($prototypeids);
 
 			$options = array(
 				'itemids' => $prototypeids,

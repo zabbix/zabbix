@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,23 +19,14 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/class.ctest.php');
+require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageHosts extends CTest
+class testPageHosts extends CWebTest
 {
 	// Returns all hosts
 	public static function allHosts()
 	{
-		DBconnect($error);
-
-		$hosts=array();
-
-		$result=DBselect('select * from hosts where status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')');
-		while($host=DBfetch($result))
-		{
-			$hosts[]=array($host);
-		}
-		return $hosts;
+		return DBdata('select * from hosts where status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')');
 	}
 
 	/**
@@ -129,7 +120,19 @@ class testPageHosts extends CTest
 		$this->ok($host['host']);
 	}
 
+	public function testPageHosts_MassExportAll()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
 	public function testPageHosts_MassExport()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
+	public function testPageHosts_MassUpdateAll()
 	{
 // TODO
 		$this->markTestIncomplete();
@@ -141,7 +144,19 @@ class testPageHosts extends CTest
 		$this->markTestIncomplete();
 	}
 
+	public function testPageHosts_MassActivateAll()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
 	public function testPageHosts_MassActivate()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
+	public function testPageHosts_MassDisableAll()
 	{
 // TODO
 		$this->markTestIncomplete();
@@ -153,7 +168,19 @@ class testPageHosts extends CTest
 		$this->markTestIncomplete();
 	}
 
+	public function testPageHosts_MassDeleteAll()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
 	public function testPageHosts_MassDelete()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
+	public function testPageHosts_Sorting()
 	{
 // TODO
 		$this->markTestIncomplete();

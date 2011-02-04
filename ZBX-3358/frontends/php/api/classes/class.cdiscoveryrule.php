@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -570,9 +570,9 @@ COpt::memoryPick();
 
 			//validating item key
 			if(isset($item['key_'])){
-				list($item_key_is_valid, $check_result) = check_item_key($item['key_']);
-				if(!$item_key_is_valid){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Error in item key: %s', $check_result));
+				$itemCheck = check_item_key($item['key_']);
+				if(!$itemCheck['valid']){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Error in item key: %s', $itemCheck['description']));
 				}
 			}
 
@@ -913,12 +913,13 @@ COpt::memoryPick();
  * @return
  */
 	public static function delete($ruleids, $nopermissions=false){
-		if(empty($ruleids)) return true;
-
-		$ruleids = zbx_toHash($ruleids);
 
 		try{
 			self::BeginTransaction(__METHOD__);
+
+			if(empty($ruleids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+
+			$ruleids = zbx_toHash($ruleids);
 
 			$options = array(
 				'output' => API_OUTPUT_EXTEND,
@@ -973,9 +974,10 @@ COpt::memoryPick();
 			while($item = DBfetch($db_items)){
 				$iprototypeids[$item['itemid']] = $item['itemid'];
 			}
-			if(!CItemPrototype::delete($iprototypeids, true))
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete discovery rule');
-
+			if(!empty($iprototypeids)){
+				if(!CItemPrototype::delete($iprototypeids, true))
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete discovery rule'));
+			}
 
 			DB::delete('items', array('itemid'=>$ruleids));
 

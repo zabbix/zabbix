@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -843,7 +843,7 @@ Copt::memoryPick();
 
 			self::EndTransaction(true, __METHOD__);
 
-			return array('eventids' => $eventids);
+			return array('eventids' => array_values($eventids));
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -500,13 +500,14 @@ class CProxy extends CZBXAPI{
  * @return array|boolean
  */
 	public static function delete($proxies){
-		if(empty($proxies)) return true;
-
-		$proxies = zbx_toArray($proxies);
-		$proxyids = zbx_objectValues($proxies, 'proxyid');
 
 		try{
 			self::BeginTransaction(__METHOD__);
+
+			if(empty($proxies)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+
+			$proxies = zbx_toArray($proxies);
+			$proxyids = zbx_objectValues($proxies, 'proxyid');
 
 			self::checkInput($proxies, __FUNCTION__);
 

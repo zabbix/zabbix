@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,16 +23,13 @@
 require_once 'PHPUnit/Extensions/SeleniumTestCase.php';
 
 require_once(dirname(__FILE__).'/../../include/defines.inc.php');
-require_once(dirname(__FILE__).'/../../conf/zabbix.conf.php');
-require_once(dirname(__FILE__).'/../../include/copt.lib.php');
-require_once(dirname(__FILE__).'/../../include/func.inc.php');
-require_once(dirname(__FILE__).'/../../include/db.inc.php');
+require_once(dirname(__FILE__).'/dbfunc.php');
 
-class CTest extends PHPUnit_Extensions_SeleniumTestCase
+class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 {
 	protected $captureScreenshotOnFailure = TRUE;
 	protected $screenshotPath = '/home/hudson/public_html/screenshots';
-	protected $screenshotUrl = 'http://hudson/~hudson/screenshots';
+	protected $screenshotUrl = 'http://192.168.3.32/~hudson/screenshots';
 
 	// List of strings that should NOT appear on any page
 	public $failIfExists = array (
@@ -84,81 +81,12 @@ class CTest extends PHPUnit_Extensions_SeleniumTestCase
 			exit;
 		}*/
 
-		// Connect once, do not reconnect
 		if(!isset($DB['DB'])) DBConnect($error);
 	}
 
 	protected function tearDown()
 	{
-// Do not close DB for better performance
-//		DBclose();
-	}
-
-	protected function DBsave_tables($tables)
-	{
-		global $DB;
-
-		if(!is_array($tables))	$tables=array($tables);
-
-		foreach($tables as $table)
-		{
-			switch($DB['TYPE']) {
-			case 'MYSQL':
-				DBexecute("drop table if exists ${table}_tmp");
-				DBexecute("create table ${table}_tmp like $table");
-				DBexecute("insert into ${table}_tmp select * from $table");
-				break;
-			default:
-				DBexecute("drop table if exists ${table}_tmp");
-				DBexecute("select * into temp table ${table}_tmp from $table");
-			}
-		}
-	}
-
-	protected function DBrestore_tables($tables)
-	{
-		global $DB;
-
-		if(!is_array($tables))	$tables=array($tables);
-
-		foreach($tables as $table)
-		{
-			DBexecute("delete from $table");
-			DBexecute("insert into $table select * from ${table}_tmp");
-			DBexecute("drop table ${table}_tmp");
-		}
-	}
-
-	protected function DBhash($sql)
-	{
-		global $DB;
-
-		$hash = '';
-
-		$result=DBselect($sql);
-		while($row = DBfetch($result))
-		{
-			foreach($row as $key => $value)
-			{
-				$hash = md5($hash.$value);
-			}
-		}
-
-		return $hash;
-	}
-
-	protected function DBcount($sql)
-	{
-		global $DB;
-		$cnt=0;
-
-		$result=DBselect($sql);
-		while($row = DBfetch($result))
-		{
-			$cnt++;
-		}
-
-		return $cnt;
+		DBclose();
 	}
 
 	public function login($url = NULL)
@@ -180,6 +108,8 @@ class CTest extends PHPUnit_Extensions_SeleniumTestCase
 			$this->open($url);
 			$this->wait();
 		}
+		$this->ok('Admin');
+		$this->nok('Login name or password is incorrect');
 	}
 
 	public function logout()
@@ -192,7 +122,7 @@ class CTest extends PHPUnit_Extensions_SeleniumTestCase
 	{
 		foreach($this->failIfExists as $str)
 		{
-			$this->assertTextNotPresent($str);
+			$this->assertTextNotPresent($str,"Chuck Norris: I do not expect string '$str' here.");
 		}
 	}
 
@@ -211,6 +141,11 @@ class CTest extends PHPUnit_Extensions_SeleniumTestCase
 	public function button_click($a)
 	{
 		$this->click($a);
+	}
+
+	public function href_click($a)
+	{
+		$this->click("xpath=//a[contains(@href,'$a')]");
 	}
 
 	public function checkbox_select($a)
@@ -234,12 +169,18 @@ class CTest extends PHPUnit_Extensions_SeleniumTestCase
 		$this->select($id,$str);
 	}
 
+	public function dropdown_select_wait($id,$str)
+	{
+		$selected = $this->getSelectedLabel($id);
+		$this->dropdown_select($id, $str);
+		// Wait only if drop down selection was changed
+		if($selected != $str)	$this->wait();
+	}
+
 	public function wait()
 	{
 		$this->waitForPageToLoad();
 		$this->checkFatalErrors();
 	}
-
-
 }
 ?>

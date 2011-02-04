@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -786,11 +786,13 @@ COpt::memoryPick();
  * @return boolean
  */
 	public static function delete($actionids){
-		if(empty($actionids)) return true;
-		$actionids = zbx_toArray($actionids);
 
 		try{
 			self::BeginTransaction(__METHOD__);
+
+		if(empty($actionids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+
+		$actionids = zbx_toArray($actionids);
 
 			$options = array(
 				'actionids' => $actionids,

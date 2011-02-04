@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -176,8 +176,14 @@ class Curl{
 			foreach($args as $id => $arg){
 				if(empty($arg)) continue;
 
-				list($name, $value) = explode('=',$arg);
-				$this->arguments[$name] = isset($value) ? urldecode($value):'';
+				if(strpos($arg, '=') !== false){
+					list($name, $value) = explode('=', $arg);
+					$this->arguments[$name] = isset($value) ? urldecode($value):'';
+				}
+				else{
+					$this->arguments[$arg] = '';
+				}
+
 			}
 		}
 		$this->formatQuery();

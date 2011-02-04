@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -254,11 +254,12 @@ include_once('include/page_header.php');
 		$form = new CForm();
 		$form->setName('frm_media_types');
 
-		$table=new CTableInfo(S_NO_MEDIA_TYPES_DEFINED);
+		$table=new CTableInfo(_('No media types defined'));
 		$table->setHeader(array(
 			new CCheckBox('all_media_types', NULL, "checkAll('".$form->getName()."','all_media_types','media_types');"),
-			make_sorting_header(S_DESCRIPTION,'description'),
-			make_sorting_header(S_TYPE,'type'),
+			make_sorting_header(_('Description'),'description'),
+			make_sorting_header(_('Type'),'type'),
+			make_sorting_header(_('Used in actions'),'usedInActions'),
 			S_DETAILS
 		));
 
@@ -268,12 +269,34 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'output' => API_OUTPUT_EXTEND,
-			'editable' => 1,
+			'preservekeys' => 1,
+			'editable' => true,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
 		$mediatypes = CMediatype::get($options);
+
+
+// Check if media type are used by existing actions
+		$options = array(
+			'mediatypeids' => zbx_objectValues($mediatypes, 'mediatypeid'),
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => 1,
+		);
+		$actions = CAction::get($options);
+
+		foreach($actions as $actionid => $action){
+			if(!isset($mediatypes[$action['mediatypeid']]['listOfActions']))
+				$mediatypes[$action['mediatypeid']]['listOfActions'] = array();
+			$mediatypes[$action['mediatypeid']]['listOfActions'][] = array('actionid' => $actionid, 'name' => $action['name']);
+		}
+
+		foreach($mediatypes as $mnum => $mediatype){
+// !isset() for better default sorting
+			$mediatypes[$mnum]['usedInActions'] = !isset($mediatype['listOfActions']);
+		}
+
 		order_result($mediatypes, $sortfield, $sortorder);
 
 		$paging = getPagingLine($mediatypes);
@@ -302,10 +325,25 @@ include_once('include/page_header.php');
 					$details = '';
 			}
 
+			$actionLinks = array();
+			if(isset($mediatype['listOfActions'])){
+				order_result($mediatype['listOfActions'], 'name');
+				foreach($mediatype['listOfActions'] as $mediaaction){
+					$actionLinks[] = new CLink($mediaaction['name'],'actionconf.php?form=update&actionid='.$mediaaction['actionid']);
+					$actionLinks[] = ', ';
+				}
+				array_pop($actionLinks);
+			}
+			else{
+				$actionLinks = '-';
+			}
+
+
 			$table->addRow(array(
 				new CCheckBox('media_types['.$mediatype['mediatypeid'].']',NULL,NULL,$mediatype['mediatypeid']),
 				new CLink($mediatype['description'],'?form=update&mediatypeid='.$mediatype['mediatypeid']),
 				media_type2str($mediatype['type']),
+				$actionLinks,
 				$details
 			));
 		}

@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1294,7 +1294,16 @@ Copt::memoryPick();
 			}
 			// Check if host name isn't longer then 64 chars
 			if(!$delete && zbx_strlen($host['host']) > 64){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host name must not be longer than %1$d characters, [ %2$s ] is %3$d', 64, $host['host'], zbx_strlen($host['host'])));
+				self::exception(
+					ZBX_API_ERROR_PARAMETERS,
+					_n(
+						'Maximum host name length is %2$d characters, "%3$s" is %1$d character.',
+						'Maximum host name length is %2$d characters, "%3$s" is %1$d characters.',
+						zbx_strlen($host['host']),
+						64,
+						$host['host']
+					)
+				);
 			}
 
 			if($update || $delete){
@@ -2053,13 +2062,14 @@ Copt::memoryPick();
  * @return array|boolean
  */
 	public static function delete($hosts){
-		if(empty($hosts)) return true;
-
-		$hosts = zbx_toArray($hosts);
-		$hostids = zbx_objectValues($hosts, 'hostid');
 
 		try{
 			self::BeginTransaction(__METHOD__);
+
+			if(empty($hosts)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+
+			$hosts = zbx_toArray($hosts);
+			$hostids = zbx_objectValues($hosts, 'hostid');
 
 			self::checkInput($hosts, __FUNCTION__);
 

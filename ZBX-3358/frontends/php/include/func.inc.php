@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -536,16 +536,7 @@ return bcdiv($sum, count($values));
 
 // accepts parametr as integer either
 function zbx_ctype_digit($x){
-	return preg_match('/^\\d+$/',$x);
-}
-
-function zbx_numeric($value){
-	if(is_array($value)) return false;
-	if(zbx_empty($value)) return false;
-
-	$value = strval($value);
-
-return preg_match('/^[-|+]?\\d+$/',$value);
+	return ctype_digit(strval($x));
 }
 
 function zbx_empty($value){
@@ -553,6 +544,17 @@ function zbx_empty($value){
 	if(is_array($value) && empty($value)) return true;
 	if(is_string($value) && ($value === '')) return true;
 return false;
+}
+
+function zbx_is_int($var){
+	if(is_int($var)) return true;
+
+	if(is_string($var))
+		if(ctype_digit($var) || (strcmp(intval($var), $var) == 0)) return true;
+	else
+		if(($var>0) && ctype_digit(strval($var))) return true;
+
+return preg_match("/^\-?\d{1,20}+$/", $var);
 }
 
 
@@ -1090,6 +1092,24 @@ function zbx_cleanHashes(&$value){
 
 return $value;
 }
+
+function zbx_toCSV($values){
+	$csv = '';
+
+	$glue = '","';
+	foreach($values as $row){
+		if(!is_array($row)) $row = array($row);
+		foreach($row as $num => $value){
+			if(is_null($value)) unset($row[$num]);
+			else $row[$num] = str_replace('"', '""', $value);
+		}
+
+		$csv .= '"'.implode($glue, $row).'"'."\n";
+	}
+
+return $csv;
+}
+
 // }}} ARRAY FUNCTION
 function zbx_array_mintersect($keys, $array){
 	$result = array();

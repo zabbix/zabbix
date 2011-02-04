@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -841,7 +841,6 @@ COpt::memoryPick();
  * @param array $elements[0,...]['x']
  * @param array $elements[0,...]['y']
  * @param array $elements[0,...]['iconid_off']
- * @param array $elements[0,...]['iconid_unknown']
  * @param array $elements[0,...]['iconid_on']
  * @param array $elements[0,...]['iconid_disabled']
  * @param array $elements[0,...]['url']
@@ -923,7 +922,6 @@ COpt::memoryPick();
  * @param array $elements[0,...]['x']
  * @param array $elements[0,...]['y']
  * @param array $elements[0,...]['iconid_off']
- * @param array $elements[0,...]['iconid_unknown']
  * @param array $elements[0,...]['iconid_on']
  * @param array $elements[0,...]['iconid_disabled']
  * @param array $elements[0,...]['url']

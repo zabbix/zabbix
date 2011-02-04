@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -208,7 +208,7 @@ include_once('include/page_header.php');
 		$numrows->setAttribute('name','numrows');
 
 		$slide_wdgt->addHeader(S_SLIDESHOWS_BIG);
-//		$slide_wdgt->addHeader($numrows);
+		$slide_wdgt->addHeader($numrows);
 
 		$table = new CTableInfo(S_NO_SLIDESHOWS_DEFINED);
 		$table->setHeader(array(
@@ -218,14 +218,7 @@ include_once('include/page_header.php');
 			make_sorting_header(S_COUNT_OF_SLIDES,'cnt')
 			));
 
-/* sorting
-		order_page_result($applications, 'name');
 
-// PAGING UPPER
-		$paging = getPagingLine($applications);
-		$slide_wdgt->addItem($paging);
-//-------*/
-		$slide_wdgt->addItem(BR());
 
 		$sql = 'SELECT s.slideshowid, s.name, s.delay, count(sl.slideshowid) as cnt '.
 			' FROM slideshows s '.
@@ -234,7 +227,17 @@ include_once('include/page_header.php');
 			' GROUP BY s.slideshowid,s.name,s.delay '.
 			order_by('s.name,s.delay,cnt','s.slideshowid');
 		$db_slides = DBselect($sql);
+
+		// gathering all data we got from database in array, so we can feed it to pagination function
+		$slides_arr = array();
 		while($slide_data = DBfetch($db_slides)){
+			$slides_arr[] = $slide_data;
+		}
+
+		// getting paging element
+		$paging = getPagingLine($slides_arr);
+
+		foreach($slides_arr as $slide_data){
 			if(!slideshow_accessible($slide_data['slideshowid'], PERM_READ_WRITE)) continue;
 
 			$table->addRow(array(
@@ -244,11 +247,13 @@ include_once('include/page_header.php');
 				$slide_data['delay'],
 				$slide_data['cnt']
 				));
+
+
 		}
-// PAGING FOOTER
-//			$table->addRow(new CCol($paging));
-//			$screen_wdgt->addItem($paging);
-//---------
+
+		// adding paging to widget
+		$table->addRow(new CCol($paging));
+		$slide_wdgt->addItem($paging);
 
 // goBox
 		$goBox = new CComboBox('go');

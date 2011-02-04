@@ -77,6 +77,7 @@ FIELD		|lastup		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lastdown	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|dcheckid	|t_id		|	|NOT NULL	|ZBX_SYNC		|2|dchecks
 FIELD		|ip		|t_varchar(39)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|dns		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 UNIQUE		|1		|dcheckid,type,key_,ip,port
 INDEX		|2		|dhostid
 
@@ -281,6 +282,7 @@ FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|dcheckid	|t_id		|	|NOT NULL	|0			|-|dchecks
+FIELD		|dns		|t_varchar(64)	|''	|NOT NULL	|0
 INDEX		|1		|clock
 
 TABLE|events|eventid|ZBX_HISTORY
@@ -950,7 +952,7 @@ FIELD		|passwd		|t_char(32)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|url		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|autologin	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|autologout	|t_integer	|'900'	|NOT NULL	|ZBX_SYNC
-FIELD		|lang		|t_varchar(5)	|'en_gb'|NOT NULL	|ZBX_SYNC
+FIELD		|lang		|t_varchar(5)	|'en_GB'|NOT NULL	|ZBX_SYNC
 FIELD		|refresh	|t_integer	|'30'	|NOT NULL	|ZBX_SYNC
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|theme		|t_varchar(128)	|'default.css'|NOT NULL	|ZBX_SYNC
@@ -1054,7 +1056,8 @@ FIELD		|proxy_hostid	|t_id		|	|NULL		|ZBX_SYNC		|1|hosts		|hostid
 FIELD		|host		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|listen_ip	|t_varchar(39)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|listen_port	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-UNIQUE		|1		|proxy_hostid,host
+FIELD		|listen_dns	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
+INDEX		|1		|proxy_hostid,host
 
 TABLE|proxy_autoreg_host|id|0
 FIELD		|id		|t_serial	|	|NOT NULL	|0
@@ -1062,6 +1065,7 @@ FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|host		|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|listen_ip	|t_varchar(39)	|''	|NOT NULL	|0
 FIELD		|listen_port	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|listen_dns	|t_varchar(64)	|''	|NOT NULL	|0
 INDEX		|1		|clock
 
 TABLE|interface|interfaceid|ZBX_SYNC

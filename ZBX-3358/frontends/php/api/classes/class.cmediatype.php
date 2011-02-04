@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -490,7 +490,7 @@ Copt::memoryPick();
 
 			$options = array(
 				'mediatypeids' => $mediatypeids,
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1,
 			);
 			$actions = CAction::get($options);

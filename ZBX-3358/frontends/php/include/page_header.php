@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,7 +33,6 @@
 
 	/* Init CURRENT NODE ID */
 	init_nodes();
-
 	/* switch($page["type"]) */
 	switch($page['type']){
 		case PAGE_TYPE_IMAGE:
@@ -68,6 +67,11 @@
 			break;
 		case PAGE_TYPE_TEXT_FILE:
 			header('Content-Type: text/plain; charset=UTF-8');
+			header('Content-Disposition: attachment; filename="'.$page['file'].'"');
+			if(!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
+			break;
+		case PAGE_TYPE_CSV:
+			header('Content-Type: text/csv; charset=UTF-8');
 			header('Content-Disposition: attachment; filename="'.$page['file'].'"');
 			if(!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
 			break;

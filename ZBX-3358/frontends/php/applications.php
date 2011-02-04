@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -175,10 +175,11 @@ include_once('include/page_header.php');
 
 			$sql = 'SELECT ia.itemid,i.hostid,i.key_'.
 					' FROM items_applications ia '.
-					  ' LEFT JOIN items i ON ia.itemid=i.itemid '.
+						' LEFT JOIN items i ON ia.itemid=i.itemid '.
 					' WHERE ia.applicationid='.$appid.
-					  ' AND i.hostid='.$_REQUEST['hostid'].
-					  ' AND '.DBin_node('ia.applicationid');
+						' AND i.hostid='.$_REQUEST['hostid'].
+						' AND i.type<>9'.
+						' AND '.DBin_node('ia.applicationid');
 
 			$res_items = DBselect($sql);
 			while($item=DBfetch($res_items)){

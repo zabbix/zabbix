@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -926,9 +926,9 @@ COpt::memoryPick();
 
 			//validating item key
 			if(isset($item['key_'])){
-				list($item_key_is_valid, $check_result) = check_item_key($item['key_']);
-				if(!$item_key_is_valid){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Error in item key: %s', $check_result));
+				$itemCheck = check_item_key($item['key_']);
+				if(!$itemCheck['valid']){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Error in item key: %s', $itemCheck['description']));
 				}
 			}
 
@@ -1028,6 +1028,7 @@ COpt::memoryPick();
 				$item['interfaceid'] = 0;
 			}
 
+
 			if((isset($item['port']) && !zbx_empty($item['port']))
 				&& !((zbx_ctype_digit($item['port']) && ($item['port']>0) && ($item['port']<=65535))
 				|| preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/u', $item['port']))
@@ -1100,6 +1101,7 @@ COpt::memoryPick();
 		}
 		unset($item);
 	}
+
 /**
  * Add item
  *
@@ -1278,12 +1280,13 @@ COpt::memoryPick();
  * @return
  */
 	public static function delete($itemids, $nopermissions=false){
-		if(empty($itemids)) return true;
-
-		$itemids = zbx_toHash($itemids);
 
 		try{
 			self::BeginTransaction(__METHOD__);
+
+			if(empty($itemids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+
+			$itemids = zbx_toHash($itemids);
 
 			$options = array(
 				'itemids' => $itemids,

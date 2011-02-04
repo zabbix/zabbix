@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -412,7 +412,7 @@ include_once('include/page_header.php');
 		$numrows->setAttribute('name', 'numrows');
 
 		$dscry_wdgt->addHeader(S_DISCOVERY_BIG);
-//		$dscry_wdgt->addHeader($numrows);
+		$dscry_wdgt->addHeader($numrows);
 /* table */
 		$form = new CForm();
 		$form->setName('frmdrules');
@@ -427,21 +427,23 @@ include_once('include/page_header.php');
 			S_STATUS
 		));
 
-/* sorting
-		order_page_result($applications, 'name');
-
-// PAGING UPPER
-		$paging = getPagingLine($applications);
-		$dscry_wdgt->addItem($paging);
-//-------*/
-		$dscry_wdgt->addItem(BR());
-
 		$sql = 'SELECT d.* '.
 				' FROM drules d'.
 				' WHERE '.DBin_node('druleid').
 				order_by('d.name,d.iprange,d.delay','d.druleid');
 		$db_rules = DBselect($sql);
+
+		// Discovery rules will be gathered here, so we can feed this array to pagination function
+		$rules_arr = array();
+
 		while($rule_data = DBfetch($db_rules)){
+			$rules_arr[] = $rule_data;
+		}
+
+		// getting paging element
+		$paging = getPagingLine($rules_arr);
+
+		foreach($rules_arr as $rule_data){
 			$checks = array();
 			$sql = 'SELECT type FROM dchecks WHERE druleid='.$rule_data['druleid'].' ORDER BY type, ports';
 			$db_checks = DBselect($sql);
@@ -475,10 +477,10 @@ include_once('include/page_header.php');
 			));
 		}
 
-// PAGING FOOTER
-//		$table->addRow(new CCol($paging));
-//		$dscry_wdgt->addItem($paging);
-//---------
+		// pagination at the top and the bottom of the page
+		$tblDiscovery->addRow(new CCol($paging));
+		$dscry_wdgt->addItem($paging);
+
 
 // gobox
 		$goBox = new CComboBox('go');

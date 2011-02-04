@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -488,7 +488,7 @@ Copt::memoryPick();
 
 				$dbInterface = $dbInterfaces[$interface['interfaceid']];
 				if(isset($interface['hostid']) && (bccomp($dbInterface['hostid'], $interface['hostid']) !=0))
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Can not switch host for interface');
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Can not switch host for interface'));
 
 				$interface['hostid'] = $dbInterface['hostid'];
 
@@ -518,7 +518,13 @@ Copt::memoryPick();
 			}
 
 			if(($interface['useip'] == INTERFACE_USE_DNS) && zbx_empty($interface['dns'])){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface with IP " %1$s " can not have empty DNS name.', $interface['ip']));
+				$dbHosts = CHost::get(array(
+					'output' => array('host'),
+					'hostids' => $interface['hostid'],
+					'nopermissions' => 1,
+					'preservekeys' => 1
+				));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface with IP "%1$s" can not have empty DNS name while having "Use DNS" property on host "%2$s".', $interface['ip'], $dbHosts[$interface['hostid']]['host']));
 			}
 
 			if(isset($interface['dns']) && !zbx_empty($interface['dns'])){
@@ -546,7 +552,7 @@ Copt::memoryPick();
 			if(isset($interface['port'])){
 				if(zbx_ctype_digit($interface['port'])){
 					if($interface['port'] > 65535 || $interface['port'] < 0)
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect interface PORT "'.$interface['port'].'" provided');
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect interface PORT "%s" provided', $interface['port']));
 				}
 				else if(!preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $interface['port'])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect interface PORT "'.$interface['port'].'". '.S_WRONG_MACRO);
@@ -571,7 +577,7 @@ Copt::memoryPick();
 
 			foreach($items as $item){
 				$host = reset($item['hosts']);
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Interface is linked to "'.$host['host'].':'.$item['key_'].' item');
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface is linked to item "%s"', $host['host'].':'.$item['key_']));
 			}
 		}
 	}
@@ -693,13 +699,14 @@ Copt::memoryPick();
  * @return array|boolean
  */
 	public static function delete($interfaceids){
-		if(empty($interfaceids)) return true;
-
-		$interfaceids = zbx_toArray($interfaceids);
-		$interfaces = zbx_toObject($interfaceids, 'interfaceid');
 
 		try{
 			self::BeginTransaction(__METHOD__);
+
+			if(empty($interfaceids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+
+			$interfaceids = zbx_toArray($interfaceids);
+			$interfaces = zbx_toObject($interfaceids, 'interfaceid');
 
 			self::checkInput($interfaces,__FUNCTION__);
 

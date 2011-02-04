@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -126,6 +126,7 @@ class CProfile{
 	}
 
 	private static function insertDB($idx, $value, $type, $idx2){
+
 		$value_type = self::getFieldByType($type);
 
 		$values = array(
@@ -185,7 +186,7 @@ class CProfile{
 				$result = zbx_ctype_digit($value);
 				break;
 			case PROFILE_TYPE_INT:
-				$result = zbx_numeric($value);
+				$result = zbx_is_int($value);
 				break;
 			default:
 				$result = true;

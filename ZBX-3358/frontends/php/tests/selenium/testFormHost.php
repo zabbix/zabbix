@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,11 +19,11 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/class.ctest.php');
+require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testFormHost extends CTest
+class testFormHost extends CWebTest
 {
-	public $host = "Text host";
+	public $host = "Test host";
 
 	public function testFormHost_Create()
 	{
@@ -36,6 +36,7 @@ class testFormHost extends CTest
 		$this->wait();
 		$this->assertTitle('Hosts');
 		$this->ok('Host added');
+		$this->ok($this->host);
 	}
 
 	public function testFormHost_CreateLongHostName()
@@ -62,6 +63,7 @@ class testFormHost extends CTest
 		$this->wait();
 		$this->assertTitle('Hosts');
 		$this->ok('Host updated');
+		$this->ok($this->host);
 	}
 
 	public function testFormHost_UpdateHostName()

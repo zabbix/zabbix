@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,23 +19,14 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/class.ctest.php');
+require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageMediaTypes extends CTest
+class testPageMediaTypes extends CWebTest
 {
 	// Returns all media types
 	public static function allMediaTypes()
 	{
-		DBconnect($error);
-
-		$meditypes=array();
-
-		$result=DBselect('select * from media_type');
-		while($mediatype=DBfetch($result))
-		{
-			$mediatypes[]=array($mediatype);
-		}
-		return $mediatypes;
+		return DBdata('select * from media_type');
 	}
 
 	/**
@@ -54,6 +45,7 @@ class testPageMediaTypes extends CTest
 		if($mediatype['type'] == MEDIA_TYPE_EMAIL)	$this->ok('Email');
 		if($mediatype['type'] == MEDIA_TYPE_JABBER)	$this->ok('Jabber');
 		if($mediatype['type'] == MEDIA_TYPE_SMS)	$this->ok('SMS');
+		if($mediatype['type'] == MEDIA_TYPE_EZ_TEXTING)	$this->ok('Ez Texting');
 		$this->dropdown_select('go','Delete selected');
 	}
 
@@ -65,7 +57,7 @@ class testPageMediaTypes extends CTest
 		$name=$mediatype['description'];
 
 		$sql="select * from media_type where description='$name' order by mediatypeid";
-		$oldHash=$this->DBhash($sql);
+		$oldHash=DBhash($sql);
 
 		$this->login('media_types.php');
 		$this->assertTitle('Media types');
@@ -78,7 +70,13 @@ class testPageMediaTypes extends CTest
 		$this->ok("$name");
 		$this->ok('CONFIGURATION OF MEDIA TYPES');
 
-		$this->assertEquals($oldHash,$this->DBhash($sql));
+		$this->assertEquals($oldHash,DBhash($sql));
+	}
+
+	public function testPageMediaTypes_MassDeleteAll()
+	{
+// TODO
+		$this->markTestIncomplete();
 	}
 
 	/**
@@ -88,7 +86,11 @@ class testPageMediaTypes extends CTest
 	{
 		$id=$mediatype['mediatypeid'];
 
-		$this->DBsave_tables('media_type');
+		$row=DBfetch(DBselect("select count(*) as cnt from media_type where mediatypeid=$id"));
+		$row=DBfetch(DBselect("select count(*) as cnt from operations where mediatypeid=$id"));
+		$used_by_operations = ($row['cnt'] > 0);
+
+		DBsave_tables(array('media_type','media','operations'));
 
 		$this->chooseOkOnNextConfirmation();
 
@@ -97,16 +99,30 @@ class testPageMediaTypes extends CTest
 		$this->checkbox_select("media_types[$id]");
 		$this->dropdown_select('go','Delete selected');
 		$this->button_click('goButton');
-		$this->wait();
 
 		$this->getConfirmation();
+		$this->wait();
 		$this->assertTitle('Media types');
-		$this->ok('Media type deleted');
+		switch($used_by_operations){
+			case true:
+				$this->nok('Media type deleted');
+				$this->ok('Media type was not deleted');
+				$this->ok('Mediatypes used by action');
+			break;
+			case false:
+				$this->ok('Media type deleted');
+				$sql="select * from media_type where mediatypeid=$id";
+				$this->assertEquals(0,DBcount($sql));
+			break;
+		}
 
-		$sql="select * from media_type where mediatypeid=$id";
-		$this->assertEquals(0,$this->DBcount($sql));
+		DBrestore_tables(array('media_type','media','operations'));
+	}
 
-		$this->DBrestore_tables('media_type');
+	public function testPageMediaTypes_Sorting()
+	{
+// TODO
+		$this->markTestIncomplete();
 	}
 }
 ?>

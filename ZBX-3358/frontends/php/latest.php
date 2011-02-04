@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -283,7 +283,8 @@ include_once('include/page_header.php');
 
 		if(isset($db_item['lastvalue']) && isset($db_item['prevvalue'])
 				&& in_array($db_item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
-				&& ($db_item['lastvalue']-$db_item['prevvalue'] != 0)){
+				&& ($db_item['lastvalue']-$db_item['prevvalue'] != 0))
+		{
 			if($db_item['lastvalue']-$db_item['prevvalue']<0){
 				$change=convert_units($db_item['lastvalue']-$db_item['prevvalue'],$db_item['units']);
 			}
@@ -426,14 +427,12 @@ include_once('include/page_header.php');
 		if(isset($showAll) && !empty($apps) && !isset($apps[0])) continue;
 		else if(isset($hideAll) && (empty($apps) || isset($apps[0]))) continue;
 
-
-
 		if(isset($db_item['lastclock']))
 			$lastclock=zbx_date2str(S_LATEST_ITEMS_TRIGGERS_DATE_FORMAT,$db_item['lastclock']);
 		else
 			$lastclock = new CCol(' - ');
 
-		$lastvalue=format_lastvalue($db_item);
+		$lastvalue = format_lastvalue($db_item);
 
 		if( isset($db_item['lastvalue']) && isset($db_item['prevvalue']) &&
 			($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $db_item['value_type'] == ITEM_VALUE_TYPE_UINT64) &&

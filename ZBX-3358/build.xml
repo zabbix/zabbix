@@ -60,12 +60,24 @@
 	</target>
 
 	<target name="init-sqlite3" depends="init-common">
-		<!-- Create PostgreSQL database -->
+		<!-- Remove old SQLite3 database if exists -->
+		<delete failonerror="off">
+			<fileset dir="/tmp" includes="${dbname}.db" />
+		</delete>
+		<!-- Create SQLite3 database -->
 		<exec executable="sqlite3" input="${builddir}/create/schema/sqlite3.sql" failonerror="on">
 			<arg line="-init ${builddir}/tests/templates/sqlite3.init"/>
 			<arg line="/tmp/${dbname}.db"/>
 		</exec>
+		<exec executable="chmod" dir="/tmp" failonerror="on">
+			<arg line="go+rw"/>
+			<arg line="/tmp/${dbname}.db"/>
+		</exec>
 		<exec executable="sqlite3" input="${builddir}/create/data/data.sql" failonerror="on">
+			<arg line="-init ${builddir}/tests/templates/sqlite3.init"/>
+			<arg line="/tmp/${dbname}.db"/>
+		</exec>
+		<exec executable="sqlite3" input="${builddir}/tests/data/data_test.sql" failonerror="on">
 			<arg line="-init ${builddir}/tests/templates/sqlite3.init"/>
 			<arg line="/tmp/${dbname}.db"/>
 		</exec>
@@ -89,18 +101,27 @@
 	<target name="init-postgresql" depends="init-common">
 		<!-- Create PostgreSQL database -->
 		<exec executable="psql" failonerror="on">
+			<arg line="-1"/>
 			<arg line="template1 -c 'drop database if exists ${dbname};'"/>
 		</exec>
 		<exec executable="psql" failonerror="on">
+			<arg line="-1"/>
 			<arg line="template1 -c 'create database ${dbname};'"/>
 		</exec>
 		<exec executable="psql" input="${builddir}/create/schema/postgresql.sql" failonerror="on">
+			<arg line="-1"/>
 			<arg line="${dbname}"/>
 		</exec>
 		<exec executable="psql" input="${builddir}/create/data/images_postgresql.sql" failonerror="on">
+			<arg line="-1"/>
 			<arg line="${dbname}"/>
 		</exec>
 		<exec executable="psql" input="${builddir}/create/data/data.sql" failonerror="on">
+			<arg line="-1"/>
+			<arg line="${dbname}"/>
+		</exec>
+		<exec executable="psql" input="${builddir}/tests/data/data_test.sql" failonerror="on">
+			<arg line="-1"/>
 			<arg line="${dbname}"/>
 		</exec>
 
@@ -133,6 +154,9 @@
 		<exec executable="mysql" input="${builddir}/create/data/data.sql" failonerror="on">
 			<arg line="-uroot ${dbname}"/>
 		</exec>
+		<exec executable="mysql" input="${builddir}/tests/data/data_test.sql" failonerror="on">
+			<arg line="-uroot ${dbname}"/>
+		</exec>
 
 		<!-- Create PHP config file -->
 		<exec executable="sed" failonerror="on" output="${builddir}/frontends/php/conf/zabbix.conf.php">
@@ -151,7 +175,6 @@
 		<delete failonerror="off">
 			<fileset dir="${basedir}/build/logs" includes="**.*" />
 			<fileset dir="${builddir}" includes="**.*" />
-			<fileset dir="/tmp" includes="sqlite3.db" />
 		</delete>
 	</target>
 

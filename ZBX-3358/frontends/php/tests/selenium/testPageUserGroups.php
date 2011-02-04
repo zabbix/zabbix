@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,23 +19,14 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/class.ctest.php');
+require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageUserGroups extends CTest
+class testPageUserGroups extends CWebTest
 {
 	// Returns all user groups
 	public static function allGroups()
 	{
-		DBconnect($error);
-
-		$groups=array();
-
-		$result=DBselect("select * from usrgrp where name<>'Disabled' order by usrgrpid");
-		while($group=DBfetch($result))
-		{
-			$groups[]=array($group);
-		}
-		return $groups;
+		return DBdata("select * from usrgrp where name<>'Disabled' order by usrgrpid");
 	}
 
 	/**
@@ -69,9 +60,9 @@ class testPageUserGroups extends CTest
 		$name=$group['name'];
 
 		$sql1="select * from usrgrp where name='$name' order by usrgrpid";
-		$oldHashGroup=$this->DBhash($sql1);
+		$oldHashGroup=DBhash($sql1);
 		$sql2="select * from users_groups where usrgrpid=$usrgrpid order by id";
-		$oldHashUsersGroups=$this->DBhash($sql2);
+		$oldHashUsersGroups=DBhash($sql2);
 
 		$this->login('usergrps.php');
 		$this->assertTitle('User groups');
@@ -84,11 +75,23 @@ class testPageUserGroups extends CTest
 		$this->ok("$name");
 		$this->ok('CONFIGURATION OF USERS AND USER GROUPS');
 
-		$this->assertEquals($oldHashGroup,$this->DBhash($sql1));
-		$this->assertEquals($oldHashUsersGroups,$this->DBhash($sql2));
+		$this->assertEquals($oldHashGroup,DBhash($sql1));
+		$this->assertEquals($oldHashUsersGroups,DBhash($sql2));
+	}
+
+	public function testPageUserGroups_MassEnableAll()
+	{
+// TODO
+		$this->markTestIncomplete();
 	}
 
 	public function testPageUserGroups_MassEnable()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
+	public function testPageUserGroups_MassDisableAll()
 	{
 // TODO
 		$this->markTestIncomplete();
@@ -100,31 +103,159 @@ class testPageUserGroups extends CTest
 		$this->markTestIncomplete();
 	}
 
-	public function testPageUserGroups_MassEnableAPI()
+	public function testPageUserGroups_MassEnableAPIAll()
 	{
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageUserGroups_MassDisableAPI()
+	/**
+	* @dataProvider allGroups
+	*/
+	public function testPageUserGroups_MassEnableAPI($group)
+	{
+		$usrgrpid=$group['usrgrpid'];
+		$name=$group['name'];
+
+		$sql1="select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
+		$oldHashGroups=DBhash($sql1);
+
+		$this->login('usergrps.php');
+		$this->assertTitle('User groups');
+
+		$this->checkbox_select("group_groupid[$usrgrpid]");
+		$this->dropdown_select('go','Enable API');
+		$this->button_click('goButton');
+
+		$this->getConfirmation();
+		$this->wait();
+		$this->assertTitle('User groups');
+		$this->ok('API access updated');
+
+		$sql="select * from usrgrp where usrgrpid=$usrgrpid and api_access=".GROUP_API_ACCESS_ENABLED;
+		$this->assertEquals(1,DBcount($sql));
+
+		$this->assertEquals($oldHashGroups,DBhash($sql1));
+	}
+
+	public function testPageUserGroups_MassDisableAPIAll()
 	{
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageUserGroups_MassEnableDEBUG()
+	/**
+	* @dataProvider allGroups
+	*/
+	public function testPageUserGroups_MassDisableAPI($group)
+	{
+		$usrgrpid=$group['usrgrpid'];
+		$name=$group['name'];
+
+		$sql1="select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
+		$oldHashGroups=DBhash($sql1);
+
+		$this->login('usergrps.php');
+		$this->assertTitle('User groups');
+
+		$this->checkbox_select("group_groupid[$usrgrpid]");
+		$this->dropdown_select('go','Disable API');
+		$this->button_click('goButton');
+
+		$this->getConfirmation();
+		$this->wait();
+		$this->assertTitle('User groups');
+		$this->ok('API access updated');
+
+		$sql="select * from usrgrp where usrgrpid=$usrgrpid and api_access=".GROUP_API_ACCESS_DISABLED;
+		$this->assertEquals(1,DBcount($sql));
+
+		$this->assertEquals($oldHashGroups,DBhash($sql1));
+	}
+
+	public function testPageUserGroups_MassEnableDEBUGAll()
 	{
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageUserGroups_MassDisableDEBUG()
+	/**
+	* @dataProvider allGroups
+	*/
+	public function testPageUserGroups_MassEnableDEBUG($group)
+	{
+		$usrgrpid=$group['usrgrpid'];
+		$name=$group['name'];
+
+		$sql1="select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
+		$oldHashGroups=DBhash($sql1);
+
+		$this->login('usergrps.php');
+		$this->assertTitle('User groups');
+
+		$this->checkbox_select("group_groupid[$usrgrpid]");
+		$this->dropdown_select('go','Enable DEBUG');
+		$this->button_click('goButton');
+
+		$this->getConfirmation();
+		$this->wait();
+		$this->assertTitle('User groups');
+		$this->ok('Debug mode updated');
+
+		$sql="select * from usrgrp where usrgrpid=$usrgrpid and debug_mode=".GROUP_DEBUG_MODE_ENABLED;
+		$this->assertEquals(1,DBcount($sql));
+
+		$this->assertEquals($oldHashGroups,DBhash($sql1));
+	}
+
+	public function testPageUserGroups_MassDisableDEBUGAll()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
+	/**
+	* @dataProvider allGroups
+	*/
+	public function testPageUserGroups_MassDisableDEBUG($group)
+	{
+		$usrgrpid=$group['usrgrpid'];
+		$name=$group['name'];
+
+		$sql1="select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
+		$oldHashGroups=DBhash($sql1);
+
+		$this->login('usergrps.php');
+		$this->assertTitle('User groups');
+
+		$this->checkbox_select("group_groupid[$usrgrpid]");
+		$this->dropdown_select('go','Disable DEBUG');
+		$this->button_click('goButton');
+
+		$this->getConfirmation();
+		$this->wait();
+		$this->assertTitle('User groups');
+		$this->ok('Debug mode updated');
+
+		$sql="select * from usrgrp where usrgrpid=$usrgrpid and debug_mode=".GROUP_DEBUG_MODE_DISABLED;
+		$this->assertEquals(1,DBcount($sql));
+
+		$this->assertEquals($oldHashGroups,DBhash($sql1));
+	}
+
+	public function testPageUserGroups_MassDeleteAll()
 	{
 // TODO
 		$this->markTestIncomplete();
 	}
 
 	public function testPageUserGroups_MassDelete()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
+	public function testPageUserGroups_Sorting()
 	{
 // TODO
 		$this->markTestIncomplete();

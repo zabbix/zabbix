@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ class CCheckBox extends CInput{
 	}
 
 	public function setChecked($value='yes'){
-		if(($value === true) || (zbx_numeric($value) && ($value!=0)) || (is_string($value) && ($value=='yes' || $value=='checked' || $value=='on') || $value=='1'))
+		if(($value === true) || (is_numeric($value) && ($value!=0)) || (is_string($value) && ($value=='yes' || $value=='checked' || $value=='on') || $value=='1'))
 			return $this->attributes['checked'] = 'checked';
 
 		$this->removeAttribute('checked');

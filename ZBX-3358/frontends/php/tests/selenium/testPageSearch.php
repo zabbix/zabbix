@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,9 +19,9 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/class.ctest.php');
+require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageSearch extends CTest
+class testPageSearch extends CWebTest
 {
 	public function testPageHosts_FindZabbixServer()
 	{
@@ -70,6 +70,12 @@ class testPageSearch extends CTest
 		$this->nok('Zabbix server');
 		$this->ok('Displaying 0 of 0 found');
 		$this->ok('...');
+	}
+
+	public function testPageHosts_Sorting()
+	{
+// TODO
+		$this->markTestIncomplete();
 	}
 }
 ?>

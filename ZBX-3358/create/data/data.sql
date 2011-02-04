@@ -1,6 +1,6 @@
 --
 -- Zabbix
--- Copyright (C) 2000,2001,2002,2003,2004 Alexei Vladishev
+-- Copyright (C) 2000-2011 SIA Zabbix
 --
 -- This program is free software; you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -36,8 +36,8 @@ INSERT INTO usrgrp VALUES (10,'API access',0,0,1,0);
 -- Dumping data for table `users`
 --
 
-INSERT INTO users VALUES (1,'Admin','Zabbix','Administrator','5fce1b3e34b520afeffb37ce08c7cd66','',0, 900,'en_gb',30,3,'default.css',0,'',0,50);
-INSERT INTO users VALUES (2,'guest','Default','User','d41d8cd98f00b204e9800998ecf8427e','',0,900,'en_gb',30,1,'default.css',0,'',0,50);
+INSERT INTO users VALUES (1,'Admin','Zabbix','Administrator','5fce1b3e34b520afeffb37ce08c7cd66','',0, 900,'en_GB',30,3,'default.css',0,'',0,50);
+INSERT INTO users VALUES (2,'guest','Default','User','d41d8cd98f00b204e9800998ecf8427e','',0,900,'en_GB',30,1,'default.css',0,'',0,50);
 
 --
 -- Dumping data for table `users_groups`

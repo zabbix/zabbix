@@ -174,9 +174,6 @@ typedef enum {
 #define GRAPH_ITEM_COLOR_LEN		6
 #define GRAPH_ITEM_COLOR_LEN_MAX	GRAPH_ITEM_COLOR_LEN+1
 
-#define DHOST_IP_LEN			39
-#define DHOST_IP_LEN_MAX		DHOST_IP_LEN+1
-
 #define DSERVICE_KEY_LEN		255
 #define DSERVICE_KEY_LEN_MAX		DSERVICE_KEY_LEN+1
 #define DSERVICE_VALUE_LEN		255
@@ -187,8 +184,6 @@ typedef enum {
 #define HTTPTEST_HTTP_PASSWORD_LEN	64
 #define HTTPTEST_HTTP_PASSWORD_LEN_MAX	HTTPTEST_HTTP_PASSWORD_LEN+1
 
-#define PROXY_DHISTORY_IP_LEN		39
-#define PROXY_DHISTORY_IP_LEN_MAX	PROXY_DHISTORY_IP_LEN+1
 #define PROXY_DHISTORY_KEY_LEN		255
 #define PROXY_DHISTORY_KEY_LEN_MAX	PROXY_DHISTORY_KEY_LEN+1
 #define PROXY_DHISTORY_VALUE_LEN	255
@@ -578,14 +573,10 @@ int	DBget_queue_count(int from, int to);
 double	DBget_requiredperformance();
 zbx_uint64_t DBget_proxy_lastaccess(const char *hostname);
 
-int	DBget_escape_string_len(const char *src);
-void    DBescape_string(const char *src, char *dst, int len);
 char	*DBdyn_escape_string(const char *src);
 char	*DBdyn_escape_string_len(const char *src, int max_src_len);
 
 #define ZBX_SQL_LIKE_ESCAPE_CHAR '!'
-int	DBget_escape_like_pattern_len(const char *src);
-void	DBescape_like_pattern(const char *src, char *dst, int len);
 char	*DBdyn_escape_like_pattern(const char *src);
 
 void    DBget_item_from_db(DB_ITEM *item, DB_ROW row);
@@ -624,8 +615,8 @@ char	*zbx_user_string(zbx_uint64_t userid);
 double	DBmultiply_value_float(DB_ITEM *item, double value);
 zbx_uint64_t	DBmultiply_value_uint64(DB_ITEM *item, zbx_uint64_t value);
 
-void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, unsigned short port, int now);
-void	DBproxy_register_host(const char *host, const char *ip, unsigned short port);
+void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns, unsigned short port, int now);
+void	DBproxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port);
 void	DBexecute_overflowed_sql(char **sql, int *sql_allocated, int *sql_offset);
 char	*DBget_unique_hostname_by_sample(char *host_name_sample);
 

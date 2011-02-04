@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -184,12 +184,35 @@ class CUser extends CZBXAPI{
 
 // filter
 		if(is_array($options['filter'])){
+			try{
+				if($options['filter']['passwd']){
+					unset($options['filter']['passwd']);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('It is not possible to filter by user password') );
+				}
+			}
+			catch(APIException $e){
+				$error = $e->getErrors();
+				$error = reset($error);
+				self::setError(__METHOD__, $e->getCode(), $error);
+				return false;
+			}
 			zbx_db_filter('users u', $options, $sql_parts);
 		}
 
 // search
 		if(is_array($options['search'])){
-			unset($options['search']['passwd']);
+			try{
+				if($options['search']['passwd']){
+					unset($options['search']['passwd']);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('It is not possible to search by user password') );
+				}
+			}
+			catch(APIException $e){
+				$error = $e->getErrors();
+				$error = reset($error);
+				self::setError(__METHOD__, $e->getCode(), $error);
+				return false;
+			}
 			zbx_db_search('users u', $options, $sql_parts);
 		}
 
@@ -236,6 +259,7 @@ class CUser extends CZBXAPI{
 //SDI($sql);
 		$res = DBselect($sql, $sql_limit);
 		while($user = DBfetch($res)){
+			unset($user['passwd']);
 			if(!is_null($options['countOutput'])){
 				$result = $user['rowscount'];
 			}
@@ -556,6 +580,7 @@ Copt::memoryPick();
 	// unset if not changed passwd
 				if(isset($user['passwd']) && !is_null($user['passwd'])){
 					$user['passwd'] = md5($user['passwd']);
+					$user_db_fields['passwd'] = '';
 				}
 				else{
 					unset($user['passwd']);
@@ -576,21 +601,8 @@ Copt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_USER_EXISTS_FIRST_PART.' '.$user['alias'].' '.S_CUSER_ERROR_USER_EXISTS_SECOND_PART);
 				}
 
-				$sql = 'UPDATE users SET '.
-							' name='.zbx_dbstr($user['name']).', '.
-							' surname='.zbx_dbstr($user['surname']).', '.
-							' alias='.zbx_dbstr($user['alias']).', '.
-							' passwd='.zbx_dbstr($user['passwd']).', '.
-							' url='.zbx_dbstr($user['url']).', '.
-							' autologin='.$user['autologin'].', '.
-							' autologout='.$user['autologout'].', '.
-							' lang='.zbx_dbstr($user['lang']).', '.
-							' theme='.zbx_dbstr($user['theme']).', '.
-							' refresh='.$user['refresh'].', '.
-							' rows_per_page='.$user['rows_per_page'].', '.
-							' type='.$user['type'].
-						' WHERE userid='.$user['userid'];
-				if(!DBexecute($sql))
+				$result = DB::update('users', array(array('values'=>$user,'where'=>array('userid='.$user['userid']))));
+				if(!$result)
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 
 				// if(isset($user['usrgrps']) && !is_null($user['usrgrps'])){
@@ -613,14 +625,27 @@ Copt::memoryPick();
 
 
 				if(isset($user['usrgrps']) && !is_null($user['usrgrps'])){
-					DBexecute('DELETE FROM users_groups WHERE userid='.$user['userid']);
 
-				$options = array(
-						'usrgrpids' => zbx_objectValues($user['usrgrps'], 'usrgrpid'),
-					'output' => API_OUTPUT_EXTEND,
-					'preservekeys' => 1
-				);
-				$usrgrps = CUserGroup::get($options);
+					// list with group id's where user must be after update
+					$user_must_be_in_groups = zbx_objectValues($user['usrgrps'], 'usrgrpid');
+
+					// deleting all relations with groups, but not touching those, where user still must be after update
+					$sql = 'DELETE FROM users_groups WHERE userid='.$user['userid'].' AND '.DBcondition('usrgrpid', $user_must_be_in_groups, true);  // true - NOT IN
+					DBexecute($sql);
+
+					// getting the list of groups user is currently in
+					$db_groups_user_is_in = DBSelect('SELECT usrgrpid FROM users_groups WHERE userid='.$user['userid']);
+					$groups_user_is_in = array();
+					while($grp = DBfetch($db_groups_user_is_in)){
+						$groups_user_is_in[] = $grp['usrgrpid'];
+					}
+
+					$options = array(
+						'usrgrpids' => $user_must_be_in_groups,
+						'output' => API_OUTPUT_EXTEND,
+						'preservekeys' => 1
+					);
+					$usrgrps = CUserGroup::get($options);
 
 					foreach($usrgrps as $groupid => $group){
 						if(($group['gui_access'] == GROUP_GUI_ACCESS_DISABLED) && $self){
@@ -631,11 +656,14 @@ Copt::memoryPick();
 							self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_USER_CANT_DISABLE_SELF_PART1);
 						}
 
-						$users_groups_id = get_dbid('users_groups', 'id');
-						$sql = 'INSERT INTO users_groups (id, usrgrpid, userid)'.
-								' VALUES ('.$users_groups_id.','.$groupid.','.$user['userid'].')';
-						if(!DBexecute($sql))
-							self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+						// if user is not already in a given group
+						if (!in_array($groupid, $groups_user_is_in)){
+							$users_groups_id = get_dbid('users_groups', 'id');
+							$sql = 'INSERT INTO users_groups (id, usrgrpid, userid)'.
+									' VALUES ('.$users_groups_id.','.$groupid.','.$user['userid'].')';
+							if(!DBexecute($sql))
+								self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+						}
 					}
 				}
 	/*
@@ -654,7 +682,7 @@ Copt::memoryPick();
 			}
 
 			self::EndTransaction(true, __METHOD__);
-			return true;
+			return array('userids' => $user['userid']);
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
@@ -685,6 +713,7 @@ Copt::memoryPick();
 // unset if not changed passwd
 			if(isset($user['passwd']) && !is_null($user['passwd'])){
 				$user['passwd'] = md5($user['passwd']);
+				$user_db_fields['passwd'] = '';
 			}
 			else{
 				unset($user['passwd']);
@@ -695,22 +724,13 @@ Copt::memoryPick();
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_WRONG_FIELD_FOR_USER);
 			}
 
-			$sql = 'UPDATE users SET '.
-						' passwd='.zbx_dbstr($user['passwd']).', '.
-						' url='.zbx_dbstr($user['url']).', '.
-						' autologin='.$user['autologin'].', '.
-						' autologout='.$user['autologout'].', '.
-						' lang='.zbx_dbstr($user['lang']).', '.
-						' theme='.zbx_dbstr($user['theme']).', '.
-						' refresh='.$user['refresh'].', '.
-						' rows_per_page='.$user['rows_per_page'].
-					' WHERE userid='.$user['userid'];
-			if(!DBexecute($sql))
+			$result = DB::update('users', array(array('values'=>$user,'where'=>array('userid='.$user['userid']))));
+			if(!$result)
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 
-
 			self::EndTransaction(true, __METHOD__);
-			return true;
+
+			return $user;
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);

@@ -976,6 +976,77 @@ static int	DBget_host_name_by_hostid(zbx_uint64_t hostid, char **replace_to)
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBget_interface_value_by_hostid                                  *
+ *                                                                            *
+ * Purpose: request interface value by hostid and request                     *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+#define ZBX_REQUEST_HOST_IPADDRESS	1
+#define ZBX_REQUEST_HOST_DNS		2
+#define ZBX_REQUEST_HOST_CONN		3
+static int	DBget_interface_value_by_hostid(zbx_uint64_t hostid, char **replace_to, int request)
+{
+#define MAX_INTERFACE_COUNT	3
+	DB_RESULT	result;
+	DB_ROW		row;
+	unsigned char	type, useip, pr, last_pr = MAX_INTERFACE_COUNT,
+			priority[MAX_INTERFACE_COUNT] = {
+					INTERFACE_TYPE_AGENT,
+					INTERFACE_TYPE_SNMP,
+					INTERFACE_TYPE_IPMI};
+	int		ret = FAIL;
+
+	result = DBselect(
+			"select type,useip,ip,dns"
+			" from interface"
+			" where hostid=" ZBX_FS_UI64
+				" and type in (%d,%d,%d)"
+				" and main=1",
+			hostid, INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_IPMI);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		type = (unsigned char)atoi(row[0]);
+
+		for (pr = 0; pr < MAX_INTERFACE_COUNT && priority[pr] != type; pr++)
+			;
+
+		if (pr >= last_pr)
+			continue;
+
+		last_pr = pr;
+
+		switch (request)
+		{
+			case ZBX_REQUEST_HOST_IPADDRESS:
+				*replace_to = zbx_strdup(*replace_to, row[2]);
+				break;
+			case ZBX_REQUEST_HOST_DNS:
+				*replace_to = zbx_strdup(*replace_to, row[3]);
+				break;
+			case ZBX_REQUEST_HOST_CONN:
+				useip = (unsigned char)atoi(row[1]);
+				*replace_to = zbx_strdup(*replace_to, useip ? row[2] : row[3]);
+				break;
+		}
+		ret = SUCCEED;
+	}
+	DBfree_result(result);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBget_trigger_value_by_triggerid                                 *
  *                                                                            *
  * Purpose: retrieve a particular value associated with the trigger's         *
@@ -992,9 +1063,6 @@ static int	DBget_host_name_by_hostid(zbx_uint64_t hostid, char **replace_to)
  *                                                                            *
  ******************************************************************************/
 #define ZBX_REQUEST_HOST_NAME		0
-#define ZBX_REQUEST_HOST_IPADDRESS	1
-#define ZBX_REQUEST_HOST_DNS		2
-#define ZBX_REQUEST_HOST_CONN		3
 #define ZBX_REQUEST_ITEM_NAME		4
 #define ZBX_REQUEST_ITEM_KEY		5
 #define ZBX_REQUEST_PROXY_NAME		6
@@ -1004,7 +1072,7 @@ static int	DBget_trigger_value_by_triggerid(zbx_uint64_t triggerid, char **repla
 	DB_ROW		row;
 	DC_HOST		dc_host;
 	char		expression[TRIGGER_EXPRESSION_LEN_MAX], *key;
-	zbx_uint64_t	functionid, proxy_hostid;
+	zbx_uint64_t	functionid, proxy_hostid, hostid;
 	int		ret = FAIL;
 
 	if (FAIL == DBget_trigger_expression_by_triggerid(triggerid, expression, sizeof(expression)))
@@ -1014,11 +1082,8 @@ static int	DBget_trigger_value_by_triggerid(zbx_uint64_t triggerid, char **repla
 		return ret;
 
 	result = DBselect(
-			"select i.description,i.key_,h.hostid,h.host,"
-				"ni.useip,ni.ip,ni.dns,h.proxy_hostid"
+			"select i.description,i.key_,h.hostid,h.host,h.proxy_hostid"
 			" from functions f,hosts h,items i"
-				" left join interface ni"
-					" on ni.interfaceid=i.interfaceid"
 			" where f.itemid=i.itemid"
 				" and i.hostid=h.hostid"
 				" and f.functionid=" ZBX_FS_UI64,
@@ -1033,17 +1098,10 @@ static int	DBget_trigger_value_by_triggerid(zbx_uint64_t triggerid, char **repla
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_HOST_IPADDRESS:
-				*replace_to = zbx_dsprintf(*replace_to, "%s", row[5]);
-				ret = SUCCEED;
-				break;
 			case ZBX_REQUEST_HOST_DNS:
-				*replace_to = zbx_dsprintf(*replace_to, "%s", row[6]);
-				ret = SUCCEED;
-				break;
 			case ZBX_REQUEST_HOST_CONN:
-				*replace_to = zbx_dsprintf(*replace_to, "%s",
-						atoi(row[4]) ? row[5] : row[6]);
-				ret = SUCCEED;
+				ZBX_STR2UINT64(hostid, row[2]);
+				ret = DBget_interface_value_by_hostid(hostid, replace_to, request);
 				break;
 			case ZBX_REQUEST_ITEM_NAME:
 			case ZBX_REQUEST_ITEM_KEY:
@@ -1068,7 +1126,7 @@ static int	DBget_trigger_value_by_triggerid(zbx_uint64_t triggerid, char **repla
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_PROXY_NAME:
-				ZBX_DBROW2UINT64(proxy_hostid, row[7]);
+				ZBX_DBROW2UINT64(proxy_hostid, row[4]);
 
 				if (0 == proxy_hostid)
 				{
@@ -1162,29 +1220,29 @@ static int	DBget_dhost_value_by_event(DB_EVENT *event, char **replace_to, const 
 
 	switch (event->object)
 	{
-	case EVENT_OBJECT_DHOST:
-		zbx_snprintf(sql, sizeof(sql),
-				"select %s"
-				" from drules r,dhosts h,dservices s"
-				" where r.druleid=h.druleid"
-					" and h.dhostid=s.dhostid"
-					" and h.dhostid=" ZBX_FS_UI64
-				" order by s.dserviceid",
-				fieldname,
-				event->objectid);
-		break;
-	case EVENT_OBJECT_DSERVICE:
-		zbx_snprintf(sql, sizeof(sql),
-				"select %s"
-				" from drules r,dhosts h,dservices s"
-				" where r.druleid=h.druleid"
-					" and h.dhostid=s.dhostid"
-					" and s.dserviceid=" ZBX_FS_UI64,
-				fieldname,
-				event->objectid);
-		break;
-	default:
-		return ret;
+		case EVENT_OBJECT_DHOST:
+			zbx_snprintf(sql, sizeof(sql),
+					"select %s"
+					" from drules r,dhosts h,dservices s"
+					" where r.druleid=h.druleid"
+						" and h.dhostid=s.dhostid"
+						" and h.dhostid=" ZBX_FS_UI64
+					" order by s.dserviceid",
+					fieldname,
+					event->objectid);
+			break;
+		case EVENT_OBJECT_DSERVICE:
+			zbx_snprintf(sql, sizeof(sql),
+					"select %s"
+					" from drules r,dhosts h,dservices s"
+					" where r.druleid=h.druleid"
+						" and h.dhostid=s.dhostid"
+						" and s.dserviceid=" ZBX_FS_UI64,
+					fieldname,
+					event->objectid);
+			break;
+		default:
+			return ret;
 	}
 
 	result = DBselectN(sql, 1);
@@ -2016,6 +2074,7 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 #define MVAR_DISCOVERY_SERVICE_STATUS	"{DISCOVERY.SERVICE.STATUS}"
 #define MVAR_DISCOVERY_SERVICE_UPTIME	"{DISCOVERY.SERVICE.UPTIME}"
 #define MVAR_DISCOVERY_DEVICE_IPADDRESS	"{DISCOVERY.DEVICE.IPADDRESS}"
+#define MVAR_DISCOVERY_DEVICE_DNS	"{DISCOVERY.DEVICE.DNS}"
 #define MVAR_DISCOVERY_DEVICE_STATUS	"{DISCOVERY.DEVICE.STATUS}"
 #define MVAR_DISCOVERY_DEVICE_UPTIME	"{DISCOVERY.DEVICE.UPTIME}"
 
@@ -2278,6 +2337,8 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 					ret = DBget_drule_value_by_event(event, &replace_to, "name");
 				else if (0 == strcmp(m, MVAR_DISCOVERY_DEVICE_IPADDRESS))
 					ret = DBget_dhost_value_by_event(event, &replace_to, "s.ip");
+				else if (0 == strcmp(m, MVAR_DISCOVERY_DEVICE_DNS))
+					ret = DBget_dhost_value_by_event(event, &replace_to, "s.dns");
 				else if (0 == strcmp(m, MVAR_DISCOVERY_DEVICE_STATUS))
 				{
 					if (SUCCEED == (ret = DBget_dhost_value_by_event(event, &replace_to, "h.status")))
@@ -2700,7 +2761,7 @@ error:
 	if (NULL != out)
 		zbx_free(out);
 
-	zabbix_log(LOG_LEVEL_WARNING, "%s", error);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
 	zabbix_syslog("%s", error);
 
 	return FAIL;
@@ -2750,9 +2811,9 @@ int	evaluate_expression(int *result, char **expression, time_t now,
 	{
 		/* Evaluate expression */
 		zbx_remove_spaces(*expression);
-		if (substitute_functions(expression, now, error, maxerrlen) == SUCCEED)
+		if (SUCCEED == substitute_functions(expression, now, error, maxerrlen))
 		{
-			if (evaluate(&value, *expression, error, maxerrlen) == SUCCEED)
+			if (SUCCEED == evaluate(&value, *expression, error, maxerrlen))
 			{
 				if (0 == cmp_double(value, 0))
 					*result = TRIGGER_VALUE_FALSE;

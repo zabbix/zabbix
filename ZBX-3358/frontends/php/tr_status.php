@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -365,7 +365,7 @@ require_once('include/templates/scriptConfirm.js.php');
 				'filter' => array(
 					'object' => EVENT_OBJECT_TRIGGER,
 					'value_changed' => TRIGGER_VALUE_CHANGED_YES,
-					'acknowledged' => false,
+					'acknowledged' => 0,
 					'value' => TRIGGER_VALUE_TRUE,
 				),
 				'nopermissions' => true

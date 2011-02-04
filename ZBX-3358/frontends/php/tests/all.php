@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 <?php
 require_once(dirname(__FILE__).'/general/GeneralTests.php');
 require_once(dirname(__FILE__).'/api/ApiTests.php');
+require_once(dirname(__FILE__).'/api_json/ApiJsonTests.php');
 require_once(dirname(__FILE__).'/selenium/SeleniumTests.php');
 
 class All
@@ -31,8 +32,8 @@ class All
 
 		$suite->addTest(GeneralTests::suite());
 		$suite->addTest(ApiTests::suite());
+		$suite->addTest(ApiJsonTests::suite());
 		$suite->addTest(SeleniumTests::suite());
-		// ...
 
 		return $suite;
 	}

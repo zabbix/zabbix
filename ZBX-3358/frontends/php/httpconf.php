@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -217,7 +217,7 @@ include_once('include/page_header.php');
 				'status' => $_REQUEST['status'],
 				'agent' => $_REQUEST['agent'],
 				'macros' => $_REQUEST['macros'],
-				'steps' => get_request('steps',array()),
+				'steps' => get_request('steps', array()),
 			);
 
 
