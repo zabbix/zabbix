@@ -1888,7 +1888,8 @@ COpt::memoryPick();
 				}
 			}
 
-			$tdiff = array_diff($dep_templateids, $templateids);
+			// finding if there are new linked templates
+			$tdiff = array_diff($templateids, $dep_templateids);
 			if(!empty($templateids) && !empty($dep_templateids) && !empty($tdiff)){
 				$tpls = zbx_array_merge($templateids, $dep_templateids);
 				$sql = 'SELECT DISTINCT ht.templateid, ht.hostid, h.host'.
