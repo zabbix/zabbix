@@ -82,11 +82,26 @@ class API{
 	public static function Alert(){
 		return self::getObject('alert');
 	}
+	public static function APIInfo(){
+		return self::getObject('apiinfo');
+	}
 	public static function Application(){
 		return self::getObject('application');
 	}
+	public static function DCheck(){
+		return self::getObject('dcheck');
+	}
+	public static function DHost(){
+		return self::getObject('dhost');
+	}
 	public static function DiscoveryRule(){
 		return self::getObject('discoveryrule');
+	}
+	public static function Drule(){
+		return self::getObject('drule');
+	}
+	public static function DService(){
+		return self::getObject('dservice');
 	}
 	public static function Event(){
 		return self::getObject('event');
@@ -97,6 +112,12 @@ class API{
 	public static function GraphItem(){
 		return self::getObject('graphitem');
 	}
+	public static function GraphPrototype(){
+		return self::getObject('graphprototype');
+	}
+	public static function History(){
+		return self::getObject('history');
+	}
 	public static function Host(){
 		return self::getObject('host');
 	}
@@ -106,14 +127,23 @@ class API{
 	public static function HostInterface(){
 		return self::getObject('hostinterface');
 	}
+	public static function Image(){
+		return self::getObject('image');
+	}
 	public static function Item(){
 		return self::getObject('item');
+	}
+	public static function ItemPrototype(){
+		return self::getObject('itemprototype');
 	}
 	public static function Maintenance(){
 		return self::getObject('maintenance');
 	}
 	public static function Map(){
 		return self::getObject('map');
+	}
+	public static function MediaType(){
+		return self::getObject('mediatype');
 	}
 	public static function Proxy(){
 		return self::getObject('proxy');
@@ -133,6 +163,12 @@ class API{
 	public static function Trigger(){
 		return self::getObject('trigger');
 	}
+	public static function TriggerExpression(){
+		return self::getObject('triggerexpression');
+	}
+	public static function TriggerPrototype(){
+		return self::getObject('triggerprototype');
+	}
 	public static function User(){
 		return self::getObject('user');
 	}
@@ -141,6 +177,9 @@ class API{
 	}
 	public static function UserMacro(){
 		return self::getObject('usermacro');
+	}
+	public static function WebCheck(){
+		return self::getObject('webcheck');
 	}
 
 }
