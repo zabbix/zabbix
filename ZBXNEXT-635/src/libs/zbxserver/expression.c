@@ -1220,29 +1220,29 @@ static int	DBget_dhost_value_by_event(DB_EVENT *event, char **replace_to, const 
 
 	switch (event->object)
 	{
-	case EVENT_OBJECT_DHOST:
-		zbx_snprintf(sql, sizeof(sql),
-				"select %s"
-				" from drules r,dhosts h,dservices s"
-				" where r.druleid=h.druleid"
-					" and h.dhostid=s.dhostid"
-					" and h.dhostid=" ZBX_FS_UI64
-				" order by s.dserviceid",
-				fieldname,
-				event->objectid);
-		break;
-	case EVENT_OBJECT_DSERVICE:
-		zbx_snprintf(sql, sizeof(sql),
-				"select %s"
-				" from drules r,dhosts h,dservices s"
-				" where r.druleid=h.druleid"
-					" and h.dhostid=s.dhostid"
-					" and s.dserviceid=" ZBX_FS_UI64,
-				fieldname,
-				event->objectid);
-		break;
-	default:
-		return ret;
+		case EVENT_OBJECT_DHOST:
+			zbx_snprintf(sql, sizeof(sql),
+					"select %s"
+					" from drules r,dhosts h,dservices s"
+					" where r.druleid=h.druleid"
+						" and h.dhostid=s.dhostid"
+						" and h.dhostid=" ZBX_FS_UI64
+					" order by s.dserviceid",
+					fieldname,
+					event->objectid);
+			break;
+		case EVENT_OBJECT_DSERVICE:
+			zbx_snprintf(sql, sizeof(sql),
+					"select %s"
+					" from drules r,dhosts h,dservices s"
+					" where r.druleid=h.druleid"
+						" and h.dhostid=s.dhostid"
+						" and s.dserviceid=" ZBX_FS_UI64,
+					fieldname,
+					event->objectid);
+			break;
+		default:
+			return ret;
 	}
 
 	result = DBselectN(sql, 1);
@@ -2074,6 +2074,7 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 #define MVAR_DISCOVERY_SERVICE_STATUS	"{DISCOVERY.SERVICE.STATUS}"
 #define MVAR_DISCOVERY_SERVICE_UPTIME	"{DISCOVERY.SERVICE.UPTIME}"
 #define MVAR_DISCOVERY_DEVICE_IPADDRESS	"{DISCOVERY.DEVICE.IPADDRESS}"
+#define MVAR_DISCOVERY_DEVICE_DNS	"{DISCOVERY.DEVICE.DNS}"
 #define MVAR_DISCOVERY_DEVICE_STATUS	"{DISCOVERY.DEVICE.STATUS}"
 #define MVAR_DISCOVERY_DEVICE_UPTIME	"{DISCOVERY.DEVICE.UPTIME}"
 
@@ -2336,6 +2337,8 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 					ret = DBget_drule_value_by_event(event, &replace_to, "name");
 				else if (0 == strcmp(m, MVAR_DISCOVERY_DEVICE_IPADDRESS))
 					ret = DBget_dhost_value_by_event(event, &replace_to, "s.ip");
+				else if (0 == strcmp(m, MVAR_DISCOVERY_DEVICE_DNS))
+					ret = DBget_dhost_value_by_event(event, &replace_to, "s.dns");
 				else if (0 == strcmp(m, MVAR_DISCOVERY_DEVICE_STATUS))
 				{
 					if (SUCCEED == (ret = DBget_dhost_value_by_event(event, &replace_to, "h.status")))

@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -723,18 +723,19 @@ COpt::memoryPick();
 
 			DB::insert('items_applications', $apps_insert);
 
-
-			$child_applications = array();
 			foreach($itemids as $inum => $itemid){
 				$db_childs = DBselect('SELECT itemid, hostid FROM items WHERE templateid=' . $itemid);
 
-				if($child = DBfetch($db_childs)){
+				while($child = DBfetch($db_childs)){
 					$sql = 'SELECT a1.applicationid ' .
 							' FROM applications a1, applications a2 ' .
 							' WHERE a1.name=a2.name ' .
 								' AND a1.hostid=' . $child['hostid'] .
 								' AND ' . DBcondition('a2.applicationid', $applicationids);
 					$db_apps = DBselect($sql);
+
+					$child_applications = array();
+
 					while($app = DBfetch($db_apps)){
 						$child_applications[] = $app;
 					}
