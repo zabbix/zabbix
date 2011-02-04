@@ -304,7 +304,8 @@ static int	run_remote_command(DC_ITEM *item, char *command, char *error, size_t 
 					zbx_strlcpy(error, "Incorrect format of IPMI command", max_error_len);
 			}
 			else
-				zbx_snprintf(error, max_error_len, "Invalid port number [%s]", item->interface.port_orig);
+				zbx_snprintf(error, max_error_len, "Invalid port number [%s]",
+						item->interface.port_orig);
 
 			zbx_free(port);
 			zbx_free(item->interface.addr);
@@ -343,7 +344,8 @@ static int	run_remote_command(DC_ITEM *item, char *command, char *error, size_t 
 				zbx_free(item->key);
 			}
 			else
-				zbx_snprintf(error, max_error_len, "Invalid port number [%s]", item->interface.port_orig);
+				zbx_snprintf(error, max_error_len, "Invalid port number [%s]",
+						item->interface.port_orig);
 
 			zbx_free(port);
 			zbx_free(item->interface.addr);
