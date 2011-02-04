@@ -95,8 +95,10 @@ return (GROUP_GUI_ACCESS_DISABLED == $res)?false:true;
 function get_user_auth($userid){
 	global $USER_DETAILS;
 
-	if(($userid == $USER_DETAILS['userid']) && isset($USER_DETAILS['gui_access'])) return $USER_DETAILS['gui_access'];
-	else $result = GROUP_GUI_ACCESS_SYSTEM;
+	if(isset($USER_DETAILS['userid']) && ($userid == $USER_DETAILS['userid']) && isset($USER_DETAILS['gui_access']))
+		return $USER_DETAILS['gui_access'];
+	else
+		$result = GROUP_GUI_ACCESS_SYSTEM;
 
 	$sql = 'SELECT MAX(g.gui_access) as gui_access '.
 		' FROM usrgrp g, users_groups ug '.

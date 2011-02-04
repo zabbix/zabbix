@@ -73,7 +73,6 @@ $page['file']	= 'index.php';
 
 		if($login){
 			$url = is_null($request) ? CWebUser::$data['url'] : $request;
-
 			jsRedirect($url);
 			exit();
 		}

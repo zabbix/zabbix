@@ -106,39 +106,45 @@ include_once('include/page_header.php');
 	else if($_REQUEST['config']==ZBX_AUTH_LDAP){
 		if(isset($_REQUEST['save'])){
 			$alias = get_request('user', $USER_DETAILS['alias']);
-			$passwd = get_request('user_password','');
+			$passwd = get_request('user_password', '');
 
-			$config=select_config();
-			$cur_auth_type = $config['authentication_type'] ;
+			try{
+				$config = select_config();
+				$cur_auth_type = $config['authentication_type'];
 
-			foreach($config as $id => $value){
-				if(isset($_REQUEST[$id])){
-					$config[$id] = $_REQUEST[$id];
-					$ldap_cnf[str_replace('ldap_','',$id)] = $_REQUEST[$id];
+				foreach($config as $id => $value){
+					if(isset($_REQUEST[$id])){
+						$config[$id] = $_REQUEST[$id];
+						$ldap_cnf[str_replace('ldap_','',$id)] = $_REQUEST[$id];
+					}
+					else{
+						unset($config[$id]);
+					}
 				}
-				else{
-					unset($config[$id]);
-				}
-			}
 
-			$result = true;
-			if(ZBX_AUTH_LDAP == $config['authentication_type']){
-				$result = API::User()->ldapLogin(array('user'=>$alias,'password'=>$passwd,'cnf'=>$ldap_cnf));
-			}
+				if(ZBX_AUTH_LDAP == $config['authentication_type']){
+					$login = API::User()->ldapLogin(array(
+						'user' => $alias,
+						'password' => $passwd,
+						'cnf' => $ldap_cnf
+					));
+					if(!$login) throw new Exception();
+				}
 
 // If we do save and auth_type changed, reset all sessions
-			if($result && ($cur_auth_type<>$config['authentication_type'])){
-				DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid<>'.zbx_dbstr($USER_DETAILS['sessionid']));
+				if($cur_auth_type <> $config['authentication_type']){
+					DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid<>'.zbx_dbstr($USER_DETAILS['sessionid']));
+				}
+
+				if(!update_config($config)){
+					throw new Exception();
+				}
+
+				show_messages(true, _('LDAP updated.'), null);
+				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ZABBIX_CONFIG, _('LDAP'));
 			}
-
-			if($result){
-				$result=update_config($config);
-			}
-
-			show_messages($result, S_LDAP.SPACE.S_UPDATED, S_LDAP.SPACE.S_WAS_NOT.SPACE.S_UPDATED);
-
-			if($result){
-				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,S_LDAP);
+			catch(Exception $e){
+				show_messages(false, null, _('LDAP was not updated.'));
 			}
 		}
 		else if(isset($_REQUEST['test'])){
@@ -152,9 +158,13 @@ include_once('include/page_header.php');
 				}
 			}
 
-			$result = API::User()->ldapLogin(array('user'=>$alias,'password'=>$passwd,'cnf'=>$ldap_cnf));
+			$result = API::User()->ldapLogin(array(
+				'user' => $alias,
+				'password' => $passwd,
+				'cnf' => $ldap_cnf
+			));
 
-			show_messages($result, S_LDAP.SPACE.S_LOGIN.SPACE.S_SUCCESSFUL_SMALL, S_LDAP.SPACE.S_LOGIN.SPACE.S_WAS_NOT.SPACE.S_SUCCESSFUL_SMALL);
+			show_messages($result, _('LDAP login successful.'), _('LDAP login was not successful.'));
 		}
 	}
 	else if(ZBX_AUTH_HTTP==$_REQUEST['config']){
