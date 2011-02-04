@@ -192,7 +192,7 @@ ZBX_MUTEX	node_sync_access;
  ******************************************************************************/
 static void	init_config()
 {
-	static struct cfg_line cfg[] =
+	static struct cfg_line	cfg[] =
 	{
 		/* PARAMETER,			VAR,					FUNC,
 			TYPE,		MANDATORY,	MIN,			MAX */
