@@ -147,7 +147,7 @@ require_once('include/templates/scriptConfirm.js.php');
 			$parent_maps = array();
 			foreach($maps as $sysmapid => $map){
 				foreach($map['selements'] as $enum => $selement){
-					if(($selement['elementid'] == $_REQUEST['sysmapid']) && ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP)){
+					if((bccomp($selement['elementid'],$_REQUEST['sysmapid']) == 0) && ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP)){
 						$parent_maps[] = SPACE.SPACE;
 						$parent_maps[] = new Clink($map['name'], 'maps.php?sysmapid='.$map['sysmapid'].'&fullscreen='.$_REQUEST['fullscreen']);
 						break;
