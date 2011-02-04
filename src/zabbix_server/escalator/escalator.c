@@ -291,7 +291,8 @@ static int	run_remote_command(DC_ITEM *item, char *command, char *error, size_t 
 		if (SUCCEED == (ret = DCconfig_get_interface_by_type(&item->interface, item->host.hostid,
 				INTERFACE_TYPE_IPMI, 1)))
 		{
-			item->interface.addr = strdup(item->interface.useip ? item->interface.ip_orig : item->interface.dns_orig);
+			item->interface.addr = strdup(item->interface.useip ? item->interface.ip_orig :
+					item->interface.dns_orig);
 			substitute_simple_macros(NULL, NULL, &item->host, NULL,
 					&item->interface.addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
 
@@ -324,9 +325,8 @@ static int	run_remote_command(DC_ITEM *item, char *command, char *error, size_t 
 		if (SUCCEED == (ret = DCconfig_get_interface_by_type(&item->interface, item->host.hostid,
 				INTERFACE_TYPE_AGENT, 1)))
 		{
-			item->interface.addr = strdup(item->interface.useip ? item->interface.ip_orig : item->interface.dns_orig);
-			substitute_simple_macros(NULL, NULL, &item->host, NULL,
-					&item->interface.addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
+			item->interface.addr = (item->interface.useip ? item->interface.ip_orig :
+					item->interface.dns_orig);
 
 			port = strdup(item->interface.port_orig);
 			substitute_simple_macros(NULL, &item->host.hostid, NULL, NULL,
@@ -353,7 +353,6 @@ static int	run_remote_command(DC_ITEM *item, char *command, char *error, size_t 
 						item->interface.port_orig);
 
 			zbx_free(port);
-			zbx_free(item->interface.addr);
 		}
 		else
 			zbx_snprintf(error, max_error_len, "Zabbix Agent interface is not defined for host [%s]", item->host.host);
