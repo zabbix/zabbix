@@ -954,13 +954,10 @@ Copt::memoryPick();
  */
 	public function login($user){
 		global $ZBX_LOCALNODEID;
-		global $ZBX_NODES;
-
-		$config = select_config();
+		global $USER_DETAILS;
 
 		$name = $user['user'];
 		$password = md5($user['password']);
-		$auth_type = $config['authentication_type'];
 
 		$sql = 'SELECT u.userid, u.attempt_failed, u.attempt_clock, u.attempt_ip'.
 				' FROM users u '.
@@ -971,11 +968,13 @@ Copt::memoryPick();
 //							' OR (attempt_failed>'.(ZBX_LOGIN_ATTEMPTS-1).
 //									' AND ('.time().'-attempt_clock)>'.ZBX_LOGIN_BLOCK.'))';
 		$userInfo = DBfetch(DBselect($sql));
-
 		if(!$userInfo){
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Login name or password is incorrect'));
 		}
 
+		$USER_DETAILS['userid'] = $userInfo['userid'];
+
+// check if user is blocked
 		if($userInfo['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS){
 			if((time() - $userInfo['attempt_clock']) < ZBX_LOGIN_BLOCK){
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Account is blocked for %s seconds', (ZBX_LOGIN_BLOCK - (time() - $userInfo['attempt_clock']))));
@@ -985,19 +984,32 @@ Copt::memoryPick();
 			}
 		}
 
+// check system permissions
 		if(!check_perm2system($userInfo['userid']))
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions for system access.'));
 
 
+		$sql = 'SELECT MAX(g.gui_access) as gui_access '.
+			' FROM usrgrp g, users_groups ug '.
+			' WHERE ug.userid='.$userInfo['userid'].
+				' AND g.usrgrpid=ug.usrgrpid ';
+		$db_access = DBfetch(DBselect($sql));
+		if(!zbx_empty($db_access['gui_access'])){
+			$guiAccess = $db_access['gui_access'];
+		}
+		else{
+			$guiAccess = GROUP_GUI_ACCESS_SYSTEM;
+		}
 
-		if($auth_type != ZBX_AUTH_HTTP){
-			switch(get_user_auth($userInfo['userid'])){
-				case GROUP_GUI_ACCESS_INTERNAL:
-					$auth_type = ZBX_AUTH_INTERNAL;
-					break;
-				case GROUP_GUI_ACCESS_SYSTEM:
-				case GROUP_GUI_ACCESS_DISABLED:
-			}
+		switch($guiAccess){
+			case GROUP_GUI_ACCESS_INTERNAL:
+				$auth_type = ZBX_AUTH_INTERNAL;
+				break;
+			case GROUP_GUI_ACCESS_DISABLED:
+			case GROUP_GUI_ACCESS_SYSTEM:
+				$config = select_config();
+				$auth_type = $config['authentication_type'];
+				break;
 		}
 
 		try{
@@ -1030,40 +1042,16 @@ Copt::memoryPick();
 
 		$sessionid = zbx_session_start($userInfo['userid'], $name, $password);
 
-		$sql = 'SELECT u.userid, u.alias, u.name, u.surname, u.url, u.autologin, u.autologout, u.lang, u.refresh, u.type,'.
-			' u.theme, u.attempt_failed, u.attempt_ip, u.attempt_clock, u.rows_per_page, s.sessionid, s.lastaccess,'.
-			' s.status'.
-			' FROM sessions s,users u'.
-			' WHERE s.sessionid='.zbx_dbstr($sessionid).
-				' AND s.status='.ZBX_SESSION_ACTIVE.
-				' AND s.userid=u.userid'.
-				' AND ((s.lastaccess+u.autologout>'.time().') OR (u.autologout=0))'.
-				' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);
-		$userData = DBfetch(DBselect($sql));
 
+		add_audit(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, _s('Correct login [%s]', $name));
+
+
+		$userData = $this->_getUserData($userInfo['userid']);
 		$userData['sessionid'] = $sessionid;
+		$userData['gui_access'] = $guiAccess;
 
-		$sql = 'SELECT ug.userid '.
-			' FROM usrgrp g, users_groups ug '.
-			' WHERE ug.userid = '.$userData['userid'].
-				' AND g.usrgrpid = ug.usrgrpid '.
-				' AND g.debug_mode = '.GROUP_DEBUG_MODE_ENABLED;
-		$userData['debug_mode'] = (bool) DBfetch(DBselect($sql));
-
-		if(isset($ZBX_NODES[$ZBX_LOCALNODEID])){
-			$userData['node'] = $ZBX_NODES[$ZBX_LOCALNODEID];
-		}
-		else{
-			$userData['node'] = array();
-			$userData['node']['name'] = '- unknown -';
-			$userData['node']['nodeid'] = $ZBX_LOCALNODEID;
-		}
-
-		if($userInfo['attempt_failed']){
+		if($userInfo['attempt_failed'])
 			DBexecute('UPDATE users SET attempt_failed=0 WHERE userid='.$userInfo['userid']);
-		}
-
-		add_audit(AUDIT_ACTION_LOGIN,AUDIT_RESOURCE_USER, _s('Correct login [%s]', $name));
 
 		return $userData;
 	}
@@ -1075,44 +1063,64 @@ Copt::memoryPick();
  */
 	public function checkAuthentication($sessionid){
 		global $ZBX_LOCALNODEID;
-		global $ZBX_NODES;
 
-		$sql = 'SELECT u.userid, u.alias, u.name, u.surname, u.url, u.autologin, u.autologout, u.lang, u.refresh, u.type,'.
-				' u.theme, u.attempt_failed, u.attempt_ip, u.attempt_clock, u.rows_per_page, s.sessionid, s.lastaccess,'.
-				' s.status'.
-				' FROM sessions s,users u'.
+		$sql = 'SELECT u.userid, u.autologout'.
+				' FROM sessions s, users u'.
 				' WHERE s.sessionid='.zbx_dbstr($sessionid).
 					' AND s.status='.ZBX_SESSION_ACTIVE.
 					' AND s.userid=u.userid'.
 					' AND ((s.lastaccess+u.autologout>'.time().') OR (u.autologout=0))'.
 					' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);
-		$userData = DBfetch(DBselect($sql));
+		$userInfo = DBfetch(DBselect($sql));
 
-		if(!$userData)
+		if(!$userInfo)
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
 
-		if(!check_perm2system($userData['userid']))
+		if(!check_perm2system($userInfo['userid']))
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions for system access.'));
 
 
 		DBexecute('UPDATE sessions SET lastaccess='.time().' WHERE sessionid='.zbx_dbstr($sessionid));
 
-		if($userData['autologout'] > 0){
-			DBexecute('DELETE FROM sessions WHERE userid='.$userData['userid'].' AND status='.ZBX_SESSION_ACTIVE.' AND lastaccess<'.(time() - $userData['autologout']));
+		if($userInfo['autologout'] > 0){
+			DBexecute('DELETE FROM sessions WHERE userid='.$userInfo['userid'].' AND status='.ZBX_SESSION_ACTIVE.' AND lastaccess<'.(time() - $userInfo['autologout']));
 		}
 
-		if(isset($ZBX_NODES[$ZBX_LOCALNODEID])){
-			$userData['node'] = $ZBX_NODES[$ZBX_LOCALNODEID];
+
+		$sql = 'SELECT MAX(g.gui_access) as gui_access '.
+			' FROM usrgrp g, users_groups ug '.
+			' WHERE ug.userid='.$userInfo['userid'].
+				' AND g.usrgrpid=ug.usrgrpid ';
+		$db_access = DBfetch(DBselect($sql));
+		if(!zbx_empty($db_access['gui_access'])){
+			$guiAccess = $db_access['gui_access'];
 		}
 		else{
-			$userData['node'] = array();
-			$userData['node']['name'] = '- unknown -';
-			$userData['node']['nodeid'] = $ZBX_LOCALNODEID;
+			$guiAccess = GROUP_GUI_ACCESS_SYSTEM;
 		}
+
+
+		$userData = $this->_getUserData($userInfo['userid']);
+		$userData['sessionid'] = $sessionid;
+		$userData['gui_access'] = $guiAccess;
+
+		return $userData;
+	}
+
+	private function _getUserData($userid){
+		global $ZBX_LOCALNODEID;
+		global $ZBX_NODES;
+
+		$sql = 'SELECT u.userid, u.alias, u.name, u.surname, u.url, u.autologin, u.autologout, u.lang, u.refresh, u.type,'.
+				' u.theme, u.attempt_failed, u.attempt_ip, u.attempt_clock, u.rows_per_page'.
+				' FROM users u'.
+				' WHERE u.userid='.$userid;
+		$userData = DBfetch(DBselect($sql));
+
 
 		$sql = 'SELECT ug.userid '.
 			' FROM usrgrp g, users_groups ug '.
-			' WHERE ug.userid = '.$userData['userid'].
+			' WHERE ug.userid = '.$userid.
 				' AND g.usrgrpid = ug.usrgrpid '.
 				' AND g.debug_mode = '.GROUP_DEBUG_MODE_ENABLED;
 		$userData['debug_mode'] = (bool) DBfetch(DBselect($sql));
@@ -1123,7 +1131,17 @@ Copt::memoryPick();
 					: $_SERVER['REMOTE_ADDR'];
 
 
+		if(isset($ZBX_NODES[$ZBX_LOCALNODEID])){
+			$userData['node'] = $ZBX_NODES[$ZBX_LOCALNODEID];
+		}
+		else{
+			$userData['node'] = array();
+			$userData['node']['name'] = '- unknown -';
+			$userData['node']['nodeid'] = $ZBX_LOCALNODEID;
+		}
+
 		return $userData;
+
 	}
 
 }
