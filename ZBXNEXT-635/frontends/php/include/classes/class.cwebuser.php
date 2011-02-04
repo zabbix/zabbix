@@ -1,6 +1,6 @@
 <?php
 
-class CWebUser {
+class CWebUser{
 
 	public static $data = null;
 
@@ -66,6 +66,8 @@ class CWebUser {
 				error(_('GUI access disabled.'));
 				throw new Exception();
 			}
+
+			zbx_setcookie('zbx_sessionid', $sessionid, self::$data['autologin'] ? (time()+86400*31) : 0);
 
 			self::makeGlobal();
 			return true;

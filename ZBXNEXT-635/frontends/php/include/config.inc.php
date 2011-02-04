@@ -147,9 +147,6 @@ function __autoload($class_name){
 
 	set_error_handler('zbx_err_handler');
 
-	unset($show_setup);
-
-
 	if(defined('ZBX_DENY_GUI_ACCESS')){
 		if(isset($ZBX_GUI_ACCESS_IP_RANGE) && is_array($ZBX_GUI_ACCESS_IP_RANGE)){
 			$user_ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))?($_SERVER['HTTP_X_FORWARDED_FOR']):($_SERVER['REMOTE_ADDR']);
