@@ -47,7 +47,7 @@ require_once('include/templates/action.js.php');
 	$actionList->addRow(S_NAME, new CTextBox('name', $data['name'], $inputLength));
 
 	if(EVENT_SOURCE_TRIGGERS == $data['eventsource']){
-		$actionList->addRow(_('Period (minimal 60 seconds)'), array(new CNumericBox('esc_period', $data['esc_period'], 6, 'no'), ' ('.S_SECONDS_SMALL.')'));
+		$actionList->addRow(_('Period (minimum 60 seconds)'), array(new CNumericBox('esc_period', $data['esc_period'], 6, 'no'), ' ('.S_SECONDS_SMALL.')'));
 	}
 	else{
 		$frmAction->addVar('esc_period', 0);
@@ -457,7 +457,7 @@ require_once('include/templates/action.js.php');
 				_('Period'),
 				new CCol(array(
 					new CNumericBox('new_operation[esc_period]', $new_operation['esc_period'], 5),
-					_('(mininum 60, 0 - use action default)')))
+					_('(mininum 60 seconds, 0 - use action default)')))
 			));
 
 			$tblOper->addRow(array(S_STEP, $tblStep));

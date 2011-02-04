@@ -95,7 +95,7 @@
 	<td> <?php print(_('Target')); ?> </td>
 	<td>
 		<select name="opCmdTarget" class="input select">
-			<option value="0"><?php print(_('Current Host')); ?></option>
+			<option value="0"><?php print(_('Current host')); ?></option>
 			<option value="1"><?php print(_('Host')); ?></option>
 			<option value="2"><?php print(_('Host group')); ?></option>
 		</select>
