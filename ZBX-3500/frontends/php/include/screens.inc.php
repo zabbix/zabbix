@@ -1513,6 +1513,10 @@ require_once('include/js.inc.php');
 					$item->setTimeZone($timeZone);
 					$item->setTimeOffset($timeOffset);
 
+					$item = array($item);
+					if($editmode == 1)
+						$item[] = BR();
+						$item[] = new CLink(S_CHANGE,$action);
 				}
 				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_SCREEN) ){
 					$subScreens = CScreen::get(array(
