@@ -2217,11 +2217,11 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$units		= get_request('units'		,'');
 
 		// Authentication method, User name, Public key file, Private key file, Password
-		$authtype		= get_request('authtype', '');
+		$authtype = get_request('authtype', '');
 		$username = get_request('username', '');
 		$password = get_request('password', '');
-		$publickey		= get_request('publickey', '');
-		$privatekey		= get_request('privatekey', '');
+		$publickey = get_request('publickey', '');
+		$privatekey = get_request('privatekey', '');
 
 		$valuemapid	= get_request('valuemapid'	,0);
 		$delta		= get_request('delta'		,0);
@@ -2316,18 +2316,18 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 		// Authentication method, User name, Public key file, Private key file, Password
 		$cmbAuthType = new CComboBox('authtype', $authtype);
-		$cmbAuthType->addItem(ITEM_AUTHTYPE_PASSWORD,S_PASSWORD);
-		$cmbAuthType->addItem(ITEM_AUTHTYPE_PUBLICKEY,S_PUBLIC_KEY);
-		$frmItem->addRow(array( new CVisibilityBox('authtype_visible', get_request('authtype_visible'), 'authtype', S_ORIGINAL), S_AUTHENTICATION_METHOD),
+		$cmbAuthType->addItem(ITEM_AUTHTYPE_PASSWORD, S_PASSWORD);
+		$cmbAuthType->addItem(ITEM_AUTHTYPE_PUBLICKEY, S_PUBLIC_KEY);
+		$frmItem->addRow(array(new CVisibilityBox('authtype_visible', get_request('authtype_visible'), 'authtype', S_ORIGINAL), S_AUTHENTICATION_METHOD),
 			$cmbAuthType);
-		$frmItem->addRow(array( new CVisibilityBox('username_visible', get_request('username_visible'), 'username', S_ORIGINAL), S_USER_NAME),
-			new CTextBox('username',$username,40));
-		$frmItem->addRow(array( new CVisibilityBox('password_visible', get_request('password_visible'), 'password', S_ORIGINAL), S_PASSWORD),
-			new CTextBox('password',$password,40));
-		$frmItem->addRow(array( new CVisibilityBox('publickey_visible', get_request('publickey_visible'), 'publickey', S_ORIGINAL), S_PUBLIC_KEY_FILE),
-			new CTextBox('publickey',$publickey,40));
-		$frmItem->addRow(array( new CVisibilityBox('privatekey_visible', get_request('privatekey_visible'), 'privatekey', S_ORIGINAL), S_PRIVATE_KEY_FILE),
-			new CTextBox('privatekey',$privatekey,40));
+		$frmItem->addRow(array(new CVisibilityBox('username_visible', get_request('username_visible'), 'username', S_ORIGINAL), S_USER_NAME),
+			new CTextBox('username', $username, 40));
+		$frmItem->addRow(array(new CVisibilityBox('password_visible', get_request('password_visible'), 'password', S_ORIGINAL), S_PASSWORD),
+			new CTextBox('password', $password, 40));
+		$frmItem->addRow(array(new CVisibilityBox('publickey_visible', get_request('publickey_visible'), 'publickey', S_ORIGINAL), S_PUBLIC_KEY_FILE),
+			new CTextBox('publickey', $publickey, 40));
+		$frmItem->addRow(array(new CVisibilityBox('privatekey_visible', get_request('privatekey_visible'), 'privatekey', S_ORIGINAL), S_PRIVATE_KEY_FILE),
+			new CTextBox('privatekey', $privatekey, 40));
 
 		$frmItem->addRow(array( new CVisibilityBox('formula_visible', get_request('formula_visible'), 'formula', S_ORIGINAL),
 			S_CUSTOM_MULTIPLIER.' (0 - '.S_DISABLED.')'), new CTextBox('formula',$formula,40));
