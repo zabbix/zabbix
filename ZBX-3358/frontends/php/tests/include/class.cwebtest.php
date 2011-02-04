@@ -66,7 +66,8 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 	{
 		global $DB;
 
-		$this->setHost('localhost');
+		//$this->setHost('localhost');
+		$this->setHost('192.168.3.32');
 		$this->setBrowser('*firefox');
 		if(strstr(PHPUNIT_URL,'http://'))
 		{
