@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ require_once('include/html.inc.php');
 
 if(isset($_REQUEST['csv_export'])){
 	$CSV_EXPORT = true;
+	$csvRows = array();
 
 	$page['type'] = detect_page_type(PAGE_TYPE_CSV);
 	$page['file'] = 'zbx_events_export.csv';
@@ -317,7 +318,7 @@ include_once('include/page_header.php');
 
 // OBJECT DHOST
 			$dhosts = array();
-			$sql = 'SELECT s.dserviceid, s.dhostid, s.ip '.
+			$sql = 'SELECT s.dserviceid,s.dhostid,s.ip,s.dns '.
 					' FROM dservices s '.
 					' WHERE '.DBcondition('s.dhostid', $objectids);
 			$res = DBselect($sql);
@@ -327,7 +328,7 @@ include_once('include/page_header.php');
 
 // OBJECT DSERVICE
 			$dservices = array();
-			$sql = 'SELECT s.dserviceid,s.ip,s.type,s.port '.
+			$sql = 'SELECT s.dserviceid,s.ip,s.dns,s.type,s.port '.
 					' FROM dservices s '.
 					' WHERE '.DBcondition('s.dserviceid', $objectids);
 			$res = DBselect($sql);
@@ -339,20 +340,19 @@ include_once('include/page_header.php');
 			$table->setHeader(array(
 				S_TIME,
 				S_IP,
+				S_DNS,
 				S_DESCRIPTION,
 				S_STATUS
 			));
 
 			if($CSV_EXPORT){
-				$csv_return = '';
-
-				$tbHeader = array(
+				$csvRows[] = array(
 					S_TIME,
 					S_IP,
+					S_DNS,
 					S_DESCRIPTION,
 					S_STATUS
 				);
-				$csv_return .= zbx_toCSV($tbHeader);
 			}
 
 			foreach($dsc_events as $num => $event_data){
@@ -363,6 +363,7 @@ include_once('include/page_header.php');
 						}
 						else{
 							$event_data['object_data']['ip'] = S_UNKNOWN;
+							$event_data['object_data']['dns'] = S_UNKNOWN;
 						}
 						$event_data['description'] = S_HOST;
 						break;
@@ -372,12 +373,15 @@ include_once('include/page_header.php');
 						}
 						else{
 							$event_data['object_data']['ip'] = S_UNKNOWN;
+							$event_data['object_data']['dns'] = S_UNKNOWN;
 							$event_data['object_data']['type'] = S_UNKNOWN;
 							$event_data['object_data']['port'] = S_UNKNOWN;
 						}
 
-						$event_data['description'] = S_SERVICE.': '.discovery_check_type2str($event_data['object_data']['type']).'; '.
-							S_PORT.': '.$event_data['object_data']['port'];
+						$event_data['description'] = S_SERVICE.': '.
+								discovery_check_type2str($event_data['object_data']['type']).
+								discovery_port2str($event_data['object_data']['type'], $event_data['object_data']['port']);
+
 						break;
 					default:
 						continue;
@@ -387,18 +391,19 @@ include_once('include/page_header.php');
 				$table->addRow(array(
 					zbx_date2str(S_EVENTS_DISCOVERY_TIME_FORMAT,$event_data['clock']),
 					$event_data['object_data']['ip'],
+					zbx_empty($event_data['object_data']['dns']) ? SPACE : $event_data['object_data']['dns'],
 					$event_data['description'],
 					new CCol(discovery_value($event_data['value']), discovery_value_style($event_data['value']))
 				));
 
 				if($CSV_EXPORT){
-					$tbHeader = array(
+					$csvRows[] = array(
 						zbx_date2str(S_EVENTS_DISCOVERY_TIME_FORMAT,$event_data['clock']),
 						$event_data['object_data']['ip'],
+						$event_data['object_data']['dns'],
 						$event_data['description'],
 						discovery_value($event_data['value'])
 					);
-					$csv_return .= zbx_toCSV($tbHeader);
 				}
 
 
@@ -420,8 +425,6 @@ include_once('include/page_header.php');
 
 
 			if($CSV_EXPORT){
-				$csvRows = array();
-
 				$csvRows[] = array(
 					S_TIME,
 					is_show_all_nodes()?S_NODE:null,

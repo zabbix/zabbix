@@ -1,6 +1,6 @@
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@
 static int	get_hostid_by_host(const char *host, const char *ip, unsigned short port,
 		zbx_uint64_t *hostid, char *error, unsigned char zbx_process)
 {
-	char		*host_esc;
+	char		*host_esc, dns[INTERFACE_DNS_LEN_MAX];
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		res = FAIL;
@@ -89,15 +89,19 @@ static int	get_hostid_by_host(const char *host, const char *ip, unsigned short p
 		if (0 == strncmp("::ffff:", ip, 7) && SUCCEED == is_ip4(ip + 7))
 			ip += 7;
 
+		alarm(CONFIG_TIMEOUT);
+		zbx_gethost_by_ip(ip, dns, sizeof(dns));
+		alarm(0);
+
 		DBbegin();
 
 		if (0 != (zbx_process & ZBX_PROCESS_SERVER))
 		{
-			DBregister_host(0, host, ip, port, (int)time(NULL));
+			DBregister_host(0, host, ip, dns, port, (int)time(NULL));
 		}
 		else if (0 != (zbx_process & ZBX_PROCESS_PROXY))
 		{
-			DBproxy_register_host(host, ip, port);
+			DBproxy_register_host(host, ip, dns, port);
 		}
 
 		DBcommit();

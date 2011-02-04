@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -137,7 +137,7 @@ class testPageMaps extends CWebTest
 	{
 		$sysmapid=$map['sysmapid'];
 
-		DBsave_tables(array('sysmaps','sysmaps_elements','sysmaps_links','sysmaps_link_triggers'));
+		DBsave_tables(array('sysmaps','sysmaps_elements','sysmaps_links','sysmaps_link_triggers','screens_items'));
 
 		$this->chooseOkOnNextConfirmation();
 
@@ -160,8 +160,10 @@ class testPageMaps extends CWebTest
 		$this->assertEquals(0,DBcount($sql),'Data from sysmaps_links table was not deleted');
 		$sql="select * from sysmaps_link_triggers where linkid in (select linkid from sysmaps_links where sysmapid=$sysmapid) order by linktriggerid";
 		$this->assertEquals(0,DBcount($sql),'Data from sysmaps_link_triggers table was not deleted');
+		$sql="select * from screens_items where resourcetype=".SCREEN_RESOURCE_MAP." and resourceid=$sysmapid;";
+		$this->assertEquals(0,DBcount($sql),'Data from screens_items table was not deleted');
 
-		DBsave_tables(array('sysmaps','sysmaps_elements','sysmaps_links','sysmaps_link_triggers'));
+		DBsave_tables(array('sysmaps','sysmaps_elements','sysmaps_links','sysmaps_link_triggers','screens_items'));
 	}
 
 	public function testPageMaps_MassExportAll()

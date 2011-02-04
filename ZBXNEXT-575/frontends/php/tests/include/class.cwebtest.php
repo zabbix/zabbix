@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -167,6 +167,14 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 	{
 		$this->assertSelectHasOption($id,$str);
 		$this->select($id,$str);
+	}
+
+	public function dropdown_select_wait($id,$str)
+	{
+		$selected = $this->getSelectedLabel($id);
+		$this->dropdown_select($id, $str);
+		// Wait only if drop down selection was changed
+		if($selected != $str)	$this->wait();
 	}
 
 	public function wait()

@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -571,6 +571,49 @@ return $caption;
 		}
 	return $value;
 	}
+
+
+/*
+ * Function: utf8RawUrlDecode
+ *
+ * Description:
+ *	 unescape Raw URL
+ *
+ * Author: Vlad
+ */
+function utf8RawUrlDecode($source){
+	$decodedStr = "";
+	$pos = 0;
+	$len = strlen($source);
+	while($pos < $len){
+		$charAt = substr($source, $pos, 1);
+		if($charAt == '%'){
+			$pos++;
+			$charAt = substr($source, $pos, 1);
+			if($charAt == 'u'){
+				// we got a unicode character
+				$pos++;
+				$unicodeHexVal = substr($source, $pos, 4);
+				$unicode = hexdec($unicodeHexVal);
+				$entity = "&#" . $unicode . ';';
+				$decodedStr .= html_entity_decode(  utf8_encode($entity), ENT_COMPAT, 'UTF-8' );
+				$pos += 4;
+			}
+			else{
+				// we have an escaped ascii character
+				// $hexVal = substr($source, $pos, 2);
+				// $decodedStr .= chr(hexdec($hexVal));
+				// $pos += 2;
+				$decodedStr .= substr($source, $pos-1, 1);
+			}
+		}
+		else{
+			$decodedStr .= $charAt;
+			$pos++;
+		}
+	}
+	return $decodedStr;
+}
 
 /*
  * Function: zbx_get_params
@@ -2766,7 +2809,7 @@ return $caption;
  * Comments:
  *
  */
-	function build_expression_html_tree($expression, &$treeLevel, $level, &$next, &$nextletter) {
+	function build_expression_html_tree($expression, &$treeLevel, $level, &$next, &$nextletter, &$secondLetters=null) {
 		$treeList = Array();
 		$outline = '';
 		$expr = Array();
@@ -2784,7 +2827,7 @@ return $caption;
 
 			if(count($parts) == 1 && $sStart == $fPart['openSymbolNum'] && $sEnd == $fPart['closeSymbolNum']) {
 				$next[$level] = false;
-				list($outline, $treeList) = build_expression_html_tree($expression, $fPart, $level, $next, $nextletter);
+				list($outline, $treeList) = build_expression_html_tree($expression, $fPart, $level, $next, $nextletter, $secondLetters);
 				$outline = (isset($treeLevel['openSymbol']) && $treeLevel['levelType'] == 'grouping' ? $treeLevel['openSymbol'].' ' : '').$outline.(isset($treeLevel['closeSymbol'])  && $treeLevel['levelType'] == 'grouping' ? ' '.$treeLevel['closeSymbol'] : '');
 				return Array($outline, $treeList);
 			}
@@ -2851,7 +2894,7 @@ return $caption;
 
 //					SDI('>>>>>>>>>>>>>>>>>>>newTreeLevel parts count:'.(isset($newTreeLevel['parts']) ? count($newTreeLevel['parts']) : 0));
 					$next[$level] = is_int($prev) && $prev < $sEnd ? true : false;
-					list($outln, $treeLst) = build_expression_html_tree($expression, $newTreeLevel, $level+1, $next, $nextletter);
+					list($outln, $treeLst) = build_expression_html_tree($expression, $newTreeLevel, $level+1, $next, $nextletter, $secondLetters);
 					$treeList = array_merge($treeList, $treeLst);
 					$levelOutline .= trim($outln).(is_int($prev) && $prev < $sEnd ? ' '.$operand.' ':'');
 //					SDI("After {$treeLevel['levelType']} parts:".(isset($treeLevel['parts']) ? count($treeLevel['parts']): 0));
@@ -2860,20 +2903,41 @@ return $caption;
 			}
 		}
 
-		if($letterLevel) {
+		if($letterLevel){
 			if(!$nextletter) $nextletter = 'A';
-			array_push($expr, SPACE, bold($nextletter), SPACE);
+
+			if ($nextletter > 'Z'){
+				if(!$secondLetters) $secondLetters = 'AA';
+				if($secondLetters[1] > 'Z'){
+					$secondLetters[1] = 'A';
+					$secondLetters[0] = chr(ord($secondLetters[0])+1);
+				}
+				if($secondLetters[0] > 'Z') $secondLetters[0] = 'A';
+				$newch = $secondLetters;
+			}
+			else{
+				$newch = $nextletter;
+			}
+
+			array_push($expr, SPACE, bold($newch), SPACE);
 			$expValue = trim(zbx_substr($expression, $treeLevel['openSymbolNum'], $treeLevel['closeSymbolNum']-$treeLevel['openSymbolNum']+1));
 			if(!defined('NO_LINK_IN_TESTING')) {
 				$url =  new CSpan($expValue, 'link');
 				$url->setAttribute('id', 'expr_'.$treeLevel['openSymbolNum'].'_'.$treeLevel['closeSymbolNum']);
 				$url->setAttribute('onclick', 'javascript: copy_expression("expr_'.$treeLevel['openSymbolNum'].'_'.$treeLevel['closeSymbolNum'].'");');
 			}else{
-				$url =  new CSpan($expValue);
+				$url = new CSpan($expValue);
 			}
 			$expr[] = $url;
-			$outline = ' '.$nextletter.' ';
-			$nextletter = chr(ord($nextletter)+1);
+			$glue = '';
+			if(isset($secondLetters[1])){
+				$glue = ($secondLetters[1] == 'A'?"&nbsp;\r\n":' ');
+				$secondLetters[1] = chr(ord($secondLetters[1])+1);
+			}
+			else{
+				$nextletter = chr(ord($nextletter)+1);
+			}
+			$outline = $glue.$newch.' ';
 
 			$levelDetails = Array(
 					'start' => $treeLevel['openSymbolNum'],
