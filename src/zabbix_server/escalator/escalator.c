@@ -451,14 +451,13 @@ static int	get_dynamic_hostid(DB_EVENT *event, DC_ITEM *item, char *error, size_
 		case EVENT_SOURCE_AUTO_REGISTRATION:
 			zbx_snprintf(sql + offset, sizeof(sql) - offset,
 					" from autoreg_host a,hosts h"
-					" where a.proxy_hostid=h.proxy_hostid"
+					" where " ZBX_SQL_NULLCMP("a.proxy_hostid", "h.proxy_hostid")
 						" and a.host=h.host"
 						" and h.status=%d"
 						" and a.autoreg_hostid=" ZBX_FS_UI64
 						DB_NODE,
 					HOST_STATUS_MONITORED, event->objectid,
 					DBnode_local("h.hostid"));
-
 			break;
 		default:
 			zbx_snprintf(error, max_error_len, "Unsupported event source [%d]", event->source);

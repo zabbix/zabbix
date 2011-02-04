@@ -222,6 +222,8 @@ typedef enum {
 #define	ZBX_SQL_STRVAL_NE(str)	"<>", str
 #endif
 
+#define ZBX_SQL_NULLCMP(f1, f2)	"((" f1 " is null and " f2 " is null) or " f1 "=" f2 ")"
+
 #define ZBX_DBROW2UINT64(uint, row)	if (SUCCEED == DBis_null(row))		\
 						uint = 0;			\
 					else					\
