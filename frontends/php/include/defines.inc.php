@@ -259,6 +259,9 @@
 	define('TIMEPERIOD_TYPE_MONTHLY',	4);
 	define('TIMEPERIOD_TYPE_YEARLY',	5);
 
+	define('MAP_LABEL_ADVANCE_OFF',		0);
+	define('MAP_LABEL_ADVANCE_ON',		1);
+
 	define('MAP_LABEL_TYPE_LABEL',		0);
 	define('MAP_LABEL_TYPE_IP',			1);
 	define('MAP_LABEL_TYPE_NAME',		2);
