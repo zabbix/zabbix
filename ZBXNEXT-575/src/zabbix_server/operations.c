@@ -63,9 +63,9 @@ static zbx_uint64_t	select_discovered_host(DB_EVENT *event)
 					DB_NODE
 				" order by i.hostid",
 				event->objectid, DBnode_local("i.interfaceid"));
-		break;
-	case EVENT_OBJECT_DSERVICE:
-		zbx_snprintf(sql, sizeof(sql),
+			break;
+		case EVENT_OBJECT_DSERVICE:
+			zbx_snprintf(sql, sizeof(sql),
 				"select h.hostid"
 				" from hosts h,interface i,dservices ds"
 				" where h.hostid=i.hostid"
@@ -75,9 +75,9 @@ static zbx_uint64_t	select_discovered_host(DB_EVENT *event)
 					DB_NODE
 				" order by i.hostid",
 				event->objectid, DBnode_local("i.interfaceid"));
-		break;
-	default:
-		goto exit;
+			break;
+		default:
+			goto exit;
 	}
 
 	result = DBselectN(sql, 1);
@@ -88,7 +88,7 @@ static zbx_uint64_t	select_discovered_host(DB_EVENT *event)
 	}
 	DBfree_result(result);
 exit:
-	zabbix_log(LOG_LEVEL_DEBUG, "End %s():" ZBX_FS_UI64, __function_name, hostid);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_UI64, __function_name, hostid);
 
 	return hostid;
 }

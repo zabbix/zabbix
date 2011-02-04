@@ -276,8 +276,7 @@ static int	run_remote_command(DC_ITEM *item, char *command, char *error, size_t 
 	int		val;
 #endif
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostname:'%s' command:'%s'",
-			__function_name, item->host.host, command);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostname:'%s' command:'%s'", __function_name, item->host.host, command);
 
 	*error = '\0';
 
@@ -305,8 +304,7 @@ static int	run_remote_command(DC_ITEM *item, char *command, char *error, size_t 
 					zbx_strlcpy(error, "Incorrect format of IPMI command", max_error_len);
 			}
 			else
-				zbx_snprintf(error, max_error_len, "Invalid port number [%s]",
-							item->interface.port_orig);
+				zbx_snprintf(error, max_error_len, "Invalid port number [%s]", item->interface.port_orig);
 
 			zbx_free(port);
 			zbx_free(item->interface.addr);
@@ -317,7 +315,6 @@ static int	run_remote_command(DC_ITEM *item, char *command, char *error, size_t 
 	else
 	{
 #endif
-		zabbix_log(LOG_LEVEL_DEBUG, ZBX_FS_UI64, item->host.hostid);
 		if (SUCCEED == (ret = DCconfig_get_interface_by_type(&item->interface, item->host.hostid,
 				INTERFACE_TYPE_AGENT, 1)))
 		{
@@ -337,7 +334,7 @@ static int	run_remote_command(DC_ITEM *item, char *command, char *error, size_t 
 				init_result(&agent_result);
 
 				alarm(CONFIG_TIMEOUT);
-				if (SUCCEED != (ret = get_value_agent(item, &agent_result)) && GET_MSG_RESULT(&agent_result))
+				if (SUCCEED != (ret = get_value_agent(item, &agent_result)) && ISSET_MSG(&agent_result))
 					zbx_strlcpy(error, agent_result.msg, max_error_len);
 				alarm(0);
 
@@ -345,6 +342,8 @@ static int	run_remote_command(DC_ITEM *item, char *command, char *error, size_t 
 
 				zbx_free(item->key);
 			}
+			else
+				zbx_snprintf(error, max_error_len, "Invalid port number [%s]", item->interface.port_orig);
 
 			zbx_free(port);
 			zbx_free(item->interface.addr);
@@ -395,11 +394,9 @@ static int	get_dynamic_hostid(DB_EVENT *event, DC_ITEM *item, char *error, size_
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		sql[512];
-	int		offset = 0, ret = SUCCEED;
+	int		offset, ret = SUCCEED;
 
-	item->host.hostid = 0;
-
-	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
+	offset = zbx_snprintf(sql, sizeof(sql),
 			"select distinct h.hostid,h.host"
 #ifdef HAVE_OPENIPMI
 				",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
@@ -461,6 +458,8 @@ static int	get_dynamic_hostid(DB_EVENT *event, DC_ITEM *item, char *error, size_
 			zbx_snprintf(error, max_error_len, "Unsupported event source [%d]", event->source);
 			return FAIL;
 	}
+
+	item->host.hostid = 0;
 
 	result = DBselect("%s", sql);
 
@@ -577,8 +576,7 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 			rc = run_remote_command(&item, command, error, sizeof(error));
 
 		if (SUCCEED != rc && '\0' != *error)
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot execute remote command [%s]: %s",
-					command, error);
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot execute remote command [%s]: %s", command, error);
 
 		status = (SUCCEED != rc ? ALERT_STATUS_FAILED : ALERT_STATUS_SENT);
 		if (ALERT_STATUS_SENT == status)
@@ -861,9 +859,9 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 
 		if (SUCCEED == check_operation_conditions(event, operation.operationid, operation.evaltype))
 		{
-			unsigned char	default_msg = 1;
+			unsigned char	default_msg;
 			char		*subject = NULL, *message = NULL;
-			zbx_uint64_t	mediatypeid = 0;
+			zbx_uint64_t	mediatypeid;
 
 			zabbix_log(LOG_LEVEL_DEBUG, "Conditions match our event. Execute operation.");
 
