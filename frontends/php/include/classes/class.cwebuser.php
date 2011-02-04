@@ -19,7 +19,10 @@ class CWebUser {
 				throw new Exception();
 			}
 
-			self::makeGlobal();
+			if(empty(self::$data['url'])){
+				self::$data['url'] = CProfile::get('web.menu.view.last', 'index.php');
+			}
+
 
 			if(isset(self::$data['attempt_failed']) && self::$data['attempt_failed']){
 				CProfile::init();
@@ -29,12 +32,7 @@ class CWebUser {
 				CProfile::flush();
 			}
 
-			if(empty(self::$data['url'])){
-				self::$data['url'] = CProfile::get('web.menu.view.last', 'index.php');
-			}
-
 			zbx_setcookie('zbx_sessionid', self::$data['sessionid'], self::$data['autologin'] ? (time()+86400*31) : 0);
-
 
 			self::makeGlobal();
 			return true;
