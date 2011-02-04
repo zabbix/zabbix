@@ -172,7 +172,6 @@ static int	get_trigger_permission(zbx_uint64_t userid, zbx_uint64_t triggerid)
 		if (perm < host_perm)
 			perm = host_perm;
 	}
-
 	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of get_trigger_permission():%s",
@@ -245,18 +244,24 @@ static void	add_object_msg(zbx_uint64_t operationid, zbx_uint64_t mediatypeid, Z
 		ZBX_STR2UINT64(userid, row[0]);
 		add_user_msg(userid, mediatypeid, user_msg, subject, message, source, triggerid);
 	}
-
 	DBfree_result(result);
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: run_remote_commands                                              *
+ * Function: run_remote_command                                               *
  *                                                                            *
  * Purpose: run remote command on specific host                               *
  *                                                                            *
- * Parameters: host_name - host name                                          *
- *             command - remote command                                       *
+ * Parameters: item          - [IN] DC_ITEM structure with valid              *
+ *                             item->host.hostid, item->host.host,            *
+ *                             item->host.ipmi_authtype,                      *
+ *                             item->host.ipmi_privilege,                     *
+ *                             item->host.ipmi_username,                      *
+ *                             item->host.ipmi_password values                *
+ *             command       - [IN] remote command                            *
+ *             error         - [OUT] buffer for message if error occured      *
+ *             max_error_len - [IN] lengts of error buffer                    *
  *                                                                            *
  * Return value: nothing                                                      *
  *                                                                            *
@@ -490,7 +495,6 @@ static int	get_dynamic_hostid(DB_EVENT *event, DC_ITEM *item, char *error, size_
 		strscpy(item->host.ipmi_password, row[5]);
 #endif
 	}
-
 	DBfree_result(result);
 
 	if (FAIL == ret)
@@ -543,9 +547,9 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 				" and o.operationid=" ZBX_FS_UI64
 				" and h.status=%d"
 			" union "
-			"select distinct NULL,NULL,command"
+			"select distinct null,null,command"
 #ifdef HAVE_OPENIPMI
-				",NULL,NULL,NULL,NULL"
+				",null,null,null,null"
 #endif
 			" from opcommand_hst"
 			" where operationid=" ZBX_FS_UI64
@@ -673,7 +677,6 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 
 		zbx_free(sendto_esc);
 	}
-
 	DBfree_result(result);
 
 	if (0 == medias)
@@ -914,7 +917,6 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 
 		operations = 1;
 	}
-
 	DBfree_result(result);
 
 	while (NULL != user_msg)
@@ -981,7 +983,6 @@ static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *r_event, D
 			escalation->esc_step = 0;
 			add_message_alert(escalation, r_event, action, userid, mediatypeid, action->shortdata, action->longdata);
 		}
-
 		DBfree_result(result);
 	}
 	else
@@ -1032,7 +1033,6 @@ static int	get_event_info(zbx_uint64_t eventid, DB_EVENT *event)
 
 		res = SUCCEED;
 	}
-
 	DBfree_result(result);
 
 	if (res == SUCCEED && event->object == EVENT_OBJECT_TRIGGER)
@@ -1290,7 +1290,6 @@ static void	process_escalations(int now)
 
 		DBcommit();
 	}
-
 	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of process_escalations()");
