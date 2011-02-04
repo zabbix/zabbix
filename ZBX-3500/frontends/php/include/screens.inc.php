@@ -1521,13 +1521,15 @@ require_once('include/js.inc.php');
 				}
 				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_SCREEN) ){
 					$subScreens = CScreen::get(array(
-						'screenids' => $screen['screenid'],
+						'screenids' => $resourceid,
 						'output' => API_OUTPUT_EXTEND,
 						'select_screenitems' => API_OUTPUT_EXTEND
 					));
 					$subScreen = reset($subScreens);
 					$item = array(get_screen($subScreen, 2, $effectiveperiod));
-					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
+					if($editmode == 1){
+						array_push($item,new CLink(S_CHANGE,$action));
+					}
 				}
 				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_TRIGGERS_OVERVIEW) ){
 					$hostids = array();
