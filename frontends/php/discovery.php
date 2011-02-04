@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -205,6 +205,7 @@ include_once('include/page_header.php');
 				if(!isset($discovery_info[$dservice['ip']])){
 					$discovery_info[$dservice['ip']] = array(
 						'ip' => $dservice['ip'],
+						'dns' => $dservice['dns'],
 						'type' => $htype,
 						'class' => $hclass,
 						'host' => $hostName,
@@ -238,7 +239,7 @@ include_once('include/page_header.php');
 		}
 
 		if($druleid == 0 && !empty($discovery_info)){
-			$col = new CCol(array(bold($drule['name']),	SPACE.'('.count($discovery_info).SPACE.S_ITEMS.')'));
+			$col = new CCol(array(bold($drule['name']),	SPACE.'('._n('%d device', '%d devices', count($discovery_info)).')'));
 			$col->setColSpan(count($services) + 3);
 
 			$table->addRow(array(get_node_name_by_elid($drule['druleid']),$col));
@@ -247,9 +248,10 @@ include_once('include/page_header.php');
 		order_result($discovery_info, $_REQUEST['sort'], $_REQUEST['sortorder']);
 
 		foreach($discovery_info as $ip => $h_data){
+			$dns = $h_data['dns'] == '' ? '' : ' ('.$h_data['dns'].')';
 			$table_row = array(
 				get_node_name_by_elid($h_data['druleid']),
-				$h_data['type'] == 'primary' ? new CSpan($ip, $h_data['class']) : new CSpan(SPACE.SPACE.$ip),
+				$h_data['type'] == 'primary' ? new CSpan($ip.$dns, $h_data['class']) : new CSpan(SPACE.SPACE.$ip.$dns),
 				new CSpan(empty($h_data['host']) ? '-' : $h_data['host']),
 				new CSpan((($h_data['time'] == 0 || $h_data['type'] === 'slave') ?
 						'' : convert_units(time() - $h_data['time'], 'uptime')), $h_data['class'])

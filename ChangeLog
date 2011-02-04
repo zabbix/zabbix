@@ -2,6 +2,7 @@
 Changes for 1.9.2
 
 New features:
+ - [ZBXNEXT-630] added automatic filling of DNS name for discovered and auto-registered devices (Sasha)
  - [ZBXNEXT-634] added information about usage of media types for actions in the list of media types (Alexei)
  - [ZBXNEXT-602] Export events to CSV (Vlad,Aly)
  - [ZBXNEXT-623] restored support of SQLite3 for use with Zabbix Server and front-end (Alexei)
@@ -77,6 +78,11 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
 
+ - [ZBX-3494] added database monitor items to the queue calculation (asaveljevs)
+ - [ZBX-3454] fixed clearing item edited using by Trigger-wizard (Vlad)
+ - [ZBX-3481] fixed massAdd for applications (KB)
+ - [ZBX-3480] fixed possible crash of server after shutdown of ORACLE server (Sasha)
+ - [ZBX-3457] in triggers Wizard, add more that 26 symbols with symbols dublicate (Vlad)
  - [ZBX-3446] fixed possible hang of pollers - added timeout handler for external scripts (Sasha)
  - [ZBX-3461] fixed names of IPMI pollers in debug output and the number of items they take (asaveljevs)
  - [ZBX-3100] fixed messages in popup when no proxies or discovery checks defined (Vedmak)

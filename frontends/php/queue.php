@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -62,6 +62,7 @@ include_once 'include/page_header.php';
 			ITEM_TYPE_TELNET,
 			ITEM_TYPE_SIMPLE,
 			ITEM_TYPE_INTERNAL,
+			ITEM_TYPE_DB_MONITOR,
 			ITEM_TYPE_AGGREGATE,
 			ITEM_TYPE_EXTERNAL,
 			ITEM_TYPE_CALCULATED);
@@ -77,16 +78,17 @@ include_once 'include/page_header.php';
 	$item_types = array(
 			ITEM_TYPE_ZABBIX,
 			ITEM_TYPE_ZABBIX_ACTIVE,
+			ITEM_TYPE_SIMPLE,
 			ITEM_TYPE_SNMPV1,
 			ITEM_TYPE_SNMPV2C,
 			ITEM_TYPE_SNMPV3,
-			ITEM_TYPE_IPMI,
-			ITEM_TYPE_SSH,
-			ITEM_TYPE_TELNET,
-			ITEM_TYPE_SIMPLE,
 			ITEM_TYPE_INTERNAL,
 			ITEM_TYPE_AGGREGATE,
 			ITEM_TYPE_EXTERNAL,
+			ITEM_TYPE_DB_MONITOR,
+			ITEM_TYPE_IPMI,
+			ITEM_TYPE_SSH,
+			ITEM_TYPE_TELNET,
 			ITEM_TYPE_CALCULATED);
 
 	$sql = 'SELECT i.itemid,i.lastclock,i.description,i.key_,i.type,h.host,h.hostid,h.proxy_hostid,i.delay,i.delay_flex'.

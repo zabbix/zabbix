@@ -238,7 +238,6 @@ frontends/php/styles/originalblue/images/ui-icons_469bdd_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_5481ab_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_d40000_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_ffffff_256x240.png -text
-frontends/php/tests/api/classes/class.triggerexpressionTest.php -text
 frontends/php/tests/api_json/APIInfo.php -text
 frontends/php/tests/api_json/ApiJsonTests.php -text
 frontends/php/tests/api_json/General.php -text

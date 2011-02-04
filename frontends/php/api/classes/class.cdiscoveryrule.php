@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -977,7 +977,7 @@ COpt::memoryPick();
 			}
 			if(!empty($iprototypeids)){
 				if(!CItemPrototype::delete($iprototypeids, true))
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete discovery rule');
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete discovery rule'));
 			}
 
 			DB::delete('items', array('itemid'=>$ruleids));
