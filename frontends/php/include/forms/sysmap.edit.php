@@ -115,6 +115,7 @@
 	$sysmapList->addRow(_('Image label type'), array($labelTypeImage, BR(), $customLabelImage));
 // --
 
+	unset($labelTypes[MAP_LABEL_TYPE_CUSTOM]);
 	$sysmapList->addRow(_('Icon label type'), new CComboBox('label_type', $data['label_type'], null, $labelTypes));
 
 	$cmbLocation = new CComboBox('label_location', $data['label_location']);
