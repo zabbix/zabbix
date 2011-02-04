@@ -787,8 +787,8 @@ class zbxXML{
 					$selementid = reset($selementids);
 
 					foreach($links as $id => &$link){
-						if($link['selementid1'] == $selement['selementid']) $links[$id]['selementid1'] = $selementid;
-						else if($link['selementid2'] == $selement['selementid']) $links[$id]['selementid2'] = $selementid;
+						if(bccomp($link['selementid1'],$selement['selementid']) == 0) $links[$id]['selementid1'] = $selementid;
+						else if(bccomp($link['selementid2'],$selement['selementid']) == 0) $links[$id]['selementid2'] = $selementid;
 					}
 					unset($link);
 				}
@@ -1742,7 +1742,7 @@ class zbxXML{
 				$screens_node = $host_node->appendChild(new DOMElement(XML_TAG_SCREENS));
 
 				foreach($data['screens'] as $screen){
-					if($screen['templateid'] == $host['hostid']){
+					if(bccomp($screen['templateid'],$host['hostid']) == 0){
 						unset($screen['screenid'], $screen['templateid']);
 						self::arrayToDOM($screens_node, $screen, XML_TAG_SCREEN);
 					}
