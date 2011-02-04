@@ -145,9 +145,9 @@ switch($itemType) {
 		'ipmi_sensor'=>		array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,	'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_IPMI.'))', S_IPMI_SENSOR),
 
 		'trapper_hosts'=>	array(T_ZBX_STR, O_OPT,  null,  null,			'isset({save})&&isset({type})&&({type}==2)'),
-		'units'=>		array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&isset({value_type})&&'.IN('0,3','value_type')),
+		'units'=>		array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&isset({value_type})&&'.IN('0,3','value_type').'(isset({data_type})&&({data_type}!='.ITEM_DATA_TYPE_BOOLEAN.'))'),
 		'multiplier'=>		array(T_ZBX_INT, O_OPT,  null,  null,		null),
-		'delta'=>		array(T_ZBX_INT, O_OPT,  null,  IN('0,1,2'),	'isset({save})&&isset({value_type})&&'.IN('0,3','value_type')),
+		'delta'=>		array(T_ZBX_INT, O_OPT,  null,  IN('0,1,2'),	'isset({save})&&isset({value_type})&&'.IN('0,3','value_type').'(isset({data_type})&&({data_type}!='.ITEM_DATA_TYPE_BOOLEAN.'))'),
 
 		'formula'=>		array(T_ZBX_DBL, O_OPT,  null,  '({value_type}==0&&{}!=0)||({value_type}==3&&{}>0)',	'isset({save})&&isset({multiplier})&&({multiplier}==1)', S_CUSTOM_MULTIPLIER),
 		'logtimefmt'=>		array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({value_type})&&({value_type}==2))'),
