@@ -773,6 +773,10 @@ int	str_in_list(const char *list, const char *value, char delimiter);
 #endif /* HAVE___VA_ARGS__ */
 void	__zbx_zbx_setproctitle(const char *fmt, ...);
 
+#define ZBX_KIBIBYTE		1024
+#define ZBX_MEBIBYTE		1048576
+#define ZBX_GIBIBYTE		1073741824
+
 #define SEC_PER_MIN		60
 #define SEC_PER_HOUR		3600
 #define SEC_PER_DAY		86400
