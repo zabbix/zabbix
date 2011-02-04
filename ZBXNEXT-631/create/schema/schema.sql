@@ -459,14 +459,6 @@ FIELD		|severity_name_3	|t_varchar(32)	|'Average'	|NOT NULL	|ZBX_SYNC
 FIELD		|severity_name_4	|t_varchar(32)	|'High'	|NOT NULL	|ZBX_SYNC
 FIELD		|severity_name_5	|t_varchar(32)	|'Disaster'	|NOT NULL	|ZBX_SYNC
 
-		case TRIGGER_SEVERITY_DISASTER: $style='disaster'; break;
-		case TRIGGER_SEVERITY_HIGH: $style='high'; break;
-		case TRIGGER_SEVERITY_AVERAGE: $style='average'; break;
-		case TRIGGER_SEVERITY_WARNING: $style='warning'; break;
-		case TRIGGER_SEVERITY_INFORMATION:
-		default: $style='information';
-
-
 TABLE|functions|functionid|ZBX_SYNC
 FIELD		|functionid	|t_id		|	|NOT NULL	|0
 FIELD		|itemid		|t_id		|	|NOT NULL	|ZBX_SYNC		|1|items
