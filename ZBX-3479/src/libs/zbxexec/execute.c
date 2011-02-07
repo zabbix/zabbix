@@ -62,14 +62,14 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t buf_size, DWORD t
 				break;
 		}
 
-		if (timeout < 250)
+		if (timeout < 20)
 			break;
 
-		timeout -= 250;
-		Sleep(250);
+		timeout -= 20;
+		Sleep(20);
 	}
 
-	if (timeout < 250)
+	if (timeout < 20)
 	{
 		zbx_strlcpy(error, "Timeout while executing a shell script", max_error_len);
 		return FAIL;
