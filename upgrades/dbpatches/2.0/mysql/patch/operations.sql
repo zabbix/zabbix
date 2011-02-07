@@ -279,7 +279,7 @@ UPDATE optemplate
 
 ALTER TABLE operations MODIFY operationid bigint unsigned NOT NULL,
 		       MODIFY actionid bigint unsigned NOT NULL,
-		       MODIFY esc_step_from int NOT NULL DEFAULT '1',
+		       MODIFY esc_step_from integer NOT NULL DEFAULT '1',
 		       DROP COLUMN object,
 		       DROP COLUMN objectid,
 		       DROP COLUMN shortdata,
