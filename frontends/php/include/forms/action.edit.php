@@ -457,7 +457,7 @@ require_once('include/templates/action.js.php');
 				_('Period'),
 				new CCol(array(
 					new CNumericBox('new_operation[esc_period]', $new_operation['esc_period'], 5),
-					_('(mininum 60 seconds, 0 - use action default)')))
+					_('(minimum 60 seconds, 0 - use action default)')))
 			));
 
 			$tblOper->addRow(array(S_STEP, $tblStep));
