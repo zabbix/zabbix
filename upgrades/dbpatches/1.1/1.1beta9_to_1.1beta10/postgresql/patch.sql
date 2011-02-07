@@ -28,7 +28,7 @@ CREATE TABLE items_applications (
         itemid                  int4          DEFAULT '0' NOT NULL,
         PRIMARY KEY (applicationid,itemid),
 	FOREIGN KEY (applicationid) REFERENCES applications,
-	FOREIGN KEY (itemid) REFERENCES items 
+	FOREIGN KEY (itemid) REFERENCES items
 );
 
 alter table audit rename auditlog;
