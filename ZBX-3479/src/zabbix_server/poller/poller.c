@@ -84,9 +84,8 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 #endif
 			break;
 		case ITEM_TYPE_SIMPLE:
-			alarm(CONFIG_TIMEOUT);
+			/* Simple checks use own time-outs */
 			res = get_value_simple(item, result);
-			alarm(0);
 			break;
 		case ITEM_TYPE_INTERNAL:
 			res = get_value_internal(item, result);

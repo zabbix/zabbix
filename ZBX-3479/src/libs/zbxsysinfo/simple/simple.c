@@ -38,7 +38,7 @@ ZBX_METRIC	parameters_simple[] =
 
 #ifdef HAVE_LDAP
 
-static int    check_ldap(const char *host, unsigned short port, int *value_int)
+static int    check_ldap(const char *host, unsigned short port, int timeout, int *value_int)
 {
 	LDAP		*ldap	= NULL;
 	LDAPMessage	*res	= NULL;
@@ -46,20 +46,18 @@ static int    check_ldap(const char *host, unsigned short port, int *value_int)
 	BerElement	*ber	= NULL;
 
 	char	*attrs[2] = { "namingContexts", NULL };
-
 	char	*attr	 = NULL;
 	char	**valRes = NULL;
-
 	int	ldapErr = 0;
 
-	assert(NULL != value_int);
-
 	*value_int = 0;
+
+	alarm(timeout);
 
 	if (NULL == (ldap = ldap_init(host, port)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "LDAP - initialization failed [%s:%hu]", host, port);
-		return SYSINFO_RET_OK;
+		goto lbl_ret;
 	}
 
 	if (LDAP_SUCCESS != (ldapErr = ldap_search_s(ldap, "", LDAP_SCOPE_BASE, "(objectClass=*)", attrs, 0, &res)))
@@ -80,6 +78,8 @@ static int    check_ldap(const char *host, unsigned short port, int *value_int)
 	*value_int = 1;
 
 lbl_ret:
+	alarm(0);
+
 	if (NULL != valRes)
 		ldap_value_free(valRes);
 	if (NULL != attr)
@@ -94,9 +94,9 @@ lbl_ret:
 	return SYSINFO_RET_OK;
 }
 
-#endif
+#endif	/* HAVE_LDAP */
 
-static int	check_ssh(const char *host, unsigned short port, int *value_int)
+static int	check_ssh(const char *host, unsigned short port, int timeout, int *value_int)
 {
 	int		ret;
 	zbx_sock_t	s;
@@ -108,7 +108,7 @@ static int	check_ssh(const char *host, unsigned short port, int *value_int)
 
 	*value_int = 0;
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, 0)))
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout)))
 	{
 		if (SUCCEED == (ret = zbx_tcp_recv(&s, &recv_buf)))
 		{
@@ -141,12 +141,8 @@ static int	check_ssh(const char *host, unsigned short port, int *value_int)
 static int	check_service(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result, int perf)
 {
 	unsigned short	port = 0;
-	char		service[MAX_STRING_LEN];
-	char		ip[MAX_STRING_LEN];
-	char		str_port[MAX_STRING_LEN];
-
-	int		ret = SYSINFO_RET_FAIL;
-	int		value_int = 0;
+	char		service[16], ip[64], str_port[8];
+	int		value_int = 0, ret = SYSINFO_RET_FAIL;
 	double		check_time;
 
 	assert(NULL != result);
@@ -156,96 +152,88 @@ static int	check_service(const char *cmd, const char *param, unsigned flags, AGE
 	check_time = zbx_time();
 
 	if (num_param(param) > 3)
-	{
-		return SYSINFO_RET_FAIL;
-	}
+		return ret;
 
-	if (0 != get_param(param, 1, service, MAX_STRING_LEN))
-	{
-		return SYSINFO_RET_FAIL;
-	}
+	if (0 != get_param(param, 1, service, sizeof(service)))
+		return ret;
 
-	if (0 != get_param(param, 2, ip, MAX_STRING_LEN) || '\0' == *ip)
-	{
+	if (0 != get_param(param, 2, ip, sizeof(ip)) || '\0' == *ip)
 		strscpy(ip, "127.0.0.1");
-	}
 
-	if (0 != get_param(param, 3, str_port, MAX_STRING_LEN) || '\0' == *str_port)
-	{
-		port = 0;
-	}
-	else if (FAIL == is_uint(str_port))
-	{
-		return SYSINFO_RET_FAIL;
-	}
-	else
-		port = (unsigned short)atoi(str_port);
+	if (0 != get_param(param, 3, str_port, sizeof(str_port)))
+		*str_port = '\0';
+
+	if ('\0' != *str_port && FAIL == is_ushort(str_port, &port))
+		return ret;
 
 	if (0 == strcmp(service, "ssh"))
 	{
-		if (0 == port) port = ZBX_DEFAULT_SSH_PORT;
-		ret = check_ssh(ip, port, &value_int);
+		if ('\0' == *str_port)
+			port = ZBX_DEFAULT_SSH_PORT;
+		ret = check_ssh(ip, port, CONFIG_TIMEOUT, &value_int);
 	}
 	else if (0 == strcmp(service, "ntp") || 0 == strcmp(service, "service.ntp" /* obsolete */))
 	{
-		if (0 == port) port = ZBX_DEFAULT_NTP_PORT;
-		ret = check_ntp(ip, port, &value_int);
+		if ('\0' == *str_port)
+			port = ZBX_DEFAULT_NTP_PORT;
+		ret = check_ntp(ip, port, CONFIG_TIMEOUT, &value_int);
 	}
 #ifdef HAVE_LDAP
 	else if (0 == strcmp(service, "ldap"))
 	{
-		if (0 == port) port = ZBX_DEFAULT_LDAP_PORT;
-		ret = check_ldap(ip, port, &value_int);
+		if ('\0' == *str_port)
+			port = ZBX_DEFAULT_LDAP_PORT;
+		ret = check_ldap(ip, port, CONFIG_TIMEOUT, &value_int);
 	}
-#endif
+#endif	/* HAVE_LDAP */
 	else if (0 == strcmp(service, "smtp"))
 	{
-		if (0 == port) port = ZBX_DEFAULT_SMTP_PORT;
-		ret = tcp_expect(ip, port, 0, NULL, "220", "QUIT\n", &value_int);
+		if ('\0' == *str_port)
+			port = ZBX_DEFAULT_SMTP_PORT;
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "220", "QUIT\n", &value_int);
 	}
 	else if (0 == strcmp(service, "ftp"))
 	{
-		if (0 == port) port = ZBX_DEFAULT_FTP_PORT;
-		ret = tcp_expect(ip, port, 0, NULL, "220", "QUIT\n", &value_int);
+		if ('\0' == *str_port)
+			port = ZBX_DEFAULT_FTP_PORT;
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "220", "QUIT\n", &value_int);
 	}
 	else if (0 == strcmp(service, "http"))
 	{
-		if (0 == port) port = ZBX_DEFAULT_HTTP_PORT;
-		ret = tcp_expect(ip, port, 0, NULL, NULL, NULL, &value_int);
+		if ('\0' == *str_port)
+			port = ZBX_DEFAULT_HTTP_PORT;
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, NULL, NULL, &value_int);
 	}
 	else if (0 == strcmp(service, "pop"))
 	{
-		if (0 == port) port = ZBX_DEFAULT_POP_PORT;
-		ret = tcp_expect(ip, port, 0, NULL, "+OK", "QUIT\n", &value_int);
+		if ('\0' == *str_port)
+			port = ZBX_DEFAULT_POP_PORT;
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "+OK", "QUIT\n", &value_int);
 	}
 	else if (0 == strcmp(service, "nntp"))
 	{
-		if (0 == port) port = ZBX_DEFAULT_NNTP_PORT;
-		ret = tcp_expect(ip, port, 0, NULL, "200", "QUIT\n", &value_int);
+		if ('\0' == *str_port)
+			port = ZBX_DEFAULT_NNTP_PORT;
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "200", "QUIT\n", &value_int);
 	}
 	else if (0 == strcmp(service, "imap"))
 	{
-		if (0 == port) port = ZBX_DEFAULT_IMAP_PORT;
-		ret = tcp_expect(ip, port, 0, NULL, "* OK", "a1 LOGOUT\n", &value_int);
+		if ('\0' == *str_port)
+			port = ZBX_DEFAULT_IMAP_PORT;
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "* OK", "a1 LOGOUT\n", &value_int);
 	}
 	else if (0 == strcmp(service, "tcp"))
 	{
-		if (0 == port) return SYSINFO_RET_FAIL;
-		ret = tcp_expect(ip, port, 0, NULL, NULL, NULL, &value_int);
+		if ('\0' == *str_port)
+			return ret;
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, NULL, NULL, &value_int);
 	}
 	else
 		return SYSINFO_RET_FAIL;
 
-	if (!perf)
+	if (SYSINFO_RET_OK == ret)
 	{
-		if (SYSINFO_RET_OK == ret)
-		{
-			SET_UI64_RESULT(result, value_int);
-		}
-	}
-	else
-	{
-		if (SYSINFO_RET_OK == ret)
+		if (0 != perf)
 		{
 			if (value_int)
 			{
@@ -256,6 +244,8 @@ static int	check_service(const char *cmd, const char *param, unsigned flags, AGE
 			else
 				SET_DBL_RESULT(result, 0.0);
 		}
+		else
+			SET_UI64_RESULT(result, value_int);
 	}
 
 	return ret;

@@ -176,21 +176,18 @@ static void display_data (ntp_data *data) {
 }
 */
 
-int	check_ntp(char *host, unsigned short port, int *value_int)
+int	check_ntp(char *host, unsigned short port, int timeout, int *value_int)
 {
 	zbx_sock_t	s;
-
 	int		ret;
-	char		*buf = NULL;
-
+	char		*buf = NULL, packet[NTP_PACKET_MIN];
 	ntp_data	data;
-	char		packet[NTP_PACKET_MIN];
 
 	assert(value_int);
 
 	*value_int = 0;
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, 0)))
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout)))
 	{
 		make_packet(&data);
 
@@ -203,14 +200,17 @@ int	check_ntp(char *host, unsigned short port, int *value_int)
 				unpack_ntp(&data, (unsigned char *)buf, (int)strlen(buf));
 
 #if OFF
-			/* local time */	*value_int = time(NULL);
+				/* local time */
+				*value_int = time(NULL);
 #else
-			/* server time */	*value_int = (data.receive > 0) ? (int)(data.receive - ZBX_JAN_1970_IN_SEC) : 0;
+				/* server time */
+				*value_int = (data.receive > 0) ? (int)(data.receive - ZBX_JAN_1970_IN_SEC) : 0;
 #endif
 			}
 		}
+
+		zbx_tcp_close(&s);
 	}
-	zbx_tcp_close(&s);
 
 	if (FAIL == ret)
 		zabbix_log(LOG_LEVEL_DEBUG, "NTP check error: %s", zbx_tcp_strerror());
