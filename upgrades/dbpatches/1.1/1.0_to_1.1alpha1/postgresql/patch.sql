@@ -75,6 +75,3 @@ insert into images values(17,1,"UPS",load_file("../data/images/UPS.png"));
 insert into images values(18,1,"UPS (small)",load_file("../data/images/UPS_small.png"));
 insert into images values(19,1,"Workstation",load_file("../data/images/Workstation.png"));
 insert into images values(20,1,"Workstation (small)",load_file("../data/images/Workstation_small.png"));
-
-insert into images values(21,2,"Europe",load_file("../data/images/europe.png"));
-insert into images values(22,2,"Europe B&W",load_file("../data/images/europe2.jpg"));
