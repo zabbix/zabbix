@@ -21,6 +21,74 @@
 #include "threads.h"
 #include "log.h"
 
+#ifdef	_WINDOWS
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_read_from_pipe                                               *
+ *                                                                            *
+ * Purpose: read data from pipe                                               *
+ *                                                                            *
+ * Parameters: hRead         - [IN] a handle to the device                    *
+ *             buf           - [IN/OUT] a pointer to the buffer               *
+ *             buf_size      - [IN] buffer size                               *
+ *             timeout       - [IN] timeout in milliseconds                   *
+ *             error         - [OUT] error string if function fails           *
+ *             max_error_len - [IN] length of error buffer                    *
+ *                                                                            *
+ * Return value: SUCCEED or FAIL                                              *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t buf_size, DWORD timeout,
+		char *error, size_t max_error_len)
+{
+	DWORD	in_buf_size, read_bytes;
+	BOOL	rc;
+
+	while (0 != (rc = PeekNamedPipe(hRead, NULL, 0, NULL, &in_buf_size, NULL)))
+	{
+		if (0 != in_buf_size)
+		{
+			if (0 != (rc = ReadFile(hRead, *buf, MIN(in_buf_size, buf_size), &read_bytes, NULL)))
+			{
+				*buf += read_bytes;
+				if (0 == (buf_size -= read_bytes))
+					break;
+			}
+			else
+				break;
+		}
+
+		if (timeout < 250)
+			break;
+
+		timeout -= 250;
+		Sleep(250);
+	}
+
+	if (timeout < 250)
+	{
+		zbx_strlcpy(error, "Timeout while executing a shell script", max_error_len);
+		return FAIL;
+	}
+
+	if (0 == rc)
+	{
+		zbx_snprintf(error, max_error_len, "Unable to read from pipe [%s]",
+				strerror_from_system(GetLastError()));
+
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+#else /* not _WINDOWS */
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_popen                                                        *
@@ -131,6 +199,8 @@ exit:
 	return rc;
 }
 
+#endif	/* _WINDOWS */
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_execute                                                      *
@@ -159,7 +229,6 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 	HANDLE			hWrite = NULL, hRead = NULL;
 	char			*cmd = NULL;
 	LPTSTR			wcmd;
-	DWORD			len;
 
 #else /* not _WINDOWS */
 
@@ -220,27 +289,8 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 
 	if (NULL != buffer)
 	{
-		if (0 != timeout)
-		{
-			if (0 == SetCommTimeouts(hRead, &ct))
-			{
-				zbx_snprintf(error, max_error_len, "Unable to set time-outs: '%s' [%s]",
-						cmd, strerror_from_system(GetLastError()));
-				ret = FAIL;
-				zbx_free(wcmd);
-				goto lbl_exit;
-			}
-		}
-
-		/* Read process output */
-		while (0 != ReadFile(hRead, p, buf_size, &len, NULL))
-		{
-			p += len;
-			if (0 == (buf_size -= len))
-				break;
-		}
-
-		*p = '\0';
+		if (SUCCEED == (ret = zbx_read_from_pipe(hRead, &p, buf_size, timeout * 1000, error, max_error_len)))
+			*p = '\0';
 	}
 
 	/* Don't wait child process exiting. */
@@ -268,7 +318,7 @@ lbl_exit:
 		hRead = NULL;
 	}
 
-	zbx_free(command);
+	zbx_free(cmd);
 
 #else	/* not _WINDOWS */
 
