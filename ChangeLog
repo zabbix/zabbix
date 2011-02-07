@@ -1,5 +1,6 @@
 Changes for 1.8.5rc1
 
+ - [ZBX-2913] fixed timeout handling in processing of web.page.* checks (sasha)
  - [ZBX-3176] removed navigation dropdown from applications screen (Vedmak)
  - [ZBX-3494] added database monitor items to the queue calculation (asaveljevs)
  - [ZBX-3454] fixed clearing item edited using by Trigger-wizard (Vlad)
