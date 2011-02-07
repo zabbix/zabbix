@@ -379,13 +379,13 @@ include_once('include/page_header.php');
 	$menuRow = array();
 
 	$gridShow = new CSpan(
-		$sysmap['grid_show'] == 1 ? S_SHOWN : S_HIDDEN,
+		$sysmap['grid_show'] == SYSMAP_GRID_SHOW_ON ? S_SHOWN : S_HIDDEN,
 		'whitelink'
 	);
 	$gridShow->setAttribute('id', 'gridshow');
 
 	$gridAutoAlign = new CSpan(
-		$sysmap['grid_align'] == 1 ? S_ON : S_OFF,
+		$sysmap['grid_align'] == SYSMAP_GRID_ALIGN_ON ? S_ON : S_OFF,
 		'whitelink'
 	);
 	$gridAutoAlign->setAttribute('id', 'gridautoalign');
