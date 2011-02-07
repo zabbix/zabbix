@@ -36,7 +36,7 @@
  *             error         - [OUT] error string if function fails           *
  *             max_error_len - [IN] length of error buffer                    *
  *                                                                            *
- * Return value: SUCCEED or FAIL                                              *
+ * Return value: SUCCEED or FAIL if timeout reached                           *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
@@ -58,8 +58,7 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t buf_size, DWORD t
 				if (0 == (buf_size -= read_bytes))
 					break;
 			}
-			else
-				break;
+			continue;
 		}
 
 		if (timeout < 20)
@@ -288,7 +287,8 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 	/* WaitForSingleObject(pi.hProcess, INFINITE); */
 
 	/* Terminate child process */
-	/* TerminateProcess(pi.hProcess, 0); */
+	if (FAIL == ret)
+		TerminateProcess(pi.hProcess, 0);
 
 	CloseHandle(pi.hProcess);
 	CloseHandle(pi.hThread);
