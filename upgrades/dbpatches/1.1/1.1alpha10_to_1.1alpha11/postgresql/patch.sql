@@ -2,7 +2,7 @@ alter table screens_items add	rowspan		int4	DEFAULT '0' NOT NULL;
 alter table users add	autologout		int4	DEFAULT '900' NOT NULL;
 alter table users add	lang			varchar(5)	DEFAULT 'en_gb' NOT NULL;
 
-drop table escalation_rules;
+drop table if exists escalation_rules;
 drop table escalations;
 
 --
