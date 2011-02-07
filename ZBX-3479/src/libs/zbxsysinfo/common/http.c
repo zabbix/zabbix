@@ -52,9 +52,9 @@ static int	get_http_page(const char *host, const char *path, unsigned short port
 					zbx_strlcpy(buffer, recv_buffer, max_buffer_len);
 			}
 		}
-	}
 
-	zbx_tcp_close(&s);
+		zbx_tcp_close(&s);
+	}
 
 	if (FAIL == ret)
 	{

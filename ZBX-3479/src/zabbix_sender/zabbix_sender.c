@@ -222,8 +222,9 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 					ret = SUCCEED;
 			}
 		}
+
+		zbx_tcp_close(&sock);
 	}
-	zbx_tcp_close(&sock);
 
 	if (FAIL == tcp_ret)
 	{

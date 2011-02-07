@@ -128,9 +128,9 @@ static int	check_ssh(const char *host, unsigned short port, int timeout, int *va
 
 			ret = zbx_tcp_send_raw(&s, send_buf);
 		}
-	}
 
-	zbx_tcp_close(&s);
+		zbx_tcp_close(&s);
+	}
 
 	if (FAIL == ret)
 		zabbix_log(LOG_LEVEL_DEBUG, "SSH check error: %s", zbx_tcp_strerror());
