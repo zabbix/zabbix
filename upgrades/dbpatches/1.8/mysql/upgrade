@@ -40,6 +40,7 @@ fail() {
 }
 
 [[ "$MYSQL" ]] || fail "No mysql binary in path."
+[[ -f "patch.sql" ]] || fail "File patch.sql not found."
 
 timer() {
 	TIMER=$(echo "$@" | cut -d" " -f 2- | tr " " _)
