@@ -260,8 +260,8 @@ static void	add_object_msg(zbx_uint64_t operationid, zbx_uint64_t mediatypeid, Z
  *                             item->host.ipmi_username,                      *
  *                             item->host.ipmi_password values                *
  *             command       - [IN] remote command                            *
- *             error         - [OUT] buffer for message if error occured      *
- *             max_error_len - [IN] lengts of error buffer                    *
+ *             error         - [OUT] buffer for message if error occurred     *
+ *             max_error_len - [IN] length of error buffer                    *
  *                                                                            *
  * Return value: nothing                                                      *
  *                                                                            *
