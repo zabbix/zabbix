@@ -16,4 +16,3 @@ CREATE TABLE history_text (
 );
 
 CREATE INDEX history_text_itemidclock on history_text (itemid,clock);
-
