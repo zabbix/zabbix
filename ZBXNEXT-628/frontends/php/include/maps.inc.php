@@ -588,50 +588,50 @@
 
 		if(!is_null($db_element)){
 			switch($db_element['elementtype']){
-			case SYSMAP_ELEMENT_TYPE_HOST:
-			case SYSMAP_ELEMENT_TYPE_TRIGGER:
-				while(zbx_strstr($label, '{HOSTNAME}') ||
-						zbx_strstr($label, '{HOST.DNS}') ||
-						zbx_strstr($label, '{IPADDRESS}') ||
-						zbx_strstr($label, '{HOST.CONN}'))
-				{
-					if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST){
-						$sql = 'SELECT hi.*, h.host '.
-								' FROM interface hi,hosts h '.
-								' WHERE hi.hostid=h.hostid '.
-									' AND hi.hostid='.$db_element['elementid'];
+				case SYSMAP_ELEMENT_TYPE_HOST:
+				case SYSMAP_ELEMENT_TYPE_TRIGGER:
+					while(zbx_strstr($label, '{HOSTNAME}') ||
+							zbx_strstr($label, '{HOST.DNS}') ||
+							zbx_strstr($label, '{IPADDRESS}') ||
+							zbx_strstr($label, '{HOST.CONN}'))
+					{
+						if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST){
+							$sql = 'SELECT hi.*, h.host '.
+									' FROM interface hi,hosts h '.
+									' WHERE hi.hostid=h.hostid '.
+										' AND hi.hostid='.$db_element['elementid'];
+						}
+						else if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER)
+							$sql =	'SELECT hi.*, h.host '.
+								' FROM interface hi,items i,functions f,hosts h '.
+								' WHERE h.hostid=hi.hostid '.
+									' AND hi.hostid=i.hostid '.
+									' AND i.itemid=f.itemid '.
+									' AND f.triggerid='.$db_element['elementid'];
+						else{
+	// Should never be here
+						}
+
+						$db_hosts = DBselect($sql);
+
+						if($db_host = DBfetch($db_hosts)){
+							if(zbx_strstr($label, '{HOSTNAME}')){
+								$label = str_replace('{HOSTNAME}', $db_host['host'], $label);
+							}
+
+							if(zbx_strstr($label, '{HOST.DNS}')){
+								$label = str_replace('{HOST.DNS}', $db_host['dns'], $label);
+							}
+
+							if(zbx_strstr($label, '{IPADDRESS}')){
+								$label = str_replace('{IPADDRESS}', $db_host['ip'], $label);
+							}
+
+							if(zbx_strstr($label, '{HOST.CONN}')){
+								$label = str_replace('{HOST.CONN}', $db_host['useip'] ? $db_host['ip'] : $db_host['dns'], $label);
+							}
+						}
 					}
-					else if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER)
-						$sql =	'SELECT hi.*, h.host '.
-							' FROM interface hi,items i,functions f,hosts h '.
-							' WHERE h.hostid=hi.hostid '.
-								' AND hi.hostid=i.hostid '.
-								' AND i.itemid=f.itemid '.
-								' AND f.triggerid='.$db_element['elementid'];
-					else{
-// Should never be here
-					}
-
-					$db_hosts = DBselect($sql);
-
-					if($db_host = DBfetch($db_hosts)){
-						if(zbx_strstr($label, '{HOSTNAME}')){
-							$label = str_replace('{HOSTNAME}', $db_host['host'], $label);
-						}
-
-						if(zbx_strstr($label, '{HOST.DNS}')){
-							$label = str_replace('{HOST.DNS}', $db_host['dns'], $label);
-						}
-
-						if(zbx_strstr($label, '{IPADDRESS}')){
-							$label = str_replace('{IPADDRESS}', $db_host['ip'], $label);
-						}
-
-						if(zbx_strstr($label, '{HOST.CONN}')){
-							$label = str_replace('{HOST.CONN}', $db_host['useip'] ? $db_host['ip'] : $db_host['dns'], $label);
-						}
-					}
-				}
 				break;
 			}
 
@@ -674,47 +674,6 @@
 			}
 		}
 
-/*
-		while(false !== ($pos = zbx_strpos($label, '{'))){
-
-			$expr = substr($label, $pos);
-
-			if(false === ($pos = zbx_strpos($expr, '}'))) break;
-
-			$expr = substr($expr, 1, $pos - 1);
-
-			if(false === ($pos = zbx_strpos($expr, ':'))){
-				$label = str_replace('{'.$expr.'}', '???', $label);
-				continue;
-			}
-
-			$host = substr($expr, 0, $pos);
-			$key = substr($expr, $pos + 1);
-
-			if(false === ($pos = zbx_strrpos($key, '.'))){
-				$label = str_replace('{'.$expr.'}', '???', $label);
-				continue;
-			}
-
-			$function = substr($key, $pos + 1);
-			$key = substr($key, 0, $pos);
-
-			if(false === ($pos = zbx_strpos($function, '('))){
-				$label = str_replace('{'.$expr.'}', '???', $label);
-				continue;
-			}
-
-			$parameter = substr($function, $pos + 1);
-			$function = substr($function, 0, $pos);
-
-			if(false === ($pos = zbx_strrpos($parameter, ')'))){
-				$label = str_replace('{'.$expr.'}', '???', $label);
-				continue;
-			}
-
-			$parameter = substr($parameter, 0, $pos);
-*/
-//		$pattern = "/{(?P<host>.+?):(?P<key>.+?)\.(?P<func>[^.]+?)\((?P<param>.+?)\)}/u";
 		$pattern="/{(?P<host>.[^}]*):(?P<key>.[^}]*)\.(?P<func>.[^}]*)\((?P<param>.[^}]*)\)*}/u";
 		preg_match_all($pattern, $label, $matches);
 		foreach($matches[0] as $num => $expr){
@@ -1973,12 +1932,48 @@
 	function drawMapLabels(&$im, &$map, &$map_info){
 		global $colors;
 
-		if($map['label_type'] == MAP_LABEL_TYPE_NOTHING) return;
+		if(($map['label_type'] == MAP_LABEL_TYPE_NOTHING) && ($map['label_format'] == MAP_LABEL_ADVANCE_OFF))
+			return;
 
 		$selements = $map['selements'];
 		$all_strings = '';
 		$label_lines = array();
 		$status_lines = array();
+
+		foreach($selements as $selementid => $selement){
+			$selements[$selementid]['label_type'] = $map['label_type'];
+
+			if($map['label_format'] == MAP_LABEL_ADVANCE_OFF) continue;
+
+			switch($selement['elementtype']){
+				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+					$selements[$selementid]['label_type'] = $map['label_type_hostgroup'];
+					if($map['label_type_hostgroup'] == MAP_LABEL_TYPE_CUSTOM)
+						$selements[$selementid]['label'] = $map['label_string_hostgroup'];
+					break;
+				case SYSMAP_ELEMENT_TYPE_HOST:
+					$selements[$selementid]['label_type'] = $map['label_type_host'];
+					if($map['label_type_host'] == MAP_LABEL_TYPE_CUSTOM)
+						$selements[$selementid]['label'] = $map['label_string_host'];
+					break;
+				case SYSMAP_ELEMENT_TYPE_TRIGGER:
+					$selements[$selementid]['label_type'] = $map['label_type_trigger'];
+					if($map['label_type_trigger'] == MAP_LABEL_TYPE_CUSTOM)
+						$selements[$selementid]['label'] = $map['label_string_trigger'];
+					break;
+				case SYSMAP_ELEMENT_TYPE_MAP:
+					$selements[$selementid]['label_type'] = $map['label_type_map'];
+					if($map['label_type_map'] == MAP_LABEL_TYPE_CUSTOM)
+						$selements[$selementid]['label'] = $map['label_string_map'];
+					break;
+				case SYSMAP_ELEMENT_TYPE_IMAGE:
+					$selements[$selementid]['label_type'] = $map['label_type_image'];
+					if($map['label_type_image'] == MAP_LABEL_TYPE_CUSTOM)
+						$selements[$selementid]['label'] = $map['label_string_image'];
+					break;
+			}
+		}
+
 		foreach($selements as $selementid => $selement){
 			if(!isset($label_lines[$selementid])) $label_lines[$selementid] = array();
 			if(!isset($status_lines[$selementid])) $status_lines[$selementid] = array();
@@ -1991,6 +1986,7 @@
 			}
 
 			$el_info = $map_info[$selementid];
+
 			$el_msgs = array('problem', 'unack', 'maintenance', 'unknown', 'ok', 'status');
 			foreach($el_msgs as $key => $caption){
 				if(!isset($el_info['info'][$caption]) || zbx_empty($el_info['info'][$caption]['msg'])) continue;
@@ -2008,24 +2004,25 @@
 		$labelFontHeight = $allLabelsSize['height'];
 		$labelFontBaseline = $allLabelsSize['baseline'];
 
-		if($map['label_type'] == MAP_LABEL_TYPE_IP){
-			$elementsHostids = array();
-			foreach($selements as $selementid => $selement){
-				if($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST)
-					$elementsHostids[] = $selement['elementid'];
-			}
 
-			if(!empty($elementsHostids)){
-				$mapHosts = CHost::get(array(
-					'hostids' => $elementsHostids,
-					'output' => API_OUTPUT_SHORTEN,
-					'selectInterfaces' => API_OUTPUT_EXTEND,
-				));
-				$mapHosts = zbx_toHash($mapHosts, 'hostid');
-			}
+		$elementsHostids = array();
+		foreach($selements as $selementid => $selement){
+			if($selement['label_type'] != MAP_LABEL_TYPE_IP) continue;
+
+			if($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST)
+				$elementsHostids[] = $selement['elementid'];
 		}
 
+		if(!empty($elementsHostids)){
+			$mapHosts = CHost::get(array(
+				'hostids' => $elementsHostids,
+				'output' => API_OUTPUT_SHORTEN,
+				'selectInterfaces' => API_OUTPUT_EXTEND,
+			));
+			$mapHosts = zbx_toHash($mapHosts, 'hostid');
+		}
 
+// DRAW
 		foreach($selements as $selementid => $selement){
 			if(empty($selement)) continue;
 
@@ -2050,23 +2047,23 @@
 					? $map['label_location'] : $selement['label_location'];
 
 			$label = array();
-			if(($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) && ($map['label_type'] == MAP_LABEL_TYPE_IP)){
+			if(($selement['label_type'] == MAP_LABEL_TYPE_IP) && ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST)){
 				$interface = reset($mapHosts[$selement['elementid']]['interfaces']);
 
 				$label[] = array('msg' => $interface['ip']);
 				$label = array_merge($label, $status_lines[$selementid]);
 			}
-			else if($map['label_type'] == MAP_LABEL_TYPE_STATUS){
+			else if($selement['label_type'] == MAP_LABEL_TYPE_STATUS){
 				$label = $status_lines[$selementid];
 			}
-			else if($map['label_type'] == MAP_LABEL_TYPE_NAME){
+			else if($selement['label_type'] == MAP_LABEL_TYPE_NAME){
 				$label[] = array('msg' => $el_info['name']);
 				$label = array_merge($label, $status_lines[$selementid]);
 			}
 			else{
 				$label = array_merge($label_lines[$selementid], $status_lines[$selementid]);
 			}
-			if(zbx_empty($label)) continue;
+			if(empty($label)) continue;
 
 			$w = 0;
 			foreach($label as $str){

@@ -84,6 +84,7 @@
 
 	$labelTypesImage = $labelTypesLimited;
 	unset($labelTypesImage[MAP_LABEL_TYPE_STATUS]);
+
 // hostgroup
 	$labelTypeHostgroup = new CComboBox('label_type_hostgroup', $data['label_type_hostgroup'], null, $labelTypesLimited);
 	$customLabelHostgroup = new CTextarea('label_string_hostgroup', $data['label_string_hostgroup']);
