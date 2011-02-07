@@ -210,7 +210,7 @@ class CMap extends CZBXAPI{
 				else{
 					if(!isset($result[$sysmap['sysmapid']])) $result[$sysmap['sysmapid']]= array();
 
-					if(isset($sysmap['label_format']) && ($sysmap['label_format'] == MAP_LABEL_ADVANCE_OFF)){
+					if(isset($sysmap['label_format']) && ($sysmap['label_format'] == SYSMAP_LABEL_ADVANCE_OFF)){
 ///						unset($sysmap['label_string_hostgroup'],$sysmap['label_string_host'],$sysmap['label_string_trigger'],$sysmap['label_string_map'],$sysmap['label_string_image']);
 					}
 					if(!is_null($options['select_selements']) && !isset($result[$sysmap['sysmapid']]['selements'])){
@@ -919,7 +919,7 @@ COpt::memoryPick();
  * @param array $elements[0,...]['iconid_off']
  * @param array $elements[0,...]['iconid_on']
  * @param array $elements[0,...]['iconid_disabled']
- * @param array $elements[0,...]['url']
+ * @param array $elements[0,...]['urls'][0,...]
  * @param array $elements[0,...]['label_location']
  */
 	public static function addElements($selements){
