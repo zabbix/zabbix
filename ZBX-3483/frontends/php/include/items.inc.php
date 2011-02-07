@@ -747,6 +747,15 @@
 			}
 		}
 
+		if($item_data['type'] != ITEM_TYPE_SSH && $item_data['type'] != ITEM_TYPE_TELNET){
+			$item['username'] = '';
+			$item['password'] = '';
+		}
+		if($item_data['type'] != ITEM_TYPE_SSH && $item_data['authtype'] != ITEM_AUTHTYPE_PUBLICKEY){
+			$item['publickey'] = '';
+			$item['privatekey'] = '';
+		}
+
 /*		if($item_data['type'] == ITEM_TYPE_HTTPTEST)
 			$item['applications'] = get_applications_by_itemid($itemid);*/
 
