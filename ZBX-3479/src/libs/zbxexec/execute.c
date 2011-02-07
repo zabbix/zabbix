@@ -149,10 +149,131 @@ exit:
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_execute(const char *command, char **buffer, char *error, size_t max_error_len)
+int	zbx_execute(const char *command, char **buffer, char *error, size_t max_error_len, int timeout)
 {
-	pid_t	pid;
-	int	fd, ret = SUCCEED;
+#ifdef _WINDOWS
+
+	STARTUPINFO		si = {0};
+	PROCESS_INFORMATION	pi = {0};
+	SECURITY_ATTRIBUTES	sa;
+	HANDLE			hWrite = NULL, hRead = NULL;
+	char			*cmd = NULL;
+	LPTSTR			wcmd;
+	DWORD			len;
+
+#else /* not _WINDOWS */
+
+	pid_t			pid;
+	int			fd;
+
+#endif /* _WINDOWS */
+
+	char			*p = NULL;
+	size_t			buf_size = MAX_BUFFER_LEN;
+	int			ret = SUCCEED;
+
+	if (NULL != buffer)
+	{
+		*buffer = p = zbx_realloc(*buffer, buf_size);
+		buf_size--;	/* '\0' */
+	}
+
+#ifdef _WINDOWS
+
+	/* Set the bInheritHandle flag so pipe handles are inherited */
+	sa.nLength = sizeof(SECURITY_ATTRIBUTES);
+	sa.bInheritHandle = TRUE;
+	sa.lpSecurityDescriptor = NULL;
+
+	/* Create a pipe for the child process's STDOUT */
+	if (0 == CreatePipe(&hRead, &hWrite, &sa, 0))
+	{
+		zbx_snprintf(error, max_error_len, "Unable to create pipe [%s]", strerror_from_system(GetLastError()));
+		ret = FAIL;
+		goto lbl_exit;
+	}
+
+	/* Fill in process startup info structure */
+	memset(&si, 0, sizeof(STARTUPINFO));
+	si.cb = sizeof(STARTUPINFO);
+	si.dwFlags = STARTF_USESTDHANDLES;
+	si.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
+	si.hStdOutput = hWrite;
+	si.hStdError = hWrite;
+
+	cmd = zbx_dsprintf(cmd, "cmd /C \"%s\"", command);
+	wcmd = zbx_utf8_to_unicode(cmd);
+
+	/* Create new process */
+	if (0 == CreateProcess(NULL, wcmd, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi))
+	{
+		zbx_snprintf(error, max_error_len, "Unable to create process: '%s' [%s]",
+				cmd, strerror_from_system(GetLastError()));
+		ret = FAIL;
+		zbx_free(wcmd);
+		goto lbl_exit;
+	}
+	zbx_free(wcmd);
+
+	CloseHandle(hWrite);
+	hWrite = NULL;
+
+	if (NULL != buffer)
+	{
+		if (0 != timeout)
+		{
+			if (0 == SetCommTimeouts(hRead, &ct))
+			{
+				zbx_snprintf(error, max_error_len, "Unable to set time-outs: '%s' [%s]",
+						cmd, strerror_from_system(GetLastError()));
+				ret = FAIL;
+				zbx_free(wcmd);
+				goto lbl_exit;
+			}
+		}
+
+		/* Read process output */
+		while (0 != ReadFile(hRead, p, buf_size, &len, NULL))
+		{
+			p += len;
+			if (0 == (buf_size -= len))
+				break;
+		}
+
+		*p = '\0';
+	}
+
+	/* Don't wait child process exiting. */
+	/* WaitForSingleObject(pi.hProcess, INFINITE); */
+
+	/* Terminate child process */
+	/* TerminateProcess(pi.hProcess, 0); */
+
+	CloseHandle(pi.hProcess);
+	CloseHandle(pi.hThread);
+
+	CloseHandle(hRead);
+	hRead = NULL;
+
+lbl_exit:
+	if (NULL != hWrite)
+	{
+		CloseHandle(hWrite);
+		hWrite = NULL;
+	}
+
+	if (NULL != hRead)
+	{
+		CloseHandle(hRead);
+		hRead = NULL;
+	}
+
+	zbx_free(command);
+
+#else	/* not _WINDOWS */
+
+	if (0 != timeout)
+		alarm(timeout);
 
 	if (-1 != (fd = zbx_popen(&pid, command)))
 	{
@@ -160,16 +281,11 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 
 		if (NULL != buffer)
 		{
-			char	*p;
-			size_t	buf_size = MAX_BUFFER_LEN;
-
-			*buffer = p = zbx_realloc(*buffer, buf_size);
-			buf_size--;	/* '\0' */
-
 			while (0 < (rc = read(fd, p, buf_size)))
 			{
 				p += rc;
-				buf_size -= rc;
+				if (0 == (buf_size -= rc))
+					break;
 			}
 
 			*p = '\0';
@@ -208,6 +324,14 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 		zbx_strlcpy(error, strerror(errno), max_error_len);
 		ret = FAIL;
 	}
+
+	if (0 != timeout)
+		alarm(0);
+
+#endif	/* _WINDOWS */
+
+	if (FAIL == ret && NULL != buffer)
+		zbx_free(*buffer);
 
 	return ret;
 }
