@@ -11,6 +11,7 @@ REORG TABLE config;
 ALTER TABLE config ADD ns_support integer DEFAULT '0' NOT NULL;
 REORG TABLE config;
 ALTER TABLE config ADD severity_color_0 varchar(6) SET WITH DEFAULT 'AADDAA' NOT NULL;
+REORG TABLE config;
 ALTER TABLE config ADD severity_color_1 varchar(6) SET WITH DEFAULT 'CCE2CC' NOT NULL;
 REORG TABLE config;
 ALTER TABLE config ADD severity_color_2 varchar(6) SET WITH DEFAULT 'EFEFCC' NOT NULL;
