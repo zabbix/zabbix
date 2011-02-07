@@ -70,7 +70,7 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 		}
 		else if (SUCCEED != is_ushort(port, NULL))
 		{
-			error = zbx_strdup(error, "Port number must be numeric");
+			error = zbx_strdup(error, "Incorrect port number");
 			ret = NOTSUPPORTED;
 		}
 	}

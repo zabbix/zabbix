@@ -47,13 +47,12 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t buf_size, DWORD t
 		char *error, size_t max_error_len)
 {
 	DWORD	in_buf_size, read_bytes;
-	BOOL	rc;
 
-	while (0 != (rc = PeekNamedPipe(hRead, NULL, 0, NULL, &in_buf_size, NULL)))
+	while (0 != PeekNamedPipe(hRead, NULL, 0, NULL, &in_buf_size, NULL))
 	{
 		if (0 != in_buf_size)
 		{
-			if (0 != (rc = ReadFile(hRead, *buf, MIN(in_buf_size, buf_size), &read_bytes, NULL)))
+			if (0 != ReadFile(hRead, *buf, MIN(in_buf_size, buf_size), &read_bytes, NULL))
 			{
 				*buf += read_bytes;
 				if (0 == (buf_size -= read_bytes))
@@ -73,14 +72,6 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t buf_size, DWORD t
 	if (timeout < 250)
 	{
 		zbx_strlcpy(error, "Timeout while executing a shell script", max_error_len);
-		return FAIL;
-	}
-
-	if (0 == rc)
-	{
-		zbx_snprintf(error, max_error_len, "Unable to read from pipe [%s]",
-				strerror_from_system(GetLastError()));
-
 		return FAIL;
 	}
 
