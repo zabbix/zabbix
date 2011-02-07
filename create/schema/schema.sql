@@ -446,12 +446,12 @@ FIELD		|discovery_groupid|t_id		|	|NOT NULL	|ZBX_SYNC		|2|groups	|groupid	|RESTR
 FIELD		|max_in_table	|t_integer	|'50'	|NOT NULL	|ZBX_SYNC
 FIELD		|search_limit	|t_integer	|'1000'	|NOT NULL	|ZBX_SYNC
 FIELD		|ns_support	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|severity_color_0	|t_varchar(6)	|'information'	|NOT NULL	|ZBX_SYNC
-FIELD		|severity_color_1	|t_varchar(6)	|'information'	|NOT NULL	|ZBX_SYNC
-FIELD		|severity_color_2	|t_varchar(6)	|'warning'	|NOT NULL	|ZBX_SYNC
-FIELD		|severity_color_3	|t_varchar(6)	|'average'	|NOT NULL	|ZBX_SYNC
-FIELD		|severity_color_4	|t_varchar(6)	|'high'	|NOT NULL	|ZBX_SYNC
-FIELD		|severity_color_5	|t_varchar(6)	|'disaster'	|NOT NULL	|ZBX_SYNC
+FIELD		|severity_color_0	|t_varchar(6)	|'AADDAA'	|NOT NULL	|ZBX_SYNC
+FIELD		|severity_color_1	|t_varchar(6)	|'CCE2CC'	|NOT NULL	|ZBX_SYNC
+FIELD		|severity_color_2	|t_varchar(6)	|'EFEFCC'	|NOT NULL	|ZBX_SYNC
+FIELD		|severity_color_3	|t_varchar(6)	|'DDAAAA'	|NOT NULL	|ZBX_SYNC
+FIELD		|severity_color_4	|t_varchar(6)	|'FF8888'	|NOT NULL	|ZBX_SYNC
+FIELD		|severity_color_5	|t_varchar(6)	|'FF0000'	|NOT NULL	|ZBX_SYNC
 FIELD		|severity_name_0	|t_varchar(32)	|'Not classified'	|NOT NULL	|ZBX_SYNC
 FIELD		|severity_name_1	|t_varchar(32)	|'Information'	|NOT NULL	|ZBX_SYNC
 FIELD		|severity_name_2	|t_varchar(32)	|'Warning'	|NOT NULL	|ZBX_SYNC
