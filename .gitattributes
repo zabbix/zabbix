@@ -242,8 +242,10 @@ frontends/php/styles/originalblue/images/ui-icons_d8e7f3_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_f9bd01_256x240.png -text
 frontends/php/tests/api_json/APIInfo.php -text
 frontends/php/tests/api_json/ApiJsonTests.php -text
+frontends/php/tests/api_json/CMap.php -text
 frontends/php/tests/api_json/General.php -text
 frontends/php/tests/api_json/User.php -text
+frontends/php/tests/bootstrap.php -text
 frontends/php/tests/bootstrap.php.template -text
 frontends/php/tests/general/function_DBclose.php -text
 frontends/php/tests/general/function_DBcommit.php -text
