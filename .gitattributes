@@ -323,66 +323,26 @@ tests/templates/sqlite3.init -text
 tests/templates/zabbix.conf.php.mysql -text
 tests/templates/zabbix.conf.php.postgresql -text
 tests/templates/zabbix.conf.php.sqlite3 -text
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Hub.png -text
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Hub_small.png -text
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Network.png -text
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Network_small.png -text
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Notebook.png -text
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Notebook_small.png -text
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Phone.png -text
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Phone_small.png -text
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Printer.png -text
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Printer_small.png -text
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Router.png -text
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Router_small.png -text
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Satellite.png -text
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Satellite_small.png -text
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Server.png -text
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Server_small.png -text
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/UPS.png -text
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/UPS_small.png -text
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Workstation.png -text
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Workstation_small.png -text
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/patch.sql -text
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/postgresql/patch.sql -text
-upgrades/dbpatches/1.1/1.1alpha10_to_1.1alpha11/mysql/patch.sql -text
-upgrades/dbpatches/1.1/1.1alpha10_to_1.1alpha11/postgresql/patch.sql -text
-upgrades/dbpatches/1.1/1.1alpha11_to_1.1alpha12/mysql/patch.sql -text
-upgrades/dbpatches/1.1/1.1alpha11_to_1.1alpha12/postgresql/patch.sql -text
-upgrades/dbpatches/1.1/1.1alpha12_to_1.1beta1/mysql/patch.sql -text
-upgrades/dbpatches/1.1/1.1alpha12_to_1.1beta1/postgresql/patch.sql -text
-upgrades/dbpatches/1.1/1.1alpha2_to_1.1alpha3/mysql/patch.sql -text
-upgrades/dbpatches/1.1/1.1alpha2_to_1.1alpha3/postgresql/patch.sql -text
-upgrades/dbpatches/1.1/1.1alpha3_to_1.1alpha4/mysql/patch.sql -text
-upgrades/dbpatches/1.1/1.1alpha3_to_1.1alpha4/postgresql/patch.sql -text
-upgrades/dbpatches/1.1/1.1alpha4_to_1.1alpha5/mysql/patch.sql -text
-upgrades/dbpatches/1.1/1.1alpha4_to_1.1alpha5/postgresql/patch.sql -text
-upgrades/dbpatches/1.1/1.1alpha8_to_1.1alpha9/mysql/patch.sql -text
-upgrades/dbpatches/1.1/1.1alpha8_to_1.1alpha9/postgresql/patch.sql -text
-upgrades/dbpatches/1.1/1.1alpha9_to_1.1alpha10/mysql/patch.sql -text
-upgrades/dbpatches/1.1/1.1alpha9_to_1.1alpha10/postgresql/patch.sql -text
-upgrades/dbpatches/1.1/1.1beta11_to_1.1beta12/mysql/patch.sql -text
-upgrades/dbpatches/1.1/1.1beta11_to_1.1beta12/oracle/patch.sql -text
-upgrades/dbpatches/1.1/1.1beta11_to_1.1beta12/postgresql/patch.sql -text
-upgrades/dbpatches/1.1/1.1beta12_to_1.1/mysql/patch.sql -text
-upgrades/dbpatches/1.1/1.1beta12_to_1.1/oracle/patch.sql -text
-upgrades/dbpatches/1.1/1.1beta12_to_1.1/postgresql/patch.sql -text
-upgrades/dbpatches/1.1/1.1beta1_to_1.1beta2/mysql/patch.sql -text
-upgrades/dbpatches/1.1/1.1beta1_to_1.1beta2/postgresql/patch.sql -text
-upgrades/dbpatches/1.1/1.1beta2_to_1.1beta3/mysql/patch.sql -text
-upgrades/dbpatches/1.1/1.1beta2_to_1.1beta3/postgresql/patch.sql -text
-upgrades/dbpatches/1.1/1.1beta4_to_1.1beta5/mysql/patch.sql -text
-upgrades/dbpatches/1.1/1.1beta4_to_1.1beta5/postgresql/patch.sql -text
-upgrades/dbpatches/1.1/1.1beta5_to_1.1beta6/mysql/patch.sql -text
-upgrades/dbpatches/1.1/1.1beta5_to_1.1beta6/postgresql/patch.sql -text
-upgrades/dbpatches/1.1/1.1beta6_to_1.1beta7/mysql/patch.sql -text
-upgrades/dbpatches/1.1/1.1beta6_to_1.1beta7/postgresql/patch.sql -text
-upgrades/dbpatches/1.1/1.1beta7_to_1.1beta8/mysql/patch.sql -text
-upgrades/dbpatches/1.1/1.1beta7_to_1.1beta8/postgresql/patch.sql -text
-upgrades/dbpatches/1.1/1.1beta8_to_1.1beta9/mysql/patch.sql -text
-upgrades/dbpatches/1.1/1.1beta8_to_1.1beta9/postgresql/patch.sql -text
-upgrades/dbpatches/1.1/1.1beta9_to_1.1beta10/mysql/patch.sql -text
-upgrades/dbpatches/1.1/1.1beta9_to_1.1beta10/postgresql/patch.sql -text
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Hub.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Hub_small.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Network.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Network_small.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Notebook.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Notebook_small.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Phone.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Phone_small.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Printer.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Printer_small.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Router.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Router_small.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Satellite.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Satellite_small.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Server.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Server_small.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/UPS.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/UPS_small.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Workstation.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Workstation_small.png -text svneol=unset#image/png
 upgrades/dbpatches/2.0/ibm_db2/patch/graph_discovery.sql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/item_discovery.sql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/trigger_discovery.sql -text
