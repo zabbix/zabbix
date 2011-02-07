@@ -81,21 +81,12 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
+
 #define ZBX_TCP_MAX_STRERROR	255
-
-int	zbx_tcp_error(void)
-{
-	if (ZBX_SOCK_ERR_TIMEDOUT == zbx_sock_last_error())
-	{
-		return ZBX_TCP_ERR_TIMEOUT;
-	}
-
-	return ZBX_TCP_ERR_NETWORK;
-}
 
 static char	zbx_tcp_strerror_message[ZBX_TCP_MAX_STRERROR];
 
-const char	*zbx_tcp_strerror(void)
+const char	*zbx_tcp_strerror()
 {
 	zbx_tcp_strerror_message[ZBX_TCP_MAX_STRERROR - 1] = '\0'; /* force terminate string */
 	return (&zbx_tcp_strerror_message[0]);
@@ -106,7 +97,7 @@ const char	*zbx_tcp_strerror(void)
 #else
 #	define zbx_set_tcp_strerror __zbx_zbx_set_tcp_strerror
 #endif /* HAVE___VA_ARGS__ */
-static void __zbx_zbx_set_tcp_strerror(const char *fmt, ...)
+static void	__zbx_zbx_set_tcp_strerror(const char *fmt, ...)
 {
 	va_list args;
 
@@ -240,7 +231,7 @@ struct hostent	*zbx_gethost(const char *hostname)
 
 /* static (winXX threads require OFF) */ int	tcp_started = FAIL;
 
-static int	zbx_tcp_start(void)
+static int	zbx_tcp_start()
 {
 	WSADATA sockInfo;
 
