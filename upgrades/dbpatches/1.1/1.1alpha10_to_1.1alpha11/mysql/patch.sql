@@ -3,7 +3,7 @@ alter table users add	autologout		int(4)	DEFAULT '900' NOT NULL;
 alter table users add	lang			varchar(5)	DEFAULT 'en_gb' NOT NULL;
 
 drop table if exists escalation_rules;
-drop table if exists escalations;
+drop table escalations;
 
 --
 -- Table structure for table 'escalations'
