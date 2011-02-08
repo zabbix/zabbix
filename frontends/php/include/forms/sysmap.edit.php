@@ -193,8 +193,8 @@
 // Footer
 	$main = array(new CSubmit('save', _('Save')));
 	$others = array();
-	if($_REQUEST['sysmapid']>0){
-		$others[] = new CSubmit('clone', _('Clone'));
+	if(isset($_REQUEST['sysmapid']) && ($_REQUEST['sysmapid']>0)){
+		$others[] = new CButton('clone', _('Clone'));
 		$others[] = new CButtonDelete(_('Delete system map?'), url_param('form').url_param('sysmapid'));
 	}
 	$others[] = new CButtonCancel();
