@@ -27,6 +27,15 @@ jQuery(document).ready(function(){
 	jQuery.each(inputs, function(){ jQuery('#'+this).change(toggleCustomLabel); });
 
 	toggleAdvancedLabels(jQuery('#label_format:checked').length != 0);
+
+// Clone button
+	jQuery("#clone").click(function(){
+		jQuery("#sysmapid, #delete, #clone").remove();
+
+		jQuery("#cancel").addClass('ui-corner-left');
+		jQuery("#name").focus();
+	});
+
 	jQuery('#name').focus();
 });
 
