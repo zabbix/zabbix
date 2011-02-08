@@ -21,7 +21,36 @@
 #include "threads.h"
 #include "log.h"
 
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_get_timediff_ms                                              *
+ *                                                                            *
+ * Purpose: considers a difference between times in milliseconds              *
+ *                                                                            *
+ * Parameters: time1         - [IN] first time point                          *
+ *             time2         - [IN] second time point                         *
+ *                                                                            *
+ * Return value: difference between times in milliseconds                     *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_get_timediff_ms(struct _timeb time1, struct _timeb time2)
+{
+	int	ms;
+
+	ms = (time2.time - time1.time) * 1000;
+	ms += time2.millitm - time1.millitm;
+
+	if (0 > ms)
+		ms = 0;
+
+	return ms;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -32,7 +61,8 @@
  * Parameters: hRead         - [IN] a handle to the device                    *
  *             buf           - [IN/OUT] a pointer to the buffer               *
  *             buf_size      - [IN] buffer size                               *
- *             timeout       - [IN] timeout in seconds                        *
+ *             start_time    - [IN] script execution starting time            *
+ *             timeout_ms    - [IN] timeout in milliseconds                   *
  *                                                                            *
  * Return value: SUCCEED or TIMEOUT_ERROR if timeout reached                  *
  *                                                                            *
@@ -41,11 +71,11 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t buf_size, int timeout)
+static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t buf_size,
+		struct _timeb start_time, int timeout_ms)
 {
-	DWORD	in_buf_size, read_bytes;
-
-	timeout *= 1000;
+	DWORD		in_buf_size, read_bytes;
+	struct _timeb	current_time;
 
 	while (0 != PeekNamedPipe(hRead, NULL, 0, NULL, &in_buf_size, NULL))
 	{
@@ -60,15 +90,12 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t buf_size, int tim
 			continue;
 		}
 
-		if (timeout < 20)
-			break;
+		_ftime(&current_time);
+		if (zbx_get_timediff_ms(start_time, current_time) < 20)
+			return TIMEOUT_ERROR;
 
-		timeout -= 20;
 		Sleep(20);
 	}
-
-	if (timeout < 20)
-		return TIMEOUT_ERROR;
 
 	return SUCCEED;
 }
@@ -215,7 +242,7 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 	HANDLE			hWrite = NULL, hRead = NULL;
 	char			*cmd = NULL;
 	LPTSTR			wcmd = NULL;
-	time_t			now;
+	struct _timeb		start_time, current_time;
 
 #else /* not _WINDOWS */
 
@@ -236,7 +263,7 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 
 #ifdef _WINDOWS
 
-	now = time(NULL);
+	_ftime(&start_time);
 
 	/* set the bInheritHandle flag so pipe handles are inherited */
 	sa.nLength = sizeof(SECURITY_ATTRIBUTES);
@@ -276,13 +303,22 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 
 	if (NULL != buffer)
 	{
-		if (SUCCEED == (ret = zbx_read_from_pipe(hRead, &p, buf_size, timeout)))
+		if (SUCCEED == (ret = zbx_read_from_pipe(hRead, &p, buf_size, start_time, timeout * 1000)))
 			*p = '\0';
 	}
 
+	if (TIMEOUT_ERROR != ret)
+	{
+		_ftime(&current_time);
+		if (0 > (timeout = zbx_get_timediff_ms(start_time, current_time)))
+		{
+			if (WAIT_TIMEOUT == WaitForSingleObject(pi.hProcess, timeout))
+				ret = TIMEOUT_ERROR;
+		}
+	}
+
 	/* wait for child process to exit */
-	if (TIMEOUT_ERROR == ret || (0 < (timeout -= time(NULL) - now) &&
-				WAIT_TIMEOUT == WaitForSingleObject(pi.hProcess, timeout * 1000)))
+	if (TIMEOUT_ERROR == ret)
 	{
 		zbx_strlcpy(error, "Timeout while executing a shell script", max_error_len);
 		ret = FAIL;
