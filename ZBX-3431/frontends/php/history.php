@@ -154,11 +154,6 @@ include_once('include/page_header.php');
 		if(!isset($items[$itemid])) access_deny();
 	}
 
-	$eventlogExist = false;
-	foreach($items as $itm){
-		if(strpos($itm['key_'], 'eventlog[') === 0) $eventlogExist = true;
-	}
-
 	$item = reset($items);
 	$host = reset($item['hosts']);
 	$item['host'] = $host['host'];
@@ -314,15 +309,17 @@ include_once('include/page_header.php');
 // TEXT LOG
 		if(isset($iv_string[$item['value_type']])){
 			$logItem = ($item['value_type'] == ITEM_VALUE_TYPE_LOG);
+			// is this an eventolog item? If so, we must show some additional columns
+			$eventLogItem = (strpos($itm['key_'], 'eventlog[') === 0);
 
 			$table = new CTableInfo('...');
 			$table->setHeader(array(
 				S_TIMESTAMP,
 				$fewItems ? S_ITEM : null,
 				$logItem ? S_LOCAL_TIME : null,
-				(($eventlogExist && $logItem) ? S_SOURCE : null),
-				(($eventlogExist && $logItem) ? S_SEVERITY : null),
-				(($eventlogExist && $logItem) ? S_EVENT_ID : null),
+				(($eventLogItem && $logItem) ? S_SOURCE : null),
+				(($eventLogItem && $logItem) ? S_SEVERITY : null),
+				(($eventLogItem && $logItem) ? S_EVENT_ID : null),
 				S_VALUE
 			), 'header');
 
@@ -368,7 +365,8 @@ include_once('include/page_header.php');
 				if($logItem){
 					$row[] = ($data['timestamp'] == 0) ? '-' : zbx_date2str(S_HISTORY_LOG_LOCALTIME_DATE_FORMAT, $data['timestamp']);
 
-					if($eventlogExist){
+					// if this is a eventLog item, showing additional info
+					if($eventLogItem){
 						$row[] = zbx_empty($data['source']) ? '-' : $data['source'];
 						$row[] = ($data['severity'] == 0)
 								? '-'
