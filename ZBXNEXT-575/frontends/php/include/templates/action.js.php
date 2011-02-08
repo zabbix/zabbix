@@ -160,9 +160,11 @@ function addPopupValues(list){
 				if(!isset('action', value))
 					value.action = isset('opcommand_grpid', value) ? 'update' : 'create';
 
+				value.commandLine = value.command;
+				var cmdLines = value.command.split("\n");
 
-				value.commandLine = value.command.split("\n")[0].toString();
-				if(value.commandLine.length > 48) value.commandLine = value.commandLine.substr(0,45) + '...';
+				if((value.command.length > 48) || (cmdLines.length > 1))
+					value.commandLine = cmdLines[0].toString().substr(0,45) + '...';
 
 				if(jQuery("#opCmdDraft").length){
 					jQuery("#opCmdDraft").replaceWith(tpl.evaluate(value));
