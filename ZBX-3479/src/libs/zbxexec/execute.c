@@ -61,7 +61,6 @@ static int	zbx_get_timediff_ms(struct _timeb *time1, struct _timeb *time2)
  * Parameters: hRead         - [IN] a handle to the device                    *
  *             buf           - [IN/OUT] a pointer to the buffer               *
  *             buf_size      - [IN] buffer size                               *
- *             start_time    - [IN] script execution starting time            *
  *             timeout_ms    - [IN] timeout in milliseconds                   *
  *                                                                            *
  * Return value: SUCCEED or TIMEOUT_ERROR if timeout reached                  *
@@ -71,13 +70,12 @@ static int	zbx_get_timediff_ms(struct _timeb *time1, struct _timeb *time2)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t buf_size,
-		struct _timeb *start_time, int timeout_ms)
+static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t buf_size, int timeout_ms)
 {
 	DWORD		in_buf_size, read_bytes;
-	struct _timeb	current_time;
+	struct _timeb	start_time, current_time;
 
-	timeout_ms -= 20;
+	_ftime(&start_time);
 
 	while (0 != PeekNamedPipe(hRead, NULL, 0, NULL, &in_buf_size, NULL))
 	{
@@ -257,6 +255,8 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 	size_t			buf_size = MAX_BUFFER_LEN;
 	int			ret = SUCCEED;
 
+	assert(timeout);
+
 	if (NULL != buffer)
 	{
 		*buffer = p = zbx_realloc(*buffer, buf_size);
@@ -264,8 +264,6 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 	}
 
 #ifdef _WINDOWS
-
-	_ftime(&start_time);
 
 	/* set the bInheritHandle flag so pipe handles are inherited */
 	sa.nLength = sizeof(SECURITY_ATTRIBUTES);
@@ -303,16 +301,19 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 	CloseHandle(hWrite);
 	hWrite = NULL;
 
+	_ftime(&start_time);
+	timeout *= 1000;
+
 	if (NULL != buffer)
 	{
-		if (SUCCEED == (ret = zbx_read_from_pipe(hRead, &p, buf_size, &start_time, timeout * 1000)))
+		if (SUCCEED == (ret = zbx_read_from_pipe(hRead, &p, buf_size, &start_time, timeout)))
 			*p = '\0';
 	}
 
 	if (TIMEOUT_ERROR != ret)
 	{
 		_ftime(&current_time);
-		if (0 < (timeout = zbx_get_timediff_ms(&start_time, &current_time)))
+		if (0 < (timeout -= zbx_get_timediff_ms(&start_time, &current_time)))
 		{
 			if (WAIT_TIMEOUT == WaitForSingleObject(pi.hProcess, timeout))
 				ret = TIMEOUT_ERROR;
@@ -353,8 +354,7 @@ lbl_exit:
 
 #else	/* not _WINDOWS */
 
-	if (0 != timeout)
-		alarm(timeout);
+	alarm(timeout);
 
 	if (-1 != (fd = zbx_popen(&pid, command)))
 	{
@@ -406,8 +406,7 @@ lbl_exit:
 		ret = FAIL;
 	}
 
-	if (0 != timeout)
-		alarm(0);
+	alarm(0);
 
 #endif	/* _WINDOWS */
 
