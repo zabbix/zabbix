@@ -33,18 +33,15 @@
  *             buf           - [IN/OUT] a pointer to the buffer               *
  *             buf_size      - [IN] buffer size                               *
  *             timeout       - [IN] timeout in seconds                        *
- *             error         - [OUT] error string if function fails           *
- *             max_error_len - [IN] length of error buffer                    *
  *                                                                            *
- * Return value: SUCCEED or FAIL if timeout reached                           *
+ * Return value: SUCCEED or TIMEOUT_ERROR if timeout reached                  *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t buf_size, int timeout,
-		char *error, size_t max_error_len)
+static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t buf_size, int timeout)
 {
 	DWORD	in_buf_size, read_bytes;
 
@@ -71,10 +68,7 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t buf_size, int tim
 	}
 
 	if (timeout < 20)
-	{
-		zbx_strlcpy(error, "Timeout while executing a shell script", max_error_len);
-		return FAIL;
-	}
+		return TIMEOUT_ERROR;
 
 	return SUCCEED;
 }
@@ -284,13 +278,17 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 
 	if (NULL != buffer)
 	{
-		if (SUCCEED == (ret = zbx_read_from_pipe(hRead, &p, buf_size, timeout, error, max_error_len)))
+		if (SUCCEED == (ret = zbx_read_from_pipe(hRead, &p, buf_size, timeout)))
 			*p = '\0';
 	}
 
 	/* wait child process exiting. */
-	if (0 < (timeout -= time(NULL) - now))
-		WaitForSingleObject(pi.hProcess, timeout * 1000);
+	if (TIMEOUT_ERROR == ret || (0 < (timeout -= time(NULL) - now) &&
+				WAIT_TIMEOUT == WaitForSingleObject(pi.hProcess, timeout * 1000)))
+	{
+		zbx_strlcpy(error, "Timeout while executing a shell script", max_error_len);
+		ret = FAIL;
+	}
 
 	/* terminate child process */
 	TerminateProcess(pi.hProcess, 0);
