@@ -1,5 +1,6 @@
 Changes for 1.8.5rc1
 
+ - [ZBX-3514] fixed log trigger wizard (Aly)
  - [ZBX-3515] fixed names of SNMPv3 security levels, again (asaveljevs)
  - [ZBX-3411] fixed change trigger filter where change host (Aly,Vlad)
  - [ZBX-3431] fixed severity for log and eventlog or mixed (Vlad)
