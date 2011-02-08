@@ -214,7 +214,7 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 	SECURITY_ATTRIBUTES	sa;
 	HANDLE			hWrite = NULL, hRead = NULL;
 	char			*cmd = NULL;
-	LPTSTR			wcmd;
+	LPTSTR			wcmd = NULL;
 	time_t			now;
 
 #else /* not _WINDOWS */
@@ -238,12 +238,12 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 
 	now = time(NULL);
 
-	/* Set the bInheritHandle flag so pipe handles are inherited */
+	/* set the bInheritHandle flag so pipe handles are inherited */
 	sa.nLength = sizeof(SECURITY_ATTRIBUTES);
 	sa.bInheritHandle = TRUE;
 	sa.lpSecurityDescriptor = NULL;
 
-	/* Create a pipe for the child process's STDOUT */
+	/* create a pipe for the child process's STDOUT */
 	if (0 == CreatePipe(&hRead, &hWrite, &sa, 0))
 	{
 		zbx_snprintf(error, max_error_len, "Unable to create pipe [%s]", strerror_from_system(GetLastError()));
@@ -251,7 +251,7 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 		goto lbl_exit;
 	}
 
-	/* Fill in process startup info structure */
+	/* fill in process startup info structure */
 	memset(&si, 0, sizeof(STARTUPINFO));
 	si.cb = sizeof(STARTUPINFO);
 	si.dwFlags = STARTF_USESTDHANDLES;
@@ -262,16 +262,14 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 	cmd = zbx_dsprintf(cmd, "cmd /C \"%s\"", command);
 	wcmd = zbx_utf8_to_unicode(cmd);
 
-	/* Create new process */
+	/* create new process */
 	if (0 == CreateProcess(NULL, wcmd, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi))
 	{
 		zbx_snprintf(error, max_error_len, "Unable to create process: '%s' [%s]",
 				cmd, strerror_from_system(GetLastError()));
 		ret = FAIL;
-		zbx_free(wcmd);
 		goto lbl_exit;
 	}
-	zbx_free(wcmd);
 
 	CloseHandle(hWrite);
 	hWrite = NULL;
@@ -282,7 +280,7 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 			*p = '\0';
 	}
 
-	/* wait child process exiting. */
+	/* wait for child process to exit */
 	if (TIMEOUT_ERROR == ret || (0 < (timeout -= time(NULL) - now) &&
 				WAIT_TIMEOUT == WaitForSingleObject(pi.hProcess, timeout * 1000)))
 	{
@@ -313,6 +311,7 @@ lbl_exit:
 	}
 
 	zbx_free(cmd);
+	zbx_free(wcmd);
 
 #else	/* not _WINDOWS */
 

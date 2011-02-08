@@ -165,7 +165,7 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	{
 		zbx_rtrim(cmd_result, ZBX_WHITESPACE);
 
-		/* We got EOL only */
+		/* we got whitespace only */
 		if ('\0' == *cmd_result)
 		{
 			ret = SYSINFO_RET_FAIL;
@@ -220,10 +220,8 @@ int	EXECUTE_INT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	return SYSINFO_RET_OK;
 }
 
-int	SYSTEM_RUN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	SYSTEM_RUN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#define MAX_FLAG_LEN 10
-
 	char	command[MAX_STRING_LEN], flag[9];
 
 #if defined (_WINDOWS)
@@ -248,7 +246,7 @@ int	SYSTEM_RUN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 	if (0 != get_param(param, 1, command, sizeof(command)))
 		return SYSINFO_RET_FAIL;
 
-	if (*command == '\0')
+	if ('\0' == *command)
 		return SYSINFO_RET_FAIL;
 
 	if (1 == CONFIG_LOG_REMOTE_COMMANDS)
@@ -283,7 +281,7 @@ int	SYSTEM_RUN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 		0,	/* Normal priority */
 		NULL,	/* Use the same environment as the parent */
 		NULL,	/* Launch in the current directory */
-		&si,	/* Startup Information */
+		&si,	/* Startup information */
 		&pi))	/* Process information stored upon return */
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Creation of the process failed");
@@ -343,5 +341,6 @@ lbl_exit:
 	SET_UI64_RESULT(result, 1);
 
 	return SYSINFO_RET_OK;
+
 #endif /* _WINDOWS */
 }

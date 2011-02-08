@@ -40,7 +40,7 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 
 	conn = item->host.useip == 1 ? item->host.ip : item->host.dns;
 
-	*service ='\0';
+	*service = '\0';
 	*port = '\0';
 
 	if (1 == num_param(item->key))

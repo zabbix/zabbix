@@ -122,9 +122,7 @@ static int	check_ssh(const char *host, unsigned short port, int timeout, int *va
 				*value_int = 1;
 			}
 			else
-			{
 				zbx_snprintf(send_buf, sizeof(send_buf), "0\n");
-			}
 
 			ret = zbx_tcp_send_raw(&s, send_buf);
 		}
@@ -235,7 +233,7 @@ static int	check_service(const char *cmd, const char *param, unsigned flags, AGE
 	{
 		if (0 != perf)
 		{
-			if (value_int)
+			if (0 != value_int)
 			{
 				check_time = zbx_time() - check_time;
 				check_time = MAX(check_time, 0.0001);
