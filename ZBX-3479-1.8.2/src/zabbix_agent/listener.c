@@ -41,7 +41,7 @@ static void	process_listener(zbx_sock_t *s)
 	char	**value = NULL;
 	int		ret;
 
-	if( SUCCEED == (ret = zbx_tcp_recv(s, &command)) )
+	if (SUCCEED == (ret = zbx_tcp_recv_to(s, &command, CONFIG_TIMEOUT)))
 	{
 		zbx_rtrim(command, "\r\n\0");
 
@@ -56,7 +56,7 @@ static void	process_listener(zbx_sock_t *s)
 		if(value)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Sending back [%s]", *value);
-			ret = zbx_tcp_send(s, *value);
+			ret = zbx_tcp_send_to(s, *value, CONFIG_TIMEOUT);
 		}
 
 		free_result(&result);

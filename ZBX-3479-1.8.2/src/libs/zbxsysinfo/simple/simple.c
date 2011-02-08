@@ -38,7 +38,7 @@ ZBX_METRIC	parameters_simple[]=
 
 #ifdef HAVE_LDAP
 
-static int    check_ldap(char *hostname, short port, int *value_int)
+static int    check_ldap(char *hostname, short port, int timeout, int *value_int)
 {
 	LDAP		*ldap	= NULL;
 	LDAPMessage	*res	= NULL;
@@ -56,10 +56,12 @@ static int    check_ldap(char *hostname, short port, int *value_int)
 
 	*value_int = 0;
 
+	alarm(timeout);
+
 	if(NULL == (ldap = ldap_init(hostname, port)) )
 	{
 		zabbix_log( LOG_LEVEL_DEBUG, "LDAP - initialization failed [%s:%u]",hostname, port);
-		return	SYSINFO_RET_OK;
+		goto lbl_ret;
 	}
 
 	if( LDAP_SUCCESS != (ldapErr = ldap_search_s(
@@ -88,6 +90,8 @@ static int    check_ldap(char *hostname, short port, int *value_int)
 	*value_int = 1;
 
 lbl_ret:
+	alarm(0);
+
 	if(valRes)	ldap_value_free(valRes);
 	if(attr)	ldap_memfree(attr);
 	if(ber) 	ber_free(ber, 0);
@@ -103,7 +107,7 @@ lbl_ret:
  *  0 - NOT OK
  *  1 - OK
  * */
-static int	check_ssh(const char *host, unsigned short port, int *value_int)
+static int	check_ssh(const char *host, unsigned short port, int timeout, int *value_int)
 {
 	int ret;
 
@@ -118,7 +122,7 @@ static int	check_ssh(const char *host, unsigned short port, int *value_int)
 	assert(value_int);
 
 	*value_int = 0;
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, 0))) {
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout))) {
 		if( SUCCEED == (ret = zbx_tcp_recv(&s, &recv_buf)) )
 		{
 			if ( 0 == strncmp(recv_buf, "SSH", 3) )
@@ -208,51 +212,51 @@ int	CHECK_SERVICE_PERF(const char *cmd, const char *param, unsigned flags, AGENT
 	if(strcmp(service,"ssh") == 0)
 	{
 		if(port == 0)	port=22;
-		ret=check_ssh(ip,port,&value_int);
+		ret=check_ssh(ip,port,CONFIG_TIMEOUT,&value_int);
 	}
 #ifdef HAVE_LDAP
 	else if(strcmp(service,"ldap") == 0)
 	{
 		if(port == 0)   port=389;
-		ret=check_ldap(ip,port,&value_int);
+		ret=check_ldap(ip,port,CONFIG_TIMEOUT,&value_int);
 	}
 #endif
 	else if(strcmp(service,"smtp") == 0)
 	{
 		if(port == 0)	port=25;
-		ret=tcp_expect(ip,port,NULL,"220","QUIT\n",&value_int);
+		ret=tcp_expect(ip,port,CONFIG_TIMEOUT,NULL,"220","QUIT\n",&value_int);
 	}
 	else if(strcmp(service,"ftp") == 0)
 	{
 		if(port == 0)	port=21;
-		ret=tcp_expect(ip,port,NULL,"220","",&value_int);
+		ret=tcp_expect(ip,port,CONFIG_TIMEOUT,NULL,"220","",&value_int);
 	}
 	else if(strcmp(service,"http") == 0)
 	{
 		if(port == 0)	port=80;
-		ret=tcp_expect(ip,port,NULL,NULL,"",&value_int);
+		ret=tcp_expect(ip,port,CONFIG_TIMEOUT,NULL,NULL,"",&value_int);
 	}
 	else if(strcmp(service,"pop") == 0)
 	{
 		if(port == 0)	port=110;
-		ret=tcp_expect(ip,port,NULL,"+OK","",&value_int);
+		ret=tcp_expect(ip,port,CONFIG_TIMEOUT,NULL,"+OK","",&value_int);
 	}
 	else if(strcmp(service,"nntp") == 0)
 	{
 		if(port == 0)	port=119;
 /* 220 is incorrect */
 /*		ret=tcp_expect(ip,port,"220","");*/
-		ret=tcp_expect(ip,port,NULL,"200","",&value_int);
+		ret=tcp_expect(ip,port,CONFIG_TIMEOUT,NULL,"200","",&value_int);
 	}
 	else if(strcmp(service,"imap") == 0)
 	{
 		if(port == 0)	port=143;
-		ret=tcp_expect(ip,port,NULL,"* OK","a1 LOGOUT\n",&value_int);
+		ret=tcp_expect(ip,port,CONFIG_TIMEOUT,NULL,"* OK","a1 LOGOUT\n",&value_int);
 	}
 	else if(strcmp(service,"tcp") == 0)
 	{
 		if(port == 0)	port=80;
-		ret=tcp_expect(ip,port,NULL,NULL,"",&value_int);
+		ret=tcp_expect(ip,port,CONFIG_TIMEOUT,NULL,NULL,"",&value_int);
 	}
 	else
 	{
@@ -332,56 +336,56 @@ int	CHECK_SERVICE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	if(strcmp(service,"ssh") == 0)
 	{
 		if(port == 0)	port=22;
-		ret=check_ssh(ip,port,&value_int);
+		ret=check_ssh(ip,port,CONFIG_TIMEOUT,&value_int);
 	}
 	else if(strcmp(service,"service.ntp") == 0)
 	{
 		if(port == 0)	port=123;
-		ret=check_ntp(ip,port,&value_int);
+		ret=check_ntp(ip,port,CONFIG_TIMEOUT,&value_int);
 	}
 #ifdef HAVE_LDAP
 	else if(strcmp(service,"ldap") == 0)
 	{
 		if(port == 0)   port=389;
-		ret=check_ldap(ip,port,&value_int);
+		ret=check_ldap(ip,port,CONFIG_TIMEOUT,&value_int);
 	}
 #endif
 	else if(strcmp(service,"smtp") == 0)
 	{
 		if(port == 0)	port=25;
-		ret=tcp_expect(ip,port,NULL,"220","QUIT\n",&value_int);
+		ret=tcp_expect(ip,port,CONFIG_TIMEOUT,NULL,"220","QUIT\n",&value_int);
 	}
 	else if(strcmp(service,"ftp") == 0)
 	{
 		if(port == 0)	port=21;
-		ret=tcp_expect(ip,port,NULL,"220","",&value_int);
+		ret=tcp_expect(ip,port,CONFIG_TIMEOUT,NULL,"220","",&value_int);
 	}
 	else if(strcmp(service,"http") == 0)
 	{
 		if(port == 0)	port=80;
-		ret=tcp_expect(ip,port,NULL,NULL,"",&value_int);
+		ret=tcp_expect(ip,port,CONFIG_TIMEOUT,NULL,NULL,"",&value_int);
 	}
 	else if(strcmp(service,"pop") == 0)
 	{
 		if(port == 0)	port=110;
-		ret=tcp_expect(ip,port,NULL,"+OK","",&value_int);
+		ret=tcp_expect(ip,port,CONFIG_TIMEOUT,NULL,"+OK","",&value_int);
 	}
 	else if(strcmp(service,"nntp") == 0)
 	{
 		if(port == 0)	port=119;
 /* 220 is incorrect */
 /*		ret=tcp_expect(ip,port,"220","");*/
-		ret=tcp_expect(ip,port,NULL,"200","",&value_int);
+		ret=tcp_expect(ip,port,CONFIG_TIMEOUT,NULL,"200","",&value_int);
 	}
 	else if(strcmp(service,"imap") == 0)
 	{
 		if(port == 0)	port=143;
-		ret=tcp_expect(ip,port,NULL,"* OK","a1 LOGOUT\n",&value_int);
+		ret=tcp_expect(ip,port,CONFIG_TIMEOUT,NULL,"* OK","a1 LOGOUT\n",&value_int);
 	}
 	else if(strcmp(service,"tcp") == 0)
 	{
 		if(port == 0)	port=80;
-		ret=tcp_expect(ip,port,NULL,NULL,"",&value_int);
+		ret=tcp_expect(ip,port,CONFIG_TIMEOUT,NULL,NULL,"",&value_int);
 	}
 	else
 	{

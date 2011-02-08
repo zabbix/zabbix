@@ -27,6 +27,7 @@
 #include "http.h"
 #include "net.h"
 #include "system.h"
+#include "zbxexec.h"
 
 #if !defined(_WINDOWS)
 #	define VFS_TEST_FILE "/etc/passwd"
@@ -36,9 +37,12 @@
 #	define VFS_TEST_REGEXP "fonts"
 #endif /* _WINDOWS */
 
+extern int	CONFIG_TIMEOUT;
+
 static int	AGENT_PING(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 static int	AGENT_VERSION(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 static int	ONLY_ACTIVE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+static int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
 ZBX_METRIC	parameters_common[]=
 /*      KEY                     FLAG    FUNCTION        ADD_PARAM       TEST_PARAM */
@@ -157,177 +161,45 @@ static int	AGENT_VERSION(const char *cmd, const char *param, unsigned flags, AGE
 
 int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-
-#if defined(_WINDOWS)
-
-	STARTUPINFO si = {0};
-	PROCESS_INFORMATION pi = {0};
-	SECURITY_ATTRIBUTES sa;
-	HANDLE hWrite=NULL, hRead=NULL;
-	LPTSTR	wcommand;
-
-#else /* not _WINDOWS */
-
-	FILE	*hRead = NULL;
-
-#endif /* _WINDOWS */
-
 	int	ret = SYSINFO_RET_FAIL;
-
-	char	stat_buf[128];
-	char	*cmd_result=NULL;
-	char	*command=NULL;
-	int	len;
+	char	*cmd_result = NULL, error[MAX_STRING_LEN];
 
 	assert(result);
 
 	init_result(result);
 
-	cmd_result = zbx_dsprintf(cmd_result,"");
-	memset(stat_buf, 0, sizeof(stat_buf));
-
-#if defined(_WINDOWS)
-
-	/* Set the bInheritHandle flag so pipe handles are inherited */
-	sa.nLength = sizeof(SECURITY_ATTRIBUTES);
-	sa.bInheritHandle = TRUE;
-	sa.lpSecurityDescriptor = NULL;
-
-	/* Create a pipe for the child process's STDOUT */
-	if (! CreatePipe(&hRead, &hWrite, &sa, sizeof(cmd_result)))
+	switch (zbx_execute(param, &cmd_result, error, sizeof(error), CONFIG_TIMEOUT))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Unable to create pipe [%s]", strerror_from_system(GetLastError()));
-		ret = SYSINFO_RET_FAIL;
-		goto lbl_exit;
+		case SUCCEED:
+			ret = SYSINFO_RET_OK;
+			break;
+		default:
+			SET_MSG_RESULT(result, strdup(error));
+			ret = SYSINFO_RET_FAIL;
 	}
 
-	/* Fill in process startup info structure */
-	memset(&si,0,sizeof(STARTUPINFO));
-	si.cb		= sizeof(STARTUPINFO);
-	si.dwFlags	= STARTF_USESTDHANDLES;
-	si.hStdInput	= GetStdHandle(STD_INPUT_HANDLE);
-	si.hStdOutput	= hWrite;
-	si.hStdError	= hWrite;
-
-	command = zbx_dsprintf(command, "cmd /C \"%s\"", param);
-
-	wcommand = zbx_utf8_to_unicode(command);
-
-	/* Create new process */
-	if (!CreateProcess(NULL,wcommand,NULL,NULL,TRUE,0,NULL,NULL,&si,&pi))
+	if (SYSINFO_RET_OK == ret)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Unable to create process: '%s' [%s]", command, strerror_from_system(GetLastError()));
+		zbx_rtrim(cmd_result, ZBX_WHITESPACE);
 
-		ret = SYSINFO_RET_FAIL;
-		zbx_free(wcommand);
-		goto lbl_exit;
-	}
-	zbx_free(wcommand);
-	CloseHandle(hWrite);	hWrite = NULL;
-
-	/* Read process output */
-	while( ReadFile(hRead, stat_buf, sizeof(stat_buf)-1, &len, NULL) && len > 0 )
-	{
-		cmd_result = zbx_strdcat(cmd_result, stat_buf);
-		memset(stat_buf, 0, sizeof(stat_buf));
-	}
-
-	/* Don't wait child process exiting. */
-	/* WaitForSingleObject( pi.hProcess, INFINITE ); */
-
-	/* Terminate child process */
-	/* TerminateProcess(pi.hProcess, 0); */
-
-	CloseHandle(pi.hProcess);
-	CloseHandle(pi.hThread);
-
-	CloseHandle(hRead);	hRead = NULL;
-
-
-#else /* not _WINDOWS */
-	command = zbx_dsprintf(command, "%s", param);
-
-	if(0 == (hRead = popen(command,"r")))
-	{
-		switch (errno)
+		/* we got whitespace only */
+		if ('\0' == *cmd_result)
 		{
-			case	EINTR:
-				ret = SYSINFO_RET_TIMEOUT;
-				break;
-			default:
-				ret = SYSINFO_RET_FAIL;
-				break;
+			ret = SYSINFO_RET_FAIL;
+			goto lbl_exit;
 		}
+	}
+	else
 		goto lbl_exit;
-	}
 
-	;
-	/* Read process output */
-	while( (len = fread(stat_buf, 1, sizeof(stat_buf)-1, hRead)) > 0 )
-	{
-		cmd_result = zbx_strdcat(cmd_result, stat_buf);
-		memset(stat_buf, 0, sizeof(stat_buf));
-	}
-
-	if(0 != ferror(hRead))
-	{
-		switch (errno)
-		{
-			case	EINTR:
-				ret = SYSINFO_RET_TIMEOUT;
-				break;
-			default:
-				ret = SYSINFO_RET_FAIL;
-				break;
-		}
-		goto lbl_exit;
-	}
-
-	if(pclose(hRead) == -1)
-	{
-		switch (errno)
-		{
-			case	EINTR:
-				ret = SYSINFO_RET_TIMEOUT;
-				break;
-			default:
-				ret = SYSINFO_RET_FAIL;
-				break;
-		}
-		goto lbl_exit;
-	}
-
-	hRead = NULL;
-
-#endif /* _WINDOWS */
-
-	zabbix_log(LOG_LEVEL_DEBUG, "Before");
-
-	zbx_rtrim(cmd_result,"\n\r\0");
-
-	/* We got EOL only */
-	if(cmd_result[0] == '\0')
-	{
-		ret = SYSINFO_RET_FAIL;
-		goto lbl_exit;
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "Run remote command [%s] Result [%d] [%.20s]...", command, strlen(cmd_result), cmd_result);
+	zabbix_log(LOG_LEVEL_DEBUG, "Run remote command [%s] Result [%d] [%.20s]...",
+				param, strlen(cmd_result), cmd_result);
 
 	SET_TEXT_RESULT(result, strdup(cmd_result));
 
 	ret = SYSINFO_RET_OK;
 
 lbl_exit:
-
-#if defined(_WINDOWS)
-	if ( hWrite )	{ CloseHandle(hWrite);	hWrite = NULL; }
-	if ( hRead)	{ CloseHandle(hRead);	hRead = NULL; }
-#else /* not _WINDOWS */
-	if ( hRead )	{ pclose(hRead);	hRead = NULL; }
-#endif /* _WINDOWS */
-
-	zbx_free(command)
 	zbx_free(cmd_result);
 
 	return ret;
@@ -352,7 +224,7 @@ int	EXECUTE_INT(const char *cmd, const char *command, unsigned flags, AGENT_RESU
 	return ret;
 }
 
-int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #define MAX_FLAG_LEN 10
 

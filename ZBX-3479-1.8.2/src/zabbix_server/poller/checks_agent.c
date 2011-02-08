@@ -60,7 +60,7 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 
 		/* Send requests using old protocol */
 		if (SUCCEED == (ret = zbx_tcp_send_raw(&s, buffer)))
-			ret = zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE);
+			ret = zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE, 0);
 	}
 
 	if (SUCCEED == ret)

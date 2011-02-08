@@ -70,10 +70,11 @@ int     zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, un
 
 #define ZBX_TCP_NEW_PROTOCOL	0x01
 
-#define zbx_tcp_send(s, d)		zbx_tcp_send_ext((s), (d), ZBX_TCP_NEW_PROTOCOL)
-#define zbx_tcp_send_raw(s, d)	zbx_tcp_send_ext((s), (d), 0)
+#define zbx_tcp_send(s, d)		zbx_tcp_send_ext((s), (d), ZBX_TCP_NEW_PROTOCOL, 0)
+#define zbx_tcp_send_to(s, d, timeout)	zbx_tcp_send_ext((s), (d), ZBX_TCP_NEW_PROTOCOL, timeout)
+#define zbx_tcp_send_raw(s, d)		zbx_tcp_send_ext((s), (d), 0, 0)
 
-int     zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags);
+int     zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags, int timeout);
 
 void    zbx_tcp_close(zbx_sock_t *s);
 
@@ -94,9 +95,10 @@ void    zbx_tcp_free(zbx_sock_t *s);
 
 #define ZBX_TCP_READ_UNTIL_CLOSE 0x01
 
-#define	zbx_tcp_recv(s, data) 	zbx_tcp_recv_ext(s, data, 0)
+#define	zbx_tcp_recv(s, data) 			zbx_tcp_recv_ext(s, data, 0, 0)
+#define	zbx_tcp_recv_to(s, data, timeout) 	zbx_tcp_recv_ext(s, data, 0, timeout)
 
-int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags);
+int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeout);
 
 char    *get_ip_by_socket(zbx_sock_t *s);
 int	zbx_tcp_check_security(
@@ -104,5 +106,16 @@ int	zbx_tcp_check_security(
 	const char *ip_list,
 	int allow_if_empty
 	);
+
+#define	ZBX_DEFAULT_FTP_PORT	21
+#define	ZBX_DEFAULT_SSH_PORT	22
+#define	ZBX_DEFAULT_TELNET_PORT	23
+#define	ZBX_DEFAULT_SMTP_PORT	25
+#define	ZBX_DEFAULT_HTTP_PORT	80
+#define	ZBX_DEFAULT_POP_PORT	110
+#define	ZBX_DEFAULT_NNTP_PORT	119
+#define	ZBX_DEFAULT_NTP_PORT	123
+#define	ZBX_DEFAULT_IMAP_PORT	143
+#define	ZBX_DEFAULT_LDAP_PORT	389
 
 #endif

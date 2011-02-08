@@ -64,7 +64,7 @@ static int	recv_data_from_server(zbx_sock_t *sock, char **data)
 	int	res;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In recv_data_from_server()");
-	if (FAIL == (res = zbx_tcp_recv_ext(sock, data, 0)))
+	if (FAIL == (res = zbx_tcp_recv(sock, data)))
 		zabbix_log(LOG_LEVEL_ERR, "Error while receiving answer from server [%s]",
 				zbx_tcp_strerror());
 	else

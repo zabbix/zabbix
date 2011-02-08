@@ -352,7 +352,7 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Before read");
 
-			if (SUCCEED == (ret = zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE)))
+			if (SUCCEED == (ret = zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE, 0)))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "Got [%s]", buf);
 				parse_list_of_checks(buf);

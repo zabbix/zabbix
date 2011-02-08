@@ -99,9 +99,8 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 #endif
 			break;
 		case ITEM_TYPE_SIMPLE:
-			alarm(CONFIG_TIMEOUT);
+			/* simple checks use their own timeouts */
 			res = get_value_simple(item, result);
-			alarm(0);
 			break;
 		case ITEM_TYPE_INTERNAL:
 			alarm(CONFIG_TIMEOUT);
@@ -133,9 +132,8 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			}
 			break;
 		case ITEM_TYPE_EXTERNAL:
-			alarm(CONFIG_TIMEOUT);
+			/* external checks use their own timeouts */
 			res = get_value_external(item, result);
-			alarm(0);
 
 			if (SUCCEED != res && GET_MSG_RESULT(result))
 			{

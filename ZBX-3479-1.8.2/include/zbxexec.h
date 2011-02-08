@@ -17,12 +17,9 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#ifndef ZABBIX_CHECKS_EXTERNAL_H
-#define ZABBIX_CHECKS_EXTERNAL_H
+#ifndef ZABBIX_ZBXEXEC_H
+#define ZABBIX_ZBXEXEC_H
 
-#include "dbcache.h"
-#include "sysinfo.h"
+int	zbx_execute(const char *command, char **buffer, char *error, size_t max_error_len, int timeout);
 
-int     get_value_external(DC_ITEM *item, AGENT_RESULT *result);
-
-#endif
+#endif	/* ZABBIX_ZBXEXEC_H */
