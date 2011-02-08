@@ -104,8 +104,6 @@ static int	check_ssh(const char *host, unsigned short port, int timeout, int *va
 	char		*recv_buf;
 	char		*ssh_server, *ssh_proto;
 
-	assert(NULL != value_int);
-
 	*value_int = 0;
 
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout)))
@@ -143,7 +141,7 @@ static int	check_service(const char *cmd, const char *param, unsigned flags, AGE
 	int		value_int = 0, ret = SYSINFO_RET_FAIL;
 	double		check_time;
 
-	assert(NULL != result);
+	assert(result);
 
 	init_result(result);
 
