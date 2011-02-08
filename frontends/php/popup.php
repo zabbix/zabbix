@@ -752,7 +752,7 @@ include_once('include/page_header.php');
 					$dstfld2 => $trigger[$srcfld2],
 				);
 
-				$js_action = 'javascript: addValues('.zbx_jsvalue($reference).','.zbx_jsvalue($values).'); close_window(); return false;';
+				$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).','.zbx_jsvalue($values).'); return false;';
 			}
 
 			$description->setAttribute('onclick', $js_action);
