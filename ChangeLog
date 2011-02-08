@@ -688,7 +688,6 @@ Changes for 1.8.2
  - [ZBX-1522] fixed server crash on an undefined user macro (asaveljevs)
  - [ZBX-2039] fixed pattern matching in function count (asaveljevs)
  - [ZBXNEXT-119] added support for time shifted functions (asaveljevs)
- - [ZBX-2062] fixed sending of recovery messages multiple times (Sasha)
  - [ZBX-1878] reverted map label background drawing (Aly)
  - [ZBX-2016] fixed code with "_itow_s()" and "zbx_wsnprintf" to avoid possible run-time memory corruption. Thanks to Takanori Suzuki. (Dmitry)
  - [ZBX-2059] fixed special char treatment in XML export (Aly)
@@ -1633,7 +1632,6 @@ Changes for 1.5.4
  - [DEV-198] added disabled images in the elements of maps (sasha)
  - [DEV-194] dependent triggers are not count in SoT (Artem)
  - [DEV-187] increased Url field in web scenario (Sasha)
- - [DEV-195] added support of source ip address (Sasha)
  - [DEV-191] added inline update of "Latest Data" screen (Artem)
  - [DEV-193] improved viewing integer items on graphs (Artem)
  - [DEV-196] improved performance of server module (Sasha)
@@ -1698,7 +1696,6 @@ Changes for 1.5.1:
 
 Changes for 1.5:
 
- - [DEV-137] increased max number of log file lines sent per second to 100 (Alexei)
  - [DEV-127] improved system status widget in dashboard screen (Artem)
  - [DEV-125] added "Discovery status" widget (Artem)
  - [DEV-123] screen "queue" moved to administration section (Artem)
@@ -1732,8 +1729,6 @@ Changes for 1.5:
  - [DEV-60] added availability of setting hosts view style in overview (Artem)
  - [DEV-53] added different style for dependent triggers in "Status of triggers" (Artem)
  - [DEV-62] added availability to select all hosts in "Availability report" (Artem)
- - [DEV-75] Empty command result window (Sasha)
- - [DEV-74] Scripts of all nodes are displayed (Sasha)
  - [DEV-54] added zoom for graphs (Artem)
  - [DEV-48] Support of Ping and Traceroute in Status of Triggers screen (Sasha)
  - [DEV-57] added better "hosts info" selection in screens (Artem)
