@@ -1,5 +1,8 @@
 Changes for 1.8.5rc1
 
+ - [ZBX-2152] fixed names of SNMPv3 security levels, again (asaveljevs)
+ - [ZBX-3411] fixed change trigger filter where change host (Aly,Vlad)
+ - [ZBX-3431] fixed severity for log and eventlog or mixed (Vlad)
  - [ZBX-2913] fixed timeout handling in processing of web.page.* checks (sasha)
  - [ZBX-3176] removed navigation dropdown from applications screen (Vedmak)
  - [ZBX-3494] added database monitor items to the queue calculation (asaveljevs)
