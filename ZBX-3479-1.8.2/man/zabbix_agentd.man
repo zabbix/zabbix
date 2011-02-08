@@ -1,0 +1,45 @@
+.TH ZABBIX_AGENTD 8 "4 August 2009"
+.SH NAME
+zabbix_agentd \- Zabbix agent daemon.
+.SH SYNOPSIS
+.B zabbix_agentd [-hpV] [-c 
+.I config-file
+.B ] [-t metric]
+.SH DESCRIPTION
+.B zabbix_agentd
+is a daemon for monitoring of various server parameters.
+.SS Options
+.IP "-c, --config config-file"
+Use the alternate system wide
+.I config-file
+instead  of
+.I /etc/zabbix/zabbix_agentd.conf\fR.
+Use absolute path.
+.
+.IP "-p, --print"
+Print supported metrics and exit.
+.IP "-t, --test metric"
+Test single metric and exit.
+.IP "-h, --help"
+Display this help and exit.
+.IP "-V, --version"
+Output version information and exit.
+.SH FILES
+.TP
+.I /etc/zabbix/zabbix_agentd.conf
+Default location of Zabbix Agent configuration file.
+.SH "SEE ALSO"
+.BR zabbix_get (8),
+.BR zabbix_proxy (8),
+.BR zabbix_sender (8),
+.BR zabbix_server (8)
+.SH BUGS
+Note that
+.B -t
+and
+.B -p
+switches do not work with user parameters. Use
+.B zabbix_get
+instead.
+.SH AUTHOR
+Alexei Vladishev <alex@zabbix.com>
