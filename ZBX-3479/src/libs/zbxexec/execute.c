@@ -32,7 +32,7 @@
  * Parameters: hRead         - [IN] a handle to the device                    *
  *             buf           - [IN/OUT] a pointer to the buffer               *
  *             buf_size      - [IN] buffer size                               *
- *             timeout       - [IN] timeout in milliseconds                   *
+ *             timeout       - [IN] timeout in seconds                        *
  *             error         - [OUT] error string if function fails           *
  *             max_error_len - [IN] length of error buffer                    *
  *                                                                            *
@@ -43,10 +43,12 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t buf_size, DWORD timeout,
+static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t buf_size, int timeout,
 		char *error, size_t max_error_len)
 {
 	DWORD	in_buf_size, read_bytes;
+
+	timeout *= 1000;
 
 	while (0 != PeekNamedPipe(hRead, NULL, 0, NULL, &in_buf_size, NULL))
 	{
@@ -219,6 +221,7 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 	HANDLE			hWrite = NULL, hRead = NULL;
 	char			*cmd = NULL;
 	LPTSTR			wcmd;
+	time_t			now;
 
 #else /* not _WINDOWS */
 
@@ -238,6 +241,8 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 	}
 
 #ifdef _WINDOWS
+
+	now = time(NULL);
 
 	/* Set the bInheritHandle flag so pipe handles are inherited */
 	sa.nLength = sizeof(SECURITY_ATTRIBUTES);
@@ -279,16 +284,16 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 
 	if (NULL != buffer)
 	{
-		if (SUCCEED == (ret = zbx_read_from_pipe(hRead, &p, buf_size, timeout * 1000, error, max_error_len)))
+		if (SUCCEED == (ret = zbx_read_from_pipe(hRead, &p, buf_size, timeout, error, max_error_len)))
 			*p = '\0';
 	}
 
-	/* Don't wait child process exiting. */
-	/* WaitForSingleObject(pi.hProcess, INFINITE); */
+	/* wait child process exiting. */
+	if (0 < (timeout -= time(NULL) - now))
+		WaitForSingleObject(pi.hProcess, timeout * 1000);
 
-	/* Terminate child process */
-	if (FAIL == ret)
-		TerminateProcess(pi.hProcess, 0);
+	/* terminate child process */
+	TerminateProcess(pi.hProcess, 0);
 
 	CloseHandle(pi.hProcess);
 	CloseHandle(pi.hThread);
