@@ -568,6 +568,9 @@ COpt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS,'Map [ '.$map['name'].' ] already exists.');
 				}
 
+				if (!isset($map['urls'])){
+					$map['urls'] = array();
+				}
 				$urlNames = zbx_toHash($map['urls'], 'name');
 				foreach($map['urls'] as $unum => $url){
 					if($url['name'] === '' || $url['url'] === '')
