@@ -123,12 +123,12 @@ timer stop patching of the database
 
 # ********************   4
 
-echo "Adding 'Discovered Hosts' host group"
+echo "Adding 'Discovered hosts' host group"
 
-increaseid groups groupid
+discoveredhostsgroup=$(increaseid groups groupid)
 
-echo "update config set discovery_groupid=(select nextid from ids where table_name='groups' and field_name='groupid') where configid='1';
-insert into groups (groupid,name,internal) select nextid,'Discovered Hosts','1' from ids where table_name='groups' and field_name='groupid';" | $MYSQL $MYSQLPARAMS
+echo "update config set discovery_groupid='$discoveredhostsgroup' where configid='1';
+insert into groups (groupid,name,internal) values ('$discoveredhostsgroup','Discovered hosts','1');" | $MYSQL $MYSQLPARAMS
 
 # ********************   5
 
@@ -138,8 +138,8 @@ echo -n "Checking for 'Disabled' user group... "
 	echo "found, not doing anything."
 } || {
 	echo "not found, adding."
-	increaseid usrgrp usrgrpid
-	echo "insert into usrgrp (usrgrpid,name,gui_access,users_status,api_access,debug_mode) select nextid,'Disabled','0','1','0','0' from ids where table_name='usrgrp' and field_name='usrgrpid';" | $MYSQL $MYSQLPARAMS
+	disabledusrgroup=$(increaseid usrgrp usrgrpid)
+	echo "insert into usrgrp (usrgrpid,name,gui_access,users_status,api_access,debug_mode) values ('$disabledusrgroup','Disabled','0','1','0','0');" | $MYSQL $MYSQLPARAMS
 }
 
 # ********************   6
