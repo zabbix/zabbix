@@ -62,14 +62,14 @@ increaseid() {
 # increases corresponding id if found, searches the table for max id and inserts one if not
 # returns freshly inserted id to be used with new entry
 	CURRENTID=$(echo "select nextid from ids where table_name='$1' and field_name='$2';" | $MYSQL $MYSQLPARAMS -N)
-	
+
 	[[ "$CURRENTID" ]] && {
 		echo "update ids set nextid='$[$CURRENTID+1]' where table_name='$1' and field_name='$2';" | $MYSQL $MYSQLPARAMS
 	} || {
 		CURRENTID=$(echo "select $2 from $1 order by $2 desc limit 1;" | $MYSQL $MYSQLPARAMS -N)
 		echo "insert into ids values (0,'$1','$2',$[$CURRENTID+1]);" | $MYSQL $MYSQLPARAMS
 	}
-	return $[$CURRENTID+1]
+	echo $[$CURRENTID+1]
 }
 
 drop_index() {
@@ -161,7 +161,7 @@ HOSTSWOGROUP=$(echo "select hosts.hostid from hosts left join hosts_groups on ho
 	}
 	for ORPHANHOST in $HOSTSWOGROUP; do
 		MAPPINGID=$(increaseid hosts_groups hostgroupid)
-		echo "insert into hosts_groups (hostgroupid,hostid,groupid) select nextid,'$ORPHANHOST','$GROUPFORHOSTSID' from ids where table_name='hosts_groups' and field_name='hostgroupid';" | $MYSQL $MYSQLPARAMS
+		echo "insert into hosts_groups (hostgroupid,hostid,groupid) values ('$MAPPINGID','$ORPHANHOST','$GROUPFORHOSTSID');" | $MYSQL $MYSQLPARAMS
 		((HOSTSADDED++))
 	done
 	echo "Added $HOSTSADDED hosts to group '$GROUPFORHOSTS'. Move them to correct groups manually."
