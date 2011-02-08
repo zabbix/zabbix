@@ -7,10 +7,10 @@ ALTER TABLE ONLY sysmaps ALTER sysmapid DROP DEFAULT,
 			 ALTER label_location SET DEFAULT '3',
 			 ADD expandproblem INTEGER DEFAULT '1' NOT NULL,
 			 ADD markelements INTEGER DEFAULT '0' NOT NULL,
-			 ADD show_unack INTEGER DEFAULT '0' NOT NULL;
-			 ADD grid_size INTEGER DEFAULT '50' NOT NULL;
-			 ADD grid_show INTEGER DEFAULT '1' NOT NULL;
-			 ADD grid_align INTEGER DEFAULT '1' NOT NULL;
+			 ADD show_unack INTEGER DEFAULT '0' NOT NULL,
+			ADD grid_size integer DEFAULT '50' NOT NULL,
+			ADD grid_show integer DEFAULT '1' NOT NULL,
+			ADD grid_align integer DEFAULT '1' NOT NULL;		 
 UPDATE sysmaps SET backgroundid=NULL WHERE backgroundid=0;
 UPDATE sysmaps SET show_unack=1 WHERE highlight>7 AND highlight<16;
 UPDATE sysmaps SET show_unack=2 WHERE highlight>23;
