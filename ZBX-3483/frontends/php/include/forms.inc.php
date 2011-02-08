@@ -2333,12 +2333,12 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			$cmbAuthType);
 		$frmItem->addRow(array(new CVisibilityBox('username_visible', get_request('username_visible'), 'username', S_ORIGINAL), S_USER_NAME),
 			new CTextBox('username', $username, 40));
-		$frmItem->addRow(array(new CVisibilityBox('password_visible', get_request('password_visible'), 'password', S_ORIGINAL), S_PASSWORD),
-			new CTextBox('password', $password, 40));
 		$frmItem->addRow(array(new CVisibilityBox('publickey_visible', get_request('publickey_visible'), 'publickey', S_ORIGINAL), S_PUBLIC_KEY_FILE),
 			new CTextBox('publickey', $publickey, 40));
 		$frmItem->addRow(array(new CVisibilityBox('privatekey_visible', get_request('privatekey_visible'), 'privatekey', S_ORIGINAL), S_PRIVATE_KEY_FILE),
 			new CTextBox('privatekey', $privatekey, 40));
+		$frmItem->addRow(array(new CVisibilityBox('password_visible', get_request('password_visible'), 'password', S_ORIGINAL), S_PASSWORD),
+					new CTextBox('password', $password, 40));
 
 		$frmItem->addRow(array( new CVisibilityBox('formula_visible', get_request('formula_visible'), 'formula', S_ORIGINAL),
 			S_CUSTOM_MULTIPLIER.' (0 - '.S_DISABLED.')'), new CTextBox('formula',$formula,40));

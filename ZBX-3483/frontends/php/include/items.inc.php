@@ -751,7 +751,7 @@
 			$item['username'] = '';
 			$item['password'] = '';
 		}
-		if($item_data['type'] != ITEM_TYPE_SSH && $item_data['authtype'] != ITEM_AUTHTYPE_PUBLICKEY){
+		if($item_data['type'] != ITEM_TYPE_SSH || ($item_data['type'] == ITEM_TYPE_SSH && $item_data['authtype'] != ITEM_AUTHTYPE_PUBLICKEY)){
 			$item['publickey'] = '';
 			$item['privatekey'] = '';
 		}
