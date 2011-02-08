@@ -39,12 +39,12 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_get_timediff_ms(struct _timeb time1, struct _timeb time2)
+static int	zbx_get_timediff_ms(struct _timeb *time1, struct _timeb *time2)
 {
 	int	ms;
 
-	ms = (time2.time - time1.time) * 1000;
-	ms += time2.millitm - time1.millitm;
+	ms = (int)(time2->time - time1->time) * 1000;
+	ms += time2->millitm - time1->millitm;
 
 	if (0 > ms)
 		ms = 0;
@@ -72,10 +72,12 @@ static int	zbx_get_timediff_ms(struct _timeb time1, struct _timeb time2)
  *                                                                            *
  ******************************************************************************/
 static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t buf_size,
-		struct _timeb start_time, int timeout_ms)
+		struct _timeb *start_time, int timeout_ms)
 {
 	DWORD		in_buf_size, read_bytes;
 	struct _timeb	current_time;
+
+	timeout_ms -= 20;
 
 	while (0 != PeekNamedPipe(hRead, NULL, 0, NULL, &in_buf_size, NULL))
 	{
@@ -91,7 +93,7 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t buf_size,
 		}
 
 		_ftime(&current_time);
-		if (zbx_get_timediff_ms(start_time, current_time) < 20)
+		if (zbx_get_timediff_ms(start_time, &current_time) >= timeout_ms)
 			return TIMEOUT_ERROR;
 
 		Sleep(20);
@@ -303,14 +305,14 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 
 	if (NULL != buffer)
 	{
-		if (SUCCEED == (ret = zbx_read_from_pipe(hRead, &p, buf_size, start_time, timeout * 1000)))
+		if (SUCCEED == (ret = zbx_read_from_pipe(hRead, &p, buf_size, &start_time, timeout * 1000)))
 			*p = '\0';
 	}
 
 	if (TIMEOUT_ERROR != ret)
 	{
 		_ftime(&current_time);
-		if (0 > (timeout = zbx_get_timediff_ms(start_time, current_time)))
+		if (0 < (timeout = zbx_get_timediff_ms(&start_time, &current_time)))
 		{
 			if (WAIT_TIMEOUT == WaitForSingleObject(pi.hProcess, timeout))
 				ret = TIMEOUT_ERROR;
