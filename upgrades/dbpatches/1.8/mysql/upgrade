@@ -157,7 +157,7 @@ HOSTSWOGROUP=$(echo "select hosts.hostid from hosts left join hosts_groups on ho
 	} || {
 		echo "Group '$GROUPFORHOSTS' does not exist, creating it and adding all orphaned hosts to it."
 		GROUPFORHOSTSID=$(increaseid groups groupid)
-		echo "insert into groups (groupid,name,internal) select nextid,'$GROUPFORHOSTS','0' from ids where table_name='groups' and field_name='groupid';" | $MYSQL $MYSQLPARAMS
+		echo "insert into groups (groupid,name,internal) values ('$GROUPFORHOSTSID','$GROUPFORHOSTS','0');" | $MYSQL $MYSQLPARAMS
 	}
 	for ORPHANHOST in $HOSTSWOGROUP; do
 		MAPPINGID=$(increaseid hosts_groups hostgroupid)

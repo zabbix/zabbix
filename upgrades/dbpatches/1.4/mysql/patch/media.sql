@@ -11,6 +11,6 @@ CREATE TABLE media_tmp (
 CREATE INDEX media_1 on media_tmp (userid);
 CREATE INDEX media_2 on media_tmp (mediatypeid);
 
-insert into media_tmp select * from media;
+insert into media_tmp select mediaid,userid,mediatypeid,sendto,active,severity,period from media;
 drop table media;
 alter table media_tmp rename media;
