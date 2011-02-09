@@ -22,6 +22,6 @@
 
 extern char	*CONFIG_SOURCE_IP;
 
-int	check_ntp(char *host, unsigned short port, int *value_int);
+int	check_ntp(char *host, unsigned short port, int timeout, int *value_int);
 
 #endif /* ZABBIX_SYSINFO_SIMPLE_NTP_H */
