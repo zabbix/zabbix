@@ -192,8 +192,11 @@ function addPopupValues(list){
 				if(!isset('action', value))
 					value.action = isset('opcommand_hstid', value) ? 'update' : 'create';
 
-				value.commandLine = value.command.split("\n")[0].toString();
-				if(value.commandLine.length > 48) value.commandLine = value.commandLine.substr(0,45) + '...';
+				value.commandLine = value.command;
+				var cmdLines = value.command.split("\n");
+
+				if((value.command.length > 48) || (cmdLines.length > 1))
+					value.commandLine = cmdLines[0].toString().substr(0,45) + '...';
 
 				if(jQuery("#opCmdDraft").length){
 					jQuery("#opCmdDraft").replaceWith(tpl.evaluate(value));
@@ -343,9 +346,9 @@ function saveOpCmdForm(){
 function selectOpCmdTarget(){
 	var target = jQuery('#opcmdEditForm select[name="opCmdTarget"]').val();
 	if(target.toString() == '2')
-		PopUp("popup.php?dstfrm=web.action.edit.php&srctbl=host_group&srcfld1=groupid&srcfld2=name&dstfld1=opCmdTargetObjectId&dstfld2=opCmdTargetObjectName&writeonly=1",480,480);
+		PopUp("popup.php?dstfrm=action.edit.php&srctbl=host_group&srcfld1=groupid&srcfld2=name&dstfld1=opCmdTargetObjectId&dstfld2=opCmdTargetObjectName&writeonly=1",480,480);
 	else
-		PopUp("popup.php?dstfrm=web.action.edit.php&srctbl=hosts&srcfld1=hostid&srcfld2=host&dstfld1=opCmdTargetObjectId&dstfld2=opCmdTargetObjectName&writeonly=1",780,480);
+		PopUp("popup.php?dstfrm=action.edit.php&srctbl=hosts&srcfld1=hostid&srcfld2=host&dstfld1=opCmdTargetObjectId&dstfld2=opCmdTargetObjectName&writeonly=1",780,480);
 }
 
 function changeOpCmdTarget(){
