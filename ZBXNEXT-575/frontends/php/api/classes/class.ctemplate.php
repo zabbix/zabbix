@@ -1164,7 +1164,9 @@ COpt::memoryPick();
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			));
-			CItem::delete(array_keys($delItems), true);
+
+			if(!empty($delItems))
+				CItem::delete(array_keys($delItems), true);
 
 
 // delete screen items
@@ -1174,50 +1176,68 @@ COpt::memoryPick();
 			delete_sysmaps_elements_with_hostid($templateids);
 
 // disable actions
+// actions from conditions
 			$actionids = array();
-
-// conditions
 			$sql = 'SELECT DISTINCT actionid '.
 					' FROM conditions '.
 					' WHERE conditiontype='.CONDITION_TYPE_HOST.
 						' AND '.DBcondition('value', $templateids);
 			$db_actions = DBselect($sql);
-			while($db_action = DBfetch($db_actions)){
+			while($db_action = DBfetch($db_actions))
 				$actionids[$db_action['actionid']] = $db_action['actionid'];
-			}
 
-			DBexecute('UPDATE actions '.
-						' SET status='.ACTION_STATUS_DISABLED.
-						' WHERE '.DBcondition('actionid',$actionids));
-// operations
+// actions from operations
 			$sql = 'SELECT DISTINCT o.actionid '.
-					' FROM operations o '.
-					' WHERE o.operationtype IN ('.OPERATION_TYPE_GROUP_ADD.','.OPERATION_TYPE_GROUP_REMOVE.') '.
-						' AND '.DBcondition('o.objectid', $templateids);
+					' FROM operations o, optemplate ot '.
+					' WHERE o.operationid=ot.operationid '.
+						' AND '.DBcondition('ot.templateid',$templateids);
 			$db_actions = DBselect($sql);
-			while($db_action = DBfetch($db_actions)){
+			while($db_action = DBfetch($db_actions))
 				$actionids[$db_action['actionid']] = $db_action['actionid'];
-			}
 
 			if(!empty($actionids)){
-				DBexecute('UPDATE actions '.
-						' SET status='.ACTION_STATUS_DISABLED.
-						' WHERE '.DBcondition('actionid',$actionids));
+				$update = array();
+				$update[] = array(
+					'values' => array('status' => ACTION_STATUS_DISABLED),
+					'where' => array(DBcondition('actionid',$actionids))
+				);
+				DB::update('actions', $update);
 			}
 
-
 // delete action conditions
-			DBexecute('DELETE FROM conditions '.
-						' WHERE conditiontype='.CONDITION_TYPE_HOST.
-							' AND '.DBcondition('value',$templateids));
+			DB::delete('conditions', array(
+				'conditiontype'=>CONDITION_TYPE_HOST,
+				'value'=>$templateids
+			));
 
+// delete action operation commands
+			$operationids = array();
+			$sql = 'SELECT DISTINCT ot.operationid '.
+					' FROM optemplate ot '.
+					' WHERE '.DBcondition('ot.templateid', $templateids);
+			$dbOperations = DBselect($sql);
+			while($dbOperation = DBfetch($dbOperations))
+				$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
 
-// delete action operations
-			DBexecute('DELETE FROM operations '.
-						' WHERE operationtype IN ('.OPERATION_TYPE_TEMPLATE_ADD.','.OPERATION_TYPE_TEMPLATE_REMOVE.') '.
-							' AND '.DBcondition('objectid',$templateids));
+			DB::delete('optemplate', array(
+				'templateid'=>$templateids,
+			));
 
+// delete empty operations
+			$delOperationids = array();
+			$sql = 'SELECT DISTINCT o.operationid '.
+					' FROM operations o '.
+					' WHERE '.DBcondition('o.operationid', $operationids).
+						' AND NOT EXISTS(SELECT ot.optemplateid FROM optemplate ot WHERE ot.operationid=o.operationid)';
+			$dbOperations = DBselect($sql);
+			while($dbOperation = DBfetch($dbOperations))
+				$delOperationids[$dbOperation['operationid']] = $dbOperation['operationid'];
 
+			DB::delete('operations', array(
+				'operationid'=>$delOperationids,
+			));
+
+// Applications
 			$delApplications = CApplication::get(array(
 				'templateids' => $templateids,
 				'output' => API_OUTPUT_SHORTEN,

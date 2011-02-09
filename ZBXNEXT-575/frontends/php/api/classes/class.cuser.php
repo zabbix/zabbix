@@ -775,15 +775,35 @@ Copt::memoryPick();
 				}
 			}
 
-			DBexecute('DELETE FROM operations WHERE object='.OPERATION_OBJECT_USER.' AND '.DBcondition('objectid', $userids));
-			DBexecute('DELETE FROM media WHERE '.DBcondition('userid', $userids));
-			DBexecute('DELETE FROM profiles WHERE '.DBcondition('userid', $userids));
-			DBexecute('DELETE FROM users_groups WHERE '.DBcondition('userid', $userids));
-			DBexecute('DELETE FROM users WHERE '.DBcondition('userid', $userids));
+// delete action operation msg
+			$operationids = array();
+			$sql = 'SELECT DISTINCT om.operationid '.
+					' FROM opmessage_usr om '.
+					' WHERE '.DBcondition('om.userid', $userids);
+			$dbOperations = DBselect($sql);
+			while($dbOperation = DBfetch($dbOperations))
+				$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
 
+			DB::delete('opmessage_usr', array('userid'=>$userids));
+
+// delete empty operations
+			$delOperationids = array();
+			$sql = 'SELECT DISTINCT o.operationid '.
+					' FROM operations o '.
+					' WHERE '.DBcondition('o.operationid', $operationids).
+						' AND NOT EXISTS(SELECT om.opmessage_usrid FROM opmessage_usr om WHERE om.operationid=o.operationid)';
+			$dbOperations = DBselect($sql);
+			while($dbOperation = DBfetch($dbOperations))
+				$delOperationids[$dbOperation['operationid']] = $dbOperation['operationid'];
+
+			DB::delete('operations', array('operationid'=>$delOperationids));
+			DB::delete('media', array('userid'=>$userids));
+			DB::delete('profiles', array('userid'=>$userids));
+			DB::delete('users_groups', array('userid'=>$userids));
+			DB::delete('users', array('userid'=>$userids));
 
 			self::EndTransaction(true, __METHOD__);
-			return true;
+			return array('userids' => $userids);
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);

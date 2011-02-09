@@ -718,8 +718,30 @@ class CUserGroup extends CZBXAPI{
 			}
 			if(!empty($error_array))
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error_array);
+
+// delete action operation msg
+			$operationids = array();
+			$sql = 'SELECT DISTINCT om.operationid '.
+					' FROM opmessage_grp om '.
+					' WHERE '.DBcondition('om.usrgrpid', $usrgrpids);
+			$dbOperations = DBselect($sql);
+			while($dbOperation = DBfetch($dbOperations))
+				$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
+
+			DB::delete('opmessage_grp', array('usrgrpid'=>$usrgrpids));
+
+// delete empty operations
+			$delOperationids = array();
+			$sql = 'SELECT DISTINCT o.operationid '.
+					' FROM operations o '.
+					' WHERE '.DBcondition('o.operationid', $operationids).
+						' AND NOT EXISTS(SELECT om.opmessage_grpid FROM opmessage_grp om WHERE om.operationid=o.operationid)';
+			$dbOperations = DBselect($sql);
+			while($dbOperation = DBfetch($dbOperations))
+				$delOperationids[$dbOperation['operationid']] = $dbOperation['operationid'];
+
+			DB::delete('operations', array('operationid'=>$delOperationids));
 			DB::delete('rights', array('groupid'=>$usrgrpids));
-			DB::delete('operations', array('object'=>OPERATION_OBJECT_GROUP, 'objectid'=>$usrgrpids));
 			DB::delete('users_groups', array('usrgrpid'=>$usrgrpids));
 			DB::delete('usrgrp', array('usrgrpid'=>$usrgrpids));
 
