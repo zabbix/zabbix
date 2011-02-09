@@ -42,7 +42,7 @@ CREATE TABLE opmessage_grp (
 /
 CREATE UNIQUE INDEX opmessage_grp_1 ON opmessage_grp (operationid,usrgrpid)
 /
-ALTER TABLE opcommand_grp ADD CONSTRAINT c_opcommand_grp_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE
+ALTER TABLE opmessage_grp ADD CONSTRAINT c_opmessage_grp_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE
 /
 ALTER TABLE opmessage_grp ADD CONSTRAINT c_opmessage_grp_2 FOREIGN KEY (usrgrpid) REFERENCES usrgrp (usrgrpid)
 /
