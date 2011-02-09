@@ -83,16 +83,16 @@ DROP TABLE IF EXISTS _opcommand_grp;
 CREATE TEMPORARY TABLE _opcommand_hst (
 	operationid bigint unsigned,
 	name varchar(64),
-	longdata varchar(2048),
+	longdata text,
 	hostid bigint unsigned
-) ENGINE=MEMORY;
+);
 
 CREATE TEMPORARY TABLE _opcommand_grp (
 	operationid bigint unsigned,
 	name varchar(64),
-	longdata varchar(2048),
+	longdata text,
 	groupid bigint unsigned
-) ENGINE=MEMORY;
+);
 
 DELIMITER /
 CREATE PROCEDURE split_commands ()
@@ -101,7 +101,7 @@ BEGIN
 	DECLARE l_pos, r_pos, h_pos, g_pos INT;
 	DECLARE _operationid bigint unsigned DEFAULT 0;
 	DECLARE _longdata text DEFAULT '';
-	DECLARE cur_string varchar(2048);
+	DECLARE cur_string text;
 	DECLARE op_cur CURSOR FOR (SELECT operationid, longdata FROM operations WHERE operationtype = 1);
 	DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
 

@@ -106,7 +106,7 @@ ALTER TABLE ONLY opcommand_grp ADD CONSTRAINT c_opcommand_grp_2 FOREIGN KEY (gro
 
 CREATE TABLE tmp_opcommand (
 	operationid bigint,
-	longdata varchar(2048)
+	longdata text
 );
 
 CREATE OR REPLACE FUNCTION unnest(anyarray) RETURNS SETOF anyelement
@@ -128,7 +128,7 @@ UPDATE tmp_opcommand
 CREATE TABLE tmp_opcommand_hst (
 	operationid bigint,
 	name varchar(64),
-	longdata varchar(2048),
+	longdata text,
 	hostid bigint
 );
 
@@ -176,7 +176,7 @@ DROP TABLE tmp_opcommand_hst;
 CREATE TABLE tmp_opcommand_grp (
 	operationid bigint,
 	name varchar(64),
-	longdata varchar(2048),
+	longdata text,
 	groupid bigint
 );
 
