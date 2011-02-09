@@ -1932,7 +1932,7 @@
 	function drawMapLabels(&$im, &$map, &$map_info){
 		global $colors;
 
-		if(($map['label_type'] == MAP_LABEL_TYPE_NOTHING) && ($map['label_format'] == SYSMAP_LABEL_ADVANCE_OFF))
+		if(($map['label_type'] == MAP_LABEL_TYPE_NOTHING) && ($map['label_format'] == SYSMAP_LABEL_ADVANCED_OFF))
 			return;
 
 		$selements = $map['selements'];
@@ -1943,7 +1943,7 @@
 		foreach($selements as $selementid => $selement){
 			$selements[$selementid]['label_type'] = $map['label_type'];
 
-			if($map['label_format'] == SYSMAP_LABEL_ADVANCE_OFF) continue;
+			if($map['label_format'] == SYSMAP_LABEL_ADVANCED_OFF) continue;
 
 			switch($selement['elementtype']){
 				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
