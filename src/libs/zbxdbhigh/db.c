@@ -26,6 +26,7 @@
 #include "threads.h"
 #include "zbxserver.h"
 #include "dbcache.h"
+#include "zbxalgo.h"
 
 const char	*DBnode(const char *fieldid, int nodeid)
 {
@@ -2032,53 +2033,84 @@ void	DBexecute_overflowed_sql(char **sql, int *sql_allocated, int *sql_offset)
  *           host_name_sample is not modified, allocates new memory!          *
  *                                                                            *
  ******************************************************************************/
-char	*DBget_unique_hostname_by_sample(char *host_name_sample)
+char	*DBget_unique_hostname_by_sample(const char *host_name_sample)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		num = 2;	/* produce alternatives starting from "2" */
-	char		*host_name_temp, *host_name_sample_esc;
+	const char		*__function_name = "DBget_unique_hostname_by_sample";
+	DB_RESULT		result;
+	DB_ROW			row;
+	int			full_match = 0, i;
+	char			*host_name_temp = NULL, *host_name_sample_esc;
+	zbx_vector_uint64_t	nums;
+	zbx_uint64_t		num = 2;	/* produce alternatives starting from "2" */
+	size_t			sz;
 
 	assert(host_name_sample && *host_name_sample);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In DBget_unique_hostname_by_sample() sample:'%s'",
-			host_name_sample);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sample:'%s'", __function_name, host_name_sample);
 
+	zbx_vector_uint64_create(&nums);
+	zbx_vector_uint64_reserve(&nums, 8);
+
+	sz = strlen(host_name_sample);
 	host_name_sample_esc = DBdyn_escape_like_pattern(host_name_sample);
+
 	result = DBselect(
 			"select host"
 			" from hosts"
 			" where host like '%s%%' escape '%c'"
-				DB_NODE
-			" order by host",
-			host_name_sample_esc,
-			ZBX_SQL_LIKE_ESCAPE_CHAR,
-			DBnode_local("hostid"));
-
-	host_name_temp = strdup(host_name_sample);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		if (0 < strcmp(host_name_temp, row[0]))
-		{
-			/* skip those which are lexicographically smaller */
-			continue;
-		}
-		if (0 > strcmp(host_name_temp, row[0]))
-		{
-			/* found, all other will be bigger */
-			break;
-		}
-		/* 0 == strcmp(host_name_temp, row[0]) */
-		/* must construct bigger one, the constructed one already exists */
-		host_name_temp = zbx_dsprintf(host_name_temp, "%s_%d", host_name_sample, num++);
-	}
-	DBfree_result(result);
+				DB_NODE,
+			host_name_sample_esc, ZBX_SQL_LIKE_ESCAPE_CHAR, DBnode_local("hostid"));
 
 	zbx_free(host_name_sample_esc);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of DBget_unique_hostname_by_sample() constructed:'%s'",
-			host_name_temp);
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	n;
+		const char	*p;
+
+		if (0 != strncmp(row[0], host_name_sample, sz))
+			continue;
+
+		p = row[0] + sz;
+
+		if ('\0' == *p)
+		{
+			full_match = 1;
+			continue;
+		}
+
+		if ('_' != *p || FAIL == is_uint64(p + 1, &n))
+			continue;
+
+		zbx_vector_uint64_append(&nums, n);
+	}
+	DBfree_result(result);
+
+	zbx_vector_uint64_sort(&nums, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	if (0 == full_match)
+	{
+		host_name_temp = zbx_strdup(host_name_temp, host_name_sample);
+		goto clean;
+	}
+
+	for (i = 0; i < nums.values_num; i++)
+	{
+		if (num > nums.values[i])
+			continue;
+
+		if (num < nums.values[i])	/* found, all other will be bigger */
+			break;
+
+		num++;
+	}
+
+	host_name_temp = zbx_dsprintf(host_name_temp, "%s_%d", host_name_sample, num);
+
+clean:
+	zbx_vector_uint64_destroy(&nums);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():'%s'", __function_name, host_name_temp);
 
 	return host_name_temp;
 }
