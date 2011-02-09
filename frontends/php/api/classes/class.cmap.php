@@ -613,7 +613,7 @@ COpt::memoryPick();
 				}
 
 				if(($labelName == 'label_type_image') && (MAP_LABEL_TYPE_STATUS == $map[$labelName]))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect %1$s element custom label string for map "%s".', $labelData['typeName'], $dbMap['name']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect %1$s label type value for map "%2$s".', $labelData['typeName'], $dbMap['name']));
 
 				if($labelName == 'label_type' || $labelName == 'label_type_host') continue;
 
