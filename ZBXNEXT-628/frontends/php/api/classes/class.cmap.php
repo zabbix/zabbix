@@ -130,17 +130,7 @@ class CMap extends CZBXAPI{
 
 // filter
 		if(!is_null($options['filter'])){
-			zbx_value2array($options['filter']);
-
-			if(isset($options['filter']['sysmapid']) && !is_null($options['filter']['sysmapid'])){
-				zbx_value2array($options['filter']['sysmapid']);
-				$sql_parts['where']['sysmapid'] = DBcondition('s.sysmapid', $options['filter']['sysmapid']);
-			}
-
-			if(isset($options['filter']['name']) && !is_null($options['filter']['name'])){
-				zbx_value2array($options['filter']['name']);
-				$sql_parts['where']['name'] = DBcondition('s.name', $options['filter']['name'], false, true);
-			}
+			zbx_db_filter('sysmaps s', $options, $sql_parts);
 		}
 
 // output
@@ -430,7 +420,7 @@ COpt::memoryPick();
 				if(!isset($result[$selement['sysmapid']]['selements'])){
 					$result[$selement['sysmapid']]['selements'] = array();
 				}
-				$result[$selement['sysmapid']]['selements'][$selement['selementid']] = $selement;
+				$result[$selement['sysmapid']]['selements'][] = $selement;
 			}
 		}
 
