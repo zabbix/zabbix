@@ -2024,7 +2024,7 @@
 
 // DRAW
 		foreach($selements as $selementid => $selement){
-			if(empty($selement)) continue;
+			if(empty($selement) || (($selement['label_type'] == MAP_LABEL_TYPE_NOTHING))) continue;
 
 			$el_info = $map_info[$selementid];
 
