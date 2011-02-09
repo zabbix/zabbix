@@ -32,7 +32,7 @@ require_once('include/templates/action.js.php');
 	if(!isset($_REQUEST['form_refresh'])) $divTabs->setSelected(0);
 
 	$frmAction = new CForm();
-	$frmAction->setName('web.action.edit.php');
+	$frmAction->setName('action.edit.php');
 	$frmAction->addVar('form', get_request('form', 1));
 
 	$from_rfr = get_request('form_refresh',0);

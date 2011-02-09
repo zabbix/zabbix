@@ -359,10 +359,15 @@ function get_operation_desc($type, $data){
 				));
 				order_result($hosts, 'host');
 				foreach($data['opcommand_hst'] as $cnum => $command){
-					if($command['hostid'] == 0)
-						$result[] = _s('Current host: ');
-					else
-						$result[] = _s('Host "%1$s": ', $hosts[$command['hostid']]['host']);
+					if($command['hostid'] > 0) continue;
+					$result[] = _s('Current host: ');
+
+					$result[] = italic(zbx_nl2br($command['command']));
+				}
+
+				foreach($data['opcommand_hst'] as $cnum => $command){
+					if($command['hostid'] == 0) continue;
+					$result[] = _s('Host "%1$s": ', $hosts[$command['hostid']]['host']);
 
 					$result[] = italic(zbx_nl2br($command['command']));
 				}
@@ -377,7 +382,6 @@ function get_operation_desc($type, $data){
 					$result[] = _s('Host group "%1$s": ', $groups[$command['groupid']]['name']);
 					$result[] = italic(zbx_nl2br($command['command']));
 				}
-
 				break;
 			default:
 		}
