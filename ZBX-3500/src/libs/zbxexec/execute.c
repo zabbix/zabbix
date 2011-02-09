@@ -1,6 +1,6 @@
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,6 +20,87 @@
 #include "common.h"
 #include "threads.h"
 #include "log.h"
+
+#ifdef _WINDOWS
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_get_timediff_ms                                              *
+ *                                                                            *
+ * Purpose: considers a difference between times in milliseconds              *
+ *                                                                            *
+ * Parameters: time1         - [IN] first time point                          *
+ *             time2         - [IN] second time point                         *
+ *                                                                            *
+ * Return value: difference between times in milliseconds                     *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_get_timediff_ms(struct _timeb *time1, struct _timeb *time2)
+{
+	int	ms;
+
+	ms = (int)(time2->time - time1->time) * 1000;
+	ms += time2->millitm - time1->millitm;
+
+	if (0 > ms)
+		ms = 0;
+
+	return ms;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_read_from_pipe                                               *
+ *                                                                            *
+ * Purpose: read data from pipe                                               *
+ *                                                                            *
+ * Parameters: hRead         - [IN] a handle to the device                    *
+ *             buf           - [IN/OUT] a pointer to the buffer               *
+ *             buf_size      - [IN] buffer size                               *
+ *             timeout_ms    - [IN] timeout in milliseconds                   *
+ *                                                                            *
+ * Return value: SUCCEED or TIMEOUT_ERROR if timeout reached                  *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t buf_size, int timeout_ms)
+{
+	DWORD		in_buf_size, read_bytes;
+	struct _timeb	start_time, current_time;
+
+	_ftime(&start_time);
+
+	while (0 != PeekNamedPipe(hRead, NULL, 0, NULL, &in_buf_size, NULL))
+	{
+		if (0 != in_buf_size)
+		{
+			if (0 != ReadFile(hRead, *buf, MIN(in_buf_size, buf_size), &read_bytes, NULL))
+			{
+				*buf += read_bytes;
+				if (0 == (buf_size -= read_bytes))
+					break;
+			}
+			continue;
+		}
+
+		_ftime(&current_time);
+		if (zbx_get_timediff_ms(&start_time, &current_time) >= timeout_ms)
+			return TIMEOUT_ERROR;
+
+		Sleep(20);
+	}
+
+	return SUCCEED;
+}
+
+#else /* not _WINDOWS */
 
 /******************************************************************************
  *                                                                            *
@@ -131,6 +212,8 @@ exit:
 	return rc;
 }
 
+#endif	/* _WINDOWS */
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_execute                                                      *
@@ -149,10 +232,129 @@ exit:
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_execute(const char *command, char **buffer, char *error, size_t max_error_len)
+int	zbx_execute(const char *command, char **buffer, char *error, size_t max_error_len, int timeout)
 {
-	pid_t	pid;
-	int	fd, ret = SUCCEED;
+#ifdef _WINDOWS
+
+	STARTUPINFO		si = {0};
+	PROCESS_INFORMATION	pi = {0};
+	SECURITY_ATTRIBUTES	sa;
+	HANDLE			hWrite = NULL, hRead = NULL;
+	char			*cmd = NULL;
+	LPTSTR			wcmd = NULL;
+	struct _timeb		start_time, current_time;
+
+#else /* not _WINDOWS */
+
+	pid_t			pid;
+	int			fd;
+
+#endif /* _WINDOWS */
+
+	char			*p = NULL;
+	size_t			buf_size = MAX_BUFFER_LEN;
+	int			ret = SUCCEED;
+
+	assert(timeout);
+
+	if (NULL != buffer)
+	{
+		*buffer = p = zbx_realloc(*buffer, buf_size);
+		buf_size--;	/* '\0' */
+	}
+
+#ifdef _WINDOWS
+
+	/* set the bInheritHandle flag so pipe handles are inherited */
+	sa.nLength = sizeof(SECURITY_ATTRIBUTES);
+	sa.bInheritHandle = TRUE;
+	sa.lpSecurityDescriptor = NULL;
+
+	/* create a pipe for the child process's STDOUT */
+	if (0 == CreatePipe(&hRead, &hWrite, &sa, 0))
+	{
+		zbx_snprintf(error, max_error_len, "Unable to create pipe [%s]", strerror_from_system(GetLastError()));
+		ret = FAIL;
+		goto lbl_exit;
+	}
+
+	/* fill in process startup info structure */
+	memset(&si, 0, sizeof(STARTUPINFO));
+	si.cb = sizeof(STARTUPINFO);
+	si.dwFlags = STARTF_USESTDHANDLES;
+	si.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
+	si.hStdOutput = hWrite;
+	si.hStdError = hWrite;
+
+	cmd = zbx_dsprintf(cmd, "cmd /C \"%s\"", command);
+	wcmd = zbx_utf8_to_unicode(cmd);
+
+	/* create new process */
+	if (0 == CreateProcess(NULL, wcmd, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi))
+	{
+		zbx_snprintf(error, max_error_len, "Unable to create process: '%s' [%s]",
+				cmd, strerror_from_system(GetLastError()));
+		ret = FAIL;
+		goto lbl_exit;
+	}
+
+	CloseHandle(hWrite);
+	hWrite = NULL;
+
+	_ftime(&start_time);
+	timeout *= 1000;
+
+	if (NULL != buffer)
+	{
+		if (SUCCEED == (ret = zbx_read_from_pipe(hRead, &p, buf_size, timeout)))
+			*p = '\0';
+	}
+
+	if (TIMEOUT_ERROR != ret)
+	{
+		_ftime(&current_time);
+		if (0 < (timeout -= zbx_get_timediff_ms(&start_time, &current_time)))
+		{
+			if (WAIT_TIMEOUT == WaitForSingleObject(pi.hProcess, timeout))
+				ret = TIMEOUT_ERROR;
+		}
+	}
+
+	/* wait for child process to exit */
+	if (TIMEOUT_ERROR == ret)
+	{
+		zbx_strlcpy(error, "Timeout while executing a shell script", max_error_len);
+		ret = FAIL;
+	}
+
+	/* terminate child process */
+	TerminateProcess(pi.hProcess, 0);
+
+	CloseHandle(pi.hProcess);
+	CloseHandle(pi.hThread);
+
+	CloseHandle(hRead);
+	hRead = NULL;
+
+lbl_exit:
+	if (NULL != hWrite)
+	{
+		CloseHandle(hWrite);
+		hWrite = NULL;
+	}
+
+	if (NULL != hRead)
+	{
+		CloseHandle(hRead);
+		hRead = NULL;
+	}
+
+	zbx_free(cmd);
+	zbx_free(wcmd);
+
+#else	/* not _WINDOWS */
+
+	alarm(timeout);
 
 	if (-1 != (fd = zbx_popen(&pid, command)))
 	{
@@ -160,16 +362,11 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 
 		if (NULL != buffer)
 		{
-			char	*p;
-			size_t	buf_size = MAX_BUFFER_LEN;
-
-			*buffer = p = zbx_realloc(*buffer, buf_size);
-			buf_size--;	/* '\0' */
-
 			while (0 < (rc = read(fd, p, buf_size)))
 			{
 				p += rc;
-				buf_size -= rc;
+				if (0 == (buf_size -= rc))
+					break;
 			}
 
 			*p = '\0';
@@ -208,6 +405,13 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 		zbx_strlcpy(error, strerror(errno), max_error_len);
 		ret = FAIL;
 	}
+
+	alarm(0);
+
+#endif	/* _WINDOWS */
+
+	if (FAIL == ret && NULL != buffer)
+		zbx_free(*buffer);
 
 	return ret;
 }
