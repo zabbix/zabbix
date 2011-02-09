@@ -132,7 +132,7 @@ insert into groups (groupid,name,internal) values ('$discoveredhostsgroup','Disc
 
 # ********************   5
 
-[[ "$(echo $BASH_VERSION | cut -d. -f1,2 )" < "4.1" ]] && {{
+[[ "$(echo $BASH_VERSION | cut -d. -f1,2 )" < "4.1" ]] && {
 	# bash < 4.1 version
 	echo "bash < 4.1 detected"
 	# groupname,columnname
