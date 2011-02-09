@@ -47,7 +47,7 @@ INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid)
 
 UPDATE opmessage_grp
 	SET opmessage_grpid = (operationid div 100000000000) * 100000000000 + opmessage_grpid
-	WHERE opmessage_grpid >= 100000000000;
+	WHERE operationid >= 100000000000;
 
 ---- Patching table `opmessage_usr`
 
@@ -70,7 +70,7 @@ INSERT INTO opmessage_usr (opmessage_usrid, operationid, userid)
 
 UPDATE opmessage_usr
 	SET opmessage_usrid = (operationid div 100000000000) * 100000000000 + opmessage_usrid
-	WHERE opmessage_usrid >= 100000000000;
+	WHERE operationid >= 100000000000;
 
 ---- Patching tables `opcommand_hst` and `opcommand_grp`
 
