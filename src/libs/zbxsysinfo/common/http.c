@@ -35,7 +35,7 @@ static int	get_http_page(const char *host, const char *path, unsigned short port
 	char		request[MAX_STRING_LEN];
 	zbx_sock_t	s;
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, MAX(CONFIG_TIMEOUT - 1, 1))))
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, CONFIG_TIMEOUT)))
 	{
 		zbx_snprintf(request, sizeof(request),
 				"GET /%s HTTP/1.1\r\n"
@@ -52,9 +52,9 @@ static int	get_http_page(const char *host, const char *path, unsigned short port
 					zbx_strlcpy(buffer, recv_buffer, max_buffer_len);
 			}
 		}
-	}
 
-	zbx_tcp_close(&s);
+		zbx_tcp_close(&s);
+	}
 
 	if (FAIL == ret)
 	{

@@ -372,6 +372,7 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 				parse_list_of_checks(buf);
 			}
 		}
+
 		zbx_tcp_close(&s);
 	}
 
