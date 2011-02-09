@@ -1202,7 +1202,7 @@ COpt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 
 
-				if($del_triggers[$triggerid]['templateid'] != 0){
+				if($dbTriggers[$trigger['triggerid']]['templateid'] != 0){
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Cannot delete templated trigger [%1$s:%2$s]', $del_triggers[$triggerid]['description'], explode_exp($del_triggers[$triggerid]['expression'], false))
 					);
@@ -1349,8 +1349,8 @@ COpt::memoryPick();
  * @return array
  */
 	public static function delete($triggerids, $nopermissions=false){
-
 		$triggerids = zbx_toArray($triggerids);
+		$triggers = zbx_toObject($triggerids, 'triggerid');
 
 		try{
 			self::BeginTransaction(__METHOD__);
@@ -1359,7 +1359,7 @@ COpt::memoryPick();
 
 // TODO: remove $nopermissions hack
 			if(!$nopermissions){
-				self::checkInput(zbx_toObject($triggerids, 'triggerid'), __FUNCTION__);
+				self::checkInput($triggers, __FUNCTION__);
 			}
 
 // get child triggers
@@ -1409,10 +1409,7 @@ COpt::memoryPick();
 					' WHERE '.DBcondition('actionid', $actionids));
 
 // delete action conditions
-			DB::delete('conditions', array(
-				'conditiontype' => CONDITION_TYPE_TRIGGER,
-				'value' => $triggerids,
-			));
+			DB::delete('conditions', array('conditiontype' => CONDITION_TYPE_TRIGGER,'value' => $triggerids));
 
 // TODO: REMOVE info
 			foreach($del_triggers as $triggerid => $trigger){

@@ -156,7 +156,9 @@ include_once('include/page_header.php');
 		unset($_REQUEST['save']);
 	}
 	else if(isset($_REQUEST['delete']) && isset($_REQUEST['groupid'])){
+		DBstart();
 		$result = CHostGroup::delete($_REQUEST['groupid']);
+		$result = DBend($result);
 
 		unset($_REQUEST['form']);
 		show_messages($result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);

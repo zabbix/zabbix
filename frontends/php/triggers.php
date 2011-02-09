@@ -179,7 +179,9 @@ include_once('include/page_header.php');
 			unset($_REQUEST['form']);
 	}
 	else if(isset($_REQUEST['delete']) && isset($_REQUEST['triggerid'])){
+		DBstart();
 		$result = CTrigger::delete($_REQUEST['triggerid']);
+		$result = DBend($result);
 		show_messages($result, S_TRIGGER_DELETED, S_CANNOT_DELETE_TRIGGER);
 
 		if($result){

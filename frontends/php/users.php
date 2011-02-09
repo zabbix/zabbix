@@ -212,7 +212,9 @@ include_once('include/page_header.php');
 		$users = CUser::get(array('userids' => $_REQUEST['userid'],  'output' => API_OUTPUT_EXTEND));
 		$user = reset($users);
 
+		DBstart();
 		$result = CUser::delete($users);
+		$result = DBend($result);
 		if(!$result) error(CUser::resetErrors());
 
 		show_messages($result, S_USER_DELETED, S_CANNOT_DELETE_USER);

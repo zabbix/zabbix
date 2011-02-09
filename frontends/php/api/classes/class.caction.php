@@ -1358,6 +1358,7 @@ COpt::memoryPick();
 			}
 
 			DB::delete('actions', array('actionid'=>$actionids));
+			DB::delete('alerts', array('actionid'=>$actionids));
 
 			self::EndTransaction(true, __METHOD__);
 			return array('actionids' => $actionids);

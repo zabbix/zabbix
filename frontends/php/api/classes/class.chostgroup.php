@@ -776,36 +776,34 @@ COpt::memoryPick();
 			if(!delete_sysmaps_elements_with_groupid($groupids))
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete sysmap elements');
 
-
 // disable actions
+// actions from conditions
 			$actionids = array();
-
-// conditions
 			$sql = 'SELECT DISTINCT c.actionid '.
 					' FROM conditions c '.
 					' WHERE c.conditiontype='.CONDITION_TYPE_HOST_GROUP.
-						' AND '.DBcondition('c.value',$groupids, false, true);
+						' AND '.DBcondition('c.value',$groupids);
 			$db_actions = DBselect($sql);
-			while($db_action = DBfetch($db_actions)){
+			while($db_action = DBfetch($db_actions))
 				$actionids[$db_action['actionid']] = $db_action['actionid'];
-			}
 
-// operations
+// actions from operations
 			$sql = 'SELECT DISTINCT o.actionid '.
-					' FROM operations o '.
-					' WHERE o.operationtype IN ('.OPERATION_TYPE_GROUP_ADD.','.OPERATION_TYPE_GROUP_REMOVE.') '.
-						' AND '.DBcondition('o.objectid',$groupids);
+					' FROM operations o, opgroup og '.
+					' WHERE o.operationid=og.operationid '.
+						' AND '.DBcondition('og.groupid',$groupids);
 			$db_actions = DBselect($sql);
-			while($db_action = DBfetch($db_actions)){
+			while($db_action = DBfetch($db_actions))
 				$actionids[$db_action['actionid']] = $db_action['actionid'];
-			}
 
 			if(!empty($actionids)){
-				DBexecute('UPDATE actions '.
-						' SET status='.ACTION_STATUS_DISABLED.
-						' WHERE '.DBcondition('actionid', $actionids));
+				$update = array();
+				$update[] = array(
+					'values' => array('status' => ACTION_STATUS_DISABLED),
+					'where' => array(DBcondition('actionid',$actionids))
+				);
+				DB::update('actions', $update);
 			}
-
 
 // delete action conditions
 			DB::delete('conditions', array(
@@ -813,12 +811,34 @@ COpt::memoryPick();
 				'value'=>$groupids
 			));
 
-// delete action operations
-			DB::delete('operations', array(
-				'operationtype'=>array(OPERATION_TYPE_GROUP_ADD, OPERATION_TYPE_GROUP_REMOVE),
-				'objectid'=>$groupids
+// delete action operation commands
+			$operationids = array();
+			$sql = 'SELECT DISTINCT og.operationid '.
+					' FROM opgroup og '.
+					' WHERE '.DBcondition('og.groupid', $groupids);
+			$dbOperations = DBselect($sql);
+			while($dbOperation = DBfetch($dbOperations))
+				$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
+
+			DB::delete('opgroup', array(
+				'groupid'=>$groupids,
 			));
 
+// delete empty operations
+			$delOperationids = array();
+			$sql = 'SELECT DISTINCT o.operationid '.
+					' FROM operations o '.
+					' WHERE '.DBcondition('o.operationid', $operationids).
+						' AND NOT EXISTS(SELECT og.opgroupid FROM opgroup og WHERE og.operationid=o.operationid)';
+			$dbOperations = DBselect($sql);
+			while($dbOperation = DBfetch($dbOperations))
+				$delOperationids[$dbOperation['operationid']] = $dbOperation['operationid'];
+
+			DB::delete('operations', array(
+				'operationid'=>$delOperationids,
+			));
+
+// Host groups
 			DB::delete('groups', array(
 				'groupid'=>$groupids
 			));

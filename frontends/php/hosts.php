@@ -634,6 +634,7 @@ include_once('include/page_header.php');
 
 		unset($_REQUEST['save']);
 	}
+
 // DELETE HOST
 	else if(isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])){
 		DBstart();

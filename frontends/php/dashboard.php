@@ -88,7 +88,6 @@ include_once('include/page_header.php');
 
 // ------
 
-
 // ACTION /////////////////////////////////////////////////////////////////////////////
 	if(isset($_REQUEST['favobj'])){
 		$_REQUEST['pmasterid'] = get_request('pmasterid','mainpage');
