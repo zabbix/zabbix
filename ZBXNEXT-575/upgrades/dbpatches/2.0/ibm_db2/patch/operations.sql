@@ -164,7 +164,7 @@ BEGIN
 		SET r_pos = 1;
 		SET l_pos = 1;
 
-		LOOP
+		parse_loop: LOOP
 			SET r_pos = INSTR(v_longdata, CHR(10), l_pos);
 
 			IF r_pos = 0 THEN
@@ -181,7 +181,7 @@ BEGIN
 			END IF;
 
 			IF r_pos = 0 THEN
-				LEAVE read_loop;
+				LEAVE parse_loop;
 			END IF;
 
 			SET l_pos = r_pos + 1;
