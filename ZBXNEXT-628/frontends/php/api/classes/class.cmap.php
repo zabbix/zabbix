@@ -210,9 +210,11 @@ class CMap extends CZBXAPI{
 				else{
 					if(!isset($result[$sysmap['sysmapid']])) $result[$sysmap['sysmapid']]= array();
 
-					if(isset($sysmap['label_format']) && ($sysmap['label_format'] == SYSMAP_LABEL_ADVANCE_OFF)){
-///						unset($sysmap['label_string_hostgroup'],$sysmap['label_string_host'],$sysmap['label_string_trigger'],$sysmap['label_string_map'],$sysmap['label_string_image']);
-					}
+					// originally we intended not to pass those parameters if advanced lables are off, but they might be useful
+					// leaving this block commented
+					// if(isset($sysmap['label_format']) && ($sysmap['label_format'] == SYSMAP_LABEL_ADVANCE_OFF)){
+					// 	unset($sysmap['label_string_hostgroup'],$sysmap['label_string_host'],$sysmap['label_string_trigger'],$sysmap['label_string_map'],$sysmap['label_string_image']);
+					// }
 					if(!is_null($options['select_selements']) && !isset($result[$sysmap['sysmapid']]['selements'])){
 						$result[$sysmap['sysmapid']]['selements'] = array();
 					}
