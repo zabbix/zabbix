@@ -16,9 +16,5 @@ DELETE FROM httpstepitem WHERE NOT itemid IN (SELECT itemid FROM items)
 /
 ALTER TABLE httpstepitem ADD CONSTRAINT c_httpstepitem_1 FOREIGN KEY (httpstepid) REFERENCES httpstep (httpstepid) ON DELETE CASCADE
 /
-REORG TABLE httpstepitem
-/
 ALTER TABLE httpstepitem ADD CONSTRAINT c_httpstepitem_2 FOREIGN KEY (itemid) REFERENCES items (itemid) ON DELETE CASCADE
-/
-REORG TABLE httpstepitem
 /

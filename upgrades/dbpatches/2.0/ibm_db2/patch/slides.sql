@@ -16,9 +16,5 @@ DELETE FROM slides WHERE NOT screenid IN (SELECT screenid FROM screens)
 /
 ALTER TABLE slides ADD CONSTRAINT c_slides_1 FOREIGN KEY (slideshowid) REFERENCES slideshows (slideshowid) ON DELETE CASCADE
 /
-REORG TABLE slides
-/
 ALTER TABLE slides ADD CONSTRAINT c_slides_2 FOREIGN KEY (screenid) REFERENCES screens (screenid) ON DELETE CASCADE
-/
-REORG TABLE slides
 /

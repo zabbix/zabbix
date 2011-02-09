@@ -20,9 +20,5 @@ DELETE FROM functions WHERE NOT triggerid IN (SELECT triggerid FROM triggers)
 /
 ALTER TABLE functions ADD CONSTRAINT c_functions_1 FOREIGN KEY (itemid) REFERENCES items (itemid) ON DELETE CASCADE
 /
-REORG TABLE functions
-/
 ALTER TABLE functions ADD CONSTRAINT c_functions_2 FOREIGN KEY (triggerid) REFERENCES triggers (triggerid) ON DELETE CASCADE
-/
-REORG TABLE functions
 /

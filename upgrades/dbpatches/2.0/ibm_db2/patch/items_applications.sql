@@ -20,9 +20,5 @@ CREATE UNIQUE INDEX items_applications_1 ON items_applications (applicationid,it
 /
 ALTER TABLE items_applications ADD CONSTRAINT c_items_applications_1 FOREIGN KEY (applicationid) REFERENCES applications (applicationid) ON DELETE CASCADE
 /
-REORG TABLE items_applications
-/
 ALTER TABLE items_applications ADD CONSTRAINT c_items_applications_2 FOREIGN KEY (itemid) REFERENCES items (itemid) ON DELETE CASCADE
-/
-REORG TABLE items_applications
 /

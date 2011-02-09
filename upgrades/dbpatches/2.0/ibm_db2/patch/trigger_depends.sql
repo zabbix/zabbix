@@ -20,9 +20,5 @@ CREATE UNIQUE INDEX trigger_depends_1 ON trigger_depends (triggerid_down,trigger
 /
 ALTER TABLE trigger_depends ADD CONSTRAINT c_trigger_depends_1 FOREIGN KEY (triggerid_down) REFERENCES triggers (triggerid) ON DELETE CASCADE
 /
-REORG TABLE trigger_depends
-/
 ALTER TABLE trigger_depends ADD CONSTRAINT c_trigger_depends_2 FOREIGN KEY (triggerid_up) REFERENCES triggers (triggerid) ON DELETE CASCADE
-/
-REORG TABLE trigger_depends
 /

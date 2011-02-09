@@ -50,13 +50,7 @@ UPDATE graphs SET ymax_type=0 WHERE ymax_type=2 AND ymax_itemid=NULL
 /
 ALTER TABLE graphs ADD CONSTRAINT c_graphs_1 FOREIGN KEY (templateid) REFERENCES graphs (graphid) ON DELETE CASCADE
 /
-REORG TABLE graphs
-/
 ALTER TABLE graphs ADD CONSTRAINT c_graphs_2 FOREIGN KEY (ymin_itemid) REFERENCES items (itemid)
 /
-REORG TABLE graphs
-/
 ALTER TABLE graphs ADD CONSTRAINT c_graphs_3 FOREIGN KEY (ymax_itemid) REFERENCES items (itemid)
-/
-REORG TABLE graphs
 /

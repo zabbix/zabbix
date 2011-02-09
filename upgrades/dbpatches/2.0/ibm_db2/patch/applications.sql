@@ -22,9 +22,5 @@ UPDATE applications SET templateid=NULL WHERE NOT templateid IS NULL AND NOT tem
 /
 ALTER TABLE applications ADD CONSTRAINT c_applications_1 FOREIGN KEY (hostid) REFERENCES hosts (hostid) ON DELETE CASCADE
 /
-REORG TABLE applications
-/
 ALTER TABLE applications ADD CONSTRAINT c_applications_2 FOREIGN KEY (templateid) REFERENCES applications (applicationid) ON DELETE CASCADE
-/
-REORG TABLE applications
 /

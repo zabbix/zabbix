@@ -16,9 +16,5 @@ DELETE FROM rights WHERE NOT id IN (SELECT groupid FROM groups)
 /
 ALTER TABLE rights ADD CONSTRAINT c_rights_1 FOREIGN KEY (groupid) REFERENCES usrgrp (usrgrpid) ON DELETE CASCADE
 /
-REORG TABLE rights
-/
 ALTER TABLE rights ADD CONSTRAINT c_rights_2 FOREIGN KEY (id) REFERENCES groups (groupid) ON DELETE CASCADE
-/
-REORG TABLE rights
 /

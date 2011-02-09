@@ -36,9 +36,5 @@ DELETE FROM scripts WHERE NOT groupid IS NULL AND NOT groupid IN (SELECT groupid
 /
 ALTER TABLE scripts ADD CONSTRAINT c_scripts_1 FOREIGN KEY (usrgrpid) REFERENCES usrgrp (usrgrpid)
 /
-REORG TABLE scripts
-/
 ALTER TABLE scripts ADD CONSTRAINT c_scripts_2 FOREIGN KEY (groupid) REFERENCES groups (groupid)
-/
-REORG TABLE scripts
 /

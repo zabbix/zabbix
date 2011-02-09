@@ -14,15 +14,11 @@ ALTER TABLE media ALTER COLUMN period SET DEFAULT '1-7,00:00-24:00'
 /
 REORG TABLE media
 /
-DELETE FROM media WHERE NOT userid IN (SELECT userid FROM users)
+DELETE FROM media WHERE userid NOT IN (SELECT userid FROM users)
 /
-DELETE FROM media WHERE NOT mediatypeid IN (SELECT mediatypeid FROM media_type)
+DELETE FROM media WHERE mediatypeid NOT IN (SELECT mediatypeid FROM media_type)
 /
 ALTER TABLE media ADD CONSTRAINT c_media_1 FOREIGN KEY (userid) REFERENCES users (userid) ON DELETE CASCADE
 /
-REORG TABLE media
-/
 ALTER TABLE media ADD CONSTRAINT c_media_2 FOREIGN KEY (mediatypeid) REFERENCES media_type (mediatypeid) ON DELETE CASCADE
-/
-REORG TABLE media
 /

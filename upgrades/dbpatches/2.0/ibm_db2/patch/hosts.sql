@@ -12,19 +12,11 @@ CREATE TABLE interface (
 	PRIMARY KEY (interfaceid)
 )
 /
-REORG TABLE interface
-/
 CREATE INDEX interface_1 on interface (hostid,type)
-/
-REORG TABLE interface
 /
 CREATE INDEX interface_2 on interface (ip,dns)
 /
-REORG TABLE interface
-/
 ALTER TABLE interface ADD CONSTRAINT c_interface_1 FOREIGN KEY (hostid) REFERENCES hosts (hostid) ON DELETE CASCADE
-/
-REORG TABLE interface
 /
 
 -- Passive proxy interface
@@ -122,31 +114,20 @@ UPDATE items SET units='Bps' WHERE type=9 AND units='bps'
 /
 DELETE FROM items WHERE hostid NOT IN (SELECT hostid FROM hosts)
 /
-ALTER TABLE items ADD CONSTRAINT c_items_1 FOREIGN KEY (hostid) REFERENCES hosts (hostid) ON DELETE CASCADE
+CREATE INDEX items_5 on items (valuemapid)
 /
-REORG TABLE items
+ALTER TABLE items ADD CONSTRAINT c_items_1 FOREIGN KEY (hostid) REFERENCES hosts (hostid) ON DELETE CASCADE
 /
 ALTER TABLE items ADD CONSTRAINT c_items_2 FOREIGN KEY (templateid) REFERENCES items (itemid) ON DELETE CASCADE
 /
-REORG TABLE items
-/
 ALTER TABLE items ADD CONSTRAINT c_items_3 FOREIGN KEY (valuemapid) REFERENCES valuemaps (valuemapid)
 /
-REORG TABLE items
-/
 ALTER TABLE items ADD CONSTRAINT c_items_4 FOREIGN KEY (interfaceid) REFERENCES interface (interfaceid)
-/
-REORG TABLE items
 /
 
 UPDATE items SET port=snmp_port
 /
 ALTER TABLE items DROP COLUMN snmp_port
-/
-REORG TABLE items
-/
-
-CREATE INDEX items_5 on items (valuemapid)
 /
 REORG TABLE items
 /
@@ -243,9 +224,5 @@ UPDATE hosts SET maintenanceid=NULL WHERE maintenanceid=0
 /
 ALTER TABLE hosts ADD CONSTRAINT c_hosts_1 FOREIGN KEY (proxy_hostid) REFERENCES hosts (hostid)
 /
-REORG TABLE hosts
-/
 ALTER TABLE hosts ADD CONSTRAINT c_hosts_2 FOREIGN KEY (maintenanceid) REFERENCES maintenances (maintenanceid)
-/
-REORG TABLE hosts
 /

@@ -420,8 +420,6 @@ DELETE FROM operations WHERE actionid NOT IN (SELECT actionid FROM actions)
 /
 ALTER TABLE operations ADD CONSTRAINT c_operations_1 FOREIGN KEY (actionid) REFERENCES actions (actionid) ON DELETE CASCADE
 /
-REORG TABLE operations
-/
 
 ---- Dropping table `opmediatypes`
 

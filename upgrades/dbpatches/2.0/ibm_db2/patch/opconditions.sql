@@ -10,5 +10,3 @@ DELETE FROM opconditions WHERE NOT operationid IN (SELECT operationid FROM opera
 /
 ALTER TABLE opconditions ADD CONSTRAINT c_opconditions_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE
 /
-REORG TABLE opconditions
-/
