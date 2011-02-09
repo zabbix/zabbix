@@ -590,57 +590,35 @@ COpt::memoryPick();
 			);
 
 			$mapLabels = array(
-				'label_type' => array(
-					'typeError' => 'Incorrect label type value for map "%s".'
-				),
-				'label_type_hostgroup' => array(
-					'string' => 'label_string_hostgroup',
-					'typeError' => 'Incorrect host group label type value for map "%s".',
-					'stringError' => 'Incorrect host group element custom label string for map "%s".'
-				),
-				'label_type_host' => array(
-					'string' => 'label_string_host',
-					'typeError' => 'Incorrect host label type value for map "%s".',
-					'stringError' => 'Incorrect host element custom label string for map "%s".'
-				),
-				'label_type_trigger' => array(
-					'string' => 'label_string_trigger',
-					'typeError' => 'Incorrect trigger label type value for map "%s".',
-					'stringError' => 'Incorrect trigger element custom label string for map "%s".'
-				),
-				'label_type_map' => array(
-					'string' => 'label_string_map',
-					'typeError' => 'Incorrect map label type value for map "%s".',
-					'stringError' => 'Incorrect map element custom label string for map "%s".'
-				),
-				'label_type_image' => array(
-					'string' => 'label_string_image',
-					'typeError' => 'Incorrect image label type value for map "%s".',
-					'stringError' => 'Incorrect image element custom label string for map "%s".'
-				)
+				'label_type' => array('typeName' => _('icon')),
+				'label_type_hostgroup' => array('string' => 'label_string_hostgroup','typeName' => _('host group')),
+				'label_type_host' => array('string' => 'label_string_host','typeName' => _('host')),
+				'label_type_trigger' => array('string' => 'label_string_trigger','typeName' => _('trigger')),
+				'label_type_map' => array('string' => 'label_string_map','typeName' => _('map')),
+				'label_type_image' => array('string' => 'label_string_image','typeName' => _('image'))
 			);
 
 			foreach($mapLabels as $labelName => $labelData){
 				if(!isset($map[$labelName])) continue;
 
 				if(!isset($labelTypes[$map[$labelName]]))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s($labelData['typeError'], $dbMap['name']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect %1$s label type value for map "%2$s".', $labelData['typeName'], $dbMap['name']));
 
 				if(MAP_LABEL_TYPE_CUSTOM == $map[$labelName]){
 					if(!isset($labelData['string']))
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s($labelData['typeError'], $dbMap['name']));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect %1$s label type value for map "%2$s".', $labelData['typeName'], $dbMap['name']));
 
 					if(!isset($map[$labelData['string']]) || zbx_empty($map[$labelData['string']]))
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s($labelName['stringError'], $dbMap['name']));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect %1$s element custom label string for map "%s".', $labelData['typeName'], $dbMap['name']));
 				}
 
 				if(($labelName == 'label_type_image') && (MAP_LABEL_TYPE_STATUS == $map[$labelName]))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s($labelData['typeError'], $dbMap['name']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect %1$s element custom label string for map "%s".', $labelData['typeName'], $dbMap['name']));
 
 				if($labelName == 'label_type' || $labelName == 'label_type_host') continue;
 
 				if(MAP_LABEL_TYPE_IP == $map[$labelName])
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s($labelData['typeError'], $dbMap['name']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect %1$s label type value for map "%2$s".', $labelData['typeName'], $dbMap['name']));
 			}
 //---
 
