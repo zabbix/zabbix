@@ -333,6 +333,8 @@ static int	run_remote_command(DC_ITEM *item, char *command, char *error, size_t 
 					&port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
 			if (SUCCEED == (ret = is_ushort(port, &item->interface.port)))
 			{
+				win2unix_eol(command);	/* CR+LF (Windows) => LF (Unix) */
+
 				param = dyn_escape_param(command);
 				item->key = zbx_dsprintf(NULL, "system.run[\"%s\",\"nowait\"]", param);
 				zbx_free(param);
@@ -545,9 +547,9 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 				" and o.operationid=" ZBX_FS_UI64
 				" and h.status=%d"
 			" union "
-			"select distinct null,null,command"
+			"select distinct 0,null,command"
 #ifdef HAVE_OPENIPMI
-				",null,null,null,null"
+				",0,2,null,null"
 #endif
 			" from opcommand_hst"
 			" where operationid=" ZBX_FS_UI64
@@ -558,9 +560,10 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		if (SUCCEED != DBis_null(row[0]))
+		ZBX_STR2UINT64(item.host.hostid, row[0]);
+
+		if (0 != item.host.hostid)
 		{
-			ZBX_STR2UINT64(item.host.hostid, row[0]);
 			strscpy(item.host.host, row[1]);
 #ifdef HAVE_OPENIPMI
 			item.host.ipmi_authtype = (signed char)atoi(row[3]);

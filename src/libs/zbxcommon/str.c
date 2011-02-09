@@ -3114,21 +3114,17 @@ void	zbx_replace_invalid_utf8(char *text)
 	*out = '\0';
 }
 
-void	win2unix_eol(char *text)
+void	win2unix_eol(char *str)
 {
-	size_t	i, sz;
+	char	*o = str;
 
-	sz = strlen(text);
-
-	for (i = 0; i < sz; i++)
+	while ('\0' != *str)
 	{
-		if (text[i] == '\r' && text[i + 1] == '\n')	/* CR+LF (Windows) */
-		{
-			text[i] = '\n';	/* LF (Unix) */
-			sz--;
-			memmove(&text[i + 1], &text[i + 2], (sz - i) * sizeof(char));
-		}
+		if ('\r' == str[0] && '\n' == str[1])	/* CR+LF (Windows) */
+			str++;
+		*o++ = *str++;
 	}
+	*o = '\0';
 }
 
 int	is_ascii_string(const char *str)
