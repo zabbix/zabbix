@@ -164,13 +164,9 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, char **res
 	else
 	{
 #endif
-		alarm(CONFIG_TRAPPER_TIMEOUT);
-
-		if (SUCCEED != (ret = zbx_execute(p, result, error, sizeof(error))))
+		if (SUCCEED != (ret = zbx_execute(p, result, error, sizeof(error), CONFIG_TRAPPER_TIMEOUT)))
 			*result = zbx_dsprintf(*result, "NODE %d: Cannot execute command: %s",
 					CONFIG_NODEID, error);
-
-		alarm(0);
 #ifdef HAVE_OPENIPMI
 	}
 #endif
