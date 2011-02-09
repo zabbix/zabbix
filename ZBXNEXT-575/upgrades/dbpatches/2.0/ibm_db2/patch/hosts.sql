@@ -146,8 +146,10 @@ ALTER TABLE items DROP COLUMN snmp_port
 REORG TABLE items
 /
 
-CREATE INDEX items_5 on items (valuemapid);
-REORG TABLE items;
+CREATE INDEX items_5 on items (valuemapid)
+/
+REORG TABLE items
+/
 
 -- host interface for non IPMI, SNMP and non templated items
 UPDATE items
