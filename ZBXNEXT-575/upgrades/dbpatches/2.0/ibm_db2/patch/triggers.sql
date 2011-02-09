@@ -8,7 +8,11 @@ CREATE INDEX events_2 on events (clock)
 /
 ALTER TABLE events ALTER COLUMN eventid SET WITH DEFAULT NULL
 /
+REORG TABLE events
+/
 ALTER TABLE events ADD ns integer DEFAULT '0' NOT NULL
+/
+REORG TABLE events
 /
 ALTER TABLE events ADD value_changed integer DEFAULT '0' NOT NULL
 /
@@ -112,13 +116,23 @@ DROP TABLE tmp_events_eventid
 
 ALTER TABLE triggers ALTER COLUMN triggerid SET WITH DEFAULT NULL
 /
+REORG TABLE triggers
+/
 ALTER TABLE triggers ALTER COLUMN templateid SET WITH DEFAULT NULL
+/
+REORG TABLE triggers
 /
 ALTER TABLE triggers ALTER COLUMN templateid DROP NOT NULL
 /
+REORG TABLE triggers
+/
 ALTER TABLE triggers DROP COLUMN dep_level
 /
+REORG TABLE triggers
+/
 ALTER TABLE triggers ADD value_flags integer WITH DEFAULT '0' NOT NULL
+/
+REORG TABLE triggers
 /
 ALTER TABLE triggers ADD flags integer WITH DEFAULT '0' NOT NULL
 /
@@ -129,8 +143,6 @@ UPDATE triggers SET templateid=NULL WHERE templateid=0
 UPDATE triggers SET templateid=NULL WHERE NOT templateid IS NULL AND NOT templateid IN (SELECT triggerid FROM triggers)
 /
 ALTER TABLE triggers ADD CONSTRAINT c_triggers_1 FOREIGN KEY (templateid) REFERENCES triggers (triggerid) ON DELETE CASCADE
-/
-REORG TABLE triggers
 /
 
 -- Begin event redesign patch

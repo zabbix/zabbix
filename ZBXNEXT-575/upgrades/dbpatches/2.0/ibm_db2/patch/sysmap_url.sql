@@ -11,5 +11,3 @@ CREATE UNIQUE INDEX sysmap_url_1 on sysmap_url (sysmapid,name)
 /
 ALTER TABLE sysmap_url ADD CONSTRAINT c_sysmap_url_1 FOREIGN KEY (sysmapid) REFERENCES sysmaps (sysmapid) ON DELETE CASCADE
 /
-REORG TABLE sysmap_url
-/

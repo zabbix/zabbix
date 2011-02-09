@@ -30,9 +30,5 @@ UPDATE config SET default_theme='css_ob.css' WHERE default_theme='default.css'
 /
 ALTER TABLE config ADD CONSTRAINT c_config_1 FOREIGN KEY (alert_usrgrpid) REFERENCES usrgrp (usrgrpid)
 /
-REORG TABLE config
-/
 ALTER TABLE config ADD CONSTRAINT c_config_2 FOREIGN KEY (discovery_groupid) REFERENCES groups (groupid)
-/
-REORG TABLE config
 /

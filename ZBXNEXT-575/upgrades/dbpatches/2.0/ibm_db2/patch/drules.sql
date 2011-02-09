@@ -14,8 +14,6 @@ DELETE FROM dchecks WHERE NOT druleid IN (SELECT druleid FROM drules)
 /
 ALTER TABLE dchecks ADD CONSTRAINT c_dchecks_1 FOREIGN KEY (druleid) REFERENCES drules (druleid) ON DELETE CASCADE
 /
-REORG TABLE dchecks
-/
 UPDATE dchecks SET uniq=1 WHERE dcheckid IN (SELECT unique_dcheckid FROM drules)
 /
 ALTER TABLE drules ALTER COLUMN druleid SET WITH DEFAULT NULL
@@ -37,6 +35,4 @@ REORG TABLE drules
 UPDATE drules SET proxy_hostid=NULL WHERE NOT proxy_hostid IN (SELECT hostid FROM hosts)
 /
 ALTER TABLE drules ADD CONSTRAINT c_drules_1 FOREIGN KEY (proxy_hostid) REFERENCES hosts (hostid)
-/
-REORG TABLE drules
 /

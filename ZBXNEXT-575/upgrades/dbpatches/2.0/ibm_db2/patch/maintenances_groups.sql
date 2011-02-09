@@ -20,9 +20,5 @@ CREATE UNIQUE INDEX maintenances_groups_1 ON maintenances_groups (maintenanceid,
 /
 ALTER TABLE maintenances_groups ADD CONSTRAINT c_maintenances_groups_1 FOREIGN KEY (maintenanceid) REFERENCES maintenances (maintenanceid) ON DELETE CASCADE
 /
-REORG TABLE maintenances_groups
-/
 ALTER TABLE maintenances_groups ADD CONSTRAINT c_maintenances_groups_2 FOREIGN KEY (groupid) REFERENCES groups (groupid) ON DELETE CASCADE
-/
-REORG TABLE maintenances_groups
 /

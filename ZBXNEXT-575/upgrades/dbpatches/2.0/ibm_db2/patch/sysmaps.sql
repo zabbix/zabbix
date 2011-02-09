@@ -58,5 +58,3 @@ UPDATE sysmaps SET highlight=(highlight-2) WHERE highlight>1
 /
 ALTER TABLE sysmaps ADD CONSTRAINT c_sysmaps_1 FOREIGN KEY (backgroundid) REFERENCES images (imageid)
 /
-REORG TABLE sysmaps
-/

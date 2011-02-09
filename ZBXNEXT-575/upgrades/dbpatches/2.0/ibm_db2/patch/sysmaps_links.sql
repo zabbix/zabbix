@@ -22,13 +22,7 @@ DELETE FROM sysmaps_links WHERE selementid2 NOT IN (SELECT selementid FROM sysma
 /
 ALTER TABLE sysmaps_links ADD CONSTRAINT c_sysmaps_links_1 FOREIGN KEY (sysmapid) REFERENCES sysmaps (sysmapid) ON DELETE CASCADE
 /
-REORG TABLE sysmaps_links
-/
 ALTER TABLE sysmaps_links ADD CONSTRAINT c_sysmaps_links_2 FOREIGN KEY (selementid1) REFERENCES sysmaps_elements (selementid) ON DELETE CASCADE
 /
-REORG TABLE sysmaps_links
-/
 ALTER TABLE sysmaps_links ADD CONSTRAINT c_sysmaps_links_3 FOREIGN KEY (selementid2) REFERENCES sysmaps_elements (selementid) ON DELETE CASCADE
-/
-REORG TABLE sysmaps_links
 /

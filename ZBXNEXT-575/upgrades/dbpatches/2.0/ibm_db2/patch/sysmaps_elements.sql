@@ -10,8 +10,6 @@ CREATE UNIQUE INDEX sysmap_element_url_1 on sysmap_element_url (selementid,name)
 /
 ALTER TABLE sysmap_element_url ADD CONSTRAINT c_sysmap_element_url_1 FOREIGN KEY (selementid) REFERENCES sysmaps_elements (selementid) ON DELETE CASCADE
 /
-REORG TABLE sysmap_element_url
-/
 
 INSERT INTO sysmap_element_url (sysmapelementurlid,selementid,name,url)
 	SELECT selementid,selementid,url,url FROM sysmaps_elements WHERE url IS NOT NULL
@@ -85,21 +83,11 @@ UPDATE sysmaps_elements SET iconid_maintenance=NULL WHERE NOT iconid_maintenance
 /
 ALTER TABLE sysmaps_elements ADD CONSTRAINT c_sysmaps_elements_1 FOREIGN KEY (sysmapid) REFERENCES sysmaps (sysmapid) ON DELETE CASCADE
 /
-REORG TABLE sysmaps_elements
-/
 ALTER TABLE sysmaps_elements ADD CONSTRAINT c_sysmaps_elements_2 FOREIGN KEY (iconid_off) REFERENCES images (imageid)
-/
-REORG TABLE sysmaps_elements
 /
 ALTER TABLE sysmaps_elements ADD CONSTRAINT c_sysmaps_elements_3 FOREIGN KEY (iconid_on) REFERENCES images (imageid)
 /
-REORG TABLE sysmaps_elements
-/
 ALTER TABLE sysmaps_elements ADD CONSTRAINT c_sysmaps_elements_4 FOREIGN KEY (iconid_disabled) REFERENCES images (imageid)
 /
-REORG TABLE sysmaps_elements
-/
 ALTER TABLE sysmaps_elements ADD CONSTRAINT c_sysmaps_elements_5 FOREIGN KEY (iconid_maintenance) REFERENCES images (imageid)
-/
-REORG TABLE sysmaps_elements
 /

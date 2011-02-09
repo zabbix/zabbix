@@ -40,17 +40,9 @@ DELETE FROM alerts WHERE NOT mediatypeid IN (SELECT mediatypeid FROM media_type)
 /
 ALTER TABLE alerts ADD CONSTRAINT c_alerts_1 FOREIGN KEY (actionid) REFERENCES actions (actionid) ON DELETE CASCADE
 /
-REORG TABLE alerts
-/
 ALTER TABLE alerts ADD CONSTRAINT c_alerts_2 FOREIGN KEY (eventid) REFERENCES events (eventid) ON DELETE CASCADE
-/
-REORG TABLE alerts
 /
 ALTER TABLE alerts ADD CONSTRAINT c_alerts_3 FOREIGN KEY (userid) REFERENCES users (userid) ON DELETE CASCADE
 /
-REORG TABLE alerts
-/
 ALTER TABLE alerts ADD CONSTRAINT c_alerts_4 FOREIGN KEY (mediatypeid) REFERENCES media_type (mediatypeid) ON DELETE CASCADE
-/
-REORG TABLE alerts
 /
