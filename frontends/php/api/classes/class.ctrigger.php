@@ -1595,8 +1595,8 @@ COpt::memoryPick();
 						break;
 					}
 				}
-				if($trigger_exist && ($trigger_exist['triggerid'] != $trigger['triggerid'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_TRIGGER.' ['.$trigger['description'].'] '.S_ALREADY_EXISTS_SMALL);
+				if($trigger_exist && (bccomp($trigger_exist['triggerid'],$trigger['triggerid']) != 0)){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Trigger "%s" already exists.',$trigger['description']));
 				}
 			}
 
@@ -1841,7 +1841,7 @@ COpt::memoryPick();
 				$db_up_triggers = DBselect($sql);
 				$up_triggerids = array();
 				while($up_trigger = DBfetch($db_up_triggers)){
-					if($up_trigger['triggerid_up'] == $trigger['triggerid']){
+					if(bccomp($up_trigger['triggerid_up'],$trigger['triggerid']) == 0){
 						self::exception(ZBX_API_ERROR_PARAMETESRS, S_INCORRECT_DEPENDENCY);
 					}
 					$up_triggerids[] = $up_trigger['triggerid_up'];

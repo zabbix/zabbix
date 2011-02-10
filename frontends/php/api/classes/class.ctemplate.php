@@ -1743,7 +1743,7 @@ COpt::memoryPick();
 		foreach($targetids as $targetid){
 			foreach($templateids as $tnum => $templateid){
 				foreach($linked as $lnum => $link){
-					if(isset($link[$targetid]) && ($link[$targetid] == $templateid)) continue 2;
+					if(isset($link[$targetid]) && (bccomp($link[$targetid],$templateid) == 0)) continue 2;
 				}
 
 				$values = array(get_dbid('hosts_templates', 'hosttemplateid'), $targetid, $templateid);
@@ -1803,7 +1803,7 @@ COpt::memoryPick();
 		foreach($targetids as $targetid){
 			foreach($templateids as $tnum => $templateid){
 				foreach($linked as $lnum => $link){
-					if(isset($link[$targetid]) && ($link[$targetid] == $templateid)){
+					if(isset($link[$targetid]) && (bccomp($link[$targetid],$templateid) == 0)){
 						unset($linked[$lnum]);
 						continue 2;
 					}

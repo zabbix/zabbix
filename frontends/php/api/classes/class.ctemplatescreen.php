@@ -538,7 +538,7 @@ class CTemplateScreen extends CScreen{
 				}
 
 				foreach($db_screens as $dbsnum => $db_screen){
-					if(($db_screen['name'] == $screen['name']) && ($db_screen['templateid'] == $screen['templateid'])){
+					if(($db_screen['name'] == $screen['name']) && (bccomp($db_screen['templateid'],$screen['templateid']) == 0)){
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_SCREEN.' [ '.$db_screen['name'].' ] '.S_ALREADY_EXISTS_SMALL);
 					}
 				}

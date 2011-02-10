@@ -539,34 +539,34 @@ Copt::memoryPick();
 			$timeperiodids = DB::insert('timeperiods', $insert_timeperiods);
 
 
-			$insert_windows = array();
+			$insertWindows = array();
 			foreach($timeperiods as $tid => $mnum){
-				$insert_windows[] = array(
+				$insertWindows[] = array(
 					'timeperiodid' => $timeperiodids[$tid],
 					'maintenanceid' => $maintenanceids[$mnum],
 				);
 			}
-			DB::insert('maintenances_windows', $insert_windows);
+			DB::insert('maintenances_windows', $insertWindows);
 
 
-			$insert_hosts = array();
-			$insert_groups = array();
+			$insertHosts = array();
+			$insertGroups = array();
 			foreach($maintenances as $mnum => $maintenance){
 				foreach($maintenance['hostids'] as $hostid){
-					$insert_hosts[] = array(
+					$insertHosts[] = array(
 						'hostid' => $hostid,
 						'maintenanceid' => $maintenanceids[$mnum],
 					);
 				}
 				foreach($maintenance['groupids'] as $groupid){
-					$insert_groups[] = array(
+					$insertGroups[] = array(
 						'groupid' => $groupid,
 						'maintenanceid' => $maintenanceids[$mnum],
 					);
 				}
 			}
-			DB::insert('maintenances_hosts', $insert_hosts);
-			DB::insert('maintenances_groups', $insert_groups);
+			DB::insert('maintenances_hosts', $insertHosts);
+			DB::insert('maintenances_groups', $insertGroups);
 
 
 			self::EndTransaction(true, __METHOD__);
@@ -605,24 +605,26 @@ Copt::memoryPick();
 			$options = array(
 				'maintenanceids' => zbx_objectValues($maintenances, 'maintenanceid'),
 				'editable' => 1,
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => API_OUTPUT_EXTEND,
+				'selectGroups' => API_OUTPUT_REFER,
+				'selectHosts' => API_OUTPUT_REFER,
 				'preservekeys' => 1,
 			);
-			$upd_maintenances = self::get($options);
+			$updMaintenances = self::get($options);
 			foreach($maintenances as $maintenance){
-				if(!isset($upd_maintenances[$maintenance['maintenanceid']])){
+				if(!isset($updMaintenances[$maintenance['maintenanceid']])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				}
 
-				//checkig wheter a maintence with this name and different already exists
-				//first, getting all maintences with the same name as this
+				// checking whether a maintenance with this name already exists
+				// first, getting all maintenances with the same name as this
 				$options = array(
 					'filter' => array(
 									'name'=>$maintenance['name']
 								)
 				);
 				$recieved_maintenaces = CMaintenance::get($options);
-				//now going though a result, to find records with different id, then our object
+				// now going though a result, to find records with different id, then our object
 				foreach($recieved_maintenaces as $r_maintenace){
 					if ($r_maintenace['maintenanceid'] != $maintenance['maintenanceid']) {
 						//error! Maintenance with this name already exists
@@ -706,38 +708,69 @@ Copt::memoryPick();
 			$timeperiodids = DB::insert('timeperiods', $insert_timeperiods);
 
 
-			$insert_windows = array();
+			$insertWindows = array();
 			foreach($timeperiods as $tid => $mnum){
-				$insert_windows[] = array(
+				$insertWindows[] = array(
 					'timeperiodid' => $timeperiodids[$tid],
 					'maintenanceid' => $maintenances[$mnum]['maintenanceid'],
 				);
 			}
-			DB::insert('maintenances_windows', $insert_windows);
+			DB::insert('maintenances_windows', $insertWindows);
 
+			// some of the hosts and groups bound to maintenance must be deleted, other inserted and others left alone
+			$insertHosts = array();
+			$insertGroups = array();
 
-			DB::delete('maintenances_hosts', array('maintenanceid'=>$maintenanceids));
-			DB::delete('maintenances_groups', array('maintenanceid'=>$maintenanceids));
-
-			$insert_hosts = array();
-			$insert_groups = array();
 			foreach($maintenances as $mnum => $maintenance){
-				foreach($maintenance['hostids'] as $hostid){
-					$insert_hosts[] = array(
-						'hostid' => $hostid,
+
+				// putting apart those host<->maintenance connections that should be inserted, deleted and not changed
+				// $hostDiff['first'] - new hosts, that should be inserted
+				// $hostDiff['second'] - hosts, that should be deleted
+				// $hostDiff['both'] - hosts, that should not be touched
+				$hostDiff = zbx_array_diff(
+					zbx_toObject($maintenance['hostids'], 'hostid'),
+					$updMaintenances[$maintenance['maintenanceid']]['hosts'],
+					'hostid'
+				);
+
+				foreach($hostDiff['first'] as $host){
+					$insertHosts[] = array(
+						'hostid' => $host['hostid'],
 						'maintenanceid' => $maintenance['maintenanceid'],
 					);
 				}
-				foreach($maintenance['groupids'] as $groupid){
-					$insert_groups[] = array(
-						'groupid' => $groupid,
+				foreach($hostDiff['second'] as $host){
+					$deleteHosts = array(
+						'hostid' => $host['hostid'],
 						'maintenanceid' => $maintenance['maintenanceid'],
 					);
+					DB::delete('maintenances_hosts', $deleteHosts);
+				}
+
+				// now the same with the groups
+				$groupDiff = zbx_array_diff(
+					zbx_toObject($maintenance['groupids'], 'groupid'),
+					$updMaintenances[$maintenance['maintenanceid']]['groups'],
+					'groupid'
+				);
+
+				foreach($groupDiff['first'] as $group){
+					$insertGroups[] = array(
+						'groupid' => $group['groupid'],
+						'maintenanceid' => $maintenance['maintenanceid'],
+					);
+				}
+				foreach($groupDiff['second'] as $group){
+					$deleteGroups = array(
+						'groupid' => $group['groupid'],
+						'maintenanceid' => $maintenance['maintenanceid'],
+					);
+					DB::delete('maintenances_groups', $deleteGroups);
 				}
 			}
-			DB::insert('maintenances_hosts', $insert_hosts);
-			DB::insert('maintenances_groups', $insert_groups);
 
+			DB::insert('maintenances_hosts', $insertHosts);
+			DB::insert('maintenances_groups', $insertGroups);
 
 			self::EndTransaction(true, __METHOD__);
 			return array('maintenanceids'=> $maintenanceids);
