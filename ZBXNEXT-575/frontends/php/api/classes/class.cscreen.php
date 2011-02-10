@@ -357,7 +357,7 @@ SDI('/////////////////////////////////');
 // group
 			foreach($restr_groups as $resourceid){
 				foreach($screens_items as $screen_itemid => $screen_item){
-					if(($screen_item['resourceid'] == $resourceid) &&
+					if((bccomp($screen_item['resourceid'],$resourceid) == 0) &&
 						uint_in_array($screen_item['resourcetype'], array(SCREEN_RESOURCE_HOSTS_INFO,SCREEN_RESOURCE_TRIGGERS_INFO,SCREEN_RESOURCE_TRIGGERS_OVERVIEW,SCREEN_RESOURCE_DATA_OVERVIEW,SCREEN_RESOURCE_HOSTGROUP_TRIGGERS))
 					){
 						unset($result[$screen_item['screenid']]);
@@ -368,7 +368,7 @@ SDI('/////////////////////////////////');
 // host
 			foreach($restr_hosts as $resourceid){
 				foreach($screens_items as $screen_itemid => $screen_item){
-					if(($screen_item['resourceid'] == $resourceid) &&
+					if((bccomp($screen_item['resourceid'],$resourceid) == 0) &&
 						uint_in_array($screen_item['resourcetype'], array(SCREEN_RESOURCE_HOST_TRIGGERS))
 					){
 						unset($result[$screen_item['screenid']]);
@@ -379,7 +379,7 @@ SDI('/////////////////////////////////');
 // graph
 			foreach($restr_graphs as $resourceid){
 				foreach($screens_items as $screen_itemid => $screen_item){
-					if(($screen_item['resourceid'] == $resourceid) && ($screen_item['resourcetype'] == SCREEN_RESOURCE_GRAPH)){
+					if((bccomp($screen_item['resourceid'],$resourceid) == 0) && ($screen_item['resourcetype'] == SCREEN_RESOURCE_GRAPH)){
 						unset($result[$screen_item['screenid']]);
 						unset($screens_items[$screen_itemid]);
 					}
@@ -388,7 +388,7 @@ SDI('/////////////////////////////////');
 // item
 			foreach($restr_items as $resourceid){
 				foreach($screens_items as $screen_itemid => $screen_item){
-					if(($screen_item['resourceid'] == $resourceid) &&
+					if((bccomp($screen_item['resourceid'],$resourceid) == 0) &&
 						uint_in_array($screen_item['resourcetype'], array(SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT))
 					){
 						unset($result[$screen_item['screenid']]);
@@ -399,7 +399,7 @@ SDI('/////////////////////////////////');
 // map
 			foreach($restr_maps as $resourceid){
 				foreach($screens_items as $screen_itemid => $screen_item){
-					if($screen_item['resourceid'] == $resourceid && ($screen_item['resourcetype'] == SCREEN_RESOURCE_MAP)){
+					if((bccomp($screen_item['resourceid'],$resourceid) == 0) && ($screen_item['resourcetype'] == SCREEN_RESOURCE_MAP)){
 						unset($result[$screen_item['screenid']]);
 						unset($screens_items[$screen_itemid]);
 					}
@@ -408,7 +408,7 @@ SDI('/////////////////////////////////');
 // screen
 			foreach($restr_screens as $resourceid){
 				foreach($screens_items as $screen_itemid => $screen_item){
-					if($screen_item['resourceid'] == $resourceid && ($screen_item['resourcetype'] == SCREEN_RESOURCE_SCREEN)){
+					if((bccomp($screen_item['resourceid'],$resourceid) == 0) && ($screen_item['resourcetype'] == SCREEN_RESOURCE_SCREEN)){
 						unset($result[$screen_item['screenid']]);
 						unset($screens_items[$screen_itemid]);
 					}

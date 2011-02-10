@@ -1291,7 +1291,7 @@ Copt::memoryPick();
 
 		foreach($hosts as $inum => &$host){
 			if(!check_db_fields($hostDBfields, $host)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for host [ %s ]', $host['host']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for host "%s"', $host['host']));
 			}
 			// Check if host name isn't longer then 64 chars
 			if(!$delete && zbx_strlen($host['host']) > 64){
@@ -1315,17 +1315,17 @@ Copt::memoryPick();
 			}
 			else{
 				if(!isset($host['groups']))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host [ %s ]', $host['host']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host "%s"', $host['host']));
 
 				if(!isset($host['interfaces']))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces for host [ %s ]', $host['host']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces for host "%s"', $host['host']));
 			}
 
 			if($delete) continue;
 
 			if(isset($host['groups'])){
 				if(!is_array($host['groups']) || empty($host['groups']))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host [ %s ]', $host['host']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host "%s"', $host['host']));
 
 				foreach($host['groups'] as $gnum => $group){
 					if(!isset($dbGroups[$group['groupid']])){
@@ -1336,20 +1336,20 @@ Copt::memoryPick();
 
 			if(isset($host['interfaces'])){
 				if(!is_array($host['interfaces']) || empty($host['interfaces']))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces for host [ %s ]', $host['host']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces for host "%s"', $host['host']));
 			}
 
 			if(isset($host['host'])){
 				if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $host['host'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Host name [ %s ]', $host['host']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Host name "%s"', $host['host']));
 				}
 
 				$hostsExists = self::get(array(
 					'filter' => array('host' => $host['host'])
 				));
 				foreach($hostsExists as $exnum => $hostExists){
-					if(!$update || ($hostExists['hostid'] != $host['hostid'])){
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+					if(!$update || (bccomp($hostExists['hostid'],$host['hostid']) != 0)){
+						self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' "'.$host['host'].'" '.S_ALREADY_EXISTS_SMALL);
 					}
 				}
 
@@ -1358,7 +1358,7 @@ Copt::memoryPick();
 				));
 				foreach($templatesExists as $exnum => $templatesExists){
 					if(!$update || ($templatesExists['hostid'] != $host['hostid'])){
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+						self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' "'.$host['host'].'" '.S_ALREADY_EXISTS_SMALL);
 					}
 				}
 			}
@@ -1705,7 +1705,7 @@ Copt::memoryPick();
 			}
 
 			if(isset($data['host']) && !preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $data['host'])){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Hostname [ %s ]', $data['host']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Hostname "%s"', $data['host']));
 			}
 
 			$update = array(

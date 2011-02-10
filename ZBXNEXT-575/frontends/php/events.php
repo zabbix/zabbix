@@ -118,8 +118,8 @@ include_once('include/page_header.php');
 		$hostid = get_request('hostid');
 		$oldTriggers = CTrigger::get(array(
 			'output' => array('triggerid', 'description', 'expression'),
-			'select_hosts' => array('hostid', 'host'),
-			'select_items' => API_OUTPUT_EXTEND,
+			'selectHosts' => array('hostid', 'host'),
+			'selectItems' => API_OUTPUT_EXTEND,
 			'select_functions' => API_OUTPUT_EXTEND,
 			'triggerids' => $_REQUEST['triggerid'],
 		));
@@ -135,8 +135,8 @@ include_once('include/page_header.php');
 
 			$newTriggers = CTrigger::get(array(
 				'output' => array('triggerid', 'description', 'expression'),
-				'select_hosts' => array('hostid', 'host'),
-				'select_items' => API_OUTPUT_EXTEND,
+				'selectHosts' => array('hostid', 'host'),
+				'selectItems' => API_OUTPUT_EXTEND,
 				'select_functions' => API_OUTPUT_EXTEND,
 				'filter' => array('description' => $oldTrigger['description']),
 				'hostids' => $hostid,

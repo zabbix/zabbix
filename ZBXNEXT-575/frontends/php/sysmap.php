@@ -49,12 +49,17 @@ include_once('include/page_header.php');
 		'url'=>		array(T_ZBX_STR, O_OPT,  NULL, NULL,		'isset({save})'),
 		'label_location'=>array(T_ZBX_INT, O_OPT, NULL,	IN('-1,0,1,2,3'),'isset({save})'),
 
+		'grid_size' => array(T_ZBX_INT, O_OPT,  NULL, IN('20, 40, 50, 75, 100'),'isset({save})'),
+		'grid_show' => array(T_ZBX_INT, O_OPT,  NULL, IN('1, 0'),'isset({save})'),
+		'grid_align' => array(T_ZBX_INT, O_OPT,  NULL, IN('1, 0'),'isset({save})'),
+
 		'linkid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,NULL),
 		'selementid1'=>	array(T_ZBX_INT, O_OPT,  NULL, DB_ID.'{}!={selementid2}','isset({save_link})'),
 		'selementid2'=> array(T_ZBX_INT, O_OPT,  NULL, DB_ID.'{}!={selementid1}','isset({save_link})'),
 		'triggers'=>	array(T_ZBX_STR, O_OPT,  NULL, null,null),
 		'drawtype'=>array(T_ZBX_INT, O_OPT,  NULL, IN('0,1,2,3,4'),'isset({save_link})'),
 		'color'=>	array(T_ZBX_STR, O_OPT,  NULL, NOT_EMPTY,'isset({save_link})'),
+
 
 // actions
 		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -175,6 +180,16 @@ include_once('include/page_header.php');
 
 						$transaction = DBstart();
 
+						// updating map parameters
+						$sysmap_to_update = array(
+							'sysmapid' => $sysmaps[0]['sysmapid'],
+							'grid_size' => $_REQUEST['grid_size'],
+							'grid_show' => $_REQUEST['grid_show'],
+							'grid_align' => $_REQUEST['grid_align']
+						);
+						CMap::update($sysmap_to_update);
+
+
 						foreach($selements as $id => $selement){
 							if(isset($selement['urls'])){
 								foreach($selement['urls'] as $unum => $url){
@@ -195,8 +210,8 @@ include_once('include/page_header.php');
 								$selementid = reset($selementids);
 
 								foreach($links as $id => $link){
-									if($link['selementid1'] == $selement['selementid']) $links[$id]['selementid1'] = $selementid;
-									else if($link['selementid2'] == $selement['selementid']) $links[$id]['selementid2'] = $selementid;
+									if(bccomp($link['selementid1'],$selement['selementid']) == 0) $links[$id]['selementid1'] = $selementid;
+									else if(bccomp($link['selementid2'],$selement['selementid']) == 0) $links[$id]['selementid2'] = $selementid;
 								}
 							}
 							else{
@@ -363,19 +378,31 @@ include_once('include/page_header.php');
 	$elcn_tab = new CTable(null,'textwhite');
 	$menuRow = array();
 
-	$gridShow = new CSpan(S_SHOWN, 'whitelink');
+	$gridShow = new CSpan(
+		$sysmap['grid_show'] == SYSMAP_GRID_SHOW_ON ? S_SHOWN : S_HIDDEN,
+		'whitelink'
+	);
 	$gridShow->setAttribute('id', 'gridshow');
 
-	$gridAutoAlign = new CSpan(S_ON,'whitelink');
+	$gridAutoAlign = new CSpan(
+		$sysmap['grid_align'] == SYSMAP_GRID_ALIGN_ON ? S_ON : S_OFF,
+		'whitelink'
+	);
 	$gridAutoAlign->setAttribute('id', 'gridautoalign');
 
 
 	$gridSize = new CComboBox('gridsize');
-	$gridSize->addItem('20x20', '20x20');
-	$gridSize->addItem('40x40', '40x40');
-	$gridSize->addItem('50x50', '50x50', 1);
-	$gridSize->addItem('75x75', '75x75');
-	$gridSize->addItem('100x100', '100x100');
+
+	// possible grid sizes, selecting the one saved to DB
+	$possibleGridSizes = array(20, 40, 50, 75, 100);
+	foreach($possibleGridSizes as $possibleGridSize){
+
+		$gridSize->addItem(
+			$possibleGridSize.'x'.$possibleGridSize,
+			$possibleGridSize.'x'.$possibleGridSize,
+			($sysmap['grid_size'] == $possibleGridSize ? 'yes' : NULL) // is selected
+		);
+	}
 
 	$gridAlignAll = new CSubmit('gridalignall', S_ALIGN_ICONS);
 	$gridAlignAll->setAttribute('id', 'gridalignall');

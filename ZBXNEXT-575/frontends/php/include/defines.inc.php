@@ -259,11 +259,15 @@
 	define('TIMEPERIOD_TYPE_MONTHLY',	4);
 	define('TIMEPERIOD_TYPE_YEARLY',	5);
 
+	define('SYSMAP_LABEL_ADVANCED_OFF',		0);
+	define('SYSMAP_LABEL_ADVANCED_ON',		1);
+
 	define('MAP_LABEL_TYPE_LABEL',		0);
 	define('MAP_LABEL_TYPE_IP',			1);
 	define('MAP_LABEL_TYPE_NAME',		2);
 	define('MAP_LABEL_TYPE_STATUS',		3);
 	define('MAP_LABEL_TYPE_NOTHING',	4);
+	define('MAP_LABEL_TYPE_CUSTOM',		5);
 
 	define('MAP_LABEL_LOC_BOTTOM',		0);
 	define('MAP_LABEL_LOC_LEFT',		1);
@@ -289,6 +293,12 @@
 
 	define('SYSMAP_MARKELEMENTS_OFF',		0);
 	define('SYSMAP_MARKELEMENTS_ON',		1);
+
+	define('SYSMAP_GRID_SHOW_ON',		1);
+	define('SYSMAP_GRID_SHOW_OFF',		0);
+
+	define('SYSMAP_GRID_ALIGN_ON',		1);
+	define('SYSMAP_GRID_ALIGN_OFF',		0);
 
 	define('ITEM_TYPE_ZABBIX',			0);
 	define('ITEM_TYPE_SNMPV1',			1);

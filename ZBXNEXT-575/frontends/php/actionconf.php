@@ -369,8 +369,8 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			$action['operations']	= get_request('operations',array());
 		}
 
-		$actionForm = new CGetForm();
-		$action_wdgt->addItem($actionForm->render('action.edit', $action));
+		$actionForm = new CGetForm('action.edit', $action);
+		$action_wdgt->addItem($actionForm->render());
 
 		show_messages();
 
@@ -441,13 +441,13 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		$esc_step_to = array();
 		$esc_period = array();
 		$esc_keys = array();
-		foreach($data['operations'] as $key => $operation) {
+		foreach($action['operations'] as $key => $operation) {
 			$esc_step_from[$key] = $operation['esc_step_from'];
 			$esc_step_to[$key] = $operation['esc_step_to'];
 			$esc_period[$key] = $operation['esc_period'];
 			$esc_keys[$key] = $key;
 		}
-		array_multisort($esc_step_from, SORT_ASC, $esc_step_to, SORT_ASC, $esc_period, SORT_ASC, $esc_keys, SORT_ASC, $data['operations']);
+		array_multisort($esc_step_from, SORT_ASC, $esc_step_to, SORT_ASC, $esc_period, SORT_ASC, $esc_keys, SORT_ASC, $action['operations']);
 
 			$operations=array();
 			foreach($action['operations'] as $onum => $operation){
