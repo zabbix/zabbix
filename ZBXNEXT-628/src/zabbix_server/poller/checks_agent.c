@@ -57,7 +57,7 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 		zbx_snprintf(buffer, sizeof(buffer), "%s\n", item->key);
 		zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", buffer);
 
-		/* Send requests using old protocol */
+		/* send requests using old protocol */
 		if (SUCCEED == (ret = zbx_tcp_send_raw(&s, buffer)))
 			ret = zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE, 0);
 	}
@@ -81,7 +81,7 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 			SET_MSG_RESULT(result, strdup(buffer));
 			ret = AGENT_ERROR;
 		}
-		else if ('\0' == *buf)	/* The section should be improved */
+		else if ('\0' == *buf)	/* this section should be improved */
 		{
 			zbx_snprintf(buffer, sizeof(buffer), "Got empty string from [%s]."
 					" Assuming that agent dropped connection because of access permissions",

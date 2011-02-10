@@ -4254,6 +4254,24 @@ return array(
 				'length' => 10,
 				'default' => '0',
 			),
+			'grid_size' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '50',
+			),
+			'grid_show' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
+			),
+			'grid_align' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
+			),
 			'label_format' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
