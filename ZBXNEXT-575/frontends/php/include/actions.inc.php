@@ -864,11 +864,7 @@ function get_action_msgs_for_event($event){
 		$sendto=$alert["sendto"];
 
 		$message = array(bold(S_SUBJECT.':'),br(),$alert["subject"],br(),br(),bold(S_MESSAGE.':'));
-		$msg = explode("\n",$alert['message']);
-
-		foreach($msg as $m){
-			array_push($message, BR(), $m);
-		}
+		array_push($message, BR(), zbx_nl2br($alert['message']));
 
 		if(empty($alert["error"])){
 			$error=new CSpan(SPACE,"off");
