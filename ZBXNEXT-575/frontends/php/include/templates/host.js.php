@@ -39,12 +39,6 @@
 </tr>
 </script>
 
-<script type="text/x-jquery-tmpl" id="hostInterfaceRowRemove">
-
-</script>
-
-
-
 <script type="text/javascript">
 function addInterfaceRow(hostInterface){
 	var tpl = new Template(jQuery('#hostInterfaceRow').html());
