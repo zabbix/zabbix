@@ -1,6 +1,6 @@
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,10 +20,12 @@
 #ifndef ZABBIX_COMMS_H
 #define ZABBIX_COMMS_H
 
-typedef enum {
+typedef enum
+{
 	ZBX_TCP_ERR_NETWORK = 1,
 	ZBX_TCP_ERR_TIMEOUT
-} zbx_tcp_errors;
+}
+zbx_tcp_errors;
 
 #if defined(SOCKET) || defined(_WINDOWS)
 	typedef SOCKET ZBX_SOCKET;
@@ -35,12 +37,13 @@ typedef enum
 {
 	ZBX_BUF_TYPE_STAT = 0,
 	ZBX_BUF_TYPE_DYN
-} zbx_buf_type_t;
+}
+zbx_buf_type_t;
 
 #define ZBX_SOCKET_COUNT	256
 #define ZBX_STAT_BUF_LEN	2048
 
-typedef struct zbx_sock
+typedef struct
 {
 	int		num_socks;
 	ZBX_SOCKET	sockets[ZBX_SOCKET_COUNT];
@@ -52,10 +55,10 @@ typedef struct zbx_sock
 	unsigned char	accepted;
 	char		*error;
 	int		timeout;
-} zbx_sock_t;
+}
+zbx_sock_t;
 
-const char	*zbx_tcp_strerror(void);
-int		zbx_tcp_error(void);
+const char	*zbx_tcp_strerror();
 
 struct hostent	*zbx_gethost(const char *hostname);
 
