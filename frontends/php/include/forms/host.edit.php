@@ -20,7 +20,7 @@
 ?>
 <?php
 // include JS + templates
-	include('include/templates/hosts.js.php');
+	include('include/templates/host.js.php');
 	include('include/templates/macros.js.php');
 ?>
 <?php

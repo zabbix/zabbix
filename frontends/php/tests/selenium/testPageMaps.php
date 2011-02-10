@@ -187,7 +187,7 @@ class testPageMaps extends CWebTest
 		$this->assertTitle('Network maps');
 		$this->button_click('form');
 		$this->wait();
-		$this->ok('New system map');
+		$this->ok('Map');
 		$this->button_click('cancel');
 		$this->wait();
 		$this->assertTitle('Network maps');
