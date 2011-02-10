@@ -839,6 +839,10 @@ COpt::memoryPick();
 				'elementid'=>$sysmapids,
 				'elementtype'=>SYSMAP_ELEMENT_TYPE_MAP
 			));
+			DB::delete('screens_items', array(
+				'resourceid'=>$sysmapids,
+				'resourcetype'=>SCREEN_RESOURCE_MAP
+			));
 //----
 			DB::delete('sysmaps', array('sysmapid'=>$sysmapids));
 
