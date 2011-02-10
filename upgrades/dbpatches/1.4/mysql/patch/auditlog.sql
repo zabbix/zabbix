@@ -10,6 +10,6 @@ CREATE TABLE auditlog_tmp (
 CREATE INDEX auditlog_1 on auditlog_tmp (userid,clock);
 CREATE INDEX auditlog_2 on auditlog_tmp (clock);
 
-insert into auditlog_tmp select * from auditlog;
+insert into auditlog_tmp select auditid,userid,clock,action,resourcetype,details from auditlog;
 drop table auditlog;
 alter table auditlog_tmp rename auditlog;

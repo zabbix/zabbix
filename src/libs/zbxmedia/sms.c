@@ -1,6 +1,6 @@
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -185,20 +185,21 @@ int	send_sms(const char *device, const char *number, const char *message, char *
 #define	ZBX_AT_ESC	"\x1B"
 #define ZBX_AT_CTRL_Z	"\x1A"
 
-	zbx_sms_scenario scenario[] = {
-/*  0  */	{ZBX_AT_ESC	, NULL		, 0	},	/* Send <ESC> */
-/*  1  */	{"AT+CMEE=2\r"	, ""/*"OK"*/	, 5	},	/* verbose error values */
-/*  1  */	{"ATE0\r"	, "OK"		, 5	},	/* Turn off echo */
-/*  2  */	{"AT\r"		, "OK"		, 5	},	/* Init modem */
-/*  3  */	{"AT+CMGF=1\r"	, "OK"		, 5	},	/* Switch to text mode */
-/*  4  */	{"AT+CMGS=\""	, NULL		, 0	},	/* Set phone number */
-/*  5  */	{number		, NULL		, 0	},	/* Write phone number */
-/*  6  */	{"\"\r"		, "> "		, 5	},	/* Set phone number */
-/*  7  */	{message	, NULL		, 0	},	/* Write message */
-/*  8  */	{ZBX_AT_CTRL_Z	, "+CMGS: "	, 40	},	/* Send message */
-/*  9  */	{NULL		, "OK"		, 1	},	/* ^Z */
-/* EOS */	{NULL		, NULL		, 0	}
-		};
+	zbx_sms_scenario scenario[] =
+	{
+		{ZBX_AT_ESC	, NULL		, 0},	/* Send <ESC> */
+		{"AT+CMEE=2\r"	, ""/*"OK"*/	, 5},	/* verbose error values */
+		{"ATE0\r"	, "OK"		, 5},	/* Turn off echo */
+		{"AT\r"		, "OK"		, 5},	/* Init modem */
+		{"AT+CMGF=1\r"	, "OK"		, 5},	/* Switch to text mode */
+		{"AT+CMGS=\""	, NULL		, 0},	/* Set phone number */
+		{number		, NULL		, 0},	/* Write phone number */
+		{"\"\r"		, "> "		, 5},	/* Set phone number */
+		{message	, NULL		, 0},	/* Write message */
+		{ZBX_AT_CTRL_Z	, "+CMGS: "	, 40},	/* Send message */
+		{NULL		, "OK"		, 1},	/* ^Z */
+		{NULL		, NULL		, 0}
+	};
 
 	zbx_sms_scenario *step = NULL;
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -369,7 +369,7 @@ class CGraph extends CZBXAPI{
 					$sql_where.
 				$sql_group.
 				$sql_order;
-//SDI($sql);
+
 		$db_res = DBselect($sql, $sql_limit);
 		while($graph = DBfetch($db_res)){
 			if(!is_null($options['countOutput'])){
@@ -442,7 +442,7 @@ COpt::memoryPick();
 				'preservekeys' => 1
 			);
 			$gitems = CGraphItem::get($obj_params);
-//SDI($gitems);
+
 			foreach($gitems as $gitemid => $gitem){
 				$ggraphs = $gitem['graphs'];
 				unset($gitem['graphs']);
@@ -1136,7 +1136,6 @@ COpt::memoryPick();
 // }}} EXCEPTION: ITEMS PERMISSIONS
 		}
 
-
 		foreach($graphs as $gnum => $graph){
 			if(!isset($graph['name'])) continue;
 
@@ -1155,6 +1154,7 @@ COpt::memoryPick();
 			}
 // }}} EXCEPTION: GRAPH EXISTS
 		}
+
 
 		return true;
 	}

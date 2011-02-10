@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -83,8 +83,12 @@ include_once('include/page_header.php');
 		);
 		$maps = CMap::get($options);
 
-		if(empty($maps)) access_deny();
-		else $sysmap = reset($maps);
+		if(empty($maps)){
+			access_deny();
+		}
+		else{
+			$sysmap = reset($maps);
+		}
 	}
 ?>
 <?php
@@ -163,7 +167,7 @@ include_once('include/page_header.php');
 			'label_type' => $_REQUEST['label_type'],
 			'label_location' => $_REQUEST['label_location'],
 			'show_unack' => get_request('show_unack', 0),
-			'urls' => $urls,
+			'urls' => $urls
 		);
 
 		if(isset($_REQUEST['sysmapid'])){

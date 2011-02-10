@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,8 +35,7 @@ class testPageMaintenance extends CWebTest
 	public function testPageMaintenance_SimpleTest($maintenance)
 	{
 		$this->login('maintenance.php');
-		$this->dropdown_select('groupid','all');
-		$this->wait();
+		$this->dropdown_select_wait('groupid','all');
 		$this->assertTitle('Maintenance');
 
 		$this->ok('Maintenance');
@@ -73,7 +72,7 @@ class testPageMaintenance extends CWebTest
 		$oldHashTimeperiods=DBhash($sql5);
 
 		$this->login('maintenance.php');
-		$this->dropdown_select('groupid','all');
+		$this->dropdown_select_wait('groupid','all');
 		$this->assertTitle('Maintenance');
 		$this->click("link=$name");
 		$this->wait();
@@ -109,7 +108,7 @@ class testPageMaintenance extends CWebTest
 		$this->chooseOkOnNextConfirmation();
 
 		$this->login('maintenance.php');
-		$this->dropdown_select('groupid','all');
+		$this->dropdown_select_wait('groupid','all');
 		$this->assertTitle('Maintenance');
 		$this->checkbox_select("maintenanceids[$maintenanceid]");
 		$this->dropdown_select('go','Delete selected');

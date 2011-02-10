@@ -1,6 +1,6 @@
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -390,6 +390,7 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 				parse_list_of_checks(buf);
 			}
 		}
+
 		zbx_tcp_close(&s);
 	}
 

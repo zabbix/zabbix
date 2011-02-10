@@ -1,6 +1,6 @@
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@
 #define ZBX_PROTO_TAG_HOST		"host"
 #define ZBX_PROTO_TAG_INFO		"info"
 #define ZBX_PROTO_TAG_IP		"ip"
+#define ZBX_PROTO_TAG_DNS		"dns"
 #define ZBX_PROTO_TAG_KEY		"key"
 #define ZBX_PROTO_TAG_KEY_ORIG		"key_orig"
 #define ZBX_PROTO_TAG_LOGLASTSIZE	"lastlogsize"

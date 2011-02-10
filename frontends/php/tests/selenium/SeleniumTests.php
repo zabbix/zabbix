@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -52,6 +52,7 @@ require_once(dirname(__FILE__).'/testFormLogin.php');
 require_once(dirname(__FILE__).'/testFormMediaType.php');
 require_once(dirname(__FILE__).'/testFormProfile.php');
 require_once(dirname(__FILE__).'/testFormScreen.php');
+require_once(dirname(__FILE__).'/testFormMap.php');
 
 class SeleniumTests
 {
@@ -92,6 +93,7 @@ class SeleniumTests
 		$suite->addTestSuite('testFormMediaType');
 		$suite->addTestSuite('testFormProfile');
 		$suite->addTestSuite('testFormScreen');
+		$suite->addTestSuite('testFormMap');
 
 		return $suite;
 	}

@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1126,7 +1126,7 @@ switch($itemType) {
 			}
 //-------
 			//if item type is 'Log' we must show log menu
-			if($item['value_type'] == ITEM_VALUE_TYPE_LOG || $item['value_type'] == ITEM_VALUE_TYPE_STR || $item['value_type'] == ITEM_VALUE_TYPE_TEXT){
+			if(in_array($item['value_type'],array(ITEM_VALUE_TYPE_LOG,ITEM_VALUE_TYPE_STR,ITEM_VALUE_TYPE_TEXT))){
 
 				$triggers_flag = false;
 				$triggers="Array('".S_EDIT_TRIGGER."',null,null,{'outer' : 'pum_o_submenu','inner' : ['pum_i_submenu']}\n";
@@ -1165,7 +1165,7 @@ switch($itemType) {
 				$description,
 				$trigger_info,
 				$item['key_'],
-				$item['delay'],
+				($item['type'] == ITEM_TYPE_TRAPPER ? '' : $item['delay']),
 				$item['history'],
 				(in_array($item['value_type'], array(ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT)) ? '' : $item['trends']),
 				item_type2str($item['type']),

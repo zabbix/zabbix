@@ -1,6 +1,6 @@
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -374,7 +374,7 @@ void	main_proxypoller_loop()
 
 		if (sleeptime > 0)
 		{
-			zbx_setproctitle("poller [sleeping for %d seconds]", sleeptime);
+			zbx_setproctitle("proxy poller [sleeping for %d seconds]", sleeptime);
 			sleep(sleeptime);
 		}
 	}

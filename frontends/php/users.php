@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -111,9 +111,9 @@ include_once('include/page_header.php');
 		}
 	}
 	else if(isset($_REQUEST['save'])){
-		$config = select_config();		
+		$config = select_config();
 		$auth_type = isset($_REQUEST['userid']) ? get_user_system_auth($_REQUEST['userid']) : $config['authentication_type'];
-		
+
 		if(isset($_REQUEST['userid']) && (ZBX_AUTH_INTERNAL != $auth_type)){
 			$_REQUEST['password1'] = $_REQUEST['password2'] = null;
 		}
@@ -124,7 +124,7 @@ include_once('include/page_header.php');
 			$_REQUEST['password1'] = get_request('password1', null);
 			$_REQUEST['password2'] = get_request('password2', null);
 		}
-		
+
 		if($_REQUEST['password1'] != $_REQUEST['password2']){
 			if(isset($_REQUEST['userid']))
 				show_error_message(S_CANNOT_UPDATE_USER_BOTH_PASSWORDS);
@@ -166,9 +166,7 @@ include_once('include/page_header.php');
 				$result = CUser::update($user);
 				if(!$result)
 					error(CUser::resetErrors());
-				// if($result)	$result = CUserGroup::updateUsers(array('users' => $user, 'usrgrps' => $usrgrps));
-				// if($result === false)
-					// error(CUserGroup::resetErrors());
+
 				if($result !== false) $result = CUser::updateMedia(array('users' => $user, 'medias' => $user['user_medias']));
 				$result = ($result === false) ? false : true;
 				$result = DBend($result);
@@ -182,9 +180,7 @@ include_once('include/page_header.php');
 				$result = CUser::create($user);
 				if(!$result)
 					error(CUser::resetErrors());
-				// if($result) $result = CUserGroup::updateUsers(array('users' => $result, 'usrgrps' => $usrgrps));
-				// if($result === false)
-					// error(CUserGroup::resetErrors());
+
 				$result = ($result === false) ? false : true;
 				$result = DBend($result);
 
@@ -519,7 +515,7 @@ include_once('include/page_header.php');
 
 		$user_wdgt->addItem($form);
 	}
-	
+
 	$user_wdgt->show();
 
 
