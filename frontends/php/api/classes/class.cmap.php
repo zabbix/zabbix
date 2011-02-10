@@ -632,6 +632,23 @@ COpt::memoryPick();
 				}
 			}
 
+// GRID OPTIONS
+			// validating grid options
+			$possibleGridSizes = array(20, 40, 50, 75, 100);
+			if($update || $create){
+				// grid size
+				if(isset($map['grid_size']) && !in_array($map['grid_size'], $possibleGridSizes)){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Value "%1$s" is invalid for parameter "grid_show". Choices are: "%2$s"', $map['grid_size'], implode('", "', $possibleGridSizes)));
+				}
+				// grid auto align
+				if(isset($map['grid_align']) && $map['grid_align'] != SYSMAP_GRID_ALIGN_ON &&  $map['grid_align'] != SYSMAP_GRID_ALIGN_OFF){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Value "%1$s" is invalid for parameter "grid_align". Choices are: "%2$s" and "%3$s"', $map['grid_align'], SYSMAP_GRID_ALIGN_ON, SYSMAP_GRID_ALIGN_OFF));
+				}
+				// grid show
+				if(isset($map['grid_show']) && $map['grid_show'] != SYSMAP_GRID_SHOW_ON &&  $map['grid_show'] != SYSMAP_GRID_SHOW_OFF){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Value "%1$s" is invalid for parameter "grid_show". Choices are: "%2$s" and "%3$s"', $map['grid_show'], SYSMAP_GRID_SHOW_ON, SYSMAP_GRID_SHOW_OFF));
+				}
+			}
 		}
 
 // Exists
