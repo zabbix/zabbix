@@ -242,6 +242,7 @@ frontends/php/styles/originalblue/images/ui-icons_d8e7f3_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_f9bd01_256x240.png -text
 frontends/php/tests/api_json/APIInfo.php -text
 frontends/php/tests/api_json/ApiJsonTests.php -text
+frontends/php/tests/api_json/CMap.php -text
 frontends/php/tests/api_json/General.php -text
 frontends/php/tests/api_json/User.php -text
 frontends/php/tests/bootstrap.php.template -text
@@ -266,6 +267,7 @@ frontends/php/tests/selenium/testClicks.php -text
 frontends/php/tests/selenium/testFormHost.php -text
 frontends/php/tests/selenium/testFormHostGroup.php -text
 frontends/php/tests/selenium/testFormLogin.php -text
+frontends/php/tests/selenium/testFormMap.php -text
 frontends/php/tests/selenium/testFormMediaType.php -text
 frontends/php/tests/selenium/testFormProfile.php -text
 frontends/php/tests/selenium/testFormScreen.php -text

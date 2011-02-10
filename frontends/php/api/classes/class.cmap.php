@@ -532,6 +532,9 @@ COpt::memoryPick();
  * @param string $maps['highlight']
  * @param array $maps['label_type']
  * @param int $maps['label_location']
+ * @param int $maps['grid_size'] size of a one grid cell. 100 refers to 100x100 and so on.
+ * @param int $maps['grid_show'] does grid need to be shown. Constants: SYSMAP_GRID_SHOW_ON / SYSMAP_GRID_SHOW_OFF
+ * @param int $maps['grid_align'] does elements need to be aligned to the grid. Constants: SYSMAP_GRID_ALIGN_ON / SYSMAP_GRID_ALIGN_OFF
  * @return boolean | array
  */
 	public static function create($maps){
@@ -565,6 +568,9 @@ COpt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS,'Map [ '.$map['name'].' ] already exists.');
 				}
 
+				if (!isset($map['urls'])){
+					$map['urls'] = array();
+				}
 				$urlNames = zbx_toHash($map['urls'], 'name');
 				foreach($map['urls'] as $unum => $url){
 					if($url['name'] === '' || $url['url'] === '')
@@ -624,6 +630,9 @@ COpt::memoryPick();
  * @param string $maps['backgroundid']
  * @param array $maps['label_type']
  * @param int $maps['label_location']
+ * @param int $maps['grid_size'] size of a one grid cell. 100 refers to 100x100 and so on.
+ * @param int $maps['grid_show'] does grid need to be shown. Constants: SYSMAP_GRID_SHOW_ON / SYSMAP_GRID_SHOW_OFF
+ * @param int $maps['grid_align'] does elements need to be aligned to the grid. Constants: SYSMAP_GRID_ALIGN_ON / SYSMAP_GRID_ALIGN_OFF
  * @return boolean
  */
 	public static function update($maps){
