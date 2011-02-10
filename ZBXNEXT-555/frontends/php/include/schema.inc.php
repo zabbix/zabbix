@@ -281,6 +281,12 @@ return array(
 				'length' => 39,
 				'default' => '',
 			),
+			'dns' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
+			),
 		),
 	),
 	'ids' => array(
@@ -1209,6 +1215,12 @@ return array(
 				'length' => 20,
 				'ref_table' => 'dchecks',
 				'ref_field' => 'dcheckid',
+			),
+			'dns' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
 			),
 		),
 	),
@@ -4242,6 +4254,24 @@ return array(
 				'length' => 10,
 				'default' => '0',
 			),
+			'grid_size' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '50',
+			),
+			'grid_show' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
+			),
+			'grid_align' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
+			),
 		),
 	),
 	'sysmap_url' => array(
@@ -4475,7 +4505,7 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 5,
-				'default' => 'en_gb',
+				'default' => 'en_GB',
 			),
 			'refresh' => array(
 				'null' => false,
@@ -4942,6 +4972,12 @@ return array(
 				'length' => 10,
 				'default' => '0',
 			),
+			'listen_dns' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
+			),
 		),
 	),
 	'proxy_autoreg_host' => array(
@@ -4975,6 +5011,12 @@ return array(
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0',
+			),
+			'listen_dns' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
 			),
 		),
 	),
