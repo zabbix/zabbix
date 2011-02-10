@@ -129,13 +129,15 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 	public function ok($strings)
 	{
 		if(!is_array($strings))	$strings=array($strings);
-		foreach($strings as $string) $this->assertTextPresent($string,"Chuck Norris: I expect string '$string' here");
+		foreach($strings as $string)
+			$this->assertTextPresent($string,"Chuck Norris: I expect string '$string' here");
 	}
 
 	public function nok($strings)
 	{
 		if(!is_array($strings))	$strings=array($strings);
-		foreach($strings as $string) $this->assertTextNotPresent($string,"Chuck Norris: I do not expect string '$string' here");
+		foreach($strings as $string)
+			$this->assertTextNotPresent($string,"Chuck Norris: I do not expect string '$string' here");
 	}
 
 	public function button_click($a)
@@ -167,6 +169,14 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 	{
 		$this->assertSelectHasOption($id,$str);
 		$this->select($id,$str);
+	}
+
+	public function dropdown_select_wait($id,$str)
+	{
+		$selected = $this->getSelectedLabel($id);
+		$this->dropdown_select($id, $str);
+		// Wait only if drop down selection was changed
+		if($selected != $str)	$this->wait();
 	}
 
 	public function wait()

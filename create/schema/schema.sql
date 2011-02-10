@@ -1,6 +1,6 @@
 --
 -- ZABBIX
--- Copyright (C) 2000-2005 SIA Zabbix
+-- Copyright (C) 2000-2011 SIA Zabbix
 --
 -- This program is free software; you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -901,6 +901,9 @@ FIELD		|highlight	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|expandproblem	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|markelements	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|show_unack	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|grid_size	|t_integer	|'50'	|NOT NULL	|ZBX_SYNC
+FIELD		|grid_show	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
+FIELD		|grid_align	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|label_format	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|label_type_host|t_integer	|'2'	|NOT NULL	|ZBX_SYNC
 FIELD		|label_type_hostgroup|t_integer	|'2'	|NOT NULL	|ZBX_SYNC

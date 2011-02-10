@@ -27,7 +27,8 @@ class testPageEvents extends CWebTest
 	public function testPageEvents_Triggers_SimpleTest()
 	{
 		$this->login('events.php');
-		$this->dropdown_select('source','Trigger');
+
+		$this->dropdown_select_wait('source','Trigger');
 
 		$this->assertTitle('Latest events');
 		$this->ok('HISTORY OF EVENTS');
@@ -35,9 +36,24 @@ class testPageEvents extends CWebTest
 		$this->ok('Host');
 		$this->ok('Source');
 		$this->ok('Filter');
-		$this->ok('Displaying 0 of 0 found');
+		$this->ok('Displaying');
 		// table header
 		$this->ok(array('Time','Description','Status','Severity','Duration','Ack','Actions'));
+	}
+
+	public function testPageEvents_Discovery_SimpleTest()
+	{
+		$this->login('events.php');
+
+		$this->dropdown_select_wait('source','Discovery');
+
+		$this->assertTitle('Latest events');
+		$this->ok('HISTORY OF EVENTS');
+		$this->ok('Source');
+		$this->ok('Filter');
+		$this->ok('Displaying');
+		// table header
+		$this->ok(array('Time','IP','DNS','Description','Status'));
 	}
 
 	public function testPageEvents_Triggers_Sorting()
