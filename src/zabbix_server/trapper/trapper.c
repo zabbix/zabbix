@@ -408,14 +408,8 @@ static void	process_trapper_child(zbx_sock_t *sock)
 {
 	char	*data;
 
-	alarm(CONFIG_TRAPPER_TIMEOUT);
-
-	if (SUCCEED != zbx_tcp_recv(sock, &data))
-	{
-		alarm(0);
+	if (SUCCEED != zbx_tcp_recv_to(sock, &data, CONFIG_TRAPPER_TIMEOUT))
 		return;
-	}
-	alarm(0);
 
 	process_trap(sock, data, sizeof(data));
 }
