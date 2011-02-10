@@ -65,6 +65,7 @@ class testFormMap extends CWebTest
 	 */
 	public function testFormMap_UpdateGridOptions($gridSize, $showGrid, $autoAlign)
 	{
+		DBconnect($error);
 
 		$map_name = 'Test map 1';
 
@@ -155,6 +156,7 @@ class testFormMap extends CWebTest
 		}
 
 		// if we got until here, everything works as expected
+		DBclose();
 	}
 }
 ?>
