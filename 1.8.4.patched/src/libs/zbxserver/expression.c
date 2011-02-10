@@ -1520,9 +1520,9 @@ static int	DBget_item_value_by_triggerid(zbx_uint64_t triggerid, char **value, i
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		expression[TRIGGER_EXPRESSION_LEN_MAX];
-	zbx_uint64_t	functionid, itemid;
+	zbx_uint64_t	functionid, itemid, valuemapid;
 	int		value_type, ret = FAIL;
-	const char	*table;
+	char		tmp[MAX_STRING_LEN];
 
 	if (FAIL == DBget_trigger_expression_by_triggerid(triggerid, expression, sizeof(expression)))
 		return FAIL;
@@ -1531,7 +1531,7 @@ static int	DBget_item_value_by_triggerid(zbx_uint64_t triggerid, char **value, i
 		return FAIL;
 
 	result = DBselect(
-			"select i.itemid,i.value_type"
+			"select i.itemid,i.value_type,i.valuemapid,i.units"
 			" from items i,functions f"
 			" where i.itemid=f.itemid"
 				" and f.functionid=" ZBX_FS_UI64,
@@ -1541,12 +1541,33 @@ static int	DBget_item_value_by_triggerid(zbx_uint64_t triggerid, char **value, i
 	{
 		ZBX_STR2UINT64(itemid, row[0]);
 		value_type = atoi(row[1]);
-		table = get_table_by_value_type(value_type);
+		ZBX_STR2UINT64(valuemapid, row[2]);
 
-		if (SUCCEED == (ret = DBget_history_value(itemid, value, table, "value", clock, ns)))
+		if (SUCCEED == (ret = DBget_history_value(itemid, value, get_table_by_value_type(value_type), "value", clock, ns)))
 		{
-			if (ITEM_VALUE_TYPE_FLOAT == value_type)
-				del_zeroes(*value);
+			switch (value_type)
+			{
+				case ITEM_VALUE_TYPE_FLOAT:
+				case ITEM_VALUE_TYPE_UINT64:
+					zbx_strlcpy(tmp, *value, sizeof(tmp));
+
+					if (ITEM_VALUE_TYPE_FLOAT == value_type)
+						del_zeroes(tmp);
+					if (SUCCEED != replace_value_by_map(tmp, sizeof(tmp), valuemapid))
+						add_value_suffix(tmp, sizeof(tmp), row[3], value_type);
+
+					*value = zbx_strdup(*value, tmp);
+					break;
+				case ITEM_VALUE_TYPE_STR:
+					zbx_strlcpy(tmp, *value, sizeof(tmp));
+
+					replace_value_by_map(tmp, sizeof(tmp), valuemapid);
+
+					*value = zbx_strdup(*value, tmp);
+					break;
+				default:
+					;
+			}
 		}
 	}
 	DBfree_result(result);
