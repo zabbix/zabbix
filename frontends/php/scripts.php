@@ -171,8 +171,8 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 	$scripts_wdgt = new CWidget();
 
 	if(isset($_REQUEST['form'])){
-		$scriptForm = new CGetForm();
-		$scripts_wdgt->addItem($scriptForm->render('script.edit'));
+		$scriptForm = new CGetForm('script.edit');
+		$scripts_wdgt->addItem($scriptForm->render());
 	}
 	else{
 		$frmForm = new CForm(null, 'get');
