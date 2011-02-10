@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -752,7 +752,7 @@ include_once('include/page_header.php');
 					$dstfld2 => $trigger[$srcfld2],
 				);
 
-				$js_action = 'javascript: addValues('.zbx_jsvalue($reference).','.zbx_jsvalue($values).'); close_window(); return false;';
+				$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).','.zbx_jsvalue($values).'); return false;';
 			}
 
 			$description->setAttribute('onclick', $js_action);
@@ -1578,7 +1578,7 @@ include_once('include/page_header.php');
 		$table->show();
 	}
 	else if($srctbl == 'dchecks'){
-		$table = new CTableInfo(S_NO_DISCOVERY_RULES_DEFINED);
+		$table = new CTableInfo(_('No discovery checks defined'));
 		$table->setHeader(S_NAME);
 
 		$result = DBselect('SELECT DISTINCT r.name,c.dcheckid,c.type,c.key_,c.snmp_community,c.ports FROM drules r,dchecks c'.
@@ -1598,7 +1598,7 @@ include_once('include/page_header.php');
 		$table->show();
 	}
 	else if($srctbl == 'proxies'){
-		$table = new CTableInfo(S_NO_DISCOVERY_RULES_DEFINED);
+		$table = new CTableInfo(S_NO_PROXIES_DEFINED);
 		$table->setHeader(S_NAME);
 
 		$sql = 'SELECT DISTINCT hostid,host '.

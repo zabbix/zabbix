@@ -1,6 +1,6 @@
 --
 -- ZABBIX
--- Copyright (C) 2000-2005 SIA Zabbix
+-- Copyright (C) 2000-2011 SIA Zabbix
 --
 -- This program is free software; you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -77,6 +77,7 @@ FIELD		|lastup		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lastdown	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|dcheckid	|t_id		|	|NOT NULL	|ZBX_SYNC		|2|dchecks
 FIELD		|ip		|t_varchar(39)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|dns		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 UNIQUE		|1		|dcheckid,type,key_,ip,port
 INDEX		|2		|dhostid
 
@@ -281,6 +282,7 @@ FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|dcheckid	|t_id		|	|NOT NULL	|0			|-|dchecks
+FIELD		|dns		|t_varchar(64)	|''	|NOT NULL	|0
 INDEX		|1		|clock
 
 TABLE|events|eventid|ZBX_HISTORY
@@ -899,6 +901,9 @@ FIELD		|highlight	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|expandproblem	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|markelements	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|show_unack	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|grid_size	|t_integer	|'50'	|NOT NULL	|ZBX_SYNC
+FIELD		|grid_show	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
+FIELD		|grid_align	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|name
 
 TABLE|sysmap_url|sysmapurlid|ZBX_SYNC
@@ -1054,6 +1059,7 @@ FIELD		|proxy_hostid	|t_id		|	|NULL		|ZBX_SYNC		|1|hosts		|hostid
 FIELD		|host		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|listen_ip	|t_varchar(39)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|listen_port	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|listen_dns	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|proxy_hostid,host
 
 TABLE|proxy_autoreg_host|id|0
@@ -1062,6 +1068,7 @@ FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|host		|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|listen_ip	|t_varchar(39)	|''	|NOT NULL	|0
 FIELD		|listen_port	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|listen_dns	|t_varchar(64)	|''	|NOT NULL	|0
 INDEX		|1		|clock
 
 TABLE|interface|interfaceid|ZBX_SYNC

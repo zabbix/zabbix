@@ -1,6 +1,6 @@
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -851,7 +851,7 @@ int	DBget_queue_count(int from, int to)
 					" and i.lastclock<%d"
 					")"
 				" and ("
-					"i.type in (%d,%d,%d,%d,%d,%d,%d,%d)"
+					"i.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d)"
 					" or (h.available<>%d and i.type in (%d))"
 					" or (h.snmp_available<>%d and i.type in (%d,%d,%d))"
 					" or (h.ipmi_available<>%d and i.type in (%d))"
@@ -862,8 +862,9 @@ int	DBget_queue_count(int from, int to)
 			ITEM_VALUE_TYPE_LOG,
 			SERVER_STATUS_KEY, SERVER_ZABBIXLOG_KEY,
 			now - from,
-				ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SIMPLE,
-				ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_CALCULATED,
+				ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+				ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_DB_MONITOR,
+				ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_CALCULATED,
 			HOST_AVAILABLE_FALSE,
 				ITEM_TYPE_ZABBIX,
 			HOST_AVAILABLE_FALSE,
@@ -1861,9 +1862,10 @@ zbx_uint64_t	DBmultiply_value_uint64(DB_ITEM *item, zbx_uint64_t value)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, unsigned short port, int now)
+void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip,
+		const char *dns, unsigned short port, int now)
 {
-	char		*host_esc, *ip_esc;
+	char		*host_esc, *ip_esc, *dns_esc;
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_EVENT	event;
@@ -1871,7 +1873,6 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 	int		res = SUCCEED;
 
 	host_esc = DBdyn_escape_string_len(host, HOST_HOST_LEN);
-	ip_esc = DBdyn_escape_string_len(ip, INTERFACE_IP_LEN);
 
 	if (0 != proxy_hostid)
 	{
@@ -1891,6 +1892,9 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 
 	if (SUCCEED == res)
 	{
+		ip_esc = DBdyn_escape_string_len(ip, INTERFACE_IP_LEN);
+		dns_esc = DBdyn_escape_string_len(dns, INTERFACE_DNS_LEN);
+
 		result = DBselect(
 				"select autoreg_hostid"
 				" from autoreg_host"
@@ -1905,19 +1909,19 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 			ZBX_STR2UINT64(autoreg_hostid, row[0]);
 
 			DBexecute("update autoreg_host"
-					" set listen_ip='%s',listen_port=%d"
+					" set listen_ip='%s',listen_dns='%s',listen_port=%d"
 					" where autoreg_hostid=" ZBX_FS_UI64,
-					ip_esc, (int)port, autoreg_hostid);
+					ip_esc, dns_esc, (int)port, autoreg_hostid);
 		}
 		else
 		{
 			autoreg_hostid = DBget_maxid("autoreg_host");
 			DBexecute("insert into autoreg_host"
-					" (autoreg_hostid,proxy_hostid,host,listen_ip,listen_port)"
+					" (autoreg_hostid,proxy_hostid,host,listen_ip,listen_dns,listen_port)"
 					" values"
-					" (" ZBX_FS_UI64 ",%s,'%s','%s',%d)",
+					" (" ZBX_FS_UI64 ",%s,'%s','%s','%s',%d)",
 					autoreg_hostid, DBsql_id_ins(proxy_hostid),
-					host_esc, ip_esc, (int)port);
+					host_esc, ip_esc, dns_esc, (int)port);
 		}
 		DBfree_result(result);
 
@@ -1931,9 +1935,11 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 
 		/* Processing event */
 		process_event(&event, 1);
+
+		zbx_free(dns_esc);
+		zbx_free(ip_esc);
 	}
 
-	zbx_free(ip_esc);
 	zbx_free(host_esc);
 }
 
@@ -1952,19 +1958,21 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	DBproxy_register_host(const char *host, const char *ip, unsigned short port)
+void	DBproxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port)
 {
-	char	*host_esc, *ip_esc;
+	char	*host_esc, *ip_esc, *dns_esc;
 
 	host_esc = DBdyn_escape_string_len(host, HOST_HOST_LEN);
 	ip_esc = DBdyn_escape_string_len(ip, INTERFACE_IP_LEN);
+	dns_esc = DBdyn_escape_string_len(dns, INTERFACE_DNS_LEN);
 
 	DBexecute("insert into proxy_autoreg_host"
-			" (clock,host,listen_ip,listen_port)"
+			" (clock,host,listen_ip,listen_dns,listen_port)"
 			" values"
-			" (%d,'%s','%s',%d)",
-			(int)time(NULL), host_esc, ip_esc, (int)port);
+			" (%d,'%s','%s','%s',%d)",
+			(int)time(NULL), host_esc, ip_esc, dns_esc, (int)port);
 
+	zbx_free(dns_esc);
 	zbx_free(ip_esc);
 	zbx_free(host_esc);
 }
@@ -2042,7 +2050,7 @@ char	*DBget_unique_hostname_by_sample(char *host_name_sample)
 			" from hosts"
 			" where host like '%s%%' escape '%c'"
 				DB_NODE
-			" group by host",
+			" order by host",
 			host_name_sample_esc,
 			ZBX_SQL_LIKE_ESCAPE_CHAR,
 			DBnode_local("hostid"));

@@ -1,6 +1,6 @@
 /*
 ** ZABBIX
-** Copyright (C) 2000-2006 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,15 +32,11 @@ int	connect_to_server(zbx_sock_t *sock, int timeout)
 	int	res;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In connect_to_server() [%s]:%d [timeout:%d]",
-			CONFIG_SERVER,
-			CONFIG_SERVER_PORT,
-			timeout);
+			CONFIG_SERVER, CONFIG_SERVER_PORT, timeout);
 
 	if (FAIL == (res = zbx_tcp_connect(sock, CONFIG_SOURCE_IP, CONFIG_SERVER, CONFIG_SERVER_PORT, timeout)))
 		zabbix_log(LOG_LEVEL_ERR, "Unable to connect to the server [%s]:%d [%s]",
-				CONFIG_SERVER,
-				CONFIG_SERVER_PORT,
-				zbx_tcp_strerror());
+				CONFIG_SERVER, CONFIG_SERVER_PORT, zbx_tcp_strerror());
 
 	return res;
 }
@@ -49,12 +45,10 @@ static int	send_data_to_server(zbx_sock_t *sock, const char *data)
 {
 	int	res;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In send_data_to_server() [%s]",
-			data);
+	zabbix_log(LOG_LEVEL_DEBUG, "In send_data_to_server() [%s]", data);
 
 	if (FAIL == (res = zbx_tcp_send(sock, data)))
-		zabbix_log(LOG_LEVEL_ERR, "Error while sending data to the server [%s]",
-				zbx_tcp_strerror());
+		zabbix_log(LOG_LEVEL_ERR, "Error while sending data to the server [%s]", zbx_tcp_strerror());
 
 	return res;
 }
@@ -64,12 +58,11 @@ static int	recv_data_from_server(zbx_sock_t *sock, char **data)
 	int	res;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In recv_data_from_server()");
+
 	if (FAIL == (res = zbx_tcp_recv(sock, data)))
-		zabbix_log(LOG_LEVEL_ERR, "Error while receiving answer from server [%s]",
-				zbx_tcp_strerror());
+		zabbix_log(LOG_LEVEL_ERR, "Error while receiving answer from server [%s]", zbx_tcp_strerror());
 	else
-		zabbix_log(LOG_LEVEL_DEBUG, "Received [%s] from server",
-				*data);
+		zabbix_log(LOG_LEVEL_DEBUG, "Received [%s] from server", *data);
 
 	return res;
 }

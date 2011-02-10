@@ -1,6 +1,6 @@
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -3653,7 +3653,7 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
 		goto out;
 
 	ip_esc = DBdyn_escape_string_len(ip, INTERFACE_IP_LEN);
-	dns_esc = DBdyn_escape_string_len(dns, INTERFACE_IP_LEN);
+	dns_esc = DBdyn_escape_string_len(dns, INTERFACE_DNS_LEN);
 
 	interfaceid = DBget_maxid("interface");
 

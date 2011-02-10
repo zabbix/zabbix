@@ -1,6 +1,6 @@
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -222,13 +222,12 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 					ret = SUCCEED;
 			}
 		}
+
+		zbx_tcp_close(&sock);
 	}
-	zbx_tcp_close(&sock);
 
 	if (FAIL == tcp_ret)
-	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Send value error: %s", zbx_tcp_strerror());
-	}
 
 	zbx_thread_exit(ret);
 }

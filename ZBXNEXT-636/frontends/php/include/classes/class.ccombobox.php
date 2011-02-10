@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ class CComboBox extends CTag{
 		}
 		else{
 			$title = false;
-			
+
 			if(zbx_strlen($caption) > 44){
 				$this->setAttribute('class', $this->getAttribute('class').' selectShorten');
 				$title = true;

@@ -1,7 +1,7 @@
 // JavaScript Document
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -298,11 +298,13 @@ saveSysmap: function(){
 		'favobj': 	'sysmap',
 		'favid':	this.id,
 		'sysmapid':	this.sysmapid,
+		'grid_size': this.grid.gridSize,
+		'grid_show': this.grid.showGrid ? '1' : '0',
+		'grid_align': this.grid.autoAlign ? '1' : '0',
 		'action':	'save'
 	};
 
 	params = this.get_update_params(params);
-//SDJ(params);
 	new Ajax.Request(url.getPath()+'?output=ajax'+'&sid='+url.getArgument('sid'),
 					{
 						'method': 'post',
@@ -3324,6 +3326,12 @@ gridSize:	'50',				// grid size
 
 initialize: function($super, id, params){
 	this.mapObjectId = id;
+
+	// setting map grid params to default ones
+	var gridSizeDropDownValue = params.gridsize.value.split('x');
+	this.gridSize = gridSizeDropDownValue[0];
+	this.showGrid = params.gridshow.innerHTML == locale['S_SHOWN'];
+	this.autoAlign = params.gridautoalign.innerHTML == locale['S_ON'];
 
 	$super('CGrid['+id+']');
 

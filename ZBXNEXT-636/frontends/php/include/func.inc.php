@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -557,6 +557,43 @@ function zbx_is_int($var){
 return preg_match("/^\-?\d{1,20}+$/", $var);
 }
 
+function zbx_array_diff($array1, $array2, $field){
+
+	$fields1 = zbx_objectValues($array1, $field);
+	$fields2 = zbx_objectValues($array2, $field);
+
+	$first = array_diff($fields1, $fields2);
+	$first = zbx_toHash($first);
+
+	$second = array_diff($fields2, $fields1);
+	$second = zbx_toHash($second);
+
+	$result = array(
+		'first' => array(),
+		'second' => array(),
+		'both' => array()
+	);
+
+	foreach($array1 as $array){
+		if(!isset($array[$field]))
+			$result['first'][] = $array;
+		else if(isset($first[$array[$field]]))
+			$result['first'][] = $array;
+		else
+			$result['both'][$array[$field]] = $array;
+	}
+
+	foreach($array2 as $array){
+		if(!isset($array[$field]))
+			$result['second'][] = $array;
+		else if(isset($second[$array[$field]]))
+			$result['second'][] = $array;
+		else
+			$result['both'][$array[$field]] = $array;
+	}
+
+	return $result;
+}
 
 // STRING FUNCTIONS {{{
 if(!function_exists('zbx_stripslashes')){

@@ -1,6 +1,6 @@
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -312,79 +312,65 @@ static int	delete_history(const char *table, zbx_uint64_t itemid, int keep_histo
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int housekeeping_history_and_trends(int now)
+static int	housekeeping_history_and_trends(int now)
 {
-        DB_ITEM         item;
+	DB_ITEM         item;
+	DB_RESULT       result;
+	DB_ROW          row;
+	int             deleted = 0;
 
-        DB_RESULT       result;
-        DB_ROW          row;
+	zabbix_log(LOG_LEVEL_DEBUG, "In housekeeping_history_and_trends() now:%d", now);
 
-        int             deleted = 0;
+	result = DBselect("select itemid,history,trends from items");
 
-        zabbix_log( LOG_LEVEL_DEBUG, "In housekeeping_history_and_trends(%d)",
-		now);
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(item.itemid, row[0]);
+		item.history = atoi(row[1]);
+		item.trends = atoi(row[2]);
 
-        result = DBselect("select itemid,history,trends from items");
-
-        while((row=DBfetch(result)))
-        {
-		ZBX_STR2UINT64(item.itemid,row[0]);
-                item.history=atoi(row[1]);
-                item.trends=atoi(row[2]);
-
-                deleted += delete_history("history", item.itemid, item.history, now);
-                deleted += delete_history("history_uint", item.itemid, item.history, now);
-                deleted += delete_history("history_str", item.itemid, item.history, now);
-                deleted += delete_history("history_text", item.itemid, item.history, now);
-                deleted += delete_history("history_log", item.itemid, item.history, now);
-                deleted += delete_history("trends", item.itemid, item.trends, now);
+		deleted += delete_history("history", item.itemid, item.history, now);
+		deleted += delete_history("history_uint", item.itemid, item.history, now);
+		deleted += delete_history("history_str", item.itemid, item.history, now);
+		deleted += delete_history("history_text", item.itemid, item.history, now);
+		deleted += delete_history("history_log", item.itemid, item.history, now);
+		deleted += delete_history("trends", item.itemid, item.trends, now);
 		deleted += delete_history("trends_uint", item.itemid, item.trends, now);
-        }
-        DBfree_result(result);
-        return deleted;
+	}
+	DBfree_result(result);
+
+	return deleted;
 }
 
-int main_housekeeper_loop()
+int	main_housekeeper_loop()
 {
-	int	now;
-	int	d;
+	int	d, now;
 
-	if(CONFIG_DISABLE_HOUSEKEEPING == 1)
+	if (1 == CONFIG_DISABLE_HOUSEKEEPING)
 	{
-		for(;;)
+		for (;;)
 		{
-/* Do nothing */
-			zbx_setproctitle("do nothing");
-
-			sleep(3600);
+			zbx_setproctitle("housekeeper [sleeping forever]");
+			sleep(SEC_PER_HOUR);
 		}
 	}
 
-	for(;;)
+	for (;;)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Executing housekeeper");
+		zabbix_log(LOG_LEVEL_WARNING, "Executing housekeeper");
 		now = time(NULL);
 
-		zbx_setproctitle("connecting to the database");
+		zbx_setproctitle("housekeeper [connecting to the database]");
 
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-/* Transaction is not required here. It causes timeouts under MySQL */
+/* Transaction is not required here. It causes timeouts under MySQL. */
 /*		DBbegin();*/
 
-/*		zbx_setproctitle("housekeeper [removing deleted hosts]");*/
-
-/*		housekeeping_hosts();*/
-
-/*		zbx_setproctitle("housekeeper [removing deleted items]");*/
-
-/*		housekeeping_items();*/
-
-/*		zbx_setproctitle("housekeeper [removing old history]");*/
+		zbx_setproctitle("housekeeper [removing old history]");
 
 		d = housekeeping_history_and_trends(now);
-		zabbix_log( LOG_LEVEL_WARNING, "Deleted %d records from history and trends",
-			d);
+		zabbix_log(LOG_LEVEL_WARNING, "Deleted %d records from history and trends", d);
 
 		zbx_setproctitle("housekeeper [removing old history]");
 
@@ -402,20 +388,14 @@ int main_housekeeper_loop()
 
 		housekeeping_sessions(now);
 
-		zbx_setproctitle("housekeeper [vacuuming database]");
-
-/* Transaction is not required here. It causes timeouts under MySQL */
+/* Transaction is not required here. It causes timeouts under MySQL. */
 /*		DBcommit();*/
 
-		zabbix_log( LOG_LEVEL_DEBUG, "Sleeping for %d hours",
-			CONFIG_HOUSEKEEPING_FREQUENCY);
-
-		zbx_setproctitle("housekeeper [sleeping for %d hour(s)]",
-			CONFIG_HOUSEKEEPING_FREQUENCY);
-
 		DBclose();
-		zabbix_log( LOG_LEVEL_DEBUG, "Next housekeeper run is after %dh",
-			CONFIG_HOUSEKEEPING_FREQUENCY);
-		sleep(3660*CONFIG_HOUSEKEEPING_FREQUENCY);
+
+		zabbix_log(LOG_LEVEL_DEBUG, "Sleeping for %d hours", CONFIG_HOUSEKEEPING_FREQUENCY);
+		zbx_setproctitle("housekeeper [sleeping for %d hours]", CONFIG_HOUSEKEEPING_FREQUENCY);
+
+		sleep(SEC_PER_HOUR * CONFIG_HOUSEKEEPING_FREQUENCY);
 	}
 }

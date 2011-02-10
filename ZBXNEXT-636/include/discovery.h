@@ -1,7 +1,7 @@
 
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,6 +26,6 @@
 
 void	discovery_update_host(DB_DHOST *dhost, const char *ip, int status, int now);
 void	discovery_update_service(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost,
-		char *ip, int port, int status, const char *value, int now);
+		const char *ip, const char *dns, int port, int status, const char *value, int now);
 
 #endif

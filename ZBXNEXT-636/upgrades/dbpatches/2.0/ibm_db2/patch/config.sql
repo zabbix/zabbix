@@ -6,6 +6,8 @@ ALTER TABLE config ALTER COLUMN alert_usrgrpid DROP NOT NULL;
 REORG TABLE config;
 ALTER TABLE config ALTER COLUMN discovery_groupid SET WITH DEFAULT NULL;
 REORG TABLE config;
+ALTER TABLE config ALTER COLUMN default_theme SET WITH DEFAULT 'css_ob.css';
+REORG TABLE config;
 ALTER TABLE config ADD ns_support integer DEFAULT '0' NOT NULL;
 REORG TABLE config;
 UPDATE config SET alert_usrgrpid=NULL WHERE NOT alert_usrgrpid IN (SELECT usrgrpid FROM usrgrp);

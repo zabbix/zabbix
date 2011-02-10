@@ -1,6 +1,6 @@
 --
 -- Zabbix
--- Copyright (C) 2000,2001,2002,2003,2004 Alexei Vladishev
+-- Copyright (C) 2000-2011 SIA Zabbix
 --
 -- This program is free software; you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -12193,7 +12193,7 @@ INSERT INTO graphs_items VALUES (796,385,22137,0,0,'009900',1,2,0,5);
 -- Dumping data for table `sysmaps`
 --
 
-INSERT INTO sysmaps VALUES (2,'Local network',980,200,NULL,1,2,1,1,0,0);
+INSERT INTO sysmaps VALUES (2,'Local network',980,200,NULL,1,2,1,1,0,0,50,1,1);
 
 --
 -- Dumping data for table `sysmaps_elements`

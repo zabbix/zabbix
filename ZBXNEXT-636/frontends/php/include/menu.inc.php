@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -187,12 +187,12 @@ $ZBX_MENU = array(
 						'label' => _('Maps'),
 						'sub_pages' => array('image.php','sysmap.php','popup_link_tr.php')
 					),
+				array('url' => 'discoveryconf.php',
+					'label' => _('Discovery')
+					),
 				array('url'=>'services.php',
 						'label'=>_('IT Services'),
 						'sub_pages'=>array('services_form.php')
-					),
-				array('url' => 'discoveryconf.php',
-					'label' => _('Discovery')
 					),
 			)
 	),

@@ -1,6 +1,6 @@
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 	char		*p, *error = NULL;
 	char		check[MAX_STRING_LEN];
 	char		service[MAX_STRING_LEN];
-	char		port[MAX_STRING_LEN];
+	char		port[8];
 	char		net_tcp_service[MAX_STRING_LEN];
 	int		ret = SUCCEED;
 
@@ -37,8 +37,8 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 
 	init_result(result);
 
-	service[0] ='\0';
-	port[0] = '\0';
+	*service = '\0';
+	*port = '\0';
 
 	if (1 == num_param(item->key))
 	{
@@ -60,20 +60,20 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 			THIS_SHOULD_NEVER_HAPPEN;
 			ret = NOTSUPPORTED;
 		}
-		else if (0 != get_param(item->key, 2, port, MAX_STRING_LEN))
+		else if (0 != get_param(item->key, 2, port, sizeof(port)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			ret = NOTSUPPORTED;
 		}
-		else if (SUCCEED != is_uint(port))
+		else if (SUCCEED != is_ushort(port, NULL))
 		{
-			error = zbx_dsprintf(error, "Port number must be numeric");
+			error = zbx_strdup(error, "Incorrect port number");
 			ret = NOTSUPPORTED;
 		}
 	}
 	else
 	{
-		error = zbx_dsprintf(error, "Too many parameters");
+		error = zbx_strdup(error, "Too many parameters");
 		ret = NOTSUPPORTED;
 	}
 
@@ -87,7 +87,7 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 		else
 			strscpy(net_tcp_service, "net.tcp.service");
 
-		if ('\0' == port[0])
+		if ('\0' == *port)
 			zbx_snprintf(check, sizeof(check), "%s[%s,%s]", net_tcp_service, service, item->interface.addr);
 		else
 			zbx_snprintf(check, sizeof(check), "%s[%s,%s,%s]", net_tcp_service, service, item->interface.addr, port);
@@ -99,7 +99,7 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 		ret = NOTSUPPORTED;
 
 	if (NOTSUPPORTED == ret && NULL == error)
-		error = zbx_dsprintf(error, "Simple check is not supported");
+		error = zbx_strdup(error, "Simple check is not supported");
 
 	if (NOTSUPPORTED == ret)
 		SET_MSG_RESULT(result, error);
