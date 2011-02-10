@@ -19,44 +19,72 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
+require_once(dirname(__FILE__) . '/../include/class.cwebtest.php');
 
-class testFormSysmap extends CWebTest{
-	public $mapName = "Test Map";
-	public $mapName2 = "Test Map 2";
+class testFormSysmap extends CWebTest {
 
-	public function testFormSysmapOpen(){
+	public $mapName = "Test map 1";
+	public $affectedTables = array('sysmaps', 'sysmaps_elements', 'sysmaps_links', 'sysmaps_link_triggers', 'sysmap_element_url', 'sysmap_url');
+
+	/**
+	 * Returns all possible map name variants
+	 * used as a data provider
+	 * @static
+	 * @return array
+	 */
+	public static function possibleMapNames() {
+		return array(
+			//string map name
+			//bool   operation with this name should be successful
+			array('My map name', true),
+			array('Another_map_name', true),
+			array('1 starts with a number', true),
+			array('!@#$%^&*()', true),
+			array('0', true),
+
+			array('', false), // map with empty name
+			array('0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789', false),
+		);
+	}
+
+
+	public function testFormSysmapOpen() {
 		$this->login('sysmaps.php');
 		$this->assertTitle('Network maps');
 	}
 
-	public function testFormSysmapCreate(){
+
+	/**
+	 * Test creation of map
+	 * @dataProvider possibleMapNames
+	 */
+	public function testFormSysmapCreate($mapName, $successExpected) {
+
+		DBsave_tables($this->affectedTables);
+
 		$this->login('sysmaps.php');
 		$this->button_click('form');
 		$this->wait();
-		$this->input_type('name',$this->mapName);
+		$this->input_type('name', $mapName);
 		$this->button_click('save');
 		$this->wait();
 		$this->assertTitle('Network maps');
-		$this->ok('Network map added');
-		$this->ok($this->mapName);
+		if ($successExpected) {
+			$this->ok('Network map added');
+			$this->ok($mapName);
+
+		}
+		else {
+			$this->ok('ERROR');
+		}
+
+		DBrestore_tables($this->affectedTables);
 	}
 
-	public function testFormSysmapCreateLongMapName(){
-		$mapName="0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789";
-		$this->login('sysmaps.php');
-		$this->button_click('form');
-		$this->wait();
-		$this->input_type('name',$mapName);
-		$this->button_click('save');
-		$this->wait();
-		$this->assertTitle('Network maps');
-		$this->ok('ERROR');
-	}
 
-	public function testFormSysmapSimpleUpdate(){
+	public function testFormSysmapSimpleUpdate() {
 		$this->login('sysmaps.php');
-		$this->click('//a[text()="'.$this->mapName.'"]/../../td/a[text()="Edit"]');
+		$this->click('//a[text()="' . $this->mapName . '"]/../../td/a[text()="Edit"]');
 		$this->wait();
 		$this->button_click('save');
 		$this->wait();
@@ -65,51 +93,83 @@ class testFormSysmap extends CWebTest{
 		$this->ok($this->mapName);
 	}
 
-	public function testFormSysmapUpdateMapName(){
-// Update Map
+
+	/**
+	 * Test map update
+	 * @dataProvider possibleMapNames
+	 */
+	public function testFormSysmapUpdateMapName($mapName, $successExpected) {
+		// Update Map
+		DBsave_tables($this->affectedTables);
+
 		$this->login('sysmaps.php');
-		$this->click('//a[text()="'.$this->mapName.'"]/../../td/a[text()="Edit"]');
+		$this->click('//a[text()="' . $this->mapName . '"]/../../td/a[text()="Edit"]');
 		$this->wait();
 
-		$this->input_type('name', $this->mapName2);
+		$this->input_type('name', $mapName);
 		$this->button_click('save');
 		$this->wait();
 		$this->assertTitle('Network maps');
-		$this->ok('Network map updated');
+
+		if ($successExpected) {
+			$this->ok('Network map updated');
+			$this->ok($mapName);
+		}
+		else {
+			$this->ok('ERROR');
+		}
+
+		DBrestore_tables($this->affectedTables);
 	}
 
-	public function testFormSysmapDelete(){
+
+	public function testFormSysmapDelete() {
+
+		DBsave_tables($this->affectedTables);
+
 		$this->chooseOkOnNextConfirmation();
-// Delete Map
+		// Delete Map
 		$this->login('sysmaps.php');
-		$this->click('//a[text()="'.$this->mapName2.'"]/../../td/a[text()="Edit"]');
+		$this->click('//a[text()="' . $this->mapName . '"]/../../td/a[text()="Edit"]');
 		$this->wait();
 		$this->button_click('delete');
 		$this->waitForConfirmation();
 		$this->wait();
 		$this->assertTitle('Network maps');
 		$this->ok('Network map deleted');
+
+		DBrestore_tables($this->affectedTables);
 	}
 
-	public function testFormSysmapCloneMap(){
-// Update Map
+
+	public function testFormSysmapCloneMap() {
+
+		$mapName = 'Cloned map';
+
 		$this->login('sysmaps.php');
-		$this->click('//a[text()="Local network"]/../../td/a[text()="Edit"]');
+		$this->click('//a[text()="' . $this->mapName . '"]/../../td/a[text()="Edit"]');
 		$this->wait();
 		$this->button_click('clone');
-		$this->input_type('name',$this->mapName2);
+		$this->input_type('name', $mapName);
 		$this->button_click('save');
 		$this->wait();
 		$this->assertTitle('Network maps');
 		$this->ok('Network map added');
+		$this->ok($mapName);
+		return $mapName;
+
 	}
 
-	public function testFormSysmapDeleteClonedMap(){
-		$this->chooseOkOnNextConfirmation();
 
-// Delete Map
+	/**
+	 * @depends testFormSysmapCloneMap
+	 */
+	public function testFormSysmapDeleteClonedMap($mapName = 'Cloned map') {
+		// Delete Map if it was created
+		$this->open('sysmaps.php');
+		$this->chooseOkOnNextConfirmation();
 		$this->login('sysmaps.php');
-		$this->click('//a[text()="'.$this->mapName2.'"]/../../td/a[text()="Edit"]');
+		$this->click('//a[text()="' . $mapName . '"]/../../td/a[text()="Edit"]');
 		$this->wait();
 		$this->button_click('delete');
 		$this->wait();
@@ -119,4 +179,5 @@ class testFormSysmap extends CWebTest{
 	}
 
 }
+
 ?>
