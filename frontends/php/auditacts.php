@@ -203,9 +203,9 @@ include_once('include/page_header.php');
 		}
 
 		if($row['alerttype'] == ALERT_TYPE_MESSAGE)
-			$message = array(bold(S_SUBJECT.': '), br(), $row['subject'], br(), br(), bold(S_MESSAGE.': '), br(), $row['message']);
+			$message = array(bold(S_SUBJECT.': '), br(), $row['subject'], br(), br(), bold(S_MESSAGE.': '), br(), zbx_nl2br($row['message']));
 		else
-			$message = array(bold(S_COMMAND.': '), br(), $row['message']);
+			$message = array(bold(S_COMMAND.': '), br(), zbx_nl2br($row['message']));
 
 		$error = empty($row['error']) ? new CSpan(SPACE,'off') : new CSpan($row['error'],'on');
 
