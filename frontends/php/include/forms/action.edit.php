@@ -332,12 +332,14 @@ require_once('include/templates/action.js.php');
 	$esc_step_from = array();
 	$esc_step_to = array();
 	$esc_period = array();
+	$esc_keys = array();
 	foreach($data['operations'] as $key => $operation) {
 		$esc_step_from[$key] = $operation['esc_step_from'];
 		$esc_step_to[$key] = $operation['esc_step_to'];
 		$esc_period[$key] = $operation['esc_period'];
+		$esc_keys[$key] = $key;
 	}
-	array_multisort($esc_step_from, SORT_ASC, SORT_NUMERIC, $esc_step_to, SORT_ASC, $esc_period, SORT_ASC, $data['operations']);
+	array_multisort($esc_step_from, SORT_ASC, $esc_step_to, SORT_ASC, $esc_period, SORT_ASC, $esc_keys, SORT_ASC, $data['operations']);
 // --
 
 	if(EVENT_SOURCE_TRIGGERS == $data['eventsource'])
