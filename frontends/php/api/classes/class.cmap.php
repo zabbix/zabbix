@@ -291,16 +291,16 @@ class CMap extends CZBXAPI{
 						'preservekeys' => 1,
 						'output' => API_OUTPUT_SHORTEN,
 					);
-				$allowed_hosts = CHost::get($host_options);
+					$allowed_hosts = CHost::get($host_options);
 
 					foreach($hosts_to_check as $elementid){
 						if(!isset($allowed_hosts[$elementid])){
-					foreach($selements as $selementid => $selement){
-						if(($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) && (bccomp($selement['elementid'],$elementid) == 0)){
+							foreach($selements as $selementid => $selement){
+								if(($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) && (bccomp($selement['elementid'],$elementid) == 0)){
 									unset($result[$selement['sysmapid']], $selements[$selementid]);
+								}
+							}
 						}
-					}
-				}
 					}
 				}
 
@@ -316,12 +316,12 @@ class CMap extends CZBXAPI{
 
 					foreach($maps_to_check as $elementid){
 						if(!isset($allowed_maps[$elementid])){
-					foreach($selements as $selementid => $selement){
-						if(($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP) && (bccomp($selement['elementid'],$elementid) == 0)){
+							foreach($selements as $selementid => $selement){
+								if(($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP) && (bccomp($selement['elementid'],$elementid) == 0)){
 									unset($result[$selement['sysmapid']], $selements[$selementid]);
+								}
+							}
 						}
-					}
-				}
 					}
 				}
 
@@ -337,12 +337,12 @@ class CMap extends CZBXAPI{
 
 					foreach($triggers_to_check as $elementid){
 						if(!isset($allowed_triggers[$elementid])){
-					foreach($selements as $selementid => $selement){
-						if(($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) && (bccomp($selement['elementid'],$elementid) == 0)){
+							foreach($selements as $selementid => $selement){
+								if(($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) && (bccomp($selement['elementid'],$elementid) == 0)){
 									unset($result[$selement['sysmapid']], $selements[$selementid]);
+								}
+							}
 						}
-					}
-				}
 					}
 				}
 
@@ -358,14 +358,14 @@ class CMap extends CZBXAPI{
 
 					foreach($host_groups_to_check as $elementid){
 						if(!isset($allowed_host_groups[$elementid])){
-					foreach($selements as $selementid => $selement){
-						if(($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP) && (bccomp($selement['elementid'],$elementid) == 0)){
+							foreach($selements as $selementid => $selement){
+								if(($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP) && (bccomp($selement['elementid'],$elementid) == 0)){
 									unset($result[$selement['sysmapid']], $selements[$selementid]);
+								}
+							}
 						}
 					}
 				}
-			}
-		}
 
 			}
 		}
@@ -420,7 +420,10 @@ COpt::memoryPick();
 				if(!isset($result[$selement['sysmapid']]['selements'])){
 					$result[$selement['sysmapid']]['selements'] = array();
 				}
-				$result[$selement['sysmapid']]['selements'][] = $selement;
+				if(!is_null($options['preservekeys']))
+					$result[$selement['sysmapid']]['selements'][$selement['selementid']] = $selement;
+				else
+					$result[$selement['sysmapid']]['selements'][] = $selement;
 			}
 		}
 
@@ -449,7 +452,10 @@ COpt::memoryPick();
 					$result[$link['sysmapid']]['links'] = array();
 				}
 
-				$result[$link['sysmapid']]['links'][] = $link;
+				if(!is_null($options['preservekeys']))
+					$result[$link['sysmapid']]['links'][$link['linkid']] = $link;
+				else
+					$result[$link['sysmapid']]['links'][] = $link;
 			}
 		}
 
@@ -629,7 +635,7 @@ COpt::memoryPick();
 		}
 
 // Exists
-		if($create || $update){
+		if(($create || $update) && !empty($mapNames)){
 			$options = array(
 				'filter' => array('name' => array_keys($mapNames)),
 				'output' => array('sysmapid', 'name'),
