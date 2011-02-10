@@ -904,6 +904,17 @@ FIELD		|show_unack	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|grid_size	|t_integer	|'50'	|NOT NULL	|ZBX_SYNC
 FIELD		|grid_show	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|grid_align	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
+FIELD		|label_format	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|label_type_host|t_integer	|'2'	|NOT NULL	|ZBX_SYNC
+FIELD		|label_type_hostgroup|t_integer	|'2'	|NOT NULL	|ZBX_SYNC
+FIELD		|label_type_trigger|t_integer	|'2'	|NOT NULL	|ZBX_SYNC
+FIELD		|label_type_map|t_integer	|'2'	|NOT NULL	|ZBX_SYNC
+FIELD		|label_type_image|t_integer	|'2'	|NOT NULL	|ZBX_SYNC
+FIELD		|label_string_host|t_varchar(255)|''	|NOT NULL	|ZBX_SYNC
+FIELD		|label_string_hostgroup|t_varchar(255)|''|NOT NULL	|ZBX_SYNC
+FIELD		|label_string_trigger|t_varchar(255)|''	|NOT NULL	|ZBX_SYNC
+FIELD		|label_string_map|t_varchar(255)|''	|NOT NULL	|ZBX_SYNC
+FIELD		|label_string_image|t_varchar(255)|''	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|name
 
 TABLE|sysmap_url|sysmapurlid|ZBX_SYNC
