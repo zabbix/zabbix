@@ -643,7 +643,7 @@ Index: src/zabbix_server/escalator/escalator.c
  	}
 Index: src/libs/zbxserver/expression.c
 ===================================================================
---- src/libs/zbxserver/expression.c	(revision 16852)
+--- src/libs/zbxserver/expression.c	(revision 16938)
 +++ src/libs/zbxserver/expression.c	(working copy)
 @@ -1230,6 +1230,140 @@
  
@@ -834,7 +834,7 @@ Index: src/libs/zbxserver/expression.c
  	}
  
  	DBfree_result(result);
-@@ -1397,16 +1515,14 @@
+@@ -1397,14 +1515,12 @@
   * Comments:                                                                  *
   *                                                                            *
   ******************************************************************************/
@@ -847,51 +847,50 @@ Index: src/libs/zbxserver/expression.c
 -	DB_ROW		h_row;
  	char		expression[TRIGGER_EXPRESSION_LEN_MAX];
 -	zbx_uint64_t	functionid, valuemapid;
-+	zbx_uint64_t	functionid, itemid;
++	zbx_uint64_t	functionid, itemid, valuemapid;
  	int		value_type, ret = FAIL;
--	char		tmp[MAX_STRING_LEN];
-+	const char	*table;
+ 	char		tmp[MAX_STRING_LEN];
  
- 	if (FAIL == DBget_trigger_expression_by_triggerid(triggerid, expression, sizeof(expression)))
- 		return FAIL;
-@@ -1415,7 +1531,7 @@
- 		return FAIL;
- 
- 	result = DBselect(
--			"select i.itemid,i.value_type,i.valuemapid,i.units"
-+			"select i.itemid,i.value_type"
- 			" from items i,functions f"
- 			" where i.itemid=f.itemid"
- 				" and f.functionid=" ZBX_FS_UI64,
-@@ -1423,42 +1539,15 @@
+@@ -1423,42 +1539,36 @@
  
  	if (NULL != (row = DBfetch(result)))
  	{
 +		ZBX_STR2UINT64(itemid, row[0]);
  		value_type = atoi(row[1]);
--		ZBX_STR2UINT64(valuemapid, row[2]);
-+		table = get_table_by_value_type(value_type);
+ 		ZBX_STR2UINT64(valuemapid, row[2]);
  
 -		zbx_snprintf(tmp, sizeof(tmp), "select value from %s where itemid=%s and clock<=%d order by itemid,clock desc",
 -				get_table_by_value_type(value_type), row[0], clock);
 -
 -		h_result = DBselectN(tmp, 1);
 -		if (NULL != (h_row = DBfetch(h_result)))
--		{
--			switch (value_type)
--			{
++		if (SUCCEED == (ret = DBget_history_value(itemid, value, get_table_by_value_type(value_type), "value", clock, ns)))
+ 		{
+ 			switch (value_type)
+ 			{
 -				case ITEM_VALUE_TYPE_LOG:
 -				case ITEM_VALUE_TYPE_TEXT:
 -					*value = zbx_strdup(*value, h_row[0]);
--					break;
--				case ITEM_VALUE_TYPE_STR:
++				case ITEM_VALUE_TYPE_FLOAT:
++				case ITEM_VALUE_TYPE_UINT64:
++					zbx_strlcpy(tmp, *value, sizeof(tmp));
++
++					if (ITEM_VALUE_TYPE_FLOAT == value_type)
++						del_zeroes(tmp);
++					if (SUCCEED != replace_value_by_map(tmp, sizeof(tmp), valuemapid))
++						add_value_suffix(tmp, sizeof(tmp), row[3], value_type);
++
++					*value = zbx_strdup(*value, tmp);
+ 					break;
+ 				case ITEM_VALUE_TYPE_STR:
 -					zbx_strlcpy(tmp, h_row[0], sizeof(tmp));
--
--					replace_value_by_map(tmp, sizeof(tmp), valuemapid);
--
--					*value = zbx_strdup(*value, tmp);
--					break;
--				default:
++					zbx_strlcpy(tmp, *value, sizeof(tmp));
+ 
+ 					replace_value_by_map(tmp, sizeof(tmp), valuemapid);
+ 
+ 					*value = zbx_strdup(*value, tmp);
+ 					break;
+ 				default:
 -					zbx_strlcpy(tmp, h_row[0], sizeof(tmp));
 -
 -					if (ITEM_VALUE_TYPE_FLOAT == value_type)
@@ -901,19 +900,15 @@ Index: src/libs/zbxserver/expression.c
 -
 -					*value = zbx_strdup(*value, tmp);
 -					break;
--			}
++					;
+ 			}
 -			ret = SUCCEED;
--		}
+ 		}
 -		DBfree_result(h_result);
-+		if (SUCCEED == (ret = DBget_history_value(itemid, value, table, "value", clock, ns)))
-+		{
-+			if (ITEM_VALUE_TYPE_FLOAT == value_type)
-+				del_zeroes(*value);
-+		}
  	}
  	DBfree_result(result);
  
-@@ -1993,38 +2082,42 @@
+@@ -1993,38 +2103,42 @@
  				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
  					ret = DBget_item_lastvalue_by_triggerid(event->objectid, &replace_to, N_functionid);
  				else if (0 == strcmp(m, MVAR_ITEM_VALUE))
@@ -964,7 +959,7 @@ Index: src/libs/zbxserver/expression.c
  				else if (0 == strcmp(m, MVAR_DATE))
  					replace_to = zbx_strdup(replace_to, zbx_date2str(time(NULL)));
  				else if (0 == strcmp(m, MVAR_TIME))
-@@ -2189,7 +2282,8 @@
+@@ -2189,7 +2303,8 @@
  				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
  					ret = DBget_item_lastvalue_by_triggerid(event->objectid, &replace_to, N_functionid);
  				else if (0 == strcmp(m, MVAR_ITEM_VALUE))
@@ -2166,39 +2161,39 @@ Index: src/libs/zbxcommon/misc.c
 -	return (((double)current.time) + 1.0e-3 * ((double)current.millitm));
 +			if (0 == boottime)
 +				boottime = (int)(time(NULL) - tick.QuadPart);
-+
+ 
+-#else /* not _WINDOWS */
 +			ts->sec = (int)(tick.QuadPart + boottime);
 +		}
 +	}
-+
+ 
+-	struct timeval current;
 +	if (TRUE != rc)
 +	{
 +		struct _timeb   tb;
  
--#else /* not _WINDOWS */
+-	gettimeofday(&current, NULL);
 +		_ftime(&tb);
  
--	struct timeval current;
+-	return (((double)current.tv_sec) + 1.0e-6 * ((double)current.tv_usec));
 +		ts->sec = (int)tb.time;
 +		ts->ns = tb.millitm * 1000000;
 +	}
  
--	gettimeofday(&current, NULL);
+-#endif /* _WINDOWS */
 +#else	/* not _WINDOWS */
  
--	return (((double)current.tv_sec) + 1.0e-6 * ((double)current.tv_usec));
 +	struct timeval	tv;
 +	int		rc = -1;
 +#ifdef HAVE_TIME_CLOCK_GETTIME
 +	struct timespec	tp;
- 
--#endif /* _WINDOWS */
++
 +	if (0 == (rc = clock_gettime(CLOCK_REALTIME, &tp)))
 +	{
 +		ts->sec = (int)tp.tv_sec;
 +		ts->ns = (int)tp.tv_nsec;
 +	}
- 
++
 +#endif	/* HAVE_TIME_CLOCK_GETTIME */
 +
 +	if (0 != rc && 0 == (rc = gettimeofday(&tv, NULL)))
