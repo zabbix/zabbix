@@ -66,7 +66,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 	{
 		global $DB;
 
-		$this->setHost('localhost');
+		$this->setHost('hudson');
 		$this->setBrowser('*firefox');
 		if(strstr(PHPUNIT_URL,'http://'))
 		{
@@ -167,6 +167,14 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 	{
 		$this->assertSelectHasOption($id,$str);
 		$this->select($id,$str);
+	}
+
+	public function dropdown_select_wait($id,$str)
+	{
+		$selected = $this->getSelectedLabel($id);
+		$this->dropdown_select($id, $str);
+		// Wait only if drop down selection was changed
+		if($selected != $str)	$this->wait();
 	}
 
 	public function wait()

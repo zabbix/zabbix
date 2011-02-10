@@ -28,6 +28,7 @@ require_once('include/html.inc.php');
 
 if(isset($_REQUEST['csv_export'])){
 	$CSV_EXPORT = true;
+	$csvRows = array();
 
 	$page['type'] = detect_page_type(PAGE_TYPE_CSV);
 	$page['file'] = 'zbx_events_export.csv';
@@ -112,6 +113,76 @@ include_once('include/page_header.php');
 	$_REQUEST['triggerid'] = get_request('triggerid',CProfile::get('web.events.filter.triggerid',0));
 	$_REQUEST['showUnknown'] = get_request('showUnknown',CProfile::get('web.events.filter.showUnknown',0));
 
+	// Change triggerId filter if change hostId
+	if(($_REQUEST['triggerid'] > 0) && isset($_REQUEST['hostid'])){
+		$hostid = get_request('hostid');
+		$oldTriggers = CTrigger::get(array(
+			'output' => array('triggerid', 'description', 'expression'),
+			'select_hosts' => array('hostid', 'host'),
+			'select_items' => API_OUTPUT_EXTEND,
+			'select_functions' => API_OUTPUT_EXTEND,
+			'triggerids' => $_REQUEST['triggerid'],
+		));
+
+		foreach($oldTriggers as $oldTrigger){
+			$_REQUEST['triggerid'] = 0;
+			$oldTrigger['hosts'] = zbx_toHash($oldTrigger['hosts'],'hostid');
+			$oldTrigger['items'] = zbx_toHash($oldTrigger['items'],'itemid');
+			$oldTrigger['functions'] = zbx_toHash($oldTrigger['functions'],'functionid');
+			$oldExpression = triggerExpression($oldTrigger,false);
+
+			if(isset($oldTrigger['hosts'][$hostid])) break;
+
+			$newTriggers = CTrigger::get(array(
+				'output' => array('triggerid', 'description', 'expression'),
+				'select_hosts' => array('hostid', 'host'),
+				'select_items' => API_OUTPUT_EXTEND,
+				'select_functions' => API_OUTPUT_EXTEND,
+				'filter' => array('description' => $oldTrigger['description']),
+				'hostids' => $hostid,
+			));
+
+			foreach($newTriggers as $tnum => $newTrigger){
+				if(count($oldTrigger['items']) != count($newTrigger['items'])) continue;
+				$newTrigger['items'] = zbx_toHash($newTrigger['items'],'itemid');
+				$newTrigger['hosts'] = zbx_toHash($newTrigger['hosts'],'hostid');
+				$newTrigger['functions'] = zbx_toHash($newTrigger['functions'],'functionid');
+
+				$found = false;
+				foreach($newTrigger['functions'] as $fnum => $function){
+					foreach($oldTrigger['functions'] as $ofnum => $oldFunction){;
+// compare functions
+						if(($function['function'] != $oldFunction['function']) || ($function['parameter'] != $oldFunction['parameter'])) continue;
+// compare that functions uses same item keys
+						if($newTrigger['items'][$function['itemid']]['key_'] != $oldTrigger['items'][$oldFunction['itemid']]['key_']) continue;
+// rewrite itemid so we could compare expressions
+// of two triggers form different hosts
+						$newTrigger['functions'][$fnum]['itemid'] = $oldFunction['itemid'];
+						$found = true;
+
+						unset($oldTrigger['functions'][$ofnum]);
+						break;
+					}
+					if(!$found) break;
+				}
+				if(!$found) continue;
+
+// if we found same trigger we overwriting it's hosts and items for expression compare
+				$newTrigger['hosts'] = $oldTrigger['hosts'];
+				$newTrigger['items'] = $oldTrigger['items'];
+
+				$newExpression = triggerExpression($newTrigger,false);
+
+				if(strcmp($oldExpression, $newExpression) == 0){
+					$_REQUEST['triggerid'] = $newTrigger['triggerid'];
+					$_REQUEST['filter_set'] = 1;
+					break;
+				}
+			}
+		}
+	}
+// --------
+
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
 		CProfile::update('web.events.filter.triggerid',$_REQUEST['triggerid'], PROFILE_TYPE_ID);
 		CProfile::update('web.events.filter.showUnknown',$_REQUEST['showUnknown'], PROFILE_TYPE_INT);
@@ -133,6 +204,9 @@ include_once('include/page_header.php');
 // HEADER {{{
 	$r_form = new CForm(null, 'get');
 	$r_form->addVar('fullscreen',$_REQUEST['fullscreen']);
+	$r_form->addVar('triggerid', get_request('triggerid'));
+	$r_form->addVar('stime', get_request('stime'));
+	$r_form->addVar('period', get_request('period'));
 
 	if(EVENT_SOURCE_TRIGGERS == $source){
 
@@ -202,7 +276,9 @@ include_once('include/page_header.php');
 		$filterForm->setAttribute('name', 'zbx_filter');
 		$filterForm->setAttribute('id', 'zbx_filter');
 
-		$filterForm->addVar('triggerid', get_request('triggerid', 0));
+		$filterForm->addVar('triggerid', get_request('triggerid'));
+		$filterForm->addVar('stime', get_request('stime'));
+		$filterForm->addVar('period', get_request('period'));
 		$filterForm->addVar('stime', get_request('stime'));
 		$filterForm->addVar('period', get_request('period'));
 
@@ -345,16 +421,13 @@ include_once('include/page_header.php');
 			));
 
 			if($CSV_EXPORT){
-				$csv_return = '';
-
-				$tbHeader = array(
+				$csvRows[] = array(
 					S_TIME,
 					S_IP,
 					S_DNS,
 					S_DESCRIPTION,
 					S_STATUS
 				);
-				$csv_return .= zbx_toCSV($tbHeader);
 			}
 
 			foreach($dsc_events as $num => $event_data){
@@ -399,14 +472,13 @@ include_once('include/page_header.php');
 				));
 
 				if($CSV_EXPORT){
-					$tbHeader = array(
+					$csvRows[] = array(
 						zbx_date2str(S_EVENTS_DISCOVERY_TIME_FORMAT,$event_data['clock']),
 						$event_data['object_data']['ip'],
 						$event_data['object_data']['dns'],
 						$event_data['description'],
 						discovery_value($event_data['value'])
 					);
-					$csv_return .= zbx_toCSV($tbHeader);
 				}
 
 
@@ -428,8 +500,6 @@ include_once('include/page_header.php');
 
 
 			if($CSV_EXPORT){
-				$csvRows = array();
-
 				$csvRows[] = array(
 					S_TIME,
 					is_show_all_nodes()?S_NODE:null,

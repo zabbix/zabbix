@@ -1,6 +1,6 @@
 /*
 ** ZABBIX
-** Copyright (C) 2000-2006 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -81,21 +81,12 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
+
 #define ZBX_TCP_MAX_STRERROR	255
-
-int	zbx_tcp_error(void)
-{
-	if (ZBX_SOCK_ERR_TIMEDOUT == zbx_sock_last_error())
-	{
-		return ZBX_TCP_ERR_TIMEOUT;
-	}
-
-	return ZBX_TCP_ERR_NETWORK;
-}
 
 static char	zbx_tcp_strerror_message[ZBX_TCP_MAX_STRERROR];
 
-const char	*zbx_tcp_strerror(void)
+const char	*zbx_tcp_strerror()
 {
 	zbx_tcp_strerror_message[ZBX_TCP_MAX_STRERROR - 1] = '\0'; /* force terminate string */
 	return (&zbx_tcp_strerror_message[0]);
@@ -106,7 +97,7 @@ const char	*zbx_tcp_strerror(void)
 #else
 #	define zbx_set_tcp_strerror __zbx_zbx_set_tcp_strerror
 #endif /* HAVE___VA_ARGS__ */
-static void __zbx_zbx_set_tcp_strerror(const char *fmt, ...)
+static void	__zbx_zbx_set_tcp_strerror(const char *fmt, ...)
 {
 	va_list args;
 
@@ -241,7 +232,7 @@ struct hostent	*zbx_gethost(const char *hostname)
 
 /* static (winXX threads require OFF) */ int	tcp_started = FAIL;
 
-static int	zbx_tcp_start(void)
+static int	zbx_tcp_start()
 {
 	WSADATA sockInfo;
 
@@ -333,24 +324,22 @@ void	zbx_tcp_init(zbx_sock_t *s, ZBX_SOCKET o)
  ******************************************************************************/
 static void	zbx_tcp_timeout_set(zbx_sock_t *s, int timeout)
 {
-	if (0 != timeout)
-	{
-		s->timeout = timeout;
+	s->timeout = timeout;
 #if defined(_WINDOWS)
-		timeout *= 1000;
-		if (setsockopt(s->socket, SOL_SOCKET, SO_RCVTIMEO,
-				(const char *)&timeout, sizeof(timeout)) == ZBX_TCP_ERROR)
-			zbx_set_tcp_strerror("setsockopt() failed with error %d: %s",
-					zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
+	timeout *= 1000;
 
-		if (setsockopt(s->socket, SOL_SOCKET, SO_SNDTIMEO,
-				(const char *)&timeout, sizeof(timeout)) == ZBX_TCP_ERROR)
-			zbx_set_tcp_strerror("setsockopt() failed with error %d: %s",
-					zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
+	if (setsockopt(s->socket, SOL_SOCKET, SO_RCVTIMEO,
+			(const char *)&timeout, sizeof(timeout)) == ZBX_TCP_ERROR)
+		zbx_set_tcp_strerror("setsockopt() failed with error %d: %s",
+				zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
+
+	if (setsockopt(s->socket, SOL_SOCKET, SO_SNDTIMEO,
+			(const char *)&timeout, sizeof(timeout)) == ZBX_TCP_ERROR)
+		zbx_set_tcp_strerror("setsockopt() failed with error %d: %s",
+				zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
 #else
-		alarm(timeout);
+	alarm(timeout);
 #endif
-	}
 }
 
 /******************************************************************************
@@ -372,7 +361,10 @@ static void	zbx_tcp_timeout_cleanup(zbx_sock_t *s)
 {
 #if !defined(_WINDOWS)
 	if (0 != s->timeout)
+	{
 		alarm(0);
+		s->timeout = 0;
+	}
 #endif
 }
 
@@ -448,7 +440,8 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 		}
 	}
 
-	zbx_tcp_timeout_set(s, timeout);
+	if (0 != timeout)
+		zbx_tcp_timeout_set(s, timeout);
 
 	if (ZBX_TCP_ERROR == connect(s->socket, ai->ai_addr, ai->ai_addrlen))
 	{
@@ -509,7 +502,8 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 		}
 	}
 
-	zbx_tcp_timeout_set(s, timeout);
+	if (0 != timeout)
+		zbx_tcp_timeout_set(s, timeout);
 
 	if (ZBX_TCP_ERROR == connect(s->socket, (struct sockaddr *)&servaddr_in, sizeof(ZBX_SOCKADDR)))
 	{
@@ -553,7 +547,8 @@ int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags, int t
 
 	ZBX_TCP_START();
 
-	zbx_tcp_timeout_set(s, timeout);
+	if (0 != timeout)
+		zbx_tcp_timeout_set(s, timeout);
 
 	if( flags & ZBX_TCP_NEW_PROTOCOL )
 	{
@@ -588,7 +583,8 @@ int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags, int t
 		written += i;
 	}
 cleanup:
-	zbx_tcp_timeout_cleanup(s);
+	if (0 != timeout)
+		zbx_tcp_timeout_cleanup(s);
 
 	return ret;
 }
@@ -1065,7 +1061,8 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeou
 
 	ZBX_TCP_START();
 
-	zbx_tcp_timeout_set(s, timeout);
+	if (0 != timeout)
+		zbx_tcp_timeout_set(s, timeout);
 
 	zbx_free(s->buf_dyn);
 
@@ -1163,7 +1160,8 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeou
 		ret = FAIL;
 	}
 cleanup:
-	zbx_tcp_timeout_cleanup(s);
+	if (0 != timeout)
+		zbx_tcp_timeout_cleanup(s);
 
 	return ret;
 }
