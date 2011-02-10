@@ -925,13 +925,9 @@ function get_action_cmds_for_event($event){
 		}
 
 		$message = array(bold(S_COMMAND.':'));
-		$msg = explode('\n', $alert['message']);
-		foreach($msg as $m){
-			array_push($message, BR(), $m);
-		}
+		array_push($message, BR(), zbx_nl2br($alert['message']));
 
 		$error = empty($alert['error']) ? new CSpan(SPACE, 'off') : new CSpan($alert['error'], 'on');
-
 
 		$table->addRow(array(
 			get_node_name_by_elid($alert['alertid']),
@@ -967,19 +963,7 @@ function get_actions_hint_by_eventid($eventid,$status=NULL){
 			S_DETAILS,
 			S_STATUS
 			));
-/*
-	$sql = 'SELECT DISTINCT a.alertid,mt.description,a.sendto,a.status,u.alias,a.retries '.
-			' FROM events e,users u,alerts a'.
-			' left join media_type mt on mt.mediatypeid=a.mediatypeid'.
-			' WHERE a.eventid='.$eventid.
-				(is_null($status)?'':' AND a.status='.$status).
-				' AND e.eventid = a.eventid'.
-				' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
-				' AND '.DBcondition('e.objectid',$available_triggers).
-				' AND '.DBin_node('a.alertid').
-				' AND u.userid=a.userid '.
-			' ORDER BY mt.description';
-//*/
+
 	$sql = 'SELECT DISTINCT a.alertid,mt.description,u.alias,a.subject,a.message,a.sendto,a.status,a.retries,a.alerttype '.
 			' FROM events e,alerts a '.
 				' LEFT JOIN users u ON u.userid=a.userid '.
