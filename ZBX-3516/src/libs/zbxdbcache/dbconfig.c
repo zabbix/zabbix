@@ -165,10 +165,10 @@ ZBX_DC_HOST;
 typedef struct
 {
 	zbx_uint64_t	proxy_hostid;
-	unsigned char	status;
 	const char	*host;
 	ZBX_DC_HOST	*host_ptr;
 	unsigned int	sync_num;
+	unsigned char	status;
 }
 ZBX_DC_HOST_PH;
 
@@ -248,9 +248,9 @@ ZBX_DC_INTERFACE;
 typedef struct
 {
 	zbx_uint64_t		hostid;
-	unsigned char		type;
 	ZBX_DC_INTERFACE	*interface_ptr;
 	unsigned int		sync_num;
+	unsigned char		type;
 }
 ZBX_DC_INTERFACE_HT;
 
@@ -1070,7 +1070,6 @@ static void	DCsync_hosts(DB_RESULT result)
 			else
 				update_index = 1;
 		}
-
 
 		/* store new information in host structure */
 
