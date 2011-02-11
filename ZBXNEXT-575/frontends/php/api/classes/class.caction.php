@@ -1420,22 +1420,23 @@ COpt::memoryPick();
 					if(isset($operation['opcommand_grp'])){
 						$groupids = zbx_objectValues($operation['opcommand_grp'], 'groupid');
 
-						if(!isset($operation['opcommand_grp']['command']) || zbx_empty(trim($operation['opcommand_grp']['command'])))
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('You did not specify command for host operation.'));
+						foreach($operation['opcommand_grp'] as $grpCommand)
+							if(!isset($grpCommand['command']) || zbx_empty(trim($grpCommand['command'])))
+								self::exception(ZBX_API_ERROR_PARAMETERS, _('You did not specify command for host operation.'));
 					}
 
 					$hostids = array();
 					$without_current = true;
 					if(isset($operation['opcommand_hst'])){
-						foreach($operation['opcommand_hst'] as $hid){
-							if($hid['hostid'] == 0)
+						foreach($operation['opcommand_hst'] as $hstCommand){
+							if($hstCommand['hostid'] == 0)
 								$without_current = false;
 							else
-								$hostids[$hid['hostid']] = $hid['hostid'];
-						}
+								$hostids[$hstCommand['hostid']] = $hstCommand['hostid'];
 
-						if(!isset($operation['opcommand_hst']['command']) || zbx_empty(trim($operation['opcommand_hst']['command'])))
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('You did not specify command for host operation.'));
+							if(!isset($hstCommand['command']) || zbx_empty(trim($hstCommand['command'])))
+								self::exception(ZBX_API_ERROR_PARAMETERS, _('You did not specify command for host operation.'));
+						}
 					}
 
 					if(empty($groupids) && empty($hostids) && $without_current)
