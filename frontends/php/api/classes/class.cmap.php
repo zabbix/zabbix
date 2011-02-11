@@ -841,6 +841,11 @@ COpt::memoryPick();
 				'resourceid'=>$sysmapids,
 				'resourcetype'=>SCREEN_RESOURCE_MAP
 			));
+
+			DB::delete('profiles', array(
+				'idx'=>'web.maps.sysmapid',
+				'value_id'=>$sysmapids
+			));
 //----
 			DB::delete('sysmaps', array('sysmapid'=>$sysmapids));
 
