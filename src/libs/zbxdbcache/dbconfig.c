@@ -174,10 +174,10 @@ ZBX_DC_HOST
 ZBX_DC_HOST_PH
 {
 	zbx_uint64_t	proxy_hostid;
-	unsigned char	status;
 	const char	*host;			/* interned; host[HOST_HOST_LEN_MAX];					*/
 	ZBX_DC_HOST	*host_ptr;
 	unsigned int	sync_num;
+	unsigned char	status;
 };
 
 ZBX_DC_IPMIHOST
@@ -916,7 +916,7 @@ static void	DCsync_items(DB_RESULT result)
 		item_hk_local.key = item->key;
 		item_hk = zbx_hashset_search(&config->items_hk, &item_hk_local);
 
-		if (NULL != item_hk && sync_num != item_hk->sync_num)
+		if (sync_num != item_hk->sync_num)
 		{
 			zbx_strpool_release(item_hk->key);
 			zbx_hashset_remove(&config->items_hk, &item_hk_local);
@@ -1130,7 +1130,7 @@ static void	DCsync_hosts(DB_RESULT result)
 		host_ph_local.host = host->host;
 		host_ph = zbx_hashset_search(&config->hosts_ph, &host_ph_local);
 
-		if (NULL != host_ph && sync_num != host_ph->sync_num)
+		if (sync_num != host_ph->sync_num)
 		{
 			zbx_strpool_release(host_ph->host);
 			zbx_hashset_remove(&config->hosts_ph, &host_ph_local);
