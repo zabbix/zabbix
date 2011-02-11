@@ -1201,12 +1201,13 @@ COpt::memoryPick();
 				if(!isset($dbTriggers[$trigger['triggerid']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 
-
 				if($dbTriggers[$trigger['triggerid']]['templateid'] != 0){
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Cannot delete templated trigger [%1$s:%2$s]', $del_triggers[$triggerid]['description'], explode_exp($del_triggers[$triggerid]['expression'], false))
+						_s('Cannot delete templated trigger [%1$s:%2$s]', $dbTriggers[$trigger['triggerid']]['description'], explode_exp($dbTriggers[$trigger['triggerid']]['expression'], false))
 					);
 				}
+
+				continue;
 			}
 
 			if($update){
