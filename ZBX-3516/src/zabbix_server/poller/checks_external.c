@@ -77,7 +77,7 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 		command = zbx_dsprintf(command, "%s/%s %s",
 				CONFIG_EXTERNALSCRIPTS, item->key, conn);
 
-	if (SUCCEED == zbx_execute(command, &buf, error, sizeof(error)))
+	if (SUCCEED == zbx_execute(command, &buf, error, sizeof(error), CONFIG_TIMEOUT))
 	{
 		/* we only care about the first line */
 		if (NULL != (p = strchr(buf, '\n')))

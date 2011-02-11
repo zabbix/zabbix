@@ -117,7 +117,6 @@ static void	get_signal_handler(int sig)
  * Parameters: host   - server name or IP address                             *
  *             port   - port number                                           *
  *             key    - item's key                                            *
- *             value_max_len - maximal size of value                          *
  *                                                                            *
  * Return value: SUCCEED - ok, FAIL - otherwise                               *
  *             value  - retrieved value                                       *
@@ -127,18 +126,11 @@ static void	get_signal_handler(int sig)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	get_value(
-	const char	*source_ip,
-	const char	*host,
-	unsigned short	port,
-	const char	*key,
-	char		**value
-	)
+static int	get_value(const char *source_ip, const char *host, unsigned short port, const char *key, char **value)
 {
 	zbx_sock_t	s;
-	int	ret;
-	char	*buf,
-		request[1024];
+	int		ret;
+	char		*buf, request[1024];
 
 	assert(value);
 
@@ -147,6 +139,7 @@ static int	get_value(
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, source_ip, host, port, GET_SENDER_TIMEOUT)))
 	{
 		zbx_snprintf(request, sizeof(request), "%s\n", key);
+
 		if (SUCCEED == (ret = zbx_tcp_send(&s, request)))
 		{
 			if (SUCCEED == (ret = zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE, 0)))
@@ -155,8 +148,9 @@ static int	get_value(
 				*value = strdup(buf);
 			}
 		}
+
+		zbx_tcp_close(&s);
 	}
-	zbx_tcp_close(&s);
 
 	if (FAIL == ret)
 		zbx_error("Get value error: %s", zbx_tcp_strerror());

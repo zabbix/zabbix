@@ -39,6 +39,6 @@ CREATE UNIQUE INDEX items_1 on items_tmp (hostid,key_);
 CREATE INDEX items_2 on items_tmp (nextcheck);
 CREATE INDEX items_3 on items_tmp (status);
 
-insert into items_tmp select *,'','' from items;
+insert into items_tmp select itemid,type,snmp_community,snmp_oid,snmp_port,hostid,description ,key_,delay,history,trends,nextcheck,lastvalue,lastclock,prevvalue,status,value_type,trapper_hosts,units,multiplier,delta,prevorgvalue,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,formula,error,lastlogsize,logtimefmt,templateid,valuemapid,'','' from items;
 drop table items;
 alter table items_tmp rename to items;
