@@ -977,7 +977,7 @@ static void	DCsync_items(DB_RESULT result)
 		item_hk_local.key = item->key;
 		item_hk = zbx_hashset_search(&config->items_hk, &item_hk_local);
 
-		if (NULL != item_hk && sync_num != item_hk->sync_num)
+		if (sync_num != item_hk->sync_num)
 		{
 			zbx_strpool_release(item_hk->key);
 			zbx_hashset_remove(&config->items_hk, &item_hk_local);
@@ -1201,7 +1201,7 @@ static void	DCsync_hosts(DB_RESULT result)
 		host_ph_local.host = host->host;
 		host_ph = zbx_hashset_search(&config->hosts_ph, &host_ph_local);
 
-		if (NULL != host_ph && sync_num != host_ph->sync_num)
+		if (sync_num != host_ph->sync_num)
 		{
 			zbx_strpool_release(host_ph->host);
 			zbx_hashset_remove(&config->hosts_ph, &host_ph_local);
@@ -1370,7 +1370,7 @@ static void	DCsync_gmacros(DB_RESULT result)
 		gmacro_m_local.macro = gmacro->macro;
 		gmacro_m = zbx_hashset_search(&config->gmacros_m, &gmacro_m_local);
 
-		if (NULL != gmacro_m && sync_num != gmacro_m->sync_num)
+		if (sync_num != gmacro_m->sync_num)
 		{
 			zbx_strpool_release(gmacro_m->macro);
 			zbx_hashset_remove(&config->gmacros_m, &gmacro_m_local);
@@ -1481,7 +1481,7 @@ static void	DCsync_hmacros(DB_RESULT result)
 		hmacro_hm_local.macro = hmacro->macro;
 		hmacro_hm = zbx_hashset_search(&config->hmacros_hm, &hmacro_hm_local);
 
-		if (NULL != hmacro_hm && sync_num != hmacro_hm->sync_num)
+		if (sync_num != hmacro_hm->sync_num)
 		{
 			zbx_strpool_release(hmacro_hm->macro);
 			zbx_hashset_remove(&config->hmacros_hm, &hmacro_hm_local);
@@ -1601,7 +1601,7 @@ static void	DCsync_interfaces(DB_RESULT result)
 			interface_ht_local.type = interface->type;
 			interface_ht = zbx_hashset_search(&config->interfaces_ht, &interface_ht_local);
 
-			if (NULL != interface_ht && sync_num != interface_ht->sync_num)
+			if (sync_num != interface_ht->sync_num)
 				zbx_hashset_remove(&config->interfaces_ht, &interface_ht_local);
 		}
 
