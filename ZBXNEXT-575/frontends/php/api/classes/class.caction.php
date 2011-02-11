@@ -1422,7 +1422,7 @@ COpt::memoryPick();
 
 						foreach($operation['opcommand_grp'] as $grpCommand)
 							if(!isset($grpCommand['command']) || zbx_empty(trim($grpCommand['command'])))
-								self::exception(ZBX_API_ERROR_PARAMETERS, _('You did not specify command for host operation.'));
+								self::exception(ZBX_API_ERROR_PARAMETERS, _('You did not specify command for host group operation.'));
 					}
 
 					$hostids = array();
