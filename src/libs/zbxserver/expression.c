@@ -2464,7 +2464,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 				DCget_user_macro(&dc_host->hostid, 1, m, &replace_to);
 			else if (0 == strcmp(m, MVAR_HOSTNAME))
 				replace_to = zbx_dsprintf(replace_to, "%s", dc_host->host);
-			else if (SUCCEED == DCconfig_get_interface_by_type(&interface, dc_host->hostid, INTERFACE_TYPE_AGENT, 1))
+			else if (SUCCEED == DCconfig_get_interface_by_type(&interface, dc_host->hostid, INTERFACE_TYPE_AGENT))
 			{
 				if (0 == strcmp(m, MVAR_IPADDRESS))
 					replace_to = zbx_dsprintf(replace_to, "%s", interface.ip_orig);
@@ -2513,7 +2513,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 		{
 			if (0 == strcmp(m, MVAR_HOSTNAME))
 				replace_to = zbx_strdup(replace_to, dc_host->host);
-			else if (SUCCEED == DCconfig_get_interface_by_type(&interface, dc_host->hostid, INTERFACE_TYPE_AGENT, 1))
+			else if (SUCCEED == DCconfig_get_interface_by_type(&interface, dc_host->hostid, INTERFACE_TYPE_AGENT))
 			{
 				if (0 == strcmp(m, MVAR_IPADDRESS))
 					replace_to = zbx_dsprintf(replace_to, "%s", interface.ip_orig);
