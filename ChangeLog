@@ -84,6 +84,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
 
+ - [ZBX-1357] fixed confusing date format in network maps (Richlv)
  - [ZBX-3516] fixed items and hosts disappearing from configuration cache indexes (asaveljevs)
  - [ZBX-3479] fixed possible hang of agents while processing scripts or net.tcp.service* checks (Sasha)
  - [ZBX-3514] fixed log trigger wizard (Aly)

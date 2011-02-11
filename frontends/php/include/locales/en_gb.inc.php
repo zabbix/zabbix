@@ -1312,7 +1312,7 @@
 	'S_ELEMENT_NAME'=>		_('Element name'),
 	'S_STATUS_ONLY'=>		_('Status only'),
 	'S_NOTHING'=>			_('Nothing'),
-	'S_MAPS_DATE_FORMAT'=>           _('m.d.Y H:i:s'),
+	'S_MAPS_DATE_FORMAT'=>	_('Y.m.d H:i:s'),
 
 //	media.php
 	'S_CONFIGURATION_OF_MEDIA_TYPES_BIG'=>	_('CONFIGURATION OF MEDIA TYPES'),
