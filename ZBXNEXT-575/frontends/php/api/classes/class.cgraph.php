@@ -1140,12 +1140,19 @@ COpt::memoryPick();
 
 		foreach($graphs as $gnum => $graph){
 			if(!isset($graph['name'])) continue;
+			$hosts = CHost::get(array(
+				'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
+				'nopermissions'=> true,
+				'preservekeys' => true
+			));
 
 			$options = array(
 //				'nodeids' => get_current_nodeid(true),
+				'hostids' => array_keys($hosts),
 				'output' => API_OUTPUT_SHORTEN,
 				'filter' => array('name' => $graph['name'], 'flags' => null),
-				'nopermissions' => 1
+				'nopermissions' => true,
+				'preservekeys' => true
 			);
 			$graphsExists = self::get($options);
 			foreach($graphsExists as $genum => $graphExists){

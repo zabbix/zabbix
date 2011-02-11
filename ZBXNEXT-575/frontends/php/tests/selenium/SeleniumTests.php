@@ -54,6 +54,7 @@ require_once(dirname(__FILE__).'/testFormMediaType.php');
 require_once(dirname(__FILE__).'/testFormProfile.php');
 require_once(dirname(__FILE__).'/testFormScreen.php');
 require_once(dirname(__FILE__).'/testFormSysmap.php');
+
 class SeleniumTests
 {
 	public static function suite()
