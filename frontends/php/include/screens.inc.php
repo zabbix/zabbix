@@ -1243,8 +1243,11 @@ require_once('include/js.inc.php');
 						$item = array($action_map,$image_map);
 					}
 					else {
-						$item = $image_map;
-//						$item = new CLink($image_map, $action);
+						$item = array(
+							$image_map,
+							BR(),
+							new CLink(S_CHANGE, $action)
+						);
 					}
 				}
 				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_PLAIN_TEXT) ){
