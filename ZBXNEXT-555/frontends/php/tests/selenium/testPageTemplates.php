@@ -66,7 +66,7 @@ class testPageTemplates extends CWebTest
 		$oldHashTriggers=DBhash($sql4);
 
 		$this->login('templates.php');
-		$this->dropdown_select('groupid','all');
+		$this->dropdown_select_wait('groupid','all');
 
 		$this->assertTitle('Templates');
 

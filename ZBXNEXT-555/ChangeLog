@@ -2,6 +2,8 @@
 Changes for 1.9.2
 
 New features:
+ - [ZBXNEXT-628] added advanced label settings for maps (Aly)
+ - [ZBXNEXT-626] added remembering of grid options for maps (KB)
  - [ZBXNEXT-630] added automatic filling of DNS name for discovered and auto-registered devices (Sasha)
  - [ZBXNEXT-634] added information about usage of media types for actions in the list of media types (Alexei)
  - [ZBXNEXT-602] Export events to CSV (Vlad,Aly)
@@ -82,6 +84,8 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
 
+ - [ZBX-1357] fixed confusing date format in network maps (Richlv)
+ - [ZBX-3516] fixed items and hosts disappearing from configuration cache indexes (asaveljevs)
  - [ZBX-3479] fixed possible hang of agents while processing scripts or net.tcp.service* checks (Sasha)
  - [ZBX-3514] fixed log trigger wizard (Aly)
  - [ZBX-3515] fixed names of SNMPv3 security levels, again (asaveljevs)

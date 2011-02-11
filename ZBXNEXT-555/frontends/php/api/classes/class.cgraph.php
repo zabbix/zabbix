@@ -1138,19 +1138,24 @@ COpt::memoryPick();
 
 		foreach($graphs as $gnum => $graph){
 			if(!isset($graph['name'])) continue;
+			$hosts = CHost::get(array(
+				'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
+				'nopermissions'=> true,
+				'preservekeys' => true
+			));
 
 			$options = array(
-				'nodeids' => get_current_nodeid(true),
+//				'nodeids' => get_current_nodeid(true),
+				'hostids' => array_keys($hosts),
 				'output' => API_OUTPUT_SHORTEN,
 				'filter' => array('name' => $graph['name'], 'flags' => null),
-				'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
-				'nopermissions' => 1
+				'nopermissions' => true,
+				'preservekeys' => true
 			);
 			$graphsExists = self::get($options);
 			foreach($graphsExists as $genum => $graphExists){
-				if(($update && ($graphExists['graphid'] != $graph['graphid'])) || !$update){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph with name [ %1$s ] already exists', $graph['name']));
-				}
+				if(!$update || (bccomp($graphExists['graphid'],$graph['graphid']) != 0))
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph with name "%1$s" already exists', $graph['name']));
 			}
 // }}} EXCEPTION: GRAPH EXISTS
 		}

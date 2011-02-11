@@ -417,7 +417,7 @@ class CUserMacro extends CZBXAPI{
 				unset($group['hosts']);
 				foreach($ghosts as $num => $host){
 					foreach($result as $macroid => $macro){
-						if($macro['hostid'] == $host['hostid']){
+						if(bccomp($macro['hostid'],$host['hostid']) == 0){
 							$result[$macroid]['groups'][] = $group;
 						}
 					}
@@ -438,7 +438,7 @@ class CUserMacro extends CZBXAPI{
 				unset($template['hosts']);
 				foreach($thosts as $num => $host){
 					foreach($result as $macroid => $macro){
-						if($macro['hostid'] == $host['hostid']){
+						if(bccomp($macro['hostid'],$host['hostid']) == 0){
 							$result[$macroid]['templates'][] = $template;
 						}
 					}
@@ -456,7 +456,7 @@ class CUserMacro extends CZBXAPI{
 			$hosts = CHost::get($obj_params);
 			foreach($hosts as $hostid => $host){
 				foreach($result as $macroid => $macro){
-					if($macro['hostid'] == $hostid){
+					if(bccomp($macro['hostid'],$hostid) == 0){
 						$result[$macroid]['hosts'][] = $host;
 					}
 				}
