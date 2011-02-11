@@ -319,7 +319,7 @@ function saveOpCmdForm(){
 		object.name = jQuery(objectForm).find('input[name="opCmdTargetObjectName"]').val();
 
 		if(empty(object.name)){
-			alert("<?php print(_('You did not specified host group for operation.')); ?>");
+			alert("<?php print(_('You did not specify host group for operation.')); ?>");
 			return true;
 		}
 
@@ -332,7 +332,7 @@ function saveOpCmdForm(){
 		object.host = jQuery(objectForm).find('input[name="opCmdTargetObjectName"]').val();
 
 		if((object.target.toString() != '0') && empty(object.host)){
-			alert("<?php print(_('You did not specified host for operation.')); ?>");
+			alert("<?php print(_('You did not specify host for operation.')); ?>");
 			return true;
 		}
 
