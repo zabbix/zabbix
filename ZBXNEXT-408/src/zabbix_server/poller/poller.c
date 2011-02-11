@@ -84,9 +84,8 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 #endif
 			break;
 		case ITEM_TYPE_SIMPLE:
-			alarm(CONFIG_TIMEOUT);
+			/* simple checks use their own timeouts */
 			res = get_value_simple(item, result);
-			alarm(0);
 			break;
 		case ITEM_TYPE_INTERNAL:
 			res = get_value_internal(item, result);
@@ -100,9 +99,8 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			res = get_value_aggregate(item, result);
 			break;
 		case ITEM_TYPE_EXTERNAL:
-			alarm(CONFIG_TIMEOUT);
+			/* external checks use their own timeouts */
 			res = get_value_external(item, result);
-			alarm(0);
 			break;
 		case ITEM_TYPE_SSH:
 #ifdef HAVE_SSH2

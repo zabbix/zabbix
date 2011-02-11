@@ -1,3 +1,4 @@
+begin execute immediate 'drop table escalations'; exception when others then null; end;
 CREATE TABLE escalations (
 	escalationid	number(20)	DEFAULT '0'	NOT NULL,
 	actionid	number(20)	DEFAULT '0'	NOT NULL,
