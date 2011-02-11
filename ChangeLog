@@ -3,6 +3,7 @@ Changes for 1.9.2
 
 New features:
  - [ZBXNEXT-628] added advanced label settings for maps (Aly)
+ - [ZBXNEXT-626] added remembering of grid options for maps (KB)
  - [ZBXNEXT-630] added automatic filling of DNS name for discovered and auto-registered devices (Sasha)
  - [ZBXNEXT-634] added information about usage of media types for actions in the list of media types (Alexei)
  - [ZBXNEXT-602] Export events to CSV (Vlad,Aly)
