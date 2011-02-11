@@ -74,7 +74,7 @@ class CAction extends CZBXAPI{
 			'filter'				=> null,
 			'search'				=> null,
 			'searchByAny'			=> null,
-			'startSearch'				=> null,
+			'startSearch'			=> null,
 			'excludeSearch'			=> null,
 
 // OutPut
@@ -1416,21 +1416,26 @@ COpt::memoryPick();
 					$userGroupIdsAll = array_merge($userGroupIdsAll, $usergroupids);
 					break;
 				case OPERATION_TYPE_COMMAND:
-					$groupids = isset($operation['opcommand_grp'])
-							? zbx_objectValues($operation['opcommand_grp'], 'groupid')
-							: array();
+					$groupids = array();
+					if(isset($operation['opcommand_grp'])){
+						$groupids = zbx_objectValues($operation['opcommand_grp'], 'groupid');
+
+						if(!isset($operation['opcommand_grp']['command']) || zbx_empty(trim($operation['opcommand_grp']['command'])))
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('You did not specify command for host operation.'));
+					}
 
 					$hostids = array();
 					$without_current = true;
 					if(isset($operation['opcommand_hst'])){
 						foreach($operation['opcommand_hst'] as $hid){
-							if($hid['hostid'] == 0){
+							if($hid['hostid'] == 0)
 								$without_current = false;
-							}
-							else{
+							else
 								$hostids[$hid['hostid']] = $hid['hostid'];
-							}
 						}
+
+						if(!isset($operation['opcommand_hst']['command']) || zbx_empty(trim($operation['opcommand_hst']['command'])))
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('You did not specify command for host operation.'));
 					}
 
 					if(empty($groupids) && empty($hostids) && $without_current)

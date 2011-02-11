@@ -328,8 +328,8 @@ function get_operation_desc($type, $data){
 			case OPERATION_TYPE_MESSAGE:
 				if(isset($data['opmessage']['default_msg']) && !empty($data['opmessage']['default_msg'])){
 					if(isset($_REQUEST['def_shortdata']) && isset($_REQUEST['def_longdata'])){
-						$result[] = array(bold(S_SUBJECT.': '),BR(),$_REQUEST['def_shortdata'],BR());
-						$result[] = array(bold(S_MESSAGE.':'),BR(),$_REQUEST['def_longdata']);
+						$result[] = array(bold(S_SUBJECT.': '),BR(),zbx_nl2br($_REQUEST['def_shortdata']));
+						$result[] = array(bold(S_MESSAGE.':'),BR(),zbx_nl2br($_REQUEST['def_longdata']));
 					}
 					else if(isset($data['opmessage']['operationid'])){
 						$sql = 'SELECT a.def_shortdata,a.def_longdata '.
@@ -337,14 +337,14 @@ function get_operation_desc($type, $data){
 								' WHERE a.actionid=o.actionid '.
 									' AND o.operationid='.$data['operationid'];
 						if($rows = DBfetch(DBselect($sql,1))){
-							$result[] = array(bold(S_SUBJECT.': '), BR(),$rows['def_shortdata'],BR());
-							$result[] = array(bold(S_MESSAGE.':'), BR(),$rows['def_longdata']);
+							$result[] = array(bold(S_SUBJECT.': '), BR(),zbx_nl2br($rows['def_shortdata']));
+							$result[] = array(bold(S_MESSAGE.':'), BR(),zbx_nl2br($rows['def_longdata']));
 						}
 					}
 				}
 				else{
-					$result[] = array(bold(S_SUBJECT.': '), $data['opmessage']['subject'], BR());
-					$result[] = array(bold(S_MESSAGE.':'), $data['opmessage']['message']);
+					$result[] = array(bold(S_SUBJECT.': '), BR(), zbx_nl2br($data['opmessage']['subject']));
+					$result[] = array(bold(S_MESSAGE.':'), BR(), zbx_nl2br($data['opmessage']['message']));
 				}
 
 				break;
