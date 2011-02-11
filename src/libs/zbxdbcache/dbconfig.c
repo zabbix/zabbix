@@ -62,6 +62,7 @@ typedef struct
 	zbx_uint64_t	hostid;
 	const char	*key;
 	ZBX_DC_ITEM	*item_ptr;
+	unsigned int	sync_num;
 }
 ZBX_DC_ITEM_HK;
 
@@ -167,6 +168,7 @@ typedef struct
 	unsigned char	status;
 	const char	*host;
 	ZBX_DC_HOST	*host_ptr;
+	unsigned int	sync_num;
 }
 ZBX_DC_HOST_PH;
 
@@ -284,6 +286,8 @@ static ZBX_MUTEX	config_lock;
 static zbx_mem_info_t	*config_mem;
 
 ZBX_MEM_FUNC_IMPL(__config, config_mem);
+
+static unsigned int	sync_num = 0;
 
 static const char	*INTERNED_SERVER_STATUS_KEY;
 static const char	*INTERNED_SERVER_ZABBIXLOG_KEY;
@@ -570,7 +574,7 @@ static void	DCsync_items(DB_RESULT result)
 	ZBX_DC_TELNETITEM	*telnetitem;
 	ZBX_DC_CALCITEM		*calcitem;
 
-	ZBX_DC_ITEM_HK		item_hk;
+	ZBX_DC_ITEM_HK		*item_hk, item_hk_local;
 
 	time_t			now;
 	unsigned char		status, old_poller_type;
@@ -600,17 +604,39 @@ static void	DCsync_items(DB_RESULT result)
 
 		item = DCfind_id(&config->items, itemid, sizeof(ZBX_DC_ITEM), &found);
 
+		/* see whether we should and can update items_hk index at this point */
+
 		update_index = 0;
 
-		/* check whether we need to update item_hk index */
-		if (found && (0 != strcmp(item->key, row[6]) || item->hostid != hostid))
+		if (!(found && item->hostid == hostid && 0 == strcmp(item->key, row[6])))
 		{
-			update_index = 1;
-			item_hk.hostid = item->hostid;
-			item_hk.key = item->key;
-			zbx_strpool_release(item_hk.key);
-			zbx_hashset_remove(&config->items_hk, &item_hk);
+			if (found)
+			{
+				item_hk_local.hostid = item->hostid;
+				item_hk_local.key = item->key;
+				item_hk = zbx_hashset_search(&config->items_hk, &item_hk_local);
+
+				if (sync_num != item_hk->sync_num)
+				{
+					zbx_strpool_release(item_hk->key);
+					zbx_hashset_remove(&config->items_hk, &item_hk_local);
+				}
+			}
+
+			item_hk_local.hostid = hostid;
+			item_hk_local.key = row[6];
+			item_hk = zbx_hashset_search(&config->items_hk, &item_hk_local);
+
+			if (NULL != item_hk)
+			{
+				item_hk->item_ptr = item;
+				item_hk->sync_num = sync_num;
+			}
+			else
+				update_index = 1;
 		}
+
+		/* store new information in item structure */
 
 		item->hostid = hostid;
 		item->type = (unsigned char)atoi(row[3]);
@@ -625,13 +651,15 @@ static void	DCsync_items(DB_RESULT result)
 		else
 			item->value_type = (unsigned char)atoi(row[5]);
 
-		/* update item_hk index, if needed */
-		if (!found || update_index)
+		/* update items_hk index using new data, if not done already */
+
+		if (update_index)
 		{
-			item_hk.hostid = item->hostid;
-			item_hk.key = zbx_strpool_acquire(item->key);
-			item_hk.item_ptr = item;
-			zbx_hashset_insert(&config->items_hk, &item_hk, sizeof(ZBX_DC_ITEM_HK));
+			item_hk_local.hostid = item->hostid;
+			item_hk_local.key = zbx_strpool_acquire(item->key);
+			item_hk_local.item_ptr = item;
+			item_hk_local.sync_num = sync_num;
+			zbx_hashset_insert(&config->items_hk, &item_hk_local, sizeof(ZBX_DC_ITEM_HK));
 		}
 
 		if (!found)
@@ -947,10 +975,15 @@ static void	DCsync_items(DB_RESULT result)
 
 		/* items */
 
-		item_hk.hostid = item->hostid;
-		item_hk.key = item->key;
-		zbx_strpool_release(item_hk.key);
-		zbx_hashset_remove(&config->items_hk, &item_hk);
+		item_hk_local.hostid = item->hostid;
+		item_hk_local.key = item->key;
+		item_hk = zbx_hashset_search(&config->items_hk, &item_hk_local);
+
+		if (NULL != item_hk && sync_num != item_hk->sync_num)
+		{
+			zbx_strpool_release(item_hk->key);
+			zbx_hashset_remove(&config->items_hk, &item_hk_local);
+		}
 
 		if (ZBX_LOC_QUEUE == item->location)
 			zbx_binary_heap_remove_direct(&config->queues[item->poller_type], item->itemid);
@@ -975,7 +1008,7 @@ static void	DCsync_hosts(DB_RESULT result)
 	ZBX_DC_IPMIHOST		*ipmihost;
 	ZBX_DC_PROXY		*proxy;
 
-	ZBX_DC_HOST_PH		host_ph;
+	ZBX_DC_HOST_PH		*host_ph, host_ph_local;
 
 	int			found;
 	int			update_index;
@@ -1005,19 +1038,43 @@ static void	DCsync_hosts(DB_RESULT result)
 
 		host = DCfind_id(&config->hosts, hostid, sizeof(ZBX_DC_HOST), &found);
 
-		/* check whether we need to update host_ph index */
-		if (found && (host->proxy_hostid != proxy_hostid ||
-				host->status != status || 0 != strcmp(host->host, row[2])))
+		/* see whether we should and can update hosts_ph index at this point */
+
+		update_index = 0;
+
+		if (!(found && host->proxy_hostid == proxy_hostid &&
+					host->status == status && 0 == strcmp(host->host, row[2])))
 		{
-			update_index = 1;
-			host_ph.proxy_hostid = host->proxy_hostid;
-			host_ph.status = host->status;
-			host_ph.host = host->host;
-			zbx_strpool_release(host_ph.host);
-			zbx_hashset_remove(&config->hosts_ph, &host_ph);
+			if (found)
+			{
+				host_ph_local.proxy_hostid = host->proxy_hostid;
+				host_ph_local.status = host->status;
+				host_ph_local.host = host->host;
+				host_ph = zbx_hashset_search(&config->hosts_ph, &host_ph_local);
+
+				if (sync_num != host_ph->sync_num)
+				{
+					zbx_strpool_release(host_ph->host);
+					zbx_hashset_remove(&config->hosts_ph, &host_ph_local);
+				}
+			}
+
+			host_ph_local.proxy_hostid = proxy_hostid;
+			host_ph_local.status = status;
+			host_ph_local.host = row[2];
+			host_ph = zbx_hashset_search(&config->hosts_ph, &host_ph_local);
+
+			if (NULL != host_ph)
+			{
+				host_ph->host_ptr = host;
+				host_ph->sync_num = sync_num;
+			}
+			else
+				update_index = 1;
 		}
-		else
-			update_index = 0;
+
+
+		/* store new information in host structure */
 
 		host->proxy_hostid = proxy_hostid;
 		DCstrpool_replace(found, &host->host, row[2]);
@@ -1039,14 +1096,16 @@ static void	DCsync_hosts(DB_RESULT result)
 			host->ipmi_disable_until = atoi(row[18]);
 		}
 
-		/* update host_ph index, if needed */
-		if (!found || update_index)
+		/* update hosts_ph index using new data, if not done already */
+
+		if (update_index)
 		{
-			host_ph.proxy_hostid = host->proxy_hostid;
-			host_ph.status = host->status;
-			host_ph.host = zbx_strpool_acquire(host->host);
-			host_ph.host_ptr = host;
-			zbx_hashset_insert(&config->hosts_ph, &host_ph, sizeof(ZBX_DC_HOST_PH));
+			host_ph_local.proxy_hostid = host->proxy_hostid;
+			host_ph_local.status = host->status;
+			host_ph_local.host = zbx_strpool_acquire(host->host);
+			host_ph_local.host_ptr = host;
+			host_ph_local.sync_num = sync_num;
+			zbx_hashset_insert(&config->hosts_ph, &host_ph_local, sizeof(ZBX_DC_HOST_PH));
 		}
 
 		/* IPMI hosts */
@@ -1140,11 +1199,16 @@ static void	DCsync_hosts(DB_RESULT result)
 
 		/* hosts */
 
-		host_ph.proxy_hostid = host->proxy_hostid;
-		host_ph.status = host->status;
-		host_ph.host = host->host;
-		zbx_strpool_release(host_ph.host);
-		zbx_hashset_remove(&config->hosts_ph, &host_ph);
+		host_ph_local.proxy_hostid = host->proxy_hostid;
+		host_ph_local.status = host->status;
+		host_ph_local.host = host->host;
+		host_ph = zbx_hashset_search(&config->hosts_ph, &host_ph_local);
+
+		if (NULL != host_ph && sync_num != host_ph->sync_num)
+		{
+			zbx_strpool_release(host_ph->host);
+			zbx_hashset_remove(&config->hosts_ph, &host_ph_local);
+		}
 
 		zbx_strpool_release(host->host);
 
@@ -1502,6 +1566,8 @@ void	DCsync_configuration()
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	sync_num++;
+
 	sec = zbx_time();
 	item_result = DBselect(
 			"select i.itemid,i.hostid,h.proxy_hostid,i.type,i.data_type,i.value_type,i.key_,"
@@ -1584,6 +1650,7 @@ void	DCsync_configuration()
 
 	strpool = zbx_strpool_info();
 
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() sync_num   : %u", __function_name, sync_num);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() item sql   : " ZBX_FS_DBL " sec.", __function_name,
 			isec);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() host sql   : " ZBX_FS_DBL " sec.", __function_name,
@@ -2794,7 +2861,7 @@ void	DCconfig_set_maintenance(zbx_uint64_t hostid, int maintenance_status,
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev, Aleksandrs Saveljevs                         *
+ * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *

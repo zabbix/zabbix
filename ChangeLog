@@ -83,6 +83,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
 
+ - [ZBX-3516] fixed items and hosts disappearing from configuration cache indexes (asaveljevs)
  - [ZBX-3479] fixed possible hang of agents while processing scripts or net.tcp.service* checks (Sasha)
  - [ZBX-3514] fixed log trigger wizard (Aly)
  - [ZBX-3515] fixed names of SNMPv3 security levels, again (asaveljevs)
