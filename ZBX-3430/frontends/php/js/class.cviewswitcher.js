@@ -31,6 +31,9 @@ initialize : function(objId, objAction, confData){
 
 	this.depObjects = {};
 
+	if(!is_array(objAction)) objAction = new Array(objAction);
+	this.actionsObj = objAction;
+
 	for(var key in confData){
 		if(empty(confData[key])) continue;
 
@@ -40,11 +43,20 @@ initialize : function(objId, objAction, confData){
 
 			if(is_string(confData[key][vKey])) this.depObjects[key][vKey] = {'id': confData[key][vKey]};
 			else if(is_object(confData[key][vKey])) this.depObjects[key][vKey] = confData[key][vKey];
+
+			var elm = $(this.depObjects[key][vKey].id);
+			if(is_null(elm)) continue;
+
+			this.hideObj(this.depObjects[key][vKey]);
+			if(isset('defaultValue', this.depObjects[key][vKey])){
+				this.changedFields[this.depObjects[key][vKey].id] = false;
+
+				for(var i = 0; i < this.actionsObj.length; i++) {
+					addListener(elm, this.actionsObj[i], this.chageFieldStatus.bindAsEventListener(this, this.depObjects[key][vKey].id));
+				}
+			}
 		}
 	}
-
-	if(!is_array(objAction)) objAction = new Array(objAction);
-	this.actionsObj = objAction;
 
 	for(var i = 0; i < this.actionsObj.length; i++) {
 		addListener(this.mainObj, objAction[i], this.rebuildView.bindAsEventListener(this));
@@ -204,18 +216,6 @@ hideAllObjs: function(){
 			if(isset(this.depObjects[i][a].id, hidden)) continue;
 
 			hidden[this.depObjects[i][a].id] = true;
-
-			var elm = $(this.depObjects[i][a].id);
-			if(is_null(elm)) continue;
-
-			this.hideObj(this.depObjects[i][a]);
-			if(isset('defaultValue', this.depObjects[i][a])){
-				this.changedFields[this.depObjects[i][a].id] = false;
-
-				for(var i = 0; i < this.actionsObj.length; i++) {
-					addListener(elm, this.actionsObj[i], this.chageFieldStatus.bindAsEventListener(this, this.depObjects[i][a].id));
-				}
-			}
 		}
 	}
 },

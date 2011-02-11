@@ -1846,7 +1846,7 @@
 					zbx_subarray_push($typeVisibility, $it, array('id'=>'key', 'defaultValue'=> 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]'));
 				break;
 				default:
-					zbx_subarray_push($typeVisibility, $it, 'key');
+					zbx_subarray_push($typeVisibility, $it, array('id'=>'key', 'defaultValue'=> ''));
 			}
 		}
 
