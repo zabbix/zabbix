@@ -78,7 +78,7 @@ require_once('include/templates/action.js.php');
 	$conditionList = new CFormList('conditionlist');
 	$allowedConditions = get_conditions_by_eventsource($data['eventsource']);
 
-	order_result($data['conditions'], 'conditiontype', ZBX_SORT_DOWN);
+	morder_result($data['conditions'], array('conditiontype','operator'), ZBX_SORT_DOWN);
 
 // group conditions by type
 	$condElements = new CTable(S_NO_CONDITIONS_DEFINED);

@@ -625,6 +625,7 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'nodeids' => $nodeid,
+			'groupids' => $groupid,
 			'output' => array('templateid', 'host'),
 			'preservekeys' => true
 		);

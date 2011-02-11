@@ -78,7 +78,7 @@
 			return $row;
 		}
 		if($no_error_message == 0)
-			error(S_NO_HOST_WITH.' hostid=['.$hostid.']');
+			error(_s('Now host wirt hostid "%s".', $hostid));
 
 	return	false;
 	}
