@@ -236,16 +236,41 @@ require_once('include/js.inc.php');
 		if(!$result = DBexecute('UPDATE slideshows SET name='.zbx_dbstr($name).',delay='.$delay.' WHERE slideshowid='.$slideshowid))
 			return false;
 
-		DBexecute('DELETE FROM slides where slideshowid='.$slideshowid);
+		// fetching all slides that currently are
+		$dbSlidesR = DBSelect('SELECT * FROM slides WHERE slideshowid='.$slideshowid.' ORDER BY step');
+		$dbSlides = array();
+		while($dbSlide = DBFetch($dbSlidesR)){
+			$dbSlides[] = $dbSlide;
+		}
 
-		$i = 0;
-		foreach($slides as $slide){
-			$slideid = get_dbid('slides','slideid');
-			if(!isset($slide['delay'])) $slide['delay'] = $delay;
-			$result = DBexecute('INSERT INTO slides (slideid,slideshowid,screenid,step,delay) '.
-				' VALUES ('.$slideid.','.$slideshowid.','.$slide['screenid'].','.($i++).','.$slide['delay'].')');
-			if(!$result){
-				return false;
+		// checking, if at least one of them has changes
+		$slidesChanged = false;
+		if(count($dbSlides) != count($slides)){
+			$slidesChanged = true;
+		}
+		else{
+			foreach($dbSlides as $i=>$dbSlide){
+				if(bccomp($dbSlides[$i]['screenid'], $slides[$i]['screenid']) != 0 || $dbSlides[$i]['delay'] != $slides[$i]['delay']){
+					$slidesChanged = true;
+					break;
+				}
+			}
+		}
+
+		// if slides have changed
+		if($slidesChanged){
+			// wiping all of them out
+			DBexecute('DELETE FROM slides where slideshowid='.$slideshowid);
+			// and inserting new ones
+			$i = 0;
+			foreach($slides as $slide){
+				$slideid = get_dbid('slides','slideid');
+				if(!isset($slide['delay'])) $slide['delay'] = $delay;
+				$result = DBexecute('INSERT INTO slides (slideid,slideshowid,screenid,step,delay) '.
+					' VALUES ('.$slideid.','.$slideshowid.','.$slide['screenid'].','.($i++).','.$slide['delay'].')');
+				if(!$result){
+					return false;
+				}
 			}
 		}
 
@@ -1243,8 +1268,11 @@ require_once('include/js.inc.php');
 						$item = array($action_map,$image_map);
 					}
 					else {
-						$item = $image_map;
-//						$item = new CLink($image_map, $action);
+						$item = array(
+							$image_map,
+							BR(),
+							new CLink(S_CHANGE, $action)
+						);
 					}
 				}
 				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_PLAIN_TEXT) ){

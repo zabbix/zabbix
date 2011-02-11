@@ -1722,7 +1722,7 @@
 							' AND h.hostid=i.hostid';
 				$itm = DBfetch(DBselect($sql));
 				if($itm){
-					if($_REQUEST['itemid'] == $itmid){
+					if(bccomp($_REQUEST['itemid'],$itmid) == 0){
 						$caption[] = SPACE;
 						$caption[] = $itm['host'];
 					}

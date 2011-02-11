@@ -151,6 +151,8 @@ jQuery(document).ready(function(){
 			jQuery("#profileexlist :input:gt(0)").attr("disabled", "disabled");
 		}
 	}).button().change();
+
+	jQuery('#name').focus();
 });
 
 </script>

@@ -210,8 +210,8 @@ include_once('include/page_header.php');
 								$selementid = reset($selementids);
 
 								foreach($links as $id => $link){
-									if($link['selementid1'] == $selement['selementid']) $links[$id]['selementid1'] = $selementid;
-									else if($link['selementid2'] == $selement['selementid']) $links[$id]['selementid2'] = $selementid;
+									if(bccomp($link['selementid1'],$selement['selementid']) == 0) $links[$id]['selementid1'] = $selementid;
+									else if(bccomp($link['selementid2'],$selement['selementid']) == 0) $links[$id]['selementid2'] = $selementid;
 								}
 							}
 							else{

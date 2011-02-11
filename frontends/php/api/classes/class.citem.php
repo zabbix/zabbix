@@ -1199,7 +1199,7 @@ COpt::memoryPick();
 				'nopermissions' => 1
 			));
 			foreach($itemsExists as $inum => $itemExists){
-				if($itemExists['itemid'] != $item['itemid']){
+				if(bccomp($itemExists['itemid'],$item['itemid']) != 0){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Host with item [ '.$item['key_'].' ] already exists');
 				}
 			}
