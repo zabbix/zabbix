@@ -307,7 +307,7 @@ function saveOpCmdForm(){
 	object.target = jQuery(objectForm).find('select[name="opCmdTarget"]').val();
 	object.command = jQuery(objectForm).find('textarea[name="opCmdTargetObjectCommand"]').val();
 
-	if(empty(object.command)){
+	if(empty(jQuery.trim(object.command))){
 		alert("<?php print(_('Command field is empty. Please provide some instructions for operation.')); ?>");
 		return true;
 	}
