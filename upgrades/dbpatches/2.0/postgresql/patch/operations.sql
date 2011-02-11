@@ -109,14 +109,14 @@ CREATE TABLE tmp_opcommand (
 	longdata text
 );
 
-CREATE OR REPLACE FUNCTION unnest(anyarray) RETURNS SETOF anyelement
+CREATE OR REPLACE FUNCTION zbx_unnest(anyarray) RETURNS SETOF anyelement
 LANGUAGE SQL AS $$
 	SELECT $1[i]
 		FROM generate_series(array_lower($1, 1), array_upper($1, 1)) as i;
 $$;
 
 INSERT INTO tmp_opcommand (operationid, longdata)
-	SELECT operationid, unnest(string_to_array(longdata, '\n'))
+	SELECT operationid, zbx_unnest(string_to_array(longdata, '\n'))
 		FROM operations
 		WHERE operationtype = 1;
 
@@ -217,7 +217,7 @@ UPDATE opcommand_grp
 
 DROP TABLE tmp_opcommand_grp;
 DROP TABLE tmp_opcommand;
-DROP FUNCTION unnest(anyarray);
+DROP FUNCTION zbx_unnest(anyarray);
 
 ---- Patching table `opgroup`
 
