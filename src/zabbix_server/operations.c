@@ -99,8 +99,7 @@ static void	run_remote_command(char *host_name, char *command)
 			strscpy(item.host.ipmi_username, row[3]);
 			strscpy(item.host.ipmi_password, row[4]);
 
-			if (SUCCEED == DCconfig_get_interface_by_type(&item.interface, item.host.hostid,
-					INTERFACE_TYPE_IPMI, 1))
+			if (SUCCEED == DCconfig_get_interface_by_type(&item.interface, item.host.hostid, INTERFACE_TYPE_IPMI))
 			{
 				item.interface.addr = strdup(item.interface.useip ? item.interface.ip_orig : item.interface.dns_orig);
 				substitute_simple_macros(NULL, NULL, &item.host, NULL,
@@ -132,8 +131,7 @@ static void	run_remote_command(char *host_name, char *command)
 		else
 		{
 #endif
-			if (SUCCEED == DCconfig_get_interface_by_type(&item.interface, item.host.hostid,
-					INTERFACE_TYPE_AGENT, 1))
+			if (SUCCEED == DCconfig_get_interface_by_type(&item.interface, item.host.hostid, INTERFACE_TYPE_AGENT))
 			{
 				param = dyn_escape_param(p);
 				item.key = zbx_dsprintf(NULL, "system.run[\"%s\",\"nowait\"]", param);
