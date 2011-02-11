@@ -29,9 +29,6 @@ initialize : function(objId, objAction, confData){
 	this.mainObj = $(objId);
 	if(is_null(this.mainObj)) throw('ViewSwitcher error: main object not found!');
 
-	if(!is_array(objAction)) objAction = new Array(objAction);
-	this.actionsObj = objAction;
-
 	this.depObjects = {};
 
 	for(var key in confData){
@@ -43,19 +40,11 @@ initialize : function(objId, objAction, confData){
 
 			if(is_string(confData[key][vKey])) this.depObjects[key][vKey] = {'id': confData[key][vKey]};
 			else if(is_object(confData[key][vKey])) this.depObjects[key][vKey] = confData[key][vKey];
-
-			if(this.depObjects[key][vKey]['defaultValue']){
-				this.changedFields[this.depObjects[key][vKey]['id']] = false;
-
-				var elm = $(this.depObjects[key][vKey]['id']);
-				if(is_null(elm)) continue;
-				for(var u = 0; u < this.actionsObj.length; u++) {
-					addListener(elm, this.actionsObj[u], this.chageFieldStatus.bindAsEventListener(this, this.depObjects[key][vKey]['id']));
-				}
-			}
-
 		}
 	}
+
+	if(!is_array(objAction)) objAction = new Array(objAction);
+	this.actionsObj = objAction;
 
 	for(var i = 0; i < this.actionsObj.length; i++) {
 		addListener(this.mainObj, objAction[i], this.rebuildView.bindAsEventListener(this));
@@ -175,7 +164,10 @@ hideObj: function(data) {
 		elmValue = this.objValue($(data.value));
 	}
 
-	this.setObjValue($(data.id), elmValue);
+	if(is_null(elmValue) && isset('defaultValue', data) && (this.changedFields[data.id] === false))
+		this.setObjValue($(data.id), data.defaultValue);
+	else if(!is_null(elmValue))
+		this.setObjValue($(data.id), elmValue);
 },
 
 showObj : function(data){
@@ -210,16 +202,20 @@ hideAllObjs: function(){
 		for(var a in this.depObjects[i]) {
 			if(empty(this.depObjects[i][a])) continue;
 			if(isset(this.depObjects[i][a].id, hidden)) continue;
-			if(isset(this.depObjects[i][a].id, hidden) && this.depObjects[i][a].id == 'key') SDI(isset('defaultValue', this.depObjects[i][a])+'hidden:'+this.depObjects[i][a].id);
 
-			//if(!isset(this.depObjects[i][a].id, hidden) && this.depObjects[i][a].id == 'key') SDI('show:'+this.depObjects[i][a].id);
 			hidden[this.depObjects[i][a].id] = true;
 
 			var elm = $(this.depObjects[i][a].id);
 			if(is_null(elm)) continue;
 
-
 			this.hideObj(this.depObjects[i][a]);
+			if(isset('defaultValue', this.depObjects[i][a])){
+				this.changedFields[this.depObjects[i][a].id] = false;
+
+				for(var i = 0; i < this.actionsObj.length; i++) {
+					addListener(elm, this.actionsObj[i], this.chageFieldStatus.bindAsEventListener(this, this.depObjects[i][a].id));
+				}
+			}
 		}
 	}
 },
