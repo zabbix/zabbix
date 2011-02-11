@@ -1,0 +1,64 @@
+## Process this file with automake to produce Makefile.in
+
+DIST_SUBDIRS = \
+	zbxdbcache \
+	zbxdbhigh \
+	zbxdb \
+	zbxmemory \
+	zbxalgo \
+	zbxmedia \
+	zbxcrypto \
+	zbxcommon \
+	zbxcomms \
+	zbxcommshigh \
+	zbxlog \
+	zbxnix \
+	zbxconf \
+	zbxsysinfo \
+	zbxplugin \
+	zbxsys \
+	zbxjson \
+	zbxserver \
+	zbxicmpping \
+	zbxexec
+
+if PROXY
+PROXY_SUBDIRS = \
+	zbxcommshigh \
+	zbxdb \
+	zbxdbcache \
+	zbxdbhigh \
+	zbxmemory \
+	zbxserver \
+	zbxicmpping
+endif
+
+if SERVER
+SERVER_SUBDIRS = \
+	zbxcommshigh \
+	zbxdb \
+	zbxdbcache \
+	zbxdbhigh \
+	zbxmemory \
+	zbxserver \
+	zbxicmpping \
+	zbxmedia
+endif
+
+SUBDIRS = \
+	zbxcrypto \
+	zbxcommon \
+	zbxlog \
+	zbxalgo \
+	zbxnix \
+	zbxconf \
+	zbxsysinfo \
+	zbxplugin \
+	zbxsys \
+	zbxcomms \
+	zbxjson \
+	zbxexec \
+	$(PROXY_SUBDIRS) \
+	$(SERVER_SUBDIRS)
+
+EXTRA_DIST = zbxwin32
