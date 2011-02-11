@@ -527,21 +527,21 @@ function insert_js_function($fnct_name){
 					var parentDocumentForm = $(parentDocument.body).select("form[name="+frame+"]");
 					var submitParent = submitParent || false;
 
-					var tmpStorage = null;
+					var frmStorage = null;
 					for(var key in values){
 						if(is_null(values[key])) continue;
 
 						if(parentDocumentForm.length > 0)
-							tmpStorage = jQuery(parentDocumentForm[0]).find("#"+key).first();
+							frmStorage = jQuery(parentDocumentForm[0]).find("#"+key).get(0);
 
-						if(typeof(tmpStorage) == "undefined" || (tmpStorage.length == 0))
-							tmpStorage = parentDocument.getElementById(key);
+						if(typeof(tmpStorage) == "undefined" || is_null(tmpStorage))
+							frmStorage = parentDocument.getElementById(key);
 
-						jQuery(tmpStorage).val(values[key]);
+						frmStorage.value = values[key];
 					}
 
-					if(!is_null(tmpStorage) && submitParent){
-						tmpStorage.form.submit();
+					if(!is_null(frmStorage) && submitParent){
+						frmStorage.form.submit();
 					}
 
 					close_window();

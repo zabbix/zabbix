@@ -1067,7 +1067,7 @@ COpt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for trigger'));
 				}
 
-				$expressionData = new CTriggerExpression(array('expression' => $expression));
+				$expressionData = new CTriggerExpression(array('expression' => $trigger['expression']));
 
 				if(!empty($expressionData->errors)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->errors);
