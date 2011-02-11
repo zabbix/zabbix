@@ -119,8 +119,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, char **res
 #ifdef HAVE_OPENIPMI
 	if (0 == strncmp(p, "IPMI", 4))
 	{
-		if (SUCCEED == (ret = DCconfig_get_interface_by_type(&item.interface, item.host.hostid,
-				INTERFACE_TYPE_IPMI, 1)))
+		if (SUCCEED == (ret = DCconfig_get_interface_by_type(&item.interface, item.host.hostid, INTERFACE_TYPE_IPMI)))
 		{
 			item.interface.addr = strdup(item.interface.useip ? item.interface.ip_orig : item.interface.dns_orig);
 			substitute_simple_macros(NULL, NULL, &item.host, NULL,
