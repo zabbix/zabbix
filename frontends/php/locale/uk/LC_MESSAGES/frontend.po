@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-28 22:05+0200\n"
-"PO-Revision-Date: 2011-01-28 14:59+0200\n"
+"POT-Creation-Date: 2011-01-27 14:02+0200\n"
+"PO-Revision-Date: 2011-02-06 21:09+0200\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
@@ -3022,7 +3022,7 @@ msgstr "Отримання Img: Дані по елементу не знайде
 
 #: include/locales/en_gb.inc.php:1268
 msgid "Get selected elements FAILED."
-msgstr "НЕ ВДАЛОСЬ отримати елементи."
+msgstr "НЕ вдалось отримати вибрані елементи."
 
 #: include/locales/en_gb.inc.php:2325
 msgid "Get support"
@@ -3571,7 +3571,7 @@ msgstr "Звіт про доступність IT послуг"
 
 #: include/locales/en_gb.inc.php:1172
 msgid "ITEM PROTOTYPES OF"
-msgstr "ПРОТОТИПИ ЕЛЕМЕНТІВ ДАННИХ ДЛЯ"
+msgstr "ПРОТОТИПИ ЕЛЕМЕНТІВ ДАНИХ ДЛЯ"
 
 #: include/locales/en_gb.inc.php:856
 msgid "ITEMS"
@@ -3583,7 +3583,7 @@ msgstr "Іконка"
 
 #: include/locales/en_gb.inc.php:1225
 msgid "Icon (OK)"
-msgstr "Іконка (ok)"
+msgstr "Іконка (OK)"
 
 #: include/locales/en_gb.inc.php:1246
 msgid "Icon (default)"
@@ -5730,7 +5730,7 @@ msgstr "Версія PHP"
 
 #: include/locales/en_gb.inc.php:1567
 msgid "PLAINT TEXT"
-msgstr "ТЕКСТ"
+msgstr "ПРОСТИЙ ТЕКСТ"
 
 #: include/locales/en_gb.inc.php:119
 msgid "POP"
@@ -7148,7 +7148,7 @@ msgstr "ВСЬОГО"
 
 #: include/locales/en_gb.inc.php:1742
 msgid "TRIGGER COMMENTS"
-msgstr "КОМЕНТАРІЇ ДО ТРИГЕРА"
+msgstr "КОМЕНТАРІ ДО ТРИГЕРА"
 
 #: include/locales/en_gb.inc.php:1182
 msgid "TRIGGER PROTOTYPES OF"
