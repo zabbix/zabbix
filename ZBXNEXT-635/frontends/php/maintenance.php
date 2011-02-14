@@ -323,7 +323,7 @@ include_once('include/page_header.php');
 	$_REQUEST['groupid'] = $pageFilter->groupid;
 
 
-	$frmForm = new CForm(null, 'get');
+	$frmForm = new CForm('get');
 
 	if(!isset($_REQUEST['form'])){
 		$frmForm->addItem(new CSubmit('form',S_CREATE_MAINTENANCE_PERIOD));
@@ -334,7 +334,7 @@ include_once('include/page_header.php');
 ?>
 <?php
 	if(isset($_REQUEST['form'])){
-		$frmMaintenance = new CForm('maintenance.php', 'post');
+		$frmMaintenance = new CForm();
 		$frmMaintenance->setName(S_MAINTENANCE);
 		$frmMaintenance->addVar('form', get_request('form', 1));
 		$frmMaintenance->addVar('form_refresh', get_request('form_refresh',0)+1);
@@ -608,7 +608,7 @@ include_once('include/page_header.php');
 	}
 	else{
 // Table HEADER
-		$form = new CForm(null,'get');
+		$form = new CForm('get');
 		$form->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB()));
 
 		$numrows = new CDiv();

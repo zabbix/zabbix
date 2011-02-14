@@ -128,7 +128,7 @@ class CImage extends CZBXAPI{
 // count
 		if(!is_null($options['countOutput'])){
 			$options['sortfield'] = '';
-			$sql_parts['select'] = array('count(i.imageid) as rowscount');
+			$sql_parts['select'] = array('count(DISTINCT i.imageid) as rowscount');
 		}
 
 

@@ -87,7 +87,6 @@ class CAlert extends CZBXAPI{
 			'time_till'				=> null,
 
 // OutPut
-			'extendoutput'			=> null,
 			'output'				=> API_OUTPUT_REFER,
 			'select_mediatypes'		=> null,
 			'select_users'			=> null,
@@ -103,24 +102,14 @@ class CAlert extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
-
-		if(!is_null($options['extendoutput'])){
-			$options['output'] = API_OUTPUT_EXTEND;
-
-			if(!is_null($options['select_mediatypes'])){
-				$options['select_mediatypes'] = API_OUTPUT_EXTEND;
-			}
-			if(!is_null($options['select_users'])){
-				$options['select_users'] = API_OUTPUT_EXTEND;
-			}
-		}
-
-
 		if(is_array($options['output'])){
 			unset($sql_parts['select']['alerts']);
+
+			$dbTable = DB::getSchema('alerts');
 			$sql_parts['select']['alertid'] = ' a.alertid';
 			foreach($options['output'] as $key => $field){
-				$sql_parts['select'][$field] = ' a.'.$field;
+				if(isset($dbTable['fields'][$field]))
+					$sql_parts['select'][$field] = ' a.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;
@@ -290,7 +279,7 @@ class CAlert extends CZBXAPI{
 			$sql_parts['where'][] = 'a.clock<'.$options['time_till'];
 		}
 
-// extendoutput
+// output
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['alerts'] = 'a.*';
 		}
@@ -405,7 +394,6 @@ class CAlert extends CZBXAPI{
 
 COpt::memoryPick();
 		if(!is_null($options['countOutput'])){
-			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 

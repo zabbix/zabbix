@@ -130,23 +130,20 @@
 	<link rel="shortcut icon" href="images/general/zabbix.ico" />
 	<link rel="stylesheet" type="text/css" href="css.css" />
 <?php
+	$css = 'css_ob.css';
 	$bodyCSS = 'originalblue';
 	if(isset($DB['DB']) && !is_null($DB['DB'])){
 		$config = select_config();
 
 		$css = getUserTheme($USER_DETAILS);
-		$config=select_config();
-		if($css){
-			print('<link rel="stylesheet" type="text/css" href="styles/'.$css.'" />'."\n");
-			print('<!--[if IE 6]><link rel="stylesheet" type="text/css" href="styles/ie_'.$css.'" /><![endif]-->'."\n");
-		}
-
 		switch($css){
 			case "css_od.css": $bodyCSS = 'darkorange'; break;
 			case "css_bb.css": $bodyCSS = 'darkblue'; break;
 			default: $bodyCSS = 'originalblue'; break;
 		}
 	}
+
+	print('<link rel="stylesheet" type="text/css" href="styles/'.$css.'" />'."\n");
 
 	if($page['file'] == 'sysmap.php')
 		print('<link rel="stylesheet" type="text/css" href="imgstore.php?css=1&output=css" />');
@@ -234,19 +231,18 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$logo = new CLink(new CDiv(SPACE,'zabbix_logo'),'http://www.zabbix.com/', 'image', null, 'nosid');
 		$logo->setTarget('_blank');
 
-		$td_r = new CCol($page_header_r_col, 'page_header_r');
-		$td_r->setAttribute('width','100%');
+		$td_r = new CCol($page_header_r_col, 'maxwidth page_header_r');
+		$top_page_row = array(new CCol($logo, 'page_header_l'), $td_r);
 
-		$top_page_row	= array(new CCol($logo, 'page_header_l'), $td_r);
 		unset($logo, $page_header_r_col, $help, $support);
 
-		$table = new CTable(NULL,'page_header');
+		$table = new CTable(NULL,'maxwidth page_header');
 		$table->setCellSpacing(0);
 		$table->setCellPadding(5);
 		$table->addRow($top_page_row);
 		$table->show();
 
-		$menu_table = new CTable(NULL,'menu');
+		$menu_table = new CTable(NULL,'menu pointer');
 		$menu_table->setCellSpacing(0);
 		$menu_table->setCellPadding(5);
 		$menu_table->addRow($main_menu);
@@ -342,27 +338,20 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		}
 
 // 1st level menu
-		$table = new CTable();
-		$table->setCellSpacing(0);
-		$table->setCellPadding(0);
-		$table->setAttribute('style','width: 100%;');
+		$table = new CTable(null, 'maxwidth');
 
-		$r_col = new CCol($node_form);
-		$r_col->setAttribute('align','right');
-//		$r_col->setAttribute('style','text-align: right;');
+		$r_col = new CCol($node_form, 'right');
+		$r_col->setAttribute('style','line-height: 1.8em;');
 
 		$table->addRow(array($menu_table,$r_col));
 
-		$page_menu = new CDiv();
+		$page_menu = new CDiv(null,'textwhite');
 		$page_menu->setAttribute('id','mmenu');
 		$page_menu->addItem($table);
 //----
 
 // 2nd level menu
-		$sub_menu_table = new CTable(NULL,'sub_menu');
-		$sub_menu_table->setCellSpacing(0);
-		$sub_menu_table->setCellPadding(5);
-
+		$sub_menu_table = new CTable(NULL,'sub_menu maxwidth ui-widget-header');
 		$menu_divs = array();
 		$menu_selected = false;
 		foreach($sub_menus as $label => $sub_menu){
@@ -376,6 +365,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 				$sub_menu_row[] = $sub_menu_item;
 				$sub_menu_row[] = new CSpan(SPACE.' | '.SPACE, 'divider');
 			}
+			array_pop($sub_menu_row);
 
 			$sub_menu_div = new CDiv($sub_menu_row);
 			$sub_menu_div->setAttribute('id', 'sub_'.$label);
@@ -402,19 +392,17 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$search_div = null;
 
 		if(($page['file'] != 'index.php') && ($USER_DETAILS['userid'] > 0)){
-			$search_form = new CForm('search.php');
-			$search_form->setMethod('get');
+			$search_form = new CForm('get','search.php');
 			$search_form->setAttribute('class','thin');
 
-			$searchBox = new CTextBox('search', get_request('search',''));
+			$searchBox = new CTextBox('search', get_request('search'));
 			$searchBox->setAttribute('autocomplete', 'off');
-			$searchBox->setAttribute('style', 'width: 160px;');
+			$searchBox->addClass('search');
 
 			$search_form->addItem(new CDiv(array(S_SEARCH_BIG.': ', $searchBox)));
 
-			$search_div = new CDiv($search_form);
+			$search_div = new CDiv($search_form, 'zbx_search');
 			$search_div->setAttribute('id','zbx_search');
-			$search_div->setAttribute('class','zbx_search');
 
 			zbx_add_post_js("var sid = createSuggest('search');");
 		}
@@ -429,7 +417,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 
 //------------------------------------- <HISTORY> ---------------------------------------
 	if(isset($page['hist_arg']) && ($USER_DETAILS['alias'] != ZBX_GUEST_USER) && ($page['type'] == PAGE_TYPE_HTML) && !defined('ZBX_PAGE_NO_MENU')){
-		$table = new CTable(null,'history');
+		$table = new CTable(null,'history left');
 		$table->setCellSpacing(0);
 		$table->setCellPadding(0);
 

@@ -58,7 +58,7 @@
 		$original_templates = array();
 	}
 
-	$frmHost = new CForm('templates.php');
+	$frmHost = new CForm();
 	$frmHost->setName('tpl_for');
 
 	$frmHost->addVar('form', get_request('form', 1));

@@ -242,7 +242,7 @@ include_once('include/page_header.php');
 
 ?>
 <?php
-	$form = new CForm(null, 'get');
+	$form = new CForm('get');
 	$form->cleanItems();
 	$form->addItem(new CSubmit('form', S_CREATE_MAP));
 	$form->addItem(new CSubmit('form', S_IMPORT_MAP));
