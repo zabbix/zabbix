@@ -80,7 +80,6 @@ class CMediatype extends CZBXAPI{
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 // OutPut
-			'extendoutput'				=> null,
 			'output'					=> API_OUTPUT_REFER,
 			'select_users'				=> null,
 			'select_medias'				=> null,
@@ -94,17 +93,6 @@ class CMediatype extends CZBXAPI{
 		);
 
 		$options = zbx_array_merge($def_options, $options);
-
-		if(!is_null($options['extendoutput'])){
-			$options['output'] = API_OUTPUT_EXTEND;
-
-			if(!is_null($options['select_users'])){
-				$options['select_users'] = API_OUTPUT_EXTEND;
-			}
-			if(!is_null($options['select_medias'])){
-				$options['select_medias'] = API_OUTPUT_EXTEND;
-			}
-		}
 
 // PERMISSION CHECK
 		if(USER_TYPE_SUPER_ADMIN == $user_type){
@@ -179,7 +167,7 @@ class CMediatype extends CZBXAPI{
 			zbx_db_search('media_type mt', $options, $sql_parts);
 		}
 
-// extendoutput
+// output
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['media_type'] = 'mt.*';
 		}
@@ -283,7 +271,6 @@ class CMediatype extends CZBXAPI{
 
 Copt::memoryPick();
 		if(!is_null($options['countOutput'])){
-			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 

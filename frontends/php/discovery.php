@@ -61,7 +61,7 @@ include_once('include/page_header.php');
 	$dscvry_wdgt = new CWidget('hat_discovery');
 
 // HEADER
-	$r_form = new CForm(null, 'get');
+	$r_form = new CForm('get');
 
 	$fullscreen = get_request('fullscreen', 0);
 	$druleid = get_request('druleid', 0);

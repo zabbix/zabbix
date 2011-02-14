@@ -51,7 +51,6 @@ class CUserMacro extends CZBXAPI{
  * @param boolean $options['with_monitored_httptests'] only with monitored http tests
  * @param boolean $options['with_graphs'] only with graphs
  * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
- * @param int $options['extendoutput'] return all fields for UserMacros
  * @param int $options['count'] count UserMacros, returned column name is rowscount
  * @param string $options['pattern'] search macros by pattern in macro names
  * @param int $options['limit'] limit selection
@@ -100,7 +99,6 @@ class CUserMacro extends CZBXAPI{
 			'excludeSearch'				=> null,
 // OutPut
 			'output'					=> API_OUTPUT_REFER,
-			'extendoutput'				=> null,
 			'selectGroups'				=> null,
 			'selectHosts'				=> null,
 			'select_templates'			=> null,
@@ -113,22 +111,6 @@ class CUserMacro extends CZBXAPI{
 		);
 
 		$options = zbx_array_merge($def_options, $options);
-
-
-		if(!is_null($options['extendoutput'])){
-			$options['output'] = API_OUTPUT_EXTEND;
-
-			if(!is_null($options['selectGroups'])){
-				$options['selectGroups'] = API_OUTPUT_EXTEND;
-			}
-			if(!is_null($options['selectHosts'])){
-				$options['selectHosts'] = API_OUTPUT_EXTEND;
-			}
-			if(!is_null($options['select_templates'])){
-				$options['select_templates'] = API_OUTPUT_EXTEND;
-			}
-		}
-
 
 // editable + PERMISSION CHECK
 
@@ -228,8 +210,8 @@ class CUserMacro extends CZBXAPI{
 			if(isset($options['filter']['macro'])){
 				zbx_value2array($options['filter']['macro']);
 
-				$sql_parts['where'][] = DBcondition('hm.macro', $options['filter']['macro'], null, true);
-				$sql_parts_global['where'][] = DBcondition('gm.macro', $options['filter']['macro'], null, true);
+				$sql_parts['where'][] = DBcondition('hm.macro', $options['filter']['macro']);
+				$sql_parts_global['where'][] = DBcondition('gm.macro', $options['filter']['macro']);
 			}
 		}
 
@@ -399,7 +381,6 @@ class CUserMacro extends CZBXAPI{
 		}
 
 		if(!is_null($options['countOutput'])){
-			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 
@@ -648,7 +629,7 @@ class CUserMacro extends CZBXAPI{
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
 //--------
-			$sql = 'DELETE FROM globalmacro WHERE '.DBcondition('macro', $globalmacros, false, true);
+			$sql = 'DELETE FROM globalmacro WHERE '.DBcondition('macro', $globalmacros);
 			if(!DBExecute($sql))
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 

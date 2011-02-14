@@ -299,7 +299,6 @@ class CDRule extends CZBXAPI{
 
 COpt::memoryPick();
 		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['countOutput'])){
-			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 
@@ -533,8 +532,8 @@ COpt::memoryPick();
 		}
 
 // check if drule is templated drule, then checks cannot be added
-		$drule = $this->get(array('druleids' => $druleid,  'extendoutput' => 1));
-		$drule = reset($drule);
+		$drules = $this->getget(array('druleids' => $druleid,  'output' => API_OUTPUT_EXTEND));
+		$drule = reset($drules);
 
 		if($drule['templateid'] != 0){
 			$this->$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Cannot edit templated drule : '.$drule['name']);
@@ -579,7 +578,7 @@ COpt::memoryPick();
 
 		if(!$force){
 			// check if drule is templated drule, then checks cannot be deleted
-			$drule = $this->get(array('druleids' => $druleid,  'extendoutput' => 1));
+			$drule = $this->get(array('druleids' => $druleid,  'output' => API_OUTPUT_EXTEND));
 			$drule = reset($drule);
 
 			if($drule['templateid'] != 0){
