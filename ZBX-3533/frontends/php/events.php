@@ -246,7 +246,7 @@ include_once('include/page_header.php');
 
 
 
-	// allow CVS export button
+	// allow CSV export button
 	$frmForm = new CForm();
 	$frmForm->cleanItems();
 	if(isset($_REQUEST['groupid'])) $frmForm->addVar('groupid', $_REQUEST['groupid']);
