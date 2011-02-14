@@ -111,16 +111,39 @@ INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) V
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (80,8,16,4,'');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (81,8,16,7,'');
 
-INSERT INTO operations (operationid, actionid, operationtype, object, objectid, shortdata, longdata, esc_period, esc_step_from, esc_step_to, default_msg, evaltype, mediatypeid) VALUES (7,4,0,1,2,'{TRIGGER.NAME}: {TRIGGER.STATUS}','{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}',0,1,1,1,0,NULL);
-INSERT INTO operations (operationid, actionid, operationtype, object, objectid, shortdata, longdata, esc_period, esc_step_from, esc_step_to, default_msg, evaltype, mediatypeid) VALUES (8,5,0,1,2,'{TRIGGER.NAME}: {TRIGGER.STATUS}','{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}',0,1,1,1,0,NULL);
-INSERT INTO operations (operationid, actionid, operationtype, object, objectid, shortdata, longdata, esc_period, esc_step_from, esc_step_to, default_msg, evaltype, mediatypeid) VALUES (9,6,0,1,2,'{TRIGGER.NAME}: {TRIGGER.STATUS}','{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}',0,1,1,1,0,NULL);
-INSERT INTO operations (operationid, actionid, operationtype, object, objectid, shortdata, longdata, esc_period, esc_step_from, esc_step_to, default_msg, evaltype, mediatypeid) VALUES (10,7,0,1,2,'{TRIGGER.NAME}: {TRIGGER.STATUS}','{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}',0,1,1,1,0,NULL);
-INSERT INTO operations (operationid, actionid, operationtype, object, objectid, shortdata, longdata, esc_period, esc_step_from, esc_step_to, default_msg, evaltype, mediatypeid) VALUES (11,7,0,1,3,'{TRIGGER.NAME}: {TRIGGER.STATUS}','{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}',3600,2,2,1,0,1);
-INSERT INTO operations (operationid, actionid, operationtype, object, objectid, shortdata, longdata, esc_period, esc_step_from, esc_step_to, default_msg, evaltype, mediatypeid) VALUES (12,7,0,0,1,'Custom: {TRIGGER.NAME}: {TRIGGER.STATUS}','Custom: {TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}',0,5,6,0,0,1);
-INSERT INTO operations (operationid, actionid, operationtype, object, objectid, shortdata, longdata, esc_period, esc_step_from, esc_step_to, default_msg, evaltype, mediatypeid) VALUES (13,8,0,1,2,'{TRIGGER.NAME}: {TRIGGER.STATUS}','{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}',0,1,1,1,0,NULL);
-INSERT INTO operations (operationid, actionid, operationtype, object, objectid, shortdata, longdata, esc_period, esc_step_from, esc_step_to, default_msg, evaltype, mediatypeid) VALUES (14,8,0,1,3,'{TRIGGER.NAME}: {TRIGGER.STATUS}','{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}',3600,2,2,1,0,1);
-INSERT INTO operations (operationid, actionid, operationtype, object, objectid, shortdata, longdata, esc_period, esc_step_from, esc_step_to, default_msg, evaltype, mediatypeid) VALUES (15,8,0,0,1,'Custom: {TRIGGER.NAME}: {TRIGGER.STATUS}','Custom: {TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}',0,5,6,0,0,1);
-INSERT INTO operations (operationid, actionid, operationtype, object, objectid, shortdata, longdata, esc_period, esc_step_from, esc_step_to, default_msg, evaltype, mediatypeid) VALUES (16,8,1,0,0,'','{HOSTNAME}:/sbin/shutdown -r',0,20,0,0,0,NULL);
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (7, 4, 0, 0, 1, 1, 0);
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (8, 5, 0, 0, 1, 1, 0);
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (9, 6, 0, 0, 1, 1, 0);
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (10, 7, 0, 0, 1, 1, 0);
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (11, 7, 0, 3600, 2, 2, 0);
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (12, 7, 0, 0, 5, 6, 0);
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (13, 8, 0, 0, 1, 1, 0); 
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (14, 8, 0, 3600, 2, 2, 0);
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (15, 8, 0, 0, 5, 6, 0);
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (16, 8, 1, 0, 20, 0, 0);
+
+INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (7, 1, '{TRIGGER.NAME}: {TRIGGER.STATUS}', '{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', NULL);
+INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (8, 1, '{TRIGGER.NAME}: {TRIGGER.STATUS}', '{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', NULL);
+INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (9, 1, '{TRIGGER.NAME}: {TRIGGER.STATUS}', '{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', NULL);
+INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (10, 1, '{TRIGGER.NAME}: {TRIGGER.STATUS}', '{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', NULL);
+INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (11, 1, '{TRIGGER.NAME}: {TRIGGER.STATUS}', '{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', 1);  
+INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (12, 0, 'Custom: {TRIGGER.NAME}: {TRIGGER.STATUS}', 'Custom: {TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', 1); 
+INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (13, 1, '{TRIGGER.NAME}: {TRIGGER.STATUS}', '{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', NULL);
+INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (14, 1, '{TRIGGER.NAME}: {TRIGGER.STATUS}', '{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', 1);
+INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (15, 0, 'Custom: {TRIGGER.NAME}: {TRIGGER.STATUS}', 'Custom: {TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', 1);
+
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (1, 7, 2);
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (2, 8, 2);
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (3, 9, 2);
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (4, 10, 2);
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (5, 11, 3);
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (6, 13, 2);
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (7, 14, 3);
+
+INSERT INTO opmessage_usr (opmessage_usrid, operationid, userid) VALUES (2, 12, 1);
+INSERT INTO opmessage_usr (opmessage_usrid, operationid, userid) VALUES (3, 15, 1);
+
+INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid, command) VALUES (1, 16, NULL, '/sbin/shutdown -r');
 
 INSERT INTO opconditions (opconditionid, operationid, conditiontype, operator, value) VALUES (1,11,14,0,'0');
 INSERT INTO opconditions (opconditionid, operationid, conditiontype, operator, value) VALUES (2,11,14,0,'1');
@@ -143,20 +166,40 @@ INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) V
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (88,10,20,0,'10047');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (89,10,20,1,'10048');
 
-INSERT INTO operations (operationid, actionid, operationtype, object, objectid, shortdata, longdata, esc_period, esc_step_from, esc_step_to, default_msg, evaltype, mediatypeid) VALUES (17,9,0,1,1,'Special: {TRIGGER.NAME}: {TRIGGER.STATUS}','Special: {TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}',0,1,1,0,0,NULL);
-INSERT INTO operations (operationid, actionid, operationtype, object, objectid, shortdata, longdata, esc_period, esc_step_from, esc_step_to, default_msg, evaltype, mediatypeid) VALUES (18,9,0,1,4,'{TRIGGER.NAME}: {TRIGGER.STATUS}','{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}',0,1,1,1,0,4);
-INSERT INTO operations (operationid, actionid, operationtype, object, objectid, shortdata, longdata, esc_period, esc_step_from, esc_step_to, default_msg, evaltype, mediatypeid) VALUES (19,9,1,0,0,'','{HOSTNAME}:echo TEST',0,1,1,0,0,NULL);
-INSERT INTO operations (operationid, actionid, operationtype, object, objectid, shortdata, longdata, esc_period, esc_step_from, esc_step_to, default_msg, evaltype, mediatypeid) VALUES (20,9,2,0,0,'','',0,1,1,0,0,NULL);
-INSERT INTO operations (operationid, actionid, operationtype, object, objectid, shortdata, longdata, esc_period, esc_step_from, esc_step_to, default_msg, evaltype, mediatypeid) VALUES (21,9,9,0,0,'','',0,1,1,0,0,NULL);
-INSERT INTO operations (operationid, actionid, operationtype, object, objectid, shortdata, longdata, esc_period, esc_step_from, esc_step_to, default_msg, evaltype, mediatypeid) VALUES (22,9,4,0,5,'','',0,1,1,0,0,NULL);
-INSERT INTO operations (operationid, actionid, operationtype, object, objectid, shortdata, longdata, esc_period, esc_step_from, esc_step_to, default_msg, evaltype, mediatypeid) VALUES (23,9,6,0,10002,'','',0,1,1,0,0,NULL);
-INSERT INTO operations (operationid, actionid, operationtype, object, objectid, shortdata, longdata, esc_period, esc_step_from, esc_step_to, default_msg, evaltype, mediatypeid) VALUES (24,10,0,1,1,'Special: {TRIGGER.NAME}: {TRIGGER.STATUS}','Special: {TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}',0,1,1,0,0,NULL);
-INSERT INTO operations (operationid, actionid, operationtype, object, objectid, shortdata, longdata, esc_period, esc_step_from, esc_step_to, default_msg, evaltype, mediatypeid) VALUES (25,10,0,1,4,'{TRIGGER.NAME}: {TRIGGER.STATUS}','{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}',0,1,1,1,0,4);
-INSERT INTO operations (operationid, actionid, operationtype, object, objectid, shortdata, longdata, esc_period, esc_step_from, esc_step_to, default_msg, evaltype, mediatypeid) VALUES (26,10,1,0,0,'','{HOSTNAME}:echo TEST',0,1,1,0,0,NULL);
-INSERT INTO operations (operationid, actionid, operationtype, object, objectid, shortdata, longdata, esc_period, esc_step_from, esc_step_to, default_msg, evaltype, mediatypeid) VALUES (27,10,2,0,0,'','',0,1,1,0,0,NULL);
-INSERT INTO operations (operationid, actionid, operationtype, object, objectid, shortdata, longdata, esc_period, esc_step_from, esc_step_to, default_msg, evaltype, mediatypeid) VALUES (28,10,9,0,0,'','',0,1,1,0,0,NULL);
-INSERT INTO operations (operationid, actionid, operationtype, object, objectid, shortdata, longdata, esc_period, esc_step_from, esc_step_to, default_msg, evaltype, mediatypeid) VALUES (29,10,4,0,5,'','',0,1,1,0,0,NULL);
-INSERT INTO operations (operationid, actionid, operationtype, object, objectid, shortdata, longdata, esc_period, esc_step_from, esc_step_to, default_msg, evaltype, mediatypeid) VALUES (30,10,6,0,10002,'','',0,1,1,0,0,NULL);
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (17, 9, 0, 0, 1, 1, 0);
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (18, 9, 0, 0, 1, 1, 0);
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (19, 9, 1, 0, 1, 1, 0);
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (20, 9, 2, 0, 1, 1, 0);
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (21, 9, 9, 0, 1, 1, 0);
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (22, 9, 4, 0, 1, 1, 0);
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (23, 9, 6, 0, 1, 1, 0);
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (24, 10, 0, 0, 1, 1, 0);
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (25, 10, 0, 0, 1, 1, 0);
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (26, 10, 1, 0, 1, 1, 0);
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (27, 10, 2, 0, 1, 1, 0);
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (28, 10, 9, 0, 1, 1, 0);
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (29, 10, 4, 0, 1, 1, 0);
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (30, 10, 6, 0, 1, 1, 0);
+
+INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (17, 0, 'Special: {TRIGGER.NAME}: {TRIGGER.STATUS}', 'Special: {TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', NULL);
+INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (18, 1, '{TRIGGER.NAME}: {TRIGGER.STATUS}', '{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', 4);
+INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (24, 0, 'Special: {TRIGGER.NAME}: {TRIGGER.STATUS}', 'Special: {TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', NULL);
+INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (25, 1, '{TRIGGER.NAME}: {TRIGGER.STATUS}', '{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', 4);
+
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (8, 17, 1);
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (9, 18, 4);
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (10, 24, 1);
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (11, 25, 4);
+
+INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid, command) VALUES (2, 19, NULL, 'echo TEST');
+INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid, command) VALUES (3, 26, NULL, 'echo TEST');
+
+INSERT INTO opgroup (opgroupid, operationid, groupid) VALUES (3, 22, 5);
+INSERT INTO opgroup (opgroupid, operationid, groupid) VALUES (4, 29, 5);
+
+INSERT INTO optemplate (optemplateid, operationid, templateid) VALUES (3, 23, 10002);
+INSERT INTO optemplate (optemplateid, operationid, templateid) VALUES (4, 30, 10002);
+
 
 -- Add more screens
 INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (3,'Test screen (graph)',1,1,NULL);

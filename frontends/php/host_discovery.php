@@ -278,7 +278,7 @@ switch($itemType) {
 
 	$form = null;
 	if(!isset($_REQUEST['form'])){
-		$form = new CForm(null, 'get');
+		$form = new CForm('get');
 		$form->addVar('hostid', $_REQUEST['hostid']);
 		$form->addItem(new CSubmit('form', S_CREATE_RULE));
 	}
@@ -712,10 +712,10 @@ switch($itemType) {
 
 
 			if(zbx_empty($item['error'])){
-				$error = new CDiv(SPACE, 'iconok');
+				$error = new CDiv(SPACE, 'status_icon iconok');
 			}
 			else{
-				$error = new CDiv(SPACE, 'iconerror');
+				$error = new CDiv(SPACE, 'status_icon iconerror');
 				$error->setHint($item['error'], '', 'on');
 			}
 

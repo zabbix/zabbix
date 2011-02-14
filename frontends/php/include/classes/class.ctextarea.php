@@ -21,9 +21,9 @@
 <?php
 class CTextArea extends CTag{
 /* public */
-	public function __construct($name='textarea',$value='',$cols=77,$rows=7, $readonly=false){
+	public function __construct($name='textarea',$value='', $cols=77, $rows=7, $readonly=false){
 		parent::__construct('textarea','yes');
-		$this->attributes['class'] = 'input';
+		$this->attributes['class'] = 'input textarea';
 
 		$this->attributes['id'] = $name;
 		$this->attributes['name'] = $name;

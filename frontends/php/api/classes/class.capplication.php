@@ -218,7 +218,7 @@ class CApplication extends CZBXAPI{
 			}
 		}
 
-// extendoutput
+// output
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['apps'] = 'a.*';
 		}
@@ -226,7 +226,7 @@ class CApplication extends CZBXAPI{
 // countOutput
 		if(!is_null($options['countOutput'])){
 			$options['sortfield'] = '';
-			$sql_parts['select'] = array('count(a.applicationid) as rowscount');
+			$sql_parts['select'] = array('count(DISTINCT a.applicationid) as rowscount');
 
 //groupCount
 			if(!is_null($options['groupCount'])){
@@ -343,7 +343,6 @@ class CApplication extends CZBXAPI{
 
 COpt::memoryPick();
 		if(!is_null($options['countOutput'])){
-			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 

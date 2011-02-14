@@ -119,7 +119,7 @@ private $flicker;
 			$icon_r->setAttribute('title',S_MAXIMIZE.'/'.S_MINIMIZE);
 			$icon_r->setAttribute('id','flicker_icon_r');
 
-			$icons_row = new CTable(null,'whitetext');
+			$icons_row = new CTable(null,'textwhite');
 			$icons_row->addRow(array($icon_l,new CSpan(SPACE.S_FILTER.SPACE),$icon_r));
 
 			$thin_tab = $this->createFlicker($icons_row);
@@ -160,7 +160,7 @@ private $flicker;
 			$pageHeader[] = $this->createPageHeaderRow($header['left'], $header['right']);
 		}
 
-	return new CDiv($pageHeader, 'pageHeader');
+	return new CDiv($pageHeader);
 	}
 
 	private function createPageHeaderRow($col1, $col2=SPACE){
@@ -188,14 +188,12 @@ private $flicker;
 
 		$right_tab->addRow($right_row);
 
-		$table = new CTable(NULL,'header bottom_space');
+		$table = new CTable(NULL,'ui-widget-header ui-corner-all header maxwidth');
 		$table->setCellSpacing(0);
 		$table->setCellPadding(1);
 
-		$td_r = new CCol($right_tab,'header_r');
-		$td_r->setAttribute('align','right');
-
-		$table->addRow(array(new CCol($col1,'header_l'), $td_r));
+		$td_r = new CCol($right_tab,'header_r right');
+		$table->addRow(array(new CCol($col1,'header_l left'), $td_r));
 
 	return $table;
 	}
@@ -228,7 +226,11 @@ private $flicker;
 
 		$header['right'] = $right_tab;
 
-		$header_tab = new CTable(null,$this->css_class);
+
+		$header_tab = new CTable(null, $this->css_class.' maxwidth');
+		if($this->css_class != 'header_wide')
+			$header_tab->addClass('ui-widget-header ui-corner-all');
+
 		$header_tab->setCellSpacing(0);
 		$header_tab->setCellPadding(1);
 
@@ -243,7 +245,7 @@ private $flicker;
 			$header_tab->addRow($this->createHeaderRow($header['left'],$header['right']), 'next');
 		}
 
-	return new CDiv($header_tab, 'header');
+		return new CDiv($header_tab);
 	}
 
 	private function createHeaderRow($col1, $col2=SPACE){
@@ -254,17 +256,15 @@ private $flicker;
 			if(($col1 === SPACE) && ($col2 === SPACE)) return new CJSscript('');
 		}
 
-		$td_r = new CCol($col2,'header_r');
-		$td_r->setAttribute('align','right');
-
-		$row = array(new CCol($col1,'header_l'), $td_r);
+		$td_r = new CCol($col2,'header_r right');
+		$row = array(new CCol($col1,'header_l left'), $td_r);
 
 	return $row;
 	}
 
 	private function createFlicker($col1, $col2=NULL){
 
-		$table = new CTable(NULL,'flicker');
+		$table = new CTable(NULL,'textwhite maxwidth middle flicker');
 //		$table->setAttribute('border',1);
 		$table->setCellSpacing(0);
 		$table->setCellPadding(1);
@@ -304,7 +304,7 @@ private $footer;
 		$this->header = null;
 		$this->body = array($body);
 		$this->footer = null;
-		
+
 		parent::__construct(null, 'ui-widget ui-widget-content ui-helper-clearfix ui-corner-all widget');
 		$this->setAttribute('id', $id.'_widget');
 	}
@@ -318,7 +318,7 @@ private $footer;
 
 		if(is_null($caption) && !is_null($icons)) $caption = SPACE;
 
-		$this->header = new CDiv(null, 'nowrap ui-corner-all ui-widget-header move '.$this->css_class);
+		$this->header = new CDiv(null, 'nowrap ui-corner-all ui-widget-header '.$this->css_class);
 
 		if(!is_null($this->state)){
 			$icon = new CIcon(
@@ -349,10 +349,10 @@ private $footer;
 		if(is_null($this->state)){
 			$this->state = true;
 		}
-		
+
 		$div = new CDiv($this->body, 'body');
 		$div->setAttribute('id',$this->domid);
-		
+
 		if(!$this->state){
 			$div->setAttribute('style','display: none;');
 			$this->footer->setAttribute('style','display: none;');
