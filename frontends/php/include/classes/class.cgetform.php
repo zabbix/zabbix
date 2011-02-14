@@ -20,25 +20,30 @@
 ?>
 <?php
 class CGetForm{
+	private $file;
 	private $data;
 	private $form;
 	private $scripts;
 
-	public function __construct(){
+	public function __construct($file, $data=array()){
+		$this->assign($file, $data);
 	}
 
-	public function assign($data){
-		$this->data = $data;
-	}
-
-	public function render($file){
+	public function assign($file, $data){
 		if(!preg_match("/[a-z\.]+/", $file)){
 			error('Invalid form name given ['.$file.']');
 			return false;
 		}
 
+		$this->file = './include/forms/'.$file.'.php';
+		$this->data = $data;
+	}
+
+	public function render(){
+		$data = $this->data;
+
 		ob_start();
-		$this->form = include('./include/forms/'.$file.'.php');
+		$this->form = include($this->file);
 		$this->scripts = ob_get_clean();
 
 		print($this->scripts);

@@ -186,8 +186,8 @@
 
 
 	if(isset($_REQUEST['form'])){
-		$proxyForm = new CGetForm();
-		$proxies_wdgt->addItem($proxyForm->render('proxy.edit'));
+		$proxyForm = new CGetForm('proxy.edit');
+		$proxies_wdgt->addItem($proxyForm->render());
 		$proxies_wdgt->show();
 	}
 	else{

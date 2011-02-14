@@ -1,6 +1,9 @@
 -- Activate Zabbix Server
 UPDATE hosts SET status=0 WHERE host='Zabbix server';
 
+-- Granting admin API access rights
+UPDATE usrgrp SET api_access = 1, debug_mode = 1 WHERE usrgrpid = 7;
+
 -- New media types
 INSERT INTO media_type (mediatypeid, type, description, smtp_server, smtp_helo, smtp_email, exec_path, gsm_modem, username, passwd) VALUES (4,100,'SMS via IP','','','','0','','test','test');
 

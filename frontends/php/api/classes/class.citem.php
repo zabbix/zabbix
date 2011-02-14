@@ -1091,7 +1091,7 @@ COpt::memoryPick();
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_TYPE_INFORMATION_BUST_LOG_FOR_LOG_KEY);
 					}
 
-					if(($item['type'] == ITEM_TYPE_AGGREGATE) && ($item['value_type'] != ITEM_VALUE_TYPE_FLOAT)){
+					if(isset($item['type']) && ($item['type'] == ITEM_TYPE_AGGREGATE) && ($item['value_type'] != ITEM_VALUE_TYPE_FLOAT)){
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_VALUE_TYPE_MUST_FLOAT_FOR_AGGREGATE_ITEMS);
 					}
 				}
@@ -1184,7 +1184,7 @@ COpt::memoryPick();
 				'nopermissions' => 1
 			));
 			foreach($itemsExists as $inum => $itemExists){
-				if($itemExists['itemid'] != $item['itemid']){
+				if(bccomp($itemExists['itemid'],$item['itemid']) != 0){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Host with item [ '.$item['key_'].' ] already exists');
 				}
 			}
