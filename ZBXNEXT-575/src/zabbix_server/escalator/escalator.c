@@ -289,7 +289,7 @@ static int	run_remote_command(DC_ITEM *item, char *command, char *error, size_t 
 	if (0 == strncmp(command, "IPMI", 4))
 	{
 		if (SUCCEED == (ret = DCconfig_get_interface_by_type(&item->interface, item->host.hostid,
-				INTERFACE_TYPE_IPMI, 1)))
+				INTERFACE_TYPE_IPMI)))
 		{
 			item->interface.addr = strdup(item->interface.useip ? item->interface.ip_orig :
 					item->interface.dns_orig);
@@ -323,7 +323,7 @@ static int	run_remote_command(DC_ITEM *item, char *command, char *error, size_t 
 	{
 #endif
 		if (SUCCEED == (ret = DCconfig_get_interface_by_type(&item->interface, item->host.hostid,
-				INTERFACE_TYPE_AGENT, 1)))
+				INTERFACE_TYPE_AGENT)))
 		{
 			item->interface.addr = (item->interface.useip ? item->interface.ip_orig :
 					item->interface.dns_orig);
