@@ -1555,8 +1555,8 @@ msgid "Copy selected triggers?"
 msgstr "Скопировать выбранные триггеры?"
 
 #: include/locales/en_gb.inc.php:637
-msgid "Copyright 2001-2010 by"
-msgstr "Все права защищены 2001-2010"
+msgid "Copyright 2001-2011 by"
+msgstr "Все права защищены 2001-2011"
 
 #: include/locales/en_gb.inc.php:2222
 msgid "Could not save image!"
