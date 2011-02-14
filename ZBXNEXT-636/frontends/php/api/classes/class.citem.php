@@ -128,9 +128,12 @@ class CItem extends CZBXAPI{
 
 		if(is_array($options['output'])){
 			unset($sql_parts['select']['items']);
+
+			$dbTable = DB::getSchema('items');
 			$sql_parts['select']['itemid'] = ' i.itemid';
 			foreach($options['output'] as $key => $field){
-				$sql_parts['select'][$field] = ' i.'.$field;
+				if(isset($dbTable['fields'][$field]))
+					$sql_parts['select'][$field] = ' i.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;
@@ -544,7 +547,6 @@ class CItem extends CZBXAPI{
 
 COpt::memoryPick();
 		if(!is_null($options['countOutput'])){
-			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 
@@ -1198,7 +1200,7 @@ COpt::memoryPick();
 				'nopermissions' => 1
 			));
 			foreach($itemsExists as $inum => $itemExists){
-				if($itemExists['itemid'] != $item['itemid']){
+				if(bccomp($itemExists['itemid'],$item['itemid']) != 0){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Host with item [ '.$item['key_'].' ] already exists');
 				}
 			}

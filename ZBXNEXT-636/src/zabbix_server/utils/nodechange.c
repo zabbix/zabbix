@@ -316,13 +316,6 @@ int	change_nodeid(int old_id, int new_id)
 			{NULL}
 			}
 		},
-		{"operations",		"objectid",	"object",
-			{
-			{"users",	OPERATION_OBJECT_USER},
-			{"usrgrp",	OPERATION_OBJECT_GROUP},
-			{NULL}
-			}
-		},
 		{"ids",			"nextid",	NULL,
 			{
 			{NULL}

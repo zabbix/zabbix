@@ -164,7 +164,9 @@ include_once('include/page_header.php');
 		$group = CUserGroup::get(array('usrgrpids' => $_REQUEST['usrgrpid'], 'output' => API_OUTPUT_EXTEND));
 		$group = reset($group);
 
+		DBstart();
 		$result = CUserGroup::delete($_REQUEST['usrgrpid']);
+		$result = DBend($result);
 
 		show_messages($result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
 		if($result){
@@ -333,7 +335,7 @@ include_once('include/page_header.php');
 <?php
 
 // Config
-	$frmForm = new CForm(null, 'get');
+	$frmForm = new CForm('get');
 
 	$cmbConf = new CComboBox('config','usergrps.php');
 	$cmbConf->setAttribute('onchange','javascript: redirect(this.options[this.selectedIndex].value);');

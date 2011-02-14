@@ -281,7 +281,7 @@ include_once('include/page_header.php');
 <?php
 
 	if(!isset($_REQUEST['form'])){
-		$form = new CForm(null, 'get');
+		$form = new CForm('get');
 		$form->cleanItems();
 		$form->addItem(new CSubmit('form', S_CREATE_GRAPH));
 		$form->addVar('parent_discoveryid', $_REQUEST['parent_discoveryid']);
@@ -322,7 +322,7 @@ include_once('include/page_header.php');
 		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
 
-		$graphs_wdgt->addHeader(array(S_GRAPH_PROTOTYPES_OF_BIG.SPACE, new CSpan($discovery_rule['description'], 'discoveryName')));
+		$graphs_wdgt->addHeader(array(S_GRAPH_PROTOTYPES_OF_BIG.SPACE, new CSpan($discovery_rule['description'], 'gold')));
 		$graphs_wdgt->addHeader($numrows);
 
 // Header Host

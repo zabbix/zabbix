@@ -212,7 +212,9 @@ include_once('include/page_header.php');
 		$users = CUser::get(array('userids' => $_REQUEST['userid'],  'output' => API_OUTPUT_EXTEND));
 		$user = reset($users);
 
+		DBstart();
 		$result = CUser::delete($users);
+		$result = DBend($result);
 		if(!$result) error(CUser::resetErrors());
 
 		show_messages($result, S_USER_DELETED, S_CANNOT_DELETE_USER);
@@ -331,7 +333,7 @@ include_once('include/page_header.php');
 	$_REQUEST['filter_usrgrpid'] = get_request('filter_usrgrpid', CProfile::get('web.users.filter.usrgrpid', 0));
 	CProfile::update('web.users.filter.usrgrpid', $_REQUEST['filter_usrgrpid'], PROFILE_TYPE_ID);
 
-	$frmForm = new CForm(null, 'get');
+	$frmForm = new CForm('get');
 	$cmbConf = new CComboBox('config', 'users.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
 		$cmbConf->addItem('usergrps.php', S_USER_GROUPS);
 		$cmbConf->addItem('users.php', S_USERS);
@@ -347,7 +349,7 @@ include_once('include/page_header.php');
 		$user_wdgt->addItem($userForm);
 	}
 	else{
-		$form = new CForm(null, 'get');
+		$form = new CForm('get');
 
 		$cmbUGrp = new CComboBox('filter_usrgrpid',$_REQUEST['filter_usrgrpid'],'submit()');
 		$cmbUGrp->addItem(0, S_ALL_S);
@@ -370,7 +372,7 @@ include_once('include/page_header.php');
 		$user_wdgt->addHeader(S_USERS_BIG, $form);
 		$user_wdgt->addHeader($numrows);
 
-		$form = new CForm(null,'post');
+		$form = new CForm();
 		$form->setName('users');
 
 		$table=new CTableInfo(S_NO_USERS_DEFINED);
