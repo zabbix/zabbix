@@ -40,7 +40,6 @@ class CProxy extends CZBXAPI{
  * @param array $options['nodeids']
  * @param array $options['proxyids']
  * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
- * @param boolean $options['extendoutput'] return all fields
  * @param int $options['count'] returns value in rowscount
  * @param string $options['pattern']
  * @param int $options['limit']
@@ -95,11 +94,14 @@ class CProxy extends CZBXAPI{
 
 		if(is_array($options['output'])){
 			unset($sql_parts['select']['hosts']);
+
+			$dbTable = DB::getSchema('hosts');
 			$sql_parts['select']['hostid'] = ' h.hostid';
 			foreach($options['output'] as $key => $field){
 				if($field == 'proxyid') continue;
 
-				$sql_parts['select'][$field] = ' h.'.$field;
+				if(isset($dbTable['fields'][$field]))
+					$sql_parts['select'][$field] = ' h.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;
@@ -136,7 +138,7 @@ class CProxy extends CZBXAPI{
 		}
 
 
-// extendoutput
+// output
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['hostid'] = 'h.hostid';
 			$sql_parts['select']['host'] = 'h.host';
@@ -223,7 +225,6 @@ class CProxy extends CZBXAPI{
 		}
 
 		if(!is_null($options['countOutput']) || empty($proxyids)){
-			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 
@@ -519,7 +520,7 @@ class CProxy extends CZBXAPI{
 			$sql = 'SELECT DISTINCT actionid '.
 					' FROM conditions '.
 					' WHERE conditiontype='.CONDITION_TYPE_PROXY.
-						' AND '.DBcondition('value',$proxyids, false, true);		// FIXED[POSIBLE value type violation]!!!
+						' AND '.DBcondition('value',$proxyids);
 			$db_actions = DBselect($sql);
 			while($db_action = DBfetch($db_actions)){
 				$actionids[$db_action['actionid']] = $db_action['actionid'];

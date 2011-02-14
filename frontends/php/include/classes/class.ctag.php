@@ -131,7 +131,7 @@ class CTag extends CObject{
 			$this->attributes[$name] = unpack_object($value);
 		}
 		else if(isset($value))
-			$this->attributes[$name] = htmlspecialchars(str_replace(array("\r", "\n"), '', strval($value)), ENT_COMPAT, 'UTF-8');
+			$this->attributes[$name] = $value;
 		else
 			unset($this->attributes[$name]);
 	}
@@ -183,8 +183,8 @@ class CTag extends CObject{
 		return 1;
 	}
 
-	public function getForm($action=NULL, $method='post', $enctype=NULL){
-		$form = new CForm($action, $method, $enctype);
+	public function getForm($method='post', $action=null, $enctype=null){
+		$form = new CForm($method, $action, $enctype);
 		$form->addItem($this);
 	return $form;
 	}

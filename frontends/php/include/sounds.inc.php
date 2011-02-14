@@ -70,7 +70,7 @@ function getMessageSettings(){
 	$sql = 'SELECT idx, source, value_str '.
 			' FROM profiles '.
 			' WHERE userid='.$USER_DETAILS['userid'].
-				' AND '.DBcondition('idx',array('web.messages'), false, true);
+				' AND '.DBcondition('idx',array('web.messages'));
 	$db_profiles = DBselect($sql);
 	while($profile = DBfetch($db_profiles)){
 		$messages[$profile['source']] = $profile['value_str'];
@@ -94,7 +94,7 @@ function updateMessageSettings($messages){
 	$sql = 'SELECT profileid, idx, source, value_str '.
 			' FROM profiles '.
 			' WHERE userid='.$USER_DETAILS['userid'].
-				' AND '.DBcondition('idx',array('web.messages'), false, true);
+				' AND '.DBcondition('idx',array('web.messages'));
 	$db_profiles = DBselect($sql);
 	while($profile = DBfetch($db_profiles)){
 		$profile['value'] = $profile['value_str'];

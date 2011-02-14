@@ -45,7 +45,6 @@ class CMap extends CZBXAPI{
  * @param boolean $options['with_monitored_httptests'] only with monitored http tests
  * @param boolean $options['with_graphs'] only with graphs
  * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
- * @param int $options['extendoutput'] return all fields for Hosts
  * @param int $options['count'] count Hosts, returned column name is rowscount
  * @param string $options['pattern'] search hosts by pattern in host names
  * @param int $options['limit'] limit selection
@@ -244,7 +243,7 @@ class CMap extends CZBXAPI{
 					$all_triggers = CTrigger::get($trig_options);
 					foreach($link_triggers as $id => $triggerid){
 						if(!isset($all_triggers[$triggerid])){
-								unset($result[$id], $sysmapids[$id]);
+							unset($result[$id], $sysmapids[$id]);
 						}
 					}
 				}
@@ -286,8 +285,8 @@ class CMap extends CZBXAPI{
 				if(!empty($hosts_to_check)){
 					$host_options = array(
 						'hostids' => $hosts_to_check,
-									'nodeids' => $nodeids,
-									'editable' => $options['editable'],
+						'nodeids' => $nodeids,
+						'editable' => $options['editable'],
 						'preservekeys' => 1,
 						'output' => API_OUTPUT_SHORTEN,
 					);
@@ -372,7 +371,6 @@ class CMap extends CZBXAPI{
 
 COpt::memoryPick();
 		if(!is_null($options['countOutput'])){
-			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 
@@ -842,6 +840,11 @@ COpt::memoryPick();
 			DB::delete('screens_items', array(
 				'resourceid'=>$sysmapids,
 				'resourcetype'=>SCREEN_RESOURCE_MAP
+			));
+
+			DB::delete('profiles', array(
+				'idx'=>'web.maps.sysmapid',
+				'value_id'=>$sysmapids
 			));
 //----
 			DB::delete('sysmaps', array('sysmapid'=>$sysmapids));

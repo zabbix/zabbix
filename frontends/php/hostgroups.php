@@ -156,7 +156,9 @@ include_once('include/page_header.php');
 		unset($_REQUEST['save']);
 	}
 	else if(isset($_REQUEST['delete']) && isset($_REQUEST['groupid'])){
+		DBstart();
 		$result = CHostGroup::delete($_REQUEST['groupid']);
+		$result = DBend($result);
 
 		unset($_REQUEST['form']);
 		show_messages($result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
@@ -359,7 +361,7 @@ include_once('include/page_header.php');
 		$groups_wdgt->addHeader($numrows);
 
 // Host Groups table
-		$form = new CForm('hostgroups.php');
+		$form = new CForm();
 		$form->setName('form_groups');
 
 		$table = new CTableInfo(S_NO_HOST_GROUPS_DEFINED);

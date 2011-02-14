@@ -99,8 +99,20 @@ class CHostGroup extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $params);
 
-// editable + PERMISSION CHECK
+		if(is_array($options['output'])){
+			unset($sql_parts['select']['groups']);
 
+			$dbTable = DB::getSchema('groups');
+			$sql_parts['select']['groupid'] = ' g.groupid';
+			foreach($options['output'] as $key => $field){
+				if(isset($dbTable['fields'][$field]))
+					$sql_parts['select'][$field] = ' g.'.$field;
+			}
+
+			$options['output'] = API_OUTPUT_CUSTOM;
+		}
+
+// editable + PERMISSION CHECK
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
 		}
 		else{
@@ -443,9 +455,9 @@ class CHostGroup extends CZBXAPI{
 
 COpt::memoryPick();
 		if(!is_null($options['countOutput'])){
-			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
+
 
 // Adding hosts
 		if(!is_null($options['selectHosts'])){
@@ -764,36 +776,34 @@ COpt::memoryPick();
 			if(!delete_sysmaps_elements_with_groupid($groupids))
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete sysmap elements');
 
-
 // disable actions
+// actions from conditions
 			$actionids = array();
-
-// conditions
 			$sql = 'SELECT DISTINCT c.actionid '.
 					' FROM conditions c '.
 					' WHERE c.conditiontype='.CONDITION_TYPE_HOST_GROUP.
-						' AND '.DBcondition('c.value',$groupids, false, true);
+						' AND '.DBcondition('c.value',$groupids);
 			$db_actions = DBselect($sql);
-			while($db_action = DBfetch($db_actions)){
+			while($db_action = DBfetch($db_actions))
 				$actionids[$db_action['actionid']] = $db_action['actionid'];
-			}
 
-// operations
+// actions from operations
 			$sql = 'SELECT DISTINCT o.actionid '.
-					' FROM operations o '.
-					' WHERE o.operationtype IN ('.OPERATION_TYPE_GROUP_ADD.','.OPERATION_TYPE_GROUP_REMOVE.') '.
-						' AND '.DBcondition('o.objectid',$groupids);
+					' FROM operations o, opgroup og '.
+					' WHERE o.operationid=og.operationid '.
+						' AND '.DBcondition('og.groupid',$groupids);
 			$db_actions = DBselect($sql);
-			while($db_action = DBfetch($db_actions)){
+			while($db_action = DBfetch($db_actions))
 				$actionids[$db_action['actionid']] = $db_action['actionid'];
-			}
 
 			if(!empty($actionids)){
-				DBexecute('UPDATE actions '.
-						' SET status='.ACTION_STATUS_DISABLED.
-						' WHERE '.DBcondition('actionid', $actionids));
+				$update = array();
+				$update[] = array(
+					'values' => array('status' => ACTION_STATUS_DISABLED),
+					'where' => array(DBcondition('actionid',$actionids))
+				);
+				DB::update('actions', $update);
 			}
-
 
 // delete action conditions
 			DB::delete('conditions', array(
@@ -801,12 +811,34 @@ COpt::memoryPick();
 				'value'=>$groupids
 			));
 
-// delete action operations
-			DB::delete('operations', array(
-				'operationtype'=>array(OPERATION_TYPE_GROUP_ADD, OPERATION_TYPE_GROUP_REMOVE),
-				'objectid'=>$groupids
+// delete action operation commands
+			$operationids = array();
+			$sql = 'SELECT DISTINCT og.operationid '.
+					' FROM opgroup og '.
+					' WHERE '.DBcondition('og.groupid', $groupids);
+			$dbOperations = DBselect($sql);
+			while($dbOperation = DBfetch($dbOperations))
+				$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
+
+			DB::delete('opgroup', array(
+				'groupid'=>$groupids,
 			));
 
+// delete empty operations
+			$delOperationids = array();
+			$sql = 'SELECT DISTINCT o.operationid '.
+					' FROM operations o '.
+					' WHERE '.DBcondition('o.operationid', $operationids).
+						' AND NOT EXISTS(SELECT og.opgroupid FROM opgroup og WHERE og.operationid=o.operationid)';
+			$dbOperations = DBselect($sql);
+			while($dbOperation = DBfetch($dbOperations))
+				$delOperationids[$dbOperation['operationid']] = $dbOperation['operationid'];
+
+			DB::delete('operations', array(
+				'operationid'=>$delOperationids,
+			));
+
+// Host groups
 			DB::delete('groups', array(
 				'groupid'=>$groupids
 			));
@@ -1070,6 +1102,40 @@ COpt::memoryPick();
 			return false;
 		}
 	}
+
+	public static function isReadable($ids){
+		if(!is_array($ids)) return false;
+		if(empty($ids)) return true;
+
+		$ids = array_unique($ids);
+
+		$count = self::get(array(
+			'nodeids' => get_current_nodeid(true),
+			'groupids' => $ids,
+			'output' => API_OUTPUT_SHORTEN,
+			'countOutput' => true
+		));
+
+		return (count($ids) == $count);
+	}
+
+	public static function isWritable($ids){
+		if(!is_array($ids)) return false;
+		if(empty($ids)) return true;
+
+		$ids = array_unique($ids);
+
+		$count = self::get(array(
+			'nodeids' => get_current_nodeid(true),
+			'groupids' => $ids,
+			'output' => API_OUTPUT_SHORTEN,
+			'editable' => true,
+			'countOutput' => true
+		));
+
+		return (count($ids) == $count);
+	}
+
 }
 
 ?>
