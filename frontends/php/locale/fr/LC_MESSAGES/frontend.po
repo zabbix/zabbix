@@ -2,14 +2,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-27 14:02+0200\n"
+"POT-Creation-Date: 2011-02-14 18:50+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
+"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: fr\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Poedit-Basepath: ../../\n"
 
@@ -22,6 +22,13 @@ msgstr "- tous les groupes -"
 msgid "%1$s (year %2$s)"
 msgstr ""
 
+#: discovery.php:242
+#, php-format
+msgid "%d device"
+msgid_plural "%d devices"
+msgstr[0] ""
+msgstr[1] ""
+
 #: include/locales/en_gb.inc.php:394
 msgid "&"
 msgstr "&"
@@ -33,6 +40,14 @@ msgstr "'"
 #: include/locales/en_gb.inc.php:2174
 msgid "' does not accept parameters."
 msgstr "' n'accepte pas de paramètres."
+
+#: include/forms/action.edit.php:455
+msgid "(0 - infinitely)"
+msgstr ""
+
+#: include/forms/action.edit.php:462
+msgid "(minimum 60 seconds, 0 - use action default)"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:108
 msgid "(no proxy)"
@@ -170,9 +185,30 @@ msgstr "Acquittement"
 msgid "Acknowledges"
 msgstr "Acquittements"
 
+#: include/forms/sysmap.edit.php:135
+msgid "Acknowledging disabled"
+msgstr ""
+
+#: include/forms/action.edit.php:347 include/forms/action.edit.php:350
 #: include/locales/en_gb.inc.php:1898
 msgid "Action"
 msgstr "Action"
+
+#: api/classes/class.caction.php:708 api/classes/class.caction.php:721
+#: api/classes/class.caction.php:823 api/classes/class.caction.php:842
+#, php-format
+msgid "Action \"%s\" already exists."
+msgstr ""
+
+#: api/classes/class.caction.php:705 api/classes/class.caction.php:817
+#, php-format
+msgid "Action \"%s\" has incorrect value for \"esc_period\" (minimum 60 seconds)."
+msgstr ""
+
+#: api/classes/class.caction.php:872
+#, php-format
+msgid "Action \"%s\" no operations defined."
+msgstr ""
 
 #: include/locales/en_gb.inc.php:363
 msgid "Action added"
@@ -186,7 +222,7 @@ msgstr "Conditions d'action"
 msgid "Action deleted"
 msgstr "Action supprimée"
 
-#: include/locales/en_gb.inc.php:320
+#: include/forms/action.edit.php:415 include/locales/en_gb.inc.php:320
 msgid "Action operations"
 msgstr "Opérations d'action"
 
@@ -222,7 +258,11 @@ msgstr "Actif depuis"
 msgid "Active till"
 msgstr "Actif jusqu'à"
 
-#: include/locales/en_gb.inc.php:1745
+#: include/forms/action.edit.php:317 include/forms/action.edit.php:496
+#: include/forms/action.edit.php:510 include/forms/action.edit.php:640
+#: include/forms/action.edit.php:675 include/forms/action.edit.php:794
+#: include/forms/action.edit.php:842 include/forms/sysmap.edit.php:179
+#: include/locales/en_gb.inc.php:1745 include/templates/action.js.php:286
 msgid "Add"
 msgstr "Ajouter"
 
@@ -238,7 +278,7 @@ msgstr "Ajout commentaire par"
 msgid "Add element"
 msgstr "Ajouter élément"
 
-#: include/locales/en_gb.inc.php:326
+#: include/actions.inc.php:271 include/locales/en_gb.inc.php:326
 msgid "Add host"
 msgstr "Ajouter hôte"
 
@@ -257,6 +297,14 @@ msgstr "Ajouter à"
 #: include/locales/en_gb.inc.php:968
 msgid "Add to group"
 msgstr "Ajouter au groupe"
+
+#: include/forms/action.edit.php:663
+msgid "Add to host groups"
+msgstr ""
+
+#: include/actions.inc.php:295
+msgid "Add to host groups: "
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1901
 msgid "Added"
@@ -281,6 +329,10 @@ msgstr "Admin"
 #: include/locales/en_gb.inc.php:501
 msgid "Administration"
 msgstr "Administration"
+
+#: include/forms/sysmap.edit.php:72
+msgid "Advanced labels"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1334
 msgid "Age"
@@ -310,7 +362,8 @@ msgstr "Identifiant"
 msgid "Align icons"
 msgstr "Aligner les icônes"
 
-#: include/forms/script.edit.php:88 include/forms/script.edit.php:100
+#: include/forms/action.edit.php:545 include/forms/script.edit.php:88
+#: include/forms/script.edit.php:100 include/forms/sysmap.edit.php:129
 #: include/locales/en_gb.inc.php:628 include/locales/en_gb.inc.php:1361
 msgid "All"
 msgstr "Tous"
@@ -351,18 +404,18 @@ msgstr "Toute chaîne de caractères inclue"
 msgid "Application"
 msgstr "Application"
 
-#: api/classes/class.capplication.php:577
-#: api/classes/class.capplication.php:601
+#: api/classes/class.capplication.php:576
+#: api/classes/class.capplication.php:600
 #, php-format
 msgid "Application [%1$s:%2$s] updated."
 msgstr ""
 
-#: api/classes/class.capplication.php:674
+#: api/classes/class.capplication.php:673
 #, php-format
 msgid "Application [%1$s] deleted"
 msgstr ""
 
-#: api/classes/class.ctemplate.php:2094
+#: api/classes/class.ctemplate.php:2116
 #, php-format
 msgid "Application [%1$s] unlinked."
 msgstr ""
@@ -507,7 +560,7 @@ msgstr "RETOUR"
 msgid "Background"
 msgstr "Fond"
 
-#: include/locales/en_gb.inc.php:1309
+#: include/forms/sysmap.edit.php:67 include/locales/en_gb.inc.php:1309
 msgid "Background image"
 msgstr "Image de fond"
 
@@ -543,7 +596,7 @@ msgstr "Bloqué"
 msgid "Bold line"
 msgstr "Ligne épaisse"
 
-#: include/locales/en_gb.inc.php:1278
+#: include/forms/sysmap.edit.php:123 include/locales/en_gb.inc.php:1278
 msgid "Bottom"
 msgstr "Bas"
 
@@ -679,7 +732,7 @@ msgstr "Rappel"
 msgid "Can not create new element"
 msgstr "Impossible de créer un nouvel élément"
 
-#: api/classes/class.cuser.php:758
+#: api/classes/class.cuser.php:774
 #, php-format
 msgid "Can not delete %1$s internal user \" %2$s \", try disabling that user."
 msgstr ""
@@ -688,7 +741,11 @@ msgstr ""
 msgid "Can not find objects with name"
 msgstr "Impossible de trouver un objet avec ce nom"
 
-#: api/classes/class.ctemplate.php:1405
+#: api/classes/class.chostinterface.php:492
+msgid "Can not switch host for interface"
+msgstr ""
+
+#: api/classes/class.ctemplate.php:1427
 msgid "Can't add group"
 msgstr ""
 
@@ -704,7 +761,7 @@ msgstr "Production arbre de tri impossible"
 msgid "Can't insert user medias"
 msgstr "Impossible d'ajouter les medias utilisateur"
 
-#: api/classes/class.ctemplate.php:1481 api/classes/class.ctemplate.php:1491
+#: api/classes/class.ctemplate.php:1503 api/classes/class.ctemplate.php:1513
 msgid "Can't link template"
 msgstr ""
 
@@ -712,15 +769,15 @@ msgstr ""
 msgid "Can't read script response, check connection"
 msgstr "Impossible de lire la réponse du script, vérifier la connexion"
 
-#: api/classes/class.ctemplate.php:1416
+#: api/classes/class.ctemplate.php:1438
 msgid "Can't remove group"
 msgstr ""
 
-#: api/classes/class.ctemplate.php:1531
+#: api/classes/class.ctemplate.php:1553
 msgid "Can't remove macro"
 msgstr ""
 
-#: api/classes/class.ctemplate.php:1625
+#: api/classes/class.ctemplate.php:1647
 msgid "Can't remove macros"
 msgstr ""
 
@@ -728,11 +785,11 @@ msgstr ""
 msgid "Can't send command, check connection"
 msgstr "Impossible d'envoyer la commande, vérifier la connexion"
 
-#: api/classes/class.ctemplate.php:1601
+#: api/classes/class.ctemplate.php:1623
 msgid "Can't unlink groups"
 msgstr ""
 
-#: api/classes/class.ctemplate.php:1452 api/classes/class.ctemplate.php:1470
+#: api/classes/class.ctemplate.php:1474 api/classes/class.ctemplate.php:1492
 msgid "Can't unlink template"
 msgstr ""
 
@@ -744,7 +801,8 @@ msgstr "Impossible de modifier les medias utilisateur"
 msgid "Canada (136 characters)"
 msgstr "Canada (136 caractères)"
 
-#: include/locales/en_gb.inc.php:1327
+#: include/forms/action.edit.php:796 include/forms/action.edit.php:844
+#: include/locales/en_gb.inc.php:1327 include/templates/action.js.php:118
 #: include/templates/scriptConfirm.js.php:39
 #: include/templates/script.js.php:41
 msgid "Cancel"
@@ -770,7 +828,7 @@ msgstr "Ajout règle de découverte impossible"
 msgid "Cannot add graph"
 msgstr "Impossible d'ajouter le graphique"
 
-#: api/classes/class.chost.php:1727 include/locales/en_gb.inc.php:1788
+#: api/classes/class.chost.php:1737 include/locales/en_gb.inc.php:1788
 msgid "Cannot add group"
 msgstr "Impossible d'ajouter le groupe"
 
@@ -786,7 +844,7 @@ msgstr "Impossible d'ajouter l'image"
 msgid "Cannot add item"
 msgstr "Impossible d'ajouter l'élément"
 
-#: api/classes/class.chost.php:1845 api/classes/class.ctemplate.php:1547
+#: api/classes/class.chost.php:1855 api/classes/class.ctemplate.php:1569
 msgid "Cannot add macro"
 msgstr "Impossible d'ajouter la macro"
 
@@ -874,7 +932,7 @@ msgstr "Impossible de copier les éléménts"
 msgid "Cannot create another database connection."
 msgstr ""
 
-#: api/classes/class.chost.php:1922
+#: api/classes/class.chost.php:1932
 msgid "Cannot create extended profile"
 msgstr ""
 
@@ -886,20 +944,20 @@ msgstr "Impossible de supprimer l'action"
 msgid "Cannot delete application"
 msgstr "Suppression application impossible"
 
-#: host_discovery.php:182 host_discovery.php:267
-#: include/locales/en_gb.inc.php:128
+#: api/classes/class.cdiscoveryrule.php:980 host_discovery.php:182
+#: host_discovery.php:267 include/locales/en_gb.inc.php:128
 msgid "Cannot delete discovery rule"
 msgstr "Suppression de la règle de découverte impossible"
 
-#: api/classes/class.chost.php:1902
+#: api/classes/class.chost.php:1912
 msgid "Cannot delete extended profile"
 msgstr ""
 
-#: api/classes/class.citem.php:1339 include/locales/en_gb.inc.php:685
+#: api/classes/class.citem.php:1342 include/locales/en_gb.inc.php:685
 msgid "Cannot delete graph"
 msgstr "Impossible de supprimer le graphique"
 
-#: api/classes/class.cgraphprototype.php:1051
+#: api/classes/class.cgraphprototype.php:1053
 msgid "Cannot delete graph prototype"
 msgstr ""
 
@@ -939,7 +997,7 @@ msgstr "Impossible de supprimer la carte réseau"
 msgid "Cannot delete node"
 msgstr "Suppression neud impossible"
 
-#: api/classes/class.chost.php:1857
+#: api/classes/class.chost.php:1867
 msgid "Cannot delete profile"
 msgstr ""
 
@@ -959,8 +1017,8 @@ msgstr "Suppression du scénario impossible"
 msgid "Cannot delete script"
 msgstr "Impossible de supprimer le script"
 
-#: actionconf.php:313
-msgid "Cannot delete selected actions."
+#: actionconf.php:308
+msgid "Cannot delete selected actions"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1633
@@ -975,17 +1033,17 @@ msgstr "Impossible de supprimer le diaporama"
 msgid "Cannot delete template"
 msgstr "Impossible de supprimer le modèle"
 
-#: api/classes/class.cgraph.php:1032
-#: api/classes/class.cgraphprototype.php:1028
+#: api/classes/class.cgraph.php:1034
+#: api/classes/class.cgraphprototype.php:1030
 msgid "Cannot delete templated graphs"
 msgstr ""
 
-#: api/classes/class.cdiscoveryrule.php:939
+#: api/classes/class.cdiscoveryrule.php:940
 msgid "Cannot delete templated items"
 msgstr ""
 
 #: api/classes/class.ctrigger.php:1206
-#: api/classes/class.ctriggerprototype.php:1242
+#: api/classes/class.ctriggerprototype.php:1243
 #, php-format
 msgid "Cannot delete templated trigger [%1$s:%2$s]"
 msgstr ""
@@ -1050,11 +1108,11 @@ msgstr "Impossible de trouver le déclencheur"
 msgid "Cannot format Tree. Check logic structure in service links"
 msgstr "Impossible de formater l'arbre. Vérifier la structure logique des liens entre services"
 
-#: api/classes/class.ctriggerprototype.php:1348
+#: api/classes/class.ctriggerprototype.php:1349
 msgid "Cannot implode expression"
 msgstr ""
 
-#: api/classes/class.ctrigger.php:1519
+#: api/classes/class.ctrigger.php:1518
 #, php-format
 msgid "Cannot implode expression \"%s\"."
 msgstr ""
@@ -1071,19 +1129,19 @@ msgstr "Impossible de lier un service à lui-même."
 msgid "Cannot link template"
 msgstr "Impossible de lier le modèle"
 
-#: api/classes/class.chost.php:1674
+#: api/classes/class.chost.php:1684
 msgid "Cannot mass update host name"
 msgstr ""
 
-#: api/classes/class.ctemplate.php:1351
+#: api/classes/class.ctemplate.php:1373
 msgid "Cannot mass update template name"
 msgstr ""
 
-#: api/classes/class.chost.php:1736
+#: api/classes/class.chost.php:1746
 msgid "Cannot remove group"
 msgstr ""
 
-#: api/classes/class.chost.php:1829 config.php:542
+#: api/classes/class.chost.php:1839 config.php:542
 msgid "Cannot remove macro"
 msgstr ""
 
@@ -1091,35 +1149,35 @@ msgstr ""
 msgid "Cannot rename guest user"
 msgstr "Impossible de renommer l'utilisateur guest"
 
-#: api/classes/class.ctemplate.php:1818
+#: api/classes/class.ctemplate.php:1840
 msgid "Cannot sync Triggers"
 msgstr ""
 
-#: api/classes/class.ctemplate.php:1824
+#: api/classes/class.ctemplate.php:1846
 msgid "Cannot sync Triggers prototypes"
 msgstr ""
 
-#: api/classes/class.ctemplate.php:1794
+#: api/classes/class.ctemplate.php:1816
 msgid "Cannot sync applications"
 msgstr ""
 
-#: api/classes/class.ctemplate.php:1800
+#: api/classes/class.ctemplate.php:1822
 msgid "Cannot sync discovery rules"
 msgstr ""
 
-#: api/classes/class.ctemplate.php:1830
+#: api/classes/class.ctemplate.php:1852
 msgid "Cannot sync graph prototypes"
 msgstr ""
 
-#: api/classes/class.ctemplate.php:1836
+#: api/classes/class.ctemplate.php:1858
 msgid "Cannot sync graphs"
 msgstr ""
 
-#: api/classes/class.ctemplate.php:1806
+#: api/classes/class.ctemplate.php:1828
 msgid "Cannot sync item prototypes"
 msgstr ""
 
-#: api/classes/class.ctemplate.php:1812
+#: api/classes/class.ctemplate.php:1834
 msgid "Cannot sync items"
 msgstr ""
 
@@ -1127,31 +1185,31 @@ msgstr ""
 msgid "Cannot unblock users"
 msgstr "Impossible de débloquer les utilisateurs"
 
-#: api/classes/class.ctemplate.php:2085
+#: api/classes/class.ctemplate.php:2107
 msgid "Cannot unlink and clear applications"
 msgstr ""
 
-#: api/classes/class.ctemplate.php:1880
+#: api/classes/class.ctemplate.php:1902
 msgid "Cannot unlink and clear discovery rules"
 msgstr ""
 
-#: api/classes/class.ctemplate.php:1964
+#: api/classes/class.ctemplate.php:1986
 msgid "Cannot unlink and clear graph prototypes"
 msgstr ""
 
-#: api/classes/class.ctemplate.php:1982
+#: api/classes/class.ctemplate.php:2004
 msgid "Cannot unlink and clear graphs."
 msgstr ""
 
-#: api/classes/class.ctemplate.php:1916
+#: api/classes/class.ctemplate.php:1938
 msgid "Cannot unlink and clear item prototypes"
 msgstr ""
 
-#: api/classes/class.ctemplate.php:1898
+#: api/classes/class.ctemplate.php:1920
 msgid "Cannot unlink and clear items"
 msgstr ""
 
-#: api/classes/class.ctemplate.php:2033 api/classes/class.ctemplate.php:2050
+#: api/classes/class.ctemplate.php:2055 api/classes/class.ctemplate.php:2072
 msgid "Cannot unlink and clear triggers"
 msgstr ""
 
@@ -1191,7 +1249,7 @@ msgstr "Impossible de modifier le mode debug"
 msgid "Cannot update discovery rule"
 msgstr "Modification de règle impossible"
 
-#: api/classes/class.chost.php:1944
+#: api/classes/class.chost.php:1954
 msgid "Cannot update extended profile"
 msgstr ""
 
@@ -1219,7 +1277,7 @@ msgstr "Impossible de modifier l'image"
 msgid "Cannot update item"
 msgstr "Impossible d'actualiser l'élément"
 
-#: api/classes/class.chost.php:1836 api/classes/class.ctemplate.php:1538
+#: api/classes/class.chost.php:1846 api/classes/class.ctemplate.php:1560
 #: config.php:547
 msgid "Cannot update macro"
 msgstr ""
@@ -1240,7 +1298,7 @@ msgstr "Impossible de mettre à jour la carte"
 msgid "Cannot update node"
 msgstr "Modification noeud impossible"
 
-#: api/classes/class.chost.php:1890
+#: api/classes/class.chost.php:1900
 msgid "Cannot update profile"
 msgstr ""
 
@@ -1352,7 +1410,7 @@ msgstr "Distant"
 msgid "Chinese (CN)"
 msgstr "Chinois (CN)"
 
-#: api/classes/class.ctemplate.php:1774 include/locales/en_gb.inc.php:2115
+#: api/classes/class.ctemplate.php:1796 include/locales/en_gb.inc.php:2115
 msgid "Circular link can not be created"
 msgstr "Impossible de créer une liste circulaire"
 
@@ -1376,13 +1434,18 @@ msgstr "Effacer en déliant"
 msgid "Clock"
 msgstr "Horloge"
 
-#: include/forms/script.edit.php:139 include/locales/en_gb.inc.php:1649
+#: include/forms/action.edit.php:860 include/forms/script.edit.php:139
+#: include/forms/sysmap.edit.php:197 include/locales/en_gb.inc.php:1649
 msgid "Clone"
 msgstr "Clone"
 
 #: include/locales/en_gb.inc.php:1883
 msgid "Close"
 msgstr "Fermer"
+
+#: include/templates/action.js.php:362
+msgid "Close currently opened remote command details without saving?"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:651
 msgid "Colour"
@@ -1404,13 +1467,18 @@ msgstr "Colonnes"
 msgid "Combined result"
 msgstr "Résultat combiné"
 
-#: include/forms/script.edit.php:79 include/locales/en_gb.inc.php:1870
+#: include/forms/action.edit.php:571 include/forms/script.edit.php:79
+#: include/locales/en_gb.inc.php:1870 include/templates/action.js.php:112
 msgid "Command"
 msgstr "Commande"
 
 #: include/locales/en_gb.inc.php:362
 msgid "Command actions"
 msgstr "Actions associées à la commande"
+
+#: include/templates/action.js.php:311
+msgid "Command field is empty. Please provide some instructions for operation."
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1743
 msgid "Comment updated"
@@ -1432,7 +1500,7 @@ msgstr "Comparer les valeurs de périodes multiples"
 msgid "Condition"
 msgstr "Condition"
 
-#: include/locales/en_gb.inc.php:317
+#: include/forms/action.edit.php:323 include/locales/en_gb.inc.php:317
 msgid "Conditions"
 msgstr "Conditions"
 
@@ -1644,6 +1712,14 @@ msgstr "Créer une correspondance"
 msgid "Critical error"
 msgstr "Erreur critique"
 
+#: include/templates/action.js.php:98 include/templates/action.js.php:190
+msgid "Current host"
+msgstr ""
+
+#: include/actions.inc.php:363
+msgid "Current host: "
+msgstr ""
+
 #: include/locales/en_gb.inc.php:275
 msgid "Current node"
 msgstr "Noeud courant"
@@ -1651,6 +1727,10 @@ msgstr "Noeud courant"
 #: include/locales/en_gb.inc.php:439
 msgid "Custom graphs"
 msgstr "Graphiques personnalisés"
+
+#: api/classes/class.cmap.php:583 include/forms/sysmap.edit.php:79
+msgid "Custom label"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1128
 msgid "Custom multiplier"
@@ -1890,7 +1970,7 @@ msgstr "Constante ZBX_SCRIPT_BYTES_LIMIT définie dans \"include/defines.inc.php
 msgid "Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value"
 msgstr "Constante ZBX_SCRIPT_TIMEOUT définie dans \"include/defines.inc.php\" atteinte.Vous pouvez augmenter cette valeur"
 
-#: include/locales/en_gb.inc.php:371
+#: include/forms/action.edit.php:347 include/locales/en_gb.inc.php:371
 msgid "Delay"
 msgstr "Délai"
 
@@ -1925,6 +2005,10 @@ msgstr "Attention : ceci supprimera les modèles sélectionnés et effecera les 
 #: include/locales/en_gb.inc.php:954
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
 msgstr "Supprimer et effacer le modèle (Attention : tous les liens avec les hôtes seront effacés!)"
+
+#: include/forms/action.edit.php:861
+msgid "Delete current action?"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:2006
 msgid "Delete expression?"
@@ -2125,7 +2209,7 @@ msgstr "Supprimer les liens avec les éléments sélectionnés"
 msgid "Delete slideshow?"
 msgstr "Supprimer le diaporama ?"
 
-#: include/locales/en_gb.inc.php:2088
+#: include/forms/sysmap.edit.php:198 include/locales/en_gb.inc.php:2088
 msgid "Delete system map?"
 msgstr "Supprimer la carte système ?"
 
@@ -2174,6 +2258,7 @@ msgstr "Dépend de"
 msgid "Description"
 msgstr "Description"
 
+#: include/forms/action.edit.php:347 include/forms/action.edit.php:350
 #: include/locales/en_gb.inc.php:1899
 msgid "Details"
 msgstr "Détails"
@@ -2250,11 +2335,11 @@ msgstr "Désactiver DEBUG"
 msgid "Disable debug mode in selected groups?"
 msgstr "Désctiver le mode debug des groupes sélectionnés ?"
 
-#: include/templates/hosts.js.php:140
+#: include/templates/host.js.php:133
 msgid "Disable extended profile"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:329
+#: include/actions.inc.php:280 include/locales/en_gb.inc.php:329
 msgid "Disable host"
 msgstr "Désactiver hôte"
 
@@ -2262,7 +2347,7 @@ msgstr "Désactiver hôte"
 msgid "Disable hosts monitored by selected proxies?"
 msgstr "Désactiver les hôtes surveillés par les proxies sélectionnés ?"
 
-#: include/templates/hosts.js.php:127
+#: include/templates/host.js.php:120
 msgid "Disable profile"
 msgstr ""
 
@@ -2342,17 +2427,17 @@ msgstr "Test de découverte"
 msgid "Discovery rule"
 msgstr "Règle de découverte"
 
-#: api/classes/class.cdiscoveryrule.php:1009
+#: api/classes/class.cdiscoveryrule.php:1011
 #, php-format
 msgid "Discovery rule [%1$s:%2$s] deleted."
 msgstr ""
 
-#: api/classes/class.cdiscoveryrule.php:591
+#: api/classes/class.cdiscoveryrule.php:592
 #, php-format
 msgid "Discovery rule [%1$s:%2$s] has no interface."
 msgstr ""
 
-#: api/classes/class.ctemplate.php:1889
+#: api/classes/class.ctemplate.php:1911
 #, php-format
 msgid "Discovery rule [%1$s:%2$s] unlinked."
 msgstr ""
@@ -2447,12 +2532,12 @@ msgid "Down"
 msgstr "Bas"
 
 #. GETTEXT: Legend below graph
-#: api/classes/class.cwebcheck.php:562
+#: api/classes/class.cwebcheck.php:561
 #, php-format
 msgid "Download speed for scenario '%s'"
 msgstr ""
 
-#: api/classes/class.cwebcheck.php:651
+#: api/classes/class.cwebcheck.php:650
 #, php-format
 msgid "Download speed for step '%1$s' of scenario '%2$s'"
 msgstr ""
@@ -2468,6 +2553,11 @@ msgstr "Style de dessin"
 #: include/locales/en_gb.inc.php:462
 msgid "Dropdown first entry"
 msgstr "Première entrée du menu déroulant"
+
+#: api/classes/class.cmap.php:565
+#, php-format
+msgid "Duplicate map name for map \"%s\"."
+msgstr ""
 
 #: include/locales/en_gb.inc.php:411
 msgid "Duration"
@@ -2497,7 +2587,9 @@ msgstr "EVENEMENTS"
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1539
+#: include/forms/action.edit.php:388 include/forms/action.edit.php:394
+#: include/locales/en_gb.inc.php:1539 include/templates/action.js.php:64
+#: include/templates/action.js.php:85
 msgid "Edit"
 msgstr "Edition"
 
@@ -2529,10 +2621,11 @@ msgstr "Modifier l'élément de la carte"
 msgid "Edit operation"
 msgstr "Editer opération"
 
-#: include/locales/en_gb.inc.php:217
+#: include/forms/sysmap.edit.php:140 include/locales/en_gb.inc.php:217
 msgid "Element"
 msgstr "Elément"
 
+#: api/classes/class.cmap.php:580 include/forms/sysmap.edit.php:76
 #: include/locales/en_gb.inc.php:1312
 msgid "Element name"
 msgstr "Nom de l'élément"
@@ -2545,14 +2638,14 @@ msgstr "Courriel"
 msgid "Empty"
 msgstr "Vide"
 
-#: api/classes/class.caction.php:793 api/classes/class.capplication.php:701
-#: api/classes/class.cdiscoveryrule.php:920 api/classes/class.cgraph.php:1014
-#: api/classes/class.cgraphprototype.php:1010
-#: api/classes/class.chostgroup.php:719
-#: api/classes/class.chostinterface.php:700 api/classes/class.chost.php:2060
-#: api/classes/class.citem.php:1286 api/classes/class.citemprototype.php:892
-#: api/classes/class.cproxy.php:507 api/classes/class.ctemplate.php:1139
-#: api/classes/class.ctrigger.php:1357 api/classes/class.cusergroup.php:699
+#: api/classes/class.caction.php:1345 api/classes/class.capplication.php:700
+#: api/classes/class.cdiscoveryrule.php:921 api/classes/class.cgraph.php:1016
+#: api/classes/class.cgraphprototype.php:1012
+#: api/classes/class.chostgroup.php:731
+#: api/classes/class.chostinterface.php:707 api/classes/class.chost.php:2070
+#: api/classes/class.citem.php:1289 api/classes/class.citemprototype.php:893
+#: api/classes/class.cproxy.php:508 api/classes/class.ctemplate.php:1141
+#: api/classes/class.ctrigger.php:1359 api/classes/class.cusergroup.php:700
 msgid "Empty input parameter"
 msgstr "Paramêtre d'entrée vide"
 
@@ -2592,11 +2685,11 @@ msgstr "Activer le mode debug des groupes sélectionnés ?"
 msgid "Enable escalations"
 msgstr "Activer les escalades"
 
-#: include/templates/hosts.js.php:144
+#: include/templates/host.js.php:137
 msgid "Enable extended profile"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:328
+#: include/actions.inc.php:277 include/locales/en_gb.inc.php:328
 msgid "Enable host"
 msgstr "Activer hôte"
 
@@ -2604,7 +2697,7 @@ msgstr "Activer hôte"
 msgid "Enable hosts monitored by selected proxies?"
 msgstr "Activer les hôtes surveillés par les proxies sélectionnés ?"
 
-#: include/templates/hosts.js.php:131
+#: include/templates/host.js.php:124
 msgid "Enable profile"
 msgstr ""
 
@@ -2668,8 +2761,8 @@ msgstr ""
 msgid "Error adding service time"
 msgstr ""
 
-#: api/classes/class.cdiscoveryrule.php:575 api/classes/class.citem.php:931
-#: api/classes/class.citemprototype.php:576
+#: api/classes/class.cdiscoveryrule.php:576 api/classes/class.citem.php:933
+#: api/classes/class.citemprototype.php:577
 #, php-format
 msgid "Error in item key: %s"
 msgstr ""
@@ -2751,7 +2844,7 @@ msgstr ""
 msgid "Existing"
 msgstr "Existant"
 
-#: include/locales/en_gb.inc.php:1266
+#: include/forms/sysmap.edit.php:70 include/locales/en_gb.inc.php:1266
 msgid "Expand single problem"
 msgstr "Détailler problème unique"
 
@@ -2771,7 +2864,7 @@ msgstr "Explosé"
 msgid "Export selected"
 msgstr "Export sélectionné"
 
-#: events.php:185
+#: events.php:259
 msgid "Export to CSV"
 msgstr ""
 
@@ -2844,12 +2937,12 @@ msgid "Failed on"
 msgstr "Echoué sur"
 
 #. GETTEXT: Legend below graph
-#: api/classes/class.cwebcheck.php:570
+#: api/classes/class.cwebcheck.php:569
 #, php-format
 msgid "Failed step of scenario '%s'"
 msgstr ""
 
-#: api/classes/class.ctemplate.php:1113
+#: api/classes/class.ctemplate.php:1115
 msgid "Failed to update template"
 msgstr ""
 
@@ -2885,7 +2978,7 @@ msgstr "Février"
 msgid "Field"
 msgstr "Champ"
 
-#: api/classes/class.ctemplate.php:1023
+#: api/classes/class.ctemplate.php:1025
 msgid "Field \"host\" is mandatory"
 msgstr ""
 
@@ -3046,44 +3139,44 @@ msgstr "Ligne en gradiant"
 msgid "Graph"
 msgstr "Graphique"
 
-#: api/classes/class.cgraph.php:863 api/classes/class.cgraphprototype.php:858
+#: api/classes/class.cgraph.php:865 api/classes/class.cgraphprototype.php:860
 #, php-format
 msgid "Graph [ %1$s ]: already exists on [ %2$s ]"
 msgstr ""
 
-#: api/classes/class.cgraph.php:884 api/classes/class.cgraphprototype.php:879
+#: api/classes/class.cgraph.php:886 api/classes/class.cgraphprototype.php:881
 #, php-format
 msgid "Graph [ %1$s ]: already exists on [ %2$s ] (inherited from another template)"
 msgstr ""
 
-#: api/classes/class.cgraph.php:906 api/classes/class.cgraph.php:913
-#: api/classes/class.cgraphprototype.php:901
-#: api/classes/class.cgraphprototype.php:908
+#: api/classes/class.cgraph.php:908 api/classes/class.cgraph.php:915
+#: api/classes/class.cgraphprototype.php:903
+#: api/classes/class.cgraphprototype.php:910
 #, php-format
 msgid "Graph [ %1$s ]: already exists on [ %2$s ] (items are not identical)"
 msgstr ""
 
-#: api/classes/class.cgraph.php:836 api/classes/class.cgraphprototype.php:831
+#: api/classes/class.cgraph.php:838 api/classes/class.cgraphprototype.php:833
 #, php-format
 msgid "Graph [ %1$s ]: cannot inherit. No required items on [ %2$s ]"
 msgstr ""
 
-#: api/classes/class.cgraph.php:840 api/classes/class.cgraphprototype.php:835
+#: api/classes/class.cgraph.php:842 api/classes/class.cgraphprototype.php:837
 #, php-format
 msgid "Graph [ %1$s ]: cannot inherit. No required items on [ %2$s ] (Ymax value item)"
 msgstr ""
 
-#: api/classes/class.cgraph.php:846 api/classes/class.cgraphprototype.php:841
+#: api/classes/class.cgraph.php:848 api/classes/class.cgraphprototype.php:843
 #, php-format
 msgid "Graph [ %1$s ]: cannot inherit. No required items on [ %2$s ] (Ymin value item)"
 msgstr ""
 
-#: api/classes/class.ctemplate.php:1991
+#: api/classes/class.ctemplate.php:2013
 #, php-format
 msgid "Graph [%1$s] unlinked."
 msgstr ""
 
-#: api/classes/class.cgraph.php:1064
+#: api/classes/class.cgraph.php:1066
 #, php-format
 msgid "Graph [%s] deleted."
 msgstr ""
@@ -3108,17 +3201,17 @@ msgstr "Graphe des éléments"
 msgid "Graph name"
 msgstr "Nom du graphique"
 
-#: api/classes/class.ctemplate.php:1973
+#: api/classes/class.ctemplate.php:1995
 #, php-format
 msgid "Graph prototype [%1$s] unlinked."
 msgstr ""
 
-#: api/classes/class.cgraphprototype.php:1070
+#: api/classes/class.cgraphprototype.php:1072
 #, php-format
 msgid "Graph prototype [%s] deleted."
 msgstr ""
 
-#: api/classes/class.cgraphprototype.php:1172
+#: api/classes/class.cgraphprototype.php:1174
 msgid "Graph prototype must have at least one prototype"
 msgstr ""
 
@@ -3138,14 +3231,14 @@ msgstr "Type de graphe"
 msgid "Graph updated"
 msgstr "Graphique actualisé"
 
-#: api/classes/class.cgraph.php:1153
+#: api/classes/class.cgraph.php:1160
 #, php-format
-msgid "Graph with name [ %1$s ] already exists"
+msgid "Graph with name \"%1$s\" already exists"
 msgstr ""
 
-#: api/classes/class.cgraph.php:866 api/classes/class.cgraph.php:887
-#: api/classes/class.cgraphprototype.php:861
-#: api/classes/class.cgraphprototype.php:882
+#: api/classes/class.cgraph.php:868 api/classes/class.cgraph.php:889
+#: api/classes/class.cgraphprototype.php:863
+#: api/classes/class.cgraphprototype.php:884
 msgid "Graph with same name but other type exist"
 msgstr ""
 
@@ -3246,7 +3339,7 @@ msgstr "Architecture HW"
 msgid "Hardware"
 msgstr "Matériel"
 
-#: include/locales/en_gb.inc.php:1536
+#: include/forms/sysmap.edit.php:50 include/locales/en_gb.inc.php:1536
 msgid "Height"
 msgstr "Hauteur"
 
@@ -3319,12 +3412,32 @@ msgid "Horizontal align"
 msgstr "Alignement horizontal"
 
 #: include/locales/en_gb.inc.php:880 include/locales/en_gb.inc.php:2125
+#: include/templates/action.js.php:99 include/templates/action.js.php:188
 msgid "Host"
 msgstr "Hôte"
 
-#: api/classes/class.cproxy.php:373
+#: include/actions.inc.php:370
+#, php-format
+msgid "Host \"%1$s\": "
+msgstr ""
+
+#: api/classes/class.cproxy.php:374
 #, php-format
 msgid "Host \"%s\" already exists."
+msgstr ""
+
+#: api/classes/class.chost.php:2196
+#, php-format
+msgid "Host \"%s\" deleted."
+msgstr ""
+
+#: include/export.inc.php:874
+#, php-format
+msgid "Host \"%s\" has \"use_ipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
+msgstr ""
+
+#: include/forms/sysmap.edit.php:92
+msgid "Host Group label type"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:89
@@ -3342,11 +3455,6 @@ msgstr "Hôte - Routeur"
 #: include/locales/en_gb.inc.php:1006
 msgid "Host Subnet Mask"
 msgstr "Hôte - Masque de sous-réseau"
-
-#: api/classes/class.chost.php:2167
-#, php-format
-msgid "Host [%1$s] deleted."
-msgstr ""
 
 #: include/locales/en_gb.inc.php:1874
 msgid "Host access"
@@ -3368,9 +3476,15 @@ msgstr "Hôte supprimé"
 msgid "Host does not exist."
 msgstr "L'hôte n'existe pas."
 
-#: include/locales/en_gb.inc.php:919
+#: include/locales/en_gb.inc.php:919 include/templates/action.js.php:100
+#: include/templates/action.js.php:158
 msgid "Host group"
 msgstr "Groupe d'hôtes"
+
+#: include/actions.inc.php:382
+#, php-format
+msgid "Host group \"%1$s\": "
+msgstr ""
 
 #: include/forms/script.edit.php:108 include/locales/en_gb.inc.php:920
 msgid "Host groups"
@@ -3384,6 +3498,10 @@ msgstr ""
 msgid "Host key does not exist."
 msgstr "La clé de l'hôte n'existe pas."
 
+#: include/forms/sysmap.edit.php:98
+msgid "Host label type"
+msgstr ""
+
 #: include/forms/host.massupdate.php:123
 msgid "Host mass update"
 msgstr ""
@@ -3391,11 +3509,6 @@ msgstr ""
 #: include/locales/en_gb.inc.php:314
 msgid "Host name"
 msgstr "Nom d'hôte"
-
-#: api/classes/class.chost.php:1297
-#, php-format
-msgid "Host name must not be longer than %1$d characters, [ %2$s ] is %3$d"
-msgstr ""
 
 #: include/locales/en_gb.inc.php:957
 msgid "Host profile"
@@ -3425,8 +3538,8 @@ msgstr "Modèle d'hôte"
 msgid "Host time"
 msgstr ""
 
-#: api/classes/class.chost.php:1506 api/classes/class.chost.php:1511
-#: api/classes/class.chost.php:1516 api/classes/class.chost.php:1525
+#: api/classes/class.chost.php:1516 api/classes/class.chost.php:1521
+#: api/classes/class.chost.php:1526 api/classes/class.chost.php:1535
 msgid "Host update failed"
 msgstr ""
 
@@ -3498,11 +3611,12 @@ msgstr "IMAP"
 msgid "IP"
 msgstr "IP"
 
+#: api/classes/class.cmap.php:579 include/forms/sysmap.edit.php:75
 #: include/locales/en_gb.inc.php:896
 msgid "IP address"
 msgstr "adresse IP"
 
-#: api/classes/class.chostinterface.php:513
+#: api/classes/class.chostinterface.php:514
 msgid "IP and DNS can not be empty for host interface."
 msgstr ""
 
@@ -3594,15 +3708,19 @@ msgstr "Icône (problème)"
 msgid "Icon (unknown)"
 msgstr "Icône (inconnu)"
 
+#: include/forms/sysmap.edit.php:68
+msgid "Icon highlight"
+msgstr ""
+
 #: include/locales/en_gb.inc.php:1256
 msgid "Icon highlighting"
 msgstr "Mise en évidence de l'icône"
 
-#: include/locales/en_gb.inc.php:1255
+#: include/forms/sysmap.edit.php:125 include/locales/en_gb.inc.php:1255
 msgid "Icon label location"
 msgstr "Position de l'icône du label"
 
-#: include/locales/en_gb.inc.php:1310
+#: include/forms/sysmap.edit.php:120 include/locales/en_gb.inc.php:1310
 msgid "Icon label type"
 msgstr "Type étiquette icône"
 
@@ -3633,6 +3751,10 @@ msgstr "Image supprimée"
 #: include/locales/en_gb.inc.php:1244
 msgid "Image is used in Zabbix map"
 msgstr "L'image est utilisée dans une carte ZABBIX"
+
+#: include/forms/sysmap.edit.php:116
+msgid "Image label type"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:2225
 msgid "Image size must be less than 1MB"
@@ -3698,17 +3820,28 @@ msgstr "En cours"
 msgid "Include"
 msgstr "Inclure"
 
-#: api/classes/class.cscreen.php:563
+#: api/classes/class.cmap.php:606
+#, php-format
+msgid "Incorrect %1$s element custom label string for map \"%s\"."
+msgstr ""
+
+#: api/classes/class.cmap.php:599 api/classes/class.cmap.php:603
+#: api/classes/class.cmap.php:610 api/classes/class.cmap.php:615
+#, php-format
+msgid "Incorrect %1$s label type value for map \"%2$s\"."
+msgstr ""
+
+#: api/classes/class.cscreen.php:555
 #, php-format
 msgid "Incorrect Graph identity \"%s\" provided for Screens item resource"
 msgstr ""
 
-#: api/classes/class.cscreen.php:541
+#: api/classes/class.cscreen.php:533
 #, php-format
 msgid "Incorrect Host group identity \"%s\" provided for Screens item resource"
 msgstr ""
 
-#: api/classes/class.cscreen.php:552
+#: api/classes/class.cscreen.php:544
 #, php-format
 msgid "Incorrect Host identity \"%s\" provided for Screens item resource"
 msgstr ""
@@ -3725,35 +3858,127 @@ msgstr "Plage d'IP incorrecte"
 msgid "Incorrect Image"
 msgstr "Image incorrecte"
 
-#: api/classes/class.cscreen.php:575
+#: api/classes/class.cscreen.php:567
 #, php-format
 msgid "Incorrect Item identity \"%s\" provided for Screens item resource"
 msgstr ""
 
-#: api/classes/class.cscreen.php:586
+#: api/classes/class.cscreen.php:578
 #, php-format
 msgid "Incorrect Map identity \"%s\" provided for Screens item resource"
 msgstr ""
 
-#: api/classes/class.cscreen.php:597
+#: api/classes/class.cscreen.php:589
 #, php-format
 msgid "Incorrect Screen identity \"%s\" provided for Screens item resource"
 msgstr ""
 
-#: api/classes/class.cwebcheck.php:382 include/locales/en_gb.inc.php:2091
+#: api/classes/class.caction.php:1529
+msgid "Incorrect action condition discovery check."
+msgstr ""
+
+#: api/classes/class.caction.php:1539
+msgid "Incorrect action condition discovery status."
+msgstr ""
+
+#: api/classes/class.caction.php:1562
+msgid "Incorrect action condition host group. Host group does not exist or you have no access to this host group."
+msgstr ""
+
+#: api/classes/class.caction.php:1564
+msgid "Incorrect action condition host. Host does not exist or you have no access to this host."
+msgstr ""
+
+#: api/classes/class.caction.php:1524
+#, php-format
+msgid "Incorrect action condition ip \"%s\"."
+msgstr ""
+
+#: api/classes/class.caction.php:1519
+#, php-format
+msgid "Incorrect action condition period \"%s\"."
+msgstr ""
+
+#: api/classes/class.caction.php:1534
+#, php-format
+msgid "Incorrect action condition port \"%s\"."
+msgstr ""
+
+#: api/classes/class.caction.php:1566
+msgid "Incorrect action condition template. Template does not exist or you have no access to this template."
+msgstr ""
+
+#: api/classes/class.caction.php:1568
+msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to this trigger."
+msgstr ""
+
+#: api/classes/class.caction.php:1557
+msgid "Incorrect action condition type"
+msgstr ""
+
+#: api/classes/class.caction.php:864
+msgid "Incorrect action conditionid"
+msgstr ""
+
+#: api/classes/class.caction.php:1585
+msgid "Incorrect action operation condition acknowledge type."
+msgstr ""
+
+#: api/classes/class.caction.php:1589
+msgid "Incorrect action operation condition type"
+msgstr ""
+
+#: api/classes/class.caction.php:1398
+msgid "Incorrect action operation escalation period."
+msgstr ""
+
+#: api/classes/class.caction.php:1388 api/classes/class.caction.php:1392
+msgid "Incorrect action operation escalation step values."
+msgstr ""
+
+#: api/classes/class.caction.php:1481
+msgid "Incorrect action operation group. Host group does not exist or you have no access to this host group."
+msgstr ""
+
+#: api/classes/class.caction.php:1483
+msgid "Incorrect action operation host. Host does not exist or you have no access to this host."
+msgstr ""
+
+#: api/classes/class.caction.php:1476
+msgid "Incorrect action operation type."
+msgstr ""
+
+#: api/classes/class.caction.php:1487
+msgid "Incorrect action operation user group. User group does not exist or you have no access to this user group."
+msgstr ""
+
+#: api/classes/class.caction.php:1485
+msgid "Incorrect action operation user. User does not exist or you have no access to this user."
+msgstr ""
+
+#: api/classes/class.caction.php:889
+msgid "Incorrect action operationid"
+msgstr ""
+
+#: api/classes/class.cwebcheck.php:381 include/locales/en_gb.inc.php:2091
 msgid "Incorrect arguments passed to function"
 msgstr "Arguments incorrects passés à la fonction"
 
-#: api/classes/class.chostinterface.php:509
+#: api/classes/class.chostinterface.php:510
 msgid "Incorrect arguments passed to method."
 msgstr ""
 
-#: api/classes/class.chost.php:1334
+#: api/classes/class.chost.php:1344
 #, php-format
-msgid "Incorrect characters used for Host name [ %s ]"
+msgid "Incorrect characters used for Host name \"%s\""
 msgstr ""
 
-#: api/classes/class.chost.php:1698 api/classes/class.ctemplate.php:1377
+#: api/classes/class.chost.php:1708
+#, php-format
+msgid "Incorrect characters used for Hostname \"%s\""
+msgstr ""
+
+#: api/classes/class.ctemplate.php:1399
 #, php-format
 msgid "Incorrect characters used for Hostname [ %s ]"
 msgstr ""
@@ -3762,12 +3987,12 @@ msgstr ""
 msgid "Incorrect characters used for Node name"
 msgstr "Caractères incorrects utilisés pour le nom du noeud"
 
-#: api/classes/class.cproxy.php:365
+#: api/classes/class.cproxy.php:366
 #, php-format
 msgid "Incorrect characters used for Proxy name \"%s\"."
 msgstr ""
 
-#: api/classes/class.ctemplate.php:1027
+#: api/classes/class.ctemplate.php:1029
 #, php-format
 msgid "Incorrect characters used for Template name [ %1$s ]"
 msgstr ""
@@ -3800,7 +4025,11 @@ msgstr ""
 msgid "Incorrect expression"
 msgstr "Expression incorrecte"
 
-#: api/classes/class.ctrigger.php:1189
+#: api/classes/class.cmap.php:550
+msgid "Incorrect fields for sysmap"
+msgstr ""
+
+#: api/classes/class.ctrigger.php:1190
 msgid "Incorrect fields for trigger"
 msgstr ""
 
@@ -3816,18 +4045,23 @@ msgstr "Groupe incorrect"
 msgid "Incorrect host"
 msgstr "Hote incorrect"
 
-#: api/classes/class.chostinterface.php:529
+#: api/classes/class.chostinterface.php:536
 #, php-format
 msgid "Incorrect interface DNS parameter \" %1$s \" provided."
 msgstr ""
 
-#: api/classes/class.chostinterface.php:538
+#: api/classes/class.chostinterface.php:545
 #, php-format
 msgid "Incorrect interface IP parameter \" %1$s \" provided."
 msgstr ""
 
-#: api/classes/class.cgraph.php:1188
-#: api/classes/class.cgraphprototype.php:1206
+#: api/classes/class.chostinterface.php:556
+#, php-format
+msgid "Incorrect interface PORT \"%s\" provided"
+msgstr ""
+
+#: api/classes/class.cgraph.php:1195
+#: api/classes/class.cgraphprototype.php:1208
 msgid "Incorrect item for axis value item"
 msgstr ""
 
@@ -3863,6 +4097,16 @@ msgstr "Période de maintenance incorrecte"
 msgid "Incorrect maintenance week period"
 msgstr "Semaine de période de maintenance incorrecte"
 
+#: api/classes/class.cmap.php:574
+#, php-format
+msgid "Incorrect map height value for map \"%s\"."
+msgstr ""
+
+#: api/classes/class.cmap.php:571
+#, php-format
+msgid "Incorrect map width value for map \"%s\"."
+msgstr ""
+
 #: include/locales/en_gb.inc.php:2232
 msgid "Incorrect node type"
 msgstr "Type de noeud incorrect"
@@ -3874,6 +4118,11 @@ msgstr "Type d'objet incorrect"
 #: include/locales/en_gb.inc.php:351
 msgid "Incorrect operation type"
 msgstr "Type d'opération incorrecte"
+
+#: api/classes/class.caction.php:702
+#, php-format
+msgid "Incorrect parameter is used for action \"%s\""
+msgstr ""
 
 #: include/locales/en_gb.inc.php:260
 msgid "Incorrect parameter used for Action"
@@ -3887,6 +4136,15 @@ msgstr "Paramètre utilisé incorrect pour Conditions"
 msgid "Incorrect parameter used for Operations"
 msgstr "Paramètre utilisé incorrect pour Opérations"
 
+#: api/classes/class.caction.php:808
+#, php-format
+msgid "Incorrect parameters are used for action update method \"%s\""
+msgstr ""
+
+#: api/classes/class.caction.php:937
+msgid "Incorrect parameters for condition."
+msgstr ""
+
 #: include/locales/en_gb.inc.php:343
 msgid "Incorrect period"
 msgstr "Période incorrecte"
@@ -3895,7 +4153,11 @@ msgstr "Période incorrecte"
 msgid "Incorrect port"
 msgstr "Port incorrect"
 
-#: api/classes/class.cscreen.php:501
+#: include/actions.inc.php:655
+msgid "Incorrect proxy."
+msgstr ""
+
+#: api/classes/class.cscreen.php:493
 msgid "Incorrect resource provided for screen item"
 msgstr ""
 
@@ -3915,7 +4177,7 @@ msgstr "Déclencheur incorrect"
 msgid "Incorrect trigger expression"
 msgstr "Expression de déclencheur incorrecte"
 
-#: api/classes/class.ctrigger.php:1259
+#: api/classes/class.ctrigger.php:1261
 #, php-format
 msgid "Incorrect trigger expression. Host \"%s\" does not exist or you have no access to this host."
 msgstr ""
@@ -3936,22 +4198,22 @@ msgstr "Utilisateur incorrect"
 msgid "Incorrect user data in"
 msgstr "Données utilisateur incorrectes dans"
 
-#: include/db.inc.php:1203
+#: include/db.inc.php:1178
 #, php-format
 msgid "Incorrect value \"%1$s\" for float field \"%2$s\"."
 msgstr ""
 
-#: include/db.inc.php:1199
+#: include/db.inc.php:1174
 #, php-format
 msgid "Incorrect value \"%1$s\" for int field \"%2$s\"."
 msgstr ""
 
-#: include/db.inc.php:1195
+#: include/db.inc.php:1170
 #, php-format
 msgid "Incorrect value \"%1$s\" for unsigned int field \"%2$s\"."
 msgstr ""
 
-#: include/db.inc.php:1180
+#: include/db.inc.php:1155
 #, php-format
 msgid "Incorrect value \"NULL\" for NOT NULL field \"%s\"."
 msgstr ""
@@ -4004,14 +4266,19 @@ msgstr "Installateur"
 msgid "Interface"
 msgstr ""
 
-#: api/classes/class.chostinterface.php:517
+#: api/classes/class.chostinterface.php:581
+#, php-format
+msgid "Interface is linked to item \"%s\""
+msgstr ""
+
+#: api/classes/class.chostinterface.php:518
 #, php-format
 msgid "Interface with DNS \" %1$s \" can not have empty IP address."
 msgstr ""
 
-#: api/classes/class.chostinterface.php:521
+#: api/classes/class.chostinterface.php:528
 #, php-format
-msgid "Interface with IP \" %1$s \" can not have empty DNS name."
+msgid "Interface with IP \"%1$s\" can not have empty DNS name while having \"Use DNS\" property on host \"%2$s\"."
 msgstr ""
 
 #: include/locales/en_gb.inc.php:937
@@ -4042,11 +4309,11 @@ msgstr "Est connecté ?"
 msgid "Issue"
 msgstr "Problème"
 
-#: api/classes/class.cuser.php:190
+#: api/classes/class.cuser.php:191
 msgid "It is not possible to filter by user password"
 msgstr ""
 
-#: api/classes/class.cuser.php:207
+#: api/classes/class.cuser.php:208
 msgid "It is not possible to search by user password"
 msgstr ""
 
@@ -4063,18 +4330,18 @@ msgstr "Elément"
 msgid "Item [%1$s:%2$s] cannot find interface on host [%3$s]"
 msgstr ""
 
-#: api/classes/class.citem.php:1389
+#: api/classes/class.citem.php:1392
 #, php-format
 msgid "Item [%1$s:%2$s] deleted."
 msgstr ""
 
-#: api/classes/class.cdiscoveryrule.php:674 api/classes/class.citem.php:1036
-#: api/classes/class.citemprototype.php:640
+#: api/classes/class.cdiscoveryrule.php:675 api/classes/class.citem.php:1039
+#: api/classes/class.citemprototype.php:641
 #, php-format
 msgid "Item [%1$s:%2$s] has invalid port: \"%3$s\"."
 msgstr ""
 
-#: api/classes/class.ctemplate.php:1907
+#: api/classes/class.ctemplate.php:1929
 #, php-format
 msgid "Item [%1$s:%2$s] unlinked."
 msgstr ""
@@ -4103,12 +4370,12 @@ msgstr "Elément / Fonction"
 msgid "Item prototype"
 msgstr ""
 
-#: api/classes/class.citemprototype.php:1003
+#: api/classes/class.citemprototype.php:1004
 #, php-format
 msgid "Item prototype [%1$s:%2$s] deleted."
 msgstr ""
 
-#: api/classes/class.ctemplate.php:1925
+#: api/classes/class.ctemplate.php:1947
 #, php-format
 msgid "Item prototype [%1$s:%2$s] unlinked."
 msgstr ""
@@ -4121,7 +4388,7 @@ msgstr ""
 msgid "Item updated"
 msgstr "Elément actualisé"
 
-#: api/classes/class.cdiscoveryrule.php:662 api/classes/class.citem.php:1024
+#: api/classes/class.cdiscoveryrule.php:663 api/classes/class.citem.php:1026
 msgid "Item uses Host interface from non parent host"
 msgstr ""
 
@@ -4129,7 +4396,7 @@ msgstr ""
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "L'élément ne sera pas rafraichi. Merci de saisir une période de mise à jour valide."
 
-#: api/classes/class.cwebcheck.php:584
+#: api/classes/class.cwebcheck.php:583
 #, php-format
 msgid "Item with key [%s] already exists"
 msgstr ""
@@ -4278,6 +4545,7 @@ msgstr "JOURNAUX"
 msgid "LOST"
 msgstr "PERDU"
 
+#: api/classes/class.cmap.php:578 include/forms/sysmap.edit.php:74
 #: include/locales/en_gb.inc.php:1220
 msgid "Label"
 msgstr "Label"
@@ -4362,7 +4630,7 @@ msgstr "Derniers événements"
 msgid "Latvian (LV)"
 msgstr "Letton (LV)"
 
-#: include/locales/en_gb.inc.php:659
+#: include/forms/sysmap.edit.php:123 include/locales/en_gb.inc.php:659
 msgid "Left"
 msgstr "Gauche"
 
@@ -4386,12 +4654,14 @@ msgstr "Lier des modèles additionnels"
 msgid "Link indicators"
 msgstr "Indicateurs de lien"
 
-#: api/classes/class.cmap.php:574 api/classes/class.cmap.php:681
-msgid "Link name should be unique."
+#: api/classes/class.cmap.php:627
+#, php-format
+msgid "Link name should be unique for map \"%s\"."
 msgstr ""
 
-#: api/classes/class.cmap.php:571 api/classes/class.cmap.php:678
-msgid "Link should have both \"name\" and \"url\" fields."
+#: api/classes/class.cmap.php:624
+#, php-format
+msgid "Link should have both \"name\" and \"url\" fields for map \"%s\"."
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1229
@@ -4406,9 +4676,17 @@ msgstr "Lier les indicateurs de statut"
 msgid "Link to template"
 msgstr "Lier au modèle"
 
+#: include/actions.inc.php:315
+msgid "Link to templates: "
+msgstr ""
+
 #: include/locales/en_gb.inc.php:1644
 msgid "Link to trigger?"
 msgstr "Lier au déclencheur ?"
+
+#: include/forms/action.edit.php:698
+msgid "Link with templates"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:946
 msgid "Linked templates"
@@ -4418,7 +4696,7 @@ msgstr "Modèles liés"
 msgid "Linked to"
 msgstr "Lié à"
 
-#: include/locales/en_gb.inc.php:1218
+#: include/forms/sysmap.edit.php:185 include/locales/en_gb.inc.php:1218
 msgid "Links"
 msgstr "Liens"
 
@@ -4574,12 +4852,12 @@ msgstr "Type de maintenance"
 msgid "Maintenance updated"
 msgstr "Maintenance modifiée"
 
-#: include/db.inc.php:1168
+#: include/db.inc.php:1143
 #, php-format
 msgid "Mandatory field \"%1$s\" is missing in table \"%2$s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1564
+#: include/forms/sysmap.edit.php:187 include/locales/en_gb.inc.php:1564
 msgid "Map"
 msgstr "Carte"
 
@@ -4591,9 +4869,18 @@ msgstr "Eléments de la carte"
 msgid "Map is saved! Return?"
 msgstr "Carte sauvegardée! Retour ?"
 
+#: include/forms/sysmap.edit.php:110
+msgid "Map label type"
+msgstr ""
+
 #: include/locales/en_gb.inc.php:1233
 msgid "Map save operation failed."
 msgstr "Echec de la sauvegarde de la carte"
+
+#: api/classes/class.cmap.php:662
+#, php-format
+msgid "Map with name \"%s\" already exists"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:486
 msgid "Mapping"
@@ -4610,6 +4897,10 @@ msgstr "Mar"
 #: include/locales/en_gb.inc.php:69 include/locales/en_gb.inc.php:801
 msgid "March"
 msgstr "Mars"
+
+#: include/forms/sysmap.edit.php:69
+msgid "Mark elements on trigger status change"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1267
 msgid "Mark elements on triggers status change"
@@ -4658,6 +4949,13 @@ msgstr "Nombre max d'événements par déclencheur à afficher"
 #: include/locales/en_gb.inc.php:1344
 msgid "Maximize"
 msgstr "Maximiser"
+
+#: api/classes/class.chost.php:1301
+#, php-format
+msgid "Maximum host name length is %2$d characters, \"%3$s\" is %1$d character."
+msgid_plural "Maximum host name length is %2$d characters, \"%3$s\" is %1$d characters."
+msgstr[0] ""
+msgstr[1] ""
 
 #: include/locales/en_gb.inc.php:58 include/locales/en_gb.inc.php:71
 #: include/locales/en_gb.inc.php:803
@@ -4720,7 +5018,7 @@ msgstr "Utilisation mémoire"
 msgid "Menu"
 msgstr "Menu"
 
-#: include/locales/en_gb.inc.php:376
+#: include/forms/action.edit.php:562 include/locales/en_gb.inc.php:376
 msgid "Message"
 msgstr "Message"
 
@@ -4884,7 +5182,8 @@ msgstr "NOTIFICATIONS"
 msgid "NTLM authentication"
 msgstr "Authentification NTLM"
 
-#: include/forms/script.edit.php:73 include/locales/en_gb.inc.php:1819
+#: include/forms/script.edit.php:73 include/forms/sysmap.edit.php:48
+#: include/forms/sysmap.edit.php:140 include/locales/en_gb.inc.php:1819
 msgid "Name"
 msgstr "Nom"
 
@@ -4912,7 +5211,8 @@ msgstr "Cartes réseau"
 msgid "Never"
 msgstr "Jamais"
 
-#: include/locales/en_gb.inc.php:325
+#: include/forms/action.edit.php:408 include/forms/action.edit.php:573
+#: include/forms/action.edit.php:745 include/locales/en_gb.inc.php:325
 msgid "New"
 msgstr "Nouveau"
 
@@ -5016,6 +5316,16 @@ msgstr "Prochaine vérification"
 msgid "No"
 msgstr "Non"
 
+#: include/export.inc.php:1492
+#, php-format
+msgid "No \"ymax_type\" field for graph \"%s\""
+msgstr ""
+
+#: include/export.inc.php:1488
+#, php-format
+msgid "No \"ymin_type\" field for graph \"%s\""
+msgstr ""
+
 #: include/locales/en_gb.inc.php:1628
 msgid "No IT service defined"
 msgstr "Pas de service défini"
@@ -5040,7 +5350,7 @@ msgstr "Pas d'application avec"
 msgid "No applications defined"
 msgstr "Aucune application définie"
 
-#: include/locales/en_gb.inc.php:323
+#: include/forms/action.edit.php:718 include/locales/en_gb.inc.php:323
 msgid "No conditions defined"
 msgstr "Aucune condition définie"
 
@@ -5056,7 +5366,7 @@ msgstr "Maintenance sans données"
 msgid "No dependencies defined"
 msgstr "Pas de dépendence définie"
 
-#: popup.php:1581
+#: popup.php:1709
 msgid "No discovery checks defined"
 msgstr ""
 
@@ -5100,20 +5410,20 @@ msgstr "Aucun graphique n'est défini"
 msgid "No groups defined"
 msgstr "Aucun groupe défini"
 
-#: api/classes/class.chost.php:1308 api/classes/class.chost.php:1318
+#: api/classes/class.chost.php:1318 api/classes/class.chost.php:1328
 #, php-format
-msgid "No groups for host [ %s ]"
+msgid "No groups for host \"%s\""
 msgstr ""
 
-#: api/classes/class.chost.php:1666
+#: api/classes/class.chost.php:1676
 msgid "No groups for hosts"
 msgstr ""
 
-#: api/classes/class.ctemplate.php:1341
+#: api/classes/class.ctemplate.php:1363
 msgid "No groups for template"
 msgstr ""
 
-#: api/classes/class.ctemplate.php:992
+#: api/classes/class.ctemplate.php:994
 #, php-format
 msgid "No groups for template [ %s ]"
 msgstr ""
@@ -5130,6 +5440,11 @@ msgstr "Pas de groupe d'hôte avec"
 msgid "No host with"
 msgstr "Pas d'hôte avec"
 
+#: include/hosts.inc.php:81
+#, php-format
+msgid "No host with hostid \"%s\"."
+msgstr ""
+
 #: include/locales/en_gb.inc.php:876
 msgid "No hosts defined"
 msgstr "Aucun hôte n'est défini"
@@ -5138,7 +5453,7 @@ msgstr "Aucun hôte n'est défini"
 msgid "No icon for map element"
 msgstr "Pas d'icône pour l'élément de la carte"
 
-#: include/locales/en_gb.inc.php:2087
+#: include/forms/sysmap.edit.php:53 include/locales/en_gb.inc.php:2087
 msgid "No image"
 msgstr "Pas d'image"
 
@@ -5146,22 +5461,22 @@ msgstr "Pas d'image"
 msgid "No images defined"
 msgstr "Aucune image n'est définie"
 
-#: api/classes/class.chost.php:1311 api/classes/class.chost.php:1329
+#: api/classes/class.chost.php:1321 api/classes/class.chost.php:1339
 #, php-format
-msgid "No interfaces for host [ %s ]"
+msgid "No interfaces for host \"%s\""
 msgstr ""
 
-#: api/classes/class.cproxy.php:358
+#: api/classes/class.cproxy.php:359
 #, php-format
 msgid "No interfaces for proxy \"%s\""
 msgstr ""
 
-#: api/classes/class.cproxy.php:351
+#: api/classes/class.cproxy.php:352
 #, php-format
 msgid "No interfaces provided for proxy \"%s\""
 msgstr ""
 
-#: api/classes/class.cproxy.php:341
+#: api/classes/class.cproxy.php:342
 #, php-format
 msgid "No interfaces provided for proxy \"%s\"."
 msgstr ""
@@ -5206,9 +5521,14 @@ msgstr "Aucun type média défini"
 msgid "No nodes defined"
 msgstr "Aucun noeud défini"
 
-#: include/locales/en_gb.inc.php:324
+#: include/forms/action.edit.php:352 include/locales/en_gb.inc.php:324
 msgid "No operations defined"
 msgstr "Aucune opération définie"
+
+#: include/export.inc.php:1351
+#, php-format
+msgid "No permission for trigger \"%s\""
+msgstr ""
 
 #: include/locales/en_gb.inc.php:2345
 msgid "No permissions for map"
@@ -5218,10 +5538,6 @@ msgstr "Pas de permission pour la carte"
 msgid "No permissions for screen"
 msgstr "Pas de permission pour l'écran"
 
-#: maps.php:122
-msgid "No permissions or map does not exist."
-msgstr ""
-
 #: include/locales/en_gb.inc.php:626
 msgid "No permissions to referred object or it does not exist!"
 msgstr ""
@@ -5229,6 +5545,10 @@ msgstr ""
 #: include/locales/en_gb.inc.php:878
 msgid "No proxies defined"
 msgstr "Pas de proxy défini"
+
+#: api/classes/class.caction.php:1413
+msgid "No recipients for operation message."
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1529
 msgid "No resources defined"
@@ -5281,6 +5601,10 @@ msgstr "Pas de carte système avec"
 #: include/locales/en_gb.inc.php:707
 msgid "No target selected"
 msgstr "Pas de cible sélectionnée"
+
+#: api/classes/class.caction.php:1443
+msgid "No targets for operation command."
+msgstr ""
 
 #: include/locales/en_gb.inc.php:877
 msgid "No templates defined"
@@ -5342,11 +5666,11 @@ msgstr "Noeuds"
 msgid "None"
 msgstr "Aucun"
 
-#: include/forms.inc.php:2931 include/locales/en_gb.inc.php:669
+#: include/forms.inc.php:2935 include/locales/en_gb.inc.php:669
 msgid "Normal"
 msgstr "Normal"
 
-#: include/forms.inc.php:2932
+#: include/forms.inc.php:2936
 msgid "Normal + Multiple PROBLEM events"
 msgstr ""
 
@@ -5406,6 +5730,7 @@ msgstr "Note"
 msgid "Notes"
 msgstr "Notes"
 
+#: api/classes/class.cmap.php:582 include/forms/sysmap.edit.php:78
 #: include/locales/en_gb.inc.php:1314
 msgid "Nothing"
 msgstr "Rien"
@@ -5551,7 +5876,7 @@ msgid "Only Super Admins can create media types"
 msgstr "Seuls les Super Admins peuvent créer des types de media"
 
 #. GETTEXT: Api exception
-#: api/classes/class.cusergroup.php:703
+#: api/classes/class.cusergroup.php:704
 msgid "Only Super Admins can delete User Groups."
 msgstr ""
 
@@ -5579,7 +5904,7 @@ msgstr "Seuls les Admins peuvent modifier des medias"
 msgid "Only Zabbix Admins can remove user Medias"
 msgstr "Seuls les Admins peuvent supprimer des medias"
 
-#: api/classes/class.cwebcheck.php:321 api/classes/class.cwebcheck.php:387
+#: api/classes/class.cwebcheck.php:320 api/classes/class.cwebcheck.php:386
 msgid "Only characters are allowed"
 msgstr "Seules des lettres sont autorisées"
 
@@ -5595,15 +5920,27 @@ msgstr "Seuls les déclencheurs assignés à des hôtes activés et déepndant d
 msgid "Operation cannot be performed due to unauthorized request"
 msgstr "L'opération ne peut pas être effectuée en raison d'une requête non autorisée"
 
-#: include/locales/en_gb.inc.php:316
+#: include/forms/action.edit.php:847 include/locales/en_gb.inc.php:316
 msgid "Operation condition"
 msgstr "Condition d'opération"
+
+#: include/forms/action.edit.php:799
+msgid "Operation details"
+msgstr ""
+
+#: api/classes/class.caction.php:1455
+msgid "Operation has no group to operate."
+msgstr ""
+
+#: api/classes/class.caction.php:1466
+msgid "Operation has no template to operate."
+msgstr ""
 
 #: include/locales/en_gb.inc.php:301
 msgid "Operation type"
 msgstr "Type d'opération"
 
-#: include/locales/en_gb.inc.php:321
+#: include/forms/action.edit.php:851 include/locales/en_gb.inc.php:321
 msgid "Operations"
 msgstr "Opérations"
 
@@ -5700,7 +6037,7 @@ msgstr "TEXTE BRUT"
 msgid "POP"
 msgstr "POP"
 
-#: api/classes/class.chostinterface.php:543
+#: api/classes/class.chostinterface.php:550
 msgid "PORT can not be empty for host interface"
 msgstr ""
 
@@ -5761,9 +6098,17 @@ msgstr "Pourcentage"
 msgid "Percentile line"
 msgstr "Ligne percentile"
 
-#: include/locales/en_gb.inc.php:441
+#: include/forms/action.edit.php:459 include/locales/en_gb.inc.php:441
 msgid "Period"
 msgstr "Période"
+
+#: include/forms/action.edit.php:50
+msgid "Period (minimum 60 seconds)"
+msgstr ""
+
+#: include/forms/action.edit.php:347
+msgid "Period (sec)"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:779
 msgid "Period type"
@@ -5882,7 +6227,7 @@ msgstr "Le module php-ldap est probablement absent"
 msgid "Problem"
 msgstr "Problème"
 
-#: include/locales/en_gb.inc.php:1364
+#: include/forms/sysmap.edit.php:137 include/locales/en_gb.inc.php:1364
 msgid "Problem display"
 msgstr "Affichage des problèmes"
 
@@ -6051,11 +6396,15 @@ msgstr "Expressions régulières"
 msgid "Remote command"
 msgstr "Commande à distance"
 
-#: include/locales/en_gb.inc.php:304
+#: include/forms/action.edit.php:620 include/locales/en_gb.inc.php:304
 msgid "Remote commands"
 msgstr "Commandes à distance"
 
-#: include/locales/en_gb.inc.php:1658
+#: include/forms/sysmap.edit.php:152 include/forms/sysmap.edit.php:170
+#: include/locales/en_gb.inc.php:1658 include/templates/action.js.php:9
+#: include/templates/action.js.php:21 include/templates/action.js.php:33
+#: include/templates/action.js.php:45 include/templates/action.js.php:65
+#: include/templates/action.js.php:86
 msgid "Remove"
 msgstr "Supprimer"
 
@@ -6067,7 +6416,15 @@ msgstr "Supprimer l'élément"
 msgid "Remove from"
 msgstr "Supprimer de"
 
-#: include/locales/en_gb.inc.php:327
+#: include/forms/action.edit.php:663
+msgid "Remove from host groups"
+msgstr ""
+
+#: include/actions.inc.php:297
+msgid "Remove from host groups: "
+msgstr ""
+
+#: include/actions.inc.php:274 include/locales/en_gb.inc.php:327
 msgid "Remove host"
 msgstr "Supprimer hôte"
 
@@ -6075,6 +6432,7 @@ msgstr "Supprimer hôte"
 msgid "Remove link"
 msgstr "Supprimer le lien"
 
+#: include/forms/action.edit.php:412 include/forms/action.edit.php:749
 #: include/locales/en_gb.inc.php:724
 msgid "Remove selected"
 msgstr "Supprimer sélection"
@@ -6159,7 +6517,7 @@ msgstr "Ressource"
 msgid "Response code"
 msgstr "Code de réponse"
 
-#: api/classes/class.cwebcheck.php:665
+#: api/classes/class.cwebcheck.php:664
 #, php-format
 msgid "Response code for step '%1$s' of scenario '%2$s'"
 msgstr ""
@@ -6168,7 +6526,7 @@ msgstr ""
 msgid "Response time"
 msgstr "Temps de réponse"
 
-#: api/classes/class.cwebcheck.php:658
+#: api/classes/class.cwebcheck.php:657
 #, php-format
 msgid "Response time for step '%1$s' of scenario '%2$s'"
 msgstr ""
@@ -6201,7 +6559,7 @@ msgstr "Réessayer"
 msgid "Return"
 msgstr "Retour"
 
-#: include/locales/en_gb.inc.php:1591
+#: include/forms/sysmap.edit.php:123 include/locales/en_gb.inc.php:1591
 msgid "Right"
 msgstr "Droit"
 
@@ -6229,6 +6587,18 @@ msgstr ""
 msgid "Rules"
 msgstr "Règles"
 
+#: include/actions.inc.php:246
+msgid "Run remote command on current host"
+msgstr ""
+
+#: include/actions.inc.php:266
+msgid "Run remote command on host groups: "
+msgstr ""
+
+#: include/actions.inc.php:253
+msgid "Run remote command on hosts: "
+msgstr ""
+
 #: include/locales/en_gb.inc.php:370
 msgid "Run remote commands"
 msgstr "Lancement commande à distance"
@@ -6245,7 +6615,7 @@ msgstr "S"
 msgid "SCENARIOS"
 msgstr "SCENARIOS"
 
-#: include/locales/en_gb.inc.php:1601 screens.php:172 screens.php:212
+#: include/locales/en_gb.inc.php:1601 screens.php:171 screens.php:211
 msgid "SCREENS"
 msgstr ""
 
@@ -6389,7 +6759,8 @@ msgstr "Sam"
 msgid "Saturday"
 msgstr "Samedi"
 
-#: include/forms/script.edit.php:136 include/locales/en_gb.inc.php:1326
+#: include/forms/action.edit.php:857 include/forms/script.edit.php:136
+#: include/forms/sysmap.edit.php:194 include/locales/en_gb.inc.php:1326
 msgid "Save"
 msgstr "Sauver"
 
@@ -6401,17 +6772,17 @@ msgstr "Echelle"
 msgid "Scenario"
 msgstr "Scénario"
 
-#: api/classes/class.cwebcheck.php:542
+#: api/classes/class.cwebcheck.php:541
 #, php-format
 msgid "Scenario [%1$s] [%2$s] host [%3$s]"
 msgstr ""
 
-#: api/classes/class.cwebcheck.php:400
+#: api/classes/class.cwebcheck.php:331 api/classes/class.cwebcheck.php:399
 #, php-format
 msgid "Scenario [%s] already exists."
 msgstr ""
 
-#: api/classes/class.cwebcheck.php:535
+#: api/classes/class.cwebcheck.php:534
 #, php-format
 msgid "Scenario [%s] deleted."
 msgstr ""
@@ -6432,22 +6803,17 @@ msgstr "Scénario supprimé"
 msgid "Scenario disabled"
 msgstr "Scénario désactivé"
 
-#: api/classes/class.cwebcheck.php:627 api/classes/class.cwebcheck.php:724
+#: api/classes/class.cwebcheck.php:626 api/classes/class.cwebcheck.php:723
 msgid "Scenario step name should contain only printable characters."
 msgstr ""
 
-#: api/classes/class.cwebcheck.php:640 api/classes/class.cwebcheck.php:729
+#: api/classes/class.cwebcheck.php:639 api/classes/class.cwebcheck.php:728
 msgid "Scenario step number cannot be less than 1"
 msgstr "Le numéro d'étape de scénario ne peut pas être inférieur à 1"
 
 #: include/locales/en_gb.inc.php:195
 msgid "Scenario updated"
 msgstr "Scénario modifié"
-
-#: api/classes/class.cwebcheck.php:332
-#, php-format
-msgid "Scenarion [%s] already exists."
-msgstr ""
 
 #: include/locales/en_gb.inc.php:185
 msgid "Scenarios"
@@ -6520,7 +6886,7 @@ msgstr "Nom du script"
 msgid "Script updated"
 msgstr "Script modifié"
 
-#: api/classes/class.cscript.php:431 api/classes/class.cscript.php:487
+#: api/classes/class.cscript.php:416 api/classes/class.cscript.php:472
 #, php-format
 msgid "Script with scriptid [%s] does not exist."
 msgstr ""
@@ -6581,6 +6947,10 @@ msgstr "Contact Secondaire - Identifiant"
 msgid "Seconds"
 msgstr "Secondes"
 
+#: include/forms/action.edit.php:173 include/forms/action.edit.php:183
+#: include/forms/action.edit.php:193 include/forms/action.edit.php:204
+#: include/forms/action.edit.php:239 include/forms/action.edit.php:249
+#: include/forms/action.edit.php:259 include/forms/action.edit.php:269
 #: include/locales/en_gb.inc.php:1769
 msgid "Select"
 msgstr "Sélectionner"
@@ -6605,8 +6975,8 @@ msgstr "Sélection les lignes avec une valeur comme"
 msgid "Selected"
 msgstr "Sélectionné"
 
-#: actionconf.php:313
-msgid "Selected actions deleted."
+#: actionconf.php:308
+msgid "Selected actions deleted"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1500
@@ -6625,7 +6995,7 @@ msgstr "Envoi message"
 msgid "Send message to"
 msgstr "Envoyer le message"
 
-#: include/locales/en_gb.inc.php:334
+#: include/forms/action.edit.php:556 include/locales/en_gb.inc.php:334
 msgid "Send only to"
 msgstr "Envoyé uniquement à"
 
@@ -6633,11 +7003,19 @@ msgstr "Envoyé uniquement à"
 msgid "Send to"
 msgstr "Envoyer"
 
+#: include/forms/action.edit.php:541
+msgid "Send to User groups"
+msgstr ""
+
+#: include/forms/action.edit.php:542
+msgid "Send to Users"
+msgstr ""
+
 #: include/locales/en_gb.inc.php:62
 msgid "Sep"
 msgstr "Sep"
 
-#: include/locales/en_gb.inc.php:1363
+#: include/forms/sysmap.edit.php:130 include/locales/en_gb.inc.php:1363
 msgid "Separated"
 msgstr "Séparé"
 
@@ -7005,6 +7383,7 @@ msgstr "Statut des déclencheurs du groupe d'hôtes"
 msgid "Status of triggers"
 msgstr "Statut des déclencheurs"
 
+#: api/classes/class.cmap.php:581 include/forms/sysmap.edit.php:77
 #: include/locales/en_gb.inc.php:1313
 msgid "Status only"
 msgstr "Statut seulement"
@@ -7017,7 +7396,7 @@ msgstr "Statut actualisé"
 msgid "Step"
 msgstr "Etape"
 
-#: api/classes/class.cwebcheck.php:634
+#: api/classes/class.cwebcheck.php:633
 #, php-format
 msgid "Step [%s] already exists."
 msgstr ""
@@ -7026,7 +7405,7 @@ msgstr ""
 msgid "Step of scenario"
 msgstr "Etape du scénario"
 
-#: include/locales/en_gb.inc.php:203
+#: include/forms/action.edit.php:347 include/locales/en_gb.inc.php:203
 msgid "Steps"
 msgstr "Etapes"
 
@@ -7050,7 +7429,7 @@ msgstr "Style"
 msgid "Subfilter"
 msgstr "Sous-filtre"
 
-#: include/locales/en_gb.inc.php:372
+#: include/forms/action.edit.php:561 include/locales/en_gb.inc.php:372
 msgid "Subject"
 msgstr "Sujet"
 
@@ -7131,7 +7510,7 @@ msgstr "DÉCLENCHEURS"
 msgid "TRUE"
 msgstr "VRAI"
 
-#: include/db.inc.php:1150
+#: include/db.inc.php:1125
 #, php-format
 msgid "Table \"%s\" does not exist."
 msgstr ""
@@ -7144,7 +7523,8 @@ msgstr "La table users est vide. Possible corruption de la base de données."
 msgid "Tag"
 msgstr "Marque"
 
-#: include/locales/en_gb.inc.php:1134
+#: include/forms/action.edit.php:571 include/locales/en_gb.inc.php:1134
+#: include/templates/action.js.php:95
 msgid "Target"
 msgstr "Cible"
 
@@ -7156,7 +7536,7 @@ msgstr "Type de cible"
 msgid "Template"
 msgstr "Modèle"
 
-#: api/classes/class.ctemplate.php:1232
+#: api/classes/class.ctemplate.php:1254
 #, php-format
 msgid "Template [%1$s] deleted."
 msgstr ""
@@ -7193,7 +7573,7 @@ msgstr "Eléments en modèle"
 msgid "Templates"
 msgstr "Modèles"
 
-#: api/classes/class.ctemplate.php:2131
+#: api/classes/class.ctemplate.php:2153
 #, php-format
 msgid "Templates [%1$s] unlinked from hosts [%2$s]."
 msgstr ""
@@ -7338,7 +7718,7 @@ msgstr "Changer la méthode d'entrée"
 msgid "Too many hosts"
 msgstr "Trop d'hôtes"
 
-#: api/classes/class.cproxy.php:360
+#: api/classes/class.cproxy.php:361
 #, php-format
 msgid "Too many interfaces provided for proxy \"%s\"."
 msgstr ""
@@ -7347,7 +7727,7 @@ msgstr ""
 msgid "Tools"
 msgstr "Outils"
 
-#: include/locales/en_gb.inc.php:1279
+#: include/forms/sysmap.edit.php:123 include/locales/en_gb.inc.php:1279
 msgid "Top"
 msgstr "Haut"
 
@@ -7379,46 +7759,51 @@ msgstr "Tendances stockées"
 msgid "Trigger"
 msgstr "Déclencheur"
 
-#: api/classes/class.ctrigger.php:1272
-#: api/classes/class.ctriggerprototype.php:1080
+#: api/classes/class.ctrigger.php:1600
+#, php-format
+msgid "Trigger \"%s\" already exists."
+msgstr ""
+
+#: api/classes/class.ctrigger.php:1274
+#: api/classes/class.ctriggerprototype.php:1081
 #, php-format
 msgid "Trigger [%1$s:%2$s] already exists."
 msgstr ""
 
-#: api/classes/class.ctrigger.php:1527
-#: api/classes/class.ctriggerprototype.php:1355
+#: api/classes/class.ctrigger.php:1526
+#: api/classes/class.ctriggerprototype.php:1356
 #, php-format
 msgid "Trigger [%1$s:%2$s] created."
 msgstr ""
 
-#: api/classes/class.ctrigger.php:1418
+#: api/classes/class.ctrigger.php:1417
 #, php-format
 msgid "Trigger [%1$s:%2$s] deleted."
 msgstr ""
 
-#: api/classes/class.ctriggerprototype.php:1102
+#: api/classes/class.ctriggerprototype.php:1103
 #, php-format
 msgid "Trigger [%1$s:%2$s] does not have item prototype."
 msgstr ""
 
-#: api/classes/class.ctemplate.php:2042
+#: api/classes/class.ctemplate.php:2064
 #, php-format
 msgid "Trigger [%1$s:%2$s] unlinked."
 msgstr ""
 
-#: api/classes/class.ctrigger.php:1629
+#: api/classes/class.ctrigger.php:1632
 #, php-format
 msgid "Trigger [%1$s:%2$s] updated."
 msgstr ""
 
-#: api/classes/class.ctrigger.php:1716 api/classes/class.ctrigger.php:1751
-#: api/classes/class.ctriggerprototype.php:1514
-#: api/classes/class.ctriggerprototype.php:1549
+#: api/classes/class.ctrigger.php:1719 api/classes/class.ctrigger.php:1754
+#: api/classes/class.ctriggerprototype.php:1515
+#: api/classes/class.ctriggerprototype.php:1550
 #, php-format
 msgid "Trigger [%1$s] already exists on [%2$s]"
 msgstr ""
 
-#: api/classes/class.ctriggerprototype.php:1191
+#: api/classes/class.ctriggerprototype.php:1192
 #, php-format
 msgid "Trigger [%1$s] does not have item prototype."
 msgstr ""
@@ -7447,26 +7832,30 @@ msgstr "Description déclencheur"
 msgid "Trigger form"
 msgstr ""
 
-#: api/classes/class.ctemplate.php:1704
+#: api/classes/class.ctemplate.php:1726
 #, php-format
 msgid "Trigger in template [ %1$s ] has dependency with trigger in template [ %2$s ]"
 msgstr ""
 
-#: api/classes/class.ctriggerprototype.php:1062
+#: api/classes/class.ctriggerprototype.php:1063
 msgid "Trigger just added. No status update so far."
 msgstr ""
 
-#: api/classes/class.ctriggerprototype.php:1314
+#: include/forms/sysmap.edit.php:104
+msgid "Trigger label type"
+msgstr ""
+
+#: api/classes/class.ctriggerprototype.php:1315
 #, php-format
 msgid "Trigger prototype [%1$s:%2$s] deleted."
 msgstr ""
 
-#: api/classes/class.ctemplate.php:2059
+#: api/classes/class.ctemplate.php:2081
 #, php-format
 msgid "Trigger prototype [%1$s:%2$s] unlinked."
 msgstr ""
 
-#: api/classes/class.ctriggerprototype.php:1446
+#: api/classes/class.ctriggerprototype.php:1447
 #, php-format
 msgid "Trigger prototype [%1$s:%2$s] updated."
 msgstr ""
@@ -7487,9 +7876,9 @@ msgstr "Déclencheur mis à jour"
 msgid "Trigger value"
 msgstr "Valeur déclencheur"
 
-#: api/classes/class.ctrigger.php:1720 api/classes/class.ctrigger.php:1754
-#: api/classes/class.ctriggerprototype.php:1518
-#: api/classes/class.ctriggerprototype.php:1552
+#: api/classes/class.ctrigger.php:1723 api/classes/class.ctrigger.php:1757
+#: api/classes/class.ctriggerprototype.php:1519
+#: api/classes/class.ctriggerprototype.php:1553
 msgid "Trigger with same name but other type exists"
 msgstr ""
 
@@ -7578,7 +7967,7 @@ msgstr "ACTIF"
 msgid "UPDATE"
 msgstr "MODIF"
 
-#: include/locales/en_gb.inc.php:1708
+#: include/forms/sysmap.edit.php:140 include/locales/en_gb.inc.php:1708
 msgid "URL"
 msgstr "URL"
 
@@ -7634,7 +8023,7 @@ msgstr "Impossible de sélectionner la configuration"
 msgid "Unacknowledged"
 msgstr "Non acquitté"
 
-#: include/locales/en_gb.inc.php:1362
+#: include/forms/sysmap.edit.php:131 include/locales/en_gb.inc.php:1362
 msgid "Unacknowledged only"
 msgstr "Non acquittés uniquement"
 
@@ -7710,6 +8099,14 @@ msgstr "Supprimer lien et nettoyer"
 msgid "Unlink from template"
 msgstr "Supprimer lien au modèle"
 
+#: include/forms/action.edit.php:698
+msgid "Unlink from templates"
+msgstr ""
+
+#: include/actions.inc.php:317
+msgid "Unlink from templates: "
+msgstr ""
+
 #: include/locales/en_gb.inc.php:1912
 msgid "Unmute"
 msgstr "Activer le son"
@@ -7722,7 +8119,8 @@ msgstr "Symboles inutiles détectés"
 msgid "Up"
 msgstr "Haut"
 
-#: include/locales/en_gb.inc.php:921
+#: include/forms/action.edit.php:794 include/locales/en_gb.inc.php:921
+#: include/templates/action.js.php:261 include/templates/action.js.php:276
 msgid "Update"
 msgstr "Actualiser"
 
@@ -7750,6 +8148,14 @@ msgstr "Actualisé"
 #: include/locales/en_gb.inc.php:934
 msgid "Updated status of host"
 msgstr "Statut de l'hôte mis à jour"
+
+#: include/blocks.inc.php:408 include/blocks.inc.php:724
+#: include/blocks.inc.php:802 include/blocks.inc.php:1003
+#: include/blocks.inc.php:1081 include/blocks.inc.php:1129
+#: include/screens.inc.php:1470
+#, php-format
+msgid "Updated: %s"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:521
 msgid "Upload"
@@ -7833,7 +8239,7 @@ msgid "User group"
 msgstr "Groupe d'utilisateurs"
 
 #. GETTEXT: User gets this error message when tries to delete user group used in script
-#: api/classes/class.cusergroup.php:716
+#: api/classes/class.cusergroup.php:717
 #, php-format
 msgid "User group [%1$s] is used in script [%2$s]."
 msgstr ""
@@ -7902,7 +8308,22 @@ msgstr "TABLE DE CORRESPONDANCE"
 msgid "Value"
 msgstr "Valeur"
 
-#: include/db.inc.php:1186
+#: api/classes/class.cmap.php:643
+#, php-format
+msgid "Value \"%1$s\" is invalid for parameter \"grid_align\". Choices are: \"%2$s\" and \"%3$s\""
+msgstr ""
+
+#: api/classes/class.cmap.php:639
+#, php-format
+msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\""
+msgstr ""
+
+#: api/classes/class.cmap.php:647
+#, php-format
+msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\" and \"%3$s\""
+msgstr ""
+
+#: include/db.inc.php:1161
 #, php-format
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
 msgstr ""
@@ -7983,12 +8404,12 @@ msgstr "Web"
 msgid "Web item"
 msgstr "Elément Web"
 
-#: api/classes/class.cwebcheck.php:619 api/classes/class.cwebcheck.php:715
+#: api/classes/class.cwebcheck.php:618 api/classes/class.cwebcheck.php:714
 #, php-format
 msgid "Web item [%s] created."
 msgstr ""
 
-#: api/classes/class.cwebcheck.php:678
+#: api/classes/class.cwebcheck.php:677
 #, php-format
 msgid "Web item with key [%s] already exists."
 msgstr ""
@@ -7997,7 +8418,7 @@ msgstr ""
 msgid "Web monitoring"
 msgstr "Supervision Web"
 
-#: api/classes/class.cwebcheck.php:340
+#: api/classes/class.cwebcheck.php:339
 msgid "Webcheck must have at least one step."
 msgstr ""
 
@@ -8025,7 +8446,7 @@ msgstr "Bienvenue sur Zabbix ! Vous êtes connecté en tant que"
 msgid "When active"
 msgstr "Lorsque actif"
 
-#: include/locales/en_gb.inc.php:1535
+#: include/forms/sysmap.edit.php:49 include/locales/en_gb.inc.php:1535
 msgid "Width"
 msgstr "Largeur"
 
@@ -8069,18 +8490,18 @@ msgstr "Temps de travail"
 msgid "Write"
 msgstr "Ecriture"
 
-#: api/classes/class.cgraph.php:1086
-#: api/classes/class.cgraphprototype.php:1092
+#: api/classes/class.cgraph.php:1088
+#: api/classes/class.cgraphprototype.php:1094
 msgid "Wrong fields for graph"
 msgstr ""
 
-#: api/classes/class.chost.php:1293
+#: api/classes/class.chost.php:1294
 #, php-format
-msgid "Wrong fields for host [ %s ]"
+msgid "Wrong fields for host \"%s\""
 msgstr ""
 
-#: api/classes/class.cgraph.php:1100
-#: api/classes/class.cgraphprototype.php:1106
+#: api/classes/class.cgraph.php:1102
+#: api/classes/class.cgraphprototype.php:1108
 msgid "Wrong fields for items"
 msgstr ""
 
@@ -8088,22 +8509,22 @@ msgstr ""
 msgid "Wrong fields for media type"
 msgstr "Champs incorrects pour ce type de media"
 
-#: api/classes/class.cscreen.php:635
+#: api/classes/class.cscreen.php:627
 #, php-format
 msgid "Wrong fields for screen [ %s ]"
 msgstr ""
 
-#: api/classes/class.cscreen.php:804 api/classes/class.cscreen.php:843
-#: api/classes/class.cscreen.php:880
+#: api/classes/class.cscreen.php:796 api/classes/class.cscreen.php:835
+#: api/classes/class.cscreen.php:872
 msgid "Wrong fields for screen items"
 msgstr ""
 
-#: api/classes/class.cscript.php:384
+#: api/classes/class.cscript.php:369
 msgid "Wrong fields for script"
 msgstr ""
 
-#: api/classes/class.ctriggerprototype.php:1066
-#: api/classes/class.ctriggerprototype.php:1147
+#: api/classes/class.ctriggerprototype.php:1067
+#: api/classes/class.ctriggerprototype.php:1148
 msgid "Wrong fields for trigger"
 msgstr ""
 
@@ -8165,7 +8586,7 @@ msgstr "Y.m.d"
 msgid "Y.m.d H:i"
 msgstr "Y.m.d H:i"
 
-#: include/locales/en_gb.inc.php:2075
+#: include/locales/en_gb.inc.php:1315 include/locales/en_gb.inc.php:2075
 msgid "Y.m.d H:i:s"
 msgstr "Y.m.d H:i:s"
 
@@ -8205,7 +8626,23 @@ msgstr "Vous ne pouvez pas utiliser des modèles d'hôtes dans des expressions m
 msgid "You cannot view this URL as a"
 msgstr "Vous ne pouvez pas voir cette URL comme"
 
-#: api/classes/class.chost.php:1563
+#: api/classes/class.caction.php:1425
+msgid "You did not specify command for host group operation."
+msgstr ""
+
+#: api/classes/class.caction.php:1438
+msgid "You did not specify command for host operation."
+msgstr ""
+
+#: include/templates/action.js.php:335
+msgid "You did not specify host for operation."
+msgstr ""
+
+#: include/templates/action.js.php:322
+msgid "You did not specify host group for operation."
+msgstr ""
+
+#: api/classes/class.chost.php:1573
 msgid "You do not have enough rights for operation"
 msgstr ""
 
@@ -8362,6 +8799,7 @@ msgstr "existe déjà pour l'hôte"
 msgid "already linked to host"
 msgstr "déjà lié à l'hôte"
 
+#: include/forms/action.edit.php:756 include/forms/action.edit.php:763
 #: include/locales/en_gb.inc.php:393
 msgid "and"
 msgstr "et"
@@ -8483,6 +8921,10 @@ msgstr "dynamique"
 msgid "elements copy to ..."
 msgstr "éléments copiés vers ..."
 
+#: api/classes/class.caction.php:1383
+msgid "esc_step_from and esc_step_to must be set together."
+msgstr ""
+
 #: include/locales/en_gb.inc.php:2203
 msgid "every"
 msgstr "chaque"
@@ -8527,9 +8969,25 @@ msgstr "h"
 msgid "has been deleted from the system"
 msgstr "a été supprimé du système"
 
+#: api/classes/class.cmap.php:589
+msgid "host"
+msgstr ""
+
+#: api/classes/class.cmap.php:588
+msgid "host group"
+msgstr ""
+
 #: include/locales/en_gb.inc.php:1302
 msgid "http://www.zabbix.com"
 msgstr "http://www.zabbix.com"
+
+#: api/classes/class.cmap.php:587
+msgid "icon"
+msgstr ""
+
+#: api/classes/class.cmap.php:592
+msgid "image"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:402
 msgid "in"
@@ -8648,10 +9106,6 @@ msgstr "like"
 msgid "m"
 msgstr "m"
 
-#: include/locales/en_gb.inc.php:1315
-msgid "m.d.Y H:i:s"
-msgstr "m.d.Y H:i:s"
-
 #: include/locales/en_gb.inc.php:1995
 msgid "macro(s)"
 msgstr "macro(s)"
@@ -8659,6 +9113,10 @@ msgstr "macro(s)"
 #: include/locales/en_gb.inc.php:310
 msgid "maintenance"
 msgstr "maintenance"
+
+#: api/classes/class.cmap.php:591
+msgid "map"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:663
 msgid "max"
@@ -8748,6 +9206,7 @@ msgstr "sur"
 msgid "option in"
 msgstr "option in"
 
+#: include/forms/action.edit.php:759 include/forms/action.edit.php:762
 #: include/locales/en_gb.inc.php:396
 msgid "or"
 msgstr "ou"
@@ -8800,6 +9259,10 @@ msgstr "sec"
 msgid "seconds"
 msgstr "secondes"
 
+#: include/templates/action.js.php:107
+msgid "select"
+msgstr ""
+
 #: include/locales/en_gb.inc.php:354
 msgid "selected actions?"
 msgstr "actions sélectionnées ?"
@@ -8827,6 +9290,10 @@ msgstr "à"
 #: include/locales/en_gb.inc.php:2166
 msgid "to host"
 msgstr "vers l'hôte"
+
+#: api/classes/class.cmap.php:590
+msgid "trigger"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:2103
 msgid "updated"
@@ -8875,6 +9342,9 @@ msgstr "yes"
 #: include/locales/en_gb.inc.php:2055
 msgid "µ"
 msgstr "µ"
+
+#~ msgid "m.d.Y H:i:s"
+#~ msgstr "m.d.Y H:i:s"
 
 #~ msgid "\""
 #~ msgstr "\""
