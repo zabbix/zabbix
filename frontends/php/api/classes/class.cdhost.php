@@ -51,7 +51,6 @@ class CDHost extends CZBXAPI{
  * @param boolean $options['with_monitored_httptests'] only with monitored http tests
  * @param boolean $options['with_graphs'] only with graphs
  * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
- * @param int $options['extendoutput'] return all fields for Hosts
  * @param boolean $options['selectGroups'] select HostGroups
  * @param boolean $options['select_templates'] select Templates
  * @param boolean $options['selectItems'] select Items
@@ -124,8 +123,11 @@ class CDHost extends CZBXAPI{
 
 		if(is_array($options['output'])){
 			unset($sql_parts['select']['dhosts']);
+
+			$dbTable = DB::getSchema('dhosts');
 			foreach($options['output'] as $key => $field){
-				$sql_parts['select'][$field] = ' dh.'.$field;
+				if(isset($dbTable['fields'][$field]))
+					$sql_parts['select'][$field] = ' dh.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;
@@ -394,7 +396,6 @@ class CDHost extends CZBXAPI{
 
 Copt::memoryPick();
 		if(!is_null($options['countOutput'])){
-			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 

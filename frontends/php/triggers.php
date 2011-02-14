@@ -179,7 +179,9 @@ include_once('include/page_header.php');
 			unset($_REQUEST['form']);
 	}
 	else if(isset($_REQUEST['delete']) && isset($_REQUEST['triggerid'])){
+		DBstart();
 		$result = CTrigger::delete($_REQUEST['triggerid']);
+		$result = DBend($result);
 		show_messages($result, S_TRIGGER_DELETED, S_CANNOT_DELETE_TRIGGER);
 
 		if($result){
@@ -370,7 +372,7 @@ include_once('include/page_header.php');
 <?php
 	$triggers_wdgt = new CWidget();
 
-	$form = new CForm(null, 'get');
+	$form = new CForm('get');
 
 // Config
 	if(!isset($_REQUEST['form'])){
@@ -393,7 +395,7 @@ include_once('include/page_header.php');
 /* TABLE */
 
 // Triggers Header
-		$r_form = new CForm(null, 'get');
+		$r_form = new CForm('get');
 
 		$r_form->addItem(array(S_GROUP.SPACE,$pageFilter->getGroupsCB()));
 		$r_form->addItem(array(SPACE.S_HOST.SPACE,$pageFilter->getHostsCB()));
@@ -407,7 +409,7 @@ include_once('include/page_header.php');
 		$triggers_wdgt->addHeader($numrows, array('[ ',$tr_link,' ]'));
 // ----------------
 
-		$form = new CForm('triggers.php', 'post');
+		$form = new CForm();
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
 
 // Header Host
@@ -496,7 +498,7 @@ include_once('include/page_header.php');
 
 			if(!empty($trigger['discoveryRule'])){
 				$description[] = new CLink($trigger['discoveryRule']['description'], 'trigger_prototypes.php?parent_discoveryid='.
-					$trigger['discoveryRule']['itemid'],'discoveryName');
+					$trigger['discoveryRule']['itemid'],'gold');
 				$description[] = ':'.$trigger['description'];
 			}
 			else{
@@ -532,11 +534,11 @@ include_once('include/page_header.php');
 			}
 
 			if(!zbx_empty($trigger['error']) && !$templated){
-				$error = new CDiv(SPACE,'iconerror');
+				$error = new CDiv(SPACE,'status_icon iconerror');
 				$error->setHint($trigger['error'], '', 'on');
 			}
 			else{
-				$error = new CDiv(SPACE,'iconok');
+				$error = new CDiv(SPACE,'status_icon iconok');
 			}
 
 			switch($trigger['priority']){

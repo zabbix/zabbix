@@ -37,7 +37,6 @@ class CTriggerPrototype extends CZBXAPI{
  * @param array $options['applicationids']
  * @param array $options['status']
  * @param array $options['editable']
- * @param array $options['extendoutput']
  * @param array $options['count']
  * @param array $options['pattern']
  * @param array $options['limit']
@@ -126,9 +125,12 @@ class CTriggerPrototype extends CZBXAPI{
 
 		if(is_array($options['output'])){
 			unset($sql_parts['select']['triggers']);
+
+			$dbTable = DB::getSchema('triggers');
 			$sql_parts['select']['triggerid'] = ' t.triggerid';
 			foreach($options['output'] as $key => $field){
-				$sql_parts['select'][$field] = ' t.'.$field;
+				if(isset($dbTable['fields'][$field]))
+					$sql_parts['select'][$field] = ' t.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;
@@ -319,7 +321,7 @@ class CTriggerPrototype extends CZBXAPI{
 
 			$sql_parts['from']['functions'] = 'functions f';
 			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
-			$sql_parts['where'][] = DBcondition('f.function', $options['functions'], false, true);
+			$sql_parts['where'][] = DBcondition('f.function', $options['functions']);
 		}
 
 // monitored
@@ -458,7 +460,7 @@ class CTriggerPrototype extends CZBXAPI{
 
 				$sql_parts['from']['hosts'] = 'hosts h';
 				$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
-				$sql_parts['where']['host'] = DBcondition('h.host', $options['filter']['host'], false, true);
+				$sql_parts['where']['host'] = DBcondition('h.host', $options['filter']['host']);
 			}
 
 			if(isset($options['filter']['hostid']) && !is_null($options['filter']['hostid'])){
@@ -657,7 +659,6 @@ class CTriggerPrototype extends CZBXAPI{
 
 Copt::memoryPick();
 		if(!is_null($options['countOutput'])){
-			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 
@@ -1066,7 +1067,7 @@ COpt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for trigger'));
 				}
 
-				$expressionData = new CTriggerExpression(array('expression' => $expression));
+				$expressionData = new CTriggerExpression(array('expression' => $trigger['expression']));
 
 				if(!empty($expressionData->errors)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->errors);
