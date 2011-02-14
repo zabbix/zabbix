@@ -1542,7 +1542,7 @@ msgid "Copy selected triggers?"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:637
-msgid "Copyright 2001-2010 by"
+msgid "Copyright 2001-2011 by"
 msgstr "Autortiesības 2001-2011"
 
 #: include/locales/en_gb.inc.php:2222
