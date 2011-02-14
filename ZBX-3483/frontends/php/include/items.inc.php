@@ -747,14 +747,76 @@
 			}
 		}
 
-		if($item_data['type'] != ITEM_TYPE_SSH && $item_data['type'] != ITEM_TYPE_TELNET){
-			$item['username'] = '';
-			$item['password'] = '';
+
+		/**
+		 * @var array Fields as replace default
+		 * @todo Add all other fields
+		 */
+		$defaultRules = array(
+			'type' => array(
+				ITEM_TYPE_SSH => array('username', 'password', 'authtype', 'publickey', 'privatekey'),
+				ITEM_TYPE_TELNET => array('username', 'password'),
+			),
+			'authtype' => array(
+				ITEM_AUTHTYPE_PASSWORD => array('username', 'password'),
+				ITEM_AUTHTYPE_PUBLICKEY => array('username', 'password', 'publickey', 'privatekey'),
+			)
+		);
+
+		/**
+		 * @var array Fields to require
+		 * @todo Add all other fields
+		 */
+		$requireRules = array(
+			'authtype2' => array(
+				'type' => array(ITEM_TYPE_SSH)),
+			'username' => array(
+				'type' => array(ITEM_TYPE_SSH, ITEM_TYPE_TELNET),
+				//'authtype' => array(ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY)
+			),
+			'password' => array(
+				'type' => array(ITEM_TYPE_SSH, ITEM_TYPE_TELNET),
+				//'authtype' => array(ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY)
+			),
+			'publickey' => array(
+				'type' => array(ITEM_TYPE_SSH),
+				'authtype' => array(ITEM_AUTHTYPE_PUBLICKEY)
+			),
+			'privatekey' => array(
+				'type' => array(ITEM_TYPE_SSH),
+				'authtype' => array(ITEM_AUTHTYPE_PUBLICKEY)
+			),
+		);
+
+		/**
+		 * @var array Default item fields value
+		 * @todo Add all other fields
+		 */
+		$defaultItemValue = array(
+			'authtype' => 0, 'username' => '', 'password' => '', 'publickey' => '', 'privatekey' => '',
+		);
+
+
+		foreach($item as $field => $value){
+			if(isset($requireRules[$field]) && !empty($value)){
+
+				foreach($requireRules[$field] as $requireField => $allowArray){
+					if(isset($item[$requireField] ) && !in_array($item[$requireField], $allowArray)){
+						unset($item[$field]);
+					}
+					else if(!in_array($item_data[$requireField], $allowArray)){
+							unset($item[$field]);
+					}
+				}
+			}
 		}
-		if($item_data['type'] != ITEM_TYPE_SSH || ($item_data['type'] == ITEM_TYPE_SSH && $item_data['authtype'] != ITEM_AUTHTYPE_PUBLICKEY)){
-			$item['publickey'] = '';
-			$item['privatekey'] = '';
+
+		if(isset($item['type']) && $item['type'] != $item_data['type'] && isset($defaultRules['type'][$item_data['type']])){
+			foreach($defaultRules['type'][$item_data['type']] as $field){
+				if(!isset($item[$field]) || empty($item[$field])) $item[$field] = $defaultItemValue[$field];
+			}
 		}
+
 
 /*		if($item_data['type'] == ITEM_TYPE_HTTPTEST)
 			$item['applications'] = get_applications_by_itemid($itemid);*/
