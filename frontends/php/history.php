@@ -299,7 +299,7 @@ include_once('include/page_header.php');
 			$options['limit'] = 500;
 		}
 		else if($_REQUEST['action']=='showvalues'){
-			$options['time_from'] = $time - 10; // some seconds to take script execued
+			$options['time_from'] = $time - 10; // some seconds to allow script to execute
 			$options['time_till'] = $till;
 
 			$options['limit'] = $config['search_limit'];
@@ -308,8 +308,8 @@ include_once('include/page_header.php');
 // TEXT LOG
 		if(isset($iv_string[$item['value_type']])){
 			$logItem = ($item['value_type'] == ITEM_VALUE_TYPE_LOG);
-			// is this an eventolog item? If so, we must show some additional columns
-			$eventLogItem = (strpos($itm['key_'], 'eventlog[') === 0);
+			// is this an eventlog item? If so, we must show some additional columns
+			$eventLogItem = (strpos($item['key_'], 'eventlog[') === 0);
 
 			$table = new CTableInfo('...');
 			$table->setHeader(array(
@@ -392,7 +392,7 @@ include_once('include/page_header.php');
 
 				$table->addRow($crow);
 
-// Plaint Text
+// Plain Text
 				if(!isset($_REQUEST['plaintext'])) continue;
 
 				$ptData['body'][] = zbx_date2str(S_HISTORY_LOG_ITEM_PLAINTEXT,$data['clock']);
