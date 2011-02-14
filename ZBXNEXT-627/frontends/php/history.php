@@ -143,7 +143,7 @@ include_once('include/page_header.php');
 		'nodeids' => get_current_nodeid(),
 		'itemids' => $_REQUEST['itemid'],
 		'webitems' => 1,
-		'selectHosts' => array('hostid','host'),
+		'selectHosts' => array('hostid','name'),
 		'output' => API_OUTPUT_EXTEND
 	);
 
@@ -156,7 +156,7 @@ include_once('include/page_header.php');
 
 	$item = reset($items);
 	$host = reset($item['hosts']);
-	$item['host'] = $host['host'];
+	$item['hostname'] = $host['name'];
 
 // resets get params for proper page refresh
 	if(isset($_REQUEST['period']) || isset($_REQUEST['stime'])){
@@ -187,9 +187,9 @@ include_once('include/page_header.php');
 	);
 
 	if(count($items) == 1){
-		$ptData['header'][] = $item['host'].': '.item_description($item);
+		$ptData['header'][] = $item['hostname'].': '.item_description($item);
 
-		$header['left'] = array(new CLink($item['host'],'latest.php?hostid='.$item['hostid']),': ',item_description($item));
+		$header['left'] = array(new CLink($item['hostname'],'latest.php?hostid='.$item['hostid']),': ',item_description($item));
 
 		if('showgraph' == $_REQUEST['action']){
 			$header['right'][] = get_icon('favourite', array(
@@ -248,7 +248,7 @@ include_once('include/page_header.php');
 				}
 
 				$host = reset($item['hosts']);
-				$cmbitemlist->addItem($itemid,$host['host'].': '.item_description($item));
+				$cmbitemlist->addItem($itemid,$host['hostname'].': '.item_description($item));
 			}
 
 			$addItemBttn = new CButton('add_log',S_ADD,"return PopUp('popup.php?multiselect=1".'&reference=itemid&srctbl=items&value_types[]='.$item['value_type']."&srcfld1=itemid');");
@@ -360,7 +360,7 @@ include_once('include/page_header.php');
 
 				$row = array(nbsp(zbx_date2str(S_HISTORY_LOG_ITEM_DATE_FORMAT,$data['clock'])));
 
-				if($fewItems) $row[] = $host['host'].':'.item_description($item);
+				if($fewItems) $row[] = $host['hostname'].':'.item_description($item);
 
 				if($logItem){
 					if($data['timestamp'] == 0) $row[] = new CCol(' - ');

@@ -460,7 +460,7 @@
 						'action'
 						),
 					is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
-					$_REQUEST['hostid'] == 0 ? $host['host'] : null,
+					$_REQUEST['hostid'] == 0 ? $host['name'] : null,
 					new CSpan($tr_desc, 'link_menu'),
 					new CCol(trigger_value2str($event['value']), get_trigger_value_style($event['value'])),
 					new CCol(get_severity_description($trigger['priority']), get_severity_style($trigger['priority'],$event['value'])),

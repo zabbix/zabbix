@@ -56,7 +56,7 @@
 	function make_decoration($haystack, $needle, $class=null){
 		$result = $haystack;
 
-		$pos = stripos($haystack,$needle);
+		$pos = zbx_stripos($haystack,$needle);
 		if($pos !== FALSE){
 			$start = zbx_substring($haystack, 0, $pos);
 //			$middle = substr($haystack, $pos, zbx_strlen($needle));

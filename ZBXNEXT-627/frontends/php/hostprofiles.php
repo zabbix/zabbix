@@ -38,7 +38,7 @@
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder('host', ZBX_SORT_UP);
+	validate_sort_and_sortorder('name', ZBX_SORT_UP);
 ?>
 <?php
 
@@ -85,7 +85,7 @@
 		}
 	}
 	else{
-		$sortfield = getPageSortField('host');
+		$sortfield = getPageSortField('name');
 		$sortorder = getPageSortOrder();
 		$options = array(
 			'output' => API_OUTPUT_EXTEND,
@@ -147,7 +147,7 @@
 		if(0 == $_REQUEST['prof_type']){
 			$table->setHeader(array(
 				is_show_all_nodes() ? make_sorting_header(S_NODE, 'hostid') : null,
-				make_sorting_header(S_HOST, 'host'),
+				make_sorting_header(S_HOST, 'name'),
 				S_GROUP,
 				make_sorting_header(S_NAME, 'pr_name'),
 				make_sorting_header(S_OS, 'pr_os'),
@@ -159,7 +159,7 @@
 		else{
 			$table->setHeader(array(
 				is_show_all_nodes() ? make_sorting_header(S_NODE, 'hostid') : null,
-				make_sorting_header(S_HOST, 'host'),
+				make_sorting_header(S_HOST, 'name'),
 				S_GROUP,
 				make_sorting_header(S_DEVICE_OS_SHORT, 'pre_device_os_short'),
 				make_sorting_header(S_DEVICE_HW_ARCH, 'pre_device_hw_arch'),
@@ -178,7 +178,7 @@
 
 			$row = array(
 				get_node_name_by_elid($host['hostid']),
-				new CLink($host['host'],'?hostid='.$host['hostid'].url_param('groupid').'&prof_type='.$_REQUEST['prof_type']),
+				new CLink($host['name'],'?hostid='.$host['hostid'].url_param('groupid').'&prof_type='.$_REQUEST['prof_type']),
 				$host_groups);
 			if(0 == $_REQUEST['prof_type']){
 				$row[] = zbx_str2links($host['profile']['name']);

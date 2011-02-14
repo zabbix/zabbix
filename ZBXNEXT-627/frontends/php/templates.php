@@ -90,7 +90,7 @@ include_once('include/page_header.php');
 
 // OUTER DATA
 	check_fields($fields);
-	validate_sort_and_sortorder('host', ZBX_SORT_UP);
+	validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go', 'none');
 
@@ -536,7 +536,7 @@ include_once('include/page_header.php');
 
 		$table->setHeader(array(
 			new CCheckBox('all_templates', NULL, "checkAll('".$form->getName()."', 'all_templates', 'templates');"),
-			make_sorting_header(S_TEMPLATES, 'host'),
+			make_sorting_header(S_TEMPLATES, 'name'),
 			S_APPLICATIONS,
 			S_ITEMS,
 			S_TRIGGERS,
@@ -551,7 +551,7 @@ include_once('include/page_header.php');
 // get templates
 		$templates = array();
 
-		$sortfield = getPageSortField('host');
+		$sortfield = getPageSortField('name');
 		$sortorder = getPageSortOrder();
 
 		if($pageFilter->groupsSelected){
@@ -576,9 +576,9 @@ include_once('include/page_header.php');
 			'templateids' => zbx_objectValues($templates, 'templateid'),
 			'editable' => 1,
 			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => array('hostid','host','status'),
-			'select_templates' => array('hostid','host','status'),
-			'selectParentTemplates' => array('hostid','host','status'),
+			'selectHosts' => array('hostid','name','status'),
+			'select_templates' => array('hostid','name','status'),
+			'selectParentTemplates' => array('hostid','name','status'),
 			'selectItems' => API_OUTPUT_COUNT,
 			'select_triggers' => API_OUTPUT_COUNT,
 			'select_graphs' => API_OUTPUT_COUNT,
@@ -598,7 +598,7 @@ include_once('include/page_header.php');
 				$proxy = get_host_by_hostid($template['proxy_hostid']);
 				$templates_output[] = $proxy['host'].':';
 			}
-			$templates_output[] = new CLink($template['host'], 'templates.php?form=update&templateid='.$template['templateid'].url_param('groupid'));
+			$templates_output[] = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid'].url_param('groupid'));
 
 			$applications = array(new CLink(S_APPLICATIONS,'applications.php?groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
 				' ('.$template['applications'].')');
@@ -667,7 +667,7 @@ include_once('include/page_header.php');
 					break;
 				}
 
-				$linked_to_output[] = new CLink($linked_to_host['host'], $url, $style);
+				$linked_to_output[] = new CLink($linked_to_host['name'], $url, $style);
 				$linked_to_output[] = ', ';
 			}
 			array_pop($linked_to_output);

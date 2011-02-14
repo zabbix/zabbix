@@ -788,8 +788,8 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			if(!isset($condition['opconditions'])) $condition['opconditions'] = array();
 			if(!isset($condition['mediatypeid'])) $condition['mediatypeid'] = 0;
 
-			$oper_details = new CSpan(get_operation_desc(SHORT_DESCRITION, $condition));
-			$oper_details->setHint(nl2br(get_operation_desc(LONG_DESCRITION, $condition)));
+			$oper_details = new CSpan(get_operation_desc(SHORT_DESCRIPTION, $condition));
+			$oper_details->setHint(nl2br(get_operation_desc(LONG_DESCRIPTION, $condition)));
 
 			$esc_steps_txt = null;
 			$esc_period_txt = null;
@@ -1317,7 +1317,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			order_result($action['operations'], 'operationtype', ZBX_SORT_DOWN);
 			foreach($action['operations'] as $onum => $operation){
 				$operations[] = array(
-					get_operation_desc(SHORT_DESCRITION, $operation),
+					get_operation_desc(SHORT_DESCRIPTION, $operation),
 					BR()
 				);
 			}

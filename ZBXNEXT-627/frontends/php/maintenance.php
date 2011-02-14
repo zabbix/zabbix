@@ -552,10 +552,10 @@ include_once('include/page_header.php');
 
 		$hosts = array_merge($hosts, $hosts_selected);
 		$hosts = zbx_toHash($hosts, 'hostid');
-		order_result($hosts, 'host');
+		order_result($hosts, 'name');
 
 		foreach($hosts as $host){
-			$host_tb->addItem($host['hostid'], $host['host']);
+			$host_tb->addItem($host['hostid'], $host['name']);
 		}
 
 		$tblHlink = new CTable(null, 'formElementTable');
