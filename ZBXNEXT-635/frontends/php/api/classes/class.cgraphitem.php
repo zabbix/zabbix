@@ -30,7 +30,6 @@ class CGraphItem extends CZBXAPI{
 /**
 * Get GraphItems data
 *
-* @static
 * @param array $options
 * @return array|boolean
 */
@@ -254,8 +253,7 @@ class CGraphItem extends CZBXAPI{
 /**
  * Get graph items by graph id and graph item id
  *
- * @static
- * @param _array $gitem_data
+ * @param array $gitem_data
  * @param array $gitem_data['itemid']
  * @param array $gitem_data['graphid']
  * @return string|boolean graphid

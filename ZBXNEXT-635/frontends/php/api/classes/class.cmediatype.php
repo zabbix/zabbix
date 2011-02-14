@@ -30,13 +30,7 @@ class CMediatype extends CZBXAPI{
 /**
  * Get Media types data
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $options
+ * @param array $options
  * @param array $options['nodeids'] filter by Node IDs
  * @param array $options['mediatypeids'] filter by Mediatype IDs
  * @param boolean $options['type'] filter by Mediatype type [ USER_TYPE_ZABBIX_USER: 1, USER_TYPE_ZABBIX_ADMIN: 2, USER_TYPE_SUPER_ADMIN: 3 ]
@@ -427,12 +421,6 @@ Copt::memoryPick();
 
 /**
  * Delete Media types
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
  *
  * @param array $mediatypes
  * @param array $mediatypes[0,...]['mediatypeids']

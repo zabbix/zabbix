@@ -30,13 +30,7 @@ class CUser extends CZBXAPI{
 /**
  * Get Users data
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $options
+ * @param array $options
  * @param array $options['nodeids'] filter by Node IDs
  * @param array $options['usrgrpids'] filter by UserGroup IDs
  * @param array $options['userids'] filter by User IDs
@@ -348,12 +342,6 @@ Copt::memoryPick();
 
 /**
  * Get User ID by User alias
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
  *
  * @param array $user_data
  * @param array $user_data['alias'] User alias
@@ -1165,13 +1153,13 @@ Copt::memoryPick();
 
 	}
 
-	public static function isReadable($ids){
+	public function isReadable($ids){
 		if(!is_array($ids)) return false;
 		if(empty($ids)) return true;
 
 		$ids = array_unique($ids);
 
-		$count = self::get(array(
+		$count = $this->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'userids' => $ids,
 			'output' => API_OUTPUT_SHORTEN,
@@ -1181,13 +1169,13 @@ Copt::memoryPick();
 		return (count($ids) == $count);
 	}
 
-	public static function isWritable($ids){
+	public function isWritable($ids){
 		if(!is_array($ids)) return false;
 		if(empty($ids)) return true;
 
 		$ids = array_unique($ids);
 
-		$count = self::get(array(
+		$count = $this->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'userids' => $ids,
 			'output' => API_OUTPUT_SHORTEN,

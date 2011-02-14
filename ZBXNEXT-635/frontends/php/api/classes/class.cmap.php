@@ -520,7 +520,7 @@ COpt::memoryPick();
 	return !empty($objs);
 	}
 
-	public static function checkInput($maps, $method){
+	public function checkInput($maps, $method){
 		$create = ($method == 'create');
 		$update = ($method == 'update');
 		$delete = ($method == 'delete');
@@ -528,7 +528,7 @@ COpt::memoryPick();
 // permissions
 		if($update || $delete){
 			$mapDbFields = array('sysmapid'=> null);
-			$dbMaps = self::get(array(
+			$dbMaps = $this->get(array(
 				'sysmapids' => zbx_objectValues($maps, 'sysmapid'),
 				'output' => API_OUTPUT_EXTEND,
 				'editable' => true,
@@ -656,7 +656,7 @@ COpt::memoryPick();
 				'output' => array('sysmapid', 'name'),
 				'nopermissions' => 1
 			);
-			$dbMaps = self::get($options);
+			$dbMaps = $this->get($options);
 			foreach($dbMaps as $dbmnum => $dbMap){
 				if($create || (bccomp($mapNames[$dbMap['name']],$dbMap['sysmapid']) != 0))
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Map with name "%s" already exists', $dbMap['name']));
@@ -684,7 +684,7 @@ COpt::memoryPick();
 	public function create($maps){
 		$maps = zbx_toArray($maps);
 
-			self::checkInput($maps, __FUNCTION__);
+			$this->checkInput($maps, __FUNCTION__);
 
 
 			$sysmapids = DB::insert('sysmaps', $maps);
@@ -734,7 +734,7 @@ COpt::memoryPick();
 		$maps = zbx_toArray($maps);
 		$sysmapids = zbx_objectValues($maps, 'sysmapid');
 
-			self::checkInput($maps, __FUNCTION__);
+			$this->checkInput($maps, __FUNCTION__);
 
 			$update = array();
 			$urlidsToDelete = $urlsToUpdate = $urlsToAdd = array();
@@ -748,7 +748,7 @@ COpt::memoryPick();
 				if(isset($map['urls'])){
 					$map['urls'] = zbx_toHash($map['urls'], 'name');
 
-					$dbSysmaps = self::get(array(
+					$dbSysmaps = $this->get(array(
 						'sysmapids' => $sysmapids,
 						'preservekeys' => true,
 						'output' => API_OUTPUT_EXTEND,
@@ -804,7 +804,7 @@ COpt::memoryPick();
 	public function delete($sysmapids){
 
 			$maps = zbx_toObject($sysmapids, 'sysmapid');
-			self::checkInput($maps, __FUNCTION__);
+			$this->checkInput($maps, __FUNCTION__);
 
 // delete maps from selements of other maps
 			DB::delete('sysmaps_elements', array(

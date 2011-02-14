@@ -31,12 +31,6 @@ class CItem extends CZBXAPI{
 /**
  * Get items data
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param array $options
  * @param array $options['itemids']
  * @param array $options['hostids']
@@ -814,12 +808,6 @@ COpt::memoryPick();
 
 /**
  * Get itemid by host.name and item.key
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
  *
  * @param array $item_data
  * @param array $item_data['key_']

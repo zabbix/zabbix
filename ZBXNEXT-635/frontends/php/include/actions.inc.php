@@ -79,7 +79,7 @@ return S_UNKNOWN;
 function condition_value2str($conditiontype, $value){
 	switch($conditiontype){
 		case CONDITION_TYPE_HOST_GROUP:
-			$groups = CHostGroup::get(array(
+			$groups = API::HostGroup()->get(array(
 				'groupids' => $value,
 				'output' => API_OUTPUT_EXTEND,
 				'nodeids' => get_current_nodeid(true),
@@ -220,7 +220,7 @@ function get_operation_desc($type, $data){
 				}
 
 
-				$usrgrps = CUserGroup::get(array(
+				$usrgrps = API::UserGroup()->get(array(
 					'usrgrpids' => zbx_objectValues($data['opmessage_grp'],'usrgrpid'),
 					'output' => API_OUTPUT_EXTEND
 				));
@@ -235,7 +235,7 @@ function get_operation_desc($type, $data){
 				if(!isset($data['opcommand_grp'])) $data['opcommand_grp'] = array();
 				if(!isset($data['opcommand_hst'])) $data['opcommand_hst'] = array();
 
-				$hosts = CHost::get(array(
+				$hosts = API::Host()->get(array(
 					'hostids' => zbx_objectValues($data['opcommand_hst'],'hostid'),
 					'output' => array('hostid', 'host')
 				));
@@ -255,7 +255,7 @@ function get_operation_desc($type, $data){
 				}
 
 
-				$groups = CHostgroup::get(array(
+				$groups = API::HostGroup()->get(array(
 					'groupids' => zbx_objectValues($data['opcommand_grp'],'groupid'),
 					'output' => array('groupid', 'name')
 				));
@@ -283,7 +283,7 @@ function get_operation_desc($type, $data){
 			case OPERATION_TYPE_GROUP_REMOVE:
 				if(!isset($data['opgroup'])) $data['opgroup'] = array();
 
-				$groups = CHostgroup::get(array(
+				$groups = API::HostGroup()->get(array(
 					'groupids' => zbx_objectValues($data['opgroup'],'groupid'),
 					'output' => array('groupid', 'name')
 				));
@@ -303,7 +303,7 @@ function get_operation_desc($type, $data){
 			case OPERATION_TYPE_TEMPLATE_REMOVE:
 				if(!isset($data['optemplate'])) $data['optemplate'] = array();
 
-				$templates = CTemplate::get(array(
+				$templates = API::Template()->get(array(
 					'templateids' => zbx_objectValues($data['optemplate'],'templateid'),
 					'output' => array('hostid', 'host')
 				));
@@ -352,7 +352,7 @@ function get_operation_desc($type, $data){
 				if(!isset($data['opcommand_grp'])) $data['opcommand_grp'] = array();
 				if(!isset($data['opcommand_hst'])) $data['opcommand_hst'] = array();
 
-				$hosts = CHost::get(array(
+				$hosts = API::Host()->get(array(
 					'hostids' => zbx_objectValues($data['opcommand_hst'],'hostid'),
 					'output' => array('hostid', 'host'),
 					'preservekeys' => true
@@ -372,7 +372,7 @@ function get_operation_desc($type, $data){
 					$result[] = italic(zbx_nl2br($command['command']));
 				}
 
-				$groups = CHostgroup::get(array(
+				$groups = API::HostGroup()->get(array(
 					'groupids' => zbx_objectValues($data['opcommand_grp'],'groupid'),
 					'output' => array('groupid', 'name'),
 					'preservekeys' => true

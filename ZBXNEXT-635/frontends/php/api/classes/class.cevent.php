@@ -31,12 +31,6 @@ class CEvent extends CZBXAPI{
 /**
  * Get events data
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param _array $options
  * @param array $options['itemids']
  * @param array $options['hostids']
@@ -584,12 +578,6 @@ Copt::memoryPick();
 
 /**
  * Add events ( without alerts )
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
  *
  * @param _array $events multidimensional array with events data
  * @param array $events[0,...]['source']

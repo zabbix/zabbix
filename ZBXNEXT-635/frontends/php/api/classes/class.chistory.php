@@ -31,12 +31,6 @@ class CHistory extends CZBXAPI{
 /**
  * Get history data
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8.3
- * @version 1.3
- *
  * @param array $options
  * @param array $options['itemids']
  * @param boolean $options['editable']

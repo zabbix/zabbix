@@ -1093,7 +1093,7 @@ COpt::memoryPick();
 
 		foreach($graphs as $gnum => $graph){
 			if(!isset($graph['name'])) continue;
-			$hosts = CHost::get(array(
+			$hosts = API::Host()->get(array(
 				'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
 				'nopermissions'=> true,
 				'preservekeys' => true

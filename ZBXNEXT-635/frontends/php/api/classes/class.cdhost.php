@@ -30,12 +30,6 @@ class CDHost extends CZBXAPI{
 /**
  * Get Host data
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param _array $options
  * @param array $options['nodeids'] Node IDs
  * @param array $options['groupids'] HostGroup IDs
@@ -578,12 +572,6 @@ Copt::memoryPick();
 /**
  * Add Host
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param _array $dhosts multidimensional array with Hosts data
  */
 	public function create($dhosts){
@@ -593,12 +581,6 @@ Copt::memoryPick();
 /**
  * Update DHost
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param _array $dhosts multidimensional array with Hosts data
  */
 	public function update($dhosts){
@@ -607,12 +589,6 @@ Copt::memoryPick();
 
 /**
  * Delete Discovered Host
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
  *
  * @param array $dhosts
  * @param array $dhosts[0, ...]['hostid'] Host ID to delete

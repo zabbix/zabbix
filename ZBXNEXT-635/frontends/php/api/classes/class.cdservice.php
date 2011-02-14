@@ -30,12 +30,6 @@ class CDService extends CZBXAPI{
 /**
  * Get Service data
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param _array $options
  * @param array $options['nodeids'] Node IDs
  * @param array $options['groupids'] ServiceGroup IDs
