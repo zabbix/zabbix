@@ -1877,12 +1877,16 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$row = new CRow(array(new CCol(S_PUBLIC_KEY_FILE,'form_row_l'), new CCol(new CTextBox('publickey',$publickey,16),'form_row_r')));
 		$row->setAttribute('id', 'row_publickey');
 		$frmItem->addRow($row);
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'publickey');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'row_publickey');
 		zbx_subarray_push($authTypeVisibility, ITEM_AUTHTYPE_PUBLICKEY, 'publickey');
 		zbx_subarray_push($authTypeVisibility, ITEM_AUTHTYPE_PUBLICKEY, 'row_publickey');
 
 		$row = new CRow(array(new CCol(S_PRIVATE_KEY_FILE,'form_row_l'), new CCol(new CTextBox('privatekey',$privatekey,16),'form_row_r')));
 		$row->setAttribute('id', 'row_privatekey');
 		$frmItem->addRow($row);
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'privatekey');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'row_privatekey');
 		zbx_subarray_push($authTypeVisibility, ITEM_AUTHTYPE_PUBLICKEY, 'privatekey');
 		zbx_subarray_push($authTypeVisibility, ITEM_AUTHTYPE_PUBLICKEY, 'row_privatekey');
 
