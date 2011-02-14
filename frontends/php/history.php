@@ -310,7 +310,7 @@ include_once('include/page_header.php');
 		if(isset($iv_string[$item['value_type']])){
 			$logItem = ($item['value_type'] == ITEM_VALUE_TYPE_LOG);
 			// is this an eventlog item? If so, we must show some additional columns
-			$eventLogItem = (strpos($itm['key_'], 'eventlog[') === 0);
+			$eventLogItem = (strpos($item['key_'], 'eventlog[') === 0);
 
 			$table = new CTableInfo('...');
 			$table->setHeader(array(
