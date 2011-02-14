@@ -2098,13 +2098,13 @@ COpt::memoryPick();
 		return true;
 	}
 
-	public static function isReadable($ids){
+	public function isReadable($ids){
 		if(!is_array($ids)) return false;
 		if(empty($ids)) return true;
 
 		$ids = array_unique($ids);
 
-		$count = self::get(array(
+		$count = $this->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'templateids' => $ids,
 			'output' => API_OUTPUT_SHORTEN,
@@ -2114,13 +2114,13 @@ COpt::memoryPick();
 		return (count($ids) == $count);
 	}
 
-	public static function isWritable($ids){
+	public function isWritable($ids){
 		if(!is_array($ids)) return false;
 		if(empty($ids)) return true;
 
 		$ids = array_unique($ids);
 
-		$count = self::get(array(
+		$count = $this->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'templateids' => $ids,
 			'output' => API_OUTPUT_SHORTEN,

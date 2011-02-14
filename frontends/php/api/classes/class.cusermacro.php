@@ -30,13 +30,7 @@ class CUserMacro extends CZBXAPI{
 /**
  * Get UserMacros data
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $options
+ * @param array $options
  * @param array $options['nodeids'] Node IDs
  * @param array $options['groupids'] UserMacrosGroup IDs
  * @param array $options['macroids'] UserMacros IDs
@@ -455,12 +449,6 @@ class CUserMacro extends CZBXAPI{
 /**
  * Delete UserMacros
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param array $hostmacroids
  * @param array $hostmacroids['hostmacroids']
  * @return boolean
@@ -496,12 +484,7 @@ class CUserMacro extends CZBXAPI{
 /**
  * Add global macros
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- * @param _array $macros
+ * @param array $macros
  * @param string $macros[0..]['macro']
  * @param string $macros[0..]['value']
  * @return array|boolean
@@ -598,12 +581,6 @@ class CUserMacro extends CZBXAPI{
 /**
  * Delete UserMacros
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param array $globalmacroids
  * @param array $globalmacroids['globalmacroids']
  * @return boolean
@@ -639,13 +616,7 @@ class CUserMacro extends CZBXAPI{
 /**
  * Validates macros expression
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $macros array with macros expressions
+ * @param array $macros array with macros expressions
  * @return array|boolean
  */
 	private function validate($macros){
@@ -679,12 +650,6 @@ class CUserMacro extends CZBXAPI{
 
 /**
  * Add Macros to Hosts
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
  *
  * @param array $data
  * @param array $data['templates']
@@ -774,12 +739,6 @@ class CUserMacro extends CZBXAPI{
 /**
  * Remove Macros from Hosts
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param array $data
  * @param array $data['hostids']
  * @param array $data['templateids']
@@ -825,12 +784,6 @@ class CUserMacro extends CZBXAPI{
 
 /**
  * Remove Macros from Hosts
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
  *
  * @param array $data
  * @param array $data['groups']

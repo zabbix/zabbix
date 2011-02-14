@@ -30,13 +30,7 @@ class CScreen extends CZBXAPI{
 /**
  * Get Screen data
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $options
+ * @param array $options
  * @param array $options['nodeids'] Node IDs
  * @param boolean $options['with_items'] only with items
  * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins

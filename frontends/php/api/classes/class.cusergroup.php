@@ -30,13 +30,7 @@ class CUserGroup extends CZBXAPI{
 /**
  * Get UserGroups
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $options
+ * @param array $options
  * @param array $options['nodeids'] Node IDs
  * @param array $options['usrgrpids'] UserGroup IDs
  * @param array $options['userids'] User IDs
@@ -698,13 +692,13 @@ class CUserGroup extends CZBXAPI{
 			return array('usrgrpids' => $usrgrpids);
 	}
 
-	public static function isReadable($ids){
+	public function isReadable($ids){
 		if(!is_array($ids)) return false;
 		if(empty($ids)) return true;
 
 		$ids = array_unique($ids);
 
-		$count = self::get(array(
+		$count = $this->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'usrgrpids' => $ids,
 			'output' => API_OUTPUT_SHORTEN,
@@ -714,13 +708,13 @@ class CUserGroup extends CZBXAPI{
 		return (count($ids) == $count);
 	}
 
-	public static function isWritable($ids){
+	public function isWritable($ids){
 		if(!is_array($ids)) return false;
 		if(empty($ids)) return true;
 
 		$ids = array_unique($ids);
 
-		$count = self::get(array(
+		$count = $this->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'usrgrpids' => $ids,
 			'output' => API_OUTPUT_SHORTEN,

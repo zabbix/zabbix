@@ -237,7 +237,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		try{
 			$new_operation = $_REQUEST['new_operation'];
 
-			CAction::validateOperations($new_operation);
+			API::Action()->validateOperations($new_operation);
 
 			$_REQUEST['operations'] = get_request('operations', array());
 
@@ -252,7 +252,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			unset($_REQUEST['new_operation']);
 		}
 		catch(APIException $e){
-			error($e->getErrors());
+			error($e->getMessage());
 		}
 	}
 	else if(inarr_isset(array('del_operation','g_operationid'))){

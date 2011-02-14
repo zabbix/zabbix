@@ -30,7 +30,6 @@ class CDRule extends CZBXAPI{
 /**
 * Get drule data
 *
-* @static
 * @param array $options
 * @return array
 */
@@ -424,7 +423,6 @@ COpt::memoryPick();
 /**
  * Create new drules
  *
- * @static
  * @param array $drules
  * @return boolean
  */
@@ -436,7 +434,6 @@ COpt::memoryPick();
 /**
  * Update existing drules
  *
- * @static
  * @param array $drules
  * @return boolean
  */
@@ -448,7 +445,6 @@ COpt::memoryPick();
 /**
  * Delete drules
  *
- * @static
  * @param array $drules
  * @param array $drules['druleids']
  * @return boolean

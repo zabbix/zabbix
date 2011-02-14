@@ -25,8 +25,8 @@
 
 class CWebCheck extends CZBXAPI{
 
-	private static $history = 30;
-	private static $trends = 90;
+	private $history = 30;
+	private $trends = 90;
 
 	public function get($options=array()){
 		global $USER_DETAILS;
@@ -552,8 +552,8 @@ COpt::memoryPick();
 			$item['delay'] = $webcheck['delay'];
 			$item['type'] = ITEM_TYPE_HTTPTEST;
 			$item['trapper_hosts'] = 'localhost';
-			$item['history'] = $this->$history;
-			$item['trends'] = $this->$trends;
+			$item['history'] = $this->history;
+			$item['trends'] = $this->trends;
 			$item['status'] = $webcheck['status'];
 		}
 		unset($item);
@@ -646,8 +646,8 @@ COpt::memoryPick();
 				$item['type'] = ITEM_TYPE_HTTPTEST;
 				$item['data_type'] = ITEM_DATA_TYPE_DECIMAL;
 				$item['trapper_hosts'] = 'localhost';
-				$item['history'] = $this->$history;
-				$item['trends'] = $this->$trends;
+				$item['history'] = $this->history;
+				$item['trends'] = $this->trends;
 				$item['status'] = $webcheck['status'];
 			}
 			unset($item);
