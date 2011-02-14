@@ -73,7 +73,7 @@ include_once('include/page_header.php');
 	if(id2nodeid($db_data['graphid']) != get_current_nodeid()){
 		$chart_header = get_node_name_by_elid($db_data['graphid'], true, ': ');
 	}
-	$chart_header.= $host['host'].': '.$db_data['name'];
+	$chart_header.= $host['name'].': '.$db_data['name'];
 
 
 	$graph = new CChart($db_data['graphtype']);

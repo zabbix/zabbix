@@ -2138,9 +2138,9 @@ return $caption;
 		$options = array(
 			'hostids' => $hostids,
 			'monitored' => 1,
-			'expandData' => 1,
 			'skipDependent' => 1,
 			'output' => API_OUTPUT_EXTEND,
+			'selectHosts' => array('hostid', 'name'),
 			'sortfield' => 'description'
 		);
 
@@ -2152,6 +2152,10 @@ return $caption;
 		$triggers = array();
 
 		foreach($db_triggers as $tnum => $row){
+			// Fill host details from first selected host to make old code untouched
+			$row['host'] = $row['hosts'][0]['name'];
+			$row['hostid'] = $row['hosts'][0]['hostid'];
+
 			$row['host'] = get_node_name_by_elid($row['hostid'], null, ': ').$row['host'];
 			$row['description'] = expand_trigger_description_constants($row['description'], $row);
 

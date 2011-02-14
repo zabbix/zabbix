@@ -178,7 +178,7 @@ include_once('include/page_header.php');
 			'with_monitored_items' => 1,
 			'output' => API_OUTPUT_SHORTEN,
 			'search' => array(
-				'host' => (empty($_REQUEST['filter_host']) ? null : $_REQUEST['filter_host']),
+				'name' => (empty($_REQUEST['filter_host']) ? null : $_REQUEST['filter_host']),
 				'ip' => (empty($_REQUEST['filter_ip']) ? null : $_REQUEST['filter_ip']),
 				'dns' => (empty($_REQUEST['filter_dns']) ? null : $_REQUEST['filter_dns']),
 			),
@@ -238,7 +238,7 @@ include_once('include/page_header.php');
 			$description[] = $proxy['host'] . ':';
 		}
 
-		$description[] = new CLink($host['host'], 'hosts.php?form=update&hostid='.$host['hostid'].url_param('groupid'));
+		$description[] = new CLink($host['name'], 'hosts.php?form=update&hostid='.$host['hostid'].url_param('groupid'));
 
 
 		switch($host['available']){

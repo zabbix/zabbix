@@ -645,12 +645,12 @@ include_once('include/page_header.php');
 			$sql_where = ' AND h.hostid='.$_REQUEST['hostid'];
 		}
 
-		$sql = 'SELECT DISTINCT h.host,h.hostid,a.* '.
+		$sql = 'SELECT DISTINCT h.name as hostname,h.hostid,a.* '.
 				' FROM applications a,hosts h '.
 				' WHERE a.hostid=h.hostid '.
 					$sql_where.
 					' AND '.DBcondition('h.hostid',$available_hosts).
-				order_by('a.applicationid,h.host,h.hostid','a.name');
+				order_by('a.applicationid,h.name,h.hostid','a.name');
 		$db_app_res = DBselect($sql);
 		while($db_app = DBfetch($db_app_res)){
 			$db_app['scenarios_cnt'] = 0;
@@ -663,13 +663,13 @@ include_once('include/page_header.php');
 		$db_httptests = array();
 		$db_httptestids = array();
 
-		$sql = 'SELECT wt.*,a.name as application, h.host,h.hostid '.
+		$sql = 'SELECT wt.*,a.name as application, h.name as hostname,h.hostid '.
 			' FROM httptest wt '.
 				' LEFT JOIN applications a on wt.applicationid=a.applicationid '.
 				' LEFT JOIN hosts h on h.hostid=a.hostid '.
 			' WHERE '.DBcondition('a.applicationid',$db_appids).
 				($showdisabled==0?' AND wt.status <> 1':'').
-			order_by('wt.name,wt.status','h.host');
+			order_by('wt.name,wt.status','h.name');
 //SDI($sql);
 		$db_httptests_res = DBselect($sql);
 		while($httptest_data = DBfetch($db_httptests_res)){
@@ -721,7 +721,7 @@ include_once('include/page_header.php');
 				new CRow(array(
 					$chkBox,
 					is_show_all_nodes()?SPACE:NULL,
-					($_REQUEST['hostid']>0) ? null : $db_app['host'],
+					($_REQUEST['hostid']>0) ? null : $db_app['hostname'],
 					$name,
 					$step_cout,
 					$httptest_data['delay'],

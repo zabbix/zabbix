@@ -559,10 +559,10 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 				host_unique_esc = DBdyn_escape_string(host_unique);
 
 				DBexecute("insert into hosts"
-							" (hostid,proxy_hostid,host)"
+							" (hostid,proxy_hostid,host,name)"
 						" values"
-							" (" ZBX_FS_UI64 ",%s,'%s')",
-						hostid, DBsql_id_ins(proxy_hostid), host_unique_esc);
+							" (" ZBX_FS_UI64 ",%s,'%s','%s')",
+						hostid, DBsql_id_ins(proxy_hostid), host_unique_esc, host_unique_esc);
 
 				DBadd_interface(hostid, interface_type, 1, row[2], host, port);
 
@@ -617,10 +617,10 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 				hostid = DBget_maxid("hosts");
 
 				DBexecute("insert into hosts"
-							" (hostid,proxy_hostid,host)"
+							" (hostid,proxy_hostid,host,name)"
 						" values"
-							" (" ZBX_FS_UI64 ",%s,'%s')",
-						hostid, DBsql_id_ins(proxy_hostid), host_esc);
+							" (" ZBX_FS_UI64 ",%s,'%s','%s')",
+						hostid, DBsql_id_ins(proxy_hostid), host_esc, host_esc);
 
 				DBadd_interface(hostid, INTERFACE_TYPE_AGENT, 1, row[2], row[1], port);
 			}

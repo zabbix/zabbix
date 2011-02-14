@@ -286,7 +286,7 @@ require_once('include/js.inc.php');
 		$host = get_host_by_itemid($itemid);
 
 		$table = new CTableInfo();
-		$table->setHeader(array(S_TIMESTAMP,$host['host'].': '.item_description($item)));
+		$table->setHeader(array(S_TIMESTAMP,$host['name'].': '.item_description($item)));
 
 		$options = array(
 			'history' => $item['value_type'],

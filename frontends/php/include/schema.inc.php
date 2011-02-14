@@ -2525,6 +2525,12 @@ return array(
 				'length' => 128,
 				'default' => '',
 			),
+			'name' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
+			),
 		),
 	),
 	'globalmacro' => array(
@@ -4475,7 +4481,7 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 5,
-				'default' => 'en_gb',
+				'default' => 'en_GB',
 			),
 			'refresh' => array(
 				'null' => false,

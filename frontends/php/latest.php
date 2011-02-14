@@ -205,7 +205,7 @@ include_once('include/page_header.php');
 	$table->setHeader(array(
 		$link,
 		is_show_all_nodes()?make_sorting_header(S_NODE,'h.hostid') : null,
-		($_REQUEST['hostid'] ==0)?make_sorting_header(S_HOST,'h.host') : NULL,
+		($_REQUEST['hostid'] ==0)?make_sorting_header(S_HOST,'h.name') : NULL,
 		make_sorting_header(S_DESCRIPTION,'i.description'),
 		make_sorting_header(S_LAST_CHECK,'i.lastclock'),
 		S_LAST_VALUE,
@@ -228,13 +228,13 @@ include_once('include/page_header.php');
 		$sql_where.= ' AND h.hostid='.$_REQUEST['hostid'];
 	}
 
-	$sql = 'SELECT DISTINCT h.host,h.hostid, a.* '.
+	$sql = 'SELECT DISTINCT h.name as hostname,h.hostid, a.* '.
 			' FROM applications a, hosts h '.$sql_from.
 			' WHERE a.hostid=h.hostid'.
 				$sql_where.
 				' AND '.DBcondition('h.hostid',$available_hosts).
 				' AND h.status='.HOST_STATUS_MONITORED.
-			order_by('h.host,h.hostid','a.name,a.applicationid');
+			order_by('h.name,h.hostid','a.name,a.applicationid');
 //SDI($sql);
 	$db_app_res = DBselect($sql);
 	while($db_app = DBfetch($db_app_res)){
@@ -359,7 +359,7 @@ include_once('include/page_header.php');
 		$table->addRow(array(
 			$link,
 			get_node_name_by_elid($db_app['applicationid']),
-			($_REQUEST['hostid'] > 0)?NULL:$db_app['host'],
+			($_REQUEST['hostid'] > 0)?NULL:$db_app['hostname'],
 			$col
 		));
 

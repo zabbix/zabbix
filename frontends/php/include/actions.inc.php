@@ -184,7 +184,7 @@ function condition_value2str($conditiontype, $value){
 			$host = get_host_by_hostid($value);
 			$str_val = '';
 			if(id2nodeid($value) != get_current_nodeid()) $str_val = get_node_name_by_elid($value, true, ': ');
-			$str_val.= $host['host'];
+			$str_val.= $host['name'];
 			break;
 		case CONDITION_TYPE_TRIGGER_NAME:
 		case CONDITION_TYPE_HOST_NAME:
@@ -260,14 +260,14 @@ function get_condition_desc($conditiontype, $operator, $value){
 		condition_value2str($conditiontype, $value);
 }
 
-define('LONG_DESCRITION', 0);
-define('SHORT_DESCRITION', 1);
+define('LONG_DESCRIPTION', 0);
+define('SHORT_DESCRIPTION', 1);
 
-function get_operation_desc($type=SHORT_DESCRITION, $data){
+function get_operation_desc($type=SHORT_DESCRIPTION, $data){
 	$result = null;
 
 	switch($type){
-		case SHORT_DESCRITION:
+		case SHORT_DESCRIPTION:
 			switch($data['operationtype']){
 				case OPERATION_TYPE_MESSAGE:
 					switch($data['object']){
@@ -311,16 +311,16 @@ function get_operation_desc($type=SHORT_DESCRITION, $data){
 					break;
 				case OPERATION_TYPE_TEMPLATE_ADD:
 					$obj_data = get_host_by_hostid($data['objectid']);
-					$result = S_LINK_TO_TEMPLATE.' "'.$obj_data['host'].'"';
+					$result = S_LINK_TO_TEMPLATE.' "'.$obj_data['name'].'"';
 					break;
 				case OPERATION_TYPE_TEMPLATE_REMOVE:
 					$obj_data = get_host_by_hostid($data['objectid']);
-					$result = S_UNLINK_FROM_TEMPLATE.' "'.$obj_data['host'].'"';
+					$result = S_UNLINK_FROM_TEMPLATE.' "'.$obj_data['name'].'"';
 					break;
 				default: break;
 			}
 			break;
-		case LONG_DESCRITION:
+		case LONG_DESCRIPTION:
 			switch($data['operationtype']){
 				case OPERATION_TYPE_MESSAGE:
 					// for PHP4

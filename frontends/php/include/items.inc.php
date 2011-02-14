@@ -663,7 +663,7 @@
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
 
 // COpt::profiling_start('prepare_data');
-		$result = DBselect('SELECT DISTINCT h.hostid, h.host,i.itemid, i.key_, i.value_type, i.lastvalue, i.units, '.
+		$result = DBselect('SELECT DISTINCT h.hostid, h.name as hostname,i.itemid, i.key_, i.value_type, i.lastvalue, i.units, '.
 				' i.description, t.priority, i.valuemapid, t.value as tr_value, t.triggerid '.
 			' FROM hosts h, items i '.
 				' LEFT JOIN functions f on f.itemid=i.itemid '.
@@ -681,22 +681,22 @@
 		$items = array();
 		while($row = DBfetch($result)){
 			$descr = item_description($row);
-			$row['host'] = get_node_name_by_elid($row['hostid'], null, ': ').$row['host'];
-			$hosts[zbx_strtolower($row['host'])] = $row['host'];
+			$row['hostname'] = get_node_name_by_elid($row['hostid'], null, ': ').$row['hostname'];
+			$hosts[zbx_strtolower($row['hostname'])] = $row['hostname'];
 
 // A little tricky check for attempt to overwrite active trigger (value=1) with
 // inactive or active trigger with lower priority.
-			if (!isset($items[$descr][$row['host']]) ||
+			if (!isset($items[$descr][$row['hostname']]) ||
 				(
-					(($items[$descr][$row['host']]['tr_value'] == TRIGGER_VALUE_FALSE) && ($row['tr_value'] == TRIGGER_VALUE_TRUE)) ||
+					(($items[$descr][$row['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE) && ($row['tr_value'] == TRIGGER_VALUE_TRUE)) ||
 					(
-						(($items[$descr][$row['host']]['tr_value'] == TRIGGER_VALUE_FALSE) || ($row['tr_value'] == TRIGGER_VALUE_TRUE)) &&
-						($row['priority'] > $items[$descr][$row['host']]['severity'])
+						(($items[$descr][$row['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE) || ($row['tr_value'] == TRIGGER_VALUE_TRUE)) &&
+						($row['priority'] > $items[$descr][$row['hostname']]['severity'])
 					)
 				)
 			)
 			{
-				$items[$descr][$row['host']] = array(
+				$items[$descr][$row['hostname']] = array(
 					'itemid'	=> $row['itemid'],
 					'value_type'=> $row['value_type'],
 					'lastvalue'	=> $row['lastvalue'],

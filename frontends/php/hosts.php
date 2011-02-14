@@ -130,7 +130,7 @@ include_once('include/page_header.php');
 
 // OUTER DATA
 	check_fields($fields);
-	validate_sort_and_sortorder('host', ZBX_SORT_UP);
+	validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go', 'none');
 
@@ -170,7 +170,7 @@ include_once('include/page_header.php');
 			'select_profile' => 1
 		);
 		$hosts = CHost::get($params);
-		order_result($hosts, 'host');
+		order_result($hosts, 'name');
 
 // SELECT HOST GROUPS
 		$params = array(
@@ -783,7 +783,7 @@ include_once('include/page_header.php');
 		$table = new CTableInfo(S_NO_HOSTS_DEFINED);
 		$table->setHeader(array(
 			new CCheckBox('all_hosts', null, "checkAll('" . $form->getName() . "','all_hosts','hosts');"),
-			make_sorting_header(S_NAME, 'host'),
+			make_sorting_header(S_NAME, 'name'),
 			S_APPLICATIONS,
 			S_ITEMS,
 			S_TRIGGERS,
@@ -798,7 +798,7 @@ include_once('include/page_header.php');
 // get Hosts
 		$hosts = array();
 
-		$sortfield = getPageSortField('host');
+		$sortfield = getPageSortField('name');
 		$sortorder = getPageSortOrder();
 
 		if($pageFilter->groupsSelected){
@@ -835,7 +835,7 @@ include_once('include/page_header.php');
 		$options = array(
 			'hostids' => zbx_objectValues($hosts, 'hostid'),
 			'output' => API_OUTPUT_EXTEND,
-			'selectParentTemplates' => array('hostid','host'),
+			'selectParentTemplates' => array('hostid','name'),
 			'selectInterfaces' => API_OUTPUT_EXTEND,
 			'selectItems' => API_OUTPUT_COUNT,
 			'selectDiscoveries' => API_OUTPUT_COUNT,
@@ -858,7 +858,7 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'templateids' => $templateids,
-			'selectParentTemplates' => array('hostid', 'host'),
+			'selectParentTemplates' => array('hostid', 'name'),
 		);
 		$templates = CTemplate::get($options);
 		$templates = zbx_toHash($templates, 'templateid');
@@ -888,7 +888,7 @@ include_once('include/page_header.php');
 				$description[] = $proxy['host'] . ':';
 			}
 
-			$description[] = new CLink($host['host'], 'hosts.php?form=update&hostid='.$host['hostid'].url_param('groupid'));
+			$description[] = new CLink($host['name'], 'hosts.php?form=update&hostid='.$host['hostid'].url_param('groupid'));
 
 			$hostIF = ($interface['useip'] == INTERFACE_USE_IP) ? $interface['ip'] : $interface['dns'];
 			$hostIF .= empty($interface['port']) ? '' : ': '.$interface['port'];
@@ -970,17 +970,17 @@ include_once('include/page_header.php');
 			}
 			else{
 				$hostTemplates = array();
-				order_result($host['parentTemplates'], 'host');
+				order_result($host['parentTemplates'], 'name');
 				foreach($host['parentTemplates'] as $htnum => $template){
 					$caption = array();
-					$caption[] = new CLink($template['host'],'templates.php?form=update&templateid='.$template['templateid'],'unknown');
+					$caption[] = new CLink($template['name'],'templates.php?form=update&templateid='.$template['templateid'],'unknown');
 
 					if(!empty($templates[$template['templateid']]['parentTemplates'])){
-						order_result($templates[$template['templateid']]['parentTemplates'], 'host');
+						order_result($templates[$template['templateid']]['parentTemplates'], 'name');
 
 						$caption[] = ' (';
 						foreach($templates[$template['templateid']]['parentTemplates'] as $tnum => $tpl){
-							$caption[] = new CLink($tpl['host'],'templates.php?form=update&templateid='.$tpl['templateid'], 'unknown');
+							$caption[] = new CLink($tpl['name'],'templates.php?form=update&templateid='.$tpl['templateid'], 'unknown');
 							$caption[] = ', ';
 						}
 						array_pop($caption);

@@ -1502,7 +1502,7 @@
 			}
 			if(!empty($elems['hosts'])){
 				foreach($elems['hosts'] as $elem){
-					$info[$elem['selementid']]['name'] = $all_hosts[$elem['elementid']]['host'];;
+					$info[$elem['selementid']]['name'] = $all_hosts[$elem['elementid']]['name'];;
 				}
 			}
 		}
@@ -1830,7 +1830,7 @@
 	}
 
 
-	function drawMapSelemetsMarks(&$im, &$map, &$map_info){
+	function drawMapSelementsMarks(&$im, &$map, &$map_info){
 		global $colors;
 
 		$selements = $map['selements'];

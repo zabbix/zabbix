@@ -847,7 +847,7 @@ include_once('include/page_header.php');
 
 		foreach($items as $tnum => $row){
 			$host = reset($row['hosts']);
-			$row['host'] = $host['host'];
+			$row['host'] = $host['name'];
 
 			$row['description'] = item_description($row);
 			$description = new CLink($row['description'],'#');
