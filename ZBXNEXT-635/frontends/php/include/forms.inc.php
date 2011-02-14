@@ -1703,27 +1703,27 @@
 
 		if(isset($_REQUEST['itemid'])){
 			$caption = array();
-			$itmid = $_REQUEST['itemid'];
+			$itemid = $_REQUEST['itemid'];
 			do{
 				$sql = 'SELECT i.itemid, i.templateid, h.host'.
 						' FROM items i, hosts h'.
-						' WHERE i.itemid='.$itmid.
+						' WHERE i.itemid='.$itemid.
 							' AND h.hostid=i.hostid';
-				$itm = DBfetch(DBselect($sql));
-				if($itm){
-					if($_REQUEST['itemid'] == $itmid){
+				$itemFromDb = DBfetch(DBselect($sql));
+				if($itemFromDb){
+					if(bccomp($_REQUEST['itemid'], $itemid) == 0){
 						$caption[] = SPACE;
-						$caption[] = $itm['host'];
+						$caption[] = $itemFromDb['host'];
 					}
 					else{
 						$caption[] = ' : ';
-						$caption[] = new CLink($itm['host'], 'items.php?form=update&itemid='.$itm['itemid'], 'highlight underline');
+						$caption[] = new CLink($itemFromDb['host'], 'items.php?form=update&itemid='.$itemFromDb['itemid'], 'highlight underline');
 					}
 
-					$itmid = $itm['templateid'];
+					$itemid = $itemFromDb['templateid'];
 				}
 				else break;
-			}while($itmid != 0);
+			}while($itemid != 0);
 
 			$caption[] = ($parent_discoveryid) ? S_ITEM_PROTOTYPE.' "' : S_ITEM.' "';
 			$caption = array_reverse($caption);
@@ -1819,7 +1819,7 @@
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmpv3_securityname');
 
 		$cmbSecLevel = new CComboBox('snmpv3_securitylevel', $snmpv3_securitylevel);
-		$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,'noAuthPriv');
+		$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,'noAuthNoPriv');
 		$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,'authNoPriv');
 		$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,'authPriv');
 

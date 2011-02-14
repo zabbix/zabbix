@@ -730,8 +730,8 @@ include_once('include/page_header.php');
 		else{
 			$hosts_wdgt->addItem(get_header_host_table($_REQUEST['hostid'], 'host'));
 
-			$hostForm = new CGetForm();
-			$hosts_wdgt->addItem($hostForm->render('host.edit'));
+			$hostForm = new CGetForm('host.edit');
+			$hosts_wdgt->addItem($hostForm->render());
 		}
 	}
 	else{

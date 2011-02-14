@@ -121,7 +121,6 @@ function removeInterfaceRow(hostInterfaceId){
 }
 
 jQuery(document).ready(function(){
-
 	jQuery("#useprofile").change(function(){
 		if(this.checked){
 			jQuery("#useprofile").button("option", "label", "<?php print(_('Disable profile'));?>");
@@ -145,6 +144,8 @@ jQuery(document).ready(function(){
 			jQuery("#profileexlist :input:gt(0)").attr("disabled", "disabled");
 		}
 	}).button().change();
+
+	jQuery('#name').focus();
 });
 
 </script>

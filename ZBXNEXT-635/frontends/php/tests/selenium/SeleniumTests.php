@@ -49,9 +49,11 @@ require_once(dirname(__FILE__).'/testPageUsers.php');
 require_once(dirname(__FILE__).'/testFormHost.php');
 require_once(dirname(__FILE__).'/testFormHostGroup.php');
 require_once(dirname(__FILE__).'/testFormLogin.php');
+require_once(dirname(__FILE__).'/testFormMap.php');
 require_once(dirname(__FILE__).'/testFormMediaType.php');
 require_once(dirname(__FILE__).'/testFormProfile.php');
 require_once(dirname(__FILE__).'/testFormScreen.php');
+require_once(dirname(__FILE__).'/testFormSysmap.php');
 
 class SeleniumTests
 {
@@ -92,6 +94,7 @@ class SeleniumTests
 		$suite->addTestSuite('testFormMediaType');
 		$suite->addTestSuite('testFormProfile');
 		$suite->addTestSuite('testFormScreen');
+		$suite->addTestSuite('testFormMap');
 
 		return $suite;
 	}
