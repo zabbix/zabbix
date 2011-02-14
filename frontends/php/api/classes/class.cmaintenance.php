@@ -679,20 +679,6 @@ Copt::memoryPick();
 			}
 
 
-			$timeperiodids = array();
-			$sql = 'SELECT DISTINCT tp.timeperiodid '.
-			' FROM timeperiods tp, maintenances_windows mw '.
-			' WHERE '.DBcondition('mw.maintenanceid',$maintenanceids).
-				' AND tp.timeperiodid=mw.timeperiodid ';
-			$db_timeperiods = DBselect($sql);
-			while($timeperiod = DBfetch($db_timeperiods)){
-				$timeperiodids[] = $timeperiod['timeperiodid'];
-			}
-
-			DB::delete('timeperiods', array('timeperiodid'=>$timeperiodids));
-			DB::delete('maintenances_windows', array('maintenanceid'=>$maintenanceids));
-
-
 			$tid = 0;
 			$update = array();
 			$timeperiods = array();
@@ -710,24 +696,72 @@ Copt::memoryPick();
 					'where' => array('maintenanceid='.$maintenance['maintenanceid']),
 				);
 
-				foreach($maintenance['timeperiods'] as $timeperiod){
-					$tid++;
-					$insert_timeperiods[$tid] = $timeperiod;
-					$timeperiods[$tid] = $mnum;
+				// getting current time periods
+				$timeperiodids = $timeperiods = array();
+				$sql = 'SELECT tp.* '.
+				' FROM timeperiods tp, maintenances_windows mw '.
+				' WHERE '.DBcondition('mw.maintenanceid',array($maintenance['maintenanceid'])).
+					' AND tp.timeperiodid=mw.timeperiodid ';
+				$db_timeperiods = DBselect($sql);
+				while($timeperiod = DBfetch($db_timeperiods)){
+					$timeperiodids[] = $timeperiod['timeperiodid']; //list of ids
+					$timeperiods[] = $timeperiod; // list ob objects
+				}
+
+				// have time periods changed?
+				$timePeriodsChanged = false;
+				if(count($timeperiods) != count($maintenance['timeperiods'])){
+					$timePeriodsChanged = true;
+				}
+				else{
+					foreach($maintenance['timeperiods'] as $i=>$currentTimePeriod){
+						// if records are not completely identical
+						if(
+							$currentTimePeriod['timeperiod_type'] != $timeperiods[$i]['timeperiod_type']
+							|| $currentTimePeriod['every'] != $timeperiods[$i]['every']
+							|| $currentTimePeriod['month'] != $timeperiods[$i]['month']
+							|| $currentTimePeriod['dayofweek'] != $timeperiods[$i]['dayofweek']
+							|| $currentTimePeriod['day'] != $timeperiods[$i]['day']
+							|| $currentTimePeriod['start_time'] != $timeperiods[$i]['start_time']
+							|| $currentTimePeriod['start_date'] != $timeperiods[$i]['start_date']
+							|| $currentTimePeriod['period'] != $timeperiods[$i]['period']
+						){
+							// this means, that time periods have changed (at least one of them)
+							$timePeriodsChanged = true;
+							break;
+						}
+					}
+				}
+
+				// if time periods have changed
+				if($timePeriodsChanged){
+					// wiping the out to insert new ones
+					DB::delete('timeperiods', array('timeperiodid'=>$timeperiodids));
+					DB::delete('maintenances_windows', array('maintenanceid'=>$maintenance['maintenanceid']));
+
+					// gathering the new ones to create
+					$insert_timeperiods = array();
+					foreach($maintenance['timeperiods'] as $timeperiod){
+						$tid++;
+						$insert_timeperiods[$tid] = $timeperiod;
+						$timeperiods[$tid] = $mnum;
+					}
+
+					// inserting them and getting back id's that were just inserted
+					$insertedTimepePiodids = DB::insert('timeperiods', $insert_timeperiods);
+
+					// inserting references to maintenances_windows table
+					$insertWindows = array();
+					foreach($insertedTimepePiodids as $insertedTimepePiodid){
+						$insertWindows[] = array(
+							'timeperiodid' => $insertedTimepePiodid,
+							'maintenanceid' => $maintenance['maintenanceid'],
+						);
+					}
+					DB::insert('maintenances_windows', $insertWindows);
 				}
 			}
 			DB::update('maintenances', $update);
-			$timeperiodids = DB::insert('timeperiods', $insert_timeperiods);
-
-
-			$insertWindows = array();
-			foreach($timeperiods as $tid => $mnum){
-				$insertWindows[] = array(
-					'timeperiodid' => $timeperiodids[$tid],
-					'maintenanceid' => $maintenances[$mnum]['maintenanceid'],
-				);
-			}
-			DB::insert('maintenances_windows', $insertWindows);
 
 			// some of the hosts and groups bound to maintenance must be deleted, other inserted and others left alone
 			$insertHosts = array();
