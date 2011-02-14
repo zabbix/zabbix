@@ -704,7 +704,7 @@ Copt::memoryPick();
 					' AND tp.timeperiodid=mw.timeperiodid ';
 				$db_timeperiods = DBselect($sql);
 				while($timeperiod = DBfetch($db_timeperiods)){
-					$timeperiodids[] = $timeperiod['timeperiodid']; //list of ids
+					$timeperiodids[] = $timeperiod['timeperiodid']; // list of ids
 					$timeperiods[] = $timeperiod; // list ob objects
 				}
 
