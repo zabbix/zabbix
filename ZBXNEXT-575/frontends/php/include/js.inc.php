@@ -534,7 +534,7 @@ function insert_js_function($fnct_name){
 						if(parentDocumentForm.length > 0)
 							frmStorage = jQuery(parentDocumentForm[0]).find("#"+key).get(0);
 
-						if(typeof(tmpStorage) == "undefined" || is_null(tmpStorage))
+						if(typeof(frmStorage) == "undefined" || is_null(frmStorage))
 							frmStorage = parentDocument.getElementById(key);
 
 						frmStorage.value = values[key];
