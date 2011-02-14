@@ -1,0 +1,8922 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Zabbix 1.9\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-01-27 14:02+0200\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
+"Language-Team: Zabbix <info@zabbix.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: sv\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Basepath: ../../\n"
+
+#: include/locales/en_gb.inc.php:891
+msgid " - all groups - "
+msgstr ""
+
+#: chart4.php:87 chart5.php:90
+#, php-format
+msgid "%1$s (year %2$s)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:394
+msgid "&"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1988
+msgid "'"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2174
+msgid "' does not accept parameters."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:108
+msgid "(no proxy)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:214
+msgid "(select host first)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:630
+msgid "- all -"
+msgstr "- alla -"
+
+#: include/locales/en_gb.inc.php:631
+msgid "- other -"
+msgstr "- övriga -"
+
+#: include/locales/en_gb.inc.php:288
+msgid "----[BULK ACKNOWLEDGE]----"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2169
+msgid "0 or 1"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1387
+msgid "1 minute"
+msgstr "1 minut"
+
+#: include/locales/en_gb.inc.php:1385
+msgid "10 seconds"
+msgstr "10 sekunder"
+
+#: include/locales/en_gb.inc.php:1376
+msgid "15 min"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1386
+msgid "30 seconds"
+msgstr "30 sekunder"
+
+#: include/locales/en_gb.inc.php:701
+msgid "3D view"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1375
+msgid "5 min"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1388
+msgid "5 minutes"
+msgstr "5 minuter"
+
+#: include/locales/en_gb.inc.php:1384
+msgid "5 seconds"
+msgstr "5 sekunder"
+
+#: include/locales/en_gb.inc.php:717
+msgid "500 latest values"
+msgstr "500 senaste värdena"
+
+#: include/locales/en_gb.inc.php:360
+msgid "ACTIONS"
+msgstr "ÅTGÄRDER"
+
+#: include/locales/en_gb.inc.php:285
+msgid "ALARM ACKNOWLEDGES"
+msgstr "ALARMBEKRÄFTELSER"
+
+#: include/locales/en_gb.inc.php:392
+msgid "AND"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:391
+msgid "AND / OR"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1825
+msgid "API access"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1805
+msgid "API access updated"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:845
+msgid "APPLICATIONS"
+msgstr "PROGRAM"
+
+#: include/locales/en_gb.inc.php:1897
+msgid "AUDIT ACTIONS"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1896
+msgid "AUDIT LOGS"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1420
+msgid "AVAILABILITY REPORT"
+msgstr "TILLGÄNGLIGHETSRAPPORT"
+
+#: include/locales/en_gb.inc.php:1643
+msgid "Acceptable SLA (in %)"
+msgstr "Acceptabel SLA (i %)"
+
+#: include/locales/en_gb.inc.php:2276
+msgid "Account is blocked for"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1760
+msgid "Ack"
+msgstr "Bekräfta"
+
+#: include/locales/en_gb.inc.php:281
+msgid "Acknowledge"
+msgstr "Bekräfta"
+
+#: include/locales/en_gb.inc.php:286
+msgid "Acknowledge added"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:283
+msgid "Acknowledge alarm by"
+msgstr "Bekräfta alarm för"
+
+#: include/locales/en_gb.inc.php:1763
+msgid "Acknowledge status"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1759
+msgid "Acknowledged"
+msgstr "Bekräftade"
+
+#: include/locales/en_gb.inc.php:280
+msgid "Acknowledges"
+msgstr "Bekräftelser"
+
+#: include/locales/en_gb.inc.php:1898
+msgid "Action"
+msgstr "Åtgärd"
+
+#: include/locales/en_gb.inc.php:363
+msgid "Action added"
+msgstr "Åtgärd lades till"
+
+#: include/locales/en_gb.inc.php:315
+msgid "Action conditions"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:367
+msgid "Action deleted"
+msgstr "Åtgärd borttagen"
+
+#: include/locales/en_gb.inc.php:320
+msgid "Action operations"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:365
+msgid "Action updated"
+msgstr "Åtgärd uppdaterad"
+
+#: include/locales/en_gb.inc.php:357
+msgid "Actions"
+msgstr "Åtgärder"
+
+#: include/locales/en_gb.inc.php:80
+msgid "Activate selected"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2021
+msgid "Activate selected applications?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:82
+msgid "Activate selected hosts"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:606 include/locales/en_gb.inc.php:1089
+msgid "Active"
+msgstr "Aktiv"
+
+#: include/locales/en_gb.inc.php:777
+msgid "Active since"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:778
+msgid "Active till"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1745
+msgid "Add"
+msgstr "Lägg till"
+
+#: include/locales/en_gb.inc.php:2366
+msgid "Add Service"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:284
+msgid "Add comment by"
+msgstr "Lägg till kommentar av"
+
+#: include/locales/en_gb.inc.php:1236
+msgid "Add element"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:326
+msgid "Add host"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1283
+msgid "Add link"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1173
+msgid "Add prototype"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1844
+msgid "Add to"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:968
+msgid "Add to group"
+msgstr "Lägg till i grupp"
+
+#: include/locales/en_gb.inc.php:1901
+msgid "Added"
+msgstr "Lades till"
+
+#: include/locales/en_gb.inc.php:494
+msgid "Added new media type"
+msgstr "Lade till ny mediatyp"
+
+#: include/locales/en_gb.inc.php:2165
+msgid "Added trigger"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1145
+msgid "Additional parameters"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:911
+msgid "Admin"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:501
+msgid "Administration"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1334
+msgid "Age"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1768
+msgid "Age less than"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:200
+msgid "Agent"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:672
+msgid "Aggregated"
+msgstr "Samlad"
+
+#: include/locales/en_gb.inc.php:673
+msgid "Aggregated periods count"
+msgstr "Antal perioder"
+
+#: include/locales/en_gb.inc.php:982 include/locales/en_gb.inc.php:1818
+msgid "Alias"
+msgstr "Alias"
+
+#: include/locales/en_gb.inc.php:1216
+msgid "Align icons"
+msgstr ""
+
+#: include/forms/script.edit.php:88 include/forms/script.edit.php:100
+#: include/locales/en_gb.inc.php:628 include/locales/en_gb.inc.php:1361
+msgid "All"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:892
+msgid "All groups"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1296
+msgid "All links should have \"Name\" and \"URL\" specified"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:592
+msgid "All nodes"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1123
+msgid "Allowed hosts"
+msgstr "Tillåtna värdar"
+
+#: include/locales/en_gb.inc.php:2162
+msgid "An item key must be used in trigger expression"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2100
+msgid "An item with the Key"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1764
+msgid "Any"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:549
+msgid "Any character string included"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:843
+msgid "Application"
+msgstr "Program"
+
+#: api/classes/class.capplication.php:577
+#: api/classes/class.capplication.php:601
+#, php-format
+msgid "Application [%1$s:%2$s] updated."
+msgstr ""
+
+#: api/classes/class.capplication.php:674
+#, php-format
+msgid "Application [%1$s] deleted"
+msgstr ""
+
+#: api/classes/class.ctemplate.php:2094
+#, php-format
+msgid "Application [%1$s] unlinked."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:849
+msgid "Application added"
+msgstr "Program lades till"
+
+#: include/locales/en_gb.inc.php:851
+msgid "Application deleted"
+msgstr "Program togs bort"
+
+#: include/locales/en_gb.inc.php:847
+msgid "Application updated"
+msgstr "Program uppdaterat"
+
+#: include/locales/en_gb.inc.php:844
+msgid "Applications"
+msgstr "Program"
+
+#: include/locales/en_gb.inc.php:1247
+msgid "Apply"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:767
+msgid "Approach"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:57
+msgid "Apr"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:70 include/locales/en_gb.inc.php:802
+msgid "April"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1994
+msgid "Are you sure you want to delete"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1117
+msgid "As is"
+msgstr "Som det är"
+
+#: include/locales/en_gb.inc.php:1565
+msgid "As plain text"
+msgstr "Som ren text"
+
+#: include/locales/en_gb.inc.php:989
+msgid "Asset Tag"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:797
+msgid "At"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:750
+msgid "At least one host or group should be selected"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2170
+msgid "At least one item must be present in the trigger expression."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1895
+msgid "Audit"
+msgstr "Granskning"
+
+#: include/locales/en_gb.inc.php:61
+msgid "Aug"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:74 include/locales/en_gb.inc.php:806
+msgid "August"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:609
+msgid "Authentication"
+msgstr ""
+
+#: include/forms/host.edit.php:511
+msgid "Authentication algorithm"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1155
+msgid "Authentication method"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:610
+msgid "Authentication to Zabbix"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:339
+msgid "Auto registration"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1838
+msgid "Auto-login"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1839
+msgid "Auto-logout (min 90 seconds)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:922
+msgid "Availability"
+msgstr "Tillgänglighet"
+
+#: include/locales/en_gb.inc.php:1419
+msgid "Availability report"
+msgstr "Tillgänglighetsrapport"
+
+#: include/locales/en_gb.inc.php:923
+msgid "Available"
+msgstr "Tillgänglig"
+
+#: include/locales/en_gb.inc.php:388
+msgid "Average"
+msgstr "Medel"
+
+#: include/locales/en_gb.inc.php:1502
+msgid "Average by"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1620
+msgid "Average problem"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:658
+msgid "Axis side"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2052
+msgid "B"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:222
+msgid "BACK"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:520
+msgid "Background"
+msgstr "Bakgrund"
+
+#: include/locales/en_gb.inc.php:1309
+msgid "Background image"
+msgstr "Bakgrundsbild"
+
+#: include/locales/en_gb.inc.php:1494
+msgid "Bar reports"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:611
+msgid "Base DN"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:208
+msgid "Basic authentication"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:612
+msgid "Bind DN"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:613
+msgid "Bind Password"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:468
+msgid "Black & Blue"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1852
+msgid "Blocked"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:433
+msgid "Bold line"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1278
+msgid "Bottom"
+msgstr "Nederkant"
+
+#: include/locales/en_gb.inc.php:1505
+msgid "Brighten"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:289
+msgid "Bulk acknowledge"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1422
+msgid "By host"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1423
+msgid "By trigger template"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:300
+msgid "CONFIGURATION OF ACTIONS"
+msgstr "KONFIGURATION AV ÅTGÄRDER"
+
+#: include/locales/en_gb.inc.php:872
+msgid "CONFIGURATION OF APPLICATIONS"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:101
+msgid "CONFIGURATION OF DISCOVERY"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1167
+msgid "CONFIGURATION OF DISCOVERY RULES"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1178
+msgid "CONFIGURATION OF GRAPH PROTOTYPES"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:680
+msgid "CONFIGURATION OF GRAPHS"
+msgstr "KONFIGURATION AV DIAGRAM"
+
+#: include/locales/en_gb.inc.php:820
+msgid "CONFIGURATION OF HOST GROUPS"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:870
+msgid "CONFIGURATION OF HOSTS"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1171
+msgid "CONFIGURATION OF ITEM PROTOTYPES"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1056
+msgid "CONFIGURATION OF ITEMS"
+msgstr "KONFIGURATION AV OBJEKT"
+
+#: include/locales/en_gb.inc.php:873
+msgid "CONFIGURATION OF MAINTENANCE PERIODS"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1318
+msgid "CONFIGURATION OF MEDIA TYPES"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1231
+msgid "CONFIGURATION OF NETWORK MAPS"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:585
+msgid "CONFIGURATION OF NODES"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:599
+msgid "CONFIGURATION OF PROXIES"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1525
+msgid "CONFIGURATION OF SCREEN"
+msgstr "KONFIGURATION AV SKÄRM"
+
+#: include/locales/en_gb.inc.php:1513
+msgid "CONFIGURATION OF SCREENS"
+msgstr "KONFIGURATION AV SKÄRMAR"
+
+#: include/locales/en_gb.inc.php:1867
+msgid "CONFIGURATION OF SCRIPTS"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1547
+msgid "CONFIGURATION OF SLIDE SHOWS"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:871
+msgid "CONFIGURATION OF TEMPLATES"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1181
+msgid "CONFIGURATION OF TRIGGER PROTOTYPES"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1688
+msgid "CONFIGURATION OF TRIGGERS"
+msgstr "KONFIGURATION AV UTLÖSARE"
+
+#: include/locales/en_gb.inc.php:1812
+msgid "CONFIGURATION OF USERS AND USER GROUPS"
+msgstr "KONFIGURATION AV ANVÄNDARE OCH ANVÄNDARGRUPPER"
+
+#: include/locales/en_gb.inc.php:183
+msgid "CONFIGURATION OF WEB MONITORING"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:491
+msgid "CONFIGURATION OF ZABBIX"
+msgstr "KONFIGURATION AV ZABBIX"
+
+#: include/locales/en_gb.inc.php:1642
+msgid "Calculate SLA"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:696
+msgid "Calculated"
+msgstr "Beräknade"
+
+#: include/locales/en_gb.inc.php:908
+msgid "Callback"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2373
+msgid "Can not create new element"
+msgstr ""
+
+#: api/classes/class.cuser.php:758
+#, php-format
+msgid "Can not delete %1$s internal user \" %2$s \", try disabling that user."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2372
+msgid "Can not find objects with name"
+msgstr ""
+
+#: api/classes/class.ctemplate.php:1405
+msgid "Can't add group"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2289
+msgid "Can't delete user medias"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2342
+msgid "Can't format Tree"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2291
+msgid "Can't insert user medias"
+msgstr ""
+
+#: api/classes/class.ctemplate.php:1481 api/classes/class.ctemplate.php:1491
+msgid "Can't link template"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1889
+msgid "Can't read script response, check connection"
+msgstr ""
+
+#: api/classes/class.ctemplate.php:1416
+msgid "Can't remove group"
+msgstr ""
+
+#: api/classes/class.ctemplate.php:1531
+msgid "Can't remove macro"
+msgstr ""
+
+#: api/classes/class.ctemplate.php:1625
+msgid "Can't remove macros"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1888
+msgid "Can't send command, check connection"
+msgstr ""
+
+#: api/classes/class.ctemplate.php:1601
+msgid "Can't unlink groups"
+msgstr ""
+
+#: api/classes/class.ctemplate.php:1452 api/classes/class.ctemplate.php:1470
+msgid "Can't unlink template"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2290
+msgid "Can't update user medias"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:539
+msgid "Canada (136 characters)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1327
+#: include/templates/scriptConfirm.js.php:39
+#: include/templates/script.js.php:41
+msgid "Cancel"
+msgstr "Avbryt"
+
+#: include/locales/en_gb.inc.php:287
+msgid "Cannot acknowledge event"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:364
+msgid "Cannot add action"
+msgstr "Kan inte lägga till åtgärd"
+
+#: include/locales/en_gb.inc.php:850
+msgid "Cannot add application"
+msgstr "Kan inte lägga till program"
+
+#: host_discovery.php:247 include/locales/en_gb.inc.php:133
+msgid "Cannot add discovery rule"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:688
+msgid "Cannot add graph"
+msgstr "Kan inte lägga till diagram"
+
+#: api/classes/class.chost.php:1727 include/locales/en_gb.inc.php:1788
+msgid "Cannot add group"
+msgstr "Kan inte lägga till grupp"
+
+#: include/locales/en_gb.inc.php:860
+msgid "Cannot add host"
+msgstr "Kan inte lägga till värd"
+
+#: include/locales/en_gb.inc.php:523
+msgid "Cannot add image"
+msgstr "Kan inte lägga till bild"
+
+#: include/locales/en_gb.inc.php:1060
+msgid "Cannot add item"
+msgstr "Kan inte lägga till objekt"
+
+#: api/classes/class.chost.php:1845 api/classes/class.ctemplate.php:1547
+msgid "Cannot add macro"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:756
+msgid "Cannot add maintenance"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:689
+msgid "Cannot add more than one item with type \"Graph sum\""
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1263
+msgid "Cannot add network map"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2109
+msgid "Cannot add new application"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:272
+msgid "Cannot add node"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1794
+msgid "Cannot add proxy"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:564
+msgid "Cannot add regular expression"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:198
+msgid "Cannot add scenario"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1516
+msgid "Cannot add screen"
+msgstr "Kan inte lägga till skärm"
+
+#: include/locales/en_gb.inc.php:1876
+msgid "Cannot add script"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1631
+msgid "Cannot add service"
+msgstr "Kan inte lägga till tjänst"
+
+#: include/locales/en_gb.inc.php:1607
+msgid "Cannot add slideshow"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:943
+msgid "Cannot add template"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1694
+msgid "Cannot add trigger"
+msgstr "Kan inte lägga till utlösare"
+
+#: include/locales/en_gb.inc.php:1778
+msgid "Cannot add user"
+msgstr "Kan inte lägga till användare"
+
+#: include/locales/en_gb.inc.php:1779
+msgid "Cannot add user. Both passwords must be equal."
+msgstr "Kan inte lägga till användare. Båda lösenorden måste vara samma."
+
+#: include/locales/en_gb.inc.php:479
+msgid "Cannot add value map"
+msgstr "Kan inte lägga till värdeskarta"
+
+#: include/locales/en_gb.inc.php:1054
+msgid "Cannot clear history"
+msgstr "Kan inte rensa historik"
+
+#: include/locales/en_gb.inc.php:644
+msgid "Cannot copy graphs"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:862
+msgid "Cannot copy items"
+msgstr ""
+
+#: include/db.inc.php:45
+msgid "Cannot create another database connection."
+msgstr ""
+
+#: api/classes/class.chost.php:1922
+msgid "Cannot create extended profile"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:368
+msgid "Cannot delete action"
+msgstr "Kan inte ta bort åtgärd"
+
+#: include/locales/en_gb.inc.php:852 include/locales/en_gb.inc.php:2025
+msgid "Cannot delete application"
+msgstr "Kan inte ta bort program"
+
+#: host_discovery.php:182 host_discovery.php:267
+#: include/locales/en_gb.inc.php:128
+msgid "Cannot delete discovery rule"
+msgstr ""
+
+#: api/classes/class.chost.php:1902
+msgid "Cannot delete extended profile"
+msgstr ""
+
+#: api/classes/class.citem.php:1339 include/locales/en_gb.inc.php:685
+msgid "Cannot delete graph"
+msgstr "Kan inte ta bort diagram"
+
+#: api/classes/class.cgraphprototype.php:1051
+msgid "Cannot delete graph prototype"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:687
+msgid "Cannot delete graphs"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1792
+msgid "Cannot delete group"
+msgstr "Kan inte ta bort grupp"
+
+#: include/locales/en_gb.inc.php:869
+msgid "Cannot delete host"
+msgstr "Kan inte ta bort värd"
+
+#: include/locales/en_gb.inc.php:525
+msgid "Cannot delete image"
+msgstr "Kan inte ta bort bild"
+
+#: include/locales/en_gb.inc.php:1062
+msgid "Cannot delete item"
+msgstr "Kan inte ta bort objekt"
+
+#: include/locales/en_gb.inc.php:1064
+msgid "Cannot delete items"
+msgstr "Kan inte ta bort objekt"
+
+#: include/locales/en_gb.inc.php:758
+msgid "Cannot delete maintenance"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1250
+msgid "Cannot delete network map"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:274
+msgid "Cannot delete node"
+msgstr ""
+
+#: api/classes/class.chost.php:1857
+msgid "Cannot delete profile"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1798
+msgid "Cannot delete proxy"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:570
+msgid "Cannot delete regular expression"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:199
+msgid "Cannot delete scenario"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1880
+msgid "Cannot delete script"
+msgstr ""
+
+#: actionconf.php:313
+msgid "Cannot delete selected actions."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1633
+msgid "Cannot delete service"
+msgstr "Kan inte ta bort tjänst"
+
+#: include/locales/en_gb.inc.php:1609
+msgid "Cannot delete slideshow"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:949
+msgid "Cannot delete template"
+msgstr ""
+
+#: api/classes/class.cgraph.php:1032
+#: api/classes/class.cgraphprototype.php:1028
+msgid "Cannot delete templated graphs"
+msgstr ""
+
+#: api/classes/class.cdiscoveryrule.php:939
+msgid "Cannot delete templated items"
+msgstr ""
+
+#: api/classes/class.ctrigger.php:1206
+#: api/classes/class.ctriggerprototype.php:1242
+#, php-format
+msgid "Cannot delete templated trigger [%1$s:%2$s]"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1692
+msgid "Cannot delete trigger"
+msgstr "Kan inte ta bort utlösare"
+
+#: include/locales/en_gb.inc.php:1690
+msgid "Cannot delete triggers"
+msgstr "Kan inte ta bort utlösare"
+
+#: include/locales/en_gb.inc.php:1781
+msgid "Cannot delete user"
+msgstr "Kan inte ta bort användare"
+
+#: include/locales/en_gb.inc.php:481
+msgid "Cannot delete value map"
+msgstr "Kan inte ta bort värdeskarta"
+
+#: include/locales/en_gb.inc.php:1520
+msgid "Cannot deleted screen"
+msgstr "Kan inte ta bort skärm"
+
+#: include/locales/en_gb.inc.php:1287
+msgid "Cannot find background image"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1559
+msgid "Cannot find graph"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1289
+msgid "Cannot find host"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1290
+msgid "Cannot find hostgroup"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1286
+msgid "Cannot find image"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1560
+msgid "Cannot find item"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1291
+msgid "Cannot find map"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1292
+msgid "Cannot find screen"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1288
+msgid "Cannot find trigger"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1681
+msgid "Cannot format Tree. Check logic structure in service links"
+msgstr ""
+
+#: api/classes/class.ctriggerprototype.php:1348
+msgid "Cannot implode expression"
+msgstr ""
+
+#: api/classes/class.ctrigger.php:1519
+#, php-format
+msgid "Cannot implode expression \"%s\"."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2212
+msgid "Cannot link hardlinked service."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2213
+msgid "Cannot link service to itself."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:976
+msgid "Cannot link template"
+msgstr ""
+
+#: api/classes/class.chost.php:1674
+msgid "Cannot mass update host name"
+msgstr ""
+
+#: api/classes/class.ctemplate.php:1351
+msgid "Cannot mass update template name"
+msgstr ""
+
+#: api/classes/class.chost.php:1736
+msgid "Cannot remove group"
+msgstr ""
+
+#: api/classes/class.chost.php:1829 config.php:542
+msgid "Cannot remove macro"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2295
+msgid "Cannot rename guest user"
+msgstr ""
+
+#: api/classes/class.ctemplate.php:1818
+msgid "Cannot sync Triggers"
+msgstr ""
+
+#: api/classes/class.ctemplate.php:1824
+msgid "Cannot sync Triggers prototypes"
+msgstr ""
+
+#: api/classes/class.ctemplate.php:1794
+msgid "Cannot sync applications"
+msgstr ""
+
+#: api/classes/class.ctemplate.php:1800
+msgid "Cannot sync discovery rules"
+msgstr ""
+
+#: api/classes/class.ctemplate.php:1830
+msgid "Cannot sync graph prototypes"
+msgstr ""
+
+#: api/classes/class.ctemplate.php:1836
+msgid "Cannot sync graphs"
+msgstr ""
+
+#: api/classes/class.ctemplate.php:1806
+msgid "Cannot sync item prototypes"
+msgstr ""
+
+#: api/classes/class.ctemplate.php:1812
+msgid "Cannot sync items"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1802
+msgid "Cannot unblock users"
+msgstr ""
+
+#: api/classes/class.ctemplate.php:2085
+msgid "Cannot unlink and clear applications"
+msgstr ""
+
+#: api/classes/class.ctemplate.php:1880
+msgid "Cannot unlink and clear discovery rules"
+msgstr ""
+
+#: api/classes/class.ctemplate.php:1964
+msgid "Cannot unlink and clear graph prototypes"
+msgstr ""
+
+#: api/classes/class.ctemplate.php:1982
+msgid "Cannot unlink and clear graphs."
+msgstr ""
+
+#: api/classes/class.ctemplate.php:1916
+msgid "Cannot unlink and clear item prototypes"
+msgstr ""
+
+#: api/classes/class.ctemplate.php:1898
+msgid "Cannot unlink and clear items"
+msgstr ""
+
+#: api/classes/class.ctemplate.php:2033 api/classes/class.ctemplate.php:2050
+msgid "Cannot unlink and clear triggers"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:975
+msgid "Cannot unlink template"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:865
+msgid "Cannot update"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1806
+msgid "Cannot update API access"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1804
+msgid "Cannot update GUI access"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:366
+msgid "Cannot update action"
+msgstr "Kan inte uppdatera åtgärd"
+
+#: include/locales/en_gb.inc.php:848 include/locales/en_gb.inc.php:2024
+msgid "Cannot update application"
+msgstr "Kan inte uppdatera program"
+
+#: include/locales/en_gb.inc.php:1744
+msgid "Cannot update comment"
+msgstr "Kan inte uppdatera kommentar"
+
+#: include/locales/en_gb.inc.php:1808
+msgid "Cannot update debug mode"
+msgstr ""
+
+#: host_discovery.php:243 include/locales/en_gb.inc.php:131
+msgid "Cannot update discovery rule"
+msgstr ""
+
+#: api/classes/class.chost.php:1944
+msgid "Cannot update extended profile"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:683
+msgid "Cannot update graph"
+msgstr "Kan inte uppdatera diagram"
+
+#: include/locales/en_gb.inc.php:1790
+msgid "Cannot update group"
+msgstr "Kan inte uppdatera grupp"
+
+#: include/locales/en_gb.inc.php:864
+msgid "Cannot update host"
+msgstr "Kan inte uppdatera värd"
+
+#: include/locales/en_gb.inc.php:867
+msgid "Cannot update host status"
+msgstr "Kan inte uppdatera värdstatus"
+
+#: include/locales/en_gb.inc.php:527
+msgid "Cannot update image"
+msgstr "Kan inte uppdatera bild"
+
+#: include/locales/en_gb.inc.php:1057
+msgid "Cannot update item"
+msgstr "Kan inte uppdatera objekt"
+
+#: api/classes/class.chost.php:1836 api/classes/class.ctemplate.php:1538
+#: config.php:547
+msgid "Cannot update macro"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:838
+msgid "Cannot update macros"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:757
+msgid "Cannot update maintenance"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1265
+msgid "Cannot update network map"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:270
+msgid "Cannot update node"
+msgstr ""
+
+#: api/classes/class.chost.php:1890
+msgid "Cannot update profile"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1796
+msgid "Cannot update proxy"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:567
+msgid "Cannot update regular expression"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:196
+msgid "Cannot update scenario"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1518
+msgid "Cannot update screen"
+msgstr "Kan inte uppdatera skärm"
+
+#: include/locales/en_gb.inc.php:1878
+msgid "Cannot update script"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1629
+msgid "Cannot update service"
+msgstr "Kan inte uppdatera tjänst"
+
+#: include/locales/en_gb.inc.php:1605
+msgid "Cannot update slideshow"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1059
+msgid "Cannot update status"
+msgstr "Kan inte uppdatera status"
+
+#: include/locales/en_gb.inc.php:945
+msgid "Cannot update template"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1705
+msgid "Cannot update trigger"
+msgstr "Kan inte uppdatera utlösare"
+
+#: include/locales/en_gb.inc.php:1785
+msgid "Cannot update user"
+msgstr "Kan inte uppdatera användare"
+
+#: include/locales/en_gb.inc.php:1786
+msgid "Cannot update user. Both passwords must be equal."
+msgstr "Kan inte uppdatera användare. Båda lösenorden måste vara samma."
+
+#: include/locales/en_gb.inc.php:1800
+msgid "Cannot update users status"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:477
+msgid "Cannot update value map"
+msgstr "Kan inte uppdatera värdeskarta"
+
+#: include/locales/en_gb.inc.php:1966
+msgid "Caption"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:556
+msgid "Case sensitive"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1590
+msgid "Centre"
+msgstr "Centrera"
+
+#: include/locales/en_gb.inc.php:1703
+msgid "Change"
+msgstr "Ändra"
+
+#: include/locales/en_gb.inc.php:1835
+msgid "Change password"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1113
+msgid "Character"
+msgstr "Tecken"
+
+#: include/locales/en_gb.inc.php:548
+msgid "Character string included"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:550
+msgid "Character string not included"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1987
+msgid "Check expression part starting from '"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2106
+msgid "Check the key, please. Default example was passed"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:104
+msgid "Checks"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:267
+msgid "Child"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1938
+msgid "Chinese (CN)"
+msgstr "Kinesiska (CN)"
+
+#: api/classes/class.ctemplate.php:1774 include/locales/en_gb.inc.php:2115
+msgid "Circular link can not be created"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1909
+msgid "Clear"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1053
+msgid "Clear history"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1052
+msgid "Clear history for selected"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:935
+msgid "Clear when unlinking"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1574
+msgid "Clock"
+msgstr "Klocka"
+
+#: include/forms/script.edit.php:139 include/locales/en_gb.inc.php:1649
+msgid "Clone"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1883
+msgid "Close"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:651
+msgid "Colour"
+msgstr "Färg"
+
+#: include/locales/en_gb.inc.php:1259
+msgid "Colour (OK)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1568
+msgid "Column span"
+msgstr "Kolumnspann"
+
+#: include/locales/en_gb.inc.php:1521
+msgid "Columns"
+msgstr "Kolumner"
+
+#: include/locales/en_gb.inc.php:2017
+msgid "Combined result"
+msgstr ""
+
+#: include/forms/script.edit.php:79 include/locales/en_gb.inc.php:1870
+msgid "Command"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:362
+msgid "Command actions"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1743
+msgid "Comment updated"
+msgstr "Kommentar uppdaterades"
+
+#: include/locales/en_gb.inc.php:1758
+msgid "Comments"
+msgstr "Kommentarer"
+
+#: include/locales/en_gb.inc.php:581
+msgid "Commercial"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1497
+msgid "Compare values for multiple periods"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:318
+msgid "Condition"
+msgstr "Villkor"
+
+#: include/locales/en_gb.inc.php:317
+msgid "Conditions"
+msgstr "Villkor"
+
+#: include/locales/en_gb.inc.php:500
+msgid "Configuration"
+msgstr "Konfiguration"
+
+#: include/locales/en_gb.inc.php:1626
+msgid "Configuration of IT services"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:182
+msgid "Configuration of Web monitoring"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:490
+msgid "Configuration of Zabbix"
+msgstr "Konfiguration av ZABBIX"
+
+#: include/locales/en_gb.inc.php:299
+msgid "Configuration of actions"
+msgstr "Konfiguration av åtgärder"
+
+#: include/locales/en_gb.inc.php:100
+msgid "Configuration of discovery"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:679
+msgid "Configuration of graphs"
+msgstr "Konfiguration av diagram"
+
+#: include/locales/en_gb.inc.php:1055
+msgid "Configuration of items"
+msgstr "Konfiguration av objekt"
+
+#: include/locales/en_gb.inc.php:1230
+msgid "Configuration of network maps"
+msgstr "KONFIGURATION AV NÄTVERKSKARTOR"
+
+#: include/locales/en_gb.inc.php:1514
+msgid "Configuration of screens"
+msgstr "Konfiguration av skärmar"
+
+#: include/locales/en_gb.inc.php:1548
+msgid "Configuration of slideshows"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1687
+msgid "Configuration of triggers"
+msgstr "Konfiguration av utlösare"
+
+#: include/locales/en_gb.inc.php:492
+msgid "Configuration updated"
+msgstr "Konfiguration uppdaterad"
+
+#: include/locales/en_gb.inc.php:493
+msgid "Configuration was not updated"
+msgstr "Konfiguration blev inte uppdaterad"
+
+#: include/locales/en_gb.inc.php:1353
+msgid "Configure"
+msgstr ""
+
+#: include/forms/script.edit.php:126
+msgid "Confirmation text"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:881
+msgid "Connect to"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:638
+msgid "Connected as"
+msgstr "Ansluten som"
+
+#: include/locales/en_gb.inc.php:1240
+msgid "Connectors"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:964
+msgid "Contact"
+msgstr "Kontakt"
+
+#: include/locales/en_gb.inc.php:1237
+msgid "Coordinate X"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1238
+msgid "Coordinate Y"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1136
+msgid "Copy"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1160
+msgid "Copy selected items?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:85
+msgid "Copy selected to ..."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1735
+msgid "Copy selected triggers?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:637
+msgid "Copyright 2001-2010 by"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2222
+msgid "Could not save image!"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1383
+msgid "Count"
+msgstr "Antal"
+
+#: include/locales/en_gb.inc.php:1551
+msgid "Count of slides"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1474
+msgid "Create"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:398
+msgid "Create Action"
+msgstr "Skapa åtgärd"
+
+#: include/locales/en_gb.inc.php:698
+msgid "Create Graph"
+msgstr "Skapa diagram"
+
+#: include/locales/en_gb.inc.php:1842
+msgid "Create Group"
+msgstr "Skapa grupp"
+
+#: include/locales/en_gb.inc.php:532
+msgid "Create Image"
+msgstr "Skapa bild"
+
+#: include/locales/en_gb.inc.php:1131
+msgid "Create Item"
+msgstr "Skapa objekt"
+
+#: include/locales/en_gb.inc.php:1253
+msgid "Create Map"
+msgstr "Skapa karta"
+
+#: include/locales/en_gb.inc.php:531
+msgid "Create Media Type"
+msgstr "Skapa mediatyp"
+
+#: include/locales/en_gb.inc.php:928
+msgid "Create Proxy"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1537
+msgid "Create Screen"
+msgstr "Skapa skärm"
+
+#: include/locales/en_gb.inc.php:1538
+msgid "Create Slide Show"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1710
+msgid "Create Trigger"
+msgstr "Skapa utlösare"
+
+#: include/locales/en_gb.inc.php:1841
+msgid "Create User"
+msgstr "Skapa användare"
+
+#: include/locales/en_gb.inc.php:846
+msgid "Create application"
+msgstr "Skapa program"
+
+#: include/locales/en_gb.inc.php:764
+msgid "Create maintenance period"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1175
+msgid "Create prototype"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:105
+msgid "Create rule"
+msgstr "Skapa regel"
+
+#: include/locales/en_gb.inc.php:187
+msgid "Create scenario"
+msgstr ""
+
+#: scripts.php:179
+msgid "Create script"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2364
+msgid "Create trigger"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:489
+msgid "Create value map"
+msgstr "Skapa värdeskarta"
+
+#: include/locales/en_gb.inc.php:2130
+msgid "Critical error"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:275
+msgid "Current node"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:439
+msgid "Custom graphs"
+msgstr "Anpassade diagram"
+
+#: include/locales/en_gb.inc.php:1128
+msgid "Custom multiplier"
+msgstr "Anpassad faktor"
+
+#: include/locales/en_gb.inc.php:1600
+msgid "Custom screens"
+msgstr "Anpassade skärmar"
+
+#: include/locales/en_gb.inc.php:1616
+msgid "Custom slides"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1943
+msgid "Czech (CZ)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:447
+msgid "D"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1352
+msgid "DASHBOARD CONFIGURATION"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:158
+msgid "DETAILS OF SCENARIO"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1698
+msgid "DISABLED"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1199
+msgid "DISCOVERED"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:99
+msgid "DISCOVERY"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1971
+msgid "DISCOVERY CHECKS"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1970
+msgid "DISCOVERY RULES"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:586
+msgid "DM"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:882
+msgid "DNS"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:895
+msgid "DNS name"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1198
+msgid "DOWN"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1456
+msgid "Daily"
+msgstr "Dagligen"
+
+#: include/locales/en_gb.inc.php:470
+msgid "Dark orange"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1504
+msgid "Darken"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1332
+msgid "Dashboard"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1351
+msgid "Dashboard configuration"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1357
+msgid "Dashboard filter"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:435
+msgid "Dashed line"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1371
+msgid "Data"
+msgstr "Data"
+
+#: include/classes/class.cpie.php:618
+#, php-format
+msgid "Data from %1$s. Generated in %2$s sec"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1576
+msgid "Data overview"
+msgstr "Översikt över data"
+
+#: include/locales/en_gb.inc.php:1104
+msgid "Data type"
+msgstr ""
+
+#: include/setup.inc.php:240 include/setup.inc.php:294
+msgid "Database file"
+msgstr ""
+
+#: include/setup.inc.php:243
+msgid "Database host"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1081
+msgid "Database monitor"
+msgstr ""
+
+#: include/setup.inc.php:245 include/setup.inc.php:302
+msgid "Database name"
+msgstr ""
+
+#: include/setup.inc.php:304
+msgid "Database password"
+msgstr ""
+
+#: include/setup.inc.php:244 include/setup.inc.php:299
+#: include/setup.inc.php:301
+msgid "Database port"
+msgstr ""
+
+#: include/setup.inc.php:247 include/setup.inc.php:306
+msgid "Database schema"
+msgstr ""
+
+#: include/setup.inc.php:297
+msgid "Database server"
+msgstr ""
+
+#: include/setup.inc.php:237 include/setup.inc.php:290
+msgid "Database type"
+msgstr ""
+
+#: include/setup.inc.php:303
+msgid "Database user"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:783
+msgid "Date"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1015
+msgid "Date HW Decommissioned"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1013
+msgid "Date HW Installed"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1014
+msgid "Date HW Maintenance Expires"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1012
+msgid "Date HW Purchased"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1452
+msgid "Day"
+msgstr "Dag"
+
+#: include/locales/en_gb.inc.php:787
+msgid "Day of month"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:786
+msgid "Day of week"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:473
+msgid "Days"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1826
+msgid "Debug"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1827
+msgid "Debug mode"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1807
+msgid "Debug mode updated"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:65
+msgid "Dec"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:78 include/locales/en_gb.inc.php:810
+msgid "December"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1105
+msgid "Decimal"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:514 include/locales/en_gb.inc.php:900
+msgid "Default"
+msgstr "Standard"
+
+#: include/locales/en_gb.inc.php:621
+msgid "Default authentication"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:374
+msgid "Default message"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:375
+msgid "Default subject"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:471
+msgid "Default theme"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1891
+msgid "Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1890
+msgid "Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:371
+msgid "Delay"
+msgstr "Fördröjning"
+
+#: discoveryconf.php:298
+msgid "Delay (seconds)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1391
+msgid "Delayed by"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1648
+msgid "Delete"
+msgstr "Ta bort"
+
+#: include/locales/en_gb.inc.php:1272
+msgid "Delete Links between selected elements?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2368
+msgid "Delete Service"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:950
+msgid "Delete and clear"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:952
+msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:954
+msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2006
+msgid "Delete expression?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:969
+msgid "Delete from group"
+msgstr "Ta bort från grupp"
+
+#: include/locales/en_gb.inc.php:693
+msgid "Delete graph?"
+msgstr "Ta bort diagram?"
+
+#: include/locales/en_gb.inc.php:212
+msgid "Delete history of selected WEB scenarios?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1161
+msgid "Delete history of selected items?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2186
+msgid "Delete it?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2007
+msgid "Delete keyword?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:775
+msgid "Delete maintenance period?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:572
+msgid "Delete regular expression?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:106
+msgid "Delete rule?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:194
+msgid "Delete scenario?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1524
+msgid "Delete screen?"
+msgstr "Ta bort skärm?"
+
+#: include/forms/script.edit.php:140
+msgid "Delete script?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:84
+msgid "Delete selected"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:824
+msgid "Delete selected Host Groups?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:213
+msgid "Delete selected WEB scenarios?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:399
+msgid "Delete selected action?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2023
+msgid "Delete selected applications?"
+msgstr ""
+
+#: host_discovery.php:638 include/locales/en_gb.inc.php:138
+msgid "Delete selected discovery rules?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1270
+msgid "Delete selected elements?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:708
+msgid "Delete selected graphs?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:821
+msgid "Delete selected group?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:825
+msgid "Delete selected groups"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1864
+msgid "Delete selected groups?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:916
+msgid "Delete selected host?"
+msgstr "Ta bort markerad värd?"
+
+#: include/locales/en_gb.inc.php:933
+msgid "Delete selected hosts?"
+msgstr "Ta bort markerade värdar?"
+
+#: include/locales/en_gb.inc.php:509
+msgid "Delete selected image?"
+msgstr "Ta bort markerad bild?"
+
+#: include/locales/en_gb.inc.php:2082
+msgid "Delete selected item?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1162
+msgid "Delete selected items?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:749
+msgid "Delete selected maintenance periods?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1261
+msgid "Delete selected maps?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:580
+msgid "Delete selected media types?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:508
+msgid "Delete selected media?"
+msgstr "Ta bort markerat media?"
+
+#: include/locales/en_gb.inc.php:593
+msgid "Delete selected node?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:598
+msgid "Delete selected proxies?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:600
+msgid "Delete selected proxy?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:573
+msgid "Delete selected regular expressions?"
+msgstr ""
+
+#: screenconf.php:360
+msgid "Delete selected screens?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1884
+msgid "Delete selected scripts?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2369
+msgid "Delete selected services?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1542
+msgid "Delete selected slideshows?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:951
+msgid "Delete selected templates?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1736
+msgid "Delete selected triggers?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2078
+msgid "Delete selected user?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1855
+msgid "Delete selected users?"
+msgstr ""
+
+#: config.php:887
+msgid "Delete selected value mapping?"
+msgstr ""
+
+#: config.php:883
+#, php-format
+msgid "Delete selected value mapping? It is used for %d item!"
+msgid_plural "Delete selected value mapping? It is used for %d items!"
+msgstr[0] ""
+msgstr[1] ""
+
+#: include/locales/en_gb.inc.php:917
+msgid "Delete selected with linked elements"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1610
+msgid "Delete slideshow?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2088
+msgid "Delete system map?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:953
+msgid "Delete template?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2020
+msgid "Delete this application?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2085
+msgid "Delete trigger?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:888
+msgid "Deleted"
+msgstr "Borttagen"
+
+#: include/locales/en_gb.inc.php:558
+msgid "Delimiter"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1119
+msgid "Delta (simple change)"
+msgstr "Delta (enkel ändring)"
+
+#: include/locales/en_gb.inc.php:1118
+msgid "Delta (speed per second)"
+msgstr "Delta (hastighet per sekund)"
+
+#: include/locales/en_gb.inc.php:1832
+msgid "Deny"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1707
+msgid "Dependent"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1706
+msgid "Depends on"
+msgstr "Beroende av"
+
+#: include/forms/script.edit.php:84 include/locales/en_gb.inc.php:1068
+#: media_types.php:260
+msgid "Description"
+msgstr "Beskrivning"
+
+#: include/locales/en_gb.inc.php:1899
+msgid "Details"
+msgstr "Detaljer"
+
+#: include/locales/en_gb.inc.php:157
+msgid "Details of scenario"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:338
+msgid "Device"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:983
+msgid "Device Chassis"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:991
+msgid "Device Contract Number"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:993
+msgid "Device Deployment Status"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1004
+msgid "Device Hardware"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1003
+msgid "Device Notes"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1002
+msgid "Device Port Connections"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1005
+msgid "Device Software"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:990
+msgid "Device Vendor"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:958
+msgid "Device type"
+msgstr "Enhetstyp"
+
+#: include/locales/en_gb.inc.php:109
+msgid "Device uniqueness criteria"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1541
+msgid "Dimension (cols x rows)"
+msgstr "Dimension (kolumner x rader)"
+
+#: include/locales/en_gb.inc.php:1700
+msgid "Disable"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1849
+msgid "Disable API"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1861
+msgid "Disable API access in selected groups?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1851
+msgid "Disable DEBUG"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1863
+msgid "Disable debug mode in selected groups?"
+msgstr ""
+
+#: include/templates/hosts.js.php:140
+msgid "Disable extended profile"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:329
+msgid "Disable host"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:597
+msgid "Disable hosts monitored by selected proxies?"
+msgstr ""
+
+#: include/templates/hosts.js.php:127
+msgid "Disable profile"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:81
+msgid "Disable selected"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:823
+msgid "Disable selected Host Groups?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:211
+msgid "Disable selected WEB scenarios?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2022
+msgid "Disable selected applications?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:137
+msgid "Disable selected discovery rules?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1859
+msgid "Disable selected groups?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:83
+msgid "Disable selected hosts"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:932
+msgid "Disable selected hosts?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1158
+msgid "Disable selected items?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1733
+msgid "Disable selected triggers?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1697
+msgid "Disabled"
+msgstr "Inaktiverad"
+
+#: include/locales/en_gb.inc.php:390
+msgid "Disaster"
+msgstr "Allvarlig"
+
+#: include/locales/en_gb.inc.php:140
+msgid "Discovered"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:146
+msgid "Discovered device"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:337
+msgid "Discovered object"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:98
+msgid "Discovery"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:107
+msgid "Discovery by proxy"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:336
+msgid "Discovery check"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:97
+msgid "Discovery rule"
+msgstr ""
+
+#: api/classes/class.cdiscoveryrule.php:1009
+#, php-format
+msgid "Discovery rule [%1$s:%2$s] deleted."
+msgstr ""
+
+#: api/classes/class.cdiscoveryrule.php:591
+#, php-format
+msgid "Discovery rule [%1$s:%2$s] has no interface."
+msgstr ""
+
+#: api/classes/class.ctemplate.php:1889
+#, php-format
+msgid "Discovery rule [%1$s:%2$s] unlinked."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:132
+msgid "Discovery rule added"
+msgstr ""
+
+#: host_discovery.php:247
+msgid "Discovery rule created"
+msgstr ""
+
+#: host_discovery.php:182 host_discovery.php:267
+#: include/locales/en_gb.inc.php:127
+msgid "Discovery rule deleted"
+msgstr ""
+
+#: host_discovery.php:243 include/locales/en_gb.inc.php:130
+msgid "Discovery rule updated"
+msgstr ""
+
+#: include/forms/host.edit.php:402 include/forms/template.edit.php:256
+msgid "Discovery rules"
+msgstr ""
+
+#: host_discovery.php:263
+msgid "Discovery rules activated"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:126
+msgid "Discovery rules deleted"
+msgstr ""
+
+#: host_discovery.php:263
+msgid "Discovery rules disabled"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:129
+msgid "Discovery rules updated"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:92
+msgid "Discovery status"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1962
+msgid "Displaying"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1496
+msgid "Distribution of values for multiple items"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1495
+msgid "Distribution of values for multiple periods"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2083
+msgid "Do"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1641
+msgid "Do not calculate"
+msgstr "Beräkna inte"
+
+#: include/locales/en_gb.inc.php:502
+msgid "Do not keep actions older than (in days)"
+msgstr "Behåll inte åtgärder äldre än (i dagar)"
+
+#: include/locales/en_gb.inc.php:503
+msgid "Do not keep events older than (in days)"
+msgstr "Behåll inte händelser äldre än (i dagar)"
+
+#: include/locales/en_gb.inc.php:264
+msgid "Do not keep history older than (in days)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:265
+msgid "Do not keep trends older than (in days)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2365
+msgid "Do you wish to replace the conditional expression?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:434
+msgid "Dot"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:653
+msgid "Down"
+msgstr "Nedåt"
+
+#. GETTEXT: Legend below graph
+#: api/classes/class.cwebcheck.php:562
+#, php-format
+msgid "Download speed for scenario '%s'"
+msgstr ""
+
+#: api/classes/class.cwebcheck.php:651
+#, php-format
+msgid "Download speed for step '%1$s' of scenario '%2$s'"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:145 include/locales/en_gb.inc.php:1652
+msgid "Downtime"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:665
+msgid "Draw style"
+msgstr "Ritstil"
+
+#: include/locales/en_gb.inc.php:462
+msgid "Dropdown first entry"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:411
+msgid "Duration"
+msgstr "Längd"
+
+#: include/locales/en_gb.inc.php:1939
+msgid "Dutch (NL)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1540
+msgid "Dynamic item"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2069
+msgid "E"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2315
+msgid "ERROR"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2330
+msgid "EVENTS"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1297
+msgid "Each URL should have a unique name. Please make sure there is only one URL named"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1539
+msgid "Edit"
+msgstr "Redigera"
+
+#: include/locales/en_gb.inc.php:2367
+msgid "Edit Service"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1156
+msgid "Edit Trigger"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1999
+msgid "Edit connector"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1958
+msgid "Edit hosts"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:763
+msgid "Edit maintenance period"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1245
+msgid "Edit map element"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:322
+msgid "Edit operation"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:217
+msgid "Element"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1312
+msgid "Element name"
+msgstr "Elementnamn"
+
+#: include/locales/en_gb.inc.php:1091
+msgid "Email"
+msgstr "E-post"
+
+#: include/locales/en_gb.inc.php:1967
+msgid "Empty"
+msgstr "Tom"
+
+#: api/classes/class.caction.php:793 api/classes/class.capplication.php:701
+#: api/classes/class.cdiscoveryrule.php:920 api/classes/class.cgraph.php:1014
+#: api/classes/class.cgraphprototype.php:1010
+#: api/classes/class.chostgroup.php:719
+#: api/classes/class.chostinterface.php:700 api/classes/class.chost.php:2060
+#: api/classes/class.citem.php:1286 api/classes/class.citemprototype.php:892
+#: api/classes/class.cproxy.php:507 api/classes/class.ctemplate.php:1139
+#: api/classes/class.ctrigger.php:1357 api/classes/class.cusergroup.php:699
+msgid "Empty input parameter"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:836
+msgid "Empty macro value"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1892
+msgid "Empty response received"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1701
+msgid "Enable"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1848
+msgid "Enable API"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1860
+msgid "Enable API access in selected groups?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1850
+msgid "Enable DEBUG"
+msgstr ""
+
+#: include/forms/script.edit.php:118
+msgid "Enable confirmation"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1862
+msgid "Enable debug mode in selected groups?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:513
+msgid "Enable escalations"
+msgstr ""
+
+#: include/templates/hosts.js.php:144
+msgid "Enable extended profile"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:328
+msgid "Enable host"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:596
+msgid "Enable hosts monitored by selected proxies?"
+msgstr ""
+
+#: include/templates/hosts.js.php:131
+msgid "Enable profile"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1702
+msgid "Enable selected"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:822
+msgid "Enable selected Host Groups?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:210
+msgid "Enable selected WEB scenarios?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:136
+msgid "Enable selected discovery rules?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1858
+msgid "Enable selected groups?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:931
+msgid "Enable selected hosts?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1157
+msgid "Enable selected items?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1732
+msgid "Enable selected triggers?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1699
+msgid "Enabled"
+msgstr "Aktiverad"
+
+#: include/locales/en_gb.inc.php:2046
+msgid "End of"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1927
+msgid "English (GB)"
+msgstr "Engelska (GB)"
+
+#: include/locales/en_gb.inc.php:420 include/locales/en_gb.inc.php:1983
+msgid "Error"
+msgstr "Fel"
+
+#: include/locales/en_gb.inc.php:1887
+msgid "Error Description"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2175
+msgid "Error adding dependencies. Following dependencies are not allowed: 1) from a host trigger to a template trigger; 2) from a template trigger to a host trigger; 3) between template triggers, where templates have links to other templates."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1470
+msgid "Error adding service time"
+msgstr ""
+
+#: api/classes/class.cdiscoveryrule.php:575 api/classes/class.citem.php:931
+#: api/classes/class.citemprototype.php:576
+#, php-format
+msgid "Error in item key: %s"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:512
+msgid "Escalation rules"
+msgstr "Eskaleringsregler"
+
+#: include/locales/en_gb.inc.php:1188
+msgid "Event"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:722
+msgid "Event ID"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:333
+msgid "Event acknowledged"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:472
+msgid "Event acknowledges"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1304
+msgid "Event acknowledging disabled"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1189
+msgid "Event details"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1722
+msgid "Event generation"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:111
+msgid "Event source"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2329
+msgid "Events"
+msgstr "Händelser"
+
+#: include/locales/en_gb.inc.php:789
+msgid "Every day(s)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:790
+msgid "Every week(s)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2070
+msgid "Exa"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2003
+msgid "Exclude"
+msgstr ""
+
+#: include/templates/scriptConfirm.js.php:35
+#: include/templates/script.js.php:40
+msgid "Execute"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2223
+msgid "Execute SQL error"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1150
+msgid "Executed script"
+msgstr ""
+
+#: include/templates/scriptConfirm.js.php:17
+msgid "Execution confirmation"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:226
+msgid "Existing"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1266
+msgid "Expand single problem"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:547
+msgid "Expected result"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:766
+msgid "Expired"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:671
+msgid "Exploded"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:220
+msgid "Export selected"
+msgstr ""
+
+#: events.php:185
+msgid "Export to CSV"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:545
+msgid "Expression"
+msgstr "Uttryck"
+
+#: include/locales/en_gb.inc.php:1985
+msgid "Expression Syntax Error"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2011
+msgid "Expression Variable Elements"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2149
+msgid "Expression cannot be empty"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:554
+msgid "Expression type"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:544
+msgid "Expressions"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1955
+msgid "Extended"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1953
+msgid "Extended host profile"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1954
+msgid "Extended profile"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1086
+msgid "External check"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1096
+msgid "Ez Texting"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2353
+msgid "F"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:413
+msgid "FALSE"
+msgstr "FALSKT"
+
+#: include/locales/en_gb.inc.php:117
+msgid "FTP"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:245
+msgid "Fail"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:169
+msgid "Failed"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:168
+msgid "Failed on"
+msgstr ""
+
+#. GETTEXT: Legend below graph
+#: api/classes/class.cwebcheck.php:570
+#, php-format
+msgid "Failed step of scenario '%s'"
+msgstr ""
+
+#: api/classes/class.ctemplate.php:1113
+msgid "Failed to update template"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:735
+msgid "Failure Audit"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1358
+msgid "Favourite graphs"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1359
+msgid "Favourite maps"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1360
+msgid "Favourite screens"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1341
+msgid "Favourites"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:55
+msgid "Feb"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:68 include/locales/en_gb.inc.php:800
+msgid "February"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2131
+msgid "Field"
+msgstr ""
+
+#: api/classes/class.ctemplate.php:1023
+msgid "Field \"host\" is mandatory"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:432
+msgid "Filled region"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:305
+msgid "Filter"
+msgstr "Filter"
+
+#: include/locales/en_gb.inc.php:1755
+msgid "Filter by name"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:244
+msgid "Finish"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:792 include/locales/en_gb.inc.php:2380
+msgid "First"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:697
+msgid "Fixed"
+msgstr "Fast"
+
+#: include/locales/en_gb.inc.php:1143
+msgid "Flexible intervals (sec)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1783
+msgid "For guest, password must be empty"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1163
+msgid "Formula"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:795
+msgid "Fourth"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1928
+msgid "French (FR)"
+msgstr "Franska (FR)"
+
+#: include/locales/en_gb.inc.php:43
+msgid "Fri"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:51 include/locales/en_gb.inc.php:1665
+msgid "Friday"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1438
+msgid "From"
+msgstr "Från"
+
+#: include/locales/en_gb.inc.php:1650
+msgid "Full clone"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:442
+msgid "Fullscreen"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:660
+msgid "Function"
+msgstr "Funktion"
+
+#: include/locales/en_gb.inc.php:2173
+msgid "Function '"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2063
+msgid "G"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2262
+msgid "GD PNG Support"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1185
+msgid "GRAPH PROTOTYPES OF"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:440
+msgid "GRAPHS"
+msgstr "DIAGRAM"
+
+#: include/locales/en_gb.inc.php:1098
+msgid "GSM modem"
+msgstr "GSM-modem"
+
+#: include/locales/en_gb.inc.php:461
+msgid "GUI"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1918
+msgid "GUI Messaging"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1824
+msgid "GUI access"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1803
+msgid "GUI access updated"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2334
+msgid "General"
+msgstr "Allmänt"
+
+#: include/classes/class.cbar.php:726 include/classes/class.cchart.php:2194
+#, php-format
+msgid "Generated in %s sec"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1929
+msgid "German (DE)"
+msgstr "Tyska (DE)"
+
+#: include/locales/en_gb.inc.php:1234
+msgid "Get Img: Element data not found!"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1268
+msgid "Get selected elements FAILED."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2325
+msgid "Get support"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2064
+msgid "Giga"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2015
+msgid "Given expression is not a macro"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1960
+msgid "Go"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1222
+msgid "Go to"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:436
+msgid "Gradient line"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:633
+msgid "Graph"
+msgstr "Diagram"
+
+#: api/classes/class.cgraph.php:863 api/classes/class.cgraphprototype.php:858
+#, php-format
+msgid "Graph [ %1$s ]: already exists on [ %2$s ]"
+msgstr ""
+
+#: api/classes/class.cgraph.php:884 api/classes/class.cgraphprototype.php:879
+#, php-format
+msgid "Graph [ %1$s ]: already exists on [ %2$s ] (inherited from another template)"
+msgstr ""
+
+#: api/classes/class.cgraph.php:906 api/classes/class.cgraph.php:913
+#: api/classes/class.cgraphprototype.php:901
+#: api/classes/class.cgraphprototype.php:908
+#, php-format
+msgid "Graph [ %1$s ]: already exists on [ %2$s ] (items are not identical)"
+msgstr ""
+
+#: api/classes/class.cgraph.php:836 api/classes/class.cgraphprototype.php:831
+#, php-format
+msgid "Graph [ %1$s ]: cannot inherit. No required items on [ %2$s ]"
+msgstr ""
+
+#: api/classes/class.cgraph.php:840 api/classes/class.cgraphprototype.php:835
+#, php-format
+msgid "Graph [ %1$s ]: cannot inherit. No required items on [ %2$s ] (Ymax value item)"
+msgstr ""
+
+#: api/classes/class.cgraph.php:846 api/classes/class.cgraphprototype.php:841
+#, php-format
+msgid "Graph [ %1$s ]: cannot inherit. No required items on [ %2$s ] (Ymin value item)"
+msgstr ""
+
+#: api/classes/class.ctemplate.php:1991
+#, php-format
+msgid "Graph [%1$s] unlinked."
+msgstr ""
+
+#: api/classes/class.cgraph.php:1064
+#, php-format
+msgid "Graph [%s] deleted."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:681
+msgid "Graph added"
+msgstr "Diagram lades till"
+
+#: include/locales/en_gb.inc.php:684
+msgid "Graph deleted"
+msgstr "Diagram togs bort"
+
+#: include/locales/en_gb.inc.php:1904
+msgid "Graph element"
+msgstr "Diagramelement"
+
+#: include/locales/en_gb.inc.php:705
+msgid "Graph item"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1534
+msgid "Graph name"
+msgstr "Diagramnamn"
+
+#: api/classes/class.ctemplate.php:1973
+#, php-format
+msgid "Graph prototype [%1$s] unlinked."
+msgstr ""
+
+#: api/classes/class.cgraphprototype.php:1070
+#, php-format
+msgid "Graph prototype [%s] deleted."
+msgstr ""
+
+#: api/classes/class.cgraphprototype.php:1172
+msgid "Graph prototype must have at least one prototype"
+msgstr ""
+
+#: include/forms/host.edit.php:469 include/forms/template.edit.php:319
+msgid "Graph prototypes"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:704
+msgid "Graph sum"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:667
+msgid "Graph type"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:682
+msgid "Graph updated"
+msgstr "Diagram uppdaterades"
+
+#: api/classes/class.cgraph.php:1153
+#, php-format
+msgid "Graph with name [ %1$s ] already exists"
+msgstr ""
+
+#: api/classes/class.cgraph.php:866 api/classes/class.cgraph.php:887
+#: api/classes/class.cgraphprototype.php:861
+#: api/classes/class.cgraphprototype.php:882
+msgid "Graph with same name but other type exist"
+msgstr ""
+
+#: include/forms/host.edit.php:379 include/forms/template.edit.php:235
+#: include/locales/en_gb.inc.php:858
+msgid "Graphs"
+msgstr "Diagram"
+
+#: include/locales/en_gb.inc.php:643
+msgid "Graphs copied"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:686
+msgid "Graphs deleted"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1221
+msgid "Grid"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:383
+msgid "Group"
+msgstr "Grupp"
+
+#: include/locales/en_gb.inc.php:1787
+msgid "Group added"
+msgstr "Grupp lades till"
+
+#: include/locales/en_gb.inc.php:1791
+msgid "Group deleted"
+msgstr "Grupp togs bort"
+
+#: include/locales/en_gb.inc.php:575
+msgid "Group for discovered hosts"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2096
+msgid "Group function"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:918
+msgid "Group name"
+msgstr "Gruppnamn"
+
+#: include/locales/en_gb.inc.php:1789
+msgid "Group updated"
+msgstr "Grupp har uppdaterats"
+
+#: include/locales/en_gb.inc.php:890
+msgid "Groups"
+msgstr "Grupper"
+
+#: include/locales/en_gb.inc.php:754
+msgid "Groups in maintenance"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:238
+msgid "H.i"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:446 include/locales/en_gb.inc.php:451
+msgid "H:i"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1979
+msgid "H:i:s"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1192
+msgid "HISTORY OF EVENTS"
+msgstr "HÄNDELSEHISTORIK"
+
+#: include/locales/en_gb.inc.php:874
+msgid "HOST GROUPS"
+msgstr "VÄRDGRUPPER"
+
+#: include/locales/en_gb.inc.php:1952
+msgid "HOST PROFILES"
+msgstr "VÄRDPROFILER"
+
+#: include/locales/en_gb.inc.php:879
+msgid "HOSTS"
+msgstr "VÄRDAR"
+
+#: include/locales/en_gb.inc.php:118
+msgid "HTTP"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:619
+msgid "HTTP Authentication"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:986
+msgid "HW Architecture"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:962
+msgid "Hardware"
+msgstr "Hårdvara"
+
+#: include/locales/en_gb.inc.php:1536
+msgid "Height"
+msgstr "Höjd"
+
+#: include/locales/en_gb.inc.php:2323
+msgid "Help"
+msgstr "Hjälp"
+
+#: include/locales/en_gb.inc.php:1107
+msgid "Hexadecimal"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1214
+msgid "Hidden"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1833
+msgid "Hide"
+msgstr "Dölj"
+
+#: include/locales/en_gb.inc.php:1752
+msgid "Hide all"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:188
+msgid "Hide disabled scenarios"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1717
+msgid "Hide disabled triggers"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:727
+msgid "Hide selected"
+msgstr "Dölj markerade"
+
+#: include/locales/en_gb.inc.php:389
+msgid "High"
+msgstr "Hög"
+
+#: include/locales/en_gb.inc.php:1071
+msgid "History"
+msgstr "Historik"
+
+#: include/locales/en_gb.inc.php:1532
+msgid "History and simple graphs"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1051
+msgid "History cleared"
+msgstr "Historik rensad"
+
+#: include/locales/en_gb.inc.php:1138
+msgid "History clearing can take a long time. Continue?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1577
+msgid "History of actions"
+msgstr "Historik för åtgärder"
+
+#: include/locales/en_gb.inc.php:1578
+msgid "History of events"
+msgstr "Historik för händelser"
+
+#: include/locales/en_gb.inc.php:1587
+msgid "Horizontal"
+msgstr "Horisontell"
+
+#: include/locales/en_gb.inc.php:1589
+msgid "Horizontal align"
+msgstr "Horisontell justering"
+
+#: include/locales/en_gb.inc.php:880 include/locales/en_gb.inc.php:2125
+msgid "Host"
+msgstr "Värd"
+
+#: api/classes/class.cproxy.php:373
+#, php-format
+msgid "Host \"%s\" already exists."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:89
+msgid "Host IP"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1008
+msgid "Host MAC Address"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1007
+msgid "Host Router"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1006
+msgid "Host Subnet Mask"
+msgstr ""
+
+#: api/classes/class.chost.php:2167
+#, php-format
+msgid "Host [%1$s] deleted."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1874
+msgid "Host access"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:859
+msgid "Host added"
+msgstr "Värd lades till"
+
+#: include/locales/en_gb.inc.php:601
+msgid "Host count"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:868
+msgid "Host deleted"
+msgstr "Värd togs bort"
+
+#: include/locales/en_gb.inc.php:2171
+msgid "Host does not exist."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:919
+msgid "Host group"
+msgstr "Värdgrupp"
+
+#: include/forms/script.edit.php:108 include/locales/en_gb.inc.php:920
+msgid "Host groups"
+msgstr "Värdgrupper"
+
+#: include/locales/en_gb.inc.php:828
+msgid "Host interface"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2172
+msgid "Host key does not exist."
+msgstr ""
+
+#: include/forms/host.massupdate.php:123
+msgid "Host mass update"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:314
+msgid "Host name"
+msgstr ""
+
+#: api/classes/class.chost.php:1297
+#, php-format
+msgid "Host name must not be longer than %1$d characters, [ %2$s ] is %3$d"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:957
+msgid "Host profile"
+msgstr "Värdprofil"
+
+#: include/locales/en_gb.inc.php:1951
+msgid "Host profiles"
+msgstr "Värdprofiler"
+
+#: include/locales/en_gb.inc.php:1602
+msgid "Host screens"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1337
+msgid "Host status"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:866
+msgid "Host status updated"
+msgstr "Värdstatus uppdaterades"
+
+#: include/locales/en_gb.inc.php:332
+msgid "Host template"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1583
+msgid "Host time"
+msgstr ""
+
+#: api/classes/class.chost.php:1506 api/classes/class.chost.php:1511
+#: api/classes/class.chost.php:1516 api/classes/class.chost.php:1525
+msgid "Host update failed"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:863
+msgid "Host updated"
+msgstr "Värd uppdaterades"
+
+#: include/locales/en_gb.inc.php:854
+msgid "Hosts"
+msgstr "Värdar"
+
+#: include/locales/en_gb.inc.php:1411
+msgid "Hosts (m/n/t)"
+msgstr "Värdar (ö/i/m)"
+
+#: include/locales/en_gb.inc.php:1972
+msgid "Hosts and templates"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:753
+msgid "Hosts in maintenance"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1571
+msgid "Hosts info"
+msgstr "Info om värdar"
+
+#: include/locales/en_gb.inc.php:839
+msgid "Hosts list"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1370
+msgid "Hosts location"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1448
+msgid "Hour"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1455
+msgid "Hourly"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1449
+msgid "Hours"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:510
+msgid "Housekeeper"
+msgstr "Hushållerska"
+
+#: include/locales/en_gb.inc.php:1940
+msgid "Hungarian (HU)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:123
+msgid "ICMP Ping"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:517
+msgid "IMAGES"
+msgstr "BILDER"
+
+#: include/locales/en_gb.inc.php:121
+msgid "IMAP"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:883
+msgid "IP"
+msgstr "IP"
+
+#: include/locales/en_gb.inc.php:896
+msgid "IP address"
+msgstr "IP-adress"
+
+#: api/classes/class.chostinterface.php:513
+msgid "IP and DNS can not be empty for host interface."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:103
+msgid "IP range"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:829
+msgid "IPMI"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1082
+msgid "IPMI agent"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:899
+msgid "IPMI authentication algorithm"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:914
+msgid "IPMI password"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:907
+msgid "IPMI privilege level"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1147
+msgid "IPMI sensor"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:913
+msgid "IPMI username"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1669
+msgid "IT SERVICES"
+msgstr "IT-TJÄNSTER"
+
+#: include/locales/en_gb.inc.php:1437
+msgid "IT SERVICES AVAILABILITY REPORT"
+msgstr "TILLGÄNGLIGHETSRAPPOR FÖR IT-TJÄNSTER"
+
+#: include/locales/en_gb.inc.php:1624
+msgid "IT service"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1625
+msgid "IT services"
+msgstr "IT-tjänster"
+
+#: include/locales/en_gb.inc.php:1436
+msgid "IT services availability report"
+msgstr "Tillgänglighetsrapport för IT-tjänster"
+
+#: include/locales/en_gb.inc.php:1172
+msgid "ITEM PROTOTYPES OF"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:856
+msgid "ITEMS"
+msgstr "OBJEKT"
+
+#: include/locales/en_gb.inc.php:518
+msgid "Icon"
+msgstr "Ikon"
+
+#: include/locales/en_gb.inc.php:1225
+msgid "Icon (OK)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1246
+msgid "Icon (default)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1228
+msgid "Icon (disabled)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1227
+msgid "Icon (maintenance)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1224
+msgid "Icon (problem)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1226
+msgid "Icon (unknown)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1256
+msgid "Icon highlighting"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1255
+msgid "Icon label location"
+msgstr "Position för ikonetikett"
+
+#: include/locales/en_gb.inc.php:1310
+msgid "Icon label type"
+msgstr "Typ av ikonetikett"
+
+#: include/locales/en_gb.inc.php:690
+msgid "Id"
+msgstr "Id"
+
+#: include/locales/en_gb.inc.php:167
+msgid "Idle till"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2313
+msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:516
+msgid "Image"
+msgstr "Bild"
+
+#: include/locales/en_gb.inc.php:522
+msgid "Image added"
+msgstr "Bild lades till"
+
+#: include/locales/en_gb.inc.php:524
+msgid "Image deleted"
+msgstr "Bild togs bort"
+
+#: include/locales/en_gb.inc.php:1244
+msgid "Image is used in Zabbix map"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2225
+msgid "Image size must be less than 1MB"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:526
+msgid "Image updated"
+msgstr "Bild uppdaterades"
+
+#: include/locales/en_gb.inc.php:515
+msgid "Images"
+msgstr "Bilder"
+
+#: include/locales/en_gb.inc.php:296
+msgid "Immediately"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:219
+msgid "Import"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1254
+msgid "Import Map"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:218
+msgid "Import file"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1557
+msgid "Import screen"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:230
+msgid "Imported"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1596
+msgid "Impossible to remove last row and column"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:842
+msgid "In"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:166
+msgid "In check"
+msgstr ""
+
+#: include/forms/host.massupdate.php:146 include/locales/en_gb.inc.php:841
+msgid "In groups"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:752
+msgid "In maintenance"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:163
+msgid "In progress"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2002
+msgid "Include"
+msgstr ""
+
+#: api/classes/class.cscreen.php:563
+#, php-format
+msgid "Incorrect Graph identity \"%s\" provided for Screens item resource"
+msgstr ""
+
+#: api/classes/class.cscreen.php:541
+#, php-format
+msgid "Incorrect Host group identity \"%s\" provided for Screens item resource"
+msgstr ""
+
+#: api/classes/class.cscreen.php:552
+#, php-format
+msgid "Incorrect Host identity \"%s\" provided for Screens item resource"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:344
+msgid "Incorrect IP"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:148
+msgid "Incorrect IP range."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2227
+msgid "Incorrect Image"
+msgstr ""
+
+#: api/classes/class.cscreen.php:575
+#, php-format
+msgid "Incorrect Item identity \"%s\" provided for Screens item resource"
+msgstr ""
+
+#: api/classes/class.cscreen.php:586
+#, php-format
+msgid "Incorrect Map identity \"%s\" provided for Screens item resource"
+msgstr ""
+
+#: api/classes/class.cscreen.php:597
+#, php-format
+msgid "Incorrect Screen identity \"%s\" provided for Screens item resource"
+msgstr ""
+
+#: api/classes/class.cwebcheck.php:382 include/locales/en_gb.inc.php:2091
+msgid "Incorrect arguments passed to function"
+msgstr ""
+
+#: api/classes/class.chostinterface.php:509
+msgid "Incorrect arguments passed to method."
+msgstr ""
+
+#: api/classes/class.chost.php:1334
+#, php-format
+msgid "Incorrect characters used for Host name [ %s ]"
+msgstr ""
+
+#: api/classes/class.chost.php:1698 api/classes/class.ctemplate.php:1377
+#, php-format
+msgid "Incorrect characters used for Hostname [ %s ]"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2230
+msgid "Incorrect characters used for Node name"
+msgstr ""
+
+#: api/classes/class.cproxy.php:365
+#, php-format
+msgid "Incorrect characters used for Proxy name \"%s\"."
+msgstr ""
+
+#: api/classes/class.ctemplate.php:1027
+#, php-format
+msgid "Incorrect characters used for Template name [ %1$s ]"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:425
+msgid "Incorrect command"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:348
+msgid "Incorrect condition type"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1726
+msgid "Incorrect dependency"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:345
+msgid "Incorrect discovery check"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:347
+msgid "Incorrect discovery status"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:405
+msgid "Incorrect escalation period"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:560
+msgid "Incorrect expression"
+msgstr ""
+
+#: api/classes/class.ctrigger.php:1189
+msgid "Incorrect fields for trigger"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2168
+msgid "Incorrect function is used"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:535
+msgid "Incorrect group"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:342
+msgid "Incorrect host"
+msgstr ""
+
+#: api/classes/class.chostinterface.php:529
+#, php-format
+msgid "Incorrect interface DNS parameter \" %1$s \" provided."
+msgstr ""
+
+#: api/classes/class.chostinterface.php:538
+#, php-format
+msgid "Incorrect interface IP parameter \" %1$s \" provided."
+msgstr ""
+
+#: api/classes/class.cgraph.php:1188
+#: api/classes/class.cgraphprototype.php:1206
+msgid "Incorrect item for axis value item"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2092
+msgid "Incorrect key format"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2084
+msgid "Incorrect list of items."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:813
+msgid "Incorrect maintenance date"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:814
+msgid "Incorrect maintenance day period"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:817
+msgid "Incorrect maintenance days of week"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:816
+msgid "Incorrect maintenance month period"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:812
+msgid "Incorrect maintenance period"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:815
+msgid "Incorrect maintenance week period"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2232
+msgid "Incorrect node type"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:349
+msgid "Incorrect object type"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:351
+msgid "Incorrect operation type"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:260
+msgid "Incorrect parameter used for Action"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:258
+msgid "Incorrect parameter used for Conditions"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:259
+msgid "Incorrect parameter used for Operations"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:343
+msgid "Incorrect period"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:346
+msgid "Incorrect port"
+msgstr ""
+
+#: api/classes/class.cscreen.php:501
+msgid "Incorrect resource provided for screen item"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:353
+msgid "Incorrect steps"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2028 include/locales/en_gb.inc.php:2298
+msgid "Incorrect time period"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:341
+msgid "Incorrect trigger"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2163
+msgid "Incorrect trigger expression"
+msgstr ""
+
+#: api/classes/class.ctrigger.php:1259
+#, php-format
+msgid "Incorrect trigger expression. Host \"%s\" does not exist or you have no access to this host."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2050
+msgid "Incorrect type of asort_by_key"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2148
+msgid "Incorrect usage of quotes"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:352
+msgid "Incorrect user"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2219
+msgid "Incorrect user data in"
+msgstr ""
+
+#: include/db.inc.php:1203
+#, php-format
+msgid "Incorrect value \"%1$s\" for float field \"%2$s\"."
+msgstr ""
+
+#: include/db.inc.php:1199
+#, php-format
+msgid "Incorrect value \"%1$s\" for int field \"%2$s\"."
+msgstr ""
+
+#: include/db.inc.php:1195
+#, php-format
+msgid "Incorrect value \"%1$s\" for unsigned int field \"%2$s\"."
+msgstr ""
+
+#: include/db.inc.php:1180
+#, php-format
+msgid "Incorrect value \"NULL\" for NOT NULL field \"%s\"."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2144
+msgid "Incorrect value for"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2155
+msgid "Incorrect value type"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:537
+msgid "Incorrect work period"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:297
+msgid "Infinity"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:721
+msgid "Info"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:386
+msgid "Information"
+msgstr "Information"
+
+#: include/locales/en_gb.inc.php:1711
+msgid "Insert"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1729
+msgid "Insert macro"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:247
+msgid "Installation"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:250
+msgid "Installation/Update"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:992
+msgid "Installer Name"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:938
+msgid "Interface"
+msgstr ""
+
+#: api/classes/class.chostinterface.php:517
+#, php-format
+msgid "Interface with DNS \" %1$s \" can not have empty IP address."
+msgstr ""
+
+#: api/classes/class.chostinterface.php:521
+#, php-format
+msgid "Interface with IP \" %1$s \" can not have empty DNS name."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:937
+msgid "Interfaces"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1846
+msgid "Internal"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1070
+msgid "Interval"
+msgstr ""
+
+#: include/items.inc.php:1499
+msgid "Invalid key format"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2327
+msgid "Inventory"
+msgstr "Inventarier"
+
+#: include/locales/en_gb.inc.php:1821
+msgid "Is online?"
+msgstr "Är ansluten?"
+
+#: include/locales/en_gb.inc.php:1335
+msgid "Issue"
+msgstr ""
+
+#: api/classes/class.cuser.php:190
+msgid "It is not possible to filter by user password"
+msgstr ""
+
+#: api/classes/class.cuser.php:207
+msgid "It is not possible to search by user password"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1930
+msgid "Italian (IT)"
+msgstr "Italienska (IT)"
+
+#: include/locales/en_gb.inc.php:1120
+msgid "Item"
+msgstr "Objekt"
+
+#: include/items.inc.php:351
+#, php-format
+msgid "Item [%1$s:%2$s] cannot find interface on host [%3$s]"
+msgstr ""
+
+#: api/classes/class.citem.php:1389
+#, php-format
+msgid "Item [%1$s:%2$s] deleted."
+msgstr ""
+
+#: api/classes/class.cdiscoveryrule.php:674 api/classes/class.citem.php:1036
+#: api/classes/class.citemprototype.php:640
+#, php-format
+msgid "Item [%1$s:%2$s] has invalid port: \"%3$s\"."
+msgstr ""
+
+#: api/classes/class.ctemplate.php:1907
+#, php-format
+msgid "Item [%1$s:%2$s] unlinked."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:645
+msgid "Item added"
+msgstr "Objekt lades till"
+
+#: include/locales/en_gb.inc.php:602
+msgid "Item count"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1061
+msgid "Item deleted"
+msgstr "Objekt togs bort"
+
+#: include/locales/en_gb.inc.php:648
+msgid "Item does not exist"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2098
+msgid "Item function"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1176
+msgid "Item prototype"
+msgstr ""
+
+#: api/classes/class.citemprototype.php:1003
+#, php-format
+msgid "Item prototype [%1$s:%2$s] deleted."
+msgstr ""
+
+#: api/classes/class.ctemplate.php:1925
+#, php-format
+msgid "Item prototype [%1$s:%2$s] unlinked."
+msgstr ""
+
+#: include/forms/host.edit.php:423 include/forms/template.edit.php:276
+msgid "Item prototypes"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:646
+msgid "Item updated"
+msgstr "Objekt uppdaterades"
+
+#: api/classes/class.cdiscoveryrule.php:662 api/classes/class.citem.php:1024
+msgid "Item uses Host interface from non parent host"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2093
+msgid "Item will not be refreshed. Please enter a correct update interval."
+msgstr ""
+
+#: api/classes/class.cwebcheck.php:584
+#, php-format
+msgid "Item with key [%s] already exists"
+msgstr ""
+
+#: include/forms/host.edit.php:333 include/forms/template.edit.php:192
+#: include/locales/en_gb.inc.php:855
+msgid "Items"
+msgstr "Objekt"
+
+#: include/locales/en_gb.inc.php:1406
+msgid "Items (m/d/n)"
+msgstr "Objekt (ö/i/s)"
+
+#: include/locales/en_gb.inc.php:1065
+msgid "Items activated"
+msgstr "Objekt aktiverade"
+
+#: include/locales/en_gb.inc.php:861
+msgid "Items copied"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1063
+msgid "Items deleted"
+msgstr "Objekt borttagna"
+
+#: include/locales/en_gb.inc.php:1066
+msgid "Items disabled"
+msgstr "Objekt inaktiverade"
+
+#: include/locales/en_gb.inc.php:725
+msgid "Items list"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:706
+msgid "Items required for graph"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:647
+msgid "Items updated"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1092
+msgid "Jabber"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1093
+msgid "Jabber identifier"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:54
+msgid "Jan"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:67 include/locales/en_gb.inc.php:799
+msgid "January"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1937
+msgid "Japanese (JP)"
+msgstr "Japanska (JP)"
+
+#: include/locales/en_gb.inc.php:60
+msgid "Jul"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:73 include/locales/en_gb.inc.php:805
+msgid "July"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:59
+msgid "Jun"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:72 include/locales/en_gb.inc.php:804
+msgid "June"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2059
+msgid "K"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1101
+msgid "Keep history (in days)"
+msgstr "Behåll historik (i dagar)"
+
+#: include/locales/en_gb.inc.php:1102
+msgid "Keep trends (in days)"
+msgstr "Behåll trender (i dagar)"
+
+#: include/locales/en_gb.inc.php:1067
+msgid "Key"
+msgstr "Nyckel"
+
+#: include/items.inc.php:1320
+msgid "Key cannot be empty"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2099
+msgid "Key does not match"
+msgstr ""
+
+#: include/items.inc.php:1328
+#, php-format
+msgid "Key is too large: maximum %d characters"
+msgstr ""
+
+#: include/items.inc.php:1350 include/items.inc.php:1390
+#: include/items.inc.php:1412 include/items.inc.php:1440
+#: include/items.inc.php:1489
+msgid "Key is valid"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2004
+msgid "Keyword"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2060
+msgid "Kilo"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1931
+msgid "Korean (KO)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:627
+msgid "LATEST DATA"
+msgstr "SENASTE DATA"
+
+#: include/locales/en_gb.inc.php:115
+msgid "LDAP"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:618
+msgid "LDAP Authentication"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:233
+msgid "LOCAL"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:359
+msgid "LOGS"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1200
+msgid "LOST"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1220
+msgid "Label"
+msgstr "Etikett"
+
+#: include/locales/en_gb.inc.php:1311
+msgid "Label location"
+msgstr "Etikettposition"
+
+#: include/locales/en_gb.inc.php:1925
+msgid "Language"
+msgstr "Språk"
+
+#: include/locales/en_gb.inc.php:1491 include/locales/en_gb.inc.php:2379
+msgid "Last"
+msgstr "Senaste"
+
+#: include/locales/en_gb.inc.php:1340
+msgid "Last 20 issues"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1677
+msgid "Last 24 hours"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1679
+msgid "Last 30 days"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1680
+msgid "Last 365 days"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1678
+msgid "Last 7 days"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1757
+msgid "Last change"
+msgstr "Senaste ändring"
+
+#: include/locales/en_gb.inc.php:1209
+msgid "Last check"
+msgstr "Senaste kontroll"
+
+#: include/locales/en_gb.inc.php:2283
+msgid "Last failed attempt was from"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:714
+msgid "Last hour graph"
+msgstr "Diagram för senaste timmen"
+
+#: include/locales/en_gb.inc.php:716
+msgid "Last month graph"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1713
+msgid "Last of"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:930
+msgid "Last seen (age)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1210
+msgid "Last value"
+msgstr "Senaste värde"
+
+#: include/locales/en_gb.inc.php:715
+msgid "Last week graph"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2338
+msgid "Latest data"
+msgstr "Senaste data"
+
+#: include/locales/en_gb.inc.php:1191
+msgid "Latest events"
+msgstr "Senaste händelser"
+
+#: include/locales/en_gb.inc.php:1932
+msgid "Latvian (LV)"
+msgstr "Lettiska (LV)"
+
+#: include/locales/en_gb.inc.php:659
+msgid "Left"
+msgstr "Vänster"
+
+#: include/locales/en_gb.inc.php:702
+msgid "Legend"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:431
+msgid "Line"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1219
+msgid "Link"
+msgstr "Länk"
+
+#: include/locales/en_gb.inc.php:897
+msgid "Link additional templates"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1257
+msgid "Link indicators"
+msgstr ""
+
+#: api/classes/class.cmap.php:574 api/classes/class.cmap.php:681
+msgid "Link name should be unique."
+msgstr ""
+
+#: api/classes/class.cmap.php:571 api/classes/class.cmap.php:678
+msgid "Link should have both \"name\" and \"url\" fields."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1229
+msgid "Link status indicator"
+msgstr "Länkstatusindikator"
+
+#: include/locales/en_gb.inc.php:1280
+msgid "Link status indicators"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:330
+msgid "Link to template"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1644
+msgid "Link to trigger?"
+msgstr "Länk till utlösare?"
+
+#: include/locales/en_gb.inc.php:946
+msgid "Linked templates"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:947
+msgid "Linked to"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1218
+msgid "Links"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1190
+msgid "List"
+msgstr ""
+
+#: include/classes/class.clist.php:32
+msgid "List is empty"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1346
+msgid "Loading..."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:719
+msgid "Local"
+msgstr "Lokal"
+
+#: include/locales/en_gb.inc.php:1582
+msgid "Local time"
+msgstr "Lokal tid"
+
+#: include/locales/en_gb.inc.php:965
+msgid "Location"
+msgstr "Plats"
+
+#: include/locales/en_gb.inc.php:1115
+msgid "Log"
+msgstr "Logg"
+
+#: include/locales/en_gb.inc.php:1130
+msgid "Log time format"
+msgstr "Tidsformat för logg"
+
+#: include/classes/class.cserverinfo.php:46
+msgid "Logged in as"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2335
+msgid "Login"
+msgstr "Inloggning"
+
+#: include/locales/en_gb.inc.php:1948
+msgid "Login name"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2278
+msgid "Login name or password is incorrect"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2336
+msgid "Logout"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:358
+msgid "Logs"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:141
+msgid "Lost"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2061 include/locales/en_gb.inc.php:2349
+msgid "M"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1461 include/locales/en_gb.inc.php:1482
+msgid "M Y"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:967
+msgid "MAC Address"
+msgstr "MAC-adress"
+
+#: include/locales/en_gb.inc.php:1241
+msgid "MAINTENANCE"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:761
+msgid "MAINTENANCE PERIODS"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1251
+msgid "MAPS"
+msgstr "KARTOR"
+
+#: include/locales/en_gb.inc.php:902
+msgid "MD2"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:903
+msgid "MD5"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1319
+msgid "MEDIA TYPES"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2047
+msgid "MEMORY LIMIT REACHED! Profiling was stopped to save memory for script processing."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1488
+msgid "MOST BUSY TRIGGERS TOP 100"
+msgstr "MEST ANVÄNDA UTLÖSARE - TOPP 100"
+
+#: include/locales/en_gb.inc.php:832
+msgid "Macro"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:834
+msgid "Macro name is too long, should not exceed 64 chars."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:835
+msgid "Macro value is too long, should not exceed 255 chars."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:831
+msgid "Macros"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:837
+msgid "Macros updated"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:745
+msgid "Maintenance"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:746
+msgid "Maintenance added"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:748
+msgid "Maintenance deleted"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:760
+msgid "Maintenance period length"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:309
+msgid "Maintenance status"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:765
+msgid "Maintenance type"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:747
+msgid "Maintenance updated"
+msgstr ""
+
+#: include/db.inc.php:1168
+#, php-format
+msgid "Mandatory field \"%1$s\" is missing in table \"%2$s\"."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1564
+msgid "Map"
+msgstr "Karta"
+
+#: include/locales/en_gb.inc.php:1248
+msgid "Map elements"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1232
+msgid "Map is saved! Return?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1233
+msgid "Map save operation failed."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:486
+msgid "Mapping"
+msgstr "Mappning"
+
+#: include/locales/en_gb.inc.php:2331
+msgid "Maps"
+msgstr "Kartor"
+
+#: include/locales/en_gb.inc.php:56
+msgid "Mar"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:69 include/locales/en_gb.inc.php:801
+msgid "March"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1267
+msgid "Mark elements on triggers status change"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:729
+msgid "Mark others"
+msgstr "Markera övriga"
+
+#: include/locales/en_gb.inc.php:728
+msgid "Mark selected"
+msgstr "Markera markerade"
+
+#: include/locales/en_gb.inc.php:1139
+msgid "Mass update"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1159
+msgid "Mass update selected items?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1734
+msgid "Mass update selected triggers?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:268
+msgid "Master"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:266
+msgid "Master node"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2231
+msgid "Master node already exists"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:464
+msgid "Max count of elements to show inside table cell"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:476
+msgid "Max count of events per trigger to show"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1344
+msgid "Maximize"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:58 include/locales/en_gb.inc.php:71
+#: include/locales/en_gb.inc.php:803
+msgid "May"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1320
+msgid "Media"
+msgstr "Media"
+
+#: include/locales/en_gb.inc.php:1903
+msgid "Media type"
+msgstr "Mediatyp"
+
+#: include/locales/en_gb.inc.php:498
+msgid "Media type deleted"
+msgstr "Mediatyp borttagen"
+
+#: include/locales/en_gb.inc.php:496
+msgid "Media type updated"
+msgstr "Mediatyp uppdaterad"
+
+#: include/locales/en_gb.inc.php:499
+msgid "Media type was not deleted"
+msgstr "Mediatyp blev inte borttagen"
+
+#: include/locales/en_gb.inc.php:497
+msgid "Media type was not updated"
+msgstr "Mediatyp blev inte uppdaterad"
+
+#: include/locales/en_gb.inc.php:511
+msgid "Media types"
+msgstr "Mediatyper"
+
+#: include/locales/en_gb.inc.php:2305
+msgid "Mediatype already exists:"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2306
+msgid "Mediatypes used by action:"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2062
+msgid "Mega"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1816
+msgid "Members"
+msgstr "Medlemmar"
+
+#: include/locales/en_gb.inc.php:2040
+msgid "Memory limit"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2041
+msgid "Memory usage"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1342
+msgid "Menu"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:376
+msgid "Message"
+msgstr "Meddelande"
+
+#: include/locales/en_gb.inc.php:361
+msgid "Message actions"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:540
+msgid "Message text limit"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1920
+msgid "Message timeout"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1915
+msgid "Messages"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2056
+msgid "Micro"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1594
+msgid "Middle"
+msgstr "Mitten"
+
+#: include/locales/en_gb.inc.php:2058
+msgid "Milli"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1696
+msgid "Min severity"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2239
+msgid "Minimal version of PHP is"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1345
+msgid "Minimize"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1622
+msgid "Minor problem"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1450
+msgid "Minute"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1451
+msgid "Minutes"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:227
+msgid "Missing"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2194
+msgid "Missing items for graph"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2167
+msgid "Missing key"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2159
+msgid "Missing mandatory parameter for function"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1133
+msgid "Mode"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:988
+msgid "Model Number"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:39
+msgid "Mon"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:47 include/locales/en_gb.inc.php:1661
+msgid "Monday"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:885
+msgid "Monitored"
+msgstr "Övervakad"
+
+#: include/locales/en_gb.inc.php:978
+msgid "Monitored by proxy"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:147
+msgid "Monitored host"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2326
+msgid "Monitoring"
+msgstr "Övervakning"
+
+#: include/locales/en_gb.inc.php:1453
+msgid "Month"
+msgstr "Månad"
+
+#: include/locales/en_gb.inc.php:1458
+msgid "Monthly"
+msgstr "Månatligen"
+
+#: include/locales/en_gb.inc.php:1389
+msgid "More than 10 minutes"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1487
+msgid "Most busy triggers top 100"
+msgstr "Mest använda utlösare - topp 100"
+
+#: include/locales/en_gb.inc.php:1911
+msgid "Move"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:252
+msgid "Multibyte String module required to run FrontEnd"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1715
+msgid "Multiple PROBLEM events"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1913
+msgid "Mute"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1308
+msgid "NETWORK MAPS"
+msgstr "NÄTVERKSKARTOR"
+
+#: include/locales/en_gb.inc.php:249
+msgid "NEW INSTALLATION"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:120
+msgid "NNTP"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:224
+msgid "NO DATA"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:589
+msgid "NODES"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1479
+msgid "NOTIFICATIONS"
+msgstr "NOTIFIERINGAR"
+
+#: include/locales/en_gb.inc.php:209
+msgid "NTLM authentication"
+msgstr ""
+
+#: include/forms/script.edit.php:73 include/locales/en_gb.inc.php:1819
+msgid "Name"
+msgstr "Namn"
+
+#: include/locales/en_gb.inc.php:2054
+msgid "Nano"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1262
+msgid "Network map added"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1249
+msgid "Network map deleted"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1264
+msgid "Network map updated"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1307
+msgid "Network maps"
+msgstr "Nätverkskartor"
+
+#: include/locales/en_gb.inc.php:1762
+msgid "Never"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:325
+msgid "New"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1146
+msgid "New application"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:113
+msgid "New check"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:319
+msgid "New condition"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1720
+msgid "New dependency"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1275
+msgid "New element"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:555
+msgid "New expression"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1142
+msgid "New flexible interval"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:894
+msgid "New group"
+msgstr "Ny grupp"
+
+#: include/locales/en_gb.inc.php:830
+msgid "New host"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1998
+msgid "New indicators"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:248
+msgid "New installation"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:654
+msgid "New item for the graph"
+msgstr "Nytt objekt för diagrammet"
+
+#: include/locales/en_gb.inc.php:762
+msgid "New maintenance period"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:487
+msgid "New mapping"
+msgstr "Ny mappning"
+
+#: include/locales/en_gb.inc.php:1324
+msgid "New media"
+msgstr "Nytt media"
+
+#: include/locales/en_gb.inc.php:495
+msgid "New media type was not added"
+msgstr "Ny mediatyp lades inte till"
+
+#: include/locales/en_gb.inc.php:590
+msgid "New node"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:562
+msgid "New regular expression"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1656
+msgid "New service time"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1554
+msgid "New slide"
+msgstr ""
+
+#: include/html.inc.php:325
+msgid "New template"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:942
+msgid "New template added"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:242 include/locales/en_gb.inc.php:2382
+msgid "Next"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1380
+msgid "Next check"
+msgstr "Nästa kontroll"
+
+#: include/locales/en_gb.inc.php:1414
+msgid "No"
+msgstr "Nej"
+
+#: include/locales/en_gb.inc.php:1628
+msgid "No IT service defined"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1843
+msgid "No accessible resources"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:380
+msgid "No actions defined"
+msgstr "Inga åtgärder har definierats"
+
+#: include/locales/en_gb.inc.php:424
+msgid "No actions found"
+msgstr "Inga åtgärder hittades"
+
+#: include/locales/en_gb.inc.php:2121
+msgid "No application with"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:853
+msgid "No applications defined"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:323
+msgid "No conditions defined"
+msgstr "Inga villkor har definierats"
+
+#: include/locales/en_gb.inc.php:770
+msgid "No data collection"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:773
+msgid "No data maintenance"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1719
+msgid "No dependencies defined"
+msgstr ""
+
+#: popup.php:1581
+msgid "No discovery checks defined"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:102
+msgid "No discovery rules defined"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2031
+msgid "No elements selected!"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1984
+msgid "No errors found"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1193
+msgid "No events found"
+msgstr "Inga händelser hittades"
+
+#: include/locales/en_gb.inc.php:279
+msgid "No events to acknowledge"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1144
+msgid "No flexible intervals"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:692
+msgid "No graph defined"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2193
+msgid "No graph item with"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:691
+msgid "No graphs defined"
+msgstr "Inga diagram har definierats"
+
+#: include/locales/en_gb.inc.php:893
+msgid "No groups defined"
+msgstr ""
+
+#: api/classes/class.chost.php:1308 api/classes/class.chost.php:1318
+#, php-format
+msgid "No groups for host [ %s ]"
+msgstr ""
+
+#: api/classes/class.chost.php:1666
+msgid "No groups for hosts"
+msgstr ""
+
+#: api/classes/class.ctemplate.php:1341
+msgid "No groups for template"
+msgstr ""
+
+#: api/classes/class.ctemplate.php:992
+#, php-format
+msgid "No groups for template [ %s ]"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:875
+msgid "No host groups defined"
+msgstr "Inga värdgrupper har definierats"
+
+#: include/locales/en_gb.inc.php:2118
+msgid "No host groups with"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2119
+msgid "No host with"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:876
+msgid "No hosts defined"
+msgstr "Inga värdar har definierats"
+
+#: include/locales/en_gb.inc.php:1294
+msgid "No icon for map element"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2087
+msgid "No image"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:519
+msgid "No images defined"
+msgstr "Inga bilder har definierats"
+
+#: api/classes/class.chost.php:1311 api/classes/class.chost.php:1329
+#, php-format
+msgid "No interfaces for host [ %s ]"
+msgstr ""
+
+#: api/classes/class.cproxy.php:358
+#, php-format
+msgid "No interfaces for proxy \"%s\""
+msgstr ""
+
+#: api/classes/class.cproxy.php:351
+#, php-format
+msgid "No interfaces provided for proxy \"%s\""
+msgstr ""
+
+#: api/classes/class.cproxy.php:341
+#, php-format
+msgid "No interfaces provided for proxy \"%s\"."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1050
+msgid "No item defined"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2104
+msgid "No item with"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1969
+msgid "No items"
+msgstr "Inga objekt"
+
+#: include/locales/en_gb.inc.php:1049
+msgid "No items defined"
+msgstr "Inga objekt har definierats"
+
+#: include/locales/en_gb.inc.php:1273
+msgid "No links"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:488
+msgid "No mapping defined"
+msgstr "Ingen mappning definierad"
+
+#: include/locales/en_gb.inc.php:1252
+msgid "No maps defined"
+msgstr "Inga kartor har definierats"
+
+#: include/locales/en_gb.inc.php:1323
+msgid "No media defined"
+msgstr "Inget media har definierats"
+
+#: media_types.php:257
+msgid "No media types defined"
+msgstr "Inga mediatyper har definierats"
+
+#: include/locales/en_gb.inc.php:591
+msgid "No nodes defined"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:324
+msgid "No operations defined"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2345
+msgid "No permissions for map"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2344
+msgid "No permissions for screen"
+msgstr ""
+
+#: maps.php:122
+msgid "No permissions or map does not exist."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:626
+msgid "No permissions to referred object or it does not exist!"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:878
+msgid "No proxies defined"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1529
+msgid "No resources defined"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1829
+msgid "No rights defined"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2185
+msgid "No rows in screen"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1523
+msgid "No screens defined"
+msgstr "Inga skärmar har definierats"
+
+#: include/locales/en_gb.inc.php:1873
+msgid "No scripts defined"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2215
+msgid "No service linkage with"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2214
+msgid "No service with"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1550
+msgid "No slide shows defined"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1552
+msgid "No slides defined"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2150
+msgid "No such host"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2152
+msgid "No such monitored parameter"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2181
+msgid "No system map with"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:707
+msgid "No target selected"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:877
+msgid "No templates defined"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1654
+msgid "No times defined"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1684
+msgid "No trigger"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1686
+msgid "No trigger defined"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2147
+msgid "No trigger with"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1685
+msgid "No triggers defined"
+msgstr "Inga utlösare har definierats"
+
+#: include/locales/en_gb.inc.php:1817
+msgid "No user groups defined"
+msgstr "Inga användargrupper har definierats"
+
+#: include/locales/en_gb.inc.php:1822
+msgid "No users defined"
+msgstr "Inga användare har definierats"
+
+#: include/locales/en_gb.inc.php:587
+msgid "Node"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:271
+msgid "Node added"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:273
+msgid "Node deleted"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:269
+msgid "Node updated"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2233
+msgid "Node with same ID already exists"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:588
+msgid "Nodes"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:901 include/locales/en_gb.inc.php:1637
+msgid "None"
+msgstr "Ingen"
+
+#: include/forms.inc.php:2931 include/locales/en_gb.inc.php:669
+msgid "Normal"
+msgstr ""
+
+#: include/forms.inc.php:2932
+msgid "Normal + Multiple PROBLEM events"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:772
+msgid "Normal maintenance"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1761
+msgid "Not Ack"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1045
+msgid "Not Templated items"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1992
+msgid "Not allowed symbols detected after element"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1993
+msgid "Not allowed symbols detected before element"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1989
+msgid "Not allowed symbols or sequence of symbols in expression element detected"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1990
+msgid "Not allowed value detected in element"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:924
+msgid "Not available"
+msgstr "Inte tillgänglig"
+
+#: include/locales/en_gb.inc.php:385
+msgid "Not classified"
+msgstr "Inte klassifierad"
+
+#: include/locales/en_gb.inc.php:639
+msgid "Not connected"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:886
+msgid "Not monitored"
+msgstr "Inte övervakad"
+
+#: include/locales/en_gb.inc.php:1090
+msgid "Not supported"
+msgstr "Stöds inte"
+
+#: include/locales/en_gb.inc.php:1657
+msgid "Note"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:966
+msgid "Notes"
+msgstr "Anteckningar"
+
+#: include/locales/en_gb.inc.php:1314
+msgid "Nothing"
+msgstr "Ingenting"
+
+#: include/locales/en_gb.inc.php:536
+msgid "Nothing to do"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1480
+msgid "Notification report"
+msgstr "Notifieringsrapport"
+
+#: include/locales/en_gb.inc.php:1478
+msgid "Notifications"
+msgstr "Notifieringar"
+
+#: include/locales/en_gb.inc.php:64
+msgid "Nov"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:77 include/locales/en_gb.inc.php:809
+msgid "November"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1410
+msgid "Number of hosts (monitored/not monitored/templates)"
+msgstr "Antal värdar (övervakade/inte övervakade/mallar)"
+
+#: include/locales/en_gb.inc.php:1405
+msgid "Number of items (monitored/disabled/not supported)"
+msgstr "Antal objekt (övervakade/inaktiverade/stöds inte)"
+
+#: include/locales/en_gb.inc.php:1489
+msgid "Number of status changes"
+msgstr "Antal statusändringar"
+
+#: include/locales/en_gb.inc.php:190
+msgid "Number of steps"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1402
+msgid "Number of triggers (enabled/disabled)[problem/unknown/ok]"
+msgstr "Antal utlösare (aktiverade/inaktiverade)[problem/okänt/ok]"
+
+#: include/locales/en_gb.inc.php:1408
+msgid "Number of users (online)"
+msgstr "Antal användare (anslutna)"
+
+#: include/locales/en_gb.inc.php:1112
+msgid "Numeric (float)"
+msgstr "Numerisk (flyttal)"
+
+#: include/locales/en_gb.inc.php:1110
+msgid "Numeric (integer 64bit)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1111
+msgid "Numeric (unsigned)"
+msgstr "Numerisk (heltal 64-bit)"
+
+#: include/locales/en_gb.inc.php:905 include/locales/en_gb.inc.php:912
+msgid "OEM"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1300
+msgid "OK"
+msgstr "OK"
+
+#: include/locales/en_gb.inc.php:377
+msgid "ON"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1009
+msgid "OOB IP Address"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1011
+msgid "OOB Router"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1010
+msgid "OOB Subnet Mask"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:395
+msgid "OR"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:959
+msgid "OS"
+msgstr "OS"
+
+#: include/locales/en_gb.inc.php:984
+msgid "OS (Full Details)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:985
+msgid "OS (Short)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1369
+msgid "OVERVIEW"
+msgstr "ÖVERSIKT"
+
+#: include/locales/en_gb.inc.php:63
+msgid "Oct"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1106
+msgid "Octal"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:76 include/locales/en_gb.inc.php:808
+msgid "October"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:379
+msgid "Off"
+msgstr "AV"
+
+#: include/locales/en_gb.inc.php:1442
+msgid "Ok"
+msgstr "Ok"
+
+#: include/locales/en_gb.inc.php:378
+msgid "On"
+msgstr "P"
+
+#: include/locales/en_gb.inc.php:1910
+msgid "Once"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:784
+msgid "One time only"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1653
+msgid "One-time downtime"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2307
+msgid "Only Super Admins can create media types"
+msgstr ""
+
+#. GETTEXT: Api exception
+#: api/classes/class.cusergroup.php:703
+msgid "Only Super Admins can delete User Groups."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2285
+msgid "Only Super Admins can delete Users"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2308
+msgid "Only Super Admins can delete media types"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2284
+msgid "Only Super Admins can update Users"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2286
+msgid "Only Zabbix Admins can add user Medias"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2288
+msgid "Only Zabbix Admins can change user Medias"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2287
+msgid "Only Zabbix Admins can remove user Medias"
+msgstr ""
+
+#: api/classes/class.cwebcheck.php:321 api/classes/class.cwebcheck.php:387
+msgid "Only characters are allowed"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1407
+msgid "Only items assigned to enabled hosts are counted"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1404
+msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2143
+msgid "Operation cannot be performed due to unauthorized request"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:316
+msgid "Operation condition"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:301
+msgid "Operation type"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:321
+msgid "Operations"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:910
+msgid "Operator"
+msgstr ""
+
+#: include/forms/host.massupdate.php:144 include/forms/host.massupdate.php:166
+#: include/forms/host.massupdate.php:177 include/locales/en_gb.inc.php:1141
+msgid "Original"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:469
+msgid "Original blue"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:528
+msgid "Other"
+msgstr "Övrigt"
+
+#: include/forms/host.massupdate.php:146 include/locales/en_gb.inc.php:840
+msgid "Other groups"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:529
+msgid "Other parameters"
+msgstr "Övriga parametrar"
+
+#: include/locales/en_gb.inc.php:1367
+msgid "Overview"
+msgstr "Översikt"
+
+#: include/locales/en_gb.inc.php:1368
+msgid "Overview by proxy"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2067
+msgid "P"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1333
+msgid "PERSONAL DASHBOARD"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2270
+msgid "PHP Session"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2259
+msgid "PHP Sockets"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2254
+msgid "PHP databases support"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2272
+msgid "PHP gettext"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2244
+msgid "PHP max execution time"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2245
+msgid "PHP max input time"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2240
+msgid "PHP memory limit"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2242
+msgid "PHP post max size"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2248
+msgid "PHP timezone"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2268
+msgid "PHP upload max filesize"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2238
+msgid "PHP version"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1567
+msgid "PLAINT TEXT"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:119
+msgid "POP"
+msgstr ""
+
+#: api/classes/class.chostinterface.php:543
+msgid "PORT can not be empty for host interface"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1301
+msgid "PROBLEM"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:926
+msgid "PROXIES"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2035
+msgid "Page received incorrect data"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1503
+msgid "Palette"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:650
+msgid "Parameter"
+msgstr "Parameter"
+
+#: include/locales/en_gb.inc.php:1634
+msgid "Parent service"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2224
+msgid "Parse SQL error"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:605
+msgid "Passive"
+msgstr ""
+
+#: include/forms/host.edit.php:524 include/locales/en_gb.inc.php:1834
+#: include/setup.inc.php:249
+msgid "Password"
+msgstr "Lösenord"
+
+#: include/locales/en_gb.inc.php:1836
+msgid "Password (once again)"
+msgstr "Lösenord (en gång till)"
+
+#: include/locales/en_gb.inc.php:2304
+msgid "Password required for mediatype"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1782
+msgid "Password should not be empty"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1446
+msgid "Percentage"
+msgstr "Procentandel"
+
+#: include/locales/en_gb.inc.php:678
+msgid "Percentile line"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:441
+msgid "Period"
+msgstr "Period"
+
+#: include/locales/en_gb.inc.php:779
+msgid "Period type"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2068
+msgid "Peta"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:670
+msgid "Pie"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1566
+msgid "Plain text"
+msgstr "Ren text"
+
+#: include/locales/en_gb.inc.php:1921
+msgid "Play"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1919
+msgid "Play sound"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2235
+msgid "Please be aware that database still contains data related to the deleted Node"
+msgstr ""
+
+#: scripts.php:91
+msgid "Please enter confirmation text."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1271
+msgid "Please select two elements"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2252
+msgid "Please set"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1941
+msgid "Polish (PL)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:884
+msgid "Port"
+msgstr "Port"
+
+#: include/locales/en_gb.inc.php:1934
+msgid "Portuguese (PT)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2005
+msgid "Position"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:205
+msgid "Post"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:221
+msgid "Preview"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:241 include/locales/en_gb.inc.php:2381
+#: include/locales/en_gb.inc.php:2383
+msgid "Previous"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1029
+msgid "Primary POC Cell"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1031
+msgid "Primary POC Comments"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1026
+msgid "Primary POC Email"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1025
+msgid "Primary POC Name"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1027
+msgid "Primary POC Phone 1"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1028
+msgid "Primary POC Phone 2"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1030
+msgid "Primary POC Screen Name"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2337
+msgid "Print"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1153
+msgid "Private key file"
+msgstr ""
+
+#: include/forms/host.edit.php:521
+msgid "Privilege level"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2281
+msgid "Probably php-ldap module is missing"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1444
+msgid "Problem"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1364
+msgid "Problem display"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1916
+msgid "Problem on"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1639
+msgid "Problem, if all children have problems"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1638
+msgid "Problem, if at least one child has a problem"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1445
+msgid "Problems"
+msgstr "Problem"
+
+#: include/locales/en_gb.inc.php:2324
+msgid "Profile"
+msgstr "Profil"
+
+#: include/locales/en_gb.inc.php:2086
+msgid "Profile for this host is missing"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:925
+msgid "Proxies"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:927
+msgid "Proxy"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1793
+msgid "Proxy added"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1797
+msgid "Proxy deleted"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:604
+msgid "Proxy mode"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:929
+msgid "Proxy name"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1795
+msgid "Proxy updated"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1154
+msgid "Public key"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1152
+msgid "Public key file"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1379
+msgid "QUEUE OF ITEMS TO BE UPDATED"
+msgstr "UPPDATERINGSKÖ FÖR OBJEKT"
+
+#: include/locales/en_gb.inc.php:2328
+msgid "Queue"
+msgstr "K"
+
+#: include/locales/en_gb.inc.php:1395
+msgid "REPORT"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:906
+msgid "RMCP+"
+msgstr ""
+
+#: include/forms/script.edit.php:112 include/locales/en_gb.inc.php:1871
+msgid "Read"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1830
+msgid "Read only"
+msgstr "Endast läs"
+
+#: include/locales/en_gb.inc.php:1831
+msgid "Read-write"
+msgstr "Läs-skriv"
+
+#: include/locales/en_gb.inc.php:1672
+msgid "Reason"
+msgstr "Anledning"
+
+#: include/locales/en_gb.inc.php:93
+msgid "Received value"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:419
+msgid "Recipient"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:418
+msgid "Recipient(s)"
+msgstr "Mottagare"
+
+#: include/locales/en_gb.inc.php:1917
+msgid "Recovery"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:298
+msgid "Recovery message"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:373
+msgid "Recovery subject"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1840
+msgid "Refresh (in seconds)"
+msgstr "Uppdatera (i sekunder)"
+
+#: include/locales/en_gb.inc.php:228
+msgid "Refresh time in seconds"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:229
+msgid "Refresh time multiplier"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:530
+msgid "Refresh unsupported items (in sec)"
+msgstr "Uppdatera objekt som inte stöds (i sekunder)"
+
+#: include/classes/class.cserverinfo.php:43
+#, php-format
+msgid "Refreshed every: %s sec "
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1168
+msgid "Regexp"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:543
+msgid "Regular expression"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:563
+msgid "Regular expression added"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:569
+msgid "Regular expression deleted"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:566
+msgid "Regular expression updated"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:542
+msgid "Regular expressions"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:303
+msgid "Remote command"
+msgstr "Fjärrkommando"
+
+#: include/locales/en_gb.inc.php:304
+msgid "Remote commands"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1658
+msgid "Remove"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1282
+msgid "Remove element"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1845
+msgid "Remove from"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:327
+msgid "Remove host"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1284
+msgid "Remove link"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:724
+msgid "Remove selected"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1730
+msgid "Replace"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:898
+msgid "Replace linked templates"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2332
+msgid "Report"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2333
+msgid "Reports"
+msgstr "Rapporter"
+
+#: include/locales/en_gb.inc.php:206
+msgid "Required"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2271
+msgid "Required Session module"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2260
+msgid "Required Sockets module"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2273
+msgid "Required gettext module"
+msgstr ""
+
+#: include/forms/script.edit.php:114
+msgid "Required host permissions"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:603
+msgid "Required performance (vps)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1412
+msgid "Required server performance, new values per second"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2255
+msgid "Requires any database support [MySQL or PostgreSQL or Oracle or SQLite3]"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2256
+msgid "Requires bcmath module"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2267
+msgid "Requires ctype module"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2263
+msgid "Requires images generation support"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2258
+msgid "Requires mb string module"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1343
+msgid "Reset"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1443
+msgid "Resolved"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1527
+msgid "Resource"
+msgstr "Resurs"
+
+#: include/locales/en_gb.inc.php:160
+msgid "Response code"
+msgstr ""
+
+#: api/classes/class.cwebcheck.php:665
+#, php-format
+msgid "Response code for step '%1$s' of scenario '%2$s'"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:162
+msgid "Response time"
+msgstr ""
+
+#: api/classes/class.cwebcheck.php:658
+#, php-format
+msgid "Response time for step '%1$s' of scenario '%2$s'"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1882
+msgid "Result"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:552
+msgid "Result is FALSE"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:551
+msgid "Result is TRUE"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2016
+msgid "Result type"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:404
+msgid "Retries left"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:243
+msgid "Retry"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:282
+msgid "Return"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1591
+msgid "Right"
+msgstr "Rättighet"
+
+#: include/locales/en_gb.inc.php:1823
+msgid "Rights"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1569
+msgid "Row span"
+msgstr "Radspann"
+
+#: include/locales/en_gb.inc.php:1522
+msgid "Rows"
+msgstr "Rader"
+
+#: include/locales/en_gb.inc.php:1847
+msgid "Rows per page"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1164
+msgid "Rule"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:225
+msgid "Rules"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:370
+msgid "Run remote commands"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1933
+msgid "Russian (RU)"
+msgstr "Ryska (RU)"
+
+#: include/locales/en_gb.inc.php:2354 include/locales/en_gb.inc.php:2355
+msgid "S"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:186
+msgid "SCENARIOS"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1601 screens.php:172 screens.php:212
+msgid "SCREENS"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1886
+msgid "SCRIPT ERROR"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1869
+msgid "SCRIPTS"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1959
+msgid "SEARCH"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:234
+msgid "SERVER"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:640
+msgid "SIA Zabbix"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1533
+msgid "SIMPLE GRAPH"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1447
+msgid "SLA"
+msgstr "SLA"
+
+#: include/locales/en_gb.inc.php:1549
+msgid "SLIDE SHOWS"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1094
+msgid "SMS"
+msgstr "SMS"
+
+#: include/locales/en_gb.inc.php:116
+msgid "SMTP"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:506
+msgid "SMTP email"
+msgstr "SMTP email"
+
+#: include/locales/en_gb.inc.php:505
+msgid "SMTP helo"
+msgstr "SMTP helo"
+
+#: include/locales/en_gb.inc.php:504
+msgid "SMTP server"
+msgstr "SMTP-server"
+
+#: include/locales/en_gb.inc.php:936
+msgid "SNMP"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1122
+msgid "SNMP OID"
+msgstr "SNMP OID"
+
+#: include/locales/en_gb.inc.php:1121
+msgid "SNMP community"
+msgstr "SNMP community"
+
+#: include/locales/en_gb.inc.php:1075
+msgid "SNMPv1 agent"
+msgstr "SNMPv1-agent"
+
+#: include/locales/en_gb.inc.php:1078
+msgid "SNMPv2 agent"
+msgstr "SNMPv2-agent"
+
+#: include/locales/en_gb.inc.php:1079
+msgid "SNMPv3 agent"
+msgstr "SNMPv3-agent"
+
+#: include/locales/en_gb.inc.php:1126
+msgid "SNMPv3 auth passphrase"
+msgstr "SNMPv3 auth passphrase"
+
+#: include/locales/en_gb.inc.php:1127
+msgid "SNMPv3 priv passphrase"
+msgstr "SNMPv3 priv passphrase"
+
+#: include/locales/en_gb.inc.php:1125
+msgid "SNMPv3 security level"
+msgstr "SNMPv3 security level"
+
+#: include/locales/en_gb.inc.php:1124
+msgid "SNMPv3 security name"
+msgstr "SNMPv3 security name"
+
+#: include/locales/en_gb.inc.php:2043
+msgid "SQL executes count"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2044
+msgid "SQL requests count"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2042
+msgid "SQL selects count"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:114
+msgid "SSH"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1083
+msgid "SSH agent"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1968
+msgid "STANDARD ITEMS"
+msgstr "STANDARDOBJEKT"
+
+#: include/locales/en_gb.inc.php:134
+msgid "STATUS OF DISCOVERY"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1749
+msgid "STATUS OF TRIGGERS"
+msgstr "STATUS FÖR UTLÖSARE"
+
+#: include/locales/en_gb.inc.php:173
+msgid "STATUS OF WEB MONITORING"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1397
+msgid "STATUS OF ZABBIX"
+msgstr "STATUS FÖR ZABBIX"
+
+#: include/locales/en_gb.inc.php:44
+msgid "Sat"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:52 include/locales/en_gb.inc.php:1666
+msgid "Saturday"
+msgstr ""
+
+#: include/forms/script.edit.php:136 include/locales/en_gb.inc.php:1326
+msgid "Save"
+msgstr "Spara"
+
+#: include/locales/en_gb.inc.php:1501
+msgid "Scale"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:184
+msgid "Scenario"
+msgstr ""
+
+#: api/classes/class.cwebcheck.php:542
+#, php-format
+msgid "Scenario [%1$s] [%2$s] host [%3$s]"
+msgstr ""
+
+#: api/classes/class.cwebcheck.php:400
+#, php-format
+msgid "Scenario [%s] already exists."
+msgstr ""
+
+#: api/classes/class.cwebcheck.php:535
+#, php-format
+msgid "Scenario [%s] deleted."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:192
+msgid "Scenario activated"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:197
+msgid "Scenario added"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:191
+msgid "Scenario deleted"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:193
+msgid "Scenario disabled"
+msgstr ""
+
+#: api/classes/class.cwebcheck.php:627 api/classes/class.cwebcheck.php:724
+msgid "Scenario step name should contain only printable characters."
+msgstr ""
+
+#: api/classes/class.cwebcheck.php:640 api/classes/class.cwebcheck.php:729
+msgid "Scenario step number cannot be less than 1"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:195
+msgid "Scenario updated"
+msgstr ""
+
+#: api/classes/class.cwebcheck.php:332
+#, php-format
+msgid "Scenarion [%s] already exists."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:185
+msgid "Scenarios"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:781
+msgid "Schedule"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1512
+msgid "Screen"
+msgstr "Skärm"
+
+#: include/locales/en_gb.inc.php:1515
+msgid "Screen added"
+msgstr "Skärm lades till"
+
+#: include/locales/en_gb.inc.php:1526
+msgid "Screen cell configuration"
+msgstr "Konfiguration av skärmcell"
+
+#: include/locales/en_gb.inc.php:1519
+msgid "Screen deleted"
+msgstr "Skärm togs bort"
+
+#: include/locales/en_gb.inc.php:1597
+msgid "Screen should contain at least one row and column"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1517
+msgid "Screen updated"
+msgstr "Skärm uppdaterades"
+
+#: include/locales/en_gb.inc.php:1613
+#, php-format
+msgid "Screen with id \"%d\" does not exist"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1612
+#, php-format
+msgid "Screen with name \"%s\" does not exist"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1511
+msgid "Screens"
+msgstr "Skärmar"
+
+#: include/forms/script.edit.php:131 include/locales/en_gb.inc.php:1095
+msgid "Script"
+msgstr "Skript"
+
+#: scripts.php:87
+#, php-format
+msgid "Script [%s] already exists."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1875
+msgid "Script added"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1879
+msgid "Script deleted"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:507
+msgid "Script name"
+msgstr "Skriptnamn"
+
+#: include/locales/en_gb.inc.php:1877
+msgid "Script updated"
+msgstr ""
+
+#: api/classes/class.cscript.php:431 api/classes/class.cscript.php:487
+#, php-format
+msgid "Script with scriptid [%s] does not exist."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1868
+msgid "Scripts"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1140
+msgid "Search"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:614
+msgid "Search attribute"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1963
+msgid "Search pattern is empty"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:465
+msgid "Search/Filter elements limit"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:793
+msgid "Second"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1036
+msgid "Secondary POC Cell"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1038
+msgid "Secondary POC Comments"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1033
+msgid "Secondary POC Email"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1032
+msgid "Secondary POC Name"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1034
+msgid "Secondary POC Phone 1"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1035
+msgid "Secondary POC Phone 2"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1037
+msgid "Secondary POC Screen Name"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1712
+msgid "Seconds"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1769
+msgid "Select"
+msgstr "Välj"
+
+#: include/locales/en_gb.inc.php:276
+msgid "Select Nodes"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2226
+msgid "Select image to download"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1174
+msgid "Select prototype"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:713
+msgid "Select rows with value like"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1354
+msgid "Selected"
+msgstr ""
+
+#: actionconf.php:313
+msgid "Selected actions deleted."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1500
+msgid "Selected groups"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1499
+msgid "Selected hosts"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:302
+msgid "Send message"
+msgstr "Skicka meddelande"
+
+#: include/locales/en_gb.inc.php:369
+msgid "Send message to"
+msgstr "Skicka meddelande till"
+
+#: include/locales/en_gb.inc.php:334
+msgid "Send only to"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1321
+msgid "Send to"
+msgstr "Skicka till"
+
+#: include/locales/en_gb.inc.php:62
+msgid "Sep"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1363
+msgid "Separated"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:75 include/locales/en_gb.inc.php:807
+msgid "September"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:987
+msgid "Serial Number"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:960
+msgid "SerialNo"
+msgstr "Serienummer"
+
+#: include/locales/en_gb.inc.php:1621
+msgid "Serious problem"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1647
+msgid "Server"
+msgstr "Server"
+
+#: include/locales/en_gb.inc.php:1573
+msgid "Server info"
+msgstr "Serverinfo"
+
+#: include/locales/en_gb.inc.php:1581
+msgid "Server time"
+msgstr "Servertid"
+
+#: include/locales/en_gb.inc.php:1670
+msgid "Service"
+msgstr "Tjänst"
+
+#: include/locales/en_gb.inc.php:1630
+msgid "Service added"
+msgstr "Tjänst lades till"
+
+#: include/locales/en_gb.inc.php:2211
+msgid "Service cannot be parent and child at the same time."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1632
+msgid "Service deleted"
+msgstr "Tjänst togs bort"
+
+#: include/locales/en_gb.inc.php:91
+msgid "Service port"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1655
+msgid "Service times"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:90
+msgid "Service type"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1627
+msgid "Service updated"
+msgstr "Tjänst uppdaterad"
+
+#: include/locales/en_gb.inc.php:1671
+msgid "Services"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2279
+msgid "Session terminated, please re-login!"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1276
+msgid "Set trigger"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1695
+msgid "Severity"
+msgstr "Allvarlighetsgrad"
+
+#: include/locales/en_gb.inc.php:1421
+msgid "Show"
+msgstr "Visa"
+
+#: include/locales/en_gb.inc.php:408
+msgid "Show all"
+msgstr "Visa alla"
+
+#: include/locales/en_gb.inc.php:1754
+msgid "Show details"
+msgstr "Visa detaljer"
+
+#: include/locales/en_gb.inc.php:189
+msgid "Show disabled scenarios"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1716
+msgid "Show disabled triggers"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:475
+msgid "Show events max"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:474
+msgid "Show events not older"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1372
+msgid "Show graph of item"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1355
+msgid "Show hosts in maintenance"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1137
+msgid "Show items with description like"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:703
+msgid "Show legend"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1570
+msgid "Show lines"
+msgstr "Visa linjer"
+
+#: include/locales/en_gb.inc.php:726
+msgid "Show selected"
+msgstr "Visa markerade"
+
+#: include/locales/en_gb.inc.php:1555
+msgid "Show text as HTML"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:700
+msgid "Show triggers"
+msgstr "Visa utlösare"
+
+#: include/locales/en_gb.inc.php:1753
+msgid "Show unacknowledged"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:723
+msgid "Show unknown events"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1109
+msgid "Show value"
+msgstr "Visa värde"
+
+#: include/locales/en_gb.inc.php:1373
+msgid "Show values of item"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:699
+msgid "Show working time"
+msgstr "Visa arbetstid"
+
+#: include/locales/en_gb.inc.php:1215
+msgid "Shown"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:666
+msgid "Simple"
+msgstr "Enkel"
+
+#: include/locales/en_gb.inc.php:1077
+msgid "Simple check"
+msgstr "Enkel kontroll"
+
+#: include/locales/en_gb.inc.php:1530
+msgid "Simple graph"
+msgstr "Enkelt diagram"
+
+#: include/locales/en_gb.inc.php:1531
+msgid "Simple graphs"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:381
+msgid "Single user"
+msgstr "En användare"
+
+#: include/locales/en_gb.inc.php:1016
+msgid "Site Address 1"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1017
+msgid "Site Address 2"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1018
+msgid "Site Address 3"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1019
+msgid "Site City"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1021
+msgid "Site Country"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1024
+msgid "Site Notes"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1023
+msgid "Site Rack Location"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1020
+msgid "Site State / Province"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1022
+msgid "Site Zip / Postal"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2196
+msgid "Skipped copying of graph"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1546
+msgid "Slide show"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1545
+msgid "Slide shows"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1553
+msgid "Slides"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1606
+msgid "Slideshow added"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1608
+msgid "Slideshow deleted"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1544
+msgid "Slideshow must contain slides"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1604
+msgid "Slideshow updated"
+msgstr ""
+
+#: include/locales.inc.php:80
+msgid "Slovak (SK)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1914
+msgid "Snooze"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1640
+msgid "Soft"
+msgstr "Mjuk"
+
+#: include/locales/en_gb.inc.php:963
+msgid "Software"
+msgstr "Programvara"
+
+#: include/locales/en_gb.inc.php:994
+msgid "Software Application #1"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:995
+msgid "Software Application #2"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:996
+msgid "Software Application #3"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:997
+msgid "Software Application #4"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:998
+msgid "Software Application #5"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:179
+msgid "Sort"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:649
+msgid "Sort by"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:656
+msgid "Sort order (0->100)"
+msgstr "Sorteringsordning (0->100)"
+
+#: include/locales/en_gb.inc.php:1645
+msgid "Sort order (0->999)"
+msgstr "Sorteringsordning (0->999)"
+
+#: include/locales/en_gb.inc.php:720
+msgid "Source"
+msgstr "Källa"
+
+#: include/locales/en_gb.inc.php:1935
+msgid "Spanish (ES)"
+msgstr "Spanska (ES)"
+
+#: include/locales/en_gb.inc.php:159
+msgid "Speed"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:668
+msgid "Stacked"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:174
+msgid "State"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2038
+msgid "Stats for"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:410
+msgid "Status"
+msgstr "Status"
+
+#: include/locales/en_gb.inc.php:1635
+msgid "Status calculation"
+msgstr "Statusberäkning"
+
+#: include/locales/en_gb.inc.php:1636
+msgid "Status calculation algorithm"
+msgstr "Algoritm för statusberäkning"
+
+#: include/locales/en_gb.inc.php:180
+msgid "Status codes"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:172
+msgid "Status of Web monitoring"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1396
+msgid "Status of Zabbix"
+msgstr "Status för ZABBIX"
+
+#: include/locales/en_gb.inc.php:135
+msgid "Status of discovery"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1751
+msgid "Status of host triggers"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1750
+msgid "Status of hostgroup triggers"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1748
+msgid "Status of triggers"
+msgstr "Status för utlösare"
+
+#: include/locales/en_gb.inc.php:1313
+msgid "Status only"
+msgstr "Endast status"
+
+#: include/locales/en_gb.inc.php:1058
+msgid "Status updated"
+msgstr "Status uppdaterad"
+
+#: include/locales/en_gb.inc.php:202
+msgid "Step"
+msgstr ""
+
+#: api/classes/class.cwebcheck.php:634
+#, php-format
+msgid "Step [%s] already exists."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:207
+msgid "Step of scenario"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:203
+msgid "Steps"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1922
+msgid "Stop"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1108
+msgid "Store value"
+msgstr "Lagra värde"
+
+#: include/locales/en_gb.inc.php:904
+msgid "Straight"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1585
+msgid "Style"
+msgstr "Stil"
+
+#: include/locales/en_gb.inc.php:2079
+msgid "Subfilter"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:372
+msgid "Subject"
+msgstr "Ämne"
+
+#: include/locales/en_gb.inc.php:2182
+msgid "Submap"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:736
+msgid "Success Audit"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:38
+msgid "Sun"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:46 include/locales/en_gb.inc.php:1660
+msgid "Sunday"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1820
+msgid "Surname"
+msgstr "Efternamn"
+
+#: include/locales/en_gb.inc.php:1936
+msgid "Swedish (SE)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:622
+msgid "Switching HTTP authentication will reset all current sessions! Continue?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:623
+msgid "Switching LDAP authentication will reset all current sessions! Continue?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:467
+msgid "System default"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1336
+msgid "System status"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2065 include/locales/en_gb.inc.php:2350
+#: include/locales/en_gb.inc.php:2352
+msgid "T"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:122
+msgid "TCP"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1084
+msgid "TELNET agent"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:973
+msgid "TEMPLATES"
+msgstr "MALLAR"
+
+#: include/locales/en_gb.inc.php:161
+msgid "TOTAL"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1742
+msgid "TRIGGER COMMENTS"
+msgstr "KOMMENTARER FÖR UTLÖSARE"
+
+#: include/locales/en_gb.inc.php:1182
+msgid "TRIGGER PROTOTYPES OF"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1756
+msgid "TRIGGERS"
+msgstr "UTLÖSARE"
+
+#: include/locales/en_gb.inc.php:412
+msgid "TRUE"
+msgstr "SANT"
+
+#: include/db.inc.php:1150
+#, php-format
+msgid "Table \"%s\" does not exist."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2280
+msgid "Table users is empty. Possible database corruption."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:961
+msgid "Tag"
+msgstr "Tagg"
+
+#: include/locales/en_gb.inc.php:1134
+msgid "Target"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1135
+msgid "Target type"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:887
+msgid "Template"
+msgstr "Mall"
+
+#: api/classes/class.ctemplate.php:1232
+#, php-format
+msgid "Template [%1$s] deleted."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:948
+msgid "Template deleted"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:971
+msgid "Template linkage"
+msgstr "Mallkoppling"
+
+#: include/locales/en_gb.inc.php:944
+msgid "Template updated"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2123
+msgid "Template with application"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2122
+msgid "Template with item key"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1148
+msgid "Templated item"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1044
+msgid "Templated items"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:972
+msgid "Templates"
+msgstr "Mallar"
+
+#: api/classes/class.ctemplate.php:2131
+#, php-format
+msgid "Templates [%1$s] unlinked from hosts [%2$s]."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:941
+msgid "Templates list"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2066
+msgid "Tera"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:557
+msgid "Test"
+msgstr ""
+
+#: include/forms/script.edit.php:124
+msgid "Test confirmation"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2010
+msgid "Test data"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:559
+msgid "Test string"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1116
+msgid "Text"
+msgstr "Text"
+
+#: include/locales/en_gb.inc.php:2261
+msgid "The GD extension is not loaded."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2102
+msgid "The key must be unique."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1381
+msgid "The queue is empty"
+msgstr "Kön är tom"
+
+#: include/locales/en_gb.inc.php:1718
+msgid "The trigger depends on"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1926
+msgid "Theme"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:466
+msgid "Themes"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:794
+msgid "Third"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1676
+msgid "This month"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2188
+msgid "This screen-column is not empty"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2187
+msgid "This screen-row is not empty"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1674
+msgid "This week"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1675
+msgid "This year"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:42
+msgid "Thu"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:50 include/locales/en_gb.inc.php:1664
+msgid "Thursday"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1440
+msgid "Till"
+msgstr "Till"
+
+#: include/locales/en_gb.inc.php:409
+msgid "Time"
+msgstr "Tid"
+
+#: include/locales/en_gb.inc.php:308
+msgid "Time period"
+msgstr "Tidsperiod"
+
+#: include/locales/en_gb.inc.php:1714
+msgid "Time shift"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1580
+msgid "Time type"
+msgstr "Tidstyp"
+
+#: include/locales/en_gb.inc.php:263
+msgid "Time zone"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:204
+msgid "Timeout"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:718
+msgid "Timestamp"
+msgstr "Tidsstämpel"
+
+#: include/locales/en_gb.inc.php:2251
+msgid "Timezone for PHP is not set"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:677
+msgid "Title"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1441
+msgid "To"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1673
+msgid "Today"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1728
+msgid "Toggle input method"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2151
+msgid "Too many hosts"
+msgstr ""
+
+#: api/classes/class.cproxy.php:360
+#, php-format
+msgid "Too many interfaces provided for proxy \"%s\"."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1881
+msgid "Tools"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1279
+msgid "Top"
+msgstr "Överkant"
+
+#: include/locales/en_gb.inc.php:1382
+msgid "Total"
+msgstr "Totalt"
+
+#: include/locales/en_gb.inc.php:2039
+msgid "Total time"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2045
+msgid "Total time spent on SQL"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2178
+msgid "Transaction has not been closed. Aborting.."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1072
+msgid "Trends"
+msgstr "Trender"
+
+#: include/locales/en_gb.inc.php:1401
+msgid "Trends stored"
+msgstr "Lagrade trender"
+
+#: include/locales/en_gb.inc.php:1646
+msgid "Trigger"
+msgstr "Utlösare"
+
+#: api/classes/class.ctrigger.php:1272
+#: api/classes/class.ctriggerprototype.php:1080
+#, php-format
+msgid "Trigger [%1$s:%2$s] already exists."
+msgstr ""
+
+#: api/classes/class.ctrigger.php:1527
+#: api/classes/class.ctriggerprototype.php:1355
+#, php-format
+msgid "Trigger [%1$s:%2$s] created."
+msgstr ""
+
+#: api/classes/class.ctrigger.php:1418
+#, php-format
+msgid "Trigger [%1$s:%2$s] deleted."
+msgstr ""
+
+#: api/classes/class.ctriggerprototype.php:1102
+#, php-format
+msgid "Trigger [%1$s:%2$s] does not have item prototype."
+msgstr ""
+
+#: api/classes/class.ctemplate.php:2042
+#, php-format
+msgid "Trigger [%1$s:%2$s] unlinked."
+msgstr ""
+
+#: api/classes/class.ctrigger.php:1629
+#, php-format
+msgid "Trigger [%1$s:%2$s] updated."
+msgstr ""
+
+#: api/classes/class.ctrigger.php:1716 api/classes/class.ctrigger.php:1751
+#: api/classes/class.ctriggerprototype.php:1514
+#: api/classes/class.ctriggerprototype.php:1549
+#, php-format
+msgid "Trigger [%1$s] already exists on [%2$s]"
+msgstr ""
+
+#: api/classes/class.ctriggerprototype.php:1191
+#, php-format
+msgid "Trigger [%1$s] does not have item prototype."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1693
+msgid "Trigger added"
+msgstr "Utlösare lades till"
+
+#: include/locales/en_gb.inc.php:1741
+msgid "Trigger comments"
+msgstr "Kommentarer för utlösare"
+
+#: include/locales/en_gb.inc.php:1691
+msgid "Trigger deleted"
+msgstr "Utlösare togs bort"
+
+#: include/locales/en_gb.inc.php:1725
+msgid "Trigger dependencies"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:313
+msgid "Trigger description"
+msgstr "Beskrivning av utlösare"
+
+#: include/locales/en_gb.inc.php:1738
+msgid "Trigger form"
+msgstr ""
+
+#: api/classes/class.ctemplate.php:1704
+#, php-format
+msgid "Trigger in template [ %1$s ] has dependency with trigger in template [ %2$s ]"
+msgstr ""
+
+#: api/classes/class.ctriggerprototype.php:1062
+msgid "Trigger just added. No status update so far."
+msgstr ""
+
+#: api/classes/class.ctriggerprototype.php:1314
+#, php-format
+msgid "Trigger prototype [%1$s:%2$s] deleted."
+msgstr ""
+
+#: api/classes/class.ctemplate.php:2059
+#, php-format
+msgid "Trigger prototype [%1$s:%2$s] unlinked."
+msgstr ""
+
+#: api/classes/class.ctriggerprototype.php:1446
+#, php-format
+msgid "Trigger prototype [%1$s:%2$s] updated."
+msgstr ""
+
+#: include/forms/host.edit.php:445 include/forms/template.edit.php:298
+msgid "Trigger prototypes"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:306
+msgid "Trigger severity"
+msgstr "Allvarlighetsgrad för utlösare"
+
+#: include/locales/en_gb.inc.php:1704
+msgid "Trigger updated"
+msgstr "Utlösare uppdaterades"
+
+#: include/locales/en_gb.inc.php:307
+msgid "Trigger value"
+msgstr "Värde för utlösare"
+
+#: api/classes/class.ctrigger.php:1720 api/classes/class.ctrigger.php:1754
+#: api/classes/class.ctriggerprototype.php:1518
+#: api/classes/class.ctriggerprototype.php:1552
+msgid "Trigger with same name but other type exists"
+msgstr ""
+
+#: include/forms/host.edit.php:355 include/forms/template.edit.php:214
+#: include/locales/en_gb.inc.php:857
+msgid "Triggers"
+msgstr "Utlösare"
+
+#: include/locales/en_gb.inc.php:1403
+msgid "Triggers (e/d)[p/u/o]"
+msgstr "Utlösare (a/i)[p/o/ok]"
+
+#: include/locales/en_gb.inc.php:1689
+msgid "Triggers deleted"
+msgstr "Utlösare togs bort"
+
+#: include/locales/en_gb.inc.php:1572
+msgid "Triggers info"
+msgstr "Info om utlösare"
+
+#: include/locales/en_gb.inc.php:1724
+msgid "Triggers massupdate"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1575
+msgid "Triggers overview"
+msgstr "Översikt över utlösare"
+
+#: include/locales/en_gb.inc.php:1767
+msgid "Triggers status"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1356
+msgid "Triggers with severity"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1390
+msgid "Truncated"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:40
+msgid "Tue"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:48 include/locales/en_gb.inc.php:1662
+msgid "Tuesday"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1269
+msgid "Two elements should be selected"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:417 media_types.php:261
+msgid "Type"
+msgstr "Typ"
+
+#: include/locales/en_gb.inc.php:1258
+msgid "Type (OK)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:397
+msgid "Type of calculation"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1103
+msgid "Type of information"
+msgstr "Typ av information"
+
+#: include/locales/en_gb.inc.php:2094
+msgid "Type of information must be Log for log key"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1048
+msgid "Types"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:414
+msgid "UNKNOWN"
+msgstr "OKÄNT"
+
+#: include/locales/en_gb.inc.php:1197
+msgid "UP"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:246
+msgid "UPDATE"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1708
+msgid "URL"
+msgstr "URL"
+
+#: include/locales/en_gb.inc.php:999
+msgid "URL #1"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1000
+msgid "URL #2"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1001
+msgid "URL #3"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1837
+msgid "URL (after login)"
+msgstr "URL (efter inloggning)"
+
+#: include/locales/en_gb.inc.php:538
+msgid "USA (160 characters)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1813
+msgid "USER GROUPS"
+msgstr "ANVÄNDARGRUPPER"
+
+#: include/locales/en_gb.inc.php:1923
+msgid "USER PROFILE"
+msgstr "ANVÄNDARPROFIL"
+
+#: include/locales/en_gb.inc.php:1814
+msgid "USERS"
+msgstr "ANVÄNDARE"
+
+#: include/locales/en_gb.inc.php:27
+msgid "UTF-8"
+msgstr "UTF-8"
+
+#: include/locales/en_gb.inc.php:1942
+msgid "Ukrainian (UA)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2234
+msgid "Unable to remove local node"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2199
+msgid "Unable to select configuration"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1303
+msgid "Unacknowledged"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1362
+msgid "Unacknowledged only"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1853
+msgid "Unblock selected"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1854
+msgid "Unblock selected users?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1986
+msgid "Unexpected end of element"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1099
+msgid "Units"
+msgstr "Enheter"
+
+#: include/locales/en_gb.inc.php:889
+msgid "Unknown"
+msgstr "Okänd"
+
+#: include/locales/en_gb.inc.php:1900
+msgid "Unknown action"
+msgstr "Okänd åtgärd"
+
+#: include/locales/en_gb.inc.php:2216
+msgid "Unknown calculation algorithm of service status"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2154
+msgid "Unknown function"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:426
+msgid "Unknown group name"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2014
+msgid "Unknown host item, no such item in selected host"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:427
+msgid "Unknown host name"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2013
+msgid "Unknown host, no such host present in system"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1905
+msgid "Unknown resource"
+msgstr "Okänd resurs"
+
+#: include/locales/en_gb.inc.php:2105
+msgid "Unknown value type"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2012
+msgid "Unknown variable type, testing not available"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:974
+msgid "Unlink"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:977
+msgid "Unlink and clear"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:331
+msgid "Unlink from template"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1912
+msgid "Unmute"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1991
+msgid "Unnecessary symbols detected"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:652
+msgid "Up"
+msgstr "Uppåt"
+
+#: include/locales/en_gb.inc.php:921
+msgid "Update"
+msgstr "Uppdatera"
+
+#: include/locales/en_gb.inc.php:970
+msgid "Update in group"
+msgstr "Uppdatera i grupp"
+
+#: include/locales/en_gb.inc.php:1069
+msgid "Update interval"
+msgstr "Uppdateringsintervall"
+
+#: include/locales/en_gb.inc.php:1100
+msgid "Update interval (in sec)"
+msgstr "Uppdateringsintervall (i sekunder)"
+
+#: include/locales/en_gb.inc.php:655
+msgid "Update item for the graph"
+msgstr ""
+
+#. GETTEXT: r is date format string as described in http://php.net/date
+#: include/classes/class.cserverinfo.php:42 include/locales/en_gb.inc.php:1902
+msgid "Updated"
+msgstr "Uppdaterad"
+
+#: include/locales/en_gb.inc.php:934
+msgid "Updated status of host"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:521
+msgid "Upload"
+msgstr "Skicka upp"
+
+#: include/locales/en_gb.inc.php:1217
+msgid "Upper level maps"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:144 include/locales/en_gb.inc.php:1651
+msgid "Uptime"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:95
+msgid "Uptime/Downtime"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1260
+msgid "Use advanced icons"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1129
+msgid "Use custom multiplier"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:981
+msgid "Use extended profile"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1325
+msgid "Use if severity"
+msgstr "Använd om allvarlighetsgrad"
+
+#: include/locales/en_gb.inc.php:915
+msgid "Use profile"
+msgstr "Använd profil"
+
+#: media_types.php:262
+msgid "Used in actions"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:384 include/locales/en_gb.inc.php:909
+#: include/setup.inc.php:248
+msgid "User"
+msgstr "Användare"
+
+#: include/locales/en_gb.inc.php:2293
+msgid "User ["
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1777
+msgid "User added"
+msgstr "Användare lades till"
+
+#: include/locales/en_gb.inc.php:1810
+msgid "User cannot change GUI access for himself"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1809
+msgid "User cannot change status of himself"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1811
+msgid "User cannot delete himself"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2297
+msgid "User cannot disable himself. Group \""
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2296
+msgid "User cannot restrict access to GUI for himself. Group \""
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1780
+msgid "User deleted"
+msgstr "Användare togs bort"
+
+#: include/locales/en_gb.inc.php:382
+msgid "User group"
+msgstr "Användargrupp"
+
+#. GETTEXT: User gets this error message when tries to delete user group used in script
+#: api/classes/class.cusergroup.php:716
+#, php-format
+msgid "User group [%1$s] is used in script [%2$s]."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:534
+msgid "User group for database down message"
+msgstr ""
+
+#: include/forms/script.edit.php:96 include/locales/en_gb.inc.php:1815
+msgid "User groups"
+msgstr "Användargrupper"
+
+#: include/locales/en_gb.inc.php:335
+msgid "User medias"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1151
+msgid "User name"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1924
+msgid "User profile"
+msgstr "Användarprofil"
+
+#: include/locales/en_gb.inc.php:1528
+msgid "User rights"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1775
+msgid "User type"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1784
+msgid "User updated"
+msgstr "Användare uppdaterades"
+
+#: include/forms/host.edit.php:523 include/locales/en_gb.inc.php:1097
+msgid "Username"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1776
+msgid "Users"
+msgstr "Användare"
+
+#: include/locales/en_gb.inc.php:1409
+msgid "Users (online)"
+msgstr "Användare (anslutna)"
+
+#: include/locales/en_gb.inc.php:1828
+msgid "Users status"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1799
+msgid "Users status updated"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1801
+msgid "Users unblocked"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:483
+msgid "VALUE MAPPING"
+msgstr "VÄRDESMAPPNING"
+
+#: include/locales/en_gb.inc.php:1398
+msgid "Value"
+msgstr "Värde"
+
+#: include/db.inc.php:1186
+#, php-format
+msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:485
+msgid "Value map"
+msgstr "Värdeskarta"
+
+#: include/locales/en_gb.inc.php:478
+msgid "Value map added"
+msgstr "Värdeskarta lades till"
+
+#: include/locales/en_gb.inc.php:480
+msgid "Value map deleted"
+msgstr "Värdeskarta borttagen"
+
+#: include/locales/en_gb.inc.php:482
+msgid "Value map updated"
+msgstr "Värdeskarta uppdaterad"
+
+#: include/locales/en_gb.inc.php:484
+msgid "Value mapping"
+msgstr "Värdesmappning"
+
+#: include/locales/en_gb.inc.php:577
+msgid "Value maps are used to create a mapping between numeric values and string representations"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2095
+msgid "Value type must be Float for aggregate items"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1374
+msgid "Values"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1400
+msgid "Values stored"
+msgstr "Lagrade värden"
+
+#: include/locales/en_gb.inc.php:201
+msgid "Variables"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1586
+msgid "Vertical"
+msgstr "Vertikal"
+
+#: include/locales/en_gb.inc.php:1593
+msgid "Vertical align"
+msgstr "Vertikal justering"
+
+#: include/locales/en_gb.inc.php:443
+msgid "View"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2351
+msgid "W"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1088
+msgid "WEB CHECKS"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:387
+msgid "Warning"
+msgstr "Varning"
+
+#: include/locales/en_gb.inc.php:2377
+msgid "We are sorry, the maximum possible number of elements to remember has been reached."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:181
+msgid "Web"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1149
+msgid "Web item"
+msgstr ""
+
+#: api/classes/class.cwebcheck.php:619 api/classes/class.cwebcheck.php:715
+#, php-format
+msgid "Web item [%s] created."
+msgstr ""
+
+#: api/classes/class.cwebcheck.php:678
+#, php-format
+msgid "Web item with key [%s] already exists."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1087
+msgid "Web monitoring"
+msgstr ""
+
+#: api/classes/class.cwebcheck.php:340
+msgid "Webcheck must have at least one step."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:41
+msgid "Wed"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:49 include/locales/en_gb.inc.php:1663
+msgid "Wednesday"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1490
+msgid "Week"
+msgstr "Vecka"
+
+#: include/locales/en_gb.inc.php:1457
+msgid "Weekly"
+msgstr "Veckovis"
+
+#: include/locales/en_gb.inc.php:1947
+msgid "Welcome to Zabbix! You are connected as"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1322
+msgid "When active"
+msgstr "När aktiv"
+
+#: include/locales/en_gb.inc.php:1535
+msgid "Width"
+msgstr "Bredd"
+
+#: include/locales/en_gb.inc.php:769
+msgid "With data collection"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1766
+msgid "With last event unacknowledged"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1339
+msgid "With problems"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1046
+msgid "With triggers"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1765
+msgid "With unacknowledged events"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1338
+msgid "Without problems"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1047
+msgid "Without triggers"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1114
+msgid "Wizard"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:533
+msgid "Working time"
+msgstr "Arbetstid"
+
+#: include/forms/script.edit.php:113 include/locales/en_gb.inc.php:1872
+msgid "Write"
+msgstr ""
+
+#: api/classes/class.cgraph.php:1086
+#: api/classes/class.cgraphprototype.php:1092
+msgid "Wrong fields for graph"
+msgstr ""
+
+#: api/classes/class.chost.php:1293
+#, php-format
+msgid "Wrong fields for host [ %s ]"
+msgstr ""
+
+#: api/classes/class.cgraph.php:1100
+#: api/classes/class.cgraphprototype.php:1106
+msgid "Wrong fields for items"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2303
+msgid "Wrong fields for media type"
+msgstr ""
+
+#: api/classes/class.cscreen.php:635
+#, php-format
+msgid "Wrong fields for screen [ %s ]"
+msgstr ""
+
+#: api/classes/class.cscreen.php:804 api/classes/class.cscreen.php:843
+#: api/classes/class.cscreen.php:880
+msgid "Wrong fields for screen items"
+msgstr ""
+
+#: api/classes/class.cscript.php:384
+msgid "Wrong fields for script"
+msgstr ""
+
+#: api/classes/class.ctriggerprototype.php:1066
+#: api/classes/class.ctriggerprototype.php:1147
+msgid "Wrong fields for trigger"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2292
+msgid "Wrong fields for user"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:833
+msgid "Wrong macro"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2299
+msgid "Wrong period ["
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1274
+msgid "Wrong type of arguments passed to function"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1223
+msgid "X"
+msgstr "X"
+
+#: include/locales/en_gb.inc.php:2346
+msgid "XML file contains errors"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1460 include/locales/en_gb.inc.php:1481
+#: include/locales/en_gb.inc.php:2073
+msgid "Y"
+msgstr "Y"
+
+#: include/locales/en_gb.inc.php:695
+msgid "Y axis MAX value"
+msgstr "MAX-värde för Y-axel"
+
+#: include/locales/en_gb.inc.php:694
+msgid "Y axis MIN value"
+msgstr "MIN-värde för Y-axel"
+
+#: include/locales/en_gb.inc.php:657
+msgid "Y axis side"
+msgstr "Y-axel"
+
+#: include/locales/en_gb.inc.php:740 include/locales/en_gb.inc.php:741
+msgid "Y-m-d H:i:s"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:257 include/locales/en_gb.inc.php:739
+#: include/locales/en_gb.inc.php:742
+msgid "Y.M.d H:i:s"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1433
+msgid "Y.m.d"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1432
+msgid "Y.m.d H:i"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2075
+msgid "Y.m.d H:i:s"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1454
+msgid "Year"
+msgstr "År"
+
+#: include/locales/en_gb.inc.php:1459
+msgid "Yearly"
+msgstr "Årligen"
+
+#: include/locales/en_gb.inc.php:1413
+msgid "Yes"
+msgstr "Ja"
+
+#: include/locales/en_gb.inc.php:2074
+msgid "Yotta"
+msgstr ""
+
+#: include/forms.inc.php:392
+msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2314
+msgid "You are not logged in."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1973
+msgid "You can not switch hosts for current selection"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2164
+msgid "You can not use template hosts in mixed expressions."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2311
+msgid "You cannot view this URL as a"
+msgstr ""
+
+#: api/classes/class.chost.php:1563
+msgid "You do not have enough rights for operation"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2343
+msgid "You do not have permission to perform this operation"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2312
+msgid "You must login to view this page."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:584
+msgid "Your setup is not configured for distributed monitoring"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2071
+msgid "Z"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1946
+msgid "ZABBIX"
+msgstr "ZABBIX"
+
+#: include/locales/en_gb.inc.php:636
+msgid "Zabbix"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1773
+msgid "Zabbix Admin"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:620
+msgid "Zabbix Internal authentication"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1774
+msgid "Zabbix Super Admin"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1772
+msgid "Zabbix User"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1073
+msgid "Zabbix agent"
+msgstr "ZABBIX-agent"
+
+#: include/locales/en_gb.inc.php:1074
+msgid "Zabbix agent (active)"
+msgstr "ZABBIX-agent (aktiv)"
+
+#: include/locales/en_gb.inc.php:1085
+msgid "Zabbix aggregate"
+msgstr "ZABBIX samlat"
+
+#: include/locales/en_gb.inc.php:1709
+msgid "Zabbix has received an incorrect request"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1080
+msgid "Zabbix internal"
+msgstr "ZABBIX internt"
+
+#: include/locales/en_gb.inc.php:251
+msgid "Zabbix is temporarily unavailable"
+msgstr ""
+
+#: include/classes/class.cserverinfo.php:47 include/setup.inc.php:312
+msgid "Zabbix server"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1348
+msgid "Zabbix server ip or port is not set!"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1399
+msgid "Zabbix server is running"
+msgstr "ZABBIX-server kör"
+
+#: include/setup.inc.php:314
+msgid "Zabbix server name"
+msgstr ""
+
+#: include/setup.inc.php:313
+msgid "Zabbix server port"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1076
+msgid "Zabbix trapper"
+msgstr "ZABBIX-fångare"
+
+#: include/locales/en_gb.inc.php:2072
+msgid "Zetta"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2358
+msgid "Zoom"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2190
+msgid "[H:i:s]"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2318
+msgid "[Wrong value for day of week:"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2316
+msgid "[Wrong value for month:"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:738
+msgid "[Y.M.d H:i:s]"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2300 include/locales/en_gb.inc.php:2317
+#: include/locales/en_gb.inc.php:2319
+msgid "]"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2294
+msgid "] already exists"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1469
+msgid "add"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:676
+msgid "add graph items first"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2110
+msgid "added"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2080
+msgid "affects only filtered data!"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:629
+msgid "all"
+msgstr "alla"
+
+#: include/locales/en_gb.inc.php:1906
+msgid "already exists"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2101
+msgid "already exists for host"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2124
+msgid "already linked to host"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:393
+msgid "and"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2127
+msgid "and can't be deleted"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:733
+msgid "as Blue"
+msgstr "som Bl"
+
+#: include/locales/en_gb.inc.php:732
+msgid "as Green"
+msgstr "som Grön"
+
+#: include/locales/en_gb.inc.php:731
+msgid "as Red"
+msgstr "som Röd"
+
+#: include/locales/en_gb.inc.php:2158
+msgid "available only for items with value types"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:662
+msgid "avg"
+msgstr "medel"
+
+#: include/locales/en_gb.inc.php:2117
+msgid "can not be deleted, due to inner hosts can not be unlinked"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2257
+msgid "configure PHP with"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2138
+msgid "contains Multibyte chars"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:88
+msgid "created"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2266
+msgid "ctype module"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:32
+msgid "d"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1462 include/locales/en_gb.inc.php:1483
+#: include/locales/en_gb.inc.php:2208
+msgid "d M Y"
+msgstr "Y M d"
+
+#: include/locales/en_gb.inc.php:1463 include/locales/en_gb.inc.php:1468
+#: include/locales/en_gb.inc.php:1484
+msgid "d M Y H:i"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:26 include/locales/en_gb.inc.php:151
+#: include/locales/en_gb.inc.php:154 include/locales/en_gb.inc.php:175
+#: include/locales/en_gb.inc.php:176 include/locales/en_gb.inc.php:255
+#: include/locales/en_gb.inc.php:256 include/locales/en_gb.inc.php:290
+#: include/locales/en_gb.inc.php:293 include/locales/en_gb.inc.php:1194
+#: include/locales/en_gb.inc.php:1195 include/locales/en_gb.inc.php:1196
+#: include/locales/en_gb.inc.php:1203 include/locales/en_gb.inc.php:1204
+#: include/locales/en_gb.inc.php:1205 include/locales/en_gb.inc.php:1206
+#: include/locales/en_gb.inc.php:1211 include/locales/en_gb.inc.php:1392
+#: include/locales/en_gb.inc.php:1508 include/locales/en_gb.inc.php:1976
+#: include/locales/en_gb.inc.php:1980 include/locales/en_gb.inc.php:2189
+msgid "d M Y H:i:s"
+msgstr "d M H:i:s"
+
+#: include/locales/en_gb.inc.php:1426 include/locales/en_gb.inc.php:1429
+msgid "d.M"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:448 include/locales/en_gb.inc.php:453
+msgid "d.m"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:449 include/locales/en_gb.inc.php:450
+#: include/locales/en_gb.inc.php:452
+msgid "d.m H:i"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:456
+msgid "d.m.Y H:i"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:237
+msgid "d.m.y"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2204
+msgid "day"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2051
+msgid "days"
+msgstr ""
+
+#: include/setup.inc.php:299
+msgid "default"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2341
+msgid "does not exist"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2360
+msgid "dynamic"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1132
+msgid "elements copy to ..."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2203
+msgid "every"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:422
+msgid "executed"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:232
+msgid "failed"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2282
+msgid "failed login attempts logged."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2359
+msgid "fixed"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2156
+msgid "for function"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2153
+msgid "for host"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1961
+msgid "found"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1439
+msgid "from"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:33
+msgid "h"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2126
+msgid "has been deleted from the system"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1302
+msgid "http://www.zabbix.com"
+msgstr "http://www.zabbix.com"
+
+#: include/locales/en_gb.inc.php:402
+msgid "in"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:428
+msgid "in command"
+msgstr ""
+
+#: include/items.inc.php:1398 include/items.inc.php:1455
+#, php-format
+msgid "incorrect syntax near '%1$s' at position %2$d"
+msgstr ""
+
+#: include/items.inc.php:1406 include/items.inc.php:1446
+#: include/items.inc.php:1483
+#, php-format
+msgid "incorrect usage of bracket symbols. '%s' found after final bracket."
+msgstr ""
+
+#: include/items.inc.php:1506
+#, php-format
+msgid "invalid character '%1$s' at position %2$d"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2241
+msgid "is a minimal PHP memory limitation"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2246
+msgid "is a minimal limitation on execution time of PHP scripts"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2247
+msgid "is a minimal limitation on input parse time for PHP scripts"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1471
+msgid "is a wrong time format. Should be from 00:00 to 23:59."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2116
+msgid "is internal and can not be deleted"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2141
+msgid "is mandatory"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2269
+msgid "is minimum for PHP upload filesize"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2243
+msgid "is minimum size of PHP post"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2132
+msgid "is not IP range"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2133
+msgid "is not PORT range"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2140
+msgid "is not a colour"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2161
+msgid "is not a float or counter or macro for function"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2160
+msgid "is not a float or macro for function"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2136
+msgid "is not double"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2135
+msgid "is not integer"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2134
+msgid "is not integer range"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2097
+msgid "is not one of"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2137
+msgid "is not string"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1466 include/locales/en_gb.inc.php:1467
+msgid "l H:i"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:664
+msgid "last"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2264
+msgid "libxml module"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:400
+msgid "like"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:30 include/locales/en_gb.inc.php:34
+#: include/locales/en_gb.inc.php:2057
+msgid "m"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1315
+msgid "m.d.Y H:i:s"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1995
+msgid "macro(s)"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:310
+msgid "maintenance"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:663
+msgid "max"
+msgstr "max"
+
+#: include/locales/en_gb.inc.php:311
+msgid "max value"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:661
+msgid "min"
+msgstr "min"
+
+#: include/locales/en_gb.inc.php:312
+msgid "min value"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:36
+msgid "ms"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2139
+msgid "multibyte chars are restricted"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2142
+msgid "must be missing"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:617
+msgid "must be valid"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2053
+msgid "n"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2249
+msgid "no"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:223
+msgid "no data"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:403
+msgid "not in"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:401
+msgid "not like"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1416
+msgid "not running"
+msgstr "kör inte"
+
+#: include/locales/en_gb.inc.php:632
+msgid "not selected"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:423
+msgid "not sent"
+msgstr "inte skickat"
+
+#: include/locales/en_gb.inc.php:2361
+msgid "now"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:164 include/locales/en_gb.inc.php:1347
+msgid "of"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2205
+msgid "of every"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2157
+msgid "of key"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2202
+msgid "on"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2253
+msgid "option in"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:396
+msgid "or"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2374
+msgid "other"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2265
+msgid "php-xml module is not installed"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:124
+msgid "ports"
+msgstr ""
+
+#: include/classes/class.cserverinfo.php:42
+msgid "r"
+msgstr ""
+
+#: include/classes/class.cserverinfo.php:44
+msgid "refresh now"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2034
+msgid "refreshed every"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:463
+msgid "remember selected"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1623
+msgid "root"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1415
+msgid "running"
+msgstr "kör"
+
+#: include/locales/en_gb.inc.php:35
+msgid "s"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:712
+msgid "sec"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:711 include/locales/en_gb.inc.php:2277
+msgid "seconds"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:354
+msgid "selected actions?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:421
+msgid "sent"
+msgstr "skickat"
+
+#: include/locales/en_gb.inc.php:2081
+msgid "show value mappings"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:616
+msgid "successful"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:231
+msgid "successfully"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:165
+msgid "to"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2166
+msgid "to host"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2103
+msgid "updated"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2120
+msgid "used by scenario"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1293
+msgid "used in exported map"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1561
+msgid "used in exported screen"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:31
+msgid "w"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:615
+msgid "was not"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2207
+msgid "week"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2206
+msgid "weeks"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2195
+msgid "with template host can not contain items from other hosts."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:29
+msgid "y"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2250
+msgid "yes"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:2055
+msgid "µ"
+msgstr ""
+
+#~ msgid "Actions deleted"
+#~ msgstr "Åtgärder borttagna"
+
+#~ msgid "Cannot delete actions"
+#~ msgstr "Kan inte ta bort åtgärder"
+
+#~ msgid "Create Host"
+#~ msgstr "Skapa värd"
+
+#~ msgid "Create Template"
+#~ msgstr "Skapa mall"
+
+#~ msgid "Escalation"
+#~ msgstr "Eskalering"
+
+#~ msgid "Escalation rule"
+#~ msgstr "Eskaleringsregel"
+
+#~ msgid "Incorrect description"
+#~ msgstr "Felaktig beskrivning"
+
+#~ msgid "Link with template"
+#~ msgstr "Koppla mot mall"
+
+#~ msgid "No permissions !"
+#~ msgstr "Inga rättigheter!"
+
+#~ msgid "QUEUE"
+#~ msgstr "K"
+
+#~ msgid "SNMP port"
+#~ msgstr "SNMP-port"
+
+#~ msgid "Select graph to display"
+#~ msgstr "Välj diagram att visa"
+
+#~ msgid "Select graph..."
+#~ msgstr "Välj diagram..."
+
+#~ msgid "Select host..."
+#~ msgstr "Välj värd..."
+
+#~ msgid "SCREENS 45645645"
+#~ msgstr "SKÄRMAR"
