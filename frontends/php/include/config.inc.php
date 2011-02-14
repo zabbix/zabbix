@@ -101,6 +101,7 @@ function __autoload($class_name){
 	require_once('include/items.inc.php');
 	require_once('include/maintenances.inc.php');
 	require_once('include/maps.inc.php');
+	require_once('include/media.inc.php');
 	require_once('include/nodes.inc.php');
 	require_once('include/services.inc.php');
 	require_once('include/sounds.inc.php');
@@ -108,7 +109,7 @@ function __autoload($class_name){
 	require_once('include/users.inc.php');
 	require_once('include/valuemap.inc.php');
 // GLOBALS
-	global $USER_DETAILS, $USER_RIGHTS, $page;
+	global $USER_DETAILS, $USER_RIGHTS, $ZBX_PAGE_POST_JS, $page;
 
 	global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID, $ZBX_CONFIGURATION_FILE, $DB;
 	global $ZBX_SERVER, $ZBX_SERVER_PORT;

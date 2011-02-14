@@ -145,7 +145,7 @@ void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, s
 		entry->next = hs->slots[slot];
 		hs->slots[slot] = entry;
 		hs->num_data++;
-		
+
 		if (hs->num_data >= hs->num_slots * CRIT_LOAD_FACTOR)
 		{
 			int			inc_slots, new_slot;

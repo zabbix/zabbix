@@ -144,7 +144,6 @@ static void	process_test_data(zbx_uint64_t httptestid, ZBX_HTTPSTAT *stat)
 
 		free_result(&value);
 	}
-
 	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -197,7 +196,6 @@ static void	process_step_data(zbx_uint64_t httpstepid, ZBX_HTTPSTAT *stat)
 
 		free_result(&value);
 	}
-
 	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -455,7 +453,6 @@ clean:
 		else
 			THIS_SHOULD_NEVER_HAPPEN;
 	}
-
 	DBfree_result(result);
 
 	err_str_esc = DBdyn_escape_string_len(err_str, HTTPTEST_ERROR_LEN);
@@ -548,7 +545,6 @@ void	process_httptests(int now)
 
 		process_httptest(&httptest);
 	}
-
 	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);

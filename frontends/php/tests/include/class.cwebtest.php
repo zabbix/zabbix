@@ -129,13 +129,15 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 	public function ok($strings)
 	{
 		if(!is_array($strings))	$strings=array($strings);
-		foreach($strings as $string) $this->assertTextPresent($string,"Chuck Norris: I expect string '$string' here");
+		foreach($strings as $string)
+			$this->assertTextPresent($string,"Chuck Norris: I expect string '$string' here");
 	}
 
 	public function nok($strings)
 	{
 		if(!is_array($strings))	$strings=array($strings);
-		foreach($strings as $string) $this->assertTextNotPresent($string,"Chuck Norris: I do not expect string '$string' here");
+		foreach($strings as $string)
+			$this->assertTextNotPresent($string,"Chuck Norris: I do not expect string '$string' here");
 	}
 
 	public function button_click($a)

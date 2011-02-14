@@ -71,7 +71,7 @@ class testFormMap extends CWebTest
 		// getting map options from DB as they are at the beginning of the test
 		$db_result = DBSelect("SELECT * FROM sysmaps WHERE name = '$map_name'");
 		$db_map = DBfetch($db_result);
-		$this->assertTrue(isset($db_map['sysmapid']), 'Chuck Norris: Could not fetch map with name "'.$map_name.'" from DB');
+		$this->assertTrue(isset($db_map['sysmapid']), 'Chuck Norris: Could not fetch map with name "'.$map_name.'" from DB. Here is what I got: '.print_r($db_map, true));
 
 		$this->login('sysmaps.php');
 		$this->click('link='.$map_name);

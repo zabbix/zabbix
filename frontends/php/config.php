@@ -589,7 +589,7 @@ include_once('include/page_header.php');
 ?>
 
 <?php
-	$form = new CForm('config.php', 'get');
+	$form = new CForm('get','config.php');
 	$cmbConfig = new CCombobox('config',$_REQUEST['config'], 'javascript: redirect("config.php?config="+this.options[this.selectedIndex].value);');
 //	$cmbConfig->addItem(4,S_AUTOREGISTRATION);
 //	$cmbConfig->addItem(2,S_ESCALATION_RULES);
@@ -1005,7 +1005,7 @@ include_once('include/page_header.php');
 	else if($_REQUEST['config'] == 10){
 		if(isset($_REQUEST['form'])){
 
-			$frmRegExp = new CForm('config.php', 'post');
+			$frmRegExp = new CForm('post','config.php');
 			$frmRegExp->setName(S_REGULAR_EXPRESSION);
 			$frmRegExp->addVar('form', get_request('form', 1));
 
@@ -1114,7 +1114,7 @@ include_once('include/page_header.php');
 				$regexp[$exp['regexpid']]['expressions'][$exp['expressionid']] = $exp;
 			}
 
-			$form = new CForm(null,'post');
+			$form = new CForm();
 			$form->setName('regexp');
 
 			$table = new CTableInfo();
