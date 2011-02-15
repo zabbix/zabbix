@@ -520,10 +520,8 @@ function insert_js_function($fnct_name){
 					for(var key in values){
 						if(is_null(values[key])) continue;
 
-						if(parentDocumentForm.length){
-							// .parentNode, to make prototype .select work
-							tmpStorage = $(parentDocumentForm[0].parentNode).select("#"+key).first();
-						}
+						if(parentDocumentForm.length)
+							tmpStorage = parentDocumentForm[0].parentNode.select("#"+key).first();
 
 						if(typeof(tmpStorage) == "undefined" || is_null(tmpStorage))
 							tmpStorage = parentDocument.getElementById(key);
