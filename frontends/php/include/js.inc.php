@@ -521,7 +521,7 @@ function insert_js_function($fnct_name){
 						if(is_null(values[key])) continue;
 
 						if(parentDocumentForm.length)
-							tmpStorage = parentDocumentForm[0].parentNode.select("#"+key).first();
+							tmpStorage = $(parentDocumentForm[0].parentNode).select("#"+key).first();
 
 						if(typeof(tmpStorage) == "undefined" || is_null(tmpStorage))
 							tmpStorage = parentDocument.getElementById(key);
