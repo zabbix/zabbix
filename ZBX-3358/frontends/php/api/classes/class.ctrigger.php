@@ -1552,6 +1552,7 @@ COpt::memoryPick();
 		$dbTriggers = self::get($options);
 
 		$description_changed = $expression_changed = false;
+		$messages = array();
 		foreach($triggers as &$trigger){
 			$dbTrigger = $dbTriggers[$trigger['triggerid']];
 
@@ -1625,14 +1626,7 @@ COpt::memoryPick();
 				'where' => array('triggerid='.$trigger['triggerid'])
 			));
 
-			$expression = isset($trigger['expression']) ? $trigger['expression'] : explode_exp($dbTrigger['expression'], false);
-			$trigger['expression'] = $expression;
-			info(_s('Trigger [%1$s:%2$s] updated.', $trigger['description'], $expression));
-		}
-		unset($trigger);
 
-		$messages = array();
-		foreach($triggers as $tnum => &$trigger){
 			if(isset($trigger['dependencies'])){
 				// deleting existing ones
 				DB::delete('trigger_depends', array('triggerid_down' => $trigger['triggerid']));
@@ -1652,7 +1646,9 @@ COpt::memoryPick();
 			$expression = isset($trigger['expression']) ? $trigger['expression'] : explode_exp($dbTrigger['expression'], false);
 			$trigger['expression'] = $expression;
 			$messages[] = _s('Trigger [%1$s:%2$s] updated.', $description, $expression);
+
 		}
+		unset($trigger);
 
 		// now, check if current situation with dependencies is valid
 		self::validateDependencies($triggers);
@@ -1866,8 +1862,6 @@ COpt::memoryPick();
 			} while(!empty($up_triggerids));
 // }}} check circular dependency
 
-
-			$templateids = array();
 
 			$expr = new CTriggerExpression($trigger);
 
