@@ -44,7 +44,6 @@ class CUserGroup extends CZBXAPI{
  * @param boolean $options['with_gui_access']
  * @param boolean $options['with_api_access']
  * @param boolean $options['select_users']
- * @param int $options['extendoutput']
  * @param int $options['count']
  * @param string $options['pattern']
  * @param int $options['limit'] limit selection
@@ -83,7 +82,6 @@ class CUserGroup extends CZBXAPI{
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 // OutPut
-			'extendoutput'				=> null,
 			'editable'					=> null,
 			'output'					=> API_OUTPUT_REFER,
 			'select_users'				=> null,
@@ -97,13 +95,17 @@ class CUserGroup extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
+		if(is_array($options['output'])){
+			unset($sql_parts['select']['usrgrp']);
 
-		if(!is_null($options['extendoutput'])){
-			$options['output'] = API_OUTPUT_EXTEND;
-
-			if(!is_null($options['select_users'])){
-				$options['select_users'] = API_OUTPUT_EXTEND;
+			$dbTable = DB::getSchema('usrgrp');
+			$sql_parts['select']['usrgrpid'] = ' g.usrgrpid';
+			foreach($options['output'] as $key => $field){
+				if(isset($dbTable['fields'][$field]))
+					$sql_parts['select'][$field] = ' g.'.$field;
 			}
+
+			$options['output'] = API_OUTPUT_CUSTOM;
 		}
 
 // PERMISSION CHECK
@@ -158,7 +160,7 @@ class CUserGroup extends CZBXAPI{
 			$sql_parts['where'][] = 'g.api_access='.GROUP_API_ACCESS_ENABLED;
 		}
 
-// extendoutput
+// output
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['usrgrp'] = 'g.*';
 		}
@@ -254,7 +256,6 @@ class CUserGroup extends CZBXAPI{
 		}
 
 		if(!is_null($options['countOutput'])){
-			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 
@@ -305,7 +306,7 @@ class CUserGroup extends CZBXAPI{
 		}
 
 		if(!empty($usrgrpids))
-			$result = self::get(array('usrgrpids'=>$usrgrpids, 'extendoutput'=>1));
+			$result = self::get(array('usrgrpids'=>$usrgrpids, 'output' => API_OUTPUT_EXTEND));
 
 	return $result;
 	}
@@ -717,8 +718,30 @@ class CUserGroup extends CZBXAPI{
 			}
 			if(!empty($error_array))
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error_array);
+
+// delete action operation msg
+			$operationids = array();
+			$sql = 'SELECT DISTINCT om.operationid '.
+					' FROM opmessage_grp om '.
+					' WHERE '.DBcondition('om.usrgrpid', $usrgrpids);
+			$dbOperations = DBselect($sql);
+			while($dbOperation = DBfetch($dbOperations))
+				$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
+
+			DB::delete('opmessage_grp', array('usrgrpid'=>$usrgrpids));
+
+// delete empty operations
+			$delOperationids = array();
+			$sql = 'SELECT DISTINCT o.operationid '.
+					' FROM operations o '.
+					' WHERE '.DBcondition('o.operationid', $operationids).
+						' AND NOT EXISTS(SELECT om.opmessage_grpid FROM opmessage_grp om WHERE om.operationid=o.operationid)';
+			$dbOperations = DBselect($sql);
+			while($dbOperation = DBfetch($dbOperations))
+				$delOperationids[$dbOperation['operationid']] = $dbOperation['operationid'];
+
+			DB::delete('operations', array('operationid'=>$delOperationids));
 			DB::delete('rights', array('groupid'=>$usrgrpids));
-			DB::delete('operations', array('object'=>OPERATION_OBJECT_GROUP, 'objectid'=>$usrgrpids));
 			DB::delete('users_groups', array('usrgrpid'=>$usrgrpids));
 			DB::delete('usrgrp', array('usrgrpid'=>$usrgrpids));
 
@@ -732,6 +755,39 @@ class CUserGroup extends CZBXAPI{
 			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
+	}
+
+	public static function isReadable($ids){
+		if(!is_array($ids)) return false;
+		if(empty($ids)) return true;
+
+		$ids = array_unique($ids);
+
+		$count = self::get(array(
+			'nodeids' => get_current_nodeid(true),
+			'usrgrpids' => $ids,
+			'output' => API_OUTPUT_SHORTEN,
+			'countOutput' => true
+		));
+
+		return (count($ids) == $count);
+	}
+
+	public static function isWritable($ids){
+		if(!is_array($ids)) return false;
+		if(empty($ids)) return true;
+
+		$ids = array_unique($ids);
+
+		$count = self::get(array(
+			'nodeids' => get_current_nodeid(true),
+			'usrgrpids' => $ids,
+			'output' => API_OUTPUT_SHORTEN,
+			'editable' => true,
+			'countOutput' => true
+		));
+
+		return (count($ids) == $count);
 	}
 
 }

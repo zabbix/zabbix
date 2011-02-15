@@ -51,6 +51,7 @@ local $uniq;
 	"t_varchar"	=>	"varchar",
 	"t_char"	=>	"char",
 	"t_image"	=>	"longblob",
+	"t_text"	=>	"text",
 	"t_history_log"	=>	"text",
 	"t_history_text"=>	"text",
 	"t_blob"	=>	"blob",
@@ -72,6 +73,7 @@ local $uniq;
 	"t_varchar"	=>	"ZBX_TYPE_CHAR",
 	"t_char"	=>	"ZBX_TYPE_CHAR",
 	"t_image"	=>	"ZBX_TYPE_BLOB",
+	"t_text"	=>	"ZBX_TYPE_TEXT",
 	"t_history_log"	=>	"ZBX_TYPE_TEXT",
 	"t_history_text"=>	"ZBX_TYPE_TEXT",
 	"t_blob"	=>	"ZBX_TYPE_BLOB",
@@ -119,6 +121,7 @@ const ZBX_TABLE	tables[]={
 	"t_varchar"	=>	"nvarchar2",
 	"t_char"	=>	"nvarchar2",
 	"t_image"	=>	"blob",
+	"t_text"	=>	"nclob",
 	"t_history_log"	=>	"nclob",
 	"t_history_text"=>	"nclob",
 	"t_blob"	=>	"nvarchar2(2048)",
@@ -140,6 +143,7 @@ const ZBX_TABLE	tables[]={
 	"t_varchar"	=>	"varchar",
 	"t_char"	=>	"varchar",
 	"t_image"	=>	"blob",
+	"t_text"	=>	"varchar(2048)",
 	"t_history_log"	=>	"varchar(2048)",
 	"t_history_text"=>	"varchar(2048)",
 	"t_time"	=>	"integer",
@@ -163,6 +167,7 @@ const ZBX_TABLE	tables[]={
 	"t_varchar"	=>	"varchar",
 	"t_char"	=>	"char",
 	"t_image"	=>	"bytea",
+	"t_text"	=>	"text",
 	"t_history_log"	=>	"text",
 	"t_history_text"=>	"text",
 	"t_time"	=>	"integer",
@@ -187,6 +192,7 @@ const ZBX_TABLE	tables[]={
 	"t_varchar"	=>	"varchar",
 	"t_char"	=>	"char",
 	"t_image"	=>	"longblob",
+	"t_text"	=>	"text",
 	"t_history_log"	=>	"text",
 	"t_history_text"=>	"text",
 	"t_blob"	=>	"blob",
@@ -467,7 +473,7 @@ sub process_index
 		if (1 == $unique) { $unique = " UNIQUE"; }
 		else { $unique = ""; }
 
-		print "CREATE${unique} INDEX ${table_name}_$name\ on $table_name ($fields);${eol}\n";
+		print "CREATE${unique} INDEX ${table_name}_$name\ ON $table_name ($fields);${eol}\n";
 	}
 }
 

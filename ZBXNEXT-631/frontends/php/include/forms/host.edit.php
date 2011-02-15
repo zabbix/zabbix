@@ -20,7 +20,7 @@
 ?>
 <?php
 // include JS + templates
-	include('include/templates/hosts.js.php');
+	include('include/templates/host.js.php');
 	include('include/templates/macros.js.php');
 ?>
 <?php
@@ -222,7 +222,7 @@
 	$clear_templates = array_diff($clear_templates,array_keys($templates));
 	natcasesort($templates);
 
-	$frmHost = new CForm('hosts.php');
+	$frmHost = new CForm();
 	$frmHost->setName('web.hosts.host.php.');
 	$frmHost->addVar('form', get_request('form', 1));
 

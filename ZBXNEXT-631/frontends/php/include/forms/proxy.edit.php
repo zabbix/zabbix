@@ -31,7 +31,7 @@
 
 	$interfaces = get_request('interfaces',array());
 
-	$frmProxy = new CForm('proxies.php');
+	$frmProxy = new CForm();
 	$frmProxy->addVar('form', get_request('form', 1));
 	$frmProxy->addVar('form_refresh', get_request('form_refresh',0)+1);
 
@@ -114,7 +114,7 @@
 			$db_host['hostid'],
 			$db_host['host'],
 			NULL,
-			($db_host['proxy_hostid'] == 0 || ($_REQUEST['hostid']>0) && ($db_host['proxy_hostid'] == $_REQUEST['hostid']))
+			($db_host['proxy_hostid'] == 0 || ($_REQUEST['hostid']>0) && (bccomp($db_host['proxy_hostid'],$_REQUEST['hostid']) == 0))
 		);
 	}
 	$proxyList->addRow(S_HOSTS,$cmbHosts->Get(S_PROXY.SPACE.S_HOSTS,S_OTHER.SPACE.S_HOSTS));
