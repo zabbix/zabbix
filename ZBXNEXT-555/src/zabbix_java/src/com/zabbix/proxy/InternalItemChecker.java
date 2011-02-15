@@ -17,11 +17,6 @@ class InternalItemChecker extends ItemChecker
 	@Override
 	protected String getStringValue(ZabbixItem item) throws Exception
 	{
-		if (item.getKeyId().equals("zabbix"))
-		{
-			return "1";
-		}
-		else
-			throw new ZabbixException("Key ID '%s' is not supported", item.getKeyId());
+		return "1";
 	}
 }

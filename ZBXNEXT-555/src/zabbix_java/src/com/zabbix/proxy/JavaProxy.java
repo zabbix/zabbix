@@ -4,10 +4,17 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.util.concurrent.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class JavaProxy
 {
+	private static final Logger logger = LoggerFactory.getLogger(JavaProxy.class);
+
 	public static void main(String[] args)
 	{
+		logger.info("Zabbix Java Proxy has started");
+
 		try
 		{
 			ConfigurationManager.parseConfiguration();
@@ -16,9 +23,10 @@ public class JavaProxy
 			int listenPort = ConfigurationManager.getIntegerParameterValue(ConfigurationManager.LISTEN_PORT);
 
 			ServerSocket socket = new ServerSocket(listenPort, 0, listenIP);
+			logger.info("listening on {}:{}", socket.getInetAddress(), socket.getLocalPort());
 
 			int startPollers = ConfigurationManager.getIntegerParameterValue(ConfigurationManager.START_POLLERS);
-
+			logger.debug("creating a thread pool of {} pollers", startPollers);
 			ExecutorService threadPool = new ThreadPoolExecutor(
 					startPollers,
 					startPollers,
@@ -29,9 +37,11 @@ public class JavaProxy
 			while (true)
 				threadPool.execute(new SocketProcessor(socket.accept()));
 		}
-		catch (Exception exception)
+		catch (Exception e)
 		{
-			exception.printStackTrace();
+			logger.error("caught fatal exception", e);
 		}
+
+		logger.info("Zabbix Java Proxy has stopped");
 	}
 }
