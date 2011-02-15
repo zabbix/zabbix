@@ -19,45 +19,41 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
+require_once(dirname(__FILE__) . '/../include/class.cwebtest.php');
 
-class testPageMediaTypes extends CWebTest
-{
+class testPageMediaTypes extends CWebTest{
 	// Returns all media types
-	public static function allMediaTypes()
-	{
+	public static function allMediaTypes(){
 		return DBdata('select * from media_type');
 	}
 
 	/**
-	* @dataProvider allMediaTypes
-	*/
-	public function testPageMediaTypes_SimpleTest($mediatype)
-	{
+	 * @dataProvider allMediaTypes
+	 */
+	public function testPageMediaTypes_SimpleTest($mediatype){
 		$this->login('media_types.php');
 		$this->assertTitle('Media types');
 
 		$this->ok('Media types');
 		$this->ok('CONFIGURATION OF MEDIA TYPES');
 		$this->ok('Displaying');
-		$this->ok(array('Description','Type','Details'));
+		$this->ok(array('Description', 'Type', 'Details'));
 		$this->ok($mediatype['description']);
-		if($mediatype['type'] == MEDIA_TYPE_EMAIL)	$this->ok('Email');
-		if($mediatype['type'] == MEDIA_TYPE_JABBER)	$this->ok('Jabber');
-		if($mediatype['type'] == MEDIA_TYPE_SMS)	$this->ok('SMS');
-		if($mediatype['type'] == MEDIA_TYPE_EZ_TEXTING)	$this->ok('Ez Texting');
-		$this->dropdown_select('go','Delete selected');
+		if($mediatype['type'] == MEDIA_TYPE_EMAIL) $this->ok('Email');
+		if($mediatype['type'] == MEDIA_TYPE_JABBER) $this->ok('Jabber');
+		if($mediatype['type'] == MEDIA_TYPE_SMS) $this->ok('SMS');
+		if($mediatype['type'] == MEDIA_TYPE_EZ_TEXTING) $this->ok('Ez Texting');
+		$this->dropdown_select('go', 'Delete selected');
 	}
 
 	/**
-	* @dataProvider allMediaTypes
-	*/
-	public function testPageMediaTypes_SimpleUpdate($mediatype)
-	{
-		$name=$mediatype['description'];
+	 * @dataProvider allMediaTypes
+	 */
+	public function testPageMediaTypes_SimpleUpdate($mediatype){
+		$name = $mediatype['description'];
 
-		$sql="select * from media_type where description='$name' order by mediatypeid";
-		$oldHash=DBhash($sql);
+		$sql = "select * from media_type where description='$name' order by mediatypeid";
+		$oldHash = DBhash($sql);
 
 		$this->login('media_types.php');
 		$this->assertTitle('Media types');
@@ -70,59 +66,54 @@ class testPageMediaTypes extends CWebTest
 		$this->ok("$name");
 		$this->ok('CONFIGURATION OF MEDIA TYPES');
 
-		$this->assertEquals($oldHash,DBhash($sql));
+		$this->assertEquals($oldHash, DBhash($sql));
 	}
 
-	public function testPageMediaTypes_MassDeleteAll()
-	{
-// TODO
+	public function testPageMediaTypes_MassDeleteAll(){
+		// TODO
 		$this->markTestIncomplete();
 	}
 
 	/**
-	* @dataProvider allMediaTypes
-	*/
-	public function testPageMediaTypes_MassDelete($mediatype)
-	{
-		$id=$mediatype['mediatypeid'];
+	 * @dataProvider allMediaTypes
+	 */
+	public function testPageMediaTypes_MassDelete($mediatype){
+		$id = $mediatype['mediatypeid'];
 
-		$row=DBfetch(DBselect("select count(*) as cnt from media_type where mediatypeid=$id"));
-		$row=DBfetch(DBselect("select count(*) as cnt from opmessage where mediatypeid=$id"));
+		$row = DBfetch(DBselect("select count(*) as cnt from opmessage where mediatypeid=$id"));
 		$used_by_operations = ($row['cnt'] > 0);
 
-		DBsave_tables(array('opmessage','media_type','media'));
+		DBsave_tables(array('opmessage', 'media_type', 'media'));
 
 		$this->chooseOkOnNextConfirmation();
 
 		$this->login('media_types.php');
 		$this->assertTitle('Media types');
 		$this->checkbox_select("media_types[$id]");
-		$this->dropdown_select('go','Delete selected');
+		$this->dropdown_select('go', 'Delete selected');
 		$this->button_click('goButton');
 
 		$this->getConfirmation();
 		$this->wait();
 		$this->assertTitle('Media types');
-		switch($used_by_operations){
-			case true:
-				$this->nok('Media type deleted');
-				$this->ok('Media type was not deleted');
-				$this->ok('Mediatypes used by action');
-			break;
-			case false:
-				$this->ok('Media type deleted');
-				$sql="select * from media_type where mediatypeid=$id";
-				$this->assertEquals(0,DBcount($sql));
-			break;
+		if($used_by_operations){
+			$this->nok('Media type deleted');
+			$this->ok('Media type was not deleted');
+			$this->ok('Mediatypes used by action');
+		}
+		else{
+			$this->ok('Media type deleted');
+			$sql = "select * from media_type where mediatypeid=$id";
+			$this->assertEquals(0, DBcount($sql));
 		}
 
-		DBrestore_tables(array('opmessage','media_type','media'));
+		DBrestore_tables(array('opmessage', 'media_type', 'media'));
 	}
 
-	public function testPageMediaTypes_Sorting()
-	{
-// TODO
+	public function testPageMediaTypes_Sorting(){
+		// TODO
 		$this->markTestIncomplete();
 	}
 }
+
 ?>
