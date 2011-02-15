@@ -116,7 +116,7 @@ include_once('include/page_header.php');
 	// Change triggerId filter if change hostId
 	if(($_REQUEST['triggerid'] > 0) && isset($_REQUEST['hostid'])){
 		$hostid = get_request('hostid');
-		$oldTriggers = CTrigger::get(array(
+		$oldTriggers = API::Trigger()->get(array(
 			'output' => array('triggerid', 'description', 'expression'),
 			'selectHosts' => array('hostid', 'host'),
 			'selectItems' => API_OUTPUT_EXTEND,
@@ -133,7 +133,7 @@ include_once('include/page_header.php');
 
 			if(isset($oldTrigger['hosts'][$hostid])) break;
 
-			$newTriggers = CTrigger::get(array(
+			$newTriggers = API::Trigger()->get(array(
 				'output' => array('triggerid', 'description', 'expression'),
 				'selectHosts' => array('hostid', 'host'),
 				'selectItems' => API_OUTPUT_EXTEND,

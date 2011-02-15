@@ -1529,7 +1529,7 @@ COpt::memoryPick();
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action condition host. Host does not exist or you have no access to this host.'));
 		if(!API::Template()->isWritable($templateIdsAll))
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action condition template. Template does not exist or you have no access to this template.'));
-		if(!CTrigger::isWritable($triggerIdsAll))
+		if(!API::Trigger()->isWritable($triggerIdsAll))
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action condition trigger. Trigger does not exist or you have no access to this trigger.'));
 
 		return true;
