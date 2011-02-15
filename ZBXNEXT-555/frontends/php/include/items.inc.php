@@ -186,6 +186,7 @@
 			case ITEM_TYPE_SNMPV2C: $type = INTERFACE_TYPE_SNMP; break;
 			case ITEM_TYPE_SNMPV3: $type = INTERFACE_TYPE_SNMP; break;
 			case ITEM_TYPE_IPMI: $type = INTERFACE_TYPE_IPMI; break;
+			case ITEM_TYPE_JMX: $type = INTERFACE_TYPE_JMX; break;
 			case ITEM_TYPE_ZABBIX:
 			default: $type = INTERFACE_TYPE_AGENT;
 		}
