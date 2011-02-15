@@ -51,6 +51,7 @@ frontends/php/locale/sk/LC_MESSAGES/frontend.mo
 frontends/php/locale/sv/LC_MESSAGES/frontend.mo
 frontends/php/locale/uk/LC_MESSAGES/frontend.mo
 frontends/php/locale/zh_CN/LC_MESSAGES/frontend.mo
+frontends/php/tests/bootstrap.php
 include/config.h
 include/config.h.in
 include/stamp-h1

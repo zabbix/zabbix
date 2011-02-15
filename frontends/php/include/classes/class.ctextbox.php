@@ -27,6 +27,7 @@ class CTextBox extends CInput{
 		$this->caption = null;
 		$this->tag_body_start = '';
 		$this->setAttribute('size', $size);
+		$this->setAttribute('maxLength', '255');
 	}
 }
 ?>

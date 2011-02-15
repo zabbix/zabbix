@@ -19,86 +19,6 @@
 **/
 ?>
 <?php
-function check_permission_for_action_conditions($conditions){
-	global $USER_DETAILS;
-
-	if(USER_TYPE_SUPER_ADMIN == $USER_DETAILS['type']) return true;
-
-	$groupids = array();
-	$hostids = array();
-	$triggerids = array();
-
-	foreach($conditions as $ac_data){
-		if($ac_data['operator'] != 0) continue;
-
-		switch($ac_data['type']){
-			case CONDITION_TYPE_HOST_GROUP:
-				$groupids[$ac_data['value']] = $ac_data['value'];
-				break;
-			case CONDITION_TYPE_HOST:
-			case CONDITION_TYPE_HOST_TEMPLATE:
-				$hostids[$ac_data['value']] = $ac_data['value'];
-				break;
-			case CONDITION_TYPE_TRIGGER:
-				$triggerids[$ac_data['value']] = $ac_data['value'];
-				break;
-		}
-	}
-
-	$options = array(
-		'groupids' => $groupids,
-		'editable' => 1
-	);
-
-	try{
-		$groups = CHostgroup::get($options);
-		$groups = zbx_toHash($groups, 'groupid');
-		foreach($groupids as $hgnum => $groupid){
-			if(!isset($groups[$groupid])) throw new Exception(S_INCORRECT_GROUP);
-		}
-
-		$options = array(
-			'hostids' => $hostids,
-			'editable' => 1
-		);
-		$hosts = CHost::get($options);
-		$hosts = zbx_toHash($hosts, 'hostid');
-		foreach($hostids as $hnum => $hostid){
-			if(!isset($hosts[$hostid])) throw new Exception(S_INCORRECT_HOST);
-		}
-
-		$options = array(
-			'triggerids' => $triggerids,
-			'editable' => 1
-		);
-		$triggers = CTrigger::get($options);
-		$triggers = zbx_toHash($triggers, 'triggerid');
-		foreach($triggerids as $hnum => $triggerid){
-			if(!isset($triggers[$triggerid])) throw new Exception(S_INCORRECT_TRIGGER);
-		}
-	}
-	catch(Exception $e){
-//		throw new Exception($e->getMessage());
-//		error($e->getMessage());
-		return false;
-	}
-
-return true;
-}
-
-function get_action_by_actionid($actionid){
-	$sql='select * from actions where actionid='.$actionid;
-	$result=DBselect($sql);
-
-	if($row=DBfetch($result)){
-		return	$row;
-	}
-	else{
-		error('No action with actionid=['.$actionid.']');
-	}
-return	$result;
-}
-
 function condition_operator2str($operator){
 	$str_op[CONDITION_OPERATOR_EQUAL] 	= '=';
 	$str_op[CONDITION_OPERATOR_NOT_EQUAL]	= '<>';
@@ -159,24 +79,37 @@ return S_UNKNOWN;
 function condition_value2str($conditiontype, $value){
 	switch($conditiontype){
 		case CONDITION_TYPE_HOST_GROUP:
-			$group = get_hostgroup_by_groupid($value);
+			$groups = CHostGroup::get(array(
+				'groupids' => $value,
+				'output' => API_OUTPUT_EXTEND,
+				'nodeids' => get_current_nodeid(true),
+				'limit' => 1
+			));
+
+			if(!$group = reset($groups))
+				error(S_NO_HOST_GROUPS_WITH.' groupid "'.$value.'"');
 
 			$str_val = '';
-			if(id2nodeid($value) != get_current_nodeid()) $str_val = get_node_name_by_elid($value, true, ': ');
+			if(id2nodeid($value) != get_current_nodeid())
+				$str_val = get_node_name_by_elid($value, true, ': ');
+
 			$str_val.= $group['name'];
 			break;
 		case CONDITION_TYPE_TRIGGER:
-			$trig = CTrigger::get(array(
+			$trigs = CTrigger::get(array(
 				'triggerids' => $value,
 				'expandTriggerDescriptions' => true,
 				'output' => API_OUTPUT_EXTEND,
-				'selectHosts' => API_OUTPUT_EXTEND,
+				'selectHosts' => array('host'),
 				'nodeids' => get_current_nodeid(true),
+				'limit' => 1
 			));
-			$trig = reset($trig);
+			$trig = reset($trigs);
 			$host = reset($trig['hosts']);
 			$str_val = '';
-			if(id2nodeid($value) != get_current_nodeid()) $str_val = get_node_name_by_elid($value, true, ': ');
+			if(id2nodeid($value) != get_current_nodeid())
+				$str_val = get_node_name_by_elid($value, true, ': ');
+
 			$str_val .= $host['host'].':'.$trig['description'];
 			break;
 		case CONDITION_TYPE_HOST:
@@ -211,8 +144,11 @@ function condition_value2str($conditiontype, $value){
 			$str_val = $drule['name'];
 			break;
 		case CONDITION_TYPE_DCHECK:
-			$row = DBfetch(DBselect('SELECT DISTINCT r.name,c.dcheckid,c.type,c.key_,c.snmp_community,c.ports'.
-					' FROM drules r,dchecks c WHERE r.druleid=c.druleid AND c.dcheckid='.$value));
+			$sql = 'SELECT DISTINCT dr.name,c.dcheckid,c.type,c.key_,c.snmp_community,c.ports'.
+					' FROM drules dr,dchecks c '.
+					' WHERE dr.druleid=c.druleid '.
+						' AND c.dcheckid='.$value;
+			$row = DBfetch(DBselect($sql));
 			$str_val = $row['name'].':'.discovery_check2str($row['type'],
 					$row['snmp_community'], $row['key_'], $row['ports']);
 			break;
@@ -263,104 +199,192 @@ function get_condition_desc($conditiontype, $operator, $value){
 define('LONG_DESCRITION', 0);
 define('SHORT_DESCRITION', 1);
 
-function get_operation_desc($type=SHORT_DESCRITION, $data){
-	$result = null;
+function get_operation_desc($type, $data){
+	$result = array();
 
-	switch($type){
-		case SHORT_DESCRITION:
-			switch($data['operationtype']){
-				case OPERATION_TYPE_MESSAGE:
-					switch($data['object']){
-						case OPERATION_OBJECT_USER:
-							$obj_data = CUser::get(array('userids' => $data['objectid'],  'output' => API_OUTPUT_EXTEND));
-							$obj_data = reset($obj_data);
+	if($type == SHORT_DESCRITION){
+		switch($data['operationtype']){
+			case OPERATION_TYPE_MESSAGE:
+				if(!isset($data['opmessage_usr'])) $data['opmessage_usr'] = array();
+				if(!isset($data['opmessage_grp'])) $data['opmessage_grp'] = array();
 
-							$obj_data = S_USER.' "'.$obj_data['alias'].'"';
-							break;
-						case OPERATION_OBJECT_GROUP:
-							$obj_data = CUserGroup::get(array('usrgrpids' => $data['objectid'],  'output' => API_OUTPUT_EXTEND));
-							$obj_data = reset($obj_data);
+				$users = CUser::get(array(
+					'userids' => zbx_objectValues($data['opmessage_usr'],'userid'),
+					'output' => array('userid', 'alias')
+				));
+				if(!empty($users)){
+					order_result($users, 'alias');
 
-							$obj_data = S_GROUP.' "'.$obj_data['name'].'"';
-							break;
+					$result[] = bold(array(S_SEND_MESSAGE_TO,SPACE,S_USERS,': ' ));
+					$result[] = array(implode(', ', zbx_objectValues($users,'alias')), BR());
+				}
+
+
+				$usrgrps = CUserGroup::get(array(
+					'usrgrpids' => zbx_objectValues($data['opmessage_grp'],'usrgrpid'),
+					'output' => API_OUTPUT_EXTEND
+				));
+				if(!empty($usrgrps)){
+					order_result($usrgrps, 'name');
+
+					$result[] = bold(array(S_SEND_MESSAGE_TO,SPACE,S_GROUPS,': ' ));
+					$result[] = array(implode(', ', zbx_objectValues($usrgrps,'name')), BR());
+				}
+				break;
+			case OPERATION_TYPE_COMMAND:
+				if(!isset($data['opcommand_grp'])) $data['opcommand_grp'] = array();
+				if(!isset($data['opcommand_hst'])) $data['opcommand_hst'] = array();
+
+				$hosts = CHost::get(array(
+					'hostids' => zbx_objectValues($data['opcommand_hst'],'hostid'),
+					'output' => array('hostid', 'host')
+				));
+
+				foreach($data['opcommand_hst'] as $num => $cmd){
+					if($cmd['hostid'] != 0) continue;
+
+					$result[] = array(bold(_('Run remote command on current host')), BR());
+					break;
+				}
+
+				if(!empty($hosts)){
+					order_result($hosts, 'host');
+
+					$result[] = bold(_('Run remote command on hosts: '));
+					$result[] = array(implode(', ', zbx_objectValues($hosts,'host')), BR());
+				}
+
+
+				$groups = CHostgroup::get(array(
+					'groupids' => zbx_objectValues($data['opcommand_grp'],'groupid'),
+					'output' => array('groupid', 'name')
+				));
+
+				if(!empty($groups)){
+					order_result($groups, 'name');
+
+					$result[] = bold(_('Run remote command on host groups: '));
+					$result[] = array(implode(', ', zbx_objectValues($groups,'name')), BR());
+				}
+				break;
+			case OPERATION_TYPE_HOST_ADD:
+				$result[] = array(bold(_('Add host')), BR());
+				break;
+			case OPERATION_TYPE_HOST_REMOVE:
+				$result[] = array(bold(_('Remove host')), BR());
+				break;
+			case OPERATION_TYPE_HOST_ENABLE:
+				$result[] = array(bold(_('Enable host')), BR());
+				break;
+			case OPERATION_TYPE_HOST_DISABLE:
+				$result[] = array(bold(_('Disable host')), BR());
+				break;
+			case OPERATION_TYPE_GROUP_ADD:
+			case OPERATION_TYPE_GROUP_REMOVE:
+				if(!isset($data['opgroup'])) $data['opgroup'] = array();
+
+				$groups = CHostgroup::get(array(
+					'groupids' => zbx_objectValues($data['opgroup'],'groupid'),
+					'output' => array('groupid', 'name')
+				));
+
+				if(!empty($groups)){
+					order_result($groups, 'name');
+
+					if(OPERATION_TYPE_GROUP_ADD == $data['operationtype'])
+						$result[] = bold(_('Add to host groups: '));
+					else
+						$result[] = bold(_('Remove from host groups: '));
+
+					$result[] = array(implode(', ', zbx_objectValues($groups,'name')), BR());
+				}
+				break;
+			case OPERATION_TYPE_TEMPLATE_ADD:
+			case OPERATION_TYPE_TEMPLATE_REMOVE:
+				if(!isset($data['optemplate'])) $data['optemplate'] = array();
+
+				$templates = CTemplate::get(array(
+					'templateids' => zbx_objectValues($data['optemplate'],'templateid'),
+					'output' => array('hostid', 'host')
+				));
+
+				if(!empty($templates)){
+					order_result($templates, 'host');
+
+					if(OPERATION_TYPE_TEMPLATE_ADD == $data['operationtype'])
+						$result[] = bold(_('Link to templates: '));
+					else
+						$result[] = bold(_('Unlink from templates: '));
+
+					$result[] = array(implode(', ', zbx_objectValues($templates,'host')), BR());
+				}
+				break;
+			default:
+				break;
+		}
+	}
+	else{
+		switch($data['operationtype']){
+			case OPERATION_TYPE_MESSAGE:
+				if(isset($data['opmessage']['default_msg']) && !empty($data['opmessage']['default_msg'])){
+					if(isset($_REQUEST['def_shortdata']) && isset($_REQUEST['def_longdata'])){
+						$result[] = array(bold(S_SUBJECT.': '),BR(),zbx_nl2br($_REQUEST['def_shortdata']));
+						$result[] = array(bold(S_MESSAGE.':'),BR(),zbx_nl2br($_REQUEST['def_longdata']));
 					}
-					$result = S_SEND_MESSAGE_TO.' '.$obj_data;
-					break;
-				case OPERATION_TYPE_COMMAND:
-					$result = S_RUN_REMOTE_COMMANDS;
-					break;
-				case OPERATION_TYPE_HOST_ADD:
-					$result = S_ADD_HOST;
-					break;
-				case OPERATION_TYPE_HOST_REMOVE:
-					$result = S_REMOVE_HOST;
-					break;
-				case OPERATION_TYPE_HOST_ENABLE:
-					$result = S_ENABLE_HOST;
-					break;
-				case OPERATION_TYPE_HOST_DISABLE:
-					$result = S_DISABLE_HOST;
-					break;
-				case OPERATION_TYPE_GROUP_ADD:
-					$obj_data = get_hostgroup_by_groupid($data['objectid']);
-					$result = S_ADD_TO_GROUP.' "'.$obj_data['name'].'"';
-					break;
-				case OPERATION_TYPE_GROUP_REMOVE:
-					$obj_data = get_hostgroup_by_groupid($data['objectid']);
-					$result = S_DELETE_FROM_GROUP.' "'.$obj_data['name'].'"';
-					break;
-				case OPERATION_TYPE_TEMPLATE_ADD:
-					$obj_data = get_host_by_hostid($data['objectid']);
-					$result = S_LINK_TO_TEMPLATE.' "'.$obj_data['host'].'"';
-					break;
-				case OPERATION_TYPE_TEMPLATE_REMOVE:
-					$obj_data = get_host_by_hostid($data['objectid']);
-					$result = S_UNLINK_FROM_TEMPLATE.' "'.$obj_data['host'].'"';
-					break;
-				default: break;
-			}
-			break;
-		case LONG_DESCRITION:
-			switch($data['operationtype']){
-				case OPERATION_TYPE_MESSAGE:
-					// for PHP4
-					if(isset($data['default_msg']) && !empty($data['default_msg'])){
-						if(isset($_REQUEST['def_shortdata']) && isset($_REQUEST['def_longdata'])){
-							$temp = bold(S_SUBJECT.': ');
-							$result = $temp->ToString()."\n".$_REQUEST['def_shortdata']."\n";
-							$temp = bold(S_MESSAGE.':');
-							$result .= $temp->ToString()."\n".$_REQUEST['def_longdata'];
+					else if(isset($data['opmessage']['operationid'])){
+						$sql = 'SELECT a.def_shortdata,a.def_longdata '.
+								' FROM actions a, operations o '.
+								' WHERE a.actionid=o.actionid '.
+									' AND o.operationid='.$data['operationid'];
+						if($rows = DBfetch(DBselect($sql,1))){
+							$result[] = array(bold(S_SUBJECT.': '), BR(),zbx_nl2br($rows['def_shortdata']));
+							$result[] = array(bold(S_MESSAGE.':'), BR(),zbx_nl2br($rows['def_longdata']));
 						}
-						else if(isset($data['operationid'])){
-							$sql = 'SELECT a.def_shortdata,a.def_longdata '.
-									' FROM actions a, operations o '.
-									' WHERE a.actionid=o.actionid '.
-										' AND o.operationid='.$data['operationid'];
-							if($rows = DBfetch(DBselect($sql,1))){
-								$temp = bold(S_SUBJECT.': ');
-								$result = $temp->ToString()."\n".$rows['def_shortdata']."\n";
-								$temp = bold(S_MESSAGE.':');
-								$result .= $temp->ToString()."\n".$rows['def_longdata'];
-							}
-						}
 					}
-					else{
-						$temp = bold(S_SUBJECT.': ');
-						$result = $temp->ToString().$data['shortdata']."\n";
-						$temp = bold(S_MESSAGE.':');
-						$result .= $temp->ToString().$data['longdata'];
-					}
+				}
+				else{
+					$result[] = array(bold(S_SUBJECT.': '), BR(), zbx_nl2br($data['opmessage']['subject']));
+					$result[] = array(bold(S_MESSAGE.':'), BR(), zbx_nl2br($data['opmessage']['message']));
+				}
 
-					break;
-				case OPERATION_TYPE_COMMAND:
-					$temp = bold(S_REMOTE_COMMANDS.': ');
-					$result = $temp->ToString().$data['longdata'];
-					break;
-				default: break;
-			}
-			break;
-		default:
-			break;
+				break;
+			case OPERATION_TYPE_COMMAND:
+				if(!isset($data['opcommand_grp'])) $data['opcommand_grp'] = array();
+				if(!isset($data['opcommand_hst'])) $data['opcommand_hst'] = array();
+
+				$hosts = CHost::get(array(
+					'hostids' => zbx_objectValues($data['opcommand_hst'],'hostid'),
+					'output' => array('hostid', 'host'),
+					'preservekeys' => true
+				));
+				order_result($hosts, 'host');
+				foreach($data['opcommand_hst'] as $cnum => $command){
+					if($command['hostid'] > 0) continue;
+					$result[] = _s('Current host: ');
+
+					$result[] = italic(zbx_nl2br($command['command']));
+				}
+
+				foreach($data['opcommand_hst'] as $cnum => $command){
+					if($command['hostid'] == 0) continue;
+					$result[] = _s('Host "%1$s": ', $hosts[$command['hostid']]['host']);
+
+					$result[] = italic(zbx_nl2br($command['command']));
+				}
+
+				$groups = CHostgroup::get(array(
+					'groupids' => zbx_objectValues($data['opcommand_grp'],'groupid'),
+					'output' => array('groupid', 'name'),
+					'preservekeys' => true
+				));
+				order_result($groups, 'name');
+				foreach($data['opcommand_grp'] as $cnum => $command){
+					$result[] = _s('Host group "%1$s": ', $groups[$command['groupid']]['name']);
+					$result[] = italic(zbx_nl2br($command['command']));
+				}
+				break;
+			default:
+		}
 	}
 
 	return $result;
@@ -451,27 +475,28 @@ function get_operations_by_eventsource($eventsource){
 	return $operations[EVENT_SOURCE_TRIGGERS];
 }
 
-function	operation_type2str($type)
-{
-	$str_type[OPERATION_TYPE_MESSAGE]		= S_SEND_MESSAGE;
-	$str_type[OPERATION_TYPE_COMMAND]		= S_REMOTE_COMMAND;
-	$str_type[OPERATION_TYPE_HOST_ADD]		= S_ADD_HOST;
-	$str_type[OPERATION_TYPE_HOST_REMOVE]		= S_REMOVE_HOST;
-	$str_type[OPERATION_TYPE_HOST_ENABLE]		= S_ENABLE_HOST;
-	$str_type[OPERATION_TYPE_HOST_DISABLE]		= S_DISABLE_HOST;
-	$str_type[OPERATION_TYPE_GROUP_ADD]		= S_ADD_TO_GROUP;
-	$str_type[OPERATION_TYPE_GROUP_REMOVE]		= S_DELETE_FROM_GROUP;
-	$str_type[OPERATION_TYPE_TEMPLATE_ADD]		= S_LINK_TO_TEMPLATE;
-	$str_type[OPERATION_TYPE_TEMPLATE_REMOVE]	= S_UNLINK_FROM_TEMPLATE;
+function operation_type2str($type=null){
+	$types = array(
+		OPERATION_TYPE_MESSAGE => S_SEND_MESSAGE,
+		OPERATION_TYPE_COMMAND => S_REMOTE_COMMAND,
+		OPERATION_TYPE_HOST_ADD => S_ADD_HOST,
+		OPERATION_TYPE_HOST_REMOVE => S_REMOVE_HOST,
+		OPERATION_TYPE_HOST_ENABLE => S_ENABLE_HOST,
+		OPERATION_TYPE_HOST_DISABLE => S_DISABLE_HOST,
+		OPERATION_TYPE_GROUP_ADD => S_ADD_TO_GROUP,
+		OPERATION_TYPE_GROUP_REMOVE => S_DELETE_FROM_GROUP,
+		OPERATION_TYPE_TEMPLATE_ADD => S_LINK_TO_TEMPLATE,
+		OPERATION_TYPE_TEMPLATE_REMOVE => S_UNLINK_FROM_TEMPLATE,
+	);
 
-	if(isset($str_type[$type]))
-		return $str_type[$type];
-
-	return S_UNKNOWN;
+	if(is_null($type))
+		return order_result($types);
+	else if(isset($types[$type]))
+		return $types[$type];
+	else return S_UNKNOWN;
 }
 
-function	get_operators_by_conditiontype($conditiontype)
-{
+function get_operators_by_conditiontype($conditiontype){
 	$operators[CONDITION_TYPE_HOST_GROUP] = array(
 			CONDITION_OPERATOR_EQUAL,
 			CONDITION_OPERATOR_NOT_EQUAL
@@ -574,11 +599,6 @@ function	get_operators_by_conditiontype($conditiontype)
 	return array();
 }
 
-function	update_action_status($actionid, $status)
-{
-	return DBexecute("update actions set status=$status where actionid=$actionid");
-}
-
 function validate_condition($conditiontype, $value){
 	switch($conditiontype){
 		case CONDITION_TYPE_HOST_GROUP:
@@ -622,6 +642,17 @@ function validate_condition($conditiontype, $value){
 			));
 			if(empty($hosts)){
 				error(S_INCORRECT_HOST);
+				return false;
+			}
+			break;
+		case CONDITION_TYPE_PROXY:
+			$proxyes = CProxy::get(array(
+				'proxyids' => $value,
+				'output' => API_OUTPUT_SHORTEN,
+				'nodeids' => get_current_nodeid(true),
+			));
+			if(empty($proxyes)){
+				error(_('Incorrect proxy.'));
 				return false;
 			}
 			break;
@@ -670,7 +701,6 @@ function validate_condition($conditiontype, $value){
 		case CONDITION_TYPE_DRULE:
 		case CONDITION_TYPE_DCHECK:
 		case CONDITION_TYPE_DOBJECT:
-		case CONDITION_TYPE_PROXY:
 		case CONDITION_TYPE_DUPTIME:
 		case CONDITION_TYPE_DVALUE:
 		case CONDITION_TYPE_APPLICATION:
@@ -682,98 +712,6 @@ function validate_condition($conditiontype, $value){
 			break;
 	}
 	return true;
-}
-
-function validate_operation($operation){
-	if(isset($operation['esc_period']) && (($operation['esc_period'] > 0) && ($operation['esc_period'] < 60))){
-		error(S_INCORRECT_ESCALATION_PERIOD);
-		return false;
-	}
-
-	switch($operation['operationtype']){
-		case OPERATION_TYPE_MESSAGE:
-			switch($operation['object']){
-				case OPERATION_OBJECT_USER:
-					$users = CUser::get(array('userids' => $operation['objectid'],  'output' => API_OUTPUT_EXTEND));
-					if(empty($users)){
-						error(S_INCORRECT_USER);
-						return false;
-					}
-					break;
-				case OPERATION_OBJECT_GROUP:
-					$usrgrps = CUserGroup::get(array('usrgrpids' => $operation['objectid'],  'output' => API_OUTPUT_EXTEND));
-					if(empty($usrgrps)){
-						error(S_INCORRECT_GROUP);
-						return false;
-					}
-					break;
-				default:
-					error(S_INCORRECT_OBJECT_TYPE);
-					return false;
-			}
-			break;
-		case OPERATION_TYPE_COMMAND:
-			return validate_commands($operation['longdata']);
-		case OPERATION_TYPE_HOST_ADD:
-		case OPERATION_TYPE_HOST_REMOVE:
-		case OPERATION_TYPE_HOST_ENABLE:
-		case OPERATION_TYPE_HOST_DISABLE:
-			break;
-		case OPERATION_TYPE_GROUP_ADD:
-		case OPERATION_TYPE_GROUP_REMOVE:
-			$groups = CHostGroup::get(array(
-				'groupids' => $operation['objectid'],
-				'output' => API_OUTPUT_SHORTEN,
-				'editable' => 1,
-			));
-			if(empty($groups)){
-				error(S_INCORRECT_GROUP);
-				return false;
-			}
-			break;
-		case OPERATION_TYPE_TEMPLATE_ADD:
-		case OPERATION_TYPE_TEMPLATE_REMOVE:
-			$tpls = CTemplate::get(array(
-				'templateids' => $operation['objectid'],
-				'output' => API_OUTPUT_SHORTEN,
-				'editable' => 1,
-			));
-			if(empty($tpls)){
-				error(S_INCORRECT_HOST);
-				return false;
-			}
-			break;
-		default:
-			error(S_INCORRECT_OPERATION_TYPE);
-			return false;
-	}
-return true;
-}
-
-function validate_commands($commands){
-	$cmd_list = explode("\n",$commands);
-	foreach($cmd_list as $cmd){
-		$cmd = trim($cmd, "\x00..\x1F");
-//		if(!ereg("^(({HOSTNAME})|".ZBX_EREG_INTERNAL_NAMES.")(:|#)[[:print:]]*$",$cmd,$cmd_items)){
-		if(!preg_match("/^(({HOSTNAME})|".ZBX_PREG_INTERNAL_NAMES.")(:|#)[".ZBX_PREG_PRINT."]*$/", $cmd, $cmd_items)){
-			error(S_INCORRECT_COMMAND.": '$cmd'");
-			return FALSE;
-		}
-
-		if($cmd_items[4] == '#'){ // group
-			if(!DBfetch(DBselect('select groupid from groups where name='.zbx_dbstr($cmd_items[1])))){
-				error(S_UNKNOWN_GROUP_NAME.": '".$cmd_items[1]."' ".S_IN_COMMAND_SMALL." '".$cmd."'");
-				return FALSE;
-			}
-		}
-		else if($cmd_items[4] == ':'){ // host
-			if(($cmd_items[1] != '{HOSTNAME}') && !DBfetch(DBselect('select hostid from hosts where host='.zbx_dbstr($cmd_items[1])))){
-				error(S_UNKNOWN_HOST_NAME.": '".$cmd_items[1]."' ".S_IN_COMMAND_SMALL." '".$cmd."'");
-				return FALSE;
-			}
-		}
-	}
-	return TRUE;
 }
 
 function count_operations_delay($operations, $def_period=0){
@@ -926,11 +864,7 @@ function get_action_msgs_for_event($event){
 		$sendto=$alert["sendto"];
 
 		$message = array(bold(S_SUBJECT.':'),br(),$alert["subject"],br(),br(),bold(S_MESSAGE.':'));
-		$msg = explode("\n",$alert['message']);
-
-		foreach($msg as $m){
-			array_push($message, BR(), $m);
-		}
+		array_push($message, BR(), zbx_nl2br($alert['message']));
 
 		if(empty($alert["error"])){
 			$error=new CSpan(SPACE,"off");
@@ -987,13 +921,9 @@ function get_action_cmds_for_event($event){
 		}
 
 		$message = array(bold(S_COMMAND.':'));
-		$msg = explode('\n', $alert['message']);
-		foreach($msg as $m){
-			array_push($message, BR(), $m);
-		}
+		array_push($message, BR(), zbx_nl2br($alert['message']));
 
 		$error = empty($alert['error']) ? new CSpan(SPACE, 'off') : new CSpan($alert['error'], 'on');
-
 
 		$table->addRow(array(
 			get_node_name_by_elid($alert['alertid']),
@@ -1029,19 +959,7 @@ function get_actions_hint_by_eventid($eventid,$status=NULL){
 			S_DETAILS,
 			S_STATUS
 			));
-/*
-	$sql = 'SELECT DISTINCT a.alertid,mt.description,a.sendto,a.status,u.alias,a.retries '.
-			' FROM events e,users u,alerts a'.
-			' left join media_type mt on mt.mediatypeid=a.mediatypeid'.
-			' WHERE a.eventid='.$eventid.
-				(is_null($status)?'':' AND a.status='.$status).
-				' AND e.eventid = a.eventid'.
-				' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
-				' AND '.DBcondition('e.objectid',$available_triggers).
-				' AND '.DBin_node('a.alertid').
-				' AND u.userid=a.userid '.
-			' ORDER BY mt.description';
-//*/
+
 	$sql = 'SELECT DISTINCT a.alertid,mt.description,u.alias,a.subject,a.message,a.sendto,a.status,a.retries,a.alerttype '.
 			' FROM events e,alerts a '.
 				' LEFT JOIN users u ON u.userid=a.userid '.
@@ -1226,4 +1144,5 @@ function get_event_actions_stat_hints($eventid){
 	}
 return $actions;
 }
+
 ?>

@@ -77,8 +77,11 @@ class CDCheck extends CZBXAPI{
 
 		if(is_array($options['output'])){
 			unset($sql_parts['select']['dchecks']);
+
+			$dbTable = DB::getSchema('dchecks');
 			foreach($options['output'] as $key => $field){
-				$sql_parts['select'][$field] = ' dc.'.$field;
+				if(isset($dbTable['fields'][$field]))
+					$sql_parts['select'][$field] = ' dc.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;
@@ -293,7 +296,6 @@ class CDCheck extends CZBXAPI{
 
 Copt::memoryPick();
 		if(!is_null($options['countOutput'])){
-			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 

@@ -32,7 +32,7 @@ class czbxrpc{
 		);
 //-----
 
-// list of methods which does not require athentication
+// list of methods which does not require authentication
 		$without_auth = array(
 			'apiinfo.version' => 1
 		);

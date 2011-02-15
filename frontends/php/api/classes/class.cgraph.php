@@ -96,8 +96,11 @@ class CGraph extends CZBXAPI{
 
 		if(is_array($options['output'])){
 			unset($sql_parts['select']['graphs']);
+
+			$dbTable = DB::getSchema('graphs');
 			foreach($options['output'] as $key => $field){
-				$sql_parts['select'][$field] = ' g.'.$field;
+				if(isset($dbTable['fields'][$field]))
+					$sql_parts['select'][$field] = ' g.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;
@@ -266,7 +269,7 @@ class CGraph extends CZBXAPI{
 			}
 		}
 
-// extendoutput
+// output
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['graphs'] = 'g.*';
 		}
@@ -309,7 +312,7 @@ class CGraph extends CZBXAPI{
 				$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
 
 				$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
-				$sql_parts['where']['host'] = DBcondition('h.host', $options['filter']['host'], false, true);
+				$sql_parts['where']['host'] = DBcondition('h.host', $options['filter']['host']);
 			}
 
 			if(isset($options['filter']['hostid'])){
@@ -428,7 +431,6 @@ class CGraph extends CZBXAPI{
 
 COpt::memoryPick();
 		if(!is_null($options['countOutput'])){
-			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 
@@ -1138,19 +1140,24 @@ COpt::memoryPick();
 
 		foreach($graphs as $gnum => $graph){
 			if(!isset($graph['name'])) continue;
+			$hosts = CHost::get(array(
+				'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
+				'nopermissions'=> true,
+				'preservekeys' => true
+			));
 
 			$options = array(
-				'nodeids' => get_current_nodeid(true),
+//				'nodeids' => get_current_nodeid(true),
+				'hostids' => array_keys($hosts),
 				'output' => API_OUTPUT_SHORTEN,
 				'filter' => array('name' => $graph['name'], 'flags' => null),
-				'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
-				'nopermissions' => 1
+				'nopermissions' => true,
+				'preservekeys' => true
 			);
 			$graphsExists = self::get($options);
 			foreach($graphsExists as $genum => $graphExists){
-				if(($update && ($graphExists['graphid'] != $graph['graphid'])) || !$update){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph with name [ %1$s ] already exists', $graph['name']));
-				}
+				if(!$update || (bccomp($graphExists['graphid'],$graph['graphid']) != 0))
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph with name "%1$s" already exists', $graph['name']));
 			}
 // }}} EXCEPTION: GRAPH EXISTS
 		}

@@ -1,6 +1,6 @@
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,6 @@
 
 extern char	*CONFIG_SOURCE_IP;
 
-int	check_ntp(char *host, unsigned short port, int *value_int);
+int	check_ntp(char *host, unsigned short port, int timeout, int *value_int);
 
 #endif /* ZABBIX_SYSINFO_SIMPLE_NTP_H */
