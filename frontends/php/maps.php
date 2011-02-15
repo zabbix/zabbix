@@ -130,14 +130,14 @@ require_once('include/templates/scriptConfirm.js.php');
 		if(!isset($_REQUEST[GET_PARAM_NAME]))
 			CProfile::update('web.maps.sysmapid', $_REQUEST['sysmapid'], PROFILE_TYPE_ID);
 
-		$form = new CForm(null, 'get');
-		$form->addVar('fullscreen', $_REQUEST['fullscreen']);
-		$cmbMaps = new CComboBox('sysmapid', get_request('sysmapid', 0), 'submit()');
-		order_result($maps, 'name');
-		foreach($maps as $sysmapid => $map){
-			$cmbMaps->addItem($sysmapid, get_node_name_by_elid($sysmapid, null, ': ').$map['name']);
-		}
-		$form->addItem($cmbMaps);
+			$form = new CForm('get');
+			$form->addVar('fullscreen', $_REQUEST['fullscreen']);
+			$cmbMaps = new CComboBox('sysmapid', get_request('sysmapid', 0), 'submit()');
+			order_result($maps, 'name');
+			foreach($maps as $sysmapid => $map){
+				$cmbMaps->addItem($sysmapid, get_node_name_by_elid($sysmapid, null, ': ').$map['name']);
+			}
+			$form->addItem($cmbMaps);
 
 		$map_wdgt->addHeader($maps[$_REQUEST['sysmapid']]['name'], $form);
 

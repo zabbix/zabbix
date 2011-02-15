@@ -128,22 +128,26 @@
 		return $status;
 	}
 
-	function discovery_object_status2str($status){
+	function discovery_object_status2str($status=null){
 		$statuses = array(
 			DOBJECT_STATUS_UP => S_UP,
 			DOBJECT_STATUS_DOWN => S_DOWN,
 			DOBJECT_STATUS_DISCOVER => S_DISCOVERED,
 			DOBJECT_STATUS_LOST => S_LOST,
 		);
-		return isset($statuses[$status]) ? $statuses[$status] : S_UNKNOWN;
+
+		if(is_null($status)){
+			order_result($statuses);
+			return $statuses;
+		}
+		else if(isset($statuses[$status]))
+			return $statuses[$status];
+		else
+			return S_UNKNOWN;
 	}
 
 	function get_discovery_rule_by_druleid($druleid){
 		return DBfetch(DBselect('select * from drules where druleid='.$druleid));
-	}
-
-	function set_discovery_rule_status($druleid, $status){
-		return DBexecute('update drules set status='.$status.' where druleid='.$druleid);
 	}
 
 	function add_discovery_check($druleid, $type, $ports, $key, $snmp_community,
@@ -227,7 +231,7 @@
 		$sql = 'SELECT DISTINCT actionid '.
 				' FROM conditions '.
 				' WHERE conditiontype='.CONDITION_TYPE_DCHECK.
-					' AND '.DBcondition('value', $dcheckids, false, true);	// FIXED[POSIBLE value type violation]!!!
+					' AND '.DBcondition('value', $dcheckids);
 
 		$db_actions = DBselect($sql);
 		while($db_action = DBfetch($db_actions))
@@ -242,7 +246,7 @@
 // delete action conditions
 			DBexecute('DELETE FROM conditions '.
 					' WHERE conditiontype='.CONDITION_TYPE_DCHECK.
-					' AND '.DBcondition('value', $dcheckids, false, true));	// FIXED[POSIBLE value type violation]!!!
+					' AND '.DBcondition('value', $dcheckids));
 		}
 
 		DBexecute('DELETE FROM dchecks WHERE '.DBcondition('dcheckid', $dcheckids));

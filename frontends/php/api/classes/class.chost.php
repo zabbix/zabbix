@@ -51,7 +51,6 @@ class CHost extends CZBXAPI{
  * @param boolean $options['with_monitored_httptests'] only with monitored http tests
  * @param boolean $options['with_graphs'] only with graphs
  * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
- * @param int $options['extendoutput'] return all fields for Hosts
  * @param boolean $options['selectGroups'] select HostGroups
  * @param boolean $options['select_templates'] select Templates
  * @param boolean $options['selectItems'] select Items
@@ -154,9 +153,12 @@ class CHost extends CZBXAPI{
 
 		if(is_array($options['output'])){
 			unset($sql_parts['select']['hosts']);
+
+			$dbTable = DB::getSchema('hosts');
 			$sql_parts['select']['hostid'] = ' h.hostid';
 			foreach($options['output'] as $key => $field){
-				$sql_parts['select'][$field] = ' h.'.$field;
+				if(isset($dbTable['fields'][$field]))
+					$sql_parts['select'][$field] = ' h.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;
@@ -741,7 +743,6 @@ class CHost extends CZBXAPI{
 
 Copt::memoryPick();
 		if(!is_null($options['countOutput'])){
-			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 
@@ -2081,8 +2082,10 @@ Copt::memoryPick();
 				'preservekeys' => 1
 			));
 
-			$delItemIds = zbx_objectValues($delItems, 'itemid');
-			CItem::delete($delItemIds, true);
+			if(!empty($delItems)){
+				$delItemIds = zbx_objectValues($delItems, 'itemid');
+				CItem::delete($delItemIds, true);
+			}
 
 // delete host interfaces
 			DB::delete('interface', array('hostid'=>$hostids));
@@ -2117,28 +2120,24 @@ Copt::memoryPick();
 			DB::delete('hosts_templates', array('hostid'=>$hostids));
 
 // disable actions
+// actions from conditions
 			$actionids = array();
-
-// conditions
 			$sql = 'SELECT DISTINCT actionid '.
 					' FROM conditions '.
 					' WHERE conditiontype='.CONDITION_TYPE_HOST.
-						' AND '.DBcondition('value',$hostids, false, true);		// FIXED[POSIBLE value type violation]!!!
+						' AND '.DBcondition('value',$hostids);
 			$db_actions = DBselect($sql);
-			while($db_action = DBfetch($db_actions)){
+			while($db_action = DBfetch($db_actions))
 				$actionids[$db_action['actionid']] = $db_action['actionid'];
-			}
 
-// operations
+// actions from operations
 			$sql = 'SELECT DISTINCT o.actionid '.
-					' FROM operations o '.
-					' WHERE o.operationtype IN ('.OPERATION_TYPE_GROUP_ADD.','.OPERATION_TYPE_GROUP_REMOVE.') '.
-						' AND '.DBcondition('o.objectid',$hostids);
+					' FROM operations o, opcommand_hst oh '.
+					' WHERE o.operationid=oh.operationid '.
+						' AND '.DBcondition('oh.hostid',$hostids);
 			$db_actions = DBselect($sql);
-			while($db_action = DBfetch($db_actions)){
+			while($db_action = DBfetch($db_actions))
 				$actionids[$db_action['actionid']] = $db_action['actionid'];
-			}
-
 
 			if(!empty($actionids)){
 				$update = array();
@@ -2155,10 +2154,31 @@ Copt::memoryPick();
 				'value'=>$hostids
 			));
 
-// delete action operations
+// delete action operation commands
+			$operationids = array();
+			$sql = 'SELECT DISTINCT oh.operationid '.
+					' FROM opcommand_hst oh '.
+					' WHERE '.DBcondition('oh.hostid', $hostids);
+			$dbOperations = DBselect($sql);
+			while($dbOperation = DBfetch($dbOperations))
+				$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
+
+			DB::delete('opcommand_hst', array(
+				'hostid'=>$hostids,
+			));
+
+// delete empty operations
+			$delOperationids = array();
+			$sql = 'SELECT DISTINCT o.operationid '.
+					' FROM operations o '.
+					' WHERE '.DBcondition('o.operationid', $operationids).
+						' AND NOT EXISTS(SELECT oh.opcommand_hstid FROM opcommand_hst oh WHERE oh.operationid=o.operationid)';
+			$dbOperations = DBselect($sql);
+			while($dbOperation = DBfetch($dbOperations))
+				$delOperationids[$dbOperation['operationid']] = $dbOperation['operationid'];
+
 			DB::delete('operations', array(
-				'operationtype'=>array(OPERATION_TYPE_TEMPLATE_ADD, OPERATION_TYPE_TEMPLATE_REMOVE),
-				'objectid'=>$hostids
+				'operationid'=>$delOperationids,
 			));
 
 // delete host profile
@@ -2173,7 +2193,7 @@ Copt::memoryPick();
 
 // TODO: remove info from API
 			foreach($hosts as $hnum => $host){
-				info(_s('Host [%1$s] deleted.', $host['host']));
+				info(_s('Host "%s" deleted.', $host['host']));
 				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $host['hostid'], $host['host'], 'hosts', NULL, NULL);
 			}
 
@@ -2187,6 +2207,41 @@ Copt::memoryPick();
 			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
+	}
+
+	public static function isReadable($ids){
+		if(!is_array($ids)) return false;
+		if(empty($ids)) return true;
+
+		$ids = array_unique($ids);
+
+		$count = self::get(array(
+			'nodeids' => get_current_nodeid(true),
+			'hostids' => $ids,
+			'output' => API_OUTPUT_SHORTEN,
+			'templated_hosts' => true,
+			'countOutput' => true
+		));
+
+		return (count($ids) == $count);
+	}
+
+	public static function isWritable($ids){
+		if(!is_array($ids)) return false;
+		if(empty($ids)) return true;
+
+		$ids = array_unique($ids);
+
+		$count = self::get(array(
+			'nodeids' => get_current_nodeid(true),
+			'hostids' => $ids,
+			'output' => API_OUTPUT_SHORTEN,
+			'editable' => true,
+			'templated_hosts' => true,
+			'countOutput' => true
+		));
+
+		return (count($ids) == $count);
 	}
 }
 ?>

@@ -179,7 +179,7 @@ include_once('include/page_header.php');
 
 	$slides_wdgt = new CWidget('hat_slides');
 
-	$formHeader = new CForm(null, 'get');
+	$formHeader = new CForm('get');
 	$cmbConfig = new CComboBox('config', 'slides.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
 		$cmbConfig->addItem('screens.php', S_SCREENS);
 		$cmbConfig->addItem('slides.php', S_SLIDESHOWS);
@@ -239,7 +239,7 @@ include_once('include/page_header.php');
 // }}} PAGE HEADER
 
 // HEADER {{{
-		$form = new CForm(null, 'get');
+		$form = new CForm('get');
 		$form->addVar('fullscreen', $_REQUEST['fullscreen']);
 
 		$cmbElements = new CComboBox('elementid', $elementid, 'submit()');

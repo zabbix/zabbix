@@ -43,7 +43,6 @@ class CUser extends CZBXAPI{
  * @param boolean $options['type'] filter by User type [ USER_TYPE_ZABBIX_USER: 1, USER_TYPE_ZABBIX_ADMIN: 2, USER_TYPE_SUPER_ADMIN: 3 ]
  * @param boolean $options['select_usrgrps'] extend with UserGroups data for each User
  * @param boolean $options['get_access'] extend with access data for each User
- * @param boolean $options['extendoutput'] output only User IDs if not set.
  * @param boolean $options['count'] output only count of objects in result. ( result returned in property 'rowscount' )
  * @param string $options['pattern'] filter by Host name containing only give pattern
  * @param int $options['limit'] output will be limited to given number
@@ -84,7 +83,6 @@ class CUser extends CZBXAPI{
 			'excludeSearch'				=> null,
 
 // OutPut
-			'extendoutput'				=> null,
 			'output'					=> API_OUTPUT_REFER,
 			'editable'					=> null,
 			'select_usrgrps'			=> null,
@@ -101,15 +99,18 @@ class CUser extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
+		if(is_array($options['output'])){
+			unset($sql_parts['select']['users']);
 
-		if(!is_null($options['extendoutput'])){
-			$options['output'] = API_OUTPUT_EXTEND;
-
-			if(!is_null($options['select_usrgrps'])){
-				$options['select_usrgrps'] = API_OUTPUT_EXTEND;
+			$dbTable = DB::getSchema('users');
+			$sql_parts['select']['userid'] = ' u.userid';
+			foreach($options['output'] as $key => $field){
+				if(isset($dbTable['fields'][$field]))
+					$sql_parts['select'][$field] = ' u.'.$field;
 			}
-		}
 
+			$options['output'] = API_OUTPUT_CUSTOM;
+		}
 
 // PERMISSION CHECK
 		if(USER_TYPE_SUPER_ADMIN == $user_type){
@@ -170,7 +171,7 @@ class CUser extends CZBXAPI{
 			$sql_parts['where']['mu'] = 'm.userid=u.userid';
 		}
 
-// extendoutput
+// output
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['users'] = 'u.*';
 		}
@@ -179,7 +180,7 @@ class CUser extends CZBXAPI{
 		if(!is_null($options['countOutput'])){
 			$options['sortfield'] = '';
 
-			$sql_parts['select'] = array('count(u.userid) as rowscount');
+			$sql_parts['select'] = array('count(DISTINCT u.userid) as rowscount');
 		}
 
 // filter
@@ -309,7 +310,6 @@ class CUser extends CZBXAPI{
 
 Copt::memoryPick();
 		if(!is_null($options['countOutput'])){
-			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 
@@ -391,7 +391,7 @@ Copt::memoryPick();
 		}
 
 		if(!empty($userids))
-			$result = self::get(array('userids' => $userids, 'extendoutput' => 1));
+			$result = self::get(array('userids' => $userids, 'output' => API_OUTPUT_EXTEND));
 
 		return $result;
 	}
@@ -775,15 +775,35 @@ Copt::memoryPick();
 				}
 			}
 
-			DBexecute('DELETE FROM operations WHERE object='.OPERATION_OBJECT_USER.' AND '.DBcondition('objectid', $userids));
-			DBexecute('DELETE FROM media WHERE '.DBcondition('userid', $userids));
-			DBexecute('DELETE FROM profiles WHERE '.DBcondition('userid', $userids));
-			DBexecute('DELETE FROM users_groups WHERE '.DBcondition('userid', $userids));
-			DBexecute('DELETE FROM users WHERE '.DBcondition('userid', $userids));
+// delete action operation msg
+			$operationids = array();
+			$sql = 'SELECT DISTINCT om.operationid '.
+					' FROM opmessage_usr om '.
+					' WHERE '.DBcondition('om.userid', $userids);
+			$dbOperations = DBselect($sql);
+			while($dbOperation = DBfetch($dbOperations))
+				$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
 
+			DB::delete('opmessage_usr', array('userid'=>$userids));
+
+// delete empty operations
+			$delOperationids = array();
+			$sql = 'SELECT DISTINCT o.operationid '.
+					' FROM operations o '.
+					' WHERE '.DBcondition('o.operationid', $operationids).
+						' AND NOT EXISTS(SELECT om.opmessage_usrid FROM opmessage_usr om WHERE om.operationid=o.operationid)';
+			$dbOperations = DBselect($sql);
+			while($dbOperation = DBfetch($dbOperations))
+				$delOperationids[$dbOperation['operationid']] = $dbOperation['operationid'];
+
+			DB::delete('operations', array('operationid'=>$delOperationids));
+			DB::delete('media', array('userid'=>$userids));
+			DB::delete('profiles', array('userid'=>$userids));
+			DB::delete('users_groups', array('userid'=>$userids));
+			DB::delete('users', array('userid'=>$userids));
 
 			self::EndTransaction(true, __METHOD__);
-			return true;
+			return array('userids' => $userids);
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
@@ -1333,6 +1353,39 @@ Copt::memoryPick();
 		}
 
 	return true;
+	}
+
+	public static function isReadable($ids){
+		if(!is_array($ids)) return false;
+		if(empty($ids)) return true;
+
+		$ids = array_unique($ids);
+
+		$count = self::get(array(
+			'nodeids' => get_current_nodeid(true),
+			'userids' => $ids,
+			'output' => API_OUTPUT_SHORTEN,
+			'countOutput' => true
+		));
+
+		return (count($ids) == $count);
+	}
+
+	public static function isWritable($ids){
+		if(!is_array($ids)) return false;
+		if(empty($ids)) return true;
+
+		$ids = array_unique($ids);
+
+		$count = self::get(array(
+			'nodeids' => get_current_nodeid(true),
+			'userids' => $ids,
+			'output' => API_OUTPUT_SHORTEN,
+			'editable' => true,
+			'countOutput' => true
+		));
+
+		return (count($ids) == $count);
 	}
 }
 ?>

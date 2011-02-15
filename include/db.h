@@ -168,6 +168,8 @@ typedef enum {
 #define ALERT_SENDTO_LEN_MAX		ALERT_SENDTO_LEN+1
 #define ALERT_SUBJECT_LEN		255
 #define ALERT_SUBJECT_LEN_MAX		ALERT_SUBJECT_LEN+1
+#define ALERT_MESSAGE_LEN		65535
+#define ALERT_MESSAGE_LEN_MAX		ALERT_MESSAGE_LEN+1
 #define ALERT_ERROR_LEN			128
 #define ALERT_ERROR_LEN_MAX		ALERT_ERROR_LEN+1
 
@@ -219,6 +221,8 @@ typedef enum {
 #define	ZBX_SQL_STRVAL_EQ(str)	"=", str
 #define	ZBX_SQL_STRVAL_NE(str)	"<>", str
 #endif
+
+#define ZBX_SQL_NULLCMP(f1, f2)	"((" f1 " is null and " f2 " is null) or " f1 "=" f2 ")"
 
 #define ZBX_DBROW2UINT64(uint, row)	if (SUCCEED == DBis_null(row))		\
 						uint = 0;			\
@@ -390,15 +394,9 @@ typedef struct
 {
 	zbx_uint64_t	operationid;
 	zbx_uint64_t	actionid;
-	zbx_uint64_t	objectid;
-	zbx_uint64_t	mediatypeid;
-	char		*shortdata;
-	char		*longdata;
 	int		operationtype;
-	int		object;
 	int		esc_period;
-	int		default_msg;
-	int		evaltype;
+	unsigned char	evaltype;
 }
 DB_OPERATION;
 
@@ -618,7 +616,7 @@ zbx_uint64_t	DBmultiply_value_uint64(DB_ITEM *item, zbx_uint64_t value);
 void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns, unsigned short port, int now);
 void	DBproxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port);
 void	DBexecute_overflowed_sql(char **sql, int *sql_allocated, int *sql_offset);
-char	*DBget_unique_hostname_by_sample(char *host_name_sample);
+char	*DBget_unique_hostname_by_sample(const char *host_name_sample);
 
 char	*DBsql_id_cmp(zbx_uint64_t id);
 char	*DBsql_id_ins(zbx_uint64_t id);

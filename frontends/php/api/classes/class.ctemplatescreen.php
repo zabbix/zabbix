@@ -40,7 +40,6 @@ class CTemplateScreen extends CScreen{
  * @param array $options['nodeids'] Node IDs
  * @param boolean $options['with_items'] only with items
  * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
- * @param int $options['extendoutput'] return all fields for Hosts
  * @param int $options['count'] count Hosts, returned column name is rowscount
  * @param string $options['pattern'] search hosts by pattern in host names
  * @param int $options['limit'] limit selection
@@ -98,8 +97,11 @@ class CTemplateScreen extends CScreen{
 
 		if(is_array($options['output'])){
 			unset($sql_parts['select']['screens']);
+
+			$dbTable = DB::getSchema('screens');
 			foreach($options['output'] as $key => $field){
-				$sql_parts['select'][$field] = ' s.'.$field;
+				if(isset($dbTable['fields'][$field]))
+					$sql_parts['select'][$field] = ' s.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;
@@ -464,7 +466,6 @@ class CTemplateScreen extends CScreen{
 //-----
 
 		if(!is_null($options['countOutput'])){
-			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 
