@@ -24,6 +24,19 @@ require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
 class testPageActionsTriggers extends CWebTest
 {
+	public $affectedTables = array(
+		'actions',
+		'operations',
+		'conditions',
+		'opmessage',
+		'opgroup',
+		'optemplate',
+		'opcommand_grp',
+		'opcommand_hst',
+		'opconditions',
+		'opmessage_grp',
+		'opmessage_usr'
+	);
 	// Returns all trigger actions
 	public static function allActions()
 	{
@@ -210,7 +223,7 @@ class testPageActionsTriggers extends CWebTest
 
 		$this->chooseOkOnNextConfirmation();
 
-		DBsave_tables(array('actions','operations','conditions'));
+		DBsave_tables($this->affectedTables);
 
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS);
 		$this->assertTitle('Configuration of actions');
@@ -232,7 +245,7 @@ class testPageActionsTriggers extends CWebTest
 		$sql="select * from conditions where actionid=$actionid";
 		$this->assertEquals(0,DBcount($sql));
 
-		DBrestore_tables(array('actions','operations','conditions'));
+		DBrestore_tables($this->affectedTables);
 	}
 
 	public function testPageActionsTriggers_Sorting()
