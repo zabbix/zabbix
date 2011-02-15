@@ -178,7 +178,7 @@ void	get_values_jmx(DC_ITEM *items, AGENT_RESULT *results, int *errcodes, zbx_ti
 
 		if (SUCCEED == (err = zbx_tcp_send(&s, json.buffer)))
 		{
-			if (SUCCEED == (err = zbx_tcp_recv_ext(&s, &buffer, ZBX_TCP_READ_UNTIL_CLOSE, 0)))
+			if (SUCCEED == (err = zbx_tcp_recv(&s, &buffer)))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "JSON back [%s]", buffer);
 

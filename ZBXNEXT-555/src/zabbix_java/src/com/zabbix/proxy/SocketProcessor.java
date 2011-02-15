@@ -1,10 +1,6 @@
 package com.zabbix.proxy;
 
-import java.io.*;
 import java.net.Socket;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.util.Vector;
 import java.util.Formatter;
 
 import org.json.*;
@@ -27,57 +23,31 @@ class SocketProcessor implements Runnable
 	{
 		logger.debug("starting to process incoming connection");
 
-		PrintWriter out = null;
-		DataInputStream in = null;
+		BinaryProtocolSpeaker speaker = null;
 
 		try
 		{
-			out = new PrintWriter(socket.getOutputStream(), true);
-			in = new DataInputStream(socket.getInputStream());
+			speaker = new BinaryProtocolSpeaker(socket);
 
-			byte[] data;
-
-			logger.debug("reading Zabbix protocol header");
-			data = new byte[13];
-			in.readFully(data);
-
-			if (!('Z' == data[0] && 'B' == data[1] && 'X' == data[2] && 'D' == data[3] && '\1' == data[4]))
-				throw new ZabbixException("bad TCP header: %02X %02X %02X %02X %02X", data[0], data[1], data[2], data[3], data[4]);
-
-			ByteBuffer buffer = ByteBuffer.wrap(data, 5, 8);
-			buffer.order(ByteOrder.LITTLE_ENDIAN);
-			long length = buffer.getLong();
-
-			if (!(0 <= length && length <= Integer.MAX_VALUE))
-				throw new ZabbixException("bad data length: %d", length);
-
-			logger.debug("reading {} bytes of request data", length);
-			data = new byte[(int)length];
-			in.readFully(data);
-			
-			String text = new String(data);
-			logger.debug("received the following data in request: {}", text);
-			JSONObject json = new JSONObject(text);
+			JSONObject request = new JSONObject(speaker.getRequest());
 
 			ItemChecker checker;
 
-			if (json.getString(ItemChecker.JSON_TAG_REQUEST).equals(ItemChecker.JSON_REQUEST_INTERNAL))
-				checker = new InternalItemChecker(json);
-			else if (json.getString(ItemChecker.JSON_TAG_REQUEST).equals(ItemChecker.JSON_REQUEST_JMX))
-				checker = new JMXItemChecker(json);
+			if (request.getString(ItemChecker.JSON_TAG_REQUEST).equals(ItemChecker.JSON_REQUEST_INTERNAL))
+				checker = new InternalItemChecker(request);
+			else if (request.getString(ItemChecker.JSON_TAG_REQUEST).equals(ItemChecker.JSON_REQUEST_JMX))
+				checker = new JMXItemChecker(request);
 			else
-				throw new ZabbixException("bad request tag value: '%s'", json.getString(ItemChecker.JSON_TAG_REQUEST));
+				throw new ZabbixException("bad request tag value: '%s'", request.getString(ItemChecker.JSON_TAG_REQUEST));
 
 			logger.debug("dispatched request to class {}", checker.getClass().getName());
 			JSONArray values = checker.getValues();
 
-			JSONObject jsonResponse = new JSONObject();
-			jsonResponse.put(ItemChecker.JSON_TAG_RESPONSE, ItemChecker.JSON_RESPONSE_SUCCESS);
-			jsonResponse.put(ItemChecker.JSON_TAG_DATA, values);
+			JSONObject response = new JSONObject();
+			response.put(ItemChecker.JSON_TAG_RESPONSE, ItemChecker.JSON_RESPONSE_SUCCESS);
+			response.put(ItemChecker.JSON_TAG_DATA, values);
 
-			String strResponse = jsonResponse.toString(2);
-			logger.debug("sending the following data in response: {}", strResponse);
-			out.println(strResponse);
+			speaker.sendResponse(response.toString(2));
 		}
 		catch (Exception e1)
 		{
@@ -85,11 +55,11 @@ class SocketProcessor implements Runnable
 
 			try
 			{
-				String strResponse = new Formatter().format("{ \"%s\" : \"%s\", \"%s\" : %s }\n",
+				String response = new Formatter().format("{ \"%s\" : \"%s\", \"%s\" : %s }\n",
 						ItemChecker.JSON_TAG_RESPONSE, ItemChecker.JSON_RESPONSE_FAILED,
 						ItemChecker.JSON_TAG_ERROR, JSONObject.quote(e1.getMessage())).toString();
-				logger.debug("sending the following data in response: {}", strResponse);
-				out.println(strResponse);
+
+				speaker.sendResponse(response);
 			}
 			catch (Exception e2)
 			{
@@ -98,9 +68,8 @@ class SocketProcessor implements Runnable
 		}
 		finally
 		{
+			try { if (null != speaker) speaker.close(); } catch (Exception e) { }
 			try { if (null != socket) socket.close(); } catch (Exception e) { }
-			try { if (null != out) out.close(); } catch (Exception e) { }
-			try { if (null != in) in.close(); } catch (Exception e) { }
 		}
 
 		logger.debug("finished processing incoming connection");
