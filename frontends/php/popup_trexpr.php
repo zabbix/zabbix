@@ -290,7 +290,7 @@
 						'webitems' => 1,
 				);
 
-				$myItem = CItem::get($options);
+				$myItem = API::Item()->get($options);
 				$myItem = reset($myItem);
 				if(isset($myItem['itemid'])) $_REQUEST['itemid'] = $myItem['itemid'];
 			}

@@ -646,7 +646,7 @@ function validate_condition($conditiontype, $value){
 			}
 			break;
 		case CONDITION_TYPE_PROXY:
-			$proxyes = CProxy::get(array(
+			$proxyes = API::Proxy()->get(array(
 				'proxyids' => $value,
 				'output' => API_OUTPUT_SHORTEN,
 				'nodeids' => get_current_nodeid(true),

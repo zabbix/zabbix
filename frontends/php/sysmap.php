@@ -187,7 +187,7 @@ include_once('include/page_header.php');
 							'grid_show' => $_REQUEST['grid_show'],
 							'grid_align' => $_REQUEST['grid_align']
 						);
-						CMap::update($sysmap_to_update);
+						API::Map()->update($sysmap_to_update);
 
 
 						foreach($selements as $id => $selement){
