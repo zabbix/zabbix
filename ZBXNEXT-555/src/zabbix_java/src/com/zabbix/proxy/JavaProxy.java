@@ -42,16 +42,17 @@ public class JavaProxy
 			int listenPort = ConfigurationManager.getIntegerParameterValue(ConfigurationManager.LISTEN_PORT);
 
 			ServerSocket socket = new ServerSocket(listenPort, 0, listenIP);
+			socket.setReuseAddress(true);
 			logger.info("listening on {}:{}", socket.getInetAddress(), socket.getLocalPort());
 
 			int startPollers = ConfigurationManager.getIntegerParameterValue(ConfigurationManager.START_POLLERS);
-			logger.debug("creating a thread pool of {} pollers", startPollers);
 			ExecutorService threadPool = new ThreadPoolExecutor(
 					startPollers,
 					startPollers,
 					30L, TimeUnit.SECONDS,
 					new ArrayBlockingQueue<Runnable>(startPollers),
 					new ThreadPoolExecutor.CallerRunsPolicy());
+			logger.debug("created a thread pool of {} pollers", startPollers);
 
 			while (true)
 				threadPool.execute(new SocketProcessor(socket.accept()));
