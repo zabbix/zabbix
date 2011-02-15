@@ -2,6 +2,7 @@
 Changes for 1.9.2
 
 New features:
+ - [ZBXNEXT-575] added new design for action operation remote commands (Aly,asaveljevs,Sasha,Vedmak)
  - [ZBXNEXT-628] added advanced label settings for maps (Aly)
  - [ZBXNEXT-626] added remembering of grid options for maps (KB)
  - [ZBXNEXT-630] added automatic filling of DNS name for discovered and auto-registered devices (Sasha)
