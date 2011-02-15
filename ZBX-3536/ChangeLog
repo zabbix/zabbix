@@ -1,5 +1,6 @@
 Changes for 1.8.5rc1
 
+ - [ZBX-3536] made SNMP checks work when DNS resolves to IPv6 address; thanks to Marc Dequènes (asaveljevs,Sasha)
  - [ZBX-3158] improved links in map element menu (Aly)
  - [ZBX-3532] fixed add item to trigger expression from popup menu (Vedmak,Vlad)
  - [ZBX-1357] fixed confusing date format in network maps (Richlv)
