@@ -111,6 +111,7 @@ class czbxrpc{
 			return array('result' => $result);
 		}
 		catch(APIException $e){
+			API::setReturnRPC();
 			$result = ($method === 'user.login');
 			self::transactionEnd($result);
 
