@@ -26,9 +26,9 @@ class ConfigurationManager
 {
 	private static final Logger logger = LoggerFactory.getLogger(ConfigurationManager.class);
 
-	public static final String LISTEN_IP = "ListenIP";
-	public static final String LISTEN_PORT = "ListenPort";
-	public static final String START_POLLERS = "StartPollers";
+	public static final String LISTEN_IP = "listenIP";
+	public static final String LISTEN_PORT = "listenPort";
+	public static final String START_POLLERS = "startPollers";
 
 	private static ConfigurationParameter[] parameters =
 	{
@@ -43,7 +43,7 @@ class ConfigurationManager
 
 		for (ConfigurationParameter parameter : parameters)
 		{
-			String property = System.getProperty(getPackage() + "." + parameter.getName());
+			String property = System.getProperty("zabbix." + parameter.getName());
 
 			if (null != property)
 			{
