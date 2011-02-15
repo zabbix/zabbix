@@ -1620,9 +1620,9 @@ int	is_boolean(const char *str, zbx_uint64_t *value)
 	strscpy(tmp, str);
 	zbx_strlower(tmp);
 
-	if (SUCCEED == (res = str_in_list("true,t,yes,y,on,up", tmp, ',')))
+	if (SUCCEED == (res = str_in_list("true,t,yes,y,on,up,running,enabled,available", tmp, ',')))
 		*value = 1;
-	else if (SUCCEED == (res = str_in_list("false,f,no,n,off,down", tmp, ',')))
+	else if (SUCCEED == (res = str_in_list("false,f,no,n,off,down,unused,disabled,unavailable", tmp, ',')))
 		*value = 0;
 	else if (SUCCEED == (res = is_double(str)))
 		*value = (0 != atof(str));
