@@ -221,7 +221,7 @@ class testPageActionsAutoregistration extends CWebTest
 		$this->getConfirmation();
 
 		$this->assertTitle('Configuration of actions');
-		$this->ok('Selected actions deleted.');
+		$this->ok('Selected actions deleted');
 		$this->ok('CONFIGURATION OF ACTIONS');
 
 		$sql="select * from actions where actionid=$actionid";
