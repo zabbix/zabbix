@@ -18,7 +18,7 @@ class ZabbixItem
 		if (-1 != bracket)
 		{
 			if (']' != key.charAt(key.length() - 1))
-				throw new IllegalArgumentException("no terminating ']' in key '" + key + "'");
+				throw new IllegalArgumentException("no terminating ']' in key: '" + key + "'");
 
 			keyId = key.substring(0, bracket);
 			args = parseArguments(key.substring(bracket + 1, key.length() - 1));
@@ -27,11 +27,11 @@ class ZabbixItem
 			keyId = key;
 
 		if (0 == keyId.length())
-			throw new IllegalArgumentException("key id is empty in key '" + key + "'");
+			throw new IllegalArgumentException("key ID is empty in key: '" + key + "'");
 
 		for (int i = 0; i < keyId.length(); i++)
 			if (!isValidKeyIdChar(keyId.charAt(i)))
-				throw new IllegalArgumentException("bad key id char '" + keyId.charAt(i) + "' in key '" + key + "'");
+				throw new IllegalArgumentException("bad key ID char '" + keyId.charAt(i) + "' in key: '" + key + "'");
 
 		this.key = key;
 	}
@@ -49,7 +49,7 @@ class ZabbixItem
 	public String getArgument(int index)
 	{
 		if (null == args || !(1 <= index && index <= args.size()))
-			throw new IndexOutOfBoundsException("bad argument index '" + index + "' for key '" + key + "'");
+			throw new IndexOutOfBoundsException("bad argument index for key '" + key + "': " + index);
 		else
 			return args.elementAt(index - 1);
 	}
@@ -87,7 +87,7 @@ class ZabbixItem
 				}
 
 				if (index == keyArgs.length())
-					throw new IllegalArgumentException("quoted argument not terminated in '" + keyArgs + "'");
+					throw new IllegalArgumentException("quoted argument not terminated: '" + key + "'");
 
 				args.add(keyArgs.substring(1, index).replace("\\\"", "\""));
 
@@ -98,7 +98,7 @@ class ZabbixItem
 					break;
 
 				if (',' != keyArgs.charAt(index))
-					throw new IllegalArgumentException("quoted argument not followed by a comma in '" + keyArgs + "'");
+					throw new IllegalArgumentException("quoted argument not followed by comma: '" + key + "'");
 
 				keyArgs = keyArgs.substring(index + 1);
 			}

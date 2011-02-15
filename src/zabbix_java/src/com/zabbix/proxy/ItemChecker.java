@@ -43,9 +43,9 @@ abstract class ItemChecker
 			for (int i = 0; i < keys.length(); i++)
 				items.add(new ZabbixItem(keys.getString(i)));
 		}
-		catch (JSONException jsonException)
+		catch (Exception e)
 		{
-			throw new ZabbixException(jsonException);
+			throw new ZabbixException(e);
 		}
 	}
 
@@ -68,17 +68,16 @@ abstract class ItemChecker
 			String text = getStringValue(item);
 			value.put(JSON_TAG_VALUE, text);
 		}
-		catch (Exception exception)
+		catch (Exception e1)
 		{
 			try
 			{
-				value.put(JSON_TAG_ERROR, exception.getMessage());
+				value.put(JSON_TAG_ERROR, e1.getMessage());
 			}
-			catch (JSONException jsonException)
+			catch (JSONException e2)
 			{
-				Object[] args = {JSON_TAG_ERROR, exception.getMessage(), jsonException};
-				logger.warn("Could not add JSON attribute \"{}\" with message \"{}\".", args);
-				return null;
+				Object[] logInfo = {JSON_TAG_ERROR, e1.getMessage(), e2};
+				logger.warn("cannot add JSON attribute '{}' with message '{}'", logInfo);
 			}
 		}
 

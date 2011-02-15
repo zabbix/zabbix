@@ -28,33 +28,24 @@
 static int	parse_response(DC_ITEM *items, AGENT_RESULT *results, int *errcodes, zbx_timespec_t *timespecs, int num,
 			char *response, char *error, int max_error_len)
 {
+	const char		*p;
 	struct zbx_json_parse	jp, jp_data, jp_row;
 	char			value[MAX_BUFFER_LEN];
-	char			*buffer = NULL;
-	const char		*p;
 	int			i, ret = PROXY_ERROR;
-
-	*value = '\0';
 
 	if (SUCCEED == zbx_json_open(response, &jp))
 	{
 		if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, value, sizeof(value)))
 		{
-			zbx_snprintf(error, max_error_len, "No response tag in received JSON");
+			zbx_snprintf(error, max_error_len, "No '%s' tag in received JSON", ZBX_PROTO_TAG_RESPONSE);
 			goto exit;
 		}
 
 		if (0 == strcmp(value, ZBX_PROTO_VALUE_SUCCESS))
 		{
-			if (NULL == (p = zbx_json_pair_by_name(&jp, ZBX_PROTO_TAG_DATA)))
+			if (SUCCEED != zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
 			{
-				zbx_snprintf(error, max_error_len, "No data tag in received JSON");
-				goto exit;
-			}
-
-			if (SUCCEED != zbx_json_brackets_open(p, &jp_data))
-			{
-				zbx_snprintf(error, max_error_len, "Could not open data array");
+				zbx_snprintf(error, max_error_len, "Cannot open data array in received JSON");
 				goto exit;
 			}
 
@@ -62,23 +53,25 @@ static int	parse_response(DC_ITEM *items, AGENT_RESULT *results, int *errcodes, 
 
 			for (i = 0; i < num; i++)
 			{
-				if ((NULL == p && 0 != i) || NULL == (p = zbx_json_next(&jp_data, p)))
+				if (NULL == (p = zbx_json_next(&jp_data, p)))
 				{
-					SET_MSG_RESULT(&results[i], "Value not included in received JSON");
-					errcodes[i] = NOTSUPPORTED;
-					continue;
+					zbx_snprintf(error, max_error_len, "Not all values included in received JSON");
+					goto exit;
 				}
 
 				if (SUCCEED != zbx_json_brackets_open(p, &jp_row))
 				{
-					zbx_snprintf(error, max_error_len, "Could not open value object");
+					zbx_snprintf(error, max_error_len, "Cannot open value object in received JSON");
 					goto exit;
 				}
 
 				if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_VALUE, value, sizeof(value)))
 				{
-					set_result_type(&results[i], items[i].value_type, items[i].data_type, value);
-					errcodes[i] = SUCCEED;
+					if (SUCCEED == set_result_type(&results[i],
+								items[i].value_type, items[i].data_type, value))
+						errcodes[i] = SUCCEED;
+					else
+						errcodes[i] = NOTSUPPORTED;
 				}
 				else if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_ERROR, value, sizeof(value)))
 				{
@@ -87,8 +80,8 @@ static int	parse_response(DC_ITEM *items, AGENT_RESULT *results, int *errcodes, 
 				}
 				else
 				{
-					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Could not get item value or error"));
-					errcodes[i] = NOTSUPPORTED;
+					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Cannot get item value nor error message"));
+					errcodes[i] = AGENT_ERROR;
 				}
 			}
 
@@ -96,19 +89,23 @@ static int	parse_response(DC_ITEM *items, AGENT_RESULT *results, int *errcodes, 
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_FAILED))
 		{
-			zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_ERROR, error, max_error_len);
-			/* classify error */
+			if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_ERROR, error, max_error_len))
+				ret = NETWORK_ERROR;
+			else
+				zbx_snprintf(error, max_error_len, "Cannot get error message describing reasons for failure");
+
 			goto exit;
 		}
 		else
 		{
-			zbx_snprintf(error, max_error_len, "Bad response tag in received JSON");
+			zbx_snprintf(error, max_error_len, "Bad '%s' tag value '%s' in received JSON",
+					ZBX_PROTO_TAG_RESPONSE, value);
 			goto exit;
 		}
 	}
 	else
 	{
-		zbx_snprintf(error, max_error_len, "Could not open received JSON");
+		zbx_snprintf(error, max_error_len, "Cannot open received JSON");
 		goto exit;
 	}
 exit:
@@ -187,30 +184,29 @@ void	get_values_jmx(DC_ITEM *items, AGENT_RESULT *results, int *errcodes, zbx_ti
 
 				err = parse_response(items, results, errcodes, timespecs, num, buffer, error, sizeof(error));
 			}
-			else
-				zabbix_log(LOG_LEVEL_DEBUG, "Send value error: [recv] %s", zbx_tcp_strerror());
 		}
-		else
-			zabbix_log(LOG_LEVEL_DEBUG, "Send value error: [send] %s", zbx_tcp_strerror());
 
 		zbx_tcp_close(&s);
 	}
-	else
-		zabbix_log(LOG_LEVEL_DEBUG, "Send value error: [connect] %s", zbx_tcp_strerror());
 
 	zbx_json_free(&json);
 
 	if (FAIL == err)
-		err = PROXY_ERROR;
-exit:
-	if (PROXY_ERROR == err)
 	{
+		strlcpy(error, zbx_tcp_strerror(), sizeof(error));
+		err = PROXY_ERROR;
+	}
+exit:
+	if (NETWORK_ERROR == err || PROXY_ERROR == err)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Getting JMX values failed: %s", error);
+
 		for (i = 0; i < num; i++)
 		{
-			if (NULL == GET_MSG_RESULT(&results[i]))
+			if (!ISSET_MSG(&results[i]))
 			{
 				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
-				errcodes[i] = PROXY_ERROR;
+				errcodes[i] = err;
 			}
 		}
 	}

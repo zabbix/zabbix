@@ -8,7 +8,7 @@ class IntegerValidator implements InputValidator
 	public IntegerValidator(int lo, int hi)
 	{
 		if (lo > hi)
-			throw new IllegalArgumentException("bad bounds '" + lo + "' and '" + hi + "'");
+			throw new IllegalArgumentException("bad validation bounds: " + lo + " and " + hi);
 
 		this.lo = lo;
 		this.hi = hi;

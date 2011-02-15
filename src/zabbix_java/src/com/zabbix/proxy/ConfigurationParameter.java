@@ -51,13 +51,13 @@ class ConfigurationParameter
 					break;
 			}
 		}
-		catch (Exception exception)
+		catch (Exception e)
 		{
-			throw new IllegalArgumentException(exception);
+			throw new IllegalArgumentException(e);
 		}
 
 		if (null != validator && !validator.validate(userValue))
-			throw new IllegalArgumentException("value '" + text + "' not allowed for parameter '" + name + "'");
+			throw new IllegalArgumentException("bad value for " + name + " parameter: '" + text + "'");
 
 		this.value = userValue;
 	}

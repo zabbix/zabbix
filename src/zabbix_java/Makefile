@@ -18,7 +18,7 @@ run:
 	java -classpath $(LIB):$(JAR) com.zabbix.proxy.JavaProxy
 
 test:
-	java -classpath build/tests:$(JAR):$(CLASSPATH) com.zabbix.proxy.AllTestRunner
+	java -classpath build/tests:$(LIB):$(JAR):$(CLASSPATH) com.zabbix.proxy.AllTestRunner
 
 clean:
 	rm -f $(JAR)

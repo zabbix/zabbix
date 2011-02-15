@@ -46,11 +46,11 @@ class JMXItemChecker extends ItemChecker
 			password = request.optString(JSON_TAG_PASSWORD, null);
 
 			if (null != username && null == password || null == username && null != password)
-				throw new IllegalArgumentException("invalid 'username' and 'password' null-ness combination");
+				throw new IllegalArgumentException("invalid username and password nullness combination");
 		}
-		catch (Exception exception)
+		catch (Exception e)
 		{
-			throw new ZabbixException(exception);
+			throw new ZabbixException(e);
 		}
 	}
 
@@ -69,15 +69,16 @@ class JMXItemChecker extends ItemChecker
 				env.put(JMXConnector.CREDENTIALS, new String[] {username, password});
 			}
 
+			logger.debug("connecting to JMX agent at {}", url);
 			jmxc = JMXConnectorFactory.connect(url, env);
 			mbsc = jmxc.getMBeanServerConnection();
 
 			for (ZabbixItem item : items)
 				values.put(getJSONValue(item));
 		}
-		catch (Exception exception)
+		catch (Exception e)
 		{
-			throw new ZabbixException(exception);
+			throw new ZabbixException(e);
 		}
 		finally
 		{
@@ -93,13 +94,19 @@ class JMXItemChecker extends ItemChecker
 	@Override
 	protected String getStringValue(ZabbixItem item) throws Exception
 	{
+		String value;
+
+		logger.debug("getting value for item '{}'", item.getKey());
+
 		if (item.getKeyId().equals("jmx"))
 		{
 			if (2 != item.getArgumentCount())
-				throw new ZabbixException("required format: jmx[object_name,attribute_name]");
+				throw new ZabbixException("required key format: jmx[<object name>,<attribute name>]");
 
 			ObjectName objectName = new ObjectName(item.getArgument(1));
 			String attributeName = item.getArgument(2);
+
+			logger.trace("looking for value of primitive type for '{},{}'", objectName, attributeName);
 
 			String subAttributeNames = "";
 			int dot = attributeName.indexOf('.');
@@ -110,57 +117,67 @@ class JMXItemChecker extends ItemChecker
 				attributeName = attributeName.substring(0, dot);
 			}
 
-			return getPrimitiveAttributeValue(mbsc.getAttribute(objectName, attributeName), subAttributeNames);
+			value = getPrimitiveAttributeValue(mbsc.getAttribute(objectName, attributeName), subAttributeNames);
 		}
 		else if (item.getKeyId().equals("jmx.discovery"))
 		{
 			if (0 != item.getArgumentCount())
-				throw new ZabbixException("required format: jmx.discovery");
+				throw new ZabbixException("required key format: jmx.discovery");
 
 			JSONArray counters = new JSONArray();
 
 			for (ObjectName name : mbsc.queryNames(null, null))
 			{
+				logger.trace("discovered object '{}'", name);
+
 				for (MBeanAttributeInfo attrInfo : mbsc.getMBeanInfo(name).getAttributes())
 				{
+					logger.trace("discovered attribute '{}'", attrInfo.getName());
+
 					if (!attrInfo.isReadable())
 					{
-						System.out.printf("attribute '%s,%s' is not readable\n", name, attrInfo.getName());
+						logger.trace("attribute not readable, skipping");
 						continue;
 					}
 
 					try
 					{
+						logger.trace("looking for attributes of primitive types");
 						String descr = (attrInfo.getName().equals(attrInfo.getDescription()) ? null : attrInfo.getDescription());
 						findPrimitiveAttributes(counters, name, descr, attrInfo.getName(), mbsc.getAttribute(name, attrInfo.getName()));
 					}
-					catch (Exception exception)
+					catch (Exception e)
 					{
-						System.out.printf("processing '%s,%s' failed with:\n",  name, attrInfo.getName());
-						System.out.println(exception.getClass().getName() + " " + exception.getMessage());
+						Object[] logInfo = {name, attrInfo.getName(), e};
+						logger.trace("processing '{},{}' failed", logInfo);
 					}
 				}
 			}
 
 			JSONObject mapping = new JSONObject();
 			mapping.put(item.getKey(), counters);
-			return mapping.toString(2);
+			value = mapping.toString(2);
 		}
 		else
-			throw new ZabbixException("Key ID '%s' is not supported", item.getKeyId());
+			throw new ZabbixException("key ID '%s' is not supported", item.getKeyId());
+
+		logger.debug("returning value '{}' for item '{}'", value, item.getKey());
+		return value;
 	}
 
 	private String getPrimitiveAttributeValue(Object attribute, String subAttributeNames) throws ZabbixException
 	{
+		logger.trace("drilling down with attribute '{}' and subattributes '{}'", attribute, subAttributeNames);
+
 		if (null == attribute)
-			throw new ZabbixException("Attribute is NULL");
+			throw new ZabbixException("attribute is null");
 
 		if (subAttributeNames.equals(""))
 		{
 			if (isPrimitiveAttributeType(attribute.getClass()))
 				return attribute.toString();
 			else
-				throw new ZabbixException("Attribute type is not primitive");
+				throw new ZabbixException("attribute type is not primitive: %s" + attribute.getClass());
 		}
 		else if (attribute instanceof CompositeData)
 		{
@@ -174,13 +191,17 @@ class JMXItemChecker extends ItemChecker
 				return getPrimitiveAttributeValue(comp.get(subAttributeNames.substring(0, dot)), subAttributeNames.substring(dot + 1));
 		}
 		else
-			throw new ZabbixException("Unsupported attribute type along the path");
+			throw new ZabbixException("unsupported attribute type along the path: %s", attribute.getClass());
 	}
 
 	private void findPrimitiveAttributes(JSONArray counters, ObjectName name, String descr, String attrPath, Object attribute) throws JSONException
 	{
+		logger.trace("drilling down with attribute path '{}'", attrPath);
+
 		if (isPrimitiveAttributeType(attribute.getClass()))
 		{
+			logger.trace("found attribute of a primitive type: {}", attribute.getClass());
+
 			JSONObject counter = new JSONObject();
 
 			counter.put("{#JMXDESC}", null == descr ? name + "," + attrPath : descr);
@@ -193,6 +214,8 @@ class JMXItemChecker extends ItemChecker
 		}
 		else if (attribute instanceof CompositeData)
 		{
+			logger.trace("found attribute of a composite type: {}", attribute.getClass());
+
 			CompositeData comp = (CompositeData)attribute;
 
 			for (String key : comp.getCompositeType().keySet())
@@ -200,15 +223,15 @@ class JMXItemChecker extends ItemChecker
 		}
 		else if (attribute instanceof TabularDataSupport || attribute.getClass().isArray())
 		{
-			// not supported
+			logger.trace("found attribute of a known, unsupported type: {}", attribute.getClass());
 		}
 		else
-			System.out.println("unknown type: " + attribute.getClass().getName());
+			logger.trace("found attribute of an unknown, unsupported type: {}", attribute.getClass());
 	}
 
 	private boolean isPrimitiveAttributeType(Class<?> clazz)
 	{
-		Class<?>[] clazzez = { Boolean.class, Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, String.class };
+		Class<?>[] clazzez = {Boolean.class, Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, String.class};
 
 		return HelperFunctionChest.arrayContains(clazzez, clazz);
 	}

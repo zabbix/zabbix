@@ -1,7 +1,12 @@
 package com.zabbix.proxy;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 class ConfigurationManager
 {
+	private static final Logger logger = LoggerFactory.getLogger(ConfigurationManager.class);
+
 	public static final String LISTEN_IP = "ListenIP";
 	public static final String LISTEN_PORT = "ListenPort";
 	public static final String START_POLLERS = "StartPollers";
@@ -15,13 +20,20 @@ class ConfigurationManager
 
 	public static void parseConfiguration()
 	{
+		logger.debug("starting to parse configuration parameters");
+
 		for (ConfigurationParameter parameter : parameters)
 		{
 			String property = System.getProperty(getPackage() + "." + parameter.getName());
 
 			if (null != property)
+			{
+				logger.debug("found {} configuration parameter with value '{}'", parameter.getName(), property);
 				parameter.setValue(property);
+			}
 		}
+
+		logger.debug("finished parsing configuration parameters");
 	}
 
 	public static ConfigurationParameter getParameter(String name)
@@ -30,7 +42,7 @@ class ConfigurationManager
 			if (parameter.getName().equals(name))
 				return parameter;
 
-		throw new IllegalArgumentException("unknown configuration parameter '" + name + "'");
+		throw new IllegalArgumentException("unknown configuration parameter: '" + name + "'");
 	}
 
 	public static int getIntegerParameterValue(String name)
