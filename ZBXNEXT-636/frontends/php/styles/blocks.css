@@ -622,3 +622,6 @@ div.calendar input.calendar_textbox{
 #color_picker a { text-decoration: none; padding: 0px; margin: 0px; }
 
 /************ END OF COLOR PICKER ***********/
+
+.zbx_search{margin-bottom: 1px; font-weight:bold; float:right; height: 18px; min-width: 220px;}
+.zbx_search input[type=text] {margin-right: 0; vertical-align:top;  padding: 0 2px; height: 18px; width: 160px; border-right: 0; border-color: #9DB2CD; }
