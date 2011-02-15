@@ -64,7 +64,6 @@ class CGraphItem extends CZBXAPI{
 			'select_graphs'			=> null,
 			'output'				=> API_OUTPUT_REFER,
 			'expandData'			=> null,
-			'extendoutput'			=> null,
 			'countOutput'			=> null,
 			'preservekeys'			=> null,
 
@@ -75,13 +74,7 @@ class CGraphItem extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
-		if(!is_null($options['extendoutput'])){
-			$options['output'] = API_OUTPUT_EXTEND;
-		}
-
-
 // editable + PERMISSION CHECK
-
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
 		}
 		else{
@@ -229,7 +222,6 @@ class CGraphItem extends CZBXAPI{
 		}
 
 		if(!is_null($options['countOutput'])){
-			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 
@@ -282,7 +274,7 @@ class CGraphItem extends CZBXAPI{
 		}
 
 		if(!empty($gitemids))
-			$result = self::get(array('gitemids'=>$gitemids, 'extendoutput'=>1));
+			$result = self::get(array('gitemids'=>$gitemids, 'output' => API_OUTPUT_EXTEND));
 
 	return $result;
 	}

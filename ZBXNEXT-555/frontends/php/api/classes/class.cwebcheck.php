@@ -146,7 +146,7 @@ class CWebCheck extends CZBXAPI{
 
 		}
 
-// extendoutput
+// output
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['httptests'] = 'ht.*';
 		}
@@ -263,7 +263,6 @@ class CWebCheck extends CZBXAPI{
 
 COpt::memoryPick();
 		if(!is_null($options['countOutput'])){
-			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 
@@ -629,7 +628,7 @@ COpt::memoryPick();
 		$sql = 'SELECT httpstepid, name'.
 				' FROM httpstep '.
 				' WHERE httptestid='.$webcheck['webcheckid'].
-					' AND '.DBcondition('name', $websteps_names, false, true);
+					' AND '.DBcondition('name', $websteps_names);
 		if($httpstep_data = DBfetch(DBselect($sql))){
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Step [%s] already exists.', $httpstep_data['name']));
 		}

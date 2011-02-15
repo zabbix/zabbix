@@ -36,7 +36,7 @@ class CServerInfo extends CTable{
 		else
 			$server = new CSpan(S_NOT_RUNNING,'on');
 
-		$header = new CCol('Zabbix '.S_SERVER_INFO,'header');
+		$header = new CCol('Zabbix '.S_SERVER_INFO,'nowrap ui-corner-all ui-widget-header');
 		$this->addRow($header);
 		// GETTEXT: r is date format string as described in http://php.net/date
 		$this->addRow(_('Updated').': '.zbx_date2str(_('r'),time()));

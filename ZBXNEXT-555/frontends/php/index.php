@@ -121,7 +121,7 @@ include_once('include/page_header.php');
 
 	}
 	else{
-		echo '<div align="center" class="textcolorstyles">'.S_WELCOME.' <b>'.$USER_DETAILS['alias'].'</b>.</div>';
+		echo '<div class="textcolorstyles center">'.S_WELCOME.' <b>'.$USER_DETAILS['alias'].'</b>.</div>';
 	}
 ?>
 <?php

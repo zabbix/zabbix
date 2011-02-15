@@ -486,7 +486,13 @@ function insert_js_function($fnct_name){
 					var chkBoxes = form.getInputs("checkbox");
 					for(var i=0; i < chkBoxes.length; i++){
 						if(chkBoxes[i].checked && (chkBoxes[i].name.indexOf("all_") < 0)){
-							items["values"].push(chkBoxes[i].value);
+							var value = {};
+							if(isset(chkBoxes[i].value, popupReference))
+								value = popupReference[chkBoxes[i].value];
+							else
+								value[object] = chkBoxes[i].value;
+
+							items["values"].push(value);
 						}
 					}
 
@@ -500,7 +506,13 @@ function insert_js_function($fnct_name){
 					var parent = window.opener;
 					if(!parent) return close_window();
 
-					var items = { "object": object, "values": new Array(singleValue) };
+					var value = {};
+					if(isset(singleValue, popupReference))
+						value = popupReference[singleValue];
+					else
+						value[object] = singleValue;
+
+					var items = { "object": object, "values": new Array(value) };
 
 					parent.addPopupValues(items);
 					close_window();
@@ -515,21 +527,21 @@ function insert_js_function($fnct_name){
 					var parentDocumentForm = $(parentDocument.body).select("form[name="+frame+"]");
 					var submitParent = submitParent || false;
 
-					var tmpStorage = null;
+					var frmStorage = null;
 					for(var key in values){
 						if(is_null(values[key])) continue;
 
 						if(parentDocumentForm.length > 0)
-							tmpStorage = jQuery(parentDocumentForm[0]).find("#"+key).first();
+							frmStorage = jQuery(parentDocumentForm[0]).find("#"+key).get(0);
 
-						if(typeof(tmpStorage) == "undefined" || (tmpStorage.length == 0))
-							tmpStorage = parentDocument.getElementById(key);
+						if(typeof(frmStorage) == "undefined" || is_null(frmStorage))
+							frmStorage = parentDocument.getElementById(key);
 
-						jQuery(tmpStorage).val(values[key]);
+						frmStorage.value = values[key];
 					}
 
-					if(!is_null(tmpStorage) && submitParent){
-						tmpStorage.form.submit();
+					if(!is_null(frmStorage) && submitParent){
+						frmStorage.form.submit();
 					}
 
 					close_window();
@@ -564,7 +576,10 @@ function insert_js_function($fnct_name){
 };
 
 function insert_js($script){
-	print('<script type="text/javascript">// <![CDATA['."\n".$script."\n".'// ]]></script>');
+	print(get_js($script));
 }
 
+function get_js($script){
+	return('<script type="text/javascript">// <![CDATA['."\n".$script."\n".'// ]]></script>');
+}
 ?>

@@ -595,6 +595,14 @@ function zbx_array_diff($array1, $array2, $field){
 	return $result;
 }
 
+function zbx_array_push(&$array, $add){
+	foreach($array as $key => $value){
+		foreach($add as $newKey => $newValue){
+			$array[$key][$newKey] = $newValue;
+		}
+	}
+}
+
 // STRING FUNCTIONS {{{
 if(!function_exists('zbx_stripslashes')){
 function zbx_stripslashes($value){
@@ -846,13 +854,12 @@ function sortSub($data, $sortorder){
 	$keys = array_keys($data);
 	natcasesort($keys);
 
-
 	if($sortorder != ZBX_SORT_UP)
 		$keys = array_reverse($keys);
 
 	foreach($keys as $key){
 		$tst = reset($data[$key]);
-		if(isset($tst[0]) && !is_array($tst[0])){
+		if(is_array($tst) && isset($tst[0]) && !is_array($tst[0])){
 			$data[$key] = sortSub($data[$key], $sortorder);
 		}
 
