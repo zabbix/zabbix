@@ -634,7 +634,7 @@
 
 //	Footer
 	'S_ZABBIX'=>				_('Zabbix'),
-	'S_COPYRIGHT_BY'=>			_('Copyright 2001-2010 by'),
+	'S_COPYRIGHT_BY'=>			_('Copyright 2001-2011 by'),
 	'S_CONNECTED_AS'=>			_('Connected as'),
 	'S_NOT_CONNECTED'=>			_('Not connected'),
 	'S_SIA_ZABBIX'=>			_('SIA Zabbix'),
