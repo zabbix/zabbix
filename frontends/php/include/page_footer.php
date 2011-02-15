@@ -85,9 +85,9 @@
 		$post_script.= 'cookie.init();'."\n";
 		$post_script.= 'chkbxRange.init();'."\n";
 
-		$post_script.= 'var sizeCSS = "screen.css"'."\n";
-		$post_script.= 'if(screen.width<1024) sizeCSS = "handheld.css";'."\n";
-		$post_script.= 'jQuery("head").append(\'<link rel="stylesheet" type="text/css" href="styles/\'+sizeCSS+\'" />\');';
+		$post_script.= 'var screenCSS = null;'."\n";
+		$post_script.= 'if(jQuery(window).width()<1024) screenCSS = "handheld.css";'."\n";
+		$post_script.= 'if(!is_null(screenCSS)) jQuery("head").append(\'<link rel="stylesheet" type="text/css" href="styles/\'+screenCSS+\'" />\');';
 
 		$post_script.='});'."\n";
 

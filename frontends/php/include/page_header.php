@@ -394,19 +394,8 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$search_div = null;
 
 		if(($page['file'] != 'index.php') && ($USER_DETAILS['userid'] > 0)){
-			$search_form = new CForm('get','search.php');
-			$search_form->setAttribute('class','thin');
-
-			$searchBox = new CTextBox('search', get_request('search'));
-			$searchBox->setAttribute('autocomplete', 'off');
-			$searchBox->addClass('search');
-
-			$search_form->addItem(new CDiv(array(_('Search').': ', $searchBox)));
-
-			$search_div = new CDiv($search_form, 'zbx_search');
-			$search_div->setAttribute('id','zbx_search');
-
-			zbx_add_post_js("var sid = createSuggest('search');");
+			$searchForm = new CGetForm('gsearch.edit');
+			$search_div = $searchForm->render();
 		}
 
 		$sub_menu_table->addRow(array($menu_divs, $search_div));
