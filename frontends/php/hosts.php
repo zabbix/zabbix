@@ -722,8 +722,8 @@ include_once('include/page_header.php');
 ?>
 <?php
 	if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['hosts'])){
-		$hostForm = new CGetForm();
-		$hosts_wdgt->addItem($hostForm->render('host.massupdate'));
+		$hostForm = new CGetForm('host.massupdate');
+		$hosts_wdgt->addItem($hostForm->render());
 	}
 	else if(isset($_REQUEST['form'])){
 		if($_REQUEST['form'] == S_IMPORT)
