@@ -87,7 +87,7 @@ class testPageMediaTypes extends CWebTest
 		$id=$mediatype['mediatypeid'];
 
 		$row=DBfetch(DBselect("select count(*) as cnt from media_type where mediatypeid=$id"));
-		$row=DBfetch(DBselect("select count(*) as cnt from operations where mediatypeid=$id"));
+		$row=DBfetch(DBselect("select count(*) as cnt from opmessage where mediatypeid=$id"));
 		$used_by_operations = ($row['cnt'] > 0);
 
 		DBsave_tables(array('media_type','media','operations'));
