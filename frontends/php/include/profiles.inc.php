@@ -227,7 +227,7 @@ function update_config($configs){
 	}
 	if(isset($configs['alert_usrgrpid']) && !is_null($configs['alert_usrgrpid'])){
 		if(($configs['alert_usrgrpid'] != 0) && !DBfetch(DBselect('select usrgrpid from usrgrp where usrgrpid='.$configs['alert_usrgrpid']))){
-			error(S_INCORRECT_GROUP);;
+			error(S_INCORRECT_GROUP);
 			return NULL;
 		}
 	}
