@@ -34,11 +34,10 @@ class CGraphPrototype extends CZBXAPI{
 * @return array
 */
 	public function get($options=array()){
-		global $USER_DETAILS;
 
 		$result = array();
-		$user_type = $USER_DETAILS['type'];
-		$userid = $USER_DETAILS['userid'];
+		$user_type = self::$userData['type'];
+		$userid = self::$userData['userid'];
 		$result = array();
 
 		$sort_columns = array('graphid','name'); // allowed columns for sorting

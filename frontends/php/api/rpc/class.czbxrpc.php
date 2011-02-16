@@ -45,15 +45,12 @@ class czbxrpc{
 		list($resource, $action) = explode('.', $method);
 
 // Authentication {{{
-		if(!isset($without_auth[$method]) && empty($sessionid)){
-
+		if(!isset($without_auth[$method])){
 // compatibility mode
-			if(($resource == 'user') && ($action == 'authenticate')) $action = 'login';
-
-			if(empty($sessionid) && (($resource != 'user') || ($action != 'login'))){
+			if(zbx_empty($sessionid) && (($resource != 'user') || ($action != 'login' && $action != 'authenticate'))){
 				return array('error' => ZBX_API_ERROR_NO_AUTH, 'message' => 'Not authorized');
 			}
-			else if(!empty($sessionid)){
+			else if(!zbx_empty($sessionid)){
 				if(!self::callAPI('user.checkAuthentication', $sessionid)){
 					return array('error' => ZBX_API_ERROR_NO_AUTH, 'message' => 'Not authorized');
 				}

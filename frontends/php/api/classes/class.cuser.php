@@ -45,15 +45,12 @@ class CUser extends CZBXAPI{
  * @return array
  */
 	public function get($options=array()){
-		global $USER_DETAILS;
-
 		$result = array();
-		$user_type = $USER_DETAILS['type'];
-		$userid = $USER_DETAILS['userid'];
+		$user_type = self::$userData['type'];
+		$userid = self::$userData['userid'];
 
 		$sort_columns = array('userid', 'alias'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
-
 
 		$sql_parts = array(
 			'select' => array('users' => 'u.userid'),
@@ -110,17 +107,17 @@ class CUser extends CZBXAPI{
 		if(USER_TYPE_SUPER_ADMIN == $user_type){
 
 		}
-		else if(is_null($options['editable']) && ($USER_DETAILS['type'] == USER_TYPE_ZABBIX_ADMIN)){
+		else if(is_null($options['editable']) && (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN)){
 			$sql_parts['from']['users_groups'] = 'users_groups ug';
 			$sql_parts['where']['uug'] = 'u.userid=ug.userid';
 			$sql_parts['where'][] = 'ug.usrgrpid IN ('.
 				' SELECT uug.usrgrpid'.
 				' FROM users_groups uug'.
-				' WHERE uug.userid='.$USER_DETAILS['userid'].
+				' WHERE uug.userid='.self::$userData['userid'].
 				' )';
 		}
-		else if(!is_null($options['editable']) || ($USER_DETAILS['type']!=USER_TYPE_SUPER_ADMIN)){
-			$options['userids'] = $USER_DETAILS['userid'];
+		else if(!is_null($options['editable']) || (self::$userData['type']!=USER_TYPE_SUPER_ADMIN)){
+			$options['userids'] = self::$userData['userid'];
 		}
 
 // nodeids
@@ -341,32 +338,6 @@ Copt::memoryPick();
 	}
 
 /**
- * Get User ID by User alias
- *
- * @param array $user_data
- * @param array $user_data['alias'] User alias
- * @return string|boolean
- */
-	public function getObjects($user_data){
-		$result = array();
-		$userids = array();
-
-		$sql = 'SELECT u.userid '.
-				' FROM users u '.
-				' WHERE u.alias='.zbx_dbstr($user_data['alias']).
-					' AND '.DBin_node('u.userid', false);
-		$res = DBselect($sql);
-		while($user = DBfetch($res)){
-			$userids[] = $user['userid'];
-		}
-
-		if(!empty($userids))
-			$result = $this->get(array('userids' => $userids, 'output' => API_OUTPUT_EXTEND));
-
-		return $result;
-	}
-
-/**
  * Add Users
  *
  * @param array $users multidimensional array with Users data
@@ -391,15 +362,14 @@ Copt::memoryPick();
  * @return array|boolean
  */
 	public function create($users){
-		global $USER_DETAILS;
 
-			if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
+
+			if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
 			}
 
 			$users = zbx_toArray($users);
 			$userids = array();
-
 
 			foreach($users as $unum => $user){
 
@@ -422,8 +392,7 @@ Copt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_WRONG_FIELD_FOR_USER);
 				}
 
-
-				$user_exist = $this->getObjects(array('alias' => $user['alias']));
+				$user_exist = $this->get(array('filter' => array('alias' => $user['alias'])));
 				if(!empty($user_exist)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_USER_EXISTS_FIRST_PART);
 				}
@@ -500,10 +469,10 @@ Copt::memoryPick();
  * @return boolean
  */
 	public function update($users){
-		global $USER_DETAILS;
+
 		$self = false;
 
-			if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
+			if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_UPDATE_USERS);
 			}
 
@@ -519,7 +488,7 @@ Copt::memoryPick();
 				//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER, 'User ['.$user['alias'].']');
 			}
 
-			if(bccomp($USER_DETAILS['userid'], $user['userid']) == 0){
+			if(bccomp(self::$userData['userid'], $user['userid']) == 0){
 				$self = true;
 			}
 
@@ -640,11 +609,11 @@ Copt::memoryPick();
 	}
 
 	public function updateProfile($user){
-		global $USER_DETAILS;
+
 
 			$options = array(
-				'nodeids' => id2nodeid($USER_DETAILS['userid']),
-				'userids' => $USER_DETAILS['userid'],
+				'nodeids' => id2nodeid(self::$userData['userid']),
+				'userids' => self::$userData['userid'],
 			'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1
 			);
@@ -681,12 +650,12 @@ Copt::memoryPick();
  * @return boolean
  */
 	public function delete($users){
-		global $USER_DETAILS;
+
 
 		$users = zbx_toArray($users);
 		$userids = zbx_objectValues($users, 'userid');
 
-			if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
+			if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_DELETE_USERS);
 			}
 
@@ -697,7 +666,7 @@ Copt::memoryPick();
 			);
 			$del_users = $this->get($options);
 			foreach($del_users as $gnum => $user){
-				if(bccomp($USER_DETAILS['userid'], $user['userid']) == 0){
+				if(bccomp(self::$userData['userid'], $user['userid']) == 0){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_USER_CANNOT_DELETE_ITSELF);
 				}
 
@@ -749,7 +718,7 @@ Copt::memoryPick();
  * @return boolean
  */
 	public function addMedia($media_data){
-		global $USER_DETAILS;
+
 
 			$medias = zbx_toArray($media_data['medias']);
 			$users = zbx_toArray($media_data['users']);
@@ -757,7 +726,7 @@ Copt::memoryPick();
 
 		$userids = array();
 
-			if($USER_DETAILS['type'] < USER_TYPE_ZABBIX_ADMIN){
+			if(self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN){
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_ONLY_ADMIN_CAN_ADD_USER_MEDIAS);
 			}
 
@@ -791,11 +760,11 @@ Copt::memoryPick();
  * @return boolean
  */
 	public function deleteMedia($mediaids){
-		global $USER_DETAILS;
+
 
 			$mediaids = zbx_toArray($mediaids);
 
-			if($USER_DETAILS['type'] < USER_TYPE_ZABBIX_ADMIN){
+			if(self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN){
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_ONLY_ADMIN_CAN_REMOVE_USER_MEDIAS);
 			}
 
@@ -821,13 +790,13 @@ Copt::memoryPick();
  * @return boolean
  */
 	public function updateMedia($media_data){
-		global $USER_DETAILS;
+
 
 
 		$new_medias = zbx_toArray($media_data['medias']);
 		$users = zbx_toArray($media_data['users']);
 
-			if($USER_DETAILS['type'] < USER_TYPE_ZABBIX_ADMIN){
+			if(self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_CUSER_ERROR_ONLY_ADMIN_CAN_CHANGE_USER_MEDIAS);
 			}
 
@@ -953,6 +922,10 @@ Copt::memoryPick();
 	return true;
 	}
 
+	public function authenticate($user){
+		$userData = $this->login($user);
+		return $userData['sessionid'];
+	}
 /**
  * Login user
  *
@@ -963,7 +936,6 @@ Copt::memoryPick();
  */
 	public function login($user){
 		global $ZBX_LOCALNODEID;
-		global $USER_DETAILS;
 
 		$name = $user['user'];
 		$password = md5($user['password']);
@@ -972,25 +944,19 @@ Copt::memoryPick();
 				' FROM users u '.
 				' WHERE u.alias='.zbx_dbstr($name);
 					' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);
-//SQL to BLOCK attempts
-//					.' AND ( attempt_failed<'.ZBX_LOGIN_ATTEMPTS.
-//							' OR (attempt_failed>'.(ZBX_LOGIN_ATTEMPTS-1).
-//									' AND ('.time().'-attempt_clock)>'.ZBX_LOGIN_BLOCK.'))';
-		$userInfo = DBfetch(DBselect($sql));
-		if(!$userInfo){
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Login name or password is incorrect'));
-		}
 
-		$USER_DETAILS['userid'] = $userInfo['userid'];
+		$userInfo = DBfetch(DBselect($sql));
+		if(!$userInfo)
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Login name or password is incorrect'));
+
+		self::$userData['userid'] = $userInfo['userid'];
 
 // check if user is blocked
 		if($userInfo['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS){
-			if((time() - $userInfo['attempt_clock']) < ZBX_LOGIN_BLOCK){
+			if((time() - $userInfo['attempt_clock']) < ZBX_LOGIN_BLOCK)
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Account is blocked for %s seconds', (ZBX_LOGIN_BLOCK - (time() - $userInfo['attempt_clock']))));
-			}
-			else{
-				DBexecute('UPDATE users SET attempt_clock='.time().' WHERE alias='.zbx_dbstr($name));
-			}
+
+			DBexecute('UPDATE users SET attempt_clock='.time().' WHERE alias='.zbx_dbstr($name));
 		}
 
 // check system permissions
@@ -1003,12 +969,10 @@ Copt::memoryPick();
 			' WHERE ug.userid='.$userInfo['userid'].
 				' AND g.usrgrpid=ug.usrgrpid ';
 		$db_access = DBfetch(DBselect($sql));
-		if(!zbx_empty($db_access['gui_access'])){
+		if(!zbx_empty($db_access['gui_access']))
 			$guiAccess = $db_access['gui_access'];
-		}
-		else{
+		else
 			$guiAccess = GROUP_GUI_ACCESS_SYSTEM;
-		}
 
 		switch($guiAccess){
 			case GROUP_GUI_ACCESS_INTERNAL:
@@ -1049,8 +1013,10 @@ Copt::memoryPick();
 			self::exception(ZBX_API_ERROR_PARAMETERS, $e->getMessage());
 		}
 
-		$sessionid = zbx_session_start($userInfo['userid'], $name, $password);
-
+// start session
+		$sessionid = md5(time().$password.$name.rand(0,10000000));
+		DBexecute('INSERT INTO sessions (sessionid,userid,lastaccess,status) VALUES ('.zbx_dbstr($sessionid).','.$userInfo['userid'].','.time().','.ZBX_SESSION_ACTIVE.')');
+// --
 
 		add_audit(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, _s('Correct login [%s]', $name));
 
@@ -1108,10 +1074,11 @@ Copt::memoryPick();
 			$guiAccess = GROUP_GUI_ACCESS_SYSTEM;
 		}
 
-
 		$userData = $this->_getUserData($userInfo['userid']);
 		$userData['sessionid'] = $sessionid;
 		$userData['gui_access'] = $guiAccess;
+
+		self::$userData = $userData;
 
 		return $userData;
 	}
@@ -1149,8 +1116,7 @@ Copt::memoryPick();
 			$userData['node']['nodeid'] = $ZBX_LOCALNODEID;
 		}
 
-		return $userData;
-
+	return $userData;
 	}
 
 	public function isReadable($ids){

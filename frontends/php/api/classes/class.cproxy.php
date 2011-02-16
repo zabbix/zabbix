@@ -42,10 +42,9 @@ class CProxy extends CZBXAPI{
  * @return array|boolean
  */
 	public function get($options=array()){
-		global $USER_DETAILS;
 
 		$result = array();
-		$user_type = $USER_DETAILS['type'];
+		$user_type = self::$userData['type'];
 
 		$sort_columns = array('hostid', 'host', 'status'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
@@ -293,7 +292,7 @@ class CProxy extends CZBXAPI{
 	}
 
 	protected function checkInput(&$proxies, $method){
-		global $USER_DETAILS;
+
 
 		$create = ($method == 'create');
 		$update = ($method == 'update');
@@ -339,7 +338,7 @@ class CProxy extends CZBXAPI{
 				if($delete) $proxy['host'] = $dbProxies[$proxy['proxyid']]['host'];
 			}
 			else{
-				if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type'])
+				if(USER_TYPE_SUPER_ADMIN != self::$userData['type'])
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 
 				if(($proxy['status'] == HOST_STATUS_PROXY_PASSIVE) && !isset($proxy['interfaces']))

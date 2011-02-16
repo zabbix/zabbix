@@ -46,11 +46,10 @@ class CMaintenance extends CZBXAPI{
  * @return array|int item data as array or false if error
  */
 	public function get($options=array()){
-		global $USER_DETAILS;
 
 		$result = array();
-		$user_type = $USER_DETAILS['type'];
-		$userid = $USER_DETAILS['userid'];
+		$user_type = self::$userData['type'];
+		$userid = self::$userData['userid'];
 
 		$sort_columns = array('maintenanceid', 'name'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
@@ -454,10 +453,10 @@ Copt::memoryPick();
  * @return boolean
  */
 	public function create($maintenances){
-		global $USER_DETAILS;
+
 		$maintenances = zbx_toArray($maintenances);
 
-			if($USER_DETAILS['type'] == USER_TYPE_ZABBIX_USER){
+			if(self::$userData['type'] == USER_TYPE_ZABBIX_USER){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
 
@@ -576,11 +575,11 @@ Copt::memoryPick();
  * @return boolean
  */
 	public function update($maintenances){
-		global $USER_DETAILS;
+
 		$maintenances = zbx_toArray($maintenances);
 		$maintenanceids = zbx_objectValues($maintenances, 'maintenanceid');
 
-			if($USER_DETAILS['type'] == USER_TYPE_ZABBIX_USER){
+			if(self::$userData['type'] == USER_TYPE_ZABBIX_USER){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
 
@@ -802,10 +801,10 @@ Copt::memoryPick();
  * @return boolean
  */
 	public function delete($maintenanceids){
-		global $USER_DETAILS;
+
 		$maintenanceids = zbx_toArray($maintenanceids);
 
-			if($USER_DETAILS['type'] == USER_TYPE_ZABBIX_USER){
+			if(self::$userData['type'] == USER_TYPE_ZABBIX_USER){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
 

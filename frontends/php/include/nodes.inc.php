@@ -162,7 +162,7 @@
 		$result = array('selected' => 0, 'nodes' => array(), 'nodeids' => array());
 
 		if(!defined('ZBX_NOT_ALLOW_ALL_NODES')){
-			$result['nodes'][0] = array('nodeid' => 0, 'name' => S_ALL_S);
+			$result['nodes'][0] = array('nodeid' => 0, 'name' => _('All'));
 		}
 
 		$available_nodes = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST, PERM_RES_DATA_ARRAY);

@@ -34,11 +34,10 @@ class CDRule extends CZBXAPI{
 * @return array
 */
 	public function get($options=array()){
-		global $USER_DETAILS;
 
 		$result = array();
 		$nodeCheck = false;
-		$user_type = $USER_DETAILS['type'];
+		$user_type = self::$userData['type'];
 		$result = array();
 
 		$sort_columns = array('druleid','name'); // allowed columns for sorting
@@ -88,9 +87,9 @@ class CDRule extends CZBXAPI{
 // editable + PERMISSION CHECK
 		if(USER_TYPE_SUPER_ADMIN == $user_type){
 		}
-		else if(is_null($options['editable']) && ($USER_DETAILS['type'] == USER_TYPE_ZABBIX_ADMIN)){
+		else if(is_null($options['editable']) && (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN)){
 		}
-		else if(!is_null($options['editable']) && ($USER_DETAILS['type']!=USER_TYPE_SUPER_ADMIN)){
+		else if(!is_null($options['editable']) && (self::$userData['type']!=USER_TYPE_SUPER_ADMIN)){
 			return array();
 		}
 

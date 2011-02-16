@@ -40,7 +40,6 @@ class CHistory extends CZBXAPI{
  * @return array|int item data as array or false if error
  */
 	public function get($options=array()){
-		global $USER_DETAILS;
 
 		$nodeCheck = false;
 		$result = array();
@@ -111,7 +110,7 @@ class CHistory extends CZBXAPI{
 		}
 
 // editable + PERMISSION CHECK
-		if((USER_TYPE_SUPER_ADMIN == $USER_DETAILS['type']) || $options['nopermissions']){
+		if((USER_TYPE_SUPER_ADMIN == self::$userData['type']) || $options['nopermissions']){
 		}
 		else{
 			$itemOptions = array(

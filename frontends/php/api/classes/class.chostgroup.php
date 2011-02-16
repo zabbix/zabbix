@@ -34,11 +34,10 @@ class CHostGroup extends CZBXAPI{
  * @return array
  */
 	public function get($params){
-		global $USER_DETAILS;
 
 		$result = array();
-		$user_type = $USER_DETAILS['type'];
-		$userid = $USER_DETAILS['userid'];
+		$user_type = self::$userData['type'];
+		$userid = self::$userData['userid'];
 
 		$sort_columns = array('groupid', 'name'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
@@ -609,11 +608,11 @@ COpt::memoryPick();
  * @return array
  */
 	public function create($groups){
-		global $USER_DETAILS;
+
 		$groups = zbx_toArray($groups);
 		$insert = array();
 
-			if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
+			if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can create HostGroups');
 			}
 

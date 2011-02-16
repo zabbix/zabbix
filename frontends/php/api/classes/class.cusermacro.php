@@ -52,11 +52,10 @@ class CUserMacro extends CZBXAPI{
  * @return array|boolean UserMacros data as array or false if error
  */
 	public function get($options=array()){
-		global $USER_DETAILS;
 
 		$result = array();
-		$user_type = $USER_DETAILS['type'];
-		$userid = $USER_DETAILS['userid'];
+		$user_type = self::$userData['type'];
+		$userid = self::$userData['userid'];
 
 		$sort_columns = array('macro'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
@@ -490,14 +489,14 @@ class CUserMacro extends CZBXAPI{
  * @return array|boolean
  */
 	public function createGlobal($macros){
-		global $USER_DETAILS;
+
 
 		$macros = zbx_toArray($macros);
 		$macros_macros = zbx_objectValues($macros, 'macro');
 		$globalmacroids = array();
 
 // permission check
-			if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
+			if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
 //--
@@ -533,7 +532,7 @@ class CUserMacro extends CZBXAPI{
 	}
 
 	public function updateGlobal($globalmacros){
-		global $USER_DETAILS;
+
 
 		$globalmacros = zbx_toArray($globalmacros);
 		$globalmacros = zbx_toHash($globalmacros, 'macro');
@@ -541,7 +540,7 @@ class CUserMacro extends CZBXAPI{
 		$globalmacroids = array();
 
 // permission check
-			if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
+			if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
 //--

@@ -20,15 +20,6 @@
 ?>
 <?php
 
-function zbx_session_start($userid, $name, $password){
-	$sessionid = md5(time().$password.$name.rand(0,10000000));
-	zbx_setcookie('zbx_sessionid',$sessionid);
-
-	DBexecute('INSERT INTO sessions (sessionid,userid,lastaccess,status) VALUES ('.zbx_dbstr($sessionid).','.$userid.','.time().','.ZBX_SESSION_ACTIVE.')');
-
-return $sessionid;
-}
-
 function permission2str($group_permission){
 	$str_perm[PERM_READ_WRITE]	= S_READ_WRITE;
 	$str_perm[PERM_READ_ONLY]	= S_READ_ONLY;
