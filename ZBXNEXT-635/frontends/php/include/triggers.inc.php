@@ -929,7 +929,7 @@ function utf8RawUrlDecode($source){
 
 					if($resolve_macro){
 						$function_data['expression'] = $macros;
-						API::UserMacro()->resolveTrigger($function_data);
+						$function_data = API::UserMacro()->resolveTrigger($function_data);
 						$macros = $function_data['expression'];
 					}
 
@@ -957,10 +957,10 @@ function utf8RawUrlDecode($source){
 
 					if($resolve_macro){
 						$trigger = $function_data;
-						API::UserMacro()->resolveItem($function_data);
+						$function_data = API::UserMacro()->resolveItem($function_data);
 
 						$function_data['expression'] = $function_data['parameter'];
-						API::UserMacro()->resolveTrigger($function_data);
+						$function_data = API::UserMacro()->resolveTrigger($function_data);
 						$function_data['parameter'] = $function_data['expression'];
 					}
 
@@ -1054,7 +1054,7 @@ function utf8RawUrlDecode($source){
 
 					if($resolve_macro){
 						$function_data['expression'] = $macros;
-						API::UserMacro()->resolveTrigger($function_data);
+						$function_data = API::UserMacro()->resolveTrigger($function_data);
 						$macros = $function_data['expression'];
 					}
 
@@ -1080,10 +1080,10 @@ function utf8RawUrlDecode($source){
 					if($template) $function_data['host'] = '{HOSTNAME}';
 
 					if($resolve_macro){
-						API::UserMacro()->resolveItem($function_data);
+						$function_data = API::UserMacro()->resolveItem($function_data);
 
 						$function_data['expression'] = $function_data['parameter'];
-						API::UserMacro()->resolveTrigger($function_data);
+						$function_data = API::UserMacro()->resolveTrigger($function_data);
 						$function_data['parameter'] = $function_data['expression'];
 					}
 

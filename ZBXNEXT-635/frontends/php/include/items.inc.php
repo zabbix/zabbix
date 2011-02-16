@@ -592,7 +592,7 @@
 			}
 		}
 
-		API::UserMacro()->resolveItem($item);
+		$item = API::UserMacro()->resolveItem($item);
 
 	return $item['key_'];
 	}

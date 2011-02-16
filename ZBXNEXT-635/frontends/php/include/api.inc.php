@@ -38,7 +38,6 @@ class CAPIObject{
 		}
 		else{
 			error($result['message']);
-//			error($result['data']);
 			return false;
 		}
 	}

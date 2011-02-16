@@ -10,11 +10,10 @@ class CWebUser{
 
 			self::$data = API::User()->login(array(
 				'user' => $login,
-				'password' => $password
+				'password' => $password,
+				'userData' => true
 			));
-			if(!self::$data){
-				throw new Exception();
-			}
+			if(!self::$data) throw new Exception();
 
 			if(self::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED){
 				error(_('GUI access disabled.'));
@@ -60,7 +59,8 @@ class CWebUser{
 				self::setDefault();
 				self::$data = API::User()->login(array(
 					'user' => ZBX_GUEST_USER,
-					'password' => ''
+					'password' => '',
+					'userData' => true
 				));
 
 				if(!self::$data) throw new Exception();
