@@ -99,7 +99,7 @@ class testPageUsers extends CWebTest
 
 	public function testPageUsers_MassDelete()
 	{
-		DBsave_tables(array('users','users_groups','media'));
+		DBsave_tables(array('opmessage_usr', 'users','users_groups','media'));
 
 		$this->chooseOkOnNextConfirmation();
 
@@ -130,12 +130,12 @@ class testPageUsers extends CWebTest
 			$this->assertEquals(0,DBcount($sql),"Chuck Norris: user $id deleted but still exists in table media");
 		}
 
-		DBrestore_tables(array('users','users_groups','media'));
+		DBrestore_tables(array('opmessage_usr', 'users','users_groups','media'));
 	}
 
 	public function testPageUsers_MassDeleteSpecialUsers()
 	{
-		DBsave_tables(array('users','users_groups','media'));
+		DBsave_tables(array('opmessage_usr', 'users','users_groups','media'));
 
 		$this->chooseOkOnNextConfirmation();
 
@@ -167,7 +167,7 @@ class testPageUsers extends CWebTest
 //			$this->assertNotEquals(0,DBcount($sql));
 		}
 
-		DBrestore_tables(array('users','users_groups','media'));
+		DBrestore_tables(array('opmessage_usr', 'users','users_groups','media'));
 	}
 
 	public function testPageUsers_MassUnblockAll()
