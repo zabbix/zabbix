@@ -124,6 +124,7 @@ div.scrollbar{
 	height: 56px;
 	background-color: #DDDDDD;
 	margin: 0 auto;
+	line-height: 1em;
 /*	overflow: hidden; */
 }
 
