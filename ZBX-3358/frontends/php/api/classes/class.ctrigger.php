@@ -1864,6 +1864,7 @@ COpt::memoryPick();
 
 			$expr = new CTriggerExpression($trigger);
 
+			// which templates are currently linked to host?
 			$templates = CTemplate::get(array(
 				'output' => array('hostid','host'),
 				'filter' => array('host' => $expr->data['hosts']),
@@ -1873,15 +1874,26 @@ COpt::memoryPick();
 			$templateids = array_keys($templates);
 			$templateids = zbx_toHash($templateids);
 
+			$templated_trigger = !empty($templateids);
+
+			// which templates contain triggers that we are about to add dependencies to?
 			$dep_templateids = array();
 			$db_dephosts = get_hosts_by_triggerid($trigger['dependencies']);
 			while($dephost = DBfetch($db_dephosts)) {
 				if($dephost['status'] == HOST_STATUS_TEMPLATE){ //template
 					$dep_templateids[$dephost['hostid']] = $dephost['hostid'];
 				}
+
+				//we have a host trigger added to template trigger or otherwise
+				if($templated_trigger && $dephost['status'] != HOST_STATUS_TEMPLATE){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot add dependency on trigger inside host "%s", only other templated triggers can be added as dependencies to templated trigger.', $dephost['host']));
+				}
+				if(!$templated_trigger && $dephost['status'] == HOST_STATUS_TEMPLATE){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot add dependency on trigger inside template "%s", only other host triggers can be added as dependencies to host trigger.', $dephost['host']));
+				}
 			}
 
-			// finding if there are new linked templates
+			// new dependencies are about to be added?
 			$tdiff = array_diff($templateids, $dep_templateids);
 			if(!empty($templateids) && !empty($dep_templateids) && !empty($tdiff)){
 				$tpls = zbx_array_merge($templateids, $dep_templateids);
@@ -1908,7 +1920,7 @@ COpt::memoryPick();
 					}
 					foreach($dep_templateids as $dep_tplid){
 						if(!isset($templates[$dep_tplid]) && $set_with_dep){
-							self::exception(ZBX_API_ERROR_PARAMETERS, 'Not all Templates are linked to host [ '.reset($templates).' ]');
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Not all Templates are linked to host "%s"', reset($templates)));
 						}
 					}
 				}

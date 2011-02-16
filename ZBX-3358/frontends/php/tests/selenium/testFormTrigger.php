@@ -26,7 +26,6 @@ class testFormTrigger extends CWebTest
 
 	/**
 	 * Check if it is possible to add circular trigger dependency
-	 *
 	 * @author Konstantin Buravcov
 	 */
 	public function testFormTrigger_CircularDependency()
@@ -50,6 +49,9 @@ class testFormTrigger extends CWebTest
 
 		// selecting the same trigger
 		$this->assertTitle('TRIGGERS');
+		$this->ok('Group');
+		$this->dropdown_select_wait("groupid", "label=Zabbix servers");
+		$this->dropdown_select_wait("hostid", "label=Zabbix server");
 		$this->click('//span[text()="SSH server is down on Zabbix server"]');
 		$this->selectWindow("null");
 		$this->wait();
@@ -64,6 +66,93 @@ class testFormTrigger extends CWebTest
 
 		// and error should appear
 		$this->ok('Incorrect dependency');
+	}
+
+	/**
+	 * Check if it is possible to add trigger dependency: "templated trigger depends on host trigger"
+	 * @author Konstantin Buravcov
+	 */
+	public function testFormTrigger_TemplateToHostDependency()
+	{
+		$this->login('triggers.php');
+		$this->assertTitle('Configuration of triggers');
+
+		// selecting group 'Zabbix server' if it is not already selected
+		$this->dropdown_select_wait('groupid', 'Templates');
+		$this->dropdown_select_wait('hostid', 'Template_AIX');
+
+		// clicking on template name
+		$this->click('link=SSH server is down on {HOSTNAME}');
+		$this->wait();
+
+		// clicking on "Add" button
+		$this->button_click('btn1');
+		// switching to popoup that has opened
+		$this->waitForPopUp('zbx_popup');
+		$this->selectWindow('zbx_popup');
+
+		// selecting the same trigger
+		$this->assertTitle('TRIGGERS');
+		$this->dropdown_select_wait('groupid', 'Zabbix servers');
+		$this->dropdown_select_wait('hostid', 'Zabbix server');
+		$this->click('//span[text()="Configured max number of opened files is too low on Zabbix server"]');
+		$this->selectWindow("null");
+		$this->wait();
+
+		// did it show up in dependencies?
+		$this->assertTitle('Configuration of triggers');
+		$this->ok('Configured max number of opened files is too low on Zabbix server');
+
+		// clicking on 'Save'
+		$this->button_click('save');
+		$this->wait();
+
+		// and error should appear
+		$this->ok('Cannot add dependency on trigger inside host');
+	}
+
+
+	/**
+	 * Check if it is possible to add trigger dependency: "host trigger depends on templated trigger"
+	 * @author Konstantin Buravcov
+	 */
+	public function testFormTrigger_HostToTemplateDependency()
+	{
+		$this->login('triggers.php');
+		$this->assertTitle('Configuration of triggers');
+
+		// selecting group 'Zabbix server' if it is not already selected
+		$this->dropdown_select_wait('groupid', 'Templates');
+		$this->dropdown_select_wait('hostid', 'Template_AIX');
+
+		// clicking on template name
+		$this->click('link=IMAP server is down on {HOSTNAME}');
+		$this->wait();
+
+		// clicking on "Add" button
+		$this->button_click('btn1');
+		// switching to popoup that has opened
+		$this->waitForPopUp('zbx_popup');
+		$this->selectWindow('zbx_popup');
+
+		// selecting the same trigger
+		$this->assertTitle('TRIGGERS');
+		$this->dropdown_select_wait('groupid', 'Zabbix servers');
+		$this->dropdown_select_wait('hostid', 'Zabbix server');
+		$this->click('//span[text()="Apache is not running on Zabbix server"]');
+		$this->selectWindow("null");
+		$this->wait();
+
+		// did it show up in dependencies?
+		$this->assertTitle('Configuration of triggers');
+		$this->ok('Apache is not running on Zabbix server');
+
+		// clicking on 'Save'
+		$this->button_click('save');
+		$this->wait();
+
+		// and error should appear
+		$this->ok('Cannot add dependency on trigger inside host');
 	}
 
 }

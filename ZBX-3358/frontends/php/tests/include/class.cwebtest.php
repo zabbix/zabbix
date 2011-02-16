@@ -169,6 +169,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 
 	public function dropdown_select($id,$str)
 	{
+		$str = strpos($str, '=') === false ? $str : substr($str, strpos($str, '=')+1);
 		$this->assertSelectHasOption($id,$str);
 		$this->select($id,$str);
 	}
@@ -178,7 +179,10 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 		$selected = $this->getSelectedLabel($id);
 		$this->dropdown_select($id, $str);
 		// Wait only if drop down selection was changed
-		if($selected != $str)	$this->wait();
+		$str = strpos($str, '=') === false ? $str : substr($str, strpos($str, '=')+1);
+		if($selected != $str){
+			$this->wait();
+		}
 	}
 
 	public function wait()
