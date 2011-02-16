@@ -22,6 +22,8 @@
 require_once(dirname(__FILE__) . '/../include/class.cwebtest.php');
 
 class testPageMediaTypes extends CWebTest{
+	public $affectedTables = array('opmessage', 'media_type', 'media', 'operations');
+
 	// Returns all media types
 	public static function allMediaTypes(){
 		return DBdata('select * from media_type');
@@ -83,7 +85,7 @@ class testPageMediaTypes extends CWebTest{
 		$row = DBfetch(DBselect("select count(*) as cnt from opmessage where mediatypeid=$id"));
 		$used_by_operations = ($row['cnt'] > 0);
 
-		DBsave_tables(array('opmessage', 'media_type', 'media'));
+		DBsave_tables($this->affectedTables);
 
 		$this->chooseOkOnNextConfirmation();
 
@@ -107,7 +109,7 @@ class testPageMediaTypes extends CWebTest{
 			$this->assertEquals(0, DBcount($sql));
 		}
 
-		DBrestore_tables(array('opmessage', 'media_type', 'media'));
+		DBrestore_tables($this->affectedTables);
 	}
 
 	public function testPageMediaTypes_Sorting(){
