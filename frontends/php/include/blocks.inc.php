@@ -174,12 +174,12 @@ function make_system_status($filter){
 	$table->setHeader(array(
 		is_show_all_nodes() ? S_NODE : null,
 		S_HOST_GROUP,
-		is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_DISASTER])?S_DISASTER:null,
-		is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_HIGH])?S_HIGH:null,
-		is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_AVERAGE])?S_AVERAGE:null,
-		is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_WARNING])?S_WARNING:null,
-		is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_INFORMATION])?S_INFORMATION:null,
-		is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_NOT_CLASSIFIED])?S_NOT_CLASSIFIED:null
+		is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_DISASTER])?getSeverityCaption(TRIGGER_SEVERITY_DISASTER):null,
+		is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_HIGH])?getSeverityCaption(TRIGGER_SEVERITY_HIGH):null,
+		is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_AVERAGE])?getSeverityCaption(TRIGGER_SEVERITY_AVERAGE):null,
+		is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_WARNING])?getSeverityCaption(TRIGGER_SEVERITY_WARNING):null,
+		is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_INFORMATION])?getSeverityCaption(TRIGGER_SEVERITY_INFORMATION):null,
+		is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_NOT_CLASSIFIED])?getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED):null
 	));
 
 // SELECT HOST GROUPS {{{
@@ -611,12 +611,12 @@ function make_hoststat_summary($filter){
 				$table_inf->setAttribute('style', 'width: 400px;');
 				$table_inf->setHeader(array(
 					S_HOST,
-					is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_DISASTER])?S_DISASTER:null,
-					is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_HIGH])?S_HIGH:null,
-					is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_AVERAGE])?S_AVERAGE:null,
-					is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_WARNING])?S_WARNING:null,
-					is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_INFORMATION])?S_INFORMATION:null,
-					is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_NOT_CLASSIFIED])?S_NOT_CLASSIFIED:null
+					is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_DISASTER])?getSeverityCaption(TRIGGER_SEVERITY_DISASTER):null,
+					is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_HIGH])?getSeverityCaption(TRIGGER_SEVERITY_HIGH):null,
+					is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_AVERAGE])?getSeverityCaption(TRIGGER_SEVERITY_AVERAGE):null,
+					is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_WARNING])?getSeverityCaption(TRIGGER_SEVERITY_WARNING):null,
+					is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_INFORMATION])?getSeverityCaption(TRIGGER_SEVERITY_INFORMATION):null,
+					is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_NOT_CLASSIFIED])?getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED):null
 				));
 
 				$popup_rows = 0;
@@ -655,12 +655,12 @@ function make_hoststat_summary($filter){
 			$table_inf->setAttribute('style', 'width: 400px;');
 			$table_inf->setHeader(array(
 				S_HOST,
-				is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_DISASTER])?S_DISASTER:null,
-				is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_HIGH])?S_HIGH:null,
-				is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_AVERAGE])?S_AVERAGE:null,
-				is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_WARNING])?S_WARNING:null,
-				is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_INFORMATION])?S_INFORMATION:null,
-				is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_NOT_CLASSIFIED])?S_NOT_CLASSIFIED:null
+				is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_DISASTER])?getSeverityCaption(TRIGGER_SEVERITY_DISASTER):null,
+				is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_HIGH])?getSeverityCaption(TRIGGER_SEVERITY_HIGH):null,
+				is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_AVERAGE])?getSeverityCaption(TRIGGER_SEVERITY_AVERAGE):null,
+				is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_WARNING])?getSeverityCaption(TRIGGER_SEVERITY_WARNING):null,
+				is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_INFORMATION])?getSeverityCaption(TRIGGER_SEVERITY_INFORMATION):null,
+				is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_NOT_CLASSIFIED])?getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED):null
 			));
 
 			$popup_rows = 0;

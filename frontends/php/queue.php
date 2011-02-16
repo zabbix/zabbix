@@ -145,12 +145,12 @@ include_once 'include/page_header.php';
 		foreach($item_types as $type){
 			$elements=array(
 				item_type2str($type),
-				new CCol($sec_10[$type],($sec_10[$type])?"unknown_trigger":"normal"),
-				new CCol($sec_30[$type],($sec_30[$type])?"information":"normal"),
-				new CCol($sec_60[$type],($sec_60[$type])?"warning":"normal"),
-				new CCol($sec_300[$type],($sec_300[$type])?"average":"normal"),
-				new CCol($sec_600[$type],($sec_600[$type])?"high":"normal"),
-				new CCol($sec_rest[$type],($sec_rest[$type])?"disaster":"normal")
+				getSeverityCell(TRIGGER_SEVERITY_NOT_CLASSIFIED, $sec_10[$type], !$sec_10[$type]),
+				getSeverityCell(TRIGGER_SEVERITY_INFORMATION, $sec_30[$type], !$sec_30[$type]),
+				getSeverityCell(TRIGGER_SEVERITY_WARNING, $sec_60[$type], !$sec_60[$type]),
+				getSeverityCell(TRIGGER_SEVERITY_AVERAGE, $sec_300[$type], !$sec_300[$type]),
+				getSeverityCell(TRIGGER_SEVERITY_HIGH, $sec_600[$type], !$sec_600[$type]),
+				getSeverityCell(TRIGGER_SEVERITY_DISASTER, $sec_rest[$type], !$sec_rest[$type]),
 			);
 
 			$table->addRow($elements);
@@ -200,23 +200,23 @@ include_once 'include/page_header.php';
 		while (null != ($db_proxy = DBfetch($db_proxies))){
 			$elements = array(
 				$db_proxy['host'],
-				new CCol($sec_10[$db_proxy['hostid']], $sec_10[$db_proxy['hostid']] ? "unknown_trigger" : "normal"),
-				new CCol($sec_30[$db_proxy['hostid']], $sec_30[$db_proxy['hostid']] ? "information" : "normal"),
-				new CCol($sec_60[$db_proxy['hostid']], $sec_60[$db_proxy['hostid']] ? "warning" : "normal"),
-				new CCol($sec_300[$db_proxy['hostid']], $sec_300[$db_proxy['hostid']] ? "average" : "normal"),
-				new CCol($sec_600[$db_proxy['hostid']], $sec_600[$db_proxy['hostid']] ? "high" : "normal"),
-				new CCol($sec_rest[$db_proxy['hostid']], $sec_rest[$db_proxy['hostid']] ? "disaster" : "normal")
+				getSeverityCell(TRIGGER_SEVERITY_NOT_CLASSIFIED, $sec_10[$db_proxy['hostid']], !$sec_10[$db_proxy['hostid']]),
+				getSeverityCell(TRIGGER_SEVERITY_INFORMATION, $sec_30[$db_proxy['hostid']], !$sec_30[$db_proxy['hostid']]),
+				getSeverityCell(TRIGGER_SEVERITY_WARNING, $sec_60[$db_proxy['hostid']], !$sec_60[$db_proxy['hostid']]),
+				getSeverityCell(TRIGGER_SEVERITY_AVERAGE, $sec_300[$db_proxy['hostid']], !$sec_300[$db_proxy['hostid']]),
+				getSeverityCell(TRIGGER_SEVERITY_HIGH, $sec_600[$db_proxy['hostid']], !$sec_600[$db_proxy['hostid']]),
+				getSeverityCell(TRIGGER_SEVERITY_DISASTER, $sec_rest[$db_proxy['hostid']], !$sec_rest[$db_proxy['hostid']]),
 			);
 			$table->addRow($elements);
 		}
 		$elements = array(
 			new CCol(S_SERVER, 'bold'),
-			new CCol($sec_10[0], $sec_10[0] ? 'unknown_trigger' : 'normal'),
-			new CCol($sec_30[0], $sec_30[0] ? 'information' : 'normal'),
-			new CCol($sec_60[0], $sec_60[0] ? 'warning' : 'normal'),
-			new CCol($sec_300[0], $sec_300[0] ? 'average' : 'normal'),
-			new CCol($sec_600[0], $sec_600[0] ? 'high' : 'normal'),
-			new CCol($sec_rest[0], $sec_rest[0] ? 'disaster' : 'normal')
+			getSeverityCell(TRIGGER_SEVERITY_NOT_CLASSIFIED, $sec_10[0], !$sec_10[0]),
+			getSeverityCell(TRIGGER_SEVERITY_INFORMATION, $sec_30[0], !$sec_30[0]),
+			getSeverityCell(TRIGGER_SEVERITY_WARNING, $sec_60[0], !$sec_60[0]),
+			getSeverityCell(TRIGGER_SEVERITY_AVERAGE, $sec_300[0], !$sec_300[0]),
+			getSeverityCell(TRIGGER_SEVERITY_HIGH, $sec_600[0], !$sec_600[0]),
+			getSeverityCell(TRIGGER_SEVERITY_DISASTER, $sec_rest[0], !$sec_rest[0]),
 		);
 		$table->addRow($elements);
 	}
