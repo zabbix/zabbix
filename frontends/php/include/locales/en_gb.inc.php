@@ -487,7 +487,6 @@
 	'S_DELETE_SELECTED_IMAGE'=>			_('Delete selected image?'),
 	'S_HOUSEKEEPER'=>				_('Housekeeper'),
 	'S_MEDIA_TYPES'=>				_('Media types'),
-	'S_ESCALATION_RULES'=>				_('Escalation rules'),
 	'S_DEFAULT'=>					_('Default'),
 	'S_IMAGES'=>					_('Images'),
 	'S_IMAGE'=>					_('Image'),
