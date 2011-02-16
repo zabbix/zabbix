@@ -116,12 +116,13 @@ include_once('include/page_header.php');
 
 // IMPORT ///////////////////////////////////
 	$rules = get_request('rules', array());
-	if(!isset($_REQUEST['form_refresh'])){
+	if(!isset($_FILES['import_file'])){
 		foreach(array('screen') as $key){
 			$rules[$key]['exist'] = 1;
 			$rules[$key]['missed'] = 1;
 		}
 	}
+
 
 	if(isset($_FILES['import_file']) && is_file($_FILES['import_file']['tmp_name'])){
 		require_once('include/export.inc.php');
