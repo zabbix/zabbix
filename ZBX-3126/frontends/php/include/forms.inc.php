@@ -3661,12 +3661,12 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$titles = array('screens' => S_SCREEN);
 
 		foreach($titles as $key => $title){
-			$cbExist = new CCheckBox('rules['.$key.'][exist]', isset($rules[$key]['exist']));
+			$cbExist = new CCheckBox('rules['.$key.'][exist]', true);
 
 			if($key == 'template')
 				$cbMissed = null;
 			else
-				$cbMissed = new CCheckBox('rules['.$key.'][missed]', isset($rules[$key]['missed']));
+				$cbMissed = new CCheckBox('rules['.$key.'][missed]', true);
 
 			$table->addRow(array($title, $cbExist, $cbMissed));
 		}
@@ -4725,12 +4725,12 @@ JAVASCRIPT;
 		}
 
 		foreach($titles as $key => $title){
-			$cbExist = new CCheckBox('rules['.$key.'][exist]', isset($rules[$key]['exist']));
+			$cbExist = new CCheckBox('rules['.$key.'][exist]', true);
 
 			if($key != 'maps')
 				$cbExist->setAttribute('onclick', 'javascript: if(this.checked) return confirm(\'Images for all maps will be updated\')');
 
-			$cbMissed = new CCheckBox('rules['.$key.'][missed]', isset($rules[$key]['missed']));
+			$cbMissed = new CCheckBox('rules['.$key.'][missed]', true);
 
 			$table->addRow(array($title, $cbExist, $cbMissed));
 		}
