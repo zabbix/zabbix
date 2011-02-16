@@ -359,35 +359,6 @@ function getSeverityCell($severity, $text=null, $force_normal=false){
 	return $status;
 	}
 
-/*
- * Function: get_severity_description
- *
- * Description:
- *	 convert severity constant in to the string representation
- *
- * Author:
- *	 Eugene Grigorjev (eugene.grigorjev@zabbix.com)
- *
- * Comments:
- *
- */
-	function get_severity_description($severity=null){
-		$severities = array(
-			TRIGGER_SEVERITY_NOT_CLASSIFIED => S_NOT_CLASSIFIED,
-			TRIGGER_SEVERITY_INFORMATION => S_INFORMATION,
-			TRIGGER_SEVERITY_WARNING => S_WARNING,
-			TRIGGER_SEVERITY_AVERAGE => S_AVERAGE,
-			TRIGGER_SEVERITY_HIGH => S_HIGH,
-			TRIGGER_SEVERITY_DISASTER => S_DISASTER,
-		);
-
-		if(is_null($severity))
-			return $severities;
-		else if(isset($severities[$severity]))
-			return $severities[$severity];
-		else return S_UNKNOWN;
-	}
-
 	function get_trigger_value_style($value){
 		$str_val[TRIGGER_VALUE_FALSE]	= 'off';
 		$str_val[TRIGGER_VALUE_TRUE]	= 'on';
@@ -2473,7 +2444,7 @@ function utf8RawUrlDecode($source){
 
 		$table->addRow(array(S_HOST, $trigger['host']));
 		$table->addRow(array(S_TRIGGER, $trigger['description']));
-		$table->addRow(array(S_SEVERITY, new CCol(get_severity_description($trigger['priority']), get_severity_style($trigger['priority']))));
+		$table->addRow(array(S_SEVERITY, getSeverityCell($trigger['priority'])));
 		$table->addRow(array(S_EXPRESSION, $expression));
 		$table->addRow(array(S_EVENT_GENERATION, S_NORMAL.((TRIGGER_MULT_EVENT_ENABLED==$trigger['type'])?SPACE.'+'.SPACE.S_MULTIPLE_PROBLEM_EVENTS:'')));
 		$table->addRow(array(S_DISABLED, ((TRIGGER_STATUS_ENABLED==$trigger['status'])?new CCol(S_NO,'off'):new CCol(S_YES,'on')) ));

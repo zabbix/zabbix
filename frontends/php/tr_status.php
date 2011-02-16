@@ -623,7 +623,7 @@ require_once('include/templates/scriptConfirm.js.php');
 		}
 
 
-		$severity_col = new CCol(get_severity_description($trigger['priority']), get_severity_style($trigger['priority'], $trigger['value']));
+		$severity_col = getSeverityCell($trigger['priority'], null, !$trigger['value']);
 		if($show_event_col) $severity_col->setColSpan(2);
 
 

@@ -135,7 +135,7 @@ include_once('include/page_header.php');
 					str_in_array($i,$severity)?'yes':'no',
 					null,		/* action */
 					$i),		/* value */
-				get_severity_description($i)
+				getSeverityCaption($i)
 			),
 			BR());
 	}
