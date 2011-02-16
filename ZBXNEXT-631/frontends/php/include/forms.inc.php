@@ -2562,7 +2562,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		}
 
 		$cmbPrior = new CComboBox("priority",$priority);
-		$cmbPrior->addItems(get_severity_description());
+		$cmbPrior->addItems(getSeverityCaption());
 
 		$frmMTrig->addRow(array(
 			new CVisibilityBox('visible[priority]', isset($visible['priority']), 'priority', S_ORIGINAL), S_SEVERITY),
@@ -2944,9 +2944,8 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$frmTrig->addRow(S_EVENT_GENERATION, $type_select);
 
 		$cmbPrior = new CComboBox('priority', $priority);
-		for($i = 0; $i <= 5; $i++){
-			$cmbPrior->addItem($i,get_severity_description($i));
-		}
+		$cmbPrior->addItems(getSeverityCaption());
+
 		$frmTrig->addRow(S_SEVERITY,$cmbPrior);
 
 		$frmTrig->addRow(S_COMMENTS,new CTextArea("comments", $comments,90,7));

@@ -17,13 +17,7 @@
 .blue	{ color: #0033FF; }
 .gold	{ color: #999900; }
 
-.disaster	{	background-color: #FF0000;	color: #222222;}
-.high		{	background-color: #FF8888;	color: #222222;}
-.average	{	background-color: #DDAAAA;	color: #222222;}
-.warning	{	background-color: #EFEFCC;	color: #222222;}
-.information	{	background-color: #CCE2CC;	color: #222222;}
-.unknown_trigger{	background-color: #BCBCBC;	color: #222222;}
-.normal		{	background-color: #AADDAA;	color: #222222;}
+.normal		{	background-color: #AAFFAA !important; }
 
 .textcolorstyles{ color: #000000; }
 .textblackwhite{ color: #000000; }

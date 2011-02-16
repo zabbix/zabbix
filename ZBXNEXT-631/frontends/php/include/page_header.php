@@ -141,12 +141,26 @@
 			case "css_bb.css": $bodyCSS = 'darkblue'; break;
 			default: $bodyCSS = 'originalblue'; break;
 		}
+
+		echo '<style type="text/css">'."\n";
+		echo '.disaster { background-color: #' . $config['severity_color_5']. ' !important;}'."\n";
+		echo '.high { background-color: #' . $config['severity_color_4']. ' !important;}'."\n";
+		echo '.average { background-color: #' . $config['severity_color_3']. ' !important;}'."\n";
+		echo '.warning { background-color: #' . $config['severity_color_2']. ' !important;}'."\n";
+		echo '.information { background-color: #' . $config['severity_color_1']. ' !important;}'."\n";
+		echo '.unknown_trigger { background-color: #' . $config['severity_color_0']. ' !important;}'."\n";
+		echo '</style>';
+
 	}
 
 	print('<link rel="stylesheet" type="text/css" href="styles/'.$css.'" />'."\n");
 
-	if($page['file'] == 'sysmap.php')
+	if($page['file'] == 'sysmap.php'){
 		print('<link rel="stylesheet" type="text/css" href="imgstore.php?css=1&output=css" />');
+	}
+
+
+
 ?>
 <!--[if IE 6]>
 	<script type="text/javascript" src="js/ie6fix.js"></script>
