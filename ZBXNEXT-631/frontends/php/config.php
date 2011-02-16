@@ -602,7 +602,7 @@ include_once('include/page_header.php');
 	}
 
 // Trigger severities
-	else if($_REQUEST['config'] == 12){
+	else if($_REQUEST['config'] == 12 && isset($_REQUEST['save'])){
 		$configs = array(
 			'severity_name_0' => get_request('severity_name_0', _('Not classified')),
 			'severity_color_0' => get_request('severity_color_0'),
@@ -646,7 +646,7 @@ include_once('include/page_header.php');
 				$form->addItem(new CSubmit('form', _('Create image')));
 				break;
 			case 6:
-				$form->addItem(new CSubmit('form', _('Create va;ue map')));
+				$form->addItem(new CSubmit('form', _('Create value map')));
 				break;
 			case 10:
 				$form->addItem(new CSubmit('form', _('New regular expression')));
