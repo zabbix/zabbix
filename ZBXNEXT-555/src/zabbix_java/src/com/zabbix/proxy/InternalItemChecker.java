@@ -36,6 +36,23 @@ class InternalItemChecker extends ItemChecker
 	@Override
 	protected String getStringValue(ZabbixItem item) throws Exception
 	{
-		return "1";
+		if (item.getKeyId().equals("zabbix"))
+		{
+			if (3 != item.getArgumentCount() ||
+					!item.getArgument(1).equals("java") ||
+					!item.getArgument(2).equals(""))
+				throw new ZabbixException("required key format: zabbix[java,,<parameter>]");
+
+			String parameter = item.getArgument(3);
+
+			if (parameter.equals("version"))
+				return GeneralInformation.VERSION;
+			else if (parameter.equals("ping"))
+				return "1";
+			else
+				throw new ZabbixException("third parameter '%s' is not supported", parameter);
+		}
+		else
+			throw new ZabbixException("key ID '%s' is not supported", item.getKeyId());
 	}
 }

@@ -23,7 +23,7 @@
 
 #include "zbxjson.h"
 
-#include "checks_jmx.h"
+#include "checks_java.h"
 
 static int	parse_response(DC_ITEM *items, AGENT_RESULT *results, int *errcodes, zbx_timespec_t *timespecs, int num,
 			char *response, char *error, int max_error_len)
@@ -112,19 +112,20 @@ exit:
 	return ret;
 }
 
-int	get_value_jmx(DC_ITEM *item, AGENT_RESULT *result)
+int	get_value_java(unsigned char request, DC_ITEM *item, AGENT_RESULT *result)
 {
 	int		res;
 	zbx_timespec_t	ts;
 
-	get_values_jmx(item, result, &res, &ts, 1);
+	get_values_java(request, item, result, &res, &ts, 1);
 
 	return res;
 }
 
-void	get_values_jmx(DC_ITEM *items, AGENT_RESULT *results, int *errcodes, zbx_timespec_t *timespecs, int num)
+void	get_values_java(unsigned char request, DC_ITEM *items, AGENT_RESULT *results,
+		int *errcodes, zbx_timespec_t *timespecs, int num)
 {
-	const char	*__function_name = "get_values_jmx";
+	const char	*__function_name = "get_values_java";
 
 	zbx_sock_t	s;
 	struct zbx_json	json;
@@ -144,27 +145,36 @@ void	get_values_jmx(DC_ITEM *items, AGENT_RESULT *results, int *errcodes, zbx_ti
 		goto exit;
 	}
 
-	for (i = 1; i < num; i++)
+	if (ZBX_JAVA_PROXY_REQUEST_INTERNAL == request)
 	{
-		if (0 != strcmp(items[0].interface.addr, items[i].interface.addr) ||
-				items[0].interface.port != items[i].interface.port ||
-				0 != strcmp(items[0].username, items[i].username) ||
-				0 != strcmp(items[0].password, items[i].password))
-		{
-			err = PROXY_ERROR;
-			zbx_snprintf(error, sizeof(error), "Java poller received items with different connection parameters");
-			goto exit;
-		}
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_JAVA_PROXY_INTERNAL, ZBX_JSON_TYPE_STRING);
 	}
+	else if (ZBX_JAVA_PROXY_REQUEST_JMX == request)
+	{
+		for (i = 1; i < num; i++)
+		{
+			if (0 != strcmp(items[0].interface.addr, items[i].interface.addr) ||
+					items[0].interface.port != items[i].interface.port ||
+					0 != strcmp(items[0].username, items[i].username) ||
+					0 != strcmp(items[0].password, items[i].password))
+			{
+				err = PROXY_ERROR;
+				zbx_snprintf(error, sizeof(error), "Java poller received items with different connection parameters");
+				goto exit;
+			}
+		}
 
-	zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_JAVA_PROXY_JMX_ITEMS, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_JAVA_PROXY_JMX, ZBX_JSON_TYPE_STRING);
 
-	zbx_json_addstring(&json, ZBX_PROTO_TAG_CONN, items[0].interface.addr, ZBX_JSON_TYPE_STRING);
-	zbx_json_adduint64(&json, ZBX_PROTO_TAG_PORT, items[0].interface.port);
-	if ('\0' != items[0].username)
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_USERNAME, items[0].username, ZBX_JSON_TYPE_STRING);
-	if ('\0' != items[0].password)
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_PASSWORD, items[0].password, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_CONN, items[0].interface.addr, ZBX_JSON_TYPE_STRING);
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_PORT, items[0].interface.port);
+		if ('\0' != items[0].username)
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_USERNAME, items[0].username, ZBX_JSON_TYPE_STRING);
+		if ('\0' != items[0].password)
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_PASSWORD, items[0].password, ZBX_JSON_TYPE_STRING);
+	}
+	else
+		assert(0);
 
 	zbx_json_addarray(&json, ZBX_PROTO_TAG_KEYS);
 	for (i = 0; i < num; i++)

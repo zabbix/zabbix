@@ -41,8 +41,8 @@ abstract class ItemChecker
 	public static final String JSON_TAG_USERNAME = "username";
 	public static final String JSON_TAG_VALUE = "value";
 
-	public static final String JSON_REQUEST_INTERNAL = "java proxy internal items";
-	public static final String JSON_REQUEST_JMX = "java proxy jmx items";
+	public static final String JSON_REQUEST_INTERNAL = "java proxy internal";
+	public static final String JSON_REQUEST_JMX = "java proxy jmx";
 
 	public static final String JSON_RESPONSE_FAILED = "failed";
 	public static final String JSON_RESPONSE_SUCCESS = "success";
@@ -78,19 +78,22 @@ abstract class ItemChecker
 		return values;
 	}
 
-	protected JSONObject getJSONValue(ZabbixItem item)
+	protected final JSONObject getJSONValue(ZabbixItem item)
 	{
 		JSONObject value = new JSONObject();
 
 		try
 		{
+			logger.debug("getting value for item '{}'", item.getKey());
 			String text = getStringValue(item);
+			logger.debug("received value '{}' for item '{}'", text, item.getKey());
 			value.put(JSON_TAG_VALUE, text);
 		}
 		catch (Exception e1)
 		{
 			try
 			{
+				logger.debug("caught exception for item '{}'", item.getKey(), e1);
 				value.put(JSON_TAG_ERROR, e1.getMessage());
 			}
 			catch (JSONException e2)
