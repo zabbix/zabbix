@@ -113,10 +113,6 @@ class JMXItemChecker extends ItemChecker
 	@Override
 	protected String getStringValue(ZabbixItem item) throws Exception
 	{
-		String value;
-
-		logger.debug("getting value for item '{}'", item.getKey());
-
 		if (item.getKeyId().equals("jmx"))
 		{
 			if (2 != item.getArgumentCount())
@@ -136,7 +132,7 @@ class JMXItemChecker extends ItemChecker
 				attributeName = attributeName.substring(0, dot);
 			}
 
-			value = getPrimitiveAttributeValue(mbsc.getAttribute(objectName, attributeName), subAttributeNames);
+			return getPrimitiveAttributeValue(mbsc.getAttribute(objectName, attributeName), subAttributeNames);
 		}
 		else if (item.getKeyId().equals("jmx.discovery"))
 		{
@@ -175,13 +171,10 @@ class JMXItemChecker extends ItemChecker
 
 			JSONObject mapping = new JSONObject();
 			mapping.put(item.getKey(), counters);
-			value = mapping.toString(2);
+			return mapping.toString(2);
 		}
 		else
 			throw new ZabbixException("key ID '%s' is not supported", item.getKeyId());
-
-		logger.debug("returning value '{}' for item '{}'", value, item.getKey());
-		return value;
 	}
 
 	private String getPrimitiveAttributeValue(Object attribute, String subAttributeNames) throws ZabbixException

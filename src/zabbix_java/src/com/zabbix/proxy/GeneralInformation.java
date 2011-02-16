@@ -17,17 +17,12 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#ifndef ZABBIX_CHECKS_JMX_H
-#define ZABBIX_CHECKS_JMX_H
+package com.zabbix.proxy;
 
-#include "dbcache.h"
-#include "sysinfo.h"
-
-extern char	*CONFIG_SOURCE_IP;
-extern char	*CONFIG_JAVA_PROXY;
-extern int	CONFIG_JAVA_PROXY_PORT;
-
-int	get_value_jmx(DC_ITEM *item, AGENT_RESULT *result);
-void	get_values_jmx(DC_ITEM *items, AGENT_RESULT *results, int *errcodes, zbx_timespec_t *timespecs, int num);
-
-#endif
+class GeneralInformation
+{
+	public static final String APPLICATION_NAME = "Zabbix Java Proxy";
+	public static final String REVISION_DATE = "28 December 2010";
+	public static final String REVISION = "{ZABBIX_REVISION}";
+	public static final String VERSION = "1.9.2";
+}

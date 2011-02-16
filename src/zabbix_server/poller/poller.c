@@ -40,7 +40,7 @@
 #include "checks_ssh.h"
 #endif	/* HAVE_SSH2 */
 #include "checks_telnet.h"
-#include "checks_jmx.h"
+#include "checks_java.h"
 #include "checks_calculated.h"
 
 #define MAX_BUNCH_ITEMS	32
@@ -410,7 +410,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			break;
 		case ITEM_TYPE_JMX:
 			alarm(CONFIG_TIMEOUT);
-			res = get_value_jmx(item, result);
+			res = get_value_java(ZBX_JAVA_PROXY_REQUEST_JMX, item, result);
 			alarm(0);
 			break;
 		case ITEM_TYPE_CALCULATED:
@@ -601,7 +601,7 @@ static int	get_values()
 	else if (ZBX_POLLER_TYPE_JAVA == poller_type)
 	{
 		alarm(CONFIG_TIMEOUT);
-		get_values_jmx(items, results, errcodes, timespecs, num);
+		get_values_java(ZBX_JAVA_PROXY_REQUEST_JMX, items, results, errcodes, timespecs, num);
 		alarm(0);
 	}
 
