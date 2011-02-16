@@ -942,7 +942,7 @@ class CUserMacro extends CZBXAPI{
 		return $result;
 	}
 
-	public function resolveTrigger(&$triggers){
+	public function resolveTrigger($triggers){
 		$single = false;
 		if(isset($triggers['triggerid'])){
 			$single = true;
@@ -963,10 +963,11 @@ class CUserMacro extends CZBXAPI{
 		}
 
 		if($single) $triggers = reset($triggers);
+		return $triggers;
 	}
 
 
-	public function resolveItem(&$items){
+	public function resolveItem($items){
 		$single = false;
 		if(isset($items['itemid'])){
 			$single = true;
@@ -986,6 +987,8 @@ class CUserMacro extends CZBXAPI{
 		}
 
 		if($single) $items = $items[0];
+
+		return $items;
 	}
 }
 ?>

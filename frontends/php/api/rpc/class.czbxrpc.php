@@ -47,7 +47,9 @@ class czbxrpc{
 // Authentication {{{
 		if(!isset($without_auth[$method])){
 // compatibility mode
-			if(zbx_empty($sessionid) && (($resource != 'user') || ($action != 'login' && $action != 'authenticate'))){
+			if(($resource == 'user') && ($action == 'authenticate')) $action = 'login';
+
+			if(zbx_empty($sessionid) && (($resource != 'user') || ($action != 'login'))){
 				return array('error' => ZBX_API_ERROR_NO_AUTH, 'message' => 'Not authorized');
 			}
 			else if(!zbx_empty($sessionid)){

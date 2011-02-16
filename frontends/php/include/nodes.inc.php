@@ -124,7 +124,8 @@
 	function get_current_nodeid($forse_all_nodes = null, $perm = null){
 		global $USER_DETAILS, $ZBX_CURRENT_NODEID, $ZBX_AVAILABLE_NODES, $ZBX_VIEWED_NODES;
 		if(!isset($ZBX_CURRENT_NODEID)) {
-			init_nodes();
+			error('Nodes are not initialized!');
+// init_nodes();
 		}
 
 		if(!is_null($perm)){

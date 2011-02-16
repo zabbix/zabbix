@@ -518,10 +518,9 @@ COpt::memoryPick();
 				'periods_cnt'	=> 5
 			);
 
-			if(!check_db_fields($drule_db_fields, $check)){
-				$this->$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Wrong fields for check [ '.$check['checkid'].' ]');
-				return false;
-			}
+			if(!check_db_fields($drule_db_fields, $check))
+				throw new APIException(ZBX_API_ERROR_INTERNAL, 'Wrong fields for check [ '.$check['checkid'].' ]');
+
 			$checks[$check['checkid']] = $check;
 			$checkids[$check['checkid']] = $check['checkid'];
 		}
@@ -530,10 +529,8 @@ COpt::memoryPick();
 		$drules = $this->getget(array('druleids' => $druleid,  'output' => API_OUTPUT_EXTEND));
 		$drule = reset($drules);
 
-		if($drule['templateid'] != 0){
-			$this->$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Cannot edit templated drule : '.$drule['name']);
-			return false;
-		}
+		if($drule['templateid'] != 0)
+			throw new APIException(ZBX_API_ERROR_INTERNAL, 'Cannot edit templated drule : '.$drule['name']);
 
 		// check if drule belongs to template, if so, only checks from same template can be added
 		$tmp_hosts = get_hosts_by_druleid($druleid);
@@ -546,22 +543,15 @@ COpt::memoryPick();
 						' AND '.DBcondition('i.checkid', $checkids);
 
 			$host_count = DBfetch(DBselect($sql));
-			if ($host_count['count']){
-				$this->$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'You must use checks only from host : '.$host['host'].' for template drule : '.$drule['name']);
-				return false;
-			}
+			if($host_count['count'])
+				throw new APIException(ZBX_API_ERROR_INTERNAL, 'You must use checks only from host : '.$host['host'].' for template drule : '.$drule['name']);
+
 			$tpl_drule = true;
 		}
 
 		$result = $this->addchecks_rec($druleid, $checks, $tpl_drule);
 
-		if($result){
-			return $result;
-		}
-		else{
-			$this->$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);//'Internal Zabbix error');
-			return false;
-		}
+		return $result;
 	}
 
 // DEPRECATED
@@ -576,17 +566,17 @@ COpt::memoryPick();
 			$drule = $this->get(array('druleids' => $druleid,  'output' => API_OUTPUT_EXTEND));
 			$drule = reset($drule);
 
-			if($drule['templateid'] != 0){
-				$this->$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Cannot edit templated drule : '.$drule['name']);
-				return false;
-			}
+			if($drule['templateid'] != 0)
+				throw new APIException(ZBX_API_ERROR_INTERNAL, 'Cannot edit templated drule : '.$drule['name']);
+
 		}
 
 		$chd_drules = get_drules_by_templateid($druleid);
 		while($chd_drule = DBfetch($chd_drules)){
 			$check_list['druleid'] = $chd_drule['druleid'];
 			$result = $this->deletechecks($check_list, true);
-			if(!$result) return false;
+			if(!$result)
+				throw new APIException(ZBX_API_ERROR_INTERNAL, 'Cannot delete check');
 		}
 
 

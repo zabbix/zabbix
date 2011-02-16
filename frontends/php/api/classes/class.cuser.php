@@ -922,10 +922,6 @@ Copt::memoryPick();
 	return true;
 	}
 
-	public function authenticate($user){
-		$userData = $this->login($user);
-		return $userData['sessionid'];
-	}
 /**
  * Login user
  *
@@ -1028,7 +1024,9 @@ Copt::memoryPick();
 		if($userInfo['attempt_failed'])
 			DBexecute('UPDATE users SET attempt_failed=0 WHERE userid='.$userInfo['userid']);
 
-		return $userData;
+		self::$userData = $userData;
+
+	return isset($user['userData']) ? $userData : $userData['sessionid'];
 	}
 
 /**
