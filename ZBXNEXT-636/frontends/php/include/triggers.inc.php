@@ -1951,13 +1951,11 @@ function utf8RawUrlDecode($source){
 
 
 		$css = getUserTheme($USER_DETAILS);
-		$vTextColor = ($css == 'css_od.css')?'&color=white':'';
-
 		if($view_style == STYLE_TOP){
 			$header = array(new CCol(S_TRIGGERS,'center'));
 
 			foreach($hosts as $hostname){
-				$header = array_merge($header,array(new CCol(array(new CImg('vtext.php?text='.$hostname.$vTextColor)), 'hosts')));
+				$header = array_merge($header,array(new CCol(array(new CImg('vtext.php?text='.$hostname.'&theme='.$css)), 'hosts')));
 			}
 			$table->setHeader($header,'vertical_header');
 
@@ -1972,7 +1970,7 @@ function utf8RawUrlDecode($source){
 		else{
 			$header=array(new CCol(S_HOSTS,'center'));
 			foreach($triggers as $descr => $trhosts){
-				$descr = array(new CImg('vtext.php?text='.$descr.$vTextColor));
+				$descr = array(new CImg('vtext.php?text='.$descr.'&theme='.$css));
 				array_push($header,$descr);
 			}
 			$table->setHeader($header,'vertical_header');
