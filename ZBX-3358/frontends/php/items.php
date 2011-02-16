@@ -780,7 +780,7 @@ switch($itemType) {
 <?php
 	$items_wdgt = new CWidget();
 
-	$form = new CForm(null, 'get');
+	$form = new CForm('get');
 	$form->setName('hdrform');
 	if(!isset($_REQUEST['form']))
 		$form->addVar('form_hostid', $hostid);
@@ -1026,7 +1026,7 @@ switch($itemType) {
 
 			if(!empty($item['discoveryRule'])){
 				$description[] = new CLink($item['discoveryRule']['description'], 'disc_prototypes.php?parent_discoveryid='.
-					$item['discoveryRule']['itemid'], 'discoveryName');
+					$item['discoveryRule']['itemid'], 'gold');
 				$description[] = ':'.$item['description_expanded'];
 			}
 			else{
@@ -1038,10 +1038,10 @@ switch($itemType) {
 
 
 			if(zbx_empty($item['error'])){
-				$error = new CDiv(SPACE, 'iconok');
+				$error = new CDiv(SPACE, 'status_icon iconok');
 			}
 			else{
-				$error = new CDiv(SPACE, 'iconerror');
+				$error = new CDiv(SPACE, 'status_icon iconerror');
 				$error->setHint($item['error'], '', 'on');
 			}
 
@@ -1126,7 +1126,7 @@ switch($itemType) {
 			}
 //-------
 			//if item type is 'Log' we must show log menu
-			if($item['value_type'] == ITEM_VALUE_TYPE_LOG || $item['value_type'] == ITEM_VALUE_TYPE_STR || $item['value_type'] == ITEM_VALUE_TYPE_TEXT){
+			if(in_array($item['value_type'],array(ITEM_VALUE_TYPE_LOG,ITEM_VALUE_TYPE_STR,ITEM_VALUE_TYPE_TEXT))){
 
 				$triggers_flag = false;
 				$triggers="Array('".S_EDIT_TRIGGER."',null,null,{'outer' : 'pum_o_submenu','inner' : ['pum_i_submenu']}\n";

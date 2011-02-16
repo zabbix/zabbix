@@ -1,6 +1,6 @@
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -145,7 +145,7 @@ void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, s
 		entry->next = hs->slots[slot];
 		hs->slots[slot] = entry;
 		hs->num_data++;
-		
+
 		if (hs->num_data >= hs->num_slots * CRIT_LOAD_FACTOR)
 		{
 			int			inc_slots, new_slot;

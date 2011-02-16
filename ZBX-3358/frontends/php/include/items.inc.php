@@ -628,7 +628,7 @@
 // kostilek //
 	function get_realrule_by_itemid_and_hostid($itemid, $hostid){
 		$item = get_item_by_itemid($itemid);
-		if($hostid == $item['hostid'])
+		if(bccomp($hostid,$item['hostid']) == 0)
 			return $item['itemid'];
 
 		if($item['templateid'] <> 0)

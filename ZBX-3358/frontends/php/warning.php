@@ -70,10 +70,7 @@ unset($USER_DETAILS);
 	$msg = new CSpan(bold(SPACE.$warning_msg));
 	$msg->setAttribute('style','line-height: 20px; vertical-align: top;');
 
-	$table->addRow(new CCol(array(
-						$img,
-						$msg),
-						'center'));
+	$table->addRow(new CCol(array($img, $msg),'center'));
 	$table->addRow(SPACE);
 
 	$table->setFooter(new CCol(new CButton('retry',S_RETRY,'javascript: document.location.reload();'),'left'),'footer');

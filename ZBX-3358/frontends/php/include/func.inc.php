@@ -557,6 +557,51 @@ function zbx_is_int($var){
 return preg_match("/^\-?\d{1,20}+$/", $var);
 }
 
+function zbx_array_diff($array1, $array2, $field){
+
+	$fields1 = zbx_objectValues($array1, $field);
+	$fields2 = zbx_objectValues($array2, $field);
+
+	$first = array_diff($fields1, $fields2);
+	$first = zbx_toHash($first);
+
+	$second = array_diff($fields2, $fields1);
+	$second = zbx_toHash($second);
+
+	$result = array(
+		'first' => array(),
+		'second' => array(),
+		'both' => array()
+	);
+
+	foreach($array1 as $array){
+		if(!isset($array[$field]))
+			$result['first'][] = $array;
+		else if(isset($first[$array[$field]]))
+			$result['first'][] = $array;
+		else
+			$result['both'][$array[$field]] = $array;
+	}
+
+	foreach($array2 as $array){
+		if(!isset($array[$field]))
+			$result['second'][] = $array;
+		else if(isset($second[$array[$field]]))
+			$result['second'][] = $array;
+		else
+			$result['both'][$array[$field]] = $array;
+	}
+
+	return $result;
+}
+
+function zbx_array_push(&$array, $add){
+	foreach($array as $key => $value){
+		foreach($add as $newKey => $newValue){
+			$array[$key][$newKey] = $newValue;
+		}
+	}
+}
 
 // STRING FUNCTIONS {{{
 if(!function_exists('zbx_stripslashes')){
@@ -809,13 +854,12 @@ function sortSub($data, $sortorder){
 	$keys = array_keys($data);
 	natcasesort($keys);
 
-
 	if($sortorder != ZBX_SORT_UP)
 		$keys = array_reverse($keys);
 
 	foreach($keys as $key){
 		$tst = reset($data[$key]);
-		if(isset($tst[0]) && !is_array($tst[0])){
+		if(is_array($tst) && isset($tst[0]) && !is_array($tst[0])){
 			$data[$key] = sortSub($data[$key], $sortorder);
 		}
 
