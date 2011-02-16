@@ -22,9 +22,9 @@
 #include "zlog.h"
 #include "db.h"
 #include "dbcache.h"
-#include "sysinfo.h"
 #include "daemon.h"
 #include "zbxserver.h"
+#include "zbxself.h"
 
 #include "poller.h"
 
@@ -46,8 +46,7 @@
 #define MAX_UNREACHABLE_ITEMS	1	/* must not be greater than MAX_REACHABLE_ITEMS to avoid buffer overflow */
 
 static unsigned char	zbx_process;
-static int		poller_type;
-static int		poller_num;
+extern int		process_num;
 
 static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 {
@@ -441,7 +440,7 @@ static void	deactivate_host(DC_ITEM *item, int now, const char *error)
  * Comments: always SUCCEED                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	get_values()
+static int	get_values(unsigned char poller_type)
 {
 	const char	*__function_name = "get_values";
 	DC_ITEM		items[MAX_REACHABLE_ITEMS];
@@ -694,22 +693,16 @@ static int	get_values()
 	return num;
 }
 
-void	main_poller_loop(unsigned char p, int type, int num)
+void	main_poller_loop(unsigned char p, unsigned char poller_type)
 {
-	struct	sigaction phan;
-	int	sleeptime, processed;
-	double	sec;
+	int		sleeptime, processed;
+	double		sec;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In main_poller_loop() poller_type:%d poller_num:%d", type, num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In main_poller_loop() poller_type:%d process_num:%d", (int)poller_type, process_num);
 
-	phan.sa_sigaction = child_signal_handler;
-	sigemptyset(&phan.sa_mask);
-	phan.sa_flags = SA_SIGINFO;
-	sigaction(SIGALRM, &phan, NULL);
+	set_child_signal_handler();
 
 	zbx_process = p;
-	poller_type = type;
-	poller_num = num - 1;
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
@@ -718,20 +711,22 @@ void	main_poller_loop(unsigned char p, int type, int num)
 		zbx_setproctitle("%s [getting values]", zbx_poller_type_string(poller_type));
 
 		sec = zbx_time();
-		processed = get_values();
+		processed = get_values(poller_type);
 		sec = zbx_time() - sec;
 
 		sleeptime = DCconfig_get_poller_sleeptime(poller_type);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while updating %d values."
 				" Sleeping for %d seconds",
-				zbx_poller_type_string(poller_type), poller_num, sec, processed, sleeptime);
+				zbx_poller_type_string(poller_type), process_num, sec, processed, sleeptime);
 
 		if (sleeptime > 0)
 		{
 			zbx_setproctitle("%s [sleeping for %d seconds]",
 					zbx_poller_type_string(poller_type), sleeptime);
+			update_sm_counter(ZBX_STATE_IDLE);
 			sleep(sleeptime);
+			update_sm_counter(ZBX_STATE_BUSY);
 		}
 	}
 }

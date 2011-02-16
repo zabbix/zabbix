@@ -93,14 +93,9 @@ exit:
  ******************************************************************************/
 void	main_proxyconfig_loop()
 {
-	struct sigaction	phan;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_proxyconfig_loop()");
 
-	phan.sa_sigaction = child_signal_handler;
-	sigemptyset(&phan.sa_mask);
-	phan.sa_flags = SA_SIGINFO;
-	sigaction(SIGALRM, &phan, NULL);
+	set_child_signal_handler();
 
 	zbx_setproctitle("configuration syncer [connecting to the database]]");
 

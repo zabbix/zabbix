@@ -20,6 +20,7 @@
 #include "common.h"
 #include "daemon.h"
 #include "comms.h"
+#include "zbxself.h"
 
 #include "proxypoller.h"
 #include "dbcache.h"
@@ -27,6 +28,8 @@
 #include "zbxjson.h"
 #include "log.h"
 #include "proxy.h"
+
+extern int	process_num;
 
 static int	connect_to_proxy(DC_HOST *host, zbx_sock_t *sock, int timeout)
 {
@@ -321,17 +324,13 @@ exit:
 
 void	main_proxypoller_loop()
 {
-	const char		*__function_name = "main_proxypoller_loop";
-	struct sigaction	phan;
-	int			nextcheck, sleeptime, processed;
-	double			sec;
+	const char	*__function_name = "main_proxypoller_loop";
+	int		nextcheck, sleeptime, processed;
+	double		sec;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	phan.sa_sigaction = child_signal_handler;
-	sigemptyset(&phan.sa_mask);
-	phan.sa_flags = SA_SIGINFO;
-	sigaction(SIGALRM, &phan, NULL);
+	set_child_signal_handler();
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
@@ -350,19 +349,21 @@ void	main_proxypoller_loop()
 			sleeptime = nextcheck - time(NULL);
 			if (sleeptime < 0)
 				sleeptime = 0;
-			if (sleeptime > POLLER_DELAY)
+			else if (sleeptime > POLLER_DELAY)
 				sleeptime = POLLER_DELAY;
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Poller spent " ZBX_FS_DBL
+		zabbix_log(LOG_LEVEL_DEBUG, "Proxy poller #%d spent " ZBX_FS_DBL
 				" seconds while processing %3d proxies."
 				" Sleeping for %d seconds",
-				sec, processed, sleeptime);
+				process_num, sec, processed, sleeptime);
 
 		if (sleeptime > 0)
 		{
 			zbx_setproctitle("proxy poller [sleeping for %d seconds]", sleeptime);
+			update_sm_counter(ZBX_STATE_IDLE);
 			sleep(sleeptime);
+			update_sm_counter(ZBX_STATE_IDLE);
 		}
 	}
 }

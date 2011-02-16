@@ -1500,7 +1500,7 @@ int	is_uint64(const char *str, zbx_uint64_t *value)
  ******************************************************************************/
 int	is_ushort(const char *str, unsigned short *value)
 {
-	register unsigned short	max_ushort = 0xFFFF;
+	register unsigned short	max_ushort = 0xffff;
 	register unsigned short	value_ushort = 0, c;
 
 	if ('\0' == *str)

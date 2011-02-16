@@ -24,6 +24,6 @@
 
 extern	int	CONFIG_DISCOVERER_FORKS;
 
-void	main_discoverer_loop(unsigned char p, int num);
+void	main_discoverer_loop(unsigned char p);
 
 #endif

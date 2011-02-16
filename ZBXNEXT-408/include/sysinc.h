@@ -109,6 +109,10 @@
 #	include <sys/time.h>
 #endif
 
+#ifdef HAVE_SYS_TIMES_H
+#	include <sys/times.h>
+#endif
+
 #ifdef HAVE_LINUX_KERNEL_H
 #	include <linux/kernel.h>
 #endif

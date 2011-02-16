@@ -21,7 +21,6 @@
 #include "stats.h"
 
 #include "log.h"
-#include "mutexs.h"
 #include "zbxconf.h"
 
 #include "interfaces.h"

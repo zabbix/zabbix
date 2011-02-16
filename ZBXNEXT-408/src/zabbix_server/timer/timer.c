@@ -27,6 +27,7 @@
 #include "dbcache.h"
 #include "zlog.h"
 #include "zbxserver.h"
+#include "zbxself.h"
 
 #include "timer.h"
 
@@ -777,8 +778,8 @@ void	main_timer_loop()
 		maintenance = (0 == (nextcheck % 60)) ? 1 : 0;
 
 		zbx_setproctitle("timer [sleeping for %d seconds]", sleeptime);
+		update_sm_counter(ZBX_STATE_IDLE);
 		sleep(sleeptime);
+		update_sm_counter(ZBX_STATE_BUSY);
 	}
-
-	DBclose();
 }

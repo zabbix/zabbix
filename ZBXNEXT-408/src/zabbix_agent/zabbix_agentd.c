@@ -25,7 +25,6 @@
 #include "zbxconf.h"
 #include "zbxgetopt.h"
 #include "comms.h"
-#include "mutexs.h"
 #include "alias.h"
 
 #include "stats.h"

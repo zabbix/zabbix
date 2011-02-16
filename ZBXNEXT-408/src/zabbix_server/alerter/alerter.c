@@ -26,6 +26,7 @@
 #include "daemon.h"
 #include "zbxmedia.h"
 #include "zbxserver.h"
+#include "zbxself.h"
 
 #include "alerter.h"
 
@@ -149,16 +150,12 @@ int	main_alerter_loop()
 {
 	char			error[MAX_STRING_LEN], *error_esc;
 	int			res, now;
-	struct	sigaction	phan;
 	DB_RESULT		result;
 	DB_ROW			row;
 	DB_ALERT		alert;
 	DB_MEDIATYPE		mediatype;
 
-        phan.sa_sigaction = child_signal_handler;
-	sigemptyset(&phan.sa_mask);
-	phan.sa_flags = SA_SIGINFO;
-	sigaction(SIGALRM, &phan, NULL);
+	set_child_signal_handler();
 
 	zbx_setproctitle("connecting to the database");
 
@@ -245,7 +242,9 @@ int	main_alerter_loop()
 		zbx_setproctitle("sender [sleeping for %d seconds]",
 				CONFIG_SENDER_FREQUENCY);
 
+		update_sm_counter(ZBX_STATE_IDLE);
 		sleep(CONFIG_SENDER_FREQUENCY);
+		update_sm_counter(ZBX_STATE_BUSY);
 	}
 
 	/* Never reached */

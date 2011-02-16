@@ -77,15 +77,11 @@ static void	send_heartbeat()
  ******************************************************************************/
 void main_heart_loop()
 {
-	struct	sigaction phan;
 	int	start, sleeptime;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_heart_loop()");
 
-        phan.sa_sigaction = child_signal_handler;
-	sigemptyset(&phan.sa_mask);
-	phan.sa_flags = SA_SIGINFO;
-	sigaction(SIGALRM, &phan, NULL);
+	set_child_signal_handler();
 
 	if (CONFIG_HEARTBEAT_FREQUENCY == 0) {
 		zbx_setproctitle("heartbeat sender [do nothing]");

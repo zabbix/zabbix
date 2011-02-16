@@ -1,6 +1,6 @@
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,22 +17,9 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#ifndef ZABBIX_IPC_H
-#define ZABBIX_IPC_H
+#ifndef ZABBIX_SELFSTATS_H
+#define ZABBIX_SELFSTATS_H
 
-#if defined(_WINDOWS)
-#	error "This module allowed only for Unix OS"
-#endif /* _WINDOWS */
-
-#define ZBX_IPC_CONFIG_ID	'g'
-#define ZBX_IPC_HISTORY_ID	'h'
-#define ZBX_IPC_HISTORY_TEXT_ID	'x'
-#define ZBX_IPC_TREND_ID	't'
-#define ZBX_IPC_STRPOOL_ID	's'
-#define ZBX_IPC_COLLECTOR_ID	'l'
-#define ZBX_IPC_SELF_STATS_ID	'S'
-
-key_t	zbx_ftok(char *path, int id);
-int	zbx_shmget(key_t key, size_t size);
+void	main_selfstats_loop();
 
 #endif

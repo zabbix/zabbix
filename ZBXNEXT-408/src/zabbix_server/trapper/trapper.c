@@ -28,6 +28,7 @@
 #include "zbxserver.h"
 #include "dbcache.h"
 #include "proxy.h"
+#include "zbxself.h"
 
 #include "../nodewatcher/nodecomms.h"
 #include "../nodewatcher/nodesender.h"
@@ -416,16 +417,11 @@ static void	process_trapper_child(zbx_sock_t *sock)
 
 void	child_trapper_main(unsigned char p, zbx_sock_t *s)
 {
-	const char		*__function_name = "child_trapper_main";
-
-	struct sigaction	phan;
+	const char	*__function_name = "child_trapper_main";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	phan.sa_sigaction = child_signal_handler;
-	sigemptyset(&phan.sa_mask);
-	phan.sa_flags = SA_SIGINFO;
-	sigaction(SIGALRM, &phan, NULL);
+	set_child_signal_handler();
 
 	zbx_process = p;
 
@@ -435,8 +431,12 @@ void	child_trapper_main(unsigned char p, zbx_sock_t *s)
 	{
 		zbx_setproctitle("trapper [waiting for connection]");
 
+		update_sm_counter(ZBX_STATE_IDLE);
+
 		if (SUCCEED == zbx_tcp_accept(s))
 		{
+			update_sm_counter(ZBX_STATE_BUSY);
+
 			zbx_setproctitle("trapper [processing data]");
 
 			process_trapper_child(s);
@@ -446,5 +446,4 @@ void	child_trapper_main(unsigned char p, zbx_sock_t *s)
 		else
 			zabbix_log(LOG_LEVEL_WARNING, "Trapper failed to accept connection");
 	}
-	DBclose();
 }

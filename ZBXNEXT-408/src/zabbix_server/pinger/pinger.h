@@ -22,8 +22,6 @@
 
 #include "common.h"
 
-extern int	CONFIG_PINGER_FORKS;
-
-void	main_pinger_loop(int num);
+void	main_pinger_loop();
 
 #endif

@@ -1068,17 +1068,11 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 {
 	ZBX_THREAD_ACTIVECHK_ARGS activechk_args;
 
-#if defined(ZABBIX_DAEMON)
-	struct	sigaction phan;
-#endif /* ZABBIX_DAEMON */
 	int	nextcheck = 0, nextrefresh = 0, nextsend = 0;
 	char	*p = NULL;
 
 #if defined(ZABBIX_DAEMON)
-	phan.sa_sigaction = child_signal_handler;
-	sigemptyset(&phan.sa_mask);
-	phan.sa_flags = SA_SIGINFO;
-	sigaction(SIGALRM, &phan, NULL);
+	set_child_signal_handler();
 #endif /* ZABBIX_DAEMON */
 
 	activechk_args.host = strdup(((ZBX_THREAD_ACTIVECHK_ARGS *)args)->host);

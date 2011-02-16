@@ -501,7 +501,7 @@ clean:
  * Comments: always SUCCEED                                                   *
  *                                                                            *
  ******************************************************************************/
-void	process_httptests(int now)
+void	process_httptests(int poller_num, int now)
 {
 	const char	*__function_name = "process_httptests";
 
@@ -525,7 +525,7 @@ void	process_httptests(int now)
 				" and (h.maintenance_status=%d or h.maintenance_type=%d)"
 				DB_NODE,
 			now,
-			CONFIG_HTTPPOLLER_FORKS, httppoller_num - 1,
+			CONFIG_HTTPPOLLER_FORKS, poller_num - 1,
 			HTTPTEST_STATUS_MONITORED,
 			HOST_STATUS_MONITORED,
 			HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL,

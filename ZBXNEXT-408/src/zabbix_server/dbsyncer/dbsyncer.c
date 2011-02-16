@@ -22,12 +22,14 @@
 #include "db.h"
 #include "log.h"
 #include "zlog.h"
-#include "threads.h"
+#include "zbxself.h"
 
 #include "dbcache.h"
 #include "dbsyncer.h"
 
 extern int	ZBX_SYNC_MAX;
+extern int	process_num;
+
 /******************************************************************************
  *                                                                            *
  * Function: main_dbsyncer_loop                                               *
@@ -43,7 +45,7 @@ extern int	ZBX_SYNC_MAX;
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-int main_dbsyncer_loop()
+int	main_dbsyncer_loop()
 {
 	int	now, sleeptime, last_sleeptime = -1, num;
 	double	sec;
@@ -55,7 +57,8 @@ int main_dbsyncer_loop()
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	for (;;) {
+	for (;;)
+	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Syncing ...");
 
 		now = time(NULL);
@@ -103,17 +106,17 @@ int main_dbsyncer_loop()
 
 		last_sleeptime = sleeptime;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "DB syncer spent " ZBX_FS_DBL " second while processing %d items. "
+		zabbix_log(LOG_LEVEL_DEBUG, "DB syncer #%d spent " ZBX_FS_DBL " second while processing %d items. "
 				"Nextsync after %d sec.",
-				sec,
-				num,
-				sleeptime);
+				process_num, sec, num, sleeptime);
 
-		if (sleeptime > 0) {
-			zbx_setproctitle("db syncer [sleeping for %d seconds]",
-					sleeptime);
+		if (sleeptime > 0)
+		{
+			zbx_setproctitle("db syncer [sleeping for %d seconds]", sleeptime);
 
+			update_sm_counter(ZBX_STATE_IDLE);
 			sleep(sleeptime);
+			update_sm_counter(ZBX_STATE_BUSY);
 		}
 	}
 	DBclose();

@@ -22,6 +22,6 @@
 
 #include "db.h"
 
-int main_escalator_loop();
+int	main_escalator_loop();
 
 #endif

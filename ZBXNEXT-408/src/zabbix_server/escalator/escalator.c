@@ -23,6 +23,7 @@
 #include "zlog.h"
 #include "daemon.h"
 #include "zbxserver.h"
+#include "zbxself.h"
 
 #include "escalator.h"
 #include "../operations.h"
@@ -40,6 +41,8 @@ typedef struct
 	void		*next;
 }
 ZBX_USER_MSG;
+
+extern int	process_num;
 
 /******************************************************************************
  *                                                                            *
@@ -991,16 +994,12 @@ static void	process_escalations(int now)
  ******************************************************************************/
 int	main_escalator_loop()
 {
-	int			now;
-	double			sec;
-	struct sigaction	phan;
+	int	now;
+	double	sec;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_escalator_loop()");
 
-        phan.sa_sigaction = child_signal_handler;
-	sigemptyset(&phan.sa_mask);
-	phan.sa_flags = SA_SIGINFO;
-	sigaction(SIGALRM, &phan, NULL);
+	set_child_signal_handler();
 
 	zbx_setproctitle("escalator [connecting to the database]");
 
@@ -1017,15 +1016,15 @@ int	main_escalator_loop()
 
 		sec = zbx_time() - sec;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Escalator spent " ZBX_FS_DBL " seconds while processing escalation items."
-				" Nextcheck after %d sec.",
-				sec,
-				CONFIG_ESCALATOR_FREQUENCY);
+		zabbix_log(LOG_LEVEL_DEBUG, "Escalator #%d spent " ZBX_FS_DBL " seconds while processing"
+				" escalation items. Sleeping for %d seconds",
+				process_num, sec, CONFIG_ESCALATOR_FREQUENCY);
 
-		zbx_setproctitle("escalator [sleeping for %d seconds]",
-				CONFIG_ESCALATOR_FREQUENCY);
+		zbx_setproctitle("escalator [sleeping for %d seconds]", CONFIG_ESCALATOR_FREQUENCY);
 
+		update_sm_counter(ZBX_STATE_IDLE);
 		sleep(CONFIG_ESCALATOR_FREQUENCY);
+		update_sm_counter(ZBX_STATE_IDLE);
 	}
 
 	/* Never reached */

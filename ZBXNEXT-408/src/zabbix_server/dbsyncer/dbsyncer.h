@@ -24,6 +24,6 @@
 
 extern int CONFIG_DBSYNCER_FREQUENCY;
 
-int main_dbsyncer_loop();
+int	main_dbsyncer_loop();
 
 #endif

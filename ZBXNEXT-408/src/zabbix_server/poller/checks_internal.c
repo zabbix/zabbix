@@ -21,6 +21,7 @@
 #include "checks_internal.h"
 #include "log.h"
 #include "dbcache.h"
+#include "zbxself.h"
 
 /******************************************************************************
  *                                                                            *
@@ -190,6 +191,80 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 		SET_UI64_RESULT(result, i);
 	}
+	/* zabbix[<process_type>,<process_num>,<state>] */
+	else if (0 == strcmp(tmp, "poller") || 0 == strcmp(tmp, "unreachable poller") ||
+			0 == strcmp(tmp, "ipmi poller") || 0 == strcmp(tmp, "pinger") ||
+			0 == strcmp(tmp, "http poller") || 0 == strcmp(tmp, "trapper") ||
+			0 == strcmp(tmp, "proxy poller") || 0 == strcmp(tmp, "escalator") ||
+			0 == strcmp(tmp, "dbsyncer") || 0 == strcmp(tmp, "discoverer") ||
+			0 == strcmp(tmp, "alerter") || 0 == strcmp(tmp, "timer"))
+	{
+		unsigned char	process_type, state;
+		int		process_num;
+		double		value;
+
+		if (nparams > 3)
+			goto not_supported;
+
+		if (0 == strcmp(tmp, "poller"))
+			process_type = ZBX_PROCESS_TYPE_POLLER;
+		else if (0 == strcmp(tmp, "unreachable poller"))
+			process_type = ZBX_PROCESS_TYPE_UNREACHABLE;
+		else if (0 == strcmp(tmp, "ipmi poller"))
+			process_type = ZBX_PROCESS_TYPE_IPMI;
+		else if (0 == strcmp(tmp, "pinger"))
+			process_type = ZBX_PROCESS_TYPE_PINGER;
+		else if (0 == strcmp(tmp, "http poller"))
+			process_type = ZBX_PROCESS_TYPE_HTTP;
+		else if (0 == strcmp(tmp, "trapper"))
+			process_type = ZBX_PROCESS_TYPE_TRAPPER;
+		else if (0 == strcmp(tmp, "proxy poller"))
+			process_type = ZBX_PROCESS_TYPE_PROXYPOLLER;
+		else if (0 == strcmp(tmp, "escalator"))
+			process_type = ZBX_PROCESS_TYPE_ESCALATOR;
+		else if (0 == strcmp(tmp, "dbsyncer"))
+			process_type = ZBX_PROCESS_TYPE_DBSYNCER;
+		else if (0 == strcmp(tmp, "discoverer"))
+			process_type = ZBX_PROCESS_TYPE_DISCOVERER;
+		else if (0 == strcmp(tmp, "alerter"))
+			process_type = ZBX_PROCESS_TYPE_ALERTER;
+		else if (0 == strcmp(tmp, "timer"))
+			process_type = ZBX_PROCESS_TYPE_TIMER;
+		else
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			goto not_supported;
+		}
+
+		if (0 != get_param(params, 2, tmp, sizeof(tmp)))
+			*tmp = '\0';
+
+		if ('\0' == *tmp || 0 == strcmp(tmp, "all"))
+		{
+			process_num = 0;	/* all processes */
+		}
+		else
+		{
+			process_num = atoi(tmp);
+			if (0 >= process_num || process_num > get_process_forks(process_type))
+				goto not_supported;
+		}
+
+		if (0 != get_param(params, 3, tmp, sizeof(tmp)))
+			*tmp = '\0';
+
+		if ('\0' == *tmp || 0 == strcmp(tmp, "busy"))
+			state = ZBX_STATE_BUSY;
+		else if (0 == strcmp(tmp, "idle"))
+			state = ZBX_STATE_IDLE;
+		else
+			goto not_supported;
+
+		if (NOTSUPPORTED == get_selfstats(process_type, process_num, state, &value))
+			goto not_supported;
+
+		SET_DBL_RESULT(result, value);
+	}
 	else if (0 == strcmp(tmp, "wcache"))
 	{
 		if (nparams > 3)
@@ -293,7 +368,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	return SUCCEED;
 not_supported:
 	if (NULL == error)
-		error = zbx_dsprintf(error, "Internal check is not supported");
+		error = zbx_strdup(error, "Internal check is not supported");
 
 	SET_MSG_RESULT(result, error);
 
