@@ -82,7 +82,7 @@ function DBsave_tables($tables)
 
 /**
  * Restores data from temporary tables. DBsave_tables() must be called first.
- * The tables should be ordered so that referenced tables comes after main ones.
+ * The tables should be ordered so that referenced tables come after main ones.
  * For example: DBrestore_tables(array('users','users_groups','media'))
  */
 function DBrestore_tables($tables)
