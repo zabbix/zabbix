@@ -32,7 +32,18 @@ public class JavaProxy
 
 	public static void main(String[] args)
 	{
-		logger.info("Zabbix Java Proxy has started");
+		if (1 == args.length && (args[0].equals("-V") || args[0].equals("--version")))
+		{
+			GeneralInformation.printVersion();
+			System.exit(0);
+		}
+		else if (0 != args.length)
+		{
+			System.out.println("unsupported command line options");
+			System.exit(1);
+		}
+
+		logger.info("Zabbix Java Proxy {} (revision {}) has started", GeneralInformation.VERSION, GeneralInformation.REVISION);
 
 		try
 		{
@@ -62,6 +73,6 @@ public class JavaProxy
 			logger.error("caught fatal exception", e);
 		}
 
-		logger.info("Zabbix Java Proxy has stopped");
+		logger.info("Zabbix Java Proxy {} (revision {}) has stopped", GeneralInformation.VERSION, GeneralInformation.REVISION);
 	}
 }
