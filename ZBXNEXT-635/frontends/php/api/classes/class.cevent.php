@@ -46,12 +46,11 @@ class CEvent extends CZBXAPI{
  * @return array|int item data as array or false if error
  */
 	public function get($options=array()){
-		global $USER_DETAILS;
 
 		$result = array();
 		$nodeCheck = array();
-		$user_type = $USER_DETAILS['type'];
-		$userid = $USER_DETAILS['userid'];
+		$user_type = self::$userData['type'];
+		$userid = self::$userData['userid'];
 
 		$sort_columns = array('eventid', 'object', 'clock'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
@@ -697,7 +696,7 @@ Copt::memoryPick();
 	}
 
 	public function acknowledge($data){
-		global $USER_DETAILS;
+
 
 		$eventids = isset($data['eventids']) ? zbx_toArray($data['eventids']) : array();
 		$eventids = zbx_toHash($eventids);
@@ -766,7 +765,7 @@ Copt::memoryPick();
 			$dataInsert = array();
 			foreach($eventids as $enum => $eventid){
 				$dataInsert[] = array(
-					'userid' => $USER_DETAILS['userid'],
+					'userid' => self::$userData['userid'],
 					'eventid' => $eventid,
 					'clock' => $time,
 					'message'=> $data['message']

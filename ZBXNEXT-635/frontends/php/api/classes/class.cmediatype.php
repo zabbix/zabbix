@@ -43,12 +43,11 @@ class CMediatype extends CZBXAPI{
  * @return array
  */
 	public function get($options=array()){
-		global $USER_DETAILS;
 
 		$result = array();
 		$nodeCheck = false;
-		$user_type = $USER_DETAILS['type'];
-		$userid = $USER_DETAILS['userid'];
+		$user_type = self::$userData['type'];
+		$userid = self::$userData['userid'];
 
 		$sort_columns = array('mediatypeid'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
@@ -91,9 +90,9 @@ class CMediatype extends CZBXAPI{
 // PERMISSION CHECK
 		if(USER_TYPE_SUPER_ADMIN == $user_type){
 		}
-		else if(is_null($options['editable']) && ($USER_DETAILS['type'] == USER_TYPE_ZABBIX_ADMIN)){
+		else if(is_null($options['editable']) && (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN)){
 		}
-		else if(!is_null($options['editable']) || ($USER_DETAILS['type']!=USER_TYPE_SUPER_ADMIN)){
+		else if(!is_null($options['editable']) || (self::$userData['type']!=USER_TYPE_SUPER_ADMIN)){
 			return array();
 		}
 
@@ -313,9 +312,9 @@ Copt::memoryPick();
  * @return array|boolean
  */
 	public function create($mediatypes){
-		global $USER_DETAILS;
 
-			if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
+
+			if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_CREATE_MEDIATYPES);
 			}
 
@@ -366,9 +365,9 @@ Copt::memoryPick();
  * @return boolean
  */
 	public function update($mediatypes){
-		global $USER_DETAILS;
 
-			if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
+
+			if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
 			}
 			$mediatypes = zbx_toArray($mediatypes);
@@ -427,9 +426,9 @@ Copt::memoryPick();
  * @return boolean
  */
 	public function delete($mediatypeids){
-		global $USER_DETAILS;
 
-		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
+
+		if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
 			self::exception(ZBX_API_ERROR_PERMISSIONS, S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_DELETE_MEDIATYPES);
 		}
 

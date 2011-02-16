@@ -41,10 +41,9 @@ class CTemplateScreen extends CScreen{
  * @return array|boolean Host data as array or false if error
  */
 	public function get($options=array()){
-		global $USER_DETAILS;
 
 		$result = array();
-		$user_type = $USER_DETAILS['type'];
+		$user_type = self::$userData['type'];
 
 		$sort_columns = array('screenid', 'name'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
@@ -136,7 +135,7 @@ class CTemplateScreen extends CScreen{
 				$sql_parts['where'][] = 'hg.hostid=s.templateid';
 				$sql_parts['where'][] = 'r.id=hg.groupid ';
 				$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
-				$sql_parts['where'][] = 'ug.userid='.$USER_DETAILS['userid'];
+				$sql_parts['where'][] = 'ug.userid='.self::$userData['userid'];
 				$sql_parts['where'][] = 'r.permission>='.$permission;
 				$sql_parts['where'][] = 'NOT EXISTS( '.
 									' SELECT hgg.groupid '.
@@ -144,7 +143,7 @@ class CTemplateScreen extends CScreen{
 									' WHERE hgg.hostid=hg.hostid '.
 										' AND rr.id=hgg.groupid '.
 										' AND rr.groupid=gg.usrgrpid '.
-										' AND gg.userid='.$USER_DETAILS['userid'].
+										' AND gg.userid='.self::$userData['userid'].
 										' AND rr.permission<'.$permission.')';
 			}
 		}

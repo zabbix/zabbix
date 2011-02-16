@@ -6,6 +6,8 @@ class CWebUser{
 
 	public static function login($login, $password){
 		try{
+			self::setDefault();
+
 			self::$data = API::User()->login(array(
 				'user' => $login,
 				'password' => $password
@@ -55,10 +57,12 @@ class CWebUser{
 			}
 
 			if(($sessionid === null) || !self::$data){
+				self::setDefault();
 				self::$data = API::User()->login(array(
 					'user' => ZBX_GUEST_USER,
 					'password' => ''
 				));
+
 				if(!self::$data) throw new Exception();
 			}
 

@@ -26,47 +26,6 @@
 
 
 class CTrigger extends CZBXAPI{
-
-	protected function get_rules($method){
-		$rules = array();
-
-		$rules['create'] = array(
-			'expression' => array(
-				array('String'),
-				array('Required'),
-			),
-			'description' => array(
-				array('String'),
-				array('Required'),
-			),
-			'type' => array(
-				array('Range', 'range' => array(0, 1))
-			),
-			'priority' => array(
-				array('Range', 'range' => array(0, 1, 2, 3))
-			),
-			'status' => array(
-				array('Range', 'range' => array(0, 1))
-			),
-			'comments' => array(
-				array('String'),
-			),
-			'url' => array(
-				array('String'),
-				array('Required', 'condition' => array(
-					'priority' => array(
-						array('Range', 'range' => array(0))
-					),
-				)),
-			),
-			'dependencies' => array(
-				array('Array', 'rules' => array())
-			),
-		);
-
-		return $rules[$method];
-	}
-
 /**
  * Get Triggers data
  *
@@ -85,11 +44,10 @@ class CTrigger extends CZBXAPI{
  * @return array|int item data as array or false if error
  */
 	public function get($options=array()){
-		global $USER_DETAILS;
 
 		$result = array();
-		$user_type = $USER_DETAILS['type'];
-		$userid = $USER_DETAILS['userid'];
+		$user_type = self::$userData['type'];
+		$userid = self::$userData['userid'];
 
 		$sort_columns = array('triggerid', 'description', 'status', 'priority', 'lastchange'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
@@ -1870,6 +1828,44 @@ COpt::memoryPick();
 		return (count($ids) == $count);
 	}
 
-}
+	protected function get_rules($method){
+		$rules = array();
 
+		$rules['create'] = array(
+			'expression' => array(
+				array('String'),
+				array('Required'),
+			),
+			'description' => array(
+				array('String'),
+				array('Required'),
+			),
+			'type' => array(
+				array('Range', 'range' => array(0, 1))
+			),
+			'priority' => array(
+				array('Range', 'range' => array(0, 1, 2, 3))
+			),
+			'status' => array(
+				array('Range', 'range' => array(0, 1))
+			),
+			'comments' => array(
+				array('String'),
+			),
+			'url' => array(
+				array('String'),
+				array('Required', 'condition' => array(
+					'priority' => array(
+						array('Range', 'range' => array(0))
+					),
+				)),
+			),
+			'dependencies' => array(
+				array('Array', 'rules' => array())
+			),
+		);
+
+		return $rules[$method];
+	}
+}
 ?>

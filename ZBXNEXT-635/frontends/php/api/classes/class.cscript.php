@@ -46,11 +46,10 @@ class CScript extends CZBXAPI{
  * @return array|int item data as array or false if error
  */
 	public function get($options = array()){
-		global $USER_DETAILS;
 
 		$result = array();
-		$user_type = $USER_DETAILS['type'];
-		$userid = $USER_DETAILS['userid'];
+		$user_type = self::$userData['type'];
+		$userid = self::$userData['userid'];
 
 		$sort_columns = array('scriptid', 'name'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
@@ -350,10 +349,10 @@ class CScript extends CZBXAPI{
  * @return boolean
  */
 	public function create($scripts){
-		global $USER_DETAILS;
+
 		$scripts = zbx_toArray($scripts);
 
-			if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
+			if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
 
@@ -381,12 +380,12 @@ class CScript extends CZBXAPI{
  * @return boolean
  */
 	public function update($scripts){
-		global $USER_DETAILS;
+
 
 		$scripts = zbx_toArray($scripts);
 		$scriptids = zbx_objectValues($scripts, 'scriptid');
 
-			if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
+			if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
 
@@ -422,10 +421,10 @@ class CScript extends CZBXAPI{
  * @return boolean
  */
 	public function delete($scriptids){
-		global $USER_DETAILS;
+
 		$scriptids = zbx_toArray($scriptids);
 
-			if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
+			if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
 
