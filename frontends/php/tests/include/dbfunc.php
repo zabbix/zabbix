@@ -52,13 +52,14 @@ function DBdata($query)
 }
 
 /**
- * Saves data of the specified tables in temporary tables.
+ * Saves data of the specified tables in temporary tables. The tables can be in any order.
  */
 function DBsave_tables($tables)
 {
 	global $DB;
 
 	if(!is_array($tables))	$tables=array($tables);
+
 
 	foreach($tables as $table)
 	{
@@ -81,6 +82,8 @@ function DBsave_tables($tables)
 
 /**
  * Restores data from temporary tables. DBsave_tables() must be called first.
+ * The tables should be ordered so that referenced tables comes after main ones.
+ * For example: DBrestore_tables(array('users','users_groups','media'))
  */
 function DBrestore_tables($tables)
 {
@@ -88,7 +91,9 @@ function DBrestore_tables($tables)
 
 	if(!is_array($tables))	$tables=array($tables);
 
-	foreach($tables as $table)
+	$tables_reversed = array_reverse($tables);
+
+	foreach($tables_reversed as $table)
 	{
 		DBexecute("delete from $table");
 	}

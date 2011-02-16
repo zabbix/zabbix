@@ -23,6 +23,8 @@ require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
 class testFormMediaType extends CWebTest
 {
+	public $affectedTables = array('media_type','media','opmessage');
+
 	// Returns all media types
 	public static function allMediaTypes()
 	{
@@ -153,7 +155,7 @@ class testFormMediaType extends CWebTest
 		$row=DBfetch(DBselect("select count(*) as cnt from opmessage where mediatypeid=$id"));
 		$used_by_operations = ($row['cnt'] > 0);
 
-		DBsave_tables(array('opmessage','media_type','media'));
+		DBsave_tables($this->affectedTables);
 
 		$this->chooseOkOnNextConfirmation();
 
@@ -180,7 +182,7 @@ class testFormMediaType extends CWebTest
 			break;
 		}
 
-		DBrestore_tables(array('opmessage','media_type','media'));
+		DBrestore_tables($this->affectedTables);
 	}
 }
 ?>
