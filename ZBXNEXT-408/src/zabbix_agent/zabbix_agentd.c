@@ -84,7 +84,7 @@ const char	usage_message[] =
 const char	*help_message[] = {
 	"Options:",
 	"",
-	"  -c --config <file>    Specify configuration file. Use absolute path",
+	"  -c --config <file>    absolute path to the configuration file",
 	"  -h --help             give this help",
 	"  -V --version          display version number",
 	"  -p --print            print supported items and exit",

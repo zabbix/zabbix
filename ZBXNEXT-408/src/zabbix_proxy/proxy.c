@@ -55,7 +55,7 @@ const char	usage_message[] = "[-hV] [-c <file>]";
 #ifndef HAVE_GETOPT_LONG
 const char	*help_message[] = {
 	"Options:",
-	"  -c <file>       Specify configuration file",
+	"  -c <file>       absolute path to the configuration file",
 	"  -h              give this help",
 	"  -V              display version number",
 	0 /* end of text */
@@ -63,7 +63,7 @@ const char	*help_message[] = {
 #else
 const char	*help_message[] = {
 	"Options:",
-	"  -c --config <file>       Specify configuration file",
+	"  -c --config <file>       absolute path to the configuration file",
 	"  -h --help                give this help",
 	"  -V --version             display version number",
 	0 /* end of text */
@@ -653,7 +653,7 @@ int	MAIN_ZABBIX_ENTRY()
 			+ CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS
 			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_HTTPPOLLER_FORKS)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [HTTP Poller]",
+		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [HTTP poller]",
 				server_num);
 
 		process_type = ZBX_PROCESS_TYPE_HTTP;
@@ -691,7 +691,7 @@ int	MAIN_ZABBIX_ENTRY()
 			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_HTTPPOLLER_FORKS
 			+ CONFIG_DISCOVERER_FORKS + CONFIG_DBSYNCER_FORKS)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [DB Syncer]",
+		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [DB syncer]",
 				server_num);
 
 		process_type = ZBX_PROCESS_TYPE_DBSYNCER;
@@ -710,7 +710,7 @@ int	MAIN_ZABBIX_ENTRY()
 			+ CONFIG_DISCOVERER_FORKS + CONFIG_DBSYNCER_FORKS
 			+ CONFIG_IPMIPOLLER_FORKS)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [IPMI Poller]",
+		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [IPMI poller]",
 				server_num);
 
 		process_type = ZBX_PROCESS_TYPE_IPMI;

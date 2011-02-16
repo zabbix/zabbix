@@ -59,7 +59,7 @@ const char	usage_message[] = "[-hV] [-c <file>] [-n <nodeid>]";
 #ifndef HAVE_GETOPT_LONG
 const char	*help_message[] = {
 	"Options:",
-	"  -c <file>       Specify configuration file",
+	"  -c <file>       absolute path to the configuration file",
 	"  -h              give this help",
 	"  -n <nodeid>     convert database data to new nodeid",
 	"  -V              display version number",
@@ -68,7 +68,7 @@ const char	*help_message[] = {
 #else
 const char	*help_message[] = {
 	"Options:",
-	"  -c --config <file>       Specify configuration file",
+	"  -c --config <file>       absolute path to the configuration file",
 	"  -h --help                give this help",
 	"  -n --new-nodeid <nodeid> convert database data to new nodeid",
 	"  -V --version             display version number",
@@ -576,7 +576,7 @@ int	MAIN_ZABBIX_ENTRY()
 	}
 	else if (server_num <= CONFIG_DBCONFIG_FORKS)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [DB Cache]",
+		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [DB cache]",
 				server_num);
 
 		main_dbconfig_loop();
@@ -693,7 +693,7 @@ int	MAIN_ZABBIX_ENTRY()
 			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS
 			+ CONFIG_NODEWATCHER_FORKS + CONFIG_HTTPPOLLER_FORKS)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [HTTP Poller]",
+		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [HTTP poller]",
 				server_num);
 
 		process_type = ZBX_PROCESS_TYPE_HTTP;
@@ -735,7 +735,7 @@ int	MAIN_ZABBIX_ENTRY()
 			+ CONFIG_NODEWATCHER_FORKS + CONFIG_HTTPPOLLER_FORKS
 			+ CONFIG_DISCOVERER_FORKS + CONFIG_DBSYNCER_FORKS)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [DB Syncer]",
+		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [DB syncer]",
 				server_num);
 
 		process_type = ZBX_PROCESS_TYPE_DBSYNCER;
@@ -778,7 +778,7 @@ int	MAIN_ZABBIX_ENTRY()
 			+ CONFIG_DISCOVERER_FORKS + CONFIG_DBSYNCER_FORKS
 			+ CONFIG_ESCALATOR_FORKS + CONFIG_IPMIPOLLER_FORKS)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [IPMI Poller]",
+		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [IPMI poller]",
 				server_num);
 
 		process_type = ZBX_PROCESS_TYPE_IPMI;
@@ -801,7 +801,7 @@ int	MAIN_ZABBIX_ENTRY()
 			+ CONFIG_ESCALATOR_FORKS + CONFIG_IPMIPOLLER_FORKS
 			+ CONFIG_PROXYPOLLER_FORKS)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [Proxy Poller]",
+		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [Proxy poller]",
 				server_num);
 
 		process_type = ZBX_PROCESS_TYPE_PROXYPOLLER;
