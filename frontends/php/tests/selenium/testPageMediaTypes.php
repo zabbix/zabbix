@@ -22,7 +22,7 @@
 require_once(dirname(__FILE__) . '/../include/class.cwebtest.php');
 
 class testPageMediaTypes extends CWebTest{
-	public $affectedTables = array('opmessage', 'media_type', 'media', 'operations');
+	public $affectedTables = array('media_type','media','opmessage');
 
 	// Returns all media types
 	public static function allMediaTypes(){
@@ -110,6 +110,7 @@ class testPageMediaTypes extends CWebTest{
 		}
 
 		DBrestore_tables($this->affectedTables);
+
 	}
 
 	public function testPageMediaTypes_Sorting(){
