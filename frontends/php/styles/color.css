@@ -1,18 +1,18 @@
 /* Color CSS Document */
 .ok{ color: #00AA00; }
-.fail{ color: #D40000; }
+.fail{ color: #AA0000; }
 .info{ color: #444444; }
 
 .footer 	{ 	color: #CCCCCC;	}
 .enabled	{	color: #00AA00;	}
-.disabled	{	color: #D40000;	}
+.disabled	{	color: #AA0000;	}
 .unknown	{	color: #AAAAAA;	}
-.on			{	color: #D40000;	}
+.on			{	color: #AA0000;	}
 .off		{	color: #00AA00;	}
 .hidden		{	display: none;	}
 
 .green	{ color: #00AA00; }
-.red	{ color: #D40000; }
+.red	{ color: #AA0000; }
 .orange	{ color: #EE6000; }
 .blue	{ color: #0033FF; }
 .gold	{ color: #999900; }
@@ -58,3 +58,54 @@ a.on:link		{	color:#D40000;	}
 a.on:visited 	{	color:#D40000;	}
 a.on:hover 		{	color:#CC7777;	}
 a.on:active 	{	color:#D40000;	}
+
+table.tableinfo{ color: #1f1f1f; background-color: #FFF; }
+table.tableinfo tr.header td { background-color:#CED7DF; }
+table.tableinfo tr.header td.hover_grey { background-color:#C3CCE4; }
+table.tableinfo tr.header td.hover_grey:hover  { color: #000000; background-color:#B3BCD7;}
+table.tableinfo tr.vertical_header td { background-color: #CED7DF;}
+table.tableinfo tr.vertical_header td.hover_grey:hover{ color: #EEEEEE; background-color:#999999; }
+table.tableinfo tr.footer td { color: #FFFFFF; background: #6d88ad url('../images/gradients/table_head2.gif') repeat-x top left; }
+table.tableinfo tr.selected > td { background-color: #FFFFBB; }
+table.tableinfo tr.selected:hover > td { background-color: #BBCCFF; }
+table.tableinfo tr.odd_row > td { background-color: #E1E7EC; }
+table.tableinfo tr.odd_row:hover > td { background-color: #BBCCFF; }
+table.tableinfo tr.even_row > td { background-color: #F2F7FA; }
+table.tableinfo tr.even_row:hover > td{ background-color: #BBCCFF; }
+
+table.tableinfo tr > td.disaster_empty { border: 1px #FF0000 solid; }
+table.tableinfo tr:hover > td.disaster_empty { border: 1px #FF0000 solid; }
+table.tableinfo tr > td.disaster { background-color: #FF0000;	border: 1px #FF0000 solid; }
+table.tableinfo tr:hover > td.disaster { background-color: #FA0000;	border: 1px #FA0000 solid; }
+table.tableinfo tr > td.high_empty { border: 1px #FF8888 solid; }
+table.tableinfo tr:hover > td.high_empty { border: 1px #FF8888 solid; }
+table.tableinfo tr > td.high				{	background-color: #FF8888;	border: 1px #FF8888 solid; }
+table.tableinfo tr:hover > td.high			{	background-color: #FA8388;	border: 1px #FA8388 solid; }
+table.tableinfo tr > td.average_empty			{	border: 1px #DDAAAA solid; }
+table.tableinfo tr:hover > td.average_empty		{	border: 1px #DDAAAA solid; }
+table.tableinfo tr > td.average				{	background-color: #DDAAAA;	border: 1px #DDAAAA solid; }
+table.tableinfo tr:hover > td.average			{	background-color: #D8A5AA;	border: 1px #D8A5AA solid; }
+table.tableinfo tr > td.warning_empty			{	border: 1px #EFEFCC solid; }
+table.tableinfo tr:hover > td.warning_empty		{	border: 1px #EAEACC solid; }
+table.tableinfo tr > td.warning				{	background-color: #EFEFCC;	border: 1px #EFEFCC solid; }
+table.tableinfo tr:hover > td.warning			{	background-color: #EAEACC;	border: 1px #EAEACC solid; }
+table.tableinfo tr > td.information_empty			{	border: 1px #BBE2BB solid; }
+table.tableinfo tr:hover > td.information_empty		{	border: 1px #B7DDBB solid; }
+table.tableinfo tr > td.information			{	background-color: #BBE2BB;	border: 1px #CCE2CC solid; }
+table.tableinfo tr:hover > td.information			{	background-color: #B7DDBB;	border: 1px #C7DDCC solid; }
+table.tableinfo tr > td.unknown_trigger_empty		{	border: 1px #ACACAC solid; }
+table.tableinfo tr:hover > td.unknown_trigger_empty	{	border: 1px #ACA7AC solid; }
+table.tableinfo tr > td.unknown_trigger			{	background-color: #BCBCBC;	border: 1px #BCBCBC solid; }
+table.tableinfo tr:hover > td.unknown_trigger		{	background-color: #BCB7BC;	border: 1px #BCB7BC solid; }
+table.tableinfo tr > td.normal				{	background-color: #AAFFAA;	border: 1px #AAFFAA solid; }
+table.tableinfo tr:hover > td.normal			{	background-color: #AAF9AA;	border: 1px #AAF9AA solid; }
+table.tableinfo tr > td.active				{	background-color: #AADDAA;	border: 1px #AADDAA solid; color: #222222;}
+table.tableinfo tr:hover > td.active			{	background-color: #AAD9AA;	border: 1px #AAD9AA solid; }
+table.tableinfo tr > td.inactive				{	background-color: #FF8888;	border: 1px #FF8888 solid; color: #222222;}
+table.tableinfo tr:hover > td.inactive			{	background-color: #FA8388;	border: 1px #FA8388 solid; }
+table.tableinfo tr.red						{	background-color: #FFBBBB; border: 1px #FFBBBB solid; }
+table.tableinfo tr.red:hover				{	background-color: #EEAAAA; border: 1px #EEAAAA solid; }
+table.tableinfo tr.green					{	background-color: #BBFFBB; border: 1px #BBFFBB solid; }
+table.tableinfo tr.green:hover				{	background-color: #AAEEAA; border: 1px #AAEEAA solid; }
+table.tableinfo tr.blue 					{	background-color: #BBBBFF; border: 1px #BBBBFF solid; }
+table.tableinfo tr.blue:hover 				{	background-color: #AAAAEE; border: 1px #AAAAEE solid; }
