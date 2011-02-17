@@ -58,7 +58,7 @@
 		if(!empty($elements['hosts_groups'])) $options['groupids'] = array_unique($elements['hosts_groups']);
 		if(!empty($elements['hosts'])) $options['hostids'] = array_unique($elements['hosts']);
 		if(!empty($elements['triggers'])) $options['triggerids'] = array_unique($elements['triggers']);
-		$triggerids = CTrigger::get($options);
+		$triggerids = API::Trigger()->get($options);
 
 		$options = array(
 			'countOutput' => 1,
@@ -71,7 +71,7 @@
 			'object' => EVENT_OBJECT_TRIGGER,
 			'nopermissions' => 1
 		);
-		$event_count = CEvent::get($options);
+		$event_count = API::Event()->get($options);
 
 	return $event_count;
 	}
@@ -124,7 +124,7 @@ function make_event_details($event, $trigger){
 
 	$table->addRow(array(S_EVENT, expand_trigger_description_by_data(array_merge($trigger, $event), ZBX_FLAG_EVENT)));
 	$table->addRow(array(S_TIME, zbx_date2str(S_EVENTS_EVENT_DETAILS_DATE_FORMAT,$event['clock'])));
-	
+
 	if($config['event_ack_enable']){
 		$ack = getEventAckState($event, true);
 		$table->addRow(array(S_ACKNOWLEDGED, $ack));
@@ -159,7 +159,7 @@ function make_small_eventlist($startEvent){
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => 20
 	);
-	$events = CEvent::get($options);
+	$events = API::Event()->get($options);
 	order_result($events, array('clock', 'eventid'), ZBX_SORT_DOWN);
 	foreach($events as $enum => $event){
 		$lclock = $clock;
@@ -228,7 +228,7 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => ZBX_WIDGET_ROWS
 	);
-	$db_events = CEvent::get($options);
+	$db_events = API::Event()->get($options);
 
 	$lclock = time();
 	foreach($db_events as $id => $event) {
@@ -320,12 +320,12 @@ function getLastEvents($options){
 	}
 
 // triggers
-	$triggers = CTrigger::get($triggerOptions);
+	$triggers = API::Trigger()->get($triggerOptions);
 	$triggers = zbx_toHash($triggers, 'triggerid');
 
 // events
 	$eventOptions['triggerids'] = zbx_objectValues($triggers, 'triggerid');
-	$events = CEvent::get($eventOptions);
+	$events = API::Event()->get($eventOptions);
 
 	$sortClock = array();
 	$sortEvent = array();

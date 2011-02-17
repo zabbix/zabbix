@@ -364,7 +364,7 @@ include_once('include/page_header.php');
 			'output' => array('hostid', 'host'),
 			'limit' => 1
 		);
-		$only_hosts = CHost::get($options);
+		$only_hosts = API::Host()->get($options);
 		$host = reset($only_hosts);
 
 		if(empty($host)) access_deny();
@@ -443,7 +443,7 @@ include_once('include/page_header.php');
 		if(!is_null($writeonly)) $options['editable'] = 1;
 		if(!is_null($host_status)) $options[$host_status] = 1;
 
-		$hosts = CHost::get($options);
+		$hosts = API::Host()->get($options);
 		order_result($hosts, 'host');
 
 		foreach($hosts as $hnum => $host){
@@ -524,7 +524,7 @@ include_once('include/page_header.php');
 		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 
-		$template_list = CTemplate::get($options);
+		$template_list = API::Template()->get($options);
 		foreach($template_list as $tnum => $host){
 
 			$chk = new CCheckBox('templates['.$host['hostid'].']', isset($templates[$host['hostid']]), null, $host['host']);
@@ -572,7 +572,7 @@ include_once('include/page_header.php');
 		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 
-		$hostgroups = CHostGroup::get($options);
+		$hostgroups = API::HostGroup()->get($options);
 		order_result($hostgroups, 'name');
 
 		foreach($hostgroups as $gnum => $group){
@@ -631,7 +631,7 @@ include_once('include/page_header.php');
 		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 
-		$templates = CTemplate::get($options);
+		$templates = API::Template()->get($options);
 		order_result($templates, 'host');
 
 		foreach($templates as $tnum => $template){
@@ -679,11 +679,11 @@ include_once('include/page_header.php');
 		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 
-		$templates = CTemplate::get($options);
+		$templates = API::Template()->get($options);
 		foreach($templates as $tnum => $template){
 			$templates[$tnum]['hostid'] = $template['templateid'];
 		}
-		$hosts = CHost::get($options);
+		$hosts = API::Host()->get($options);
 		$objects = array_merge($templates, $hosts);
 
 		foreach($objects as $row){
@@ -715,7 +715,7 @@ include_once('include/page_header.php');
 		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 
-		$usergroups = CUserGroup::get($options);
+		$usergroups = API::UserGroup()->get($options);
 		order_result($usergroups, 'name');
 
 		foreach($usergroups as $ugnum => $usrgrp){
@@ -772,7 +772,7 @@ include_once('include/page_header.php');
 		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 
-		$users = CUser::get($options);
+		$users = API::User()->get($options);
 		order_result($users, 'alias');
 
 		foreach($users as $unum => $user){
@@ -856,7 +856,7 @@ include_once('include/page_header.php');
 		if(!is_null($writeonly)) $options['editable'] = true;
 		if(!is_null($templated)) $options['templated'] = $templated;
 
-		$triggers = CTrigger::get($options);
+		$triggers = API::Trigger()->get($options);
 		order_result($triggers, 'description');
 
 		$jsTriggers = array();
@@ -965,7 +965,7 @@ include_once('include/page_header.php');
 		//host can't have id=0. This option made hosts dissapear from list
 		if ($options['hostids'] == 0) unset($options['hostids']);
 
-		$items = CItem::get($options);
+		$items = API::Item()->get($options);
 		order_result($items, 'description', ZBX_SORT_UP);
 
 		$jsItems = array();
@@ -1058,7 +1058,7 @@ include_once('include/page_header.php');
 			'preservekeys' => true
 		);
 
-		$items = CItem::get($options);
+		$items = API::Item()->get($options);
 		order_result($items, 'description');
 
 		foreach($items as $tnum => $row){
@@ -1119,7 +1119,7 @@ include_once('include/page_header.php');
 		if(!is_null($writeonly)) $options['editable'] = 1;
 		if(!is_null($templated)) $options['templated'] = $templated;
 
-		$apps = CApplication::get($options);
+		$apps = API::Application()->get($options);
 		morder_result($apps, array('host', 'name'));
 
 		foreach($apps as $app){
@@ -1181,7 +1181,7 @@ include_once('include/page_header.php');
 		if(!is_null($writeonly)) $options['editable'] = 1;
 		if(!is_null($templated)) $options['templated'] = $templated;
 
-		$graphs = CGraph::get($options);
+		$graphs = API::Graph()->get($options);
 		order_result($graphs, 'name');
 
 		foreach($graphs as $gnum => $row){
@@ -1289,7 +1289,7 @@ include_once('include/page_header.php');
 		if(!is_null($writeonly)) $options['editable'] = 1;
 		if(!is_null($templated)) $options['templated'] = $templated;
 
-		$items = CItem::get($options);
+		$items = API::Item()->get($options);
 		order_result($items, 'description');
 
 		foreach($items as $tnum => $row){
@@ -1363,7 +1363,7 @@ include_once('include/page_header.php');
 		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 
-		$sysmaps = CMap::get($options);
+		$sysmaps = API::Map()->get($options);
 		order_result($sysmaps, 'name');
 
 		foreach($sysmaps as $mnum => $sysmap){
@@ -1433,7 +1433,7 @@ include_once('include/page_header.php');
 		if(!is_null($writeonly)) $options['editable'] = 1;
 		if(!is_null($templated)) $options['templated'] = $templated;
 
-		$items = CItem::get($options);
+		$items = API::Item()->get($options);
 
 		foreach($items as $tnum => $row){
 			$host = reset($row['hosts']);
@@ -1545,7 +1545,7 @@ include_once('include/page_header.php');
 			'preservekeys' => true
 		);
 
-		$screens = CScreen::get($options);
+		$screens = API::Screen()->get($options);
 		order_result($screens, 'name');
 
 		foreach($screens as $snum => $row){
@@ -1593,7 +1593,7 @@ include_once('include/page_header.php');
 			'output' => API_OUTPUT_EXTEND
 		);
 
-		$screens = CScreen::get($options);
+		$screens = API::Screen()->get($options);
 		order_result($screens, 'name');
 
 		foreach($screens as $snum => $row){
@@ -1627,7 +1627,7 @@ include_once('include/page_header.php');
 			);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 
-		$hostgroups = CHostGroup::get($options);
+		$hostgroups = API::HostGroup()->get($options);
 		order_result($hostgroups, 'name');
 
 		foreach($hostgroups as $gnum => $row){
@@ -1657,7 +1657,7 @@ include_once('include/page_header.php');
 			);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 
-		$hostgroups = CHostGroup::get($options);
+		$hostgroups = API::HostGroup()->get($options);
 		order_result($hostgroups, 'name');
 
 		$all = false;

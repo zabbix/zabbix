@@ -25,15 +25,14 @@
 
 class CWebCheck extends CZBXAPI{
 
-	private static $history = 30;
-	private static $trends = 90;
+	private $history = 30;
+	private $trends = 90;
 
-	public static function get($options=array()){
-		global $USER_DETAILS;
+	public function get($options=array()){
 
 		$result = array();
-		$user_type = $USER_DETAILS['type'];
-		$userid = $USER_DETAILS['userid'];
+		$user_type = self::$userData['type'];
+		$userid = self::$userData['userid'];
 
 		$sort_columns = array('httptestid', 'name'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
@@ -274,7 +273,7 @@ COpt::memoryPick();
 				'nopermissions' => true,
 				'preservekeys' => true
 			);
-			$hosts = CHost::get($obj_params);
+			$hosts = API::Host()->get($obj_params);
 
 			foreach($hosts as $hostid => $host){
 				$hwebchecks = $host['webchecks'];
@@ -308,11 +307,8 @@ COpt::memoryPick();
 		return $result;
 	}
 
-	public static function create($webchecks){
+	public function create($webchecks){
 		$webchecks = zbx_toArray($webchecks);
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			$webcheck_names = zbx_objectValues($webchecks, 'name');
 
@@ -326,7 +322,7 @@ COpt::memoryPick();
 				'nopermissions' => true,
 				'preservekeys' => true,
 			);
-			$db_webchecks = self::get($options);
+			$db_webchecks = $this->get($options);
 			foreach($db_webchecks as $webcheck){
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario [%s] already exists.', $webcheck['name']));
 			}
@@ -340,30 +336,18 @@ COpt::memoryPick();
 
 				$webcheck['webcheckid'] = $webcheckids[$wnum];
 
-				self::createCheckItems($webcheck);
-				self::createStepsReal($webcheck, $webcheck['steps']);
+				$this->createCheckItems($webcheck);
+				$this->createStepsReal($webcheck, $webcheck['steps']);
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('webcheckids' => $webcheckids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, $error);
-			return false;
-		}
 	}
 
-	public static function update($webchecks){
+	public function update($webchecks){
 		$webchecks = zbx_toArray($webchecks);
 		$webcheckids = zbx_objectValues($webchecks, 'webcheckid');
 
-		try{
-			self::BeginTransaction(__METHOD__);
-
-			$dbWebchecks = self::get(array(
+			$dbWebchecks = $this->get(array(
 				'output' => API_OUTPUT_EXTEND,
 				'httptestids' => $webcheckids,
 				'selectSteps' => API_OUTPUT_EXTEND,
@@ -392,7 +376,7 @@ COpt::memoryPick();
 						'nopermissions' => true,
 						'output' => API_OUTPUT_SHORTEN,
 					);
-					$webcheck_exist = self::get($options);
+					$webcheck_exist = $this->get($options);
 					$webcheck_exist = reset($webcheck_exist);
 
 					if($webcheck_exist && ($webcheck_exist['webcheckid'] != $webcheck_exist['webcheckid']))
@@ -467,31 +451,20 @@ COpt::memoryPick();
 				$stepids_delete = array_keys($dbSteps);
 
 				if(!empty($steps_create))
-					self::createStepsReal($webcheck, $steps_create);
+					$this->createStepsReal($webcheck, $steps_create);
 				if(!empty($steps_update))
-					self::updateStepsReal($webcheck, $steps_update);
+					$this->updateStepsReal($webcheck, $steps_update);
 				if(!empty($stepids_delete))
-					self::deleteStepsReal($stepids_delete);
+					$this->deleteStepsReal($stepids_delete);
 			}
 
 			return array('webchekids' => $webcheckids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, $error);
-			return false;
-		}
 	}
 
-	public static function delete($webcheckids){
+	public function delete($webcheckids){
 		if(empty($webcheckids)) return true;
 
 		$webcheckids = zbx_toArray($webcheckids);
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			$options = array(
 				'httptestids' => $webcheckids,
@@ -500,7 +473,7 @@ COpt::memoryPick();
 				'select_hosts' => API_OUTPUT_EXTEND,
 				'preservekeys' => true
 			);
-			$del_webchecks = self::get($options);
+			$del_webchecks = $this->get($options);
 			foreach($webcheckids as $webcheckid){
 				if(!isset($del_webchecks[$webcheckid])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
@@ -525,7 +498,7 @@ COpt::memoryPick();
 				$itemids_del[] = $stepitem['itemid'];
 			}
 
-			CItem::delete($itemids_del, true);
+			API::Item()->delete($itemids_del, true);
 
 			DB::delete('httptest', array('httptestid' => $webcheckids));
 
@@ -541,20 +514,11 @@ COpt::memoryPick();
 					_s('Scenario [%1$s] [%2$s] host [%3$s]', $webcheck['name'], $webcheck['webcheckid'], $host['host']));
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('webcheckids' => $webcheckids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 
-	protected static function createCheckItems($webcheck){
+	protected function createCheckItems($webcheck){
 		$checkitems = array(
 			array(
 				// GETTEXT: Legend below graph
@@ -575,7 +539,7 @@ COpt::memoryPick();
 		);
 
 		foreach($checkitems as &$item){
-			$items_exist = CItem::exists(array(
+			$items_exist = API::Item()->exists(array(
 				'key_' => $item['key_'],
 				'hostid' => $webcheck['hostid']
 			));
@@ -587,8 +551,8 @@ COpt::memoryPick();
 			$item['delay'] = $webcheck['delay'];
 			$item['type'] = ITEM_TYPE_HTTPTEST;
 			$item['trapper_hosts'] = 'localhost';
-			$item['history'] = self::$history;
-			$item['trends'] = self::$trends;
+			$item['history'] = $this->history;
+			$item['trends'] = $this->trends;
 			$item['status'] = $webcheck['status'];
 		}
 		unset($item);
@@ -618,7 +582,7 @@ COpt::memoryPick();
 			info(_s('Web item [%s] created.', $stepitem['key_']));
 	}
 
-	protected static function createStepsReal($webcheck, $websteps){
+	protected function createStepsReal($webcheck, $websteps){
 
 		$websteps_names = zbx_objectValues($websteps, 'name');
 
@@ -669,7 +633,7 @@ COpt::memoryPick();
 				)
 			);
 			foreach($stepitems as &$item){
-				$items_exist = CItem::exists(array(
+				$items_exist = API::Item()->exists(array(
 					'key_' => $item['key_'],
 					'hostid' => $webcheck['hostid']
 				));
@@ -681,8 +645,8 @@ COpt::memoryPick();
 				$item['type'] = ITEM_TYPE_HTTPTEST;
 				$item['data_type'] = ITEM_DATA_TYPE_DECIMAL;
 				$item['trapper_hosts'] = 'localhost';
-				$item['history'] = self::$history;
-				$item['trends'] = self::$trends;
+				$item['history'] = $this->history;
+				$item['trends'] = $this->trends;
 				$item['status'] = $webcheck['status'];
 			}
 			unset($item);
@@ -715,7 +679,7 @@ COpt::memoryPick();
 		}
 	}
 
-	protected static function updateStepsReal($webcheck, $websteps){
+	protected function updateStepsReal($webcheck, $websteps){
 
 		$websteps_names = zbx_objectValues($websteps, 'name');
 
@@ -782,7 +746,7 @@ COpt::memoryPick();
 		}
 	}
 
-	protected static function deleteStepsReal($webstepids){
+	protected function deleteStepsReal($webstepids){
 
 		$itemids = array();
 		$sql = 'SELECT i.itemid'.
@@ -796,7 +760,7 @@ COpt::memoryPick();
 
 		DB::delete('httpstep', array('httpstepid' => $webstepids));
 
-		CItem::delete($itemids, true);
+		API::Item()->delete($itemids, true);
 	}
 }
 ?>

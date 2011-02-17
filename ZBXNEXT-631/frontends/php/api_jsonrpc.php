@@ -49,12 +49,9 @@ $data = $http_request->body();
 if($allowed_content[$content_type] == 'json-rpc'){
 	header('Content-Type: application/json');
 
-	$json_rpc = new CJSONrpc();
+	$jsonRpc = new CJSONrpc($data);
 
-	$json_rpc->process($data);
-	$data = $json_rpc->result();
-
-	echo $data;
+	print($jsonRpc->execute());
 }
 else if($allowed_content[$content_type] == 'xml-rpc'){
 

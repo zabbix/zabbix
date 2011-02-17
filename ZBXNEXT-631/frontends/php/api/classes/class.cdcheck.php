@@ -27,12 +27,11 @@
  * Class containing methods for operations with Discovery checks for discovery rules
  */
 class CDCheck extends CZBXAPI{
-	public static function get($options){
-		global $USER_DETAILS;
+	public function get($options){
 
 		$result = array();
 		$nodeCheck = false;
-		$user_type = $USER_DETAILS['type'];
+		$user_type = self::$userData['type'];
 
 		$sort_columns = array('dcheckid', 'druleid'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM); // allowed output options for [ select_* ] params
@@ -90,9 +89,9 @@ class CDCheck extends CZBXAPI{
 // editable + PERMISSION CHECK
 		if(USER_TYPE_SUPER_ADMIN == $user_type){
 		}
-		else if(is_null($options['editable']) && ($USER_DETAILS['type'] == USER_TYPE_ZABBIX_ADMIN)){
+		else if(is_null($options['editable']) && (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN)){
 		}
-		else if(!is_null($options['editable']) && ($USER_DETAILS['type']!=USER_TYPE_SUPER_ADMIN)){
+		else if(!is_null($options['editable']) && (self::$userData['type']!=USER_TYPE_SUPER_ADMIN)){
 			return array();
 		}
 
@@ -310,7 +309,7 @@ Copt::memoryPick();
 
 			if(is_array($options['selectDRules']) || str_in_array($options['selectDRules'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['selectDRules'];
-				$drules = CDRule::get($obj_params);
+				$drules = API::DRule()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($drules, 'name');
 				foreach($drules as $druleid => $drule){
@@ -332,7 +331,7 @@ Copt::memoryPick();
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$drules = CDRule::get($obj_params);
+				$drules = API::DRule()->get($obj_params);
 				$drules = zbx_toHash($drules, 'dcheckid');
 				foreach($result as $dcheckid => $dcheck){
 					if(isset($drules[$dcheckid]))
@@ -353,7 +352,7 @@ Copt::memoryPick();
 
 			if(is_array($options['selectDHosts']) || str_in_array($options['selectDHosts'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['selectDHosts'];
-				$dhosts = CDHost::get($obj_params);
+				$dhosts = API::DHost()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($dhosts, 'dhostid');
 				foreach($dhosts as $dhostid => $dhost){
@@ -374,7 +373,7 @@ Copt::memoryPick();
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$dhosts = CDHost::get($obj_params);
+				$dhosts = API::DHost()->get($obj_params);
 				$dhosts = zbx_toHash($dhosts, 'dhostid');
 				foreach($result as $dcheckid => $dcheck){
 					if(isset($dhosts[$dcheckid]))
@@ -396,7 +395,7 @@ Copt::memoryPick();
 
 			if(is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['selectHosts'];
-				$hosts = CHost::get($obj_params);
+				$hosts = API::Host()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($hosts, 'hostid');
 
@@ -418,7 +417,7 @@ Copt::memoryPick();
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$hosts = CHost::get($obj_params);
+				$hosts = API::Host()->get($obj_params);
 				$hosts = zbx_toHash($hosts, 'hostid');
 				foreach($result as $dcheckid => $dcheck){
 					if(isset($hosts[$dcheckid]))
