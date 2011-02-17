@@ -98,7 +98,7 @@ if(isset($_REQUEST['apicall'])){
 		'jsonrpc' => '2.0',
 		'method' => $_REQUEST['apimethod'],
 		'params' => json_decode($_REQUEST['apiparams'], true),
-		'auth' => $auth['result'],
+		'auth' => $auth,
 		'id'=> 2
 	);
 	$data = json_encode($data);
