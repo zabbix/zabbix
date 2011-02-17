@@ -30,16 +30,13 @@ class CGraphItem extends CZBXAPI{
 /**
 * Get GraphItems data
 *
-* @static
 * @param array $options
 * @return array|boolean
 */
-	public static function get($options = array()){
-		global $USER_DETAILS;
-
+	public function get($options = array()){
 		$result = array();
-		$user_type = $USER_DETAILS['type'];
-		$userid = $USER_DETAILS['userid'];
+		$user_type = self::$userData['type'];
+		$userid = self::$userData['userid'];
 		$result = array();
 
 		$sort_columns = array('gitemid'); // allowed columns for sorting
@@ -233,7 +230,7 @@ class CGraphItem extends CZBXAPI{
 				'gitemids' => $gitemids,
 				'preservekeys' => 1
 			);
-			$graphs = CGraph::get($obj_params);
+			$graphs = API::Graph()->get($obj_params);
 			foreach($graphs as $graphid => $graph){
 				$gitems = $graph['gitems'];
 				unset($graph['gitems']);
@@ -254,13 +251,12 @@ class CGraphItem extends CZBXAPI{
 /**
  * Get graph items by graph id and graph item id
  *
- * @static
- * @param _array $gitem_data
+ * @param array $gitem_data
  * @param array $gitem_data['itemid']
  * @param array $gitem_data['graphid']
  * @return string|boolean graphid
  */
-	public static function getObjects($gitem_data){
+	public function getObjects($gitem_data){
 		$result = array();
 		$gitemids = array();
 
@@ -274,7 +270,7 @@ class CGraphItem extends CZBXAPI{
 		}
 
 		if(!empty($gitemids))
-			$result = self::get(array('gitemids'=>$gitemids, 'output' => API_OUTPUT_EXTEND));
+			$result = $this->get(array('gitemids'=>$gitemids, 'output' => API_OUTPUT_EXTEND));
 
 	return $result;
 	}

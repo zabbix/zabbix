@@ -30,7 +30,7 @@ function getSounds(){
 		list($filename, $type) = explode('.', $file);
 		$fileList[$filename] = $file;
 	}
-	
+
 return $fileList;
 }
 
@@ -129,10 +129,7 @@ function updateMessageSettings($messages){
 		DB::update('profiles', $updates);
 	}
 	catch(APIException $e){
-		$errors = $e->getErrors();
-		$error = reset($errors);
-
-		error($error);
+		error($e->getMessage());
 	}
 
 return $messages;

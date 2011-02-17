@@ -52,7 +52,7 @@ include_once('include/page_header.php');
 		'graphids' => $_REQUEST['graphid'],
 		'output' => API_OUTPUT_EXTEND
 	);
-	$db_data = CGraph::get($options);
+	$db_data = API::Graph()->get($options);
 	if(empty($db_data)) access_deny();
 	else $db_data = reset($db_data);
 
@@ -62,7 +62,7 @@ include_once('include/page_header.php');
 		'output' => API_OUTPUT_EXTEND,
 		'templated_hosts' => 1,
 	);
-	$host = CHost::get($options);
+	$host = API::Host()->get($options);
 	$host = reset($host);
 
 	$effectiveperiod = navigation_bar_calc();
@@ -91,7 +91,7 @@ include_once('include/page_header.php');
 	if($height <= 0) $height = $db_data['height'];
 
 	$graph->showLegend($db_data['show_legend']);
-	
+
 	$graph->showWorkPeriod($db_data['show_work_period']);
 	$graph->showTriggers($db_data['show_triggers']);
 

@@ -43,12 +43,11 @@ class CTriggerPrototype extends CZBXAPI{
  * @param array $options['order']
  * @return array|int item data as array or false if error
  */
-	public static function get($options=array()){
-		global $USER_DETAILS;
+	public function get($options=array()){
 
 		$result = array();
-		$user_type = $USER_DETAILS['type'];
-		$userid = $USER_DETAILS['userid'];
+		$user_type = self::$userData['type'];
+		$userid = self::$userData['userid'];
 
 		$sort_columns = array('triggerid', 'description', 'status', 'priority', 'lastchange'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
@@ -750,7 +749,7 @@ Copt::memoryPick();
 					'triggerids' => $triggerids,
 					'preservekeys' => 1
 				);
-			$groups = CHostgroup::get($obj_params);
+			$groups = API::HostGroup()->get($obj_params);
 			foreach($groups as $groupid => $group){
 				$gtriggers = $group['triggers'];
 				unset($group['triggers']);
@@ -773,7 +772,7 @@ Copt::memoryPick();
 
 			if(is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['selectHosts'];
-				$hosts = CHost::get($obj_params);
+				$hosts = API::Host()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($hosts, 'host');
 				foreach($hosts as $hostid => $host){
@@ -796,7 +795,7 @@ Copt::memoryPick();
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$hosts = CHost::get($obj_params);
+				$hosts = API::Host()->get($obj_params);
 				$hosts = zbx_toHash($hosts, 'hostid');
 				foreach($result as $triggerid => $trigger){
 					if(isset($hosts[$triggerid]))
@@ -837,7 +836,7 @@ Copt::memoryPick();
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
-			$items = CItem::get($obj_params);
+			$items = API::Item()->get($obj_params);
 			foreach($items as $itemid => $item){
 				$itriggers = $item['triggers'];
 				unset($item['triggers']);
@@ -871,7 +870,7 @@ Copt::memoryPick();
 
 			if(is_array($options['selectDiscoveryRule']) || str_in_array($options['selectDiscoveryRule'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['selectDiscoveryRule'];
-				$discoveryRules = CItem::get($obj_params);
+				$discoveryRules = API::Item()->get($obj_params);
 
 				foreach($result as $triggerid => $trigger){
 					if(isset($rule_map[$triggerid]) && isset($discoveryRules[$rule_map[$triggerid]])){
@@ -985,7 +984,7 @@ Copt::memoryPick();
 
 			foreach($result as $tnum => $trigger){
 				if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $trigger['description'], $arr)){
-					$macros = CUserMacro::getMacros($arr[1], array('triggerid' => $trigger['triggerid']));
+					$macros = API::UserMacro()->getMacros($arr[1], array('triggerid' => $trigger['triggerid']));
 
 					$search = array_keys($macros);
 					$values = array_values($macros);
@@ -1004,7 +1003,7 @@ COpt::memoryPick();
 	return $result;
 	}
 
-	public static function exists($object){
+	public function exists($object){
 		$keyFields = array(array('hostid', 'host'), 'description');
 
 		$result = false;
@@ -1029,7 +1028,7 @@ COpt::memoryPick();
 		else if(isset($object['nodeids']))
 			$options['nodeids'] = $object['nodeids'];
 
-		$triggers = self::get($options);
+		$triggers = $this->get($options);
 		foreach($triggers as $tnum => $trigger){
 			$tmp_exp = explode_exp($trigger['expression'], false);
 			if(strcmp($tmp_exp, $object['expression']) == 0){
@@ -1049,12 +1048,9 @@ COpt::memoryPick();
  * @param array $triggers
  * @return boolean
  */
-	public static function create($triggers){
+	public function create($triggers){
 		$triggers = zbx_toArray($triggers);
 		$triggerids = array();
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			foreach($triggers as $num => $trigger){
 				$trigger_db_fields = array(
@@ -1073,7 +1069,7 @@ COpt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->errors);
 				}
 
-				if(CTrigger::exists(array(
+				if(API::Trigger()->exists(array(
 					'description' => $trigger['description'],
 					'expression' => $trigger['expression'])
 				)){
@@ -1082,9 +1078,9 @@ COpt::memoryPick();
 				}
 			}
 
-			self::createReal($triggers);
+			$this->createReal($triggers);
 
-			$createdTriggers = self::get(array(
+			$createdTriggers = $this->get(array(
 				'triggerids' => array_keys($triggers),
 				'output' => API_OUTPUT_REFER,
 				'selectItems' => API_OUTPUT_EXTEND
@@ -1105,18 +1101,9 @@ COpt::memoryPick();
 			}
 
 			foreach($triggers as $trigger)
-				self::inherit($trigger);
+				$this->inherit($trigger);
 
-			self::EndTransaction(true, __METHOD__);
 			return array('triggerids' => $triggerids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, $error);
-			return false;
-		}
 	}
 
 /**
@@ -1125,12 +1112,9 @@ COpt::memoryPick();
  * @param array $triggers
  * @return boolean
  */
-	public static function update($triggers){
+	public function update($triggers){
 		$triggers = zbx_toArray($triggers);
 		$triggerids = zbx_objectValues($triggers, 'triggerid');
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			$options = array(
 				'triggerids' => $triggerids,
@@ -1138,7 +1122,7 @@ COpt::memoryPick();
 				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => true,
 			);
-			$dbTriggers = self::get($options);
+			$dbTriggers = $this->get($options);
 			foreach($triggers as $tnum => $trigger){
 				if(!isset($dbTriggers[$trigger['triggerid']])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
@@ -1171,9 +1155,9 @@ COpt::memoryPick();
 					unset($triggers[$tnum]['status']);
 			}
 
-			self::updateReal($triggers);
+			$this->updateReal($triggers);
 
-			$updatedTriggers = self::get(array(
+			$updatedTriggers = $this->get(array(
 				'triggerids' => array_keys($triggers),
 				'output' => API_OUTPUT_REFER,
 				'selectItems' => API_OUTPUT_EXTEND
@@ -1194,19 +1178,10 @@ COpt::memoryPick();
 			}
 
 			foreach($triggers as $trigger)
-				self::inherit($trigger);
+				$this->inherit($trigger);
 
 
-			self::EndTransaction(true, __METHOD__);
 			return array('triggerids' => $triggerids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, $error);
-			return false;
-		}
 	}
 
 /**
@@ -1215,11 +1190,8 @@ COpt::memoryPick();
  * @param array $triggerids array with trigger ids
  * @return array
  */
-	public static function delete($triggerids, $nopermissions=false){
+	public function delete($triggerids, $nopermissions=false){
 		$triggerids = zbx_toArray($triggerids);
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			if(empty($triggerids)) self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter');
 
@@ -1229,7 +1201,7 @@ COpt::memoryPick();
 				'editable' => true,
 				'preservekeys' => true
 			);
-			$del_triggers = self::get($options);
+			$del_triggers = $this->get($options);
 
 // TODO: remove $nopermissions hack
 			if(!$nopermissions){
@@ -1247,15 +1219,6 @@ COpt::memoryPick();
 					}
 				}
 			}
-
-//			if(!empty($trigger_prototypes)){
-//				$sql = 'SELECT triggerid FROM trigger_discovery WHERE '.
-//						DBcondition('parent_triggerid', $trigger_prototypes);
-//				$db_triggers = DBselect($sql);
-//				while($trigger = DBfetch($db_triggers)){
-//					$triggerids[] = $trigger['triggerid'];
-//				}
-//			}
 
 // get child triggers
 			$parent_triggerids = $triggerids;
@@ -1276,7 +1239,7 @@ COpt::memoryPick();
 				'nopermissions' => true,
 				'preservekeys' => true,
 			);
-			$del_triggers = self::get($options);
+			$del_triggers = $this->get($options);
 
 			DB::delete('events', array(
 				'objectid' => $triggerids,
@@ -1322,19 +1285,10 @@ COpt::memoryPick();
 			update_services_status_all();
 
 
-			self::EndTransaction(true, __METHOD__);
 			return array('triggerids' => $triggerids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
-	protected static function createReal(&$triggers){
+	protected function createReal(&$triggers){
 		$triggers = zbx_toArray($triggers);
 
 		$triggerids = DB::insert('triggers', $triggers);
@@ -1358,7 +1312,7 @@ COpt::memoryPick();
 
 	}
 
-	protected static function updateReal($triggers){
+	protected function updateReal($triggers){
 		$triggers = zbx_toArray($triggers);
 
 		$options = array(
@@ -1367,7 +1321,7 @@ COpt::memoryPick();
 			'preservekeys' => 1,
 			'nopermissions' => 1,
 		);
-		$dbTriggers = self::get($options);
+		$dbTriggers = $this->get($options);
 
 		$description_changed = $expression_changed = false;
 		foreach($triggers as $tnum => &$trigger){
@@ -1401,7 +1355,7 @@ COpt::memoryPick();
 					'editable' => 1,
 					'nopermissions' => 1,
 				);
-				$triggers_exist = CTrigger::get($options);
+				$triggers_exist = API::Trigger()->get($options);
 
 				$trigger_exist = false;
 				foreach($triggers_exist as $tnum => $tr){
@@ -1449,8 +1403,8 @@ COpt::memoryPick();
 		unset($trigger);
 	}
 
-	protected static function inherit($trigger, $hostids=null){
-		$triggerTemplate = CTemplate::get(array(
+	protected function inherit($trigger, $hostids=null){
+		$triggerTemplate = API::Template()->get(array(
 			'triggerids' => $trigger['triggerid'],
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => 1,
@@ -1465,7 +1419,7 @@ COpt::memoryPick();
 				'preservekeys' => true,
 				'nopermissions' => true,
 			);
-			$dbTrigger = self::get($options);
+			$dbTrigger = $this->get($options);
 			$dbTrigger = reset($dbTrigger);
 
 			if(!isset($trigger['description']))
@@ -1482,7 +1436,7 @@ COpt::memoryPick();
 			'nopermissions' => 1,
 			'templated_hosts' => 1,
 		);
-		$chd_hosts = CHost::get($options);
+		$chd_hosts = API::Host()->get($options);
 
 		foreach($chd_hosts as $chd_host){
 			$newTrigger = $trigger;
@@ -1492,7 +1446,7 @@ COpt::memoryPick();
 			$newTrigger['expression'] = str_replace('{'.$triggerTemplate['host'].':', '{'.$chd_host['host'].':', $trigger['expression']);
 
 // check if templated trigger exists
-			$childTriggers = self::get(array(
+			$childTriggers = $this->get(array(
 				'filter' => array('templateid' => $newTrigger['triggerid']),
 				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1,
@@ -1505,7 +1459,7 @@ COpt::memoryPick();
 				if((strcmp($childTrigger['expression'], $newTrigger['expression']) != 0) ||
 						(strcmp($childTrigger['description'], $newTrigger['description']) != 0))
 				{
-					$exists = self::exists(array(
+					$exists = $this->exists(array(
 						'description' => $newTrigger['description'],
 						'expression' => $newTrigger['expression'],
 						'hostids' => $chd_host['hostid']
@@ -1520,7 +1474,7 @@ COpt::memoryPick();
 				}
 
 				$newTrigger['triggerid'] = $childTrigger['triggerid'];
-				self::updateReal($newTrigger);
+				$this->updateReal($newTrigger);
 			}
 			else{
 				$options = array(
@@ -1533,7 +1487,7 @@ COpt::memoryPick();
 					'nopermissions' => 1,
 					'hostids' => $chd_host['hostid']
 				);
-				$childTriggers = self::get($options);
+				$childTriggers = $this->get($options);
 
 				$childTrigger = false;
 				foreach($childTriggers as $tnum => $tr){
@@ -1554,20 +1508,18 @@ COpt::memoryPick();
 					}
 
 					$newTrigger['triggerid'] = $childTrigger['triggerid'];
-					self::updateReal($newTrigger);
+					$this->updateReal($newTrigger);
 				}
 				else{
-					self::createReal($newTrigger);
+					$this->createReal($newTrigger);
 					$newTrigger = reset($newTrigger);
 				}
 			}
-			self::inherit($newTrigger);
+			$this->inherit($newTrigger);
 		}
 	}
 
-	public static function syncTemplates($data){
-		try{
-			self::BeginTransaction(__METHOD__);
+	public function syncTemplates($data){
 
 			$data['templateids'] = zbx_toArray($data['templateids']);
 			$data['hostids'] = zbx_toArray($data['hostids']);
@@ -1579,7 +1531,7 @@ COpt::memoryPick();
 				'templated_hosts' => true,
 				'output' => API_OUTPUT_SHORTEN
 			);
-			$allowedHosts = CHost::get($options);
+			$allowedHosts = API::Host()->get($options);
 			foreach($data['hostids'] as $hostid){
 				if(!isset($allowedHosts[$hostid])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -1591,7 +1543,7 @@ COpt::memoryPick();
 				'editable' => true,
 				'output' => API_OUTPUT_SHORTEN
 			);
-			$allowedTemplates = CTemplate::get($options);
+			$allowedTemplates = API::Template()->get($options);
 			foreach($data['templateids'] as $templateid){
 				if(!isset($allowedTemplates[$templateid])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -1604,23 +1556,14 @@ COpt::memoryPick();
 				'output' => API_OUTPUT_EXTEND,
 				'select_dependencies' => true,
 			);
-			$triggers = self::get($options);
+			$triggers = $this->get($options);
 
 			foreach($triggers as $trigger){
 				$trigger['expression'] = explode_exp($trigger['expression'], false);
-				self::inherit($trigger, $data['hostids']);
+				$this->inherit($trigger, $data['hostids']);
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return true;
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 }
 

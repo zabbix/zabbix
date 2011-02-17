@@ -168,7 +168,7 @@ include_once('include/page_header.php');
 	else if(isset($_REQUEST['delete'])&&isset($_REQUEST['httptestid'])){
 		$result = false;
 		if($httptest_data = get_httptest_by_httptestid($_REQUEST['httptestid'])){
-			$result = CWebCheck::delete($_REQUEST['httptestid']);
+			$result = API::WebCheck()->delete($_REQUEST['httptestid']);
 		}
 		show_messages($result, S_SCENARIO_DELETED, S_CANNOT_DELETE_SCENARIO);
 		if($result){
@@ -227,7 +227,7 @@ include_once('include/page_header.php');
 				$webcheck['applicationid'] = $applicationid['applicationid'];
 			}
 			else{
-				$result = CApplication::create(array(
+				$result = API::Application()->create(array(
 					'name' => $_REQUEST['application'],
 					'hostid' => $_REQUEST['hostid']
 				));
@@ -251,12 +251,12 @@ include_once('include/page_header.php');
 
 			if(isset($_REQUEST['httptestid'])){
 				$webcheck['webcheckid'] = $httptestid = $_REQUEST['httptestid'];
-				$result = CWebCheck::update($webcheck);
+				$result = API::WebCheck()->update($webcheck);
 				if(!$result)
 					throw new Exception();
 			}
 			else{
-				$result = CWebCheck::create($webcheck);
+				$result = API::WebCheck()->create($webcheck);
 				if(!$result)
 					throw new Exception();
 
@@ -341,7 +341,7 @@ include_once('include/page_header.php');
 		show_messages($go_result, S_HISTORY_CLEARED, $go_result);
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_httptestid'])){
-		$go_result = CWebCheck::delete($_REQUEST['group_httptestid']);
+		$go_result = API::WebCheck()->delete($_REQUEST['group_httptestid']);
 		show_messages($go_result, S_SCENARIO_DELETED, null);
 	}
 

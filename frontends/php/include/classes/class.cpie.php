@@ -529,7 +529,6 @@ class CPie extends CGraphDraw{
 	public function draw(){
 		$start_time=getmicrotime();
 		set_image_header();
-		check_authorisation();
 
 		$this->selectData();
 

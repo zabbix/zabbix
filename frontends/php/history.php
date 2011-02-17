@@ -146,7 +146,7 @@ include_once('include/page_header.php');
 		'output' => API_OUTPUT_EXTEND
 	);
 
-	$items = CItem::get($options);
+	$items = API::Item()->get($options);
 	$items = zbx_toHash($items, 'itemid');
 
 	foreach($_REQUEST['itemid'] as $inum =>  $itemid){
@@ -330,7 +330,7 @@ include_once('include/page_header.php');
 			}
 
 			$options['sortfield'] = 'id';
-			$hData = CHistory::get($options);
+			$hData = API::History()->get($options);
 
 			foreach($hData as $hnum => $data){
 				$color_style = null;
@@ -405,7 +405,7 @@ include_once('include/page_header.php');
 			$table->setHeader(array(S_TIMESTAMP, S_VALUE));
 
 			$options['sortfield'] = 'clock';
-			$hData = CHistory::get($options);
+			$hData = API::History()->get($options);
 			foreach($hData as $hnum => $data){
 				$item = $items[$data['itemid']];
 				$host = reset($item['hosts']);

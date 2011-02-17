@@ -196,7 +196,7 @@
 				);
 			if($profile) $options['nodeids'] = id2nodeid($userid);
 
-			$users = CUser::get($options);
+			$users = API::User()->get($options);
 			$user = reset($users);
 
 			$frm_title = S_USER.' "'.$user['alias'].'"';
@@ -226,7 +226,7 @@
 				'userids' => $userid,
 				'output' => API_OUTPUT_SHORTEN
 			);
-			$user_groups = CUserGroup::get($options);
+			$user_groups = API::UserGroup()->get($options);
 			$user_groups = zbx_objectValues($user_groups, 'usrgrpid');
 			$user_groups = zbx_toHash($user_groups);
 
@@ -349,7 +349,7 @@
 				'usrgrpids' => $user_groups,
 				'output' => API_OUTPUT_EXTEND
 			);
-			$groups = CUserGroup::get($options);
+			$groups = API::UserGroup()->get($options);
 			order_result($groups, 'name');
 			foreach($groups as $num => $group){
 				$lstGroups->addItem($group['usrgrpid'], $group['name']);
@@ -628,7 +628,7 @@
 		$frm_title = S_USER_GROUP;
 
 		if(isset($_REQUEST['usrgrpid'])){
-			$usrgrp	= CUserGroup::get(array(
+			$usrgrp	= API::UserGroup()->get(array(
 				'usrgrpids' => $_REQUEST['usrgrpid'],
 				'output' => API_OUTPUT_EXTEND
 			));
@@ -642,7 +642,6 @@
 
 			$users_status = $usrgrp['users_status'];
 			$gui_access = $usrgrp['gui_access'];
-			$api_access = $usrgrp['api_access'];
 			$debug_mode = $usrgrp['debug_mode'];
 
 			$group_users = array();
@@ -679,7 +678,6 @@
 			$name			= get_request('gname','');
 			$users_status	= get_request('users_status',GROUP_STATUS_ENABLED);
 			$gui_access	= get_request('gui_access',GROUP_GUI_ACCESS_SYSTEM);
-			$api_access	= get_request('api_access',GROUP_API_ACCESS_DISABLED);
 			$debug_mode	= get_request('debug_mode',GROUP_DEBUG_MODE_DISABLED);
 			$group_users	= get_request('group_users',array());
 			$group_rights	= get_request('group_rights',array());
@@ -786,11 +784,6 @@
 			$frmUserG->addVar('users_status',GROUP_STATUS_ENABLED);
 			$frmUserG->addRow(S_USERS_STATUS, new CSpan(S_ENABLED,'green'));
 		}
-
-		$cmbAPI = new CComboBox('api_access', $api_access);
-		$cmbAPI->addItem(GROUP_API_ACCESS_ENABLED, S_ENABLED);
-		$cmbAPI->addItem(GROUP_API_ACCESS_DISABLED, S_DISABLED);
-		$frmUserG->addRow(S_API_ACCESS, $cmbAPI);
 
 		$cmbDebug = new CComboBox('debug_mode', $debug_mode);
 		$cmbDebug->addItem(GROUP_DEBUG_MODE_ENABLED, S_ENABLED);
@@ -1518,7 +1511,7 @@
 				'output' => API_OUTPUT_EXTEND,
 				'editable' => true,
 			);
-			$discoveryRule = CDiscoveryRule::get($options);
+			$discoveryRule = API::DiscoveryRule()->get($options);
 			$discoveryRule = reset($discoveryRule);
 			$hostid = $discoveryRule['hostid'];
 		}
@@ -1591,7 +1584,7 @@
 				'itemids' => $_REQUEST['itemid'],
 				'output' => API_OUTPUT_EXTEND,
 			);
-			$item_data = CItem::get($options);
+			$item_data = API::Item()->get($options);
 			$item_data = reset($item_data);
 
 			$hostid	= ($hostid > 0) ? $hostid : $item_data['hostid'];
@@ -1605,7 +1598,7 @@
 					'output' => API_OUTPUT_EXTEND,
 					'templated_hosts' => 1
 				);
-				$host_info = CHost::get($options);
+				$host_info = API::Host()->get($options);
 				$host_info = reset($host_info);
 				$host = $host_info['host'];
 			}
@@ -1755,7 +1748,7 @@
 			));
 
 
-			$interfaces = CHostInterface::get(array(
+			$interfaces = API::HostInterface()->get(array(
 				'hostids' => $hostid,
 				'output' => API_OUTPUT_EXTEND
 			));
@@ -2207,7 +2200,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		if(!$parent_discoveryid){
 // GROUP OPERATIONS
 			$cmbGroups = new CComboBox('add_groupid',$add_groupid);
-			$groups = CHostGroup::get(array(
+			$groups = API::HostGroup()->get(array(
 				'editable' => 1,
 				'output' => API_OUTPUT_EXTEND,
 			));
@@ -2301,7 +2294,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 		if(count($applications)==0)  array_push($applications,0);
 
-		$dbHosts = CHost::get(array(
+		$dbHosts = API::Host()->get(array(
 			'itemids' => $itemids,
 			'selectInterfaces' => API_OUTPUT_EXTEND
 		));
@@ -2475,7 +2468,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 		$target_list = array();
 
-		$groups = CHostGroup::get(array(
+		$groups = API::HostGroup()->get(array(
 			'output'=>API_OUTPUT_EXTEND,
 			'sortorder'=>'name'
 		));
@@ -2496,7 +2489,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 				'groupids' => $filter_groupid,
 				'templated_hosts' => 1
 			);
-			$hosts = CHost::get($options);
+			$hosts = API::Host()->get($options);
 			order_result($hosts, 'host');
 
 			foreach($hosts as $num => $host){
@@ -2999,7 +2992,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 				'filter' => array('flags' => null),
 				'output' => API_OUTPUT_EXTEND,
 			);
-			$graphs = CGraph::get($options);
+			$graphs = API::Graph()->get($options);
 			$graph = reset($graphs);
 
 			$frmGraph->setTitle(S_GRAPH.' "'.$graph['name'].'"');
@@ -3028,7 +3021,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 				'sortfield' => 'sortorder',
 				'output' => API_OUTPUT_EXTEND,
 			);
-			$items = CGraphItem::get($options);
+			$items = API::GraphItem()->get($options);
 		}
 		else{
 			$name = get_request('name', '');
@@ -4162,11 +4155,11 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			$macros = get_request('macros', array());
 		}
 		else if($hostid > 0){
-			$macros = CUserMacro::get(array('output' => API_OUTPUT_EXTEND, 'hostids' => $hostid));
+			$macros = API::UserMacro()->get(array('output' => API_OUTPUT_EXTEND, 'hostids' => $hostid));
 			order_result($macros, 'macro');
 		}
 		else if($hostid === null){
-			$macros = CUserMacro::get(array('output' => API_OUTPUT_EXTEND, 'globalmacro' => 1));
+			$macros = API::UserMacro()->get(array('output' => API_OUTPUT_EXTEND, 'globalmacro' => 1));
 			order_result($macros, 'macro');
 		}
 		else{

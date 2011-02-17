@@ -448,5 +448,20 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		zbx_add_post_js("var msglistid = initMessages({});");
 	}
 
+	if($failed_attempt = CProfile::get('web.login.attempt.failed', 0)){
+		$attempip = CProfile::get('web.login.attempt.ip', '');
+		$attempdate = CProfile::get('web.login.attempt.clock', 0);
+
+		$error_msg = array(
+			new CSpan($failed_attempt, 'bold'),
+			_(' failed login attempts logged. Last failed attempt was from '),
+			new CSpan($attempip, 'bold'),
+			_(' on '),
+			new CSpan(zbx_date2str(S_CUSER_ERROR_DATE_FORMAT, $attempdate), 'bold'),
+		);
+		error(new CSpan($error_msg));
+
+		CProfile::update('web.login.attempt.failed', 0, PROFILE_TYPE_INT);
+	}
 	show_messages();
 ?>

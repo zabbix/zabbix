@@ -38,7 +38,7 @@
 	$frm_title = S_TEMPLATE;
 
 	if($templateid > 0){
-		$dbTemplates = CTemplate::get(array(
+		$dbTemplates = API::Template()->get(array(
 			'templateids' => $templateid,
 			'selectGroups' => API_OUTPUT_EXTEND,
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
@@ -81,7 +81,7 @@
 		$macros = $dbTemplate['macros'];
 
 // get template hosts from db
-		$hosts_linked_to = CHost::get(array(
+		$hosts_linked_to = API::Host()->get(array(
 			'templateids' => $templateid,
 			'editable' => 1,
 			'templated_hosts' => 1
@@ -114,7 +114,7 @@
 // get all Groups
 	$group_tb = new CTweenBox($frmHost, 'groups', $groups, 10);
 	$options = array('editable' => 1, 'output' => API_OUTPUT_EXTEND);
-	$all_groups = CHostGroup::get($options);
+	$all_groups = API::HostGroup()->get($options);
 	order_result($all_groups, 'name');
 
 	foreach($all_groups as $gnum => $group){
@@ -146,7 +146,7 @@
 		'editable' => 1,
 		'output' => API_OUTPUT_EXTEND
 	);
-	$db_hosts = CHost::get($params);
+	$db_hosts = API::Host()->get($params);
 	order_result($db_hosts, 'host');
 
 	foreach($db_hosts as $hnum => $db_host){
@@ -161,7 +161,7 @@
 		'editable' => 1,
 		'output' => API_OUTPUT_EXTEND
 	);
-	$db_hosts = CHost::get($params);
+	$db_hosts = API::Host()->get($params);
 	order_result($db_hosts, 'host');
 	foreach($db_hosts as $hnum => $db_host){
 		$host_tb->addItem($db_host['hostid'], $db_host['host']);
@@ -172,7 +172,7 @@
 // FULL CLONE {
 	if($_REQUEST['form'] == 'full_clone'){
 // Items
-		$hostItems = CItem::get(array(
+		$hostItems = API::Item()->get(array(
 			'hostids' => $templateid,
 			'inherited' => false,
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
@@ -193,7 +193,7 @@
 		}
 
 // Triggers
-		$hostTriggers = CTrigger::get(array(
+		$hostTriggers = API::Trigger()->get(array(
 			'inherited' => false,
 			'hostids' => $templateid,
 			'output' => API_OUTPUT_EXTEND,
@@ -215,7 +215,7 @@
 		}
 
 // Graphs
-		$hostGraphs = CGraph::get(array(
+		$hostGraphs = API::Graph()->get(array(
 			'inherited' => false,
 			'hostids' => $templateid,
 			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)),
@@ -236,7 +236,7 @@
 		}
 
 // Discovery rules
-		$hostDiscoveryRules = CDiscoveryRule::get(array(
+		$hostDiscoveryRules = API::DiscoveryRule()->get(array(
 			'inherited' => false,
 			'hostids' => $templateid,
 			'output' => API_OUTPUT_EXTEND,
@@ -256,7 +256,7 @@
 			$templateList->addRow(_('Discovery rules'), $listBox);
 
 // Item prototypes
-			$hostItemPrototypes = CItemPrototype::get(array(
+			$hostItemPrototypes = API::Itemprototype()->get(array(
 				'hostids' => $templateid,
 				'discoveryids' => $hostDiscoveryRuleids,
 				'inherited' => false,
@@ -277,7 +277,7 @@
 			}
 
 // Trigger prototypes
-			$hostTriggerPrototypes = CTriggerPrototype::get(array(
+			$hostTriggerPrototypes = API::TriggerPrototype()->get(array(
 				'hostids' => $templateid,
 				'discoveryids' => $hostDiscoveryRuleids,
 				'inherited' => false,
@@ -299,7 +299,7 @@
 			}
 
 // Graph prototypes
-			$hostGraphPrototypes = CGraphPrototype::get(array(
+			$hostGraphPrototypes = API::GraphPrototype()->get(array(
 				'hostids' => $templateid,
 				'discoveryids' => $hostDiscoveryRuleids,
 				'inherited' => false,

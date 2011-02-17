@@ -124,6 +124,8 @@
 	function get_current_nodeid($forse_all_nodes = null, $perm = null){
 		global $USER_DETAILS, $ZBX_CURRENT_NODEID, $ZBX_AVAILABLE_NODES, $ZBX_VIEWED_NODES;
 		if(!isset($ZBX_CURRENT_NODEID)) {
+// frontend error!!!
+			error('Nodes are not initialized!');
 			init_nodes();
 		}
 
@@ -162,7 +164,7 @@
 		$result = array('selected' => 0, 'nodes' => array(), 'nodeids' => array());
 
 		if(!defined('ZBX_NOT_ALLOW_ALL_NODES')){
-			$result['nodes'][0] = array('nodeid' => 0, 'name' => S_ALL_S);
+			$result['nodes'][0] = array('nodeid' => 0, 'name' => _('All'));
 		}
 
 		$available_nodes = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST, PERM_RES_DATA_ARRAY);

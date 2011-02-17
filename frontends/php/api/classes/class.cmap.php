@@ -52,11 +52,10 @@ class CMap extends CZBXAPI{
  * @param string $options['sortfield']
  * @return array|boolean Host data as array or false if error
  */
-	public static function get($options=array()){
-		global $USER_DETAILS;
+	public function get($options=array()){
 
 		$result = array();
-		$user_type = $USER_DETAILS['type'];
+		$user_type = self::$userData['type'];
 
 		$sort_columns = array('name'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
@@ -240,7 +239,7 @@ class CMap extends CZBXAPI{
 						'output' => API_OUTPUT_SHORTEN,
 						'preservekeys' => 1,
 					);
-					$all_triggers = CTrigger::get($trig_options);
+					$all_triggers = API::Trigger()->get($trig_options);
 					foreach($link_triggers as $id => $triggerid){
 						if(!isset($all_triggers[$triggerid])){
 							unset($result[$id], $sysmapids[$id]);
@@ -290,7 +289,7 @@ class CMap extends CZBXAPI{
 						'preservekeys' => 1,
 						'output' => API_OUTPUT_SHORTEN,
 					);
-					$allowed_hosts = CHost::get($host_options);
+					$allowed_hosts = API::Host()->get($host_options);
 
 					foreach($hosts_to_check as $elementid){
 						if(!isset($allowed_hosts[$elementid])){
@@ -311,7 +310,7 @@ class CMap extends CZBXAPI{
 						'preservekeys' => 1,
 						'output' => API_OUTPUT_SHORTEN,
 					);
-					$allowed_maps = self::get($map_options);
+					$allowed_maps = $this->get($map_options);
 
 					foreach($maps_to_check as $elementid){
 						if(!isset($allowed_maps[$elementid])){
@@ -332,7 +331,7 @@ class CMap extends CZBXAPI{
 						'preservekeys' => 1,
 						'output' => API_OUTPUT_SHORTEN,
 					);
-					$allowed_triggers = CTrigger::get($trigger_options);
+					$allowed_triggers = API::Trigger()->get($trigger_options);
 
 					foreach($triggers_to_check as $elementid){
 						if(!isset($allowed_triggers[$elementid])){
@@ -353,7 +352,7 @@ class CMap extends CZBXAPI{
 						'preservekeys' => 1,
 						'output' => API_OUTPUT_SHORTEN,
 					);
-					$allowed_host_groups = CHostGroup::get($hostgroup_options);
+					$allowed_host_groups = API::HostGroup()->get($hostgroup_options);
 
 					foreach($host_groups_to_check as $elementid){
 						if(!isset($allowed_host_groups[$elementid])){
@@ -397,7 +396,7 @@ COpt::memoryPick();
 				while($map_url = DBfetch($db_map_urls)){
 					foreach($selements as $snum => $selement){
 						if((bccomp($selement['sysmapid'],$map_url['sysmapid']) == 0) && ($selement['elementtype'] == $map_url['elementtype'])){
-							$selements[$snum]['urls'][] = self::expandUrlMacro($map_url, $selement);
+							$selements[$snum]['urls'][] = $this->expandUrlMacro($map_url, $selement);
 						}
 					}
 				}
@@ -411,7 +410,7 @@ COpt::memoryPick();
 				if(is_null($options['expand_urls']))
 					$selements[$selement_url['selementid']]['urls'][] = $selement_url;
 				else
-				$selements[$selement_url['selementid']]['urls'][] = self::expandUrlMacro($selement_url, $selements[$selement_url['selementid']]);
+				$selements[$selement_url['selementid']]['urls'][] = $this->expandUrlMacro($selement_url, $selements[$selement_url['selementid']]);
 			}
 
 			foreach($selements as $num => $selement){
@@ -485,7 +484,7 @@ COpt::memoryPick();
  * @param array $sysmap_data['sysmapid']
  * @return string sysmapid
  */
-	public static function getObjects($sysmapData){
+	public function getObjects($sysmapData){
 		$options = array(
 			'filter' => $sysmapData,
 			'output'=>API_OUTPUT_EXTEND
@@ -496,12 +495,12 @@ COpt::memoryPick();
 		else if(isset($sysmapData['nodeids']))
 			$options['nodeids'] = $sysmapData['nodeids'];
 
-		$result = self::get($options);
+		$result = $this->get($options);
 
 	return $result;
 	}
 
-	public static function exists($object){
+	public function exists($object){
 		$keyFields = array(array('sysmapid', 'name'));
 
 		$options = array(
@@ -515,12 +514,12 @@ COpt::memoryPick();
 		else if(isset($object['nodeids']))
 			$options['nodeids'] = $object['nodeids'];
 
-		$objs = self::get($options);
+		$objs = $this->get($options);
 
 	return !empty($objs);
 	}
 
-	public static function checkInput($maps, $method){
+	public function checkInput($maps, $method){
 		$create = ($method == 'create');
 		$update = ($method == 'update');
 		$delete = ($method == 'delete');
@@ -528,7 +527,7 @@ COpt::memoryPick();
 // permissions
 		if($update || $delete){
 			$mapDbFields = array('sysmapid'=> null);
-			$dbMaps = self::get(array(
+			$dbMaps = $this->get(array(
 				'sysmapids' => zbx_objectValues($maps, 'sysmapid'),
 				'output' => API_OUTPUT_EXTEND,
 				'editable' => true,
@@ -656,7 +655,7 @@ COpt::memoryPick();
 				'output' => array('sysmapid', 'name'),
 				'nopermissions' => 1
 			);
-			$dbMaps = self::get($options);
+			$dbMaps = $this->get($options);
 			foreach($dbMaps as $dbmnum => $dbMap){
 				if($create || (bccomp($mapNames[$dbMap['name']],$dbMap['sysmapid']) != 0))
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Map with name "%s" already exists', $dbMap['name']));
@@ -681,13 +680,11 @@ COpt::memoryPick();
  * @param int $maps['grid_align'] does elements need to be aligned to the grid. Constants: SYSMAP_GRID_ALIGN_ON / SYSMAP_GRID_ALIGN_OFF
  * @return boolean | array
  */
-	public static function create($maps){
+	public function create($maps){
 		$maps = zbx_toArray($maps);
 
-		try{
-			self::BeginTransaction(__METHOD__);
+			$this->checkInput($maps, __FUNCTION__);
 
-			self::checkInput($maps, __FUNCTION__);
 
 			$sysmapids = DB::insert('sysmaps', $maps);
 
@@ -711,19 +708,9 @@ COpt::memoryPick();
 			DB::insert('sysmap_url', $insert_urls);
 
 			if(!empty($data_elements))
-				self::addElements($data_elements);
-
-			self::EndTransaction(true, __METHOD__);
+				$this->addElements($data_elements);
 
 			return array('sysmapids' => $sysmapids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -742,18 +729,16 @@ COpt::memoryPick();
  * @param int $maps['grid_align'] does elements need to be aligned to the grid. Constants: SYSMAP_GRID_ALIGN_ON / SYSMAP_GRID_ALIGN_OFF
  * @return boolean
  */
-	public static function update($maps){
+	public function update($maps){
 		$maps = zbx_toArray($maps);
 		$sysmapids = zbx_objectValues($maps, 'sysmapid');
 
-		try{
-			self::BeginTransaction(__METHOD__);
-
-			self::checkInput($maps, __FUNCTION__);
+			$this->checkInput($maps, __FUNCTION__);
 
 			$update = array();
 			$urlidsToDelete = $urlsToUpdate = $urlsToAdd = array();
 			foreach($maps as $map){
+
 				$update[] = array(
 					'values' => $map,
 					'where' => array('sysmapid='.$map['sysmapid']),
@@ -762,7 +747,7 @@ COpt::memoryPick();
 				if(isset($map['urls'])){
 					$map['urls'] = zbx_toHash($map['urls'], 'name');
 
-					$dbSysmaps = self::get(array(
+					$dbSysmaps = $this->get(array(
 						'sysmapids' => $sysmapids,
 						'preservekeys' => true,
 						'output' => API_OUTPUT_EXTEND,
@@ -804,16 +789,7 @@ COpt::memoryPick();
 			DB::update('sysmap_url', $urlsToUpdate);
 			DB::insert('sysmap_url', $urlsToAdd);
 
-			self::EndTransaction(true, __METHOD__);
 			return array('sysmapids' => $sysmapids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 
@@ -824,13 +800,10 @@ COpt::memoryPick();
  * @param array $sysmaps['sysmapid']
  * @return boolean
  */
-	public static function delete($sysmapids){
-
-		try{
-			self::BeginTransaction(__METHOD__);
+	public function delete($sysmapids){
 
 			$maps = zbx_toObject($sysmapids, 'sysmapid');
-			self::checkInput($maps, __FUNCTION__);
+			$this->checkInput($maps, __FUNCTION__);
 
 // delete maps from selements of other maps
 			DB::delete('sysmaps_elements', array(
@@ -849,16 +822,7 @@ COpt::memoryPick();
 //----
 			DB::delete('sysmaps', array('sysmapid'=>$sysmapids));
 
-			self::EndTransaction(true, __METHOD__);
 			return array('sysmapids' => $sysmapids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -872,12 +836,9 @@ COpt::memoryPick();
  * @param array $links[0,...]['color']
  * @return boolean
  */
-	public static function addLinks($links){
+	public function addLinks($links){
 		$result_links = array();
 		$links = zbx_toArray($links);
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			foreach($links as $lnum => $link){
 				$link_db_fields = array(
@@ -902,16 +863,7 @@ COpt::memoryPick();
 				$result_links[] = array_merge($new_link, $link);
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return $result_links;
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 /**
  * Add Element to Sysmap
@@ -928,11 +880,8 @@ COpt::memoryPick();
  * @param array $elements[0,...]['urls'][0,...]
  * @param array $elements[0,...]['label_location']
  */
-	public static function addElements($selements){
+	public function addElements($selements){
 		$selements = zbx_toArray($selements);
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			$options = array(
 				'sysmapids' => zbx_objectValues($selements, 'sysmapid'),
@@ -940,7 +889,7 @@ COpt::memoryPick();
 				'preservekeys' => 1,
 				'output' => API_OUTPUT_SHORTEN,
 			);
-			$upd_maps = self::get($options);
+			$upd_maps = $this->get($options);
 
 			foreach($selements as $snumm => $selement){
 				if(!isset($upd_maps[$selement['sysmapid']])){
@@ -977,19 +926,7 @@ COpt::memoryPick();
 			}
 			DB::insert('sysmap_element_url', $insert_urls);
 
-			self::EndTransaction(true, __METHOD__);
-
 		return $selementids;
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-
-			$errors = $e->getErrors();
-			$error = reset($errors);
-
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, $error);
-			return false;
-		}
 	}
 
 
@@ -1009,14 +946,11 @@ COpt::memoryPick();
  * @param array $elements[0,...]['url']
  * @param array $elements[0,...]['label_location']
  */
-	public static function updateElements($selements){
+	public function updateElements($selements){
 		$selements = zbx_toArray($selements);
 		$selementids = array();
 
 		$sysmapids = zbx_objectValues($selements, 'sysmapid');
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			$options = array(
 				'sysmapids' => $sysmapids,
@@ -1025,7 +959,7 @@ COpt::memoryPick();
 				'select_selements' => API_OUTPUT_EXTEND,
 				'output' => API_OUTPUT_SHORTEN,
 			);
-			$upd_maps = self::get($options);
+			$upd_maps = $this->get($options);
 
 			foreach($selements as $snumm => $selement){
 				if(!isset($upd_maps[$selement['sysmapid']])){
@@ -1092,18 +1026,7 @@ COpt::memoryPick();
 			DB::update('sysmap_element_url', $urlsToUpdate);
 			DB::insert('sysmap_element_url', $urlsToAdd);
 
-			self::EndTransaction(true, __METHOD__);
 			return $selementids;
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-
-			$errors = $e->getErrors();
-			$error = reset($errors);
-
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, $error);
-			return false;
-		}
 	}
 
 /**
@@ -1112,14 +1035,11 @@ COpt::memoryPick();
  * @param array $selements multidimensional array with selement objects
  * @param array $selements[0, ...]['selementid'] selementid to delete
  */
-    public static function deleteElements($selements){
+	public function deleteElements($selements){
         $selements = zbx_toArray($selements);
         $selementids = zbx_objectValues($selements, 'selementid');
 
 		$sysmapids = zbx_objectValues($selements, 'sysmapid');
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			$options = array(
 				'sysmapids' => $sysmapids,
@@ -1127,7 +1047,7 @@ COpt::memoryPick();
 				'preservekeys' => 1,
 				'output' => API_OUTPUT_SHORTEN,
 			);
-			$upd_maps = self::get($options);
+			$upd_maps = $this->get($options);
 
 			foreach($selements as $snumm => $selement){
 				if(!isset($upd_maps[$selement['sysmapid']])){
@@ -1138,17 +1058,7 @@ COpt::memoryPick();
 	        $result = delete_sysmaps_element($selementids);
 			if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Map delete elements failed');
 
-			self::EndTransaction(true, __METHOD__);
-
 			return $selementids;
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$errors = $e->getErrors();
-			$error = reset($errors);
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, $error);
-			return false;
-		}
     }
 
 /**
@@ -1159,14 +1069,13 @@ COpt::memoryPick();
  * @param array $links[0,...]['drawtype']
  * @param array $links[0,...]['color']
  */
-	private static function addLinkTrigger($linktriggers){
+	private function addLinkTrigger($linktriggers){
 		$errors = array();
 		$result_linktriggers = array();
 		$result = false;
 
 		$linktriggers = zbx_toArray($linktriggers);
 
-		self::BeginTransaction(__METHOD__);
 		foreach($linktriggers as $linktrigger){
 
 			$linktrigger_db_fields = array(
@@ -1195,17 +1104,15 @@ COpt::memoryPick();
 			$new_linktriggerid = array('linktriggerid' => $linktriggerid);
 			$result_linktriggers[] = array_merge($new_linktriggerid, $linktriggerid);
 		}
-		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
 			return $result_linktriggers;
 		else{
-			self::setMethodErrors(__METHOD__, $errors);
 			return false;
 		}
 	}
 
-	private static function expandUrlMacro($url, $selement){
+	private function expandUrlMacro($url, $selement){
 
 		switch($selement['elementtype']){
 			case SYSMAP_ELEMENT_TYPE_HOST_GROUP: $macro = '{HOSTGROUP.ID}' ; break;

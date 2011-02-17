@@ -31,12 +31,6 @@ class CHistory extends CZBXAPI{
 /**
  * Get history data
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8.3
- * @version 1.3
- *
  * @param array $options
  * @param array $options['itemids']
  * @param boolean $options['editable']
@@ -45,8 +39,7 @@ class CHistory extends CZBXAPI{
  * @param string $options['order']
  * @return array|int item data as array or false if error
  */
-	public static function get($options=array()){
-		global $USER_DETAILS;
+	public function get($options=array()){
 
 		$nodeCheck = false;
 		$result = array();
@@ -117,7 +110,7 @@ class CHistory extends CZBXAPI{
 		}
 
 // editable + PERMISSION CHECK
-		if((USER_TYPE_SUPER_ADMIN == $USER_DETAILS['type']) || $options['nopermissions']){
+		if((USER_TYPE_SUPER_ADMIN == self::$userData['type']) || $options['nopermissions']){
 		}
 		else{
 			$itemOptions = array(
@@ -126,7 +119,7 @@ class CHistory extends CZBXAPI{
 				'preservekeys' => 1
 			);
 			if(!is_null($options['itemids'])) $itemOptions['itemids'] = $options['itemids'];
-			$items = CItem::get($itemOptions);
+			$items = API::Item()->get($itemOptions);
 
 			$options['itemids'] = array_keys($items);
 		}
@@ -317,10 +310,10 @@ COpt::memoryPick();
 	return $result;
 	}
 
-	public static function create($items=array()){
+	public function create($items=array()){
 	}
 
-	public static function delete($itemids=array()){
+	public function delete($itemids=array()){
 	}
 }
 ?>
