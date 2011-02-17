@@ -38,7 +38,27 @@ class CAPIObject{
 			return $result['result'];
 		}
 		else{
-			error($result['message']);
+			$trace = $result['data'];
+
+			if(isset($result['debug'])){
+				$trace .= ' [';
+
+				$chain = array();
+				foreach($result['debug'] as $bt){
+					if($bt['function'] == 'exception') continue;
+					if($bt['function'] == 'call_user_func') break;
+
+					$chain[] = (isset($bt['class']) ? $bt['class'].'.'.$bt['function'] : $bt['function']);
+					$chain[] = ' -> ';
+				}
+				array_pop($chain);
+				$trace .= implode('', array_reverse($chain));
+
+				$trace .= ']';
+			}
+
+			error($trace);
+
 			return false;
 		}
 	}
