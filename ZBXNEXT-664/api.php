@@ -30,6 +30,7 @@ function do_post_request($url, $data){
 
 	return $response;
 }
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -43,23 +44,25 @@ function do_post_request($url, $data){
 	<script src="http://yui.yahooapis.com/2.8.2r1/build/json/json-min.js"></script>
 
 	<script src="http://yandex.st/highlightjs/5.16/highlight.min.js"></script>
-	<link rel="stylesheet" href="http://yandex.st/highlightjs/5.16/styles/zenburn.min.css">
+	<link rel="stylesheet" href="http://yandex.st/highlightjs/5.16/styles/idea.min.css">
 
 <?php
-	$_REQUEST['path'] = isset($_REQUEST['path']) ? $_REQUEST['path'] : 'http://localhost/current/frontends/php/api_jsonrpc.php';
+	$_REQUEST['path'] = isset($_REQUEST['path']) ? $_REQUEST['path'] : 'trunk';
 	$_REQUEST['user'] = isset($_REQUEST['user']) ? $_REQUEST['user'] : 'Admin';
 	$_REQUEST['pswd'] = isset($_REQUEST['pswd']) ? $_REQUEST['pswd'] : 'zabbix';
-	$url = $_REQUEST['path'];
+	$url = 'http://'.$_REQUEST['path'].'/api_jsonrpc.php';
 	$user = $_REQUEST['user'];
 	$pswd = $_REQUEST['pswd'];
 ?>
 <body>
 <form method="post">
-	Path: <input type="text" name="path" size="70" value="<?= $url;?>"/><br />
-	User: <input type="text" name="user" value="<?= $user;?>"/>  Pass: <input type="password" name="pswd" value="<?= $pswd; ?>"/><br />
-	Method: <input type="text" name="apimethod" size="40" value="<?= isset($_REQUEST['apimethod']) ? $_REQUEST['apimethod'] : '';?>"/><br />
-	Params: <textarea name="apiparams" cols="100" rows="20"><?= isset($_REQUEST['apiparams']) ? $_REQUEST['apiparams'] : '';?></textarea><br />
-	<input type="submit" value="OK" name="apicall" /><br />
+	Path: <input type="text" name="path" value="<?php print($_REQUEST['path']);?>"/><br />
+	User: <input type="text" name="user" value="<?php print($user);?>"/><br />
+	Pass: <input type="password" name="pswd" value="<?php print($pswd); ?>"/><br />
+	Method: <input type="text" name="apimethod" size="40" value="<?php print(isset($_REQUEST['apimethod']) ? $_REQUEST['apimethod'] : '');?>"/><br />
+	Params: <textarea name="apiparams" cols="100" rows="20"><?php print(isset($_REQUEST['apiparams']) ? $_REQUEST['apiparams'] : '');?></textarea><br />
+	<input type="submit" value="OK" name="apicall" />
+	<br />
 </form>
 <?php
 
@@ -82,11 +85,11 @@ if(isset($_REQUEST['apicall'])){
 <div style="color: darkgreen; border: 2px solid darkblue;">
 	<div>
 		<span style="color: blue;">request:</span>
-		<pre><code class="javascript"><?= $data ?></code></pre>
+		<pre><code class="javascript"><?php print($data); ?></code></pre>
 	</div>
 	<div>
 		<span style="color: blue;">response:</span>
-		<pre><code class="javascript"><?= $responce ?></code></pre>
+		<pre><code class="javascript"><?php print($responce); ?></code></pre>
 	</div>
 </div>
 
@@ -106,15 +109,15 @@ if(isset($_REQUEST['apicall'])){
 <div style="color: darkgreen; border: 2px solid darkblue;">
 	<div>
 		<span style="color: blue;">request:</span>
-		<pre><code id="data" class="javascript"><?= $data ?></code></pre>
+		<pre><code id="data" class="javascript"><?php print($data); ?></code></pre>
 	</div>
 	<div>
 		<span style="color: blue;">response:</span>
-		<pre><code id="resp" class="javascript"><?= $responce ?></code></pre>
+		<pre><code id="resp" class="javascript"><?php print($responce); ?></code></pre>
 	</div>
 </div>
 
-<script>
+<script type="text/javascript">
 var j = YAHOO.lang.JSON.parse(document.getElementById("resp").innerHTML);
 document.getElementById("resp").innerHTML = YAHOO.lang.JSON.stringify(j,function(key, value){return value;}, 4);
 var j = YAHOO.lang.JSON.parse(document.getElementById("data").innerHTML);
