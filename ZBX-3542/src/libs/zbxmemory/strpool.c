@@ -68,7 +68,7 @@ void	zbx_strpool_create(size_t size)
 
 	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_STRPOOL_ID)))
 	{	
-		zabbix_log(LOG_LEVEL_CRIT, "Could not create IPC key for string pool.");
+		zabbix_log(LOG_LEVEL_CRIT, "cannot create IPC key for string pool");
 		exit(FAIL);
 	}
 
@@ -76,7 +76,7 @@ void	zbx_strpool_create(size_t size)
 
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&strpool.pool_lock, ZBX_MUTEX_STRPOOL))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Could not create mutex for string pool.");
+		zabbix_log(LOG_LEVEL_CRIT, "cannot create mutex for string pool");
 		exit(FAIL);
 	}
 
@@ -102,12 +102,8 @@ void	zbx_strpool_destroy()
 
 const char	*zbx_strpool_intern(const char *str)
 {
-	const char	*__function_name = "zbx_strpool_intern";
-
 	void		*record;
 	uint32_t	*refcount;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() str:'%s'", __function_name, str);
 
 	LOCK_POOL;
 
@@ -127,18 +123,12 @@ const char	*zbx_strpool_intern(const char *str)
 
 	UNLOCK_POOL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-
 	return record + REFCOUNT_FIELD_SIZE;
 }
 
 const char	*zbx_strpool_acquire(const char *str)
 {
-	const char	*__function_name = "zbx_strpool_acquire";
-
 	uint32_t	*refcount;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() str:'%s'", __function_name, str);
 
 	LOCK_POOL;
 
@@ -147,18 +137,12 @@ const char	*zbx_strpool_acquire(const char *str)
 
 	UNLOCK_POOL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-
 	return str;
 }
 
 void	zbx_strpool_release(const char *str)
 {
-	const char	*__function_name = "zbx_strpool_release";
-
 	uint32_t	*refcount;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() str:'%s'", __function_name, str);
 
 	LOCK_POOL;
 
@@ -167,8 +151,6 @@ void	zbx_strpool_release(const char *str)
 		zbx_hashset_remove(strpool.hashset, str - REFCOUNT_FIELD_SIZE);
 
 	UNLOCK_POOL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 void	zbx_strpool_clear()

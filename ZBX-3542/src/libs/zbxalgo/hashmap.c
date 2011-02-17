@@ -65,10 +65,6 @@ void	zbx_hashmap_create_ext(zbx_hashmap_t *hm, size_t init_size,
 				zbx_mem_realloc_func_t mem_realloc_func,
 				zbx_mem_free_func_t mem_free_func)
 {
-	const char	*__function_name = "zbx_hashmap_create";
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
 	hm->num_data = 0;
 	hm->num_slots = next_prime(init_size);
 
@@ -80,17 +76,11 @@ void	zbx_hashmap_create_ext(zbx_hashmap_t *hm, size_t init_size,
 	hm->mem_malloc_func = mem_malloc_func;
 	hm->mem_realloc_func = mem_realloc_func;
 	hm->mem_free_func = mem_free_func;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 void	zbx_hashmap_destroy(zbx_hashmap_t *hm)
 {
-	const char	*__function_name = "zbx_hashmap_destroy";
-
-	int		i;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	int	i;
 
 	for (i = 0; i < hm->num_slots; i++)
 		if (NULL != hm->slots[i].entries)
@@ -107,54 +97,46 @@ void	zbx_hashmap_destroy(zbx_hashmap_t *hm)
 	hm->mem_malloc_func = NULL;
 	hm->mem_realloc_func = NULL;
 	hm->mem_free_func = NULL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 int	zbx_hashmap_get(zbx_hashmap_t *hm, zbx_uint64_t key)
 {
-	const char		*__function_name = "zbx_hashmap_get";
-
 	int			i, value = FAIL;
 	zbx_hash_t		hash;
 	ZBX_HASHMAP_SLOT_T	*slot;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:" ZBX_FS_UI64, __function_name, key);
 	
 	hash = hm->hash_func(&key);
 	slot = &hm->slots[hash % hm->num_slots];
 
 	for (i = 0; i < slot->entries_num; i++)
-		if (hm->compare_func(&slot->entries[i].key, &key) == 0)
+	{
+		if (0 == hm->compare_func(&slot->entries[i].key, &key))
 		{
 			value = slot->entries[i].value;
 			break;
 		}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() key:" ZBX_FS_UI64 " value:%d", __function_name, key, value);
+	}
 
 	return value;
 }
 
 void	zbx_hashmap_set(zbx_hashmap_t *hm, zbx_uint64_t key, int value)
 {
-	const char		*__function_name = "zbx_hashmap_set";
-
 	int			i;
 	zbx_hash_t		hash;
 	ZBX_HASHMAP_SLOT_T	*slot;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:" ZBX_FS_UI64 " value:%d", __function_name, key, value);
 
 	hash = hm->hash_func(&key);
 	slot = &hm->slots[hash % hm->num_slots];
 
 	for (i = 0; i < slot->entries_num; i++)
-		if (hm->compare_func(&slot->entries[i].key, &key) == 0)
+	{
+		if (0 == hm->compare_func(&slot->entries[i].key, &key))
 		{
 			slot->entries[i].value = value;
 			break;
 		}
+	}
 
 	if (i == slot->entries_num)
 	{
@@ -199,43 +181,33 @@ void	zbx_hashmap_set(zbx_hashmap_t *hm, zbx_uint64_t key, int value)
 			hm->num_slots = inc_slots;
 		}
 	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 void	zbx_hashmap_remove(zbx_hashmap_t *hm, zbx_uint64_t key)
 {
-	const char		*__function_name = "zbx_hashmap_remove";
-
 	int			i;
 	zbx_hash_t		hash;
 	ZBX_HASHMAP_SLOT_T	*slot;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:" ZBX_FS_UI64, __function_name, key);
 	
 	hash = hm->hash_func(&key);
 	slot = &hm->slots[hash % hm->num_slots];
 
 	for (i = 0; i < slot->entries_num; i++)
-		if (hm->compare_func(&slot->entries[i].key, &key) == 0)
+	{
+		if (0 == hm->compare_func(&slot->entries[i].key, &key))
 		{
 			slot->entries[i] = slot->entries[slot->entries_num - 1];
 			slot->entries_num--;
 			hm->num_data--;
 			break;
 		}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	}
 }
 
 void	zbx_hashmap_clear(zbx_hashmap_t *hm)
 {
-	const char		*__function_name = "zbx_hashmap_clear";
-
 	int			i;
 	ZBX_HASHMAP_SLOT_T	*slot;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	for (i = 0; i < hm->num_slots; i++)
 	{
@@ -251,6 +223,4 @@ void	zbx_hashmap_clear(zbx_hashmap_t *hm)
 	}
 
 	hm->num_data = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
