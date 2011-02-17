@@ -85,6 +85,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
 
+ - [ZBX-3536] made SNMP checks work when DNS resolves to IPv6 address; thanks to Marc Dequènes (asaveljevs,Sasha)
  - [ZBX-3541] fixed processing of nodata() function (Sasha)
  - [ZBX-3126] all checkboxes in map and screen import are now "on" by default (KB)
  - [ZBX-3158] improved links in map element menu (Aly)
