@@ -418,4 +418,5 @@ function infavorites($favobj, $favid, $source=null){
 	return false;
 }
 /********** END USER FAVORITES ***********/
+
 ?>
