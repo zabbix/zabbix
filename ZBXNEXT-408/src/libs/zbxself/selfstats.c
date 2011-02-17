@@ -338,6 +338,8 @@ void	collect_selfstats()
  *             process_num  - [IN] process number; 1 - first process;         *
  *                                 0 - all processes                          *
  *             state        - [IN] process state; ZBX_PROCESS_STATE_*         *
+ *             value        - [OUT] a pointer to a variable that receives     *
+ *                                  requested statistics                      *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
