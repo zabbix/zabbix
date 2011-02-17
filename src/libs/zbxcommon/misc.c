@@ -743,37 +743,38 @@ int	is_ip4(const char *ip)
 static int	is_ip6(const char *ip)
 {
 	const char	*p = ip;
-	int		nums, is_nums, colons, dcolons, res = FAIL;
+	int		nums = 0, is_nums = 0, colons = 0, dcolons = 0, res = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In is_ip6() [%s]",
-			ip);
+	zabbix_log(LOG_LEVEL_DEBUG, "In is_ip6() ip:'%s'", ip);
 
-	nums = 0;
-	is_nums = 0;
-	colons = 0;
-	dcolons = 0;
-	while ('\0' != *p) {
-		if ((*p >= '0' && *p <= '9') || (*p >= 'A' && *p <= 'F') || (*p >= 'a' && *p <= 'f')) {
+	while ('\0' != *p)
+	{
+		if ((*p >= '0' && *p <= '9') || (*p >= 'a' && *p <= 'f') || (*p >= 'A' && *p <= 'F'))
+		{
 			nums++;
 			is_nums = 1;
-		} else if (*p == ':') {
+		}
+		else if (*p == ':')
+		{
 			if (nums == 0 && colons > 0)
 				dcolons++;
 			if (nums > 4 || dcolons > 1)
 				break;
 			nums = 0;
 			colons++;
-		} else {
+		}
+		else
+		{
 			is_nums = 0;
 			break;
 		}
 		p++;
 	}
+
 	if (colons >= 2 && colons <= 7 && nums <= 4 && is_nums == 1)
 		res = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of is_ip6(result:%d)",
-			res);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of is_ip6():%s", zbx_result_string(res));
 
 	return res;
 }
