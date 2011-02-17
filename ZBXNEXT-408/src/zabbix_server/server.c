@@ -568,7 +568,8 @@ int	MAIN_ZABBIX_ENTRY()
 	/* Main process */
 	if (server_num == 0)
 	{
-		init_main_process();
+		set_parent_signal_handler();
+
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [Watchdog]",
 			server_num);
 

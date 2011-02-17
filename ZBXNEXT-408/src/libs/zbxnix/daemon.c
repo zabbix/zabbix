@@ -257,7 +257,7 @@ void	daemon_stop()
 	drop_pid_file(CONFIG_PID_FILE);
 }
 
-void	init_main_process()
+void	set_parent_signal_handler()
 {
 	struct sigaction	phan;
 

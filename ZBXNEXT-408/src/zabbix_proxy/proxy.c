@@ -549,7 +549,7 @@ int	MAIN_ZABBIX_ENTRY()
 	/* Main process */
 	if (server_num == 0)
 	{
-		init_main_process();
+		set_parent_signal_handler();
 
 		if (ZBX_PROXYMODE_ACTIVE == CONFIG_PROXYMODE)
 		{

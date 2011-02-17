@@ -287,7 +287,7 @@ int	MAIN_ZABBIX_ENTRY()
 	}
 
 	/* Must be called after all child processes loading. */
-	init_main_process();
+	set_parent_signal_handler();
 
 	/* wait for all threads exiting */
 	for(i = 0; i < 1 + CONFIG_ZABBIX_FORKS +((0 == CONFIG_DISABLE_ACTIVE) ? 1 : 0); i++)
