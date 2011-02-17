@@ -342,17 +342,16 @@ static int	housekeeping_history_and_trends(int now)
 	return deleted;
 }
 
-int	main_housekeeper_loop()
+void	main_housekeeper_loop()
 {
 	int	d, now;
 
 	if (1 == CONFIG_DISABLE_HOUSEKEEPING)
 	{
+		zbx_setproctitle("housekeeper [sleeping forever]");
+
 		for (;;)
-		{
-			zbx_setproctitle("housekeeper [sleeping forever]");
 			sleep(SEC_PER_HOUR);
-		}
 	}
 
 	for (;;)

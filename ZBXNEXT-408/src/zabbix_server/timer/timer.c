@@ -775,7 +775,7 @@ void	main_timer_loop()
 		sleeptime = nextcheck - now;
 
 		/* process maintenance every minute */
-		maintenance = (0 == (nextcheck % 60)) ? 1 : 0;
+		maintenance = (0 == nextcheck % 60 ? 1 : 0);
 
 		zbx_setproctitle("timer [sleeping for %d seconds]", sleeptime);
 		update_sm_counter(ZBX_STATE_IDLE);

@@ -415,9 +415,9 @@ static void	process_trapper_child(zbx_sock_t *sock)
 	process_trap(sock, data, sizeof(data));
 }
 
-void	child_trapper_main(unsigned char p, zbx_sock_t *s)
+void	main_trapper_loop(unsigned char p, zbx_sock_t *s)
 {
-	const char	*__function_name = "child_trapper_main";
+	const char	*__function_name = "main_trapper_loop";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 

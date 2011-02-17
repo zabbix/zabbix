@@ -75,7 +75,7 @@ static void	send_heartbeat()
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void main_heart_loop()
+void	main_heart_loop()
 {
 	int	start, sleeptime;
 
@@ -83,14 +83,16 @@ void main_heart_loop()
 
 	set_child_signal_handler();
 
-	if (CONFIG_HEARTBEAT_FREQUENCY == 0) {
-		zbx_setproctitle("heartbeat sender [do nothing]");
+	if (0 == CONFIG_HEARTBEAT_FREQUENCY)
+	{
+		zbx_setproctitle("heartbeat sender [sleeping forever]");
 
-		for (;;) /* Do nothing */
-			sleep(3600);
+		for (;;)
+			sleep(SEC_PER_HOUR);
 	}
 
-	for (;;) {
+	for (;;)
+	{
 		start = time(NULL);
 
 		zbx_setproctitle("heartbeat sender [sending heartbeat message]");
@@ -99,7 +101,8 @@ void main_heart_loop()
 
 		sleeptime = CONFIG_HEARTBEAT_FREQUENCY - (time(NULL) - start);
 
-		if (sleeptime > 0) {
+		if (sleeptime > 0)
+		{
 			zbx_setproctitle("heartbeat sender [sleeping for %d seconds]",
 					sleeptime);
 			zabbix_log(LOG_LEVEL_DEBUG, "Sleeping for %d seconds",

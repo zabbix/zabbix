@@ -20,12 +20,6 @@
 #ifndef ZABBIX_POLLER_H
 #define ZABBIX_POLLER_H
 
-#include "common.h"
-#include "dbcache.h"
-#include "sysinfo.h"
-
-extern int	server_num;
-
 extern int	CONFIG_TIMEOUT;
 extern int	CONFIG_UNAVAILABLE_DELAY;
 extern int	CONFIG_UNREACHABLE_PERIOD;

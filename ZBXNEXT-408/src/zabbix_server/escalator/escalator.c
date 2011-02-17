@@ -987,12 +987,12 @@ static void	process_escalations(int now)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-int	main_escalator_loop()
+void	main_escalator_loop()
 {
 	int	now;
 	double	sec;
@@ -1024,9 +1024,6 @@ int	main_escalator_loop()
 
 		update_sm_counter(ZBX_STATE_IDLE);
 		sleep(CONFIG_ESCALATOR_FREQUENCY);
-		update_sm_counter(ZBX_STATE_IDLE);
+		update_sm_counter(ZBX_STATE_BUSY);
 	}
-
-	/* Never reached */
-	DBclose();
 }

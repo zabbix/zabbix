@@ -20,7 +20,7 @@
 #ifndef ZABBIX_HTTPPOLLER_H
 #define ZABBIX_HTTPPOLLER_H
 
-extern  int     CONFIG_HTTPPOLLER_FORKS;
+extern int	CONFIG_HTTPPOLLER_FORKS;
 
 void	main_httppoller_loop();
 

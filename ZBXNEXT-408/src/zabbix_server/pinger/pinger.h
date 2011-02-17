@@ -20,8 +20,6 @@
 #ifndef ZABBIX_PINGER_H
 #define ZABBIX_PINGER_H
 
-#include "common.h"
-
 void	main_pinger_loop();
 
 #endif

@@ -159,7 +159,7 @@ int	is_direct_slave_node(int slave_nodeid)
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-int main_nodewatcher_loop()
+void	main_nodewatcher_loop()
 {
 	int	start, end;
 	int	lastrun = 0;
@@ -170,33 +170,28 @@ int main_nodewatcher_loop()
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	for(;;)
+	for (;;)
 	{
 		start = time(NULL);
 
-		zabbix_log( LOG_LEVEL_DEBUG, "Starting sync with nodes");
+		zabbix_log(LOG_LEVEL_DEBUG, "Starting sync with nodes");
 
-		if(lastrun + 120 < start)
+		if (lastrun + 120 < start)
 		{
 			process_nodes();
-
 			lastrun = start;
 		}
 
-		/* Send new history data to master node */
+		/* send new history data to master node */
 		main_historysender();
 
 		end = time(NULL);
 
-		if(end-start<10)
+		if (end - start < 10)
 		{
-			zbx_setproctitle("sender [sleeping for %d seconds]",
-				10-(end-start));
-			zabbix_log( LOG_LEVEL_DEBUG, "Sleeping %d seconds",
-				10-(end-start));
-			sleep(10-(end-start));
+			zbx_setproctitle("sender [sleeping for %d seconds]", 10 - (end - start));
+			zabbix_log(LOG_LEVEL_DEBUG, "Sleeping %d seconds", 10 - (end - start));
+			sleep(10 - (end - start));
 		}
 	}
-
-	DBclose();
 }

@@ -22,6 +22,6 @@
 
 extern int	CONFIG_DBCONFIG_FREQUENCY;
 
-int	main_dbconfig_loop();
+void	main_dbconfig_loop();
 
 #endif

@@ -146,7 +146,7 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-int	main_alerter_loop()
+void	main_alerter_loop()
 {
 	char			error[MAX_STRING_LEN], *error_esc;
 	int			res, now;
@@ -246,7 +246,4 @@ int	main_alerter_loop()
 		sleep(CONFIG_SENDER_FREQUENCY);
 		update_sm_counter(ZBX_STATE_BUSY);
 	}
-
-	/* Never reached */
-	DBclose();
 }

@@ -133,20 +133,22 @@ static int housekeeping_history(int now)
         return records;
 }
 
-int main_housekeeper_loop()
+void	main_housekeeper_loop()
 {
 	int	records;
 	int	start, sleeptime;
 	double	sec;
 
-	if (CONFIG_DISABLE_HOUSEKEEPING == 1) {
-		zbx_setproctitle("housekeeper [disabled]");
+	if (1 == CONFIG_DISABLE_HOUSEKEEPING)
+	{
+		zbx_setproctitle("housekeeper [sleeping forever]");
 
-		for(;;) /* Do nothing */
-			sleep(3600);
+		for (;;)
+			sleep(SEC_PER_HOUR);
 	}
 
-	for (;;) {
+	for (;;)
+	{
 		start = time(NULL);
 
 		zabbix_log(LOG_LEVEL_WARNING, "Executing housekeeper");
@@ -169,7 +171,8 @@ int main_housekeeper_loop()
 
 		sleeptime = CONFIG_HOUSEKEEPING_FREQUENCY * 3600 - (time(NULL) - start);
 
-		if (sleeptime > 0) {
+		if (sleeptime > 0)
+		{
 			zbx_setproctitle("housekeeper [sleeping for %d seconds]",
 					sleeptime);
 			zabbix_log(LOG_LEVEL_DEBUG, "Sleeping for %d seconds",

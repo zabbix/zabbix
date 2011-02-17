@@ -45,7 +45,7 @@ extern int	process_num;
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-int	main_dbsyncer_loop()
+void	main_dbsyncer_loop()
 {
 	int	now, sleeptime, last_sleeptime = -1, num;
 	double	sec;
@@ -106,7 +106,7 @@ int	main_dbsyncer_loop()
 
 		last_sleeptime = sleeptime;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "DB syncer #%d spent " ZBX_FS_DBL " second while processing %d items. "
+		zabbix_log(LOG_LEVEL_DEBUG, "DB syncer #%d spent " ZBX_FS_DBL " seconds while processing %d items. "
 				"Nextsync after %d sec.",
 				process_num, sec, num, sleeptime);
 
@@ -119,5 +119,4 @@ int	main_dbsyncer_loop()
 			update_sm_counter(ZBX_STATE_BUSY);
 		}
 	}
-	DBclose();
 }

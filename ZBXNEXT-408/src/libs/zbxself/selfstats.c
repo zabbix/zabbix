@@ -37,7 +37,7 @@ zbx_stat_process_t;
 typedef struct
 {
 	zbx_stat_process_t	**process;
-	int			first;	/* first value */
+	int			first;
 	int			count;
 }
 zbx_sm_collector_t;

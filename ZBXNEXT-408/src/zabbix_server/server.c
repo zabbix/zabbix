@@ -620,7 +620,7 @@ int	MAIN_ZABBIX_ENTRY()
 		process_num = server_num - CONFIG_DBCONFIG_FORKS - CONFIG_POLLER_FORKS
 				- CONFIG_UNREACHABLE_POLLER_FORKS;
 
-		child_trapper_main(ZBX_PROCESS_SERVER, &listen_sock);
+		main_trapper_loop(ZBX_PROCESS_SERVER, &listen_sock);
 	}
 	else if (server_num <= CONFIG_DBCONFIG_FORKS + CONFIG_POLLER_FORKS
 			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS

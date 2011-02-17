@@ -40,6 +40,6 @@ ZBX_HTTPSTAT;
 
 extern int	CONFIG_HTTPPOLLER_FORKS;
 
-void	process_httptests(int poller_num, int now);
+void	process_httptests(int httppoller_num, int now);
 
 #endif

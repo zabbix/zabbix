@@ -228,10 +228,8 @@ int	daemon_start(int allow_root)
 
 /*------------------------------------------------*/
 
-	if( FAIL == create_pid_file(CONFIG_PID_FILE))
-	{
+	if (FAIL == create_pid_file(CONFIG_PID_FILE))
 		exit(FAIL);
-	}
 
 	parent_pid = (int)getpid();
 
@@ -239,15 +237,15 @@ int	daemon_start(int allow_root)
 	sigemptyset(&phan.sa_mask);
 	phan.sa_flags = SA_SIGINFO;
 
-	sigaction(SIGINT,	&phan, NULL);
-	sigaction(SIGQUIT,	&phan, NULL);
-	sigaction(SIGTERM,	&phan, NULL);
-	sigaction(SIGPIPE,	&phan, NULL);
+	sigaction(SIGINT, &phan, NULL);
+	sigaction(SIGQUIT, &phan, NULL);
+	sigaction(SIGTERM, &phan, NULL);
+	sigaction(SIGPIPE, &phan, NULL);
 
-	sigaction(SIGILL,	&phan, NULL);
-	sigaction(SIGFPE,	&phan, NULL);
-	sigaction(SIGSEGV,	&phan, NULL);
-	sigaction(SIGBUS,	&phan, NULL);
+	sigaction(SIGILL, &phan, NULL);
+	sigaction(SIGFPE, &phan, NULL);
+	sigaction(SIGSEGV, &phan, NULL);
+	sigaction(SIGBUS, &phan, NULL);
 
 	zbx_setproctitle("main process");
 
@@ -268,9 +266,7 @@ void	init_main_process()
 	phan.sa_sigaction = parent_signal_handler;
 	sigemptyset(&phan.sa_mask);
 	phan.sa_flags = SA_SIGINFO;
-
-	/* For parent only. To avoid problems with EXECUTE_INT */
-	sigaction(SIGCHLD,	&phan, NULL);
+	sigaction(SIGCHLD, &phan, NULL); /* for parent only, to avoid problems with EXECUTE_INT/DBL/STR and others */
 }
 
 void	set_child_signal_handler()

@@ -622,7 +622,7 @@ int	MAIN_ZABBIX_ENTRY()
 		process_num = server_num - CONFIG_CONFSYNCER_FORKS - CONFIG_DATASENDER_FORKS
 				- CONFIG_POLLER_FORKS - CONFIG_UNREACHABLE_POLLER_FORKS;
 
-		child_trapper_main(zbx_process, &listen_sock);
+		main_trapper_loop(zbx_process, &listen_sock);
 	}
 	else if (server_num <= CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS
 			+ CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS

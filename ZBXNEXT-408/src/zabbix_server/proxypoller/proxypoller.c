@@ -363,7 +363,7 @@ void	main_proxypoller_loop()
 			zbx_setproctitle("proxy poller [sleeping for %d seconds]", sleeptime);
 			update_sm_counter(ZBX_STATE_IDLE);
 			sleep(sleeptime);
-			update_sm_counter(ZBX_STATE_IDLE);
+			update_sm_counter(ZBX_STATE_BUSY);
 		}
 	}
 }

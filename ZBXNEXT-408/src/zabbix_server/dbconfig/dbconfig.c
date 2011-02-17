@@ -42,7 +42,7 @@
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-int	main_dbconfig_loop()
+void	main_dbconfig_loop()
 {
 	double	sec;
 
@@ -52,7 +52,8 @@ int	main_dbconfig_loop()
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	for (;;) {
+	for (;;)
+	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Syncing ...");
 
 		sec = zbx_time();
@@ -69,5 +70,4 @@ int	main_dbconfig_loop()
 
 		sleep(CONFIG_DBCONFIG_FREQUENCY);
 	}
-	DBclose();
 }

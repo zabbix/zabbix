@@ -256,17 +256,16 @@ retry:
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-int	main_datasender_loop()
+void	main_datasender_loop()
 {
-	int			now, sleeptime,
-				records, r;
-	double			sec;
-	struct zbx_json		j;
+	int		now, sleeptime, records, r;
+	double		sec;
+	struct zbx_json	j;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_datasender_loop()");
 
@@ -276,9 +275,10 @@ int	main_datasender_loop()
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	zbx_json_init(&j, 16*1024);
+	zbx_json_init(&j, 16 * ZBX_KIBIBYTE);
 
-	for (;;) {
+	for (;;)
+	{
 		now = time(NULL);
 		sec = zbx_time();
 
@@ -314,7 +314,8 @@ retry_autoreg_host:
 
 		sleeptime = CONFIG_PROXYDATA_FREQUENCY;
 
-		if (sleeptime > 0) {
+		if (sleeptime > 0)
+		{
 			zbx_setproctitle("data sender [sleeping for %d seconds]",
 					sleeptime);
 			zabbix_log(LOG_LEVEL_DEBUG, "Sleeping for %d seconds",
@@ -322,8 +323,4 @@ retry_autoreg_host:
 			sleep(sleeptime);
 		}
 	}
-
-	zbx_json_free(&j);
-
-	DBclose();
 }

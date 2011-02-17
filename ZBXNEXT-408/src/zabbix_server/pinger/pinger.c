@@ -543,7 +543,4 @@ void	main_pinger_loop()
 			update_sm_counter(ZBX_STATE_BUSY);
 		}
 	}
-
-	/* Never reached */
-	DBclose();
 }

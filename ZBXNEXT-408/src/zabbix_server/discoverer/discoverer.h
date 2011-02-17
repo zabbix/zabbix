@@ -22,7 +22,7 @@
 
 #include "common.h"
 
-extern	int	CONFIG_DISCOVERER_FORKS;
+extern int	CONFIG_DISCOVERER_FORKS;
 
 void	main_discoverer_loop(unsigned char p);
 
