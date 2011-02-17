@@ -73,7 +73,7 @@ $page['file']	= 'index.php';
 		$name = get_request('name','');
 		$passwd = get_request('password','');
 
-		$login = CWebUser::login($name, $password);
+		$login = CWebUser::login($name, $passwd);
 
 
 		if($login){
