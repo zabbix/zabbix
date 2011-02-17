@@ -36,7 +36,7 @@ function do_post_request($url, $data){
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>XMLRPC ZABBIX API</title>
+<title>JSONRPC Zabbix API</title>
 </head>
 	<!-- Dependencies -->
 	<script src="http://yui.yahooapis.com/2.8.2r1/build/yahoo/yahoo-min.js"></script>
@@ -48,18 +48,16 @@ function do_post_request($url, $data){
 
 <?php
 	$_REQUEST['path'] = isset($_REQUEST['path']) ? $_REQUEST['path'] : 'trunk';
-	$_REQUEST['user'] = isset($_REQUEST['user']) ? $_REQUEST['user'] : 'Admin';
-	$_REQUEST['pswd'] = isset($_REQUEST['pswd']) ? $_REQUEST['pswd'] : 'zabbix';
+	$user = isset($_REQUEST['user']) ? $_REQUEST['user'] : 'Admin';
+	$pswd = isset($_REQUEST['pswd']) ? $_REQUEST['pswd'] : 'zabbix';
 	$url = 'http://'.$_REQUEST['path'].'/api_jsonrpc.php';
-	$user = $_REQUEST['user'];
-	$pswd = $_REQUEST['pswd'];
 ?>
 <body>
 <form method="post">
-	Path: <input type="text" name="path" value="<?php print($_REQUEST['path']);?>"/><br />
-	User: <input type="text" name="user" value="<?php print($user);?>"/><br />
-	Pass: <input type="password" name="pswd" value="<?php print($pswd); ?>"/><br />
-	Method: <input type="text" name="apimethod" size="40" value="<?php print(isset($_REQUEST['apimethod']) ? $_REQUEST['apimethod'] : '');?>"/><br />
+	<label>Path: <input type="text" name="path" value="<?php print($_REQUEST['path']);?>"/></label><br />
+	<label>User: <input type="text" name="user" value="<?php print($user);?>"/></label><br />
+	<label>Pass: <input type="password" name="pswd" value="<?php print($pswd); ?>"/></label><br />
+	<label>Method: <input type="text" name="apimethod" size="40" value="<?php print(isset($_REQUEST['apimethod']) ? $_REQUEST['apimethod'] : '');?>"/></label><br />
 	Params: <textarea name="apiparams" cols="100" rows="20"><?php print(isset($_REQUEST['apiparams']) ? $_REQUEST['apiparams'] : '');?></textarea><br />
 	<input type="submit" value="OK" name="apicall" />
 	<br />
