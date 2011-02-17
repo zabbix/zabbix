@@ -105,7 +105,7 @@ include_once('include/page_header.php');
 
 	CProfile::update('web.config.config',$_REQUEST['config'],PROFILE_TYPE_INT);
 
-	$orig_config = select_config();
+	$orig_config = select_config(false, get_current_nodeid(false));
 
 	$result = 0;
 	if($_REQUEST['config']==3){
@@ -624,7 +624,7 @@ include_once('include/page_header.php');
 
 
 	if(isset($_REQUEST['config'])){
-		$config = select_config(false);
+		$config = select_config(false, get_current_nodeid(false));
 	}
 
 /////////////////////////////////
