@@ -222,15 +222,27 @@ function update_config($configs){
 	if(isset($configs['work_period']) && !is_null($configs['work_period'])){
 		if(!validate_period($configs['work_period'])){
 			error(S_INCORRECT_WORK_PERIOD);
-			return NULL;
+			return false;
 		}
 	}
 	if(isset($configs['alert_usrgrpid']) && !is_null($configs['alert_usrgrpid'])){
 		if(($configs['alert_usrgrpid'] != 0) && !DBfetch(DBselect('select usrgrpid from usrgrp where usrgrpid='.$configs['alert_usrgrpid']))){
 			error(S_INCORRECT_GROUP);
-			return NULL;
+			return false;
 		}
 	}
+
+// cycle for 6 severities. check color value for each severity.
+	for($i=0; $i<6; $i++){
+		$varName = 'severity_color_'.$i;
+		if(isset($configs[$varName]) && !is_null($configs[$varName])){
+			if(!preg_match('/[0-9a-f]{6}/i', $configs[$varName])){
+				error(_s('Severity %s color is not correct.', $i));
+				return false;
+			}
+		}
+	}
+
 
 	foreach($configs as $key => $value){
 		if(!is_null($value)){

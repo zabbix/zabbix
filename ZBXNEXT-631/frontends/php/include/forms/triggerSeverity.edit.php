@@ -26,8 +26,25 @@ $severityForm->setName('triggerSeverity');
 $severityForm->addVar('form', get_request('form', 1));
 $severityForm->addVar('form_refresh', get_request('form_refresh', 0) + 1);
 
-
-$config = select_config(false);
+if(get_request('form_refresh', false)){
+	$config = array(
+		'severity_name_0' => get_request('severity_name_0', _('Not classified')),
+		'severity_color_0' => get_request('severity_color_0', ''),
+		'severity_name_1' => get_request('severity_name_1', _('Information')),
+		'severity_color_1' => get_request('severity_color_1', ''),
+		'severity_name_2' => get_request('severity_name_2', _('Warning')),
+		'severity_color_2' => get_request('severity_color_2', ''),
+		'severity_name_3' => get_request('severity_name_3', _('Average')),
+		'severity_color_3' => get_request('severity_color_3', ''),
+		'severity_name_4' => get_request('severity_name_4', _('High')),
+		'severity_color_4' => get_request('severity_color_4', ''),
+		'severity_name_5' => get_request('severity_name_5', _('Disaster')),
+		'severity_color_5' => get_request('severity_color_5', ''),
+	);
+}
+else{
+	$config = select_config(false);
+}
 
 $severityName0TB = new CTextBox('severity_name_0', $config['severity_name_0']);
 $severityName0TB->setAttribute('maxlength', 32);

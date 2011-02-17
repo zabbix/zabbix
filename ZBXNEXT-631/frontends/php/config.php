@@ -600,23 +600,23 @@ include_once('include/page_header.php');
 		}
 
 	}
-
 // Trigger severities
 	else if($_REQUEST['config'] == 12 && isset($_REQUEST['save'])){
 		$configs = array(
 			'severity_name_0' => get_request('severity_name_0', _('Not classified')),
-			'severity_color_0' => get_request('severity_color_0'),
+			'severity_color_0' => get_request('severity_color_0', ''),
 			'severity_name_1' => get_request('severity_name_1', _('Information')),
-			'severity_color_1' => get_request('severity_color_1'),
+			'severity_color_1' => get_request('severity_color_1', ''),
 			'severity_name_2' => get_request('severity_name_2', _('Warning')),
-			'severity_color_2' => get_request('severity_color_2'),
+			'severity_color_2' => get_request('severity_color_2', ''),
 			'severity_name_3' => get_request('severity_name_3', _('Average')),
-			'severity_color_3' => get_request('severity_color_3'),
+			'severity_color_3' => get_request('severity_color_3', ''),
 			'severity_name_4' => get_request('severity_name_4', _('High')),
-			'severity_color_4' => get_request('severity_color_4'),
+			'severity_color_4' => get_request('severity_color_4', ''),
 			'severity_name_5' => get_request('severity_name_5', _('Disaster')),
-			'severity_color_5' => get_request('severity_color_5'),
+			'severity_color_5' => get_request('severity_color_5', ''),
 		);
+
 		$result = update_config($configs);
 
 		show_messages($result, S_CONFIGURATION_UPDATED, S_CONFIGURATION_WAS_NOT_UPDATED);
