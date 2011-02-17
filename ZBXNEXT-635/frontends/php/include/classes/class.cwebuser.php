@@ -64,6 +64,7 @@ class CWebUser{
 				));
 
 				if(!self::$data) throw new Exception();
+				$sessionid = self::$data['sessionid'];
 			}
 
 			if(self::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED){

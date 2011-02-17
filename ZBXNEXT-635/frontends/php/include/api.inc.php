@@ -31,6 +31,7 @@ class CAPIObject{
 		global $USER_DETAILS;
 		if(!isset($USER_DETAILS['sessionid'])) $USER_DETAILS['sessionid'] = null;
 		$sessionid = get_cookie('zbx_sessionid');
+
 		$result = czbxrpc::call($this->_name.'.'.$method, $params[0], $sessionid);
 
 		if(isset($result['result'])){
@@ -62,13 +63,17 @@ class API{
 
 	private static function getAPIObject($className){
 		$c = 'C'.$className;
-		if(!isset(self::$APIobjects[$className])) self::$APIobjects[$className] = new $c;
-			return self::$APIobjects[$className];
+		if(!isset(self::$APIobjects[$className]))
+			self::$APIobjects[$className] = new $c;
+
+		return self::$APIobjects[$className];
 	}
 
 	private static function getRPCObject($className){
-		if(!isset(self::$RPCobjects[$className])) self::$RPCobjects[$className] = new CAPIObject($className);
-			return self::$RPCobjects[$className];
+		if(!isset(self::$RPCobjects[$className]))
+			self::$RPCobjects[$className] = new CAPIObject($className);
+
+		return self::$RPCobjects[$className];
 	}
 
 	public static function getObject($className){

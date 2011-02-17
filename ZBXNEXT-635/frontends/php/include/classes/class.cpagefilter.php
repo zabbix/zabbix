@@ -267,6 +267,7 @@ options = array(
 		);
 		$options = zbx_array_merge($def_options, $options);
 		$groups = API::HostGroup()->get($options);
+
 		order_result($groups, 'name');
 
 		$this->data['groups'] = array();
