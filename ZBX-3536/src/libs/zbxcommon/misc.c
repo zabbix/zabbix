@@ -685,7 +685,7 @@ static int	is_ip6(const char *ip)
 
 	while ('\0' != *p)
 	{
-		if ((*p >= '0' && *p <= '9') || (*p >= 'A' && *p <= 'F') || (*p >= 'a' && *p <= 'f'))
+		if ((*p >= '0' && *p <= '9') || (*p >= 'a' && *p <= 'f') || (*p >= 'A' && *p <= 'F'))
 		{
 			nums++;
 			is_nums = 1;
