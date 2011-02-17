@@ -238,8 +238,8 @@ zbx_hash_t	zbx_default_string_hash_func(const void *data)
 
 int	zbx_default_int_compare_func(const void *d1, const void *d2)
 {
-	const int	*i1=(const int *)d1;
-	const int	*i2=(const int *)d2;
+	const int	*i1 = (const int *)d1;
+	const int	*i2 = (const int *)d2;
 
 	if (*i1 < *i2) return -1;
 	if (*i1 > *i2) return +1;
@@ -248,8 +248,8 @@ int	zbx_default_int_compare_func(const void *d1, const void *d2)
 
 int	zbx_default_uint64_compare_func(const void *d1, const void *d2)
 {
-	const zbx_uint64_t	*i1=(const zbx_uint64_t *)d1;
-	const zbx_uint64_t	*i2=(const zbx_uint64_t *)d2;
+	const zbx_uint64_t	*i1 = (const zbx_uint64_t *)d1;
+	const zbx_uint64_t	*i2 = (const zbx_uint64_t *)d2;
 
 	if (*i1 < *i2) return -1;
 	if (*i1 > *i2) return +1;
