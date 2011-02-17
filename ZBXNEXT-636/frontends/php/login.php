@@ -23,7 +23,7 @@ define('ZBX_PAGE_NO_HEADER', 1);
 define('ZBX_PAGE_NO_FOOTER',1);
 
 $sessionid = get_cookie('zbx_sessionid');
-CUser::checkAuthentication(array('sessionid'=>$sessionid));
+CWebUser::checkAuthentication($sessionid);
 
 $request = zbx_htmlstr(get_request('request',''));
 $message = zbx_htmlstr(get_request('message','')) ;
@@ -37,7 +37,7 @@ require_once('include/page_header.php');
 	<div style="position: relative; color: #F0F0F0; height: 100%;">
 <!-- Help & Support -->
 		<div style="position: absolute; top: 0px; right: 10px;">
-			<a class="highlight" href="http://www.zabbix.com/documentation/1.8/manual/about/overview_of_zabbix"><?php print(_('Help')); ?></a>
+			<a class="highlight" href="http://www.zabbix.com/documentation"><?php print(_('Help')); ?></a>
 			&nbsp;|&nbsp;
 			<a class="highlight" href="https://support.zabbix.com"><?php print(_('Support')); ?></a>
 		</div>
