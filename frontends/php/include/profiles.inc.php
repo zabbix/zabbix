@@ -199,12 +199,12 @@ class CProfile{
 /************ CONFIG **************/
 
 function select_config($cache = true){
-	global $page;
+	global $page, $ZBX_LOCALNODEID;
 	static $config;
 
 	if($cache && isset($config)) return $config;
 
-	$row = DBfetch(DBselect('SELECT * FROM config WHERE '.DBin_node('configid', get_current_nodeid(false))));
+	$row = DBfetch(DBselect('SELECT * FROM config WHERE '.DBin_node('configid', $ZBX_LOCALNODEID)));
 
 	if($row){
 		$config = $row;

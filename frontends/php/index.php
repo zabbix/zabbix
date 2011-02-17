@@ -20,7 +20,6 @@
 ?>
 <?php
 require_once('include/config.inc.php');
-require_once('include/forms.inc.php');
 
 define('ZBX_NOT_ALLOW_ALL_NODES', 1);
 define('ZBX_HIDE_NODE_SELECTION', 1);
