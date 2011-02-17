@@ -30,13 +30,7 @@ class CHostInterface extends CZBXAPI{
 /**
  * Get Interface Interface data
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $options
+ * @param array $options
  * @param array $options['nodeids'] Node IDs
  * @param array $options['hostids'] Interface IDs
  * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
@@ -49,13 +43,12 @@ class CHostInterface extends CZBXAPI{
  * @param string $options['sortorder'] sort order
  * @return array|boolean Interface data as array or false if error
  */
-	public static function get($options=array()){
-		global $USER_DETAILS;
+	public function get($options=array()){
 
 		$result = array();
 		$nodeCheck = false;
-		$user_type = $USER_DETAILS['type'];
-		$userid = $USER_DETAILS['userid'];
+		$user_type = self::$userData['type'];
+		$userid = self::$userData['userid'];
 
 		$sort_columns = array('interfaceid', 'dns', 'ip'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM); // allowed output options for [ select_* ] params
@@ -340,7 +333,7 @@ Copt::memoryPick();
 
 			if(is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['selectHosts'];
-				$hosts = CHost::get($obj_params);
+				$hosts = API::Host()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($hosts, 'host');
 
@@ -364,7 +357,7 @@ Copt::memoryPick();
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$hosts = CHost::get($obj_params);
+				$hosts = API::Host()->get($obj_params);
 				$hosts = zbx_toHash($hosts, 'hostid');
 				foreach($result as $templateid => $template){
 					if(isset($hosts[$templateid]))
@@ -386,7 +379,7 @@ Copt::memoryPick();
 			);
 			if(is_array($options['selectItems']) || str_in_array($options['selectItems'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['selectItems'];
-				$items = CItem::get($obj_params);
+				$items = API::Item()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($items, 'description');
 
@@ -406,7 +399,7 @@ Copt::memoryPick();
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$items = CItem::get($obj_params);
+				$items = API::Item()->get($obj_params);
 				$items = zbx_toHash($items, 'interfaceid');
 				foreach($result as $interfaceid => $interface){
 					if(isset($items[$interfaceid]))
@@ -426,7 +419,7 @@ Copt::memoryPick();
 	return $result;
 	}
 
-	public static function exists($object){
+	public function exists($object){
 		$keyFields = array('interfaceid', 'hostid', 'ip', 'dns');
 
 		$options = array(
@@ -441,12 +434,12 @@ Copt::memoryPick();
 		else if(isset($object['nodeids']))
 			$options['nodeids'] = $object['nodeids'];
 
-		$objs = self::get($options);
+		$objs = $this->get($options);
 
 	return !empty($objs);
 	}
 
-	protected static function checkInput(&$interfaces, $method){
+	protected function checkInput(&$interfaces, $method){
 		$create = ($method == 'create');
 		$update = ($method == 'update');
 		$delete = ($method == 'delete');
@@ -454,7 +447,7 @@ Copt::memoryPick();
 // permissions
 		if($update || $delete){
 			$interfaceDBfields = array('interfaceid'=> null);
-			$dbInterfaces = self::get(array(
+			$dbInterfaces = $this->get(array(
 				'output' => API_OUTPUT_EXTEND,
 				'interfaceids' => zbx_objectValues($interfaces, 'interfaceid'),
 				'editable' => 1,
@@ -463,14 +456,14 @@ Copt::memoryPick();
 		}
 		else{
 			$interfaceDBfields = array('hostid'=>null,'ip'=>null,'dns'=>null,'useip'=>null,'port'=>null);
-			$dbHosts = CHost::get(array(
+			$dbHosts = API::Host()->get(array(
 				'output' => array('host', 'status'),
 				'hostids' => zbx_objectValues($interfaces, 'hostid'),
 				'editable' => 1,
 				'preservekeys' => 1
 			));
 
-			$dbProxies = CProxy::get(array(
+			$dbProxies = API::Proxy()->get(array(
 				'output' => array('host', 'status'),
 				'proxyids' => zbx_objectValues($interfaces, 'hostid'),
 				'editable' => 1,
@@ -519,7 +512,7 @@ Copt::memoryPick();
 			}
 
 			if(($interface['useip'] == INTERFACE_USE_DNS) && zbx_empty($interface['dns'])){
-				$dbHosts = CHost::get(array(
+				$dbHosts = API::Host()->get(array(
 					'output' => array('host'),
 					'hostids' => $interface['hostid'],
 					'nopermissions' => 1,
@@ -567,7 +560,7 @@ Copt::memoryPick();
 		unset($interface);
 
 		if($delete){
-			$items = CItem::get(array(
+			$items = API::Item()->get(array(
 				'output' => array('key_'),
 				'selectHosts' => array('host'),
 				'interfaceids' => zbx_objectValues($interfaces, 'interfaceid'),
@@ -583,13 +576,13 @@ Copt::memoryPick();
 		}
 	}
 
-	protected static function setMainInterfaces($interfaces){
+	protected function setMainInterfaces($interfaces){
 		$interfaces = zbx_toHash($interfaces, 'hostid');
 		$hostids = array_keys($interfaces);
 
 		$updateData = array();
 		foreach($hostids as $hnum => $hostid){
-			$interfaces = self::get(array(
+			$interfaces = $this->get(array(
 				'output' => API_OUTPUT_EXTEND,
 				'hostids' => $hostid,
 				'nopermissions' => 1,
@@ -631,28 +624,17 @@ Copt::memoryPick();
  * @param _array $Interfaces multidimensional array with Interfaces data
  * @return array
  */
-	public static function create($interfaces){
+	public function create($interfaces){
 		$interfaces = zbx_toArray($interfaces);
-		try{
-			self::BeginTransaction(__METHOD__);
 
-			self::checkInput($interfaces, __FUNCTION__);
+			$this->checkInput($interfaces, __FUNCTION__);
 
 			$interfaceids = DB::insert('interface', $interfaces);
 
 // auto seting main interfaces
-			self::setMainInterfaces($interfaces);
+			$this->setMainInterfaces($interfaces);
 
-			self::EndTransaction(true, __METHOD__);
 			return array('interfaceids' => $interfaceids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -661,13 +643,10 @@ Copt::memoryPick();
  * @param _array $interfaces multidimensional array with Interfaces data
  * @return array
  */
-	public static function update($interfaces){
+	public function update($interfaces){
 		$interfaces = zbx_toArray($interfaces);
 
-		try{
-			self::BeginTransaction(__METHOD__);
-
-			self::checkInput($interfaces, __FUNCTION__);
+			$this->checkInput($interfaces, __FUNCTION__);
 
 			$data = array();
 			foreach($interfaces as $inum => $interface){
@@ -676,21 +655,10 @@ Copt::memoryPick();
 			$result = DB::update('interface', $data);
 
 // auto seting main interfaces
-			self::setMainInterfaces($interfaces);
+			$this->setMainInterfaces($interfaces);
 
-			self::EndTransaction($result, __METHOD__);
 			return array('interfaceids' => zbx_objectValues($interfaces, 'interfaceid'));
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
-
-
 
 /**
  * Delete Interface
@@ -699,41 +667,26 @@ Copt::memoryPick();
  * @param array $Interfaceids[1, ...] Interface ID to delete
  * @return array|boolean
  */
-	public static function delete($interfaceids){
-
-		try{
-			self::BeginTransaction(__METHOD__);
+	public function delete($interfaceids){
 
 			if(empty($interfaceids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
 
 			$interfaceids = zbx_toArray($interfaceids);
 			$interfaces = zbx_toObject($interfaceids, 'interfaceid');
 
-			self::checkInput($interfaces,__FUNCTION__);
+			$this->checkInput($interfaces,__FUNCTION__);
 
 			DB::delete('interface', array('interfaceid'=>$interfaceids));
 
 // auto seting main interfaces
-			self::setMainInterfaces($interfaces);
+			$this->setMainInterfaces($interfaces);
 
-			self::EndTransaction(true, __METHOD__);
 			return array('interfaceids' => $interfaceids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
-	public static function massAdd($data){
+	public function massAdd($data){
 		$interfaces = zbx_toArray($data['interfaces']);
 		$hosts = zbx_toArray($data['hosts']);
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			$insertData = array();
 			foreach($interfaces as $inum => $interface){
@@ -745,18 +698,9 @@ Copt::memoryPick();
 				}
 			}
 
-			$interfaceids = self::create($insertData);
+			$interfaceids = $this->create($insertData);
 
-			self::EndTransaction(true, __METHOD__);
 			return array('interfaceids' => $interfaceids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -768,16 +712,13 @@ Copt::memoryPick();
  * @param array $data['templateids']
  * @return boolean
  */
-	public static function massRemove($data){
+	public function massRemove($data){
 		$interfaces = zbx_toArray($data['interfaces']);
 		$interfaceids = zbx_objectValues($interfaces, 'interfaceid');
 
 		$hostids = zbx_toArray($data['hostids']);
 
-		try{
-			self::BeginTransaction(__METHOD__);
-
-			self::checkInput($interfaces, __FUNCTION__);
+			$this->checkInput($interfaces, __FUNCTION__);
 
 			foreach($interfaces as $inum => $interface){
 				DB::delete('interface', array(
@@ -788,16 +729,7 @@ Copt::memoryPick();
 				));
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('interfaceids' => $interfaceids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 }
 ?>

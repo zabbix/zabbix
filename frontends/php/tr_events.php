@@ -73,7 +73,7 @@
 		'expandDescription' => 1,
 		'output' => API_OUTPUT_EXTEND
 	);
-	$triggers = CTrigger::get($options);
+	$triggers = API::Trigger()->get($options);
 	if(empty($triggers)) access_deny();
 
 	$trigger = reset($triggers);
@@ -86,7 +86,7 @@
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => API_OUTPUT_EXTEND
 	);
-	$events = CEvent::get($options);
+	$events = API::Event()->get($options);
 	$event = reset($events);
 
 	$tr_event_wdgt = new CWidget();
@@ -166,7 +166,7 @@
 	);
 	$events_histry->addHeader(S_EVENTS.SPACE.S_LIST.SPACE.'['.S_PREVIOUS_EVENTS.' 20]');
 	$right_tab->addRow($events_histry);
-	
+
 //----------------
 
 	$td_l = new CCol($left_tab);

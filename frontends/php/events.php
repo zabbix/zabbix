@@ -116,7 +116,7 @@ include_once('include/page_header.php');
 	// Change triggerId filter if change hostId
 	if(($_REQUEST['triggerid'] > 0) && isset($_REQUEST['hostid'])){
 		$hostid = get_request('hostid');
-		$oldTriggers = CTrigger::get(array(
+		$oldTriggers = API::Trigger()->get(array(
 			'output' => array('triggerid', 'description', 'expression'),
 			'selectHosts' => array('hostid', 'host'),
 			'selectItems' => API_OUTPUT_EXTEND,
@@ -133,7 +133,7 @@ include_once('include/page_header.php');
 
 			if(isset($oldTrigger['hosts'][$hostid])) break;
 
-			$newTriggers = CTrigger::get(array(
+			$newTriggers = API::Trigger()->get(array(
 				'output' => array('triggerid', 'description', 'expression'),
 				'selectHosts' => array('hostid', 'host'),
 				'selectItems' => API_OUTPUT_EXTEND,
@@ -348,8 +348,7 @@ include_once('include/page_header.php');
 		);
 	}
 
-
-	$firstEvent = CEvent::get($options);
+	$firstEvent = API::Event()->get($options);
 // }}} CHECK IF EVENTS EXISTS
 
 	$_REQUEST['period'] = get_request('period', 604800); // 1 week
@@ -380,7 +379,7 @@ include_once('include/page_header.php');
 				'sortorder' => ZBX_SORT_DOWN,
 				'limit' => ($config['search_limit']+1)
 			);
-			$dsc_events = CEvent::get($options);
+			$dsc_events = API::Event()->get($options);
 
 			$paging = getPagingLine($dsc_events);
 
@@ -392,7 +391,7 @@ include_once('include/page_header.php');
 				'select_triggers' => API_OUTPUT_EXTEND,
 				'selectItems' => API_OUTPUT_EXTEND,
 			);
-			$dsc_events = CEvent::get($options);
+			$dsc_events = API::Event()->get($options);
 			order_result($dsc_events, 'eventid', ZBX_SORT_DOWN);
 
 			// do we need to make CVS export button enabled?
@@ -539,7 +538,7 @@ include_once('include/page_header.php');
 				else if($pageFilter->groupid > 0)
 					$trigOpt['groupids'] = $pageFilter->groupid;
 
-				$triggers = CTrigger::get($trigOpt);
+				$triggers = API::Trigger()->get($trigOpt);
 			}
 
 			$options = array(
@@ -559,7 +558,7 @@ include_once('include/page_header.php');
 			if($_REQUEST['showUnknown']) $options['filter']['value_changed'] = null;
 			if(!empty($triggers)) $options['triggerids'] = zbx_objectValues($triggers, 'triggerid');
 
-			$events = CEvent::get($options);
+			$events = API::Event()->get($options);
 
 			$paging = getPagingLine($events);
 
@@ -573,7 +572,7 @@ include_once('include/page_header.php');
 				'nopermissions' => 1
 			);
 
-			$events = CEvent::get($options);
+			$events = API::Event()->get($options);
 			order_result($events, array('clock','ns'), ZBX_SORT_DOWN);
 
 			$csv_disabled = zbx_empty($events);
@@ -585,7 +584,7 @@ include_once('include/page_header.php');
 				'selectItems' => API_OUTPUT_EXTEND,
 				'output' => API_OUTPUT_EXTEND
 			);
-			$triggers = CTrigger::get($triggersOptions);
+			$triggers = API::Trigger()->get($triggersOptions);
 			$triggers = zbx_toHash($triggers, 'triggerid');
 
 			foreach($events as $enum => $event){
