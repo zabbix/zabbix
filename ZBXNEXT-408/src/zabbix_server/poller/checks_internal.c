@@ -194,7 +194,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	else if (0 == strcmp(tmp, "process"))	/* zabbix["process",<process_type>,<process_num>,<process_state>] */
 	{
 		unsigned char	process_type, state;
-		int		process_num;
+		unsigned short	process_num;
 		double		value;
 
 		if (nparams > 4)
@@ -234,15 +234,10 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			*tmp = '\0';
 
 		if ('\0' == *tmp || 0 == strcmp(tmp, "all"))
-		{
 			process_num = 0;	/* all processes */
-		}
-		else
-		{
-			process_num = atoi(tmp);
-			if (0 >= process_num || process_num > get_process_forks(process_type))
-				goto not_supported;
-		}
+		else if (FAIL == is_ushort(tmp, &process_num) || 0 == process_num ||
+				process_num > get_process_forks(process_type))
+			goto not_supported;
 
 		if (0 != get_param(params, 4, tmp, sizeof(tmp)))
 			*tmp = '\0';
