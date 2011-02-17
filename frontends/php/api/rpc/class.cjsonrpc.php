@@ -102,7 +102,7 @@ class CJSONrpc{
 
 			$formedResp = array(
 				'jsonrpc' => self::VERSION,
-				'result' => $result,
+				'result' => $result['result'],
 				'id' => $call['id']
 			);
 
