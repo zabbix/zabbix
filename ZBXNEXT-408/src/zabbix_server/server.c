@@ -352,6 +352,9 @@ static void	init_config()
 #ifdef HAVE_SQLITE3
 	CONFIG_MAX_HOUSEKEEPER_DELETE = 0;
 #endif
+
+	if (1 == CONFIG_DISABLE_HOUSEKEEPING)
+		CONFIG_HOUSEKEEPER_FORKS = 0;
 }
 
 /******************************************************************************

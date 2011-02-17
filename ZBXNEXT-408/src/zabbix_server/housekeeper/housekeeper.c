@@ -348,14 +348,6 @@ void	main_housekeeper_loop()
 
 	set_child_signal_handler();
 
-	if (1 == CONFIG_DISABLE_HOUSEKEEPING)
-	{
-		zbx_setproctitle("housekeeper [sleeping forever]");
-
-		for (;;)
-			sleep(SEC_PER_HOUR);
-	}
-
 	for (;;)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Executing housekeeper");
