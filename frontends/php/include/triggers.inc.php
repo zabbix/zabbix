@@ -226,7 +226,7 @@ function get_accessible_triggers($perm, $hostids, $cache=1){
 	);
 	if(!empty($hostids)) $options['hostids'] = $hostids;
 	if($perm == PERM_READ_WRITE) $options['editable'] = 1;
-	$result = CTrigger::get($options);
+	$result = API::Trigger()->get($options);
 	$result = zbx_objectValues($result, 'triggerid');
 	$result = zbx_toHash($result);
 
@@ -473,7 +473,7 @@ return $caption;
 				'nopermissions' => 1
 			);
 
-			$triggers = CTrigger::get($options);
+			$triggers = API::Trigger()->get($options);
 		}
 
 	return $hosts;
@@ -929,7 +929,7 @@ function utf8RawUrlDecode($source){
 
 					if($resolve_macro){
 						$function_data['expression'] = $macros;
-						CUserMacro::resolveTrigger($function_data);
+						$function_data = API::UserMacro()->resolveTrigger($function_data);
 						$macros = $function_data['expression'];
 					}
 
@@ -957,10 +957,10 @@ function utf8RawUrlDecode($source){
 
 					if($resolve_macro){
 						$trigger = $function_data;
-						CUserMacro::resolveItem($function_data);
+						$function_data = API::UserMacro()->resolveItem($function_data);
 
 						$function_data['expression'] = $function_data['parameter'];
-						CUserMacro::resolveTrigger($function_data);
+						$function_data = API::UserMacro()->resolveTrigger($function_data);
 						$function_data['parameter'] = $function_data['expression'];
 					}
 
@@ -1054,7 +1054,7 @@ function utf8RawUrlDecode($source){
 
 					if($resolve_macro){
 						$function_data['expression'] = $macros;
-						CUserMacro::resolveTrigger($function_data);
+						$function_data = API::UserMacro()->resolveTrigger($function_data);
 						$macros = $function_data['expression'];
 					}
 
@@ -1080,10 +1080,10 @@ function utf8RawUrlDecode($source){
 					if($template) $function_data['host'] = '{HOSTNAME}';
 
 					if($resolve_macro){
-						CUserMacro::resolveItem($function_data);
+						$function_data = API::UserMacro()->resolveItem($function_data);
 
 						$function_data['expression'] = $function_data['parameter'];
-						CUserMacro::resolveTrigger($function_data);
+						$function_data = API::UserMacro()->resolveTrigger($function_data);
 						$function_data['parameter'] = $function_data['expression'];
 					}
 
@@ -1336,7 +1336,7 @@ function utf8RawUrlDecode($source){
 			}
 
 			if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $description, $arr)){
-				$macros = CUserMacro::getMacros($arr[1], array('triggerid' => $row['triggerid']));
+				$macros = API::UserMacro()->getMacros($arr[1], array('triggerid' => $row['triggerid']));
 
 				$search = array_keys($macros);
 				$values = array_values($macros);
@@ -1407,7 +1407,7 @@ function utf8RawUrlDecode($source){
 				'acknowledged'	=> 0
 			);
 		}
-		$eventids = CEvent::create($events);
+		$eventids = API::Event()->create($events);
 
 	return $eventids;
 	}
@@ -1453,7 +1453,7 @@ function utf8RawUrlDecode($source){
 			$description = $trigger['description'];
 		}
 
-		if(CTrigger::exists(array('description' => $description, 'expression' => $expression))){
+		if(API::Trigger()->exists(array('description' => $description, 'expression' => $expression))){
 
 			$host = reset($expr->data['hosts']);
 			$options = array(
@@ -1461,7 +1461,7 @@ function utf8RawUrlDecode($source){
 				'output' => API_OUTPUT_EXTEND,
 				'editable' => 1,
 			);
-			$triggers_exist = CTrigger::get($options);
+			$triggers_exist = API::Trigger()->get($options);
 
 			$trigger_exist = false;
 			foreach($triggers_exist as $tnum => $tr){
@@ -1550,7 +1550,7 @@ function utf8RawUrlDecode($source){
 
 // TODO: peredelatj!
 		if($flags != ZBX_FLAG_DISCOVERY_NORMAL){
-			$trig_info = CTrigger::get(array(
+			$trig_info = API::Trigger()->get(array(
 				'triggerids' => $triggerid,
 				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 				'output' => API_OUTPUT_REFER,
@@ -1606,7 +1606,7 @@ function utf8RawUrlDecode($source){
 	function check_right_on_trigger_by_expression($permission,$expression){
 		$expr = new CTriggerExpression(array('expression' => $expression));
 
-		$hosts = CHost::get(array(
+		$hosts = API::Host()->get(array(
 			'filter' => array('host' => $expr->data['hosts']),
 			'editable' => (($permission == PERM_READ_WRITE) ? 1 : null),
 			'output' => array('hostid', 'host'),
@@ -1792,7 +1792,7 @@ function utf8RawUrlDecode($source){
 			$templated_trigger = false;
 
 			$expr = new CTriggerExpression(array('expression' => $expression));
-			$hosts = CHost::get(array(
+			$hosts = API::Host()->get(array(
 				'templated_hosts' => true,
 				'filter' => array('host' => $expr->data['hosts']),
 				'output' => array('host', 'status')
@@ -1910,7 +1910,7 @@ function utf8RawUrlDecode($source){
 			'sortfield' => 'description'
 		);
 
-		$db_triggers = CTrigger::get($options);
+		$db_triggers = API::Trigger()->get($options);
 
 		unset($triggers);
 		unset($hosts);
@@ -2413,7 +2413,7 @@ function utf8RawUrlDecode($source){
 		if(!empty($elements['hosts_groups'])) $options['groupids'] = array_unique($elements['hosts_groups']);
 		if(!empty($elements['hosts'])) $options['hostids'] = array_unique($elements['hosts']);
 		if(!empty($elements['triggers'])) $options['triggerids'] = array_unique($elements['triggers']);
-		$triggers = CTrigger::get($options);
+		$triggers = API::Trigger()->get($options);
 
 
 	return $triggers;
@@ -3207,7 +3207,7 @@ function utf8RawUrlDecode($source){
 					//SDI($hostKey.$hostKeyParams);
 					//SDI($function);
 
-					$hostFound = CHost::get(Array('filter' => Array('host' => $host), 'templated_hosts' => true));
+					$hostFound = API::Host()->get(Array('filter' => Array('host' => $host), 'templated_hosts' => true));
 					if(count($hostFound) > 0) {
 						$hostFound = array_shift($hostFound);
 						if(isset($hostFound['hostid']) && $hostFound['hostid'] > 0) $hostId = $hostFound['hostid'];
@@ -3215,7 +3215,7 @@ function utf8RawUrlDecode($source){
 
 					if($hostId == null) return EXPRESSION_HOST_UNKNOWN;
 
-					$itemFound = CItem::get(array(
+					$itemFound = API::Item()->get(array(
 						'filter' => array(
 							'hostid' => $hostId,
 							'key_' => $hostKey.$hostKeyParams,
@@ -3241,7 +3241,7 @@ function utf8RawUrlDecode($source){
 							'output'=>API_OUTPUT_EXTEND,
 							'webitems'=> true
 						);
-						$item_data = CItem::get($options);
+						$item_data = API::Item()->get($options);
 
 						if($item_data = reset($item_data)){
 							$value_type = $item_data['value_type'];
@@ -3293,7 +3293,7 @@ function utf8RawUrlDecode($source){
 				'templated_hosts' => true,
 				'preservekeys' => true
 			);
-			$hosts = CHost::get($options);
+			$hosts = API::Host()->get($options);
 
 			if(isset($hosts[$srcid], $hosts[$destid])){
 				$src = $hosts[$srcid];
@@ -3308,7 +3308,7 @@ function utf8RawUrlDecode($source){
 				'inherited' => 0,
 				'select_dependencies' => API_OUTPUT_EXTEND
 			);
-			$triggers = CTrigger::get($options);
+			$triggers = API::Trigger()->get($options);
 
 			$hash = array();
 			foreach($triggers as $trigger){
@@ -3317,7 +3317,7 @@ function utf8RawUrlDecode($source){
 				$trigger['expression'] = $expr;
 				$trigger['dependencies'] = array();
 
-				$result = CTrigger::create($trigger);
+				$result = API::Trigger()->create($trigger);
 
 				if(!$result) throw new Exception();
 

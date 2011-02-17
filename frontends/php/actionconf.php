@@ -103,7 +103,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 //--------
 
 	if(isset($_REQUEST['actionid'])){
-		$aa = CAction::get(array('actionids' => $_REQUEST['actionid'], 'editable' => 1));
+		$aa = API::Action()->get(array('actionids' => $_REQUEST['actionid'], 'editable' => 1));
 		if(empty($aa)){
 			access_deny();
 		}
@@ -163,11 +163,11 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 
 			$action['actionid']= $_REQUEST['actionid'];
 
-			$result = CAction::update($action);
+			$result = API::Action()->update($action);
 			show_messages($result,S_ACTION_UPDATED,S_CANNOT_UPDATE_ACTION);
 		}
 		else{
-			$result = CAction::create($action);
+			$result = API::Action()->create($action);
 			show_messages($result,S_ACTION_ADDED,S_CANNOT_ADD_ACTION);
 		}
 
@@ -184,7 +184,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 			access_deny();
 
-		$result = CAction::delete($_REQUEST['actionid']);
+		$result = API::Action()->delete($_REQUEST['actionid']);
 
 		show_messages($result,S_ACTION_DELETED,S_CANNOT_DELETE_ACTION);
 		if($result){
@@ -237,7 +237,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		try{
 			$new_operation = $_REQUEST['new_operation'];
 
-			CAction::validateOperations($new_operation);
+			API::Action()->validateOperations($new_operation);
 
 			$_REQUEST['operations'] = get_request('operations', array());
 
@@ -252,7 +252,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			unset($_REQUEST['new_operation']);
 		}
 		catch(APIException $e){
-			error($e->getErrors());
+			error($e->getMessage());
 		}
 	}
 	else if(inarr_isset(array('del_operation','g_operationid'))){
@@ -304,7 +304,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		if(!count($nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 			access_deny();
 
-		$go_result = CAction::delete($_REQUEST['g_actionid']);
+		$go_result = API::Action()->delete($_REQUEST['g_actionid']);
 		show_messages($go_result,_('Selected actions deleted'), _('Cannot delete selected actions'));
 	}
 
@@ -337,7 +337,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 				'output' => API_OUTPUT_EXTEND,
 				'editable' => true
 			);
-			$actions = CAction::get($options);
+			$actions = API::Action()->get($options);
 			$action = reset($actions);
 		}
 		else{
@@ -371,6 +371,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 
 		$actionForm = new CGetForm('action.edit', $action);
 		$action_wdgt->addItem($actionForm->render());
+
 
 		show_messages();
 
@@ -419,7 +420,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
-		$actions = CAction::get($options);
+		$actions = API::Action()->get($options);
 //SDII($actions);
 // sorting && paging
 		order_result($actions, $sortfield, $sortorder);

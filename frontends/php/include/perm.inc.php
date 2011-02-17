@@ -20,15 +20,6 @@
 ?>
 <?php
 
-function zbx_session_start($userid, $name, $password){
-	$sessionid = md5(time().$password.$name.rand(0,10000000));
-	zbx_setcookie('zbx_sessionid',$sessionid);
-
-	DBexecute('INSERT INTO sessions (sessionid,userid,lastaccess,status) VALUES ('.zbx_dbstr($sessionid).','.$userid.','.time().','.ZBX_SESSION_ACTIVE.')');
-
-return $sessionid;
-}
-
 function permission2str($group_permission){
 	$str_perm[PERM_READ_WRITE]	= S_READ_WRITE;
 	$str_perm[PERM_READ_ONLY]	= S_READ_ONLY;
@@ -39,28 +30,6 @@ function permission2str($group_permission){
 
 	return S_UNKNOWN;
 }
-
-/*****************************************
-	CHECK USER AUTHORISATION
-*****************************************/
-
-function check_authorisation(){
-	global $USER_DETAILS;
-	$sessionid = get_cookie('zbx_sessionid');
-
-	$user = array('sessionid'=>$sessionid);
-	if(!$auth = CUser::checkAuthentication($user)){
-
-		include_once('include/locales/en_gb.inc.php');
-		process_locales();
-
-		include('index.php');
-		exit();
-	}
-
-return $auth;
-}
-
 
 /***********************************************
 	CHECK USER ACCESS TO SYSTEM STATUS
@@ -117,8 +86,10 @@ return (GROUP_GUI_ACCESS_DISABLED == $res)?false:true;
 function get_user_auth($userid){
 	global $USER_DETAILS;
 
-	if((bccomp($userid,$USER_DETAILS['userid']) == 0) && isset($USER_DETAILS['gui_access'])) return $USER_DETAILS['gui_access'];
-	else $result = GROUP_GUI_ACCESS_SYSTEM;
+	if((bccomp($userid,$USER_DETAILS['userid']) == 0) && isset($USER_DETAILS['gui_access']))
+		return $USER_DETAILS['gui_access'];
+	else
+		$result = GROUP_GUI_ACCESS_SYSTEM;
 
 	$sql = 'SELECT MAX(g.gui_access) as gui_access '.
 		' FROM usrgrp g, users_groups ug '.
@@ -131,18 +102,6 @@ function get_user_auth($userid){
 	}
 
 return $result;
-}
-
-function get_user_debug_mode($userid){
-	$sql = 'SELECT g.usrgrpid '.
-			' FROM usrgrp g, users_groups ug '.
-			' WHERE ug.userid = '.$userid.
-				' AND g.usrgrpid = ug.usrgrpid '.
-				' AND g.debug_mode = '.GROUP_DEBUG_MODE_ENABLED;
-	if($res = DBfetch(DBselect($sql,1))){
-		return true;
-	}
-return false;
 }
 
 /* Function: get_user_system_auth()
@@ -190,7 +149,7 @@ function available_groups($groupids, $editable=null){
 	$options['groupids'] = $groupids;
 	$options['editable'] = $editable;
 
-	$groups = CHostGroup::get($options);
+	$groups = API::HostGroup()->get($options);
 return zbx_objectValues($groups, 'groupid');
 }
 function available_hosts($hostids, $editable=null){
@@ -199,7 +158,7 @@ function available_hosts($hostids, $editable=null){
 	$options['editable'] = $editable;
 	$options['templated_hosts'] = 1;
 
-	$hosts = CHost::get($options);
+	$hosts = API::Host()->get($options);
 
 return zbx_objectValues($hosts, 'hostid');
 }
@@ -211,7 +170,7 @@ function available_triggers($triggerids, $editable=null){
 		'nodes' => get_current_nodeid(true)
 	);
 
-	$triggers = CTrigger::get($options);
+	$triggers = API::Trigger()->get($options);
 
 return zbx_objectValues($triggers, 'triggerid');
 }

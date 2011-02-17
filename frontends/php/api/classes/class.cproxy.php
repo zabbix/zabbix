@@ -30,12 +30,6 @@ class CProxy extends CZBXAPI{
 /**
  * Get Proxy data
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param _array $options
  * @param array $options['nodeids']
  * @param array $options['proxyids']
@@ -47,11 +41,10 @@ class CProxy extends CZBXAPI{
  * @param string $options['sortorder']
  * @return array|boolean
  */
-	public static function get($options=array()){
-		global $USER_DETAILS;
+	public function get($options=array()){
 
 		$result = array();
-		$user_type = $USER_DETAILS['type'];
+		$user_type = self::$userData['type'];
 
 		$sort_columns = array('hostid', 'host', 'status'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
@@ -240,7 +233,7 @@ class CProxy extends CZBXAPI{
 			if(is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['selectHosts'];
 
-				$hosts = CHost::get($obj_params);
+				$hosts = API::Host()->get($obj_params);
 
 				foreach($hosts as $host){
 					$result[$host['proxy_hostid']]['hosts'][] = $host;
@@ -258,7 +251,7 @@ class CProxy extends CZBXAPI{
 			);
 			if(is_array($options['selectInterfaces']) || str_in_array($options['selectInterfaces'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['selectInterfaces'];
-				$interfaces = CHostInterface::get($obj_params);
+				$interfaces = API::HostInterface()->get($obj_params);
 
 				if(!is_null($options['limitSelects']))
 					order_result($interfaces, 'interfaceid', ZBX_SORT_UP);
@@ -279,7 +272,7 @@ class CProxy extends CZBXAPI{
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$interfaces = CHostInterface::get($obj_params);
+				$interfaces = API::HostInterface()->get($obj_params);
 				$interfaces = zbx_toHash($interfaces, 'hostid');
 				foreach($result as $proxyid => $proxy){
 					if(isset($interfaces[$proxyid]))
@@ -298,8 +291,8 @@ class CProxy extends CZBXAPI{
 	return $result;
 	}
 
-	protected static function checkInput(&$proxies, $method){
-		global $USER_DETAILS;
+	protected function checkInput(&$proxies, $method){
+
 
 		$create = ($method == 'create');
 		$update = ($method == 'update');
@@ -314,7 +307,7 @@ class CProxy extends CZBXAPI{
 // permissions
 		if($update || $delete){
 			$proxyDBfields = array('proxyid'=> null);
-			$dbProxies = self::get(array(
+			$dbProxies = $this->get(array(
 				'output' => array('proxyid', 'hostid', 'host', 'status'),
 				'proxyids' => zbx_objectValues($proxies, 'proxyid'),
 				'editable' => 1,
@@ -345,7 +338,7 @@ class CProxy extends CZBXAPI{
 				if($delete) $proxy['host'] = $dbProxies[$proxy['proxyid']]['host'];
 			}
 			else{
-				if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type'])
+				if(USER_TYPE_SUPER_ADMIN != self::$userData['type'])
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 
 				if(($proxy['status'] == HOST_STATUS_PROXY_PASSIVE) && !isset($proxy['interfaces']))
@@ -366,7 +359,7 @@ class CProxy extends CZBXAPI{
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Proxy name "%s".',$proxy['host']));
 				}
 
-				$proxiesExists = self::get(array(
+				$proxiesExists = $this->get(array(
 					'filter' => array('host' => $proxy['host'])
 				));
 				foreach($proxiesExists as $exnum => $proxyExists){
@@ -380,14 +373,11 @@ class CProxy extends CZBXAPI{
 	}
 
 
-	public static function create($proxies){
+	public function create($proxies){
 		$proxies = zbx_toArray($proxies);
 		$proxyids = array();
 
-		try{
-			self::BeginTransaction(__METHOD__);
-
-			self::checkInput($proxies, __FUNCTION__);
+			$this->checkInput($proxies, __FUNCTION__);
 
 			$proxyids = DB::insert('hosts', $proxies);
 
@@ -409,33 +399,21 @@ class CProxy extends CZBXAPI{
 				}
 				unset($interface);
 
-				$result = CHostInterface::create($proxy['interfaces']);
+				$result = API::HostInterface()->create($proxy['interfaces']);
 				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Proxy interface creation failed');
 			}
 
 			DB::update('hosts', $hostUpdate);
 
-			self::EndTransaction(true, __METHOD__);
 			return array('proxyids' => $proxyids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 
-	public static function update($proxies){
+	public function update($proxies){
 		$proxies = zbx_toArray($proxies);
 		$proxyids = array();
 
-		try{
-			self::BeginTransaction(__METHOD__);
-
-			self::checkInput($proxies, __FUNCTION__);
+			$this->checkInput($proxies, __FUNCTION__);
 
 			$proxyUpdate = array();
 			$hostUpdate = array();
@@ -467,9 +445,9 @@ class CProxy extends CZBXAPI{
 					}
 
 					if(isset($interface['interfaceid']))
-						$result = CHostInterface::update($proxy['interfaces']);
+						$result = API::HostInterface()->update($proxy['interfaces']);
 					else
-						$result = CHostInterface::create($proxy['interfaces']);
+						$result = API::HostInterface()->create($proxy['interfaces']);
 
 					if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Proxy interface update failed');
 
@@ -481,16 +459,7 @@ class CProxy extends CZBXAPI{
 			DB::update('hosts', $proxyUpdate);
 			DB::update('hosts', $hostUpdate);
 
-			self::EndTransaction(true, __METHOD__);
 			return array('proxyids' => $proxyids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -500,17 +469,14 @@ class CProxy extends CZBXAPI{
  * @param array $proxies[0, ...]['hostid'] Host ID to delete
  * @return array|boolean
  */
-	public static function delete($proxies){
-
-		try{
-			self::BeginTransaction(__METHOD__);
+	public function delete($proxies){
 
 			if(empty($proxies)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
 
 			$proxies = zbx_toArray($proxies);
 			$proxyids = zbx_objectValues($proxies, 'proxyid');
 
-			self::checkInput($proxies, __FUNCTION__);
+			$this->checkInput($proxies, __FUNCTION__);
 
 // disable actions
 			$actionids = array();
@@ -562,16 +528,7 @@ class CProxy extends CZBXAPI{
 				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_PROXY,'['.$proxy['host'].' ] ['.$proxy['hostid'].']');
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('proxyids' => $proxyids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 }
 ?>

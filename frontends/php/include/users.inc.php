@@ -23,9 +23,9 @@
 	function getUserTheme($USER_DETAILS){
 		$config = select_config();
 
-		if(isset($config['default_theme'])) 
+		if(isset($config['default_theme']))
 			$css = $config['default_theme'];
-		
+
 		if(isset($USER_DETAILS['theme']) &&
 			($USER_DETAILS['theme']!=ZBX_DEFAULT_CSS) &&
 			($USER_DETAILS['alias']!=ZBX_GUEST_USER))
@@ -141,7 +141,7 @@
 		global $USER_DETAILS;
 
 		$result = true;
-		$group = CUserGroup::get(array('usrgrpids' => $usrgrpid,  'output' => API_OUTPUT_EXTEND));
+		$group = API::UserGroup()->get(array('usrgrpids' => $usrgrpid,  'output' => API_OUTPUT_EXTEND));
 		$group = reset($group);
 
 		if(($group['gui_access'] == GROUP_GUI_ACCESS_DISABLED) || ($group['users_status'] == GROUP_STATUS_DISABLED)){
@@ -183,13 +183,6 @@
 		else
 			error(S_USER_CANNOT_CHANGE_GUI_ACCESS);
 
-	return $res;
-	}
-
-	function change_group_api_access($usrgrpids, $api_access){
-		zbx_value2array($usrgrpids);
-		$res = false;
-		$res = DBexecute('UPDATE usrgrp SET api_access='.$api_access.' WHERE '.DBcondition('usrgrpid',$usrgrpids));
 	return $res;
 	}
 
