@@ -553,10 +553,13 @@ function __autoload($class_name){
 		}
 	}
 
-	function clear_messages(){
+	function clear_messages($count=null){
 		global $ZBX_MESSAGES;
 
-		$ZBX_MESSAGES = null;
+		if(!is_null($count))
+			while($count-- > 0) array_pop($ZBX_MESSAGES);
+		else
+			$ZBX_MESSAGES = null;
 	}
 
 	function fatal_error($msg){
