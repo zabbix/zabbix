@@ -1337,10 +1337,10 @@ static int	evaluate_DELTA(char *value, DB_ITEM *item, const char *function, cons
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, const char *parameters)
 {
 	const char	*__function_name = "evaluate_NODATA";
-	int		arg1, flag, res = FAIL;
+	int		arg1, flag, now, res = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1352,6 +1352,8 @@ static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, con
 
 	if (flag != ZBX_FLAG_SEC)
 		return res;
+
+	now = (int)time(NULL);
 
 	if (item->lastclock + arg1 > now)
 		zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
@@ -1931,7 +1933,7 @@ int	evaluate_function(char *value, DB_ITEM *item, const char *function, const ch
 	}
 	else if (0 == strcmp(function, "nodata"))
 	{
-		ret = evaluate_NODATA(value, item, function, parameter, now);
+		ret = evaluate_NODATA(value, item, function, parameter);
 	}
 	else if (0 == strcmp(function, "date"))
 	{

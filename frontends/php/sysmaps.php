@@ -136,10 +136,9 @@ include_once('include/page_header.php');
 
 // IMPORT ///////////////////////////////////
 	$rules = get_request('rules', array());
-	if(!isset($_REQUEST['form_refresh'])){
+	if(!isset($_FILES['import_file'])){
 		foreach(array('maps', 'icons', 'background') as $key){
-			if($key == 'maps')
-				$rules[$key]['exist'] = 1;
+			$rules[$key]['exist'] = 1;
 			$rules[$key]['missed'] = 1;
 		}
 	}

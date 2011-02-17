@@ -188,10 +188,18 @@ static struct snmp_session	*snmp_open_session(DC_ITEM *item, char *err)
 
 	switch (item->type)
 	{
-		case ITEM_TYPE_SNMPv1:	session.version = SNMP_VERSION_1;	break;
-		case ITEM_TYPE_SNMPv2c:	session.version = SNMP_VERSION_2c;	break;
-		case ITEM_TYPE_SNMPv3:	session.version = SNMP_VERSION_3;	break;
-		default:		THIS_SHOULD_NEVER_HAPPEN;		break;
+		case ITEM_TYPE_SNMPv1:
+			session.version = SNMP_VERSION_1;
+			break;
+		case ITEM_TYPE_SNMPv2c:
+			session.version = SNMP_VERSION_2c;
+			break;
+		case ITEM_TYPE_SNMPv3:
+			session.version = SNMP_VERSION_3;
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			break;
 	}
 
 #ifdef HAVE_IPV6
@@ -201,7 +209,12 @@ static struct snmp_session	*snmp_open_session(DC_ITEM *item, char *err)
 	if (family == PF_INET)
 		zbx_snprintf(addr, sizeof(addr), "%s:%d", item->interface.addr, (int)item->interface.port);
 	else
-		zbx_snprintf(addr, sizeof(addr), "udp6:[%s]:%d", item->interface.addr, (int)item->interface.port);
+	{
+		if (item->interface.useip)
+			zbx_snprintf(addr, sizeof(addr), "udp6:[%s]:%d", item->interface.addr, (int)item->interface.port);
+		else
+			zbx_snprintf(addr, sizeof(addr), "udp6:%s:%d", item->interface.addr, (int)item->interface.port);
+	}
 #else
 	zbx_snprintf(addr, sizeof(addr), "%s:%d", item->interface.addr, (int)item->interface.port);
 #endif	/* HAVE_IPV6 */

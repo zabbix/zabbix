@@ -85,10 +85,33 @@ class testPageUserGroups extends CWebTest
 		$this->markTestIncomplete();
 	}
 
-	public function testPageUserGroups_MassEnable()
+	/**
+	* @dataProvider allGroups
+	*/
+	public function testPageUserGroups_MassEnable($group)
 	{
-// TODO
-		$this->markTestIncomplete();
+		$usrgrpid=$group['usrgrpid'];
+		$name=$group['name'];
+
+		$sql1="select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
+		$oldHashGroups=DBhash($sql1);
+
+		$this->login('usergrps.php');
+		$this->assertTitle('User groups');
+
+		$this->checkbox_select("group_groupid[$usrgrpid]");
+		$this->dropdown_select('go','Enable selected');
+		$this->button_click('goButton');
+
+		$this->getConfirmation();
+		$this->wait();
+		$this->assertTitle('User groups');
+		$this->ok('Users status updated');
+
+		$sql="select * from usrgrp where usrgrpid=$usrgrpid and users_status=".GROUP_STATUS_ENABLED;
+		$this->assertEquals(1,DBcount($sql));
+
+		$this->assertEquals($oldHashGroups,DBhash($sql1));
 	}
 
 	public function testPageUserGroups_MassDisableAll()
@@ -97,10 +120,41 @@ class testPageUserGroups extends CWebTest
 		$this->markTestIncomplete();
 	}
 
-	public function testPageUserGroups_MassDisable()
+	/**
+	* @dataProvider allGroups
+	*/
+	public function testPageUserGroups_MassDisable($group)
 	{
-// TODO
-		$this->markTestIncomplete();
+		$usrgrpid=$group['usrgrpid'];
+		$name=$group['name'];
+
+		$cannotDisable = ('Zabbix administrators' == $name);
+
+		$sql1="select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
+		$oldHashGroups=DBhash($sql1);
+
+		$this->login('usergrps.php');
+		$this->assertTitle('User groups');
+
+		$this->checkbox_select("group_groupid[$usrgrpid]");
+		$this->dropdown_select('go','Disable selected');
+		$this->button_click('goButton');
+
+		$this->getConfirmation();
+		$this->wait();
+		$this->assertTitle('User groups');
+		if($cannotDisable)
+			$this->ok('Cannot update users status');
+		else
+			$this->ok('Users status updated');
+
+		$sql="select * from usrgrp where usrgrpid=$usrgrpid and users_status=".GROUP_STATUS_DISABLED;
+		if($cannotDisable)
+			$this->assertEquals(0,DBcount($sql));
+		else
+			$this->assertEquals(1,DBcount($sql));
+
+		$this->assertEquals($oldHashGroups,DBhash($sql1));
 	}
 
 	public function testPageUserGroups_MassEnableAPIAll()
