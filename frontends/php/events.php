@@ -246,20 +246,20 @@ include_once('include/page_header.php');
 
 
 
-	// allow CVS export button
+	// allow CSV export button
 	$frmForm = new CForm();
-		$frmForm->cleanItems();
-		if(isset($_REQUEST['groupid'])) $frmForm->addVar('groupid', $_REQUEST['groupid']);
-		if(isset($_REQUEST['hostid'])) $frmForm->addVar('hostid', $_REQUEST['hostid']);
-		if(isset($_REQUEST['source'])) $frmForm->addVar('source', $_REQUEST['source']);
-		if(isset($_REQUEST['start'])) $frmForm->addVar('start', $_REQUEST['start']);
-		if(isset($_REQUEST['stime'])) $frmForm->addVar('stime', $_REQUEST['stime']);
-		if(isset($_REQUEST['period'])) $frmForm->addVar('period', $_REQUEST['period']);
-		$buttons = new CDiv(array(
-			new CSubmit('csv_export', _('Export to CSV')),
-		));
-		$buttons->useJQueryStyle();
-		$frmForm->addItem($buttons);
+	$frmForm->cleanItems();
+	if(isset($_REQUEST['groupid'])) $frmForm->addVar('groupid', $_REQUEST['groupid']);
+	if(isset($_REQUEST['hostid'])) $frmForm->addVar('hostid', $_REQUEST['hostid']);
+	if(isset($_REQUEST['source'])) $frmForm->addVar('source', $_REQUEST['source']);
+	if(isset($_REQUEST['start'])) $frmForm->addVar('start', $_REQUEST['start']);
+	if(isset($_REQUEST['stime'])) $frmForm->addVar('stime', $_REQUEST['stime']);
+	if(isset($_REQUEST['period'])) $frmForm->addVar('period', $_REQUEST['period']);
+	$buttons = new CDiv(array(
+		new CSubmit('csv_export', _('Export to CSV')),
+	));
+	$buttons->useJQueryStyle();
+	$frmForm->addItem($buttons);
 
 	$numrows = new CDiv();
 	$numrows->setAttribute('name', 'numrows');
@@ -335,11 +335,19 @@ include_once('include/page_header.php');
 	if($source == EVENT_SOURCE_DISCOVERY){
 		$options['source'] = EVENT_SOURCE_DISCOVERY;
 	}
-	else if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid'] > 0)){
+	else{
+		if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid'] > 0)){
+			$options['triggerids'] = $_REQUEST['triggerid'];
+		}
 		$options['object'] = EVENT_OBJECT_TRIGGER;
-		$options['triggerids'] = $_REQUEST['triggerid'];
 		$options['filter'] = array('value_changed' => TRIGGER_VALUE_CHANGED_YES);
+		$options['nodeids'] = get_current_nodeid();
+		$options['filters'] = array(
+			'value_changed' => TRIGGER_VALUE_CHANGED_YES,
+			'object' => EVENT_OBJECT_TRIGGER,
+		);
 	}
+
 
 	$firstEvent = CEvent::get($options);
 // }}} CHECK IF EVENTS EXISTS
@@ -350,12 +358,14 @@ include_once('include/page_header.php');
 	$from = zbxDateToTime($_REQUEST['stime']);
 	$till = $from + $effectiveperiod;
 
+	$csv_disabled = true;
+
 	if(empty($firstEvent)){
 		$starttime = null;
-		$csv_disabled = true;
+		$events = array();
+		$paging = getPagingLine($events);
 	}
 	else{
-		$csv_disabled = false;
 		$config = select_config();
 		$firstEvent = reset($firstEvent);
 		$starttime = $firstEvent['clock'];
@@ -385,6 +395,8 @@ include_once('include/page_header.php');
 			$dsc_events = CEvent::get($options);
 			order_result($dsc_events, 'eventid', ZBX_SORT_DOWN);
 
+			// do we need to make CVS export button enabled?
+			$csv_disabled = zbx_empty($dsc_events);
 
 			$objectids = array();
 			foreach($dsc_events as $enum => $event_data){
@@ -563,6 +575,8 @@ include_once('include/page_header.php');
 
 			$events = CEvent::get($options);
 			order_result($events, array('clock','ns'), ZBX_SORT_DOWN);
+
+			$csv_disabled = zbx_empty($events);
 
 			$triggersOptions = array(
 				'triggerids' => zbx_objectValues($events, 'objectid'),
