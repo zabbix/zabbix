@@ -129,6 +129,10 @@ void	load_config()
 			if (NULL != (value = GET_STR_RESULT(&result)))
 			{
 				CONFIG_HOSTNAME = strdup(*value);
+
+				/* If auto registration is used, our CONFIG_HOSTNAME will make it into the  */
+				/* server's database, where it is limited by HOST_HOST_LEN (currently, 64), */
+				/* so to make it work properly we need to truncate our hostname.            */
 				if (strlen(CONFIG_HOSTNAME) > 64)
 					CONFIG_HOSTNAME[64] = '\0';
 			}
