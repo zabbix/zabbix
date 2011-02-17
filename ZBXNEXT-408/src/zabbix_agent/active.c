@@ -25,17 +25,17 @@
 #include "sysinfo.h"
 #include "logfiles.h"
 #if defined (_WINDOWS)
-#include "eventlog.h"
-#endif
+#	include "eventlog.h"
+#endif	/* _WINDOWS */
 #include "comms.h"
 #include "threads.h"
 #include "zbxjson.h"
 
 #if defined(ZABBIX_SERVICE)
 #	include "service.h"
-#elif defined(ZABBIX_DAEMON) /* ZABBIX_SERVICE */
+#elif defined(ZABBIX_DAEMON)	/* ZABBIX_SERVICE */
 #	include "daemon.h"
-#endif /* ZABBIX_DAEMON */
+#endif	/* ZABBIX_DAEMON */
 
 static ZBX_ACTIVE_METRIC *active_metrics = NULL;
 static ZBX_ACTIVE_BUFFER buffer;
@@ -1073,7 +1073,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 #if defined(ZABBIX_DAEMON)
 	set_child_signal_handler();
-#endif /* ZABBIX_DAEMON */
+#endif	/* ZABBIX_DAEMON */
 
 	activechk_args.host = strdup(((ZBX_THREAD_ACTIVECHK_ARGS *)args)->host);
 	activechk_args.port = ((ZBX_THREAD_ACTIVECHK_ARGS *)args)->port;

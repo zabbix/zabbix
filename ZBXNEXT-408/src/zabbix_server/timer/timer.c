@@ -27,6 +27,7 @@
 #include "dbcache.h"
 #include "zlog.h"
 #include "zbxserver.h"
+#include "daemon.h"
 #include "zbxself.h"
 
 #include "timer.h"
@@ -761,6 +762,8 @@ static void	process_maintenance()
 void	main_timer_loop()
 {
 	int	now, nextcheck, sleeptime, maintenance = 1;
+
+	set_child_signal_handler();
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 

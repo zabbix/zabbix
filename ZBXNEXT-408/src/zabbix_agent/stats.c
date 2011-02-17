@@ -253,6 +253,10 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 {
 	zabbix_log(LOG_LEVEL_INFORMATION, "zabbix_agentd collector started");
 
+#if defined(ZABBIX_DAEMON)
+	set_child_signal_handler();
+#endif	/* ZABBIX_DAEMON */
+
 	if (0 != init_cpu_collector(&(collector->cpus)))
 		close_cpu_collector(&(collector->cpus));
 

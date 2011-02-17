@@ -18,9 +18,9 @@
 **/
 
 #include "common.h"
-#include "cfg.h"
 #include "db.h"
 #include "log.h"
+#include "daemon.h"
 
 #include "housekeeper.h"
 
@@ -138,6 +138,8 @@ void	main_housekeeper_loop()
 	int	records;
 	int	start, sleeptime;
 	double	sec;
+
+	set_child_signal_handler();
 
 	if (1 == CONFIG_DISABLE_HOUSEKEEPING)
 	{

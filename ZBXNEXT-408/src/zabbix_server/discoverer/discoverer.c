@@ -32,6 +32,7 @@
 #include "../poller/checks_agent.h"
 #include "../poller/checks_snmp.h"
 
+extern int		CONFIG_DISCOVERER_FORKS;
 static unsigned char	zbx_process;
 extern int		process_num;
 

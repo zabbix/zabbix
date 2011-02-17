@@ -19,18 +19,14 @@
 
 #include "common.h"
 
-#include "cfg.h"
 #include "dbcache.h"
 #include "log.h"
-#include "zlog.h"
-#include "sysinfo.h"
 #include "zbxserver.h"
 #include "zbxicmpping.h"
 #include "daemon.h"
 #include "zbxself.h"
 
 #include "pinger.h"
-#include "dbcache.h"
 
 /*some defines so the `fping' and `fping6' could successfully process pings*/
 #define 	MIN_COUNT		1

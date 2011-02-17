@@ -21,11 +21,12 @@
 
 #include "db.h"
 #include "log.h"
-#include "zlog.h"
-#include "threads.h"
+#include "daemon.h"
 
 #include "dbconfig.h"
 #include "dbcache.h"
+
+extern int	CONFIG_DBCONFIG_FREQUENCY;
 
 /******************************************************************************
  *                                                                            *
@@ -47,6 +48,8 @@ void	main_dbconfig_loop()
 	double	sec;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_dbconfig_loop()");
+
+	set_child_signal_handler();
 
 	zbx_setproctitle("db config [connecting to the database]");
 

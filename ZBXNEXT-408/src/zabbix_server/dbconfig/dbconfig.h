@@ -20,8 +20,6 @@
 #ifndef ZABBIX_DBCONFIG_H
 #define ZABBIX_DBCONFIG_H
 
-extern int	CONFIG_DBCONFIG_FREQUENCY;
-
 void	main_dbconfig_loop();
 
 #endif

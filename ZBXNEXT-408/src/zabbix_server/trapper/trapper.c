@@ -19,9 +19,7 @@
 
 #include "common.h"
 
-#include "cfg.h"
 #include "comms.h"
-#include "pid.h"
 #include "log.h"
 #include "zlog.h"
 #include "zbxjson.h"

@@ -18,9 +18,9 @@
 **/
 
 #include "common.h"
-#include "cfg.h"
 #include "db.h"
 #include "log.h"
+#include "daemon.h"
 
 #include "housekeeper.h"
 
@@ -345,6 +345,8 @@ static int	housekeeping_history_and_trends(int now)
 void	main_housekeeper_loop()
 {
 	int	d, now;
+
+	set_child_signal_handler();
 
 	if (1 == CONFIG_DISABLE_HOUSEKEEPING)
 	{

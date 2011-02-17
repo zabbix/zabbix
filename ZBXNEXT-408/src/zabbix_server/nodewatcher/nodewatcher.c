@@ -18,10 +18,9 @@
 **/
 
 #include "common.h"
-#include "cfg.h"
 #include "db.h"
 #include "log.h"
-#include "zlog.h"
+#include "daemon.h"
 
 #include "nodewatcher.h"
 #include "nodesender.h"
@@ -165,6 +164,8 @@ void	main_nodewatcher_loop()
 	int	lastrun = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_nodewatcher_loop()");
+
+	set_child_signal_handler();
 
 	zbx_setproctitle("connecting to the database");
 

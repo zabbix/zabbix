@@ -19,15 +19,14 @@
 
 #include "common.h"
 
-#include "cfg.h"
 #include "db.h"
 #include "zbxdb.h"
 #include "log.h"
 #include "zlog.h"
+#include "daemon.h"
 
 #include "../alerter/alerter.h"
 
-#include "zlog.h"
 #include "watchdog.h"
 
 typedef struct
@@ -194,6 +193,8 @@ static void	ping_database()
 void	main_watchdog_loop()
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_watchdog_loop()");
+
+	set_child_signal_handler();
 
 	/* Disable writing to database in zabbix_syslog() */
 	CONFIG_ENABLE_LOG = 0;

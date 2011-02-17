@@ -29,9 +29,9 @@
 
 #if defined(ZABBIX_SERVICE)
 #	include "service.h"
-#elif defined(ZABBIX_DAEMON) /* ZABBIX_SERVICE */
+#elif defined(ZABBIX_DAEMON)	/* ZABBIX_SERVICE */
 #	include "daemon.h"
-#endif /* ZABBIX_DAEMON */
+#endif	/* ZABBIX_DAEMON */
 
 static void	process_listener(zbx_sock_t *s)
 {
@@ -76,7 +76,7 @@ ZBX_THREAD_ENTRY(listener_thread, pSock)
 
 #if defined(ZABBIX_DAEMON)
 	set_child_signal_handler();
-#endif
+#endif	/* ZABBIX_DAEMON */
 
 	memcpy(&s, ((zbx_sock_t *)pSock), sizeof(zbx_sock_t));
 

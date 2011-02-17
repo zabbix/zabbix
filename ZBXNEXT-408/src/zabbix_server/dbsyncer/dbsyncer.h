@@ -20,8 +20,6 @@
 #ifndef ZABBIX_DBSYNCER_H
 #define ZABBIX_DBSYNCER_H
 
-extern int	CONFIG_DBSYNCER_FREQUENCY;
-
 void	main_dbsyncer_loop();
 
 #endif

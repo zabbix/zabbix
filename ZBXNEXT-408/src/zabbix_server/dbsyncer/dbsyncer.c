@@ -21,12 +21,13 @@
 
 #include "db.h"
 #include "log.h"
-#include "zlog.h"
+#include "daemon.h"
 #include "zbxself.h"
 
 #include "dbcache.h"
 #include "dbsyncer.h"
 
+extern int	CONFIG_DBSYNCER_FREQUENCY;
 extern int	ZBX_SYNC_MAX;
 extern int	process_num;
 
@@ -52,6 +53,8 @@ void	main_dbsyncer_loop()
 	int	retry_up = 0, retry_dn = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_dbsyncer_loop()");
+
+	set_child_signal_handler();
 
 	zbx_setproctitle("db syncer [connecting to the database]");
 
