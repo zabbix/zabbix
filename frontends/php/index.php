@@ -46,9 +46,9 @@ $page['file']	= 'index.php';
 	$sessionid = get_cookie('zbx_sessionid');
 
 	if(isset($_REQUEST['reconnect']) && isset($sessionid)){
-		add_audit(AUDIT_ACTION_LOGOUT,AUDIT_RESOURCE_USER,'Manual Logout');
+		add_audit(AUDIT_ACTION_LOGOUT,AUDIT_RESOURCE_USER, 'Manual Logout');
 
-		CUser::logout($sessionid);
+		CWebUser::logout($sessionid);
 
 		require('login.php');
 		exit();
@@ -56,9 +56,7 @@ $page['file']	= 'index.php';
 
 	$config = select_config();
 
-	$authentication_type = $config['authentication_type'];
-
-	if($authentication_type == ZBX_AUTH_HTTP){
+	if($config['authentication_type'] == ZBX_AUTH_HTTP){
 		if(isset($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_USER'])){
 			$_REQUEST['enter'] = _('Sign in');
 			$_REQUEST['name'] = $_SERVER['PHP_AUTH_USER'];
@@ -75,13 +73,14 @@ $page['file']	= 'index.php';
 		$name = get_request('name','');
 		$passwd = get_request('password','');
 
-		$login = CUser::authenticate(array('user'=>$name, 'password'=>$passwd, 'auth_type'=>$authentication_type));
+		$login = CWebUser::login($name, $password);
+
 
 		if($login){
 // save remember login preferance
 			$user = array('autologin' => get_request('autologin', 0));
 			if($USER_DETAILS['autologin'] != $user['autologin'])
-				$result = CUser::updateProfile($user);
+				$result = API::User()->updateProfile($user);
 // --
 
 			$url = is_null($request)?$USER_DETAILS['url']:$request;
@@ -98,14 +97,14 @@ $page['file']	= 'index.php';
 
 	if($sessionid)
 		CUser::checkAuthentication(array('sessionid'=>$sessionid));
+	show_messages();
 
 	if($USER_DETAILS['alias'] == ZBX_GUEST_USER){
-		switch($authentication_type){
+		switch($config['authentication_type']){
 			case ZBX_AUTH_HTTP:
 				break;
 			case ZBX_AUTH_LDAP:
 			case ZBX_AUTH_INTERNAL:
-			default:
 				if(isset($_REQUEST['enter'])) $_REQUEST['autologin'] = get_request('autologin', 0);
 				require('login.php');
 		}

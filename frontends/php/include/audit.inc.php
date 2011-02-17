@@ -70,7 +70,6 @@
 	function add_audit($action,$resourcetype,$details){
 		global $USER_DETAILS;
 
-		if(!isset($USER_DETAILS['userid']))	check_authorisation();
 		if($USER_DETAILS['userid'] == 0) return true;
 
 
@@ -95,17 +94,14 @@
 	function add_audit_ext($action, $resourcetype, $resourceid, $resourcename, $table_name, $values_old, $values_new){
 		global $USER_DETAILS;
 
-		if (!isset($USER_DETAILS["userid"]))
-			check_authorisation();
-
-		if ($action == AUDIT_ACTION_UPDATE){
+		if($action == AUDIT_ACTION_UPDATE){
 			$values_diff = array();
 			foreach ($values_new as $id => $value){
 				if ($values_old[$id] !== $value)
 					array_push($values_diff, $id);
 			}
 
-			if (0 == count($values_diff))
+			if(0 == count($values_diff))
 				return true;
 		}
 

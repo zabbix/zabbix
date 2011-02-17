@@ -30,12 +30,6 @@ class CDService extends CZBXAPI{
 /**
  * Get Service data
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param _array $options
  * @param array $options['nodeids'] Node IDs
  * @param array $options['groupids'] ServiceGroup IDs
@@ -67,12 +61,11 @@ class CDService extends CZBXAPI{
  * @param string $options['sortorder'] sort order
  * @return array|boolean Service data as array or false if error
  */
-	public static function get($options=array()){
-		global $USER_DETAILS;
+	public function get($options=array()){
 
 		$result = array();
 		$nodeCheck = false;
-		$user_type = $USER_DETAILS['type'];
+		$user_type = self::$userData['type'];
 
 		$sort_columns = array('dserviceid', 'dhostid'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM); // allowed output options for [ select_* ] params
@@ -136,9 +129,9 @@ class CDService extends CZBXAPI{
 // editable + PERMISSION CHECK
 		if(USER_TYPE_SUPER_ADMIN == $user_type){
 		}
-		else if(is_null($options['editable']) && ($USER_DETAILS['type'] == USER_TYPE_ZABBIX_ADMIN)){
+		else if(is_null($options['editable']) && (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN)){
 		}
-		else if(!is_null($options['editable']) && ($USER_DETAILS['type']!=USER_TYPE_SUPER_ADMIN)){
+		else if(!is_null($options['editable']) && (self::$userData['type']!=USER_TYPE_SUPER_ADMIN)){
 			return array();
 		}
 
@@ -374,7 +367,7 @@ Copt::memoryPick();
 
 			if(is_array($options['selectDRules']) || str_in_array($options['selectDRules'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['selectDRules'];
-				$drules = CDRule::get($obj_params);
+				$drules = API::DRule()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($drules, 'name');
 				foreach($drules as $druleid => $drule){
@@ -396,7 +389,7 @@ Copt::memoryPick();
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$drules = CDRule::get($obj_params);
+				$drules = API::DRule()->get($obj_params);
 				$drules = zbx_toHash($drules, 'dserviceid');
 				foreach($result as $dserviceid => $dservice){
 					if(isset($drules[$dserviceid]))
@@ -417,7 +410,7 @@ Copt::memoryPick();
 
 			if(is_array($options['selectDHosts']) || str_in_array($options['selectDHosts'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['selectDHosts'];
-				$dhosts = CDHost::get($obj_params);
+				$dhosts = API::DHost()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($dhosts, 'dhostid');
 				foreach($dhosts as $dhostid => $dhost){
@@ -438,7 +431,7 @@ Copt::memoryPick();
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$dhosts = CDHost::get($obj_params);
+				$dhosts = API::DHost()->get($obj_params);
 				$dhosts = zbx_toHash($dhosts, 'dhostid');
 				foreach($result as $dserviceid => $dservice){
 					if(isset($dhosts[$dserviceid]))
@@ -460,7 +453,7 @@ Copt::memoryPick();
 
 			if(is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['selectHosts'];
-				$hosts = CHost::get($obj_params);
+				$hosts = API::Host()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($hosts, 'hostid');
 
@@ -482,7 +475,7 @@ Copt::memoryPick();
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$hosts = CHost::get($obj_params);
+				$hosts = API::Host()->get($obj_params);
 				$hosts = zbx_toHash($hosts, 'hostid');
 				foreach($result as $dserviceid => $dservice){
 					if(isset($hosts[$dserviceid]))
@@ -502,7 +495,7 @@ Copt::memoryPick();
 	return $result;
 	}
 
-	public static function exists($object){
+	public function exists($object){
 		$keyFields = array(array('dserviceid'));
 
 		$options = array(
@@ -516,90 +509,30 @@ Copt::memoryPick();
 		else if(isset($object['nodeids']))
 			$options['nodeids'] = $object['nodeids'];
 
-		$objs = self::get($options);
+		$objs = $this->get($options);
 
 	return !empty($objs);
 	}
 
 /**
  * Add Service
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $dservices multidimensional array with Services data
  */
-	public static function create($dservices){
-		$errors = array();
-		$dservices = zbx_toArray($dservices);
-		$dserviceids = array();
-		$result = false;
+	public function create($dservices){
 
-		if($result){
-			return array('dserviceids' => $dserviceids);
-		}
-		else{
-			self::setMethodErrors(__METHOD__, $errors);
-			return false;
-		}
 	}
 
 /**
  * Update DService
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $dservices multidimensional array with Services data
  */
-	public static function update($dservices){
-		$dservices = zbx_toArray($dservices);
-		$dserviceids = zbx_objectValues($dservices, 'hostid');
+	public function update($dservices){
 
-		try{
-			return array('dserviceids' => $dserviceids);
-		}
-		catch(APIException $e){
-			if(isset($transaction)) self::EndTransaction(false, __METHOD__);
-
-			$error = $e->getErrors();
-			$error = reset($error);
-
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
  * Delete Discovered Service
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param array $dservices
- * @param array $dservices[0, ...]['hostid'] Service ID to delete
- * @return array|boolean
  */
-	public static function delete($dservices){
-		$dservices = zbx_toArray($dservices);
-		$dserviceids = array();
+	public function delete($dservices){
 
-		if($result){
-			return array('hostids' => $dserviceids);
-		}
-		else{
-			self::setError(__METHOD__);
-			return false;
-		}
 	}
 
 }

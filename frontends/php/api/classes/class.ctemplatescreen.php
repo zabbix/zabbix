@@ -30,13 +30,7 @@ class CTemplateScreen extends CScreen{
 /**
  * Get Screen data
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $options
+ * @param array $options
  * @param array $options['nodeids'] Node IDs
  * @param boolean $options['with_items'] only with items
  * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
@@ -46,11 +40,10 @@ class CTemplateScreen extends CScreen{
  * @param string $options['order'] deprecated parameter (for now)
  * @return array|boolean Host data as array or false if error
  */
-	public static function get($options=array()){
-		global $USER_DETAILS;
+	public function get($options=array()){
 
 		$result = array();
-		$user_type = $USER_DETAILS['type'];
+		$user_type = self::$userData['type'];
 
 		$sort_columns = array('screenid', 'name'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
@@ -119,14 +112,14 @@ class CTemplateScreen extends CScreen{
 			if(!is_null($options['templateids'])){
 				unset($options['hostids']);
 
-				$options['templateids'] = CTemplate::get(array(
+				$options['templateids'] = API::Template()->get(array(
 					'templateids' => $options['templateids'],
 					'editable' => $options['editable'],
 					'preservekeys' => 1
 				));
 			}
 			else if(!is_null($options['hostids'])){
-				$options['templateids'] = CHost::get(array(
+				$options['templateids'] = API::Host()->get(array(
 					'hostids' => $options['hostids'],
 					'editable' => $options['editable'],
 					'preservekeys' => 1
@@ -142,7 +135,7 @@ class CTemplateScreen extends CScreen{
 				$sql_parts['where'][] = 'hg.hostid=s.templateid';
 				$sql_parts['where'][] = 'r.id=hg.groupid ';
 				$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
-				$sql_parts['where'][] = 'ug.userid='.$USER_DETAILS['userid'];
+				$sql_parts['where'][] = 'ug.userid='.self::$userData['userid'];
 				$sql_parts['where'][] = 'r.permission>='.$permission;
 				$sql_parts['where'][] = 'NOT EXISTS( '.
 									' SELECT hgg.groupid '.
@@ -150,7 +143,7 @@ class CTemplateScreen extends CScreen{
 									' WHERE hgg.hostid=hg.hostid '.
 										' AND rr.id=hgg.groupid '.
 										' AND rr.groupid=gg.usrgrpid '.
-										' AND gg.userid='.$USER_DETAILS['userid'].
+										' AND gg.userid='.self::$userData['userid'].
 										' AND rr.permission<'.$permission.')';
 			}
 		}
@@ -370,14 +363,14 @@ class CTemplateScreen extends CScreen{
 		if(!is_null($options['select_screenitems']) && !is_null($options['hostids'])){
 // prepare Graphs
 			if(!empty($graphids)){
-				$tplGraphs = CGraph::get(array(
+				$tplGraphs = API::Graph()->get(array(
 					'output' => array('graphid', 'name'),
 					'graphids' => $graphids,
 					'nopermissions' => 1,
 					'preservekeys' => 1
 				));
 
-				$dbGraphs = CGraph::get(array(
+				$dbGraphs = API::Graph()->get(array(
 					'output' => array('graphid', 'name'),
 					'hostids' => $options['hostids'],
 					'filter' => array('name' => zbx_objectValues($tplGraphs, 'name')),
@@ -396,14 +389,14 @@ class CTemplateScreen extends CScreen{
 
 // prepare Items
 			if(!empty($itemids)){
-				$tplItems = CItem::get(array(
+				$tplItems = API::Item()->get(array(
 					'output' => array('itemid', 'key_'),
 					'itemids' => $itemids,
 					'nopermissions' => 1,
 					'preservekeys' => 1
 				));
 
-				$dbItems = CItem::get(array(
+				$dbItems = API::Item()->get(array(
 					'output' => array('itemid', 'key_'),
 					'hostids' => $options['hostids'],
 					'filter' => array('key_' => zbx_objectValues($tplItems, 'key_')),
@@ -480,7 +473,7 @@ class CTemplateScreen extends CScreen{
 	return $result;
 	}
 
-	public static function exists($data){
+	public function exists($data){
 		$keyFields = array(array('screenid', 'name'), 'templateid');
 
 		$options = array(
@@ -496,7 +489,7 @@ class CTemplateScreen extends CScreen{
 		else if(isset($data['nodeids']))
 			$options['nodeids'] = $data['nodeids'];
 
-		$screens = self::get($options);
+		$screens = $this->get($options);
 
 	return !empty($screens);
 	}
@@ -510,12 +503,9 @@ class CTemplateScreen extends CScreen{
  * @param int $screens['vsize']
  * @return array
  */
-	public static function create($screens){
+	public function create($screens){
 		$screens = zbx_toArray($screens);
 		$insert_screen_items = array();
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			$screenNames = zbx_objectValues($screens, 'name');
 			$templateids = zbx_objectValues($screens, 'templateid');
@@ -528,7 +518,7 @@ class CTemplateScreen extends CScreen{
 				'output' => API_OUTPUT_EXTEND,
 				'nopermissions' => 1
 			);
-			$db_screens = self::get($options);
+			$db_screens = $this->get($options);
 //---
 
 			foreach($screens as $snum => $screen){
@@ -553,18 +543,9 @@ class CTemplateScreen extends CScreen{
 					}
 				}
 			}
-			self::addItems($insert_screen_items);
+			$this->addItems($insert_screen_items);
 
-			self::EndTransaction(true, __METHOD__);
 			return array('screenids' => $screenids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -577,12 +558,9 @@ class CTemplateScreen extends CScreen{
  * @param int $screens['vsize']
  * @return boolean
  */
-	public static function update($screens){
+	public function update($screens){
 		$screens = zbx_toArray($screens);
 		$update = array();
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			$options = array(
 				'screenids' => zbx_objectValues($screens, 'screenid'),
@@ -590,7 +568,7 @@ class CTemplateScreen extends CScreen{
 				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1,
 			);
-			$updScreens = self::get($options);
+			$updScreens = $this->get($options);
 			foreach($screens as $gnum => $screen){
 				if(!isset($screen['screenid'], $updScreens[$screen['screenid']])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -618,7 +596,7 @@ class CTemplateScreen extends CScreen{
 						'nopermissions' => 1,
 						'output' => API_OUTPUT_SHORTEN
 					);
-					$exist_screens = self::get($options);
+					$exist_screens = $this->get($options);
 					$exist_screen = reset($exist_screens);
 
 					if($exist_screen && ($exist_screen['screenid'] != $screen['screenid']))
@@ -639,21 +617,12 @@ class CTemplateScreen extends CScreen{
 						'screenids' => $screenid,
 						'screenitems' => $screen['screenitems'],
 					);
-					self::updateItems($update_items);
+					$this->updateItems($update_items);
 				}
 			}
 			DB::update('screens', $update);
 
-			self::EndTransaction(true, __METHOD__);
 			return  array('screenids' => zbx_objectValues($screens, 'screenid'));
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -662,18 +631,15 @@ class CTemplateScreen extends CScreen{
  * @param array $screenids
  * @return boolean
  */
-	public static function delete($screenids){
+	public function delete($screenids){
 		$screenids = zbx_toArray($screenids);
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			$options = array(
 					'screenids' => $screenids,
 					'editable' => 1,
 					'preservekeys' => 1
 			);
-			$del_screens = self::get($options);
+			$del_screens = $this->get($options);
 			foreach($screenids as $screenid){
 				if(!isset($del_screens[$screenid])) self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
@@ -683,16 +649,7 @@ class CTemplateScreen extends CScreen{
 			DB::delete('slides', array('screenid'=>$screenids));
 			DB::delete('screens', array('screenid'=>$screenids));
 
-			self::EndTransaction(true, __METHOD__);
 			return array('screenids' => $screenids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 }
 ?>

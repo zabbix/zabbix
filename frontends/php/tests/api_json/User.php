@@ -68,10 +68,5 @@ class API_JSON_User extends CZabbixTest
 		// TODO
 		$this->markTestIncomplete();
 	}
-
-	public function testUser_Authenticate_Documented()
-	{
-		$this->assertTrue(false,"Chuck Norris: API method 'user.authenticate' is not documented");
-	}
 }
 ?>

@@ -79,6 +79,7 @@ function __autoload($class_name){
 }
 ?>
 <?php
+	require_once('include/api.inc.php');
 
 	require_once('include/gettextwrapper.inc.php');
 	require_once('include/defines.inc.php');
@@ -218,7 +219,13 @@ function __autoload($class_name){
 	}
 
 	if(!defined('ZBX_PAGE_NO_AUTHORIZATION') && !defined('ZBX_RPC_REQUEST')){
-		check_authorisation($USER_DETAILS);
+		if(!CWebUser::checkAuthentication(get_cookie('zbx_sessionid'))){
+			include_once('include/locales/en_gb.inc.php');
+			process_locales();
+
+			include('index.php');
+			exit();
+		}
 
 		if(function_exists('bindtextdomain')){
 			//initializing gettext translations depending on language selected by user
@@ -237,14 +244,14 @@ function __autoload($class_name){
 				}
 			}
 
-			if (!$locale_found && $USER_DETAILS['lang'] != 'en_GB' && $USER_DETAILS['lang'] != 'en_gb'){
+			if(!$locale_found && $USER_DETAILS['lang'] != 'en_GB' && $USER_DETAILS['lang'] != 'en_gb'){
 				error('Locale for language "'.$USER_DETAILS['lang'].'" is not found on the web server. Tried to set: '.implode(', ', $locales).'. Unable to translate zabbix interface.');
 			}
 			bindtextdomain('frontend', 'locale');
 			bind_textdomain_codeset('frontend', 'UTF-8');
 			textdomain('frontend');
 		}
-		else {
+		else{
 			error('Your PHP has no gettext support. Zabbix translations are not available.');
 		}
 // Numeric Locale to default
@@ -253,21 +260,6 @@ function __autoload($class_name){
 
 		include_once('include/locales/en_gb.inc.php');
 		process_locales();
-
-		if($USER_DETAILS['attempt_failed']) {
-			$attemps = bold($USER_DETAILS['attempt_failed']);
-			$attempip = bold($USER_DETAILS['attempt_ip']);
-			$attempdate = bold(zbx_date2str(S_CUSER_ERROR_DATE_FORMAT,$USER_DETAILS['attempt_clock']));
-
-			$error_msg = array(
-				$attemps,
-				SPACE.S_CUSER_ERROR_FAILED_LOGIN_ATTEMPTS,SPACE.S_CUSER_ERROR_LAST_FAILED_ATTEMPTS.SPACE,
-				$attempip,
-				SPACE.S_ON_SMALL.SPACE,
-				$attempdate
-			);
-			error(new CSpan($error_msg));
-		}
 	}
 	else{
 		$USER_DETAILS = array(
@@ -279,7 +271,6 @@ function __autoload($class_name){
 				'name'  =>'- unknown -',
 				'nodeid'=>0)
 			);
-
 	}
 
 	include_once('include/locales/en_gb.inc.php');
@@ -394,9 +385,6 @@ function __autoload($class_name){
 
 		if(!$bool && !is_null($errmsg))		$msg=S_CONFIG_ERROR_HEAD.': '.$errmsg;
 		else if($bool && !is_null($okmsg))	$msg=$okmsg;
-
-		$api_errors = CZBXAPI::resetErrors();
-		if(!empty($api_errors)) error($api_errors);
 
 		if(isset($msg)){
 			switch($page['type']){
@@ -567,10 +555,13 @@ function __autoload($class_name){
 		}
 	}
 
-	function clear_messages(){
+	function clear_messages($count=null){
 		global $ZBX_MESSAGES;
 
-		$ZBX_MESSAGES = null;
+		if(!is_null($count))
+			while($count-- > 0) array_pop($ZBX_MESSAGES);
+		else
+			$ZBX_MESSAGES = null;
 	}
 
 	function fatal_error($msg){
