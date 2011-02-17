@@ -6,13 +6,14 @@ class CWebUser{
 
 	public static function login($login, $password){
 		try{
+			self::setDefault();
+
 			self::$data = API::User()->login(array(
 				'user' => $login,
-				'password' => $password
+				'password' => $password,
+				'userData' => true
 			));
-			if(!self::$data){
-				throw new Exception();
-			}
+			if(!self::$data) throw new Exception();
 
 			if(self::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED){
 				error(_('GUI access disabled.'));
@@ -55,11 +56,19 @@ class CWebUser{
 			}
 
 			if(($sessionid === null) || !self::$data){
+				self::setDefault();
 				self::$data = API::User()->login(array(
 					'user' => ZBX_GUEST_USER,
-					'password' => ''
+					'password' => '',
+					'userData' => true
 				));
-				if(!self::$data) throw new Exception();
+
+				if(!self::$data){
+					clear_messages(1);
+					throw new Exception();
+				}
+
+				$sessionid = self::$data['sessionid'];
 			}
 
 			if(self::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED){
