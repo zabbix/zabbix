@@ -1074,8 +1074,7 @@ Copt::memoryPick();
 		$user['auth_type'] = $config['authentication_type'];
 
 		$sessionid = self::authenticate($user);
-		if($sessionid !== false){
-			self::checkAuthentication(array('sessionid' => $sessionid));
+		if(($sessionid !== false) && self::checkAuthentication(array('sessionid' => $sessionid))){
 			return $sessionid;
 		}
 		else{
