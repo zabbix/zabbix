@@ -1203,7 +1203,7 @@ COpt::memoryPick();
 // expression permissions
 				$expressionData = new CTriggerExpression($trigger);
 				if(!empty($expressionData->errors)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->errors);
+					self::exception(ZBX_API_ERROR_PARAMETERS, implode(' ', $expressionData->errors));
 				}
 
 				$hosts = API::Host()->get(array(
