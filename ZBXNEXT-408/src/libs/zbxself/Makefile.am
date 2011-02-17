@@ -2,4 +2,4 @@
 
 noinst_LIBRARIES = libzbxself.a
 
-libzbxself_a_SOURCES = selfstats.c
+libzbxself_a_SOURCES = selfmon.c

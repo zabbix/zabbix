@@ -125,9 +125,9 @@ void	main_httppoller_loop()
 		{
 			zbx_setproctitle("http poller [sleeping for %d seconds]", sleeptime);
 
-			update_sm_counter(ZBX_PROCESS_STATE_IDLE);
+			update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 			sleep(sleeptime);
-			update_sm_counter(ZBX_PROCESS_STATE_BUSY);
+			update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 		}
 	}
 }

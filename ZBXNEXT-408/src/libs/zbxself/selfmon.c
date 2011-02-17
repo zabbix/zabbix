@@ -40,9 +40,9 @@ typedef struct
 	int			first;
 	int			count;
 }
-zbx_sm_collector_t;
+zbx_selfmon_collector_t;
 
-static zbx_sm_collector_t	*sm_collector = NULL;
+static zbx_selfmon_collector_t	*collector = NULL;
 static int			shm_id;
 
 #define	LOCK_SM		zbx_mutex_lock(&sm_lock)
@@ -114,7 +114,7 @@ int	get_process_forks(unsigned char process_type)
 
 /******************************************************************************
  *                                                                            *
- * Function: init_collector_data                                              *
+ * Function: init_selfmon_collector                                           *
  *                                                                            *
  * Purpose: Initialize structures and prepare state                           *
  *          for self-monitoring collector                                     *
@@ -128,9 +128,9 @@ int	get_process_forks(unsigned char process_type)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	init_sm_collector()
+void	init_selfmon_collector()
 {
-	const char	*__function_name = "init_sm_collector";
+	const char	*__function_name = "init_selfmon_collector";
 	size_t		sz, sz_array, sz_process[ZBX_PROCESS_TYPE_COUNT], sz_total;
 	key_t		shm_key;
 	char		*p;
@@ -141,20 +141,20 @@ void	init_sm_collector()
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	sz_total = sz = sizeof(zbx_sm_collector_t);
+	sz_total = sz = sizeof(zbx_selfmon_collector_t);
 	sz_total += sz_array = sizeof(zbx_stat_process_t *) * ZBX_PROCESS_TYPE_COUNT;
 	for (process_type = 0; process_type < ZBX_PROCESS_TYPE_COUNT; process_type++)
 		sz_total += sz_process[process_type] = sizeof(zbx_stat_process_t) * get_process_forks(process_type);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() size:%d", __function_name, (int)sz_total);
 
-	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_SELF_STATS_ID)))
+	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_SELFMON_ID)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Cannot create IPC key for a self-monitoring collector");
 		exit(FAIL);
 	}
 
-	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&sm_lock, ZBX_MUTEX_SM))
+	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&sm_lock, ZBX_MUTEX_SELFMON))
 	{
 		zbx_error("Unable to create mutex for a self-monitoring collector");
 		exit(FAIL);
@@ -173,30 +173,30 @@ void	init_sm_collector()
 		exit(FAIL);
 	}
 
-	sm_collector = (zbx_sm_collector_t *)p; p += sz;
-	sm_collector->process = (zbx_stat_process_t **)p; p += sz_array;
+	collector = (zbx_selfmon_collector_t *)p; p += sz;
+	collector->process = (zbx_stat_process_t **)p; p += sz_array;
 
 	ticks = times(&buf);
 
 	for (process_type = 0; process_type < ZBX_PROCESS_TYPE_COUNT; process_type++)
 	{
-		sm_collector->process[process_type] = (zbx_stat_process_t *)p; p += sz_process[process_type];
-		memset(sm_collector->process[process_type], 0, sz_process[process_type]);
+		collector->process[process_type] = (zbx_stat_process_t *)p; p += sz_process[process_type];
+		memset(collector->process[process_type], 0, sz_process[process_type]);
 
 		process_forks = get_process_forks(process_type);
 		for (process_num = 0; process_num < process_forks; process_num++)
 		{
-			sm_collector->process[process_type][process_num].last_ticks = ticks;
-			sm_collector->process[process_type][process_num].last_state = ZBX_PROCESS_STATE_BUSY;
+			collector->process[process_type][process_num].last_ticks = ticks;
+			collector->process[process_type][process_num].last_state = ZBX_PROCESS_STATE_BUSY;
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() sm_collector:%p", __function_name, sm_collector);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() collector:%p", __function_name, collector);
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: free_sm_collector                                                *
+ * Function: free_selfmon_collector                                           *
  *                                                                            *
  * Purpose: Free memory allocated for self-monitoring collector               *
  *                                                                            *
@@ -209,18 +209,18 @@ void	init_sm_collector()
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	free_sm_collector()
+void	free_selfmon_collector()
 {
-	const char	*__function_name = "free_sm_collector";
+	const char	*__function_name = "free_selfmon_collector";
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sm_collector:%p", __function_name, sm_collector);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() collector:%p", __function_name, collector);
 
-	if (NULL == sm_collector)
+	if (NULL == collector)
 		return;
 
 	LOCK_SM;
 
-	sm_collector = NULL;
+	collector = NULL;
 
 	if (-1 == shmctl(shm_id, IPC_RMID, 0))
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot remove shared memory for self-monitoring collector [%s]",
@@ -235,7 +235,7 @@ void	free_sm_collector()
 
 /******************************************************************************
  *                                                                            *
- * Function: update_sm_counter                                                *
+ * Function: update_selfmon_counter                                           *
  *                                                                            *
  * Purpose:                                                                   *
  *                                                                            *
@@ -248,7 +248,7 @@ void	free_sm_collector()
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	update_sm_counter(unsigned char state)
+void	update_selfmon_counter(unsigned char state)
 {
 	extern int		process_num;
 	extern unsigned char	process_type;
@@ -260,7 +260,7 @@ void	update_sm_counter(unsigned char state)
 	if (ZBX_PROCESS_TYPE_UNKNOWN == process_type)
 		return;
 
-	process = &sm_collector->process[process_type][process_num - 1];
+	process = &collector->process[process_type][process_num - 1];
 	ticks = times(&buf);
 
 	LOCK_SM;
@@ -275,7 +275,7 @@ void	update_sm_counter(unsigned char state)
 
 /******************************************************************************
  *                                                                            *
- * Function: collect_selfstats                                                *
+ * Function: collect_selfmon_stats                                            *
  *                                                                            *
  * Purpose:                                                                   *
  *                                                                            *
@@ -288,9 +288,9 @@ void	update_sm_counter(unsigned char state)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	collect_selfstats()
+void	collect_selfmon_stats()
 {
-	const char		*__function_name = "collect_selfstats";
+	const char		*__function_name = "collect_selfmon_stats";
 	zbx_stat_process_t	*process;
 	clock_t			ticks;
 	struct tms		buf;
@@ -303,19 +303,19 @@ void	collect_selfstats()
 
 	LOCK_SM;
 
-	index = (sm_collector->first + sm_collector->count) % MAX_HISTORY;
+	index = (collector->first + collector->count) % MAX_HISTORY;
 
-	if (sm_collector->count < MAX_HISTORY)
-		sm_collector->count++;
-	else if (++sm_collector->first == MAX_HISTORY)
-		sm_collector->first = 0;
+	if (collector->count < MAX_HISTORY)
+		collector->count++;
+	else if (++collector->first == MAX_HISTORY)
+		collector->first = 0;
 
 	for (process_type = 0; process_type < ZBX_PROCESS_TYPE_COUNT; process_type++)
 	{
 		process_forks = get_process_forks(process_type);
 		for (process_num = 0; process_num < process_forks; process_num++)
 		{
-			process = &sm_collector->process[process_type][process_num];
+			process = &collector->process[process_type][process_num];
 			for (state = 0; state < ZBX_PROCESS_STATE_COUNT; state++)
 				process->h_counter[state][index] = process->counter[state];
 			if (ticks > process->last_ticks)
@@ -330,7 +330,7 @@ void	collect_selfstats()
 
 /******************************************************************************
  *                                                                            *
- * Function: get_selfstats                                                    *
+ * Function: get_selfmon_stats                                                *
  *                                                                            *
  * Purpose: calculate statistics for selected process                         *
  *                                                                            *
@@ -348,9 +348,9 @@ void	collect_selfstats()
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	get_selfstats(unsigned char process_type, int process_num, unsigned char state, double *value)
+int	get_selfmon_stats(unsigned char process_type, int process_num, unsigned char state, double *value)
 {
-	const char		*__function_name = "get_selfstats";
+	const char		*__function_name = "get_selfmon_stats";
 	unsigned int		total = 0, counter = 0;
 	zbx_stat_process_t	*process;
 	unsigned char		s;
@@ -373,20 +373,20 @@ int	get_selfstats(unsigned char process_type, int process_num, unsigned char sta
 
 	LOCK_SM;
 
-	if (0 == sm_collector->count)
+	if (0 == collector->count)
 		goto unlock;
 
-	current = (sm_collector->first + sm_collector->count - 1) % MAX_HISTORY;
+	current = (collector->first + collector->count - 1) % MAX_HISTORY;
 
 	for (; process_num < process_forks; process_num++)
 	{
-		process = &sm_collector->process[process_type][process_num];
+		process = &collector->process[process_type][process_num];
 
 		for (s = 0; s < ZBX_PROCESS_STATE_COUNT; s++)
 			total += (unsigned short)(process->h_counter[s][current] -
-					process->h_counter[s][sm_collector->first]);
+					process->h_counter[s][collector->first]);
 		counter += (unsigned short)(process->h_counter[state][current] -
-				process->h_counter[state][sm_collector->first]);
+				process->h_counter[state][collector->first]);
 	}
 
 unlock:

@@ -22,9 +22,9 @@
 #include "zbxself.h"
 #include "log.h"
 
-void	main_selfstats_loop()
+void	main_selfmon_loop()
 {
-	const char	*__function_name = "main_selfstats_loop";
+	const char	*__function_name = "main_selfmon_loop";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -34,7 +34,7 @@ void	main_selfstats_loop()
 
 	for (;;)
 	{
-		collect_selfstats();
+		collect_selfmon_stats();
 		sleep(1);
 	}
 }

@@ -44,10 +44,10 @@
 #define ZBX_PROCESS_TYPE_UNKNOWN	255
 
 int	get_process_forks(unsigned char process_type);
-void	init_sm_collector();
-void	free_sm_collector();
-void	update_sm_counter(unsigned char state);
-void	collect_selfstats();
-int	get_selfstats(unsigned char process_type, int process_num, unsigned char state, double *value);
+void	init_selfmon_collector();
+void	free_selfmon_collector();
+void	update_selfmon_counter(unsigned char state);
+void	collect_selfmon_stats();
+int	get_selfmon_stats(unsigned char process_type, int process_num, unsigned char state, double *value);
 
 #endif	/* ZABBIX_ZBXSELF_H */

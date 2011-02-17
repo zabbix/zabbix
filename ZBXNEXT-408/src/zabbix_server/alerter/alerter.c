@@ -242,8 +242,8 @@ void	main_alerter_loop()
 		zbx_setproctitle("sender [sleeping for %d seconds]",
 				CONFIG_SENDER_FREQUENCY);
 
-		update_sm_counter(ZBX_PROCESS_STATE_IDLE);
+		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 		sleep(CONFIG_SENDER_FREQUENCY);
-		update_sm_counter(ZBX_PROCESS_STATE_BUSY);
+		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 	}
 }

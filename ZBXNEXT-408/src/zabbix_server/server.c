@@ -50,7 +50,7 @@
 #include "utils/nodechange.h"
 #include "escalator/escalator.h"
 #include "proxypoller/proxypoller.h"
-#include "selfstats/selfstats.h"
+#include "selfmon/selfmon.h"
 
 const char	*progname = NULL;
 const char	title_message[] = "Zabbix Server";
@@ -113,7 +113,7 @@ int	CONFIG_IPMIPOLLER_FORKS		= 0;
 int	CONFIG_TIMER_FORKS		= 1;
 int	CONFIG_TRAPPER_FORKS		= 5;
 int	CONFIG_ESCALATOR_FORKS		= 1;
-int	CONFIG_SELFSTATS_FORKS		= 1;
+int	CONFIG_SELFMON_FORKS		= 1;
 
 int	CONFIG_LISTEN_PORT		= 10051;
 char	*CONFIG_LISTEN_IP		= NULL;
@@ -523,7 +523,7 @@ int	MAIN_ZABBIX_ENTRY()
 
 	init_database_cache(ZBX_PROCESS_SERVER);
 	init_configuration_cache();
-	init_sm_collector();
+	init_selfmon_collector();
 
 	/* Need to set trigger status to UNKNOWN since last run */
 	DBupdate_triggers_status_after_restart();
@@ -540,7 +540,7 @@ int	MAIN_ZABBIX_ENTRY()
 			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS + CONFIG_NODEWATCHER_FORKS
 			+ CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS + CONFIG_DBSYNCER_FORKS
 			+ CONFIG_ESCALATOR_FORKS + CONFIG_IPMIPOLLER_FORKS + CONFIG_PROXYPOLLER_FORKS
-			+ CONFIG_SELFSTATS_FORKS;
+			+ CONFIG_SELFMON_FORKS;
 	threads = calloc(threads_num, sizeof(pid_t));
 
 	if (CONFIG_TRAPPER_FORKS > 0)
@@ -557,7 +557,7 @@ int	MAIN_ZABBIX_ENTRY()
 			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS + CONFIG_NODEWATCHER_FORKS
 			+ CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS + CONFIG_DBSYNCER_FORKS
 			+ CONFIG_ESCALATOR_FORKS + CONFIG_IPMIPOLLER_FORKS + CONFIG_PROXYPOLLER_FORKS
-			+ CONFIG_SELFSTATS_FORKS; i++)
+			+ CONFIG_SELFMON_FORKS; i++)
 	{
 		if (0 == (pid = zbx_fork()))
 		{
@@ -825,12 +825,12 @@ int	MAIN_ZABBIX_ENTRY()
 			+ CONFIG_NODEWATCHER_FORKS + CONFIG_HTTPPOLLER_FORKS
 			+ CONFIG_DISCOVERER_FORKS + CONFIG_DBSYNCER_FORKS
 			+ CONFIG_ESCALATOR_FORKS + CONFIG_IPMIPOLLER_FORKS
-			+ CONFIG_PROXYPOLLER_FORKS + CONFIG_SELFSTATS_FORKS)
+			+ CONFIG_PROXYPOLLER_FORKS + CONFIG_SELFMON_FORKS)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [Self-monitoring]",
 				server_num);
 
-		main_selfstats_loop();
+		main_selfmon_loop();
 	}
 
 	return SUCCEED;
@@ -851,7 +851,7 @@ void	zbx_on_exit()
 				+ CONFIG_NODEWATCHER_FORKS + CONFIG_HTTPPOLLER_FORKS
 				+ CONFIG_DISCOVERER_FORKS + CONFIG_DBSYNCER_FORKS
 				+ CONFIG_ESCALATOR_FORKS + CONFIG_IPMIPOLLER_FORKS
-				+ CONFIG_PROXYPOLLER_FORKS + CONFIG_SELFSTATS_FORKS; i++)
+				+ CONFIG_PROXYPOLLER_FORKS + CONFIG_SELFMON_FORKS; i++)
 		{
 			if (threads[i])
 			{
@@ -888,7 +888,7 @@ void	zbx_on_exit()
 	php_sem_remove(&sqlite_access);
 #endif	/* HAVE_SQLITE3 */
 
-	free_sm_collector();
+	free_selfmon_collector();
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Server stopped. Zabbix %s (revision %s).",
 			ZABBIX_VERSION,

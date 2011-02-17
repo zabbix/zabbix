@@ -17,9 +17,9 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#ifndef ZABBIX_SELFSTATS_H
-#define ZABBIX_SELFSTATS_H
+#ifndef ZABBIX_SELFSMON_H
+#define ZABBIX_SELFSMON_H
 
-void	main_selfstats_loop();
+void	main_selfmon_loop();
 
 #endif

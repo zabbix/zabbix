@@ -46,7 +46,7 @@
 #include "proxyconfig/proxyconfig.h"
 #include "datasender/datasender.h"
 #include "heart/heart.h"
-#include "../zabbix_server/selfstats/selfstats.h"
+#include "../zabbix_server/selfmon/selfmon.h"
 
 const char	*progname = NULL;
 const char	title_message[] = "Zabbix Proxy";
@@ -107,7 +107,7 @@ int	CONFIG_UNREACHABLE_POLLER_FORKS	= 1;
 int	CONFIG_HTTPPOLLER_FORKS		= 1;
 int	CONFIG_IPMIPOLLER_FORKS		= 0;
 int	CONFIG_TRAPPER_FORKS		= 5;
-int	CONFIG_SELFSTATS_FORKS		= 0;
+int	CONFIG_SELFMON_FORKS		= 0;
 int	CONFIG_PROXYPOLLER_FORKS	= 0;
 int	CONFIG_ESCALATOR_FORKS		= 0;
 int	CONFIG_ALERTER_FORKS		= 0;
@@ -509,7 +509,7 @@ int	MAIN_ZABBIX_ENTRY()
 
 	init_database_cache(zbx_process);
 	init_configuration_cache();
-	init_sm_collector();
+	init_selfmon_collector();
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
 	DCsync_configuration();
@@ -518,7 +518,7 @@ int	MAIN_ZABBIX_ENTRY()
 	threads_num = 1 + CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS + CONFIG_POLLER_FORKS
 			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS
 			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS
-			+ CONFIG_DBSYNCER_FORKS + CONFIG_IPMIPOLLER_FORKS + CONFIG_SELFSTATS_FORKS;
+			+ CONFIG_DBSYNCER_FORKS + CONFIG_IPMIPOLLER_FORKS + CONFIG_SELFMON_FORKS;
 	threads = calloc(threads_num, sizeof(pid_t));
 
 	if (CONFIG_TRAPPER_FORKS > 0)
@@ -533,7 +533,7 @@ int	MAIN_ZABBIX_ENTRY()
 	for (i = 1; i <= CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS + CONFIG_POLLER_FORKS
 			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS
 			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS
-			+ CONFIG_DBSYNCER_FORKS + CONFIG_IPMIPOLLER_FORKS + CONFIG_SELFSTATS_FORKS;
+			+ CONFIG_DBSYNCER_FORKS + CONFIG_IPMIPOLLER_FORKS + CONFIG_SELFMON_FORKS;
 		i++)
 	{
 		if (0 == (pid = zbx_fork()))
@@ -726,12 +726,12 @@ int	MAIN_ZABBIX_ENTRY()
 			+ CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS
 			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_HTTPPOLLER_FORKS
 			+ CONFIG_DISCOVERER_FORKS + CONFIG_DBSYNCER_FORKS
-			+ CONFIG_IPMIPOLLER_FORKS + CONFIG_SELFSTATS_FORKS)
+			+ CONFIG_IPMIPOLLER_FORKS + CONFIG_SELFMON_FORKS)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [Self-monitoring]",
 				server_num);
 
-		main_selfstats_loop();
+		main_selfmon_loop();
 	}
 
 	return SUCCEED;
@@ -750,7 +750,7 @@ void	zbx_on_exit()
 				+ CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS
 				+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_HTTPPOLLER_FORKS
 				+ CONFIG_DISCOVERER_FORKS + CONFIG_DBSYNCER_FORKS
-				+ CONFIG_IPMIPOLLER_FORKS + CONFIG_SELFSTATS_FORKS; i++)
+				+ CONFIG_IPMIPOLLER_FORKS + CONFIG_SELFMON_FORKS; i++)
 		{
 			if (threads[i])
 			{
@@ -785,7 +785,7 @@ void	zbx_on_exit()
 	php_sem_remove(&sqlite_access);
 #endif	/* HAVE_SQLITE3 */
 
-	free_sm_collector();
+	free_selfmon_collector();
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Proxy stopped. Zabbix %s (revision %s).",
 		ZABBIX_VERSION,

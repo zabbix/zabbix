@@ -249,7 +249,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		else
 			goto not_supported;
 
-		if (NOTSUPPORTED == get_selfstats(process_type, process_num, state, &value))
+		if (NOTSUPPORTED == get_selfmon_stats(process_type, process_num, state, &value))
 			goto not_supported;
 
 		SET_DBL_RESULT(result, value);
