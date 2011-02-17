@@ -63,7 +63,11 @@ class CWebUser{
 					'userData' => true
 				));
 
-				if(!self::$data) throw new Exception();
+				if(!self::$data){
+					clear_messages(1);
+					throw new Exception();
+				}
+
 				$sessionid = self::$data['sessionid'];
 			}
 
