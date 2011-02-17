@@ -39,7 +39,7 @@ class czbxrpc{
 //-----
 
 		if(is_null($params) && !isset($notifications[$method])){
-			return array('error' => ZBX_API_ERROR_PARAMETERS, 'message' => _('Empty parameters'));
+			return array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => _('Empty parameters'));
 		}
 
 		list($resource, $action) = explode('.', $method);
@@ -50,11 +50,11 @@ class czbxrpc{
 			if(($resource == 'user') && ($action == 'authenticate')) $action = 'login';
 
 			if(zbx_empty($sessionid) && (($resource != 'user') || ($action != 'login'))){
-				return array('error' => ZBX_API_ERROR_NO_AUTH, 'message' => 'Not authorized');
+				return array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => _('Not authorized'));
 			}
 			else if(!zbx_empty($sessionid)){
 				if(!self::callAPI('user.checkAuthentication', $sessionid)){
-					return array('error' => ZBX_API_ERROR_NO_AUTH, 'message' => 'Not authorized');
+					return array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => _('Not authorized'));
 				}
 			}
 		}
@@ -91,11 +91,11 @@ class czbxrpc{
 
 		$class_name = 'C'.$resource;
 		if(!class_exists($class_name)){
-			return array('error' => ZBX_API_ERROR_PARAMETERS, 'message' => 'Resource ('.$resource.') does not exist');
+			return array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Resource ('.$resource.') does not exist');
 		}
 
 		if(!method_exists($class_name, $action)){
-			return array('error' => ZBX_API_ERROR_PARAMETERS, 'message' => 'Action ('.$action.') does not exist');
+			return array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Action ('.$action.') does not exist');
 		}
 
 		try{
@@ -114,7 +114,16 @@ class czbxrpc{
 			$result = ($method === 'user.login');
 			self::transactionEnd($result);
 
-			return array('error' => $e->getCode(), 'message' => $e->getMessage(), 'data' => $e->getTrace());
+			$result = array(
+				'error' => $e->getCode(),
+				'data' => $e->getMessage(),
+			);
+
+			if(isset(CZBXAPI::$userData['debug_mode']) && CZBXAPI::$userData['debug_mode']){
+				$result['debug'] = $e->getTrace();
+			}
+
+			return $result;
 		}
 	}
 

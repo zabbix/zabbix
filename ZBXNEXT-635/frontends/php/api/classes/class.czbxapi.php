@@ -21,7 +21,7 @@
 <?php
 
 class CZBXAPI{
-	protected static $userData;
+	public static $userData;
 
 	protected static function exception($code=ZBX_API_ERROR_INTERNAL, $error=''){
 		throw new APIException($code, $error);

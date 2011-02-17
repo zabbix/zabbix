@@ -22,30 +22,26 @@
 // @author: Artem Suharev <aly@zabbix.com>
 
 class CJSONrpc{
-public $json;
+	const VERSION = '2.0';
 
+	public $json;
 
-private $version='2.0';
-private $multicall;
-private $error;
-private $response;
-private $error_list;
-private $zbx2json_error_list;
+	private $multicall = false;
+	private $error = false;
+	private $response = array();
+	private $error_list;
+	private $zbx2json_errors;
 
 	public function __construct(){
 		$this->json = new CJSON();
 
-		$this->error = false;
-		$this->response = array();
-		$this->multicall = false;
 		$this->initErrors();
-
 	}
 
 	public function process($json_call){
 		$json_decoded = $this->json->decode($json_call, true);
 		if(!$json_decoded){
-			$this->json_error(null, '-32700', null ,true);
+			$this->json_error(null, '-32700', null, null, true);
 			return;
 		}
 
@@ -54,19 +50,49 @@ private $zbx2json_error_list;
 		else
 			$json_decoded = array($json_decoded);
 
-		foreach($json_decoded as $num => $call){
-			$this->execute($call);
+		foreach($json_decoded as $call){
+			if(!isset($call['id'])) $call['id'] = null;  // Notification
+
+			if($this->validate($call)){
+				$params = isset($call['params']) ? $call['params'] : null;
+				$auth = isset($call['auth']) ? $call['auth'] : null;
+
+				$result = czbxrpc::call($call['method'], $params, $auth);
+
+				if(isset($result['result'])){
+					// Notifications MUST NOT be answered
+					if($call['id'] !== null){
+						$formed_resp = array(
+							'jsonrpc' => self::VERSION,
+							'result' => $result,
+							'id' => $call['id']
+						);
+
+						if($this->multicall)
+							$this->response[] = $formed_resp;
+						else
+							$this->response = $formed_resp;
+					}
+				}
+				else{
+					$result['data'] = isset($result['data']) ? $result['data'] : null;
+					$result['debug'] = isset($result['debug']) ? $result['debug'] : null;
+					$errno = $this->zbx2json_errors[$result['error']];
+
+					$this->json_error($call['id'], $errno, $result['data'], $result['debug']);
+				}
+			}
 		}
 	}
 
 	public function validate($call){
 		if(!isset($call['jsonrpc'])){
-			$this->json_error($call['id'], '-32600', 'JSON-rpc version is not specified.',true);
+			$this->json_error($call['id'], '-32600', 'JSON-rpc version is not specified.', null, true);
 			return false;
 		}
 
-		if($call['jsonrpc'] != $this->version){
-			$this->json_error($call['id'], '-32600', 'Expacting JSON-rpc version 2.0, '.$call['jsonrpc'].' is given .',true);
+		if($call['jsonrpc'] != self::VERSION){
+			$this->json_error($call['id'], '-32600', 'Expacting JSON-rpc version 2.0, '.$call['jsonrpc'].' is given.', null, true);
 			return false;
 		}
 
@@ -95,38 +121,7 @@ private $zbx2json_error_list;
 // NOT Public methods
 //------------------------------------------------------------------------------
 
-	private function execute($call){
-		if(!isset($call['id'])) $call['id'] = null;  // Notification
-
-		if($this->validate($call)){
-			$method = $call['method'];
-			$params = isset($call['params'])?$call['params']:null;
-			$auth = isset($call['auth'])?$call['auth']:null;
-
-			$result = czbxrpc::call($method, $params, $auth);
-			if(isset($result['result'])){
-				$this->json_success($call['id'], $result['result']);
-			}
-			else{
-				$result['data'] = isset($result['data'])?$result['data']:null;
-				$errno = $this->zbx2json_error($result['error']);
-				$this->json_error($call['id'], $errno, $result['data']);
-			}
-		}
-	}
-
-	private function json_success($id, $result){
-		if(is_null($id)) return;	// Notifications MUST NOT be answered
-
-		$formed_resp = array('jsonrpc'=>'2.0', 'result'=> $result, 'id'=>$id);
-
-		if($this->multicall)
-			$this->response[] = $formed_resp;
-		else
-			$this->response = $formed_resp;
-	}
-
-	private function json_error($id, $errno, $data=null, $force_err=false){
+	private function json_error($id, $errno, $data=null, $debug=null, $force_err=false){
 // Notifications MUST NOT be answered, but error MUST be generated on JSON parse error
 		if(is_null($id) && !$force_err) return;
 
@@ -141,8 +136,15 @@ private $zbx2json_error_list;
 
 		if(!is_null($data))
 			$error['data'] = $data;
+		if(!is_null($debug))
+			$error['debug'] = $debug;
 
-		$formed_error = array('jsonrpc'=>'2.0', 'error'=> $error, 'id'=>$id);
+
+		$formed_error = array(
+			'jsonrpc' => self::VERSION,
+			'error' => $error,
+			'id' => $id
+		);
 
 		if($this->multicall)
 			$this->response[] = $formed_error;
@@ -186,17 +188,12 @@ private $zbx2json_error_list;
 					'data' => 'No details'));
 
 		$this->zbx2json_errors = array(
-			'-32601' => array(ZBX_API_ERROR_NO_METHOD),
-			'-32602' => array(ZBX_API_ERROR_PARAMETERS, ZBX_API_ERROR_NO_AUTH),
-			'-32500' => array(ZBX_API_ERROR_PERMISSIONS, ZBX_API_ERROR_INTERNAL)
+			ZBX_API_ERROR_NO_METHOD => '-32601',
+			ZBX_API_ERROR_PARAMETERS => '-32602',
+			ZBX_API_ERROR_NO_AUTH => '-32602',
+			ZBX_API_ERROR_PERMISSIONS => '-32500',
+			ZBX_API_ERROR_INTERNAL => '-32500',
 		);
-	}
-
-	private function zbx2json_error($error){
-		foreach($this->zbx2json_errors as $json_error => $zbx_errors){
-			if(str_in_array($error, $zbx_errors))
-				return $json_error;
-		}
 	}
 }
 ?>

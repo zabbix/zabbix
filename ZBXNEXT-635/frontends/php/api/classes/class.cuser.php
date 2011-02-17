@@ -925,7 +925,7 @@ Copt::memoryPick();
 /**
  * Login user
  *
- * @param _array $user
+ * @param array $user
  * @param array $user['user'] User alias
  * @param array $user['password'] User password
  * @return string session ID
