@@ -1,4 +1,3 @@
-<<<<<<< .working
 <?php
 /*
 ** ZABBIX
