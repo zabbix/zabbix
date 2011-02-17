@@ -141,7 +141,7 @@ void	init_sm_collector()
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	sz_total = sz = sizeof(zbx_sm_collector_t);
-	sz_total += sz_array = sizeof(zbx_stat_process_t **) * ZBX_PROCESS_TYPE_COUNT;
+	sz_total += sz_array = sizeof(zbx_stat_process_t *) * ZBX_PROCESS_TYPE_COUNT;
 	for (process_type = 0; process_type < ZBX_PROCESS_TYPE_COUNT; process_type++)
 		sz_total += sz_process[process_type] = sizeof(zbx_stat_process_t) * get_process_forks(process_type);
 
@@ -304,8 +304,8 @@ void	collect_selfstats()
 
 	if (sm_collector->count < MAX_HISTORY)
 		sm_collector->count++;
-	else
-		sm_collector->first = ++sm_collector->first % MAX_HISTORY;
+	else if (++sm_collector->first == MAX_HISTORY)
+		sm_collector->first = 0;
 
 	for (process_type = 0; process_type < ZBX_PROCESS_TYPE_COUNT; process_type++)
 	{
@@ -334,7 +334,7 @@ void	collect_selfstats()
  * Parameters: process_type - [IN] type of process; ZBX_PROCESS_TYPE_*        *
  *             process_num  - [IN] process number; 1 - first process;         *
  *                                 0 - all processes                          *
- *             state        - [IN] new process state; ZBX_STATE_*             *
+ *             state        - [IN] process state; ZBX_STATE_*                 *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *

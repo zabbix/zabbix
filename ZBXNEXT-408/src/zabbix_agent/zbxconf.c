@@ -192,7 +192,7 @@ void	load_user_parameters(int optional)
 #ifdef WITH_PLUGINS
 		{"Plugin",		NULL,				&add_plugin,
 			TYPE_STRING,	PARM_OPT,	0,	0},
-#endif	/* ZABBIX_DAEMON */
+#endif	/* WITH_PLUGINS */
 		{NULL}
 	};
 

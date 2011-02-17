@@ -261,7 +261,7 @@ void	init_main_process()
 {
 	struct sigaction	phan;
 
-	parent = 1; /* signalize signal_handler that this process is a PARENT process */
+	parent = 1; /* signalize signal handler that this process is a PARENT process */
 
 	phan.sa_sigaction = parent_signal_handler;
 	sigemptyset(&phan.sa_mask);
