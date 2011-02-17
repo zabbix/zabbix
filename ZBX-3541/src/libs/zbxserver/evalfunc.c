@@ -1355,8 +1355,6 @@ static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, con
 
 	now = (int)time(NULL);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() %s", __function_name, zbx_time2str(item->lastclock));
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() %s", __function_name, zbx_time2str(now));
 	if (item->lastclock + arg1 > now)
 		zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
 	else
