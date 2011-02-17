@@ -531,7 +531,7 @@ function bar_report_form3(){
 		'output' => 'extend'
 	);
 
-	$db_groups = CHostGroup::get($options);
+	$db_groups = API::HostGroup()->get($options);
 	order_result($db_groups, 'name');
 	foreach($db_groups as $gnum => $group){
 		$groupids[$group['groupid']] = $group['groupid'];
@@ -563,7 +563,7 @@ function bar_report_form3(){
 	if($groupid > 0){
 		$options['groupids'] = $groupid;
 	}
-	$db_hosts = CHost::get($options);
+	$db_hosts = API::Host()->get($options);
 	$db_hosts = zbx_toHash($db_hosts, 'hostid');
 	order_result($db_hosts, 'host');
 
@@ -576,7 +576,7 @@ function bar_report_form3(){
 		'output' => array('hostid', 'host'),
 		'hostids' => $hostids,
 	);
-	$db_hosts2 = CHost::get($options);
+	$db_hosts2 = API::Host()->get($options);
 	order_result($db_hosts2, 'host');
 	foreach($db_hosts2 as $hnum => $host){
 		if(!isset($db_hosts[$host['hostid']]))

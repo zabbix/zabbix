@@ -88,9 +88,9 @@ include_once('include/page_header.php');
 		'output' => API_OUTPUT_EXTEND,
 		'select_screenitems' => API_OUTPUT_EXTEND
 	);
-	$screens = CScreen::get($options);
+	$screens = API::Screen()->get($options);
 	if(empty($screens)){
-		$screens = CTemplateScreen::get($options);
+		$screens = API::TemplateScreen()->get($options);
 		if(empty($screens)) access_deny();
 	}
 
@@ -262,9 +262,9 @@ include_once('include/page_header.php');
 		$screen_wdgt->addItem(get_header_host_table($screen['templateid']));
 
 	//getting updated screen, so we wont have to refresh the page to see changes
-	$screens = CScreen::get($options);
+	$screens = API::Screen()->get($options);
 	if(empty($screens)){
-		$screens = CTemplateScreen::get($options);
+		$screens = API::TemplateScreen()->get($options);
 		if(empty($screens)) access_deny();
 	}
 	$screen = reset($screens);

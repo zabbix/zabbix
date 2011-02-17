@@ -161,11 +161,11 @@ include_once('include/page_header.php');
 	);
 
 	if($_REQUEST['alias']){
-		$users = CUser::get(array('filter' => array('alias' => $_REQUEST['alias'])));
+		$users = API::User()->get(array('filter' => array('alias' => $_REQUEST['alias'])));
 		$options['userids'] = zbx_objectValues($users, 'userid');
 	}
 
-	$alerts = CAlert::get($options);
+	$alerts = API::Alert()->get($options);
 
 // get first event for selected filters, to get starttime for timeline bar
 	unset($options['userids']);
@@ -174,7 +174,7 @@ include_once('include/page_header.php');
 	unset($options['select_mediatypes']);
 	$options['limit'] = 1;
 	$options['sortorder'] = ZBX_SORT_UP;
-	$firstAlert = CAlert::get($options);
+	$firstAlert = API::Alert()->get($options);
 	$firstAlert = reset($firstAlert);
 	$starttime = $firstAlert ? $firstAlert['clock'] : time()-3600;
 
