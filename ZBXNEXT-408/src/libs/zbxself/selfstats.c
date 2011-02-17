@@ -135,6 +135,7 @@ void	init_sm_collector()
 	key_t		shm_key;
 	char		*p;
 	clock_t		ticks;
+	struct tms	buf;
 	unsigned char	process_type;
 	int		process_num, process_forks;
 
@@ -175,7 +176,7 @@ void	init_sm_collector()
 	sm_collector = (zbx_sm_collector_t *)p; p += sz;
 	sm_collector->process = (zbx_stat_process_t **)p; p += sz_array;
 
-	ticks = times(NULL);
+	ticks = times(&buf);
 
 	for (process_type = 0; process_type < ZBX_PROCESS_TYPE_COUNT; process_type++)
 	{
@@ -254,12 +255,13 @@ void	update_sm_counter(unsigned char state)
 
 	zbx_stat_process_t	*process;
 	clock_t			ticks;
+	struct tms		buf;
 
 	if (ZBX_PROCESS_TYPE_UNKNOWN == process_type)
 		return;
 
 	process = &sm_collector->process[process_type][process_num - 1];
-	ticks = times(NULL);
+	ticks = times(&buf);
 
 	LOCK_SM;
 
@@ -291,12 +293,13 @@ void	collect_selfstats()
 	const char		*__function_name = "collect_selfstats";
 	zbx_stat_process_t	*process;
 	clock_t			ticks;
+	struct tms		buf;
 	unsigned char		process_type, state;
 	int			process_num, process_forks, index;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ticks = times(NULL);
+	ticks = times(&buf);
 
 	LOCK_SM;
 
