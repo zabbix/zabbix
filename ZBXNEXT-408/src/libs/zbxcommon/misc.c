@@ -2123,3 +2123,37 @@ void	make_hostname(char *host)
 		if (FAIL == is_hostname_char(*c))
 			*c = '_';
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: calculate_sleeptime                                              *
+ *                                                                            *
+ * Purpose: calculate sleep time for Zabbix processes                         *
+ *                                                                            *
+ * Parameters: nextcheck     - [IN] next check or -1 (FAIL) if nothing to do  *
+ *             max_sleeptime - [IN] maximum sleep time, in seconds            *
+ *                                                                            *
+ * Return value: sleep time, in seconds                                       *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	calculate_sleeptime(int nextcheck, int max_sleeptime)
+{
+	int	sleeptime;
+
+	if (FAIL == nextcheck)
+		return max_sleeptime;
+
+	sleeptime = nextcheck - time(NULL);
+
+	if (sleeptime < 0)
+		return 0;
+
+	if (sleeptime > max_sleeptime)
+		return max_sleeptime;
+
+	return sleeptime;
+}

@@ -946,4 +946,6 @@ int	parse_host_key(char *exp, char **host, char **key);
 
 void	make_hostname(char *host);
 
+int	calculate_sleeptime(int nextcheck, int max_sleeptime);
+
 #endif

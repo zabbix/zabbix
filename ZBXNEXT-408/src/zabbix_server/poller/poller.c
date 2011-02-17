@@ -695,7 +695,7 @@ static int	get_values(unsigned char poller_type)
 
 void	main_poller_loop(unsigned char p, unsigned char poller_type)
 {
-	int		sleeptime, processed;
+	int		nextcheck, sleeptime, processed;
 	double		sec;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_poller_loop() poller_type:%d process_num:%d", (int)poller_type, process_num);
@@ -714,7 +714,8 @@ void	main_poller_loop(unsigned char p, unsigned char poller_type)
 		processed = get_values(poller_type);
 		sec = zbx_time() - sec;
 
-		sleeptime = DCconfig_get_poller_sleeptime(poller_type);
+		nextcheck = DCconfig_get_poller_nextcheck(poller_type);
+		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while updating %d values."
 				" Sleeping for %d seconds",

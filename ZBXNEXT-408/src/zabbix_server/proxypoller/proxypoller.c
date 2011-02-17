@@ -342,16 +342,8 @@ void	main_proxypoller_loop()
 		processed = process_proxy();
 		sec = zbx_time() - sec;
 
-		if (FAIL == (nextcheck = DCconfig_get_proxy_nextcheck()))
-			sleeptime = POLLER_DELAY;
-		else
-		{
-			sleeptime = nextcheck - time(NULL);
-			if (sleeptime < 0)
-				sleeptime = 0;
-			else if (sleeptime > POLLER_DELAY)
-				sleeptime = POLLER_DELAY;
-		}
+		nextcheck = DCconfig_get_proxy_nextcheck();
+		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Proxy poller #%d spent " ZBX_FS_DBL
 				" seconds while processing %3d proxies."

@@ -768,18 +768,9 @@ void	main_discoverer_loop(unsigned char p)
 		process_discovery(now);
 		sec = zbx_time() - sec;
 
-		if (FAIL == (nextcheck = get_minnextcheck(now)))
-			sleeptime = DISCOVERER_DELAY;
-		else
-		{
-			sleeptime = nextcheck - time(NULL);
-			if (sleeptime < 0)
-				sleeptime = 0;
-			else if (sleeptime > DISCOVERER_DELAY)
-				sleeptime = DISCOVERER_DELAY;
-		}
+		nextcheck = get_minnextcheck(now);
+		sleeptime = calculate_sleeptime(nextcheck, DISCOVERER_DELAY);
 
-		now = time(NULL);
 		zabbix_log(LOG_LEVEL_DEBUG, "Discoverer #%d spent " ZBX_FS_DBL " seconds while"
 				" processing rules. Sleeping for %d seconds.",
 				process_num, sec, sleeptime);

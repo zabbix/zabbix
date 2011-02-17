@@ -114,16 +114,8 @@ void	main_httppoller_loop()
 		process_httptests(process_num, now);
 		sec = zbx_time() - sec;
 
-		if (FAIL == (nextcheck = get_minnextcheck(now)))
-			sleeptime = POLLER_DELAY;
-		else
-		{
-			sleeptime = nextcheck - time(NULL);
-			if (sleeptime < 0)
-				sleeptime = 0;
-			else if (sleeptime > POLLER_DELAY)
-				sleeptime = POLLER_DELAY;
-		}
+		nextcheck = get_minnextcheck(now);
+		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "HTTP poller #%d spent " ZBX_FS_DBL " seconds while updating HTTP tests"
 				" Sleeping for %d seconds",

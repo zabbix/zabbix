@@ -1765,24 +1765,24 @@ unlock:
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_get_poller_sleeptime                                    *
+ * Function: DCconfig_get_poller_nextcheck                                    *
  *                                                                            *
- * Purpose: Get sleeptime for selected poller                                 *
+ * Purpose: Get nextcheck for selected poller                                 *
  *                                                                            *
  * Parameters: poller_type - [IN] poller type (ZBX_POLLER_TYPE_...)           *
  *                                                                            *
- * Return value: sleeptime for selected poller                                *
+ * Return value: nextcheck or FAIL if no items for selected poller            *
  *                                                                            *
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	DCconfig_get_poller_sleeptime(unsigned char poller_type)
+int	DCconfig_get_poller_nextcheck(unsigned char poller_type)
 {
-	const char			*__function_name = "DCconfig_get_poller_sleeptime";
+	const char			*__function_name = "DCconfig_get_poller_nextcheck";
 
-	int				nextcheck, sleeptime;
+	int				nextcheck;
 	zbx_binary_heap_t		*queue;
 	const zbx_binary_heap_elem_t	*min;
 	const ZBX_DC_ITEM		*dc_item;
@@ -1805,20 +1805,9 @@ int	DCconfig_get_poller_sleeptime(unsigned char poller_type)
 
 	UNLOCK_CACHE;
 
-	if (FAIL == nextcheck)
-		sleeptime = POLLER_DELAY;
-	else
-	{
-		sleeptime = nextcheck - time(NULL);
-		if (sleeptime < 0)
-			sleeptime = 0;
-		else if (sleeptime > POLLER_DELAY)
-			sleeptime = POLLER_DELAY;
-	}
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, nextcheck);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, sleeptime);
-
-	return sleeptime;
+	return nextcheck;
 }
 
 /******************************************************************************
