@@ -538,9 +538,9 @@ void	main_pinger_loop()
 		{
 			zbx_setproctitle("%s [sleeping for %d seconds]",
 					zbx_poller_type_string(ZBX_POLLER_TYPE_PINGER), sleeptime);
-			update_sm_counter(ZBX_STATE_IDLE);
+			update_sm_counter(ZBX_PROCESS_STATE_IDLE);
 			sleep(sleeptime);
-			update_sm_counter(ZBX_STATE_BUSY);
+			update_sm_counter(ZBX_PROCESS_STATE_BUSY);
 		}
 	}
 }

@@ -211,11 +211,11 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		else if (0 == strcmp(tmp, "unreachable poller"))
 			process_type = ZBX_PROCESS_TYPE_UNREACHABLE;
 		else if (0 == strcmp(tmp, "ipmi poller"))
-			process_type = ZBX_PROCESS_TYPE_IPMI;
+			process_type = ZBX_PROCESS_TYPE_IPMIPOLLER;
 		else if (0 == strcmp(tmp, "pinger"))
 			process_type = ZBX_PROCESS_TYPE_PINGER;
 		else if (0 == strcmp(tmp, "http poller"))
-			process_type = ZBX_PROCESS_TYPE_HTTP;
+			process_type = ZBX_PROCESS_TYPE_HTTPPOLLER;
 		else if (0 == strcmp(tmp, "trapper"))
 			process_type = ZBX_PROCESS_TYPE_TRAPPER;
 		else if (0 == strcmp(tmp, "proxy poller"))
@@ -254,9 +254,9 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			*tmp = '\0';
 
 		if ('\0' == *tmp || 0 == strcmp(tmp, "busy"))
-			state = ZBX_STATE_BUSY;
+			state = ZBX_PROCESS_STATE_BUSY;
 		else if (0 == strcmp(tmp, "idle"))
-			state = ZBX_STATE_IDLE;
+			state = ZBX_PROCESS_STATE_IDLE;
 		else
 			goto not_supported;
 

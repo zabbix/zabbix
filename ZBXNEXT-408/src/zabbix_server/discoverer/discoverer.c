@@ -787,9 +787,9 @@ void	main_discoverer_loop(unsigned char p)
 		{
 			zbx_setproctitle("discoverer [sleeping for %d seconds]", sleeptime);
 
-			update_sm_counter(ZBX_STATE_IDLE);
+			update_sm_counter(ZBX_PROCESS_STATE_IDLE);
 			sleep(sleeptime);
-			update_sm_counter(ZBX_STATE_BUSY);
+			update_sm_counter(ZBX_PROCESS_STATE_BUSY);
 		}
 	}
 }

@@ -431,11 +431,11 @@ void	main_trapper_loop(unsigned char p, zbx_sock_t *s)
 	{
 		zbx_setproctitle("trapper [waiting for connection]");
 
-		update_sm_counter(ZBX_STATE_IDLE);
+		update_sm_counter(ZBX_PROCESS_STATE_IDLE);
 
 		if (SUCCEED == zbx_tcp_accept(s))
 		{
-			update_sm_counter(ZBX_STATE_BUSY);
+			update_sm_counter(ZBX_PROCESS_STATE_BUSY);
 
 			zbx_setproctitle("trapper [processing data]");
 

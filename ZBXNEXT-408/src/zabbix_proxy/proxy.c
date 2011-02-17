@@ -656,7 +656,7 @@ int	MAIN_ZABBIX_ENTRY()
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [HTTP poller]",
 				server_num);
 
-		process_type = ZBX_PROCESS_TYPE_HTTP;
+		process_type = ZBX_PROCESS_TYPE_HTTPPOLLER;
 		process_num = server_num - CONFIG_CONFSYNCER_FORKS - CONFIG_DATASENDER_FORKS
 				- CONFIG_POLLER_FORKS - CONFIG_UNREACHABLE_POLLER_FORKS
 				- CONFIG_TRAPPER_FORKS - CONFIG_PINGER_FORKS
@@ -713,7 +713,7 @@ int	MAIN_ZABBIX_ENTRY()
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [IPMI poller]",
 				server_num);
 
-		process_type = ZBX_PROCESS_TYPE_IPMI;
+		process_type = ZBX_PROCESS_TYPE_IPMIPOLLER;
 		process_num = server_num - CONFIG_CONFSYNCER_FORKS - CONFIG_DATASENDER_FORKS
 				- CONFIG_POLLER_FORKS - CONFIG_UNREACHABLE_POLLER_FORKS
 				- CONFIG_TRAPPER_FORKS - CONFIG_PINGER_FORKS

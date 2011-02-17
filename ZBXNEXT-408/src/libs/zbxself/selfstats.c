@@ -27,8 +27,8 @@
 
 typedef struct
 {
-	unsigned short	h_counter[ZBX_STATE_COUNT][MAX_HISTORY];
-	unsigned short	counter[ZBX_STATE_COUNT];
+	unsigned short	h_counter[ZBX_PROCESS_STATE_COUNT][MAX_HISTORY];
+	unsigned short	counter[ZBX_PROCESS_STATE_COUNT];
 	clock_t		last_ticks;
 	unsigned char	last_state;
 }
@@ -87,11 +87,11 @@ int	get_process_forks(unsigned char process_type)
 			return CONFIG_POLLER_FORKS;
 		case ZBX_PROCESS_TYPE_UNREACHABLE:
 			return CONFIG_UNREACHABLE_POLLER_FORKS;
-		case ZBX_PROCESS_TYPE_IPMI:
+		case ZBX_PROCESS_TYPE_IPMIPOLLER:
 			return CONFIG_IPMIPOLLER_FORKS;
 		case ZBX_PROCESS_TYPE_PINGER:
 			return CONFIG_PINGER_FORKS;
-		case ZBX_PROCESS_TYPE_HTTP:
+		case ZBX_PROCESS_TYPE_HTTPPOLLER:
 			return CONFIG_HTTPPOLLER_FORKS;
 		case ZBX_PROCESS_TYPE_TRAPPER:
 			return CONFIG_TRAPPER_FORKS;
@@ -186,7 +186,7 @@ void	init_sm_collector()
 		for (process_num = 0; process_num < process_forks; process_num++)
 		{
 			sm_collector->process[process_type][process_num].last_ticks = ticks;
-			sm_collector->process[process_type][process_num].last_state = ZBX_STATE_BUSY;
+			sm_collector->process[process_type][process_num].last_state = ZBX_PROCESS_STATE_BUSY;
 		}
 	}
 
@@ -238,7 +238,7 @@ void	free_sm_collector()
  *                                                                            *
  * Purpose:                                                                   *
  *                                                                            *
- * Parameters: state - [IN] new process state; ZBX_STATE_*                    *
+ * Parameters: state - [IN] new process state; ZBX_PROCESS_STATE_*            *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
@@ -313,7 +313,7 @@ void	collect_selfstats()
 		for (process_num = 0; process_num < process_forks; process_num++)
 		{
 			process = &sm_collector->process[process_type][process_num];
-			for (state = 0; state < ZBX_STATE_COUNT; state++)
+			for (state = 0; state < ZBX_PROCESS_STATE_COUNT; state++)
 				process->h_counter[state][index] = process->counter[state];
 			if (ticks > process->last_ticks)
 				process->h_counter[process->last_state][index] += ticks - process->last_ticks;
@@ -334,7 +334,7 @@ void	collect_selfstats()
  * Parameters: process_type - [IN] type of process; ZBX_PROCESS_TYPE_*        *
  *             process_num  - [IN] process number; 1 - first process;         *
  *                                 0 - all processes                          *
- *             state        - [IN] process state; ZBX_STATE_*                 *
+ *             state        - [IN] process state; ZBX_PROCESS_STATE_*         *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
@@ -377,7 +377,7 @@ int	get_selfstats(unsigned char process_type, int process_num, unsigned char sta
 	{
 		process = &sm_collector->process[process_type][process_num];
 
-		for (s = 0; s < ZBX_STATE_COUNT; s++)
+		for (s = 0; s < ZBX_PROCESS_STATE_COUNT; s++)
 			total += (unsigned short)(process->h_counter[s][current] -
 					process->h_counter[s][sm_collector->first]);
 		counter += (unsigned short)(process->h_counter[state][current] -

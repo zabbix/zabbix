@@ -724,9 +724,9 @@ void	main_poller_loop(unsigned char p, unsigned char poller_type)
 		{
 			zbx_setproctitle("%s [sleeping for %d seconds]",
 					zbx_poller_type_string(poller_type), sleeptime);
-			update_sm_counter(ZBX_STATE_IDLE);
+			update_sm_counter(ZBX_PROCESS_STATE_IDLE);
 			sleep(sleeptime);
-			update_sm_counter(ZBX_STATE_BUSY);
+			update_sm_counter(ZBX_PROCESS_STATE_BUSY);
 		}
 	}
 }
