@@ -149,7 +149,7 @@
 //	$formHeader->addItem($cmbConfig);
 
 
-	$screens = CTemplateScreen::get(array(
+	$screens = API::TemplateScreen()->get(array(
 		'hostids' => $_REQUEST['hostid'],
 		'output' => API_OUTPUT_EXTEND
 	));
@@ -164,7 +164,7 @@
 	}
 	else{
 		$screen = (!isset($screens[$screenid]))?reset($screens):$screens[$screenid];
-		$tmpScreens = CTemplateScreen::get(array(
+		$tmpScreens = API::TemplateScreen()->get(array(
 			'screenids' => $screen['screenid'],
 			'hostids' => $_REQUEST['hostid'],
 			'output' => API_OUTPUT_EXTEND,

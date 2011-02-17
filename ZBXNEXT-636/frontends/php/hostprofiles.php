@@ -55,7 +55,7 @@
 	$_REQUEST['hostid'] = get_request('hostid', 0);
 // permission check, imo should be removed in future.
 	if($_REQUEST['hostid'] > 0){
-		$res = CHost::get(array(
+		$res = API::Host()->get(array(
 			'real_hosts' => 1,
 			'hostids' => $_REQUEST['hostid']
 		));
@@ -102,7 +102,7 @@
 		else{
 			$options['groupids'] = array();
 		}
-		$hosts = CHost::get($options);
+		$hosts = API::Host()->get($options);
 
 // unset hosts without profiles, and copy some profile fields to the uppers array level for sorting
 		$pr = ($_REQUEST['prof_type'] == 0) ? 'profile' : 'profile_ext';

@@ -33,12 +33,10 @@ class CGraph extends CZBXAPI{
 * @param array $options
 * @return array
 */
-	public static function get($options=array()){
-		global $USER_DETAILS;
-
+	public function get($options=array()){
 		$result = array();
-		$user_type = $USER_DETAILS['type'];
-		$userid = $USER_DETAILS['userid'];
+		$user_type = self::$userData['type'];
+		$userid = self::$userData['userid'];
 		$result = array();
 
 		$sort_columns = array('graphid','name'); // allowed columns for sorting
@@ -443,7 +441,7 @@ COpt::memoryPick();
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
-			$gitems = CGraphItem::get($obj_params);
+			$gitems = API::GraphItem()->get($obj_params);
 
 			foreach($gitems as $gitemid => $gitem){
 				$ggraphs = $gitem['graphs'];
@@ -464,7 +462,7 @@ COpt::memoryPick();
 					'nopermissions' => 1,
 					'preservekeys' => 1
 				);
-				$groups = CHostGroup::get($obj_params);
+				$groups = API::HostGroup()->get($obj_params);
 
 				foreach($groups as $groupis => $group){
 					$ggraphs = $group['graphs'];
@@ -487,7 +485,7 @@ COpt::memoryPick();
 					'nopermissions' => 1,
 					'preservekeys' => 1
 				);
-				$hosts = CHost::get($obj_params);
+				$hosts = API::Host()->get($obj_params);
 				foreach($hosts as $hostid => $host){
 					$hgraphs = $host['graphs'];
 					unset($host['graphs']);
@@ -507,7 +505,7 @@ COpt::memoryPick();
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
-			$templates = CTemplate::get($obj_params);
+			$templates = API::Template()->get($obj_params);
 			foreach($templates as $templateid => $template){
 				$tgraphs = $template['graphs'];
 				unset($template['graphs']);
@@ -526,7 +524,7 @@ COpt::memoryPick();
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
-			$items = CItem::get($obj_params);
+			$items = API::Item()->get($obj_params);
 			foreach($items as $itemid => $item){
 				$igraphs = $item['graphs'];
 				unset($item['graphs']);
@@ -560,7 +558,7 @@ COpt::memoryPick();
 
 			if(is_array($options['selectDiscoveryRule']) || str_in_array($options['selectDiscoveryRule'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['selectDiscoveryRule'];
-				$discoveryRules = CItem::get($obj_params);
+				$discoveryRules = API::Item()->get($obj_params);
 
 				foreach($result as $graphid => $graph){
 					if(isset($rule_map[$graphid]) && isset($discoveryRules[$rule_map[$graphid]])){
@@ -588,7 +586,7 @@ COpt::memoryPick();
  * @param array $graphData
  * @return string|boolean
  */
-	public static function getObjects($graphData){
+	public function getObjects($graphData){
 		$options = array(
 			'filter' => $graphData,
 			'output'=>API_OUTPUT_EXTEND
@@ -599,12 +597,12 @@ COpt::memoryPick();
 		else if(isset($graphData['nodeids']))
 			$options['nodeids'] = $graphData['nodeids'];
 
-		$result = self::get($options);
+		$result = $this->get($options);
 
 	return $result;
 	}
 
-	public static function exists($object){
+	public function exists($object){
 		$options = array(
 			'filter' => array('flags' => null),
 			'output' => API_OUTPUT_SHORTEN,
@@ -620,7 +618,7 @@ COpt::memoryPick();
 		else if(isset($object['nodeids']))
 			$options['nodeids'] = $object['nodeids'];
 
-		$objs = self::get($options);
+		$objs = $this->get($options);
 
 	return !empty($objs);
 	}
@@ -631,14 +629,11 @@ COpt::memoryPick();
  * @param array $graphs
  * @return boolean
  */
-	public static function create($graphs){
+	public function create($graphs){
 		$graphs = zbx_toArray($graphs);
 		$graphids = array();
 
-		try{
-			self::BeginTransaction(__METHOD__);
-
-			self::checkInput($graphs, false);
+			$this->checkInput($graphs, false);
 
 			foreach($graphs as $gnum => $graph){
 
@@ -648,7 +643,7 @@ COpt::memoryPick();
 					'editable' => 1,
 					'templated_hosts' => 1,
 				);
-				$graph_hosts = CHost::get($options);
+				$graph_hosts = API::Host()->get($options);
 
 // check - items from one template
 				$templated_graph = false;
@@ -663,28 +658,19 @@ COpt::memoryPick();
 				}
 
 // check ymin, ymax items
-				self::checkAxisItems($graph, $templated_graph);
+				$this->checkAxisItems($graph, $templated_graph);
 
-				$graphid = self::createReal($graph);
+				$graphid = $this->createReal($graph);
 
 				if($templated_graph){
 					$graph['graphid'] = $graphid;
-					self::inherit($graph);
+					$this->inherit($graph);
 				}
 
 				$graphids[] = $graphid;
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('graphids' => $graphids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, $error);
-			return false;
-		}
 	}
 
 /**
@@ -693,12 +679,9 @@ COpt::memoryPick();
  * @param array $graphs
  * @return boolean
  */
-	public static function update($graphs){
+	public function update($graphs){
 		$graphs = zbx_toArray($graphs);
 		$graphids = zbx_objectValues($graphs, 'graphid');
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 // GRAPHS PERMISSIONS {{{
 			$options = array(
@@ -708,7 +691,7 @@ COpt::memoryPick();
 				'output' => API_OUTPUT_SHORTEN,
 				'select_graph_items'=> API_OUTPUT_EXTEND
 			);
-			$upd_graphs = self::get($options);
+			$upd_graphs = $this->get($options);
 
 			foreach($graphs as $gnum => $graph){
 				if(!isset($upd_graphs[$graph['graphid']])){
@@ -721,7 +704,7 @@ COpt::memoryPick();
 
 // }}} GRAPHS PERMISSIONS
 
-			self::checkInput($graphs, true);
+			$this->checkInput($graphs, true);
 
 			foreach($graphs as $gnum => $graph){
 
@@ -733,7 +716,7 @@ COpt::memoryPick();
 					'editable' => 1,
 					'templated_hosts' => 1,
 				);
-				$graph_hosts = CHost::get($options);
+				$graph_hosts = API::Host()->get($options);
 
 // EXCEPTION: MESS TEMPLATED ITEMS {{{
 				$templated_graph = false;
@@ -749,26 +732,17 @@ COpt::memoryPick();
 // }}} EXCEPTION: MESS TEMPLATED ITEMS
 
 // check ymin, ymax items
-				self::checkAxisItems($graph, $templated_graph);
+				$this->checkAxisItems($graph, $templated_graph);
 
-				self::updateReal($graph);
+				$this->updateReal($graph);
 // inheritance
-				if($templated_graph) self::inherit($graph);
+				if($templated_graph) $this->inherit($graph);
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('graphids' => $graphids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, $error);
-			return false;
-		}
 	}
 
-	protected static function createReal($graph){
+	protected function createReal($graph){
 		$graphids = DB::insert('graphs', array($graph));
 		$graphid = reset($graphids);
 
@@ -781,7 +755,7 @@ COpt::memoryPick();
 		return $graphid;
 	}
 
-	protected static function updateReal($graph){
+	protected function updateReal($graph){
 		$data = array(array('values' => $graph, 'where'=> array('graphid='.$graph['graphid'])));
 		DB::update('graphs', $data);
 
@@ -798,13 +772,13 @@ COpt::memoryPick();
 		return $graph['graphid'];
 	}
 
-	protected static function inherit($graph, $hostids=null){
+	protected function inherit($graph, $hostids=null){
 		$options = array(
 			'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
 			'output' => API_OUTPUT_SHORTEN,
 			'nopermissions' => 1,
 		);
-		$graph_templates = CTemplate::get($options);
+		$graph_templates = API::Template()->get($options);
 
 		if(empty($graph_templates)) return true;
 
@@ -818,7 +792,7 @@ COpt::memoryPick();
 			'nopermissions' => 1,
 			'templated_hosts' => 1,
 		);
-		$chd_hosts = CHost::get($options);
+		$chd_hosts = API::Host()->get($options);
 
 		$options = array(
 			'graphids' => $graph['graphid'],
@@ -827,7 +801,7 @@ COpt::memoryPick();
 			'select_graph_items' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND
 		);
-		$graph = self::get($options);
+		$graph = $this->get($options);
 		$graph = reset($graph);
 
 		foreach($chd_hosts as $chd_host){
@@ -851,7 +825,7 @@ COpt::memoryPick();
 			}
 
 // check if templated graph exists
-			$chd_graphs = self::get(array(
+			$chd_graphs = $this->get(array(
 				'filter' => array('templateid' => $tmp_graph['graphid'], 'flags' => array(ZBX_FLAG_DISCOVERY_CHILD, ZBX_FLAG_DISCOVERY_NORMAL)),
 				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1,
@@ -860,7 +834,7 @@ COpt::memoryPick();
 
 			if($chd_graph = reset($chd_graphs)){
 				if((zbx_strtolower($tmp_graph['name']) != zbx_strtolower($chd_graph['name']))
-						&& self::exists(array('name' => $tmp_graph['name'], 'hostids' => $chd_host['hostid'])))
+						&& $this->exists(array('name' => $tmp_graph['name'], 'hostids' => $chd_host['hostid'])))
 				{
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph [ %1$s ]: already exists on [ %2$s ]', $tmp_graph['name'], $chd_host['host']));
 				}
@@ -869,7 +843,7 @@ COpt::memoryPick();
 				}
 
 				$tmp_graph['graphid'] = $chd_graph['graphid'];
-				self::updateReal($tmp_graph);
+				$this->updateReal($tmp_graph);
 			}
 // check if graph with same name and items exists
 			else{
@@ -880,7 +854,7 @@ COpt::memoryPick();
 					'nopermissions' => 1,
 					'hostids' => $chd_host['hostid']
 				);
-				$chd_graph = self::get($options);
+				$chd_graph = $this->get($options);
 				if($chd_graph = reset($chd_graph)){
 					if($chd_graph['templateid'] != 0){
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph [ %1$s ]: already exists on [ %2$s ] (inherited from another template)', $tmp_graph['name'], $chd_host['host']));
@@ -896,7 +870,7 @@ COpt::memoryPick();
 						'expandData' => 1,
 						'nopermissions' => 1
 					);
-					$chd_graph_items = CGraphItem::get($options);
+					$chd_graph_items = API::GraphItem()->get($options);
 
 					if(count($chd_graph_items) == count($tmp_graph['gitems'])){
 						foreach($tmp_graph['gitems'] as $gitem){
@@ -909,18 +883,18 @@ COpt::memoryPick();
 						}
 
 						$tmp_graph['graphid'] = $chd_graph['graphid'];
-						self::updateReal($tmp_graph);
+						$this->updateReal($tmp_graph);
 					}
 					else{
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph [ %1$s ]: already exists on [ %2$s ] (items are not identical)', $tmp_graph['name'], $chd_host['host']));
 					}
 				}
 				else{
-					$graphid = self::createReal($tmp_graph);
+					$graphid = $this->createReal($tmp_graph);
 					$tmp_graph['graphid'] = $graphid;
 				}
 			}
-			self::inherit($tmp_graph);
+			$this->inherit($tmp_graph);
 		}
 	}
 
@@ -930,9 +904,7 @@ COpt::memoryPick();
  * @param array $data
  * @return boolean
  */
-	public static function syncTemplates($data){
-		try{
-			self::BeginTransaction(__METHOD__);
+	public function syncTemplates($data){
 
 			$data['templateids'] = zbx_toArray($data['templateids']);
 			$data['hostids'] = zbx_toArray($data['hostids']);
@@ -944,7 +916,7 @@ COpt::memoryPick();
 				'templated_hosts' => 1,
 				'output' => API_OUTPUT_SHORTEN
 			);
-			$allowedHosts = CHost::get($options);
+			$allowedHosts = API::Host()->get($options);
 			foreach($data['hostids'] as $hostid){
 				if(!isset($allowedHosts[$hostid])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -955,7 +927,7 @@ COpt::memoryPick();
 				'preservekeys' => 1,
 				'output' => API_OUTPUT_SHORTEN
 			);
-			$allowedTemplates = CTemplate::get($options);
+			$allowedTemplates = API::Template()->get($options);
 			foreach($data['templateids'] as $templateid){
 				if(!isset($allowedTemplates[$templateid])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -979,26 +951,17 @@ COpt::memoryPick();
 				'output' => API_OUTPUT_EXTEND,
 				'select_graph_items' => API_OUTPUT_EXTEND,
 			);
-			$graphs = self::get($options);
+			$graphs = $this->get($options);
 
 			foreach($graphs as $graph){
 				foreach($data['hostids'] as $hostid){
 					if(isset($linkage[$graph['hosts'][0]['hostid']][$hostid])){
-						self::inherit($graph, $hostid);
+						$this->inherit($graph, $hostid);
 					}
 				}
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return true;
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -1008,10 +971,7 @@ COpt::memoryPick();
  * @param array $graphs['graphids']
  * @return boolean
  */
-	public static function delete($graphids, $nopermissions=false){
-
-		try{
-			self::BeginTransaction(__METHOD__);
+	public function delete($graphids, $nopermissions=false){
 
 			if(empty($graphids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
 
@@ -1024,7 +984,7 @@ COpt::memoryPick();
 				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1
 			);
-			$del_graphs = self::get($options);
+			$del_graphs = $this->get($options);
 
 			if(!$nopermissions){
 				foreach($graphids as $graphid){
@@ -1066,19 +1026,10 @@ COpt::memoryPick();
 				info(_s('Graph [%s] deleted.', $graph['name']));
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('graphids'=> $graphids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
-	private static function checkInput($graphs, $update=false){
+	private function checkInput($graphs, $update=false){
 		$itemids = array();
 
 		foreach($graphs as $gnum => $graph){
@@ -1128,7 +1079,7 @@ COpt::memoryPick();
 				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1,
 			);
-			$allowed_items = CItem::get($options);
+			$allowed_items = API::Item()->get($options);
 
 			foreach($itemids as $inum => $itemid){
 				if(!isset($allowed_items[$itemid])){
@@ -1140,7 +1091,7 @@ COpt::memoryPick();
 
 		foreach($graphs as $gnum => $graph){
 			if(!isset($graph['name'])) continue;
-			$hosts = CHost::get(array(
+			$hosts = API::Host()->get(array(
 				'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
 				'nopermissions'=> true,
 				'preservekeys' => true
@@ -1154,7 +1105,7 @@ COpt::memoryPick();
 				'nopermissions' => true,
 				'preservekeys' => true
 			);
-			$graphsExists = self::get($options);
+			$graphsExists = $this->get($options);
 			foreach($graphsExists as $genum => $graphExists){
 				if(!$update || (bccomp($graphExists['graphid'],$graph['graphid']) != 0))
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph with name "%1$s" already exists', $graph['name']));
@@ -1162,11 +1113,10 @@ COpt::memoryPick();
 // }}} EXCEPTION: GRAPH EXISTS
 		}
 
-
 		return true;
 	}
 
-	protected static function checkAxisItems($graph, $tpl=false){
+	protected function checkAxisItems($graph, $tpl=false){
 
 		$axis_items = array();
 		if(isset($graph['ymin_type']) && ($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE)){
@@ -1189,7 +1139,7 @@ COpt::memoryPick();
 			else
 				$options['templated'] = false;
 
-			$cnt_exist = CItem::get($options);
+			$cnt_exist = API::Item()->get($options);
 
 			if($cnt != $cnt_exist)
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect item for axis value item'));

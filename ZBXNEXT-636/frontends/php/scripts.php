@@ -66,7 +66,7 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 			'scriptids' => $sid,
 			'output' => API_OUTPUT_SHORTEN,
 		);
-		$scripts = CScript::get($options);
+		$scripts = API::Script()->get($options);
 		if(empty($scripts)) access_deny();
 	}
 
@@ -105,13 +105,13 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 			if(isset($_REQUEST['scriptid'])){
 				$script['scriptid'] = $_REQUEST['scriptid'];
 
-				$result = CScript::update($script);
+				$result = API::Script()->update($script);
 				show_messages($result, S_SCRIPT_UPDATED, S_CANNOT_UPDATE_SCRIPT);
 				$scriptid = $_REQUEST['scriptid'];
 				$audit_acrion = AUDIT_ACTION_UPDATE;
 			}
 			else{
-				$result = CScript::create($script);
+				$result = API::Script()->create($script);
 
 				show_messages($result, S_SCRIPT_ADDED, S_CANNOT_ADD_SCRIPT);
 				$scriptid = reset($result['scriptids']);
@@ -130,7 +130,7 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 	else if(isset($_REQUEST['delete'])){
 		$scriptid = get_request('scriptid', 0);
 
-		$result = CScript::delete($scriptid);
+		$result = API::Script()->delete($scriptid);
 
 		if($result){
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCRIPT, S_SCRIPT.' ['.$scriptid.']');
@@ -147,7 +147,7 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['scripts'])){
 		$scriptids = $_REQUEST['scripts'];
 
-		$go_result = CScript::delete($scriptids);
+		$go_result = API::Script()->delete($scriptids);
 		if($go_result){
 			foreach($scriptids as $snum => $scriptid)
 				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCRIPT, S_SCRIPT.' ['.$scriptid.']');
@@ -207,7 +207,7 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 			'editable' => true,
 			'selectGroups' => API_OUTPUT_EXTEND
 		);
-		$scripts = CScript::get($options);
+		$scripts = API::Script()->get($options);
 
 // sorting
 		order_result($scripts, $sortfield, $sortorder);
@@ -219,7 +219,7 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 			$user_group_name = S_ALL_S;
 
 			if($script['usrgrpid'] > 0){
-				$user_group = CUserGroup::get(array('usrgrpids' => $script['usrgrpid'], 'output' => API_OUTPUT_EXTEND));
+				$user_group = API::UserGroup()->get(array('usrgrpids' => $script['usrgrpid'], 'output' => API_OUTPUT_EXTEND));
 				$user_group = reset($user_group);
 
 				$user_group_name = $user_group['name'];

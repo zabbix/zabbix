@@ -95,14 +95,14 @@ include_once('include/page_header.php');
 
 		if(isset($_REQUEST['applicationid'])){
 			$application['applicationid'] = $_REQUEST['applicationid'];
-			$DBapplications = CApplication::update($application);
+			$DBapplications = API::Application()->update($application);
 
 			$action		= AUDIT_ACTION_UPDATE;
 			$msg_ok		= S_APPLICATION_UPDATED;
 			$msg_fail	= S_CANNOT_UPDATE_APPLICATION;
 		}
 		else{
-			$DBapplications = CApplication::create($application);
+			$DBapplications = API::Application()->create($application);
 
 			$action		= AUDIT_ACTION_ADD;
 			$msg_ok		= S_APPLICATION_ADDED;
@@ -125,7 +125,7 @@ include_once('include/page_header.php');
 				$host = get_host_by_hostid($app['hostid']);
 
 				DBstart();
-				$result = CApplication::delete($_REQUEST['applicationid']);
+				$result = API::Application()->delete($_REQUEST['applicationid']);
 				$result = DBend($result);
 			}
 			show_messages($result, S_APPLICATION_DELETED, S_CANNOT_DELETE_APPLICATION);
@@ -154,7 +154,7 @@ include_once('include/page_header.php');
 		while($db_app = DBfetch($db_applications)){
 			if(!isset($applications[$db_app['applicationid']]))	continue;
 
-			$go_result &= (bool) CApplication::delete($db_app['applicationid']);
+			$go_result &= (bool) API::Application()->delete($db_app['applicationid']);
 
 			if($go_result){
 				$host = get_host_by_hostid($db_app['hostid']);
@@ -335,7 +335,7 @@ include_once('include/page_header.php');
 				$options['hostids'] = $pageFilter->hostid;
 			else if($pageFilter->groupid > 0)
 				$options['groupids'] = $pageFilter->groupid;
-			$applications = CApplication::get($options);
+			$applications = API::Application()->get($options);
 
 			$paging = getPagingLine($applications);
 
@@ -345,7 +345,7 @@ include_once('include/page_header.php');
 				'selectItems' => API_OUTPUT_REFER,
 				'expandData' => 1,
 			);
-			$applications = CApplication::get($options);
+			$applications = API::Application()->get($options);
 
 			order_result($applications, $sortfield, $sortorder);
 
