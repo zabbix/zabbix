@@ -364,7 +364,7 @@ include_once('include/page_header.php');
 				$row->setAttribute('id', 'row_snmpv3_authpassphrase');
 				$external_param->addRow($row);
 
-				$row = new CRow(array(S_SNMPV3_PRIV_PASSPHRASE, new CTextBox('new_check_snmpv3_privpassphrase', $new_check_snmpv3_privpassphrase), BR()));
+				$row = new CRow(array(S_SNMPV3_PRIV_PASSPHRASE, new CTextBox('new_check_snmpv3_privpassphrase', $new_check_snmpv3_privpassphrase)));
 				$row->setAttribute('id', 'row_snmpv3_privpassphrase');
 				$external_param->addRow($row);
 			break;
