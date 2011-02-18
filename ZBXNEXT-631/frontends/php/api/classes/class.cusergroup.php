@@ -36,7 +36,6 @@ class CUserGroup extends CZBXAPI{
  * @param array $options['userids'] User IDs
  * @param boolean $options['status']
  * @param boolean $options['with_gui_access']
- * @param boolean $options['with_api_access']
  * @param boolean $options['select_users']
  * @param int $options['count']
  * @param string $options['pattern']
@@ -67,7 +66,6 @@ class CUserGroup extends CZBXAPI{
 			'userids'					=> null,
 			'status'					=> null,
 			'with_gui_access'			=> null,
-			'with_api_access'			=> null,
 // filter
 			'filter'					=> null,
 			'search'					=> null,
@@ -147,10 +145,6 @@ class CUserGroup extends CZBXAPI{
 // with_gui_access
 		if(!is_null($options['with_gui_access'])){
 			$sql_parts['where'][] = 'g.gui_access='.GROUP_GUI_ACCESS_ENABLED;
-		}
-// with_api_access
-		if(!is_null($options['with_api_access'])){
-			$sql_parts['where'][] = 'g.api_access='.GROUP_API_ACCESS_ENABLED;
 		}
 
 // output
