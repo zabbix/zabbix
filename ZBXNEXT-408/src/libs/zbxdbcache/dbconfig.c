@@ -2331,7 +2331,7 @@ int	DCconfig_get_proxypoller_hosts(DC_HOST *hosts, int max_hosts)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_get_proxy_nextcheck                                     *
+ * Function: DCconfig_get_proxypoller_nextcheck                               *
  *                                                                            *
  * Purpose: Get nextcheck for passive proxies                                 *
  *                                                                            *

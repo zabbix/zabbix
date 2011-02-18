@@ -177,25 +177,25 @@ void	load_user_parameters(int optional)
 {
 	struct cfg_line	cfg[] =
 	{
-		/* PARAMETER,		VAR,				FUNC,
-			TYPE,		MANDATORY,	MIN,	MAX */
-		{"EnableRemoteCommands",&CONFIG_ENABLE_REMOTE_COMMANDS,	NULL,
-			TYPE_INT,	PARM_OPT,	0,	1},
-		{"LogRemoteCommands",	&CONFIG_LOG_REMOTE_COMMANDS,	NULL,
-			TYPE_INT,	PARM_OPT,	0,	1},
-		{"UnsafeUserParameters",&CONFIG_UNSAFE_USER_PARAMETERS,	NULL,
-			TYPE_INT,	PARM_OPT,	0,	1},
-		{"Alias",		NULL,				&add_alias_from_config,
-			TYPE_STRING,	PARM_OPT,	0,	0},
-		{"UserParameter",	NULL,				&add_parameter,
-			0,		0,		0,	0},
+		/* PARAMETER,			VAR,					FUNC,
+			TYPE,		MANDATORY,	MIN,			MAX */
+		{"EnableRemoteCommands",	&CONFIG_ENABLE_REMOTE_COMMANDS,		NULL,
+			TYPE_INT,	PARM_OPT,	0,			1},
+		{"LogRemoteCommands",		&CONFIG_LOG_REMOTE_COMMANDS,		NULL,
+			TYPE_INT,	PARM_OPT,	0,			1},
+		{"UnsafeUserParameters",	&CONFIG_UNSAFE_USER_PARAMETERS,		NULL,
+			TYPE_INT,	PARM_OPT,	0,			1},
+		{"Alias",			NULL,					&add_alias_from_config,
+			TYPE_STRING,	PARM_OPT,	0,			0},
+		{"UserParameter",		NULL,					&add_parameter,
+			0,		0,		0,			0},
 #ifdef _WINDOWS
-		{"PerfCounter",		NULL,				&add_perfs_from_config,
-			TYPE_STRING,	PARM_OPT,	0,	0},
+		{"PerfCounter",			NULL,					&add_perfs_from_config,
+			TYPE_STRING,	PARM_OPT,	0,			0},
 #endif	/* _WINDOWS */
 #ifdef WITH_PLUGINS
-		{"Plugin",		NULL,				&add_plugin,
-			TYPE_STRING,	PARM_OPT,	0,	0},
+		{"Plugin",			NULL,					&add_plugin,
+			TYPE_STRING,	PARM_OPT,	0,			0},
 #endif	/* WITH_PLUGINS */
 		{NULL}
 	};
