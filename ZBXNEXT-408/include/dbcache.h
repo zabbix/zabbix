@@ -29,6 +29,13 @@
 #define DC_ITEM struct dc_item
 #define DC_HOST struct dc_host
 
+#define	ZBX_NO_POLLER			255
+#define	ZBX_POLLER_TYPE_NORMAL		0
+#define	ZBX_POLLER_TYPE_UNREACHABLE	1
+#define	ZBX_POLLER_TYPE_IPMI		2
+#define	ZBX_POLLER_TYPE_PINGER		3
+#define	ZBX_POLLER_TYPE_COUNT		4	/* number of poller types */
+
 extern char	*CONFIG_FILE;
 extern int	CONFIG_TIMEOUT;
 extern int	CONFIG_DBCONFIG_SIZE;
