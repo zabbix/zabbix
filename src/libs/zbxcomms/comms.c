@@ -629,7 +629,7 @@ void	zbx_tcp_close(zbx_sock_t *s)
  * Return value: SUCCEED - success                                            *
  *               FAIL - an error occurred                                     *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -637,8 +637,8 @@ void	zbx_tcp_close(zbx_sock_t *s)
 #ifdef HAVE_IPV6
 int	get_address_family(const char *addr, int *family, char *error, int max_error_len)
 {
-	struct	addrinfo hints, *ai = NULL;
-	int	err, res = FAIL;
+	struct addrinfo	hints, *ai = NULL;
+	int		err, res = FAIL;
 
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = PF_UNSPEC;
@@ -651,7 +651,7 @@ int	get_address_family(const char *addr, int *family, char *error, int max_error
 		goto out;
 	}
 
-	if (ai->ai_family != PF_INET && ai->ai_family != PF_INET6)
+	if (PF_INET != ai->ai_family && PF_INET6 != ai->ai_family)
 	{
 		zbx_snprintf(error, max_error_len, "%s: Unsupported address family", addr);
 		goto out;

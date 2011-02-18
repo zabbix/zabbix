@@ -526,10 +526,10 @@ require_once('include/templates/action.js.php');
 					zbx_objectValues($new_operation['opmessage_usr'], 'userid') :
 					array();
 
-				$usrgrps = CUserGroup::get(array('usrgrpids' => $usrgrpids, 'output' => array('name')));
+				$usrgrps = API::UserGroup()->get(array('usrgrpids' => $usrgrpids, 'output' => array('name')));
 				order_result($usrgrps, 'name');
 
-				$users = CUser::get(array('userids' => $userids, 'output' => array('alias')));
+				$users = API::User()->get(array('userids' => $userids, 'output' => array('alias')));
 				order_result($users, 'alias');
 
 				$jsInsert = '';
@@ -584,7 +584,7 @@ require_once('include/templates/action.js.php');
 				if(!isset($new_operation['opcommand_grp'])) $new_operation['opcommand_grp'] = array();
 				if(!isset($new_operation['opcommand_hst'])) $new_operation['opcommand_hst'] = array();
 
-				$hosts = CHost::get(array(
+				$hosts = API::Host()->get(array(
 					'hostids' => zbx_objectValues($new_operation['opcommand_hst'], 'hostid'),
 					'output' => array('hostid','host'),
 					'preservekeys' => true,
@@ -596,7 +596,7 @@ require_once('include/templates/action.js.php');
 					$new_operation['opcommand_hst'][$ohnum]['host'] = ($cmd['hostid'] > 0) ? $hosts[$cmd['hostid']]['host'] : '';
 				morder_result($new_operation['opcommand_hst'], array('host', 'opcommand_hstid'));
 
-				$groups = CHostGroup::get(array(
+				$groups = API::HostGroup()->get(array(
 					'groupids' => zbx_objectValues($new_operation['opcommand_grp'], 'groupid'),
 					'output' => array('groupid','name'),
 					'preservekeys' => true,
@@ -652,7 +652,7 @@ require_once('include/templates/action.js.php');
 					zbx_objectValues($new_operation['opgroup'], 'groupid') :
 					array();
 
-				$groups = CHostGroup::get(array('groupids' => $groupids, 'output' => array('name')));
+				$groups = API::HostGroup()->get(array('groupids' => $groupids, 'output' => array('name')));
 				order_result($groups, 'name');
 
 				$jsInsert = '';
@@ -687,7 +687,7 @@ require_once('include/templates/action.js.php');
 					zbx_objectValues($new_operation['optemplate'], 'templateid') :
 					array();
 
-				$templates = CTemplate::get(array('templateids' => $templateids, 'output' => array('templateid','host')));
+				$templates = API::Template()->get(array('templateids' => $templateids, 'output' => array('templateid','host')));
 				order_result($templates, 'host');
 
 				$jsInsert = '';

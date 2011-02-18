@@ -198,13 +198,14 @@ class CProfile{
 
 /************ CONFIG **************/
 
-function select_config($cache = true){
-	global $page;
+function select_config($cache = true, $nodeid=null){
+	global $page, $ZBX_LOCALNODEID;
 	static $config;
 
 	if($cache && isset($config)) return $config;
+	if(is_null($nodeid)) $nodeid = $ZBX_LOCALNODEID;
 
-	$row = DBfetch(DBselect('SELECT * FROM config WHERE '.DBin_node('configid', get_current_nodeid(false))));
+	$row = DBfetch(DBselect('SELECT * FROM config WHERE '.DBin_node('configid', $nodeid)));
 
 	if($row){
 		$config = $row;
@@ -417,4 +418,5 @@ function infavorites($favobj, $favid, $source=null){
 	return false;
 }
 /********** END USER FAVORITES ***********/
+
 ?>

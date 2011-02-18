@@ -110,7 +110,7 @@ include_once('include/page_header.php');
 			'triggerids' => $_REQUEST['triggerid'],
 			'editable' => 1,
 		);
-		$triggers = CTrigger::get($options);
+		$triggers = API::Trigger()->get($options);
 		if(empty($triggers)) access_deny();
 	}
 	else if(get_request('hostid', 0) > 0){
@@ -120,7 +120,7 @@ include_once('include/page_header.php');
 			'templated_hosts' => 1,
 			'editable' => 1
 		);
-		$hosts = CHost::get($options);
+		$hosts = API::Host()->get($options);
 		if(empty($hosts)) access_deny();
 	}
 ?>
@@ -166,12 +166,12 @@ include_once('include/page_header.php');
 
 		if(isset($_REQUEST['triggerid'])){
 			$trigger['triggerid'] = $_REQUEST['triggerid'];
-			$result = CTrigger::update($trigger);
+			$result = API::Trigger()->update($trigger);
 
 			show_messages($result, S_TRIGGER_UPDATED, S_CANNOT_UPDATE_TRIGGER);
 		}
 		else{
-			$result = CTrigger::create($trigger);
+			$result = API::Trigger()->create($trigger);
 
 			show_messages($result, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
 		}
@@ -180,7 +180,7 @@ include_once('include/page_header.php');
 	}
 	else if(isset($_REQUEST['delete']) && isset($_REQUEST['triggerid'])){
 		DBstart();
-		$result = CTrigger::delete($_REQUEST['triggerid']);
+		$result = API::Trigger()->delete($_REQUEST['triggerid']);
 		$result = DBend($result);
 		show_messages($result, S_TRIGGER_DELETED, S_CANNOT_DELETE_TRIGGER);
 
@@ -220,7 +220,7 @@ include_once('include/page_header.php');
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1
 		);
-		$triggers = CTrigger::get($options);
+		$triggers = API::Trigger()->get($options);
 
 		DBstart();
 		foreach($triggers as $tnum => $db_trig){
@@ -230,7 +230,7 @@ include_once('include/page_header.php');
 				}
 			}
 
-			$result = CTrigger::update(array(
+			$result = API::Trigger()->update(array(
 				'triggerid' =>$db_trig['triggerid'],
 				'priority' => $db_trig['priority'],
 				'dependencies' => $db_trig['dependencies'],
@@ -257,7 +257,7 @@ include_once('include/page_header.php');
 			'selectHosts' => API_OUTPUT_EXTEND
 		);
 
-		$triggers = CTrigger::get($options);
+		$triggers = API::Trigger()->get($options);
 		$triggerids = zbx_objectValues($triggers, 'triggerid');
 
 		if(($_REQUEST['go'] == 'activate')){
@@ -338,7 +338,7 @@ include_once('include/page_header.php');
 		show_messages($go_result, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['g_triggerid'])){
-		$go_result = CTrigger::delete($_REQUEST['g_triggerid']);
+		$go_result = API::Trigger()->delete($_REQUEST['g_triggerid']);
 		show_messages($go_result, S_TRIGGERS_DELETED, S_CANNOT_DELETE_TRIGGERS);
 	}
 
@@ -452,7 +452,7 @@ include_once('include/page_header.php');
 			else if($pageFilter->groupid > 0) $options['groupids'] = $pageFilter->groupid;
 
 
-			$triggers = CTrigger::get($options);
+			$triggers = API::Trigger()->get($options);
 		}
 
 // sorting && paging
@@ -470,7 +470,7 @@ include_once('include/page_header.php');
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 		);
 
-		$triggers = CTrigger::get($options);
+		$triggers = API::Trigger()->get($options);
 		order_result($triggers, $sortfield, $sortorder);
 
 		$realHosts = getParentHostsByTriggers($triggers);

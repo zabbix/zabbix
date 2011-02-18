@@ -54,10 +54,6 @@ void	zbx_hashset_create_ext(zbx_hashset_t *hs, size_t init_size,
 				zbx_mem_realloc_func_t mem_realloc_func,
 				zbx_mem_free_func_t mem_free_func)
 {
-	const char	*__function_name = "zbx_hashset_create";
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
 	hs->num_data = 0;
 	hs->num_slots = next_prime(init_size);
 
@@ -69,18 +65,12 @@ void	zbx_hashset_create_ext(zbx_hashset_t *hs, size_t init_size,
 	hs->mem_malloc_func = mem_malloc_func;
 	hs->mem_realloc_func = mem_realloc_func;
 	hs->mem_free_func = mem_free_func;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 void	zbx_hashset_destroy(zbx_hashset_t *hs)
 {
-	const char		*__function_name = "zbx_hashset_destroy";
-
 	int			i;
 	ZBX_HASHSET_ENTRY_T	*entry, *next_entry;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	for (i = 0; i < hs->num_slots; i++)
 	{
@@ -105,8 +95,6 @@ void	zbx_hashset_destroy(zbx_hashset_t *hs)
 	hs->mem_malloc_func = NULL;
 	hs->mem_realloc_func = NULL;
 	hs->mem_free_func = NULL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 void	*zbx_hashset_insert(zbx_hashset_t *hs, const void *data, size_t size)
@@ -116,13 +104,9 @@ void	*zbx_hashset_insert(zbx_hashset_t *hs, const void *data, size_t size)
 
 void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, size_t offset)
 {
-	const char		*__function_name = "zbx_hashset_insert";
-
 	int			slot;
 	zbx_hash_t		hash;
 	ZBX_HASHSET_ENTRY_T	*entry;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	hash = hs->hash_func(data);
 
@@ -184,20 +168,14 @@ void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, s
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-
 	return entry->data;
 }
 
 void	*zbx_hashset_search(zbx_hashset_t *hs, const void *data)
 {
-	const char		*__function_name = "zbx_hashset_search";
-
 	int			slot;
 	zbx_hash_t		hash;
 	ZBX_HASHSET_ENTRY_T	*entry;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	hash = hs->hash_func(data);
 
@@ -211,20 +189,14 @@ void	*zbx_hashset_search(zbx_hashset_t *hs, const void *data)
 		entry = entry->next;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-
 	return (NULL != entry ? entry->data : NULL);
 }
 
 void	zbx_hashset_remove(zbx_hashset_t *hs, const void *data)
 {
-	const char		*__function_name = "zbx_hashset_remove";
-
 	int			slot;
 	zbx_hash_t		hash;
 	ZBX_HASHSET_ENTRY_T	*entry;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	hash = hs->hash_func(data);
 
@@ -261,18 +233,12 @@ void	zbx_hashset_remove(zbx_hashset_t *hs, const void *data)
 			}
 		}
 	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 void	zbx_hashset_clear(zbx_hashset_t *hs)
 {
-	const char		*__function_name = "zbx_hashset_clear";
-
 	int			slot;
 	ZBX_HASHSET_ENTRY_T	*entry;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	for (slot = 0; slot < hs->num_slots; slot++)
 	{
@@ -285,8 +251,6 @@ void	zbx_hashset_clear(zbx_hashset_t *hs)
 	}
 
 	hs->num_data = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 #define	ITER_START	(-1)
@@ -331,7 +295,7 @@ void	zbx_hashset_iter_remove(zbx_hashset_iter_t *iter)
 {
 	if (ITER_START == iter->slot || ITER_FINISH == iter->slot || NULL == iter->entry)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Removing a hashset entry through a bad iterator.");
+		zabbix_log(LOG_LEVEL_CRIT, "removing a hashset entry through a bad iterator");
 		exit(FAIL);
 	}
 
