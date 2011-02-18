@@ -21,29 +21,24 @@
 <?php
 function init_mbstrings(){
 	$res = true;
-	
+
 	$res &= mbstrings_available();
 
 	ini_set('mbstring.internal_encoding', 'UTF-8');
 	$res &= (ini_get('mbstring.internal_encoding') == 'UTF-8');
-		
+
 	ini_set('mbstring.detect_order', 'UTF-8, ISO-8859-1, JIS, SJIS');
 	$res &= (ini_get('mbstring.detect_order') == 'UTF-8, ISO-8859-1, JIS, SJIS');
-	
+
 	if($res) define('ZBX_MBSTRINGS_ENABLED', true);
 return $res;
 }
 
 function mbstrings_available(){
-	$mbstrings_fnc_exist =
-		function_exists('mb_strlen') &&
-		function_exists('mb_strtoupper') &&
-		function_exists('mb_strpos') &&
-		function_exists('mb_substr'); //&&
-		// function_exists('mb_stristr') &&
-		// function_exists('mb_strstr');
-
-return $mbstrings_fnc_exist;
+	return (function_exists('mb_strlen')
+			&& function_exists('mb_strtoupper')
+			&& function_exists('mb_strpos')
+			&& function_exists('mb_substr'));
 }
 
 // Translate global array $TRANSLATION into constants
@@ -56,8 +51,6 @@ function process_locales(){
 		}
 	}
 	unset($GLOBALS['TRANSLATION']);
-
-
 }
 
 function set_zbx_locales(){

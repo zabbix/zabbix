@@ -460,7 +460,7 @@ class CChart extends CGraphDraw{
 
 				if($fnc_cnt['cnt'] != 1) continue;
 
-				CUserMacro::resolveTrigger($trigger);
+				$trigger = API::UserMacro()->resolveTrigger($trigger);
 				if(!preg_match('/\{([0-9]{1,})\}([\<\>\=]{1})([0-9\.]{1,})([K|M|G]{0,1})/i', $trigger['expression'], $arr)) continue;
 
 				$val = $arr[3];
@@ -1998,8 +1998,6 @@ class CChart extends CGraphDraw{
 		$start_time=getmicrotime();
 
 		set_image_header();
-
-		check_authorisation();
 
 		$this->selectData();
 

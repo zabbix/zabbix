@@ -106,7 +106,7 @@ include_once('include/page_header.php');
 						'select_links' => API_OUTPUT_EXTEND
 					);
 
-					$sysmaps = CMap::get($options);
+					$sysmaps = API::Map()->get($options);
 					$db_map = reset($sysmaps);
 
 					expandMapLabels($db_map);
@@ -160,7 +160,7 @@ include_once('include/page_header.php');
 							'select_selements'=>API_OUTPUT_EXTEND,
 							'select_links'=>API_OUTPUT_EXTEND
 						);
-					$sysmaps = CMap::get($options);
+					$sysmaps = API::Map()->get($options);
 					if(empty($sysmaps)) print('alert("Access denied!");');
 
 					$selements = get_request('selements', '[]');
@@ -187,7 +187,7 @@ include_once('include/page_header.php');
 							'grid_show' => $_REQUEST['grid_show'],
 							'grid_align' => $_REQUEST['grid_align']
 						);
-						CMap::update($sysmap_to_update);
+						API::Map()->update($sysmap_to_update);
 
 
 						foreach($selements as $id => $selement){
@@ -206,7 +206,7 @@ include_once('include/page_header.php');
 							}
 							if(isset($selement['new'])){
 								$selement['sysmapid'] = $sysmapid;
-								$selementids = CMap::addElements($selement);
+								$selementids = API::Map()->addElements($selement);
 								$selementid = reset($selementids);
 
 								foreach($links as $id => $link){
@@ -217,7 +217,7 @@ include_once('include/page_header.php');
 							else{
 //SDII($selement);
 								$selement['sysmapid'] = $sysmapid;
-								$result = CMap::updateElements($selement);
+								$result = API::Map()->updateElements($selement);
 								unset($db_selementids[$selement['selementid']]);
 							}
 						}
@@ -337,7 +337,7 @@ include_once('include/page_header.php');
 			'editable' => 1,
 			'output' => API_OUTPUT_EXTEND,
 		);
-		$maps = CMap::get($options);
+		$maps = API::Map()->get($options);
 
 		if(empty($maps)) access_deny();
 		else $sysmap = reset($maps);

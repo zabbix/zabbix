@@ -86,11 +86,11 @@ if(isset($_REQUEST['save_trigger'])){
 				'output' => API_OUTPUT_EXTEND,
 				'select_dependencies' => API_OUTPUT_REFER
 			);
-			$triggersData = CTrigger::get($options);
+			$triggersData = API::Trigger()->get($options);
 			$triggerData = reset($triggersData);
 
 // Saving dependencies
-// TODO: add dependencies to CTrigger::update
+// TODO: add dependencies to API::Trigger()->update
 			$deps = array();
 			foreach($triggerData['dependencies'] as $dnum => $depTrigger){
 				$deps[] = array(
@@ -115,9 +115,9 @@ if(isset($_REQUEST['save_trigger'])){
 			$trigger['url'] = $_REQUEST['url'];
 
 			DBstart();
-			$result = CTrigger::update($trigger);
+			$result = API::Trigger()->update($trigger);
 
-			$result &= CTrigger::addDependencies($deps);
+			$result &= API::Trigger()->addDependencies($deps);
 //REVERT
 			$result = DBend($result);
 
@@ -137,13 +137,13 @@ if(isset($_REQUEST['save_trigger'])){
 			$trigger['url'] = $_REQUEST['url'];
 
 			DBstart();
-			if($result = CTrigger::create($trigger)){
+			if($result = API::Trigger()->create($trigger)){
 				if($result !== false){
 					$options = array(
 						'triggerids' => $result['triggerids'],
 						'output' => API_OUTPUT_EXTEND
 					);
-					$db_triggers = CTrigger::get($options);
+					$db_triggers = API::Trigger()->get($options);
 
 					$result = true;
 					$db_triggers = reset($db_triggers);

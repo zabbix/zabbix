@@ -123,13 +123,13 @@ include_once('include/page_header.php');
 		if(isset($_REQUEST['maintenanceid'])){
 			$maintenance['maintenanceid'] = $_REQUEST['maintenanceid'];
 
-			$result = CMaintenance::update($maintenance);
+			$result = API::Maintenance()->update($maintenance);
 
 			$msg1 = S_MAINTENANCE_UPDATED;
 			$msg2 = S_CANNOT_UPDATE_MAINTENANCE;
 		}
 		else{
-			$result = CMaintenance::create($maintenance);
+			$result = API::Maintenance()->create($maintenance);
 
 			$msg1 = S_MAINTENANCE_ADDED;
 			$msg2 = S_CANNOT_ADD_MAINTENANCE;
@@ -159,7 +159,7 @@ include_once('include/page_header.php');
 			$maintenances[$maintenanceid] = get_maintenance_by_maintenanceid($maintenanceid);
 		}
 
-		$go_result = CMaintenance::delete($maintenanceids);
+		$go_result = API::Maintenance()->delete($maintenanceids);
 
 		show_messages($go_result,S_MAINTENANCE_DELETED,S_CANNOT_DELETE_MAINTENANCE);
 		if($go_result){
@@ -353,7 +353,7 @@ include_once('include/page_header.php');
 				'maintenanceids' => $_REQUEST['maintenanceid'],
 				'output' => API_OUTPUT_EXTEND,
 			);
-			$maintenance = CMaintenance::get($options);
+			$maintenance = API::Maintenance()->get($options);
 			$maintenance = reset($maintenance);
 
 			$mname				= $maintenance['name'];
@@ -502,7 +502,7 @@ include_once('include/page_header.php');
 			'output' => API_OUTPUT_EXTEND,
 			'real_hosts' => 1,
 		);
-		$all_groups = CHostGroup::get($options);
+		$all_groups = API::HostGroup()->get($options);
 		$all_groups = zbx_toHash($all_groups, 'groupid');
 		order_result($all_groups, 'name');
 
@@ -518,7 +518,7 @@ include_once('include/page_header.php');
 		}
 
 		if(isset($_REQUEST['maintenanceid']) && !isset($_REQUEST['form_refresh'])){
-			$hostids = CHost::get(array(
+			$hostids = API::Host()->get(array(
 				'maintenanceids' => $_REQUEST['maintenanceid'],
 				'real_hosts' => 1,
 				'output' => API_OUTPUT_SHORTEN,
@@ -539,7 +539,7 @@ include_once('include/page_header.php');
 			'editable' => 1,
 			'groupids' => $twb_groupid,
 		);
-		$hosts = CHost::get($options);
+		$hosts = API::Host()->get($options);
 
 		// selected hosts
 		$options = array(
@@ -548,7 +548,7 @@ include_once('include/page_header.php');
 			'editable' => 1,
 			'hostids' => $hostids,
 		);
-		$hosts_selected = CHost::get($options);
+		$hosts_selected = API::Host()->get($options);
 
 		$hosts = array_merge($hosts, $hosts_selected);
 		$hosts = zbx_toHash($hosts, 'hostid');
@@ -569,7 +569,7 @@ include_once('include/page_header.php');
 		$tblGlink = new CTable(null, 'formElementTable');
 
 		if(isset($_REQUEST['maintenanceid']) && !isset($_REQUEST['form_refresh'])){
-			$groupids = CHostGroup::get(array(
+			$groupids = API::HostGroup()->get(array(
 				'maintenanceids' => $_REQUEST['maintenanceid'],
 				'real_hosts' => 1,
 				'output' => API_OUTPUT_SHORTEN,
@@ -637,7 +637,7 @@ include_once('include/page_header.php');
 			$options['groupids'] = array();
 		}
 
-		$maintenances = CMaintenance::get($options);
+		$maintenances = API::Maintenance()->get($options);
 
 		$form = new CForm();
 		$form->setName('maintenances');

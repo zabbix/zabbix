@@ -192,7 +192,7 @@ include_once('include/page_header.php');
 		);
 		if($pageFilter->groupid > 0) $options['groupids'] = $pageFilter->groupid;
 
-		$hosts = CHost::get($options);
+		$hosts = API::Host()->get($options);
 	}
 	else{
 		$hosts = array();
@@ -213,7 +213,7 @@ include_once('include/page_header.php');
 		'selectScreens' => API_OUTPUT_COUNT,
 		'nopermissions' => 1
 	);
-	$hosts = CHost::get($options);
+	$hosts = API::Host()->get($options);
 	order_result($hosts, $sortfield, $sortorder);
 
 	foreach($hosts as $num => $host){
@@ -230,7 +230,7 @@ include_once('include/page_header.php');
 
 		$description = array();
 		if($host['proxy_hostid']){
-			$proxy = CProxy::get(array(
+			$proxy = API::Proxy()->get(array(
 				'proxyids' => $host['proxy_hostid'],
 				'output' => API_OUTPUT_EXTEND
 			));

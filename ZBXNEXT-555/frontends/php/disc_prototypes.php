@@ -172,7 +172,7 @@ switch($itemType) {
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1
 		);
-		$discovery_rule = CDiscoveryRule::get($options);
+		$discovery_rule = API::DiscoveryRule()->get($options);
 		$discovery_rule = reset($discovery_rule);
 		if(!$discovery_rule) access_deny();
 		$_REQUEST['hostid'] = $discovery_rule['hostid'];
@@ -209,7 +209,7 @@ switch($itemType) {
 	}
 	else if(isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])){
 		DBstart();
-		$result = CItemPrototype::delete($_REQUEST['itemid']);
+		$result = API::Itemprototype()->delete($_REQUEST['itemid']);
 		$result = DBend($result);
 		show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
 
@@ -235,7 +235,7 @@ switch($itemType) {
 		if($fapp == 0) array_shift($applications);
 
 		if(!zbx_empty($_REQUEST['new_application'])){
-			$new_appid = CApplication::create(array(
+			$new_appid = API::Application()->create(array(
 				'name' => $_REQUEST['new_application'],
 				'hostid' => $_REQUEST['hostid']
 			));
@@ -294,12 +294,12 @@ switch($itemType) {
 
 			$item['itemid'] = $_REQUEST['itemid'];
 
-			$result = CItemPrototype::update($item);
+			$result = API::Itemprototype()->update($item);
 
 			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 		}
 		else{
-			$result = CItemPrototype::create($item);
+			$result = API::Itemprototype()->create($item);
 			show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 		}
 
@@ -323,7 +323,7 @@ switch($itemType) {
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_itemid'])){
 		$group_itemid = $_REQUEST['group_itemid'];
 		DBstart();
-		$go_result = CItemPrototype::delete($group_itemid);
+		$go_result = API::Itemprototype()->delete($group_itemid);
 		$go_result = DBend($go_result);
 		show_messages($go_result, S_ITEMS_DELETED, S_CANNOT_DELETE_ITEMS);
 	}
@@ -395,7 +395,7 @@ switch($itemType) {
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
-		$items = CItemPrototype::get($options);
+		$items = API::Itemprototype()->get($options);
 
 		order_result($items, $sortfield, $sortorder);
 		$paging = getPagingLine($items);
