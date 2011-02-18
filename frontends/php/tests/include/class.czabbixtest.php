@@ -98,7 +98,7 @@ class CZabbixTest extends PHPUnit_Framework_TestCase
 
 		$data = array(
 			'jsonrpc' => '2.0',
-			'method' => 'user.authenticate',
+			'method' => 'user.login',
 			'params' => array('user'=>'Admin', 'password'=>'zabbix'),
 			'id'=> $this->ID
 		);
