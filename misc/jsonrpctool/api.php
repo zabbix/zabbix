@@ -78,9 +78,9 @@ if(isset($_REQUEST['apicall'])){
 
 	$data = json_encode($data);
 
-	$responce = do_post_request($url, $data);
+	$response = do_post_request($url, $data);
 
-	$json_decoded = json_decode($responce, true);
+	$json_decoded = json_decode($response, true);
 	$auth = $json_decoded['result'];
 ?>
 <span style="font-weight: bolder;">AUTH</span>
@@ -91,7 +91,7 @@ if(isset($_REQUEST['apicall'])){
 	</div>
 	<div>
 		<span style="color: blue;">response:</span>
-		<pre><code class="javascript"><?php print($responce); ?></code></pre>
+		<pre><code class="javascript"><?php print($response); ?></code></pre>
 	</div>
 </div>
 
@@ -104,7 +104,7 @@ if(isset($_REQUEST['apicall'])){
 		'id'=> 2
 	);
 	$data = json_encode($data);
-	$responce = do_post_request($url, $data);
+	$response = do_post_request($url, $data);
 ?>
 
 <span style="font-weight: bolder;">API call</span>
@@ -115,7 +115,7 @@ if(isset($_REQUEST['apicall'])){
 	</div>
 	<div>
 		<span style="color: blue;">response:</span>
-		<pre><code id="resp" class="javascript"><?php print($responce); ?></code></pre>
+		<pre><code id="resp" class="javascript"><?php print($response); ?></code></pre>
 	</div>
 </div>
 
