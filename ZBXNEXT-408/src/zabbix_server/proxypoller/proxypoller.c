@@ -339,17 +339,17 @@ void	main_proxypoller_loop()
 
 	for (;;)
 	{
-		zbx_setproctitle("%s [data exchange]", get_process_type_string(process_type));
+		zbx_setproctitle("%s [exchanging data]", get_process_type_string(process_type));
 
 		sec = zbx_time();
 		processed = process_proxy();
 		sec = zbx_time() - sec;
 
-		nextcheck = DCconfig_get_proxy_nextcheck();
-		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
-
 		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while processing %3d proxies",
 				get_process_type_string(process_type), process_num, sec, processed);
+
+		nextcheck = DCconfig_get_proxy_nextcheck();
+		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
 
 		zbx_sleep_loop(sleeptime);
 	}

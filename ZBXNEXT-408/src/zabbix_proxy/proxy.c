@@ -382,6 +382,7 @@ static void	init_config()
 		CONFIG_FPING6_LOCATION = zbx_strdup(CONFIG_FPING6_LOCATION, "/usr/sbin/fping6");
 	}
 #endif /* HAVE_IPV6 */
+
 	if (NULL == CONFIG_EXTERNALSCRIPTS)
 	{
 		CONFIG_EXTERNALSCRIPTS = zbx_strdup(CONFIG_EXTERNALSCRIPTS, "/etc/zabbix/externalscripts");
@@ -566,7 +567,7 @@ int	MAIN_ZABBIX_ENTRY()
 			zabbix_log(LOG_LEVEL_WARNING, "server #%d started");
 
 			for (;;)
-				zbx_sleep(3600);
+				zbx_sleep(SEC_PER_HOUR);
 		}
 	}
 	else if (server_num <= CONFIG_CONFSYNCER_FORKS)

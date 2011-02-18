@@ -176,7 +176,7 @@ void	main_nodewatcher_loop()
 
 	for (;;)
 	{
-		zbx_setproctitle("%s [data exchange]", get_process_type_string(process_type));
+		zbx_setproctitle("%s [exchanging data]", get_process_type_string(process_type));
 
 		start = time(NULL);
 

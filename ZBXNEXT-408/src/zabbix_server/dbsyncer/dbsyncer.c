@@ -72,6 +72,9 @@ void	main_dbsyncer_loop()
 		num = DCsync_history(ZBX_SYNC_PARTIAL);
 		sec = zbx_time() - sec;
 
+		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while processing %d items",
+				get_process_type_string(process_type), process_num, sec, num);
+
 		if (last_sleeptime == -1)
 		{
 			sleeptime = num ? ZBX_SYNC_MAX / num : CONFIG_DBSYNCER_FREQUENCY;
@@ -111,9 +114,6 @@ void	main_dbsyncer_loop()
 			sleeptime = CONFIG_DBSYNCER_FREQUENCY;
 
 		last_sleeptime = sleeptime;
-
-		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while processing %d items",
-				get_process_type_string(process_type), process_num, sec, num);
 
 		zbx_sleep_loop(sleeptime);
 	}

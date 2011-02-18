@@ -1012,9 +1012,7 @@ void	main_escalator_loop()
 
 		now = time(NULL);
 		sec = zbx_time();
-
 		process_escalations(now);
-
 		sec = zbx_time() - sec;
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while processing escalations",

@@ -524,13 +524,13 @@ void	main_pinger_loop()
 		process_pinger_hosts(items, items_count);
 		sec = zbx_time() - sec;
 
-		nextcheck = DCconfig_get_poller_nextcheck(ZBX_POLLER_TYPE_PINGER);
-		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
-
 		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while processing %d items",
 				get_process_type_string(process_type), process_num, sec, items_count);
 
 		free_hosts(&items, &items_count);
+
+		nextcheck = DCconfig_get_poller_nextcheck(ZBX_POLLER_TYPE_PINGER);
+		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
 
 		zbx_sleep_loop(sleeptime);
 	}

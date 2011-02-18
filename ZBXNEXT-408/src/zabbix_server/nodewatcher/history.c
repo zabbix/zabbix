@@ -230,7 +230,8 @@ static void process_history_tables(int master_nodeid, int nodeid)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_history_tables()");
 
-	for (t = 0; tables[t].table != 0; t++) {
+	for (t = 0; tables[t].table != 0; t++)
+	{
 		if (tables[t].flags & (ZBX_HISTORY | ZBX_HISTORY_SYNC))
 			process_history_table_data(&tables[t], master_nodeid, nodeid);
 	}
@@ -256,7 +257,7 @@ static void process_history_tables(int master_nodeid, int nodeid)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void main_historysender()
+void	main_historysender()
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -269,7 +270,8 @@ void main_historysender()
 		return;
 
 	result = DBselect("select nodeid from nodes");
-	while ((row = DBfetch(result))) {
+	while (NULL != (row = DBfetch(result)))
+	{
 		nodeid = atoi(row[0]);
 		if (SUCCEED == is_master_node(CONFIG_NODEID, nodeid))
 			continue;

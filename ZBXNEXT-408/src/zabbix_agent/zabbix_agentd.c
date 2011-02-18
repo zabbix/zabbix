@@ -230,22 +230,20 @@ int	MAIN_ZABBIX_ENTRY()
 
 	zbx_sock_t	listen_sock;
 	
-	if (NULL == CONFIG_LOG_FILE || ('\0' == *CONFIG_LOG_FILE))
+	if (NULL == CONFIG_LOG_FILE || '\0' == *CONFIG_LOG_FILE)
 	{
 		zabbix_open_log(LOG_TYPE_SYSLOG, CONFIG_LOG_LEVEL, NULL);
 	}
 	else
-	{
 		zabbix_open_log(LOG_TYPE_FILE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
-	}
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent started. Zabbix %s (revision %s).",
 			ZABBIX_VERSION,
 			ZABBIX_REVISION);
 
-	if(0 == CONFIG_DISABLE_PASSIVE)
+	if (0 == CONFIG_DISABLE_PASSIVE)
 	{
-		if( FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT) )
+		if (FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "Listener failed with error: %s.", zbx_tcp_strerror());
 			exit(1);
@@ -258,7 +256,7 @@ int	MAIN_ZABBIX_ENTRY()
 
 	/* --- START THREADS ---*/
 
-	if(1 == CONFIG_DISABLE_PASSIVE)
+	if (1 == CONFIG_DISABLE_PASSIVE)
 	{
 		/* Only main process and active checks will be started */
 		CONFIG_ZABBIX_FORKS = 0;/* Listeners won't be needed for passive checks. */
@@ -269,16 +267,16 @@ int	MAIN_ZABBIX_ENTRY()
 	threads = calloc(threads_num, sizeof(ZBX_THREAD_HANDLE));
 
 	/* Start the collector thread. */
-	threads[i=0] = zbx_thread_start(collector_thread, NULL);
+	threads[i = 0] = zbx_thread_start(collector_thread, NULL);
 
 	/* start listeners */
-	for(i++; i <= CONFIG_ZABBIX_FORKS; i++)
+	for (i++; i <= CONFIG_ZABBIX_FORKS; i++)
 	{
 		threads[i] = zbx_thread_start(listener_thread, &listen_sock);
 	}
 
 	/* start active check */
-	if(0 == CONFIG_DISABLE_ACTIVE)
+	if (0 == CONFIG_DISABLE_ACTIVE)
 	{
 		activechk_args.host = CONFIG_HOSTS_ALLOWED;
 		activechk_args.port = (unsigned short)CONFIG_SERVER_PORT;
@@ -290,14 +288,12 @@ int	MAIN_ZABBIX_ENTRY()
 	set_parent_signal_handler();
 
 	/* wait for all threads exiting */
-	for(i = 0; i < 1 + CONFIG_ZABBIX_FORKS +((0 == CONFIG_DISABLE_ACTIVE) ? 1 : 0); i++)
+	for (i = 0; i < 1 + CONFIG_ZABBIX_FORKS + (0 == CONFIG_DISABLE_ACTIVE ? 1 : 0); i++)
 	{
-		if(threads && threads[i])
+		if (threads[i])
 		{
 			zbx_thread_wait(threads[i]);
-
-			if(threads)
-				zabbix_log( LOG_LEVEL_DEBUG, "thread [%i] is terminated", i);
+			zabbix_log(LOG_LEVEL_DEBUG, "thread [%i] is terminated", i);
 
 			ZBX_DO_EXIT();
 		}

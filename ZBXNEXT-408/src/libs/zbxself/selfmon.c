@@ -135,7 +135,7 @@ int	get_process_forks(unsigned char process_type)
 
 /******************************************************************************
  *                                                                            *
- * Function: getx_process_type_string                                          *
+ * Function: get_process_type_string                                          *
  *                                                                            *
  * Purpose: Returns process name                                              *
  *                                                                            *

@@ -343,6 +343,7 @@ static void	init_config()
 		CONFIG_FPING6_LOCATION = zbx_strdup(CONFIG_FPING6_LOCATION, "/usr/sbin/fping6");
 	}
 #endif /* HAVE_IPV6 */
+
 	if (NULL == CONFIG_EXTERNALSCRIPTS)
 	{
 		CONFIG_EXTERNALSCRIPTS = zbx_strdup(CONFIG_EXTERNALSCRIPTS, "/etc/zabbix/externalscripts");
@@ -352,6 +353,7 @@ static void	init_config()
 	{
 		CONFIG_NODEWATCHER_FORKS = 0;
 	}
+
 #ifdef HAVE_SQLITE3
 	CONFIG_MAX_HOUSEKEEPER_DELETE = 0;
 #endif

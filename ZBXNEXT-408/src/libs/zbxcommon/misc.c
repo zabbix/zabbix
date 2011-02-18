@@ -237,7 +237,7 @@ char    *zbx_strdup2(const char *filename, int line, char *old, const char *str)
  *                                                                            *
  * Purpose: set process title                                                 *
  *                                                                            *
- * Parameters: title - item's refresh rate in sec                             *
+ * Parameters:                                                                *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
@@ -253,7 +253,7 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...)
 	va_list args;
 
 	va_start(args, fmt);
-	vsnprintf(title, MAX_STRING_LEN-1, fmt, args);
+	vsnprintf(title, MAX_STRING_LEN - 1, fmt, args);
 	va_end(args);
 
 	setproctitle(title);

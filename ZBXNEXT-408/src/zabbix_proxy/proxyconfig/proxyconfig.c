@@ -106,7 +106,7 @@ void	main_proxyconfig_loop()
 
 	for (;;)
 	{
-		zbx_setproctitle("%s [load configuration]", get_process_type_string(process_type));
+		zbx_setproctitle("%s [loading configuration]", get_process_type_string(process_type));
 
 		process_configuration_sync();
 

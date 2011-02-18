@@ -199,14 +199,14 @@ void	main_watchdog_loop()
 
 	set_child_signal_handler();
 
-	/* Disable writing to database in zabbix_syslog() */
+	/* disable writing to database in zabbix_syslog() */
 	CONFIG_ENABLE_LOG = 0;
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	zbx_setproctitle("%s [initialize]", get_process_type_string(process_type));
+	zbx_setproctitle("%s [initializing]", get_process_type_string(process_type));
 
 	init_config();
 
@@ -218,8 +218,6 @@ void	main_watchdog_loop()
 
 		ping_database();
 
-		zbx_sleep_loop(60);
+		zbx_sleep_loop(SEC_PER_MIN);
 	}
-
-	/* We will never reach this point */
 }

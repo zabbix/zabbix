@@ -117,11 +117,11 @@ void	main_httppoller_loop()
 		process_httptests(process_num, now);
 		sec = zbx_time() - sec;
 
-		nextcheck = get_minnextcheck(now);
-		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
-
 		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while updating HTTP tests",
 				get_process_type_string(process_type), process_num, sec);
+
+		nextcheck = get_minnextcheck(now);
+		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
 
 		zbx_sleep_loop(sleeptime);
 	}

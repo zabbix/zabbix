@@ -773,11 +773,11 @@ void	main_discoverer_loop(unsigned char p)
 		process_discovery(now);
 		sec = zbx_time() - sec;
 
-		nextcheck = get_minnextcheck(now);
-		sleeptime = calculate_sleeptime(nextcheck, DISCOVERER_DELAY);
-
 		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while processing rules",
 				get_process_type_string(process_type), process_num, sec);
+
+		nextcheck = get_minnextcheck(now);
+		sleeptime = calculate_sleeptime(nextcheck, DISCOVERER_DELAY);
 
 		zbx_sleep_loop(sleeptime);
 	}

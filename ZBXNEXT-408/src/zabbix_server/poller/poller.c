@@ -718,11 +718,11 @@ void	main_poller_loop(unsigned char p, unsigned char poller_type)
 		processed = get_values(poller_type);
 		sec = zbx_time() - sec;
 
-		nextcheck = DCconfig_get_poller_nextcheck(poller_type);
-		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
-
 		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while updating %d values",
 				get_process_type_string(process_type), process_num, sec, processed);
+
+		nextcheck = DCconfig_get_poller_nextcheck(poller_type);
+		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
 
 		zbx_sleep_loop(sleeptime);
 	}
