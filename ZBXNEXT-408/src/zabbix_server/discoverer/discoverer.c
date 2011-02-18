@@ -34,7 +34,7 @@
 
 extern int		CONFIG_DISCOVERER_FORKS;
 static unsigned char	zbx_process;
-static unsigned char	process_type;
+extern unsigned char	process_type;
 extern int		process_num;
 
 /******************************************************************************

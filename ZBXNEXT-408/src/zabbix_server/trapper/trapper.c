@@ -43,7 +43,7 @@
 #include "daemon.h"
 
 static unsigned char	zbx_process;
-static unsigned char	process_type;
+extern unsigned char	process_type;
 
 /******************************************************************************
  *                                                                            *

@@ -168,7 +168,7 @@ void	DCconfig_set_maintenance(zbx_uint64_t hostid, int maintenance_status,
 void	*DCconfig_get_stats(int request);
 
 int	DCconfig_get_proxypoller_hosts(DC_HOST *hosts, int max_hosts);
-int	DCconfig_get_proxy_nextcheck();
+int	DCconfig_get_proxypoller_nextcheck();
 void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck);
 
 #endif
