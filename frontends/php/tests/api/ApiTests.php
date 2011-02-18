@@ -21,7 +21,7 @@
 <?php
 //require_once 'Framework/ClassTest.php';
 require_once(dirname(__FILE__).'/otherTest2.php');
-//require_once(dirname(__FILE__).'/classes/class.triggerexpressionTest.php');
+require_once(dirname(__FILE__).'/classes/class.triggerexpressionTest.php');
 // ...
 
 //class Package_GeneralTests
@@ -32,7 +32,7 @@ class ApiTests
 		$suite = new PHPUnit_Framework_TestSuite('api');
 
 		$suite->addTestSuite('otherTest2');
-//		$suite->addTestSuite('class_triggerexpressionTest');
+		$suite->addTestSuite('class_triggerexpressionTest');
 		// ...
 
 		return $suite;
