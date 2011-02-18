@@ -1,7 +1,7 @@
 -- Activate Zabbix Server
 UPDATE hosts SET status=0 WHERE host='Zabbix server';
 
--- Granting admin API access rights
+-- Enabling debug mode
 UPDATE usrgrp SET debug_mode = 1 WHERE usrgrpid = 7;
 
 -- New media types
