@@ -6640,8 +6640,8 @@ msgid "SERVER"
 msgstr "СЕРВЕР"
 
 #: include/locales/en_gb.inc.php:640
-msgid "SIA Zabbix"
-msgstr "SIA Zabbix"
+msgid "Zabbix SIA"
+msgstr "Zabbix SIA"
 
 #: include/locales/en_gb.inc.php:1533
 msgid "SIMPLE GRAPH"

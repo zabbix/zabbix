@@ -6637,7 +6637,7 @@ msgid "SERVER"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:640
-msgid "SIA Zabbix"
+msgid "Zabbix SIA"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1533
