@@ -42,7 +42,8 @@ typedef struct
 }
 ZBX_USER_MSG;
 
-extern int	process_num;
+extern unsigned char	process_type;
+extern int		process_num;
 
 /******************************************************************************
  *                                                                            *
@@ -1001,29 +1002,24 @@ void	main_escalator_loop()
 
 	set_child_signal_handler();
 
-	zbx_setproctitle("escalator [connecting to the database]");
+	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
 	{
+		zbx_setproctitle("%s [processing escalations]", get_process_type_string(process_type));
+
 		now = time(NULL);
 		sec = zbx_time();
-
-		zbx_setproctitle("escalator [processing escalations]");
 
 		process_escalations(now);
 
 		sec = zbx_time() - sec;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Escalator #%d spent " ZBX_FS_DBL " seconds while processing"
-				" escalation items. Sleeping for %d seconds",
-				process_num, sec, CONFIG_ESCALATOR_FREQUENCY);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while processing escalations",
+				get_process_type_string(process_type), process_num, sec);
 
-		zbx_setproctitle("escalator [sleeping for %d seconds]", CONFIG_ESCALATOR_FREQUENCY);
-
-		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
-		sleep(CONFIG_ESCALATOR_FREQUENCY);
-		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+		zbx_sleep_loop(CONFIG_ESCALATOR_FREQUENCY);
 	}
 }

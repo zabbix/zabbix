@@ -24,6 +24,7 @@
 #include "log.h"
 #include "zlog.h"
 #include "daemon.h"
+#include "zbxself.h"
 
 #include "../alerter/alerter.h"
 
@@ -42,6 +43,8 @@ ZBX_RECIPIENT	recipients[ZBX_MAX_RECIPIENTS];
 
 static int	num = 0;
 static int	lastsent = 0;
+
+extern unsigned char	process_type;
 
 /******************************************************************************
  *                                                                            *
@@ -199,7 +202,11 @@ void	main_watchdog_loop()
 	/* Disable writing to database in zabbix_syslog() */
 	CONFIG_ENABLE_LOG = 0;
 
+	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
+
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+	zbx_setproctitle("%s [initialize]", get_process_type_string(process_type));
 
 	init_config();
 
@@ -207,9 +214,11 @@ void	main_watchdog_loop()
 
 	for (;;)
 	{
+		zbx_setproctitle("%s [pinging database]", get_process_type_string(process_type));
+
 		ping_database();
 
-		sleep(60);
+		zbx_sleep_loop(60);
 	}
 
 	/* We will never reach this point */

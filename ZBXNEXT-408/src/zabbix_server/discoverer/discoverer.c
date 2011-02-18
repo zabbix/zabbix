@@ -34,6 +34,7 @@
 
 extern int		CONFIG_DISCOVERER_FORKS;
 static unsigned char	zbx_process;
+static unsigned char	process_type;
 extern int		process_num;
 
 /******************************************************************************
@@ -759,10 +760,14 @@ void	main_discoverer_loop(unsigned char p)
 
 	zbx_process = p;
 
+	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
+
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
 	{
+		zbx_setproctitle("%s [discovering network]", get_process_type_string(process_type));
+
 		now = time(NULL);
 		sec = zbx_time();
 		process_discovery(now);
@@ -771,17 +776,9 @@ void	main_discoverer_loop(unsigned char p)
 		nextcheck = get_minnextcheck(now);
 		sleeptime = calculate_sleeptime(nextcheck, DISCOVERER_DELAY);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Discoverer #%d spent " ZBX_FS_DBL " seconds while"
-				" processing rules. Sleeping for %d seconds.",
-				process_num, sec, sleeptime);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while processing rules",
+				get_process_type_string(process_type), process_num, sec);
 
-		if (sleeptime > 0)
-		{
-			zbx_setproctitle("discoverer [sleeping for %d seconds]", sleeptime);
-
-			update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
-			sleep(sleeptime);
-			update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
-		}
+		zbx_sleep_loop(sleeptime);
 	}
 }

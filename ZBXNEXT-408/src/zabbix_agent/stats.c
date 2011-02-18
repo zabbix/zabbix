@@ -264,6 +264,8 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
+		zbx_setproctitle("collector [processing data]");
+
 		if (CPU_COLLECTOR_STARTED(collector))
 			collect_cpustat(&(collector->cpus));
 #ifdef _WINDOWS
@@ -275,6 +277,7 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 #ifdef _AIX
 		collect_vmstat_data(&collector->vmstat);
 #endif
+		zbx_setproctitle("collector [sleeping for %d seconds]", 1);
 		zbx_sleep(1);
 	}
 

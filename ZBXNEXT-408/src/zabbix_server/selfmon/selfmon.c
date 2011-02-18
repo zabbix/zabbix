@@ -22,6 +22,8 @@
 #include "zbxself.h"
 #include "log.h"
 
+extern unsigned char	process_type;
+
 void	main_selfmon_loop()
 {
 	const char	*__function_name = "main_selfmon_loop";
@@ -30,11 +32,12 @@ void	main_selfmon_loop()
 
 	set_child_signal_handler();
 
-	zbx_setproctitle("self-monitoring collector");
-
 	for (;;)
 	{
+		zbx_setproctitle("%s [processing data]", get_process_type_string(process_type));
+
 		collect_selfmon_stats();
-		sleep(1);
+
+		zbx_sleep_loop(1);
 	}
 }

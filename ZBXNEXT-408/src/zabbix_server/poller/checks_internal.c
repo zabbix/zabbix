@@ -203,31 +203,11 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		if (0 != get_param(params, 2, tmp, sizeof(tmp)))
 			*tmp = '\0';
 
-		if (0 == strcmp(tmp, "poller"))
-			process_type = ZBX_PROCESS_TYPE_POLLER;
-		else if (0 == strcmp(tmp, "unreachable poller"))
-			process_type = ZBX_PROCESS_TYPE_UNREACHABLE;
-		else if (0 == strcmp(tmp, "ipmi poller"))
-			process_type = ZBX_PROCESS_TYPE_IPMIPOLLER;
-		else if (0 == strcmp(tmp, "pinger"))
-			process_type = ZBX_PROCESS_TYPE_PINGER;
-		else if (0 == strcmp(tmp, "http poller"))
-			process_type = ZBX_PROCESS_TYPE_HTTPPOLLER;
-		else if (0 == strcmp(tmp, "trapper"))
-			process_type = ZBX_PROCESS_TYPE_TRAPPER;
-		else if (0 == strcmp(tmp, "proxy poller"))
-			process_type = ZBX_PROCESS_TYPE_PROXYPOLLER;
-		else if (0 == strcmp(tmp, "escalator"))
-			process_type = ZBX_PROCESS_TYPE_ESCALATOR;
-		else if (0 == strcmp(tmp, "db syncer"))
-			process_type = ZBX_PROCESS_TYPE_DBSYNCER;
-		else if (0 == strcmp(tmp, "discoverer"))
-			process_type = ZBX_PROCESS_TYPE_DISCOVERER;
-		else if (0 == strcmp(tmp, "alerter"))
-			process_type = ZBX_PROCESS_TYPE_ALERTER;
-		else if (0 == strcmp(tmp, "timer"))
-			process_type = ZBX_PROCESS_TYPE_TIMER;
-		else
+		for (process_type = 0; process_type < ZBX_PROCESS_TYPE_COUNT; process_type++)
+			if (0 == strcmp(tmp, get_process_type_string(process_type)))
+				break;
+
+		if (ZBX_PROCESS_TYPE_COUNT == process_type)
 			goto not_supported;
 
 		if (0 != get_param(params, 3, tmp, sizeof(tmp)))

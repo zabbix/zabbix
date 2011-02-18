@@ -59,10 +59,17 @@ extern int	CONFIG_HTTPPOLLER_FORKS;
 extern int	CONFIG_TRAPPER_FORKS;
 extern int	CONFIG_PROXYPOLLER_FORKS;
 extern int	CONFIG_ESCALATOR_FORKS;
-extern int	CONFIG_DBSYNCER_FORKS;
+extern int	CONFIG_HISTSYNCER_FORKS;
 extern int	CONFIG_DISCOVERER_FORKS;
 extern int	CONFIG_ALERTER_FORKS;
 extern int	CONFIG_TIMER_FORKS;
+extern int	CONFIG_NODEWATCHER_FORKS;
+extern int	CONFIG_HOUSEKEEPER_FORKS;
+extern int	CONFIG_WATCHDOG_FORKS;
+extern int	CONFIG_DATASENDER_FORKS;
+extern int	CONFIG_CONFSYNCER_FORKS;
+extern int	CONFIG_HEARTBEAT_FORKS;
+extern int	CONFIG_SELFMON_FORKS;
 
 /******************************************************************************
  *                                                                            *
@@ -99,14 +106,91 @@ int	get_process_forks(unsigned char process_type)
 			return CONFIG_PROXYPOLLER_FORKS;
 		case ZBX_PROCESS_TYPE_ESCALATOR:
 			return CONFIG_ESCALATOR_FORKS;
-		case ZBX_PROCESS_TYPE_DBSYNCER:
-			return CONFIG_DBSYNCER_FORKS;
+		case ZBX_PROCESS_TYPE_HISTSYNCER:
+			return CONFIG_HISTSYNCER_FORKS;
 		case ZBX_PROCESS_TYPE_DISCOVERER:
 			return CONFIG_DISCOVERER_FORKS;
 		case ZBX_PROCESS_TYPE_ALERTER:
 			return CONFIG_ALERTER_FORKS;
 		case ZBX_PROCESS_TYPE_TIMER:
 			return CONFIG_TIMER_FORKS;
+		case ZBX_PROCESS_TYPE_NODEWATCHER:
+			return CONFIG_NODEWATCHER_FORKS;
+		case ZBX_PROCESS_TYPE_HOUSEKEEPER:
+			return CONFIG_HOUSEKEEPER_FORKS;
+		case ZBX_PROCESS_TYPE_WATCHDOG:
+			return CONFIG_WATCHDOG_FORKS;
+		case ZBX_PROCESS_TYPE_DATASENDER:
+			return CONFIG_DATASENDER_FORKS;
+		case ZBX_PROCESS_TYPE_CONFSYNCER:
+			return CONFIG_CONFSYNCER_FORKS;
+		case ZBX_PROCESS_TYPE_HEARTBEAT:
+			return CONFIG_HEARTBEAT_FORKS;
+		case ZBX_PROCESS_TYPE_SELFMON:
+			return CONFIG_SELFMON_FORKS;
+	}
+
+	assert(0);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: getx_process_type_string                                          *
+ *                                                                            *
+ * Purpose: Returns process name                                              *
+ *                                                                            *
+ * Parameters: process_type - [IN] process type; ZBX_PROCESS_TYPE_*           *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments: used in internals checks zabbix["process",...], process titles   *
+ *           and log files                                                    *
+ *                                                                            *
+ ******************************************************************************/
+const char	*get_process_type_string(unsigned char process_type)
+{
+	switch (process_type)
+	{
+		case ZBX_PROCESS_TYPE_POLLER:
+			return "poller";
+		case ZBX_PROCESS_TYPE_UNREACHABLE:
+			return "unreachable poller";
+		case ZBX_PROCESS_TYPE_IPMIPOLLER:
+			return "ipmi poller";
+		case ZBX_PROCESS_TYPE_PINGER:
+			return "icmp pinger";
+		case ZBX_PROCESS_TYPE_HTTPPOLLER:
+			return "http poller";
+		case ZBX_PROCESS_TYPE_TRAPPER:
+			return "trapper";
+		case ZBX_PROCESS_TYPE_PROXYPOLLER:
+			return "proxy poller";
+		case ZBX_PROCESS_TYPE_ESCALATOR:
+			return "escalator";
+		case ZBX_PROCESS_TYPE_HISTSYNCER:
+			return "history syncer";
+		case ZBX_PROCESS_TYPE_DISCOVERER:
+			return "discoverer";
+		case ZBX_PROCESS_TYPE_ALERTER:
+			return "alerter";
+		case ZBX_PROCESS_TYPE_TIMER:
+			return "timer";
+		case ZBX_PROCESS_TYPE_NODEWATCHER:
+			return "node watcher";
+		case ZBX_PROCESS_TYPE_HOUSEKEEPER:
+			return "housekeeper";
+		case ZBX_PROCESS_TYPE_WATCHDOG:
+			return "db watchdog";
+		case ZBX_PROCESS_TYPE_DATASENDER:
+			return "data sender";
+		case ZBX_PROCESS_TYPE_CONFSYNCER:
+			return "configuration syncer";
+		case ZBX_PROCESS_TYPE_HEARTBEAT:
+			return "heartbeat sender";
+		case ZBX_PROCESS_TYPE_SELFMON:
+			return "self-monitoring";
 	}
 
 	assert(0);
@@ -354,7 +438,7 @@ int	get_selfmon_stats(unsigned char process_type, int process_num, unsigned char
 	unsigned int		total = 0, counter = 0;
 	zbx_stat_process_t	*process;
 	unsigned char		s;
-	int			process_forks, current, res = SUCCEED;
+	int			process_forks, current, res = NOTSUPPORTED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -363,18 +447,18 @@ int	get_selfmon_stats(unsigned char process_type, int process_num, unsigned char
 	if (0 != process_num)
 	{
 		if (process_num > process_forks)
-		{
-			res = NOTSUPPORTED;
 			goto exit;
-		}
 
 		process_forks = process_num--;
 	}
 
 	LOCK_SM;
 
-	if (0 == collector->count)
+	if (collector->count <= 1)
+	{
+		res = SUCCEED;
 		goto unlock;
+	}
 
 	current = (collector->first + collector->count - 1) % MAX_HISTORY;
 
@@ -387,15 +471,54 @@ int	get_selfmon_stats(unsigned char process_type, int process_num, unsigned char
 					process->h_counter[s][collector->first]);
 		counter += (unsigned short)(process->h_counter[state][current] -
 				process->h_counter[state][collector->first]);
+		res = SUCCEED;
 	}
 
 unlock:
 	UNLOCK_SM;
 
-	*value = (0 == total ? 0 : 100. * (double)counter / (double)total);
+	if (SUCCEED == res)
+		*value = (0 == total ? 0 : 100. * (double)counter / (double)total);
 
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
 	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_sleep_loop                                                   *
+ *                                                                            *
+ * Purpose: sleeping process                                                  *
+ *                                                                            *
+ * Parameters: sleeptime - [IN] required sleeptime, in seconds                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_sleep_loop(int sleeptime)
+{
+	extern unsigned char	process_type;
+
+	if (sleeptime <= 0)
+		return;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "sleeping for %d seconds", sleeptime);
+
+	update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+
+	do
+	{
+		zbx_setproctitle("%s [sleeping for %d seconds]",
+				get_process_type_string(process_type), sleeptime);
+		sleep(1);
+	}
+	while (--sleeptime > 0);
+
+	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 }

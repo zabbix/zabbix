@@ -46,6 +46,7 @@
 #define MAX_UNREACHABLE_ITEMS	1	/* must not be greater than MAX_REACHABLE_ITEMS to avoid buffer overflow */
 
 static unsigned char	zbx_process;
+extern unsigned char	process_type;
 extern int		process_num;
 
 static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
@@ -698,17 +699,20 @@ void	main_poller_loop(unsigned char p, unsigned char poller_type)
 	int		nextcheck, sleeptime, processed;
 	double		sec;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In main_poller_loop() poller_type:%d process_num:%d", (int)poller_type, process_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In main_poller_loop() process_type:'%s' process_num:%d",
+			get_process_type_string(process_type), process_num);
 
 	set_child_signal_handler();
 
 	zbx_process = p;
 
+	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
+
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
 	{
-		zbx_setproctitle("%s [getting values]", zbx_poller_type_string(poller_type));
+		zbx_setproctitle("%s [getting values]", get_process_type_string(process_type));
 
 		sec = zbx_time();
 		processed = get_values(poller_type);
@@ -717,17 +721,9 @@ void	main_poller_loop(unsigned char p, unsigned char poller_type)
 		nextcheck = DCconfig_get_poller_nextcheck(poller_type);
 		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while updating %d values."
-				" Sleeping for %d seconds",
-				zbx_poller_type_string(poller_type), process_num, sec, processed, sleeptime);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while updating %d values",
+				get_process_type_string(process_type), process_num, sec, processed);
 
-		if (sleeptime > 0)
-		{
-			zbx_setproctitle("%s [sleeping for %d seconds]",
-					zbx_poller_type_string(poller_type), sleeptime);
-			update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
-			sleep(sleeptime);
-			update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
-		}
+		zbx_sleep_loop(sleeptime);
 	}
 }

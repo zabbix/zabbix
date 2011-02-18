@@ -43,6 +43,7 @@
 #include "daemon.h"
 
 static unsigned char	zbx_process;
+static unsigned char	process_type;
 
 /******************************************************************************
  *                                                                            *
@@ -423,11 +424,13 @@ void	main_trapper_loop(unsigned char p, zbx_sock_t *s)
 
 	zbx_process = p;
 
+	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
+
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
 	{
-		zbx_setproctitle("trapper [waiting for connection]");
+		zbx_setproctitle("%s [waiting for connection]", get_process_type_string(process_type));
 
 		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
@@ -435,7 +438,7 @@ void	main_trapper_loop(unsigned char p, zbx_sock_t *s)
 		{
 			update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
-			zbx_setproctitle("trapper [processing data]");
+			zbx_setproctitle("%s [processing data]", get_process_type_string(process_type));
 
 			process_trapper_child(s);
 

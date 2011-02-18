@@ -27,9 +27,10 @@
 #include "dbcache.h"
 #include "dbsyncer.h"
 
-extern int	CONFIG_DBSYNCER_FREQUENCY;
-extern int	ZBX_SYNC_MAX;
-extern int	process_num;
+extern int		CONFIG_DBSYNCER_FREQUENCY;
+extern int		ZBX_SYNC_MAX;
+extern unsigned char	process_type;
+extern int		process_num;
 
 /******************************************************************************
  *                                                                            *
@@ -52,16 +53,18 @@ void	main_dbsyncer_loop()
 	double	sec;
 	int	retry_up = 0, retry_dn = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In main_dbsyncer_loop()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In main_dbsyncer_loop() process_num:%d", process_num);
 
 	set_child_signal_handler();
 
-	zbx_setproctitle("db syncer [connecting to the database]");
+	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
 	{
+		zbx_setproctitle("%s [syncing history]", get_process_type_string(process_type));
+
 		zabbix_log(LOG_LEVEL_DEBUG, "Syncing ...");
 
 		now = time(NULL);
@@ -109,17 +112,9 @@ void	main_dbsyncer_loop()
 
 		last_sleeptime = sleeptime;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "DB syncer #%d spent " ZBX_FS_DBL " seconds while processing %d items. "
-				"Nextsync after %d sec.",
-				process_num, sec, num, sleeptime);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while processing %d items",
+				get_process_type_string(process_type), process_num, sec, num);
 
-		if (sleeptime > 0)
-		{
-			zbx_setproctitle("db syncer [sleeping for %d seconds]", sleeptime);
-
-			update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
-			sleep(sleeptime);
-			update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
-		}
+		zbx_sleep_loop(sleeptime);
 	}
 }

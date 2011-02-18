@@ -21,10 +21,13 @@
 #include "db.h"
 #include "log.h"
 #include "daemon.h"
+#include "zbxself.h"
 
 #include "nodewatcher.h"
 #include "nodesender.h"
 #include "history.h"
+
+extern unsigned char	process_type;
 
 /******************************************************************************
  *                                                                            *
@@ -167,12 +170,14 @@ void	main_nodewatcher_loop()
 
 	set_child_signal_handler();
 
-	zbx_setproctitle("connecting to the database");
+	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
 	{
+		zbx_setproctitle("%s [data exchange]", get_process_type_string(process_type));
+
 		start = time(NULL);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Starting sync with nodes");
@@ -188,11 +193,6 @@ void	main_nodewatcher_loop()
 
 		end = time(NULL);
 
-		if (end - start < 10)
-		{
-			zbx_setproctitle("sender [sleeping for %d seconds]", 10 - (end - start));
-			zabbix_log(LOG_LEVEL_DEBUG, "Sleeping %d seconds", 10 - (end - start));
-			sleep(10 - (end - start));
-		}
+		zbx_sleep_loop(10 - (end - start));
 	}
 }

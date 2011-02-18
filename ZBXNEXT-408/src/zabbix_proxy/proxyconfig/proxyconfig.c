@@ -22,11 +22,14 @@
 #include "log.h"
 #include "daemon.h"
 #include "proxy.h"
+#include "zbxself.h"
 
 #include "proxyconfig.h"
 #include "../servercomms.h"
 
-#define CONFIG_PROXYCONFIG_RETRY 120 /* seconds */
+#define CONFIG_PROXYCONFIG_RETRY	120	/* seconds */
+
+extern unsigned char	process_type;
 
 /******************************************************************************
  *                                                                            *
@@ -97,22 +100,16 @@ void	main_proxyconfig_loop()
 
 	set_child_signal_handler();
 
-	zbx_setproctitle("configuration syncer [connecting to the database]]");
+	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
 	{
-		zbx_setproctitle("configuration syncer [load configuration]");
+		zbx_setproctitle("%s [load configuration]", get_process_type_string(process_type));
 
 		process_configuration_sync();
 
-		zbx_setproctitle("configuration syncer"
-				" [sleeping for %d seconds]",
-				CONFIG_PROXYCONFIG_FREQUENCY);
-		zabbix_log(LOG_LEVEL_DEBUG, "Sleeping for %d seconds",
-				CONFIG_PROXYCONFIG_FREQUENCY);
-
-		sleep(CONFIG_PROXYCONFIG_FREQUENCY);
+		zbx_sleep_loop(CONFIG_PROXYCONFIG_FREQUENCY);
 	}
 }

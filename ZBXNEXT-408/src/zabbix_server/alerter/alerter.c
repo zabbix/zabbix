@@ -30,6 +30,8 @@
 
 #include "alerter.h"
 
+extern unsigned char	process_type;
+
 /******************************************************************************
  *                                                                            *
  * Function: execute_action                                                   *
@@ -157,12 +159,14 @@ void	main_alerter_loop()
 
 	set_child_signal_handler();
 
-	zbx_setproctitle("connecting to the database");
+	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
 	{
+		zbx_setproctitle("%s [sending alerts]", get_process_type_string(process_type));
+
 		now = time(NULL);
 
 		result = DBselect("select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,mt.mediatypeid"
@@ -239,11 +243,6 @@ void	main_alerter_loop()
 		}
 		DBfree_result(result);
 
-		zbx_setproctitle("sender [sleeping for %d seconds]",
-				CONFIG_SENDER_FREQUENCY);
-
-		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
-		sleep(CONFIG_SENDER_FREQUENCY);
-		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+		zbx_sleep_loop(CONFIG_SENDER_FREQUENCY);
 	}
 }

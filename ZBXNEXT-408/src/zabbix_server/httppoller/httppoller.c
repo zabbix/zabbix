@@ -27,7 +27,8 @@
 #include "httptest.h"
 #include "httppoller.h"
 
-extern int	process_num;
+extern unsigned char	process_type;
+extern int		process_num;
 
 /******************************************************************************
  *                                                                            *
@@ -103,11 +104,13 @@ void	main_httppoller_loop()
 
 	set_child_signal_handler();
 
+	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
+
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
 	{
-		zbx_setproctitle("http poller [getting values]");
+		zbx_setproctitle("%s [getting values]", get_process_type_string(process_type));
 
 		now = time(NULL);
 		sec = zbx_time();
@@ -117,17 +120,9 @@ void	main_httppoller_loop()
 		nextcheck = get_minnextcheck(now);
 		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "HTTP poller #%d spent " ZBX_FS_DBL " seconds while updating HTTP tests"
-				" Sleeping for %d seconds",
-				process_num, sec, sleeptime);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while updating HTTP tests",
+				get_process_type_string(process_type), process_num, sec);
 
-		if (sleeptime > 0)
-		{
-			zbx_setproctitle("http poller [sleeping for %d seconds]", sleeptime);
-
-			update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
-			sleep(sleeptime);
-			update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
-		}
+		zbx_sleep_loop(sleeptime);
 	}
 }

@@ -39,7 +39,8 @@
 
 #define MAX_ITEMS	128
 
-extern int	process_num;
+extern unsigned char	process_type;
+extern int		process_num;
 
 /******************************************************************************
  *                                                                            *
@@ -462,7 +463,7 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count)
 		if (i == items_count - 1 || items[i].count != items[i + 1].count || items[i].interval != items[i + 1].interval ||
 				items[i].size != items[i + 1].size || items[i].timeout != items[i + 1].timeout)
 		{
-			zbx_setproctitle("pinger [pinging hosts]");
+			zbx_setproctitle("%s [pinging hosts]", get_process_type_string(process_type));
 
 			now = time(NULL);
 			ping_result = do_ping(hosts, hosts_count,
@@ -509,12 +510,14 @@ void	main_pinger_loop()
 	if (NULL == items)
 		items = zbx_malloc(items, sizeof(icmpitem_t) * items_alloc);
 
-	zbx_setproctitle("pinger [connecting to the database]");
+	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
 	{
+		zbx_setproctitle("%s [getting values]", get_process_type_string(process_type));
+
 		now = time(NULL);
 		sec = zbx_time();
 		get_pinger_hosts(&items, &items_alloc, &items_count, now);
@@ -524,20 +527,11 @@ void	main_pinger_loop()
 		nextcheck = DCconfig_get_poller_nextcheck(ZBX_POLLER_TYPE_PINGER);
 		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while processing %d items."
-				" Sleeping for %d seconds",
-				zbx_poller_type_string(ZBX_POLLER_TYPE_PINGER), process_num, sec, items_count,
-				sleeptime);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while processing %d items",
+				get_process_type_string(process_type), process_num, sec, items_count);
 
 		free_hosts(&items, &items_count);
 
-		if (sleeptime > 0)
-		{
-			zbx_setproctitle("%s [sleeping for %d seconds]",
-					zbx_poller_type_string(ZBX_POLLER_TYPE_PINGER), sleeptime);
-			update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
-			sleep(sleeptime);
-			update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
-		}
+		zbx_sleep_loop(sleeptime);
 	}
 }

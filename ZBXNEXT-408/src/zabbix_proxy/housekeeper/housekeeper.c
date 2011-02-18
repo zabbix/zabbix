@@ -21,8 +21,11 @@
 #include "db.h"
 #include "log.h"
 #include "daemon.h"
+#include "zbxself.h"
 
 #include "housekeeper.h"
+
+extern unsigned char	process_type;
 
 /******************************************************************************
  *                                                                            *
@@ -147,17 +150,17 @@ void	main_housekeeper_loop()
 
 		zabbix_log(LOG_LEVEL_WARNING, "Executing housekeeper");
 
-		zbx_setproctitle("housekeeper [connecting to the database]");
+		zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-		zbx_setproctitle("housekeeper [removing old history]");
+		zbx_setproctitle("%s [removing old history]", get_process_type_string(process_type));
 
 		sec = zbx_time();
 
 		records = housekeeping_history(start);
 
-		zabbix_log(LOG_LEVEL_WARNING, "Deleted %d records from history [%f seconds]",
+		zabbix_log(LOG_LEVEL_WARNING, "Deleted %d records from history [" ZBX_FS_DBL " seconds]",
 				records,
 				zbx_time() - sec);
 
@@ -165,13 +168,6 @@ void	main_housekeeper_loop()
 
 		sleeptime = CONFIG_HOUSEKEEPING_FREQUENCY * 3600 - (time(NULL) - start);
 
-		if (sleeptime > 0)
-		{
-			zbx_setproctitle("housekeeper [sleeping for %d seconds]",
-					sleeptime);
-			zabbix_log(LOG_LEVEL_DEBUG, "Sleeping for %d seconds",
-					sleeptime);
-			sleep(sleeptime);
-		}
+		zbx_sleep_loop(sleeptime);
 	}
 }

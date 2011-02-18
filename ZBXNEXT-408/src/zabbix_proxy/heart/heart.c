@@ -21,9 +21,12 @@
 #include "daemon.h"
 #include "log.h"
 #include "zbxjson.h"
+#include "zbxself.h"
 
 #include "heart.h"
 #include "../servercomms.h"
+
+extern unsigned char	process_type;
 
 /******************************************************************************
  *                                                                            *
@@ -83,31 +86,16 @@ void	main_heart_loop()
 
 	set_child_signal_handler();
 
-	if (0 == CONFIG_HEARTBEAT_FREQUENCY)
-	{
-		zbx_setproctitle("heartbeat sender [sleeping forever]");
-
-		for (;;)
-			sleep(SEC_PER_HOUR);
-	}
-
 	for (;;)
 	{
 		start = time(NULL);
 
-		zbx_setproctitle("heartbeat sender [sending heartbeat message]");
+		zbx_setproctitle("%s [sending heartbeat message]", get_process_type_string(process_type));
 
 		send_heartbeat();
 
 		sleeptime = CONFIG_HEARTBEAT_FREQUENCY - (time(NULL) - start);
 
-		if (sleeptime > 0)
-		{
-			zbx_setproctitle("heartbeat sender [sleeping for %d seconds]",
-					sleeptime);
-			zabbix_log(LOG_LEVEL_DEBUG, "Sleeping for %d seconds",
-					sleeptime);
-			sleep(sleeptime);
-		}
+		zbx_sleep_loop(sleeptime);
 	}
 }

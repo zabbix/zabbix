@@ -82,13 +82,13 @@ ZBX_THREAD_ENTRY(listener_thread, pSock)
 
 	while (ZBX_IS_RUNNING())
 	{
-		zbx_setproctitle("waiting for connection");
+		zbx_setproctitle("trapper [waiting for connection]");
 
 		if (SUCCEED == (ret = zbx_tcp_accept(&s)))
 		{
 			local_request_failed = 0;     /* Reset consecutive errors counter */
 
-			zbx_setproctitle("processing request");
+			zbx_setproctitle("trapper [processing request]");
 			zabbix_log(LOG_LEVEL_DEBUG, "Processing request.");
 
 			if (SUCCEED == (ret = zbx_tcp_check_security(&s, CONFIG_HOSTS_ALLOWED, 0)))

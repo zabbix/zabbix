@@ -29,7 +29,8 @@
 #include "log.h"
 #include "proxy.h"
 
-extern int	process_num;
+extern unsigned char	process_type;
+extern int		process_num;
 
 static int	connect_to_proxy(DC_HOST *host, zbx_sock_t *sock, int timeout)
 {
@@ -328,15 +329,17 @@ void	main_proxypoller_loop()
 	int		nextcheck, sleeptime, processed;
 	double		sec;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() process_num:%d", __function_name, process_num);
 
 	set_child_signal_handler();
+
+	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
 	{
-		zbx_setproctitle("proxy poller [data exchange]");
+		zbx_setproctitle("%s [data exchange]", get_process_type_string(process_type));
 
 		sec = zbx_time();
 		processed = process_proxy();
@@ -345,17 +348,9 @@ void	main_proxypoller_loop()
 		nextcheck = DCconfig_get_proxy_nextcheck();
 		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Proxy poller #%d spent " ZBX_FS_DBL
-				" seconds while processing %3d proxies."
-				" Sleeping for %d seconds",
-				process_num, sec, processed, sleeptime);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while processing %3d proxies",
+				get_process_type_string(process_type), process_num, sec, processed);
 
-		if (sleeptime > 0)
-		{
-			zbx_setproctitle("proxy poller [sleeping for %d seconds]", sleeptime);
-			update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
-			sleep(sleeptime);
-			update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
-		}
+		zbx_sleep_loop(sleeptime);
 	}
 }

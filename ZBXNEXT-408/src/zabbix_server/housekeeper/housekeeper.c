@@ -21,8 +21,11 @@
 #include "db.h"
 #include "log.h"
 #include "daemon.h"
+#include "zbxself.h"
 
 #include "housekeeper.h"
+
+extern unsigned char	process_type;
 
 /******************************************************************************
  *                                                                            *
@@ -353,31 +356,31 @@ void	main_housekeeper_loop()
 		zabbix_log(LOG_LEVEL_WARNING, "Executing housekeeper");
 		now = time(NULL);
 
-		zbx_setproctitle("housekeeper [connecting to the database]");
+		zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 /* Transaction is not required here. It causes timeouts under MySQL. */
 /*		DBbegin();*/
 
-		zbx_setproctitle("housekeeper [removing old history]");
+		zbx_setproctitle("%s [removing old history]", get_process_type_string(process_type));
 
 		d = housekeeping_history_and_trends(now);
 		zabbix_log(LOG_LEVEL_WARNING, "Deleted %d records from history and trends", d);
 
-		zbx_setproctitle("housekeeper [removing old history]");
+		zbx_setproctitle("%s [removing old history]", get_process_type_string(process_type));
 
 		housekeeping_process_log(now);
 
-		zbx_setproctitle("housekeeper [removing old events]");
+		zbx_setproctitle("%s [removing old events]", get_process_type_string(process_type));
 
 		housekeeping_events(now);
 
-		zbx_setproctitle("housekeeper [removing old alerts]");
+		zbx_setproctitle("%s [removing old alerts]", get_process_type_string(process_type));
 
 		housekeeping_alerts(now);
 
-		zbx_setproctitle("housekeeper [removing old sessions]");
+		zbx_setproctitle("%s [removing old sessions]", get_process_type_string(process_type));
 
 		housekeeping_sessions(now);
 
@@ -390,9 +393,6 @@ void	main_housekeeper_loop()
 
 		DBclose();
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Sleeping for %d hours", CONFIG_HOUSEKEEPING_FREQUENCY);
-		zbx_setproctitle("housekeeper [sleeping for %d hours]", CONFIG_HOUSEKEEPING_FREQUENCY);
-
-		sleep(SEC_PER_HOUR * CONFIG_HOUSEKEEPING_FREQUENCY);
+		zbx_sleep_loop(SEC_PER_HOUR * CONFIG_HOUSEKEEPING_FREQUENCY);
 	}
 }
