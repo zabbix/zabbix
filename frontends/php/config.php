@@ -591,8 +591,6 @@ include_once('include/page_header.php');
 <?php
 	$form = new CForm('get','config.php');
 	$cmbConfig = new CCombobox('config',$_REQUEST['config'], 'javascript: redirect("config.php?config="+this.options[this.selectedIndex].value);');
-//	$cmbConfig->addItem(4,S_AUTOREGISTRATION);
-//	$cmbConfig->addItem(2,S_ESCALATION_RULES);
 	$cmbConfig->addItem(8,S_GUI);
 	$cmbConfig->addItem(0,S_HOUSEKEEPER);
 	$cmbConfig->addItem(3,S_IMAGES);
