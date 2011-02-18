@@ -27,14 +27,8 @@
 #include "perfstat.h"
 
 #if defined(ZABBIX_DAEMON)
-/* use pid file configuration */
 #	include "daemon.h"
 #endif	/* ZABBIX_DAEMON */
-
-#if defined(WITH_PLUGINS)
-/* use Zabbix plugins configurations */
-#	include "zbxplugin.h"
-#endif	/* WITH_PLUGINS */
 
 char	*CONFIG_HOSTS_ALLOWED		= NULL;
 char	*CONFIG_HOSTNAME		= NULL;
@@ -193,10 +187,6 @@ void	load_user_parameters(int optional)
 		{"PerfCounter",			NULL,					&add_perfs_from_config,
 			TYPE_STRING,	PARM_OPT,	0,			0},
 #endif	/* _WINDOWS */
-#ifdef WITH_PLUGINS
-		{"Plugin",			NULL,					&add_plugin,
-			TYPE_STRING,	PARM_OPT,	0,			0},
-#endif	/* WITH_PLUGINS */
 		{NULL}
 	};
 
