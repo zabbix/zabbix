@@ -1984,8 +1984,6 @@
 	'S_ACTIVATE_SELECTED_APPLICATIONS' => _('Activate selected applications?'),
 	'S_DISABLE_SELECTED_APPLICATIONS' => _('Disable selected applications?'),
 	'S_DELETE_SELECTED_APPLICATIONS'  => _('Delete selected applications?'),
-	'S_CANNOT_UPDATE_APPLICATION'  => _('Cannot update application'),
-	'S_CANNOT_DELETE_APPLICATION'  => _('Cannot delete application'),
 
 // popup_media.php
 	'S_INCORRECT_TIME_PERIOD'=>	_('Incorrect time period'),
