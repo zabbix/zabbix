@@ -83,7 +83,7 @@ void	disconnect_server(zbx_sock_t *sock)
  * Return value: SUCCESS - processed successfully                             *
  *               FAIL - an error occurred                                     *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -129,7 +129,7 @@ exit:
  * Return value: SUCCESS - processed successfully                             *
  *               FAIL - an error occurred                                     *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *

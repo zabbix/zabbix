@@ -863,7 +863,7 @@ static int	get_host_profile_value_by_triggerid(zbx_uint64_t triggerid, char **re
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1879,7 +1879,7 @@ static int	get_event_ack_history(DB_EVENT *event, char **replace_to)
  * Return value: returns requested host profile value                         *
  *                      or *UNKNOWN* if profile is not defined                *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -2661,7 +2661,7 @@ void	substitute_macros(DB_EVENT *event, DB_ESCALATION *escalation, char **data)
  * Return value:  SUCCEED - evaluated successfully, exp - updated expression  *
  *                FAIL - otherwise                                            *
  *                                                                            *
- * Author: Alexei Vladishev, Aleksander Vladishev, Aleksandrs Saveljevs       *
+ * Author: Alexei Vladishev, Alexander Vladishev, Aleksandrs Saveljevs        *
  *                                                                            *
  * Comments: example: "({15}>10)|({123}=0)" => "(6.456>10)|(0=0)              *
  *                                                                            *
