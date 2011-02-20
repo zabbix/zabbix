@@ -38,7 +38,7 @@
  * Return value:  SUCCEED - master_nodeid is a master node of current_nodeid  *
  *                FAIL - otherwise                                            *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -118,7 +118,7 @@ int	is_slave_node(int current_nodeid, int slave_nodeid)
  * Return value:  SUCCEED - slave_nodeid is our direct slave node             *
  *                FAIL - otherwise                                            *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
