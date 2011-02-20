@@ -190,7 +190,7 @@ lbl_return:
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Eugene Grigorjev, Aleksander Vladishev                             *
+ * Author: Eugene Grigorjev, Alexander Vladishev                              *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -239,7 +239,7 @@ void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Eugene Grigorjev, Aleksander Vladishev                             *
+ * Author: Eugene Grigorjev, Alexander Vladishev                              *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
