@@ -607,9 +607,9 @@ Copt::memoryPick();
 									'name'=>$maintenance['name']
 								)
 				);
-				$recieved_maintenaces = API::Maintenance()->get($options);
+				$received_maintenaces = API::Maintenance()->get($options);
 				// now going though a result, to find records with different id, then our object
-				foreach($recieved_maintenaces as $r_maintenace){
+				foreach($received_maintenaces as $r_maintenace){
 					if ($r_maintenace['maintenanceid'] != $maintenance['maintenanceid']) {
 						//error! Maintenance with this name already exists
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_MAINTENANCE.' [ '.$maintenance['name'].' ] '.S_ALREADY_EXISTS_SMALL);
@@ -677,7 +677,7 @@ Copt::memoryPick();
 				$db_timeperiods = DBselect($sql);
 				while($timeperiod = DBfetch($db_timeperiods)){
 					$timeperiodids[] = $timeperiod['timeperiodid']; // list of ids
-					$timeperiods[] = $timeperiod; // list ob objects
+					$timeperiods[] = $timeperiod; // list of objects
 				}
 
 				// have time periods changed?
