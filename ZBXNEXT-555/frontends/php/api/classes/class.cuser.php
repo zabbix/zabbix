@@ -614,7 +614,7 @@ Copt::memoryPick();
 			$options = array(
 				'nodeids' => id2nodeid(self::$userData['userid']),
 				'userids' => self::$userData['userid'],
-			'output' => API_OUTPUT_EXTEND,
+				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1
 			);
 			$upd_users = $this->get($options);

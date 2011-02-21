@@ -548,11 +548,11 @@
 
 			if(!$valid){
 				if($flags&P_SYS){
-					info(S_CRITICAL_ERROR.'.'.SPACE.S_INCORRECT_VALUE_FOR.SPACE.'['.$caption.'] = "'.$_REQUEST[$field].'"');
+					info(_s('Critical error. Incorrect value "%1$s" for "%2$s" field.',$_REQUEST[$field], $caption));
 					return ZBX_VALID_ERROR;
 				}
 				else{
-					info(S_WARNING.'.'.SPACE.S_INCORRECT_VALUE_FOR.SPACE.'['.$caption.']');
+					info(_s('Warning. Incorrect value for field "%s".',$caption));
 					return ZBX_VALID_WARNING;
 				}
 			}

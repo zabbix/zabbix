@@ -44,7 +44,7 @@ static int	buffer_allocated, tmp_allocated;
  * Return value:  SUCCEED - sent successfully                                 *
  *                FAIL - an error occurred                                    *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *

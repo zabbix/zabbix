@@ -1881,7 +1881,7 @@ const char	*get_string(const char *p, char *buf, size_t bufsize)
  * Return value:                                                              *
  *      '0'-'f'                                                               *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1906,7 +1906,7 @@ char	zbx_num2hex(u_char c)
  * Return value:                                                              *
  *      0-15                                                                  *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1933,7 +1933,7 @@ u_char	zbx_hex2num(char c)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1977,7 +1977,7 @@ int	zbx_binary2hex(const u_char *input, int ilen, char **output, int *olen)
  * Return value:                                                              *
  *	size of buffer                                                        *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -2020,7 +2020,7 @@ int	zbx_hex2binary(char *io)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -2105,7 +2105,7 @@ int	zbx_pg_escape_bytea(const u_char *input, int ilen, char **output, int *olen)
  *                                                                            *
  * Return value: length of the binary buffer                                  *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -2161,7 +2161,7 @@ int	zbx_pg_unescape_bytea(u_char *io)
  *                                                                            *
  * Return value: pointer to the next field                                    *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *

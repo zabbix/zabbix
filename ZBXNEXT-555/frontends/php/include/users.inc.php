@@ -20,17 +20,17 @@
 ?>
 <?php
 
-	function getUserTheme($USER_DETAILS){
+	function getUserTheme($user){
 		$config = select_config();
 
 		if(isset($config['default_theme']))
 			$css = $config['default_theme'];
 
-		if(isset($USER_DETAILS['theme']) &&
-			($USER_DETAILS['theme']!=ZBX_DEFAULT_CSS) &&
-			($USER_DETAILS['alias']!=ZBX_GUEST_USER))
+		if(isset($user['theme']) &&
+			($user['theme']!=ZBX_DEFAULT_CSS) &&
+			($user['alias']!=ZBX_GUEST_USER))
 		{
-			$css = $USER_DETAILS['theme'];
+			$css = $user['theme'];
 		}
 		if(!isset($css)) $css = 'css_ob.css';
 	return $css;
@@ -54,8 +54,7 @@
 
 	function user_auth_type2str($auth_type){
 		if(is_null($auth_type)){
-			global $USER_DETAILS;
-			$auth_type = get_user_auth($USER_DETAILS['userid']);
+			$auth_type = get_user_auth(CWebUser::$data['userid']);
 		}
 
 		$auth_user_type[GROUP_GUI_ACCESS_SYSTEM]	= S_SYSTEM_DEFAULT;
@@ -125,11 +124,10 @@
 // description:
 //		checks if user is adding himself to disabled group
 	function granted2update_group($usrgrpids){
-		global $USER_DETAILS;
 		zbx_value2array($usrgrpids);
 
 		$users = get_userid_by_usrgrpid($usrgrpids);
-		$result=(!isset($users[$USER_DETAILS['userid']]));
+		$result=(!isset($users[CWebUser::$data['userid']]));
 
 	return $result;
 	}
@@ -138,14 +136,13 @@
 // description:
 //		checks if user is adding himself to disabled group
 	function granted2move_user($userid,$usrgrpid){
-		global $USER_DETAILS;
 
 		$result = true;
 		$group = API::UserGroup()->get(array('usrgrpids' => $usrgrpid,  'output' => API_OUTPUT_EXTEND));
 		$group = reset($group);
 
 		if(($group['gui_access'] == GROUP_GUI_ACCESS_DISABLED) || ($group['users_status'] == GROUP_STATUS_DISABLED)){
-			$result=(bccomp($USER_DETAILS['userid'],$userid)!=0);
+			$result=(bccomp(CWebUser::$data['userid'],$userid)!=0);
 		}
 
 	return $result;

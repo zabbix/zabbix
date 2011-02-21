@@ -1,29 +1,29 @@
 /* Color CSS Document */
 .ok{ color: #00AA00; }
-.fail{ color: #D40000; }
+.fail{ color: #DC0000; }
 .info{ color: #444444; }
 
 .footer 	{ 	color: #CCCCCC;	}
 .enabled	{	color: #00AA00;	}
-.disabled	{	color: #D40000;	}
+.disabled	{	color: #DC0000;	}
 .unknown	{	color: #AAAAAA;	}
-.on			{	color: #D40000;	}
+.on			{	color: #DC0000;	}
 .off		{	color: #00AA00;	}
 .hidden		{	display: none;	}
 
 .green	{ color: #00AA00; }
-.red	{ color: #D40000; }
+.red	{ color: #DC0000; }
 .orange	{ color: #EE6000; }
-.blue	{ color: #0033FF; }
+.blue	{ color: #0099FF; }
 .gold	{ color: #999900; }
 
-.disaster	{	background-color: #FF0000;	color: #222222;}
-.high		{	background-color: #FF8888;	color: #222222;}
-.average	{	background-color: #DDAAAA;	color: #222222;}
-.warning	{	background-color: #EFEFCC;	color: #222222;}
-.information	{	background-color: #CCE2CC;	color: #222222;}
-.unknown_trigger{	background-color: #BCBCBC;	color: #222222;}
-.normal		{	background-color: #AADDAA;	color: #222222;}
+.disaster	{	background-color: #FF3838;	color: #222222;}
+.high		{	background-color: #FF9999;	color: #222222;}
+.average	{	background-color: #FFB689;	color: #222222;}
+.warning	{	background-color: #FFF384;	color: #222222;}
+.information	{	background-color: #ADEDFF;	color: #222222;}
+.unknown_trigger{	background-color: #CECECE;	color: #222222;}
+.normal		{	background-color: #AFFFAF;	color: #222222;}
 
 .textcolorstyles{ color: #000000; }
 .textblackwhite{ color: #000000; }
@@ -34,10 +34,10 @@ a.enabled:visited 	{	color:#00AA00;	}
 a.enabled:hover 	{	color:#44CC44;	}
 a.enabled:active 	{	color:#00AA00;	}
 
-a.disabled:link		{	color:#D40000;	}
-a.disabled:visited 	{	color:#D40000;	}
+a.disabled:link		{	color:#DC0000;	}
+a.disabled:visited 	{	color:#DC0000;	}
 a.disabled:hover 	{	color:#CC4444;	}
-a.disabled:active 	{	color:#D40000;	}
+a.disabled:active 	{	color:#DC0000;	}
 
 a.orange:link		{	color:#EE7000;	}
 a.orange:visited 	{	color:#EE7000;	}
@@ -54,7 +54,58 @@ a.off:visited 	{	color:#00AA00;	}
 a.off:hover 	{	color:#44CC44;	}
 a.off:active 	{	color:#00AA00;	}
 
-a.on:link		{	color:#D40000;	}
-a.on:visited 	{	color:#D40000;	}
+a.on:link		{	color:#DC0000;	}
+a.on:visited 	{	color:#DC0000;	}
 a.on:hover 		{	color:#CC7777;	}
-a.on:active 	{	color:#D40000;	}
+a.on:active 	{	color:#DC0000;	}
+
+table.tableinfo{ color: #1f1f1f; background-color: #FFF; }
+table.tableinfo tr.header td { background-color:#CED7DF; }
+table.tableinfo tr.header td.hover_grey { background-color:#BFCBD5; }
+table.tableinfo tr.header td.hover_grey:hover  { color: #000000; background-color:#B3BCD7;}
+table.tableinfo tr.vertical_header td { background-color: #CED7DF;}
+table.tableinfo tr.vertical_header td.hover_grey:hover{ color: #EEEEEE; background-color:#999999; }
+table.tableinfo tr.footer td { color: #FFFFFF; background: #5c9ccc url(originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x; }
+table.tableinfo tr.selected > td { background-color: #FFFFBB; }
+table.tableinfo tr.selected:hover > td { background-color: #BBCCFF; }
+table.tableinfo tr.odd_row > td { background-color: #E1E7EC; }
+table.tableinfo tr.odd_row:hover > td { background-color: #BBCCFF; }
+table.tableinfo tr.even_row > td { background-color: #F2F7FA; }
+table.tableinfo tr.even_row:hover > td{ background-color: #BBCCFF; }
+
+table.tableinfo tr > td.disaster_empty { border: 1px #FF3838 solid; }
+table.tableinfo tr:hover > td.disaster_empty { border: 1px #FF3838 solid; }
+table.tableinfo tr > td.disaster { background-color: #FF3838;	border: 1px #FF3838 solid; }
+table.tableinfo tr:hover > td.disaster { background-color: #FF2222;	border: 1px #FF2222 solid; }
+table.tableinfo tr > td.high_empty { border: 1px #FF9999 solid; }
+table.tableinfo tr:hover > td.high_empty { border: 1px #FF9999 solid; }
+table.tableinfo tr > td.high				{	background-color: #FF9999;	border: 1px #FF9999 solid; }
+table.tableinfo tr:hover > td.high			{	background-color: #FA8388;	border: 1px #FA8388 solid; }
+table.tableinfo tr > td.average_empty			{	border: 1px #FFB689 solid; }
+table.tableinfo tr:hover > td.average_empty		{	border: 1px #FFB689 solid; }
+table.tableinfo tr > td.average				{	background-color: #FFB689;	border: 1px #FFB689 solid; }
+table.tableinfo tr:hover > td.average			{	background-color: #FFAB73;	border: 1px #FFAB73 solid; }
+table.tableinfo tr > td.warning_empty			{	border: 1px #FFF384 solid; }
+table.tableinfo tr:hover > td.warning_empty		{	border: 1px #FFF069 solid; }
+table.tableinfo tr > td.warning				{	background-color: #FFF384;	border: 1px #FFF384 solid; }
+table.tableinfo tr:hover > td.warning			{	background-color: #FFF069;	border: 1px #FFF069 solid; }
+table.tableinfo tr > td.information_empty			{	border: 1px #ADEDFF solid; }
+table.tableinfo tr:hover > td.information_empty		{	border: 1px #92E7FF solid; }
+table.tableinfo tr > td.information			{	background-color: #ADEDFF;	border: 1px #ADEDFF solid; }
+table.tableinfo tr:hover > td.information			{	background-color: #92E7FF;	border: 1px #92E7FF solid; }
+table.tableinfo tr > td.unknown_trigger_empty		{	border: 1px #CECECE solid; }
+table.tableinfo tr:hover > td.unknown_trigger_empty	{	border: 1px #BCBCBC solid; }
+table.tableinfo tr > td.unknown_trigger			{	background-color: #CECECE;	border: 1px #CECECE solid; }
+table.tableinfo tr:hover > td.unknown_trigger		{	background-color: #BCBCBC;	border: 1px #BCBCBC solid; }
+table.tableinfo tr > td.normal				{	background-color: #AFFFAF;	border: 1px #AFFFAF solid; }
+table.tableinfo tr:hover > td.normal			{	background-color: #A1F9A1;	border: 1px #A1F9A1 solid; }
+table.tableinfo tr > td.active				{	background-color: #AADDAA;	border: 1px #AADDAA solid; color: #222222;}
+table.tableinfo tr:hover > td.active			{	background-color: #AAD9AA;	border: 1px #AAD9AA solid; }
+table.tableinfo tr > td.inactive				{	background-color: #FF8888;	border: 1px #FF8888 solid; color: #222222;}
+table.tableinfo tr:hover > td.inactive			{	background-color: #FA8388;	border: 1px #FA8388 solid; }
+table.tableinfo tr.red						{	background-color: #FFBBBB; border: 1px #FFBBBB solid; }
+table.tableinfo tr.red:hover				{	background-color: #EEAAAA; border: 1px #EEAAAA solid; }
+table.tableinfo tr.green					{	background-color: #BBFFBB; border: 1px #BBFFBB solid; }
+table.tableinfo tr.green:hover				{	background-color: #AAEEAA; border: 1px #AAEEAA solid; }
+table.tableinfo tr.blue 					{	background-color: #BBBBFF; border: 1px #BBBBFF solid; }
+table.tableinfo tr.blue:hover 				{	background-color: #AAAAEE; border: 1px #AAAAEE solid; }

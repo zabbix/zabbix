@@ -1292,7 +1292,7 @@ function zbx_subarray_push(&$mainArray, $sIndex, $element = null) {
 
 /************* PAGING *************/
 function getPagingLine(&$items, $autotrim=true){
-	global $USER_DETAILS, $page;
+	global $page;
 	$config = select_config();
 
 	$search_limit = '';
@@ -1308,7 +1308,7 @@ function getPagingLine(&$items, $autotrim=true){
 		$start = ($last_page == $page['file']) ? CProfile::get('web.paging.start', 0) : 0;
 	}
 
-	$rows_per_page = $USER_DETAILS['rows_per_page'];
+	$rows_per_page = CWebUser::$data['rows_per_page'];
 
 	$cnt_items = count($items);
 	$cnt_pages = ceil($cnt_items / $rows_per_page);

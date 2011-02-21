@@ -99,89 +99,74 @@
 	$tr_event_wdgt->addHeader($text, $fs_icon);
 //-------
 
-	$left_tab = new CTable();
-	$left_tab->setCellPadding(3);
-	$left_tab->setCellSpacing(3);
-	$left_tab->setAttribute('border',0);
+	$left_col = array();
 
 // tr details
-	$tr_dtl = new CWidget('hat_triggerdetails', make_trigger_details($trigger));
-	$tr_dtl->setClass('header');
-	$tr_dtl->addHeader(S_EVENT.SPACE.S_SOURCE.SPACE.S_DETAILS, SPACE);
-	$left_tab->addRow($tr_dtl);
+	$triggerDetails = new CUIWidget('hat_triggerdetails', make_trigger_details($trigger));
+	$triggerDetails->setHeader(S_EVENT.SPACE.S_SOURCE.SPACE.S_DETAILS);
+	$left_col[] = $triggerDetails;
 //----------------
 
 // event details
-	$event_dtl = new CWidget('hat_eventdetails', make_event_details($event, $trigger));
-	$event_dtl->addHeader(S_EVENT_DETAILS, SPACE);
-	$event_dtl->setClass('header');
-	$left_tab->addRow($event_dtl);
+	$eventDetails = new CUIWidget('hat_eventdetails', make_event_details($event, $trigger));
+	$eventDetails->setHeader(S_EVENT_DETAILS);
+	$left_col[] = $eventDetails;
 //----------------
 
-	$right_tab = new CTable();
-	$right_tab->setCellPadding(3);
-	$right_tab->setCellSpacing(3);
-	$right_tab->setAttribute('border',0);
-
+	$right_col = array();
 
 //if acknowledges are not disabled by confuguration, let's show them
 	if ($config['event_ack_enable']) {
-		$event_ack = new CWidget(
+		$event_ack = new CUIWidget(
 			'hat_eventack',
 			make_acktab_by_eventid($event),
 			CProfile::get('web.tr_events.hats.hat_eventack.state', 1)
 		);
-		$event_ack->addHeader(S_ACKNOWLEDGES);
-		$right_tab->addRow($event_ack);
+		$event_ack->setHeader(S_ACKNOWLEDGES);
+		$right_col[] = $event_ack;
 	}
 
 //----------------
 
 // event sms actions
-	$actions_sms = new CWidget(
+	$actions_sms = new CUIWidget(
 		'hat_eventactionmsgs',
 		get_action_msgs_for_event($event),
 		CProfile::get('web.tr_events.hats.hat_eventactionmsgs.state',1)
 	);
-	$actions_sms->addHeader(S_MESSAGE_ACTIONS);
-	$right_tab->addRow($actions_sms);
+	$actions_sms->setHeader(S_MESSAGE_ACTIONS);
+	$right_col[] = $actions_sms;
 //----------------
 
 // event cmd actions
-	$actions_cmd = new CWidget(
+	$actions_cmd = new CUIWidget(
 		'hat_eventactionmcmds',
 		get_action_cmds_for_event($event),//null,
 		CProfile::get('web.tr_events.hats.hat_eventactioncmds.state',1)
 	);
-	$actions_cmd->addHeader(S_COMMAND_ACTIONS);
-	$right_tab->addRow($actions_cmd);
+	$actions_cmd->setHeader(S_COMMAND_ACTIONS);
+	$right_col[] = $actions_cmd;
 //----------------
 
 // event history
 
-	$events_histry = new CWidget(
+	$events_histry = new CUIWidget(
 		'hat_eventlist',
 		make_small_eventlist($event),
 		CProfile::get('web.tr_events.hats.hat_eventlist.state',1)
 	);
-	$events_histry->addHeader(S_EVENTS.SPACE.S_LIST.SPACE.'['.S_PREVIOUS_EVENTS.' 20]');
-	$right_tab->addRow($events_histry);
+	$events_histry->setHeader(S_EVENTS.SPACE.S_LIST.SPACE.'['.S_PREVIOUS_EVENTS.' 20]');
+	$right_col[] = $events_histry;
 
 //----------------
 
-	$td_l = new CCol($left_tab);
-	$td_l->setAttribute('valign','top');
+	$leftDiv = new CDiv($left_col, 'column');
+	$middleDiv = new CDiv($right_col, 'column');
 
-	$td_r = new CCol($right_tab);
-	$td_r->setAttribute('valign','top');
+	$ieTab = new CTable();
+	$ieTab->addRow(array($leftDiv,$middleDiv), 'top');
 
-	$outer_table = new CTable();
-	$outer_table->setAttribute('border',0);
-	$outer_table->setCellPadding(1);
-	$outer_table->setCellSpacing(1);
-	$outer_table->addRow(array($td_l, $td_r));
-
-	$tr_event_wdgt->addItem($outer_table);
+	$tr_event_wdgt->addItem($ieTab);
 	$tr_event_wdgt->show();
 
 ?>

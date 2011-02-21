@@ -205,10 +205,9 @@
  *
  */
 function get_accessible_triggers($perm, $hostids, $cache=1){
-	global $USER_DETAILS;
 	static $available_triggers;
 
-	$userid = $USER_DETAILS['userid'];
+	$userid = CWebUser::$data['userid'];
 
 	$nodeid = get_current_nodeid();
 
@@ -1895,7 +1894,6 @@ function utf8RawUrlDecode($source){
  *
  */
 	function get_triggers_overview($hostids,$view_style=null){
-		global $USER_DETAILS;
 
 		if(is_null($view_style)) $view_style = CProfile::get('web.overview.view.style',STYLE_TOP);
 
@@ -1950,14 +1948,12 @@ function utf8RawUrlDecode($source){
 		ksort($hosts);
 
 
-		$css = getUserTheme($USER_DETAILS);
-		$vTextColor = ($css == 'css_od.css')?'&color=white':'';
-
+		$css = getUserTheme(CWebUser::$data);
 		if($view_style == STYLE_TOP){
 			$header = array(new CCol(S_TRIGGERS,'center'));
 
 			foreach($hosts as $hostname){
-				$header = array_merge($header,array(new CCol(array(new CImg('vtext.php?text='.$hostname.$vTextColor)), 'hosts')));
+				$header = array_merge($header,array(new CCol(array(new CImg('vtext.php?text='.$hostname.'&theme='.$css)), 'hosts')));
 			}
 			$table->setHeader($header,'vertical_header');
 
@@ -1972,7 +1968,7 @@ function utf8RawUrlDecode($source){
 		else{
 			$header=array(new CCol(S_HOSTS,'center'));
 			foreach($triggers as $descr => $trhosts){
-				$descr = array(new CImg('vtext.php?text='.$descr.$vTextColor));
+				$descr = array(new CImg('vtext.php?text='.$descr.'&theme='.$css));
 				array_push($header,$descr);
 			}
 			$table->setHeader($header,'vertical_header');

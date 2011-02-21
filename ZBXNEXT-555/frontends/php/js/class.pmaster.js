@@ -357,7 +357,7 @@ updateSortable: function(){
 	}).portletState("load", {"name": "dashboard"})
 	.children('div').children('div.header').addClass('move');
 
-	jQuery(".column").disableSelection();
+//	jQuery(".column").disableSelection();
 }
 });
 
