@@ -21,6 +21,7 @@
 #include "checks_internal.h"
 #include "log.h"
 #include "dbcache.h"
+#include "zbxself.h"
 
 /******************************************************************************
  *                                                                            *
@@ -190,6 +191,49 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 		SET_UI64_RESULT(result, i);
 	}
+	else if (0 == strcmp(tmp, "process"))	/* zabbix["process",<process_type>,<process_num>,<process_state>] */
+	{
+		unsigned char	process_type, state;
+		unsigned short	process_num;
+		double		value;
+
+		if (nparams > 4)
+			goto not_supported;
+
+		if (0 != get_param(params, 2, tmp, sizeof(tmp)))
+			goto not_supported;
+
+		for (process_type = 0; process_type < ZBX_PROCESS_TYPE_COUNT; process_type++)
+			if (0 == strcmp(tmp, get_process_type_string(process_type)))
+				break;
+
+		if (ZBX_PROCESS_TYPE_COUNT == process_type)
+			goto not_supported;
+
+		if (0 != get_param(params, 3, tmp, sizeof(tmp)))
+			*tmp = '\0';
+
+		if ('\0' == *tmp || 0 == strcmp(tmp, "all"))
+			process_num = 0;	/* all processes */
+		else if (FAIL == is_ushort(tmp, &process_num) || 0 == process_num ||
+				process_num > get_process_type_forks(process_type))
+			goto not_supported;
+
+		if (0 != get_param(params, 4, tmp, sizeof(tmp)))
+			*tmp = '\0';
+
+		if ('\0' == *tmp || 0 == strcmp(tmp, "busy"))
+			state = ZBX_PROCESS_STATE_BUSY;
+		else if (0 == strcmp(tmp, "idle"))
+			state = ZBX_PROCESS_STATE_IDLE;
+		else
+			goto not_supported;
+
+		if (NOTSUPPORTED == get_selfmon_stats(process_type, process_num, state, &value))
+			goto not_supported;
+
+		SET_DBL_RESULT(result, value);
+	}
 	else if (0 == strcmp(tmp, "wcache"))
 	{
 		if (nparams > 3)
@@ -293,7 +337,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	return SUCCEED;
 not_supported:
 	if (NULL == error)
-		error = zbx_dsprintf(error, "Internal check is not supported");
+		error = zbx_strdup(error, "Internal check is not supported");
 
 	SET_MSG_RESULT(result, error);
 

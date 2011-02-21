@@ -20,8 +20,6 @@
 #ifndef ZABBIX_ESCALATOR_H
 #define ZABBIX_ESCALATOR_H
 
-#include "db.h"
-
-int main_escalator_loop();
+void	main_escalator_loop();
 
 #endif

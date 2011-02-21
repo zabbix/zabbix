@@ -20,11 +20,10 @@
 #ifndef ZABBIX_HOUSEKEEPER_H
 #define ZABBIX_HOUSEKEEPER_H
 
-extern	int	CONFIG_DISABLE_HOUSEKEEPING;
-extern	int	CONFIG_HOUSEKEEPING_FREQUENCY;
-extern	int     CONFIG_PROXY_LOCAL_BUFFER;
-extern	int     CONFIG_PROXY_OFFLINE_BUFFER;
+extern int	CONFIG_HOUSEKEEPING_FREQUENCY;
+extern int	CONFIG_PROXY_LOCAL_BUFFER;
+extern int	CONFIG_PROXY_OFFLINE_BUFFER;
 
-int main_housekeeper_loop();
+void	main_housekeeper_loop();
 
 #endif

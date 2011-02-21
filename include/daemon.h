@@ -30,12 +30,11 @@ extern char	*CONFIG_PID_FILE;
 
 #include "threads.h"
 
-void	child_signal_handler(int sig, siginfo_t *siginfo, void *context);
-
 int	daemon_start(int allow_root);
 void	daemon_stop();
 
-void	init_main_process();
+void	set_parent_signal_handler();
+void	set_child_signal_handler();
 
 #define ZBX_IS_RUNNING()	1
 #define ZBX_DO_EXIT()
