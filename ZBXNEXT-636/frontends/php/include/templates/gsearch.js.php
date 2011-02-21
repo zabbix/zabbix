@@ -13,6 +13,10 @@ jQuery(document).ready(function(){
 	jQuery('#searchbttn').css('height', '18px');
 
 	createSuggest('search');
+
+// FF visual fix
+if(GK) jQuery('#searchbttn').css({'line-height':'12px', 'padding-bottom': '2px'});
+if(IE) jQuery('#search').css({'height':'14px', 'padding-top': '2px'});
 });
 
 
