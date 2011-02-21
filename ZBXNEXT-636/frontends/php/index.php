@@ -84,7 +84,7 @@ $page['file']	= 'index.php';
 // --
 			add_audit_ext(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, CWebUser::$data['userid'], '', null,null,null);
 
-			$url = is_null($request)?CWebUser::$data['url']:$request;
+			$url = zbx_empty($request)?CWebUser::$data['url']:$request;
 			if(zbx_empty($url) || ($url == $page['file'])){
 				$url = 'dashboard.php';
 			}
