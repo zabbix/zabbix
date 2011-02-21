@@ -82,3 +82,4 @@ ul.formlist li div.dd{
 .footer .dt input.main{ height: 25px; }
 .footer .dd { padding-left: 1%; }
 
+.zbx_search input[type=text] { padding-top:2px; height: 14px; border: 0; }

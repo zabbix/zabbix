@@ -29,15 +29,13 @@ require_once('include/templates/gsearch.js.php');
 	$searchButtonDiv = new CDiv();
 
 	$search_form = new CForm('get','search.php');
-	$search_form->setAttribute('class','thin');
-
 	$searchBox = new CTextBox('search', get_request('search'));
 	$searchBox->setAttribute('autocomplete', 'off');
 	$searchBox->addClass('search');
 
 	$search_form->addItem(new CDiv(array(_('Search').': ', $searchBox)));
 
-	$search_div = new CDiv(SPACE, 'zbx_search', 'zbx_search');
+	$search_div = new CDiv(SPACE, 'zbx_search nowrap', 'zbx_search');
 
 return new CDiv(SPACE, 'zbx_search', 'zbx_search');
 ?>
