@@ -33,7 +33,7 @@ class czbxrpc{
 //-----
 
 // list of methods which does not require authentication
-		$without_auth = array(
+		$withoutAuth = array(
 			'apiinfo.version' => 1
 		);
 //-----
@@ -42,19 +42,17 @@ class czbxrpc{
 			return array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => _('Empty parameters'));
 		}
 
-		list($resource, $action) = explode('.', $method);
-
 // Authentication {{{
-		if(!isset($without_auth[$method]) || !zbx_empty($sessionid)){
+		if(!isset($withoutAuth[$method]) || !zbx_empty($sessionid)){
 // compatibility mode
-			if(($resource == 'user') && ($action == 'authenticate')) $action = 'login';
+			if($method == 'user.authenticate') $method = 'user.login';
 
-			if(zbx_empty($sessionid) && (($resource != 'user') || ($action != 'login'))){
+			if(zbx_empty($sessionid) && ($method != 'user.login')){
 				return array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => _('Not authorized'));
 			}
 			else if(!zbx_empty($sessionid)){
 				$usr = self::callAPI('user.checkAuthentication', $sessionid);
-				if($usr['error']){
+				if(!isset($usr['result'])){
 					return array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => _('Not authorized'));
 				}
 			}
