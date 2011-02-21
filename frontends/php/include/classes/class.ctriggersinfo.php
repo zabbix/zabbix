@@ -122,8 +122,8 @@ class CTriggersInfo extends CTable{
 		$info = getSeverityCell(TRIGGER_SEVERITY_INFORMATION, $info.SPACE.getSeverityCaption(TRIGGER_SEVERITY_INFORMATION), !$info);
 		$warn = getSeverityCell(TRIGGER_SEVERITY_WARNING, $warn.SPACE.getSeverityCaption(TRIGGER_SEVERITY_WARNING), !$warn);
 		$avg = getSeverityCell(TRIGGER_SEVERITY_AVERAGE, $avg.SPACE.getSeverityCaption(TRIGGER_SEVERITY_AVERAGE), !$avg);
-		$high = getSeverityCell(TRIGGER_SEVERITY_HIGH, $high.SPACE.getSeverityCaption(TRIGGER_SEVERITY_HIGH_INFORMATION), !$high);
-		$dis = getSeverityCell(TRIGGER_SEVERITY_DISASTER_INFORMATION, $dis.SPACE.getSeverityCaption(TRIGGER_SEVERITY_DISASTER), !$dis);
+		$high = getSeverityCell(TRIGGER_SEVERITY_HIGH, $high.SPACE.getSeverityCaption(TRIGGER_SEVERITY_HIGH), !$high);
+		$dis = getSeverityCell(TRIGGER_SEVERITY_DISASTER, $dis.SPACE.getSeverityCaption(TRIGGER_SEVERITY_DISASTER), !$dis);
 
 
 		if(STYLE_HORISONTAL == $this->style){
