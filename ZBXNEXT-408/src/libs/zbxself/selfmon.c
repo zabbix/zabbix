@@ -437,9 +437,9 @@ int	get_selfmon_stats(unsigned char process_type, int process_num, unsigned char
 {
 	const char		*__function_name = "get_selfmon_stats";
 	unsigned int		total = 0, counter = 0;
-	zbx_stat_process_t	*process;
+	zbx_stat_process_t	*process = NULL;
 	unsigned char		s;
-	int			process_forks, current, res = NOTSUPPORTED;
+	int			process_forks, current, res = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -447,8 +447,7 @@ int	get_selfmon_stats(unsigned char process_type, int process_num, unsigned char
 
 	if (0 != process_num)
 	{
-		if (process_num > process_forks)
-			goto exit;
+		assert(process_num <= process_forks);
 
 		process_forks = process_num--;
 	}
@@ -456,12 +455,10 @@ int	get_selfmon_stats(unsigned char process_type, int process_num, unsigned char
 	LOCK_SM;
 
 	if (collector->count <= 1)
-	{
-		res = SUCCEED;
 		goto unlock;
-	}
 
-	current = (collector->first + collector->count - 1) % MAX_HISTORY;
+	if (MAX_HISTORY <= (current = (collector->first + collector->count - 1)))
+		current -= MAX_HISTORY;
 
 	for (; process_num < process_forks; process_num++)
 	{
@@ -472,8 +469,10 @@ int	get_selfmon_stats(unsigned char process_type, int process_num, unsigned char
 					process->h_counter[s][collector->first]);
 		counter += (unsigned short)(process->h_counter[state][current] -
 				process->h_counter[state][collector->first]);
-		res = SUCCEED;
 	}
+
+	if (NULL == process)
+		res = NOTSUPPORTED;
 
 unlock:
 	UNLOCK_SM;
@@ -481,7 +480,6 @@ unlock:
 	if (SUCCEED == res)
 		*value = (0 == total ? 0 : 100. * (double)counter / (double)total);
 
-exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
 	return res;
