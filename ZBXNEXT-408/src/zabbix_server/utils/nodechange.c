@@ -178,7 +178,7 @@ static int convert_profiles(int old_id, int new_id, const char *field_name)
  * Return value: SUCCEED - converted successfully                             *
  *               FAIL - an error occurred                                     *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
