@@ -153,6 +153,15 @@
 	function add_discovery_check($druleid, $type, $ports, $key, $snmp_community,
 			$snmpv3_securityname, $snmpv3_securitylevel, $snmpv3_authpassphrase, $snmpv3_privpassphrase, $uniq=0)
 	{
+		// no need to store those items in DB if they will not be used
+		if($snmpv3_securitylevel == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV){
+			$snmpv3_authpassphrase = '';
+			$snmpv3_privpassphrase = '';
+		}
+		if($snmpv3_securitylevel == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV){
+			$snmpv3_privpassphrase = '';
+		}
+
 		$dcheckid = get_dbid('dchecks', 'dcheckid');
 		$result = DBexecute('insert into dchecks (dcheckid,druleid,type,ports,key_,snmp_community'.
 				',snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,uniq) '.
