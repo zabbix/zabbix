@@ -49,7 +49,7 @@ $refresh_rate = 30; //seconds
 		redirect('index.php');
 	}
 //	clear_messages();
-$USER_DETAILS['refresh'] = $refresh_rate;
+CWebUser::$data['refresh'] = $refresh_rate;
 
 include_once('include/page_header.php');
 

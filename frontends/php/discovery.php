@@ -136,9 +136,8 @@ include_once('include/page_header.php');
 	);
 
 	$css = getUserTheme($USER_DETAILS);
-	$vTextColor = ($css == 'css_od.css')?'&color=white':'';
 	foreach($services as $name => $foo) {
-		$header[] = new CImg('vtext.php?text='.$name.$vTextColor);
+		$header[] = new CImg('vtext.php?text='.$name.'&theme='.$css);
 	}
 
 	$table = new CTableInfo();

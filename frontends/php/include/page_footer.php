@@ -22,7 +22,6 @@
 	require_once('include/config.inc.php');
 
 // if we include footer in some function
-	if(!isset($USER_DETAILS)) global $USER_DETAILS;
 	if(!isset($page)) global $page;
 	if(!isset($ZBX_PAGE_POST_JS)) global $ZBX_PAGE_POST_JS;
 // ---
@@ -32,7 +31,7 @@
 	}
 
 // HISTORY{
-	if(isset($page['hist_arg']) && ($USER_DETAILS['alias'] != ZBX_GUEST_USER) && ($page['type'] == PAGE_TYPE_HTML) && !defined('ZBX_PAGE_NO_MENU')){
+	if(isset($page['hist_arg']) && (CWebUser::$data['alias'] != ZBX_GUEST_USER) && ($page['type'] == PAGE_TYPE_HTML) && !defined('ZBX_PAGE_NO_MENU')){
 		add_user_history($page);
 	}
 // HISTORY}
@@ -55,7 +54,7 @@
 
 	$post_script = '';
 	if(uint_in_array($page['type'], array(PAGE_TYPE_HTML_BLOCK, PAGE_TYPE_HTML))){
-		if(!is_null($USER_DETAILS) && isset($USER_DETAILS['debug_mode']) && ($USER_DETAILS['debug_mode'] == GROUP_DEBUG_MODE_ENABLED)){
+		if(!is_null(CWebUser::$data) && isset(CWebUser::$data['debug_mode']) && (CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_ENABLED)){
 			COpt::profiling_stop('script');
 			COpt::show();
 		}
@@ -78,16 +77,16 @@
 			}
 		}
 
-		if(defined('ZBX_PAGE_DO_REFRESH') && $USER_DETAILS['refresh']){
-			$post_script.= 'PageRefresh.init('.($USER_DETAILS['refresh']*1000).');'."\n";
+		if(defined('ZBX_PAGE_DO_REFRESH') && CWebUser::$data['refresh']){
+			$post_script.= 'PageRefresh.init('.(CWebUser::$data['refresh']*1000).');'."\n";
 		}
 
 		$post_script.= 'cookie.init();'."\n";
 		$post_script.= 'chkbxRange.init();'."\n";
 
-		$post_script.= 'var sizeCSS = "screen.css"'."\n";
-		$post_script.= 'if(screen.width<1024) sizeCSS = "handheld.css";'."\n";
-		$post_script.= 'jQuery("head").append(\'<link rel="stylesheet" type="text/css" href="styles/\'+sizeCSS+\'" />\');';
+		$post_script.= 'var screenCSS = null;'."\n";
+		$post_script.= 'if(jQuery(window).width()<1024) screenCSS = "handheld.css";'."\n";
+		$post_script.= 'if(!is_null(screenCSS)) jQuery("head").append(\'<link rel="stylesheet" type="text/css" href="styles/\'+screenCSS+\'" />\');';
 
 		$post_script.='});'."\n";
 
@@ -102,8 +101,8 @@
 					'center'),
 				new CCol(array(
 						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE,'divider'),
-						new CSpan(($USER_DETAILS['userid'] == 0)?S_NOT_CONNECTED:S_CONNECTED_AS.SPACE."'".$USER_DETAILS['alias']."'".
-						(ZBX_DISTRIBUTED ? SPACE.S_FROM_SMALL.SPACE."'".$USER_DETAILS['node']['name']."'" : ''),'footer_sign')
+						new CSpan((CWebUser::$data['userid'] == 0)?S_NOT_CONNECTED:S_CONNECTED_AS.SPACE."'".CWebUser::$data['alias']."'".
+						(ZBX_DISTRIBUTED ? SPACE.S_FROM_SMALL.SPACE."'".CWebUser::$data['node']['name']."'" : ''),'footer_sign')
 					),
 					'right')
 				));

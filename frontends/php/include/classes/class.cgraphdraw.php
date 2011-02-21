@@ -141,15 +141,12 @@ class CGraphDraw{
 	}
 
 	public function applyGraphTheme($description=null){
-		global $USER_DETAILS;
 
 		if(!is_null($description)){
 			$sql_where = ' AND gt.description='.zbx_dbstr($description);
 		}
 		else{
-			$css = getUserTheme($USER_DETAILS);
-			if($css == 'css_od.css') $css = 'css_bb.css';
-
+			$css = getUserTheme(CWebUser::$data);
 			$sql_where = ' AND gt.theme='.zbx_dbstr($css);
 		}
 

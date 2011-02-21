@@ -106,8 +106,8 @@
 				}
 			}
 
-			if((defined('ZBX_PAGE_DO_REFRESH') || defined('ZBX_PAGE_DO_JS_REFRESH')) && $USER_DETAILS['refresh']){
-				$page_title .= ' ['.S_REFRESHED_EVERY_SMALL.' '.$USER_DETAILS['refresh'].' '.S_SEC_SMALL.']';
+			if((defined('ZBX_PAGE_DO_REFRESH') || defined('ZBX_PAGE_DO_JS_REFRESH')) && CWebUser::$data['refresh']){
+				$page_title .= ' ['.S_REFRESHED_EVERY_SMALL.' '.CWebUser::$data['refresh'].' '.S_SEC_SMALL.']';
 			}
 		break;
 	}
@@ -122,8 +122,8 @@
 
 	if($page['type'] == PAGE_TYPE_HTML){
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!doctype html>
+<html>
   <head>
     <title><?php echo $page_title; ?></title>
 	<meta name="Author" content="ZABBIX SIA" />
@@ -135,7 +135,7 @@
 	if(isset($DB['DB']) && !is_null($DB['DB'])){
 		$config = select_config();
 
-		$css = getUserTheme($USER_DETAILS);
+		$css = getUserTheme(CWebUser::$data);
 		switch($css){
 			case "css_od.css": $bodyCSS = 'darkorange'; break;
 			case "css_bb.css": $bodyCSS = 'darkblue'; break;
@@ -156,7 +156,7 @@
 <![endif]-->
 <script type="text/javascript">	var PHP_TZ_OFFSET = <?php echo date('Z'); ?>;</script>
 <?php
-	$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&lang='.$USER_DETAILS['lang'];
+	$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&lang='.CWebUser::$data['lang'];
 	print('<script type="text/javascript" src="'.$path.'"></script>'."\n");
 
 	if(isset($page['scripts']) && is_array($page['scripts']) && !empty($page['scripts'])){
@@ -171,7 +171,9 @@
 <?php
 	}
 
-	define ('PAGE_HEADER_LOADED', 1);
+	define('PAGE_HEADER_LOADED', 1);
+
+	if(defined('ZBX_PAGE_NO_HEADER')) return;
 
 	if(isset($_REQUEST['print'])){
 		if(!defined('ZBX_PAGE_NO_MENU'))
@@ -192,23 +194,23 @@
 	if(!defined('ZBX_PAGE_NO_MENU')){
 COpt::compare_files_with_menu($ZBX_MENU);
 
-		$help = new CLink(S_HELP, 'http://www.zabbix.com/documentation/', 'small_font', null, 'nosid');
+		$help = new CLink(_('Help'), 'http://www.zabbix.com/documentation/', 'small_font', null, 'nosid');
 		$help->setTarget('_blank');
-		$support = new CLink(S_GET_SUPPORT, 'http://www.zabbix.com/support.php', 'small_font', null, 'nosid');
+		$support = new CLink(_('Get support'), 'http://www.zabbix.com/support.php', 'small_font', null, 'nosid');
 		$support->setTarget('_blank');
 
 		$req = new CUrl($_SERVER['REQUEST_URI']);
 		$req->setArgument('print', 1);
-		$printview = new CLink(S_PRINT, $req->getUrl(), 'small_font', null, 'nosid');
+		$printview = new CLink(_('Print'), $req->getUrl(), 'small_font', null, 'nosid');
 
 		$page_header_r_col = array($help,'|',$support,'|',$printview);
 
-		if($USER_DETAILS['alias']!=ZBX_GUEST_USER){
+		if(CWebUser::$data['alias']!=ZBX_GUEST_USER){
 			$page_header_r_col[] = array('|');
 
-			array_push($page_header_r_col, new CLink(S_PROFILE, 'profile.php', 'small_font', null, 'nosid'),'|');
+			array_push($page_header_r_col, new CLink(_('Profile'), 'profile.php', 'small_font', null, 'nosid'),'|');
 
-			if($USER_DETAILS['debug_mode'] == GROUP_DEBUG_MODE_ENABLED){
+			if(CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_ENABLED){
 
 				$debug = new CLink(S_DEBUG, '#debug', 'small_font', null, 'nosid');
 
@@ -222,10 +224,10 @@ COpt::compare_files_with_menu($ZBX_MENU);
 				array_push($page_header_r_col,$debug,'|');
 			}
 
-			array_push($page_header_r_col,new CLink(S_LOGOUT, 'index.php?reconnect=1', 'small_font', null, 'nosid'));
+			array_push($page_header_r_col,new CLink(_('Logout'), 'index.php?reconnect=1', 'small_font', null, 'nosid'));
 		}
 		else {
-			$page_header_r_col[] = array('|', new CLink(S_LOGIN, 'index.php?reconnect=1', 'small_font', null, 'nosid'));
+			$page_header_r_col[] = array('|', new CLink(_('Login'), 'index.php?reconnect=1', 'small_font', null, 'nosid'));
 		}
 
 		$logo = new CLink(new CDiv(SPACE,'zabbix_logo'),'http://www.zabbix.com/', 'image', null, 'nosid');
@@ -251,7 +253,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		if(ZBX_DISTRIBUTED && !defined('ZBX_HIDE_NODE_SELECTION')) {
 			insert_js_function('check_all');
 
-			$available_nodes = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST, PERM_RES_DATA_ARRAY);
+			$available_nodes = get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_LIST, PERM_RES_DATA_ARRAY);
 			$available_nodes = get_tree_by_parentid($ZBX_LOCALNODEID, $available_nodes, 'masterid'); //remove parent nodes
 
 			if(!empty($available_nodes)) {
@@ -283,7 +285,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 				$combo_check_all = new CCheckbox('check_all_nodes', null, "javascript : check_all('node_form', this.checked);");
 
 				$node_tree = array();
-				$node_tree[0] = array('id' => 0, 'caption' => S_ALL_S, 'combo_select_node' => $combo_check_all, 'parentid' => 0); //root
+				$node_tree[0] = array('id' => 0, 'caption' => _('All'), 'combo_select_node' => $combo_check_all, 'parentid' => 0); //root
 
 				foreach($available_nodes as $num => $node) {
 					$checked = isset($ZBX_VIEWED_NODES['nodeids'][$node['nodeid']]);
@@ -300,7 +302,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 					'parentid' => $node['masterid']);
 				}
 
-				$node_tree_captions = array('caption' => bold(S_NODE), 'combo_select_node' => SPACE);
+				$node_tree_captions = array('caption' => bold(_('Node')), 'combo_select_node' => SPACE);
 
 				$node_tree = new CTree('nodes', $node_tree, $node_tree_captions);
 // --- ---
@@ -308,7 +310,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 				$div_node_tree = new CDiv();
 				$div_node_tree->addItem($node_tree->getHTML());
 
-				$div_node_tree->addItem(new CSubmit('select_nodes', S_SELECT, "javascript: ".
+				$div_node_tree->addItem(new CSubmit('select_nodes', _('Select'), "javascript: ".
 																				" if(IE6) hidePopupDiv('select_iframe');".	//IE6 fix
 																				" \$('div_node_tree').setStyle({display:'none'});"));
 
@@ -317,7 +319,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 
 
 				if(!is_null($combo_node_list))
-					$node_form->addItem(array(new CSpan(S_CURRENT_NODE.SPACE,'textcolorstyles'), $combo_node_list));
+					$node_form->addItem(array(new CSpan(_('Current node').SPACE,'textcolorstyles'), $combo_node_list));
 				$node_form->addItem($button_show_tree);
 				$node_form->addItem($div_node_tree);
 				unset($combo_node_list);
@@ -391,20 +393,9 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$menu_divs[] = $sub_menu_div;
 		$search_div = null;
 
-		if(($page['file'] != 'index.php') && ($USER_DETAILS['userid'] > 0)){
-			$search_form = new CForm('get','search.php');
-			$search_form->setAttribute('class','thin');
-
-			$searchBox = new CTextBox('search', get_request('search'));
-			$searchBox->setAttribute('autocomplete', 'off');
-			$searchBox->addClass('search');
-
-			$search_form->addItem(new CDiv(array(S_SEARCH_BIG.': ', $searchBox)));
-
-			$search_div = new CDiv($search_form, 'zbx_search');
-			$search_div->setAttribute('id','zbx_search');
-
-			zbx_add_post_js("var sid = createSuggest('search');");
+		if(($page['file'] != 'index.php') && (CWebUser::$data['userid'] > 0)){
+			$searchForm = new CGetForm('gsearch.edit');
+			$search_div = $searchForm->render();
 		}
 
 		$sub_menu_table->addRow(array($menu_divs, $search_div));
@@ -416,7 +407,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 	}
 
 //------------------------------------- <HISTORY> ---------------------------------------
-	if(isset($page['hist_arg']) && ($USER_DETAILS['alias'] != ZBX_GUEST_USER) && ($page['type'] == PAGE_TYPE_HTML) && !defined('ZBX_PAGE_NO_MENU')){
+	if(isset($page['hist_arg']) && (CWebUser::$data['alias'] != ZBX_GUEST_USER) && ($page['type'] == PAGE_TYPE_HTML) && !defined('ZBX_PAGE_NO_MENU')){
 		$table = new CTable(null,'history left');
 		$table->setCellSpacing(0);
 		$table->setCellPadding(0);

@@ -728,7 +728,7 @@ return new CDiv(array($table, $script));
 
 // Author: Aly
 function make_status_of_zbx(){
-	global $USER_DETAILS, $ZBX_SERVER, $ZBX_SERVER_PORT;
+	global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 	$table = new CTableInfo();
 	$table->setHeader(array(
@@ -785,7 +785,7 @@ function make_status_of_zbx(){
 
 
 // CHECK REQUIREMENTS {{{
-	if($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN){
+	if(CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN){
 		$reqs = check_php_requirements();
 		foreach($reqs as $req){
 			if($req['result'] == false){

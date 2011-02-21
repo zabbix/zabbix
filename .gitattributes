@@ -97,6 +97,9 @@ frontends/php/images/general/ipmi_available.png -text
 frontends/php/images/general/ipmi_available_bb.png -text
 frontends/php/images/general/ipmi_unavailable.png -text
 frontends/php/images/general/ipmi_unknown.png -text
+frontends/php/images/general/login/background.png -text
+frontends/php/images/general/login/logo.png -text
+frontends/php/images/general/login/username_pass_field.png -text
 frontends/php/images/general/no_icon.png -text
 frontends/php/images/general/ok.png -text
 frontends/php/images/general/ok_bb.png -text
@@ -108,8 +111,10 @@ frontends/php/images/general/snmp_available_bb.png -text
 frontends/php/images/general/snmp_unavailable.png -text
 frontends/php/images/general/snmp_unknown.png -text
 frontends/php/images/general/sort_down.gif -text
+frontends/php/images/general/sort_down_blue.gif -text
 frontends/php/images/general/sort_down_od.gif -text
 frontends/php/images/general/sort_up.gif -text
+frontends/php/images/general/sort_up_blue.gif -text
 frontends/php/images/general/sort_up_od.gif -text
 frontends/php/images/general/tick.png -text
 frontends/php/images/general/tr_space.gif -text
@@ -142,19 +147,21 @@ frontends/php/images/gradients/blink1.gif -text svneol=unset#unset
 frontends/php/images/gradients/blink2.gif -text svneol=unset#unset
 frontends/php/images/gradients/button.gif -text svneol=unset#unset
 frontends/php/images/gradients/gradient.png -text
+frontends/php/images/gradients/header_footer_blue.png -text svneol=unset#image/png
+frontends/php/images/gradients/header_link_blue.png -text svneol=unset#image/png
 frontends/php/images/gradients/menu_not_active.gif -text svneol=unset#unset
 frontends/php/images/gradients/menu_not_active2.gif -text
 frontends/php/images/gradients/menu_not_active_bb.gif -text
+frontends/php/images/gradients/menu_not_active_blue.png -text svneol=unset#image/png
 frontends/php/images/gradients/sla_blue.png -text
 frontends/php/images/gradients/sla_blue15.png -text
 frontends/php/images/gradients/sla_green.png -text
 frontends/php/images/gradients/sla_green15.png -text
 frontends/php/images/gradients/sla_red.png -text
 frontends/php/images/gradients/sla_red15.png -text
-frontends/php/images/gradients/table_head.gif -text svneol=unset#unset
-frontends/php/images/gradients/table_head2.gif -text svneol=unset#unset
 frontends/php/images/gradients/table_head2_bb.gif -text
 frontends/php/images/gradients/table_head_bb.gif -text
+frontends/php/images/gradients/texture_diagonal.gif -text
 frontends/php/images/sysmaps/Hub.png -text svneol=unset#unset
 frontends/php/images/sysmaps/Hub_small.png -text svneol=unset#unset
 frontends/php/images/sysmaps/Network.png -text svneol=unset#unset
@@ -198,19 +205,18 @@ frontends/php/locale/sk/LC_MESSAGES/frontend.po -text
 frontends/php/locale/sv/LC_MESSAGES/frontend.po -text
 frontends/php/locale/uk/LC_MESSAGES/frontend.po -text
 frontends/php/locale/zh_CN/LC_MESSAGES/frontend.po -text
-frontends/php/styles/darkblue/images/ui-bg_diagonals-small_50_5c5c5c_40x40.png -text
-frontends/php/styles/darkblue/images/ui-bg_flat_25_000000_40x100.png -text
-frontends/php/styles/darkblue/images/ui-bg_flat_30_cccccc_40x100.png -text
-frontends/php/styles/darkblue/images/ui-bg_glass_40_ffc73d_1x400.png -text
-frontends/php/styles/darkblue/images/ui-bg_highlight-hard_20_0972a5_1x100.png -text
-frontends/php/styles/darkblue/images/ui-bg_highlight-soft_33_003147_1x100.png -text
-frontends/php/styles/darkblue/images/ui-bg_highlight-soft_35_222222_1x100.png -text
-frontends/php/styles/darkblue/images/ui-bg_highlight-soft_44_444444_1x100.png -text
-frontends/php/styles/darkblue/images/ui-bg_highlight-soft_80_eeeeee_1x100.png -text
+frontends/php/styles/darkblue/images/ui-bg_flat_0_aaaaaa_40x100.png -text svneol=unset#image/png
+frontends/php/styles/darkblue/images/ui-bg_flat_100_1d92cd_40x100.png -text svneol=unset#image/png
+frontends/php/styles/darkblue/images/ui-bg_flat_10_aaaaaa_40x100.png -text svneol=unset#image/png
+frontends/php/styles/darkblue/images/ui-bg_flat_30_dc0000_40x100.png -text svneol=unset#image/png
+frontends/php/styles/darkblue/images/ui-bg_highlight-hard_25_000e19_1x100.png -text svneol=unset#image/png
+frontends/php/styles/darkblue/images/ui-bg_highlight-hard_40_1d92cd_1x100.png -text svneol=unset#image/png
+frontends/php/styles/darkblue/images/ui-bg_inset-hard_40_1d92cd_1x100.png -text svneol=unset#image/png
+frontends/php/styles/darkblue/images/ui-bg_inset-soft_25_3c759b_1x100.png -text svneol=unset#image/png
 frontends/php/styles/darkblue/images/ui-icons_222222_256x240.png -text
 frontends/php/styles/darkblue/images/ui-icons_4b8e0b_256x240.png -text
-frontends/php/styles/darkblue/images/ui-icons_a83300_256x240.png -text
-frontends/php/styles/darkblue/images/ui-icons_cccccc_256x240.png -text
+frontends/php/styles/darkblue/images/ui-icons_77b7da_256x240.png -text svneol=unset#image/png
+frontends/php/styles/darkblue/images/ui-icons_a83300_256x240.png -text svneol=unset#image/png
 frontends/php/styles/darkblue/images/ui-icons_ffffff_256x240.png -text
 frontends/php/styles/darkorange/images/ui-bg_flat_25_1f1f1f_40x100.png -text
 frontends/php/styles/darkorange/images/ui-bg_flat_30_cccccc_40x100.png -text
