@@ -35,7 +35,7 @@
  * Return value:  SUCCEED - host is found                                     *
  *                FAIL - an error occurred or host not found                  *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -246,7 +246,7 @@ static void	add_regexp_name(char ***regexp, int *regexp_alloc, int *regexp_num, 
  * Return value:  SUCCEED - list of active checks sent successfully           *
  *                FAIL - an error occurred                                    *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *

@@ -316,6 +316,8 @@
 
 	if(empty($firstEvent)){
 		$starttime = null;
+		$events = array();
+		$paging = getPagingLine($events);
 	}
 	else{
 		$config = select_config();

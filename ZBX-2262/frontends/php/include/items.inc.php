@@ -653,8 +653,8 @@
 				'delta='.$item['delta'].','.
 				'snmpv3_securityname='.zbx_dbstr($item['snmpv3_securityname']).','.
 				'snmpv3_securitylevel='.$item['snmpv3_securitylevel'].','.
-				'snmpv3_authpassphrase='.zbx_dbstr($item['snmpv3_authpassphrase']).','.
-				'snmpv3_privpassphrase='.zbx_dbstr($item['snmpv3_privpassphrase']).','.
+				'snmpv3_authpassphrase='.($item['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV || $item['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV ? zbx_dbstr($item['snmpv3_authpassphrase']) : "''").','.
+				'snmpv3_privpassphrase='.($item['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV ? zbx_dbstr($item['snmpv3_privpassphrase']) : "''").','.
 				'formula='.zbx_dbstr($item['formula']).','.
 				'trends='.$item['trends'].','.
 				'logtimefmt='.zbx_dbstr($item['logtimefmt']).','.
