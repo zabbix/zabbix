@@ -96,8 +96,8 @@ switch($itemType) {
 													ITEM_TYPE_SNMPV3,'type')),
 		'snmpv3_securitylevel'=>array(T_ZBX_INT, O_OPT,  null,  IN('0,1,2'),	'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
 		'snmpv3_securityname'=>	array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
-		'snmpv3_authpassphrase'=>array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
-		'snmpv3_privpassphrase'=>array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
+		'snmpv3_authpassphrase'=>array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.')&&({snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.'||{snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV.'))'),
+		'snmpv3_privpassphrase'=>array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.')&&({snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.'))'),
 
 		'ipmi_sensor'=>		array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,	'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_IPMI.'))', S_IPMI_SENSOR),
 		'trapper_hosts'=>	array(T_ZBX_STR, O_OPT,  null,  null,			'isset({save})&&isset({type})&&({type}==2)'),
@@ -492,13 +492,9 @@ switch($itemType) {
 
 // SNMPv3 auth passphrase
 		$frmItem->addRow(S_SNMPV3_AUTH_PASSPHRASE, new CTextBox('snmpv3_authpassphrase',$snmpv3_authpassphrase,64), null, 'row_snmpv3_authpassphrase');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'snmpv3_authpassphrase');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmpv3_authpassphrase');
 
 // SNMPv3 priv passphrase
 		$frmItem->addRow(S_SNMPV3_PRIV_PASSPHRASE, new CTextBox('snmpv3_privpassphrase',$snmpv3_privpassphrase,64), null, 'row_snmpv3_privpassphrase');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'snmpv3_privpassphrase');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmpv3_privpassphrase');
 
 // SNMP port
 		$frmItem->addRow(S_PORT, new CNumericBox('port',$port,5), null, 'row_port');
@@ -640,9 +636,21 @@ switch($itemType) {
 		$frmRow[] = new CButtonCancel(url_param('groupid').url_param('hostid'));
 		$frmItem->addItemToBottomRow($frmRow);
 
+		// adding javascript, so that auth fields would be hidden if they are not used in specific auth type
+		$securityLevelVisibility = array();
+		zbx_subarray_push($securityLevelVisibility, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, 'row_snmpv3_authpassphrase');
+		zbx_subarray_push($securityLevelVisibility, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, 'snmpv3_authpassphrase');
+
+		zbx_subarray_push($securityLevelVisibility, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'row_snmpv3_authpassphrase');
+		zbx_subarray_push($securityLevelVisibility, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'snmpv3_authpassphrase');
+		zbx_subarray_push($securityLevelVisibility, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'row_snmpv3_privpassphrase');
+		zbx_subarray_push($securityLevelVisibility, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'snmpv3_privpassphrase');
+
+		zbx_add_post_js("var securityLevelSwitcher = new CViewSwitcher('snmpv3_securitylevel', 'change', ".zbx_jsvalue($securityLevelVisibility, true).");");
 		zbx_add_post_js("var authTypeSwitcher = new CViewSwitcher('authtype', 'change', ".zbx_jsvalue($authTypeVisibility, true).");");
 		zbx_add_post_js("var typeSwitcher = new CViewSwitcher('type', 'change', ".zbx_jsvalue($typeVisibility, true).(isset($_REQUEST['itemid'])? ', true': '').');');
 		zbx_add_post_js("var mnFrmTbl = document.getElementById('".$frmItem->getName()."'); if(mnFrmTbl) mnFrmTbl.style.visibility = 'visible';");
+
 
 		$items_wdgt->addItem($frmItem);
 	}
