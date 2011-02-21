@@ -503,17 +503,20 @@ unlock:
  ******************************************************************************/
 void	zbx_sleep_loop(int sleeptime)
 {
+#ifdef HAVE_FUNCTION_SETPROCTITLE
 	extern unsigned char	process_type;
 	const char		*process_type_string;
+#endif	/* HAVE_FUNCTION_SETPROCTITLE */
 
 	if (sleeptime <= 0)
 		return;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "sleeping for %d seconds", sleeptime);
 
-	process_type_string = get_process_type_string(process_type);
-
 	update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+	process_type_string = get_process_type_string(process_type);
 
 	do
 	{
@@ -521,6 +524,9 @@ void	zbx_sleep_loop(int sleeptime)
 		sleep(1);
 	}
 	while (--sleeptime > 0);
+#else
+	sleep(sleeptime);
+#endif	/* HAVE_FUNCTION_SETPROCTITLE */
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 }
