@@ -47,14 +47,13 @@ class czbxrpc{
 // compatibility mode
 			if($method == 'user.authenticate') $method = 'user.login';
 
-			if(zbx_empty($sessionid) && ($method != 'user.login')){
-				return array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => _('Not authorized'));
-			}
-			else if(!zbx_empty($sessionid)){
+			if(!zbx_empty($sessionid)){
 				$usr = self::callAPI('user.checkAuthentication', $sessionid);
-				if(!isset($usr['result'])){
+				if(!isset($usr['result']))
 					return array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => _('Not authorized'));
-				}
+			}
+			else if($method != 'user.login'){
+				return array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => _('Not authorized'));
 			}
 		}
 // }}} Authentication

@@ -32,8 +32,8 @@ require_once('include/page_header.php');
 ?>
 <form action="index.php">
 <input type="hidden" name="request" class="input hidden" value="<?php print($request); ?>" />
-<div style="position: absolute; top: 25%; left: 25%;">
-<div class="loginForm">
+<div style="position: absolute; vertical-align: middle; top: 25%; width: 99%;">
+<div class="loginForm" style="margin: auto; ">
 	<div style="position: relative; color: #F0F0F0; height: 100%;">
 <!-- Help & Support -->
 		<div style="position: absolute; top: 0px; right: 10px;">
