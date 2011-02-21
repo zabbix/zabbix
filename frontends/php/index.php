@@ -46,7 +46,7 @@ $page['file']	= 'index.php';
 	$sessionid = get_cookie('zbx_sessionid');
 
 	if(isset($_REQUEST['reconnect']) && isset($sessionid)){
-		add_audit(AUDIT_ACTION_LOGOUT,AUDIT_RESOURCE_USER, 'Manual Logout');
+		add_audit(AUDIT_ACTION_LOGOUT,AUDIT_RESOURCE_USER, _('Manual Logout'));
 
 		CWebUser::logout($sessionid);
 
@@ -84,7 +84,7 @@ $page['file']	= 'index.php';
 // --
 			add_audit_ext(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, CWebUser::$data['userid'], '', null,null,null);
 
-			$url = zbx_empty($request)?CWebUser::$data['url']:$request;
+			$url = zbx_empty($request) ? CWebUser::$data['url'] : $request;
 			if(zbx_empty($url) || ($url == $page['file'])){
 				$url = 'dashboard.php';
 			}
@@ -117,6 +117,6 @@ $page['file']	= 'index.php';
 		}
 	}
 	else{
-		redirect(zbx_empty(CWebUser::$data['url'])?'dashboard.php':CWebUser::$data['url']);
+		redirect(zbx_empty(CWebUser::$data['url']) ? 'dashboard.php' : CWebUser::$data['url']);
 	}
 ?>

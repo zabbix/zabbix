@@ -43,7 +43,7 @@ class czbxrpc{
 		}
 
 // Authentication {{{
-		if(!isset($withoutAuth[$method])){
+		if(!isset($withoutAuth[$method]) || !zbx_empty($sessionid)){
 // compatibility mode
 			if($method == 'user.authenticate') $method = 'user.login';
 
