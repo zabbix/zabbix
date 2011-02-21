@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -346,7 +346,7 @@
  *
  */
 	function copy_graph_to_host($graphid, $hostid){
-		$graphs = CGraph::get(array(
+		$graphs = API::Graph()->get(array(
 			'graphids' => $graphid,
 			'output' => API_OUTPUT_EXTEND,
 			'select_graph_items' => API_OUTPUT_EXTEND
@@ -363,7 +363,7 @@
 
 		$graph['gitems'] = $new_gitems;
 
-		$result = CGraph::create($graph);
+		$result = API::Graph()->create($graph);
 
 	return $result;
 	}

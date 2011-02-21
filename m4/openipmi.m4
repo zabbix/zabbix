@@ -1,6 +1,6 @@
 # LIBOPENIPMI_CHECK_CONFIG ([DEFAULT-ACTION])
 # ----------------------------------------------------------
-#    Aleksander Vladishev                     Sep-10-2008
+#    Alexander Vladishev                      Sep-10-2008
 #
 # Checks for openipmi.  DEFAULT-ACTION is the string yes or no to
 # specify whether to default to --with-openipmi or --without-openipmi.

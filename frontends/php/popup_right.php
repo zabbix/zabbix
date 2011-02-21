@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,7 +77,7 @@ check_fields($fields);
 // NODES
 	if($nodeid == 0) $nodeids = get_current_nodeid(true);
 	else $nodeids = $nodeid;
-	
+
 	$count=0;
 	$grouplist = array();
 
@@ -85,7 +85,7 @@ check_fields($fields);
 		'nodeids' => $nodeids,
 		'output' => API_OUTPUT_EXTEND
 	);
-	$groups = CHostGroup::get($options);
+	$groups = API::HostGroup()->get($options);
 	foreach($groups as $gnum => $row){
 		$groups[$gnum]['nodename'] = get_node_name_by_elid($row['groupid'], true, ':').$row['name'];
 		if($nodeid == 0) $groups[$gnum]['name'] = $groups[$gnum]['nodename'];

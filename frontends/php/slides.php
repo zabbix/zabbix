@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -110,14 +110,14 @@ include_once('include/page_header.php');
 						$slideshow = get_slideshow_by_slideshowid($elementid);
 						$screen = get_slideshow($elementid, $step);
 
-						$screens = CScreen::get(array(
+						$screens = API::Screen()->get(array(
 							'screenids' => $screen['screenid']
 						));
 						if(empty($screens)){
 							print alert('No permissions');
 						}
 						else{
-							$screens = CScreen::get(array(
+							$screens = API::Screen()->get(array(
 								'screenids' => $screen['screenid'],
 								'output' => API_OUTPUT_EXTEND,
 								'select_screenitems' => API_OUTPUT_EXTEND

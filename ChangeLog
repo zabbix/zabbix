@@ -2,6 +2,8 @@
 Changes for 1.9.2
 
 New features:
+ - [ZBXNEXT-636] login screen redesign, frontend themes restyle (Aly, Elvis)
+ - [ZBXNEXT-635] introduced API wrapper for Zabbix frontend (Vedmak, Aly)
  - [ZBXNEXT-575] added new design for action operation remote commands (Aly,asaveljevs,Sasha,Vedmak)
  - [ZBXNEXT-628] added advanced label settings for maps (Aly)
  - [ZBXNEXT-626] added remembering of grid options for maps (KB)
@@ -18,6 +20,7 @@ New features:
  - [ZBX-3338] updated Ukrainian translation; thanks to zalex_ua (Richlv)
 
 Bug fixes:
+ - [ZBX-3550] enforce authentication for API, if auth param is not empty (Vedmak)
  - [ZBX-3500] added "change" link to "clock" element in screen configuration (KB)
  - [ZBX-3500] fixed infinite loop when screen was added as an element of another screen (KB)
  - [ZBX-3500] fixed database query algorithm when saving maintenance (KB)
@@ -85,6 +88,11 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
 
+ - [ZBX-2262] added `hosts_templates_2' index (Sasha)
+ - [ZBX-3537] trigger events are now sorted by timestamp (KB)
+ - [ZBX-3472] changed item and discovery rule form to display SSH and SNMPv3 auth fields correctly when changing item type (KB)
+ - [ZBX-3542] reduced the amount of debugging output for configuration cache (asaveljevs)
+ - [ZBX-3536] made SNMP checks work when DNS resolves to IPv6 address; thanks to Marc Dequènes (asaveljevs,Sasha)
  - [ZBX-3541] fixed processing of nodata() function (Sasha)
  - [ZBX-3126] all checkboxes in map and screen import are now "on" by default (KB)
  - [ZBX-3158] improved links in map element menu (Aly)

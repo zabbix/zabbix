@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -68,7 +68,7 @@ class CTriggersInfo extends CTable{
 			$options['groupids'] = $this->groupid;
 
 
-		$triggers = CTrigger::get($options);
+		$triggers = API::Trigger()->get($options);
 		$triggers = zbx_objectValues($triggers, 'triggerid');
 
 		$sql = 'SELECT t.priority,t.value,count(DISTINCT t.triggerid) as cnt '.

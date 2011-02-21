@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ class testPageUsers extends CWebTest
 
 		$this->ok('CONFIGURATION OF USERS AND USER GROUPS');
 		$this->ok('Displaying');
-		$this->ok(array('Alias','Name','Surname','User type','Groups','Is online?','Login','GUI access','API access','Debug mode','Status'));
+		$this->ok(array('Alias','Name','Surname','User type','Groups','Is online?','Login','GUI access','Debug mode','Status'));
 		$this->ok(array($user['alias'],$user['name'],$user['surname']));
 		$this->dropdown_select('go','Unblock selected');
 		$this->dropdown_select('go','Delete selected');

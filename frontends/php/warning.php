@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ $refresh_rate = 30; //seconds
 		redirect('index.php');
 	}
 //	clear_messages();
-$USER_DETAILS['refresh'] = $refresh_rate;
+CWebUser::$data['refresh'] = $refresh_rate;
 
 include_once('include/page_header.php');
 

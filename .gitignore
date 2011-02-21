@@ -32,6 +32,7 @@ frontends/php/images/general/*.db
 frontends/php/images/general/bar/*.db
 frontends/php/images/general/bttn/*.db
 frontends/php/images/general/tree/*.db
+frontends/php/images/gradients/*.db
 frontends/php/locale/POTFILES.in
 frontends/php/locale/cs/LC_MESSAGES/frontend.mo
 frontends/php/locale/de/LC_MESSAGES/frontend.mo
@@ -115,9 +116,6 @@ src/libs/zbxmemory/Makefile.in
 src/libs/zbxnix/.deps
 src/libs/zbxnix/Makefile
 src/libs/zbxnix/Makefile.in
-src/libs/zbxplugin/.deps
-src/libs/zbxplugin/Makefile
-src/libs/zbxplugin/Makefile.in
 src/libs/zbxserver/.deps
 src/libs/zbxserver/Makefile
 src/libs/zbxserver/Makefile.in

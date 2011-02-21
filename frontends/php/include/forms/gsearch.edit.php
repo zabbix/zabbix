@@ -1,3 +1,4 @@
+<?php
 /*
 ** ZABBIX
 ** Copyright (C) 2000-2011 SIA Zabbix
@@ -16,18 +17,25 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
+?>
+<?php
+// include JS + templates
+require_once('include/templates/gsearch.js.php');
+?>
+<?php
+//	$hosts_wdgt->addItem();
+	$searchDiv = new CDiv();
+	$searchInputDiv = new CDiv();
+	$searchButtonDiv = new CDiv();
 
-#include "common.h"
+	$search_form = new CForm('get','search.php');
+	$searchBox = new CTextBox('search', get_request('search'));
+	$searchBox->setAttribute('autocomplete', 'off');
+	$searchBox->addClass('search');
 
-#include "zbxplugin.h"
+	$search_form->addItem(new CDiv(array(_('Search').': ', $searchBox)));
 
-ZBX_PLUGIN_LIST	*PluginsList = NULL;
+	$search_div = new CDiv(SPACE, 'zbx_search nowrap', 'zbx_search');
 
-
-int add_plugin(char *args)
-{
-#ifdef TODO
-#	error Realize plugin functionality!!!
-#endif
-	return 0;
-}
+return new CDiv(SPACE, 'zbx_search', 'zbx_search');
+?>

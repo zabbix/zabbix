@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 SIA Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -612,7 +612,7 @@
 	'S_COPYRIGHT_BY'=>			_('Copyright 2001-2011 by'),
 	'S_CONNECTED_AS'=>			_('Connected as'),
 	'S_NOT_CONNECTED'=>			_('Not connected'),
-	'S_SIA_ZABBIX'=>			_('SIA Zabbix'),
+	'S_SIA_ZABBIX'=>			_('Zabbix SIA'),
 
 //	graph.php
 	'S_GRAPHS_COPIED'=>			_('Graphs copied'),
@@ -1984,8 +1984,6 @@
 	'S_ACTIVATE_SELECTED_APPLICATIONS' => _('Activate selected applications?'),
 	'S_DISABLE_SELECTED_APPLICATIONS' => _('Disable selected applications?'),
 	'S_DELETE_SELECTED_APPLICATIONS'  => _('Delete selected applications?'),
-	'S_CANNOT_UPDATE_APPLICATION'  => _('Cannot update application'),
-	'S_CANNOT_DELETE_APPLICATION'  => _('Cannot delete application'),
 
 // popup_media.php
 	'S_INCORRECT_TIME_PERIOD'=>	_('Incorrect time period'),
@@ -2228,14 +2226,8 @@
 	'S_REQUIRED_GETTEXT_MODULE' => _('Required gettext module'),
 
 //	class.cuser.php
-	'S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_SECONDS_FIRST_PART'=> _('Account is blocked for'),
-	'S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_SECONDS_SECOND_PART'=>	_('seconds'),
-	'S_CUSER_ERROR_LOGIN_OR_PASSWORD_INCORRECT'=>		_('Login name or password is incorrect'),
 	'S_CUSER_ERROR_SESSION_TERMINATED'=>			_('Session terminated, please re-login!'),
 	'S_CUSER_ERROR_TABLE_USERS_EMPTY'=>			_('Table users is empty. Possible database corruption.'),
-	'S_CUSER_ERROR_LDAP_MODULE_MISSING'=>			_('Probably php-ldap module is missing'),
-	'S_CUSER_ERROR_FAILED_LOGIN_ATTEMPTS'=>				_('failed login attempts logged.'),
-	'S_CUSER_ERROR_LAST_FAILED_ATTEMPTS'=>				_('Last failed attempt was from'),
 	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_UPDATE_USERS'=>		_('Only Super Admins can update Users'),
 	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_DELETE_USERS'=>		_('Only Super Admins can delete Users'),
 	'S_CUSER_ERROR_ONLY_ADMIN_CAN_ADD_USER_MEDIAS'=>	_('Only Zabbix Admins can add user Medias'),

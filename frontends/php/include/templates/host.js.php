@@ -4,10 +4,10 @@
 <td>
 	<input type="hidden" name="interfaces[#{interfaceid}][new]" value="#{newValue}" />
 	<input type="hidden" id="interface_id_#{interfaceid}" name="interfaces[#{interfaceid}][interfaceid]" value="#{interfaceid}" />
-	<input class="input" id="interface_ip_#{interfaceid}" name="interfaces[#{interfaceid}][ip]" type="text" size="24" value="#{ip}" />
+	<input class="input text" id="interface_ip_#{interfaceid}" name="interfaces[#{interfaceid}][ip]" type="text" size="24" value="#{ip}" />
 </td>
 <td>
-	<input class="input" id="interface_dns_#{interfaceid}" name="interfaces[#{interfaceid}][dns]" type="text" size="30" value="#{dns}" />
+	<input class="input text" id="interface_dns_#{interfaceid}" name="interfaces[#{interfaceid}][dns]" type="text" size="30" value="#{dns}" />
 </td>
 <td>
 	<div class="jqueryinputset">
@@ -19,7 +19,7 @@
 	</div>
 </td>
 <td>
-	<input class="input" id="port_#{interfaceid}" name="interfaces[#{interfaceid}][port]" type="text" size="15" value="#{port}" />
+	<input class="input text" id="port_#{interfaceid}" name="interfaces[#{interfaceid}][port]" type="text" size="15" value="#{port}" />
 </td>
 <td>
 	<div id="interface_type_#{interfaceid}" class="jqueryinputset">

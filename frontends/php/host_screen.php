@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -149,7 +149,7 @@
 //	$formHeader->addItem($cmbConfig);
 
 
-	$screens = CTemplateScreen::get(array(
+	$screens = API::TemplateScreen()->get(array(
 		'hostids' => $_REQUEST['hostid'],
 		'output' => API_OUTPUT_EXTEND
 	));
@@ -164,7 +164,7 @@
 	}
 	else{
 		$screen = (!isset($screens[$screenid]))?reset($screens):$screens[$screenid];
-		$tmpScreens = CTemplateScreen::get(array(
+		$tmpScreens = API::TemplateScreen()->get(array(
 			'screenids' => $screen['screenid'],
 			'hostids' => $_REQUEST['hostid'],
 			'output' => API_OUTPUT_EXTEND,

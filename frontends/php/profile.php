@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -102,7 +102,7 @@ $fields=array(
 	}
 	else if(isset($_REQUEST['save'])){
 		$auth_type = get_user_system_auth($USER_DETAILS['userid']);
-		
+
 		if(ZBX_AUTH_INTERNAL != $auth_type){
 			$_REQUEST['password1'] = $_REQUEST['password2'] = null;
 		}
@@ -110,7 +110,7 @@ $fields=array(
 			$_REQUEST['password1'] = get_request('password1', null);
 			$_REQUEST['password2'] = get_request('password2', null);
 		}
-		
+
 		if($_REQUEST['password1'] != $_REQUEST['password2']){
 			show_error_message(S_CANNOT_UPDATE_USER_BOTH_PASSWORDS);
 		}
@@ -128,7 +128,6 @@ $fields=array(
 			$user['alias'] = $USER_DETAILS['alias'];
 			$user['passwd'] = get_request('password1');
 			$user['url'] = get_request('url');
-			$user['autologin'] = get_request('autologin', 0);
 			$user['autologout'] = get_request('autologout', 0);
 			$user['lang'] = get_request('lang');
 			$user['theme'] = get_request('theme');
@@ -146,18 +145,18 @@ $fields=array(
 
 			DBstart();
 			updateMessageSettings($messages);
-			
-			$result = CUser::updateProfile($user);
+
+			$result = API::User()->updateProfile($user);
 			if($result && ($USER_DETAILS['type'] > USER_TYPE_ZABBIX_USER)){
 				$data = array(
 					'users' => $user,
 					'medias' => $user['user_medias']
 				);
-				$result = CUser::updateMedia($data);
+				$result = API::User()->updateMedia($data);
 			}
 
 			$result = DBend($result);
-			if(!$result) error(CUser::resetErrors());
+			if(!$result) error(API::User()->resetErrors());
 
 			if($result){
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_USER,
@@ -165,7 +164,7 @@ $fields=array(
 					' Surname ['.$USER_DETAILS['surname'].'] profile id ['.$USER_DETAILS['userid'].']');
 
 				$url = CProfile::get('web.paging.lastpage', 'profile.php');
-				
+
 				ob_end_clean();
 				redirect($url);
 			}
