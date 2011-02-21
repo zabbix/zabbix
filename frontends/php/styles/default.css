@@ -306,12 +306,12 @@ div #div_node_tree {
 	z-index: 200;
 }
 
-div.thin_header{ width: 100%; color: #FFFFFF; background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left; border: 0 #000000 solid; text-align: center; }
+div.thin_header{ width: 100%; color: #FFFFFF;  background: #5c9ccc url(originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x; border: 0 #000000 solid; text-align: center; }
 
 /* <FORM ELEMENT> */
 div.formElement_header{
 	color: #FFFFFF;
-	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
+	background: #5c9ccc url(originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x;
 	border: 0;
 	text-align: left;
 	height: 20px;
@@ -322,7 +322,7 @@ div.formElement_header{
 div.formElement_body{ border: 1px solid #AAAAAA; background-color: #E5E5E5; }
 .formElementTable{  }
 .formElementTable tr td{ vertical-align: top; padding-left: 5px; padding-right: 5px; height: 24px;}
-div.formElement_footer{ color: #FFFFFF; background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left; border: 0; text-align: right; height: 20px; padding-right: 5px;}
+div.formElement_footer{ color: #FFFFFF;  background: #5c9ccc url(originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x; border: 0; text-align: right; height: 20px; padding-right: 5px;}
 
 /* CSS Document */
 /**************** PAGE TABLE ****************/
@@ -341,8 +341,8 @@ table.formtable tr.edit { background-color: #F0F0E0; }
 table.formtable tr.form_odd_row td{ background-color: #D8D8D8; }
 table.formtable tr.form_even_row td{ background-color: #DFDFDF; }
 table.formtable tr td { text-decoration: none; background-color: #EEEEEE; }
-table.formtable tr td.form_row_first{ background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left; color: #FFFFFF; font-size:11px; font-weight: bold; }
-table.formtable tr td.form_row_last { color: #FFFFFF; background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left; text-align: right; }
+table.formtable tr td.form_row_first{  background: #5c9ccc url(originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x; color: #FFFFFF; font-size:11px; font-weight: bold; }
+table.formtable tr td.form_row_last { color: #FFFFFF;  background: #5c9ccc url(originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x; text-align: right; }
 table.formtable tr td.form_row_l { width: 30%; }
 table.formtable tr td.form_row_c { text-align: center; }
 table.formtable tr td.form_row_r { }
@@ -445,7 +445,7 @@ table.itemfilter{ border: 1px solid #777777; width: 100%; background-color: whit
 /**************** Aknowledges ****************/
 
 table.ack_msgs{ width: 70%; background-color: #EEEEEE; padding: 0; border: 0 solid;}
-table.ack_msgs tr.title { height: 14px; vertical-align: middle; color: #FFFFFF; background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;}
+table.ack_msgs tr.title { height: 14px; vertical-align: middle; color: #FFFFFF;  background: #5c9ccc url(originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x;}
 table.ack_msgs tr td.user{ padding-left: 10px; padding-right: 10px; text-align: left;}
 table.ack_msgs tr td.time{ padding-left: 10px; padding-right: 10px; text-align: center; width: 150px;}
 table.ack_msgs tr.msg{ height: 25px; background-color: #F8F8F8; }
@@ -499,7 +499,7 @@ table.triggers_info tr td {
 	height: 18px;
 }
 
-table.triggers_info tr td.header { background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left; color: #FFFFFF;}
+table.triggers_info tr td.header {  background: #5c9ccc url(originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x; color: #FFFFFF;}
 table.triggers_info tr td 			{	background-color: #CCCCCC;	}
 table.triggers_info tr td.disaster		{	background-color: #FF0000;	}
 table.triggers_info tr td.high			{	background-color: #FF8888;	}
@@ -524,7 +524,7 @@ table.hosts_info tr td {
 	font-size: 1.1em;
 }
 
-table.hosts_info tr td.header { background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left; color: #FFFFFF;}
+table.hosts_info tr td.header {  background: #5c9ccc url(originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x; color: #FFFFFF;}
 table.hosts_info tr td.avail{ background-color: #99F099;}
 table.hosts_info tr td.notav{ background-color: #F09999;}
 table.hosts_info tr td.uncn{ background-color: #CCCCCC;}
@@ -532,7 +532,7 @@ table.hosts_info tr td.uncn{ background-color: #CCCCCC;}
 /**************** SERVER INFORMATION MODULE ****************/
 table.server_info { width: 100%; background-color: #EFEFEF; border: 1px gray dotted;}
 table.server_info tr td { border: 0; padding-left: 5px; padding-right: 5px; text-align: left; font-size: 1.1em; background-color: #EFEFEF; white-space: nowrap;word-spacing: 0;}
-table.server_info tr td.header { background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left; color: #FFFFFF;}
+table.server_info tr td.header {  background: #5c9ccc url(originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x; color: #FFFFFF;}
 table.server_info tr.status td{ white-space: nowrap; word-spacing: 0; }
 /**************** WARNING ***********/
 
