@@ -50,7 +50,8 @@ $page['file']	= 'index.php';
 
 		CWebUser::logout($sessionid);
 
-		require('login.php');
+		$loginForm = new CGetForm('login');
+		$loginForm->render();
 		exit();
 	}
 
@@ -75,17 +76,16 @@ $page['file']	= 'index.php';
 
 		$login = CWebUser::login($name, $passwd);
 
-
 		if($login){
 // save remember login preferance
 			$user = array('autologin' => get_request('autologin', 0));
-			if($USER_DETAILS['autologin'] != $user['autologin'])
+			if(CWebUser::$data['autologin'] != $user['autologin'])
 				$result = API::User()->updateProfile($user);
 // --
 
-			$url = is_null($request)?$USER_DETAILS['url']:$request;
+			$url = is_null($request)?CWebUser::$data['url']:$request;
 
-			add_audit_ext(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, $USER_DETAILS['userid'], '', null,null,null);
+			add_audit_ext(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, CWebUser::$data['userid'], '', null,null,null);
 			if(zbx_empty($url) || ($url == $page['file'])){
 				$url = 'dashboard.php';
 			}
@@ -96,17 +96,23 @@ $page['file']	= 'index.php';
 	}
 
 	if($sessionid)
-		CUser::checkAuthentication(array('sessionid'=>$sessionid));
-	show_messages();
+		CWebUser::checkAuthentication($sessionid);
 
-	if($USER_DETAILS['alias'] == ZBX_GUEST_USER){
+//	show_messages();
+
+	if(CWebUser::$data['alias'] == ZBX_GUEST_USER){
 		switch($config['authentication_type']){
 			case ZBX_AUTH_HTTP:
 				break;
 			case ZBX_AUTH_LDAP:
 			case ZBX_AUTH_INTERNAL:
 				if(isset($_REQUEST['enter'])) $_REQUEST['autologin'] = get_request('autologin', 0);
-				require('login.php');
+
+				$_REQUEST['message'] = clear_messages(1);
+				if(is_array($_REQUEST['message'])) $_REQUEST['message'] = $_REQUEST['message'][0]['message'];
+
+				$loginForm = new CGetForm('login');
+				$loginForm->render();
 		}
 	}
 	else{

@@ -28,9 +28,7 @@ class CProfile{
 	private static $insert = array();
 
 	public static function init(){
-		global $USER_DETAILS;
-
-		self::$userDetails = $USER_DETAILS;
+		self::$userDetails = CWebUser::$data;
 		self::$profiles = array();
 
 		$sql = 'SELECT * '.
@@ -255,19 +253,17 @@ return	DBexecute('update config set '.implode(',',$update).' where '.DBin_node('
 
 /************ HISTORY **************/
 function get_user_history(){
-	global $USER_DETAILS;
-
 	$result = array();
 	$delimiter = new CSpan('&raquo;','delimiter');
 
 	$sql = 'SELECT title1, url1, title2, url2, title3, url3, title4, url4, title5, url5
-			FROM user_history WHERE userid='.$USER_DETAILS['userid'];
+			FROM user_history WHERE userid='.CWebUser::$data['userid'];
 	$history = DBfetch(DBSelect($sql));
 
 	if($history)
-		$USER_DETAILS['last_page'] = array('title' => $history['title4'], 'url' => $history['url4']);
+		CWebUser::$data['last_page'] = array('title' => $history['title4'], 'url' => $history['url4']);
 	else
-		$USER_DETAILS['last_page'] = false;
+		CWebUser::$data['last_page'] = false;
 
 	for($i = 1; $i<6; $i++){
 		if(defined($history['title'.$i])){
@@ -282,9 +278,7 @@ function get_user_history(){
 }
 
 function add_user_history($page){
-	global $USER_DETAILS;
-
-	$userid = $USER_DETAILS['userid'];
+	$userid = CWebUser::$data['userid'];
 	$title = $page['title'];
 
 	if(isset($page['hist_arg']) && is_array($page['hist_arg'])){
@@ -315,7 +309,7 @@ function add_user_history($page){
 			return; // no need to change anything;
 	}
 	else{ // new page with new title is added
-		if(!$USER_DETAILS['last_page']){
+		if(!CWebUser::$data['last_page']){
 			$userhistoryid = get_dbid('user_history', 'userhistoryid');
 			$sql = 'INSERT INTO user_history (userhistoryid, userid, title5, url5)'.
 					' VALUES('.$userhistoryid.', '.$userid.', '.zbx_dbstr($title).', '.zbx_dbstr($url).')';
@@ -344,13 +338,11 @@ return $result;
 /********** USER FAVORITES ***********/
 // Author: Aly
 function get_favorites($idx){
-	global $USER_DETAILS;
-
 	$result = array();
 
 	$sql = 'SELECT value_id, source '.
 			' FROM profiles '.
-			' WHERE userid='.$USER_DETAILS['userid'].
+			' WHERE userid='.CWebUser::$data['userid'].
 				' AND idx='.zbx_dbstr($idx).
 			' ORDER BY profileid ASC';
 	$db_profiles = DBselect($sql);
@@ -363,8 +355,6 @@ function get_favorites($idx){
 
 // Author: Aly
 function add2favorites($favobj, $favid, $source=null){
-	global $USER_DETAILS;
-
 	$favorites = get_favorites($favobj);
 
 	foreach($favorites as $id => $favorite){
@@ -376,7 +366,7 @@ function add2favorites($favobj, $favid, $source=null){
 	DBstart();
 	$values = array(
 		'profileid' => get_dbid('profiles', 'profileid'),
-		'userid' => $USER_DETAILS['userid'],
+		'userid' => CWebUser::$data['userid'],
 		'idx' => zbx_dbstr($favobj),
 		'value_id' =>  $favid,
 		'type' => PROFILE_TYPE_ID
@@ -393,10 +383,8 @@ return $result;
 
 // Author: Aly
 function rm4favorites($favobj, $favid=0, $source=null){
-	global $USER_DETAILS;
-
 	$sql = 'DELETE FROM profiles '.
-		' WHERE userid='.$USER_DETAILS['userid'].
+		' WHERE userid='.CWebUser::$data['userid'].
 			' AND idx='.zbx_dbstr($favobj).
 			(($favid > 0) ? ' AND value_id='.$favid : '').
 			(is_null($source) ? '' : ' AND source='.zbx_dbstr($source));

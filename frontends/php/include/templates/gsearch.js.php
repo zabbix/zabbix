@@ -7,8 +7,13 @@
 jQuery(document).ready(function(){
 	var tpl = new Template(jQuery('#globalSearch').html());
 	jQuery("#zbx_search").html(tpl.evaluate([]));
-	jQuery('#searchbttn').button().removeClass('ui-corner-all').addClass('ui-corner-right');
+	jQuery('#searchbttn').button()
+		.removeClass('ui-corner-all')
+		.addClass('ui-corner-right');
+	jQuery('#searchbttn').css('height', '18px');
 
 	createSuggest('search');
 });
+
+
 </script>
