@@ -1,7 +1,7 @@
 /*
- * jQuery UI CSS Framework 1.8.6
+ * jQuery UI CSS Framework 1.8.9
  *
- * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
+ * Copyright 2011, AUTHORS.txt (http://jqueryui.com/about)
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://jquery.org/license
  *
@@ -11,7 +11,7 @@
 /* Layout helpers
 ----------------------------------*/
 .darkblue .ui-helper-hidden { display: none; }
-.darkblue .ui-helper-hidden-accessible { position: absolute; left: -99999999px; }
+.darkblue .ui-helper-hidden-accessible { position: absolute !important; clip: rect(1px 1px 1px 1px); clip: rect(1px,1px,1px,1px); }
 .darkblue .ui-helper-reset { margin: 0; padding: 0; border: 0; outline: 0; line-height: 1.3; text-decoration: none; font-size: 100%; list-style: none; }
 .darkblue .ui-helper-clearfix:after { content: "."; display: block; height: 0; clear: both; visibility: hidden; }
 .darkblue .ui-helper-clearfix { display: inline-block; }
@@ -42,45 +42,46 @@
 
 
 /*
- * jQuery UI CSS Framework 1.8.6
+ * jQuery UI CSS Framework 1.8.9
  *
- * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
+ * Copyright 2011, AUTHORS.txt (http://jqueryui.com/about)
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://jquery.org/license
  *
  * http://docs.jquery.com/UI/Theming/API
  *
- * To view and modify this theme, visit http://jqueryui.com/themeroller/?ffDefault=Verdana,%20Arial,%20sans-serif&fwDefault=normal&fsDefault=1.1em&cornerRadius=3px&bgColorHeader=444444&bgTextureHeader=03_highlight_soft.png&bgImgOpacityHeader=44&borderColorHeader=333333&fcHeader=ffffff&iconColorHeader=ffffff&bgColorContent=000000&bgTextureContent=01_flat.png&bgImgOpacityContent=25&borderColorContent=555555&fcContent=ffffff&iconColorContent=cccccc&bgColorDefault=222222&bgTextureDefault=03_highlight_soft.png&bgImgOpacityDefault=35&borderColorDefault=444444&fcDefault=eeeeee&iconColorDefault=cccccc&bgColorHover=003147&bgTextureHover=03_highlight_soft.png&bgImgOpacityHover=33&borderColorHover=0b93d5&fcHover=ffffff&iconColorHover=ffffff&bgColorActive=0972a5&bgTextureActive=04_highlight_hard.png&bgImgOpacityActive=20&borderColorActive=26b3f7&fcActive=ffffff&iconColorActive=222222&bgColorHighlight=eeeeee&bgTextureHighlight=03_highlight_soft.png&bgImgOpacityHighlight=80&borderColorHighlight=cccccc&fcHighlight=2e7db2&iconColorHighlight=4b8e0b&bgColorError=ffc73d&bgTextureError=02_glass.png&bgImgOpacityError=40&borderColorError=ffb73d&fcError=111111&iconColorError=a83300&bgColorOverlay=5c5c5c&bgTextureOverlay=07_diagonals_small.png&bgImgOpacityOverlay=50&opacityOverlay=80&bgColorShadow=cccccc&bgTextureShadow=01_flat.png&bgImgOpacityShadow=30&opacityShadow=60&thicknessShadow=3px&offsetTopShadow=-3px&offsetLeftShadow=-3px&cornerRadiusShadow=4px
+ * To view and modify this theme, visit http://jqueryui.com/themeroller/?ffDefault=verdana,%20arial,%20sans-serif&fwDefault=bold&fsDefault=1em&cornerRadius=2px&bgColorHeader=3c759b&bgTextureHeader=05_inset_soft.png&bgImgOpacityHeader=25&borderColorHeader=77b7da&fcHeader=ffffff&iconColorHeader=ffffff&bgColorContent=000E19&bgTextureContent=01_flat.png&bgImgOpacityContent=100&borderColorContent=77b7da&fcContent=ffffff&iconColorContent=ffffff&bgColorDefault=000E19&bgTextureDefault=04_highlight_hard.png&bgImgOpacityDefault=25&borderColorDefault=77b7da&fcDefault=77b7da&iconColorDefault=77b7da&bgColorHover=1d92cd&bgTextureHover=06_inset_hard.png&bgImgOpacityHover=40&borderColorHover=77b7da&fcHover=ffffff&iconColorHover=ffffff&bgColorActive=1d92cd&bgTextureActive=04_highlight_hard.png&bgImgOpacityActive=40&borderColorActive=77b7da&fcActive=ffffff&iconColorActive=ffffff&bgColorHighlight=1d92cd&bgTextureHighlight=01_flat.png&bgImgOpacityHighlight=100&borderColorHighlight=77b7da&fcHighlight=ffffff&iconColorHighlight=ffffff&bgColorError=dc0000&bgTextureError=01_flat.png&bgImgOpacityError=30&borderColorError=dc0000&fcError=ffffff&iconColorError=ffffff&bgColorOverlay=aaaaaa&bgTextureOverlay=01_flat.png&bgImgOpacityOverlay=10&opacityOverlay=40&bgColorShadow=aaaaaa&bgTextureShadow=01_flat.png&bgImgOpacityShadow=0&opacityShadow=30&thicknessShadow=8px&offsetTopShadow=-8px&offsetLeftShadow=-8px&cornerRadiusShadow=8px
  */
 
 
 /* Component containers
 ----------------------------------*/
-.darkblue .ui-widget { font-family: Verdana, Arial, sans-serif; font-size: 1.1em; }
+.darkblue .ui-widget { font-family: verdana, arial, sans-serif; font-size: 1em; }
 .darkblue .ui-widget .ui-widget { font-size: 1em; }
-.darkblue .ui-widget input, .darkblue .ui-widget select, .darkblue .ui-widget textarea, .darkblue .ui-widget button { font-family: Verdana, Arial, sans-serif; font-size: 1em; }
-.darkblue .ui-widget-content { border: 1px solid #555555; background: #000000 url(images/ui-bg_flat_25_000000_40x100.png) 50% 50% repeat-x; color: #ffffff; }
-.darkblue .ui-widget-content a { color: #ffffff; }
-.darkblue .ui-widget-header { border: 1px solid #333333; background: #444444 url(images/ui-bg_highlight-soft_44_444444_1x100.png) 50% 50% repeat-x; color: #ffffff; font-weight: bold; }
+.darkblue .ui-widget input, .darkblue .ui-widget select, .darkblue .ui-widget textarea, .darkblue .ui-widget button { font-family: verdana, arial, sans-serif; font-size: 1em;}
+.darkblue .ui-widget-content { border: 1px solid #77b7da; background-color: #001C31; color: #ffffff; }
+.darkblue .ui-widget-content a { color: #77B7DA; }
+.darkblue .ui-widget-content a:hover { color: #B0D5EC; }
+.darkblue .ui-widget-header { border: 1px solid #77b7da; background: #3c759b url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x; color: #ffffff; font-weight: bold; }
 .darkblue .ui-widget-header a { color: #ffffff; }
 
 /* Interaction states
 ----------------------------------*/
-.darkblue .ui-state-default, .darkblue .ui-widget-content .ui-state-default, .darkblue .ui-widget-header .ui-state-default { border: 1px solid #444444; background: #222222 url(images/ui-bg_highlight-soft_35_222222_1x100.png) 50% 50% repeat-x; font-weight: normal; color: #eeeeee; }
-.darkblue .ui-state-default a, .darkblue .ui-state-default a:link, .darkblue .ui-state-default a:visited { color: #eeeeee; text-decoration: none; }
-.darkblue .ui-state-hover, .darkblue .ui-widget-content .ui-state-hover, .darkblue .ui-widget-header .ui-state-hover, .darkblue .ui-state-focus, .darkblue .ui-widget-content .ui-state-focus, .darkblue .ui-widget-header .ui-state-focus { border: 1px solid #0b93d5; background: #003147 url(images/ui-bg_highlight-soft_33_003147_1x100.png) 50% 50% repeat-x; font-weight: normal; color: #ffffff; }
+.darkblue .ui-state-default, .darkblue .ui-widget-content .ui-state-default, .darkblue .ui-widget-header .ui-state-default { border: 1px solid #77b7da; background: #000e19 url(images/ui-bg_highlight-hard_25_000e19_1x100.png) 50% 50% repeat-x; font-weight: bold; color: #77b7da; }
+.darkblue .ui-state-default a, .darkblue .ui-state-default a:link, .darkblue .ui-state-default a:visited { color: #77b7da; text-decoration: none; }
+.darkblue .ui-state-hover, .darkblue .ui-widget-content .ui-state-hover, .darkblue .ui-widget-header .ui-state-hover, .darkblue .ui-state-focus, .darkblue .ui-widget-content .ui-state-focus, .darkblue .ui-widget-header .ui-state-focus { border: 1px solid #77b7da; background: #1d92cd url(images/ui-bg_inset-hard_40_1d92cd_1x100.png) 50% 50% repeat-x; font-weight: bold; color: #ffffff; }
 .darkblue .ui-state-hover a, .darkblue .ui-state-hover a:hover { color: #ffffff; text-decoration: none; }
-.darkblue .ui-state-active, .darkblue .ui-widget-content .ui-state-active, .darkblue .ui-widget-header .ui-state-active { border: 1px solid #26b3f7; background: #0972a5 url(images/ui-bg_highlight-hard_20_0972a5_1x100.png) 50% 50% repeat-x; font-weight: normal; color: #ffffff; }
+.darkblue .ui-state-active, .darkblue .ui-widget-content .ui-state-active, .darkblue .ui-widget-header .ui-state-active { border: 1px solid #77b7da; background: #1d92cd url(images/ui-bg_highlight-hard_40_1d92cd_1x100.png) 50% 50% repeat-x; font-weight: bold; color: #ffffff; }
 .darkblue .ui-state-active a, .darkblue .ui-state-active a:link, .darkblue .ui-state-active a:visited { color: #ffffff; text-decoration: none; }
 .darkblue .ui-widget :active { outline: none; }
 
 /* Interaction Cues
 ----------------------------------*/
-.darkblue .ui-state-highlight, .darkblue .ui-widget-content .ui-state-highlight, .darkblue .ui-widget-header .ui-state-highlight  {border: 1px solid #cccccc; background: #eeeeee url(images/ui-bg_highlight-soft_80_eeeeee_1x100.png) 50% top repeat-x; color: #2e7db2; }
-.darkblue .ui-state-highlight a, .darkblue .ui-widget-content .ui-state-highlight a,.ui-widget-header .ui-state-highlight a { color: #2e7db2; }
-.darkblue .ui-state-error, .darkblue .ui-widget-content .ui-state-error, .darkblue .ui-widget-header .ui-state-error {border: 1px solid #ffb73d; background: #ffc73d url(images/ui-bg_glass_40_ffc73d_1x400.png) 50% 50% repeat-x; color: #111111; }
-.darkblue .ui-state-error a, .darkblue .ui-widget-content .ui-state-error a, .darkblue .ui-widget-header .ui-state-error a { color: #111111; }
-.darkblue .ui-state-error-text, .darkblue .ui-widget-content .ui-state-error-text, .darkblue .ui-widget-header .ui-state-error-text { color: #111111; }
+.darkblue .ui-state-highlight, .darkblue .ui-widget-content .ui-state-highlight, .darkblue .ui-widget-header .ui-state-highlight  {border: 1px solid #77b7da; background: #1d92cd url(images/ui-bg_flat_100_1d92cd_40x100.png) 50% 50% repeat-x; color: #ffffff; }
+.darkblue .ui-state-highlight a, .darkblue .ui-widget-content .ui-state-highlight a,.ui-widget-header .ui-state-highlight a { color: #ffffff; }
+.darkblue .ui-state-error, .darkblue .ui-widget-content .ui-state-error, .darkblue .ui-widget-header .ui-state-error {border: 1px solid #dc0000; background: #dc0000 url(images/ui-bg_flat_30_dc0000_40x100.png) 50% 50% repeat-x; color: #ffffff; }
+.darkblue .ui-state-error a, .darkblue .ui-widget-content .ui-state-error a, .darkblue .ui-widget-header .ui-state-error a { color: #ffffff; }
+.darkblue .ui-state-error-text, .darkblue .ui-widget-content .ui-state-error-text, .darkblue .ui-widget-header .ui-state-error-text { color: #ffffff; }
 .darkblue .ui-priority-primary, .darkblue .ui-widget-content .ui-priority-primary, .darkblue .ui-widget-header .ui-priority-primary { font-weight: bold; }
 .darkblue .ui-priority-secondary, .darkblue .ui-widget-content .ui-priority-secondary,  .ui-widget-header .ui-priority-secondary { opacity: .7; filter:Alpha(Opacity=70); font-weight: normal; }
 .darkblue .ui-state-disabled, .darkblue .ui-widget-content .ui-state-disabled, .darkblue .ui-widget-header .ui-state-disabled { opacity: .35; filter:Alpha(Opacity=35); background-image: none; }
@@ -89,14 +90,14 @@
 ----------------------------------*/
 
 /* states and images */
-.darkblue .ui-icon { width: 16px; height: 16px; background-image: url(images/ui-icons_cccccc_256x240.png); }
-.darkblue .ui-widget-content .ui-icon {background-image: url(images/ui-icons_cccccc_256x240.png); }
+.darkblue .ui-icon { width: 16px; height: 16px; background-image: url(images/ui-icons_ffffff_256x240.png); }
+.darkblue .ui-widget-content .ui-icon {background-image: url(images/ui-icons_ffffff_256x240.png); }
 .darkblue .ui-widget-header .ui-icon {background-image: url(images/ui-icons_ffffff_256x240.png); }
-.darkblue .ui-state-default .ui-icon { background-image: url(images/ui-icons_cccccc_256x240.png); }
+.darkblue .ui-state-default .ui-icon { background-image: url(images/ui-icons_77b7da_256x240.png); }
 .darkblue .ui-state-hover .ui-icon, .darkblue .ui-state-focus .ui-icon {background-image: url(images/ui-icons_ffffff_256x240.png); }
-.darkblue .ui-state-active .ui-icon {background-image: url(images/ui-icons_222222_256x240.png); }
-.darkblue .ui-state-highlight .ui-icon {background-image: url(images/ui-icons_4b8e0b_256x240.png); }
-.darkblue .ui-state-error .ui-icon, .darkblue .ui-state-error-text .ui-icon {background-image: url(images/ui-icons_a83300_256x240.png); }
+.darkblue .ui-state-active .ui-icon {background-image: url(images/ui-icons_ffffff_256x240.png); }
+.darkblue .ui-state-highlight .ui-icon {background-image: url(images/ui-icons_ffffff_256x240.png); }
+.darkblue .ui-state-error .ui-icon, .darkblue .ui-state-error-text .ui-icon {background-image: url(images/ui-icons_ffffff_256x240.png); }
 
 /* positioning */
 .darkblue .ui-icon-carat-1-n { background-position: 0 0; }
@@ -280,22 +281,22 @@
 ----------------------------------*/
 
 /* Corner radius */
-.darkblue .ui-corner-tl { -moz-border-radius-topleft: 3px; -webkit-border-top-left-radius: 3px; border-top-left-radius: 3px; }
-.darkblue .ui-corner-tr { -moz-border-radius-topright: 3px; -webkit-border-top-right-radius: 3px; border-top-right-radius: 3px; }
-.darkblue .ui-corner-bl { -moz-border-radius-bottomleft: 3px; -webkit-border-bottom-left-radius: 3px; border-bottom-left-radius: 3px; }
-.darkblue .ui-corner-br { -moz-border-radius-bottomright: 3px; -webkit-border-bottom-right-radius: 3px; border-bottom-right-radius: 3px; }
-.darkblue .ui-corner-top { -moz-border-radius-topleft: 3px; -webkit-border-top-left-radius: 3px; border-top-left-radius: 3px; -moz-border-radius-topright: 3px; -webkit-border-top-right-radius: 3px; border-top-right-radius: 3px; }
-.darkblue .ui-corner-bottom { -moz-border-radius-bottomleft: 3px; -webkit-border-bottom-left-radius: 3px; border-bottom-left-radius: 3px; -moz-border-radius-bottomright: 3px; -webkit-border-bottom-right-radius: 3px; border-bottom-right-radius: 3px; }
-.darkblue .ui-corner-right {  -moz-border-radius-topright: 3px; -webkit-border-top-right-radius: 3px; border-top-right-radius: 3px; -moz-border-radius-bottomright: 3px; -webkit-border-bottom-right-radius: 3px; border-bottom-right-radius: 3px; }
-.darkblue .ui-corner-left { -moz-border-radius-topleft: 3px; -webkit-border-top-left-radius: 3px; border-top-left-radius: 3px; -moz-border-radius-bottomleft: 3px; -webkit-border-bottom-left-radius: 3px; border-bottom-left-radius: 3px; }
-.darkblue .ui-corner-all { -moz-border-radius: 3px; -webkit-border-radius: 3px; border-radius: 3px; }
+.darkblue .ui-corner-tl { -moz-border-radius-topleft: 2px; -webkit-border-top-left-radius: 2px; border-top-left-radius: 2px; }
+.darkblue .ui-corner-tr { -moz-border-radius-topright: 2px; -webkit-border-top-right-radius: 2px; border-top-right-radius: 2px; }
+.darkblue .ui-corner-bl { -moz-border-radius-bottomleft: 2px; -webkit-border-bottom-left-radius: 2px; border-bottom-left-radius: 2px; }
+.darkblue .ui-corner-br { -moz-border-radius-bottomright: 2px; -webkit-border-bottom-right-radius: 2px; border-bottom-right-radius: 2px; }
+.darkblue .ui-corner-top { -moz-border-radius-topleft: 2px; -webkit-border-top-left-radius: 2px; border-top-left-radius: 2px; -moz-border-radius-topright: 2px; -webkit-border-top-right-radius: 2px; border-top-right-radius: 2px; }
+.darkblue .ui-corner-bottom { -moz-border-radius-bottomleft: 2px; -webkit-border-bottom-left-radius: 2px; border-bottom-left-radius: 2px; -moz-border-radius-bottomright: 2px; -webkit-border-bottom-right-radius: 2px; border-bottom-right-radius: 2px; }
+.darkblue .ui-corner-right {  -moz-border-radius-topright: 2px; -webkit-border-top-right-radius: 2px; border-top-right-radius: 2px; -moz-border-radius-bottomright: 2px; -webkit-border-bottom-right-radius: 2px; border-bottom-right-radius: 2px; }
+.darkblue .ui-corner-left { -moz-border-radius-topleft: 2px; -webkit-border-top-left-radius: 2px; border-top-left-radius: 2px; -moz-border-radius-bottomleft: 2px; -webkit-border-bottom-left-radius: 2px; border-bottom-left-radius: 2px; }
+.darkblue .ui-corner-all { -moz-border-radius: 2px; -webkit-border-radius: 2px; border-radius: 2px; }
 
 /* Overlays */
-.darkblue .ui-widget-overlay { background: #5c5c5c url(images/ui-bg_diagonals-small_50_5c5c5c_40x40.png) 50% 50% repeat; opacity: .80;filter:Alpha(Opacity=80); }
-.darkblue .ui-widget-shadow { margin: -3px 0 0 -3px; padding: 3px; background: #cccccc url(images/ui-bg_flat_30_cccccc_40x100.png) 50% 50% repeat-x; opacity: .60;filter:Alpha(Opacity=60); -moz-border-radius: 4px; -webkit-border-radius: 4px; border-radius: 4px; }/*
- * jQuery UI Resizable 1.8.6
+.darkblue .ui-widget-overlay { background: #aaaaaa url(images/ui-bg_flat_10_aaaaaa_40x100.png) 50% 50% repeat-x; opacity: .40;filter:Alpha(Opacity=40); }
+.darkblue .ui-widget-shadow { margin: -8px 0 0 -8px; padding: 8px; background: #aaaaaa url(images/ui-bg_flat_0_aaaaaa_40x100.png) 50% 50% repeat-x; opacity: .30;filter:Alpha(Opacity=30); -moz-border-radius: 8px; -webkit-border-radius: 8px; border-radius: 8px; }/*
+ * jQuery UI Resizable 1.8.9
  *
- * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
+ * Copyright 2011, AUTHORS.txt (http://jqueryui.com/about)
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://jquery.org/license
  *
@@ -312,9 +313,9 @@
 .darkblue .ui-resizable-sw { cursor: sw-resize; width: 9px; height: 9px; left: -5px; bottom: -5px; }
 .darkblue .ui-resizable-nw { cursor: nw-resize; width: 9px; height: 9px; left: -5px; top: -5px; }
 .darkblue .ui-resizable-ne { cursor: ne-resize; width: 9px; height: 9px; right: -5px; top: -5px;}/*
- * jQuery UI Selectable 1.8.6
+ * jQuery UI Selectable 1.8.9
  *
- * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
+ * Copyright 2011, AUTHORS.txt (http://jqueryui.com/about)
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://jquery.org/license
  *
@@ -322,9 +323,9 @@
  */
 .darkblue .ui-selectable-helper { position: absolute; z-index: 100; border:1px dotted black; }
 /*
- * jQuery UI Accordion 1.8.6
+ * jQuery UI Accordion 1.8.9
  *
- * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
+ * Copyright 2011, AUTHORS.txt (http://jqueryui.com/about)
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://jquery.org/license
  *
@@ -339,10 +340,11 @@
 .darkblue .ui-accordion-icons .ui-accordion-header a { padding-left: 2.2em; }
 .darkblue .ui-accordion .ui-accordion-header .ui-icon { position: absolute; left: .5em; top: 50%; margin-top: -8px; }
 .darkblue .ui-accordion .ui-accordion-content { padding: 1em 2.2em; border-top: 0; margin-top: -2px; position: relative; top: 1px; margin-bottom: 2px; overflow: auto; display: none; zoom: 1; }
-.darkblue .ui-accordion .ui-accordion-content-active { display: block; }/*
- * jQuery UI Autocomplete 1.8.6
+.darkblue .ui-accordion .ui-accordion-content-active { display: block; }
+/*
+ * jQuery UI Autocomplete 1.8.9
  *
- * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
+ * Copyright 2011, AUTHORS.txt (http://jqueryui.com/about)
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://jquery.org/license
  *
@@ -354,7 +356,7 @@
 * html .ui-autocomplete { width:1px; } /* without this, the menu expands to 100% in IE6 */
 
 /*
- * jQuery UI Menu 1.8.6
+ * jQuery UI Menu 1.8.9
  *
  * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
  * Dual licensed under the MIT or GPL Version 2 licenses.
@@ -393,29 +395,29 @@
 	margin: -1px;
 }
 /*
- * jQuery UI Button 1.8.6
+ * jQuery UI Button 1.8.9
  *
- * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
+ * Copyright 2011, AUTHORS.txt (http://jqueryui.com/about)
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://jquery.org/license
  *
  * http://docs.jquery.com/UI/Button#theming
  */
-.darkblue .ui-button { display: inline-block; position: relative; padding: 0; margin-right: .1em; text-decoration: none !important; cursor: pointer; text-align: center; zoom: 1; overflow: visible; } /* the overflow property removes extra width in IE */
+.darkblue .ui-button { display: inline-block; position: relative; margin-right: .1em; text-decoration: none !important; cursor: pointer; text-align: center; zoom: 1; overflow: visible; } /* the overflow property removes extra width in IE */
 .darkblue .ui-button-icon-only { width: 2.2em; } /* to make room for the icon, a width needs to be set here */
 button.ui-button-icon-only { width: 2.4em; } /* button elements seem to need a little more width */
 .darkblue .ui-button-icons-only { width: 3.4em; } 
 button.ui-button-icons-only { width: 3.7em; } 
 
 /*button text element */
-.darkblue .ui-button .ui-button-text { display: block; line-height: 1.4;  }
+.darkblue .ui-button .ui-button-text { display: block; line-height: 1.0;  }
 .darkblue .ui-button-text-only .ui-button-text { padding: .4em 1em; }
 .darkblue .ui-button-icon-only .ui-button-text, .darkblue .ui-button-icons-only .ui-button-text { padding: .4em; text-indent: -9999999px; }
 .darkblue .ui-button-text-icon-primary .ui-button-text, .darkblue .ui-button-text-icons .ui-button-text { padding: .4em 1em .4em 2.1em; }
 .darkblue .ui-button-text-icon-secondary .ui-button-text, .darkblue .ui-button-text-icons .ui-button-text { padding: .4em 2.1em .4em 1em; }
 .darkblue .ui-button-text-icons .ui-button-text { padding-left: 2.1em; padding-right: 2.1em; }
 /* no icon support for input elements, provide padding by default */
-input.ui-button { padding: .4em 1em; }
+input.ui-button { padding: .3em 1em; }
 
 /*button icon element(s) */
 .darkblue .ui-button-icon-only .ui-icon, .darkblue .ui-button-text-icon-primary .ui-icon, .darkblue .ui-button-text-icon-secondary .ui-icon, .darkblue .ui-button-text-icons .ui-icon, .darkblue .ui-button-icons-only .ui-icon { position: absolute; top: 50%; margin-top: -8px; }
@@ -426,35 +428,37 @@ input.ui-button { padding: .4em 1em; }
 
 /*button sets*/
 .darkblue .ui-buttonset { margin-right: 7px; }
-.darkblue .ui-buttonset .ui-button { margin-left: 0; margin-right: -.3em; }
+.darkblue .ui-buttonset .ui-button { margin-left: 0; margin-right: -.4em; }
 
 /* workarounds */
 button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra padding in Firefox */
 /*
- * jQuery UI Dialog 1.8.6
+ * jQuery UI Dialog 1.8.9
  *
- * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
+ * Copyright 2011, AUTHORS.txt (http://jqueryui.com/about)
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://jquery.org/license
  *
  * http://docs.jquery.com/UI/Dialog#theming
  */
 .darkblue .ui-dialog { position: absolute; padding: .2em; width: 300px; overflow: hidden; }
-.darkblue .ui-dialog .ui-dialog-titlebar { padding: .5em 1em .3em; position: relative;  }
-.darkblue .ui-dialog .ui-dialog-title { float: left; margin: .1em 16px .2em 0; } 
+.darkblue .ui-dialog .ui-dialog-titlebar { padding: .4em 1em; position: relative;  }
+.darkblue .ui-dialog .ui-dialog-title { float: left; margin: .1em 16px .1em 0; }
 .darkblue .ui-dialog .ui-dialog-titlebar-close { position: absolute; right: .3em; top: 50%; width: 19px; margin: -10px 0 0 0; padding: 1px; height: 18px; }
 .darkblue .ui-dialog .ui-dialog-titlebar-close span { display: block; margin: 1px; }
 .darkblue .ui-dialog .ui-dialog-titlebar-close:hover, .darkblue .ui-dialog .ui-dialog-titlebar-close:focus { padding: 0; }
 .darkblue .ui-dialog .ui-dialog-content { position: relative; border: 0; padding: .5em 1em; background: none; overflow: auto; zoom: 1; }
 .darkblue .ui-dialog .ui-dialog-buttonpane { text-align: left; border-width: 1px 0 0 0; background-image: none; margin: .5em 0 0 0; padding: .3em 1em .5em .4em; }
 .darkblue .ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset { float: right; }
-.darkblue .ui-dialog .ui-dialog-buttonpane button { margin: .5em .8em .5em 0; cursor: pointer; }
+.darkblue .ui-dialog .ui-dialog-buttonpane button { margin: .5em .4em .5em 0; cursor: pointer; }
 .darkblue .ui-dialog .ui-resizable-se { width: 14px; height: 14px; right: 3px; bottom: 3px; }
 .darkblue .ui-draggable .ui-dialog-titlebar { cursor: move; }
+.darkblue .ui-sortable-placeholder { border: 1px dotted #2f2f2f; }
+
 /*
- * jQuery UI Slider 1.8.6
+ * jQuery UI Slider 1.8.9
  *
- * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
+ * Copyright 2011, AUTHORS.txt (http://jqueryui.com/about)
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://jquery.org/license
  *
@@ -475,9 +479,9 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 .darkblue .ui-slider-vertical .ui-slider-range { left: 0; width: 100%; }
 .darkblue .ui-slider-vertical .ui-slider-range-min { bottom: 0; }
 .darkblue .ui-slider-vertical .ui-slider-range-max { top: 0; }/*
- * jQuery UI Tabs 1.8.6
+ * jQuery UI Tabs 1.8.9
  *
- * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
+ * Copyright 2011, AUTHORS.txt (http://jqueryui.com/about)
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://jquery.org/license
  *
@@ -493,15 +497,15 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 .darkblue .ui-tabs .ui-tabs-panel { display: block; border-width: 0; padding: 1em 1.4em; background: none; }
 .darkblue .ui-tabs .ui-tabs-hide { display: none !important; }
 /*
- * jQuery UI Datepicker 1.8.6
+ * jQuery UI Datepicker 1.8.9
  *
- * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
+ * Copyright 2011, AUTHORS.txt (http://jqueryui.com/about)
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://jquery.org/license
  *
  * http://docs.jquery.com/UI/Datepicker#theming
  */
-.darkblue .ui-datepicker { width: 17em; padding: .2em .2em 0; }
+.darkblue .ui-datepicker { width: 17em; padding: .2em .2em 0; display: none; }
 .darkblue .ui-datepicker .ui-datepicker-header { position:relative; padding:.2em 0; }
 .darkblue .ui-datepicker .ui-datepicker-prev, .darkblue .ui-datepicker .ui-datepicker-next { position:absolute; top: 2px; width: 1.8em; height: 1.8em; }
 .darkblue .ui-datepicker .ui-datepicker-prev-hover, .darkblue .ui-datepicker .ui-datepicker-next-hover { top: 1px; }
@@ -560,9 +564,9 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
     width: 200px; /*must have*/
     height: 200px; /*must have*/
 }/*
- * jQuery UI Progressbar 1.8.6
+ * jQuery UI Progressbar 1.8.9
  *
- * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
+ * Copyright 2011, AUTHORS.txt (http://jqueryui.com/about)
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://jquery.org/license
  *

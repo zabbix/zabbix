@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -321,8 +321,9 @@ if(isset($_REQUEST['sform'])){
 	$maxid=0;
 
 	$bExprResult = true;
-
-	$exprData = new CTriggerExpression(array('expression'=>construct_expression($itemid,$expressions)));
+	$exprData = new CTriggerExpression(array(
+		'expression'=> empty($expressions) ? '' : construct_expression($itemid,$expressions)
+	));
 	if(isset($_REQUEST['triggerid']) && !isset($_REQUEST['save_trigger'])
 			&& !empty($exprData->errors) && !isset($_REQUEST['form_refresh'])){
 

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2010-2011 SIA Zabbix
+** Copyright (C) 2010-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -357,7 +357,7 @@ updateSortable: function(){
 	}).portletState("load", {"name": "dashboard"})
 	.children('div').children('div.header').addClass('move');
 
-	jQuery(".column").disableSelection();
+//	jQuery(".column").disableSelection();
 }
 });
 

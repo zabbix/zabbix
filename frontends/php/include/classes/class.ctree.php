@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -238,7 +238,7 @@ class CTree{
 		$js.= 'var '.$this->treename.' = null';
 		$js.= '</script>'."\n";
 
-		zbx_add_post_js($this->treename.' = new CTree("tree_'.$this->getUserAlias().'_'.$this->treename.'", '.$this->treename.'_tree);');
+		zbx_add_post_js($this->treename.' = new CTree("tree_'.CWebUser::$data['alias'].'_'.$this->treename.'", '.$this->treename.'_tree);');
 
 	return new CJSscript($js);
 	}
@@ -279,11 +279,6 @@ class CTree{
 
 	private function destroy(){
 		unset($this->tree);
-	}
-
-	private function getUserAlias(){
-		global $USER_DETAILS;
-	return $USER_DETAILS['alias'];
 	}
 }
 ?>
