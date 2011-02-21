@@ -326,12 +326,7 @@ function getSeverityCell($severity, $text=null, $force_normal=false){
 		$text = getSeverityCaption($severity);
 	}
 
-	if($severity == TRIGGER_SEVERITY_NOT_CLASSIFIED){
-		return new CCol($text);
-	}
-	else{
-		return new CCol($text, get_severity_style($severity, !$force_normal));
-	}
+	return new CCol($text, get_severity_style($severity, !$force_normal));
 }
 
 /*

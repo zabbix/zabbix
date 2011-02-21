@@ -381,12 +381,7 @@ if(isset($_REQUEST['sform'])){
 //	$frmTRLog->addRow(S_MULTIPLE_EVENTS,new CCheckBox('type', (($type == TRIGGER_MULT_EVENT_ENABLED)?'yes':'no'), null,1));
 
 	$sev_select = new CComboBox('priority', $priority);
-	$sev_select->addItem(TRIGGER_SEVERITY_NOT_CLASSIFIED, getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED));
-	$sev_select->addItem(TRIGGER_SEVERITY_INFORMATION, getSeverityCaption(TRIGGER_SEVERITY_INFORMATION));
-	$sev_select->addItem(TRIGGER_SEVERITY_WARNING, getSeverityCaption(TRIGGER_SEVERITY_WARNING));
-	$sev_select->addItem(TRIGGER_SEVERITY_AVERAGE, getSeverityCaption(TRIGGER_SEVERITY_AVERAGE));
-	$sev_select->addItem(TRIGGER_SEVERITY_HIGH, getSeverityCaption(TRIGGER_SEVERITY_HIGH));
-	$sev_select->addItem(TRIGGER_SEVERITY_DISASTER, getSeverityCaption(TRIGGER_SEVERITY_DISASTER));
+	$sev_select->addItems(getSeverityCaption());
 	$frmTRLog->addRow(S_SEVERITY, $sev_select);
 
 	$frmTRLog->addRow(S_COMMENTS, new CTextArea('comments',$comments));

@@ -108,8 +108,9 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 		$help_table->addRow(array(new CCol(SPACE, 'normal'), S_DISABLED));
 	}
 
-	foreach(array(1,2,3,4,5) as $tr_severity)
-		$help_table->addRow(array(getSeverityCell($tr_severity),S_ENABLED));
+	for($i=0; $i<6; $i++){
+		$help_table->addRow(array(getSeverityCell($i), S_ENABLED));
+	}
 
 	$help_table->addRow(array(new CCol(SPACE, 'unknown_trigger'), S_UNKNOWN));
 
