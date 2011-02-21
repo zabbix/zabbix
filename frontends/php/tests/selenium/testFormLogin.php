@@ -29,7 +29,7 @@ class testFormLogin extends CWebTest
 		$this->assertTitle('Dashboard');
 		$this->click('link=Logout');
 		$this->wait();
-		$this->ok('Login name');
+		$this->ok('Username');
 		$this->ok('Password');
 
 		$this->input_type('name','Admin');
@@ -47,7 +47,7 @@ class testFormLogin extends CWebTest
 		$this->assertTitle('Dashboard');
 		$this->click('link=Logout');
 		$this->wait();
-		$this->ok('Login name');
+		$this->ok('Username');
 		$this->ok('Password');
 
 		$this->input_type('name','Admin');
