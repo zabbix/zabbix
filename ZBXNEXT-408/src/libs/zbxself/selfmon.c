@@ -388,7 +388,8 @@ void	collect_selfmon_stats()
 
 	LOCK_SM;
 
-	index = (collector->first + collector->count) % MAX_HISTORY;
+	if (MAX_HISTORY <= (index = collector->first + collector->count))
+		index -= MAX_HISTORY;
 
 	if (collector->count < MAX_HISTORY)
 		collector->count++;
