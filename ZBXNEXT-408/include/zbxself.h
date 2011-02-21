@@ -50,7 +50,7 @@
 #define ZBX_PROCESS_TYPE_COUNT		19	/* number of process types */
 #define ZBX_PROCESS_TYPE_UNKNOWN	255
 
-int	get_process_forks(unsigned char process_type);
+int	get_process_type_forks(unsigned char process_type);
 const char	*get_process_type_string(unsigned char process_type);
 void	init_selfmon_collector();
 void	free_selfmon_collector();

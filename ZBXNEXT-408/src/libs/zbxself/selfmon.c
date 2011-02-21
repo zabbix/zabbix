@@ -73,7 +73,7 @@ extern int	CONFIG_SELFMON_FORKS;
 
 /******************************************************************************
  *                                                                            *
- * Function: get_process_forks                                                *
+ * Function: get_process_type_forks                                           *
  *                                                                            *
  * Purpose: Returns number of processes depending on process type             *
  *                                                                            *
@@ -86,7 +86,7 @@ extern int	CONFIG_SELFMON_FORKS;
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	get_process_forks(unsigned char process_type)
+int	get_process_type_forks(unsigned char process_type)
 {
 	switch (process_type)
 	{
@@ -228,7 +228,8 @@ void	init_selfmon_collector()
 	sz_total = sz = sizeof(zbx_selfmon_collector_t);
 	sz_total += sz_array = sizeof(zbx_stat_process_t *) * ZBX_PROCESS_TYPE_COUNT;
 	for (process_type = 0; process_type < ZBX_PROCESS_TYPE_COUNT; process_type++)
-		sz_total += sz_process[process_type] = sizeof(zbx_stat_process_t) * get_process_forks(process_type);
+		sz_total += sz_process[process_type] = sizeof(zbx_stat_process_t) *
+				get_process_type_forks(process_type);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() size:%d", __function_name, (int)sz_total);
 
@@ -267,7 +268,7 @@ void	init_selfmon_collector()
 		collector->process[process_type] = (zbx_stat_process_t *)p; p += sz_process[process_type];
 		memset(collector->process[process_type], 0, sz_process[process_type]);
 
-		process_forks = get_process_forks(process_type);
+		process_forks = get_process_type_forks(process_type);
 		for (process_num = 0; process_num < process_forks; process_num++)
 		{
 			collector->process[process_type][process_num].last_ticks = ticks;
@@ -396,7 +397,7 @@ void	collect_selfmon_stats()
 
 	for (process_type = 0; process_type < ZBX_PROCESS_TYPE_COUNT; process_type++)
 	{
-		process_forks = get_process_forks(process_type);
+		process_forks = get_process_type_forks(process_type);
 		for (process_num = 0; process_num < process_forks; process_num++)
 		{
 			process = &collector->process[process_type][process_num];
@@ -442,7 +443,7 @@ int	get_selfmon_stats(unsigned char process_type, int process_num, unsigned char
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	process_forks = get_process_forks(process_type);
+	process_forks = get_process_type_forks(process_type);
 
 	if (0 != process_num)
 	{
@@ -504,18 +505,21 @@ exit:
 void	zbx_sleep_loop(int sleeptime)
 {
 	extern unsigned char	process_type;
+	const char		*process_type_string;
 
 	if (sleeptime <= 0)
 		return;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "sleeping for %d seconds", sleeptime);
 
+	process_type_string = get_process_type_string(process_type);
+
 	update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
 	do
 	{
 		zbx_setproctitle("%s [sleeping for %d seconds]",
-				get_process_type_string(process_type), sleeptime);
+				process_type_string, sleeptime);
 		sleep(1);
 	}
 	while (--sleeptime > 0);

@@ -201,7 +201,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			goto not_supported;
 
 		if (0 != get_param(params, 2, tmp, sizeof(tmp)))
-			*tmp = '\0';
+			goto not_supported;
 
 		for (process_type = 0; process_type < ZBX_PROCESS_TYPE_COUNT; process_type++)
 			if (0 == strcmp(tmp, get_process_type_string(process_type)))
@@ -216,7 +216,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		if ('\0' == *tmp || 0 == strcmp(tmp, "all"))
 			process_num = 0;	/* all processes */
 		else if (FAIL == is_ushort(tmp, &process_num) || 0 == process_num ||
-				process_num > get_process_forks(process_type))
+				process_num > get_process_type_forks(process_type))
 			goto not_supported;
 
 		if (0 != get_param(params, 4, tmp, sizeof(tmp)))
