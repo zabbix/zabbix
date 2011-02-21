@@ -148,6 +148,8 @@ function __autoload($class_name){
 
 	set_error_handler('zbx_err_handler');
 
+	unset($show_setup);
+
 	if(defined('ZBX_DENY_GUI_ACCESS')){
 		if(isset($ZBX_GUI_ACCESS_IP_RANGE) && is_array($ZBX_GUI_ACCESS_IP_RANGE)){
 			$user_ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))?($_SERVER['HTTP_X_FORWARDED_FOR']):($_SERVER['REMOTE_ADDR']);
@@ -227,7 +229,7 @@ function __autoload($class_name){
 
 		if(function_exists('bindtextdomain')){
 			//initializing gettext translations depending on language selected by user
-			$locales = zbx_locale_variants($USER_DETAILS['lang']);
+			$locales = zbx_locale_variants(CWebUser::$data['lang']);
 
 			$locale_found = false;
 			foreach($locales as $locale){
@@ -237,13 +239,13 @@ function __autoload($class_name){
 
 				if(setlocale(LC_ALL, $locale)){
 					$locale_found = true;
-					$USER_DETAILS['locale'] = $locale;
+					CWebUser::$data['locale'] = $locale;
 					break;
 				}
 			}
 
-			if(!$locale_found && $USER_DETAILS['lang'] != 'en_GB' && $USER_DETAILS['lang'] != 'en_gb'){
-				error('Locale for language "'.$USER_DETAILS['lang'].'" is not found on the web server. Tried to set: '.implode(', ', $locales).'. Unable to translate zabbix interface.');
+			if(!$locale_found && CWebUser::$data['lang'] != 'en_GB' && CWebUser::$data['lang'] != 'en_gb'){
+				error('Locale for language "'.CWebUser::$data['lang'].'" is not found on the web server. Tried to set: '.implode(', ', $locales).'. Unable to translate zabbix interface.');
 			}
 			bindtextdomain('frontend', 'locale');
 			bind_textdomain_codeset('frontend', 'UTF-8');
@@ -260,7 +262,7 @@ function __autoload($class_name){
 		process_locales();
 	}
 	else{
-		$USER_DETAILS = array(
+		CWebUser::$data = array(
 			'alias' =>ZBX_GUEST_USER,
 			'userid'=>0,
 			'lang'  =>'en_gb',
@@ -269,6 +271,8 @@ function __autoload($class_name){
 				'name'  =>'- unknown -',
 				'nodeid'=>0)
 			);
+
+		$USER_DETAILS = CWebUser::$data;
 	}
 
 	include_once('include/locales/en_gb.inc.php');
@@ -309,10 +313,9 @@ function __autoload($class_name){
 	/********** END INITIALIZATION ************/
 
 	function access_deny(){
-		global $USER_DETAILS;
 		include_once('include/page_header.php');
 
-		if($USER_DETAILS['alias'] != ZBX_GUEST_USER){
+		if(CWebUser::$data['alias'] != ZBX_GUEST_USER){
 			show_error_message(S_NO_PERMISSIONS);
 		}
 		else{
@@ -539,14 +542,14 @@ function __autoload($class_name){
 	}
 
 	function error($msgs){
-		global $ZBX_MESSAGES, $USER_DETAILS;
+		global $ZBX_MESSAGES;
 		$msgs = zbx_toArray($msgs);
 
 		if(is_null($ZBX_MESSAGES))
 			$ZBX_MESSAGES = array();
 
 		foreach($msgs as $msg){
-			if(isset($USER_DETAILS['debug_mode']) && !is_object($msg) && !$USER_DETAILS['debug_mode']){
+			if(isset(CWebUser::$data['debug_mode']) && !is_object($msg) && !CWebUser::$data['debug_mode']){
 				$msg = preg_replace('/^\[.+?::.+?\]/', '', $msg);
 			}
 			array_push($ZBX_MESSAGES, array('type' => 'error', 'message' => $msg));
@@ -556,10 +559,17 @@ function __autoload($class_name){
 	function clear_messages($count=null){
 		global $ZBX_MESSAGES;
 
-		if(!is_null($count))
-			while($count-- > 0) array_pop($ZBX_MESSAGES);
-		else
+		$result = array();
+		if(!is_null($count)){
+			while($count-- > 0)
+				array_unshift($result, array_pop($ZBX_MESSAGES));
+		}
+		else{
+			$result = $ZBX_MESSAGES;
 			$ZBX_MESSAGES = null;
+		}
+
+		return $result;
 	}
 
 	function fatal_error($msg){

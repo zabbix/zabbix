@@ -33,7 +33,7 @@ require_once('include/page_header.php');
 	$fields=array(
 		'text'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,			null),
 		'font'=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(1,5),	null),
-		'color'=>		array(T_ZBX_STR, O_OPT,	null,	null,			null),
+		'theme'=>		array(T_ZBX_STR, O_OPT,	null,	null,			null),
 	);
 
 	check_fields($fields);
@@ -42,14 +42,15 @@ require_once('include/page_header.php');
 
 	$text = get_request('text', ' ');
 	$font = get_request('font', 9);
-	$color = get_request('color', 'black');
+	$theme = get_request('theme', 'css_ob.css');
 
-	switch($color){
-		case 'white':
+	switch($theme){
+		case 'css_bb.css':
+		case 'css_od.css':
 			$color = array('red' => 255, 'green' => 255, 'blue' => 255);
 			$shadow = array('red' => 105, 'green' => 105, 'blue' => 105);
 			break;
-		case 'black':
+		case 'css_ob.css':
 		default:
 			$color = array('red' => 0, 'green' => 0, 'blue' => 0);
 			$shadow = array('red' => 175, 'green' => 175, 'blue' => 175);

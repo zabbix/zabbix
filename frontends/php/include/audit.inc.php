@@ -68,9 +68,7 @@
 	}
 
 	function add_audit($action,$resourcetype,$details){
-		global $USER_DETAILS;
-
-		if($USER_DETAILS['userid'] == 0) return true;
+		if(CWebUser::$data['userid'] == 0) return true;
 
 
 		$auditid = get_dbid('auditlog','auditid');
@@ -81,7 +79,7 @@
 		$ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))?$_SERVER['HTTP_X_FORWARDED_FOR']:$_SERVER['REMOTE_ADDR'];
 
 		if(($result = DBexecute('INSERT INTO auditlog (auditid,userid,clock,action,resourcetype,details,ip) '.
-			' VALUES ('.$auditid.','.$USER_DETAILS['userid'].','.time().','.
+			' VALUES ('.$auditid.','.CWebUser::$data['userid'].','.time().','.
 						$action.','.$resourcetype.','.zbx_dbstr($details).','.
 						zbx_dbstr($ip).')')))
 		{
@@ -92,7 +90,6 @@
 	}
 
 	function add_audit_ext($action, $resourcetype, $resourceid, $resourcename, $table_name, $values_old, $values_new){
-		global $USER_DETAILS;
 
 		if($action == AUDIT_ACTION_UPDATE){
 			$values_diff = array();
@@ -113,10 +110,10 @@
 		$ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))?$_SERVER['HTTP_X_FORWARDED_FOR']:$_SERVER['REMOTE_ADDR'];
 		/*SDI(
 			'INSERT INTO auditlog (auditid,userid,clock,ip,action,resourcetype,resourceid,resourcename)'.
-			' values ('.$auditid.','.$USER_DETAILS['userid'].','.time().','.zbx_dbstr($ip).
+			' values ('.$auditid.','.CWebUser::$data['userid'].','.time().','.zbx_dbstr($ip).
 			','.$action.','.$resourcetype.','.$resourceid.','.zbx_dbstr($resourcename).')');*/
 		$result = DBexecute('INSERT INTO auditlog (auditid,userid,clock,ip,action,resourcetype,resourceid,resourcename)'.
-				' values ('.$auditid.','.$USER_DETAILS['userid'].','.time().','.zbx_dbstr($ip).
+				' values ('.$auditid.','.CWebUser::$data['userid'].','.time().','.zbx_dbstr($ip).
 				','.$action.','.$resourcetype.','.$resourceid.','.zbx_dbstr($resourcename).')');
 
 		if($result && $action == AUDIT_ACTION_UPDATE){
