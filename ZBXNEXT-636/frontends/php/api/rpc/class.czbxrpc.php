@@ -51,7 +51,8 @@ class czbxrpc{
 				return array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => _('Not authorized'));
 			}
 			else if(!zbx_empty($sessionid)){
-				if(!self::callAPI('user.checkAuthentication', $sessionid)){
+				$usr = self::callAPI('user.checkAuthentication', $sessionid);
+				if($usr['error']){
 					return array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => _('Not authorized'));
 				}
 			}

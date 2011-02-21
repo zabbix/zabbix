@@ -38,7 +38,10 @@ class testPageEvents extends CWebTest
 		$this->ok('Filter');
 		$this->ok('Displaying');
 		// table header
-		$this->ok(array('Time','Description','Status','Severity','Duration','Ack','Actions'));
+		if(0 == DBcount('select * from events where source='.EVENT_SOURCE_TRIGGERS))
+			$this->ok('No events found');
+		else
+			$this->ok(array('Time','IP','DNS','Description','Status'));
 	}
 
 	public function testPageEvents_Discovery_SimpleTest()
@@ -53,7 +56,10 @@ class testPageEvents extends CWebTest
 		$this->ok('Filter');
 		$this->ok('Displaying');
 		// table header
-		$this->ok(array('Time','IP','DNS','Description','Status'));
+		if(0 == DBcount('select * from events where source='.EVENT_SOURCE_DISCOVERY))
+			$this->ok('No events found');
+		else
+			$this->ok(array('Time','IP','DNS','Description','Status'));
 	}
 
 	public function testPageEvents_Triggers_Sorting()
