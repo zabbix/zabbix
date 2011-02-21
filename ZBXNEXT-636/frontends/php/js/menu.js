@@ -1,6 +1,6 @@
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 // Tech. Support: http://www.softcomplex.com/forum/forumdisplay.php?fid=40
 // Notes: This script is free. Visit official site for further details.
 //        This script adapted by Eugene Grigorjev for using as popup menu
-//        of ZABBIX software. See http://www.zabbix.com.
+//        of Zabbix software. See http://www.zabbix.com.
 //debugger;
 
 function show_popup_menu(e, content, width){

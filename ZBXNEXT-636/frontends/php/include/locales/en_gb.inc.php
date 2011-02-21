@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 SIA Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -612,7 +612,7 @@
 	'S_COPYRIGHT_BY'=>			_('Copyright 2001-2011 by'),
 	'S_CONNECTED_AS'=>			_('Connected as'),
 	'S_NOT_CONNECTED'=>			_('Not connected'),
-	'S_SIA_ZABBIX'=>			_('SIA Zabbix'),
+	'S_SIA_ZABBIX'=>			_('Zabbix SIA'),
 
 //	graph.php
 	'S_GRAPHS_COPIED'=>			_('Graphs copied'),
@@ -1984,8 +1984,6 @@
 	'S_ACTIVATE_SELECTED_APPLICATIONS' => _('Activate selected applications?'),
 	'S_DISABLE_SELECTED_APPLICATIONS' => _('Disable selected applications?'),
 	'S_DELETE_SELECTED_APPLICATIONS'  => _('Delete selected applications?'),
-	'S_CANNOT_UPDATE_APPLICATION'  => _('Cannot update application'),
-	'S_CANNOT_DELETE_APPLICATION'  => _('Cannot delete application'),
 
 // popup_media.php
 	'S_INCORRECT_TIME_PERIOD'=>	_('Incorrect time period'),
