@@ -86,7 +86,8 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
 
- - [ZBX-3472] changed item form to display SSH auth fields correctly (KB)
+ - [ZBX-3537] trigger events are now sorted by timestamp (KB)
+ - [ZBX-3472] changed item and discovery rule form to display SSH and SNMPv3 auth fields correctly when changing item type (KB)
  - [ZBX-3542] reduced the amount of debugging output for configuration cache (asaveljevs)
  - [ZBX-3536] made SNMP checks work when DNS resolves to IPv6 address; thanks to Marc Dequènes (asaveljevs,Sasha)
  - [ZBX-3541] fixed processing of nodata() function (Sasha)
