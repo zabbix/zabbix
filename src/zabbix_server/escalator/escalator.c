@@ -23,6 +23,7 @@
 #include "zlog.h"
 #include "daemon.h"
 #include "zbxserver.h"
+#include "zbxself.h"
 
 #include "escalator.h"
 #include "../operations.h"
@@ -42,6 +43,9 @@ typedef struct
 	void		*next;
 }
 ZBX_USER_MSG;
+
+extern unsigned char	process_type;
+extern int		process_num;
 
 /******************************************************************************
  *                                                                            *
@@ -1311,45 +1315,31 @@ static void	process_escalations(int now)
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-int	main_escalator_loop()
+void	main_escalator_loop()
 {
-	int			now;
-	double			sec;
-	struct sigaction	phan;
+	int	now;
+	double	sec;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_escalator_loop()");
 
-        phan.sa_sigaction = child_signal_handler;
-	sigemptyset(&phan.sa_mask);
-	phan.sa_flags = SA_SIGINFO;
-	sigaction(SIGALRM, &phan, NULL);
+	set_child_signal_handler();
 
-	zbx_setproctitle("escalator [connecting to the database]");
+	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
 	{
+		zbx_setproctitle("%s [processing escalations]", get_process_type_string(process_type));
+
 		now = time(NULL);
 		sec = zbx_time();
-
-		zbx_setproctitle("escalator [processing escalations]");
-
 		process_escalations(now);
-
 		sec = zbx_time() - sec;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Escalator spent " ZBX_FS_DBL " seconds while processing escalation items."
-				" Nextcheck after %d sec.",
-				sec,
-				CONFIG_ESCALATOR_FREQUENCY);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while processing escalations",
+				get_process_type_string(process_type), process_num, sec);
 
-		zbx_setproctitle("escalator [sleeping for %d seconds]",
-				CONFIG_ESCALATOR_FREQUENCY);
-
-		sleep(CONFIG_ESCALATOR_FREQUENCY);
+		zbx_sleep_loop(CONFIG_ESCALATOR_FREQUENCY);
 	}
-
-	/* Never reached */
-	DBclose();
 }

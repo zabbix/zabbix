@@ -60,7 +60,7 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   sys/resource.h pthread.h windows.h process.h conio.h sys/wait.h regex.h \
   stdarg.h winsock2.h pdh.h psapi.h sys/sem.h sys/ipc.h sys/shm.h Winldap.h \
   sys/timeb.h Winber.h lber.h ws2tcpip.h inttypes.h sys/file.h grp.h \
-  execinfo.h libperfstat.h sys/systemcfg.h sys/mnttab.h mntent.h)
+  execinfo.h libperfstat.h sys/systemcfg.h sys/mnttab.h mntent.h sys/times.h)
 AC_CHECK_HEADERS(resolv.h, [], [], [
   #ifdef HAVE_SYS_TYPES_H
   #  include <sys/types.h>
@@ -1431,6 +1431,7 @@ AC_OUTPUT([
 	src/libs/zbxserver/Makefile
 	src/libs/zbxicmpping/Makefile
 	src/libs/zbxexec/Makefile
+	src/libs/zbxself/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_get/Makefile
 	src/zabbix_sender/Makefile
@@ -1450,6 +1451,7 @@ AC_OUTPUT([
 	src/zabbix_server/watchdog/Makefile
 	src/zabbix_server/escalator/Makefile
 	src/zabbix_server/proxypoller/Makefile
+	src/zabbix_server/selfmon/Makefile
 	src/zabbix_proxy/Makefile
 	src/zabbix_proxy/heart/Makefile
 	src/zabbix_proxy/housekeeper/Makefile

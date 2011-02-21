@@ -26,6 +26,13 @@
 #define ZBX_SYNC_PARTIAL	0
 #define	ZBX_SYNC_FULL		1
 
+#define	ZBX_NO_POLLER			255
+#define	ZBX_POLLER_TYPE_NORMAL		0
+#define	ZBX_POLLER_TYPE_UNREACHABLE	1
+#define	ZBX_POLLER_TYPE_IPMI		2
+#define	ZBX_POLLER_TYPE_PINGER		3
+#define	ZBX_POLLER_TYPE_COUNT		4	/* number of poller types */
+
 extern char	*CONFIG_FILE;
 extern int	CONFIG_TIMEOUT;
 extern int	CONFIG_DBCONFIG_SIZE;
@@ -41,7 +48,7 @@ extern int	CONFIG_NS_SUPPORT;
 extern int	CONFIG_UNAVAILABLE_DELAY;
 extern int	CONFIG_UNREACHABLE_PERIOD;
 extern int	CONFIG_UNREACHABLE_DELAY;
-extern int	CONFIG_DBSYNCER_FORKS;
+extern int	CONFIG_HISTSYNCER_FORKS;
 extern int	CONFIG_PROXYCONFIG_FREQUENCY;
 extern int	CONFIG_PROXYDATA_FREQUENCY;
 
@@ -190,7 +197,7 @@ void	DCconfig_set_maintenance(zbx_uint64_t hostid, int maintenance_status,
 void	*DCconfig_get_stats(int request);
 
 int	DCconfig_get_proxypoller_hosts(DC_PROXY *proxies, int max_hosts);
-int	DCconfig_get_proxy_nextcheck();
+int	DCconfig_get_proxypoller_nextcheck();
 void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck);
 
 void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, char **replace_to);

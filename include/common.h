@@ -644,14 +644,6 @@ const char	*zbx_nodetype_string(unsigned char nodetype);
 #define POLLER_DELAY		5
 #define DISCOVERER_DELAY	60
 
-#define	ZBX_NO_POLLER			255
-#define	ZBX_POLLER_TYPE_NORMAL		0
-#define	ZBX_POLLER_TYPE_UNREACHABLE	1
-#define	ZBX_POLLER_TYPE_IPMI		2
-#define	ZBX_POLLER_TYPE_PINGER		3
-#define	ZBX_POLLER_TYPE_COUNT		4	/* number of poller types */
-const char	*zbx_poller_type_string(int poller_type);
-
 #define	GET_SENDER_TIMEOUT	60
 
 #ifndef MAX
@@ -790,6 +782,10 @@ int	str_in_list(const char *list, const char *value, char delimiter);
 #	define zbx_setproctitle __zbx_zbx_setproctitle
 #endif /* HAVE___VA_ARGS__ */
 void	__zbx_zbx_setproctitle(const char *fmt, ...);
+
+#define ZBX_KIBIBYTE		1024
+#define ZBX_MEBIBYTE		1048576
+#define ZBX_GIBIBYTE		1073741824
 
 #define SEC_PER_MIN		60
 #define SEC_PER_HOUR		3600
@@ -943,7 +939,7 @@ int	__zbx_open(const char *pathname, int flags);
 #endif	/* _WINDOWS && _UNICODE */
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
 
-int	MAIN_ZABBIX_ENTRY(void);
+int	MAIN_ZABBIX_ENTRY();
 
 zbx_uint64_t	zbx_letoh_uint64(zbx_uint64_t data);
 zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data);
@@ -963,5 +959,7 @@ int	parse_host_key(char *exp, char **host, char **key);
 void	make_hostname(char *host);
 
 unsigned char	get_interface_type_by_item_type(unsigned char type);
+
+int	calculate_sleeptime(int nextcheck, int max_sleeptime);
 
 #endif
