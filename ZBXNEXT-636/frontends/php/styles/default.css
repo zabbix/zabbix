@@ -481,7 +481,7 @@ table.menu tr td.active{ background: #5c9ccc url(originalblue/images/ui-bg_highl
 /************* SUB MENU ************/
 
 table.sub_menu{height: 1.8em;}
-table.sub_menu tr td{ padding-right: 5px; padding-left: 5px; padding-top: 0; padding-bottom: 0; height: 2.2em;}
+table.sub_menu tr td{ padding-left: 5px; padding-top: 0; padding-bottom: 0; height: 2.2em;}
 table.sub_menu tr td span.active a.highlight{ color: #ffcc00; }
 
 /**************** TRIGGERS INFORMATION MODULE ****************/

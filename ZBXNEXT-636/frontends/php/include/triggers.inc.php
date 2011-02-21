@@ -205,10 +205,9 @@
  *
  */
 function get_accessible_triggers($perm, $hostids, $cache=1){
-	global $USER_DETAILS;
 	static $available_triggers;
 
-	$userid = $USER_DETAILS['userid'];
+	$userid = CWebUser::$data['userid'];
 
 	$nodeid = get_current_nodeid();
 
@@ -1895,7 +1894,6 @@ function utf8RawUrlDecode($source){
  *
  */
 	function get_triggers_overview($hostids,$view_style=null){
-		global $USER_DETAILS;
 
 		if(is_null($view_style)) $view_style = CProfile::get('web.overview.view.style',STYLE_TOP);
 
@@ -1950,7 +1948,7 @@ function utf8RawUrlDecode($source){
 		ksort($hosts);
 
 
-		$css = getUserTheme($USER_DETAILS);
+		$css = getUserTheme(CWebUser::$data);
 		if($view_style == STYLE_TOP){
 			$header = array(new CCol(S_TRIGGERS,'center'));
 

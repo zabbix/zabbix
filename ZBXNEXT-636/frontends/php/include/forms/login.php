@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 ?>
 <?php
 define('ZBX_PAGE_NO_HEADER', 1);
-define('ZBX_PAGE_NO_FOOTER',1);
+define('ZBX_PAGE_NO_FOOTER', 1);
 
 $sessionid = get_cookie('zbx_sessionid');
 CWebUser::checkAuthentication($sessionid);
@@ -74,7 +74,7 @@ require_once('include/page_header.php');
 					</label>
 					<div style="height: 8px;"></div>
 					<input type="submit" class="input" name="enter" id="enter" value="<?php print(_('Sign in'));?>" />
-					<?php if($USER_DETAILS['userid'] > 0){ ?>
+					<?php if(CWebUser::$data['userid'] > 0){ ?>
 						<span style="margin-left: 14px;">
 							<a class="highlight underline" href="dashboard.php"><?php print(_('Login as Guest')); ?></a>
 						</span>
