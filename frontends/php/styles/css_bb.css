@@ -189,8 +189,8 @@ table.tableinfo tr.vertical_header td.hover_grey:hover{
 	background-color:#245078;
 }
 
-table.tableinfo tr.selected > td { background-color: #000E19; }
-table.tableinfo tr.selected:hover > td { background-color: #000E19; }
+table.tableinfo tr.selected > td { background-color: #2F56A6; }
+table.tableinfo tr.selected:hover > td { background-color: #3663BF; }
 
 table.tableinfo tr.odd_row > td { background-color: #022744; }
 table.tableinfo tr.odd_row:hover > td { background-color: #245078; }
