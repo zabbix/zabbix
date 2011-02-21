@@ -675,6 +675,7 @@ table.suggest tr td{ text-align: left; padding-left: 4px; line-height: 2.2em; fo
 /********** END OF DISCOVERY STATUS *********/
 
 .loginBG{ background-color: #AABBCC; background-image: url(../images/gradients/texture_diagonal.gif); }
-.loginForm{ padding: 15px; height: 260px; width: 582px; background-image: url(../images/general/login/background.png); background-repeat: no-repeat; }
+.loginForm{ margin: auto; padding: 15px; height: 260px; width: 582px; background-image: url(../images/general/login/background.png); background-repeat: no-repeat; *position: relative; *top: -50%;}
 .loginLogo{ height: 53px; width: 163px; background-image: url(../images/general/login/logo.png); background-repeat: no-repeat; }
 
+.vertical-middle {width: 100%; display: table-cell; vertical-align: middle; *position: absolute; *top: 50%;}
