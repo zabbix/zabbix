@@ -35,7 +35,7 @@ extern unsigned char	process_type;
  *                                                                            *
  * Function: process_configuration_sync                                       *
  *                                                                            *
- * Purpose: calculates checksum of config data                                *
+ * Purpose:                                                                   *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -43,7 +43,7 @@ extern unsigned char	process_type;
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: never returns                                                    *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	process_configuration_sync()

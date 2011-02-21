@@ -223,12 +223,13 @@ static void	process_history_table_data(ZBX_TABLE *table, int master_nodeid, int 
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void process_history_tables(int master_nodeid, int nodeid)
+static void	process_history_tables(int master_nodeid, int nodeid)
 {
-	int	t;
-	int	start = time(NULL);
+	int	t, start;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_history_tables()");
+
+	start = time(NULL);
 
 	for (t = 0; tables[t].table != 0; t++)
 	{
