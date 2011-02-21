@@ -18,14 +18,16 @@
 **/
 
 #include "common.h"
-#include "cfg.h"
 #include "db.h"
 #include "log.h"
-#include "zlog.h"
+#include "daemon.h"
+#include "zbxself.h"
 
 #include "nodewatcher.h"
 #include "nodesender.h"
 #include "history.h"
+
+extern unsigned char	process_type;
 
 /******************************************************************************
  *                                                                            *
@@ -159,44 +161,38 @@ int	is_direct_slave_node(int slave_nodeid)
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-int main_nodewatcher_loop()
+void	main_nodewatcher_loop()
 {
 	int	start, end;
 	int	lastrun = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_nodewatcher_loop()");
 
-	zbx_setproctitle("connecting to the database");
+	set_child_signal_handler();
+
+	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	for(;;)
+	for (;;)
 	{
+		zbx_setproctitle("%s [exchanging data]", get_process_type_string(process_type));
+
 		start = time(NULL);
 
-		zabbix_log( LOG_LEVEL_DEBUG, "Starting sync with nodes");
+		zabbix_log(LOG_LEVEL_DEBUG, "Starting sync with nodes");
 
-		if(lastrun + 120 < start)
+		if (lastrun + 120 < start)
 		{
 			process_nodes();
-
 			lastrun = start;
 		}
 
-		/* Send new history data to master node */
+		/* send new history data to master node */
 		main_historysender();
 
 		end = time(NULL);
 
-		if(end-start<10)
-		{
-			zbx_setproctitle("sender [sleeping for %d seconds]",
-				10-(end-start));
-			zabbix_log( LOG_LEVEL_DEBUG, "Sleeping %d seconds",
-				10-(end-start));
-			sleep(10-(end-start));
-		}
+		zbx_sleep_loop(10 - (end - start));
 	}
-
-	DBclose();
 }

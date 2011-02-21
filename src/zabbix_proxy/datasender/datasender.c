@@ -24,9 +24,12 @@
 #include "daemon.h"
 #include "zbxjson.h"
 #include "proxy.h"
+#include "zbxself.h"
 
 #include "datasender.h"
 #include "../servercomms.h"
+
+extern unsigned char	process_type;
 
 /******************************************************************************
  *                                                                            *
@@ -261,32 +264,28 @@ retry:
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-int	main_datasender_loop()
+void	main_datasender_loop()
 {
-	struct sigaction	phan;
-	int			now, sleeptime,
-				records, r;
-	double			sec;
-	struct zbx_json		j;
+	int		now, records, r;
+	double		sec;
+	struct zbx_json	j;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_datasender_loop()");
 
-	phan.sa_sigaction = child_signal_handler;
-	sigemptyset(&phan.sa_mask);
-	phan.sa_flags = SA_SIGINFO;
-	sigaction(SIGALRM, &phan, NULL);
+	set_child_signal_handler();
 
-	zbx_setproctitle("data sender [connecting to the database]");
+	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	zbx_json_init(&j, 16*1024);
+	zbx_json_init(&j, 16 * ZBX_KIBIBYTE);
 
-	for (;;) {
+	for (;;)
+	{
 		now = time(NULL);
 		sec = zbx_time();
 
-		zbx_setproctitle("data sender [sending data]");
+		zbx_setproctitle("%s [sending data]", get_process_type_string(process_type));
 
 		host_availability_sender(&j);
 
@@ -316,18 +315,6 @@ retry_autoreg_host:
 				zbx_time() - sec,
 				records);
 
-		sleeptime = CONFIG_PROXYDATA_FREQUENCY;
-
-		if (sleeptime > 0) {
-			zbx_setproctitle("data sender [sleeping for %d seconds]",
-					sleeptime);
-			zabbix_log(LOG_LEVEL_DEBUG, "Sleeping for %d seconds",
-					sleeptime);
-			sleep(sleeptime);
-		}
+		zbx_sleep_loop(CONFIG_PROXYDATA_FREQUENCY);
 	}
-
-	zbx_json_free(&j);
-
-	DBclose();
 }

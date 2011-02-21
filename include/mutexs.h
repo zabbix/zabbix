@@ -51,7 +51,8 @@
 #	define ZBX_MUTEX_CACHE_IDS	4
 #	define ZBX_MUTEX_CONFIG		5
 #	define ZBX_MUTEX_STRPOOL	6
-#	define ZBX_MUTEX_COUNT		7
+#	define ZBX_MUTEX_SELFMON	7
+#	define ZBX_MUTEX_COUNT		8
 
 #	define ZBX_MUTEX_MAX_TRIES	20 /* seconds */
 

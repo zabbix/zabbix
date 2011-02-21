@@ -26,8 +26,11 @@
 #include "daemon.h"
 #include "zbxmedia.h"
 #include "zbxserver.h"
+#include "zbxself.h"
 
 #include "alerter.h"
+
+extern unsigned char	process_type;
 
 /******************************************************************************
  *                                                                            *
@@ -145,27 +148,25 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-int	main_alerter_loop()
+void	main_alerter_loop()
 {
 	char			error[MAX_STRING_LEN], *error_esc;
 	int			res, now;
-	struct	sigaction	phan;
 	DB_RESULT		result;
 	DB_ROW			row;
 	DB_ALERT		alert;
 	DB_MEDIATYPE		mediatype;
 
-        phan.sa_sigaction = child_signal_handler;
-	sigemptyset(&phan.sa_mask);
-	phan.sa_flags = SA_SIGINFO;
-	sigaction(SIGALRM, &phan, NULL);
+	set_child_signal_handler();
 
-	zbx_setproctitle("connecting to the database");
+	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
 	{
+		zbx_setproctitle("%s [sending alerts]", get_process_type_string(process_type));
+
 		now = time(NULL);
 
 		result = DBselect("select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,mt.mediatypeid"
@@ -242,12 +243,6 @@ int	main_alerter_loop()
 		}
 		DBfree_result(result);
 
-		zbx_setproctitle("sender [sleeping for %d seconds]",
-				CONFIG_SENDER_FREQUENCY);
-
-		sleep(CONFIG_SENDER_FREQUENCY);
+		zbx_sleep_loop(CONFIG_SENDER_FREQUENCY);
 	}
-
-	/* Never reached */
-	DBclose();
 }

@@ -2331,7 +2331,7 @@ int	DCconfig_get_proxypoller_hosts(DC_HOST *hosts, int max_hosts)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_get_proxy_nextcheck                                     *
+ * Function: DCconfig_get_proxypoller_nextcheck                               *
  *                                                                            *
  * Purpose: Get nextcheck for passive proxies                                 *
  *                                                                            *
@@ -2344,9 +2344,9 @@ int	DCconfig_get_proxypoller_hosts(DC_HOST *hosts, int max_hosts)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	DCconfig_get_proxy_nextcheck()
+int	DCconfig_get_proxypoller_nextcheck()
 {
-	const char			*__function_name = "DCconfig_get_proxy_nextcheck";
+	const char			*__function_name = "DCconfig_get_proxypoller_nextcheck";
 
 	int				nextcheck;
 	zbx_binary_heap_t		*queue;

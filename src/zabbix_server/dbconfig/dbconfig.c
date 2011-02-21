@@ -21,11 +21,14 @@
 
 #include "db.h"
 #include "log.h"
-#include "zlog.h"
-#include "threads.h"
+#include "daemon.h"
+#include "zbxself.h"
 
 #include "dbconfig.h"
 #include "dbcache.h"
+
+extern int		CONFIG_DBCONFIG_FREQUENCY;
+extern unsigned char	process_type;
 
 /******************************************************************************
  *                                                                            *
@@ -42,32 +45,31 @@
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-int	main_dbconfig_loop()
+void	main_dbconfig_loop()
 {
 	double	sec;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_dbconfig_loop()");
 
-	zbx_setproctitle("db config [connecting to the database]");
+	set_child_signal_handler();
+
+	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	for (;;) {
+	for (;;)
+	{
+		zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
+
 		zabbix_log(LOG_LEVEL_DEBUG, "Syncing ...");
 
 		sec = zbx_time();
 		DCsync_configuration();
 		sec = zbx_time() - sec;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "DB config spent " ZBX_FS_DBL " second while processing configuration data. "
-				"Nextsync after %d sec.",
-				sec,
-				CONFIG_DBCONFIG_FREQUENCY);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s spent " ZBX_FS_DBL " second while processing configuration data",
+				get_process_type_string(process_type), sec);
 
-		zbx_setproctitle("db config [sleeping for %d seconds]",
-				CONFIG_DBCONFIG_FREQUENCY);
-
-		sleep(CONFIG_DBCONFIG_FREQUENCY);
+		zbx_sleep_loop(CONFIG_DBCONFIG_FREQUENCY);
 	}
-	DBclose();
 }
