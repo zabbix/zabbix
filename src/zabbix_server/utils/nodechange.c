@@ -1,6 +1,6 @@
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -179,7 +179,7 @@ static int convert_profiles(int old_id, int new_id, const char *field_name)
  * Return value: SUCCEED - converted successfully                             *
  *               FAIL - an error occurred                                     *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
