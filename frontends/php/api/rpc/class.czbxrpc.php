@@ -34,6 +34,8 @@ class czbxrpc{
 
 // list of methods which does not require authentication
 		$withoutAuth = array(
+			'user.login' => 1,
+			'user.checkAuthentication' => 1,
 			'apiinfo.version' => 1
 		);
 //-----
@@ -52,7 +54,7 @@ class czbxrpc{
 				if(!isset($usr['result']))
 					return array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => _('Not authorized'));
 			}
-			else if($method != 'user.login'){
+			else if(!isset($withoutAuth[$method])){
 				return array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => _('Not authorized'));
 			}
 		}

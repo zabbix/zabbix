@@ -1053,12 +1053,11 @@ Copt::memoryPick();
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions for system access.'));
 
 
-		DBexecute('UPDATE sessions SET lastaccess='.time().' WHERE sessionid='.zbx_dbstr($sessionid));
-
 		if($userInfo['autologout'] > 0){
 			DBexecute('DELETE FROM sessions WHERE userid='.$userInfo['userid'].' AND status='.ZBX_SESSION_ACTIVE.' AND lastaccess<'.(time() - $userInfo['autologout']));
 		}
 
+		DBexecute('UPDATE sessions SET lastaccess='.time().' WHERE sessionid='.zbx_dbstr($sessionid));
 
 		$sql = 'SELECT MAX(g.gui_access) as gui_access '.
 			' FROM usrgrp g, users_groups ug '.
