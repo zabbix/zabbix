@@ -20,7 +20,6 @@
 #include "common.h"
 #include "daemon.h"
 
-#include "mutexs.h"
 #include "pid.h"
 #include "cfg.h"
 #include "log.h"
@@ -36,7 +35,7 @@ static int	exiting = 0;
 #define CHECKED_FIELD(siginfo, field)			(NULL == siginfo ? -1 : siginfo->field)
 #define CHECKED_FIELD_TYPE(siginfo, field, type)	(NULL == siginfo ? (type)-1 : siginfo->field)
 
-void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
+static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
 	if (NULL == siginfo)
 		zabbix_log(LOG_LEVEL_DEBUG, "Received [signal:%d(%s)] with NULL siginfo.",
@@ -229,27 +228,24 @@ int	daemon_start(int allow_root)
 
 /*------------------------------------------------*/
 
-	if( FAIL == create_pid_file(CONFIG_PID_FILE))
-	{
+	if (FAIL == create_pid_file(CONFIG_PID_FILE))
 		exit(FAIL);
-	}
 
 	parent_pid = (int)getpid();
 
-/*	phan.sa_handler = child_signal_handler;*/
 	phan.sa_sigaction = child_signal_handler;
 	sigemptyset(&phan.sa_mask);
 	phan.sa_flags = SA_SIGINFO;
 
-	sigaction(SIGINT,	&phan, NULL);
-	sigaction(SIGQUIT,	&phan, NULL);
-	sigaction(SIGTERM,	&phan, NULL);
-	sigaction(SIGPIPE,	&phan, NULL);
+	sigaction(SIGINT, &phan, NULL);
+	sigaction(SIGQUIT, &phan, NULL);
+	sigaction(SIGTERM, &phan, NULL);
+	sigaction(SIGPIPE, &phan, NULL);
 
-	sigaction(SIGILL,	&phan, NULL);
-	sigaction(SIGFPE,	&phan, NULL);
-	sigaction(SIGSEGV,	&phan, NULL);
-	sigaction(SIGBUS,	&phan, NULL);
+	sigaction(SIGILL, &phan, NULL);
+	sigaction(SIGFPE, &phan, NULL);
+	sigaction(SIGSEGV, &phan, NULL);
+	sigaction(SIGBUS, &phan, NULL);
 
 	zbx_setproctitle("main process");
 
@@ -261,17 +257,24 @@ void	daemon_stop()
 	drop_pid_file(CONFIG_PID_FILE);
 }
 
-void	init_main_process()
+void	set_parent_signal_handler()
 {
 	struct sigaction	phan;
 
-	parent = 1; /* signalize signal_handler that this process is a PARENT process */
+	parent = 1; /* signalize signal handler that this process is a PARENT process */
 
-/*	phan.sa_handler = parent_signal_handler;*/
 	phan.sa_sigaction = parent_signal_handler;
 	sigemptyset(&phan.sa_mask);
 	phan.sa_flags = SA_SIGINFO;
+	sigaction(SIGCHLD, &phan, NULL); /* for parent only, to avoid problems with EXECUTE_INT/DBL/STR and others */
+}
 
-	/* For parent only. To avoid problems with EXECUTE_INT */
-	sigaction(SIGCHLD,	&phan, NULL);
+void	set_child_signal_handler()
+{
+	struct sigaction	phan;
+
+	phan.sa_sigaction = child_signal_handler;
+	sigemptyset(&phan.sa_mask);
+	phan.sa_flags = SA_SIGINFO;
+	sigaction(SIGALRM, &phan, NULL);
 }

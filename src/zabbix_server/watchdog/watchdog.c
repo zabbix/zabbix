@@ -19,15 +19,15 @@
 
 #include "common.h"
 
-#include "cfg.h"
 #include "db.h"
 #include "zbxdb.h"
 #include "log.h"
 #include "zlog.h"
+#include "daemon.h"
+#include "zbxself.h"
 
 #include "../alerter/alerter.h"
 
-#include "zlog.h"
 #include "watchdog.h"
 
 typedef struct
@@ -43,6 +43,8 @@ ZBX_RECIPIENT	recipients[ZBX_MAX_RECIPIENTS];
 
 static int	num = 0;
 static int	lastsent = 0;
+
+extern unsigned char	process_type;
 
 /******************************************************************************
  *                                                                            *
@@ -195,10 +197,16 @@ void	main_watchdog_loop()
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_watchdog_loop()");
 
-	/* Disable writing to database in zabbix_syslog() */
+	set_child_signal_handler();
+
+	/* disable writing to database in zabbix_syslog() */
 	CONFIG_ENABLE_LOG = 0;
 
+	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
+
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+	zbx_setproctitle("%s [initializing]", get_process_type_string(process_type));
 
 	init_config();
 
@@ -206,8 +214,10 @@ void	main_watchdog_loop()
 
 	for (;;)
 	{
+		zbx_setproctitle("%s [pinging database]", get_process_type_string(process_type));
+
 		ping_database();
 
-		sleep(60);
+		zbx_sleep_loop(SEC_PER_MIN);
 	}
 }

@@ -301,7 +301,7 @@ char    *zbx_strdup2(const char *filename, int line, char *old, const char *str)
  *                                                                            *
  * Purpose: set process title                                                 *
  *                                                                            *
- * Parameters: title - item's refresh rate in sec                             *
+ * Parameters:                                                                *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
@@ -317,7 +317,7 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...)
 	va_list args;
 
 	va_start(args, fmt);
-	vsnprintf(title, MAX_STRING_LEN-1, fmt, args);
+	vsnprintf(title, MAX_STRING_LEN - 1, fmt, args);
 	va_end(args);
 
 	setproctitle(title);
@@ -1568,7 +1568,7 @@ int	is_uint64(const char *str, zbx_uint64_t *value)
  ******************************************************************************/
 int	is_ushort(const char *str, unsigned short *value)
 {
-	register unsigned short	max_ushort = 0xFFFF;
+	register unsigned short	max_ushort = 0xffff;
 	register unsigned short	value_ushort = 0, c;
 
 	if ('\0' == *str)
@@ -2253,4 +2253,38 @@ unsigned char	get_interface_type_by_item_type(unsigned char type)
 		default:
 			return INTERFACE_TYPE_AGENT;
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: calculate_sleeptime                                              *
+ *                                                                            *
+ * Purpose: calculate sleep time for Zabbix processes                         *
+ *                                                                            *
+ * Parameters: nextcheck     - [IN] next check or -1 (FAIL) if nothing to do  *
+ *             max_sleeptime - [IN] maximum sleep time, in seconds            *
+ *                                                                            *
+ * Return value: sleep time, in seconds                                       *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	calculate_sleeptime(int nextcheck, int max_sleeptime)
+{
+	int	sleeptime;
+
+	if (FAIL == nextcheck)
+		return max_sleeptime;
+
+	sleeptime = nextcheck - time(NULL);
+
+	if (sleeptime < 0)
+		return 0;
+
+	if (sleeptime > max_sleeptime)
+		return max_sleeptime;
+
+	return sleeptime;
 }

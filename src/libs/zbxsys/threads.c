@@ -20,8 +20,6 @@
 #include "common.h"
 #include "threads.h"
 
-#include "log.h"
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_fork                                                         *

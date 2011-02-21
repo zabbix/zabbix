@@ -17,34 +17,27 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#ifndef ZABBIX_SERVICE_H
-#define ZABBIX_SERVICE_H
+#include "common.h"
+#include "daemon.h"
+#include "zbxself.h"
+#include "log.h"
 
-#if !defined(_WINDOWS)
-#	error "This module allowed only for Windows OS"
-#endif /* _WINDOWS */
+extern unsigned char	process_type;
 
-#include "threads.h"
+void	main_selfmon_loop()
+{
+	const char	*__function_name = "main_selfmon_loop";
 
-extern ZBX_THREAD_HANDLE	*threads;
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-void	service_start();
+	set_child_signal_handler();
 
-int	ZabbixCreateService(const char *path, int multiple_agents);
-int	ZabbixRemoveService();
-int	ZabbixStartService();
-int	ZabbixStopService();
+	for (;;)
+	{
+		zbx_setproctitle("%s [processing data]", get_process_type_string(process_type));
 
-void	set_parent_signal_handler();
+		collect_selfmon_stats();
 
-int	application_status;	/* required for closing application from service */
-
-#define ZBX_APP_STOPPED	0
-#define ZBX_APP_RUNNING	1
-
-#define ZBX_IS_RUNNING()	(ZBX_APP_RUNNING == application_status)
-#define ZBX_DO_EXIT()		application_status = ZBX_APP_STOPPED
-
-#define START_MAIN_ZABBIX_ENTRY(a)	service_start()
-
-#endif /* ZABBIX_SERVICE_H */
+		zbx_sleep_loop(1);
+	}
+}
