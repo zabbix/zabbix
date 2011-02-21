@@ -562,7 +562,7 @@ function __autoload($class_name){
 		$result = array();
 		if(!is_null($count)){
 			while($count-- > 0)
-				$result[] = array_pop($ZBX_MESSAGES);
+				array_unshift($result, array_pop($ZBX_MESSAGES));
 		}
 		else{
 			$result = $ZBX_MESSAGES;
