@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ include_once('include/page_header.php');
 				'limit' => 15
 			);
 
-			$result = CHost::get($options);
+			$result = API::Host()->get($options);
 			break;
 		case 'message.mute':
 			$msgsettings = getMessageSettings();

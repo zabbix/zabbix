@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -97,7 +97,7 @@ require_once('include/templates/scriptConfirm.js.php');
 		'expand_urls' => true,
 		'select_selements' => API_OUTPUT_EXTEND,
 	);
-	$maps = CMap::get($options);
+	$maps = API::Map()->get($options);
 	$maps = zbx_toHash($maps, 'sysmapid');
 
 	if($name = get_request(GET_PARAM_NAME)){

@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -807,7 +807,7 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	define('SEC_PER_YEAR', (365*SEC_PER_DAY));
 
 // if magic quotes on, then get rid of them
-	if(get_magic_quotes_gpc()){
+	if(version_compare(phpversion(), '6.0', '<') && get_magic_quotes_gpc()){
 		$_GET	 = zbx_stripslashes($_GET);
 		$_POST	 = zbx_stripslashes($_POST);
 		$_COOKIE = zbx_stripslashes($_COOKIE);

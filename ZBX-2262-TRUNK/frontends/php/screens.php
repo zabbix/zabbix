@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -146,7 +146,7 @@
 	$formHeader->addItem($cmbConfig);
 
 
-	$screens = CScreen::get(array(
+	$screens = API::Screen()->get(array(
 		'nodeids' => get_current_nodeid(),
 		'output' => API_OUTPUT_EXTEND,
 		'select_screenitems' => API_OUTPUT_EXTEND
