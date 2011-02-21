@@ -13,6 +13,7 @@ class CWebUser{
 				'password' => $password,
 				'userData' => true
 			));
+
 			if(!self::$data) throw new Exception();
 
 			if(self::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED){
@@ -52,6 +53,7 @@ class CWebUser{
 	public static function checkAuthentication($sessionid){
 		try{
 			if($sessionid !== null){
+				self::$data['sessionid'] = $sessionid;
 				self::$data = API::User()->checkAuthentication($sessionid);
 			}
 
