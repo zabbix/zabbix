@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -136,9 +136,8 @@ include_once('include/page_header.php');
 	);
 
 	$css = getUserTheme($USER_DETAILS);
-	$vTextColor = ($css == 'css_od.css')?'&color=white':'';
 	foreach($services as $name => $foo) {
-		$header[] = new CImg('vtext.php?text='.$name.$vTextColor);
+		$header[] = new CImg('vtext.php?text='.$name.'&theme='.$css);
 	}
 
 	$table = new CTableInfo();

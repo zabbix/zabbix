@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -614,7 +614,7 @@ Copt::memoryPick();
 			$options = array(
 				'nodeids' => id2nodeid(self::$userData['userid']),
 				'userids' => self::$userData['userid'],
-			'output' => API_OUTPUT_EXTEND,
+				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1
 			);
 			$upd_users = $this->get($options);

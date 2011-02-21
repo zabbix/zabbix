@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2010-2011 SIA Zabbix
+** Copyright (C) 2010-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ var CSuggest = Class.create(CDebug,{
 	'sugtab':		null	// DOM node suggests table
 },
 
-'hlIndex':			0,		// indicates what row should be highlilghted
+'hlIndex':			0,		// indicates what row should be highlighted
 'suggestCount':		0,		// suggests shown
 
 'mouseOverSuggest':	false,	// indicates if mouse is over suggests
