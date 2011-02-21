@@ -766,7 +766,7 @@ void	main_discoverer_loop(unsigned char p)
 
 	for (;;)
 	{
-		zbx_setproctitle("%s [discovering network]", get_process_type_string(process_type));
+		zbx_setproctitle("%s [performing discovery]", get_process_type_string(process_type));
 
 		now = time(NULL);
 		sec = zbx_time();
