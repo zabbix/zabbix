@@ -31,7 +31,7 @@ $page['file']	= 'index.php';
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'name'=>			array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'isset({enter})', S_LOGIN_NAME),
+		'name'=>			array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'isset({enter})', _('Username')),
 		'password'=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({enter})'),
 		'sessionid'=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		NULL),
 //		'message'=>			array(T_ZBX_STR, O_OPT,	NULL,	NULL,		NULL),
@@ -82,10 +82,9 @@ $page['file']	= 'index.php';
 			if(CWebUser::$data['autologin'] != $user['autologin'])
 				$result = API::User()->updateProfile($user);
 // --
+			add_audit_ext(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, CWebUser::$data['userid'], '', null,null,null);
 
 			$url = is_null($request)?CWebUser::$data['url']:$request;
-
-			add_audit_ext(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, CWebUser::$data['userid'], '', null,null,null);
 			if(zbx_empty($url) || ($url == $page['file'])){
 				$url = 'dashboard.php';
 			}
@@ -108,14 +107,16 @@ $page['file']	= 'index.php';
 			case ZBX_AUTH_INTERNAL:
 				if(isset($_REQUEST['enter'])) $_REQUEST['autologin'] = get_request('autologin', 0);
 
-				$_REQUEST['message'] = clear_messages(1);
-				if(is_array($_REQUEST['message'])) $_REQUEST['message'] = $_REQUEST['message'][0]['message'];
+				if($messages = clear_messages()){
+					$messages = array_pop($messages);
+					$_REQUEST['message'] = $messages['message'];
+				}
 
 				$loginForm = new CGetForm('login');
 				$loginForm->render();
 		}
 	}
 	else{
-		redirect('dashboard.php');
+		redirect(zbx_empty(CWebUser::$data['url'])?'dashboard.php':CWebUser::$data['url']);
 	}
 ?>

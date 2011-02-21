@@ -56,7 +56,7 @@ require_once('include/page_header.php');
 			<ul style="list-style-type: none;">
 				<li style="padding-right: 6px; height: 22px;">
 					<div class="ui-corner-all textwhite bold" style="padding: 2px 4px; float: right; background-color: #CC3333; visibility: <?php print(zbx_empty($message)?'hidden':'visible'); ?>" >
-						<?php print($message); ?>
+						<span class="nowrap"><?php print($message); ?></span>
 					</div>
 				</li>
 				<li style="margin-top: 10px; padding-top: 1px; height: 22px; width: 265px; background-image: url(images/general/login/username_pass_field.png); background-repeat: no-repeat;" >
