@@ -81,7 +81,7 @@ table{
 }
 
 table.page_footer{
-	background: #000E19 url('../images/gradients/table_head_blue.png') repeat-x top left;
+	background: #3C759B url(darkblue/images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
 	margin-top:20px;
 	border:1px solid #77B7DA;
 }
@@ -312,7 +312,7 @@ table.menu tr td{
 table.menu tr td.active{
 	color: #FFFFFF;
 	border-color: #022744;
-	background: #3C759B url('../images/gradients/table_head_blue.png') repeat-x top left;
+	background: #3C759B url(darkblue/images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
 }
 
 table.sub_menu {
@@ -320,7 +320,7 @@ table.sub_menu {
 }
 
 table.sub_menu tr{
-	background: #3C759B url('../images/gradients/table_head_blue.png') repeat-x bottom left;
+	background: #3C759B url(darkblue/images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
 }
 
 table.sub_menu tr td span.active a.highlight{
