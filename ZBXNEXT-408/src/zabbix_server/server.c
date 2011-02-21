@@ -491,20 +491,19 @@ int	MAIN_ZABBIX_ENTRY()
 #	define IPV6_FEATURE_STATUS " NO"
 #endif
 
-	zabbix_log(LOG_LEVEL_WARNING, "Starting Zabbix Server. Zabbix %s (revision %s).",
-			ZABBIX_VERSION,
-			ZABBIX_REVISION);
+	zabbix_log(LOG_LEVEL_INFORMATION, "Starting Zabbix Server. Zabbix %s (revision %s).",
+			ZABBIX_VERSION, ZABBIX_REVISION);
 
-	zabbix_log(LOG_LEVEL_WARNING, "****** Enabled features ******");
-	zabbix_log(LOG_LEVEL_WARNING, "SNMP monitoring:           " SNMP_FEATURE_STATUS);
-	zabbix_log(LOG_LEVEL_WARNING, "IPMI monitoring:           " IPMI_FEATURE_STATUS);
-	zabbix_log(LOG_LEVEL_WARNING, "WEB monitoring:            " LIBCURL_FEATURE_STATUS);
-	zabbix_log(LOG_LEVEL_WARNING, "Jabber notifications:      " JABBER_FEATURE_STATUS);
-	zabbix_log(LOG_LEVEL_WARNING, "Ez Texting notifications:  " LIBCURL_FEATURE_STATUS);
-	zabbix_log(LOG_LEVEL_WARNING, "ODBC:                      " ODBC_FEATURE_STATUS);
-	zabbix_log(LOG_LEVEL_WARNING, "SSH2 support:              " SSH2_FEATURE_STATUS);
-	zabbix_log(LOG_LEVEL_WARNING, "IPv6 support:              " IPV6_FEATURE_STATUS);
-	zabbix_log(LOG_LEVEL_WARNING, "******************************");
+	zabbix_log(LOG_LEVEL_INFORMATION, "****** Enabled features ******");
+	zabbix_log(LOG_LEVEL_INFORMATION, "SNMP monitoring:           " SNMP_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_INFORMATION, "IPMI monitoring:           " IPMI_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_INFORMATION, "WEB monitoring:            " LIBCURL_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_INFORMATION, "Jabber notifications:      " JABBER_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_INFORMATION, "Ez Texting notifications:  " LIBCURL_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_INFORMATION, "ODBC:                      " ODBC_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_INFORMATION, "SSH2 support:              " SSH2_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_INFORMATION, "IPv6 support:              " IPV6_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_INFORMATION, "******************************");
 
 #ifdef	HAVE_SQLITE3
 	zbx_create_sqlite3_mutex(CONFIG_DBNAME);

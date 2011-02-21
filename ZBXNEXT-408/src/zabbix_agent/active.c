@@ -1080,10 +1080,8 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 	assert(activechk_args.host);
 
-	p = strchr(activechk_args.host,',');
-	if(p) *p = '\0';
-
-	zabbix_log( LOG_LEVEL_INFORMATION, "zabbix_agentd active check started [%s:%u]", activechk_args.host, activechk_args.port);
+	if (NULL != (p = strchr(activechk_args.host, ',')))
+		*p = '\0';
 
 	init_active_metrics();
 

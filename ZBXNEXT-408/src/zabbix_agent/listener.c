@@ -72,8 +72,6 @@ ZBX_THREAD_ENTRY(listener_thread, pSock)
 
 	assert(pSock);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "zabbix_agentd listener started");
-
 #if defined(ZABBIX_DAEMON)
 	set_child_signal_handler();
 #endif	/* ZABBIX_DAEMON */
@@ -82,13 +80,13 @@ ZBX_THREAD_ENTRY(listener_thread, pSock)
 
 	while (ZBX_IS_RUNNING())
 	{
-		zbx_setproctitle("trapper [waiting for connection]");
+		zbx_setproctitle("listener [waiting for connection]");
 
 		if (SUCCEED == (ret = zbx_tcp_accept(&s)))
 		{
 			local_request_failed = 0;     /* Reset consecutive errors counter */
 
-			zbx_setproctitle("trapper [processing request]");
+			zbx_setproctitle("listener [processing request]");
 			zabbix_log(LOG_LEVEL_DEBUG, "Processing request.");
 
 			if (SUCCEED == (ret = zbx_tcp_check_security(&s, CONFIG_HOSTS_ALLOWED, 0)))

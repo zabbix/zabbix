@@ -251,8 +251,6 @@ void	free_collector_data()
  ******************************************************************************/
 ZBX_THREAD_ENTRY(collector_thread, args)
 {
-	zabbix_log(LOG_LEVEL_INFORMATION, "zabbix_agentd collector started");
-
 #if defined(ZABBIX_DAEMON)
 	set_child_signal_handler();
 #endif	/* ZABBIX_DAEMON */
@@ -277,7 +275,7 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 #ifdef _AIX
 		collect_vmstat_data(&collector->vmstat);
 #endif
-		zbx_setproctitle("collector [sleeping for %d seconds]", 1);
+		zbx_setproctitle("collector [sleeping for 1 seconds]");
 		zbx_sleep(1);
 	}
 
