@@ -714,11 +714,10 @@
 // COpt::profiling_start('prepare_table');
 
 		$css = getUserTheme($USER_DETAILS);
-		$vTextColor = ($css == 'css_od.css')?'&color=white':'';
 		if($view_style == STYLE_TOP){
 			$header=array(new CCol(S_ITEMS,'center'));
 			foreach($hosts as $hostname){
-				$header = array_merge($header,array(new CImg('vtext.php?text='.$hostname.$vTextColor)));
+				$header = array_merge($header,array(new CImg('vtext.php?text='.$hostname.'&theme='.$css)));
 			}
 
 			$table->SetHeader($header,'vertical_header');
@@ -734,7 +733,7 @@
 		else{
 			$header=array(new CCol(S_HOSTS,'center'));
 			foreach($items as $descr => $ithosts){
-				$header = array_merge($header,array(new CImg('vtext.php?text='.$descr.$vTextColor)));
+				$header = array_merge($header,array(new CImg('vtext.php?text='.$descr.'&theme='.$css)));
 			}
 
 			$table->SetHeader($header,'vertical_header');

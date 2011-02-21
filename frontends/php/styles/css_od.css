@@ -2,7 +2,11 @@
 /* Dark Orange Theme by Aly */
 @import "darkorange/jquery-ui.css";
 
-@media print { body{ background-color:#A5A5A5; } }
+@media print {
+	body{
+		background-color:#A5A5A5;
+	}
+}
 
 @media screen {
 	body{
@@ -31,14 +35,12 @@
 	border-color: #222222;
 }
 
-.hintbox{
-	color: #2f2f2f;
-}
 
-.unknown{
+
+.unknown	{
 	color: #999999;
 }
-.normal{
+.normal		{
 	background-color: #AADDDD;
 }
 
@@ -159,7 +161,7 @@ table.filter .subfilter_active{
 
 table.tableinfo{
 	color: #DFDFDF;
-	background-color: #5A5A5A;
+	background-color: #1F1F1F;
 }
 
 table.tableinfo tr td {
@@ -182,8 +184,8 @@ table.tableinfo tr.vertical_header td {
 	background-color:#111111;
 }
 
-table.tableinfo tr.selected > td { background-color: #6F6F6F; }
-table.tableinfo tr.selected:hover > td { background-color: #6F6F6F; }
+table.tableinfo tr.selected > td { background-color: #553020; }
+table.tableinfo tr.selected:hover > td { background-color: #6F3F00; }
 
 table.tableinfo tr.odd_row > td { background-color: #1F1F1F; }
 table.tableinfo tr.odd_row:hover > td { background-color: #6F3F00; }
@@ -192,44 +194,44 @@ table.tableinfo tr.even_row > td { background-color: #2F2F2F; }
 table.tableinfo tr.even_row:hover > td{ background-color: #6F3F00; }
 
 
-table.tableinfo tr > td.disaster_empty { border: 1px #FF0000 solid; }
-table.tableinfo tr:hover > td.disaster_empty { border: 1px #FF0000 solid; }
+table.tableinfo tr > td.disaster_empty { border: 1px #FF3838 solid; }
+table.tableinfo tr:hover > td.disaster_empty { border: 1px #FF3838 solid; }
 
-table.tableinfo tr > td.disaster { background-color: #FF0000;	border: 1px #FF0000 solid; }
-table.tableinfo tr:hover > td.disaster { background-color: #FA0000;	border: 1px #FA0000 solid; }
+table.tableinfo tr > td.disaster { background-color: #FF3838;	border: 1px #FF3838 solid; }
+table.tableinfo tr:hover > td.disaster { background-color: #FF2222;	border: 1px #FF2222 solid; }
 
-table.tableinfo tr > td.high_empty { border: 1px #FF8888 solid; }
-table.tableinfo tr:hover > td.high_empty { border: 1px #FF8888 solid; }
+table.tableinfo tr > td.high_empty { border: 1px #FF9999 solid; }
+table.tableinfo tr:hover > td.high_empty { border: 1px #FF9999 solid; }
 
-table.tableinfo tr > td.high				{	background-color: #FF8888;	border: 1px #FF8888 solid; }
+table.tableinfo tr > td.high				{	background-color: #FF9999;	border: 1px #FF9999 solid; }
 table.tableinfo tr:hover > td.high			{	background-color: #FA8388;	border: 1px #FA8388 solid; }
 
-table.tableinfo tr > td.average_empty			{	border: 1px #DDAAAA solid; }
-table.tableinfo tr:hover > td.average_empty		{	border: 1px #DDAAAA solid; }
+table.tableinfo tr > td.average_empty			{	border: 1px #FFB689 solid; }
+table.tableinfo tr:hover > td.average_empty		{	border: 1px #FFB689 solid; }
 
-table.tableinfo tr > td.average				{	background-color: #DDAAAA;	border: 1px #DDAAAA solid; }
-table.tableinfo tr:hover > td.average			{	background-color: #D8A5AA;	border: 1px #D8A5AA solid; }
+table.tableinfo tr > td.average				{	background-color: #FFB689;	border: 1px #FFB689 solid; }
+table.tableinfo tr:hover > td.average			{	background-color: #FFAB73;	border: 1px #FFAB73 solid; }
 
-table.tableinfo tr > td.warning_empty			{	border: 1px #EFEFCC solid; }
-table.tableinfo tr:hover > td.warning_empty		{	border: 1px #EAEACC solid; }
+table.tableinfo tr > td.warning_empty			{	border: 1px #FFF384 solid; }
+table.tableinfo tr:hover > td.warning_empty		{	border: 1px #FFF069 solid; }
 
-table.tableinfo tr > td.warning				{	background-color: #EFEFCC;	border: 1px #EFEFCC solid; }
-table.tableinfo tr:hover > td.warning			{	background-color: #EAEACC;	border: 1px #EAEACC solid; }
+table.tableinfo tr > td.warning				{	background-color: #FFF384;	border: 1px #FFF384 solid; }
+table.tableinfo tr:hover > td.warning			{	background-color: #FFF069;	border: 1px #FFF069 solid; }
 
-table.tableinfo tr > td.information_empty			{	border: 1px #BBE2BB solid; }
-table.tableinfo tr:hover > td.information_empty		{	border: 1px #B7DDBB solid; }
+table.tableinfo tr > td.information_empty			{	border: 1px #ADEDFF solid; }
+table.tableinfo tr:hover > td.information_empty		{	border: 1px #92E7FF solid; }
 
-table.tableinfo tr > td.information			{	background-color: #BBE2BB;	border: 1px #CCE2CC solid; }
-table.tableinfo tr:hover > td.information			{	background-color: #B7DDBB;	border: 1px #C7DDCC solid; }
+table.tableinfo tr > td.information			{	background-color: #ADEDFF;	border: 1px #ADEDFF solid; }
+table.tableinfo tr:hover > td.information			{	background-color: #92E7FF;	border: 1px #92E7FF solid; }
 
-table.tableinfo tr > td.unknown_trigger_empty		{	border: 1px #ACACAC solid; }
-table.tableinfo tr:hover > td.unknown_trigger_empty	{	border: 1px #ACA7AC solid; }
+table.tableinfo tr > td.unknown_trigger_empty		{	border: 1px #CECECE solid; }
+table.tableinfo tr:hover > td.unknown_trigger_empty	{	border: 1px #BCBCBC solid; }
 
-table.tableinfo tr > td.unknown_trigger			{	background-color: #BCBCBC;	border: 1px #BCBCBC solid; }
-table.tableinfo tr:hover > td.unknown_trigger		{	background-color: #BCB7BC;	border: 1px #BCB7BC solid; }
+table.tableinfo tr > td.unknown_trigger			{	background-color: #CECECE;	border: 1px #CECECE solid; }
+table.tableinfo tr:hover > td.unknown_trigger		{	background-color: #BCBCBC;	border: 1px #BCBCBC solid; }
 
-table.tableinfo tr > td.normal				{	background-color: #AAFFAA;	border: 1px #AAFFAA solid; }
-table.tableinfo tr:hover > td.normal			{	background-color: #AAF9AA;	border: 1px #AAF9AA solid; }
+table.tableinfo tr > td.normal				{	background-color: #AFFFAF;	border: 1px #AFFFAF solid; }
+table.tableinfo tr:hover > td.normal			{	background-color: #A1F9A1;	border: 1px #A1F9A1 solid; }
 
 table.tableinfo tr > td.active				{	background-color: #AADDAA;	border: 1px #AADDAA solid; }
 table.tableinfo tr:hover > td.active			{	background-color: #AAD9AA;	border: 1px #AAD9AA solid; }
@@ -252,9 +254,29 @@ table.tableinfo tr.footer td{
 /**************************************************/
 /**************************************************/
 
+table.tablestripped{
+	border: 1px solid #5A5A5A;;
+	border-top: 0px solid #AAAAAA;
+}
+
+table.tablestripped tr.form_odd_row td{
+	color: #DFDFDF;
+	background-color:#1F1F1F;
+}
+
+table.tablestripped tr.form_even_row td{
+	color: #DFDFDF;
+	background-color:#2F2F2F;
+}
+
+table.tablestripped tr.footer td {
+	background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left;
+}
+
+
 table.header{
 	background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left;
-	border: 1px solid #5A5A5A;;
+	border: 1px solid #5A5A5A;
 }
 
 table.header tr td.header_l{

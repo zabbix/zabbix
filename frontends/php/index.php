@@ -19,23 +19,25 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-
+define('ZBX_PAGE_NO_AUTHORIZATION', 1);
 define('ZBX_NOT_ALLOW_ALL_NODES', 1);
 define('ZBX_HIDE_NODE_SELECTION', 1);
+
+require_once('include/config.inc.php');
+require_once('include/forms.inc.php');
 
 $page['title']	= 'S_ZABBIX_BIG';
 $page['file']	= 'index.php';
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'name'=>			array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'isset({enter})', S_LOGIN_NAME),
+		'name'=>			array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'isset({enter})', _('Username')),
 		'password'=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({enter})'),
 		'sessionid'=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		NULL),
+//		'message'=>			array(T_ZBX_STR, O_OPT,	NULL,	NULL,		NULL),
 		'reconnect'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(0,65535),NULL),
 		'enter'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,		NULL),
-		'form'=>			array(T_ZBX_STR, O_OPT, P_SYS,  NULL,   	NULL),
-		'form_refresh'=>	array(T_ZBX_INT, O_OPT, NULL,   NULL,   	NULL),
+		'autologin'=>		array(T_ZBX_INT, O_OPT, NULL,   NULL,   	NULL),
 		'request'=>			array(T_ZBX_STR, O_OPT, NULL, 	NULL,   	NULL),
 	);
 	check_fields($fields);
@@ -44,11 +46,12 @@ $page['file']	= 'index.php';
 	$sessionid = get_cookie('zbx_sessionid');
 
 	if(isset($_REQUEST['reconnect']) && isset($sessionid)){
-		add_audit(AUDIT_ACTION_LOGOUT,AUDIT_RESOURCE_USER, 'Manual Logout');
+		add_audit(AUDIT_ACTION_LOGOUT,AUDIT_RESOURCE_USER, _('Manual Logout'));
 
 		CWebUser::logout($sessionid);
 
-		jsRedirect('index.php');
+		$loginForm = new CGetForm('login');
+		$loginForm->render();
 		exit();
 	}
 
@@ -56,8 +59,7 @@ $page['file']	= 'index.php';
 
 	if($config['authentication_type'] == ZBX_AUTH_HTTP){
 		if(isset($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_USER'])){
-			if(!isset($sessionid)) $_REQUEST['enter'] = 'Enter';
-
+			$_REQUEST['enter'] = _('Sign in');
 			$_REQUEST['name'] = $_SERVER['PHP_AUTH_USER'];
 			$_REQUEST['password'] = 'zabbix';//$_SERVER['PHP_AUTH_PW'];
 		}
@@ -67,48 +69,54 @@ $page['file']	= 'index.php';
 	}
 
 	$request = get_request('request');
-	if(isset($_REQUEST['enter']) && ($_REQUEST['enter'] == 'Enter')){
-		$login = CWebUser::login(get_request('name', ''), get_request('password', ''));
+
+	if(isset($_REQUEST['enter']) && ($_REQUEST['enter'] == _('Sign in'))){
+		$name = get_request('name','');
+		$passwd = get_request('password','');
+
+		$login = CWebUser::login($name, $passwd);
 
 		if($login){
-			$url = is_null($request) ? CWebUser::$data['url'] : $request;
-			jsRedirect($url);
+// save remember login preferance
+			$user = array('autologin' => get_request('autologin', 0));
+			if(CWebUser::$data['autologin'] != $user['autologin'])
+				$result = API::User()->updateProfile($user);
+// --
+			add_audit_ext(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, CWebUser::$data['userid'], '', null,null,null);
+
+			$url = zbx_empty($request) ? CWebUser::$data['url'] : $request;
+			if(zbx_empty($url) || ($url == $page['file'])){
+				$url = 'dashboard.php';
+			}
+
+			redirect($url);
 			exit();
 		}
 	}
 
-include_once('include/page_header.php');
-	show_messages();
+	if($sessionid)
+		CWebUser::checkAuthentication($sessionid);
 
-	if(!isset($sessionid) || ($USER_DETAILS['alias'] == ZBX_GUEST_USER)){
+//	show_messages();
+
+	if(CWebUser::$data['alias'] == ZBX_GUEST_USER){
 		switch($config['authentication_type']){
 			case ZBX_AUTH_HTTP:
 				break;
 			case ZBX_AUTH_LDAP:
 			case ZBX_AUTH_INTERNAL:
-//	konqueror bug #138024; adding useless param(login=1) to the form's action path to avoid bug!!
-				$frmLogin = new CFormTable(S_LOGIN,'index.php?login=1','post','multipart/form-data');
-				$frmLogin->setHelp('web.index.login');
-				$frmLogin->addVar('request', $request);
-				$lt = new CTextBox('name');
-				$lt->addStyle('width: 150px');
-				$frmLogin->addRow(S_LOGIN_NAME, $lt);
+				if(isset($_REQUEST['enter'])) $_REQUEST['autologin'] = get_request('autologin', 0);
 
-				$pt = new CPassBox('password');
-				$pt->addStyle('width: 150px');
-				$frmLogin->addRow(S_PASSWORD, $pt);
-				$frmLogin->addItemToBottomRow(new CSubmit('enter','Enter'));
-				$frmLogin->show(false);
+				if($messages = clear_messages()){
+					$messages = array_pop($messages);
+					$_REQUEST['message'] = $messages['message'];
+				}
 
-				setFocus($frmLogin->getName(),'name');
+				$loginForm = new CGetForm('login');
+				$loginForm->render();
 		}
 	}
 	else{
-		echo '<div class="textcolorstyles center">'.S_WELCOME.' <b>'.$USER_DETAILS['alias'].'</b>.</div>';
+		redirect(zbx_empty(CWebUser::$data['url']) ? 'dashboard.php' : CWebUser::$data['url']);
 	}
-?>
-<?php
-
-include_once('include/page_footer.php');
-
 ?>

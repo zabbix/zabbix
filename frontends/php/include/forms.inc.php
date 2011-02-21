@@ -378,9 +378,8 @@
 			$selected = ($loc_id == $USER_DETAILS['lang']) ? true : null;
 			$cmbLang->addItem($loc_id, $loc_name, $selected, $locale_exists);
 
-			if($locale_exists != 'yes'){
+			if($locale_exists != 'yes')
 				$languages_unable_set++;
-			}
 		}
 // restoring original locale
 		setlocale(LC_ALL, zbx_locale_variants($USER_DETAILS['lang']));
@@ -391,16 +390,7 @@
 // if some languages can't be set, showing a warning about that
 		$lang_hint = $languages_unable_set > 0 ? _('You are not able to choose some of the languages, because locales for them are not installed on the web server.') : '';
 
-		$lang_tbl = new CTable();
-		$c1 = new CCol($cmbLang);
-		$c1->addStyle('padding-left: 0;');
-		$langHintSpan = new Cspan($lang_hint, 'red');
-		$c2 = new CCol($langHintSpan);
-		$c2->addStyle('white-space: normal;');
-
-		$lang_tbl->addRow(array($c1, $c2));
-
-		$frmUser->addRow(S_LANGUAGE, $lang_tbl);
+		$frmUser->addRow(S_LANGUAGE, array($cmbLang, new CSpan($lang_hint, 'red wrap')));
 
 		$cmbTheme = new CComboBox('theme',$theme);
 			$cmbTheme->addItem(ZBX_DEFAULT_CSS,S_SYSTEM_DEFAULT);
@@ -411,37 +401,17 @@
 		$frmUser->addRow(S_THEME, $cmbTheme);
 
 		$script = "javascript:
-			var autologout_visible = document.getElementById('autologout_visible');
 			var autologout = document.getElementById('autologout');
-			if(this.checked){
-				if(autologout_visible.checked){
-					autologout_visible.checked = false;
-					autologout_visible.onclick();
-				}
-				autologout_visible.disabled = true;
-			}
-			else{
-				autologout_visible.disabled = false;
-			}";
-		$chkbx_autologin = new CCheckBox("autologin", $autologin, $script, 1);
+			if(this.checked) autologout.disabled = false;
+			else autologout.disabled = true;";
 
-		$chkbx_autologin->setAttribute('autocomplete','off');
-		$frmUser->addRow(S_AUTO_LOGIN,	$chkbx_autologin);
-
-		$script = "javascript: var autologout = document.getElementById('autologout');
-					if(this.checked) autologout.disabled = false;
-					else autologout.disabled = true;";
 		$autologoutCheckBox = new CCheckBox('autologout_visible', ($autologout == 0) ? 'no' : 'yes', $script);
 
 		$autologoutTextBox = new CNumericBox("autologout", ($autologout == 0) ? '90' : $autologout, 4);
 // if autologout is disabled
-		if($autologout == 0) {
+		if($autologout == 0)
 			$autologoutTextBox->setAttribute('disabled','disabled');
-		}
 
-		if($autologin != 0) {
-			$autologoutCheckBox->setAttribute('disabled','disabled');
-		}
 
 		$frmUser->addRow(S_AUTO_LOGOUT, array($autologoutCheckBox, $autologoutTextBox));
 		$frmUser->addRow(S_SCREEN_REFRESH,	new CNumericBox('refresh',$refresh,4));
@@ -479,16 +449,16 @@
 					new CSpan($one_media['period'], 'nowrap'),
 					media_severity2str($one_media['severity']),
 					$status,
-					new CButton('edit_media',S_EDIT,'javascript: return PopUp("popup_media.php'.$media_url.'",550,400);'))
+					new CButton('edit_media',_('Edit'),'javascript: return PopUp("popup_media.php'.$media_url.'",550,400);','link_menu'))
 				);
 			}
 
 			$frmUser->addRow(
 				S_MEDIA,
 				array($media_table,
-					new CButton('add_media',S_ADD,'javascript: return PopUp("popup_media.php?dstfrm='.$frmUser->getName().'",550,400);'),
-					SPACE,
-					(count($user_medias) > 0) ? new CSubmit('del_user_media',S_DELETE_SELECTED) : null
+					new CButton('add_media',_('Add'),'javascript: return PopUp("popup_media.php?dstfrm='.$frmUser->getName().'",550,400);', 'link_menu'),
+					SPACE,SPACE,
+					(count($user_medias) > 0) ? new CSubmit('del_user_media',_('Delete selected'),null,'link_menu') : null
 				));
 		}
 

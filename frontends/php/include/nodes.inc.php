@@ -21,16 +21,14 @@
 <?php
 
 	function update_node_profile($nodeids){
-		global $USER_DETAILS;
-
 		DBstart();
-		$sql = 'DELETE FROM profiles WHERE userid='.$USER_DETAILS['userid'].' AND idx='.zbx_dbstr('web.nodes.selected');
+		$sql = 'DELETE FROM profiles WHERE userid='.CWebUser::$data['userid'].' AND idx='.zbx_dbstr('web.nodes.selected');
 		DBexecute($sql);
 
 		foreach($nodeids as $nodeid){
 			$profileid = get_dbid('profiles', 'profileid');
 			$sql='INSERT INTO profiles (profileid, userid, idx, value_id, type)'.
-				' VALUES ('.$profileid.','.$USER_DETAILS['userid'].', '.zbx_dbstr('web.nodes.selected').','.$nodeid.', 4)';
+				' VALUES ('.$profileid.','.CWebUser::$data['userid'].', '.zbx_dbstr('web.nodes.selected').','.$nodeid.', 4)';
 			DBexecute($sql);
 		}
 
@@ -38,10 +36,9 @@
 	}
 
 	function get_node_profile($default=null){
-		global $USER_DETAILS;
 		$result = array();
 
-		$sql = 'SELECT value_id FROM profiles WHERE userid='.$USER_DETAILS['userid'].' AND idx='.zbx_dbstr('web.nodes.selected');
+		$sql = 'SELECT value_id FROM profiles WHERE userid='.CWebUser::$data['userid'].' AND idx='.zbx_dbstr('web.nodes.selected');
 		$db_profiles = DBselect($sql);
 		while($profile = DBfetch($db_profiles)){
 			$result[] = $profile['value_id'];
@@ -54,7 +51,6 @@
 		/* Init CURRENT NODE ID */
 		if(defined('ZBX_NODES_INITIALIZED')) return;
 
-		global $USER_DETAILS;
 		global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID,
 			$ZBX_CURRENT_NODEID, $ZBX_CURMASTERID,
 			$ZBX_NODES, $ZBX_NODES_IDS,
@@ -69,16 +65,16 @@
 		$ZBX_WITH_ALL_NODES = !defined('ZBX_NOT_ALLOW_ALL_NODES');
 
 		if(!defined('ZBX_PAGE_NO_AUTHORIZATION') && ZBX_DISTRIBUTED) {
-			if($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN) {
+			if(CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
 				$sql = 'SELECT DISTINCT n.nodeid,n.name,n.masterid FROM nodes n ';
 			}
 			else {
 				$sql = 'SELECT DISTINCT n.nodeid,n.name,n.masterid '.
 					' FROM nodes n, groups hg,rights r, users_groups g '.
 					' WHERE r.id=hg.groupid '.
-					 	' AND r.groupid=g.usrgrpid '.
-					 	' AND g.userid='.$USER_DETAILS['userid'].
-					 	' AND n.nodeid='.DBid2nodeid('hg.groupid');
+						' AND r.groupid=g.usrgrpid '.
+						' AND g.userid='.CWebUser::$data['userid'].
+						' AND n.nodeid='.DBid2nodeid('hg.groupid');
 			}
 			$db_nodes = DBselect($sql);
 			while($node = DBfetch($db_nodes)) {
@@ -86,7 +82,7 @@
 				$ZBX_NODES_IDS[$node['nodeid']] = $node['nodeid'];
 			}
 
-			$ZBX_AVAILABLE_NODES = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST, PERM_RES_IDS_ARRAY, $ZBX_NODES_IDS);
+			$ZBX_AVAILABLE_NODES = get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_LIST, PERM_RES_IDS_ARRAY, $ZBX_NODES_IDS);
 
 			$ZBX_VIEWED_NODES = get_viewed_nodes();
 			$ZBX_CURRENT_NODEID = $ZBX_VIEWED_NODES['selected'];
@@ -122,7 +118,7 @@
 	}
 
 	function get_current_nodeid($forse_all_nodes = null, $perm = null){
-		global $USER_DETAILS, $ZBX_CURRENT_NODEID, $ZBX_AVAILABLE_NODES, $ZBX_VIEWED_NODES;
+		global $ZBX_CURRENT_NODEID, $ZBX_AVAILABLE_NODES, $ZBX_VIEWED_NODES;
 		if(!isset($ZBX_CURRENT_NODEID)) {
 // frontend error!!!
 			error('Nodes are not initialized!');
@@ -130,7 +126,7 @@
 		}
 
 		if(!is_null($perm)){
-			return get_accessible_nodes_by_user($USER_DETAILS, $perm, PERM_RES_IDS_ARRAY, $ZBX_AVAILABLE_NODES);
+			return get_accessible_nodes_by_user(CWebUser::$data, $perm, PERM_RES_IDS_ARRAY, $ZBX_AVAILABLE_NODES);
 		}
 		else if(is_null($forse_all_nodes)){
 			if($ZBX_VIEWED_NODES['selected'] == 0) {
@@ -140,7 +136,7 @@
 				$result = $ZBX_VIEWED_NODES['selected'];
 			}
 
-			if(empty($result)) $result = $USER_DETAILS['node']['nodeid'];
+			if(empty($result)) $result = CWebUser::$data['node']['nodeid'];
 			if(empty($result)) $result = $ZBX_CURRENT_NODEID;
 		}
 		else if($forse_all_nodes) {
@@ -154,7 +150,7 @@
 	}
 
 	function get_viewed_nodes($options=array()) {
-		global $USER_DETAILS, $ZBX_LOCALNODEID;
+		global $ZBX_LOCALNODEID;
 
 		$def_options = array(
 			'allow_all' => 0
@@ -167,12 +163,12 @@
 			$result['nodes'][0] = array('nodeid' => 0, 'name' => _('All'));
 		}
 
-		$available_nodes = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST, PERM_RES_DATA_ARRAY);
+		$available_nodes = get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_LIST, PERM_RES_DATA_ARRAY);
 		$available_nodes = get_tree_by_parentid($ZBX_LOCALNODEID, $available_nodes, 'masterid'); //remove parent nodes
 
 
-		// $selected_nodeids = get_request('selected_nodes', CProfile::get('web.nodes.selected', array($USER_DETAILS['node']['nodeid'])));
-		$selected_nodeids = get_request('selected_nodes', get_node_profile(array($USER_DETAILS['node']['nodeid'])));
+		// $selected_nodeids = get_request('selected_nodes', CProfile::get('web.nodes.selected', array(CWebUser::$data['node']['nodeid'])));
+		$selected_nodeids = get_request('selected_nodes', get_node_profile(array(CWebUser::$data['node']['nodeid'])));
 
 // +++ Fill $result['NODEIDS'], $result['NODES'] +++
 		$nodeids = array();

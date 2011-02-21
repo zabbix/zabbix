@@ -426,7 +426,6 @@ require_once('include/js.inc.php');
 	}
 
 	function get_screen_item_form($screen){
-		global $USER_DETAILS;
 
 		$form = new CFormTable(S_SCREEN_CELL_CONFIGURATION, 'screenedit.php?screenid='.$_REQUEST['screenid']);
 		$form->setName('screen_item_form');
@@ -778,7 +777,7 @@ require_once('include/js.inc.php');
 			$caption = '';
 			$id=0;
 
-			$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
+			$available_groups = get_accessible_groups_by_user(CWebUser::$data,PERM_READ_ONLY);
 			if(remove_nodes_from_id($resourceid) > 0){
 				$sql = 'SELECT DISTINCT n.name as node_name,g.groupid,g.name '.
 						' FROM hosts_groups hg, groups g '.
