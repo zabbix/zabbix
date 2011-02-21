@@ -94,10 +94,8 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 		$this->open('index.php');
 		$this->wait();
 		// Login if not logged in already
-		if($this->isElementPresent('link=Login'))
+		if($this->isElementPresent('id=password'))
 		{
-			$this->click('link=Login');
-			$this->wait();
 			$this->input_type('name','Admin');
 			$this->input_type('password','zabbix');
 			$this->click('enter');

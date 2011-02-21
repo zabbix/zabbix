@@ -626,7 +626,7 @@ include_once('include/page_header.php');
 <?php
 	$form = new CForm();
 
-	$cmbConfig = new CCombobox('config', $_REQUEST['config'], 'javascript: redirect("config.php?config="+this.options[this.selectedIndex].value);');
+	$cmbConfig = new CCombobox('configDropDown', $_REQUEST['config'], 'javascript: redirect("config.php?config="+this.options[this.selectedIndex].value);');
 	$cmbConfig->addItems(array(
 		8 => S_GUI,
 		0 => S_HOUSEKEEPER,
