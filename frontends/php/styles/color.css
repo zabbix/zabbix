@@ -61,7 +61,7 @@ a.on:active 	{	color:#DC0000;	}
 
 table.tableinfo{ color: #1f1f1f; background-color: #FFF; }
 table.tableinfo tr.header td { background-color:#CED7DF; }
-table.tableinfo tr.header td.hover_grey { background-color:#C3CCE4; }
+table.tableinfo tr.header td.hover_grey { background-color:#BFCBD5; }
 table.tableinfo tr.header td.hover_grey:hover  { color: #000000; background-color:#B3BCD7;}
 table.tableinfo tr.vertical_header td { background-color: #CED7DF;}
 table.tableinfo tr.vertical_header td.hover_grey:hover{ color: #EEEEEE; background-color:#999999; }
