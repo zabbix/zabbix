@@ -38,7 +38,7 @@
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: never returns                                                    *
  *                                                                            *
@@ -86,7 +86,7 @@ exit:
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: never returns                                                    *
  *                                                                            *

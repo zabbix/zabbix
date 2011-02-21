@@ -336,10 +336,10 @@
 				$links_menus .= "['".S_SUBMAP."',\"javascript: redirect('maps.php?sysmapid=".$db_element['elementid']."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 			}
 			else if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER){
-				$links_menus.= "['".S_STATUS_OF_TRIGGERS."',\"javascript: redirect('events.php?source=0&triggerid=".$db_element['elementid']."&nav_time=".(time()-7*86400)."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+				$links_menus.= "['".S_LATEST_EVENTS."',\"javascript: redirect('events.php?source=0&triggerid=".$db_element['elementid']."&nav_time=".(time()-7*86400)."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 			}
 			else if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP){
-				$links_menus.= "['".S_STATUS_OF_TRIGGERS."',\"javascript: redirect('events.php?source=0&groupid=".$db_element['elementid']."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+				$links_menus.= "['".S_STATUS_OF_TRIGGERS."',\"javascript: redirect('tr_status.php?hostid=0&groupid=".$db_element['elementid']."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 			}
 
 
@@ -684,7 +684,8 @@
 
 			$parameter = substr($parameter, 0, $pos);
 */
-		$pattern = "/{(?P<host>.+?):(?P<key>.+?)\.(?P<func>[^.]+?)\((?P<param>.+?)\)}/u";
+//		$pattern = "/{(?P<host>.+?):(?P<key>.+?)\.(?P<func>[^.]+?)\((?P<param>.+?)\)}/u";
+		$pattern="/{(?P<host>.[^}]*):(?P<key>.[^}]*)\.(?P<func>.[^}]*)\((?P<param>.[^}]*)\)*}/u";
 		preg_match_all($pattern, $label, $matches);
 		foreach($matches[0] as $num => $expr){
 			$host = $matches['host'][$num];

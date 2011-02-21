@@ -1337,10 +1337,10 @@ static int	evaluate_DELTA(char *value, DB_ITEM *item, const char *function, cons
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, const char *parameters)
 {
 	const char	*__function_name = "evaluate_NODATA";
-	int		arg1, flag, res = FAIL;
+	int		arg1, flag, now, res = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1352,6 +1352,8 @@ static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, con
 
 	if (flag != ZBX_FLAG_SEC)
 		return res;
+
+	now = (int)time(NULL);
 
 	if (item->lastclock + arg1 > now)
 		zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
@@ -1931,7 +1933,7 @@ int	evaluate_function(char *value, DB_ITEM *item, const char *function, const ch
 	}
 	else if (0 == strcmp(function, "nodata"))
 	{
-		ret = evaluate_NODATA(value, item, function, parameter, now);
+		ret = evaluate_NODATA(value, item, function, parameter);
 	}
 	else if (0 == strcmp(function, "date"))
 	{
@@ -2370,23 +2372,25 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 	DB_ITEM		item;
 	DB_RESULT	result;
 	DB_ROW		row;
-
-	char	host_esc[MAX_STRING_LEN];
-	char	key_esc[MAX_STRING_LEN];
-
-	int	res;
+	char		*host_esc, *key_esc;
+	int		res;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() function:'%s:%s.%s(%s)'",
 			__function_name, host, key, function, parameter);
 
-	DBescape_string(host, host_esc, MAX_STRING_LEN);
-	DBescape_string(key, key_esc, MAX_STRING_LEN);
+	host_esc = DBdyn_escape_string(host);
+	key_esc = DBdyn_escape_string(key);
 
-	result = DBselect("select %s where h.host='%s' and h.hostid=i.hostid and i.key_='%s'" DB_NODE,
-		ZBX_SQL_ITEM_SELECT,
-		host_esc,
-		key_esc,
-		DBnode_local("h.hostid"));
+	result = DBselect(
+			"select %s"
+			" where h.host='%s'"
+				" and h.hostid=i.hostid"
+				" and i.key_='%s'"
+				DB_NODE,
+			ZBX_SQL_ITEM_SELECT, host_esc, key_esc, DBnode_local("h.hostid"));
+
+	zbx_free(host_esc);
+	zbx_free(key_esc);
 
 	if (NULL == (row = DBfetch(result)))
 	{

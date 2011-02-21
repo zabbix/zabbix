@@ -573,14 +573,10 @@ int	DBget_queue_count(int from, int to);
 double	DBget_requiredperformance();
 zbx_uint64_t DBget_proxy_lastaccess(const char *hostname);
 
-int	DBget_escape_string_len(const char *src);
-void    DBescape_string(const char *src, char *dst, int len);
 char	*DBdyn_escape_string(const char *src);
 char	*DBdyn_escape_string_len(const char *src, int max_src_len);
 
 #define ZBX_SQL_LIKE_ESCAPE_CHAR '!'
-int	DBget_escape_like_pattern_len(const char *src);
-void	DBescape_like_pattern(const char *src, char *dst, int len);
 char	*DBdyn_escape_like_pattern(const char *src);
 
 void    DBget_item_from_db(DB_ITEM *item, DB_ROW row);

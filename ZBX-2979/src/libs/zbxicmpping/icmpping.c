@@ -27,74 +27,105 @@ extern char	*CONFIG_SOURCE_IP;
 extern char	*CONFIG_FPING_LOCATION;
 #ifdef HAVE_IPV6
 extern char	*CONFIG_FPING6_LOCATION;
-#endif /* HAVE_IPV6 */
+#endif	/* HAVE_IPV6 */
 extern char	*CONFIG_TMPDIR;
+
+/* official fping does not support source IP address */
+/* patched versions provide either -I or -S options */
+
+static unsigned char	source_ip_checked = 0;
+static const char	*source_ip_option = NULL;
+#ifdef HAVE_IPV6
+static unsigned char	source_ip6_checked = 0;
+static const char	*source_ip6_option = NULL;
+#endif	/* HAVE_IPV6 */
+
+static void	get_source_ip_option(const char *fping, const char **option, unsigned char *checked)
+{
+	FILE	*f;
+	char	*p, tmp[MAX_STRING_LEN];
+
+	zbx_snprintf(tmp, sizeof(tmp), "%s -h 2>&1", fping);
+
+	if (NULL == (f = popen(tmp, "r")))
+		return;
+
+	while (NULL != fgets(tmp, sizeof(tmp), f))
+	{
+		for (p = tmp; isspace(*p); p++)
+			;
+
+		if ('-' == p[0] && 'I' == p[1] && isspace(p[2]))
+		{
+			*option = "-I";
+			break;
+		}
+
+		if ('-' == p[0] && 'S' == p[1] && isspace(p[2]))
+		{
+			*option = "-S";
+			break;
+		}
+	}
+
+	pclose(f);
+
+	*checked = 1;
+}
 
 static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int interval, int size, int timeout,
 		char *error, int max_error_len)
 {
+	const char	*__function_name = "process_ping";
+
 	FILE		*f;
-	char		filename[MAX_STRING_LEN], tmp[MAX_STRING_LEN],
-			*c, *c2, params[64]; /*usually this amount of memory is enough*/
+	char		*c, *c2, params[64];
+	char		filename[MAX_STRING_LEN], tmp[MAX_STRING_LEN];
 	int		i;
 	ZBX_FPING_HOST	*host;
 	double		sec;
-	
+
 #ifdef HAVE_IPV6
 	int		family;
-	char		*fping;
-	char		fping_fping6_combination = 0;
-#define	FPING_EXISTS		0x1
-#define	FPING6_EXISTS		0x2
-#define	FPING_FPING6_EXIST	0x3
+	char		params6[64];
+	char		fping_existence = 0;
+#define	FPING_EXISTS	0x1
+#define	FPING6_EXISTS	0x2
 
-#endif /* #ifdef HAVE_IPV6 */
+#endif	/* HAVE_IPV6 */
 
 	assert(hosts);
-	zabbix_log(LOG_LEVEL_DEBUG, "In process_ping() [hosts_count:%d]", hosts_count);
 
-	i = zbx_snprintf(params, sizeof(params), "-q -C%d", count);
-	if (0 != interval)
-		i += zbx_snprintf(params + i, sizeof(params) - i, " -p%d", interval);
-	if (0 != size)
-		i += zbx_snprintf(params + i, sizeof(params) - i, " -b%d", size);
-	if (0 != timeout)
-		i += zbx_snprintf(params + i, sizeof(params) - i, " -t%d", timeout);
-	if (NULL != CONFIG_SOURCE_IP)
-		i += zbx_snprintf(params + i, sizeof(/*source_ip*/params) - i, " -S%s ", CONFIG_SOURCE_IP);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hosts_count:%d", __function_name, hosts_count);
 
-	if (access(CONFIG_FPING_LOCATION, F_OK|X_OK) == -1)
+	if (-1 == access(CONFIG_FPING_LOCATION, F_OK | X_OK))
 	{
 #ifndef HAVE_IPV6
 		zbx_snprintf(error, max_error_len, "%s: [%d] %s", CONFIG_FPING_LOCATION, errno, strerror(errno));
 		return NOTSUPPORTED;
-#endif /* #ifndef HAVE_IPV6 */
+#endif	/* HAVE_IPV6 */
 	}
 	else
 	{
 #ifdef HAVE_IPV6
-		fping_fping6_combination |= FPING_EXISTS;
-#else /* #ifdef HAVE_IPV6 */
+		fping_existence |= FPING_EXISTS;
+#else
 		if (NULL != CONFIG_SOURCE_IP)
 		{
 			if (FAIL == is_ip4(CONFIG_SOURCE_IP)) /* we do not have IPv4 family address in CONFIG_SOURCE_IP */
 			{
-				zbx_snprintf(error, max_error_len, 
+				zbx_snprintf(error, max_error_len,
 					"You should enable IPv6 support to use IPv6 family address for SourceIP '%s'.", CONFIG_SOURCE_IP);
 				return NOTSUPPORTED;
 			}
-		}		
-#endif /* #ifdef HAVE_IPV6 */
+		}
+#endif	/* HAVE_IPV6 */
 	}
 
-	zbx_snprintf(filename, sizeof(filename), "%s/zabbix_server_%li.pinger",
-			CONFIG_TMPDIR,
-			zbx_get_thread_id());
-
 #ifdef HAVE_IPV6
-	if (access(CONFIG_FPING6_LOCATION, F_OK|X_OK) == -1)
+	if (-1 == access(CONFIG_FPING6_LOCATION, F_OK | X_OK))
 	{
-		if (FPING_EXISTS != (fping_fping6_combination & FPING_EXISTS))
+		if (0 == (fping_existence & FPING_EXISTS))
 		{
 			zbx_snprintf(error, max_error_len, "At least one of '%s', '%s' must exist. Both are missing in the system.",
 					CONFIG_FPING_LOCATION,
@@ -103,10 +134,51 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 		}
 	}
 	else
+		fping_existence |= FPING6_EXISTS;
+#endif	/* HAVE_IPV6 */
+
+	i = zbx_snprintf(params, sizeof(params), "-q -C%d", count);
+	if (0 != interval)
+		i += zbx_snprintf(params + i, sizeof(params) - i, " -p%d", interval);
+	if (0 != size)
+		i += zbx_snprintf(params + i, sizeof(params) - i, " -b%d", size);
+	if (0 != timeout)
+		i += zbx_snprintf(params + i, sizeof(params) - i, " -t%d", timeout);
+
+#ifdef HAVE_IPV6
+	strscpy(params6, params);
+#endif	/* HAVE_IPV6 */
+
+	if (NULL != CONFIG_SOURCE_IP)
 	{
-		fping_fping6_combination |= FPING6_EXISTS;
+#ifdef HAVE_IPV6
+		if (0 != (fping_existence & FPING_EXISTS))
+		{
+			if (0 == source_ip_checked)
+				get_source_ip_option(CONFIG_FPING_LOCATION, &source_ip_option, &source_ip_checked);
+			if (NULL != source_ip_option)
+				zbx_snprintf(params + i, sizeof(params) - i, " %s%s", source_ip_option, CONFIG_SOURCE_IP);
+		}
+
+		if (0 != (fping_existence & FPING6_EXISTS))
+		{
+			if (0 == source_ip6_checked)
+				get_source_ip_option(CONFIG_FPING6_LOCATION, &source_ip6_option, &source_ip6_checked);
+			if (NULL != source_ip6_option)
+				zbx_snprintf(params6 + i, sizeof(params6) - i, " %s%s", source_ip6_option, CONFIG_SOURCE_IP);
+		}
+#else
+		if (0 == source_ip_checked)
+			get_source_ip_option(CONFIG_FPING_LOCATION, &source_ip_option, &source_ip_checked);
+		if (NULL != source_ip_option)
+			zbx_snprintf(params + i, sizeof(params) - i, " %s%s", source_ip_option, CONFIG_SOURCE_IP);
+#endif	/* HAVE_IPV6 */
 	}
-	
+
+	zbx_snprintf(filename, sizeof(filename), "%s/zabbix_server_%li.pinger",
+			CONFIG_TMPDIR, zbx_get_thread_id());
+
+#ifdef HAVE_IPV6
 	if (NULL != CONFIG_SOURCE_IP)
 	{
 		if (SUCCEED != get_address_family(CONFIG_SOURCE_IP, &family, error, max_error_len))
@@ -114,67 +186,43 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 		if (family == PF_INET)
 		{
-			if (FPING_EXISTS != (fping_fping6_combination & FPING_EXISTS))
+			if (0 == (fping_existence & FPING_EXISTS))
 			{
-				zbx_snprintf(error, max_error_len, "File '%s' cannot be found in the system.", 
+				zbx_snprintf(error, max_error_len, "File '%s' cannot be found in the system.",
 						CONFIG_FPING_LOCATION);
 				return NOTSUPPORTED;
 			}
-			else
-				fping = CONFIG_FPING_LOCATION;
+
+			zbx_snprintf(tmp, sizeof(tmp), "%s %s 2>&1 <%s", CONFIG_FPING_LOCATION, params, filename);
 		}
 		else
 		{
-			if (FPING6_EXISTS != (fping_fping6_combination & FPING6_EXISTS))
+			if (0 == (fping_existence & FPING6_EXISTS))
 			{
-				zbx_snprintf(error, max_error_len, "File '%s' cannot be found in the system.", 
+				zbx_snprintf(error, max_error_len, "File '%s' cannot be found in the system.",
 						CONFIG_FPING6_LOCATION);
 				return NOTSUPPORTED;
 			}
-			else
-				fping = CONFIG_FPING6_LOCATION;
-		}
 
-		zbx_snprintf(tmp, sizeof(tmp), "%s %s 2>&1 <%s",
-				fping,
-				params,
-				filename);
+			zbx_snprintf(tmp, sizeof(tmp), "%s %s 2>&1 <%s", CONFIG_FPING6_LOCATION, params6, filename);
+		}
 	}
-	else /* CONFIG_SOURCE_IP has no value */	
+	else
 	{
-		if (FPING_FPING6_EXIST == (fping_fping6_combination & FPING_FPING6_EXIST))
-		{
-			zbx_snprintf(tmp, sizeof(tmp), "%s %s 2>&1 <%s;%s %s 2>&1 <%s",
-				CONFIG_FPING_LOCATION,
-				params,
-				filename,
-				CONFIG_FPING6_LOCATION,
-				params,
-				filename);
-		}
-		else if (FPING_EXISTS == (fping_fping6_combination & FPING_EXISTS))
-		{
-			zbx_snprintf(tmp, sizeof(tmp), "%s %s 2>&1 <%s",
-				CONFIG_FPING_LOCATION,
-				params,
-				filename);
-		}
-		else /* fping6 must surely exist */
-		{
-			zbx_snprintf(tmp, sizeof(tmp), "%s %s 2>&1 <%s",
-				CONFIG_FPING6_LOCATION,
-				params,
-				filename);
-		}
-	}
-#else /* HAVE_IPV6 */				
-	zbx_snprintf(tmp, sizeof(tmp), "%s %s 2>&1 <%s",
-			CONFIG_FPING_LOCATION,
-			params,
-			filename);
-#endif /* HAVE_IPV6 */
+		i = 0;
 
-	if (NULL == (f = fopen(filename, "w"))) {
+		if (0 != (fping_existence & FPING_EXISTS))
+			i += zbx_snprintf(tmp + i, sizeof(tmp) - i, "%s %s 2>&1 <%s;", CONFIG_FPING_LOCATION, params, filename);
+
+		if (0 != (fping_existence & FPING6_EXISTS))
+			i += zbx_snprintf(tmp + i, sizeof(tmp) - i, "%s %s 2>&1 <%s;", CONFIG_FPING6_LOCATION, params6, filename);
+	}
+#else
+	zbx_snprintf(tmp, sizeof(tmp), "%s %s 2>&1 <%s", CONFIG_FPING_LOCATION, params, filename);
+#endif	/* HAVE_IPV6 */
+
+	if (NULL == (f = fopen(filename, "w")))
+	{
 		zbx_snprintf(error, max_error_len, "%s: [%d] %s", filename, errno, strerror(errno));
 		return NOTSUPPORTED;
 	}
@@ -191,7 +239,8 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s", tmp);
 
-	if (0 == (f = popen(tmp, "r"))) {
+	if (NULL == (f = popen(tmp, "r")))
+	{
 		zbx_snprintf(error, max_error_len, "%s: [%d] %s", tmp, errno, strerror(errno));
 
 		unlink(filename);
@@ -199,19 +248,19 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 		return NOTSUPPORTED;
 	}
 
-	while (NULL != fgets(tmp, sizeof(tmp), f)) {
+	while (NULL != fgets(tmp, sizeof(tmp), f))
+	{
 		zbx_rtrim(tmp, "\n");
-		zabbix_log(LOG_LEVEL_DEBUG, "Update IP [%s]",
-				tmp);
-
-		/* 12fc::21 : [0], 76 bytes, 0.39 ms (0.39 avg, 0% loss) */
+		zabbix_log(LOG_LEVEL_DEBUG, "Update IP [%s]", tmp);
 
 		host = NULL;
 
-		if (NULL != (c = strchr(tmp, ' '))) {
+		if (NULL != (c = strchr(tmp, ' ')))
+		{
 			*c = '\0';
 			for (i = 0; i < hosts_count; i++)
-				if (0 == strcmp(tmp, hosts[i].addr)) {
+				if (0 == strcmp(tmp, hosts[i].addr))
+				{
 					host = &hosts[i];
 					break;
 				}
@@ -224,34 +273,44 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 		if (NULL == (c = strstr(tmp, " : ")))
 			continue;
 
+		/* when NIC bonding is used, there are also lines like */
+		/* 192.168.1.2 : duplicate for [0], 96 bytes, 0.19 ms */
+
+		if (NULL != strstr(tmp, "duplicate for"))
+			continue;
+
 		c += 3;
 
-		do {
+		do
+		{
 			if (NULL != (c2 = strchr(c, ' ')))
 				*c2 = '\0';
 
 			if (0 != strcmp(c, "-"))
 			{
 				/* Convert ms to seconds */
-				sec = atof(c)/1000;
+				sec = atof(c) / 1000;
 
 				if (host->rcv == 0 || host->min > sec)
 					host->min = sec;
 				if (host->rcv == 0 || host->max < sec)
 					host->max = sec;
-				host->avg = (host->avg * host->rcv + sec)/(host->rcv + 1);
+				host->avg = (host->avg * host->rcv + sec) / (host->rcv + 1);
 				host->rcv++;
 			}
 
+			host->cnt++;
+
 			if (NULL != c2)
 				*c2++ = ' ';
-		} while (NULL != (c = c2));
+		}
+		while (NULL != (c = c2));
 	}
 	pclose(f);
 
 	unlink(filename);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of process_ping()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return SUCCEED;
 }
@@ -269,15 +328,16 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments: use external binary 'fping' to avoid superuser priviledges       *
+ * Comments: use external binary 'fping' to avoid superuser privileges        *
  *                                                                            *
  ******************************************************************************/
 int	do_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int interval, int size, int timeout, char *error, int max_error_len)
 {
-	int res;
+	const char	*__function_name = "do_ping";
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In do_ping(hosts_count:%d)",
-			hosts_count);
+	int	res;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hosts_count:%d", __function_name, hosts_count);
 
 	if (NOTSUPPORTED == (res = process_ping(hosts, hosts_count, count, interval, size, timeout, error, max_error_len)))
 	{
@@ -285,8 +345,7 @@ int	do_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int interval, int
 		zabbix_syslog("%s", error);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of do_ping():%s",
-			zbx_result_string(res));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
 	return res;
 }

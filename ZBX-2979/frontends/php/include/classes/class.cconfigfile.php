@@ -35,22 +35,36 @@ class CConfigFile{
 // config file in plain php is bad
 // {{{
 			$dbs = array('MYSQL', 'POSTGRESQL', 'ORACLE', 'IBM_DB2', 'SQLITE3');
-			if(!isset($DB['TYPE']))
+			if(!isset($DB['TYPE']) && !isset($DB_TYPE))
 				self::exception('DB type is not set.');
-			else if(!in_array($DB['TYPE'], $dbs))
+			else if(isset($DB['TYPE']) && !in_array($DB['TYPE'], $dbs))
 				self::exception('DB type has wrong value. Possible values '.implode(', ', $dbs));
-			else if(!isset($DB['DATABASE']))
+			else if(isset($DB_TYPE) && !isset($DB['TYPE']) && !in_array($DB_TYPE, $dbs))
+				self::exception('DB type has wrong value. Possible values '.implode(', ', $dbs));
+			else if(!isset($DB['DATABASE']) && !isset($DB_DATABASE))
 				self::exception('DB database is not set.');
 // }}}
 
 			$this->setDefaults();
 
-			$this->config['DB']['TYPE'] = $DB['TYPE'];
-			$this->config['DB']['DATABASE'] = $DB['DATABASE'];
+			if(isset($DB['TYPE'])) $this->config['DB']['TYPE'] = $DB['TYPE'];
+			else if(isset($DB_TYPE)) $this->config['DB']['TYPE'] = $DB_TYPE;
+
+			if(isset($DB['DATABASE'])) $this->config['DB']['DATABASE'] = $DB['DATABASE'];
+			else if(isset($DB_DATABASE)) $this->config['DB']['DATABASE'] = $DB_DATABASE;
+
 			if(isset($DB['SERVER'])) $this->config['DB']['SERVER'] = $DB['SERVER'];
+			else if(isset($DB_SERVER)) $this->config['DB']['SERVER'] = $DB_SERVER;
+
 			if(isset($DB['PORT'])) $this->config['DB']['PORT'] = $DB['PORT'];
+			else if(isset($DB_PORT)) $this->config['DB']['PORT'] = $DB_PORT;
+
 			if(isset($DB['USER'])) $this->config['DB']['USER'] = $DB['USER'];
+			else if(isset($DB_USER)) $this->config['DB']['USER'] = $DB_USER;
+
 			if(isset($DB['PASSWORD'])) $this->config['DB']['PASSWORD'] = $DB['PASSWORD'];
+			else if(isset($DB_PASSWORD)) $this->config['DB']['PASSWORD'] = $DB_PASSWORD;
+
 			if(isset($DB['SCHEMA'])) $this->config['DB']['SCHEMA'] = $DB['SCHEMA'];
 
 			if(isset($ZBX_SERVER)) $this->config['ZBX_SERVER'] = $ZBX_SERVER;

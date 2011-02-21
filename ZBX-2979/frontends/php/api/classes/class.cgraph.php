@@ -891,14 +891,14 @@ COpt::memoryPick();
 									continue 2;
 							}
 
-							self::exception(ZBX_API_ERROR_PARAMETERS, sprint_f(S_GRAPH_ALREADY_EXISTS_ON, $tmp_graph['name'], $chd_host['host']).SPACE.S_ITEMS_ARE_NOT_IDENTICAL);
+							self::exception(ZBX_API_ERROR_PARAMETERS, sprintf(S_GRAPH_ALREADY_EXISTS_ON, $tmp_graph['name'], $chd_host['host']).SPACE.S_ITEMS_ARE_NOT_IDENTICAL);
 						}
 
 						$tmp_graph['graphid'] = $chd_graph['graphid'];
 						self::updateReal($tmp_graph);
 					}
 					else{
-						self::exception(ZBX_API_ERROR_PARAMETERS, sprint_f(S_GRAPH_ALREADY_EXISTS_ON, $tmp_graph['name'], $chd_host['host']).SPACE.S_ITEMS_ARE_NOT_IDENTICAL);
+						self::exception(ZBX_API_ERROR_PARAMETERS, sprintf(S_GRAPH_ALREADY_EXISTS_ON, $tmp_graph['name'], $chd_host['host']).SPACE.S_ITEMS_ARE_NOT_IDENTICAL);
 					}
 				}
 				else{

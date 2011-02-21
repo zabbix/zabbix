@@ -40,7 +40,7 @@ static int	sql_alloc = 4096, sql_offset, buf_alloc = 128,
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -115,7 +115,7 @@ next:
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -257,7 +257,7 @@ next:
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -391,7 +391,7 @@ next:
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *

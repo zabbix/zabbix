@@ -42,9 +42,9 @@ msgcounter:				0,				// how many messages have been added
 
 pipeLength:				15,				// how many messages to show
 
-messageList:			{},				// list of recieved messages
+messageList:			{},				// list of received messages
 messagePipe:			new Array(),	// messageid pipe line
-messageLast:			{},				// last massages sourceid by caption
+messageLast:			{},				// last message's sourceid by caption
 
 effectTimeout:			1000,			// effect time out
 

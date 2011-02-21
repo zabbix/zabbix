@@ -445,11 +445,7 @@ int	MAIN_ZABBIX_ENTRY(void)
 	zabbix_log(LOG_LEVEL_WARNING, "******************************");
 
 #ifdef  HAVE_SQLITE3
-	if(ZBX_MUTEX_ERROR == php_sem_get(&sqlite_access, CONFIG_DBNAME))
-	{
-		zbx_error("Unable to create mutex for sqlite");
-		exit(FAIL);
-	}
+	zbx_create_sqlite3_mutex(CONFIG_DBNAME);
 #endif /* HAVE_SQLITE3 */
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
@@ -780,9 +776,9 @@ void	zbx_on_exit()
 	free_ipmi_handler();
 #endif
 
-#ifdef  HAVE_SQLITE3
+#ifdef HAVE_SQLITE3
 	php_sem_remove(&sqlite_access);
-#endif /* HAVE_SQLITE3 */
+#endif	/* HAVE_SQLITE3 */
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Server stopped. Zabbix %s (revision %s).",
 			ZABBIX_VERSION,

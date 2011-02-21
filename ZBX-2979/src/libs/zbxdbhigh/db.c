@@ -897,7 +897,7 @@ int	DBget_queue_count(int from, int to)
 					" and i.lastclock<%d"
 					")"
 				" and ("
-					"i.type in (%d,%d,%d,%d,%d,%d,%d,%d)"
+					"i.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d)"
 					" or (h.available<>%d and i.type in (%d))"
 					" or (h.snmp_available<>%d and i.type in (%d,%d,%d))"
 					" or (h.ipmi_available<>%d and i.type in (%d))"
@@ -908,8 +908,9 @@ int	DBget_queue_count(int from, int to)
 			ITEM_VALUE_TYPE_LOG,
 			SERVER_STATUS_KEY, SERVER_ZABBIXLOG_KEY,
 			now - from,
-				ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SIMPLE,
-				ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_CALCULATED,
+				ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+				ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_DB_MONITOR,
+				ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_CALCULATED,
 			HOST_AVAILABLE_FALSE,
 				ITEM_TYPE_ZABBIX,
 			HOST_AVAILABLE_FALSE,
@@ -1141,7 +1142,7 @@ void	DBvacuum()
  *           and 'DBdyn_escape_string_len'                                    *
  *                                                                            *
  ******************************************************************************/
-int	DBget_escape_string_len(const char *src)
+static int	DBget_escape_string_len(const char *src)
 {
 	const char	*s;
 	int		len = 0;
@@ -1183,7 +1184,7 @@ int	DBget_escape_string_len(const char *src)
  *           and 'DBdyn_escape_string_len'                                    *
  *                                                                            *
  ******************************************************************************/
-void	DBescape_string(const char *src, char *dst, int len)
+static void	DBescape_string(const char *src, char *dst, int len)
 {
 	const char	*s;
 	char		*d;
@@ -1316,7 +1317,7 @@ char	*DBdyn_escape_string_len(const char *src, int max_src_len)
  * Comments: sync changes with 'DBescape_like_pattern'                        *
  *                                                                            *
  ******************************************************************************/
-int	DBget_escape_like_pattern_len(const char *src)
+static int	DBget_escape_like_pattern_len(const char *src)
 {
 	int		len;
 	const char	*s;
@@ -1365,7 +1366,7 @@ int	DBget_escape_like_pattern_len(const char *src)
  *           Hence '!' instead of backslash.                                  *
  *                                                                            *
  ******************************************************************************/
-void	DBescape_like_pattern(const char *src, char *dst, int len)
+static void	DBescape_like_pattern(const char *src, char *dst, int len)
 {
 	char		*d;
 	char		*tmp = NULL;

@@ -36,7 +36,8 @@ $definedErrorPhrases = array(
 			EXPRESSION_NOT_A_MACRO_ERROR => S_EXPRESSION_NOT_A_MACRO_ERROR);
 
 include_once('include/page_header.php');
-
+?>
+<?php
 //----------------------------------------------------------------------
 
 // expression analyze

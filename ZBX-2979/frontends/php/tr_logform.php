@@ -329,9 +329,13 @@ if(isset($_REQUEST['sform'])){
 	$maxid=0;
 
 	$bExprResult = true;
-
+	$exprData = new CTriggerExpression(array(
+		'expression'=> empty($expressions) ? '' : construct_expression($itemid,$expressions)
+	));
 	if(isset($_REQUEST['triggerid']) && !isset($_REQUEST['save_trigger'])
-			&& !validate_expression(construct_expression($itemid,$expressions)) && !isset($_REQUEST['form_refresh'])){
+			&& !empty($exprData->errors) && !isset($_REQUEST['form_refresh'])){
+
+		info($exprData->errors);
 
 		unset($expressions);
 		$expressions[0]['value'] = $expr_incase;

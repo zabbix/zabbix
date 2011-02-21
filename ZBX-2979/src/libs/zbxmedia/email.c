@@ -89,7 +89,7 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 	if (FAIL == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, smtp_server, ZBX_DEFAULT_SMTP_PORT, 0))
 	{
 		zbx_snprintf(error, max_error_len, "Cannot connect to SMTP server [%s] [%s]", smtp_server, zbx_tcp_strerror());
-		goto out;
+		goto close;
 	}
 	if (-1 == smtp_readln(s.socket, cmd, sizeof(cmd)))
 	{
@@ -277,7 +277,7 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 	ret = SUCCEED;
 out:
 	zbx_tcp_close(&s);
-
+close:
 	if ('\0' != *error)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s", error);

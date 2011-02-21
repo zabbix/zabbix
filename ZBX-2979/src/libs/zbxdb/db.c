@@ -309,10 +309,20 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	return ret;
 }
 
+#if defined(HAVE_SQLITE3)
+void	zbx_create_sqlite3_mutex(const char *dbname)
+{
+	if (ZBX_MUTEX_ERROR == php_sem_get(&sqlite_access, dbname))
+	{
+		zbx_error("Unable to create mutex for sqlite");
+		exit(FAIL);
+	}
+}
+#endif	/* HAVE_SQLITE3 */
+
 void	zbx_db_init(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port)
 {
 #if defined(HAVE_SQLITE3)
-	int		ret;
 	struct stat	buf;
 
 	if (0 != stat(dbname, &buf))
@@ -320,16 +330,20 @@ void	zbx_db_init(char *host, char *user, char *password, char *dbname, char *dbs
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot open database file \"%s\": %s", dbname, strerror(errno));
 		zabbix_log(LOG_LEVEL_WARNING, "Creating database ...");
 
-		ret = sqlite3_open(dbname, &conn);
-		if (SQLITE_OK != ret)
+		if (SQLITE_OK != sqlite3_open(dbname, &conn))
 		{
 			zabbix_errlog(ERR_Z3002, dbname, 0, sqlite3_errmsg(conn));
 			exit(FAIL);
 		}
 
+		zbx_create_sqlite3_mutex(dbname);
+
 		DBexecute("%s", db_schema);
 		DBclose();
 	}
+	else
+		zbx_create_sqlite3_mutex(dbname);
+
 #endif	/* HAVE_SQLITE3 */
 }
 
@@ -1159,11 +1173,33 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 
 	return mysql_fetch_row(result);
 #elif defined(HAVE_ORACLE)
+	sword		rc;
+	static char	errbuf[512];
+	sb4		errcode;
+
 	if (NULL == result)
 		return NULL;
 
-	if (OCI_NO_DATA == OCIStmtFetch(result->stmthp, oracle.errhp, 1, OCI_FETCH_NEXT, OCI_DEFAULT))
+	if (OCI_NO_DATA == (rc = OCIStmtFetch2(result->stmthp, oracle.errhp, 1, OCI_FETCH_NEXT, 0, OCI_DEFAULT)))
 		return NULL;
+
+	if (OCI_SUCCESS == rc)
+		return result->values;
+
+	if (OCI_SUCCESS != (rc = OCIErrorGet((dvoid *)oracle.errhp, (ub4)1, (text *)NULL,
+			&errcode, (text *)errbuf, (ub4)sizeof(errbuf), OCI_HTYPE_ERROR)))
+	{
+		zabbix_errlog(ERR_Z3006, rc, zbx_oci_error(rc));
+		return NULL;
+	}
+
+	switch (errcode)
+	{
+		case 3113:	/* ORA-03113: end-of-file on communication channel */
+		case 3114:	/* ORA-03114: not connected to ORACLE */
+			zabbix_errlog(ERR_Z3006, errcode, errbuf);
+			return NULL;
+	}
 
 	return result->values;
 #elif defined(HAVE_POSTGRESQL)

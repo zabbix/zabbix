@@ -15,11 +15,11 @@ DIST_SUBDIRS = \
 	zbxnix \
 	zbxconf \
 	zbxsysinfo \
-	zbxplugin \
 	zbxsys \
 	zbxjson \
 	zbxserver \
-	zbxicmpping
+	zbxicmpping \
+	zbxexec
 
 if PROXY
 PROXY_SUBDIRS = \
@@ -52,10 +52,10 @@ SUBDIRS = \
 	zbxnix \
 	zbxconf \
 	zbxsysinfo \
-	zbxplugin \
 	zbxsys \
 	zbxcomms \
 	zbxjson \
+	zbxexec \
 	$(PROXY_SUBDIRS) \
 	$(SERVER_SUBDIRS)
 

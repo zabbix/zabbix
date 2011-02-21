@@ -22,7 +22,7 @@
 
 #include <stdarg.h>
 
-extern	int	CONFIG_ENABLE_LOG;
+extern int	CONFIG_ENABLE_LOG;
 
 #ifdef HAVE___VA_ARGS__
 #	define zabbix_syslog(fmt, ...) __zbx_zabbix_syslog(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)

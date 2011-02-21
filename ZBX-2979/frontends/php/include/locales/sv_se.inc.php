@@ -24,7 +24,6 @@
 	$TRANSLATION=array(
 
 	'S_DATE_FORMAT_YMDHMS'=>			'd M H:i:s',
-	'S_DATE_FORMAT_YMD'=>			'Y M d',
 	'S_HTML_CHARSET'=>			'UTF-8',
 	'S_CREATE_RULE'=>			'Skapa regel',
 	'S_ACKNOWLEDGES'=>			'Bekräftelser',
@@ -44,8 +43,6 @@
 	'S_CONDITIONS'=>			'Villkor',
 	'S_CONDITION'=>			'Villkor',
 	'S_NO_CONDITIONS_DEFINED'=>			'Inga villkor har definierats',
-	'S_ACTIONS_DELETED'=>			'Åtgärder borttagna',
-	'S_CANNOT_DELETE_ACTIONS'=>			'Kan inte ta bort åtgärder',
 	'S_ACTIONS'=>			'Åtgärder',
 	'S_ACTIONS_BIG'=>			'ÅTGÄRDER',
 	'S_ACTION_ADDED'=>			'Åtgärd lades till',
@@ -87,9 +84,7 @@
 	'S_NO_ACTIONS_FOUND'=>			'Inga åtgärder hittades',
 	'S_CUSTOM_GRAPHS'=>			'Anpassade diagram',
 	'S_GRAPHS_BIG'=>			'DIAGRAM',
-	'S_SELECT_GRAPH_TO_DISPLAY'=>			'Välj diagram att visa',
 	'S_PERIOD'=>			'Period',
-	'S_SELECT_GRAPH_DOT_DOT_DOT'=>			'Välj diagram...',
 	'S_CANNNOT_UPDATE_VALUE_MAP'=>			'Kan inte uppdatera värdeskarta',
 	'S_VALUE_MAP_ADDED'=>			'Värdeskarta lades till',
 	'S_CANNNOT_ADD_VALUE_MAP'=>			'Kan inte lägga till värdeskarta',
@@ -126,8 +121,6 @@
 	'S_HOUSEKEEPER'=>			'Hushållerska',
 	'S_MEDIA_TYPES'=>			'Mediatyper',
 	'S_ESCALATION_RULES'=>			'Eskaleringsregler',
-	'S_ESCALATION'=>			'Eskalering',
-	'S_ESCALATION_RULE'=>			'Eskaleringsregel',
 	'S_DEFAULT'=>			'Standard',
 	'S_IMAGES'=>			'Bilder',
 	'S_IMAGE'=>			'Bild',
@@ -331,9 +324,6 @@
 	'S_SNMPV3_AUTH_PASSPHRASE'=>			'SNMPv3 auth passphrase',
 	'S_SNMPV3_PRIV_PASSPHRASE'=>			'SNMPv3 priv passphrase',
 	'S_CUSTOM_MULTIPLIER'=>			'Anpassad faktor',
-	'S_DO_NOT_USE'=>			'Använd inte',
-	'S_USE_MULTIPLIER'=>			'Använd faktor',
-	'S_SELECT_HOST_DOT_DOT_DOT'=>			'Välj värd...',
 	'S_LOG_TIME_FORMAT'=>			'Tidsformat för logg',
 	'S_CREATE_ITEM'=>			'Skapa objekt',
 	'S_LATEST_EVENTS'=>			'Senaste händelser',
@@ -374,7 +364,6 @@
 	'S_OVERVIEW'=>			'Översikt',
 	'S_OVERVIEW_BIG'=>			'ÖVERSIKT',
 	'S_DATA'=>			'Data',
-	'S_QUEUE_BIG'=>			'K',
 	'S_QUEUE_OF_ITEMS_TO_BE_UPDATED_BIG'=>			'UPPDATERINGSKÖ FÖR OBJEKT',
 	'S_NEXT_CHECK'=>			'Nästa kontroll',
 	'S_THE_QUEUE_IS_EMPTY'=>			'Kön är tom',
@@ -608,7 +597,6 @@
 	'S_AUDIT'=>			'Granskning',
 	'S_LOGIN'=>			'Inloggning',
 	'S_LATEST_DATA'=>			'Senaste data',
-	'S_INCORRECT_DESCRIPTION'=>			'Felaktig beskrivning',
 
 	);
 ?>

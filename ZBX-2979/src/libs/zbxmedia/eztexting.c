@@ -126,7 +126,7 @@ int	send_ez_texting(const char *username, const char *password, const char *send
 			goto clean;
 	}
 
-	if (NULL == (message_ascii = zbx_replace_utf8(message, '?')))
+	if (NULL == (message_ascii = zbx_replace_utf8(message)))
 	{
 		zbx_snprintf(error, max_error_len, "Could not replace UTF-8 characters: [%s]", message);
 		goto clean;

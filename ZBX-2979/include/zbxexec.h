@@ -17,17 +17,9 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#include "common.h"
+#ifndef ZABBIX_ZBXEXEC_H
+#define ZABBIX_ZBXEXEC_H
 
-#include "zbxplugin.h"
+int	zbx_execute(const char *command, char **buffer, char *error, size_t max_error_len, int timeout);
 
-ZBX_PLUGIN_LIST	*PluginsList = NULL;
-
-
-int add_plugin(char *args)
-{
-#ifdef TODO
-#	error Realize plugin functionality!!!
-#endif
-	return 0;
-}
+#endif	/* ZABBIX_ZBXEXEC_H */

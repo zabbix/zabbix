@@ -765,11 +765,11 @@ Copt::memoryPick();
 // Adding groups
 		if(!is_null($options['select_groups']) && str_in_array($options['select_groups'], $subselects_allowed_outputs)){
 			$obj_params = array(
-					'nodeids' => $nodeids,
-					'output' => $options['select_groups'],
-					'triggerids' => $triggerids,
-					'preservekeys' => 1
-				);
+				'nodeids' => $nodeids,
+				'output' => $options['select_groups'],
+				'triggerids' => $triggerids,
+				'preservekeys' => 1
+			);
 			$groups = CHostgroup::get($obj_params);
 			foreach($groups as $groupid => $group){
 				$gtriggers = $group['triggers'];
@@ -1032,22 +1032,13 @@ COpt::memoryPick();
 		$result = false;
 
 		if(!isset($object['hostid']) && !isset($object['host'])){
+			$expr = new CTriggerExpression($object);
 			$expression = $object['expression'];
-			$expressionData = parseTriggerExpressions($expression, true);
 
-			if( isset($expressionData[$expression]['errors']) ) {
-				//showExpressionErrors($expression, $expressionData[$expression]['errors']);
-				return false;
-			}
+			if(!empty($expr->errors)) return false;
+			if(empty($expr->data['hosts'])) return false;
 
-			if(!isset($expressionData[$expression]['hosts']) || !is_array($expressionData[$expression]['hosts']) || !count($expressionData[$expression]['hosts'])) {
-				//error(S_TRIGGER_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR);
-				return false;
-			}
-
-			reset($expressionData[$expression]['hosts']);
-			$hData =& $expressionData[$expression]['hosts'][key($expressionData[$expression]['hosts'])];
-			$object['host'] = zbx_substr($expression, $hData['openSymbolNum']+1, $hData['closeSymbolNum']-($hData['openSymbolNum']+1));
+			$object['host'] = reset($expr->data['hosts']);
 		}
 
 		$options = array(
@@ -1170,8 +1161,8 @@ COpt::memoryPick();
 
 				if($trigger_db_fields['type'] == $trigger['type']) $trigger['type'] = null;
 				if($trigger_db_fields['priority'] == $trigger['priority']) $trigger['priority'] = null;
-				if($trigger_db_fields['comments'] == $trigger['comments']) $trigger['comments'] = null;
-				if($trigger_db_fields['url'] == $trigger['url']) $trigger['url'] = null;
+				if(strcmp($trigger_db_fields['comments'], $trigger['comments']) == 0) $trigger['comments'] = null;
+				if(strcmp($trigger_db_fields['url'], $trigger['url']) == 0) $trigger['url'] = null;
 
 				$result = update_trigger(
 					$trigger['triggerid'],

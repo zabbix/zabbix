@@ -72,14 +72,14 @@ int	zbx_shmget(key_t key, size_t size)
 {
 	int	shm_id, ret = SUCCEED;
 
-	if (-1 != (shm_id = shmget(key, size, IPC_CREAT | IPC_EXCL | 0666)))
+	if (-1 != (shm_id = shmget(key, size, IPC_CREAT | IPC_EXCL | 0600)))
 		return shm_id;
 
 	/* If shared memory block exists, try to remove and re-create it */
 	if (EEXIST == errno)
 	{
 		/* Get ID of existing memory */
-		if (-1 == (shm_id = shmget(key, 0 /* get reference */, 0666)))
+		if (-1 == (shm_id = shmget(key, 0 /* get reference */, 0600)))
 		{
 			zbx_error("Cannot attach to existing shared memory [%s]", strerror(errno));
 			ret = FAIL;
@@ -91,17 +91,17 @@ int	zbx_shmget(key_t key, size_t size)
 			ret = FAIL;
 		}
 
-		if (SUCCEED == ret && -1 == (shm_id = shmget(key, size, IPC_CREAT | IPC_EXCL | 0666)))
+		if (SUCCEED == ret && -1 == (shm_id = shmget(key, size, IPC_CREAT | IPC_EXCL | 0600)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "Cannot allocate shared memory of size %lu [%s]",
-				size, strerror(errno));
+					size, strerror(errno));
 			ret = FAIL;
 		}
 	}
 	else
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Cannot allocate shared memory of size %lu [%s]",
-			size, strerror(errno));
+				size, strerror(errno));
 		ret = FAIL;
 	}
 

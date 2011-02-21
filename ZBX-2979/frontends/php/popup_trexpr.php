@@ -61,7 +61,7 @@
 				'M' => $metrics		/* metrcis */
 			     )
 	);
-	
+
 	$param1_sec = array(
 			array(
 				'C' => S_LAST_OF.' (T)',	/* caption */
@@ -266,6 +266,36 @@
 
 	check_fields($fields);
 
+	if(isset($_REQUEST['expression']) && $_REQUEST['dstfld1'] == 'expr_temp'){
+		$_REQUEST['expression'] = utf8RawUrlDecode($_REQUEST['expression']);
+
+		$trigExpr = new CTriggerExpression(array('expression' => $_REQUEST['expression']));
+
+		if(empty($trigExpr->errors) && !empty($trigExpr->expressions)){
+			preg_match('/\}([=><#]{1})([0-9]+)$/', $_REQUEST['expression'], $match);
+			$exprSymbols = $match;
+			$expr = reset($trigExpr->expressions);
+			if(isset($expr['functionName']) && isset($exprSymbols[1])) $_REQUEST['expr_type'] = $expr['functionName'].'['.$exprSymbols[1].']';
+			if(isset($expr['functionParamList'])){
+				$_REQUEST['param'] = $expr['functionParamList'];
+				$_REQUEST['paramtype'] = 0;
+			}
+			if(isset($exprSymbols[2])) $_REQUEST['value'] = $exprSymbols[2];
+			if(isset($expr['host']) && isset($expr['item'])){
+				$_REQUEST['description'] = $expr['host'] .':'. $expr['item'];
+				$options = array(
+						'filter' => array('host' => $expr['host'], 'key_' => $expr['item']),
+						'output'=>API_OUTPUT_EXTEND,
+						'webitems' => 1,
+				);
+
+				$myItem = CItem::get($options);
+				$myItem = reset($myItem);
+				if(isset($myItem['itemid'])) $_REQUEST['itemid'] = $myItem['itemid'];
+			}
+		}
+	}
+
 	$expr_type	= get_request('expr_type', 'last[=]');
 	if(preg_match('/^([a-z]+)\[(['.implode('',array_keys($operators)).'])\]$/i', $expr_type, $expr_res)){
 		$function = $expr_res[1];
@@ -273,20 +303,19 @@
 
 		if(!isset($functions[$function])) unset($function);
 	}
-	
-	
+
 	$dstfrm = get_request('dstfrm', 0);
 	$dstfld1 = get_request('dstfld1', '');
 	$itemid = get_request('itemid', 0);
 	$value = get_request('value', 0);
 	$param = get_request('param', 0);
 	$paramtype = get_request('paramtype');
-	
+
 	if(!isset($function)) $function = 'last';
 	if(!isset($functions[$function]['operators'][$operator])) $operator = '=';
 
 	$expr_type = $function.'['.$operator.']';
-	
+
 	if($itemid){
 		$options = array(
 			'output' => API_OUTPUT_EXTEND,
@@ -300,7 +329,7 @@
 
 		$item_host = reset($item_data['hosts']);
 		$item_host = $item_host['host'];
-		
+
 		$description = $item_host.':'.item_description($item_data);
 	}
 	else{
@@ -309,14 +338,14 @@
 
 
 	if(is_null($paramtype) && isset($functions[$function]['params']['M'])){
-		$paramtype = is_array($functions[$function]['params']['M'])  
+		$paramtype = is_array($functions[$function]['params']['M'])
 				? reset($functions[$function]['params']['M'])
 				: $functions[$function]['params']['M'];
 	}
 	else if(is_null($paramtype)){
 		$paramtype = PARAM_TYPE_SECONDS;
 	}
-		
+
 	if(!is_array($param)){
 		if(isset($functions[$function]['params'])){
 			$param = explode(',', $param, count($functions[$function]['params']));

@@ -24,7 +24,6 @@
 	$TRANSLATION=array(
 
 	'S_DATE_FORMAT_YMDHMS'=>			'd M H:i:s',
-	'S_DATE_FORMAT_YMD'=>			'd M Y',
 	'S_HTML_CHARSET'=>			'UTF-8',
 	'S_CREATE_RULE'=>			'Creër Regel',
 	'S_ACKNOWLEDGES'=>			'Herkenningen',
@@ -44,8 +43,6 @@
 	'S_CONDITIONS'=>			'Condities',
 	'S_CONDITION'=>			'Condities',
 	'S_NO_CONDITIONS_DEFINED'=>			'Geen condities gedefineerd',
-	'S_ACTIONS_DELETED'=>			'Acties verwijderd',
-	'S_CANNOT_DELETE_ACTIONS'=>			'Kan acties niet verwijderen',
 	'S_ACTIONS'=>			'Acties',
 	'S_ACTIONS_BIG'=>			'ACTIES',
 	'S_ACTION_ADDED'=>			'Actie toegevoegd',
@@ -87,9 +84,7 @@
 	'S_NO_ACTIONS_FOUND'=>			'Geen acties gedefineerd',
 	'S_CUSTOM_GRAPHS'=>			'Speciale grafieken',
 	'S_GRAPHS_BIG'=>			'GRAFIEKEN',
-	'S_SELECT_GRAPH_TO_DISPLAY'=>			'Selecteer een grafiek om weer te geven',
 	'S_PERIOD'=>			'Periode',
-	'S_SELECT_GRAPH_DOT_DOT_DOT'=>			'Selecteer een grafiek...',
 	'S_CANNNOT_UPDATE_VALUE_MAP'=>			'Kan map waarde niet bijwerken',
 	'S_VALUE_MAP_ADDED'=>			'Waarde aan map toegevoegd',
 	'S_CANNNOT_ADD_VALUE_MAP'=>			'Kan niet map waarde bijwerken',
@@ -126,8 +121,6 @@
 	'S_HOUSEKEEPER'=>			'Huishoudster',
 	'S_MEDIA_TYPES'=>			'Media types',
 	'S_ESCALATION_RULES'=>			'Escalatie regels',
-	'S_ESCALATION'=>			'Escalatie',
-	'S_ESCALATION_RULE'=>			'Escalatie regel',
 	'S_DEFAULT'=>			'Standaard',
 	'S_IMAGES'=>			'Afbeeldingen',
 	'S_IMAGE'=>			'Afbeelding',
@@ -331,9 +324,6 @@
 	'S_SNMPV3_AUTH_PASSPHRASE'=>			'SNMPv3 auth inhaalfase',
 	'S_SNMPV3_PRIV_PASSPHRASE'=>			'SNMPv3 rechten inhaalfase',
 	'S_CUSTOM_MULTIPLIER'=>			'Aangepaste vermenigvuldiging',
-	'S_DO_NOT_USE'=>			'Niet in gebruik',
-	'S_USE_MULTIPLIER'=>			'Gebruik vermenigvuldiger',
-	'S_SELECT_HOST_DOT_DOT_DOT'=>			'Selecteer gastheer...',
 	'S_LOG_TIME_FORMAT'=>			'Log tijd formaat',
 	'S_CREATE_ITEM'=>			'Creër Item',
 	'S_LATEST_EVENTS'=>			'Laatste gebeurtenissen',
@@ -374,7 +364,6 @@
 	'S_OVERVIEW'=>			'Overzicht',
 	'S_OVERVIEW_BIG'=>			'OVERZICHT',
 	'S_DATA'=>			'Data',
-	'S_QUEUE_BIG'=>			'WACHTRIJ',
 	'S_QUEUE_OF_ITEMS_TO_BE_UPDATED_BIG'=>			'WACHTRIJ VAN ITEMS OM BIJGEWERKT TE WORDEN',
 	'S_NEXT_CHECK'=>			'Volgende controle',
 	'S_THE_QUEUE_IS_EMPTY'=>			'De wachtrij is leeg',
@@ -608,7 +597,6 @@
 	'S_AUDIT'=>			'Controle',
 	'S_LOGIN'=>			'Login',
 	'S_LATEST_DATA'=>			'Laatste data',
-	'S_INCORRECT_DESCRIPTION'=>			'Incorrecte omschrijving',
 
 	);
 ?>

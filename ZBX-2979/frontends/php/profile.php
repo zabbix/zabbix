@@ -96,8 +96,9 @@ $fields=array(
 
 //Primary Actions
 	else if(isset($_REQUEST['cancel'])){
-		$url = CProfile::get('web.menu.view.last', 'index.php');
-		jsRedirect($url);
+		$url = CProfile::get('web.paging.lastpage', 'profile.php');
+		ob_end_clean();
+		redirect($url);
 	}
 	else if(isset($_REQUEST['save'])){
 		$auth_type = get_user_system_auth($USER_DETAILS['userid']);

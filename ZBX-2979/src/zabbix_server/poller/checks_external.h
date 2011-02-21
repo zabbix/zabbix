@@ -23,8 +23,6 @@
 #include "dbcache.h"
 #include "sysinfo.h"
 
-extern  char	*CONFIG_EXTERNALSCRIPTS;
-
 int     get_value_external(DC_ITEM *item, AGENT_RESULT *result);
 
 #endif

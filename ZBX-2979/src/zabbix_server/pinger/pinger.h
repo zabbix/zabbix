@@ -22,7 +22,7 @@
 
 #include "common.h"
 
-extern	int	CONFIG_PINGER_FORKS;
+extern int	CONFIG_PINGER_FORKS;
 
 void	main_pinger_loop(int num);
 

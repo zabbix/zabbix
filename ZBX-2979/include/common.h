@@ -117,8 +117,8 @@
 #define OFF	0
 
 #define	APPLICATION_NAME	"Zabbix Agent"
-#define	ZABBIX_REVDATE		"1 November 2010"
-#define	ZABBIX_VERSION		"1.8.4rc2"
+#define	ZABBIX_REVDATE		"4 January 2011"
+#define	ZABBIX_VERSION		"1.8.5rc1"
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
 #if defined(_WINDOWS)
@@ -632,6 +632,7 @@ const char	*zbx_permission_string(int perm);
 #define	ZBX_POLLER_TYPE_IPMI		2
 #define	ZBX_POLLER_TYPE_PINGER		3
 #define	ZBX_POLLER_TYPE_COUNT		4	/* number of poller types */
+const char	*zbx_poller_type_string(int poller_type);
 
 #define	GET_SENDER_TIMEOUT	60
 
@@ -642,10 +643,6 @@ const char	*zbx_permission_string(int perm);
 #ifndef MIN
 #	define MIN(a, b) ((a) < (b) ? (a) : (b))
 #endif
-
-/* Secure string copy */
-#define strscpy(x, y)		zbx_strlcpy(x, y, sizeof(x))
-#define strnscpy(x, y, n)	zbx_strlcpy(x, y, n);
 
 #define zbx_malloc(old, size)	zbx_malloc2(__FILE__, __LINE__, old, size)
 #define zbx_realloc(src, size)	zbx_realloc2(__FILE__, __LINE__, src, size)
@@ -737,8 +734,9 @@ int	is_ascii_string(const char *str);
 int	zbx_rtrim(char *str, const char *charlist);
 void	zbx_ltrim(char *str, const char *charlist);
 void	zbx_remove_chars(register char *str, const char *charlist);
-#define zbx_remove_spaces(str)		zbx_remove_chars(str, " ");
-#define zbx_remove_whitespace(str)	zbx_remove_chars(str, " \t\r\n");
+#define ZBX_WHITESPACE			" \t\r\n"
+#define zbx_remove_spaces(str)		zbx_remove_chars(str, " ")
+#define zbx_remove_whitespace(str)	zbx_remove_chars(str, ZBX_WHITESPACE)
 void	compress_signs(char *str);
 void	ltrim_spaces(char *c);
 void	rtrim_spaces(char *c);
@@ -775,13 +773,13 @@ int	str_in_list(const char *list, const char *value, char delimiter);
 #endif /* HAVE___VA_ARGS__ */
 void	__zbx_zbx_setproctitle(const char *fmt, ...);
 
-#define SEC_PER_MIN 60
-#define SEC_PER_HOUR 3600
-#define SEC_PER_DAY 86400
-#define SEC_PER_WEEK (7 * SEC_PER_DAY)
-#define SEC_PER_MONTH (30 * SEC_PER_DAY)
-#define SEC_PER_YEAR (365 * SEC_PER_DAY)
-#define ZBX_JAN_1970_IN_SEC   2208988800.0        /* 1970 - 1900 in seconds */
+#define SEC_PER_MIN		60
+#define SEC_PER_HOUR		3600
+#define SEC_PER_DAY		86400
+#define SEC_PER_WEEK		(7 * SEC_PER_DAY)
+#define SEC_PER_MONTH		(30 * SEC_PER_DAY)
+#define SEC_PER_YEAR		(365 * SEC_PER_DAY)
+#define ZBX_JAN_1970_IN_SEC	2208988800.0        /* 1970 - 1900 in seconds */
 double	zbx_time();
 double	zbx_current_time();
 
@@ -811,6 +809,8 @@ void	__zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_l
 void	zbx_strcpy_alloc(char **str, int *alloc_len, int *offset, const char *src);
 void	zbx_chrcpy_alloc(char **str, int *alloc_len, int *offset, const char src);
 
+/* Secure string copy */
+#define strscpy(x, y)	zbx_strlcpy(x, y, sizeof(x))
 size_t	zbx_strlcpy(char *dst, const char *src, size_t siz);
 size_t	zbx_strlcat(char *dst, const char *src, size_t siz);
 
@@ -906,8 +906,11 @@ void	zbx_strupper(char *str);
 #if defined(_WINDOWS) || defined(HAVE_ICONV)
 char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);
 #endif	/* HAVE_ICONV */
-char	*zbx_replace_utf8(const char *text, char replacement);
 int	zbx_strlen_utf8(const char *text);
+
+#define ZBX_UTF8_REPLACE_CHAR	'?'
+char	*zbx_replace_utf8(const char *text);
+void	zbx_replace_invalid_utf8(char *text);
 
 void	win2unix_eol(char *text);
 int	str2uint(const char *str);
@@ -924,6 +927,8 @@ int	MAIN_ZABBIX_ENTRY(void);
 
 zbx_uint64_t	zbx_letoh_uint64(zbx_uint64_t data);
 zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data);
+
+int	zbx_check_hostname(const char *hostname);
 
 int	is_hostname_char(char c);
 int	is_key_char(char c);

@@ -655,6 +655,7 @@ FIELD		|hosttemplateid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|hostid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY	|hosts
 FIELD		|templateid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY	|hosts
 UNIQUE		|1		|hostid,templateid
+INDEX		|2		|templateid
 
 TABLE|housekeeper|housekeeperid|0
 FIELD		|housekeeperid	|t_id		|'0'	|NOT NULL	|0
@@ -1010,7 +1011,7 @@ TABLE|autoreg_host|autoreg_hostid|ZBX_SYNC
 FIELD		|autoreg_hostid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|proxy_hostid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|hosts
 FIELD		|host		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
-UNIQUE		|1		|proxy_hostid,host
+INDEX		|1		|proxy_hostid,host
 
 TABLE|proxy_autoreg_host|id|0
 FIELD		|id		|t_serial	|	|NOT NULL	|0

@@ -45,7 +45,7 @@ class CCheckBox extends CTag{
 	}
 
 	public function setChecked($value='yes'){
-		if((zbx_numeric($value) && ($value!=0)) || (is_string($value) && ($value=='yes' || $value=='checked' || $value=='on') || $value=='1'))
+		if((is_numeric($value) && ($value!=0)) || (is_string($value) && ($value=='yes' || $value=='checked' || $value=='on') || $value=='1'))
 			return $this->attributes['checked'] = 'checked';
 
 		$this->removeAttribute('checked');

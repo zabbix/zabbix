@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-	define('ZABBIX_VERSION','1.8.4rc2');
+	define('ZABBIX_VERSION','1.8.5rc1');
 	define('ZABBIX_API_VERSION','1.3');
 /* USER DEFINES */
 
@@ -50,12 +50,10 @@
 	define('ZBX_UNITS_ROUNDOFF_UPPER_LIMIT', 2);
 	define('ZBX_UNITS_ROUNDOFF_LOWER_LIMIT', 6);
 
-// this define made for partitioned DB installs!!
+// for partitioned DB installs!!
 	define('ZBX_HISTORY_DATA_UPKEEP',		-1); // in days; -1: disabled, 0: always use trends
 
 /* END OF USERS DEFINES */
-	define('ZAPCAT_COMPATIBILITY', false);
-
 	define('ZBX_MAP_HIGHLIGHT', 0x1);
 	define('ZBX_MAP_EXPANDPROBLEM', 0x2);
 	define('ZBX_MAP_MARKELEMENTS', 0x4);
@@ -180,7 +178,7 @@
 	define('AUDIT_RESOURCE_MAINTENANCE',	27);
 	define('AUDIT_RESOURCE_REGEXP',			28);
 	define('AUDIT_RESOURCE_MACRO',			29);
-	define('AUDIT_RESOURCE_TEMPLATE',			30);
+	define('AUDIT_RESOURCE_TEMPLATE',		30);
 
 	define('CONDITION_TYPE_HOST_GROUP',			0);
 	define('CONDITION_TYPE_HOST',				1);
@@ -664,7 +662,7 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	// define('ZBX_PREG_ITEM_KEY_FORMAT', '('.ZBX_PREG_KEY_NAME.'(\['.ZBX_PREG_PARAMS.'\]){0,1})');
 
 
-	define('ZBX_PREG_FUNCTION_FORMAT', '('.ZBX_PREG_INTERNAL_NAMES.'(\('.ZBX_PREG_PARAMS.'\)))');
+	define('ZBX_PREG_FUNCTION_FORMAT', '([a-z]+(\('.ZBX_PREG_PARAMS.'\)))');
 
 	define('ZBX_PREG_SIMPLE_EXPRESSION_FORMAT','(\{'.ZBX_PREG_HOST_FORMAT.'\:'.ZBX_PREG_ITEM_KEY_FORMAT.'\.'.ZBX_PREG_FUNCTION_FORMAT.'\})');
 //	define('ZBX_PREG_MACRO_NAME_FORMAT', '(\{[A-Z\.]+\})');

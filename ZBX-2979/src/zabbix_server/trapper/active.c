@@ -24,7 +24,6 @@
 
 #include "active.h"
 
-
 /******************************************************************************
  *                                                                            *
  * Function: get_hostid_by_host                                               *
@@ -36,7 +35,7 @@
  * Return value:  SUCCEED - host is found                                     *
  *                FAIL - an error occurred or host not found                  *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -48,7 +47,13 @@ static int	get_hostid_by_host(const char *host, zbx_uint64_t *hostid, char *erro
 	DB_ROW		row;
 	int		res = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In get_hostid_by_host(host:'%s')", host);
+	zabbix_log(LOG_LEVEL_DEBUG, "In get_hostid_by_host() host:'%s'", host);
+
+	if (FAIL == zbx_check_hostname(host))
+	{
+		zbx_snprintf(error, MAX_STRING_LEN, "host name [%s] contains invalid characters", host);
+		return res;
+	}
 
 	host_esc = DBdyn_escape_string(host);
 
@@ -241,7 +246,7 @@ static void	add_regexp_name(char ***regexp, int *regexp_alloc, int *regexp_num, 
  * Return value:  SUCCEED - list of active checks sent successfully           *
  *                FAIL - an error occurred                                    *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *

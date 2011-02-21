@@ -1668,10 +1668,12 @@
 			}
 		}
 
+		$securityLevelVisibility = array();
 		$valueTypeVisibility = array();
 		$authTypeVisibility = array();
 		$typeVisibility = array();
 		$delay_flex_el = array();
+
 
 		//if($type != ITEM_TYPE_TRAPPER){
 			$i = 0;
@@ -1707,27 +1709,27 @@
 
 		if(isset($_REQUEST['itemid'])){
 			$caption = array();
-			$itmid = $_REQUEST['itemid'];
+			$itemid = $_REQUEST['itemid'];
 			do{
 				$sql = 'SELECT i.itemid, i.templateid, h.host'.
 						' FROM items i, hosts h'.
-						' WHERE i.itemid='.$itmid.
+						' WHERE i.itemid='.$itemid.
 							' AND h.hostid=i.hostid';
-				$itm = DBfetch(DBselect($sql));
-				if($itm){
-					if($_REQUEST['itemid'] == $itmid){
+				$itemFromDb = DBfetch(DBselect($sql));
+				if($itemFromDb){
+					if($_REQUEST['itemid'] == $itemid){
 						$caption[] = SPACE;
-						$caption[] = $itm['host'];
+						$caption[] = $itemFromDb['host'];
 					}
 					else{
 						$caption[] = ' : ';
-						$caption[] = new CLink($itm['host'], 'items.php?form=update&itemid='.$itm['itemid'], 'highlight underline');
+						$caption[] = new CLink($itemFromDb['host'], 'items.php?form=update&itemid='.$itemFromDb['itemid'], 'highlight underline');
 					}
 
-					$itmid = $itm['templateid'];
+					$itemid = $itemFromDb['templateid'];
 				}
 				else break;
-			}while($itmid != 0);
+			}while($itemid != 0);
 
 			$caption[] = S_ITEM.' "';
 			$caption = array_reverse($caption);
@@ -1785,7 +1787,7 @@
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmpv3_securityname');
 
 		$cmbSecLevel = new CComboBox('snmpv3_securitylevel', $snmpv3_securitylevel);
-		$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,'noAuthPriv');
+		$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,'noAuthNoPriv');
 		$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,'authNoPriv');
 		$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,'authPriv');
 
@@ -1798,14 +1800,16 @@
 		$row = new CRow(array(new CCol(S_SNMPV3_AUTH_PASSPHRASE,'form_row_l'), new CCol(new CTextBox('snmpv3_authpassphrase',$snmpv3_authpassphrase,64), 'form_row_r')));
 		$row->setAttribute('id', 'row_snmpv3_authpassphrase');
 		$frmItem->addRow($row);
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'snmpv3_authpassphrase');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmpv3_authpassphrase');
+		zbx_subarray_push($securityLevelVisibility, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, 'snmpv3_authpassphrase');
+		zbx_subarray_push($securityLevelVisibility, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, 'row_snmpv3_authpassphrase');
 
 		$row = new CRow(array(new CCol(S_SNMPV3_PRIV_PASSPHRASE,'form_row_l'), new CCol(new CTextBox('snmpv3_privpassphrase',$snmpv3_privpassphrase,64), 'form_row_r')));
 		$row->setAttribute('id', 'row_snmpv3_privpassphrase');
 		$frmItem->addRow($row);
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'snmpv3_privpassphrase');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmpv3_privpassphrase');
+		zbx_subarray_push($securityLevelVisibility, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'snmpv3_privpassphrase');
+		zbx_subarray_push($securityLevelVisibility, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'row_snmpv3_privpassphrase');
+		zbx_subarray_push($securityLevelVisibility, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'snmpv3_authpassphrase');
+		zbx_subarray_push($securityLevelVisibility, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'row_snmpv3_authpassphrase');
 
 		$row = new CRow(array(new CCol(S_SNMP_PORT,'form_row_l'), new CCol(new CNumericBox('snmp_port',$snmp_port,5), 'form_row_r')));
 		$row->setAttribute('id', 'row_snmp_port');
@@ -2184,6 +2188,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		zbx_add_post_js("var valueTypeSwitcher = new CViewSwitcher('value_type', 'change', ".zbx_jsvalue($valueTypeVisibility, true).");");
 		zbx_add_post_js("var authTypeSwitcher = new CViewSwitcher('authtype', 'change', ".zbx_jsvalue($authTypeVisibility, true).");");
 		zbx_add_post_js("var typeSwitcher = new CViewSwitcher('type', 'change', ".zbx_jsvalue($typeVisibility, true).(isset($_REQUEST['itemid'])? ', true': '').');');
+		zbx_add_post_js("var securityLevelSwitcher = new CViewSwitcher('snmpv3_securitylevel', 'change', ".zbx_jsvalue($securityLevelVisibility, true).");");
 		zbx_add_post_js("var multpStat = document.getElementById('multiplier'); if(multpStat && multpStat.onclick) multpStat.onclick();");
 		zbx_add_post_js("var mnFrmTbl = document.getElementById('web.items.item.php'); if(mnFrmTbl) mnFrmTbl.style.visibility = 'visible';");
 
@@ -2617,7 +2622,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		}
 
 		$expression		= get_request('expression',	'');
-		$description		= get_request('description',	'');
+		$description	= get_request('description',	'');
 		$type 			= get_request('type',		0);
 		$priority		= get_request('priority',	0);
 		$status			= get_request('status',		0);
@@ -2625,10 +2630,11 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$url			= get_request('url',		'');
 
 		$expr_temp		= get_request('expr_temp',	'');
-		$input_method		= get_request('input_method',	IM_ESTABLISHED);
+		$input_method	= get_request('input_method',	IM_ESTABLISHED);
 
 		if((isset($_REQUEST['triggerid']) && !isset($_REQUEST['form_refresh']))  || isset($limited)){
 			$description	= $trigger['description'];
+
 			$expression	= explode_exp($trigger['expression'],0);
 
 			if(!isset($limited) || !isset($_REQUEST['form_refresh'])){
@@ -2678,6 +2684,11 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 				$exprfname = 'expr_temp';
 				$exprtxt = new CTextBox($exprfname, $expr_temp, 65, 'yes');
 				$macrobtn = new CButton('insert_macro', S_INSERT_MACRO, 'return call_ins_macro_menu(event);');
+				//disabling button, if this trigger is templated
+				if($limited=='yes'){
+					$macrobtn->setAttribute('disabled', 'disabled');
+				}
+
 				$exprparam = "this.form.elements['$exprfname'].value";
 			}
 			else{
@@ -2696,6 +2707,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 										 "return PopUp('popup_trexpr.php?dstfrm=".$frmTrig->getName().
 										 "&dstfld1=${exprfname}&srctbl=expression".
 										 "&srcfld1=expression&expression=' + escape($exprparam),1000,700);");
+		//disabling button, if this trigger is templated
 		if($limited=='yes'){
 			$add_expr_button->setAttribute('disabled', 'disabled');
 		}
@@ -2706,19 +2718,37 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		if($input_method == IM_TREE){
 			array_push($row, BR());
 			if(empty($outline)){
-				array_push($row, new CButton('add_expression', S_ADD, ""));
+				$tmpbtn = new CButton('add_expression', S_ADD, "");
+				if($limited=='yes'){
+					$tmpbtn->setAttribute('disabled', 'disabled');
+				}
+				array_push($row, $tmpbtn);
 			}
 			else{
-				array_push($row, new CButton('and_expression', S_AND_BIG, ""));
-				array_push($row, new CButton('or_expression', S_OR_BIG, ""));
-				array_push($row, new CButton('replace_expression', S_REPLACE, ""));
+				$tmpbtn = new CButton('and_expression', S_AND_BIG, "");
+				if($limited=='yes'){
+					$tmpbtn->setAttribute('disabled', 'disabled');
+				}
+				array_push($row, $tmpbtn);
+
+				$tmpbtn = new CButton('or_expression', S_OR_BIG, "");
+				if($limited=='yes'){
+					$tmpbtn->setAttribute('disabled', 'disabled');
+				}
+				array_push($row, $tmpbtn);
+
+				$tmpbtn = new CButton('replace_expression', S_REPLACE, "");
+				if($limited=='yes'){
+					$tmpbtn->setAttribute('disabled', 'disabled');
+				}
+				array_push($row, $tmpbtn);
 			}
 		}
 		$frmTrig->addVar('input_method', $input_method);
 		$frmTrig->addVar('toggle_input_method', '');
 		$exprtitle = array(S_EXPRESSION);
 
-		if($input_method != IM_FORCED && $limited != 'yes'){
+		if($input_method != IM_FORCED){
 			$btn_im = new CSpan(S_TOGGLE_INPUT_METHOD,'link');
 			$btn_im->setAttribute('onclick','javascript: '.
 								"document.getElementById('toggle_input_method').value=1;".
@@ -2737,18 +2767,24 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			$exp_table->setOddRowClass('even_row');
 			$exp_table->setEvenRowClass('even_row');
 
-			$exp_table->setHeader(array(S_TARGET, S_EXPRESSION, S_EXPRESSION_PART_ERROR, S_DELETE));
+			$exp_table->setHeader(array(($limited == 'yes' ? null : S_TARGET), S_EXPRESSION, S_EXPRESSION_PART_ERROR, ($limited == 'yes' ? null : S_DELETE)));
 
 			$allowedTesting = true;
 			if($eHTMLTree != null){
 				foreach($eHTMLTree as $i => $e){
-					$tgt_chk = new CCheckbox('expr_target_single', ($i==0) ? 'yes':'no', 'check_target(this);', $e['id']);
-					$del_url = new CSpan(S_DELETE,'link');
 
-					$del_url->setAttribute('onclick', 'javascript: if(confirm("'.S_DELETE_EXPRESSION_Q.'")) {'.
-									' delete_expression(\''.$e['id'] .'\');'.
-									' document.forms["config_triggers.php"].submit(); '.
-								'}');
+					if($limited != 'yes'){
+						$del_url = new CSpan(S_DELETE,'link');
+
+						$del_url->setAttribute('onclick', 'javascript: if(confirm("'.S_DELETE_EXPRESSION_Q.'")) {'.
+										' delete_expression(\''.$e['id'] .'\');'.
+										' document.forms["config_triggers.php"].submit(); '.
+									'}');
+						$tgt_chk = new CCheckbox('expr_target_single', ($i==0) ? 'yes':'no', 'check_target(this);', $e['id']);
+					}
+					else{
+						$tgt_chk = null;
+					}
 
 					if(!isset($e['expression']['levelErrors'])) {
 						$errorImg = new CImg('images/general/ok_icon.png', 'expression_no_errors');
@@ -2768,8 +2804,19 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 						$errorImg->setHint($errorTexts, '', 'left', false);
 					}
 
+					//if it is a templated trigger
+					if($limited == 'yes'){
+						//make all links inside inactive
+						for($i = 0; $i < count($e['list']); $i++){
+							if(gettype($e['list'][$i]) == 'object' && get_class($e['list'][$i]) == 'CSpan' && $e['list'][$i]->getAttribute('class') == 'link'){
+								$e['list'][$i]->setClass('');
+								$e['list'][$i]->setAttribute('onclick', '');
+							}
+						}
+					}
+
 					$errorCell = new CCol($errorImg, 'center');
-					$row = new CRow(array($tgt_chk, $e['list'], $errorCell, $del_url));
+					$row = new CRow(array($tgt_chk, $e['list'], $errorCell, (isset($del_url) ? $del_url : null)));
 					$exp_table->addRow($row);
 				}
 			}
@@ -2790,7 +2837,9 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			if(!isset($allowedTesting) || !$allowedTesting) $btn_test->setAttribute('disabled', 'disabled');
 			if (empty($outline)) $btn_test->setAttribute('disabled', 'yes');
 			//SDI($outline);
-			$frmTrig->addRow(SPACE, array($outline,
+			$wrapOutline = new CSpan(array($outline));
+			$wrapOutline->addStyle('white-space: pre;');
+			$frmTrig->addRow(SPACE, array($wrapOutline,
 										  BR(),BR(),
 										  $exp_table,
 										  $btn_test));
@@ -3614,7 +3663,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$table = new CTable();
 		$table->setHeader(array(S_ELEMENT, S_UPDATE.SPACE.S_EXISTING, S_ADD.SPACE.S_MISSING), 'bold');
 
-		$titles = array('screens' => S_SCREEN);
+		$titles = array('screen' => S_SCREEN);
 
 		foreach($titles as $key => $title){
 			$cbExist = new CCheckBox('rules['.$key.'][exist]', isset($rules[$key]['exist']));
