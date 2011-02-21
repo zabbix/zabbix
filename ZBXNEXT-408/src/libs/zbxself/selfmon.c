@@ -228,8 +228,8 @@ void	init_selfmon_collector()
 	sz_total = sz = sizeof(zbx_selfmon_collector_t);
 	sz_total += sz_array = sizeof(zbx_stat_process_t *) * ZBX_PROCESS_TYPE_COUNT;
 	for (process_type = 0; process_type < ZBX_PROCESS_TYPE_COUNT; process_type++)
-		sz_total += sz_process[process_type] = sizeof(zbx_stat_process_t) *
-				get_process_type_forks(process_type);
+		sz_total += sz_process[process_type] =
+			sizeof(zbx_stat_process_t) * get_process_type_forks(process_type);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() size:%d", __function_name, (int)sz_total);
 
@@ -517,8 +517,7 @@ void	zbx_sleep_loop(int sleeptime)
 
 	do
 	{
-		zbx_setproctitle("%s [sleeping for %d seconds]",
-				process_type_string, sleeptime);
+		zbx_setproctitle("%s [sleeping for %d seconds]", process_type_string, sleeptime);
 		sleep(1);
 	}
 	while (--sleeptime > 0);

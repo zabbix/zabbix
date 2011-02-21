@@ -296,7 +296,7 @@ int	MAIN_ZABBIX_ENTRY()
 		if (threads[i])
 		{
 			zbx_thread_wait(threads[i]);
-			zabbix_log(LOG_LEVEL_DEBUG, "thread [%i] is terminated", i);
+			zabbix_log(LOG_LEVEL_DEBUG, "thread [%d] has terminated", i);
 
 			ZBX_DO_EXIT();
 		}
@@ -342,8 +342,7 @@ void	zbx_on_exit()
 	zbx_sleep(2); /* wait for all threads closing */
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent stopped. Zabbix %s (revision %s).",
-			ZABBIX_VERSION,
-			ZABBIX_REVISION);
+			ZABBIX_VERSION, ZABBIX_REVISION);
 
 	zabbix_close_log();
 

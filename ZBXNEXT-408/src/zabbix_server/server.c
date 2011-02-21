@@ -921,8 +921,7 @@ void	zbx_on_exit()
 	free_selfmon_collector();
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Server stopped. Zabbix %s (revision %s).",
-			ZABBIX_VERSION,
-			ZABBIX_REVISION);
+			ZABBIX_VERSION, ZABBIX_REVISION);
 
 	zabbix_close_log();
 
