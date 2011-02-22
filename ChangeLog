@@ -89,6 +89,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
 
+ - [ZBX-3555] fixed possible pollers hang while processing ssh.run[] checks (Sasha)
  - [ZBXNEXT-408] added zabbix[process,...] internal checks (Sasha)
  - [ZBX-2262] added `hosts_templates_2' index (Sasha)
  - [ZBX-3537] trigger events are now sorted by timestamp (KB)
