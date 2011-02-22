@@ -107,19 +107,19 @@ class CTree{
 				switch($this->tree[$id][$value]){
 					case TRIGGER_SEVERITY_DISASTER:
 						$this->tree[$id][$value] = getSeverityCaption(TRIGGER_SEVERITY_DISASTER);
-						$style = getSeverityColor(TRIGGER_SEVERITY_DISASTER);
+						$style = get_severity_style(TRIGGER_SEVERITY_DISASTER);
 						break;
 					case TRIGGER_SEVERITY_HIGH:
 						$this->tree[$id][$value] = getSeverityCaption(TRIGGER_SEVERITY_HIGH);
-						$style = getSeverityColor(TRIGGER_SEVERITY_HIGH);
+						$style = get_severity_style(TRIGGER_SEVERITY_HIGH);
 						break;
 					case TRIGGER_SEVERITY_AVERAGE:
 						$this->tree[$id][$value] = getSeverityCaption(TRIGGER_SEVERITY_AVERAGE);
-						$style = getSeverityColor(TRIGGER_SEVERITY_AVERAGE);
+						$style = get_severity_style(TRIGGER_SEVERITY_AVERAGE);
 						break;
 					case TRIGGER_SEVERITY_WARNING:
 						$this->tree[$id][$value] = getSeverityCaption(TRIGGER_SEVERITY_WARNING);
-						$style = getSeverityColor(TRIGGER_SEVERITY_WARNING);
+						$style = get_severity_style(TRIGGER_SEVERITY_WARNING);
 						break;
 					case TRIGGER_SEVERITY_INFORMATION:
 					default:
