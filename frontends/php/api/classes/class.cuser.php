@@ -176,9 +176,9 @@ class CUser extends CZBXAPI{
 
 // filter
 		if(is_array($options['filter'])){
-			if($options['filter']['passwd']){
+			if(isset($options['filter']['passwd']))
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('It is not possible to filter by user password'));
-			}
+
 			zbx_db_filter('users u', $options, $sql_parts);
 		}
 
@@ -337,6 +337,142 @@ Copt::memoryPick();
 	return $result;
 	}
 
+	protected function checkInput(&$users, $method){
+		$create = ($method == 'create');
+		$update = ($method == 'update');
+		$delete = ($method == 'delete');
+
+// permissions
+
+		if($update || $delete){
+			$userDBfields = array('userid'=> null);
+			$dbUsers = $this->get(array(
+				'output' => array('userid','alias','autologin','autologout'),
+				'userids' => zbx_objectValues($users, 'userid'),
+				'editable' => true,
+				'preservekeys' => true
+			));
+		}
+		else{
+			$userDBfields = array('alias'=>null,'passwd'=>null,'usergrps'=>null,'user_medias'=>array());
+		}
+
+		$alias = array();
+		foreach($users as $unum => &$user){
+			if(!check_db_fields($userDBfields, $user)){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for user "%s"', $user['alias']));
+			}
+
+// PERMISSION CHECK
+			if($create){
+				if(USER_TYPE_SUPER_ADMIN != self::$userData['type'])
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('You do not have permissions to create users.'));
+
+				$dbUser = $user;
+			}
+			else if($update){
+				if(bccomp(self::$userData['userid'], $user['userid']) != 0){
+					if(USER_TYPE_SUPER_ADMIN != self::$userData['type'])
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('You do not have permissions to update other users.'));
+				}
+				else{
+				}
+				$dbUser = $dbUsers[$user['userid']];
+			}
+			else{
+				if(bccomp(self::$userData['userid'], $user['userid']) == 0)
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('User is not allowed to delete it self.'));
+
+				if($dbUsers[$user['userid']]['alias'] == ZBX_GUEST_USER)
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Can not delete %1$s internal user "%2$s", try disabling that user.', S_ZABBIX, ZBX_GUEST_USER));
+
+				continue;
+			}
+
+// Check if user alais
+			if(isset($user['alias'])){
+// check if we change guest user
+				if(($dbUser['alias'] == ZBX_GUEST_USER) && ($user['alias'] != ZBX_GUEST_USER))
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_CANT_RENAME_GUEST_USER);
+
+				if(!isset($alias[$user['alias']])){
+					$alias[$user['alias']] = $update?$user['userid']:1;
+				}
+				else{
+					if($create || (bccomp($user['userid'], $alias[$user['alias']]) != 0))
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate user alias "%s".', $user['alias']));
+				}
+
+				if(zbx_strlen($user['alias']) > 64)
+					self::exception(
+						ZBX_API_ERROR_PARAMETERS,
+						_n(
+							'Maximum host name length is %2$d characters, "%3$s" is %1$d character.',
+							'Maximum host name length is %2$d characters, "%3$s" is %1$d characters.',
+							zbx_strlen($user['alias']),
+							64,
+							$user['alias']
+						)
+					);
+			}
+
+			if(isset($user['usrgrps'])){
+				if(empty($user['usrgrps']))
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('User "%s" can not be without user group.', $dbUser['alias']));
+
+				if(bccomp(self::$userData['userid'], $user['userid']) == 0){
+					$usrgrps = API::UserGroup()->get(array(
+						'usrgrpids' => zbx_objectValues($user['usrgrps'], 'usrgrpid'),
+						'output' => API_OUTPUT_EXTEND,
+						'preservekeys' => true,
+						'nopermissions' => true
+					));
+					foreach($usrgrps as $groupid => $group){
+						if($group['gui_access'] == GROUP_GUI_ACCESS_DISABLED)
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('User is disallowed to alter GUI access to him self by linking to user group "%s".', $group['name']));
+
+						if($group['users_status'] == GROUP_STATUS_DISABLED)
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('User is disallowed to alter system status to him self by linking to user group "%s".', $group['name']));
+					}
+				}
+			}
+
+			if(isset($user['type']) && (USER_TYPE_SUPER_ADMIN != self::$userData['type']))
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('You are not allowed to alter privilages for user "%s".', $dbUser['alias']));
+
+			if(isset($user['autologin']) && ($user['autologin'] == 1) && ($dbUser['autologout'] != 0))
+				$user['autologout'] = 0;
+
+			if(isset($user['autologout']) && ($user['autologout'] > 0) && ($dbUser['autologin'] != 0))
+				$user['autologin'] = 0;
+
+			if(array_key_exists('passwd', $user)){
+				if(is_null($user['passwd'])){
+					unset($user['passwd']);
+				}
+				else{
+					if(($dbUser['alias'] == ZBX_GUEST_USER) && !zbx_empty($user['passwd']))
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Not allowed to set password for user "guest"'));
+
+					$user['passwd'] = md5($user['passwd']);
+				}
+			}
+
+			if(isset($user['alias'])){
+				$nodeids = $update ? id2nodeid($user['userid']) : get_current_nodeid(false);
+				$userExist = $this->get(array(
+					'nodeids' => $nodeids,
+					'filter' => array('alias' => $user['alias']),
+					'nopermissions' => true
+				));
+				if($exUser = reset($userExist)){
+					if($create || (bccomp($exUser['userid'], $user['userid']) != 0))
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('User with alias "%s" already exists.', $user['alias']));
+				}
+			}
+		}
+		unset($user);
+	}
 /**
  * Add Users
  *
@@ -362,85 +498,37 @@ Copt::memoryPick();
  * @return array|boolean
  */
 	public function create($users){
+		$users = zbx_toArray($users);
 
+		$this->checkInput($users,__FUNCTION__);
 
-			if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
-				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
-			}
+		$userids = DB::insert('users', $users);
 
-			$users = zbx_toArray($users);
-			$userids = array();
+		foreach($users as $unum => $user){
+			$userid = $userids[$unum];
 
-			foreach($users as $unum => $user){
+			$usrgrps = zbx_objectValues($user['usrgrps'], 'usrgrpid');
+			foreach($usrgrps as $groupid){
+				$users_groups_id = get_dbid("users_groups","id");
+				$sql = 'INSERT INTO users_groups (id,usrgrpid,userid)'.
+					'values('.$users_groups_id.','.$groupid.','.$userid.')';
 
-				$user_db_fields = array(
-					'name' => 'ZABBIX',
-					'surname' => 'USER',
-					'alias' => null,
-					'passwd' => 'zabbix',
-					'url' => '',
-					'autologin' => 0,
-					'autologout' => 900,
-					'lang' => 'en_gb',
-					'theme' => 'default.css',
-					'refresh' => 30,
-					'rows_per_page' => 50,
-					'type' => USER_TYPE_ZABBIX_USER,
-					'user_medias' => array(),
-				);
-				if(!check_db_fields($user_db_fields, $user)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_WRONG_FIELD_FOR_USER);
-				}
-
-				$user_exist = $this->get(array('filter' => array('alias' => $user['alias'])));
-				if(!empty($user_exist)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_USER_EXISTS_FIRST_PART);
-				}
-
-				$userid = get_dbid('users', 'userid');
-				$sql = 'INSERT INTO users (userid, name, surname, alias, passwd, url, autologin, autologout, lang, theme,
-					refresh, rows_per_page, type) '.
-					' VALUES ('.
-						$userid.','.
-						zbx_dbstr($user['name']).','.
-						zbx_dbstr($user['surname']).','.
-						zbx_dbstr($user['alias']).','.
-						zbx_dbstr(md5($user['passwd'])).','.
-						zbx_dbstr($user['url']).','.
-						$user['autologin'].','.
-						$user['autologout'].','.
-						zbx_dbstr($user['lang']).','.
-						zbx_dbstr($user['theme']).','.
-						$user['refresh'].','.
-						$user['rows_per_page'].','.
-						$user['type'].
-					')';
 				if(!DBexecute($sql))
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-
-				$usrgrps = zbx_objectValues($user['usrgrps'], 'usrgrpid');
-				foreach($usrgrps as $groupid){
-					$users_groups_id = get_dbid("users_groups","id");
-					$sql = 'INSERT INTO users_groups (id,usrgrpid,userid)'.
-						'values('.$users_groups_id.','.$groupid.','.$userid.')';
-					if(!DBexecute($sql))
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-				}
-
-				foreach($user['user_medias'] as $media_data){
-					$mediaid = get_dbid('media', 'mediaid');
-					$sql = 'INSERT INTO media (mediaid,userid,mediatypeid,sendto,active,severity,period)'.
-						' VALUES ('.$mediaid.','.$userid.','.$media_data['mediatypeid'].','.
-						zbx_dbstr($media_data['sendto']).','.$media_data['active'].','.$media_data['severity'].','.
-						zbx_dbstr($media_data['period']).')';
-					if(!DBexecute($sql))
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-				}
-
-				$userids[] = $userid;
 			}
 
-			return array('userids' => $userids);
+			foreach($user['user_medias'] as $media_data){
+				$mediaid = get_dbid('media', 'mediaid');
+				$sql = 'INSERT INTO media (mediaid,userid,mediatypeid,sendto,active,severity,period)'.
+					' VALUES ('.$mediaid.','.$userid.','.$media_data['mediatypeid'].','.
+					zbx_dbstr($media_data['sendto']).','.$media_data['active'].','.$media_data['severity'].','.
+					zbx_dbstr($media_data['period']).')';
+				if(!DBexecute($sql))
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+			}
+		}
+
+		return array('userids' => $userids);
 	}
 
 /**
@@ -469,179 +557,64 @@ Copt::memoryPick();
  * @return boolean
  */
 	public function update($users){
+		$users = zbx_toArray($users);
+		$userids = zbx_objectValues($users,'userid');
 
-		$self = false;
+		$this->checkInput($users,__FUNCTION__);
 
-			if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
-				self::exception(ZBX_API_ERROR_PERMISSIONS, S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_UPDATE_USERS);
-			}
+		foreach($users as $unum => $user){
+			$self = (bccomp(self::$userData['userid'], $user['userid']) == 0);
 
-			$users = zbx_toArray($users);
+			$result = DB::update('users', array(
+				array(
+						'values'=> $user,
+						'where'=> array('userid='.$user['userid'])
+				)
+			));
 
-			$options = array(
-				'userids' => zbx_objectValues($users, 'userid'),
-			'output' => API_OUTPUT_EXTEND,
-				'preservekeys' => 1
-			);
-			$upd_users = $this->get($options);
-			foreach($users as $gnum => $user){
-				//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER, 'User ['.$user['alias'].']');
-			}
-
-			if(bccomp(self::$userData['userid'], $user['userid']) == 0){
-				$self = true;
-			}
-
-			foreach($users as $unum => $user){
-				$user_db_fields = $upd_users[$user['userid']];
-
-	// check if we change guest user
-				if(($user_db_fields['alias'] == ZBX_GUEST_USER) && isset($user['alias']) && ($user['alias'] != ZBX_GUEST_USER)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_CANT_RENAME_GUEST_USER);
-				}
-
-
-	// unset if not changed passwd
-				if(isset($user['passwd']) && !is_null($user['passwd'])){
-					$user['passwd'] = md5($user['passwd']);
-					$user_db_fields['passwd'] = '';
-				}
-				else{
-					unset($user['passwd']);
-				}
-	//---------
-
-				if(!check_db_fields($user_db_fields, $user)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_WRONG_FIELD_FOR_USER);
-				}
-
-	// copy from frontend {
-				$sql = 'SELECT userid '.
-						' FROM users '.
-						' WHERE alias='.zbx_dbstr($user['alias']).
-							' AND '.DBin_node('userid', id2nodeid($user['userid']));
-				$db_user = DBfetch(DBselect($sql));
-				if($db_user && ($db_user['userid'] != $user['userid'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_USER_EXISTS_FIRST_PART.' '.$user['alias'].' '.S_CUSER_ERROR_USER_EXISTS_SECOND_PART);
-				}
-
-				$result = DB::update('users', array(array('values'=>$user,'where'=>array('userid='.$user['userid']))));
-				if(!$result)
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-
-				// if(isset($user['usrgrps']) && !is_null($user['usrgrps'])){
-					// $user_groups = API::HostGroup()->get(array('userids' => $user['userid']));
-					// $user_groupids = zbx_objectValues($user_groups, 'usrgrpid');
-					// $new_groupids = zbx_objectValues($user['usrgrps'], 'usrgrpid');
-
-					// $groups_to_add = array_diff($new_groupids, $user_groupids);
-
-					// if(!empty($groups_to_add)){
-						// $result &= $this->massAdd(array('users' => $user, 'usrgrps' => $groups_to_add));
-					// }
-
-					// $groups_to_del = array_diff($user_groupids, $new_groupids);
-					// if(!empty($groups_to_del)){
-						// $result &= $this->massRemove(array('users' => $user, 'usrgrps' => $groups_to_del));
-					// }
-				// }
-
-
-
-				if(isset($user['usrgrps']) && !is_null($user['usrgrps'])){
-
-					// list with group id's where user must be after update
-					$user_must_be_in_groups = zbx_objectValues($user['usrgrps'], 'usrgrpid');
-
-					// deleting all relations with groups, but not touching those, where user still must be after update
-					$sql = 'DELETE FROM users_groups WHERE userid='.$user['userid'].' AND '.DBcondition('usrgrpid', $user_must_be_in_groups, true);  // true - NOT IN
-					DBexecute($sql);
-
-					// getting the list of groups user is currently in
-					$db_groups_user_is_in = DBSelect('SELECT usrgrpid FROM users_groups WHERE userid='.$user['userid']);
-					$groups_user_is_in = array();
-					while($grp = DBfetch($db_groups_user_is_in)){
-						$groups_user_is_in[] = $grp['usrgrpid'];
-					}
-
-					$options = array(
-						'usrgrpids' => $user_must_be_in_groups,
-						'output' => API_OUTPUT_EXTEND,
-						'preservekeys' => 1
-					);
-					$usrgrps = API::UserGroup()->get($options);
-
-					foreach($usrgrps as $groupid => $group){
-						if(($group['gui_access'] == GROUP_GUI_ACCESS_DISABLED) && $self){
-							self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_USER_UNABLE_RESTRICT_SELF_GUI_ACCESS_PART1);
-						}
-
-						if(($group['users_status'] == GROUP_STATUS_DISABLED) && $self){
-							self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_USER_CANT_DISABLE_SELF_PART1);
-						}
-
-						// if user is not already in a given group
-						if (!in_array($groupid, $groups_user_is_in)){
-							$users_groups_id = get_dbid('users_groups', 'id');
-							$sql = 'INSERT INTO users_groups (id, usrgrpid, userid)'.
-									' VALUES ('.$users_groups_id.','.$groupid.','.$user['userid'].')';
-							if(!DBexecute($sql))
-								self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-						}
-					}
-				}
-	/*
-				if($result && !is_null($user['user_medias'])){
-					$result = DBexecute('DELETE FROM media WHERE userid='.$userid);
-					foreach($user['user_medias'] as $media_data){
-						if(!$result) break;
-						$mediaid = get_dbid('media', 'mediaid');
-						$result = DBexecute('INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period)'.
-							' VALUES ('.$mediaid.','.$userid.','.$media_data['mediatypeid'].','.
-								zbx_dbstr($media_data['sendto']).','.$media_data['active'].','.$media_data['severity'].','.
-								zbx_dbstr($media_data['period']).')');
-					}
-				}
-	//*/
-			}
-
-			return array('userids' => $user['userid']);
-	}
-
-	public function updateProfile($user){
-
-
-			$options = array(
-				'nodeids' => id2nodeid(self::$userData['userid']),
-				'userids' => self::$userData['userid'],
-				'output' => API_OUTPUT_EXTEND,
-				'preservekeys' => 1
-			);
-			$upd_users = $this->get($options);
-			$upd_user = reset($upd_users);
-
-			$user_db_fields = $upd_user;
-
-// unset if not changed passwd
-			if(isset($user['passwd']) && !is_null($user['passwd'])){
-				$user['passwd'] = md5($user['passwd']);
-				$user_db_fields['passwd'] = '';
-			}
-			else{
-				unset($user['passwd']);
-			}
-//---------
-
-			if(!check_db_fields($user_db_fields, $user)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_WRONG_FIELD_FOR_USER);
-			}
-
-			$result = DB::update('users', array(array('values'=>$user,'where'=>array('userid='.$user['userid']))));
 			if(!$result)
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 
-			return $user;
+			if(isset($user['usrgrps']) && !is_null($user['usrgrps'])){
+				$newUsrgrpids = zbx_objectValues($user['usrgrps'], 'usrgrpid');
+
+// deleting all relations with groups, but not touching those, where user still must be after update
+				$sql = 'DELETE FROM users_groups WHERE userid='.$user['userid'].' AND '.DBcondition('usrgrpid', $newUsrgrpids, true);  // true - NOT IN
+				DBexecute($sql);
+
+// getting the list of groups user is currently in
+				$dbGroupsUserIn = DBSelect('SELECT usrgrpid FROM users_groups WHERE userid='.$user['userid']);
+				$groupsUserIn = array();
+				while($grp = DBfetch($dbGroupsUserIn))
+					$groupsUserIn[$grp['usrgrpid']] = $grp['usrgrpid'];
+
+				$usrgrps = API::UserGroup()->get(array(
+					'usrgrpids' => zbx_objectValues($user['usrgrps'], 'usrgrpid'),
+					'output' => API_OUTPUT_EXTEND,
+					'preservekeys' => 1
+				));
+				foreach($usrgrps as $groupid => $group){
+// if user is not already in a given group
+					if(isset($groupsUserIn[$groupid])) continue;
+
+					$users_groups_id = get_dbid('users_groups', 'id');
+					$sql = 'INSERT INTO users_groups (id, usrgrpid, userid)'.
+							' VALUES ('.$users_groups_id.','.$groupid.','.$user['userid'].')';
+
+					if(!DBexecute($sql))
+						self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+				}
+			}
+		}
+
+		return array('userids' => $userids);
 	}
+
+	public function updateProfile($user){
+		$user['userid'] = self::$userData['userid'];
+		return $this->update(array($user));
+	}
+
 /**
  * Delete Users
  *
@@ -650,59 +623,39 @@ Copt::memoryPick();
  * @return boolean
  */
 	public function delete($users){
-
-
 		$users = zbx_toArray($users);
 		$userids = zbx_objectValues($users, 'userid');
 
-			if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
-				self::exception(ZBX_API_ERROR_PERMISSIONS, S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_DELETE_USERS);
-			}
-
-			$options = array(
-				'userids' => $userids,
-				'output' => API_OUTPUT_EXTEND,
-				'preservekeys' => 1
-			);
-			$del_users = $this->get($options);
-			foreach($del_users as $gnum => $user){
-				if(bccomp(self::$userData['userid'], $user['userid']) == 0){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_USER_CANNOT_DELETE_ITSELF);
-				}
-
-				if($del_users[$user['userid']]['alias'] == ZBX_GUEST_USER){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Can not delete %1$s internal user " %2$s ", try disabling that user.', S_ZABBIX, ZBX_GUEST_USER));
-				}
-			}
+		$this->checkInput($users, __FUNCTION__);
 
 // delete action operation msg
-			$operationids = array();
-			$sql = 'SELECT DISTINCT om.operationid '.
-					' FROM opmessage_usr om '.
-					' WHERE '.DBcondition('om.userid', $userids);
-			$dbOperations = DBselect($sql);
-			while($dbOperation = DBfetch($dbOperations))
-				$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
+		$operationids = array();
+		$sql = 'SELECT DISTINCT om.operationid '.
+				' FROM opmessage_usr om '.
+				' WHERE '.DBcondition('om.userid', $userids);
+		$dbOperations = DBselect($sql);
+		while($dbOperation = DBfetch($dbOperations))
+			$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
 
-			DB::delete('opmessage_usr', array('userid'=>$userids));
+		DB::delete('opmessage_usr', array('userid'=>$userids));
 
 // delete empty operations
-			$delOperationids = array();
-			$sql = 'SELECT DISTINCT o.operationid '.
-					' FROM operations o '.
-					' WHERE '.DBcondition('o.operationid', $operationids).
-						' AND NOT EXISTS(SELECT om.opmessage_usrid FROM opmessage_usr om WHERE om.operationid=o.operationid)';
-			$dbOperations = DBselect($sql);
-			while($dbOperation = DBfetch($dbOperations))
-				$delOperationids[$dbOperation['operationid']] = $dbOperation['operationid'];
+		$delOperationids = array();
+		$sql = 'SELECT DISTINCT o.operationid '.
+				' FROM operations o '.
+				' WHERE '.DBcondition('o.operationid', $operationids).
+					' AND NOT EXISTS(SELECT om.opmessage_usrid FROM opmessage_usr om WHERE om.operationid=o.operationid)';
+		$dbOperations = DBselect($sql);
+		while($dbOperation = DBfetch($dbOperations))
+			$delOperationids[$dbOperation['operationid']] = $dbOperation['operationid'];
 
-			DB::delete('operations', array('operationid'=>$delOperationids));
-			DB::delete('media', array('userid'=>$userids));
-			DB::delete('profiles', array('userid'=>$userids));
-			DB::delete('users_groups', array('userid'=>$userids));
-			DB::delete('users', array('userid'=>$userids));
+		DB::delete('operations', array('operationid'=>$delOperationids));
+		DB::delete('media', array('userid'=>$userids));
+		DB::delete('profiles', array('userid'=>$userids));
+		DB::delete('users_groups', array('userid'=>$userids));
+		DB::delete('users', array('userid'=>$userids));
 
-			return array('userids' => $userids);
+		return array('userids' => $userids);
 	}
 
 /**
@@ -791,8 +744,6 @@ Copt::memoryPick();
  */
 	public function updateMedia($media_data){
 
-
-
 		$new_medias = zbx_toArray($media_data['medias']);
 		$users = zbx_toArray($media_data['users']);
 
@@ -872,15 +823,13 @@ Copt::memoryPick();
 		if(is_null($cnf)){
 			$config = select_config();
 			foreach($config as $id => $value){
-				if(zbx_strpos($id, 'ldap_') !== false){
+				if(zbx_strpos($id, 'ldap_') !== false)
 					$cnf[str_replace('ldap_', '', $id)] = $config[$id];
-				}
 			}
 		}
 
-		if(!function_exists('ldap_connect')){
+		if(!function_exists('ldap_connect'))
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Probably php-ldap module is missing'));
-		}
 
 		$ldap = new CLdap($cnf);
 		$ldap->connect();
@@ -892,12 +841,14 @@ Copt::memoryPick();
 	}
 
 	private function dbLogin($user){
-		$sql = 'SELECT u.userid '.
-				' FROM users u'.
-				' WHERE u.alias='.zbx_dbstr($user['user']).
-					' AND u.passwd='.zbx_dbstr(md5($user['password']));
-		$login = DBfetch(DBselect($sql));
+		global $ZBX_LOCALNODEID;
 
+		$sql = 'SELECT u.userid '.
+				' FROM users u '.
+				' WHERE u.alias='.zbx_dbstr($user['user']).
+					' AND u.passwd='.zbx_dbstr(md5($user['password'])).
+					' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);
+		$login = DBfetch(DBselect($sql));
 		if($login)
 			return true;
 		else
