@@ -27,7 +27,7 @@
 #include "dbcache.h"
 #include "dbsyncer.h"
 
-extern int		CONFIG_DBSYNCER_FREQUENCY;
+extern int		CONFIG_HISTSYNCER_FREQUENCY;
 extern int		ZBX_SYNC_MAX;
 extern unsigned char	process_type;
 extern int		process_num;
@@ -77,7 +77,7 @@ void	main_dbsyncer_loop()
 
 		if (last_sleeptime == -1)
 		{
-			sleeptime = num ? ZBX_SYNC_MAX / num : CONFIG_DBSYNCER_FREQUENCY;
+			sleeptime = num ? ZBX_SYNC_MAX / num : CONFIG_HISTSYNCER_FREQUENCY;
 		}
 		else
 		{
@@ -110,8 +110,8 @@ void	main_dbsyncer_loop()
 
 		if (sleeptime < 0)
 			sleeptime = 0;
-		else if (sleeptime > CONFIG_DBSYNCER_FREQUENCY)
-			sleeptime = CONFIG_DBSYNCER_FREQUENCY;
+		else if (sleeptime > CONFIG_HISTSYNCER_FREQUENCY)
+			sleeptime = CONFIG_HISTSYNCER_FREQUENCY;
 
 		last_sleeptime = sleeptime;
 
