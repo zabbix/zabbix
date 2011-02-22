@@ -19,15 +19,14 @@
 
 #include "common.h"
 
-#include "cfg.h"
 #include "comms.h"
-#include "pid.h"
 #include "log.h"
 #include "zlog.h"
 #include "zbxjson.h"
 #include "zbxserver.h"
 #include "dbcache.h"
 #include "proxy.h"
+#include "zbxself.h"
 
 #include "../nodewatcher/nodecomms.h"
 #include "../nodewatcher/nodesender.h"
@@ -44,6 +43,7 @@
 #include "daemon.h"
 
 static unsigned char	zbx_process;
+extern unsigned char	process_type;
 
 /******************************************************************************
  *                                                                            *
@@ -414,30 +414,31 @@ static void	process_trapper_child(zbx_sock_t *sock)
 	process_trap(sock, data, sizeof(data));
 }
 
-void	child_trapper_main(unsigned char p, zbx_sock_t *s)
+void	main_trapper_loop(unsigned char p, zbx_sock_t *s)
 {
-	const char		*__function_name = "child_trapper_main";
-
-	struct sigaction	phan;
+	const char	*__function_name = "main_trapper_loop";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	phan.sa_sigaction = child_signal_handler;
-	sigemptyset(&phan.sa_mask);
-	phan.sa_flags = SA_SIGINFO;
-	sigaction(SIGALRM, &phan, NULL);
+	set_child_signal_handler();
 
 	zbx_process = p;
+
+	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
 	{
-		zbx_setproctitle("trapper [waiting for connection]");
+		zbx_setproctitle("%s [waiting for connection]", get_process_type_string(process_type));
+
+		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
 		if (SUCCEED == zbx_tcp_accept(s))
 		{
-			zbx_setproctitle("trapper [processing data]");
+			update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+
+			zbx_setproctitle("%s [processing data]", get_process_type_string(process_type));
 
 			process_trapper_child(s);
 
@@ -446,5 +447,4 @@ void	child_trapper_main(unsigned char p, zbx_sock_t *s)
 		else
 			zabbix_log(LOG_LEVEL_WARNING, "Trapper failed to accept connection");
 	}
-	DBclose();
 }

@@ -49,6 +49,7 @@ $page['file']	= 'index.php';
 		add_audit(AUDIT_ACTION_LOGOUT,AUDIT_RESOURCE_USER, _('Manual Logout'));
 
 		CWebUser::logout($sessionid);
+		clear_messages(1);
 
 		$loginForm = new CGetForm('login');
 		$loginForm->render();

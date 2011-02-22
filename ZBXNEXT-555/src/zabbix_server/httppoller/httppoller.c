@@ -21,11 +21,14 @@
 
 #include "db.h"
 #include "log.h"
+#include "daemon.h"
+#include "zbxself.h"
 
 #include "httptest.h"
 #include "httppoller.h"
 
-int	httppoller_num;
+extern unsigned char	process_type;
+extern int		process_num;
 
 /******************************************************************************
  *                                                                            *
@@ -58,7 +61,7 @@ static int	get_minnextcheck(int now)
 				" and h.status=%d"
 				" and (h.maintenance_status=%d or h.maintenance_type=%d)"
 				DB_NODE,
-			CONFIG_HTTPPOLLER_FORKS, httppoller_num - 1,
+			CONFIG_HTTPPOLLER_FORKS, process_num - 1,
 			HTTPTEST_STATUS_MONITORED,
 			HOST_STATUS_MONITORED,
 			HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL,
@@ -92,60 +95,34 @@ static int	get_minnextcheck(int now)
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-void	main_httppoller_loop(int num)
+void	main_httppoller_loop()
 {
 	int	now, nextcheck, sleeptime;
+	double	sec;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In main_httppoller_loop() num:%d", num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In main_httppoller_loop() process_num:%d", process_num);
 
-	httppoller_num = num;
+	set_child_signal_handler();
+
+	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
 	{
-		zbx_setproctitle("http poller [getting values]");
+		zbx_setproctitle("%s [getting values]", get_process_type_string(process_type));
 
-		now=time(NULL);
-		process_httptests(now);
+		now = time(NULL);
+		sec = zbx_time();
+		process_httptests(process_num, now);
+		sec = zbx_time() - sec;
 
-		zabbix_log( LOG_LEVEL_DEBUG, "Spent %d seconds while processing HTTP tests",
-			(int)time(NULL)-now);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while updating HTTP tests",
+				get_process_type_string(process_type), process_num, sec);
 
-		nextcheck=get_minnextcheck(now);
-		zabbix_log( LOG_LEVEL_DEBUG, "Nextcheck:%d Time:%d",
-			nextcheck,
-			(int)time(NULL));
+		nextcheck = get_minnextcheck(now);
+		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
 
-		if( FAIL == nextcheck)
-		{
-			sleeptime=POLLER_DELAY;
-		}
-		else
-		{
-			sleeptime=nextcheck-time(NULL);
-			if(sleeptime<0)
-			{
-				sleeptime=0;
-			}
-		}
-		if(sleeptime>0)
-		{
-			if(sleeptime > POLLER_DELAY)
-			{
-				sleeptime = POLLER_DELAY;
-			}
-			zabbix_log( LOG_LEVEL_DEBUG, "Sleeping for %d seconds",
-					sleeptime );
-
-			zbx_setproctitle("http poller [sleeping for %d seconds]",
-					sleeptime);
-
-			sleep( sleeptime );
-		}
-		else
-		{
-			zabbix_log( LOG_LEVEL_DEBUG, "No sleeping" );
-		}
+		zbx_sleep_loop(sleeptime);
 	}
 }

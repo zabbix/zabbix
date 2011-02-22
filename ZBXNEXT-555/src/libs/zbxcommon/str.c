@@ -2532,25 +2532,6 @@ const char	*zbx_host_type_string(zbx_item_type_t item_type)
 	}
 }
 
-const char	*zbx_poller_type_string(int poller_type)
-{
-	switch (poller_type)
-	{
-		case ZBX_POLLER_TYPE_NORMAL:
-			return "poller";
-		case ZBX_POLLER_TYPE_UNREACHABLE:
-			return "poller for unreachable hosts";
-		case ZBX_POLLER_TYPE_IPMI:
-			return "ipmi poller";
-		case ZBX_POLLER_TYPE_PINGER:
-			return "pinger";
-		case ZBX_POLLER_TYPE_JAVA:
-			return "java poller";
-		default:
-			return "unknown";
-	}
-}
-
 const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type)
 {
 	switch (value_type)

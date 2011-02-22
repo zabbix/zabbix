@@ -25,14 +25,17 @@
 #include "zbxicmpping.h"
 #include "discovery.h"
 #include "zbxserver.h"
+#include "zbxself.h"
 
 #include "daemon.h"
 #include "discoverer.h"
 #include "../poller/checks_agent.h"
 #include "../poller/checks_snmp.h"
 
+extern int		CONFIG_DISCOVERER_FORKS;
 static unsigned char	zbx_process;
-int			discoverer_num;
+extern unsigned char	process_type;
+extern int		process_num;
 
 /******************************************************************************
  *                                                                            *
@@ -712,7 +715,7 @@ static void	process_discovery(int now)
 			now,
 			now,
 			CONFIG_DISCOVERER_FORKS,
-			discoverer_num - 1,
+			process_num - 1,
 			DBnode_local("r.druleid"));
 
 	while (NULL != (row = DBfetch(result))) {
@@ -747,7 +750,7 @@ static int	get_minnextcheck(int now)
 				DB_NODE,
 			DRULE_STATUS_MONITORED,
 			CONFIG_DISCOVERER_FORKS,
-			discoverer_num - 1,
+			process_num - 1,
 			DBnode_local("druleid"));
 
 	row = DBfetch(result);
@@ -777,61 +780,36 @@ static int	get_minnextcheck(int now)
  * Comments: executes once per 30 seconds (hardcoded)                         *
  *                                                                            *
  ******************************************************************************/
-void	main_discoverer_loop(unsigned char p, int num)
+void	main_discoverer_loop(unsigned char p)
 {
-	struct		sigaction phan;
-	int		now, nextcheck, sleeptime;
-	double		sec;
+	int	now, nextcheck, sleeptime;
+	double	sec;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In main_discoverer_loop(num:%d)",
-			num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In main_discoverer_loop() process_num:%d", process_num);
 
-        phan.sa_sigaction = child_signal_handler;
-	sigemptyset(&phan.sa_mask);
-        phan.sa_flags = SA_SIGINFO;
-	sigaction(SIGALRM, &phan, NULL);
+	set_child_signal_handler();
 
-	zbx_process	= p;
-	discoverer_num	= num;
+	zbx_process = p;
+
+	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
 	{
+		zbx_setproctitle("%s [performing discovery]", get_process_type_string(process_type));
+
 		now = time(NULL);
 		sec = zbx_time();
-
 		process_discovery(now);
-
 		sec = zbx_time() - sec;
 
+		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while processing rules",
+				get_process_type_string(process_type), process_num, sec);
+
 		nextcheck = get_minnextcheck(now);
+		sleeptime = calculate_sleeptime(nextcheck, DISCOVERER_DELAY);
 
-		now = time(NULL);
-		zabbix_log(LOG_LEVEL_DEBUG, "Discoverer spent " ZBX_FS_DBL " seconds while processing rules. Nextcheck: %d Time: %d",
-				sec,
-				nextcheck,
-				now);
-
-		if (FAIL == nextcheck)
-			sleeptime = DISCOVERER_DELAY;
-		else
-			sleeptime = nextcheck - now;
-
-		if (sleeptime > 0)
-		{
-			if (sleeptime > DISCOVERER_DELAY)
-				sleeptime = DISCOVERER_DELAY;
-
-			zabbix_log(LOG_LEVEL_DEBUG, "Sleeping for %d seconds",
-					sleeptime);
-
-			zbx_setproctitle("discoverer [sleeping for %d seconds]",
-					sleeptime);
-
-			sleep(sleeptime);
-		}
-		else
-			zabbix_log(LOG_LEVEL_DEBUG, "No sleeping");
+		zbx_sleep_loop(sleeptime);
 	}
 }

@@ -28,11 +28,10 @@ class CAPIObject{
 	}
 
 	public function __call($method, $params){
-		global $USER_DETAILS;
-		if(!isset($USER_DETAILS['sessionid'])) $USER_DETAILS['sessionid'] = null;
-		$sessionid = get_cookie('zbx_sessionid');
+		if(!isset(CWebUser::$data['sessionid']))
+			CWebUser::$data['sessionid'] = null;
 
-		$result = czbxrpc::call($this->_name.'.'.$method, $params[0], $sessionid);
+		$result = czbxrpc::call($this->_name.'.'.$method, $params[0], CWebUser::$data['sessionid']);
 
 		if(isset($result['result'])){
 			return $result['result'];
