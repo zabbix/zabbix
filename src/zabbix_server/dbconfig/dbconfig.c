@@ -27,7 +27,7 @@
 #include "dbconfig.h"
 #include "dbcache.h"
 
-extern int		CONFIG_DBCONFIG_FREQUENCY;
+extern int		CONFIG_CONFSYNCER_FREQUENCY;
 extern unsigned char	process_type;
 
 /******************************************************************************
@@ -70,6 +70,6 @@ void	main_dbconfig_loop()
 		zabbix_log(LOG_LEVEL_DEBUG, "%s spent " ZBX_FS_DBL " second while processing configuration data",
 				get_process_type_string(process_type), sec);
 
-		zbx_sleep_loop(CONFIG_DBCONFIG_FREQUENCY);
+		zbx_sleep_loop(CONFIG_CONFSYNCER_FREQUENCY);
 	}
 }
