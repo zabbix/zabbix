@@ -500,7 +500,7 @@ clean:
  * Comments: always SUCCEED                                                   *
  *                                                                            *
  ******************************************************************************/
-void	process_httptests(int now)
+void	process_httptests(int httppoller_num, int now)
 {
 	const char	*__function_name = "process_httptests";
 

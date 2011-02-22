@@ -19,19 +19,14 @@
 
 #include "common.h"
 
-#include "cfg.h"
 #include "dbcache.h"
 #include "log.h"
-#include "zlog.h"
-#include "sysinfo.h"
 #include "zbxserver.h"
 #include "zbxicmpping.h"
+#include "daemon.h"
+#include "zbxself.h"
 
 #include "pinger.h"
-#include "dbcache.h"
-
-static int	poller_type;
-static int	poller_num;
 
 /*some defines so the `fping' and `fping6' could successfully process pings*/
 #define 	MIN_COUNT		1
@@ -43,6 +38,9 @@ static int	poller_num;
 /*end some defines*/
 
 #define MAX_ITEMS	128
+
+extern unsigned char	process_type;
+extern int		process_num;
 
 /******************************************************************************
  *                                                                            *
@@ -362,7 +360,7 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 
 	DCinit_nextchecks();
 
-	num = DCconfig_get_poller_items(poller_type, items, MAX_ITEMS);
+	num = DCconfig_get_poller_items(ZBX_POLLER_TYPE_PINGER, items, MAX_ITEMS);
 
 	for (i = 0; i < num; i++)
 	{
@@ -469,7 +467,7 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count)
 		if (i == items_count - 1 || items[i].count != items[i + 1].count || items[i].interval != items[i + 1].interval ||
 				items[i].size != items[i + 1].size || items[i].timeout != items[i + 1].timeout)
 		{
-			zbx_setproctitle("pinger [pinging hosts]");
+			zbx_setproctitle("%s [pinging hosts]", get_process_type_string(process_type));
 
 			zbx_timespec(&ts);
 
@@ -502,7 +500,7 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count)
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-void	main_pinger_loop(int num)
+void	main_pinger_loop()
 {
 	int			now, nextcheck, sleeptime;
 	double			sec;
@@ -510,54 +508,35 @@ void	main_pinger_loop(int num)
 	static int		items_alloc = 4;
 	int			items_count = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In main_pinger_loop() num:%d", num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In main_pinger_loop() process_num:%d", process_num);
 
-	poller_type = ZBX_POLLER_TYPE_PINGER;
-	poller_num = num - 1;
+	set_child_signal_handler();
 
 	if (NULL == items)
 		items = zbx_malloc(items, sizeof(icmpitem_t) * items_alloc);
 
-	zbx_setproctitle("pinger [connecting to the database]");
+	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
 	{
+		zbx_setproctitle("%s [getting values]", get_process_type_string(process_type));
+
 		now = time(NULL);
 		sec = zbx_time();
 		get_pinger_hosts(&items, &items_alloc, &items_count, now);
 		process_pinger_hosts(items, items_count);
 		sec = zbx_time() - sec;
 
-		if (FAIL == (nextcheck = DCconfig_get_poller_nextcheck(poller_type)))
-			sleeptime = POLLER_DELAY;
-		else
-		{
-			sleeptime = nextcheck - time(NULL);
-			if (sleeptime < 0)
-				sleeptime = 0;
-			else if (sleeptime > POLLER_DELAY)
-				sleeptime = POLLER_DELAY;
-		}
-
-		zabbix_log(LOG_LEVEL_DEBUG, "Pinger spent " ZBX_FS_DBL " seconds while processing %d items."
-				" Nextcheck after %d sec.",
-				sec,
-				items_count,
-				sleeptime);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while processing %d items",
+				get_process_type_string(process_type), process_num, sec, items_count);
 
 		free_hosts(&items, &items_count);
 
-		if (sleeptime > 0)
-		{
-			zbx_setproctitle("pinger [sleeping for %d seconds]",
-					sleeptime);
+		nextcheck = DCconfig_get_poller_nextcheck(ZBX_POLLER_TYPE_PINGER);
+		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
 
-			sleep(sleeptime);
-		}
+		zbx_sleep_loop(sleeptime);
 	}
-
-	/* Never reached */
-	DBclose();
 }

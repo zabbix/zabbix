@@ -38,10 +38,8 @@ typedef struct
 }
 ZBX_HTTPSTAT;
 
-extern int	httppoller_num;
-
 extern int	CONFIG_HTTPPOLLER_FORKS;
 
-void	process_httptests(int now);
+void	process_httptests(int httppoller_num, int now);
 
 #endif
