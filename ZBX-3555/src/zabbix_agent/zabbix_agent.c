@@ -32,7 +32,7 @@ const char	usage_message[] = "[-Vhp] [-c <file>] [-t <item>]";
 #ifndef HAVE_GETOPT_LONG
 const char	*help_message[] = {
 	"Options:",
-	"  -c <file>     Specify configuration file. Use absolute path",
+	"  -c <file>     absolute path to the configuration file",
 	"  -h            give this help",
 	"  -V            display version number",
 	"  -p            print supported items and exit",
@@ -42,7 +42,7 @@ const char	*help_message[] = {
 #else
 const char	*help_message[] = {
 	"Options:",
-	"  -c --config <file>  Specify configuration file. Use absolute path",
+	"  -c --config <file>  absolute path to the configuration file",
 	"  -h --help           give this help",
 	"  -V --version        display version number",
 	"  -p --print          print supported items and exit",
@@ -75,20 +75,6 @@ void	child_signal_handler( int sig )
 }
 
 static char	DEFAULT_CONFIG_FILE[] = "/etc/zabbix/zabbix_agent.conf";
-
-void    init_config(void)
-{
-	struct cfg_line cfg[] =
-	{
-/*               PARAMETER      ,VAR    ,FUNC,  TYPE(0i,1s),MANDATORY,MIN,MAX
-*/
-		{"Server",&CONFIG_HOSTS_ALLOWED,0,TYPE_STRING,PARM_MAND,0,0},
-		{"Timeout",&CONFIG_TIMEOUT,0,TYPE_INT,PARM_OPT,1,30},
-		{0}
-	};
-
-	parse_cfg_file(CONFIG_FILE, cfg);
-}
 
 int	main(int argc, char **argv)
 {
@@ -144,7 +130,7 @@ int	main(int argc, char **argv)
 	if (CONFIG_FILE == NULL)
 		CONFIG_FILE = DEFAULT_CONFIG_FILE;
 
-	init_metrics(); /* Must be before init_config() */
+	init_metrics();
 
 	if (ZBX_TASK_START == task)
 	{

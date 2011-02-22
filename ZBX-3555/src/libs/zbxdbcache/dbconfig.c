@@ -1386,10 +1386,10 @@ void	init_configuration_cache()
 	size_t		config_size;
 	size_t		strpool_size;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() size:%d", __function_name, CONFIG_DBCONFIG_SIZE);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() size:%d", __function_name, CONFIG_CONF_CACHE_SIZE);
 
-	strpool_size = (size_t)(CONFIG_DBCONFIG_SIZE * 0.15);
-	config_size = CONFIG_DBCONFIG_SIZE - strpool_size;
+	strpool_size = (size_t)(CONFIG_CONF_CACHE_SIZE * 0.15);
+	config_size = CONFIG_CONF_CACHE_SIZE - strpool_size;
 
 	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_CONFIG_ID)))
 	{
@@ -2331,7 +2331,7 @@ int	DCconfig_get_proxypoller_hosts(DC_HOST *hosts, int max_hosts)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_get_proxy_nextcheck                                     *
+ * Function: DCconfig_get_proxypoller_nextcheck                               *
  *                                                                            *
  * Purpose: Get nextcheck for passive proxies                                 *
  *                                                                            *
@@ -2344,9 +2344,9 @@ int	DCconfig_get_proxypoller_hosts(DC_HOST *hosts, int max_hosts)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	DCconfig_get_proxy_nextcheck()
+int	DCconfig_get_proxypoller_nextcheck()
 {
-	const char			*__function_name = "DCconfig_get_proxy_nextcheck";
+	const char			*__function_name = "DCconfig_get_proxypoller_nextcheck";
 
 	int				nextcheck;
 	zbx_binary_heap_t		*queue;

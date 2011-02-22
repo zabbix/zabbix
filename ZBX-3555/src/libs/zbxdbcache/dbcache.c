@@ -51,7 +51,7 @@ static int		sql_allocated = 65536;
 
 static unsigned char	zbx_process;
 
-extern int		CONFIG_DBSYNCER_FREQUENCY;
+extern int		CONFIG_HISTSYNCER_FREQUENCY;
 
 static int		ZBX_HISTORY_SIZE = 0;
 int			ZBX_SYNC_MAX = 1000;	/* Must be less than ZBX_HISTORY_SIZE */
@@ -2131,7 +2131,7 @@ int	DCsync_history(int sync_type)
 		history = zbx_malloc(history, ZBX_SYNC_MAX * sizeof(ZBX_DC_HISTORY));
 
 	syncs = cache->history_num / ZBX_SYNC_MAX;
-	max_delay = (int)time(NULL) - CONFIG_DBSYNCER_FREQUENCY;
+	max_delay = (int)time(NULL) - CONFIG_HISTSYNCER_FREQUENCY;
 
 	do
 	{
@@ -2713,7 +2713,7 @@ void	init_database_cache(unsigned char p)
 	ZBX_HISTORY_SIZE = CONFIG_HISTORY_CACHE_SIZE / sizeof(ZBX_DC_HISTORY);
 	if (ZBX_SYNC_MAX > ZBX_HISTORY_SIZE)
 		ZBX_SYNC_MAX = ZBX_HISTORY_SIZE;
-	ZBX_ITEMIDS_SIZE = CONFIG_DBSYNCER_FORKS * ZBX_SYNC_MAX;
+	ZBX_ITEMIDS_SIZE = CONFIG_HISTSYNCER_FORKS * ZBX_SYNC_MAX;
 
 	/* history cache */
 

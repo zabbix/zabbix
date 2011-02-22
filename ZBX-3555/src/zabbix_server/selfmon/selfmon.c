@@ -1,6 +1,6 @@
 /*
-** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,11 +17,27 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#ifndef ZABBIX_DATASENDER_H
-#define ZABBIX_DATASENDER_H
+#include "common.h"
+#include "daemon.h"
+#include "zbxself.h"
+#include "log.h"
 
-extern int	CONFIG_PROXYDATA_FREQUENCY;
+extern unsigned char	process_type;
 
-void	main_datasender_loop();
+void	main_selfmon_loop()
+{
+	const char	*__function_name = "main_selfmon_loop";
 
-#endif
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	set_child_signal_handler();
+
+	for (;;)
+	{
+		zbx_setproctitle("%s [processing data]", get_process_type_string(process_type));
+
+		collect_selfmon_stats();
+
+		zbx_sleep_loop(1);
+	}
+}
