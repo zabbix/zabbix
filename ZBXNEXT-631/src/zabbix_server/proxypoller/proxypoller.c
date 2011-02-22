@@ -20,6 +20,7 @@
 #include "common.h"
 #include "daemon.h"
 #include "comms.h"
+#include "zbxself.h"
 
 #include "proxypoller.h"
 #include "zbxserver.h"
@@ -28,6 +29,9 @@
 #include "zbxjson.h"
 #include "log.h"
 #include "proxy.h"
+
+extern unsigned char	process_type;
+extern int		process_num;
 
 static int	connect_to_proxy(DC_PROXY *proxy, zbx_sock_t *sock, int timeout)
 {
@@ -334,48 +338,32 @@ exit:
 
 void	main_proxypoller_loop()
 {
-	const char		*__function_name = "main_proxypoller_loop";
-	struct sigaction	phan;
-	int			nextcheck, sleeptime, processed;
-	double			sec;
+	const char	*__function_name = "main_proxypoller_loop";
+	int		nextcheck, sleeptime, processed;
+	double		sec;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() process_num:%d", __function_name, process_num);
 
-	phan.sa_sigaction = child_signal_handler;
-	sigemptyset(&phan.sa_mask);
-	phan.sa_flags = SA_SIGINFO;
-	sigaction(SIGALRM, &phan, NULL);
+	set_child_signal_handler();
+
+	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
 	{
-		zbx_setproctitle("proxy poller [data exchange]");
+		zbx_setproctitle("%s [exchanging data]", get_process_type_string(process_type));
 
 		sec = zbx_time();
 		processed = process_proxy();
 		sec = zbx_time() - sec;
 
-		if (FAIL == (nextcheck = DCconfig_get_proxy_nextcheck()))
-			sleeptime = POLLER_DELAY;
-		else
-		{
-			sleeptime = nextcheck - time(NULL);
-			if (sleeptime < 0)
-				sleeptime = 0;
-			if (sleeptime > POLLER_DELAY)
-				sleeptime = POLLER_DELAY;
-		}
+		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while processing %3d proxies",
+				get_process_type_string(process_type), process_num, sec, processed);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Poller spent " ZBX_FS_DBL
-				" seconds while processing %3d proxies."
-				" Sleeping for %d seconds",
-				sec, processed, sleeptime);
+		nextcheck = DCconfig_get_proxypoller_nextcheck();
+		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
 
-		if (sleeptime > 0)
-		{
-			zbx_setproctitle("proxy poller [sleeping for %d seconds]", sleeptime);
-			sleep(sleeptime);
-		}
+		zbx_sleep_loop(sleeptime);
 	}
 }

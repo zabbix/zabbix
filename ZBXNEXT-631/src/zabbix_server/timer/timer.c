@@ -27,10 +27,14 @@
 #include "dbcache.h"
 #include "zlog.h"
 #include "zbxserver.h"
+#include "daemon.h"
+#include "zbxself.h"
 
 #include "timer.h"
 
 #define TIMER_DELAY 30
+
+extern unsigned char	process_type;
 
 /******************************************************************************
  *                                                                            *
@@ -769,24 +773,32 @@ void	main_timer_loop()
 {
 	int	now, nextcheck, sleeptime, maintenance = 1;
 
+	set_child_signal_handler();
+
+	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
+
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
 	{
+		zbx_setproctitle("%s [processing time functions]", get_process_type_string(process_type));
+
 		process_time_functions();
+
 		if (1 == maintenance)
+		{
+			zbx_setproctitle("%s [processing maintenance periods]", get_process_type_string(process_type));
+
 			process_maintenance();
+		}
 
 		now = time(NULL);
 		nextcheck = now + TIMER_DELAY - (now % TIMER_DELAY);
 		sleeptime = nextcheck - now;
 
 		/* process maintenance every minute */
-		maintenance = (0 == (nextcheck % 60)) ? 1 : 0;
+		maintenance = (0 == nextcheck % 60 ? 1 : 0);
 
-		zbx_setproctitle("timer [sleeping for %d seconds]", sleeptime);
-		sleep(sleeptime);
+		zbx_sleep_loop(sleeptime);
 	}
-
-	DBclose();
 }
