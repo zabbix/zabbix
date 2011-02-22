@@ -39,13 +39,13 @@ int	application_status = ZBX_APP_RUNNING;
 
 static void	parent_signal_handler(int sig)
 {
-	switch(sig)
+	switch (sig)
 	{
-	case SIGINT:
-	case SIGTERM:
-		zabbix_log(LOG_LEVEL_INFORMATION, "Got signal. Exiting ...");
-		zbx_on_exit();
-		break;
+		case SIGINT:
+		case SIGTERM:
+			zabbix_log(LOG_LEVEL_INFORMATION, "Got signal. Exiting ...");
+			zbx_on_exit();
+			break;
 	}
 }
 
@@ -123,7 +123,7 @@ static VOID WINAPI ServiceEntry(DWORD argc, LPTSTR *argv)
 /*
  * Initialize service
  */
-void service_start(void)
+void	service_start()
 {
 	int				ret;
 	static SERVICE_TABLE_ENTRY	serviceTable[2];
@@ -335,7 +335,7 @@ static int	svc_RemoveEventSource()
 /*
  * Remove service
  */
-int ZabbixRemoveService(void)
+int	ZabbixRemoveService()
 {
 	SC_HANDLE	mgr, service;
 	int		ret = FAIL;
@@ -368,7 +368,7 @@ int ZabbixRemoveService(void)
 /*
  * Start service
  */
-int ZabbixStartService(void)
+int	ZabbixStartService()
 {
 	SC_HANDLE	mgr, service;
 	int		ret = FAIL;
@@ -398,7 +398,7 @@ int ZabbixStartService(void)
 /*
  * Stop service
  */
-int ZabbixStopService(void)
+int	ZabbixStopService()
 {
 	SC_HANDLE	mgr, service;
 	SERVICE_STATUS	status;
@@ -426,7 +426,7 @@ int ZabbixStopService(void)
 	return ret;
 }
 
-void	init_main_process(void)
+void	set_parent_signal_handler()
 {
 	signal( SIGINT,  parent_signal_handler);
 	signal( SIGTERM, parent_signal_handler );

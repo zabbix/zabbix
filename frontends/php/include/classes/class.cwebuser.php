@@ -13,6 +13,7 @@ class CWebUser{
 				'password' => $password,
 				'userData' => true
 			));
+
 			if(!self::$data) throw new Exception();
 
 			if(self::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED){

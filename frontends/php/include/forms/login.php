@@ -32,7 +32,8 @@ require_once('include/page_header.php');
 ?>
 <form action="index.php">
 <input type="hidden" name="request" class="input hidden" value="<?php print($request); ?>" />
-<div style="position: absolute; top: 25%; left: 25%;">
+<div style="display: table; position: absolute; height: 99%; width: 99%;">
+<div class="vertical-middle">
 <div class="loginForm">
 	<div style="position: relative; color: #F0F0F0; height: 100%;">
 <!-- Help & Support -->
@@ -65,7 +66,7 @@ require_once('include/page_header.php');
 				</li>
 				<li style="margin-top: 10px; padding-top: 1px; height: 22px; width: 265px; background-image: url(images/general/login/username_pass_field.png); background-repeat: no-repeat;" >
 					<div class="bold" style="display: inline-block; zoom: 1; *display:inline; *margin-right: 2px; font-size: 1.1em; width: 70px; padding-left: 10px; line-height: 22px;"><?php print(_('Password')); ?></div>
-					<input type="password" name="password" class="input bold transparent" style="color: #5f5f5f; height: 16px; line-height: 16px; width: 16.6em;" />
+					<input type="password" id="password" name="password" class="input bold transparent" style="color: #5f5f5f; height: 16px; line-height: 16px; width: 16.6em;" />
 				</li>
 				<li style="margin-top: 8px; margin-left: 64px;">
 					<input type="checkbox" id="autologin" name="autologin" value="1" <?php print((get_request('autologin',1) == 1)?'checked="checked"':''); ?> />
@@ -84,6 +85,7 @@ require_once('include/page_header.php');
 			</div>
 		</div>
 	</div>
+</div>
 </div>
 </div>
 </form>

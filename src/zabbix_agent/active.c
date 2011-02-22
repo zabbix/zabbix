@@ -25,17 +25,17 @@
 #include "sysinfo.h"
 #include "logfiles.h"
 #if defined (_WINDOWS)
-#include "eventlog.h"
-#endif
+#	include "eventlog.h"
+#endif	/* _WINDOWS */
 #include "comms.h"
 #include "threads.h"
 #include "zbxjson.h"
 
 #if defined(ZABBIX_SERVICE)
 #	include "service.h"
-#elif defined(ZABBIX_DAEMON) /* ZABBIX_SERVICE */
+#elif defined(ZABBIX_DAEMON)	/* ZABBIX_SERVICE */
 #	include "daemon.h"
-#endif /* ZABBIX_DAEMON */
+#endif	/* ZABBIX_DAEMON */
 
 static ZBX_ACTIVE_METRIC *active_metrics = NULL;
 static ZBX_ACTIVE_BUFFER buffer;
@@ -1125,28 +1125,20 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 {
 	ZBX_THREAD_ACTIVECHK_ARGS activechk_args;
 
-#if defined(ZABBIX_DAEMON)
-	struct	sigaction phan;
-#endif /* ZABBIX_DAEMON */
 	int	nextcheck = 0, nextrefresh = 0, nextsend = 0;
 	char	*p = NULL;
 
 #if defined(ZABBIX_DAEMON)
-	phan.sa_sigaction = child_signal_handler;
-	sigemptyset(&phan.sa_mask);
-	phan.sa_flags = SA_SIGINFO;
-	sigaction(SIGALRM, &phan, NULL);
-#endif /* ZABBIX_DAEMON */
+	set_child_signal_handler();
+#endif	/* ZABBIX_DAEMON */
 
 	activechk_args.host = strdup(((ZBX_THREAD_ACTIVECHK_ARGS *)args)->host);
 	activechk_args.port = ((ZBX_THREAD_ACTIVECHK_ARGS *)args)->port;
 
 	assert(activechk_args.host);
 
-	p = strchr(activechk_args.host,',');
-	if(p) *p = '\0';
-
-	zabbix_log( LOG_LEVEL_INFORMATION, "zabbix_agentd active check started [%s:%u]", activechk_args.host, activechk_args.port);
+	if (NULL != (p = strchr(activechk_args.host, ',')))
+		*p = '\0';
 
 	init_active_metrics();
 
