@@ -168,7 +168,7 @@ function __autoload($class_name){
 		else{
 			$show_warning = true;
 			define('ZBX_DISTRIBUTED', false);
-			define('ZBX_PAGE_NO_AUTHORIZATION', true);
+			if(!defined('ZBX_PAGE_NO_AUTHORIZATION')) define('ZBX_PAGE_NO_AUTHORIZATION', true);
 			error($config->error);
 		}
 
@@ -180,7 +180,7 @@ function __autoload($class_name){
 				$_REQUEST['message'] = $error;
 
 				define('ZBX_DISTRIBUTED', false);
-				define('ZBX_PAGE_NO_AUTHORIZATION', true);
+				if(!defined('ZBX_PAGE_NO_AUTHORIZATION')) define('ZBX_PAGE_NO_AUTHORIZATION', true);
 
 				$show_warning = true;
 			}
@@ -213,7 +213,7 @@ function __autoload($class_name){
 
 		require_once('include/db.inc.php');
 
-		define('ZBX_PAGE_NO_AUTHORIZATION', true);
+		if(!defined('ZBX_PAGE_NO_AUTHORIZATION')) define('ZBX_PAGE_NO_AUTHORIZATION', true);
 		define('ZBX_DISTRIBUTED', false);
 		$show_setup = true;
 	}
