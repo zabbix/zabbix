@@ -232,7 +232,7 @@ function update_config($configs){
 	}
 
 // cycle for 6 severities. check color value for each severity.
-	for($i=0; $i<6; $i++){
+	for($i=0; $i<TRIGGER_SEVERITY_COUNT; $i++){
 		$varName = 'severity_color_'.$i;
 		if(isset($configs[$varName]) && !is_null($configs[$varName])){
 			if(!preg_match('/[0-9a-f]{6}/i', $configs[$varName])){

@@ -267,8 +267,11 @@ function get_severity_style($severity, $type=true){
 	if(!$type){
 		return 'normal';
 	}
-	else{
+	else if(isset($styles[$severity])){
 		return $styles[$severity];
+	}
+	else{
+		return '';
 	}
 }
 
