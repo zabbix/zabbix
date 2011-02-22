@@ -628,15 +628,15 @@ include_once('include/page_header.php');
 
 	$cmbConfig = new CCombobox('configDropDown', $_REQUEST['config'], 'javascript: redirect("config.php?config="+this.options[this.selectedIndex].value);');
 	$cmbConfig->addItems(array(
-		8 => S_GUI,
-		0 => S_HOUSEKEEPER,
-		3 => S_IMAGES,
-		10 => S_REGULAR_EXPRESSIONS,
-		11 => S_MACROS,
-		6 => S_VALUE_MAPPING,
-		7 => S_WORKING_TIME,
-		5 => S_OTHER,
-		12 => _('Trigger severities')
+		8 => _('GUI'),
+		0 => _('Housekeeper'),
+		3 => _('Images'),
+		10 => _('Regular expressions'),
+		11 => _('Macros'),
+		6 => _('Value mapping'),
+		7 => _('Working time'),
+		12 => _('Trigger severities'),
+		5 => _('Other'),
 	));
 	$form->addItem($cmbConfig);
 

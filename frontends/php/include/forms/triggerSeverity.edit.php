@@ -46,36 +46,12 @@ else{
 	$config = select_config(false);
 }
 
-$severityName0TB = new CTextBox('severity_name_0', $config['severity_name_0']);
-$severityName0TB->setAttribute('maxlength', 32);
-$severityColor0TB = new CColor('severity_color_0', $config['severity_color_0']);
-$severityTab->addRow(_('Severity 0'), array($severityName0TB, SPACE, $severityColor0TB));
-
-$severityName1TB = new CTextBox('severity_name_1', $config['severity_name_1']);
-$severityName1TB->setAttribute('maxlength', 32);
-$severityColor1TB = new CColor('severity_color_1', $config['severity_color_1']);
-$severityTab->addRow(_('Severity 1'), array($severityName1TB, SPACE, $severityColor1TB));
-
-$severityName2TB = new CTextBox('severity_name_2', $config['severity_name_2']);
-$severityName2TB->setAttribute('maxlength', 32);
-$severityColor2TB = new CColor('severity_color_2', $config['severity_color_2']);
-$severityTab->addRow(_('Severity 2'), array($severityName2TB, SPACE, $severityColor2TB));
-
-$severityName3TB = new CTextBox('severity_name_3', $config['severity_name_3']);
-$severityName3TB->setAttribute('maxlength', 32);
-$severityColor3TB = new CColor('severity_color_3', $config['severity_color_3']);
-$severityTab->addRow(_('Severity 3'), array($severityName3TB, SPACE, $severityColor3TB));
-
-$severityName4TB = new CTextBox('severity_name_4', $config['severity_name_4']);
-$severityName4TB->setAttribute('maxlength', 32);
-$severityColor4TB = new CColor('severity_color_4', $config['severity_color_4']);
-$severityTab->addRow(_('Severity 4'), array($severityName4TB, SPACE, $severityColor4TB));
-
-$severityName5TB = new CTextBox('severity_name_5', $config['severity_name_5']);
-$severityName5TB->setAttribute('maxlength', 32);
-$severityColor5TB = new CColor('severity_color_5', $config['severity_color_5']);
-$severityTab->addRow(_('Severity 5'), array($severityName5TB, SPACE, $severityColor5TB));
-
+for($i=0; $i<6; $i++){
+	$severityNameTB = new CTextBox('severity_name_'.$i, $config['severity_name_'.$i]);
+	$severityNameTB->setAttribute('maxlength', 32);
+	$severityColorTB = new CColor('severity_color_'.$i, $config['severity_color_'.$i]);
+	$severityTab->addRow(_s('Severity %s', $i), array($severityNameTB, _(' Colour '), $severityColorTB));
+}
 
 $severityView = new CTabView();
 $severityView->addTab('severities', _('Trigger severities'), $severityTab);
