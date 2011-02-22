@@ -276,12 +276,12 @@ function getSeverityCaption($severity=null){
 	$config = select_config();
 
 	$severities = array(
-		TRIGGER_SEVERITY_NOT_CLASSIFIED => $config['severity_name_0'],
-		TRIGGER_SEVERITY_INFORMATION => $config['severity_name_1'],
-		TRIGGER_SEVERITY_WARNING => $config['severity_name_2'],
-		TRIGGER_SEVERITY_AVERAGE => $config['severity_name_3'],
-		TRIGGER_SEVERITY_HIGH => $config['severity_name_4'],
-		TRIGGER_SEVERITY_DISASTER => $config['severity_name_5'],
+		TRIGGER_SEVERITY_NOT_CLASSIFIED => _($config['severity_name_0']),
+		TRIGGER_SEVERITY_INFORMATION => _($config['severity_name_1']),
+		TRIGGER_SEVERITY_WARNING => _($config['severity_name_2']),
+		TRIGGER_SEVERITY_AVERAGE => _($config['severity_name_3']),
+		TRIGGER_SEVERITY_HIGH => _($config['severity_name_4']),
+		TRIGGER_SEVERITY_DISASTER => _($config['severity_name_5']),
 	);
 
 	if(is_null($severity))
