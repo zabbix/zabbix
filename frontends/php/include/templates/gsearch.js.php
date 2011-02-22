@@ -1,6 +1,6 @@
 <script type="text/x-jquery-tmpl" id="globalSearch">
 <form action="search.php" method="get">
-	<input type="text" id="search" name="search" class="input text ui-corner-left" value="<?php print(get_request('search','')); ?>"autocomplete="off" />
+	<input type="text" id="search" name="search" class="input text ui-corner-left" value="<?php print(get_request('search','')); ?>" autocomplete="off" />
 	<input type="submit" id="searchbttn" name="searchbttn" value="<?php print(_('Search')); ?>" class="input button" style="margin: 0; padding: 0 8px; height: 20px; position: relative; left: -3px;" />
 </form>
 </script>
