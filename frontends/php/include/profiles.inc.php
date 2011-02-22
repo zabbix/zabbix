@@ -243,6 +243,25 @@ function update_config($configs){
 	}
 
 
+	$currentConfig = select_config();
+// cycle for 6 severities. check color value for each severity.
+	$names = array();
+	for($i=0; $i<TRIGGER_SEVERITY_COUNT; $i++){
+		$varName = 'severity_name_'.$i;
+		if(!isset($configs[$varName]) || is_null($configs[$varName])){
+			$configs[$varName] = $currentConfig[$varName];
+		}
+
+		if(isset($names[$configs[$varName]])){
+			error(_s('Duplicate severity name "%s".', $configs[$varName]));
+			return false;
+		}
+		else{
+			$names[$configs[$varName]] = 1;
+		}
+	}
+
+
 	foreach($configs as $key => $value){
 		if(!is_null($value)){
 			if($key == 'alert_usrgrpid'){
