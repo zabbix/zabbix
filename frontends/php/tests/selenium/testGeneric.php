@@ -30,7 +30,7 @@ class testGeneric extends CWebTest
 		return array(
 
 			// Monitoring
-			array('index.php',	'PERSONAL DASHBOARD'),
+			array('index.php',	'Dashboard'),
 			array('dashboard.php',	'Dashboard'),
 			array('dashconf.php',	'Dashboard configuration'),
 
