@@ -37,7 +37,6 @@ class API_JSON_General extends CZabbixTest
 		$result = $this->api_call_raw($json, &$debug);
 
 		$this->assertTrue(isset($result['error']),"Chuck Norris: 'auth' must be verified if given. Always! $debug");
-		$this->assertTrue(false,"Chuck Norris: It should be documented!");
 	}
 
 	public function testGeneral_IncorrectMethodName()
