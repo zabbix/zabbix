@@ -104,11 +104,9 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			break;
 		case ITEM_TYPE_SSH:
 #ifdef HAVE_SSH2
-			/* Cannot use "alarming" since it breaks down libssh2 and our process terminates. */
-			/* libssh2 has its own default timeout == 60 and it should not hang on under usual circumstances. */
-			/* alarm(CONFIG_TIMEOUT); */
+			alarm(CONFIG_TIMEOUT);
 			res = get_value_ssh(item, result);
-			/* alarm(0); */
+			alarm(0);
 #else
 			SET_MSG_RESULT(result, strdup("Support of SSH parameters was not compiled in"));
 			res = NOTSUPPORTED;
