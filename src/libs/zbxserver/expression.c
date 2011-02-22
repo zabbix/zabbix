@@ -29,11 +29,11 @@
  *                                                                            *
  * Function: DBget_trigger_severity_name                                      *
  *                                                                            *
- * Purpose: get trigger seveirty name                                         *
+ * Purpose: get trigger severity name                                         *
  *                                                                            *
  * Parameters: severity   - [IN] a trigger severity; TRIGGER_SEVERITY_*       *
- *             replace_to - [OUT] pointer to a buffer that receive a          *
- *                          null-terminated trigger severity string           *
+ *             replace_to - [OUT] pointer to a buffer that will receive       *
+ *                          a null-terminated trigger severity string         *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
@@ -43,7 +43,7 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	DBget_trigger_severity_name(int severity, char **replace_to)
+static int	DBget_trigger_severity_name(int severity, char **replace_to)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -141,10 +141,12 @@ static int	trigger_get_N_functionid(char *short_expression, int n, zbx_uint64_t 
 {
 	const char	*__function_name = "trigger_get_N_functionid";
 
-	typedef enum {
+	typedef enum
+	{
 		EXP_NONE,
 		EXP_FUNCTIONID
-	} parsing_state_t;
+	}
+	parsing_state_t;
 
 	parsing_state_t	state = EXP_NONE;
 	int		num = 0, ret = FAIL;
