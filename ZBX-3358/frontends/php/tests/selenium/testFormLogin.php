@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ class testFormLogin extends CWebTest
 		$this->assertTitle('Dashboard');
 		$this->click('link=Logout');
 		$this->wait();
-		$this->ok('Login name');
+		$this->ok('Username');
 		$this->ok('Password');
 
 		$this->input_type('name','Admin');
@@ -47,7 +47,7 @@ class testFormLogin extends CWebTest
 		$this->assertTitle('Dashboard');
 		$this->click('link=Logout');
 		$this->wait();
-		$this->ok('Login name');
+		$this->ok('Username');
 		$this->ok('Password');
 
 		$this->input_type('name','Admin');

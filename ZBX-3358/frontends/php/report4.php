@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -90,14 +90,13 @@ include_once('include/page_header.php');
 	$_REQUEST['media_type']	= $media_type;
 
 	$css = getUserTheme($USER_DETAILS);
-	$vTextColor = ($css == 'css_od.css')?'&color=white':'';
 
     $table = new CTableInfo();
 
 	$header = array();
 	$db_users = DBselect('select * from users where '.DBin_node('userid').' order by alias,userid');
 	while($user_data = DBfetch($db_users)){
-		array_push($header, new CImg('vtext.php?text='.$user_data['alias'].$vTextColor));
+		array_push($header, new CImg('vtext.php?text='.$user_data['alias'].'&theme='.$css));
 		$users[$user_data['userid']] = $user_data['alias'];
 	}
 
@@ -181,7 +180,7 @@ include_once('include/page_header.php');
 		}
 
 		//getting data throung API
-		$alert_info = CAlert::get($options);
+		$alert_info = API::Alert()->get($options);
 
 		//counting alert count for each user and media type
 		$summary = array();
@@ -190,7 +189,7 @@ include_once('include/page_header.php');
 			$summary[$userid]['total'] = 0;
 			$summary[$userid]['medias'] = array('1'=>0, '2'=>0, '3'=>0, '4'=>0);
 		}
-		
+
 		foreach($alert_info as $ai){
 			if( !isset($summary[$ai['userid']]) ) continue;
 
@@ -202,7 +201,7 @@ include_once('include/page_header.php');
 				$summary[$ai['userid']]['medias'][$ai['mediatypeid']] = 1;
 			}
 		}
-		
+
 		foreach($summary as $s){
 			array_push($table_row, array($s['total'], ($media_type == 0 ? SPACE.'('.implode('/',$s['medias']).')' : '' )));
 		}

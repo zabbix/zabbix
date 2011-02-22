@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -96,10 +96,8 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 		$this->open('index.php');
 		$this->wait();
 		// Login if not logged in already
-		if($this->isElementPresent('link=Login'))
+		if($this->isElementPresent('id=password'))
 		{
-			$this->click('link=Login');
-			$this->wait();
 			$this->input_type('name','Admin');
 			$this->input_type('password','zabbix');
 			$this->click('enter');

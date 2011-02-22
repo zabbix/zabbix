@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -67,11 +67,6 @@ class API_JSON_User extends CZabbixTest
 	{
 		// TODO
 		$this->markTestIncomplete();
-	}
-
-	public function testUser_Authenticate_Documented()
-	{
-		$this->assertTrue(false,"Chuck Norris: API method 'user.authenticate' is not documented");
 	}
 }
 ?>

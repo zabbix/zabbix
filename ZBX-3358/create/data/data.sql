@@ -1,6 +1,6 @@
 --
 -- Zabbix
--- Copyright (C) 2000-2011 SIA Zabbix
+-- Copyright (C) 2000-2011 Zabbix SIA
 --
 -- This program is free software; you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -21,16 +21,15 @@
 -- Dumping data for table `usrgrp`
 --
 
-INSERT INTO usrgrp VALUES (1,'UNIX administrators',0,0,0,0);
-INSERT INTO usrgrp VALUES (2,'Database administrators',0,0,0,0);
-INSERT INTO usrgrp VALUES (3,'Network administrators',0,0,0,0);
-INSERT INTO usrgrp VALUES (4,'Security specialists',0,0,0,0);
-INSERT INTO usrgrp VALUES (5,'WEB administrators',0,0,0,0);
-INSERT INTO usrgrp VALUES (6,'Head of IT department',0,0,0,0);
-INSERT INTO usrgrp VALUES (7,'Zabbix administrators',0,0,0,0);
-INSERT INTO usrgrp VALUES (8,'Guests',0,0,0,0);
-INSERT INTO usrgrp VALUES (9,'Disabled',0,1,0,0);
-INSERT INTO usrgrp VALUES (10,'API access',0,0,1,0);
+INSERT INTO usrgrp VALUES (1,'UNIX administrators',0,0,0);
+INSERT INTO usrgrp VALUES (2,'Database administrators',0,0,0);
+INSERT INTO usrgrp VALUES (3,'Network administrators',0,0,0);
+INSERT INTO usrgrp VALUES (4,'Security specialists',0,0,0);
+INSERT INTO usrgrp VALUES (5,'WEB administrators',0,0,0);
+INSERT INTO usrgrp VALUES (6,'Head of IT department',0,0,0);
+INSERT INTO usrgrp VALUES (7,'Zabbix administrators',0,0,0);
+INSERT INTO usrgrp VALUES (8,'Guests',0,0,0);
+INSERT INTO usrgrp VALUES (9,'Disabled',0,1,0);
 
 --
 -- Dumping data for table `users`
@@ -12276,6 +12275,7 @@ insert into help_items values (5,'zabbix[trends_uint]','Number of values stored 
 insert into help_items values (5,'zabbix[triggers]','Number of triggers in Zabbix database.');
 insert into help_items values (5,'zabbix[uptime]','Uptime of Zabbix server process in seconds.');
 insert into help_items values (5,'zabbix[wcache,&lt;cache&gt;,&lt;mode&gt;]','Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free).');
+insert into help_items values (5,'zabbix[process,&lt;type&gt;,&lt;num&gt;,&lt;state&gt;]','Time a particular Zabbix process or a group of processes (identified by <type> and <num>) spent in <state> in percentage.');
 
 insert into help_items values (8,'grpfunc[&lt;Group&gt;,&lt;Key&gt;,&lt;func&gt;,&lt;param&gt;]','Aggregate checks do not require any agent running on a host being monitored. Zabbix server collects aggregate information by doing direct database queries. See Zabbix Manual.');
 

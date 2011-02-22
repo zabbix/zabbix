@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -96,8 +96,8 @@ switch($itemType) {
 													ITEM_TYPE_SNMPV3,'type')),
 		'snmpv3_securitylevel'=>array(T_ZBX_INT, O_OPT,  null,  IN('0,1,2'),	'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
 		'snmpv3_securityname'=>	array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
-		'snmpv3_authpassphrase'=>array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
-		'snmpv3_privpassphrase'=>array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
+		'snmpv3_authpassphrase'=>array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.')&&({snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.'||{snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV.'))'),
+		'snmpv3_privpassphrase'=>array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.')&&({snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.'))'),
 
 		'ipmi_sensor'=>		array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,	'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_IPMI.'))', S_IPMI_SENSOR),
 		'trapper_hosts'=>	array(T_ZBX_STR, O_OPT,  null,  null,			'isset({save})&&isset({type})&&({type}==2)'),
@@ -135,7 +135,7 @@ switch($itemType) {
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1
 		);
-		$item = CDiscoveryRule::get($options);
+		$item = API::DiscoveryRule()->get($options);
 		$item = reset($item);
 		if(!$item) access_deny();
 		$_REQUEST['hostid'] = $item['hostid'];
@@ -147,7 +147,7 @@ switch($itemType) {
 			'templated_hosts' => 1,
 			'editable' => 1
 		);
-		$hosts = CHost::get($options);
+		$hosts = API::Host()->get($options);
 		if(empty($hosts)) access_deny();
 	}
 ?>
@@ -178,7 +178,7 @@ switch($itemType) {
 		array_push($_REQUEST['delay_flex'],$_REQUEST['new_delay_flex']);
 	}
 	else if(isset($_REQUEST['delete'])&&isset($_REQUEST['itemid'])){
-		$result = CDiscoveryRule::delete($_REQUEST['itemid']);
+		$result = API::DiscoveryRule()->delete($_REQUEST['itemid']);
 		show_messages($result, _('Discovery rule deleted'), _('Cannot delete discovery rule'));
 
 		unset($_REQUEST['itemid']);
@@ -238,12 +238,12 @@ switch($itemType) {
 
 			$item['itemid'] = $_REQUEST['itemid'];
 
-			$result = CDiscoveryRule::update($item);
+			$result = API::DiscoveryRule()->update($item);
 			$result = DBend($result);
 			show_messages($result, _('Discovery rule updated'), _('Cannot update discovery rule'));
 		}
 		else{
-			$result = CDiscoveryRule::create(array($item));
+			$result = API::DiscoveryRule()->create(array($item));
 			show_messages($result, _('Discovery rule created'), _('Cannot add discovery rule'));
 		}
 
@@ -263,7 +263,7 @@ switch($itemType) {
 		show_messages($go_result, ($_REQUEST['go'] == 'activate') ? _('Discovery rules activated') : _('Discovery rules disabled'), null);
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_itemid'])){
-		$go_result = CDiscoveryRule::delete($_REQUEST['group_itemid']);
+		$go_result = API::DiscoveryRule()->delete($_REQUEST['group_itemid']);
 		show_messages($go_result, _('Discovery rule deleted'), _('Cannot delete discovery rule'));
 	}
 
@@ -337,7 +337,7 @@ switch($itemType) {
 				'output' => API_OUTPUT_EXTEND,
 				'editable' => 1,
 			);
-			$item_data = CItem::get($options);
+			$item_data = API::Item()->get($options);
 			$item_data = reset($item_data);
 
 			$limited = ($item_data['templateid'] != 0);
@@ -427,7 +427,7 @@ switch($itemType) {
 
 
 // Interfaces
-		$interfaces = CHostInterface::get(array(
+		$interfaces = API::HostInterface()->get(array(
 			'hostids' => $hostid,
 			'output' => API_OUTPUT_EXTEND,
 		));
@@ -492,13 +492,9 @@ switch($itemType) {
 
 // SNMPv3 auth passphrase
 		$frmItem->addRow(S_SNMPV3_AUTH_PASSPHRASE, new CTextBox('snmpv3_authpassphrase',$snmpv3_authpassphrase,64), null, 'row_snmpv3_authpassphrase');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'snmpv3_authpassphrase');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmpv3_authpassphrase');
 
 // SNMPv3 priv passphrase
 		$frmItem->addRow(S_SNMPV3_PRIV_PASSPHRASE, new CTextBox('snmpv3_privpassphrase',$snmpv3_privpassphrase,64), null, 'row_snmpv3_privpassphrase');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'snmpv3_privpassphrase');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmpv3_privpassphrase');
 
 // SNMP port
 		$frmItem->addRow(S_PORT, new CNumericBox('port',$port,5), null, 'row_port');
@@ -640,9 +636,21 @@ switch($itemType) {
 		$frmRow[] = new CButtonCancel(url_param('groupid').url_param('hostid'));
 		$frmItem->addItemToBottomRow($frmRow);
 
+		// adding javascript, so that auth fields would be hidden if they are not used in specific auth type
+		$securityLevelVisibility = array();
+		zbx_subarray_push($securityLevelVisibility, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, 'row_snmpv3_authpassphrase');
+		zbx_subarray_push($securityLevelVisibility, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, 'snmpv3_authpassphrase');
+
+		zbx_subarray_push($securityLevelVisibility, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'row_snmpv3_authpassphrase');
+		zbx_subarray_push($securityLevelVisibility, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'snmpv3_authpassphrase');
+		zbx_subarray_push($securityLevelVisibility, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'row_snmpv3_privpassphrase');
+		zbx_subarray_push($securityLevelVisibility, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'snmpv3_privpassphrase');
+
+		zbx_add_post_js("var securityLevelSwitcher = new CViewSwitcher('snmpv3_securitylevel', 'change', ".zbx_jsvalue($securityLevelVisibility, true).");");
 		zbx_add_post_js("var authTypeSwitcher = new CViewSwitcher('authtype', 'change', ".zbx_jsvalue($authTypeVisibility, true).");");
 		zbx_add_post_js("var typeSwitcher = new CViewSwitcher('type', 'change', ".zbx_jsvalue($typeVisibility, true).(isset($_REQUEST['itemid'])? ', true': '').');');
 		zbx_add_post_js("var mnFrmTbl = document.getElementById('".$frmItem->getName()."'); if(mnFrmTbl) mnFrmTbl.style.visibility = 'visible';");
+
 
 		$items_wdgt->addItem($frmItem);
 	}
@@ -691,7 +699,7 @@ switch($itemType) {
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
-		$items = CDiscoveryRule::get($options);
+		$items = API::DiscoveryRule()->get($options);
 
 		order_result($items, $sortfield, $sortorder);
 		$paging = getPagingLine($items);

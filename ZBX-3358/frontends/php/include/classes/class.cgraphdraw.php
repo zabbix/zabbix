@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -141,15 +141,12 @@ class CGraphDraw{
 	}
 
 	public function applyGraphTheme($description=null){
-		global $USER_DETAILS;
 
 		if(!is_null($description)){
 			$sql_where = ' AND gt.description='.zbx_dbstr($description);
 		}
 		else{
-			$css = getUserTheme($USER_DETAILS);
-			if($css == 'css_od.css') $css = 'css_bb.css';
-
+			$css = getUserTheme(CWebUser::$data);
 			$sql_where = ' AND gt.theme='.zbx_dbstr($css);
 		}
 

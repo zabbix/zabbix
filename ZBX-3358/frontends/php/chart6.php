@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ include_once 'include/page_header.php';
 		'selectHosts' => API_OUTPUT_EXTEND,
 		'output' => API_OUTPUT_EXTEND
 	);
-	$db_data = CGraph::get($options);
+	$db_data = API::Graph()->get($options);
 	if(empty($db_data)) access_deny();
 	else $db_data = reset($db_data);
 

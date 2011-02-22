@@ -1,6 +1,6 @@
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ const char	usage_message[] = "[-Vhv] {[-zpsI] -ko | [-zpI] -T -i <file> -r} [-c 
 #ifdef HAVE_GETOPT_LONG
 const char	*help_message[] = {
 	"Options:",
-	"  -c --config <file>                   Specify configuration file",
+	"  -c --config <file>                   Specify absolute path to the configuration file",
 	"",
 	"  -z --zabbix-server <server>          Hostname or IP address of Zabbix Server",
 	"  -p --port <server port>              Specify port number of server trapper running on the server. Default is " ZBX_DEFAULT_SERVER_PORT_STR,
@@ -62,7 +62,7 @@ const char	*help_message[] = {
 #else
 const char	*help_message[] = {
 	"Options:",
-	"  -c <file>                    Specify configuration file",
+	"  -c <file>                    Specify absolute path to the configuration file",
 	"",
 	"  -z <server>                  Hostname or IP address of Zabbix Server",
 	"  -p <server port>             Specify port number of server trapper running on the server. Default is " ZBX_DEFAULT_SERVER_PORT_STR,
