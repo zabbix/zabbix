@@ -46,11 +46,11 @@ else{
 	$config = select_config(false);
 }
 
-for($i=0; $i<6; $i++){
+for($i=0; $i<TRIGGER_SEVERITY_COUNT; $i++){
 	$severityNameTB = new CTextBox('severity_name_'.$i, $config['severity_name_'.$i]);
 	$severityNameTB->setAttribute('maxlength', 32);
 	$severityColorTB = new CColor('severity_color_'.$i, $config['severity_color_'.$i]);
-	$severityTab->addRow(_s('Severity %s', $i), array($severityNameTB, _(' Colour '), $severityColorTB));
+	$severityTab->addRow(_s('Severity %s', $i), array($severityNameTB, SPACE._('Colour').SPACE, $severityColorTB));
 }
 
 $severityView = new CTabView();
