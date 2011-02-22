@@ -146,35 +146,5 @@ class testFormProfile extends CWebTest
 
 		$this->assertEquals($this->oldHash,$this->hashUsersExcept('Admin'));
 	}
-
-	public function testFormProfile_AutologinSet()
-	{
-		$this->login('profile.php');
-
-		$this->checkbox_select('autologin');
-		$this->button_click('save');
-		$this->wait();
-		$this->ok('Copyright');
-
-		$row=DBfetch(DBselect("select autologin from users where alias='Admin'"));
-		$this->assertEquals(1,$row['autologin']);
-
-		$this->assertEquals($this->oldHash,$this->hashUsersExcept('Admin'));
-	}
-
-	public function testFormProfile_AutologinUnSet()
-	{
-		$this->login('profile.php');
-
-		$this->checkbox_unselect('autologin');
-		$this->button_click('save');
-		$this->wait();
-		$this->ok('Copyright');
-
-		$row=DBfetch(DBselect("select autologin from users where alias='Admin'"));
-		$this->assertEquals(0,$row['autologin']);
-
-		$this->assertEquals($this->oldHash,$this->hashUsersExcept('Admin'));
-	}
 }
 ?>
