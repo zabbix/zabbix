@@ -655,6 +655,7 @@ FIELD		|hosttemplateid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|hostid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY	|hosts
 FIELD		|templateid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY	|hosts
 UNIQUE		|1		|hostid,templateid
+INDEX		|2		|templateid
 
 TABLE|housekeeper|housekeeperid|0
 FIELD		|housekeeperid	|t_id		|'0'	|NOT NULL	|0

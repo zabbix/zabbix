@@ -33,7 +33,7 @@ const char	usage_message[] = "[-Vhv] {[-zpsI] -ko | [-zpI] -T -i <file> -r} [-c 
 #ifdef HAVE_GETOPT_LONG
 const char	*help_message[] = {
 	"Options:",
-	"  -c --config <file>                   Specify configuration file",
+	"  -c --config <file>                   Specify absolute path to the configuration file",
 	"",
 	"  -z --zabbix-server <server>          Hostname or IP address of Zabbix Server",
 	"  -p --port <server port>              Specify port number of server trapper running on the server. Default is 10051",
@@ -62,7 +62,7 @@ const char	*help_message[] = {
 #else
 const char	*help_message[] = {
 	"Options:",
-	"  -c <file>                    Specify configuration file",
+	"  -c <file>                    Specify absolute path to the configuration file",
 	"",
 	"  -z <server>                  Hostname or IP address of Zabbix Server",
 	"  -p <server port>             Specify port number of server trapper running on the server. Default is 10051",
@@ -222,13 +222,12 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 					ret = SUCCEED;
 			}
 		}
+
+		zbx_tcp_close(&sock);
 	}
-	zbx_tcp_close(&sock);
 
 	if (FAIL == tcp_ret)
-	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Send value error: %s", zbx_tcp_strerror());
-	}
 
 	zbx_thread_exit(ret);
 }

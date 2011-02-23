@@ -51,7 +51,7 @@ static int		sql_allocated = 65536;
 
 static unsigned char	zbx_process;
 
-extern int		CONFIG_DBSYNCER_FREQUENCY;
+extern int		CONFIG_HISTSYNCER_FREQUENCY;
 
 static int		ZBX_HISTORY_SIZE = 0;
 int			ZBX_SYNC_MAX = 1000;	/* Must be less than ZBX_HISTORY_SIZE */
@@ -154,7 +154,7 @@ ZBX_DC_CACHE		*cache = NULL;
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -267,7 +267,7 @@ void	*DCget_stats(int request)
  *                                                                            *
  * Return value: pointer to a trend structure                                 *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -297,7 +297,7 @@ static ZBX_DC_TREND	*DCget_trend(zbx_uint64_t itemid)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -661,7 +661,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -694,7 +694,7 @@ static void	DCflush_trend(ZBX_DC_TREND *trend, ZBX_DC_TREND **trends, int *trend
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -747,7 +747,7 @@ static void	DCadd_trend(ZBX_DC_HISTORY *history, ZBX_DC_TREND **trends, int *tre
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -797,7 +797,7 @@ static void	DCmass_update_trends(ZBX_DC_HISTORY *history, int history_num)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -846,7 +846,7 @@ static void	DCsync_trends()
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Alexei Vladishev, Aleksander Vladishev                             *
+ * Author: Alexei Vladishev, Alexander Vladishev                              *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1003,7 +1003,7 @@ static int	DBchk_double(double value)
  * Parameters: history - array of history data                                *
  *             history_num - number of history structures                     *
  *                                                                            *
- * Author: Alexei Vladishev, Eugene Grigorjev, Aleksander Vladishev           *
+ * Author: Alexei Vladishev, Eugene Grigorjev, Alexander Vladishev            *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1324,7 +1324,7 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
  * Parameters: history - array of history data                                *
  *             history_num - number of history structures                     *
  *                                                                            *
- * Author: Alexei Vladishev, Eugene Grigorjev, Aleksander Vladishev           *
+ * Author: Alexei Vladishev, Eugene Grigorjev, Alexander Vladishev            *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1398,7 +1398,7 @@ static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
  * Parameters: history - array of history data                                *
  *             history_num - number of history structures                     *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1857,7 +1857,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
  * Parameters: history - array of history data                                *
  *             history_num - number of history structures                     *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -2131,7 +2131,7 @@ int	DCsync_history(int sync_type)
 		history = zbx_malloc(history, ZBX_SYNC_MAX * sizeof(ZBX_DC_HISTORY));
 
 	syncs = cache->history_num / ZBX_SYNC_MAX;
-	max_delay = (int)time(NULL) - CONFIG_DBSYNCER_FREQUENCY;
+	max_delay = (int)time(NULL) - CONFIG_HISTSYNCER_FREQUENCY;
 
 	do
 	{
@@ -2257,7 +2257,7 @@ finish:
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -2323,7 +2323,7 @@ quit:
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -2395,7 +2395,7 @@ retry:
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -2433,7 +2433,7 @@ static void	DCadd_history(zbx_uint64_t itemid, double value_orig, int clock)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -2471,7 +2471,7 @@ static void	DCadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value_orig, int
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -2514,7 +2514,7 @@ static void	DCadd_history_str(zbx_uint64_t itemid, char *value_orig, int clock)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -2557,7 +2557,7 @@ static void	DCadd_history_text(zbx_uint64_t itemid, char *value_orig, int clock)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -2616,7 +2616,7 @@ static void	DCadd_history_log(zbx_uint64_t itemid, char *value_orig, int clock, 
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -2713,7 +2713,7 @@ void	init_database_cache(unsigned char p)
 	ZBX_HISTORY_SIZE = CONFIG_HISTORY_CACHE_SIZE / sizeof(ZBX_DC_HISTORY);
 	if (ZBX_SYNC_MAX > ZBX_HISTORY_SIZE)
 		ZBX_SYNC_MAX = ZBX_HISTORY_SIZE;
-	ZBX_ITEMIDS_SIZE = CONFIG_DBSYNCER_FORKS * ZBX_SYNC_MAX;
+	ZBX_ITEMIDS_SIZE = CONFIG_HISTSYNCER_FORKS * ZBX_SYNC_MAX;
 
 	/* history cache */
 
@@ -3050,7 +3050,7 @@ retry:
  *                                                                            *
  * Return value: last clock or FAIL if item not found in dbcache              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *

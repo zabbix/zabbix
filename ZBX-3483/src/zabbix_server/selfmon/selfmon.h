@@ -1,6 +1,6 @@
 /*
-** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,17 +17,9 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#include "common.h"
+#ifndef ZABBIX_SELFMON_H
+#define ZABBIX_SELFMON_H
 
-#include "zbxplugin.h"
+void	main_selfmon_loop();
 
-ZBX_PLUGIN_LIST	*PluginsList = NULL;
-
-
-int add_plugin(char *args)
-{
-#ifdef TODO
-#	error Realize plugin functionality!!!
 #endif
-	return 0;
-}

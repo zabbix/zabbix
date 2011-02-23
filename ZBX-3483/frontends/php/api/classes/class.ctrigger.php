@@ -765,11 +765,11 @@ Copt::memoryPick();
 // Adding groups
 		if(!is_null($options['select_groups']) && str_in_array($options['select_groups'], $subselects_allowed_outputs)){
 			$obj_params = array(
-					'nodeids' => $nodeids,
-					'output' => $options['select_groups'],
-					'triggerids' => $triggerids,
-					'preservekeys' => 1
-				);
+				'nodeids' => $nodeids,
+				'output' => $options['select_groups'],
+				'triggerids' => $triggerids,
+				'preservekeys' => 1
+			);
 			$groups = CHostgroup::get($obj_params);
 			foreach($groups as $groupid => $group){
 				$gtriggers = $group['triggers'];

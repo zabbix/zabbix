@@ -20,6 +20,6 @@
 #ifndef ZABBIX_ZBXEXEC_H
 #define ZABBIX_ZBXEXEC_H
 
-int	zbx_execute(const char *command, char **buffer, char *error, size_t max_error_len);
+int	zbx_execute(const char *command, char **buffer, char *error, size_t max_error_len, int timeout);
 
 #endif	/* ZABBIX_ZBXEXEC_H */

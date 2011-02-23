@@ -1073,12 +1073,9 @@ Copt::memoryPick();
 		$config = select_config();
 		$user['auth_type'] = $config['authentication_type'];
 
-		$login = self::authenticate($user);
-
-		if($login){
-// TODO: why we need to recheck authentication???
-			self::checkAuthentication($login);
-			return $login;
+		$sessionid = self::authenticate($user);
+		if(($sessionid !== false) && self::checkAuthentication(array('sessionid' => $sessionid))){
+			return $sessionid;
 		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => $_REQUEST['message']);
