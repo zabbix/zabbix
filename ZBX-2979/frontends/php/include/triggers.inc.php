@@ -3742,7 +3742,14 @@ function utf8RawUrlDecode($source){
 				'value_type'	=> S_0_OR_1,
 				'type'			=> T_ZBX_INT,
 				'validation'	=> IN('0,1')
-				);
+			);
+		}
+		else if(preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $expr)){
+			$result = array(
+				'value_type'	=> S_0_OR_1,
+				'type'			=> T_ZBX_INT,
+				'validation'	=> NOT_EMPTY
+			);
 		}
 		else{
 			$hostId = $itemId = $function = null;

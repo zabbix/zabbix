@@ -64,7 +64,6 @@ include_once('include/page_header.php');
 		$macrosData = array();
 
 		foreach($triggerExpr->expressions as $exprPart){
-
 			$macrosId = md5($exprPart['expression']);
 
 			if(isset($macrosData[$exprPart['expression']])) continue;
@@ -73,6 +72,7 @@ include_once('include/page_header.php');
 			$macrosData[$exprPart['expression']] = get_request($fname, '');
 
 			$info = get_item_function_info($exprPart['expression']);
+
 			$octet = ($info['value_type'] == 'HHMMSS');
 
 			$validation = $info['validation'];
@@ -90,7 +90,7 @@ include_once('include/page_header.php');
 				$allowedTesting = false;
 			}
 
-			$data_table->addRow(new CRow(array($exprPart['expression'], is_array($info) || !isset($definedErrorPhrases[$info]) ? $info['value_type'] : new CCol($definedErrorPhrases[$info], 'disaster'), $control)));
+			$data_table->addRow(new CRow(array($exprPart['expression'], (is_array($info) || !isset($definedErrorPhrases[$info])) ? $info['value_type'] : new CCol($definedErrorPhrases[$info], 'disaster'), $control)));
 			$fields[$fname] = array($info['type'], O_OPT, null, $validation, 'isset({test_expression})', $exprPart['expression']);
 		}
 	}
