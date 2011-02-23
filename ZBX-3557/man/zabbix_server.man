@@ -1,0 +1,34 @@
+.TH ZABBIX_SERVER 8 "4 August 2009"
+.SH NAME
+zabbix_server \- Zabbix server daemon.
+.SH SYNOPSIS
+.B zabbix_server [-hV] [-c 
+.I config-file
+.B ] [-n <nodeid>]
+.SH DESCRIPTION
+.B zabbix_server
+is a core daemon of Zabbix software.
+.SS Options
+.IP "-c, --config config-file"
+Use the alternate system wide
+.I config-file
+instead of
+.I /etc/zabbix/zabbix_server.conf
+.
+.IP "-n, --new-nodeid nodeid"
+Convert database data to new nodeid.
+.IP "-h, --help"
+Display this help and exit.
+.IP "-V, --version"
+Output version information and exit.
+.SH FILES
+.TP
+.I /etc/zabbix/zabbix_server.conf
+Default location of Zabbix Server configuration file.
+.SH "SEE ALSO"
+.BR zabbix_agentd (8),
+.BR zabbix_get (8),
+.BR zabbix_proxy (8),
+.BR zabbix_sender (8)
+.SH AUTHOR
+Alexei Vladishev <alex@zabbix.com>
