@@ -115,7 +115,7 @@ include_once('include/page_header.php');
 
 
 	if(!(isset($_REQUEST['sysmapid']) && isset($maps[$_REQUEST['sysmapid']]))){
-		show_error_message(_('No permissions or map does not exist.'));
+		show_error_message(S_NO_PERMISSIONS_OR_MAP_DOES_NOT_EXIST);
 	}
 	else{
 		$map_wdgt = new CWidget('hat_maps');
