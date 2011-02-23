@@ -89,6 +89,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
  
+ - [ZBX-2979] fixed trigger function time() test (Aly)
  - [ZBX-3563] fixed host group filter in graph selection popup (Aly)
  - [ZBX-3544] fixed user login method reseting attempts (Aly)
  - [ZBX-3555] fixed possible pollers hang while processing ssh.run[] checks (Sasha)
