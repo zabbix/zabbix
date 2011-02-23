@@ -66,39 +66,34 @@
 		}
 	}
 
-/*
- * Function: item_type2str
- *
- * Description:
- *     Represent integer value of item type as string
- *
- * Author:
- *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
- *
- * Comments:
- *
- */
-	function item_type2str($type){
-		switch($type){
-			case ITEM_TYPE_ZABBIX:		$type = S_ZABBIX_AGENT;			break;
-			case ITEM_TYPE_SNMPV1:		$type = S_SNMPV1_AGENT;			break;
-			case ITEM_TYPE_TRAPPER:		$type = S_ZABBIX_TRAPPER;		break;
-			case ITEM_TYPE_SIMPLE:		$type = S_SIMPLE_CHECK;			break;
-			case ITEM_TYPE_SNMPV2C:		$type = S_SNMPV2_AGENT;			break;
-			case ITEM_TYPE_INTERNAL:	$type = S_ZABBIX_INTERNAL;		break;
-			case ITEM_TYPE_SNMPV3:		$type = S_SNMPV3_AGENT;			break;
-			case ITEM_TYPE_ZABBIX_ACTIVE:	$type = S_ZABBIX_AGENT_ACTIVE;		break;
-			case ITEM_TYPE_AGGREGATE:	$type = S_ZABBIX_AGGREGATE;		break;
-			case ITEM_TYPE_HTTPTEST:	$type = S_WEB_MONITORING;		break;
-			case ITEM_TYPE_EXTERNAL:	$type = S_EXTERNAL_CHECK;		break;
-			case ITEM_TYPE_DB_MONITOR:	$type = S_ZABBIX_DATABASE_MONITOR;	break;
-			case ITEM_TYPE_IPMI:		$type = S_IPMI_AGENT;			break;
-			case ITEM_TYPE_SSH:		$type = S_SSH_AGENT;			break;
-			case ITEM_TYPE_TELNET:		$type = S_TELNET_AGENT;			break;
-			case ITEM_TYPE_CALCULATED:	$type = S_CALCULATED;			break;
-			default:$type = S_UNKNOWN;			break;
+	function item_type2str($type=null){
+		$types = array(
+			ITEM_TYPE_ZABBIX => S_ZABBIX_AGENT,
+			ITEM_TYPE_SNMPV1 => S_SNMPV1_AGENT,
+			ITEM_TYPE_TRAPPER => S_ZABBIX_TRAPPER,
+			ITEM_TYPE_SIMPLE => S_SIMPLE_CHECK,
+			ITEM_TYPE_SNMPV2C => S_SNMPV2_AGENT,
+			ITEM_TYPE_INTERNAL => S_ZABBIX_INTERNAL,
+			ITEM_TYPE_SNMPV3 => S_SNMPV3_AGENT,
+			ITEM_TYPE_ZABBIX_ACTIVE => S_ZABBIX_AGENT_ACTIVE,
+			ITEM_TYPE_AGGREGATE => S_ZABBIX_AGGREGATE,
+			ITEM_TYPE_HTTPTEST => S_WEB_MONITORING,
+			ITEM_TYPE_EXTERNAL => S_EXTERNAL_CHECK,
+			ITEM_TYPE_DB_MONITOR => S_ZABBIX_DATABASE_MONITOR,
+			ITEM_TYPE_IPMI => S_IPMI_AGENT,
+			ITEM_TYPE_SSH => S_SSH_AGENT,
+			ITEM_TYPE_TELNET => S_TELNET_AGENT,
+			ITEM_TYPE_CALCULATED => S_CALCULATED,
+		);
+
+		if(is_null($type)){
+			natsort($types);
+			return $types;
 		}
-	return $type;
+		else if(isset($types[$type]))
+			return $types[$type];
+		else
+			return S_UNKNOWN;
 	}
 
 	/*
@@ -700,44 +695,41 @@
 		$item_data = get_item_by_itemid_limited($itemid);
 
 		$restore_rules= array(
-					'description'		=> array(),
-					'key_'			=> array(),
-					'hostid'		=> array(),
-					'delay'			=> array('template' => 1),
-					'history'		=> array('template' => 1 , 'httptest' => 1),
-					'status'		=> array('template' => 1 , 'httptest' => 1),
-					'type'			=> array(),
-					'snmp_community'	=> array('template' => 1),
-					'snmp_oid'		=> array(),
-					'snmp_port'		=> array('template' => 1),
-					'snmpv3_securityname'	=> array('template' => 1),
-					'snmpv3_securitylevel'	=> array('template' => 1),
-					'snmpv3_authpassphrase'	=> array('template' => 1),
-					'snmpv3_privpassphrase'	=> array('template' => 1),
-					'value_type'		=> array(),
-					'data_type'		=> array(),
-					'trapper_hosts'		=> array('template' =>1 ),
-					'units'			=> array(),
-					'multiplier'		=> array(),
-					'delta'			=> array('template' => 1 , 'httptest' => 1),
-					'formula'		=> array(),
-					'trends'		=> array('template' => 1 , 'httptest' => 1),
-					'logtimefmt'		=> array(),
-					'valuemapid'		=> array('httptest' => 1),
-					'authtype'		=> array('template' => 1),
-					'username'		=> array('template' => 1),
-					'password'		=> array('template' => 1),
-					'publickey'		=> array('template' => 1),
-					'privatekey'		=> array('template' => 1),
-					'params'		=> array('template' => 1),
-					'delay_flex'		=> array('template' => 1),
-					'ipmi_sensor'		=> array());
+			'description'		=> array(),
+			'key_'			=> array(),
+			'hostid'		=> array(),
+			'delay'			=> array('template' => 1),
+			'history'		=> array('template' => 1 , 'httptest' => 1),
+			'status'		=> array('template' => 1 , 'httptest' => 1),
+			'type'			=> array(),
+			'snmp_community'	=> array('template' => 1),
+			'snmp_oid'		=> array(),
+			'snmp_port'		=> array('template' => 1),
+			'snmpv3_securityname'	=> array('template' => 1),
+			'snmpv3_securitylevel'	=> array('template' => 1),
+			'snmpv3_authpassphrase'	=> array('template' => 1),
+			'snmpv3_privpassphrase'	=> array('template' => 1),
+			'value_type'		=> array(),
+			'data_type'		=> array(),
+			'trapper_hosts'		=> array('template' =>1 ),
+			'units'			=> array(),
+			'multiplier'		=> array(),
+			'delta'			=> array('template' => 1 , 'httptest' => 1),
+			'formula'		=> array(),
+			'trends'		=> array('template' => 1 , 'httptest' => 1),
+			'logtimefmt'		=> array(),
+			'valuemapid'		=> array('httptest' => 1),
+			'authtype'		=> array('template' => 1),
+			'username'		=> array('template' => 1),
+			'password'		=> array('template' => 1),
+			'publickey'		=> array('template' => 1),
+			'privatekey'		=> array('template' => 1),
+			'params'		=> array('template' => 1),
+			'delay_flex'		=> array('template' => 1),
+			'ipmi_sensor'		=> array()
+		);
 
 		foreach($restore_rules as $var_name => $info){
-/*			if(($item_data['type'] == ITEM_TYPE_HTTPTEST) && !isset($info['httptest'])){
-				$item[$var_name] = $item_data[$var_name];
-			}*/
-
 			if(!isset($info['template']) && (0 != $item_data['templateid'])){
 				$item[$var_name] = $item_data[$var_name];
 			}
@@ -769,7 +761,8 @@
 		 */
 		$requireRules = array(
 			'authtype2' => array(
-				'type' => array(ITEM_TYPE_SSH)),
+				'type' => array(ITEM_TYPE_SSH)
+			),
 			'username' => array(
 				'type' => array(ITEM_TYPE_SSH, ITEM_TYPE_TELNET),
 				//'authtype' => array(ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY)
@@ -805,7 +798,7 @@
 						unset($item[$field]);
 					}
 					else if(!in_array($item_data[$requireField], $allowArray)){
-							unset($item[$field]);
+						unset($item[$field]);
 					}
 				}
 			}
@@ -817,11 +810,7 @@
 			}
 		}
 
-
-/*		if($item_data['type'] == ITEM_TYPE_HTTPTEST)
-			$item['applications'] = get_applications_by_itemid($itemid);*/
-
-	return update_item($itemid,$item);
+		return update_item($itemid,$item);
 	}
 
 	/*

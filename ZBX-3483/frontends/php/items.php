@@ -810,7 +810,7 @@ switch($itemType) {
 		$items_wdgt->addItem(insert_item_form());
 	}
 	else if((($_REQUEST['go'] == 'massupdate') || isset($_REQUEST['massupdate'])) && isset($_REQUEST['group_itemid'])){
-		$items_wdgt->addItem(insert_mass_update_item_form('group_itemid'));
+		$items_wdgt->addItem(insert_mass_update_item_form());
 	}
 	else if(($_REQUEST['go'] == 'copy_to') && isset($_REQUEST['group_itemid'])){
 		$items_wdgt->addItem(insert_copy_elements_to_forms('group_itemid'));
