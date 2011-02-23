@@ -36,74 +36,70 @@ $definedErrorPhrases = array(
 			EXPRESSION_NOT_A_MACRO_ERROR => S_EXPRESSION_NOT_A_MACRO_ERROR);
 
 include_once('include/page_header.php');
-
+?>
+<?php
 //----------------------------------------------------------------------
 
 // expression analyze
 	$expression = urldecode(get_request('expression', ''));
 	
 	define('NO_LINK_IN_TESTING', true);
-	$expressionData = parseTriggerExpressions($expression, true);
+	$triggerExpr = new CTriggerExpression(array('expression' => $expression));
 	list($outline, $eHTMLTree) = analyze_expression($expression);
 
 // test data (create table, create check fields)
 
 	$data_table = new CTable(null, 'tableinfo');
 	$data_table->setAttribute('id', 'data_list');
-	$data_table->setOddRowClass('even_row');
-	$data_table->setEvenRowClass('even_row');
+
 	$data_table->setHeader(array(S_EXPRESSION_VARIABLE_ELEMENTS, S_RESULT_TYPE, S_VALUE));
 
+	$octet = false;
 	$datas = array();
 	$fields = array();
 	$rplcts = array();
 	$allowedTesting = true;
 
-	if(!isset($expressionData[$expression]['errors']) && isset($expressionData[$expression]['allMacros'])) {
+	if(empty($triggerExpr->errors)){
 		$macrosData = array();
-		foreach ($expressionData[$expression]['allMacros'] as $macros){
-			$macroStr = zbx_substr($expression, $macros['openSymbolNum'], $macros['closeSymbolNum']-$macros['openSymbolNum']+1);
-			//SDI($macroStr);
-			
-			$macrosId = md5($macroStr);
-			$skip = isset($macrosData[$macrosId]);
-			
-			$rplcts[$macros['openSymbolNum'].'_'.$macros['closeSymbolNum']] = array('start' => $macros['openSymbolNum'], 'end' => $macros['closeSymbolNum'], 'item' => &$macrosData[$macrosId]);
-			
-			if($skip) continue;
+
+		foreach($triggerExpr->expressions as $exprPart){
+			$macrosId = md5($exprPart['expression']);
+
+			if(isset($macrosData[$exprPart['expression']])) continue;
 
 			$fname = 'test_data_'.$macrosId;
-			$macrosData[$macrosId]['cValue'] = get_request($fname, '');
-			$info = get_item_function_info($macroStr);
-			//SDII($info);
+			$macrosData[$exprPart['expression']] = get_request($fname, '');
+
+			$info = get_item_function_info($exprPart['expression']);
+
+			$octet = ($info['value_type'] == 'HHMMSS');
 
 			$validation = $info['validation'];
-
 			if(substr($validation, 0, COMBO_PATTERN_LENGTH) == COMBO_PATTERN){
 				$vals = explode(',', substr($validation, COMBO_PATTERN_LENGTH, zbx_strlen($validation) - COMBO_PATTERN_LENGTH - 4));
 
 				$control = new CComboBox($fname, $macrosData[$macrosId]['cValue']);
 				foreach ($vals as $v) $control->addItem($v, $v);
-			}else
-				$control = new CTextBox($fname, $macrosData[$macrosId]['cValue'], 30);
+			}
+			else
+				$control = new CTextBox($fname, $macrosData[$exprPart['expression']], 30);
 			
 			if(!is_array($info) && isset($definedErrorPhrases[$info])) {
 				$control->setAttribute('disabled', 'disabled');
 				$allowedTesting = false;
 			}
 
-			$data_table->addRow(new CRow(array($macroStr, is_array($info) || !isset($definedErrorPhrases[$info]) ? $info['value_type'] : new CCol($definedErrorPhrases[$info], 'disaster'), $control)));
-			$fields[$fname] = array($info['type'], O_OPT, null, $validation, 'isset({test_expression})', $macroStr);
+			$data_table->addRow(new CRow(array($exprPart['expression'], (is_array($info) || !isset($definedErrorPhrases[$info])) ? $info['value_type'] : new CCol($definedErrorPhrases[$info], 'disaster'), $control)));
+			$fields[$fname] = array($info['type'], O_OPT, null, $validation, 'isset({test_expression})', $exprPart['expression']);
 		}
 	}
-
 //---------------------------------- CHECKS ------------------------------------
 
 	$fields['test_expression'] = array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null);
 	if(!check_fields($fields)) {
 		$test = false;
 	}
-
 
 //------------------------ <ACTIONS> ---------------------------
 	if(isset($_REQUEST['test_expression'])){
@@ -137,12 +133,9 @@ include_once('include/page_header.php');
 	foreach($eHTMLTree as $e){
 		//if(!isset($e['expression']))
 			//continue;
-		
 		$result = '-';
 		if($allowedTesting && $test && isset($e['expression'])){
-			$evStr = replaceExpressionTestData($expression, $e, $rplcts);
-			if(preg_match("/^[0-9.\s=!()><+*\/&|\-]+$/is", $evStr)) eval('$result = '.$evStr.';');
-			$result = $result === true || ($result && $result != '-') ? 'TRUE' : 'FALSE';
+			$result = evalExpressionData($e['expression']['value'], $macrosData, $octet);
 		}
 
 		$style = 'text-align: center;';
@@ -156,10 +149,7 @@ include_once('include/page_header.php');
 
 	$result = '-';
 	if($allowedTesting && $test){
-		$e['expression'] = array('start' => 0, 'end' => zbx_strlen($expression), 'oSym' => NULL, 'cSym' => NULL);
-		$evStr = replaceExpressionTestData($expression, $e, $rplcts);
-		if(preg_match("/^[0-9.\s=!()><+*\/&|\-]+$/is", $evStr)) eval('$result = '.$evStr.';');
-		$result = $result === true || ($result && $result != '-') ? 'TRUE' : 'FALSE';
+		$result = evalExpressionData($expression, $macrosData, $octet);
 	}
 
 	$style = 'text-align: center;';
