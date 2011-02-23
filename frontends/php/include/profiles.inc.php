@@ -231,7 +231,7 @@ function update_config($configs){
 		}
 	}
 
-// cycle for 6 severities. check color value for each severity.
+// check color value for each severity.
 	for($i=0; $i<TRIGGER_SEVERITY_COUNT; $i++){
 		$varName = 'severity_color_'.$i;
 		if(isset($configs[$varName]) && !is_null($configs[$varName])){
@@ -244,7 +244,7 @@ function update_config($configs){
 
 
 	$currentConfig = select_config();
-// cycle for 6 severities. check color value for each severity.
+// check duplicate severity names.
 	$names = array();
 	for($i=0; $i<TRIGGER_SEVERITY_COUNT; $i++){
 		$varName = 'severity_name_'.$i;
