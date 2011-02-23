@@ -193,8 +193,8 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	}
 	else if (0 == strcmp(tmp, "process"))	/* zabbix["process",<process_type>,<process_num>,<process_state>] */
 	{
-		unsigned char	process_type, state;
-		unsigned short	process_num;
+		unsigned char	process_type;
+		int		process_forks;
 		double		value;
 
 		if (nparams > 4)
@@ -210,29 +210,50 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		if (ZBX_PROCESS_TYPE_COUNT == process_type)
 			goto not_supported;
 
+		process_forks = get_process_type_forks(process_type);
+
 		if (0 != get_param(params, 3, tmp, sizeof(tmp)))
 			*tmp = '\0';
 
-		if ('\0' == *tmp || 0 == strcmp(tmp, "all"))
-			process_num = 0;	/* all processes */
-		else if (FAIL == is_ushort(tmp, &process_num) || 0 == process_num ||
-				process_num > get_process_type_forks(process_type))
-			goto not_supported;
+		if (0 == strcmp(tmp, "count"))
+		{
+			if (nparams > 3)
+				goto not_supported;
 
-		if (0 != get_param(params, 4, tmp, sizeof(tmp)))
-			*tmp = '\0';
-
-		if ('\0' == *tmp || 0 == strcmp(tmp, "busy"))
-			state = ZBX_PROCESS_STATE_BUSY;
-		else if (0 == strcmp(tmp, "idle"))
-			state = ZBX_PROCESS_STATE_IDLE;
+			SET_UI64_RESULT(result, process_forks);
+		}
 		else
-			goto not_supported;
+		{
+			unsigned char	aggr_func, state;
+			unsigned short	process_num = 0;
 
-		if (NOTSUPPORTED == get_selfmon_stats(process_type, process_num, state, &value))
-			goto not_supported;
+			if ('\0' == *tmp || 0 == strcmp(tmp, "avg"))
+				aggr_func = ZBX_AGGR_FUNC_AVG;
+			else if (0 == strcmp(tmp, "max"))
+				aggr_func = ZBX_AGGR_FUNC_MAX;
+			else if (0 == strcmp(tmp, "min"))
+				aggr_func = ZBX_AGGR_FUNC_MIN;
+			else if (SUCCEED == is_ushort(tmp, &process_num) && process_num > 0 &&
+					process_num <= process_forks)
+				aggr_func = ZBX_AGGR_FUNC_ONE;
+			else
+				goto not_supported;
 
-		SET_DBL_RESULT(result, value);
+			if (0 != get_param(params, 4, tmp, sizeof(tmp)))
+				*tmp = '\0';
+
+			if ('\0' == *tmp || 0 == strcmp(tmp, "busy"))
+				state = ZBX_PROCESS_STATE_BUSY;
+			else if (0 == strcmp(tmp, "idle"))
+				state = ZBX_PROCESS_STATE_IDLE;
+			else
+				goto not_supported;
+
+			if (NOTSUPPORTED == get_selfmon_stats(process_type, aggr_func, process_num, state, &value))
+				goto not_supported;
+
+			SET_DBL_RESULT(result, value);
+		}
 	}
 	else if (0 == strcmp(tmp, "wcache"))
 	{
