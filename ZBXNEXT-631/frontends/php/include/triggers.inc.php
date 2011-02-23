@@ -234,27 +234,7 @@ function get_accessible_triggers($perm, $hostids, $cache=1){
 return $result;
 }
 
-/*
- * Function: getEventColor()
- * Description: convert trigger severity and event value in to the RGB color
- * Author: Aly
- */
-function getEventColor($severity, $value=TRIGGER_VALUE_TRUE){
-	if($value == TRIGGER_VALUE_FALSE) return 'AADDAA';
-
-	switch($severity){
-		case TRIGGER_SEVERITY_DISASTER: $color='FF0000'; break;
-		case TRIGGER_SEVERITY_HIGH: $color='FF8888'; break;
-		case TRIGGER_SEVERITY_AVERAGE: $color='DDAAAA'; break;
-		case TRIGGER_SEVERITY_WARNING: $color='EFEFCC'; break;
-		case TRIGGER_SEVERITY_INFORMATION: $color='CCE2CC'; break;
-		default: $color='BCBCBC';
-	}
-
-return $color;
-}
-
-function get_severity_style($severity, $type=true){
+function getSeverityStyle($severity, $type=true){
 	$styles = array(
 		TRIGGER_SEVERITY_DISASTER => 'disaster',
 		TRIGGER_SEVERITY_HIGH => 'high',
@@ -264,15 +244,12 @@ function get_severity_style($severity, $type=true){
 		TRIGGER_SEVERITY_NOT_CLASSIFIED => 'unknown_trigger',
 	);
 
-	if(!$type){
+	if(!$type)
 		return 'normal';
-	}
-	else if(isset($styles[$severity])){
+	else if(isset($styles[$severity]))
 		return $styles[$severity];
-	}
-	else{
+	else
 		return '';
-	}
 }
 
 function getSeverityCaption($severity=null){
@@ -294,7 +271,9 @@ function getSeverityCaption($severity=null){
 	else return _('Unknown');
 }
 
-function getSeverityColor($severity){
+function getSeverityColor($severity, $value=TRIGGER_VALUE_TRUE){
+	if($value == TRIGGER_VALUE_FALSE) return 'AAFFAA';
+
 	$config = select_config();
 
 	switch($severity){
@@ -328,7 +307,7 @@ function getSeverityCell($severity, $text=null, $force_normal=false){
 		$text = getSeverityCaption($severity);
 	}
 
-	return new CCol($text, get_severity_style($severity, !$force_normal));
+	return new CCol($text, getSeverityStyle($severity, !$force_normal));
 }
 
 /*
@@ -2006,7 +1985,7 @@ function utf8RawUrlDecode($source){
 
 			switch($trhosts[$hostname]['value']){
 				case TRIGGER_VALUE_TRUE:
-					$css_class = get_severity_style($trhosts[$hostname]['priority']);
+					$css_class = getSeverityStyle($trhosts[$hostname]['priority']);
 					$ack = null;
 
 					if($config['event_ack_enable'] == 1){
