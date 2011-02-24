@@ -28,6 +28,7 @@ ul.objectlist li{
 
 ul.formlist li div.dd{
 	padding-left: 1%;
+	margin-left: 0;
 }
 
 /* INPUT */
@@ -42,3 +43,19 @@ ul.formlist li div.dd{
 
 .footer .dt input.main{ height: 25px; }
 .footer .dd { padding-left: 1%; }
+
+
+/* form info line */
+.formrow .listInfoLabel{
+	display: block;
+	float: left;
+	padding: 8px 0;
+}
+
+.formrow .listInfoText{
+	margin-left: 21%;
+}
+
+.listInfo{
+	display: list-item;
+}

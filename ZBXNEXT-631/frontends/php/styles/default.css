@@ -182,6 +182,22 @@ div.footer .formrow .main:hover{ border-color: #DD7711; }
 .select{ cursor: pointer; margin: 1px 4px 1px 2px; }
 .selectShorten{ width: 200px; }
 
+
+.formrow .listInfoLabel{
+	vertical-align: middle;
+	display: table-cell;
+	height:100%;
+}
+
+.formrow .listInfoText{
+	margin-left: 1%;
+}
+
+.listInfo{
+	width: 100%;
+	display: table;
+}
+
 /******************* BUTTONS *********************/
 .button{ border: 1px solid #808080; vertical-align: top; margin: 1px 2px 0 0; background: #F0F0F0 url('../images/gradients/button.gif') repeat-x top left; }
 .button:hover{ text-decoration: underline; border-color: black; cursor: pointer; }
@@ -245,7 +261,7 @@ div.footer .formrow .main:hover{ border-color: #DD7711; }
 
 .widget .footer { color: white; line-height: 12px; height: 12px; padding: 4px 4px; margin-top: 2px;}
 
-.inlineblock{ display: inline-block; }
+.inlineblock{ display: inline-block;}
 
 
 span.footer_sign{ padding-right: 5px; padding-left: 5px; }
@@ -530,7 +546,7 @@ table.server_info tr td.header {  background: #5c9ccc url(originalblue/images/ui
 table.server_info tr.status td{ white-space: nowrap; word-spacing: 0; }
 /**************** WARNING ***********/
 
-table.warning{
+table.warningTable{
 	border-spacing:	0; /* cellspacing */
 	border-collapse: collapse;
 	border: 2px solid gray;
@@ -539,15 +555,15 @@ table.warning{
 	background-color: #EAEAEA;
 }
 
-table.warning td{ padding:	10px; line-height: 20px;}
-table.warning tr.header{ height: 24px; border: 1px black solid; background-color: #F00000; color: white; font-weight: bold; }
-table.warning tr.header td{ padding: 2px;}
-table.warning tr.footer{ height: 34px; border-top: 1px black dotted;}
-table.warning tr.footer td{ padding: 2px; }
-table.warning tr td.left{ padding-left: 10px; padding-right: 5px; white-space: nowrap; word-spacing: 0; text-align: left;}
-table.warning tr td.right{ width: 100%; padding-left: 5px; padding-right: 10px; text-align: right; vertical-align: text-top; }
-table.warning tr.center td.left{ vertical-align: text-top; padding-top: 0; }
-table.warning tr.center td.right{
+table.warningTable td{ padding:	10px; line-height: 20px;}
+table.warningTable tr.header{ height: 24px; border: 1px black solid; background-color: #F00000; color: white; font-weight: bold; }
+table.warningTable tr.header td{ padding: 2px;}
+table.warningTable tr.footer{ height: 34px; border-top: 1px black dotted;}
+table.warningTable tr.footer td{ padding: 2px; }
+table.warningTable tr td.left{ padding-left: 10px; padding-right: 5px; white-space: nowrap; word-spacing: 0; text-align: left;}
+table.warningTable tr td.right{ width: 100%; padding-left: 5px; padding-right: 10px; text-align: right; vertical-align: text-top; }
+table.warningTable tr.center td.left{ vertical-align: text-top; padding-top: 0; }
+table.warningTable tr.center td.right{
 	padding: 	5px;
 	vertical-align:	middle;
 	text-align: 	center;
@@ -673,3 +689,5 @@ table.suggest tr td{ text-align: left; padding-left: 4px; line-height: 2.2em; fo
 .loginLogo{ height: 53px; width: 163px; background-image: url(../images/general/login/logo.png); background-repeat: no-repeat; }
 
 .vertical-middle {width: 100%; display: table-cell; vertical-align: middle; *position: absolute; *top: 50%;}
+
+

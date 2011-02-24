@@ -322,7 +322,7 @@ function __autoload($class_name){
 			$req = new Curl($_SERVER['REQUEST_URI']);
 			$req->setArgument('sid', null);
 
-			$table = new CTable(null, 'warning');
+			$table = new CTable(null, 'warningTable');
 			$table->setAlign('center');
 			$table->setHeader(new CCol(S_CONFIG_ERROR_YOU_ARE_NOT_LOGGED_IN_HEAD, 'left'),'header');
 
