@@ -905,8 +905,10 @@ require_once('include/js.inc.php');
 					$item = get_screen_item_form();
 					$item_form = true;
 				}
-				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_GRAPH) ){
-					if($editmode == 0)	$action = 'charts.php?graphid='.$resourceid.url_param('period').url_param('stime');
+				else if(($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_GRAPH)){
+					if($editmode == 0){
+						$action = 'charts.php?graphid='.$resourceid.url_param('period').url_param('stime');
+					}
 
 // GRAPH & ZOOM features
 					$dom_graph_id = 'graph_'.$screenitemid.'_'.$resourceid;
@@ -918,33 +920,58 @@ require_once('include/js.inc.php');
 
 					$graph = get_graph_by_graphid($resourceid);
 
-					if($graph){
-						$graphid = $graph['graphid'];
-						$legend = $graph['show_legend'];
-						$graph3d = $graph['show_3d'];
-					}
+					$graphid = $graph['graphid'];
+					$legend = $graph['show_legend'];
+					$graph3d = $graph['show_3d'];
 //-------------
 
 // Host feature
-					if(($dynamic == SCREEN_DYNAMIC_ITEM) && isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0)){
+					if(($dynamic == SCREEN_DYNAMIC_ITEM) && isset($_REQUEST['hostid']) && ($_REQUEST['hostid'] > 0)){
+
 						$options = array(
-							'hostids' => $_REQUEST['hostid'],
-							'output' => API_OUTPUT_EXTEND
+							'graphids' => $resourceid,
+							'output' => API_OUTPUT_EXTEND,
+							'select_hosts' => array('hostid', 'host'),
+							'select_graph_items' => API_OUTPUT_EXTEND,
 						);
-						$hosts = CHost::get($options);
-						$host = reset($hosts);
+						$graph = CGraph::get($options);
+						$graph = reset($graph);
+						if(count($graph['hosts']) == 1){
+// if items from one host we change them, or set calculated if not exist on that host
+							if($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $graph['ymax_itemid']){
+								$new_dinamic = get_same_graphitems_for_host(
+									array(array('itemid' => $graph['ymax_itemid'])),
+									$_REQUEST['hostid'],
+									false // false = don't rise Error if item doesn't exist
+								);
+								$new_dinamic = reset($new_dinamic);
+								if(isset($new_dinamic['itemid']) && $new_dinamic['itemid'] > 0){
+									$graph['ymax_itemid'] = $new_dinamic['itemid'];
+								}
+								else{
+									$graph['ymax_type'] = GRAPH_YAXIS_TYPE_CALCULATED;
+								}
+							}
+							if($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $graph['ymin_itemid']){
+								$new_dinamic = get_same_graphitems_for_host(
+									array(array('itemid' => $graph['ymin_itemid'])),
+									$_REQUEST['hostid'],
+									false // false = don't rise Error if item doesn't exist
+								);
+								$new_dinamic = reset($new_dinamic);
+								if(isset($new_dinamic['itemid']) && $new_dinamic['itemid'] > 0){
+									$graph['ymin_itemid'] = $new_dinamic['itemid'];
+								}
+								else{
+									$graph['ymin_type'] = GRAPH_YAXIS_TYPE_CALCULATED;
+								}
+							}
+						}
 
-						$def_items = array();
-						$di_res = get_graphitems_by_graphid($resourceid);
-						while($gitem = DBfetch($di_res)) $def_items[] = $gitem;
 
-						$new_items = get_same_graphitems_for_host($def_items, $_REQUEST['hostid'], false);
-
-						if(($graph['graphtype']==GRAPH_TYPE_PIE) || ($graph['graphtype']==GRAPH_TYPE_EXPLODED))
-							$url = 'chart7.php';
-						else
-							$url = 'chart3.php';
-//-----
+						$url = (($graph['graphtype'] == GRAPH_TYPE_PIE) || ($graph['graphtype'] == GRAPH_TYPE_EXPLODED))
+								? 'chart7.php'
+								: 'chart3.php';
 
 						$url = new Curl($url);
 						foreach($graph as $name => $value){
@@ -953,7 +980,8 @@ require_once('include/js.inc.php');
 							$url->setArgument($name, $value);
 						}
 
-						foreach($new_items as $ginum => $gitem){
+						$new_items = get_same_graphitems_for_host($graph['gitems'], $_REQUEST['hostid'], false);
+						foreach($new_items as $gitem){
 							unset($gitem['gitemid']);
 							unset($gitem['graphid']);
 
@@ -962,17 +990,12 @@ require_once('include/js.inc.php');
 							}
 						}
 
+
+						$host = reset($graph['hosts']);
 						$url->setArgument('name', $host['host'].': '.$graph['name']);
 						$url = $url->getUrl();
 					}
 //-------------
-
-					if(($graphDims['graphtype'] == GRAPH_TYPE_PIE) || ($graphDims['graphtype'] == GRAPH_TYPE_EXPLODED)){
-						$src = 'chart6.php?graphid='.$resourceid.url_param('stime').'&period='.$effectiveperiod;
-					}
-					else{
-						$src = 'chart2.php?graphid='.$resourceid.url_param('stime').'&period='.$effectiveperiod;
-					}
 
 
 					$objData = array(
@@ -1005,7 +1028,6 @@ require_once('include/js.inc.php');
 						$src = $url.'&width='.$width.'&height='.$height.'&legend='.$legend.'&graph3d='.$graph3d.'&period='.$effectiveperiod.url_param('stime');
 
 						$objData['src'] = $src;
-
 					}
 					else{
 						if(($dynamic == SCREEN_SIMPLE_ITEM) || empty($url)){
@@ -1025,7 +1047,6 @@ require_once('include/js.inc.php');
 							}
 
 							$objData['loadSBox'] = 1;
-//							zbx_add_post_js('graph_zoom_init("'.$dom_graph_id.'",'.$stime.','.$effectiveperiod.','.$width.','.$height.', false);');
 						}
 
 						$objData['src'] = $src;
