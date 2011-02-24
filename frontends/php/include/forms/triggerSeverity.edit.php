@@ -53,6 +53,9 @@ for($i=0; $i<TRIGGER_SEVERITY_COUNT; $i++){
 	$severityTab->addRow(_s('Severity %s', $i), array($severityNameTB, SPACE._('Colour').SPACE, $severityColorTB));
 }
 
+$severityTab->addRow(SPACE);
+$severityTab->addInfo(_('Custom severity names affect all locales and require manual translation!'));
+
 $severityView = new CTabView();
 $severityView->addTab('severities', _('Trigger severities'), $severityTab);
 $severityForm->addItem($severityView);
