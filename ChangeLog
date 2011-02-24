@@ -89,6 +89,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
  
+ - [ZBX-3523] fixed error when open monitoring->maps and last viewed map was removed (Vedmak)
  - [ZBX-3557] fixed possible incorrect usage of internal array pointers in frontend (Aly)
  - [ZBX-2979] fixed trigger function time() test (Aly)
  - [ZBX-3563] fixed host group filter in graph selection popup (Aly)
