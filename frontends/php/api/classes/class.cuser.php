@@ -360,7 +360,7 @@ Copt::memoryPick();
 		$alias = array();
 		foreach($users as $unum => &$user){
 			if(!check_db_fields($userDBfields, $user)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for user "%s"', $user['alias']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for user "%s".', $user['alias']));
 			}
 
 // PERMISSION CHECK
@@ -381,10 +381,10 @@ Copt::memoryPick();
 			}
 			else{
 				if(bccomp(self::$userData['userid'], $user['userid']) == 0)
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('User is not allowed to delete it self.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('User is not allowed to delete himself.'));
 
 				if($dbUsers[$user['userid']]['alias'] == ZBX_GUEST_USER)
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Can not delete %1$s internal user "%2$s", try disabling that user.', S_ZABBIX, ZBX_GUEST_USER));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete %1$s internal user "%2$s", try disabling that user.', S_ZABBIX, ZBX_GUEST_USER));
 
 				continue;
 			}
@@ -418,7 +418,7 @@ Copt::memoryPick();
 
 			if(isset($user['usrgrps'])){
 				if(empty($user['usrgrps']))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('User "%s" can not be without user group.', $dbUser['alias']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('User "%s" cannot be without user group.', $dbUser['alias']));
 
 				if(bccomp(self::$userData['userid'], $user['userid']) == 0){
 					$usrgrps = API::UserGroup()->get(array(
@@ -438,7 +438,7 @@ Copt::memoryPick();
 			}
 
 			if(isset($user['type']) && (USER_TYPE_SUPER_ADMIN != self::$userData['type']))
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('You are not allowed to alter privilages for user "%s".', $dbUser['alias']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('You are not allowed to alter privileges for user "%s".', $dbUser['alias']));
 
 			if(isset($user['autologin']) && ($user['autologin'] == 1) && ($dbUser['autologout'] != 0))
 				$user['autologout'] = 0;
@@ -452,7 +452,7 @@ Copt::memoryPick();
 				}
 				else{
 					if(($dbUser['alias'] == ZBX_GUEST_USER) && !zbx_empty($user['passwd']))
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Not allowed to set password for user "guest"'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Not allowed to set password for user "guest".'));
 
 					$user['passwd'] = md5($user['passwd']);
 				}
