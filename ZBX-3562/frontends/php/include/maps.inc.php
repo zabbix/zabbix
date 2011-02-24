@@ -684,20 +684,22 @@
 
 			$parameter = substr($parameter, 0, $pos);
 */
-//		$pattern = "/{(?P<host>.+?):(?P<key>.+?)\.(?P<func>[^.]+?)\((?P<param>.+?)\)}/u";
-		$pattern="/{(?P<host>.[^}]*):(?P<key>.[^}]*)\.(?P<func>.[^}]*)\((?P<param>.[^}]*)\)*}/u";
+//		$pattern = "/{(?P<host>.[^:]+):(?P<key>.[^(]+)\.(?P<func>.[^)]*)\((?P<param>.[^)]*)\)*}/u";
+		$pattern = "/{[^:]+:.+\.[\w]+\([^}]+\)}/Uu";
 		preg_match_all($pattern, $label, $matches);
 		foreach($matches[0] as $num => $expr){
-			$host = $matches['host'][$num];
-			$key = $matches['key'][$num];
-			$function = $matches['func'][$num];
-			$parameter = $matches['param'][$num];
+			$trigExpr = new CTriggerExpression(array('expression' => $expr));
+			if(!empty($trigExpr->errors)) continue;
 
-			$options = array(
+			$host = reset($trigExpr->data['hosts']);
+			$key = reset($trigExpr->data['items']);
+			$function = reset($trigExpr->data['functions']);
+			$parameter = reset($trigExpr->data['functionParams']);
+
+			$db_item = CItem::get(array(
 				'filter' => array('host' => $host, 'key_' => $key),
 				'output' => API_OUTPUT_EXTEND
-			);
-			$db_item = CItem::get($options);
+			));
 			$db_item = reset($db_item);
 
 			if(!$db_item){
