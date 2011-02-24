@@ -1397,7 +1397,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 				if (NULL != processed)
 					(*processed)++;
 			}
-			else if (GET_MSG_RESULT(&agent))
+			else if (ISSET_MSG(&agent))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "Item [%s:%s] error: %s",
 						item.host.host, item.key_orig, agent.msg);
