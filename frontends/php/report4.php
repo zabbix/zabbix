@@ -175,7 +175,7 @@ include_once('include/page_header.php');
 		);
 
 		//if we must get only specific media type, no need to select the other ones
-		if ($media_type>0){
+		if ($media_type > 0){
 			$options['mediatypeids'] = $media_type;
 		}
 
@@ -187,7 +187,10 @@ include_once('include/page_header.php');
 		foreach($users as $userid => $alias){
 			$summary[$userid] = array();
 			$summary[$userid]['total'] = 0;
-			$summary[$userid]['medias'] = array('1'=>0, '2'=>0, '3'=>0, '4'=>0);
+			$summary[$userid]['medias'] = array();
+			foreach($media_types as $media_type_nr => $media_type){
+				$summary[$userid]['medias'][$media_type_nr] = 0;
+			}
 		}
 
 		foreach($alert_info as $ai){
