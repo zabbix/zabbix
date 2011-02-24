@@ -552,7 +552,7 @@ function zbx_is_int($var){
 	if(is_string($var))
 		if(ctype_digit($var) || (strcmp(intval($var), $var) == 0)) return true;
 	else
-		if(($var>0) && ctype_digit(strval($var))) return true;
+		if(($var>0) && zbx_ctype_digit($var)) return true;
 
 return preg_match("/^\-?\d{1,20}+$/", $var);
 }
@@ -1086,12 +1086,14 @@ function zbx_toArray($value){
 	if(!is_array($value)){
 		$result = array($value);
 	}
-	else if(reset($value) && zbx_ctype_digit(key($value))){
-// reset() is needed to move internal array pointer to the begining of the array
-		$result = array_values($value);
-	}
-	else if(!empty($value)){
-		$result = array($value);
+	else{
+// reset() is needed to move internal array pointer to the beginning of the array
+		reset($value);
+
+		if(zbx_ctype_digit(key($value)))
+			$result = array_values($value);
+		else if(!empty($value))
+			$result = array($value);
 	}
 
 return $result;
@@ -1125,9 +1127,11 @@ return $result;
 }
 
 function zbx_cleanHashes(&$value){
-	if(is_array($value) && reset($value) && ctype_digit((string) key($value))){
-// reset() is needed to move internal array pointer to the begining of the array
-		$value = array_values($value);
+	if(is_array($value)){
+// reset() is needed to move internal array pointer to the beginning of the array
+		reset($value);
+		if(zbx_ctype_digit(key($value)))
+			$value = array_values($value);
 	}
 
 return $value;
