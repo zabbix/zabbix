@@ -128,7 +128,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			res = NOTSUPPORTED;
 	}
 
-	if (SUCCEED != res && GET_MSG_RESULT(result))
+	if (SUCCEED != res && ISSET_MSG(result))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Item [%s:%s] error: %s",
 				item->host.host, item->key_orig, result->msg);
@@ -654,8 +654,8 @@ update:
 				deactivate_host(&items[i], &ts, agent.msg);
 				break;
 			default:
-				zbx_error("Unknown response code returned.");
-				assert(0 == 1);
+				zbx_error("unknown response code returned: %d", res);
+				assert(0);
 		}
 
 		if (res == SUCCEED)
