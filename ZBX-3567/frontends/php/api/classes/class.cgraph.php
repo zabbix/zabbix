@@ -36,7 +36,6 @@ class CGraph extends CZBXAPI{
 	public static function get($options=array()){
 		global $USER_DETAILS;
 
-		$result = array();
 		$user_type = $USER_DETAILS['type'];
 		$userid = $USER_DETAILS['userid'];
 		$result = array();

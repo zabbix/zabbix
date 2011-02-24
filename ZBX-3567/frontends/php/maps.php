@@ -40,20 +40,19 @@ include_once('include/page_header.php');
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	$fields=array(
-		'sysmapid'=>	array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,		NULL),
-		GET_PARAM_NAME=>		array(T_ZBX_STR, O_OPT,	P_SYS,		null,		null),
-		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,		IN('0,1'),	NULL),
+	$fields = array(
+		'sysmapid'=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,					NULL),
+		GET_PARAM_NAME=>	array(T_ZBX_STR, O_OPT,	P_SYS,			null,					null),
+		'fullscreen'=>		array(T_ZBX_INT, O_OPT,	P_SYS,			IN('0,1'),				NULL),
 //ajax
-		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
-		'favid'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NULL,			NULL),
+		'favobj'=>			array(T_ZBX_STR, O_OPT, P_ACT,			NULL,					NULL),
+		'favref'=>			array(T_ZBX_STR, O_OPT, P_ACT, 			NOT_EMPTY,				NULL),
+		'favid'=>			array(T_ZBX_INT, O_OPT, P_ACT, 			NULL,					NULL),
 
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
-		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove'"),NULL)
+		'state'=>			array(T_ZBX_INT, O_OPT, P_ACT,  		NOT_EMPTY,				NULL),
+		'action'=>			array(T_ZBX_STR, O_OPT, P_ACT, 			IN("'add','remove'"),	NULL)
 	);
 	check_fields($fields);
-
 ?>
 <?php
 	if(isset($_REQUEST['favobj'])){
@@ -91,7 +90,8 @@ include_once('include/page_header.php');
 	$options = array(
 		'output' => API_OUTPUT_EXTEND,
 		'nodeids' => get_current_nodeid(),
-		'select_selements' => API_OUTPUT_EXTEND
+		'select_selements' => API_OUTPUT_EXTEND,
+		'preservekeys' => true,
 	);
 	$maps = CMap::get($options);
 	$maps = zbx_toHash($maps, 'sysmapid');
@@ -107,7 +107,7 @@ include_once('include/page_header.php');
 	}
 	else if(!isset($_REQUEST['sysmapid'])){
 		$_REQUEST['sysmapid'] = CProfile::get('web.maps.sysmapid');
-		if(is_null($_REQUEST['sysmapid'])){
+		if(is_null($_REQUEST['sysmapid']) || !isset($maps[$_REQUEST['sysmapid']])){
 			$first_map = reset($maps);
 			$_REQUEST['sysmapid'] = $first_map['sysmapid'];
 		}
