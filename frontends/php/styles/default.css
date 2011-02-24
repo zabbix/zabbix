@@ -268,10 +268,10 @@ span.fail{ font-weight: bold; }
 span.info{ font-weight: bold; font-size: 11px; }
 
 /* CSS Document */
-div.disaster{ background-color: #FF0000; width: 100%; height: 100%; padding-left: 2px; margin-right: 5px; }
-div.high{ background-color: #FF8888; width: 100%; height: 100%; padding-left: 2px; margin-right: 5px; }
-div.average{ background-color: #DDAAAA; width: 100%; height: 100%; padding-left: 2px; margin-right: 5px; }
-div.warning{ background-color: #EFEFCC; width: 100%; height: 100%; padding-left: 2px; margin-right: 5px; }
+div.disaster{ width: 100%; height: 100%; padding-left: 2px; margin-right: 5px; }
+div.high{ width: 100%; height: 100%; padding-left: 2px; margin-right: 5px; }
+div.average{ width: 100%; height: 100%; padding-left: 2px; margin-right: 5px; }
+div.warning{ width: 100%; height: 100%; padding-left: 2px; margin-right: 5px; }
 
 div.onajaxload{ position: absolute; background-color:#000000; filter:alpha(opacity=05); opacity:.05; cursor:wait; z-index: 50; }
 
@@ -502,13 +502,6 @@ table.triggers_info tr td {
 
 table.triggers_info tr td.header {  background: #5c9ccc url(originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x; color: #FFFFFF;}
 table.triggers_info tr td 			{	background-color: #CCCCCC;	}
-table.triggers_info tr td.disaster		{	background-color: #FF0000;	}
-table.triggers_info tr td.high			{	background-color: #FF8888;	}
-table.triggers_info tr td.average		{	background-color: #DDAAAA;	}
-table.triggers_info tr td.warning		{	background-color: #EFEFCC;	}
-table.triggers_info tr td.information		{	background-color: #CCE2CC;	}
-table.triggers_info tr td.unknown_trigger	{	background-color: #BCBCBC;	}
-table.triggers_info tr td.normal		{	background-color: #AADDAA; 	}
 
 /**************** HOSTS INFORMATION MODULE ****************/
 table.hosts_info { width: 100%; background-color: #FFFFFF; border: 1px gray dotted;}
