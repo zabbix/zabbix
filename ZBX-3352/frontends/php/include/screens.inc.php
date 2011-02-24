@@ -939,7 +939,11 @@ require_once('include/js.inc.php');
 						if(count($graph['hosts']) == 1){
 // if items from one host we change them, or set calculated if not exist on that host
 							if($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $graph['ymax_itemid']){
-								$new_dinamic = get_same_graphitems_for_host(array( array('itemid' => $graph['ymax_itemid'])), $_REQUEST['hostid'], false);
+								$new_dinamic = get_same_graphitems_for_host(
+									array(array('itemid' => $graph['ymax_itemid'])),
+									$_REQUEST['hostid'],
+									false // false = don't rise Error if item doesn't exist
+								);
 								$new_dinamic = reset($new_dinamic);
 								if(isset($new_dinamic['itemid']) && $new_dinamic['itemid'] > 0){
 									$graph['ymax_itemid'] = $new_dinamic['itemid'];
@@ -949,7 +953,11 @@ require_once('include/js.inc.php');
 								}
 							}
 							if($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $graph['ymin_itemid']){
-								$new_dinamic = get_same_graphitems_for_host(array( array('itemid' => $graph['ymin_itemid'])), $_REQUEST['hostid'], false);
+								$new_dinamic = get_same_graphitems_for_host(
+									array(array('itemid' => $graph['ymin_itemid'])),
+									$_REQUEST['hostid'],
+									false // false = don't rise Error if item doesn't exist
+								);
 								$new_dinamic = reset($new_dinamic);
 								if(isset($new_dinamic['itemid']) && $new_dinamic['itemid'] > 0){
 									$graph['ymin_itemid'] = $new_dinamic['itemid'];
