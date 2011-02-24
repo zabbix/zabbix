@@ -976,12 +976,6 @@ return $result;
 }
 
 function uint_in_array($needle,$haystack){
-//TODO: REMOVE
-//	if(!empty($haystack) && !is_numeric(key($haystack))){
-//		info('uint_in_array: possible pasted associated array');
-//	}
-//----
-
 	foreach($haystack as $id => $value)
 		if(bccomp($needle,$value) == 0) return true;
 
@@ -1092,7 +1086,8 @@ function zbx_toArray($value){
 	if(!is_array($value)){
 		$result = array($value);
 	}
-	else if(zbx_ctype_digit(key($value))){
+	else if(reset($value) && zbx_ctype_digit(key($value))){
+// reset() is needed to move internal array pointer to the begining of the array
 		$result = array_values($value);
 	}
 	else if(!empty($value)){
@@ -1130,7 +1125,8 @@ return $result;
 }
 
 function zbx_cleanHashes(&$value){
-	if(is_array($value) && ctype_digit((string) key($value))){
+	if(is_array($value) && reset($value) && ctype_digit((string) key($value))){
+// reset() is needed to move internal array pointer to the begining of the array
 		$value = array_values($value);
 	}
 
