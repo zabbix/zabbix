@@ -929,14 +929,21 @@ require_once('include/js.inc.php');
 					if(($dynamic == SCREEN_DYNAMIC_ITEM) && isset($_REQUEST['hostid']) && ($_REQUEST['hostid'] > 0)){
 
 						$options = array(
+							'hostids' => $_REQUEST['hostid'],
+							'output' => array('hostid', 'host'),
+						);
+						$hosts = CHost::get($options);
+						$host = reset($hosts);
+
+						$options = array(
 							'graphids' => $resourceid,
 							'output' => API_OUTPUT_EXTEND,
-							'select_hosts' => array('hostid', 'host'),
+							'select_hosts' => API_OUTPUT_COUNT,
 							'select_graph_items' => API_OUTPUT_EXTEND,
 						);
 						$graph = CGraph::get($options);
 						$graph = reset($graph);
-						if(count($graph['hosts']) == 1){
+						if($graph['hosts'] == 1){
 // if items from one host we change them, or set calculated if not exist on that host
 							if($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $graph['ymax_itemid']){
 								$new_dinamic = get_same_graphitems_for_host(
@@ -991,7 +998,6 @@ require_once('include/js.inc.php');
 						}
 
 
-						$host = reset($graph['hosts']);
 						$url->setArgument('name', $host['host'].': '.$graph['name']);
 						$url = $url->getUrl();
 					}
