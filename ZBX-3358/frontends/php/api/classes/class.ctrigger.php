@@ -44,7 +44,6 @@ class CTrigger extends CZBXAPI{
  * @return array|int item data as array or false if error
  */
 	public function get($options=array()){
-
 		$result = array();
 		$user_type = self::$userData['type'];
 		$userid = self::$userData['userid'];
@@ -1423,11 +1422,13 @@ COpt::memoryPick();
 			));
 
 			if (isset($trigger['dependencies'])){
+
 				foreach($trigger['dependencies'] as $triggerid_up){
-					DB::insert('trigger_depends', array(
+					$depsToInsert = array(
 						'triggerid_down' => $triggerid,
-						'triggerid_up' => $triggerid_up
-					));
+						'triggerid_up' => is_array($triggerid_up) ? $triggerid_up['triggerid'] : $triggerid_up
+					);
+					DB::insert('trigger_depends', array($depsToInsert));
 				}
 			}
 
@@ -1712,7 +1713,7 @@ COpt::memoryPick();
 				'hostids' => $data['templateids'],
 				'preservekeys' => 1,
 				'output' => API_OUTPUT_EXTEND,
-				'select_dependencies' => true,
+				'select_dependencies' => API_OUTPUT_EXTEND
 			);
 			$triggers = $this->get($options);
 

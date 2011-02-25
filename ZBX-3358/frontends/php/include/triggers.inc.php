@@ -1733,7 +1733,7 @@ function utf8RawUrlDecode($source){
 		foreach($deps as $id => $val){
 			$sql = 'SELECT t.triggerid '.
 				' FROM triggers t,functions f,items i '.
-				' WHERE t.templateid='.$val.
+				' WHERE t.templateid='.(is_array($val) ? $val['triggerid'] : $val).
 					' AND f.triggerid=t.triggerid '.
 					' AND f.itemid=i.itemid '.
 					' AND i.hostid='.$hostid;
