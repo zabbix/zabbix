@@ -1160,7 +1160,8 @@ COpt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 
 				if($dbTriggers[$trigger['triggerid']]['templateid'] != 0){
-					self::exception(ZBX_API_ERROR_PARAMETERS,
+					self::exception(
+						ZBX_API_ERROR_PARAMETERS,
 						_s('Cannot delete templated trigger [%1$s:%2$s]', $dbTriggers[$trigger['triggerid']]['description'], explode_exp($dbTriggers[$trigger['triggerid']]['expression'], false))
 					);
 				}
@@ -1731,14 +1732,20 @@ COpt::memoryPick();
 // check circular dependency {{{
 			$triggerid_down = $trigger['dependencies'];
 			do{
-				$sql = 'SELECT triggerid_up '.
-						' FROM trigger_depends'.
-						' WHERE'.DBcondition('triggerid_down', $triggerid_down);
+				$sql = 'SELECT triggerid_up, description '.
+						' FROM trigger_depends, triggers'.
+						' WHERE trigger_depends.triggerid_down = triggers.triggerid AND '.DBcondition('trigger_depends.triggerid_down', $triggerid_down);
 				$db_up_triggers = DBselect($sql);
 				$up_triggerids = array();
 				while($up_trigger = DBfetch($db_up_triggers)){
 					if(bccomp($up_trigger['triggerid_up'],$trigger['triggerid']) == 0){
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_DEPENDENCY);
+
+						self::exception(
+							ZBX_API_ERROR_PARAMETERS,
+							$up_trigger['description'] == $trigger['description']
+							? _s('Cannot add circular dependency: trigger "%1$s" cannot depend on itself.', $trigger['description'])
+							: _s('Cannot add circular dependency: trigger "%1$s" depends on trigger "%2$s".', $up_trigger['description'] , $trigger['description'])
+						);
 					}
 					$up_triggerids[] = $up_trigger['triggerid_up'];
 				}
