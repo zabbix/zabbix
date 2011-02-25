@@ -88,7 +88,8 @@ New features:
 
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
- 
+
+ - [ZBX-3565] changed style for media types display in administration->notifications (Vedmak)
  - [ZBX-3352] made item Y axis min/max items also change when used in screen with Dynamic enabled (Vedmak)
  - [ZBX-3523] fixed error when open monitoring->maps and last viewed map was removed (Vedmak)
  - [ZBX-3557] fixed possible incorrect usage of internal array pointers in frontend (Aly)
