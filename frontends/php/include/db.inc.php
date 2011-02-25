@@ -1208,9 +1208,10 @@ if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
 				}
 
 				$sql = 'INSERT INTO '.$table.' ('.implode(',',array_keys($row)).')'.
-					' VALUES ('.implode(',',array_values($row)).')';
+						' VALUES ('.implode(',',array_values($row)).')';
 
-				if(!DBexecute($sql)) self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
+				if(!DBexecute($sql))
+					self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%s"', $sql));
 			}
 
 			return $resultIds;
@@ -1228,24 +1229,36 @@ if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
 		public static function update($table, $data){
 			if(empty($data)) return true;
 
+//W			$table_schema = self::getSchema($table);
+
 			$data = zbx_toArray($data);
-
 			foreach($data as $dnum => $row){
-				$sql_set = '';
-
+// check
+				if(empty($row['values'])) continue;
 				self::checkValueTypes($table, $row['values']);
 
-				foreach($row['values'] as $field => $value){
-					$sql_set .= $field.'='.$value.',';
+// set creation
+				$sqlSet = '';
+				foreach($row['values'] as $field => $value)
+					$sqlSet.= $field.'='.$value.',';
+				$sqlSet = rtrim($sqlSet, ',');
+
+				if(!isset($row['where']) || empty($row['where']) || !is_array($row['where']))
+					self::exception(self::DBEXECUTE_ERROR, _s('Cannot perform update statement on table "%s" without where condition.', $table));
+
+// where condition proccess
+				$sqlWhere = array();
+				foreach($row['where'] as $field => $values){
+//					if(!isset($table_schema['fields'][$field]) || is_null($values))
+//						self::exception(self::DBEXECUTE_ERROR, _s('Incorrect field "%1$s" name or value in where statement for table "%2$s".', $field, $table));
+
+					$sqlWhere[] = DBcondition($field, zbx_toArray($values));
 				}
 
-				$sql_set = rtrim($sql_set, ',');
-
-				if(!empty($sql_set)){
-					$sql = 'UPDATE '.$table.' SET '.$sql_set.' WHERE '.implode(' AND ', $row['where']);
-
-					if(!DBexecute($sql)) self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
-				}
+// sql execution
+				$sql = 'UPDATE '.$table.' SET '.$sqlSet.' WHERE '.implode(' AND ', $sqlWhere);
+				if(!DBexecute($sql))
+					self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%s"', $sql));
 			}
 			return true;
 		}
@@ -1266,36 +1279,23 @@ if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
  * @return bool
  */
 		public static function delete($table, $wheres, $use_or=false){
-			if(empty($wheres) || !is_array($wheres)){
-				return true;
-			}
+			if(empty($wheres) || !is_array($wheres))
+				self::exception(self::DBEXECUTE_ERROR, _s('Cannot perform delete statement on table "%s" without where condition.', $table));
 
 			$table_schema = self::getSchema($table);
-			$sql_wheres = array();
 
-//for every field
+			$sqlWhere = array();
 			foreach($wheres as $field => $values){
-//if this field does not exist, just skip it
-				if(!isset($table_schema['fields'][$field]) || is_null($values)){
-					continue;
-				}
-				$values = zbx_toArray($values);
-				$is_string = ($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR);
+				if(!isset($table_schema['fields'][$field]) || is_null($values))
+					self::exception(self::DBEXECUTE_ERROR, _s('Incorrect field "%1$s" name or value in where statement for table "%2$s".', $field, $table));
 
-//false = not NOT IN
-				$sql_wheres[] = DBcondition($field, $values, false, $is_string);
+				$sqlWhere[] = DBcondition($field, zbx_toArray($values));
 			}
 
-//we will not delete everything from a table just like this
-			if(count($sql_wheres) == 0){
-				return false;
-			}
+			$sql = 'DELETE FROM '.$table.' WHERE '.implode(($use_or ? ' OR ' : ' AND '), $sqlWhere);
+			if(!DBexecute($sql))
+				self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%s"', $sql));
 
-			$sql = 'DELETE FROM '.$table.' WHERE '.implode(($use_or ? ' OR ' : ' AND '), $sql_wheres);
-
-			if(!DBexecute($sql)) {
-				self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
-			}
 			return true;
 		}
 

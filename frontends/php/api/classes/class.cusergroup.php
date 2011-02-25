@@ -36,7 +36,7 @@ class CUserGroup extends CZBXAPI{
  * @param array $options['userids'] User IDs
  * @param boolean $options['status']
  * @param boolean $options['with_gui_access']
- * @param boolean $options['select_users']
+ * @param boolean $options['selectUsers']
  * @param int $options['count']
  * @param string $options['pattern']
  * @param int $options['limit'] limit selection
@@ -69,14 +69,14 @@ class CUserGroup extends CZBXAPI{
 // filter
 			'filter'					=> null,
 			'search'					=> null,
-			'searchByAny'			=> null,
+			'searchByAny'				=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 // OutPut
 			'editable'					=> null,
 			'output'					=> API_OUTPUT_REFER,
-			'select_users'				=> null,
-			'countOutput'						=> null,
+			'selectUsers'				=> null,
+			'countOutput'				=> null,
 			'preservekeys'				=> null,
 
 			'sortfield'					=> '',
@@ -224,12 +224,12 @@ class CUserGroup extends CZBXAPI{
 				else{
 					if(!isset($result[$usrgrp['usrgrpid']])) $result[$usrgrp['usrgrpid']]= array();
 
-					if(!is_null($options['select_users']) && !isset($result[$usrgrp['usrgrpid']]['users'])){
+					if(!is_null($options['selectUsers']) && !isset($result[$usrgrp['usrgrpid']]['users'])){
 						$result[$usrgrp['usrgrpid']]['users'] = array();
 					}
 
 // groupids
-					if(isset($usrgrp['userid']) && is_null($options['select_users'])){
+					if(isset($usrgrp['userid']) && is_null($options['selectUsers'])){
 						if(!isset($result[$usrgrp['usrgrpid']]['users']))
 							$result[$usrgrp['usrgrpid']]['users'] = array();
 
@@ -248,11 +248,11 @@ class CUserGroup extends CZBXAPI{
 
 // Adding Objects
 // Adding users
-		if(!is_null($options['select_users']) && str_in_array($options['select_users'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectUsers']) && str_in_array($options['selectUsers'], $subselects_allowed_outputs)){
 			$obj_params = array(
-				'output' => $options['select_users'],
+				'output' => $options['selectUsers'],
 				'usrgrpids' => $usrgrpids,
-				'get_access' => ($options['select_users'] == API_OUTPUT_EXTEND)?true:null,
+				'getAccess' => ($options['selectUsers'] == API_OUTPUT_EXTEND)?true:null,
 				'preservekeys' => 1
 			);
 			$users = API::User()->get($obj_params);
@@ -506,7 +506,7 @@ class CUserGroup extends CZBXAPI{
 				if(!empty($data)){
 					$update[] = array(
 						'values' => $data,
-						'where' => array('usrgrpid='.$usrgrpid),
+						'where' => array('usrgrpid' => $usrgrpid),
 					);
 				}
 			}
@@ -560,7 +560,6 @@ class CUserGroup extends CZBXAPI{
 					));
 			}
 
-
 			if(!is_null($rights)){
 				$linked_rights = array();
 				$sql = 'SELECT groupid, permission, id'.
@@ -587,7 +586,7 @@ class CUserGroup extends CZBXAPI{
 						else if($linked_rights[$usrgrpid][$right['id']] != $right['permission']){
 							$rights_update[] = array(
 								'values' => array('permission' => $right['permission']),
-								'where' => array('groupid='.$usrgrpid, 'id='.$right['id']),
+								'where' => array('groupid' => $usrgrpid, 'id' => $right['id']),
 							);
 						}
 						unset($linked_rights[$usrgrpid][$right['id']]);

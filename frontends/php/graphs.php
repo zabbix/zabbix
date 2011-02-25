@@ -461,7 +461,7 @@ include_once('include/page_header.php');
 			'graphids' => $graphids,
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => API_OUTPUT_EXTEND,
-			'select_templates' => API_OUTPUT_EXTEND,
+			'selectTemplates' => API_OUTPUT_EXTEND,
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 		);
 		$graphs = API::Graph()->get($options);

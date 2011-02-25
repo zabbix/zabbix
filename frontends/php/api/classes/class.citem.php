@@ -101,9 +101,9 @@ class CItem extends CZBXAPI{
 			'output'				=> API_OUTPUT_REFER,
 			'selectHosts'			=> null,
 			'selectInterfaces'		=> null,
-			'select_triggers'		=> null,
-			'select_graphs'			=> null,
-			'select_applications'	=> null,
+			'selectTriggers'		=> null,
+			'selectGraphs'			=> null,
+			'selectApplications'	=> null,
 			'select_prototypes'		=> null,
 			'selectDiscoveryRule'	=> null,
 			'countOutput'			=> null,
@@ -492,13 +492,13 @@ class CItem extends CZBXAPI{
 					if(!is_null($options['selectHosts']) && !isset($result[$item['itemid']]['hosts'])){
 						$result[$item['itemid']]['hosts'] = array();
 					}
-					if(!is_null($options['select_triggers']) && !isset($result[$item['itemid']]['triggers'])){
+					if(!is_null($options['selectTriggers']) && !isset($result[$item['itemid']]['triggers'])){
 						$result[$item['itemid']]['triggers'] = array();
 					}
-					if(!is_null($options['select_graphs']) && !isset($result[$item['itemid']]['graphs'])){
+					if(!is_null($options['selectGraphs']) && !isset($result[$item['itemid']]['graphs'])){
 						$result[$item['itemid']]['graphs'] = array();
 					}
-					if(!is_null($options['select_applications']) && !isset($result[$item['itemid']]['applications'])){
+					if(!is_null($options['selectApplications']) && !isset($result[$item['itemid']]['applications'])){
 						$result[$item['itemid']]['applications'] = array();
 					}
 					if(!is_null($options['select_prototypes']) && !isset($result[$item['itemid']]['prototypes'])){
@@ -509,7 +509,7 @@ class CItem extends CZBXAPI{
 					}
 
 // triggerids
-					if(isset($item['triggerid']) && is_null($options['select_triggers'])){
+					if(isset($item['triggerid']) && is_null($options['selectTriggers'])){
 						if(!isset($result[$item['itemid']]['triggers']))
 							$result[$item['itemid']]['triggers'] = array();
 
@@ -517,7 +517,7 @@ class CItem extends CZBXAPI{
 						unset($item['triggerid']);
 					}
 // graphids
-					if(isset($item['graphid']) && is_null($options['select_graphs'])){
+					if(isset($item['graphid']) && is_null($options['selectGraphs'])){
 						if(!isset($result[$item['itemid']]['graphs']))
 							$result[$item['itemid']]['graphs'] = array();
 
@@ -525,7 +525,7 @@ class CItem extends CZBXAPI{
 						unset($item['graphid']);
 					}
 // applicationids
-					if(isset($item['applicationid']) && is_null($options['select_applications'])){
+					if(isset($item['applicationid']) && is_null($options['selectApplications'])){
 						if(!isset($result[$item['itemid']]['applications']))
 							$result[$item['itemid']]['applications'] = array();
 
@@ -598,15 +598,15 @@ COpt::memoryPick();
 		}
 
 // Adding triggers
-		if(!is_null($options['select_triggers'])){
+		if(!is_null($options['selectTriggers'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'itemids' => $itemids,
 				'preservekeys' => 1
 			);
 
-			if(in_array($options['select_triggers'], $subselects_allowed_outputs)){
-				$obj_params['output'] = $options['select_triggers'];
+			if(in_array($options['selectTriggers'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['selectTriggers'];
 				$triggers = API::Trigger()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($triggers, 'name');
@@ -625,7 +625,7 @@ COpt::memoryPick();
 					}
 				}
 			}
-			else if(API_OUTPUT_COUNT == $options['select_triggers']){
+			else if(API_OUTPUT_COUNT == $options['selectTriggers']){
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
@@ -642,15 +642,15 @@ COpt::memoryPick();
 		}
 
 // Adding graphs
-		if(!is_null($options['select_graphs'])){
+		if(!is_null($options['selectGraphs'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'itemids' => $itemids,
 				'preservekeys' => 1
 			);
 
-			if(in_array($options['select_graphs'], $subselects_allowed_outputs)){
-				$obj_params['output'] = $options['select_graphs'];
+			if(in_array($options['selectGraphs'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['selectGraphs'];
 				$graphs = API::Graph()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($graphs, 'name');
@@ -669,7 +669,7 @@ COpt::memoryPick();
 					}
 				}
 			}
-			else if(API_OUTPUT_COUNT == $options['select_graphs']){
+			else if(API_OUTPUT_COUNT == $options['selectGraphs']){
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
@@ -686,10 +686,10 @@ COpt::memoryPick();
 		}
 
 // Adding applications
-		if(!is_null($options['select_applications']) && str_in_array($options['select_applications'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectApplications']) && str_in_array($options['selectApplications'], $subselects_allowed_outputs)){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'output' => $options['select_applications'],
+				'output' => $options['selectApplications'],
 				'itemids' => $itemids,
 				'preservekeys' => 1
 			);
@@ -1178,7 +1178,7 @@ COpt::memoryPick();
 				}
 			}
 
-			$data[] = array('values' => $item, 'where'=> array('itemid='.$item['itemid']));
+			$data[] = array('values' => $item, 'where'=> array('itemid'=>$item['itemid']));
 			$itemids[] = $item['itemid'];
 		}
 		$result = DB::update('items', $data);
@@ -1386,7 +1386,7 @@ COpt::memoryPick();
 			$options = array(
 				'hostids' => $data['templateids'],
 				'preservekeys' => 1,
-				'select_applications' => API_OUTPUT_REFER,
+				'selectApplications' => API_OUTPUT_REFER,
 				'output' => API_OUTPUT_EXTEND,
 				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 			);

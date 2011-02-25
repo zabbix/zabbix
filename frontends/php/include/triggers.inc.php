@@ -1545,7 +1545,10 @@ function utf8RawUrlDecode($source){
 			}
 		}
 
-		DB::update('triggers', array('values' => $update_values, 'where' => array('triggerid='.$triggerid)));
+		DB::update('triggers', array(
+			'values' => $update_values,
+			'where' => array('triggerid' => $triggerid)
+		));
 
 // TODO: peredelatj!
 		if($flags != ZBX_FLAG_DISCOVERY_NORMAL){
@@ -3289,7 +3292,7 @@ function utf8RawUrlDecode($source){
 				'output' => API_OUTPUT_EXTEND,
 				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 				'inherited' => 0,
-				'select_dependencies' => API_OUTPUT_EXTEND
+				'selectDependencies' => API_OUTPUT_EXTEND
 			);
 			$triggers = API::Trigger()->get($options);
 

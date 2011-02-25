@@ -352,23 +352,23 @@ class CScript extends CZBXAPI{
 
 		$scripts = zbx_toArray($scripts);
 
-			if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
-				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+		if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
+			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+		}
+
+		foreach($scripts as $snum => $script){
+			$script_db_fields = array(
+				'name' => null,
+				'command' => null,
+			);
+			if(!check_db_fields($script_db_fields, $script)){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for script'));
 			}
+		}
 
-			foreach($scripts as $snum => $script){
-				$script_db_fields = array(
-					'name' => null,
-					'command' => null,
-				);
-				if(!check_db_fields($script_db_fields, $script)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for script'));
-				}
-			}
+		$scriptids = DB::insert('scripts', $scripts);
 
-			$scriptids = DB::insert('scripts', $scripts);
-
-			return array('scriptids' => $scriptids);
+		return array('scriptids' => $scriptids);
 	}
 
 /**
@@ -380,37 +380,35 @@ class CScript extends CZBXAPI{
  * @return boolean
  */
 	public function update($scripts){
-
-
 		$scripts = zbx_toArray($scripts);
 		$scriptids = zbx_objectValues($scripts, 'scriptid');
 
-			if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
-				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-			}
+		if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
+			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+		}
 
-			$options = array(
-				'scriptids' => $scriptids,
-				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1
+		$options = array(
+			'scriptids' => $scriptids,
+			'output' => API_OUTPUT_SHORTEN,
+			'preservekeys' => 1
+		);
+		$upd_scripts = $this->get($options);
+		foreach($scripts as $snum => $script){
+			if(!isset($upd_scripts[$script['scriptid']])){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script with scriptid [%s] does not exist.', $script['scriptid']));
+			}
+		}
+
+		$update = array();
+		foreach($scripts as $num => $script){
+			$update[] = array(
+				'values' => $script,
+				'where' => array('scriptid'=>$script['scriptid']),
 			);
-			$upd_scripts = $this->get($options);
-			foreach($scripts as $snum => $script){
-				if(!isset($upd_scripts[$script['scriptid']])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script with scriptid [%s] does not exist.', $script['scriptid']));
-				}
-			}
+		}
+		DB::update('scripts', $update);
 
-			$update = array();
-			foreach($scripts as $num => $script){
-				$update[] = array(
-					'values' => $script,
-					'where' => array('scriptid='.$script['scriptid']),
-				);
-			}
-			DB::update('scripts', $update);
-
-			return array('scriptids' => $scriptids);
+		return array('scriptids' => $scriptids);
 	}
 
 /**
@@ -424,32 +422,32 @@ class CScript extends CZBXAPI{
 
 		$scriptids = zbx_toArray($scriptids);
 
-			if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
-				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+		if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
+			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+		}
+
+		if(empty($scriptids)){
+			self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ scriptids ]');
+		}
+
+		$options = array(
+			'scriptids' => $scriptids,
+			'editable' => 1,
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => 1
+		);
+		$del_scripts = $this->get($options);
+		foreach($scriptids as $snum => $scriptid){
+			if(!isset($del_scripts[$scriptid])){
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Script with scriptid [%s] does not exist.', $scriptid));
 			}
+		}
 
-			if(empty($scriptids)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ scriptids ]');
-			}
+		$sql = 'DELETE FROM scripts WHERE '.DBcondition('scriptid',$scriptids);
+		if(!$result = DBexecute($sql))
+			self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete script');
 
-			$options = array(
-				'scriptids' => $scriptids,
-				'editable' => 1,
-				'output' => API_OUTPUT_EXTEND,
-				'preservekeys' => 1
-			);
-			$del_scripts = $this->get($options);
-			foreach($scriptids as $snum => $scriptid){
-				if(!isset($del_scripts[$scriptid])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Script with scriptid [%s] does not exist.', $scriptid));
-				}
-			}
-
-			$sql = 'DELETE FROM scripts WHERE '.DBcondition('scriptid',$scriptids);
-			if(!$result = DBexecute($sql))
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete script');
-
-			return array('scriptids' => $scriptids);
+		return array('scriptids' => $scriptids);
 	}
 
 	public function execute($data){
@@ -458,102 +456,102 @@ class CScript extends CZBXAPI{
 		$scriptid = $data['scriptid'];
 		$hostid = $data['hostid'];
 
-			$options = array(
-				'hostids' => $hostid,
-				'scriptids' => $scriptid,
-				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => true,
-			);
-			$alowedScripts = $this->get($options);
-			if(!isset($alowedScripts[$scriptid])){
-				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-			}
+		$options = array(
+			'hostids' => $hostid,
+			'scriptids' => $scriptid,
+			'output' => API_OUTPUT_SHORTEN,
+			'preservekeys' => true,
+		);
+		$alowedScripts = $this->get($options);
+		if(!isset($alowedScripts[$scriptid])){
+			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+		}
 
-			if(!$socket = fsockopen($ZBX_SERVER, $ZBX_SERVER_PORT, $errorCode, $errorMsg, ZBX_SCRIPT_TIMEOUT)){
+		if(!$socket = fsockopen($ZBX_SERVER, $ZBX_SERVER_PORT, $errorCode, $errorMsg, ZBX_SCRIPT_TIMEOUT)){
 // pop E_WARNING generated by fsockopen
-				array_pop($ZBX_MESSAGES);
-				self::exception(ZBX_API_ERROR_INTERNAL, S_SCRIPT_ERROR_DESCRIPTION.': '.$errorMsg);
+			array_pop($ZBX_MESSAGES);
+			self::exception(ZBX_API_ERROR_INTERNAL, S_SCRIPT_ERROR_DESCRIPTION.': '.$errorMsg);
+		}
+
+		$json = new CJSON();
+		$array = array(
+			'request' => 'command',
+			'nodeid' => id2nodeid($hostid),
+			'scriptid' => $scriptid,
+			'hostid' => $hostid
+		);
+		$dataToSend = $json->encode($array, false);
+
+		stream_set_timeout($socket, ZBX_SCRIPT_TIMEOUT);
+
+		if(fwrite($socket, $dataToSend) === false) {
+			self::exception(ZBX_API_ERROR_INTERNAL, S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_SEND_ERROR);
+		}
+
+		$response = '';
+
+		$pbl = ZBX_SCRIPT_BYTES_LIMIT > 8192 ? 8192 : ZBX_SCRIPT_BYTES_LIMIT; // PHP read bytes limit
+		$now = time();
+		$i = 0;
+		while(!feof($socket)){
+			$i++;
+			if((time()-$now) >= ZBX_SCRIPT_TIMEOUT){
+				self::exception(ZBX_API_ERROR_INTERNAL, S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_TIMEOUT_ERROR);
 			}
-
-			$json = new CJSON();
-			$array = array(
-				'request' => 'command',
-				'nodeid' => id2nodeid($hostid),
-				'scriptid' => $scriptid,
-				'hostid' => $hostid
-			);
-			$dataToSend = $json->encode($array, false);
-
-			stream_set_timeout($socket, ZBX_SCRIPT_TIMEOUT);
-
-			if(fwrite($socket, $dataToSend) === false) {
-				self::exception(ZBX_API_ERROR_INTERNAL, S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_SEND_ERROR);
-			}
-
-			$response = '';
-
-			$pbl = ZBX_SCRIPT_BYTES_LIMIT > 8192 ? 8192 : ZBX_SCRIPT_BYTES_LIMIT; // PHP read bytes limit
-			$now = time();
-			$i = 0;
-			while(!feof($socket)){
-				$i++;
-				if((time()-$now) >= ZBX_SCRIPT_TIMEOUT){
-					self::exception(ZBX_API_ERROR_INTERNAL, S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_TIMEOUT_ERROR);
-				}
-				else if( ($i*$pbl) >= ZBX_SCRIPT_BYTES_LIMIT ){
-					self::exception(ZBX_API_ERROR_INTERNAL, S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_BYTES_LIMIT_ERROR);
-				}
-
-				if(($out = fread($socket, $pbl)) !== false) {
-					$response .= $out;
-				}
-				else{
-					self::exception(ZBX_API_ERROR_INTERNAL, S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_READ_ERROR);
-				}
-			}
-
-			if(strlen($response) > 0){
-				$json = new CJSON();
-				$rcv = $json->decode($response, true);
-			}
-			else{
-				self::exception(ZBX_API_ERROR_INTERNAL, S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_ERROR_EMPTY_RESPONSE);
-			}
-
-			fclose($socket);
-			return $rcv;
-
-/*
-			$dataToSend = $json->encode($array, false);
-
-
-			if(fwrite($socket, $dataToSend) === false){
-				self::exception(ZBX_API_ERROR_INTERNAL, S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_SEND_ERROR);
-			}
-
-			stream_set_blocking($socket, true);
-			stream_set_timeout($socket, ZBX_SCRIPT_TIMEOUT);
-			$response = stream_get_contents($socket, ZBX_SCRIPT_BYTES_LIMIT);
-
-			$info = stream_get_meta_data($socket);
-
-   			if($info['timed_out']){
-				self::exception(S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_TIMEOUT_ERROR);
-			}
-			if(false === $response){
-				self::exception(ZBX_API_ERROR_INTERNAL, S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_READ_ERROR);
-			}
-			if(strlen($response) == 0){
-				self::exception(ZBX_API_ERROR_INTERNAL, S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_ERROR_EMPTY_RESPONSE);
-			}
-			if(!feof($socket)){
+			else if( ($i*$pbl) >= ZBX_SCRIPT_BYTES_LIMIT ){
 				self::exception(ZBX_API_ERROR_INTERNAL, S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_BYTES_LIMIT_ERROR);
 			}
 
+			if(($out = fread($socket, $pbl)) !== false) {
+				$response .= $out;
+			}
+			else{
+				self::exception(ZBX_API_ERROR_INTERNAL, S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_READ_ERROR);
+			}
+		}
 
-			fclose($socket);
+		if(strlen($response) > 0){
+			$json = new CJSON();
+			$rcv = $json->decode($response, true);
+		}
+		else{
+			self::exception(ZBX_API_ERROR_INTERNAL, S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_ERROR_EMPTY_RESPONSE);
+		}
 
-			return $json->decode($response, true);
+		fclose($socket);
+		return $rcv;
+
+/*
+		$dataToSend = $json->encode($array, false);
+
+
+		if(fwrite($socket, $dataToSend) === false){
+			self::exception(ZBX_API_ERROR_INTERNAL, S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_SEND_ERROR);
+		}
+
+		stream_set_blocking($socket, true);
+		stream_set_timeout($socket, ZBX_SCRIPT_TIMEOUT);
+		$response = stream_get_contents($socket, ZBX_SCRIPT_BYTES_LIMIT);
+
+		$info = stream_get_meta_data($socket);
+
+		if($info['timed_out']){
+			self::exception(S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_TIMEOUT_ERROR);
+		}
+		if(false === $response){
+			self::exception(ZBX_API_ERROR_INTERNAL, S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_READ_ERROR);
+		}
+		if(strlen($response) == 0){
+			self::exception(ZBX_API_ERROR_INTERNAL, S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_ERROR_EMPTY_RESPONSE);
+		}
+		if(!feof($socket)){
+			self::exception(ZBX_API_ERROR_INTERNAL, S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_BYTES_LIMIT_ERROR);
+		}
+
+
+		fclose($socket);
+
+		return $json->decode($response, true);
 */
 	}
 

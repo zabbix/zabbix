@@ -850,7 +850,7 @@ include_once('include/page_header.php');
 			'hostids' => $hostid,
 			'output' => array('triggerid', 'description', 'expression', 'priority', 'status'),
 			'selectHosts' => array('hostid','host'),
-			'select_dependencies' => API_OUTPUT_EXTEND,
+			'selectDependencies' => API_OUTPUT_EXTEND,
 			'expandDescription' => true
 		);
 		if(is_null($hostid)) $options['groupids'] = $groupid;

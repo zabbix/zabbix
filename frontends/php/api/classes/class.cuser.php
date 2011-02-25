@@ -35,8 +35,8 @@ class CUser extends CZBXAPI{
  * @param array $options['usrgrpids'] filter by UserGroup IDs
  * @param array $options['userids'] filter by User IDs
  * @param boolean $options['type'] filter by User type [ USER_TYPE_ZABBIX_USER: 1, USER_TYPE_ZABBIX_ADMIN: 2, USER_TYPE_SUPER_ADMIN: 3 ]
- * @param boolean $options['select_usrgrps'] extend with UserGroups data for each User
- * @param boolean $options['get_access'] extend with access data for each User
+ * @param boolean $options['selectUsrgrps'] extend with UserGroups data for each User
+ * @param boolean $options['getAccess'] extend with access data for each User
  * @param boolean $options['count'] output only count of objects in result. ( result returned in property 'rowscount' )
  * @param string $options['pattern'] filter by Host name containing only give pattern
  * @param int $options['limit'] output will be limited to given number
@@ -46,6 +46,7 @@ class CUser extends CZBXAPI{
  */
 	public function get($options=array()){
 		$result = array();
+		$nodeCheck = false;
 		$user_type = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
@@ -69,17 +70,17 @@ class CUser extends CZBXAPI{
 // filter
 			'filter'					=> null,
 			'search'					=> null,
-			'searchByAny'			=> null,
+			'searchByAny'				=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 
 // OutPut
 			'output'					=> API_OUTPUT_REFER,
 			'editable'					=> null,
-			'select_usrgrps'			=> null,
-			'select_medias'				=> null,
-			'select_mediatypes'			=> null,
-			'get_access'				=> null,
+			'selectUsrgrps'				=> null,
+			'selectMedias'				=> null,
+			'selectMediatypes'			=> null,
+			'getAccess'					=> null,
 			'countOutput'				=> null,
 			'preservekeys'				=> null,
 
@@ -246,12 +247,12 @@ class CUser extends CZBXAPI{
 				else{
 					if(!isset($result[$user['userid']])) $result[$user['userid']]= array();
 
-					if($options['select_usrgrps'] && !isset($result[$user['userid']]['usrgrps'])){
+					if($options['selectUsrgrps'] && !isset($result[$user['userid']]['usrgrps'])){
 						$result[$user['userid']]['usrgrps'] = array();
 					}
 
 // usrgrpids
-					if(isset($user['usrgrpid']) && is_null($options['select_usrgrps'])){
+					if(isset($user['usrgrpid']) && is_null($options['selectUsrgrps'])){
 						if(!isset($result[$user['userid']]['usrgrps']))
 							$result[$user['userid']]['usrgrps'] = array();
 
@@ -260,7 +261,7 @@ class CUser extends CZBXAPI{
 					}
 
 // mediaids
-					if(isset($user['mediaid']) && is_null($options['select_medias'])){
+					if(isset($user['mediaid']) && is_null($options['selectMedias'])){
 						if(!isset($result[$user['userid']]['medias']))
 							$result[$user['userid']]['medias'] = array();
 
@@ -269,7 +270,7 @@ class CUser extends CZBXAPI{
 					}
 
 // mediatypeids
-					if(isset($user['mediatypeid']) && is_null($options['select_mediatypes'])){
+					if(isset($user['mediatypeid']) && is_null($options['selectMediatypes'])){
 						if(!isset($result[$user['userid']]['mediatypes']))
 							$result[$user['userid']]['mediatypes'] = array();
 
@@ -287,7 +288,7 @@ Copt::memoryPick();
 		}
 
 // Adding Objects
-		if(!is_null($options['get_access'])){
+		if(!is_null($options['getAccess'])){
 			foreach($result as $userid => $user){
 				$result[$userid] += array('gui_access' => 0, 'debug_mode' => 0, 'users_status' => 0);
 			}
@@ -305,9 +306,9 @@ Copt::memoryPick();
 		}
 
 // Adding usergroups
-		if(!is_null($options['select_usrgrps']) && str_in_array($options['select_usrgrps'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectUsrgrps']) && str_in_array($options['selectUsrgrps'], $subselects_allowed_outputs)){
 			$obj_params = array(
-				'output' => $options['select_usrgrps'],
+				'output' => $options['selectUsrgrps'],
 				'userids' => $userids,
 				'preservekeys' => 1
 			);
@@ -323,10 +324,10 @@ Copt::memoryPick();
 
 // TODO:
 // Adding medias
-		if(!is_null($options['select_medias']) && str_in_array($options['select_medias'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectMedias']) && str_in_array($options['selectMedias'], $subselects_allowed_outputs)){
 		}
 // Adding mediatypes
-		if(!is_null($options['select_mediatypes']) && str_in_array($options['select_mediatypes'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectMediatypes']) && str_in_array($options['selectMediatypes'], $subselects_allowed_outputs)){
 		}
 
 // removing keys (hash -> array)
@@ -371,6 +372,9 @@ Copt::memoryPick();
 				$dbUser = $user;
 			}
 			else if($update){
+				if(!isset($dbUsers[$user['userid']]))
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('You do not have permissions to update user or user does not exist.'));
+
 				if(bccomp(self::$userData['userid'], $user['userid']) != 0){
 					if(USER_TYPE_SUPER_ADMIN != self::$userData['type'])
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('You do not have permissions to update other users.'));
@@ -380,6 +384,12 @@ Copt::memoryPick();
 				$dbUser = $dbUsers[$user['userid']];
 			}
 			else{
+				if(USER_TYPE_SUPER_ADMIN != self::$userData['type'])
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('You do not have permissions to delete users.'));
+
+				if(!isset($dbUsers[$user['userid']]))
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('You do not have permissions to delete user or user does not exist.'));
+
 				if(bccomp(self::$userData['userid'], $user['userid']) == 0)
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('User is not allowed to delete himself.'));
 
@@ -567,8 +577,8 @@ Copt::memoryPick();
 
 			$result = DB::update('users', array(
 				array(
-						'values'=> $user,
-						'where'=> array('userid='.$user['userid'])
+					'values'=> $user,
+					'where'=> array('userid' => $user['userid'])
 				)
 			));
 

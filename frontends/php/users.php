@@ -388,8 +388,8 @@ include_once('include/page_header.php');
 // User table
 		$options = array(
 			'output' => API_OUTPUT_EXTEND,
-			'select_usrgrps' => API_OUTPUT_EXTEND,
-			'get_access' => 1,
+			'selectUsrgrps' => API_OUTPUT_EXTEND,
+			'getAccess' => 1,
 			'limit' => ($config['search_limit']+1)
 		);
 		if($_REQUEST['filter_usrgrpid'] > 0){

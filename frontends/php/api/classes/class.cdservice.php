@@ -46,11 +46,11 @@ class CDService extends CZBXAPI{
  * @param boolean $options['with_graphs'] only with graphs
  * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
  * @param boolean $options['selectGroups'] select ServiceGroups
- * @param boolean $options['select_templates'] select Templates
+ * @param boolean $options['selectTemplates'] select Templates
  * @param boolean $options['selectItems'] select Items
- * @param boolean $options['select_triggers'] select Triggers
- * @param boolean $options['select_graphs'] select Graphs
- * @param boolean $options['select_applications'] select Applications
+ * @param boolean $options['selectTriggers'] select Triggers
+ * @param boolean $options['selectGraphs'] select Graphs
+ * @param boolean $options['selectApplications'] select Applications
  * @param boolean $options['selectMacros'] select Macros
  * @param boolean $options['select_profile'] select Profile
  * @param int $options['count'] count Services, returned column name is rowscount

@@ -164,7 +164,7 @@ include_once('include/page_header.php');
 // SELECT SCREENS
 		$params = array(
 			'templateids' => $templateids,
-			'select_screenitems' => API_OUTPUT_EXTEND,
+			'selectScreenItems' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND,
 			'noInheritance' => true
 		);
@@ -197,7 +197,7 @@ include_once('include/page_header.php');
 			'hostids' => $templateids,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => 1,
-			'select_dependencies' => API_OUTPUT_EXTEND,
+			'selectDependencies' => API_OUTPUT_EXTEND,
 			'expandData' => 1
 		);
 		$triggers = API::Trigger()->get($params);
@@ -575,12 +575,12 @@ include_once('include/page_header.php');
 			'editable' => 1,
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => array('hostid','host','status'),
-			'select_templates' => array('hostid','host','status'),
+			'selectTemplates' => array('hostid','host','status'),
 			'selectParentTemplates' => array('hostid','host','status'),
 			'selectItems' => API_OUTPUT_COUNT,
-			'select_triggers' => API_OUTPUT_COUNT,
-			'select_graphs' => API_OUTPUT_COUNT,
-			'select_applications' => API_OUTPUT_COUNT,
+			'selectTriggers' => API_OUTPUT_COUNT,
+			'selectGraphs' => API_OUTPUT_COUNT,
+			'selectApplications' => API_OUTPUT_COUNT,
 			'selectDiscoveries' => API_OUTPUT_COUNT,
 			'selectScreens' => API_OUTPUT_COUNT,
 			'nopermissions' => 1,
