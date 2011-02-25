@@ -88,7 +88,14 @@ New features:
 
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
-
+ 
+ - [ZBX-3352] made item Y axis min/max items also change when used in screen with Dynamic enabled (Vedmak)
+ - [ZBX-3523] fixed error when open monitoring->maps and last viewed map was removed (Vedmak)
+ - [ZBX-3557] fixed possible incorrect usage of internal array pointers in frontend (Aly)
+ - [ZBX-2979] fixed trigger function time() test (Aly)
+ - [ZBX-3563] fixed host group filter in graph selection popup (Aly)
+ - [ZBX-3544] fixed user login method reseting attempts (Aly)
+ - [ZBX-3555] fixed possible pollers hang while processing ssh.run[] checks (Sasha)
  - [ZBXNEXT-408] added zabbix[process,...] internal checks (Sasha)
  - [ZBX-2262] added `hosts_templates_2' index (Sasha)
  - [ZBX-3537] trigger events are now sorted by timestamp (KB)
@@ -173,7 +180,7 @@ Changes for 1.8.4rc3
  - [ZBX-3333] fixed icmppingloss[] returning bad values when NIC bonding is used (asaveljevs)
  - [ZBX-1985,ZBX-2394] fixed icmppingloss[] returning bad values when fping is capable of pinging both address families (asaveljevs)
  - [ZBX-2825] fix after saving the profile it stays in the profile page (Vlad)
- - [ZBX-1294] disabled GUI interface action elements for editing a templated trigger
+ - [ZBX-1294] disabled GUI interface action elements for editing a templated trigger (KB)
  - [ZBX-3306] fixed minimal value limit for action escalation period (Vedmak)
  - [ZBX-3320] fixed host.create, template.create permission error for admin users (Vedmak)
  - [ZBX-266] made debugging output for Web scenarios more useful (Sasha)

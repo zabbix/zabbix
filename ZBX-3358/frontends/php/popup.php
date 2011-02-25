@@ -394,13 +394,14 @@ include_once('include/page_header.php');
 		if(!isset($ok)) $nodeid = get_current_nodeid();
 		unset($ok);
 
-		if(str_in_array($srctbl,array('hosts_and_templates', 'hosts','templates','triggers','items','applications','host_templates','graphs','simple_graph','plain_text'))){
+		if(str_in_array($srctbl,array('hosts_and_templates','hosts','templates','triggers','items','applications','host_templates','graphs','simple_graph','plain_text'))){
 			$frmTitle->addItem(array(S_GROUP,SPACE, $pageFilter->getGroupsCB(true)));
 		}
 
 		if(str_in_array($srctbl,array('help_items'))){
 			$itemtype = get_request('itemtype',CProfile::get('web.popup.itemtype',0));
 			$cmbTypes = new CComboBox('itemtype',$itemtype,'javascript: submit();');
+
 			foreach($allowed_item_types as $type)
 				$cmbTypes->addItem($type, item_type2str($type));
 			$frmTitle->addItem(array(S_TYPE,SPACE,$cmbTypes));
@@ -847,12 +848,12 @@ include_once('include/page_header.php');
 		$options = array(
 			'nodeids' => $nodeid,
 			'hostids' => $hostid,
-			'groupids' => $groupid,
 			'output' => array('triggerid', 'description', 'expression', 'priority', 'status'),
 			'selectHosts' => array('hostid','host'),
 			'select_dependencies' => API_OUTPUT_EXTEND,
 			'expandDescription' => true
 		);
+		if(is_null($hostid)) $options['groupids'] = $groupid;
 		if(!is_null($writeonly)) $options['editable'] = true;
 		if(!is_null($templated)) $options['templated'] = $templated;
 
@@ -962,7 +963,8 @@ include_once('include/page_header.php');
 		if(!is_null($writeonly)) $options['editable'] = 1;
 		if(!is_null($templated) && $templated == 1) $options['templated'] = $templated;
 		if(!is_null($value_types)) $options['filter']['value_type'] = $value_types;
-		//host can't have id=0. This option made hosts dissapear from list
+
+// host can't have id=0. This option made hosts dissapear from list
 		if ($options['hostids'] == 0) unset($options['hostids']);
 
 		$items = API::Item()->get($options);
@@ -1111,11 +1113,11 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'nodeids' => $nodeid,
-			'groupids' => $groupid,
 			'hostids' => $hostid,
 			'output' => API_OUTPUT_EXTEND,
 			'expandData' => true,
 		);
+		if(is_null($hostid)) $options['groupids'] = $groupid;
 		if(!is_null($writeonly)) $options['editable'] = 1;
 		if(!is_null($templated)) $options['templated'] = $templated;
 
@@ -1178,6 +1180,8 @@ include_once('include/page_header.php');
 			'selectHosts' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		);
+
+		if(is_null($hostid)) $options['groupids'] = $groupid;
 		if(!is_null($writeonly)) $options['editable'] = 1;
 		if(!is_null($templated)) $options['templated'] = $templated;
 
@@ -1286,6 +1290,7 @@ include_once('include/page_header.php');
 			),
 			'preservekeys' => true
 		);
+		if(is_null($hostid)) $options['groupids'] = $groupid;
 		if(!is_null($writeonly)) $options['editable'] = 1;
 		if(!is_null($templated)) $options['templated'] = $templated;
 
@@ -1361,7 +1366,7 @@ include_once('include/page_header.php');
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		);
-		if(!is_null($writeonly)) $options['editable'] = 1;
+		if(!is_null($writeonly)) $options['editable'] = true;
 
 		$sysmaps = API::Map()->get($options);
 		order_result($sysmaps, 'name');

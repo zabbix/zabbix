@@ -43,20 +43,19 @@ require_once('include/templates/scriptConfirm.js.php');
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	$fields=array(
-		'sysmapid'=>	array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,		NULL),
-		GET_PARAM_NAME=>		array(T_ZBX_STR, O_OPT,	P_SYS,		null,		null),
-		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,		IN('0,1'),	NULL),
+	$fields = array(
+		'sysmapid'=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,					NULL),
+		GET_PARAM_NAME=>	array(T_ZBX_STR, O_OPT,	P_SYS,			null,					null),
+		'fullscreen'=>		array(T_ZBX_INT, O_OPT,	P_SYS,			IN('0,1'),				NULL),
 //ajax
-		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
-		'favid'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NULL,			NULL),
+		'favobj'=>			array(T_ZBX_STR, O_OPT, P_ACT,			NULL,					NULL),
+		'favref'=>			array(T_ZBX_STR, O_OPT, P_ACT, 			NOT_EMPTY,				NULL),
+		'favid'=>			array(T_ZBX_INT, O_OPT, P_ACT, 			NULL,					NULL),
 
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
-		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove'"),NULL)
+		'state'=>			array(T_ZBX_INT, O_OPT, P_ACT,  		NOT_EMPTY,				NULL),
+		'action'=>			array(T_ZBX_STR, O_OPT, P_ACT, 			IN("'add','remove'"),	NULL)
 	);
 	check_fields($fields);
-
 ?>
 <?php
 	if(isset($_REQUEST['favobj'])){
@@ -96,6 +95,7 @@ require_once('include/templates/scriptConfirm.js.php');
 		'nodeids' => get_current_nodeid(),
 		'expand_urls' => true,
 		'select_selements' => API_OUTPUT_EXTEND,
+		'preservekeys' => true,
 	);
 	$maps = API::Map()->get($options);
 	$maps = zbx_toHash($maps, 'sysmapid');
