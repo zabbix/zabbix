@@ -148,30 +148,27 @@ int	get_value_db(DC_ITEM *item, AGENT_RESULT *result)
 
 	#define DB_ODBC_SELECT_KEY "db.odbc.select["
 
-	if(strncmp(item->key, DB_ODBC_SELECT_KEY, strlen(DB_ODBC_SELECT_KEY)) == 0)
+	if (0 == strncmp(item->key, DB_ODBC_SELECT_KEY, strlen(DB_ODBC_SELECT_KEY)))
 	{
-		db_dsn = get_param_value(item->params,"DSN");
-		db_user = get_param_value(item->params,"user");
-		db_pass = get_param_value(item->params,"password");
-		db_sql  = get_param_value(item->params,"sql");
+		db_dsn = get_param_value(item->params, "DSN");
+		db_user = get_param_value(item->params, "user");
+		db_pass = get_param_value(item->params, "password");
+		db_sql  = get_param_value(item->params, "sql");
 
-		if( SUCCEED == odbc_DBconnect(&dbh, db_dsn, db_user, db_pass) )
+		if (SUCCEED == odbc_DBconnect(&dbh, db_dsn, db_user, db_pass))
 		{
-			if( NULL != (row = odbc_DBfetch(odbc_DBselect(&dbh, db_sql))) )
+			if (NULL != (row = odbc_DBfetch(odbc_DBselect(&dbh, db_sql))))
 			{
 				if (SUCCEED == set_result_type(result, item->value_type, item->data_type, row[0]))
 					ret = SUCCEED;
 			}
 			else
-			{
 				SET_MSG_RESULT(result, strdup(get_last_odbc_strerror()));
-			}
+
 			odbc_DBclose(&dbh);
 		}
 		else
-		{
 			SET_MSG_RESULT(result, strdup(get_last_odbc_strerror()));
-		}
 
 		zbx_free(db_dsn);
 		zbx_free(db_user);

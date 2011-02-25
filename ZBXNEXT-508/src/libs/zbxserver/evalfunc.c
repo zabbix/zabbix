@@ -1952,6 +1952,12 @@ int	evaluate_function(char *value, DB_ITEM *item, const char *function, const ch
 				0 == tm->tm_wday ? 7 : tm->tm_wday);
 		ret = SUCCEED;
 	}
+	else if (0 == strcmp(function, "dayofmonth"))
+	{
+		tm = localtime(&now);
+		zbx_snprintf(value, MAX_BUFFER_LEN, "%d", tm->tm_mday);
+		ret = SUCCEED;
+	}
 	else if (0 == strcmp(function, "time"))
 	{
 		tm = localtime(&now);

@@ -527,7 +527,7 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGEN
 					ptemp = temp + 12;
 				else
 					ptemp = temp;
-				if (FAIL == set_result_type(value, item->value_type, item->data_type, ptemp))
+				if (SUCCEED != set_result_type(value, item->value_type, item->data_type, ptemp))
 					ret = NOTSUPPORTED;
 			}
 			else if (vars->type == ASN_UINTEGER || vars->type == ASN_COUNTER ||
