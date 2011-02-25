@@ -214,16 +214,8 @@ include_once('include/page_header.php');
 	$table->show();
 
 	if($media_type == 0){
-		foreach($media_types as $mediatypeid => $mediatype){
-			$links[] = new CLink($mediatype, 'media_types.php?form=update&mediatypeid='.$mediatypeid);
-			$links[] = ', ';
-		}
-		array_pop($links);
-		array_unshift($links, SPACE.SPACE.SPACE.SPACE.SPACE.SPACE.S_ALL_SMALL.SPACE.'(');
-		$links[] = ')';
-
 		$table = new CTableInfo();
-		$table->addRow(new CSpan($links));
+		$table->addRow(new CSpan(SPACE.SPACE.SPACE.SPACE.SPACE.SPACE.'all'.SPACE.'('.implode('/', $media_types).')','off'));
 		$table->Show();
 	}
 
