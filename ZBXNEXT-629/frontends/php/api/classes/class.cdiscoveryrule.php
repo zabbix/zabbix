@@ -67,8 +67,8 @@ class CDiscoveryRule extends CZBXAPI{
 // OutPut
 			'output'				=> API_OUTPUT_REFER,
 			'selectHosts'			=> null,
-			'select_triggers'		=> null,
-			'select_graphs'			=> null,
+			'selectTriggers'		=> null,
+			'selectGraphs'			=> null,
 			'select_prototypes'		=> null,
 			'countOutput'			=> null,
 			'groupCount'			=> null,
@@ -295,10 +295,10 @@ class CDiscoveryRule extends CZBXAPI{
 					if(!is_null($options['selectHosts']) && !isset($result[$item['itemid']]['hosts'])){
 						$result[$item['itemid']]['hosts'] = array();
 					}
-					if(!is_null($options['select_triggers']) && !isset($result[$item['itemid']]['triggers'])){
+					if(!is_null($options['selectTriggers']) && !isset($result[$item['itemid']]['triggers'])){
 						$result[$item['itemid']]['triggers'] = array();
 					}
-					if(!is_null($options['select_graphs']) && !isset($result[$item['itemid']]['graphs'])){
+					if(!is_null($options['selectGraphs']) && !isset($result[$item['itemid']]['graphs'])){
 						$result[$item['itemid']]['graphs'] = array();
 					}
 					if(!is_null($options['select_prototypes']) && !isset($result[$item['itemid']]['prototypes'])){
@@ -356,7 +356,7 @@ COpt::memoryPick();
 		}
 
 // Adding triggers
-		if(!is_null($options['select_triggers'])){
+		if(!is_null($options['selectTriggers'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'discoveryids' => $itemids,
@@ -364,8 +364,8 @@ COpt::memoryPick();
 				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 			);
 
-			if(in_array($options['select_triggers'], $subselects_allowed_outputs)){
-				$obj_params['output'] = $options['select_triggers'];
+			if(in_array($options['selectTriggers'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['selectTriggers'];
 				$triggers = API::Trigger()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($triggers, 'name');
@@ -384,7 +384,7 @@ COpt::memoryPick();
 					}
 				}
 			}
-			else if(API_OUTPUT_COUNT == $options['select_triggers']){
+			else if(API_OUTPUT_COUNT == $options['selectTriggers']){
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
@@ -401,7 +401,7 @@ COpt::memoryPick();
 		}
 
 // Adding graphs
-		if(!is_null($options['select_graphs'])){
+		if(!is_null($options['selectGraphs'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'discoveryids' => $itemids,
@@ -409,8 +409,8 @@ COpt::memoryPick();
 				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 			);
 
-			if(in_array($options['select_graphs'], $subselects_allowed_outputs)){
-				$obj_params['output'] = $options['select_graphs'];
+			if(in_array($options['selectGraphs'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['selectGraphs'];
 				$graphs = API::Graph()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($graphs, 'name');
@@ -429,7 +429,7 @@ COpt::memoryPick();
 					}
 				}
 			}
-			else if(API_OUTPUT_COUNT == $options['select_graphs']){
+			else if(API_OUTPUT_COUNT == $options['selectGraphs']){
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
@@ -824,7 +824,7 @@ COpt::memoryPick();
 				}
 			}
 
-			$data[] = array('values' => $item, 'where'=> array('itemid='.$item['itemid']));
+			$data[] = array('values' => $item, 'where'=> array('itemid'=>$item['itemid']));
 		}
 		$result = DB::update('items', $data);
 		if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');

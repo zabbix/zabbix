@@ -75,7 +75,7 @@ class CTemplateScreen extends CScreen{
 			'excludeSearch'				=> null,
 // OutPut
 			'output'					=> API_OUTPUT_REFER,
-			'select_screenitems'		=> null,
+			'selectScreenItems'		=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -312,11 +312,11 @@ class CTemplateScreen extends CScreen{
 				else{
 					if(!isset($result[$screen['screenid']])) $result[$screen['screenid']]= array();
 
-					if(!is_null($options['select_screenitems']) && !isset($result[$screen['screenid']]['screenitems'])){
+					if(!is_null($options['selectScreenItems']) && !isset($result[$screen['screenid']]['screenitems'])){
 						$result[$screen['screenid']]['screenitems'] = array();
 					}
 
-					if(isset($screen['screenitemid']) && is_null($options['select_screenitems'])){
+					if(isset($screen['screenitemid']) && is_null($options['selectScreenItems'])){
 						if(!isset($result[$screen['screenid']]['screenitems']))
 							$result[$screen['screenid']]['screenitems'] = array();
 
@@ -333,7 +333,7 @@ class CTemplateScreen extends CScreen{
 		$options['hostids'] = zbx_toHash($options['hostids']);
 
 // Adding ScreenItems
-		if(!is_null($options['select_screenitems']) && str_in_array($options['select_screenitems'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectScreenItems']) && str_in_array($options['selectScreenItems'], $subselects_allowed_outputs)){
 			$screens_items = array();
 			$db_sitems = DBselect('SELECT * FROM screens_items WHERE '.DBcondition('screenid', $screenids));
 			while($sitem = DBfetch($db_sitems)){
@@ -360,7 +360,7 @@ class CTemplateScreen extends CScreen{
 		}
 
 // Creating linkage of template -> real objects
-		if(!is_null($options['select_screenitems']) && !is_null($options['hostids'])){
+		if(!is_null($options['selectScreenItems']) && !is_null($options['hostids'])){
 // prepare Graphs
 			if(!empty($graphids)){
 				$tplGraphs = API::Graph()->get(array(
@@ -608,7 +608,7 @@ class CTemplateScreen extends CScreen{
 				if(!empty($screen)){
 					$update[] = array(
 						'values' => $screen,
-						'where' => array('screenid='.$screenid),
+						'where' => array('screenid' => $screenid),
 					);
 				}
 

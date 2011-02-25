@@ -84,7 +84,7 @@ class CHostGroup extends CZBXAPI{
 // output
 			'output'					=> API_OUTPUT_REFER,
 			'selectHosts'				=> null,
-			'select_templates'			=> null,
+			'selectTemplates'			=> null,
 
 			'countOutput'				=> null,
 			'groupCount'				=> null,
@@ -403,7 +403,7 @@ class CHostGroup extends CZBXAPI{
 
 					if(!isset($result[$group['groupid']])) $result[$group['groupid']]= array();
 
-					if(!is_null($options['select_templates']) && !isset($result[$group['groupid']]['templates'])){
+					if(!is_null($options['selectTemplates']) && !isset($result[$group['groupid']]['templates'])){
 						$result[$group['groupid']]['templates'] = array();
 					}
 
@@ -504,15 +504,15 @@ COpt::memoryPick();
 		}
 
 // Adding templates
-		if(!is_null($options['select_templates'])){
+		if(!is_null($options['selectTemplates'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'groupids' => $groupids,
 				'preservekeys' => 1
 			);
 
-			if(is_array($options['select_templates']) || str_in_array($options['select_templates'], $subselects_allowed_outputs)){
-				$obj_params['output'] = $options['select_templates'];
+			if(is_array($options['selectTemplates']) || str_in_array($options['selectTemplates'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['selectTemplates'];
 				$templates = API::Template()->get($obj_params);
 				if(!is_null($options['limitSelects'])) order_result($templates, 'host');
 
@@ -532,7 +532,7 @@ COpt::memoryPick();
 					}
 				}
 			}
-			else if(API_OUTPUT_COUNT == $options['select_templates']){
+			else if(API_OUTPUT_COUNT == $options['selectTemplates']){
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
@@ -772,7 +772,7 @@ COpt::memoryPick();
 				$update = array();
 				$update[] = array(
 					'values' => array('status' => ACTION_STATUS_DISABLED),
-					'where' => array(DBcondition('actionid',$actionids))
+					'where' => array('actionid' => $actionids)
 				);
 				DB::update('actions', $update);
 			}

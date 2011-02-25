@@ -733,63 +733,63 @@ COpt::memoryPick();
 		$maps = zbx_toArray($maps);
 		$sysmapids = zbx_objectValues($maps, 'sysmapid');
 
-			$this->checkInput($maps, __FUNCTION__);
+		$this->checkInput($maps, __FUNCTION__);
 
-			$update = array();
-			$urlidsToDelete = $urlsToUpdate = $urlsToAdd = array();
-			foreach($maps as $map){
+		$update = array();
+		$urlidsToDelete = $urlsToUpdate = $urlsToAdd = array();
+		foreach($maps as $map){
 
-				$update[] = array(
-					'values' => $map,
-					'where' => array('sysmapid='.$map['sysmapid']),
-				);
+			$update[] = array(
+				'values' => $map,
+				'where' => array('sysmapid'=>$map['sysmapid']),
+			);
 
-				if(isset($map['urls'])){
-					$map['urls'] = zbx_toHash($map['urls'], 'name');
+			if(isset($map['urls'])){
+				$map['urls'] = zbx_toHash($map['urls'], 'name');
 
-					$dbSysmaps = $this->get(array(
-						'sysmapids' => $sysmapids,
-						'preservekeys' => true,
-						'output' => API_OUTPUT_EXTEND,
-					));
-					foreach($dbSysmaps[$map['sysmapid']]['urls'] as $existing_url){
-						$toUpdate = false;
-						foreach($map['urls'] as $unum => $new_url){
-							if($existing_url['name'] == $new_url['name']){
-								$toUpdate = array(
-									'values' => $new_url,
-									'where' => array('sysmapurlid='.$existing_url['sysmapurlid'])
-								);
-								unset($map['urls'][$unum]);
+				$dbSysmaps = $this->get(array(
+					'sysmapids' => $sysmapids,
+					'preservekeys' => true,
+					'output' => API_OUTPUT_EXTEND,
+				));
+				foreach($dbSysmaps[$map['sysmapid']]['urls'] as $existing_url){
+					$toUpdate = false;
+					foreach($map['urls'] as $unum => $new_url){
+						if($existing_url['name'] == $new_url['name']){
+							$toUpdate = array(
+								'values' => $new_url,
+								'where' => array('sysmapurlid'=>$existing_url['sysmapurlid'])
+							);
+							unset($map['urls'][$unum]);
 
-								break;
-							}
-						}
-
-						if($toUpdate){
-							$urlsToUpdate[] = $toUpdate;
-						}
-						else{
-							$urlidsToDelete[] = $existing_url['sysmapurlid'];
+							break;
 						}
 					}
 
-					foreach($map['urls'] as $newUrl){
-						$newUrl['sysmapid'] = $map['sysmapid'];
-						$urlsToAdd[] = $newUrl;
+					if($toUpdate){
+						$urlsToUpdate[] = $toUpdate;
+					}
+					else{
+						$urlidsToDelete[] = $existing_url['sysmapurlid'];
 					}
 				}
+
+				foreach($map['urls'] as $newUrl){
+					$newUrl['sysmapid'] = $map['sysmapid'];
+					$urlsToAdd[] = $newUrl;
+				}
 			}
+		}
 
-			DB::update('sysmaps', $update);
+		DB::update('sysmaps', $update);
 
-			if(!empty($urlidsToDelete))
-				DB::delete('sysmap_url', array('sysmapurlid'=>$urlidsToDelete));
+		if(!empty($urlidsToDelete))
+			DB::delete('sysmap_url', array('sysmapurlid'=>$urlidsToDelete));
 
-			DB::update('sysmap_url', $urlsToUpdate);
-			DB::insert('sysmap_url', $urlsToAdd);
+		DB::update('sysmap_url', $urlsToUpdate);
+		DB::insert('sysmap_url', $urlsToAdd);
 
-			return array('sysmapids' => $sysmapids);
+		return array('sysmapids' => $sysmapids);
 	}
 
 
@@ -985,7 +985,7 @@ COpt::memoryPick();
 
 				$update[] = array(
 					'values' => $selement,
-					'where' => array('selementid='.$selement['selementid']),
+					'where' => array('selementid'=>$selement['selementid']),
 				);
 				$selementids[] = $selement['selementid'];
 
@@ -996,7 +996,7 @@ COpt::memoryPick();
 							if($existing_url['name'] == $new_url['name']){
 								$toUpdate = array(
 									'values' => $new_url,
-									'where' => array('sysmapelementurlid ='.$existing_url['sysmapelementurlid'])
+									'where' => array('sysmapelementurlid'=>$existing_url['sysmapelementurlid'])
 								);
 								unset($selement['urls'][$unum]);
 

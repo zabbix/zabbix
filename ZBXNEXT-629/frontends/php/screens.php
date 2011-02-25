@@ -149,7 +149,7 @@
 	$screens = API::Screen()->get(array(
 		'nodeids' => get_current_nodeid(),
 		'output' => API_OUTPUT_EXTEND,
-		'select_screenitems' => API_OUTPUT_EXTEND
+		'selectScreenItems' => API_OUTPUT_EXTEND
 	));
 
 

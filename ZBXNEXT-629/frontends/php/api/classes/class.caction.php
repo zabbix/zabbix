@@ -770,136 +770,136 @@ COpt::memoryPick();
 		$update = array();
 
 
-			$options = array(
-				'actionids' => $actionids,
-				'editable' => true,
-				'output' => API_OUTPUT_EXTEND,
-				'preservekeys' => true,
-				'selectOperations' => API_OUTPUT_EXTEND,
-				'selectConditions' => API_OUTPUT_EXTEND,
-			);
-			$updActions = $this->get($options);
-			foreach($actions as $anum => $action){
-				if(isset($action['actionid']) && !isset($updActions[$action['actionid']])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
-				}
+		$options = array(
+			'actionids' => $actionids,
+			'editable' => true,
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => true,
+			'selectOperations' => API_OUTPUT_EXTEND,
+			'selectConditions' => API_OUTPUT_EXTEND,
+		);
+		$updActions = $this->get($options);
+		foreach($actions as $anum => $action){
+			if(isset($action['actionid']) && !isset($updActions[$action['actionid']])){
+				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
 			}
+		}
 
 // Check fields
-			$duplicates = array();
-			foreach($actions as $anum => $action){
-				if(!check_db_fields(array('actionid' => null), $action)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect parameters are used for action update method "%s"',$action['name']));
-				}
+		$duplicates = array();
+		foreach($actions as $anum => $action){
+			if(!check_db_fields(array('actionid' => null), $action)){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect parameters are used for action update method "%s"',$action['name']));
+			}
 
 // check if user change esc_period or eventsource
-				if(isset($action['esc_period']) || isset($action['eventsource'])){
-					$eventsource = isset($action['eventsource']) ? $action['eventsource']: $updActions[$action['actionid']]['eventsource'];
-					$esc_period = isset($action['esc_period']) ? $action['esc_period']: $updActions[$action['actionid']]['esc_period'];
+			if(isset($action['esc_period']) || isset($action['eventsource'])){
+				$eventsource = isset($action['eventsource']) ? $action['eventsource']: $updActions[$action['actionid']]['eventsource'];
+				$esc_period = isset($action['esc_period']) ? $action['esc_period']: $updActions[$action['actionid']]['esc_period'];
 
-					if(($esc_period < 60) && (EVENT_SOURCE_TRIGGERS == $eventsource))
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" has incorrect value for "esc_period" (minimum 60 seconds).', $action['name']));
-				}
-//--
-				if(!isset($action['name'])) continue;
-
-				if(isset($duplicates[$action['name']]))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" already exists.', $action['name']));
-				else
-					$duplicates[$action['name']] = $action['name'];
+				if(($esc_period < 60) && (EVENT_SOURCE_TRIGGERS == $eventsource))
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" has incorrect value for "esc_period" (minimum 60 seconds).', $action['name']));
 			}
+//--
+			if(!isset($action['name'])) continue;
+
+			if(isset($duplicates[$action['name']]))
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" already exists.', $action['name']));
+			else
+				$duplicates[$action['name']] = $action['name'];
+		}
 //------
 
-			$operationsCreate = $operationsUpdate = $operationidsDelete = array();
-			$conditionsCreate = $conditionsUpdate = $conditionidsDelete = array();
-			foreach($actions as $anum => $action){
+		$operationsCreate = $operationsUpdate = $operationidsDelete = array();
+		$conditionsCreate = $conditionsUpdate = $conditionidsDelete = array();
+		foreach($actions as $anum => $action){
 // Existance
-				$options = array(
-					'filter' => array( 'name' => $action['name'] ),
-					'output' => API_OUTPUT_SHORTEN,
-					'editable' => 1,
-					'nopermissions' => true,
-					'preservekeys' => true,
-				);
-				$action_exists = $this->get($options);
-				if(($action_exist = reset($action_exists)) && ($action_exist['actionid'] != $action['actionid'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" already exists.', $action['name']));
-				}
+			$options = array(
+				'filter' => array( 'name' => $action['name'] ),
+				'output' => API_OUTPUT_SHORTEN,
+				'editable' => 1,
+				'nopermissions' => true,
+				'preservekeys' => true,
+			);
+			$action_exists = $this->get($options);
+			if(($action_exist = reset($action_exists)) && ($action_exist['actionid'] != $action['actionid'])){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" already exists.', $action['name']));
+			}
 //----
 
-				if(isset($action['conditions'])){
-					$conditionsDb = isset($updActions[$action['actionid']]['conditions'])
-							? $updActions[$action['actionid']]['conditions']
-							: array();
+			if(isset($action['conditions'])){
+				$conditionsDb = isset($updActions[$action['actionid']]['conditions'])
+						? $updActions[$action['actionid']]['conditions']
+						: array();
 
-					$this->validateConditions($action['conditions']);
+				$this->validateConditions($action['conditions']);
 
-					foreach($action['conditions'] as $condition){
-						$condition['actionid'] = $action['actionid'];
+				foreach($action['conditions'] as $condition){
+					$condition['actionid'] = $action['actionid'];
 
-						if(!isset($condition['conditionid'])){
-							$conditionsCreate[] = $condition;
-						}
-						else if(isset($conditionsDb[$condition['conditionid']])){
-							$conditionsUpdate[] = $condition;
-							unset($conditionsDb[$condition['conditionid']]);
-						}
-						else{
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action conditionid'));
-						}
+					if(!isset($condition['conditionid'])){
+						$conditionsCreate[] = $condition;
 					}
-
-					$conditionidsDelete = array_merge($conditionidsDelete, array_keys($conditionsDb));
-				}
-
-				if(isset($action['operations']) && empty($action['operations'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" no operations defined.', $action['name']));
-				}
-				else if(isset($action['operations'])){
-					$this->validateOperations($action['operations']);
-
-					$operations_db = $updActions[$action['actionid']]['operations'];
-					foreach($action['operations'] as $operation){
-						$operation['actionid'] = $action['actionid'];
-
-						if(!isset($operation['operationid'])){
-							$operationsCreate[] = $operation;
-						}
-						else if(isset($operations_db[$operation['operationid']])){
-							$operationsUpdate[] = $operation;
-							unset($operations_db[$operation['operationid']]);
-						}
-						else{
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operationid'));
-						}
+					else if(isset($conditionsDb[$condition['conditionid']])){
+						$conditionsUpdate[] = $condition;
+						unset($conditionsDb[$condition['conditionid']]);
 					}
-					$operationidsDelete = array_merge($operationidsDelete, array_keys($operations_db));
+					else{
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action conditionid'));
+					}
 				}
 
-				$actionid = $action['actionid'];
-				unset($action['actionid']);
-				if(!empty($action)){
-					$update[] = array(
-						'values' => $action,
-						'where' => array('actionid='.$actionid),
-					);
-				}
+				$conditionidsDelete = array_merge($conditionidsDelete, array_keys($conditionsDb));
 			}
 
-			DB::update('actions', $update);
+			if(isset($action['operations']) && empty($action['operations'])){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" no operations defined.', $action['name']));
+			}
+			else if(isset($action['operations'])){
+				$this->validateOperations($action['operations']);
 
-			$this->addConditions($conditionsCreate);
-			$this->updateConditions($conditionsUpdate);
-			if(!empty($conditionidsDelete))
-				$this->deleteConditions($conditionidsDelete);
+				$operations_db = $updActions[$action['actionid']]['operations'];
+				foreach($action['operations'] as $operation){
+					$operation['actionid'] = $action['actionid'];
 
-			$this->addOperations($operationsCreate);
-			$this->updateOperations($operationsUpdate, $updActions);
-			if(!empty($operationidsDelete))
-				$this->deleteOperations($operationidsDelete);
+					if(!isset($operation['operationid'])){
+						$operationsCreate[] = $operation;
+					}
+					else if(isset($operations_db[$operation['operationid']])){
+						$operationsUpdate[] = $operation;
+						unset($operations_db[$operation['operationid']]);
+					}
+					else{
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operationid'));
+					}
+				}
+				$operationidsDelete = array_merge($operationidsDelete, array_keys($operations_db));
+			}
+
+			$actionid = $action['actionid'];
+			unset($action['actionid']);
+			if(!empty($action)){
+				$update[] = array(
+					'values' => $action,
+					'where' => array('actionid' => $actionid),
+				);
+			}
+		}
+
+		DB::update('actions', $update);
+
+		$this->addConditions($conditionsCreate);
+		$this->updateConditions($conditionsUpdate);
+		if(!empty($conditionidsDelete))
+			$this->deleteConditions($conditionidsDelete);
+
+		$this->addOperations($operationsCreate);
+		$this->updateOperations($operationsUpdate, $updActions);
+		if(!empty($operationidsDelete))
+			$this->deleteOperations($operationidsDelete);
 
 
-			return array('actionids' => $actionids);
+		return array('actionids' => $actionids);
 	}
 
 
@@ -924,7 +924,7 @@ COpt::memoryPick();
 			unset($condition['conditionid']);
 			$update = array(
 				'values' => $condition,
-				'where' => array('conditionid='.$conditionid)
+				'where' => array('conditionid'=>$conditionid)
 			);
 		}
 		DB::update('conditions', $update);
@@ -1138,7 +1138,7 @@ COpt::memoryPick();
 					else{
 						$opmessageUpdate[] = array(
 							'values' => $operation['opmessage'],
-							'where' => array('operationid='.$operation['operationid']),
+							'where' => array('operationid'=>$operation['operationid']),
 						);
 
 						$diff = zbx_array_diff($operationDb['opmessage_grp'], $operation['opmessage_grp'], 'usrgrpid');
@@ -1191,7 +1191,7 @@ COpt::memoryPick();
 							unset($opcommand_grp['opcommand_grpid']);
 							$opcommand_grpUpdate[] = array(
 								'values' => $opcommand_grp,
-								'where' => array('opcommand_grpid='.$opcommand_grpid),
+								'where' => array('opcommand_grpid'=>$opcommand_grpid),
 							);
 						}
 
@@ -1203,7 +1203,7 @@ COpt::memoryPick();
 							unset($opcommand_hst['opcommand_hstid']);
 							$opcommand_hstUpdate[] = array(
 								'values' => $opcommand_hst,
-								'where' => array('opcommand_hstid='.$opcommand_hstid),
+								'where' => array('opcommand_hstid'=>$opcommand_hstid),
 							);
 						}
 
@@ -1264,7 +1264,7 @@ COpt::memoryPick();
 			if(!empty($operation)){
 				$operationsUpdate[] = array(
 					'values' => $operation,
-					'where' => array('operationid='.$operationid),
+					'where' => array('operationid'=>$operationid),
 				);
 			}
 		}

@@ -216,7 +216,7 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'triggerids' => $_REQUEST['g_triggerid'],
-			'select_dependencies' => 1,
+			'selectDependencies' => 1,
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1
 		);
@@ -465,8 +465,8 @@ include_once('include/page_header.php');
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => API_OUTPUT_EXTEND,
 			'selectItems' => API_OUTPUT_EXTEND,
-			'select_functions' => API_OUTPUT_EXTEND,
-			'select_dependencies' => API_OUTPUT_EXTEND,
+			'selectFunctions' => API_OUTPUT_EXTEND,
+			'selectDependencies' => API_OUTPUT_EXTEND,
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 		);
 

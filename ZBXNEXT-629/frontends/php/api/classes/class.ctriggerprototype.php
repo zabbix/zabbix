@@ -107,7 +107,7 @@ class CTriggerPrototype extends CZBXAPI{
 			'selectGroups'			=> null,
 			'selectHosts'			=> null,
 			'selectItems'			=> null,
-			'select_functions'		=> null,
+			'selectFunctions'		=> null,
 			'selectDiscoveryRule'	=> null,
 			'countOutput'			=> null,
 			'groupCount'			=> null,
@@ -619,7 +619,7 @@ class CTriggerPrototype extends CZBXAPI{
 					if(!is_null($options['selectItems']) && !isset($result[$trigger['triggerid']]['items'])){
 						$result[$trigger['triggerid']]['items'] = array();
 					}
-					if(!is_null($options['select_functions']) && !isset($result[$trigger['triggerid']]['functions'])){
+					if(!is_null($options['selectFunctions']) && !isset($result[$trigger['triggerid']]['functions'])){
 						$result[$trigger['triggerid']]['functions'] = array();
 					}
 					if(!is_null($options['selectDiscoveryRule']) && !isset($result[$trigger['triggerid']]['discoveryRule'])){
@@ -807,9 +807,9 @@ Copt::memoryPick();
 		}
 
 // Adding Functions
-		if(!is_null($options['select_functions']) && str_in_array($options['select_functions'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectFunctions']) && str_in_array($options['selectFunctions'], $subselects_allowed_outputs)){
 
-			if($options['select_functions'] == API_OUTPUT_EXTEND)
+			if($options['selectFunctions'] == API_OUTPUT_EXTEND)
 				$sql_select = 'f.*';
 			else
 				$sql_select = 'f.functionid, f.triggerid';
@@ -1304,7 +1304,7 @@ COpt::memoryPick();
 			}
 			DB::update('triggers', array(
 				'values' => array('expression' => $expression),
-				'where' => array('triggerid='.$triggerid)
+				'where' => array('triggerid' => $triggerid)
 			));
 
 			info(sprintf(_('Trigger [%1$s:%2$s] created.'), $trigger['description'], $trigger['expression']));
@@ -1393,7 +1393,7 @@ COpt::memoryPick();
 
 			DB::update('triggers', array(
 				'values' => $trigger_update,
-				'where' => array('triggerid='.$trigger['triggerid'])
+				'where' => array('triggerid' => $trigger['triggerid'])
 			));
 
 			$description = isset($trigger['description']) ? $trigger['description'] : $dbTrigger['description'];
@@ -1554,7 +1554,7 @@ COpt::memoryPick();
 				'hostids' => $data['templateids'],
 				'preservekeys' => 1,
 				'output' => API_OUTPUT_EXTEND,
-				'select_dependencies' => true,
+				'selectDependencies' => true,
 			);
 			$triggers = $this->get($options);
 
