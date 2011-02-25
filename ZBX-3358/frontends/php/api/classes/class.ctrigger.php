@@ -1122,7 +1122,7 @@ COpt::memoryPick();
 		$delete = ($method == 'delete');
 
 // permissions
-		if($update || $delete){
+		if($delete){
 			$trigger_db_fields = array('triggerid'=> null);
 			$dbTriggers = $this->get(array(
 				'triggerids' => zbx_objectValues($triggers, 'triggerid'),
@@ -1131,14 +1131,25 @@ COpt::memoryPick();
 				'preservekeys' => true,
 			));
 		}
+		else if($update){
+			$trigger_db_fields = array('triggerid'=> null);
+			$dbTriggers = $this->get(array(
+				'triggerids' => zbx_objectValues($triggers, 'triggerid'),
+				'output' => API_OUTPUT_EXTEND,
+				'editable' => true,
+				'preservekeys' => true,
+				'select_dependencies' => API_OUTPUT_REFER, // on update we also must check if dependencies have changed
+			));
+		}
 		else{
 			$trigger_db_fields = array(
 				'description' => null,
 				'expression' => null,
-				'error' => 'Trigger just added. No status update so far.',
+				'error' => _('Trigger just added. No status update so far.'),
 				'value'	=> 2,
 			);
 		}
+
 
 		foreach($triggers as $tnum => &$trigger){
 			$currentTrigger = $triggers[$tnum];
@@ -1194,6 +1205,18 @@ COpt::memoryPick();
 				if(isset($trigger['status']) && ($trigger['status'] == $dbTrigger['status']))
 					unset($trigger['status']);
 
+				// checking if dependencies have changed
+				if(isset($trigger['dependencies']) && count($trigger['dependencies']) == count($dbTrigger['dependencies'])){
+					foreach($trigger['dependencies'] as $i => $trDep){
+						// if at least of the elements is different
+						if ($trigger['dependencies'][$i] != $dbTrigger['dependencies'][$i]['triggerid']){
+							// we will not unset dependencies array
+							break;
+						}
+						unset($trigger['dependencies']);
+					}
+
+				}
 			}
 
 // if some of the properties are unchanged, no need to update them in DB
@@ -1853,44 +1876,5 @@ COpt::memoryPick();
 		return (count($ids) == $count);
 	}
 
-	protected function get_rules($method){
-		$rules = array();
-
-		$rules['create'] = array(
-			'expression' => array(
-				array('String'),
-				array('Required'),
-			),
-			'description' => array(
-				array('String'),
-				array('Required'),
-			),
-			'type' => array(
-				array('Range', 'range' => array(0, 1))
-			),
-			'priority' => array(
-				array('Range', 'range' => array(0, 1, 2, 3))
-			),
-			'status' => array(
-				array('Range', 'range' => array(0, 1))
-			),
-			'comments' => array(
-				array('String'),
-			),
-			'url' => array(
-				array('String'),
-				array('Required', 'condition' => array(
-					'priority' => array(
-						array('Range', 'range' => array(0))
-					),
-				)),
-			),
-			'dependencies' => array(
-				array('Array', 'rules' => array())
-			),
-		);
-
-		return $rules[$method];
-	}
 }
 ?>
