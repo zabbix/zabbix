@@ -1804,7 +1804,7 @@ COpt::memoryPick();
 					}
 					foreach($dep_templateids as $dep_tplid){
 						if(!isset($templates[$dep_tplid]) && $set_with_dep){
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Not all Templates are linked to host "%s"', reset($templates)));
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Not all Templates are linked to host "%s"', reset($templates)));
 						}
 					}
 				}
