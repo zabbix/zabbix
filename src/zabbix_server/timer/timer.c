@@ -71,7 +71,7 @@ static void	process_time_functions()
 			" from triggers t,functions f,items i,hosts h"
 			" where t.status=%d"
 				" and t.triggerid=f.triggerid"
-				" and f.function in ('nodata','date','dayofweek','time','now')"
+				" and f.function in ('nodata','date','dayofmonth','dayofweek','time','now')"
 				" and f.itemid=i.itemid"
 				" and i.status=%d"
 				" and i.hostid=h.hostid"
