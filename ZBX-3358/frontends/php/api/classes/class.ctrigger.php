@@ -1758,7 +1758,6 @@ COpt::memoryPick();
 				$dbTriggersUp = DBselect($sql);
 				$triggeridsUp = array();
 				while($triggerUp = DBfetch($dbTriggersUp)){
-					sdi($triggerUp); sdi($trigger);
 					if(bccomp($triggerUp['triggerid_up'],$trigger['triggerid']) == 0){
 						self::exception(
 							ZBX_API_ERROR_PARAMETERS,
