@@ -17,7 +17,6 @@ ALTER TABLE config
 	ADD severity_name_4 varchar(32) DEFAULT 'High' NOT NULL,
 	ADD severity_name_5 varchar(32) DEFAULT 'Disaster' NOT NULL;
 
-
 UPDATE config SET alert_usrgrpid=NULL WHERE NOT alert_usrgrpid IN (SELECT usrgrpid FROM usrgrp);
 UPDATE config SET discovery_groupid=NULL WHERE NOT discovery_groupid IN (SELECT groupid FROM groups);
 UPDATE config SET default_theme='css_ob.css' WHERE default_theme='default.css';

@@ -17,8 +17,7 @@ ALTER TABLE ONLY config
 	ADD severity_name_3 varchar(32) DEFAULT 'Average' NOT NULL,
 	ADD severity_name_4 varchar(32) DEFAULT 'High' NOT NULL,
 	ADD severity_name_5 varchar(32) DEFAULT 'Disaster' NOT NULL;
-	
-	
+
 UPDATE config SET alert_usrgrpid=NULL WHERE NOT EXISTS (SELECT 1 FROM usrgrp WHERE usrgrp.usrgrpid=config.alert_usrgrpid);
 UPDATE config SET discovery_groupid=NULL WHERE NOT EXISTS (SELECT 1 FROM groups WHERE groups.groupid=config.discovery_groupid);
 UPDATE config SET default_theme='css_ob.css' WHERE default_theme='default.css';
