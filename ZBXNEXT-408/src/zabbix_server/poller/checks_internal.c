@@ -198,17 +198,31 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		double		value;
 
 		if (nparams > 4)
+		{
+			error = zbx_strdup(error, "Too many parameters");
 			goto not_supported;
+		}
+		else if (1 == nparams)
+		{
+			error = zbx_strdup(error, "Required parameter missing");
+			goto not_supported;
+		}
 
 		if (0 != get_param(params, 2, tmp, sizeof(tmp)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
 			goto not_supported;
+		}
 
 		for (process_type = 0; process_type < ZBX_PROCESS_TYPE_COUNT; process_type++)
 			if (0 == strcmp(tmp, get_process_type_string(process_type)))
 				break;
 
 		if (ZBX_PROCESS_TYPE_COUNT == process_type)
+		{
+			error = zbx_strdup(error, "Invalid second parameter");
 			goto not_supported;
+		}
 
 		process_forks = get_process_type_forks(process_type);
 
@@ -218,7 +232,10 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		if (0 == strcmp(tmp, "count"))
 		{
 			if (nparams > 3)
+			{
+				error = zbx_strdup(error, "Too many parameters");
 				goto not_supported;
+			}
 
 			SET_UI64_RESULT(result, process_forks);
 		}
@@ -233,11 +250,26 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 				aggr_func = ZBX_AGGR_FUNC_MAX;
 			else if (0 == strcmp(tmp, "min"))
 				aggr_func = ZBX_AGGR_FUNC_MIN;
-			else if (SUCCEED == is_ushort(tmp, &process_num) && process_num > 0 &&
-					process_num <= process_forks)
+			else if (SUCCEED == is_ushort(tmp, &process_num) && process_num > 0)
 				aggr_func = ZBX_AGGR_FUNC_ONE;
 			else
+			{
+				error = zbx_strdup(error, "Invalid third parameter");
 				goto not_supported;
+			}
+
+			if (0 == process_forks)
+			{
+				error = zbx_dsprintf(error, "No \"%s\" processes started",
+						get_process_type_string(process_type));
+				goto not_supported;
+			}
+			else if (process_num > process_forks)
+			{
+				error = zbx_dsprintf(error, "\"%s\" #%d is not started",
+						get_process_type_string(process_type), process_num);
+				goto not_supported;
+			}
 
 			if (0 != get_param(params, 4, tmp, sizeof(tmp)))
 				*tmp = '\0';
@@ -247,10 +279,12 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			else if (0 == strcmp(tmp, "idle"))
 				state = ZBX_PROCESS_STATE_IDLE;
 			else
+			{
+				error = zbx_strdup(error, "Invalid fouth parameter");
 				goto not_supported;
+			}
 
-			if (NOTSUPPORTED == get_selfmon_stats(process_type, aggr_func, process_num, state, &value))
-				goto not_supported;
+			get_selfmon_stats(process_type, aggr_func, process_num, state, &value);
 
 			SET_DBL_RESULT(result, value);
 		}
