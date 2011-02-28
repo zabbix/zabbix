@@ -693,8 +693,8 @@ switch($itemType) {
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1,
 			'select_prototypes' => API_OUTPUT_COUNT,
-			'select_graphs' => API_OUTPUT_COUNT,
-			'select_triggers' => API_OUTPUT_COUNT,
+			'selectGraphs' => API_OUTPUT_COUNT,
+			'selectTriggers' => API_OUTPUT_COUNT,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)

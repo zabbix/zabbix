@@ -325,7 +325,17 @@ Copt::memoryPick();
 // TODO:
 // Adding medias
 		if(!is_null($options['selectMedias']) && str_in_array($options['selectMedias'], $subselects_allowed_outputs)){
+			$obj_params = array(
+				'output' => $options['selectMedias'],
+				'userids' => $userids,
+				'preservekeys' => true
+			);
+			$userMedias = API::UserMedia()->get($obj_params);
+			foreach($userMedias as $mediaid => $media){
+				$result[$media['userid']]['medias'][] = $media;
+			}
 		}
+
 // Adding mediatypes
 		if(!is_null($options['selectMediatypes']) && str_in_array($options['selectMediatypes'], $subselects_allowed_outputs)){
 		}
