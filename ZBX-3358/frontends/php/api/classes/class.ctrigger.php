@@ -1559,14 +1559,12 @@ COpt::memoryPick();
 						'triggerid_up' => $triggerid_up
 					)));
 				}
-
-
 			}
 
 			$description = isset($trigger['description']) ? $trigger['description'] : $dbTrigger['description'];
 			$expression = isset($trigger['expression']) ? $trigger['expression'] : explode_exp($dbTrigger['expression'], false);
 			$trigger['expression'] = $expression;
-			$messages[] = _s('Trigger [%1$s:%2$s] updated.', $description, $expression);
+			$messages[] = _s('Trigger "%1$s:%2$s" updated.', $description, $expression);
 
 		}
 		unset($trigger);
@@ -1752,27 +1750,27 @@ COpt::memoryPick();
 			if(!isset($trigger['dependencies']) || empty($trigger['dependencies'])) continue;
 
 // check circular dependency {{{
-			$triggerid_down = $trigger['dependencies'];
+			$triggeridDown = $trigger['dependencies'];
 			do{
 				$sql = 'SELECT triggerid_up, description '.
 						' FROM trigger_depends, triggers'.
-						' WHERE trigger_depends.triggerid_down = triggers.triggerid AND '.DBcondition('trigger_depends.triggerid_down', $triggerid_down);
-				$db_up_triggers = DBselect($sql);
-				$up_triggerids = array();
-				while($up_trigger = DBfetch($db_up_triggers)){
-					if(bccomp($up_trigger['triggerid_up'],$trigger['triggerid']) == 0){
-
+						' WHERE trigger_depends.triggerid_down = triggers.triggerid AND '.DBcondition('trigger_depends.triggerid_down', $triggeridDown);
+				$dbTriggersUp = DBselect($sql);
+				$triggeridsUp = array();
+				while($triggerUp = DBfetch($dbTriggersUp)){
+					sdi($triggerUp); sdi($trigger);
+					if(bccomp($triggerUp['triggerid_up'],$trigger['triggerid']) == 0){
 						self::exception(
 							ZBX_API_ERROR_PARAMETERS,
-							$up_trigger['description'] == $trigger['description']
+							$triggerUp['description'] === $trigger['description']
 							? _s('Cannot add circular dependency: trigger "%1$s" cannot depend on itself.', $trigger['description'])
-							: _s('Cannot add circular dependency: trigger "%1$s" depends on trigger "%2$s".', $up_trigger['description'] , $trigger['description'])
+							: _s('Cannot add circular dependency: trigger "%1$s" depends on trigger "%2$s".', $triggerUp['description'] , $trigger['description'])
 						);
 					}
-					$up_triggerids[] = $up_trigger['triggerid_up'];
+					$triggeridsUp[] = $triggerUp['triggerid_up'];
 				}
-				$triggerid_down = $up_triggerids;
-			} while(!empty($up_triggerids));
+				$triggeridDown = $triggeridsUp;
+			} while(!empty($triggeridsUp));
 // }}} check circular dependency
 
 
@@ -1833,7 +1831,7 @@ COpt::memoryPick();
 					}
 					foreach($dep_templateids as $dep_tplid){
 						if(!isset($templates[$dep_tplid]) && $set_with_dep){
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Not all Templates are linked to host "%s"', reset($templates)));
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Not all templates are linked to host "%s"', reset($templates)));
 						}
 					}
 				}
