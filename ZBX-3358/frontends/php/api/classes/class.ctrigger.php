@@ -1577,8 +1577,6 @@ COpt::memoryPick();
 			info($message);
 		}
 
-
-		unset($trigger);
 	}
 
 	protected function inherit($trigger, $hostids=null){
