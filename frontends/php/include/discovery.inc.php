@@ -33,24 +33,22 @@
 	}
 
 	function svc_default_port($type_int){
-		$port = 0;
+		$typePort = array(
+			SVC_SSH =>		'22',
+			SVC_LDAP =>		'389',
+			SVC_SMTP =>		'25',
+			SVC_FTP =>		'21',
+			SVC_HTTP =>		'80',
+			SVC_POP =>		'110',
+			SVC_NNTP =>		'119',
+			SVC_IMAP =>		'143',
+			SVC_AGENT =>	'10050',
+			SVC_SNMPv1 =>	'161',
+			SVC_SNMPv2 =>	'161',
+			SVC_SNMPv3 =>	'161'
+		);
 
-		switch($type_int){
-			case SVC_SSH:		$port = '22';		break;
-			case SVC_LDAP:		$port = '389';		break;
-			case SVC_SMTP:		$port = '25';		break;
-			case SVC_FTP:		$port = '21';		break;
-			case SVC_HTTP:		$port = '80';		break;
-			case SVC_POP:		$port = '110';		break;
-			case SVC_NNTP:		$port = '119';		break;
-			case SVC_IMAP:		$port = '143';		break;
-			case SVC_AGENT:		$port = '10050';	break;
-			case SVC_SNMPv1:	$port = '161';		break;
-			case SVC_SNMPv2:	$port = '161';		break;
-			case SVC_SNMPv3:	$port = '161';		break;
-			default: 			$port = '0';		break;
-		}
-		return $port;
+		return isset($typePort[$type_int]) ? $typePort[$type_int] : 0;
 	}
 
 	function discovery_check_type2str($type=null){
