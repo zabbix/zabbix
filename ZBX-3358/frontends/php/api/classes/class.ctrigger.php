@@ -1207,12 +1207,16 @@ COpt::memoryPick();
 
 				// checking if dependencies have changed
 				if(isset($trigger['dependencies']) && count($trigger['dependencies']) == count($dbTrigger['dependencies'])){
+					$equal = true;
 					foreach($trigger['dependencies'] as $i => $trDep){
 						// if at least of the elements is different
 						if ($trigger['dependencies'][$i] != $dbTrigger['dependencies'][$i]['triggerid']){
 							// we will not unset dependencies array
+							$equal = false;
 							break;
 						}
+					}
+					if($equal){
 						unset($trigger['dependencies']);
 					}
 
@@ -1568,7 +1572,6 @@ COpt::memoryPick();
 
 		}
 		unset($trigger);
-
 		// now, check if current situation with dependencies is valid
 		$this->validateDependencies($triggers);
 		foreach($messages as $message){
