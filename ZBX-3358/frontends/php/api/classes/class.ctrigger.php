@@ -1209,8 +1209,8 @@ COpt::memoryPick();
 				if(isset($trigger['dependencies']) && count($trigger['dependencies']) == count($dbTrigger['dependencies'])){
 					$equal = true;
 					foreach($trigger['dependencies'] as $i => $trDep){
-						// if at least of the elements is different
-						if ($trigger['dependencies'][$i] != $dbTrigger['dependencies'][$i]['triggerid']){
+						// if at least one of the elements is different
+						if (bccomp($trigger['dependencies'][$i], $dbTrigger['dependencies'][$i]['triggerid']) != 0){
 							// we will not unset dependencies array
 							$equal = false;
 							break;
