@@ -676,7 +676,7 @@ Copt::memoryPick();
 			$result = DBexecute('DELETE FROM events WHERE '.DBcondition('eventid', $eventids));
 			$result &= DBexecute('DELETE FROM alerts WHERE '.DBcondition('eventid', $eventids));
 
-			if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Can not delete event');
+			if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete event');
 
 			return array('eventids' => $eventids);
 	}

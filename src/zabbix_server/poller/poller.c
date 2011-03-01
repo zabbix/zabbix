@@ -360,7 +360,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			res = get_value_snmp(item, result);
 			alarm(0);
 #else
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support of SNMP parameters was not compiled in"));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for SNMP checks was not compiled in"));
 			res = NOTSUPPORTED;
 #endif
 			break;
@@ -368,7 +368,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 #ifdef HAVE_OPENIPMI
 			res = get_value_ipmi(item, result);
 #else
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support of IPMI parameters was not compiled in"));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for IPMI checks was not compiled in"));
 			res = NOTSUPPORTED;
 #endif
 			break;
@@ -397,7 +397,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			res = get_value_ssh(item, result);
 			alarm(0);
 #else
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support of SSH parameters was not compiled in"));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for SSH checks was not compiled in"));
 			res = NOTSUPPORTED;
 #endif	/* HAVE_SSH2 */
 			break;
@@ -619,7 +619,7 @@ static int	get_values(unsigned char poller_type)
 				deactivate_host(&items[i], &timespecs[i], results[i].msg);
 				break;
 			default:
-				zbx_error("Unknown response code returned: %d", errcodes[i]);
+				zbx_error("unknown response code returned: %d", errcodes[i]);
 				assert(0);
 		}
 
@@ -634,9 +634,9 @@ static int	get_values(unsigned char poller_type)
 		{
 			if (ITEM_STATUS_NOTSUPPORTED != items[i].status)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "Parameter [%s:%s] is not supported, old status [%d]",
-						items[i].host.host, items[i].key_orig, items[i].status);
-				zabbix_syslog("Parameter [%s:%s] is not supported",
+				zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] is not supported",
+						items[i].host.host, items[i].key_orig);
+				zabbix_syslog("Item [%s:%s] is not supported",
 						items[i].host.host, items[i].key_orig);
 			}
 
