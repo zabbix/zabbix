@@ -200,6 +200,11 @@
 			'operators' => $operators,
 			'allowed_types' => $allowed_types_any
 		),
+		'dayofmonth' => array(
+			'description' => 'Day of month is {OP} N.',
+			'operators' => $operators,
+			'allowed_types' => $allowed_types_any
+		),
 		'fuzzytime' => array(
 			'description' => 'N {OP} X, where X is 1 - if timestamp is equal with Zabbix server time for T seconds, 0 - otherwise',
 			'operators' => $limited_operators,

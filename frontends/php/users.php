@@ -144,7 +144,6 @@ include_once('include/page_header.php');
 			$user['alias'] = get_request('alias');
 			$user['passwd'] = get_request('password1');
 			$user['url'] = get_request('url');
-			$user['autologin'] = get_request('autologin', 0);
 			$user['autologout'] = get_request('autologout', 0);
 			$user['lang'] = get_request('lang');
 			$user['theme'] = get_request('theme');
@@ -163,7 +162,7 @@ include_once('include/page_header.php');
 				$user['userid'] = $_REQUEST['userid'];
 
 				DBstart();
-				$result = API::User()->update($user);
+				$result = API::User()->update(array($user));
 
 				if($result !== false)
 					$result = API::User()->updateMedia(array(

@@ -482,7 +482,7 @@ Copt::memoryPick();
 
 				$dbInterface = $dbInterfaces[$interface['interfaceid']];
 				if(isset($interface['hostid']) && (bccomp($dbInterface['hostid'], $interface['hostid']) !=0))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Can not switch host for interface'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot switch host for interface'));
 
 				$interface['hostid'] = $dbInterface['hostid'];
 
@@ -504,11 +504,11 @@ Copt::memoryPick();
 			}
 
 			if(zbx_empty($interface['ip']) && zbx_empty($interface['dns'])){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('IP and DNS can not be empty for host interface.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('IP and DNS cannot be empty for host interface.'));
 			}
 
 			if(($interface['useip'] == INTERFACE_USE_IP) && zbx_empty($interface['ip'])){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface with DNS " %1$s " can not have empty IP address.', $interface['dns']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface with DNS " %1$s " cannot have empty IP address.', $interface['dns']));
 			}
 
 			if(($interface['useip'] == INTERFACE_USE_DNS) && zbx_empty($interface['dns'])){
@@ -518,7 +518,7 @@ Copt::memoryPick();
 					'nopermissions' => 1,
 					'preservekeys' => 1
 				));
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface with IP "%1$s" can not have empty DNS name while having "Use DNS" property on host "%2$s".', $interface['ip'], $dbHosts[$interface['hostid']]['host']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface with IP "%1$s" cannot have empty DNS name while having "Use DNS" property on host "%2$s".', $interface['ip'], $dbHosts[$interface['hostid']]['host']));
 			}
 
 			if(isset($interface['dns']) && !zbx_empty($interface['dns'])){
@@ -540,7 +540,7 @@ Copt::memoryPick();
 			}
 
 			if(!isset($interface['port']) || zbx_empty($interface['port'])){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('PORT can not be empty for host interface'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('PORT cannot be empty for host interface'));
 			}
 
 			if(isset($interface['port'])){

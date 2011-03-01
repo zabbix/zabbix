@@ -421,6 +421,7 @@ void	collect_selfmon_stats()
  * Purpose: calculate statistics for selected process                         *
  *                                                                            *
  * Parameters: process_type - [IN] type of process; ZBX_PROCESS_TYPE_*        *
+ *             aggr_func    - [IN] one of ZBX_AGGR_FUNC_*                     *
  *             process_num  - [IN] process number; 1 - first process;         *
  *                                 0 - all processes                          *
  *             state        - [IN] process state; ZBX_PROCESS_STATE_*         *
@@ -434,7 +435,8 @@ void	collect_selfmon_stats()
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	get_selfmon_stats(unsigned char process_type, int process_num, unsigned char state, double *value)
+int	get_selfmon_stats(unsigned char process_type, unsigned char aggr_func, int process_num,
+		unsigned char state, double *value)
 {
 	const char		*__function_name = "get_selfmon_stats";
 	unsigned int		total = 0, counter = 0;
@@ -446,11 +448,19 @@ int	get_selfmon_stats(unsigned char process_type, int process_num, unsigned char
 
 	process_forks = get_process_type_forks(process_type);
 
-	if (0 != process_num)
+	switch (aggr_func)
 	{
-		assert(process_num <= process_forks);
-
-		process_forks = process_num--;
+		case ZBX_AGGR_FUNC_ONE:
+			assert(process_num <= process_forks);
+			process_forks = process_num--;
+			break;
+		case ZBX_AGGR_FUNC_AVG:
+		case ZBX_AGGR_FUNC_MAX:
+		case ZBX_AGGR_FUNC_MIN:
+			assert(0 == process_num);
+			break;
+		default:
+			assert(0);
 	}
 
 	LOCK_SM;
@@ -463,13 +473,36 @@ int	get_selfmon_stats(unsigned char process_type, int process_num, unsigned char
 
 	for (; process_num < process_forks; process_num++)
 	{
+		unsigned short	one_total = 0, one_counter;
+
 		process = &collector->process[process_type][process_num];
 
 		for (s = 0; s < ZBX_PROCESS_STATE_COUNT; s++)
-			total += (unsigned short)(process->h_counter[s][current] -
-					process->h_counter[s][collector->first]);
-		counter += (unsigned short)(process->h_counter[state][current] -
-				process->h_counter[state][collector->first]);
+			one_total += process->h_counter[s][current] - process->h_counter[s][collector->first];
+		one_counter = process->h_counter[state][current] - process->h_counter[state][collector->first];
+
+		switch (aggr_func)
+		{
+			case ZBX_AGGR_FUNC_ONE:
+			case ZBX_AGGR_FUNC_AVG:
+				total += one_total;
+				counter += one_counter;
+				break;
+			case ZBX_AGGR_FUNC_MAX:
+				if (0 == process_num || one_counter > counter)
+				{
+					counter = one_counter;
+					total = one_total;
+				}
+				break;
+			case ZBX_AGGR_FUNC_MIN:
+				if (0 == process_num || one_counter < counter)
+				{
+					counter = one_counter;
+					total = one_total;
+				}
+				break;
+		}
 	}
 
 	if (NULL == process)

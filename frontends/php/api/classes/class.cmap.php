@@ -553,7 +553,7 @@ COpt::memoryPick();
 				if(!isset($dbMaps[$map['sysmapid']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 
-				$dbMap = $dbMaps[$map['sysmapid']];
+				$dbMap = array_merge($dbMaps[$map['sysmapid']], $map);
 			}
 			else{
 				$dbMap = $map;
@@ -582,14 +582,14 @@ COpt::memoryPick();
 				MAP_LABEL_TYPE_CUSTOM => _('Custom label')
 			);
 
-			$mapLabels = array(
-				'label_type' => array('typeName' => _('icon')),
-				'label_type_hostgroup' => array('string' => 'label_string_hostgroup','typeName' => _('host group')),
-				'label_type_host' => array('string' => 'label_string_host','typeName' => _('host')),
-				'label_type_trigger' => array('string' => 'label_string_trigger','typeName' => _('trigger')),
-				'label_type_map' => array('string' => 'label_string_map','typeName' => _('map')),
-				'label_type_image' => array('string' => 'label_string_image','typeName' => _('image'))
-			);
+			$mapLabels = array('label_type' => array('typeName' => _('icon')));
+			if($dbMap['label_format'] == SYSMAP_LABEL_ADVANCED_ON){
+				$mapLabels['label_type_hostgroup'] = array('string' => 'label_string_hostgroup','typeName' => _('host group'));
+				$mapLabels['label_type_host'] = array('string' => 'label_string_host','typeName' => _('host'));
+				$mapLabels['label_type_trigger'] = array('string' => 'label_string_trigger','typeName' => _('trigger'));
+				$mapLabels['label_type_map'] = array('string' => 'label_string_map','typeName' => _('map'));
+				$mapLabels['label_type_image'] = array('string' => 'label_string_image','typeName' => _('image'));
+			}
 
 			foreach($mapLabels as $labelName => $labelData){
 				if(!isset($map[$labelName])) continue;
@@ -602,7 +602,7 @@ COpt::memoryPick();
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect %1$s label type value for map "%2$s".', $labelData['typeName'], $dbMap['name']));
 
 					if(!isset($map[$labelData['string']]) || zbx_empty($map[$labelData['string']]))
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect %1$s element custom label string for map "%s".', $labelData['typeName'], $dbMap['name']));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot be empty %1$s element custom label for map "%2$s".', $labelData['typeName'], $dbMap['name']));
 				}
 
 				if(($labelName == 'label_type_image') && (MAP_LABEL_TYPE_STATUS == $map[$labelName]))

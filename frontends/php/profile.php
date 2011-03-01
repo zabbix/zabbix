@@ -147,7 +147,7 @@ $fields=array(
 			updateMessageSettings($messages);
 
 			$result = API::User()->updateProfile($user);
-			if($result && ($USER_DETAILS['type'] > USER_TYPE_ZABBIX_USER)){
+			if($result && (CwebUser::$data['type'] > USER_TYPE_ZABBIX_USER)){
 				$data = array(
 					'users' => $user,
 					'medias' => $user['user_medias']

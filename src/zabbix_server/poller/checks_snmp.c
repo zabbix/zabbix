@@ -507,7 +507,7 @@ static int	snmp_set_value(const char *snmp_oid, struct variable_list *vars, DC_I
 			ptemp = temp + 12;
 		else
 			ptemp = temp;
-		if (FAIL == set_result_type(value, item->value_type, item->data_type, ptemp))
+		if (SUCCEED != set_result_type(value, item->value_type, item->data_type, ptemp))
 			ret = NOTSUPPORTED;
 	}
 	else if (vars->type == ASN_UINTEGER || vars->type == ASN_COUNTER ||
