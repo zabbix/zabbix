@@ -105,7 +105,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		i = DBget_row_count(tmp);
 		SET_UI64_RESULT(result, i);
 	}
-	else if (0 == strcmp(tmp, "queue"))		/* zabbix["queue"<,from><,to>] */
+	else if (0 == strcmp(tmp, "queue"))		/* zabbix["queue",<from>,<to>] */
 	{
 		int	from = 6, to = (-1);
 
@@ -118,7 +118,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 				goto not_supported;
 			else if (*tmp != '\0' && is_uint_prefix(tmp) == FAIL)
 			{
-				error = zbx_dsprintf(error, "Second argument is badly formatted");
+				error = zbx_dsprintf(error, "Second parameter is badly formatted");
 				goto not_supported;
 			}
 			else
@@ -131,7 +131,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 				goto not_supported;
 			else if (*tmp != '\0' && is_uint_prefix(tmp) == FAIL)
 			{
-				error = zbx_dsprintf(error, "Third argument is badly formatted");
+				error = zbx_dsprintf(error, "Third parameter is badly formatted");
 				goto not_supported;
 			}
 			else
@@ -140,7 +140,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 		if (from > to && -1 != to)
 		{
-			error = zbx_dsprintf(error, "Arguments represent an invalid interval");
+			error = zbx_dsprintf(error, "Parameters represent an invalid interval");
 			goto not_supported;
 		}
 
@@ -191,7 +191,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 		SET_UI64_RESULT(result, i);
 	}
-	else if (0 == strcmp(tmp, "process"))	/* zabbix["process",<process_type>,<process_num>,<process_state>] */
+	else if (0 == strcmp(tmp, "process"))		/* zabbix["process",<type>,<mode>,<state>] */
 	{
 		unsigned char	process_type;
 		int		process_forks;
@@ -202,15 +202,10 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			error = zbx_strdup(error, "Too many parameters");
 			goto not_supported;
 		}
-		else if (1 == nparams)
-		{
-			error = zbx_strdup(error, "Required parameter missing");
-			goto not_supported;
-		}
 
 		if (0 != get_param(params, 2, tmp, sizeof(tmp)))
 		{
-			THIS_SHOULD_NEVER_HAPPEN;
+			error = zbx_strdup(error, "Required second parameter missing");
 			goto not_supported;
 		}
 
@@ -280,7 +275,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 				state = ZBX_PROCESS_STATE_IDLE;
 			else
 			{
-				error = zbx_strdup(error, "Invalid fouth parameter");
+				error = zbx_strdup(error, "Invalid fourth parameter");
 				goto not_supported;
 			}
 
