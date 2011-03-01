@@ -166,7 +166,8 @@ for($t = $from; $t <= $to; $t++){
 	$options = array(
 		'output' => array('mediatypeid', 'userid'),
 		'time_from' => $start,
-		'time_till' => $end
+		'time_till' => $end,
+		'filter' => array('status' => ALERT_STATUS_SENT),
 	);
 	//if we must get only specific media type, no need to select the other ones
 	if($media_type > 0){
@@ -182,18 +183,29 @@ for($t = $from; $t <= $to; $t++){
 		$summary[$userid]['medias'] = array();
 		foreach($media_types as $mediaTypeId => $mediaTypeDescrition){
 			$summary[$userid]['medias'][$mediaTypeId] = 0;
+			$summary[$userid]['medias_deleted'] = 0;
 		}
 	}
 
 	foreach($alerts as $alert){
-		if(isset($users[$alert['userid']], $media_types[$alert['mediatypeid']])){
-			$summary[$alert['userid']]['total']++;
-			$summary[$alert['userid']]['medias'][$alert['mediatypeid']]++;
+		if(isset($users[$alert['userid']])){
+			if(isset($media_types[$alert['mediatypeid']])){
+				$summary[$alert['userid']]['total']++;
+				$summary[$alert['userid']]['medias'][$alert['mediatypeid']]++;
+			}
+			else{
+				$summary[$userid]['medias_deleted']++;
+			}
 		}
 	}
 
 	foreach($summary as $s){
-		array_push($table_row, array($s['total'], ($media_type == 0 ? SPACE.'('.implode('/',$s['medias']).')' : '' )));
+		if($media_type == 0){
+			array_push($table_row, array($s['total'], ' / ', $s['medias_deleted'], ($media_type == 0 ? SPACE.'('.implode('/',$s['medias']).')' : '' )));
+		}
+		else{
+			array_push($table_row, array($s['total'], ($media_type == 0 ? SPACE.'('.implode('/',$s['medias']).')' : '' )));
+		}
 	}
 
 	$table->addRow($table_row);
@@ -206,7 +218,7 @@ if(($media_type == 0) && !empty($media_types)){
 		$links[] = ', ';
 	}
 	array_pop($links);
-	array_unshift($links, SPACE.SPACE.SPACE.SPACE.SPACE.SPACE.S_ALL_SMALL.SPACE.'(');
+	array_unshift($links, SPACE.SPACE.SPACE.SPACE.SPACE.SPACE.S_ALL_SMALL.' / '.'deleted '.'(');
 	$links[] = ')';
 
 	$table = new CTableInfo();
