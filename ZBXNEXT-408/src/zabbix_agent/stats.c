@@ -269,7 +269,7 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 		collect_perfstat();
 #endif /* _WINDOWS */
 
-		collect_stats_diskdevices(&(collector->diskdevices)); /* TODO */
+		collect_stats_diskdevices(&(collector->diskdevices));
 #ifdef _AIX
 		collect_vmstat_data(&collector->vmstat);
 #endif
