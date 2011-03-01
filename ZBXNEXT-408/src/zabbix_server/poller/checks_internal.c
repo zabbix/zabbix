@@ -118,7 +118,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 				goto not_supported;
 			else if (*tmp != '\0' && is_uint_prefix(tmp) == FAIL)
 			{
-				error = zbx_dsprintf(error, "Second parameter is badly formatted");
+				error = zbx_strdup(error, "Second parameter is badly formatted");
 				goto not_supported;
 			}
 			else
@@ -131,7 +131,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 				goto not_supported;
 			else if (*tmp != '\0' && is_uint_prefix(tmp) == FAIL)
 			{
-				error = zbx_dsprintf(error, "Third parameter is badly formatted");
+				error = zbx_strdup(error, "Third parameter is badly formatted");
 				goto not_supported;
 			}
 			else
@@ -140,7 +140,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 		if (from > to && -1 != to)
 		{
-			error = zbx_dsprintf(error, "Parameters represent an invalid interval");
+			error = zbx_strdup(error, "Parameters represent an invalid interval");
 			goto not_supported;
 		}
 

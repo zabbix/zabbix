@@ -23,7 +23,6 @@
 #include "log.h"
 #include "zbxconf.h"
 
-#include "interfaces.h"
 #include "diskdevices.h"
 #include "cpustat.h"
 #include "perfstat.h"
@@ -270,7 +269,6 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 		collect_perfstat();
 #endif /* _WINDOWS */
 
-		collect_stats_interfaces(&(collector->interfaces)); /* TODO */
 		collect_stats_diskdevices(&(collector->diskdevices)); /* TODO */
 #ifdef _AIX
 		collect_vmstat_data(&collector->vmstat);
