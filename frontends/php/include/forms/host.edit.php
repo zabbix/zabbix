@@ -275,7 +275,7 @@
 	foreach($interfaces as $inum => $interface){
 		$jsInsert.= 'addInterfaceRow('.zbx_jsvalue($interface).');';
 	}
-	zbx_add_post_js('setTimeout(function(){'.$jsInsert.'}, 20);');
+	zbx_add_post_js('setTimeout(function(){'.$jsInsert.'}, 1);');
 
 	$addButton = new CButton('add', S_ADD, 'javascript: addInterfaceRow({});');
 	$addButton->setAttribute('class', 'link_menu');

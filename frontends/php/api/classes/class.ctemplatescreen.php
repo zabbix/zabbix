@@ -70,7 +70,7 @@ class CTemplateScreen extends CScreen{
 // filter
 			'filter'					=> null,
 			'search'					=> null,
-			'searchByAny'			=> null,
+			'searchByAny'				=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 // OutPut
@@ -115,15 +115,17 @@ class CTemplateScreen extends CScreen{
 				$options['templateids'] = API::Template()->get(array(
 					'templateids' => $options['templateids'],
 					'editable' => $options['editable'],
-					'preservekeys' => 1
+					'preservekeys' => true
 				));
+				$options['templateids'] = array_keys($options['templateids']);
 			}
 			else if(!is_null($options['hostids'])){
 				$options['templateids'] = API::Host()->get(array(
 					'hostids' => $options['hostids'],
 					'editable' => $options['editable'],
-					'preservekeys' => 1
+					'preservekeys' => true
 				));
+				$options['templateids'] = array_keys($options['templateids']);
 			}
 			else{
 // TODO: get screen
@@ -205,7 +207,6 @@ class CTemplateScreen extends CScreen{
 				}
 			}
 //----
-
 			if($options['output'] != API_OUTPUT_EXTEND){
 				$sql_parts['select']['templateid'] = 's.templateid';
 			}
@@ -216,7 +217,6 @@ class CTemplateScreen extends CScreen{
 
 			$sql_parts['where']['templateid'] = DBcondition('s.templateid', $linkedTemplateIds);
 		}
-
 
 // filter
 		if(is_array($options['filter'])){
