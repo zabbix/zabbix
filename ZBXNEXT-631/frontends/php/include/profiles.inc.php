@@ -236,7 +236,7 @@ function update_config($configs){
 		$varName = 'severity_color_'.$i;
 		if(isset($configs[$varName]) && !is_null($configs[$varName])){
 			if(!preg_match('/[0-9a-f]{6}/i', $configs[$varName])){
-				error(_s('Severity colour is not correct: expecting hexadecimal colour code (6 symbols).', $i));
+				error(_('Severity colour is not correct: expecting hexadecimal colour code (6 symbols).'));
 				return false;
 			}
 		}
