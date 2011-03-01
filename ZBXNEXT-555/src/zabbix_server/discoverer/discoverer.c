@@ -291,7 +291,7 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 					ret = FAIL;
 #endif
 
-				if (FAIL == ret && GET_MSG_RESULT(&result))
+				if (FAIL == ret && ISSET_MSG(&result))
 					zabbix_log(LOG_LEVEL_DEBUG, "Discovery: Item [%s] error: %s",
 							item.key, result.msg);
 				break;

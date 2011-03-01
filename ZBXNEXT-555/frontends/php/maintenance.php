@@ -498,18 +498,18 @@ include_once('include/page_header.php');
 
 // MAINTENANCE HOSTS {{{
 		$options = array(
-			'editable' => 1,
+			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
-			'real_hosts' => 1,
+			'real_hosts' => true,
+			'preservekeys' => true
 		);
 		$all_groups = API::HostGroup()->get($options);
-		$all_groups = zbx_toHash($all_groups, 'groupid');
 		order_result($all_groups, 'name');
-
 
 		$twb_groupid = get_request('twb_groupid', 0);
 		if(!isset($all_groups[$twb_groupid])){
-			$twb_groupid = key($all_groups);
+			$twb_group = reset($all_groups);
+			$twb_groupid = $twb_group['groupid'];
 		}
 
 		$cmbGroups = new CComboBox('twb_groupid', $twb_groupid, 'submit()');

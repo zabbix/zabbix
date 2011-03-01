@@ -1721,7 +1721,7 @@ COpt::memoryPick();
 		foreach($start_points as $spnum => $start){
 			$path = array();
 			if(!$this->checkCircularLink($graph, $start, $path)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Circular link can not be created'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Circular link cannot be created'));
 			}
 		}
 
