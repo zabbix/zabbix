@@ -57,6 +57,7 @@ include_once('include/page_header.php');
 		'add_map'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'del_map'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'save'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'resetDefaults'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'delete'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'cancel'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 /* GUI */
@@ -600,21 +601,40 @@ include_once('include/page_header.php');
 
 	}
 // Trigger severities
-	else if($_REQUEST['config'] == 12 && isset($_REQUEST['save'])){
-		$configs = array(
-			'severity_name_0' => get_request('severity_name_0', _('Not classified')),
-			'severity_color_0' => get_request('severity_color_0', ''),
-			'severity_name_1' => get_request('severity_name_1', _('Information')),
-			'severity_color_1' => get_request('severity_color_1', ''),
-			'severity_name_2' => get_request('severity_name_2', _('Warning')),
-			'severity_color_2' => get_request('severity_color_2', ''),
-			'severity_name_3' => get_request('severity_name_3', _('Average')),
-			'severity_color_3' => get_request('severity_color_3', ''),
-			'severity_name_4' => get_request('severity_name_4', _('High')),
-			'severity_color_4' => get_request('severity_color_4', ''),
-			'severity_name_5' => get_request('severity_name_5', _('Disaster')),
-			'severity_color_5' => get_request('severity_color_5', ''),
-		);
+	else if(($_REQUEST['config'] == 12) && (isset($_REQUEST['save']) || isset($_REQUEST['resetDefaults']))){
+		if(isset($_REQUEST['save'])){
+			$configs = array(
+				'severity_name_0' => get_request('severity_name_0', _('Not classified')),
+				'severity_color_0' => get_request('severity_color_0', ''),
+				'severity_name_1' => get_request('severity_name_1', _('Information')),
+				'severity_color_1' => get_request('severity_color_1', ''),
+				'severity_name_2' => get_request('severity_name_2', _('Warning')),
+				'severity_color_2' => get_request('severity_color_2', ''),
+				'severity_name_3' => get_request('severity_name_3', _('Average')),
+				'severity_color_3' => get_request('severity_color_3', ''),
+				'severity_name_4' => get_request('severity_name_4', _('High')),
+				'severity_color_4' => get_request('severity_color_4', ''),
+				'severity_name_5' => get_request('severity_name_5', _('Disaster')),
+				'severity_color_5' => get_request('severity_color_5', ''),
+			);
+		}
+		else if(isset($_REQUEST['resetDefaults'])){
+			$schema = DB::getSchema('config');
+			$configs = array(
+				'severity_name_0' => $schema['fields']['severity_name_0']['default'],
+				'severity_color_0' => $schema['fields']['severity_color_0']['default'],
+				'severity_name_1' => $schema['fields']['severity_name_1']['default'],
+				'severity_color_1' => $schema['fields']['severity_color_1']['default'],
+				'severity_name_2' => $schema['fields']['severity_name_2']['default'],
+				'severity_color_2' => $schema['fields']['severity_color_2']['default'],
+				'severity_name_3' => $schema['fields']['severity_name_3']['default'],
+				'severity_color_3' => $schema['fields']['severity_color_3']['default'],
+				'severity_name_4' => $schema['fields']['severity_name_4']['default'],
+				'severity_color_4' => $schema['fields']['severity_color_4']['default'],
+				'severity_name_5' => $schema['fields']['severity_name_5']['default'],
+				'severity_color_5' => $schema['fields']['severity_color_5']['default'],
+			);
+		}
 
 		$result = update_config($configs);
 
