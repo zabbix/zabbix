@@ -95,6 +95,7 @@ img.borderless	{	border-width: 0; vertical-align: bottom;	}
 .move{}
 .move:hover{ cursor: move; }
 .cell{ padding: 1px 3px; white-space: nowrap; text-align: left; border: 0; height: 20px; }
+table.cell tr td { padding: 1px; white-space: nowrap; text-align: left;}
 
 /************** DISCOVERY STATUS ************/
 .dhosts_active { padding: 5px; text-align: center; color: #0FA00F; }
@@ -168,7 +169,7 @@ form .thin .input{ height: 14px; }
 	font-family: Verdana, arial, helvetica, sans-serif;
 	border: 1px solid gray;
 	background-color: white;
-	margin: 0 2px 0 2px;
+	margin: 0 1px;
 }
 .input:focus { border-color: #6e8ab4; }
 .input:hover { border-color: #6e8ab4; }
@@ -179,11 +180,11 @@ form .thin .input{ height: 14px; }
 div.footer .formrow .main{ border-color: #FFAA33;}
 div.footer .formrow .main:hover{ border-color: #DD7711; }
 
-.select{ cursor: pointer; margin: 1px 4px 1px 2px; }
+.select{ cursor: pointer; margin: 1px 2px; }
 .selectShorten{ width: 200px; }
 
 /******************* BUTTONS *********************/
-.button{ border: 1px solid #808080; vertical-align: top; margin: 1px 2px 0 0; background: #F0F0F0 url('../images/gradients/button.gif') repeat-x top left; }
+.button{ border: 1px solid #808080; vertical-align: top; margin: 1px 2px; background: #F0F0F0 url('../images/gradients/button.gif') repeat-x top left; }
 .button:hover{ text-decoration: underline; border-color: black; cursor: pointer; }
 
 .link_menu{
