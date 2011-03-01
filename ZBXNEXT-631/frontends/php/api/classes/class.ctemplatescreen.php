@@ -583,7 +583,7 @@ class CTemplateScreen extends CScreen{
 
 				$dbScreen = $updScreens[$screen['screenid']];
 				if(isset($screen['templateid']) && ($screen['templateid'] != $dbScreen['templateid'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Can not change template for Screen [ '.$screen['name'].' ]');
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot change template for Screen [ '.$screen['name'].' ]');
 				}
 
 				if(isset($screen['name'])){

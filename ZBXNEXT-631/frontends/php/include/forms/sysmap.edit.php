@@ -52,7 +52,7 @@
 	$cmbImg = new CComboBox('backgroundid', $data['backgroundid']);
 	$cmbImg->addItem(0, _('No image'));
 
-	$images = CImage::get(array(
+	$images = API::Image()->get(array(
 		'filter' => array('imagetype' => 2),
 		'output' => API_OUTPUT_EXTEND,
 	));

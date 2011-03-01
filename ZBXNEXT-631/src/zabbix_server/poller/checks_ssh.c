@@ -104,6 +104,9 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 		goto tcp_close;
 	}
 
+	/* set blocking mode on session */
+	libssh2_session_set_blocking(session, 1);
+
 	/* Create a session instance and start it up. This will trade welcome
 	 * banners, exchange keys, and setup crypto, compression, and MAC layers
 	 */

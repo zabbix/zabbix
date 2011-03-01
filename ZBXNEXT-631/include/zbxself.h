@@ -50,13 +50,19 @@
 #define ZBX_PROCESS_TYPE_COUNT		19	/* number of process types */
 #define ZBX_PROCESS_TYPE_UNKNOWN	255
 
+#define ZBX_AGGR_FUNC_ONE		0
+#define ZBX_AGGR_FUNC_AVG		1
+#define ZBX_AGGR_FUNC_MAX		2
+#define ZBX_AGGR_FUNC_MIN		3
+
 int	get_process_type_forks(unsigned char process_type);
 const char	*get_process_type_string(unsigned char process_type);
 void	init_selfmon_collector();
 void	free_selfmon_collector();
 void	update_selfmon_counter(unsigned char state);
 void	collect_selfmon_stats();
-int	get_selfmon_stats(unsigned char process_type, int process_num, unsigned char state, double *value);
+int	get_selfmon_stats(unsigned char process_type, unsigned char aggr_func, int process_num,
+		unsigned char state, double *value);
 void	zbx_sleep_loop(int sleeptime);
 
 #endif	/* ZABBIX_ZBXSELF_H */
