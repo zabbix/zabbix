@@ -1997,7 +1997,8 @@ int	str2uint(const char *str)
 	size_t	sz = strlen(str) - 1;
 	int	factor = 1;
 
-	switch (str[sz]) {
+	switch (str[sz])
+	{
 		case 's': factor = 1;         break;
 		case 'm': factor = 60;        break;
 		case 'h': factor = 3600;      break;
