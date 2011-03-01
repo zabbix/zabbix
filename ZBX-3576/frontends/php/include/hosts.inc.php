@@ -553,7 +553,10 @@
 		while($host=DBfetch($result)){
 			if($status != $host['status']){
 //				$hosts[$host['hostid']] = $host['hostid'];
-				update_trigger_value_to_unknown_by_hostid($host['hostid']);
+				if($status != HOST_STATUS_MONITORED){
+					update_trigger_value_to_unknown_by_hostid($host['hostid']);
+				}
+
 				$res = DBexecute('UPDATE hosts SET status='.$status.' WHERE hostid='.$host['hostid']);
 				if($res){
 					$host_new = $host;//get_host_by_hostid($host['hostid']);

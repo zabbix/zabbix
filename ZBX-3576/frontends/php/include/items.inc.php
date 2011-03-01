@@ -463,8 +463,6 @@
 	return $result;
 	}
 
-// Update Item status
-
 	function update_item_status($itemids, $status){
 		zbx_value2array($itemids);
 		$result = true;
@@ -474,7 +472,6 @@
 			$old_status=$row['status'];
 
 			if($status != $old_status){
-/*				unset($itemids[$row['itemid']]);*/
 				if ($status==ITEM_STATUS_ACTIVE)
 					$sql='UPDATE items SET status='.$status.",error='' ".
 						' WHERE itemid='.$row['itemid'];
@@ -490,18 +487,27 @@
 				}
 			}
 		}
-/*		if(!empty($itemids)){
-			update_trigger_value_to_unknown_by_itemid($itemids);
 
-			if($status==ITEM_STATUS_ACTIVE)
-				$sql='UPDATE items SET status='.$status.",error='' ".
-					' WHERE '.DBcondition('itemid',$itemids);
-			else
-				$sql='UPDATE items SET status='.$status.
-					' WHERE '.DBcondition('itemid',$itemids);
+		if($status!=ITEM_STATUS_ACTIVE){
+			$now = time();
+			$result = DBselect('SELECT DISTINCT t.triggerid '.
+					' FROM triggers t,functions f '.
+					' WHERE f.triggerid=t.triggerid '.
+					' AND '.DBcondition('f.itemid', $itemids));
+			$triggerids = array();
+			while($row=DBfetch($result)){
+				$triggerids[$row['triggerid']] = $row['triggerid'];
+			}
 
-			$result = DBexecute($sql);
-		}*/
+			if(!empty($triggerids)){
+				addEvent($triggerids,TRIGGER_VALUE_UNKNOWN,$now);
+			}
+
+			if(!empty($triggerids)){
+				DBexecute('UPDATE triggers SET value='.TRIGGER_VALUE_UNKNOWN.', lastchange='.$now.' WHERE '.DBcondition('triggerid',$triggerids));
+			}
+		}
+
 
 	return $result;
 	}
