@@ -26,7 +26,7 @@ $severityForm->setName('triggerSeverity');
 $severityForm->addVar('form', get_request('form', 1));
 $severityForm->addVar('form_refresh', get_request('form_refresh', 0) + 1);
 
-if(get_request('form_refresh', false)){
+if(get_request('form_refresh', false) && !isset($_REQUEST['resetDefaults'])){
 	$config = array(
 		'severity_name_0' => get_request('severity_name_0'),
 		'severity_color_0' => get_request('severity_color_0', ''),
@@ -97,7 +97,8 @@ $severityForm->addItem($severityView);
 
 
 // Footer
-$footer = makeFormFooter(array(new CSubmit('save', _('Save'))), new CButton('resetDefaults', _('Reset defaults')));
+$footer = makeFormFooter(array(new CSubmit('save', _('Save'))),
+	new CSubmit('resetDefaults', _('Reset defaults'), 'if(!Confirm("'._('All values will be reset to default!').'")) return false;'));
 $severityForm->addItem($footer);
 
 
