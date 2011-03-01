@@ -85,8 +85,10 @@
 			'hostids' => $dbHost['hostid'],
 			'output' => API_OUTPUT_EXTEND,
 			'selectItems' => API_OUTPUT_COUNT,
-			'preserveKeys' => true
+			'preserveKeys' => true,
 		));
+
+		morder_result($dbHost['interfaces'], array('type', 'interfaceid'));
 
 		$frm_title	.= SPACE.' ['.$dbHost['host'].']';
 		$original_templates = $dbHost['parentTemplates'];
@@ -267,7 +269,7 @@
 		));
 	}
 
-	$ifTab = new CTable();
+	$ifTab = new CTable(null, 'cell');
 	$ifTab->addRow(array(S_IP_ADDRESS,S_DNS_NAME,S_CONNECT_TO,S_PORT,S_TYPE));
 	$ifTab->setAttribute('id', 'hostInterfaces');
 
