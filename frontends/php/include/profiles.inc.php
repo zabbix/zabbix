@@ -236,7 +236,7 @@ function update_config($configs){
 		$varName = 'severity_color_'.$i;
 		if(isset($configs[$varName]) && !is_null($configs[$varName])){
 			if(!preg_match('/[0-9a-f]{6}/i', $configs[$varName])){
-				error(_s('Severity %s color is not correct: expecting hexadecimal colour code (6 symbols).', $i));
+				error(_s('Severity %s colour is not correct: expecting hexadecimal colour code (6 symbols).', $i));
 				return false;
 			}
 		}
@@ -244,12 +244,17 @@ function update_config($configs){
 
 
 	$currentConfig = select_config();
-// check duplicate severity names.
+// check duplicate severity names and if name is empty.
 	$names = array();
 	for($i=0; $i<TRIGGER_SEVERITY_COUNT; $i++){
 		$varName = 'severity_name_'.$i;
 		if(!isset($configs[$varName]) || is_null($configs[$varName])){
 			$configs[$varName] = $currentConfig[$varName];
+		}
+
+		if($configs[$varName] == ''){
+			error(_s('Severity name cannot be empty.'));
+			return false;
 		}
 
 		if(isset($names[$configs[$varName]])){
