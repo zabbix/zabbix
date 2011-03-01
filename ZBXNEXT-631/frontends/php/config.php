@@ -34,7 +34,6 @@ include_once('include/page_header.php');
 <?php
 	$fields=array(
 //		VAR								TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-
 		'config'=>				array(T_ZBX_INT, O_OPT,	NULL,	IN('0,3,5,6,7,8,9,10,11,12'),	NULL),
 // other form
 		'alert_history'=>		array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),	'isset({config})&&({config}==0)&&isset({save})'),
@@ -94,17 +93,17 @@ include_once('include/page_header.php');
 		'edit_expressionid'=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		null),
 		'delete_expression'=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		null),
 // Trigger severities
-		'severity_name_0' =>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,		'isset({config})&&({config}==12)&&isset({save})'),
+		'severity_name_0' =>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({config})&&({config}==12)&&isset({save})'),
 		'severity_color_0' =>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({config})&&({config}==12)&&isset({save})'),
-		'severity_name_1' =>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,		'isset({config})&&({config}==12)&&isset({save})'),
+		'severity_name_1' =>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({config})&&({config}==12)&&isset({save})'),
 		'severity_color_1' =>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({config})&&({config}==12)&&isset({save})'),
-		'severity_name_2' =>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,		'isset({config})&&({config}==12)&&isset({save})'),
+		'severity_name_2' =>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({config})&&({config}==12)&&isset({save})'),
 		'severity_color_2' =>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({config})&&({config}==12)&&isset({save})'),
-		'severity_name_3' =>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,		'isset({config})&&({config}==12)&&isset({save})'),
+		'severity_name_3' =>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({config})&&({config}==12)&&isset({save})'),
 		'severity_color_3' =>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({config})&&({config}==12)&&isset({save})'),
-		'severity_name_4' =>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,		'isset({config})&&({config}==12)&&isset({save})'),
+		'severity_name_4' =>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({config})&&({config}==12)&&isset({save})'),
 		'severity_color_4' =>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({config})&&({config}==12)&&isset({save})'),
-		'severity_name_5' =>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,		'isset({config})&&({config}==12)&&isset({save})'),
+		'severity_name_5' =>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({config})&&({config}==12)&&isset({save})'),
 		'severity_color_5' =>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({config})&&({config}==12)&&isset({save})'),
 
 /* other */

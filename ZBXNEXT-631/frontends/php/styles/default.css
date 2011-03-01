@@ -261,7 +261,7 @@ div.footer .formrow .main:hover{ border-color: #DD7711; }
 
 .widget .footer { color: white; line-height: 12px; height: 12px; padding: 4px 4px; margin-top: 2px;}
 
-.inlineblock{ display: inline-block;}
+.inlineblock{ display: inline-block; }
 
 
 span.footer_sign{ padding-right: 5px; padding-left: 5px; }
