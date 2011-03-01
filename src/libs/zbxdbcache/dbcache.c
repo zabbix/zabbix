@@ -1232,17 +1232,13 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 						h->value.value_float,
 						zbx_item_value_type_string(h->value_type));
 
-				zabbix_log(LOG_LEVEL_WARNING, "Item [%s] error: %s",
-						hostkey_name, message);
-				zabbix_syslog("Item [%s] error: %s",
-						hostkey_name, message);
+				zabbix_log(LOG_LEVEL_WARNING, "Item [%s] error: %s", hostkey_name, message);
+				zabbix_syslog("Item [%s] error: %s", hostkey_name, message);
 
 				if (ITEM_STATUS_NOTSUPPORTED != item.status)
 				{
-					zabbix_log(LOG_LEVEL_WARNING, "Parameter [%s] is not supported, old status [%d]",
-							hostkey_name, item.status);
-					zabbix_syslog("Parameter [%s] is not supported",
-							hostkey_name);
+					zabbix_log(LOG_LEVEL_WARNING, "Item [%s] is not supported", hostkey_name);
+					zabbix_syslog("Item [%s] is not supported", hostkey_name);
 				}
 
 				DCadd_nextcheck(h->itemid, h->clock, message);	/* update error & status field in items table */
