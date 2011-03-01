@@ -711,47 +711,33 @@ static void	zbx_free_numbers(char ***numbers, int count)
  *           replace ONLY $1-9 macros NOT {HOSTNAME}                          *
  *                                                                            *
  ******************************************************************************/
-static void	expand_trigger_description_constants(
-		char **data,
-		zbx_uint64_t triggerid
-	)
+static void	expand_trigger_description_constants(char **data, zbx_uint64_t triggerid)
 {
-	DB_RESULT db_trigger;
-	DB_ROW	db_trigger_data;
+	DB_RESULT	result;
+	DB_ROW		row;
 
 	char	**numbers = NULL;
-	int	numbers_cnt = 0;
-
-	int	i = 0;
-
+	int	numbers_cnt = 0, i = 0;
 	char	*new_str = NULL;
-
 	char	replace[3] = "$0";
 
-	db_trigger = DBselect("select expression from triggers where triggerid=" ZBX_FS_UI64, triggerid);
+	result = DBselect("select expression from triggers where triggerid=" ZBX_FS_UI64, triggerid);
 
-	if ( (db_trigger_data = DBfetch(db_trigger)) ) {
+	if (NULL != (row = DBfetch(result)))
+	{
+		numbers = extract_numbers(row[0], &numbers_cnt);
 
-		numbers = extract_numbers(db_trigger_data[0], &numbers_cnt);
-
-		for ( i = 0; i < 9; i++ )
+		for (i = 0; i < 9; i++)
 		{
 			replace[1] = '0' + i + 1;
-			new_str = string_replace(
-					*data,
-					replace,
-					i < numbers_cnt ?
-						numbers[i] :
-						""
-					);
+			new_str = string_replace(*data, replace, i < numbers_cnt ?  numbers[i] : "");
 			zbx_free(*data);
 			*data = new_str;
 		}
 
 		zbx_free_numbers(&numbers, numbers_cnt);
 	}
-
-	DBfree_result(db_trigger);
+	DBfree_result(result);
 }
 
 /******************************************************************************
@@ -1874,7 +1860,7 @@ static const char	*ex_macros[] = {MVAR_PROFILE_DEVICETYPE, MVAR_PROFILE_NAME, MV
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_get_trigger_function_value                                   *
+ * Function: get_trigger_function_value                                       *
  *                                                                            *
  * Purpose: trying to evaluate a trigger function                             *
  *                                                                            *
@@ -1887,7 +1873,7 @@ static const char	*ex_macros[] = {MVAR_PROFILE_DEVICETYPE, MVAR_PROFILE_NAME, MV
  * Return value: (1) *replace_to = NULL - invalid function format;            *
  *                    'br' pointer remains invariable                         *
  *               (2) *replace_to = "*UNKNOWN*" - invalid hostname, key,       *
- *                    function format, or a function can not be evaluated     *
+ *                    function format, or a function cannot be evaluated      *
  *               (3) *replace_to = "<value>" - a function successfully        *
  *                    evaluated                                               *
  *                                                                            *
@@ -1897,7 +1883,7 @@ static const char	*ex_macros[] = {MVAR_PROFILE_DEVICETYPE, MVAR_PROFILE_NAME, MV
  *                      ^ - bl                                ^ - br          *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_get_trigger_function_value(zbx_uint64_t triggerid, char **replace_to, char *bl, char **br)
+static void	get_trigger_function_value(zbx_uint64_t triggerid, char **replace_to, char *bl, char **br)
 {
 	char	*p = bl + 1, *host = NULL, *key = NULL, *function = NULL, *parameter = NULL;
 	int	N_functionid, res = SUCCEED;
@@ -1906,7 +1892,7 @@ static void	zbx_get_trigger_function_value(zbx_uint64_t triggerid, char **replac
 	sz = strlen(MVAR_HOSTNAME) - 1;
 
 	if (0 == strncmp(p, MVAR_HOSTNAME, sz) && ('}' == p[sz] ||
-			('}' == p[sz + 1] && p[sz] > '0' && p[sz] <= '9')))
+			('}' == p[sz + 1] && '1' <= p[sz] && p[sz] <= '9')))
 	{
 		N_functionid = ('}' == p[sz] ? 1 : p[sz] - '0');
 		p += sz + ('}' == p[sz] ? 1 : 2);
@@ -1922,7 +1908,7 @@ static void	zbx_get_trigger_function_value(zbx_uint64_t triggerid, char **replac
 	sz = strlen(MVAR_TRIGGER_KEY) - 1;
 
 	if (0 == strncmp(p, MVAR_TRIGGER_KEY, sz) && ('}' == p[sz] ||
-			('}' == p[sz + 1] && p[sz] > '0' && p[sz] <= '9')))
+			('}' == p[sz + 1] && '1' <= p[sz] && p[sz] <= '9')))
 	{
 		N_functionid = ('}' == p[sz] ? 1 : p[sz] - '0');
 		p += sz + ('}' == p[sz] ? 1 : 2);
@@ -1959,11 +1945,7 @@ fail:
  *                                                                            *
  * Purpose: substitute simple macros in data string with real values          *
  *                                                                            *
- * Parameters: trigger - trigger structure                                    *
- *             escalation - escalation structure. used for recovery           *
- *                          messages in {ESC.HISTORY} macro.                  *
- *                          (NULL for other cases)                            *
- *             data - data string                                             *
+ * Parameters:                                                                *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
@@ -2003,7 +1985,7 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ITEM *item, DC_HOST *dc_host,
 	if (NULL == (m = bl = strchr(p, '{')))
 		return res;
 
-	for ( ; NULL != bl && SUCCEED == res; m = bl = strchr(p, '{'))
+	for (; NULL != bl && SUCCEED == res; m = bl = strchr(p, '{'))
 	{
 		if (NULL == (br = strchr(bl, '}')))
 			break;
@@ -2014,22 +1996,17 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ITEM *item, DC_HOST *dc_host,
 		ret = SUCCEED;
 		N_functionid = 1;
 
-		if (*(br - 2) > '0' && *(br - 2) <= '9')
+		if ('1' <= *(br - 2) && *(br - 2) <= '9')
 		{
-			int	i;
-			size_t	sz, sz_m;
-
-			sz_m = br - bl;
+			int	i, diff;
 
 			for (i = 0; NULL != ex_macros[i]; i++)
 			{
-				sz = strlen(ex_macros[i]) - 1;
-				if (sz != sz_m - 2)
-					continue;
+				diff = zbx_mismatch(ex_macros[i], bl);
 
-				if (0 == strncmp(ex_macros[i], bl, sz))
+				if ('}' == ex_macros[i][diff] && bl + diff == br - 2)
 				{
-					N_functionid = bl[sz] - '0';
+					N_functionid = *(br - 2) - '0';
 					m = ex_macros[i];
 					break;
 				}
@@ -2172,8 +2149,7 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ITEM *item, DC_HOST *dc_host,
 				else
 				{
 					*br = c;
-					zbx_get_trigger_function_value(event->objectid, &replace_to, bl, &br);
-
+					get_trigger_function_value(event->objectid, &replace_to, bl, &br);
 					c = *br;
 					*br = '\0';
 				}
