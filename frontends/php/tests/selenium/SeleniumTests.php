@@ -30,6 +30,7 @@ require_once(dirname(__FILE__).'/testPageEvents.php');
 require_once(dirname(__FILE__).'/testPageHosts.php');
 require_once(dirname(__FILE__).'/testPageInventory.php');
 require_once(dirname(__FILE__).'/testPageInventoryExtended.php');
+require_once(dirname(__FILE__).'/testPageItems.php');
 require_once(dirname(__FILE__).'/testPageMaintenance.php');
 require_once(dirname(__FILE__).'/testPageMaps.php');
 require_once(dirname(__FILE__).'/testPageMediaTypes.php');

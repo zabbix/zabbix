@@ -42,6 +42,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 		"Fatal error",
 		"Call to undefined method",
 		"Invalid argument supplied",
+		"Missing argument",
 		"Warning:",
 		"PHP notice",
 		"PHP warning",
