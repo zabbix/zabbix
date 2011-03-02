@@ -84,6 +84,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	int		i;
 	ZBX_FPING_HOST	*host;
 	double		sec;
+	int 		ret = NOTSUPPORTED;
 
 #ifdef HAVE_IPV6
 	int		family;
@@ -102,7 +103,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	{
 #ifndef HAVE_IPV6
 		zbx_snprintf(error, max_error_len, "%s: [%d] %s", CONFIG_FPING_LOCATION, errno, strerror(errno));
-		return NOTSUPPORTED;
+		return ret;
 #endif	/* HAVE_IPV6 */
 	}
 	else
@@ -116,7 +117,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 			{
 				zbx_snprintf(error, max_error_len,
 					"You should enable IPv6 support to use IPv6 family address for SourceIP '%s'.", CONFIG_SOURCE_IP);
-				return NOTSUPPORTED;
+				return ret;
 			}
 		}
 #endif	/* HAVE_IPV6 */
@@ -130,7 +131,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 			zbx_snprintf(error, max_error_len, "At least one of '%s', '%s' must exist. Both are missing in the system.",
 					CONFIG_FPING_LOCATION,
 					CONFIG_FPING6_LOCATION);
-			return NOTSUPPORTED;
+			return ret;
 		}
 	}
 	else
@@ -182,7 +183,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	if (NULL != CONFIG_SOURCE_IP)
 	{
 		if (SUCCEED != get_address_family(CONFIG_SOURCE_IP, &family, error, max_error_len))
-			return NOTSUPPORTED;
+			return ret;
 
 		if (family == PF_INET)
 		{
@@ -190,7 +191,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 			{
 				zbx_snprintf(error, max_error_len, "File '%s' cannot be found in the system.",
 						CONFIG_FPING_LOCATION);
-				return NOTSUPPORTED;
+				return ret;
 			}
 
 			zbx_snprintf(tmp, sizeof(tmp), "%s %s 2>&1 <%s", CONFIG_FPING_LOCATION, params, filename);
@@ -201,7 +202,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 			{
 				zbx_snprintf(error, max_error_len, "File '%s' cannot be found in the system.",
 						CONFIG_FPING6_LOCATION);
-				return NOTSUPPORTED;
+				return ret;
 			}
 
 			zbx_snprintf(tmp, sizeof(tmp), "%s %s 2>&1 <%s", CONFIG_FPING6_LOCATION, params6, filename);
@@ -224,7 +225,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	if (NULL == (f = fopen(filename, "w")))
 	{
 		zbx_snprintf(error, max_error_len, "%s: [%d] %s", filename, errno, strerror(errno));
-		return NOTSUPPORTED;
+		return ret;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s", filename);
@@ -245,18 +246,12 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 		unlink(filename);
 
-		return NOTSUPPORTED;
+		return ret;
 	}
 
 	while (NULL != fgets(tmp, sizeof(tmp), f))
 	{
 		zbx_rtrim(tmp, "\n");
-		if (NULL == (c = strchr(tmp, ':')))
-		{
-			zbx_snprintf(error, max_error_len, "fping failed: \"%s\"", tmp);
-			unlink(filename);
-			return NOTSUPPORTED;
-		}
 		zabbix_log(LOG_LEVEL_DEBUG, "Update IP [%s]", tmp);
 
 		host = NULL;
@@ -311,14 +306,18 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 				*c2++ = ' ';
 		}
 		while (NULL != (c = c2));
+		ret = SUCCEED;
 	}
 	pclose(f);
 
 	unlink(filename);
 
+	if (NOTSUPPORTED == ret)
+		zbx_snprintf(error, max_error_len, "fping failed: \"%s\"", tmp);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
-	return SUCCEED;
+	return ret;
 }
 
 /******************************************************************************
