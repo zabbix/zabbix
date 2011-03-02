@@ -243,19 +243,19 @@ void	test_parameter(const char *key, unsigned flags)
 
 	process(key, flags, &result);
 
-	if (0 != (result.type & AR_UINT64))
+	if (ISSET_UI64(&result))
 		printf(" [u|" ZBX_FS_UI64 "]", result.ui64);
 
-	if (0 != (result.type & AR_DOUBLE))
+	if (ISSET_DBL(&result))
 		printf(" [d|" ZBX_FS_DBL "]", result.dbl);
 
-	if (0 != (result.type & AR_STRING))
+	if (ISSET_STR(&result))
 		printf(" [s|%s]", result.str);
 
-	if (0 != (result.type & AR_TEXT))
+	if (ISSET_TEXT(&result))
 		printf(" [t|%s]", result.text);
 
-	if (0 != (result.type & AR_MESSAGE))
+	if (ISSET_MSG(&result))
 		printf(" [m|%s]", result.msg);
 
 	free_result(&result);
@@ -466,14 +466,14 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 
 	if (NOTSUPPORTED == err)
 	{
-		if (0 == (result->type & AR_MESSAGE))
+		if (!ISSET_MSG(result))
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "ZBX_NOTSUPPORTED"));
 
 		ret = NOTSUPPORTED;
 	}
 	else if (TIMEOUT_ERROR == err)
 	{
-		if (0 == (result->type & AR_MESSAGE))
+		if (!ISSET_MSG(result))
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "ZBX_ERROR"));
 
 		ret = TIMEOUT_ERROR;

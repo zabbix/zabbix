@@ -461,8 +461,8 @@ static int	get_values(unsigned char poller_type)
 	AGENT_RESULT	results[MAX_BUNCH_ITEMS];
 	int		errcodes[MAX_BUNCH_ITEMS];
 	zbx_timespec_t	timespecs[MAX_BUNCH_ITEMS];
-	int		i, num, res;
-	char		*addr = NULL, *port = NULL;
+	int		i, num;
+	char		*addr, *port;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -648,8 +648,7 @@ static int	get_values(unsigned char poller_type)
 			DCrequeue_unreachable_item(items[i].itemid);
 		}
 
-		if (items[i].interface.ip_orig != items[i].interface.addr &&
-				items[i].interface.dns_orig != items[i].interface.addr)
+		if (INTERFACE_TYPE_AGENT != items[i].interface.type || 1 != items[i].interface.main)
 			zbx_free(items[i].interface.addr);
 
 		switch (items[i].type)

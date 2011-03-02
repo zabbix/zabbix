@@ -893,28 +893,28 @@ int	get_host_availability_data(struct zbx_json *j)
 		{
 			zbx_json_addstring(j, ZBX_PROTO_TAG_ERROR, error, ZBX_JSON_TYPE_STRING);
 			zbx_free(ha[index].error);
-			ha[index].error = strdup(error);
+			ZBX_STRDUP(ha[index].error, error);
 		}
 
 		if (1 == new || 0 != strcmp(ha[index].snmp_error, snmp_error))
 		{
 			zbx_json_addstring(j, ZBX_PROTO_TAG_SNMP_ERROR, snmp_error, ZBX_JSON_TYPE_STRING);
 			zbx_free(ha[index].snmp_error);
-			ha[index].snmp_error = strdup(snmp_error);
+			ZBX_STRDUP(ha[index].snmp_error, snmp_error);
 		}
 
 		if (1 == new || 0 != strcmp(ha[index].ipmi_error, ipmi_error))
 		{
 			zbx_json_addstring(j, ZBX_PROTO_TAG_IPMI_ERROR, ipmi_error, ZBX_JSON_TYPE_STRING);
 			zbx_free(ha[index].ipmi_error);
-			ha[index].ipmi_error = strdup(ipmi_error);
+			ZBX_STRDUP(ha[index].ipmi_error, ipmi_error);
 		}
 
 		if (1 == new || 0 != strcmp(ha[index].jmx_error, jmx_error))
 		{
 			zbx_json_addstring(j, ZBX_PROTO_TAG_JMX_ERROR, jmx_error, ZBX_JSON_TYPE_STRING);
 			zbx_free(ha[index].jmx_error);
-			ha[index].jmx_error = strdup(jmx_error);
+			ZBX_STRDUP(ha[index].jmx_error, jmx_error);
 		}
 
 		zbx_json_close(j);

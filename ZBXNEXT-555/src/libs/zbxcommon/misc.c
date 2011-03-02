@@ -592,10 +592,11 @@ static int	get_next_delay_interval(const char *flex_intervals, time_t now, time_
 int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int item_type,
 		int delay, const char *flex_intervals, time_t now, int *effective_delay)
 {
-	int	nextcheck;
+	const char	*__function_name = "calculate_item_nextcheck";
+	int		nextcheck;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In calculate_item_nextcheck(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,\"%s\",%d)",
-			interfaceid, itemid, delay, NULL == flex_intervals ? "" : flex_intervals, now);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() interfaceid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " delay:%d flex_intervals:'%s' now:%d",
+			__function_name, interfaceid, itemid, delay, NULL == flex_intervals ? "" : flex_intervals, now);
 
 	if (0 == delay)
 		delay = SEC_PER_YEAR;
@@ -642,7 +643,7 @@ int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int 
 	if (NULL != effective_delay)
 		*effective_delay = delay;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End calculate_item_nextcheck(nextcheck:%d delay:%d)", nextcheck, delay);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d delay:%d", __function_name, nextcheck, delay);
 
 	return nextcheck;
 }
