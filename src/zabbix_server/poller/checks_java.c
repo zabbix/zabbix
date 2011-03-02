@@ -80,7 +80,7 @@ static int	parse_response(DC_ITEM *items, AGENT_RESULT *results, int *errcodes, 
 				}
 				else
 				{
-					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Cannot get item value nor error message"));
+					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Cannot get item value or error message"));
 					errcodes[i] = AGENT_ERROR;
 				}
 			}

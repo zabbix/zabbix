@@ -145,9 +145,15 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 					case ICMPPINGSEC:
 						switch (items[i].type)
 						{
-							case ICMPPINGSEC_MIN: value_dbl = hosts[h].min; break;
-							case ICMPPINGSEC_MAX: value_dbl = hosts[h].max; break;
-							case ICMPPINGSEC_AVG: value_dbl = hosts[h].avg; break;
+							case ICMPPINGSEC_MIN:
+								value_dbl = hosts[h].min;
+								break;
+							case ICMPPINGSEC_MAX:
+								value_dbl = hosts[h].max;
+								break;
+							case ICMPPINGSEC_AVG:
+								value_dbl = hosts[h].avg;
+								break;
 						}
 						process_value(items[i].itemid, NULL, &value_dbl, ts, ping_result, error);
 						break;
