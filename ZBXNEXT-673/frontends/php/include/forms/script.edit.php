@@ -37,6 +37,8 @@
 
 	if(!isset($_REQUEST['scriptid']) || isset($_REQUEST['form_refresh'])){
 		$name = get_request('name', '');
+		$type = get_request('type', ZBX_SCRIPT_TYPE_SCRIPT);
+		$execute_on = get_request('execute_on', ZBX_SCRIPT_TARGET_SERVER);
 		$command  = get_request('command', '');
 		$description  = get_request('description', '');
 		$usrgrpid = get_request('usrgrpid',	0);
@@ -57,6 +59,8 @@
 		$script = reset($script);
 
 		$name = $script['name'];
+		$type = $script['type'];
+		$execute_on = $script['execute_on'];
 		$command  = $script['command'];
 		$description = $script['description'];
 		$usrgrpid = $script['usrgrpid'];
@@ -72,16 +76,29 @@
 	$nameTB->addStyle('width: 50em');
 	$scriptTab->addRow(_('Name'), $nameTB);
 
+// TYPE
+	$typeCB = new CComboBox('type', $type);
+	$typeCB->addItem(ZBX_SCRIPT_TYPE_IPMI, _('IPMI'));
+	$typeCB->addItem(ZBX_SCRIPT_TYPE_SCRIPT, _('Script'));
+	$scriptTab->addRow(_('Type'), $typeCB);
+
+// EXECUTE ON
+	$typeRB = new CRadioButton('execute_on', $execute_on);
+	$typeRB->makeVertical();
+	$typeRB->addValue(_('Zabbix agent'), ZBX_SCRIPT_TARGET_AGENT);
+	$typeRB->addValue(_('Zabbix server'), ZBX_SCRIPT_TARGET_SERVER);
+
+	$scriptTab->addRow(_('Execute on'), $typeRB);
+
 // COMMAND
-	$commandTB = new CTextBox('command', $command);
-	$commandTB->setAttribute('maxlength', 255);
-	$commandTB->addStyle('width: 50em');
-	$scriptTab->addRow(_('Command'), $commandTB);
+	$commandTA = new CTextArea('command', $command);
+	$commandTA->addStyle('width: 50em; padding: 0;');
+	$scriptTab->addRow(_('Command'), $commandTA);
 
 // DESCRIPTION
-	$description_ta = new CTextArea('description', $description);
-	$description_ta->addStyle('width: 50em; padding: 0;');
-	$scriptTab->addRow(_('Description'), $description_ta);
+	$descriptionTA = new CTextArea('description', $description);
+	$descriptionTA->addStyle('width: 50em; padding: 0;');
+	$scriptTab->addRow(_('Description'), $descriptionTA);
 
 // USER GROUPS
 	$usr_groups = new CCombobox('usrgrpid', $usrgrpid);

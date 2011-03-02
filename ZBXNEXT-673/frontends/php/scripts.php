@@ -43,6 +43,8 @@ $fields = array(
 	'clone'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 // form
 	'name'=>			array(T_ZBX_STR, O_OPT,  NULL,			NOT_EMPTY,	'isset({save})'),
+	'type'=>			array(T_ZBX_INT, O_OPT,  NULL,			IN('0,1'),	'isset({save})'),
+	'execute_on'=>		array(T_ZBX_INT, O_OPT,  NULL,			IN('0,1'),	'isset({save})&&{type}=='.ZBX_SCRIPT_TYPE_SCRIPT),
 	'command'=>			array(T_ZBX_STR, O_OPT,  NULL,			NOT_EMPTY,	'isset({save})'),
 	'description'=>		array(T_ZBX_STR, O_OPT,  NULL,			NULL,	'isset({save})'),
 	'access'=>			array(T_ZBX_INT, O_OPT,  NULL,			IN('0,1,2,3'),	'isset({save})'),
@@ -61,14 +63,14 @@ $_REQUEST['go'] = get_request('go', 'none');
 
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
-	if($sid = get_request('scriptid')){
-		$options = array(
-			'scriptids' => $sid,
-			'output' => API_OUTPUT_SHORTEN,
-		);
-		$scripts = API::Script()->get($options);
-		if(empty($scripts)) access_deny();
-	}
+if($sid = get_request('scriptid')){
+	$options = array(
+		'scriptids' => $sid,
+		'output' => API_OUTPUT_SHORTEN,
+	);
+	$scripts = API::Script()->get($options);
+	if(empty($scripts)) access_deny();
+}
 
 ?>
 <?php
@@ -94,6 +96,8 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 		else{
 			$script = array(
 				'name' => $_REQUEST['name'],
+				'type' => $_REQUEST['type'],
+				'execute_on' => $_REQUEST['execute_on'],
 				'command' => $_REQUEST['command'],
 				'description' => $_REQUEST['description'],
 				'usrgrpid' => $_REQUEST['usrgrpid'],
@@ -175,7 +179,7 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 		$scripts_wdgt->addItem($scriptForm->render());
 	}
 	else{
-		$frmForm = new CForm(null, 'get');
+		$frmForm = new CForm('get');
 		$frmForm->addItem(new CSubmit('form', _('Create script')));
 		$scripts_wdgt->addPageHeader(S_SCRIPTS_CONFIGURATION_BIG, $frmForm);
 
