@@ -1008,37 +1008,39 @@ Copt::memoryPick();
 	public function checkAuthentication($sessionid){
 		global $ZBX_LOCALNODEID;
 
-		$sql = 'SELECT u.userid, u.autologout'.
+		$time = time();
+		$sql = 'SELECT u.userid, u.autologout, s.lastaccess '.
 				' FROM sessions s, users u'.
 				' WHERE s.sessionid='.zbx_dbstr($sessionid).
 					' AND s.status='.ZBX_SESSION_ACTIVE.
 					' AND s.userid=u.userid'.
-					' AND ((s.lastaccess+u.autologout>'.time().') OR (u.autologout=0))'.
+					' AND ((s.lastaccess+u.autologout>'.$time.') OR (u.autologout=0))'.
 					' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);
 		$userInfo = DBfetch(DBselect($sql));
 
 		if(!$userInfo)
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
 
-		if(!check_perm2system($userInfo['userid']))
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions for system access.'));
+// dont check permissions on the same second
+		if($time != $userInfo['lastaccess']){
+			if(!check_perm2system($userInfo['userid']))
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions for system access.'));
 
-		if($userInfo['autologout'] > 0)
-			DBexecute('DELETE FROM sessions WHERE userid='.$userInfo['userid'].' AND lastaccess<'.(time() - $userInfo['autologout']));
+			if($userInfo['autologout'] > 0)
+				DBexecute('DELETE FROM sessions WHERE userid='.$userInfo['userid'].' AND lastaccess<'.(time() - $userInfo['autologout']));
 
-		DBexecute('UPDATE sessions SET lastaccess='.time().' WHERE userid='.$userInfo['userid'].' AND sessionid='.zbx_dbstr($sessionid));
+			DBexecute('UPDATE sessions SET lastaccess='.time().' WHERE userid='.$userInfo['userid'].' AND sessionid='.zbx_dbstr($sessionid));
+		}
 
 		$sql = 'SELECT MAX(g.gui_access) as gui_access '.
 			' FROM usrgrp g, users_groups ug '.
 			' WHERE ug.userid='.$userInfo['userid'].
 				' AND g.usrgrpid=ug.usrgrpid ';
 		$db_access = DBfetch(DBselect($sql));
-		if(!zbx_empty($db_access['gui_access'])){
+		if(!zbx_empty($db_access['gui_access']))
 			$guiAccess = $db_access['gui_access'];
-		}
-		else{
+		else
 			$guiAccess = GROUP_GUI_ACCESS_SYSTEM;
-		}
 
 		$userData = $this->_getUserData($userInfo['userid']);
 		$userData['sessionid'] = $sessionid;

@@ -182,6 +182,8 @@ div.footer .formrow .main:hover{ border-color: #DD7711; }
 .select{ cursor: pointer; margin: 1px 4px 1px 2px; }
 .selectShorten{ width: 200px; }
 
+.radio{ margin: 2px 2px; vertical-align: top; }
+
 /******************* BUTTONS *********************/
 .button{ border: 1px solid #808080; vertical-align: top; margin: 1px 2px 0 0; background: #F0F0F0 url('../images/gradients/button.gif') repeat-x top left; }
 .button:hover{ text-decoration: underline; border-color: black; cursor: pointer; }
@@ -237,13 +239,13 @@ div.footer .formrow .main:hover{ border-color: #DD7711; }
 
 /* Sortable */
 .header{ height: 18px; line-height: 18px; font-size: 1.1em; font-weight: bold; margin-bottom: 2px;}
+
+.widget .header{ padding: 3px; }
+.widget .header .menu_icon{ float: right; margin-right: 2px; }
+.widget .footer { color: white; line-height: 12px; height: 12px; padding: 4px 4px; margin-top: 2px;}
+
 .column{ margin: 5px 0 5px 5px; min-width: 240px; padding-bottom: 100px; }
 .column .widget{ padding: 2px; margin-bottom: 5px; overflow: hidden; }
-.column .widget .header{ padding: 3px; }
-
-.widget .header .menu_icon{ float: right; margin-right: 2px; }
-
-.widget .footer { color: white; line-height: 12px; height: 12px; padding: 4px 4px; margin-top: 2px;}
 
 .inlineblock{ display: inline-block; }
 

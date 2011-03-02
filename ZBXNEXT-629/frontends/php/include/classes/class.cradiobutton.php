@@ -36,7 +36,7 @@ class CRadioButton extends CDiv{
 	public function addValue($name, $value, $checked=null){
 		$this->count++;
 
-		$id = $name.'_'.$this->count;
+		$id = $this->name.'_'.$this->count;
 
 		$radio = new CInput('radio', $this->name, $value);
 		$radio->setAttribute('id', $id);
@@ -45,7 +45,7 @@ class CRadioButton extends CDiv{
 			$radio->setAttribute('checked', 'checked');
 		}
 
-		$label = new CLabel($name, $id);
+		$label = new CLabel(' '.$name, $id);
 
 		parent::addItem(array($radio, $label));
 	}
