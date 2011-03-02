@@ -349,26 +349,25 @@ class CScript extends CZBXAPI{
  * @return boolean
  */
 	public function create($scripts){
-
 		$scripts = zbx_toArray($scripts);
 
-			if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
-				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+		if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
+			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+		}
+
+		foreach($scripts as $script){
+			$script_db_fields = array(
+				'name' => null,
+				'command' => null,
+			);
+			if(!check_db_fields($script_db_fields, $script)){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for script'));
 			}
+		}
 
-			foreach($scripts as $snum => $script){
-				$script_db_fields = array(
-					'name' => null,
-					'command' => null,
-				);
-				if(!check_db_fields($script_db_fields, $script)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for script'));
-				}
-			}
+		$scriptids = DB::insert('scripts', $scripts);
 
-			$scriptids = DB::insert('scripts', $scripts);
-
-			return array('scriptids' => $scriptids);
+		return array('scriptids' => $scriptids);
 	}
 
 /**
@@ -380,37 +379,35 @@ class CScript extends CZBXAPI{
  * @return boolean
  */
 	public function update($scripts){
-
-
 		$scripts = zbx_toArray($scripts);
 		$scriptids = zbx_objectValues($scripts, 'scriptid');
 
-			if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
-				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-			}
+		if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
+			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+		}
 
-			$options = array(
-				'scriptids' => $scriptids,
-				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1
+		$options = array(
+			'scriptids' => $scriptids,
+			'output' => API_OUTPUT_SHORTEN,
+			'preservekeys' => true
+		);
+		$upd_scripts = $this->get($options);
+		foreach($scripts as $script){
+			if(!isset($upd_scripts[$script['scriptid']])){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script with scriptid [%s] does not exist.', $script['scriptid']));
+			}
+		}
+
+		$update = array();
+		foreach($scripts as $script){
+			$update[] = array(
+				'values' => $script,
+				'where' => array('scriptid='.$script['scriptid']),
 			);
-			$upd_scripts = $this->get($options);
-			foreach($scripts as $snum => $script){
-				if(!isset($upd_scripts[$script['scriptid']])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script with scriptid [%s] does not exist.', $script['scriptid']));
-				}
-			}
+		}
+		DB::update('scripts', $update);
 
-			$update = array();
-			foreach($scripts as $num => $script){
-				$update[] = array(
-					'values' => $script,
-					'where' => array('scriptid='.$script['scriptid']),
-				);
-			}
-			DB::update('scripts', $update);
-
-			return array('scriptids' => $scriptids);
+		return array('scriptids' => $scriptids);
 	}
 
 /**
