@@ -176,8 +176,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 #endif	/* HAVE_IPV6 */
 	}
 
-	zbx_snprintf(filename, sizeof(filename), "%s/zabbix_server_%li.pinger",
-			CONFIG_TMPDIR, zbx_get_thread_id());
+	zbx_snprintf(filename, sizeof(filename), "%s/%s_%li.pinger", CONFIG_TMPDIR, progname, zbx_get_thread_id());
 
 #ifdef HAVE_IPV6
 	if (NULL != CONFIG_SOURCE_IP)
@@ -306,6 +305,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 				*c2++ = ' ';
 		}
 		while (NULL != (c = c2));
+
 		ret = SUCCEED;
 	}
 	pclose(f);
