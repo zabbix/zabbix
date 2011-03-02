@@ -355,6 +355,7 @@ class CScript extends CZBXAPI{
 			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 		}
 
+		$scriptNames = array();
 		foreach($scripts as $script){
 			$script_db_fields = array(
 				'name' => null,
@@ -363,6 +364,23 @@ class CScript extends CZBXAPI{
 			if(!check_db_fields($script_db_fields, $script)){
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for script'));
 			}
+
+			if(isset($scriptNames[$script['name']])){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate script name "%s"', $script['name']));
+			}
+
+			$scriptNames[$script['name']] = $script['name'];
+		}
+
+		$options = array(
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => true,
+			'filter' => array('name' => $scriptNames),
+			'limit' => 1,
+		);
+		$scriptsDB = $this->get($options);
+		if($exScript = reset($scriptsDB)){
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%s" already exists.', $exScript['name']));
 		}
 
 		$scriptids = DB::insert('scripts', $scripts);
@@ -379,8 +397,8 @@ class CScript extends CZBXAPI{
  * @return boolean
  */
 	public function update($scripts){
-		$scripts = zbx_toArray($scripts);
-		$scriptids = zbx_objectValues($scripts, 'scriptid');
+		$scripts = zbx_toHash($scripts, 'scriptid');
+		$scriptids = array_keys($scripts);
 
 		if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
 			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -392,9 +410,33 @@ class CScript extends CZBXAPI{
 			'preservekeys' => true
 		);
 		$upd_scripts = $this->get($options);
+		$scriptNames = array();
 		foreach($scripts as $script){
 			if(!isset($upd_scripts[$script['scriptid']])){
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script with scriptid [%s] does not exist.', $script['scriptid']));
+			}
+
+			if(isset($script['name'])){
+				if(isset($scriptNames[$script['name']])){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate script name "%s"', $script['name']));
+				}
+
+				$scriptNames[$script['name']] = $script['name'];
+			}
+		}
+
+
+		if(!empty($scriptNames)){
+			$options = array(
+				'output' => API_OUTPUT_EXTEND,
+				'preservekeys' => true,
+				'filter' => array('name' => $scriptNames),
+			);
+			$scriptsDB = $this->get($options);
+			foreach($scriptsDB as $exScript){
+				if(!isset($scripts[$exScript['scriptid']]) || ($scripts[$exScript['scriptid']]['scriptid'] !== $exScript['scriptid'])){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%s" already exists.', $exScript['name']));
+				}
 			}
 		}
 

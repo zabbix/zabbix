@@ -79,17 +79,10 @@ if($sid = get_request('scriptid')){
 		$_REQUEST['form'] = 'clone';
 	}
 	else if(isset($_REQUEST['save'])){
-		$cond = (isset($_REQUEST['scriptid']))?(' AND scriptid<>'.$_REQUEST['scriptid']):('');
-		$scripts = DBfetch(DBselect('SELECT count(scriptid) as cnt FROM scripts WHERE name='.zbx_dbstr($_REQUEST['name']).$cond.' and '.DBin_node('scriptid', get_current_nodeid(false)),1));
-
 		$confirmation = get_request('confirmation', '');
 		$enableConfirmation = get_request('enableConfirmation', false);
 
-		if($scripts && $scripts['cnt'] > 0){
-			error(_s('Script [%s] already exists.', htmlspecialchars($_REQUEST['name'])));
-			show_messages(null, S_ERROR, S_CANNOT_ADD_SCRIPT);
-		}
-		else if($enableConfirmation && zbx_empty($confirmation)){
+		if($enableConfirmation && zbx_empty($confirmation)){
 			error(_('Please enter confirmation text.'));
 			show_messages(null, S_ERROR, S_CANNOT_ADD_SCRIPT);
 		}
@@ -111,16 +104,18 @@ if($sid = get_request('scriptid')){
 
 				$result = API::Script()->update($script);
 				show_messages($result, S_SCRIPT_UPDATED, S_CANNOT_UPDATE_SCRIPT);
-				$scriptid = $_REQUEST['scriptid'];
+
 				$audit_acrion = AUDIT_ACTION_UPDATE;
 			}
 			else{
 				$result = API::Script()->create($script);
 
 				show_messages($result, S_SCRIPT_ADDED, S_CANNOT_ADD_SCRIPT);
-				$scriptid = reset($result['scriptids']);
+
 				$audit_acrion = AUDIT_ACTION_ADD;
 			}
+
+			$scriptid = isset($result['scriptids']) ? reset($result['scriptids']) : null;
 
 			add_audit_if($result,$audit_acrion,AUDIT_RESOURCE_SCRIPT,' Name ['.$_REQUEST['name'].'] id ['.$scriptid.']');
 
