@@ -1,299 +1,262 @@
 <!-- Discovery -->
-<script type="text/x-jquery-tmpl" id="opmsgUserRowTPL">
-<tr id="opmsgUserRow_#{userid}">
+<script type="text/x-jquery-tmpl" id="dcheckRowTPL">
+<tr id="dcheckRow_#{dcheckid}">
 <td>
-	<input name="new_operation[opmessage_usr][#{userid}][userid]" type="hidden" value="#{userid}" />
-	<span style="font-size: 1.1em; font-weight: bold;"> #{alias} </span>
+	<input name="dchecks[#{dcheckid}][dcheckid]" type="hidden" value="#{dcheckid}" />
+	<input name="dchecks[#{dcheckid}][name]" type="hidden" value="#{name}" />
+	<input name="dchecks[#{dcheckid}][type]" type="hidden" value="#{type}" />
+	<input name="dchecks[#{dcheckid}][key_]" type="hidden" value="#{key_}" />
+	<input name="dchecks[#{dcheckid}][ports]" type="hidden" value="#{ports}" />
+	<input name="dchecks[#{dcheckid}][snmp_community]" type="hidden" value="#{snmp_community}" />
+	<input name="dchecks[#{dcheckid}][snmpv3_securityname]" type="hidden" value="#{snmpv3_securityname}" />
+	<input name="dchecks[#{dcheckid}][snmpv3_securitylevel]" type="hidden" value="#{snmpv3_securitylevel}" />
+	<input name="dchecks[#{dcheckid}][snmpv3_authpassphrase]" type="hidden" value="#{snmpv3_authpassphrase}" />
+	<input name="dchecks[#{dcheckid}][snmpv3_privpassphrase]" type="hidden" value="#{snmpv3_privpassphrase}" />
+	<input name="dchecks[#{dcheckid}][uniq]" type="hidden" value="#{uniq}" />
+	<span style="font-size: 1.1em;" class="bold"> #{name} </span>
 </td>
 <td>
-	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="javascript: removeOpmsgUserRow(#{userid});" />
+	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="javascript: removeDCheckRow(#{dcheckid});" />
 </td>
 </tr>
 </script>
 
+<script type="text/x-jquery-tmpl" id="uniqRowTPL">
+	<div id="uniqueness_criteria_row_#{dcheckid}">
+	<input type="radio" id="uniqueness_criteria_#{dcheckid}" name="uniqueness_criteria" value="#{dcheckid}" class="input radio">
+<label for="uniqueness_criteria_#{dcheckid}">#{name}</label>
+</div>
+</script>
 
-<script type="text/x-jquery-tmpl" id="opcmdEditFormTPL">
-<div id="opcmdEditForm" class="objectgroup border_dotted ui-corner-all">
+<script type="text/x-jquery-tmpl" id="newDCheckTPL">
+<div id="new_check_form">
+<div class="objectgroup inlineblock border_dotted ui-corner-all">
 <table class="formElementTable"><tbody>
 <tr>
-	<td> <?php print(_('Target')); ?> </td>
+	<td><label for="new_check_type"><?php print(_('Check type')); ?></label></td>
 	<td>
-		<select name="opCmdTarget" class="input select">
-			<option value="0"><?php print(_('Current host')); ?></option>
-			<option value="1"><?php print(_('Host')); ?></option>
-			<option value="2"><?php print(_('Host group')); ?></option>
-		</select>
-		<div id="opCmdTargetSelect" class="inlineblock">
-			<input name="action" type="hidden" value="#{action}" />
-			<input name="opCmdId" type="hidden" value="#{opcmdid}" />
-			<input name="opCmdTargetObjectId" id="opCmdTargetObjectId" type="hidden" value="#{objectid}" />
-			<input name="opCmdTargetObjectName" id="opCmdTargetObjectName" type="text" class="input text" value="#{name}" readonly="readonly" size="30"/>
-			<input type="button" class="input link_menu" name="select" value="<?php print(_('select'));?>" />
-		</div>
+	<select id="new_check_type" name="new_check_type" class="input select">
+		<option value="3">FTP</option>
+		<option value="4">HTTP</option>
+		<option value="12">ICMP Ping</option>
+		<option value="7">IMAP</option>
+		<option value="1">LDAP</option>
+		<option value="6">NNTP</option>
+		<option value="5">POP</option>
+		<option value="2">SMTP</option>
+		<option value="10">SNMPv1 agent</option>
+		<option value="11">SNMPv2 agent</option>
+		<option value="13">SNMPv3 agent</option>
+		<option value="0">SSH</option>
+		<option value="8">TCP</option>
+		<option value="9">Zabbix agent</option>
+	</select>
 	</td>
 </tr>
-<tr>
-	<td> <?php print(_('Command')); ?> </td>
-	<td><textarea name="opCmdTargetObjectCommand" class="input textarea" style="width: 320px; height: 60px;">#{command}</textarea></td>
+<tr id="newCheckPortsRow" class="hidden">
+	<td><label for="new_check_ports"><?php print(_('Ports')); ?></label></td>
+	<td><input type="text" id="new_check_ports" name="new_check_ports" value="" class="input text" size="16" maxlength="255"></td>
+</tr>
+<tr id="newCheckComunityRow" class="hidden">
+	<td><label for="new_check_comunity"><?php print(_('SNMP Comunity')); ?></label></td>
+	<td><input type="text" id="new_check_ports" name="new_check_comunity" value="" class="input text" size="20" maxlength="255"></td>
+</tr>
+<tr id="newCheckKeyRow" class="hidden">
+	<td><label for="new_check_key_"><?php print(_('SNMP Key')); ?></label></td>
+	<td><input type="text" id="new_check_key_" name="new_check_key_" value="" class="input text" size="20" maxlength="255"></td>
+</tr>
+<tr id="newCheckSecNameRow" class="hidden">
+	<td><label for="new_check_securityname"><?php print(_('SNMPv3 Security name')); ?></label></td>
+	<td><input type="text" id="new_check_snmpv3_securityname" name="new_check_snmpv3_securityname" value="" class="input text" size="20" maxlength="64"></td>
+</tr>
+<tr id="newCheckSecLevRow" class="hidden">
+	<td><label for="new_check_seclev"><?php print(_('SNMPv3 Security level')); ?></label></td>
+	<td><select id="new_check_snmpv3_securitylevel" name="new_check_snmpv3_securitylevel" class="input select" size="1">
+		<option value="0"><?php print('noAuthNoPriv'); ?> </option>
+		<option value="1"><?php print('authNoPriv'); ?> </option>
+		<option value="2"><?php print('authPriv'); ?> </option>
+	</select></td>
+</tr>
+<tr id="newCheckAuthPassRow" class="hidden">
+	<td><label for="new_check_snmpv3_authpassphrase"><?php print(_('SNMPv3 auth passphrase')); ?></label></td>
+	<td><input type="text" id="new_check_snmpv3_authpassphrase" name="new_check_snmpv3_authpassphrase" value="" class="input text" size="20" maxlength="64"></td>
+</tr>
+<tr id="newCheckPrivPassRow" class="hidden">
+	<td><label for="new_check_snmpv3_authpassphrase"><?php print(_('SNMPv3 priv passphrase')); ?></label></td>
+	<td><input type="text" id="new_check_snmpv3_privpassphrase" name="new_check_snmpv3_privpassphrase" value="" class="input text" size="20" maxlength="64"></td>
 </tr>
 </tbody></table>
-<div>
-	<input type="button" class="input link_menu" name="save" value="#{operationName}" />
-	&nbsp;<input type="button" class="input link_menu" name="cancel" value="<?php print(_('Cancel')); ?>" />
+<input type="button" id="add_new_dcheck" name="add_new_dcheck" value="<?php print(_('Add'));?>" class="input button link_menu">
+&nbsp;&nbsp;<input type="button" id="cancel_new_dcheck" name="cancel_new_dcheck" value="<?php print(_('Cancel'));?>" class="input button link_menu">
 </div>
 </div>
 </script>
 
 <script type="text/javascript">
 //<!--<![CDATA[
+var ZBX_SVC_PORT = {
+	'ssh': <?php print(SVC_SSH);?>,
+	'ldap': <?php print(SVC_LDAP);?>,
+	'smtp': <?php print(SVC_SMTP);?>,
+	'ftp': <?php print(SVC_FTP);?>,
+	'http': <?php print(SVC_HTTP);?>,
+	'pop': <?php print(SVC_POP);?>,
+	'nntp': <?php print(SVC_NNTP);?>,
+	'imap': <?php print(SVC_IMAP);?>,
+	'agent': <?php print(SVC_AGENT);?>,
+	'snmpv1': <?php print(SVC_SNMPv1);?>,
+	'snmpv2': <?php print(SVC_SNMPv2);?>,
+	'snmpv3': <?php print(SVC_SNMPv3);?>,
+	'icmp': <?php print(SVC_ICMPPING);?>
+};
+
+function defaultPort(service){
+	service = service.toString();
+	var defPorts = {};
+	defPorts[ZBX_SVC_PORT.ssh] = '22';
+	defPorts[ZBX_SVC_PORT.ldap] = '389';
+	defPorts[ZBX_SVC_PORT.smtp] = '25';
+	defPorts[ZBX_SVC_PORT.ftp] = '21';
+	defPorts[ZBX_SVC_PORT.http] = '80';
+	defPorts[ZBX_SVC_PORT.pop] = '110';
+	defPorts[ZBX_SVC_PORT.nntp] = '119';
+	defPorts[ZBX_SVC_PORT.imap] = '143';
+	defPorts[ZBX_SVC_PORT.agent] = '10050';
+	defPorts[ZBX_SVC_PORT.snmpv1] = '161';
+	defPorts[ZBX_SVC_PORT.snmpv2] = '161';
+	defPorts[ZBX_SVC_PORT.snmpv3] = '161';
+
+	return isset(service, defPorts) ? defPorts[service] : 0;
+}
+
 function addPopupValues(list){
+	var uniqTypeList = {};
+	uniqTypeList[ZBX_SVC_PORT.agent] = true;
+	uniqTypeList[ZBX_SVC_PORT.snmpv1] = true;
+	uniqTypeList[ZBX_SVC_PORT.snmpv2] = true;
+	uniqTypeList[ZBX_SVC_PORT.snmpv3] = true;
+
 	for(var i=0; i < list.values.length; i++){
 		if(empty(list.values[i])) continue;
 		var value = list.values[i];
 
 		switch(list.object){
-			case 'userid':
-				if(jQuery("#opmsgUserRow_"+value.userid).length) continue;
+			case 'dcheckid':
+				if(jQuery("#dcheckRow_"+value.dcheckid).length) continue;
 
-				var tpl = new Template(jQuery('#opmsgUserRowTPL').html());
-				jQuery("#opmsgUserListFooter").before(tpl.evaluate(value));
-				break;
-			case 'usrgrpid':
-				if(jQuery("#opmsgUsrgrpRow_"+value.usrgrpid).length) continue;
+				var tpl = new Template(jQuery('#dcheckRowTPL').html());
+				jQuery("#dcheckListFooter").before(tpl.evaluate(value));
 
-				var tpl = new Template(jQuery('#opmsgUsrgrpRowTPL').html());
-				jQuery("#opmsgUsrgrpListFooter").before(tpl.evaluate(value));
-				break;
-			case 'dsc_groupid':
-				if(jQuery("#opGroupRow_"+value.groupid).length) continue;
 
-				var tpl = new Template(jQuery('#opGroupRowTPL').html());
-				jQuery("#opGroupListFooter").before(tpl.evaluate(value));
-				break;
-			case 'dsc_templateid':
-				if(jQuery("#opTemplateRow_"+value.templateid).length) continue;
-
-				var tpl = new Template(jQuery('#opTemplateRowTPL').html());
-				jQuery("#opTemplateListFooter").before(tpl.evaluate(value));
-				break;
-			case 'groupid':
-				var tpl = new Template(jQuery('#opCmdGroupRowTPL').html());
-
-				value.objectCaption = "<?php print(_('Host group').': '); ?>";
-
-				if(!isset('action', value))
-					value.action = isset('opcommand_grpid', value) ? 'update' : 'create';
-
-				value.commandLine = value.command;
-				var cmdLines = value.command.split("\n");
-
-				if((value.command.length > 48) || (cmdLines.length > 1))
-					value.commandLine = cmdLines[0].toString().substr(0,45) + '...';
-
-				if(jQuery("#opCmdDraft").length){
-					jQuery("#opCmdDraft").replaceWith(tpl.evaluate(value));
+				if(isset(parseInt(value.type, 10), uniqTypeList)){
+					var tpl = new Template(jQuery('#uniqRowTPL').html());
+					jQuery("#uniqList").append(tpl.evaluate(value));
 				}
-				else{
-					if(!isset('opcommand_grpid', value)){
-						value.opcommand_grpid = jQuery("#opCmdList tr[id^=opCmdGroupRow_]").length;
-						while(jQuery("#opCmdGroupRow_"+value.opcommand_grpid).length){
-							value.opcommand_grpid++;
-						}
-					}
 
-					value.newValue = "create";
-					jQuery("#opCmdListFooter").before(tpl.evaluate(value));
-				}
+				uniqList
 				break;
-			case 'hostid':
-				var tpl = new Template(jQuery('#opCmdHostRowTPL').html());
-
-				if(value.hostid.toString() != '0')
-					value.objectCaption = "<?php print(_('Host').': '); ?>";
-				else
-					value.host = "<?php print(_('Current host')); ?>";
-
-				if(!isset('action', value))
-					value.action = isset('opcommand_hstid', value) ? 'update' : 'create';
-
-				value.commandLine = value.command;
-				var cmdLines = value.command.split("\n");
-
-				if((value.command.length > 48) || (cmdLines.length > 1))
-					value.commandLine = cmdLines[0].toString().substr(0,45) + '...';
-
-				if(jQuery("#opCmdDraft").length){
-					jQuery("#opCmdDraft").replaceWith(tpl.evaluate(value));
-				}
-				else{
-					if(!isset('opcommand_hstid', value)){
-						value.opcommand_hstid = jQuery("#opCmdList tr[id^=opCmdHostRow_]").length;
-						while(jQuery("#opCmdHostRow_"+value.opcommand_hstid).length){
-							value.opcommand_hstid++;
-						}
-					}
-
-					value.newValue = "create";
-					jQuery("#opCmdListFooter").before(tpl.evaluate(value));
-				}
-				break;
+//			if(in_array($data['type'], array(SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2, SVC_SNMPv3)))
+//				$cmbUniquenessCriteria->addItem($id, $data['name']);
 		}
 	}
 }
 
-function removeOpmsgUsrgrpRow(usrgrpid){
-	jQuery('#opmsgUsrgrpRow_'+usrgrpid).remove();
-}
-function removeOpmsgUserRow(userid){
-	jQuery('#opmsgUserRow_'+userid).remove();
-}
-function removeOpGroupRow(groupid){
-	jQuery('#opGroupRow_'+groupid).remove();
-}
-function removeOpTemplateRow(tplid){
-	jQuery('#opTemplateRow_'+tplid).remove();
+function removeDCheckRow(dcheckid){
+	jQuery('#dcheckRow_'+dcheckid).remove();
+	jQuery('#uniqueness_criteria_row_'+dcheckid).remove();
 }
 
-function removeOpCmdRow(opCmdRowId, object){
-	if(object == 'groupid'){
-		jQuery('#opCmdGroupRow_'+opCmdRowId).remove();
+function showNewCheckForm(e, dcheckType){
+	if(jQuery('#new_check_form').length == 0){
+		var tpl = new Template(jQuery('#newDCheckTPL').html());
+		jQuery("#dcheckList").after(tpl.evaluate());
+
+		jQuery("#new_check_type").change(updateNewDCheckType);
+		jQuery("#new_check_snmpv3_securitylevel").change(updateNewDCheckSNMPType);
+		jQuery("#add_new_dcheck").click(saveNewDCheckForm);
+		jQuery("#cancel_new_dcheck").click(function(){ jQuery('#new_check_form').remove(); });
 	}
-	else{
-		jQuery('#opCmdHostRow_'+opCmdRowId).remove();
-	}
+
+	updateNewDCheckType(e);
 }
 
-function showOpCmdForm(opCmdId, object){
-	if(jQuery("#opcmdEditForm").length > 0){
-		if(!closeOpCmdForm()) return true;
+function updateNewDCheckType(e){
+	var dcheckType = parseInt(jQuery("#new_check_type").val(), 10);
+
+	var keyRowTypes = {}
+	keyRowTypes[ZBX_SVC_PORT.agent] = true;
+	keyRowTypes[ZBX_SVC_PORT.snmpv1] = true;
+	keyRowTypes[ZBX_SVC_PORT.snmpv2] = true;
+	keyRowTypes[ZBX_SVC_PORT.snmpv3] = true;
+
+	var ComRowTypes = {}
+	ComRowTypes[ZBX_SVC_PORT.snmpv1] = true;
+	ComRowTypes[ZBX_SVC_PORT.snmpv2] = true;
+
+	var SecNameRowTypes = {};
+	SecNameRowTypes[ZBX_SVC_PORT.snmpv3] = true;
+
+	jQuery('#newCheckPortsRow').toggle((ZBX_SVC_PORT.icmp != dcheckType));
+	jQuery('#newCheckKeyRow').toggle(isset(dcheckType, keyRowTypes));
+	if(isset(dcheckType, keyRowTypes)){
+		var caption = (dcheckType == ZBX_SVC_PORT.agent)? "<?php print(_('Key')); ?>" : "<?php print(_('SNMP OID')); ?>";
+		jQuery('#newCheckKeyRow label').text(caption);
 	}
 
-	var objectTPL = {};
-	if(object == 'hostid'){
-		var objectRow = jQuery('#opCmdHostRow_'+opCmdId);
-		objectRow.attr('origid', objectRow.attr('id'));
-		objectRow.attr('id', 'opCmdDraft');
+	jQuery('#newCheckComunityRow').toggle(isset(dcheckType, ComRowTypes));
+	jQuery('#newCheckSecNameRow').toggle(isset(dcheckType, SecNameRowTypes));
+	jQuery('#newCheckSecLevRow').toggle(isset(dcheckType, SecNameRowTypes));
 
-//#new_operation[opcommand_hst][#{opcommand_hstid}][opcommand_hstid]')
-		objectTPL.action = jQuery(objectRow).find('input[name="new_operation[opcommand_hst]['+opCmdId+'][action]"]').val();
+	if(ZBX_SVC_PORT.icmp != dcheckType)
+		jQuery('#new_check_ports').val(defaultPort(dcheckType));
 
-		objectTPL.opcmdid = opCmdId;
-		objectTPL.objectid = jQuery(objectRow).find('input[name="new_operation[opcommand_hst]['+opCmdId+'][hostid]"]').val();
-		objectTPL.name = jQuery(objectRow).find('input[name="new_operation[opcommand_hst]['+opCmdId+'][host]"]').val();
-		objectTPL.target = (objectTPL.objectid == 0) ? 0 : 1;
-		objectTPL.command = jQuery(objectRow).find('textarea[name="new_operation[opcommand_hst]['+opCmdId+'][command]"]').val();
-		objectTPL.operationName = '<?php print(_('Update'));?>';
-	}
-	else if(object == 'groupid'){
-		objectTPL.action = jQuery(objectRow).find('input[name="new_operation[opcommand_hst]['+opCmdId+'][action]"]').val();
-
-		var objectRow = jQuery('#opCmdGroupRow_'+opCmdId);
-		objectRow.attr('origid', objectRow.attr('id'));
-		objectRow.attr('id', 'opCmdDraft');
-//#new_operation[opcommand_hst][#{opcommand_hstid}][opcommand_hstid]')
-
-		objectTPL.opcmdid = opCmdId;
-		objectTPL.objectid = jQuery(objectRow).find('input[name="new_operation[opcommand_grp]['+opCmdId+'][groupid]"]').val();
-		objectTPL.name = jQuery(objectRow).find('input[name="new_operation[opcommand_grp]['+opCmdId+'][name]"]').val();
-		objectTPL.target = 2;
-		objectTPL.command = jQuery(objectRow).find('textarea[name="new_operation[opcommand_grp]['+opCmdId+'][command]"]').val();
-		objectTPL.operationName = '<?php print(_('Update'));?>';
-	}
-	else{
-// new
-		objectTPL.action = 'create';
-		objectTPL.opcmdid = 'new';
-		objectTPL.objectid = 0;
-		objectTPL.name = '';
-		objectTPL.target = 0;
-		objectTPL.command = '';
-		objectTPL.operationName = '<?php print(_('Add'));?>';
-	}
-
-	var tpl = new Template(jQuery('#opcmdEditFormTPL').html());
-	jQuery("#opCmdList").after(tpl.evaluate(objectTPL));
-
-// actions
-	jQuery('#opcmdEditForm')
-		.find('#opCmdTargetSelect').toggle((objectTPL.target != 0)).end()
-		.find('input[name="save"]').click(saveOpCmdForm).end()
-		.find('input[name="cancel"]').click(closeOpCmdForm).end()
-		.find('input[name="select"]').click(selectOpCmdTarget).end()
-		.find('select[name="opCmdTarget"]').val(objectTPL.target).change(changeOpCmdTarget);
+	updateNewDCheckSNMPType(e);
 }
 
+function updateNewDCheckSNMPType(e){
+	var dcheckType = parseInt(jQuery("#new_check_type").val(), 10);
+	var dcheckSecLevType = parseInt(jQuery("#new_check_snmpv3_securitylevel").val(), 10);
 
-function saveOpCmdForm(){
-	var objectForm = jQuery('#opcmdEditForm');
+	var SecNameRowTypes = {};
+	SecNameRowTypes[ZBX_SVC_PORT.snmpv3] = true;
 
-	var object = {};
-	object.action = jQuery(objectForm).find('input[name="action"]').val();
-	object.target = jQuery(objectForm).find('select[name="opCmdTarget"]').val();
-	object.command = jQuery(objectForm).find('textarea[name="opCmdTargetObjectCommand"]').val();
+	var showAuthPass = (isset(dcheckType, SecNameRowTypes) && ((dcheckSecLevType == <?php print(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV); ?>) || (dcheckSecLevType == <?php print(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV); ?>)));
+	var showPrivPass = (isset(dcheckType, SecNameRowTypes) && (dcheckSecLevType == <?php print(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV); ?>));
 
-	if(empty(jQuery.trim(object.command))){
-		alert("<?php print(_('Command field is empty. Please provide some instructions for operation.')); ?>");
-		return true;
-	}
+	jQuery('#newCheckAuthPassRow').toggle(showAuthPass);
+	jQuery('#newCheckPrivPassRow').toggle(showPrivPass);
 
-	if(object.target.toString() == '2'){
-		object.object = 'groupid';
-		object.opcommand_grpid = jQuery(objectForm).find('input[name="opCmdId"]').val();
-		object.groupid = jQuery(objectForm).find('input[name="opCmdTargetObjectId"]').val();
-		object.name = jQuery(objectForm).find('input[name="opCmdTargetObjectName"]').val();
-
-		if(empty(object.name)){
-			alert("<?php print(_('You did not specify host group for operation.')); ?>");
-			return true;
-		}
-
-		if(object.opcommand_grpid == 'new') delete(object["opcommand_grpid"]);
-	}
-	else{
-		object.object = 'hostid';
-		object.opcommand_hstid = jQuery(objectForm).find('input[name="opCmdId"]').val();
-		object.hostid = jQuery(objectForm).find('input[name="opCmdTargetObjectId"]').val();
-		object.host = jQuery(objectForm).find('input[name="opCmdTargetObjectName"]').val();
-
-		if((object.target.toString() != '0') && empty(object.host)){
-			alert("<?php print(_('You did not specify host for operation.')); ?>");
-			return true;
-		}
-
-		if(object.opcommand_hstid == 'new') delete(object["opcommand_hstid"]);
-	}
-
-	addPopupValues({'object': object.object, 'values': [object]});
-	jQuery(objectForm).remove();
 }
 
-function selectOpCmdTarget(){
-	var target = jQuery('#opcmdEditForm select[name="opCmdTarget"]').val();
-	if(target.toString() == '2')
-		PopUp("popup.php?dstfrm=action.edit.php&srctbl=host_group&srcfld1=groupid&srcfld2=name&dstfld1=opCmdTargetObjectId&dstfld2=opCmdTargetObjectName&writeonly=1",480,480);
-	else
-		PopUp("popup.php?dstfrm=action.edit.php&srctbl=hosts&srcfld1=hostid&srcfld2=host&dstfld1=opCmdTargetObjectId&dstfld2=opCmdTargetObjectName&writeonly=1",780,480);
-}
+function saveNewDCheckForm(e){
+	var formData = jQuery('#new_check_form').find('input,select').serializeJSON();
 
-function changeOpCmdTarget(){
-	jQuery('#opcmdEditForm')
-		.find('#opCmdTargetSelect').toggle((jQuery('#opcmdEditForm select[name="opCmdTarget"]').val() > 0)).end()
-		.find('input[name="opCmdTargetObjectId"]').val(0).end()
-		.find('input[name="opCmdTargetObjectName"]').val('').end();
-}
+	var dCheck = {
+		'dcheckid': jQuery("#dcheckList tr[id^=dcheckRow_]").length,
+		'name': jQuery('#new_check_type :selected').text()
+	};
 
-function closeOpCmdForm(){
-//	if(Confirm("<?php print(_('Close currently opened remote command details without saving?')); ?>")){
-		jQuery('#opCmdDraft').attr('id', jQuery('#opCmdDraft').attr('origid'));
-		jQuery("#opcmdEditForm").remove();
-		return true;
-//	}
-	return false;
+	while(jQuery("#dcheckRow_"+dCheck.dcheckid).length)
+		dCheck.dcheckid++;
+
+	for(var key in formData){
+		var name = key.split('new_check_');
+		if(name.length != 2) continue;
+
+		dCheck[name[1]] = formData[key];
+	}
+
+	if(dCheck.ports != defaultPort(dCheck.type))
+		dCheck.name += ' ('+dCheck.ports+')'
+
+	addPopupValues({'object': 'dcheckid', 'values': [dCheck]});
+	jQuery('#new_check_form').remove();
 }
 
 jQuery(document).ready(function(){
 	setTimeout(function(){jQuery("#name").focus()}, 10);
 
+	jQuery("#newCheck").click(showNewCheckForm);
 // Clone button
 	jQuery("#clone").click(function(){
 		jQuery("#druleid, #delete, #clone").remove();
@@ -302,6 +265,16 @@ jQuery(document).ready(function(){
 		jQuery("#name").focus();
 	});
 });
+
+(function($){
+	$.fn.serializeJSON = function(){
+		var json = {};
+		jQuery.map($(this).serializeArray(), function(n, i){
+			json[n['name']] = n['value'];
+		});
+		return json;
+	};
+})(jQuery);
 
 //]]> -->
 </script>

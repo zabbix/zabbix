@@ -49,6 +49,7 @@ class CDCheck extends CZBXAPI{
 			'dcheckids'					=> null,
 			'druleids'					=> null,
 			'dhostids'					=> null,
+			'dserviceids'				=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
 // filter
@@ -62,6 +63,7 @@ class CDCheck extends CZBXAPI{
 			'output'					=> API_OUTPUT_REFER,
 			'selectDRules'				=> null,
 			'selectDHosts'				=> null,
+			'selectHosts'				=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,

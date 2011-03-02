@@ -967,7 +967,7 @@ else {
 		$condition = '';
 
 		if(!is_array($array)){
-			info('DBcondition Error: ['.$fieldname.'] = '.$array);
+			throw new APIException(1, 'DBcondition Error: ['.$fieldname.'] = '.$array);
 			return ' 1=0 ';
 		}
 
@@ -1125,41 +1125,41 @@ if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
 				self::exception(self::SCHEMA_ERROR, _s('Table "%s" does not exist.', $table));
 		}
 
-		public static function checkValueTypes($table, &$values){
-			$table_schema = self::getSchema($table);
+		public static function checkValueTypes(&$tableSchema, &$values){
+			unset($values[$tableSchema['key']]);
 
 			foreach($values as $field => $value){
-				if(!isset($table_schema['fields'][$field])){
+				if(!isset($tableSchema['fields'][$field])){
 					unset($values[$field]);
 					continue;
 				}
 
 				if(is_null($values[$field])){
-					if($table_schema['fields'][$field]['null'])
+					if($tableSchema['fields'][$field]['null'])
 						$values[$field] = 'NULL';
-					else if(isset($table_schema['fields'][$field]['default']))
-						$values[$field] = $table_schema['fields'][$field]['default'];
+					else if(isset($tableSchema['fields'][$field]['default']))
+						$values[$field] = $tableSchema['fields'][$field]['default'];
 					else
 						self::exception(self::DBEXECUTE_ERROR, _s('Mandatory field "%1$s" is missing in table "%2$s".', $field, $table));
 
 				}
 
-				if(isset($table_schema['fields'][$field]['ref_table'])){
-					if($table_schema['fields'][$field]['null'])
+				if(isset($tableSchema['fields'][$field]['ref_table'])){
+					if($tableSchema['fields'][$field]['null'])
 						$values[$field] = zero2null($values[$field]);
 				}
 
 
 				if($values[$field] === 'NULL'){
-					if(!$table_schema['fields'][$field]['null'])
+					if(!$tableSchema['fields'][$field]['null'])
 						self::exception(self::DBEXECUTE_ERROR, _s('Incorrect value "NULL" for NOT NULL field "%s".', $field));
 				}
 				else{
-					switch($table_schema['fields'][$field]['type']){
+					switch($tableSchema['fields'][$field]['type']){
 						case self::FIELD_TYPE_CHAR:
-							if(zbx_strlen($values[$field]) > $table_schema['fields'][$field]['length']){
+							if(zbx_strlen($values[$field]) > $tableSchema['fields'][$field]['length']){
 								self::exception(self::SCHEMA_ERROR, _s('Value "%1$s" is too long for field "%2$s" - %3$d characters. Allowed length is %4$d characters.',
-									$values[$field], $field, zbx_strlen($values[$field]), $table_schema['fields'][$field]['length']));
+									$values[$field], $field, zbx_strlen($values[$field]), $tableSchema['fields'][$field]['length']));
 							}
 
 							$values[$field] = zbx_dbstr($values[$field]);
@@ -1196,14 +1196,14 @@ if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
 			if($getids)
 				$id = self::reserveIds($table, count($values));
 
-			$table_schema = self::getSchema($table);
+			$tableSchema = self::getSchema($table);
 
 			foreach($values as $key => $row){
-				self::checkValueTypes($table, $row);
+				self::checkValueTypes($tableSchema, $row);
 
 				if($getids){
 					$resultIds[$key] = $id;
-					$row[$table_schema['key']] = $id;
+					$row[$tableSchema['key']] = $id;
 					$id = bcadd($id, 1, 0);
 				}
 
@@ -1229,18 +1229,18 @@ if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
 		public static function update($table, $data){
 			if(empty($data)) return true;
 
-//W			$table_schema = self::getSchema($table);
+			$tableSchema = self::getSchema($table);
 
 			$data = zbx_toArray($data);
 			foreach($data as $dnum => $row){
 // check
 				if(empty($row['values'])) continue;
-				self::checkValueTypes($table, $row['values']);
+				self::checkValueTypes($tableSchema, $row['values']);
 
 // set creation
 				$sqlSet = '';
 				foreach($row['values'] as $field => $value)
-					$sqlSet.= $field.'='.$value.',';
+					$sqlSet.= ' '.$field.'='.$value.',';
 				$sqlSet = rtrim($sqlSet, ',');
 
 				if(!isset($row['where']) || empty($row['where']) || !is_array($row['where']))
@@ -1249,8 +1249,8 @@ if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
 // where condition proccess
 				$sqlWhere = array();
 				foreach($row['where'] as $field => $values){
-//					if(!isset($table_schema['fields'][$field]) || is_null($values))
-//						self::exception(self::DBEXECUTE_ERROR, _s('Incorrect field "%1$s" name or value in where statement for table "%2$s".', $field, $table));
+					if(!isset($tableSchema['fields'][$field]) || is_null($values))
+						self::exception(self::DBEXECUTE_ERROR, _s('Incorrect field "%1$s" name or value in where statement for table "%2$s".', $field, $table));
 
 					$sqlWhere[] = DBcondition($field, zbx_toArray($values));
 				}

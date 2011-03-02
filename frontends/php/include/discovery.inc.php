@@ -196,23 +196,38 @@
 		return $result;
 	}
 
-	function update_discovery_rule($druleid, $proxy_hostid, $name, $iprange, $delay, $status, $dchecks,	$uniqueness_criteria, $dchecks_deleted){
+	function update_discovery_rule($druleid, $proxy_hostid, $name, $iprange, $delay, $status, $dchecks,	$uniqueness_criteria){
 		if(!validate_ip_range($iprange)){
 			error(S_INCORRECT_IP_RANGE);
 			return false;
 		}
+
+		$drules = API::DRule()->get(array(
+			'druleids' => $_REQUEST['druleid'],
+			'output' => API_OUTPUT_EXTEND,
+			'selectDChecks' => API_OUTPUT_EXTEND,
+			'editable' => true
+		));
+		$drule = reset($drules);
+		$dchecksDiff = zbx_array_diff($dchecks, $drule['dchecks'], 'dcheckid');
+
+		$addChecks = $dchecksDiff['first'];
+		$deleteChecks = zbx_objectValues($dchecksDiff['second'], 'dcheckid');
+		$upadteChecks = $dchecksDiff['both'];
 
 		$result = DBexecute('update drules set proxy_hostid='.zero2null($proxy_hostid).',name='.zbx_dbstr($name).',iprange='.zbx_dbstr($iprange).','.
 			'delay='.$delay.',status='.$status.' where druleid='.$druleid);
 
 		if($result && isset($dchecks)){
 			$unique_dcheckid = 0;
+
 			foreach($dchecks as $id => $data){
-				if(!isset($data['dcheckid'])){
-					$data['dcheckid'] = add_discovery_check($druleid, $data['type'], $data['ports'], $data['key'],
+				if(isset($addChecks[$id])){
+					$data['dcheckid'] = add_discovery_check($druleid, $data['type'], $data['ports'], $data['key_'],
 							$data['snmp_community'], $data['snmpv3_securityname'], $data['snmpv3_securitylevel'],
 							$data['snmpv3_authpassphrase'], $data['snmpv3_privpassphrase']);
 				}
+
 				if($uniqueness_criteria == $id && $data['dcheckid'])
 					$unique_dcheckid = $data['dcheckid'];
 			}
@@ -226,8 +241,8 @@
 			}
 		}
 
-		if($result && isset($dchecks_deleted) && !empty($dchecks_deleted))
-			delete_discovery_check($dchecks_deleted);
+		if($result && !empty($deleteChecks))
+			delete_discovery_check($deleteChecks);
 
 	return $result;
 	}

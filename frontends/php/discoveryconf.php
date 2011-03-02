@@ -19,14 +19,14 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/forms.inc.php');
-	require_once('include/discovery.inc.php');
+require_once('include/config.inc.php');
+require_once('include/forms.inc.php');
+require_once('include/discovery.inc.php');
 
-	$page['title']	= 'S_CONFIGURATION_OF_DISCOVERY';
-	$page['file']	= 'discoveryconf.php';
-	$page['hist_arg'] = array('');
-	$page['scripts'] = array('class.cviewswitcher.js');
+$page['title']	= 'S_CONFIGURATION_OF_DISCOVERY';
+$page['file']	= 'discoveryconf.php';
+$page['hist_arg'] = array();
+$page['scripts'] = array();
 
 include_once('include/page_header.php');
 
@@ -34,45 +34,29 @@ include_once('include/page_header.php');
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'druleid'=>	array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,		'isset({form})&&{form}=="update"'),
-		'name'=>	array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,	'isset({save})'),
-		'proxy_hostid'=>array(T_ZBX_INT, O_OPT,	 null,	DB_ID,	'isset({save})'),
-		'iprange'=>	array(T_ZBX_IP_RANGE, O_OPT,  null,	NOT_EMPTY,	'isset({save})'),
-		'delay'=>	array(T_ZBX_INT, O_OPT,	 null,	null, 		'isset({save})'),
-		'status'=>	array(T_ZBX_INT, O_OPT,	 null,	IN('0,1'), 	'isset({save})'),
-		'uniqueness_criteria'=>	array(T_ZBX_INT, O_OPT,  null, NULL,      'isset({save})'),
-
-		'g_druleid'=>	array(T_ZBX_INT, O_OPT,  null,	DB_ID,		null),
-
-		'dchecks'=>	array(null, O_OPT, null, null, null),
-		'dchecks_deleted'=>	array(null, O_OPT, null, null, null),
-		'selected_checks'=>	array(T_ZBX_INT, O_OPT, null, null, null),
-
-		'new_check_type'=>	array(T_ZBX_INT, O_OPT,  null,
-			IN(array(SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP, SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2, SVC_SNMPv3, SVC_ICMPPING)),
-										'isset({add_check})'),
-
-		'new_check_ports'=>	array(T_ZBX_PORTS,	O_OPT,  null,	"validate_port_list({})&&",	'isset({add_check})'),
-		'new_check_key'=>	array(T_ZBX_STR,	O_OPT,  null,	null,	'isset({add_check})'),
-		'new_check_snmp_community'=>		array(T_ZBX_STR, O_OPT,  null,	null,		'isset({add_check})'),
-		'new_check_snmpv3_securitylevel'=>	array(T_ZBX_INT, O_OPT,  null,  IN('0,1,2'),	'isset({add_check})'),
-		'new_check_snmpv3_securityname'=>	array(T_ZBX_STR, O_OPT,  null,  null,		'isset({add_check})'),
-		'new_check_snmpv3_authpassphrase'=>	array(T_ZBX_STR, O_OPT,  null,  null,		'isset({add_check})'),
-		'new_check_snmpv3_privpassphrase'=>	array(T_ZBX_STR, O_OPT,  null,  null,		'isset({add_check})'),
-
-		'type_changed'=>	array(T_ZBX_INT, O_OPT, null, IN(1), null),
+		'druleid'=>				array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,		'isset({form})&&{form}=="update"'),
+		'name'=>				array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,	'isset({save})'),
+		'proxy_hostid'=>		array(T_ZBX_INT, O_OPT,	 null,	DB_ID,		'isset({save})'),
+		'iprange'=>				array(T_ZBX_IP_RANGE, O_OPT,  null,	NOT_EMPTY,	'isset({save})'),
+		'delay'=>				array(T_ZBX_INT, O_OPT,	 null,	null, 		'isset({save})'),
+		'status'=>				array(T_ZBX_INT, O_OPT,	 null,	IN('0,1'), 	'isset({save})'),
+		'uniqueness_criteria'=>	array(T_ZBX_INT, O_OPT,  null, NULL,		'isset({save})', _('Device uniqueness criteria')),
+		'g_druleid'=>			array(T_ZBX_INT, O_OPT,  null,	DB_ID,		null),
+		'dchecks'=>				array(null, O_OPT, null, null, null),
+		'new_check_type'=>		array(T_ZBX_INT, O_OPT,  null,
+									IN(array(SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP, SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2, SVC_SNMPv3, SVC_ICMPPING)),
+									null),
+		'type_changed'=>		array(T_ZBX_INT, O_OPT, null, IN(1), null),
 // Actions
 		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
 // form
-		'add_check'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'delete_ckecks'=> 	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'clone'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'delete'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'cancel'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		'save'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'clone'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'delete'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'cancel'=>				array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 /* other */
-		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	null,	null,	null)
+		'form'=>				array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		'form_refresh'=>		array(T_ZBX_INT, O_OPT,	null,	null,	null)
 	);
 
 	check_fields($fields);
@@ -84,64 +68,28 @@ include_once('include/page_header.php');
 
 ?>
 <?php
-	if(inarr_isset(array('add_check', 'new_check_type', 'new_check_ports', 'new_check_key', 'new_check_snmp_community',
-			'new_check_snmpv3_securitylevel', 'new_check_snmpv3_securityname', 'new_check_snmpv3_authpassphrase',
-			'new_check_snmpv3_privpassphrase')))
-	{
-		$new_dcheck = array(
-			'type' => $_REQUEST['new_check_type'],
-			'ports'=> $_REQUEST['new_check_ports'],
-			'key'=> $_REQUEST['new_check_key'],
-			'snmp_community'=> $_REQUEST['new_check_snmp_community'],
-			'snmpv3_securitylevel'=> $_REQUEST['new_check_snmpv3_securitylevel'],
-			'snmpv3_securityname'=> $_REQUEST['new_check_snmpv3_securityname'],
-			'snmpv3_authpassphrase'=> $_REQUEST['new_check_snmpv3_authpassphrase'],
-			'snmpv3_privpassphrase'=> $_REQUEST['new_check_snmpv3_privpassphrase']
-			);
-
-		$found = false;
-		foreach($_REQUEST['dchecks'] as $dbcheck){
-			if($dbcheck['type'] === $new_dcheck['type']
-				&& $dbcheck['ports'] === $new_dcheck['ports']
-				&& $dbcheck['key'] === $new_dcheck['key']
-				&& $dbcheck['snmp_community'] === $new_dcheck['snmp_community']
-				&& $dbcheck['snmpv3_securityname'] === $new_dcheck['snmpv3_securityname']
-				&& $dbcheck['snmpv3_securitylevel'] === $new_dcheck['snmpv3_securitylevel']
-				&& $dbcheck['snmpv3_authpassphrase'] === $new_dcheck['snmpv3_authpassphrase']
-				&& $dbcheck['snmpv3_privpassphrase'] === $new_dcheck['snmpv3_privpassphrase']
-			){
-				$found = true;
-			}
-		}
-		if(!$found) $_REQUEST['dchecks'][] = $new_dcheck;
-	}
-	else if(inarr_isset(array('delete_ckecks', 'selected_checks'))){
-		foreach($_REQUEST['selected_checks'] as $chk_id)
-		{
-			if (isset($_REQUEST['dchecks'][$chk_id]['dcheckid']))
-				$_REQUEST['dchecks_deleted'][] = $_REQUEST['dchecks'][$chk_id]['dcheckid'];
-			unset($_REQUEST['dchecks'][$chk_id]);
-		}
-	}
-	else if(inarr_isset('save')){
+	if(inarr_isset('save')){
 		if(inarr_isset('druleid')){ /* update */
 			$msg_ok = S_DISCOVERY_RULE_UPDATED;
 			$msg_fail = S_CANNOT_UPDATE_DISCOVERY_RULE;
 
+			DBstart();
 			$result = update_discovery_rule($_REQUEST["druleid"], $_REQUEST["proxy_hostid"], $_REQUEST['name'],
 				$_REQUEST['iprange'], $_REQUEST['delay'], $_REQUEST['status'], $_REQUEST['dchecks'],
-				$_REQUEST['uniqueness_criteria'], $_REQUEST['dchecks_deleted']);
+				$_REQUEST['uniqueness_criteria']);
 
+			$result = DBend($result);
 			$druleid = $_REQUEST["druleid"];
 		}
 		else{ /* add new */
 			$msg_ok = S_DISCOVERY_RULE_ADDED;
 			$msg_fail = S_CANNOT_ADD_DISCOVERY_RULE;
 
+			DBstart();
 			$druleid = add_discovery_rule($_REQUEST["proxy_hostid"], $_REQUEST['name'], $_REQUEST['iprange'],
 				$_REQUEST['delay'], $_REQUEST['status'], $_REQUEST['dchecks'], $_REQUEST['uniqueness_criteria']);
 
-			$result = $druleid;
+			$result = $result = DBend($druleid);
 		}
 
 		show_messages($result, $msg_ok, $msg_fail);
@@ -214,7 +162,6 @@ include_once('include/page_header.php');
 	}
 
 	$dscry_wdgt = new CWidget();
-	$dscry_wdgt->addPageHeader(S_CONFIGURATION_OF_DISCOVERY_BIG, $form_button);
 
 	if(isset($_REQUEST['form'])){
 		$drule = null;
@@ -223,14 +170,17 @@ include_once('include/page_header.php');
 			$drules = API::DRule()->get(array(
 				'druleids' => $_REQUEST['druleid'],
 				'output' => API_OUTPUT_EXTEND,
-				'selectDCheck' => API_OUTPUT_EXTEND,
+				'selectDChecks' => API_OUTPUT_EXTEND,
 				'editable' => true
 			));
 			$drule = reset($drules);
+
+			foreach($drule['dchecks'] as $dcnum => $dcheck)
+				if($dcheck['uniq']) $drule['uniqueness_criteria'] = $dcheck['dcheckid'];
 		}
 
 		$uniqueness_criteria = -1;
-		if(isset($drule['drule']) && !isset($_REQUEST['form_refresh'])){
+		if(isset($drule['name']) && !isset($_REQUEST['form_refresh'])){
 		}
 		else{
 			$drule['proxy_hostid'] = get_request('proxy_hostid', 0);
@@ -240,7 +190,7 @@ include_once('include/page_header.php');
 			$drule['status'] = get_request('status', DRULE_STATUS_ACTIVE);
 
 			$drule['dchecks'] = get_request('dchecks', array());
-			$drule['dchecks_deleted'] = get_request('dchecks_deleted', array());
+			$drule['uniqueness_criteria'] = get_request('uniqueness_criteria', -1);
 		}
 
 		$discoveryForm = new CGetForm('discovery.edit', $drule);
@@ -266,30 +216,21 @@ include_once('include/page_header.php');
 			S_STATUS
 		));
 
-		$sql = 'SELECT d.* '.
-				' FROM drules d'.
-				' WHERE '.DBin_node('druleid').
-				order_by('d.name,d.iprange,d.delay','d.druleid');
-		$db_rules = DBselect($sql);
 
-		// Discovery rules will be gathered here, so we can feed this array to pagination function
-		$rules_arr = array();
+		$drules = API::DRule()->get(array(
+			'output' => API_OUTPUT_EXTEND,
+			'selectDChecks' => API_OUTPUT_EXTEND,
+			'editable' => true
+		));
+		order_result($drules, array('name'));
 
-		while($rule_data = DBfetch($db_rules)){
-			$rules_arr[] = $rule_data;
-		}
+// getting paging element
+		$paging = getPagingLine($drules);
 
-		// getting paging element
-		$paging = getPagingLine($rules_arr);
-
-		foreach($rules_arr as $rule_data){
+		foreach($drules as $rule_data){
 			$checks = array();
-			$sql = 'SELECT type FROM dchecks WHERE druleid='.$rule_data['druleid'].' ORDER BY type, ports';
-			$db_checks = DBselect($sql);
-			while($check_data = DBfetch($db_checks)){
-				if(!isset($checks[$check_data['type']]))
-					$checks[$check_data['type']] = discovery_check_type2str($check_data['type']);
-			}
+			foreach($rule_data['dchecks'] as $check_data)
+				$checks[$check_data['type']] = discovery_check_type2str($check_data['type']);
 			order_result($checks);
 
 			$status = new CCol(new CLink(discovery_status2str($rule_data["status"]),
