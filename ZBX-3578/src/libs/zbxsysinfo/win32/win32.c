@@ -29,9 +29,9 @@ ZBX_METRIC	parameters_specific[] =
 
 	{"net.tcp.listen",      CF_USEUPARAM,   NET_TCP_LISTEN, 	0,      "80"},
 
-	{"net.if.in",		CF_USEUPARAM,	NET_IF_IN,		0,	"lo,bytes"},
-	{"net.if.out",		CF_USEUPARAM,	NET_IF_OUT,		0,	"lo,bytes"},
-	{"net.if.total",	CF_USEUPARAM,	NET_IF_TOTAL,		0,	"lo,bytes"},
+	{"net.if.in",		CF_USEUPARAM,	NET_IF_IN,		0,	"MS TCP Loopback interface,bytes"},
+	{"net.if.out",		CF_USEUPARAM,	NET_IF_OUT,		0,	"MS TCP Loopback interface,bytes"},
+	{"net.if.total",	CF_USEUPARAM,	NET_IF_TOTAL,		0,	"MS TCP Loopback interface,bytes"},
 	{"net.if.list",		0,		NET_IF_LIST,		0,	0},
 
 	{"vm.memory.size",	CF_USEUPARAM,	VM_MEMORY_SIZE,		0,	"free"},
