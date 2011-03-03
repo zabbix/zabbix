@@ -198,46 +198,6 @@ table.tableinfo tr.odd_row:hover > td { background-color: #245078; }
 table.tableinfo tr.even_row > td { background-color: #1D4161; }
 table.tableinfo tr.even_row:hover > td{ background-color: #245078; }
 
-
-table.tableinfo tr > td.disaster_empty { border: 1px #FF3838 solid; }
-table.tableinfo tr:hover > td.disaster_empty { border: 1px #FF3838 solid; }
-
-table.tableinfo tr > td.disaster { background-color: #FF3838;	border: 1px #FF3838 solid; }
-table.tableinfo tr:hover > td.disaster { background-color: #FF2222;	border: 1px #FF2222 solid; }
-
-table.tableinfo tr > td.high_empty { border: 1px #FF9999 solid; }
-table.tableinfo tr:hover > td.high_empty { border: 1px #FF9999 solid; }
-
-table.tableinfo tr > td.high				{	background-color: #FF9999;	border: 1px #FF9999 solid; }
-table.tableinfo tr:hover > td.high			{	background-color: #FA8388;	border: 1px #FA8388 solid; }
-
-table.tableinfo tr > td.average_empty			{	border: 1px #FFB689 solid; }
-table.tableinfo tr:hover > td.average_empty		{	border: 1px #FFB689 solid; }
-
-table.tableinfo tr > td.average				{	background-color: #FFB689;	border: 1px #FFB689 solid; }
-table.tableinfo tr:hover > td.average		{	background-color: #FFAB73;	border: 1px #FFAB73 solid; }
-
-table.tableinfo tr > td.warning_empty			{	border: 1px #FFF384 solid; }
-table.tableinfo tr:hover > td.warning_empty		{	border: 1px #FFF069 solid; }
-
-table.tableinfo tr > td.warning				{	background-color: #FFF384;	border: 1px #FFF384 solid; }
-table.tableinfo tr:hover > td.warning			{	background-color: #FFF069;	border: 1px #FFF069 solid; }
-
-table.tableinfo tr > td.information_empty			{	border: 1px #ADEDFF solid; }
-table.tableinfo tr:hover > td.information_empty		{	border: 1px #92E7FF solid; }
-
-table.tableinfo tr > td.information			{	background-color: #ADEDFF;	border: 1px #ADEDFF solid; }
-table.tableinfo tr:hover > td.information			{	background-color: #92E7FF;	border: 1px #92E7FF solid; }
-
-table.tableinfo tr > td.unknown_trigger_empty		{	border: 1px #CECECE solid; }
-table.tableinfo tr:hover > td.unknown_trigger_empty	{	border: 1px #BCBCBC solid; }
-
-table.tableinfo tr > td.unknown_trigger			{	background-color: #CECECE;	border: 1px #CECECE solid; }
-table.tableinfo tr:hover > td.unknown_trigger		{	background-color: #BCBCBC;	border: 1px #BCBCBC solid; }
-
-table.tableinfo tr > td.normal				{	background-color: #AFFFAF;	border: 1px #AFFFAF solid; }
-table.tableinfo tr:hover > td.normal			{	background-color: #A1F9A1;	border: 1px #A1F9A1 solid; }
-
 table.tableinfo tr > td.active				{	background-color: #99EE9E;	border: 1px #99EE9E solid; }
 table.tableinfo tr:hover > td.active			{	background-color: #99EE99;	border: 1px #99EE99 solid; }
 

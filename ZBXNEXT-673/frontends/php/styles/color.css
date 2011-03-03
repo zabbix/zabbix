@@ -17,13 +17,8 @@
 .blue	{ color: #0099FF; }
 .gold	{ color: #999900; }
 
-.disaster	{	background-color: #FF3838;	color: #222222;}
-.high		{	background-color: #FF9999;	color: #222222;}
-.average	{	background-color: #FFB689;	color: #222222;}
-.warning	{	background-color: #FFF384;	color: #222222;}
-.information	{	background-color: #ADEDFF;	color: #222222;}
-.unknown_trigger{	background-color: #CECECE;	color: #222222;}
-.normal		{	background-color: #AFFFAF;	color: #222222;}
+.normal		{	background-color: #AAFFAA !important; }
+
 
 .textcolorstyles{ color: #000000; }
 .textblackwhite{ color: #000000; }
@@ -73,32 +68,6 @@ table.tableinfo tr.odd_row:hover > td { background-color: #BBCCFF; }
 table.tableinfo tr.even_row > td { background-color: #F2F7FA; }
 table.tableinfo tr.even_row:hover > td{ background-color: #BBCCFF; }
 
-table.tableinfo tr > td.disaster_empty { border: 1px #FF3838 solid; }
-table.tableinfo tr:hover > td.disaster_empty { border: 1px #FF3838 solid; }
-table.tableinfo tr > td.disaster { background-color: #FF3838;	border: 1px #FF3838 solid; }
-table.tableinfo tr:hover > td.disaster { background-color: #FF2222;	border: 1px #FF2222 solid; }
-table.tableinfo tr > td.high_empty { border: 1px #FF9999 solid; }
-table.tableinfo tr:hover > td.high_empty { border: 1px #FF9999 solid; }
-table.tableinfo tr > td.high				{	background-color: #FF9999;	border: 1px #FF9999 solid; }
-table.tableinfo tr:hover > td.high			{	background-color: #FA8388;	border: 1px #FA8388 solid; }
-table.tableinfo tr > td.average_empty			{	border: 1px #FFB689 solid; }
-table.tableinfo tr:hover > td.average_empty		{	border: 1px #FFB689 solid; }
-table.tableinfo tr > td.average				{	background-color: #FFB689;	border: 1px #FFB689 solid; }
-table.tableinfo tr:hover > td.average			{	background-color: #FFAB73;	border: 1px #FFAB73 solid; }
-table.tableinfo tr > td.warning_empty			{	border: 1px #FFF384 solid; }
-table.tableinfo tr:hover > td.warning_empty		{	border: 1px #FFF069 solid; }
-table.tableinfo tr > td.warning				{	background-color: #FFF384;	border: 1px #FFF384 solid; }
-table.tableinfo tr:hover > td.warning			{	background-color: #FFF069;	border: 1px #FFF069 solid; }
-table.tableinfo tr > td.information_empty			{	border: 1px #ADEDFF solid; }
-table.tableinfo tr:hover > td.information_empty		{	border: 1px #92E7FF solid; }
-table.tableinfo tr > td.information			{	background-color: #ADEDFF;	border: 1px #ADEDFF solid; }
-table.tableinfo tr:hover > td.information			{	background-color: #92E7FF;	border: 1px #92E7FF solid; }
-table.tableinfo tr > td.unknown_trigger_empty		{	border: 1px #CECECE solid; }
-table.tableinfo tr:hover > td.unknown_trigger_empty	{	border: 1px #BCBCBC solid; }
-table.tableinfo tr > td.unknown_trigger			{	background-color: #CECECE;	border: 1px #CECECE solid; }
-table.tableinfo tr:hover > td.unknown_trigger		{	background-color: #BCBCBC;	border: 1px #BCBCBC solid; }
-table.tableinfo tr > td.normal				{	background-color: #AFFFAF;	border: 1px #AFFFAF solid; }
-table.tableinfo tr:hover > td.normal			{	background-color: #A1F9A1;	border: 1px #A1F9A1 solid; }
 table.tableinfo tr > td.active				{	background-color: #AADDAA;	border: 1px #AADDAA solid; color: #222222;}
 table.tableinfo tr:hover > td.active			{	background-color: #AAD9AA;	border: 1px #AAD9AA solid; }
 table.tableinfo tr > td.inactive				{	background-color: #FF8888;	border: 1px #FF8888 solid; color: #222222;}
