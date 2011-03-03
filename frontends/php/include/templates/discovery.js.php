@@ -13,7 +13,7 @@
 	<input name="dchecks[#{dcheckid}][snmpv3_authpassphrase]" type="hidden" value="#{snmpv3_authpassphrase}" />
 	<input name="dchecks[#{dcheckid}][snmpv3_privpassphrase]" type="hidden" value="#{snmpv3_privpassphrase}" />
 	<input name="dchecks[#{dcheckid}][uniq]" type="hidden" value="#{uniq}" />
-	<span style="font-size: 1.1em;" class="bold"> #{name} </span>
+	<span class="bold"> #{name} </span>
 </td>
 <td>
 	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="javascript: removeDCheckRow(#{dcheckid});" />
