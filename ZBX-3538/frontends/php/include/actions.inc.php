@@ -36,29 +36,29 @@ function condition_operator2str($operator){
 }
 
 function condition_type2str($conditiontype){
-	$str_type[CONDITION_TYPE_HOST_GROUP]		= S_HOST_GROUP;
-	$str_type[CONDITION_TYPE_HOST_TEMPLATE]		= S_HOST_TEMPLATE;
-	$str_type[CONDITION_TYPE_TRIGGER]		= S_TRIGGER;
-	$str_type[CONDITION_TYPE_HOST]			= S_HOST;
-	$str_type[CONDITION_TYPE_TRIGGER_NAME]		= S_TRIGGER_DESCRIPTION;
-	$str_type[CONDITION_TYPE_TRIGGER_VALUE]		= S_TRIGGER_VALUE;
-	$str_type[CONDITION_TYPE_TRIGGER_SEVERITY]	= S_TRIGGER_SEVERITY;
-	$str_type[CONDITION_TYPE_TIME_PERIOD]		= S_TIME_PERIOD;
-	$str_type[CONDITION_TYPE_MAINTENANCE]		= S_MAINTENANCE_STATUS;
-	$str_type[CONDITION_TYPE_NODE]			= S_NODE;
-	$str_type[CONDITION_TYPE_DRULE]			= S_DISCOVERY_RULE;
-	$str_type[CONDITION_TYPE_DCHECK]		= S_DISCOVERY_CHECK;
-	$str_type[CONDITION_TYPE_DOBJECT]		= S_DISCOVERED_OBJECT;
-	$str_type[CONDITION_TYPE_DHOST_IP]		= S_HOST_IP;
-	$str_type[CONDITION_TYPE_DSERVICE_TYPE]		= S_SERVICE_TYPE;
-	$str_type[CONDITION_TYPE_DSERVICE_PORT]		= S_SERVICE_PORT;
-	$str_type[CONDITION_TYPE_DSTATUS]		= S_DISCOVERY_STATUS;
-	$str_type[CONDITION_TYPE_DUPTIME]		= S_UPTIME_DOWNTIME;
-	$str_type[CONDITION_TYPE_DVALUE]		= S_RECEIVED_VALUE;
-	$str_type[CONDITION_TYPE_EVENT_ACKNOWLEDGED]	= S_EVENT_ACKNOWLEDGED;
-	$str_type[CONDITION_TYPE_APPLICATION]		= S_APPLICATION;
-	$str_type[CONDITION_TYPE_PROXY]			= S_PROXY;
-	$str_type[CONDITION_TYPE_HOST_NAME]		= S_HOST_NAME;
+	$str_type[CONDITION_TYPE_HOST_GROUP]		= _('Host group');
+	$str_type[CONDITION_TYPE_HOST_TEMPLATE]		= _('Host template');
+	$str_type[CONDITION_TYPE_TRIGGER]		= _('Trigger');
+	$str_type[CONDITION_TYPE_HOST]			= _('Host');
+	$str_type[CONDITION_TYPE_TRIGGER_NAME]		= _('Trigger name');
+	$str_type[CONDITION_TYPE_TRIGGER_VALUE]		= _('Trigger value');
+	$str_type[CONDITION_TYPE_TRIGGER_SEVERITY]	= _('Trigger severity');
+	$str_type[CONDITION_TYPE_TIME_PERIOD]		= _('Time period');
+	$str_type[CONDITION_TYPE_MAINTENANCE]		= _('Maintenance status');
+	$str_type[CONDITION_TYPE_NODE]			= _('Node');
+	$str_type[CONDITION_TYPE_DRULE]			= _('Discovery rule');
+	$str_type[CONDITION_TYPE_DCHECK]		= _('Discovery check');
+	$str_type[CONDITION_TYPE_DOBJECT]		= _('Discovery object');
+	$str_type[CONDITION_TYPE_DHOST_IP]		= _('Host IP');
+	$str_type[CONDITION_TYPE_DSERVICE_TYPE]		= _('Service type');
+	$str_type[CONDITION_TYPE_DSERVICE_PORT]		= _('Service port');
+	$str_type[CONDITION_TYPE_DSTATUS]		= _('Discovery status');
+	$str_type[CONDITION_TYPE_DUPTIME]		= _('Uptime/Downtime');
+	$str_type[CONDITION_TYPE_DVALUE]		= _('Received value');
+	$str_type[CONDITION_TYPE_EVENT_ACKNOWLEDGED]	= _('Event acknowledged');
+	$str_type[CONDITION_TYPE_APPLICATION]		= _('Application');
+	$str_type[CONDITION_TYPE_PROXY]			= _('Proxy');
+	$str_type[CONDITION_TYPE_HOST_NAME]		= _('Host name');
 
 	if(isset($str_type[$conditiontype]))
 		return $str_type[$conditiontype];
