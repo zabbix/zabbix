@@ -27,29 +27,28 @@
 	$scriptTab = new CFormList('scriptsTab');
 	$frmScr = new CForm();
 	$frmScr->setName('scripts');
-	$frmScr->addVar('form', get_request('form', 1));
 
-	$from_rfr = get_request('form_refresh',0);
-	$frmScr->addVar('form_refresh', $from_rfr+1);
+	$frmScr->addVar('form', $data['form']);
+	$frmScr->addVar('form_refresh', $data['form_refresh'] + 1);
 
 
 	if(isset($_REQUEST['scriptid'])) $frmScr->addVar('scriptid', $_REQUEST['scriptid']);
 
 	if(!isset($_REQUEST['scriptid']) || isset($_REQUEST['form_refresh'])){
-		$name = get_request('name', '');
-		$type = get_request('type', ZBX_SCRIPT_TYPE_SCRIPT);
-		$execute_on = get_request('execute_on', ZBX_SCRIPT_TARGET_SERVER);
-		$command  = get_request('command', '');
-		$description  = get_request('description', '');
-		$usrgrpid = get_request('usrgrpid',	0);
-		$groupid = get_request('groupid', 0);
-		$access = get_request('access',	PERM_READ_ONLY);
-		$confirmation = get_request('confirmation',	'');
-		$enableConfirmation = get_request('enableConfirmation', false);
+		$name = $data['name'];
+		$type = $data['type'];
+		$execute_on = $data['execute_on'];
+		$command  = $data['command'];
+		$description = $data['description'];
+		$usrgrpid = $data['usrgrpid'];
+		$groupid = $data['groupid'];
+		$access = $data['access'];
+		$confirmation = $data['confirmation'];
+		$enableConfirmation = $data['enableConfirmation'];
 	}
 
 	if(isset($_REQUEST['scriptid']) && !isset($_REQUEST['form_refresh'])){
-		$frmScr->addVar('form_refresh', get_request('form_refresh',1));
+		$frmScr->addVar('form_refresh', get_request('form_refresh', 1));
 
 		$options = array(
 			'scriptids' => $_REQUEST['scriptid'],
@@ -85,10 +84,9 @@
 // EXECUTE ON
 	$typeRB = new CRadioButton('execute_on', $execute_on);
 	$typeRB->makeVertical();
-	$typeRB->addValue(_('Zabbix agent'), ZBX_SCRIPT_TARGET_AGENT);
-	$typeRB->addValue(_('Zabbix server'), ZBX_SCRIPT_TARGET_SERVER);
-
-	$scriptTab->addRow(_('Execute on'), $typeRB);
+	$typeRB->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT);
+	$typeRB->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER);
+	$scriptTab->addRow(_('Execute on'), $typeRB, ($type == ZBX_SCRIPT_TYPE_IPMI));
 
 // COMMAND
 	$commandTA = new CTextArea('command', $command);

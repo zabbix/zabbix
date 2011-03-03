@@ -19,6 +19,7 @@
 **/
 ?>
 <?php
+define('PHPUNIT_URL', 'http://192.168.3.35/current/frontends/php/');
 
 require_once 'PHPUnit/Extensions/SeleniumTestCase.php';
 
