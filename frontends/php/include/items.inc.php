@@ -606,7 +606,7 @@
         }
 
 		if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $descr, $arr)){
-			$macros = API::UserMacro()->getMacros($arr[1], array('itemid' => $item['itemid']));
+			$macros = API::UserMacro()->getMacros(array('macros' => $arr[1], 'itemid' => $item['itemid']));
 
 			$search = array_keys($macros);
 			$values = array_values($macros);
