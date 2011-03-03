@@ -1349,7 +1349,7 @@
 				'nopermissions' => 1,
 				'filter' => array('value' => array(TRIGGER_VALUE_UNKNOWN, TRIGGER_VALUE_TRUE)),
 				'nodeids' => get_current_nodeid(true),
-				'active' => true,
+				'monitored' => true,
 				'skipDependent' => 1,
 			);
 			$triggers = CTrigger::get($options);
@@ -1371,7 +1371,7 @@
 			'output' => API_OUTPUT_SHORTEN,
 			'nodeids' => get_current_nodeid(true),
 			'nopermissions' => 1,
-			'active' => 1,
+			'monitored' => true,
 			'filter' => array('value' => TRIGGER_VALUE_TRUE),
 		);
 		$unack_triggerids = CTrigger::get($options);
