@@ -120,26 +120,26 @@ class testFormConfigTriggerSeverity extends CWebTest{
 		$this->ok('Trigger severities');
 		$this->ok('CONFIGURATION OF ZABBIX');
 
-		$this->ok(array('Severity 0', 'Severity 1', 'Severity 2', 'Severity 3', 'Severity 4', 'Severity 5'));
-		$this->verifyElementPresent('severity_name_0');
-		$this->verifyElementPresent('severity_color_0');
-		$this->verifyElementPresent('lbl_severity_color_0');
-		$this->verifyElementPresent('severity_name_1');
-		$this->verifyElementPresent('severity_color_1');
-		$this->verifyElementPresent('lbl_severity_color_1');
-		$this->verifyElementPresent('severity_name_2');
-		$this->verifyElementPresent('severity_color_2');
-		$this->verifyElementPresent('lbl_severity_color_2');
-		$this->verifyElementPresent('severity_name_3');
-		$this->verifyElementPresent('severity_color_3');
-		$this->verifyElementPresent('lbl_severity_color_3');
-		$this->verifyElementPresent('severity_name_4');
-		$this->verifyElementPresent('severity_color_4');
-		$this->verifyElementPresent('lbl_severity_color_4');
-		$this->verifyElementPresent('severity_name_5');
-		$this->verifyElementPresent('severity_color_5');
-		$this->verifyElementPresent('lbl_severity_color_5');
-		$this->verifyElementPresent('save');
+		$this->ok(array('Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'));
+		$this->assertElementPresent('severity_name_0');
+		$this->assertElementPresent('severity_color_0');
+		$this->assertElementPresent('lbl_severity_color_0');
+		$this->assertElementPresent('severity_name_1');
+		$this->assertElementPresent('severity_color_1');
+		$this->assertElementPresent('lbl_severity_color_1');
+		$this->assertElementPresent('severity_name_2');
+		$this->assertElementPresent('severity_color_2');
+		$this->assertElementPresent('lbl_severity_color_2');
+		$this->assertElementPresent('severity_name_3');
+		$this->assertElementPresent('severity_color_3');
+		$this->assertElementPresent('lbl_severity_color_3');
+		$this->assertElementPresent('severity_name_4');
+		$this->assertElementPresent('severity_color_4');
+		$this->assertElementPresent('lbl_severity_color_4');
+		$this->assertElementPresent('severity_name_5');
+		$this->assertElementPresent('severity_color_5');
+		$this->assertElementPresent('lbl_severity_color_5');
+		$this->assertElementPresent('save');
 
 		$this->assertElementPresent('color_picker');
 		$this->assertNotVisible('color_picker');
@@ -165,7 +165,8 @@ class testFormConfigTriggerSeverity extends CWebTest{
 			$DBhash = DBhash($sql);
 		}
 
-		$this->clickAndWait('save');
+		$this->click('save');
+		$this->wait();
 
 
 		if($resultSave){
@@ -173,12 +174,12 @@ class testFormConfigTriggerSeverity extends CWebTest{
 
 			$dbres = DBfetch(DBselect($sql));
 			foreach($dbres as $field => $value){
-				$this->assertSame($value, $DBvalues[$field], "Value for '$field' was not updated.");
+				$this->assertEquals($value, $DBvalues[$field], "Value for '$field' was not updated.");
 			}
 		}
 		else{
 			$this->ok('ERROR:');
-			$this->assertTrue($DBhash === DBhash($sql), "DB fields changed after unsuccessful save.");
+			$this->assertEquals($DBhash, DBhash($sql), "DB fields changed after unsuccessful save.");
 		}
 
 
