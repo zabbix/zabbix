@@ -168,7 +168,6 @@ class testFormConfigTriggerSeverity extends CWebTest{
 		$this->click('save');
 		$this->wait();
 
-
 		if($resultSave){
 			$this->ok('Configuration updated');
 
@@ -182,10 +181,8 @@ class testFormConfigTriggerSeverity extends CWebTest{
 			$this->assertEquals($DBhash, DBhash($sql), "DB fields changed after unsuccessful save.");
 		}
 
-
 		DBrestore_tables($this->affectedTables);
 	}
 
 }
 ?>
-
