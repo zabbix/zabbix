@@ -408,7 +408,7 @@ table.calendartab tr td{
 	background-color:#1F1F1F;
 	color: #FF5500;
 }
-table.calendartab tr td.hollyday{
+table.calendartab tr td.holiday{
 	background-color:#2F2F2F;
 }
 table.calendartab tr td.selected{
