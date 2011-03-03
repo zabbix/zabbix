@@ -215,19 +215,23 @@ static char	*get_name(unsigned char *msg, unsigned char *msg_end, unsigned char 
 
 int	NET_TCP_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#if !defined(_WINDOWS)
-#ifdef HAVE_RES_QUERY
+#if defined(HAVE_RES_QUERY) || defined(_WINDOWS)
+
 	int		res;
 	char		ip[MAX_STRING_LEN];
 	char		zone[MAX_STRING_LEN];
+#ifdef _WINDOWS
+	WSADATA wsaData;
+#else /* not _WINDOWS */
 #if defined(NS_PACKETSZ)
 	char	respbuf[NS_PACKETSZ];
 #elif defined(PACKETSZ)
 	char	respbuf[PACKETSZ];
 #else
 	char	respbuf[512];
-#endif
+#endif /* NS_PACKETSZ */
 	struct	in_addr in;
+#endif /* ifdef _WINDOWS */
 
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
@@ -238,7 +242,7 @@ int	NET_TCP_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
         }
 
 	/* default parameter */
-	if(ip[0] == '\0')
+	if('\0' == ip[0])
 	{
 		strscpy(ip, "127.0.0.1");
 	}
@@ -249,13 +253,25 @@ int	NET_TCP_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
         }
 
 	/* default parameter */
-	if(zone[0] == '\0')
+	if('\0' == zone[0])
 	{
 		strscpy(zone, "localhost");
 	}
 
-	res = inet_aton(ip, &in);
-	if(res != 1)
+#ifdef _WINDOWS
+	if(INADDR_NONE == inet_addr(ip))
+	{
+		SET_UI64_RESULT(result,0);
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (!(res = WSAStartup(MAKEWORD(2, 2), &wsaData))) {
+		zabbix_log(LOG_LEVEL_ERR, "WSAStartup failed: %d", res);
+	};
+
+	SET_UI64_RESULT(result, NULL == gethostbyname(zone) ? 0 : 1);
+#else
+	if(1 != inet_aton(ip, &in))
 	{
 		SET_UI64_RESULT(result,0);
 		return SYSINFO_RET_FAIL;
@@ -266,15 +282,12 @@ int	NET_TCP_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 	res = res_query(zone, C_IN, T_SOA, (unsigned char *)respbuf, sizeof(respbuf));
 
-	SET_UI64_RESULT(result, res != -1 ? 1 : 0);
-
+	SET_UI64_RESULT(result, -1 != res ? 1 : 0);
+#endif
 	return SYSINFO_RET_OK;
-#else /* HAVE_RES_QUERY is not defined */
+#else /* Both HAVE_RES_QUERY and _WINDOWS not defined */
 	return SYSINFO_RET_FAIL;
-#endif /* ifdef HAVE_RES_QUERY */
-#else /* _WINDOWS is defined */
-	return SYSINFO_RET_FAIL;
-#endif /* if !defined(_WINDOWS) */
+#endif /* defined(HAVE_RES_QUERY) || defined(_WINDOWS) */
 }
 
 int	NET_TCP_DNS_QUERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
