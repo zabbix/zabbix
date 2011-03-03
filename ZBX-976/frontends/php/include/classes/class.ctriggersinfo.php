@@ -54,7 +54,7 @@ class CTriggersInfo extends CTable{
 	public function bodyToString(){
 		$this->cleanItems();
 
-		$ok = $uncn = $uncl = $info = $warn = $avg = $high = $dis = 0;
+		$ok = $uncl = $info = $warn = $avg = $high = $dis = 0;
 
 		$options = array(
 			'active' => 1,
@@ -92,9 +92,6 @@ class CTriggersInfo extends CTable{
 				case TRIGGER_VALUE_FALSE:
 					$ok	+= $row['cnt'];
 				break;
-				default:
-					$uncn += $row['cnt'];
-				break;
 			}
 		}
 
@@ -120,22 +117,20 @@ class CTriggersInfo extends CTable{
 			$this->addRow($header);
 		}
 
-		$trok	= new CCol($ok.SPACE.S_OK,					get_severity_style('ok',false));
-		$uncn	= new CCol($uncn.SPACE.S_UNKNOWN, 'unknown');
-		$uncl	= new CCol($uncl.SPACE.S_NOT_CLASSIFIED,	get_severity_style(TRIGGER_SEVERITY_NOT_CLASSIFIED,$uncl));
-		$info	= new CCol($info.SPACE.S_INFORMATION,		get_severity_style(TRIGGER_SEVERITY_INFORMATION,$info));
-		$warn	= new CCol($warn.SPACE.S_WARNING,			get_severity_style(TRIGGER_SEVERITY_WARNING,$warn));
-		$avg	= new CCol($avg.SPACE.S_AVERAGE,			get_severity_style(TRIGGER_SEVERITY_AVERAGE,$avg));
-		$high	= new CCol($high.SPACE.S_HIGH,				get_severity_style(TRIGGER_SEVERITY_HIGH,$high));
-		$dis	= new CCol($dis.SPACE.S_DISASTER,			get_severity_style(TRIGGER_SEVERITY_DISASTER,$dis));
+		$trok = getSeverityCell(null, $ok.SPACE.S_OK, true);
+		$uncl = getSeverityCell(TRIGGER_SEVERITY_NOT_CLASSIFIED, $uncl.SPACE.getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED), !$uncl);
+		$info = getSeverityCell(TRIGGER_SEVERITY_INFORMATION, $info.SPACE.getSeverityCaption(TRIGGER_SEVERITY_INFORMATION), !$info);
+		$warn = getSeverityCell(TRIGGER_SEVERITY_WARNING, $warn.SPACE.getSeverityCaption(TRIGGER_SEVERITY_WARNING), !$warn);
+		$avg = getSeverityCell(TRIGGER_SEVERITY_AVERAGE, $avg.SPACE.getSeverityCaption(TRIGGER_SEVERITY_AVERAGE), !$avg);
+		$high = getSeverityCell(TRIGGER_SEVERITY_HIGH, $high.SPACE.getSeverityCaption(TRIGGER_SEVERITY_HIGH), !$high);
+		$dis = getSeverityCell(TRIGGER_SEVERITY_DISASTER, $dis.SPACE.getSeverityCaption(TRIGGER_SEVERITY_DISASTER), !$dis);
 
 
 		if(STYLE_HORISONTAL == $this->style){
-			$this->addRow(array($trok, $uncn, $uncl, $info, $warn, $avg, $high, $dis));
+			$this->addRow(array($trok, $uncl, $info, $warn, $avg, $high, $dis));
 		}
 		else{
 			$this->addRow($trok);
-			$this->addRow($uncn);
 			$this->addRow($uncl);
 			$this->addRow($info);
 			$this->addRow($warn);

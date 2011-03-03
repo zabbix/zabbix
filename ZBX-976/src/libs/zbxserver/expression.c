@@ -27,6 +27,49 @@
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBget_trigger_severity_name                                      *
+ *                                                                            *
+ * Purpose: get trigger severity name                                         *
+ *                                                                            *
+ * Parameters: severity   - [IN] a trigger severity; TRIGGER_SEVERITY_*       *
+ *             replace_to - [OUT] pointer to a buffer that will receive       *
+ *                          a null-terminated trigger severity string         *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBget_trigger_severity_name(int severity, char **replace_to)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		res = FAIL;
+
+	if (severity < 0 || severity >= TRIGGER_SEVERITY_COUNT)
+		return res;
+
+	result = DBselect(
+			"select severity_name_%d"
+			" from config"
+			" where 1=1" DB_NODE,
+			severity, DBnode_local("configid"));
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		*replace_to = zbx_strdup(*replace_to, row[0]);
+		res = SUCCEED;
+	}
+	DBfree_result(result);
+
+	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBget_macro_value_by_triggerid                                   *
  *                                                                            *
  * Purpose: get value of a user macro                                         *
@@ -98,10 +141,12 @@ static int	trigger_get_N_functionid(char *short_expression, int n, zbx_uint64_t 
 {
 	const char	*__function_name = "trigger_get_N_functionid";
 
-	typedef enum {
+	typedef enum
+	{
 		EXP_NONE,
 		EXP_FUNCTIONID
-	} parsing_state_t;
+	}
+	parsing_state_t;
 
 	parsing_state_t	state = EXP_NONE;
 	int		num = 0, ret = FAIL;
@@ -2303,8 +2348,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 				else if (0 == strcmp(m, MVAR_ESC_HISTORY))
 					ret = get_escalation_history(event, escalation, &replace_to);
 				else if (0 == strcmp(m, MVAR_TRIGGER_SEVERITY))
-					replace_to = zbx_strdup(replace_to,
-							zbx_trigger_severity_string((zbx_trigger_severity_t)event->trigger_priority));
+					ret = DBget_trigger_severity_name(event->trigger_priority, &replace_to);
 				else if (0 == strcmp(m, MVAR_TRIGGER_NSEVERITY))
 					replace_to = zbx_dsprintf(replace_to, "%d", event->trigger_priority);
 				else if (0 == strcmp(m, MVAR_NODE_ID))
