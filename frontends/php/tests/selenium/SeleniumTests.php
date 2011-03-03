@@ -55,6 +55,7 @@ require_once(dirname(__FILE__).'/testFormMediaType.php');
 require_once(dirname(__FILE__).'/testFormProfile.php');
 require_once(dirname(__FILE__).'/testFormScreen.php');
 require_once(dirname(__FILE__).'/testFormSysmap.php');
+require_once(dirname(__FILE__).'/testFormTemplate.php');
 
 class SeleniumTests
 {
@@ -73,6 +74,7 @@ class SeleniumTests
 		$suite->addTestSuite('testPageHosts');
 		$suite->addTestSuite('testPageInventory');
 		$suite->addTestSuite('testPageInventoryExtended');
+		$suite->addTestSuite('testPageItems');
 		$suite->addTestSuite('testPageMaintenance');
 		$suite->addTestSuite('testPageMaps');
 		$suite->addTestSuite('testPageMediaTypes');
@@ -96,6 +98,7 @@ class SeleniumTests
 		$suite->addTestSuite('testFormProfile');
 		$suite->addTestSuite('testFormScreen');
 		$suite->addTestSuite('testFormMap');
+		$suite->addTestSuite('testFormTemplate');
 
 		return $suite;
 	}
