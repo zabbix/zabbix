@@ -340,6 +340,14 @@ class CScript extends CZBXAPI{
 	return $result;
 	}
 
+	private function _clearData(&$scripts){
+		foreach($scripts as $snum => $script){
+			if(isset($script['type']) && $script['type'] == ZBX_SCRIPT_TYPE_IPMI){
+				unset($scripts[$snum]['execute_on']);
+			}
+		}
+	}
+
 /**
  * Add Scripts
  *
@@ -383,6 +391,7 @@ class CScript extends CZBXAPI{
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%s" already exists.', $exScript['name']));
 		}
 
+		$this->_clearData($scripts);
 		$scriptids = DB::insert('scripts', $scripts);
 
 		return array('scriptids' => $scriptids);
@@ -440,11 +449,14 @@ class CScript extends CZBXAPI{
 			}
 		}
 
+		$this->_clearData($scripts);
 		$update = array();
 		foreach($scripts as $script){
+			$scriptid = $script['scriptid'];
+			unset($script['scriptid']);
 			$update[] = array(
 				'values' => $script,
-				'where' => array('scriptid='.$script['scriptid']),
+				'where' => array('scriptid='.$scriptid),
 			);
 		}
 		DB::update('scripts', $update);

@@ -170,7 +170,22 @@ if($sid = get_request('scriptid')){
 	$scripts_wdgt = new CWidget();
 
 	if(isset($_REQUEST['form'])){
-		$scriptForm = new CGetForm('script.edit');
+		$data = array();
+		$data['form'] = get_request('form', 1);
+		$data['form_refresh'] = get_request('form_refresh', 0);
+
+		$data['name'] = get_request('name', '');
+		$data['type'] = get_request('type', ZBX_SCRIPT_TYPE_SCRIPT);
+		$data['execute_on'] = get_request('execute_on', ZBX_SCRIPT_EXECUTE_ON_SERVER);
+		$data['command'] = get_request('command', '');
+		$data['description'] = get_request('description', '');
+		$data['usrgrpid'] = get_request('usrgrpid',	0);
+		$data['groupid'] = get_request('groupid', 0);
+		$data['access'] = get_request('groupid', 0);
+		$data['confirmation'] = get_request('confirmation',	'');
+		$data['enable'] = get_request('enableConfirmation', false);
+
+		$scriptForm = new CGetForm('script.edit', $data);
 		$scripts_wdgt->addItem($scriptForm->render());
 	}
 	else{
