@@ -1679,7 +1679,7 @@ function utf8RawUrlDecode($source){
 		}
 		if(!empty($triggers)){
 // returns updated triggers
-			addEvent($triggers,TRIGGER_VALUE_UNKNOWN,$now);
+			$triggers = addEvent($triggers,TRIGGER_VALUE_UNKNOWN,$now);
 		}
 
 		if(!empty($triggers)){
