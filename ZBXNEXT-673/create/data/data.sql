@@ -49,8 +49,8 @@ INSERT INTO users_groups VALUES (2,8,2);
 -- Dumping data for table `scripts`
 --
 
-INSERT INTO scripts VALUES (1,'Ping','/bin/ping -c 3 {HOST.CONN}',2,NULL,NULL,'','');
-INSERT INTO scripts VALUES (2,'Traceroute','/usr/bin/traceroute {HOST.CONN}',2,NULL,NULL,'','');
+INSERT INTO scripts VALUES (1,'Ping','/bin/ping -c 3 {HOST.CONN}',2,NULL,NULL,'','',0,1);
+INSERT INTO scripts VALUES (2,'Traceroute','/usr/bin/traceroute {HOST.CONN}',2,NULL,NULL,'','',0,1);
 
 --
 -- Dumping data for table `media_type`
