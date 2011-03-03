@@ -21,12 +21,10 @@
 <?php
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testFormHost extends CWebTest
-{
+class testFormHost extends CWebTest{
 	public $host = "Test host";
 
-	public function testFormHost_Create()
-	{
+	public function testFormHost_Create(){
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid','Zabbix servers');
 		$this->button_click('form');
@@ -39,8 +37,7 @@ class testFormHost extends CWebTest
 		$this->ok($this->host);
 	}
 
-	public function testFormHost_CreateLongHostName()
-	{
+	public function testFormHost_CreateLongHostName(){
 		$host="01234567890123456789012345678901234567890123456789012345678901234";
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid','Zabbix servers');
@@ -53,8 +50,7 @@ class testFormHost extends CWebTest
 		$this->ok('ERROR');
 	}
 
-	public function testFormHost_SimpleUpdate()
-	{
+	public function testFormHost_SimpleUpdate(){
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid','Zabbix servers');
 		$this->click('link=Zabbix server');
@@ -66,8 +62,7 @@ class testFormHost extends CWebTest
 		$this->ok($this->host);
 	}
 
-	public function testFormHost_UpdateHostName()
-	{
+	public function testFormHost_UpdateHostName(){
 		// Update Host
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid','all');
@@ -80,8 +75,7 @@ class testFormHost extends CWebTest
 		$this->ok('Host updated');
 	}
 
-	public function testFormHost_CreateExistingHostNoGroups()
-	{
+	public function testFormHost_CreateExistingHostNoGroups(){
 		// Attempt to create a host with a name that already exists and not add it to any groups
 		// In future should also check these conditions individually
 		$this->login('hosts.php');
@@ -96,8 +90,7 @@ class testFormHost extends CWebTest
 		$this->assertEquals(1,DBcount("select * from hosts where host='Zabbix server'"));
 	}
 
-	public function testFormHost_Delete()
-	{
+	public function testFormHost_Delete(){
 		$this->chooseOkOnNextConfirmation();
 
 		// Delete Host
@@ -112,8 +105,7 @@ class testFormHost extends CWebTest
 		$this->ok('Host deleted');
 	}
 
-	public function testFormHost_CloneHost()
-	{
+	public function testFormHost_CloneHost(){
 		// Clone Host
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid','all');
@@ -128,8 +120,7 @@ class testFormHost extends CWebTest
 		$this->ok('Host added');
 	}
 
-	public function testFormHost_DeleteClonedHost()
-	{
+	public function testFormHost_DeleteClonedHost(){
 		$this->chooseOkOnNextConfirmation();
 
 		// Delete Host
@@ -144,8 +135,7 @@ class testFormHost extends CWebTest
 		$this->ok('Host deleted');
 	}
 
-	public function testFormHost_FullCloneHost()
-	{
+	public function testFormHost_FullCloneHost(){
 		// Full clone Host
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid','all');
@@ -160,8 +150,7 @@ class testFormHost extends CWebTest
 		$this->ok('Host added');
 	}
 
-	public function testFormHost_DeleteFullClonedHost()
-	{
+	public function testFormHost_DeleteFullClonedHost(){
 		$this->chooseOkOnNextConfirmation();
 
 		// Delete Host
