@@ -983,8 +983,11 @@ Copt::memoryPick();
 			}
 
 			foreach($result as $tnum => $trigger){
-				if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $trigger['description'], $arr)){
-					$macros = API::UserMacro()->getMacros($arr[1], array('triggerid' => $trigger['triggerid']));
+				if(preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $trigger['description'], $arr)){
+					$macros = API::UserMacro()->getMacros(array(
+						'macros' => $arr[1],
+						'triggerid' => $trigger['triggerid']
+					));
 
 					$search = array_keys($macros);
 					$values = array_values($macros);

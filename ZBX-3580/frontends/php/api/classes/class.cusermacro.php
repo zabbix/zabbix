@@ -868,15 +868,16 @@ class CUserMacro extends CZBXAPI{
 	}
 
 // TODO: should be private
-	public function getMacros($macros, $options){
+	public function getMacros($data){
+		$macros = $data['macros'];
 		zbx_value2array($macros);
 		$macros = array_unique($macros);
 
 		$result = array();
 
 		$obj_options = array(
-			'itemids' => isset($options['itemid']) ? $options['itemid'] : null,
-			'triggerids' => isset($options['triggerid']) ? $options['triggerid'] : null,
+			'itemids' => isset($data['itemid']) ? $data['itemid'] : null,
+			'triggerids' => isset($data['triggerid']) ? $data['triggerid'] : null,
 			'nopermissions' => 1,
 			'preservekeys' => 1,
 			'output' => API_OUTPUT_SHORTEN,
@@ -952,8 +953,11 @@ class CUserMacro extends CZBXAPI{
 		foreach($triggers as $num => $trigger){
 			if(!isset($trigger['triggerid']) || !isset($trigger['expression'])) continue;
 
-			if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $trigger['expression'], $arr)){
-				$macros = $this->getMacros($arr[1], array('triggerid' => $trigger['triggerid']));
+			if(preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $trigger['expression'], $arr)){
+				$macros = $this->getMacros(array(
+					'macros' => $arr[1],
+					'triggerid' => $trigger['triggerid']
+				));
 
 				$search = array_keys($macros);
 				$values = array_values($macros);
@@ -977,8 +981,11 @@ class CUserMacro extends CZBXAPI{
 		foreach($items as $num => $item){
 			if(!isset($item['itemid']) || !isset($item['key_'])) continue;
 
-			if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $item['key_'], $arr)){
-				$macros = $this->getMacros($arr[1], array('itemid' => $item['itemid']));
+			if(preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $item['key_'], $arr)){
+				$macros = $this->getMacros(array(
+					'macros' => $arr[1],
+					'itemid' => $item['itemid']
+				));
 
 				$search = array_keys($macros);
 				$values = array_values($macros);
