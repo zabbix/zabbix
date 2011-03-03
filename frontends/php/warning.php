@@ -55,7 +55,7 @@ include_once('include/page_header.php');
 
 unset($USER_DETAILS);
 
-	$table = new CTable(null, 'warning');
+	$table = new CTable(null, 'warningTable');
 	$table->setAlign('center');
 	$table->setAttribute('style','width: 480px; margin-top: 100px;');
 	$table->setHeader(array(new CCol(S_ZABBIX.SPACE.ZABBIX_VERSION, 'left')),'header');

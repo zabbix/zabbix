@@ -2315,7 +2315,13 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			new CTextBox('port',$port,15));
 
 		$cmbValType = new CComboBox('value_type',$value_type);
-		$cmbValType->addItem(ITEM_VALUE_TYPE_UINT64,	S_NUMERIC_UNSIGNED);		$cmbValType->addItem(ITEM_VALUE_TYPE_FLOAT,	S_NUMERIC_FLOAT);		$cmbValType->addItem(ITEM_VALUE_TYPE_STR, 	S_CHARACTER);		$cmbValType->addItem(ITEM_VALUE_TYPE_LOG, 	S_LOG);		$cmbValType->addItem(ITEM_VALUE_TYPE_TEXT,	S_TEXT);		$frmItem->addRow(array( new CVisibilityBox('value_type_visible', get_request('value_type_visible'), 'value_type', S_ORIGINAL),			S_TYPE_OF_INFORMATION), $cmbValType);
+		$cmbValType->addItem(ITEM_VALUE_TYPE_UINT64,	S_NUMERIC_UNSIGNED);
+		$cmbValType->addItem(ITEM_VALUE_TYPE_FLOAT,	S_NUMERIC_FLOAT);
+		$cmbValType->addItem(ITEM_VALUE_TYPE_STR, 	S_CHARACTER);
+		$cmbValType->addItem(ITEM_VALUE_TYPE_LOG, 	S_LOG);
+		$cmbValType->addItem(ITEM_VALUE_TYPE_TEXT,	S_TEXT);
+		$frmItem->addRow(array( new CVisibilityBox('value_type_visible', get_request('value_type_visible'), 'value_type', S_ORIGINAL),
+			S_TYPE_OF_INFORMATION), $cmbValType);
 
 		$cmbDataType = new CComboBox('data_type',$data_type);
 		$cmbDataType->addItem(ITEM_DATA_TYPE_DECIMAL,		item_data_type2str(ITEM_DATA_TYPE_DECIMAL));
@@ -2524,7 +2530,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		}
 
 		$cmbPrior = new CComboBox("priority",$priority);
-		$cmbPrior->addItems(get_severity_description());
+		$cmbPrior->addItems(getSeverityCaption());
 
 		$frmMTrig->addRow(array(
 			new CVisibilityBox('visible[priority]', isset($visible['priority']), 'priority', S_ORIGINAL), S_SEVERITY),
@@ -2906,9 +2912,8 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$frmTrig->addRow(S_EVENT_GENERATION, $type_select);
 
 		$cmbPrior = new CComboBox('priority', $priority);
-		for($i = 0; $i <= 5; $i++){
-			$cmbPrior->addItem($i,get_severity_description($i));
-		}
+		$cmbPrior->addItems(getSeverityCaption());
+
 		$frmTrig->addRow(S_SEVERITY,$cmbPrior);
 
 		$frmTrig->addRow(S_COMMENTS,new CTextArea("comments", $comments,90,7));
