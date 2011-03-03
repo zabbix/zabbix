@@ -49,7 +49,7 @@ $schema = DB::getSchema('config');
 				close: function(){ jQuery(this).dialog('destroy'); }
 			});
 
-//			jQuery('#scriptDialog').dialog('widget');
+			jQuery('#dialog').dialog('widget').find('button:first').addClass('main');
 		});
 	});
 
