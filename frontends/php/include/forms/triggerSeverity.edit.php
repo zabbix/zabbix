@@ -19,28 +19,18 @@
 **/
 ?>
 <?php
+include('include/templates/triggerSeverity.js.php');
+
+
 $severityTab = new CFormList('scriptsTab');
 
 $severityForm = new CForm();
 $severityForm->setName('triggerSeverity');
-$severityForm->addVar('form', get_request('form', 1));
-$severityForm->addVar('form_refresh', get_request('form_refresh', 0) + 1);
+$severityForm->addVar('form', $this->data['form']);
+$severityForm->addVar('form_refresh', $this->data['form_refresh'] + 1);
 
-if(get_request('form_refresh', false) && !isset($_REQUEST['resetDefaults'])){
-	$config = array(
-		'severity_name_0' => get_request('severity_name_0'),
-		'severity_color_0' => get_request('severity_color_0', ''),
-		'severity_name_1' => get_request('severity_name_1'),
-		'severity_color_1' => get_request('severity_color_1', ''),
-		'severity_name_2' => get_request('severity_name_2'),
-		'severity_color_2' => get_request('severity_color_2', ''),
-		'severity_name_3' => get_request('severity_name_3'),
-		'severity_color_3' => get_request('severity_color_3', ''),
-		'severity_name_4' => get_request('severity_name_4'),
-		'severity_color_4' => get_request('severity_color_4', ''),
-		'severity_name_5' => get_request('severity_name_5'),
-		'severity_color_5' => get_request('severity_color_5', ''),
-	);
+if($this->data['form_refresh']){
+	$config = $this->data['config'];
 }
 else{
 	$config = select_config(false);
@@ -97,8 +87,7 @@ $severityForm->addItem($severityView);
 
 
 // Footer
-$footer = makeFormFooter(array(new CSubmit('save', _('Save'))),
-	new CSubmit('resetDefaults', _('Reset defaults'), 'if(!Confirm("'._('All values will be reset to default!').'")) return false;'));
+$footer = makeFormFooter(array(new CSubmit('save', _('Save'))),	new CButton('resetDefaults', _('Reset defaults')));
 $severityForm->addItem($footer);
 
 

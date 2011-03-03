@@ -886,7 +886,7 @@ function set_color(color){
 		curr_lbl.style.background = curr_lbl.style.color = "#" + color;
 		curr_lbl.title = "#" + color;
 	}
-	if(curr_txt)	curr_txt.value = color;
+	if(curr_txt) curr_txt.value = color.toString().toUpperCase();
 
 	hide_color_picker();
 }
