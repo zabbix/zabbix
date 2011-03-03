@@ -101,10 +101,10 @@ class CMap extends CZBXAPI{
 			unset($sql_parts['select']['sysmaps']);
 
 			$dbTable = DB::getSchema('sysmaps');
-			$sql_parts['select']['sysmapid'] = ' s.sysmap';
+			$sql_parts['select']['sysmapid'] = 's.sysmapid';
 			foreach($options['output'] as $key => $field){
 				if(isset($dbTable['fields'][$field]))
-					$sql_parts['select'][$field] = ' s.'.$field;
+					$sql_parts['select'][$field] = 's.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;
