@@ -25,7 +25,6 @@ zabbix_agent_SOURCES = \
 	stats.c stats.h \
 	cpustat.c cpustat.h \
 	diskdevices.c diskdevices.h \
-	interfaces.c interfaces.h \
 	perfstat.c perfstat.h \
 	vmstats.c vmstats.h \
 	zbxconf.c zbxconf.h
@@ -37,7 +36,6 @@ zabbix_agentd_SOURCES = \
 	stats.c stats.h \
 	cpustat.c cpustat.h \
 	diskdevices.c diskdevices.h \
-	interfaces.c interfaces.h \
 	perfstat.c perfstat.h \
 	vmstats.c vmstats.h \
 	logfiles.c logfiles.h \

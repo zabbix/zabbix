@@ -120,6 +120,29 @@ class testPageHosts extends CWebTest
 		$this->ok($host['host']);
 	}
 
+	/**
+	* @dataProvider allHosts
+	*/
+	public function testPageHosts_Items($host)
+	{
+		$hostid=$host['hostid'];
+
+		$this->login('hosts.php');
+		$this->dropdown_select_wait('groupid','all');
+//		$this->wait();
+		$this->assertTitle('Hosts');
+		$this->ok('CONFIGURATION OF HOSTS');
+		$this->ok('Displaying');
+		// Go to the list of items
+		$this->href_click("items.php?filter_set=1&hostid=$hostid&sid=");
+		$this->wait();
+		// We are in the list of items
+		$this->assertTitle('Configuration of items');
+		$this->ok('Displaying');
+		// Header
+		$this->ok(array('Wizard','Description','Triggers','Key','Interval','History','Trends','Type','Status','Applications','Error'));
+	}
+
 	public function testPageHosts_MassExportAll()
 	{
 // TODO
