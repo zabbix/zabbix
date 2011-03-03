@@ -175,6 +175,8 @@ include_once('include/page_header.php');
 			));
 			$drule = reset($drules);
 
+			$drule['uniqueness_criteria'] = -1;
+
 			foreach($drule['dchecks'] as $dcnum => $dcheck)
 				if($dcheck['uniq']) $drule['uniqueness_criteria'] = $dcheck['dcheckid'];
 		}
