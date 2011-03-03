@@ -2427,7 +2427,6 @@ static int	substitute_functions(char **exp, time_t now, char *error, int maxerrl
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_ITEM		item;
-	DB_FUNCTION	function;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_functions(%s)",
 			*exp);
@@ -2462,38 +2461,48 @@ static int	substitute_functions(char **exp, time_t now, char *error, int maxerrl
 			*f = '\0';
 			e++;	/* '}' */
 
+			*error = '\0';
+
 			result = DBselect(
-					"select distinct %s,f.function,f.parameter from %s,functions f"
+					"select distinct %s,f.function,f.parameter,h.status from %s,functions f"
 					" where i.hostid=h.hostid and i.itemid=f.itemid and f.functionid=%s",
 					ZBX_SQL_ITEM_FIELDS,
 					ZBX_SQL_ITEM_TABLES,
 					functionid);
 
-			row = DBfetch(result);
-
-			if (NULL == row)
+			if (NULL == (row = DBfetch(result)))
 			{
 				zbx_snprintf(error, maxerrlen, "Could not obtain function and item for functionid: %s",
 						functionid);
-				DBfree_result(result);
-				goto error;
 			}
 			else
 			{
+				const char	*function;
+				const char	*parameter;
+				unsigned char	host_status;
+
 				DBget_item_from_db(&item, row);
 
-				function.function	= row[ZBX_SQL_ITEM_FIELDS_NUM];
-				function.parameter	= row[ZBX_SQL_ITEM_FIELDS_NUM + 1];
+				function = row[ZBX_SQL_ITEM_FIELDS_NUM];
+				parameter = row[ZBX_SQL_ITEM_FIELDS_NUM + 1];
+				host_status = (unsigned char)atoi(row[ZBX_SQL_ITEM_FIELDS_NUM + 2]);
 
-				if (FAIL == evaluate_function(value, &item, function.function, function.parameter, now))
-				{
-					zbx_snprintf(error, maxerrlen, "Evaluation failed for function: %s", function.function);
-					DBfree_result(result);
-					goto error;
-				}
+				if (ITEM_STATUS_DISABLED == item.status)
+					zbx_snprintf(error, maxerrlen, "Item disabled for function: {%s:%s.%s(%s)}",
+							item.host_name, item.key, function, parameter);
+
+				if ('\0' == *error && HOST_STATUS_NOT_MONITORED == host_status)
+					zbx_snprintf(error, maxerrlen, "Host disabled for function: {%s:%s.%s(%s)}",
+							item.host_name, item.key, function, parameter);
+
+				if ('\0' == *error && FAIL == evaluate_function(value, &item, function, parameter, now))
+					zbx_snprintf(error, maxerrlen, "Evaluation failed for function: {%s:%s.%s(%s)}",
+							item.host_name, item.key, function, parameter);
 			}
-
 			DBfree_result(result);
+
+			if ('\0' != *error)
+				goto error;
 
 			zbx_strcpy_alloc(&out, &out_alloc, &out_offset, value);
 		}
@@ -2508,8 +2517,7 @@ empty:
 
 	return SUCCEED;
 error:
-	if (NULL != out)
-		zbx_free(out);
+	zbx_free(out);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
 	zabbix_syslog("%s", error);
