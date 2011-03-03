@@ -383,16 +383,6 @@ include_once('include/page_header.php');
 				$templated |= (HOST_STATUS_TEMPLATE == $host['status']);
 			}
 
-			switch($trigger['priority']){
-				case 0: $priority = S_NOT_CLASSIFIED; break;
-				case 1: $priority = new CCol(S_INFORMATION, 'information'); break;
-				case 2: $priority = new CCol(S_WARNING, 'warning'); break;
-				case 3: $priority = new CCol(S_AVERAGE, 'average'); break;
-				case 4: $priority = new CCol(S_HIGH, 'high'); break;
-				case 5: $priority = new CCol(S_DISASTER, 'disaster'); break;
-			}
-
-
 			$status_link = 'trigger_prototypes.php?go='.(($trigger['status'] == TRIGGER_STATUS_DISABLED) ? 'activate' : 'disable').
 				'&g_triggerid%5B%5D='.$triggerid.'&parent_discoveryid='.$_REQUEST['parent_discoveryid'];
 			if($trigger['status'] == TRIGGER_STATUS_DISABLED){
@@ -404,7 +394,7 @@ include_once('include/page_header.php');
 
 			$table->addRow(array(
 				new CCheckBox('g_triggerid['.$triggerid.']', NULL, NULL, $triggerid),
-				$priority,
+				getSeverityCell($trigger['priority']),
 				$status,
 				$description,
 				triggerExpression($trigger, 1),

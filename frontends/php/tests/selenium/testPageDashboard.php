@@ -23,8 +23,6 @@ require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
 class testPageDashboard extends CWebTest
 {
-	public $host = "Text host";
-
 	public function testPageDashboard_SimpleTest()
 	{
 		$this->login('dashboard.php');

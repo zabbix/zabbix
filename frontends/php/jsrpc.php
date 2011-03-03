@@ -125,7 +125,7 @@ include_once('include/page_header.php');
 					'time' => $event['clock'],
 					'priority' => $priority,
 					'sound' => $sound,
-					'color' => getEventColor($trigger['priority'], $event['value']),
+					'color' => getSeverityColor($trigger['priority'], $event['value']),
 					'title' => $title.' '.get_node_name_by_elid($host['hostid'],null,':').'[url='.$url_tr_status.']'.$host['host'].'[/url]',
 					'body' => array(
 						S_DETAILS.': '.' [url='.$url_events.']'.$trigger['description'].'[/url]',

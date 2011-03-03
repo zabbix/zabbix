@@ -221,12 +221,8 @@ require_once('include/templates/action.js.php');
 			break;
 		case CONDITION_TYPE_TRIGGER_SEVERITY:
 			$cmbCondVal = new CComboBox('new_condition[value]');
-			foreach(array(TRIGGER_SEVERITY_INFORMATION,
-				TRIGGER_SEVERITY_WARNING,
-				TRIGGER_SEVERITY_AVERAGE,
-				TRIGGER_SEVERITY_HIGH,
-				TRIGGER_SEVERITY_DISASTER) as $id)
-				$cmbCondVal->addItem($id,get_severity_description($id));
+			$cmbCondVal->addItems(getSeverityCaption());
+
 			$rowCondition[] = $cmbCondVal;
 			break;
 		case CONDITION_TYPE_MAINTENANCE:
