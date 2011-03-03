@@ -27,7 +27,7 @@ class testFormScript extends CWebTest{
 	// Data provider
 	public static function providerScripts(){
 		// data - values for form inputs
-		// saveResult - if save action shoould be successful
+		// saveResult - if save action should be successful
 		// dbValues - values which should be in db if saveResult is true
 		$data = array(
 			array(
@@ -164,10 +164,8 @@ class testFormScript extends CWebTest{
 			$this->assertEquals($DBhash, DBhash($sql), "DB fields changed after unsuccessful save.");
 		}
 
-
 		DBrestore_tables($this->affectedTables);
 	}
 
 }
 ?>
-
