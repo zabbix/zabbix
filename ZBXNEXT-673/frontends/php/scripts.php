@@ -183,7 +183,7 @@ if($sid = get_request('scriptid')){
 		$data['groupid'] = get_request('groupid', 0);
 		$data['access'] = get_request('groupid', 0);
 		$data['confirmation'] = get_request('confirmation',	'');
-		$data['enable'] = get_request('enableConfirmation', false);
+		$data['enableConfirmation'] = get_request('enableConfirmation', false);
 
 		$scriptForm = new CGetForm('script.edit', $data);
 		$scripts_wdgt->addItem($scriptForm->render());
