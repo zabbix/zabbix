@@ -674,13 +674,17 @@
 			}
 		}
 
-		$pattern="/{(?P<host>.[^}]*):(?P<key>.[^}]*)\.(?P<func>.[^}]*)\((?P<param>.[^}]*)\)*}/u";
+		$pattern = "/{".ZBX_PREG_HOST_FORMAT.":.+\.\w+\(.+\)}/Uu";
+
 		preg_match_all($pattern, $label, $matches);
 		foreach($matches[0] as $num => $expr){
-			$host = $matches['host'][$num];
-			$key = $matches['key'][$num];
-			$function = $matches['func'][$num];
-			$parameter = $matches['param'][$num];
+			$trigExpr = new CTriggerExpression(array('expression' => $expr));
+			if(!empty($trigExpr->errors)) continue;
+
+			$host = reset($trigExpr->data['hosts']);
+			$key = reset($trigExpr->data['items']);
+			$function = reset($trigExpr->data['functions']);
+			$parameter = reset($trigExpr->data['functionParams']);
 
 			$db_items = API::Item()->get(array(
 				'filter' => array(
