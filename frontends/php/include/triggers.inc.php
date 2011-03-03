@@ -1340,7 +1340,7 @@ function utf8RawUrlDecode($source){
 			}
 
 			if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $description, $arr)){
-				$macros = API::UserMacro()->getMacros($arr[1], array('triggerid' => $row['triggerid']));
+				$macros = API::UserMacro()->getMacros(array('macros' => $arr[1], 'triggerid' => $row['triggerid']));
 
 				$search = array_keys($macros);
 				$values = array_values($macros);
