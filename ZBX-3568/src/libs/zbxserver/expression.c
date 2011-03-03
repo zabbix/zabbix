@@ -1871,9 +1871,9 @@ static const char	*ex_macros[] = {MVAR_PROFILE_DEVICETYPE, MVAR_PROFILE_NAME, MV
  *                          curly bracket                                     *
  *                                                                            *
  * Return value: (1) *replace_to = NULL - invalid function format;            *
- *                    'br' pointer remains invariable                         *
- *               (2) *replace_to = "*UNKNOWN*" - invalid hostname, key,       *
- *                    function format, or a function cannot be evaluated      *
+ *                    'br' pointer remains unchanged                          *
+ *               (2) *replace_to = "*UNKNOWN*" - invalid hostname, key or     *
+ *                    function, or a function cannot be evaluated             *
  *               (3) *replace_to = "<value>" - a function successfully        *
  *                    evaluated                                               *
  *                                                                            *
