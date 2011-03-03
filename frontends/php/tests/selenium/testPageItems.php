@@ -22,13 +22,35 @@
 require_once(dirname(__FILE__) . '/../include/class.cwebtest.php');
 
 class testPageItems extends CWebTest{
-	public function testPageItems_SimpleTest(){
 
-		$this->login('items.php');
+	// Returns all hosts
+	public static function allHosts()
+	{
+		return DBdata('select * from hosts where status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')');
+	}
+
+	/**
+	* @dataProvider allHosts
+	*/
+
+	public function testPageItems_SimpleTest($host){
+	{
+		$hostid=$host['hostid'];
+
+		$this->login('hosts.php');
+		$this->dropdown_select_wait('groupid','all');
+
+		$this->assertTitle('Hosts');
+		$this->ok('CONFIGURATION OF HOSTS');
+		// Go to the list of items
+		$this->href_click("items.php?filter_set=1&hostid=$hostid&sid=");
+		$this->wait();
+		// We are in the list of items
 		$this->assertTitle('Configuration of items');
 		$this->ok('CONFIGURATION OF ITEMS');
 		$this->ok('Displaying');
-
+		$this->ok('Hosts list');
+		// Header
 		$this->ok(array('Wizard', 'Description', 'Triggers', 'Key', 'Interval', 'History', 'Trends', 'Type', 'Status', 'Applications', 'Error'));
 		// someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
 
