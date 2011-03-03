@@ -148,10 +148,10 @@ class CHost extends CZBXAPI{
 			unset($sql_parts['select']['hosts']);
 
 			$dbTable = DB::getSchema('hosts');
-			$sql_parts['select']['hostid'] = ' h.hostid';
+			$sql_parts['select']['hostid'] = 'h.hostid';
 			foreach($options['output'] as $key => $field){
 				if(isset($dbTable['fields'][$field]))
-					$sql_parts['select'][$field] = ' h.'.$field;
+					$sql_parts['select'][$field] = 'h.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;
