@@ -1234,8 +1234,9 @@ if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
 			$data = zbx_toArray($data);
 			foreach($data as $dnum => $row){
 // check
-				if(empty($row['values'])) continue;
 				self::checkValueTypes($tableSchema, $row['values']);
+				if(empty($row['values']))
+					self::exception(self::DBEXECUTE_ERROR, _s('Cannot perform update statement on table "%s" without values.', $table));
 
 // set creation
 				$sqlSet = '';
