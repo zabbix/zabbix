@@ -275,6 +275,7 @@ frontends/php/tests/selenium/testFormMap.php -text
 frontends/php/tests/selenium/testFormMediaType.php -text
 frontends/php/tests/selenium/testFormProfile.php -text
 frontends/php/tests/selenium/testFormScreen.php -text
+frontends/php/tests/selenium/testFormTemplate.php -text
 frontends/php/tests/selenium/testGeneric.php -text
 frontends/php/tests/selenium/testPageActionsAutoregistration.php -text
 frontends/php/tests/selenium/testPageActionsDiscovery.php -text

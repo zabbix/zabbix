@@ -6,7 +6,7 @@ echo " WARNING: backup your database before performing upgrade
  It does the following things:
   1. Updates indexes that might require changes;
   2. Patches the database from 1.8 schema to 2.0 schema;
-  3. Adds 'Disabled', 'API access' and 'Debug' usergroup if any missing;
+  3. Adds 'Disabled' and 'Debug' usergroup if any missing;
   4. Checks for hosts not belonging to any group and adds them to one if any found.
 
  Usage: pass required MySQL parameters to this script (like database, user, password etc).
@@ -107,7 +107,7 @@ timer stop patching of the database
 	# bash < 4.1 version
 	echo "bash < 4.1 detected"
 	# groupname,columnname
-	for group in "Disabled,users_status" "API access,api_access" "Debug,debug_mode"; do
+	for group in "Disabled,users_status" "Debug,debug_mode"; do
 		groupname=$(echo $group | cut -d, -f1)
 		column=$(echo $group | cut -d, -f2)
 		echo -n "Checking for '$groupname' user group... "
@@ -120,7 +120,7 @@ timer stop patching of the database
 			# avoiding eval
 			declare $dbcolumn=1
 			usrgrouptoadd=$(increaseid usrgrp usrgrpid)
-			echo "insert into usrgrp (usrgrpid,name,gui_access,users_status,api_access,debug_mode) values ('$usrgrouptoadd','$groupname','0','$users_status','$api_access','$debug_mode');" | $MYSQL $MYSQLPARAMS
+			echo "insert into usrgrp (usrgrpid,name,gui_access,users_status,debug_mode) values ('$usrgrouptoadd','$groupname','0','$users_status','$debug_mode');" | $MYSQL $MYSQLPARAMS
 			unset $dbcolumn
 		}
 	done
@@ -134,7 +134,6 @@ timer stop patching of the database
 	declare -A groupstoadd
 	groupstoadd=(
 ["Disabled"]=users_status
-["API access"]=api_access
 ["Debug"]=debug_mode
 )
 
@@ -147,7 +146,7 @@ timer stop patching of the database
 			echo "not found, adding."
 			declare ${groupstoadd[$groupname]}=1
 			usrgrouptoadd=$(increaseid usrgrp usrgrpid)
-			echo "insert into usrgrp (usrgrpid,name,gui_access,users_status,api_access,debug_mode) values ('$usrgrouptoadd','$groupname','0','$users_status','$api_access','$debug_mode');" | $MYSQL $MYSQLPARAMS
+			echo "insert into usrgrp (usrgrpid,name,gui_access,users_status,debug_mode) values ('$usrgrouptoadd','$groupname','0','$users_status','$debug_mode');" | $MYSQL $MYSQLPARAMS
 			unset ${groupstoadd[$groupname]}
 		}
 	done
