@@ -174,7 +174,7 @@ class CTemplateScreen extends CScreen{
 		if(!is_null($options['templateids'])){
 			zbx_value2array($options['templateids']);
 
-			if(!is_null($options['hostids'])){
+			if(isset($options['hostids']) && !is_null($options['hostids'])){
 				zbx_value2array($options['hostids']);
 				$options['hostids'] = array_merge($options['hostids'], $options['templateids']);
 			}
