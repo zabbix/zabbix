@@ -51,7 +51,7 @@
 
 		foreach($mapping as $id => $map){
 			$result[$id] = new CSpan($map['letter'], $map['style']);
-			$result[$id]->SetHint(get_severity_description($id)." (".(isset($map['style']) ? "on" : "off").")");
+			$result[$id]->SetHint(getSeverityCaption($id)." (".(isset($map['style']) ? "on" : "off").")");
 		}
 
 	return $result;

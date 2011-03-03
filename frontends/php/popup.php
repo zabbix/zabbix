@@ -904,7 +904,7 @@ include_once('include/page_header.php');
 			$table->addRow(array(
 				($multiselect ? new CCheckBox('triggers['.zbx_jsValue($trigger[$srcfld1]).']', NULL, NULL, $trigger['triggerid']) : null),
 				$description,
-				new CCol(get_severity_description($trigger['priority']), get_severity_style($trigger['priority'])),
+				getSeverityCell($trigger['priority']),
 				$status
 			));
 

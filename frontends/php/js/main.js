@@ -886,7 +886,7 @@ function set_color(color){
 		curr_lbl.style.background = curr_lbl.style.color = "#" + color;
 		curr_lbl.title = "#" + color;
 	}
-	if(curr_txt)	curr_txt.value = color;
+	if(curr_txt) curr_txt.value = color.toString().toUpperCase();
 
 	hide_color_picker();
 }
@@ -905,7 +905,6 @@ function set_color_by_name(name, color){
 function add2favorites(favobj,favid){
 	if('undefined' == typeof(Ajax)){
 		throw("Prototype.js lib is required!");
-		return false;
 	}
 
 	if((typeof(favid) == 'undefined') || empty(favid)) return;
@@ -925,7 +924,6 @@ function rm4favorites(favobj,favid,menu_rowid){
 //	alert(favobj+','+favid+','+menu_rowid);
 	if('undefined' == typeof(Ajax)){
 		throw("Prototype.js lib is required!");
-		return false;
 	}
 
 	if((typeof(favobj) == 'undefined') || (typeof(favid) == 'undefined'))
@@ -1043,7 +1041,6 @@ function send_params(params){
 function setRefreshRate(pmasterid,dollid,interval,params){
 	if(typeof(Ajax) == 'undefined'){
 		throw("Prototype.js lib is required!");
-		return false;
 	}
 
 	if((typeof(params) == 'undefined') || is_null(params))  var params = new Array();
