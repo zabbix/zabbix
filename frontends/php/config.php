@@ -34,8 +34,7 @@ include_once('include/page_header.php');
 <?php
 	$fields=array(
 //		VAR								TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-
-		'config'=>				array(T_ZBX_INT, O_OPT,	NULL,	IN('0,3,5,6,7,8,9,10,11'),	NULL),
+		'config'=>				array(T_ZBX_INT, O_OPT,	NULL,	IN('0,3,5,6,7,8,9,10,11,12'),	NULL),
 // other form
 		'alert_history'=>		array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),	'isset({config})&&({config}==0)&&isset({save})'),
 		'event_history'=>		array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),	'isset({config})&&({config}==0)&&isset({save})'),
@@ -93,17 +92,31 @@ include_once('include/page_header.php');
 		'add_expression'=>			array(T_ZBX_STR, O_OPT,	NULL,	NULL,		null),
 		'edit_expressionid'=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		null),
 		'delete_expression'=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		null),
+// Trigger severities
+		'severity_name_0' =>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({config})&&({config}==12)&&isset({save})'),
+		'severity_color_0' =>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({config})&&({config}==12)&&isset({save})'),
+		'severity_name_1' =>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({config})&&({config}==12)&&isset({save})'),
+		'severity_color_1' =>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({config})&&({config}==12)&&isset({save})'),
+		'severity_name_2' =>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({config})&&({config}==12)&&isset({save})'),
+		'severity_color_2' =>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({config})&&({config}==12)&&isset({save})'),
+		'severity_name_3' =>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({config})&&({config}==12)&&isset({save})'),
+		'severity_color_3' =>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({config})&&({config}==12)&&isset({save})'),
+		'severity_name_4' =>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({config})&&({config}==12)&&isset({save})'),
+		'severity_color_4' =>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({config})&&({config}==12)&&isset({save})'),
+		'severity_name_5' =>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({config})&&({config}==12)&&isset({save})'),
+		'severity_color_5' =>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({config})&&({config}==12)&&isset({save})'),
+
 /* other */
 		'form'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
 	);
 ?>
 <?php
-	$_REQUEST['config'] = get_request('config',CProfile::get('web.config.config',0));
+	$_REQUEST['config'] = get_request('config', CProfile::get('web.config.config', 0));
 
 	check_fields($fields);
 
-	CProfile::update('web.config.config',$_REQUEST['config'],PROFILE_TYPE_INT);
+	CProfile::update('web.config.config' ,$_REQUEST['config'], PROFILE_TYPE_INT);
 
 	$orig_config = select_config(false, get_current_nodeid(false));
 
@@ -586,35 +599,56 @@ include_once('include/page_header.php');
 		}
 
 	}
+// Trigger severities
+	else if(($_REQUEST['config'] == 12) && (isset($_REQUEST['save']) || isset($_REQUEST['resetDefaults']))){
+		$configs = array(
+			'severity_name_0' => get_request('severity_name_0', _('Not classified')),
+			'severity_color_0' => get_request('severity_color_0', ''),
+			'severity_name_1' => get_request('severity_name_1', _('Information')),
+			'severity_color_1' => get_request('severity_color_1', ''),
+			'severity_name_2' => get_request('severity_name_2', _('Warning')),
+			'severity_color_2' => get_request('severity_color_2', ''),
+			'severity_name_3' => get_request('severity_name_3', _('Average')),
+			'severity_color_3' => get_request('severity_color_3', ''),
+			'severity_name_4' => get_request('severity_name_4', _('High')),
+			'severity_color_4' => get_request('severity_color_4', ''),
+			'severity_name_5' => get_request('severity_name_5', _('Disaster')),
+			'severity_color_5' => get_request('severity_color_5', ''),
+		);
+
+		$result = update_config($configs);
+
+		show_messages($result, S_CONFIGURATION_UPDATED, S_CONFIGURATION_WAS_NOT_UPDATED);
+	}
 ?>
 
 <?php
-	$form = new CForm('get','config.php');
-	$cmbConfig = new CCombobox('config',$_REQUEST['config'], 'javascript: redirect("config.php?config="+this.options[this.selectedIndex].value);');
-//	$cmbConfig->addItem(4,S_AUTOREGISTRATION);
-//	$cmbConfig->addItem(2,S_ESCALATION_RULES);
-	$cmbConfig->addItem(8,S_GUI);
-	$cmbConfig->addItem(0,S_HOUSEKEEPER);
-	$cmbConfig->addItem(3,S_IMAGES);
-	$cmbConfig->addItem(10,S_REGULAR_EXPRESSIONS);
-//	$cmbConfig->addItem(9,S_THEMES);
-	$cmbConfig->addItem(11,S_MACROS);
-	$cmbConfig->addItem(6,S_VALUE_MAPPING);
-	$cmbConfig->addItem(7,S_WORKING_TIME);
-	$cmbConfig->addItem(5,S_OTHER);
+	$form = new CForm();
 
+	$cmbConfig = new CCombobox('configDropDown', $_REQUEST['config'], 'javascript: redirect("config.php?config="+this.options[this.selectedIndex].value);');
+	$cmbConfig->addItems(array(
+		8 => _('GUI'),
+		0 => _('Housekeeper'),
+		3 => _('Images'),
+		10 => _('Regular expressions'),
+		11 => _('Macros'),
+		6 => _('Value mapping'),
+		7 => _('Working time'),
+		12 => _('Trigger severities'),
+		5 => _('Other'),
+	));
 	$form->addItem($cmbConfig);
 
 	if(!isset($_REQUEST['form'])){
 		switch($_REQUEST['config']){
 			case 3:
-				$form->addItem(new CSubmit('form',S_CREATE_IMAGE));
+				$form->addItem(new CSubmit('form', _('Create image')));
 				break;
 			case 6:
-				$form->addItem(new CSubmit('form',S_CREATE_VALUE_MAP));
+				$form->addItem(new CSubmit('form', _('Create value map')));
 				break;
 			case 10:
-				$form->addItem(new CSubmit('form',S_NEW_REGULAR_EXPRESSION));
+				$form->addItem(new CSubmit('form', _('New regular expression')));
 				break;
 		}
 	}
@@ -1142,11 +1176,10 @@ include_once('include/page_header.php');
 			$cnf_wdgt->addItem($form);
 		}
 	}
-
 /////////////////////////////
 //  config = 11 // Macros  //
 /////////////////////////////
-	else if($_REQUEST['config']==11){	// Macros
+	else if($_REQUEST['config']==11){
 		$form = new CForm();
 		$tbl = new CTable();
 		$tbl->addRow(get_macros_widget());
@@ -1154,6 +1187,33 @@ include_once('include/page_header.php');
 		$tbl->addStyle('margin: 0 auto;');
 		$form->addItem($tbl);
 		$cnf_wdgt->addItem($form);
+	}
+/////////////////////////////////////////
+//  config = 12 // Trigger severities  //
+/////////////////////////////////////////
+	else if($_REQUEST['config']==12){
+		$data = array();
+		$data['form'] = get_request('form', 1);
+		$data['form_refresh'] = get_request('form_refresh', 0);
+
+		if($data['form_refresh']){
+			$data['config']['severity_name_0'] = get_request('severity_name_0');
+			$data['config']['severity_color_0'] = get_request('severity_color_0', '');
+			$data['config']['severity_name_1'] = get_request('severity_name_1');
+			$data['config']['severity_color_1'] = get_request('severity_color_1', '');
+			$data['config']['severity_name_2'] = get_request('severity_name_2');
+			$data['config']['severity_color_2'] = get_request('severity_color_2', '');
+			$data['config']['severity_name_3'] = get_request('severity_name_3');
+			$data['config']['severity_color_3'] = get_request('severity_color_3', '');
+			$data['config']['severity_name_4'] = get_request('severity_name_4');
+			$data['config']['severity_color_4'] = get_request('severity_color_4', '');
+			$data['config']['severity_name_5'] = get_request('severity_name_5');
+			$data['config']['severity_color_5'] = get_request('severity_color_5', '');
+		}
+
+
+		$triggerSeverityForm = new CGetForm('triggerSeverity.edit', $data);
+		$cnf_wdgt->addItem($triggerSeverityForm->render());
 	}
 
 	$cnf_wdgt->show();

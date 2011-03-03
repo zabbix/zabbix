@@ -115,13 +115,6 @@ class CGraphDraw{
 			'ValueMax'		=> array(255,180,180,50),
 			'ValueMin'		=> array(100,255,100,50),
 
-			'Priority Disaster'	=> array(255,0,0),
-			'Priority High'		=> array(255,100,100),
-			'Priority Average'	=> array(221,120,120),
-			'Priority Warning'	=> array(239,239,204),
-			'Priority Information'	=> array(204,226,204),
-			'Priority'		=> array(188,188,188),
-
 			'Not Work Period'	=> array(230,230,230),
 
 			'UnknownData'		=> array(130,130,130, 50)
@@ -257,12 +250,12 @@ class CGraphDraw{
 		}
 
 		$str.=$this->period2str($this->period);
-		
+
 		$fontnum = 11;
 		if(($this->sizeX < 500) && ($this->type == GRAPH_TYPE_NORMAL || $this->type == GRAPH_TYPE_BAR)) $fontnum = 8;
 		$dims = imageTextSize( $fontnum, 0, $str );
 		$x = $this->fullSizeX/2-($dims['width']/2);
-		
+
 		imagetext($this->im, $fontnum, 0, $x, 24, $this->getColor($this->graphtheme['textcolor'], 0), $str);
 	}
 

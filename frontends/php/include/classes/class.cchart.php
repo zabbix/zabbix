@@ -471,22 +471,13 @@ class CChart extends CGraphDraw{
 				$minY = $this->m_minY[$this->items[$inum]['axisside']];
 				$maxY = $this->m_maxY[$this->items[$inum]['axisside']];
 
-				switch($trigger['priority']){
-					case TRIGGER_SEVERITY_DISASTER:	$color = 'Priority Disaster'; break;
-					case TRIGGER_SEVERITY_HIGH: $color = 'Priority High'; break;
-					case TRIGGER_SEVERITY_AVERAGE: $color = 'Priority Average'; break;
-					case TRIGGER_SEVERITY_WARNING: $color = 'Priority Warning'; break;
-					case TRIGGER_SEVERITY_INFORMATION: $color = 'Priority Information'; break;
-					default: $color = 'Priority';
-				}
-
-				array_push($this->triggers,array(
+				array_push($this->triggers, array(
 					'skipdraw' => ($val <= $minY || $val >= $maxY),
 					'y' => $this->sizeY - (($val-$minY) / ($maxY-$minY)) * $this->sizeY + $this->shiftY,
-					'color' => $color,
+					'color' => getSeverityColor($trigger['priority']),
 					'description' => S_TRIGGER.': '.expand_trigger_description_by_data($trigger),
 					'constant' => '['.$arr[2].' '.$arr[3].$arr[4].']'
-					));
+				));
 				++$cnt;
 			}
 		}

@@ -154,7 +154,7 @@ include_once('include/page_header.php');
 			get_node_name_by_elid($row['triggerid']),
 			$host,
 			$tr_desc,
-			new CCol(get_severity_description($row['priority']),get_severity_style($row['priority'])),
+			getSeverityCell($row['priority']),
 			$row['cnt_event'],
 		));
 	}
