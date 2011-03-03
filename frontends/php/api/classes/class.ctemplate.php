@@ -1023,7 +1023,7 @@ COpt::memoryPick();
 				}
 
 				if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $template['host'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Template name [ %1$s ]'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Template name [ %1$s ]', $template['host']));
 				}
 
 				if($this->exists(array('host' => $template['host']))){
