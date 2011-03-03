@@ -25,14 +25,16 @@ class testPageMediaTypes extends CWebTest{
 	public $affectedTables = array('media_type','media','opmessage');
 
 	// Returns all media types
-	public static function allMediaTypes(){
+	public static function allMediaTypes()
+	{
 		return DBdata('select * from media_type');
 	}
 
 	/**
 	 * @dataProvider allMediaTypes
 	 */
-	public function testPageMediaTypes_SimpleTest($mediatype){
+	public function testPageMediaTypes_SimpleTest($mediatype)
+	{
 		$this->login('media_types.php');
 		$this->assertTitle('Media types');
 
@@ -51,7 +53,8 @@ class testPageMediaTypes extends CWebTest{
 	/**
 	 * @dataProvider allMediaTypes
 	 */
-	public function testPageMediaTypes_SimpleUpdate($mediatype){
+	public function testPageMediaTypes_SimpleUpdate($mediatype)
+	{
 		$name = $mediatype['description'];
 
 		$sql = "select * from media_type where description='$name' order by mediatypeid";
@@ -71,7 +74,8 @@ class testPageMediaTypes extends CWebTest{
 		$this->assertEquals($oldHash, DBhash($sql));
 	}
 
-	public function testPageMediaTypes_MassDeleteAll(){
+	public function testPageMediaTypes_MassDeleteAll()
+	{
 		// TODO
 		$this->markTestIncomplete();
 	}
@@ -79,7 +83,8 @@ class testPageMediaTypes extends CWebTest{
 	/**
 	 * @dataProvider allMediaTypes
 	 */
-	public function testPageMediaTypes_MassDelete($mediatype){
+	public function testPageMediaTypes_MassDelete($mediatype)
+	{
 		$id = $mediatype['mediatypeid'];
 
 		$row = DBfetch(DBselect("select count(*) as cnt from opmessage where mediatypeid=$id"));
@@ -98,7 +103,8 @@ class testPageMediaTypes extends CWebTest{
 		$this->getConfirmation();
 		$this->wait();
 		$this->assertTitle('Media types');
-		if($used_by_operations){
+		if($used_by_operations)
+		{
 			$this->nok('Media type deleted');
 			$this->ok('Media type was not deleted');
 			$this->ok('Mediatypes used by action');
@@ -113,7 +119,8 @@ class testPageMediaTypes extends CWebTest{
 
 	}
 
-	public function testPageMediaTypes_Sorting(){
+	public function testPageMediaTypes_Sorting()
+	{
 		// TODO
 		$this->markTestIncomplete();
 	}
