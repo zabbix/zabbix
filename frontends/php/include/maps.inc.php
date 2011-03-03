@@ -138,9 +138,7 @@
 		);
 
 		if(!check_db_fields($link_db_fields, $link)){
-			$result = false;
-			$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Wrong fields for link');
-			break;
+			return false;
 		}
 
 		$result = delete_all_link_triggers($link['linkid']);
@@ -1685,15 +1683,7 @@
 				$st_color = null;
 
 				if($el_info['icon_type'] == SYSMAP_ELEMENT_ICON_ON){
-					switch($el_info['priority']){
-						case TRIGGER_SEVERITY_DISASTER: 	$hl_color = hex2rgb('FF0000'); break;
-						case TRIGGER_SEVERITY_HIGH:  		$hl_color = hex2rgb('FF8888'); break;
-						case TRIGGER_SEVERITY_AVERAGE:  	$hl_color = hex2rgb('DDAAAA'); break;
-						case TRIGGER_SEVERITY_WARNING:  	$hl_color = hex2rgb('EFEFCC'); break;
-						case TRIGGER_SEVERITY_INFORMATION:  $hl_color = hex2rgb('CCE2CC'); break;
-						case TRIGGER_SEVERITY_NOT_CLASSIFIED: $hl_color = hex2rgb('C0E0C0'); break;
-						default:
-					}
+					$hl_color = hex2rgb(getSeverityColor($el_info['priority']));
 				}
 
 				if($el_info['icon_type'] == SYSMAP_ELEMENT_ICON_MAINTENANCE) $st_color = hex2rgb('FF9933');

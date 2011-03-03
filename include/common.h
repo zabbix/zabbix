@@ -552,16 +552,13 @@ typedef enum
 #define TRIGGER_VALUE_CHANGED_YES	1
 
 /* Trigger severity */
-typedef enum
-{
-	TRIGGER_SEVERITY_NOT_CLASSIFIED = 0,
-	TRIGGER_SEVERITY_INFORMATION,
-	TRIGGER_SEVERITY_WARNING,
-	TRIGGER_SEVERITY_AVERAGE,
-	TRIGGER_SEVERITY_HIGH,
-	TRIGGER_SEVERITY_DISASTER
-} zbx_trigger_severity_t;
-const char	*zbx_trigger_severity_string(zbx_trigger_severity_t severity);
+#define TRIGGER_SEVERITY_NOT_CLASSIFIED	0
+#define TRIGGER_SEVERITY_INFORMATION	1
+#define TRIGGER_SEVERITY_WARNING	2
+#define TRIGGER_SEVERITY_AVERAGE	3
+#define TRIGGER_SEVERITY_HIGH		4
+#define TRIGGER_SEVERITY_DISASTER	5
+#define TRIGGER_SEVERITY_COUNT		6	/* number of trigger severities */
 
 typedef enum
 {

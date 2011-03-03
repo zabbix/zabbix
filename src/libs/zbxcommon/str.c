@@ -2569,27 +2569,6 @@ const char	*zbx_result_string(int result)
 	}
 }
 
-const char	*zbx_trigger_severity_string(zbx_trigger_severity_t severity)
-{
-	switch (severity)
-	{
-		case TRIGGER_SEVERITY_NOT_CLASSIFIED:
-			return "Not classified";
-		case TRIGGER_SEVERITY_INFORMATION:
-			return "Information";
-		case TRIGGER_SEVERITY_WARNING:
-			return "Warning";
-		case TRIGGER_SEVERITY_AVERAGE:
-			return "Average";
-		case TRIGGER_SEVERITY_HIGH:
-			return "High";
-		case TRIGGER_SEVERITY_DISASTER:
-			return "Disaster";
-		default:
-			return "unknown";
-	}
-}
-
 const char	*zbx_item_logtype_string(zbx_item_logtype_t logtype)
 {
 	switch (logtype)

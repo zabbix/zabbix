@@ -47,6 +47,7 @@ require_once(dirname(__FILE__).'/testPageStatusOfZabbix.php');
 require_once(dirname(__FILE__).'/testPageTemplates.php');
 require_once(dirname(__FILE__).'/testPageUserGroups.php');
 require_once(dirname(__FILE__).'/testPageUsers.php');
+require_once(dirname(__FILE__).'/testFormConfigTriggerSeverity.php');
 require_once(dirname(__FILE__).'/testFormHost.php');
 require_once(dirname(__FILE__).'/testFormHostGroup.php');
 require_once(dirname(__FILE__).'/testFormLogin.php');
@@ -91,6 +92,7 @@ class SeleniumTests
 		$suite->addTestSuite('testPageTemplates');
 		$suite->addTestSuite('testPageUserGroups');
 		$suite->addTestSuite('testPageUsers');
+		$suite->addTestSuite('testFormConfigTriggerSeverity');
 		$suite->addTestSuite('testFormHost');
 		$suite->addTestSuite('testFormHostGroup');
 		$suite->addTestSuite('testFormLogin');

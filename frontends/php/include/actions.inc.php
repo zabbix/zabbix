@@ -127,7 +127,7 @@ function condition_value2str($conditiontype, $value){
 			$str_val = trigger_value2str($value);
 			break;
 		case CONDITION_TYPE_TRIGGER_SEVERITY:
-			$str_val = get_severity_description($value);
+			$str_val = getSeverityCaption($value);
 			break;
 		case CONDITION_TYPE_TIME_PERIOD:
 			$str_val = $value;

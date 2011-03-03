@@ -239,61 +239,80 @@ function get_accessible_triggers($perm, $hostids, $cache=1){
 return $result;
 }
 
-/*
- * Function: getEventColor()
- * Description: convert trigger severity and event value in to the RGB color
- * Author: Aly
- */
-function getEventColor($severity, $value=TRIGGER_VALUE_TRUE){
-	if($value == TRIGGER_VALUE_FALSE) return 'AADDAA';
+function getSeverityStyle($severity, $type=true){
+	$styles = array(
+		TRIGGER_SEVERITY_DISASTER => 'disaster',
+		TRIGGER_SEVERITY_HIGH => 'high',
+		TRIGGER_SEVERITY_AVERAGE => 'average',
+		TRIGGER_SEVERITY_WARNING => 'warning',
+		TRIGGER_SEVERITY_INFORMATION => 'information',
+		TRIGGER_SEVERITY_NOT_CLASSIFIED => 'unknown_trigger',
+	);
 
-	switch($severity){
-		case TRIGGER_SEVERITY_DISASTER: $color='FF0000'; break;
-		case TRIGGER_SEVERITY_HIGH: $color='FF8888'; break;
-		case TRIGGER_SEVERITY_AVERAGE: $color='DDAAAA'; break;
-		case TRIGGER_SEVERITY_WARNING: $color='EFEFCC'; break;
-		case TRIGGER_SEVERITY_INFORMATION: $color='CCE2CC'; break;
-		default: $color='BCBCBC';
-	}
-
-return $color;
+	if(!$type)
+		return 'normal';
+	else if(isset($styles[$severity]))
+		return $styles[$severity];
+	else
+		return '';
 }
 
-/*
- * Function: get_severity_style()
- * Description: convert severity constant in to the CSS style name
- * Author: Aly
- */
-function get_severity_style($severity,$type=true){
+function getSeverityCaption($severity=null){
+	$config = select_config();
+
+	$severities = array(
+		TRIGGER_SEVERITY_NOT_CLASSIFIED => _($config['severity_name_0']),
+		TRIGGER_SEVERITY_INFORMATION => _($config['severity_name_1']),
+		TRIGGER_SEVERITY_WARNING => _($config['severity_name_2']),
+		TRIGGER_SEVERITY_AVERAGE => _($config['severity_name_3']),
+		TRIGGER_SEVERITY_HIGH => _($config['severity_name_4']),
+		TRIGGER_SEVERITY_DISASTER => _($config['severity_name_5']),
+	);
+
+	if(is_null($severity))
+		return $severities;
+	else if(isset($severities[$severity]))
+		return $severities[$severity];
+	else return _('Unknown');
+}
+
+function getSeverityColor($severity, $value=TRIGGER_VALUE_TRUE){
+	if($value == TRIGGER_VALUE_FALSE) return 'AAFFAA';
+
+	$config = select_config();
+
 	switch($severity){
-		case TRIGGER_SEVERITY_DISASTER: $style='disaster'; break;
-		case TRIGGER_SEVERITY_HIGH: $style='high'; break;
-		case TRIGGER_SEVERITY_AVERAGE: $style='average'; break;
-		case TRIGGER_SEVERITY_WARNING: $style='warning'; break;
+		case TRIGGER_SEVERITY_DISASTER:
+			$color = $config['severity_color_5'];
+			break;
+		case TRIGGER_SEVERITY_HIGH:
+			$color = $config['severity_color_4'];
+			break;
+		case TRIGGER_SEVERITY_AVERAGE:
+			$color = $config['severity_color_3'];
+			break;
+		case TRIGGER_SEVERITY_WARNING:
+			$color = $config['severity_color_2'];
+			break;
 		case TRIGGER_SEVERITY_INFORMATION:
-		default: $style='information';
+			$color = $config['severity_color_1'];
+			break;
+		case TRIGGER_SEVERITY_NOT_CLASSIFIED:
+			$color = $config['severity_color_0'];
+			break;
+		default:
+			$color = $config['severity_color_0'];
 	}
 
-	if(!$type) $style='normal';//$style.='_empty';
-return $style;
+	return $color;
 }
 
-/*
- * Function: getSeverityCaption()
- * Description: convert severity constant in to the CSS style name
- * Author: Aly
- */
-function getSeverityCaption($severity){
-	switch($severity){
-		case TRIGGER_SEVERITY_DISASTER: $caption=S_DISASTER; break;
-		case TRIGGER_SEVERITY_HIGH:		$caption=S_HIGH; break;
-		case TRIGGER_SEVERITY_AVERAGE:	$caption=S_AVERAGE; break;
-		case TRIGGER_SEVERITY_WARNING:	$caption=S_WARNING; break;
-		case TRIGGER_SEVERITY_INFORMATION: $caption=S_INFORMATION; break;
-		default: $caption=S_NOT_CLASSIFIED;
+function getSeverityCell($severity, $text=null, $force_normal=false){
+	if($text === null){
+		$text = getSeverityCaption($severity);
 	}
 
-return $caption;
+	return new CCol($text, getSeverityStyle($severity, !$force_normal));
 }
 
 /*
@@ -319,35 +338,6 @@ return $caption;
 		$status = ($rows=DBfetch(DBselect($sql,1)))?$rows['priority']:0;
 
 	return $status;
-	}
-
-/*
- * Function: get_severity_description
- *
- * Description:
- *	 convert severity constant in to the string representation
- *
- * Author:
- *	 Eugene Grigorjev (eugene.grigorjev@zabbix.com)
- *
- * Comments:
- *
- */
-	function get_severity_description($severity=null){
-		$severities = array(
-			TRIGGER_SEVERITY_NOT_CLASSIFIED => S_NOT_CLASSIFIED,
-			TRIGGER_SEVERITY_INFORMATION => S_INFORMATION,
-			TRIGGER_SEVERITY_WARNING => S_WARNING,
-			TRIGGER_SEVERITY_AVERAGE => S_AVERAGE,
-			TRIGGER_SEVERITY_HIGH => S_HIGH,
-			TRIGGER_SEVERITY_DISASTER => S_DISASTER,
-		);
-
-		if(is_null($severity))
-			return $severities;
-		else if(isset($severities[$severity]))
-			return $severities[$severity];
-		else return S_UNKNOWN;
 	}
 
 	function get_trigger_value_style($value){
@@ -2000,7 +1990,7 @@ function utf8RawUrlDecode($source){
 
 			switch($trhosts[$hostname]['value']){
 				case TRIGGER_VALUE_TRUE:
-					$css_class = get_severity_style($trhosts[$hostname]['priority']);
+					$css_class = getSeverityStyle($trhosts[$hostname]['priority']);
 					$ack = null;
 
 					if($config['event_ack_enable'] == 1){
@@ -2432,7 +2422,7 @@ function utf8RawUrlDecode($source){
 
 		$table->addRow(array(S_HOST, $trigger['host']));
 		$table->addRow(array(S_TRIGGER, $trigger['description']));
-		$table->addRow(array(S_SEVERITY, new CCol(get_severity_description($trigger['priority']), get_severity_style($trigger['priority']))));
+		$table->addRow(array(S_SEVERITY, getSeverityCell($trigger['priority'])));
 		$table->addRow(array(S_EXPRESSION, $expression));
 		$table->addRow(array(S_EVENT_GENERATION, S_NORMAL.((TRIGGER_MULT_EVENT_ENABLED==$trigger['type'])?SPACE.'+'.SPACE.S_MULTIPLE_PROBLEM_EVENTS:'')));
 		$table->addRow(array(S_DISABLED, ((TRIGGER_STATUS_ENABLED==$trigger['status'])?new CCol(S_NO,'off'):new CCol(S_YES,'on')) ));

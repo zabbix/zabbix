@@ -485,6 +485,18 @@ FIELD		|discovery_groupid|t_id		|	|NOT NULL	|ZBX_SYNC		|2|groups	|groupid	|RESTR
 FIELD		|max_in_table	|t_integer	|'50'	|NOT NULL	|ZBX_SYNC
 FIELD		|search_limit	|t_integer	|'1000'	|NOT NULL	|ZBX_SYNC
 FIELD		|ns_support	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|severity_color_0|t_varchar(6)	|'DBDBDB'|NOT NULL	|ZBX_SYNC
+FIELD		|severity_color_1|t_varchar(6)	|'D6F6FF'|NOT NULL	|ZBX_SYNC
+FIELD		|severity_color_2|t_varchar(6)	|'FFF6A5'|NOT NULL	|ZBX_SYNC
+FIELD		|severity_color_3|t_varchar(6)	|'FFB689'|NOT NULL	|ZBX_SYNC
+FIELD		|severity_color_4|t_varchar(6)	|'FF9999'|NOT NULL	|ZBX_SYNC
+FIELD		|severity_color_5|t_varchar(6)	|'FF3838'|NOT NULL	|ZBX_SYNC
+FIELD		|severity_name_0|t_varchar(32)	|'Not classified'|NOT NULL	|ZBX_SYNC
+FIELD		|severity_name_1|t_varchar(32)	|'Information'|NOT NULL	|ZBX_SYNC
+FIELD		|severity_name_2|t_varchar(32)	|'Warning'|NOT NULL	|ZBX_SYNC
+FIELD		|severity_name_3|t_varchar(32)	|'Average'|NOT NULL	|ZBX_SYNC
+FIELD		|severity_name_4|t_varchar(32)	|'High'	|NOT NULL	|ZBX_SYNC
+FIELD		|severity_name_5|t_varchar(32)	|'Disaster'|NOT NULL	|ZBX_SYNC
 
 TABLE|functions|functionid|ZBX_SYNC
 FIELD		|functionid	|t_id		|	|NOT NULL	|0

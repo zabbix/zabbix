@@ -1086,16 +1086,6 @@ switch($itemType) {
 
 				if($trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN) $trigger['error'] = '';
 
-				switch($trigger['priority']){
-					case 0: $priority = S_NOT_CLASSIFIED; break;
-					case 1: $priority = new CCol(S_INFORMATION, 'information'); break;
-					case 2: $priority = new CCol(S_WARNING, 'warning'); break;
-					case 3: $priority = new CCol(S_AVERAGE, 'average'); break;
-					case 4: $priority = new CCol(S_HIGH, 'high'); break;
-					case 5: $priority = new CCol(S_DISASTER, 'disaster'); break;
-					default: $priority = $trigger['priority'];
-				}
-
 				if($trigger['status'] == TRIGGER_STATUS_DISABLED){
 					$tstatus = new CSpan(S_DISABLED, 'disabled');
 				}
@@ -1104,7 +1094,7 @@ switch($itemType) {
 				}
 
 				$trigger_hint->addRow(array(
-					$priority,
+					getSeverityCell($trigger['priority']),
 					$tr_description,
 					explode_exp($trigger['expression'], 1),
 					$tstatus,
