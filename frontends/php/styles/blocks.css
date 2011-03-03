@@ -458,7 +458,7 @@ table.calendartab tr td:hover{
 	cursor: pointer;
 }
 
-table.calendartab tr td.hollyday{
+table.calendartab tr td.holiday{
 	background-color:#AADDEE;
 }
 
