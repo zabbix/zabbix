@@ -26,11 +26,11 @@ $severityTab = new CFormList('scriptsTab');
 
 $severityForm = new CForm();
 $severityForm->setName('triggerSeverity');
-$severityForm->addVar('form', $this->data['form']);
-$severityForm->addVar('form_refresh', $this->data['form_refresh'] + 1);
+$severityForm->addVar('form', $data['form']);
+$severityForm->addVar('form_refresh', $data['form_refresh'] + 1);
 
 if($this->data['form_refresh']){
-	$config = $this->data['config'];
+	$config = $data['config'];
 }
 else{
 	$config = select_config(false);
