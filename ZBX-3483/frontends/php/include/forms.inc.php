@@ -1521,38 +1521,6 @@
 		// http items only for internal processes
 		unset($types[ITEM_TYPE_HTTPTEST]);
 
-/*		switch ($type) {
-		case ITEM_TYPE_DB_MONITOR:
-			if (zbx_empty($key) || $key == 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]' ||
-					$key == 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]')
-				$key = 'db.odbc.select[<unique short description>]';
-			if (zbx_empty($params))
-				$params = "DSN=<database source name>\nuser=<user name>\npassword=<password>\nsql=<query>";
-			break;
-		case ITEM_TYPE_SSH:
-			if (zbx_empty($key) || $key == 'db.odbc.select[<unique short description>]' ||
-					$key == 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]')
-				$key = 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]';
-			if (0 == strncmp($params, "DSN=<database source name>", 26))
-				$params = '';
-			break;
-		case ITEM_TYPE_TELNET:
-			if (zbx_empty($key) || $key == 'db.odbc.select[<unique short description>]' ||
-					$key == 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]')
-				$key = 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]';
-			if (0 == strncmp($params, "DSN=<database source name>", 26))
-				$params = '';
-			break;
-		default:
-			if ($key == 'db.odbc.select[<unique short description>]' ||
-					$key == 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]' ||
-					$key == 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]')
-				$key = '';
-			if (0 == strncmp($params, "DSN=<database source name>", 26))
-				$params = '';
-			break;
-		}*/
-
 		if(isset($_REQUEST['itemid'])){
 			$frmItem->addVar('itemid', $_REQUEST['itemid']);
 
@@ -1808,8 +1776,8 @@
 				'T');
 
 		$frmItem->addRow(S_KEY, array(new CTextBox('key',$key,40,$limited), $btnSelect));
-		foreach($types as $it) {
-			switch($it) {
+		foreach($types as $it => $ilabel) {
+			switch($it){
 				case ITEM_TYPE_DB_MONITOR:
 					zbx_subarray_push($typeVisibility, $it, array('id'=>'key','defaultValue'=> 'db.odbc.select[<unique short description>]'));
 				break;
@@ -1991,7 +1959,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$row = new CRow(array(new CCol(S_UPDATE_INTERVAL_IN_SEC,'form_row_l'), new CCol(new CNumericBox('delay',$delay,5),'form_row_r')));
 		$row->setAttribute('id', 'row_delay');
 		$frmItem->addRow($row);
-		foreach($types as $it) {
+		foreach($types as $it => $ilabel) {
 			if($it == ITEM_TYPE_TRAPPER) continue;
 			zbx_subarray_push($typeVisibility, $it, 'delay');
 			zbx_subarray_push($typeVisibility, $it, 'row_delay');
@@ -2012,7 +1980,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$row->setAttribute('id', 'row_new_delay_flex');
 		$frmItem->addRow($row);
 
-		foreach($types as $it) {
+		foreach($types as $it => $ilabel){
 			if($it == ITEM_TYPE_TRAPPER || $it == ITEM_TYPE_ZABBIX_ACTIVE) continue;
 			zbx_subarray_push($typeVisibility, $it, 'row_flex_intervals');
 			zbx_subarray_push($typeVisibility, $it, 'row_new_delay_flex');

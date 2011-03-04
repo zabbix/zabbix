@@ -69,25 +69,25 @@
 	function item_type2str($type=null){
 		$types = array(
 			ITEM_TYPE_ZABBIX => S_ZABBIX_AGENT,
-			ITEM_TYPE_SNMPV1 => S_SNMPV1_AGENT,
-			ITEM_TYPE_TRAPPER => S_ZABBIX_TRAPPER,
-			ITEM_TYPE_SIMPLE => S_SIMPLE_CHECK,
-			ITEM_TYPE_SNMPV2C => S_SNMPV2_AGENT,
-			ITEM_TYPE_INTERNAL => S_ZABBIX_INTERNAL,
-			ITEM_TYPE_SNMPV3 => S_SNMPV3_AGENT,
 			ITEM_TYPE_ZABBIX_ACTIVE => S_ZABBIX_AGENT_ACTIVE,
+			ITEM_TYPE_SIMPLE => S_SIMPLE_CHECK,
+			ITEM_TYPE_SNMPV1 => S_SNMPV1_AGENT,
+			ITEM_TYPE_SNMPV2C => S_SNMPV2_AGENT,
+			ITEM_TYPE_SNMPV3 => S_SNMPV3_AGENT,
+			ITEM_TYPE_INTERNAL => S_ZABBIX_INTERNAL,
+			ITEM_TYPE_TRAPPER => S_ZABBIX_TRAPPER,
 			ITEM_TYPE_AGGREGATE => S_ZABBIX_AGGREGATE,
-			ITEM_TYPE_HTTPTEST => S_WEB_MONITORING,
 			ITEM_TYPE_EXTERNAL => S_EXTERNAL_CHECK,
 			ITEM_TYPE_DB_MONITOR => S_ZABBIX_DATABASE_MONITOR,
 			ITEM_TYPE_IPMI => S_IPMI_AGENT,
 			ITEM_TYPE_SSH => S_SSH_AGENT,
 			ITEM_TYPE_TELNET => S_TELNET_AGENT,
 			ITEM_TYPE_CALCULATED => S_CALCULATED,
+			ITEM_TYPE_HTTPTEST => S_WEB_MONITORING,
 		);
 
 		if(is_null($type)){
-			natsort($types);
+//			natsort($types);
 			return $types;
 		}
 		else if(isset($types[$type]))
@@ -154,7 +154,7 @@
 	 * Comments:
 	 *
 	 */
-	function	item_status2str($status){
+	function item_status2str($status){
 		switch($status){
 			case ITEM_STATUS_ACTIVE:	$status = S_ACTIVE;		break;
 			case ITEM_STATUS_DISABLED:	$status = S_DISABLED;		break;
@@ -736,77 +736,6 @@
 
 			if(!array_key_exists($var_name,$item)){
 				$item[$var_name] = $item_data[$var_name];
-			}
-		}
-
-
-		/**
-		 * @var array Fields as replace default
-		 * @todo Add all other fields
-		 */
-		$defaultRules = array(
-			'type' => array(
-				ITEM_TYPE_SSH => array('username', 'password', 'authtype', 'publickey', 'privatekey'),
-				ITEM_TYPE_TELNET => array('username', 'password'),
-			),
-			'authtype' => array(
-				ITEM_AUTHTYPE_PASSWORD => array('username', 'password'),
-				ITEM_AUTHTYPE_PUBLICKEY => array('username', 'password', 'publickey', 'privatekey'),
-			)
-		);
-
-		/**
-		 * @var array Fields to require
-		 * @todo Add all other fields
-		 */
-		$requireRules = array(
-			'authtype2' => array(
-				'type' => array(ITEM_TYPE_SSH)
-			),
-			'username' => array(
-				'type' => array(ITEM_TYPE_SSH, ITEM_TYPE_TELNET),
-				//'authtype' => array(ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY)
-			),
-			'password' => array(
-				'type' => array(ITEM_TYPE_SSH, ITEM_TYPE_TELNET),
-				//'authtype' => array(ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY)
-			),
-			'publickey' => array(
-				'type' => array(ITEM_TYPE_SSH),
-				'authtype' => array(ITEM_AUTHTYPE_PUBLICKEY)
-			),
-			'privatekey' => array(
-				'type' => array(ITEM_TYPE_SSH),
-				'authtype' => array(ITEM_AUTHTYPE_PUBLICKEY)
-			),
-		);
-
-		/**
-		 * @var array Default item fields value
-		 * @todo Add all other fields
-		 */
-		$defaultItemValue = array(
-			'authtype' => 0, 'username' => '', 'password' => '', 'publickey' => '', 'privatekey' => '',
-		);
-
-
-		foreach($item as $field => $value){
-			if(isset($requireRules[$field]) && !empty($value)){
-
-				foreach($requireRules[$field] as $requireField => $allowArray){
-					if(isset($item[$requireField] ) && !in_array($item[$requireField], $allowArray)){
-						unset($item[$field]);
-					}
-					else if(!in_array($item_data[$requireField], $allowArray)){
-						unset($item[$field]);
-					}
-				}
-			}
-		}
-
-		if(isset($item['type']) && $item['type'] != $item_data['type'] && isset($defaultRules['type'][$item_data['type']])){
-			foreach($defaultRules['type'][$item_data['type']] as $field){
-				if(!isset($item[$field]) || empty($item[$field])) $item[$field] = $defaultItemValue[$field];
 			}
 		}
 
