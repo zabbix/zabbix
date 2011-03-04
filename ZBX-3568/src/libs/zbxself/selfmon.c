@@ -435,14 +435,13 @@ void	collect_selfmon_stats()
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	get_selfmon_stats(unsigned char process_type, unsigned char aggr_func, int process_num,
+void	get_selfmon_stats(unsigned char process_type, unsigned char aggr_func, int process_num,
 		unsigned char state, double *value)
 {
-	const char		*__function_name = "get_selfmon_stats";
-	unsigned int		total = 0, counter = 0;
-	zbx_stat_process_t	*process = NULL;
-	unsigned char		s;
-	int			process_forks, current, res = SUCCEED;
+	const char	*__function_name = "get_selfmon_stats";
+	unsigned int	total = 0, counter = 0;
+	unsigned char	s;
+	int		process_forks, current;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -451,13 +450,13 @@ int	get_selfmon_stats(unsigned char process_type, unsigned char aggr_func, int p
 	switch (aggr_func)
 	{
 		case ZBX_AGGR_FUNC_ONE:
-			assert(process_num <= process_forks);
+			assert(0 < process_num && process_num <= process_forks);
 			process_forks = process_num--;
 			break;
 		case ZBX_AGGR_FUNC_AVG:
 		case ZBX_AGGR_FUNC_MAX:
 		case ZBX_AGGR_FUNC_MIN:
-			assert(0 == process_num);
+			assert(0 == process_num && 0 < process_forks);
 			break;
 		default:
 			assert(0);
@@ -473,7 +472,8 @@ int	get_selfmon_stats(unsigned char process_type, unsigned char aggr_func, int p
 
 	for (; process_num < process_forks; process_num++)
 	{
-		unsigned short	one_total = 0, one_counter;
+		zbx_stat_process_t	*process;
+		unsigned short		one_total = 0, one_counter;
 
 		process = &collector->process[process_type][process_num];
 
@@ -505,18 +505,12 @@ int	get_selfmon_stats(unsigned char process_type, unsigned char aggr_func, int p
 		}
 	}
 
-	if (NULL == process)
-		res = NOTSUPPORTED;
-
 unlock:
 	UNLOCK_SM;
 
-	if (SUCCEED == res)
-		*value = (0 == total ? 0 : 100. * (double)counter / (double)total);
+	*value = (0 == total ? 0 : 100. * (double)counter / (double)total);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
-
-	return res;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************

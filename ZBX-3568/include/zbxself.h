@@ -61,7 +61,7 @@ void	init_selfmon_collector();
 void	free_selfmon_collector();
 void	update_selfmon_counter(unsigned char state);
 void	collect_selfmon_stats();
-int	get_selfmon_stats(unsigned char process_type, unsigned char aggr_func, int process_num,
+void	get_selfmon_stats(unsigned char process_type, unsigned char aggr_func, int process_num,
 		unsigned char state, double *value);
 void	zbx_sleep_loop(int sleeptime);
 
