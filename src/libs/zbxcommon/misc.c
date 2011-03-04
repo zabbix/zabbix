@@ -1617,7 +1617,7 @@ int	is_ushort(const char *str, unsigned short *value)
 int	is_boolean(const char *str, zbx_uint64_t *value)
 {
 	int	res;
-	char	tmp[8];
+	char	tmp[16];
 
 	strscpy(tmp, str);
 	zbx_strlower(tmp);

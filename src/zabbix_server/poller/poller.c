@@ -588,19 +588,19 @@ static int	get_values(unsigned char poller_type)
 
 	/* retrieve item values */
 
-	if (SUCCEED != is_bunch_poller(poller_type))
+	if (SUCCEED == errcodes[0])
 	{
-		if (SUCCEED == errcodes[0])
+		if (SUCCEED != is_bunch_poller(poller_type))
 		{
 			errcodes[0] = get_value(&items[0], &results[0]);
 			zbx_timespec(&timespecs[0]);
 		}
-	}
-	else if (ZBX_POLLER_TYPE_JAVA == poller_type)
-	{
-		alarm(CONFIG_TIMEOUT);
-		get_values_java(ZBX_JAVA_PROXY_REQUEST_JMX, items, results, errcodes, timespecs, num);
-		alarm(0);
+		else if (ZBX_POLLER_TYPE_JAVA == poller_type)
+		{
+			alarm(CONFIG_TIMEOUT);
+			get_values_java(ZBX_JAVA_PROXY_REQUEST_JMX, items, results, errcodes, timespecs, num);
+			alarm(0);
+		}
 	}
 
 	/* process item values */
