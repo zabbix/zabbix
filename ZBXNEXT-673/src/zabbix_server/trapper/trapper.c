@@ -418,6 +418,7 @@ void	main_trapper_loop(unsigned char p, zbx_sock_t *s)
 {
 	const char	*__function_name = "main_trapper_loop";
 
+	zabbix_set_log_level(LOG_LEVEL_DEBUG);
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	set_child_signal_handler();
