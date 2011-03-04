@@ -6,12 +6,7 @@ jQuery(document).ready(function(){
 
 // Type change
 	jQuery("#type").change(function(){
-		if(jQuery(this).val() == 0){
-			jQuery("#execute_on").closest('li').show();
-		}
-		else{
-			jQuery("#execute_on").closest('li').hide();
-		}
+		jQuery("#execute_on").closest('li').toggle((jQuery(this).val() == '0'));
 	}).change();
 
 // Clone button

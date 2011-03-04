@@ -86,7 +86,7 @@
 	$typeRB->makeVertical();
 	$typeRB->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT);
 	$typeRB->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER);
-	$scriptTab->addRow(_('Execute on'), $typeRB, ($type == ZBX_SCRIPT_TYPE_IPMI));
+	$scriptTab->addRow(_('Execute on'), new CDiv($typeRB, 'objectgroup inlineblock border_dotted ui-corner-all'), ($type == ZBX_SCRIPT_TYPE_IPMI));
 
 // COMMAND
 	$commandTA = new CTextArea('command', $command);
