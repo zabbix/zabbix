@@ -1880,24 +1880,25 @@ static const char	*ex_macros[] = {MVAR_PROFILE_DEVICETYPE, MVAR_PROFILE_NAME, MV
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: example: " {Zabbix server:{TRIGGER.KEY1}.last(0)} " to "1.34"    *
- *                      ^ - bl                                ^ - br          *
+ *                 bl - ^                                br - ^      ^        *
+ *                                                       replace_to -|        *
  *                                                                            *
  ******************************************************************************/
 static void	get_trigger_function_value(zbx_uint64_t triggerid, char **replace_to, char *bl, char **br)
 {
-	char	*p = bl + 1, *host = NULL, *key = NULL, *function = NULL, *parameter = NULL;
+	char	*p, *host = NULL, *key = NULL, *function = NULL, *parameter = NULL;
 	int	N_functionid, res = SUCCEED;
 	size_t	sz;
 
-	sz = strlen(MVAR_HOSTNAME) - 1;
+	p = bl + 1;
+	sz = sizeof(MVAR_HOSTNAME) - 2;
 
 	if (0 == strncmp(p, MVAR_HOSTNAME, sz) && ('}' == p[sz] ||
 			('}' == p[sz + 1] && '1' <= p[sz] && p[sz] <= '9')))
 	{
 		N_functionid = ('}' == p[sz] ? 1 : p[sz] - '0');
 		p += sz + ('}' == p[sz] ? 1 : 2);
-		if (FAIL == DBget_trigger_value_by_triggerid(triggerid, &host, N_functionid, ZBX_REQUEST_HOST_NAME))
-			host = zbx_strdup(host, STR_UNKNOWN_VARIABLE);
+		DBget_trigger_value_by_triggerid(triggerid, &host, N_functionid, ZBX_REQUEST_HOST_NAME);
 	}
 	else
 		res = parse_host(&p, &host);
@@ -1905,15 +1906,14 @@ static void	get_trigger_function_value(zbx_uint64_t triggerid, char **replace_to
 	if (SUCCEED != res || ':' != *p++)
 		goto fail;
 
-	sz = strlen(MVAR_TRIGGER_KEY) - 1;
+	sz = sizeof(MVAR_TRIGGER_KEY) - 2;
 
 	if (0 == strncmp(p, MVAR_TRIGGER_KEY, sz) && ('}' == p[sz] ||
 			('}' == p[sz + 1] && '1' <= p[sz] && p[sz] <= '9')))
 	{
 		N_functionid = ('}' == p[sz] ? 1 : p[sz] - '0');
 		p += sz + ('}' == p[sz] ? 1 : 2);
-		if (FAIL == DBget_trigger_value_by_triggerid(triggerid, &key, N_functionid, ZBX_REQUEST_ITEM_KEY_ORIG))
-			key = zbx_strdup(key, STR_UNKNOWN_VARIABLE);
+		DBget_trigger_value_by_triggerid(triggerid, &key, N_functionid, ZBX_REQUEST_ITEM_KEY_ORIG);
 	}
 	else
 		res = parse_key(&p, &key);
@@ -1927,7 +1927,8 @@ static void	get_trigger_function_value(zbx_uint64_t triggerid, char **replace_to
 	/* function 'evaluate_macro_function' requires 'replace_to' with size 'MAX_BUFFER_LEN' */
 	*replace_to = zbx_realloc(*replace_to, MAX_BUFFER_LEN);
 
-	if (SUCCEED != evaluate_macro_function(*replace_to, host, key, function, parameter))
+	if (NULL == host || NULL == key ||
+			SUCCEED != evaluate_macro_function(*replace_to, host, key, function, parameter))
 		zbx_strlcpy(*replace_to, STR_UNKNOWN_VARIABLE, MAX_BUFFER_LEN);
 
 	*br = p;
@@ -1979,11 +1980,11 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ITEM *item, DC_HOST *dc_host,
 	if (macro_type & MACRO_TYPE_TRIGGER_DESCRIPTION)
 		expand_trigger_description_constants(data, event->objectid);
 
-	data_alloc = data_len = strlen(*data) + 1;
-
 	p = *data;
 	if (NULL == (m = bl = strchr(p, '{')))
 		return res;
+
+	data_alloc = data_len = strlen(*data) + 1;
 
 	for (; NULL != bl && SUCCEED == res; m = bl = strchr(p, '{'))
 	{
