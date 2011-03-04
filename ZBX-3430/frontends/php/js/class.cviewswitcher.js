@@ -16,7 +16,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-
+var allObj = {};
 var CViewSwitcher = Class.create({
 inAction:			false,
 mainObj:			null,
@@ -50,6 +50,8 @@ initialize : function(objId, objAction, confData){
 		addListener(this.mainObj, objAction[i], this.rebuildView.bindAsEventListener(this));
 	}
 
+	allObj[objId] = this;
+
 	this.hideAllObjs();
 	this.rebuildView();
 },
@@ -67,6 +69,9 @@ rebuildView: function(e){
 			if(empty(this.depObjects[this.lastValue][key])) continue;
 
 			this.hideObj(this.depObjects[this.lastValue][key]);
+
+			if(isset(this.depObjects[this.lastValue][key].id, allObj))
+				allObj[this.depObjects[this.lastValue][key].id].rebuildView();
 		}
 	}
 
@@ -75,6 +80,9 @@ rebuildView: function(e){
 			if(empty(this.depObjects[myValue][key])) continue;
 
 			this.showObj(this.depObjects[myValue][key]);
+
+			if(isset(this.depObjects[myValue][key].id, allObj))
+				allObj[this.depObjects[myValue][key].id].rebuildView();
 		}
 	}
 

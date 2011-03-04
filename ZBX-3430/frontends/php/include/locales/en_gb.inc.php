@@ -640,7 +640,7 @@
 
 //	Footer
 	'S_ZABBIX'=>				'Zabbix',
-	'S_COPYRIGHT_BY'=>			'Copyright 2001-2010 by',
+	'S_COPYRIGHT_BY'=>			'Copyright 2001-2011 by',
 	'S_CONNECTED_AS'=>			'Connected as',
 	'S_NOT_CONNECTED'=>			'Not connected',
 	'S_SIA_ZABBIX'=>			'SIA Zabbix',
@@ -1232,6 +1232,7 @@
 	'S_MAINTENANCE_BIG'=>			'MAINTENANCE',
 
 //	sysmaps.php
+	'S_NO_PERMISSIONS_OR_MAP_DOES_NOT_EXIST' => 'No permissions or map does not exist.',
 	'S_IMAGE_IS_USED_IN_ZABBIX_MAP' => 'Image is used in Zabbix map',
 	'S_EDIT_MAP_ELEMENT'=>			'Edit map element',
 	'S_ICON_DEFAULT'=>			'Icon (default)',
@@ -1300,7 +1301,7 @@
 	'S_ELEMENT_NAME'=>		'Element name',
 	'S_STATUS_ONLY'=>		'Status only',
 	'S_NOTHING'=>			'Nothing',
-	'S_MAPS_DATE_FORMAT'=>           'm.d.Y H:i:s',
+	'S_MAPS_DATE_FORMAT'=>	'Y.m.d H:i:s',
 
 //	media.php
 	'S_CONFIGURATION_OF_MEDIA_TYPES_BIG'=>	'CONFIGURATION OF MEDIA TYPES',

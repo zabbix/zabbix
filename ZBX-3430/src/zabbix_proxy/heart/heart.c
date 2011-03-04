@@ -21,9 +21,12 @@
 #include "daemon.h"
 #include "log.h"
 #include "zbxjson.h"
+#include "zbxself.h"
 
 #include "heart.h"
 #include "../servercomms.h"
+
+extern unsigned char	process_type;
 
 /******************************************************************************
  *                                                                            *
@@ -75,40 +78,24 @@ static void	send_heartbeat()
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void main_heart_loop()
+void	main_heart_loop()
 {
-	struct	sigaction phan;
 	int	start, sleeptime;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_heart_loop()");
 
-        phan.sa_sigaction = child_signal_handler;
-	sigemptyset(&phan.sa_mask);
-	phan.sa_flags = SA_SIGINFO;
-	sigaction(SIGALRM, &phan, NULL);
+	set_child_signal_handler();
 
-	if (CONFIG_HEARTBEAT_FREQUENCY == 0) {
-		zbx_setproctitle("heartbeat sender [do nothing]");
-
-		for (;;) /* Do nothing */
-			sleep(3600);
-	}
-
-	for (;;) {
+	for (;;)
+	{
 		start = time(NULL);
 
-		zbx_setproctitle("heartbeat sender [sending heartbeat message]");
+		zbx_setproctitle("%s [sending heartbeat message]", get_process_type_string(process_type));
 
 		send_heartbeat();
 
 		sleeptime = CONFIG_HEARTBEAT_FREQUENCY - (time(NULL) - start);
 
-		if (sleeptime > 0) {
-			zbx_setproctitle("heartbeat sender [sleeping for %d seconds]",
-					sleeptime);
-			zabbix_log(LOG_LEVEL_DEBUG, "Sleeping for %d seconds",
-					sleeptime);
-			sleep(sleeptime);
-		}
+		zbx_sleep_loop(sleeptime);
 	}
 }

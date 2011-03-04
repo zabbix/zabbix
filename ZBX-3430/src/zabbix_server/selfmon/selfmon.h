@@ -1,6 +1,6 @@
 /*
-** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,38 +17,9 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#ifndef ZABBIX_INTERFACES_H
-#define ZABBIX_INTERFACES_H
+#ifndef ZABBIX_SELFMON_H
+#define ZABBIX_SELFMON_H
 
-#define	MAX_INTERFACE	(16)
+void	main_selfmon_loop();
 
-typedef struct s_single_interface_data
-{
-	char    *name;
-	int	clock[60*15];
-	double	sent[60*15];
-	double	received[60*15];
-} ZBX_SINGLE_INTERFACE_DATA;
-
-typedef struct s_interfaces_data
-{
-	ZBX_SINGLE_INTERFACE_DATA intfs[MAX_INTERFACE];
-} ZBX_INTERFACES_DATA;
-
-void	collect_stats_interfaces(ZBX_INTERFACES_DATA *pinterfaces);
-
-/*
-#define	MAX_INTERFACE	16
-
-#define INTERFACE struct interface_type
-INTERFACE
-{
-	char    *interface;
-	int	clock[60*15];
-	double	sent[60*15];
-	double	received[60*15];
-};
-
-void	collect_stats_interfaces(FILE *outfile);
-*/
 #endif

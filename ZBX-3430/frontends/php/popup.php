@@ -373,13 +373,14 @@ include_once('include/page_header.php');
 		if(!isset($ok)) $nodeid = get_current_nodeid();
 		unset($ok);
 
-		if(str_in_array($srctbl,array('hosts_and_templates', 'hosts','templates','triggers','items','applications','host_templates','graphs','simple_graph','plain_text'))){
+		if(str_in_array($srctbl,array('hosts_and_templates','hosts','templates','triggers','items','applications','host_templates','graphs','simple_graph','plain_text'))){
 			$frmTitle->addItem(array(S_GROUP,SPACE, $pageFilter->getGroupsCB(true)));
 		}
 
 		if(str_in_array($srctbl,array('help_items'))){
 			$itemtype = get_request('itemtype',CProfile::get('web.popup.itemtype',0));
 			$cmbTypes = new CComboBox('itemtype',$itemtype,'javascript: submit();');
+
 			foreach($allowed_item_types as $type)
 				$cmbTypes->addItem($type, item_type2str($type));
 			$frmTitle->addItem(array(S_TYPE,SPACE,$cmbTypes));
@@ -703,12 +704,12 @@ include_once('include/page_header.php');
 		$options = array(
 			'nodeids' => $nodeid,
 			'hostids' => $hostid,
-			'groupids' => $groupid,
 			'output' => API_OUTPUT_EXTEND,
 			'select_hosts' => API_OUTPUT_EXTEND,
 			'select_dependencies' => API_OUTPUT_EXTEND,
 			'expandDescription' => 1,
 		);
+		if(is_null($hostid)) $options['groupids'] = $groupid;
 		if(!is_null($writeonly)) $options['editable'] = 1;
 		if(!is_null($templated)) $options['templated'] = $templated;
 
@@ -733,7 +734,7 @@ include_once('include/page_header.php');
 					$dstfld2 => $trigger[$srcfld2],
 				);
 
-				$js_action = 'javascript: addValues('.zbx_jsvalue($reference).','.zbx_jsvalue($values).'); close_window(); return false;';
+				$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).','.zbx_jsvalue($values).'); return false;';
 			}
 
 			$description->setAttribute('onclick', $js_action);
@@ -809,12 +810,12 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'nodeids' => $nodeid,
-			'groupids' => $groupid,
 			'hostids' => $hostid,
 			'webitems' => 1,
 			'output' => API_OUTPUT_EXTEND,
 			'select_hosts' => API_OUTPUT_EXTEND
 		);
+		if(is_null($hostid)) $options['groupids'] = $groupid;
 		if(!is_null($writeonly)) $options['editable'] = 1;
 		if(!is_null($templated)) $options['templated'] = $templated;
 		if(!is_null($value_types)) $options['filter']['value_type'] = $value_types;
@@ -878,11 +879,11 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'nodeids' => $nodeid,
-			'groupids' => $groupid,
 			'hostids' => $hostid,
 			'output' => API_OUTPUT_EXTEND,
 			'expandData' => true,
 		);
+		if(is_null($hostid)) $options['groupids'] = $groupid;
 		if(!is_null($writeonly)) $options['editable'] = 1;
 		if(!is_null($templated)) $options['templated'] = $templated;
 
@@ -948,6 +949,8 @@ include_once('include/page_header.php');
 			'nodeids' => $nodeid,
 			'select_hosts' => API_OUTPUT_EXTEND
 		);
+
+		if(is_null($hostid)) $options['groupids'] = $groupid;
 		if(!is_null($writeonly)) $options['editable'] = 1;
 		if(!is_null($templated)) $options['templated'] = $templated;
 
@@ -1048,13 +1051,14 @@ include_once('include/page_header.php');
 			'hostids' => $hostid,
 			'output' => API_OUTPUT_EXTEND,
 			'select_hosts' => API_OUTPUT_EXTEND,
-			'webitems' => 1,
-			'templated' => 0,
+			'webitems' => true,
+			'templated' => false,
 			'filter' => array(
 				'value_type' => array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64),
 				'status' => ITEM_STATUS_ACTIVE
 			)
 		);
+		if(is_null($hostid)) $options['groupids'] = $groupid;
 		if(!is_null($writeonly)) $options['editable'] = 1;
 		if(!is_null($templated)) $options['templated'] = $templated;
 
@@ -1131,7 +1135,7 @@ include_once('include/page_header.php');
 			'nodeids' => $nodeid,
 			'output' => API_OUTPUT_EXTEND
 		);
-		if(!is_null($writeonly)) $options['editable'] = 1;
+		if(!is_null($writeonly)) $options['editable'] = true;
 
 		$sysmaps = CMap::get($options);
 		order_result($sysmaps, 'name');
@@ -1188,16 +1192,17 @@ include_once('include/page_header.php');
 			));
 
 		$options = array(
-				'nodeids' => $nodeid,
-				'hostids'=> $hostid,
-				'output' => API_OUTPUT_EXTEND,
-				'select_hosts' => API_OUTPUT_EXTEND,
-				'templated' => 0,
-				'filter' => array(
-					'status' => ITEM_STATUS_ACTIVE
-				),
-				'sortfield'=>'description'
-			);
+			'nodeids' => $nodeid,
+			'hostids'=> $hostid,
+			'output' => API_OUTPUT_EXTEND,
+			'select_hosts' => API_OUTPUT_EXTEND,
+			'templated' => false,
+			'filter' => array(
+				'status' => ITEM_STATUS_ACTIVE
+			),
+			'sortfield'=>'description'
+		);
+		if(is_null($hostid)) $options['groupids'] = $groupid;
 		if(!is_null($writeonly)) $options['editable'] = 1;
 		if(!is_null($templated)) $options['templated'] = $templated;
 

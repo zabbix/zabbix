@@ -370,7 +370,7 @@ exit:
  *                                                                            *
  * Return value: discovered port number, otherwise default port - 10050       *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *

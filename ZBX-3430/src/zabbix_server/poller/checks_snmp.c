@@ -43,7 +43,7 @@ static int		snmpidx_count = 0, snmpidx_alloc = 16;
  *                                                                            *
  * Return value: index of new record                                          *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -187,10 +187,18 @@ static struct snmp_session	*snmp_open_session(DC_ITEM *item, char *err)
 
 	switch (item->type)
 	{
-		case ITEM_TYPE_SNMPv1:	session.version = SNMP_VERSION_1;	break;
-		case ITEM_TYPE_SNMPv2c:	session.version = SNMP_VERSION_2c;	break;
-		case ITEM_TYPE_SNMPv3:	session.version = SNMP_VERSION_3;	break;
-		default:		THIS_SHOULD_NEVER_HAPPEN;		break;
+		case ITEM_TYPE_SNMPv1:
+			session.version = SNMP_VERSION_1;
+			break;
+		case ITEM_TYPE_SNMPv2c:
+			session.version = SNMP_VERSION_2c;
+			break;
+		case ITEM_TYPE_SNMPv3:
+			session.version = SNMP_VERSION_3;
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			break;
 	}
 
 	conn = item->host.useip == 1 ? item->host.ip : item->host.dns;
@@ -202,7 +210,12 @@ static struct snmp_session	*snmp_open_session(DC_ITEM *item, char *err)
 	if (family == PF_INET)
 		zbx_snprintf(addr, sizeof(addr), "%s:%d", conn, item->snmp_port);
 	else
-		zbx_snprintf(addr, sizeof(addr), "udp6:[%s]:%d", conn, item->snmp_port);
+	{
+		if (item->host.useip == 1)
+			zbx_snprintf(addr, sizeof(addr), "udp6:[%s]:%d", conn, item->snmp_port);
+		else
+			zbx_snprintf(addr, sizeof(addr), "udp6:%s:%d", conn, item->snmp_port);
+	}
 #else
 	zbx_snprintf(addr, sizeof(addr), "%s:%d", conn, item->snmp_port);
 #endif	/* HAVE_IPV6 */
@@ -514,7 +527,7 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGEN
 					ptemp = temp + 12;
 				else
 					ptemp = temp;
-				if (FAIL == set_result_type(value, item->value_type, item->data_type, ptemp))
+				if (SUCCEED != set_result_type(value, item->value_type, item->data_type, ptemp))
 					ret = NOTSUPPORTED;
 			}
 			else if (vars->type == ASN_UINTEGER || vars->type == ASN_COUNTER ||

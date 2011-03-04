@@ -1,6 +1,6 @@
 /*
-** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,16 +18,26 @@
 **/
 
 #include "common.h"
+#include "daemon.h"
+#include "zbxself.h"
+#include "log.h"
 
-#include "zbxplugin.h"
+extern unsigned char	process_type;
 
-ZBX_PLUGIN_LIST	*PluginsList = NULL;
-
-
-int add_plugin(char *args)
+void	main_selfmon_loop()
 {
-#ifdef TODO
-#	error Realize plugin functionality!!!
-#endif
-	return 0;
+	const char	*__function_name = "main_selfmon_loop";
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	set_child_signal_handler();
+
+	for (;;)
+	{
+		zbx_setproctitle("%s [processing data]", get_process_type_string(process_type));
+
+		collect_selfmon_stats();
+
+		zbx_sleep_loop(1);
+	}
 }

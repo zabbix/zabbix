@@ -20,8 +20,8 @@
 #ifndef ZABBIX_HEART_H
 #define ZABBIX_HEART_H
 
-extern int CONFIG_HEARTBEAT_FREQUENCY;
+extern int	CONFIG_HEARTBEAT_FREQUENCY;
 
-void main_heart_loop();
+void	main_heart_loop();
 
 #endif

@@ -21,10 +21,8 @@
 #include "stats.h"
 
 #include "log.h"
-#include "mutexs.h"
 #include "zbxconf.h"
 
-#include "interfaces.h"
 #include "diskdevices.h"
 #include "cpustat.h"
 #include "perfstat.h"
@@ -252,7 +250,9 @@ void	free_collector_data()
  ******************************************************************************/
 ZBX_THREAD_ENTRY(collector_thread, args)
 {
-	zabbix_log(LOG_LEVEL_INFORMATION, "zabbix_agentd collector started");
+#if defined(ZABBIX_DAEMON)
+	set_child_signal_handler();
+#endif	/* ZABBIX_DAEMON */
 
 	if (0 != init_cpu_collector(&(collector->cpus)))
 		close_cpu_collector(&(collector->cpus));
@@ -261,17 +261,19 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
+		zbx_setproctitle("collector [processing data]");
+
 		if (CPU_COLLECTOR_STARTED(collector))
 			collect_cpustat(&(collector->cpus));
 #ifdef _WINDOWS
 		collect_perfstat();
 #endif /* _WINDOWS */
 
-		collect_stats_interfaces(&(collector->interfaces)); /* TODO */
-		collect_stats_diskdevices(&(collector->diskdevices)); /* TODO */
+		collect_stats_diskdevices(&(collector->diskdevices));
 #ifdef _AIX
 		collect_vmstat_data(&collector->vmstat);
 #endif
+		zbx_setproctitle("collector [sleeping for 1 seconds]");
 		zbx_sleep(1);
 	}
 

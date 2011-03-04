@@ -31,7 +31,7 @@ static int	__binary_heap_bubble_down(zbx_binary_heap_t *heap, int index);
 
 #define	ARRAY_GROWTH_FACTOR	3/2
 
-#define	HAS_DIRECT_OPTION(heap)	((heap->options & ZBX_BINARY_HEAP_OPTION_DIRECT) != 0)
+#define	HAS_DIRECT_OPTION(heap)	(0 != (heap->options & ZBX_BINARY_HEAP_OPTION_DIRECT))
 
 /* helper functions */
 
@@ -142,10 +142,6 @@ void	zbx_binary_heap_create_ext(zbx_binary_heap_t *heap, zbx_compare_func_t comp
 					zbx_mem_realloc_func_t mem_realloc_func,
 					zbx_mem_free_func_t mem_free_func)
 {
-	const char	*__function_name = "zbx_binary_heap_create";
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() options:%d", __function_name, options);
-
 	heap->elems = NULL;
 	heap->elems_num = 0;
 	heap->elems_alloc = 0;
@@ -168,16 +164,10 @@ void	zbx_binary_heap_create_ext(zbx_binary_heap_t *heap, zbx_compare_func_t comp
 	heap->mem_malloc_func = mem_malloc_func;
 	heap->mem_realloc_func = mem_realloc_func;
 	heap->mem_free_func = mem_free_func;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 void	zbx_binary_heap_destroy(zbx_binary_heap_t *heap)
 {
-	const char	*__function_name = "zbx_binary_heap_destroy";
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
 	if (NULL != heap->elems)
 	{
 		heap->mem_free_func(heap->elems);
@@ -199,20 +189,18 @@ void	zbx_binary_heap_destroy(zbx_binary_heap_t *heap)
 	heap->mem_malloc_func = NULL;
 	heap->mem_realloc_func = NULL;
 	heap->mem_free_func = NULL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 int	zbx_binary_heap_empty(zbx_binary_heap_t *heap)
 {
-	return (heap->elems_num == 0 ? SUCCEED : FAIL);
+	return (0 == heap->elems_num ? SUCCEED : FAIL);
 }
 
 zbx_binary_heap_elem_t	*zbx_binary_heap_find_min(zbx_binary_heap_t *heap)
 {
 	if (0 == heap->elems_num)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Asking for a minimum in an empty heap.");
+		zabbix_log(LOG_LEVEL_CRIT, "asking for a minimum in an empty heap");
 		exit(FAIL);
 	}
 
@@ -221,15 +209,11 @@ zbx_binary_heap_elem_t	*zbx_binary_heap_find_min(zbx_binary_heap_t *heap)
 
 void	zbx_binary_heap_insert(zbx_binary_heap_t *heap, zbx_binary_heap_elem_t *elem)
 {
-	const char	*__function_name = "zbx_binary_heap_insert";
-
-	int		index;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:" ZBX_FS_UI64, __function_name, elem->key);
+	int	index;
 
 	if (HAS_DIRECT_OPTION(heap) && FAIL != zbx_hashmap_get(heap->key_index, elem->key))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Inserting a duplicate key into a heap with direct option.");
+		zabbix_log(LOG_LEVEL_CRIT, "inserting a duplicate key into a heap with direct option");
 		exit(FAIL);
 	}
 
@@ -242,21 +226,15 @@ void	zbx_binary_heap_insert(zbx_binary_heap_t *heap, zbx_binary_heap_elem_t *ele
 
 	if (HAS_DIRECT_OPTION(heap) && index == heap->elems_num - 1)
 		zbx_hashmap_set(heap->key_index, elem->key, index);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 void	zbx_binary_heap_update_direct(zbx_binary_heap_t *heap, zbx_binary_heap_elem_t *elem)
 {
-	const char	*__function_name = "zbx_binary_heap_update_direct";
-
-	int		index;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:" ZBX_FS_UI64, __function_name, elem->key);
+	int	index;
 
 	if (!HAS_DIRECT_OPTION(heap))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Direct update operation is not supported for this heap.");
+		zabbix_log(LOG_LEVEL_CRIT, "direct update operation is not supported for this heap");
 		exit(FAIL);
 	}
 
@@ -269,25 +247,18 @@ void	zbx_binary_heap_update_direct(zbx_binary_heap_t *heap, zbx_binary_heap_elem
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Element with key " ZBX_FS_UI64 " not found in heap for update.",
-				elem->key);
+		zabbix_log(LOG_LEVEL_CRIT, "element with key " ZBX_FS_UI64 " not found in heap for update", elem->key);
 		exit(FAIL);
 	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 void	zbx_binary_heap_remove_min(zbx_binary_heap_t *heap)
 {
-	const char	*__function_name = "zbx_binary_heap_remove_min";
-
-	int		index;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	int	index;
 
 	if (0 == heap->elems_num)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Removing a minimum from an empty heap.");
+		zabbix_log(LOG_LEVEL_CRIT, "removing a minimum from an empty heap");
 		exit(FAIL);
 	}
 
@@ -302,21 +273,15 @@ void	zbx_binary_heap_remove_min(zbx_binary_heap_t *heap)
 		if (HAS_DIRECT_OPTION(heap) && index == 0)
 			zbx_hashmap_set(heap->key_index, heap->elems[index].key, index);
 	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 void	zbx_binary_heap_remove_direct(zbx_binary_heap_t *heap, zbx_uint64_t key)
 {
-	const char	*__function_name = "zbx_binary_heap_remove_direct";
-
-	int		index;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:" ZBX_FS_UI64, __function_name, key);
+	int	index;
 
 	if (!HAS_DIRECT_OPTION(heap))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Direct remove operation is not supported for this heap.");
+		zabbix_log(LOG_LEVEL_CRIT, "direct remove operation is not supported for this heap");
 		exit(FAIL);
 	}
 
@@ -334,20 +299,13 @@ void	zbx_binary_heap_remove_direct(zbx_binary_heap_t *heap, zbx_uint64_t key)
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Element with key " ZBX_FS_UI64 " not found in heap for remove.",
-				key);
+		zabbix_log(LOG_LEVEL_CRIT, "element with key " ZBX_FS_UI64 " not found in heap for remove", key);
 		exit(FAIL);
 	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 void	zbx_binary_heap_clear(zbx_binary_heap_t *heap)
 {
-	const char	*__function_name = "zbx_binary_heap_clear";
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
 	if (NULL != heap->elems)
 	{
 		heap->mem_free_func(heap->elems);
@@ -358,6 +316,4 @@ void	zbx_binary_heap_clear(zbx_binary_heap_t *heap)
 
 	if (HAS_DIRECT_OPTION(heap))
 		zbx_hashmap_clear(heap->key_index);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

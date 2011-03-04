@@ -29,9 +29,9 @@
 
 #if defined(ZABBIX_SERVICE)
 #	include "service.h"
-#elif defined(ZABBIX_DAEMON) /* ZABBIX_SERVICE */
+#elif defined(ZABBIX_DAEMON)	/* ZABBIX_SERVICE */
 #	include "daemon.h"
-#endif /* ZABBIX_DAEMON */
+#endif	/* ZABBIX_DAEMON */
 
 static void	process_listener(zbx_sock_t *s)
 {
@@ -67,37 +67,26 @@ static void	process_listener(zbx_sock_t *s)
 
 ZBX_THREAD_ENTRY(listener_thread, pSock)
 {
-#if defined(ZABBIX_DAEMON)
-	struct	sigaction phan;
-#endif
-	int
-		ret,
-		local_request_failed = 0;
-
+	int		ret, local_request_failed = 0;
 	zbx_sock_t	s;
 
 	assert(pSock);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "zabbix_agentd listener started");
-
 #if defined(ZABBIX_DAEMON)
-	phan.sa_sigaction = child_signal_handler;
-	sigemptyset(&phan.sa_mask);
-	phan.sa_flags = SA_SIGINFO;
-	sigaction(SIGALRM, &phan, NULL);
-#endif
+	set_child_signal_handler();
+#endif	/* ZABBIX_DAEMON */
 
 	memcpy(&s, ((zbx_sock_t *)pSock), sizeof(zbx_sock_t));
 
 	while (ZBX_IS_RUNNING())
 	{
-		zbx_setproctitle("waiting for connection");
+		zbx_setproctitle("listener [waiting for connection]");
 
 		if (SUCCEED == (ret = zbx_tcp_accept(&s)))
 		{
 			local_request_failed = 0;     /* Reset consecutive errors counter */
 
-			zbx_setproctitle("processing request");
+			zbx_setproctitle("listener [processing request]");
 			zabbix_log(LOG_LEVEL_DEBUG, "Processing request.");
 
 			if (SUCCEED == (ret = zbx_tcp_check_security(&s, CONFIG_HOSTS_ALLOWED, 0)))

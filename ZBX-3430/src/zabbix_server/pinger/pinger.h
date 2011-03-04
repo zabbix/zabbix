@@ -20,10 +20,6 @@
 #ifndef ZABBIX_PINGER_H
 #define ZABBIX_PINGER_H
 
-#include "common.h"
-
-extern int	CONFIG_PINGER_FORKS;
-
-void	main_pinger_loop(int num);
+void	main_pinger_loop();
 
 #endif

@@ -1337,10 +1337,10 @@ static int	evaluate_DELTA(char *value, DB_ITEM *item, const char *function, cons
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, const char *parameters)
 {
 	const char	*__function_name = "evaluate_NODATA";
-	int		arg1, flag, res = FAIL;
+	int		arg1, flag, now, res = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1352,6 +1352,8 @@ static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, con
 
 	if (flag != ZBX_FLAG_SEC)
 		return res;
+
+	now = (int)time(NULL);
 
 	if (item->lastclock + arg1 > now)
 		zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
@@ -1931,32 +1933,30 @@ int	evaluate_function(char *value, DB_ITEM *item, const char *function, const ch
 	}
 	else if (0 == strcmp(function, "nodata"))
 	{
-		ret = evaluate_NODATA(value, item, function, parameter, now);
+		ret = evaluate_NODATA(value, item, function, parameter);
 	}
 	else if (0 == strcmp(function, "date"))
 	{
 		tm = localtime(&now);
-		zbx_snprintf(value, MAX_BUFFER_LEN, "%.4d%.2d%.2d",
-				tm->tm_year + 1900,
-				tm->tm_mon + 1,
-				tm->tm_mday);
+		zbx_snprintf(value, MAX_BUFFER_LEN, "%.4d%.2d%.2d", tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday);
 		ret = SUCCEED;
 	}
 	else if (0 == strcmp(function, "dayofweek"))
 	{
 		tm = localtime(&now);
-		/* The number of days since Sunday, in the range 0 to 6. */
-		zbx_snprintf(value, MAX_BUFFER_LEN, "%d",
-				0 == tm->tm_wday ? 7 : tm->tm_wday);
+		zbx_snprintf(value, MAX_BUFFER_LEN, "%d", 0 == tm->tm_wday ? 7 : tm->tm_wday);
+		ret = SUCCEED;
+	}
+	else if (0 == strcmp(function, "dayofmonth"))
+	{
+		tm = localtime(&now);
+		zbx_snprintf(value, MAX_BUFFER_LEN, "%d", tm->tm_mday);
 		ret = SUCCEED;
 	}
 	else if (0 == strcmp(function, "time"))
 	{
 		tm = localtime(&now);
-		zbx_snprintf(value, MAX_BUFFER_LEN, "%.2d%.2d%.2d",
-				tm->tm_hour,
-				tm->tm_min,
-				tm->tm_sec);
+		zbx_snprintf(value, MAX_BUFFER_LEN, "%.2d%.2d%.2d", tm->tm_hour, tm->tm_min, tm->tm_sec);
 		ret = SUCCEED;
 	}
 	else if (0 == strcmp(function, "abschange"))

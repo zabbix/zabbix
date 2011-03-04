@@ -22,9 +22,9 @@
 #include "zlog.h"
 #include "db.h"
 #include "dbcache.h"
-#include "sysinfo.h"
 #include "daemon.h"
 #include "zbxserver.h"
+#include "zbxself.h"
 
 #include "poller.h"
 
@@ -46,8 +46,8 @@
 #define MAX_UNREACHABLE_ITEMS	1	/* must not be greater than MAX_REACHABLE_ITEMS to avoid buffer overflow */
 
 static unsigned char	zbx_process;
-static int		poller_type;
-static int		poller_num;
+extern unsigned char	process_type;
+extern int		process_num;
 
 static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 {
@@ -71,7 +71,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			res = get_value_snmp(item, result);
 			alarm(0);
 #else
-			SET_MSG_RESULT(result, strdup("Support of SNMP parameters was not compiled in"));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for SNMP checks was not compiled in"));
 			res = NOTSUPPORTED;
 #endif
 			break;
@@ -79,14 +79,13 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 #ifdef HAVE_OPENIPMI
 			res = get_value_ipmi(item, result);
 #else
-			SET_MSG_RESULT(result, strdup("Support of IPMI parameters was not compiled in"));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for IPMI checks was not compiled in"));
 			res = NOTSUPPORTED;
 #endif
 			break;
 		case ITEM_TYPE_SIMPLE:
-			alarm(CONFIG_TIMEOUT);
+			/* simple checks use their own timeouts */
 			res = get_value_simple(item, result);
-			alarm(0);
 			break;
 		case ITEM_TYPE_INTERNAL:
 			res = get_value_internal(item, result);
@@ -100,19 +99,16 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			res = get_value_aggregate(item, result);
 			break;
 		case ITEM_TYPE_EXTERNAL:
-			alarm(CONFIG_TIMEOUT);
+			/* external checks use their own timeouts */
 			res = get_value_external(item, result);
-			alarm(0);
 			break;
 		case ITEM_TYPE_SSH:
 #ifdef HAVE_SSH2
-			/* Cannot use "alarming" since it breaks down libssh2 and our process terminates. */
-			/* libssh2 has its own default timeout == 60 and it should not hang on under usual circumstances. */
-			/* alarm(CONFIG_TIMEOUT); */
+			alarm(CONFIG_TIMEOUT);
 			res = get_value_ssh(item, result);
-			/* alarm(0); */
+			alarm(0);
 #else
-			SET_MSG_RESULT(result, strdup("Support of SSH parameters was not compiled in"));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for SSH checks was not compiled in"));
 			res = NOTSUPPORTED;
 #endif	/* HAVE_SSH2 */
 			break;
@@ -132,7 +128,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			res = NOTSUPPORTED;
 	}
 
-	if (SUCCEED != res && GET_MSG_RESULT(result))
+	if (SUCCEED != res && ISSET_MSG(result))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Item [%s:%s] error: %s",
 				item->host.host, item->key_orig, result->msg);
@@ -443,7 +439,7 @@ static void	deactivate_host(DC_ITEM *item, int now, const char *error)
  * Comments: always SUCCEED                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	get_values()
+static int	get_values(unsigned char poller_type)
 {
 	const char	*__function_name = "get_values";
 	DC_ITEM		items[MAX_REACHABLE_ITEMS];
@@ -629,9 +625,9 @@ static int	get_values()
 		{
 			if (ITEM_STATUS_NOTSUPPORTED != items[i].status)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "Parameter [%s:%s] is not supported, old status [%d]",
-						items[i].host.host, items[i].key_orig, items[i].status);
-				zabbix_syslog("Parameter [%s:%s] is not supported",
+				zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] is not supported",
+						items[i].host.host, items[i].key_orig);
+				zabbix_syslog("Item [%s:%s] is not supported",
 						items[i].host.host, items[i].key_orig);
 			}
 
@@ -665,8 +661,8 @@ static int	get_values()
 		}
 		else
 		{
-			zbx_error("Unknown response code returned.");
-			assert(0 == 1);
+			zbx_error("unknown response code returned: %d", res);
+			assert(0);
 		}
 
 		free_result(&agent);
@@ -696,53 +692,36 @@ static int	get_values()
 	return num;
 }
 
-void	main_poller_loop(unsigned char p, int type, int num)
+void	main_poller_loop(unsigned char p, unsigned char poller_type)
 {
-	struct	sigaction phan;
-	int	nextcheck, sleeptime, processed;
-	double	sec;
+	int		nextcheck, sleeptime, processed;
+	double		sec;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In main_poller_loop() poller_type:%d poller_num:%d", type, num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In main_poller_loop() process_type:'%s' process_num:%d",
+			get_process_type_string(process_type), process_num);
 
-	phan.sa_sigaction = child_signal_handler;
-	sigemptyset(&phan.sa_mask);
-	phan.sa_flags = SA_SIGINFO;
-	sigaction(SIGALRM, &phan, NULL);
+	set_child_signal_handler();
 
 	zbx_process = p;
-	poller_type = type;
-	poller_num = num - 1;
+
+	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
 	{
-		zbx_setproctitle("%s [getting values]", zbx_poller_type_string(poller_type));
+		zbx_setproctitle("%s [getting values]", get_process_type_string(process_type));
 
 		sec = zbx_time();
-		processed = get_values();
+		processed = get_values(poller_type);
 		sec = zbx_time() - sec;
 
-		if (FAIL == (nextcheck = DCconfig_get_poller_nextcheck(poller_type)))
-			sleeptime = POLLER_DELAY;
-		else
-		{
-			sleeptime = nextcheck - time(NULL);
-			if (sleeptime < 0)
-				sleeptime = 0;
-			if (sleeptime > POLLER_DELAY)
-				sleeptime = POLLER_DELAY;
-		}
+		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while updating %d values",
+				get_process_type_string(process_type), process_num, sec, processed);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while updating %d values."
-				" Sleeping for %d seconds",
-				zbx_poller_type_string(poller_type), poller_num, sec, processed, sleeptime);
+		nextcheck = DCconfig_get_poller_nextcheck(poller_type);
+		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
 
-		if (sleeptime > 0)
-		{
-			zbx_setproctitle("%s [sleeping for %d seconds]",
-					zbx_poller_type_string(poller_type), sleeptime);
-			sleep(sleeptime);
-		}
+		zbx_sleep_loop(sleeptime);
 	}
 }

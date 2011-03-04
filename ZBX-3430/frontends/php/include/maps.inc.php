@@ -336,10 +336,10 @@
 				$links_menus .= "['".S_SUBMAP."',\"javascript: redirect('maps.php?sysmapid=".$db_element['elementid']."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 			}
 			else if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER){
-				$links_menus.= "['".S_STATUS_OF_TRIGGERS."',\"javascript: redirect('events.php?source=0&triggerid=".$db_element['elementid']."&nav_time=".(time()-7*86400)."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+				$links_menus.= "['".S_LATEST_EVENTS."',\"javascript: redirect('events.php?source=0&triggerid=".$db_element['elementid']."&nav_time=".(time()-7*86400)."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 			}
 			else if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP){
-				$links_menus.= "['".S_STATUS_OF_TRIGGERS."',\"javascript: redirect('events.php?source=0&groupid=".$db_element['elementid']."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+				$links_menus.= "['".S_STATUS_OF_TRIGGERS."',\"javascript: redirect('tr_status.php?hostid=0&groupid=".$db_element['elementid']."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 			}
 
 
@@ -684,20 +684,23 @@
 
 			$parameter = substr($parameter, 0, $pos);
 */
-//		$pattern = "/{(?P<host>.+?):(?P<key>.+?)\.(?P<func>[^.]+?)\((?P<param>.+?)\)}/u";
-		$pattern="/{(?P<host>.[^}]*):(?P<key>.[^}]*)\.(?P<func>.[^}]*)\((?P<param>.[^}]*)\)*}/u";
+//		$pattern = "/{(?P<host>.[^:]+):(?P<key>.[^(]+)\.(?P<func>.[^)]*)\((?P<param>.[^)]*)\)*}/u";
+		$pattern = "/{".ZBX_PREG_HOST_FORMAT.":.+\.\w+\(.+\)}/Uu";
+
 		preg_match_all($pattern, $label, $matches);
 		foreach($matches[0] as $num => $expr){
-			$host = $matches['host'][$num];
-			$key = $matches['key'][$num];
-			$function = $matches['func'][$num];
-			$parameter = $matches['param'][$num];
+			$trigExpr = new CTriggerExpression(array('expression' => $expr));
+			if(!empty($trigExpr->errors)) continue;
 
-			$options = array(
+			$host = reset($trigExpr->data['hosts']);
+			$key = reset($trigExpr->data['items']);
+			$function = reset($trigExpr->data['functions']);
+			$parameter = reset($trigExpr->data['functionParams']);
+
+			$db_item = CItem::get(array(
 				'filter' => array('host' => $host, 'key_' => $key),
 				'output' => API_OUTPUT_EXTEND
-			);
-			$db_item = CItem::get($options);
+			));
 			$db_item = reset($db_item);
 
 			if(!$db_item){

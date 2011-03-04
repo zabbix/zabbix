@@ -237,7 +237,7 @@ char    *zbx_strdup2(const char *filename, int line, char *old, const char *str)
  *                                                                            *
  * Purpose: set process title                                                 *
  *                                                                            *
- * Parameters: title - item's refresh rate in sec                             *
+ * Parameters:                                                                *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
@@ -253,7 +253,7 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...)
 	va_list args;
 
 	va_start(args, fmt);
-	vsnprintf(title, MAX_STRING_LEN-1, fmt, args);
+	vsnprintf(title, MAX_STRING_LEN - 1, fmt, args);
 	va_end(args);
 
 	setproctitle(title);
@@ -621,7 +621,7 @@ time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t
  * Return value: SUCCEED - is IPv4 address                                    *
  *               FAIL - otherwise                                             *
  *                                                                            *
- * Author: Alexei Vladishev, Aleksander Vladishev                             *
+ * Author: Alexei Vladishev, Alexander Vladishev                              *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -671,7 +671,7 @@ int	is_ip4(const char *ip)
  * Return value: SUCCEED - is IPv6 address                                    *
  *               FAIL - otherwise                                             *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: could be improved (not supported x:x:x:x:x:x:d.d.d.d addresses)  *
  *                                                                            *
@@ -679,37 +679,38 @@ int	is_ip4(const char *ip)
 static int	is_ip6(const char *ip)
 {
 	const char	*p = ip;
-	int		nums, is_nums, colons, dcolons, res = FAIL;
+	int		nums = 0, is_nums = 0, colons = 0, dcolons = 0, res = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In is_ip6() [%s]",
-			ip);
+	zabbix_log(LOG_LEVEL_DEBUG, "In is_ip6() ip:'%s'", ip);
 
-	nums = 0;
-	is_nums = 0;
-	colons = 0;
-	dcolons = 0;
-	while ('\0' != *p) {
-		if ((*p >= '0' && *p <= '9') || (*p >= 'A' && *p <= 'F') || (*p >= 'a' && *p <= 'f')) {
+	while ('\0' != *p)
+	{
+		if ((*p >= '0' && *p <= '9') || (*p >= 'a' && *p <= 'f') || (*p >= 'A' && *p <= 'F'))
+		{
 			nums++;
 			is_nums = 1;
-		} else if (*p == ':') {
+		}
+		else if (*p == ':')
+		{
 			if (nums == 0 && colons > 0)
 				dcolons++;
 			if (nums > 4 || dcolons > 1)
 				break;
 			nums = 0;
 			colons++;
-		} else {
+		}
+		else
+		{
 			is_nums = 0;
 			break;
 		}
 		p++;
 	}
+
 	if (colons >= 2 && colons <= 7 && nums <= 4 && is_nums == 1)
 		res = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of is_ip6(result:%d)",
-			res);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of is_ip6():%s", zbx_result_string(res));
 
 	return res;
 }
@@ -726,7 +727,7 @@ static int	is_ip6(const char *ip)
  * Return value: SUCCEED - is IP address                                      *
  *               FAIL - otherwise                                             *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -757,7 +758,7 @@ int	is_ip(const char *ip)
  *                                                                            *
  * Return value: FAIL - invalid IP address, SUCCEED - conversion OK           *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -840,7 +841,7 @@ int	expand_ipv6(const char *ip, char *str, size_t str_len )
  *                                                                            *
  * Return value: pointer to result buffer                                     *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1451,7 +1452,7 @@ int	is_int_prefix(const char *c)
  * Return value:  SUCCEED - the string is unsigned integer                    *
  *                FAIL - the string is not number or overflow                 *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1500,7 +1501,7 @@ int	is_uint64(const char *str, zbx_uint64_t *value)
  ******************************************************************************/
 int	is_ushort(const char *str, unsigned short *value)
 {
-	register unsigned short	max_ushort = 0xFFFF;
+	register unsigned short	max_ushort = 0xffff;
 	register unsigned short	value_ushort = 0, c;
 
 	if ('\0' == *str)
@@ -1538,7 +1539,7 @@ int	is_ushort(const char *str, unsigned short *value)
  * Return value:  SUCCEED - the string is unsigned octal                      *
  *                FAIL - otherwise                                            *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1578,7 +1579,7 @@ int	is_uoct(const char *str)
  * Return value:  SUCCEED - the string is unsigned hexadecimal                *
  *                FAIL - otherwise                                            *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1766,7 +1767,7 @@ int	get_nearestindex(void *p, size_t sz, int num, zbx_uint64_t id)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1808,7 +1809,7 @@ int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t v
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1831,7 +1832,7 @@ void	uint64_array_merge(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1857,7 +1858,7 @@ int	uint64_array_exists(zbx_uint64_t *values, int num, zbx_uint64_t value)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1897,7 +1898,8 @@ int	str2uint(const char *str)
 	size_t	sz = strlen(str) - 1;
 	int	factor = 1;
 
-	switch (str[sz]) {
+	switch (str[sz])
+	{
 		case 's': factor = 1;         break;
 		case 'm': factor = 60;        break;
 		case 'h': factor = 3600;      break;
@@ -1920,7 +1922,7 @@ int	str2uint(const char *str)
  * Return value:  SUCCEED - the string is unsigned integer                    *
  *                FAIL - otherwise                                            *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: the function automatically processes suffixes 'K','M','G','T'    *
  *                                                                            *
@@ -2122,4 +2124,38 @@ void	make_hostname(char *host)
 	for (c = host; '\0' != *c; ++c)
 		if (FAIL == is_hostname_char(*c))
 			*c = '_';
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: calculate_sleeptime                                              *
+ *                                                                            *
+ * Purpose: calculate sleep time for Zabbix processes                         *
+ *                                                                            *
+ * Parameters: nextcheck     - [IN] next check or -1 (FAIL) if nothing to do  *
+ *             max_sleeptime - [IN] maximum sleep time, in seconds            *
+ *                                                                            *
+ * Return value: sleep time, in seconds                                       *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	calculate_sleeptime(int nextcheck, int max_sleeptime)
+{
+	int	sleeptime;
+
+	if (FAIL == nextcheck)
+		return max_sleeptime;
+
+	sleeptime = nextcheck - time(NULL);
+
+	if (sleeptime < 0)
+		return 0;
+
+	if (sleeptime > max_sleeptime)
+		return max_sleeptime;
+
+	return sleeptime;
 }
