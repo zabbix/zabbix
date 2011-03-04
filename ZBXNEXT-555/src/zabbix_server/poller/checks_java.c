@@ -45,7 +45,7 @@ static int	parse_response(DC_ITEM *items, AGENT_RESULT *results, int *errcodes, 
 		{
 			if (SUCCEED != zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
 			{
-				zbx_snprintf(error, max_error_len, "Cannot open data array in received JSON");
+				zbx_strlcpy(error, "Cannot open data array in received JSON", max_error_len);
 				goto exit;
 			}
 
@@ -55,13 +55,13 @@ static int	parse_response(DC_ITEM *items, AGENT_RESULT *results, int *errcodes, 
 			{
 				if (NULL == (p = zbx_json_next(&jp_data, p)))
 				{
-					zbx_snprintf(error, max_error_len, "Not all values included in received JSON");
+					zbx_strlcpy(error, "Not all values included in received JSON", max_error_len);
 					goto exit;
 				}
 
 				if (SUCCEED != zbx_json_brackets_open(p, &jp_row))
 				{
-					zbx_snprintf(error, max_error_len, "Cannot open value object in received JSON");
+					zbx_strlcpy(error, "Cannot open value object in received JSON", max_error_len);
 					goto exit;
 				}
 
@@ -92,7 +92,7 @@ static int	parse_response(DC_ITEM *items, AGENT_RESULT *results, int *errcodes, 
 			if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_ERROR, error, max_error_len))
 				ret = NETWORK_ERROR;
 			else
-				zbx_snprintf(error, max_error_len, "Cannot get error message describing reasons for failure");
+				zbx_strlcpy(error, "Cannot get error message describing reasons for failure", max_error_len);
 
 			goto exit;
 		}
@@ -105,7 +105,7 @@ static int	parse_response(DC_ITEM *items, AGENT_RESULT *results, int *errcodes, 
 	}
 	else
 	{
-		zbx_snprintf(error, max_error_len, "Cannot open received JSON");
+		zbx_strlcpy(error, "Cannot open received JSON", max_error_len);
 		goto exit;
 	}
 exit:
@@ -141,7 +141,7 @@ void	get_values_java(unsigned char request, DC_ITEM *items, AGENT_RESULT *result
 	if (NULL == CONFIG_JAVA_PROXY || '\0' == *CONFIG_JAVA_PROXY)
 	{
 		err = PROXY_ERROR;
-		zbx_snprintf(error, sizeof(error), "JavaProxy configuration parameter not set or empty");
+		strscpy(error, "JavaProxy configuration parameter not set or empty");
 		goto exit;
 	}
 
@@ -159,7 +159,7 @@ void	get_values_java(unsigned char request, DC_ITEM *items, AGENT_RESULT *result
 					0 != strcmp(items[0].password, items[i].password))
 			{
 				err = PROXY_ERROR;
-				zbx_snprintf(error, sizeof(error), "Java poller received items with different connection parameters");
+				strscpy(error, "Java poller received items with different connection parameters");
 				goto exit;
 			}
 		}
@@ -168,9 +168,9 @@ void	get_values_java(unsigned char request, DC_ITEM *items, AGENT_RESULT *result
 
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_CONN, items[0].interface.addr, ZBX_JSON_TYPE_STRING);
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_PORT, items[0].interface.port);
-		if ('\0' != items[0].username)
+		if ('\0' != *items[0].username)
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_USERNAME, items[0].username, ZBX_JSON_TYPE_STRING);
-		if ('\0' != items[0].password)
+		if ('\0' != *items[0].password)
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_PASSWORD, items[0].password, ZBX_JSON_TYPE_STRING);
 	}
 	else
@@ -203,13 +203,13 @@ void	get_values_java(unsigned char request, DC_ITEM *items, AGENT_RESULT *result
 
 	if (FAIL == err)
 	{
-		strlcpy(error, zbx_tcp_strerror(), sizeof(error));
+		strscpy(error, zbx_tcp_strerror());
 		err = PROXY_ERROR;
 	}
 exit:
 	if (NETWORK_ERROR == err || PROXY_ERROR == err)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Getting JMX values failed: %s", error);
+		zabbix_log(LOG_LEVEL_DEBUG, "Getting Java values failed: %s", error);
 
 		for (i = 0; i < num; i++)
 		{
