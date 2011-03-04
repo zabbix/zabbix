@@ -103,12 +103,12 @@ class CTemplate extends CZBXAPI{
 			unset($sql_parts['select']['templates']);
 
 			$dbTable = DB::getSchema('hosts');
-			$sql_parts['select']['hostid'] = ' h.hostid';
+			$sql_parts['select']['hostid'] = 'h.hostid';
 			foreach($options['output'] as $key => $field){
 				if($field == 'templateid') continue;
 
 				if(isset($dbTable['fields'][$field]))
-					$sql_parts['select'][$field] = ' h.'.$field;
+					$sql_parts['select'][$field] = 'h.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;
@@ -341,7 +341,6 @@ class CTemplate extends CZBXAPI{
 			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN)?ZBX_SORT_DOWN:ZBX_SORT_UP;
 
 			$sql_parts['order'][] = 'h.'.$options['sortfield'].' '.$sortorder;
-
 			if(!str_in_array('h.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('h.*', $sql_parts['select'])){
 				$sql_parts['select'][] = 'h.'.$options['sortfield'];
 			}
@@ -379,6 +378,7 @@ class CTemplate extends CZBXAPI{
 					$sql_where.
 				$sql_group.
 				$sql_order;
+//SDI($sql);
 		$res = DBselect($sql, $sql_limit);
 		while($template = DBfetch($res)){
 			if(!is_null($options['countOutput'])){
@@ -1023,7 +1023,7 @@ COpt::memoryPick();
 				}
 
 				if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $template['host'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Template name [ %1$s ]'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Template name [ %1$s ]', $template['host']));
 				}
 
 				if($this->exists(array('host' => $template['host']))){

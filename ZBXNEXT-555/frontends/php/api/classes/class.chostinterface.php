@@ -100,10 +100,10 @@ class CHostInterface extends CZBXAPI{
 			unset($sql_parts['select']['interface']);
 
 			$dbTable = DB::getSchema('interface');
-			$sql_parts['select']['interfaceid'] = ' hi.interfaceid';
+			$sql_parts['select']['interfaceid'] = 'hi.interfaceid';
 			foreach($options['output'] as $key => $field){
 				if(isset($dbTable['fields'][$field]))
-					$sql_parts['select'][$field] = ' hi.'.$field;
+					$sql_parts['select'][$field] = 'hi.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;

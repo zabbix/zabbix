@@ -44,8 +44,8 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 		$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid, null, ': ').$name);
 	}
 
-	$filterForm->addRow(S_GROUP,$cmbGroups);
-	$filterForm->addRow(S_HOST,$cmbHosts);
+	$filterForm->addRow(_('Template group'),$cmbGroups);
+	$filterForm->addRow(_('Template'),$cmbHosts);
 
 	if(1 == $config){
 		$cmbTrigs = new CComboBox('tpl_triggerid',get_request('tpl_triggerid',0),'submit()');
@@ -103,8 +103,8 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 					);
 		}
 
-		$filterForm->addRow(S_TRIGGER,$cmbTrigs);
-		$filterForm->addRow(S_FILTER.SPACE.S_HOST_GROUP,$cmbHGrps);
+		$filterForm->addRow(_('Template trigger'),$cmbTrigs);
+		$filterForm->addRow(_('Filter by host group'),$cmbHGrps);
 	}
 
 //*

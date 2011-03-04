@@ -174,12 +174,12 @@ function make_system_status($filter){
 	$table->setHeader(array(
 		is_show_all_nodes() ? S_NODE : null,
 		S_HOST_GROUP,
-		is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_DISASTER])?S_DISASTER:null,
-		is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_HIGH])?S_HIGH:null,
-		is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_AVERAGE])?S_AVERAGE:null,
-		is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_WARNING])?S_WARNING:null,
-		is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_INFORMATION])?S_INFORMATION:null,
-		is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_NOT_CLASSIFIED])?S_NOT_CLASSIFIED:null
+		is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_DISASTER])?getSeverityCaption(TRIGGER_SEVERITY_DISASTER):null,
+		is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_HIGH])?getSeverityCaption(TRIGGER_SEVERITY_HIGH):null,
+		is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_AVERAGE])?getSeverityCaption(TRIGGER_SEVERITY_AVERAGE):null,
+		is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_WARNING])?getSeverityCaption(TRIGGER_SEVERITY_WARNING):null,
+		is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_INFORMATION])?getSeverityCaption(TRIGGER_SEVERITY_INFORMATION):null,
+		is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_NOT_CLASSIFIED])?getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED):null
 	));
 
 // SELECT HOST GROUPS {{{
@@ -317,7 +317,7 @@ function make_system_status($filter){
 					$table_inf->addRow(array(
 						get_node_name_by_elid($trigger['triggerid']),
 						$trigger['host'],
-						new CCol($trigger['description'], get_severity_style($trigger['priority'])),
+						new CCol($trigger['description'], getSeverityStyle($trigger['priority'])),
 						zbx_date2age($event['clock']),
 						$unknown,
 						($config['event_ack_enable']) ? (new CCol($ack, 'center')) : NULL,
@@ -357,7 +357,7 @@ function make_system_status($filter){
 					$table_inf_unack->addRow(array(
 						get_node_name_by_elid($trigger['triggerid']),
 						$trigger['host'],
-						new CCol($trigger['description'], get_severity_style($trigger['priority'])),
+						new CCol($trigger['description'], getSeverityStyle($trigger['priority'])),
 						zbx_date2age($event['clock']),
 						$unknown,
 						($config['event_ack_enable']) ? (new CCol($ack, 'center')) : NULL,
@@ -373,7 +373,7 @@ function make_system_status($filter){
 					if($data['count'])
 						$trigger_count->setHint($table_inf);
 
-					$group_row->addItem(new CCol($trigger_count, get_severity_style($severity, $data['count'])));
+					$group_row->addItem(new CCol($trigger_count, getSeverityStyle($severity, $data['count'])));
 				break;
 				case EXTACK_OPTION_UNACK:
 					$trigger_count = $data['count_unack'];
@@ -381,7 +381,7 @@ function make_system_status($filter){
 						$trigger_count = new CSpan($data['count_unack'], 'pointer red bold');
 						$trigger_count->setHint($table_inf_unack);
 					}
-					$group_row->addItem(new CCol($trigger_count, get_severity_style($severity, $data['count_unack'])));
+					$group_row->addItem(new CCol($trigger_count, getSeverityStyle($severity, $data['count_unack'])));
 				break;
 				case EXTACK_OPTION_BOTH:
 					if($data['count_unack']){
@@ -397,7 +397,7 @@ function make_system_status($filter){
 					if($data['count'])
 						$trigger_count->setHint($table_inf);
 
-					$group_row->addItem(new CCol(array($unack_count, $trigger_count), get_severity_style($severity, $data['count'])));
+					$group_row->addItem(new CCol(array($unack_count, $trigger_count), getSeverityStyle($severity, $data['count'])));
 				break;
 			}
 		}
@@ -611,12 +611,12 @@ function make_hoststat_summary($filter){
 				$table_inf->setAttribute('style', 'width: 400px;');
 				$table_inf->setHeader(array(
 					S_HOST,
-					is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_DISASTER])?S_DISASTER:null,
-					is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_HIGH])?S_HIGH:null,
-					is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_AVERAGE])?S_AVERAGE:null,
-					is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_WARNING])?S_WARNING:null,
-					is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_INFORMATION])?S_INFORMATION:null,
-					is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_NOT_CLASSIFIED])?S_NOT_CLASSIFIED:null
+					is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_DISASTER])?getSeverityCaption(TRIGGER_SEVERITY_DISASTER):null,
+					is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_HIGH])?getSeverityCaption(TRIGGER_SEVERITY_HIGH):null,
+					is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_AVERAGE])?getSeverityCaption(TRIGGER_SEVERITY_AVERAGE):null,
+					is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_WARNING])?getSeverityCaption(TRIGGER_SEVERITY_WARNING):null,
+					is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_INFORMATION])?getSeverityCaption(TRIGGER_SEVERITY_INFORMATION):null,
+					is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_NOT_CLASSIFIED])?getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED):null
 				));
 
 				$popup_rows = 0;
@@ -636,7 +636,7 @@ function make_hoststat_summary($filter){
 					foreach($lastUnack_host_list[$host['hostid']]['severities'] as $severity => $trigger_count){
 						if(!is_null($filter['severity'])&&!isset($filter['severity'][$severity])) continue;
 
-						$r->addItem(new CCol($trigger_count, get_severity_style($severity, $trigger_count)));
+						$r->addItem(new CCol($trigger_count, getSeverityStyle($severity, $trigger_count)));
 					}
 					$table_inf->addRow($r);
 				}
@@ -655,12 +655,12 @@ function make_hoststat_summary($filter){
 			$table_inf->setAttribute('style', 'width: 400px;');
 			$table_inf->setHeader(array(
 				S_HOST,
-				is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_DISASTER])?S_DISASTER:null,
-				is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_HIGH])?S_HIGH:null,
-				is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_AVERAGE])?S_AVERAGE:null,
-				is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_WARNING])?S_WARNING:null,
-				is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_INFORMATION])?S_INFORMATION:null,
-				is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_NOT_CLASSIFIED])?S_NOT_CLASSIFIED:null
+				is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_DISASTER])?getSeverityCaption(TRIGGER_SEVERITY_DISASTER):null,
+				is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_HIGH])?getSeverityCaption(TRIGGER_SEVERITY_HIGH):null,
+				is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_AVERAGE])?getSeverityCaption(TRIGGER_SEVERITY_AVERAGE):null,
+				is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_WARNING])?getSeverityCaption(TRIGGER_SEVERITY_WARNING):null,
+				is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_INFORMATION])?getSeverityCaption(TRIGGER_SEVERITY_INFORMATION):null,
+				is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_NOT_CLASSIFIED])?getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED):null
 			));
 
 			$popup_rows = 0;
@@ -680,7 +680,7 @@ function make_hoststat_summary($filter){
 				foreach($problematic_host_list[$host['hostid']]['severities'] as $severity => $trigger_count){
 					if(!is_null($filter['severity'])&&!isset($filter['severity'][$severity])) continue;
 
-					$r->addItem(new CCol($trigger_count, get_severity_style($severity, $trigger_count)));
+					$r->addItem(new CCol($trigger_count, getSeverityStyle($severity, $trigger_count)));
 				}
 				$table_inf->addRow($r);
 			}
@@ -696,14 +696,14 @@ function make_hoststat_summary($filter){
 			case EXTACK_OPTION_ALL:
 		        $group_row->addItem(new CCol(
 					$problematic_count,
-					get_severity_style($highest_severity[$group['groupid']], $hosts_data[$group['groupid']]['problematic']))
+					getSeverityStyle($highest_severity[$group['groupid']], $hosts_data[$group['groupid']]['problematic']))
 				);
 		        $group_row->addItem($hosts_data[$group['groupid']]['problematic'] + $hosts_data[$group['groupid']]['ok']);
 		        break;
 			case EXTACK_OPTION_UNACK:
 				$group_row->addItem(new CCol(
 					$lastUnack_count,
-					get_severity_style((isset($highest_severity2[$group['groupid']]) ? $highest_severity2[$group['groupid']] : 0),
+					getSeverityStyle((isset($highest_severity2[$group['groupid']]) ? $highest_severity2[$group['groupid']] : 0),
 						$hosts_data[$group['groupid']]['lastUnack']))
 				);
 				$group_row->addItem($hosts_data[$group['groupid']]['lastUnack'] + $hosts_data[$group['groupid']]['ok']);
@@ -712,7 +712,7 @@ function make_hoststat_summary($filter){
 				$unackspan = $lastUnack_count ? new CSpan(array($lastUnack_count, SPACE.S_OF.SPACE)) : null;
 				$group_row->addItem(new CCol(array(
 					$unackspan, $problematic_count),
-					get_severity_style($highest_severity[$group['groupid']], $hosts_data[$group['groupid']]['problematic']))
+					getSeverityStyle($highest_severity[$group['groupid']], $hosts_data[$group['groupid']]['problematic']))
 				);
 				$group_row->addItem($hosts_data[$group['groupid']]['problematic'] + $hosts_data[$group['groupid']]['ok']);
 				break;
@@ -983,7 +983,7 @@ function make_latest_issues($filter = array()){
 			else
 				$description = new CSpan($description,'pointer');
 
-			$description = new CCol($description,get_severity_style($trigger['priority']));
+			$description = new CCol($description,getSeverityStyle($trigger['priority']));
 			$description->setHint(make_popup_eventlist($event['eventid'], $trigger['type'], $trigger['triggerid']), '', '', false);
 
 			$table->addRow(array(

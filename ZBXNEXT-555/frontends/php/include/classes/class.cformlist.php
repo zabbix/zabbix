@@ -48,6 +48,14 @@ class CFormList extends CDiv{
 			$this->formList->addItem(array(new CDiv(SPACE, 'dt floatleft right'), new CDiv($label, 'dd')), 'formrow');
 	}
 
+	public function addInfo($text){
+		$infoDiv = new CDiv(_('Info'), 'dt right listInfoLabel');
+
+		$textDiv = new CDiv($text, 'objectgroup inlineblock border_dotted ui-corner-all listInfoText');
+
+		$this->formList->addItem(array($infoDiv, $textDiv), 'formrow listInfo');
+	}
+
 	public function toString($destroy=true){
 		$this->addItem($this->formList);
 		return parent::toString($destroy);
