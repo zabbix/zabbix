@@ -101,6 +101,11 @@
 			'item_types' =>	$item_types_all
 		);
 
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['dayofmonth'] = array(
+			'args' => $args_ignored,
+			'item_types' =>	$item_types_all
+		);
+
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['dayofweek'] = array(
 			'args' => $args_ignored,
 			'item_types' =>	$item_types_all
@@ -3716,11 +3721,12 @@ function utf8RawUrlDecode($source){
 		$function_info = array(
 			'abschange' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
 			'avg' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
-			'delta' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
 			'change' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
 			'count' =>		array('value_type' => S_NUMERIC_UINT64,	'type' => T_ZBX_INT,		'validation' => NOT_EMPTY),
 			'date' =>		array('value_type' => 'YYYYMMDD',	'type' => T_ZBX_INT,		'validation' => '{}>=19700101&&{}<=99991231'),
+			'dayofmonth' =>		array('value_type' => '1-31',		'type' => T_ZBX_INT,		'validation' => '{}>=1&&{}<=31'),
 			'dayofweek' =>		array('value_type' => '1-7',		'type' => T_ZBX_INT,		'validation' => IN('1,2,3,4,5,6,7')),
+			'delta' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
 			'diff' =>		array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,		'validation' => IN('0,1')),
 			'fuzzytime' =>		array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,		'validation' => IN('0,1')),
 			'iregexp' =>		array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,		'validation' => IN('0,1')),
@@ -3734,75 +3740,63 @@ function utf8RawUrlDecode($source){
 			'prev' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
 			'regexp' =>		array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,		'validation' => IN('0,1')),
 			'str' =>		array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,		'validation' => IN('0,1')),
+			'strlen' =>		array('value_type' => S_NUMERIC_UINT64,	'type' => T_ZBX_INT,		'validation' => NOT_EMPTY),
 			'sum' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
 			'time' =>		array( 'value_type' => 'HHMMSS',	'type' => T_ZBX_INT,		'validation' => 'zbx_strlen({})==6'));
 
 		if(isset($ZBX_TR_EXPR_SIMPLE_MACROS[$expr])){
 			$result = array(
 				'value_type'	=> S_0_OR_1,
-				'type'		=> T_ZBX_INT,
+				'type'			=> T_ZBX_INT,
 				'validation'	=> IN('0,1')
-				);
+			);
+		}
+		else if(preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $expr)){
+			$result = array(
+				'value_type'	=> S_0_OR_1,
+				'type'			=> T_ZBX_INT,
+				'validation'	=> NOT_EMPTY
+			);
 		}
 		else{
 			$hostId = $itemId = $function = null;
-			$expData = parseTriggerExpressions($expr, true);
-			if(!isset($expData[$expr]['errors'])) {
-				if(isset($expData[$expr]['customMacros']) && count($expData[$expr]['customMacros']) > 0) {
+			$triggerExpr = new CTriggerExpression(array('expression' => $expr));
+			if(empty($triggerExpr->errors)){
+
+				if(count($triggerExpr->data['macros']) > 0){
 					$result = array(
 						'value_type'    => S_NUMERIC_FLOAT,
-						'type'		=> T_ZBX_DBL,
+						'type'			=> T_ZBX_DBL,
 						'validation'	=> NOT_EMPTY
 					);
-				} elseif(isset($expData[$expr]['expressions']) && count($expData[$expr]['expressions']) > 0) {
-					reset($expData[$expr]['hosts']);
-					$hData =& $expData[$expr]['hosts'][key($expData[$expr]['hosts'])];
-					reset($expData[$expr]['keys']);
-					$kData =& $expData[$expr]['keys'][key($expData[$expr]['keys'])];
-					reset($expData[$expr]['keysParams']);
-					$kpData =& $expData[$expr]['keysParams'][key($expData[$expr]['keysParams'])];
-					reset($expData[$expr]['keysFunctions']);
-					$fData =& $expData[$expr]['keysFunctions'][key($expData[$expr]['keysFunctions'])];
-					$host = zbx_substr($expr, $hData['openSymbolNum']+zbx_strlen($hData['openSymbol']), $hData['closeSymbolNum']-$hData['openSymbolNum']-zbx_strlen($hData['closeSymbol']));
-					$hostKey = zbx_substr($expr, $kData['openSymbolNum']+zbx_strlen($kData['openSymbol']), $kData['closeSymbolNum']-$kData['openSymbolNum']-zbx_strlen($kData['closeSymbol']));
-					$hostKeyParams = isset($expData[$expr]['keysParams']) && count($expData[$expr]['keysParams']) > 0 ? zbx_substr($expr, $kpData['openSymbolNum'], $kpData['closeSymbolNum']-$kpData['openSymbolNum']+zbx_strlen($kpData['closeSymbol'])) : '';
-					$function = zbx_substr($expr, $fData['openSymbolNum']+zbx_strlen($fData['openSymbol']), $fData['closeSymbolNum']-$fData['openSymbolNum']-zbx_strlen($fData['closeSymbol']));
+				}
+				else if(count($triggerExpr->expressions) > 0){
+					$function = reset($triggerExpr->data['functions']);
+					$hostFound = CHost::get(array(
+						'filter' => array('host' => $triggerExpr->data['hosts']),
+						'templated_hosts' => true
+					));
 
-					//SDI($host);
-					//SDI($hostKey.$hostKeyParams);
-					//SDI($function);
-
-					$hostFound = CHost::get(Array('filter' => Array('host' => $host), 'templated_hosts' => true));
-					if(count($hostFound) > 0) {
-						$hostFound = array_shift($hostFound);
-						if(isset($hostFound['hostid']) && $hostFound['hostid'] > 0) $hostId = $hostFound['hostid'];
-					}
-
-					if($hostId == null) return EXPRESSION_HOST_UNKNOWN;
+					if(empty($hostFound)) return EXPRESSION_HOST_UNKNOWN;
 
 					$itemFound = CItem::get(array(
-						'filter' => array('hostid' => $hostId, 'key_' => $hostKey.$hostKeyParams),
+						'hostids' => zbx_objectValues($hostFound, 'hostid'),
+						'filter' => array('key_' => $triggerExpr->data['items']),
 						'webitems' => true
 					));
-					if(count($itemFound) > 0) {
-						$itemFound = array_shift($itemFound);
-						if(isset($itemFound['itemid']) && $itemFound['itemid'] > 0) $itemId = $itemFound['itemid'];
-					}
+					if(empty($itemFound)) return EXPRESSION_HOST_ITEM_UNKNOWN;
 
-					if($itemId == null) return EXPRESSION_HOST_ITEM_UNKNOWN;
-
-					unset($expData);
+					unset($triggerExpr);
 
 					$result = $function_info[$function];
 
 					if(is_array($result['value_type'])){
 						$value_type = null;
-						$options = array(
-							'itemids'=>$itemId,
+						$item_data = CItem::get(array(
+							'itemids'=>zbx_objectValues($itemFound, 'itemid'),
 							'output'=>API_OUTPUT_EXTEND,
 							'webitems'=> true
-						);
-						$item_data = CItem::get($options);
+						));
 
 						if($item_data = reset($item_data)){
 							$value_type = $item_data['value_type'];
@@ -3818,7 +3812,8 @@ function utf8RawUrlDecode($source){
 							$result['validation'] = 'preg_match("/^'.ZBX_PREG_NUMBER.'$/u",{})';
 						}
 					}
-				}else{
+				}
+				else{
 					return EXPRESSION_NOT_A_MACRO_ERROR;
 				}
 			}
@@ -3911,32 +3906,23 @@ function utf8RawUrlDecode($source){
 		}
 	}
 
-	function replaceExpressionTestData($expression, &$e, &$rplcts) {
-		$evStr = zbx_substr($expression, $e['expression']['start'],
-						 $e['expression']['end']-$e['expression']['start']+1);
+	function evalExpressionData($expression, $rplcts, $oct=false){
+		$result = false;
 
-		$chStart = $e['expression']['start'];
-		if(is_array($rplcts)) {
-			foreach($rplcts as $mKey => $mData) {
-				if($mData['start'] >= $e['expression']['start'] && $mData['end'] <= $e['expression']['end']) {
-					$vStart = $mData['start'] - $chStart;
-					$vEnd = $mData['end'] - $chStart+1;
-					$cValue = convert($mData['item']['cValue']);
-					if($cValue === '' || $cValue === null) $cValue = "''";
-					$chStart += ($mData['end']-$mData['start']+1)-zbx_strlen($cValue);
-					$evStr = ($vStart > 0 ? zbx_substr($evStr, 0, $vStart) : '').$cValue.($vEnd < zbx_strlen($evStr) ? zbx_substr($evStr, $vEnd) : '');
-				}
-			}
-		}
+		$evStr = str_replace(array_keys($rplcts), array_values($rplcts), $expression);
+		if(!preg_match("/^[0-9.\s=!()><+*\/&|\-]+$/is", $evStr)) return 'FALSE';
 
-		$evStr = str_replace('=', '==', $evStr);
-		$evStr = str_replace('#', '!=', $evStr);
-		$evStr = str_replace('&', '&&', $evStr);
-		$evStr = str_replace('|', '||', $evStr);
-		$evStr = trim($evStr);
+		if($oct)
+			$evStr = preg_replace('/([0-9]+)(\=|\#|\!=|\<|\>)([0-9]+)/','((float)ltrim("$1","0") $2 (float)ltrim("$3","0"))', $evStr);
 
-		//SDI($evStr);
-		return $evStr;
+		$switch = array('=' => '==','#' => '!=','&' => '&&','|' => '||');
+		$evStr = str_replace(array_keys($switch), array_values($switch), $evStr);
+
+		eval('$result = ('.trim($evStr).');');
+
+		$result = (($result === true) || ($result && $result != '-')) ? 'TRUE' : 'FALSE';
+
+	return $result;
 	}
 
 	function parseTriggerExpressions($expressions, $askData=false) {

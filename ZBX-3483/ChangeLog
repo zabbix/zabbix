@@ -1,5 +1,12 @@
 Changes for 1.8.5rc1
- 
+
+ - [ZBX-3562] fixed user macros in map element label expressions (Aly)
+ - [ZBXNEXT-508] added dayofmonth to trigger functions (rudolfs)
+ - [ZBX-3352] made item Y axis min/max items also change when used in screen with Dynamic enabled (Vedmak)
+ - [ZBX-3523] fixed error when open monitoring->maps and last viewed map was removed (Vedmak)
+ - [ZBX-3557] fixed possible incorrect usage of internal array pointers in frontend (Aly)
+ - [ZBX-2979] fixed trigger function time() test (Aly)
+ - [ZBX-3563] fixed host group filter in graph selection popup (Aly)
  - [ZBX-3544] fixed user login method reseting attempts (Aly)
  - [ZBX-3555] fixed possible pollers hang while processing ssh.run[] checks (Sasha)
  - [ZBXNEXT-408] added zabbix[process,...] internal checks (Sasha)

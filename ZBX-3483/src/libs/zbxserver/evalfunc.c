@@ -1938,27 +1938,25 @@ int	evaluate_function(char *value, DB_ITEM *item, const char *function, const ch
 	else if (0 == strcmp(function, "date"))
 	{
 		tm = localtime(&now);
-		zbx_snprintf(value, MAX_BUFFER_LEN, "%.4d%.2d%.2d",
-				tm->tm_year + 1900,
-				tm->tm_mon + 1,
-				tm->tm_mday);
+		zbx_snprintf(value, MAX_BUFFER_LEN, "%.4d%.2d%.2d", tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday);
 		ret = SUCCEED;
 	}
 	else if (0 == strcmp(function, "dayofweek"))
 	{
 		tm = localtime(&now);
-		/* The number of days since Sunday, in the range 0 to 6. */
-		zbx_snprintf(value, MAX_BUFFER_LEN, "%d",
-				0 == tm->tm_wday ? 7 : tm->tm_wday);
+		zbx_snprintf(value, MAX_BUFFER_LEN, "%d", 0 == tm->tm_wday ? 7 : tm->tm_wday);
+		ret = SUCCEED;
+	}
+	else if (0 == strcmp(function, "dayofmonth"))
+	{
+		tm = localtime(&now);
+		zbx_snprintf(value, MAX_BUFFER_LEN, "%d", tm->tm_mday);
 		ret = SUCCEED;
 	}
 	else if (0 == strcmp(function, "time"))
 	{
 		tm = localtime(&now);
-		zbx_snprintf(value, MAX_BUFFER_LEN, "%.2d%.2d%.2d",
-				tm->tm_hour,
-				tm->tm_min,
-				tm->tm_sec);
+		zbx_snprintf(value, MAX_BUFFER_LEN, "%.2d%.2d%.2d", tm->tm_hour, tm->tm_min, tm->tm_sec);
 		ret = SUCCEED;
 	}
 	else if (0 == strcmp(function, "abschange"))

@@ -380,7 +380,7 @@ function make_small_eventlist($eventid, $trigger_data){
 
 		$value = new CCol(trigger_value2str($event['value']), get_trigger_value_style($event['value']));
 
-		//if acknowledges are not disabled by confuguration, let's show them
+		// if acknowledges are not disabled in configuration, let's show them
 		if($config['event_ack_enable']){
 			global $page;
 			$backurl = urlencode(urlencode($page['file'].'?eventid='.$curevent['eventid'].'&triggerid='.$trigger_data['triggerid']));

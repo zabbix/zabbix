@@ -1232,6 +1232,7 @@
 	'S_MAINTENANCE_BIG'=>			'MAINTENANCE',
 
 //	sysmaps.php
+	'S_NO_PERMISSIONS_OR_MAP_DOES_NOT_EXIST' => 'No permissions or map does not exist.',
 	'S_IMAGE_IS_USED_IN_ZABBIX_MAP' => 'Image is used in Zabbix map',
 	'S_EDIT_MAP_ELEMENT'=>			'Edit map element',
 	'S_ICON_DEFAULT'=>			'Icon (default)',
