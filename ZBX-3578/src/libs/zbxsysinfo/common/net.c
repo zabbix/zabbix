@@ -217,72 +217,86 @@ int	NET_TCP_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 {
 #if defined(HAVE_RES_QUERY) || defined(_WINDOWS)
 
-	int		res;
+	int		res, retrans, retry;
 	char		ip[MAX_STRING_LEN];
 	char		zone[MAX_STRING_LEN];
+	char		retransStr[MAX_STRING_LEN];
+	char		retryStr[MAX_STRING_LEN];
 #ifdef _WINDOWS
-	WSADATA wsaData;
+	WSADATA 	wsaData;
 #else /* not _WINDOWS */
+	struct in_addr 	dns_serv;
+	HEADER 		*hp;
+
 #if defined(NS_PACKETSZ)
-	char	respbuf[NS_PACKETSZ];
+	char		respbuf[NS_PACKETSZ];
 #elif defined(PACKETSZ)
-	char	respbuf[PACKETSZ];
+	char		respbuf[PACKETSZ];
 #else
-	char	respbuf[512];
+	char		respbuf[512];
 #endif /* NS_PACKETSZ */
-	struct	in_addr in;
+
+#if PACKETSZ > 1024
+	char 		buf[PACKETSZ];
+#else
+	char 		buf[1024];
+#endif
+
 #endif /* ifdef _WINDOWS */
 
-	if (num_param(param) > 2)
+	if (num_param(param) > 4)
 		return SYSINFO_RET_FAIL;
 
-	if(get_param(param, 1, ip, MAX_STRING_LEN) != 0)
-        {
+	if(0 != get_param(param, 1, ip, MAX_STRING_LEN))
                ip[0] = '\0';
-        }
 
-	/* default parameter */
-	if('\0' == ip[0])
-	{
-		strscpy(ip, "127.0.0.1");
-	}
-
-	if(get_param(param, 2, zone, MAX_STRING_LEN) != 0)
-        {
-                zone[0] = '\0';
-        }
-
-	/* default parameter */
-	if('\0' == zone[0])
-	{
+	if(0 != get_param(param, 2, zone, MAX_STRING_LEN) || '\0' == zone[0])
 		strscpy(zone, "localhost");
-	}
+
+	if(0 != get_param(param, 3, retransStr, MAX_STRING_LEN) || '\0' == retransStr[0])
+		retrans = 1;
+	else
+		retrans = atoi(retransStr);
+
+	if(0 != get_param(param, 4, retryStr, MAX_STRING_LEN) || '\0' == retryStr[0])
+		retry = 2;
+	else
+		retry = atoi(retryStr);
 
 #ifdef _WINDOWS
-	if(INADDR_NONE == inet_addr(ip))
-	{
-		SET_UI64_RESULT(result,0);
+	if (!(res = WSAStartup(MAKEWORD(2, 2), &wsaData)))
 		return SYSINFO_RET_FAIL;
-	}
-
-	if (!(res = WSAStartup(MAKEWORD(2, 2), &wsaData))) {
-		zabbix_log(LOG_LEVEL_ERR, "WSAStartup failed: %d", res);
-	};
 
 	SET_UI64_RESULT(result, NULL == gethostbyname(zone) ? 0 : 1);
 #else
-	if(1 != inet_aton(ip, &in))
-	{
-		SET_UI64_RESULT(result,0);
-		return SYSINFO_RET_FAIL;
-	}
 
 	if (!(_res.options & RES_INIT))
 		res_init();
 
-	res = res_query(zone, C_IN, T_SOA, (unsigned char *)respbuf, sizeof(respbuf));
+	res = res_mkquery(QUERY, zone, C_IN, T_SOA, NULL, 0, NULL, buf, sizeof(buf));
+	if (res <= 0)
+		return SYSINFO_RET_FAIL;
 
-	SET_UI64_RESULT(result, -1 != res ? 1 : 0);
+	if('\0' != ip[0])
+	{
+		if(1 != inet_aton(ip, &dns_serv))
+		{
+			SET_UI64_RESULT(result,0);
+			return SYSINFO_RET_FAIL;
+		}
+		_res.nsaddr_list[0].sin_addr = dns_serv;
+		_res.nsaddr_list[0].sin_family = AF_INET;
+		_res.nsaddr_list[0].sin_port = htons(NS_DEFAULTPORT);
+		_res.nscount = 1;
+	}
+
+	_res.retrans = retrans;
+	_res.retry = retry;
+
+	res = res_send(buf, res, (unsigned char *)respbuf, sizeof(respbuf));
+
+	hp = (HEADER *) respbuf;
+	SET_UI64_RESULT(result, ((hp->rcode == NOERROR && ntohs(hp->ancount) != 0) && -1 < res) ? 1 : 0);
 #endif
 	return SYSINFO_RET_OK;
 #else /* Both HAVE_RES_QUERY and _WINDOWS not defined */
