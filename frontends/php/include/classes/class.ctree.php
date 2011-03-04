@@ -100,26 +100,26 @@ class CTree{
 		$tr->setAttribute('style',($this->tree[$id]['parentid'] != '0')?('display: none;'):(''));
 
 
-		foreach($this->fields as $key => $value){
+		foreach($this->fields as $value){
 			$style = null;
-			
+
 			if(($value == 'status') && ($this->tree[$id]['serviceid'] > 0)){
 				switch($this->tree[$id][$value]){
 					case TRIGGER_SEVERITY_DISASTER:
-						$this->tree[$id][$value] = S_DISASTER;
-						$style = 'disaster'; 
+						$this->tree[$id][$value] = getSeverityCaption(TRIGGER_SEVERITY_DISASTER);
+						$style = getSeverityStyle(TRIGGER_SEVERITY_DISASTER);
 						break;
 					case TRIGGER_SEVERITY_HIGH:
-						$this->tree[$id][$value] = S_HIGH;
-						$style = 'high'; 
+						$this->tree[$id][$value] = getSeverityCaption(TRIGGER_SEVERITY_HIGH);
+						$style = getSeverityStyle(TRIGGER_SEVERITY_HIGH);
 						break;
 					case TRIGGER_SEVERITY_AVERAGE:
-						$this->tree[$id][$value] = S_AVERAGE;
-						$style = 'average'; 
+						$this->tree[$id][$value] = getSeverityCaption(TRIGGER_SEVERITY_AVERAGE);
+						$style = getSeverityStyle(TRIGGER_SEVERITY_AVERAGE);
 						break;
 					case TRIGGER_SEVERITY_WARNING:
-						$this->tree[$id][$value] = S_WARNING;
-						$style = 'warning'; 
+						$this->tree[$id][$value] = getSeverityCaption(TRIGGER_SEVERITY_WARNING);
+						$style = getSeverityStyle(TRIGGER_SEVERITY_WARNING);
 						break;
 					case TRIGGER_SEVERITY_INFORMATION:
 					default:
@@ -127,7 +127,7 @@ class CTree{
 						break;
 				}
 			}
-			
+
 			$tr->addItem(new CCol($this->tree[$id][$value], $style));
 		}
 

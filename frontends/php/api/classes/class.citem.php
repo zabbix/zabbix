@@ -123,10 +123,10 @@ class CItem extends CZBXAPI{
 			unset($sql_parts['select']['items']);
 
 			$dbTable = DB::getSchema('items');
-			$sql_parts['select']['itemid'] = ' i.itemid';
+			$sql_parts['select']['itemid'] = 'i.itemid';
 			foreach($options['output'] as $key => $field){
 				if(isset($dbTable['fields'][$field]))
-					$sql_parts['select'][$field] = ' i.'.$field;
+					$sql_parts['select'][$field] = 'i.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;

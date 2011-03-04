@@ -102,10 +102,10 @@ class CHostGroup extends CZBXAPI{
 			unset($sql_parts['select']['groups']);
 
 			$dbTable = DB::getSchema('groups');
-			$sql_parts['select']['groupid'] = ' g.groupid';
+			$sql_parts['select']['groupid'] = 'g.groupid';
 			foreach($options['output'] as $key => $field){
 				if(isset($dbTable['fields'][$field]))
-					$sql_parts['select'][$field] = ' g.'.$field;
+					$sql_parts['select'][$field] = 'g.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;

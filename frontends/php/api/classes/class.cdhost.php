@@ -120,7 +120,7 @@ class CDHost extends CZBXAPI{
 			$dbTable = DB::getSchema('dhosts');
 			foreach($options['output'] as $key => $field){
 				if(isset($dbTable['fields'][$field]))
-					$sql_parts['select'][$field] = ' dh.'.$field;
+					$sql_parts['select'][$field] = 'dh.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;
