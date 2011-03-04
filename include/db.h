@@ -329,16 +329,6 @@ DB_ITEM;
 
 typedef struct
 {
-	zbx_uint64_t     functionid;
-	zbx_uint64_t     itemid;
-	zbx_uint64_t     triggerid;
-	char    *function;
-	char	*parameter;
-}
-DB_FUNCTION;
-
-typedef struct
-{
 	zbx_uint64_t	mediaid;
 	zbx_uint64_t	mediatypeid;
 	char	*sendto;
