@@ -1,0 +1,11 @@
+alter table hosts_profiles modify devicetype              nvarchar2(64)           DEFAULT '';
+alter table hosts_profiles modify name            nvarchar2(64)           DEFAULT '';
+alter table hosts_profiles modify os              nvarchar2(64)           DEFAULT '';
+alter table hosts_profiles modify serialno                nvarchar2(64)           DEFAULT '';
+alter table hosts_profiles modify tag             nvarchar2(64)           DEFAULT '';
+alter table hosts_profiles modify macaddress              nvarchar2(64)           DEFAULT '';
+alter table hosts_profiles modify hardware                nvarchar2(2048)         DEFAULT '';
+alter table hosts_profiles modify software                nvarchar2(2048)         DEFAULT '';
+alter table hosts_profiles modify contact         nvarchar2(2048)         DEFAULT '';
+alter table hosts_profiles modify location                nvarchar2(2048)         DEFAULT '';
+alter table hosts_profiles modify notes           nvarchar2(2048)         DEFAULT '';
