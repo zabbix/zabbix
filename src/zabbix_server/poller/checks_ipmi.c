@@ -1040,42 +1040,52 @@ int	get_value_ipmi(DC_ITEM *item, AGENT_RESULT *value)
 }
 
 /* function 'parse_ipmi_command' require 'c_name' with size 'ITEM_IPMI_SENSOR_LEN_MAX' */
-int	parse_ipmi_command(char *command, char *c_name, int *val)
+int	parse_ipmi_command(const char *command, char *c_name, int *val, char *error, size_t error_max_len)
 {
-	char	*p, *ipmi_command;
+	const char	*__function_name = "parse_ipmi_command";
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In parse_ipmi_command(%s)", command);
+	const char	*p;
+	size_t		sz_c_name;
 
-	if (0 != strncmp(command, "IPMI", 4))
-		return FAIL;
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() command:'%s'", __function_name, command);
 
-	p = command + 4;
-	while (*p == ' ' && *p != '\0')
-		p++;
-
-	ipmi_command = p;
 	*val = 1;
 
-	if (NULL != (p = strchr(p, ' ')))
-	{
-		*p++ = '\0';
-		while (*p == ' ' && *p != '\0')
-			p++;
+	while ('\0' != *command && NULL != strchr(" \t", *command))
+		command++;
 
-		if (*p == '\0' || 0 == strcasecmp(p, "on"))
-			*val = 1;
-		else if (0 == strcasecmp(p, "off"))
-			*val = 0;
-		else if (SUCCEED == is_uint(p))
-			*val = atoi(p);
-		else
-		{
-			zabbix_log(LOG_LEVEL_ERR, "IPMI command Value is not supported [%s %s]",
-					command, p);
-			return FAIL;
-		}
+	for (p = command; '\0' != *p && NULL == strchr(" \t", *p); p++)
+		;
+
+	if (0 == (sz_c_name = p - command))
+	{
+		zbx_strlcpy(error, "IPMI command is empty", error_max_len);
+		return FAIL;
 	}
-	zbx_strlcpy(c_name, ipmi_command, ITEM_IPMI_SENSOR_LEN_MAX);
+
+	if (sz_c_name >= ITEM_IPMI_SENSOR_LEN_MAX)
+	{
+		zbx_snprintf(error, error_max_len, "IPMI command is too long [%.*s]", sz_c_name, command);
+		return FAIL;
+	}
+
+	memcpy(c_name, command, sz_c_name);
+	c_name[sz_c_name] = '\0';
+
+	while ('\0' != *p && NULL != strchr(" \t", *p))
+		p++;
+
+	if (*p == '\0' || 0 == strcasecmp(p, "on"))
+		*val = 1;
+	else if (0 == strcasecmp(p, "off"))
+		*val = 0;
+	else if (SUCCEED == is_uint(p))
+		*val = atoi(p);
+	else
+	{
+		zbx_snprintf(error, error_max_len, "IPMI command value is not supported [%s]", p);
+		return FAIL;
+	}
 
 	return SUCCEED;
 }

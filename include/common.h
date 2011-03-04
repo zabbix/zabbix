@@ -639,6 +639,12 @@ const char	*zbx_permission_string(int perm);
 #define	ZBX_NODE_SLAVE	1
 const char	*zbx_nodetype_string(unsigned char nodetype);
 
+#define ZBX_SCRIPT_TYPE_SCRIPT		0
+#define ZBX_SCRIPT_TYPE_IPMI		1
+
+#define ZBX_SCRIPT_EXECUTE_ON_AGENT	0
+#define ZBX_SCRIPT_EXECUTE_ON_SERVER	1
+
 #define POLLER_DELAY		5
 #define DISCOVERER_DELAY	60
 
