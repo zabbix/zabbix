@@ -1879,9 +1879,8 @@ static const char	*ex_macros[] = {MVAR_PROFILE_DEVICETYPE, MVAR_PROFILE_NAME, MV
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: example: " {Zabbix server:{TRIGGER.KEY1}.last(0)} " to "1.34"    *
- *                 bl - ^                                br - ^      ^        *
- *                                                       replace_to -|        *
+ * Comments: example: " {Zabbix server:{TRIGGER.KEY1}.last(0)} " to " 1.34 "  *
+ *                      ^ - bl                                ^ - br          *
  *                                                                            *
  ******************************************************************************/
 static void	get_trigger_function_value(zbx_uint64_t triggerid, char **replace_to, char *bl, char **br)
@@ -1932,7 +1931,6 @@ static void	get_trigger_function_value(zbx_uint64_t triggerid, char **replace_to
 		zbx_strlcpy(*replace_to, STR_UNKNOWN_VARIABLE, MAX_BUFFER_LEN);
 
 	*br = p;
-
 fail:
 	zbx_free(host);
 	zbx_free(key);
