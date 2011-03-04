@@ -26,6 +26,16 @@
 
 #include "net.h"
 
+#ifdef _WINDOWS
+#include <windns.h>
+
+#include <winsock2.h>  //winsock
+#include <stdio.h>    //standard i/o
+#pragma comment(lib, "Ws2_32.lib")
+
+#pragma comment(lib, "Dnsapi.lib")
+#endif
+
 /*
  * 0 - NOT OK
  * 1 - OK
@@ -110,63 +120,61 @@ int	NET_TCP_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	return ret;
 }
 
-#ifndef _WINDOWS
-#ifdef HAVE_RES_QUERY
+#if defined(HAVE_RES_QUERY) || defined(_WINDOWS)
 
 #ifndef C_IN
 #	define C_IN	ns_c_in
 #endif	/* C_IN */
-
 #ifndef T_ANY
-#	define T_ANY	ns_t_any
-#endif
+#	define T_ANY	255
+#endif	/* T_ANY */
 #ifndef T_A
-#	define T_A	ns_t_a
-#endif
+#	define T_A	1
+#endif	/* T_A */
 #ifndef T_NS
-#	define T_NS	ns_t_ns
+#	define T_NS	2
 #endif	/* T_NS */
 #ifndef T_MD
-#	define T_MD	ns_t_md
+#	define T_MD	3
 #endif	/* T_MD */
 #ifndef T_MF
-#	define T_MF	ns_t_mf
+#	define T_MF	4
 #endif	/* T_MF */
 #ifndef T_CNAME
-#	define T_CNAME	ns_t_cname
+#	define T_CNAME	5
 #endif	/* T_CNAME */
 #ifndef T_SOA
-#	define T_SOA	ns_t_soa
+#	define T_SOA	6
 #endif	/* T_SOA */
 #ifndef T_MB
-#	define T_MB	ns_t_mb
+#	define T_MB	7
 #endif	/* T_MB */
 #ifndef T_MG
-#	define T_MG	ns_t_mg
+#	define T_MG	8
 #endif	/* T_MG */
 #ifndef T_MR
-#	define T_MR	ns_t_mr
+#	define T_MR	9
 #endif	/* T_MR */
 #ifndef T_NULL
-#	define T_NULL	ns_t_null
+#	define T_NULL	10
 #endif	/* T_NULL */
 #ifndef T_WKS
-#	define T_WKS	ns_t_wks
+#	define T_WKS	11
 #endif	/* T_WKS */
 #ifndef T_PTR
-#	define T_PTR	ns_t_ptr
+#	define T_PTR	12
 #endif	/* T_PTR */
 #ifndef T_HINFO
-#	define T_HINFO	ns_t_hinfo
+#	define T_HINFO	13
 #endif	/* T_HINFO */
 #ifndef T_MINFO
-#	define T_MINFO	ns_t_minfo
+#	define T_MINFO	14
 #endif	/* T_MINFO */
 #ifndef T_MX
-#	define T_MX	ns_t_mx
+#	define T_MX	15
 #endif	/* T_MX */
 #ifndef T_TXT
-#	define T_TXT	ns_t_txt
+#	define T_TXT	16
 #endif	/* T_TXT */
 
 static char	*decode_type(int q_type)
@@ -197,6 +205,7 @@ static char	*decode_type(int q_type)
 	}
 }
 
+#ifndef _WINDOWS
 static char	*get_name(unsigned char *msg, unsigned char *msg_end, unsigned char **msg_ptr)
 {
 	int		res;
@@ -209,39 +218,36 @@ static char	*get_name(unsigned char *msg, unsigned char *msg_end, unsigned char 
 
 	return buffer;
 }
+#endif
 
-#endif /* HAVE_RES_QUERY */
-#endif /* not _WINDOWS */
+#endif defined(HAVE_RES_QUERY) || defined(_WINDOWS)
+
 
 int	NET_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	dns_query(cmd, param, flags, result, 1);
+	return dns_query(cmd, param, flags, result, 1);
 }
 int	NET_DNS_RECORD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	dns_query(cmd, param, flags, result, 0);
+	return dns_query(cmd, param, flags, result, 0);
 }
 
 int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result, int shortAnswer)
 {
 #if defined(HAVE_RES_QUERY) || defined(_WINDOWS)
 
-	int		res, retrans, retry;
+	int		res, type, retrans, retry, i, offset;
 	char		ip[MAX_STRING_LEN];
 	char		zone[MAX_STRING_LEN];
 	char		retransStr[MAX_STRING_LEN];
 	char		retryStr[MAX_STRING_LEN];
+	char		tmp[MAX_STRING_LEN];
+	char		buffer[MAX_STRING_LEN];
 
-#ifdef _WINDOWS
-	WSADATA 	wsaData;
-	PDNS_RECORD	pDnsRecord;
-	PIP4_ARRAY	pSrvList = NULL;
-#else /* not _WINDOWS */
 	typedef struct resolv_querytype_s {
 		char	*name;
 		int	type;
 	} resolv_querytype_t;
-
 	static resolv_querytype_t qt[] = {
 		{"ANY", T_ANY},
 		{"A", T_A},
@@ -263,6 +269,12 @@ int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 		{NULL}
 	};
 
+#ifdef _WINDOWS
+	PDNS_RECORD	pDnsRecord;
+	PIP4_ARRAY	pSrvList = NULL;
+	DWORD		options = DNS_QUERY_STANDARD;
+#else /* not _WINDOWS */
+
 	typedef union {
 		HEADER		h;
 #if defined(NS_PACKETSZ)
@@ -274,16 +286,15 @@ int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 #endif
 	} answer_t;
 
-	char		tmp[MAX_STRING_LEN], *name,
-			buffer[MAX_STRING_LEN];
+	char		*name;
 	unsigned char	*msg_end, *msg_ptr, *p;
 	int		num_answers, num_query, q_type, q_class, q_ttl, q_len,
-			value, offset, c, i, type, n;
+			value, c, n;
 	answer_t	answer;
-	struct in_addr	inaddr, dns_serv;
-	struct protoent	*pr;
 	struct servent	*s;
 	HEADER 		*hp;
+	struct in_addr	inaddr, dns_serv;
+	struct protoent	*pr;
 
 #if PACKETSZ > 1024
 	char 		buf[PACKETSZ];
@@ -293,6 +304,8 @@ int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 
 #endif /* ifdef _WINDOWS */
 
+	*buffer = '\0';
+	offset = 0;
 
 	if (num_param(param) > 5)
 		return SYSINFO_RET_FAIL;
@@ -304,12 +317,16 @@ int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 		strscpy(zone, "localhost");
 
 	if (get_param(param, 3, tmp, sizeof(tmp)) != 0 || *tmp == ' ')
-		type = T_SOA;
+		type = DNS_TYPE_SOA;
 	else
 	{
 		for (i = 0; qt[i].name != NULL; i++)
 		{
+#ifdef _WINDOWS
+			if (0 == lstrcmpiA(qt[i].name, tmp))
+#else
 			if (0 == strcasecmp(qt[i].name, tmp))
+#endif
 			{
 				type = qt[i].type;
 				break;
@@ -330,44 +347,111 @@ int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 	else
 		retry = atoi(retryStr);
 
+#ifdef _WINDOWS
 	if('\0' != ip[0])
 	{
-		if(1 != inet_aton(ip, &dns_serv))
-		{
-			SET_UI64_RESULT(result,0);
-			return SYSINFO_RET_FAIL;
-		}
-#ifdef _WINDOWS
-		pSrvList = (PIP4_ARRAY) LocalAlloc(LPTR,sizeof(IP4_ARRAY));
-		if(!pSrvList)
-			return SYSINFO_RET_FAIL;
+		options |= DNS_QUERY_BYPASS_CACHE;
+		pSrvList = (PIP4_ARRAY) zbx_malloc(pSrvList,sizeof(IP4_ARRAY));
 		pSrvList->AddrCount = 1;
-		pSrvList->AddrArray[0] = inet_addr(dns_serv);
-#else
-		_res.nsaddr_list[0].sin_addr = dns_serv;
-		_res.nsaddr_list[0].sin_family = AF_INET;
-		_res.nsaddr_list[0].sin_port = htons(NS_DEFAULTPORT);
-		_res.nscount = 1;
-#endif
+		pSrvList->AddrArray[0] = inet_addr(ip);
 	}
+	res = DnsQuery_A( zone, type, DNS_QUERY_STANDARD, pSrvList, &pDnsRecord, NULL);
 
-#ifdef _WINDOWS
-//	if (!(res = WSAStartup(MAKEWORD(2, 2), &wsaData)))
-//		return SYSINFO_RET_FAIL;
+	zbx_free(pSrvList);
 	if (1 == shortAnswer)
-		SET_UI64_RESULT(result, DnsQuery(zone, DNS_TYPE_A, DNS_QUERY_BYPASS_CACHE, pSrvList, &pDnsRecord, NULL) ? 0 : 1);
-	else
-		return SYSINFO_RET_FAIL;
-//		SET_UI64_RESULT(result, NULL == gethostbyname(zone) ? 0 : 1);
-//		SET_TEXT_RESULT(result, strdup(buffer));
+		SET_UI64_RESULT(result, res == DNS_RCODE_NOERROR ? 1 : 0);
+	else {
+		if (NULL == pDnsRecord)
+			return SYSINFO_RET_FAIL;
+		while( NULL != pDnsRecord)
+		{
+			if (T_ANY != type && type != pDnsRecord->wType)
+			{
+				pDnsRecord = pDnsRecord->pNext;
+				continue;
+			}
+			if (NULL == pDnsRecord->pName)
+				return SYSINFO_RET_FAIL;
 
-//    status = DnsQuery(zone, DNS_TYPE_A, DNS_QUERY_BYPASS_CACHE, pSrvList, &pDnsRecord, NULL);
+			offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%-20s", pDnsRecord->pName);
 
+			offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %-8s", decode_type(pDnsRecord->wType));
+			switch(pDnsRecord->wType)
+			{
+				case T_A:
+					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", inet_ntop(AF_INET, &(pDnsRecord->Data.A.IpAddress), tmp, sizeof(tmp)));
+					break;
+				case T_NS:
+					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", pDnsRecord->Data.NS.pNameHost);
+					break;
+				case T_MD:
+					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", pDnsRecord->Data.MD.pNameHost);
+					break;
+				case T_MF:
+					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", pDnsRecord->Data.MF.pNameHost);
+					break;
+				case T_CNAME:
+					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", pDnsRecord->Data.CNAME.pNameHost);
+					break;
+				case T_SOA:
+					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s %s %d %d %d %d %d",
+								pDnsRecord->Data.SOA.pNamePrimaryServer,
+								pDnsRecord->Data.SOA.pNameAdministrator,
+								pDnsRecord->Data.SOA.dwSerialNo,
+								pDnsRecord->Data.SOA.dwRefresh,
+								pDnsRecord->Data.SOA.dwRetry,
+								pDnsRecord->Data.SOA.dwExpire,
+								pDnsRecord->Data.SOA.dwDefaultTtl);
+					break;
+				case T_MB:
+					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", pDnsRecord->Data.MB.pNameHost);
+					break;
+				case T_MG:
+					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", pDnsRecord->Data.MG.pNameHost);
+					break;
+				case T_MR:
+					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", pDnsRecord->Data.MR.pNameHost);
+					break;
+				/* TODO: add case T_WKS */
+				case T_PTR:
+					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", pDnsRecord->Data.PTR.pNameHost);
+					break;
+				case T_HINFO:
+					for (i=0; i < (int)(pDnsRecord->Data.HINFO.dwStringCount); i++)
+						offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", pDnsRecord->Data.HINFO.pStringArray[i]);
+					break;
+				case T_MINFO:
+					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s %s", pDnsRecord->Data.MINFO.pNameMailbox, pDnsRecord->Data.MINFO.pNameErrorsMailbox);
+					break;
+				case T_MX:
+					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d %s", pDnsRecord->Data.MX.wPreference, pDnsRecord->Data.MX.pNameExchange);
+					break;
+				case T_TXT:
+					for (i=0; i < (int)(pDnsRecord->Data.TXT.dwStringCount); i++)
+						offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", pDnsRecord->Data.TXT.pStringArray[i]);
+					break;
+				default:
+					break;
+			}
+			offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "\n");
+			pDnsRecord = pDnsRecord->pNext;
+		}
 
+	}
 #else
 
 	if (!(_res.options & RES_INIT))
 		res_init();
+
+	if('\0' != ip[0])
+	{
+		1 != inet_aton(ip, &dns_serv))
+			return SYSINFO_RET_FAIL;
+		_res.nsaddr_list[0].sin_addr = dns_serv;
+		_res.nsaddr_list[0].sin_family = AF_INET;
+		_res.nsaddr_list[0].sin_port = htons(NS_DEFAULTPORT);
+		_res.nscount = 1;
+	}
 
 	res = res_mkquery(QUERY, zone, C_IN, type, NULL, 0, NULL, buf, sizeof(buf));
 	if (res <= 0)
@@ -560,14 +644,11 @@ int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 		}
 		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "\n");
 	}
+#endif
+
 	if (offset != 0)
 		buffer[--offset] = '\0';
-
-	/*zabbix_log(LOG_LEVEL_CRIT, "== [%zd] %s", strlen(buffer), buffer);*/
-
 	SET_TEXT_RESULT(result, strdup(buffer));
-
-#endif
 	return SYSINFO_RET_OK;
 #else /* Both HAVE_RES_QUERY and _WINDOWS not defined */
 	return SYSINFO_RET_FAIL;
