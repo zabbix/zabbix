@@ -64,17 +64,15 @@ static void	process_time_functions()
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_setproctitle("timer [updating triggers]");
-
 	result = DBselect(
 			"select distinct t.triggerid,t.type,t.value,t.value_flags,t.error,t.expression"
 			" from triggers t,functions f,items i,hosts h"
-			" where t.status=%d"
-				" and t.triggerid=f.triggerid"
-				" and f.function in ('nodata','date','dayofmonth','dayofweek','time','now')"
+			" where t.triggerid=f.triggerid"
 				" and f.itemid=i.itemid"
-				" and i.status=%d"
 				" and i.hostid=h.hostid"
+				" and t.status=%d"
+				" and f.function in ('nodata','date','dayofmonth','dayofweek','time','now')"
+				" and i.status=%d"
 				" and h.status=%d"
 				" and (h.maintenance_status=%d or h.maintenance_type=%d)"
 				DB_NODE,
@@ -617,8 +615,6 @@ static void	process_maintenance()
 	int				hm_count = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	zbx_setproctitle("timer [processing maintenance periods]");
 
 	if (NULL == hm)
 		hm = zbx_malloc(hm, sizeof(zbx_host_maintenance_t) * hm_alloc);
