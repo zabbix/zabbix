@@ -63,6 +63,14 @@ class testFormScript extends CWebTest{
 				false,
 				array()
 			),
+			array(
+				array(
+					array('name' => 'name', 'value' => 'script', 'type' => 'text'),
+					array('name' => 'command', 'value' => '', 'type' => 'text'),
+				),
+				false,
+				array()
+			),
 		);
 		return $data;
 	}
