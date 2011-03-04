@@ -581,7 +581,7 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 			rc = get_dynamic_hostid(event, &item, error, sizeof(error));
 
 		command = zbx_strdup(command, row[2]);
-		substitute_macros(event, NULL, &command);
+		substitute_simple_macros(event, NULL, NULL, NULL, &command, MACRO_TYPE_MESSAGE, NULL, 0);
 
 		if (SUCCEED == rc)
 			rc = run_remote_command(&item, command, error, sizeof(error));
@@ -889,11 +889,13 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 
 					if (0 == default_msg)
 					{
-						subject = strdup(row[6]);
-						message = strdup(row[7]);
+						subject = zbx_strdup(subject, row[6]);
+						message = zbx_strdup(message, row[7]);
 
-						substitute_macros(event, NULL, &subject);
-						substitute_macros(event, NULL, &message);
+						substitute_simple_macros(event, NULL, NULL, NULL, &subject,
+								MACRO_TYPE_MESSAGE, NULL, 0);
+						substitute_simple_macros(event, NULL, NULL, NULL, &message,
+								MACRO_TYPE_MESSAGE, NULL, 0);
 					}
 					else
 					{
@@ -1185,8 +1187,10 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 			case ESCALATION_STATUS_ACTIVE:
 				if (SUCCEED == get_event_info(escalation->eventid, &event))
 				{
-					substitute_macros(&event, NULL, &action.shortdata);
-					substitute_macros(&event, NULL, &action.longdata);
+					substitute_simple_macros(&event, NULL, NULL, NULL,
+							&action.shortdata, MACRO_TYPE_MESSAGE, NULL, 0);
+					substitute_simple_macros(&event, NULL, NULL, NULL,
+							&action.longdata, MACRO_TYPE_MESSAGE, NULL, 0);
 
 					execute_operations(escalation, &event, &action);
 				}
@@ -1195,8 +1199,10 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 			case ESCALATION_STATUS_RECOVERY:
 				if (SUCCEED == get_event_info(escalation->r_eventid, &event))
 				{
-					substitute_macros(&event, escalation, &action.shortdata);
-					substitute_macros(&event, escalation, &action.longdata);
+					substitute_simple_macros(&event, NULL, NULL, escalation,
+							&action.shortdata, MACRO_TYPE_MESSAGE, NULL, 0);
+					substitute_simple_macros(&event, NULL, NULL, escalation,
+							&action.longdata, MACRO_TYPE_MESSAGE, NULL, 0);
 
 					process_recovery_msg(escalation, &event, &action);
 				}

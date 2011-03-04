@@ -120,7 +120,7 @@ class CDService extends CZBXAPI{
 			$dbTable = DB::getSchema('dservices');
 			foreach($options['output'] as $key => $field){
 				if(isset($dbTable['fields'][$field]))
-					$sql_parts['select'][$field] = ' ds.'.$field;
+					$sql_parts['select'][$field] = 's.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;

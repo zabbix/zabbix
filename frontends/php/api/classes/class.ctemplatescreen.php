@@ -94,7 +94,7 @@ class CTemplateScreen extends CScreen{
 			$dbTable = DB::getSchema('screens');
 			foreach($options['output'] as $key => $field){
 				if(isset($dbTable['fields'][$field]))
-					$sql_parts['select'][$field] = ' s.'.$field;
+					$sql_parts['select'][$field] = 's.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;
