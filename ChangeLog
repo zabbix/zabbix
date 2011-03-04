@@ -91,7 +91,8 @@ New features:
 
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
- 
+
+ - [ZBX-3076] disabled generation of events in case if some items or hosts in trigger expression are not active (Sasha)
  - [ZBX-3562] fixed user macros in map element label expressions (Aly)
  - [ZBXNEXT-508] added dayofmonth to trigger functions (rudolfs)
  - [ZBX-3352] made item Y axis min/max items also change when used in screen with Dynamic enabled (Vedmak)

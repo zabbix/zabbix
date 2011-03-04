@@ -151,6 +151,7 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #define	AGENT_ERROR	(-5)
 const char	*zbx_result_string(int result);
 
+#define MAX_ID_LEN	21
 #define MAX_STRING_LEN	2048
 #define MAX_BUFFER_LEN	65536
 
