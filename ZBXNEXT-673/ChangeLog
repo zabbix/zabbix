@@ -21,6 +21,7 @@ New features:
  - [ZBX-3338] updated Ukrainian translation; thanks to zalex_ua (Richlv)
 
 Bug fixes:
+ - [ZBX-3538] action condition 'Trigger description' renamed to 'Trigger name' (Alexei)
  - [ZBX-976] fix and improve availability report dropdown captions (Richlv)
  - [ZBX-3472] In item and discovery forms snmpv3 auth fields are now hidden if not needed (KB)
  - [ZBX-3550] enforce authentication for API, if auth param is not empty (Vedmak)
@@ -90,7 +91,9 @@ New features:
 
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
- 
+
+ - [ZBX-3568] fixed processing of trigger functions with macros in item key parameters in notifications (Sasha)
+ - [ZBX-3076] disabled generation of events in case if some items or hosts in trigger expression are not active (Sasha)
  - [ZBX-3562] fixed user macros in map element label expressions (Aly)
  - [ZBXNEXT-508] added dayofmonth to trigger functions (rudolfs)
  - [ZBX-3352] made item Y axis min/max items also change when used in screen with Dynamic enabled (Vedmak)

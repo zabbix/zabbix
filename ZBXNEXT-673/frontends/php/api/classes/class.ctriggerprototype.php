@@ -126,10 +126,10 @@ class CTriggerPrototype extends CZBXAPI{
 			unset($sql_parts['select']['triggers']);
 
 			$dbTable = DB::getSchema('triggers');
-			$sql_parts['select']['triggerid'] = ' t.triggerid';
+			$sql_parts['select']['triggerid'] = 't.triggerid';
 			foreach($options['output'] as $key => $field){
 				if(isset($dbTable['fields'][$field]))
-					$sql_parts['select'][$field] = ' t.'.$field;
+					$sql_parts['select'][$field] = 't.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;

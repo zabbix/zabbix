@@ -80,7 +80,7 @@ class CDCheck extends CZBXAPI{
 			$dbTable = DB::getSchema('dchecks');
 			foreach($options['output'] as $key => $field){
 				if(isset($dbTable['fields'][$field]))
-					$sql_parts['select'][$field] = ' dc.'.$field;
+					$sql_parts['select'][$field] = 'dc.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;

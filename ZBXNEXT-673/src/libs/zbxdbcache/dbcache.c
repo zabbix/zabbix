@@ -887,12 +887,10 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 1024,
 			"select distinct t.triggerid,t.type,t.value,t.value_flags,t.error,t.expression,f.itemid,i.flags"
 			" from triggers t,functions f,items i"
-			" where i.status not in (%d)"
-				" and i.itemid=f.itemid"
+			" where t.triggerid=f.triggerid"
+				" and f.itemid=i.itemid"
 				" and t.status=%d"
-				" and f.triggerid=t.triggerid"
 				" and f.itemid in (",
-			ITEM_STATUS_NOTSUPPORTED,
 			TRIGGER_STATUS_ENABLED);
 
 	for (i = 0; i < history_num; i++)
