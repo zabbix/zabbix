@@ -64,11 +64,10 @@ $_REQUEST['go'] = get_request('go', 'none');
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 if($sid = get_request('scriptid')){
-	$options = array(
+	$scripts = API::Script()->get(array(
 		'scriptids' => $sid,
 		'output' => API_OUTPUT_SHORTEN,
-	);
-	$scripts = API::Script()->get($options);
+	));
 	if(empty($scripts)) access_deny();
 }
 
