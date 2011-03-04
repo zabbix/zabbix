@@ -2418,21 +2418,20 @@ void	substitute_macros(DB_EVENT *event, DB_ESCALATION *escalation, char **data)
  ******************************************************************************/
 static int	substitute_functions(char **exp, time_t now, char *error, int maxerrlen)
 {
-#define ID_LEN 21
-	char	functionid[ID_LEN], *e, *f;
-	char	*out = NULL;
-	int	out_alloc = 64, out_offset = 0;
-	char	value[MAX_BUFFER_LEN];
+	const char	*__function_name = "substitute_functions";
 
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_ITEM		item;
+	char		functionid[MAX_ID_LEN], value[MAX_BUFFER_LEN], *e, *f, *out = NULL;
+	int		out_alloc = 64, out_offset = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_functions(%s)",
-			*exp);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, *exp);
 
 	if (**exp == '\0')
 		goto empty;
+
+	*error = '\0';
 
 	out = zbx_malloc(out, out_alloc);
 
@@ -2444,7 +2443,7 @@ static int	substitute_functions(char **exp, time_t now, char *error, int maxerrl
 			f = functionid;
 			while (*e != '}' && *e != '\0')
 			{
-				if (functionid - f == ID_LEN)
+				if (functionid - f == MAX_ID_LEN)
 					break;
 				if (*e < '0' || *e > '9')
 					break;
@@ -2461,8 +2460,6 @@ static int	substitute_functions(char **exp, time_t now, char *error, int maxerrl
 			*f = '\0';
 			e++;	/* '}' */
 
-			*error = '\0';
-
 			result = DBselect(
 					"select distinct %s,f.function,f.parameter,h.status from %s,functions f"
 					" where i.hostid=h.hostid and i.itemid=f.itemid and f.functionid=%s",
@@ -2477,8 +2474,7 @@ static int	substitute_functions(char **exp, time_t now, char *error, int maxerrl
 			}
 			else
 			{
-				const char	*function;
-				const char	*parameter;
+				const char	*function, *parameter;
 				unsigned char	host_status;
 
 				DBget_item_from_db(&item, row);
@@ -2490,12 +2486,15 @@ static int	substitute_functions(char **exp, time_t now, char *error, int maxerrl
 				if (ITEM_STATUS_DISABLED == item.status)
 					zbx_snprintf(error, maxerrlen, "Item disabled for function: {%s:%s.%s(%s)}",
 							item.host_name, item.key, function, parameter);
+				else if (ITEM_STATUS_NOTSUPPORTED == item.status)
+					zbx_snprintf(error, maxerrlen, "Item not supported for function: {%s:%s.%s(%s)}",
+							item.host_name, item.key, function, parameter);
 
 				if ('\0' == *error && HOST_STATUS_NOT_MONITORED == host_status)
 					zbx_snprintf(error, maxerrlen, "Host disabled for function: {%s:%s.%s(%s)}",
 							item.host_name, item.key, function, parameter);
 
-				if ('\0' == *error && FAIL == evaluate_function(value, &item, function, parameter, now))
+				if ('\0' == *error && SUCCEED != evaluate_function(value, &item, function, parameter, now))
 					zbx_snprintf(error, maxerrlen, "Evaluation failed for function: {%s:%s.%s(%s)}",
 							item.host_name, item.key, function, parameter);
 			}
@@ -2513,13 +2512,13 @@ static int	substitute_functions(char **exp, time_t now, char *error, int maxerrl
 
 	*exp = out;
 empty:
-	zabbix_log(LOG_LEVEL_DEBUG, "End substitute_functions() [%s]", *exp);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() expression:'%s'", __function_name, *exp);
 
 	return SUCCEED;
 error:
 	zbx_free(out);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() error:'%s'", __function_name, error);
 	zabbix_syslog("%s", error);
 
 	return FAIL;
