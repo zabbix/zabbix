@@ -29,23 +29,22 @@
 #include "dbcache.h"
 #include "discovery.h"
 
-#define ZBX_HISTORY_FIELD struct history_field_t
-#define ZBX_HISTORY_TABLE struct history_table_t
-
-struct history_field_t
+typedef struct
 {
 	const char		*field;
 	const char		*tag;
 	zbx_json_type_t		jt;
 	char			*default_value;
-};
+}
+ZBX_HISTORY_FIELD;
 
-struct history_table_t
+typedef struct
 {
 	const char		*table, *lastfieldname;
 	const char		*from, *where;
 	ZBX_HISTORY_FIELD	fields[ZBX_MAX_FIELDS];
-};
+}
+ZBX_HISTORY_TABLE;
 
 static ZBX_HISTORY_TABLE ht = {
 	"proxy_history", "history_lastid", "hosts h,items i,",
@@ -892,28 +891,24 @@ int	get_host_availability_data(struct zbx_json *j)
 		if (1 == new || 0 != strcmp(ha[index].error, error))
 		{
 			zbx_json_addstring(j, ZBX_PROTO_TAG_ERROR, error, ZBX_JSON_TYPE_STRING);
-			zbx_free(ha[index].error);
 			ZBX_STRDUP(ha[index].error, error);
 		}
 
 		if (1 == new || 0 != strcmp(ha[index].snmp_error, snmp_error))
 		{
 			zbx_json_addstring(j, ZBX_PROTO_TAG_SNMP_ERROR, snmp_error, ZBX_JSON_TYPE_STRING);
-			zbx_free(ha[index].snmp_error);
 			ZBX_STRDUP(ha[index].snmp_error, snmp_error);
 		}
 
 		if (1 == new || 0 != strcmp(ha[index].ipmi_error, ipmi_error))
 		{
 			zbx_json_addstring(j, ZBX_PROTO_TAG_IPMI_ERROR, ipmi_error, ZBX_JSON_TYPE_STRING);
-			zbx_free(ha[index].ipmi_error);
 			ZBX_STRDUP(ha[index].ipmi_error, ipmi_error);
 		}
 
 		if (1 == new || 0 != strcmp(ha[index].jmx_error, jmx_error))
 		{
 			zbx_json_addstring(j, ZBX_PROTO_TAG_JMX_ERROR, jmx_error, ZBX_JSON_TYPE_STRING);
-			zbx_free(ha[index].jmx_error);
 			ZBX_STRDUP(ha[index].jmx_error, jmx_error);
 		}
 

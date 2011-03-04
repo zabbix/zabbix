@@ -596,7 +596,7 @@ int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int 
 	int		nextcheck;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() interfaceid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " delay:%d flex_intervals:'%s' now:%d",
-			__function_name, interfaceid, itemid, delay, NULL == flex_intervals ? "" : flex_intervals, now);
+			__function_name, interfaceid, itemid, delay, NULL == flex_intervals ? "" : flex_intervals, (int)now);
 
 	if (0 == delay)
 		delay = SEC_PER_YEAR;
