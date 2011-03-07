@@ -337,7 +337,7 @@ static int	run_remote_command(DC_ITEM *item, char *command, char *error, size_t 
 					&port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
 			if (SUCCEED == (ret = is_ushort(port, &item->interface.port)))
 			{
-				win2unix_eol(command);	/* CR+LF (Windows) => LF (Unix) */
+				dos2unix(command);	/* CR+LF (Windows) => LF (Unix) */
 
 				param = dyn_escape_param(command);
 				item->key = zbx_dsprintf(NULL, "system.run[\"%s\",\"nowait\"]", param);

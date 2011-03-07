@@ -68,7 +68,7 @@ static int	DBget_script_by_scriptid(zbx_uint64_t scriptid, DB_SCRIPT *script)
 	return res;
 }
 
-static int	zbx_execute_ipmi_command(DC_ITEM *item, const char *command, char *error, size_t error_max_len)
+static int	zbx_execute_ipmi_command(DC_ITEM *item, const char *command, char *error, size_t max_error_len)
 {
 	int	ret = FAIL;
 #ifdef HAVE_OPENIPMI
@@ -79,7 +79,7 @@ static int	zbx_execute_ipmi_command(DC_ITEM *item, const char *command, char *er
 #ifdef HAVE_OPENIPMI
 	if (SUCCEED != (ret = DCconfig_get_interface_by_type(&item->interface, item->host.hostid, INTERFACE_TYPE_IPMI)))
 	{
-		zbx_snprintf(error, error_max_len, "IPMI interface is not defined for host [%s]", item->host.host);
+		zbx_snprintf(error, max_error_len, "IPMI interface is not defined for host [%s]", item->host.host);
 		return ret;
 	}
 
@@ -93,27 +93,27 @@ static int	zbx_execute_ipmi_command(DC_ITEM *item, const char *command, char *er
 
 	if (SUCCEED != (ret = is_ushort(port, &item->interface.port)))
 	{
-		zbx_snprintf(error, error_max_len, "Invalid port number [%s]", item->interface.port_orig);
+		zbx_snprintf(error, max_error_len, "Invalid port number [%s]", item->interface.port_orig);
 		goto clean;
 	}
 
-	if (SUCCEED == (ret = parse_ipmi_command(command, item->ipmi_sensor, &val, error, error_max_len)))
+	if (SUCCEED == (ret = parse_ipmi_command(command, item->ipmi_sensor, &val, error, max_error_len)))
 	{
-		if (SUCCEED != (ret = set_ipmi_control_value(item, val, error, error_max_len)))
+		if (SUCCEED != (ret = set_ipmi_control_value(item, val, error, max_error_len)))
 			ret = FAIL;
 	}
 clean:
 	zbx_free(port);
 	zbx_free(item->interface.addr);
 #else
-	zbx_strlcpy(error, "Support for IPMI commands was not compiled in", error_max_len);
+	zbx_strlcpy(error, "Support for IPMI commands was not compiled in", max_error_len);
 #endif	/* HAVE_OPENIPMI */
 
 	return ret;
 }
 
 static int	zbx_execute_script_on_agent(DC_ITEM *item, char *command, char **result,
-		char *error, size_t error_max_len)
+		char *error, size_t max_error_len)
 {
 	int		ret;
 	AGENT_RESULT	agent_result;
@@ -121,7 +121,7 @@ static int	zbx_execute_script_on_agent(DC_ITEM *item, char *command, char **resu
 
 	if (SUCCEED != (ret = DCconfig_get_interface_by_type(&item->interface, item->host.hostid, INTERFACE_TYPE_AGENT)))
 	{
-		zbx_snprintf(error, error_max_len, "Zabbix agent interface is not defined for host [%s]", item->host.host);
+		zbx_snprintf(error, max_error_len, "Zabbix agent interface is not defined for host [%s]", item->host.host);
 		return ret;
 	}
 
@@ -132,11 +132,11 @@ static int	zbx_execute_script_on_agent(DC_ITEM *item, char *command, char **resu
 
 	if (SUCCEED != (ret = is_ushort(port, &item->interface.port)))
 	{
-		zbx_snprintf(error, error_max_len, "Invalid port number [%s]", item->interface.port_orig);
+		zbx_snprintf(error, max_error_len, "Invalid port number [%s]", item->interface.port_orig);
 		goto clean;
 	}
 
-	win2unix_eol(command);	/* CR+LF (Windows) => LF (Unix) */
+	dos2unix(command);	/* CR+LF (Windows) => LF (Unix) */
 
 	param = dyn_escape_param(command);
 	item->key = zbx_dsprintf(NULL, "system.run[\"%s\",\"wait\"]", param);
@@ -150,11 +150,11 @@ static int	zbx_execute_script_on_agent(DC_ITEM *item, char *command, char **resu
 	if (SUCCEED != (ret = get_value_agent(item, &agent_result)))
 	{
 		if (ISSET_MSG(&agent_result))
-			zbx_strlcpy(error, agent_result.msg, error_max_len);
+			zbx_strlcpy(error, agent_result.msg, max_error_len);
 		else
 		{
-			*error = '\0';
 			THIS_SHOULD_NEVER_HAPPEN;
+			*error = '\0';
 		}
 		ret = FAIL;
 	}
@@ -164,8 +164,8 @@ static int	zbx_execute_script_on_agent(DC_ITEM *item, char *command, char **resu
 			*result = zbx_strdup(*result, agent_result.text);
 		else
 		{
-			*result = zbx_strdup(*result, "");
 			THIS_SHOULD_NEVER_HAPPEN;
+			*result = zbx_strdup(*result, "");
 		}
 	}
 
@@ -181,20 +181,20 @@ clean:
 }
 
 static int	zbx_execute_script(DC_ITEM *item, unsigned char execute_on, char *command, char **result,
-		char *error, size_t error_max_len)
+		char *error, size_t max_error_len)
 {
 	int	ret = FAIL;
 
 	switch (execute_on)
 	{
 		case ZBX_SCRIPT_EXECUTE_ON_AGENT:
-			ret = zbx_execute_script_on_agent(item, command, result, error, error_max_len);
+			ret = zbx_execute_script_on_agent(item, command, result, error, max_error_len);
 			break;
 		case ZBX_SCRIPT_EXECUTE_ON_SERVER:
-			ret = zbx_execute(command, result, error, error_max_len, CONFIG_TRAPPER_TIMEOUT);
+			ret = zbx_execute(command, result, error, max_error_len, CONFIG_TRAPPER_TIMEOUT);
 			break;
 		default:
-			zbx_snprintf(error, error_max_len, "Invalid 'Execute on' option [%d]", (int)execute_on);
+			zbx_snprintf(error, max_error_len, "Invalid 'Execute on' option [%d]", (int)execute_on);
 	}
 
 	return ret;

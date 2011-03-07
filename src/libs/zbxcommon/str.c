@@ -3089,7 +3089,7 @@ void	zbx_replace_invalid_utf8(char *text)
 	*out = '\0';
 }
 
-void	win2unix_eol(char *str)
+void	dos2unix(char *str)
 {
 	char	*o = str;
 
