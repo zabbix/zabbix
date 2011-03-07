@@ -200,6 +200,31 @@ static int	zbx_execute_script(DC_ITEM *item, unsigned char execute_on, char *com
 	return ret;
 }
 
+static int	check_script_permissions(zbx_uint64_t groupid, zbx_uint64_t hostid, char *error, size_t max_error_len)
+{
+	DB_RESULT	result;
+	int		ret = SUCCEED;
+
+	if (0 == groupid)
+		return ret;
+
+	result = DBselect(
+			"select hostid"
+			" from hosts_groups"
+			" where hostid=" ZBX_FS_UI64
+				" and groupid=" ZBX_FS_UI64,
+			hostid, groupid);
+
+	if (NULL == DBfetch(result))
+	{
+		zbx_snprintf(error, max_error_len, "Insufficient permissions. Host is not in an allowed host group.");
+		ret = FAIL;
+	}
+	DBfree_result(result);
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: execute_script                                                   *
@@ -241,6 +266,12 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, char **res
 	{
 		*result = zbx_dsprintf(*result, "NODE %d: Unknown Script ID [" ZBX_FS_UI64 "]",
 				CONFIG_NODEID, scriptid);
+		return ret;
+	}
+
+	if (FAIL == check_script_permissions(script.groupid, hostid, error, sizeof(error)))
+	{
+		*result = zbx_dsprintf(*result, "NODE %d: %s", CONFIG_NODEID, error);
 		return ret;
 	}
 
