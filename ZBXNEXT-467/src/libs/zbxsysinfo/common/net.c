@@ -298,16 +298,16 @@ int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 
 	*buffer = '\0';
 
-	if (num_param(param) > 5)
+	if (5 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	if(0 != get_param(param, 1, ip, MAX_STRING_LEN))
+	if (0 != get_param(param, 1, ip, MAX_STRING_LEN))
 		ip[0] = '\0';
 
-	if(0 != get_param(param, 2, zone, MAX_STRING_LEN) || '\0' == zone[0])
+	if (0 != get_param(param, 2, zone, MAX_STRING_LEN) || '\0' == zone[0])
 		strscpy(zone, "zabbix.com");
 
-	if (get_param(param, 3, tmp, sizeof(tmp)) != 0 || *tmp == ' ')
+	if (0 != get_param(param, 3, tmp, sizeof(tmp)) || ' ' == *tmp || '\0' == tmp[0])
 		type = T_SOA;
 	else
 	{
@@ -327,18 +327,18 @@ int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 			return SYSINFO_RET_FAIL;
 	}
 
-	if(0 != get_param(param, 4, retransStr, MAX_STRING_LEN) || '\0' == retransStr[0])
+	if (0 != get_param(param, 4, retransStr, MAX_STRING_LEN) || '\0' == retransStr[0])
 		retrans = 1;
 	else
 		retrans = atoi(retransStr);
 
-	if(0 != get_param(param, 5, retryStr, MAX_STRING_LEN) || '\0' == retryStr[0])
+	if (0 != get_param(param, 5, retryStr, MAX_STRING_LEN) || '\0' == retryStr[0])
 		retry = 2;
 	else
 		retry = atoi(retryStr);
 
 #ifdef _WINDOWS
-	if('\0' != ip[0])
+	if ('\0' != ip[0])
 	{
 		pSrvList = (PIP4_ARRAY) zbx_malloc(pSrvList,sizeof(IP4_ARRAY));
 		pSrvList->AddrCount = 1;
@@ -432,7 +432,7 @@ int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 	if (!(_res.options & RES_INIT))
 		res_init();
 
-	if('\0' != ip[0])
+	if ('\0' != ip[0])
 	{
 		if (1 != inet_aton(ip, &inaddr))
 			return SYSINFO_RET_FAIL;
@@ -477,13 +477,13 @@ int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 	{
 		if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
 			return SYSINFO_RET_FAIL;
-
 		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%-20s", name);
 
 		GETSHORT(q_type, msg_ptr);
 		GETSHORT(q_class, msg_ptr);
 		GETLONG(q_ttl, msg_ptr);
 		GETSHORT(q_len, msg_ptr);
+		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %-8s", decode_type(q_type));
 
 		switch (q_type)
 		{
@@ -493,7 +493,7 @@ int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 					case C_IN:
 					case C_HS:
 						bcopy(msg_ptr, &inaddr, INADDRSZ);
-						offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %-8s %s", decode_type(q_type), inet_ntoa(inaddr));
+						offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", inet_ntoa(inaddr));
 						break;
 					default:
 						;
@@ -508,21 +508,19 @@ int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 			case T_PTR:
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
 					return SYSINFO_RET_FAIL;
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %-8s %s", decode_type(q_type), name);
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 				break;
 			case T_MD:
 			case T_MF:
 			case T_MX:
 				GETSHORT(value, msg_ptr);
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %-8s %d", decode_type(q_type), value);
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
 
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
 					return SYSINFO_RET_FAIL;
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 				break;
 			case T_SOA:
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %-8s", decode_type(q_type));
-
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
 					return SYSINFO_RET_FAIL;
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
@@ -547,11 +545,11 @@ int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
 				break;
 			case T_NULL:
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %-8s len:%d", decode_type(q_type), q_len);
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " len:%d", q_len);
 				msg_ptr += q_len;
 				break;
 			case T_WKS:
-				if (q_len < INT32SZ + 1)
+				if (INT32SZ + 1 > q_len )
 					return SYSINFO_RET_FAIL;
 
 				p = msg_ptr + q_len;
@@ -559,7 +557,7 @@ int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 				bcopy(msg_ptr, &inaddr, INADDRSZ);
 				msg_ptr += INT32SZ;
 
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %-8s %s", decode_type(q_type), inet_ntoa(inaddr));
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", inet_ntoa(inaddr));
 
 				if (NULL != (pr = getprotobynumber(*msg_ptr)))
 					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", pr->p_name);
@@ -586,12 +584,10 @@ int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 				}
 				break;
 			case T_HINFO:
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %-8s", decode_type(q_type));
-
 				p = msg_ptr + q_len;
 				c = *msg_ptr++;
 
-				if (c != 0)
+				if (0 != c)
 				{
 					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %.*s", c, msg_ptr);
 					msg_ptr += c;
@@ -600,7 +596,7 @@ int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 				if (msg_ptr < p) {
 					c = *msg_ptr++;
 
-					if (c != 0)
+					if (0 != c)
 					{
 						offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %.*s", c, msg_ptr);
 						msg_ptr += c;
@@ -610,15 +606,14 @@ int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 			case T_MINFO:
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
 					return SYSINFO_RET_FAIL;
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %-8s %s", decode_type(q_type), name);
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
 					return SYSINFO_RET_FAIL;
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 				break;
 			case T_TXT:
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %-8s \"", decode_type(q_type));
-
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " \"");
 				p = msg_ptr + q_len;
 				while (msg_ptr < p)
 				{
@@ -634,7 +629,7 @@ int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 	}
 #endif
 
-	if (offset != 0)
+	if (0 != offset)
 		buffer[--offset] = '\0';
 	SET_TEXT_RESULT(result, strdup(buffer));
 	return SYSINFO_RET_OK;
