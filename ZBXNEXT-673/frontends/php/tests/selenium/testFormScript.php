@@ -76,7 +76,7 @@ class testFormScript extends CWebTest{
 	}
 
 
-	public function testFormScript_Layout(){
+	public function testLayout(){
 		$this->login('scripts.php?form=1');
 		$this->assertTitle('Scripts');
 
@@ -122,7 +122,7 @@ class testFormScript extends CWebTest{
 	/**
 	 * @dataProvider providerScripts
 	 */
-	public function testFormScriptCreate($data, $resultSave, $DBvalues){
+	public function testCreate($data, $resultSave, $DBvalues){
 
 		DBsave_tables($this->affectedTables);
 
@@ -148,7 +148,7 @@ class testFormScript extends CWebTest{
 
 		$sql = 'SELECT ' . implode(', ', array_keys($DBvalues)) . ' FROM scripts';
 		if($resultSave && isset($keyField))
-			$sql .= ' WHERE name="'.$keyField.'"';
+			$sql .= ' WHERE name='.zbx_dbstr($keyField);
 
 		if(!$resultSave){
 			$sql = 'SELECT * FROM scripts';

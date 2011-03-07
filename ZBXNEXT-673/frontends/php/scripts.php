@@ -83,7 +83,7 @@ if($sid = get_request('scriptid')){
 
 		if($enableConfirmation && zbx_empty($confirmation)){
 			error(_('Please enter confirmation text.'));
-			show_messages(null, S_ERROR, S_CANNOT_ADD_SCRIPT);
+			show_messages(null, null, _('Cannot add script'));
 		}
 		else{
 			$script = array(
@@ -102,14 +102,14 @@ if($sid = get_request('scriptid')){
 				$script['scriptid'] = $_REQUEST['scriptid'];
 
 				$result = API::Script()->update($script);
-				show_messages($result, S_SCRIPT_UPDATED, S_CANNOT_UPDATE_SCRIPT);
+				show_messages($result, _('Script updated'), _('Cannot update script'));
 
 				$audit_acrion = AUDIT_ACTION_UPDATE;
 			}
 			else{
 				$result = API::Script()->create($script);
 
-				show_messages($result, S_SCRIPT_ADDED, S_CANNOT_ADD_SCRIPT);
+				show_messages($result, _('Script added'), _('Cannot add script'));
 
 				$audit_acrion = AUDIT_ACTION_ADD;
 			}
@@ -131,10 +131,10 @@ if($sid = get_request('scriptid')){
 		$result = API::Script()->delete($scriptid);
 
 		if($result){
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCRIPT, S_SCRIPT.' ['.$scriptid.']');
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCRIPT, _('Script').' ['.$scriptid.']');
 		}
 
-		show_messages($result, S_SCRIPT_DELETED, S_CANNOT_DELETE_SCRIPT);
+		show_messages($result, _('Script deleted'), _('Cannot delete script'));
 
 		if($result){
 			unset($_REQUEST['form']);
@@ -148,10 +148,10 @@ if($sid = get_request('scriptid')){
 		$go_result = API::Script()->delete($scriptids);
 		if($go_result){
 			foreach($scriptids as $snum => $scriptid)
-				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCRIPT, S_SCRIPT.' ['.$scriptid.']');
+				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCRIPT, _('Script').' ['.$scriptid.']');
 		}
 
-		show_messages($go_result, S_SCRIPT_DELETED, S_CANNOT_DELETE_SCRIPT);
+		show_messages($go_result, _('Script deleted'), _('Cannot delete script'));
 
 		if($go_result){
 			unset($_REQUEST['form']);
@@ -211,9 +211,9 @@ if($sid = get_request('scriptid')){
 	else{
 		$frmForm = new CForm('get');
 		$frmForm->addItem(new CSubmit('form', _('Create script')));
-		$scripts_wdgt->addPageHeader(S_SCRIPTS_CONFIGURATION_BIG, $frmForm);
+		$scripts_wdgt->addPageHeader(_('CONFIGURATION OF SCRIPTS'), $frmForm);
 
-		$scripts_wdgt->addHeader(S_SCRIPTS_BIG);
+		$scripts_wdgt->addHeader(_('SCRIPTS'));
 		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
 		$scripts_wdgt->addHeader($numrows);
@@ -223,14 +223,15 @@ if($sid = get_request('scriptid')){
 		$form->setName('frm_scripts');
 		$form->setAttribute('id', 'scripts');
 
-		$table = new CTableInfo(S_NO_SCRIPTS_DEFINED);
+		$table = new CTableInfo(_('No scripts defined'));
 		$table->setHeader(array(
 			new CCheckBox('all_scripts', null, "checkAll('".$form->getName()."','all_scripts','scripts');"),
-			make_sorting_header(S_NAME, 'name'),
-			make_sorting_header(S_COMMAND, 'command'),
-			S_USER_GROUP,
-			S_HOST_GROUP,
-			S_HOST_ACCESS
+			make_sorting_header(_('Name'), 'name'),
+			_('Execute on'),
+			make_sorting_header(_('Command'), 'command'),
+			_('User group'),
+			_('Host group'),
+			_('Host access')
 		));
 
 		$sortfield = getPageSortField('name');
@@ -250,29 +251,47 @@ if($sid = get_request('scriptid')){
 		foreach($scripts as $snum => $script){
 			$scriptid = $script['scriptid'];
 
-			$user_group_name = S_ALL_S;
-
 			if($script['usrgrpid'] > 0){
 				$user_group = API::UserGroup()->get(array('usrgrpids' => $script['usrgrpid'], 'output' => API_OUTPUT_EXTEND));
 				$user_group = reset($user_group);
 
 				$user_group_name = $user_group['name'];
 			}
+			else{
+				$user_group_name = _('All');
+			}
 
-			$host_group_name = S_ALL_S;
 			if($script['groupid'] > 0){
 				$group = array_pop($script['groups']);
 				$host_group_name = $group['name'];
+			}
+			else{
+				$host_group_name = _('All');
+			}
+
+			if($script['type'] == ZBX_SCRIPT_TYPE_SCRIPT){
+				switch($script['execute_on']){
+					case ZBX_SCRIPT_EXECUTE_ON_AGENT:
+						$scriptExecuteOn = _('Agent');
+						break;
+					case ZBX_SCRIPT_EXECUTE_ON_SERVER:
+						$scriptExecuteOn = _('Server');
+						break;
+				}
+			}
+			else{
+				$scriptExecuteOn = '';
 			}
 
 
 			$table->addRow(array(
 				new CCheckBox('scripts['.$script['scriptid'].']', 'no', NULL, $script['scriptid']),
 				new CLink($script['name'], 'scripts.php?form=1'.'&scriptid='.$script['scriptid']),
+				$scriptExecuteOn,
 				htmlspecialchars($script['command'], ENT_COMPAT, 'UTF-8'),
 				$user_group_name,
 				$host_group_name,
-				((PERM_READ_WRITE == $script['host_access']) ? S_WRITE : S_READ)
+				((PERM_READ_WRITE == $script['host_access']) ? _('Write') : _('Read'))
 			));
 		}
 
@@ -280,12 +299,12 @@ if($sid = get_request('scriptid')){
 
 //----- GO ------
 		$goBox = new CComboBox('go');
-		$goOption = new CComboItem('delete', S_DELETE_SELECTED);
-		$goOption->setAttribute('confirm', S_DELETE_SELECTED_SCRIPTS_Q);
+		$goOption = new CComboItem('delete', _('Delete selected'));
+		$goOption->setAttribute('confirm', _('Delete selected scripts?'));
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
-		$goButton = new CSubmit('goButton',S_GO);
+		$goButton = new CSubmit('goButton', _('Go'));
 		$goButton->setAttribute('id','goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "scripts";');
