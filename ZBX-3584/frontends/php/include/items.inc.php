@@ -276,7 +276,7 @@
 				'snmp_oid'		=> '',
 				'value_type'		=> ITEM_VALUE_TYPE_STR,
 				'data_type'		=> ITEM_DATA_TYPE_DECIMAL,
-				'trapper_hosts'		=> 'localhost',
+				'trapper_hosts'		=> '',
 				'snmp_port'		=> 161,
 				'units'			=> '',
 				'multiplier'		=> 0,
