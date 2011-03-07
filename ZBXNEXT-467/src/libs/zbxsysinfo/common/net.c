@@ -28,11 +28,6 @@
 
 #ifdef _WINDOWS
 #include <windns.h>
-
-#include <winsock2.h>  //winsock
-#include <stdio.h>    //standard i/o
-#pragma comment(lib, "Ws2_32.lib")
-
 #pragma comment(lib, "Dnsapi.lib")
 #endif
 
@@ -354,8 +349,10 @@ int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 		res = DnsQuery_A( zone, type, DNS_QUERY_STANDARD, NULL, &pDnsRecord, NULL);
 
 	if (1 == shortAnswer)
+	{
 		SET_UI64_RESULT(result, res == DNS_RCODE_NOERROR ? 1 : 0);
 		return SYSINFO_RET_OK;
+	}
 	if (NULL == pDnsRecord)
 		return SYSINFO_RET_FAIL;
 
@@ -370,7 +367,6 @@ int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 			return SYSINFO_RET_FAIL;
 
 		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%-20s", pDnsRecord->pName);
-
 		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %-8s", decode_type(pDnsRecord->wType));
 		switch(pDnsRecord->wType)
 		{
