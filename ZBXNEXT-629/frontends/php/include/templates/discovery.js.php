@@ -35,22 +35,7 @@
 <tr>
 	<td><label for="new_check_type"><?php print(_('Check type')); ?></label></td>
 	<td>
-	<select id="new_check_type" name="new_check_type" class="input select">
-		<option value="3">FTP</option>
-		<option value="4">HTTP</option>
-		<option value="12">ICMP Ping</option>
-		<option value="7">IMAP</option>
-		<option value="1">LDAP</option>
-		<option value="6">NNTP</option>
-		<option value="5">POP</option>
-		<option value="2">SMTP</option>
-		<option value="10">SNMPv1 agent</option>
-		<option value="11">SNMPv2 agent</option>
-		<option value="13">SNMPv3 agent</option>
-		<option value="0">SSH</option>
-		<option value="8">TCP</option>
-		<option value="9">Zabbix agent</option>
-	</select>
+	<select id="new_check_type" name="new_check_type" class="input select"></select>
 	</td>
 </tr>
 <tr id="newCheckPortsRow" class="hidden">
@@ -100,6 +85,7 @@ var ZBX_SVC_PORT = {
 	'smtp': <?php print(SVC_SMTP);?>,
 	'ftp': <?php print(SVC_FTP);?>,
 	'http': <?php print(SVC_HTTP);?>,
+	'http': <?php print(SVC_HTTP);?>,
 	'pop': <?php print(SVC_POP);?>,
 	'nntp': <?php print(SVC_NNTP);?>,
 	'imap': <?php print(SVC_IMAP);?>,
@@ -107,10 +93,12 @@ var ZBX_SVC_PORT = {
 	'snmpv1': <?php print(SVC_SNMPv1);?>,
 	'snmpv2': <?php print(SVC_SNMPv2);?>,
 	'snmpv3': <?php print(SVC_SNMPv3);?>,
-	'icmp': <?php print(SVC_ICMPPING);?>
+	'icmp': <?php print(SVC_ICMPPING);?>,
+	'https': <?php print(SVC_HTTPS);?>,
+	'telnet': <?php print(SVC_TELNET);?>
 };
 
-function defaultPort(service){
+function discoveryCheckDefaultPort(service){
 	service = service.toString();
 	var defPorts = {};
 	defPorts[ZBX_SVC_PORT.ssh] = '22';
@@ -125,8 +113,36 @@ function defaultPort(service){
 	defPorts[ZBX_SVC_PORT.snmpv1] = '161';
 	defPorts[ZBX_SVC_PORT.snmpv2] = '161';
 	defPorts[ZBX_SVC_PORT.snmpv3] = '161';
+	defPorts[ZBX_SVC_PORT.https] = '443';
+	defPorts[ZBX_SVC_PORT.telnet] = '23';
+
 
 	return isset(service, defPorts) ? defPorts[service] : 0;
+}
+
+function discoveryCheckTypeToString(svcPort){
+	var defPorts = {};
+	defPorts[ZBX_SVC_PORT.ftp] = "<?php echo _('FTP');?>";
+	defPorts[ZBX_SVC_PORT.http] = "<?php echo _('HTTP');?>";
+	defPorts[ZBX_SVC_PORT.https] = "<?php echo _('HTTPS');?>";
+	defPorts[ZBX_SVC_PORT.imap] = "<?php echo _('IMAP');?>";
+	defPorts[ZBX_SVC_PORT.ldap] = "<?php echo _('LDAP');?>";
+	defPorts[ZBX_SVC_PORT.nntp] = "<?php echo _('NNTP');?>";
+	defPorts[ZBX_SVC_PORT.pop] = "<?php echo _('POP');?>";
+	defPorts[ZBX_SVC_PORT.snmpv1] = "<?php echo _('SNMPv1 agent');?>";
+	defPorts[ZBX_SVC_PORT.snmpv2] = "<?php echo _('SNMPv2 agent');?>";
+	defPorts[ZBX_SVC_PORT.snmpv3] = "<?php echo _('SNMPv3 agent');?>";
+	defPorts[ZBX_SVC_PORT.smtp] = "<?php echo _('SMTP');?>";
+	defPorts[ZBX_SVC_PORT.ssh] = "<?php echo _('SSH');?>";
+	defPorts[ZBX_SVC_PORT.telnet] = "<?php echo _('Telnet');?>";
+	defPorts[ZBX_SVC_PORT.agent] = "<?php echo _('Zabbix agent');?>";
+
+
+	if(typeof(svcPort) == 'undefined')
+		return defPorts;
+
+	svcPort = parseInt(svcPort, 10);
+	return isset(svcPort, defPorts) ? defPorts[svcPort] : _('Unknown');
 }
 
 function addPopupValues(list){
@@ -175,6 +191,23 @@ function showNewCheckForm(e, dcheckType){
 		jQuery("#new_check_snmpv3_securitylevel").change(updateNewDCheckSNMPType);
 		jQuery("#add_new_dcheck").click(saveNewDCheckForm);
 		jQuery("#cancel_new_dcheck").click(function(){ jQuery('#new_check_form').remove(); });
+
+// Port name sorting
+		var svcPorts = discoveryCheckTypeToString();
+		var portNameSvcValue = {};
+		var portNameOrder = new Array();
+		for(var key in svcPorts){
+			portNameOrder.push(svcPorts[key]);
+			portNameSvcValue[svcPorts[key]] = key;
+		}
+
+		portNameOrder.sort();
+// ---
+		for(var i=0; i < portNameOrder.length; i++){
+			var portName = portNameOrder[i];
+			jQuery('#new_check_type').append(jQuery('<option>').attr({'value': portNameSvcValue[portName]}).text(portName));
+		}
+
 	}
 
 	updateNewDCheckType(e);
@@ -208,7 +241,7 @@ function updateNewDCheckType(e){
 	jQuery('#newCheckSecLevRow').toggle(isset(dcheckType, SecNameRowTypes));
 
 	if(ZBX_SVC_PORT.icmp != dcheckType)
-		jQuery('#new_check_ports').val(defaultPort(dcheckType));
+		jQuery('#new_check_ports').val(discoveryCheckDefaultPort(dcheckType));
 
 	updateNewDCheckSNMPType(e);
 }
@@ -246,7 +279,7 @@ function saveNewDCheckForm(e){
 		dCheck[name[1]] = formData[key];
 	}
 
-	if(dCheck.ports != defaultPort(dCheck.type))
+	if(dCheck.ports != discoveryCheckDefaultPort(dCheck.type))
 		dCheck.name += ' ('+dCheck.ports+')'
 
 	addPopupValues({'object': 'dcheckid', 'values': [dCheck]});
