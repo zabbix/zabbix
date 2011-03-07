@@ -532,7 +532,6 @@ class CScript extends CZBXAPI{
 			'nodeid' => id2nodeid($hostid),
 			'scriptid' => $scriptid,
 			'hostid' => $hostid,
-			'sessionid' => self::$userData['sessionid'],
 		);
 		$dataToSend = $json->encode($array, false);
 

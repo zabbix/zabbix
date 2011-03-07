@@ -47,7 +47,7 @@ require_once('include/page_header.php');
 			<div style="position: absolute; top: 39%; left: 2%;" class="loginLogo"></div>
 			<div style="position: absolute; bottom: 2px;">
 				<span class="bold textwhite" style="margin: 0 0 4px 4px; font-size: 0.9em; opacity: 0.7;">
-					<?php print(_s('Zabbix %s Copyright 2001-2011 by SIA Zabbix', ZABBIX_VERSION)); ?>
+					<?php print(_s('Zabbix %s Copyright 2001-2011 by Zabbix SIA', ZABBIX_VERSION)); ?>
 				</span>
 			</div>
 		</div>
