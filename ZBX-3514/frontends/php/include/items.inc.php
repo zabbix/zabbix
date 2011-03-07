@@ -195,8 +195,6 @@
 	# Update Item definition for selected group
 
 	function update_item_in_group($groupid,$itemid,$item){
-/*		$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid,$delay_flex,$params,$ipmi_sensor,$applications)
-//*/
 		$sql='SELECT i.itemid,i.hostid '.
 				' FROM hosts_groups hg,items i '.
 				' WHERE hg.groupid='.$groupid.
@@ -240,8 +238,6 @@
 	# Add Item definition to selected group
 
 	function add_item_to_group($groupid,$item){
-/*	$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid,$delay_flex,$params,$ipmi_sensor,$applications)
-//*/
 		$sql='SELECT hostid FROM hosts_groups WHERE groupid='.$groupid;
 		$result=DBSelect($sql);
 		while($row=DBfetch($result)){
@@ -257,13 +253,6 @@
 	 *                                                                            *
 	 ******************************************************************************/
 	function add_item($item){
-/*
-		$item = array('description','key','hostid','delay','history','status','type',
-		'snmp_community','snmp_oid','value_type','trapper_hosts','snmp_port','units','multiplier','delta',
-		'snmpv3_securityname','snmpv3_securitylevel','snmpv3_authpassphrase','snmpv3_privpassphrase',
-		'formula','trends','logtimefmt','valuemapid','delay_flex','params','ipmi_sensor','applications','templateid');
-//*/
-
 		$item_db_fields = array(
 				'description'		=> null,
 				'key_'			=> null,
@@ -276,7 +265,7 @@
 				'snmp_oid'		=> '',
 				'value_type'		=> ITEM_VALUE_TYPE_STR,
 				'data_type'		=> ITEM_DATA_TYPE_DECIMAL,
-				'trapper_hosts'		=> 'localhost',
+				'trapper_hosts'		=> '',
 				'snmp_port'		=> 161,
 				'units'			=> '',
 				'multiplier'		=> 0,
@@ -342,7 +331,7 @@
 		}
 
 		if($item['value_type'] == ITEM_VALUE_TYPE_STR){
-			$item['delta']=0;
+			$item['delta'] = 0;
 		}
 
 		if ($item['value_type'] != ITEM_VALUE_TYPE_UINT64) {
@@ -368,7 +357,7 @@
 				$g=$arr[6];
 				// Item function
 				$g=$arr[8];
-				if(!str_in_array($g,array('last', 'min', 'max', 'avg', 'sum','count'))){
+				if(!str_in_array($g,array('last', 'min', 'max', 'avg', 'sum', 'count'))){
 					error(S_ITEM_FUNCTION.SPACE.'['.$g.']'.SPACE.S_IS_NOT_ONE_OF.SPACE.'[last, min, max, avg, sum, count]');
 					return FALSE;
 				}
