@@ -164,5 +164,55 @@ class testFormHost extends CWebTest{
 		$this->assertTitle('Hosts');
 		$this->ok('Host deleted');
 	}
+
+	public function testFormHost_TemplateUnlink(){
+		// Unlink a template from a host from host properties page
+		$this->login('hosts.php');
+		$this->dropdown_select_wait('groupid','all');
+		$this->click('link=Zabbix server');
+		$this->wait();
+		$this->click('link=Templates');
+		$this->ok('Template_Linux');
+//		$this->ok('Unlink');
+//		$this->ok('Unlink and clear');
+		// probably should either click "button next to the template name" or
+		// unlink[$templateid] (retrieved from the db)
+		$this->button_click('unlink[10001]');
+		$this->wait();
+		$this->nok('Template_Linux');
+//		$this->button_click('save');
+//		$this->wait();
+//		$this->assertTitle('Hosts');
+//		$this->ok('Host updated');
+// should check that items, triggers, graphs and applications are not linked to the template anymore
+	}
+
+	public function testFormHost_TemplateLink(){
+		// Link a template to a host from host properties page
+		$this->login('hosts.php');
+		$this->dropdown_select_wait('groupid','all');
+		$this->click('link=Zabbix server');
+		$this->wait();
+		$this->click('link=Templates');
+// next one should be uncommented if template is actually unlinked in the previous step
+//		$this->nok('Template_Linux');
+//		$this->ok('Unlink');
+//		$this->ok('Unlink and clear');
+		$this->button_click('add');
+		$this->wait();
+		$this->dropdown_select_wait('groupid','Templates');
+		// should use Template_Linux as above (by name or by id from the db)
+		$this->checkbox_select("templates[10001]");
+		$this->button_click('select');
+		$this->wait();
+		$this->ok('Template_Linux');
+
+//		$this->button_click('save');
+//		$this->wait();
+//		$this->assertTitle('Hosts');
+//		$this->ok('Host updated');
+// should check that items, triggers, graphs and applications exist on the host and are linked to the template
+// also that they have been updated, not deleted & recreated
+	}
 }
 ?>
