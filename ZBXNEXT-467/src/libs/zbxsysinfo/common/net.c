@@ -122,7 +122,7 @@ int	NET_TCP_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 
 #if defined(HAVE_RES_QUERY) || defined(_WINDOWS)
 
-#ifndef C_IN
+#if !defined(C_IN) && !defined(_WINDOWS)
 #	define C_IN	ns_c_in
 #endif	/* C_IN */
 #ifndef T_ANY
@@ -218,9 +218,9 @@ static char	*get_name(unsigned char *msg, unsigned char *msg_end, unsigned char 
 
 	return buffer;
 }
-#endif
+#endif /* not _WINDOWS*/
 
-#endif defined(HAVE_RES_QUERY) || defined(_WINDOWS)
+#endif /* defined(HAVE_RES_QUERY) || defined(_WINDOWS) */
 
 
 int	NET_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -236,7 +236,7 @@ int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 {
 #if defined(HAVE_RES_QUERY) || defined(_WINDOWS)
 
-	int		res, type, retrans, retry, i, offset;
+	int		res, type, retrans, retry, i, offset = 0;
 	char		ip[MAX_STRING_LEN];
 	char		zone[MAX_STRING_LEN];
 	char		retransStr[MAX_STRING_LEN];
@@ -260,7 +260,9 @@ int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 		{"MG", T_MG},
 		{"MR", T_MR},
 		{"NULL", T_NULL},
+#ifndef _WINDOWS /* TODO: add T_WKS support for Windows*/
 		{"WKS", T_WKS},
+#endif
 		{"PTR", T_PTR},
 		{"HINFO", T_HINFO},
 		{"MINFO", T_MINFO},
@@ -272,8 +274,19 @@ int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 #ifdef _WINDOWS
 	PDNS_RECORD	pDnsRecord;
 	PIP4_ARRAY	pSrvList = NULL;
-	DWORD		options = DNS_QUERY_STANDARD;
 #else /* not _WINDOWS */
+	char		*name;
+	unsigned char	*msg_end, *msg_ptr, *p;
+	int		num_answers, num_query, q_type, q_class, q_ttl, q_len, value, c, n;
+	struct servent	*s;
+	HEADER 		*hp;
+	struct in_addr	inaddr, asddd;
+	struct protoent	*pr;
+#if PACKETSZ > 1024
+	char 		buf[PACKETSZ];
+#else
+	char 		buf[1024];
+#endif
 
 	typedef union {
 		HEADER		h;
@@ -285,27 +298,10 @@ int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 		unsigned char	buffer[512];
 #endif
 	} answer_t;
-
-	char		*name;
-	unsigned char	*msg_end, *msg_ptr, *p;
-	int		num_answers, num_query, q_type, q_class, q_ttl, q_len,
-			value, c, n;
 	answer_t	answer;
-	struct servent	*s;
-	HEADER 		*hp;
-	struct in_addr	inaddr, dns_serv;
-	struct protoent	*pr;
-
-#if PACKETSZ > 1024
-	char 		buf[PACKETSZ];
-#else
-	char 		buf[1024];
-#endif
-
 #endif /* ifdef _WINDOWS */
 
 	*buffer = '\0';
-	offset = 0;
 
 	if (num_param(param) > 5)
 		return SYSINFO_RET_FAIL;
@@ -314,10 +310,10 @@ int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 		ip[0] = '\0';
 
 	if(0 != get_param(param, 2, zone, MAX_STRING_LEN) || '\0' == zone[0])
-		strscpy(zone, "localhost");
+		strscpy(zone, "zabbix.com");
 
 	if (get_param(param, 3, tmp, sizeof(tmp)) != 0 || *tmp == ' ')
-		type = DNS_TYPE_SOA;
+		type = T_SOA;
 	else
 	{
 		for (i = 0; qt[i].name != NULL; i++)
@@ -332,7 +328,6 @@ int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 				break;
 			}
 		}
-
 		if (qt[i].name == NULL)
 			return SYSINFO_RET_FAIL;
 	}
@@ -350,104 +345,102 @@ int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 #ifdef _WINDOWS
 	if('\0' != ip[0])
 	{
-		options |= DNS_QUERY_BYPASS_CACHE;
 		pSrvList = (PIP4_ARRAY) zbx_malloc(pSrvList,sizeof(IP4_ARRAY));
 		pSrvList->AddrCount = 1;
 		pSrvList->AddrArray[0] = inet_addr(ip);
-	}
-	res = DnsQuery_A( zone, type, DNS_QUERY_STANDARD, pSrvList, &pDnsRecord, NULL);
+		res = DnsQuery_A( zone, type, DNS_QUERY_BYPASS_CACHE, pSrvList, &pDnsRecord, NULL);
+		zbx_free(pSrvList);
+	} else
+		res = DnsQuery_A( zone, type, DNS_QUERY_STANDARD, NULL, &pDnsRecord, NULL);
 
-	zbx_free(pSrvList);
 	if (1 == shortAnswer)
 		SET_UI64_RESULT(result, res == DNS_RCODE_NOERROR ? 1 : 0);
-	else {
-		if (NULL == pDnsRecord)
-			return SYSINFO_RET_FAIL;
-		while( NULL != pDnsRecord)
+		return SYSINFO_RET_OK;
+	if (NULL == pDnsRecord)
+		return SYSINFO_RET_FAIL;
+
+	while( NULL != pDnsRecord)
+	{
+		if (T_ANY != type && type != pDnsRecord->wType)
 		{
-			if (T_ANY != type && type != pDnsRecord->wType)
-			{
-				pDnsRecord = pDnsRecord->pNext;
-				continue;
-			}
-			if (NULL == pDnsRecord->pName)
-				return SYSINFO_RET_FAIL;
-
-			offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%-20s", pDnsRecord->pName);
-
-			offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %-8s", decode_type(pDnsRecord->wType));
-			switch(pDnsRecord->wType)
-			{
-				case T_A:
-					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", inet_ntop(AF_INET, &(pDnsRecord->Data.A.IpAddress), tmp, sizeof(tmp)));
-					break;
-				case T_NS:
-					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", pDnsRecord->Data.NS.pNameHost);
-					break;
-				case T_MD:
-					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", pDnsRecord->Data.MD.pNameHost);
-					break;
-				case T_MF:
-					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", pDnsRecord->Data.MF.pNameHost);
-					break;
-				case T_CNAME:
-					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", pDnsRecord->Data.CNAME.pNameHost);
-					break;
-				case T_SOA:
-					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s %s %d %d %d %d %d",
-								pDnsRecord->Data.SOA.pNamePrimaryServer,
-								pDnsRecord->Data.SOA.pNameAdministrator,
-								pDnsRecord->Data.SOA.dwSerialNo,
-								pDnsRecord->Data.SOA.dwRefresh,
-								pDnsRecord->Data.SOA.dwRetry,
-								pDnsRecord->Data.SOA.dwExpire,
-								pDnsRecord->Data.SOA.dwDefaultTtl);
-					break;
-				case T_MB:
-					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", pDnsRecord->Data.MB.pNameHost);
-					break;
-				case T_MG:
-					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", pDnsRecord->Data.MG.pNameHost);
-					break;
-				case T_MR:
-					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", pDnsRecord->Data.MR.pNameHost);
-					break;
-				/* TODO: add case T_WKS */
-				case T_PTR:
-					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", pDnsRecord->Data.PTR.pNameHost);
-					break;
-				case T_HINFO:
-					for (i=0; i < (int)(pDnsRecord->Data.HINFO.dwStringCount); i++)
-						offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", pDnsRecord->Data.HINFO.pStringArray[i]);
-					break;
-				case T_MINFO:
-					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s %s", pDnsRecord->Data.MINFO.pNameMailbox, pDnsRecord->Data.MINFO.pNameErrorsMailbox);
-					break;
-				case T_MX:
-					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d %s", pDnsRecord->Data.MX.wPreference, pDnsRecord->Data.MX.pNameExchange);
-					break;
-				case T_TXT:
-					for (i=0; i < (int)(pDnsRecord->Data.TXT.dwStringCount); i++)
-						offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", pDnsRecord->Data.TXT.pStringArray[i]);
-					break;
-				default:
-					break;
-			}
-			offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "\n");
 			pDnsRecord = pDnsRecord->pNext;
+			continue;
 		}
+		if (NULL == pDnsRecord->pName)
+			return SYSINFO_RET_FAIL;
 
+		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%-20s", pDnsRecord->pName);
+
+		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %-8s", decode_type(pDnsRecord->wType));
+		switch(pDnsRecord->wType)
+		{
+			case T_A:
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", inet_ntop(AF_INET, &(pDnsRecord->Data.A.IpAddress), tmp, sizeof(tmp)));
+				break;
+			case T_NS:
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", pDnsRecord->Data.NS.pNameHost);
+				break;
+			case T_MD:
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", pDnsRecord->Data.MD.pNameHost);
+				break;
+			case T_MF:
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", pDnsRecord->Data.MF.pNameHost);
+				break;
+			case T_CNAME:
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", pDnsRecord->Data.CNAME.pNameHost);
+				break;
+			case T_SOA:
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s %s %d %d %d %d %d",
+							pDnsRecord->Data.SOA.pNamePrimaryServer,
+							pDnsRecord->Data.SOA.pNameAdministrator,
+							pDnsRecord->Data.SOA.dwSerialNo,
+							pDnsRecord->Data.SOA.dwRefresh,
+							pDnsRecord->Data.SOA.dwRetry,
+							pDnsRecord->Data.SOA.dwExpire,
+							pDnsRecord->Data.SOA.dwDefaultTtl);
+				break;
+			case T_MB:
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", pDnsRecord->Data.MB.pNameHost);
+				break;
+			case T_MG:
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", pDnsRecord->Data.MG.pNameHost);
+				break;
+			case T_MR:
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", pDnsRecord->Data.MR.pNameHost);
+				break;
+			case T_PTR:
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", pDnsRecord->Data.PTR.pNameHost);
+				break;
+			case T_HINFO:
+				for (i=0; i < (int)(pDnsRecord->Data.HINFO.dwStringCount); i++)
+					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", pDnsRecord->Data.HINFO.pStringArray[i]);
+				break;
+			case T_MINFO:
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s %s", pDnsRecord->Data.MINFO.pNameMailbox, pDnsRecord->Data.MINFO.pNameErrorsMailbox);
+				break;
+			case T_MX:
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d %s", pDnsRecord->Data.MX.wPreference, pDnsRecord->Data.MX.pNameExchange);
+				break;
+			case T_TXT:
+				for (i=0; i < (int)(pDnsRecord->Data.TXT.dwStringCount); i++)
+					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", pDnsRecord->Data.TXT.pStringArray[i]);
+				break;
+			default:
+				break;
+		}
+		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "\n");
+		pDnsRecord = pDnsRecord->pNext;
 	}
-#else
+#else /* not _WINDOWS*/
 
 	if (!(_res.options & RES_INIT))
 		res_init();
 
 	if('\0' != ip[0])
 	{
-		1 != inet_aton(ip, &dns_serv))
+		if (1 != inet_aton(ip, &inaddr))
 			return SYSINFO_RET_FAIL;
-		_res.nsaddr_list[0].sin_addr = dns_serv;
+		_res.nsaddr_list[0].sin_addr = inaddr;
 		_res.nsaddr_list[0].sin_family = AF_INET;
 		_res.nsaddr_list[0].sin_port = htons(NS_DEFAULTPORT);
 		_res.nscount = 1;
@@ -456,7 +449,6 @@ int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 	res = res_mkquery(QUERY, zone, C_IN, type, NULL, 0, NULL, buf, sizeof(buf));
 	if (res <= 0)
 		return SYSINFO_RET_FAIL;
-
 
 	_res.retrans = retrans;
 	_res.retry = retry;
