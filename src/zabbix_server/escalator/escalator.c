@@ -536,8 +536,9 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 #ifdef HAVE_OPENIPMI
 				",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
 #endif
-			" from opcommand_grp o,hosts_groups hg,hosts h"
-			" where o.groupid=hg.groupid"
+			" from opcommand o,opcommand_grp og,hosts_groups hg,hosts h"
+			" where o.operationid=og.operationid"
+				" and og.groupid=hg.groupid"
 				" and hg.hostid=h.hostid"
 				" and o.operationid=" ZBX_FS_UI64
 				" and h.status=%d"
@@ -546,18 +547,20 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 #ifdef HAVE_OPENIPMI
 				",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
 #endif
-			" from opcommand_hst o,hosts h"
-			" where o.hostid=h.hostid"
+			" from opcommand o,opcommand_hst oh,hosts h"
+			" where o.operationid=oh.operationid"
+				" and oh.hostid=h.hostid"
 				" and o.operationid=" ZBX_FS_UI64
 				" and h.status=%d"
 			" union "
-			"select distinct 0,null,command"
+			"select distinct 0,null,o.command"
 #ifdef HAVE_OPENIPMI
 				",0,2,null,null"
 #endif
-			" from opcommand_hst"
-			" where operationid=" ZBX_FS_UI64
-				" and hostid is null",
+			" from opcommand o,opcommand_hst oh"
+			" where o.operationid=oh.operationid"
+				" and o.operationid=" ZBX_FS_UI64
+				" and oh.hostid is null",
 			operationid, HOST_STATUS_MONITORED,
 			operationid, HOST_STATUS_MONITORED,
 			operationid);
