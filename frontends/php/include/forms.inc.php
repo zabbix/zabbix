@@ -1992,9 +1992,6 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 				$ctb->setAttribute('style', 'text-align: right;');
 				$mltpbox[] = $ctb;
 			}
-			else{
-				$frmItem->addVar('formula', $formula);
-			}
 		}
 		else{
 			$mltpbox[] = new CCheckBox('multiplier',$multiplier == 1 ? 'yes':'no', 'var editbx = document.getElementById(\'formula\'); if(editbx) editbx.disabled = !this.checked;', 1);
