@@ -1046,7 +1046,7 @@ int	parse_ipmi_command(const char *command, char *c_name, int *val, char *error,
 
 	const char	*p;
 	size_t		sz_c_name;
-	int		ret = SUCCEED;
+	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() command:'%s'", __function_name, command);
 
@@ -1059,14 +1059,12 @@ int	parse_ipmi_command(const char *command, char *c_name, int *val, char *error,
 	if (0 == (sz_c_name = p - command))
 	{
 		zbx_strlcpy(error, "IPMI command is empty", max_error_len);
-		ret = FAIL;
 		goto fail;
 	}
 
 	if (sz_c_name >= ITEM_IPMI_SENSOR_LEN_MAX)
 	{
 		zbx_snprintf(error, max_error_len, "IPMI command is too long [%.*s]", sz_c_name, command);
-		ret = FAIL;
 		goto fail;
 	}
 
@@ -1085,9 +1083,10 @@ int	parse_ipmi_command(const char *command, char *c_name, int *val, char *error,
 	else
 	{
 		zbx_snprintf(error, max_error_len, "IPMI command value is not supported [%s]", p);
-		ret = FAIL;
 		goto fail;
 	}
+
+	ret = SUCCEED;
 fail:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
