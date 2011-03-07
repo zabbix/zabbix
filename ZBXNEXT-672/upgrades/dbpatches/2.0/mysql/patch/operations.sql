@@ -72,7 +72,23 @@ UPDATE opmessage_usr
 	SET opmessage_usrid = (operationid div 100000000000) * 100000000000 + opmessage_usrid
 	WHERE operationid >= 100000000000;
 
----- Patching tables `opcommand_hst` and `opcommand_grp`
+---- Patching tables `opcommand`, `opcommand_hst` and `opcommand_grp`
+
+CREATE TABLE opcommand (
+	operationid              bigint unsigned                           NOT NULL,
+	type                     integer         DEFAULT '0'               NOT NULL,
+	scriptid                 bigint unsigned                           NULL,
+	execute_on               integer         DEFAULT '0'               NOT NULL,
+	authtype                 integer         DEFAULT '0'               NOT NULL,
+	username                 varchar(64)     DEFAULT ''                NOT NULL,
+	password                 varchar(64)     DEFAULT ''                NOT NULL,
+	publickey                varchar(64)     DEFAULT ''                NOT NULL,
+	privatekey               varchar(64)     DEFAULT ''                NOT NULL,
+	command                  text                                      NOT NULL,
+	PRIMARY KEY (operationid)
+) ENGINE=InnoDB;
+ALTER TABLE opcommand ADD CONSTRAINT c_opcommand_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE;
+ALTER TABLE opcommand ADD CONSTRAINT c_opcommand_2 FOREIGN KEY (scriptid) REFERENCES scripts (scriptid);
 
 -- creating temporary tables
 
@@ -159,7 +175,6 @@ CREATE TABLE opcommand_hst (
 	opcommand_hstid          bigint unsigned                           NOT NULL,
 	operationid              bigint unsigned                           NOT NULL,
 	hostid                   bigint unsigned                           NULL,
-	command                  text                                      NOT NULL,
 	PRIMARY KEY (opcommand_hstid)
 ) ENGINE=InnoDB;
 CREATE INDEX opcommand_hst_1 ON opcommand_hst (operationid);
@@ -182,9 +197,13 @@ UPDATE _opcommand_hst
 				AND (h.hostid div 100000000000000) = (_opcommand_hst.operationid div 100000000000000))
 	WHERE name <> '{HOSTNAME}';
 
+INSERT INTO opcommand (operationid, command)
+	SELECT operationid, longdata
+		FROM _opcommand_hst;
+
 SET @opcommand_hstid := 0;
-INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid, command)
-	SELECT @opcommand_hstid := @opcommand_hstid + 1, operationid, hostid, longdata
+INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid)
+	SELECT @opcommand_hstid := @opcommand_hstid + 1, operationid, hostid
 		FROM _opcommand_hst;
 
 UPDATE opcommand_hst
@@ -195,7 +214,6 @@ CREATE TABLE opcommand_grp (
 	opcommand_grpid          bigint unsigned                           NOT NULL,
 	operationid              bigint unsigned                           NOT NULL,
 	groupid                  bigint unsigned                           NOT NULL,
-	command                  text                                      NOT NULL,
 	PRIMARY KEY (opcommand_grpid)
 ) ENGINE=InnoDB;
 CREATE INDEX opcommand_grp_1 ON opcommand_grp (operationid);
@@ -216,9 +234,13 @@ UPDATE _opcommand_grp
 			WHERE g.name = _opcommand_grp.name
 				AND (g.groupid div 100000000000000) = (_opcommand_grp.operationid div 100000000000000));
 
+INSERT INTO opcommand (operationid, command)
+	SELECT operationid, longdata
+		FROM _opcommand_grp;
+
 SET @opcommand_grpid := 0;
-INSERT INTO opcommand_grp (opcommand_grpid, operationid, groupid, command)
-	SELECT @opcommand_grpid := @opcommand_grpid + 1, operationid, groupid, longdata
+INSERT INTO opcommand_grp (opcommand_grpid, operationid, groupid)
+	SELECT @opcommand_grpid := @opcommand_grpid + 1, operationid, groupid
 		FROM _opcommand_grp;
 
 UPDATE opcommand_grp
@@ -228,6 +250,8 @@ UPDATE opcommand_grp
 DROP PROCEDURE split_commands;
 DROP TABLE _opcommand_hst;
 DROP TABLE _opcommand_grp;
+
+UPDATE opcommand SET type=1,command=TRIM(SUBSTRING(command, 5)) WHERE SUBSTRING(command, 1, 4)='IPMI';
 
 ---- Patching table `opgroup`
 
