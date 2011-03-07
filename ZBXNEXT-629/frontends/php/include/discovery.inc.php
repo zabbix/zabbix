@@ -46,7 +46,7 @@
 			SVC_SNMPv1 =>	'161',
 			SVC_SNMPv2 =>	'161',
 			SVC_SNMPv3 =>	'161',
-			SVC_HTTP =>		'443',
+			SVC_HTTPS =>	'443',
 			SVC_TELNET =>	'23',
 		);
 

@@ -85,7 +85,6 @@ var ZBX_SVC_PORT = {
 	'smtp': <?php print(SVC_SMTP);?>,
 	'ftp': <?php print(SVC_FTP);?>,
 	'http': <?php print(SVC_HTTP);?>,
-	'http': <?php print(SVC_HTTP);?>,
 	'pop': <?php print(SVC_POP);?>,
 	'nntp': <?php print(SVC_NNTP);?>,
 	'imap': <?php print(SVC_IMAP);?>,
