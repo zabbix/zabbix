@@ -45,7 +45,9 @@
 			SVC_AGENT =>	'10050',
 			SVC_SNMPv1 =>	'161',
 			SVC_SNMPv2 =>	'161',
-			SVC_SNMPv3 =>	'161'
+			SVC_SNMPv3 =>	'161',
+			SVC_HTTP =>		'443',
+			SVC_TELNET =>	'23',
 		);
 
 		return isset($typePort[$type_int]) ? $typePort[$type_int] : 0;
@@ -67,6 +69,8 @@
 			SVC_SNMPv2 => S_SNMPV2_AGENT,
 			SVC_SNMPv3 => S_SNMPV3_AGENT,
 			SVC_ICMPPING => S_ICMPPING,
+			SVC_TELNET => _('Telnet'),
+			SVC_HTTPS => _('HTTPS'),
 		);
 
 		if(is_null($type)){
@@ -209,18 +213,19 @@
 			'editable' => true
 		));
 		$drule = reset($drules);
-		$dchecksDiff = zbx_array_diff($dchecks, $drule['dchecks'], 'dcheckid');
-
-		$addChecks = $dchecksDiff['first'];
-		$deleteChecks = zbx_objectValues($dchecksDiff['second'], 'dcheckid');
-		$upadteChecks = $dchecksDiff['both'];
-
 		$result = DBexecute('update drules set proxy_hostid='.zero2null($proxy_hostid).',name='.zbx_dbstr($name).',iprange='.zbx_dbstr($iprange).','.
 			'delay='.$delay.',status='.$status.' where druleid='.$druleid);
 
 		if($result && isset($dchecks)){
-			$unique_dcheckid = 0;
+			$dchecksDiff = zbx_array_diff($dchecks, $drule['dchecks'], 'dcheckid');
 
+			$addChecks = $dchecksDiff['first'];
+			$addChecks = zbx_toHash($addChecks, 'dcheckid');
+
+			$deleteChecks = zbx_objectValues($dchecksDiff['second'], 'dcheckid');
+			$upadteChecks = $dchecksDiff['both'];
+
+			$unique_dcheckid = 0;
 			foreach($dchecks as $id => $data){
 				if(isset($addChecks[$id])){
 					$data['dcheckid'] = add_discovery_check($druleid, $data['type'], $data['ports'], $data['key_'],

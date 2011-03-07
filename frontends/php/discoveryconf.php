@@ -44,7 +44,7 @@ include_once('include/page_header.php');
 		'g_druleid'=>			array(T_ZBX_INT, O_OPT,  null,	DB_ID,		null),
 		'dchecks'=>				array(null, O_OPT, null, null, null),
 		'new_check_type'=>		array(T_ZBX_INT, O_OPT,  null,
-									IN(array(SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP, SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2, SVC_SNMPv3, SVC_ICMPPING)),
+									IN(array(SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP, SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2, SVC_SNMPv3, SVC_ICMPPING, SVC_HTTPS, SVC_TELNET)),
 									null),
 		'type_changed'=>		array(T_ZBX_INT, O_OPT, null, IN(1), null),
 // Actions
