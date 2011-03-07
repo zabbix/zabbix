@@ -81,13 +81,28 @@ UPDATE opmessage_usr
 	SET opmessage_usrid = TRUNC(operationid / 100000000000) * 100000000000 + opmessage_usrid
 	WHERE operationid >= 100000000000;
 
----- Patching tables `opcommand_hst` and `opcommand_grp`
+---- Patching tables `opcommand`, `opcommand_hst` and `opcommand_grp`
+
+CREATE TABLE opcommand (
+	operationid              number(20)                                NOT NULL,
+	type                     number(10)      DEFAULT '0'               NOT NULL,
+	scriptid                 number(20)                                NULL,
+	execute_on               number(10)      DEFAULT '0'               NOT NULL,
+	authtype                 number(10)      DEFAULT '0'               NOT NULL,
+	username                 nvarchar2(64)   DEFAULT ''                ,
+	password                 nvarchar2(64)   DEFAULT ''                ,
+	publickey                nvarchar2(64)   DEFAULT ''                ,
+	privatekey               nvarchar2(64)   DEFAULT ''                ,
+	command                  nclob           DEFAULT ''                ,
+	PRIMARY KEY (operationid)
+);
+ALTER TABLE opcommand ADD CONSTRAINT c_opcommand_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE;
+ALTER TABLE opcommand ADD CONSTRAINT c_opcommand_2 FOREIGN KEY (scriptid) REFERENCES scripts (scriptid);
 
 CREATE TABLE opcommand_hst (
 	opcommand_hstid          number(20)                                NOT NULL,
 	operationid              number(20)                                NOT NULL,
 	hostid                   number(20)                                NULL,
-	command                  nclob           DEFAULT ''                ,
 	PRIMARY KEY (opcommand_hstid)
 );
 CREATE INDEX opcommand_hst_1 on opcommand_hst (operationid);
@@ -98,7 +113,6 @@ CREATE TABLE opcommand_grp (
 	opcommand_grpid          number(20)                                NOT NULL,
 	operationid              number(20)                                NOT NULL,
 	groupid                  number(20)                                NOT NULL,
-	command                  nclob           DEFAULT ''                ,
 	PRIMARY KEY (opcommand_grpid)
 );
 CREATE INDEX opcommand_grp_1 on opcommand_grp (operationid);
@@ -190,10 +204,14 @@ UPDATE tmp_opcommand_hst
 				AND TRUNC(h.hostid / 100000000000000) = TRUNC(tmp_opcommand_hst.operationid / 100000000000000))
 	WHERE name <> '{HOSTNAME}';
 
+INSERT INTO opcommand (operationid, command)
+	SELECT operationid, longdata
+		FROM tmp_opcommand_hst;
+
 CREATE SEQUENCE opcommand_hst_seq;
 
-INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid, command)
-	SELECT opcommand_hst_seq.NEXTVAL, operationid, hostid, longdata
+INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid)
+	SELECT opcommand_hst_seq.NEXTVAL, operationid, hostid
 		FROM tmp_opcommand_hst;
 
 DROP SEQUENCE opcommand_hst_seq;
@@ -236,10 +254,14 @@ UPDATE tmp_opcommand_grp
 			WHERE g.name = tmp_opcommand_grp.name
 				AND TRUNC(g.groupid / 100000000000000) = TRUNC(tmp_opcommand_grp.operationid / 100000000000000));
 
+INSERT INTO opcommand (operationid, command)
+	SELECT operationid, longdata
+		FROM tmp_opcommand_grp;
+
 CREATE SEQUENCE opcommand_grp_seq;
 
-INSERT INTO opcommand_grp (opcommand_grpid, operationid, groupid, command)
-	SELECT opcommand_grp_seq.NEXTVAL, operationid, groupid, longdata
+INSERT INTO opcommand_grp (opcommand_grpid, operationid, groupid)
+	SELECT opcommand_grp_seq.NEXTVAL, operationid, groupid
 		FROM tmp_opcommand_grp;
 
 DROP SEQUENCE opcommand_grp_seq;
@@ -250,6 +272,8 @@ UPDATE opcommand_grp
 
 DROP TABLE tmp_opcommand_grp;
 DROP TABLE tmp_opcommand;
+
+UPDATE opcommand SET type=1,command=TRIM(SUBSTR(command, 5)) WHERE SUBSTR(command, 1, 4)='IPMI';
 
 ---- Patching table `opgroup`
 

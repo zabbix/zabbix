@@ -99,13 +99,31 @@ UPDATE opmessage_usr
 	WHERE operationid >= 100000000000
 /
 
----- Patching tables `opcommand_hst` and `opcommand_grp`
+---- Patching tables `opcommand`, `opcommand_hst` and `opcommand_grp`
+
+CREATE TABLE opcommand (
+	operationid              bigint                                    NOT NULL,
+	type                     integer         WITH DEFAULT '0'          NOT NULL,
+	scriptid                 bigint                                    NULL,
+	execute_on               integer         WITH DEFAULT '0'          NOT NULL,
+	authtype                 integer         WITH DEFAULT '0'          NOT NULL,
+	username                 varchar(64)     WITH DEFAULT ''           NOT NULL,
+	password                 varchar(64)     WITH DEFAULT ''           NOT NULL,
+	publickey                varchar(64)     WITH DEFAULT ''           NOT NULL,
+	privatekey               varchar(64)     WITH DEFAULT ''           NOT NULL,
+	command                  varchar(2048)   WITH DEFAULT ''           NOT NULL,
+	PRIMARY KEY (operationid)
+)
+/
+ALTER TABLE opcommand ADD CONSTRAINT c_opcommand_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE
+/
+ALTER TABLE opcommand ADD CONSTRAINT c_opcommand_2 FOREIGN KEY (scriptid) REFERENCES scripts (scriptid)
+/
 
 CREATE TABLE opcommand_hst (
 	opcommand_hstid          bigint                                    NOT NULL,
 	operationid              bigint                                    NOT NULL,
 	hostid                   bigint                                    NULL,
-	command                  varchar(2048)   WITH DEFAULT ''           NOT NULL,
 	PRIMARY KEY (opcommand_hstid)
 )
 /
@@ -120,7 +138,6 @@ CREATE TABLE opcommand_grp (
 	opcommand_grpid          bigint                                    NOT NULL,
 	operationid              bigint                                    NOT NULL,
 	groupid                  bigint                                    NOT NULL,
-	command                  varchar(2048)   WITH DEFAULT ''           NOT NULL,
 	PRIMARY KEY (opcommand_grpid)
 )
 /
@@ -237,11 +254,16 @@ UPDATE tmp_opcommand_hst
 	WHERE name <> '{HOSTNAME}'
 /
 
+INSERT INTO opcommand (operationid, command)
+	SELECT operationid, longdata
+		FROM tmp_opcommand_hst
+/
+
 CREATE SEQUENCE opcommand_hst_seq AS bigint
 /
 
-INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid, command)
-	SELECT NEXTVAL FOR opcommand_hst_seq, operationid, hostid, longdata
+INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid)
+	SELECT NEXTVAL FOR opcommand_hst_seq, operationid, hostid
 		FROM tmp_opcommand_hst
 /
 
@@ -293,11 +315,16 @@ UPDATE tmp_opcommand_grp
 				AND TRUNC(g.groupid / 100000000000000) = TRUNC(tmp_opcommand_grp.operationid / 100000000000000))
 /
 
+INSERT INTO opcommand (operationid, command)
+	SELECT operationid, longdata
+		FROM tmp_opcommand_grp
+/
+
 CREATE SEQUENCE opcommand_grp_seq AS bigint
 /
 
-INSERT INTO opcommand_grp (opcommand_grpid, operationid, groupid, command)
-	SELECT NEXTVAL FOR opcommand_grp_seq, operationid, groupid, longdata
+INSERT INTO opcommand_grp (opcommand_grpid, operationid, groupid)
+	SELECT NEXTVAL FOR opcommand_grp_seq, operationid, groupid
 		FROM tmp_opcommand_grp
 /
 
@@ -312,6 +339,9 @@ UPDATE opcommand_grp
 DROP TABLE tmp_opcommand_grp
 /
 DROP TABLE tmp_opcommand
+/
+
+UPDATE opcommand SET type=1,command=TRIM(SUBSTR(command, 5)) WHERE SUBSTR(command, 1, 4)='IPMI'
 /
 
 ---- Patching table `opgroup`
