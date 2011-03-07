@@ -96,7 +96,7 @@
 			$table->setCellPadding(1);
 			$table->addRow(array(
 				new CCol(new CLink(
-					S_ZABBIX.SPACE.ZABBIX_VERSION.SPACE.S_COPYRIGHT_BY.SPACE.S_SIA_ZABBIX,
+					S_ZABBIX.SPACE.ZABBIX_VERSION.SPACE.S_COPYRIGHT_BY.SPACE.S_ZABBIX_SIA,
 					'http://www.zabbix.com', 'highlight', null, true),
 					'center'),
 				new CCol(array(
