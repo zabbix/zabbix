@@ -470,9 +470,9 @@ return $caption;
 //SDII($triggerParent);
 			$options = array(
 				'triggerids' => zbx_objectValues($triggers, 'templateid'),
-				'select_hosts' => API_OUTPUT_EXTEND,
-				'output' => API_OUTPUT_EXTEND,
-				'nopermissions' => 1
+				'select_hosts' => array('hostid','host','status'),
+				'output' => array('triggerid','templateid'),
+				'nopermissions' => true
 			);
 
 			$triggers = CTrigger::get($options);
