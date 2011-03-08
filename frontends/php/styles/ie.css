@@ -44,6 +44,8 @@ ul.formlist li div.dd{
 .footer .dt input.main{ height: 25px; }
 .footer .dd { padding-left: 1%; }
 
+.inlineblock{ *display: inline;}
+.radio{ border: 0;}
 
 /* form info line */
 .formrow .listInfoLabel{

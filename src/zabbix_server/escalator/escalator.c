@@ -292,6 +292,8 @@ static int	run_remote_command(DC_ITEM *item, char *command, char *error, size_t 
 #ifdef HAVE_OPENIPMI
 	if (0 == strncmp(command, "IPMI", 4))
 	{
+		command += 5;
+
 		if (SUCCEED == (ret = DCconfig_get_interface_by_type(&item->interface, item->host.hostid,
 				INTERFACE_TYPE_IPMI)))
 		{
@@ -305,13 +307,11 @@ static int	run_remote_command(DC_ITEM *item, char *command, char *error, size_t 
 					&port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
 			if (SUCCEED == (ret = is_ushort(port, &item->interface.port)))
 			{
-				if (SUCCEED == (ret = parse_ipmi_command(command, item->ipmi_sensor, &val)))
+				if (SUCCEED == (ret = parse_ipmi_command(command, item->ipmi_sensor, &val, error, max_error_len)))
 				{
 					item->key = item->ipmi_sensor;
 					ret = set_ipmi_control_value(item, val, error, max_error_len);
 				}
-				else
-					zbx_strlcpy(error, "Incorrect format of IPMI command", max_error_len);
 			}
 			else
 				zbx_snprintf(error, max_error_len, "Invalid port number [%s]",
@@ -337,7 +337,7 @@ static int	run_remote_command(DC_ITEM *item, char *command, char *error, size_t 
 					&port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
 			if (SUCCEED == (ret = is_ushort(port, &item->interface.port)))
 			{
-				win2unix_eol(command);	/* CR+LF (Windows) => LF (Unix) */
+				dos2unix(command);	/* CR+LF (Windows) => LF (Unix) */
 
 				param = dyn_escape_param(command);
 				item->key = zbx_dsprintf(NULL, "system.run[\"%s\",\"nowait\"]", param);

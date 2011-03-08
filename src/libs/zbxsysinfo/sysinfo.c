@@ -326,7 +326,7 @@ void	test_parameters()
 		test_parameter(commands[i].key, PROCESS_TEST | PROCESS_USE_TEST_PARAM);
 }
 
-static int	replace_param(const char *cmd, const char *param, char *out, int outlen, char *error, int max_err_len)
+static int	replace_param(const char *cmd, const char *param, char *out, int outlen, char *error, int max_error_len)
 {
 	int ret = SUCCEED;
 	char buf[MAX_STRING_LEN];
@@ -368,7 +368,7 @@ static int	replace_param(const char *cmd, const char *param, char *out, int outl
 					for (c = suppressed_chars; '\0' != *c; c++)
 						if (NULL != strchr(buf, *c))
 						{
-							zbx_snprintf(error, max_err_len, "Special characters '%s'"
+							zbx_snprintf(error, max_error_len, "Special characters '%s'"
 									" are not allowed in the parameters",
 									suppressed_chars);
 							ret = FAIL;

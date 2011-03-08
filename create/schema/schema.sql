@@ -851,6 +851,8 @@ FIELD		|usrgrpid	|t_id		|	|NULL		|ZBX_SYNC		|1|usrgrp	|		|RESTRICT
 FIELD		|groupid	|t_id		|	|NULL		|ZBX_SYNC		|2|groups	|		|RESTRICT
 FIELD		|description	|t_text		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|confirmation	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|execute_on	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 
 TABLE|screens|screenid|ZBX_SYNC
 FIELD		|screenid	|t_id		|	|NOT NULL	|0

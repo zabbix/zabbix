@@ -1218,7 +1218,9 @@ COpt::memoryPick();
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			));
-			API::Application()->delete(array_keys($delApplications), true);
+			if(!empty($delApplications)){
+				API::Application()->delete(array_keys($delApplications), true);
+			}
 
 
 			DB::delete('hosts', array('hostid' => $templateids));

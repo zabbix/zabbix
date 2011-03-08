@@ -19,7 +19,6 @@
 **/
 ?>
 <?php
-
 require_once 'PHPUnit/Extensions/SeleniumTestCase.php';
 
 require_once(dirname(__FILE__).'/../../include/defines.inc.php');
