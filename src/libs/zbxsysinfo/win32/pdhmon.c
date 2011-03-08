@@ -18,29 +18,26 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
 #include "threads.h"
-
 #include "stats.h"
-
 #include "log.h"
 
-int	USER_PERFCOUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	USER_PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	PERF_COUNTERS *perfs = NULL;
+	PERF_COUNTERS	*perfs = NULL;
 
 	int	ret = SYSINFO_RET_FAIL;
 
-	if ( !PERF_COLLECTOR_STARTED(collector) )
+	if (!PERF_COLLECTOR_STARTED(collector))
 	{
 		SET_MSG_RESULT(result, strdup("Collector is not started!"));
 		return SYSINFO_RET_OK;
 	}
 
-	for(perfs = collector->perfs.pPerfCounterList; perfs; perfs=perfs->next)
+	for (perfs = collector->perfs.pPerfCounterList; perfs; perfs=perfs->next)
 	{
-		if (NULL != perfs->name && 0 == strcmp(perfs->name, param) )
+		if (NULL != perfs->name && 0 == strcmp(perfs->name, param))
 		{
 			if (ITEM_STATUS_NOTSUPPORTED == perfs->status)
 				SET_MSG_RESULT(result, strdup(perfs->error));
@@ -54,7 +51,7 @@ int	USER_PERFCOUNTER(const char *cmd, const char *param, unsigned flags, AGENT_R
 	return ret;
 }
 
-int	PERF_MONITOR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	HQUERY				query;
 	HCOUNTER			counter;
@@ -87,14 +84,18 @@ int	PERF_MONITOR(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	if (FAIL == check_counter_path(counter_path))
 		return SYSINFO_RET_FAIL;
 
-	if (interval > 1) {
-		if ( !PERF_COLLECTOR_STARTED(collector) ) {
+	if (interval > 1)
+	{
+		if (!PERF_COLLECTOR_STARTED(collector))
+		{
 			SET_MSG_RESULT(result, strdup("Collector is not started!"));
 			return SYSINFO_RET_OK;
 		}
 
-		for (perfs = collector->perfs.pPerfCounterList; perfs != NULL; perfs = perfs->next) {
-			if (NULL == perfs->name && 0 == strcmp(perfs->counterPath, counter_path) && perfs->interval == interval) {
+		for (perfs = collector->perfs.pPerfCounterList; perfs != NULL; perfs = perfs->next)
+		{
+			if (NULL == perfs->name && 0 == strcmp(perfs->counterPath, counter_path) && perfs->interval == interval)
+			{
 				if (ITEM_STATUS_NOTSUPPORTED == perfs->status)
 					SET_MSG_RESULT(result, strdup(perfs->error));
 				else
@@ -115,16 +116,16 @@ int	PERF_MONITOR(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 		{
 			if (ERROR_SUCCESS == (status = PdhCollectQueryData(query)))
 			{
-				if(ERROR_SUCCESS == (status = PdhGetRawCounterValue(counter, NULL, &rawData)) &&
+				if (ERROR_SUCCESS == (status = PdhGetRawCounterValue(counter, NULL, &rawData)) &&
 					(rawData.CStatus == PDH_CSTATUS_VALID_DATA || rawData.CStatus == PDH_CSTATUS_NEW_DATA))
 				{
-					if( PDH_CSTATUS_INVALID_DATA == (status = PdhCalculateCounterFromRawValue(
+					if (PDH_CSTATUS_INVALID_DATA == (status = PdhCalculateCounterFromRawValue(
 						counter,
 						PDH_FMT_DOUBLE,
 						&rawData,
 						NULL,
 						&counterValue
-						)) )
+						)))
 					{
 						zbx_sleep(1);
 						PdhCollectQueryData(query);
@@ -135,33 +136,39 @@ int	PERF_MONITOR(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 							&rawData2,
 							&rawData,
 							&counterValue);
-
 					}
 
-					if(ERROR_SUCCESS == status) {
+					if (ERROR_SUCCESS == status)
+					{
 						SET_DBL_RESULT(result, counterValue.doubleValue);
 						ret = SYSINFO_RET_OK;
-					} else
+					}
+					else
 						zabbix_log(LOG_LEVEL_DEBUG, "Can't format counter value \"%s\": %s",
 								counter_path, strerror_from_module(status, L"PDH.DLL"));
-				} else {
+				}
+				else
+				{
 					if (ERROR_SUCCESS == status)
 						status = rawData.CStatus;
 
 					zabbix_log(LOG_LEVEL_DEBUG, "Can't get counter value \"%s\": %s",
 							counter_path, strerror_from_module(status, L"PDH.DLL"));
 				}
-			} else
+			}
+			else
 				zabbix_log(LOG_LEVEL_DEBUG, "Can't collect data \"%s\": %s",
 						counter_path, strerror_from_module(status, L"PDH.DLL"));
 
 			PdhRemoveCounter(&counter);
-		} else
+		}
+		else
 			zabbix_log(LOG_LEVEL_DEBUG, "Can't add counter \"%s\": %s",
 					counter_path, strerror_from_module(status, L"PDH.DLL"));
 
 		PdhCloseQuery(query);
-	} else
+	}
+	else
 		zabbix_log(LOG_LEVEL_DEBUG, "Can't initialize performance counters \"%s\": %s",
 				counter_path, strerror_from_module(status, L"PDH.DLL"));
 

@@ -233,9 +233,9 @@ int	NET_TCP_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		return SYSINFO_RET_FAIL;
 
 	if(get_param(param, 1, ip, MAX_STRING_LEN) != 0)
-        {
-               ip[0] = '\0';
-        }
+	{
+		ip[0] = '\0';
+	}
 
 	/* default parameter */
 	if(ip[0] == '\0')
@@ -244,9 +244,9 @@ int	NET_TCP_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	}
 
 	if(get_param(param, 2, zone, MAX_STRING_LEN) != 0)
-        {
-                zone[0] = '\0';
-        }
+	{
+		zone[0] = '\0';
+	}
 
 	/* default parameter */
 	if(zone[0] == '\0')
