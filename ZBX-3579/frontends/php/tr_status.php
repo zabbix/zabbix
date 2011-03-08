@@ -460,8 +460,9 @@ require_once('include/templates/scriptConfirm.js.php');
 
 		$menu_trigger_conf = 'null';
 		if($admin_links && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL){
-			$menu_trigger_conf = "['".S_CONFIGURATION_OF_TRIGGERS."',\"javascript:
-				redirect('triggers.php?form=update&triggerid=".$trigger['triggerid'].'&switch_node='.id2nodeid($trigger['triggerid'])."')\",
+			$str_tmp = zbx_jsvalue('javascript: redirect("triggers.php?form=update&triggerid='.
+					$trigger['triggerid'].'&switch_node='.id2nodeid($trigger['triggerid']).'")');
+			$menu_trigger_conf = "['".S_CONFIGURATION_OF_TRIGGERS."',". $str_tmp .",
 				null, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 		}
 		$menu_trigger_url = 'null';
