@@ -3970,6 +3970,18 @@ return array(
 				'length' => 255,
 				'default' => '',
 			),
+			'type' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			),
+			'execute_on' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
+			),
 		),
 	),
 	'screens' => array(

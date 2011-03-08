@@ -269,7 +269,7 @@
 		));
 	}
 
-	$ifTab = new CTable(null, 'cell');
+	$ifTab = new CTable(null, 'formElementTable');
 	$ifTab->addRow(array(S_IP_ADDRESS,S_DNS_NAME,S_CONNECT_TO,S_PORT,S_TYPE));
 	$ifTab->setAttribute('id', 'hostInterfaces');
 
@@ -540,7 +540,7 @@
 		));
 	}
 
-	$macroTab = new CTable();
+	$macroTab = new CTable(null,'formElementTable');
 	$macroTab->addRow(array(S_MACRO, SPACE, S_VALUE));
 	$macroTab->setAttribute('id', 'userMacros');
 
