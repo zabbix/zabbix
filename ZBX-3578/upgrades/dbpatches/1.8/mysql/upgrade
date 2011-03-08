@@ -8,7 +8,7 @@ echo " WARNING: backup your database before performing upgrade
   2. Converts all tables to UTF-8;
   3. Patches the database from 1.6 schema to 1.8 schema;
   4. Adds the 'Discovered Hosts' hosts group and sets it to be used for discovered hosts;
-  5. Adds 'Disabled', 'API access' and 'Debug' usergroup if any missing;
+  5. Adds 'Disabled' and 'Debug' usergroup if any missing;
   6. Checks for hosts not belonging to any group and adds them to one if any found.
 
  This script is not intended for distributed monitoring databases.
@@ -136,7 +136,7 @@ insert into groups (groupid,name,internal) values ('$discoveredhostsgroup','Disc
 	# bash < 4.1 version
 	echo "bash < 4.1 detected"
 	# groupname,columnname
-	for group in "Disabled,users_status" "API access,api_access" "Debug,debug_mode"; do
+	for group in "Disabled,users_status" "Debug,debug_mode"; do
 		groupname=$(echo $group | cut -d, -f1)
 		column=$(echo $group | cut -d, -f2)
 		echo -n "Checking for '$groupname' user group... "
@@ -163,7 +163,6 @@ insert into groups (groupid,name,internal) values ('$discoveredhostsgroup','Disc
 	declare -A groupstoadd
 	groupstoadd=(
 ["Disabled"]=users_status
-["API access"]=api_access
 ["Debug"]=debug_mode
 )
 

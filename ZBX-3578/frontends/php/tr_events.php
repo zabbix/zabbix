@@ -121,12 +121,12 @@
 	$right_tab->setCellSpacing(3);
 	$right_tab->setAttribute('border',0);
 
-	//getting current cunfiguration settings
+	// getting current configuration settings
 	$config = select_config();
 
 // event ack
 
-	//if acknowledges are not disabled by confuguration, let's show them
+	// if acknowledges are not disabled in configuration, let's show them
 	if ($config['event_ack_enable']) {
 		$event_ack = new CWidget(
 			'hat_eventack',
