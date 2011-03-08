@@ -2,6 +2,7 @@
 Changes for 1.9.2
 
 New features:
+ - [ZBXNEXT-673] added support of users scripts on Zabbix Agent and IPMI-based remote commands (Vedmak)
  - [ZBXNEXT-631] added custom trigger severities configuration (Vedmak)
  - [ZBXNEXT-636] login screen redesign, frontend themes restyle (Aly, Elvis)
  - [ZBXNEXT-635] introduced API wrapper for Zabbix frontend (Vedmak, Aly)
