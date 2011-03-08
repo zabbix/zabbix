@@ -94,6 +94,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
 
+ - [ZBX-3578] added arguments to the output when using agent with '-p' or '-t', modified default arguments in win32.c and common.c (rudolfs)
  - [ZBX-3514] removed non "regexp" triggers from item log-form menu (Aly)
  - [ZBX-3584] fixed allowed_hosts set to 'localhost' for items by default (Vedmak)
  - [ZBX-3568] fixed processing of trigger functions with macros in item key parameters in notifications (Sasha)
