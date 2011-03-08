@@ -54,6 +54,12 @@
 	define('ZBX_HISTORY_DATA_UPKEEP',		-1); // in days; -1: disabled, 0: always use trends
 
 /* END OF USERS DEFINES */
+	define('ZBX_SCRIPT_TYPE_SCRIPT', 0);
+	define('ZBX_SCRIPT_TYPE_IPMI', 1);
+
+	define('ZBX_SCRIPT_EXECUTE_ON_AGENT', 0);
+	define('ZBX_SCRIPT_EXECUTE_ON_SERVER', 1);
+
 	define('ZBX_FLAG_DISCOVERY_NORMAL', 0x0);
 	define('ZBX_FLAG_DISCOVERY', 0x1);
 	define('ZBX_FLAG_DISCOVERY_CHILD', 0x2);

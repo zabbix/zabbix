@@ -218,7 +218,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 		}
 	}
 
-	win2unix_eol(item->params);	/* CR+LF (Windows) => LF (Unix) */
+	dos2unix(item->params);	/* CR+LF (Windows) => LF (Unix) */
 	/* request a shell on a channel and execute command */
 	while (0 != (rc = libssh2_channel_exec(channel, item->params)))
 	{

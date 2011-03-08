@@ -498,7 +498,9 @@ COpt::memoryPick();
 				$itemids_del[] = $stepitem['itemid'];
 			}
 
-			API::Item()->delete($itemids_del, true);
+			if(!empty($itemids_del)){
+				API::Item()->delete($itemids_del, true);
+			}
 
 			DB::delete('httptest', array('httptestid' => $webcheckids));
 
@@ -760,7 +762,9 @@ COpt::memoryPick();
 
 		DB::delete('httpstep', array('httpstepid' => $webstepids));
 
-		API::Item()->delete($itemids, true);
+		if(!empty($itemids)){
+			API::Item()->delete($itemids, true);
+		}
 	}
 }
 ?>
