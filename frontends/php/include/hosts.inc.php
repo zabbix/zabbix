@@ -27,6 +27,14 @@
 	return $result;
 	}
 
+function getHostProfiles(){
+	$profiles = array(
+		'os' => _('Os'),
+		'name' => _('Alias'),
+	);
+
+	return $profiles;
+}
 
 
 	function get_hostgroup_by_groupid($groupid){
