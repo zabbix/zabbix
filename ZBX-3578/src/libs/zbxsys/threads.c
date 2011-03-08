@@ -20,6 +20,8 @@
 #include "common.h"
 #include "threads.h"
 
+#include "log.h" /* required for strerror_from_system() on Windows */
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_fork                                                         *
