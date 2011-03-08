@@ -247,8 +247,10 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 		return ret;
 	}
-
-	while (NULL != fgets(tmp, sizeof(tmp), f))
+	if (NULL == fgets(tmp, sizeof(tmp), f))
+	{
+		zbx_snprintf(tmp, sizeof(tmp), "No output, check DNS resolution");
+	} else do
 	{
 		zbx_rtrim(tmp, "\n");
 		zabbix_log(LOG_LEVEL_DEBUG, "Update IP [%s]", tmp);
@@ -307,7 +309,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 		while (NULL != (c = c2));
 
 		ret = SUCCEED;
-	}
+	} while (NULL != fgets(tmp, sizeof(tmp), f));
 	pclose(f);
 
 	unlink(filename);
