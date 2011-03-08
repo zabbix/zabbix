@@ -247,10 +247,10 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 		return ret;
 	}
+
 	if (NULL == fgets(tmp, sizeof(tmp), f))
-	{
-		zbx_snprintf(tmp, sizeof(tmp), "No output, check DNS resolution");
-	} else do
+		ret = SUCCEED;
+	else do
 	{
 		zbx_rtrim(tmp, "\n");
 		zabbix_log(LOG_LEVEL_DEBUG, "Update IP [%s]", tmp);
