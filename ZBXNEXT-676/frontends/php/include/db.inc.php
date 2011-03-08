@@ -1193,8 +1193,9 @@ if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
 			if(empty($values)) return true;
 			$resultIds = array();
 
-			if($getids)
+			if($getids){
 				$id = self::reserveIds($table, count($values));
+			}
 
 			$table_schema = self::getSchema($table);
 
@@ -1230,7 +1231,7 @@ if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
 
 			$data = zbx_toArray($data);
 
-			foreach($data as $dnum => $row){
+			foreach($data as $row){
 				$sql_set = '';
 
 				self::checkValueTypes($table, $row['values']);
