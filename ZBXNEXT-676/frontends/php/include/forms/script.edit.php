@@ -27,64 +27,45 @@
 	$scriptTab = new CFormList('scriptsTab');
 	$frmScr = new CForm();
 	$frmScr->setName('scripts');
-	$frmScr->addVar('form', get_request('form', 1));
 
-	$from_rfr = get_request('form_refresh',0);
-	$frmScr->addVar('form_refresh', $from_rfr+1);
+	$frmScr->addVar('form', $data['form']);
+	$frmScr->addVar('form_refresh', $data['form_refresh'] + 1);
 
 
-	if(isset($_REQUEST['scriptid'])) $frmScr->addVar('scriptid', $_REQUEST['scriptid']);
+	if($data['scriptid']) $frmScr->addVar('scriptid', $data['scriptid']);
 
-	if(!isset($_REQUEST['scriptid']) || isset($_REQUEST['form_refresh'])){
-		$name = get_request('name', '');
-		$command  = get_request('command', '');
-		$description  = get_request('description', '');
-		$usrgrpid = get_request('usrgrpid',	0);
-		$groupid = get_request('groupid', 0);
-		$access = get_request('access',	PERM_READ_ONLY);
-		$confirmation = get_request('confirmation',	'');
-		$enableConfirmation = get_request('enableConfirmation', false);
-	}
-
-	if(isset($_REQUEST['scriptid']) && !isset($_REQUEST['form_refresh'])){
-		$frmScr->addVar('form_refresh', get_request('form_refresh',1));
-
-		$options = array(
-			'scriptids' => $_REQUEST['scriptid'],
-			'output' => API_OUTPUT_EXTEND,
-		);
-		$script = API::Script()->get($options);
-		$script = reset($script);
-
-		$name = $script['name'];
-		$command  = $script['command'];
-		$description = $script['description'];
-		$usrgrpid = $script['usrgrpid'];
-		$groupid = $script['groupid'];
-		$access = $script['host_access'];
-		$confirmation = $script['confirmation'];
-		$enableConfirmation = !empty($confirmation);
-	}
 
 // NAME
-	$nameTB = new CTextBox('name', $name);
+	$nameTB = new CTextBox('name', $data['name']);
 	$nameTB->setAttribute('maxlength', 255);
 	$nameTB->addStyle('width: 50em');
 	$scriptTab->addRow(_('Name'), $nameTB);
 
+// TYPE
+	$typeCB = new CComboBox('type', $data['type']);
+	$typeCB->addItem(ZBX_SCRIPT_TYPE_IPMI, _('IPMI'));
+	$typeCB->addItem(ZBX_SCRIPT_TYPE_SCRIPT, _('Script'));
+	$scriptTab->addRow(_('Type'), $typeCB);
+
+// EXECUTE ON
+	$typeRB = new CRadioButton('execute_on', $data['execute_on']);
+	$typeRB->makeVertical();
+	$typeRB->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT);
+	$typeRB->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER);
+	$scriptTab->addRow(_('Execute on'), new CDiv($typeRB, 'objectgroup inlineblock border_dotted ui-corner-all'), ($data['type'] == ZBX_SCRIPT_TYPE_IPMI));
+
 // COMMAND
-	$commandTB = new CTextBox('command', $command);
-	$commandTB->setAttribute('maxlength', 255);
-	$commandTB->addStyle('width: 50em');
-	$scriptTab->addRow(_('Command'), $commandTB);
+	$commandTA = new CTextArea('command', $data['command']);
+	$commandTA->addStyle('width: 50em; padding: 0;');
+	$scriptTab->addRow(_('Command'), $commandTA);
 
 // DESCRIPTION
-	$description_ta = new CTextArea('description', $description);
-	$description_ta->addStyle('width: 50em; padding: 0;');
-	$scriptTab->addRow(_('Description'), $description_ta);
+	$descriptionTA = new CTextArea('description', $data['description']);
+	$descriptionTA->addStyle('width: 50em; padding: 0;');
+	$scriptTab->addRow(_('Description'), $descriptionTA);
 
 // USER GROUPS
-	$usr_groups = new CCombobox('usrgrpid', $usrgrpid);
+	$usr_groups = new CCombobox('usrgrpid', $data['usrgrpid']);
 	$usr_groups->addItem(0, _('All'));
 	$usrgrps = API::UserGroup()->get(array(
 		'output' => API_OUTPUT_EXTEND,
@@ -96,7 +77,7 @@
 	$scriptTab->addRow(_('User groups'), $usr_groups);
 
 // HOST GROUPS
-	$host_groups = new CCombobox('groupid', $groupid);
+	$host_groups = new CCombobox('groupid', $data['groupid']);
 	$host_groups->addItem(0, _('All'));
 	$groups = API::HostGroup()->get(array(
 		'output' => API_OUTPUT_EXTEND,
@@ -108,16 +89,16 @@
 	$scriptTab->addRow(_('Host groups'), $host_groups);
 
 // PERMISSIONS
-	$select_acc = new CCombobox('access', $access);
+	$select_acc = new CCombobox('access', $data['access']);
 	$select_acc->addItem(PERM_READ_ONLY, _('Read'));
 	$select_acc->addItem(PERM_READ_WRITE, _('Write'));
 	$scriptTab->addRow(_('Required host permissions'), $select_acc);
 
 // CONFIRMATION
-	$enableQuestCB = new CCheckBox('enableConfirmation', $enableConfirmation);
+	$enableQuestCB = new CCheckBox('enableConfirmation', $data['enableConfirmation']);
 	$scriptTab->addRow(new CLabel(_('Enable confirmation'), 'enableConfirmation'), array($enableQuestCB, SPACE));
 
-	$confirmationTB = new CTextBox('confirmation', $confirmation);
+	$confirmationTB = new CTextBox('confirmation', $data['confirmation']);
 	$confirmationTB->addStyle('width: 50em;');
 	$confirmationTB->setAttribute('maxlength', 255);
 
