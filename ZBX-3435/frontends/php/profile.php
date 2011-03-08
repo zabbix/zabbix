@@ -96,7 +96,7 @@ $fields=array(
 
 //Primary Actions
 	else if(isset($_REQUEST['cancel'])){
-		$sql = 'SELECT url4	FROM user_history WHERE userid='.$USER_DETAILS['userid'];
+		$sql = 'SELECT url4 FROM user_history WHERE userid='.$USER_DETAILS['userid'];
 		$history = DBfetch(DBSelect($sql));
 		ob_end_clean();
 		redirect($history['url4']);
@@ -165,7 +165,7 @@ $fields=array(
 					'User alias ['.$USER_DETAILS['alias'].'] Name ['.$USER_DETAILS['name'].']'.
 					' Surname ['.$USER_DETAILS['surname'].'] profile id ['.$USER_DETAILS['userid'].']');
 
-				$sql = 'SELECT url4	FROM user_history WHERE userid='.$USER_DETAILS['userid'];
+				$sql = 'SELECT url4 FROM user_history WHERE userid='.$USER_DETAILS['userid'];
 				$history = DBfetch(DBSelect($sql));
 				ob_end_clean();
 				redirect($history['url4']);
