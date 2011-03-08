@@ -1010,8 +1010,10 @@ COpt::memoryPick();
 			while($graph = DBfetch($db_graphs)){
 				$created_graphs[$graph['graphid']] = $graph['graphid'];
 			}
-			$result = API::Graph()->delete($created_graphs, true);
-			if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete graph prototype'));
+			if(!empty($created_graphs)){
+				$result = API::Graph()->delete($created_graphs, true);
+				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete graph prototype'));
+			}
 
 
 			DB::delete('screens_items', array(

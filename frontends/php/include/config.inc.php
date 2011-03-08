@@ -734,11 +734,11 @@ function __autoload($class_name){
 
 		if(is_null($format)) $format = $IMAGE_FORMAT_DEFAULT;
 
-		if(IMAGE_FORMAT_JPEG == $format)	Header( "Content-type:  image/jpeg");
-		if(IMAGE_FORMAT_TEXT == $format)	Header( "Content-type:  text/html");
-		else								Header( "Content-type:  image/png");
+		if(IMAGE_FORMAT_JPEG == $format)	header( "Content-type:  image/jpeg");
+		if(IMAGE_FORMAT_TEXT == $format)	header( "Content-type:  text/html");
+		else								header( "Content-type:  image/png");
 
-		Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT");
+		header("Expires:  Mon, 17 Aug 1998 12:51:50 GMT");
 	}
 
 	function ImageOut(&$image,$format=NULL){

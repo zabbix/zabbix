@@ -461,10 +461,10 @@ function getSeverityCell($severity, $text=null, $force_normal=false){
 //SDII($triggerParent);
 			$options = array(
 				'triggerids' => zbx_objectValues($triggers, 'templateid'),
-				'selectHosts' => API_OUTPUT_EXTEND,
+				'selectHosts' => array('hostid','host','status'),
+				'output' => array('triggerid','templateid'),
 				'filter' => array('flags' => null),
-				'output' => API_OUTPUT_EXTEND,
-				'nopermissions' => 1
+				'nopermissions' => true
 			);
 
 			$triggers = API::Trigger()->get($options);

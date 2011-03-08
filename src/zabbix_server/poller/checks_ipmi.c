@@ -1039,48 +1039,61 @@ int	get_value_ipmi(DC_ITEM *item, AGENT_RESULT *value)
 	return h->ret;
 }
 
-/* function 'parse_ipmi_command' require 'c_name' with size 'ITEM_IPMI_SENSOR_LEN_MAX' */
-int	parse_ipmi_command(char *command, char *c_name, int *val)
+/* function 'parse_ipmi_command' requires 'c_name' with size 'ITEM_IPMI_SENSOR_LEN_MAX' */
+int	parse_ipmi_command(const char *command, char *c_name, int *val, char *error, size_t max_error_len)
 {
-	char	*p, *ipmi_command;
+	const char	*__function_name = "parse_ipmi_command";
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In parse_ipmi_command(%s)", command);
+	const char	*p;
+	size_t		sz_c_name;
+	int		ret = FAIL;
 
-	if (0 != strncmp(command, "IPMI", 4))
-		return FAIL;
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() command:'%s'", __function_name, command);
 
-	p = command + 4;
-	while (*p == ' ' && *p != '\0')
+	while ('\0' != *command && NULL != strchr(" \t", *command))
+		command++;
+
+	for (p = command; '\0' != *p && NULL == strchr(" \t", *p); p++)
+		;
+
+	if (0 == (sz_c_name = p - command))
+	{
+		zbx_strlcpy(error, "IPMI command is empty", max_error_len);
+		goto fail;
+	}
+
+	if (sz_c_name >= ITEM_IPMI_SENSOR_LEN_MAX)
+	{
+		zbx_snprintf(error, max_error_len, "IPMI command is too long [%.*s]", sz_c_name, command);
+		goto fail;
+	}
+
+	memcpy(c_name, command, sz_c_name);
+	c_name[sz_c_name] = '\0';
+
+	while ('\0' != *p && NULL != strchr(" \t", *p))
 		p++;
 
-	ipmi_command = p;
-	*val = 1;
-
-	if (NULL != (p = strchr(p, ' ')))
+	if ('\0' == *p || 0 == strcasecmp(p, "on"))
+		*val = 1;
+	else if (0 == strcasecmp(p, "off"))
+		*val = 0;
+	else if (SUCCEED == is_uint(p))
+		*val = atoi(p);
+	else
 	{
-		*p++ = '\0';
-		while (*p == ' ' && *p != '\0')
-			p++;
-
-		if (*p == '\0' || 0 == strcasecmp(p, "on"))
-			*val = 1;
-		else if (0 == strcasecmp(p, "off"))
-			*val = 0;
-		else if (SUCCEED == is_uint(p))
-			*val = atoi(p);
-		else
-		{
-			zabbix_log(LOG_LEVEL_ERR, "IPMI command Value is not supported [%s %s]",
-					command, p);
-			return FAIL;
-		}
+		zbx_snprintf(error, max_error_len, "IPMI command value is not supported [%s]", p);
+		goto fail;
 	}
-	zbx_strlcpy(c_name, ipmi_command, ITEM_IPMI_SENSOR_LEN_MAX);
 
-	return SUCCEED;
+	ret = SUCCEED;
+fail:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
 }
 
-int	set_ipmi_control_value(DC_ITEM *item, int value, char *error, size_t error_max_len)
+int	set_ipmi_control_value(DC_ITEM *item, int value, char *error, size_t max_error_len)
 {
 	zbx_ipmi_host_t		*h;
 	zbx_ipmi_control_t	*c;
@@ -1090,7 +1103,7 @@ int	set_ipmi_control_value(DC_ITEM *item, int value, char *error, size_t error_m
 
 	if (NULL == os_hnd)
 	{
-		zbx_strlcpy(error, "IPMI handler is not initialised", error_max_len);
+		zbx_strlcpy(error, "IPMI handler is not initialised", max_error_len);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
 		return NOTSUPPORTED;
 	}
@@ -1101,7 +1114,7 @@ int	set_ipmi_control_value(DC_ITEM *item, int value, char *error, size_t error_m
 	if (0 == h->domain_up) {
 		if (NULL != h->err)
 		{
-			zbx_strlcpy(error, h->err, error_max_len);
+			zbx_strlcpy(error, h->err, max_error_len);
 			zabbix_log(LOG_LEVEL_DEBUG, "%s", h->err);
 		}
 		return h->ret;
@@ -1111,7 +1124,7 @@ int	set_ipmi_control_value(DC_ITEM *item, int value, char *error, size_t error_m
 
 	if (NULL == c)
 	{
-		zbx_snprintf(error, error_max_len, "Control %s@[%s]:%d does not exist",
+		zbx_snprintf(error, max_error_len, "Control %s@[%s]:%d does not exist",
 				item->ipmi_sensor, h->ip, h->port);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
 		return NOTSUPPORTED;
@@ -1123,7 +1136,7 @@ int	set_ipmi_control_value(DC_ITEM *item, int value, char *error, size_t error_m
 	{
 		if (NULL != h->err)
 		{
-			zbx_strlcpy(error, h->err, error_max_len);
+			zbx_strlcpy(error, h->err, max_error_len);
 			zabbix_log(LOG_LEVEL_DEBUG, "%s", h->err);
 		}
 	}
