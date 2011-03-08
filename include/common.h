@@ -639,6 +639,12 @@ const char	*zbx_permission_string(int perm);
 #define	ZBX_NODE_SLAVE	1
 const char	*zbx_nodetype_string(unsigned char nodetype);
 
+#define ZBX_SCRIPT_TYPE_SCRIPT		0
+#define ZBX_SCRIPT_TYPE_IPMI		1
+
+#define ZBX_SCRIPT_EXECUTE_ON_AGENT	0
+#define ZBX_SCRIPT_EXECUTE_ON_SERVER	1
+
 #define POLLER_DELAY		5
 #define DISCOVERER_DELAY	60
 
@@ -926,7 +932,7 @@ int	zbx_strlen_utf8(const char *text);
 char	*zbx_replace_utf8(const char *text);
 void	zbx_replace_invalid_utf8(char *text);
 
-void	win2unix_eol(char *str);
+void	dos2unix(char *str);
 int	str2uint(const char *str);
 int	str2uint64(char *str, zbx_uint64_t *value);
 double	str2double(const char *str);
