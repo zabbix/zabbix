@@ -296,10 +296,10 @@ function get_user_history(){
 			FROM user_history WHERE userid='.CWebUser::$data['userid'];
 	$history = DBfetch(DBSelect($sql));
 
-	if($history)
+	if($history && !zbx_empty($history['url4']))
 		CWebUser::$data['last_page'] = array('title' => $history['title4'], 'url' => $history['url4']);
 	else
-		CWebUser::$data['last_page'] = false;
+		CWebUser::$data['last_page'] = array('title' => S_DASHBOARD, 'url' => 'dashboard.php');
 
 	for($i = 1; $i<6; $i++){
 		if(defined($history['title'.$i])){
