@@ -96,10 +96,8 @@ $fields=array(
 
 //Primary Actions
 	else if(isset($_REQUEST['cancel'])){
-		$sql = 'SELECT url4 FROM user_history WHERE userid='.$USER_DETAILS['userid'];
-		$history = DBfetch(DBSelect($sql));
 		ob_end_clean();
-		redirect($history['url4']);
+		redirect($USER_DETAILS['last_page']['url']);
 	}
 	else if(isset($_REQUEST['save'])){
 		$auth_type = get_user_system_auth($USER_DETAILS['userid']);
@@ -165,10 +163,8 @@ $fields=array(
 					'User alias ['.$USER_DETAILS['alias'].'] Name ['.$USER_DETAILS['name'].']'.
 					' Surname ['.$USER_DETAILS['surname'].'] profile id ['.$USER_DETAILS['userid'].']');
 
-				$sql = 'SELECT url4 FROM user_history WHERE userid='.$USER_DETAILS['userid'];
-				$history = DBfetch(DBSelect($sql));
 				ob_end_clean();
-				redirect($history['url4']);
+				redirect($USER_DETAILS['last_page']['url']);
 			}
 			else{
 				show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
