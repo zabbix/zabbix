@@ -26,6 +26,7 @@
 #include "zlog.h"
 #include "zbxexec.h"
 #include "../poller/checks_ipmi.h"
+#include "../poller/checks_agent.h"
 
 /******************************************************************************
  *                                                                            *
@@ -42,23 +43,186 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static char	*get_command_by_scriptid(zbx_uint64_t scriptid)
+static int	DBget_script_by_scriptid(zbx_uint64_t scriptid, DB_SCRIPT *script)
 {
-	DB_RESULT	db_result;
-	DB_ROW		db_row;
-	char		*command = NULL;
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		res = FAIL;
 
-	db_result = DBselect(
-			"select command"
+	result = DBselect(
+			"select command,groupid,type,execute_on"
 			" from scripts"
 			" where scriptid=" ZBX_FS_UI64,
 			scriptid);
 
-	if (NULL != (db_row = DBfetch(db_result)))
-		command = strdup(db_row[0]);
-	DBfree_result(db_result);
+	if (NULL != (row = DBfetch(result)))
+	{
+		script->command = zbx_strdup(script->command, row[0]);
+		ZBX_DBROW2UINT64(script->groupid, row[1]);
+		script->type = (unsigned char)atoi(row[2]);
+		script->execute_on = (unsigned char)atoi(row[3]);
+		res = SUCCEED;
+	}
+	DBfree_result(result);
 
-	return command;
+	return res;
+}
+
+static int	zbx_execute_ipmi_command(DC_ITEM *item, const char *command, char *error, size_t max_error_len)
+{
+	int	ret = FAIL;
+#ifdef HAVE_OPENIPMI
+	int	val;
+	char	*port = NULL;
+#endif	/* HAVE_OPENIPMI */
+
+#ifdef HAVE_OPENIPMI
+	if (SUCCEED != (ret = DCconfig_get_interface_by_type(&item->interface, item->host.hostid, INTERFACE_TYPE_IPMI)))
+	{
+		zbx_snprintf(error, max_error_len, "IPMI interface is not defined for host [%s]", item->host.host);
+		return ret;
+	}
+
+	item->interface.addr = zbx_strdup(item->interface.addr,
+			item->interface.useip ? item->interface.ip_orig : item->interface.dns_orig);
+	substitute_simple_macros(NULL, NULL, &item->host, NULL,
+			&item->interface.addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
+
+	port = zbx_strdup(port, item->interface.port_orig);
+	substitute_simple_macros(NULL, &item->host.hostid, NULL, NULL, &port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
+
+	if (SUCCEED != (ret = is_ushort(port, &item->interface.port)))
+	{
+		zbx_snprintf(error, max_error_len, "Invalid port number [%s]", item->interface.port_orig);
+		goto clean;
+	}
+
+	if (SUCCEED == (ret = parse_ipmi_command(command, item->ipmi_sensor, &val, error, max_error_len)))
+	{
+		if (SUCCEED != (ret = set_ipmi_control_value(item, val, error, max_error_len)))
+			ret = FAIL;
+	}
+clean:
+	zbx_free(port);
+	zbx_free(item->interface.addr);
+#else
+	zbx_strlcpy(error, "Support for IPMI commands was not compiled in", max_error_len);
+#endif	/* HAVE_OPENIPMI */
+
+	return ret;
+}
+
+static int	zbx_execute_script_on_agent(DC_ITEM *item, char *command, char **result,
+		char *error, size_t max_error_len)
+{
+	int		ret;
+	AGENT_RESULT	agent_result;
+	char		*param, *port = NULL;
+
+	if (SUCCEED != (ret = DCconfig_get_interface_by_type(&item->interface, item->host.hostid, INTERFACE_TYPE_AGENT)))
+	{
+		zbx_snprintf(error, max_error_len, "Zabbix agent interface is not defined for host [%s]", item->host.host);
+		return ret;
+	}
+
+	item->interface.addr = (item->interface.useip ? item->interface.ip_orig : item->interface.dns_orig);
+
+	port = zbx_strdup(port, item->interface.port_orig);
+	substitute_simple_macros(NULL, &item->host.hostid, NULL, NULL, &port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
+
+	if (SUCCEED != (ret = is_ushort(port, &item->interface.port)))
+	{
+		zbx_snprintf(error, max_error_len, "Invalid port number [%s]", item->interface.port_orig);
+		goto clean;
+	}
+
+	dos2unix(command);	/* CR+LF (Windows) => LF (Unix) */
+
+	param = dyn_escape_param(command);
+	item->key = zbx_dsprintf(NULL, "system.run[\"%s\",\"wait\"]", param);
+	item->value_type = ITEM_VALUE_TYPE_TEXT;
+	zbx_free(param);
+
+	init_result(&agent_result);
+
+	alarm(CONFIG_TIMEOUT);
+
+	if (SUCCEED != (ret = get_value_agent(item, &agent_result)))
+	{
+		if (ISSET_MSG(&agent_result))
+			zbx_strlcpy(error, agent_result.msg, max_error_len);
+		else
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			*error = '\0';
+		}
+		ret = FAIL;
+	}
+	else
+	{
+		if (ISSET_TEXT(&agent_result))
+			*result = zbx_strdup(*result, agent_result.text);
+		else
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			*result = zbx_strdup(*result, "");
+		}
+	}
+
+	alarm(0);
+
+	free_result(&agent_result);
+
+	zbx_free(item->key);
+clean:
+	zbx_free(port);
+
+	return ret;
+}
+
+static int	zbx_execute_script(DC_ITEM *item, unsigned char execute_on, char *command, char **result,
+		char *error, size_t max_error_len)
+{
+	int	ret = FAIL;
+
+	switch (execute_on)
+	{
+		case ZBX_SCRIPT_EXECUTE_ON_AGENT:
+			ret = zbx_execute_script_on_agent(item, command, result, error, max_error_len);
+			break;
+		case ZBX_SCRIPT_EXECUTE_ON_SERVER:
+			ret = zbx_execute(command, result, error, max_error_len, CONFIG_TRAPPER_TIMEOUT);
+			break;
+		default:
+			zbx_snprintf(error, max_error_len, "Invalid 'Execute on' option [%d]", (int)execute_on);
+	}
+
+	return ret;
+}
+
+static int	check_script_permissions(zbx_uint64_t groupid, zbx_uint64_t hostid, char *error, size_t max_error_len)
+{
+	DB_RESULT	result;
+	int		ret = SUCCEED;
+
+	if (0 == groupid)
+		return ret;
+
+	result = DBselect(
+			"select hostid"
+			" from hosts_groups"
+			" where hostid=" ZBX_FS_UI64
+				" and groupid=" ZBX_FS_UI64,
+			hostid, groupid);
+
+	if (NULL == DBfetch(result))
+	{
+		zbx_strlcpy(error, "Insufficient permissions. Host is not in an allowed host group.", max_error_len);
+		ret = FAIL;
+	}
+	DBfree_result(result);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -79,98 +243,69 @@ static char	*get_command_by_scriptid(zbx_uint64_t scriptid)
  ******************************************************************************/
 static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, char **result)
 {
-	char		*p, *command, error[MAX_STRING_LEN];
+	char		error[MAX_STRING_LEN];
 	int		ret = FAIL;
 	DC_ITEM		item;
-#ifdef HAVE_OPENIPMI
-	int		val;
-	char		*port;
-#endif
+	DB_SCRIPT	script;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In execute_script() scriptid:" ZBX_FS_UI64
 			" hostid:" ZBX_FS_UI64, scriptid, hostid);
 
+	*error = '\0';
 	memset(&item, 0, sizeof(item));
+	memset(&script, 0, sizeof(script));
 
-	if (FAIL == DCget_host_by_hostid(&item.host, hostid))
+	if (SUCCEED != DCget_host_by_hostid(&item.host, hostid))
 	{
 		*result = zbx_dsprintf(*result, "NODE %d: Unknown Host ID [" ZBX_FS_UI64 "]",
 				CONFIG_NODEID, hostid);
 		return ret;
 	}
 
-	if (NULL == (command = get_command_by_scriptid(scriptid)))
+	if (SUCCEED != DBget_script_by_scriptid(scriptid, &script))
 	{
 		*result = zbx_dsprintf(*result, "NODE %d: Unknown Script ID [" ZBX_FS_UI64 "]",
 				CONFIG_NODEID, scriptid);
 		return ret;
 	}
 
+	if (SUCCEED != check_script_permissions(script.groupid, hostid, error, sizeof(error)))
+	{
+		*result = zbx_dsprintf(*result, "NODE %d: %s", CONFIG_NODEID, error);
+		return ret;
+	}
+
 	substitute_simple_macros(NULL, NULL, &item.host, NULL,
-			&command, MACRO_TYPE_SCRIPT, NULL, 0);
+			&script.command, MACRO_TYPE_SCRIPT, NULL, 0);
 
 	zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Executing command: '%s'",
-			CONFIG_NODEID, command);
+			CONFIG_NODEID, script.command);
 
-	p = command;
-	while (*p == ' ' && *p != '\0')
-		p++;
-
-#ifdef HAVE_OPENIPMI
-	if (0 == strncmp(p, "IPMI", 4))
+	switch (script.type)
 	{
-		if (SUCCEED == (ret = DCconfig_get_interface_by_type(&item.interface, item.host.hostid, INTERFACE_TYPE_IPMI)))
-		{
-			item.interface.addr = strdup(item.interface.useip ? item.interface.ip_orig : item.interface.dns_orig);
-			substitute_simple_macros(NULL, NULL, &item.host, NULL,
-					&item.interface.addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
+		case ZBX_SCRIPT_TYPE_IPMI:
+			if (SUCCEED == (ret = zbx_execute_ipmi_command(&item, script.command, error, sizeof(error))))
+				*result = zbx_strdup(*result, "IPMI command successfully executed");
+			break;
+		case ZBX_SCRIPT_TYPE_SCRIPT:
+			ret = zbx_execute_script(&item, script.execute_on, script.command, result,
+					error, sizeof(error));
+			break;
+		default:
+			zbx_strlcpy(error, "Invalid command type [%d]", (int)script.type);
+	}
 
-			port = strdup(item.interface.port_orig);
-			substitute_simple_macros(NULL, &item.host.hostid, NULL, NULL,
-					&port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
-			if (SUCCEED == (ret = is_ushort(port, &item.interface.port)))
-			{
-				if (SUCCEED == (ret = parse_ipmi_command(p, item.ipmi_sensor, &val)))
-				{
-					if (SUCCEED == (ret = set_ipmi_control_value(&item, val,
-							error, sizeof(error))))
-					{
-						*result = zbx_dsprintf(*result, "NODE %d: IPMI command successfully executed",
-								CONFIG_NODEID);
-					}
-					else
-					{
-						*result = zbx_dsprintf(*result, "NODE %d: Cannot execute IPMI command: %s",
-								CONFIG_NODEID, error);
-						ret = FAIL;
-					}
-				}
-				else
-					 *result = zbx_dsprintf(*result, "NODE %d: Cannot parse IPMI command",
-							CONFIG_NODEID);
-			}
-			else
-				*result = zbx_dsprintf(*result, "NODE %d: Invalid port number [%s]",
-						CONFIG_NODEID, item.interface.port_orig);
-
-			zbx_free(port);
-			zbx_free(item.interface.addr);
-		}
+	if (SUCCEED != ret)
+	{
+		if (0 != CONFIG_NODEID)
+			*result = zbx_dsprintf(*result, "NODE %d: %s", CONFIG_NODEID, error);
 		else
-			*result = zbx_dsprintf(*result, "NODE %d: IPMI host interface is not defined for host [%s]",
-					CONFIG_NODEID, item.host.host);
+			*result = zbx_strdup(*result, error);
 	}
-	else
-	{
-#endif
-		if (SUCCEED != (ret = zbx_execute(p, result, error, sizeof(error), CONFIG_TRAPPER_TIMEOUT)))
-			*result = zbx_dsprintf(*result, "NODE %d: Cannot execute command: %s",
-					CONFIG_NODEID, error);
-#ifdef HAVE_OPENIPMI
-	}
-#endif
+	else if (NULL == *result)
+		*result = zbx_strdup(*result, "");
 
-	zbx_free(command);
+	zbx_free(script.command);
 
 	return ret;
 }

@@ -261,8 +261,8 @@ int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 int	VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
 #if defined(_WINDOWS)
-int	USER_PERFCOUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	PERF_MONITOR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	USER_PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	SERVICE_STATE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	SERVICES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	PROC_INFO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);

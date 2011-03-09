@@ -2,7 +2,8 @@
 Changes for 1.9.2
 
 New features:
- - [ZBXNEXT-631] added custom trigger severities configuration (Vedmak)
+ - [ZBXNEXT-673] added support of users scripts on Zabbix Agent and IPMI-based remote commands (Sasha, Vedmak)
+ - [ZBXNEXT-631] added custom trigger severities configuration (Sasha, Vedmak)
  - [ZBXNEXT-636] login screen redesign, frontend themes restyle (Aly, Elvis)
  - [ZBXNEXT-635] introduced API wrapper for Zabbix frontend (Vedmak, Aly)
  - [ZBXNEXT-575] added new design for action operation remote commands (Aly,asaveljevs,Sasha,Vedmak)
@@ -21,6 +22,7 @@ New features:
  - [ZBX-3338] updated Ukrainian translation; thanks to zalex_ua (Richlv)
 
 Bug fixes:
+ - [ZBX-3496] fixed saving templated items (Vedmak)
  - [ZBX-3538] action condition 'Trigger description' renamed to 'Trigger name' (Alexei)
  - [ZBX-976] fix and improve availability report dropdown captions (Richlv)
  - [ZBX-3472] In item and discovery forms snmpv3 auth fields are now hidden if not needed (KB)
@@ -91,7 +93,15 @@ New features:
 
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
- 
+
+ - [ZBX-2616] bundled DejaVu font upgraded from 2.32 to 2.33 (Richlv)
+ - [ZBX-1557] changed process_ping logic to return an error if fping doesn't give a value (or '-') for any of the hosts but outputs something (rudolfs)
+ - [ZBX-3430] fixed disappeared hints for "SSH", "Telnet" and "Database Monitor" item types in item form (Vedmak)
+ - [ZBX-3578] added arguments to the output when using agent with '-p' or '-t', modified default arguments in win32.c and common.c (rudolfs)
+ - [ZBX-3514] removed non "regexp" triggers from item log-form menu (Aly)
+ - [ZBX-3584] fixed allowed_hosts set to 'localhost' for items by default (Vedmak)
+ - [ZBX-3568] fixed processing of trigger functions with macros in item key parameters in notifications (Sasha)
+ - [ZBX-3076] disabled generation of events in case if some items or hosts in trigger expression are not active (Sasha)
  - [ZBX-3562] fixed user macros in map element label expressions (Aly)
  - [ZBXNEXT-508] added dayofmonth to trigger functions (rudolfs)
  - [ZBX-3352] made item Y axis min/max items also change when used in screen with Dynamic enabled (Vedmak)
