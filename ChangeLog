@@ -94,6 +94,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
 
+ - [ZBX-1557] changed process_ping logic to return an error if fping doesn't give a value (or '-') for any of the hosts but outputs something (rudolfs)
  - [ZBX-3430] fixed disappeared hints for "SSH", "Telnet" and "Database Monitor" item types in item form (Vedmak)
  - [ZBX-3578] added arguments to the output when using agent with '-p' or '-t', modified default arguments in win32.c and common.c (rudolfs)
  - [ZBX-3514] removed non "regexp" triggers from item log-form menu (Aly)
