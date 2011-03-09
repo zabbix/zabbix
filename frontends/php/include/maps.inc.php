@@ -1421,41 +1421,49 @@
 			}
 		}
 
-// get names if is needed
-		if($sysmap['label_type'] == MAP_LABEL_TYPE_NAME){
-			$elems = separateMapElements($sysmap);
-			if(!empty($elems['sysmaps'])){
-				$maps = API::Map()->get(array(
-					'sysmapids' => zbx_objectValues($elems['sysmaps'], 'elementid'),
-					'nopermissions' => 1,
-					'output' => API_OUTPUT_EXTEND,
-				));
-				$maps = zbx_toHash($maps, 'sysmapid');
-				foreach($elems['sysmaps'] as $elem){
-					$info[$elem['selementid']]['name'] = $maps[$elem['elementid']]['name'];
-				}
-			}
-			if(!empty($elems['hostgroups'])){
-				$hostgroups = API::HostGroup()->get(array(
-					'groupids' => zbx_objectValues($elems['hostgroups'], 'elementid'),
-					'nopermissions' => 1,
-					'output' => API_OUTPUT_EXTEND,
-				));
-				$hostgroups = zbx_toHash($hostgroups, 'groupid');
-				foreach($elems['hostgroups'] as $elem){
-					$info[$elem['selementid']]['name'] = $hostgroups[$elem['elementid']]['name'];
-				}
-			}
+		if($sysmap['label_format'] == SYSMAP_LABEL_ADVANCED_OFF){
+			$hlabel = $hglabel = $tlabel = $mlabel = ($sysmap['label_type'] == MAP_LABEL_TYPE_NAME);
+		}
+		else{
+			$hlabel = $sysmap['label_type_host'] == MAP_LABEL_TYPE_NAME;
+			$hglabel = $sysmap['label_type_hostgroup'] == MAP_LABEL_TYPE_NAME;
+			$tlabel = $sysmap['label_type_trigger'] == MAP_LABEL_TYPE_NAME;
+			$mlabel = $sysmap['label_type_map'] == MAP_LABEL_TYPE_NAME;
+		}
 
-			if(!empty($elems['triggers'])){
-				foreach($elems['triggers'] as $elem){
-					$info[$elem['selementid']]['name'] = expand_trigger_description_by_data($all_triggers[$elem['elementid']]);
-				}
+// get names if is needed
+		$elems = separateMapElements($sysmap);
+		if(!empty($elems['sysmaps']) && $mlabel){
+			$maps = API::Map()->get(array(
+				'sysmapids' => zbx_objectValues($elems['sysmaps'], 'elementid'),
+				'nopermissions' => 1,
+				'output' => API_OUTPUT_EXTEND,
+			));
+			$maps = zbx_toHash($maps, 'sysmapid');
+			foreach($elems['sysmaps'] as $elem){
+				$info[$elem['selementid']]['name'] = $maps[$elem['elementid']]['name'];
 			}
-			if(!empty($elems['hosts'])){
-				foreach($elems['hosts'] as $elem){
-					$info[$elem['selementid']]['name'] = $all_hosts[$elem['elementid']]['host'];;
-				}
+		}
+		if(!empty($elems['hostgroups']) && $hglabel){
+			$hostgroups = API::HostGroup()->get(array(
+				'groupids' => zbx_objectValues($elems['hostgroups'], 'elementid'),
+				'nopermissions' => 1,
+				'output' => API_OUTPUT_EXTEND,
+			));
+			$hostgroups = zbx_toHash($hostgroups, 'groupid');
+			foreach($elems['hostgroups'] as $elem){
+				$info[$elem['selementid']]['name'] = $hostgroups[$elem['elementid']]['name'];
+			}
+		}
+
+		if(!empty($elems['triggers']) && $tlabel){
+			foreach($elems['triggers'] as $elem){
+				$info[$elem['selementid']]['name'] = expand_trigger_description_by_data($all_triggers[$elem['elementid']]);
+			}
+		}
+		if(!empty($elems['hosts']) && $hlabel){
+			foreach($elems['hosts'] as $elem){
+				$info[$elem['selementid']]['name'] = $all_hosts[$elem['elementid']]['host'];;
 			}
 		}
 
