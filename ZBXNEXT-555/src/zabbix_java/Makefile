@@ -5,9 +5,11 @@ LIB := $(LIB):lib/logback-core-0.9.27.jar
 LIB := $(LIB):lib/logback-classic-0.9.27.jar
 LIB := $(LIB):lib/slf4j-api-1.6.1.jar
 
+JUNIT := lib/junit-4.8.2.jar
+
 jar: build
 	javac -d build/src -classpath $(LIB) src/com/zabbix/proxy/*.java
-	javac -d build/tests -classpath build/src:$(CLASSPATH) tests/com/zabbix/proxy/*.java
+	javac -d build/tests -classpath build/src:$(JUNIT) tests/com/zabbix/proxy/*.java
 	jar cf $(JAR) -C build/src .
 
 build:
@@ -15,7 +17,7 @@ build:
 	mkdir -p build/tests
 
 test:
-	java -classpath build/tests:$(LIB):$(JAR):$(CLASSPATH) com.zabbix.proxy.AllTestRunner
+	java -classpath build/tests:$(LIB):$(JAR):$(JUNIT) com.zabbix.proxy.AllTestRunner
 
 clean:
 	rm -f $(JAR)
