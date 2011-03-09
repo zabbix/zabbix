@@ -249,67 +249,72 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	}
 
 	if (NULL == fgets(tmp, sizeof(tmp), f))
-		ret = SUCCEED;
-	else do
 	{
-		zbx_rtrim(tmp, "\n");
-		zabbix_log(LOG_LEVEL_DEBUG, "Update IP [%s]", tmp);
-
-		host = NULL;
-
-		if (NULL != (c = strchr(tmp, ' ')))
-		{
-			*c = '\0';
-			for (i = 0; i < hosts_count; i++)
-				if (0 == strcmp(tmp, hosts[i].addr))
-				{
-					host = &hosts[i];
-					break;
-				}
-			*c = ' ';
-		}
-
-		if (NULL == host)
-			continue;
-
-		if (NULL == (c = strstr(tmp, " : ")))
-			continue;
-
-		/* when NIC bonding is used, there are also lines like */
-		/* 192.168.1.2 : duplicate for [0], 96 bytes, 0.19 ms */
-
-		if (NULL != strstr(tmp, "duplicate for"))
-			continue;
-
-		c += 3;
-
+		ret = SUCCEED; /* fping does not output anything for DNS names that fail to resolve */
+	}
+	else
+	{
 		do
 		{
-			if (NULL != (c2 = strchr(c, ' ')))
-				*c2 = '\0';
+			zbx_rtrim(tmp, "\n");
+			zabbix_log(LOG_LEVEL_DEBUG, "read line [%s]", tmp);
 
-			if (0 != strcmp(c, "-"))
+			host = NULL;
+
+			if (NULL != (c = strchr(tmp, ' ')))
 			{
-				/* Convert ms to seconds */
-				sec = atof(c) / 1000;
-
-				if (host->rcv == 0 || host->min > sec)
-					host->min = sec;
-				if (host->rcv == 0 || host->max < sec)
-					host->max = sec;
-				host->avg = (host->avg * host->rcv + sec) / (host->rcv + 1);
-				host->rcv++;
+				*c = '\0';
+				for (i = 0; i < hosts_count; i++)
+					if (0 == strcmp(tmp, hosts[i].addr))
+					{
+						host = &hosts[i];
+						break;
+					}
+				*c = ' ';
 			}
 
-			host->cnt++;
+			if (NULL == host)
+				continue;
 
-			if (NULL != c2)
-				*c2++ = ' ';
+			if (NULL == (c = strstr(tmp, " : ")))
+				continue;
+
+			/* when NIC bonding is used, there are also lines like */
+			/* 192.168.1.2 : duplicate for [0], 96 bytes, 0.19 ms */
+
+			if (NULL != strstr(tmp, "duplicate for"))
+				continue;
+
+			c += 3;
+
+			do
+			{
+				if (NULL != (c2 = strchr(c, ' ')))
+					*c2 = '\0';
+
+				if (0 != strcmp(c, "-"))
+				{
+					sec = atof(c) / 1000; /* convert ms to seconds */
+
+					if (host->rcv == 0 || host->min > sec)
+						host->min = sec;
+					if (host->rcv == 0 || host->max < sec)
+						host->max = sec;
+					host->avg = (host->avg * host->rcv + sec) / (host->rcv + 1);
+					host->rcv++;
+				}
+
+				host->cnt++;
+
+				if (NULL != c2)
+					*c2++ = ' ';
+			}
+			while (NULL != (c = c2));
+
+			ret = SUCCEED;
 		}
-		while (NULL != (c = c2));
-
-		ret = SUCCEED;
-	} while (NULL != fgets(tmp, sizeof(tmp), f));
+		while (NULL != fgets(tmp, sizeof(tmp), f));
+	}
 	pclose(f);
 
 	unlink(filename);
@@ -330,8 +335,8 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value: => 0 - successfully processed items                          *
- *               FAIL - otherwise                                             *
+ * Return value: SUCCEED - successfully processed hosts                       *
+ *               NOTSUPPORTED - otherwise                                     *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
