@@ -292,6 +292,7 @@ misc/init.d/tru64/zabbix_server -text
 misc/init.d/ubuntu/zabbix-agent.conf -text
 misc/init.d/ubuntu/zabbix-server.conf -text
 src/libs/zbxself/Makefile.am -text
+src/zabbix_java/lib/junit-4.8.2.jar -text
 src/zabbix_java/lib/logback-classic-0.9.27.jar -text
 src/zabbix_java/lib/logback-console.xml -text
 src/zabbix_java/lib/logback-core-0.9.27.jar -text
