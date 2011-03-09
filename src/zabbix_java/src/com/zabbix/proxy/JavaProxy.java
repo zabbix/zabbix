@@ -19,6 +19,7 @@
 
 package com.zabbix.proxy;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.util.concurrent.*;
@@ -65,6 +66,8 @@ public class JavaProxy
 					new ThreadPoolExecutor.CallerRunsPolicy());
 			logger.debug("created a thread pool of {} pollers", startPollers);
 
+			daemonize();
+
 			while (true)
 				threadPool.execute(new SocketProcessor(socket.accept()));
 		}
@@ -72,7 +75,29 @@ public class JavaProxy
 		{
 			logger.error("caught fatal exception", e);
 		}
+	}
 
-		logger.info("Zabbix Java Proxy {} (revision {}) has stopped", GeneralInformation.VERSION, GeneralInformation.REVISION);
+	private static void daemonize() throws java.io.IOException
+	{
+		File pidFile = (File)ConfigurationManager.getParameter(ConfigurationManager.PID_FILE).getValue();
+
+		if (null != pidFile)
+		{
+			pidFile.deleteOnExit();
+
+			System.in.close();
+			System.out.close();
+			System.err.close();
+		}
+
+		Thread shutdownHook = new Thread()
+		{
+			public void run()
+			{
+				logger.info("Zabbix Java Proxy {} (revision {}) has stopped", GeneralInformation.VERSION, GeneralInformation.REVISION);
+			}
+		};
+
+		Runtime.getRuntime().addShutdownHook(shutdownHook);
 	}
 }

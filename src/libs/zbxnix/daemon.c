@@ -149,84 +149,67 @@ int	daemon_start(int allow_root)
 	struct sigaction	phan;
 	char			user[7] = "zabbix";
 
-	/* running as root ?*/
-	if((0 == allow_root) && (0 == getuid() || 0 == getgid()))
+	if (0 == allow_root && (0 == getuid() || 0 == getgid())) /* running as root? */
 	{
 		pwd = getpwnam(user);
+
 		if (NULL == pwd)
 		{
-			zbx_error("User %s does not exist.",
-				user);
-			zbx_error("Cannot run as root !");
+			zbx_error("user %s does not exist", user);
+			zbx_error("cannot run as root!");
 			exit(FAIL);
 		}
-		if(setgid(pwd->pw_gid) == -1)
+
+		if (-1 == setgid(pwd->pw_gid))
 		{
-			zbx_error("Cannot setgid to %s [%s].",
-				user,
-				strerror(errno));
+			zbx_error("cannot setgid to %s [%s]", user, strerror(errno));
 			exit(FAIL);
 		}
+
 #ifdef HAVE_FUNCTION_INITGROUPS
-		if(initgroups(user, pwd->pw_gid) == -1)
+		if (-1 == initgroups(user, pwd->pw_gid))
 		{
-			zbx_error("Cannot initgroups to %s [%s].",
-				user,
-				strerror(errno));
+			zbx_error("cannot initgroups to %s [%s]", user, strerror(errno));
 			exit(FAIL);
 		}
 #endif /* HAVE_FUNCTION_INITGROUPS */
-		if(setuid(pwd->pw_uid) == -1)
+
+		if (-1 == setuid(pwd->pw_uid))
 		{
-			zbx_error("Cannot setuid to %s [%s].",
-				user,
-				strerror(errno));
+			zbx_error("cannot setuid to %s [%s]", user, strerror(errno));
 			exit(FAIL);
 		}
 
 #ifdef HAVE_FUNCTION_SETEUID
-		if( (setegid(pwd->pw_gid) ==-1) || (seteuid(pwd->pw_uid) == -1) )
+		if (-1 == setegid(pwd->pw_gid) || -1 == seteuid(pwd->pw_uid))
 		{
-			zbx_error("Cannot setegid or seteuid to zabbix [%s].", strerror(errno));
+			zbx_error("cannot setegid or seteuid to %s [%s]", user, strerror(errno));
 			exit(FAIL);
 		}
 #endif /* HAVE_FUNCTION_SETEUID */
-
 	}
 
-	if( (pid = zbx_fork()) != 0 )
-	{
-		exit( 0 );
-	}
+	if (0 != (pid = zbx_fork()))
+		exit(0);
 
 	setsid();
 
-	signal( SIGHUP, SIG_IGN );
+	signal(SIGHUP, SIG_IGN);
 
-	if( (pid = zbx_fork()) !=0 )
-	{
-		exit( 0 );
-	}
+	if (0 != (pid = zbx_fork()))
+		exit(0);
 
-	/* This is to eliminate warning: ignoring return value of chdir */
-	if(-1 == chdir("/"))
-	{
+	if (-1 == chdir("/")) /* this is to eliminate warning: ignoring return value of chdir */
 		assert(0);
-	}
+
 	umask(0002);
 
 	redirect_std(CONFIG_LOG_FILE);
 
 #ifdef HAVE_SYS_RESOURCE_SETPRIORITY
-
-	if(setpriority(PRIO_PROCESS,0,5)!=0)
-	{
+	if (0 != setpriority(PRIO_PROCESS, 0, 5))
 		zbx_error("Unable to set process priority to 5. Leaving default.");
-	}
-
 #endif /* HAVE_SYS_RESOURCE_SETPRIORITY */
-
-/*------------------------------------------------*/
 
 	if (FAIL == create_pid_file(CONFIG_PID_FILE))
 		exit(FAIL);

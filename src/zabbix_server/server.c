@@ -451,13 +451,9 @@ int	MAIN_ZABBIX_ENTRY()
 	int		i, server_num = 0;
 
 	if (NULL == CONFIG_LOG_FILE || '\0' == *CONFIG_LOG_FILE)
-	{
 		zabbix_open_log(LOG_TYPE_SYSLOG, CONFIG_LOG_LEVEL, NULL);
-	}
 	else
-	{
 		zabbix_open_log(LOG_TYPE_FILE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
-	}
 
 #ifdef	HAVE_SNMP
 #	define SNMP_FEATURE_STATUS "YES"

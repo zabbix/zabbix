@@ -19,12 +19,14 @@
 
 package com.zabbix.proxy;
 
+import java.io.File;
 import java.net.InetAddress;
 
 class ConfigurationParameter
 {
 	public static final int TYPE_INTEGER = 0;
 	public static final int TYPE_INETADDRESS = 1;
+	public static final int TYPE_FILE = 2;
 
 	private String name;
 	private int type;
@@ -67,6 +69,9 @@ class ConfigurationParameter
 					break;
 				case TYPE_INETADDRESS:
 					userValue = InetAddress.getByName(text);
+					break;
+				case TYPE_FILE:
+					userValue = new File(text);
 					break;
 			}
 		}

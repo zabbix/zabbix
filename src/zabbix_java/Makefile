@@ -8,14 +8,11 @@ LIB := $(LIB):lib/slf4j-api-1.6.1.jar
 jar: build
 	javac -d build/src -classpath $(LIB) src/com/zabbix/proxy/*.java
 	javac -d build/tests -classpath build/src:$(CLASSPATH) tests/com/zabbix/proxy/*.java
-	jar cfm $(JAR) MANIFEST.MF -C build/src .
+	jar cf $(JAR) -C build/src .
 
 build:
 	mkdir -p build/src
 	mkdir -p build/tests
-
-run:
-	java -classpath $(LIB):$(JAR) com.zabbix.proxy.JavaProxy
 
 test:
 	java -classpath build/tests:$(LIB):$(JAR):$(CLASSPATH) com.zabbix.proxy.AllTestRunner
