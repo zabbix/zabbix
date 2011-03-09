@@ -85,6 +85,7 @@ CREATE TABLE opcommand (
 	type                     integer         DEFAULT '0'               NOT NULL,
 	scriptid                 bigint                                    NULL,
 	execute_on               integer         DEFAULT '0'               NOT NULL,
+	port                     varchar(64)     DEFAULT ''                NOT NULL,
 	authtype                 integer         DEFAULT '0'               NOT NULL,
 	username                 varchar(64)     DEFAULT ''                NOT NULL,
 	password                 varchar(64)     DEFAULT ''                NOT NULL,

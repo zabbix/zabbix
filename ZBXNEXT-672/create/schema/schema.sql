@@ -404,6 +404,7 @@ FIELD		|operationid	|t_id		|	|NOT NULL	|0			|1|operations
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|scriptid	|t_id		|	|NULL		|ZBX_SYNC		|2|scripts	|		|RESTRICT
 FIELD		|execute_on	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|port		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|authtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|username	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|password	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
