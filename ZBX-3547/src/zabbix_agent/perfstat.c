@@ -58,24 +58,25 @@ int	add_perf_counter(const char *name, const char *counterPath, int interval)
 
 	assert(counterPath);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In add_perf_counter() [counter:%s] [interval:%d]",
-			counterPath, interval);
+	zabbix_log(LOG_LEVEL_DEBUG, "In add_perf_counter() [counter:%s] [interval:%d]", counterPath, interval);
 
-	if (NULL == ppsd->pdh_query) {
-		zabbix_log(LOG_LEVEL_WARNING, "PerfCounter '%s' FAILED: Collector is not started!",
-				counterPath);
-		return FAIL;
+	if (NULL == ppsd->pdh_query)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "PerfCounter '%s' FAILED: Collector is not started!", counterPath);
+		return result;
 	}
 
-	if (interval < 1 || interval > 900) {
-		zabbix_log(LOG_LEVEL_WARNING, "PerfCounter '%s' FAILED: Interval value out of range",
-				counterPath);
-		return FAIL;
+	if (interval < 1 || interval > 900)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "PerfCounter '%s' FAILED: Interval value out of range", counterPath);
+		return result;
 	}
 
-	for (cptr = ppsd->pPerfCounterList; ; cptr = cptr->next) {
+	for (cptr = ppsd->pPerfCounterList; ; cptr = cptr->next)
+	{
 		/* Add new parameters */
-		if (NULL == cptr) {
+		if (NULL == cptr)
+		{
 			cptr = (PERF_COUNTERS *)zbx_malloc(cptr, sizeof(PERF_COUNTERS));
 
 			memset(cptr, 0, sizeof(PERF_COUNTERS));
@@ -83,8 +84,7 @@ int	add_perf_counter(const char *name, const char *counterPath, int interval)
 				cptr->name	= strdup(name);
 			cptr->counterPath	= strdup(counterPath);
 			cptr->interval		= interval;
-			cptr->rawValueArray	= (PDH_RAW_COUNTER *)zbx_malloc(cptr->rawValueArray,
-							sizeof(PDH_RAW_COUNTER) * interval);
+			cptr->rawValueArray	= (PDH_RAW_COUNTER *)zbx_malloc(cptr->rawValueArray, sizeof(PDH_RAW_COUNTER) * interval);
 			cptr->CurrentNum	= 1;
 
 			wcounterPath = zbx_utf8_to_unicode(cptr->counterPath);
@@ -95,10 +95,8 @@ int	add_perf_counter(const char *name, const char *counterPath, int interval)
 				cptr->status	= ITEM_STATUS_NOTSUPPORTED;
 				cptr->error	= zbx_dsprintf(cptr->error, "%s", strerror_from_module(status, L"PDH.DLL"));
 				zbx_rtrim(cptr->error, " \r\n");
-
-				zabbix_log( LOG_LEVEL_ERR, "Unable to add performance counter '%s' to query: %s",
-						cptr->counterPath,
-						cptr->error);
+				zabbix_log(LOG_LEVEL_ERR, "Unable to add performance counter '%s' to query: %s",
+						cptr->counterPath, cptr->error);
 			}
 			else
 			{
@@ -128,8 +126,7 @@ int	add_perf_counter(const char *name, const char *counterPath, int interval)
 
 	if (FAIL == result)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "PerfCounter '%s' FAILED: Counter already exists",
-				counterPath);
+		zabbix_log(LOG_LEVEL_WARNING, "PerfCounter '%s' FAILED: Counter already exists", counterPath);
 	}
 	else if (NULL != name)
 	{
@@ -334,6 +331,7 @@ void	collect_perfstat()
 	PDH_STATUS	status;
 	time_t		now;
 	LPTSTR		wcounterPath;
+	int		tmp;
 
 	if (NULL == ppsd->pdh_query)	/* collector is not started */
 		return;
@@ -354,25 +352,17 @@ void	collect_perfstat()
 			wcounterPath = zbx_utf8_to_unicode(cptr->counterPath);
 
 			/* Add user counters to query */
-			if (ERROR_SUCCESS != (status = PdhAddCounter(ppsd->pdh_query,
-					wcounterPath, 0, &cptr->handle)))
+			if (ERROR_SUCCESS != (status = PdhAddCounter(ppsd->pdh_query, wcounterPath, 0, &cptr->handle)))
 			{
-				cptr->status    = ITEM_STATUS_NOTSUPPORTED;
-				cptr->error     = zbx_dsprintf(cptr->error, "%s",
-						strerror_from_module(status, L"PDH.DLL"));
+				cptr->status = ITEM_STATUS_NOTSUPPORTED;
+				cptr->error = zbx_dsprintf(cptr->error, "%s", strerror_from_module(status, L"PDH.DLL"));
 				zbx_rtrim(cptr->error, " \r\n");
-
-				zabbix_log(LOG_LEVEL_ERR, "Unable to add performance"
-						" counter '%s' to query: %s",
-						cptr->counterPath,
-						cptr->error);
+				zabbix_log(LOG_LEVEL_ERR, "Unable to add performance counter '%s' to query: %s", cptr->counterPath, cptr->error);
 			}
 			else
 			{
-				cptr->status    = ITEM_STATUS_ACTIVE;
-				zabbix_log(LOG_LEVEL_DEBUG, "PerfCounter '%s' successfully"
-						" added. Interval %d seconds",
-						cptr->counterPath, cptr->interval);
+				cptr->status = ITEM_STATUS_ACTIVE;
+				zabbix_log(LOG_LEVEL_DEBUG, "PerfCounter '%s' successfully added. Interval %d seconds",	cptr->counterPath, cptr->interval);
 			}
 
 			zbx_free(wcounterPath);
@@ -383,35 +373,42 @@ void	collect_perfstat()
 
 	if (ERROR_SUCCESS != (status = PdhCollectQueryData(ppsd->pdh_query)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Call to PdhCollectQueryData() failed: %s",
-				strerror_from_module(status, L"PDH.DLL"));
+		zabbix_log(LOG_LEVEL_DEBUG, "Call to PdhCollectQueryData() failed: %s", strerror_from_module(status, L"PDH.DLL"));
 		return;
 	}
 
 	/* Process user-defined counters */
 	for ( cptr = ppsd->pPerfCounterList; cptr != NULL; cptr = cptr->next )
 	{
-		if (cptr->status == ITEM_STATUS_NOTSUPPORTED)	/* Inactive counter? */
+		if (ITEM_STATUS_NOTSUPPORTED == cptr->status)	/* Inactive counter? */
 			continue;
 
-		PdhGetRawCounterValue(
-			cptr->handle,
-			NULL,
-			&cptr->rawValueArray[cptr->CurrentCounter]
-			);
+		if (ERROR_SUCCESS != (status = PdhGetRawCounterValue(cptr->handle, NULL, &cptr->rawValueArray[cptr->CurrentCounter])))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "Call to PdhGetRawCounterValue() failed: %s", strerror_from_module(status, L"PDH.DLL"));
+			cptr->status = ITEM_STATUS_NOTSUPPORTED;
+			continue;
+		}
 
-		cptr->CurrentCounter++;
-		cptr->CurrentCounter = cptr->CurrentCounter % cptr->interval;
+		tmp = (cptr->CurrentCounter + 1) % cptr->interval;
 
-		PdhComputeCounterStatistics(
+		status = PdhComputeCounterStatistics(
 			cptr->handle,
 			PDH_FMT_DOUBLE,
-			(cptr->CurrentNum < cptr->interval) ? 0 : cptr->CurrentCounter,
+			(cptr->CurrentNum < cptr->interval) ? 0 : tmp,
 			cptr->CurrentNum,
 			cptr->rawValueArray,
 			&statData
 			);
 
+		if (ERROR_SUCCESS != status)
+		{
+			zabbix_log(LOG_LEVEL_ERR, "Call to PdhComputeCounterStatistics() failed: %s", strerror_from_module(status, L"PDH.DLL"));
+			cptr->status = ITEM_STATUS_NOTSUPPORTED;
+			continue;
+		}
+
+		cptr->CurrentCounter = tmp;
 		cptr->lastValue = statData.mean.doubleValue;
 
 		if(cptr->CurrentNum < cptr->interval)
