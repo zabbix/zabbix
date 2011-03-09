@@ -157,17 +157,17 @@ class zbxXML{
 				'lastlogsize'		=> '',
 				'logtimefmt'		=> '',
 				'delay_flex'		=> '',
-				'authtype'		=> '',
-				'username'		=> '',
-				'password'		=> '',
-				'publickey'		=> '',
+				'authtype'			=> '',
+				'username'			=> '',
+				'password'			=> '',
+				'publickey'			=> '',
 				'privatekey'		=> '',
 				'params'			=> '',
 				'trapper_hosts'		=> '',
 				'snmp_community'	=> '',
 				'snmp_oid'			=> '',
-				'port'			=> '',
-				'snmp_port' => '',
+				'port'				=> '',
+				'snmp_port'			=> '',
 				'snmpv3_securityname'	=> '',
 				'snmpv3_securitylevel'	=> '',
 				'snmpv3_authpassphrase'	=> '',
@@ -1499,7 +1499,7 @@ class zbxXML{
 								}
 
 								if(!$item = get_item_by_key($item_data[1], $item_data[0])){
-									throw new APIException(1, 'Missed item ['.$graph_db['ymin_item_key'].'] for host ['.$host_db['host'].']');
+									throw new APIException(1, 'Missing item ['.$graph_db['ymin_item_key'].'] for host ['.$host_db['host'].']');
 								}
 
 								$graph_db['ymin_itemid'] = $item['itemid'];
@@ -1512,7 +1512,7 @@ class zbxXML{
 								}
 
 								if(!$item = get_item_by_key($item_data[1], $item_data[0])){
-									throw new APIException(1, 'Missed item ['.$graph_db['ymax_item_key'].'] for host ['.$host_db['host'].']');
+									throw new APIException(1, 'Missing item ['.$graph_db['ymax_item_key'].'] for host ['.$host_db['host'].']');
 								}
 
 								$graph_db['ymax_itemid'] = $item['itemid'];
@@ -1845,7 +1845,6 @@ class zbxXML{
 
 		return self::outputXML($root);
 	}
-
 
 }
 
