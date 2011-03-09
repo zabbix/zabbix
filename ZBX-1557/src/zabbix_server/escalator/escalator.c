@@ -560,8 +560,10 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Conditions match our event. Execute operation.");
 
-			substitute_macros(event, NULL, &operation.shortdata);
-			substitute_macros(event, NULL, &operation.longdata);
+			substitute_simple_macros(event, NULL, NULL, NULL, NULL, &operation.shortdata,
+					MACRO_TYPE_MESSAGE, NULL, 0);
+			substitute_simple_macros(event, NULL, NULL, NULL, NULL, &operation.longdata,
+					MACRO_TYPE_MESSAGE, NULL, 0);
 
 			if (0 == esc_period || esc_period > operation.esc_period)
 				esc_period = operation.esc_period;
@@ -862,8 +864,10 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 			case ESCALATION_STATUS_ACTIVE:
 				if (SUCCEED == get_event_info(escalation->eventid, &event))
 				{
-					substitute_macros(&event, NULL, &action.shortdata);
-					substitute_macros(&event, NULL, &action.longdata);
+					substitute_simple_macros(&event, NULL, NULL, NULL, NULL,
+							&action.shortdata, MACRO_TYPE_MESSAGE, NULL, 0);
+					substitute_simple_macros(&event, NULL, NULL, NULL, NULL,
+							&action.longdata, MACRO_TYPE_MESSAGE, NULL, 0);
 
 					execute_operations(escalation, &event, &action);
 				}
@@ -872,8 +876,10 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 			case ESCALATION_STATUS_RECOVERY:
 				if (SUCCEED == get_event_info(escalation->r_eventid, &event))
 				{
-					substitute_macros(&event, escalation, &action.shortdata);
-					substitute_macros(&event, escalation, &action.longdata);
+					substitute_simple_macros(&event, NULL, NULL, NULL, escalation,
+							&action.shortdata, MACRO_TYPE_MESSAGE, NULL, 0);
+					substitute_simple_macros(&event, NULL, NULL, NULL, escalation,
+							&action.longdata, MACRO_TYPE_MESSAGE, NULL, 0);
 
 					process_recovery_msg(escalation, &event, &action);
 				}

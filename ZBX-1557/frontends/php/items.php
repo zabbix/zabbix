@@ -845,7 +845,7 @@ switch($itemType) {
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1,
 			'select_hosts' => API_OUTPUT_EXTEND,
-			'select_triggers' => API_OUTPUT_EXTEND,
+			'select_triggers' => API_OUTPUT_REFER,
 			'select_applications' => API_OUTPUT_EXTEND,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
@@ -1020,6 +1020,22 @@ switch($itemType) {
 		$paging = getPagingLine($items);
 //---------
 
+		$itemTriggerIds = array();
+		foreach($items as $num => $item)
+			$itemTriggerIds = array_merge($itemTriggerIds, zbx_objectValues($item['triggers'], 'triggerid'));
+
+		$itemTriggers = CTrigger::get(array(
+			'triggerids' => $itemTriggerIds,
+			'expandDescription' => true,
+			'output' => API_OUTPUT_EXTEND,
+			'select_hosts' => array('hostid','host','status'),
+			'select_functions' => API_OUTPUT_EXTEND,
+			'select_items' => API_OUTPUT_EXTEND,
+			'preservekeys' => true
+		));
+
+		$trigRealHosts = getParentHostsByTriggers($itemTriggers);
+
 		foreach($items as $inum => $item){
 
 			if($show_host){
@@ -1073,19 +1089,29 @@ switch($itemType) {
 			));
 
 // TRIGGERS INFO
-			foreach($item['triggers'] as $tnum => $trigger){
+			foreach($item['triggers'] as $tnum => &$trigger){
 				$triggerid = $trigger['triggerid'];
-				$tr_description = array();
+				$trigger = $itemTriggers[$triggerid];
 
+				$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
+				$trigger['items'] = zbx_toHash($trigger['items'], 'itemid');
+				$trigger['functions'] = zbx_toHash($trigger['functions'], 'functionid');
+
+				$tr_description = array();
 				if($trigger['templateid'] > 0){
-					$real_hosts = get_realhosts_by_triggerid($triggerid);
-					$real_host = DBfetch($real_hosts);
-					$tr_description[] = new CLink($real_host['host'], 'triggers.php?&hostid='.$real_host['hostid'], 'unknown');
-					$tr_description[] = ':';
+					if(!isset($trigRealHosts[$triggerid])){
+						$tr_description[] = new CSpan('HOST','unknown');
+						$tr_description[] = ':';
+					}
+					else{
+						$real_hosts = $trigRealHosts[$triggerid];
+						$real_host = reset($real_hosts);
+						$tr_description[] = new CLink($real_host['host'], 'triggers.php?&hostid='.$real_host['hostid'], 'unknown');
+						$tr_description[] = ':';
+					}
 				}
 
-				$trigger['description_expanded'] = expand_trigger_description($triggerid);
-				$tr_description[] = new CLink($trigger['description_expanded'], 'triggers.php?form=update&triggerid='.$triggerid);
+				$tr_description[] = new CLink($trigger['description'], 'triggers.php?form=update&triggerid='.$triggerid);
 
 				if($trigger['value'] != TRIGGER_VALUE_UNKNOWN) $trigger['error'] = '';
 
@@ -1109,12 +1135,13 @@ switch($itemType) {
 				$trigger_hint->addRow(array(
 					$priority,
 					$tr_description,
-					explode_exp($trigger['expression'], 1),
+					triggerExpression($trigger,1),
 					$tstatus,
 				));
 
 				$item['triggers'][$tnum] = $trigger;
 			}
+			unset($trigger);
 
 			if(!empty($item['triggers'])){
 				$trigger_info = new CSpan(S_TRIGGERS,'link_menu');
@@ -1128,14 +1155,17 @@ switch($itemType) {
 				$trigger_info = SPACE;
 			}
 //-------
-			//if item type is 'Log' we must show log menu
+// if item type is 'Log' we must show log menu
 			if($item['value_type'] == ITEM_VALUE_TYPE_LOG || $item['value_type'] == ITEM_VALUE_TYPE_STR || $item['value_type'] == ITEM_VALUE_TYPE_TEXT){
 
 				$triggers_flag = false;
 				$triggers="Array('".S_EDIT_TRIGGER."',null,null,{'outer' : 'pum_o_submenu','inner' : ['pum_i_submenu']}\n";
 
 				foreach($item['triggers'] as $num => $trigger){
-					$triggers .= ',["'.$trigger['description_expanded'].'",'.
+					foreach($trigger['functions'] as $fnum => $function)
+						if(!str_in_array($function['function'], array('regexp','iregexp'))) continue 2;
+
+					$triggers .= ',["'.$trigger['description'].'",'.
 										zbx_jsvalue("javascript: openWinCentered('tr_logform.php?sform=1&itemid=".$item['itemid'].
 																"&triggerid=".$trigger['triggerid'].
 																"','TriggerLog',760,540,".

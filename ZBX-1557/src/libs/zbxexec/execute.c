@@ -185,11 +185,19 @@ static int	zbx_waitpid(pid_t pid)
 	do
 	{
 #ifdef WCONTINUED
-		if (-1 == (rc = waitpid(pid, &status, WUNTRACED | WCONTINUED)))
+		static int	wcontinued = WCONTINUED;
+retry:
+		if (-1 == (rc = waitpid(pid, &status, WUNTRACED | wcontinued)))
+		{
+			if (EINVAL == errno && 0 != wcontinued)
+			{
+				wcontinued = 0;
+				goto retry;
+			}
 #else
 		if (-1 == (rc = waitpid(pid, &status, WUNTRACED)))
-#endif
 		{
+#endif
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() waitpid failure: %s", __function_name, strerror(errno));
 			goto exit;
 		}

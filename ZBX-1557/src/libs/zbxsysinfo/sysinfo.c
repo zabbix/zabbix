@@ -512,8 +512,8 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 
 		if(commands[i].flags & CF_USEUPARAM)
 		{
-			printf("[]");
-			i = 2;
+			printf("[%s]", usr_param);
+			i = 2 + (int)strlen(usr_param);
 		}
 		else
 			i = 0;
