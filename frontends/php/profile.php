@@ -96,9 +96,8 @@ $fields=array(
 
 //Primary Actions
 	else if(isset($_REQUEST['cancel'])){
-		$url = CProfile::get('web.paging.lastpage', 'profile.php');
 		ob_end_clean();
-		redirect($url);
+		redirect(CWebUser::$data['last_page']['url']);
 	}
 	else if(isset($_REQUEST['save'])){
 		$auth_type = get_user_system_auth($USER_DETAILS['userid']);
@@ -163,10 +162,8 @@ $fields=array(
 					'User alias ['.$USER_DETAILS['alias'].'] Name ['.$USER_DETAILS['name'].']'.
 					' Surname ['.$USER_DETAILS['surname'].'] profile id ['.$USER_DETAILS['userid'].']');
 
-				$url = CProfile::get('web.paging.lastpage', 'profile.php');
-
 				ob_end_clean();
-				redirect($url);
+				redirect(CWebUser::$data['last_page']['url']);
 			}
 			else{
 				show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
