@@ -273,7 +273,7 @@ void	test_parameters()
 		test_parameter(commands[i].key, PROCESS_TEST | PROCESS_USE_TEST_PARAM);
 }
 
-static int	replace_param(const char *cmd, const char *param, char *out, int outlen, char *error, int max_err_len)
+static int	replace_param(const char *cmd, const char *param, char *out, int outlen, char *error, int max_error_len)
 {
 	int		ret = SUCCEED;
 	char		buf[MAX_STRING_LEN];
@@ -317,7 +317,7 @@ static int	replace_param(const char *cmd, const char *param, char *out, int outl
 					{
 						if (NULL != strchr(buf, *c))
 						{
-							zbx_snprintf(error, max_err_len, "Special characters '%s'"
+							zbx_snprintf(error, max_error_len, "Special characters '%s'"
 									" are not allowed in the parameters",
 									suppressed_chars);
 							ret = FAIL;
@@ -450,8 +450,8 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 
 		if (0 != (commands[i].flags & CF_USEUPARAM))
 		{
-			printf("[]");
-			i = 2;
+			printf("[%s]", usr_param);
+			i = 2 + (int)strlen(usr_param);
 		}
 		else
 			i = 0;

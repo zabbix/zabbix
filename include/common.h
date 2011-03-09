@@ -152,6 +152,7 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #define	PROXY_ERROR	(-6)
 const char	*zbx_result_string(int result);
 
+#define MAX_ID_LEN	21
 #define MAX_STRING_LEN	2048
 #define MAX_BUFFER_LEN	65536
 
@@ -644,6 +645,12 @@ const char	*zbx_permission_string(int perm);
 #define	ZBX_NODE_SLAVE	1
 const char	*zbx_nodetype_string(unsigned char nodetype);
 
+#define ZBX_SCRIPT_TYPE_SCRIPT		0
+#define ZBX_SCRIPT_TYPE_IPMI		1
+
+#define ZBX_SCRIPT_EXECUTE_ON_AGENT	0
+#define ZBX_SCRIPT_EXECUTE_ON_SERVER	1
+
 #define POLLER_DELAY		5
 #define DISCOVERER_DELAY	60
 
@@ -904,8 +911,8 @@ char	*zbx_age2str(int age);
 char	*zbx_date2str(time_t date);
 char	*zbx_time2str(time_t time);
 
-/* Return the needle in the haystack (or NULL). */
 char	*zbx_strcasestr(const char *haystack, const char *needle);
+int	zbx_mismatch(const char *s1, const char *s2);
 int	starts_with(const char *str, const char *prefix);
 int	cmp_key_id(const char *key_1, const char *key_2);
 
@@ -935,7 +942,7 @@ int	zbx_strlen_utf8(const char *text);
 char	*zbx_replace_utf8(const char *text);
 void	zbx_replace_invalid_utf8(char *text);
 
-void	win2unix_eol(char *str);
+void	dos2unix(char *str);
 int	str2uint(const char *str);
 int	str2uint64(char *str, zbx_uint64_t *value);
 double	str2double(const char *str);
