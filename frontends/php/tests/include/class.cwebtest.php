@@ -66,7 +66,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 	{
 		global $DB;
 
-		$this->setHost('192.168.3.32');
+		$this->setHost('hudson');
 		$this->setBrowser('*firefox');
 		if(strstr(PHPUNIT_URL,'http://'))
 		{
@@ -97,7 +97,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 		if($this->isElementPresent('id=password'))
 		{
 			$this->input_type('name','Admin');
-			$this->input_type('password','zabbix2');
+			$this->input_type('password','zabbix');
 			$this->click('enter');
 			$this->wait();
 		}
