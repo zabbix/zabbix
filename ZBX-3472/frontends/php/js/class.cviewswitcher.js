@@ -16,7 +16,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-var allObj = {};
+var globalAllObjForViewSwitcher = {};
 var CViewSwitcher = Class.create({
 mainObj:			null,
 depObjects:			{},
@@ -42,7 +42,7 @@ initialize : function(objId, objAction, confData){
 
 	addListener(this.mainObj, objAction, this.rebuildView.bindAsEventListener(this));
 
-	allObj[objId] = this;
+	globalAllObjForViewSwitcher[objId] = this;
 
 	this.hideAllObjs();
 	this.rebuildView();
@@ -57,10 +57,10 @@ rebuildView: function(e){
 
 			this.hideObj(this.depObjects[this.lastValue][key]);
 
-			if(isset(this.depObjects[this.lastValue][key].id, allObj)){
-				for(var i in allObj[this.depObjects[this.lastValue][key].id].depObjects){
-					for(var j in allObj[this.depObjects[this.lastValue][key].id].depObjects[i]){
-						this.hideObj(allObj[this.depObjects[this.lastValue][key].id].depObjects[i][j]);
+			if(isset(this.depObjects[this.lastValue][key].id, globalAllObjForViewSwitcher)){
+				for(var i in globalAllObjForViewSwitcher[this.depObjects[this.lastValue][key].id].depObjects){
+					for(var j in globalAllObjForViewSwitcher[this.depObjects[this.lastValue][key].id].depObjects[i]){
+						this.hideObj(globalAllObjForViewSwitcher[this.depObjects[this.lastValue][key].id].depObjects[i][j]);
 					}
 				}
 			}
@@ -73,8 +73,8 @@ rebuildView: function(e){
 
 			this.showObj(this.depObjects[myValue][key]);
 
-			if(isset(this.depObjects[myValue][key].id, allObj))
-				allObj[this.depObjects[myValue][key].id].rebuildView();
+			if(isset(this.depObjects[myValue][key].id, globalAllObjForViewSwitcher))
+				globalAllObjForViewSwitcher[this.depObjects[myValue][key].id].rebuildView();
 		}
 	}
 
