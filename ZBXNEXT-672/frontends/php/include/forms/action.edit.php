@@ -563,6 +563,16 @@ require_once('include/templates/action.js.php');
 				}
 				break;
 			case OPERATION_TYPE_COMMAND:
+				if(!isset($new_operation['opmessage'])){
+					$new_operation['opcommand_grp'] = array();
+					$new_operation['opcommand'] = array(
+						'type' => 0,
+						'execute_on' => 1,
+						'port' => '',
+						'command' => '',
+					);
+				}
+SDII($new_operation);
 				$cmdList = new CTable();
 				$cmdList->addRow(array(_('Target'), _('Command'), SPACE));
 
@@ -603,6 +613,9 @@ require_once('include/templates/action.js.php');
 				foreach($new_operation['opcommand_grp'] as $ognum => $cmd)
 					$new_operation['opcommand_grp'][$ognum]['name'] = $groups[$cmd['groupid']]['name'];
 				morder_result($new_operation['opcommand_grp'], array('name', 'opcommand_grpid'));
+
+				$tblOper->addRow(array(_('Command'), new CTextArea('new_operation[opcommand][command]', $new_operation['opcommand']['command'], 77, 7)));
+
 // JS Add commands
 				$jsInsert = '';
 				$jsInsert.= 'addPopupValues('.zbx_jsvalue(array('object'=>'hostid', 'values'=>$new_operation['opcommand_hst'])).');';

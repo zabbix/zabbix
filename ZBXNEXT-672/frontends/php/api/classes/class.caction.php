@@ -589,25 +589,31 @@ COpt::memoryPick();
 
 // get OPERATION_TYPE_COMMAND data
 			if(!empty($opcommand)){
-				$sql = 'SELECT opcommand_hstid, operationid, hostid, command '.
+				$sql = 'SELECT * '.
+						' FROM opcommand '.
+						' WHERE '.DBcondition('operationid', $opcommand);
+				$db_opcommands = DBselect($sql);
+				while($db_opcommand = DBfetch($db_opcommands)){
+					$operations[$db_opcommand['operationid']]['opcommand_grp'] = array();
+					$operations[$db_opcommand['operationid']]['opcommand_hst'] = array();
+					$operations[$db_opcommand['operationid']]['opcommand'] = $db_opcommand;
+				}
+
+				$sql = 'SELECT opcommand_hstid, operationid, hostid '.
 						' FROM opcommand_hst '.
 						' WHERE '.DBcondition('operationid', $opcommand);
 				$db_opcommand_hst = DBselect($sql);
-				while($opcommand_hst = DBfetch($db_opcommand_hst)){
-					if(!isset($operations[$opcommand_hst['operationid']]['opcommand_hst']))
-						$operations[$opcommand_hst['operationid']]['opcommand_hst'] = array();
+				while($opcommand_hst = DBfetch($db_opcommand_hst))
 					$operations[$opcommand_hst['operationid']]['opcommand_hst'][] = $opcommand_hst;
-				}
 
-				$sql = 'SELECT opcommand_grpid, operationid, groupid, command'.
+				$sql = 'SELECT opcommand_grpid, operationid, groupid '.
 						' FROM opcommand_grp'.
 						' WHERE '.DBcondition('operationid', $opcommand);
 				$db_opcommand_grp = DBselect($sql);
-				while($opcommand_grp = DBfetch($db_opcommand_grp)){
-					if(!isset($operations[$opcommand_grp['operationid']]['opcommand_grp']))
-						$operations[$opcommand_grp['operationid']]['opcommand_grp'] = array();
+				while($opcommand_grp = DBfetch($db_opcommand_grp))
 					$operations[$opcommand_grp['operationid']]['opcommand_grp'][] = $opcommand_grp;
-				}
+
+
 			}
 
 // get OPERATION_TYPE_GROUP_ADD, OPERATION_TYPE_GROUP_REMOVE data
