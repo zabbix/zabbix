@@ -217,21 +217,8 @@ class testFormHost extends CWebTest{
 		$this->tab_switch("Templates");
 		$this->nok('Template_Linux');
 
-//		$this->button_click('add');
-		// the above does not seem to work, thus this ugly method has to be used - at least until buttons get unique names...
-		$this->click("//input[@id='add' and @name='add' and @value='Add' and @type='button' and contains(@onclick, 'return PopUp')]");
+		$this->template_link('Template_Linux');
 
-		// zbx_popup is the default opened window id if none is passed
-		$this->waitForPopUp('zbx_popup',6000);
-		$this->selectWindow('zbx_popup');
-		$this->dropdown_select_wait('groupid','Templates');
-		// should use Template_Linux as above (by name or by id from the db)
-		$this->checkbox_select("templates[10001]");
-		$this->button_click('select');
-
-		$this->selectWindow();
-		$this->wait();
-		$this->ok('Template_Linux');
 		$this->button_click('save');
 		$this->wait();
 		$this->assertTitle('Hosts');
