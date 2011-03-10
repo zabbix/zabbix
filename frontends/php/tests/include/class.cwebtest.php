@@ -66,7 +66,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 	{
 		global $DB;
 
-		$this->setHost('hudson');
+		$this->setHost('192.168.3.32');
 		$this->setBrowser('*firefox');
 		if(strstr(PHPUNIT_URL,'http://'))
 		{
@@ -97,7 +97,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 		if($this->isElementPresent('id=password'))
 		{
 			$this->input_type('name','Admin');
-			$this->input_type('password','zabbix');
+			$this->input_type('password','zabbix2');
 			$this->click('enter');
 			$this->wait();
 		}
@@ -182,5 +182,14 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 		$this->waitForPageToLoad();
 		$this->checkFatalErrors();
 	}
+
+	public function tab_switch($tab)
+	{
+		// switches tab by receiving tab title text
+		$this->click("xpath=//div[@id='tabs']/ul/li/a[text()='$tab']");
+		$this->waitForElementPresent("xpath=//li[contains(@class, 'ui-tabs-selected')]/a[text()='$tab']");
+		$this->checkFatalErrors();
+	}
+
 }
 ?>

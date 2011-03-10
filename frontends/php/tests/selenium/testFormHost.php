@@ -181,10 +181,7 @@ class testFormHost extends CWebTest{
 		$this->dropdown_select_wait('groupid','all');
 		$this->click('link=Zabbix server');
 		$this->wait();
-		$this->href_click('#templateTab');
-
-		$this->waitForElementPresent("xpath=//li[contains(@class, 'ui-tabs-selected')]/a[contains(@href, '#templateTab')]");
-
+		$this->tab_switch("Templates");
 		$this->ok('Template_Linux');
 		// probably should either click "button next to the template name" or
 		// unlink[$templateid] (retrieved from the db)
@@ -217,12 +214,7 @@ class testFormHost extends CWebTest{
 		$this->dropdown_select_wait('groupid','all');
 		$this->click('link=Zabbix server');
 		$this->wait();
-		$this->href_click('#templateTab');
-
-// xpath=//div[@id='tabs']/ul/li[2]/a
-
-		$this->waitForElementPresent("xpath=//li[contains(@class, 'ui-tabs-selected')]/a[contains(@href, '#templateTab')]");
-
+		$this->tab_switch("Templates");
 		$this->nok('Template_Linux');
 
 //		$this->button_click('add');
