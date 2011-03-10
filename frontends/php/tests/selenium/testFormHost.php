@@ -22,6 +22,16 @@
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
 class testFormHost extends CWebTest{
+
+	// Returns all hosts
+	public static function allHosts(){
+		return DBdata('select * from hosts where status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')');
+	}
+
+	/**
+	* @dataProvider allHosts
+	*/
+
 	public $host = "Test host";
 
 	public function testFormHost_Create(){
@@ -163,6 +173,97 @@ class testFormHost extends CWebTest{
 		$this->getConfirmation();
 		$this->assertTitle('Hosts');
 		$this->ok('Host deleted');
+	}
+
+	public function testFormHost_TemplateUnlink(){
+		// Unlink a template from a host from host properties page
+		$this->login('hosts.php');
+		$this->dropdown_select_wait('groupid','all');
+		$this->click('link=Zabbix server');
+		$this->wait();
+		$this->href_click('#templateTab');
+
+		$this->waitForElementPresent("xpath=//li[contains(@class, 'ui-tabs-selected')]/a[contains(@href, '#templateTab')]");
+
+		$this->ok('Template_Linux');
+		// probably should either click "button next to the template name" or
+		// unlink[$templateid] (retrieved from the db)
+		$this->button_click('unlink[10001]');
+		$this->wait();
+		$this->nok('Template_Linux');
+		$this->button_click('save');
+		$this->wait();
+		$this->assertTitle('Hosts');
+		$this->ok('Host updated');
+		// should check that items, triggers, graphs and applications are not linked to the template anymore
+		$this->href_click("items.php?filter_set=1&hostid=10017&sid=");
+		$this->wait();
+		$this->nok('Template_Linux');
+		// using "host navigation bar" at the top of entity list
+		$this->href_click("triggers.php?hostid=10017&sid=");
+		$this->wait();
+		$this->nok('Template_Linux');
+		$this->href_click("graphs.php?hostid=10017&sid=");
+		$this->wait();
+		$this->nok('Template_Linux');
+		$this->href_click("applications.php?hostid=10017&sid=");
+		$this->wait();
+		$this->nok('Template_Linux');
+	}
+
+	public function testFormHost_TemplateLink(){
+		// Link a template to a host from host properties page
+		$this->login('hosts.php');
+		$this->dropdown_select_wait('groupid','all');
+		$this->click('link=Zabbix server');
+		$this->wait();
+		$this->href_click('#templateTab');
+
+// xpath=//div[@id='tabs']/ul/li[2]/a
+
+		$this->waitForElementPresent("xpath=//li[contains(@class, 'ui-tabs-selected')]/a[contains(@href, '#templateTab')]");
+
+		$this->nok('Template_Linux');
+
+//		$this->button_click('add');
+		// the above does not seem to work, thus this ugly method has to be used - at least until buttons get unique names...
+		$this->click("//input[@id='add' and @name='add' and @value='Add' and @type='button' and contains(@onclick, 'return PopUp')]");
+
+		// zbx_popup is the default opened window id if none is passed
+		$this->waitForPopUp('zbx_popup',6000);
+		$this->selectWindow('zbx_popup');
+		$this->dropdown_select_wait('groupid','Templates');
+		// should use Template_Linux as above (by name or by id from the db)
+		$this->checkbox_select("templates[10001]");
+		$this->button_click('select');
+
+		$this->selectWindow();
+		$this->wait();
+		$this->ok('Template_Linux');
+		$this->button_click('save');
+		$this->wait();
+		$this->assertTitle('Hosts');
+		$this->ok('Host updated');
+		// no entities should be deleted, they all should be updated
+		$this->nok('deleted');
+		$this->nok('created');
+// should check that items, triggers, graphs and applications exist on the host and are linked to the template
+// currently doing something very brutal - just looking whether Template_Linux is present on entity pages
+		$this->href_click("items.php?filter_set=1&hostid=10017&sid=");
+		$this->wait();
+		$this->ok('Template_Linux:');
+		// using "host navigation bar" at the top of entity list
+		$this->href_click("triggers.php?hostid=10017&sid=");
+		$this->wait();
+		$this->ok('Template_Linux:');
+//		default data.sql has a problem - graphs are not properly linked to the template
+//		$this->href_click("graphs.php?hostid=10017&sid=");
+//		$this->wait();
+//		$this->ok('Template_Linux:');
+		$this->href_click("applications.php?hostid=10017&sid=");
+		$this->wait();
+		$this->ok('Template_Linux:');
+
 	}
 }
 ?>
