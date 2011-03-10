@@ -138,7 +138,9 @@ include_once 'include/page_header.php';
 			}
 			$diff = $now - $res['nextcheck'];
 
-			if(($diff > 5) && ($diff <= 10))
+			if($diff <= 5)
+				continue;
+			else if($diff <= 10)
 				$sec_10[$row['type']]++;
 			else if($diff <= 30)
 				$sec_30[$row['type']]++;
@@ -199,7 +201,9 @@ include_once 'include/page_header.php';
 			$diff = $now - $res['nextcheck'];
 
 
-			if(($diff > 5) && ($diff <= 10))
+			if($diff <= 5)
+				continue;
+			else if($diff <= 10)
 				$sec_10[$row['proxy_hostid']]++;
 			else if($diff <= 30)
 				$sec_30[$row['proxy_hostid']]++;
