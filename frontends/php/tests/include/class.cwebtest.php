@@ -183,12 +183,22 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 		$this->checkFatalErrors();
 	}
 
-	public function tab_switch($tab)
-	{
+	public function tab_switch($tab){
 		// switches tab by receiving tab title text
 		$this->click("xpath=//div[@id='tabs']/ul/li/a[text()='$tab']");
 		$this->waitForElementPresent("xpath=//li[contains(@class, 'ui-tabs-selected')]/a[text()='$tab']");
 		$this->checkFatalErrors();
+	}
+
+	public function template_unlink($template){
+		// clicks button named "Unlink" next to template named $template
+		$this->click("xpath=//div[text()='$template']/../div[@class='dd']/input[@value='Unlink']");
+	}
+
+	public function template_unlink_and_clear($template){
+		// WARNING: not tested yet
+		// clicks button named "Unlink and clear" next to template named $template
+		$this->click("xpath=//div[text()='$template']/../div[@class='dd']/input[@value='Unlink']/../input[@value='Unlink and clear']");
 	}
 
 }

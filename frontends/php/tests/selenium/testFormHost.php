@@ -183,9 +183,9 @@ class testFormHost extends CWebTest{
 		$this->wait();
 		$this->tab_switch("Templates");
 		$this->ok('Template_Linux');
-		// probably should either click "button next to the template name" or
-		// unlink[$templateid] (retrieved from the db)
-		$this->button_click('unlink[10001]');
+		$this->template_unlink("Template_Linux");
+//		$this->button_click('unlink[10001]');
+
 		$this->wait();
 		$this->nok('Template_Linux');
 		$this->button_click('save');
@@ -241,6 +241,13 @@ class testFormHost extends CWebTest{
 		$this->nok('created');
 // should check that items, triggers, graphs and applications exist on the host and are linked to the template
 // currently doing something very brutal - just looking whether Template_Linux is present on entity pages
+
+// should also test that items that should have interfaceid don't have it set to NULL
+// something like :
+// select itemid from items where interfaceid is NULL and type not in (5,7,8,15); (only for enabled/disabled hosts)
+// should return nothing
+// not in ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_CALCULATED
+
 		$this->href_click("items.php?filter_set=1&hostid=10017&sid=");
 		$this->wait();
 		$this->ok('Template_Linux:');
