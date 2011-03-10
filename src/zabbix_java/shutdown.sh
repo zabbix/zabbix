@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd `dirname $0`
+cd $(dirname $0)
 source settings.sh
 
 if [ -n "$PID_FILE" ]; then

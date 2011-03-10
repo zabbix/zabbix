@@ -1536,6 +1536,17 @@ echo "  Agent details:
 fi
 
 echo "
+  Enable Java proxy:     ${java}"
+
+if test "x$java" != "xno"; then
+
+echo "  Java proxy details:
+    Java compiler:         ${JAVAC}
+    Java archiver:         ${JAR}"
+
+fi
+
+echo "
   LDAP support:          ${found_ldap}
   IPv6 support:          ${have_ipv6}"
 
