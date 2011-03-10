@@ -1,5 +1,3 @@
-#!/bin/bash
-
 # This is a configuration file for Zabbix Java Proxy.
 # It is sourced by startup.sh and shutdown.sh scripts.
 

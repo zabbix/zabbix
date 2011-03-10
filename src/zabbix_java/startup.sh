@@ -16,10 +16,11 @@ if [ -z "$PID_FILE" ]; then
 fi
 
 CLASSPATH="lib"
-for jar in lib/*.jar; do
-	CLASSPATH="$CLASSPATH:$jar"
+for jar in {lib,bin}/*.jar; do
+	if [[ $jar != *junit* ]]; then
+		CLASSPATH="$CLASSPATH:$jar"
+	fi
 done
-CLASSPATH="$CLASSPATH:sbin/ZabbixJavaProxy.jar"
 
 ZABBIX_OPTIONS=""
 if [ -n "$PID_FILE" ]; then
