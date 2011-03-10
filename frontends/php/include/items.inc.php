@@ -88,7 +88,7 @@
 		);
 
 		if(is_null($type)){
-			// natsort($types);
+			natsort($types);
 			return $types;
 		}
 		else if(isset($types[$type]))

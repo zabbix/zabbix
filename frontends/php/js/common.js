@@ -507,7 +507,7 @@ function redirect(uri, method, needle) {
 		window.location = url.getUrl();
 	}
 	else{
-// ussless param just for easier loop
+// useless param just for easier loop
 		var action = '';
 
 		var domBody = document.getElementsByTagName('body')[0];
