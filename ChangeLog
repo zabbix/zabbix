@@ -94,6 +94,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
 
+ - [ZBX-3576] fixed showing triggers with disabled items in monitoring (Vedmak)
  - [ZBX-3483] added missing fields in items mass update (Vedmak)
  - [ZBX-3435] fixed error that sometimes appear after profile edit (Vedmak)
  - [ZBX-2616] bundled DejaVu font upgraded from 2.32 to 2.33 (Richlv)
