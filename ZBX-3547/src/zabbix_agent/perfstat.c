@@ -30,8 +30,6 @@
 /* Static data */
 static ZBX_PERF_STAT_DATA *ppsd = NULL;
 static ZBX_MUTEX perfstat_access;
-static int pdhErrorLogged1 = 0;
-static int pdhErrorLogged2 = 0;
 
 /******************************************************************************
  *                                                                            *
@@ -387,15 +385,7 @@ void	collect_perfstat()
 
 		if (ERROR_SUCCESS != (status = PdhGetRawCounterValue(cptr->handle, NULL, &cptr->rawValueArray[cptr->CurrentCounter])))
 		{
-			if (10 > pdhErrorLogged1)
-			{
-				zabbix_log(LOG_LEVEL_ERR, "Call to PdhGetRawCounterValue() failed: %s", strerror_from_module(status, L"PDH.DLL"));
-				pdhErrorLogged1++;
-			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "Call to PdhGetRawCounterValue() failed: %s", strerror_from_module(status, L"PDH.DLL"));
-			}
+			zabbix_log(LOG_LEVEL_ERR, "Call to PdhGetRawCounterValue() failed: %s", strerror_from_module(status, L"PDH.DLL"));
 			cptr->status = ITEM_STATUS_NOTSUPPORTED;
 			continue;
 		}
@@ -412,15 +402,7 @@ void	collect_perfstat()
 			);
 		if (ERROR_SUCCESS != status)
 		{
-			if (10 > pdhErrorLogged2)
-			{
-				zabbix_log(LOG_LEVEL_ERR, "Call to PdhComputeCounterStatistics() failed: %s", strerror_from_module(status, L"PDH.DLL"));
-				pdhErrorLogged2++;
-			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "Call to PdhComputeCounterStatistics() failed: %s", strerror_from_module(status, L"PDH.DLL"));
-			}
+			zabbix_log(LOG_LEVEL_ERR, "Call to PdhComputeCounterStatistics() failed: %s", strerror_from_module(status, L"PDH.DLL"));
 			cptr->status = ITEM_STATUS_NOTSUPPORTED;
 			continue;
 		}
