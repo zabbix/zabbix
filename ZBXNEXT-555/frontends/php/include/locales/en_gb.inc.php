@@ -1331,7 +1331,6 @@
 
 //	overview.php
 	'S_OVERVIEW'=>				_('Overview'),
-	'S_OVERVIEW_BY_PROXY'=>			_('Overview by proxy'),
 	'S_OVERVIEW_BIG'=>			_('OVERVIEW'),
 	'S_HOSTS_LOCATION'=>			_('Hosts location'),
 	'S_DATA'=>				_('Data'),
@@ -1342,9 +1341,6 @@
 	'S_15_MIN'=>				_('15 min'),
 
 //	queue.php
-	'S_QUEUE_OF_ITEMS_TO_BE_UPDATED_BIG'=>	_('QUEUE OF ITEMS TO BE UPDATED'),
-	'S_NEXT_CHECK'=>			_('Next check'),
-	'S_THE_QUEUE_IS_EMPTY'=>		_('The queue is empty'),
 	'S_TOTAL'=>				_('Total'),
 	'S_COUNT'=>				_('Count'),
 	'S_5_SECONDS'=>				_('5 seconds'),
@@ -1352,9 +1348,6 @@
 	'S_30_SECONDS'=>			_('30 seconds'),
 	'S_1_MINUTE'=>				_('1 minute'),
 	'S_5_MINUTES'=>				_('5 minutes'),
-	'S_MORE_THAN_10_MINUTES'=>		_('More than 10 minutes'),
-	'S_TRUNCATED'=>				_('Truncated'),
-	'S_DELAYED_BY'=>			_('Delayed by'),
 	'S_QUEUE_NODES_DATE_FORMAT'=>		_('d M Y H:i:s'),
 
 //	report1.php
