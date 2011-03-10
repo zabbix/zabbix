@@ -18,7 +18,6 @@
 **/
 var allObj = {};
 var CViewSwitcher = Class.create({
-inAction:			false,
 mainObj:			null,
 depObjects:			{},
 lastValue:			null,
@@ -52,23 +51,23 @@ initialize : function(objId, objAction, confData){
 rebuildView: function(e){
 	var myValue = this.objValue(this.mainObj);
 
-	if(myValue == this.lastValue){
-		this.inAction = false;
-		return true;
-	}
-
 	if(isset(this.lastValue, this.depObjects)) {
-		for(var key in this.depObjects[this.lastValue]) {
+		for(var key in this.depObjects[this.lastValue]){
 			if(empty(this.depObjects[this.lastValue][key])) continue;
 
 			this.hideObj(this.depObjects[this.lastValue][key]);
 
-			if(isset(this.depObjects[this.lastValue][key].id, allObj))
-				allObj[this.depObjects[this.lastValue][key].id].rebuildView();
+			if(isset(this.depObjects[this.lastValue][key].id, allObj)){
+				for(var i in allObj[this.depObjects[this.lastValue][key].id].depObjects){
+					for(var j in allObj[this.depObjects[this.lastValue][key].id].depObjects[i]){
+						this.hideObj(allObj[this.depObjects[this.lastValue][key].id].depObjects[i][j]);
+					}
+				}
+			}
 		}
 	}
 
-	if(isset(myValue, this.depObjects)) {
+	if(isset(myValue, this.depObjects)){
 		for(var key in this.depObjects[myValue]){
 			if(empty(this.depObjects[myValue][key])) continue;
 
