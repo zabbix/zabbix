@@ -349,39 +349,7 @@ function get_operation_desc($type, $data){
 
 				break;
 			case OPERATION_TYPE_COMMAND:
-				if(!isset($data['opcommand_grp'])) $data['opcommand_grp'] = array();
-				if(!isset($data['opcommand_hst'])) $data['opcommand_hst'] = array();
-
-				$hosts = API::Host()->get(array(
-					'hostids' => zbx_objectValues($data['opcommand_hst'],'hostid'),
-					'output' => array('hostid', 'host'),
-					'preservekeys' => true
-				));
-				order_result($hosts, 'host');
-				foreach($data['opcommand_hst'] as $cnum => $command){
-					if($command['hostid'] > 0) continue;
-					$result[] = _s('Current host: ');
-
-					$result[] = italic(zbx_nl2br($command['command']));
-				}
-
-				foreach($data['opcommand_hst'] as $cnum => $command){
-					if($command['hostid'] == 0) continue;
-					$result[] = _s('Host "%1$s": ', $hosts[$command['hostid']]['host']);
-
-					$result[] = italic(zbx_nl2br($command['command']));
-				}
-
-				$groups = API::HostGroup()->get(array(
-					'groupids' => zbx_objectValues($data['opcommand_grp'],'groupid'),
-					'output' => array('groupid', 'name'),
-					'preservekeys' => true
-				));
-				order_result($groups, 'name');
-				foreach($data['opcommand_grp'] as $cnum => $command){
-					$result[] = _s('Host group "%1$s": ', $groups[$command['groupid']]['name']);
-					$result[] = italic(zbx_nl2br($command['command']));
-				}
+				$result[] = array(bold(_('Run command:')), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
 				break;
 			default:
 		}
