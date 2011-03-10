@@ -218,7 +218,7 @@ include_once 'include/page_header.php';
 		}
 
 		$table->setHeader(array(
-			_('Items'),
+			_('Proxy'),
 			_('5 seconds'),
 			_('10 seconds'),
 			_('30 seconds'),
