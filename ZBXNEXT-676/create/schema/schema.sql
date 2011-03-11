@@ -666,7 +666,6 @@ FIELD		|url_a		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|url_b		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|url_c		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|host_networks	|t_text		|''	|NOT NULL	|ZBX_SYNC
-FIELD		|notes		|t_text		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|hardware	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|software	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|host_netmask	|t_varchar(39)	|''	|NOT NULL	|ZBX_SYNC
