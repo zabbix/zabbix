@@ -54,24 +54,24 @@ static unsigned char	zbx_process;
 extern int		CONFIG_HISTSYNCER_FREQUENCY;
 
 static int		ZBX_HISTORY_SIZE = 0;
-int			ZBX_SYNC_MAX = 1000;	/* Must be less than ZBX_HISTORY_SIZE */
+int			ZBX_SYNC_MAX = 1000;	/* must be less than ZBX_HISTORY_SIZE */
 static int		ZBX_ITEMIDS_SIZE = 0;
 
 #define ZBX_IDS_SIZE	8
-#define ZBX_DC_ID	struct zbx_dc_id_type
-#define ZBX_DC_IDS	struct zbx_dc_ids_type
 
-ZBX_DC_ID
+typedef struct
 {
 	char		table_name[16];
 	zbx_uint64_t	lastid;
 	int		reserved;
-};
+}
+ZBX_DC_ID;
 
-ZBX_DC_IDS
+typedef struct
 {
 	ZBX_DC_ID	id[ZBX_IDS_SIZE];
-};
+}
+ZBX_DC_IDS;
 
 ZBX_DC_IDS		*ids = NULL;
 
@@ -83,12 +83,7 @@ typedef union
 }
 history_value_t;
 
-#define ZBX_DC_HISTORY	struct zbx_dc_history_type
-#define ZBX_DC_TREND	struct zbx_dc_trend_type
-#define ZBX_DC_STATS	struct zbx_dc_stats_type
-#define ZBX_DC_CACHE	struct zbx_dc_cache_type
-
-ZBX_DC_HISTORY
+typedef struct
 {
 	zbx_uint64_t	itemid;
 	history_value_t	value_orig;
@@ -104,9 +99,10 @@ ZBX_DC_HISTORY
 	unsigned char	value_null;
 	unsigned char	keep_history;
 	unsigned char	keep_trends;
-};
+}
+ZBX_DC_HISTORY;
 
-ZBX_DC_TREND
+typedef struct
 {
 	zbx_uint64_t	itemid;
 	history_value_t	value_min;
@@ -116,31 +112,34 @@ ZBX_DC_TREND
 	int		num;
 	int		disable_from;
 	unsigned char	value_type;
-};
+}
+ZBX_DC_TREND;
 
-ZBX_DC_STATS
+typedef struct
 {
-	zbx_uint64_t	history_counter;	/* Total number of saved values in the DB */
-	zbx_uint64_t	history_float_counter;	/* Number of saved float values in the DB */
-	zbx_uint64_t	history_uint_counter;	/* Number of saved uint values in the DB */
-	zbx_uint64_t	history_str_counter;	/* Number of saved str values in the DB */
-	zbx_uint64_t	history_log_counter;	/* Number of saved log values in the DB */
-	zbx_uint64_t	history_text_counter;	/* Number of saved text values in the DB */
-};
+	zbx_uint64_t	history_counter;	/* total number of saved values in the DB */
+	zbx_uint64_t	history_float_counter;	/* number of saved float values in the DB */
+	zbx_uint64_t	history_uint_counter;	/* number of saved uint values in the DB */
+	zbx_uint64_t	history_str_counter;	/* number of saved str values in the DB */
+	zbx_uint64_t	history_log_counter;	/* number of saved log values in the DB */
+	zbx_uint64_t	history_text_counter;	/* number of saved text values in the DB */
+}
+ZBX_DC_STATS;
 
-ZBX_DC_CACHE
+typedef struct
 {
 	zbx_hashset_t	trends;
 	ZBX_DC_STATS	stats;
 	ZBX_DC_HISTORY	*history;	/* [ZBX_HISTORY_SIZE] */
-	char		*text;		/* [ZBX_TEXTBUFFER_SIZE] */
+	char		*text;		/* [CONFIG_TEXT_CACHE_SIZE] */
 	zbx_uint64_t	*itemids;	/* items, processed by other syncers */
 	char		*last_text;
 	int		history_first;
 	int		history_num;
 	int		trends_num;
 	int		itemids_alloc, itemids_num;
-};
+}
+ZBX_DC_CACHE;
 
 ZBX_DC_CACHE		*cache = NULL;
 
@@ -1280,10 +1279,9 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 			break;
 		}
 
-		/* Update item status if required */
 		if (item.status == ITEM_STATUS_NOTSUPPORTED && status == ITEM_STATUS_ACTIVE)
 		{
-			message = zbx_dsprintf(message, "Parameter [" ZBX_FS_UI64 "][%s] became supported",
+			message = zbx_dsprintf(message, "Item [" ZBX_FS_UI64 "][%s] became supported",
 					item.itemid, zbx_host_key_string(item.itemid));
 			zabbix_log(LOG_LEVEL_WARNING, "%s", message);
 			zabbix_syslog("%s", message);
@@ -2085,7 +2083,7 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCsync                                                           *
+ * Function: DCsync_history                                                   *
  *                                                                            *
  * Purpose: writes updates and new data from pool to database                 *
  *                                                                            *
@@ -2100,16 +2098,16 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
  ******************************************************************************/
 int	DCsync_history(int sync_type)
 {
+	const char		*__function_name = "DCsync_history";
+
 	static ZBX_DC_HISTORY	*history = NULL;
 	int			i, j, history_num, n, f;
-	int			syncs;
-	int			total_num = 0;
+	int			syncs, total_num = 0;
 	int			skipped_clock, max_delay;
 	time_t			now = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In DCsync_history(history_first:%d history_num:%d)",
-			cache->history_first,
-			cache->history_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_first:%d history_num:%d",
+			__function_name, cache->history_first, cache->history_num);
 
 	if (ZBX_SYNC_FULL == sync_type)
 	{
@@ -2160,9 +2158,9 @@ int	DCsync_history(int sync_type)
 					}
 				}
 
-				for (j = f; j != cache->history_first; j = (j == 0 ? ZBX_HISTORY_SIZE : j) - 1)
+				for (j = f; j != cache->history_first; j = (0 == j ? ZBX_HISTORY_SIZE : j) - 1)
 				{
-					i = (j == 0 ? ZBX_HISTORY_SIZE : j) - 1;
+					i = (0 == j ? ZBX_HISTORY_SIZE : j) - 1;
 					memcpy(&cache->history[j], &cache->history[i], sizeof(ZBX_DC_HISTORY));
 				}
 
@@ -2172,7 +2170,7 @@ int	DCsync_history(int sync_type)
 
 				history_num++;
 			}
-			else if (skipped_clock == 0)
+			else if (0 == skipped_clock)
 				skipped_clock = cache->history[f].clock;
 
 			n--;
@@ -2208,12 +2206,12 @@ int	DCsync_history(int sync_type)
 
 		LOCK_CACHE;
 
-		for (i = 0; i < history_num; i ++)
+		for (i = 0; i < history_num; i++)
 			uint64_array_remove(cache->itemids, &cache->itemids_num, &history[i].itemid, 1);
 
 		UNLOCK_CACHE;
 
-		for (i = 0; i < history_num; i ++)
+		for (i = 0; i < history_num; i++)
 		{
 			if (history[i].value_type == ITEM_VALUE_TYPE_STR
 					|| history[i].value_type == ITEM_VALUE_TYPE_TEXT
@@ -2233,10 +2231,13 @@ int	DCsync_history(int sync_type)
 					(double)total_num / (cache->history_num + total_num) * 100);
 			now = time(NULL);
 		}
-	} while (--syncs > 0 || sync_type == ZBX_SYNC_FULL || (skipped_clock != 0 && skipped_clock < max_delay));
+	}
+	while (--syncs > 0 || sync_type == ZBX_SYNC_FULL || (skipped_clock != 0 && skipped_clock < max_delay));
 finish:
 	if (ZBX_SYNC_FULL == sync_type)
 		zabbix_log(LOG_LEVEL_WARNING, "Syncing history data... done.");
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, total_num);
 
 	return total_num;
 }
@@ -2256,13 +2257,15 @@ finish:
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void DCvacuum_text()
+static void	DCvacuum_text()
 {
+	const char	*__function_name = "DCvacuum_text";
+
 	char	*first_text;
 	int	i, index;
 	size_t	offset;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In DCvacuum_text()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	/* vacuuming text buffer */
 	first_text = NULL;
@@ -2302,9 +2305,8 @@ static void DCvacuum_text()
 	}
 	else
 		cache->last_text = cache->text;
-
 quit:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of DCvacuum_text()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -2642,9 +2644,8 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, AGENT_RESULT 
 				DCadd_history_text(itemid, value->text, now);
 			break;
 		default:
-			zabbix_log(LOG_LEVEL_ERR, "Unknown value type [%d] for itemid [" ZBX_FS_UI64 "]",
-				value_type,
-				itemid);
+			zabbix_log(LOG_LEVEL_ERR, "unknown value type [%d] for itemid [" ZBX_FS_UI64 "]",
+					value_type, itemid);
 	}
 }
 
@@ -2765,31 +2766,6 @@ void	init_database_cache(unsigned char p)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCsync_all                                                       *
- *                                                                            *
- * Purpose: writes updates and new data from pool and cache data to database  *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-static void	DCsync_all()
-{
-	zabbix_log(LOG_LEVEL_DEBUG, "In DCsync_all()");
-
-	DCsync_history(ZBX_SYNC_FULL);
-	DCsync_trends();
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of DCsync_all()");
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: free_database_cache                                              *
  *                                                                            *
  * Purpose: Free memory allocated for database cache                          *
@@ -2809,7 +2785,8 @@ void	free_database_cache()
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	DCsync_all();
+	DCsync_history(ZBX_SYNC_FULL);
+	DCsync_trends();
 
 	LOCK_CACHE;
 	LOCK_TRENDS;
@@ -3051,9 +3028,11 @@ retry:
  ******************************************************************************/
 int	DCget_item_lastclock(zbx_uint64_t itemid)
 {
+	const char	*__function_name = "DCget_item_lastclock";
+
 	int	i, index, clock = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In DCget_item_lastclock(): itemid [" ZBX_FS_UI64 "]", itemid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, itemid);
 
 	LOCK_CACHE;
 
@@ -3073,7 +3052,7 @@ int	DCget_item_lastclock(zbx_uint64_t itemid)
 
 	UNLOCK_CACHE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of DCget_item_lastclock(): %d", clock);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, clock);
 
 	return clock;
 }
