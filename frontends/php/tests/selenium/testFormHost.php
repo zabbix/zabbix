@@ -260,7 +260,7 @@ class testFormHost extends CWebTest{
 
 // should also test that items that should have interfaceid don't have it set to NULL
 // something like :
-// select itemid from items where interfaceid is NULL and type not in (5,7,8,15); (only for enabled/disabled hosts)
+// select itemid from items where interfaceid is NULL and type not in (2,5,7,8,15); (only for enabled/disabled hosts)
 // should return nothing
 // not in ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_CALCULATED
 
