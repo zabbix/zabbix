@@ -107,7 +107,7 @@ class CHost extends CZBXAPI{
 			'with_httptests'			=> null,
 			'with_monitored_httptests'	=> null,
 			'with_graphs'				=> null,
-			'withProfile'				=> null,
+			'withProfiles'				=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
 
@@ -485,8 +485,8 @@ class CHost extends CZBXAPI{
 						' AND i.itemid=gi.itemid)';
 		}
 
-// withProfile
-		if(!is_null($options['withProfile']) && $options['withProfile']){
+// withProfiles
+		if(!is_null($options['withProfiles']) && $options['withProfiles']){
 			$sql_parts['where'][] = ' h.hostid IN ( '.
 					' SELECT hp.hostid '.
 					' FROM hosts_profiles hp )';
