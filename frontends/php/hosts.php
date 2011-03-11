@@ -153,7 +153,7 @@ include_once('include/page_header.php');
 			'hostids' => $hostids,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => 1,
-			'select_profile' => 1
+			'select_profile' => true
 		);
 		$hosts = API::Host()->get($params);
 		order_result($hosts, 'host');
