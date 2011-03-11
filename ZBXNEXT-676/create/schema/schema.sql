@@ -644,6 +644,8 @@ FIELD		|software_full	|t_text		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|contact	|t_text		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|location	|t_text		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|notes		|t_text		|''	|NOT NULL	|ZBX_SYNC
+FIELD		|location_lat	|t_varchar(16)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|location_lon	|t_varchar(16)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|alias		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|type_full	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|chassis	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
@@ -657,11 +659,11 @@ FIELD		|vendor		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|contract_number|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|installer_name	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|deployment_status|t_varchar(64)|''	|NOT NULL	|ZBX_SYNC
-FIELD		|device_app_a	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|device_app_b	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|device_app_c	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|device_app_d	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|device_app_e	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|software_app_a	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|software_app_b	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|software_app_c	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|software_app_d	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|software_app_e	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|url_a		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|url_b		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|url_c		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC

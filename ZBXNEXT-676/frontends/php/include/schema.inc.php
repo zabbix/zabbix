@@ -2918,6 +2918,18 @@ return array(
 				'length' => 2048,
 				'default' => '',
 			),
+			'location_lat' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 16,
+				'default' => '',
+			),
+			'location_lon' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 16,
+				'default' => '',
+			),
 			'alias' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
@@ -2996,31 +3008,31 @@ return array(
 				'length' => 64,
 				'default' => '',
 			),
-			'device_app_a' => array(
+			'software_app_a' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
 				'default' => '',
 			),
-			'device_app_b' => array(
+			'software_app_b' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
 				'default' => '',
 			),
-			'device_app_c' => array(
+			'software_app_c' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
 				'default' => '',
 			),
-			'device_app_d' => array(
+			'software_app_d' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
 				'default' => '',
 			),
-			'device_app_e' => array(
+			'software_app_e' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
