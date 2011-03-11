@@ -117,14 +117,13 @@
 
 	function item_data_type2str($type=null){
 		$types = array(
-			ITEM_DATA_TYPE_DECIMAL => S_DECIMAL,
-			ITEM_DATA_TYPE_OCTAL => S_OCTAL,
-			ITEM_DATA_TYPE_HEXADECIMAL => S_HEXADECIMAL,
 			ITEM_DATA_TYPE_BOOLEAN => S_BOOLEAN,
+			ITEM_DATA_TYPE_OCTAL => S_OCTAL,
+			ITEM_DATA_TYPE_DECIMAL => S_DECIMAL,
+			ITEM_DATA_TYPE_HEXADECIMAL => S_HEXADECIMAL,
 		);
 
 		if(is_null($type)){
-			natsort($types);
 			return $types;
 		}
 		else if(isset($types[$type]))

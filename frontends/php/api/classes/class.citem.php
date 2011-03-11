@@ -1448,7 +1448,7 @@ COpt::memoryPick();
 			$exItemsKeys = zbx_toHash($exItems, 'key_');
 			$exItemsTpl = zbx_toHash($exItems, 'templateid');
 
-			foreach($parentItems as $itemid => $item){
+			foreach($parentItems as $item){
 				$exItem = null;
 
 // update by templateid
@@ -1479,7 +1479,7 @@ COpt::memoryPick();
 					){
 						$type = getInterfaceTypeByItem($item);
 						if(!isset($interfaces[$type])){
-							self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot find host interface on host ['.$host['host'].'] for item key ['.$exItem['key_'].']');
+							self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot find host interface on host ['.$host['host'].'] for item key ['.$item['key_'].']');
 						}
 
 						$item['interfaceid'] = $interfaces[$type]['interfaceid'];
