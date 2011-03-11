@@ -61,7 +61,7 @@
 			'selectGroups' => API_OUTPUT_EXTEND,
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
 			'selectMacros' => API_OUTPUT_EXTEND,
-			'select_profile' => API_OUTPUT_EXTEND,
+			'selectProfile' => true,
 			'output' => API_OUTPUT_EXTEND
 		));
 		$dbHost = reset($dbHosts);

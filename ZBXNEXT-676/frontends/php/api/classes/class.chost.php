@@ -52,7 +52,7 @@ class CHost extends CZBXAPI{
  * @param boolean $options['select_graphs'] select Graphs
  * @param boolean $options['select_applications'] select Applications
  * @param boolean $options['selectMacros'] select Macros
- * @param boolean $options['select_profile'] select Profile
+ * @param boolean $options['selectProfile'] select Profile
  * @param int $options['count'] count Hosts, returned column name is rowscount
  * @param string $options['pattern'] search hosts by pattern in Host name
  * @param string $options['extendPattern'] search hosts by pattern in Host name, ip and DNS
@@ -132,7 +132,7 @@ class CHost extends CZBXAPI{
 			'selectMacros'				=> null,
 			'selectScreens'				=> null,
 			'selectInterfaces'			=> null,
-			'select_profile'			=> null,
+			'selectProfile'				=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -606,7 +606,7 @@ class CHost extends CZBXAPI{
 					if(!is_null($options['selectDiscoveries']) && !isset($result[$host['hostid']]['discoveries'])){
 						$result[$host['hostid']]['discoveries'] = array();
 					}
-					if(!is_null($options['select_profile']) && !isset($result[$host['hostid']]['profile'])){
+					if(!is_null($options['selectProfile']) && !isset($result[$host['hostid']]['profile'])){
 						$result[$host['hostid']]['profile'] = array();
 					}
 					if(!is_null($options['select_triggers']) && !isset($result[$host['hostid']]['triggers'])){
@@ -768,7 +768,7 @@ Copt::memoryPick();
 		}
 
 // Adding Profiles
-		if(!is_null($options['select_profile'])){
+		if(!is_null($options['selectProfile']) && $options['selectProfile']){
 			$sql = 'SELECT hp.* '.
 				' FROM hosts_profiles hp '.
 				' WHERE '.DBcondition('hp.hostid', $hostids);

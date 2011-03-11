@@ -93,7 +93,7 @@ else{
 	if($pageFilter->groupsSelected){
 		$options = array(
 			'output' => array('hostid', 'host'),
-			'select_profile' => API_OUTPUT_EXTEND,
+			'selectProfile' => true,
 			'withProfiles' => true,
 			'selectGroups' => API_OUTPUT_EXTEND,
 			'limit' => ($config['search_limit'] + 1)
