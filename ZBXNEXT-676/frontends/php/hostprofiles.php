@@ -94,7 +94,7 @@ else{
 		$options = array(
 			'output' => array('hostid', 'host'),
 			'selectProfile' => true,
-			'withProfiles' => true,
+			'withProfile' => true,
 			'selectGroups' => API_OUTPUT_EXTEND,
 			'limit' => ($config['search_limit'] + 1)
 		);
