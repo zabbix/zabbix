@@ -20,8 +20,6 @@ var allObj = {};
 var CViewSwitcher = Class.create({
 inAction:			false,
 mainObj:			null,
-actionsObj:			null,
-changedFields:		{},
 depObjects:			{},
 lastValue:			null,
 
@@ -43,12 +41,7 @@ initialize : function(objId, objAction, confData){
 		}
 	}
 
-	if(!is_array(objAction)) objAction = new Array(objAction);
-	this.actionsObj = objAction;
-
-	for(var i = 0; i < this.actionsObj.length; i++) {
-		addListener(this.mainObj, objAction[i], this.rebuildView.bindAsEventListener(this));
-	}
+	addListener(this.mainObj, objAction, this.rebuildView.bindAsEventListener(this));
 
 	allObj[objId] = this;
 
@@ -90,7 +83,7 @@ rebuildView: function(e){
 },
 
 objValue: function(obj){
-	if(is_null(obj) || obj.disabled) return null;
+	if(is_null(obj)) return null;
 
 	var aValue = null;
 	switch(obj.tagName.toLowerCase()) {
@@ -165,37 +158,32 @@ hideObj: function(data) {
 	this.disableObj($(data.id), true);
 	$(data.id).style.display = 'none';
 
-	var elmValue = null;
-
-	if(isset('value', data)){
-		elmValue = this.objValue($(data.value));
-	}
-
-	if(is_null(elmValue) && isset('defaultValue', data) && (this.changedFields[data.id] === false))
-		this.setObjValue($(data.id), data.defaultValue);
-	else if(!is_null(elmValue))
-		this.setObjValue($(data.id), elmValue);
 },
 
-showObj : function(data){
+showObj: function(data){
 	if(is_null($(data.id))) return true;
 
 	this.disableObj($(data.id), false);
 
 	if(!is_null(data)) {
 		var objValue = this.objValue($(data.id));
-		var elmValue = null;
 
-		if(isset('value', data)){
-			elmValue = this.objValue($(data.value));
+		var defaultValue = false;
+		for(var i in this.depObjects){
+			for(var j in this.depObjects[i]){
+				if((this.depObjects[i][j]['id'] == data.id)
+					&& (isset('defaultValue', this.depObjects[i][j]))
+					&& (this.depObjects[i][j]['defaultValue'] != '')
+					&& (this.depObjects[i][j]['defaultValue'] == objValue))
+				{
+					defaultValue = true;
+				}
+			}
 		}
 
-		if(is_null(elmValue) && isset('defaultValue', data) && (this.changedFields[data.id] === false))
+		if(((objValue == '') || defaultValue) && isset('defaultValue', data)){
 			this.setObjValue($(data.id), data.defaultValue);
-		else if(!is_null(elmValue))
-			this.setObjValue($(data.id), elmValue);
-
-		if(!is_null(elmValue)) this.setObjValue($(data.value), objValue);
+		}
 	}
 
 	this.objDisplay($(data.id));
@@ -216,18 +204,8 @@ hideAllObjs: function(){
 			if(is_null(elm)) continue;
 
 			this.hideObj(this.depObjects[i][a]);
-			if(isset('defaultValue', this.depObjects[i][a])){
-				this.changedFields[this.depObjects[i][a].id] = false;
-
-				for(var i = 0; i < this.actionsObj.length; i++) {
-					addListener(elm, this.actionsObj[i], this.chageFieldStatus.bindAsEventListener(this, this.depObjects[i][a].id));
-				}
-			}
 		}
 	}
-},
-
-chageFieldStatus: function(e, id){
-	this.changedFields[id] = true;
 }
+
 });

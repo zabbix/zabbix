@@ -377,7 +377,7 @@ return false;
 },
 
 alignSelement: function(selementid){
-	this.debug('placeSelement');
+	this.debug('alignSelement');
 //--
 
 	if(!this.grid.autoAlign) return true;
