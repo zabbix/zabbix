@@ -1127,10 +1127,7 @@
 
 		$field321 = new CComboBox('filter_data_type', $filter_data_type);//, 'submit()');
 		$field321->addItem(-1, S_ALL_SMALL);
-		$field321->addItem(ITEM_DATA_TYPE_BOOLEAN, item_data_type2str(ITEM_DATA_TYPE_BOOLEAN));
-		$field321->addItem(ITEM_DATA_TYPE_OCTAL, item_data_type2str(ITEM_DATA_TYPE_OCTAL));
-		$field321->addItem(ITEM_DATA_TYPE_DECIMAL, item_data_type2str(ITEM_DATA_TYPE_DECIMAL));
-		$field321->addItem(ITEM_DATA_TYPE_HEXADECIMAL, item_data_type2str(ITEM_DATA_TYPE_HEXADECIMAL));
+		$field321->addItems(item_data_type2str());
 		$field321->setEnabled('no');
 
 		$col_table3->addRow(array(array($label321, SPACE), array($field321, SPACE)));
@@ -1607,7 +1604,6 @@
 
 		$securityLevelVisibility = array();
 		$valueTypeVisibility = array();
-		$dataTypeVisibility = array();
 		$authTypeVisibility = array();
 		$typeVisibility = array();
 		$delay_flex_el = array();
@@ -1942,11 +1938,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		}
 		else{
 			$cmbDataType = new CComboBox('data_type', $data_type);
-			$cmbDataType->addItem(ITEM_DATA_TYPE_BOOLEAN, 	item_data_type2str(ITEM_DATA_TYPE_BOOLEAN));
-			$cmbDataType->addItem(ITEM_DATA_TYPE_OCTAL,		item_data_type2str(ITEM_DATA_TYPE_OCTAL));
-			$cmbDataType->addItem(ITEM_DATA_TYPE_DECIMAL,		item_data_type2str(ITEM_DATA_TYPE_DECIMAL));
-			$cmbDataType->addItem(ITEM_DATA_TYPE_HEXADECIMAL, 	item_data_type2str(ITEM_DATA_TYPE_HEXADECIMAL));
-
+			$cmbDataType->addItems(item_data_type2str());
 		}
 
 		$row = new CRow(array(new CCol(S_DATA_TYPE,'form_row_l'), new CCol($cmbDataType,'form_row_r')));
@@ -1962,14 +1954,8 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'row_units');
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'units');
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_units');
-		zbx_subarray_push($dataTypeVisibility, ITEM_DATA_TYPE_OCTAL, 'units');
-		zbx_subarray_push($dataTypeVisibility, ITEM_DATA_TYPE_OCTAL, 'row_units');
-		zbx_subarray_push($dataTypeVisibility, ITEM_DATA_TYPE_DECIMAL, 'units');
-		zbx_subarray_push($dataTypeVisibility, ITEM_DATA_TYPE_DECIMAL, 'row_units');
-		zbx_subarray_push($dataTypeVisibility, ITEM_DATA_TYPE_HEXADECIMAL, 'units');
-		zbx_subarray_push($dataTypeVisibility, ITEM_DATA_TYPE_HEXADECIMAL, 'row_units');
 
-		$mltpbox = Array();
+		$mltpbox = array();
 		if($limited){
 			$frmItem->addVar('multiplier', $multiplier);
 
@@ -1999,12 +1985,6 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'row_multiplier');
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'multiplier');
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_multiplier');
-		zbx_subarray_push($dataTypeVisibility, ITEM_DATA_TYPE_OCTAL, 'multiplier');
-		zbx_subarray_push($dataTypeVisibility, ITEM_DATA_TYPE_OCTAL, 'row_multiplier');
-		zbx_subarray_push($dataTypeVisibility, ITEM_DATA_TYPE_DECIMAL, 'multiplier');
-		zbx_subarray_push($dataTypeVisibility, ITEM_DATA_TYPE_DECIMAL, 'row_multiplier');
-		zbx_subarray_push($dataTypeVisibility, ITEM_DATA_TYPE_HEXADECIMAL, 'multiplier');
-		zbx_subarray_push($dataTypeVisibility, ITEM_DATA_TYPE_HEXADECIMAL, 'row_multiplier');
 
 
 		$row = new CRow(array(new CCol(S_UPDATE_INTERVAL_IN_SEC,'form_row_l'), new CCol(new CNumericBox('delay',$delay,5),'form_row_r')));
@@ -2077,12 +2057,6 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'row_delta');
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'delta');
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_delta');
-		zbx_subarray_push($dataTypeVisibility, ITEM_DATA_TYPE_OCTAL, 'delta');
-		zbx_subarray_push($dataTypeVisibility, ITEM_DATA_TYPE_OCTAL, 'row_delta');
-		zbx_subarray_push($dataTypeVisibility, ITEM_DATA_TYPE_DECIMAL, 'delta');
-		zbx_subarray_push($dataTypeVisibility, ITEM_DATA_TYPE_DECIMAL, 'row_delta');
-		zbx_subarray_push($dataTypeVisibility, ITEM_DATA_TYPE_HEXADECIMAL, 'delta');
-		zbx_subarray_push($dataTypeVisibility, ITEM_DATA_TYPE_HEXADECIMAL, 'row_delta');
 
 		if($limited){
 			$frmItem->addVar('valuemapid', $valuemapid);
@@ -2189,7 +2163,6 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		}
 
 		zbx_add_post_js("var valueTypeSwitcher = new CViewSwitcher('value_type', 'change', ".zbx_jsvalue($valueTypeVisibility, true).");");
-		zbx_add_post_js("var dataTypeSwitcher = new CViewSwitcher('data_type', 'change', ".zbx_jsvalue($dataTypeVisibility, true).");");
 		zbx_add_post_js("var authTypeSwitcher = new CViewSwitcher('authtype', 'change', ".zbx_jsvalue($authTypeVisibility, true).");");
 		zbx_add_post_js("var typeSwitcher = new CViewSwitcher('type', 'change', ".zbx_jsvalue($typeVisibility, true).(isset($_REQUEST['itemid'])? ', true': '').');');
 		zbx_add_post_js("var securityLevelSwitcher = new CViewSwitcher('snmpv3_securitylevel', 'change', ".zbx_jsvalue($securityLevelVisibility, true).");");
@@ -2330,11 +2303,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			S_TYPE_OF_INFORMATION), $cmbValType);
 
 		$cmbDataType = new CComboBox('data_type',$data_type);
-		$cmbDataType->addItem(ITEM_DATA_TYPE_BOOLEAN, 	item_data_type2str(ITEM_DATA_TYPE_BOOLEAN));
-		$cmbDataType->addItem(ITEM_DATA_TYPE_OCTAL,		item_data_type2str(ITEM_DATA_TYPE_OCTAL));
-		$cmbDataType->addItem(ITEM_DATA_TYPE_DECIMAL,		item_data_type2str(ITEM_DATA_TYPE_DECIMAL));
-		$cmbDataType->addItem(ITEM_DATA_TYPE_HEXADECIMAL, 	item_data_type2str(ITEM_DATA_TYPE_HEXADECIMAL));
-
+		$cmbDataType->addItems(item_data_type2str());
 		$frmItem->addRow(array( new CVisibilityBox('data_type_visible', get_request('data_type_visible'), 'data_type', S_ORIGINAL),
 			S_DATA_TYPE), $cmbDataType);
 
