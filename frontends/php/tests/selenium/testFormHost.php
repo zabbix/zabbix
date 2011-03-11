@@ -258,12 +258,6 @@ class testFormHost extends CWebTest{
 // should check that items, triggers, graphs and applications exist on the host and are linked to the template
 // currently doing something very brutal - just looking whether Template_Linux is present on entity pages
 
-// should also test that items that should have interfaceid don't have it set to NULL
-// something like :
-// select itemid from items where interfaceid is NULL and type not in (2,5,7,8,9,15); (only for enabled/disabled hosts)
-// should return nothing
-// not in ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_CALCULATED, ITEM_TYPE_HTTPTEST
-
 		$this->href_click("items.php?filter_set=1&hostid=10017&sid=");
 		$this->wait();
 		$this->ok("$template:");
@@ -278,6 +272,12 @@ class testFormHost extends CWebTest{
 		$this->href_click("applications.php?hostid=10017&sid=");
 		$this->wait();
 		$this->ok("$template:");
+
+		// tests that items that should have interfaceid don't have it set to NULL
+		// checks all items on enabled and disabled hosts (types 0 and 1) except:
+		// ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_CALCULATED, ITEM_TYPE_HTTPTEST
+		// if any found, something's wrong
+		$this->assertEquals(0,DBcount("select itemid from items left join hosts on items.hostid=hosts.hostid where hosts.status in (0,1) and interfaceid is NULL and type not in (2,5,7,8,9,15);"),"Chuck Norris: There are items with interfaceid NULL not of types 2, 5, 7, 8, 9, 15");
 
 	}
 }
