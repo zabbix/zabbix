@@ -84,6 +84,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	int		i;
 	ZBX_FPING_HOST	*host;
 	double		sec;
+	int 		ret = NOTSUPPORTED;
 
 #ifdef HAVE_IPV6
 	int		family;
@@ -102,7 +103,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	{
 #ifndef HAVE_IPV6
 		zbx_snprintf(error, max_error_len, "%s: [%d] %s", CONFIG_FPING_LOCATION, errno, strerror(errno));
-		return NOTSUPPORTED;
+		return ret;
 #endif	/* HAVE_IPV6 */
 	}
 	else
@@ -116,7 +117,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 			{
 				zbx_snprintf(error, max_error_len,
 					"You should enable IPv6 support to use IPv6 family address for SourceIP '%s'.", CONFIG_SOURCE_IP);
-				return NOTSUPPORTED;
+				return ret;
 			}
 		}
 #endif	/* HAVE_IPV6 */
@@ -130,7 +131,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 			zbx_snprintf(error, max_error_len, "At least one of '%s', '%s' must exist. Both are missing in the system.",
 					CONFIG_FPING_LOCATION,
 					CONFIG_FPING6_LOCATION);
-			return NOTSUPPORTED;
+			return ret;
 		}
 	}
 	else
@@ -175,14 +176,13 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 #endif	/* HAVE_IPV6 */
 	}
 
-	zbx_snprintf(filename, sizeof(filename), "%s/zabbix_server_%li.pinger",
-			CONFIG_TMPDIR, zbx_get_thread_id());
+	zbx_snprintf(filename, sizeof(filename), "%s/%s_%li.pinger", CONFIG_TMPDIR, progname, zbx_get_thread_id());
 
 #ifdef HAVE_IPV6
 	if (NULL != CONFIG_SOURCE_IP)
 	{
 		if (SUCCEED != get_address_family(CONFIG_SOURCE_IP, &family, error, max_error_len))
-			return NOTSUPPORTED;
+			return ret;
 
 		if (family == PF_INET)
 		{
@@ -190,7 +190,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 			{
 				zbx_snprintf(error, max_error_len, "File '%s' cannot be found in the system.",
 						CONFIG_FPING_LOCATION);
-				return NOTSUPPORTED;
+				return ret;
 			}
 
 			zbx_snprintf(tmp, sizeof(tmp), "%s %s 2>&1 <%s", CONFIG_FPING_LOCATION, params, filename);
@@ -201,7 +201,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 			{
 				zbx_snprintf(error, max_error_len, "File '%s' cannot be found in the system.",
 						CONFIG_FPING6_LOCATION);
-				return NOTSUPPORTED;
+				return ret;
 			}
 
 			zbx_snprintf(tmp, sizeof(tmp), "%s %s 2>&1 <%s", CONFIG_FPING6_LOCATION, params6, filename);
@@ -224,7 +224,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	if (NULL == (f = fopen(filename, "w")))
 	{
 		zbx_snprintf(error, max_error_len, "%s: [%d] %s", filename, errno, strerror(errno));
-		return NOTSUPPORTED;
+		return ret;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s", filename);
@@ -245,74 +245,86 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 		unlink(filename);
 
-		return NOTSUPPORTED;
+		return ret;
 	}
 
-	while (NULL != fgets(tmp, sizeof(tmp), f))
+	if (NULL == fgets(tmp, sizeof(tmp), f))
 	{
-		zbx_rtrim(tmp, "\n");
-		zabbix_log(LOG_LEVEL_DEBUG, "Update IP [%s]", tmp);
-
-		host = NULL;
-
-		if (NULL != (c = strchr(tmp, ' ')))
-		{
-			*c = '\0';
-			for (i = 0; i < hosts_count; i++)
-				if (0 == strcmp(tmp, hosts[i].addr))
-				{
-					host = &hosts[i];
-					break;
-				}
-			*c = ' ';
-		}
-
-		if (NULL == host)
-			continue;
-
-		if (NULL == (c = strstr(tmp, " : ")))
-			continue;
-
-		/* when NIC bonding is used, there are also lines like */
-		/* 192.168.1.2 : duplicate for [0], 96 bytes, 0.19 ms */
-
-		if (NULL != strstr(tmp, "duplicate for"))
-			continue;
-
-		c += 3;
-
+		ret = SUCCEED; /* fping does not output anything for DNS names that fail to resolve */
+	}
+	else
+	{
 		do
 		{
-			if (NULL != (c2 = strchr(c, ' ')))
-				*c2 = '\0';
+			zbx_rtrim(tmp, "\n");
+			zabbix_log(LOG_LEVEL_DEBUG, "read line [%s]", tmp);
 
-			if (0 != strcmp(c, "-"))
+			host = NULL;
+
+			if (NULL != (c = strchr(tmp, ' ')))
 			{
-				/* Convert ms to seconds */
-				sec = atof(c) / 1000;
-
-				if (host->rcv == 0 || host->min > sec)
-					host->min = sec;
-				if (host->rcv == 0 || host->max < sec)
-					host->max = sec;
-				host->avg = (host->avg * host->rcv + sec) / (host->rcv + 1);
-				host->rcv++;
+				*c = '\0';
+				for (i = 0; i < hosts_count; i++)
+					if (0 == strcmp(tmp, hosts[i].addr))
+					{
+						host = &hosts[i];
+						break;
+					}
+				*c = ' ';
 			}
 
-			host->cnt++;
+			if (NULL == host)
+				continue;
 
-			if (NULL != c2)
-				*c2++ = ' ';
+			if (NULL == (c = strstr(tmp, " : ")))
+				continue;
+
+			/* when NIC bonding is used, there are also lines like */
+			/* 192.168.1.2 : duplicate for [0], 96 bytes, 0.19 ms */
+
+			if (NULL != strstr(tmp, "duplicate for"))
+				continue;
+
+			c += 3;
+
+			do
+			{
+				if (NULL != (c2 = strchr(c, ' ')))
+					*c2 = '\0';
+
+				if (0 != strcmp(c, "-"))
+				{
+					sec = atof(c) / 1000; /* convert ms to seconds */
+
+					if (host->rcv == 0 || host->min > sec)
+						host->min = sec;
+					if (host->rcv == 0 || host->max < sec)
+						host->max = sec;
+					host->avg = (host->avg * host->rcv + sec) / (host->rcv + 1);
+					host->rcv++;
+				}
+
+				host->cnt++;
+
+				if (NULL != c2)
+					*c2++ = ' ';
+			}
+			while (NULL != (c = c2));
+
+			ret = SUCCEED;
 		}
-		while (NULL != (c = c2));
+		while (NULL != fgets(tmp, sizeof(tmp), f));
 	}
 	pclose(f);
 
 	unlink(filename);
 
+	if (NOTSUPPORTED == ret)
+		zbx_snprintf(error, max_error_len, "fping failed: \"%s\"", tmp);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
-	return SUCCEED;
+	return ret;
 }
 
 /******************************************************************************
@@ -323,8 +335,8 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value: => 0 - successfully processed items                          *
- *               FAIL - otherwise                                             *
+ * Return value: SUCCEED - successfully processed hosts                       *
+ *               NOTSUPPORTED - otherwise                                     *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *

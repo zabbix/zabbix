@@ -66,8 +66,8 @@ ZBX_METRIC	parameters_common[] =
 	{"vfs.file.md5sum",	CF_USEUPARAM,	VFS_FILE_MD5SUM,	0,	VFS_TEST_FILE},
 	{"vfs.file.cksum",	CF_USEUPARAM,	VFS_FILE_CKSUM,		0,	VFS_TEST_FILE},
 
-	{"net.tcp.dns",		CF_USEUPARAM,	NET_TCP_DNS,		0,	",localhost"},
-	{"net.tcp.dns.query",	CF_USEUPARAM,	NET_TCP_DNS_QUERY,	0,	",localhost"},
+	{"net.tcp.dns",		CF_USEUPARAM,	NET_TCP_DNS,		0,	",zabbix.com"},
+	{"net.tcp.dns.query",	CF_USEUPARAM,	NET_TCP_DNS_QUERY,	0,	",zabbix.com"},
 	{"net.tcp.port",	CF_USEUPARAM,	NET_TCP_PORT,		0,	",80"},
 
 	{"system.hostname",	0,		SYSTEM_HOSTNAME,	0,	0},
