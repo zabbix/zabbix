@@ -175,37 +175,48 @@ class testFormHost extends CWebTest{
 		$this->ok('Host deleted');
 	}
 
+//	public function testFormHost_TemplateUnlinkAndClear(){
+		// WARNING: not tested yet
+		// clicks button named "Unlink and clear" next to template named $template
+//		$this->click("xpath=//div[text()='$template']/../div[@class='dd']/input[@value='Unlink']/../input[@value='Unlink and clear']");
+//	}
+
 	public function testFormHost_TemplateUnlink(){
 		// Unlink a template from a host from host properties page
+
+		$template = "Template_Linux";
+
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid','all');
 		$this->click('link=Zabbix server');
 		$this->wait();
 		$this->tab_switch("Templates");
-		$this->ok('Template_Linux');
-		$this->template_unlink("Template_Linux");
-//		$this->button_click('unlink[10001]');
+		$this->ok("$template");
+		// clicks button named "Unlink" next to a template by name
+		$this->click("xpath=//div[text()='$template']/../div[@class='dd']/input[@value='Unlink']");
 
 		$this->wait();
-		$this->nok('Template_Linux');
+		$this->nok("$template");
 		$this->button_click('save');
 		$this->wait();
 		$this->assertTitle('Hosts');
 		$this->ok('Host updated');
+
+		// this should be a separate test
 		// should check that items, triggers, graphs and applications are not linked to the template anymore
 		$this->href_click("items.php?filter_set=1&hostid=10017&sid=");
 		$this->wait();
-		$this->nok('Template_Linux');
+		$this->nok("$template");
 		// using "host navigation bar" at the top of entity list
 		$this->href_click("triggers.php?hostid=10017&sid=");
 		$this->wait();
-		$this->nok('Template_Linux');
+		$this->nok("$template");
 		$this->href_click("graphs.php?hostid=10017&sid=");
 		$this->wait();
-		$this->nok('Template_Linux');
+		$this->nok("$template");
 		$this->href_click("applications.php?hostid=10017&sid=");
 		$this->wait();
-		$this->nok('Template_Linux');
+		$this->nok("$template");
 	}
 
 	public function testFormHost_TemplateLink(){
@@ -217,7 +228,25 @@ class testFormHost extends CWebTest{
 		$this->tab_switch("Templates");
 		$this->nok('Template_Linux');
 
-		$this->template_link('Template_Linux');
+		$template = "Template_Linux";
+
+		// adds template $template to the list of linked template list
+		// for now, ignores the fact that template might be already linked
+//		$this->button_click('add');
+		// the above does not seem to work, thus this ugly method has to be used - at least until buttons get unique names...
+		$this->click("//input[@id='add' and @name='add' and @value='Add' and @type='button' and contains(@onclick, 'return PopUp')]");
+
+		// zbx_popup is the default opened window id if none is passed
+		$this->waitForPopUp('zbx_popup',6000);
+		$this->selectWindow('zbx_popup');
+		$this->checkFatalErrors();
+
+		$this->dropdown_select_wait('groupid','Templates');
+		$this->check("//input[@value='$template' and @type='checkbox']");
+		$this->button_click('select');
+
+		$this->selectWindow();
+		$this->wait();
 
 		$this->button_click('save');
 		$this->wait();
@@ -237,18 +266,18 @@ class testFormHost extends CWebTest{
 
 		$this->href_click("items.php?filter_set=1&hostid=10017&sid=");
 		$this->wait();
-		$this->ok('Template_Linux:');
+		$this->ok("$template:");
 		// using "host navigation bar" at the top of entity list
 		$this->href_click("triggers.php?hostid=10017&sid=");
 		$this->wait();
-		$this->ok('Template_Linux:');
-//		default data.sql has a problem - graphs are not properly linked to the template
+		$this->ok("$template:");
+//		default data.sql has a problem - graphs are not present in the template
 //		$this->href_click("graphs.php?hostid=10017&sid=");
 //		$this->wait();
-//		$this->ok('Template_Linux:');
+//		$this->ok("$template:");
 		$this->href_click("applications.php?hostid=10017&sid=");
 		$this->wait();
-		$this->ok('Template_Linux:');
+		$this->ok("$template:");
 
 	}
 }
