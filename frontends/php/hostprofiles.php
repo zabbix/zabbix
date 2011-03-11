@@ -82,11 +82,11 @@ else{
 		is_show_all_nodes() ? make_sorting_header(_('Node'), 'hostid') : null,
 		make_sorting_header(_('Host'), 'host'),
 		_('Group'),
-		make_sorting_header(S_NAME, 'pr_name'),
-		make_sorting_header(S_OS, 'pr_os'),
-		make_sorting_header(S_SERIALNO, 'pr_serialno'),
-		make_sorting_header(S_TAG, 'pr_tag'),
-		make_sorting_header(S_MACADDRESS, 'pr_macaddress'))
+		make_sorting_header(_('Name'), 'pr_name'),
+		make_sorting_header(_('OS'), 'pr_os'),
+		make_sorting_header(_('Serial number A'), 'pr_serialno_a'),
+		make_sorting_header(_('Tag'), 'pr_tag'),
+		make_sorting_header(_('MAC address A'), 'pr_macaddress_a'))
 	);
 
 
@@ -107,9 +107,9 @@ else{
 		foreach($hosts as $num => $host){
 			$hosts[$num]['pr_name'] = $host['profile']['name'];
 			$hosts[$num]['pr_os'] = $host['profile']['os'];
-			$hosts[$num]['pr_serialno'] = $host['profile']['serialno'];
+			$hosts[$num]['pr_serialno_a'] = $host['profile']['serialno_a'];
 			$hosts[$num]['pr_tag'] = $host['profile']['tag'];
-			$hosts[$num]['pr_macaddress'] = $host['profile']['macaddress'];
+			$hosts[$num]['pr_macaddress_a'] = $host['profile']['macaddress_a'];
 		}
 
 		order_result($hosts, getPageSortField('host'), getPageSortOrder());
@@ -129,9 +129,9 @@ else{
 				$host_groups,
 				zbx_str2links($host['profile']['name']),
 				zbx_str2links($host['profile']['os']),
-				zbx_str2links($host['profile']['serialno']),
+				zbx_str2links($host['profile']['serialno_a']),
 				zbx_str2links($host['profile']['tag']),
-				zbx_str2links($host['profile']['macaddress']),
+				zbx_str2links($host['profile']['macaddress_a']),
 			);
 
 			$table->addRow($row);
