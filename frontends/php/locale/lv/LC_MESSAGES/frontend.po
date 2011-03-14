@@ -3,14 +3,15 @@ msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-02-18 17:33+0200\n"
-"PO-Revision-Date: 2011-02-14 17:16+0200\n"
-"Last-Translator: richlv <richlv@nakts.net>\n"
+"PO-Revision-Date: 2011-03-14 10:49+0200\n"
+"Last-Translator: Aleksandrs <Aleksandrs.Saveljevs@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
+"Language: lv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: lv\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : "
+"2);\n"
 "X-Generator: Pootle 2.1.4\n"
 "X-Poedit-Basepath: ../../\n"
 
@@ -29,23 +30,23 @@ msgstr ""
 #: chart4.php:87 chart5.php:90
 #, php-format
 msgid "%1$s (year %2$s)"
-msgstr ""
+msgstr "%1$s (%2$s. gads)"
 
 #: discovery.php:242
 #, php-format
 msgid "%d device"
 msgid_plural "%d devices"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%d iekārta"
+msgstr[1] "%d iekārtas"
+msgstr[2] "%d iekārtu"
 
 #: include/locales/en_gb.inc.php:378
 msgid "&"
-msgstr ""
+msgstr "un"
 
 #: include/locales/en_gb.inc.php:1951
 msgid "'"
-msgstr ""
+msgstr "'"
 
 #: include/locales/en_gb.inc.php:2127
 msgid "' does not accept parameters."
@@ -53,15 +54,15 @@ msgstr "' nepieņem parametrus"
 
 #: include/forms/action.edit.php:455
 msgid "(0 - infinitely)"
-msgstr ""
+msgstr "(0 - bezgalīgi)"
 
 #: include/forms/action.edit.php:462
 msgid "(minimum 60 seconds, 0 - use action default)"
-msgstr ""
+msgstr "(ne mazāk par 60 sekundēm, 0 - izmantot darbības noklusēto vērtību)"
 
 #: include/locales/en_gb.inc.php:108
 msgid "(no proxy)"
-msgstr ""
+msgstr "(bez starpniekmezgla)"
 
 #: include/locales/en_gb.inc.php:214
 msgid "(select host first)"
@@ -69,11 +70,11 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:606
 msgid "- other -"
-msgstr ""
+msgstr "- citi -"
 
 #: include/locales/en_gb.inc.php:287
 msgid "----[BULK ACKNOWLEDGE]----"
-msgstr ""
+msgstr "----[MASVEIDA APSTIPRINĀJUMS]----"
 
 #: include/locales/en_gb.inc.php:2122
 msgid "0 or 1"
@@ -89,7 +90,7 @@ msgstr "10 sekundes"
 
 #: include/locales/en_gb.inc.php:1342
 msgid "15 min"
-msgstr ""
+msgstr "15 min"
 
 #: include/locales/en_gb.inc.php:1352
 msgid "30 seconds"
@@ -97,11 +98,11 @@ msgstr "30 sekundes"
 
 #: include/locales/en_gb.inc.php:676
 msgid "3D view"
-msgstr ""
+msgstr "3D skats"
 
 #: include/locales/en_gb.inc.php:1341
 msgid "5 min"
-msgstr ""
+msgstr "5 min"
 
 #: include/locales/en_gb.inc.php:1354
 msgid "5 minutes"
@@ -113,15 +114,15 @@ msgstr "5 sekundes"
 
 #: include/locales/en_gb.inc.php:692
 msgid "500 latest values"
-msgstr ""
+msgstr "500 jaunākās vērtības"
 
 #: include/locales/en_gb.inc.php:346
 msgid "ACTIONS"
-msgstr ""
+msgstr "DARBĪBAS"
 
 #: include/locales/en_gb.inc.php:284
 msgid "ALARM ACKNOWLEDGES"
-msgstr ""
+msgstr "TRAUKSMES APSTIPRINĀJUMI"
 
 #: include/locales/en_gb.inc.php:376
 msgid "AND"
@@ -137,7 +138,7 @@ msgstr "API pieeja"
 
 #: include/locales/en_gb.inc.php:1768
 msgid "API access updated"
-msgstr ""
+msgstr "API pieeja atjaunota"
 
 #: include/locales/en_gb.inc.php:820
 msgid "APPLICATIONS"
@@ -166,11 +167,11 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1723
 msgid "Ack"
-msgstr ""
+msgstr "Apst"
 
 #: include/locales/en_gb.inc.php:280
 msgid "Acknowledge"
-msgstr ""
+msgstr "Apstiprinājums"
 
 #: include/locales/en_gb.inc.php:285
 msgid "Acknowledge added"
@@ -178,44 +179,46 @@ msgstr "Apstiprinājums pievienots"
 
 #: include/locales/en_gb.inc.php:282
 msgid "Acknowledge alarm by"
-msgstr ""
+msgstr "Apstiprināt trauksmi zem"
 
 #: include/locales/en_gb.inc.php:1726
 msgid "Acknowledge status"
-msgstr ""
+msgstr "Apstiprinājuma stāvoklis"
 
 #: include/locales/en_gb.inc.php:1722
 msgid "Acknowledged"
-msgstr ""
+msgstr "Apstiprināts"
 
 #: include/locales/en_gb.inc.php:279
 msgid "Acknowledges"
-msgstr ""
+msgstr "Apstiprinājumi"
 
 #: include/forms/sysmap.edit.php:135
 msgid "Acknowledging disabled"
-msgstr ""
+msgstr "Apstiprināšana atspējota"
 
 #: include/forms/action.edit.php:347 include/forms/action.edit.php:350
 #: include/locales/en_gb.inc.php:1861
 msgid "Action"
-msgstr ""
+msgstr "Darbība"
 
 #: api/classes/class.caction.php:704 api/classes/class.caction.php:717
 #: api/classes/class.caction.php:807 api/classes/class.caction.php:826
 #, php-format
 msgid "Action \"%s\" already exists."
-msgstr ""
+msgstr "Darbība \"%s\" jau eksistē."
 
 #: api/classes/class.caction.php:701 api/classes/class.caction.php:801
 #, php-format
 msgid "Action \"%s\" has incorrect value for \"esc_period\" (minimum 60 seconds)."
 msgstr ""
+"Darbībai \"%s\" ir nepareiza vērtība priekš \"esc_period\" (minimālā vērtība - "
+"60 sekundes)."
 
 #: api/classes/class.caction.php:856
 #, php-format
 msgid "Action \"%s\" no operations defined."
-msgstr ""
+msgstr "Darbībai \"%s\" nav definētas operācijas."
 
 #: include/locales/en_gb.inc.php:349
 msgid "Action added"
@@ -2817,7 +2820,7 @@ msgstr "Eksa"
 
 #: include/locales/en_gb.inc.php:1966
 msgid "Exclude"
-msgstr "Neikļaut"
+msgstr "Neiekļaut"
 
 #: include/templates/scriptConfirm.js.php:35
 #: include/templates/script.js.php:40
@@ -2923,7 +2926,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:117
 msgid "FTP"
-msgstr ""
+msgstr "FTP"
 
 #: include/locales/en_gb.inc.php:245
 msgid "Fail"
@@ -3419,22 +3422,22 @@ msgstr ""
 #: include/locales/en_gb.inc.php:855 include/locales/en_gb.inc.php:2084
 #: include/templates/action.js.php:99 include/templates/action.js.php:188
 msgid "Host"
-msgstr ""
+msgstr "Mezgls"
 
 #: include/actions.inc.php:370
 #, php-format
 msgid "Host \"%1$s\": "
-msgstr ""
+msgstr "Mezgls \"%1$s\": "
 
 #: api/classes/class.cproxy.php:367
 #, php-format
 msgid "Host \"%s\" already exists."
-msgstr ""
+msgstr "Mezgls \"%s\" jau eksistē."
 
 #: api/classes/class.chost.php:2127
 #, php-format
 msgid "Host \"%s\" deleted."
-msgstr ""
+msgstr "Mezgls \"%s\" izdzēsts."
 
 #: include/export.inc.php:874
 #, php-format
@@ -3447,11 +3450,11 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:89
 msgid "Host IP"
-msgstr ""
+msgstr "Mezgla IP"
 
 #: include/locales/en_gb.inc.php:983
 msgid "Host MAC Address"
-msgstr ""
+msgstr "Mezgla MAC Adrese"
 
 #: include/locales/en_gb.inc.php:982
 msgid "Host Router"
@@ -3554,19 +3557,19 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:829
 msgid "Hosts"
-msgstr ""
+msgstr "Mezgli"
 
 #: include/locales/en_gb.inc.php:1377
 msgid "Hosts (m/n/t)"
-msgstr ""
+msgstr "Mezgli (u/n/š)"
 
 #: include/locales/en_gb.inc.php:1935
 msgid "Hosts and templates"
-msgstr ""
+msgstr "Mezgli un šabloni"
 
 #: include/locales/en_gb.inc.php:728
 msgid "Hosts in maintenance"
-msgstr ""
+msgstr "Mezgli uzturēšanā"
 
 #: include/locales/en_gb.inc.php:1537
 msgid "Hosts info"
@@ -3631,7 +3634,7 @@ msgstr "IP apgabals"
 
 #: include/locales/en_gb.inc.php:804
 msgid "IPMI"
-msgstr ""
+msgstr "IPMI"
 
 #: include/locales/en_gb.inc.php:1057
 msgid "IPMI agent"
@@ -7504,7 +7507,7 @@ msgstr "O"
 
 #: include/locales/en_gb.inc.php:122
 msgid "TCP"
-msgstr ""
+msgstr "TCP"
 
 #: include/locales/en_gb.inc.php:1059
 msgid "TELNET agent"
@@ -7558,24 +7561,24 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:862
 msgid "Template"
-msgstr ""
+msgstr "Šablons"
 
 #: api/classes/class.ctemplate.php:1228
 #, php-format
 msgid "Template [%1$s] deleted."
-msgstr ""
+msgstr "Šablons [%1$s] izdzēsts."
 
 #: include/locales/en_gb.inc.php:923
 msgid "Template deleted"
-msgstr ""
+msgstr "Šablons izdzēsts"
 
 #: include/locales/en_gb.inc.php:946
 msgid "Template linkage"
-msgstr ""
+msgstr "Šablonu saistīšana"
 
 #: include/locales/en_gb.inc.php:919
 msgid "Template updated"
-msgstr ""
+msgstr "Šablons atjaunots"
 
 #: include/locales/en_gb.inc.php:2082
 msgid "Template with application"
@@ -7595,7 +7598,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:947
 msgid "Templates"
-msgstr ""
+msgstr "Šabloni"
 
 #: api/classes/class.ctemplate.php:2081
 #, php-format
@@ -7692,7 +7695,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:50 include/locales/en_gb.inc.php:1627
 msgid "Thursday"
-msgstr "Cetrutdiena"
+msgstr "Ceturtdiena"
 
 #: include/locales/en_gb.inc.php:1406
 msgid "Till"
@@ -7736,7 +7739,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1407
 msgid "To"
-msgstr ""
+msgstr "Līdz"
 
 #: include/locales/en_gb.inc.php:1636
 msgid "Today"
@@ -8781,7 +8784,7 @@ msgstr ""
 #: include/locales/en_gb.inc.php:2247 include/locales/en_gb.inc.php:2264
 #: include/locales/en_gb.inc.php:2266
 msgid "]"
-msgstr ""
+msgstr "]"
 
 #: include/locales/en_gb.inc.php:2241
 msgid "] already exists"
@@ -9289,11 +9292,11 @@ msgstr "veiksmīgs"
 
 #: include/locales/en_gb.inc.php:231
 msgid "successfully"
-msgstr ""
+msgstr "veiksmīgi"
 
 #: include/locales/en_gb.inc.php:165
 msgid "to"
-msgstr ""
+msgstr "līdz"
 
 #: include/locales/en_gb.inc.php:2119
 msgid "to host"
@@ -9349,7 +9352,7 @@ msgstr "jā"
 
 #: include/locales/en_gb.inc.php:2016
 msgid "µ"
-msgstr ""
+msgstr "µ"
 
 #~ msgid "Last failed attempt was from"
 #~ msgstr "Pēdējais kļūdainais mēģinājums bija no"
