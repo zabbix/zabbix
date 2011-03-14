@@ -14,12 +14,22 @@ CREATE TEMPORARY TABLE _operations (
 	mediatypeid		bigint unsigned
 );
 
+CREATE TEMPORARY TABLE _opconditions (
+	operationid		bigint unsigned,
+	conditiontype		integer,
+	operator		integer,
+	value			varchar(255)
+);
+
 INSERT INTO _operations
 	SELECT o.operationid, o.actionid, o.operationtype, o.object, o.objectid, o.shortdata, o.longdata,
 			o.esc_period, o.esc_step_from, o.esc_step_to, o.default_msg, o.evaltype, omt.mediatypeid
 		FROM actions a, operations o
 			LEFT JOIN opmediatypes omt ON omt.operationid=o.operationid
 		WHERE a.actionid=o.actionid;
+
+INSERT INTO _opconditions
+	SELECT operationid, conditiontype, operator, value FROM opconditions;
 
 UPDATE _operations
 	SET mediatypeid = NULL
@@ -47,6 +57,7 @@ DELETE FROM _operations
 
 DROP TABLE operations;
 DROP TABLE opmediatypes;
+DROP TABLE opconditions;
 
 CREATE TABLE operations (
 	operationid              bigint unsigned                           NOT NULL,
@@ -149,10 +160,20 @@ CREATE UNIQUE INDEX optemplate_1 ON optemplate (operationid,templateid);
 ALTER TABLE optemplate ADD CONSTRAINT c_optemplate_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE;
 ALTER TABLE optemplate ADD CONSTRAINT c_optemplate_2 FOREIGN KEY (templateid) REFERENCES hosts (hostid);
 
--- DROP PROCEDURE IF EXISTS zbx_convert_operations;
+CREATE TABLE opconditions (
+	opconditionid            bigint unsigned                           NOT NULL,
+	operationid              bigint unsigned                           NOT NULL,
+	conditiontype            integer         DEFAULT '0'               NOT NULL,
+	operator                 integer         DEFAULT '0'               NOT NULL,
+	value                    varchar(255)    DEFAULT ''                NOT NULL,
+	PRIMARY KEY (opconditionid)
+) ENGINE=InnoDB;
+CREATE INDEX opconditions_1 ON opconditions (operationid);
+ALTER TABLE opconditions ADD CONSTRAINT c_opconditions_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE;
 
 DELIMITER $
-CREATE PROCEDURE zbx_convert_operations ()
+CREATE PROCEDURE zbx_convert_operations()
+LANGUAGE SQL
 BEGIN
 	DECLARE _nodeid integer;
 	DECLARE minid, maxid bigint unsigned;
@@ -185,6 +206,7 @@ BEGIN
 		SET new_optemplateid = minid;
 		SET new_opcommand_hstid = minid;
 		SET new_opcommand_grpid = minid;
+		SET @new_opconditionid = minid;
 
 		BEGIN
 			DECLARE _operationid bigint unsigned;
@@ -216,7 +238,8 @@ BEGIN
 
 			o_loop: LOOP
 				FETCH o_cur INTO _operationid, _actionid, _operationtype, _esc_period, _esc_step_from,
-						_esc_step_to, _evaltype, _default_msg, _shortdata, _longdata, _mediatypeid, _object, _objectid;
+						_esc_step_to, _evaltype, _default_msg, _shortdata, _longdata, _mediatypeid,
+						_object, _objectid;
 
 				IF o_done THEN
 					LEAVE o_loop;
@@ -246,6 +269,12 @@ BEGIN
 						INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid)
 							VALUES (new_opmessage_grpid, new_operationid, _objectid);
 					END IF;
+
+					INSERT INTO opconditions
+						SELECT @new_opconditionid := @new_opconditionid + 1,
+								new_operationid, conditiontype, operator, value
+							FROM _opconditions
+							WHERE operationid = _operationid;
 				ELSEIF _operationtype IN (1) THEN		-- OPERATION_TYPE_COMMAND
 					SET r_pos = 1;
 					SET l_pos = 1;
@@ -271,6 +300,12 @@ BEGIN
 
 								INSERT INTO operations (operationid, actionid, operationtype)
 									VALUES (new_operationid, _actionid, _operationtype);
+
+								INSERT INTO opconditions
+									SELECT @new_opconditionid := @new_opconditionid + 1,												new_operationid, conditiontype,
+											operator, value
+										FROM _opconditions
+										WHERE operationid = _operationid;
 
 								IF h_pos <> 0 AND (g_pos = 0 OR h_pos < g_pos) THEN
 									INSERT INTO opcommand (operationid, command)
@@ -318,7 +353,6 @@ BEGIN
 											VALUES (new_opcommand_hstid, new_operationid, _groupid);
 									END IF;
 								END IF;
-
 							END IF;
 						END IF;
 
@@ -362,6 +396,7 @@ DELIMITER ;
 
 CALL zbx_convert_operations;
 
+DROP TABLE _operations;
 DROP PROCEDURE zbx_convert_operations;
 
 UPDATE opcommand
