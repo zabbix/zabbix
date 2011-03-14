@@ -1278,6 +1278,7 @@ function utf8RawUrlDecode($source){
 	}
 
 	function expand_trigger_description_by_data($row, $flag = ZBX_FLAG_TRIGGER){
+		$priorities = array( INTERFACE_TYPE_AGENT => 3, INTERFACE_TYPE_SNMP => 2, INTERFACE_TYPE_IPMI => 1);
 		if($row){
 			$description = expand_trigger_description_constants($row['description'], $row);
 
@@ -1305,14 +1306,31 @@ function utf8RawUrlDecode($source){
 					$functionid = trigger_get_N_functionid($row['expression'], $i ? $i : 1);
 
 					if(isset($functionid)) {
-						$sql = 'SELECT DISTINCT n.ip'.
+						$sql = 'SELECT DISTINCT n.ip, n.type'.
 								' FROM functions f,items i,interface n'.
 								' WHERE f.itemid=i.itemid'.
 									' AND i.hostid=n.hostid'.
 									' AND f.functionid='.$functionid;
-						$interface = DBfetch(DBselect($sql));
-						if(!is_null($interface['ip']))
-							$description = str_replace($macro, $interface['ip'], $description);
+						$db_interfaces = DBselect($sql);
+						$result = $macro;
+						$priority = 0;
+						while($interface = DBfetch($db_interfaces)) {
+							if ($priority >= $priorities[$interface['type']] || is_null($interface['ip']))
+								continue;
+							$priority = $priorities[$interface['type']];
+							switch($interface['type']){
+								case INTERFACE_TYPE_AGENT:
+									$result = $interface['ip'];
+								break;
+								case INTERFACE_TYPE_SNMP:
+									$result = $interface['ip'];
+								break;
+								case INTERFACE_TYPE_IPMI:
+									$result = $interface['ip'];
+								break;
+							}
+						}
+						$description = str_replace($macro, $result, $description);
 					}
 				}
 			}
@@ -1323,14 +1341,31 @@ function utf8RawUrlDecode($source){
 					$functionid = trigger_get_N_functionid($row['expression'], $i ? $i : 1);
 
 					if(isset($functionid)) {
-						$sql = 'SELECT DISTINCT n.dns'.
+						$sql = 'SELECT DISTINCT n.dns, n.type'.
 								' FROM functions f,items i,interface n'.
 								' WHERE f.itemid=i.itemid'.
 									' AND i.hostid=n.hostid'.
 									' AND f.functionid='.$functionid;
-						$interface = DBfetch(DBselect($sql));
-						if(!is_null($interface['dns']))
-							$description = str_replace($macro, $interface['dns'], $description);
+						$db_interfaces = DBselect($sql);
+						$result = $macro;
+						$priority = 0;
+						while($interface = DBfetch($db_interfaces)) {
+							if ($priority >= $priorities[$interface['type']] || is_null($interface['dns']))
+								continue;
+							$priority = $priorities[$interface['type']];
+							switch($interface['type']){
+								case INTERFACE_TYPE_AGENT:
+									$result = $interface['dns'];
+								break;
+								case INTERFACE_TYPE_SNMP:
+									$result = $interface['dns'];
+								break;
+								case INTERFACE_TYPE_IPMI:
+									$result = $interface['dns'];
+								break;
+							}
+						}
+						$description = str_replace($macro, $result, $description);
 					}
 				}
 			}
@@ -1341,14 +1376,31 @@ function utf8RawUrlDecode($source){
 					$functionid = trigger_get_N_functionid($row['expression'], $i ? $i : 1);
 
 					if(isset($functionid)) {
-						$sql = 'SELECT DISTINCT n.useip, n.ip, n.dns'.
+						$sql = 'SELECT DISTINCT n.useip, n.ip, n.dns, n.type'.
 								' FROM functions f,items i,interface n'.
 								' WHERE f.itemid=i.itemid'.
 									' AND i.hostid=n.hostid'.
 									' AND f.functionid='.$functionid;
-						$interface = DBfetch(DBselect($sql));
-						if(!is_null($interface['useip']))
-							$description = str_replace($macro, $interface['useip'] ? $interface['ip'] : $interface['dns'], $description);
+						$db_interfaces = DBselect($sql);
+						$result = $macro;
+						$priority = 0;
+						while($interface = DBfetch($db_interfaces)) {
+							if ($priority >= $priorities[$interface['type']])
+								continue;
+							$priority = $priorities[$interface['type']];
+							switch($interface['type']){
+								case INTERFACE_TYPE_AGENT:
+									$result = $interface['useip'] ? $interface['ip'] : $interface['dns'];
+								break;
+								case INTERFACE_TYPE_SNMP:
+									$result = $interface['useip'] ? $interface['ip'] : $interface['dns'];
+								break;
+								case INTERFACE_TYPE_IPMI:
+									$result = $interface['useip'] ? $interface['ip'] : $interface['dns'];
+								break;
+							}
+						}
+						$description = str_replace($macro, $result, $description);
 					}
 				}
 			}
