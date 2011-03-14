@@ -39,7 +39,7 @@ class testPageUsers extends CWebTest
 		$this->login('users.php');
 		$this->assertTitle('Users');
 
-		$this->dropdown_select('filter_usrgrpid','All');
+		$this->dropdown_select_wait('filter_usrgrpid','All');
 
 		$this->ok('CONFIGURATION OF USERS AND USER GROUPS');
 		$this->ok('Displaying');
@@ -77,7 +77,7 @@ class testPageUsers extends CWebTest
 
 		$this->login('users.php');
 		$this->assertTitle('Users');
-		$this->dropdown_select('filter_usrgrpid','All');
+		$this->dropdown_select_wait('filter_usrgrpid','All');
 
 		$this->click("link=$alias");
 		$this->wait();
@@ -113,7 +113,7 @@ class testPageUsers extends CWebTest
 
 			$this->login('users.php');
 			$this->assertTitle('Users');
-			$this->dropdown_select('filter_usrgrpid','All');
+			$this->dropdown_select_wait('filter_usrgrpid','All');
 
 			$this->checkbox_select("group_userid[$id]");
 			$this->dropdown_select('go','Delete selected');
@@ -149,7 +149,7 @@ class testPageUsers extends CWebTest
 
 			$this->login('users.php');
 			$this->assertTitle('Users');
-			$this->dropdown_select('filter_usrgrpid','All');
+			$this->dropdown_select_wait('filter_usrgrpid','All');
 
 			$this->checkbox_select("group_userid[$id]");
 			$this->dropdown_select('go','Delete selected');

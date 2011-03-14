@@ -21,22 +21,18 @@
 <?php
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageHosts extends CWebTest
-{
+class testPageHosts extends CWebTest{
 	// Returns all hosts
-	public static function allHosts()
-	{
+	public static function allHosts(){
 		return DBdata('select * from hosts where status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')');
 	}
 
 	/**
 	* @dataProvider allHosts
 	*/
-	public function testPageHosts_SimpleTest($host)
-	{
+	public function testPageHosts_SimpleTest($host){
 		$this->login('hosts.php');
-		$this->dropdown_select('groupid','Zabbix servers');
-//		$this->wait();
+		$this->dropdown_select_wait('groupid','Zabbix servers');
 		$this->assertTitle('Hosts');
 		$this->ok('CONFIGURATION OF HOSTS');
 		$this->ok('Displaying');
@@ -54,8 +50,7 @@ class testPageHosts extends CWebTest
 	/**
 	* @dataProvider allHosts
 	*/
-	public function testPageHosts_FilterHost($host)
-	{
+	public function testPageHosts_FilterHost($host){
 		$this->login('hosts.php');
 		$this->click('flicker_icon_l');
 		$this->input_type('filter_host',$host['host']);
@@ -67,8 +62,7 @@ class testPageHosts extends CWebTest
 	}
 
 	// Filter returns nothing
-	public function testPageHosts_FilterNone()
-	{
+	public function testPageHosts_FilterNone(){
 		$this->login('hosts.php');
 
 		// Reset filter
@@ -80,8 +74,7 @@ class testPageHosts extends CWebTest
 		$this->ok('Displaying 0 of 0 found');
 	}
 
-	public function testPageHosts_FilterNone1()
-	{
+	public function testPageHosts_FilterNone1(){
 		$this->login('hosts.php');
 
 		// Reset filter
@@ -93,8 +86,7 @@ class testPageHosts extends CWebTest
 		$this->ok('Displaying 0 of 0 found');
 	}
 
-	public function testPageHosts_FilterNone2()
-	{
+	public function testPageHosts_FilterNone2(){
 		$this->login('hosts.php');
 
 		// Reset filter
@@ -111,8 +103,7 @@ class testPageHosts extends CWebTest
 	/**
 	* @dataProvider allHosts
 	*/
-	public function testPageHosts_FilterReset($host)
-	{
+	public function testPageHosts_FilterReset($host){
 		$this->login('hosts.php');
 		$this->click('css=span.link_menu');
 		$this->click('filter');
@@ -123,13 +114,11 @@ class testPageHosts extends CWebTest
 	/**
 	* @dataProvider allHosts
 	*/
-	public function testPageHosts_Items($host)
-	{
+	public function testPageHosts_Items($host){
 		$hostid=$host['hostid'];
 
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid','all');
-//		$this->wait();
 		$this->assertTitle('Hosts');
 		$this->ok('CONFIGURATION OF HOSTS');
 		$this->ok('Displaying');
@@ -143,68 +132,57 @@ class testPageHosts extends CWebTest
 		$this->ok(array('Wizard','Description','Triggers','Key','Interval','History','Trends','Type','Status','Applications','Error'));
 	}
 
-	public function testPageHosts_MassExportAll()
-	{
+	public function testPageHosts_MassExportAll(){
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageHosts_MassExport()
-	{
+	public function testPageHosts_MassExport(){
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageHosts_MassUpdateAll()
-	{
+	public function testPageHosts_MassUpdateAll(){
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageHosts_MassUpdate()
-	{
+	public function testPageHosts_MassUpdate(){
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageHosts_MassActivateAll()
-	{
+	public function testPageHosts_MassActivateAll(){
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageHosts_MassActivate()
-	{
+	public function testPageHosts_MassActivate(){
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageHosts_MassDisableAll()
-	{
+	public function testPageHosts_MassDisableAll(){
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageHosts_MassDisable()
-	{
+	public function testPageHosts_MassDisable(){
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageHosts_MassDeleteAll()
-	{
+	public function testPageHosts_MassDeleteAll(){
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageHosts_MassDelete()
-	{
+	public function testPageHosts_MassDelete(){
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageHosts_Sorting()
-	{
+	public function testPageHosts_Sorting(){
 // TODO
 		$this->markTestIncomplete();
 	}

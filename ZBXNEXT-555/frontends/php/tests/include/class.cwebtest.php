@@ -66,7 +66,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 	{
 		global $DB;
 
-		$this->setHost('hudson');
+		$this->setHost(PHPUNIT_FRONTEND_HOST);
 		$this->setBrowser('*firefox');
 		if(strstr(PHPUNIT_URL,'http://'))
 		{
@@ -96,8 +96,8 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 		// Login if not logged in already
 		if($this->isElementPresent('id=password'))
 		{
-			$this->input_type('name','Admin');
-			$this->input_type('password','zabbix');
+			$this->input_type('name',PHPUNIT_LOGIN_NAME);
+			$this->input_type('password',PHPUNIT_LOGIN_PWD);
 			$this->click('enter');
 			$this->wait();
 		}
@@ -182,5 +182,19 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 		$this->waitForPageToLoad();
 		$this->checkFatalErrors();
 	}
+
+	public function tab_switch($tab){
+		// switches tab by receiving tab title text
+		$this->click("xpath=//div[@id='tabs']/ul/li/a[text()='$tab']");
+		$this->waitForElementPresent("xpath=//li[contains(@class, 'ui-tabs-selected')]/a[text()='$tab']");
+		$this->checkFatalErrors();
+	}
+
+	public function template_unlink_and_clear($template){
+		// WARNING: not tested yet
+		// clicks button named "Unlink and clear" next to template named $template
+		$this->click("xpath=//div[text()='$template']/../div[@class='dd']/input[@value='Unlink']/../input[@value='Unlink and clear']");
+	}
+
 }
 ?>
