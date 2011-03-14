@@ -352,7 +352,7 @@ BEGIN
 										SET new_opcommand_grpid = new_opcommand_grpid + 1;
 
 										INSERT INTO opcommand_grp
-											VALUES (new_opcommand_hstid, new_operationid, _groupid);
+											VALUES (new_opcommand_grpid, new_operationid, _groupid);
 									END IF;
 								END IF;
 							END IF;
@@ -399,6 +399,7 @@ DELIMITER ;
 CALL zbx_convert_operations;
 
 DROP TABLE _operations;
+DROP TABLE _opconditions;
 DROP PROCEDURE zbx_convert_operations;
 
 UPDATE opcommand
