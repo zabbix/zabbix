@@ -71,7 +71,7 @@ if($_REQUEST['hostid'] > 0){
 else{
 	$r_form = new CForm('get');
 	$r_form->addItem(array(_('Group'), $pageFilter->getGroupsCB(true)));
-	$hostprof_wdgt->addHeader(_('HOSTS PROFILES'), $r_form);
+	$hostprof_wdgt->addHeader(_('HOSTS'), $r_form);
 
 	$numrows = new CDiv();
 	$numrows->setAttribute('name', 'numrows');
@@ -83,6 +83,7 @@ else{
 		make_sorting_header(_('Host'), 'host'),
 		_('Group'),
 		make_sorting_header(_('Name'), 'pr_name'),
+		make_sorting_header(_('Type'), 'pr_type'),
 		make_sorting_header(_('OS'), 'pr_os'),
 		make_sorting_header(_('Serial number A'), 'pr_serialno_a'),
 		make_sorting_header(_('Tag'), 'pr_tag'),
@@ -106,6 +107,7 @@ else{
 // unset hosts without profiles, and copy some profile fields to the uppers array level for sorting
 		foreach($hosts as $num => $host){
 			$hosts[$num]['pr_name'] = $host['profile']['name'];
+			$hosts[$num]['pr_type'] = $host['profile']['type'];
 			$hosts[$num]['pr_os'] = $host['profile']['os'];
 			$hosts[$num]['pr_serialno_a'] = $host['profile']['serialno_a'];
 			$hosts[$num]['pr_tag'] = $host['profile']['tag'];
@@ -128,6 +130,7 @@ else{
 				new CLink($host['host'],'?hostid='.$host['hostid'].url_param('groupid')),
 				$host_groups,
 				zbx_str2links($host['profile']['name']),
+				zbx_str2links($host['profile']['type']),
 				zbx_str2links($host['profile']['os']),
 				zbx_str2links($host['profile']['serialno_a']),
 				zbx_str2links($host['profile']['tag']),
