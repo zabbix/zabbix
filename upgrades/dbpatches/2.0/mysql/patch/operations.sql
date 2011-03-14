@@ -298,8 +298,10 @@ BEGIN
 							IF h_pos <> 0 OR g_pos <> 0 THEN
 								SET new_operationid = new_operationid + 1;
 
-								INSERT INTO operations (operationid, actionid, operationtype)
-									VALUES (new_operationid, _actionid, _operationtype);
+								INSERT INTO operations (operationid, actionid, operationtype,
+										esc_period, esc_step_from, esc_step_to, evaltype)
+								VALUES (new_operationid, _actionid, _operationtype, _esc_period,
+										_esc_step_from, _esc_step_to, _evaltype);
 
 								INSERT INTO opconditions
 									SELECT @new_opconditionid := @new_opconditionid + 1,												new_operationid, conditiontype,
