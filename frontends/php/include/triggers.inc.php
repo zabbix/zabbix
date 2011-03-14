@@ -1309,6 +1309,7 @@ function utf8RawUrlDecode($source){
 						$sql = 'SELECT DISTINCT n.ip, n.type'.
 								' FROM functions f,items i,interface n'.
 								' WHERE f.itemid=i.itemid'.
+									' AND n.main=1'.
 									' AND i.hostid=n.hostid'.
 									' AND f.functionid='.$functionid;
 						$db_interfaces = DBselect($sql);
@@ -1344,6 +1345,7 @@ function utf8RawUrlDecode($source){
 						$sql = 'SELECT DISTINCT n.dns, n.type'.
 								' FROM functions f,items i,interface n'.
 								' WHERE f.itemid=i.itemid'.
+									' AND n.main=1'.
 									' AND i.hostid=n.hostid'.
 									' AND f.functionid='.$functionid;
 						$db_interfaces = DBselect($sql);
@@ -1379,6 +1381,7 @@ function utf8RawUrlDecode($source){
 						$sql = 'SELECT DISTINCT n.useip, n.ip, n.dns, n.type'.
 								' FROM functions f,items i,interface n'.
 								' WHERE f.itemid=i.itemid'.
+									' AND n.main=1'.
 									' AND i.hostid=n.hostid'.
 									' AND f.functionid='.$functionid;
 						$db_interfaces = DBselect($sql);
