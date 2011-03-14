@@ -853,7 +853,7 @@ COpt::memoryPick();
 				}
 
 				if(isset($action['operations']) && empty($action['operations'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" no operations defined.', $action['name']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" has no operations defined.', $action['name']));
 				}
 				else if(isset($action['operations'])){
 					$this->validateOperations($action['operations']);
