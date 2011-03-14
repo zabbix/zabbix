@@ -66,7 +66,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 	{
 		global $DB;
 
-		$this->setHost('hudson');
+		$this->setHost(PHPUNIT_FRONTEND_HOST);
 		$this->setBrowser('*firefox');
 		if(strstr(PHPUNIT_URL,'http://'))
 		{
@@ -96,8 +96,8 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 		// Login if not logged in already
 		if($this->isElementPresent('id=password'))
 		{
-			$this->input_type('name','Admin');
-			$this->input_type('password','zabbix');
+			$this->input_type('name',PHPUNIT_LOGIN_NAME);
+			$this->input_type('password',PHPUNIT_LOGIN_PWD);
 			$this->click('enter');
 			$this->wait();
 		}
@@ -190,38 +190,10 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 		$this->checkFatalErrors();
 	}
 
-	public function template_unlink($template){
-		// clicks button named "Unlink" next to template named $template
-		$this->click("xpath=//div[text()='$template']/../div[@class='dd']/input[@value='Unlink']");
-	}
-
 	public function template_unlink_and_clear($template){
 		// WARNING: not tested yet
 		// clicks button named "Unlink and clear" next to template named $template
 		$this->click("xpath=//div[text()='$template']/../div[@class='dd']/input[@value='Unlink']/../input[@value='Unlink and clear']");
-	}
-
-	public function template_link($template){
-		// adds template $template to the list of linked template list
-		// for now, ignores the fact that template might be already linked
-//		$this->button_click('add');
-		// the above does not seem to work, thus this ugly method has to be used - at least until buttons get unique names...
-		$this->click("//input[@id='add' and @name='add' and @value='Add' and @type='button' and contains(@onclick, 'return PopUp')]");
-
-		// zbx_popup is the default opened window id if none is passed
-		$this->waitForPopUp('zbx_popup',6000);
-		$this->selectWindow('zbx_popup');
-		$this->checkFatalErrors();
-
-		$this->dropdown_select_wait('groupid','Templates');
-
-		$this->check("//input[@value='$template' and @type='checkbox']");
-		$this->button_click('select');
-
-		$this->selectWindow();
-		$this->wait();
-		$this->ok('Template_Linux');
-
 	}
 
 }
