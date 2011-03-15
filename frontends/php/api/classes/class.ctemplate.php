@@ -1720,7 +1720,7 @@ COpt::memoryPick();
 		$start_points = array_merge($start_points, $targetids);
 		$start_points = array_unique($start_points);
 
-		foreach($start_points as $spnum => $start){
+		foreach($start_points as $start){
 			$path = array();
 			if(!$this->checkCircularLink($graph, $start, $path)){
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Circular link cannot be created'));
@@ -1743,49 +1743,41 @@ COpt::memoryPick();
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot sync applications'));
 
 				$result = API::DiscoveryRule()->syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot sync discovery rules'));
 
 				$result = API::Itemprototype()->syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot sync item prototypes'));
 
 				$result = API::Item()->syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot sync items'));
 
 				$result = API::Trigger()->syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot sync Triggers'));
 
 				$result = API::TriggerPrototype()->syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot sync Triggers prototypes'));
 
 				$result = API::GraphPrototype()->syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot sync graph prototypes'));
 
 				$result = API::Graph()->syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot sync graphs'));
 			}
 		}
 

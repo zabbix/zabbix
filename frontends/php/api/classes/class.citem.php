@@ -20,14 +20,15 @@
 ?>
 <?php
 /**
- * File containing CItem class for API.
  * @package API
  */
-/**
- * Class containing methods for operations with Items
- *
- */
-class CItem extends CZBXAPI{
+
+class CItem extends CItemGeneral{
+
+	public function __construct(){
+		parent::__construct();
+	}
+
 /**
  * Get items data
  *
@@ -813,7 +814,6 @@ COpt::memoryPick();
  * @param array $item_data['hostid']
  * @return int|boolean
  */
-
 	public function getObjects($itemData){
 		$options = array(
 			'filter' => $itemData,
@@ -852,7 +852,6 @@ COpt::memoryPick();
 
 	return !empty($objs);
 	}
-
 
 	public function checkInput(&$items, $method){
 		$create = ($method == 'create');
@@ -1099,13 +1098,13 @@ COpt::memoryPick();
 	public function create($items){
 		$items = zbx_toArray($items);
 
-			$this->checkInput($items, __FUNCTION__);
+		$this->checkInput($items, __FUNCTION__);
 
-			$this->createReal($items);
+		$this->createReal($items);
 
-			$this->inherit($items);
+		$this->inherit($items);
 
-			return array('itemids' => zbx_objectValues($items, 'itemid'));
+		return array('itemids' => zbx_objectValues($items, 'itemid'));
 	}
 
 	protected function createReal(&$items){
@@ -1355,84 +1354,83 @@ COpt::memoryPick();
 
 	public function syncTemplates($data){
 
-			$data['templateids'] = zbx_toArray($data['templateids']);
-			$data['hostids'] = zbx_toArray($data['hostids']);
+		$data['templateids'] = zbx_toArray($data['templateids']);
+		$data['hostids'] = zbx_toArray($data['hostids']);
 
-			$options = array(
-				'hostids' => $data['hostids'],
-				'editable' => 1,
-				'preservekeys' => 1,
-				'templated_hosts' => 1,
-				'output' => API_OUTPUT_SHORTEN
-			);
-			$allowedHosts = API::Host()->get($options);
-			foreach($data['hostids'] as $hostid){
-				if(!isset($allowedHosts[$hostid])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				}
+		$options = array(
+			'hostids' => $data['hostids'],
+			'editable' => 1,
+			'preservekeys' => 1,
+			'templated_hosts' => 1,
+			'output' => API_OUTPUT_SHORTEN
+		);
+		$allowedHosts = API::Host()->get($options);
+		foreach($data['hostids'] as $hostid){
+			if(!isset($allowedHosts[$hostid])){
+				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
-			$options = array(
-				'templateids' => $data['templateids'],
-				'preservekeys' => 1,
-				'output' => API_OUTPUT_SHORTEN
-			);
-			$allowedTemplates = API::Template()->get($options);
-			foreach($data['templateids'] as $templateid){
-				if(!isset($allowedTemplates[$templateid])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				}
+		}
+		$options = array(
+			'templateids' => $data['templateids'],
+			'preservekeys' => 1,
+			'output' => API_OUTPUT_SHORTEN
+		);
+		$allowedTemplates = API::Template()->get($options);
+		foreach($data['templateids'] as $templateid){
+			if(!isset($allowedTemplates[$templateid])){
+				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
+		}
 
-			$options = array(
-				'hostids' => $data['templateids'],
-				'preservekeys' => 1,
-				'select_applications' => API_OUTPUT_REFER,
-				'output' => API_OUTPUT_EXTEND,
-				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
-			);
-			$items = $this->get($options);
+		$options = array(
+			'hostids' => $data['templateids'],
+			'preservekeys' => 1,
+			'select_applications' => API_OUTPUT_REFER,
+			'output' => API_OUTPUT_EXTEND,
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
+		);
+		$items = $this->get($options);
 
-			foreach($items as $inum => $item){
-				$items[$inum]['applications'] = zbx_objectValues($item['applications'], 'applicationid');
-			}
+		foreach($items as $inum => $item){
+			$items[$inum]['applications'] = zbx_objectValues($item['applications'], 'applicationid');
+		}
 
-			$this->inherit($items, $data['hostids']);
+		$this->inherit($items, $data['hostids'], true);
 
-			return true;
+		return true;
 	}
 
-	protected function inherit($items, $hostids=null){
-		if(empty($items)) return $items;
-
-		$items = zbx_toHash($items, 'itemid');
+	protected function inherit($items, $hostids=null, $fromTemplate=false){
+		if(empty($items)) return true;
 
 		$chdHosts = API::Host()->get(array(
 			'output' => array('hostid', 'host', 'status'),
 			'selectInterfaces' => API_OUTPUT_EXTEND,
 			'templateids' => zbx_objectValues($items, 'hostid'),
 			'hostids' => $hostids,
-			'preservekeys' => 1,
-			'nopermissions' => 1,
-			'templated_hosts' => 1
+			'preservekeys' => true,
+			'nopermissions' => true,
+			'templated_hosts' => true
 		));
 		if(empty($chdHosts)) return true;
 
 		$insertItems = array();
 		$updateItems = array();
+		$inheritedItems = array();
 		foreach($chdHosts as $hostid => $host){
-			$interfaces = array();
-			foreach($host['interfaces'] as $hinum => $interface){
+			$interfaceids = array();
+			foreach($host['interfaces'] as $interface){
 				if($interface['main'] == 1)
-					$interfaces[$interface['type']] = $interface;
+					$interfaceids[$interface['type']] = $interface['interfaceid'];
 			}
 
 			$templateids = zbx_toHash($host['templates'], 'templateid');
 
 // skip items not from parent templates of current host
 			$parentItems = array();
-			foreach($items as $itemid => $item){
+			foreach($items as $inum => $item){
 				if(isset($templateids[$item['hostid']]))
-					$parentItems[$itemid] = $item;
+					$parentItems[$inum] = $item;
 			}
 //----
 
@@ -1441,13 +1439,13 @@ COpt::memoryPick();
 				'output' => array('itemid', 'type', 'key_', 'flags', 'templateid'),
 				'hostids' => $hostid,
 				'filter' => array('flags' => null),
-				'preservekeys' => 1,
-				'nopermissions' => 1
+				'preservekeys' => true,
+				'nopermissions' => true,
 			));
 			$exItemsKeys = zbx_toHash($exItems, 'key_');
 			$exItemsTpl = zbx_toHash($exItems, 'templateid');
 
-			foreach($parentItems as $itemid => $item){
+			foreach($parentItems as $item){
 				$exItem = null;
 
 // update by templateid
@@ -1458,12 +1456,12 @@ COpt::memoryPick();
 // update by key
 				if(isset($item['key_']) && isset($exItemsKeys[$item['key_']])){
 					$exItem = $exItemsKeys[$item['key_']];
-// TODO: fix error msg
+
 					if($exItem['flags'] != ZBX_FLAG_DISCOVERY_NORMAL){
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_AN_ITEM_WITH_THE_KEY.SPACE.'['.$exItem['key_'].']'.SPACE.S_ALREADY_EXISTS_FOR_HOST_SMALL.SPACE.'['.$host['host'].'].'.SPACE.S_THE_KEY_MUST_BE_UNIQUE);
+						$this->errorInheritFlags($exItem['flags'], $exItem['key_'], $host['host']);
 					}
 					else if(($exItem['templateid'] > 0) && ($exItem['templateid'] != $item['itemid'])){
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_AN_ITEM_WITH_THE_KEY.SPACE.'['.$exItem['key_'].']'.SPACE.S_ALREADY_EXISTS_FOR_HOST_SMALL.SPACE.'['.$host['host'].'].'.SPACE.S_THE_KEY_MUST_BE_UNIQUE);
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item "%1$s:%2$s" already exists, inherited from another template.', $host['host'], $exItem['key_']));
 					}
 				}
 
@@ -1472,23 +1470,18 @@ COpt::memoryPick();
 					unset($item['interfaceid']);
 				}
 				else if(isset($item['type']) && ($item['type'] != $exItem['type'])){
-					if(in_array($item['type'], array(ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV1,
-						ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI,
-						ITEM_TYPE_SSH, ITEM_TYPE_TELNET))
-					){
-						$type = getInterfaceTypeByItem($item);
-						if(!isset($interfaces[$type])){
-							self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot find host interface on host ['.$host['host'].'] for item key ['.$exItem['key_'].']');
+					if($type = $this->itemTypeInterface($item['type'])){
+						if(!isset($interfaceids[$type])){
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $host['host'], $exItem['key_']));
 						}
 
-						$item['interfaceid'] = $interfaces[$type]['interfaceid'];
+						$item['interfaceid'] = $interfaceids[$type];
 					}
 					else{
 						$item['interfaceid'] = 0;
 					}
 				}
 // -----
-
 
 // coping item
 				$newItem = $item;
@@ -1503,9 +1496,16 @@ COpt::memoryPick();
 
 				if($exItem){
 					$newItem['itemid'] = $exItem['itemid'];
+					$inheritedItems[] = $newItem;
+
+					if($fromTemplate){
+						unsetExcept($newItem, $this->fieldsToUpdateFromTemplate);
+					}
+
 					$updateItems[] = $newItem;
 				}
 				else{
+					$inheritedItems[] = $newItem;
 					$insertItems[] = $newItem;
 				}
 			}
@@ -1514,9 +1514,7 @@ COpt::memoryPick();
 		$this->createReal($insertItems);
 		$this->updateReal($updateItems);
 
-		$inheritedItems = array_merge($insertItems, $updateItems);
-
-		$this->inherit($inheritedItems);
+		$this->inherit($inheritedItems, null, $fromTemplate);
 	}
 }
 ?>

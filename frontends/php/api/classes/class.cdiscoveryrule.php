@@ -23,7 +23,11 @@
  * @package API
  */
 
-class CDiscoveryRule extends CZBXAPI{
+class CDiscoveryRule extends CItemGeneral{
+
+	public function __construct(){
+		parent::__construct();
+	}
 
 /**
  * Get DiscoveryRule data
@@ -1022,15 +1026,13 @@ COpt::memoryPick();
 			);
 			$items = $this->get($options);
 
-			$this->inherit($items, $data['hostids']);
+			$this->inherit($items, $data['hostids'], true);
 
 			return true;
 	}
 
-	protected function inherit($items, $hostids=null){
-		if(empty($items)) return $items;
-
-		$items = zbx_toHash($items, 'itemid');
+	protected function inherit($items, $hostids=null, $fromTemplate=false){
+		if(empty($items)) return true;
 
 		$chdHosts = API::Host()->get(array(
 			'templateids' => zbx_objectValues($items, 'hostid'),
@@ -1045,11 +1047,12 @@ COpt::memoryPick();
 
 		$insertItems = array();
 		$updateItems = array();
+		$inheritedItems = array();
 		foreach($chdHosts as $hostid => $host){
-			$interfaces = array();
-			foreach($host['interfaces'] as $hinum => $interface){
+			$interfaceids = array();
+			foreach($host['interfaces'] as $interface){
 				if($interface['main'] == 1)
-					$interfaces[$interface['type']] = $interface;
+					$interfaceids[$interface['type']] = $interface['interfaceid'];
 			}
 
 			$templateids = zbx_toHash($host['templates'], 'templateid');
@@ -1064,16 +1067,16 @@ COpt::memoryPick();
 
 // check existing items to decide insert or update
 			$exItems = $this->get(array(
-				'output' => array('itemid', 'key_', 'flags', 'templateid'),
+				'output' => array('itemid', 'key_', 'type', 'flags', 'templateid'),
 				'hostids' => $hostid,
 				'filter' => array('flags' => null),
-				'preservekeys' => 1,
-				'nopermissions' => 1
+				'preservekeys' => true,
+				'nopermissions' => true
 			));
 			$exItemsKeys = zbx_toHash($exItems, 'key_');
 			$exItemsTpl = zbx_toHash($exItems, 'templateid');
 
-			foreach($parentItems as $itemid => $item){
+			foreach($parentItems as $item){
 				$exItem = null;
 
 // update by tempalteid
@@ -1086,10 +1089,10 @@ COpt::memoryPick();
 					$exItem = $exItemsKeys[$item['key_']];
 
 					if($exItem['flags'] != ZBX_FLAG_DISCOVERY){
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_AN_ITEM_WITH_THE_KEY.SPACE.'['.$exItem['key_'].']'.SPACE.S_ALREADY_EXISTS_FOR_HOST_SMALL.SPACE.'['.$host['host'].'].'.SPACE.S_THE_KEY_MUST_BE_UNIQUE);
+						$this->errorInheritFlags($exItem['flags'], $exItem['key_'], $host['host']);
 					}
 					else if(($exItem['templateid'] > 0) && ($exItem['templateid'] != $item['itemid'])){
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_AN_ITEM_WITH_THE_KEY.SPACE.'['.$exItem['key_'].']'.SPACE.S_ALREADY_EXISTS_FOR_HOST_SMALL.SPACE.'['.$host['host'].'].'.SPACE.S_THE_KEY_MUST_BE_UNIQUE);
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item "%1$s:%2$s" already exists, inherited from another template.', $host['host'], $exItem['key_']));
 					}
 				}
 
@@ -1098,16 +1101,12 @@ COpt::memoryPick();
 					unset($item['interfaceid']);
 				}
 				else if(isset($item['type']) && ($item['type'] != $exItem['type'])){
-					if(in_array($item['type'], array(ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV1,
-						ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI,
-						ITEM_TYPE_SSH, ITEM_TYPE_TELNET))
-					){
-						$type = getInterfaceTypeByItem($item);
-						if(!isset($interfaces[$type])){
-							self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot find host interface on host ['.$host['host'].'] for item key ['.$exItem['key_'].']');
+					if($type = $this->itemTypeInterface($item['type'])){
+						if(!isset($interfaceids[$type])){
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $host['host'], $exItem['key_']));
 						}
 
-						$item['interfaceid'] = $interfaces[$type]['interfaceid'];
+						$item['interfaceid'] = $interfaceids[$type];
 					}
 					else{
 						$item['interfaceid'] = 0;
@@ -1129,6 +1128,12 @@ COpt::memoryPick();
 
 				if($exItem){
 					$newItem['itemid'] = $exItem['itemid'];
+					$inheritedItems[] = $newItem;
+
+					if($fromTemplate){
+						unsetExcept($newItem, $this->fieldsToUpdateFromTemplate);
+					}
+
 					$updateItems[] = $newItem;
 				}
 				else{
@@ -1140,9 +1145,7 @@ COpt::memoryPick();
 		$this->createReal($insertItems);
 		$this->updateReal($updateItems);
 
-		$inheritedItems = array_merge($insertItems, $updateItems);
-
-		$this->inherit($inheritedItems);
+		$this->inherit($inheritedItems, null, $fromTemplate);
 	}
 }
 ?>
