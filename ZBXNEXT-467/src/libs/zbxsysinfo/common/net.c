@@ -628,11 +628,11 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 				}
 				break;
 			case T_MINFO:
-				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
+				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr))) /* mailbox responsible for mailing lists */
 					return SYSINFO_RET_FAIL;
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 
-				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
+				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr))) /* mailbox for error messages */
 					return SYSINFO_RET_FAIL;
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 				break;
