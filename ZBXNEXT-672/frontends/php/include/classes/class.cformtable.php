@@ -58,7 +58,7 @@ class CFormTable extends CForm{
 		if(!is_string($value)){
 			return $this->error('Incorrect value for setAlign ['.$value.']');
 		}
-		$this->attr('name', zbx_formatDomId($value));
+		$this->attr('name', $value);
 		$this->attr('id', zbx_formatDomId($value));
 	return true;
 	}
