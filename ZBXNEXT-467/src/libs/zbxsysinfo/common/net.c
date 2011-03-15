@@ -513,7 +513,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 				{
 					case C_IN:
 					case C_HS:
-						bcopy(msg_ptr, &inaddr, INADDRSZ);
+						memcpy(&inaddr, msg_ptr, INADDRSZ);
 						offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", inet_ntoa(inaddr));
 						break;
 					default:
@@ -575,7 +575,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 				p = msg_ptr + q_len;
 
-				bcopy(msg_ptr, &inaddr, INADDRSZ);
+				memcpy(&inaddr, msg_ptr, INADDRSZ);
 				msg_ptr += INT32SZ;
 
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", inet_ntoa(inaddr));
