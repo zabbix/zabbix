@@ -23,7 +23,11 @@
  * @package API
  */
 
-class CItemprototype extends CZBXAPI{
+class CItemprototype extends CItemGeneral{
+
+	public function __construct(){
+		parent::__construct();
+	}
 
 /**
  * Get Itemprototype data
@@ -62,7 +66,7 @@ class CItemprototype extends CZBXAPI{
 			'filter'				=> null,
 			'search'				=> null,
 			'searchByAny'			=> null,
-			'startSearch'				=> null,
+			'startSearch'			=> null,
 			'excludeSearch'			=> null,
 
 // OutPut
@@ -1026,28 +1030,38 @@ COpt::memoryPick();
 				$items[$inum]['applications'] = zbx_objectValues($item['applications'], 'applicationid');
 			}
 
-			$this->inherit($items, $data['hostids']);
+			$this->inherit($items, $data['hostids'], true);
 
 			return true;
 	}
 
-	protected function inherit($items, $hostids=null){
-		if(empty($items)) return $items;
-
-		$items = zbx_toHash($items, 'itemid');
+	protected function inherit($items, $hostids=null, $fromTemplate=false){
+		if(empty($items)) return true;
 
 		$chdHosts = API::Host()->get(array(
 			'templateids' => zbx_objectValues($items, 'hostid'),
 			'hostids' => $hostids,
 			'output' => array('hostid', 'host'),
-			'preservekeys' => 1,
-			'nopermissions' => 1,
-			'templated_hosts' => 1
+			'preservekeys' => true,
+			'nopermissions' => true,
+			'templated_hosts' => true
 		));
 		if(empty($chdHosts)) return true;
 
+		$ruleIds = array();
+		$sql = 'SELECT i.itemid ruleid, id.itemid, i.hostid'.
+				' FROM items i, item_discovery id'.
+				' WHERE i.templateid=id.parent_itemid'.
+				' AND '.DBcondition('id.itemid', zbx_objectValues($items, 'itemid'));
+		$db_result = DBselect($sql);
+		while($rule = DBfetch($db_result)){
+			if(!isset($ruleIds[$rule['itemid']])) $ruleIds[$rule['itemid']] = array();
+			$ruleIds[$rule['itemid']][$rule['hostid']] = $rule['ruleid'];
+		}
+
 		$insertItems = array();
 		$updateItems = array();
+		$inheritedItems = array();
 		foreach($chdHosts as $hostid => $host){
 			$templateids = zbx_toHash($host['templates'], 'templateid');
 
@@ -1061,16 +1075,16 @@ COpt::memoryPick();
 
 // check existing items to decide insert or update
 			$exItems = $this->get(array(
-				'output' => array('itemid', 'key_', 'flags', 'templateid'),
+				'output' => array('itemid', 'key_', 'type', 'flags', 'templateid'),
 				'hostids' => $hostid,
 				'filter' => array('flags' => null),
-				'preservekeys' => 1,
-				'nopermissions' => 1
+				'preservekeys' => true,
+				'nopermissions' => true
 			));
 			$exItemsKeys = zbx_toHash($exItems, 'key_');
 			$exItemsTpl = zbx_toHash($exItems, 'templateid');
 
-			foreach($parentItems as $itemid => $item){
+			foreach($parentItems as $item){
 				$exItem = null;
 
 // update by tempalteid
@@ -1083,10 +1097,10 @@ COpt::memoryPick();
 					$exItem = $exItemsKeys[$item['key_']];
 
 					if($exItem['flags'] != ZBX_FLAG_DISCOVERY_CHILD){
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_AN_ITEM_WITH_THE_KEY.SPACE.'['.$exItem['key_'].']'.SPACE.S_ALREADY_EXISTS_FOR_HOST_SMALL.SPACE.'['.$host['host'].'].'.SPACE.S_THE_KEY_MUST_BE_UNIQUE);
+						$this->errorInheritFlags($exItem['flags'], $exItem['key_'], $host['host']);
 					}
 					else if(($exItem['templateid'] > 0) && ($exItem['templateid'] != $item['itemid'])){
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_AN_ITEM_WITH_THE_KEY.SPACE.'['.$exItem['key_'].']'.SPACE.S_ALREADY_EXISTS_FOR_HOST_SMALL.SPACE.'['.$host['host'].'].'.SPACE.S_THE_KEY_MUST_BE_UNIQUE);
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item "%1$s:%2$s" already exists, inherited from another template.', $host['host'], $exItem['key_']));
 					}
 				}
 
@@ -1103,29 +1117,26 @@ COpt::memoryPick();
 
 				if($exItem){
 					$newItem['itemid'] = $exItem['itemid'];
+					$inheritedItems[] = $newItem;
+
+					if($fromTemplate){
+						unsetExcept($newItem, $this->fieldsToUpdateFromTemplate);
+					}
+					unset($newItem['ruleid']);
+
 					$updateItems[] = $newItem;
 				}
 				else{
-					$insertItems[$item['itemid']] = $newItem;
+					$newItem['ruleid'] = $ruleIds[$item['itemid']][$host['hostid']];
+					$insertItems[] = $newItem;
 				}
 			}
-		}
-
-		$sql = 'SELECT i.itemid ruleid, id.itemid itemid'.
-				' FROM items i, item_discovery id'.
-				' WHERE i.templateid=id.parent_itemid'.
-					' AND '.DBcondition('id.itemid', array_keys($insertItems));
-		$db_result = DBselect($sql);
-		while($rule = DBfetch($db_result)){
-			$insertItems[$rule['itemid']]['ruleid'] = $rule['ruleid'];
 		}
 
 		$this->createReal($insertItems);
 		$this->updateReal($updateItems);
 
-		$inheritedItems = array_merge($insertItems, $updateItems);
-
-		$this->inherit($inheritedItems);
+		$this->inherit($inheritedItems, null, $fromTemplate);
 	}
 }
 ?>
