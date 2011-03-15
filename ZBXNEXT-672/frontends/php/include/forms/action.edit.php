@@ -638,8 +638,9 @@ require_once('include/templates/action.js.php');
 				$jsInsert.= 'addPopupValues('.zbx_jsvalue(array('object'=>'groupid', 'values'=>$new_operation['opcommand_grp'])).');';
 
 				zbx_add_post_js($jsInsert);
+
 // Target list
-				$cmdList = new CDiv($cmdList, 'objectgroup border_dotted ui-corner-all');
+				$cmdList = new CDiv($cmdList, 'objectgroup border_dotted ui-corner-all inlineblock');
 				$cmdList->setAttribute('id', 'opCmdList');
 
 				$tblOper->addRow(array(_('Target list'), $cmdList));
@@ -653,7 +654,7 @@ require_once('include/templates/action.js.php');
 				$typeCB->addItem(ZBX_SCRIPT_TYPE_USER_SCRIPT, _('User script'));
 
 				$userScriptId = new CVar('new_operation[opcommand][scriptid]', $new_operation['opcommand']['scriptid']);
-				$userScriptName = new CTextBox('new_operation[opcommand][script]', $new_operation['opcommand']['script'], 40);
+				$userScriptName = new CTextBox('new_operation[opcommand][script]', $new_operation['opcommand']['script'], 30);
 				$userScriptSelect = new CButton('select_opcommand_script',_('select'), null, 'link_menu');
 
 				$userScript = new CDiv(array($userScriptId,$userScriptName, SPACE, $userScriptSelect), 'class_opcommand_userscript inlineblock hidden');
