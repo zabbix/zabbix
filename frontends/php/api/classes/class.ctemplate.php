@@ -1739,42 +1739,42 @@ COpt::memoryPick();
 					}
 				}
 
-				$result = API::Application()->syncTemplates(array(
+				API::Application()->syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
 
-				$result = API::DiscoveryRule()->syncTemplates(array(
+				API::DiscoveryRule()->syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
 
-				$result = API::Itemprototype()->syncTemplates(array(
+				API::Itemprototype()->syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
 
-				$result = API::Item()->syncTemplates(array(
+				API::Item()->syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
 
-				$result = API::Trigger()->syncTemplates(array(
+				API::Trigger()->syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
 
-				$result = API::TriggerPrototype()->syncTemplates(array(
+				API::TriggerPrototype()->syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
 
-				$result = API::GraphPrototype()->syncTemplates(array(
+				API::GraphPrototype()->syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
 
-				$result = API::Graph()->syncTemplates(array(
+				API::Graph()->syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
@@ -2050,14 +2050,14 @@ COpt::memoryPick();
 		if(!is_null($targetids)){
 			$hosts = API::Host()->get(array(
 				'hostids' => $targetids,
-				'output' => array('hostid, host'),
+				'output' => array('hostid', 'host'),
 				'nopermissions' => true,
 			));
 		}
 		else{
 			$hosts = API::Host()->get(array(
 				'templateids' => $templateids,
-				'output' => array('hostid, host'),
+				'output' => array('hostid', 'host'),
 				'nopermissions' => true,
 			));
 		}
@@ -2065,7 +2065,7 @@ COpt::memoryPick();
 		if(!empty($hosts)){
 			$templates = API::Template()->get(array(
 				'templateids' => $templateids,
-				'output' => array('hostid, host'),
+				'output' => array('hostid', 'host'),
 				'nopermissions' => true,
 			));
 
