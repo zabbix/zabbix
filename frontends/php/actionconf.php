@@ -147,20 +147,6 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		}
 		DBstart();
 		if(isset($_REQUEST['actionid'])){
-			foreach($action['operations'] as $opnum => $operation){
-				if(isset($operation['opcommand_grp']))
-					foreach($operation['opcommand_grp'] as $ognum => $cmd){
-						if(isset($cmd['action']) && ($cmd['action'] != 'update')) unset($action['operations'][$opnum]['opcommand_grp'][$ognum]['opcommand_grpid']);
-						unset($action['operations'][$opnum]['opcommand_grp'][$ognum]['action']);
-					}
-
-				if(isset($operation['opcommand_hst']))
-					foreach($operation['opcommand_hst'] as $ohnum => $cmd){
-						if(isset($cmd['action']) && ($cmd['action'] != 'update')) unset($action['operations'][$opnum]['opcommand_hst'][$ohnum]['opcommand_hstid']);
-						unset($action['operations'][$opnum]['opcommand_hst'][$ohnum]['action']);
-					}
-			}
-
 			$action['actionid']= $_REQUEST['actionid'];
 
 			$result = API::Action()->update($action);
@@ -263,7 +249,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 	}
 	else if(inarr_isset(array('edit_operationid'))){
 		$_REQUEST['edit_operationid'] = array_keys($_REQUEST['edit_operationid']);
-		$edit_operationid = $_REQUEST['edit_operationid'] =array_pop($_REQUEST['edit_operationid']);
+		$edit_operationid = $_REQUEST['edit_operationid'] = array_pop($_REQUEST['edit_operationid']);
 		$_REQUEST['operations'] = get_request('operations',array());
 
 		if(isset($_REQUEST['operations'][$edit_operationid])){
@@ -372,10 +358,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		$actionForm = new CGetForm('action.edit', $action);
 		$action_wdgt->addItem($actionForm->render());
 
-
 		show_messages();
-
-//		$action_wdgt->addItem($frmAction);
 	}
 	else{
 		$form = new CForm('get');

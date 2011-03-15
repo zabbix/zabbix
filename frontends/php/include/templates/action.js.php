@@ -48,32 +48,29 @@
 </script>
 
 <script type="text/x-jquery-tmpl" id="opCmdGroupRowTPL">
-<tr id="opCmdGroupRow_#{opcommand_grpid}">
-<td><input name="new_operation[opcommand_grp][#{opcommand_grpid}][action]" type="hidden" value="#{action}" />
-	<input name="new_operation[opcommand_grp][#{opcommand_grpid}][opcommand_grpid]" type="hidden" value="#{opcommand_grpid}" />
-	<input name="new_operation[opcommand_grp][#{opcommand_grpid}][groupid]" type="hidden" value="#{groupid}" />
-	<input name="new_operation[opcommand_grp][#{opcommand_grpid}][name]" type="hidden" value="#{name}" />
+<tr id="opCmdGroupRow_#{groupid}">
+<td>
+	<input name="new_operation[opcommand_grp][#{groupid}][groupid]" type="hidden" value="#{groupid}" />
+	<input name="new_operation[opcommand_grp][#{groupid}][name]" type="hidden" value="#{name}" />
 	#{objectCaption}
 	<span class="bold"> #{name} </span>
 </td>
 <td>
-	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="javascript: removeOpCmdRow(#{opcommand_grpid}, 'groupid');" />
+	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="javascript: removeOpCmdRow(#{groupid}, 'groupid');" />
 </td>
 </tr>
 </script>
 
 <script type="text/x-jquery-tmpl" id="opCmdHostRowTPL">
-<tr id="opCmdHostRow_#{opcommand_hstid}">
+<tr id="opCmdHostRow_#{hostid}">
 <td>
-	<input name="new_operation[opcommand_hst][#{opcommand_hstid}][action]" type="hidden" value="#{action}" />
-	<input name="new_operation[opcommand_hst][#{opcommand_hstid}][opcommand_hstid]" type="hidden" value="#{opcommand_hstid}" />
-	<input name="new_operation[opcommand_hst][#{opcommand_hstid}][hostid]" type="hidden" value="#{hostid}" />
-	<input name="new_operation[opcommand_hst][#{opcommand_hstid}][host]" type="hidden" value="#{host}" />
+	<input name="new_operation[opcommand_hst][#{hostid}][hostid]" type="hidden" value="#{hostid}" />
+	<input name="new_operation[opcommand_hst][#{hostid}][host]" type="hidden" value="#{host}" />
 	#{objectCaption}
 	<span class="bold"> #{host} </span>
 </td>
 <td>
-	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="javascript: removeOpCmdRow(#{opcommand_hstid}, 'hostid');" />
+	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="javascript: removeOpCmdRow(#{hostid}, 'hostid');" />
 </td>
 </tr>
 </script>
@@ -170,21 +167,7 @@ function addPopupValues(list){
 
 				value.objectCaption = "<?php print(_('Host group').': '); ?>";
 
-				if(!isset('action', value))
-					value.action = isset('opcommand_grpid', value) ? 'update' : 'create';
-
-				if(jQuery("#opCmdDraft").length){
-					jQuery("#opCmdDraft").replaceWith(tpl.evaluate(value));
-				}
-				else{
-					if(!isset('opcommand_grpid', value)){
-						value.opcommand_grpid = jQuery("#opCmdList tr[id^=opCmdGroupRow_]").length;
-						while(jQuery("#opCmdGroupRow_"+value.opcommand_grpid).length){
-							value.opcommand_grpid++;
-						}
-					}
-
-					value.newValue = "create";
+				if(jQuery("#opCmdGroupRow_"+value.groupid).length == 0){
 					jQuery("#opCmdListFooter").before(tpl.evaluate(value));
 				}
 				break;
@@ -196,21 +179,7 @@ function addPopupValues(list){
 				else
 					value.host = "<?php print(_('Current host')); ?>";
 
-				if(!isset('action', value))
-					value.action = isset('opcommand_hstid', value) ? 'update' : 'create';
-
-				if(jQuery("#opCmdDraft").length){
-					jQuery("#opCmdDraft").replaceWith(tpl.evaluate(value));
-				}
-				else{
-					if(!isset('opcommand_hstid', value)){
-						value.opcommand_hstid = jQuery("#opCmdList tr[id^=opCmdHostRow_]").length;
-						while(jQuery("#opCmdHostRow_"+value.opcommand_hstid).length){
-							value.opcommand_hstid++;
-						}
-					}
-
-					value.newValue = "create";
+				if(jQuery("#opCmdHostRow_"+value.hostid).length == 0){
 					jQuery("#opCmdListFooter").before(tpl.evaluate(value));
 				}
 				break;
@@ -338,23 +307,39 @@ function showOpTypeForm(){
 		'class_opcommand_userscript': [ZBX_SCRIPT_TYPES.userscript],
 		'class_opcommand_execute_on': [ZBX_SCRIPT_TYPES.script],
 		'class_opcommand_port': [ZBX_SCRIPT_TYPES.ssh,ZBX_SCRIPT_TYPES.telnet],
+		'class_opcommand_command': [ZBX_SCRIPT_TYPES.script,ZBX_SCRIPT_TYPES.ipmi,ZBX_SCRIPT_TYPES.ssh,ZBX_SCRIPT_TYPES.telnet],
 		'class_authentication_method': [ZBX_SCRIPT_TYPES.ssh,ZBX_SCRIPT_TYPES.telnet],
 		'class_authentication_username': [ZBX_SCRIPT_TYPES.ssh,ZBX_SCRIPT_TYPES.telnet],
-		'class_authentication_publickey': [ZBX_SCRIPT_TYPES.ssh,ZBX_SCRIPT_TYPES.telnet],
-		'class_authentication_privatekey': [ZBX_SCRIPT_TYPES.ssh,ZBX_SCRIPT_TYPES.telnet],
+		'class_authentication_publickey': [],
+		'class_authentication_privatekey': [],
 		'class_authentication_password': [ZBX_SCRIPT_TYPES.ssh,ZBX_SCRIPT_TYPES.telnet]
 	}
 
 	var showFields = [];
 	for(var fieldClass in opTypeFields){
-		jQuery("."+fieldClass).toggle(false).attr("disabled", "disabled");
+		jQuery("#operationlist ."+fieldClass).toggleClass("hidden", true).attr("disabled", "disabled");
 
 		for(var f=0; f < opTypeFields[fieldClass].length; f++)
 			if(currentOpType == opTypeFields[fieldClass][f]) showFields.push(fieldClass);
 	}
 
-	for(var f=0; f < showFields.length; f++)
-		jQuery("."+showFields[f]).toggle(true).removeAttr("disabled");
+	for(var f=0; f < showFields.length; f++){
+		if(showFields[f] == 'class_authentication_method') showOpTypeAuth();
+		jQuery("#operationlist ."+showFields[f]).toggleClass("hidden", false).removeAttr("disabled");
+	}
+}
+
+function showOpTypeAuth(){
+	var currentOpTypeAuth = parseInt(jQuery('#new_operation_opcommand_authtype').val(), 10);
+
+	if(currentOpTypeAuth === <?php echo(ITEM_AUTHTYPE_PASSWORD); ?>){
+		jQuery('#operationlist .class_authentication_publickey').toggleClass("hidden", true).attr("disabled", "disabled");
+		jQuery('#operationlist .class_authentication_privatekey').toggleClass("hidden", true).attr("disabled", "disabled");
+	}
+	else{
+		jQuery('#operationlist .class_authentication_publickey').toggleClass("hidden", false).removeAttr("disabled");
+		jQuery('#operationlist .class_authentication_privatekey').toggleClass("hidden", false).removeAttr("disabled");
+	}
 }
 
 var ZBX_SCRIPT_TYPES = {};
@@ -378,6 +363,10 @@ jQuery(document).ready(function(){
 
 // new operation form command type
 	showOpTypeForm();
+
+	jQuery('#select_opcommand_script').click(function(){
+		PopUp("popup.php?dstfrm=action.edit.php&srctbl=scripts&srcfld1=scriptid&srcfld2=name&dstfld1=new_operation_opcommand_scriptid&dstfld2=new_operation_opcommand_script",480,720);
+	})
 });
 
 //]]> -->

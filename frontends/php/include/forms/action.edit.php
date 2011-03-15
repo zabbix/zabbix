@@ -393,8 +393,8 @@ require_once('include/templates/action.js.php');
 
 		$operation['opmessage_grp'] = zbx_toHash($operation['opmessage_grp'], 'usrgrpid');
 		$operation['opmessage_usr'] = zbx_toHash($operation['opmessage_usr'], 'userid');
-		$operation['opcommand_grp'] = zbx_toHash($operation['opcommand_grp'], 'opcommand_grpid');
-		$operation['opcommand_hst'] = zbx_toHash($operation['opcommand_hst'], 'opcommand_hstid');
+		$operation['opcommand_grp'] = zbx_toHash($operation['opcommand_grp'], 'groupid');
+		$operation['opcommand_hst'] = zbx_toHash($operation['opcommand_hst'], 'hostid');
 
 		$tblOper->addItem(new CVar('operations['.$opid.']', $operation));
 	}
@@ -566,15 +566,29 @@ require_once('include/templates/action.js.php');
 				if(!isset($new_operation['opcommand'])){
 					$new_operation['opcommand_grp'] = array();
 					$new_operation['opcommand'] = array(
-						'type' => 0,
-						'execute_on' => 1,
+						'type' => ZBX_SCRIPT_TYPE_SCRIPT,
+						'execute_on' => ZBX_SCRIPT_EXECUTE_ON_AGENT,
 						'port' => '',
 						'authtype' => ZBX_SCRIPT_EXECUTE_ON_AGENT,
+						'scriptid' => '',
 						'username' => '',
 						'privatekey' => '',
 						'publickey' => '',
-						'passwrod' => '',
+						'password' => '',
+						'command' => '',
 					);
+				}
+
+				if($new_operation['opcommand']['type'] == ZBX_SCRIPT_TYPE_USER_SCRIPT){
+					$userScripts = API::Script()->get(array(
+						'scriptid' => $new_operation['opcommand']['scriptid'],
+						'output' => API_OUTPUT_EXTEND
+					));
+					if($userScript = reset($userScripts))
+						$new_operation['opcommand']['script'] = $userScript['name'];
+				}
+				else{
+					$new_operation['opcommand']['script'] = '';
 				}
 
 				$cmdList = new CTable(null, 'formElementTable');
@@ -604,7 +618,7 @@ require_once('include/templates/action.js.php');
 				$new_operation['opcommand_hst'] = array_values($new_operation['opcommand_hst']);
 				foreach($new_operation['opcommand_hst'] as $ohnum => $cmd)
 					$new_operation['opcommand_hst'][$ohnum]['host'] = ($cmd['hostid'] > 0) ? $hosts[$cmd['hostid']]['host'] : '';
-				morder_result($new_operation['opcommand_hst'], array('host', 'opcommand_hstid'));
+				order_result($new_operation['opcommand_hst'], 'host');
 
 				$groups = API::HostGroup()->get(array(
 					'groupids' => zbx_objectValues($new_operation['opcommand_grp'], 'groupid'),
@@ -616,7 +630,7 @@ require_once('include/templates/action.js.php');
 				$new_operation['opcommand_grp'] = array_values($new_operation['opcommand_grp']);
 				foreach($new_operation['opcommand_grp'] as $ognum => $cmd)
 					$new_operation['opcommand_grp'][$ognum]['name'] = $groups[$cmd['groupid']]['name'];
-				morder_result($new_operation['opcommand_grp'], array('name', 'opcommand_grpid'));
+				order_result($new_operation['opcommand_grp'], 'name');
 
 // JS Add commands
 				$jsInsert = '';
@@ -638,11 +652,11 @@ require_once('include/templates/action.js.php');
 				$typeCB->addItem(ZBX_SCRIPT_TYPE_TELNET, _('Telnet'));
 				$typeCB->addItem(ZBX_SCRIPT_TYPE_USER_SCRIPT, _('User script'));
 
-				$typeCB->setAttribute('id', 'new_operation_opcommand_type');
+				$userScriptId = new CVar('new_operation[opcommand][scriptid]', $new_operation['opcommand']['scriptid']);
+				$userScriptName = new CTextBox('new_operation[opcommand][script]', $new_operation['opcommand']['script'], 40);
+				$userScriptSelect = new CButton('select_opcommand_script',_('select'), null, 'link_menu');
 
-				$userScriptName = new CTextBox('new_operation[opcommand][scriptname]', $new_operation['opcommand']['scriptid']);
-				$userScriptSelect = new CSpan(_('select'), 'link_menu');
-				$userScript = new CDiv(array($userScriptName, SPACE, $userScriptSelect), 'class_opcommand_userscript inlineblock hidden');
+				$userScript = new CDiv(array($userScriptId,$userScriptName, SPACE, $userScriptSelect), 'class_opcommand_userscript inlineblock hidden');
 
 				$tblOper->addRow(array(_('Type'), array($typeCB,SPACE,$userScript)));
 
@@ -651,12 +665,12 @@ require_once('include/templates/action.js.php');
 				$executeOnRb->makeVertical();
 
 				$executeOnRb->addValue(_('Zabbix agent'),ZBX_SCRIPT_EXECUTE_ON_AGENT);
-				$executeOnRb->addValue(_('Zabbix server'),ZBX_SCRIPT_EXECUTE_ON_AGENT);
+				$executeOnRb->addValue(_('Zabbix server'),ZBX_SCRIPT_EXECUTE_ON_SERVER);
 
-				$tblOper->addRow(array(_('Execute on'), new CDiv($executeOnRb, 'objectgroup border_dotted ui-corner-all')), 'class_opcommand_execute_on hidden');
+				$tblOper->addRow(array(_('Execute on'), new CDiv($executeOnRb, 'objectgroup border_dotted ui-corner-all inlineblock')), 'class_opcommand_execute_on hidden');
 
 // SSH
-				$cmbAuthType = new CComboBox('new_operation[opcommand][authtype]', $new_operation['opcommand']['authtype']);
+				$cmbAuthType = new CComboBox('new_operation[opcommand][authtype]', $new_operation['opcommand']['authtype'], 'javascript: showOpTypeAuth();');
 				$cmbAuthType->addItem(ITEM_AUTHTYPE_PASSWORD,_('Password'));
 				$cmbAuthType->addItem(ITEM_AUTHTYPE_PUBLICKEY,('Public key'));
 
@@ -672,7 +686,7 @@ require_once('include/templates/action.js.php');
 				$tblOper->addRow(array(_('Port'), new CTextBox('new_operation[opcommand][port]', $new_operation['opcommand']['port'])), 'class_opcommand_port hidden');
 
 // Command
-				$tblOper->addRow(array(_('Command'), new CTextArea('new_operation[opcommand][command]', $new_operation['opcommand']['command'], 77, 7)), 'class_operation_command hidden');
+				$tblOper->addRow(array(_('Command'), new CTextArea('new_operation[opcommand][command]', $new_operation['opcommand']['command'], 77, 7)), 'class_opcommand_command hidden');
 
 				break;
 			case OPERATION_TYPE_HOST_ADD:

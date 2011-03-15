@@ -131,6 +131,10 @@
 			$page['title'] = 'S_DISCOVERY_CHECKS_BIG';
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
+		case 'scripts':
+			$page['title'] = _('USER SCRIPTS');
+			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
+			break;
 		default:
 			$page['title'] = 'S_ERROR';
 			$error = true;
@@ -1751,6 +1755,93 @@ include_once('include/page_header.php');
 			$table->addRow($name);
 		}
 		$table->show();
+	}
+	else if($srctbl == 'scripts'){
+		$form = new CForm();
+		$form->setName('scriptform');
+		$form->attr('id', 'scripts');
+
+		$table = new CTableInfo(_('No scripts defined'));
+
+		if($multiselect)
+			$header = array(
+				array(new CCheckBox("all_scripts", NULL, "javascript: checkAll('".$form->getName()."', 'all_scripts','scripts');"), _('Name')),
+				_('Execute on'),
+				_('Command')
+			);
+		else
+			$header = array(
+				_('Name'),
+				_('Execute on'),
+				_('Command')
+			);
+
+		$table->setHeader($header);
+
+		$options = array(
+			'nodeids' => $nodeid,
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => true
+		);
+		if(is_null($hostid)) $options['groupids'] = $groupid;
+		if(!is_null($writeonly)) $options['editable'] = 1;
+
+		$scripts = API::Script()->get($options);
+		order_result($scripts, 'name');
+
+		foreach($scripts as $snum => $script){
+			$description = new CLink($script['name'],'#');
+
+			if($multiselect){
+				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", ".zbx_jsvalue($script['scriptid']).");";
+			}
+			else{
+				$values = array(
+					$dstfld1 => $script[$srcfld1],
+					$dstfld2 => $script[$srcfld2],
+				);
+
+				$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).','.zbx_jsvalue($values).'); close_window(); return false;';
+			}
+
+			$description->setAttribute('onclick', $js_action);
+
+			if($multiselect){
+				$description = new CCol(array(new CCheckBox('scripts['.zbx_jsValue($script[$srcfld1]).']', NULL, NULL, $script['scriptid']), $description));
+			}
+
+
+			if($script['type'] == ZBX_SCRIPT_TYPE_SCRIPT){
+				switch($script['execute_on']){
+					case ZBX_SCRIPT_EXECUTE_ON_AGENT:
+						$scriptExecuteOn = _('Agent');
+						break;
+					case ZBX_SCRIPT_EXECUTE_ON_SERVER:
+						$scriptExecuteOn = _('Server');
+						break;
+				}
+			}
+			else{
+				$scriptExecuteOn = '';
+			}
+
+
+			$table->addRow(array(
+				$description,
+				$scriptExecuteOn,
+				htmlspecialchars($script['command'], ENT_COMPAT, 'UTF-8'),
+			));
+		}
+
+		if($multiselect){
+			$button = new CButton('select', S_SELECT, "javascript: addSelectedValues('scripts', ".zbx_jsvalue($reference).");");
+			$table->setFooter(new CCol($button, 'right'));
+
+			insert_js('var popupReference = '.zbx_jsvalue($scripts, true).';');
+		}
+
+		$form->addItem($table);
+		$form->show();
 	}
 ?>
 <?php

@@ -349,7 +349,34 @@ function get_operation_desc($type, $data){
 
 				break;
 			case OPERATION_TYPE_COMMAND:
-				$result[] = array(bold(_('Run command:')), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
+				switch($data['opcommand']['type']){
+					case ZBX_SCRIPT_TYPE_IPMI:
+						$result[] = array(bold(_('Run IPMI command:')), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
+						break;
+					case ZBX_SCRIPT_TYPE_SSH:
+						$result[] = array(bold(_('Run SSH command:')), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
+						break;
+					case ZBX_SCRIPT_TYPE_TELNET:
+						$result[] = array(bold(_('Run TELNET command:')), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
+						break;
+					case ZBX_SCRIPT_TYPE_SCRIPT:
+						if($data['opcommand']['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_AGENT)
+							$result[] = array(bold(_('Run command on Zabbix agent:')), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
+						else
+							$result[] = array(bold(_('Run command on Zabbix server:')), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
+						break;
+					case ZBX_SCRIPT_TYPE_USER_SCRIPT:
+						$userScripts = API::Script()->get(array(
+							'scriptid' => $data['opcommand']['scriptid'],
+							'output' => API_OUTPUT_EXTEND
+						));
+						$userScript = reset($userScripts);
+
+						$result[] = array(bold(_('Run user script:')), SPACE, italic(zbx_nl2br($userScript['name'])));
+						break;
+					default:
+						$result[] = array(bold(_('Run command:')), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
+				}
 				break;
 			default:
 		}
