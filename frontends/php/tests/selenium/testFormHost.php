@@ -220,65 +220,8 @@ class testFormHost extends CWebTest{
 	}
 
 	public function testFormHost_TemplateLink(){
-		// Link a template to a host from host properties page
-		$this->login('hosts.php');
-		$this->dropdown_select_wait('groupid','all');
-		$this->click('link=Zabbix server');
-		$this->wait();
-		$this->tab_switch("Templates");
-		$this->nok('Template_Linux');
-
-		$template = "Template_Linux";
-
-		// adds template $template to the list of linked template list
-		// for now, ignores the fact that template might be already linked
-//		$this->button_click('add');
-		// the above does not seem to work, thus this ugly method has to be used - at least until buttons get unique names...
-		$this->click("//input[@id='add' and @name='add' and @value='Add' and @type='button' and contains(@onclick, 'return PopUp')]");
-
-		// zbx_popup is the default opened window id if none is passed
-		$this->waitForPopUp('zbx_popup',6000);
-		$this->selectWindow('zbx_popup');
-		$this->checkFatalErrors();
-
-		$this->dropdown_select_wait('groupid','Templates');
-		$this->check("//input[@value='$template' and @type='checkbox']");
-		$this->button_click('select');
-
-		$this->selectWindow();
-		$this->wait();
-
-		$this->button_click('save');
-		$this->wait();
-		$this->assertTitle('Hosts');
-		$this->ok('Host updated');
-		// no entities should be deleted, they all should be updated
-		$this->nok('deleted');
-		$this->nok('created');
-// should check that items, triggers, graphs and applications exist on the host and are linked to the template
-// currently doing something very brutal - just looking whether Template_Linux is present on entity pages
-
-		$this->href_click("items.php?filter_set=1&hostid=10017&sid=");
-		$this->wait();
-		$this->ok("$template:");
-		// using "host navigation bar" at the top of entity list
-		$this->href_click("triggers.php?hostid=10017&sid=");
-		$this->wait();
-		$this->ok("$template:");
-//		default data.sql has a problem - graphs are not present in the template
-//		$this->href_click("graphs.php?hostid=10017&sid=");
-//		$this->wait();
-//		$this->ok("$template:");
-		$this->href_click("applications.php?hostid=10017&sid=");
-		$this->wait();
-		$this->ok("$template:");
-
-		// tests that items that should have interfaceid don't have it set to NULL
-		// checks all items on enabled and disabled hosts (types 0 and 1) except:
-		// ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_CALCULATED, ITEM_TYPE_HTTPTEST
-		// if any found, something's wrong
-		$this->assertEquals(0,DBcount("select itemid from items left join hosts on items.hostid=hosts.hostid where hosts.status in (0,1) and interfaceid is NULL and type not in (2,5,7,8,9,15);"),"Chuck Norris: There are items with interfaceid NULL not of types 2, 5, 7, 8, 9, 15");
-
+		$this->templateLink("Zabbix server","Template_Linux");
 	}
+
 }
 ?>
