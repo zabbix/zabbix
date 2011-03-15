@@ -28,7 +28,7 @@
 
 #ifdef _WINDOWS
 #include <windns.h>
-#pragma comment(lib, "Dnsapi.lib")
+#pragma comment(lib, "Dnsapi.lib") /* Add the library for DnsQuery function */
 #endif
 
 /*
@@ -120,6 +120,7 @@ int	NET_TCP_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 #if !defined(C_IN) && !defined(_WINDOWS)
 #	define C_IN	ns_c_in
 #endif	/* C_IN */
+/* Define DNS record types to use common names on all systems, see RFC1035 standard for the types */
 #ifndef T_ANY
 #	define T_ANY	255
 #endif	/* T_ANY */
@@ -249,7 +250,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 		{"MG", T_MG},
 		{"MR", T_MR},
 		{"NULL", T_NULL},
-#ifndef _WINDOWS /* TODO: add T_WKS support for Windows */
+#ifndef _WINDOWS /* obsolete, don't add for Windows */
 		{"WKS", T_WKS},
 #endif
 		{"PTR", T_PTR},
@@ -373,7 +374,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 		{
 			case T_A:
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s",
-						inet_ntop(AF_INET, &(pDnsRecord->Data.A.IpAddress), tmp, sizeof(tmp)));
+						inet_ntoa(AF_INET, &(pDnsRecord->Data.A.IpAddress), tmp, sizeof(tmp)));
 				break;
 			case T_NS:
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s",
@@ -413,6 +414,10 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s",
 						pDnsRecord->Data.MR.pNameHost);
 				break;
+			case T_NULL:
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " len:%d",
+						pDnsRecord->Data.Null.dwByteCount,
+				break;
 			case T_PTR:
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s",
 						pDnsRecord->Data.PTR.pNameHost);
@@ -434,7 +439,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 				break;
 			case T_TXT:
 				for (i = 0; i < (int)(pDnsRecord->Data.TXT.dwStringCount); i++)
-					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s",
+					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " \"%s\"",
 							pDnsRecord->Data.TXT.pStringArray[i]);
 				break;
 			default:
@@ -449,7 +454,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	if ('\0' != *ip)
 	{
-		if (1 != inet_aton(ip, &inaddr))
+		if (0 == inet_aton(ip, &inaddr))
 			return SYSINFO_RET_FAIL;
 		_res.nsaddr_list[0].sin_addr = inaddr;
 		_res.nsaddr_list[0].sin_family = AF_INET;
@@ -528,35 +533,35 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 			case T_MD:
 			case T_MF:
 			case T_MX:
-				GETSHORT(value, msg_ptr);
+				GETSHORT(value, msg_ptr); /* preference */
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
 
-				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
+				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr))) /* exchange */
 					return SYSINFO_RET_FAIL;
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 				break;
 			case T_SOA:
-				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
+				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr))) /* source host */
 					return SYSINFO_RET_FAIL;
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 
-				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
+				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr))) /* administrator */
 					return SYSINFO_RET_FAIL;
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 
-				GETLONG(value, msg_ptr);
+				GETLONG(value, msg_ptr); /* serial number */
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
 
-				GETLONG(value, msg_ptr);
+				GETLONG(value, msg_ptr); /* refresh time */
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
 
-				GETLONG(value, msg_ptr);
+				GETLONG(value, msg_ptr); /* retry time */
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
 
-				GETLONG(value, msg_ptr);
+				GETLONG(value, msg_ptr); /* expire time */
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
 
-				GETLONG(value, msg_ptr);
+				GETLONG(value, msg_ptr); /* minimum TTL */
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
 				break;
 			case T_NULL:
