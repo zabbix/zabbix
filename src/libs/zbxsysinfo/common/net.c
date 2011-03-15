@@ -28,7 +28,7 @@
 
 #ifdef _WINDOWS
 #include <windns.h>
-#pragma comment(lib, "Dnsapi.lib") /* Add the library for DnsQuery function */
+#pragma comment(lib, "Dnsapi.lib") /* add the library for DnsQuery function */
 #endif
 
 /*
@@ -120,7 +120,7 @@ int	NET_TCP_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 #if !defined(C_IN) && !defined(_WINDOWS)
 #	define C_IN	ns_c_in
 #endif	/* C_IN */
-/* Define DNS record types to use common names on all systems, see RFC1035 standard for the types */
+/* define DNS record types to use common names on all systems, see RFC1035 standard for the types */
 #ifndef T_ANY
 #	define T_ANY	255
 #endif	/* T_ANY */
@@ -222,13 +222,14 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 {
 #if defined(HAVE_RES_QUERY) || defined(_WINDOWS)
 
-	int	res, type, retrans, retry, i, offset = 0;
-	char	ip[MAX_STRING_LEN];
-	char	zone[MAX_STRING_LEN];
-	char	retransStr[MAX_STRING_LEN];
-	char	retryStr[MAX_STRING_LEN];
-	char	tmp[MAX_STRING_LEN];
-	char	buffer[MAX_STRING_LEN];
+	int		res, type, retrans, retry, i, offset = 0;
+	char		ip[MAX_STRING_LEN];
+	char		zone[MAX_STRING_LEN];
+	char		retransStr[MAX_STRING_LEN];
+	char		retryStr[MAX_STRING_LEN];
+	char		tmp[MAX_STRING_LEN];
+	char		buffer[MAX_STRING_LEN];
+	struct in_addr	inaddr;
 
 	typedef struct
 	{
@@ -270,7 +271,6 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 	int		num_answers, num_query, q_type, q_class, q_ttl, q_len, value, c, n;
 	struct servent	*s;
 	HEADER 		*hp;
-	struct in_addr	inaddr, asddd;
 	struct protoent	*pr;
 #if PACKETSZ > 1024
 	char 		buf[PACKETSZ];
@@ -373,8 +373,9 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 		switch (pDnsRecord->wType)
 		{
 			case T_A:
+				inaddr.s_addr = pDnsRecord->Data.A.IpAddress;
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s",
-						inet_ntoa(AF_INET, &(pDnsRecord->Data.A.IpAddress), tmp, sizeof(tmp)));
+						inet_ntoa(inaddr));
 				break;
 			case T_NS:
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s",
@@ -416,7 +417,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 				break;
 			case T_NULL:
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " len:%d",
-						pDnsRecord->Data.Null.dwByteCount,
+						pDnsRecord->Data.Null.dwByteCount);
 				break;
 			case T_PTR:
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s",
