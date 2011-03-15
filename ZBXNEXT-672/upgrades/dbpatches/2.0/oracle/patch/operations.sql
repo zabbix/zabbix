@@ -192,7 +192,7 @@ BEGIN
 	LOOP
 		FETCH n_cur INTO v_nodeid;
 
- 		EXIT WHEN n_cur%NOTFOUND;
+		EXIT WHEN n_cur%NOTFOUND;
 
 		minid := v_nodeid * 100000000000000;
 		maxid := minid + 99999999999999;
@@ -240,7 +240,7 @@ BEGIN
 						v_esc_step_to, v_evaltype, v_default_msg, v_shortdata, v_longdata,
 						v_mediatypeid, v_object, v_objectid;
 
- 				EXIT WHEN o_cur%NOTFOUND;
+				EXIT WHEN o_cur%NOTFOUND;
 
 				IF v_operationtype IN (0) THEN			-- OPERATION_TYPE_MESSAGE
 					new_operationid := new_operationid + 1;
@@ -291,7 +291,7 @@ BEGIN
 							h_pos := INSTR(cur_string, ':');
 							g_pos := INSTR(cur_string, '#');
 
- 							IF h_pos <> 0 OR g_pos <> 0 THEN
+							IF h_pos <> 0 OR g_pos <> 0 THEN
 								new_operationid := new_operationid + 1;
 
 								INSERT INTO operations (operationid, actionid, operationtype,
@@ -399,5 +399,5 @@ DROP TABLE t_opconditions;
 UPDATE opcommand
 	SET type = 1, command = TRIM(SUBSTR(CAST(command AS nvarchar2(2048)), 5))
 	WHERE SUBSTR(CAST(command AS nvarchar2(2048)), 1, 4) = 'IPMI';
- 
+
 DELETE FROM ids WHERE table_name IN ('operations', 'opconditions', 'opmediatypes');
