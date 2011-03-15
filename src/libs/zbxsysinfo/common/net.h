@@ -29,6 +29,5 @@ int	tcp_expect(const char *host, unsigned short port, int timeout, const char *r
 int	NET_TCP_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	NET_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	NET_DNS_RECORD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result, int shortAnswer);
 
 #endif /* ZABBIX_SYSINFO_COMMON_NET_H */

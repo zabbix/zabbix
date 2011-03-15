@@ -2390,10 +2390,10 @@ char	*zbx_age2str(int age)
 	int		days, hours, minutes, offset;
 	static char	buffer[32];
 
-	days	= (int)((double)age / 86400);
-	hours	= (int)((double)(age - days * 86400) / 3600);
-	minutes	= (int)((double)(age - days * 86400 - hours * 3600) / 60);
-	offset	= 0;
+	days = (int)((double)age / SEC_PER_DAY);
+	hours = (int)((double)(age - days * SEC_PER_DAY) / SEC_PER_HOUR);
+	minutes	= (int)((double)(age - days * SEC_PER_DAY - hours * SEC_PER_HOUR) / SEC_PER_MIN);
+	offset = 0;
 
 	if (days)
 		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%dd ", days);
@@ -2409,7 +2409,7 @@ char	*zbx_date2str(time_t date)
 	static char	buffer[11];
 	struct tm	*tm;
 
-	tm	= localtime(&date);
+	tm = localtime(&date);
 	zbx_snprintf(buffer, sizeof(buffer), "%.4d.%.2d.%.2d",
 			tm->tm_year + 1900,
 			tm->tm_mon + 1,
@@ -2423,7 +2423,7 @@ char	*zbx_time2str(time_t time)
 	static char	buffer[9];
 	struct tm	*tm;
 
-	tm	= localtime(&time);
+	tm = localtime(&time);
 	zbx_snprintf(buffer, sizeof(buffer), "%.2d:%.2d:%.2d",
 			tm->tm_hour,
 			tm->tm_min,
@@ -2442,7 +2442,7 @@ static int	zbx_strncasecmp(const char *s1, const char *s2, size_t n)
 	if (NULL == s2)
 		return -1;
 
-	while (n && '\0' != *s1 && '\0' != *s2 &&
+	while (0 != n && '\0' != *s1 && '\0' != *s2 &&
 			tolower((unsigned char)*s1) == tolower((unsigned char)*s2))
 	{
 		s1++;
@@ -2450,7 +2450,7 @@ static int	zbx_strncasecmp(const char *s1, const char *s2, size_t n)
 		n--;
 	}
 
-	return n == 0 ? 0 : tolower((unsigned char)*s1) - tolower((unsigned char)*s2);
+	return 0 == n ? 0 : tolower((unsigned char)*s1) - tolower((unsigned char)*s2);
 }
 
 char	*zbx_strcasestr(const char *haystack, const char *needle)
