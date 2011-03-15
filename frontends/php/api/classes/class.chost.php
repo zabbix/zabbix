@@ -2035,7 +2035,6 @@ Copt::memoryPick();
 
 // delete host profile
 			DB::delete('hosts_profiles', array('hostid'=>$hostids));
-			DB::delete('hosts_profiles_ext', array('hostid'=>$hostids));
 
 // delete host applications
 			DB::delete('applications', array('hostid'=>$hostids));
