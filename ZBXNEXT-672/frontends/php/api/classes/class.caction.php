@@ -24,6 +24,14 @@
  */
 
 class CAction extends CZBXAPI{
+	private $_validOperationCommandTypes = array(
+		ZBX_SCRIPT_TYPE_IPMI => true,
+		ZBX_SCRIPT_TYPE_SCRIPT => true,
+		ZBX_SCRIPT_TYPE_SSH => true,
+		ZBX_SCRIPT_TYPE_TELNET => true,
+		ZBX_SCRIPT_TYPE_USER_SCRIPT => true
+	);
+
 /**
  * Get Actions data
  *
@@ -1055,26 +1063,32 @@ COpt::memoryPick();
 	protected function updateOperations($operations, $actionsDb){
 		$operationsUpdate = array();
 //sdii($operations);
+// messages
 		$opmessageCreate = array();
 		$opmessageUpdate = array();
 		$opmessageDeleteByOpId = array();
-		$opmessage_grpDeleteByOpId = array();
-		$opmessage_usrDeleteByOpId = array();
+
 		$opmessage_grpCreate = array();
 		$opmessage_usrCreate = array();
+		$opmessage_grpDeleteByOpId = array();
+		$opmessage_usrDeleteByOpId = array();
+
+// commands
+		$opcommandCreate = array();
+		$opcommandUpdate = array();
+		$opcommandDeleteByOpId = array();
 
 		$opcommand_grpCreate = array();
-		$opcommand_grpDelete = array();
-		$opcommand_grpUpdate = array();
 		$opcommand_hstCreate = array();
-		$opcommand_hstDelete = array();
-		$opcommand_hstUpdate = array();
-		$opcommand_hstDeleteByOpId = array();
-		$opcommand_grpDeleteByOpId = array();
 
+		$opcommand_grpDeleteByOpId = array();
+		$opcommand_hstDeleteByOpId = array();
+
+// groups
 		$opgroupCreate = array();
 		$opgroupDeleteByOpId = array();
 
+// templates
 		$optemplateCreate = array();
 		$optemplateDeleteByOpId = array();
 
@@ -1094,6 +1108,7 @@ COpt::memoryPick();
 						$opmessage_usrDeleteByOpId[] = $operationDb['operationid'];
 						break;
 					case OPERATION_TYPE_COMMAND:
+						$opcommandDeleteByOpId[] = $operationDb['operationid'];
 						$opcommand_hstDeleteByOpId[] = $operationDb['operationid'];
 						$opcommand_grpDeleteByOpId[] = $operationDb['operationid'];
 						break;
@@ -1185,34 +1200,37 @@ COpt::memoryPick();
 						$operationDb['opcommand_hst'] = array();
 
 					if($type_changed){
+						$operation['opcommand']['operationid'] = $operation['operationid'];
+						$opcommandCreate[] = $operation['opcommand'];
+
 						$opcommand_grpCreate = array_merge($opcommand_grpCreate, $operation['opcommand_grp']);
 						$opcommand_hstCreate = array_merge($opcommand_hstCreate, $operation['opcommand_hst']);
 					}
 					else{
-						$diff = zbx_array_diff($operationDb['opcommand_grp'], $operation['opcommand_grp'], 'opcommand_grpid');
+						$opcommandUpdate[] = array(
+							'values' => $operation['opcommand'],
+							'where' => array('operationid='.$operation['operationid']),
+						);
+
+						$diff = zbx_array_diff($operationDb['opcommand_grp'], $operation['opcommand_grp'], 'groupid');
 						$opcommand_grpCreate = array_merge($opcommand_grpCreate, $diff['second']);
-						$opcommand_grpDelete = array_merge($opcommand_grpDelete, zbx_objectValues($diff['first'], 'opcommand_grpid'));
-						foreach($diff['both'] as $opcommand_grp){
-							$opcommand_grpid = $opcommand_grp['opcommand_grpid'];
-							unset($opcommand_grp['opcommand_grpid']);
-							$opcommand_grpUpdate[] = array(
-								'values' => $opcommand_grp,
-								'where' => array('opcommand_grpid='.$opcommand_grpid),
-							);
+
+						foreach($diff['first'] as $omgrp){
+							DB::delete('opcommand_grp', array(
+								'groupid' => $omgrp['groupid'],
+								'operationid' => $operation['operationid'],
+							));
 						}
 
-						$diff = zbx_array_diff($operationDb['opcommand_hst'], $operation['opcommand_hst'], 'opcommand_hstid');
+
+						$diff = zbx_array_diff($operationDb['opcommand_hst'], $operation['opcommand_hst'], 'hostid');
 						$opcommand_hstCreate = array_merge($opcommand_hstCreate, $diff['second']);
-						$opcommand_hstDelete = array_merge($opcommand_hstDelete, zbx_objectValues($diff['first'], 'opcommand_hstid'));
-						foreach($diff['both'] as $opcommand_hst){
-							$opcommand_hstid = $opcommand_hst['opcommand_hstid'];
-							unset($opcommand_hst['opcommand_hstid']);
-							$opcommand_hstUpdate[] = array(
-								'values' => $opcommand_hst,
-								'where' => array('opcommand_hstid='.$opcommand_hstid),
-							);
+						foreach($diff['first'] as $omhst){
+							DB::delete('opcommand_hst', array(
+								'hostid' => $omhst['hostid'],
+								'operationid' => $operation['operationid'],
+							));
 						}
-
 					}
 					break;
 				case OPERATION_TYPE_GROUP_ADD:
@@ -1287,10 +1305,10 @@ COpt::memoryPick();
 			DB::delete('opcommand_hst', array('operationid' => $opcommand_hstDeleteByOpId));
 		if(!empty($opcommand_grpDeleteByOpId))
 			DB::delete('opcommand_grp', array('operationid' => $opcommand_grpDeleteByOpId));
-		if(!empty($opcommand_grpDelete))
-			DB::delete('opcommand_grp', array('opcommand_grpid' => $opcommand_grpDelete));
-		if(!empty($opcommand_hstDelete))
-			DB::delete('opcommand_hst', array('opcommand_hstid' => $opcommand_hstDelete));
+		if(!empty($opcommand_grpDeleteByOpId))
+			DB::delete('opcommand_grp', array('opcommand_grpid' => $opcommand_grpDeleteByOpId));
+		if(!empty($opcommand_hstDeleteByOpId))
+			DB::delete('opcommand_hst', array('opcommand_hstid' => $opcommand_hstDeleteByOpId));
 		if(!empty($opgroupDeleteByOpId))
 			DB::delete('opgroup', array('operationid' => $opgroupDeleteByOpId));
 		if(!empty($optemplateDeleteByOpId))
@@ -1307,8 +1325,7 @@ COpt::memoryPick();
 		DB::insert('optemplate', $optemplateCreate);
 
 		DB::update('opmessage', $opmessageUpdate);
-		DB::update('opcommand_grp', $opcommand_grpUpdate);
-		DB::update('opcommand_hst', $opcommand_hstUpdate);
+		DB::update('opcommand', $opcommandUpdate);
 
 
 		DB::insert('opconditions', $opconditionsCreate);
@@ -1404,6 +1421,12 @@ COpt::memoryPick();
 
 					if(empty($groupids) && empty($hostids) && $without_current)
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('No targets for operation command.'));
+
+					if(!isset($operation['opcommand']['type']))
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('You did not specify command type for operation.'));
+
+					if(!isset($this->_validOperationCommandTypes[$operation['opcommand']['type']]))
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('You specify incorrect action operation command type.'));
 
 					if(!isset($operation['opcommand']['type']))
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('You did not specify command type for operation.'));
