@@ -163,8 +163,8 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 
 	result = DBselectN(sql, 1);
 
-	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
-		zabbix_log(LOG_LEVEL_DEBUG, "Result for LOGSOURCE is empty");
+	if (NULL == (row = DBfetch(result)))
+		zabbix_log(LOG_LEVEL_DEBUG, "Result for LOGEVENTID is empty");
 	else
 	{
 		if (NULL == zbx_regexp_match(row[0], arg1, NULL))
@@ -174,6 +174,8 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 		res = SUCCEED;
 	}
 	DBfree_result(result);
+
+	zbx_free(arg1);
 clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
@@ -189,7 +191,7 @@ clean:
  * Parameters: item - item (performance metric)                               *
  *             parameter - ignored                                            *
  *                                                                            *
- * Return value: SUCCEED - evaluated successfully, result is stored in value  *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -225,7 +227,7 @@ static int	evaluate_LOGSOURCE(char *value, DB_ITEM *item, const char *function, 
 
 	result = DBselectN(sql, 1);
 
-	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
+	if (NULL == (row = DBfetch(result)))
 		zabbix_log(LOG_LEVEL_DEBUG, "Result for LOGSOURCE is empty");
 	else
 	{
@@ -283,7 +285,7 @@ static int	evaluate_LOGSEVERITY(char *value, DB_ITEM *item, const char *function
 
 	result = DBselectN(sql, 1);
 
-	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
+	if (NULL == (row = DBfetch(result)))
 		zabbix_log(LOG_LEVEL_DEBUG, "Result for LOGSEVERITY is empty");
 	else
 	{

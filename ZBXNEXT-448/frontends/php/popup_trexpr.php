@@ -235,7 +235,7 @@
 			'allowed_types' => $allowed_types_log
 		),
 		'logsource' => array(
-			'description' => 'N {OP} X, where X is 1 - last log source of the last log entry matches T',
+			'description' => 'N {OP} X, where X is 1 - last log source of the last log entry matches T, 0 - otherwise.',
 			'operators' => $limited_operators,
 			'params' => $param1_str,
 			'allowed_types' => $allowed_types_log

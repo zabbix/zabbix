@@ -140,6 +140,7 @@
 			),
 			'item_types' =>	$item_types_all
 		);
+
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['logeventid'] = array(
 			'args' => array(
 				array('type' => 'str', 'mandat' => true)
@@ -148,12 +149,14 @@
 				ITEM_VALUE_TYPE_LOG => true,
 			)
 		);
+
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['logseverity'] = array(
 			'args' => $args_ignored,
 			'item_types' => array(
 				ITEM_VALUE_TYPE_LOG => true,
 			)
 		);
+
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['logsource'] = array(
 			'args' => array(
 				array('type' => 'str', 'mandat' => true)
