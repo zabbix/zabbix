@@ -81,7 +81,7 @@ require_once('include/templates/action.js.php');
 	morder_result($data['conditions'], array('conditiontype','operator'), ZBX_SORT_DOWN);
 
 // group conditions by type
-	$condElements = new CTable(S_NO_CONDITIONS_DEFINED);
+	$condElements = new CTable(S_NO_CONDITIONS_DEFINED, 'formElementTable');
 
 	$i=0;
 	$grouped_conditions = array();
@@ -94,7 +94,7 @@ require_once('include/templates/action.js.php');
 
 		$label = chr(ord('A') + $i);
 		$condElements->addRow(array('('.$label.')',array(
-			new CCheckBox('g_conditionid[]', 'no', null,$i),
+			new CCheckBox('g_conditionid[]', 'no', null,$i), SPACE,
 			get_condition_desc($condition['conditiontype'], $condition['operator'], $condition['value']))
 		));
 
