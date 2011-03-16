@@ -4,159 +4,159 @@ DELETE FROM hosts_profiles_ext WHERE NOT hostid IN (SELECT hostid FROM hosts)
 /
 
 CREATE TABLE host_profile (
-	hostid			BIGINT NOT NULL,
-	type			VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	type_full		VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	name			VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	alias			VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	os			VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	os_full			VARCHAR(255) WITH DEFAULT '' NOT NULL,
-	os_short		VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	serialno_a		VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	serialno_b		VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	tag			VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	asset_tag		VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	macaddress_a		VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	macaddress_b		VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	hardware		VARCHAR(255) WITH DEFAULT '' NOT NULL,
-	hardware_full		VARCHAR(2048) WITH DEFAULT '' NOT NULL,
-	software		VARCHAR(255) WITH DEFAULT '' NOT NULL,
-	software_full		VARCHAR(2048) WITH DEFAULT '' NOT NULL,
-	software_app_a		VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	software_app_b		VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	software_app_c		VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	software_app_d		VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	software_app_e		VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	contact			VARCHAR(2048) WITH DEFAULT '' NOT NULL,
-	location		VARCHAR(2048) WITH DEFAULT '' NOT NULL,
-	location_lat		VARCHAR(16) WITH DEFAULT '' NOT NULL,
-	location_lon		VARCHAR(16) WITH DEFAULT '' NOT NULL,
-	notes			VARCHAR(2048) WITH DEFAULT '' NOT NULL,
-	chassis			VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	model			VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	hw_arch			VARCHAR(32) WITH DEFAULT '' NOT NULL,
-	vendor			VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	contract_number		VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	installer_name		VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	deployment_status	VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	url_a			VARCHAR(255) WITH DEFAULT '' NOT NULL,
-	url_b			VARCHAR(255) WITH DEFAULT '' NOT NULL,
-	url_c			VARCHAR(255) WITH DEFAULT '' NOT NULL,
-	host_networks		VARCHAR(2048) WITH DEFAULT '' NOT NULL,
-	host_netmask		VARCHAR(39) WITH DEFAULT '' NOT NULL,
-	host_router		VARCHAR(39) WITH DEFAULT '' NOT NULL,
-	oob_ip			VARCHAR(39) WITH DEFAULT '' NOT NULL,
-	oob_netmask		VARCHAR(39) WITH DEFAULT '' NOT NULL,
-	oob_router		VARCHAR(39) WITH DEFAULT '' NOT NULL,
-	date_hw_purchase	VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	date_hw_install		VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	date_hw_expiry		VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	date_hw_decomm		VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	site_address_a		VARCHAR(128) WITH DEFAULT '' NOT NULL,
-	site_address_b		VARCHAR(128) WITH DEFAULT '' NOT NULL,
-	site_address_c		VARCHAR(128) WITH DEFAULT '' NOT NULL,
-	site_city		VARCHAR(128) WITH DEFAULT '' NOT NULL,
-	site_state		VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	site_country		VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	site_zip		VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	site_rack		VARCHAR(128) WITH DEFAULT '' NOT NULL,
-	site_notes		VARCHAR(2048) WITH DEFAULT '' NOT NULL,
-	poc_1_name		VARCHAR(128) WITH DEFAULT '' NOT NULL,
-	poc_1_email		VARCHAR(128) WITH DEFAULT '' NOT NULL,
-	poc_1_phone_a		VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	poc_1_phone_b		VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	poc_1_cell		VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	poc_1_screen		VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	poc_1_notes		VARCHAR(2048) WITH DEFAULT '' NOT NULL,
-	poc_2_name		VARCHAR(128) WITH DEFAULT '' NOT NULL,
-	poc_2_email		VARCHAR(128) WITH DEFAULT '' NOT NULL,
-	poc_2_phone_a		VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	poc_2_phone_b		VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	poc_2_cell		VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	poc_2_screen		VARCHAR(64) WITH DEFAULT '' NOT NULL,
-	poc_2_notes		VARCHAR(2048) WITH DEFAULT '' NOT NULL,
-	PRIMARY KEY ( hostid )
-);
+	hostid                   bigint                                    NOT NULL,
+	type                     varchar(64)     WITH DEFAULT ''           NOT NULL,
+	type_full                varchar(64)     WITH DEFAULT ''           NOT NULL,
+	name                     varchar(64)     WITH DEFAULT ''           NOT NULL,
+	alias                    varchar(64)     WITH DEFAULT ''           NOT NULL,
+	os                       varchar(64)     WITH DEFAULT ''           NOT NULL,
+	os_full                  varchar(255)    WITH DEFAULT ''           NOT NULL,
+	os_short                 varchar(64)     WITH DEFAULT ''           NOT NULL,
+	serialno_a               varchar(64)     WITH DEFAULT ''           NOT NULL,
+	serialno_b               varchar(64)     WITH DEFAULT ''           NOT NULL,
+	tag                      varchar(64)     WITH DEFAULT ''           NOT NULL,
+	asset_tag                varchar(64)     WITH DEFAULT ''           NOT NULL,
+	macaddress_a             varchar(64)     WITH DEFAULT ''           NOT NULL,
+	macaddress_b             varchar(64)     WITH DEFAULT ''           NOT NULL,
+	hardware                 varchar(255)    WITH DEFAULT ''           NOT NULL,
+	hardware_full            varchar(2048)   WITH DEFAULT ''           NOT NULL,
+	software                 varchar(255)    WITH DEFAULT ''           NOT NULL,
+	software_full            varchar(2048)   WITH DEFAULT ''           NOT NULL,
+	software_app_a           varchar(64)     WITH DEFAULT ''           NOT NULL,
+	software_app_b           varchar(64)     WITH DEFAULT ''           NOT NULL,
+	software_app_c           varchar(64)     WITH DEFAULT ''           NOT NULL,
+	software_app_d           varchar(64)     WITH DEFAULT ''           NOT NULL,
+	software_app_e           varchar(64)     WITH DEFAULT ''           NOT NULL,
+	contact                  varchar(2048)   WITH DEFAULT ''           NOT NULL,
+	location                 varchar(2048)   WITH DEFAULT ''           NOT NULL,
+	location_lat             varchar(16)     WITH DEFAULT ''           NOT NULL,
+	location_lon             varchar(16)     WITH DEFAULT ''           NOT NULL,
+	notes                    varchar(2048)   WITH DEFAULT ''           NOT NULL,
+	chassis                  varchar(64)     WITH DEFAULT ''           NOT NULL,
+	model                    varchar(64)     WITH DEFAULT ''           NOT NULL,
+	hw_arch                  varchar(32)     WITH DEFAULT ''           NOT NULL,
+	vendor                   varchar(64)     WITH DEFAULT ''           NOT NULL,
+	contract_number          varchar(64)     WITH DEFAULT ''           NOT NULL,
+	installer_name           varchar(64)     WITH DEFAULT ''           NOT NULL,
+	deployment_status        varchar(64)     WITH DEFAULT ''           NOT NULL,
+	url_a                    varchar(255)    WITH DEFAULT ''           NOT NULL,
+	url_b                    varchar(255)    WITH DEFAULT ''           NOT NULL,
+	url_c                    varchar(255)    WITH DEFAULT ''           NOT NULL,
+	host_networks            varchar(2048)   WITH DEFAULT ''           NOT NULL,
+	host_netmask             varchar(39)     WITH DEFAULT ''           NOT NULL,
+	host_router              varchar(39)     WITH DEFAULT ''           NOT NULL,
+	oob_ip                   varchar(39)     WITH DEFAULT ''           NOT NULL,
+	oob_netmask              varchar(39)     WITH DEFAULT ''           NOT NULL,
+	oob_router               varchar(39)     WITH DEFAULT ''           NOT NULL,
+	date_hw_purchase         varchar(64)     WITH DEFAULT ''           NOT NULL,
+	date_hw_install          varchar(64)     WITH DEFAULT ''           NOT NULL,
+	date_hw_expiry           varchar(64)     WITH DEFAULT ''           NOT NULL,
+	date_hw_decomm           varchar(64)     WITH DEFAULT ''           NOT NULL,
+	site_address_a           varchar(128)    WITH DEFAULT ''           NOT NULL,
+	site_address_b           varchar(128)    WITH DEFAULT ''           NOT NULL,
+	site_address_c           varchar(128)    WITH DEFAULT ''           NOT NULL,
+	site_city                varchar(128)    WITH DEFAULT ''           NOT NULL,
+	site_state               varchar(64)     WITH DEFAULT ''           NOT NULL,
+	site_country             varchar(64)     WITH DEFAULT ''           NOT NULL,
+	site_zip                 varchar(64)     WITH DEFAULT ''           NOT NULL,
+	site_rack                varchar(128)    WITH DEFAULT ''           NOT NULL,
+	site_notes               varchar(2048)   WITH DEFAULT ''           NOT NULL,
+	poc_1_name               varchar(128)    WITH DEFAULT ''           NOT NULL,
+	poc_1_email              varchar(128)    WITH DEFAULT ''           NOT NULL,
+	poc_1_phone_a            varchar(64)     WITH DEFAULT ''           NOT NULL,
+	poc_1_phone_b            varchar(64)     WITH DEFAULT ''           NOT NULL,
+	poc_1_cell               varchar(64)     WITH DEFAULT ''           NOT NULL,
+	poc_1_screen             varchar(64)     WITH DEFAULT ''           NOT NULL,
+	poc_1_notes              varchar(2048)   WITH DEFAULT ''           NOT NULL,
+	poc_2_name               varchar(128)    WITH DEFAULT ''           NOT NULL,
+	poc_2_email              varchar(128)    WITH DEFAULT ''           NOT NULL,
+	poc_2_phone_a            varchar(64)     WITH DEFAULT ''           NOT NULL,
+	poc_2_phone_b            varchar(64)     WITH DEFAULT ''           NOT NULL,
+	poc_2_cell               varchar(64)     WITH DEFAULT ''           NOT NULL,
+	poc_2_screen             varchar(64)     WITH DEFAULT ''           NOT NULL,
+	poc_2_notes              varchar(2048)   WITH DEFAULT ''           NOT NULL,
+	PRIMARY KEY (hostid)
+)
 /
-ALTER TABLE host_profile ADD CONSTRAINT c_host_profile_1 FOREIGN KEY (hostid) REFERENCES hosts (hostid) ON DELETE CASCADE;
+ALTER TABLE host_profile ADD CONSTRAINT c_host_profile_1 FOREIGN KEY (hostid) REFERENCES hosts (hostid) ON DELETE CASCADE
 /
 
 -- create temporary t_host_profile table
 CREATE TABLE t_host_profile (
-	hostid			BIGINT NOT NULL,
-	type			VARCHAR(64) WITH DEFAULT '',
-	type_full		VARCHAR(64) WITH DEFAULT '',
-	name			VARCHAR(64) WITH DEFAULT '',
-	alias			VARCHAR(64) WITH DEFAULT '',
-	os			VARCHAR(64) WITH DEFAULT '',
-	os_full			VARCHAR(255) WITH DEFAULT '',
-	os_short		VARCHAR(64) WITH DEFAULT '',
-	serialno_a		VARCHAR(64) WITH DEFAULT '',
-	serialno_b		VARCHAR(64) WITH DEFAULT '',
-	tag			VARCHAR(64) WITH DEFAULT '',
-	asset_tag		VARCHAR(64) WITH DEFAULT '',
-	macaddress_a		VARCHAR(64) WITH DEFAULT '',
-	macaddress_b		VARCHAR(64) WITH DEFAULT '',
-	hardware		VARCHAR(255) WITH DEFAULT '',
-	hardware_full		VARCHAR(2048) WITH DEFAULT '',
-	software		VARCHAR(255) WITH DEFAULT '',
-	software_full		VARCHAR(2048) WITH DEFAULT '',
-	software_app_a		VARCHAR(64) WITH DEFAULT '',
-	software_app_b		VARCHAR(64) WITH DEFAULT '',
-	software_app_c		VARCHAR(64) WITH DEFAULT '',
-	software_app_d		VARCHAR(64) WITH DEFAULT '',
-	software_app_e		VARCHAR(64) WITH DEFAULT '',
-	contact			VARCHAR(2048) WITH DEFAULT '',
-	location		VARCHAR(2048) WITH DEFAULT '',
-	location_lat		VARCHAR(16) WITH DEFAULT '',
-	location_lon		VARCHAR(16) WITH DEFAULT '',
-	notes			VARCHAR(2048) WITH DEFAULT '',
-	chassis			VARCHAR(64) WITH DEFAULT '',
-	model			VARCHAR(64) WITH DEFAULT '',
-	hw_arch			VARCHAR(32) WITH DEFAULT '',
-	vendor			VARCHAR(64) WITH DEFAULT '',
-	contract_number		VARCHAR(64) WITH DEFAULT '',
-	installer_name		VARCHAR(64) WITH DEFAULT '',
-	deployment_status	VARCHAR(64) WITH DEFAULT '',
-	url_a			VARCHAR(255) WITH DEFAULT '',
-	url_b			VARCHAR(255) WITH DEFAULT '',
-	url_c			VARCHAR(255) WITH DEFAULT '',
-	host_networks		VARCHAR(2048) WITH DEFAULT '',
-	host_netmask		VARCHAR(39) WITH DEFAULT '',
-	host_router		VARCHAR(39) WITH DEFAULT '',
-	oob_ip			VARCHAR(39) WITH DEFAULT '',
-	oob_netmask		VARCHAR(39) WITH DEFAULT '',
-	oob_router		VARCHAR(39) WITH DEFAULT '',
-	date_hw_purchase	VARCHAR(64) WITH DEFAULT '',
-	date_hw_install		VARCHAR(64) WITH DEFAULT '',
-	date_hw_expiry		VARCHAR(64) WITH DEFAULT '',
-	date_hw_decomm		VARCHAR(64) WITH DEFAULT '',
-	site_address_a		VARCHAR(128) WITH DEFAULT '',
-	site_address_b		VARCHAR(128) WITH DEFAULT '',
-	site_address_c		VARCHAR(128) WITH DEFAULT '',
-	site_city		VARCHAR(128) WITH DEFAULT '',
-	site_state		VARCHAR(64) WITH DEFAULT '',
-	site_country		VARCHAR(64) WITH DEFAULT '',
-	site_zip		VARCHAR(64) WITH DEFAULT '',
-	site_rack		VARCHAR(128) WITH DEFAULT '',
-	site_notes		VARCHAR(2048) WITH DEFAULT '',
-	poc_1_name		VARCHAR(128) WITH DEFAULT '',
-	poc_1_email		VARCHAR(128) WITH DEFAULT '',
-	poc_1_phone_a		VARCHAR(64) WITH DEFAULT '',
-	poc_1_phone_b		VARCHAR(64) WITH DEFAULT '',
-	poc_1_cell		VARCHAR(64) WITH DEFAULT '',
-	poc_1_screen		VARCHAR(64) WITH DEFAULT '',
-	poc_1_notes		VARCHAR(2048) WITH DEFAULT '',
-	poc_2_name		VARCHAR(128) WITH DEFAULT '',
-	poc_2_email		VARCHAR(128) WITH DEFAULT '',
-	poc_2_phone_a		VARCHAR(64) WITH DEFAULT '',
-	poc_2_phone_b		VARCHAR(64) WITH DEFAULT '',
-	poc_2_cell		VARCHAR(64) WITH DEFAULT '',
-	poc_2_screen		VARCHAR(64) WITH DEFAULT '',
-	poc_2_notes		VARCHAR(2048) WITH DEFAULT '',
-	notes_ext		VARCHAR(2048) WITH DEFAULT '',
-	PRIMARY KEY ( hostid )
-);
+	hostid                   bigint                                    NOT NULL,
+	type                     varchar(64)     WITH DEFAULT '',
+	type_full                varchar(64)     WITH DEFAULT '',
+	name                     varchar(64)     WITH DEFAULT '',
+	alias                    varchar(64)     WITH DEFAULT '',
+	os                       varchar(64)     WITH DEFAULT '',
+	os_full                  varchar(255)    WITH DEFAULT '',
+	os_short                 varchar(64)     WITH DEFAULT '',
+	serialno_a               varchar(64)     WITH DEFAULT '',
+	serialno_b               varchar(64)     WITH DEFAULT '',
+	tag                      varchar(64)     WITH DEFAULT '',
+	asset_tag                varchar(64)     WITH DEFAULT '',
+	macaddress_a             varchar(64)     WITH DEFAULT '',
+	macaddress_b             varchar(64)     WITH DEFAULT '',
+	hardware                 varchar(255)    WITH DEFAULT '',
+	hardware_full            varchar(2048)   WITH DEFAULT '',
+	software                 varchar(255)    WITH DEFAULT '',
+	software_full            varchar(2048)   WITH DEFAULT '',
+	software_app_a           varchar(64)     WITH DEFAULT '',
+	software_app_b           varchar(64)     WITH DEFAULT '',
+	software_app_c           varchar(64)     WITH DEFAULT '',
+	software_app_d           varchar(64)     WITH DEFAULT '',
+	software_app_e           varchar(64)     WITH DEFAULT '',
+	contact                  varchar(2048)   WITH DEFAULT '',
+	location                 varchar(2048)   WITH DEFAULT '',
+	location_lat             varchar(16)     WITH DEFAULT '',
+	location_lon             varchar(16)     WITH DEFAULT '',
+	notes                    varchar(2048)   WITH DEFAULT '',
+	chassis                  varchar(64)     WITH DEFAULT '',
+	model                    varchar(64)     WITH DEFAULT '',
+	hw_arch                  varchar(32)     WITH DEFAULT '',
+	vendor                   varchar(64)     WITH DEFAULT '',
+	contract_number          varchar(64)     WITH DEFAULT '',
+	installer_name           varchar(64)     WITH DEFAULT '',
+	deployment_status        varchar(64)     WITH DEFAULT '',
+	url_a                    varchar(255)    WITH DEFAULT '',
+	url_b                    varchar(255)    WITH DEFAULT '',
+	url_c                    varchar(255)    WITH DEFAULT '',
+	host_networks            varchar(2048)   WITH DEFAULT '',
+	host_netmask             varchar(39)     WITH DEFAULT '',
+	host_router              varchar(39)     WITH DEFAULT '',
+	oob_ip                   varchar(39)     WITH DEFAULT '',
+	oob_netmask              varchar(39)     WITH DEFAULT '',
+	oob_router               varchar(39)     WITH DEFAULT '',
+	date_hw_purchase         varchar(64)     WITH DEFAULT '',
+	date_hw_install          varchar(64)     WITH DEFAULT '',
+	date_hw_expiry           varchar(64)     WITH DEFAULT '',
+	date_hw_decomm           varchar(64)     WITH DEFAULT '',
+	site_address_a           varchar(128)    WITH DEFAULT '',
+	site_address_b           varchar(128)    WITH DEFAULT '',
+	site_address_c           varchar(128)    WITH DEFAULT '',
+	site_city                varchar(128)    WITH DEFAULT '',
+	site_state               varchar(64)     WITH DEFAULT '',
+	site_country             varchar(64)     WITH DEFAULT '',
+	site_zip                 varchar(64)     WITH DEFAULT '',
+	site_rack                varchar(128)    WITH DEFAULT '',
+	site_notes               varchar(2048)   WITH DEFAULT '',
+	poc_1_name               varchar(128)    WITH DEFAULT '',
+	poc_1_email              varchar(128)    WITH DEFAULT '',
+	poc_1_phone_a            varchar(64)     WITH DEFAULT '',
+	poc_1_phone_b            varchar(64)     WITH DEFAULT '',
+	poc_1_cell               varchar(64)     WITH DEFAULT '',
+	poc_1_screen             varchar(64)     WITH DEFAULT '',
+	poc_1_notes              varchar(2048)   WITH DEFAULT '',
+	poc_2_name               varchar(128)    WITH DEFAULT '',
+	poc_2_email              varchar(128)    WITH DEFAULT '',
+	poc_2_phone_a            varchar(64)     WITH DEFAULT '',
+	poc_2_phone_b            varchar(64)     WITH DEFAULT '',
+	poc_2_cell               varchar(64)     WITH DEFAULT '',
+	poc_2_screen             varchar(64)     WITH DEFAULT '',
+	poc_2_notes              varchar(2048)   WITH DEFAULT '',
+	notes_ext                varchar(2048)   WITH DEFAULT '',
+	PRIMARY KEY (hostid)
+)
 /
 
 -- select all profiles into temporary table
@@ -182,169 +182,169 @@ INSERT INTO t_host_profile
 		ep.site_notes, ep.poc_1_name, ep.poc_1_email, ep.poc_1_phone_1, ep.poc_1_phone_2, ep.poc_1_cell, ep.poc_1_screen, ep.poc_1_notes,
 		ep.poc_2_name, ep.poc_2_email, ep.poc_2_phone_1, ep.poc_2_phone_2, ep.poc_2_cell, ep.poc_2_screen, ep.poc_2_notes, ep.device_notes
 	FROM hosts_profiles p RIGHT JOIN hosts_profiles_ext ep on p.hostid=ep.hostid
-	WHERE p.hostid IS NULL;
+	WHERE p.hostid IS NULL
 /
 
-UPDATE t_host_profile SET type='' WHERE type IS NULL;
+UPDATE t_host_profile SET type='' WHERE type IS NULL
 /
-UPDATE t_host_profile SET type_full='' WHERE type_full IS NULL;
+UPDATE t_host_profile SET type_full='' WHERE type_full IS NULL
 /
-UPDATE t_host_profile SET name='' WHERE name IS NULL;
+UPDATE t_host_profile SET name='' WHERE name IS NULL
 /
-UPDATE t_host_profile SET alias='' WHERE alias IS NULL;
+UPDATE t_host_profile SET alias='' WHERE alias IS NULL
 /
-UPDATE t_host_profile SET os='' WHERE os IS NULL;
+UPDATE t_host_profile SET os='' WHERE os IS NULL
 /
-UPDATE t_host_profile SET os_full='' WHERE os_full IS NULL;
+UPDATE t_host_profile SET os_full='' WHERE os_full IS NULL
 /
-UPDATE t_host_profile SET os_short='' WHERE os_short IS NULL;
+UPDATE t_host_profile SET os_short='' WHERE os_short IS NULL
 /
-UPDATE t_host_profile SET serialno_a='' WHERE serialno_a IS NULL;
+UPDATE t_host_profile SET serialno_a='' WHERE serialno_a IS NULL
 /
-UPDATE t_host_profile SET serialno_b='' WHERE serialno_b IS NULL;
+UPDATE t_host_profile SET serialno_b='' WHERE serialno_b IS NULL
 /
-UPDATE t_host_profile SET tag='' WHERE tag IS NULL;
+UPDATE t_host_profile SET tag='' WHERE tag IS NULL
 /
-UPDATE t_host_profile SET asset_tag='' WHERE asset_tag IS NULL;
+UPDATE t_host_profile SET asset_tag='' WHERE asset_tag IS NULL
 /
-UPDATE t_host_profile SET macaddress_a='' WHERE macaddress_a IS NULL;
+UPDATE t_host_profile SET macaddress_a='' WHERE macaddress_a IS NULL
 /
-UPDATE t_host_profile SET macaddress_b='' WHERE macaddress_b IS NULL;
+UPDATE t_host_profile SET macaddress_b='' WHERE macaddress_b IS NULL
 /
-UPDATE t_host_profile SET hardware='' WHERE hardware IS NULL;
+UPDATE t_host_profile SET hardware='' WHERE hardware IS NULL
 /
-UPDATE t_host_profile SET hardware_full='' WHERE hardware_full IS NULL;
+UPDATE t_host_profile SET hardware_full='' WHERE hardware_full IS NULL
 /
-UPDATE t_host_profile SET software='' WHERE software IS NULL;
+UPDATE t_host_profile SET software='' WHERE software IS NULL
 /
-UPDATE t_host_profile SET software_full='' WHERE software_full IS NULL;
+UPDATE t_host_profile SET software_full='' WHERE software_full IS NULL
 /
-UPDATE t_host_profile SET software_app_a='' WHERE software_app_a IS NULL;
+UPDATE t_host_profile SET software_app_a='' WHERE software_app_a IS NULL
 /
-UPDATE t_host_profile SET software_app_b='' WHERE software_app_b IS NULL;
+UPDATE t_host_profile SET software_app_b='' WHERE software_app_b IS NULL
 /
-UPDATE t_host_profile SET software_app_c='' WHERE software_app_c IS NULL;
+UPDATE t_host_profile SET software_app_c='' WHERE software_app_c IS NULL
 /
-UPDATE t_host_profile SET software_app_d='' WHERE software_app_d IS NULL;
+UPDATE t_host_profile SET software_app_d='' WHERE software_app_d IS NULL
 /
-UPDATE t_host_profile SET software_app_e='' WHERE software_app_e IS NULL;
+UPDATE t_host_profile SET software_app_e='' WHERE software_app_e IS NULL
 /
-UPDATE t_host_profile SET contact='' WHERE contact IS NULL;
+UPDATE t_host_profile SET contact='' WHERE contact IS NULL
 /
-UPDATE t_host_profile SET location='' WHERE location IS NULL;
+UPDATE t_host_profile SET location='' WHERE location IS NULL
 /
-UPDATE t_host_profile SET location_lat='' WHERE location_lat IS NULL;
+UPDATE t_host_profile SET location_lat='' WHERE location_lat IS NULL
 /
-UPDATE t_host_profile SET location_lon='' WHERE location_lon IS NULL;
+UPDATE t_host_profile SET location_lon='' WHERE location_lon IS NULL
 /
-UPDATE t_host_profile SET notes='' WHERE notes IS NULL;
+UPDATE t_host_profile SET notes='' WHERE notes IS NULL
 /
-UPDATE t_host_profile SET chassis='' WHERE chassis IS NULL;
+UPDATE t_host_profile SET chassis='' WHERE chassis IS NULL
 /
-UPDATE t_host_profile SET model='' WHERE model IS NULL;
+UPDATE t_host_profile SET model='' WHERE model IS NULL
 /
-UPDATE t_host_profile SET hw_arch='' WHERE hw_arch IS NULL;
+UPDATE t_host_profile SET hw_arch='' WHERE hw_arch IS NULL
 /
-UPDATE t_host_profile SET vendor='' WHERE vendor IS NULL;
+UPDATE t_host_profile SET vendor='' WHERE vendor IS NULL
 /
-UPDATE t_host_profile SET contract_number='' WHERE contract_number IS NULL;
+UPDATE t_host_profile SET contract_number='' WHERE contract_number IS NULL
 /
-UPDATE t_host_profile SET installer_name='' WHERE installer_name IS NULL;
+UPDATE t_host_profile SET installer_name='' WHERE installer_name IS NULL
 /
-UPDATE t_host_profile SET deployment_status='' WHERE deployment_status IS NULL;
+UPDATE t_host_profile SET deployment_status='' WHERE deployment_status IS NULL
 /
-UPDATE t_host_profile SET url_a='' WHERE url_a IS NULL;
+UPDATE t_host_profile SET url_a='' WHERE url_a IS NULL
 /
-UPDATE t_host_profile SET url_b='' WHERE url_b IS NULL;
+UPDATE t_host_profile SET url_b='' WHERE url_b IS NULL
 /
-UPDATE t_host_profile SET url_c='' WHERE url_c IS NULL;
+UPDATE t_host_profile SET url_c='' WHERE url_c IS NULL
 /
-UPDATE t_host_profile SET host_networks='' WHERE host_networks IS NULL;
+UPDATE t_host_profile SET host_networks='' WHERE host_networks IS NULL
 /
-UPDATE t_host_profile SET host_netmask='' WHERE host_netmask IS NULL;
+UPDATE t_host_profile SET host_netmask='' WHERE host_netmask IS NULL
 /
-UPDATE t_host_profile SET host_router='' WHERE host_router IS NULL;
+UPDATE t_host_profile SET host_router='' WHERE host_router IS NULL
 /
-UPDATE t_host_profile SET oob_ip='' WHERE oob_ip IS NULL;
+UPDATE t_host_profile SET oob_ip='' WHERE oob_ip IS NULL
 /
-UPDATE t_host_profile SET oob_netmask='' WHERE oob_netmask IS NULL;
+UPDATE t_host_profile SET oob_netmask='' WHERE oob_netmask IS NULL
 /
-UPDATE t_host_profile SET oob_router='' WHERE oob_router IS NULL;
+UPDATE t_host_profile SET oob_router='' WHERE oob_router IS NULL
 /
-UPDATE t_host_profile SET date_hw_purchase='' WHERE date_hw_purchase IS NULL;
+UPDATE t_host_profile SET date_hw_purchase='' WHERE date_hw_purchase IS NULL
 /
-UPDATE t_host_profile SET date_hw_install='' WHERE date_hw_install IS NULL;
+UPDATE t_host_profile SET date_hw_install='' WHERE date_hw_install IS NULL
 /
-UPDATE t_host_profile SET date_hw_expiry='' WHERE date_hw_expiry IS NULL;
+UPDATE t_host_profile SET date_hw_expiry='' WHERE date_hw_expiry IS NULL
 /
-UPDATE t_host_profile SET date_hw_decomm='' WHERE date_hw_decomm IS NULL;
+UPDATE t_host_profile SET date_hw_decomm='' WHERE date_hw_decomm IS NULL
 /
-UPDATE t_host_profile SET site_address_a='' WHERE site_address_a IS NULL;
+UPDATE t_host_profile SET site_address_a='' WHERE site_address_a IS NULL
 /
-UPDATE t_host_profile SET site_address_b='' WHERE site_address_b IS NULL;
+UPDATE t_host_profile SET site_address_b='' WHERE site_address_b IS NULL
 /
-UPDATE t_host_profile SET site_address_c='' WHERE site_address_c IS NULL;
+UPDATE t_host_profile SET site_address_c='' WHERE site_address_c IS NULL
 /
-UPDATE t_host_profile SET site_city='' WHERE site_city IS NULL;
+UPDATE t_host_profile SET site_city='' WHERE site_city IS NULL
 /
-UPDATE t_host_profile SET site_state='' WHERE site_state IS NULL;
+UPDATE t_host_profile SET site_state='' WHERE site_state IS NULL
 /
-UPDATE t_host_profile SET site_country='' WHERE site_country IS NULL;
+UPDATE t_host_profile SET site_country='' WHERE site_country IS NULL
 /
-UPDATE t_host_profile SET site_zip='' WHERE site_zip IS NULL;
+UPDATE t_host_profile SET site_zip='' WHERE site_zip IS NULL
 /
-UPDATE t_host_profile SET site_rack='' WHERE site_rack IS NULL;
+UPDATE t_host_profile SET site_rack='' WHERE site_rack IS NULL
 /
-UPDATE t_host_profile SET site_notes='' WHERE site_notes IS NULL;
+UPDATE t_host_profile SET site_notes='' WHERE site_notes IS NULL
 /
-UPDATE t_host_profile SET poc_1_name='' WHERE poc_1_name IS NULL;
+UPDATE t_host_profile SET poc_1_name='' WHERE poc_1_name IS NULL
 /
-UPDATE t_host_profile SET poc_1_email='' WHERE poc_1_email IS NULL;
+UPDATE t_host_profile SET poc_1_email='' WHERE poc_1_email IS NULL
 /
-UPDATE t_host_profile SET poc_1_phone_a='' WHERE poc_1_phone_a IS NULL;
+UPDATE t_host_profile SET poc_1_phone_a='' WHERE poc_1_phone_a IS NULL
 /
-UPDATE t_host_profile SET poc_1_phone_b='' WHERE poc_1_phone_b IS NULL;
+UPDATE t_host_profile SET poc_1_phone_b='' WHERE poc_1_phone_b IS NULL
 /
-UPDATE t_host_profile SET poc_1_cell='' WHERE poc_1_cell IS NULL;
+UPDATE t_host_profile SET poc_1_cell='' WHERE poc_1_cell IS NULL
 /
-UPDATE t_host_profile SET poc_1_screen='' WHERE poc_1_screen IS NULL;
+UPDATE t_host_profile SET poc_1_screen='' WHERE poc_1_screen IS NULL
 /
-UPDATE t_host_profile SET poc_1_notes='' WHERE poc_1_notes IS NULL;
+UPDATE t_host_profile SET poc_1_notes='' WHERE poc_1_notes IS NULL
 /
-UPDATE t_host_profile SET poc_2_name='' WHERE poc_2_name IS NULL;
+UPDATE t_host_profile SET poc_2_name='' WHERE poc_2_name IS NULL
 /
-UPDATE t_host_profile SET poc_2_email='' WHERE poc_2_email IS NULL;
+UPDATE t_host_profile SET poc_2_email='' WHERE poc_2_email IS NULL
 /
-UPDATE t_host_profile SET poc_2_phone_a='' WHERE poc_2_phone_a IS NULL;
+UPDATE t_host_profile SET poc_2_phone_a='' WHERE poc_2_phone_a IS NULL
 /
-UPDATE t_host_profile SET poc_2_phone_b='' WHERE poc_2_phone_b IS NULL;
+UPDATE t_host_profile SET poc_2_phone_b='' WHERE poc_2_phone_b IS NULL
 /
-UPDATE t_host_profile SET poc_2_cell='' WHERE poc_2_cell IS NULL;
+UPDATE t_host_profile SET poc_2_cell='' WHERE poc_2_cell IS NULL
 /
-UPDATE t_host_profile SET poc_2_screen='' WHERE poc_2_screen IS NULL;
+UPDATE t_host_profile SET poc_2_screen='' WHERE poc_2_screen IS NULL
 /
-UPDATE t_host_profile SET poc_2_notes='' WHERE poc_2_notes IS NULL;
+UPDATE t_host_profile SET poc_2_notes='' WHERE poc_2_notes IS NULL
 /
 
 -- merge notes field
-UPDATE t_host_profile SET notes_ext='' WHERE notes_ext IS NULL;
+UPDATE t_host_profile SET notes_ext='' WHERE notes_ext IS NULL
 /
-UPDATE t_host_profile SET notes=notes||'\n'||notes_ext WHERE notes<>'' AND notes_ext<>'';
+UPDATE t_host_profile SET notes=notes||'\n'||notes_ext WHERE notes<>'' AND notes_ext<>''
 /
-UPDATE t_host_profile SET notes=notes_ext WHERE notes='';
+UPDATE t_host_profile SET notes=notes_ext WHERE notes=''
 /
-ALTER TABLE t_host_profile DROP COLUMN notes_ext;
+ALTER TABLE t_host_profile DROP COLUMN notes_ext
 /
 REORG TABLE t_host_profile
 /
 
 -- copy data from temporary table
-INSERT INTO host_profile SELECT * FROM t_host_profile;
+INSERT INTO host_profile SELECT * FROM t_host_profile
 /
 
-DROP TABLE t_host_profile;
+DROP TABLE t_host_profile
 /
-DROP TABLE hosts_profiles;
+DROP TABLE hosts_profiles
 /
-DROP TABLE hosts_profiles_ext;
+DROP TABLE hosts_profiles_ext
 /
