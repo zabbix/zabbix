@@ -32,7 +32,7 @@ static	char	*zbx_regexp(const char *string, const char *pattern, int *len, int f
 
 	if(len) *len = 0;
 
-	if( string && string[0] )
+	if( string )
 	{
 		if ( 0 == regcomp(&re, pattern, flags) )
 		{
