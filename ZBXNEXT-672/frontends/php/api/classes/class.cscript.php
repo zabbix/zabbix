@@ -422,7 +422,7 @@ class CScript extends CZBXAPI{
 		$scriptNames = array();
 		foreach($scripts as $script){
 			if(!isset($upd_scripts[$script['scriptid']])){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script with scriptid [%s] does not exist.', $script['scriptid']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script with scriptid "%s" does not exist.', $script['scriptid']));
 			}
 
 			if(isset($script['name'])){
@@ -472,35 +472,40 @@ class CScript extends CZBXAPI{
  * @return boolean
  */
 	public function delete($scriptids){
-
 		$scriptids = zbx_toArray($scriptids);
 
-			if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
-				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-			}
+		if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
+			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+		}
 
-			if(empty($scriptids)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ scriptids ]');
-			}
+		if(empty($scriptids)){
+			self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete scripts. Empty input parameter "scriptids"');
+		}
 
-			$options = array(
-				'scriptids' => $scriptids,
-				'editable' => 1,
-				'output' => API_OUTPUT_EXTEND,
-				'preservekeys' => 1
-			);
-			$del_scripts = $this->get($options);
-			foreach($scriptids as $snum => $scriptid){
-				if(!isset($del_scripts[$scriptid])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Script with scriptid [%s] does not exist.', $scriptid));
-				}
-			}
+		$dbScripts = $this->get(array(
+			'scriptids' => $scriptids,
+			'editable' => true,
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => true
+		));
+		foreach($scriptids as $snum => $scriptid){
+			if(isset($dbScripts[$scriptid])) continue;
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Cannot delete scripts. Script with scriptid "%s" does not exist.', $scriptid));
+		}
 
-			$sql = 'DELETE FROM scripts WHERE '.DBcondition('scriptid',$scriptids);
-			if(!$result = DBexecute($sql))
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete script');
+		$scriptActions = API::Action()->get(array(
+			'scriptids' => $scriptids,
+			'nopermissions' => true,
+			'preservekeys' => true,
+			'output' => array('actionid','name')
+		));
 
-			return array('scriptids' => $scriptids);
+		foreach($scriptActions as $anum => $action)
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete scripts. Script "%1$s" is used in action operation "%2$s".', $dbScripts[$action['scriptid']]['name'], $action['name']));
+
+		DB::delete('scripts', array('scriptid' => $scriptids));
+
+		return array('scriptids' => $scriptids);
 	}
 
 	public function execute($data){
