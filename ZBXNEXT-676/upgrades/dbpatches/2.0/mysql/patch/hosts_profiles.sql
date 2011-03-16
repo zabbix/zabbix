@@ -32,7 +32,7 @@ CREATE TABLE host_profile (
 	notes			TEXT NOT NULL,
 	chassis			VARCHAR(64) DEFAULT '' NOT NULL,
 	model			VARCHAR(64) DEFAULT '' NOT NULL,
-	hw_arch			VARCHAR(32) DEFAULT '' NOT NULL,	
+	hw_arch			VARCHAR(32) DEFAULT '' NOT NULL,
 	vendor			VARCHAR(64) DEFAULT '' NOT NULL,
 	contract_number		VARCHAR(64) DEFAULT '' NOT NULL,
 	installer_name		VARCHAR(64) DEFAULT '' NOT NULL,
@@ -111,7 +111,7 @@ CREATE TABLE t_host_profile (
 	notes			TEXT,
 	chassis			VARCHAR(64) DEFAULT '',
 	model			VARCHAR(64) DEFAULT '',
-	hw_arch			VARCHAR(32) DEFAULT '',	
+	hw_arch			VARCHAR(32) DEFAULT '',
 	vendor			VARCHAR(64) DEFAULT '',
 	contract_number		VARCHAR(64) DEFAULT '',
 	installer_name		VARCHAR(64) DEFAULT '',
@@ -158,7 +158,7 @@ CREATE TABLE t_host_profile (
 ENGINE=InnoDB;
 
 -- select all profiles into temporary table
-INSERT INTO t_host_profile 
+INSERT INTO t_host_profile
 	SELECT p.hostid, p.devicetype, ep.device_type, p.name, ep.device_alias, p.os, ep.device_os, ep.device_os_short, p.serialno, ep.device_serial,
 		p.tag, ep.device_tag, p.macaddress, ep.ip_macaddress, ep.device_hardware, p.hardware, ep.device_software, p.software,
 		ep.device_app_01, ep.device_app_02, ep.device_app_03, ep.device_app_04, ep.device_app_05, p.contact, p.location, '', '',
@@ -169,7 +169,7 @@ INSERT INTO t_host_profile
 		ep.site_notes, ep.poc_1_name, ep.poc_1_email, ep.poc_1_phone_1, ep.poc_1_phone_2, ep.poc_1_cell, ep.poc_1_screen, ep.poc_1_notes,
 		ep.poc_2_name, ep.poc_2_email, ep.poc_2_phone_1, ep.poc_2_phone_2, ep.poc_2_cell, ep.poc_2_screen, ep.poc_2_notes, ep.device_notes
 	FROM hosts_profiles p LEFT JOIN hosts_profiles_ext ep on p.hostid=ep.hostid
-	UNION ALL 
+	UNION ALL
 	SELECT ep.hostid, p.devicetype, ep.device_type, p.name, ep.device_alias, p.os, ep.device_os, ep.device_os_short, p.serialno, ep.device_serial,
 		p.tag, ep.device_tag, p.macaddress, ep.ip_macaddress, ep.device_hardware, p.hardware, ep.device_software, p.software,
 		ep.device_app_01, ep.device_app_02, ep.device_app_03, ep.device_app_04, ep.device_app_05, p.contact, p.location, '', '',
@@ -179,9 +179,9 @@ INSERT INTO t_host_profile
 		ep.site_street_1, ep.site_street_2, ep.site_street_3, ep.site_city, ep.site_state, ep.site_country, ep.site_zip, ep.site_rack,
 		ep.site_notes, ep.poc_1_name, ep.poc_1_email, ep.poc_1_phone_1, ep.poc_1_phone_2, ep.poc_1_cell, ep.poc_1_screen, ep.poc_1_notes,
 		ep.poc_2_name, ep.poc_2_email, ep.poc_2_phone_1, ep.poc_2_phone_2, ep.poc_2_cell, ep.poc_2_screen, ep.poc_2_notes, ep.device_notes
-	FROM hosts_profiles p RIGHT JOIN hosts_profiles_ext ep on p.hostid=ep.hostid 
+	FROM hosts_profiles p RIGHT JOIN hosts_profiles_ext ep on p.hostid=ep.hostid
 	WHERE p.hostid IS NULL;
-	
+
 
 UPDATE t_host_profile SET type='' WHERE type IS NULL;
 UPDATE t_host_profile SET type_full='' WHERE type_full IS NULL;
