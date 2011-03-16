@@ -280,10 +280,13 @@ static void	add_command_alert(DC_HOST *host, zbx_uint64_t eventid, zbx_uint64_t 
 
 static int	get_dynamic_hostid(DB_EVENT *event, DC_HOST *host, char *error, size_t max_error_len)
 {
+	const char	*__function_name = "get_dynamic_hostid";
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		sql[512];
 	int		offset, ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	offset = zbx_snprintf(sql, sizeof(sql),
 			"select distinct h.hostid,h.host"
@@ -390,6 +393,8 @@ static int	get_dynamic_hostid(DB_EVENT *event, DC_HOST *host, char *error, size_
 		zbx_strlcpy(error, "Cannot find a corresponding host", max_error_len);
 		ret = FAIL;
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
