@@ -24,7 +24,7 @@ require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 class testPageInventory extends CWebTest{
 	// Returns all host inventories
 	public static function allInventory(){
-		return DBdata("select * from hosts_profiles order by hostid");
+		return DBdata("select * from host_profile order by hostid");
 	}
 
 	/**

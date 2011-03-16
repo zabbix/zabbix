@@ -489,8 +489,8 @@ class CHost extends CZBXAPI{
 		if(!is_null($options['withProfiles']) && $options['withProfiles']){
 			$sql_parts['where'][] = ' h.hostid IN ( '.
 					' SELECT hp.hostid '.
-					' FROM hosts_profiles hp )';
-//			AND exists ( SELECT hp.hostid FROM hosts_profiles hp WHERE h.hostid=hp.hostid)
+					' FROM host_profile hp )';
+//			AND exists ( SELECT hp.hostid FROM host_profile hp WHERE h.hostid=hp.hostid)
 		}
 
 // output
@@ -770,7 +770,7 @@ Copt::memoryPick();
 // Adding Profiles
 		if(!is_null($options['selectProfile']) && $options['selectProfile']){
 			$sql = 'SELECT hp.* '.
-				' FROM hosts_profiles hp '.
+				' FROM host_profile hp '.
 				' WHERE '.DBcondition('hp.hostid', $hostids);
 			$db_profile = DBselect($sql);
 			while($profile = DBfetch($db_profile))
@@ -1422,7 +1422,7 @@ Copt::memoryPick();
 				$values = array_map('zbx_dbstr', $host['profile']);
 				$values = implode(', ', $values);
 
-				DBexecute('INSERT INTO hosts_profiles (hostid, '.$fields.') VALUES ('.$hostid.', '.$values.')');
+				DBexecute('INSERT INTO host_profile (hostid, '.$fields.') VALUES ('.$hostid.', '.$values.')');
 			}
 		}
 
@@ -1806,13 +1806,13 @@ Copt::memoryPick();
 // PROFILE {{{
 			if(isset($data['profile']) && !is_null($data['profile'])){
 				if(empty($data['profile'])){
-					$sql = 'DELETE FROM hosts_profiles WHERE '.DBcondition('hostid', $hostids);
+					$sql = 'DELETE FROM host_profile WHERE '.DBcondition('hostid', $hostids);
 					if(!DBexecute($sql))
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete profile'));
 				}
 				else{
 					$existing_profiles = array();
-					$existing_profiles_db = DBselect('SELECT hostid FROM hosts_profiles WHERE '.DBcondition('hostid', $hostids));
+					$existing_profiles_db = DBselect('SELECT hostid FROM host_profile WHERE '.DBcondition('hostid', $hostids));
 					while($existing_profile = DBfetch($existing_profiles_db)){
 						$existing_profiles[] = $existing_profile['hostid'];
 					}
@@ -1820,11 +1820,11 @@ Copt::memoryPick();
 					$hostids_without_profile = array_diff($hostids, $existing_profiles);
 					foreach($hostids_without_profile as $hostid){
 						$data['profile']['hostid'] = $hostid;
-						DB::insert('hosts_profiles', array($data['profile']), false);
+						DB::insert('host_profile', array($data['profile']), false);
 					}
 
 					if(!empty($existing_profiles)){
-						DB::update('hosts_profiles', array(
+						DB::update('host_profile', array(
 							'values' => $data['profile'],
 							'where' => array(DBcondition('hostid', $existing_profiles))
 						));
@@ -2034,7 +2034,7 @@ Copt::memoryPick();
 			));
 
 // delete host profile
-			DB::delete('hosts_profiles', array('hostid'=>$hostids));
+			DB::delete('host_profile', array('hostid'=>$hostids));
 
 // delete host applications
 			DB::delete('applications', array('hostid'=>$hostids));

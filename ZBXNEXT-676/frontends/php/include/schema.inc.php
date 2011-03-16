@@ -2842,7 +2842,7 @@ return array(
 			),
 		),
 	),
-	'hosts_profiles' => array(
+	'host_profile' => array(
 		'key' => 'hostid',
 		'fields' => array(
 			'hostid' => array(
@@ -2858,76 +2858,16 @@ return array(
 				'length' => 64,
 				'default' => '',
 			),
+			'type_full' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
+			),
 			'name' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
-				'default' => '',
-			),
-			'os' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => '',
-			),
-			'serialno_a' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => '',
-			),
-			'tag' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => '',
-			),
-			'macaddress_a' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => '',
-			),
-			'hardware_full' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
-				'default' => '',
-			),
-			'software_full' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
-				'default' => '',
-			),
-			'contact' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
-				'default' => '',
-			),
-			'location' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
-				'default' => '',
-			),
-			'notes' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
-				'default' => '',
-			),
-			'location_lat' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 16,
-				'default' => '',
-			),
-			'location_lon' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 16,
 				'default' => '',
 			),
 			'alias' => array(
@@ -2936,13 +2876,7 @@ return array(
 				'length' => 64,
 				'default' => '',
 			),
-			'type_full' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => '',
-			),
-			'chassis' => array(
+			'os' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
@@ -2960,10 +2894,10 @@ return array(
 				'length' => 64,
 				'default' => '',
 			),
-			'hw_arch' => array(
+			'serialno_a' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 32,
+				'length' => 64,
 				'default' => '',
 			),
 			'serialno_b' => array(
@@ -2972,7 +2906,7 @@ return array(
 				'length' => 64,
 				'default' => '',
 			),
-			'model' => array(
+			'tag' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
@@ -2984,28 +2918,40 @@ return array(
 				'length' => 64,
 				'default' => '',
 			),
-			'vendor' => array(
+			'macaddress_a' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
 				'default' => '',
 			),
-			'contract_number' => array(
+			'macaddress_b' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
 				'default' => '',
 			),
-			'installer_name' => array(
+			'hardware' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
+				'length' => 255,
 				'default' => '',
 			),
-			'deployment_status' => array(
+			'hardware_full' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
+				'length' => 2048,
+				'default' => '',
+			),
+			'software' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			),
+			'software_full' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
 				'default' => '',
 			),
 			'software_app_a' => array(
@@ -3038,6 +2984,78 @@ return array(
 				'length' => 64,
 				'default' => '',
 			),
+			'contact' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
+				'default' => '',
+			),
+			'location' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
+				'default' => '',
+			),
+			'location_lat' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 16,
+				'default' => '',
+			),
+			'location_lon' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 16,
+				'default' => '',
+			),
+			'notes' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
+				'default' => '',
+			),
+			'chassis' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
+			),
+			'model' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
+			),
+			'hw_arch' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '',
+			),
+			'vendor' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
+			),
+			'contract_number' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
+			),
+			'installer_name' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
+			),
+			'deployment_status' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
+			),
 			'url_a' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
@@ -3062,18 +3080,6 @@ return array(
 				'length' => 2048,
 				'default' => '',
 			),
-			'hardware' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => '',
-			),
-			'software' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => '',
-			),
 			'host_netmask' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
@@ -3084,12 +3090,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 39,
-				'default' => '',
-			),
-			'macaddress_b' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
 				'default' => '',
 			),
 			'oob_ip' => array(
