@@ -93,6 +93,19 @@ class CAction extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
+		if(is_array($options['output'])){
+			unset($sql_parts['select']['actions']);
+
+			$dbTable = DB::getSchema('actions');
+			$sql_parts['select']['actionid'] = 'a.actionid';
+			foreach($options['output'] as $key => $field){
+				if(isset($dbTable['fields'][$field]))
+					$sql_parts['select'][$field] = 'a.'.$field;
+			}
+
+			$options['output'] = API_OUTPUT_CUSTOM;
+		}
+
 // editable + PERMISSION CHECK
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || !is_null($options['nopermissions'])){
 		}
@@ -252,7 +265,6 @@ class CAction extends CZBXAPI{
 		if(!is_null($options['mediatypeids'])){
 			zbx_value2array($options['mediatypeids']);
 
-
 // if($options['output'] != API_OUTPUT_SHORTEN && $options['output'] != API_OUTPUT_CUSTOM){
 			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['mediatypeid'] = 'om.mediatypeid';
@@ -265,10 +277,15 @@ class CAction extends CZBXAPI{
 			$sql_parts['where']['ao'] = 'a.actionid=o.actionid';
 			$sql_parts['where']['oom'] = 'o.operationid=om.operationid';
 		}
+
 // Operation messages
 // usrgrpids
 		if(!is_null($options['usrgrpids'])){
 			zbx_value2array($options['usrgrpids']);
+
+			if($options['output'] != API_OUTPUT_SHORTEN){
+				$sql_parts['select']['usrgrpid'] = 'omg.usrgrpid';
+			}
 
 			$sql_parts['from']['opmessage_grp'] = 'opmessage_grp omg';
 			$sql_parts['from']['operations'] = 'operations o';
@@ -282,6 +299,10 @@ class CAction extends CZBXAPI{
 		if(!is_null($options['userids'])){
 			zbx_value2array($options['userids']);
 
+			if($options['output'] != API_OUTPUT_SHORTEN){
+				$sql_parts['select']['userid'] = 'omu.userid';
+			}
+
 			$sql_parts['from']['opmessage_usr'] = 'opmessage_usr omu';
 			$sql_parts['from']['operations'] = 'operations o';
 
@@ -294,6 +315,10 @@ class CAction extends CZBXAPI{
 // scriptids
 		if(!is_null($options['scriptids'])){
 			zbx_value2array($options['scriptids']);
+
+			if($options['output'] != API_OUTPUT_SHORTEN){
+				$sql_parts['select']['scriptid'] = 'oc.scriptid';
+			}
 
 			$sql_parts['from']['opmessage_usr'] = 'opcommand oc';
 			$sql_parts['from']['operations'] = 'operations o';
