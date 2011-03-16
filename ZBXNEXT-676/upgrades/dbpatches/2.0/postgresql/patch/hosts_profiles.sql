@@ -2,7 +2,7 @@ DELETE FROM hosts_profiles WHERE NOT EXISTS (SELECT hostid FROM hosts WHERE host
 DELETE FROM hosts_profiles_ext WHERE NOT EXISTS (SELECT hostid FROM hosts WHERE hosts.hostid=hosts_profiles_ext.hostid);
 
 CREATE TABLE host_profile (
-	hostid			BIGINT(20) NOT NULL,
+	hostid			BIGINT NOT NULL,
 	type			VARCHAR(64) DEFAULT '' NOT NULL,
 	type_full		VARCHAR(64) DEFAULT '' NOT NULL,
 	name			VARCHAR(64) DEFAULT '' NOT NULL,
@@ -80,7 +80,7 @@ ALTER TABLE ONLY host_profile ADD CONSTRAINT c_host_profile_1 FOREIGN KEY (hosti
 
 -- create temporary t_host_profile table
 CREATE TABLE t_host_profile (
-	hostid			BIGINT(20) NOT NULL,
+	hostid			BIGINT NOT NULL,
 	type			VARCHAR(64) DEFAULT '',
 	type_full		VARCHAR(64) DEFAULT '',
 	name			VARCHAR(64) DEFAULT '',
@@ -244,13 +244,13 @@ UPDATE t_host_profile SET poc_1_phone_b='' WHERE poc_1_phone_b IS NULL;
 UPDATE t_host_profile SET poc_1_cell='' WHERE poc_1_cell IS NULL;
 UPDATE t_host_profile SET poc_1_screen='' WHERE poc_1_screen IS NULL;
 UPDATE t_host_profile SET poc_1_notes='' WHERE poc_1_notes IS NULL;
-UPDATE t_host_profile SET poc_2_name='' WHERE poc_1_name IS NULL;
-UPDATE t_host_profile SET poc_2_email='' WHERE poc_1_email IS NULL;
-UPDATE t_host_profile SET poc_2_phone_a='' WHERE poc_1_phone_a IS NULL;
-UPDATE t_host_profile SET poc_2_phone_b='' WHERE poc_1_phone_b IS NULL;
-UPDATE t_host_profile SET poc_2_cell='' WHERE poc_1_cell IS NULL;
-UPDATE t_host_profile SET poc_2_screen='' WHERE poc_1_screen IS NULL;
-UPDATE t_host_profile SET poc_2_notes='' WHERE poc_1_notes IS NULL;
+UPDATE t_host_profile SET poc_2_name='' WHERE poc_2_name IS NULL;
+UPDATE t_host_profile SET poc_2_email='' WHERE poc_2_email IS NULL;
+UPDATE t_host_profile SET poc_2_phone_a='' WHERE poc_2_phone_a IS NULL;
+UPDATE t_host_profile SET poc_2_phone_b='' WHERE poc_2_phone_b IS NULL;
+UPDATE t_host_profile SET poc_2_cell='' WHERE poc_2_cell IS NULL;
+UPDATE t_host_profile SET poc_2_screen='' WHERE poc_2_screen IS NULL;
+UPDATE t_host_profile SET poc_2_notes='' WHERE poc_2_notes IS NULL;
 
 -- merge notes field
 UPDATE t_host_profile SET notes_ext='' WHERE notes_ext IS NULL;
