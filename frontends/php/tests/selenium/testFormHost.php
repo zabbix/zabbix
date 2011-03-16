@@ -229,7 +229,6 @@ class testFormHost extends CWebTest{
 	}
 
 	public function testFormHost_TemplateUnlinkAndClear(){
-		// WARNING: not tested yet
 		// Unlink and clear a template from a host from host properties page
 
 		$template = "Template_Linux";
