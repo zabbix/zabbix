@@ -3754,7 +3754,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 		$sql_fields = implode(', ', array_keys($table_titles));
 
-		$sql = 'SELECT '.$sql_fields.' FROM hosts_profiles WHERE hostid='.$_REQUEST['hostid'];
+		$sql = 'SELECT '.$sql_fields.' FROM host_profile WHERE hostid='.$_REQUEST['hostid'];
 		$result = DBselect($sql);
 
 		$row = DBfetch($result);
