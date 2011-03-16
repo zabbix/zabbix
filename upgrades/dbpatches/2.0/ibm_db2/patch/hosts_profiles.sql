@@ -311,19 +311,19 @@ UPDATE t_host_profile SET poc_1_screen='' WHERE poc_1_screen IS NULL;
 /
 UPDATE t_host_profile SET poc_1_notes='' WHERE poc_1_notes IS NULL;
 /
-UPDATE t_host_profile SET poc_2_name='' WHERE poc_1_name IS NULL;
+UPDATE t_host_profile SET poc_2_name='' WHERE poc_2_name IS NULL;
 /
-UPDATE t_host_profile SET poc_2_email='' WHERE poc_1_email IS NULL;
+UPDATE t_host_profile SET poc_2_email='' WHERE poc_2_email IS NULL;
 /
-UPDATE t_host_profile SET poc_2_phone_a='' WHERE poc_1_phone_a IS NULL;
+UPDATE t_host_profile SET poc_2_phone_a='' WHERE poc_2_phone_a IS NULL;
 /
-UPDATE t_host_profile SET poc_2_phone_b='' WHERE poc_1_phone_b IS NULL;
+UPDATE t_host_profile SET poc_2_phone_b='' WHERE poc_2_phone_b IS NULL;
 /
-UPDATE t_host_profile SET poc_2_cell='' WHERE poc_1_cell IS NULL;
+UPDATE t_host_profile SET poc_2_cell='' WHERE poc_2_cell IS NULL;
 /
-UPDATE t_host_profile SET poc_2_screen='' WHERE poc_1_screen IS NULL;
+UPDATE t_host_profile SET poc_2_screen='' WHERE poc_2_screen IS NULL;
 /
-UPDATE t_host_profile SET poc_2_notes='' WHERE poc_1_notes IS NULL;
+UPDATE t_host_profile SET poc_2_notes='' WHERE poc_2_notes IS NULL;
 /
 
 -- merge notes field
