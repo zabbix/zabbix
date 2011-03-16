@@ -175,6 +175,7 @@ static int	zbx_execute_script_on_terminal(DC_HOST *host, zbx_script_t *script, c
 	item.publickey = script->publickey;
 	item.privatekey = script->privatekey;
 	item.password = script->password;
+	item.params = script->command;
 
 	substitute_simple_macros(NULL, &host->hostid, NULL, NULL, &script->port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
 
@@ -289,7 +290,7 @@ exit:
 
 void	zbx_script_init(zbx_script_t *script)
 {
-	memset(script, 0, sizeof(script));
+	memset(script, 0, sizeof(zbx_script_t));
 }
 
 void	zbx_script_clean(zbx_script_t *script)
