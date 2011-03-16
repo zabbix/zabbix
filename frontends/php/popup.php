@@ -1784,7 +1784,7 @@ include_once('include/page_header.php');
 			'preservekeys' => true
 		);
 		if(is_null($hostid)) $options['groupids'] = $groupid;
-		if(!is_null($writeonly)) $options['editable'] = 1;
+		if(!is_null($writeonly)) $options['editable'] = true;
 
 		$scripts = API::Script()->get($options);
 		order_result($scripts, 'name');
