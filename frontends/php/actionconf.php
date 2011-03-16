@@ -220,11 +220,9 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		$_REQUEST['new_operation'] = $new_operation;
 	}
 	else if(inarr_isset(array('add_operation','new_operation'))){
-		try{
-			$new_operation = $_REQUEST['new_operation'];
+		$new_operation = $_REQUEST['new_operation'];
 
-			API::Action()->validateOperations($new_operation);
-
+		if(API::Action()->validateOperations($new_operation)){
 			$_REQUEST['operations'] = get_request('operations', array());
 
 			if(!isset($new_operation['id']) && !str_in_array($new_operation, $_REQUEST['operations'])){
@@ -236,9 +234,6 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 				$_REQUEST['operations'][$id] = $new_operation;
 			}
 			unset($_REQUEST['new_operation']);
-		}
-		catch(APIException $e){
-			error($e->getMessage());
 		}
 	}
 	else if(inarr_isset(array('del_operation','g_operationid'))){
