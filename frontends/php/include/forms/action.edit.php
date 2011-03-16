@@ -582,7 +582,7 @@ require_once('include/templates/action.js.php');
 				$new_operation['opcommand']['script'] = '';
 				if(!zbx_empty($new_operation['opcommand']['scriptid'])){
 					$userScripts = API::Script()->get(array(
-						'scriptid' => $new_operation['opcommand']['scriptid'],
+						'scriptids' => $new_operation['opcommand']['scriptid'],
 						'output' => API_OUTPUT_EXTEND
 					));
 					if($userScript = reset($userScripts))
