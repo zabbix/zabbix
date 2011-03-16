@@ -474,15 +474,29 @@
 	$profileList->addRow(array(new CLabel(SPACE, 'useprofile'), new CCheckBox('useprofile', $useprofile)));
 
 
+	$hostProfileTable = DB::getSchema('host_profile');
 	$host_profile_fields = getHostProfiles();
+
 	foreach($host_profile_fields as $profileName => $profileCaption){
 		if(!isset($host_profile[$profileName])){
 			$host_profile[$profileName] = '';
 		}
-		$profileList->addRow($profileCaption, new CTextBox('host_profile['.$profileName.']', $host_profile[$profileName], 80));
+
+		$fieldLength = $hostProfileTable['fields'][$profileName]['length'];
+		if($fieldLength == 2048){
+			$input = new CTextArea('host_profile['.$profileName.']', $host_profile[$profileName]);
+			$input->addStyle('width: 64em;');
+		}
+		else{
+			if($fieldLength > 64) $fieldLength = 64;
+			$input = new CTextBox('host_profile['.$profileName.']', $host_profile[$profileName]);
+			$input->setAttribute('maxlength', $fieldLength);
+			$input->addStyle('width: '.$fieldLength.'em;');
+		}
+		$profileList->addRow($profileCaption, $input);
 	}
 
-	$divTabs->addTab('profileTab', S_HOST_PROFILE, $profileList);
+	$divTabs->addTab('profileTab', _('Host profile'), $profileList);
 // } PROFILE WIDGET
 
 	$frmHost->addItem($divTabs);
