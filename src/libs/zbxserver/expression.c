@@ -2372,7 +2372,7 @@ static int	get_host_profile(const char *macro, zbx_uint64_t triggerid, char **re
 	else if (0 == strcmp(macro, MVAR_PROFILE_POC_SECONDARY_NOTES))
 		return get_host_profile_value(triggerid, replace_to, N_functionid, "poc_2_notes");
 
-	return FAIL;
+	return SUCCEED;
 }
 
 /******************************************************************************
