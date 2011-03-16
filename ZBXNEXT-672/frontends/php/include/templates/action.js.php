@@ -308,7 +308,7 @@ function showOpTypeForm(){
 		'class_opcommand_execute_on': [ZBX_SCRIPT_TYPES.script],
 		'class_opcommand_port': [ZBX_SCRIPT_TYPES.ssh,ZBX_SCRIPT_TYPES.telnet],
 		'class_opcommand_command': [ZBX_SCRIPT_TYPES.script,ZBX_SCRIPT_TYPES.ipmi,ZBX_SCRIPT_TYPES.ssh,ZBX_SCRIPT_TYPES.telnet],
-		'class_authentication_method': [ZBX_SCRIPT_TYPES.ssh,ZBX_SCRIPT_TYPES.telnet],
+		'class_authentication_method': [ZBX_SCRIPT_TYPES.ssh],
 		'class_authentication_username': [ZBX_SCRIPT_TYPES.ssh,ZBX_SCRIPT_TYPES.telnet],
 		'class_authentication_publickey': [],
 		'class_authentication_privatekey': [],
