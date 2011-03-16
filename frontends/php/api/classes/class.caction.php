@@ -1040,7 +1040,7 @@ COpt::memoryPick();
 
 		$operationids = DB::insert('operations', $operations);
 
-		$opmessage = $opmessage_grp = $opmessage_usr = $opcommand_hst = $opcommand_grp = $opgroup = $optemplate = array();
+		$opmessage = $opcommand = $opmessage_grp = $opmessage_usr = $opcommand_hst = $opcommand_grp = $opgroup = $optemplate = array();
 		$opcondition_inserts = array();
 		foreach($operations as $onum => $operation){
 			$operationid = $operationids[$onum];
@@ -1072,12 +1072,16 @@ COpt::memoryPick();
 
 					break;
 				case OPERATION_TYPE_COMMAND:
+					if(isset($operation['opcommand']) && !empty($operation['opcommand'])){
+						$operation['opcommand']['operationid'] = $operationid;
+						$opcommand[] = $operation['opcommand'];
+					}
+
 					if(isset($operation['opcommand_hst'])){
 						foreach($operation['opcommand_hst'] as $hst){
 							$opcommand_hst[] = array(
 								'operationid' => $operationid,
 								'hostid' => $hst['hostid'],
-								'command' => $hst['command'],
 							);
 						}
 					}
@@ -1087,7 +1091,6 @@ COpt::memoryPick();
 							$opcommand_grp[] = array(
 								'operationid' => $operationid,
 								'groupid' => $grp['groupid'],
-								'command' => $grp['command'],
 							);
 						}
 					}
@@ -1128,6 +1131,8 @@ COpt::memoryPick();
 		DB::insert('opconditions', $opcondition_inserts);
 
 		DB::insert('opmessage', $opmessage, false);
+		DB::insert('opcommand', $opcommand, false);
+
 		DB::insert('opmessage_grp', $opmessage_grp);
 		DB::insert('opmessage_usr', $opmessage_usr);
 		DB::insert('opcommand_hst', $opcommand_hst);
