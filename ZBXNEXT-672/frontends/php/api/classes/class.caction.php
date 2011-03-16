@@ -481,7 +481,7 @@ class CAction extends CZBXAPI{
 			$scripts = $scriptids = array();
 			$sql = 'SELECT o.actionid, oc.scriptid'.
 					' FROM operations o, opcommand oc'.
-					' WHERE o.operationid=omu.operationid'.
+					' WHERE o.operationid=oc.operationid'.
 						' AND '.DBcondition('o.actionid', $actionids).
 						' AND oc.type='.ZBX_SCRIPT_TYPE_USER_SCRIPT;
 			$db_scripts = DBselect($sql);
