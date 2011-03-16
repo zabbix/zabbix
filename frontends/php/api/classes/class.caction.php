@@ -1500,7 +1500,6 @@ COpt::memoryPick();
 
 							break;
 						case ZBX_SCRIPT_TYPE_SSH:
-						case ZBX_SCRIPT_TYPE_TELNET:
 							if(!isset($operation['opcommand']['authtype']) || zbx_empty($operation['opcommand']['authtype']))
 								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Not specified authentication type for action operation command "%s".',$operation['opcommand']['command']));
 
@@ -1514,6 +1513,11 @@ COpt::memoryPick();
 								if(!isset($operation['opcommand']['privatekey']) || zbx_empty($operation['opcommand']['privatekey']))
 									self::exception(ZBX_API_ERROR_PARAMETERS, _s('Not specified private key file for action operation command "%s".',$operation['opcommand']['command']));
 							}
+
+							break;
+						case ZBX_SCRIPT_TYPE_TELNET:
+							if(!isset($operation['opcommand']['username']) || zbx_empty($operation['opcommand']['username']))
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Not specified authentication user name for action operation command "%s".',$operation['opcommand']['command']));
 
 							break;
 						case ZBX_SCRIPT_TYPE_USER_SCRIPT:
