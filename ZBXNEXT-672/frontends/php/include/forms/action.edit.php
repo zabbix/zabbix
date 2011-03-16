@@ -579,16 +579,14 @@ require_once('include/templates/action.js.php');
 					);
 				}
 
-				if($new_operation['opcommand']['type'] == ZBX_SCRIPT_TYPE_USER_SCRIPT){
+				$new_operation['opcommand']['script'] = '';
+				if(!zbx_empty($new_operation['opcommand']['scriptid'])){
 					$userScripts = API::Script()->get(array(
 						'scriptid' => $new_operation['opcommand']['scriptid'],
 						'output' => API_OUTPUT_EXTEND
 					));
 					if($userScript = reset($userScripts))
 						$new_operation['opcommand']['script'] = $userScript['name'];
-				}
-				else{
-					$new_operation['opcommand']['script'] = '';
 				}
 
 				$cmdList = new CTable(null, 'formElementTable');

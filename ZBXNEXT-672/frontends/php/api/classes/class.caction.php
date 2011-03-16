@@ -24,13 +24,6 @@
  */
 
 class CAction extends CZBXAPI{
-	private $_validOperationCommandTypes = array(
-		ZBX_SCRIPT_TYPE_IPMI => true,
-		ZBX_SCRIPT_TYPE_SCRIPT => true,
-		ZBX_SCRIPT_TYPE_SSH => true,
-		ZBX_SCRIPT_TYPE_TELNET => true,
-		ZBX_SCRIPT_TYPE_USER_SCRIPT => true
-	);
 
 /**
  * Get Actions data
@@ -74,7 +67,9 @@ class CAction extends CZBXAPI{
 			'actionids'				=> null,
 			'triggerids'			=> null,
 			'mediatypeids'			=> null,
+			'usrgrpids'				=> null,
 			'userids'				=> null,
+			'scriptids'				=> null,
 			'nopermissions'			=> null,
 			'editable'				=> null,
 // filter
@@ -257,6 +252,8 @@ class CAction extends CZBXAPI{
 		if(!is_null($options['mediatypeids'])){
 			zbx_value2array($options['mediatypeids']);
 
+
+// if($options['output'] != API_OUTPUT_SHORTEN && $options['output'] != API_OUTPUT_CUSTOM){
 			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['mediatypeid'] = 'om.mediatypeid';
 			}
@@ -268,11 +265,42 @@ class CAction extends CZBXAPI{
 			$sql_parts['where']['ao'] = 'a.actionid=o.actionid';
 			$sql_parts['where']['oom'] = 'o.operationid=om.operationid';
 		}
+// Operation messages
+// usrgrpids
+		if(!is_null($options['usrgrpids'])){
+			zbx_value2array($options['usrgrpids']);
+
+			$sql_parts['from']['opmessage_grp'] = 'opmessage_grp omg';
+			$sql_parts['from']['operations'] = 'operations o';
+
+			$sql_parts['where'][] = DBcondition('omg.usrgrpid', $options['usrgrpids']);
+			$sql_parts['where']['ao'] = 'a.actionid=o.actionid';
+			$sql_parts['where']['oomg'] = 'o.operationid=omg.operationid';
+		}
 
 // userids
 		if(!is_null($options['userids'])){
 			zbx_value2array($options['userids']);
-// TODO:
+
+			$sql_parts['from']['opmessage_usr'] = 'opmessage_usr omu';
+			$sql_parts['from']['operations'] = 'operations o';
+
+			$sql_parts['where'][] = DBcondition('omu.userid', $options['userids']);
+			$sql_parts['where']['ao'] = 'a.actionid=o.actionid';
+			$sql_parts['where']['oomu'] = 'o.operationid=omu.operationid';
+		}
+
+// Operation commands
+// scriptids
+		if(!is_null($options['scriptids'])){
+			zbx_value2array($options['scriptids']);
+
+			$sql_parts['from']['opmessage_usr'] = 'opcommand oc';
+			$sql_parts['from']['operations'] = 'operations o';
+
+			$sql_parts['where'][] = '('.DBcondition('oc.scriptid', $options['scriptids']).' AND oc.type='.ZBX_SCRIPT_TYPE_USER_SCRIPT.')' ;
+			$sql_parts['where']['ao'] = 'a.actionid=o.actionid';
+			$sql_parts['where']['ooc'] = 'o.operationid=oc.operationid';
 		}
 
 // filter
@@ -395,7 +423,7 @@ class CAction extends CZBXAPI{
 				$hostids[$template['templateid']] = $template['templateid'];
 			}
 
-			$allowed_hosts = API::Host()->get(array(
+			$allowedHosts = API::Host()->get(array(
 				'hostids' => $hostids,
 				'output' => API_OUTPUT_SHORTEN,
 				'editable' => $options['editable'],
@@ -403,12 +431,12 @@ class CAction extends CZBXAPI{
 				'preservekeys' => true,
 			));
 			foreach($hostids as $hostid){
-				if(!isset($allowed_hosts[$hostid])){
-					foreach($hosts[$hostid] as $actionid){
-						unset($result[$actionid], $actionids[$actionid]);
-					}
-				}
+				if(isset($allowedHosts[$hostid])) continue;
+
+				foreach($hosts[$hostid] as $actionid)
+					unset($result[$actionid], $actionids[$actionid]);
 			}
+			unset($allowedHosts);
 
 
 // check hostgroups
@@ -435,19 +463,46 @@ class CAction extends CZBXAPI{
 				$groupids[$group['groupid']] = $group['groupid'];
 			}
 
-			$allowed_groups = API::HostGroup()->get(array(
+			$allowedGroups = API::HostGroup()->get(array(
 				'groupids' => $groupids,
 				'output' => API_OUTPUT_SHORTEN,
 				'editable' => $options['editable'],
 				'preservekeys' => true,
 			));
 			foreach($groupids as $groupid){
-				if(!isset($allowed_groups[$groupid])){
-					foreach($groups[$groupid] as $actionid){
-						unset($result[$actionid], $actionids[$actionid]);
-					}
-				}
+				if(isset($allowedGroups[$groupid])) continue;
+
+				foreach($groups[$groupid] as $actionid)
+					unset($result[$actionid], $actionids[$actionid]);
 			}
+			unset($allowedGroups);
+
+// check scripts
+			$scripts = $scriptids = array();
+			$sql = 'SELECT o.actionid, oc.scriptid'.
+					' FROM operations o, opcommand oc'.
+					' WHERE o.operationid=omu.operationid'.
+						' AND '.DBcondition('o.actionid', $actionids).
+						' AND oc.type='.ZBX_SCRIPT_TYPE_USER_SCRIPT;
+			$db_scripts = DBselect($sql);
+			while($script = DBfetch($db_scripts)){
+				if(!isset($scripts[$script['scriptid']])) $scripts[$script['scriptid']] = array();
+				$scripts[$script['scriptid']][$script['actionid']] = $script['actionid'];
+				$scriptids[$script['scriptid']] = $script['scriptid'];
+			}
+
+			$allowedScripts = API::Script()->get(array(
+				'scriptids' => $scriptids,
+				'output' => API_OUTPUT_SHORTEN,
+				'preservekeys' => true
+			));
+			foreach($scriptids as $scriptid){
+				if(isset($allowedScripts[$scriptid])) continue;
+
+				foreach($scripts[$scriptid] as $actionid)
+					unset($result[$actionid], $actionids[$actionid]);
+			}
+			unset($allowedScripts);
 
 // check users
 			$users = $userids = array();
@@ -468,11 +523,10 @@ class CAction extends CZBXAPI{
 				'preservekeys' => true,
 			));
 			foreach($userids as $userid){
-				if(!isset($allowed_users[$userid])){
-					foreach($users[$userid] as $actionid){
-						unset($result[$actionid], $actionids[$actionid]);
-					}
-				}
+				if(isset($allowed_users[$userid])) continue;
+
+				foreach($users[$userid] as $actionid)
+					unset($result[$actionid], $actionids[$actionid]);
 			}
 
 // check usergroups
@@ -495,11 +549,10 @@ class CAction extends CZBXAPI{
 			));
 
 			foreach($usrgrpids as $usrgrpid){
-				if(!isset($allowed_usrgrps[$usrgrpid])){
-					foreach($usrgrps[$usrgrpid] as $actionid){
-						unset($result[$actionid], $actionids[$actionid]);
-					}
-				}
+				if(isset($allowed_usrgrps[$usrgrpid])) continue;
+
+				foreach($usrgrps[$usrgrpid] as $actionid)
+					unset($result[$actionid], $actionids[$actionid]);
 			}
 		}
 
@@ -1338,25 +1391,26 @@ COpt::memoryPick();
 
 	public function delete($actionids){
 		$actionids = zbx_toArray($actionids);
-			if(empty($actionids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+		if(empty($actionids))
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
 
-			$options = array(
-				'actionids' => $actionids,
-				'editable' => 1,
-				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => true
-			);
-			$delActions = $this->get($options);
-			foreach($actionids as $actionid){
-				if(!isset($delActions[$actionid])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				}
-			}
+		$options = array(
+			'actionids' => $actionids,
+			'editable' => true,
+			'output' => API_OUTPUT_SHORTEN,
+			'preservekeys' => true
+		);
+		$delActions = $this->get($options);
+		foreach($actionids as $actionid){
+			if(isset($delActions[$actionid])) continue;
 
-			DB::delete('actions', array('actionid'=>$actionids));
-			DB::delete('alerts', array('actionid'=>$actionids));
+			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+		}
 
-			return array('actionids' => $actionids);
+		DB::delete('actions', array('actionid'=>$actionids));
+		DB::delete('alerts', array('actionid'=>$actionids));
+
+	return array('actionids' => $actionids);
 	}
 
 	public function validateOperations($operations){
@@ -1397,12 +1451,72 @@ COpt::memoryPick();
 							: array();
 
 					if(empty($userids) && empty($usergroupids))
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('No recipients for operation message.'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('No recipients for action operation message.'));
 
 					$userIdsAll = array_merge($userIdsAll, $userids);
 					$userGroupIdsAll = array_merge($userGroupIdsAll, $usergroupids);
 					break;
 				case OPERATION_TYPE_COMMAND:
+					if(!isset($operation['opcommand']['type']))
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Not specified command type for operation.'));
+
+					if((!isset($operation['opcommand']['command']) || zbx_empty(trim($operation['opcommand']['command']))) &&
+						($operation['opcommand']['type'] != ZBX_SCRIPT_TYPE_USER_SCRIPT)
+					){
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Not specified command for action operation.'));
+					}
+
+					switch($operation['opcommand']['type']){
+						case ZBX_SCRIPT_TYPE_IPMI:
+							break;
+						case ZBX_SCRIPT_TYPE_SCRIPT:
+							if(!isset($operation['opcommand']['execute_on']))
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Not specified execution target action operation command "%s".',$operation['opcommand']['command']));
+
+							break;
+						case ZBX_SCRIPT_TYPE_SSH:
+						case ZBX_SCRIPT_TYPE_TELNET:
+							if(!isset($operation['opcommand']['authtype']) || zbx_empty($operation['opcommand']['authtype']))
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Not specified authentication type for action operation command "%s".',$operation['opcommand']['command']));
+
+							if(!isset($operation['opcommand']['username']) || zbx_empty($operation['opcommand']['username']))
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Not specified authentication user name for action operation command "%s".',$operation['opcommand']['command']));
+
+							if($operation['opcommand']['authtype'] == ITEM_AUTHTYPE_PUBLICKEY){
+								if(!isset($operation['opcommand']['publickey']) || zbx_empty($operation['opcommand']['publickey']))
+									self::exception(ZBX_API_ERROR_PARAMETERS, _s('Not specified public key file for action operation command "%s".',$operation['opcommand']['command']));
+
+								if(!isset($operation['opcommand']['privatekey']) || zbx_empty($operation['opcommand']['privatekey']))
+									self::exception(ZBX_API_ERROR_PARAMETERS, _s('Not specified private key file for action operation command "%s".',$operation['opcommand']['command']));
+							}
+
+							break;
+						case ZBX_SCRIPT_TYPE_USER_SCRIPT:
+							if(!isset($operation['opcommand']['scriptid']) || zbx_empty($operation['opcommand']['scriptid']))
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Not specified scriptid for action operation command "%s".',$operation['opcommand']['command']));
+
+							$scripts = API::Script()->get(array(
+								'scriptids' => $operation['opcommand']['scriptid'],
+								'preservekeys' => true
+							));
+
+							if(!isset($scripts[$operation['opcommand']['scriptid']]))
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Specified script does not exists or you do not have rights on it for action operation command "%s".',$operation['opcommand']['command']));
+							break;
+						default:
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation command type.'));
+					}
+
+					if(isset($operation['opcommand']['port']) && !zbx_empty($operation['opcommand']['port'])){
+						if(zbx_ctype_digit($operation['opcommand']['port'])){
+							if($operation['opcommand']['port'] > 65535 || $operation['opcommand']['port'] < 1)
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect action operation port "%s"', $operation['opcommand']['port']));
+						}
+						else if(!preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $operation['opcommand']['port'])){
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect action operation port "%s"', $operation['opcommand']['port']));
+						}
+					}
+
 					$groupids = array();
 					if(isset($operation['opcommand_grp'])){
 						$groupids = zbx_objectValues($operation['opcommand_grp'], 'groupid');
@@ -1420,22 +1534,7 @@ COpt::memoryPick();
 					}
 
 					if(empty($groupids) && empty($hostids) && $without_current)
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('No targets for operation command.'));
-
-					if(!isset($operation['opcommand']['type']))
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('You did not specify command type for operation.'));
-
-					if(!isset($this->_validOperationCommandTypes[$operation['opcommand']['type']]))
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('You specify incorrect action operation command type.'));
-
-					if(!isset($operation['opcommand']['type']))
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('You did not specify command type for operation.'));
-
-					if(($operation['opcommand']['type'] != ZBX_SCRIPT_TYPE_USER_SCRIPT) &&
-						(!isset($operation['opcommand']['command']) || zbx_empty(trim($operation['opcommand']['command'])))
-					){
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('You did not specify command for operation.'));
-					}
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('You did not specify targets for action operation command "%s".',$operation['opcommand']['command']));
 
 					$hostIdsAll = array_merge($hostIdsAll, $hostids);
 					$hostGroupIdsAll = array_merge($hostGroupIdsAll, $groupids);
