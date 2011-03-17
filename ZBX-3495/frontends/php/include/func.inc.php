@@ -947,9 +947,7 @@ return ' ORDER BY '.$tabfield.' '.$sortorder.$allways;
 
 function unsetExcept(&$array, $allowedFields){
 	foreach($array as $key => $value){
-		if(!isset($allowedFields[$key])){
-			unset($array[$key]);
-		}
+		if(!isset($allowedFields[$key])) unset($array[$key]);
 	}
 }
 
