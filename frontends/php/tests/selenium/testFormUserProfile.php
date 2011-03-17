@@ -21,7 +21,7 @@
 <?php
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testFormProfile extends CWebTest
+class testFormUserProfile extends CWebTest
 {
 	public $oldHash;
 
