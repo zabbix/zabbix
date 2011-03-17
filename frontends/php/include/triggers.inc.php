@@ -1278,6 +1278,7 @@ function utf8RawUrlDecode($source){
 	}
 
 	function expand_trigger_description_by_data($row, $flag = ZBX_FLAG_TRIGGER){
+		$priorities = array(INTERFACE_TYPE_AGENT => 3, INTERFACE_TYPE_SNMP => 2, INTERFACE_TYPE_IPMI => 1);
 		if($row){
 			$description = expand_trigger_description_constants($row['description'], $row);
 
@@ -1293,9 +1294,89 @@ function utf8RawUrlDecode($source){
 									' AND i.hostid=h.hostid'.
 									' AND f.functionid='.$functionid;
 						$host = DBfetch(DBselect($sql));
-						if(is_null($host['host']))
-							$host['host'] = $macro;
-						$description = str_replace($macro, $host['host'], $description);
+						if(!is_null($host['host']))
+							$description = str_replace($macro, $host['host'], $description);
+					}
+				}
+			}
+
+			for($i=0; $i<10; $i++){
+				$macro = '{IPADDRESS'.($i ? $i : '').'}';
+				if(zbx_strstr($description, $macro)) {
+					$functionid = trigger_get_N_functionid($row['expression'], $i ? $i : 1);
+
+					if(isset($functionid)) {
+						$sql = 'SELECT DISTINCT n.ip,n.type'.
+								' FROM functions f,items i,interface n'.
+								' WHERE f.itemid=i.itemid'.
+									' AND n.main=1'.
+									' AND n.type IN ('.implode(',', array_keys($priorities)).')'.
+									' AND i.hostid=n.hostid'.
+									' AND f.functionid='.$functionid;
+						$db_interfaces = DBselect($sql);
+						$result = $macro;
+						$priority = 0;
+						while($interface = DBfetch($db_interfaces)) {
+							if ($priority >= $priorities[$interface['type']])
+								continue;
+							$priority = $priorities[$interface['type']];
+							$result = $interface['ip'];
+						}
+						$description = str_replace($macro, $result, $description);
+					}
+				}
+			}
+
+			for($i=0; $i<10; $i++){
+				$macro = '{HOST.DNS'.($i ? $i : '').'}';
+				if(zbx_strstr($description, $macro)) {
+					$functionid = trigger_get_N_functionid($row['expression'], $i ? $i : 1);
+
+					if(isset($functionid)) {
+						$sql = 'SELECT DISTINCT n.dns,n.type'.
+								' FROM functions f,items i,interface n'.
+								' WHERE f.itemid=i.itemid'.
+									' AND n.main=1'.
+									' AND n.type IN ('.implode(',', array_keys($priorities)).')'.
+									' AND i.hostid=n.hostid'.
+									' AND f.functionid='.$functionid;
+						$db_interfaces = DBselect($sql);
+						$result = $macro;
+						$priority = 0;
+						while($interface = DBfetch($db_interfaces)) {
+							if ($priority >= $priorities[$interface['type']])
+								continue;
+							$priority = $priorities[$interface['type']];
+							$result = $interface['dns'];
+						}
+						$description = str_replace($macro, $result, $description);
+					}
+				}
+			}
+
+			for($i=0; $i<10; $i++){
+				$macro = '{HOST.CONN'.($i ? $i : '').'}';
+				if(zbx_strstr($description, $macro)) {
+					$functionid = trigger_get_N_functionid($row['expression'], $i ? $i : 1);
+
+					if(isset($functionid)) {
+						$sql = 'SELECT DISTINCT n.useip,n.ip,n.dns,n.type'.
+								' FROM functions f,items i,interface n'.
+								' WHERE f.itemid=i.itemid'.
+									' AND n.main=1'.
+									' AND n.type IN ('.implode(',', array_keys($priorities)).')'.
+									' AND i.hostid=n.hostid'.
+									' AND f.functionid='.$functionid;
+						$db_interfaces = DBselect($sql);
+						$result = $macro;
+						$priority = 0;
+						while($interface = DBfetch($db_interfaces)) {
+							if ($priority >= $priorities[$interface['type']])
+								continue;
+							$priority = $priorities[$interface['type']];
+							$result = $interface['useip'] ? $interface['ip'] : $interface['dns'];
+						}
+						$description = str_replace($macro, $result, $description);
 					}
 				}
 			}
@@ -1312,7 +1393,6 @@ function utf8RawUrlDecode($source){
 									' AND f.functionid='.$functionid;
 						$row2=DBfetch(DBselect($sql));
 						$description = str_replace($macro, format_lastvalue($row2), $description);
-
 					}
 				}
 			}
