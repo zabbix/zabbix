@@ -2,14 +2,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-18 17:33+0200\n"
-"PO-Revision-Date: 2011-01-13 19:34+0200\n"
-"Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
+"POT-Creation-Date: 2011-03-04 10:24+0500\n"
+"PO-Revision-Date: 2011-03-04 08:14+0200\n"
+"Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
+"Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.1.4\n"
 "X-Poedit-Basepath: ../../\n"
@@ -18,26 +18,26 @@ msgstr ""
 msgid " - all groups - "
 msgstr "- все группы -"
 
-#: include/page_header.php:457
+#: include/page_header.php:462
 msgid " failed login attempts logged. Last failed attempt was from "
-msgstr ""
+msgstr " ошибочных попыток входа. Последняя попытка была с "
 
-#: include/page_header.php:459
+#: include/page_header.php:464
 msgid " on "
-msgstr ""
+msgstr " на "
 
 #: chart4.php:87 chart5.php:90
 #, php-format
 msgid "%1$s (year %2$s)"
-msgstr ""
+msgstr "%1$s (год %2$s)"
 
-#: discovery.php:242
+#: discovery.php:241
 #, php-format
 msgid "%d device"
 msgid_plural "%d devices"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%d устройство"
+msgstr[1] "%d устройств"
+msgstr[2] "%d устройств"
 
 #: include/locales/en_gb.inc.php:378
 msgid "&"
@@ -51,13 +51,13 @@ msgstr "'"
 msgid "' does not accept parameters."
 msgstr "' не поддерживает параметры."
 
-#: include/forms/action.edit.php:455
+#: include/forms/action.edit.php:451
 msgid "(0 - infinitely)"
-msgstr ""
+msgstr "(0 - бесконечно)"
 
-#: include/forms/action.edit.php:462
+#: include/forms/action.edit.php:458
 msgid "(minimum 60 seconds, 0 - use action default)"
-msgstr ""
+msgstr "(минимум 60 секунл, 0 - использовать действие по умолчанию)"
 
 #: include/locales/en_gb.inc.php:108
 msgid "(no proxy)"
@@ -159,10 +159,10 @@ msgstr "ОТЧЕТ О ДОСТУПНОСТИ"
 msgid "Acceptable SLA (in %)"
 msgstr "Допустимый SLA (проценты)"
 
-#: api/classes/class.cuser.php:953
+#: api/classes/class.cuser.php:904
 #, php-format
 msgid "Account is blocked for %s seconds"
-msgstr ""
+msgstr "Аккаунт заблокирован на %s секунд"
 
 #: include/locales/en_gb.inc.php:1723
 msgid "Ack"
@@ -194,9 +194,9 @@ msgstr "Подтверждения"
 
 #: include/forms/sysmap.edit.php:135
 msgid "Acknowledging disabled"
-msgstr ""
+msgstr "Подтверждения отключение"
 
-#: include/forms/action.edit.php:347 include/forms/action.edit.php:350
+#: include/forms/action.edit.php:343 include/forms/action.edit.php:346
 #: include/locales/en_gb.inc.php:1861
 msgid "Action"
 msgstr "Действие"
@@ -205,17 +205,17 @@ msgstr "Действие"
 #: api/classes/class.caction.php:807 api/classes/class.caction.php:826
 #, php-format
 msgid "Action \"%s\" already exists."
-msgstr ""
+msgstr "Действие \"%s\" уже существует."
 
 #: api/classes/class.caction.php:701 api/classes/class.caction.php:801
 #, php-format
 msgid "Action \"%s\" has incorrect value for \"esc_period\" (minimum 60 seconds)."
-msgstr ""
+msgstr "В действии \"%s\" некорректное значение для \"esc_period\" (минимум 60 секунд)."
 
 #: api/classes/class.caction.php:856
 #, php-format
 msgid "Action \"%s\" no operations defined."
-msgstr ""
+msgstr "В действии \"%s\" нет определенных операций."
 
 #: include/locales/en_gb.inc.php:349
 msgid "Action added"
@@ -225,7 +225,7 @@ msgstr "Действие добавлено"
 msgid "Action deleted"
 msgstr "Действие удалено"
 
-#: include/forms/action.edit.php:415
+#: include/forms/action.edit.php:411
 msgid "Action operations"
 msgstr "Операции действия"
 
@@ -233,7 +233,7 @@ msgstr "Операции действия"
 msgid "Action updated"
 msgstr "Действие обновлено"
 
-#: include/locales/en_gb.inc.php:343
+#: include/locales/en_gb.inc.php:343 include/menu.inc.php:177
 msgid "Actions"
 msgstr "Действия"
 
@@ -261,11 +261,12 @@ msgstr "Активен с"
 msgid "Active till"
 msgstr "Активен до"
 
-#: include/forms/action.edit.php:317 include/forms/action.edit.php:496
-#: include/forms/action.edit.php:510 include/forms/action.edit.php:640
-#: include/forms/action.edit.php:675 include/forms/action.edit.php:794
-#: include/forms/action.edit.php:842 include/forms/sysmap.edit.php:179
-#: include/locales/en_gb.inc.php:1708 include/templates/action.js.php:286
+#: include/forms/action.edit.php:313 include/forms/action.edit.php:492
+#: include/forms/action.edit.php:506 include/forms/action.edit.php:636
+#: include/forms/action.edit.php:671 include/forms/action.edit.php:790
+#: include/forms/action.edit.php:838 include/forms.inc.php:459
+#: include/forms/sysmap.edit.php:179 include/locales/en_gb.inc.php:1708
+#: include/templates/action.js.php:286
 msgid "Add"
 msgstr "Добавить"
 
@@ -290,7 +291,6 @@ msgid "Add link"
 msgstr "Добавить соединитель"
 
 #: include/locales/en_gb.inc.php:1148
-#, fuzzy
 msgid "Add prototype"
 msgstr "Добавить прототип"
 
@@ -302,13 +302,13 @@ msgstr "Добавить в"
 msgid "Add to group"
 msgstr "Добавить в группу"
 
-#: include/forms/action.edit.php:663
+#: include/forms/action.edit.php:659
 msgid "Add to host groups"
-msgstr ""
+msgstr "Добавить в группы узлов сети"
 
 #: include/actions.inc.php:295
 msgid "Add to host groups: "
-msgstr ""
+msgstr "Добавить в группы узлов сети: "
 
 #: include/locales/en_gb.inc.php:1864
 msgid "Added"
@@ -330,13 +330,13 @@ msgstr "Дополнительные параметры"
 msgid "Admin"
 msgstr "Администратор"
 
-#: include/locales/en_gb.inc.php:479
+#: include/locales/en_gb.inc.php:479 include/menu.inc.php:200
 msgid "Administration"
 msgstr "Администрирование"
 
 #: include/forms/sysmap.edit.php:72
 msgid "Advanced labels"
-msgstr ""
+msgstr "Расширенные подписи"
 
 #: include/locales/en_gb.inc.php:1300
 msgid "Age"
@@ -366,10 +366,10 @@ msgstr "Алиас устройства"
 msgid "Align icons"
 msgstr "Привязать иконки"
 
-#: include/forms/action.edit.php:545 include/forms/script.edit.php:88
+#: include/forms/action.edit.php:541 include/forms/script.edit.php:88
 #: include/forms/script.edit.php:100 include/forms/sysmap.edit.php:129
 #: include/locales/en_gb.inc.php:604 include/locales/en_gb.inc.php:1327
-#: include/nodes.inc.php:167
+#: include/nodes.inc.php:163 include/page_header.php:302
 msgid "All"
 msgstr "Все"
 
@@ -379,7 +379,7 @@ msgstr "Все группы"
 
 #: include/locales/en_gb.inc.php:1267
 msgid "All links should have \"Name\" and \"URL\" specified"
-msgstr ""
+msgstr "Все соединители должны иметь указанные \"Имя\" и \"URL\""
 
 #: include/locales/en_gb.inc.php:568
 msgid "All nodes"
@@ -409,17 +409,17 @@ msgstr "Группа элементов данных"
 #: api/classes/class.capplication.php:575
 #, php-format
 msgid "Application [%1$s:%2$s] updated."
-msgstr ""
+msgstr "Группа элементов данных [%1$s:%2$s] обновлена."
 
 #: api/classes/class.capplication.php:646
 #, php-format
 msgid "Application [%1$s] deleted"
-msgstr ""
+msgstr "Группа элементов данных [%1$s] удалена"
 
 #: api/classes/class.ctemplate.php:2044
 #, php-format
 msgid "Application [%1$s] unlinked."
-msgstr ""
+msgstr "Группа элементов данных [%1$s] отсоединена."
 
 #: include/locales/en_gb.inc.php:824
 msgid "Application added"
@@ -431,7 +431,7 @@ msgstr "Группа элементов данных удалена"
 
 #: api/rpc/class.cjsonrpc.php:185
 msgid "Application error."
-msgstr ""
+msgstr "Ошибка группы элементов данных."
 
 #: include/locales/en_gb.inc.php:822
 msgid "Application updated"
@@ -485,7 +485,7 @@ msgstr "Должен быть выбран по крайней мере один
 msgid "At least one item must be present in the trigger expression."
 msgstr "В выражении триггера должен присуствовать хотя бы один элемент данных."
 
-#: include/locales/en_gb.inc.php:1858
+#: include/locales/en_gb.inc.php:1858 include/menu.inc.php:229
 msgid "Audit"
 msgstr "Аудит"
 
@@ -497,13 +497,13 @@ msgstr "Авг"
 msgid "August"
 msgstr "Август"
 
-#: include/locales/en_gb.inc.php:585
+#: include/locales/en_gb.inc.php:585 include/menu.inc.php:216
 msgid "Authentication"
 msgstr "Аутентификация"
 
-#: include/forms/host.edit.php:511
+#: include/forms/host.edit.php:513
 msgid "Authentication algorithm"
-msgstr ""
+msgstr "Алгоритм аутентификации"
 
 #: include/locales/en_gb.inc.php:1130
 msgid "Authentication method"
@@ -529,7 +529,7 @@ msgstr "Авто-выход (мин 90 секунд)"
 msgid "Availability"
 msgstr "Доступность"
 
-#: include/locales/en_gb.inc.php:1385
+#: include/locales/en_gb.inc.php:1385 include/menu.inc.php:119
 msgid "Availability report"
 msgstr "Отчет о доступности"
 
@@ -537,6 +537,7 @@ msgstr "Отчет о доступности"
 msgid "Available"
 msgstr "Доступен"
 
+#: config.php:611 include/forms/triggerSeverity.edit.php:66
 #: include/locales/en_gb.inc.php:372
 msgid "Average"
 msgstr "Средняя"
@@ -565,7 +566,7 @@ msgstr "Фоновое изображение"
 msgid "Background image"
 msgstr "Фоновое изображение"
 
-#: include/locales/en_gb.inc.php:1460
+#: include/locales/en_gb.inc.php:1460 include/menu.inc.php:127
 msgid "Bar reports"
 msgstr "Гистограммные отчеты"
 
@@ -630,12 +631,10 @@ msgid "CONFIGURATION OF DISCOVERY"
 msgstr "НАСТРОЙКА ОБНАРУЖЕНИЯ"
 
 #: include/locales/en_gb.inc.php:1142
-#, fuzzy
 msgid "CONFIGURATION OF DISCOVERY RULES"
 msgstr "НАСТРОЙКА ПРАВИЛ ОБНАРУЖЕНИЯ"
 
 #: include/locales/en_gb.inc.php:1153
-#, fuzzy
 msgid "CONFIGURATION OF GRAPH PROTOTYPES"
 msgstr "НАСТРОЙКА ПРОТОТИПОВ ГРАФИКОВ"
 
@@ -652,7 +651,6 @@ msgid "CONFIGURATION OF HOSTS"
 msgstr "КОНФИГУРАЦИЯ УЗЛОВ СЕТИ"
 
 #: include/locales/en_gb.inc.php:1146
-#, fuzzy
 msgid "CONFIGURATION OF ITEM PROTOTYPES"
 msgstr "НАСТРОЙКА ПРОТОТИПОВ ЭЛЕМЕНТОВ ДАННЫХ"
 
@@ -701,7 +699,6 @@ msgid "CONFIGURATION OF TEMPLATES"
 msgstr "КОНФИГУРАЦИЯ ШАБЛОНОВ"
 
 #: include/locales/en_gb.inc.php:1156
-#, fuzzy
 msgid "CONFIGURATION OF TRIGGER PROTOTYPES"
 msgstr "НАСТРОЙКА ПРОТОТИПОВ ТРИГГЕРОВ"
 
@@ -737,22 +734,13 @@ msgstr "Обратный вызов"
 msgid "Can not create new element"
 msgstr "Не удалось создать новый элемент"
 
-#: api/classes/class.cuser.php:674
-#, php-format
-msgid "Can not delete %1$s internal user \" %2$s \", try disabling that user."
-msgstr ""
-
 #: include/locales/en_gb.inc.php:2319
 msgid "Can not find objects with name"
 msgstr "Не удалось найти объекты с именем"
 
-#: api/classes/class.chostinterface.php:485
-msgid "Can not switch host for interface"
-msgstr ""
-
 #: api/classes/class.ctemplate.php:1377
 msgid "Can't add group"
-msgstr ""
+msgstr "Не удалось добавить группу"
 
 #: include/locales/en_gb.inc.php:2236
 msgid "Can't delete user medias"
@@ -768,7 +756,7 @@ msgstr "Не удалось добавить способы оповещений
 
 #: api/classes/class.ctemplate.php:1453 api/classes/class.ctemplate.php:1463
 msgid "Can't link template"
-msgstr ""
+msgstr "Не удалось соединить шаблон"
 
 #: include/locales/en_gb.inc.php:1852
 msgid "Can't read script response, check connection"
@@ -776,15 +764,15 @@ msgstr "Не удалось прочитать ответ скрипта, про
 
 #: api/classes/class.ctemplate.php:1388
 msgid "Can't remove group"
-msgstr ""
+msgstr "Не удалось удалить группу"
 
 #: api/classes/class.ctemplate.php:1503
 msgid "Can't remove macro"
-msgstr ""
+msgstr "Не удалось удалить макрос"
 
 #: api/classes/class.ctemplate.php:1584
 msgid "Can't remove macros"
-msgstr ""
+msgstr "Не удалось удалить макросы"
 
 #: include/locales/en_gb.inc.php:1851
 msgid "Can't send command, check connection"
@@ -792,11 +780,11 @@ msgstr "Не удалось отправить команду, проверьт�
 
 #: api/classes/class.ctemplate.php:1560
 msgid "Can't unlink groups"
-msgstr ""
+msgstr "Не удалось отсоединить группы"
 
 #: api/classes/class.ctemplate.php:1424 api/classes/class.ctemplate.php:1442
 msgid "Can't unlink template"
-msgstr ""
+msgstr "Не удалось отсоединить шаблон"
 
 #: include/locales/en_gb.inc.php:2237
 msgid "Can't update user medias"
@@ -806,10 +794,11 @@ msgstr "Не удалось обновить способы оповещений
 msgid "Canada (136 characters)"
 msgstr "Канада (136 символов)"
 
-#: include/forms/action.edit.php:796 include/forms/action.edit.php:844
+#: include/forms/action.edit.php:792 include/forms/action.edit.php:840
 #: include/locales/en_gb.inc.php:1293 include/templates/action.js.php:118
 #: include/templates/scriptConfirm.js.php:39
 #: include/templates/script.js.php:41
+#: include/templates/triggerSeverity.js.php:38
 msgid "Cancel"
 msgstr "Отменить"
 
@@ -921,6 +910,11 @@ msgstr "Невозможно добавить пользователя. Оба �
 msgid "Cannot add value map"
 msgstr "Не удалось добавить преобразование значения"
 
+#: api/classes/class.cmap.php:605
+#, php-format
+msgid "Cannot be empty %1$s element custom label for map \"%2$s\"."
+msgstr "Элемент %1$s пользовтельской подписи не может быть пустым для карты \"%2$s\"."
+
 #: include/locales/en_gb.inc.php:1029
 msgid "Cannot clear history"
 msgstr "Невозможно очистить историю"
@@ -935,11 +929,16 @@ msgstr "Не удалось скопировать элементы"
 
 #: include/db.inc.php:45
 msgid "Cannot create another database connection."
-msgstr ""
+msgstr "Не удалось создать другое подключение к базе данных"
 
 #: api/classes/class.chost.php:1887
 msgid "Cannot create extended profile"
-msgstr ""
+msgstr "Не удалось создать расширенный профиль"
+
+#: api/classes/class.cuser.php:387
+#, php-format
+msgid "Cannot delete %1$s internal user \"%2$s\", try disabling that user."
+msgstr "Невозможно удалить %1$s внутреннего пользователя \"%2$s\", попробуйте отключить его."
 
 #: include/locales/en_gb.inc.php:354
 msgid "Cannot delete action"
@@ -956,14 +955,13 @@ msgstr "Не удалось удалить правило обнаружения
 
 #: api/classes/class.chost.php:1867
 msgid "Cannot delete extended profile"
-msgstr ""
+msgstr "Не удалось удалить расширенный профиль"
 
 #: api/classes/class.citem.php:1299 include/locales/en_gb.inc.php:660
 msgid "Cannot delete graph"
 msgstr "Не удалось удалить график"
 
 #: api/classes/class.cgraphprototype.php:1014
-#, fuzzy
 msgid "Cannot delete graph prototype"
 msgstr "Не удалось удалить прототип графика"
 
@@ -1005,7 +1003,7 @@ msgstr "Не удалось удалить ноду"
 
 #: api/classes/class.chost.php:1822
 msgid "Cannot delete profile"
-msgstr ""
+msgstr "Не удалось удалить профиль"
 
 #: include/locales/en_gb.inc.php:1761
 msgid "Cannot delete proxy"
@@ -1025,7 +1023,7 @@ msgstr "Не удалось удалить скрипт"
 
 #: actionconf.php:308
 msgid "Cannot delete selected actions"
-msgstr ""
+msgstr "Не удалось удалить выбранные действия"
 
 #: include/locales/en_gb.inc.php:1596
 msgid "Cannot delete service"
@@ -1039,19 +1037,19 @@ msgstr "Не удалось удалить слайд-шоу"
 msgid "Cannot delete template"
 msgstr "Не удалось удалить шаблон"
 
-#: api/classes/class.cgraph.php:994 api/classes/class.cgraphprototype.php:991
+#: api/classes/class.cgraph.php:993 api/classes/class.cgraphprototype.php:991
 msgid "Cannot delete templated graphs"
-msgstr ""
+msgstr "Невозможно удалить шаблонные графики"
 
 #: api/classes/class.cdiscoveryrule.php:910
 msgid "Cannot delete templated items"
-msgstr ""
+msgstr "Невозможно удалить шаблонные элементы данных"
 
 #: api/classes/class.ctrigger.php:1164
 #: api/classes/class.ctriggerprototype.php:1215
 #, php-format
 msgid "Cannot delete templated trigger [%1$s:%2$s]"
-msgstr ""
+msgstr "Невозможно удалить шаблонный триггер [%1$s:%2$s]"
 
 #: include/locales/en_gb.inc.php:1655
 msgid "Cannot delete trigger"
@@ -1114,13 +1112,14 @@ msgid "Cannot format Tree. Check logic structure in service links"
 msgstr "Не удалось сформировать дерево. Проверьте логическую структуру в связях сервиса"
 
 #: api/classes/class.ctriggerprototype.php:1303
+#, fuzzy
 msgid "Cannot implode expression"
-msgstr ""
+msgstr "Не удалось взорвать выражение"
 
 #: api/classes/class.ctrigger.php:1416
-#, php-format
+#, fuzzy, php-format
 msgid "Cannot implode expression \"%s\"."
-msgstr ""
+msgstr "Не удалось взорвать выражение \"%s\"."
 
 #: include/locales/en_gb.inc.php:2165
 msgid "Cannot link hardlinked service."
@@ -1134,23 +1133,23 @@ msgstr "Не удается связать сервис с самим собой
 msgid "Cannot link template"
 msgstr "Не удалось присоединить шаблон"
 
-#: api/classes/class.cuser.php:917
+#: api/classes/class.cuser.php:868
 msgid "Cannot logout."
-msgstr ""
+msgstr "Не удалось выполнить выход."
 
 #: api/classes/class.chost.php:1639
 msgid "Cannot mass update host name"
-msgstr ""
+msgstr "Невозможно массово обновить имя узла сети"
 
 #: api/classes/class.ctemplate.php:1323
 msgid "Cannot mass update template name"
-msgstr ""
+msgstr "Невозможно массово обновить имя шаблона"
 
 #: api/classes/class.chost.php:1701
 msgid "Cannot remove group"
-msgstr ""
+msgstr "Не удалось удалить группу"
 
-#: api/classes/class.chost.php:1794 config.php:542
+#: api/classes/class.chost.php:1794 config.php:555
 msgid "Cannot remove macro"
 msgstr "Не удалось удалить макрос"
 
@@ -1158,41 +1157,41 @@ msgstr "Не удалось удалить макрос"
 msgid "Cannot rename guest user"
 msgstr "Невозможно переименовать гостевого пользователя"
 
+#: api/classes/class.chostinterface.php:485
+msgid "Cannot switch host for interface"
+msgstr "Не удалось переключить узел сети на интерфейс"
+
 #: api/classes/class.ctemplate.php:1768
 msgid "Cannot sync Triggers"
-msgstr ""
+msgstr "Не удалось синхронизировать триггеры"
 
 #: api/classes/class.ctemplate.php:1774
-#, fuzzy
 msgid "Cannot sync Triggers prototypes"
 msgstr "Не удалось синхронизировать прототипы триггеров"
 
 #: api/classes/class.ctemplate.php:1744
 msgid "Cannot sync applications"
-msgstr ""
+msgstr "Не удалось синхронизировать группы элементов данных"
 
 #: api/classes/class.ctemplate.php:1750
-#, fuzzy
 msgid "Cannot sync discovery rules"
 msgstr "Не удалось синхронизировать правила обнаружения"
 
 #: api/classes/class.ctemplate.php:1780
-#, fuzzy
 msgid "Cannot sync graph prototypes"
 msgstr "Не удалось сихронизировать прототипы графиков"
 
 #: api/classes/class.ctemplate.php:1786
 msgid "Cannot sync graphs"
-msgstr ""
+msgstr "Не удалось синхронизировать графики"
 
 #: api/classes/class.ctemplate.php:1756
-#, fuzzy
 msgid "Cannot sync item prototypes"
 msgstr "Не удалось синхронизировать прототипы элементов данных"
 
 #: api/classes/class.ctemplate.php:1762
 msgid "Cannot sync items"
-msgstr ""
+msgstr "Не удалось синхронизировать элементы данных"
 
 #: include/locales/en_gb.inc.php:1765
 msgid "Cannot unblock users"
@@ -1200,34 +1199,31 @@ msgstr "Не удалось разблокировать пользовател�
 
 #: api/classes/class.ctemplate.php:2035
 msgid "Cannot unlink and clear applications"
-msgstr ""
+msgstr "Не удалось отсоединить и отчистить группы элементов данных"
 
 #: api/classes/class.ctemplate.php:1830
-#, fuzzy
 msgid "Cannot unlink and clear discovery rules"
 msgstr "Не удалось отсоединить и очистить правила обнаружения"
 
 #: api/classes/class.ctemplate.php:1914
-#, fuzzy
 msgid "Cannot unlink and clear graph prototypes"
 msgstr "Не удалось отсоединить и очистить прототипы графиков"
 
 #: api/classes/class.ctemplate.php:1932
 msgid "Cannot unlink and clear graphs."
-msgstr ""
+msgstr "Не удалось отсоединить и отчистить графики."
 
 #: api/classes/class.ctemplate.php:1866
-#, fuzzy
 msgid "Cannot unlink and clear item prototypes"
 msgstr "Не удалось отсоединить и очистить прототипы элементов данных"
 
 #: api/classes/class.ctemplate.php:1848
 msgid "Cannot unlink and clear items"
-msgstr ""
+msgstr "Не удалось отсоединить и отчистить элементы данных"
 
 #: api/classes/class.ctemplate.php:1983 api/classes/class.ctemplate.php:2000
 msgid "Cannot unlink and clear triggers"
-msgstr ""
+msgstr "Не удалось отсоединить и отчистить триггеры"
 
 #: include/locales/en_gb.inc.php:950
 msgid "Cannot unlink template"
@@ -1239,7 +1235,7 @@ msgstr "Не удалось обновить"
 
 #: include/locales/en_gb.inc.php:1769
 msgid "Cannot update API access"
-msgstr "Не удалось обновить доступ к GUI"
+msgstr "Не удалось обновить доступ к API"
 
 #: include/locales/en_gb.inc.php:1767
 msgid "Cannot update GUI access"
@@ -1267,7 +1263,7 @@ msgstr "Не удалось обновить правило обнаружени
 
 #: api/classes/class.chost.php:1909
 msgid "Cannot update extended profile"
-msgstr ""
+msgstr "Не удалось обновить расширенный профиль"
 
 #: include/locales/en_gb.inc.php:658
 msgid "Cannot update graph"
@@ -1294,7 +1290,7 @@ msgid "Cannot update item"
 msgstr "Не удалось обновить элемент данных"
 
 #: api/classes/class.chost.php:1801 api/classes/class.ctemplate.php:1510
-#: config.php:547
+#: config.php:560
 msgid "Cannot update macro"
 msgstr "Не удалось обновить макрос"
 
@@ -1316,7 +1312,7 @@ msgstr "Не удалось обновить ноду"
 
 #: api/classes/class.chost.php:1855
 msgid "Cannot update profile"
-msgstr ""
+msgstr "Не удалось обновить профиль"
 
 #: include/locales/en_gb.inc.php:1759
 msgid "Cannot update proxy"
@@ -1344,7 +1340,7 @@ msgstr "Невозможно обновить услугу"
 
 #: include/locales/en_gb.inc.php:1571
 msgid "Cannot update slideshow"
-msgstr ""
+msgstr "Не удалось обновить слайд шоу"
 
 #: include/locales/en_gb.inc.php:1034
 msgid "Cannot update status"
@@ -1426,8 +1422,12 @@ msgstr "Подчиненный"
 msgid "Chinese (CN)"
 msgstr "Chinese (CN)"
 
-#: api/classes/class.ctemplate.php:1724 include/locales/en_gb.inc.php:2074
+#: include/locales/en_gb.inc.php:2074
 msgid "Circular link can not be created"
+msgstr "Закольцованная ссылка не может быть создана"
+
+#: api/classes/class.ctemplate.php:1724
+msgid "Circular link cannot be created"
 msgstr "Закольцованная ссылка не может быть создана"
 
 #: include/locales/en_gb.inc.php:1872
@@ -1450,7 +1450,7 @@ msgstr "Очистить при отсоединении"
 msgid "Clock"
 msgstr "Часы"
 
-#: include/forms/action.edit.php:860 include/forms/script.edit.php:139
+#: include/forms/action.edit.php:856 include/forms/script.edit.php:139
 #: include/forms/sysmap.edit.php:197 include/locales/en_gb.inc.php:1612
 msgid "Clone"
 msgstr "Клонировать"
@@ -1461,9 +1461,9 @@ msgstr "Закрыть"
 
 #: include/templates/action.js.php:362
 msgid "Close currently opened remote command details without saving?"
-msgstr ""
+msgstr "Закрыть открытые в данный момент детали удаленной команды без сохранения?"
 
-#: include/locales/en_gb.inc.php:626
+#: include/forms/triggerSeverity.edit.php:41 include/locales/en_gb.inc.php:626
 msgid "Colour"
 msgstr "Цвет"
 
@@ -1483,7 +1483,7 @@ msgstr "Столбцов"
 msgid "Combined result"
 msgstr "Комбинированный результат"
 
-#: include/forms/action.edit.php:571 include/forms/script.edit.php:79
+#: include/forms/action.edit.php:567 include/forms/script.edit.php:79
 #: include/locales/en_gb.inc.php:1833 include/templates/action.js.php:112
 msgid "Command"
 msgstr "Команда"
@@ -1494,7 +1494,7 @@ msgstr "Команды действий"
 
 #: include/templates/action.js.php:311
 msgid "Command field is empty. Please provide some instructions for operation."
-msgstr ""
+msgstr "Поле команды пустое. Пожалуйста, укажите какие-либо инструкции для операции."
 
 #: include/locales/en_gb.inc.php:1706
 msgid "Comment updated"
@@ -1516,11 +1516,11 @@ msgstr "Сравнение значений для нескольких пери
 msgid "Condition"
 msgstr "Условие"
 
-#: include/forms/action.edit.php:323 include/locales/en_gb.inc.php:312
+#: include/forms/action.edit.php:319 include/locales/en_gb.inc.php:312
 msgid "Conditions"
 msgstr "Условия"
 
-#: include/locales/en_gb.inc.php:478
+#: include/locales/en_gb.inc.php:478 include/menu.inc.php:135
 msgid "Configuration"
 msgstr "Настройка"
 
@@ -1582,7 +1582,7 @@ msgstr "Настройка"
 
 #: include/forms/script.edit.php:126
 msgid "Confirmation text"
-msgstr ""
+msgstr "Текст подтверждения"
 
 #: include/locales/en_gb.inc.php:856
 msgid "Connect to"
@@ -1628,10 +1628,10 @@ msgstr "Скопировать выбранные триггеры?"
 msgid "Copyright 2001-2011 by"
 msgstr "Все права защищены 2001-2011"
 
-#: api/classes/class.cuser.php:1017
+#: api/classes/class.cuser.php:968
 #, php-format
 msgid "Correct login [%s]"
-msgstr ""
+msgstr "Верное имя пользователя [%s]"
 
 #: include/locales/en_gb.inc.php:2175
 msgid "Could not save image!"
@@ -1701,12 +1701,15 @@ msgstr "Создать пользователя"
 msgid "Create application"
 msgstr "Создать группу элементов данных"
 
+#: config.php:645
+msgid "Create image"
+msgstr "Создать изображение"
+
 #: include/locales/en_gb.inc.php:739
 msgid "Create maintenance period"
 msgstr "Создать период обслуживания"
 
 #: include/locales/en_gb.inc.php:1150
-#, fuzzy
 msgid "Create prototype"
 msgstr "Создать прототип"
 
@@ -1726,23 +1729,28 @@ msgstr "Создать скрипт"
 msgid "Create trigger"
 msgstr "Создать триггер для журнала"
 
-#: include/locales/en_gb.inc.php:467
+#: config.php:648 include/locales/en_gb.inc.php:467
 msgid "Create value map"
 msgstr "Создать преобразование значения"
 
 #: include/locales/en_gb.inc.php:2089
 msgid "Critical error"
-msgstr "Критическая ошибка"
+msgstr "Критичная ошибка"
+
+#: include/validate.inc.php:551
+#, php-format
+msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field."
+msgstr "Критичная ошибка. Некорректное значение \"%1$s\" для поля \"%2$s\"."
 
 #: include/templates/action.js.php:98 include/templates/action.js.php:190
 msgid "Current host"
-msgstr ""
+msgstr "Текущий узел сети"
 
 #: include/actions.inc.php:363
 msgid "Current host: "
-msgstr ""
+msgstr "Текущий узел сети: "
 
-#: include/locales/en_gb.inc.php:274
+#: include/locales/en_gb.inc.php:274 include/page_header.php:336
 msgid "Current node"
 msgstr "Текущая нода"
 
@@ -1752,7 +1760,7 @@ msgstr "Пользовательские графики"
 
 #: api/classes/class.cmap.php:582 include/forms/sysmap.edit.php:79
 msgid "Custom label"
-msgstr ""
+msgstr "Пользовательская подпись"
 
 #: include/locales/en_gb.inc.php:1103
 msgid "Custom multiplier"
@@ -1761,6 +1769,18 @@ msgstr "Пользовательский множитель"
 #: include/locales/en_gb.inc.php:1566
 msgid "Custom screens"
 msgstr "Пользовательские комплексные экраны"
+
+#: include/forms/triggerSeverity.edit.php:39
+#, fuzzy
+msgid "Custom severity"
+msgstr "Пользовательская важность"
+
+#: include/forms/triggerSeverity.edit.php:82
+#, fuzzy
+msgid "Custom severity names affect all locales and require manual translation!"
+msgstr ""
+"Имена пользовательских важностей имеют эффект на все локализации и требуют "
+"ручного перевода!"
 
 #: include/locales/en_gb.inc.php:1582
 msgid "Custom slides"
@@ -1802,7 +1822,7 @@ msgstr "ПРОВЕРКИ ОБНАРУЖЕНИЯ"
 msgid "DISCOVERY RULES"
 msgstr "ПРАВИЛА ОБНАРУЖЕНИЯ"
 
-#: include/locales/en_gb.inc.php:562
+#: include/locales/en_gb.inc.php:562 include/menu.inc.php:212
 msgid "DM"
 msgstr "РМ"
 
@@ -1830,7 +1850,7 @@ msgstr "Темно-оранжевая"
 msgid "Darken"
 msgstr "Темнее"
 
-#: include/locales/en_gb.inc.php:1298
+#: include/locales/en_gb.inc.php:1298 include/menu.inc.php:33
 msgid "Dashboard"
 msgstr "ПАНЕЛЬ"
 
@@ -1853,7 +1873,7 @@ msgstr "Данные"
 #: include/classes/class.cpie.php:617
 #, php-format
 msgid "Data from %1$s. Generated in %2$s sec"
-msgstr ""
+msgstr "Данные из %1$s. Сгенерированы за %2$s сек"
 
 #: include/locales/en_gb.inc.php:1542
 msgid "Data overview"
@@ -1865,11 +1885,11 @@ msgstr "Тип данных"
 
 #: include/setup.inc.php:240 include/setup.inc.php:294
 msgid "Database file"
-msgstr ""
+msgstr "Файл базы данных"
 
 #: include/setup.inc.php:243
 msgid "Database host"
-msgstr ""
+msgstr "Хост базы данных"
 
 #: include/locales/en_gb.inc.php:1056
 msgid "Database monitor"
@@ -1877,32 +1897,32 @@ msgstr "Монитор баз данных"
 
 #: include/setup.inc.php:245 include/setup.inc.php:302
 msgid "Database name"
-msgstr ""
+msgstr "Имя базы данных"
 
 #: include/setup.inc.php:304
 msgid "Database password"
-msgstr ""
+msgstr "Пароль от базы данных"
 
 #: include/setup.inc.php:244 include/setup.inc.php:299
 #: include/setup.inc.php:301
 msgid "Database port"
-msgstr ""
+msgstr "Порт базы данных"
 
 #: include/setup.inc.php:247 include/setup.inc.php:306
 msgid "Database schema"
-msgstr ""
+msgstr "Схема базы данных"
 
 #: include/setup.inc.php:297
 msgid "Database server"
-msgstr ""
+msgstr "Сервер базы данных"
 
 #: include/setup.inc.php:237 include/setup.inc.php:290
 msgid "Database type"
-msgstr ""
+msgstr "Тип базы данных"
 
 #: include/setup.inc.php:303
 msgid "Database user"
-msgstr ""
+msgstr "Имя пользователя от базы данных"
 
 #: include/locales/en_gb.inc.php:758
 msgid "Date"
@@ -1992,13 +2012,13 @@ msgstr "Установленная в \"include/defines.inc.php\" констан
 msgid "Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value"
 msgstr "Установленная в \"include/defines.inc.php\" константа ZBX_SCRIPT_TIMEOUT времени ожидания истекла. Вы можете попытаться увеличить это значение"
 
-#: include/forms/action.edit.php:347 include/locales/en_gb.inc.php:356
+#: include/forms/action.edit.php:343 include/locales/en_gb.inc.php:356
 msgid "Delay"
 msgstr "Задержка"
 
-#: discoveryconf.php:298
+#: discoveryconf.php:299
 msgid "Delay (seconds)"
-msgstr ""
+msgstr "Задержка (секунды)"
 
 #: include/locales/en_gb.inc.php:1357
 msgid "Delayed by"
@@ -2028,9 +2048,9 @@ msgstr "Внимание: это действие удалит выбранны�
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
 msgstr "Удалить и очистить шаблон? (Внимание: все присоединенные узлы сети будут очищены!)"
 
-#: include/forms/action.edit.php:861
+#: include/forms/action.edit.php:857
 msgid "Delete current action?"
-msgstr ""
+msgstr "Удалить текущее действие?"
 
 #: include/locales/en_gb.inc.php:1969
 msgid "Delete expression?"
@@ -2084,7 +2104,7 @@ msgstr "Удалить комплексный экран?"
 msgid "Delete script?"
 msgstr "Удалить скрипт?"
 
-#: include/locales/en_gb.inc.php:84
+#: include/forms.inc.php:461 include/locales/en_gb.inc.php:84
 msgid "Delete selected"
 msgstr "Удалить"
 
@@ -2100,7 +2120,7 @@ msgstr "Удалить выбранные Веб сценарии?"
 msgid "Delete selected applications?"
 msgstr "Удалить выбранные группы элементов данных?"
 
-#: host_discovery.php:638 include/locales/en_gb.inc.php:138
+#: host_discovery.php:634 include/locales/en_gb.inc.php:138
 msgid "Delete selected discovery rules?"
 msgstr "Удалить выбранные правила обнаружения?"
 
@@ -2208,17 +2228,17 @@ msgstr "Удалить выбранного пользователя"
 msgid "Delete selected users?"
 msgstr "Удалить выбранных пользователей"
 
-#: config.php:887
+#: config.php:921
 msgid "Delete selected value mapping?"
 msgstr "Удалить выбранное значение преобразования?"
 
-#: config.php:883
+#: config.php:917
 #, php-format
 msgid "Delete selected value mapping? It is used for %d item!"
 msgid_plural "Delete selected value mapping? It is used for %d items!"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Удалить выбранное преобразование значений? Оно используется для %d элемента данных!"
+msgstr[1] "Удалить выбранное преобразование значений? Оно используется для %d элементов данных!"
+msgstr[2] "Удалить выбранное преобразование значений? Оно используется для %d элементов данных!"
 
 #: include/locales/en_gb.inc.php:892
 msgid "Delete selected with linked elements"
@@ -2277,7 +2297,7 @@ msgstr "Зависит от"
 msgid "Description"
 msgstr "Описание"
 
-#: include/forms/action.edit.php:347 include/forms/action.edit.php:350
+#: include/forms/action.edit.php:343 include/forms/action.edit.php:346
 #: include/locales/en_gb.inc.php:1862
 msgid "Details"
 msgstr "Детали"
@@ -2356,7 +2376,7 @@ msgstr "Отключить режим отладки у выбранных гр�
 
 #: include/templates/host.js.php:133
 msgid "Disable extended profile"
-msgstr ""
+msgstr "Отключить расширенный профиль"
 
 #: include/actions.inc.php:280 include/locales/en_gb.inc.php:321
 msgid "Disable host"
@@ -2368,7 +2388,7 @@ msgstr "Деактивировать узлы сети наблюдаемые в
 
 #: include/templates/host.js.php:120
 msgid "Disable profile"
-msgstr ""
+msgstr "Отключить профиль"
 
 #: include/locales/en_gb.inc.php:81
 msgid "Disable selected"
@@ -2414,6 +2434,7 @@ msgstr "Отключить выбранные триггеры?"
 msgid "Disabled"
 msgstr "Деактивирован"
 
+#: config.php:615 include/forms/triggerSeverity.edit.php:78
 #: include/locales/en_gb.inc.php:374
 msgid "Disaster"
 msgstr "Чрезвычайная"
@@ -2430,7 +2451,8 @@ msgstr "Обнаруженное устройство"
 msgid "Discovered object"
 msgstr "Обнаруженный объект"
 
-#: include/locales/en_gb.inc.php:98
+#: include/locales/en_gb.inc.php:98 include/menu.inc.php:82
+#: include/menu.inc.php:191
 msgid "Discovery"
 msgstr "Обнаружение"
 
@@ -2447,17 +2469,17 @@ msgid "Discovery rule"
 msgstr "Правило обнаружения"
 
 #: api/classes/class.cdiscoveryrule.php:981
-#, fuzzy, php-format
+#, php-format
 msgid "Discovery rule [%1$s:%2$s] deleted."
 msgstr "Правило обнаружения [%1$s:%2$s] удалено."
 
 #: api/classes/class.cdiscoveryrule.php:591
-#, fuzzy, php-format
+#, php-format
 msgid "Discovery rule [%1$s:%2$s] has no interface."
 msgstr "Правило обнаружения [%1$s:%2$s] не имеет интерфейса."
 
 #: api/classes/class.ctemplate.php:1839
-#, fuzzy, php-format
+#, php-format
 msgid "Discovery rule [%1$s:%2$s] unlinked."
 msgstr "Правило обнаружения [%1$s:%2$s] отсоединено."
 
@@ -2466,7 +2488,6 @@ msgid "Discovery rule added"
 msgstr "Правило обнаружения добавлено"
 
 #: host_discovery.php:247
-#, fuzzy
 msgid "Discovery rule created"
 msgstr "Правило обнаружения создано"
 
@@ -2479,13 +2500,11 @@ msgstr "Правило обнаружения удалено"
 msgid "Discovery rule updated"
 msgstr "Правило обнаружения обновлено"
 
-#: include/forms/host.edit.php:402 include/forms/template.edit.php:256
-#, fuzzy
+#: include/forms/host.edit.php:404 include/forms/template.edit.php:256
 msgid "Discovery rules"
 msgstr "Правила обнаружения"
 
 #: host_discovery.php:263
-#, fuzzy
 msgid "Discovery rules activated"
 msgstr "Правила обнаружения активированы"
 
@@ -2494,7 +2513,6 @@ msgid "Discovery rules deleted"
 msgstr "Правила обнаружения удалены"
 
 #: host_discovery.php:263
-#, fuzzy
 msgid "Discovery rules disabled"
 msgstr "Правила обнаружения отключены"
 
@@ -2558,12 +2576,12 @@ msgstr "Down"
 #: api/classes/class.cwebcheck.php:525
 #, php-format
 msgid "Download speed for scenario '%s'"
-msgstr ""
+msgstr "Скорость загрузки для сценария '%s'"
 
 #: api/classes/class.cwebcheck.php:614
 #, php-format
 msgid "Download speed for step '%1$s' of scenario '%2$s'"
-msgstr ""
+msgstr "Скорость загрузки для шага '%1$s' сценария '%2$s'"
 
 #: include/locales/en_gb.inc.php:145 include/locales/en_gb.inc.php:1615
 msgid "Downtime"
@@ -2580,7 +2598,17 @@ msgstr "Первая запись в списке"
 #: api/classes/class.cmap.php:564
 #, php-format
 msgid "Duplicate map name for map \"%s\"."
-msgstr ""
+msgstr "Дублированное имя карты для карты \"%s\"."
+
+#: include/profiles.inc.php:261
+#, php-format, fuzzy
+msgid "Duplicate severity name \"%s\"."
+msgstr "Дублированное имя важности \"%s\"."
+
+#: api/classes/class.cuser.php:403
+#, php-format
+msgid "Duplicate user alias \"%s\"."
+msgstr "Дублировенный алиас пользователя \"%s\"."
 
 #: include/locales/en_gb.inc.php:393
 msgid "Duration"
@@ -2608,11 +2636,11 @@ msgstr "СОБЫТИЯ"
 
 #: include/locales/en_gb.inc.php:1268
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
-msgstr ""
+msgstr "Каждый URL должен иметь уникальное имя. Пожалуйста, удостоверьтесь, что есть только один URL с таким именем."
 
-#: include/forms/action.edit.php:388 include/forms/action.edit.php:394
-#: include/locales/en_gb.inc.php:1505 include/templates/action.js.php:64
-#: include/templates/action.js.php:85
+#: include/forms/action.edit.php:384 include/forms/action.edit.php:390
+#: include/forms.inc.php:452 include/locales/en_gb.inc.php:1505
+#: include/templates/action.js.php:64 include/templates/action.js.php:85
 msgid "Edit"
 msgstr "Изменить"
 
@@ -2622,7 +2650,7 @@ msgstr "Изменить сервис"
 
 #: include/locales/en_gb.inc.php:1131
 msgid "Edit Trigger"
-msgstr ""
+msgstr "Изменить триггер"
 
 #: include/locales/en_gb.inc.php:1962
 msgid "Edit connector"
@@ -2657,7 +2685,7 @@ msgid "Empty"
 msgstr "Пусто"
 
 #: api/classes/class.caction.php:1318 api/classes/class.capplication.php:662
-#: api/classes/class.cdiscoveryrule.php:891 api/classes/class.cgraph.php:976
+#: api/classes/class.cdiscoveryrule.php:891 api/classes/class.cgraph.php:975
 #: api/classes/class.cgraphprototype.php:973
 #: api/classes/class.chostgroup.php:703
 #: api/classes/class.chostinterface.php:672 api/classes/class.chost.php:2001
@@ -2671,9 +2699,9 @@ msgstr "Входной параметр пустой"
 msgid "Empty macro value"
 msgstr "Пустое значение макроса"
 
-#: api/rpc/class.czbxrpc.php:42
+#: api/rpc/class.czbxrpc.php:44
 msgid "Empty parameters"
-msgstr ""
+msgstr "Пустые параметры"
 
 #: include/locales/en_gb.inc.php:1855
 msgid "Empty response received"
@@ -2697,7 +2725,7 @@ msgstr "Включить ОТЛАДКУ"
 
 #: include/forms/script.edit.php:118
 msgid "Enable confirmation"
-msgstr ""
+msgstr "Включить подтверждение"
 
 #: include/locales/en_gb.inc.php:1825
 msgid "Enable debug mode in selected groups?"
@@ -2705,7 +2733,7 @@ msgstr "Включить режим отладки для выбранных г�
 
 #: include/templates/host.js.php:137
 msgid "Enable extended profile"
-msgstr ""
+msgstr "Включить расширенный профиль"
 
 #: include/actions.inc.php:277 include/locales/en_gb.inc.php:320
 msgid "Enable host"
@@ -2717,7 +2745,7 @@ msgstr "Активировать узлы сети наблюдаемые выб
 
 #: include/templates/host.js.php:124
 msgid "Enable profile"
-msgstr ""
+msgstr "Включить профиль"
 
 #: include/locales/en_gb.inc.php:1665
 msgid "Enable selected"
@@ -2783,7 +2811,7 @@ msgstr "Ошибка при добавлении времени сервиса"
 #: api/classes/class.citemprototype.php:576
 #, php-format
 msgid "Error in item key: %s"
-msgstr ""
+msgstr "Ошибка в ключе элемента данных: %s"
 
 #: include/locales/en_gb.inc.php:1163
 msgid "Event"
@@ -2817,7 +2845,7 @@ msgstr "Генерация события"
 msgid "Event source"
 msgstr "Событие"
 
-#: include/locales/en_gb.inc.php:2276
+#: include/locales/en_gb.inc.php:2276 include/menu.inc.php:62
 msgid "Events"
 msgstr "События"
 
@@ -2840,7 +2868,7 @@ msgstr "Исключено"
 #: include/templates/scriptConfirm.js.php:35
 #: include/templates/script.js.php:40
 msgid "Execute"
-msgstr ""
+msgstr "Выполнить"
 
 #: include/locales/en_gb.inc.php:2176
 msgid "Execute SQL error"
@@ -2852,11 +2880,11 @@ msgstr "Выполняемый скрипт"
 
 #: include/templates/scriptConfirm.js.php:17
 msgid "Execution confirmation"
-msgstr ""
+msgstr "Подтверждение выполнения"
 
 #: include/locales/en_gb.inc.php:226
 msgid "Existing"
-msgstr "существующее"
+msgstr "Существующее"
 
 #: include/forms/sysmap.edit.php:70
 msgid "Expand single problem"
@@ -2869,7 +2897,7 @@ msgstr "Ожидаемый результат"
 #: api/rpc/class.cjsonrpc.php:81
 #, php-format
 msgid "Expecting JSON-rpc version 2.0, \"%s\" is given."
-msgstr ""
+msgstr "Ожидалась версия 2.0 для JSON-rpc, получена \"%s\"."
 
 #: include/locales/en_gb.inc.php:741
 msgid "Expired"
@@ -2885,7 +2913,7 @@ msgstr "Экспортировать выбранное"
 
 #: events.php:259
 msgid "Export to CSV"
-msgstr ""
+msgstr "Экспорт в CSV"
 
 #: include/locales/en_gb.inc.php:521
 msgid "Expression"
@@ -2959,11 +2987,11 @@ msgstr "Ошибочный в"
 #: api/classes/class.cwebcheck.php:533
 #, php-format
 msgid "Failed step of scenario '%s'"
-msgstr ""
+msgstr "Ошибочный шаг для сценария '%s'"
 
 #: api/classes/class.ctemplate.php:1100
 msgid "Failed to update template"
-msgstr ""
+msgstr "Ошибка обновления шаблона"
 
 #: include/locales/en_gb.inc.php:710
 msgid "Failure Audit"
@@ -2999,7 +3027,7 @@ msgstr "Поле"
 
 #: api/classes/class.ctemplate.php:1022
 msgid "Field \"host\" is mandatory"
-msgstr ""
+msgstr "Поле \"имя узла сети\" обязательно"
 
 #: include/locales/en_gb.inc.php:410
 msgid "Filled region"
@@ -3008,6 +3036,10 @@ msgstr "Заполнение"
 #: include/locales/en_gb.inc.php:302
 msgid "Filter"
 msgstr "Фильтр"
+
+#: include/reports.inc.php:107
+msgid "Filter by host group"
+msgstr "Фльтр по имени группы узлов сети"
 
 #: include/locales/en_gb.inc.php:1718
 msgid "Filter by name"
@@ -3082,7 +3114,6 @@ msgid "GD PNG Support"
 msgstr "Поддержка GD PNG"
 
 #: include/locales/en_gb.inc.php:1160
-#, fuzzy
 msgid "GRAPH PROTOTYPES OF"
 msgstr "ПРОТОТИПЫ ГРАФИКОВ ДЛЯ"
 
@@ -3094,7 +3125,7 @@ msgstr "ГРАФИКИ"
 msgid "GSM modem"
 msgstr "GSM модем"
 
-#: include/locales/en_gb.inc.php:439
+#: config.php:630 include/locales/en_gb.inc.php:439
 msgid "GUI"
 msgstr "Веб-интерфейс"
 
@@ -3106,22 +3137,22 @@ msgstr "Сообщения в веб-интерфейсе"
 msgid "GUI access"
 msgstr "Доступ к GUI"
 
-#: include/classes/class.cwebuser.php:19 include/classes/class.cwebuser.php:75
+#: include/classes/class.cwebuser.php:20 include/classes/class.cwebuser.php:76
 msgid "GUI access disabled."
-msgstr ""
+msgstr "Доступ к GUI отключен."
 
 #: include/locales/en_gb.inc.php:1766
 msgid "GUI access updated"
 msgstr "Доступ к GUI обновлен"
 
-#: include/locales/en_gb.inc.php:2281
+#: include/locales/en_gb.inc.php:2281 include/menu.inc.php:208
 msgid "General"
 msgstr "Общие"
 
-#: include/classes/class.cbar.php:725 include/classes/class.cchart.php:2192
+#: include/classes/class.cbar.php:725 include/classes/class.cchart.php:2183
 #, php-format
 msgid "Generated in %s sec"
-msgstr ""
+msgstr "Сгенерировано за %s сек."
 
 #: include/locales/en_gb.inc.php:1892
 msgid "German (DE)"
@@ -3135,7 +3166,7 @@ msgstr "Получение Img: Данные по элементу не найд
 msgid "Get selected elements FAILED."
 msgstr "Не удалось получить элементы."
 
-#: include/locales/en_gb.inc.php:2272
+#: include/locales/en_gb.inc.php:2272 include/page_header.php:213
 msgid "Get support"
 msgstr "Поддержка"
 
@@ -3153,7 +3184,7 @@ msgstr "Выполнить"
 
 #: include/locales/en_gb.inc.php:1197
 msgid "Go to"
-msgstr ""
+msgstr "Перейти к"
 
 #: include/locales/en_gb.inc.php:414
 msgid "Gradient line"
@@ -3163,47 +3194,47 @@ msgstr "Градиентная линия"
 msgid "Graph"
 msgstr "График"
 
-#: api/classes/class.cgraph.php:839 api/classes/class.cgraphprototype.php:835
+#: api/classes/class.cgraph.php:838 api/classes/class.cgraphprototype.php:835
 #, php-format
 msgid "Graph [ %1$s ]: already exists on [ %2$s ]"
-msgstr ""
+msgstr "График [ %1$s ]: уже существует у [ %2$s ]"
 
-#: api/classes/class.cgraph.php:860 api/classes/class.cgraphprototype.php:856
+#: api/classes/class.cgraph.php:859 api/classes/class.cgraphprototype.php:856
 #, php-format
 msgid "Graph [ %1$s ]: already exists on [ %2$s ] (inherited from another template)"
-msgstr ""
+msgstr "График [ %1$s ]: уже существует у [ %2$s ] (унаследован от другого шаблона)"
 
-#: api/classes/class.cgraph.php:882 api/classes/class.cgraph.php:889
+#: api/classes/class.cgraph.php:881 api/classes/class.cgraph.php:888
 #: api/classes/class.cgraphprototype.php:878
 #: api/classes/class.cgraphprototype.php:885
 #, php-format
 msgid "Graph [ %1$s ]: already exists on [ %2$s ] (items are not identical)"
-msgstr ""
+msgstr "График [ %1$s ]: уже существует у [ %2$s ] (элементы данных не идентичны)"
 
-#: api/classes/class.cgraph.php:812 api/classes/class.cgraphprototype.php:808
+#: api/classes/class.cgraph.php:811 api/classes/class.cgraphprototype.php:808
 #, php-format
 msgid "Graph [ %1$s ]: cannot inherit. No required items on [ %2$s ]"
-msgstr ""
+msgstr "График [ %1$s ]: не может быть унаследован. Не хватает элементов данных у [ %2$s ]"
 
-#: api/classes/class.cgraph.php:816 api/classes/class.cgraphprototype.php:812
+#: api/classes/class.cgraph.php:815 api/classes/class.cgraphprototype.php:812
 #, php-format
 msgid "Graph [ %1$s ]: cannot inherit. No required items on [ %2$s ] (Ymax value item)"
-msgstr ""
+msgstr "График [ %1$s ]: не может быть унаследован. Не хватает элементов данных у [ %2$s ] (элемент данных значения макс Y)"
 
-#: api/classes/class.cgraph.php:822 api/classes/class.cgraphprototype.php:818
+#: api/classes/class.cgraph.php:821 api/classes/class.cgraphprototype.php:818
 #, php-format
 msgid "Graph [ %1$s ]: cannot inherit. No required items on [ %2$s ] (Ymin value item)"
-msgstr ""
+msgstr "График [ %1$s ]: не может быть унаследован. Не хватает элементов данных у [ %2$s ] (элемент данных значения мин Y)"
 
 #: api/classes/class.ctemplate.php:1941
 #, php-format
 msgid "Graph [%1$s] unlinked."
-msgstr ""
+msgstr "График [%1$s] отсоединен."
 
-#: api/classes/class.cgraph.php:1026
+#: api/classes/class.cgraph.php:1025
 #, php-format
 msgid "Graph [%s] deleted."
-msgstr ""
+msgstr "График [%s] удален."
 
 #: include/locales/en_gb.inc.php:656
 msgid "Graph added"
@@ -3226,22 +3257,20 @@ msgid "Graph name"
 msgstr "Название графика"
 
 #: api/classes/class.ctemplate.php:1923
-#, fuzzy, php-format
+#, php-format
 msgid "Graph prototype [%1$s] unlinked."
 msgstr "Прототип графика [%1$s] отсоединен."
 
 #: api/classes/class.cgraphprototype.php:1033
-#, fuzzy, php-format
+#, php-format
 msgid "Graph prototype [%s] deleted."
 msgstr "Прототип графика [%s] удален."
 
 #: api/classes/class.cgraphprototype.php:1126
-#, fuzzy
 msgid "Graph prototype must have at least one prototype"
 msgstr "Прототип графика должен иметь как минимум один прототип"
 
-#: include/forms/host.edit.php:469 include/forms/template.edit.php:319
-#, fuzzy
+#: include/forms/host.edit.php:471 include/forms/template.edit.php:319
 msgid "Graph prototypes"
 msgstr "Прототипы графиков"
 
@@ -3257,19 +3286,19 @@ msgstr "Тип графика"
 msgid "Graph updated"
 msgstr "График обновлен"
 
-#: api/classes/class.cgraph.php:1111
+#: api/classes/class.cgraph.php:1110
 #, php-format
 msgid "Graph with name \"%1$s\" already exists"
-msgstr ""
+msgstr "График с именем \"%1$s\" уже существует"
 
-#: api/classes/class.cgraph.php:842 api/classes/class.cgraph.php:863
+#: api/classes/class.cgraph.php:841 api/classes/class.cgraph.php:862
 #: api/classes/class.cgraphprototype.php:838
 #: api/classes/class.cgraphprototype.php:859
 msgid "Graph with same name but other type exist"
-msgstr ""
+msgstr "График с таким же именем, но с другим типом, уже существует"
 
-#: include/forms/host.edit.php:379 include/forms/template.edit.php:235
-#: include/locales/en_gb.inc.php:833
+#: include/forms/host.edit.php:381 include/forms/template.edit.php:235
+#: include/locales/en_gb.inc.php:833 include/menu.inc.php:67
 msgid "Graphs"
 msgstr "Графики"
 
@@ -3369,7 +3398,8 @@ msgstr "Аппаратные средства"
 msgid "Height"
 msgstr "Высота"
 
-#: include/locales/en_gb.inc.php:2270
+#: include/forms/login.php:41 include/locales/en_gb.inc.php:2270
+#: include/page_header.php:211
 msgid "Help"
 msgstr "Помощь"
 
@@ -3401,6 +3431,7 @@ msgstr "Не отображать деактивированные тригге�
 msgid "Hide selected"
 msgstr "Не показывать выбранное"
 
+#: config.php:613 include/forms/triggerSeverity.edit.php:72
 #: include/locales/en_gb.inc.php:373
 msgid "High"
 msgstr "Высокая"
@@ -3445,26 +3476,26 @@ msgstr "Узел сети"
 #: include/actions.inc.php:370
 #, php-format
 msgid "Host \"%1$s\": "
-msgstr ""
+msgstr "Узел сети \"%1$s\": "
 
 #: api/classes/class.cproxy.php:367
 #, php-format
 msgid "Host \"%s\" already exists."
-msgstr ""
+msgstr "Узел сети \"%s\" уже существует."
 
 #: api/classes/class.chost.php:2127
 #, php-format
 msgid "Host \"%s\" deleted."
-msgstr ""
+msgstr "Узел сети \"%s\" удален."
 
 #: include/export.inc.php:874
 #, php-format
 msgid "Host \"%s\" has \"use_ipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
-msgstr ""
+msgstr "У узла сети \"%s\" выбран параметр использования impi, но не указан IP адрес IPMI! Будет использован IP адрес узла сети для интерфейса IPMI."
 
 #: include/forms/sysmap.edit.php:92
 msgid "Host Group label type"
-msgstr ""
+msgstr "Тип подписи к группе узла сети"
 
 #: include/locales/en_gb.inc.php:89
 msgid "Host IP"
@@ -3510,15 +3541,16 @@ msgstr "Группа узлов сети"
 #: include/actions.inc.php:382
 #, php-format
 msgid "Host group \"%1$s\": "
-msgstr ""
+msgstr "Группа узлов сети \"%1$s\": "
 
 #: include/forms/script.edit.php:108 include/locales/en_gb.inc.php:895
+#: include/menu.inc.php:143
 msgid "Host groups"
 msgstr "Группы узлов сети"
 
 #: include/locales/en_gb.inc.php:803
 msgid "Host interface"
-msgstr ""
+msgstr "Интерфейс узла сети"
 
 #: include/locales/en_gb.inc.php:2125
 msgid "Host key does not exist."
@@ -3526,11 +3558,11 @@ msgstr "Ключ узла сети не существует."
 
 #: include/forms/sysmap.edit.php:98
 msgid "Host label type"
-msgstr ""
+msgstr "Тип подписи к узлу сети"
 
 #: include/forms/host.massupdate.php:123
 msgid "Host mass update"
-msgstr ""
+msgstr "Массовое обновление узла сети"
 
 #: include/locales/en_gb.inc.php:311
 msgid "Host name"
@@ -3546,7 +3578,7 @@ msgstr "Профиль узлов сети"
 
 #: include/locales/en_gb.inc.php:1568
 msgid "Host screens"
-msgstr ""
+msgstr "Комплексные экраны узла сети"
 
 #: include/locales/en_gb.inc.php:1303
 msgid "Host status"
@@ -3562,7 +3594,7 @@ msgstr "Шаблон узла сети"
 
 #: include/locales/en_gb.inc.php:1549
 msgid "Host time"
-msgstr ""
+msgstr "Время узла сети"
 
 #: api/classes/class.chost.php:1494 api/classes/class.chost.php:1499
 #: api/classes/class.chost.php:1504 api/classes/class.chost.php:1513
@@ -3573,7 +3605,8 @@ msgstr "Ошибка при обновлении узла сети"
 msgid "Host updated"
 msgstr "Узел сети обновлен"
 
-#: include/locales/en_gb.inc.php:829
+#: include/locales/en_gb.inc.php:829 include/menu.inc.php:52
+#: include/menu.inc.php:103 include/menu.inc.php:151
 msgid "Hosts"
 msgstr "Узлы сети"
 
@@ -3613,7 +3646,7 @@ msgstr "Ежечасно"
 msgid "Hours"
 msgstr "Часы"
 
-#: include/locales/en_gb.inc.php:488
+#: config.php:631 include/locales/en_gb.inc.php:488
 msgid "Housekeeper"
 msgstr "Очистка истории"
 
@@ -3643,8 +3676,8 @@ msgid "IP address"
 msgstr "IP адрес"
 
 #: api/classes/class.chostinterface.php:507
-msgid "IP and DNS can not be empty for host interface."
-msgstr ""
+msgid "IP and DNS cannot be empty for host interface."
+msgstr "IP и DNS не могут быть пустыми для интерфейса узла сети."
 
 #: include/locales/en_gb.inc.php:103
 msgid "IP range"
@@ -3652,7 +3685,7 @@ msgstr "Диапазон IP адресов"
 
 #: include/locales/en_gb.inc.php:804
 msgid "IPMI"
-msgstr ""
+msgstr "IPMI"
 
 #: include/locales/en_gb.inc.php:1057
 msgid "IPMI agent"
@@ -3686,6 +3719,10 @@ msgstr "УСЛУГИ IT"
 msgid "IT SERVICES AVAILABILITY REPORT"
 msgstr "ОТЧЕТ ДОСТУПНОСТИ IT УСЛУГ"
 
+#: include/menu.inc.php:86 include/menu.inc.php:194
+msgid "IT Services"
+msgstr "Услуги IT"
+
 #: include/locales/en_gb.inc.php:1587
 msgid "IT service"
 msgstr "Услуга IT"
@@ -3699,7 +3736,6 @@ msgid "IT services availability report"
 msgstr "Отчет доступности IT услуг"
 
 #: include/locales/en_gb.inc.php:1147
-#, fuzzy
 msgid "ITEM PROTOTYPES OF"
 msgstr "ПРОТОТИПЫ ЭЛЕМЕНТОВ ДАННЫХ ДЛЯ"
 
@@ -3737,7 +3773,7 @@ msgstr "Иконка (неизвестно)"
 
 #: include/forms/sysmap.edit.php:68
 msgid "Icon highlight"
-msgstr ""
+msgstr "Выделение иконки"
 
 #: include/forms/sysmap.edit.php:125
 msgid "Icon label location"
@@ -3777,7 +3813,7 @@ msgstr "Фоновое изображение используется на ка
 
 #: include/forms/sysmap.edit.php:116
 msgid "Image label type"
-msgstr ""
+msgstr "Тип подписи к рисунку"
 
 #: include/locales/en_gb.inc.php:2178
 msgid "Image size must be less than 1MB"
@@ -3787,7 +3823,7 @@ msgstr "Размер рисунка должен быть меньше 1МБ"
 msgid "Image updated"
 msgstr "Изображение обновлено"
 
-#: include/locales/en_gb.inc.php:491
+#: config.php:632 include/locales/en_gb.inc.php:491
 msgid "Images"
 msgstr "Изображения"
 
@@ -3843,16 +3879,11 @@ msgstr "В работе"
 msgid "Include"
 msgstr "Включено"
 
-#: api/classes/class.cmap.php:605
-#, php-format
-msgid "Incorrect %1$s element custom label string for map \"%s\"."
-msgstr ""
-
 #: api/classes/class.cmap.php:598 api/classes/class.cmap.php:602
 #: api/classes/class.cmap.php:609 api/classes/class.cmap.php:614
 #, php-format
 msgid "Incorrect %1$s label type value for map \"%2$s\"."
-msgstr ""
+msgstr "Некорректное значение %1$s типа подписи для карты \"%2$s\"."
 
 #: api/classes/class.cscreen.php:548
 #, php-format
@@ -3897,12 +3928,14 @@ msgid "Incorrect Screen identity \"%s\" provided for Screens item resource"
 msgstr ""
 
 #: api/classes/class.caction.php:1493
+#, fuzzy
 msgid "Incorrect action condition discovery check."
-msgstr ""
+msgstr "Некорректное условие действия проверки обнаружения."
 
 #: api/classes/class.caction.php:1503
+#, fuzzy
 msgid "Incorrect action condition discovery status."
-msgstr ""
+msgstr "Некорретное условие действия состояния обнаружения."
 
 #: api/classes/class.caction.php:1526
 msgid "Incorrect action condition host group. Host group does not exist or you have no access to this host group."
@@ -3953,7 +3986,7 @@ msgstr ""
 
 #: api/classes/class.caction.php:1362
 msgid "Incorrect action operation escalation period."
-msgstr ""
+msgstr "В действии некорректная операция периода эскалации."
 
 #: api/classes/class.caction.php:1352 api/classes/class.caction.php:1356
 msgid "Incorrect action operation escalation step values."
@@ -3994,17 +4027,17 @@ msgstr ""
 #: api/classes/class.chost.php:1337
 #, php-format
 msgid "Incorrect characters used for Host name \"%s\""
-msgstr ""
+msgstr "Использованы недопустимые символы в имени хоста \"%s\""
 
 #: api/classes/class.chost.php:1663
 #, php-format
 msgid "Incorrect characters used for Hostname \"%s\""
-msgstr ""
+msgstr "Использованы недопустимые символы в имени хоста \"%s\""
 
 #: api/classes/class.ctemplate.php:1349
 #, php-format
 msgid "Incorrect characters used for Hostname [ %s ]"
-msgstr ""
+msgstr "Использованы недопустимые символы в имени хоста [ %s ]"
 
 #: include/locales/en_gb.inc.php:2183
 msgid "Incorrect characters used for Node name"
@@ -4013,12 +4046,12 @@ msgstr "Использованы недопустимые символы в им
 #: api/classes/class.cproxy.php:359
 #, php-format
 msgid "Incorrect characters used for Proxy name \"%s\"."
-msgstr ""
+msgstr "Использованы недопустимые символы в имени прокси \"%s\"."
 
 #: api/classes/class.ctemplate.php:1026
 #, php-format
 msgid "Incorrect characters used for Template name [ %1$s ]"
-msgstr ""
+msgstr "Использованы недопустимые символы в имени шаблона [ %1$s ]"
 
 #: include/locales/en_gb.inc.php:338
 msgid "Incorrect condition type"
@@ -4042,11 +4075,11 @@ msgstr "Некорректное выражение"
 
 #: api/classes/class.cmap.php:549
 msgid "Incorrect fields for sysmap"
-msgstr ""
+msgstr "Некорректные поля для системной карты"
 
 #: api/classes/class.ctrigger.php:1148
 msgid "Incorrect fields for trigger"
-msgstr ""
+msgstr "Некорректные поля для триггера"
 
 #: include/locales/en_gb.inc.php:2121
 msgid "Incorrect function is used"
@@ -4063,22 +4096,23 @@ msgstr "Некорректный узел сети"
 #: api/classes/class.chostinterface.php:529
 #, php-format
 msgid "Incorrect interface DNS parameter \" %1$s \" provided."
-msgstr ""
+msgstr "Указан некорректный параметр DNS \" %1$s \"."
 
 #: api/classes/class.chostinterface.php:538
-#, php-format
+#, php-format, fuzzy
 msgid "Incorrect interface IP parameter \" %1$s \" provided."
-msgstr ""
+msgstr "Указан некорректный параметр интерфейса IP \" %1$s \""
 
 #: api/classes/class.chostinterface.php:549
-#, php-format
+#, php-format, fuzzy
 msgid "Incorrect interface PORT \"%s\" provided"
-msgstr ""
+msgstr "Для интерфейса указан некорректный порт \"%s\""
 
-#: api/classes/class.cgraph.php:1145
+#: api/classes/class.cgraph.php:1144
 #: api/classes/class.cgraphprototype.php:1160
+#, fuzzy
 msgid "Incorrect item for axis value item"
-msgstr ""
+msgstr "Некорректный элемент данных для значения оси X"
 
 #: include/locales/en_gb.inc.php:2051
 msgid "Incorrect key format"
@@ -4115,12 +4149,12 @@ msgstr "Некорректная неделя периода обслужива�
 #: api/classes/class.cmap.php:573
 #, php-format
 msgid "Incorrect map height value for map \"%s\"."
-msgstr ""
+msgstr "Некорректное значение высоты для карты \"%s\"."
 
 #: api/classes/class.cmap.php:570
 #, php-format
 msgid "Incorrect map width value for map \"%s\"."
-msgstr ""
+msgstr "Некорректное значение ширины для карты \"%s\"."
 
 #: include/locales/en_gb.inc.php:2185
 msgid "Incorrect node type"
@@ -4129,7 +4163,7 @@ msgstr "Некорректный тип ноды"
 #: api/classes/class.caction.php:698
 #, php-format
 msgid "Incorrect parameter is used for action \"%s\""
-msgstr ""
+msgstr "Использован некорректный параметр для действия \"%s\""
 
 #: include/locales/en_gb.inc.php:259
 msgid "Incorrect parameter used for Action"
@@ -4140,13 +4174,13 @@ msgid "Incorrect parameter used for Operations"
 msgstr "Использован некорректный параметр для Операций"
 
 #: api/classes/class.caction.php:792
-#, php-format
+#, php-format, fuzzy
 msgid "Incorrect parameters are used for action update method \"%s\""
-msgstr ""
+msgstr "Использованы некорректные параметры для метода обновления действия \"%s\""
 
 #: api/classes/class.caction.php:913
 msgid "Incorrect parameters for condition."
-msgstr ""
+msgstr "Некорректные параметры в условии."
 
 #: include/locales/en_gb.inc.php:333
 msgid "Incorrect period"
@@ -4158,11 +4192,11 @@ msgstr "Некорректный порт"
 
 #: include/actions.inc.php:655
 msgid "Incorrect proxy."
-msgstr ""
+msgstr "Некорректный прокси."
 
 #: api/classes/class.cscreen.php:486
 msgid "Incorrect resource provided for screen item"
-msgstr ""
+msgstr "Указан некорректный ресурс для элемента комплексного экрана"
 
 #: include/locales/en_gb.inc.php:1989 include/locales/en_gb.inc.php:2245
 msgid "Incorrect time period"
@@ -4180,6 +4214,8 @@ msgstr "Некорректное выражение триггера"
 #, php-format
 msgid "Incorrect trigger expression. Host \"%s\" does not exist or you have no access to this host."
 msgstr ""
+"Некорректное выражение триггера. Узел сети \"%s\" не существует или у вас нет "
+"прав доступа к этому узлу сети."
 
 #: include/locales/en_gb.inc.php:2011
 msgid "Incorrect type of asort_by_key"
@@ -4225,10 +4261,11 @@ msgstr "Некорректный Тип информации"
 msgid "Incorrect work period"
 msgstr "Неверный режим работы"
 
-#: include/locales/en_gb.inc.php:696
+#: include/classes/class.cformlist.php:52 include/locales/en_gb.inc.php:696
 msgid "Info"
-msgstr ""
+msgstr "Инфо"
 
+#: config.php:607 include/forms/triggerSeverity.edit.php:54
 #: include/locales/en_gb.inc.php:370
 msgid "Information"
 msgstr "Информация"
@@ -4241,7 +4278,7 @@ msgstr "Вставить"
 msgid "Insert macro"
 msgstr "Вставить макрос"
 
-#: include/locales/en_gb.inc.php:247
+#: include/locales/en_gb.inc.php:247 include/menu.inc.php:239
 msgid "Installation"
 msgstr "Инсталляция"
 
@@ -4255,26 +4292,26 @@ msgstr "Имя установщика"
 
 #: include/locales/en_gb.inc.php:913
 msgid "Interface"
-msgstr ""
+msgstr "Интерфейс"
 
 #: api/classes/class.chostinterface.php:574
 #, php-format
 msgid "Interface is linked to item \"%s\""
-msgstr ""
+msgstr "Интерфейс соединен с элементом данных \"%s\""
 
 #: api/classes/class.chostinterface.php:511
 #, php-format
-msgid "Interface with DNS \" %1$s \" can not have empty IP address."
-msgstr ""
+msgid "Interface with DNS \" %1$s \" cannot have empty IP address."
+msgstr "Интерфейс с DNS \" %1$s \" не может иметь пустой IP адрес."
 
 #: api/classes/class.chostinterface.php:521
 #, php-format
-msgid "Interface with IP \"%1$s\" can not have empty DNS name while having \"Use DNS\" property on host \"%2$s\"."
+msgid "Interface with IP \"%1$s\" cannot have empty DNS name while having \"Use DNS\" property on host \"%2$s\"."
 msgstr ""
 
 #: include/locales/en_gb.inc.php:912
 msgid "Interfaces"
-msgstr ""
+msgstr "Интерфейсы"
 
 #: include/locales/en_gb.inc.php:1809
 msgid "Internal"
@@ -4282,11 +4319,11 @@ msgstr "Внутренняя"
 
 #: api/rpc/class.cjsonrpc.php:182
 msgid "Internal JSON-RPC error."
-msgstr ""
+msgstr "Внутренняя ошибка JSON-RPC."
 
 #: api/rpc/class.cjsonrpc.php:181
 msgid "Internal error."
-msgstr ""
+msgstr "Внутренняя ошибка."
 
 #: include/locales/en_gb.inc.php:1045
 msgid "Interval"
@@ -4294,25 +4331,25 @@ msgstr "Интервал"
 
 #: api/rpc/class.cjsonrpc.php:166
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
-msgstr ""
+msgstr "Ошибочный JSON. На сервере произошла ошибка при разборе текста JSON."
 
 #: api/rpc/class.cjsonrpc.php:169
 msgid "Invalid Request."
-msgstr ""
+msgstr "Ошибочный запрос."
 
-#: include/items.inc.php:1499
+#: include/items.inc.php:1498
 msgid "Invalid key format"
 msgstr "Ошибочный формат ключа"
 
 #: api/rpc/class.cjsonrpc.php:178
 msgid "Invalid method parameters."
-msgstr ""
+msgstr "Ошибочные параметры метода."
 
 #: api/rpc/class.cjsonrpc.php:177
 msgid "Invalid params."
-msgstr ""
+msgstr "Ошибочные параметры."
 
-#: include/locales/en_gb.inc.php:2274
+#: include/locales/en_gb.inc.php:2274 include/menu.inc.php:98
 msgid "Inventory"
 msgstr "Инвентаризация"
 
@@ -4326,11 +4363,11 @@ msgstr "Проблема"
 
 #: api/classes/class.cuser.php:180
 msgid "It is not possible to filter by user password"
-msgstr ""
+msgstr "Нельзя фильтровать по паролю пользователя"
 
 #: api/classes/class.cuser.php:188
 msgid "It is not possible to search by user password"
-msgstr ""
+msgstr "Нельзя искать по паролю пользователя"
 
 #: include/locales/en_gb.inc.php:1893
 msgid "Italian (IT)"
@@ -4343,23 +4380,23 @@ msgstr "Элемент данных"
 #: include/items.inc.php:351
 #, php-format
 msgid "Item [%1$s:%2$s] cannot find interface on host [%3$s]"
-msgstr ""
+msgstr "Невозможно найти интерфейс для элемента данных [%1$s:%2$s] у узла сети [%3$s]"
 
 #: api/classes/class.citem.php:1349
 #, php-format
 msgid "Item [%1$s:%2$s] deleted."
-msgstr ""
+msgstr "Элемент данных [%1$s:%2$s] удален."
 
 #: api/classes/class.cdiscoveryrule.php:674 api/classes/class.citem.php:1025
 #: api/classes/class.citemprototype.php:640
 #, php-format
 msgid "Item [%1$s:%2$s] has invalid port: \"%3$s\"."
-msgstr ""
+msgstr "У элемента данных [%1$s:%2$s] ошибочный порт: \"%3$s\"."
 
 #: api/classes/class.ctemplate.php:1857
 #, php-format
 msgid "Item [%1$s:%2$s] unlinked."
-msgstr ""
+msgstr "Элемент данных [%1$s:%2$s] отсоединен."
 
 #: include/locales/en_gb.inc.php:620
 msgid "Item added"
@@ -4382,22 +4419,20 @@ msgid "Item function"
 msgstr "Функция элемента данных"
 
 #: include/locales/en_gb.inc.php:1151
-#, fuzzy
 msgid "Item prototype"
 msgstr "Прототип элемента данных"
 
 #: api/classes/class.citemprototype.php:974
-#, fuzzy, php-format
+#, php-format
 msgid "Item prototype [%1$s:%2$s] deleted."
 msgstr "Прототип элемета данных [%1$s:%2$s] удален."
 
 #: api/classes/class.ctemplate.php:1875
-#, fuzzy, php-format
+#, php-format
 msgid "Item prototype [%1$s:%2$s] unlinked."
 msgstr "Прототип элемента данных [%1$s:%2$s] отсоединен."
 
-#: include/forms/host.edit.php:423 include/forms/template.edit.php:276
-#, fuzzy
+#: include/forms/host.edit.php:425 include/forms/template.edit.php:276
 msgid "Item prototypes"
 msgstr "Прототипы элементов данных"
 
@@ -4407,7 +4442,7 @@ msgstr "Элемент обновлен"
 
 #: api/classes/class.cdiscoveryrule.php:662 api/classes/class.citem.php:1012
 msgid "Item uses Host interface from non parent host"
-msgstr ""
+msgstr "Элемент данных использует интерфейс узла сети с не родительского узла сети"
 
 #: include/locales/en_gb.inc.php:2052
 msgid "Item will not be refreshed. Please enter a correct update interval."
@@ -4416,9 +4451,9 @@ msgstr "Элемент данных не обновлен. Пожалуйста,
 #: api/classes/class.cwebcheck.php:547
 #, php-format
 msgid "Item with key [%s] already exists"
-msgstr ""
+msgstr "Элемент данных с ключем [%s] уже существует"
 
-#: include/forms/host.edit.php:333 include/forms/template.edit.php:192
+#: include/forms/host.edit.php:335 include/forms/template.edit.php:192
 #: include/locales/en_gb.inc.php:830
 msgid "Items"
 msgstr "Элементы данных"
@@ -4456,21 +4491,21 @@ msgid "Items updated"
 msgstr "Элементы обновлены"
 
 #: api/rpc/class.cjsonrpc.php:137
-#, php-format
+#, fuzzy, php-format
 msgid "JSON-rpc error generation failed. No such error \"%s\"."
-msgstr ""
+msgstr "Ошибка при генерации JSON-rpc ошибки. Нет никакой ошибки \"%s\"."
 
 #: api/rpc/class.cjsonrpc.php:86
 msgid "JSON-rpc method is not defined."
-msgstr ""
+msgstr "JSON-rpc метод не определен."
 
 #: api/rpc/class.cjsonrpc.php:91
 msgid "JSON-rpc params is not an Array."
-msgstr ""
+msgstr "JSON-rpc параметры не являются массивом."
 
 #: api/rpc/class.cjsonrpc.php:76
 msgid "JSON-rpc version is not specified."
-msgstr ""
+msgstr "Версия JSON-rpc не указана."
 
 #: include/locales/en_gb.inc.php:1067
 msgid "Jabber"
@@ -4524,7 +4559,7 @@ msgstr "Хранить динамику изменений (дни)"
 msgid "Key"
 msgstr "Ключ"
 
-#: include/items.inc.php:1320
+#: include/items.inc.php:1319
 msgid "Key cannot be empty"
 msgstr "Ключ не может быть пустым"
 
@@ -4532,14 +4567,14 @@ msgstr "Ключ не может быть пустым"
 msgid "Key does not match"
 msgstr "Ключ не совпадает"
 
-#: include/items.inc.php:1328
+#: include/items.inc.php:1327
 #, php-format
 msgid "Key is too large: maximum %d characters"
 msgstr "Ключ слишком большой: максимально %d символов"
 
-#: include/items.inc.php:1350 include/items.inc.php:1390
-#: include/items.inc.php:1412 include/items.inc.php:1440
-#: include/items.inc.php:1489
+#: include/items.inc.php:1349 include/items.inc.php:1389
+#: include/items.inc.php:1411 include/items.inc.php:1439
+#: include/items.inc.php:1488
 msgid "Key is valid"
 msgstr "Ключ правильный"
 
@@ -4569,23 +4604,24 @@ msgstr "LDAP аутентификация"
 
 #: authentication.php:167
 msgid "LDAP login successful."
-msgstr ""
+msgstr "Успешный вход через LDAP."
 
 #: authentication.php:167
 msgid "LDAP login was not successful."
-msgstr ""
+msgstr "Неуспешный вход через LDAP."
 
 #: authentication.php:143
 msgid "LDAP updated."
-msgstr ""
+msgstr "LDAP обновлен."
 
 #: authentication.php:147
 msgid "LDAP was not updated."
-msgstr ""
+msgstr "LDAP не обновлен."
 
 #: include/locales/en_gb.inc.php:233
+#, fuzzy
 msgid "LOCAL"
-msgstr ""
+msgstr "ЛОКАЛЬНОЕ"
 
 #: include/locales/en_gb.inc.php:345
 msgid "LOGS"
@@ -4664,7 +4700,7 @@ msgstr "Последнее значение"
 msgid "Last week graph"
 msgstr "График за последнюю неделю"
 
-#: include/locales/en_gb.inc.php:2285
+#: include/locales/en_gb.inc.php:2285 include/menu.inc.php:47
 msgid "Latest data"
 msgstr "Последние данные"
 
@@ -4703,12 +4739,12 @@ msgstr "Индикаторы связи"
 #: api/classes/class.cmap.php:626
 #, php-format
 msgid "Link name should be unique for map \"%s\"."
-msgstr ""
+msgstr "Имя соединителя должно быть уникальным для карты \"%s\"."
 
 #: api/classes/class.cmap.php:623
 #, php-format
 msgid "Link should have both \"name\" and \"url\" fields for map \"%s\"."
-msgstr ""
+msgstr "У соединителя должны быть заполнены оба поля \"имя\" и \"url\" для карты \"%s\"."
 
 #: include/locales/en_gb.inc.php:1204
 msgid "Link status indicator"
@@ -4724,15 +4760,15 @@ msgstr "Присоединить шаблон"
 
 #: include/actions.inc.php:315
 msgid "Link to templates: "
-msgstr ""
+msgstr "Присоединить шаблоны: "
 
 #: include/locales/en_gb.inc.php:1607
 msgid "Link to trigger?"
 msgstr "Связать с триггером?"
 
-#: include/forms/action.edit.php:698
+#: include/forms/action.edit.php:694
 msgid "Link with templates"
-msgstr ""
+msgstr "Соединения с шаблонами"
 
 #: include/locales/en_gb.inc.php:921
 msgid "Linked templates"
@@ -4752,7 +4788,7 @@ msgstr "Список"
 
 #: include/classes/class.clist.php:32
 msgid "List is empty"
-msgstr ""
+msgstr "Список пустой"
 
 #: include/locales/en_gb.inc.php:1312
 msgid "Loading..."
@@ -4778,29 +4814,34 @@ msgstr "Журнал (лог)"
 msgid "Log time format"
 msgstr "Формат времени в журнале (логе)"
 
-#: include/classes/class.cserverinfo.php:46
+#: include/classes/class.cserverinfo.php:44
 msgid "Logged in as"
-msgstr ""
+msgstr "Вход выполнен под"
 
-#: include/locales/en_gb.inc.php:2282
+#: include/locales/en_gb.inc.php:2282 include/menu.inc.php:245
+#: include/page_header.php:244
 msgid "Login"
 msgstr "Вход в систему"
 
-#: api/classes/class.cuser.php:1008
+#: include/forms/login.php:80
+msgid "Login as Guest"
+msgstr "Вход выполнен под Гостем"
+
+#: api/classes/class.cuser.php:959
 #, php-format
 msgid "Login failed [%s]"
-msgstr ""
+msgstr "Ошибка при входе в систему [%s]"
 
 #: include/locales/en_gb.inc.php:1911
 msgid "Login name"
 msgstr "Имя пользователя"
 
-#: api/classes/class.cuser.php:891 api/classes/class.cuser.php:904
-#: api/classes/class.cuser.php:946
+#: api/classes/class.cuser.php:840 api/classes/class.cuser.php:855
+#: api/classes/class.cuser.php:897
 msgid "Login name or password is incorrect"
 msgstr "Имя пользователя или пароль неверные"
 
-#: include/locales/en_gb.inc.php:2283
+#: include/locales/en_gb.inc.php:2283 include/page_header.php:241
 msgid "Logout"
 msgstr "Выход из системы"
 
@@ -4868,7 +4909,7 @@ msgstr "Имя макроса слишком длинное, оно не дол�
 msgid "Macro value is too long, should not exceed 255 chars."
 msgstr "Значение макроса слишком длинное, оно не должно превышать 255 символов"
 
-#: include/locales/en_gb.inc.php:806
+#: config.php:634 include/locales/en_gb.inc.php:806
 msgid "Macros"
 msgstr "Макросы"
 
@@ -4876,7 +4917,7 @@ msgstr "Макросы"
 msgid "Macros updated"
 msgstr "Макросы обновлены"
 
-#: include/locales/en_gb.inc.php:720
+#: include/locales/en_gb.inc.php:720 include/menu.inc.php:169
 msgid "Maintenance"
 msgstr "Обслуживание"
 
@@ -4907,7 +4948,12 @@ msgstr "Обслуживание обновлено"
 #: include/db.inc.php:1143
 #, php-format
 msgid "Mandatory field \"%1$s\" is missing in table \"%2$s\"."
-msgstr ""
+msgstr "Пропущено обязательное поле \"%1$s\" для таблицы \"%2$s\"."
+
+#: index.php:49
+#, fuzzy
+msgid "Manual Logout"
+msgstr "Ручной выход"
 
 #: include/forms/sysmap.edit.php:187 include/locales/en_gb.inc.php:1530
 msgid "Map"
@@ -4923,7 +4969,7 @@ msgstr "Карта сети сохранена! Завершить редакт�
 
 #: include/forms/sysmap.edit.php:110
 msgid "Map label type"
-msgstr ""
+msgstr "Тип подписи карты"
 
 #: include/locales/en_gb.inc.php:1208
 msgid "Map save operation failed."
@@ -4932,13 +4978,14 @@ msgstr "Ошибка при операции сохранения карты."
 #: api/classes/class.cmap.php:661
 #, php-format
 msgid "Map with name \"%s\" already exists"
-msgstr ""
+msgstr "Карта с именем \"%s\" уже существует"
 
 #: include/locales/en_gb.inc.php:464
 msgid "Mapping"
 msgstr "Преобразование"
 
-#: include/locales/en_gb.inc.php:2278
+#: include/locales/en_gb.inc.php:2278 include/menu.inc.php:77
+#: include/menu.inc.php:187
 msgid "Maps"
 msgstr "Карты сети"
 
@@ -4951,8 +4998,9 @@ msgid "March"
 msgstr "Март"
 
 #: include/forms/sysmap.edit.php:69
+#, fuzzy
 msgid "Mark elements on trigger status change"
-msgstr ""
+msgstr "Отметьте элементы изменения состояния триггера"
 
 #: include/locales/en_gb.inc.php:704
 msgid "Mark others"
@@ -4998,13 +5046,13 @@ msgstr "Макс количество отображаемых событий у
 msgid "Maximize"
 msgstr "Развернуть"
 
-#: api/classes/class.chost.php:1294
+#: api/classes/class.chost.php:1294 api/classes/class.cuser.php:410
 #, php-format
 msgid "Maximum host name length is %2$d characters, \"%3$s\" is %1$d character."
 msgid_plural "Maximum host name length is %2$d characters, \"%3$s\" is %1$d characters."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Максимальня длина имени узла сети %2$d символов, \"%3$s\" это %1$d символ."
+msgstr[1] "Максимальня длина имени узла сети %2$d символов, \"%3$s\" это %1$d символа."
+msgstr[2] "Максимальня длина имени узла сети %2$d символов, \"%3$s\" это %1$d символов."
 
 #: include/locales/en_gb.inc.php:58 include/locales/en_gb.inc.php:71
 #: include/locales/en_gb.inc.php:778
@@ -5035,7 +5083,7 @@ msgstr "Способ оповещения не удален"
 msgid "Media type was not updated"
 msgstr "Способ оповещения не обновлен"
 
-#: include/locales/en_gb.inc.php:489
+#: include/locales/en_gb.inc.php:489 include/menu.inc.php:223
 msgid "Media types"
 msgstr "Способы оповещений"
 
@@ -5067,7 +5115,7 @@ msgstr "Использование памяти"
 msgid "Menu"
 msgstr "Меню"
 
-#: include/forms/action.edit.php:562 include/locales/en_gb.inc.php:361
+#: include/forms/action.edit.php:558 include/locales/en_gb.inc.php:361
 msgid "Message"
 msgstr "Сообщение"
 
@@ -5089,7 +5137,7 @@ msgstr "Сообщения"
 
 #: api/rpc/class.cjsonrpc.php:173
 msgid "Method not found."
-msgstr ""
+msgstr "Метод не найден"
 
 #: include/locales/en_gb.inc.php:2017
 msgid "Micro"
@@ -5167,7 +5215,7 @@ msgstr "Мониторится через прокси"
 msgid "Monitored host"
 msgstr "Наблюдаемый узел сети"
 
-#: include/locales/en_gb.inc.php:2273
+#: include/locales/en_gb.inc.php:2273 include/menu.inc.php:26
 msgid "Monitoring"
 msgstr "Мониторинг"
 
@@ -5217,7 +5265,7 @@ msgstr "NNTP"
 
 #: include/locales/en_gb.inc.php:224
 msgid "NO DATA"
-msgstr ""
+msgstr "НЕТ ДАННЫХ"
 
 #: include/locales/en_gb.inc.php:565
 msgid "NODES"
@@ -5260,8 +5308,8 @@ msgstr "Карты сетей"
 msgid "Never"
 msgstr "Никогда"
 
-#: include/forms/action.edit.php:408 include/forms/action.edit.php:573
-#: include/forms/action.edit.php:745 include/locales/en_gb.inc.php:317
+#: include/forms/action.edit.php:404 include/forms/action.edit.php:569
+#: include/forms/action.edit.php:741 include/locales/en_gb.inc.php:317
 msgid "New"
 msgstr "Новый"
 
@@ -5299,7 +5347,7 @@ msgstr "Новая группа"
 
 #: include/locales/en_gb.inc.php:805
 msgid "New host"
-msgstr ""
+msgstr "Новый узел сети"
 
 #: include/locales/en_gb.inc.php:1961
 msgid "New indicators"
@@ -5333,7 +5381,7 @@ msgstr "Новый способ оповещения не добавлен"
 msgid "New node"
 msgstr "Новая нода"
 
-#: include/locales/en_gb.inc.php:538
+#: config.php:651 include/locales/en_gb.inc.php:538
 msgid "New regular expression"
 msgstr "Новое регулярное выражение"
 
@@ -5347,7 +5395,7 @@ msgstr "Новый слайд"
 
 #: include/html.inc.php:325
 msgid "New template"
-msgstr ""
+msgstr "Новый шаблон"
 
 #: include/locales/en_gb.inc.php:917
 msgid "New template added"
@@ -5368,12 +5416,12 @@ msgstr "Нет"
 #: include/export.inc.php:1492
 #, php-format
 msgid "No \"ymax_type\" field for graph \"%s\""
-msgstr ""
+msgstr "Нет поля \"ymax_type\" для графика \"%s\""
 
 #: include/export.inc.php:1488
 #, php-format
 msgid "No \"ymin_type\" field for graph \"%s\""
-msgstr ""
+msgstr "Нет поля \"ymin_type\" для графика \"%s\""
 
 #: include/locales/en_gb.inc.php:1591
 msgid "No IT service defined"
@@ -5399,7 +5447,7 @@ msgstr "Нет группы элементов данных с"
 msgid "No applications defined"
 msgstr "Группы элементов данных не заданы"
 
-#: include/forms/action.edit.php:718 include/locales/en_gb.inc.php:316
+#: include/forms/action.edit.php:714 include/locales/en_gb.inc.php:316
 msgid "No conditions defined"
 msgstr "Условия не заданы"
 
@@ -5418,11 +5466,11 @@ msgstr "Зависимости не заданы"
 #: api/rpc/class.cjsonrpc.php:186 api/rpc/class.cjsonrpc.php:190
 #: api/rpc/class.cjsonrpc.php:194
 msgid "No details"
-msgstr ""
+msgstr "Без подробностей"
 
-#: popup.php:1709
+#: popup.php:1714
 msgid "No discovery checks defined"
-msgstr ""
+msgstr "Правила обнаружения не заданы"
 
 #: include/locales/en_gb.inc.php:102
 msgid "No discovery rules defined"
@@ -5467,20 +5515,20 @@ msgstr "Группы не заданы"
 #: api/classes/class.chost.php:1311 api/classes/class.chost.php:1321
 #, php-format
 msgid "No groups for host \"%s\""
-msgstr ""
+msgstr "Группы для узла сети \"%s\" не заданы"
 
 #: api/classes/class.chost.php:1631
 msgid "No groups for hosts"
-msgstr ""
+msgstr "Группы для узла сети не заданы"
 
 #: api/classes/class.ctemplate.php:1315
 msgid "No groups for template"
-msgstr ""
+msgstr "Группы для шаблона не заданы"
 
 #: api/classes/class.ctemplate.php:991
 #, php-format
 msgid "No groups for template [ %s ]"
-msgstr ""
+msgstr "Группы для шаблона [ %s ] не заданы"
 
 #: include/locales/en_gb.inc.php:850
 msgid "No host groups defined"
@@ -5497,7 +5545,7 @@ msgstr "Нет узла сети с"
 #: include/hosts.inc.php:81
 #, php-format
 msgid "No host with hostid \"%s\"."
-msgstr ""
+msgstr "Узел сети с hostid \"%s\" не задан."
 
 #: include/locales/en_gb.inc.php:851
 msgid "No hosts defined"
@@ -5518,22 +5566,22 @@ msgstr "Изображения не заданы"
 #: api/classes/class.chost.php:1314 api/classes/class.chost.php:1332
 #, php-format
 msgid "No interfaces for host \"%s\""
-msgstr ""
+msgstr "Интерфейсы у узла сети \"%s\" не заданы"
 
 #: api/classes/class.cproxy.php:352
 #, php-format
 msgid "No interfaces for proxy \"%s\""
-msgstr ""
+msgstr "Интерфейсы для прокси \"%s\" не заданы"
 
 #: api/classes/class.cproxy.php:345
 #, php-format
 msgid "No interfaces provided for proxy \"%s\""
-msgstr ""
+msgstr "Интерфейсы для прокси \"%s\" не заданы"
 
 #: api/classes/class.cproxy.php:335
 #, php-format
 msgid "No interfaces provided for proxy \"%s\"."
-msgstr ""
+msgstr "Интерфейсы для прокси \"%s\" не заданы"
 
 #: include/locales/en_gb.inc.php:1025
 msgid "No item defined"
@@ -5575,14 +5623,14 @@ msgstr "Способы оповещений не заданы"
 msgid "No nodes defined"
 msgstr "Ноды не заданы"
 
-#: include/forms/action.edit.php:352
+#: include/forms/action.edit.php:348
 msgid "No operations defined"
 msgstr "Операции не заданы"
 
 #: include/export.inc.php:1351
 #, php-format
 msgid "No permission for trigger \"%s\""
-msgstr ""
+msgstr "Нет прав доступа к триггеру \"%s\""
 
 #: include/locales/en_gb.inc.php:2292
 msgid "No permissions for map"
@@ -5592,13 +5640,13 @@ msgstr "Нет прав доступа к карте"
 msgid "No permissions for screen"
 msgstr "Нет прав доступа к комплексному экрану"
 
-#: api/classes/class.cuser.php:960 api/classes/class.cuser.php:1053
+#: api/classes/class.cuser.php:911 api/classes/class.cuser.php:1004
 msgid "No permissions for system access."
-msgstr ""
+msgstr "Нет прав доступа к системе."
 
 #: include/locales/en_gb.inc.php:602
 msgid "No permissions to referred object or it does not exist!"
-msgstr ""
+msgstr "Нет прав доступа к упомянутому объекту или он не существует!"
 
 #: include/locales/en_gb.inc.php:853
 msgid "No proxies defined"
@@ -5606,7 +5654,7 @@ msgstr "Прокси не заданы"
 
 #: api/classes/class.caction.php:1377
 msgid "No recipients for operation message."
-msgstr ""
+msgstr "Получатели для операции не заданы."
 
 #: include/locales/en_gb.inc.php:1495
 msgid "No resources defined"
@@ -5654,7 +5702,7 @@ msgstr "Цели не выбраны"
 
 #: api/classes/class.caction.php:1407
 msgid "No targets for operation command."
-msgstr ""
+msgstr "Нет целей для команды операции."
 
 #: include/locales/en_gb.inc.php:852
 msgid "No templates defined"
@@ -5688,7 +5736,7 @@ msgstr "Группы пользователей не заданы"
 msgid "No users defined"
 msgstr "Пользователи не заданы"
 
-#: include/locales/en_gb.inc.php:563
+#: include/locales/en_gb.inc.php:563 include/page_header.php:319
 msgid "Node"
 msgstr "Нода"
 
@@ -5716,13 +5764,13 @@ msgstr "Нода"
 msgid "None"
 msgstr "Пусто"
 
-#: include/forms.inc.php:2933 include/locales/en_gb.inc.php:644
+#: include/forms.inc.php:2909 include/locales/en_gb.inc.php:644
 msgid "Normal"
 msgstr "Нормальный"
 
-#: include/forms.inc.php:2934
+#: include/forms.inc.php:2910
 msgid "Normal + Multiple PROBLEM events"
-msgstr ""
+msgstr "Нормальный + Множественные события ПРОБЛЕМА"
 
 #: include/locales/en_gb.inc.php:747
 msgid "Normal maintenance"
@@ -5748,18 +5796,23 @@ msgstr "Найдены неразрешенные символы до элеме
 msgid "Not allowed symbols or sequence of symbols in expression element detected"
 msgstr "В выражении элемента найдены неразрешенные символы или последовательность символов"
 
+#: api/classes/class.cuser.php:455
+msgid "Not allowed to set password for user \"guest\"."
+msgstr "Не разрешено устанавливать пароль для пользователя \"гость\"."
+
 #: include/locales/en_gb.inc.php:1953
 msgid "Not allowed value detected in element"
 msgstr "В элементе найдено неразрешенное значение"
 
-#: api/rpc/class.czbxrpc.php:53 api/rpc/class.czbxrpc.php:57
+#: api/rpc/class.czbxrpc.php:55 api/rpc/class.czbxrpc.php:58
 msgid "Not authorized"
-msgstr ""
+msgstr "Не авторизован"
 
 #: include/locales/en_gb.inc.php:899
 msgid "Not available"
 msgstr "Недоступен"
 
+#: config.php:605 include/forms/triggerSeverity.edit.php:48
 #: include/locales/en_gb.inc.php:369
 msgid "Not classified"
 msgstr "Не классифицировано"
@@ -5796,7 +5849,7 @@ msgstr "Ничего не сделано"
 msgid "Notification report"
 msgstr "Отчет об уведомлениях"
 
-#: include/locales/en_gb.inc.php:1444
+#: include/locales/en_gb.inc.php:1444 include/menu.inc.php:236
 msgid "Notifications"
 msgstr "Уведомления"
 
@@ -5973,27 +6026,27 @@ msgstr "Подсчитываются только триггеры у узлов
 msgid "Operation cannot be performed due to unauthorized request"
 msgstr "Операция не может быть выполнена из-за неавторизованного запроса"
 
-#: include/forms/action.edit.php:847
+#: include/forms/action.edit.php:843
 msgid "Operation condition"
 msgstr "Условие операции"
 
-#: include/forms/action.edit.php:799
+#: include/forms/action.edit.php:795
 msgid "Operation details"
-msgstr ""
+msgstr "Детали операции"
 
 #: api/classes/class.caction.php:1419
 msgid "Operation has no group to operate."
-msgstr ""
+msgstr "Операция не имеет группу для управления."
 
 #: api/classes/class.caction.php:1430
 msgid "Operation has no template to operate."
-msgstr ""
+msgstr "Операция не имеет шаблон для управления."
 
 #: include/locales/en_gb.inc.php:299
 msgid "Operation type"
 msgstr "Тип операции"
 
-#: include/forms/action.edit.php:851 include/locales/en_gb.inc.php:315
+#: include/forms/action.edit.php:847 include/locales/en_gb.inc.php:315
 msgid "Operations"
 msgstr "Операции"
 
@@ -6010,7 +6063,7 @@ msgstr "Оригинальное"
 msgid "Original blue"
 msgstr "Оригинальная синяя"
 
-#: include/locales/en_gb.inc.php:504
+#: config.php:638 include/locales/en_gb.inc.php:504
 msgid "Other"
 msgstr "Прочие"
 
@@ -6022,7 +6075,7 @@ msgstr "Другие группы"
 msgid "Other parameters"
 msgstr "Прочие параметры"
 
-#: include/locales/en_gb.inc.php:1333
+#: include/locales/en_gb.inc.php:1333 include/menu.inc.php:38
 msgid "Overview"
 msgstr "Обзор"
 
@@ -6052,7 +6105,7 @@ msgstr "Поддержка баз данных PHP"
 
 #: include/locales/en_gb.inc.php:2225
 msgid "PHP gettext"
-msgstr ""
+msgstr "PHP gettext"
 
 #: include/locales/en_gb.inc.php:2197
 msgid "PHP max execution time"
@@ -6091,8 +6144,8 @@ msgid "POP"
 msgstr "POP"
 
 #: api/classes/class.chostinterface.php:543
-msgid "PORT can not be empty for host interface"
-msgstr ""
+msgid "PORT cannot be empty for host interface"
+msgstr "ПОРТ не может быть пустым у интерфейса узла сети"
 
 #: include/locales/en_gb.inc.php:1272
 msgid "PROBLEM"
@@ -6116,7 +6169,7 @@ msgstr "Параметр"
 
 #: include/locales/en_gb.inc.php:1597
 msgid "Parent service"
-msgstr "Родительская услуга"
+msgstr "Родительская IT услуга"
 
 #: include/locales/en_gb.inc.php:2177
 msgid "Parse SQL error"
@@ -6124,14 +6177,14 @@ msgstr "Ошибки при разборе SQL"
 
 #: api/rpc/class.cjsonrpc.php:165
 msgid "Parse error"
-msgstr ""
+msgstr "Ошибка разбора"
 
 #: include/locales/en_gb.inc.php:581
 msgid "Passive"
 msgstr "Пассивный"
 
-#: include/forms/host.edit.php:524 include/locales/en_gb.inc.php:1797
-#: include/setup.inc.php:249
+#: include/forms/host.edit.php:526 include/forms/login.php:68
+#: include/locales/en_gb.inc.php:1797 include/setup.inc.php:249
 msgid "Password"
 msgstr "Пароль"
 
@@ -6155,17 +6208,17 @@ msgstr "Процент"
 msgid "Percentile line"
 msgstr "Процентная линия"
 
-#: include/forms/action.edit.php:459 include/locales/en_gb.inc.php:419
+#: include/forms/action.edit.php:455 include/locales/en_gb.inc.php:419
 msgid "Period"
 msgstr "Период"
 
 #: include/forms/action.edit.php:50
 msgid "Period (minimum 60 seconds)"
-msgstr ""
+msgstr "Период (минимум 60 секунд)"
 
-#: include/forms/action.edit.php:347
+#: include/forms/action.edit.php:343
 msgid "Period (sec)"
-msgstr ""
+msgstr "Период (сек)"
 
 #: include/locales/en_gb.inc.php:754
 msgid "Period type"
@@ -6197,7 +6250,7 @@ msgstr "Помните, что база данных по-прежнему со�
 
 #: scripts.php:91
 msgid "Please enter confirmation text."
-msgstr ""
+msgstr "Пожалуйста, введите текст подтверждения."
 
 #: include/locales/en_gb.inc.php:1242
 msgid "Please select two elements"
@@ -6264,7 +6317,7 @@ msgstr "Первичный POC телефон 2"
 msgid "Primary POC Screen Name"
 msgstr "Первичное POC имя экрана"
 
-#: include/locales/en_gb.inc.php:2284
+#: include/locales/en_gb.inc.php:2284 include/page_header.php:218
 msgid "Print"
 msgstr "Печать"
 
@@ -6272,11 +6325,11 @@ msgstr "Печать"
 msgid "Private key file"
 msgstr "Файл приватного ключа"
 
-#: include/forms/host.edit.php:521
+#: include/forms/host.edit.php:523
 msgid "Privilege level"
-msgstr ""
+msgstr "Уровень привилегий"
 
-#: api/classes/class.cuser.php:882
+#: api/classes/class.cuser.php:832
 msgid "Probably php-ldap module is missing"
 msgstr "Вероятно не хватает модуля php-ldap"
 
@@ -6304,7 +6357,7 @@ msgstr "Проблема, если хотя бы у одного из подчи
 msgid "Problems"
 msgstr "Проблемы"
 
-#: include/locales/en_gb.inc.php:2271
+#: include/locales/en_gb.inc.php:2271 include/page_header.php:225
 msgid "Profile"
 msgstr "Профиль"
 
@@ -6352,7 +6405,7 @@ msgstr "Файл публичного ключа"
 msgid "QUEUE OF ITEMS TO BE UPDATED"
 msgstr "ОЧЕРЕДЬ ОЖИДАЮЩИХ ОБНОВЛЕНИЯ ЭЛЕМЕНТОВ ДАННЫХ"
 
-#: include/locales/en_gb.inc.php:2275
+#: include/locales/en_gb.inc.php:2275 include/menu.inc.php:233
 msgid "Queue"
 msgstr "Очередь"
 
@@ -6420,14 +6473,15 @@ msgstr "Множитель времени обновления"
 msgid "Refresh unsupported items (in sec)"
 msgstr "Обновлять неподдерживаемые элементы данных (секунды)"
 
-#: include/classes/class.cserverinfo.php:43
+#: include/classes/class.cserverinfo.php:41
 #, php-format
 msgid "Refreshed every: %s sec "
-msgstr ""
+msgstr "Обновление каждые: %s сек "
 
 #: include/locales/en_gb.inc.php:1143
+#, fuzzy
 msgid "Regexp"
-msgstr ""
+msgstr "Regexp"
 
 #: include/locales/en_gb.inc.php:519
 msgid "Regular expression"
@@ -6445,15 +6499,19 @@ msgstr "Регулярное выражение удалено"
 msgid "Regular expression updated"
 msgstr "Регулярное выражение обновлено"
 
-#: include/locales/en_gb.inc.php:518
+#: config.php:633 include/locales/en_gb.inc.php:518
 msgid "Regular expressions"
 msgstr "Регулярные выражения"
+
+#: include/forms/login.php:74
+msgid "Remember me for 30 days"
+msgstr "Запомнить меня на 30 дней"
 
 #: include/locales/en_gb.inc.php:301
 msgid "Remote command"
 msgstr "Удаленная команда"
 
-#: include/forms/action.edit.php:620
+#: include/forms/action.edit.php:616
 msgid "Remote commands"
 msgstr "Удаленные команды"
 
@@ -6473,13 +6531,13 @@ msgstr "Удалить элемент"
 msgid "Remove from"
 msgstr "Удалить из"
 
-#: include/forms/action.edit.php:663
+#: include/forms/action.edit.php:659
 msgid "Remove from host groups"
-msgstr ""
+msgstr "Удалить из групп узлов сети"
 
 #: include/actions.inc.php:297
 msgid "Remove from host groups: "
-msgstr ""
+msgstr "Удалить из групп узлов сети: "
 
 #: include/actions.inc.php:274 include/locales/en_gb.inc.php:319
 msgid "Remove host"
@@ -6489,7 +6547,7 @@ msgstr "Удалить узел сети"
 msgid "Remove link"
 msgstr "Удалить соединитель"
 
-#: include/forms/action.edit.php:412 include/forms/action.edit.php:749
+#: include/forms/action.edit.php:408 include/forms/action.edit.php:745
 #: include/locales/en_gb.inc.php:699
 msgid "Remove selected"
 msgstr "Удалить выбранные"
@@ -6506,7 +6564,7 @@ msgstr "Заменить присоединенные шаблоны на:"
 msgid "Report"
 msgstr "Отчет"
 
-#: include/locales/en_gb.inc.php:2280
+#: include/locales/en_gb.inc.php:2280 include/menu.inc.php:107
 msgid "Reports"
 msgstr "Отчеты"
 
@@ -6524,11 +6582,11 @@ msgstr "Требуется модуль сокетов"
 
 #: include/locales/en_gb.inc.php:2226
 msgid "Required gettext module"
-msgstr ""
+msgstr "Требуется модуль gettext"
 
 #: include/forms/script.edit.php:114
 msgid "Required host permissions"
-msgstr ""
+msgstr "Требуются права доступа к узлу сети"
 
 #: include/locales/en_gb.inc.php:579
 msgid "Required performance (vps)"
@@ -6562,6 +6620,20 @@ msgstr "Требуется модуль mb string"
 msgid "Reset"
 msgstr "Сбросить"
 
+#: include/templates/triggerSeverity.js.php:12
+msgid "Reset all names and colours to default values?"
+msgstr "Сбросить все имена и цвета на значения по умолчанию?"
+
+#: include/templates/triggerSeverity.js.php:48
+msgid "Reset confirmation"
+msgstr "Сбросить подтверждение"
+
+#: include/forms/triggerSeverity.edit.php:90
+#: include/templates/triggerSeverity.js.php:17
+#, fuzzy
+msgid "Reset defaults"
+msgstr "Сбросить по умолчанию"
+
 #: include/locales/en_gb.inc.php:1409
 msgid "Resolved"
 msgstr "Решена"
@@ -6577,7 +6649,7 @@ msgstr "Код ответа"
 #: api/classes/class.cwebcheck.php:628
 #, php-format
 msgid "Response code for step '%1$s' of scenario '%2$s'"
-msgstr ""
+msgstr "Код отчета на шаге '%1$s' у сценария '%2$s'"
 
 #: include/locales/en_gb.inc.php:162
 msgid "Response time"
@@ -6586,7 +6658,7 @@ msgstr "Время ответа"
 #: api/classes/class.cwebcheck.php:621
 #, php-format
 msgid "Response time for step '%1$s' of scenario '%2$s'"
-msgstr ""
+msgstr "Время ответа на шаге '%1$s' у сценария '%2$s'"
 
 #: include/locales/en_gb.inc.php:1845
 msgid "Result"
@@ -6637,7 +6709,6 @@ msgid "Rows per page"
 msgstr "Строк на странице"
 
 #: include/locales/en_gb.inc.php:1139
-#, fuzzy
 msgid "Rule"
 msgstr "Правило"
 
@@ -6647,15 +6718,15 @@ msgstr "Правила"
 
 #: include/actions.inc.php:246
 msgid "Run remote command on current host"
-msgstr ""
+msgstr "Выполнить удаленную команду на текущем узле сети"
 
 #: include/actions.inc.php:266
 msgid "Run remote command on host groups: "
-msgstr ""
+msgstr "Выполнить удаленную команду на группе узлов сети: "
 
 #: include/actions.inc.php:253
 msgid "Run remote command on hosts: "
-msgstr ""
+msgstr "Выполнить удаленную команду на узлах сети: "
 
 #: include/locales/en_gb.inc.php:1896
 msgid "Russian (RU)"
@@ -6687,7 +6758,7 @@ msgstr "ПОИСК"
 
 #: include/locales/en_gb.inc.php:234
 msgid "SERVER"
-msgstr ""
+msgstr "СЕРВЕР"
 
 #: include/locales/en_gb.inc.php:1499
 msgid "SIMPLE GRAPH"
@@ -6723,7 +6794,7 @@ msgstr "SMTP сервер"
 
 #: include/locales/en_gb.inc.php:911
 msgid "SNMP"
-msgstr ""
+msgstr "SNMP"
 
 #: include/locales/en_gb.inc.php:1097
 msgid "SNMP OID"
@@ -6809,8 +6880,9 @@ msgstr "Сб"
 msgid "Saturday"
 msgstr "Суббота"
 
-#: include/forms/action.edit.php:857 include/forms/script.edit.php:136
-#: include/forms/sysmap.edit.php:194 include/locales/en_gb.inc.php:1292
+#: include/forms/action.edit.php:853 include/forms/script.edit.php:136
+#: include/forms/sysmap.edit.php:194 include/forms/triggerSeverity.edit.php:90
+#: include/locales/en_gb.inc.php:1292
 msgid "Save"
 msgstr "Сохранить"
 
@@ -6825,17 +6897,17 @@ msgstr "Сценарий"
 #: api/classes/class.cwebcheck.php:514
 #, php-format
 msgid "Scenario [%1$s] [%2$s] host [%3$s]"
-msgstr ""
+msgstr "Сценарий [%1$s] [%2$s] узла сети [%3$s]"
 
 #: api/classes/class.cwebcheck.php:327 api/classes/class.cwebcheck.php:383
 #, php-format
 msgid "Scenario [%s] already exists."
-msgstr ""
+msgstr "Сценарий [%s] уже существует."
 
 #: api/classes/class.cwebcheck.php:507
 #, php-format
 msgid "Scenario [%s] deleted."
-msgstr ""
+msgstr "Сценарий [%s] удален."
 
 #: include/locales/en_gb.inc.php:192
 msgid "Scenario activated"
@@ -6855,7 +6927,7 @@ msgstr "Сценарий отключен"
 
 #: api/classes/class.cwebcheck.php:590 api/classes/class.cwebcheck.php:687
 msgid "Scenario step name should contain only printable characters."
-msgstr ""
+msgstr "Имя шага сценария должно содержать только печатные символы."
 
 #: api/classes/class.cwebcheck.php:603 api/classes/class.cwebcheck.php:692
 msgid "Scenario step number cannot be less than 1"
@@ -6907,7 +6979,8 @@ msgstr "Комплексный экран с id \"%d\" не существует
 msgid "Screen with name \"%s\" does not exist"
 msgstr "Комплексный экран с именем \"%s\" не существует"
 
-#: include/locales/en_gb.inc.php:1477
+#: include/locales/en_gb.inc.php:1477 include/menu.inc.php:72
+#: include/menu.inc.php:180
 msgid "Screens"
 msgstr "Комплексные экраны"
 
@@ -6918,7 +6991,7 @@ msgstr "Скрипт"
 #: scripts.php:87
 #, php-format
 msgid "Script [%s] already exists."
-msgstr ""
+msgstr "Скрипт [%s] уже существует."
 
 #: include/locales/en_gb.inc.php:1838
 msgid "Script added"
@@ -6939,13 +7012,14 @@ msgstr "Скрипт обновлен"
 #: api/classes/class.cscript.php:400 api/classes/class.cscript.php:444
 #, php-format
 msgid "Script with scriptid [%s] does not exist."
-msgstr ""
+msgstr "Скрипт с scriptid [%s] не существует."
 
-#: include/locales/en_gb.inc.php:1831
+#: include/locales/en_gb.inc.php:1831 include/menu.inc.php:226
 msgid "Scripts"
 msgstr "Скрипты"
 
-#: include/locales/en_gb.inc.php:1115
+#: include/forms/gsearch.edit.php:36 include/locales/en_gb.inc.php:1115
+#: include/templates/gsearch.js.php:4
 msgid "Search"
 msgstr "Поиск"
 
@@ -6999,9 +7073,9 @@ msgstr "Секунд"
 
 #: include/forms/action.edit.php:173 include/forms/action.edit.php:183
 #: include/forms/action.edit.php:193 include/forms/action.edit.php:204
-#: include/forms/action.edit.php:239 include/forms/action.edit.php:249
-#: include/forms/action.edit.php:259 include/forms/action.edit.php:269
-#: include/locales/en_gb.inc.php:1732
+#: include/forms/action.edit.php:235 include/forms/action.edit.php:245
+#: include/forms/action.edit.php:255 include/forms/action.edit.php:265
+#: include/locales/en_gb.inc.php:1732 include/page_header.php:327
 msgid "Select"
 msgstr "Выбрать"
 
@@ -7014,7 +7088,6 @@ msgid "Select image to download"
 msgstr "Выберите рисунок для загрузки"
 
 #: include/locales/en_gb.inc.php:1149
-#, fuzzy
 msgid "Select prototype"
 msgstr "Выбрать прототип"
 
@@ -7028,7 +7101,7 @@ msgstr "Выбранные"
 
 #: actionconf.php:308
 msgid "Selected actions deleted"
-msgstr ""
+msgstr "Выбранные действия удалены"
 
 #: include/locales/en_gb.inc.php:1466
 msgid "Selected groups"
@@ -7046,7 +7119,7 @@ msgstr "Отправить сообщение"
 msgid "Send message to"
 msgstr "Отправить сообщение"
 
-#: include/forms/action.edit.php:556
+#: include/forms/action.edit.php:552
 msgid "Send only to"
 msgstr "Отправлять только"
 
@@ -7054,13 +7127,13 @@ msgstr "Отправлять только"
 msgid "Send to"
 msgstr "Отправлять"
 
-#: include/forms/action.edit.php:541
+#: include/forms/action.edit.php:537
 msgid "Send to User groups"
-msgstr ""
+msgstr "Отправлять группе пользователей"
 
-#: include/forms/action.edit.php:542
+#: include/forms/action.edit.php:538
 msgid "Send to Users"
-msgstr ""
+msgstr "Отправлять пользователям"
 
 #: include/locales/en_gb.inc.php:62
 msgid "Sep"
@@ -7134,9 +7207,9 @@ msgstr "Услуги"
 msgid "Session terminated, please re-login!"
 msgstr "Сессия завершена, пожалуйста, перезайдите в систему!"
 
-#: api/classes/class.cuser.php:1050
+#: api/classes/class.cuser.php:1001
 msgid "Session terminated, re-login, please."
-msgstr ""
+msgstr "Сессия завершена, пожалуйста, перезайдите в систему."
 
 #: include/locales/en_gb.inc.php:1247
 msgid "Set trigger"
@@ -7145,6 +7218,16 @@ msgstr "Задать триггер"
 #: include/locales/en_gb.inc.php:1658
 msgid "Severity"
 msgstr "Важность"
+
+#: include/profiles.inc.php:239
+msgid "Severity colour is not correct: expecting hexadecimal colour code (6 symbols)."
+msgstr ""
+"Некорректный цвет важности: ожидается шестнадцатеричный код цвета (6 "
+"символов)."
+
+#: include/profiles.inc.php:256
+msgid "Severity name cannot be empty."
+msgstr "Имя важности не может быть пустым."
 
 #: include/locales/en_gb.inc.php:1387
 msgid "Show"
@@ -7212,7 +7295,7 @@ msgstr "Показывать только неподтвержденные"
 
 #: include/locales/en_gb.inc.php:698
 msgid "Show unknown events"
-msgstr ""
+msgstr "Показать неизвестные события"
 
 #: include/locales/en_gb.inc.php:1084
 msgid "Show value"
@@ -7229,6 +7312,10 @@ msgstr "Показывать рабочее время"
 #: include/locales/en_gb.inc.php:1190
 msgid "Shown"
 msgstr "Показать"
+
+#: include/forms/login.php:77 index.php:63 index.php:74
+msgid "Sign in"
+msgstr "Вход"
 
 #: include/locales/en_gb.inc.php:641
 msgid "Simple"
@@ -7294,7 +7381,7 @@ msgstr "Слайд-шоу"
 msgid "Slide shows"
 msgstr "Слайд-шоу"
 
-#: include/locales/en_gb.inc.php:1519
+#: include/locales/en_gb.inc.php:1519 include/menu.inc.php:184
 msgid "Slides"
 msgstr "Слайды"
 
@@ -7316,7 +7403,7 @@ msgstr "Слайд-шоу обновлено"
 
 #: include/locales.inc.php:73
 msgid "Slovak (SK)"
-msgstr ""
+msgstr "Slovak (SK)"
 
 #: include/locales/en_gb.inc.php:1877
 msgid "Snooze"
@@ -7372,7 +7459,7 @@ msgstr "Источник"
 
 #: include/locales/en_gb.inc.php:1898
 msgid "Spanish (ES)"
-msgstr ""
+msgstr "Spanish (ES)"
 
 #: include/locales/en_gb.inc.php:159
 msgid "Speed"
@@ -7410,7 +7497,7 @@ msgstr "Коды состояний"
 msgid "Status of Web monitoring"
 msgstr "Состояние Веб-мониторинга"
 
-#: include/locales/en_gb.inc.php:1362
+#: include/locales/en_gb.inc.php:1362 include/menu.inc.php:114
 msgid "Status of Zabbix"
 msgstr "Состояние Zabbix"
 
@@ -7445,13 +7532,13 @@ msgstr "Шаг"
 #: api/classes/class.cwebcheck.php:597
 #, php-format
 msgid "Step [%s] already exists."
-msgstr ""
+msgstr "Шаг [%s] уже существует"
 
 #: include/locales/en_gb.inc.php:207
 msgid "Step of scenario"
 msgstr "Шаг сценария"
 
-#: include/forms/action.edit.php:347 include/locales/en_gb.inc.php:203
+#: include/forms/action.edit.php:343 include/locales/en_gb.inc.php:203
 msgid "Steps"
 msgstr "Шаги"
 
@@ -7464,8 +7551,9 @@ msgid "Store value"
 msgstr "Хранить значение"
 
 #: include/locales/en_gb.inc.php:879
+#, fuzzy
 msgid "Straight"
-msgstr "Straight"
+msgstr "Прямая"
 
 #: include/locales/en_gb.inc.php:1551
 msgid "Style"
@@ -7475,7 +7563,7 @@ msgstr "Способ"
 msgid "Subfilter"
 msgstr "Подфильтр"
 
-#: include/forms/action.edit.php:561 include/locales/en_gb.inc.php:357
+#: include/forms/action.edit.php:557 include/locales/en_gb.inc.php:357
 msgid "Subject"
 msgstr "Тема"
 
@@ -7494,6 +7582,10 @@ msgstr "Вс"
 #: include/locales/en_gb.inc.php:46 include/locales/en_gb.inc.php:1623
 msgid "Sunday"
 msgstr "Воскресенье"
+
+#: include/forms/login.php:43
+msgid "Support"
+msgstr "Поддержка"
 
 #: include/locales/en_gb.inc.php:1783
 msgid "Surname"
@@ -7516,8 +7608,9 @@ msgid "System default"
 msgstr "Системная по умолчанию"
 
 #: api/rpc/class.cjsonrpc.php:189
+#, fuzzy
 msgid "System error."
-msgstr ""
+msgstr "Системная ошибка."
 
 #: include/locales/en_gb.inc.php:1302
 msgid "System status"
@@ -7549,7 +7642,6 @@ msgid "TRIGGER COMMENTS"
 msgstr "КОММЕНТАРИИ К ТРИГГЕРУ"
 
 #: include/locales/en_gb.inc.php:1157
-#, fuzzy
 msgid "TRIGGER PROTOTYPES OF"
 msgstr "ПРОТОТИПЫ ТРИГГЕРОВ ДЛЯ"
 
@@ -7564,7 +7656,7 @@ msgstr "ИСТИНА"
 #: include/db.inc.php:1125
 #, php-format
 msgid "Table \"%s\" does not exist."
-msgstr ""
+msgstr "Таблица \"%s\" не существует."
 
 #: include/locales/en_gb.inc.php:2230
 msgid "Table users is empty. Possible database corruption."
@@ -7574,7 +7666,7 @@ msgstr "Таблица пользователей пустая. Возможно
 msgid "Tag"
 msgstr "Тэг"
 
-#: include/forms/action.edit.php:571 include/locales/en_gb.inc.php:1109
+#: include/forms/action.edit.php:567 include/locales/en_gb.inc.php:1109
 #: include/templates/action.js.php:95
 msgid "Target"
 msgstr "Цель"
@@ -7583,22 +7675,30 @@ msgstr "Цель"
 msgid "Target type"
 msgstr "Тип цели"
 
-#: include/locales/en_gb.inc.php:862
+#: include/locales/en_gb.inc.php:862 include/reports.inc.php:48
 msgid "Template"
 msgstr "Шаблон"
 
 #: api/classes/class.ctemplate.php:1228
 #, php-format
 msgid "Template [%1$s] deleted."
-msgstr ""
+msgstr "Шаблон [%1$s] удален."
 
 #: include/locales/en_gb.inc.php:923
 msgid "Template deleted"
 msgstr "Шаблон удален"
 
+#: include/reports.inc.php:47
+msgid "Template group"
+msgstr "Группа шаблона"
+
 #: include/locales/en_gb.inc.php:946
 msgid "Template linkage"
 msgstr "Связи с шаблонами"
+
+#: include/reports.inc.php:106
+msgid "Template trigger"
+msgstr "Шаблонный триггер"
 
 #: include/locales/en_gb.inc.php:919
 msgid "Template updated"
@@ -7620,14 +7720,14 @@ msgstr "Шаблонный элемент"
 msgid "Templated items"
 msgstr "Элементы данных из шаблона"
 
-#: include/locales/en_gb.inc.php:947
+#: include/locales/en_gb.inc.php:947 include/menu.inc.php:147
 msgid "Templates"
 msgstr "Шаблоны"
 
 #: api/classes/class.ctemplate.php:2081
 #, php-format
 msgid "Templates [%1$s] unlinked from hosts [%2$s]."
-msgstr ""
+msgstr "Шаблоны [%1$s] отсоединены от узлов сети [%2$s]."
 
 #: include/locales/en_gb.inc.php:916
 msgid "Templates list"
@@ -7643,7 +7743,7 @@ msgstr "Тест"
 
 #: include/forms/script.edit.php:124
 msgid "Test confirmation"
-msgstr ""
+msgstr "Тест подтверждения"
 
 #: include/locales/en_gb.inc.php:1973
 msgid "Test data"
@@ -7671,11 +7771,11 @@ msgstr "Очередь пуста"
 
 #: api/rpc/class.cjsonrpc.php:170
 msgid "The received JSON is not a valid JSON-RPC Request."
-msgstr ""
+msgstr "Полученный JSON не является правильным запросом JSON-RPC."
 
 #: api/rpc/class.cjsonrpc.php:174
 msgid "The requested remote-procedure does not exist / is not available"
-msgstr ""
+msgstr "Запрашиваемая удаленная процедура не существует / недоступна"
 
 #: include/locales/en_gb.inc.php:1681
 msgid "The trigger depends on"
@@ -7776,7 +7876,7 @@ msgstr "Переключить метод ввода"
 #: api/classes/class.cproxy.php:354
 #, php-format
 msgid "Too many interfaces provided for proxy \"%s\"."
-msgstr ""
+msgstr "Указано слишком много интерфейсов для прокси \"%s\"."
 
 #: include/locales/en_gb.inc.php:1844
 msgid "Tools"
@@ -7804,7 +7904,7 @@ msgstr "Транзакция не была закрыта. Отмена..."
 
 #: api/rpc/class.cjsonrpc.php:193
 msgid "Transport error."
-msgstr ""
+msgstr "Ошибка транспорта."
 
 #: include/locales/en_gb.inc.php:1047
 msgid "Trends"
@@ -7821,49 +7921,49 @@ msgstr "Триггер"
 #: api/classes/class.ctrigger.php:1498
 #, php-format
 msgid "Trigger \"%s\" already exists."
-msgstr ""
+msgstr "Триггер \"%s\" уже существует."
 
 #: api/classes/class.ctrigger.php:1232
 #: api/classes/class.ctriggerprototype.php:1077
 #, php-format
 msgid "Trigger [%1$s:%2$s] already exists."
-msgstr ""
+msgstr "Триггер [%1$s:%2$s] уже существует."
 
 #: api/classes/class.ctrigger.php:1424
 #: api/classes/class.ctriggerprototype.php:1310
 #, php-format
 msgid "Trigger [%1$s:%2$s] created."
-msgstr ""
+msgstr "Триггер [%1$s:%2$s] создан."
 
 #: api/classes/class.ctrigger.php:1347
 #, php-format
 msgid "Trigger [%1$s:%2$s] deleted."
-msgstr ""
+msgstr "Триггер [%1$s:%2$s] удален."
 
 #: api/classes/class.ctriggerprototype.php:1099
-#, fuzzy, php-format
+#, php-format
 msgid "Trigger [%1$s:%2$s] does not have item prototype."
 msgstr "Триггер [%1$s:%2$s] не имеет прототипа элемента данных."
 
 #: api/classes/class.ctemplate.php:1992
 #, php-format
 msgid "Trigger [%1$s:%2$s] unlinked."
-msgstr ""
+msgstr "Триггер [%1$s:%2$s] отсоединен."
 
 #: api/classes/class.ctrigger.php:1530
 #, php-format
 msgid "Trigger [%1$s:%2$s] updated."
-msgstr ""
+msgstr "Триггер [%1$s:%2$s] обновлен."
 
 #: api/classes/class.ctrigger.php:1617 api/classes/class.ctrigger.php:1652
 #: api/classes/class.ctriggerprototype.php:1469
 #: api/classes/class.ctriggerprototype.php:1504
 #, php-format
 msgid "Trigger [%1$s] already exists on [%2$s]"
-msgstr ""
+msgstr "Триггер [%1$s] уже существует у [%2$s]"
 
 #: api/classes/class.ctriggerprototype.php:1176
-#, fuzzy, php-format
+#, php-format
 msgid "Trigger [%1$s] does not have item prototype."
 msgstr "Триггер [%1$s] не имеет прототипа элемента данных."
 
@@ -7895,34 +7995,38 @@ msgstr "Форма триггера для журнала"
 #, php-format
 msgid "Trigger in template [ %1$s ] has dependency with trigger in template [ %2$s ]"
 msgstr ""
+"Триггер в шаблоне [ %1$s ] имеет зависимость с триггером из шаблона [ %2$s ]"
 
 #: api/classes/class.ctriggerprototype.php:1059
 msgid "Trigger just added. No status update so far."
-msgstr ""
+msgstr "Триггер только добавлен. До сих пор нет обновления состояния."
 
 #: include/forms/sysmap.edit.php:104
 msgid "Trigger label type"
-msgstr ""
+msgstr "Тип подписи к триггеру"
 
 #: api/classes/class.ctriggerprototype.php:1278
-#, fuzzy, php-format
+#, php-format
 msgid "Trigger prototype [%1$s:%2$s] deleted."
 msgstr "Прототип триггера [%1$s:%2$s] удален."
 
 #: api/classes/class.ctemplate.php:2009
-#, fuzzy, php-format
+#, php-format
 msgid "Trigger prototype [%1$s:%2$s] unlinked."
 msgstr "Прототип триггера [%1$s:%2$s] отсоединен."
 
 #: api/classes/class.ctriggerprototype.php:1401
-#, fuzzy, php-format
+#, php-format
 msgid "Trigger prototype [%1$s:%2$s] updated."
 msgstr "Прототип триггера [%1$s:%2$s] обновлен."
 
-#: include/forms/host.edit.php:445 include/forms/template.edit.php:298
-#, fuzzy
+#: include/forms/host.edit.php:447 include/forms/template.edit.php:298
 msgid "Trigger prototypes"
 msgstr "Прототипы триггеров"
+
+#: config.php:637 include/forms/triggerSeverity.edit.php:85
+msgid "Trigger severities"
+msgstr "Важности триггера"
 
 #: include/locales/en_gb.inc.php:303
 msgid "Trigger severity"
@@ -7940,10 +8044,10 @@ msgstr "Значение триггера"
 #: api/classes/class.ctriggerprototype.php:1473
 #: api/classes/class.ctriggerprototype.php:1507
 msgid "Trigger with same name but other type exists"
-msgstr ""
+msgstr "Триггер с таким же названием, но с другим типом, уже существует"
 
-#: include/forms/host.edit.php:355 include/forms/template.edit.php:214
-#: include/locales/en_gb.inc.php:832
+#: include/forms/host.edit.php:357 include/forms/template.edit.php:214
+#: include/locales/en_gb.inc.php:832 include/menu.inc.php:57
 msgid "Triggers"
 msgstr "Триггеры"
 
@@ -7970,6 +8074,10 @@ msgstr "Обзор триггеров"
 #: include/locales/en_gb.inc.php:1730
 msgid "Triggers status"
 msgstr "Состояние триггера"
+
+#: include/menu.inc.php:123
+msgid "Triggers top 100"
+msgstr "Top 100 триггеров"
 
 #: include/locales/en_gb.inc.php:1322
 msgid "Triggers with severity"
@@ -8103,7 +8211,7 @@ msgstr "Неожиданный конец элемента"
 msgid "Units"
 msgstr "Единица измерения"
 
-#: include/locales/en_gb.inc.php:864
+#: include/locales/en_gb.inc.php:864 include/triggers.inc.php:276
 msgid "Unknown"
 msgstr "Неизвестно"
 
@@ -8147,13 +8255,13 @@ msgstr "Отсоединить и очистить"
 msgid "Unlink from template"
 msgstr "Отсоединить от шаблона"
 
-#: include/forms/action.edit.php:698
+#: include/forms/action.edit.php:694
 msgid "Unlink from templates"
-msgstr ""
+msgstr "Отсоединить от шаблонов"
 
 #: include/actions.inc.php:317
 msgid "Unlink from templates: "
-msgstr ""
+msgstr "Отсоединить от шаблонов: "
 
 #: include/locales/en_gb.inc.php:1875
 msgid "Unmute"
@@ -8167,7 +8275,7 @@ msgstr "Обнаружены ненужные символы"
 msgid "Up"
 msgstr "Up"
 
-#: include/forms/action.edit.php:794 include/locales/en_gb.inc.php:896
+#: include/forms/action.edit.php:790 include/locales/en_gb.inc.php:896
 #: include/templates/action.js.php:261 include/templates/action.js.php:276
 msgid "Update"
 msgstr "Обновить"
@@ -8189,7 +8297,7 @@ msgid "Update item for the graph"
 msgstr "Обновление элемента данных для графика"
 
 #. GETTEXT: r is date format string as described in http://php.net/date
-#: include/classes/class.cserverinfo.php:42 include/locales/en_gb.inc.php:1865
+#: include/classes/class.cserverinfo.php:40 include/locales/en_gb.inc.php:1865
 msgid "Updated"
 msgstr "Обновлено"
 
@@ -8200,10 +8308,10 @@ msgstr "Состояние узла сети обновлено"
 #: include/blocks.inc.php:408 include/blocks.inc.php:724
 #: include/blocks.inc.php:802 include/blocks.inc.php:1003
 #: include/blocks.inc.php:1081 include/blocks.inc.php:1129
-#: include/screens.inc.php:1470
+#: include/screens.inc.php:1494
 #, php-format
 msgid "Updated: %s"
-msgstr ""
+msgstr "Обновлено: %s"
 
 #: include/locales/en_gb.inc.php:497
 msgid "Upload"
@@ -8243,12 +8351,17 @@ msgstr "Использовать профиль"
 
 #: media_types.php:262
 msgid "Used in actions"
-msgstr ""
+msgstr "Используется в действиях"
 
 #: include/locales/en_gb.inc.php:368 include/locales/en_gb.inc.php:884
 #: include/setup.inc.php:248
 msgid "User"
 msgstr "Пользователь"
+
+#: api/classes/class.cuser.php:421
+#, php-format
+msgid "User \"%s\" cannot be without user group."
+msgstr "Пользователь \"%s\" не может существовать без группы пользователей."
 
 #: include/locales/en_gb.inc.php:2240
 msgid "User ["
@@ -8300,6 +8413,20 @@ msgstr "Сообщение для группы пользователей при
 msgid "User groups"
 msgstr "Группы пользователей"
 
+#: api/classes/class.cuser.php:432
+#, php-format
+msgid "User is disallowed to alter GUI access to him self by linking to user group \"%s\"."
+msgstr ""
+
+#: api/classes/class.cuser.php:435
+#, php-format
+msgid "User is disallowed to alter system status to him self by linking to user group \"%s\"."
+msgstr ""
+
+#: api/classes/class.cuser.php:384
+msgid "User is not allowed to delete himself."
+msgstr "Пользователю не разрешается удалять себя."
+
 #: include/locales/en_gb.inc.php:1126
 msgid "User name"
 msgstr "Имя пользователя"
@@ -8320,11 +8447,17 @@ msgstr "Тип пользователя"
 msgid "User updated"
 msgstr "Данные пользователя обновлены"
 
-#: include/forms/host.edit.php:523 include/locales/en_gb.inc.php:1072
+#: api/classes/class.cuser.php:470
+#, php-format
+msgid "User with alias \"%s\" already exists."
+msgstr "Пользователь с алиасом \"%s\" уже существует."
+
+#: include/forms/host.edit.php:525 include/forms/login.php:64
+#: include/locales/en_gb.inc.php:1072 index.php:34
 msgid "Username"
 msgstr "Имя пользователя"
 
-#: include/locales/en_gb.inc.php:1739
+#: include/locales/en_gb.inc.php:1739 include/menu.inc.php:219
 msgid "Users"
 msgstr "Пользователи"
 
@@ -8388,7 +8521,7 @@ msgstr "Преобразование значение удалено"
 msgid "Value map updated"
 msgstr "Преобразование значения обновлено"
 
-#: include/locales/en_gb.inc.php:462
+#: config.php:635 include/locales/en_gb.inc.php:462
 msgid "Value mapping"
 msgstr "Преобразование значений"
 
@@ -8432,15 +8565,22 @@ msgstr "Ср"
 msgid "WEB CHECKS"
 msgstr "ВЕБ ПРОВЕРКИ"
 
+#: config.php:609 include/forms/triggerSeverity.edit.php:60
 #: include/locales/en_gb.inc.php:371
 msgid "Warning"
 msgstr "Предупреждение"
+
+#: include/validate.inc.php:555
+#, php-format
+msgid "Warning. Incorrect value for field \"%s\"."
+msgstr "Внимание. Некорректное значение для поля \"%s\"."
 
 #: include/locales/en_gb.inc.php:2324
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr "Приносим свои извинения, достигнуто максимально возможное количество элементов."
 
-#: include/locales/en_gb.inc.php:181
+#: include/locales/en_gb.inc.php:181 include/menu.inc.php:42
+#: include/menu.inc.php:173
 msgid "Web"
 msgstr "Веб"
 
@@ -8451,12 +8591,12 @@ msgstr "Веб элемент"
 #: api/classes/class.cwebcheck.php:582 api/classes/class.cwebcheck.php:678
 #, php-format
 msgid "Web item [%s] created."
-msgstr ""
+msgstr "Веб элемент данных [%s] создан."
 
 #: api/classes/class.cwebcheck.php:641
 #, php-format
 msgid "Web item with key [%s] already exists."
-msgstr ""
+msgstr "Веб элемент данных с ключем [%s] уже существует."
 
 #: include/locales/en_gb.inc.php:1062
 msgid "Web monitoring"
@@ -8464,7 +8604,7 @@ msgstr "Веб-мониторинг"
 
 #: api/classes/class.cwebcheck.php:335
 msgid "Webcheck must have at least one step."
-msgstr ""
+msgstr "Веб проверка должна иметь по крайней мере один шаг."
 
 #: include/locales/en_gb.inc.php:41
 msgid "Wed"
@@ -8526,7 +8666,7 @@ msgstr "Без триггерами"
 msgid "Wizard"
 msgstr "Мастер"
 
-#: include/locales/en_gb.inc.php:509
+#: config.php:636 include/locales/en_gb.inc.php:509
 msgid "Working time"
 msgstr "Рабочее время"
 
@@ -8534,17 +8674,17 @@ msgstr "Рабочее время"
 msgid "Write"
 msgstr "Запись"
 
-#: api/classes/class.cgraph.php:1039
+#: api/classes/class.cgraph.php:1038
 #: api/classes/class.cgraphprototype.php:1046
 msgid "Wrong fields for graph"
-msgstr ""
+msgstr "Ошибочные поля для графика"
 
 #: api/classes/class.chost.php:1287
 #, php-format
 msgid "Wrong fields for host \"%s\""
 msgstr ""
 
-#: api/classes/class.cgraph.php:1053
+#: api/classes/class.cgraph.php:1052
 #: api/classes/class.cgraphprototype.php:1060
 msgid "Wrong fields for items"
 msgstr ""
@@ -8556,7 +8696,7 @@ msgstr "Ошибочные поля для способа оповещений"
 #: api/classes/class.cscreen.php:617
 #, php-format
 msgid "Wrong fields for screen [ %s ]"
-msgstr ""
+msgstr "Ошибочные поля для комплексного экрана [ %s ]"
 
 #: api/classes/class.cscreen.php:753 api/classes/class.cscreen.php:792
 #: api/classes/class.cscreen.php:829
@@ -8575,6 +8715,11 @@ msgstr ""
 #: include/locales/en_gb.inc.php:2239
 msgid "Wrong fields for user"
 msgstr "Ошибочные поля для пользователя"
+
+#: api/classes/class.cuser.php:363
+#, php-format
+msgid "Wrong fields for user \"%s\"."
+msgstr ""
 
 #: include/locales/en_gb.inc.php:808
 msgid "Wrong macro"
@@ -8650,8 +8795,15 @@ msgstr "Да"
 msgid "Yotta"
 msgstr "Йотта"
 
-#: include/forms.inc.php:392
+#: include/forms.inc.php:391
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
+msgstr ""
+"Вы не можете выбрать некоторые языки, т.к. локали для них не установлены на "
+"вашем веб-сервере."
+
+#: api/classes/class.cuser.php:441
+#, php-format
+msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr ""
 
 #: include/locales/en_gb.inc.php:2261
@@ -8694,6 +8846,14 @@ msgstr "У вас нет полномочий для этой операции"
 msgid "You do not have permission to perform this operation"
 msgstr "У вас нет полномочий для выполнения этой операции"
 
+#: api/classes/class.cuser.php:369
+msgid "You do not have permissions to create users."
+msgstr "У вас нет полномочий для создания пользователей."
+
+#: api/classes/class.cuser.php:376
+msgid "You do not have permissions to update other users."
+msgstr "У вас нет полномочий для обновления других пользователей."
+
 #: include/locales/en_gb.inc.php:2259
 msgid "You must login to view this page."
 msgstr "Вы должны войти в систему для просмотра этой страницы."
@@ -8713,6 +8873,11 @@ msgstr "ZABBIX"
 #: include/locales/en_gb.inc.php:611
 msgid "Zabbix"
 msgstr "Zabbix"
+
+#: include/forms/login.php:50
+#, php-format
+msgid "Zabbix %s Copyright 2001-2011 by SIA Zabbix"
+msgstr "Zabbix %s Все права защищены 2001-2011 SIA Zabbix"
 
 #: include/locales/en_gb.inc.php:1736
 msgid "Zabbix Admin"
@@ -8758,9 +8923,9 @@ msgstr "Внутренний Zabbix"
 msgid "Zabbix is temporarily unavailable"
 msgstr "ZABBIX временно недоступен"
 
-#: include/classes/class.cserverinfo.php:47 include/setup.inc.php:312
+#: include/classes/class.cserverinfo.php:45 include/setup.inc.php:312
 msgid "Zabbix server"
-msgstr ""
+msgstr "Zabbix сервер"
 
 #: include/locales/en_gb.inc.php:1314
 msgid "Zabbix server ip or port is not set!"
@@ -8772,11 +8937,11 @@ msgstr "Zabbix сервер запущен"
 
 #: include/setup.inc.php:314
 msgid "Zabbix server name"
-msgstr ""
+msgstr "Имя сервера Zabbix"
 
 #: include/setup.inc.php:313
 msgid "Zabbix server port"
-msgstr ""
+msgstr "Порт Zabbix сервера"
 
 #: include/locales/en_gb.inc.php:1051
 msgid "Zabbix trapper"
@@ -8847,7 +9012,7 @@ msgstr "уже существует для узла сети"
 msgid "already linked to host"
 msgstr "уже присоединен к узлу сети"
 
-#: include/forms/action.edit.php:756 include/forms/action.edit.php:763
+#: include/forms/action.edit.php:752 include/forms/action.edit.php:759
 #: include/locales/en_gb.inc.php:377
 msgid "and"
 msgstr "и"
@@ -8890,7 +9055,7 @@ msgstr "содержит Мультибайтовые символы"
 
 #: include/locales/en_gb.inc.php:88
 msgid "created"
-msgstr ""
+msgstr "создано"
 
 #: include/locales/en_gb.inc.php:2219
 msgid "ctype module"
@@ -8955,7 +9120,7 @@ msgstr "дней"
 
 #: include/setup.inc.php:299
 msgid "default"
-msgstr ""
+msgstr "по умолчанию"
 
 #: include/locales/en_gb.inc.php:2288
 msgid "does not exist"
@@ -9015,40 +9180,40 @@ msgstr "был удален из системы"
 
 #: api/classes/class.cmap.php:588
 msgid "host"
-msgstr ""
+msgstr "узел сети"
 
 #: api/classes/class.cmap.php:587
 msgid "host group"
-msgstr ""
+msgstr "группа узла сети"
 
 #: include/locales/en_gb.inc.php:1273
 msgid "http://www.zabbix.com"
 msgstr "http://www.zabbix.com"
 
-#: api/classes/class.cmap.php:586
+#: api/classes/class.cmap.php:585
 msgid "icon"
-msgstr ""
+msgstr "иконка"
 
 #: api/classes/class.cmap.php:591
 msgid "image"
-msgstr ""
+msgstr "изображение"
 
 #: include/locales/en_gb.inc.php:385
 msgid "in"
 msgstr "в"
 
-#: include/items.inc.php:1398 include/items.inc.php:1455
+#: include/items.inc.php:1397 include/items.inc.php:1454
 #, php-format
 msgid "incorrect syntax near '%1$s' at position %2$d"
 msgstr "некорректный синтаксис рядом с '%1$s' с позиции %2$d"
 
-#: include/items.inc.php:1406 include/items.inc.php:1446
-#: include/items.inc.php:1483
+#: include/items.inc.php:1405 include/items.inc.php:1445
+#: include/items.inc.php:1482
 #, php-format
 msgid "incorrect usage of bracket symbols. '%s' found after final bracket."
 msgstr "некорректное использование символов скобок. '%s' найдено после закрывающей скобки."
 
-#: include/items.inc.php:1506
+#: include/items.inc.php:1505
 #, php-format
 msgid "invalid character '%1$s' at position %2$d"
 msgstr "некорректный символ '%1$s' с позиции %2$d"
@@ -9156,7 +9321,7 @@ msgstr "обслуживание"
 
 #: api/classes/class.cmap.php:590
 msgid "map"
-msgstr ""
+msgstr "карта"
 
 #: include/locales/en_gb.inc.php:638
 msgid "max"
@@ -9242,7 +9407,7 @@ msgstr "в"
 msgid "option in"
 msgstr "опцию в"
 
-#: include/forms/action.edit.php:759 include/forms/action.edit.php:762
+#: include/forms/action.edit.php:755 include/forms/action.edit.php:758
 #: include/locales/en_gb.inc.php:380
 msgid "or"
 msgstr "или"
@@ -9259,13 +9424,13 @@ msgstr "модуль php-xml не установлен"
 msgid "ports"
 msgstr "порты"
 
-#: include/classes/class.cserverinfo.php:42
+#: include/classes/class.cserverinfo.php:40
 msgid "r"
 msgstr ""
 
-#: include/classes/class.cserverinfo.php:44
+#: include/classes/class.cserverinfo.php:42
 msgid "refresh now"
-msgstr ""
+msgstr "обновить сейчас"
 
 #: include/locales/en_gb.inc.php:1995
 msgid "refreshed every"
@@ -9297,7 +9462,7 @@ msgstr "секунд"
 
 #: include/templates/action.js.php:107
 msgid "select"
-msgstr ""
+msgstr "выбор"
 
 #: include/locales/en_gb.inc.php:340
 msgid "selected actions?"
@@ -9329,7 +9494,7 @@ msgstr "к узлу сети"
 
 #: api/classes/class.cmap.php:589
 msgid "trigger"
-msgstr ""
+msgstr "триггер"
 
 #: include/locales/en_gb.inc.php:2062
 msgid "updated"
