@@ -987,55 +987,7 @@ COpt::memoryPick();
 			return array('prototypeids' => $prototypeids);
 	}
 
-
-	public function syncTemplates($data){
-
-			$data['templateids'] = zbx_toArray($data['templateids']);
-			$data['hostids'] = zbx_toArray($data['hostids']);
-
-			$options = array(
-				'hostids' => $data['hostids'],
-				'editable' => 1,
-				'preservekeys' => 1,
-				'templated_hosts' => 1,
-				'output' => API_OUTPUT_SHORTEN
-			);
-			$allowedHosts = API::Host()->get($options);
-			foreach($data['hostids'] as $hostid){
-				if(!isset($allowedHosts[$hostid])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				}
-			}
-			$options = array(
-				'templateids' => $data['templateids'],
-				'preservekeys' => 1,
-				'output' => API_OUTPUT_SHORTEN
-			);
-			$allowedTemplates = API::Template()->get($options);
-			foreach($data['templateids'] as $templateid){
-				if(!isset($allowedTemplates[$templateid])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				}
-			}
-
-			$options = array(
-				'hostids' => $data['templateids'],
-				'preservekeys' => 1,
-				'select_applications' => API_OUTPUT_REFER,
-				'output' => API_OUTPUT_EXTEND,
-			);
-			$items = $this->get($options);
-
-			foreach($items as $inum => $item){
-				$items[$inum]['applications'] = zbx_objectValues($item['applications'], 'applicationid');
-			}
-
-			$this->inherit($items, $data['hostids'], true);
-
-			return true;
-	}
-
-	protected function inherit($items, $hostids=null, $fromTemplate=false){
+	protected function inherit($items, $hostids=null){
 		if(empty($items)) return true;
 
 		$chdHosts = API::Host()->get(array(
@@ -1049,9 +1001,9 @@ COpt::memoryPick();
 		if(empty($chdHosts)) return true;
 
 		$ruleIds = array();
-		$sql = 'SELECT i.itemid ruleid, id.itemid, i.hostid'.
-				' FROM items i, item_discovery id'.
-				' WHERE i.templateid=id.parent_itemid'.
+		$sql = 'SELECT i.itemid as ruleid, id.itemid, i.hostid '.
+			' FROM items i, item_discovery id '.
+			' WHERE i.templateid=id.parent_itemid '.
 				' AND '.DBcondition('id.itemid', zbx_objectValues($items, 'itemid'));
 		$db_result = DBselect($sql);
 		while($rule = DBfetch($db_result)){
@@ -1119,9 +1071,6 @@ COpt::memoryPick();
 					$newItem['itemid'] = $exItem['itemid'];
 					$inheritedItems[] = $newItem;
 
-					if($fromTemplate){
-						unsetExcept($newItem, $this->fieldsToUpdateFromTemplate);
-					}
 					unset($newItem['ruleid']);
 
 					$updateItems[] = $newItem;
@@ -1136,7 +1085,7 @@ COpt::memoryPick();
 		$this->createReal($insertItems);
 		$this->updateReal($updateItems);
 
-		$this->inherit($inheritedItems, null, $fromTemplate);
+		$this->inherit($inheritedItems);
 	}
 }
 ?>

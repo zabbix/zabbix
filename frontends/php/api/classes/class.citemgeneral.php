@@ -23,7 +23,7 @@
  * @package API
  */
 
-class CItemGeneral extends CZBXAPI{
+abstract class CItemGeneral extends CZBXAPI{
 
 	protected $fieldsToUpdateFromTemplate;
 
@@ -86,5 +86,56 @@ class CItemGeneral extends CZBXAPI{
 				return false;
 		}
 	}
+
+	public function syncTemplates($data){
+
+		$data['templateids'] = zbx_toArray($data['templateids']);
+		$data['hostids'] = zbx_toArray($data['hostids']);
+
+		$allowedHosts = API::Host()->get(array(
+			'hostids' => $data['hostids'],
+			'editable' => true,
+			'preservekeys' => true,
+			'templated_hosts' => true,
+			'output' => API_OUTPUT_SHORTEN
+		));
+		foreach($data['hostids'] as $hostid){
+			if(!isset($allowedHosts[$hostid])){
+				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+			}
+		}
+
+		$allowedTemplates = API::Template()->get(array(
+			'templateids' => $data['templateids'],
+			'preservekeys' => true,
+			'output' => API_OUTPUT_SHORTEN
+		));
+		foreach($data['templateids'] as $templateid){
+			if(!isset($allowedTemplates[$templateid])){
+				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+			}
+		}
+
+		$items = $this->get(array(
+			'hostids' => $data['templateids'],
+			'preservekeys' => true,
+			'select_applications' => API_OUTPUT_REFER,
+			'output' => API_OUTPUT_EXTEND,
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
+		));
+
+		foreach($items as $inum => $item){
+			unsetExcept($items[$inum], $this->fieldsToUpdateFromTemplate);
+			$items[$inum]['applications'] = zbx_objectValues($item['applications'], 'applicationid');
+		}
+
+		$this->inherit($items, $data['hostids']);
+
+	return true;
+	}
+
+	protected function inherit($items, $hostids=null){
+	}
+
 }
 ?>

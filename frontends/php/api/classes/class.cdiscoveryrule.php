@@ -989,49 +989,7 @@ COpt::memoryPick();
 	}
 
 
-	public function syncTemplates($data){
-
-			$data['templateids'] = zbx_toArray($data['templateids']);
-			$data['hostids'] = zbx_toArray($data['hostids']);
-
-			$options = array(
-				'hostids' => $data['hostids'],
-				'editable' => 1,
-				'preservekeys' => 1,
-				'templated_hosts' => 1,
-				'output' => API_OUTPUT_SHORTEN
-			);
-			$allowedHosts = API::Host()->get($options);
-			foreach($data['hostids'] as $hostid){
-				if(!isset($allowedHosts[$hostid])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				}
-			}
-			$options = array(
-				'templateids' => $data['templateids'],
-				'preservekeys' => 1,
-				'output' => API_OUTPUT_SHORTEN
-			);
-			$allowedTemplates = API::Template()->get($options);
-			foreach($data['templateids'] as $templateid){
-				if(!isset($allowedTemplates[$templateid])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				}
-			}
-
-			$options = array(
-				'hostids' => $data['templateids'],
-				'preservekeys' => 1,
-				'output' => API_OUTPUT_EXTEND,
-			);
-			$items = $this->get($options);
-
-			$this->inherit($items, $data['hostids'], true);
-
-			return true;
-	}
-
-	protected function inherit($items, $hostids=null, $fromTemplate=false){
+	protected function inherit($items, $hostids=null){
 		if(empty($items)) return true;
 
 		$chdHosts = API::Host()->get(array(
@@ -1130,10 +1088,6 @@ COpt::memoryPick();
 					$newItem['itemid'] = $exItem['itemid'];
 					$inheritedItems[] = $newItem;
 
-					if($fromTemplate){
-						unsetExcept($newItem, $this->fieldsToUpdateFromTemplate);
-					}
-
 					$updateItems[] = $newItem;
 				}
 				else{
@@ -1145,7 +1099,7 @@ COpt::memoryPick();
 		$this->createReal($insertItems);
 		$this->updateReal($updateItems);
 
-		$this->inherit($inheritedItems, null, $fromTemplate);
+		$this->inherit($inheritedItems);
 	}
 }
 ?>

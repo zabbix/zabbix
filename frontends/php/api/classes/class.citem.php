@@ -911,7 +911,7 @@ COpt::memoryPick();
 			unset($item['prevorgvalue']);
 			unset($item['lastns']);
 
-			//validating item key
+// validating item key
 			if(isset($item['key_'])){
 				$itemCheck = check_item_key($item['key_']);
 				if(!$itemCheck['valid']){
@@ -1030,9 +1030,8 @@ COpt::memoryPick();
 			}
 
 			if(isset($item['key_'])){
-				if(!preg_match('/^'.ZBX_PREG_ITEM_KEY_FORMAT.'$/u', $item['key_'])){
+				if(!preg_match('/^'.ZBX_PREG_ITEM_KEY_FORMAT.'$/u', $item['key_']))
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_KEY_FORMAT.SPACE."'key_name[param1,param2,...]'");
-				}
 
 				if(isset($item['type'])){
 					if(($item['type'] == ITEM_TYPE_DB_MONITOR && $item['key_'] == 'db.odbc.select[<unique short description>]') ||
@@ -1044,44 +1043,33 @@ COpt::memoryPick();
 
 					if(isset($item['delay']) && isset($item['delay_flex'])){
 						$res = calculate_item_nextcheck(0, $item['type'], $item['delay'], $item['delay_flex'], time());
-						if($res['delay'] == SEC_PER_YEAR && $item['type'] != ITEM_TYPE_ZABBIX_ACTIVE && $item['type'] != ITEM_TYPE_TRAPPER){
+
+						if($res['delay'] == SEC_PER_YEAR && $item['type'] != ITEM_TYPE_ZABBIX_ACTIVE && $item['type'] != ITEM_TYPE_TRAPPER)
 							self::exception(ZBX_API_ERROR_PARAMETERS, S_ITEM_WILL_NOT_BE_REFRESHED_PLEASE_ENTER_A_CORRECT_UPDATE_INTERVAL);
-						}
 					}
 
 					if($item['type'] == ITEM_TYPE_AGGREGATE){
 // grpfunc['group','key','itemfunc','numeric param']
-						if(preg_match('/^((.)*)(\[\"((.)*)\"\,\"((.)*)\"\,\"((.)*)\"\,\"([0-9]+)\"\])$/i', $item['key_'], $arr)){
-							$g=$arr[1];
-							if(!str_in_array($g,array("grpmax","grpmin","grpsum","grpavg"))){
-								self::exception(ZBX_API_ERROR_PARAMETERS, S_GROUP_FUNCTION.SPACE."[$g]".SPACE.S_IS_NOT_ONE_OF.SPACE."[grpmax, grpmin, grpsum, grpavg]");
-							}
-// Group
-							$g=$arr[4];
-// Key
-							$g=$arr[6];
-// Item function
-							$g=$arr[8];
-							if(!str_in_array($g, array('last', 'min', 'max', 'avg', 'sum','count'))){
-								self::exception(ZBX_API_ERROR_PARAMETERS, S_ITEM_FUNCTION.SPACE.'['.$g.']'.SPACE.S_IS_NOT_ONE_OF.SPACE.'[last, min, max, avg, sum, count]');
-							}
-// Parameter
-							$g=$arr[10];
-						}
-						else{
+						if(!preg_match('/^((.)*)(\[\"((.)*)\"\,\"((.)*)\"\,\"((.)*)\"\,\"([0-9]+)\"\])$/i', $item['key_'], $arr))
 							self::exception(ZBX_API_ERROR_PARAMETERS, S_KEY_DOES_NOT_MATCH.SPACE.'grpfunc["group","key","itemfunc","numeric param"]');
-						}
+
+						if(!str_in_array($arr[1],array("grpmax","grpmin","grpsum","grpavg")))
+							self::exception(ZBX_API_ERROR_PARAMETERS, S_GROUP_FUNCTION.SPACE."[$arr[1]]".SPACE.S_IS_NOT_ONE_OF.SPACE."[grpmax, grpmin, grpsum, grpavg]");
+// Group [4]
+// Key [6]
+// Item function [8]
+						if(!str_in_array($arr[8], array('last', 'min', 'max', 'avg', 'sum','count')))
+							self::exception(ZBX_API_ERROR_PARAMETERS, S_ITEM_FUNCTION.SPACE.'['.$arr[8].']'.SPACE.S_IS_NOT_ONE_OF.SPACE.'[last, min, max, avg, sum, count]');
+// Parameter [10]
 					}
 				}
 
 				if(isset($item['value_type'])){
-					if(preg_match('/^(log|logrt|eventlog)\[/', $item['key_']) && ($item['value_type'] != ITEM_VALUE_TYPE_LOG)){
+					if(preg_match('/^(log|logrt|eventlog)\[/', $item['key_']) && ($item['value_type'] != ITEM_VALUE_TYPE_LOG))
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_TYPE_INFORMATION_BUST_LOG_FOR_LOG_KEY);
-					}
 
-					if(isset($item['type']) && ($item['type'] == ITEM_TYPE_AGGREGATE) && ($item['value_type'] != ITEM_VALUE_TYPE_FLOAT)){
+					if(isset($item['type']) && ($item['type'] == ITEM_TYPE_AGGREGATE) && ($item['value_type'] != ITEM_VALUE_TYPE_FLOAT))
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_VALUE_TYPE_MUST_FLOAT_FOR_AGGREGATE_ITEMS);
-					}
 				}
 
 			}
@@ -1345,67 +1333,18 @@ COpt::memoryPick();
 
 // TODO: remove info from API
 			foreach($del_items as $item){
-				info(_s('Item [%1$s:%2$s] deleted.', $item['description'], $item['key_']));
+				info(_s('Item "%1$s:%2$s" deleted.', $item['description'], $item['key_']));
 			}
 
 			return array('itemids' => $itemids);
 	}
 
-
-	public function syncTemplates($data){
-
-		$data['templateids'] = zbx_toArray($data['templateids']);
-		$data['hostids'] = zbx_toArray($data['hostids']);
-
-		$options = array(
-			'hostids' => $data['hostids'],
-			'editable' => 1,
-			'preservekeys' => 1,
-			'templated_hosts' => 1,
-			'output' => API_OUTPUT_SHORTEN
-		);
-		$allowedHosts = API::Host()->get($options);
-		foreach($data['hostids'] as $hostid){
-			if(!isset($allowedHosts[$hostid])){
-				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-			}
-		}
-		$options = array(
-			'templateids' => $data['templateids'],
-			'preservekeys' => 1,
-			'output' => API_OUTPUT_SHORTEN
-		);
-		$allowedTemplates = API::Template()->get($options);
-		foreach($data['templateids'] as $templateid){
-			if(!isset($allowedTemplates[$templateid])){
-				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-			}
-		}
-
-		$options = array(
-			'hostids' => $data['templateids'],
-			'preservekeys' => 1,
-			'select_applications' => API_OUTPUT_REFER,
-			'output' => API_OUTPUT_EXTEND,
-			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
-		);
-		$items = $this->get($options);
-
-		foreach($items as $inum => $item){
-			$items[$inum]['applications'] = zbx_objectValues($item['applications'], 'applicationid');
-		}
-
-		$this->inherit($items, $data['hostids'], true);
-
-		return true;
-	}
-
-	protected function inherit($items, $hostids=null, $fromTemplate=false){
+	protected function inherit($items, $hostids=null){
 		if(empty($items)) return true;
 
 		$chdHosts = API::Host()->get(array(
 			'output' => array('hostid', 'host', 'status'),
-			'selectInterfaces' => API_OUTPUT_EXTEND,
+			'selectInterfaces' => API_OUTPUT_REFER,
 			'templateids' => zbx_objectValues($items, 'hostid'),
 			'hostids' => $hostids,
 			'preservekeys' => true,
@@ -1471,9 +1410,8 @@ COpt::memoryPick();
 				}
 				else if(isset($item['type']) && ($item['type'] != $exItem['type'])){
 					if($type = $this->itemTypeInterface($item['type'])){
-						if(!isset($interfaceids[$type])){
+						if(!isset($interfaceids[$type]))
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $host['host'], $exItem['key_']));
-						}
 
 						$item['interfaceid'] = $interfaceids[$type];
 					}
@@ -1498,10 +1436,6 @@ COpt::memoryPick();
 					$newItem['itemid'] = $exItem['itemid'];
 					$inheritedItems[] = $newItem;
 
-					if($fromTemplate){
-						unsetExcept($newItem, $this->fieldsToUpdateFromTemplate);
-					}
-
 					$updateItems[] = $newItem;
 				}
 				else{
@@ -1514,7 +1448,7 @@ COpt::memoryPick();
 		$this->createReal($insertItems);
 		$this->updateReal($updateItems);
 
-		$this->inherit($inheritedItems, null, $fromTemplate);
+		$this->inherit($inheritedItems);
 	}
 }
 ?>
