@@ -101,6 +101,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
 
+ - [ZBXNEXT-448] Added trigger function logeventid that matches the last event ID to a regex (rudolfs)
  - [ZBX-1419] improve and fix database upgrade patches for older versions (Richlv)
  - [ZBX-3576] fixed showing triggers with disabled items in monitoring (Vedmak)
  - [ZBX-3483] added missing fields in items mass update (Vedmak)
