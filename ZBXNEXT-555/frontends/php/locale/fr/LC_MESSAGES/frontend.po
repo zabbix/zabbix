@@ -6055,7 +6055,7 @@ msgid "PHP version"
 msgstr "PHP version"
 
 #: include/locales/en_gb.inc.php:1533
-msgid "PLAINT TEXT"
+msgid "PLAIN TEXT"
 msgstr "TEXTE BRUT"
 
 #: include/locales/en_gb.inc.php:119
