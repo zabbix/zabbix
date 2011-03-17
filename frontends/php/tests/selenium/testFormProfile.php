@@ -146,5 +146,26 @@ class testFormProfile extends CWebTest
 
 		$this->assertEquals($this->oldHash,$this->hashUsersExcept('Admin'));
 	}
+
+	public function testFormProfile_GlobalMessagingEnable(){
+		$this->login('profile.php');
+		$this->check('messages[enabled]');
+		// we wait for the first element after messaging checkbox to appear
+		$this->waitForElementPresent("xpath=///td[text()='Message&nbsp;timeout&nbsp;(seconds)']");
+		// and then check that the remaining elements are there as well
+		$this->ok('Play sound');
+		$this->ok('Trigger severity');
+		$this->ok('Recovery');
+		$this->ok('Not classified');
+		$this->ok('Information');
+		$this->ok('Warning');
+		$this->ok('Average');
+		$this->ok('High');
+		$this->ok('Disaster');
+		// should also save profile & revisit to check that it's still the same
+		// probably also should check in the db saved data
+		// and maybe individually toggle priority checkboxes and check in the db...
+	}
+
 }
 ?>
