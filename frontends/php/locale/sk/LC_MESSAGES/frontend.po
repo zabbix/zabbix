@@ -6063,8 +6063,8 @@ msgid "PHP version"
 msgstr "PHP version"
 
 #: include/locales/en_gb.inc.php:1533
-msgid "PLAINT TEXT"
-msgstr "PLAINT TEXT"
+msgid "PLAIN TEXT"
+msgstr "PLAIN TEXT"
 
 #: include/locales/en_gb.inc.php:119
 msgid "POP"
