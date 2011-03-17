@@ -1527,7 +1527,7 @@
 	'S_MAP'=>					_('Map'),
 	'S_AS_PLAIN_TEXT'=>			_('As plain text'),
 	'S_PLAIN_TEXT'=>			_('Plain text'),
-	'S_PLAIN_TEXT_BIG'=>			_('PLAINT TEXT'),
+	'S_PLAIN_TEXT_BIG'=>			_('PLAIN TEXT'),
 	'S_COLUMN_SPAN'=>			_('Column span'),
 	'S_ROW_SPAN'=>				_('Row span'),
 	'S_SHOW_LINES'=>			_('Show lines'),
@@ -2142,7 +2142,7 @@
 //	graphs.inc.php
 	'S_NO_GRAPH_WITH'=>					_('No graph item with'),
 	'S_MISSING_ITEMS_FOR_GRAPH'=>				_('Missing items for graph'),
-	'S_GRAPH_TEMPLATE_HOST_CANNOT_OTHER_ITEMS_HOSTS_SMALL'=>_('with template host can not contain items from other hosts.'),
+	'S_GRAPH_TEMPLATE_HOST_CANNOT_OTHER_ITEMS_HOSTS_SMALL'=>_('with template host cannot contain items from other hosts.'),
 	'S_SKIPPED_COPYING_OF_GRAPH'=>				_('Skipped copying of graph'),
 
 //	profiles.inc.php
