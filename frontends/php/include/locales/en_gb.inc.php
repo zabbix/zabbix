@@ -721,7 +721,6 @@
 	'S_DELETE_SELECTED_MAINTENANCE_PERIODS_Q'=>_('Delete selected maintenance periods?'),
 	'S_GROUP_OR_HOST_NEEDED' => _('At least one host or group should be selected'),
 
-	'S_IN_MAINTENANCE'=>			_('In maintenance'),
 	'S_HOSTS_IN_MAINTENANCE'=>		_('Hosts in maintenance'),
 	'S_GROUPS_IN_MAINTENANCE'=>		_('Groups in maintenance'),
 
@@ -828,17 +827,11 @@
 	'S_ITEMS_BIG'=>					_('ITEMS'),
 	'S_TRIGGERS'=>					_('Triggers'),
 	'S_GRAPHS'=>					_('Graphs'),
-	'S_HOST_ADDED'=>				_('Host added'),
-	'S_CANNOT_ADD_HOST'=>				_('Cannot add host'),
 	'S_ITEMS_COPIED'=>				_('Items copied'),
 	'S_CANNOT_COPY_ITEMS'=>				_('Cannot copy items'),
-	'S_HOST_UPDATED'=>				_('Host updated'),
 	'S_CANNOT_UPDATE_HOST'=>			_('Cannot update host'),
 	'S_CANNOT_UPDATE'=>				_('Cannot update'),
 	'S_HOST_STATUS_UPDATED'=>			_('Host status updated'),
-	'S_CANNOT_UPDATE_HOST_STATUS'=>			_('Cannot update host status'),
-	'S_HOST_DELETED'=>				_('Host deleted'),
-	'S_CANNOT_DELETE_HOST'=>			_('Cannot delete host'),
 	'S_CONFIGURATION_OF_HOSTS'=>			_('CONFIGURATION OF HOSTS'),
 	'S_CONFIGURATION_OF_TEMPLATES'=>		_('CONFIGURATION OF TEMPLATES'),
 	'S_CONFIGURATION_OF_APPLICATIONS'=>		_('CONFIGURATION OF APPLICATIONS'),
@@ -900,9 +893,6 @@
 	'S_CREATE_PROXY'=>				_('Create Proxy'),
 	'S_PROXY_NAME'=>				_('Proxy name'),
 	'S_LASTSEEN_AGE'=>				_('Last seen (age)'),
-	'S_ENABLE_SELECTED_HOSTS'=>			_('Enable selected hosts?'),
-	'S_DISABLE_SELECTED_HOSTS_Q'=>			_('Disable selected hosts?'),
-	'S_DELETE_SELECTED_HOSTS_Q'=>			_('Delete selected hosts?'),
 	'S_UPDATED_STATUS_OF_HOST' =>		_('Updated status of host'),
 	'S_CLEAR_WHEN_UNLINKING' => _('Clear when unlinking'),
 	'S_SNMP' =>						_('SNMP'),
@@ -1835,7 +1825,6 @@
 //	hostprofiles.php
 	'S_HOST_PROFILES'=>			_('Host profiles'),
 	'S_HOST_PROFILES_BIG'=>			_('HOST PROFILES'),
-	'S_EXTENDED_HOST_PROFILE'=>		_('Extended host profile'),
 	'S_EXTENDED_PROFILE'=>		_('Extended profile'),
 	'S_EXTENDED'=>				_('Extended'),
 
