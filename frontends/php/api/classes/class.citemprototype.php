@@ -933,9 +933,7 @@ COpt::memoryPick();
 				if($exItem){
 					$newItem['itemid'] = $exItem['itemid'];
 					$inheritedItems[] = $newItem;
-
 					unset($newItem['ruleid']);
-
 					$updateItems[] = $newItem;
 				}
 				else{
