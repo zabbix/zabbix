@@ -893,7 +893,6 @@ COpt::memoryPick();
 
 				if($exItem){
 					$newItem['itemid'] = $exItem['itemid'];
-					unset($newItem['interfaceid']);
 					$inheritedItems[] = $newItem;
 
 					$updateItems[] = $newItem;

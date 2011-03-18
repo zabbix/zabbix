@@ -141,9 +141,7 @@ abstract class CItemGeneral extends CZBXAPI{
 
 // apply rules
 				foreach($this->fieldRules as $field => $rules){
-					if(((0 != $fullItem['templateid']) && isset($rules['template']))
-						|| isset($rules['system'])
-					){
+					if(((0 != $fullItem['templateid']) && isset($rules['template'])) || isset($rules['system'])){
 						unset($item[$field]);
 					}
 				}
