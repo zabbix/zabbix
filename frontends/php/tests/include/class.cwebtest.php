@@ -262,8 +262,17 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 		// tests that items that should have interfaceid don't have it set to NULL
 		// checks all items on enabled and disabled hosts (types 0 and 1) except:
 		// ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_CALCULATED, ITEM_TYPE_HTTPTEST
+		// and item is not item prototype (flags!=2)
 		// if any found, something's wrong
-		$this->assertEquals(0,DBcount("select itemid from items left join hosts on items.hostid=hosts.hostid where hosts.status in (0,1) and interfaceid is NULL and type not in (2,5,7,8,9,15);"),"Chuck Norris: There are items with interfaceid NULL not of types 2, 5, 7, 8, 9, 15");
+		$sql = 'SELECT i.itemid'.
+				' FROM items i, hosts h'.
+				' WHERE i.hostid=h.hostid'.
+					' AND h.status in (0,1)'.
+					' AND i.interfaceid is NULL'.
+					' AND i.type not in (2,5,7,8,9,15)'.
+					' AND i.flags NOT IN (2)';
+
+		$this->assertEquals(0, DBcount($sql), "Chuck Norris: There are items with interfaceid NULL not of types 2, 5, 7, 8, 9, 15");
 
 	}
 }

@@ -894,7 +894,6 @@ function morder_result(&$data, $sortfields, $sortorder=ZBX_SORT_UP){
 	return true;
 }
 
-
 function order_result(&$data, $sortfield=null, $sortorder=ZBX_SORT_UP){
 	if(empty($data)) return false;
 
@@ -945,6 +944,12 @@ function order_by($def,$allways=''){
 return ' ORDER BY '.$tabfield.' '.$sortorder.$allways;
 }
 /************* END SORT *************/
+
+function unsetExcept(&$array, $allowedFields){
+	foreach($array as $key => $value){
+		if(!isset($allowedFields[$key])) unset($array[$key]);
+	}
+}
 
 function zbx_implodeHash($glue1, $glue2, $hash){
 	if(is_null($glue2)) $glue2 = $glue1;

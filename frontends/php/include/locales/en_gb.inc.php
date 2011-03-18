@@ -2045,27 +2045,13 @@
 
 //	items.inc.php
 	'S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION'=>	_('Incorrect arguments passed to function'),
-	'S_INCORRECT_KEY_FORMAT'=>			_('Incorrect key format'),
-	'S_ITEM_WILL_NOT_BE_REFRESHED_PLEASE_ENTER_A_CORRECT_UPDATE_INTERVAL'=>	_('Item will not be refreshed. Please enter a correct update interval.'),
-	'S_TYPE_INFORMATION_BUST_LOG_FOR_LOG_KEY'=>	_('Type of information must be Log for log key'),
-	'S_VALUE_TYPE_MUST_FLOAT_FOR_AGGREGATE_ITEMS'=>	_('Value type must be Float for aggregate items'),
-	'S_GROUP_FUNCTION'=>				_('Group function'),
-	'S_IS_NOT_ONE_OF'=>				_('is not one of'),
-	'S_ITEM_FUNCTION'=>				_('Item function'),
-	'S_KEY_DOES_NOT_MATCH'=>			_('Key does not match'),
-	'S_AN_ITEM_WITH_THE_KEY'=>			_('An item with the Key'),
 	'S_ALREADY_EXISTS_FOR_HOST_SMALL'=>		_('already exists for host'),
-	'S_THE_KEY_MUST_BE_UNIQUE'=>			_('The key must be unique.'),
 	'S_UPDATED_SMALL'=>				_('updated'),
 	'S_NO_ITEM_WITH'=>				_('No item with'),
-	'S_UNKNOWN_VALUE_TYPE'=>			_('Unknown value type'),
-	'S_ITEMS_CHECK_KEY_DEFAULT_EXAMPLE_PASSED'=>	_('Check the key, please. Default example was passed'),
 
 //	httptest.inc.php
 	'S_CANNOT_ADD_NEW_APPLICATION'=>		_('Cannot add new application'),
 	'S_ADDED_SMALL'=>				_('added'),
-
-//	media.inc.php
 
 //	hosts.inc.php
 	'S_CIRCULAR_LINK_CANNOT_BE_CREATED'=>		_('Circular link can not be created'),
