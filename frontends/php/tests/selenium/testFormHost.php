@@ -249,9 +249,6 @@ class testFormHost extends CWebTest{
 		$this->wait();
 		$this->assertTitle('Hosts');
 		$this->ok('Host updated');
-		// should check in the db that no items, triggers, apps or custom graphs exist on the host
-		$this->assertEquals(0, DBcount($sql), "Chuck Norris: There are items with interfaceid NULL not of types 2, 5, 7, 8, 9, 15");
-
 	}
 
 }
