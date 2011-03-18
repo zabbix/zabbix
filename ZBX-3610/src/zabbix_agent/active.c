@@ -602,7 +602,7 @@ static int	process_value(
 
 	if (0 != persistent && CONFIG_BUFFER_SIZE / 2 <= buffer.pcount)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Buffer full: can't store persistent value");
+		zabbix_log(LOG_LEVEL_WARNING, "Buffer is full, can't store persistent value.");
 		goto ret;
 	}
 
@@ -774,7 +774,10 @@ static void	process_active_checks(char *server, unsigned short port)
 					if (SUCCEED == send_err)
 						active_metrics[i].lastlogsize = lastlogsize;
 					else
+					{ /* buffer is full, stop processing the log till the buffer is cleared */
 						lastlogsize = active_metrics[i].lastlogsize;
+						break;
+					}
 
 					/* do not flood Zabbix server if file grows too fast */
 					if (s_count >= (maxlines_persec * active_metrics[i].refresh))
@@ -860,9 +863,10 @@ static void	process_active_checks(char *server, unsigned short port)
 						active_metrics[i].mtime = mtime;
 					}
 					else
-					{
+					{ /* buffer is full, stop processing the log till the buffer is cleared */
 						lastlogsize = active_metrics[i].lastlogsize;
 						mtime = active_metrics[i].mtime;
+						break;
 					}
 
 					/* do not flood Zabbix server if file grows too fast */
@@ -983,7 +987,10 @@ static void	process_active_checks(char *server, unsigned short port)
 					if (SUCCEED == send_err)
 						active_metrics[i].lastlogsize = lastlogsize;
 					else
+					{ /* buffer is full, stop processing the log till the buffer is cleared */
 						lastlogsize = active_metrics[i].lastlogsize;
+						break;
+					}
 
 					/* do not flood Zabbix server if file grows too fast */
 					if (s_count >= (maxlines_persec * active_metrics[i].refresh))
@@ -1083,7 +1090,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 			}
 		}
 
-		if (time(NULL) >= nextcheck)
+		if (time(NULL) >= nextcheck && CONFIG_BUFFER_SIZE / 2 > buffer.pcount)
 		{
 			zbx_setproctitle("poller [processing active checks]");
 
