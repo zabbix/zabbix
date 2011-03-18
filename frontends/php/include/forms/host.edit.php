@@ -488,10 +488,9 @@
 			$input->addStyle('width: 64em;');
 		}
 		else{
-			if($fieldLength > 64) $fieldLength = 64;
 			$input = new CTextBox('host_profile['.$profileName.']', $host_profile[$profileName]);
 			$input->setAttribute('maxlength', $fieldLength);
-			$input->addStyle('width: '.$fieldLength.'em;');
+			$input->addStyle('width: '.($fieldLength > 64 ? 64 : $fieldLength).'em;');
 		}
 		$profileList->addRow($profileCaption, $input);
 	}

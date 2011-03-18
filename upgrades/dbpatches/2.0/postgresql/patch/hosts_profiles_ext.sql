@@ -1,1 +1,1 @@
--- see hosts_profiles.sql
+-- see host_profile.sql
