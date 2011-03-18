@@ -179,8 +179,8 @@ INSERT INTO t_host_profile
 	WHERE p.hostid IS NULL;
 
 -- merge notes field
-UPDATE t_host_profile SET notes=notes||CHR(10)||notes_ext WHERE (dbms_lob.getlength(notes) <> 0) AND (dbms_lob.getlength(notes_ext) <> 0);
-UPDATE t_host_profile SET notes=notes_ext WHERE dbms_lob.getlength(notes) = 0;
+UPDATE t_host_profile SET notes=notes||CHR(13)||CHR(10)||notes_ext WHERE (LENGTH(notes) IS NOT NULL) AND (LENGTH(notes_ext) IS NOT NULL);
+UPDATE t_host_profile SET notes=notes_ext WHERE LENGTH(notes) IS NULL;
 ALTER TABLE t_host_profile DROP COLUMN notes_ext;
 
 -- copy data from temporary table
