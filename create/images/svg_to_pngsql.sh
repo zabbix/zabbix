@@ -3,6 +3,13 @@
 # A script to convert SVG into multiple sizes of PNG, compress them with pngcrush and create SQL to import in the database
 # MySQL only for now
 
+# todo :
+# add support for other databases;
+# integrate in make dist;
+# report some pngcrush stats
+# progress reporting
+# figure out how to auto-scale rack images
+
 outputdir=output_png
 pngcrushlog=pngcrush.log.txt
 pngcrushbin=pngcrush
