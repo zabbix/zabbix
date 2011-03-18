@@ -447,7 +447,7 @@ msgid "Apply"
 msgstr "Задіяти"
 
 #: include/locales/en_gb.inc.php:739
-msgid "Approach"
+msgid "Approaching"
 msgstr "Наближається"
 
 #: include/locales/en_gb.inc.php:57

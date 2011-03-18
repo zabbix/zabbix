@@ -444,7 +444,7 @@ msgid "Apply"
 msgstr "適用"
 
 #: include/locales/en_gb.inc.php:739
-msgid "Approach"
+msgid "Approaching"
 msgstr "メンテナンス待ち"
 
 #: include/locales/en_gb.inc.php:57
