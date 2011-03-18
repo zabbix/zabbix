@@ -383,8 +383,7 @@ return array(
 			),
 			'macros' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'agent' => array(
@@ -466,8 +465,7 @@ return array(
 			),
 			'posts' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'required' => array(
@@ -632,8 +630,7 @@ return array(
 			),
 			'cksum' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'sync' => array(
@@ -741,8 +738,7 @@ return array(
 			),
 			'message' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'status' => array(
@@ -1040,8 +1036,7 @@ return array(
 			),
 			'value' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'logeventid' => array(
@@ -1081,8 +1076,7 @@ return array(
 			),
 			'value' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'ns' => array(
@@ -1134,8 +1128,7 @@ return array(
 			),
 			'value' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'logeventid' => array(
@@ -1490,14 +1483,12 @@ return array(
 			),
 			'oldvalue' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'newvalue' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 		),
@@ -1577,8 +1568,7 @@ return array(
 			),
 			'def_longdata' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'recovery_msg' => array(
@@ -1595,8 +1585,7 @@ return array(
 			),
 			'r_longdata' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 		),
@@ -1672,8 +1661,7 @@ return array(
 			),
 			'message' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'mediatypeid' => array(
@@ -1757,8 +1745,7 @@ return array(
 			),
 			'command' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 		),
@@ -1787,8 +1774,7 @@ return array(
 			),
 			'command' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 		),
@@ -2938,8 +2924,7 @@ return array(
 			),
 			'hardware_full' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'software' => array(
@@ -2950,8 +2935,7 @@ return array(
 			),
 			'software_full' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'software_app_a' => array(
@@ -2986,14 +2970,12 @@ return array(
 			),
 			'contact' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'location' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'location_lat' => array(
@@ -3010,8 +2992,7 @@ return array(
 			),
 			'notes' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'chassis' => array(
@@ -3076,8 +3057,7 @@ return array(
 			),
 			'host_networks' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'host_netmask' => array(
@@ -3184,8 +3164,7 @@ return array(
 			),
 			'site_notes' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'poc_1_name' => array(
@@ -3226,8 +3205,7 @@ return array(
 			),
 			'poc_1_notes' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'poc_2_name' => array(
@@ -3268,8 +3246,7 @@ return array(
 			),
 			'poc_2_notes' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 		),
@@ -3544,8 +3521,7 @@ return array(
 			),
 			'params' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'ipmi_sensor' => array(
@@ -3954,8 +3930,7 @@ return array(
 			),
 			'description' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'confirmation' => array(
@@ -4660,8 +4635,7 @@ return array(
 			),
 			'comments' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'error' => array(
@@ -4945,8 +4919,7 @@ return array(
 			),
 			'description' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'active_since' => array(
@@ -5109,8 +5082,7 @@ return array(
 			),
 			'test_string' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 		),

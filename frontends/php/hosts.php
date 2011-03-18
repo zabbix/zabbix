@@ -153,7 +153,7 @@ include_once('include/page_header.php');
 			'hostids' => $hostids,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => 1,
-			'select_profile' => true
+			'selectProfile' => true
 		);
 		$hosts = API::Host()->get($params);
 		order_result($hosts, 'host');
@@ -974,18 +974,18 @@ include_once('include/page_header.php');
 
 //----- GO ------
 		$goBox = new CComboBox('go');
-		$goBox->addItem('export', _('Export'));
+		$goBox->addItem('export', _('Export selected'));
 		$goBox->addItem('massupdate', _('Mass update'));
 
-		$goOption = new CComboItem('activate', _('Activate'));
-		$goOption->setAttribute('confirm', _('Enable selected hosts?'));
+		$goOption = new CComboItem('activate', _('Activate selected'));
+		$goOption->setAttribute('confirm', _('Activate selected hosts?'));
 		$goBox->addItem($goOption);
 
-		$goOption = new CComboItem('disable', _('Disable'));
+		$goOption = new CComboItem('disable', _('Disable selected'));
 		$goOption->setAttribute('confirm', _('Disable selected hosts?'));
 		$goBox->addItem($goOption);
 
-		$goOption = new CComboItem('delete', _('Delete'));
+		$goOption = new CComboItem('delete', _('Delete selected'));
 		$goOption->setAttribute('confirm', _('Delete selected hosts?'));
 		$goBox->addItem($goOption);
 
