@@ -27,7 +27,7 @@ for svgfile in $elementdir/*.svg; do
 	svgfilemod=$(stat -c "%Y" "$svgfile")
 	for size in 24 48 64 96 128; do
 		pngoutfile="$outputdir/$(basename ${svgfile%.svg}) ($size).png"
-		[[ "$(stat -c "%Y" "$pngoutfile" 2>/dev/null)" -lt "$svgfilemod")" ]] && {
+		[[ "$(stat -c "%Y" "$pngoutfile" 2>/dev/null)" -lt "$svgfilemod" ]] && {
 			# if png file modification time is older than svg file modification time
 			echo -n " to $size..."
 			# we have to query image dimensions first, because export dimensions are used "as-is", resulting in a aquare rackmountable server, for example
