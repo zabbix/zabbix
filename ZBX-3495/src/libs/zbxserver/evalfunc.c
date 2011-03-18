@@ -120,6 +120,70 @@ clean:
 
 /******************************************************************************
  *                                                                            *
+ * Function: evaluate_LOGEVENTID                                              *
+ *                                                                            *
+ * Purpose: evaluate function 'logeventid' for the item                       *
+ *                                                                            *
+ * Parameters: item - item (performance metric)                               *
+ *             parameter - regex string for event id matching                 *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ * Author: Alexei Vladishev, Rudolfs Kreicbergs                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
+{
+	const char	*__function_name = "evaluate_LOGEVENTID";
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		sql[128], *arg1 = NULL;
+	int		res = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (item->value_type != ITEM_VALUE_TYPE_LOG)
+		goto clean;
+
+	if (num_param(parameters) > 1)
+		goto clean;
+
+	if (FAIL == get_function_parameter_str(item->hostid, parameters, 1, &arg1))
+		goto clean;
+
+	zbx_snprintf(sql, sizeof(sql),
+			"select logeventid"
+			" from history_log"
+			" where itemid=" ZBX_FS_UI64
+			" order by id desc",
+			item->itemid);
+
+	result = DBselectN(sql, 1);
+
+	if (NULL == (row = DBfetch(result)))
+		zabbix_log(LOG_LEVEL_DEBUG, "Result for LOGEVENTID is empty");
+	else
+	{
+		if (NULL == zbx_regexp_match(row[0], arg1, NULL))
+			strcpy(value, "0");
+		else
+			strcpy(value, "1");
+		res = SUCCEED;
+	}
+	DBfree_result(result);
+
+	zbx_free(arg1);
+clean:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+
+	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: evaluate_LOGSOURCE                                               *
  *                                                                            *
  * Purpose: evaluate function 'logsource' for the item                        *
@@ -127,7 +191,7 @@ clean:
  * Parameters: item - item (performance metric)                               *
  *             parameter - ignored                                            *
  *                                                                            *
- * Return value: SUCCEED - evaluated successfully, result is stored in value  *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -163,7 +227,7 @@ static int	evaluate_LOGSOURCE(char *value, DB_ITEM *item, const char *function, 
 
 	result = DBselectN(sql, 1);
 
-	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
+	if (NULL == (row = DBfetch(result)))
 		zabbix_log(LOG_LEVEL_DEBUG, "Result for LOGSOURCE is empty");
 	else
 	{
@@ -221,7 +285,7 @@ static int	evaluate_LOGSEVERITY(char *value, DB_ITEM *item, const char *function
 
 	result = DBselectN(sql, 1);
 
-	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
+	if (NULL == (row = DBfetch(result)))
 		zabbix_log(LOG_LEVEL_DEBUG, "Result for LOGSEVERITY is empty");
 	else
 	{
@@ -1987,6 +2051,10 @@ int	evaluate_function(char *value, DB_ITEM *item, const char *function, const ch
 	else if (0 == strcmp(function, "fuzzytime"))
 	{
 		ret = evaluate_FUZZYTIME(value, item, function, parameter, now);
+	}
+	else if (0 == strcmp(function, "logeventid"))
+	{
+		ret = evaluate_LOGEVENTID(value, item, function, parameter, now);
 	}
 	else if (0 == strcmp(function, "logseverity"))
 	{

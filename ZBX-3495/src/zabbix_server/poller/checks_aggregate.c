@@ -22,7 +22,7 @@
 
 #include "checks_aggregate.h"
 
-static	int	evaluate_one(double *result, int *num, char *grpfunc, const char *value_str, unsigned char valuetype)
+static int	evaluate_one(double *result, int *num, char *grpfunc, const char *value_str, unsigned char valuetype)
 {
 	int		ret = SUCCEED;
 	double		value = 0;
@@ -36,20 +36,20 @@ static	int	evaluate_one(double *result, int *num, char *grpfunc, const char *val
 		value = (double)value_uint64;
 	}
 
-	if (0 == strcmp(grpfunc, "grpsum") || 0 == strcmp(grpfunc,"grpavg"))
+	if (0 == strcmp(grpfunc, "grpavg") || 0 == strcmp(grpfunc, "grpsum"))
 	{
 		*result += value;
-		*num += 1;
-	}
-	else if (0 == strcmp(grpfunc, "grpmin"))
-	{
-		if (0 == *num || value < *result)
-			*result = value;
 		*num += 1;
 	}
 	else if (0 == strcmp(grpfunc, "grpmax"))
 	{
 		if (0 == *num || value > *result)
+			*result = value;
+		*num += 1;
+	}
+	else if (0 == strcmp(grpfunc, "grpmin"))
+	{
+		if (0 == *num || value < *result)
 			*result = value;
 		*num += 1;
 	}
@@ -72,9 +72,9 @@ static void	aggregate_get_items(zbx_uint64_t **ids, int *ids_alloc, int *ids_num
 	int		sql_alloc = 1024, sql_offset = 0;
 	int		num, n;
 
-	esc = DBdyn_escape_string(itemkey);
-
 	sql = zbx_malloc(sql, sql_alloc);
+
+	esc = DBdyn_escape_string(itemkey);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 192 + strlen(esc),
 			"select i.itemid"
@@ -94,7 +94,7 @@ static void	aggregate_get_items(zbx_uint64_t **ids, int *ids_alloc, int *ids_num
 	num = num_param(groups);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 32,
-				" and g.name in (");
+			" and g.name in (");
 
 	for (n = 1; n <= num; n++)
 	{
@@ -104,7 +104,7 @@ static void	aggregate_get_items(zbx_uint64_t **ids, int *ids_alloc, int *ids_num
 		esc = DBdyn_escape_string(group);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3 + strlen(esc),
-					"'%s'", esc);
+				"'%s'", esc);
 		
 		if (n != num)
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 2, ",");
@@ -129,8 +129,8 @@ static void	aggregate_get_items(zbx_uint64_t **ids, int *ids_alloc, int *ids_num
 }
 
 /*
- * grpfunc: grpmax, grpmin, grpsum, grpavg
- * itemfunc: last, min, max, avg, sum, count
+ * grpfunc: grpavg, grpmax, grpmin, grpsum
+ * itemfunc: avg, count, last, max, min, sum
  */
 static int	evaluate_aggregate(AGENT_RESULT *res, char *grpfunc,
 		const char *groups, const char *itemkey,
@@ -147,17 +147,13 @@ static int	evaluate_aggregate(AGENT_RESULT *res, char *grpfunc,
 
 	unsigned char	valuetype;
 	double		d = 0;
-	const		char		*value;
+	const char	*value;
 	int		num = 0;
 	int		now;
 	int		ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() grpfunc:'%s' groups:'%s'"
-			" itemkey:'%s' function:'%s(%s)'",
-			__function_name, grpfunc, groups, itemkey,
-			itemfunc, param);
-
-	init_result(res);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() grpfunc:'%s' groups:'%s' itemkey:'%s' function:'%s(%s)'",
+			__function_name, grpfunc, groups, itemkey, itemfunc, param);
 
 	now = time(NULL);
 
@@ -178,7 +174,7 @@ static int	evaluate_aggregate(AGENT_RESULT *res, char *grpfunc,
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
 				"select itemid,value_type,lastvalue"
 				" from items"
-				" where lastvalue is not NULL"
+				" where lastvalue is not null"
 					" and value_type in (%d,%d)"
 					" and",
 				ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
@@ -200,11 +196,9 @@ static int	evaluate_aggregate(AGENT_RESULT *res, char *grpfunc,
 		}
 		DBfree_result(result);
 	}
-		/* The SQL works very very slow on MySQL 4.0. That's why it has been split into two. */
-/*		zbx_snprintf(sql,sizeof(sql),"select items.itemid,items.value_type,min(history.value) from items,hosts_groups,hosts,groups,history where history.itemid=items.itemid and hosts_groups.groupid=groups.groupid and items.hostid=hosts.hostid and hosts_groups.hostid=hosts.hostid and groups.name='%s' and items.key_='%s' and history.clock>%d group by 1,2",hostgroup_esc, itemkey_esc, now - atoi(param));*/
-	else if (0 == strcmp(itemfunc,"min") || 0 == strcmp(itemfunc,"max") ||
-			0 == strcmp(itemfunc,"avg") || 0 == strcmp(itemfunc,"count") ||
-			0 == strcmp(itemfunc,"sum"))
+	else if (0 == strcmp(itemfunc, "avg") || 0 == strcmp(itemfunc, "count") ||
+			0 == strcmp(itemfunc, "max") || 0 == strcmp(itemfunc, "min") ||
+			0 == strcmp(itemfunc, "sum"))
 	{
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
@@ -318,18 +312,15 @@ clean:
 int	get_value_aggregate(DC_ITEM *item, AGENT_RESULT *result)
 {
 	const char	*__function_name = "get_value_aggregate";
-	char		key[8], params[MAX_STRING_LEN], groups[MAX_STRING_LEN],
-			itemkey[MAX_STRING_LEN],
-			func[8], funcp[32];
+	char		key[8], params[MAX_STRING_LEN],
+			groups[MAX_STRING_LEN], itemkey[MAX_STRING_LEN], func[8], funcp[32];
 	int		ret = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name,
-			item->key_orig);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, item->key_orig);
 
 	init_result(result);
 
-	if (2/* command with parameters */ != parse_command(item->key, key,
-				sizeof(key), params, sizeof(params)))
+	if (2 != parse_command(item->key, key, sizeof(key), params, sizeof(params)))
 		return NOTSUPPORTED;
 
 	if (num_param(params) != 4)
@@ -349,6 +340,8 @@ int	get_value_aggregate(DC_ITEM *item, AGENT_RESULT *result)
 
 	if (SUCCEED != evaluate_aggregate(result, key, groups, itemkey, func, funcp))
 		ret = NOTSUPPORTED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
