@@ -196,36 +196,36 @@ abstract class CItemGeneral extends CZBXAPI{
 						($item['type'] == ITEM_TYPE_SSH && $item['key_'] == 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]') ||
 						($item['type'] == ITEM_TYPE_TELNET && $item['key_'] == 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]'))
 					{
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_ITEMS_CHECK_KEY_DEFAULT_EXAMPLE_PASSED);
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Check the key, please. Default example was passed.'));
 					}
 
 					if(isset($item['delay']) && isset($item['delay_flex'])){
 						$res = calculate_item_nextcheck(0, $item['type'], $item['delay'], $item['delay_flex'], time());
 						if($res['delay'] == SEC_PER_YEAR && $item['type'] != ITEM_TYPE_ZABBIX_ACTIVE && $item['type'] != ITEM_TYPE_TRAPPER){
-							self::exception(ZBX_API_ERROR_PARAMETERS, S_ITEM_WILL_NOT_BE_REFRESHED_PLEASE_ENTER_A_CORRECT_UPDATE_INTERVAL);
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Item will not be refreshed. Please enter a correct update interval.'));
 						}
 					}
 
 					if($item['type'] == ITEM_TYPE_AGGREGATE){
 						// grpfunc['group','key','itemfunc','numeric param']
 						if(!preg_match('/^((.)*)(\[\"((.)*)\"\,\"((.)*)\"\,\"((.)*)\"\,\"([0-9]+)\"\])$/i', $item['key_'], $arr))
-							self::exception(ZBX_API_ERROR_PARAMETERS, S_KEY_DOES_NOT_MATCH.SPACE.'grpfunc["group","key","itemfunc","numeric param"]');
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Key does not match grpfunc["group","key","itemfunc","numeric param"].'));
 
 						if(!str_in_array($arr[1], array('grpmax', 'grpmin', 'grpsum', 'grpavg')))
-							self::exception(ZBX_API_ERROR_PARAMETERS, S_GROUP_FUNCTION.SPACE."[$arr[1]]".SPACE.S_IS_NOT_ONE_OF.SPACE."[grpmax, grpmin, grpsum, grpavg]");
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Group function "%s" is not one of [grpmax, grpmin, grpsum, grpavg].', $arr[1]));
 
 						if(!str_in_array($arr[8], array('last', 'min', 'max', 'avg', 'sum', 'count')))
-							self::exception(ZBX_API_ERROR_PARAMETERS, S_ITEM_FUNCTION.SPACE.'['.$arr[8].']'.SPACE.S_IS_NOT_ONE_OF.SPACE.'[last, min, max, avg, sum, count]');
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item function "%s" is not one of [last, min, max, avg, sum, count].', $arr[8]));
 					}
 				}
 
 				if(isset($item['value_type'])){
 					if(preg_match('/^(log|logrt|eventlog)\[/', $item['key_']) && ($item['value_type'] != ITEM_VALUE_TYPE_LOG)){
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_TYPE_INFORMATION_BUST_LOG_FOR_LOG_KEY);
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Type of information must be Log for log key.'));
 					}
 
 					if(($item['type'] == ITEM_TYPE_AGGREGATE) && ($item['value_type'] != ITEM_VALUE_TYPE_FLOAT)){
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_VALUE_TYPE_MUST_FLOAT_FOR_AGGREGATE_ITEMS);
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Value type must be Float for aggregate items.'));
 					}
 				}
 			}
