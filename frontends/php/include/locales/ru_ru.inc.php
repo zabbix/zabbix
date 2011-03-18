@@ -669,7 +669,7 @@
 	'S_CREATE_MAINTENANCE_PERIOD'=>			'Создать период обслуживания',
 	'S_MAINTENANCE_TYPE'=>			'Тип обслуживания',
 	'S_EXPIRED'=>			'Завершено',
-	'S_APPROACH'=>			'Близится',
+	'S_APPROACHING'=>			'Близится',
 	'S_WITH_DATA_COLLECTION'=>			'Со сбором данных',
 	'S_NO_DATA_COLLECTION'=>			'Без сбора данных',
 	'S_NORMAL_MAINTENANCE'=>			'Нормальное обслуживание',

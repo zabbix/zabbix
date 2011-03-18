@@ -653,7 +653,7 @@
 	'S_CREATE_MAINTENANCE_PERIOD'=>			'Create maintenance period',
 	'S_MAINTENANCE_TYPE'=>			'Maintenance type',
 	'S_EXPIRED'=>			'Expired',
-	'S_APPROACH'=>			'Approach',
+	'S_APPROACHING'=>			'Approach',
 	'S_WITH_DATA_COLLECTION'=>			'With data collection',
 	'S_NO_DATA_COLLECTION'=>			'No data collection',
 	'S_NORMAL_MAINTENANCE'=>			'Normal maintenance',

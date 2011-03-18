@@ -669,7 +669,7 @@
 	'S_CREATE_MAINTENANCE_PERIOD'=>			'メンテナンス期間の作成',
 	'S_MAINTENANCE_TYPE'=>			'メンテナンスタイプ',
 	'S_EXPIRED'=>			'期限切れ',
-	'S_APPROACH'=>			'メンテナンス待ち',
+	'S_APPROACHING'=>			'メンテナンス待ち',
 	'S_WITH_DATA_COLLECTION'=>			'データ収集あり',
 	'S_NO_DATA_COLLECTION'=>			'データ収集なし',
 	'S_NORMAL_MAINTENANCE'=>			'メンテナンス中(データ収集あり)',
