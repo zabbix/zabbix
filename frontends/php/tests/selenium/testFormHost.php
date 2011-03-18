@@ -34,6 +34,18 @@ class testFormHost extends CWebTest{
 
 	public $host = "Test host";
 
+	public function testFormHost_Layout(){
+		$this->login('hosts.php?form=1');
+
+		$this->click('link=Host profile');
+
+		$profileFields = getHostProfiles();
+		foreach($profileFields as $fieldId => $fieldName){
+			$this->ok($fieldName);
+			$this->assertElementPresent('host_profile['.$fieldId.']');
+		}
+	}
+
 	public function testFormHost_Create(){
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid','Zabbix servers');

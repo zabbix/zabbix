@@ -20,7 +20,7 @@
 #ifndef ZABBIX_DBSCHEMA_H
 #define ZABBIX_DBSCHEMA_H
 
-/* Flags */
+/* flags */
 #define	ZBX_SYNC		0x01
 #define ZBX_NOTNULL		0x02
 #define ZBX_HISTORY		0x04
@@ -28,10 +28,10 @@
 #define ZBX_HISTORY_TRENDS	0x10
 #define ZBX_PROXY		0x20
 
-/* FK Flags */
+/* FK flags */
 #define ZBX_FK_CASCADE_DELETE	0x01
 
-/* Field types */
+/* field types */
 #define	ZBX_TYPE_INT		0
 #define	ZBX_TYPE_CHAR		1
 #define	ZBX_TYPE_FLOAT		2
@@ -40,7 +40,7 @@
 #define	ZBX_TYPE_UINT		5
 #define	ZBX_TYPE_ID		6
 
-#define ZBX_MAX_FIELDS		64
+#define ZBX_MAX_FIELDS		72 /* maximum number of fields in a table plus one for null terminator in dbschema.c */
 #define ZBX_TABLENAME_LEN	64
 #define ZBX_TABLENAME_LEN_MAX	ZBX_TABLENAME_LEN + 1
 #define ZBX_FIELDNAME_LEN	64
