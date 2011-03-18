@@ -251,7 +251,7 @@ UPDATE t_host_profile SET poc_2_notes='' WHERE poc_2_notes IS NULL;
 
 -- merge notes field
 UPDATE t_host_profile SET notes_ext='' WHERE notes_ext IS NULL;
-UPDATE t_host_profile SET notes=CONCAT(notes, '\n', notes_ext) WHERE notes<>'' AND notes_ext<>'';
+UPDATE t_host_profile SET notes=CONCAT(notes, '\r\n', notes_ext) WHERE notes<>'' AND notes_ext<>'';
 UPDATE t_host_profile SET notes=notes_ext WHERE notes='';
 ALTER TABLE t_host_profile DROP COLUMN notes_ext;
 
