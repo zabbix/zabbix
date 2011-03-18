@@ -328,7 +328,7 @@ UPDATE t_host_profile SET poc_2_notes='' WHERE poc_2_notes IS NULL
 -- merge notes field
 UPDATE t_host_profile SET notes_ext='' WHERE notes_ext IS NULL
 /
-UPDATE t_host_profile SET notes=notes||CHR(10)||notes_ext WHERE notes<>'' AND notes_ext<>''
+UPDATE t_host_profile SET notes=notes||CHR(13)||CHR(10)||notes_ext WHERE notes<>'' AND notes_ext<>''
 /
 UPDATE t_host_profile SET notes=notes_ext WHERE notes=''
 /
