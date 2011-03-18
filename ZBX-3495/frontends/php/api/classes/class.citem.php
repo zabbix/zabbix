@@ -853,230 +853,6 @@ COpt::memoryPick();
 	return !empty($objs);
 	}
 
-	public function checkInput(&$items, $method){
-		$create = ($method == 'create');
-		$update = ($method == 'update');
-		$delete = ($method == 'delete');
-
-// interfaces
-		$interfaceids = zbx_objectValues($items, 'interfaceid');
-		$interfaces = API::HostInterface()->get(array(
-			'output' => array('interfaceid', 'hostid'),
-			'interfaceids' => $interfaceids,
-			'nopermissions' => 1,
-			'preservekeys' => 1
-		));
-
-// permissions
-		if($update || $delete){
-			$item_db_fields = array('itemid'=> null);
-			$dbItems = $this->get(array(
-				'output' => API_OUTPUT_EXTEND,
-				'itemids' => zbx_objectValues($items, 'itemid'),
-				'editable' => 1,
-				'preservekeys' => 1
-			));
-
-			$dbHosts = API::Host()->get(array(
-				'output' => array('hostid', 'host', 'status'),
-				'hostids' => zbx_objectValues($dbItems, 'hostid'),
-				'templated_hosts' => 1,
-				'editable' => 1,
-				'preservekeys' => 1
-			));
-		}
-		else{
-			$item_db_fields = array('description'=>null, 'key_'=>null, 'hostid'=>null, 'type' => null);
-
-			$dbHosts = API::Host()->get(array(
-				'output' => array('hostid', 'host', 'status'),
-				'hostids' => zbx_objectValues($items, 'hostid'),
-				'templated_hosts' => 1,
-				'editable' => 1,
-				'preservekeys' => 1
-			));
-		}
-
-		foreach($items as $inum => &$item){
-			$current_item = $items[$inum];
-
-			if(!check_db_fields($item_db_fields, $item)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION);
-			}
-
-			unset($item['templateid']);
-			unset($item['lastvalue']);
-			unset($item['prevvalue']);
-			unset($item['lastclock']);
-			unset($item['prevorgvalue']);
-			unset($item['lastns']);
-
-// validating item key
-			if(isset($item['key_'])){
-				$itemCheck = check_item_key($item['key_']);
-				if(!$itemCheck['valid']){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Error in item key: %s', $itemCheck['description']));
-				}
-			}
-
-			if($create){
-				if(!isset($dbHosts[$item['hostid']]))
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
-
-				if(!in_array($current_item['type'], array(ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV1,
-						ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI,
-						ITEM_TYPE_SSH, ITEM_TYPE_TELNET))
-					|| ($dbHosts[$item['hostid']]['status'] == HOST_STATUS_TEMPLATE)
-				){
-					unset($item['interfaceid']);
-				}
-				else if(!isset($item['interfaceid'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
-				}
-			}
-			else if($delete){
-				if(!isset($dbItems[$item['itemid']]))
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
-
-				if($dbItems[$item['itemid']]['templateid'] != 0){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete templated items');
-				}
-				if($dbItems[$item['itemid']]['type'] == ITEM_TYPE_HTTPTEST){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete web items');
-				}
-
-				continue;
-			}
-			else{
-				check_db_fields($dbItems[$item['itemid']], $current_item);
-
-				if($dbHosts[$dbItems[$item['itemid']]['hostid']]['status'] == HOST_STATUS_TEMPLATE)
-					unset($item['interfaceid']);
-
-				if(!isset($dbItems[$item['itemid']]))
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
-
-				$restoreRules = array(
-					'description'		=> array(),
-					'key_'			=> array(),
-					'hostid'		=> array(),
-					'delay'			=> array('template' => 1),
-					'history'		=> array('template' => 1 , 'httptest' => 1),
-					'status'		=> array('template' => 1 , 'httptest' => 1),
-					'type'			=> array(),
-					'snmp_community'	=> array('template' => 1),
-					'snmp_oid'		=> array(),
-					'port'		=> array('template' => 1),
-					'snmpv3_securityname'	=> array('template' => 1),
-					'snmpv3_securitylevel'	=> array('template' => 1),
-					'snmpv3_authpassphrase'	=> array('template' => 1),
-					'snmpv3_privpassphrase'	=> array('template' => 1),
-					'value_type'		=> array(),
-					'data_type'		=> array(),
-					'trapper_hosts'		=> array('template' =>1 ),
-					'units'			=> array(),
-					'multiplier'		=> array(),
-					'delta'			=> array('template' => 1 , 'httptest' => 1),
-					'formula'		=> array(),
-					'trends'		=> array('template' => 1 , 'httptest' => 1),
-					'logtimefmt'		=> array(),
-					'valuemapid'		=> array('httptest' => 1),
-					'authtype'		=> array('template' => 1),
-					'username'		=> array('template' => 1),
-					'password'		=> array('template' => 1),
-					'publickey'		=> array('template' => 1),
-					'privatekey'		=> array('template' => 1),
-					'params'		=> array('template' => 1),
-					'delay_flex'		=> array('template' => 1),
-					'ipmi_sensor'		=> array()
-				);
-
-
-				foreach($restoreRules as $var_name => $info){
-					if(!isset($info['template']) && (0 != $dbItems[$item['itemid']]['templateid'])){
-						unset($item[$var_name]);
-					}
-				}
-
-				if(!isset($item['key_'])) $item['key_'] = $dbItems[$item['itemid']]['key_'];
-				if(!isset($item['hostid'])) $item['hostid'] = $dbItems[$item['itemid']]['hostid'];
-			}
-
-			if(in_array($current_item['type'], array(ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV1,
-				ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI,
-				ITEM_TYPE_SSH, ITEM_TYPE_TELNET))
-			){
-				if(isset($item['interfaceid'])){
-					if(!isset($interfaces[$item['interfaceid']]) || ($interfaces[$item['interfaceid']]['hostid'] != $item['hostid']))
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item uses Host interface from non parent host'));
-				}
-			}
-			else{
-				$item['interfaceid'] = 0;
-			}
-
-
-			if((isset($item['port']) && !zbx_empty($item['port']))
-				&& !((zbx_ctype_digit($item['port']) && ($item['port']>0) && ($item['port']<=65535))
-				|| preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/u', $item['port']))
-			){
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Item [%1$s:%2$s] has invalid port: "%3$s".', $current_item['description'], $current_item['key_'], $item['port']));
-			}
-
-			if(isset($item['value_type'])){
-				if($item['value_type'] == ITEM_VALUE_TYPE_STR) $item['delta']=0;
-				if($item['value_type'] != ITEM_VALUE_TYPE_UINT64) $item['data_type'] = 0;
-			}
-
-			if(isset($item['key_'])){
-				if(!preg_match('/^'.ZBX_PREG_ITEM_KEY_FORMAT.'$/u', $item['key_']))
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_KEY_FORMAT.SPACE."'key_name[param1,param2,...]'");
-
-				if(isset($item['type'])){
-					if(($item['type'] == ITEM_TYPE_DB_MONITOR && $item['key_'] == 'db.odbc.select[<unique short description>]') ||
-					   ($item['type'] == ITEM_TYPE_SSH && $item['key_'] == 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]') ||
-					   ($item['type'] == ITEM_TYPE_TELNET && $item['key_'] == 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]'))
-					{
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_ITEMS_CHECK_KEY_DEFAULT_EXAMPLE_PASSED);
-					}
-
-					if(isset($item['delay']) && isset($item['delay_flex'])){
-						$res = calculate_item_nextcheck(0, $item['type'], $item['delay'], $item['delay_flex'], time());
-
-						if($res['delay'] == SEC_PER_YEAR && $item['type'] != ITEM_TYPE_ZABBIX_ACTIVE && $item['type'] != ITEM_TYPE_TRAPPER)
-							self::exception(ZBX_API_ERROR_PARAMETERS, S_ITEM_WILL_NOT_BE_REFRESHED_PLEASE_ENTER_A_CORRECT_UPDATE_INTERVAL);
-					}
-
-					if($item['type'] == ITEM_TYPE_AGGREGATE){
-// grpfunc['group','key','itemfunc','numeric param']
-						if(!preg_match('/^((.)*)(\[\"((.)*)\"\,\"((.)*)\"\,\"((.)*)\"\,\"([0-9]+)\"\])$/i', $item['key_'], $arr))
-							self::exception(ZBX_API_ERROR_PARAMETERS, S_KEY_DOES_NOT_MATCH.SPACE.'grpfunc["group","key","itemfunc","numeric param"]');
-
-						if(!str_in_array($arr[1],array("grpmax","grpmin","grpsum","grpavg")))
-							self::exception(ZBX_API_ERROR_PARAMETERS, S_GROUP_FUNCTION.SPACE."[$arr[1]]".SPACE.S_IS_NOT_ONE_OF.SPACE."[grpmax, grpmin, grpsum, grpavg]");
-// Group [4]
-// Key [6]
-// Item function [8]
-						if(!str_in_array($arr[8], array('last', 'min', 'max', 'avg', 'sum','count')))
-							self::exception(ZBX_API_ERROR_PARAMETERS, S_ITEM_FUNCTION.SPACE.'['.$arr[8].']'.SPACE.S_IS_NOT_ONE_OF.SPACE.'[last, min, max, avg, sum, count]');
-// Parameter [10]
-					}
-				}
-
-				if(isset($item['value_type'])){
-					if(preg_match('/^(log|logrt|eventlog)\[/', $item['key_']) && ($item['value_type'] != ITEM_VALUE_TYPE_LOG))
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_TYPE_INFORMATION_BUST_LOG_FOR_LOG_KEY);
-
-					if(isset($item['type']) && ($item['type'] == ITEM_TYPE_AGGREGATE) && ($item['value_type'] != ITEM_VALUE_TYPE_FLOAT))
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_VALUE_TYPE_MUST_FLOAT_FOR_AGGREGATE_ITEMS);
-				}
-
-			}
-		}
-		unset($item);
-	}
-
 /**
  * Add item
  *
@@ -1229,15 +1005,15 @@ COpt::memoryPick();
  * @return
  */
 	public function delete($itemids, $nopermissions=false){
-
-			if(empty($itemids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+			if(empty($itemids))
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
 
 			$itemids = zbx_toHash($itemids);
 
 			$options = array(
 				'itemids' => $itemids,
-				'editable' => 1,
-				'preservekeys' => 1,
+				'editable' => true,
+				'preservekeys' => true,
 				'output' => API_OUTPUT_EXTEND,
 			);
 			$del_items = $this->get($options);
@@ -1339,12 +1115,47 @@ COpt::memoryPick();
 			return array('itemids' => $itemids);
 	}
 
+	public function syncTemplates($data){
+		$data['templateids'] = zbx_toArray($data['templateids']);
+		$data['hostids'] = zbx_toArray($data['hostids']);
+
+		if(!API::Host()->isWritable($data['hostids'])){
+			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+		}
+		if(!API::Template()->isReadable($data['templateids'])){
+			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+		}
+
+		$selectFields = array();
+		foreach($this->fieldRules as $key => $rules){
+			if(!isset($rules['system'], $rules['host'])){
+				$selectFields[] = $key;
+			}
+		}
+		$options = array(
+			'hostids' => $data['templateids'],
+			'preservekeys' => true,
+			'select_applications' => API_OUTPUT_REFER,
+			'output' => $selectFields,
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
+		);
+		$items = $this->get($options);
+
+		foreach($items as $inum => $item){
+			$items[$inum]['applications'] = zbx_objectValues($item['applications'], 'applicationid');
+		}
+
+		$this->inherit($items, $data['hostids']);
+
+		return true;
+	}
+
 	protected function inherit($items, $hostids=null){
 		if(empty($items)) return true;
 
 		$chdHosts = API::Host()->get(array(
 			'output' => array('hostid', 'host', 'status'),
-			'selectInterfaces' => API_OUTPUT_REFER,
+			'selectInterfaces' => API_OUTPUT_EXTEND,
 			'templateids' => zbx_objectValues($items, 'hostid'),
 			'hostids' => $hostids,
 			'preservekeys' => true,
