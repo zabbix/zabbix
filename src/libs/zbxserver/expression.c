@@ -838,54 +838,6 @@ static void	expand_trigger_description_constants(char **data, zbx_uint64_t trigg
 
 /******************************************************************************
  *                                                                            *
- * Function: get_host_profile_value                                           *
- *                                                                            *
- * Purpose: request host profile value by triggerid and field name            *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *               otherwise FAIL                                               *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-static int	get_host_profile_value(zbx_uint64_t triggerid, char **replace_to,
-		int N_functionid, const char *fieldname)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		expression[TRIGGER_EXPRESSION_LEN_MAX];
-	zbx_uint64_t	functionid;
-	int		ret = FAIL;
-
-	if (FAIL == DBget_trigger_expression_by_triggerid(triggerid, expression, sizeof(expression)))
-		return FAIL;
-
-	if (FAIL == trigger_get_N_functionid(expression, N_functionid, &functionid))
-		return FAIL;
-
-	result = DBselect("select distinct p.%s from host_profile p,items i,functions f"
-			" where p.hostid=i.hostid and i.itemid=f.itemid and f.functionid=" ZBX_FS_UI64,
-			fieldname,
-			functionid);
-
-	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
-	{
-		*replace_to = zbx_strdup(*replace_to, row[0]);
-
-		ret = SUCCEED;
-	}
-
-	DBfree_result(result);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: item_description                                                 *
  *                                                                            *
  * Purpose: substitute key parameters and user macros in                      *
@@ -966,6 +918,56 @@ static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 		zbx_free(*data);
 		*data = str_out;
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBget_host_profile_value                                         *
+ *                                                                            *
+ * Purpose: request host profile value by triggerid and field name            *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBget_host_profile_value(zbx_uint64_t triggerid, char **replace_to,
+		int N_functionid, const char *fieldname)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		expression[TRIGGER_EXPRESSION_LEN_MAX];
+	zbx_uint64_t	functionid;
+	int		ret = FAIL;
+
+	if (FAIL == DBget_trigger_expression_by_triggerid(triggerid, expression, sizeof(expression)))
+		return FAIL;
+
+	if (FAIL == trigger_get_N_functionid(expression, N_functionid, &functionid))
+		return FAIL;
+
+	result = DBselect(
+			"select p.%s"
+			" from host_profile p,items i,functions f"
+			" where p.hostid=i.hostid"
+				" and i.itemid=f.itemid"
+				" and f.functionid=" ZBX_FS_UI64,
+			fieldname,
+			functionid);
+
+	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
+	{
+		*replace_to = zbx_strdup(*replace_to, row[0]);
+		ret = SUCCEED;
+	}
+	DBfree_result(result);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -2081,7 +2083,7 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 #define MVAR_TRIGGER_SEVERITY		"{TRIGGER.SEVERITY}"
 #define MVAR_TRIGGER_NSEVERITY		"{TRIGGER.NSEVERITY}"
 #define MVAR_TRIGGER_STATUS		"{TRIGGER.STATUS}"
-#define MVAR_STATUS			"{STATUS}"			/* obsolete */
+#define MVAR_STATUS			"{STATUS}"			/* deprecated */
 #define MVAR_TRIGGER_VALUE		"{TRIGGER.VALUE}"
 #define MVAR_TRIGGER_URL		"{TRIGGER.URL}"
 
@@ -2092,7 +2094,7 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 
 #define MVAR_PROFILE				"{PROFILE."			/* a prefix for all profile macros */
 #define MVAR_PROFILE_TYPE			MVAR_PROFILE "TYPE}"
-#define MVAR_PROFILE_DEVICETYPE			MVAR_PROFILE "DEVICETYPE}"	/* obsolete */
+#define MVAR_PROFILE_DEVICETYPE			MVAR_PROFILE "DEVICETYPE}"	/* deprecated */
 #define MVAR_PROFILE_TYPE_FULL			MVAR_PROFILE "TYPE.FULL}"
 #define MVAR_PROFILE_NAME			MVAR_PROFILE "NAME}"
 #define MVAR_PROFILE_ALIAS			MVAR_PROFILE "ALIAS}"
@@ -2100,12 +2102,12 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 #define MVAR_PROFILE_OS_FULL			MVAR_PROFILE "OS.FULL}"
 #define MVAR_PROFILE_OS_SHORT			MVAR_PROFILE "OS.SHORT}"
 #define MVAR_PROFILE_SERIALNO_A			MVAR_PROFILE "SERIALNO.A}"
-#define MVAR_PROFILE_SERIALNO			MVAR_PROFILE "SERIALNO}"	/* obsolete */
+#define MVAR_PROFILE_SERIALNO			MVAR_PROFILE "SERIALNO}"	/* deprecated */
 #define MVAR_PROFILE_SERIALNO_B			MVAR_PROFILE "SERIALNO.B}"
 #define MVAR_PROFILE_TAG			MVAR_PROFILE "TAG}"
 #define MVAR_PROFILE_ASSET_TAG			MVAR_PROFILE "ASSET.TAG}"
 #define MVAR_PROFILE_MACADDRESS_A		MVAR_PROFILE "MACADDRESS.A}"
-#define MVAR_PROFILE_MACADDRESS			MVAR_PROFILE "MACADDRESS}"	/* obsolete */
+#define MVAR_PROFILE_MACADDRESS			MVAR_PROFILE "MACADDRESS}"	/* deprecated */
 #define MVAR_PROFILE_MACADDRESS_B		MVAR_PROFILE "MACADDRESS.B}"
 #define MVAR_PROFILE_HARDWARE			MVAR_PROFILE "HARDWARE}"
 #define MVAR_PROFILE_HARDWARE_FULL		MVAR_PROFILE "HARDWARE.FULL}"
@@ -2180,38 +2182,40 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 
 #define STR_UNKNOWN_VARIABLE		"*UNKNOWN*"
 
-static const char	*ex_macros[] = {MVAR_PROFILE_TYPE, MVAR_PROFILE_DEVICETYPE, MVAR_PROFILE_TYPE_FULL,
-		MVAR_PROFILE_NAME, MVAR_PROFILE_ALIAS, MVAR_PROFILE_OS, MVAR_PROFILE_OS_FULL, MVAR_PROFILE_OS_SHORT,
-		MVAR_PROFILE_SERIALNO_A, MVAR_PROFILE_SERIALNO, MVAR_PROFILE_SERIALNO_B, MVAR_PROFILE_TAG,
-		MVAR_PROFILE_ASSET_TAG, MVAR_PROFILE_MACADDRESS_A, MVAR_PROFILE_MACADDRESS, MVAR_PROFILE_MACADDRESS_B,
-		MVAR_PROFILE_HARDWARE, MVAR_PROFILE_HARDWARE_FULL, MVAR_PROFILE_SOFTWARE, MVAR_PROFILE_SOFTWARE_FULL,
-		MVAR_PROFILE_SOFTWARE_APP_A, MVAR_PROFILE_SOFTWARE_APP_B, MVAR_PROFILE_SOFTWARE_APP_C,
-		MVAR_PROFILE_SOFTWARE_APP_D, MVAR_PROFILE_SOFTWARE_APP_E, MVAR_PROFILE_CONTACT, MVAR_PROFILE_LOCATION,
-		MVAR_PROFILE_LOCATION_LAT, MVAR_PROFILE_LOCATION_LON, MVAR_PROFILE_NOTES, MVAR_PROFILE_CHASSIS,
-		MVAR_PROFILE_MODEL, MVAR_PROFILE_HW_ARCH, MVAR_PROFILE_VENDOR, MVAR_PROFILE_CONTRACT_NUMBER,
-		MVAR_PROFILE_INSTALLER_NAME, MVAR_PROFILE_DEPLOYMENT_STATUS, MVAR_PROFILE_URL_A, MVAR_PROFILE_URL_B,
-		MVAR_PROFILE_URL_C, MVAR_PROFILE_HOST_NETWORKS, MVAR_PROFILE_HOST_NETMASK, MVAR_PROFILE_HOST_ROUTER,
-		MVAR_PROFILE_OOB_IP, MVAR_PROFILE_OOB_NETMASK, MVAR_PROFILE_OOB_ROUTER, MVAR_PROFILE_HW_DATE_PURCHASE,
-		MVAR_PROFILE_HW_DATE_INSTALL, MVAR_PROFILE_HW_DATE_EXPIRY, MVAR_PROFILE_HW_DATE_DECOMM,
-		MVAR_PROFILE_SITE_ADDRESS_A, MVAR_PROFILE_SITE_ADDRESS_B, MVAR_PROFILE_SITE_ADDRESS_C,
-		MVAR_PROFILE_SITE_CITY, MVAR_PROFILE_SITE_STATE, MVAR_PROFILE_SITE_COUNTRY, MVAR_PROFILE_SITE_ZIP,
-		MVAR_PROFILE_SITE_RACK, MVAR_PROFILE_SITE_NOTES, MVAR_PROFILE_POC_PRIMARY_NAME,
-		MVAR_PROFILE_POC_PRIMARY_EMAIL, MVAR_PROFILE_POC_PRIMARY_PHONE_A, MVAR_PROFILE_POC_PRIMARY_PHONE_B,
-		MVAR_PROFILE_POC_PRIMARY_CELL, MVAR_PROFILE_POC_PRIMARY_SCREEN, MVAR_PROFILE_POC_PRIMARY_NOTES,
-		MVAR_PROFILE_POC_SECONDARY_NAME, MVAR_PROFILE_POC_SECONDARY_EMAIL, MVAR_PROFILE_POC_SECONDARY_PHONE_A,
-		MVAR_PROFILE_POC_SECONDARY_PHONE_B, MVAR_PROFILE_POC_SECONDARY_CELL, MVAR_PROFILE_POC_SECONDARY_SCREEN,
-		MVAR_PROFILE_POC_SECONDARY_NOTES, MVAR_PROFILE_TYPE, MVAR_PROFILE_DEVICETYPE, MVAR_PROFILE_NAME,
-		MVAR_PROFILE_OS,
-		MVAR_ITEM_NAME,
-		MVAR_HOSTNAME, MVAR_PROXY_NAME,
-		MVAR_TRIGGER_KEY,
-		MVAR_HOST_CONN, MVAR_HOST_DNS, MVAR_IPADDRESS,
-		MVAR_ITEM_LASTVALUE,
-		MVAR_ITEM_VALUE,
-		MVAR_ITEM_LOG_DATE, MVAR_ITEM_LOG_TIME, MVAR_ITEM_LOG_AGE, MVAR_ITEM_LOG_SOURCE,
-		MVAR_ITEM_LOG_SEVERITY, MVAR_ITEM_LOG_NSEVERITY, MVAR_ITEM_LOG_EVENTID,
-		MVAR_NODE_ID, MVAR_NODE_NAME,
-		NULL};
+static const char	*ex_macros[] =
+{
+	MVAR_PROFILE_TYPE, MVAR_PROFILE_DEVICETYPE, MVAR_PROFILE_TYPE_FULL,
+	MVAR_PROFILE_NAME, MVAR_PROFILE_ALIAS, MVAR_PROFILE_OS, MVAR_PROFILE_OS_FULL, MVAR_PROFILE_OS_SHORT,
+	MVAR_PROFILE_SERIALNO_A, MVAR_PROFILE_SERIALNO, MVAR_PROFILE_SERIALNO_B, MVAR_PROFILE_TAG,
+	MVAR_PROFILE_ASSET_TAG, MVAR_PROFILE_MACADDRESS_A, MVAR_PROFILE_MACADDRESS, MVAR_PROFILE_MACADDRESS_B,
+	MVAR_PROFILE_HARDWARE, MVAR_PROFILE_HARDWARE_FULL, MVAR_PROFILE_SOFTWARE, MVAR_PROFILE_SOFTWARE_FULL,
+	MVAR_PROFILE_SOFTWARE_APP_A, MVAR_PROFILE_SOFTWARE_APP_B, MVAR_PROFILE_SOFTWARE_APP_C,
+	MVAR_PROFILE_SOFTWARE_APP_D, MVAR_PROFILE_SOFTWARE_APP_E, MVAR_PROFILE_CONTACT, MVAR_PROFILE_LOCATION,
+	MVAR_PROFILE_LOCATION_LAT, MVAR_PROFILE_LOCATION_LON, MVAR_PROFILE_NOTES, MVAR_PROFILE_CHASSIS,
+	MVAR_PROFILE_MODEL, MVAR_PROFILE_HW_ARCH, MVAR_PROFILE_VENDOR, MVAR_PROFILE_CONTRACT_NUMBER,
+	MVAR_PROFILE_INSTALLER_NAME, MVAR_PROFILE_DEPLOYMENT_STATUS, MVAR_PROFILE_URL_A, MVAR_PROFILE_URL_B,
+	MVAR_PROFILE_URL_C, MVAR_PROFILE_HOST_NETWORKS, MVAR_PROFILE_HOST_NETMASK, MVAR_PROFILE_HOST_ROUTER,
+	MVAR_PROFILE_OOB_IP, MVAR_PROFILE_OOB_NETMASK, MVAR_PROFILE_OOB_ROUTER, MVAR_PROFILE_HW_DATE_PURCHASE,
+	MVAR_PROFILE_HW_DATE_INSTALL, MVAR_PROFILE_HW_DATE_EXPIRY, MVAR_PROFILE_HW_DATE_DECOMM,
+	MVAR_PROFILE_SITE_ADDRESS_A, MVAR_PROFILE_SITE_ADDRESS_B, MVAR_PROFILE_SITE_ADDRESS_C,
+	MVAR_PROFILE_SITE_CITY, MVAR_PROFILE_SITE_STATE, MVAR_PROFILE_SITE_COUNTRY, MVAR_PROFILE_SITE_ZIP,
+	MVAR_PROFILE_SITE_RACK, MVAR_PROFILE_SITE_NOTES, MVAR_PROFILE_POC_PRIMARY_NAME,
+	MVAR_PROFILE_POC_PRIMARY_EMAIL, MVAR_PROFILE_POC_PRIMARY_PHONE_A, MVAR_PROFILE_POC_PRIMARY_PHONE_B,
+	MVAR_PROFILE_POC_PRIMARY_CELL, MVAR_PROFILE_POC_PRIMARY_SCREEN, MVAR_PROFILE_POC_PRIMARY_NOTES,
+	MVAR_PROFILE_POC_SECONDARY_NAME, MVAR_PROFILE_POC_SECONDARY_EMAIL, MVAR_PROFILE_POC_SECONDARY_PHONE_A,
+	MVAR_PROFILE_POC_SECONDARY_PHONE_B, MVAR_PROFILE_POC_SECONDARY_CELL, MVAR_PROFILE_POC_SECONDARY_SCREEN,
+	MVAR_PROFILE_POC_SECONDARY_NOTES,
+	MVAR_ITEM_NAME,
+	MVAR_HOSTNAME, MVAR_PROXY_NAME,
+	MVAR_TRIGGER_KEY,
+	MVAR_HOST_CONN, MVAR_HOST_DNS, MVAR_IPADDRESS,
+	MVAR_ITEM_LASTVALUE,
+	MVAR_ITEM_VALUE,
+	MVAR_ITEM_LOG_DATE, MVAR_ITEM_LOG_TIME, MVAR_ITEM_LOG_AGE, MVAR_ITEM_LOG_SOURCE,
+	MVAR_ITEM_LOG_SEVERITY, MVAR_ITEM_LOG_NSEVERITY, MVAR_ITEM_LOG_EVENTID,
+	MVAR_NODE_ID, MVAR_NODE_NAME,
+	NULL
+};
 
 /******************************************************************************
  *                                                                            *
@@ -2232,145 +2236,145 @@ static const char	*ex_macros[] = {MVAR_PROFILE_TYPE, MVAR_PROFILE_DEVICETYPE, MV
 static int	get_host_profile(const char *macro, zbx_uint64_t triggerid, char **replace_to, int N_functionid)
 {
 	if (0 == strcmp(macro, MVAR_PROFILE_TYPE) || 0 == strcmp(macro, MVAR_PROFILE_DEVICETYPE))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "type");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "type");
 	else if (0 == strcmp(macro, MVAR_PROFILE_TYPE_FULL))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "type_full");
-	else if (0 == strcmp(macro, MVAR_PROFILE_ALIAS))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "alias");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "type_full");
 	else if (0 == strcmp(macro, MVAR_PROFILE_NAME))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "name");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "name");
+	else if (0 == strcmp(macro, MVAR_PROFILE_ALIAS))
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "alias");
 	else if (0 == strcmp(macro, MVAR_PROFILE_OS))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "os");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "os");
 	else if (0 == strcmp(macro, MVAR_PROFILE_OS_FULL))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "os_full");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "os_full");
 	else if (0 == strcmp(macro, MVAR_PROFILE_OS_SHORT))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "os_short");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "os_short");
 	else if (0 == strcmp(macro, MVAR_PROFILE_SERIALNO_A))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "serialno_a");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "serialno_a");
 	else if (0 == strcmp(macro, MVAR_PROFILE_SERIALNO) || 0 == strcmp(macro, MVAR_PROFILE_SERIALNO_B))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "serialno_b");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "serialno_b");
 	else if (0 == strcmp(macro, MVAR_PROFILE_TAG))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "tag");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "tag");
 	else if (0 == strcmp(macro, MVAR_PROFILE_ASSET_TAG))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "asset_tag");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "asset_tag");
 	else if (0 == strcmp(macro, MVAR_PROFILE_MACADDRESS_A))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "macaddress_a");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "macaddress_a");
 	else if (0 == strcmp(macro, MVAR_PROFILE_MACADDRESS) || 0 == strcmp(macro, MVAR_PROFILE_MACADDRESS_B))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "macaddress_b");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "macaddress_b");
 	else if (0 == strcmp(macro, MVAR_PROFILE_HARDWARE))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "hardware");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "hardware");
 	else if (0 == strcmp(macro, MVAR_PROFILE_HARDWARE_FULL))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "hardware_full");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "hardware_full");
 	else if (0 == strcmp(macro, MVAR_PROFILE_SOFTWARE))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "software");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "software");
 	else if (0 == strcmp(macro, MVAR_PROFILE_SOFTWARE_FULL))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "software_full");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "software_full");
 	else if (0 == strcmp(macro, MVAR_PROFILE_SOFTWARE_APP_A))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "software_app_a");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "software_app_a");
 	else if (0 == strcmp(macro, MVAR_PROFILE_SOFTWARE_APP_B))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "software_app_b");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "software_app_b");
 	else if (0 == strcmp(macro, MVAR_PROFILE_SOFTWARE_APP_C))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "software_app_c");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "software_app_c");
 	else if (0 == strcmp(macro, MVAR_PROFILE_SOFTWARE_APP_D))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "software_app_d");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "software_app_d");
 	else if (0 == strcmp(macro, MVAR_PROFILE_SOFTWARE_APP_E))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "software_app_e");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "software_app_e");
 	else if (0 == strcmp(macro, MVAR_PROFILE_CONTACT))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "contact");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "contact");
 	else if (0 == strcmp(macro, MVAR_PROFILE_LOCATION))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "location");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "location");
 	else if (0 == strcmp(macro, MVAR_PROFILE_LOCATION_LAT))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "location_lat");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "location_lat");
 	else if (0 == strcmp(macro, MVAR_PROFILE_LOCATION_LON))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "location_lon");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "location_lon");
 	else if (0 == strcmp(macro, MVAR_PROFILE_NOTES))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "notes");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "notes");
 	else if (0 == strcmp(macro, MVAR_PROFILE_CHASSIS))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "chassis");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "chassis");
 	else if (0 == strcmp(macro, MVAR_PROFILE_MODEL))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "model");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "model");
 	else if (0 == strcmp(macro, MVAR_PROFILE_HW_ARCH))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "hw_arch");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "hw_arch");
 	else if (0 == strcmp(macro, MVAR_PROFILE_VENDOR))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "vendor");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "vendor");
 	else if (0 == strcmp(macro, MVAR_PROFILE_CONTRACT_NUMBER))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "contract_number");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "contract_number");
 	else if (0 == strcmp(macro, MVAR_PROFILE_INSTALLER_NAME))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "installer_name");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "installer_name");
 	else if (0 == strcmp(macro, MVAR_PROFILE_DEPLOYMENT_STATUS))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "deployment_status");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "deployment_status");
 	else if (0 == strcmp(macro, MVAR_PROFILE_URL_A))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "url_a");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "url_a");
 	else if (0 == strcmp(macro, MVAR_PROFILE_URL_B))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "url_b");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "url_b");
 	else if (0 == strcmp(macro, MVAR_PROFILE_URL_C))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "url_c");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "url_c");
 	else if (0 == strcmp(macro, MVAR_PROFILE_HOST_NETWORKS))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "host_networks");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "host_networks");
 	else if (0 == strcmp(macro, MVAR_PROFILE_HOST_NETMASK))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "host_netmask");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "host_netmask");
 	else if (0 == strcmp(macro, MVAR_PROFILE_HOST_ROUTER))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "host_router");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "host_router");
 	else if (0 == strcmp(macro, MVAR_PROFILE_OOB_IP))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "oob_ip");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "oob_ip");
 	else if (0 == strcmp(macro, MVAR_PROFILE_OOB_NETMASK))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "oob_netmask");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "oob_netmask");
 	else if (0 == strcmp(macro, MVAR_PROFILE_OOB_ROUTER))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "oob_router");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "oob_router");
 	else if (0 == strcmp(macro, MVAR_PROFILE_HW_DATE_PURCHASE))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "date_hw_purchase");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "date_hw_purchase");
 	else if (0 == strcmp(macro, MVAR_PROFILE_HW_DATE_INSTALL))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "date_hw_install");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "date_hw_install");
 	else if (0 == strcmp(macro, MVAR_PROFILE_HW_DATE_EXPIRY))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "date_hw_expiry");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "date_hw_expiry");
 	else if (0 == strcmp(macro, MVAR_PROFILE_HW_DATE_DECOMM))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "date_hw_decomm");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "date_hw_decomm");
 	else if (0 == strcmp(macro, MVAR_PROFILE_SITE_ADDRESS_A))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "site_address_a");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "site_address_a");
 	else if (0 == strcmp(macro, MVAR_PROFILE_SITE_ADDRESS_B))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "site_address_b");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "site_address_b");
 	else if (0 == strcmp(macro, MVAR_PROFILE_SITE_ADDRESS_C))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "site_address_c");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "site_address_c");
 	else if (0 == strcmp(macro, MVAR_PROFILE_SITE_CITY))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "site_city");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "site_city");
 	else if (0 == strcmp(macro, MVAR_PROFILE_SITE_STATE))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "site_state");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "site_state");
 	else if (0 == strcmp(macro, MVAR_PROFILE_SITE_COUNTRY))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "site_country");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "site_country");
 	else if (0 == strcmp(macro, MVAR_PROFILE_SITE_ZIP))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "site_zip");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "site_zip");
 	else if (0 == strcmp(macro, MVAR_PROFILE_SITE_RACK))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "site_rack");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "site_rack");
 	else if (0 == strcmp(macro, MVAR_PROFILE_SITE_NOTES))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "site_notes");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "site_notes");
 	else if (0 == strcmp(macro, MVAR_PROFILE_POC_PRIMARY_NAME))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "poc_1_name");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "poc_1_name");
 	else if (0 == strcmp(macro, MVAR_PROFILE_POC_PRIMARY_EMAIL))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "poc_1_email");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "poc_1_email");
 	else if (0 == strcmp(macro, MVAR_PROFILE_POC_PRIMARY_PHONE_A))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "poc_1_phone_a");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "poc_1_phone_a");
 	else if (0 == strcmp(macro, MVAR_PROFILE_POC_PRIMARY_PHONE_B))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "poc_1_phone_b");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "poc_1_phone_b");
 	else if (0 == strcmp(macro, MVAR_PROFILE_POC_PRIMARY_CELL))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "poc_1_cell");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "poc_1_cell");
 	else if (0 == strcmp(macro, MVAR_PROFILE_POC_PRIMARY_SCREEN))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "poc_1_screen");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "poc_1_screen");
 	else if (0 == strcmp(macro, MVAR_PROFILE_POC_PRIMARY_NOTES))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "poc_1_notes");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "poc_1_notes");
 	else if (0 == strcmp(macro, MVAR_PROFILE_POC_SECONDARY_NAME))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "poc_2_name");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "poc_2_name");
 	else if (0 == strcmp(macro, MVAR_PROFILE_POC_SECONDARY_EMAIL))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "poc_2_email");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "poc_2_email");
 	else if (0 == strcmp(macro, MVAR_PROFILE_POC_SECONDARY_PHONE_A))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "poc_2_phone_a");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "poc_2_phone_a");
 	else if (0 == strcmp(macro, MVAR_PROFILE_POC_SECONDARY_PHONE_B))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "poc_2_phone_b");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "poc_2_phone_b");
 	else if (0 == strcmp(macro, MVAR_PROFILE_POC_SECONDARY_CELL))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "poc_2_cell");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "poc_2_cell");
 	else if (0 == strcmp(macro, MVAR_PROFILE_POC_SECONDARY_SCREEN))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "poc_2_screen");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "poc_2_screen");
 	else if (0 == strcmp(macro, MVAR_PROFILE_POC_SECONDARY_NOTES))
-		return get_host_profile_value(triggerid, replace_to, N_functionid, "poc_2_notes");
+		return DBget_host_profile_value(triggerid, replace_to, N_functionid, "poc_2_notes");
 
 	return SUCCEED;
 }
