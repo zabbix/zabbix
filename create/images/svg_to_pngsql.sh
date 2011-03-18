@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# A script to convert SVG into multiple sizes of PNG, compress them with pngcrush and create SQL to import in the database
+# MySQL only for now
+
 outputdir=output_png
 pngcrushlog=pngcrush.log.txt
 pngcrushbin=pngcrush
@@ -10,10 +13,10 @@ sqlfile=images_mysql.sql
 mkdir -p "$outputdir"
 
 for svgfile in $elementdir/*.svg; do
-	echo "converting $svgfile"
+	echo -n "Converting $svgfile"
 	for size in 24 48 64 96 128; do
 		pngoutfile="$outputdir/$(basename ${svgfile%.svg}) ($size).png"
-		echo "converting $pngoutfile to size $size"
+		echo -n " to size $size..."
 		# we have to query image dimensions first, because export dimensions are used "as-is", resulting in a aquare rackmountable server, for example
 		# inkscape option --query-all could be used, but it's not fully clear which layer is supposed to be "whole image"
 		# crudely dropping decimal part, bash fails on it
@@ -26,8 +29,11 @@ for svgfile in $elementdir/*.svg; do
 		$pngcrushbin -brute -reduce -e .2.png "$pngoutfile" >> $pngcrushoutput || exit 1
 		echo "$pngoutfile : $(echo "$(stat -c %s "${pngoutfile%png}2.png")/$(stat -c %s "${pngoutfile}")*100" | bc -l)" >> $pngcrushlog
 		mv "${pngoutfile%png}2.png" "$pngoutfile"
+		echo
 	done
 done
+
+echo "Compressing images with pngcrush"
 
 for imagefile in $outputdir/*.png; do
 	((imagecount++))
