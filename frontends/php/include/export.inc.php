@@ -224,6 +224,55 @@ class zbxXML{
 		)
 	);
 
+	protected static function mapProfileName($name){
+		$map = array(
+			'devicetype' => 'type',
+			'serialno' => 'serialno_a',
+			'macaddress' => 'macaddress_a',
+			'hardware' => 'hardware_full',
+			'software' => 'software_full',
+			'device_type' => 'type_full',
+			'device_alias' => 'alias',
+			'device_os' => 'os_full',
+			'device_os_short' => 'os_short',
+			'device_serial' => 'serialno_b',
+			'device_tag' => 'asset_tag',
+			'ip_macaddress' => 'macaddress_b',
+			'device_hardware' => 'hardware',
+			'device_software' => 'software',
+			'device_app_01' => 'software_app_a',
+			'device_app_02' => 'software_app_b',
+			'device_app_03' => 'software_app_c',
+			'device_app_04' => 'software_app_d',
+			'device_app_05' => 'software_app_e',
+			'device_chassis' => 'chassis',
+			'device_model' => 'model',
+			'device_hw_arch' => 'hw_arch',
+			'device_vendor' => 'vendor',
+			'device_contract' => 'contract_number',
+			'device_who' => 'installer_name',
+			'device_status' => 'deployment_status',
+			'device_url_1' => 'url_a',
+			'device_url_2' => 'url_b',
+			'device_url_3' => 'url_c',
+			'device_networks' => 'host_networks',
+			'ip_subnet_mask' => 'host_netmask',
+			'ip_router' => 'host_router',
+			'oob_subnet_mask' => 'oob_netmask',
+			'date_hw_buy' => 'date_hw_purchase',
+			'site_street_1' => 'site_address_a',
+			'site_street_2' => 'site_address_b',
+			'site_street_3' => 'site_address_c',
+			'poc_1_phone_1' => 'poc_1_phone_a',
+			'poc_1_phone_2' => 'poc_1_phone_b',
+			'poc_2_phone_1' => 'poc_2_phone_a',
+			'poc_2_phone_2' => 'poc_2_phone_b',
+			'device_notes' => 'notes',
+		);
+
+		return isset($map[$name]) ? $map[$name] : $name;
+	}
+
 	protected static function createDOMDocument(){
 		$doc = new DOMDocument('1.0', 'UTF-8');
 		$doc->preserveWhiteSpace = false;
@@ -820,17 +869,19 @@ class zbxXML{
 		$triggers_for_dependencies = array();
 
 		try{
-
 			if(isset($rules['host']['exist']) || isset($rules['host']['missed'])){
 				$xpath = new DOMXPath(self::$xml);
 
 				$hosts = $xpath->query('hosts/host');
 
-				foreach($hosts as $hnum => $host){
+				foreach($hosts as $host){
 					$host_db = self::mapXML2arr($host, XML_TAG_HOST);
 
 					if(!isset($host_db['status'])) $host_db['status'] = HOST_STATUS_TEMPLATE;
-					$current_host = ($host_db['status'] == HOST_STATUS_TEMPLATE) ? API::Template()->exists($host_db) : API::Host()->exists($host_db);
+					$current_host = ($host_db['status'] == HOST_STATUS_TEMPLATE)
+							? API::Template()->exists($host_db)
+							: API::Host()->exists($host_db);
+
 					if(!$current_host && !isset($rules['host']['missed'])){
 						info('Host ['.$host_db['host'].'] skipped - user rule');
 						continue; // break if update nonexist
@@ -1058,19 +1109,34 @@ class zbxXML{
 
 
 // HOST PROFILES {{{
-					$profile_node = $xpath->query('host_profile/*', $host);
-					if($profile_node->length > 0){
+					if($old_version_input){
 						$host_db['profile'] = array();
-						foreach($profile_node as $num => $field){
-							$host_db['profile'][$field->nodeName] = $field->nodeValue;
+						$profile_node = $xpath->query('host_profile/*', $host);
+						if($profile_node->length > 0){
+							foreach($profile_node as $field){
+								$newProfileName = self::mapProfileName($field->nodeName);
+								if(isset($host_db['profile'][$newProfileName])){
+									$host_db['profile'][$newProfileName] .= "\n";
+									$host_db['profile'][$newProfileName] .= $field->nodeValue;
+								}
+								else{
+									$host_db['profile'][$newProfileName] = $field->nodeValue;
+								}
+							}
 						}
-					}
 
-					$profile_ext_node = $xpath->query('host_profiles_ext/*', $host);
-					if($profile_ext_node->length > 0){
-						$host_db['extendedProfile'] = array();
-						foreach($profile_ext_node as $num => $field){
-							$host_db['extendedProfile'][$field->nodeName] = $field->nodeValue;
+						$profile_ext_node = $xpath->query('host_profiles_ext/*', $host);
+						if($profile_ext_node->length > 0){
+							foreach($profile_ext_node as $field){
+								$newProfileName = self::mapProfileName($field->nodeName);
+								if(isset($host_db['profile'][$newProfileName])){
+									$host_db['profile'][$newProfileName] .= "\n";
+									$host_db['profile'][$newProfileName] .= $field->nodeValue;
+								}
+								else{
+									$host_db['profile'][$newProfileName] = $field->nodeValue;
+								}
+							}
 						}
 					}
 // }}} HOST PROFILES

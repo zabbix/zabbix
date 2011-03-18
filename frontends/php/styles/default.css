@@ -58,6 +58,7 @@ form { margin: 0 }
 /**************** OTHERS ****************/
 
 .hidden { display: none; }
+.pre {white-space: pre; }
 
 /* ALIGN */
 .floatleft {float: left;}

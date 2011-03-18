@@ -5,6 +5,7 @@ New features:
  - [ZBX-1357] Updated Latvian and Russian translations; thanks to Zabbix translators (Richlv)
  - [ZBXNEXT-696] Added support for {IPADDRESS}, {HOST.DNS} and {HOST.CONN} macros in trigger names (rudolfs)
  - [ZBX-3495] fixed interfaceid updated to null when link template (Vedmak)
+ - [ZBXNEXT-676] merged host profile and extended host profile (Sasha, Vedmak)
 
 --------------------------------------------------------------------------------
 Changes for 1.9.2
