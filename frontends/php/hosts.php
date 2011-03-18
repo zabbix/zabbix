@@ -71,21 +71,7 @@ include_once('include/page_header.php');
 		'mass_clear_tpls'=>		array(T_ZBX_STR, O_OPT, NULL, 			NULL,	NULL),
 
 		'useprofile'=>		array(T_ZBX_STR, O_OPT, NULL, 			NULL,	NULL),
-		'devicetype'=>		array(T_ZBX_STR, O_OPT, NULL, 			NULL,	NULL),
-		'name'=>			array(T_ZBX_STR, O_OPT, NULL, 			NULL,	NULL),
-		'os'=>				array(T_ZBX_STR, O_OPT, NULL, 			NULL,	NULL),
-		'serialno'=>		array(T_ZBX_STR, O_OPT, NULL, 			NULL,	NULL),
-		'tag'=>				array(T_ZBX_STR, O_OPT, NULL,			NULL,	NULL),
-		'macaddress'=>		array(T_ZBX_STR, O_OPT, NULL, 			NULL,	NULL),
-		'hardware'=>		array(T_ZBX_STR, O_OPT, NULL, 			NULL,	NULL),
-		'software'=>		array(T_ZBX_STR, O_OPT, NULL, 			NULL,	NULL),
-		'contact'=>			array(T_ZBX_STR, O_OPT, NULL,			NULL,	NULL),
-		'location'=>		array(T_ZBX_STR, O_OPT, NULL, 			NULL,	NULL),
-		'notes'=>			array(T_ZBX_STR, O_OPT, NULL, 			NULL,	NULL),
 		'host_profile'=> 	array(T_ZBX_STR, O_OPT, P_UNSET_EMPTY,	NULL,   NULL),
-
-		'useprofile_ext'=>		array(T_ZBX_STR, O_OPT, null,   null,	null),
-		'ext_host_profiles'=> 	array(T_ZBX_STR, O_OPT, P_UNSET_EMPTY,   null,   null),
 
 		'macros_rem'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   null,	null),
 		'macros'=>				array(T_ZBX_STR, O_OPT, P_SYS,   null,	null),
@@ -167,7 +153,7 @@ include_once('include/page_header.php');
 			'hostids' => $hostids,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => 1,
-			'select_profile' => 1
+			'selectProfile' => true
 		);
 		$hosts = API::Host()->get($params);
 		order_result($hosts, 'host');
@@ -304,7 +290,7 @@ include_once('include/page_header.php');
 		$result = zbxXML::import($_FILES['import_file']['tmp_name']);
 		if($result) $result = zbxXML::parseMain($rules);
 		$result = DBend($result);
-		show_messages($result, S_IMPORTED.SPACE.S_SUCCESSEFULLY_SMALL, S_IMPORT.SPACE.S_FAILED_SMALL);
+		show_messages($result, _('Imported successfully'), _('Import failed'));
 	}
 
 /* FILTER */
@@ -376,10 +362,6 @@ include_once('include/page_header.php');
 			if(isset($visible['useprofile'])){
 				$new_values['profile'] = get_request('useprofile', false) ? get_request('host_profile', array()) : array();
 			}
-
-			if(isset($visible['useprofile_ext'])){
-				$new_values['extendedProfile'] = get_request('useprofile_ext', false) ? get_request('ext_host_profiles', array()) : array();
-			}
 // }}} PROFILES
 
 			$newgroup = array();
@@ -436,7 +418,7 @@ include_once('include/page_header.php');
 
 			DBend(true);
 
-			show_messages(true, S_HOSTS.SPACE.S_UPDATED, S_CANNOT_UPDATE.SPACE.S_HOSTS);
+			show_messages(true, _('Hosts updated'), null);
 
 			unset($_REQUEST['massupdate']);
 			unset($_REQUEST['form']);
@@ -448,7 +430,7 @@ include_once('include/page_header.php');
 		}
 		catch(Exception $e){
 			DBend(false);
-			show_messages(false, S_HOSTS.SPACE.S_UPDATED, S_CANNOT_UPDATE.SPACE.S_HOSTS);
+			show_messages(false, null, _('Cannot update hosts'));
 		}
 
 		unset($_REQUEST['save']);
@@ -467,13 +449,13 @@ include_once('include/page_header.php');
 
 			if(isset($_REQUEST['hostid']) && $_REQUEST['form'] != 'full_clone'){
 				$create_new = false;
-				$msg_ok = S_HOST_UPDATED;
-				$msg_fail = S_CANNOT_UPDATE_HOST;
+				$msg_ok = _('Host updated');
+				$msg_fail = _('Cannot update host');
 			}
 			else{
 				$create_new = true;
-				$msg_ok = S_HOST_ADDED;
-				$msg_fail = S_CANNOT_ADD_HOST;
+				$msg_ok = _('Host added');
+				$msg_fail = _('Cannot add host');
 			}
 
 			$clone_hostid = false;
@@ -521,23 +503,6 @@ include_once('include/page_header.php');
 			}
 			$groups = zbx_toObject($groups, 'groupid');
 
-			$profile = array();
-			if(get_request('useprofile', 'no') == 'yes'){
-				$profile = array(
-					'devicetype' => $_REQUEST['devicetype'],
-					'name' => $_REQUEST['name'],
-					'os' => $_REQUEST['os'],
-					'serialno' => $_REQUEST['serialno'],
-					'tag' => $_REQUEST['tag'],
-					'macaddress' => $_REQUEST['macaddress'],
-					'hardware' => $_REQUEST['hardware'],
-					'software' => $_REQUEST['software'],
-					'contact' => $_REQUEST['contact'],
-					'location' => $_REQUEST['location'],
-					'notes' => $_REQUEST['notes']
-				);
-			}
-
 			$host = array(
 				'host' => $_REQUEST['host'],
 				'status' => $_REQUEST['status'],
@@ -550,8 +515,7 @@ include_once('include/page_header.php');
 				'templates' => $templates,
 				'interfaces' => $interfaces,
 				'macros' => $macros,
-				'profile' => $profile,
-				'extendedProfile' => (get_request('useprofile_ext', 'no') == 'yes') ? get_request('ext_host_profiles', array()) : array(),
+				'profile' => (get_request('useprofile', 'no') == 'yes') ? get_request('host_profile', array()) : array(),
 			);
 
 			if($create_new){
@@ -641,7 +605,7 @@ include_once('include/page_header.php');
 		$result = API::Host()->delete(array('hostid' => $_REQUEST['hostid']));
 		$result = DBend($result);
 
-		show_messages($result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
+		show_messages($result, _('Host deleted'), _('Cannot delete host'));
 
 		if($result){
 			unset($_REQUEST['form']);
@@ -655,7 +619,7 @@ include_once('include/page_header.php');
 			$result = update_host_status($_REQUEST['hostid'], $_REQUEST['chstatus']);
 		$result = DBend($result);
 
-		show_messages($result,S_HOST_STATUS_UPDATED,S_CANNOT_UPDATE_HOST_STATUS);
+		show_messages($result, _('Host status updated'), _('Cannot update host status'));
 
 		unset($_REQUEST['chstatus']);
 		unset($_REQUEST['hostid']);
@@ -669,7 +633,7 @@ include_once('include/page_header.php');
 		DBstart();
 		$go_result = API::Host()->delete(zbx_toObject($hostids,'hostid'));
 		$go_result = DBend($go_result);
-		show_messages($go_result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
+		show_messages($go_result, _('Host deleted'), _('Cannot delete host'));
 	}
 // ACTIVATE/DISABLE HOSTS
 	else if(str_in_array($_REQUEST['go'], array('activate', 'disable'))){
@@ -683,7 +647,7 @@ include_once('include/page_header.php');
 		$go_result = update_host_status($act_hosts, $status);
 		$go_result = DBend($go_result);
 
-		show_messages($go_result, S_HOST_STATUS_UPDATED, S_CANNOT_UPDATE_HOST);
+		show_messages($go_result, _('Host status updated'), _('Cannot update host status'));
 	}
 
 	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
@@ -739,12 +703,12 @@ include_once('include/page_header.php');
 		$frmGroup = new CForm();
 		$frmGroup->setMethod('get');
 
-		$frmGroup->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB()));
+		$frmGroup->addItem(array(_('Group'), $pageFilter->getGroupsCB()));
 
 		$numrows = new CDiv();
 		$numrows->setAttribute('name', 'numrows');
 
-		$hosts_wdgt->addHeader(S_CONFIGURATION_OF_HOSTS, $frmGroup);
+		$hosts_wdgt->addHeader(_('CONFIGURATION OF HOSTS'), $frmGroup);
 		$hosts_wdgt->addHeader($numrows, $frmForm);
 
 // HOSTS FILTER {{{
@@ -756,10 +720,10 @@ include_once('include/page_header.php');
 			array(bold(S_PORT.': '), new CTextBox('filter_port', $_REQUEST['filter_port'], 20))
 		));
 
-		$reset = new CSpan( S_RESET,'link_menu');
+		$reset = new CSpan(_('Reset'), 'link_menu');
 		$reset->onClick("javascript: clearAllForm('zbx_filter');");
 
-		$filter = new CButton('filter',S_FILTER,"javascript: create_var('zbx_filter', 'filter_set', '1', true);");
+		$filter = new CButton('filter', _('Filter'), "javascript: create_var('zbx_filter', 'filter_set', '1', true);");
 		$filter->useJQueryStyle();
 
 		$footer_col = new CCol(array($filter, SPACE, SPACE, SPACE, $reset), 'center');
@@ -779,19 +743,19 @@ include_once('include/page_header.php');
 		$form = new CForm();
 		$form->setName('hosts');
 
-		$table = new CTableInfo(S_NO_HOSTS_DEFINED);
+		$table = new CTableInfo(_('No hosts defined'));
 		$table->setHeader(array(
 			new CCheckBox('all_hosts', null, "checkAll('" . $form->getName() . "','all_hosts','hosts');"),
-			make_sorting_header(S_NAME, 'host'),
-			S_APPLICATIONS,
-			S_ITEMS,
-			S_TRIGGERS,
-			S_GRAPHS,
-			S_DISCOVERY,
-			S_INTERFACE,
-			S_TEMPLATES,
-			make_sorting_header(S_STATUS, 'status'),
-			S_AVAILABILITY
+			make_sorting_header(_('Name'), 'host'),
+			_('Applications'),
+			_('Items'),
+			_('Triggers'),
+			_('Graphs'),
+			_('Discovery'),
+			_('Interface'),
+			_('Templates'),
+			make_sorting_header(_('Status'), 'status'),
+			_('Availability')
 		));
 
 // get Hosts
@@ -865,15 +829,15 @@ include_once('include/page_header.php');
 		foreach($hosts as $num => $host){
 			$interface = reset($host['interfaces']);
 
-			$applications = array(new CLink(S_APPLICATIONS, 'applications.php?groupid='.$_REQUEST['groupid'].'&hostid='.$host['hostid']),
+			$applications = array(new CLink(_('Applications'), 'applications.php?groupid='.$_REQUEST['groupid'].'&hostid='.$host['hostid']),
 				' ('.$host['applications'].')');
-			$items = array(new CLink(S_ITEMS, 'items.php?filter_set=1&hostid='.$host['hostid']),
+			$items = array(new CLink(_('Items'), 'items.php?filter_set=1&hostid='.$host['hostid']),
 				' ('.$host['items'].')');
-			$triggers = array(new CLink(S_TRIGGERS, 'triggers.php?groupid='.$_REQUEST['groupid'].'&hostid='.$host['hostid']),
+			$triggers = array(new CLink(_('Triggers'), 'triggers.php?groupid='.$_REQUEST['groupid'].'&hostid='.$host['hostid']),
 				' ('.$host['triggers'].')');
-			$graphs = array(new CLink(S_GRAPHS, 'graphs.php?groupid='.$_REQUEST['groupid'].'&hostid='.$host['hostid']),
+			$graphs = array(new CLink(_('Graphs'), 'graphs.php?groupid='.$_REQUEST['groupid'].'&hostid='.$host['hostid']),
 				' ('.$host['graphs'].')');
-			$discoveries = array(new CLink(S_DISCOVERY, 'host_discovery.php?&hostid='.$host['hostid']),
+			$discoveries = array(new CLink(_('Discovery'), 'host_discovery.php?&hostid='.$host['hostid']),
 				' ('.$host['discoveries'].')');
 
 			$description = array();
@@ -895,26 +859,26 @@ include_once('include/page_header.php');
 			switch($host['status']){
 				case HOST_STATUS_MONITORED:
 					if($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON){
-						$status_caption = S_IN_MAINTENANCE;
+						$status_caption = _('In maintenance');
 						$status_class = 'orange';
 					}
 					else{
-						$status_caption = S_MONITORED;
+						$status_caption = _('Monitored');
 						$status_class = 'enabled';
 					}
 
-					$status_script = 'return Confirm('.zbx_jsvalue(S_DISABLE_HOST.'?').');';
+					$status_script = 'return Confirm('.zbx_jsvalue(_('Disable host?')).');';
 					$status_url = 'hosts.php?hosts%5B%5D='.$host['hostid'].'&go=disable'.url_param('groupid');
 					break;
 				case HOST_STATUS_NOT_MONITORED:
-					$status_caption = S_NOT_MONITORED;
+					$status_caption = _('Not monitored');
 					$status_url = 'hosts.php?hosts%5B%5D='.$host['hostid'].'&go=activate'.url_param('groupid');
-					$status_script = 'return Confirm('.zbx_jsvalue(S_ENABLE_HOST.'?').');';
+					$status_script = 'return Confirm('.zbx_jsvalue(_('Enable host?')).');';
 					$status_class = 'disabled';
 					break;
 				default:
-					$status_caption = S_UNKNOWN;
-					$status_script = 'return Confirm('.zbx_jsvalue(S_DISABLE_HOST.'?').');';
+					$status_caption = _('Unknown');
+					$status_script = 'return Confirm('.zbx_jsvalue(_('Disable host?')).');';
 					$status_url = 'hosts.php?hosts%5B%5D='.$host['hostid'].'&go=disable'.url_param('groupid');
 					$status_class = 'unknown';
 			}
@@ -1010,23 +974,23 @@ include_once('include/page_header.php');
 
 //----- GO ------
 		$goBox = new CComboBox('go');
-		$goBox->addItem('export', S_EXPORT_SELECTED);
-		$goBox->addItem('massupdate',S_MASS_UPDATE);
+		$goBox->addItem('export', _('Export selected'));
+		$goBox->addItem('massupdate', _('Mass update'));
 
-		$goOption = new CComboItem('activate',S_ACTIVATE_SELECTED);
-		$goOption->setAttribute('confirm',S_ENABLE_SELECTED_HOSTS);
+		$goOption = new CComboItem('activate', _('Activate selected'));
+		$goOption->setAttribute('confirm', _('Activate selected hosts?'));
 		$goBox->addItem($goOption);
 
-		$goOption = new CComboItem('disable',S_DISABLE_SELECTED);
-		$goOption->setAttribute('confirm',S_DISABLE_SELECTED_HOSTS_Q);
+		$goOption = new CComboItem('disable', _('Disable selected'));
+		$goOption->setAttribute('confirm', _('Disable selected hosts?'));
 		$goBox->addItem($goOption);
 
-		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
-		$goOption->setAttribute('confirm',S_DELETE_SELECTED_HOSTS_Q);
+		$goOption = new CComboItem('delete', _('Delete selected'));
+		$goOption->setAttribute('confirm', _('Delete selected hosts?'));
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
-		$goButton = new CSubmit('goButton', S_GO);
+		$goButton = new CSubmit('goButton', _('Go'));
 		$goButton->setAttribute('id', 'goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "hosts";');

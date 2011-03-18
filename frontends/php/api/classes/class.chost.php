@@ -52,7 +52,7 @@ class CHost extends CZBXAPI{
  * @param boolean $options['select_graphs'] select Graphs
  * @param boolean $options['select_applications'] select Applications
  * @param boolean $options['selectMacros'] select Macros
- * @param boolean $options['select_profile'] select Profile
+ * @param boolean $options['selectProfile'] select Profile
  * @param int $options['count'] count Hosts, returned column name is rowscount
  * @param string $options['pattern'] search hosts by pattern in Host name
  * @param string $options['extendPattern'] search hosts by pattern in Host name, ip and DNS
@@ -107,6 +107,7 @@ class CHost extends CZBXAPI{
 			'with_httptests'			=> null,
 			'with_monitored_httptests'	=> null,
 			'with_graphs'				=> null,
+			'withProfiles'				=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
 
@@ -131,7 +132,7 @@ class CHost extends CZBXAPI{
 			'selectMacros'				=> null,
 			'selectScreens'				=> null,
 			'selectInterfaces'			=> null,
-			'select_profile'			=> null,
+			'selectProfile'				=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -484,6 +485,14 @@ class CHost extends CZBXAPI{
 						' AND i.itemid=gi.itemid)';
 		}
 
+// withProfiles
+		if(!is_null($options['withProfiles']) && $options['withProfiles']){
+			$sql_parts['where'][] = ' h.hostid IN ( '.
+					' SELECT hp.hostid '.
+					' FROM host_profile hp )';
+//			AND exists ( SELECT hp.hostid FROM host_profile hp WHERE h.hostid=hp.hostid)
+		}
+
 // output
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['hosts'] = 'h.*';
@@ -597,9 +606,8 @@ class CHost extends CZBXAPI{
 					if(!is_null($options['selectDiscoveries']) && !isset($result[$host['hostid']]['discoveries'])){
 						$result[$host['hostid']]['discoveries'] = array();
 					}
-					if(!is_null($options['select_profile']) && !isset($result[$host['hostid']]['profile'])){
+					if(!is_null($options['selectProfile']) && !isset($result[$host['hostid']]['profile'])){
 						$result[$host['hostid']]['profile'] = array();
-						$result[$host['hostid']]['profile_ext'] = array();
 					}
 					if(!is_null($options['select_triggers']) && !isset($result[$host['hostid']]['triggers'])){
 						$result[$host['hostid']]['triggers'] = array();
@@ -760,21 +768,13 @@ Copt::memoryPick();
 		}
 
 // Adding Profiles
-		if(!is_null($options['select_profile'])){
+		if(!is_null($options['selectProfile']) && $options['selectProfile']){
 			$sql = 'SELECT hp.* '.
-				' FROM hosts_profiles hp '.
+				' FROM host_profile hp '.
 				' WHERE '.DBcondition('hp.hostid', $hostids);
 			$db_profile = DBselect($sql);
 			while($profile = DBfetch($db_profile))
 				$result[$profile['hostid']]['profile'] = $profile;
-
-
-			$sql = 'SELECT hpe.* '.
-				' FROM hosts_profiles_ext hpe '.
-				' WHERE '.DBcondition('hpe.hostid', $hostids);
-			$db_profile_ext = DBselect($sql);
-			while($profile_ext = DBfetch($db_profile_ext))
-				$result[$profile_ext['hostid']]['profile_ext'] = $profile_ext;
 		}
 
 // Adding Templates
@@ -1381,63 +1381,52 @@ Copt::memoryPick();
 		$hosts = zbx_toArray($hosts);
 		$hostids = array();
 
-			$this->checkInput($hosts, __FUNCTION__);
+		$this->checkInput($hosts, __FUNCTION__);
 
-			foreach($hosts as $num => $host){
-				$hostid = DB::insert('hosts', array($host));
-				$hostids[] = $hostid = reset($hostid);
+		foreach($hosts as $num => $host){
+			$hostid = DB::insert('hosts', array($host));
+			$hostids[] = $hostid = reset($hostid);
 
-				$host['hostid'] = $hostid;
+			$host['hostid'] = $hostid;
 
-				$options = array();
-				$options['hosts'] = $host;
+			$options = array();
+			$options['hosts'] = $host;
 
 
-
-				foreach($host['groups'] as $group){
-					$hostgroupid = get_dbid('hosts_groups', 'hostgroupid');
-					$result = DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES ($hostgroupid, $hostid, {$group['groupid']})");
-					if(!$result){
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-					}
-				}
-
-				if(isset($host['templates']) && !is_null($host['templates']))
-					$options['templates'] = $host['templates'];
-
-				if(isset($host['macros']) && !is_null($host['macros']))
-					$options['macros'] = $host['macros'];
-
-				if(isset($host['interfaces']) && !is_null($host['interfaces']))
-					$options['interfaces'] = $host['interfaces'];
-
-				$result = API::Host()->massAdd($options);
+			foreach($host['groups'] as $group){
+				$hostgroupid = get_dbid('hosts_groups', 'hostgroupid');
+				$result = DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES ($hostgroupid, $hostid, {$group['groupid']})");
 				if(!$result){
-					self::exception();
-				}
-
-				if(isset($host['profile']) && !empty($host['profile'])){
-					$fields = array_keys($host['profile']);
-					$fields = implode(', ', $fields);
-
-					$values = array_map('zbx_dbstr', $host['profile']);
-					$values = implode(', ', $values);
-
-					DBexecute('INSERT INTO hosts_profiles (hostid, '.$fields.') VALUES ('.$hostid.', '.$values.')');
-				}
-
-				if(isset($host['extendedProfile']) && !empty($host['extendedProfile'])){
-					$fields = array_keys($host['extendedProfile']);
-					$fields = implode(', ', $fields);
-
-					$values = array_map('zbx_dbstr', $host['extendedProfile']);
-					$values = implode(', ', $values);
-
-					DBexecute('INSERT INTO hosts_profiles_ext (hostid, '.$fields.') VALUES ('.$hostid.', '.$values.')');
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 				}
 			}
 
-			return array('hostids' => $hostids);
+			if(isset($host['templates']) && !is_null($host['templates']))
+				$options['templates'] = $host['templates'];
+
+			if(isset($host['macros']) && !is_null($host['macros']))
+				$options['macros'] = $host['macros'];
+
+			if(isset($host['interfaces']) && !is_null($host['interfaces']))
+				$options['interfaces'] = $host['interfaces'];
+
+			$result = API::Host()->massAdd($options);
+			if(!$result){
+				self::exception();
+			}
+
+			if(isset($host['profile']) && !empty($host['profile'])){
+				$fields = array_keys($host['profile']);
+				$fields = implode(', ', $fields);
+
+				$values = array_map('zbx_dbstr', $host['profile']);
+				$values = implode(', ', $values);
+
+				DBexecute('INSERT INTO host_profile (hostid, '.$fields.') VALUES ('.$hostid.', '.$values.')');
+			}
+		}
+
+		return array('hostids' => $hostids);
 	}
 
 /**
@@ -1817,100 +1806,32 @@ Copt::memoryPick();
 // PROFILE {{{
 			if(isset($data['profile']) && !is_null($data['profile'])){
 				if(empty($data['profile'])){
-					$sql = 'DELETE FROM hosts_profiles WHERE '.DBcondition('hostid', $hostids);
+					$sql = 'DELETE FROM host_profile WHERE '.DBcondition('hostid', $hostids);
 					if(!DBexecute($sql))
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete profile'));
 				}
 				else{
 					$existing_profiles = array();
-					$existing_profiles_db = DBselect('SELECT hostid FROM hosts_profiles WHERE '.DBcondition('hostid', $hostids));
+					$existing_profiles_db = DBselect('SELECT hostid FROM host_profile WHERE '.DBcondition('hostid', $hostids));
 					while($existing_profile = DBfetch($existing_profiles_db)){
 						$existing_profiles[] = $existing_profile['hostid'];
 					}
 
 					$hostids_without_profile = array_diff($hostids, $existing_profiles);
-
-					$fields = array_keys($data['profile']);
-					$fields = implode(', ', $fields);
-
-					$values = array_map('zbx_dbstr', $data['profile']);
-					$values = implode(', ', $values);
-
 					foreach($hostids_without_profile as $hostid){
-						$sql = 'INSERT INTO hosts_profiles (hostid, '.$fields.') VALUES ('.$hostid.', '.$values.')';
-						if(!DBexecute($sql))
-							self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot create profile');
+						$data['profile']['hostid'] = $hostid;
+						DB::insert('host_profile', array($data['profile']), false);
 					}
 
 					if(!empty($existing_profiles)){
-						$host_profile_fields = array('devicetype', 'name', 'os', 'serialno', 'tag','macaddress', 'hardware', 'software',
-							'contact', 'location', 'notes');
-						$sql_set = array();
-						foreach($host_profile_fields as $field){
-							if(isset($data['profile'][$field])) $sql_set[] = $field.'='.zbx_dbstr($data['profile'][$field]);
-						}
-
-						$sql = 'UPDATE hosts_profiles SET ' . implode(', ', $sql_set) . ' WHERE '.DBcondition('hostid', $existing_profiles);
-						if(!DBexecute($sql))
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update profile'));
+						DB::update('host_profile', array(
+							'values' => $data['profile'],
+							'where' => array(DBcondition('hostid', $existing_profiles))
+						));
 					}
 				}
 			}
 // }}} PROFILE
-
-
-// EXTENDED PROFILE {{{
-			if(isset($data['extendedProfile']) && !is_null($data['extendedProfile'])){
-				if(empty($data['extendedProfile'])){
-					$sql = 'DELETE FROM hosts_profiles_ext WHERE '.DBcondition('hostid', $hostids);
-					if(!DBexecute($sql))
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete extended profile'));
-				}
-				else{
-					$existing_profiles = array();
-					$existing_profiles_db = DBselect('SELECT hostid FROM hosts_profiles_ext WHERE '.DBcondition('hostid', $hostids));
-					while($existing_profile = DBfetch($existing_profiles_db)){
-						$existing_profiles[] = $existing_profile['hostid'];
-					}
-
-					$hostids_without_profile = array_diff($hostids, $existing_profiles);
-
-					$fields = array_keys($data['extendedProfile']);
-					$fields = implode(', ', $fields);
-
-					$values = array_map('zbx_dbstr', $data['extendedProfile']);
-					$values = implode(', ', $values);
-
-					foreach($hostids_without_profile as $hostid){
-						$sql = 'INSERT INTO hosts_profiles_ext (hostid, '.$fields.') VALUES ('.$hostid.', '.$values.')';
-						if(!DBexecute($sql))
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot create extended profile'));
-					}
-
-					if(!empty($existing_profiles)){
-
-						$host_profile_ext_fields = array('device_alias','device_type','device_chassis','device_os','device_os_short',
-							'device_hw_arch','device_serial','device_model','device_tag','device_vendor','device_contract',
-							'device_who','device_status','device_app_01','device_app_02','device_app_03','device_app_04',
-							'device_app_05','device_url_1','device_url_2','device_url_3','device_networks','device_notes',
-							'device_hardware','device_software','ip_subnet_mask','ip_router','ip_macaddress','oob_ip',
-							'oob_subnet_mask','oob_router','date_hw_buy','date_hw_install','date_hw_expiry','date_hw_decomm','site_street_1',
-							'site_street_2','site_street_3','site_city','site_state','site_country','site_zip','site_rack','site_notes',
-							'poc_1_name','poc_1_email','poc_1_phone_1','poc_1_phone_2','poc_1_cell','poc_1_screen','poc_1_notes','poc_2_name',
-							'poc_2_email','poc_2_phone_1','poc_2_phone_2','poc_2_cell','poc_2_screen','poc_2_notes');
-
-						$sql_set = array();
-						foreach($host_profile_ext_fields as $field){
-							if(isset($data['extendedProfile'][$field])) $sql_set[] = $field.'='.zbx_dbstr($data['extendedProfile'][$field]);
-						}
-
-						$sql = 'UPDATE hosts_profiles_ext SET ' . implode(', ', $sql_set) . ' WHERE '.DBcondition('hostid', $existing_profiles);
-						if(!DBexecute($sql))
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update extended profile'));
-					}
-				}
-			}
-// }}} EXTENDED PROFILE
 
 			return array('hostids' => $hostids);
 	}
@@ -2108,6 +2029,12 @@ Copt::memoryPick();
 			DB::delete('operations', array(
 				'operationid'=>$delOperationids,
 			));
+
+// delete host profile
+			DB::delete('host_profile', array('hostid'=>$hostids));
+
+// delete host applications
+			DB::delete('applications', array('hostid'=>$hostids));
 
 // delete host
 			DB::delete('hosts', array('hostid'=>$hostids));

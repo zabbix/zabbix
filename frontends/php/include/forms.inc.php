@@ -3747,76 +3747,27 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 	return $form;
 	}
 
-// Insert host profile ReadOnly form
 	function insert_host_profile_form(){
+		$frmHostP = new CFormTable(_('Host Profile'));
 
-		$frmHostP = new CFormTable(S_HOST_PROFILE);
+		$table_titles = getHostProfiles();
 
-		$table_titles = array(
-			'devicetype' => S_DEVICE_TYPE, 'name' => S_NAME, 'os' => S_OS, 'serialno' => S_SERIALNO,
-			'tag' => S_TAG, 'macaddress' => S_MACADDRESS, 'hardware' => S_HARDWARE, 'software' => S_SOFTWARE,
-			'contact' => S_CONTACT, 'location' => S_LOCATION, 'notes' => S_NOTES
-		);
+		$sql_fields = implode(', ', array_keys($table_titles));
 
-		$sql_fields = implode(', ', array_keys($table_titles)); //generate string of fields to get from DB
-
-		$sql = 'SELECT '.$sql_fields.' FROM hosts_profiles WHERE hostid='.$_REQUEST['hostid'];
+		$sql = 'SELECT '.$sql_fields.' FROM host_profile WHERE hostid='.$_REQUEST['hostid'];
 		$result = DBselect($sql);
 
-		if($row = DBfetch($result)) {
-			foreach($row as $key => $value) {
-				if(!zbx_empty($value)){
-					$frmHostP->addRow($table_titles[$key], new CSpan(zbx_str2links($value)));
-				}
+		$row = DBfetch($result);
+		foreach($row as $key => $value){
+			if(!zbx_empty($value)){
+				$frmHostP->addRow($table_titles[$key], new CSpan(zbx_str2links($value), 'pre'));
 			}
 		}
-		else{
-			$frmHostP->addSpanRow(S_PROFILE_FOR_THIS_HOST_IS_MISSING,"form_row_c");
-		}
-		$frmHostP->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param('prof_type')));
+
+		$frmHostP->addItemToBottomRow(new CButtonCancel(url_param('groupid')));
 
 		return $frmHostP;
 	}
-
-// BEGIN: HOSTS PROFILE EXTENDED Section
-	function insert_host_profile_ext_form(){
-
-		$frmHostPA = new CFormTable(S_EXTENDED_HOST_PROFILE);
-
-		$table_titles = array(
-				'device_alias' => S_DEVICE_ALIAS, 'device_type' => S_DEVICE_TYPE, 'device_chassis' => S_DEVICE_CHASSIS, 'device_os' => S_DEVICE_OS,
-				'device_os_short' => S_DEVICE_OS_SHORT, 'device_hw_arch' => S_DEVICE_HW_ARCH, 'device_serial' => S_DEVICE_SERIAL,
-				'device_model' => S_DEVICE_MODEL, 'device_tag' => S_DEVICE_TAG, 'device_vendor' => S_DEVICE_VENDOR, 'device_contract' => S_DEVICE_CONTRACT,
-				'device_who' => S_DEVICE_WHO, 'device_status' => S_DEVICE_STATUS, 'device_app_01' => S_DEVICE_APP_01, 'device_app_02' => S_DEVICE_APP_02,
-				'device_app_03' => S_DEVICE_APP_03, 'device_app_04' => S_DEVICE_APP_04, 'device_app_05' => S_DEVICE_APP_05, 'device_url_1' => S_DEVICE_URL_1,
-				'device_url_2' => S_DEVICE_URL_2, 'device_url_3' => S_DEVICE_URL_3, 'device_networks' => S_DEVICE_NETWORKS, 'device_notes' => S_DEVICE_NOTES,
-				'device_hardware' => S_DEVICE_HARDWARE, 'device_software' => S_DEVICE_SOFTWARE, 'ip_subnet_mask' => S_IP_SUBNET_MASK, 'ip_router' => S_IP_ROUTER,
-				'ip_macaddress' => S_IP_MACADDRESS, 'oob_ip' => S_OOB_IP, 'oob_subnet_mask' => S_OOB_SUBNET_MASK, 'oob_router' => S_OOB_ROUTER,
-				'date_hw_buy' => S_DATE_HW_BUY, 'date_hw_install' => S_DATE_HW_INSTALL, 'date_hw_expiry' => S_DATE_HW_EXPIRY, 'date_hw_decomm' => S_DATE_HW_DECOMM,
-				'site_street_1' => S_SITE_STREET_1, 'site_street_2' => S_SITE_STREET_2, 'site_street_3' => S_SITE_STREET_3, 'site_city' => S_SITE_CITY,
-				'site_state' => S_SITE_STATE, 'site_country' => S_SITE_COUNTRY, 'site_zip' => S_SITE_ZIP, 'site_rack' => S_SITE_RACK,
-				'site_notes' => S_SITE_NOTES, 'poc_1_name' => S_POC_1_NAME, 'poc_1_email' => S_POC_1_EMAIL, 'poc_1_phone_1' => S_POC_1_PHONE_1,
-				'poc_1_phone_2' => S_POC_1_PHONE_2, 'poc_1_cell' => S_POC_1_CELL, 'poc_1_screen'=>S_POC_1_SCREEN, 'poc_1_notes' => S_POC_1_NOTES, 'poc_2_name' => S_POC_2_NAME,
-				'poc_2_email' => S_POC_2_EMAIL, 'poc_2_phone_1' => S_POC_2_PHONE_1, 'poc_2_phone_2' => S_POC_2_PHONE_2, 'poc_2_cell' => S_POC_2_CELL,
-				'poc_2_screen' => S_POC_2_SCREEN, 'poc_2_notes' => S_POC_2_NOTES);
-
-		$sql_fields = implode(', ', array_keys($table_titles)); //generate string of fields to get from DB
-		$result = DBselect('SELECT '.$sql_fields.' FROM hosts_profiles_ext WHERE hostid='.$_REQUEST['hostid']);
-
-		if($row = DBfetch($result)) {
-			foreach($row as $key => $value) {
-				if(!zbx_empty($value)) {
-					$frmHostPA->addRow($table_titles[$key], new CSpan(zbx_str2links($value)));
-				}
-			}
-		}
-		else{
-			$frmHostPA->addSpanRow('Extended Profile for this host is missing','form_row_c');
-		}
-		$frmHostPA->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param('prof_type')));
-	return $frmHostPA;
-	}
-// END:   HOSTS PROFILE EXTENDED Section
 
 	function import_map_form($rules){
 		global $USER_DETAILS;
