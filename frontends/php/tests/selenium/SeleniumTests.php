@@ -29,7 +29,6 @@ require_once(dirname(__FILE__).'/testPageDiscovery.php');
 require_once(dirname(__FILE__).'/testPageEvents.php');
 require_once(dirname(__FILE__).'/testPageHosts.php');
 require_once(dirname(__FILE__).'/testPageInventory.php');
-require_once(dirname(__FILE__).'/testPageInventoryExtended.php');
 require_once(dirname(__FILE__).'/testPageItems.php');
 require_once(dirname(__FILE__).'/testPageMaintenance.php');
 require_once(dirname(__FILE__).'/testPageMaps.php');
@@ -73,7 +72,6 @@ class SeleniumTests{
 		$suite->addTestSuite('testPageEvents');
 		$suite->addTestSuite('testPageHosts');
 		$suite->addTestSuite('testPageInventory');
-		$suite->addTestSuite('testPageInventoryExtended');
 		$suite->addTestSuite('testPageItems');
 		$suite->addTestSuite('testPageMaintenance');
 		$suite->addTestSuite('testPageMaps');
