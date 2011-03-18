@@ -1527,7 +1527,7 @@
 	'S_MAP'=>					_('Map'),
 	'S_AS_PLAIN_TEXT'=>			_('As plain text'),
 	'S_PLAIN_TEXT'=>			_('Plain text'),
-	'S_PLAIN_TEXT_BIG'=>			_('PLAINT TEXT'),
+	'S_PLAIN_TEXT_BIG'=>			_('PLAIN TEXT'),
 	'S_COLUMN_SPAN'=>			_('Column span'),
 	'S_ROW_SPAN'=>				_('Row span'),
 	'S_SHOW_LINES'=>			_('Show lines'),
