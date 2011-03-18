@@ -205,18 +205,12 @@ abstract class CItemGeneral extends CZBXAPI{
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Item will not be refreshed. Please enter a correct update interval.'));
 						}
 					}
+				}
 
-					if($item['type'] == ITEM_TYPE_AGGREGATE){
-						// grpfunc['group','key','itemfunc','numeric param']
-						if(!preg_match('/^((.)*)(\[\"((.)*)\"\,\"((.)*)\"\,\"((.)*)\"\,\"([0-9]+)\"\])$/i', $item['key_'], $arr))
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Key does not match grpfunc["group","key","itemfunc","numeric param"].'));
-
-						if(!str_in_array($arr[1], array('grpmax', 'grpmin', 'grpsum', 'grpavg')))
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Group function "%s" is not one of [grpmax, grpmin, grpsum, grpavg].', $arr[1]));
-
-						if(!str_in_array($arr[8], array('last', 'min', 'max', 'avg', 'sum', 'count')))
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item function "%s" is not one of [last, min, max, avg, sum, count].', $arr[8]));
-					}
+				if($fullItem['type'] == ITEM_TYPE_AGGREGATE){
+					// grpfunc['group','key','itemfunc','numeric param']
+					if(!preg_match('/^(grpmax|grpmin|grpsum|grpavg)(\[\"(.*)\"\,\"(.*)\"\,\"(last|min|max|avg|sum|count)\"\,\"[0-9]+\"\])$/ui', $item['key_'], $arr))
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Key does not match <grpmax|grpmin|grpsum|grpavg>["group","key","<last|min|max|avg|sum|count>","numeric param"].'));
 				}
 
 				if(isset($item['value_type'])){
