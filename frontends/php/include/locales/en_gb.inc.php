@@ -735,7 +735,7 @@
 	'S_CREATE_MAINTENANCE_PERIOD'=>		_('Create maintenance period'),
 	'S_MAINTENANCE_TYPE'=>			_('Maintenance type'),
 	'S_EXPIRED'=>				_('Expired'),
-	'S_APPROACH'=>				_('Approach'),
+	'S_APPROACHING'=>				_('Approaching'),
 
 	'S_WITH_DATA_COLLECTION'=>		_('With data collection'),
 	'S_NO_DATA_COLLECTION'=>		_('No data collection'),

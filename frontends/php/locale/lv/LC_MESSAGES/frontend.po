@@ -447,7 +447,7 @@ msgid "Apply"
 msgstr "Pielietot"
 
 #: include/locales/en_gb.inc.php:739
-msgid "Approach"
+msgid "Approaching"
 msgstr "Tuvojas"
 
 #: include/locales/en_gb.inc.php:57
