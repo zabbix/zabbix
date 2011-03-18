@@ -36,7 +36,7 @@ class ConfigurationManager
 		new ConfigurationParameter(LISTEN_IP, ConfigurationParameter.TYPE_INETADDRESS, null, null),
 		new ConfigurationParameter(LISTEN_PORT, ConfigurationParameter.TYPE_INTEGER, 10051, new IntegerValidator(1024, 32767)),
 		new ConfigurationParameter(PID_FILE, ConfigurationParameter.TYPE_FILE, null, null),
-		new ConfigurationParameter(START_POLLERS, ConfigurationParameter.TYPE_INTEGER, 5, new IntegerValidator(1, 255))
+		new ConfigurationParameter(START_POLLERS, ConfigurationParameter.TYPE_INTEGER, 5, new IntegerValidator(1, 1000))
 	};
 
 	public static void parseConfiguration()

@@ -30,6 +30,6 @@ PID_FILE="/tmp/zabbix_java.pid"
 #	Number of worker threads to start.
 #
 # Mandatory: no
-# Range: 1-255
+# Range: 1-1000
 # Default:
 # START_POLLERS=5
