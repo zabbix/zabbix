@@ -1128,7 +1128,7 @@ COpt::memoryPick();
 
 		$selectFields = array();
 		foreach($this->fieldRules as $key => $rules){
-			if(!isset($rules['system'], $rules['host'])){
+			if(!isset($rules['system']) && !isset($rules['host'])){
 				$selectFields[] = $key;
 			}
 		}
@@ -1211,26 +1211,9 @@ COpt::memoryPick();
 						$this->errorInheritFlags($exItem['flags'], $exItem['key_'], $host['host']);
 					}
 					else if(($exItem['templateid'] > 0) && ($exItem['templateid'] != $item['itemid'])){
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item "%1$s:%2$s" already exists, inherited from another template.', $host['host'], $exItem['key_']));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item "%1$s:%2$s" already exists, inherited from another template.', $host['host'], $item['key_']));
 					}
 				}
-
-// checking interfaces
-				if(($host['status'] == HOST_STATUS_TEMPLATE) || !isset($item['type'])){
-					unset($item['interfaceid']);
-				}
-				else if(isset($item['type']) && ($item['type'] != $exItem['type'])){
-					if($type = $this->itemTypeInterface($item['type'])){
-						if(!isset($interfaceids[$type]))
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $host['host'], $exItem['key_']));
-
-						$item['interfaceid'] = $interfaceids[$type];
-					}
-					else{
-						$item['interfaceid'] = 0;
-					}
-				}
-// -----
 
 // coping item
 				$newItem = $item;
@@ -1251,6 +1234,14 @@ COpt::memoryPick();
 				}
 				else{
 					$inheritedItems[] = $newItem;
+
+					if($type = $this->itemTypeInterface($item['type'])){
+						if(!isset($interfaceids[$type]))
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $host['host'], $exItem['key_']));
+
+						$newItem['interfaceid'] = $interfaceids[$type];
+					}
+
 					$insertItems[] = $newItem;
 				}
 			}

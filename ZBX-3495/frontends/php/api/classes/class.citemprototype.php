@@ -829,7 +829,7 @@ COpt::memoryPick();
 
 		$selectFields = array();
 		foreach($this->fieldRules as $key => $rules){
-			if(!isset($rules['system'], $rules['host'])){
+			if(!isset($rules['system']) && !isset($rules['host'])){
 				$selectFields[] = $key;
 			}
 		}
@@ -940,6 +940,7 @@ COpt::memoryPick();
 				}
 				else{
 					$newItem['ruleid'] = $ruleIds[$item['itemid']][$host['hostid']];
+					$newItem['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
 					$insertItems[] = $newItem;
 				}
 			}
