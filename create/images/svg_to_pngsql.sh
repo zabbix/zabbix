@@ -19,8 +19,11 @@ sqlfile=images_mysql.sql
 
 mkdir -p "$outputdir"
 
+svgelementcount=$(ls $elementdir | wc -l)
+
 for svgfile in $elementdir/*.svg; do
 	echo -n "Converting $svgfile"
+	((elementfilesdone++))
 	for size in 24 48 64 96 128; do
 		pngoutfile="$outputdir/$(basename ${svgfile%.svg}) ($size).png"
 		echo -n " to size $size..."
@@ -36,8 +39,8 @@ for svgfile in $elementdir/*.svg; do
 		$pngcrushbin -brute -reduce -e .2.png "$pngoutfile" >> $pngcrushoutput || exit 1
 		echo "$pngoutfile : $(echo "$(stat -c %s "${pngoutfile%png}2.png")/$(stat -c %s "${pngoutfile}")*100" | bc -l)" >> $pngcrushlog
 		mv "${pngoutfile%png}2.png" "$pngoutfile"
-		echo
 	done
+	echo "[$[$elementfilesdone*100/$svgelementcount]%]"
 done
 
 echo "Compressing images with pngcrush"
