@@ -1933,14 +1933,20 @@ Copt::memoryPick();
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			));
-
 			if(!empty($delItems)){
 				$delItemIds = zbx_objectValues($delItems, 'itemid');
 				API::Item()->delete($delItemIds, true);
 			}
 
-// delete host interfaces
-			DB::delete('interface', array('hostid'=>$hostids));
+			$delRules = API::DiscoveryRule()->get(array(
+				'hostids' => $hostids,
+				'nopermissions' => 1,
+				'preservekeys' => 1
+			));
+			if(!empty($delRules)){
+				$delRulesIds = zbx_objectValues($delRules, 'itemid');
+				API::DiscoveryRule()->delete($delRulesIds, true);
+			}
 
 // delete web tests
 			$del_httptests = array();
@@ -1961,15 +1967,6 @@ Copt::memoryPick();
 
 // delete host from maps
 			delete_sysmaps_elements_with_hostid($hostids);
-
-// delete host from maintenances
-			DB::delete('maintenances_hosts', array('hostid'=>$hostids));
-
-// delete host from group
-			DB::delete('hosts_groups', array('hostid'=>$hostids));
-
-// delete host from template linkages
-			DB::delete('hosts_templates', array('hostid'=>$hostids));
 
 // disable actions
 // actions from conditions
@@ -2043,7 +2040,7 @@ Copt::memoryPick();
 			DB::delete('hosts', array('hostid'=>$hostids));
 
 // TODO: remove info from API
-			foreach($hosts as $hnum => $host){
+			foreach($hosts as $host){
 				info(_s('Host "%s" deleted.', $host['host']));
 				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $host['hostid'], $host['host'], 'hosts', NULL, NULL);
 			}
