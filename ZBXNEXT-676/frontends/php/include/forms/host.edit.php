@@ -482,12 +482,12 @@
 			$host_profile[$profileName] = '';
 		}
 
-		$fieldLength = $hostProfileTable['fields'][$profileName]['length'];
-		if($fieldLength == 2048){
+		if($hostProfileTable['fields'][$profileName]['type'] == DB::FIELD_TYPE_TEXT){
 			$input = new CTextArea('host_profile['.$profileName.']', $host_profile[$profileName]);
 			$input->addStyle('width: 64em;');
 		}
 		else{
+			$fieldLength = $hostProfileTable['fields'][$profileName]['length'];
 			$input = new CTextBox('host_profile['.$profileName.']', $host_profile[$profileName]);
 			$input->setAttribute('maxlength', $fieldLength);
 			$input->addStyle('width: '.($fieldLength > 64 ? 64 : $fieldLength).'em;');
