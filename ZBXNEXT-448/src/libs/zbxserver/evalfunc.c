@@ -140,8 +140,10 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 	const char	*__function_name = "evaluate_LOGEVENTID";
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		sql[128], *arg1 = NULL;
+	char		sql[128], *arg1 = NULL, *arg1_esc;
 	int		res = FAIL;
+	ZBX_REGEXP	*regexps = NULL;
+	int		regexps_alloc = 0, regexps_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -153,6 +155,22 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 
 	if (FAIL == get_function_parameter_str(item, parameters, 1, &arg1))
 		goto clean;
+
+	if ('@' == *arg1)
+	{
+		arg1_esc = DBdyn_escape_string(arg1 + 1);
+		result = DBselect("select r.name,e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
+				" from regexps r,expressions e"
+				" where r.regexpid=e.regexpid"
+					" and r.name='%s'",
+				arg1_esc);
+		zbx_free(arg1_esc);
+
+		while (NULL != (row = DBfetch(result)))
+			add_regexp_ex(&regexps, &regexps_alloc, &regexps_num,
+					row[0], row[1], atoi(row[2]), row[3][0], atoi(row[4]));
+		DBfree_result(result);
+	}
 
 	zbx_snprintf(sql, sizeof(sql),
 			"select logeventid"
@@ -167,15 +185,17 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 		zabbix_log(LOG_LEVEL_DEBUG, "Result for LOGEVENTID is empty");
 	else
 	{
-		if (NULL == zbx_regexp_match(row[0], arg1, NULL))
-			strcpy(value, "0");
+		if (SUCCEED == regexp_match_ex(regexps, regexps_num, row[0], arg1, ZBX_CASE_SENSITIVE))
+			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 		else
-			strcpy(value, "1");
+			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
 		res = SUCCEED;
 	}
 	DBfree_result(result);
-
+	if ('@' == *arg1)
+		zbx_free(regexps);
 	zbx_free(arg1);
+
 clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
