@@ -249,7 +249,6 @@ class testFormHost extends CWebTest{
 		$this->wait();
 		$this->assertTitle('Hosts');
 		$this->ok('Host updated');
-		// should check in the db that no items, triggers, apps or custom graphs exist on the host
 	}
 
 }
