@@ -24,7 +24,7 @@
  * @package API
  */
 /**
- * Class containing methods for operations with HIstory of Items
+ * Class containing methods for operations with History of Items
  *
  */
 class CHistory extends CZBXAPI{
