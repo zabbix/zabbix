@@ -10,6 +10,8 @@
 # progress reporting
 # figure out how to auto-scale rack images
 
+# depends on inkscape, pngcrush, hexdump
+
 outputdir=output_png
 pngcrushlog=pngcrush.log.txt
 pngcrushbin=pngcrush
@@ -49,6 +51,9 @@ for svgfile in $elementdir/*.svg; do
 	done
 	echo "[$[$elementfilesdone*100/$svgelementcount]%]"
 done
+
+echo "Biggest gain from pngcrush:"
+sort -n -r -t : -k 2 $pngcrushlog | tail -n 1
 
 echo "Generating SQL file"
 
