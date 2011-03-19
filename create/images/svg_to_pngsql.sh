@@ -54,6 +54,7 @@ done
 
 echo "Biggest gain from pngcrush:"
 sort -n -r -t : -k 2 $pngcrushlog | tail -n 1
+awk 'BEGIN {FS=":"}; {sum+=$2} END { print "Average gain:",sum/NR}' $pngcrushlog
 
 echo "Generating SQL file"
 
