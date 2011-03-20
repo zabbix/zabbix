@@ -13,7 +13,8 @@ agents_ldadd = \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
-	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a
+	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
+	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a
 
 sbin_PROGRAMS = \
 	zabbix_agent \
@@ -24,7 +25,6 @@ zabbix_agent_SOURCES = \
 	stats.c stats.h \
 	cpustat.c cpustat.h \
 	diskdevices.c diskdevices.h \
-	interfaces.c interfaces.h \
 	perfstat.c perfstat.h \
 	vmstats.c vmstats.h \
 	zbxconf.c zbxconf.h
@@ -36,7 +36,6 @@ zabbix_agentd_SOURCES = \
 	stats.c stats.h \
 	cpustat.c cpustat.h \
 	diskdevices.c diskdevices.h \
-	interfaces.c interfaces.h \
 	perfstat.c perfstat.h \
 	vmstats.c vmstats.h \
 	logfiles.c logfiles.h \

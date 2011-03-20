@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,8 @@ require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
 class testPageUsers extends CWebTest
 {
+	public $affectedTables = array('users','users_groups','media','opmessage_usr');
+
 	// Returns all users
 	public static function allUsers()
 	{
@@ -37,11 +39,11 @@ class testPageUsers extends CWebTest
 		$this->login('users.php');
 		$this->assertTitle('Users');
 
-		$this->dropdown_select('filter_usrgrpid','All');
+		$this->dropdown_select_wait('filter_usrgrpid','All');
 
 		$this->ok('CONFIGURATION OF USERS AND USER GROUPS');
 		$this->ok('Displaying');
-		$this->ok(array('Alias','Name','Surname','User type','Groups','Is online?','Login','GUI access','API access','Debug mode','Status'));
+		$this->ok(array('Alias','Name','Surname','User type','Groups','Is online?','Login','GUI access','Debug mode','Status'));
 		$this->ok(array($user['alias'],$user['name'],$user['surname']));
 		$this->dropdown_select('go','Unblock selected');
 		$this->dropdown_select('go','Delete selected');
@@ -75,7 +77,7 @@ class testPageUsers extends CWebTest
 
 		$this->login('users.php');
 		$this->assertTitle('Users');
-		$this->dropdown_select('filter_usrgrpid','All');
+		$this->dropdown_select_wait('filter_usrgrpid','All');
 
 		$this->click("link=$alias");
 		$this->wait();
@@ -99,7 +101,7 @@ class testPageUsers extends CWebTest
 
 	public function testPageUsers_MassDelete()
 	{
-		DBsave_tables(array('users','users_groups','media'));
+		DBsave_tables($this->affectedTables);
 
 		$this->chooseOkOnNextConfirmation();
 
@@ -111,7 +113,7 @@ class testPageUsers extends CWebTest
 
 			$this->login('users.php');
 			$this->assertTitle('Users');
-			$this->dropdown_select('filter_usrgrpid','All');
+			$this->dropdown_select_wait('filter_usrgrpid','All');
 
 			$this->checkbox_select("group_userid[$id]");
 			$this->dropdown_select('go','Delete selected');
@@ -130,12 +132,12 @@ class testPageUsers extends CWebTest
 			$this->assertEquals(0,DBcount($sql),"Chuck Norris: user $id deleted but still exists in table media");
 		}
 
-		DBrestore_tables(array('users','users_groups','media'));
+		DBrestore_tables($this->affectedTables);
 	}
 
 	public function testPageUsers_MassDeleteSpecialUsers()
 	{
-		DBsave_tables(array('users','users_groups','media'));
+		DBsave_tables($this->affectedTables);
 
 		$this->chooseOkOnNextConfirmation();
 
@@ -147,7 +149,7 @@ class testPageUsers extends CWebTest
 
 			$this->login('users.php');
 			$this->assertTitle('Users');
-			$this->dropdown_select('filter_usrgrpid','All');
+			$this->dropdown_select_wait('filter_usrgrpid','All');
 
 			$this->checkbox_select("group_userid[$id]");
 			$this->dropdown_select('go','Delete selected');
@@ -167,7 +169,7 @@ class testPageUsers extends CWebTest
 //			$this->assertNotEquals(0,DBcount($sql));
 		}
 
-		DBrestore_tables(array('users','users_groups','media'));
+		DBrestore_tables($this->affectedTables);
 	}
 
 	public function testPageUsers_MassUnblockAll()

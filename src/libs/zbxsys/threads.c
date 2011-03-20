@@ -1,6 +1,6 @@
 /*
-** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #include "common.h"
 #include "threads.h"
 
-#include "log.h"
+#include "log.h" /* required for strerror_from_system() on Windows */
 
 /******************************************************************************
  *                                                                            *

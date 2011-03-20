@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ function DBdata($query)
 }
 
 /**
- * Saves data of the specified tables in temporary tables.
+ * Saves data of the specified tables in temporary tables. The tables can be in any order.
  */
 function DBsave_tables($tables)
 {
@@ -60,13 +60,18 @@ function DBsave_tables($tables)
 
 	if(!is_array($tables))	$tables=array($tables);
 
+
 	foreach($tables as $table)
 	{
 		switch($DB['TYPE']) {
-		case 'MYSQL':
+		case ZBX_DB_MYSQL:
 			DBexecute("drop table if exists ${table}_tmp");
 			DBexecute("create table ${table}_tmp like $table");
 			DBexecute("insert into ${table}_tmp select * from $table");
+			break;
+		case ZBX_DB_SQLITE3:
+			DBexecute("drop table if exists ${table}_tmp");
+			DBexecute("create table if not exists ${table}_tmp as select * from ${table}");
 			break;
 		default:
 			DBexecute("drop table if exists ${table}_tmp");
@@ -77,6 +82,8 @@ function DBsave_tables($tables)
 
 /**
  * Restores data from temporary tables. DBsave_tables() must be called first.
+ * The tables should be ordered so that referenced tables come after main ones.
+ * For example: DBrestore_tables(array('users','users_groups','media'))
  */
 function DBrestore_tables($tables)
 {
@@ -84,7 +91,9 @@ function DBrestore_tables($tables)
 
 	if(!is_array($tables))	$tables=array($tables);
 
-	foreach($tables as $table)
+	$tables_reversed = array_reverse($tables);
+
+	foreach($tables_reversed as $table)
 	{
 		DBexecute("delete from $table");
 	}
@@ -120,12 +129,23 @@ function DBhash($sql)
 /**
  * Returns number of records in database result.
  */
-function DBcount($sql)
+function DBcount($sql,$limit = null,$offset = null)
 {
 	global $DB;
 	$cnt=0;
 
-	$result=DBselect($sql);
+	if(isset($limit) && isset($offset))
+	{
+		$result=DBselect($sql,$limit,$offset);
+	}
+	else if(isset($limit))
+	{
+		$result=DBselect($sql,$limit);
+	}
+	else
+	{
+		$result=DBselect($sql);
+	}
 	while($row = DBfetch($result))
 	{
 		$cnt++;

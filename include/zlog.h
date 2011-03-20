@@ -1,6 +1,6 @@
 /*
-** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 
 #include <stdarg.h>
 
-extern	int	CONFIG_ENABLE_LOG;
+extern int	CONFIG_ENABLE_LOG;
 
 #ifdef HAVE___VA_ARGS__
 #	define zabbix_syslog(fmt, ...) __zbx_zabbix_syslog(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ function getSounds(){
 		list($filename, $type) = explode('.', $file);
 		$fileList[$filename] = $file;
 	}
-	
+
 return $fileList;
 }
 
@@ -39,7 +39,6 @@ function getLatestCloseTime(){
 }
 
 function getMessageSettings(){
-	global $USER_DETAILS;
 
 	$defSeverities = array(
 		TRIGGER_SEVERITY_NOT_CLASSIFIED => 1,
@@ -69,8 +68,8 @@ function getMessageSettings(){
 
 	$sql = 'SELECT idx, source, value_str '.
 			' FROM profiles '.
-			' WHERE userid='.$USER_DETAILS['userid'].
-				' AND '.DBcondition('idx',array('web.messages'), false, true);
+			' WHERE userid='.CWebUser::$data['userid'].
+				' AND '.DBcondition('idx',array('web.messages'));
 	$db_profiles = DBselect($sql);
 	while($profile = DBfetch($db_profiles)){
 		$messages[$profile['source']] = $profile['value_str'];
@@ -85,7 +84,6 @@ return $messages;
 }
 
 function updateMessageSettings($messages){
-	global $USER_DETAILS;
 
 	if(!isset($messages['enabled'])) $messages['enabled'] = 0;
 	if(isset($messages['triggers.severities']))
@@ -93,8 +91,8 @@ function updateMessageSettings($messages){
 
 	$sql = 'SELECT profileid, idx, source, value_str '.
 			' FROM profiles '.
-			' WHERE userid='.$USER_DETAILS['userid'].
-				' AND '.DBcondition('idx',array('web.messages'), false, true);
+			' WHERE userid='.CWebUser::$data['userid'].
+				' AND '.DBcondition('idx',array('web.messages'));
 	$db_profiles = DBselect($sql);
 	while($profile = DBfetch($db_profiles)){
 		$profile['value'] = $profile['value_str'];
@@ -106,7 +104,7 @@ function updateMessageSettings($messages){
 
 	foreach($messages as $key => $value){
 		$values = array(
-			'userid' => $USER_DETAILS['userid'],
+			'userid' => CWebUser::$data['userid'],
 			'idx' => 'web.messages',
 			'source' => $key,
 			'value_str' =>  $value,
@@ -129,10 +127,7 @@ function updateMessageSettings($messages){
 		DB::update('profiles', $updates);
 	}
 	catch(APIException $e){
-		$errors = $e->getErrors();
-		$error = reset($errors);
-
-		error($error);
+		error($e->getMessage());
 	}
 
 return $messages;

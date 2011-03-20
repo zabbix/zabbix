@@ -1,6 +1,6 @@
 --
 -- Zabbix
--- Copyright (C) 2000,2001,2002,2003,2004 Alexei Vladishev
+-- Copyright (C) 2000-2011 Zabbix SIA
 --
 -- This program is free software; you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -21,16 +21,15 @@
 -- Dumping data for table `usrgrp`
 --
 
-INSERT INTO usrgrp VALUES (1,'UNIX administrators',0,0,0,0);
-INSERT INTO usrgrp VALUES (2,'Database administrators',0,0,0,0);
-INSERT INTO usrgrp VALUES (3,'Network administrators',0,0,0,0);
-INSERT INTO usrgrp VALUES (4,'Security specialists',0,0,0,0);
-INSERT INTO usrgrp VALUES (5,'WEB administrators',0,0,0,0);
-INSERT INTO usrgrp VALUES (6,'Head of IT department',0,0,0,0);
-INSERT INTO usrgrp VALUES (7,'Zabbix administrators',0,0,0,0);
-INSERT INTO usrgrp VALUES (8,'Guests',0,0,0,0);
-INSERT INTO usrgrp VALUES (9,'Disabled',0,1,0,0);
-INSERT INTO usrgrp VALUES (10,'API access',0,0,1,0);
+INSERT INTO usrgrp VALUES (1,'UNIX administrators',0,0,0);
+INSERT INTO usrgrp VALUES (2,'Database administrators',0,0,0);
+INSERT INTO usrgrp VALUES (3,'Network administrators',0,0,0);
+INSERT INTO usrgrp VALUES (4,'Security specialists',0,0,0);
+INSERT INTO usrgrp VALUES (5,'WEB administrators',0,0,0);
+INSERT INTO usrgrp VALUES (6,'Head of IT department',0,0,0);
+INSERT INTO usrgrp VALUES (7,'Zabbix administrators',0,0,0);
+INSERT INTO usrgrp VALUES (8,'Guests',0,0,0);
+INSERT INTO usrgrp VALUES (9,'Disabled',0,1,0);
 
 --
 -- Dumping data for table `users`
@@ -50,8 +49,8 @@ INSERT INTO users_groups VALUES (2,8,2);
 -- Dumping data for table `scripts`
 --
 
-INSERT INTO scripts VALUES (1,'Ping','/bin/ping -c 3 {HOST.CONN}',2,NULL,NULL,'','');
-INSERT INTO scripts VALUES (2,'Traceroute','/usr/bin/traceroute {HOST.CONN}',2,NULL,NULL,'','');
+INSERT INTO scripts VALUES (1,'Ping','/bin/ping -c 3 {HOST.CONN}',2,NULL,NULL,'','',0,1);
+INSERT INTO scripts VALUES (2,'Traceroute','/usr/bin/traceroute {HOST.CONN}',2,NULL,NULL,'','',0,1);
 
 --
 -- Dumping data for table `media_type`
@@ -10964,28 +10963,42 @@ INSERT INTO functions VALUES (12127,22137,12999,'last','0');
 -- Dumping data for table `actions`
 --
 
-INSERT INTO actions VALUES (2,'Auto discovery. Linux servers.',1,0,1,0,'','',0,'','');
-INSERT INTO actions VALUES (3,'Auto discovery. Windows servers.',1,0,1,0,'','',0,'','');
+INSERT INTO actions VALUES (1,'Auto discovery. Linux servers.',1,0,1,0,'','',0,'','');
+INSERT INTO actions VALUES (2,'Auto discovery. Windows servers.',1,0,1,0,'','',0,'','');
 
 --
 -- Dumping data for table `conditions`
 --
 
-INSERT INTO conditions VALUES (2,2,10,0,'0');
-INSERT INTO conditions VALUES (3,2,8,0,'9');
-INSERT INTO conditions VALUES (4,2,12,2,'Linux');
-INSERT INTO conditions VALUES (5,3,8,0,'9');
-INSERT INTO conditions VALUES (6,3,10,0,'0');
-INSERT INTO conditions VALUES (7,3,12,2,'Windows');
+INSERT INTO conditions VALUES (1,1,8,0,'9');
+INSERT INTO conditions VALUES (2,1,10,0,'0');
+INSERT INTO conditions VALUES (3,1,12,2,'Linux');
+INSERT INTO conditions VALUES (4,2,8,0,'9');
+INSERT INTO conditions VALUES (5,2,10,0,'0');
+INSERT INTO conditions VALUES (6,2,12,2,'Windows');
 
 --
 -- Dumping data for table `operations`
 --
 
-INSERT INTO operations VALUES (3,2,6,0,10001,'','',0,1,1,0,0,NULL);
-INSERT INTO operations VALUES (4,2,4,0,2,'','',0,1,1,0,0,NULL);
-INSERT INTO operations VALUES (5,3,4,0,3,'','',0,1,1,0,0,NULL);
-INSERT INTO operations VALUES (6,3,6,0,10002,'','',0,1,1,0,0,NULL);
+INSERT INTO operations VALUES (1,1,4,0,1,1,0);
+INSERT INTO operations VALUES (2,1,6,0,1,1,0);
+INSERT INTO operations VALUES (3,2,4,0,1,1,0);
+INSERT INTO operations VALUES (4,2,6,0,1,1,0);
+
+--
+-- Dumping data for table `opgroup`
+--
+
+INSERT INTO opgroup VALUES (1,1,2);
+INSERT INTO opgroup VALUES (2,3,3);
+
+--
+-- Dumping data for table `optemplate`
+--
+
+INSERT INTO optemplate VALUES (1,2,10001);
+INSERT INTO optemplate VALUES (2,4,10002);
 
 --
 -- Dumping data for table `drules`
@@ -12193,7 +12206,7 @@ INSERT INTO graphs_items VALUES (796,385,22137,0,0,'009900',1,2,0,5);
 -- Dumping data for table `sysmaps`
 --
 
-INSERT INTO sysmaps VALUES (2,'Local network',980,200,NULL,1,2,1,1,0,0);
+INSERT INTO sysmaps VALUES (2,'Local network',980,200,NULL,1,2,1,1,0,0,50,1,1,0,2,2,2,2,2,'','','','','');
 
 --
 -- Dumping data for table `sysmaps_elements`
@@ -12262,6 +12275,7 @@ insert into help_items values (5,'zabbix[trends_uint]','Number of values stored 
 insert into help_items values (5,'zabbix[triggers]','Number of triggers in Zabbix database.');
 insert into help_items values (5,'zabbix[uptime]','Uptime of Zabbix server process in seconds.');
 insert into help_items values (5,'zabbix[wcache,&lt;cache&gt;,&lt;mode&gt;]','Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free).');
+insert into help_items values (5,'zabbix[process,&lt;type&gt;,&lt;num&gt;,&lt;state&gt;]','Time a particular Zabbix process or a group of processes (identified by <type> and <num>) spent in <state> in percentage.');
 
 insert into help_items values (8,'grpfunc[&lt;Group&gt;,&lt;Key&gt;,&lt;func&gt;,&lt;param&gt;]','Aggregate checks do not require any agent running on a host being monitored. Zabbix server collects aggregate information by doing direct database queries. See Zabbix Manual.');
 
@@ -12383,4 +12397,4 @@ INSERT INTO graph_theme VALUES (2,'Black & Blue','css_bb.css','333333','0A0A0A',
 -- Dumping data for table `config`
 --
 
-INSERT INTO config VALUES (1,365,365,600,'1-5,00:00-24:00',7,1,7,100,'css_ob.css',0,'',389,'','','','',1,1,5,50,1000,1);
+INSERT INTO config VALUES (1,365,365,600,'1-5,00:00-24:00',7,1,7,100,'css_ob.css',0,'',389,'','','','',1,1,5,50,1000,1,'DBDBDB', 'D6F6FF', 'FFF6A5', 'FFB689', 'FF9999', 'FF3838', 'Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster');

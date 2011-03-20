@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 class CCheckBox extends CInput{
 /* public */
 	public function __construct($name='checkbox',$checked='no',$action=null,$value='yes'){
-		parent::__construct('checkbox', $name, $value);
+		parent::__construct('checkbox', $name, $value, 'checkbox pointer');
 
 		$this->setAttribute('onclick', $action);
 		$this->setChecked($checked);

@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -128,7 +128,7 @@ class testPageSlideShows extends CWebTest
 		$sql="select * from slides where slideshowid=$slideshowid";
 		$this->assertEquals(0,DBcount($sql));
 
-		DBrestore_tables(array('slides','slideshows'));
+		DBrestore_tables(array('slideshows','slides'));
 	}
 
 	public function testPageSlideShows_Sorting()

@@ -1,3 +1,4 @@
+/.buildpath
 /.project
 /.settings
 /Makefile
@@ -31,6 +32,7 @@ frontends/php/images/general/*.db
 frontends/php/images/general/bar/*.db
 frontends/php/images/general/bttn/*.db
 frontends/php/images/general/tree/*.db
+frontends/php/images/gradients/*.db
 frontends/php/locale/POTFILES.in
 frontends/php/locale/cs/LC_MESSAGES/frontend.mo
 frontends/php/locale/de/LC_MESSAGES/frontend.mo
@@ -39,6 +41,7 @@ frontends/php/locale/fr/LC_MESSAGES/frontend.mo
 frontends/php/locale/frontend.pot
 frontends/php/locale/hu/LC_MESSAGES/frontend.mo
 frontends/php/locale/it/LC_MESSAGES/frontend.mo
+frontends/php/locale/ja/LC_MESSAGES/frontend.mo
 frontends/php/locale/ko/LC_MESSAGES/frontend.mo
 frontends/php/locale/lv/LC_MESSAGES/frontend.mo
 frontends/php/locale/nl/LC_MESSAGES/frontend.mo
@@ -49,6 +52,7 @@ frontends/php/locale/sk/LC_MESSAGES/frontend.mo
 frontends/php/locale/sv/LC_MESSAGES/frontend.mo
 frontends/php/locale/uk/LC_MESSAGES/frontend.mo
 frontends/php/locale/zh_CN/LC_MESSAGES/frontend.mo
+frontends/php/tests/bootstrap.php
 include/config.h
 include/config.h.in
 include/stamp-h1
@@ -91,6 +95,9 @@ src/libs/zbxdbhigh/.deps
 src/libs/zbxdbhigh/Makefile
 src/libs/zbxdbhigh/Makefile.in
 src/libs/zbxdbhigh/dbschema.c
+src/libs/zbxexec/.deps
+src/libs/zbxexec/Makefile
+src/libs/zbxexec/Makefile.in
 src/libs/zbxicmpping/.deps
 src/libs/zbxicmpping/Makefile
 src/libs/zbxicmpping/Makefile.in
@@ -109,9 +116,9 @@ src/libs/zbxmemory/Makefile.in
 src/libs/zbxnix/.deps
 src/libs/zbxnix/Makefile
 src/libs/zbxnix/Makefile.in
-src/libs/zbxplugin/.deps
-src/libs/zbxplugin/Makefile
-src/libs/zbxplugin/Makefile.in
+src/libs/zbxself/.deps
+src/libs/zbxself/Makefile
+src/libs/zbxself/Makefile.in
 src/libs/zbxserver/.deps
 src/libs/zbxserver/Makefile
 src/libs/zbxserver/Makefile.in
@@ -222,6 +229,9 @@ src/zabbix_server/poller/Makefile.in
 src/zabbix_server/proxypoller/.deps
 src/zabbix_server/proxypoller/Makefile
 src/zabbix_server/proxypoller/Makefile.in
+src/zabbix_server/selfmon/.deps
+src/zabbix_server/selfmon/Makefile
+src/zabbix_server/selfmon/Makefile.in
 src/zabbix_server/timer/.deps
 src/zabbix_server/timer/Makefile
 src/zabbix_server/timer/Makefile.in

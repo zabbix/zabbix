@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ class testPageTemplates extends CWebTest
 	public function testPageTemplates_SimpleTest($template)
 	{
 		$this->login('templates.php');
-		$this->dropdown_select('groupid','Templates');
+		$this->dropdown_select_wait('groupid','Templates');
 //		$this->wait();
 		$this->assertTitle('Templates');
 		$this->ok('CONFIGURATION OF TEMPLATES');
@@ -66,7 +66,7 @@ class testPageTemplates extends CWebTest
 		$oldHashTriggers=DBhash($sql4);
 
 		$this->login('templates.php');
-		$this->dropdown_select('groupid','all');
+		$this->dropdown_select_wait('groupid','all');
 
 		$this->assertTitle('Templates');
 

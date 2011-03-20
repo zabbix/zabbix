@@ -1,6 +1,6 @@
 /*
-** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -120,6 +120,70 @@ clean:
 
 /******************************************************************************
  *                                                                            *
+ * Function: evaluate_LOGEVENTID                                              *
+ *                                                                            *
+ * Purpose: evaluate function 'logeventid' for the item                       *
+ *                                                                            *
+ * Parameters: item - item (performance metric)                               *
+ *             parameter - regex string for event id matching                 *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ * Author: Alexei Vladishev, Rudolfs Kreicbergs                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
+{
+	const char	*__function_name = "evaluate_LOGEVENTID";
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		sql[128], *arg1 = NULL;
+	int		res = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (item->value_type != ITEM_VALUE_TYPE_LOG)
+		goto clean;
+
+	if (num_param(parameters) > 1)
+		goto clean;
+
+	if (FAIL == get_function_parameter_str(item->hostid, parameters, 1, &arg1))
+		goto clean;
+
+	zbx_snprintf(sql, sizeof(sql),
+			"select logeventid"
+			" from history_log"
+			" where itemid=" ZBX_FS_UI64
+			" order by id desc",
+			item->itemid);
+
+	result = DBselectN(sql, 1);
+
+	if (NULL == (row = DBfetch(result)))
+		zabbix_log(LOG_LEVEL_DEBUG, "Result for LOGEVENTID is empty");
+	else
+	{
+		if (NULL == zbx_regexp_match(row[0], arg1, NULL))
+			strcpy(value, "0");
+		else
+			strcpy(value, "1");
+		res = SUCCEED;
+	}
+	DBfree_result(result);
+
+	zbx_free(arg1);
+clean:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+
+	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: evaluate_LOGSOURCE                                               *
  *                                                                            *
  * Purpose: evaluate function 'logsource' for the item                        *
@@ -127,7 +191,7 @@ clean:
  * Parameters: item - item (performance metric)                               *
  *             parameter - ignored                                            *
  *                                                                            *
- * Return value: SUCCEED - evaluated successfully, result is stored in value  *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -163,7 +227,7 @@ static int	evaluate_LOGSOURCE(char *value, DB_ITEM *item, const char *function, 
 
 	result = DBselectN(sql, 1);
 
-	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
+	if (NULL == (row = DBfetch(result)))
 		zabbix_log(LOG_LEVEL_DEBUG, "Result for LOGSOURCE is empty");
 	else
 	{
@@ -221,7 +285,7 @@ static int	evaluate_LOGSEVERITY(char *value, DB_ITEM *item, const char *function
 
 	result = DBselectN(sql, 1);
 
-	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
+	if (NULL == (row = DBfetch(result)))
 		zabbix_log(LOG_LEVEL_DEBUG, "Result for LOGSEVERITY is empty");
 	else
 	{
@@ -1337,10 +1401,10 @@ static int	evaluate_DELTA(char *value, DB_ITEM *item, const char *function, cons
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, const char *parameters)
 {
 	const char	*__function_name = "evaluate_NODATA";
-	int		arg1, flag, res = FAIL;
+	int		arg1, flag, now, res = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1352,6 +1416,8 @@ static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, con
 
 	if (flag != ZBX_FLAG_SEC)
 		return res;
+
+	now = (int)time(NULL);
 
 	if (item->lastclock + arg1 > now)
 		zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
@@ -1931,32 +1997,30 @@ int	evaluate_function(char *value, DB_ITEM *item, const char *function, const ch
 	}
 	else if (0 == strcmp(function, "nodata"))
 	{
-		ret = evaluate_NODATA(value, item, function, parameter, now);
+		ret = evaluate_NODATA(value, item, function, parameter);
 	}
 	else if (0 == strcmp(function, "date"))
 	{
 		tm = localtime(&now);
-		zbx_snprintf(value, MAX_BUFFER_LEN, "%.4d%.2d%.2d",
-				tm->tm_year + 1900,
-				tm->tm_mon + 1,
-				tm->tm_mday);
+		zbx_snprintf(value, MAX_BUFFER_LEN, "%.4d%.2d%.2d", tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday);
 		ret = SUCCEED;
 	}
 	else if (0 == strcmp(function, "dayofweek"))
 	{
 		tm = localtime(&now);
-		/* The number of days since Sunday, in the range 0 to 6. */
-		zbx_snprintf(value, MAX_BUFFER_LEN, "%d",
-				0 == tm->tm_wday ? 7 : tm->tm_wday);
+		zbx_snprintf(value, MAX_BUFFER_LEN, "%d", 0 == tm->tm_wday ? 7 : tm->tm_wday);
+		ret = SUCCEED;
+	}
+	else if (0 == strcmp(function, "dayofmonth"))
+	{
+		tm = localtime(&now);
+		zbx_snprintf(value, MAX_BUFFER_LEN, "%d", tm->tm_mday);
 		ret = SUCCEED;
 	}
 	else if (0 == strcmp(function, "time"))
 	{
 		tm = localtime(&now);
-		zbx_snprintf(value, MAX_BUFFER_LEN, "%.2d%.2d%.2d",
-				tm->tm_hour,
-				tm->tm_min,
-				tm->tm_sec);
+		zbx_snprintf(value, MAX_BUFFER_LEN, "%.2d%.2d%.2d", tm->tm_hour, tm->tm_min, tm->tm_sec);
 		ret = SUCCEED;
 	}
 	else if (0 == strcmp(function, "abschange"))
@@ -1987,6 +2051,10 @@ int	evaluate_function(char *value, DB_ITEM *item, const char *function, const ch
 	else if (0 == strcmp(function, "fuzzytime"))
 	{
 		ret = evaluate_FUZZYTIME(value, item, function, parameter, now);
+	}
+	else if (0 == strcmp(function, "logeventid"))
+	{
+		ret = evaluate_LOGEVENTID(value, item, function, parameter, now);
 	}
 	else if (0 == strcmp(function, "logseverity"))
 	{
@@ -2369,23 +2437,25 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 	DB_ITEM		item;
 	DB_RESULT	result;
 	DB_ROW		row;
-
-	char	host_esc[MAX_STRING_LEN];
-	char	key_esc[MAX_STRING_LEN];
-
-	int	res;
+	char		*host_esc, *key_esc;
+	int		res;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() function:'%s:%s.%s(%s)'",
 			__function_name, host, key, function, parameter);
 
-	DBescape_string(host, host_esc, MAX_STRING_LEN);
-	DBescape_string(key, key_esc, MAX_STRING_LEN);
+	host_esc = DBdyn_escape_string(host);
+	key_esc = DBdyn_escape_string(key);
 
-	result = DBselect("select %s where h.host='%s' and h.hostid=i.hostid and i.key_='%s'" DB_NODE,
-		ZBX_SQL_ITEM_SELECT,
-		host_esc,
-		key_esc,
-		DBnode_local("h.hostid"));
+	result = DBselect(
+			"select %s"
+			" where h.host='%s'"
+				" and h.hostid=i.hostid"
+				" and i.key_='%s'"
+				DB_NODE,
+			ZBX_SQL_ITEM_SELECT, host_esc, key_esc, DBnode_local("h.hostid"));
+
+	zbx_free(host_esc);
+	zbx_free(key_esc);
 
 	if (NULL == (row = DBfetch(result)))
 	{

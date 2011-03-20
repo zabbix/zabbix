@@ -1,6 +1,6 @@
 /*
-** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,6 @@
 #include "threads.h"
 #include "cpustat.h"
 #include "perfstat.h"
-#include "interfaces.h"
 #include "diskdevices.h"
 #ifdef _AIX
 #	include "vmstats.h"
@@ -39,7 +38,6 @@
 typedef struct s_collector_data
 {
 	ZBX_CPUS_STAT_DATA	cpus;
-	ZBX_INTERFACES_DATA	interfaces;
 	ZBX_DISKDEVICES_DATA	diskdevices;
 #ifdef _WINDOWS
 	ZBX_PERF_STAT_DATA	perfs;

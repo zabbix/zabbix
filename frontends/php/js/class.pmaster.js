@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2010 Artem "Aly" Suharev
+** Copyright (C) 2010-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -353,10 +353,11 @@ updateSortable: function(){
         forcePlaceholderSize: true,
         placeholder: 'widget ui-corner-all ui-sortable-placeholder',
         opacity: '0.8',
-		update: function(e, ui){ jQuery(".column").portletState("save", {"name": "dashboard"}); }
-	}).portletState("load", {"name": "dashboard"});
+		update: function(e, ui){jQuery(".column").portletState("save", {"name": "dashboard"});}
+	}).portletState("load", {"name": "dashboard"})
+	.children('div').children('div.header').addClass('move');
 
-	jQuery(".column").disableSelection();
+//	jQuery(".column").disableSelection();
 }
 });
 

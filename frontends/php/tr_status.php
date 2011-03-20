@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -165,7 +165,7 @@ require_once('include/templates/scriptConfirm.js.php');
 <?php
 	$trigg_wdgt = new CWidget();
 
-	$r_form = new CForm(null, 'get');
+	$r_form = new CForm('get');
 	$r_form->addItem(array(S_GROUP . SPACE, $pageFilter->getGroupsCB(true)));
 	$r_form->addItem(array(SPACE . S_HOST . SPACE, $pageFilter->getHostsCB(true)));
 	$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
@@ -213,12 +213,12 @@ require_once('include/templates/scriptConfirm.js.php');
 	$severity_select = new CComboBox('show_severity', $show_severity);
 	$cb_items = array(
 		-1 => S_ALL_S,
-		TRIGGER_SEVERITY_NOT_CLASSIFIED => S_NOT_CLASSIFIED,
-		TRIGGER_SEVERITY_INFORMATION => S_INFORMATION,
-		TRIGGER_SEVERITY_WARNING => S_WARNING,
-		TRIGGER_SEVERITY_AVERAGE => S_AVERAGE,
-		TRIGGER_SEVERITY_HIGH => S_HIGH,
-		TRIGGER_SEVERITY_DISASTER => S_DISASTER,
+		TRIGGER_SEVERITY_NOT_CLASSIFIED => getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED),
+		TRIGGER_SEVERITY_INFORMATION => getSeverityCaption(TRIGGER_SEVERITY_INFORMATION),
+		TRIGGER_SEVERITY_WARNING => getSeverityCaption(TRIGGER_SEVERITY_WARNING),
+		TRIGGER_SEVERITY_AVERAGE => getSeverityCaption(TRIGGER_SEVERITY_AVERAGE),
+		TRIGGER_SEVERITY_HIGH => getSeverityCaption(TRIGGER_SEVERITY_HIGH),
+		TRIGGER_SEVERITY_DISASTER => getSeverityCaption(TRIGGER_SEVERITY_DISASTER),
 	);
 	$severity_select->addItems($cb_items);
 	$filterForm->addRow(S_MIN_SEVERITY, $severity_select);
@@ -255,7 +255,7 @@ require_once('include/templates/scriptConfirm.js.php');
 		$triggerInfo->show();
 	}
 
-	$m_form = new CForm('acknow.php');
+	$m_form = new CForm('get','acknow.php');
 	$m_form->setName('tr_status');
 	$m_form->addVar('backurl', $page['file']);
 
@@ -298,7 +298,7 @@ require_once('include/templates/scriptConfirm.js.php');
 	$options = array(
 		'nodeids' => get_current_nodeid(),
 		'filter' => array(),
-		'active' => 1,
+		'monitored' => 1,
 		'output' => API_OUTPUT_EXTEND,
 		'skipDependent' => 1,
 		'sortfield' => $sortfield,
@@ -337,7 +337,7 @@ require_once('include/templates/scriptConfirm.js.php');
 		$options['lastChangeSince'] = time() - ($_REQUEST['status_change_days'] * 86400);
 	}
 
-	$triggers = CTrigger::get($options);
+	$triggers = API::Trigger()->get($options);
 
 // sorting && paging
 	order_result($triggers, $sortfield, $sortorder);
@@ -351,7 +351,7 @@ require_once('include/templates/scriptConfirm.js.php');
 		'selectItems' => API_OUTPUT_EXTEND,
 		'select_dependencies' => API_OUTPUT_EXTEND
 	);
-	$triggers = CTrigger::get($options);
+	$triggers = API::Trigger()->get($options);
 
 	$triggers = zbx_toHash($triggers, 'triggerid');
 
@@ -371,7 +371,7 @@ require_once('include/templates/scriptConfirm.js.php');
 				),
 				'nopermissions' => true
 			);
-			$triggers[$tnum]['event_count'] = CEvent::get($options);
+			$triggers[$tnum]['event_count'] = API::Event()->get($options);
 		}
 	}
 
@@ -387,7 +387,7 @@ require_once('include/templates/scriptConfirm.js.php');
 	}
 
 
-	$scripts_by_hosts = Cscript::getScriptsByHosts($tr_hostids);
+	$scripts_by_hosts = API::Script()->getScriptsByHosts($tr_hostids);
 
 	if($show_events != EVENTS_OPTION_NOEVENT){
 		$ev_options = array(
@@ -415,7 +415,7 @@ require_once('include/templates/scriptConfirm.js.php');
 			break;
 		}
 
-		$events = CEvent::get($ev_options);
+		$events = API::Event()->get($ev_options);
 		order_result($events, 'clock', ZBX_SORT_DOWN);
 
 		foreach($events as $enum => $event){
@@ -571,7 +571,7 @@ require_once('include/templates/scriptConfirm.js.php');
 					'maintenanceids' => $trigger_host['maintenanceid'],
 					'output' => API_OUTPUT_EXTEND
 				);
-				$maintenances = CMaintenance::get($maintenanceOptions);
+				$maintenances = API::Maintenance()->get($maintenanceOptions);
 				$maintenance = reset($maintenances);
 
 				$maint_hint = new CSpan($maintenance['name'].($maintenance['description']=='' ? '' : ': '.$maintenance['description']));
@@ -624,14 +624,14 @@ require_once('include/templates/scriptConfirm.js.php');
 		}
 
 
-		$severity_col = new CCol(get_severity_description($trigger['priority']), get_severity_style($trigger['priority'], $trigger['value']));
+		$severity_col = getSeverityCell($trigger['priority'], null, !$trigger['value']);
 		if($show_event_col) $severity_col->setColSpan(2);
 
 
 // Unknown triggers
 		$unknown = SPACE;
 		if($trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN){
-			$unknown = new CDiv(SPACE,'iconunknown');
+			$unknown = new CDiv(SPACE,'status_icon iconunknown');
 			$unknown->setHint($trigger['error'], '', 'on');
 		}
 //----

@@ -1,6 +1,6 @@
 /*
-** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -51,8 +51,8 @@ void	__zbx_zabbix_syslog(const char *fmt, ...)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	/* This is made to disable writing to database for watchdog */
-	if (CONFIG_ENABLE_LOG == 0)
+	/* this is made to disable writing to database for watchdog */
+	if (0 == CONFIG_ENABLE_LOG)
 		return;
 
 	init_result(&agent);

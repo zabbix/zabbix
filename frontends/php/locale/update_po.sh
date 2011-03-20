@@ -13,7 +13,7 @@ find ./ -type f -name '*.php' | sort -d -f > locale/POTFILES.in
 # keyword "_x" is Zabbix frontend context function
 xgettext --files-from=locale/POTFILES.in --from-code=UTF-8 \
 --output=locale/frontend.pot \
---copyright-holder="SIA Zabbix" --no-wrap --sort-output \
+--copyright-holder="Zabbix SIA" --no-wrap --sort-output \
 --add-comments="GETTEXT:" --keyword=_n:1,2 --keyword=_s \
 --keyword=_x:1,2c || exit 1
 
@@ -30,6 +30,8 @@ for i in */LC_MESSAGES/frontend.po; do
 	msgmerge --no-fuzzy-matching --no-wrap --update \
 --backup=off "$i" frontend.pot
 done
+
+# 'msgattrib --no-obsolete' could be used to automatically drop obsolete strings
 
 for i in */LC_MESSAGES/frontend.po; do
 	echo -ne "$i\t"

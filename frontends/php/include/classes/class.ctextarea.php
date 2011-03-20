@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,9 +21,9 @@
 <?php
 class CTextArea extends CTag{
 /* public */
-	public function __construct($name='textarea',$value='',$cols=77,$rows=7, $readonly=false){
+	public function __construct($name='textarea',$value='', $cols=77, $rows=7, $readonly=false){
 		parent::__construct('textarea','yes');
-		$this->attributes['class'] = 'input';
+		$this->attributes['class'] = 'input textarea';
 
 		$this->attributes['id'] = $name;
 		$this->attributes['name'] = $name;

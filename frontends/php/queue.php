@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -62,6 +62,7 @@ include_once 'include/page_header.php';
 			ITEM_TYPE_TELNET,
 			ITEM_TYPE_SIMPLE,
 			ITEM_TYPE_INTERNAL,
+			ITEM_TYPE_DB_MONITOR,
 			ITEM_TYPE_AGGREGATE,
 			ITEM_TYPE_EXTERNAL,
 			ITEM_TYPE_CALCULATED);
@@ -77,16 +78,17 @@ include_once 'include/page_header.php';
 	$item_types = array(
 			ITEM_TYPE_ZABBIX,
 			ITEM_TYPE_ZABBIX_ACTIVE,
+			ITEM_TYPE_SIMPLE,
 			ITEM_TYPE_SNMPV1,
 			ITEM_TYPE_SNMPV2C,
 			ITEM_TYPE_SNMPV3,
-			ITEM_TYPE_IPMI,
-			ITEM_TYPE_SSH,
-			ITEM_TYPE_TELNET,
-			ITEM_TYPE_SIMPLE,
 			ITEM_TYPE_INTERNAL,
 			ITEM_TYPE_AGGREGATE,
 			ITEM_TYPE_EXTERNAL,
+			ITEM_TYPE_DB_MONITOR,
+			ITEM_TYPE_IPMI,
+			ITEM_TYPE_SSH,
+			ITEM_TYPE_TELNET,
 			ITEM_TYPE_CALCULATED);
 
 	$sql = 'SELECT i.itemid,i.lastclock,i.description,i.key_,i.type,h.name as hostname,h.hostid,h.proxy_hostid,i.delay,i.delay_flex'.
@@ -143,12 +145,12 @@ include_once 'include/page_header.php';
 		foreach($item_types as $type){
 			$elements=array(
 				item_type2str($type),
-				new CCol($sec_10[$type],($sec_10[$type])?"unknown_trigger":"normal"),
-				new CCol($sec_30[$type],($sec_30[$type])?"information":"normal"),
-				new CCol($sec_60[$type],($sec_60[$type])?"warning":"normal"),
-				new CCol($sec_300[$type],($sec_300[$type])?"average":"normal"),
-				new CCol($sec_600[$type],($sec_600[$type])?"high":"normal"),
-				new CCol($sec_rest[$type],($sec_rest[$type])?"disaster":"normal")
+				getSeverityCell(TRIGGER_SEVERITY_NOT_CLASSIFIED, $sec_10[$type], !$sec_10[$type]),
+				getSeverityCell(TRIGGER_SEVERITY_INFORMATION, $sec_30[$type], !$sec_30[$type]),
+				getSeverityCell(TRIGGER_SEVERITY_WARNING, $sec_60[$type], !$sec_60[$type]),
+				getSeverityCell(TRIGGER_SEVERITY_AVERAGE, $sec_300[$type], !$sec_300[$type]),
+				getSeverityCell(TRIGGER_SEVERITY_HIGH, $sec_600[$type], !$sec_600[$type]),
+				getSeverityCell(TRIGGER_SEVERITY_DISASTER, $sec_rest[$type], !$sec_rest[$type]),
 			);
 
 			$table->addRow($elements);
@@ -198,23 +200,23 @@ include_once 'include/page_header.php';
 		while (null != ($db_proxy = DBfetch($db_proxies))){
 			$elements = array(
 				$db_proxy['host'],
-				new CCol($sec_10[$db_proxy['hostid']], $sec_10[$db_proxy['hostid']] ? "unknown_trigger" : "normal"),
-				new CCol($sec_30[$db_proxy['hostid']], $sec_30[$db_proxy['hostid']] ? "information" : "normal"),
-				new CCol($sec_60[$db_proxy['hostid']], $sec_60[$db_proxy['hostid']] ? "warning" : "normal"),
-				new CCol($sec_300[$db_proxy['hostid']], $sec_300[$db_proxy['hostid']] ? "average" : "normal"),
-				new CCol($sec_600[$db_proxy['hostid']], $sec_600[$db_proxy['hostid']] ? "high" : "normal"),
-				new CCol($sec_rest[$db_proxy['hostid']], $sec_rest[$db_proxy['hostid']] ? "disaster" : "normal")
+				getSeverityCell(TRIGGER_SEVERITY_NOT_CLASSIFIED, $sec_10[$db_proxy['hostid']], !$sec_10[$db_proxy['hostid']]),
+				getSeverityCell(TRIGGER_SEVERITY_INFORMATION, $sec_30[$db_proxy['hostid']], !$sec_30[$db_proxy['hostid']]),
+				getSeverityCell(TRIGGER_SEVERITY_WARNING, $sec_60[$db_proxy['hostid']], !$sec_60[$db_proxy['hostid']]),
+				getSeverityCell(TRIGGER_SEVERITY_AVERAGE, $sec_300[$db_proxy['hostid']], !$sec_300[$db_proxy['hostid']]),
+				getSeverityCell(TRIGGER_SEVERITY_HIGH, $sec_600[$db_proxy['hostid']], !$sec_600[$db_proxy['hostid']]),
+				getSeverityCell(TRIGGER_SEVERITY_DISASTER, $sec_rest[$db_proxy['hostid']], !$sec_rest[$db_proxy['hostid']]),
 			);
 			$table->addRow($elements);
 		}
 		$elements = array(
 			new CCol(S_SERVER, 'bold'),
-			new CCol($sec_10[0], $sec_10[0] ? 'unknown_trigger' : 'normal'),
-			new CCol($sec_30[0], $sec_30[0] ? 'information' : 'normal'),
-			new CCol($sec_60[0], $sec_60[0] ? 'warning' : 'normal'),
-			new CCol($sec_300[0], $sec_300[0] ? 'average' : 'normal'),
-			new CCol($sec_600[0], $sec_600[0] ? 'high' : 'normal'),
-			new CCol($sec_rest[0], $sec_rest[0] ? 'disaster' : 'normal')
+			getSeverityCell(TRIGGER_SEVERITY_NOT_CLASSIFIED, $sec_10[0], !$sec_10[0]),
+			getSeverityCell(TRIGGER_SEVERITY_INFORMATION, $sec_30[0], !$sec_30[0]),
+			getSeverityCell(TRIGGER_SEVERITY_WARNING, $sec_60[0], !$sec_60[0]),
+			getSeverityCell(TRIGGER_SEVERITY_AVERAGE, $sec_300[0], !$sec_300[0]),
+			getSeverityCell(TRIGGER_SEVERITY_HIGH, $sec_600[0], !$sec_600[0]),
+			getSeverityCell(TRIGGER_SEVERITY_DISASTER, $sec_rest[0], !$sec_rest[0]),
 		);
 		$table->addRow($elements);
 	}

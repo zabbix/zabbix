@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ class CFormTable extends CForm{
 
 	public function __construct($title=null, $action=null, $method=null, $enctype=null, $form_variable=null){
 		$method = is_null($method) ? 'post' : $method;
-		parent::__construct($action, $method, $enctype);
+		parent::__construct($method, $action, $enctype);
 
 		$this->setTitle($title);
 		$this->setHelp();

@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -88,7 +88,7 @@ include_once('include/page_header.php');
 		$rq_severity	= get_request('severity',63);
 
 		$severity = array();
-		for($i=0; $i<6; $i++){
+		for($i=0; $i<TRIGGER_SEVERITY_COUNT; $i++){
 			if($rq_severity & (1 << $i)) $severity[$i] = $i;
 		}
 	}
@@ -135,7 +135,7 @@ include_once('include/page_header.php');
 					str_in_array($i,$severity)?'yes':'no',
 					null,		/* action */
 					$i),		/* value */
-				get_severity_description($i)
+				getSeverityCaption($i)
 			),
 			BR());
 	}

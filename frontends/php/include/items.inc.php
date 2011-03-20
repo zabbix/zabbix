@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -171,7 +171,7 @@
 		$result=DBSelect($sql);
 		while($row=DBfetch($result)){
 			$item['hostid'] = $row['hostid'];
-			CItem::update($row['itemid'],$item);
+			API::Item()->update($row['itemid'],$item);
 		}
 	return true;
 	}
@@ -212,7 +212,7 @@
 			$del_items[$row['itemid']] = $row['itemid'];
 		}
 		if(!empty($del_items)){
-			CItem::delete($del_items);
+			API::Item()->delete($del_items);
 		}
 	return 1;
 	}
@@ -226,7 +226,7 @@
 		$result=DBSelect($sql);
 		while($row=DBfetch($result)){
 			$item['hostid'] = $row['hostid'];
-			CItem::create($item);
+			API::Item()->create($item);
 		}
 	return true;
 	}
@@ -279,7 +279,7 @@
 		$db_tmp_item = get_item_by_itemid_limited($itemid);
 		$applications = get_same_applications_for_host(get_applications_by_itemid($db_tmp_item['itemid']),$hostid);
 
-		$hosts = CHost::get(array(
+		$hosts = API::Host()->get(array(
 			'output' => array('hostid', 'host', 'status'),
 			'selectInterfaces' => API_OUTPUT_EXTEND,
 			'hostids' => $hostid,
@@ -309,10 +309,10 @@
 		$db_tmp_item['applications'] = $applications;
 		$db_tmp_item['templateid'] = 0;
 
-		$result = CItem::create($db_tmp_item);
+		$result = API::Item()->create($db_tmp_item);
 
-		return $result;
-	}
+	return $result;
+}
 
 	function copyItems($srcid, $destid){
 		$result = true;
@@ -324,11 +324,11 @@
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 			'select_applications' => API_OUTPUT_REFER,
 		);
-		$srcItems = CItem::get($options);
+		$srcItems = API::Item()->get($options);
 
 		foreach($srcItems as $item){
 
-			$hosts = CHost::get(array(
+			$hosts = API::Host()->get(array(
 				'output' => array('hostid', 'host', 'status'),
 				'selectInterfaces' => API_OUTPUT_EXTEND,
 				'hostids' => $destid,
@@ -350,6 +350,7 @@
 				if(!isset($item['interfaceid'])){
 					error(_s('Item [%1$s:%2$s] cannot find interface on host [%3$s]', $item['description'], $item['key_'], $host['host']));
 					return false;
+
 				}
 			}
 
@@ -357,7 +358,7 @@
 			$item['applications'] = get_same_applications_for_host(zbx_objectValues($item['applications'], 'applicationid'), $destid);
 			$item['templateid'] = 0;
 
-			$result = CItem::create($item);
+			$result = API::Item()->create($item);
 			if(!$result) break;
 		}
 
@@ -370,14 +371,14 @@
 			'output' => API_OUTPUT_EXTEND,
 			'inherited' => false,
 		);
-		$apps_to_clone = CApplication::get($options);
+		$apps_to_clone = API::Application()->get($options);
 		foreach($apps_to_clone as $num => $app){
 			$app['hostid'] = $destid;
 			unset($app['applicationid']);
 			$apps_to_clone[$num] = $app;
 		}
 
-		return CApplication::create($apps_to_clone);
+		return API::Application()->create($apps_to_clone);
 	}
 
 
@@ -563,7 +564,7 @@
 		}
 
 		if(!empty($macStack)){
-			$dbItems = CItem::get(array(
+			$dbItems = API::Item()->get(array(
 				'itemids' => $item['itemid'],
 				'selectInterfaces' => API_OUTPUT_EXTEND,
 				'selectHosts' => array('host'),
@@ -598,7 +599,7 @@
 			}
 		}
 
-		CUserMacro::resolveItem($item);
+		$item = API::UserMacro()->resolveItem($item);
 
 	return $item['key_'];
 	}
@@ -612,7 +613,7 @@
         }
 
 		if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $descr, $arr)){
-			$macros = CuserMacro::getMacros($arr[1], array('itemid' => $item['itemid']));
+			$macros = API::UserMacro()->getMacros(array('macros' => $arr[1], 'itemid' => $item['itemid']));
 
 			$search = array_keys($macros);
 			$values = array_values($macros);
@@ -634,7 +635,7 @@
 // kostilek //
 	function get_realrule_by_itemid_and_hostid($itemid, $hostid){
 		$item = get_item_by_itemid($itemid);
-		if($hostid == $item['hostid'])
+		if(bccomp($hostid,$item['hostid']) == 0)
 			return $item['itemid'];
 
 		if($item['templateid'] <> 0)
@@ -663,7 +664,7 @@
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
 
 // COpt::profiling_start('prepare_data');
-		$result = DBselect('SELECT DISTINCT h.hostid, h.name as hostname,i.itemid, i.key_, i.value_type, i.lastvalue, i.units, '.
+		$result = DBselect('SELECT DISTINCT h.hostid, h.name as hostname,i.itemid, i.key_, i.value_type, i.lastvalue, i.units, i.lastclock, '.
 				' i.description, t.priority, i.valuemapid, t.value as tr_value, t.triggerid '.
 			' FROM hosts h, items i '.
 				' LEFT JOIN functions f on f.itemid=i.itemid '.
@@ -700,6 +701,7 @@
 					'itemid'	=> $row['itemid'],
 					'value_type'=> $row['value_type'],
 					'lastvalue'	=> $row['lastvalue'],
+					'lastclock'	=> $row['lastclock'],
 					'units'		=> $row['units'],
 					'description'=> $row['description'],
 					'valuemapid' => $row['valuemapid'],
@@ -719,11 +721,10 @@
 // COpt::profiling_start('prepare_table');
 
 		$css = getUserTheme($USER_DETAILS);
-		$vTextColor = ($css == 'css_od.css')?'&color=white':'';
 		if($view_style == STYLE_TOP){
 			$header=array(new CCol(S_ITEMS,'center'));
 			foreach($hosts as $hostname){
-				$header = array_merge($header,array(new CImg('vtext.php?text='.$hostname.$vTextColor)));
+				$header = array_merge($header,array(new CImg('vtext.php?text='.$hostname.'&theme='.$css)));
 			}
 
 			$table->SetHeader($header,'vertical_header');
@@ -739,7 +740,7 @@
 		else{
 			$header=array(new CCol(S_HOSTS,'center'));
 			foreach($items as $descr => $ithosts){
-				$header = array_merge($header,array(new CImg('vtext.php?text='.$descr.$vTextColor)));
+				$header = array_merge($header,array(new CImg('vtext.php?text='.$descr.'&theme='.$css)));
 			}
 
 			$table->SetHeader($header,'vertical_header');
@@ -765,7 +766,7 @@
 		$ack = null;
 		if(isset($ithosts[$hostname])){
 			if($ithosts[$hostname]['tr_value'] == TRIGGER_VALUE_TRUE){
-				$css_class = get_severity_style($ithosts[$hostname]['severity']);
+				$css_class = getSeverityStyle($ithosts[$hostname]['severity']);
 				$ack = get_last_event_by_triggerid($ithosts[$hostname]['triggerid']);
 				if ( 1 == $ack['acknowledged'] )
 					$ack = array(SPACE, new CImg('images/general/tick.png','ack'));
@@ -926,31 +927,30 @@
 	}
 
 	function format_lastvalue($db_item){
-		if(isset($db_item["lastvalue"]) && $db_item["lastclock"] != 0){
-			if($db_item["value_type"] == ITEM_VALUE_TYPE_FLOAT){
-				$lastvalue=convert_units($db_item["lastvalue"],$db_item["units"]);
-			}
-			else if($db_item["value_type"] == ITEM_VALUE_TYPE_UINT64){
-				$lastvalue=convert_units($db_item["lastvalue"],$db_item["units"]);
-			}
-			else if($db_item["value_type"] == ITEM_VALUE_TYPE_STR ||
-					$db_item["value_type"] == ITEM_VALUE_TYPE_TEXT ||
-					$db_item["value_type"] == ITEM_VALUE_TYPE_LOG){
-				$lastvalue=$db_item["lastvalue"];
-				if(zbx_strlen($lastvalue) > 20)
-					$lastvalue = zbx_substr($lastvalue,0,20)." ...";
-				$lastvalue = nbsp(htmlspecialchars($lastvalue));
-			}
-			else{
-				$lastvalue=S_UNKNOWN_VALUE_TYPE;
-			}
-			if($db_item["valuemapid"] > 0);
-				$lastvalue = replace_value_by_map($lastvalue, $db_item["valuemapid"]);
+		if(!isset($db_item["lastvalue"]) || ($db_item["lastclock"] == 0)){
+			return '-';
+		}
 
+		if(($db_item["value_type"] == ITEM_VALUE_TYPE_FLOAT) ||
+				($db_item["value_type"] == ITEM_VALUE_TYPE_UINT64))
+		{
+			$lastvalue=convert_units($db_item["lastvalue"],$db_item["units"]);
+		}
+		else if($db_item["value_type"] == ITEM_VALUE_TYPE_STR ||
+				$db_item["value_type"] == ITEM_VALUE_TYPE_TEXT ||
+				$db_item["value_type"] == ITEM_VALUE_TYPE_LOG)
+		{
+			$lastvalue = $db_item["lastvalue"];
+			if(zbx_strlen($lastvalue) > 20)
+				$lastvalue = zbx_substr($lastvalue,0,20)." ...";
+			$lastvalue = nbsp(htmlspecialchars($lastvalue));
 		}
 		else{
-			$lastvalue = "-";
+			$lastvalue=S_UNKNOWN_VALUE_TYPE;
 		}
+		if($db_item["valuemapid"] > 0);
+			$lastvalue = replace_value_by_map($lastvalue, $db_item["valuemapid"]);
+
 	return $lastvalue;
 	}
 
@@ -1309,29 +1309,29 @@
 	}
 
 
-	/**
-	 * Check item key and return info about an error if one is present
-	 *
-	 * @param string $key item key, e.g. system.run[cat /etc/passwd | awk -F: '{ print $1 }']
-	 * @return array
-	 *
-	 */
+/**
+ * Check item key and return info about an error if one is present
+ *
+ * @param string $key item key, e.g. system.run[cat /etc/passwd | awk -F: '{ print $1 }']
+ * @return array
+ *
+ */
 	function check_item_key($key){
 		$key_strlen = zbx_strlen($key);
 
 		//empty string
 		if($key_strlen == 0){
 			return array(
-				false,   //is key valid?
-				_("Key cannot be empty") //result description
+				'valid' => false,   //is key valid?
+				'description' => _("Key cannot be empty") //result description
 			);
 		}
 
 		//key is larger then 255 chars
 		if($key_strlen > 255){
 			return array(
-				false,   //is key valid?
-				sprintf(_("Key is too large: maximum %d characters"), 255) //result description
+				'valid' => false,   //is key valid?
+				'description' => sprintf(_("Key is too large: maximum %d characters"), 255) //result description
 			);
 		}
 
@@ -1352,12 +1352,12 @@
 		//no function specified?
 		if ($current_char == $key_strlen) {
 			return array(
-				true,   //is key valid?
-				_("Key is valid") //result description
+				'valid' => true,   //is key valid?
+				'description' => _("Key is valid") //result description
 			);
 		}
 		//function with parameter, e.g. system.run[...]
-		elseif($characters[$current_char] == '[') {
+		else if($characters[$current_char] == '[') {
 
 			$state = 0; //0 - initial, 1 - inside quoted param, 2 - inside unquoted param
 			$nest_level = 0;
@@ -1371,19 +1371,19 @@
 							//do nothing
 						}
 						//Zapcat: '][' is treated as ','
-						elseif($characters[$i] == ']' && isset($characters[$i+1]) && $characters[$i+1] == '[' && $nest_level == 0) {
+						else if($characters[$i] == ']' && isset($characters[$i+1]) && $characters[$i+1] == '[' && $nest_level == 0) {
 							$i++;
 						}
 						//entering quotes
-						elseif($characters[$i] == '"') {
+						else if($characters[$i] == '"') {
 							$state = 1;
 						}
 						//next nesting level
-						elseif($characters[$i] == '[') {
+						else if($characters[$i] == '[') {
 							$nest_level++;
 						}
 						//one of the nested sets ended
-						elseif($characters[$i] == ']' && $nest_level != 0) {
+						else if($characters[$i] == ']' && $nest_level != 0) {
 							$nest_level--;
 							//skipping spaces
 							while(isset($characters[$i+1]) && $characters[$i+1] == ' ') {
@@ -1392,34 +1392,34 @@
 							//all nestings are closed correctly
 							if ($nest_level == 0 && isset($characters[$i+1]) && $characters[$i+1] == ']' && !isset($characters[$i+2])) {
 								return array(
-									true,   //is key valid?
-									_("Key is valid") //result description
+									'valid' => true,   //is key valid?
+									'description' => _("Key is valid") //result description
 								);
 							}
 
 							if((!isset($characters[$i+1]) || $characters[$i+1] != ',')
 								&& !($nest_level !=0 && isset($characters[$i+1]) && $characters[$i+1] == ']')) {
 								return array(
-									false,   //is key valid?
-									sprintf(_('incorrect syntax near \'%1$s\' at position %2$d'), $characters[$current_char], $current_char) //result description
+									'valid' => false,   //is key valid?
+									'description' => sprintf(_('incorrect syntax near \'%1$s\' at position %2$d'), $characters[$current_char], $current_char) //result description
 								);
 							}
 						}
-						elseif($characters[$i] == ']' && $nest_level == 0) {
+						else if($characters[$i] == ']' && $nest_level == 0) {
 							if (isset($characters[$i+1])){
 								return array(
-									false,   //is key valid?
-									sprintf(_('incorrect usage of bracket symbols. \'%s\' found after final bracket.'), $characters[$i+1]) //result description
+									'valid' => false,   //is key valid?
+									'description' => sprintf(_('incorrect usage of bracket symbols. \'%s\' found after final bracket.'), $characters[$i+1]) //result description
 								);
 							}
 							else {
 								return array(
-									true,   //is key valid?
-									_("Key is valid") //result description
+									'valid' => true,   //is key valid?
+									'description' => _("Key is valid") //result description
 								);
 							}
 						}
-						elseif($characters[$i] != ' ') {
+						else if($characters[$i] != ' ') {
 							$state = 2;
 						}
 
@@ -1428,31 +1428,28 @@
 					//quoted
 					case 1:
 						//ending quote is reached
-						if($characters[$i] == '"')
-						{
+						if($characters[$i] == '"'){
 							//skipping spaces
 							while(isset($characters[$i+1]) && $characters[$i+1] == ' ') {
 								$i++;
 							}
 
 							//Zapcat
-							if ($nest_level == 0 && isset($characters[$i+1]) && isset($characters[$i+2]) && $characters[$i+1] == ']' && $characters[$i+2] == '[')
-							{
+							if($nest_level == 0 && isset($characters[$i+1]) && isset($characters[$i+2]) && $characters[$i+1] == ']' && $characters[$i+2] == '['){
 								$state = 0;
 								break;
 							}
 
-							if ($nest_level == 0 && isset($characters[$i+1]) && $characters[$i+1] == ']' && !isset($characters[$i+2]))
-							{
+							if ($nest_level == 0 && isset($characters[$i+1]) && $characters[$i+1] == ']' && !isset($characters[$i+2])){
 								return array(
-									true,   //is key valid?
-									_("Key is valid") //result description
+									'valid' => true,   //is key valid?
+									'description' => _("Key is valid") //result description
 								);
 							}
-							elseif($nest_level == 0 && $characters[$i+1] == ']' && isset($characters[$i+2])){
+							else if($nest_level == 0 && $characters[$i+1] == ']' && isset($characters[$i+2])){
 								return array(
-									false,   //is key valid?
-									sprintf(_('incorrect usage of bracket symbols. \'%s\' found after final bracket.'), $characters[$i+2]) //result description
+									'valid' => false,   //is key valid?
+									'description' => sprintf(_('incorrect usage of bracket symbols. \'%s\' found after final bracket.'), $characters[$i+2]) //result description
 								);
 							}
 
@@ -1460,15 +1457,15 @@
 								&& !($nest_level != 0 && isset($characters[$i+1]) && $characters[$i+1] == ']'))
 							{
 								return array(
-									false,   //is key valid?
-									sprintf(_('incorrect syntax near \'%1$s\' at position %2$d'), $characters[$current_char], $current_char) //result description
+									'valid' => false,   //is key valid?
+									'description' => sprintf(_('incorrect syntax near \'%1$s\' at position %2$d'), $characters[$current_char], $current_char) //result description
 								);
 							}
 
 							$state = 0;
 						}
 						//escaped quote (\")
-						elseif($characters[$i] == '\\' && isset($characters[$i+1]) && $characters[$i+1] == '"') {
+						else if($characters[$i] == '\\' && isset($characters[$i+1]) && $characters[$i+1] == '"') {
 							$i++;
 						}
 
@@ -1477,26 +1474,25 @@
 					//unquoted
 					case 2:
 						//Zapcat
-						if($nest_level == 0 && $characters[$i] == ']' && isset($characters[$i+1]) && $characters[$i+1] =='[' )
-						{
+						if($nest_level == 0 && $characters[$i] == ']' && isset($characters[$i+1]) && $characters[$i+1] =='[' ){
 							$i--;
 							$state = 0;
 						}
-						elseif($characters[$i] == ',' || ($characters[$i] == ']' && $nest_level != 0)) {
+						else if($characters[$i] == ',' || ($characters[$i] == ']' && $nest_level != 0)) {
 							$i--;
 							$state = 0;
 						}
-						elseif($characters[$i] == ']' && $nest_level == 0) {
+						else if($characters[$i] == ']' && $nest_level == 0) {
 							if (isset($characters[$i+1])){
 								return array(
-									false,   //is key valid?
-									sprintf(_('incorrect usage of bracket symbols. \'%s\' found after final bracket.'), $characters[$i+1]) //result description
+									'valid' => false,   //is key valid?
+									'description' => sprintf(_('incorrect usage of bracket symbols. \'%s\' found after final bracket.'), $characters[$i+1]) //result description
 								);
 							}
 							else {
 								return array(
-									true,   //is key valid?
-									_("Key is valid") //result description
+									'valid' => true,   //is key valid?
+									'description' => _("Key is valid") //result description
 								);
 							}
 						}
@@ -1505,15 +1501,15 @@
 			}
 
 			return array(
-				false,   //is key valid?
-				_('Invalid key format') //result description
+				'valid' => false,   //is key valid?
+				'description' => _('Invalid key format') //result description
 			);
 
 		}
 		else {
 			return array(
-				false,   //is key valid?
-				sprintf(_('invalid character \'%1$s\' at position %2$d'), $characters[$current_char], $current_char) //result description
+				'valid' => false,   //is key valid?
+				'description' => sprintf(_('invalid character \'%1$s\' at position %2$d'), $characters[$current_char], $current_char) //result description
 			);
 		}
 

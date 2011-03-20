@@ -1,7 +1,7 @@
 #!/usr/bin/perl
-# 
-# ZABBIX
-# Copyright (C) 2000-2005 SIA Zabbix
+#
+# Zabbix
+# Copyright (C) 2000-2011 Zabbix SIA
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as
@@ -51,6 +51,7 @@ local $uniq;
 	"t_varchar"	=>	"varchar",
 	"t_char"	=>	"char",
 	"t_image"	=>	"longblob",
+	"t_text"	=>	"text",
 	"t_history_log"	=>	"text",
 	"t_history_text"=>	"text",
 	"t_blob"	=>	"blob",
@@ -72,17 +73,18 @@ local $uniq;
 	"t_varchar"	=>	"ZBX_TYPE_CHAR",
 	"t_char"	=>	"ZBX_TYPE_CHAR",
 	"t_image"	=>	"ZBX_TYPE_BLOB",
+	"t_text"	=>	"ZBX_TYPE_TEXT",
 	"t_history_log"	=>	"ZBX_TYPE_TEXT",
 	"t_history_text"=>	"ZBX_TYPE_TEXT",
 	"t_blob"	=>	"ZBX_TYPE_BLOB",
 	"t_text"	=>	"ZBX_TYPE_TEXT",
 	"t_item_param"	=>	"ZBX_TYPE_TEXT",
-	"t_cksum_text"	=>	"ZBX_TYPE_TEXT"  
+	"t_cksum_text"	=>	"ZBX_TYPE_TEXT"
 );
 
-$c{"before"}="/* 
-** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+$c{"before"}="/*
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -119,12 +121,13 @@ const ZBX_TABLE	tables[]={
 	"t_varchar"	=>	"nvarchar2",
 	"t_char"	=>	"nvarchar2",
 	"t_image"	=>	"blob",
+	"t_text"	=>	"nclob",
 	"t_history_log"	=>	"nclob",
 	"t_history_text"=>	"nclob",
 	"t_blob"	=>	"nvarchar2(2048)",
 	"t_text"	=>	"nvarchar2(2048)",
 	"t_item_param"	=>	"nvarchar2(2048)",
-	"t_cksum_text"	=>	"nclob"  
+	"t_cksum_text"	=>	"nclob"
 );
 
 %ibm_db2=("t_bigint"	=>	"bigint",
@@ -140,6 +143,7 @@ const ZBX_TABLE	tables[]={
 	"t_varchar"	=>	"varchar",
 	"t_char"	=>	"varchar",
 	"t_image"	=>	"blob",
+	"t_text"	=>	"varchar(2048)",
 	"t_history_log"	=>	"varchar(2048)",
 	"t_history_text"=>	"varchar(2048)",
 	"t_time"	=>	"integer",
@@ -163,6 +167,7 @@ const ZBX_TABLE	tables[]={
 	"t_varchar"	=>	"varchar",
 	"t_char"	=>	"char",
 	"t_image"	=>	"bytea",
+	"t_text"	=>	"text",
 	"t_history_log"	=>	"text",
 	"t_history_text"=>	"text",
 	"t_time"	=>	"integer",
@@ -170,7 +175,7 @@ const ZBX_TABLE	tables[]={
 	"t_blob"	=>	"text",
 	"t_text"	=>	"text",
 	"t_item_param"	=>	"text",
-	"t_cksum_text"	=>	"text"  
+	"t_cksum_text"	=>	"text"
 );
 
 %sqlite3=("t_bigint"	=>	"bigint",
@@ -187,12 +192,13 @@ const ZBX_TABLE	tables[]={
 	"t_varchar"	=>	"varchar",
 	"t_char"	=>	"char",
 	"t_image"	=>	"longblob",
+	"t_text"	=>	"text",
 	"t_history_log"	=>	"text",
 	"t_history_text"=>	"text",
 	"t_blob"	=>	"blob",
 	"t_text"	=>	"text",
 	"t_item_param"	=>	"text",
-	"t_cksum_text"	=>	"text"  
+	"t_cksum_text"	=>	"text"
 );
 
 sub rtrim($)
@@ -328,7 +334,7 @@ sub process_field
 				$default = "DEFAULT $default";
 			}
 		}
-		
+
 		if ($output{"database"} eq "mysql")
 		{
 			@text_fields = ('blob', 'longblob', 'text', 'longtext');
@@ -396,7 +402,7 @@ sub process_field
 
 # RESTRICT may contains new line chars we need to clean them out
 			$fk_flags = rtrim ($fk_flags);
-			
+
 			if ($fk_flags eq "")
 			{
 				$fk_flags = " ON DELETE CASCADE";
@@ -424,7 +430,7 @@ sub process_field
 			else
 			{
 				$references = "";
-				
+
 				$fkeys = "${fkeys}${fk_bol}ALTER TABLE${only} ${table_name} ADD CONSTRAINT ${cname} FOREIGN KEY (${name}) REFERENCES ${fk_table} (${fk_field})${fk_flags}${fk_eol}\n";
 
 				if ($output{"database"} eq "mysql")
@@ -467,7 +473,7 @@ sub process_index
 		if (1 == $unique) { $unique = " UNIQUE"; }
 		else { $unique = ""; }
 
-		print "CREATE${unique} INDEX ${table_name}_$name\ on $table_name ($fields);${eol}\n";
+		print "CREATE${unique} INDEX ${table_name}_$name\ ON $table_name ($fields);${eol}\n";
 	}
 }
 

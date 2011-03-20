@@ -1,6 +1,6 @@
 /*
-** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,10 +38,8 @@ typedef struct
 }
 ZBX_HTTPSTAT;
 
-extern int	httppoller_num;
-
 extern int	CONFIG_HTTPPOLLER_FORKS;
 
-void	process_httptests(int now);
+void	process_httptests(int httppoller_num, int now);
 
 #endif

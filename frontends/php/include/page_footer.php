@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,19 +21,25 @@
 <?php
 	require_once('include/config.inc.php');
 
-	global $USER_DETAILS;
-	global $page;
-	global $ZBX_PAGE_POST_JS;
+// if we include footer in some function
+	if(!isset($page)) global $page;
+	if(!isset($ZBX_PAGE_POST_JS)) global $ZBX_PAGE_POST_JS;
+// ---
 
 	if(!defined('PAGE_HEADER_LOADED')){
 		define ('PAGE_HEADER_LOADED', 1);
 	}
 
-//------------------------------------- <HISTORY> ---------------------------------------
-	if(isset($page['hist_arg']) && ($USER_DETAILS['alias'] != ZBX_GUEST_USER) && ($page['type'] == PAGE_TYPE_HTML) && !defined('ZBX_PAGE_NO_MENU')){
+// HISTORY{
+	if(isset($page['hist_arg']) && (CWebUser::$data['alias'] != ZBX_GUEST_USER) && ($page['type'] == PAGE_TYPE_HTML) && !defined('ZBX_PAGE_NO_MENU')){
 		add_user_history($page);
 	}
-//------------------------------------- </HISTORY> --------------------------------------
+// HISTORY}
+
+// last page
+	if(!defined('ZBX_PAGE_NO_MENU') && ($page['file'] != 'profile.php')){
+		CProfile::update('web.paging.lastpage', $page['file'], PROFILE_TYPE_STR);
+	}
 
 	CProfile::flush();
 
@@ -48,7 +54,7 @@
 
 	$post_script = '';
 	if(uint_in_array($page['type'], array(PAGE_TYPE_HTML_BLOCK, PAGE_TYPE_HTML))){
-		if(!is_null($USER_DETAILS) && isset($USER_DETAILS['debug_mode']) && ($USER_DETAILS['debug_mode'] == GROUP_DEBUG_MODE_ENABLED)){
+		if(!is_null(CWebUser::$data) && isset(CWebUser::$data['debug_mode']) && (CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_ENABLED)){
 			COpt::profiling_stop('script');
 			COpt::show();
 		}
@@ -71,32 +77,44 @@
 			}
 		}
 
-		if(defined('ZBX_PAGE_DO_REFRESH') && $USER_DETAILS['refresh']){
-			$post_script.= 'PageRefresh.init('.($USER_DETAILS['refresh']*1000).');'."\n";
+		if(defined('ZBX_PAGE_DO_REFRESH') && CWebUser::$data['refresh']){
+			$post_script.= 'PageRefresh.init('.(CWebUser::$data['refresh']*1000).');'."\n";
 		}
 
 		$post_script.= 'cookie.init();'."\n";
 		$post_script.= 'chkbxRange.init();'."\n";
-		$post_script.= 'if(IE6){ie6pngfix.run(false);}'."\n";
+
+		$post_script.= 'var screenCSS = null;'."\n";
+		$post_script.= 'if(jQuery(window).width()<1024) screenCSS = "handheld.css";'."\n";
+		$post_script.= 'if(!is_null(screenCSS)) jQuery("head").append(\'<link rel="stylesheet" type="text/css" href="styles/\'+screenCSS+\'" />\');';
 
 		$post_script.='});'."\n";
 
 		if(!defined('ZBX_PAGE_NO_MENU') && !defined('ZBX_PAGE_NO_FOOTER')){
-			$table = new CTable(NULL,"page_footer");
+			$table = new CTable(NULL,"textwhite bold maxwidth ui-widget-header ui-corner-all page_footer");
 			$table->setCellSpacing(0);
 			$table->setCellPadding(1);
+
+			if(CWebUser::$data['userid'] == 0){
+				$conString = _('Not connected');
+			}
+			else if(ZBX_DISTRIBUTED){
+				$conString = _s('Connected as \'%1$s\' from \'%2$s\'', CWebUser::$data['alias'], CWebUser::$data['node']['name']);
+			}
+			else{
+				$conString = _s('Connected as \'%1$s\'', CWebUser::$data['alias']);
+			}
+
+
 			$table->addRow(array(
 				new CCol(new CLink(
-					S_ZABBIX.SPACE.ZABBIX_VERSION.SPACE.S_COPYRIGHT_BY.SPACE.S_SIA_ZABBIX,
-					'http://www.zabbix.com', 'highlight', null, true),
-					'page_footer_l'),
+					_s('Zabbix %s Copyright 2001-2011 by Zabbix SIA', ZABBIX_VERSION),
+					'http://www.zabbix.com', 'highlight', null, true), 'center'),
 				new CCol(array(
-						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE,'divider'),
-						new CSpan(($USER_DETAILS['userid'] == 0)?S_NOT_CONNECTED:S_CONNECTED_AS.SPACE."'".$USER_DETAILS['alias']."'".
-						(ZBX_DISTRIBUTED ? SPACE.S_FROM_SMALL.SPACE."'".$USER_DETAILS['node']['name']."'" : ''),'footer_sign')
-					),
-					'page_footer_r')
-				));
+					new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
+					new CSpan($conString, 'footer_sign')
+				), 'right')
+			));
 			$table->show();
 		}
 

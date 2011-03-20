@@ -1,6 +1,6 @@
 /*
-** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -107,6 +107,10 @@
 
 #ifdef HAVE_SYS_TIME_H
 #	include <sys/time.h>
+#endif
+
+#ifdef HAVE_SYS_TIMES_H
+#	include <sys/times.h>
 #endif
 
 #ifdef HAVE_LINUX_KERNEL_H

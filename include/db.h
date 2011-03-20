@@ -1,6 +1,6 @@
 /*
-** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ extern char	*CONFIG_DBSOCKET;
 extern int	CONFIG_DBPORT;
 extern int	CONFIG_NODEID;
 extern int	CONFIG_MASTER_NODEID;
-extern int	CONFIG_DBSYNCER_FORKS;
+extern int	CONFIG_HISTSYNCER_FORKS;
 extern int	CONFIG_NODE_NOHISTORY;
 extern int	CONFIG_REFRESH_UNSUPPORTED;
 extern int	CONFIG_UNAVAILABLE_DELAY;
@@ -168,14 +168,13 @@ typedef enum {
 #define ALERT_SENDTO_LEN_MAX		ALERT_SENDTO_LEN+1
 #define ALERT_SUBJECT_LEN		255
 #define ALERT_SUBJECT_LEN_MAX		ALERT_SUBJECT_LEN+1
+#define ALERT_MESSAGE_LEN		65535
+#define ALERT_MESSAGE_LEN_MAX		ALERT_MESSAGE_LEN+1
 #define ALERT_ERROR_LEN			128
 #define ALERT_ERROR_LEN_MAX		ALERT_ERROR_LEN+1
 
 #define GRAPH_ITEM_COLOR_LEN		6
 #define GRAPH_ITEM_COLOR_LEN_MAX	GRAPH_ITEM_COLOR_LEN+1
-
-#define DHOST_IP_LEN			39
-#define DHOST_IP_LEN_MAX		DHOST_IP_LEN+1
 
 #define DSERVICE_KEY_LEN		255
 #define DSERVICE_KEY_LEN_MAX		DSERVICE_KEY_LEN+1
@@ -187,8 +186,6 @@ typedef enum {
 #define HTTPTEST_HTTP_PASSWORD_LEN	64
 #define HTTPTEST_HTTP_PASSWORD_LEN_MAX	HTTPTEST_HTTP_PASSWORD_LEN+1
 
-#define PROXY_DHISTORY_IP_LEN		39
-#define PROXY_DHISTORY_IP_LEN_MAX	PROXY_DHISTORY_IP_LEN+1
 #define PROXY_DHISTORY_KEY_LEN		255
 #define PROXY_DHISTORY_KEY_LEN_MAX	PROXY_DHISTORY_KEY_LEN+1
 #define PROXY_DHISTORY_VALUE_LEN	255
@@ -225,12 +222,23 @@ typedef enum {
 #define	ZBX_SQL_STRVAL_NE(str)	"<>", str
 #endif
 
+#define ZBX_SQL_NULLCMP(f1, f2)	"((" f1 " is null and " f2 " is null) or " f1 "=" f2 ")"
+
 #define ZBX_DBROW2UINT64(uint, row)	if (SUCCEED == DBis_null(row))		\
 						uint = 0;			\
 					else					\
 						sscanf(row, ZBX_FS_UI64, &uint)
 
 #define ZBX_MAX_SQL_LEN		65535
+
+typedef struct
+{
+	char		*command;
+	zbx_uint64_t	groupid;
+	unsigned char	type;
+	unsigned char	execute_on;
+}
+DB_SCRIPT;
 
 typedef struct
 {
@@ -330,16 +338,6 @@ DB_ITEM;
 
 typedef struct
 {
-	zbx_uint64_t     functionid;
-	zbx_uint64_t     itemid;
-	zbx_uint64_t     triggerid;
-	char    *function;
-	char	*parameter;
-}
-DB_FUNCTION;
-
-typedef struct
-{
 	zbx_uint64_t	mediaid;
 	zbx_uint64_t	mediatypeid;
 	char	*sendto;
@@ -395,15 +393,9 @@ typedef struct
 {
 	zbx_uint64_t	operationid;
 	zbx_uint64_t	actionid;
-	zbx_uint64_t	objectid;
-	zbx_uint64_t	mediatypeid;
-	char		*shortdata;
-	char		*longdata;
 	int		operationtype;
-	int		object;
 	int		esc_period;
-	int		default_msg;
-	int		evaltype;
+	unsigned char	evaltype;
 }
 DB_OPERATION;
 
@@ -578,14 +570,10 @@ int	DBget_queue_count(int from, int to);
 double	DBget_requiredperformance();
 zbx_uint64_t DBget_proxy_lastaccess(const char *hostname);
 
-int	DBget_escape_string_len(const char *src);
-void    DBescape_string(const char *src, char *dst, int len);
 char	*DBdyn_escape_string(const char *src);
 char	*DBdyn_escape_string_len(const char *src, int max_src_len);
 
 #define ZBX_SQL_LIKE_ESCAPE_CHAR '!'
-int	DBget_escape_like_pattern_len(const char *src);
-void	DBescape_like_pattern(const char *src, char *dst, int len);
 char	*DBdyn_escape_like_pattern(const char *src);
 
 void    DBget_item_from_db(DB_ITEM *item, DB_ROW row);
@@ -624,10 +612,10 @@ char	*zbx_user_string(zbx_uint64_t userid);
 double	DBmultiply_value_float(DB_ITEM *item, double value);
 zbx_uint64_t	DBmultiply_value_uint64(DB_ITEM *item, zbx_uint64_t value);
 
-void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, unsigned short port, int now);
-void	DBproxy_register_host(const char *host, const char *ip, unsigned short port);
+void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns, unsigned short port, int now);
+void	DBproxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port);
 void	DBexecute_overflowed_sql(char **sql, int *sql_allocated, int *sql_offset);
-char	*DBget_unique_hostname_by_sample(char *host_name_sample);
+char	*DBget_unique_hostname_by_sample(const char *host_name_sample);
 
 char	*DBsql_id_cmp(zbx_uint64_t id);
 char	*DBsql_id_ins(zbx_uint64_t id);

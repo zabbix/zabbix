@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2007 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -610,14 +610,12 @@ if(isset($_REQUEST['sform'])){
 
 	$time_param = new CTable();
 
-	$div = new Ctag('div','yes');
+	$div = new CDiv();
 
 	if($new_service_time['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME){
 //		$time_param->addRow(array(S_NOTE, new CTextBox('new_service_time[note]','<short description>',40)));
 //		$time_param->addRow(array(S_FROM, new CTextBox('new_service_time[from]','d M Y H:i',20)));
 //		$time_param->addRow(array(S_TILL, new CTextBox('new_service_time[to]','d M Y H:i',20)));
-
-
 
 		$script = "javascript: ".
 						"if(CLNDR['downtime_since'].clndr.setSDateFromOuterObj()){".

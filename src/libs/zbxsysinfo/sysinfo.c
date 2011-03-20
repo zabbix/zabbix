@@ -1,6 +1,6 @@
 /*
-** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -326,7 +326,7 @@ void	test_parameters()
 		test_parameter(commands[i].key, PROCESS_TEST | PROCESS_USE_TEST_PARAM);
 }
 
-static int	replace_param(const char *cmd, const char *param, char *out, int outlen, char *error, int max_err_len)
+static int	replace_param(const char *cmd, const char *param, char *out, int outlen, char *error, int max_error_len)
 {
 	int ret = SUCCEED;
 	char buf[MAX_STRING_LEN];
@@ -368,7 +368,7 @@ static int	replace_param(const char *cmd, const char *param, char *out, int outl
 					for (c = suppressed_chars; '\0' != *c; c++)
 						if (NULL != strchr(buf, *c))
 						{
-							zbx_snprintf(error, max_err_len, "Special characters '%s'"
+							zbx_snprintf(error, max_error_len, "Special characters '%s'"
 									" are not allowed in the parameters",
 									suppressed_chars);
 							ret = FAIL;
@@ -512,8 +512,8 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 
 		if(commands[i].flags & CF_USEUPARAM)
 		{
-			printf("[]");
-			i = 2;
+			printf("[%s]", usr_param);
+			i = 2 + (int)strlen(usr_param);
 		}
 		else
 			i = 0;
@@ -605,10 +605,12 @@ int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c
 		break;
 	case ITEM_VALUE_TYPE_STR:
 	case ITEM_VALUE_TYPE_LOG:
+		zbx_replace_invalid_utf8(c);
 		SET_STR_RESULT(result, strdup(c));
 		ret = SUCCEED;
 		break;
 	case ITEM_VALUE_TYPE_TEXT:
+		zbx_replace_invalid_utf8(c);
 		SET_TEXT_RESULT(result, strdup(c));
 		ret = SUCCEED;
 		break;

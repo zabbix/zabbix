@@ -97,6 +97,9 @@ frontends/php/images/general/ipmi_available.png -text
 frontends/php/images/general/ipmi_available_bb.png -text
 frontends/php/images/general/ipmi_unavailable.png -text
 frontends/php/images/general/ipmi_unknown.png -text
+frontends/php/images/general/login/background.png -text
+frontends/php/images/general/login/logo.png -text
+frontends/php/images/general/login/username_pass_field.png -text
 frontends/php/images/general/no_icon.png -text
 frontends/php/images/general/ok.png -text
 frontends/php/images/general/ok_bb.png -text
@@ -108,8 +111,10 @@ frontends/php/images/general/snmp_available_bb.png -text
 frontends/php/images/general/snmp_unavailable.png -text
 frontends/php/images/general/snmp_unknown.png -text
 frontends/php/images/general/sort_down.gif -text
+frontends/php/images/general/sort_down_blue.gif -text
 frontends/php/images/general/sort_down_od.gif -text
 frontends/php/images/general/sort_up.gif -text
+frontends/php/images/general/sort_up_blue.gif -text
 frontends/php/images/general/sort_up_od.gif -text
 frontends/php/images/general/tick.png -text
 frontends/php/images/general/tr_space.gif -text
@@ -142,19 +147,21 @@ frontends/php/images/gradients/blink1.gif -text svneol=unset#unset
 frontends/php/images/gradients/blink2.gif -text svneol=unset#unset
 frontends/php/images/gradients/button.gif -text svneol=unset#unset
 frontends/php/images/gradients/gradient.png -text
+frontends/php/images/gradients/header_footer_blue.png -text svneol=unset#image/png
+frontends/php/images/gradients/header_link_blue.png -text svneol=unset#image/png
 frontends/php/images/gradients/menu_not_active.gif -text svneol=unset#unset
 frontends/php/images/gradients/menu_not_active2.gif -text
 frontends/php/images/gradients/menu_not_active_bb.gif -text
+frontends/php/images/gradients/menu_not_active_blue.png -text svneol=unset#image/png
 frontends/php/images/gradients/sla_blue.png -text
 frontends/php/images/gradients/sla_blue15.png -text
 frontends/php/images/gradients/sla_green.png -text
 frontends/php/images/gradients/sla_green15.png -text
 frontends/php/images/gradients/sla_red.png -text
 frontends/php/images/gradients/sla_red15.png -text
-frontends/php/images/gradients/table_head.gif -text svneol=unset#unset
-frontends/php/images/gradients/table_head2.gif -text svneol=unset#unset
 frontends/php/images/gradients/table_head2_bb.gif -text
 frontends/php/images/gradients/table_head_bb.gif -text
+frontends/php/images/gradients/texture_diagonal.gif -text
 frontends/php/images/sysmaps/Hub.png -text svneol=unset#unset
 frontends/php/images/sysmaps/Hub_small.png -text svneol=unset#unset
 frontends/php/images/sysmaps/Network.png -text svneol=unset#unset
@@ -198,19 +205,18 @@ frontends/php/locale/sk/LC_MESSAGES/frontend.po -text
 frontends/php/locale/sv/LC_MESSAGES/frontend.po -text
 frontends/php/locale/uk/LC_MESSAGES/frontend.po -text
 frontends/php/locale/zh_CN/LC_MESSAGES/frontend.po -text
-frontends/php/styles/darkblue/images/ui-bg_diagonals-small_50_5c5c5c_40x40.png -text
-frontends/php/styles/darkblue/images/ui-bg_flat_25_000000_40x100.png -text
-frontends/php/styles/darkblue/images/ui-bg_flat_30_cccccc_40x100.png -text
-frontends/php/styles/darkblue/images/ui-bg_glass_40_ffc73d_1x400.png -text
-frontends/php/styles/darkblue/images/ui-bg_highlight-hard_20_0972a5_1x100.png -text
-frontends/php/styles/darkblue/images/ui-bg_highlight-soft_33_003147_1x100.png -text
-frontends/php/styles/darkblue/images/ui-bg_highlight-soft_35_222222_1x100.png -text
-frontends/php/styles/darkblue/images/ui-bg_highlight-soft_44_444444_1x100.png -text
-frontends/php/styles/darkblue/images/ui-bg_highlight-soft_80_eeeeee_1x100.png -text
+frontends/php/styles/darkblue/images/ui-bg_flat_0_aaaaaa_40x100.png -text svneol=unset#image/png
+frontends/php/styles/darkblue/images/ui-bg_flat_100_1d92cd_40x100.png -text svneol=unset#image/png
+frontends/php/styles/darkblue/images/ui-bg_flat_10_aaaaaa_40x100.png -text svneol=unset#image/png
+frontends/php/styles/darkblue/images/ui-bg_flat_30_dc0000_40x100.png -text svneol=unset#image/png
+frontends/php/styles/darkblue/images/ui-bg_highlight-hard_25_000e19_1x100.png -text svneol=unset#image/png
+frontends/php/styles/darkblue/images/ui-bg_highlight-hard_40_1d92cd_1x100.png -text svneol=unset#image/png
+frontends/php/styles/darkblue/images/ui-bg_inset-hard_40_1d92cd_1x100.png -text svneol=unset#image/png
+frontends/php/styles/darkblue/images/ui-bg_inset-soft_25_3c759b_1x100.png -text svneol=unset#image/png
 frontends/php/styles/darkblue/images/ui-icons_222222_256x240.png -text
 frontends/php/styles/darkblue/images/ui-icons_4b8e0b_256x240.png -text
-frontends/php/styles/darkblue/images/ui-icons_a83300_256x240.png -text
-frontends/php/styles/darkblue/images/ui-icons_cccccc_256x240.png -text
+frontends/php/styles/darkblue/images/ui-icons_77b7da_256x240.png -text svneol=unset#image/png
+frontends/php/styles/darkblue/images/ui-icons_a83300_256x240.png -text svneol=unset#image/png
 frontends/php/styles/darkblue/images/ui-icons_ffffff_256x240.png -text
 frontends/php/styles/darkorange/images/ui-bg_flat_25_1f1f1f_40x100.png -text
 frontends/php/styles/darkorange/images/ui-bg_flat_30_cccccc_40x100.png -text
@@ -224,66 +230,42 @@ frontends/php/styles/darkorange/images/ui-icons_000000_256x240.png -text
 frontends/php/styles/darkorange/images/ui-icons_a83300_256x240.png -text
 frontends/php/styles/darkorange/images/ui-icons_dfdfdf_256x240.png -text
 frontends/php/styles/darkorange/images/ui-icons_ff5500_256x240.png -text
-frontends/php/styles/originalblue/images/ui-bg_diagonals-small_80_666666_40x40.png -text
-frontends/php/styles/originalblue/images/ui-bg_flat_030_666666_40x100.png -text
-frontends/php/styles/originalblue/images/ui-bg_flat_55_fbec88_40x100.png -text
-frontends/php/styles/originalblue/images/ui-bg_glass_75_d0e5f5_1x400.png -text
-frontends/php/styles/originalblue/images/ui-bg_glass_85_dfeffc_1x400.png -text
-frontends/php/styles/originalblue/images/ui-bg_glass_95_fef1ec_1x400.png -text
-frontends/php/styles/originalblue/images/ui-bg_highlight-hard_55_5c9ccc_1x100.png -text
-frontends/php/styles/originalblue/images/ui-bg_inset-hard_100_f5f8f9_1x100.png -text
-frontends/php/styles/originalblue/images/ui-bg_inset-hard_100_fcfdfd_1x100.png -text
-frontends/php/styles/originalblue/images/ui-icons_217bc0_256x240.png -text
-frontends/php/styles/originalblue/images/ui-icons_2e83ff_256x240.png -text
+frontends/php/styles/originalblue/images/ui-bg_flat_0_999999_40x100.png -text
+frontends/php/styles/originalblue/images/ui-bg_flat_0_c9c9c9_40x100.png -text
+frontends/php/styles/originalblue/images/ui-bg_flat_100_fef1ec_40x100.png -text
+frontends/php/styles/originalblue/images/ui-bg_flat_100_fffce3_40x100.png -text
+frontends/php/styles/originalblue/images/ui-bg_flat_100_ffffff_40x100.png -text
+frontends/php/styles/originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png -text
+frontends/php/styles/originalblue/images/ui-bg_highlight-hard_75_dae6f1_1x100.png -text
+frontends/php/styles/originalblue/images/ui-bg_highlight-hard_85_f5f8fa_1x100.png -text
+frontends/php/styles/originalblue/images/ui-bg_inset-hard_100_dae6f1_1x100.png -text
+frontends/php/styles/originalblue/images/ui-icons_456582_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_469bdd_256x240.png -text
-frontends/php/styles/originalblue/images/ui-icons_6da8d5_256x240.png -text
-frontends/php/styles/originalblue/images/ui-icons_cd0a0a_256x240.png -text
-frontends/php/styles/originalblue/images/ui-icons_d8e7f3_256x240.png -text
-frontends/php/styles/originalblue/images/ui-icons_f9bd01_256x240.png -text
-frontends/php/tests/api/classes/class.triggerexpressionTest.php -text
+frontends/php/styles/originalblue/images/ui-icons_5481ab_256x240.png -text
+frontends/php/styles/originalblue/images/ui-icons_d40000_256x240.png -text
+frontends/php/styles/originalblue/images/ui-icons_ffffff_256x240.png -text
 frontends/php/tests/api_json/APIInfo.php -text
 frontends/php/tests/api_json/ApiJsonTests.php -text
+frontends/php/tests/api_json/CMap.php -text
 frontends/php/tests/api_json/General.php -text
 frontends/php/tests/api_json/User.php -text
 frontends/php/tests/bootstrap.php.template -text
-frontends/php/tests/general/db_test.php -text
+frontends/php/tests/general/function_DBclose.php -text
+frontends/php/tests/general/function_DBcommit.php -text
+frontends/php/tests/general/function_DBcondition.php -text
+frontends/php/tests/general/function_DBconnect.php -text
+frontends/php/tests/general/function_DBend.php -text
+frontends/php/tests/general/function_DBexecute.php -text
+frontends/php/tests/general/function_DBfetch.php -text
+frontends/php/tests/general/function_DBid2nodeid.php -text
+frontends/php/tests/general/function_DBin_node.php -text
+frontends/php/tests/general/function_DBloadfile.php -text
+frontends/php/tests/general/function_DBrollback.php -text
+frontends/php/tests/general/function_DBselect.php -text
+frontends/php/tests/general/function_DBstart.php -text
 frontends/php/tests/include/class.cwebtest.php -text
 frontends/php/tests/include/class.czabbixtest.php -text
 frontends/php/tests/include/dbfunc.php -text
-frontends/php/tests/selenium/SeleniumTests.php -text
-frontends/php/tests/selenium/testClicks.php -text
-frontends/php/tests/selenium/testFormHost.php -text
-frontends/php/tests/selenium/testFormHostGroup.php -text
-frontends/php/tests/selenium/testFormLogin.php -text
-frontends/php/tests/selenium/testFormMediaType.php -text
-frontends/php/tests/selenium/testFormProfile.php -text
-frontends/php/tests/selenium/testFormScreen.php -text
-frontends/php/tests/selenium/testGeneric.php -text
-frontends/php/tests/selenium/testPageActionsAutoregistration.php -text
-frontends/php/tests/selenium/testPageActionsDiscovery.php -text
-frontends/php/tests/selenium/testPageActionsTriggers.php -text
-frontends/php/tests/selenium/testPageDashboard.php -text
-frontends/php/tests/selenium/testPageDiscovery.php -text
-frontends/php/tests/selenium/testPageEvents.php -text
-frontends/php/tests/selenium/testPageHosts.php -text
-frontends/php/tests/selenium/testPageInventory.php -text
-frontends/php/tests/selenium/testPageInventoryExtended.php -text
-frontends/php/tests/selenium/testPageMaintenance.php -text
-frontends/php/tests/selenium/testPageMaps.php -text
-frontends/php/tests/selenium/testPageMediaTypes.php -text
-frontends/php/tests/selenium/testPageNodes.php -text
-frontends/php/tests/selenium/testPageProxies.php -text
-frontends/php/tests/selenium/testPageQueueDetails.php -text
-frontends/php/tests/selenium/testPageQueueOverview.php -text
-frontends/php/tests/selenium/testPageQueueOverviewByProxy.php -text
-frontends/php/tests/selenium/testPageScreens.php -text
-frontends/php/tests/selenium/testPageScripts.php -text
-frontends/php/tests/selenium/testPageSearch.php -text
-frontends/php/tests/selenium/testPageSlideShows.php -text
-frontends/php/tests/selenium/testPageStatusOfZabbix.php -text
-frontends/php/tests/selenium/testPageTemplates.php -text
-frontends/php/tests/selenium/testPageUserGroups.php -text
-frontends/php/tests/selenium/testPageUsers.php -text
 m4/ax_lib_ibm_db2.m4 -text
 m4/ax_lib_oracle_oci.m4 -text
 m4/iconv.m4 -text
@@ -306,15 +288,44 @@ misc/init.d/freebsd/zabbix_server -text
 misc/init.d/tru64/zabbix_server -text
 misc/init.d/ubuntu/zabbix-agent.conf -text
 misc/init.d/ubuntu/zabbix-server.conf -text
+src/libs/zbxself/Makefile.am -text
+src/zabbix_server/selfmon/Makefile.am -text
 tests/data/README -text
 tests/data/data_test.sql -text
 tests/templates/sqlite3.init -text
 tests/templates/zabbix.conf.php.mysql -text
 tests/templates/zabbix.conf.php.postgresql -text
 tests/templates/zabbix.conf.php.sqlite3 -text
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Hub.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Hub_small.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Network.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Network_small.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Notebook.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Notebook_small.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Phone.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Phone_small.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Printer.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Printer_small.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Router.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Router_small.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Satellite.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Satellite_small.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Server.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Server_small.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/UPS.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/UPS_small.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Workstation.png -text svneol=unset#image/png
+upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Workstation_small.png -text svneol=unset#image/png
 upgrades/dbpatches/2.0/ibm_db2/patch/graph_discovery.sql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/item_discovery.sql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/trigger_discovery.sql -text
 upgrades/dbpatches/2.0/mysql/patch/interface.sql -text
+upgrades/dbpatches/2.0/mysql/patch/opcommand_grp.sql -text
+upgrades/dbpatches/2.0/mysql/patch/opcommand_hst.sql -text
+upgrades/dbpatches/2.0/mysql/patch/opgroup.sql -text
+upgrades/dbpatches/2.0/mysql/patch/opmessage.sql -text
+upgrades/dbpatches/2.0/mysql/patch/opmessage_grp.sql -text
+upgrades/dbpatches/2.0/mysql/patch/opmessage_usr.sql -text
+upgrades/dbpatches/2.0/mysql/patch/optemplate.sql -text
 upgrades/dbpatches/2.0/oracle/patch/interface.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/interface.sql -text

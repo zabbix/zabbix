@@ -4,6 +4,11 @@ jQuery(document).ready(function(){
 
 	jQuery("#name").focus();
 
+// Type change
+	jQuery("#type").change(function(){
+		jQuery("#execute_on").closest('li').toggle((jQuery(this).val() == '0'));
+	}).change();
+
 // Clone button
 	jQuery("#clone").click(function(){
 		jQuery("#scriptid, #delete, #clone").remove();
