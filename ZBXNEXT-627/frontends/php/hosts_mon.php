@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -149,7 +149,7 @@ include_once('include/page_header.php');
 
 	$filter_table->addRow($footer_col);
 
-	$filter_form = new CForm(null, 'get');
+	$filter_form = new CForm('get');
 	$filter_form->setAttribute('name','zbx_filter');
 	$filter_form->setAttribute('id','zbx_filter');
 	$filter_form->addItem($filter_table);
@@ -192,7 +192,7 @@ include_once('include/page_header.php');
 		);
 		if($pageFilter->groupid > 0) $options['groupids'] = $pageFilter->groupid;
 
-		$hosts = CHost::get($options);
+		$hosts = API::Host()->get($options);
 	}
 	else{
 		$hosts = array();
@@ -213,7 +213,7 @@ include_once('include/page_header.php');
 		'selectScreens' => API_OUTPUT_COUNT,
 		'nopermissions' => 1
 	);
-	$hosts = CHost::get($options);
+	$hosts = API::Host()->get($options);
 	order_result($hosts, $sortfield, $sortorder);
 
 	foreach($hosts as $num => $host){
@@ -230,7 +230,7 @@ include_once('include/page_header.php');
 
 		$description = array();
 		if($host['proxy_hostid']){
-			$proxy = CProxy::get(array(
+			$proxy = API::Proxy()->get(array(
 				'proxyids' => $host['proxy_hostid'],
 				'output' => API_OUTPUT_EXTEND
 			));
@@ -243,40 +243,40 @@ include_once('include/page_header.php');
 
 		switch($host['available']){
 			case HOST_AVAILABLE_TRUE:
-				$zbx_available = new CDiv(SPACE, 'iconzbxavailable');
+				$zbx_available = new CDiv(SPACE, 'status_icon iconzbxavailable');
 				break;
 			case HOST_AVAILABLE_FALSE:
-				$zbx_available = new CDiv(SPACE, 'iconzbxunavailable');
+				$zbx_available = new CDiv(SPACE, 'status_icon iconzbxunavailable');
 				$zbx_available->setHint($host['error'], '', 'on');
 				break;
 			case HOST_AVAILABLE_UNKNOWN:
-				$zbx_available = new CDiv(SPACE, 'iconzbxunknown');
+				$zbx_available = new CDiv(SPACE, 'status_icon iconzbxunknown');
 				break;
 		}
 
 		switch($host['snmp_available']){
 			case HOST_AVAILABLE_TRUE:
-				$snmp_available = new CDiv(SPACE, 'iconsnmpavailable');
+				$snmp_available = new CDiv(SPACE, 'status_icon iconsnmpavailable');
 				break;
 			case HOST_AVAILABLE_FALSE:
-				$snmp_available = new CDiv(SPACE, 'iconsnmpunavailable');
+				$snmp_available = new CDiv(SPACE, 'status_icon iconsnmpunavailable');
 				$snmp_available->setHint($host['snmp_error'], '', 'on');
 				break;
 			case HOST_AVAILABLE_UNKNOWN:
-				$snmp_available = new CDiv(SPACE, 'iconsnmpunknown');
+				$snmp_available = new CDiv(SPACE, 'status_icon iconsnmpunknown');
 				break;
 		}
 
 		switch($host['ipmi_available']){
 			case HOST_AVAILABLE_TRUE:
-				$ipmi_available = new CDiv(SPACE, 'iconipmiavailable');
+				$ipmi_available = new CDiv(SPACE, 'status_icon iconipmiavailable');
 				break;
 			case HOST_AVAILABLE_FALSE:
-				$ipmi_available = new CDiv(SPACE, 'iconipmiunavailable');
+				$ipmi_available = new CDiv(SPACE, 'status_icon iconipmiunavailable');
 				$ipmi_available->setHint($host['ipmi_error'], '', 'on');
 				break;
 			case HOST_AVAILABLE_UNKNOWN:
-				$ipmi_available = new CDiv(SPACE, 'iconipmiunknown');
+				$ipmi_available = new CDiv(SPACE, 'status_icon iconipmiunknown');
 				break;
 		}
 

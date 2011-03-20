@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,8 +21,7 @@
 <?php
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageMaps extends CWebTest
-{
+class testPageMaps extends CWebTest{
 	// Returns all maps
 	public static function allMaps()
 	{
@@ -32,8 +31,7 @@ class testPageMaps extends CWebTest
 	/**
 	* @dataProvider allMaps
 	*/
-	public function testPageMaps_SimpleTest($map)
-	{
+	public function testPageMaps_SimpleTest($map){
 		$this->login('sysmaps.php');
 		$this->assertTitle('Network maps');
 
@@ -52,8 +50,7 @@ class testPageMaps extends CWebTest
 	/**
 	* @dataProvider allMaps
 	*/
-	public function testPageMaps_SimpleEdit($map)
-	{
+	public function testPageMaps_SimpleEdit($map){
 		$name=$map['name'];
 		$sysmapid=$map['sysmapid'];
 
@@ -91,8 +88,7 @@ class testPageMaps extends CWebTest
 	/**
 	* @dataProvider allMaps
 	*/
-	public function testPageMaps_SimpleUpdate($map)
-	{
+	public function testPageMaps_SimpleUpdate($map){
 		$name=$map['name'];
 		$sysmapid=$map['sysmapid'];
 
@@ -109,7 +105,7 @@ class testPageMaps extends CWebTest
 
 		$this->login('sysmaps.php');
 		$this->assertTitle('Network maps');
-		$this->click("xpath=//a[contains(@href,'sysmaps.php?form=update&sysmapid=$sysmapid#form&sid=')]");
+		$this->href_click("sysmaps.php?form=update&sysmapid=$sysmapid#form&sid=");
 		$this->wait();
 		$this->button_click('save');
 		$this->wait();
@@ -124,8 +120,7 @@ class testPageMaps extends CWebTest
 		$this->assertEquals($oldHashLinkTriggers,DBhash($sql4),"Chuck Norris: Map update changed data in table 'sysmaps_link_triggers'");
 	}
 
-	public function testPageMaps_MassDeleteAll()
-	{
+	public function testPageMaps_MassDeleteAll(){
 // TODO
 		$this->markTestIncomplete();
 	}
@@ -133,11 +128,10 @@ class testPageMaps extends CWebTest
 	/**
 	* @dataProvider allMaps
 	*/
-	public function testPageMaps_MassDelete($map)
-	{
+	public function testPageMaps_MassDelete($map){
 		$sysmapid=$map['sysmapid'];
 
-		DBsave_tables(array('sysmaps','sysmaps_elements','sysmaps_links','sysmaps_link_triggers'));
+		DBsave_tables(array('sysmaps','sysmaps_elements','sysmaps_links','sysmaps_link_triggers','screens_items'));
 
 		$this->chooseOkOnNextConfirmation();
 
@@ -160,12 +154,13 @@ class testPageMaps extends CWebTest
 		$this->assertEquals(0,DBcount($sql),'Data from sysmaps_links table was not deleted');
 		$sql="select * from sysmaps_link_triggers where linkid in (select linkid from sysmaps_links where sysmapid=$sysmapid) order by linktriggerid";
 		$this->assertEquals(0,DBcount($sql),'Data from sysmaps_link_triggers table was not deleted');
+		$sql="select * from screens_items where resourcetype=".SCREEN_RESOURCE_MAP." and resourceid=$sysmapid;";
+		$this->assertEquals(0,DBcount($sql),'Data from screens_items table was not deleted');
 
-		DBsave_tables(array('sysmaps','sysmaps_elements','sysmaps_links','sysmaps_link_triggers'));
+		DBrestore_tables(array('sysmaps','sysmaps_elements','sysmaps_links','sysmaps_link_triggers','screens_items'));
 	}
 
-	public function testPageMaps_MassExportAll()
-	{
+	public function testPageMaps_MassExportAll(){
 // TODO
 		$this->markTestIncomplete();
 	}
@@ -173,33 +168,29 @@ class testPageMaps extends CWebTest
 	/**
 	* @dataProvider allMaps
 	*/
-	public function testPageMaps_MassExport($map)
-	{
+	public function testPageMaps_MassExport($map){
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageMaps_Create()
-	{
+	public function testPageMaps_Create(){
 		$this->login('sysmaps.php');
 		$this->assertTitle('Network maps');
 		$this->button_click('form');
 		$this->wait();
-		$this->ok('New system map');
+		$this->ok('Map');
 		$this->button_click('cancel');
 		$this->wait();
 		$this->assertTitle('Network maps');
 		$this->ok('Configuration of network maps');
 	}
 
-	public function testPageMaps_Import()
-	{
+	public function testPageMaps_Import(){
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageMaps_Sorting()
-	{
+	public function testPageMaps_Sorting(){
 // TODO
 		$this->markTestIncomplete();
 	}

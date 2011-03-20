@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,12 +46,11 @@ class CAlert extends CZBXAPI{
  * @param array $options['order']
  * @return array|int item data as array or false if error
  */
-	public static function get($options=array()){
-		global $USER_DETAILS;
+	public function get($options=array()){
 
 		$result = array();
-		$user_type = $USER_DETAILS['type'];
-		$userid = $USER_DETAILS['userid'];
+		$user_type = self::$userData['type'];
+		$userid = self::$userData['userid'];
 
 		$sort_columns = array('alertid','clock','eventid','status'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM); // allowed output options for [ select_* ] params
@@ -87,7 +86,6 @@ class CAlert extends CZBXAPI{
 			'time_till'				=> null,
 
 // OutPut
-			'extendoutput'			=> null,
 			'output'				=> API_OUTPUT_REFER,
 			'select_mediatypes'		=> null,
 			'select_users'			=> null,
@@ -103,24 +101,14 @@ class CAlert extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
-
-		if(!is_null($options['extendoutput'])){
-			$options['output'] = API_OUTPUT_EXTEND;
-
-			if(!is_null($options['select_mediatypes'])){
-				$options['select_mediatypes'] = API_OUTPUT_EXTEND;
-			}
-			if(!is_null($options['select_users'])){
-				$options['select_users'] = API_OUTPUT_EXTEND;
-			}
-		}
-
-
 		if(is_array($options['output'])){
 			unset($sql_parts['select']['alerts']);
-			$sql_parts['select']['alertid'] = ' a.alertid';
+
+			$dbTable = DB::getSchema('alerts');
+			$sql_parts['select']['alertid'] = 'a.alertid';
 			foreach($options['output'] as $key => $field){
-				$sql_parts['select'][$field] = ' a.'.$field;
+				if(isset($dbTable['fields'][$field]))
+					$sql_parts['select'][$field] = 'a.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;
@@ -290,7 +278,7 @@ class CAlert extends CZBXAPI{
 			$sql_parts['where'][] = 'a.clock<'.$options['time_till'];
 		}
 
-// extendoutput
+// output
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['alerts'] = 'a.*';
 		}
@@ -405,7 +393,6 @@ class CAlert extends CZBXAPI{
 
 COpt::memoryPick();
 		if(!is_null($options['countOutput'])){
-			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 
@@ -421,7 +408,7 @@ COpt::memoryPick();
 				'hostids' => $hostids,
 				'preservekeys' => 1
 			);
-			$hosts = CHost::get($obj_params);
+			$hosts = API::Host()->get($obj_params);
 		}
 
 // Adding Users
@@ -431,7 +418,7 @@ COpt::memoryPick();
 				'userids' => $userids,
 				'preservekeys' => 1
 			);
-			$users = CUser::get($obj_params);
+			$users = API::User()->get($obj_params);
 		}
 
 // Adding MediaTypes
@@ -479,12 +466,9 @@ COpt::memoryPick();
  * @param array $alerts[0,...]['url'] OPTIONAL
  * @return boolean
  */
-	public static function create($alerts){
+	public function create($alerts){
 		$alerts = zbx_toArray($alerts);
 		$alertids = array();
-
-		try{
-			self::BeginTransaction(__METHOD__);
 
 			foreach($alerts as $anum => $alert){
 				$alert_db_fields = array(
@@ -521,16 +505,7 @@ COpt::memoryPick();
 				$alertids[] = $alertid;
 			}
 
-			self::EndTransaction(true, __METHOD__);
 			return array('alertids'=>$alertids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
@@ -539,10 +514,7 @@ COpt::memoryPick();
  * @param array $alertids
  * @return boolean
  */
-	public static function delete($alertids){
-
-		try{
-			self::BeginTransaction(__METHOD__);
+	public function delete($alertids){
 
 			$options = array(
 			'alertids' => zbx_objectValues($alerts, 'alertid'),
@@ -550,7 +522,7 @@ COpt::memoryPick();
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => 1
 			);
-			$del_alerts = self::get($options);
+			$del_alerts = $this->get($options);
 			foreach($alertids as $snum => $alertid){
 				if(!isset($del_alerts[$alertid])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -561,16 +533,7 @@ COpt::memoryPick();
 			if(!DBexecute($sql))
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 
-			self::EndTransaction(true, __METHOD__);
 			return array('alertids'=> $alertids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 }
 ?>

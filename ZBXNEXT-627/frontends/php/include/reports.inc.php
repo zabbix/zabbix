@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2008 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,8 +44,8 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 		$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid, null, ': ').$name);
 	}
 
-	$filterForm->addRow(S_GROUP,$cmbGroups);
-	$filterForm->addRow(S_HOST,$cmbHosts);
+	$filterForm->addRow(_('Template group'),$cmbGroups);
+	$filterForm->addRow(_('Template'),$cmbHosts);
 
 	if(1 == $config){
 		$cmbTrigs = new CComboBox('tpl_triggerid',get_request('tpl_triggerid',0),'submit()');
@@ -103,8 +103,8 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 					);
 		}
 
-		$filterForm->addRow(S_TRIGGER,$cmbTrigs);
-		$filterForm->addRow(S_FILTER.SPACE.S_HOST_GROUP,$cmbHGrps);
+		$filterForm->addRow(_('Template trigger'),$cmbTrigs);
+		$filterForm->addRow(_('Filter by host group'),$cmbHGrps);
 	}
 
 //*
@@ -531,7 +531,7 @@ function bar_report_form3(){
 		'output' => 'extend'
 	);
 
-	$db_groups = CHostGroup::get($options);
+	$db_groups = API::HostGroup()->get($options);
 	order_result($db_groups, 'name');
 	foreach($db_groups as $gnum => $group){
 		$groupids[$group['groupid']] = $group['groupid'];
@@ -563,7 +563,7 @@ function bar_report_form3(){
 	if($groupid > 0){
 		$options['groupids'] = $groupid;
 	}
-	$db_hosts = CHost::get($options);
+	$db_hosts = API::Host()->get($options);
 	$db_hosts = zbx_toHash($db_hosts, 'hostid');
 	order_result($db_hosts, 'name');
 
@@ -576,7 +576,7 @@ function bar_report_form3(){
 		'output' => array('hostid', 'name'),
 		'hostids' => $hostids,
 	);
-	$db_hosts2 = CHost::get($options);
+	$db_hosts2 = API::Host()->get($options);
 	order_result($db_hosts2, 'name');
 	foreach($db_hosts2 as $hnum => $host){
 		if(!isset($db_hosts[$host['hostid']]))

@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,20 @@ require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
 class testPageActionsAutoregistration extends CWebTest
 {
+	public $affectedTables = array(
+		'actions',
+		'operations',
+		'conditions',
+		'opmessage',
+		'opgroup',
+		'optemplate',
+		'opcommand_grp',
+		'opcommand_hst',
+		'opconditions',
+		'opmessage_grp',
+		'opmessage_usr'
+	);
+
 	// Returns all trigger actions
 	public static function allActions()
 	{
@@ -97,10 +111,10 @@ class testPageActionsAutoregistration extends CWebTest
 		$this->assertTitle('Configuration of actions');
 		switch($action['status']){
 			case ACTION_STATUS_ENABLED:
-				$this->click("xpath=//a[contains(@href,'actionconf.php?go=disable&g_actionid%5B%5D=$actionid&')]");
+				$this->href_click("actionconf.php?go=disable&g_actionid%5B%5D=$actionid&");
 			break;
 			case ACTION_STATUS_DISABLED:
-				$this->click("xpath=//a[contains(@href,'actionconf.php?go=activate&g_actionid%5B%5D=$actionid&')]");
+				$this->href_click("actionconf.php?go=activate&g_actionid%5B%5D=$actionid&");
 			break;
 		}
 		$this->wait();
@@ -209,7 +223,7 @@ class testPageActionsAutoregistration extends CWebTest
 
 		$this->chooseOkOnNextConfirmation();
 
-		DBsave_tables(array('actions','operations','conditions'));
+		DBsave_tables($this->affectedTables);
 
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_AUTO_REGISTRATION);
 		$this->assertTitle('Configuration of actions');
@@ -221,7 +235,7 @@ class testPageActionsAutoregistration extends CWebTest
 		$this->getConfirmation();
 
 		$this->assertTitle('Configuration of actions');
-		$this->ok('Selected actions deleted.');
+		$this->ok('Selected actions deleted');
 		$this->ok('CONFIGURATION OF ACTIONS');
 
 		$sql="select * from actions where actionid=$actionid";
@@ -231,7 +245,7 @@ class testPageActionsAutoregistration extends CWebTest
 		$sql="select * from conditions where actionid=$actionid";
 		$this->assertEquals(0,DBcount($sql));
 
-		DBrestore_tables(array('actions','operations','conditions'));
+		DBrestore_tables($this->affectedTables);
 	}
 
 	public function testPageActionsAutoregistration_Sorting()

@@ -1,6 +1,6 @@
 /*
-** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -117,8 +117,8 @@
 #define OFF	0
 
 #define	APPLICATION_NAME	"Zabbix Agent"
-#define	ZABBIX_REVDATE		"28 December 2010"
-#define	ZABBIX_VERSION		"1.9.2"
+#define	ZABBIX_REVDATE		"11 March 2011"
+#define	ZABBIX_VERSION		"1.9.3"
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
 #if defined(_WINDOWS)
@@ -151,6 +151,7 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #define	AGENT_ERROR	(-5)
 const char	*zbx_result_string(int result);
 
+#define MAX_ID_LEN	21
 #define MAX_STRING_LEN	2048
 #define MAX_BUFFER_LEN	65536
 
@@ -552,16 +553,13 @@ typedef enum
 #define TRIGGER_VALUE_CHANGED_YES	1
 
 /* Trigger severity */
-typedef enum
-{
-	TRIGGER_SEVERITY_NOT_CLASSIFIED = 0,
-	TRIGGER_SEVERITY_INFORMATION,
-	TRIGGER_SEVERITY_WARNING,
-	TRIGGER_SEVERITY_AVERAGE,
-	TRIGGER_SEVERITY_HIGH,
-	TRIGGER_SEVERITY_DISASTER
-} zbx_trigger_severity_t;
-const char	*zbx_trigger_severity_string(zbx_trigger_severity_t severity);
+#define TRIGGER_SEVERITY_NOT_CLASSIFIED	0
+#define TRIGGER_SEVERITY_INFORMATION	1
+#define TRIGGER_SEVERITY_WARNING	2
+#define TRIGGER_SEVERITY_AVERAGE	3
+#define TRIGGER_SEVERITY_HIGH		4
+#define TRIGGER_SEVERITY_DISASTER	5
+#define TRIGGER_SEVERITY_COUNT		6	/* number of trigger severities */
 
 typedef enum
 {
@@ -641,15 +639,14 @@ const char	*zbx_permission_string(int perm);
 #define	ZBX_NODE_SLAVE	1
 const char	*zbx_nodetype_string(unsigned char nodetype);
 
+#define ZBX_SCRIPT_TYPE_SCRIPT		0
+#define ZBX_SCRIPT_TYPE_IPMI		1
+
+#define ZBX_SCRIPT_EXECUTE_ON_AGENT	0
+#define ZBX_SCRIPT_EXECUTE_ON_SERVER	1
+
 #define POLLER_DELAY		5
 #define DISCOVERER_DELAY	60
-
-#define	ZBX_NO_POLLER			255
-#define	ZBX_POLLER_TYPE_NORMAL		0
-#define	ZBX_POLLER_TYPE_UNREACHABLE	1
-#define	ZBX_POLLER_TYPE_IPMI		2
-#define	ZBX_POLLER_TYPE_PINGER		3
-#define	ZBX_POLLER_TYPE_COUNT		4	/* number of poller types */
 
 #define	GET_SENDER_TIMEOUT	60
 
@@ -660,10 +657,6 @@ const char	*zbx_nodetype_string(unsigned char nodetype);
 #ifndef MIN
 #	define MIN(a, b) ((a) < (b) ? (a) : (b))
 #endif
-
-/* Secure string copy */
-#define strscpy(x, y)		zbx_strlcpy(x, y, sizeof(x))
-#define strnscpy(x, y, n)	zbx_strlcpy(x, y, n);
 
 #define zbx_malloc(old, size)	zbx_malloc2(__FILE__, __LINE__, old, size)
 #define zbx_realloc(src, size)	zbx_realloc2(__FILE__, __LINE__, src, size)
@@ -794,13 +787,17 @@ int	str_in_list(const char *list, const char *value, char delimiter);
 #endif /* HAVE___VA_ARGS__ */
 void	__zbx_zbx_setproctitle(const char *fmt, ...);
 
-#define SEC_PER_MIN 60
-#define SEC_PER_HOUR 3600
-#define SEC_PER_DAY 86400
-#define SEC_PER_WEEK (7 * SEC_PER_DAY)
-#define SEC_PER_MONTH (30 * SEC_PER_DAY)
-#define SEC_PER_YEAR (365 * SEC_PER_DAY)
-#define ZBX_JAN_1970_IN_SEC   2208988800.0        /* 1970 - 1900 in seconds */
+#define ZBX_KIBIBYTE		1024
+#define ZBX_MEBIBYTE		1048576
+#define ZBX_GIBIBYTE		1073741824
+
+#define SEC_PER_MIN		60
+#define SEC_PER_HOUR		3600
+#define SEC_PER_DAY		86400
+#define SEC_PER_WEEK		(7 * SEC_PER_DAY)
+#define SEC_PER_MONTH		(30 * SEC_PER_DAY)
+#define SEC_PER_YEAR		(365 * SEC_PER_DAY)
+#define ZBX_JAN_1970_IN_SEC	2208988800.0        /* 1970 - 1900 in seconds */
 double	zbx_time();
 void	zbx_timespec(zbx_timespec_t *ts);
 double	zbx_current_time();
@@ -831,6 +828,8 @@ void	__zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_l
 void	zbx_strcpy_alloc(char **str, int *alloc_len, int *offset, const char *src);
 void	zbx_chrcpy_alloc(char **str, int *alloc_len, int *offset, const char src);
 
+/* Secure string copy */
+#define strscpy(x, y)	zbx_strlcpy(x, y, sizeof(x))
 size_t	zbx_strlcpy(char *dst, const char *src, size_t siz);
 size_t	zbx_strlcat(char *dst, const char *src, size_t siz);
 
@@ -903,8 +902,8 @@ char	*zbx_age2str(int age);
 char	*zbx_date2str(time_t date);
 char	*zbx_time2str(time_t time);
 
-/* Return the needle in the haystack (or NULL). */
 char	*zbx_strcasestr(const char *haystack, const char *needle);
+int	zbx_mismatch(const char *s1, const char *s2);
 int	starts_with(const char *str, const char *prefix);
 int	cmp_key_id(const char *key_1, const char *key_2);
 
@@ -927,10 +926,13 @@ void	zbx_strupper(char *str);
 #if defined(_WINDOWS) || defined(HAVE_ICONV)
 char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);
 #endif	/* HAVE_ICONV */
-char	*zbx_replace_utf8(const char *text, char replacement);
 int	zbx_strlen_utf8(const char *text);
 
-void	win2unix_eol(char *text);
+#define ZBX_UTF8_REPLACE_CHAR	'?'
+char	*zbx_replace_utf8(const char *text);
+void	zbx_replace_invalid_utf8(char *text);
+
+void	dos2unix(char *str);
 int	str2uint(const char *str);
 int	str2uint64(char *str, zbx_uint64_t *value);
 double	str2double(const char *str);
@@ -941,10 +943,12 @@ int	__zbx_open(const char *pathname, int flags);
 #endif	/* _WINDOWS && _UNICODE */
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
 
-int	MAIN_ZABBIX_ENTRY(void);
+int	MAIN_ZABBIX_ENTRY();
 
 zbx_uint64_t	zbx_letoh_uint64(zbx_uint64_t data);
 zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data);
+
+int	zbx_check_hostname(const char *hostname);
 
 int	is_hostname_char(char c);
 int	is_key_char(char c);
@@ -959,5 +963,7 @@ int	parse_host_key(char *exp, char **host, char **key);
 void	make_hostname(char *host);
 
 unsigned char	get_interface_type_by_item_type(unsigned char type);
+
+int	calculate_sleeptime(int nextcheck, int max_sleeptime);
 
 #endif

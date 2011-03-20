@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -627,7 +627,6 @@ class CBar extends CGraphDraw{
 	public function draw(){
 		$start_time=getmicrotime();
 		set_image_header();
-		check_authorisation();
 
 		$this->column = uint_in_array($this->type, array(GRAPH_TYPE_COLUMN, GRAPH_TYPE_COLUMN_STACKED));
 

@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ include_once('include/page_header.php');
 	$dscvry_wdgt = new CWidget('hat_discovery');
 
 // HEADER
-	$r_form = new CForm(null, 'get');
+	$r_form = new CForm('get');
 
 	$fullscreen = get_request('fullscreen', 0);
 	$druleid = get_request('druleid', 0);
@@ -81,7 +81,7 @@ include_once('include/page_header.php');
 		),
 		'output' => API_OUTPUT_EXTEND
 	);
-	$drules = CDRule::get($options);
+	$drules = API::DRule()->get($options);
 
 	order_result($drules, 'name');
 	foreach($drules as $dnum => $drule){
@@ -104,9 +104,9 @@ include_once('include/page_header.php');
 	);
 	if($druleid > 0) $options['druleids'] = $druleid;
 	else $options['druleids'] = zbx_objectValues($drules, 'druleid');
-	$dservices = CDService::get($options);
+	$dservices = API::DService()->get($options);
 
-	$gMacros = CUserMacro::get(array(
+	$gMacros = API::UserMacro()->get(array(
 		'output' => API_OUTPUT_EXTEND,
 		'globalmacro' => 1
 	));
@@ -136,9 +136,8 @@ include_once('include/page_header.php');
 	);
 
 	$css = getUserTheme($USER_DETAILS);
-	$vTextColor = ($css == 'css_od.css')?'&color=white':'';
 	foreach($services as $name => $foo) {
-		$header[] = new CImg('vtext.php?text='.$name.$vTextColor);
+		$header[] = new CImg('vtext.php?text='.$name.'&theme='.$css);
 	}
 
 	$table = new CTableInfo();
@@ -153,7 +152,7 @@ include_once('include/page_header.php');
 	);
 	if($druleid>0) $options['druleids'] = $druleid;
 
-	$drules = CDRule::get($options);
+	$drules = API::DRule()->get($options);
 	order_result($drules, 'name');
 
 	$options = array(
@@ -161,7 +160,7 @@ include_once('include/page_header.php');
 		'selectDServices' => API_OUTPUT_REFER,
 		'output' => API_OUTPUT_REFER
 	);
-	$db_dhosts = CDHost::get($options);
+	$db_dhosts = API::DHost()->get($options);
 	$db_dhosts = zbx_toHash($db_dhosts, 'dhostid');
 
 	$db_dservices = zbx_toHash($dservices, 'dserviceid');
@@ -205,6 +204,7 @@ include_once('include/page_header.php');
 				if(!isset($discovery_info[$dservice['ip']])){
 					$discovery_info[$dservice['ip']] = array(
 						'ip' => $dservice['ip'],
+						'dns' => $dservice['dns'],
 						'type' => $htype,
 						'class' => $hclass,
 						'host' => $hostName,
@@ -238,7 +238,7 @@ include_once('include/page_header.php');
 		}
 
 		if($druleid == 0 && !empty($discovery_info)){
-			$col = new CCol(array(bold($drule['name']),	SPACE.'('.count($discovery_info).SPACE.S_ITEMS.')'));
+			$col = new CCol(array(bold($drule['name']),	SPACE.'('._n('%d device', '%d devices', count($discovery_info)).')'));
 			$col->setColSpan(count($services) + 3);
 
 			$table->addRow(array(get_node_name_by_elid($drule['druleid']),$col));
@@ -247,9 +247,10 @@ include_once('include/page_header.php');
 		order_result($discovery_info, $_REQUEST['sort'], $_REQUEST['sortorder']);
 
 		foreach($discovery_info as $ip => $h_data){
+			$dns = $h_data['dns'] == '' ? '' : ' ('.$h_data['dns'].')';
 			$table_row = array(
 				get_node_name_by_elid($h_data['druleid']),
-				$h_data['type'] == 'primary' ? new CSpan($ip, $h_data['class']) : new CSpan(SPACE.SPACE.$ip),
+				$h_data['type'] == 'primary' ? new CSpan($ip.$dns, $h_data['class']) : new CSpan(SPACE.SPACE.$ip.$dns),
 				new CSpan(empty($h_data['host']) ? '-' : $h_data['host']),
 				new CSpan((($h_data['time'] == 0 || $h_data['type'] === 'slave') ?
 						'' : convert_units(time() - $h_data['time'], 'uptime')), $h_data['class'])

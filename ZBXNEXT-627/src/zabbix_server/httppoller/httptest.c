@@ -1,6 +1,6 @@
 /*
-** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -144,7 +144,6 @@ static void	process_test_data(zbx_uint64_t httptestid, ZBX_HTTPSTAT *stat)
 
 		free_result(&value);
 	}
-
 	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -197,7 +196,6 @@ static void	process_step_data(zbx_uint64_t httpstepid, ZBX_HTTPSTAT *stat)
 
 		free_result(&value);
 	}
-
 	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -455,7 +453,6 @@ clean:
 		else
 			THIS_SHOULD_NEVER_HAPPEN;
 	}
-
 	DBfree_result(result);
 
 	err_str_esc = DBdyn_escape_string_len(err_str, HTTPTEST_ERROR_LEN);
@@ -503,7 +500,7 @@ clean:
  * Comments: always SUCCEED                                                   *
  *                                                                            *
  ******************************************************************************/
-void	process_httptests(int now)
+void	process_httptests(int httppoller_num, int now)
 {
 	const char	*__function_name = "process_httptests";
 
@@ -548,7 +545,6 @@ void	process_httptests(int now)
 
 		process_httptest(&httptest);
 	}
-
 	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);

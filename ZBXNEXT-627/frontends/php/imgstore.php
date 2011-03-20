@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ include_once('include/page_header.php');
 			'output'=> API_OUTPUT_EXTEND,
 			'select_image'=> 1
 		);
-		$images = CImage::get($options);
+		$images = API::Image()->get($options);
 		foreach($images as $inum => $image){
 //SDI($image['image']);
 			$image['image'] = zbx_unescape_image(base64_decode($image['image']));

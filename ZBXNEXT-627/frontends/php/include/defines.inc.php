@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-	define('ZABBIX_VERSION','1.9.2');
+	define('ZABBIX_VERSION','1.9.3');
 	define('ZABBIX_API_VERSION','1.2');
 /* USER DEFINES */
 
@@ -50,11 +50,15 @@
 	define('ZBX_UNITS_ROUNDOFF_UPPER_LIMIT', 2);
 	define('ZBX_UNITS_ROUNDOFF_LOWER_LIMIT', 6);
 
-// this define made for partitioned DB installs!!
+// for partitioned DB installs!!
 	define('ZBX_HISTORY_DATA_UPKEEP',		-1); // in days; -1: disabled, 0: always use trends
 
 /* END OF USERS DEFINES */
-	define('ZAPCAT_COMPATIBILITY', false);
+	define('ZBX_SCRIPT_TYPE_SCRIPT', 0);
+	define('ZBX_SCRIPT_TYPE_IPMI', 1);
+
+	define('ZBX_SCRIPT_EXECUTE_ON_AGENT', 0);
+	define('ZBX_SCRIPT_EXECUTE_ON_SERVER', 1);
 
 	define('ZBX_FLAG_DISCOVERY_NORMAL', 0x0);
 	define('ZBX_FLAG_DISCOVERY', 0x1);
@@ -82,6 +86,12 @@
 	define('ZBX_AUTH_LDAP',		1);
 	define('ZBX_AUTH_HTTP',		2);
 
+	define('ZBX_DB_DB2',		'IBM_DB2');
+	define('ZBX_DB_MYSQL',		'MYSQL');
+	define('ZBX_DB_ORACLE',		'ORACLE');
+	define('ZBX_DB_POSTGRESQL',		'POSTGRESQL');
+	define('ZBX_DB_SQLITE3',		'SQLITE3');
+
 	define('PAGE_TYPE_HTML',			0);
 	define('PAGE_TYPE_IMAGE',			1);
 	define('PAGE_TYPE_XML',				2);
@@ -92,6 +102,7 @@
 	define('PAGE_TYPE_JSON_RPC',		7);	// api call
 	define('PAGE_TYPE_TEXT_FILE',		8);	// api call
 	define('PAGE_TYPE_TEXT',			9); // simple text
+	define('PAGE_TYPE_CSV',				10); // CSV format
 
 
 	define('ZBX_SESSION_ACTIVE',		0);
@@ -254,11 +265,15 @@
 	define('TIMEPERIOD_TYPE_MONTHLY',	4);
 	define('TIMEPERIOD_TYPE_YEARLY',	5);
 
+	define('SYSMAP_LABEL_ADVANCED_OFF',		0);
+	define('SYSMAP_LABEL_ADVANCED_ON',		1);
+
 	define('MAP_LABEL_TYPE_LABEL',		0);
 	define('MAP_LABEL_TYPE_IP',			1);
 	define('MAP_LABEL_TYPE_NAME',		2);
 	define('MAP_LABEL_TYPE_STATUS',		3);
 	define('MAP_LABEL_TYPE_NOTHING',	4);
+	define('MAP_LABEL_TYPE_CUSTOM',		5);
 
 	define('MAP_LABEL_LOC_BOTTOM',		0);
 	define('MAP_LABEL_LOC_LEFT',		1);
@@ -284,6 +299,12 @@
 
 	define('SYSMAP_MARKELEMENTS_OFF',		0);
 	define('SYSMAP_MARKELEMENTS_ON',		1);
+
+	define('SYSMAP_GRID_SHOW_ON',		1);
+	define('SYSMAP_GRID_SHOW_OFF',		0);
+
+	define('SYSMAP_GRID_ALIGN_ON',		1);
+	define('SYSMAP_GRID_ALIGN_OFF',		0);
 
 	define('ITEM_TYPE_ZABBIX',			0);
 	define('ITEM_TYPE_SNMPV1',			1);
@@ -368,6 +389,9 @@
 	define('TRIGGER_SEVERITY_AVERAGE',			3);
 	define('TRIGGER_SEVERITY_HIGH',				4);
 	define('TRIGGER_SEVERITY_DISASTER',			5);
+
+	define('TRIGGER_SEVERITY_COUNT',			6);
+
 
 	define('ALERT_MAX_RETRIES',		3);
 
@@ -559,6 +583,9 @@
 	define('EVENT_ACK_DISABLED',	'0');
 	define('EVENT_ACK_ENABLED',		'1');
 
+	define('EVENT_NOT_ACKNOWLEDGED',	'0');
+	define('EVENT_ACKNOWLEDGED',		'1');
+
 	define('EVENTS_NOFALSEFORB_STATUS_ALL',		0);	// used with TRIGGERS_OPTION_NOFALSEFORB
 	define('EVENTS_NOFALSEFORB_STATUS_FALSE',	1);	// used with TRIGGERS_OPTION_NOFALSEFORB
 	define('EVENTS_NOFALSEFORB_STATUS_TRUE',	2);	// used with TRIGGERS_OPTION_NOFALSEFORB
@@ -689,33 +716,18 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	// define('ZBX_PREG_ITEM_KEY_FORMAT', '('.ZBX_PREG_KEY_NAME.'(\['.ZBX_PREG_PARAMS.'\]){0,1})');
 
 
-	define('ZBX_PREG_FUNCTION_FORMAT', '('.ZBX_PREG_INTERNAL_NAMES.'(\('.ZBX_PREG_PARAMS.'\)))');
+	define('ZBX_PREG_FUNCTION_FORMAT', '([a-z]+(\('.ZBX_PREG_PARAMS.'\)))');
 
 	define('ZBX_PREG_SIMPLE_EXPRESSION_FORMAT','(\{'.ZBX_PREG_HOST_FORMAT.'\:'.ZBX_PREG_ITEM_KEY_FORMAT.'\.'.ZBX_PREG_FUNCTION_FORMAT.'\})');
 	define('ZBX_PREG_MACRO_NAME_FORMAT', '(\{[A-Z\.]+\})');
 	define('ZBX_PREG_EXPRESSION_SIMPLE_MACROS', '(\{TRIGGER\.VALUE\})');
 	define('ZBX_PREG_EXPRESSION_USER_MACROS', '(\{\$'.ZBX_PREG_MACRO_NAME.'\})');
-
-	define('ZBX_PREG_EXPRESSION_TOKEN_FORMAT', '^(['.ZBX_PREG_PRINT.']*)('.ZBX_PREG_SIMPLE_EXPRESSION_FORMAT.'|'.ZBX_PREG_EXPRESSION_SIMPLE_MACROS.')(['.ZBX_PREG_PRINT.']*)$');
 //-------
 
 // REGEXP IDS
 	define('ZBX_KEY_ID',		1);
 	define('ZBX_KEY_NAME_ID',	2);
 	define('ZBX_KEY_PARAM_ID',	6);
-
-	define('ZBX_SIMPLE_EXPRESSION_HOST_ID', 2);
-	define('ZBX_SIMPLE_EXPRESSION_KEY_ID', 2 + ZBX_KEY_ID);
-	define('ZBX_SIMPLE_EXPRESSION_KEY_NAME_ID', 2 + ZBX_KEY_NAME_ID);
-	define('ZBX_SIMPLE_EXPRESSION_KEY_PARAM_ID', 2 + ZBX_KEY_PARAM_ID);
-	define('ZBX_SIMPLE_EXPRESSION_FUNCTION_ID', 3+ZBX_KEY_PARAM_ID);
-	define('ZBX_SIMPLE_EXPRESSION_FUNCTION_NAME_ID', 4+ZBX_KEY_PARAM_ID);
-	define('ZBX_SIMPLE_EXPRESSION_FUNCTION_PARAM_ID', 6+ZBX_KEY_PARAM_ID);
-
-	define('ZBX_EXPRESSION_LEFT_ID', 1);
-	define('ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID', 2);
-	define('ZBX_EXPRESSION_MACRO_ID', 9+ZBX_KEY_PARAM_ID);
-	define('ZBX_EXPRESSION_RIGHT_ID', 10+ZBX_KEY_PARAM_ID);
 //--------
 
 	define('ZBX_HISTORY_COUNT',5);
@@ -804,7 +816,7 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	define('SEC_PER_YEAR', (365*SEC_PER_DAY));
 
 // if magic quotes on, then get rid of them
-	if(get_magic_quotes_gpc()){
+	if(version_compare(phpversion(), '6.0', '<') && get_magic_quotes_gpc()){
 		$_GET	 = zbx_stripslashes($_GET);
 		$_POST	 = zbx_stripslashes($_POST);
 		$_COOKIE = zbx_stripslashes($_COOKIE);

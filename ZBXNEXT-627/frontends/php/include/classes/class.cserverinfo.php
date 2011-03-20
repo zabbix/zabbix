@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,8 +25,6 @@ class CServerInfo extends CTable{
 	}
 
 	public function bodyToString(){
-		global $USER_DETAILS;
-
 		$this->cleanItems();
 
 		$status = get_status();
@@ -36,14 +34,14 @@ class CServerInfo extends CTable{
 		else
 			$server = new CSpan(S_NOT_RUNNING,'on');
 
-		$header = new CCol('Zabbix '.S_SERVER_INFO,'header');
+		$header = new CCol('Zabbix '.S_SERVER_INFO,'nowrap ui-corner-all ui-widget-header');
 		$this->addRow($header);
 		// GETTEXT: r is date format string as described in http://php.net/date
 		$this->addRow(_('Updated').': '.zbx_date2str(_('r'),time()));
-		$this->addRow(new CCol(array(_s('Refreshed every: %s sec ', $USER_DETAILS['refresh']),
+		$this->addRow(new CCol(array(_s('Refreshed every: %s sec ', CWebUser::$data['refresh']),
 				'(',new CLink(_('refresh now'),'http://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']),')')));
 		$this->addRow(S_NUMBER_OF_USERS_SHORT.': '.$status['users_count'].'('.$status['users_online'].')');
-		$this->addRow(new CCol(array(_('Logged in as').SPACE, new CLink($USER_DETAILS['alias'],'profile.php'))));
+		$this->addRow(new CCol(array(_('Logged in as').SPACE, new CLink(CWebUser::$data['alias'],'profile.php'))));
 		$this->addRow(new CCol(array(new CLink(_('Zabbix server'),'report1.php'),' is ',$server)),'status');
 		//$this->addRow(S_VALUES_STORED.': '.$status['history_count']);
 		//$this->addRow(S_TRENDS_STORED.': '.$status['trends_count']);

@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -148,8 +148,7 @@
 		$cmbConfig->addItem('slides.php', S_SLIDESHOWS);
 //	$formHeader->addItem($cmbConfig);
 
-
-	$screens = CTemplateScreen::get(array(
+	$screens = API::TemplateScreen()->get(array(
 		'hostids' => $_REQUEST['hostid'],
 		'output' => API_OUTPUT_EXTEND
 	));
@@ -164,7 +163,7 @@
 	}
 	else{
 		$screen = (!isset($screens[$screenid]))?reset($screens):$screens[$screenid];
-		$tmpScreens = CTemplateScreen::get(array(
+		$tmpScreens = API::TemplateScreen()->get(array(
 			'screenids' => $screen['screenid'],
 			'hostids' => $_REQUEST['hostid'],
 			'output' => API_OUTPUT_EXTEND,
@@ -190,7 +189,7 @@
 
 
 // HEADER {{{
-		$form = new CForm(null, 'get');
+		$form = new CForm('get');
 		$form->addVar('fullscreen', $_REQUEST['fullscreen']);
 		//$form->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB(true)));
 
@@ -214,7 +213,7 @@
 				$screenList->addItem(new CLink($displayed_screen_name, 'host_screen.php?screenid='.$cbScreen['screenid'].'&hostid='.$_REQUEST['hostid']));
 		}
 
-		$screens_wdgt->addItem(new CDiv($screenList, 'objectlist'));
+		$screens_wdgt->addItem(new CDiv($screenList, 'ui-widget-content ui-corner-all objectgroup'));
 //-----
 		$element = get_screen($screen, 0, $effectiveperiod);
 

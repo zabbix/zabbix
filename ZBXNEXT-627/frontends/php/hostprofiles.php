@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@
 	$_REQUEST['hostid'] = get_request('hostid', 0);
 // permission check, imo should be removed in future.
 	if($_REQUEST['hostid'] > 0){
-		$res = CHost::get(array(
+		$res = API::Host()->get(array(
 			'real_hosts' => 1,
 			'hostids' => $_REQUEST['hostid']
 		));
@@ -67,7 +67,7 @@
 
 	$hostprof_wdgt = new CWidget();
 
-	$profile_form = new CForm(null, 'get');
+	$profile_form = new CForm('get');
 	$cmbProf = new CComboBox('prof_type', $_REQUEST['prof_type'], 'javascript: submit();');
 	$cmbProf->additem(0, S_NORMAL);
 	$cmbProf->additem(1, S_EXTENDED);
@@ -102,7 +102,7 @@
 		else{
 			$options['groupids'] = array();
 		}
-		$hosts = CHost::get($options);
+		$hosts = API::Host()->get($options);
 
 // unset hosts without profiles, and copy some profile fields to the uppers array level for sorting
 		$pr = ($_REQUEST['prof_type'] == 0) ? 'profile' : 'profile_ext';
@@ -128,7 +128,7 @@
 			}
 		}
 
-		$r_form = new CForm(null, 'get');
+		$r_form = new CForm('get');
 		$r_form->addVar('prof_type', $_REQUEST['prof_type']);
 		$r_form->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB(true)));
 

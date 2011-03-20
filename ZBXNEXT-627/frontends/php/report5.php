@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -80,7 +80,7 @@ include_once('include/page_header.php');
 
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
-	$scripts_by_hosts = CScript::getScriptsByHosts($available_hosts);
+	$scripts_by_hosts = API::Script()->getScriptsByHosts($available_hosts);
 
 	$triggers = array();
 	$triggerids = array();
@@ -154,7 +154,7 @@ include_once('include/page_header.php');
 			get_node_name_by_elid($row['triggerid']),
 			$host,
 			$tr_desc,
-			new CCol(get_severity_description($row['priority']),get_severity_style($row['priority'])),
+			getSeverityCell($row['priority']),
 			$row['cnt_event'],
 		));
 	}

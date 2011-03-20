@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -78,7 +78,7 @@
 			return $row;
 		}
 		if($no_error_message == 0)
-			error(S_NO_HOST_WITH.' with hostid=['.$hostid.']');
+			error(_s('No host with hostid "%s".', $hostid));
 
 	return	false;
 	}

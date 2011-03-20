@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2010 Artem "Aly" Suharev
+** Copyright (C) 2010-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,9 +42,9 @@ msgcounter:				0,				// how many messages have been added
 
 pipeLength:				15,				// how many messages to show
 
-messageList:			{},				// list of recieved messages
+messageList:			{},				// list of received messages
 messagePipe:			new Array(),	// messageid pipe line
-messageLast:			{},				// last massages sourceid by caption
+messageLast:			{},				// last message's sourceid by caption
 
 effectTimeout:			1000,			// effect time out
 

@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -223,15 +223,15 @@
 
 		$right_tab->addRow($right_row);
 
-		$table = new CTable(NULL,'header');
+		$table = new CTable(NULL,'header maxwidth ui-widget-header ui-corner-all');
 //		$table->setAttribute('border',0);
 		$table->setCellSpacing(0);
 		$table->setCellPadding(1);
 
-		$td_r = new CCol($right_tab,'header_r');
+		$td_r = new CCol($right_tab,'header_r right');
 		$td_r->setAttribute('align','right');
 
-		$table->addRow(array(new CCol($col1,'header_l'), $td_r));
+		$table->addRow(array(new CCol($col1,'header_l left'), $td_r));
 	return $table;
 	}
 
@@ -317,7 +317,7 @@
 		if(isset($elements['screens'])) $header_host_opt['selectScreens'] = API_OUTPUT_COUNT;
 		if(isset($elements['discoveries'])) $header_host_opt['selectDiscoveries'] = API_OUTPUT_COUNT;
 
-		$header_hosts = CHost::get($header_host_opt);
+		$header_hosts = API::Host()->get($header_host_opt);
 
 		if(!$header_host = reset($header_hosts)){
 			$header_host = array(
@@ -405,24 +405,28 @@
 	}
 
 
-	function makeFormFooter($main, $other){
+	function makeFormFooter($main, $other=array()){
 		$mainBttns = new CDiv();
 		foreach($main as $bttn){
 			$bttn->addClass('main');
 			$bttn->useJQueryStyle();
+
 			$mainBttns->addItem($bttn);
 		}
-		$space = new CDiv($mainBttns, 'dt right');
 
 		$otherBttns = new CDiv($other);
 		$otherBttns->useJQueryStyle();
+
+		if(empty($other)){
+			$space = new CDiv($mainBttns, 'dt right');
+		}
+		else{
+			$space = new CDiv($mainBttns, 'dt floatleft right');
+		}
+
 		$buttons = new CDiv(array($otherBttns), 'dd');
 
-		$footer = new CDiv(array($space, $buttons), 'footer');
-
-		$footer = new CDiv($footer);
-		$footer->addClass('min-width objectgroup ui-widget-content ui-corner-all');
-		$footer->addStyle('padding: 2px;');
+		$footer = new CDiv(new CDiv(array($space, $buttons),'formrow'), 'objectgroup footer min-width ui-widget-content ui-corner-all');
 
 		return $footer;
 	}

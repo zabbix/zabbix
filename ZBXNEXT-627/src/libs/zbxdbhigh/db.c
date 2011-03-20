@@ -1,6 +1,6 @@
 /*
-** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 #include "threads.h"
 #include "zbxserver.h"
 #include "dbcache.h"
+#include "zbxalgo.h"
 
 const char	*DBnode(const char *fieldid, int nodeid)
 {
@@ -851,7 +852,7 @@ int	DBget_queue_count(int from, int to)
 					" and i.lastclock<%d"
 					")"
 				" and ("
-					"i.type in (%d,%d,%d,%d,%d,%d,%d,%d)"
+					"i.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d)"
 					" or (h.available<>%d and i.type in (%d))"
 					" or (h.snmp_available<>%d and i.type in (%d,%d,%d))"
 					" or (h.ipmi_available<>%d and i.type in (%d))"
@@ -862,8 +863,9 @@ int	DBget_queue_count(int from, int to)
 			ITEM_VALUE_TYPE_LOG,
 			SERVER_STATUS_KEY, SERVER_ZABBIXLOG_KEY,
 			now - from,
-				ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SIMPLE,
-				ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_CALCULATED,
+				ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+				ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_DB_MONITOR,
+				ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_CALCULATED,
 			HOST_AVAILABLE_FALSE,
 				ITEM_TYPE_ZABBIX,
 			HOST_AVAILABLE_FALSE,
@@ -1073,7 +1075,7 @@ int	DBremove_escalation(zbx_uint64_t escalationid)
  *           and 'DBdyn_escape_string_len'                                    *
  *                                                                            *
  ******************************************************************************/
-int	DBget_escape_string_len(const char *src)
+static int	DBget_escape_string_len(const char *src)
 {
 	const char	*s;
 	int		len = 0;
@@ -1115,7 +1117,7 @@ int	DBget_escape_string_len(const char *src)
  *           and 'DBdyn_escape_string_len'                                    *
  *                                                                            *
  ******************************************************************************/
-void	DBescape_string(const char *src, char *dst, int len)
+static void	DBescape_string(const char *src, char *dst, int len)
 {
 	const char	*s;
 	char		*d;
@@ -1248,7 +1250,7 @@ char	*DBdyn_escape_string_len(const char *src, int max_src_len)
  * Comments: sync changes with 'DBescape_like_pattern'                        *
  *                                                                            *
  ******************************************************************************/
-int	DBget_escape_like_pattern_len(const char *src)
+static int	DBget_escape_like_pattern_len(const char *src)
 {
 	int		len;
 	const char	*s;
@@ -1297,7 +1299,7 @@ int	DBget_escape_like_pattern_len(const char *src)
  *           Hence '!' instead of backslash.                                  *
  *                                                                            *
  ******************************************************************************/
-void	DBescape_like_pattern(const char *src, char *dst, int len)
+static void	DBescape_like_pattern(const char *src, char *dst, int len)
 {
 	char		*d;
 	char		*tmp = NULL;
@@ -1861,9 +1863,10 @@ zbx_uint64_t	DBmultiply_value_uint64(DB_ITEM *item, zbx_uint64_t value)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, unsigned short port, int now)
+void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip,
+		const char *dns, unsigned short port, int now)
 {
-	char		*host_esc, *ip_esc;
+	char		*host_esc, *ip_esc, *dns_esc;
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_EVENT	event;
@@ -1871,7 +1874,6 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 	int		res = SUCCEED;
 
 	host_esc = DBdyn_escape_string_len(host, HOST_HOST_LEN);
-	ip_esc = DBdyn_escape_string_len(ip, INTERFACE_IP_LEN);
 
 	if (0 != proxy_hostid)
 	{
@@ -1891,6 +1893,9 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 
 	if (SUCCEED == res)
 	{
+		ip_esc = DBdyn_escape_string_len(ip, INTERFACE_IP_LEN);
+		dns_esc = DBdyn_escape_string_len(dns, INTERFACE_DNS_LEN);
+
 		result = DBselect(
 				"select autoreg_hostid"
 				" from autoreg_host"
@@ -1905,19 +1910,19 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 			ZBX_STR2UINT64(autoreg_hostid, row[0]);
 
 			DBexecute("update autoreg_host"
-					" set listen_ip='%s',listen_port=%d"
+					" set listen_ip='%s',listen_dns='%s',listen_port=%d"
 					" where autoreg_hostid=" ZBX_FS_UI64,
-					ip_esc, (int)port, autoreg_hostid);
+					ip_esc, dns_esc, (int)port, autoreg_hostid);
 		}
 		else
 		{
 			autoreg_hostid = DBget_maxid("autoreg_host");
 			DBexecute("insert into autoreg_host"
-					" (autoreg_hostid,proxy_hostid,host,listen_ip,listen_port)"
+					" (autoreg_hostid,proxy_hostid,host,listen_ip,listen_dns,listen_port)"
 					" values"
-					" (" ZBX_FS_UI64 ",%s,'%s','%s',%d)",
+					" (" ZBX_FS_UI64 ",%s,'%s','%s','%s',%d)",
 					autoreg_hostid, DBsql_id_ins(proxy_hostid),
-					host_esc, ip_esc, (int)port);
+					host_esc, ip_esc, dns_esc, (int)port);
 		}
 		DBfree_result(result);
 
@@ -1931,9 +1936,11 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 
 		/* Processing event */
 		process_event(&event, 1);
+
+		zbx_free(dns_esc);
+		zbx_free(ip_esc);
 	}
 
-	zbx_free(ip_esc);
 	zbx_free(host_esc);
 }
 
@@ -1952,19 +1959,21 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	DBproxy_register_host(const char *host, const char *ip, unsigned short port)
+void	DBproxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port)
 {
-	char	*host_esc, *ip_esc;
+	char	*host_esc, *ip_esc, *dns_esc;
 
 	host_esc = DBdyn_escape_string_len(host, HOST_HOST_LEN);
 	ip_esc = DBdyn_escape_string_len(ip, INTERFACE_IP_LEN);
+	dns_esc = DBdyn_escape_string_len(dns, INTERFACE_DNS_LEN);
 
 	DBexecute("insert into proxy_autoreg_host"
-			" (clock,host,listen_ip,listen_port)"
+			" (clock,host,listen_ip,listen_dns,listen_port)"
 			" values"
-			" (%d,'%s','%s',%d)",
-			(int)time(NULL), host_esc, ip_esc, (int)port);
+			" (%d,'%s','%s','%s',%d)",
+			(int)time(NULL), host_esc, ip_esc, dns_esc, (int)port);
 
+	zbx_free(dns_esc);
 	zbx_free(ip_esc);
 	zbx_free(host_esc);
 }
@@ -2024,53 +2033,84 @@ void	DBexecute_overflowed_sql(char **sql, int *sql_allocated, int *sql_offset)
  *           host_name_sample is not modified, allocates new memory!          *
  *                                                                            *
  ******************************************************************************/
-char	*DBget_unique_hostname_by_sample(char *host_name_sample)
+char	*DBget_unique_hostname_by_sample(const char *host_name_sample)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		num = 2;	/* produce alternatives starting from "2" */
-	char		*host_name_temp, *host_name_sample_esc;
+	const char		*__function_name = "DBget_unique_hostname_by_sample";
+	DB_RESULT		result;
+	DB_ROW			row;
+	int			full_match = 0, i;
+	char			*host_name_temp = NULL, *host_name_sample_esc;
+	zbx_vector_uint64_t	nums;
+	zbx_uint64_t		num = 2;	/* produce alternatives starting from "2" */
+	size_t			sz;
 
 	assert(host_name_sample && *host_name_sample);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In DBget_unique_hostname_by_sample() sample:'%s'",
-			host_name_sample);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sample:'%s'", __function_name, host_name_sample);
 
+	zbx_vector_uint64_create(&nums);
+	zbx_vector_uint64_reserve(&nums, 8);
+
+	sz = strlen(host_name_sample);
 	host_name_sample_esc = DBdyn_escape_like_pattern(host_name_sample);
+
 	result = DBselect(
 			"select host"
 			" from hosts"
 			" where host like '%s%%' escape '%c'"
-				DB_NODE
-			" group by host",
-			host_name_sample_esc,
-			ZBX_SQL_LIKE_ESCAPE_CHAR,
-			DBnode_local("hostid"));
-
-	host_name_temp = strdup(host_name_sample);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		if (0 < strcmp(host_name_temp, row[0]))
-		{
-			/* skip those which are lexicographically smaller */
-			continue;
-		}
-		if (0 > strcmp(host_name_temp, row[0]))
-		{
-			/* found, all other will be bigger */
-			break;
-		}
-		/* 0 == strcmp(host_name_temp, row[0]) */
-		/* must construct bigger one, the constructed one already exists */
-		host_name_temp = zbx_dsprintf(host_name_temp, "%s_%d", host_name_sample, num++);
-	}
-	DBfree_result(result);
+				DB_NODE,
+			host_name_sample_esc, ZBX_SQL_LIKE_ESCAPE_CHAR, DBnode_local("hostid"));
 
 	zbx_free(host_name_sample_esc);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of DBget_unique_hostname_by_sample() constructed:'%s'",
-			host_name_temp);
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	n;
+		const char	*p;
+
+		if (0 != strncmp(row[0], host_name_sample, sz))
+			continue;
+
+		p = row[0] + sz;
+
+		if ('\0' == *p)
+		{
+			full_match = 1;
+			continue;
+		}
+
+		if ('_' != *p || FAIL == is_uint64(p + 1, &n))
+			continue;
+
+		zbx_vector_uint64_append(&nums, n);
+	}
+	DBfree_result(result);
+
+	zbx_vector_uint64_sort(&nums, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	if (0 == full_match)
+	{
+		host_name_temp = zbx_strdup(host_name_temp, host_name_sample);
+		goto clean;
+	}
+
+	for (i = 0; i < nums.values_num; i++)
+	{
+		if (num > nums.values[i])
+			continue;
+
+		if (num < nums.values[i])	/* found, all other will be bigger */
+			break;
+
+		num++;
+	}
+
+	host_name_temp = zbx_dsprintf(host_name_temp, "%s_%d", host_name_sample, num);
+
+clean:
+	zbx_vector_uint64_destroy(&nums);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():'%s'", __function_name, host_name_temp);
 
 	return host_name_temp;
 }

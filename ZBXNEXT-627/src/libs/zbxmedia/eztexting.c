@@ -1,6 +1,6 @@
 /*
-** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -126,7 +126,7 @@ int	send_ez_texting(const char *username, const char *password, const char *send
 			goto clean;
 	}
 
-	if (NULL == (message_ascii = zbx_replace_utf8(message, '?')))
+	if (NULL == (message_ascii = zbx_replace_utf8(message)))
 	{
 		zbx_snprintf(error, max_error_len, "Could not replace UTF-8 characters: [%s]", message);
 		goto clean;

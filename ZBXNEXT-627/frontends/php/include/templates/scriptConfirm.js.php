@@ -42,7 +42,7 @@ function executeScript(hostid, scriptid, confirmation){
 		];
 		var d = showScriptDialog(confirmation, buttons);
 
-		jQuery(d).find('button:first').css('border-color', '#FA3');
+		jQuery(d).find('button:first').addClass('main');
 	}
 }
 

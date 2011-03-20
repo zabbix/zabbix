@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,8 +47,15 @@ class CVar{
 			return;
 		}
 
-		$hiddenVar = new CInput('hidden', $name, zbx_htmlstr($value));
-		$hiddenVar->removeAttribute('class');
+		if(strpos($value, "\n") === false){
+			$hiddenVar = new CInput('hidden', $name, zbx_htmlstr($value));
+			$hiddenVar->removeAttribute('class');
+		}
+		else{
+			$hiddenVar = new CTextArea($name, $value);
+			$hiddenVar->setAttribute('class','hidden');
+		}
+
 		$this->var_container[] = $hiddenVar;
 	}
 

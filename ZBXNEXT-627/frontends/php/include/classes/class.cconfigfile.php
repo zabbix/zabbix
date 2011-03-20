@@ -34,7 +34,7 @@ class CConfigFile{
 
 // config file in plain php is bad
 // {{{
-			$dbs = array('MYSQL', 'POSTGRESQL', 'ORACLE', 'IBM_DB2', 'SQLITE3');
+			$dbs = array(ZBX_DB_MYSQL, ZBX_DB_POSTGRESQL, ZBX_DB_ORACLE, ZBX_DB_DB2, ZBX_DB_SQLITE3);
 			if(!isset($DB['TYPE']) && !isset($DB_TYPE))
 				self::exception('DB type is not set.');
 			else if(isset($DB['TYPE']) && !in_array($DB['TYPE'], $dbs))
@@ -147,7 +147,7 @@ $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 	}
 
 	protected function check(){
-		$dbs = array('MYSQL', 'POSTGRESQL', 'ORACLE', 'IBM_DB2', 'SQLITE3');
+		$dbs = array(ZBX_DB_MYSQL, ZBX_DB_POSTGRESQL, ZBX_DB_ORACLE, ZBX_DB_DB2, ZBX_DB_SQLITE3);
 
 		if(!isset($this->config['DB']['TYPE'])){
 			self::exception('DB type is not set.');

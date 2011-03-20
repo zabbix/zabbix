@@ -1,6 +1,6 @@
 /*
-** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,12 +44,18 @@
 static int	get_hostid_by_host(const char *host, const char *ip, unsigned short port,
 		zbx_uint64_t *hostid, char *error, unsigned char zbx_process)
 {
-	char		*host_esc;
+	char		*host_esc, dns[INTERFACE_DNS_LEN_MAX];
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		res = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In get_hostid_by_host(host:'%s')", host);
+	zabbix_log(LOG_LEVEL_DEBUG, "In get_hostid_by_host() host:'%s'", host);
+
+	if (FAIL == zbx_check_hostname(host))
+	{
+		zbx_snprintf(error, MAX_STRING_LEN, "host name [%s] contains invalid characters", host);
+		return res;
+	}
 
 	host_esc = DBdyn_escape_string(host);
 
@@ -83,15 +89,19 @@ static int	get_hostid_by_host(const char *host, const char *ip, unsigned short p
 		if (0 == strncmp("::ffff:", ip, 7) && SUCCEED == is_ip4(ip + 7))
 			ip += 7;
 
+		alarm(CONFIG_TIMEOUT);
+		zbx_gethost_by_ip(ip, dns, sizeof(dns));
+		alarm(0);
+
 		DBbegin();
 
 		if (0 != (zbx_process & ZBX_PROCESS_SERVER))
 		{
-			DBregister_host(0, host, ip, port, (int)time(NULL));
+			DBregister_host(0, host, ip, dns, port, (int)time(NULL));
 		}
 		else if (0 != (zbx_process & ZBX_PROCESS_PROXY))
 		{
-			DBproxy_register_host(host, ip, port);
+			DBproxy_register_host(host, ip, dns, port);
 		}
 
 		DBcommit();
@@ -345,6 +355,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp,
 		if (0 != strcmp(key, row[0]))
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY_ORIG, row[0], ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_DELAY, row[1], ZBX_JSON_TYPE_INT);
+		/* The agent expects ALWAYS to have lastlogsize and mtime tags. Removing those would cause older agents to fail. */
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_LOGLASTSIZE, row[2], ZBX_JSON_TYPE_INT);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_MTIME, row[3], ZBX_JSON_TYPE_INT);
 		zbx_json_close(&json);

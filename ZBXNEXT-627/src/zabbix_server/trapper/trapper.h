@@ -1,6 +1,6 @@
 /*
-** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,14 +20,11 @@
 #ifndef ZABBIX_TRAPPER_H
 #define ZABBIX_TRAPPER_H
 
-#include "common.h"
 #include "comms.h"
-#include "db.h"
-#include "zbxjson.h"
 
 extern int	CONFIG_TIMEOUT;
 extern int	CONFIG_TRAPPER_TIMEOUT;
 
-void	child_trapper_main(unsigned char p, zbx_sock_t *s);
+void	main_trapper_loop(unsigned char p, zbx_sock_t *s);
 
 #endif

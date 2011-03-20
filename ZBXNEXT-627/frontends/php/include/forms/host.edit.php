@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 ?>
 <?php
 // include JS + templates
-	include('include/templates/hosts.js.php');
+	include('include/templates/host.js.php');
 	include('include/templates/macros.js.php');
 ?>
 <?php
@@ -36,7 +36,7 @@
 	$newgroup	= get_request('newgroup','');
 
 	$host 		= get_request('host',	'');
-	$name 		= get_request('name',	'');
+	$visiblename= get_request('visiblename',	'');
 	$status		= get_request('status',	HOST_STATUS_MONITORED);
 	$proxy_hostid	= get_request('proxy_hostid','');
 
@@ -76,9 +76,9 @@
 	$templates = get_request('templates',array());
 	$clear_templates = get_request('clear_templates',array());
 
-	$frm_title = S_HOST;
+	$frm_title = _('Host');
 	if($_REQUEST['hostid']>0){
-		$dbHosts = CHost::get(array(
+		$dbHosts = API::Host()->get(array(
 			'hostids' => $_REQUEST['hostid'],
 			'selectGroups' => API_OUTPUT_EXTEND,
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
@@ -88,12 +88,14 @@
 		));
 		$dbHost = reset($dbHosts);
 
-		$dbHost['interfaces'] = CHostInterface::get(array(
+		$dbHost['interfaces'] = API::HostInterface()->get(array(
 			'hostids' => $dbHost['hostid'],
 			'output' => API_OUTPUT_EXTEND,
 			'selectItems' => API_OUTPUT_COUNT,
-			'preserveKeys' => true
+			'preserveKeys' => true,
 		));
+
+		morder_result($dbHost['interfaces'], array('type', 'interfaceid'));
 
 		$frm_title	.= SPACE.' ['.$dbHost['host'].']';
 		$original_templates = $dbHost['parentTemplates'];
@@ -117,6 +119,10 @@
 	if(($_REQUEST['hostid']>0) && !isset($_REQUEST['form_refresh'])){
 		$proxy_hostid	= $dbHost['proxy_hostid'];
 		$host			= $dbHost['host'];
+		$visiblename	= $dbHost['name'];
+// display empty visible name if equal to host name
+		if($visiblename == $host)
+			$visiblename='';
 		$status			= $dbHost['status'];
 
 		$ipmi_authtype		= $dbHost['ipmi_authtype'];
@@ -255,7 +261,7 @@
 	$clear_templates = array_diff($clear_templates,array_keys($templates));
 	natcasesort($templates);
 
-	$frmHost = new CForm('hosts.php');
+	$frmHost = new CForm();
 	$frmHost->setName('web.hosts.host.php.');
 	$frmHost->addVar('form', get_request('form', 1));
 
@@ -272,14 +278,14 @@
 
 	$hostTB = new CTextBox('host',$host,54);
 	$hostTB->setAttribute('maxlength', 64);
-	$hostList->addRow(S_NAME, $hostTB);
+	$hostList->addRow(_('Host name'), $hostTB);
 
-	$nameTB = new CTextBox('name',$name,54);
-	$nameTB->setAttribute('maxlength', 64);
-	$hostList->addRow(S_NAME, $nameTB);
+	$visiblenameTB = new CTextBox('visiblename',$visiblename,54);
+	$visiblenameTB->setAttribute('maxlength', 64);
+	$hostList->addRow(_('Visible name'), $visiblenameTB);
 
 	$grp_tb = new CTweenBox($frmHost, 'groups', $host_groups, 10);
-	$all_groups = CHostGroup::get(array(
+	$all_groups = API::HostGroup()->get(array(
 		'editable' => 1,
 		'output' => API_OUTPUT_EXTEND
 	));
@@ -288,9 +294,9 @@
 		$grp_tb->addItem($group['groupid'], $group['name']);
 	}
 
-	$hostList->addRow(S_GROUPS,$grp_tb->get(S_IN_GROUPS, S_OTHER_GROUPS));
+	$hostList->addRow(_('Groups'),$grp_tb->get(_('In groups'), _('Other groups')));
 	$hostList->addRow(array(
-			new CLabel(S_NEW_GROUP, 'newgroup'), BR(),
+			new CLabel(_('New group'), 'newgroup'), BR(),
 			new CTextBox('newgroup',$newgroup)
 		));
 
@@ -306,17 +312,17 @@
 		));
 	}
 
-	$ifTab = new CTable();
-	$ifTab->addRow(array(S_IP_ADDRESS,S_DNS_NAME,S_CONNECT_TO,S_PORT,S_TYPE));
+	$ifTab = new CTable(null, 'formElementTable');
+	$ifTab->addRow(array(_('IP address'),_('DNS name'),_('Connect to'),_('Port'),_('Type')));
 	$ifTab->setAttribute('id', 'hostInterfaces');
 
 	$jsInsert = '';
 	foreach($interfaces as $inum => $interface){
 		$jsInsert.= 'addInterfaceRow('.zbx_jsvalue($interface).');';
 	}
-	zbx_add_post_js('setTimeout(function(){'.$jsInsert.'}, 20);');
+	zbx_add_post_js('setTimeout(function(){'.$jsInsert.'}, 1);');
 
-	$addButton = new CButton('add', S_ADD, 'javascript: addInterfaceRow({});');
+	$addButton = new CButton('add', _('Add'), 'javascript: addInterfaceRow({});');
 	$addButton->setAttribute('class', 'link_menu');
 
 	$col = new CCol(array($addButton));
@@ -327,32 +333,32 @@
 
 	$ifTab->addRow($buttonRow);
 
-	$hostList->addRow(S_INTERFACES, new CDiv($ifTab, 'objectgroup inlineblock border_dotted ui-corner-all'));
+	$hostList->addRow(_('Interfaces'), new CDiv($ifTab, 'objectgroup inlineblock border_dotted ui-corner-all'));
 
 //Proxy
 	$cmbProxy = new CComboBox('proxy_hostid', $proxy_hostid);
 	$cmbProxy->addItem(0, S_NO_PROXY);
 
 	$options = array('output' => API_OUTPUT_EXTEND);
-	$db_proxies = CProxy::get($options);
+	$db_proxies = API::Proxy()->get($options);
 	order_result($db_proxies, 'host');
 
 	foreach($db_proxies as $proxy){
 		$cmbProxy->addItem($proxy['proxyid'], $proxy['host']);
 	}
 
-	$hostList->addRow(S_MONITORED_BY_PROXY, $cmbProxy);
+	$hostList->addRow(_('Monitored by proxy'), $cmbProxy);
 //----------
 
 	$cmbStatus = new CComboBox('status',$status);
-	$cmbStatus->addItem(HOST_STATUS_MONITORED,	S_MONITORED);
-	$cmbStatus->addItem(HOST_STATUS_NOT_MONITORED,	S_NOT_MONITORED);
+	$cmbStatus->addItem(HOST_STATUS_MONITORED,	_('Monitored'));
+	$cmbStatus->addItem(HOST_STATUS_NOT_MONITORED,	_('Not monitored'));
 
-	$hostList->addRow(S_STATUS,$cmbStatus);
+	$hostList->addRow(_('Status'),$cmbStatus);
 
 	if($_REQUEST['form'] == 'full_clone'){
 // Items
-		$hostItems = CItem::get(array(
+		$hostItems = API::Item()->get(array(
 			'hostids' => $_REQUEST['hostid'],
 			'inherited' => false,
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
@@ -373,7 +379,7 @@
 		}
 
 // Triggers
-		$hostTriggers = CTrigger::get(array(
+		$hostTriggers = API::Trigger()->get(array(
 			'inherited' => false,
 			'hostids' => $_REQUEST['hostid'],
 			'output' => API_OUTPUT_EXTEND,
@@ -395,7 +401,7 @@
 		}
 
 // Graphs
-		$hostGraphs = CGraph::get(array(
+		$hostGraphs = API::Graph()->get(array(
 			'inherited' => false,
 			'hostids' => $_REQUEST['hostid'],
 			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)),
@@ -421,7 +427,7 @@
 // Discovery rules
 		$hostDiscoveryRuleids = array();
 
-		$hostDiscoveryRules = CDiscoveryRule::get(array(
+		$hostDiscoveryRules = API::DiscoveryRule()->get(array(
 			'inherited' => false,
 			'hostids' => $_REQUEST['hostid'],
 			'output' => API_OUTPUT_EXTEND,
@@ -442,7 +448,7 @@
 		}
 
 // Item prototypes
-		$hostItemPrototypes = CItemPrototype::get(array(
+		$hostItemPrototypes = API::Itemprototype()->get(array(
 			'hostids' => $_REQUEST['hostid'],
 			'discoveryids' => $hostDiscoveryRuleids,
 			'inherited' => false,
@@ -463,7 +469,7 @@
 		}
 
 // Trigger prototypes
-		$hostTriggerPrototypes = CTriggerPrototype::get(array(
+		$hostTriggerPrototypes = API::TriggerPrototype()->get(array(
 			'hostids' => $_REQUEST['hostid'],
 			'discoveryids' => $hostDiscoveryRuleids,
 			'inherited' => false,
@@ -485,7 +491,7 @@
 		}
 
 // Graph prototypes
-		$hostGraphPrototypes = CGraphPrototype::get(array(
+		$hostGraphPrototypes = API::GraphPrototype()->get(array(
 			'hostids' => $_REQUEST['hostid'],
 			'discoveryids' => $hostDiscoveryRuleids,
 			'inherited' => false,
@@ -509,7 +515,7 @@
 		}
 	}
 
-	$divTabs->addTab('hostTab', S_HOST, $hostList);
+	$divTabs->addTab('hostTab', _('Host'), $hostList);
 // } HOST WIDGET
 
 // TEMPLATES{
@@ -518,20 +524,20 @@
 	foreach($templates as $tid => $temp_name){
 		$frmHost->addVar('templates['.$tid.']', $temp_name);
 		$tmplList->addRow($temp_name, array(
-			new CSubmit('unlink['.$tid.']', S_UNLINK, null, 'link_menu'),
+			new CSubmit('unlink['.$tid.']', _('Unlink'), null, 'link_menu'),
 			SPACE, SPACE,
-			isset($original_templates[$tid]) ? new CSubmit('unlink_and_clear['.$tid.']', S_UNLINK_AND_CLEAR, null, 'link_menu') : SPACE
+			isset($original_templates[$tid]) ? new CSubmit('unlink_and_clear['.$tid.']', _('Unlink and clear'), null, 'link_menu') : SPACE
 		));
 	}
 
-	$tmplAdd = new CButton('add', S_ADD, "return PopUp('popup.php?dstfrm=".$frmHost->getName().
+	$tmplAdd = new CButton('add', _('Add'), "return PopUp('popup.php?dstfrm=".$frmHost->getName().
 			"&dstfld1=new_template&srctbl=templates&srcfld1=hostid&srcfld2=host".
 			url_param($templates,false,'existed_templates')."',450,450)",
 			'link_menu');
 
 	$tmplList->addRow($tmplAdd, SPACE);
 
-	$divTabs->addTab('templateTab', S_TEMPLATES, $tmplList);
+	$divTabs->addTab('templateTab', _('Templates'), $tmplList);
 // } TEMPLATES
 
 // IPMI TAB {
@@ -562,7 +568,7 @@
 	$ipmiList->addRow(_('Username'), new CTextBox('ipmi_username', $ipmi_username, 20));
 	$ipmiList->addRow(_('Password'), new CTextBox('ipmi_password', $ipmi_password, 20));
 
-	$divTabs->addTab('ipmiTab', S_IPMI, $ipmiList);
+	$divTabs->addTab('ipmiTab', _('IPMI'), $ipmiList);
 
 // } IPMI TAB
 
@@ -577,7 +583,7 @@
 		));
 	}
 
-	$macroTab = new CTable();
+	$macroTab = new CTable(null,'formElementTable');
 	$macroTab->addRow(array(S_MACRO, SPACE, S_VALUE));
 	$macroTab->setAttribute('id', 'userMacros');
 
@@ -589,7 +595,7 @@
 	}
 	zbx_add_post_js($jsInsert);
 
-	$addButton = new CButton('add', S_ADD, 'javascript: addMacroRow({});');
+	$addButton = new CButton('add', _('Add'), 'javascript: addMacroRow({});');
 	$addButton->setAttribute('class', 'link_menu');
 
 	$col = new CCol(array($addButton));
@@ -603,7 +609,7 @@
 	$macrolist = new CFormList('macrolist');
 	$macrolist->addRow($macroTab);
 
-	$divTabs->addTab('macroTab', S_MACROS, $macrolist);
+	$divTabs->addTab('macroTab', _('Macros'), $macrolist);
 // } MACROS WIDGET
 
 
@@ -653,11 +659,11 @@
 	$frmHost->addItem($divTabs);
 
 // Footer
-	$main = array(new CSubmit('save', S_SAVE));
+	$main = array(new CSubmit('save', _('Save')));
 	$others = array();
 	if(($_REQUEST['hostid']>0) && ($_REQUEST['form'] != 'full_clone')){
-		$others[] = new CSubmit('clone', S_CLONE);
-		$others[] = new CSubmit('full_clone', S_FULL_CLONE);
+		$others[] = new CSubmit('clone', _('Clone'));
+		$others[] = new CSubmit('full_clone', _('Full clone'));
 		$others[] = new CButtonDelete(S_DELETE_SELECTED_HOST_Q, url_param('form').url_param('hostid').url_param('groupid'));
 	}
 	$others[] = new CButtonCancel(url_param('groupid'));
