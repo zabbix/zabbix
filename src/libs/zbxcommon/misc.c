@@ -90,7 +90,7 @@ int	get_nodeid_by_id(zbx_uint64_t id)
 void	zbx_timespec(zbx_timespec_t *ts)
 {
 	static zbx_timespec_t	*last_ts = NULL;
-	static unsigned short	corr = 0;
+	static int		corr = 0;
 #ifdef _WINDOWS
 	LARGE_INTEGER	tickPerSecond, tick;
 	static int	boottime = 0;
@@ -155,15 +155,13 @@ void	zbx_timespec(zbx_timespec_t *ts)
 
 	if (last_ts->ns == ts->ns && last_ts->sec == ts->sec)
 	{
-		corr++;
+		ts->ns += ++corr;
 
-		while (ts->ns + corr > 1000000000)
+		while (ts->ns >= 1000000000)
 		{
 			ts->sec++;
-			corr -= 1000000000;
+			ts->ns -= 1000000000;
 		}
-
-		ts->ns += corr;
 	}
 	else
 	{
