@@ -17,23 +17,6 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <netinet/in.h>
-#include <netdb.h>
-
-#include <signal.h>
-
-#include <string.h>
-
-#include <time.h>
-
-#include <sys/socket.h>
-#include <errno.h>
-
 #include "common.h"
 #include "db.h"
 #include "log.h"
@@ -120,37 +103,37 @@ static void	get_latest_event_status(zbx_uint64_t triggerid,
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments: use 'free_trigger_info' function to clear allocated memory       *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	add_trigger_info(DB_EVENT *event)
+static int	add_trigger_info(DB_EVENT *event)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	triggerid, last_eventid;
-	int		last_value;
+	zbx_uint64_t	last_eventid;
+	int		last_value, ret = SUCCEED;
 
 	if (event->object == EVENT_OBJECT_TRIGGER && event->objectid != 0)
 	{
-		triggerid = event->objectid;
-
-		event->trigger_description[0] = '\0';
-		zbx_free(event->trigger_comments);
-		zbx_free(event->trigger_url);
-
 		result = DBselect(
-				"select description,priority,comments,url,type"
+				"select description,expression,priority,type"
 				" from triggers"
 				" where triggerid=" ZBX_FS_UI64,
-				triggerid);
+				event->objectid);
 
 		if (NULL != (row = DBfetch(result)))
 		{
-			strscpy(event->trigger_description, row[0]);
-			event->trigger_priority = atoi(row[1]);
-			event->trigger_comments	= strdup(row[2]);
-			event->trigger_url	= strdup(row[3]);
-			event->trigger_type	= atoi(row[4]);
+			event->trigger.triggerid = event->objectid;
+			strscpy(event->trigger.description, row[0]);
+			strscpy(event->trigger.expression, row[1]);
+			event->trigger.priority = (unsigned char)atoi(row[2]);
+			event->trigger.type = (unsigned char)atoi(row[3]);
+			ret = SUCCEED;
+		}
+		else
+		{
+			event->trigger.priority = TRIGGER_SEVERITY_NOT_CLASSIFIED;
+			event->trigger.type = TRIGGER_TYPE_NORMAL;
 		}
 		DBfree_result(result);
 
@@ -158,7 +141,7 @@ static void	add_trigger_info(DB_EVENT *event)
 		 * (1)  -any- / UNKNOWN	(-any-/-any-/UNKNOWN)
 		 * (2)  FALSE / FALSE	(FALSE/UNKNOWN/FALSE)
 		 * (3) UNKNOWN/ FALSE	(UNKNOWN/UNKNOWN/FALSE)
-		 * if event->trigger_type is not TRIGGER_TYPE_MULTIPLE_TRUE:
+		 * if event->trigger.type is not TRIGGER_TYPE_MULTIPLE_TRUE:
 		 * (4)  TRUE  / TRUE	(TRUE/UNKNOWN/TRUE)
 		 */
 		if (event->value == TRIGGER_VALUE_UNKNOWN)	/* (1) */
@@ -167,14 +150,14 @@ static void	add_trigger_info(DB_EVENT *event)
 		}
 		else
 		{
-			get_latest_event_status(triggerid, &last_eventid, &last_value);
+			get_latest_event_status(event->objectid, &last_eventid, &last_value);
 
 			if (event->value == TRIGGER_VALUE_FALSE &&	/* (2) & (3) */
 					(last_value == TRIGGER_VALUE_FALSE || last_value == TRIGGER_VALUE_UNKNOWN))
 			{
 				event->skip_actions = 1;
 			}
-			else if (event->trigger_type != TRIGGER_TYPE_MULTIPLE_TRUE &&	/* (4) */
+			else if (event->trigger.type != TRIGGER_TYPE_MULTIPLE_TRUE &&	/* (4) */
 					last_value == TRIGGER_VALUE_TRUE && event->value == TRIGGER_VALUE_TRUE)
 			{
 				event->skip_actions = 1;
@@ -182,12 +165,12 @@ static void	add_trigger_info(DB_EVENT *event)
 
 			/* copy acknowledges in next cases:
 			 * (1) FALSE/FALSE	(FALSE/UNKNOWN/FALSE)
-			 * if event->trigger_type is not TRIGGER_TYPE_MULTIPLE_TRUE:
+			 * if event->trigger.type is not TRIGGER_TYPE_MULTIPLE_TRUE:
 			 * (2) TRUE /TRUE	(TRUE/UNKNOWN/TRUE)
 			 */
 			if (last_value == event->value &&
 					(last_value == TRIGGER_VALUE_FALSE ||			/* (1) */
-					(event->trigger_type != TRIGGER_TYPE_MULTIPLE_TRUE &&	/* (2) */
+					(event->trigger.type != TRIGGER_TYPE_MULTIPLE_TRUE &&	/* (2) */
 					last_value == TRIGGER_VALUE_TRUE)))
 				event->ack_eventid = last_eventid;
 		}
@@ -197,6 +180,8 @@ static void	add_trigger_info(DB_EVENT *event)
 		if (0 != event->ack_eventid)
 			zabbix_log(LOG_LEVEL_DEBUG, "Copy acknowledges");
 	}
+
+	return ret;
 }
 
 /******************************************************************************
@@ -285,27 +270,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: free_trigger_info                                                *
- *                                                                            *
- * Purpose: clean allocated memory by function 'add_trigger_info'             *
- *                                                                            *
- * Parameters: event - event data (event.triggerid)                           *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-static void	free_trigger_info(DB_EVENT *event)
-{
-	zbx_free(event->trigger_url);
-	zbx_free(event->trigger_comments);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: process_event                                                    *
  *                                                                            *
  * Purpose: process new event                                                 *
@@ -322,14 +286,13 @@ static void	free_trigger_info(DB_EVENT *event)
 int	process_event(DB_EVENT *event, int force_actions)
 {
 	const char	*__function_name = "process_event";
-	int		ret = SUCCEED;
+	int		ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64
-			" object:%d objectid:" ZBX_FS_UI64 " value:%d",
-			__function_name, event->eventid, event->object,
-			event->objectid, event->value);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64 " object:%d objectid:" ZBX_FS_UI64 " value:%d",
+			__function_name, event->eventid, event->object, event->objectid, event->value);
 
-	add_trigger_info(event);
+	if (SUCCEED != add_trigger_info(event))
+		goto fail;
 
 	if (0 == event->eventid)
 		event->eventid = DBget_maxid("events");
@@ -350,12 +313,11 @@ int	process_event(DB_EVENT *event, int force_actions)
 		process_actions(event);
 
 	if (event->object == EVENT_OBJECT_TRIGGER)
-		DBupdate_services(event->objectid, (TRIGGER_VALUE_TRUE == event->value) ? event->trigger_priority : 0, event->clock);
+		DBupdate_services(event->objectid, (TRIGGER_VALUE_TRUE == event->value) ? event->trigger.priority : 0, event->clock);
 
-	free_trigger_info(event);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s",
-			__function_name, zbx_result_string(ret));
+	ret = SUCCEED;
+fail:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
