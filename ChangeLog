@@ -2,8 +2,11 @@
 Changes for 1.9.3
 
 New features:
+ - [ZBXNEXT-675] added new icons and a script to create sql file (Elvis,Richlv)
  - [ZBX-1357] Updated Latvian and Russian translations; thanks to Zabbix translators (Richlv)
  - [ZBXNEXT-696] Added support for {IPADDRESS}, {HOST.DNS} and {HOST.CONN} macros in trigger names (rudolfs)
+ - [ZBX-3495] fixed interfaceid updated to null when link template (Vedmak)
+ - [ZBXNEXT-676] merged host profile and extended host profile (Sasha, Vedmak)
 
 --------------------------------------------------------------------------------
 Changes for 1.9.2
@@ -101,6 +104,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
 
+ - [ZBX-3075] Fixed a regex bug with zero-length strings (rudolfs)
  - [ZBX-3621] changed the maximum number of processes for Zabbix daemons (asaveljevs)
  - [ZBXNEXT-448] added trigger function logeventid that matches the last event ID to a regex (rudolfs)
  - [ZBX-1419] improve and fix database upgrade patches for older versions (Richlv)
