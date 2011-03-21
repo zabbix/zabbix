@@ -58,13 +58,11 @@ static int	trigger_get_N_functionid(DB_TRIGGER *trigger, int N_functionid, zbx_u
 	char		*p_functionid = NULL;
 	register char	*c;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s' N_functionid:%d",
+			__function_name, trigger->expression, N_functionid);
 
 	if (0 == trigger->triggerid)
 		goto fail;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() expression:'%s' N_functionid:%d",
-			__function_name, trigger->expression, N_functionid);
 
 	for (c = trigger->expression; '\0' != *c && ret != SUCCEED; c++)
 	{
