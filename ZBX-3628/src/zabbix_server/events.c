@@ -96,7 +96,7 @@ static void	get_latest_event_status(zbx_uint64_t triggerid,
  *                                                                            *
  * Purpose: add trigger info to event if required                             *
  *                                                                            *
- * Parameters: event - event data (event.triggerid)                           *
+ * Parameters: event - [IN] event data                                        *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
