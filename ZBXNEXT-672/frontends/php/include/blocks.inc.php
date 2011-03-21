@@ -898,7 +898,7 @@ function make_latest_issues($filter = array()){
 			$hprofile = API::Host()->get(array(
 				'hostids' => $trigger['hostid'],
 				'output' => API_OUTPUT_SHORTEN,
-				'select_profile' => API_OUTPUT_EXTEND,
+				'selectProfile' => true,
 			));
 			$hprofile = reset($hprofile);
 			$thosts_cache[$hprofile['hostid']] = $hprofile;
