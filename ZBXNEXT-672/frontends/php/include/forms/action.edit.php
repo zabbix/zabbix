@@ -172,7 +172,7 @@ require_once('include/templates/action.js.php');
 				new CTextBox('group','',40,'yes'),
 				new CButton('btn1',_('Select'),
 					"return PopUp('popup.php?writeonly=1&dstfrm=".$frmAction->getName().
-					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=group&srctbl=host_group".
+					"&dstfld1=new_condition_value&dstfld2=group&srctbl=host_group".
 					"&srcfld1=groupid&srcfld2=name',450,450);",
 					'link_menu'));
 			break;
@@ -182,7 +182,7 @@ require_once('include/templates/action.js.php');
 				new CTextBox('host','',40,'yes'),
 				new CButton('btn1',_('Select'),
 					"return PopUp('popup.php?writeonly=1&dstfrm=".$frmAction->getName().
-					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=host&srctbl=host_templates".
+					"&dstfld1=new_condition_value&dstfld2=host&srctbl=host_templates".
 					"&srcfld1=hostid&srcfld2=host',450,450);",
 					'link_menu'));
 			break;
@@ -192,7 +192,7 @@ require_once('include/templates/action.js.php');
 				new CTextBox('host','',40,'yes'),
 				new CButton('btn1',_('Select'),
 					"return PopUp('popup.php?writeonly=1&dstfrm=".$frmAction->getName().
-					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=host&srctbl=hosts".
+					"&dstfld1=new_condition_value&dstfld2=host&srctbl=hosts".
 					"&srcfld1=hostid&srcfld2=host',450,450);",
 					'link_menu'));
 			break;
@@ -203,7 +203,7 @@ require_once('include/templates/action.js.php');
 				new CTextBox('trigger','',40,'yes'),
 				new CButton('btn1',_('Select'),
 					"return PopUp('popup.php?writeonly=1&dstfrm=".$frmAction->getName().
-					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=trigger&srctbl=triggers".
+					"&dstfld1=new_condition_value&dstfld2=trigger&srctbl=triggers".
 					"&srcfld1=triggerid&srcfld2=description');",
 					'link_menu'));
 			break;
@@ -234,7 +234,7 @@ require_once('include/templates/action.js.php');
 				new CTextBox('node','',40,'yes'),
 				new CButton('btn1',_('Select'),
 					"return PopUp('popup.php?writeonly=1&dstfrm=".$frmAction->getName().
-					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=node&srctbl=nodes".
+					"&dstfld1=new_condition_value&dstfld2=node&srctbl=nodes".
 					"&srcfld1=nodeid&srcfld2=name',450,450);",
 					'link_menu'));
 			break;
@@ -244,7 +244,7 @@ require_once('include/templates/action.js.php');
 				new CTextBox('drule','',40,'yes'),
 				new CButton('btn1',_('Select'),
 					"return PopUp('popup.php?dstfrm=".$frmAction->getName().
-					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=drule&srctbl=drules".
+					"&dstfld1=new_condition_value&dstfld2=drule&srctbl=drules".
 					"&srcfld1=druleid&srcfld2=name',450,450);",
 					'link_menu'));
 			break;
@@ -254,7 +254,7 @@ require_once('include/templates/action.js.php');
 				new CTextBox('dcheck','',40,'yes'),
 				new CButton('btn1',_('Select'),
 					"return PopUp('popup.php?writeonly=1&dstfrm=".$frmAction->getName().
-					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=dcheck&srctbl=dchecks".
+					"&dstfld1=new_condition_value&dstfld2=dcheck&srctbl=dchecks".
 					"&srcfld1=dcheckid&srcfld2=name',450,450);",
 					'link_menu'));
 			break;
@@ -264,7 +264,7 @@ require_once('include/templates/action.js.php');
 				new CTextBox('proxy','',40,'yes'),
 				new CButton('btn1',_('Select'),
 					"return PopUp('popup.php?writeonly=1&dstfrm=".$frmAction->getName().
-					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=proxy&srctbl=proxies".
+					"&dstfld1=new_condition_value&dstfld2=proxy&srctbl=proxies".
 					"&srcfld1=hostid&srcfld2=host',450,450);",
 					'link_menu'));
 			break;
