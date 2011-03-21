@@ -574,7 +574,7 @@
 			$newRow = $frmUser->addRow(S_TRIGGER_SEVERITY, $triggers);
 			$newRow->setAttribute('id', 'triggers_row');
 
-			zbx_add_post_js("var userMessageSwitcher = new CViewSwitcher('messages[enabled]', ['click', 'change'], ".zbx_jsvalue($msgVisibility, true).");");
+			zbx_add_post_js("var userMessageSwitcher = new CViewSwitcher('messages[enabled]', 'click', ".zbx_jsvalue($msgVisibility, true).");");
  		}
 
 		$frmUser->addItemToBottomRow(new CSubmit('save',S_SAVE));
@@ -1025,55 +1025,38 @@
 			zbx_subarray_push($fTypeVisibility, -1, $vItem);
 		}
 
-		$itemTypes = array(
-			ITEM_TYPE_ZABBIX,
-			ITEM_TYPE_ZABBIX_ACTIVE,
-			ITEM_TYPE_SIMPLE,
-			ITEM_TYPE_SNMPV1,
-			ITEM_TYPE_SNMPV2C,
-			ITEM_TYPE_SNMPV3,
-			ITEM_TYPE_TRAPPER,
-			ITEM_TYPE_INTERNAL,
-			ITEM_TYPE_AGGREGATE,
-			//ITEM_TYPE_HTTPTEST,
-			ITEM_TYPE_EXTERNAL,
-			ITEM_TYPE_DB_MONITOR,
-			ITEM_TYPE_IPMI,
-			ITEM_TYPE_SSH,
-			ITEM_TYPE_TELNET,
-			ITEM_TYPE_CALCULATED);
+		$itemTypes = item_type2str();
+// httptest items are only for internal zabbix logic
+		unset($itemTypes[ITEM_TYPE_HTTPTEST]);
 
-		foreach($itemTypes as $it){
+		$cmbType->addItems($itemTypes);
 
-			$cmbType->addItem($it, item_type2str($it));
-
-			if(!uint_in_array($it, array(ITEM_TYPE_TRAPPER, ITEM_TYPE_HTTPTEST))){
-				foreach(array('filter_delay_label','filter_delay') as $vItem)
-					zbx_subarray_push($fTypeVisibility, $it, $vItem);
-
-				unset($vItem);
+		foreach($itemTypes as $typeNum => $typeLabel){
+			if($typeNum != ITEM_TYPE_TRAPPER){
+				zbx_subarray_push($fTypeVisibility, $typeNum, 'filter_delay_label');
+				zbx_subarray_push($fTypeVisibility, $typeNum, 'filter_delay');
 			}
 
-			if(uint_in_array($it, array(ITEM_TYPE_SNMPV1,ITEM_TYPE_SNMPV2C))){
-				$snmp_types = array(
-					'filter_snmp_community_label', 'filter_snmp_community',
-					'filter_snmp_oid_label', 'filter_snmp_oid',
-					'filter_port_label', 'filter_port'
-				);
-
-				foreach($snmp_types as $vItem){
-					zbx_subarray_push($fTypeVisibility, $it, $vItem);
-				}
-			}
-
-			if($it == ITEM_TYPE_SNMPV3){
-				foreach(array(
-					'filter_snmpv3_securityname_label', 'filter_snmpv3_securityname',
-					'filter_snmp_oid_label', 'filter_snmp_oid',
-					'filter_port_label', 'filter_port'
-				) as $vItem)
-				zbx_subarray_push($fTypeVisibility, $it, $vItem);
-				unset($vItem);
+			switch($typeNum){
+				case ITEM_TYPE_SNMPV1:
+				case ITEM_TYPE_SNMPV2C:
+					$snmp_types = array(
+						'filter_snmp_community_label', 'filter_snmp_community',
+						'filter_snmp_oid_label', 'filter_snmp_oid',
+						'filter_port_label', 'filter_port'
+					);
+					foreach($snmp_types as $vItem){
+						zbx_subarray_push($fTypeVisibility, $typeNum, $vItem);
+					}
+					break;
+				case ITEM_TYPE_SNMPV3:
+					foreach(array(
+						'filter_snmpv3_securityname_label', 'filter_snmpv3_securityname',
+						'filter_snmp_oid_label', 'filter_snmp_oid',
+						'filter_port_label', 'filter_port'
+					) as $vItem)
+						zbx_subarray_push($fTypeVisibility, $typeNum, $vItem);
+					break;
 			}
 		}
 
@@ -1529,23 +1512,10 @@
 		$add_groupid = get_request('add_groupid', get_request('groupid', 0));
 
 		$limited = false;
-		$types = array(
-			ITEM_TYPE_ZABBIX,
-			ITEM_TYPE_ZABBIX_ACTIVE,
-			ITEM_TYPE_SIMPLE,
-			ITEM_TYPE_SNMPV1,
-			ITEM_TYPE_SNMPV2C,
-			ITEM_TYPE_SNMPV3,
-			ITEM_TYPE_INTERNAL,
-			ITEM_TYPE_TRAPPER,
-			ITEM_TYPE_AGGREGATE,
-			ITEM_TYPE_EXTERNAL,
-			ITEM_TYPE_DB_MONITOR,
-			ITEM_TYPE_IPMI,
-			ITEM_TYPE_SSH,
-			ITEM_TYPE_TELNET,
-			ITEM_TYPE_CALCULATED
-		);
+
+		$types = item_type2str();
+		// http items only for internal processes
+		unset($types[ITEM_TYPE_HTTPTEST]);
 
 		if(isset($_REQUEST['itemid'])){
 			$frmItem->addVar('itemid', $_REQUEST['itemid']);
@@ -1655,7 +1625,7 @@
 					BR());
 				$frmItem->addVar('delay_flex['.$i.'][delay]', $val['delay']);
 				$frmItem->addVar('delay_flex['.$i.'][period]', $val['period']);
-				foreach($types as $it) {
+				foreach($types as $it => $caption) {
 					if($it == ITEM_TYPE_TRAPPER || $it == ITEM_TYPE_ZABBIX_ACTIVE) continue;
 					zbx_subarray_push($typeVisibility, $it, 'delay_flex['.$i.'][delay]');
 					zbx_subarray_push($typeVisibility, $it, 'delay_flex['.$i.'][period]');
@@ -1762,7 +1732,7 @@
 		}
 		else{
 			$cmbType = new CComboBox('type',$type);
-			foreach($types as $it) $cmbType->addItem($it,item_type2str($it));
+			$cmbType->addItems($types);
 			$frmItem->addRow(S_TYPE, $cmbType);
 		}
 
@@ -1841,8 +1811,8 @@
 				'T');
 
 		$frmItem->addRow(S_KEY, array(new CTextBox('key',$key,40,$limited), $btnSelect));
-		foreach($types as $it) {
-			switch($it) {
+		foreach($types as $it => $ilabel) {
+			switch($it){
 				case ITEM_TYPE_DB_MONITOR:
 					zbx_subarray_push($typeVisibility, $it, array('id'=>'key','defaultValue'=> 'db.odbc.select[<unique short description>]'));
 					zbx_subarray_push($typeVisibility, $it, array('id'=>'params_dbmonitor','defaultValue'=> "DSN=<database source name>\nuser=<user name>\npassword=<password>\nsql=<query>"));
@@ -2015,7 +1985,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$row = new CRow(array(new CCol(S_UPDATE_INTERVAL_IN_SEC,'form_row_l'), new CCol(new CNumericBox('delay',$delay,5),'form_row_r')));
 		$row->setAttribute('id', 'row_delay');
 		$frmItem->addRow($row);
-		foreach($types as $it){
+		foreach($types as $it => $ilabel) {
 			if($it == ITEM_TYPE_TRAPPER) continue;
 			zbx_subarray_push($typeVisibility, $it, 'delay');
 			zbx_subarray_push($typeVisibility, $it, 'row_delay');
@@ -2036,7 +2006,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$row->setAttribute('id', 'row_new_delay_flex');
 		$frmItem->addRow($row);
 
-		foreach($types as $it) {
+		foreach($types as $it => $ilabel){
 			if($it == ITEM_TYPE_TRAPPER || $it == ITEM_TYPE_ZABBIX_ACTIVE) continue;
 			zbx_subarray_push($typeVisibility, $it, 'row_flex_intervals');
 			zbx_subarray_push($typeVisibility, $it, 'row_new_delay_flex');
@@ -2197,7 +2167,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		return $frmItem;
 	}
 
-	function insert_mass_update_item_form($elements_array_name){
+	function insert_mass_update_item_form(){
 		$itemids = get_request('group_itemid',array());
 
 		$frmItem = new CFormTable(S_ITEM,null,'post');
@@ -2219,6 +2189,11 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$data_type	= get_request('data_type'	,ITEM_DATA_TYPE_DECIMAL);
 		$trapper_hosts	= get_request('trapper_hosts'	,'');
 		$units		= get_request('units'		,'');
+		$authtype = get_request('authtype', '');
+		$username = get_request('username', '');
+		$password = get_request('password', '');
+		$publickey = get_request('publickey', '');
+		$privatekey = get_request('privatekey', '');
 		$valuemapid	= get_request('valuemapid'	,0);
 		$delta		= get_request('delta'		,0);
 		$trends		= get_request('trends'		,365);
@@ -2281,11 +2256,12 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 				S_HOST_INTERFACE), $sbIntereaces);
 		}
 
+		$itemTypes = item_type2str();
+		// http items only for internal processes
+		unset($itemTypes[ITEM_TYPE_HTTPTEST]);
+
 		$cmbType = new CComboBox('type',$type);
-		foreach(array(ITEM_TYPE_ZABBIX,ITEM_TYPE_ZABBIX_ACTIVE,ITEM_TYPE_SIMPLE,ITEM_TYPE_SNMPV1,
-			ITEM_TYPE_SNMPV2C,ITEM_TYPE_SNMPV3,ITEM_TYPE_TRAPPER,ITEM_TYPE_INTERNAL,
-			ITEM_TYPE_AGGREGATE,ITEM_TYPE_AGGREGATE,ITEM_TYPE_EXTERNAL,ITEM_TYPE_DB_MONITOR) as $it)
-				$cmbType->addItem($it, item_type2str($it));
+		$cmbType->addItems($itemTypes);
 
 		$frmItem->addRow(array( new CVisibilityBox('type_visible', get_request('type_visible'), 'type', S_ORIGINAL),
 			S_TYPE), $cmbType);
@@ -2330,6 +2306,31 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 		$frmItem->addRow(array( new CVisibilityBox('units_visible', get_request('units_visible'), 'units', S_ORIGINAL), S_UNITS),
 			new CTextBox('units',$units,40));
+
+
+		$cmbAuthType = new CComboBox('authtype', $authtype);
+		$cmbAuthType->addItem(ITEM_AUTHTYPE_PASSWORD, S_PASSWORD);
+		$cmbAuthType->addItem(ITEM_AUTHTYPE_PUBLICKEY, S_PUBLIC_KEY);
+		$frmItem->addRow(
+			array(new CVisibilityBox('authtype_visible', get_request('authtype_visible'), 'authtype', S_ORIGINAL), S_AUTHENTICATION_METHOD),
+			$cmbAuthType
+		);
+		$frmItem->addRow(
+			array(new CVisibilityBox('username_visible', get_request('username_visible'), 'username', S_ORIGINAL), S_USER_NAME),
+			new CTextBox('username', $username, 40)
+		);
+		$frmItem->addRow(
+			array(new CVisibilityBox('publickey_visible', get_request('publickey_visible'), 'publickey', S_ORIGINAL), S_PUBLIC_KEY_FILE),
+			new CTextBox('publickey', $publickey, 40)
+		);
+		$frmItem->addRow(
+			array(new CVisibilityBox('privatekey_visible', get_request('privatekey_visible'), 'privatekey', S_ORIGINAL), S_PRIVATE_KEY_FILE),
+			new CTextBox('privatekey', $privatekey, 40)
+		);
+		$frmItem->addRow(
+			array(new CVisibilityBox('password_visible', get_request('password_visible'), 'password', S_ORIGINAL), S_PASSWORD),
+			new CTextBox('password', $password, 40)
+		);
 
 		$frmItem->addRow(array( new CVisibilityBox('formula_visible', get_request('formula_visible'), 'formula', S_ORIGINAL),
 			S_CUSTOM_MULTIPLIER.' (0 - '.S_DISABLED.')'), new CTextBox('formula',$formula,40));
@@ -3746,76 +3747,27 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 	return $form;
 	}
 
-// Insert host profile ReadOnly form
 	function insert_host_profile_form(){
+		$frmHostP = new CFormTable(_('Host Profile'));
 
-		$frmHostP = new CFormTable(S_HOST_PROFILE);
+		$table_titles = getHostProfiles();
 
-		$table_titles = array(
-			'devicetype' => S_DEVICE_TYPE, 'name' => S_NAME, 'os' => S_OS, 'serialno' => S_SERIALNO,
-			'tag' => S_TAG, 'macaddress' => S_MACADDRESS, 'hardware' => S_HARDWARE, 'software' => S_SOFTWARE,
-			'contact' => S_CONTACT, 'location' => S_LOCATION, 'notes' => S_NOTES
-		);
+		$sql_fields = implode(', ', array_keys($table_titles));
 
-		$sql_fields = implode(', ', array_keys($table_titles)); //generate string of fields to get from DB
-
-		$sql = 'SELECT '.$sql_fields.' FROM hosts_profiles WHERE hostid='.$_REQUEST['hostid'];
+		$sql = 'SELECT '.$sql_fields.' FROM host_profile WHERE hostid='.$_REQUEST['hostid'];
 		$result = DBselect($sql);
 
-		if($row = DBfetch($result)) {
-			foreach($row as $key => $value) {
-				if(!zbx_empty($value)){
-					$frmHostP->addRow($table_titles[$key], new CSpan(zbx_str2links($value)));
-				}
+		$row = DBfetch($result);
+		foreach($row as $key => $value){
+			if(!zbx_empty($value)){
+				$frmHostP->addRow($table_titles[$key], new CSpan(zbx_str2links($value), 'pre'));
 			}
 		}
-		else{
-			$frmHostP->addSpanRow(S_PROFILE_FOR_THIS_HOST_IS_MISSING,"form_row_c");
-		}
-		$frmHostP->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param('prof_type')));
+
+		$frmHostP->addItemToBottomRow(new CButtonCancel(url_param('groupid')));
 
 		return $frmHostP;
 	}
-
-// BEGIN: HOSTS PROFILE EXTENDED Section
-	function insert_host_profile_ext_form(){
-
-		$frmHostPA = new CFormTable(S_EXTENDED_HOST_PROFILE);
-
-		$table_titles = array(
-				'device_alias' => S_DEVICE_ALIAS, 'device_type' => S_DEVICE_TYPE, 'device_chassis' => S_DEVICE_CHASSIS, 'device_os' => S_DEVICE_OS,
-				'device_os_short' => S_DEVICE_OS_SHORT, 'device_hw_arch' => S_DEVICE_HW_ARCH, 'device_serial' => S_DEVICE_SERIAL,
-				'device_model' => S_DEVICE_MODEL, 'device_tag' => S_DEVICE_TAG, 'device_vendor' => S_DEVICE_VENDOR, 'device_contract' => S_DEVICE_CONTRACT,
-				'device_who' => S_DEVICE_WHO, 'device_status' => S_DEVICE_STATUS, 'device_app_01' => S_DEVICE_APP_01, 'device_app_02' => S_DEVICE_APP_02,
-				'device_app_03' => S_DEVICE_APP_03, 'device_app_04' => S_DEVICE_APP_04, 'device_app_05' => S_DEVICE_APP_05, 'device_url_1' => S_DEVICE_URL_1,
-				'device_url_2' => S_DEVICE_URL_2, 'device_url_3' => S_DEVICE_URL_3, 'device_networks' => S_DEVICE_NETWORKS, 'device_notes' => S_DEVICE_NOTES,
-				'device_hardware' => S_DEVICE_HARDWARE, 'device_software' => S_DEVICE_SOFTWARE, 'ip_subnet_mask' => S_IP_SUBNET_MASK, 'ip_router' => S_IP_ROUTER,
-				'ip_macaddress' => S_IP_MACADDRESS, 'oob_ip' => S_OOB_IP, 'oob_subnet_mask' => S_OOB_SUBNET_MASK, 'oob_router' => S_OOB_ROUTER,
-				'date_hw_buy' => S_DATE_HW_BUY, 'date_hw_install' => S_DATE_HW_INSTALL, 'date_hw_expiry' => S_DATE_HW_EXPIRY, 'date_hw_decomm' => S_DATE_HW_DECOMM,
-				'site_street_1' => S_SITE_STREET_1, 'site_street_2' => S_SITE_STREET_2, 'site_street_3' => S_SITE_STREET_3, 'site_city' => S_SITE_CITY,
-				'site_state' => S_SITE_STATE, 'site_country' => S_SITE_COUNTRY, 'site_zip' => S_SITE_ZIP, 'site_rack' => S_SITE_RACK,
-				'site_notes' => S_SITE_NOTES, 'poc_1_name' => S_POC_1_NAME, 'poc_1_email' => S_POC_1_EMAIL, 'poc_1_phone_1' => S_POC_1_PHONE_1,
-				'poc_1_phone_2' => S_POC_1_PHONE_2, 'poc_1_cell' => S_POC_1_CELL, 'poc_1_screen'=>S_POC_1_SCREEN, 'poc_1_notes' => S_POC_1_NOTES, 'poc_2_name' => S_POC_2_NAME,
-				'poc_2_email' => S_POC_2_EMAIL, 'poc_2_phone_1' => S_POC_2_PHONE_1, 'poc_2_phone_2' => S_POC_2_PHONE_2, 'poc_2_cell' => S_POC_2_CELL,
-				'poc_2_screen' => S_POC_2_SCREEN, 'poc_2_notes' => S_POC_2_NOTES);
-
-		$sql_fields = implode(', ', array_keys($table_titles)); //generate string of fields to get from DB
-		$result = DBselect('SELECT '.$sql_fields.' FROM hosts_profiles_ext WHERE hostid='.$_REQUEST['hostid']);
-
-		if($row = DBfetch($result)) {
-			foreach($row as $key => $value) {
-				if(!zbx_empty($value)) {
-					$frmHostPA->addRow($table_titles[$key], new CSpan(zbx_str2links($value)));
-				}
-			}
-		}
-		else{
-			$frmHostPA->addSpanRow('Extended Profile for this host is missing','form_row_c');
-		}
-		$frmHostPA->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param('prof_type')));
-	return $frmHostPA;
-	}
-// END:   HOSTS PROFILE EXTENDED Section
 
 	function import_map_form($rules){
 		global $USER_DETAILS;

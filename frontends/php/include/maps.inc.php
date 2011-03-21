@@ -1313,7 +1313,7 @@
 					'value_flags' => null,
 				),
 				'nodeids' => get_current_nodeid(true),
-				'active' => true,
+				'monitored' => true,
 				'skipDependent' => 1,
 			);
 			$triggers = API::Trigger()->get($options);
@@ -1335,7 +1335,7 @@
 			'output' => API_OUTPUT_SHORTEN,
 			'nodeids' => get_current_nodeid(true),
 			'nopermissions' => 1,
-			'active' => 1,
+			'monitored' => true,
 			'filter' => array(
 				'value' => TRIGGER_VALUE_TRUE,
 				'value_flags' => null
