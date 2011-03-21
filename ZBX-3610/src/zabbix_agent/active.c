@@ -672,7 +672,6 @@ static int	process_value(
 		buffer.pcount++;
 
 	ret = SUCCEED;
-
 ret:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -724,7 +723,7 @@ static void	process_active_checks(char *server, unsigned short port)
 			ret = FAIL;
 
 			do { /* simple try realization */
-				if (2 != parse_command(active_metrics[i].key, NULL, 0, params, MAX_STRING_LEN))
+				if (2 != parse_command(active_metrics[i].key, NULL, 0, params, sizeof(params)))
 					break;
 
 				if (4 < num_param(params))
@@ -798,8 +797,8 @@ static void	process_active_checks(char *server, unsigned short port)
 						active_metrics[i].key);
 
 				process_value(server, port, CONFIG_HOSTNAME,
-						active_metrics[i].key_orig, "ZBX_NOTSUPPORTED", &active_metrics[i].lastlogsize,
-						NULL, NULL, NULL, NULL, NULL, 0);
+						active_metrics[i].key_orig, "ZBX_NOTSUPPORTED",
+						&active_metrics[i].lastlogsize, NULL, NULL, NULL, NULL, NULL, 0);
 			}
 		}
 		/* special processing for log files with rotation */
@@ -808,7 +807,7 @@ static void	process_active_checks(char *server, unsigned short port)
 			ret = FAIL;
 
 			do { /* simple try realization */
-				if (2 != parse_command(active_metrics[i].key, NULL, 0, params, MAX_STRING_LEN))
+				if (2 != parse_command(active_metrics[i].key, NULL, 0, params, sizeof(params)))
 					break;
 
 				if (4 < num_param(params))
@@ -888,8 +887,9 @@ static void	process_active_checks(char *server, unsigned short port)
 						active_metrics[i].key);
 
 				process_value(server, port, CONFIG_HOSTNAME,
-						active_metrics[i].key_orig, "ZBX_NOTSUPPORTED",	&active_metrics[i].lastlogsize,
-						&active_metrics[i].mtime, NULL, NULL, NULL, NULL, 0);
+						active_metrics[i].key_orig, "ZBX_NOTSUPPORTED",
+						&active_metrics[i].lastlogsize, &active_metrics[i].mtime,
+						NULL, NULL, NULL, NULL, 0);
 			}
 		}
 		/* special processing for eventlog */
@@ -898,7 +898,7 @@ static void	process_active_checks(char *server, unsigned short port)
 			ret = FAIL;
 #ifdef _WINDOWS
 			do{ /* simple try realization */
-				if (2 != parse_command(active_metrics[i].key, NULL, 0, params, MAX_STRING_LEN))
+				if (2 != parse_command(active_metrics[i].key, NULL, 0, params, sizeof(params)))
 					break;
 
 				if (6 < num_param(params))
@@ -1014,8 +1014,8 @@ static void	process_active_checks(char *server, unsigned short port)
 						active_metrics[i].key);
 
 				process_value(server, port, CONFIG_HOSTNAME,
-						active_metrics[i].key_orig, "ZBX_NOTSUPPORTED", &active_metrics[i].lastlogsize,
-						NULL, NULL, NULL, NULL, NULL, 0);
+						active_metrics[i].key_orig, "ZBX_NOTSUPPORTED",
+						&active_metrics[i].lastlogsize, NULL, NULL, NULL, NULL, NULL, 0);
 			}
 		}
 		else
