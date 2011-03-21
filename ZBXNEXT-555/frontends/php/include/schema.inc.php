@@ -383,8 +383,7 @@ return array(
 			),
 			'macros' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'agent' => array(
@@ -466,8 +465,7 @@ return array(
 			),
 			'posts' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'required' => array(
@@ -632,8 +630,7 @@ return array(
 			),
 			'cksum' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'sync' => array(
@@ -741,8 +738,7 @@ return array(
 			),
 			'message' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'status' => array(
@@ -1040,8 +1036,7 @@ return array(
 			),
 			'value' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'logeventid' => array(
@@ -1081,8 +1076,7 @@ return array(
 			),
 			'value' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'ns' => array(
@@ -1134,8 +1128,7 @@ return array(
 			),
 			'value' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'logeventid' => array(
@@ -1490,14 +1483,12 @@ return array(
 			),
 			'oldvalue' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'newvalue' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 		),
@@ -1577,8 +1568,7 @@ return array(
 			),
 			'def_longdata' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'recovery_msg' => array(
@@ -1595,8 +1585,7 @@ return array(
 			),
 			'r_longdata' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 		),
@@ -1672,8 +1661,7 @@ return array(
 			),
 			'message' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'mediatypeid' => array(
@@ -1757,8 +1745,7 @@ return array(
 			),
 			'command' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 		),
@@ -1787,8 +1774,7 @@ return array(
 			),
 			'command' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 		),
@@ -2842,7 +2828,7 @@ return array(
 			),
 		),
 	),
-	'hosts_profiles' => array(
+	'host_profile' => array(
 		'key' => 'hostid',
 		'fields' => array(
 			'hostid' => array(
@@ -2852,7 +2838,13 @@ return array(
 				'ref_table' => 'hosts',
 				'ref_field' => 'hostid',
 			),
-			'devicetype' => array(
+			'type' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
+			),
+			'type_full' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
@@ -2864,13 +2856,37 @@ return array(
 				'length' => 64,
 				'default' => '',
 			),
+			'alias' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
+			),
 			'os' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
 				'default' => '',
 			),
-			'serialno' => array(
+			'os_full' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			),
+			'os_short' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
+			),
+			'serialno_a' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
+			),
+			'serialno_b' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
@@ -2882,7 +2898,19 @@ return array(
 				'length' => 64,
 				'default' => '',
 			),
-			'macaddress' => array(
+			'asset_tag' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
+			),
+			'macaddress_a' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
+			),
+			'macaddress_b' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
@@ -2891,211 +2919,157 @@ return array(
 			'hardware' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'length' => 255,
+				'default' => '',
+			),
+			'hardware_full' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'software' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'length' => 255,
+				'default' => '',
+			),
+			'software_full' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'default' => '',
+			),
+			'software_app_a' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
+			),
+			'software_app_b' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
+			),
+			'software_app_c' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
+			),
+			'software_app_d' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
+			),
+			'software_app_e' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
 				'default' => '',
 			),
 			'contact' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'location' => array(
 				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'default' => '',
+			),
+			'location_lat' => array(
+				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'length' => 16,
+				'default' => '',
+			),
+			'location_lon' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 16,
 				'default' => '',
 			),
 			'notes' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
-		),
-	),
-	'hosts_profiles_ext' => array(
-		'key' => 'hostid',
-		'fields' => array(
-			'hostid' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'hosts',
-				'ref_field' => 'hostid',
-			),
-			'device_alias' => array(
+			'chassis' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
 				'default' => '',
 			),
-			'device_type' => array(
+			'model' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
 				'default' => '',
 			),
-			'device_chassis' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => '',
-			),
-			'device_os' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => '',
-			),
-			'device_os_short' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => '',
-			),
-			'device_hw_arch' => array(
+			'hw_arch' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 32,
 				'default' => '',
 			),
-			'device_serial' => array(
+			'vendor' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
 				'default' => '',
 			),
-			'device_model' => array(
+			'contract_number' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
 				'default' => '',
 			),
-			'device_tag' => array(
+			'installer_name' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
 				'default' => '',
 			),
-			'device_vendor' => array(
+			'deployment_status' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
 				'default' => '',
 			),
-			'device_contract' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => '',
-			),
-			'device_who' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => '',
-			),
-			'device_status' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => '',
-			),
-			'device_app_01' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => '',
-			),
-			'device_app_02' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => '',
-			),
-			'device_app_03' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => '',
-			),
-			'device_app_04' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => '',
-			),
-			'device_app_05' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => '',
-			),
-			'device_url_1' => array(
+			'url_a' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => '',
 			),
-			'device_url_2' => array(
+			'url_b' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => '',
 			),
-			'device_url_3' => array(
+			'url_c' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => '',
 			),
-			'device_networks' => array(
+			'host_networks' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
-			'device_notes' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
-				'default' => '',
-			),
-			'device_hardware' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
-				'default' => '',
-			),
-			'device_software' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
-				'default' => '',
-			),
-			'ip_subnet_mask' => array(
+			'host_netmask' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 39,
 				'default' => '',
 			),
-			'ip_router' => array(
+			'host_router' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 39,
-				'default' => '',
-			),
-			'ip_macaddress' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
 				'default' => '',
 			),
 			'oob_ip' => array(
@@ -3104,7 +3078,7 @@ return array(
 				'length' => 39,
 				'default' => '',
 			),
-			'oob_subnet_mask' => array(
+			'oob_netmask' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 39,
@@ -3116,7 +3090,7 @@ return array(
 				'length' => 39,
 				'default' => '',
 			),
-			'date_hw_buy' => array(
+			'date_hw_purchase' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
@@ -3140,19 +3114,19 @@ return array(
 				'length' => 64,
 				'default' => '',
 			),
-			'site_street_1' => array(
+			'site_address_a' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 128,
 				'default' => '',
 			),
-			'site_street_2' => array(
+			'site_address_b' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 128,
 				'default' => '',
 			),
-			'site_street_3' => array(
+			'site_address_c' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 128,
@@ -3190,8 +3164,7 @@ return array(
 			),
 			'site_notes' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'poc_1_name' => array(
@@ -3206,13 +3179,13 @@ return array(
 				'length' => 128,
 				'default' => '',
 			),
-			'poc_1_phone_1' => array(
+			'poc_1_phone_a' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
 				'default' => '',
 			),
-			'poc_1_phone_2' => array(
+			'poc_1_phone_b' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
@@ -3232,8 +3205,7 @@ return array(
 			),
 			'poc_1_notes' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'poc_2_name' => array(
@@ -3248,13 +3220,13 @@ return array(
 				'length' => 128,
 				'default' => '',
 			),
-			'poc_2_phone_1' => array(
+			'poc_2_phone_a' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
 				'default' => '',
 			),
-			'poc_2_phone_2' => array(
+			'poc_2_phone_b' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
@@ -3274,8 +3246,7 @@ return array(
 			),
 			'poc_2_notes' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 		),
@@ -3550,8 +3521,7 @@ return array(
 			),
 			'params' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'ipmi_sensor' => array(
@@ -3960,8 +3930,7 @@ return array(
 			),
 			'description' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'confirmation' => array(
@@ -4666,8 +4635,7 @@ return array(
 			),
 			'comments' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'error' => array(
@@ -4951,8 +4919,7 @@ return array(
 			),
 			'description' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 			'active_since' => array(
@@ -5115,8 +5082,7 @@ return array(
 			),
 			'test_string' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 		),

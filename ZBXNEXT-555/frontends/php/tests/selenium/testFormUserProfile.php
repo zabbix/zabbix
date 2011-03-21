@@ -151,7 +151,7 @@ class testFormUserProfile extends CWebTest
 		$this->login('profile.php');
 		$this->check('messages[enabled]');
 		// we wait for the first element after messaging checkbox to appear
-		$this->waitForElementPresent("xpath=///td[text()='Message&nbsp;timeout&nbsp;(seconds)']");
+		$this->waitForElementPresent("xpath=id('timeout_row')");
 		// and then check that the remaining elements are there as well
 		$this->ok('Play sound');
 		$this->ok('Trigger severity');

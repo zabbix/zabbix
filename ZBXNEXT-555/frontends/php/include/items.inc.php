@@ -940,7 +940,7 @@
 			$lastvalue = nbsp(htmlspecialchars($lastvalue));
 		}
 		else{
-			$lastvalue=S_UNKNOWN_VALUE_TYPE;
+			$lastvalue=_('Unknown value type');
 		}
 		if($db_item["valuemapid"] > 0);
 			$lastvalue = replace_value_by_map($lastvalue, $db_item["valuemapid"]);
