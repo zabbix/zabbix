@@ -87,8 +87,7 @@ static void	get_latest_event_status(zbx_uint64_t triggerid,
 			" last_value:%d",
 			__function_name, *last_eventid, *last_value);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()",
-			__function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -108,12 +107,15 @@ static void	get_latest_event_status(zbx_uint64_t triggerid,
  ******************************************************************************/
 static int	add_trigger_info(DB_EVENT *event)
 {
+	const char	*__function_name = "add_trigger_info";
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	last_eventid;
 	int		last_value, ret = SUCCEED;
 
-	if (event->object == EVENT_OBJECT_TRIGGER && event->objectid != 0)
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (EVENT_OBJECT_TRIGGER == event->object && 0 != event->objectid)
 	{
 		result = DBselect(
 				"select description,expression,priority,type"
@@ -128,14 +130,13 @@ static int	add_trigger_info(DB_EVENT *event)
 			strscpy(event->trigger.expression, row[1]);
 			event->trigger.priority = (unsigned char)atoi(row[2]);
 			event->trigger.type = (unsigned char)atoi(row[3]);
-			ret = SUCCEED;
 		}
 		else
-		{
-			event->trigger.priority = TRIGGER_SEVERITY_NOT_CLASSIFIED;
-			event->trigger.type = TRIGGER_TYPE_NORMAL;
-		}
+			ret = FAIL;
 		DBfree_result(result);
+
+		if (SUCCEED != ret)
+			goto fail;
 
 		/* skip actions in next cases:
 		 * (1)  -any- / UNKNOWN	(-any-/-any-/UNKNOWN)
@@ -180,6 +181,8 @@ static int	add_trigger_info(DB_EVENT *event)
 		if (0 != event->ack_eventid)
 			zabbix_log(LOG_LEVEL_DEBUG, "Copy acknowledges");
 	}
+fail:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
