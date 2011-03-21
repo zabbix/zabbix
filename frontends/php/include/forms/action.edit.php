@@ -652,8 +652,8 @@ require_once('include/templates/action.js.php');
 				$typeCB->addItem(ZBX_SCRIPT_TYPE_USER_SCRIPT, _('User script'));
 
 				$userScriptId = new CVar('new_operation[opcommand][scriptid]', $new_operation['opcommand']['scriptid']);
-				$userScriptName = new CTextBox('new_operation[opcommand][script]', $new_operation['opcommand']['script'], 30);
-				$userScriptSelect = new CButton('select_opcommand_script',_('select'), null, 'link_menu');
+				$userScriptName = new CTextBox('new_operation[opcommand][script]', $new_operation['opcommand']['script'], 30, true);
+				$userScriptSelect = new CButton('select_opcommand_script',_('Select'), null, 'link_menu');
 
 				$userScript = new CDiv(array($userScriptId,$userScriptName, SPACE, $userScriptSelect), 'class_opcommand_userscript inlineblock hidden');
 

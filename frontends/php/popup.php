@@ -1779,6 +1779,7 @@ include_once('include/page_header.php');
 		$table->setHeader($header);
 
 		$options = array(
+			'hostids' => $hostid,
 			'nodeids' => $nodeid,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
@@ -1834,7 +1835,7 @@ include_once('include/page_header.php');
 		}
 
 		if($multiselect){
-			$button = new CButton('select', S_SELECT, "javascript: addSelectedValues('scripts', ".zbx_jsvalue($reference).");");
+			$button = new CButton('select', _('Select'), "javascript: addSelectedValues('scripts', ".zbx_jsvalue($reference).");");
 			$table->setFooter(new CCol($button, 'right'));
 
 			insert_js('var popupReference = '.zbx_jsvalue($scripts, true).';');

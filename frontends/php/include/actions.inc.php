@@ -320,7 +320,6 @@ function get_operation_desc($type, $data){
 				}
 				break;
 			default:
-				break;
 		}
 	}
 	else{
