@@ -8,6 +8,9 @@ New features:
  - [ZBX-3495] fixed interfaceid updated to null when link template (Vedmak)
  - [ZBXNEXT-676] merged host profile and extended host profile (Sasha, Vedmak)
 
+Bug fixes:
+ - [ZBX-3623] fixed processing of nanoseconds for history data (Sasha)
+
 --------------------------------------------------------------------------------
 Changes for 1.9.2
 
