@@ -1779,7 +1779,6 @@ include_once('include/page_header.php');
 		$table->setHeader($header);
 
 		$options = array(
-			'hostids' => $hostid,
 			'nodeids' => $nodeid,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true

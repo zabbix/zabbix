@@ -126,7 +126,7 @@
 					new CButton('select_screen',S_SELECT,
 						'return PopUp("popup.php?dstfrm='.$form->getName().'&srctbl=screens'.
 						'&dstfld1=screen_name&srcfld1=name'.
-						'&dstfld2=new_step%5Bscreenid%5D&srcfld2=screenid");'),
+						'&dstfld2=new_step_screenid&srcfld2=screenid");'),
 					BR(),
 					new CSubmit('add_step', isset($new_step['sid']) ? S_SAVE : S_ADD),
 					new CSubmit('cancel_step', S_CANCEL)
