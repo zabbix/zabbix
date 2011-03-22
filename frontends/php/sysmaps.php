@@ -208,6 +208,7 @@ include_once('include/page_header.php');
 			add_audit_if($result, AUDIT_ACTION_ADD,AUDIT_RESOURCE_MAP, 'Name ['.$_REQUEST['name'].']');
 			show_messages($result, S_MAP_ADDED,S_CANNOT_ADD_MAP);
 		}
+
 		if($result){
 			unset($_REQUEST['form']);
 		}
