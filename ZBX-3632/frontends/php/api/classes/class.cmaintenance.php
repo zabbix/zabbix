@@ -151,55 +151,97 @@ class CMaintenance extends CZBXAPI{
 
 			
 
-			$sql =
-				'SELECT DISTINCT m.maintenanceid'.
+			$sql = 'SELECT DISTINCT m.maintenanceid'.
 					' FROM maintenances m'.
 					' WHERE'.
-					 ' NOT EXISTS ('.
-					  ' SELECT mh3.maintenanceid'.
-					  ' FROM maintenances_hosts mh3, rights r3, users_groups ug3, hosts_groups hg3'.
-					  ' WHERE mh3.maintenanceid = m.maintenanceid'.
-					   ' AND r3.groupid = ug3.usrgrpid'.
-					   ' AND hg3.hostid = mh3.hostid'.
-					   ' AND r3.id = hg3.groupid'.
-					   ' AND ug3.userid = '.$userid.
-					   ' AND r3.permission < '.$permission.
-					 ' ) '.
-					 ' AND NOT EXISTS ( '.
-					  ' SELECT mh4.maintenanceid '.
-					  ' FROM maintenances_hosts mh4 '.
-					  ' WHERE mh4.maintenanceid = m.maintenanceid '.
-					   ' AND NOT EXISTS( '.
-						' SELECT r5.id '.
-						' FROM rights r5, users_groups ug5, hosts_groups hg5 '.
-						' WHERE r5.groupid = ug5.usrgrpid '.
-						 ' AND hg5.hostid = mh4.hostid '.
-						 ' AND r5.id = hg5.groupid '.
-						 ' AND ug5.userid = '.$userid.
-					  ' ) '.
-					 ' ) '.
-					 ' AND NOT EXISTS ( '.
-					  ' SELECT mg2.maintenanceid '.
-					  ' FROM maintenances_groups mg2, rights r3, users_groups ug3 '.
-					  ' WHERE mg2.maintenanceid = m.maintenanceid '.
-					   ' AND r3.groupid = ug3.usrgrpid '.
-					   ' AND r3.id = mg2.groupid '.
-					   ' AND ug3.userid = '.$userid.
-					   ' AND r3.permission < '.$permission.
-					 ' ) '.
-
-					 ' AND NOT EXISTS ( '.
-					  ' SELECT mg3.maintenanceid '.
-					  ' FROM maintenances_groups mg3 '.
-					  ' WHERE mg3.maintenanceid = m.maintenanceid '.
-					   ' AND NOT EXISTS( '.
-						' SELECT r5.id '.
-						' FROM rights r5, users_groups ug5, hosts_groups hg5 '.
-						' WHERE r5.groupid = ug5.usrgrpid '.
-						 ' AND r5.id = mg3.groupid '.
-						 ' AND ug5.userid = '.$userid.
-					  ' ) '.
-					 ' ) ';
+					// with no hosts, that are in groups, for which user has no permissions
+					' NOT EXISTS ('.
+						' SELECT mh3.maintenanceid'.
+						' FROM maintenances_hosts mh3, rights r3, users_groups ug3, hosts_groups hg3'.
+						' WHERE mh3.maintenanceid = m.maintenanceid'.
+						' AND r3.groupid = ug3.usrgrpid'.
+						' AND hg3.hostid = mh3.hostid'.
+						' AND r3.id = hg3.groupid'.
+						' AND ug3.userid = '.$userid.
+						' AND r3.permission < '.$permission.
+					' ) '.
+					// the same as above (no record in 'rights' is equal to 'deny')
+					' AND NOT EXISTS ( '.
+						' SELECT mh4.hostid '.
+						' FROM maintenances_hosts mh4 '.
+						' WHERE '.
+						' mh4.maintenanceid = m.maintenanceid'.
+						' AND EXISTS ( '.
+							' SELECT hg10.groupid '.
+							' FROM hosts_groups hg10 '.
+							' WHERE hg10.hostid = mh4.hostid '.
+							' AND NOT EXISTS( '.
+								' SELECT r5.id '.
+								' FROM rights r5, users_groups ug5 '.
+								' WHERE r5.groupid = ug5.usrgrpid '.
+								' AND r5.id = hg10.groupid '.
+								' AND ug5.userid = '.$userid.
+							' ) '.
+						' ) '.
+					' ) '.
+					// with no groups, for which user has no permissions
+					' AND NOT EXISTS ( '.
+						' SELECT mg2.maintenanceid '.
+						' FROM maintenances_groups mg2, rights r3, users_groups ug3 '.
+						' WHERE mg2.maintenanceid = m.maintenanceid '.
+						' AND r3.groupid = ug3.usrgrpid '.
+						' AND r3.id = mg2.groupid '.
+						' AND ug3.userid = '.$userid.
+						' AND r3.permission < '.$permission.
+					' ) '.
+					// the same as above (no record in 'rights' is equal to 'deny')
+					' AND NOT EXISTS ( '.
+						' SELECT mg3.maintenanceid '.
+						' FROM maintenances_groups mg3 '.
+						' WHERE mg3.maintenanceid = m.maintenanceid '.
+						' AND NOT EXISTS( '.
+							' SELECT r5.id '.
+							' FROM rights r5, users_groups ug5, hosts_groups hg5 '.
+							' WHERE r5.groupid = ug5.usrgrpid '.
+							' AND r5.id = mg3.groupid '.
+							' AND ug5.userid = '.$userid.
+						' ) '.
+					' ) '.
+					// with no groups, which have at least one host, for which user has no permissions
+					' AND NOT EXISTS ( '.
+						' SELECT hg6.hostid '. // getting groups in maintenances
+						' FROM maintenances_groups mg6, hosts_groups hg6 '.
+						' WHERE mg6.maintenanceid = m.maintenanceid '.
+						' AND hg6.groupid = mg6.groupid '.
+						' AND EXISTS ( '.
+							' SELECT hg7.groupid'. // and checking permissions for hosts in those groups
+							' FROM rights r7, users_groups ug7, hosts_groups hg7'.
+							' WHERE r7.groupid = ug7.usrgrpid'.
+							' AND hg6.hostid = hg7.hostid'.
+							' AND r7.id = hg7.groupid'.
+							' AND ug7.userid = '.$userid.
+							' AND r7.permission < '.$permission.
+						' ) '.
+					' ) '.
+					// the same as above (no record in 'rights' is equal to 'deny')
+					' AND NOT EXISTS ( '.
+						' SELECT hg8.hostid '.
+						' FROM maintenances_groups mg8, hosts_groups hg8 '.
+						' WHERE mg8.maintenanceid = m.maintenanceid '.
+						' AND hg8.groupid = mg8.groupid '.
+						' AND EXISTS ( '.
+							' SELECT hg10.groupid '.
+							' FROM hosts_groups hg10 '.
+							' WHERE hg10.hostid = hg8.hostid '.
+							' AND NOT EXISTS( '.
+								' SELECT r5.id '.
+								' FROM rights r5, users_groups ug5 '.
+								' WHERE r5.groupid = ug5.usrgrpid '.
+								' AND r5.id = hg10.groupid '.
+								' AND ug5.userid = '.$userid.
+							' ) '.
+						' ) '.
+					' ) ';
 
 			if(!is_null($options['groupids'])){
 				zbx_value2array($options['groupids']);
