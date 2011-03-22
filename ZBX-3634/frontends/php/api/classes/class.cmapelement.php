@@ -680,11 +680,8 @@ COpt::memoryPick();
 
 		$mapNames = array();
 		foreach($selements as $snum => &$selement){
-			if(!check_db_fields($selementDbFields, $selement)){
-SDII($selementDbFields);
-SDII($selement);
+			if(!check_db_fields($selementDbFields, $selement))
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for element');
-			}
 
 			if($update || $delete){
 				if(!isset($dbSelements[$selement['selementid']]))
