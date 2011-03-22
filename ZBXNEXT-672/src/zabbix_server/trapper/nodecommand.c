@@ -62,7 +62,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, char **res
 
 	zbx_script_init(&script);
 
-	script.type = ZBX_SCRIPT_TYPE_USER_SCRIPT;
+	script.type = ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT;
 	script.scriptid = scriptid;
 
 	ret = zbx_execute_script(&host, &script, result, error, sizeof(error));

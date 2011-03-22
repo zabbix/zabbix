@@ -473,7 +473,7 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 
 		script.type = (unsigned char)atoi(row[2]);
 
-		if (ZBX_SCRIPT_TYPE_USER_SCRIPT != script.type)
+		if (ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT != script.type)
 		{
 			script.command = zbx_strdup(script.command, row[11]);
 			substitute_simple_macros(event, NULL, NULL, NULL, &script.command, MACRO_TYPE_MESSAGE, NULL, 0);
@@ -483,7 +483,7 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 		{
 			switch (script.type = (unsigned char)atoi(row[2]))
 			{
-				case ZBX_SCRIPT_TYPE_SCRIPT:
+				case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
 					script.execute_on = (unsigned char)atoi(row[4]);
 					break;
 				case ZBX_SCRIPT_TYPE_SSH:
@@ -495,7 +495,7 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 					script.username = zbx_strdup(script.username, row[7]);
 					script.password = zbx_strdup(script.password, row[8]);
 					break;
-				case ZBX_SCRIPT_TYPE_USER_SCRIPT:
+				case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
 					ZBX_DBROW2UINT64(script.scriptid, row[3]);
 					break;
 			}
