@@ -87,81 +87,6 @@
 	}
 
 // LINKS
-	function add_link($link){
-		$link_db_fields = array(
-			'sysmapid' => null,
-			'label' => '',
-			'selementid1' => null,
-			'selementid2' => null,
-			'drawtype' => 2,
-			'color' => 3
-		);
-
-		if(!check_db_fields($link_db_fields, $link)){
-			$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Wrong fields for link');
-			return false;
-		}
-
-		$linkid=get_dbid("sysmaps_links","linkid");
-
-		$result=TRUE;
-		foreach($link['linktriggers'] as $id => $linktrigger){
-			if(empty($linktrigger['triggerid'])) continue;
-			$result&=add_link_trigger($linkid,$linktrigger['triggerid'],$linktrigger['drawtype'],$linktrigger['color']);
-		}
-
-		if(!$result){
-			return $result;
-		}
-
-		$result&=DBexecute('INSERT INTO sysmaps_links '.
-			' (linkid,sysmapid,label,selementid1,selementid2,drawtype,color) '.
-			' VALUES ('.$linkid.','.$link['sysmapid'].','.zbx_dbstr($link['label']).','.
-						$link['selementid1'].','.$link['selementid2'].','.
-						$link['drawtype'].','.zbx_dbstr($link['color']).')');
-
-		if(!$result)
-			return $result;
-
-	return $linkid;
-	}
-
-	function update_link($link){
-		$link_db_fields = array(
-			'sysmapid' => null,
-			'linkid' => null,
-			'label' => '',
-			'selementid1' => null,
-			'selementid2' => null,
-			'drawtype' => 2,
-			'color' => 3
-		);
-
-		if(!check_db_fields($link_db_fields, $link)){
-			return false;
-		}
-
-		$result = delete_all_link_triggers($link['linkid']);
-
-		foreach($link['linktriggers'] as $id => $linktrigger){
-			if(empty($linktrigger['triggerid'])) continue;
-			$result&=add_link_trigger($link['linkid'],$linktrigger['triggerid'],$linktrigger['drawtype'],$linktrigger['color']);
-		}
-
-		if(!$result){
-			return $result;
-		}
-
-		$result&=DBexecute('UPDATE sysmaps_links SET '.
-							' sysmapid='.$link['sysmapid'].', '.
-							' label='.zbx_dbstr($link['label']).', '.
-							' selementid1='.$link['selementid1'].', '.
-							' selementid2='.$link['selementid2'].', '.
-							' drawtype='.$link['drawtype'].', '.
-							' color='.zbx_dbstr($link['color']).
-						' WHERE linkid='.$link['linkid']);
-	return	$result;
-	}
 
 	function delete_link($linkids){
 		zbx_value2array($linkids);
@@ -172,46 +97,12 @@
 	return $result;
 	}
 
-	function add_link_trigger($linkid,$triggerid,$drawtype,$color){
-		$linktriggerid=get_dbid("sysmaps_link_triggers","linktriggerid");
-		$sql = 'INSERT INTO sysmaps_link_triggers (linktriggerid,linkid,triggerid,drawtype,color) '.
-					" VALUES ($linktriggerid,$linkid,$triggerid,$drawtype,".zbx_dbstr($color).')';
-	return DBexecute($sql);
-	}
-
 	function delete_all_link_triggers($linkids){
 		zbx_value2array($linkids);
 
 		$result = (bool) DBexecute('DELETE FROM sysmaps_link_triggers WHERE '.DBcondition('linkid',$linkids));
 	return $result;
 	}
-
-/*
- * Function: check_circle_elements_link
- *
- * Description:
- *     Check for circular map creation
- *
- * Author:
- *     Eugene Grigorjev
- *
- */
-	function check_circle_elements_link($sysmapid,$elementid,$elementtype){
-		if($elementtype!=SYSMAP_ELEMENT_TYPE_MAP)	return false;
-
-		if(bccomp($sysmapid ,$elementid)==0)	return TRUE;
-
-		$db_elements = DBselect('SELECT elementid, elementtype '.
-						' FROM sysmaps_elements '.
-						' WHERE sysmapid='.$elementid);
-
-		while($element = DBfetch($db_elements)){
-			if(check_circle_elements_link($sysmapid,$element["elementid"],$element["elementtype"]))
-				return TRUE;
-		}
-		return false;
-	}
-
 
 	/******************************************************************************
 	 *                                                                            *

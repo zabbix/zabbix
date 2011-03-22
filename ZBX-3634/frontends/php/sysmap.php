@@ -187,8 +187,6 @@ include_once('include/page_header.php');
 							'grid_show' => $_REQUEST['grid_show'],
 							'grid_align' => $_REQUEST['grid_align']
 						);
-						API::Map()->update($sysmap_to_update);
-
 
 						foreach($selements as $id => $selement){
 							if(isset($selement['urls'])){
@@ -204,44 +202,11 @@ include_once('include/page_header.php');
 							if($selement['iconid_off'] == 0){
 								throw new Exception('Cannot save map. Map element "'.$selement['label'].'" contains no icon.');
 							}
-							if(isset($selement['new'])){
-								$selement['sysmapid'] = $sysmapid;
-								$selementids = API::Map()->addElements($selement);
-								$selementid = reset($selementids);
-
-								foreach($links as $id => $link){
-									if(bccomp($link['selementid1'],$selement['selementid']) == 0) $links[$id]['selementid1'] = $selementid;
-									else if(bccomp($link['selementid2'],$selement['selementid']) == 0) $links[$id]['selementid2'] = $selementid;
-								}
-							}
-							else{
-//SDII($selement);
-								$selement['sysmapid'] = $sysmapid;
-								$result = API::Map()->updateElements($selement);
-								unset($db_selementids[$selement['selementid']]);
-							}
 						}
+						$sysmap_to_update['selements'] = $selements;
+						$sysmap_to_update['links'] = $links;
 
-						delete_sysmaps_element($db_selementids);
-
-						$db_linkids = array();
-						$res = DBselect('SELECT linkid FROM sysmaps_links WHERE sysmapid='.$sysmapid);
-						while($db_link = DBfetch($res)){
-							$db_linkids[$db_link['linkid']] = $db_link['linkid'];
-						}
-
-						foreach($links as $id => $link){
-							$link['sysmapid'] = $sysmapid;
-							if(isset($link['new'])){
-								$result = add_link($link);
-							}
-							else{
-								$result = update_link($link);
-								unset($db_linkids[$link['linkid']]);
-							}
-						}
-
-						delete_link($db_linkids);
+						API::Map()->update($sysmap_to_update);
 
 						$result = DBend(true);
 
@@ -252,12 +217,16 @@ include_once('include/page_header.php');
 					}
 					catch(Exception $e){
 						if(isset($transaction)) DBend(false);
-						$msg =  $e->getMessage()."\n\r";
+
+						$msg = array($e->getMessage());
+						foreach(clear_messages() as $errMsg) $msg[] = $errMsg['type'].': '.$errMsg['message'];
 
 						ob_clean();
-						print('alert('.zbx_jsvalue($msg).');');
+
+						print('alert('.zbx_jsvalue(implode("\n\r", $msg)).');');
 					}
 					@ob_flush();
+					exit();
 					break;
 			}
 		}
