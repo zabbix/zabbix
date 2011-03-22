@@ -1147,7 +1147,8 @@ COpt::memoryPick();
 			DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid', $templateids)).' AND resourcetype='.SCREEN_RESOURCE_HOST_TRIGGERS;
 
 // delete host from maps
-			delete_sysmaps_elements_with_hostid($templateids);
+			if(empty($templateids))
+				DB::delete('sysmaps_elements', array('elementtype' => SYSMAP_ELEMENT_TYPE_HOST, 'elementid' => $templateids));
 
 // disable actions
 // actions from conditions

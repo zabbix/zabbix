@@ -1966,7 +1966,8 @@ Copt::memoryPick();
 			));
 
 // delete host from maps
-			delete_sysmaps_elements_with_hostid($hostids);
+			if(empty($hostids))
+				DB::delete('sysmaps_elements', array('elementtype' => SYSMAP_ELEMENT_TYPE_HOST, 'elementid' => $hostids));
 
 // disable actions
 // actions from conditions

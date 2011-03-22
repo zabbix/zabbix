@@ -745,8 +745,8 @@ COpt::memoryPick();
 			));
 
 // delete sysmap element
-			if(!delete_sysmaps_elements_with_groupid($groupids))
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete sysmap elements');
+			if(empty($groupids))
+				DB::delete('sysmaps_elements', array('elementtype' => SYSMAP_ELEMENT_TYPE_HOST_GROUP, 'elementid' => $groupids));
 
 // disable actions
 // actions from conditions
