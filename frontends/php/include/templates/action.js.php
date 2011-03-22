@@ -91,7 +91,7 @@
 			<input name="opCmdId" type="hidden" value="#{opcmdid}" />
 			<input name="opCmdTargetObjectId" id="opCmdTargetObjectId" type="hidden" value="#{objectid}" />
 			<input name="opCmdTargetObjectName" id="opCmdTargetObjectName" type="text" class="input text" value="#{name}" readonly="readonly" size="30"/>
-			<input type="button" class="input link_menu" name="select" value="<?php print(_('select'));?>" />
+			<input type="button" class="input link_menu" name="select" value="<?php print(_('Select'));?>" />
 		</div>
 	</td>
 </tr>

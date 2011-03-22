@@ -490,6 +490,7 @@ require_once('include/templates/action.js.php');
 				$usrgrpList->setAttribute('id', 'opmsgUsrgrpList');
 
 				$addUsrgrpBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm='.S_ACTION.'&srctbl=usrgrp'.'&srcfld1=usrgrpid'.'&srcfld2=name'.'&multiselect=1'.'",450,450)','link_menu');
+				$addUsrgrpBtn->attr('id', 'addusrgrpbtn');
 
 				$col = new CCol($addUsrgrpBtn);
 				$col->setAttribute('colspan', 2);
@@ -504,6 +505,7 @@ require_once('include/templates/action.js.php');
 				$userList->setAttribute('id', 'opmsgUserList');
 
 				$addUserBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm='.S_ACTION.'&srctbl=users'.'&srcfld1=userid'.'&srcfld2=alias'.'&multiselect=1'.'",450,450)','link_menu');
+				$addUserBtn->attr('id', 'adduserbtn');
 
 				$col = new CCol($addUserBtn);
 				$col->setAttribute('colspan', 2);
