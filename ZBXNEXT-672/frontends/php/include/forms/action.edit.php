@@ -570,7 +570,7 @@ require_once('include/templates/action.js.php');
 						'execute_on' => ZBX_SCRIPT_EXECUTE_ON_AGENT,
 						'port' => '',
 						'authtype' => ZBX_SCRIPT_EXECUTE_ON_AGENT,
-						'scriptid' => '',
+						'scriptid' => '0',
 						'username' => '',
 						'privatekey' => '',
 						'publickey' => '',
