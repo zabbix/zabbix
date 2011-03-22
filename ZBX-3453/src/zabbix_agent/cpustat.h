@@ -22,11 +22,11 @@
 
 #include "sysinfo.h"
 
-#if defined (_WINDOWS)
+#if defined(_WINDOWS)
 
-	#define MAX_CPU_HISTORY 900 /* 15 min in seconds */
+	#define MAX_CPU_HISTORY	(15 * SEC_PER_MIN)
 
-	typedef struct s_single_cpu_stat_data
+	typedef struct
 	{
 		PDH_HCOUNTER	usage_counter;
 		PDH_RAW_COUNTER	usage;
@@ -45,7 +45,7 @@
 	}
 	ZBX_SINGLE_CPU_STAT_DATA;
 
-	typedef struct s_cpus_stat_data
+	typedef struct
 	{
 		int	count;
 		ZBX_SINGLE_CPU_STAT_DATA *cpu; /* count + 1 */
@@ -67,16 +67,16 @@
 	}
 	ZBX_CPUS_STAT_DATA;
 
-#	define CPU_COLLECTOR_STARTED(collector)	((collector) && (collector)->cpus.pdh_query)
+	#define CPU_COLLECTOR_STARTED(collector)	((collector) && (collector)->cpus.pdh_query)
 
 #else /* not _WINDOWS */
 
-	#define MAX_CPU_HISTORY 900 /* 15 min in seconds */
+	#define MAX_CPU_HISTORY (15 * SEC_PER_MIN)
 
-	typedef struct s_single_cpu_stat_data
+	typedef struct
 	{
 		/* private */
-		int	clock[MAX_CPU_HISTORY];
+		int		clock[MAX_CPU_HISTORY];
 		zbx_uint64_t	h_user[MAX_CPU_HISTORY];
 		zbx_uint64_t	h_system[MAX_CPU_HISTORY];
 		zbx_uint64_t	h_nice[MAX_CPU_HISTORY];
@@ -98,14 +98,14 @@
 	}
 	ZBX_SINGLE_CPU_STAT_DATA;
 
-	typedef struct s_cpus_stat_data
+	typedef struct
 	{
 		int	count;
 		ZBX_SINGLE_CPU_STAT_DATA *cpu; /* count + 1 */
 	}
 	ZBX_CPUS_STAT_DATA;
 
-#	define CPU_COLLECTOR_STARTED(collector)	(collector)
+	#define CPU_COLLECTOR_STARTED(collector)	(collector)
 
 #endif /* _WINDOWS */
 

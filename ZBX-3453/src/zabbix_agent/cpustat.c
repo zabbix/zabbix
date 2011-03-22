@@ -462,7 +462,8 @@ static void	apply_cpustat(ZBX_CPUS_STAT_DATA *pcpus, int cpuid, int now,
 			continue;
 
 #define SAVE_CPU_CLOCK_FOR(t)										\
-		if ((curr_cpu->clock[i] >= (now - (t * 60))) && (time ## t > curr_cpu->clock[i]))	\
+													\
+		if (curr_cpu->clock[i] >= now - t * SEC_PER_MIN && time ## t > curr_cpu->clock[i])	\
 		{											\
 			time ## t	= curr_cpu->clock[i];						\
 			user ## t	= curr_cpu->h_user[i];						\
@@ -484,15 +485,14 @@ static void	apply_cpustat(ZBX_CPUS_STAT_DATA *pcpus, int cpuid, int now,
 	}
 
 #define CALC_CPU_UTIL(type, time)								\
-	if ((type) - (type ## time) > 0 && (all) - (all ## time) > 0)				\
+												\
+	if ((type) - (type ## time) > 0 && all - (all ## time) > 0)				\
 	{											\
-		curr_cpu->type[ZBX_AVG ## time] = 100. * ((double)((type) - (type ## time))) /	\
-				((double)((all) - (all ## time)));				\
+		curr_cpu->type[ZBX_AVG ## time] = 100.0 * ((double)((type) - (type ## time))) /	\
+							((double)(all - (all ## time)));	\
 	}											\
 	else											\
-	{											\
-		curr_cpu->type[ZBX_AVG ## time] = 0.;						\
-	}
+		curr_cpu->type[ZBX_AVG ## time] = 0.0;
 
 	CALC_CPU_UTIL(user, 1);
 	CALC_CPU_UTIL(user, 5);
