@@ -332,7 +332,7 @@ int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, char **result, char 
 
 	switch (script->type)
 	{
-		case ZBX_SCRIPT_TYPE_SCRIPT:
+		case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
 			switch (script->execute_on)
 			{
 				case ZBX_SCRIPT_EXECUTE_ON_AGENT:
@@ -365,7 +365,7 @@ int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, char **result, char 
 
 			ret = zbx_execute_script_on_terminal(host, script, result, error, max_error_len);
 			break;
-		case ZBX_SCRIPT_TYPE_USER_SCRIPT:
+		case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
 			if (SUCCEED != DBget_script_by_scriptid(script->scriptid, script, &groupid))
 			{
 				zbx_snprintf(error, max_error_len,
