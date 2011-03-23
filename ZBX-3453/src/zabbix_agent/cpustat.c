@@ -585,9 +585,6 @@ int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode)
 	zbx_uint64_t			counter, total = 0;
 	ZBX_SINGLE_CPU_STAT_DATA	*cpu;
 
-	if (0 > cpu_num || cpu_num > collector->cpus.count)
-		return SYSINFO_RET_FAIL;
-
 	if (0 > state || state >= ZBX_CPU_STATE_COUNT)
 		return SYSINFO_RET_FAIL;
 
@@ -611,6 +608,9 @@ int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode)
 		SET_MSG_RESULT(result, strdup("Collector is not started!"));
 		return SYSINFO_RET_FAIL;
 	}
+
+	if (0 > cpu_num || cpu_num > collector->cpus.count)
+		return SYSINFO_RET_FAIL;
 
 	cpu = &collector->cpus.cpu[cpu_num];
 
