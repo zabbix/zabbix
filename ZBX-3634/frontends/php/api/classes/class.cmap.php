@@ -487,7 +487,7 @@ COpt::memoryPick();
 	public function getObjects($sysmapData){
 		$options = array(
 			'filter' => $sysmapData,
-			'output'=>API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND
 		);
 
 		if(isset($sysmapData['node']))
@@ -526,7 +526,7 @@ COpt::memoryPick();
 
 // permissions
 		if($update || $delete){
-			$mapDbFields = array('sysmapid'=> null);
+			$mapDbFields = array('sysmapid' => null);
 			$dbMaps = $this->get(array(
 				'sysmapids' => zbx_objectValues($maps, 'sysmapid'),
 				'output' => API_OUTPUT_EXTEND,
@@ -567,7 +567,7 @@ COpt::memoryPick();
 				if(isset($mapNames[$map['name']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate map name for map "%s".', $dbMap['name']));
 				else
-					$mapNames[$map['name']] = $update ? $map['sysmapid'] : 1;
+					$mapNames[$map['name']] = $map['sysmapid'];
 			}
 
 			if(isset($map['width']) && (($map['width'] > 65535) || ($map['width'] < 1)))
@@ -577,28 +577,19 @@ COpt::memoryPick();
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect map height value for map "%s".', $dbMap['name']));
 
 // LABELS
-			$labelTypes = array(
-				MAP_LABEL_TYPE_LABEL => _('Label'),
-				MAP_LABEL_TYPE_IP => _('IP address'),
-				MAP_LABEL_TYPE_NAME => _('Element name'),
-				MAP_LABEL_TYPE_STATUS => _('Status only'),
-				MAP_LABEL_TYPE_NOTHING => _('Nothing'),
-				MAP_LABEL_TYPE_CUSTOM => _('Custom label')
-			);
-
 			$mapLabels = array('label_type' => array('typeName' => _('icon')));
 			if($dbMap['label_format'] == SYSMAP_LABEL_ADVANCED_ON){
-				$mapLabels['label_type_hostgroup'] = array('string' => 'label_string_hostgroup','typeName' => _('host group'));
-				$mapLabels['label_type_host'] = array('string' => 'label_string_host','typeName' => _('host'));
-				$mapLabels['label_type_trigger'] = array('string' => 'label_string_trigger','typeName' => _('trigger'));
-				$mapLabels['label_type_map'] = array('string' => 'label_string_map','typeName' => _('map'));
-				$mapLabels['label_type_image'] = array('string' => 'label_string_image','typeName' => _('image'));
+				$mapLabels['label_type_hostgroup'] = array('string' => 'label_string_hostgroup', 'typeName' => _('host group'));
+				$mapLabels['label_type_host'] = array('string' => 'label_string_host', 'typeName' => _('host'));
+				$mapLabels['label_type_trigger'] = array('string' => 'label_string_trigger', 'typeName' => _('trigger'));
+				$mapLabels['label_type_map'] = array('string' => 'label_string_map', 'typeName' => _('map'));
+				$mapLabels['label_type_image'] = array('string' => 'label_string_image', 'typeName' => _('image'));
 			}
 
 			foreach($mapLabels as $labelName => $labelData){
 				if(!isset($map[$labelName])) continue;
 
-				if(!isset($labelTypes[$map[$labelName]]))
+				if(sysmapElementLabel($map[$labelName]) === false)
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect %1$s label type value for map "%2$s".', $labelData['typeName'], $dbMap['name']));
 
 				if(MAP_LABEL_TYPE_CUSTOM == $map[$labelName]){
@@ -671,11 +662,11 @@ COpt::memoryPick();
 			$options = array(
 				'filter' => array('name' => array_keys($mapNames)),
 				'output' => array('sysmapid', 'name'),
-				'nopermissions' => 1
+				'nopermissions' => true
 			);
 			$existDbMaps = $this->get($options);
 			foreach($existDbMaps as $dbmnum => $dbMap){
-				if($create || (bccomp($mapNames[$dbMap['name']],$dbMap['sysmapid']) != 0))
+				if($create || (bccomp($mapNames[$dbMap['name']], $dbMap['sysmapid']) != 0))
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Map with name "%s" already exists', $dbMap['name']));
 			}
 		}
@@ -733,34 +724,34 @@ COpt::memoryPick();
 		if(!empty($newSelements)){
 			$selementids = $this->createSelements($newSelements);
 
-			if(empty($newLinks)) continue;
-
+			if(!empty($newLinks)){
 // Links
-			$mapVirtSelements = array();
-			foreach($selementids['selementids'] as $snum => $selementid)
-				$mapVirtSelements[$newSelements[$snum]['selementid']] = $selementid;
+				$mapVirtSelements = array();
+				foreach($selementids['selementids'] as $snum => $selementid)
+					$mapVirtSelements[$newSelements[$snum]['selementid']] = $selementid;
 
-			foreach($newLinks as $lnum => $link){
-				$newLinks[$lnum]['selementid1'] = $mapVirtSelements[$newLinks[$lnum]['selementid1']];
-				$newLinks[$lnum]['selementid2'] = $mapVirtSelements[$newLinks[$lnum]['selementid2']];
-			}
-			unset($mapVirtSelements);
+				foreach($newLinks as $lnum => $link){
+					$newLinks[$lnum]['selementid1'] = $mapVirtSelements[$link['selementid1']];
+					$newLinks[$lnum]['selementid2'] = $mapVirtSelements[$link['selementid2']];
+				}
+				unset($mapVirtSelements);
 
-			$linkids = $this->createLinks($newLinks);
+				$linkids = $this->createLinks($newLinks);
 
 // linkTriggers
-			$newLinkTriggers = array();
-			foreach($linkids['linkids'] as $lnum => $linkid){
-				if(!isset($newLinks[$lnum]['linktriggers'])) continue;
+				$newLinkTriggers = array();
+				foreach($linkids['linkids'] as $lnum => $linkid){
+					if(!isset($newLinks[$lnum]['linktriggers'])) continue;
 
-				foreach($newLinks[$lnum]['linktriggers'] as $ltnum => $linktrigger){
-					$linktrigger['linkid'] = $linkid;
-					$newLinkTriggers[] = $linktrigger;
+					foreach($newLinks[$lnum]['linktriggers'] as $ltnum => $linktrigger){
+						$linktrigger['linkid'] = $linkid;
+						$newLinkTriggers[] = $linktrigger;
+					}
 				}
-			}
 
-			if(!empty($newLinkTriggers))
-				$this->createLinkTriggers($newLinkTriggers);
+				if(!empty($newLinkTriggers))
+					$this->createLinkTriggers($newLinkTriggers);
+			}
 		}
 
 		return array('sysmapids' => $sysmapids);

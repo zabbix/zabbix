@@ -530,14 +530,18 @@ COpt::memoryPick();
 			);
 		}
 
-		$mapNames = array();
-		foreach($selements as $snum => &$selement){
+		foreach($selements as &$selement){
 			if(!check_db_fields($selementDbFields, $selement))
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for element');
 
 			if($update || $delete){
-				if(!isset($dbSelements[$selement['selementid']]))
+				if(!isset($dbSelements[$selement['selementid']])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+				}
+
+				if(!isset($selement['iconid_off']) || ($selement['iconid_off'] == 0)){
+					throw new Exception(_s('No icon for map element "%s"', $selement['label']));
+				}
 
 				$dbSelement = array_merge($dbSelements[$selement['selementid']], $selement);
 			}

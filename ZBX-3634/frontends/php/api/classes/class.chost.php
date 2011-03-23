@@ -1321,20 +1321,6 @@ Copt::memoryPick();
 			}
 
 			if(isset($host['host'])){
-				// Check if host name isn't longer then 64 chars
-				if(zbx_strlen($host['host']) > 64){
-					self::exception(
-						ZBX_API_ERROR_PARAMETERS,
-						_n(
-							'Maximum host name length is %2$d characters, "%3$s" is %1$d character.',
-							'Maximum host name length is %2$d characters, "%3$s" is %1$d characters.',
-							zbx_strlen($host['host']),
-							64,
-							$host['host']
-						)
-					);
-				}
-
 				if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $host['host'])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Host name "%s"', $host['host']));
 				}
@@ -1342,7 +1328,7 @@ Copt::memoryPick();
 				if(isset($hostNames[$host['host']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicated host name "%s" in data', $host['host']));
 
-				$hostNames[$host['host']] = $update ? $host['hostid'] : 1;
+				$hostNames[$host['host']] = $host['hostid'];
 			}
 		}
 		unset($host);
@@ -1356,7 +1342,7 @@ Copt::memoryPick();
 			));
 			foreach($hostsExists as $exnum => $hostExists){
 				if(!$update || (bccomp($hostExists['hostid'],$hostNames[$hostExists['host']]) != 0)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' "'.$host['host'].'" '.S_ALREADY_EXISTS_SMALL);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host "%s" already exists.', $hostExists['host']));
 				}
 			}
 
@@ -1368,7 +1354,7 @@ Copt::memoryPick();
 			));
 			foreach($templatesExists as $exnum => $templatesExists){
 				if(!$update || (bccomp($templatesExists['templateid'],$hostNames[$templatesExists['host']]) != 0)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' "'.$host['host'].'" '.S_ALREADY_EXISTS_SMALL);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template "%s" already exists.', $hostExists['host']));
 				}
 			}
 		}
