@@ -32,7 +32,7 @@ include_once('include/page_header.php');
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'year'=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	NULL,						NULL),
-		'period'=>		array(T_ZBX_STR, O_OPT,	P_SYS|P_NZERO,	IN('"dayly","weekly","monthly","yearly"'),	NULL),
+		'period'=>		array(T_ZBX_STR, O_OPT,	P_SYS|P_NZERO,	IN('"daily","weekly","monthly","yearly"'),	NULL),
 		'media_type'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,							NULL)
 	);
 
@@ -63,7 +63,6 @@ include_once('include/page_header.php');
 	$sql = 'SELECT * '.
 			' FROM media_type '.
 			' WHERE '.DBin_node('mediatypeid').
-				($media_type > 0 ? ' and mediatypeid='.$media_type : '' ).
 			' ORDER BY description';
 	$db_media_types = DBselect($sql);
 	while($media_type_data = DBfetch($db_media_types)){
@@ -95,16 +94,20 @@ include_once('include/page_header.php');
 		$form->addItem(SPACE.S_MEDIA_TYPE.SPACE);
 		$cmbMedia = new CComboBox('media_type', $media_type, 'submit();');
 		$cmbMedia->addItem(0,S_ALL_SMALL);
-			$db_medias = DBselect('select * from media_type where '.DBin_node('mediatypeid').' order by description');
 
-		while($media_data = DBfetch($db_medias)){
-			$cmbMedia->addItem($media_data['mediatypeid'], $media_data['description']);
+		foreach($media_types as $media_type_id => $media_type_description){
+			$cmbMedia->addItem($media_type_id, $media_type_description);
+			// we won't need other media types in the future, if only one was selected
+			if($media_type > 0 && $media_type != $media_type_id){
+				unset($media_types[$media_type_id]);
+			}
 		}
+
 		$form->addItem($cmbMedia);
 
 		$form->addItem(SPACE.S_PERIOD.SPACE);
 		$cmbPeriod = new CComboBox('period', $period, 'submit();');
-		$cmbPeriod->addItem('dayly',	S_DAILY);
+		$cmbPeriod->addItem('daily',	S_DAILY);
 		$cmbPeriod->addItem('weekly',	S_WEEKLY);
 		$cmbPeriod->addItem('monthly',	S_MONTHLY);
 		$cmbPeriod->addItem('yearly',	S_YEARLY);
@@ -137,7 +140,7 @@ include_once('include/page_header.php');
 				function format_time($t){	return zbx_date2str(S_REPORT4_MONTHLY_DATE_FORMAT,$t);	}
 				function format_time2($t){	return null; }
 				break;
-			case 'dayly':
+			case 'daily':
 				$from	= 1;
 				$to	= 365;
 				array_unshift($header, new CCol(S_DAY,'center'));
