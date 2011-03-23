@@ -9,6 +9,7 @@ New features:
  - [ZBXNEXT-676] merged host profile and extended host profile (Sasha, Vedmak)
 
 Bug fixes:
+ - [ZBX-3566] fixed error in administration->notifications and added a hint when no mediatypes are defined (KB)
  - [ZBX-3623] fixed processing of nanoseconds for history data (Sasha)
 
 --------------------------------------------------------------------------------
