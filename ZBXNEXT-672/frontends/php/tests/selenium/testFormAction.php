@@ -27,15 +27,28 @@ class testFormAction extends CWebTest {
 	public static function providerNewActions(){
 		$data = array(
 			array(array(
-				'name' => 'asd',
+				'name' => 'action test 2',
 				'esc_period' => '123',
 				'def_shortdata' => 'def_shortdata',
 				'def_longdata' => 'def_longdata',
+				'conditions' => array(
+					array(
+						'type' => 'Trigger name',
+						'value' => 'trigger',
+					),
+					array(
+						'type' => 'Trigger severity',
+						'value' => 'Warning',
+					),
+					array(
+						'type' => 'Application',
+						'value' => 'application',
+					),
+				),
 				'operations' => array(
 					array(
 						'type' => 'Send message',
 						'media' => 'Email',
-
 					),
 					array(
 						'type' => 'Remote command',
@@ -58,6 +71,32 @@ class testFormAction extends CWebTest {
 		$this->type('esc_period', $action['esc_period']);
 		$this->type("def_shortdata", $action['def_shortdata']);
 		$this->type("def_longdata", $action['def_longdata']);
+
+		$this->click("link=Conditions");
+		foreach($action['conditions'] as $condition){
+
+			$this->dropdown_select_wait("new_condition_conditiontype", $condition['type']);
+			switch($condition['type']){
+				case 'Trigger name':
+					$this->type("new_condition_value", $condition['value']);
+					$this->click('add_condition');
+					$this->wait();
+					$this->ok('Trigger name like "'.$condition['value'].'"');
+					break;
+				case 'Trigger severity':
+					$this->dropdown_select('new_condition_value', $condition['value']);
+					$this->click('add_condition');
+					$this->wait();
+					$this->ok('Trigger severity = "'.$condition['value'].'"');
+					break;
+				case 'Application':
+					$this->type("new_condition_value", $condition['value']);
+					$this->click('add_condition');
+					$this->wait();
+					$this->ok('Application = "'.$condition['value'].'"');
+					break;
+			}
+		}
 
 		$this->click("link=Operations");
 
@@ -115,10 +154,10 @@ class testFormAction extends CWebTest {
 		$this->type("new_condition_value", "trigger");
 		$this->click("add_condition");
 		$this->wait();
-		$this->select("new_condition_conditiontype", "label=Trigger severity");
-		$this->wait();
 		$this->assertTrue($this->isTextPresent("Trigger name like \"trigger\""));
 
+		$this->select("new_condition_conditiontype", "label=Trigger severity");
+		$this->wait();
 		$this->select("new_condition_value", "label=Average");
 		$this->click("add_condition");
 		$this->wait();
@@ -131,7 +170,7 @@ class testFormAction extends CWebTest {
 		$this->wait();
 		$this->assertTrue($this->isTextPresent("Application = \"app\""));
 
-//adding operations
+// adding operations
 		$this->click("link=Operations");
 		$this->click("new_operation");
 		$this->wait();
