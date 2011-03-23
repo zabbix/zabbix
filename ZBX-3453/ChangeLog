@@ -1,5 +1,6 @@
 Changes for 1.8.5rc1
 
+ - [ZBX-3453] improve performance of cpu collector (Sasha)
  - [ZBX-1419] improve and fix database upgrade patches for older versions (Richlv)
  - [ZBX-3576] fixed showing triggers with disabled items in monitoring (Vedmak)
  - [ZBX-3483] added missing fields in items mass update (Vedmak)
