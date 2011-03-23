@@ -156,10 +156,10 @@ CREATE TABLE optemplate (
 	templateid               number(20)                                NOT NULL,
 	PRIMARY KEY (optemplateid)
 );
+CREATE UNIQUE INDEX optemplate_1 ON optemplate (operationid,templateid);
 ALTER TABLE optemplate ADD CONSTRAINT c_optemplate_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE;
 ALTER TABLE optemplate ADD CONSTRAINT c_optemplate_2 FOREIGN KEY (templateid) REFERENCES hosts (hostid);
 
-CREATE UNIQUE INDEX optemplate_1 ON optemplate (operationid,templateid);
 CREATE TABLE opconditions (
 	opconditionid            number(20)                                NOT NULL,
 	operationid              number(20)                                NOT NULL,
