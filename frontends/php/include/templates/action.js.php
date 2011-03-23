@@ -343,11 +343,11 @@ function showOpTypeAuth(){
 }
 
 var ZBX_SCRIPT_TYPES = {};
-ZBX_SCRIPT_TYPES['script'] = <?php echo ZBX_SCRIPT_TYPE_SCRIPT; ?>;
+ZBX_SCRIPT_TYPES['script'] = <?php echo ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT; ?>;
 ZBX_SCRIPT_TYPES['ipmi'] = <?php echo ZBX_SCRIPT_TYPE_IPMI; ?>;
 ZBX_SCRIPT_TYPES['telnet'] = <?php echo ZBX_SCRIPT_TYPE_TELNET; ?>;
 ZBX_SCRIPT_TYPES['ssh'] = <?php echo ZBX_SCRIPT_TYPE_SSH; ?>;
-ZBX_SCRIPT_TYPES['userscript'] = <?php echo ZBX_SCRIPT_TYPE_USER_SCRIPT; ?>;
+ZBX_SCRIPT_TYPES['userscript'] = <?php echo ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT; ?>;
 
 jQuery(document).ready(function(){
 	setTimeout(function(){jQuery("#name").focus()}, 10);

@@ -1811,7 +1811,7 @@ include_once('include/page_header.php');
 			}
 
 
-			if($script['type'] == ZBX_SCRIPT_TYPE_SCRIPT){
+			if($script['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT){
 				switch($script['execute_on']){
 					case ZBX_SCRIPT_EXECUTE_ON_AGENT:
 						$scriptExecuteOn = _('Agent');

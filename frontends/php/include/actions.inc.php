@@ -243,14 +243,14 @@ function get_operation_desc($type, $data){
 				foreach($data['opcommand_hst'] as $num => $cmd){
 					if($cmd['hostid'] != 0) continue;
 
-					$result[] = array(bold(_('Run remote command on current host')), BR());
+					$result[] = array(bold(_('Run remote commands on current host')), BR());
 					break;
 				}
 
 				if(!empty($hosts)){
 					order_result($hosts, 'host');
 
-					$result[] = bold(_('Run remote command on hosts: '));
+					$result[] = bold(_('Run remote commands on hosts: '));
 					$result[] = array(implode(', ', zbx_objectValues($hosts,'host')), BR());
 				}
 
@@ -263,7 +263,7 @@ function get_operation_desc($type, $data){
 				if(!empty($groups)){
 					order_result($groups, 'name');
 
-					$result[] = bold(_('Run remote command on host groups: '));
+					$result[] = bold(_('Run remote commands on host groups: '));
 					$result[] = array(implode(', ', zbx_objectValues($groups,'name')), BR());
 				}
 				break;
@@ -353,28 +353,28 @@ function get_operation_desc($type, $data){
 						$result[] = array(bold(_('Run IPMI command:')), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
 						break;
 					case ZBX_SCRIPT_TYPE_SSH:
-						$result[] = array(bold(_('Run SSH command:')), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
+						$result[] = array(bold(_('Run SSH commands:')), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
 						break;
 					case ZBX_SCRIPT_TYPE_TELNET:
-						$result[] = array(bold(_('Run TELNET command:')), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
+						$result[] = array(bold(_('Run TELNET commands:')), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
 						break;
-					case ZBX_SCRIPT_TYPE_SCRIPT:
+					case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
 						if($data['opcommand']['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_AGENT)
-							$result[] = array(bold(_('Run command on Zabbix agent:')), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
+							$result[] = array(bold(_('Run custom commands on Zabbix agent:')), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
 						else
-							$result[] = array(bold(_('Run command on Zabbix server:')), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
+							$result[] = array(bold(_('Run custom commands on Zabbix server:')), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
 						break;
-					case ZBX_SCRIPT_TYPE_USER_SCRIPT:
+					case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
 						$userScripts = API::Script()->get(array(
 							'scriptid' => $data['opcommand']['scriptid'],
 							'output' => API_OUTPUT_EXTEND
 						));
 						$userScript = reset($userScripts);
 
-						$result[] = array(bold(_('Run user script:')), SPACE, italic(zbx_nl2br($userScript['name'])));
+						$result[] = array(bold(_('Run global script:')), SPACE, italic($userScript['name']));
 						break;
 					default:
-						$result[] = array(bold(_('Run command:')), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
+						$result[] = array(bold(_('Run commands:')), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
 				}
 				break;
 			default:

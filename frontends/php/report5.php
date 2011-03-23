@@ -134,7 +134,7 @@ include_once('include/page_header.php');
 		$menus.= "['".S_LATEST_DATA."',\"javascript: redirect('latest.php?hostid=".$row['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 
 		$menus = rtrim($menus,',');
-		$menus="show_popup_menu(event,[[".zbx_jsvalue(S_TOOLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus."],180);";
+		$menus="show_popup_menu(event,[[".zbx_jsvalue(_('Scripts')).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus."],180);";
 
 		$host = new CSpan($row['host']);
 		$host->setAttribute('onclick','javascript: '.$menus);

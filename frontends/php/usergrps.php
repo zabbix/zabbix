@@ -161,7 +161,9 @@ include_once('include/page_header.php');
 		$group = API::UserGroup()->get(array('usrgrpids' => $_REQUEST['usrgrpid'], 'output' => API_OUTPUT_EXTEND));
 		$group = reset($group);
 
+		DBstart();
 		$result = API::UserGroup()->delete($_REQUEST['usrgrpid']);
+		$result = DBend($result);
 
 		show_messages($result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
 		if($result){
