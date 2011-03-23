@@ -366,7 +366,7 @@ function get_operation_desc($type, $data){
 						break;
 					case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
 						$userScripts = API::Script()->get(array(
-							'scriptid' => $data['opcommand']['scriptid'],
+							'scriptids' => $data['opcommand']['scriptid'],
 							'output' => API_OUTPUT_EXTEND
 						));
 						$userScript = reset($userScripts);
