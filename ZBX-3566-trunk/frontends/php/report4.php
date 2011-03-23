@@ -50,8 +50,6 @@ include_once('include/page_header.php');
 
 	$css = getUserTheme($USER_DETAILS);
 
-
-
 	$media_types = array();
 
 	$sql = 'SELECT * '.
