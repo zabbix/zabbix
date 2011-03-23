@@ -194,7 +194,6 @@ static int	zbx_execute_script_on_terminal(DC_HOST *host, zbx_script_t *script, c
 		zbx_strlcpy(error, "Support for SSH scripts was not compiled in", max_error_len);
 		goto fail;
 #endif	/* HAVE_SSH2 */
-
 	}
 	else
 	{
