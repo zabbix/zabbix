@@ -1111,7 +1111,8 @@ int	set_ipmi_control_value(DC_ITEM *item, int value, char *error, size_t max_err
 	h = init_ipmi_host(item->interface.addr, item->interface.port, item->host.ipmi_authtype,
 			item->host.ipmi_privilege, item->host.ipmi_username, item->host.ipmi_password);
 
-	if (0 == h->domain_up) {
+	if (0 == h->domain_up)
+	{
 		if (NULL != h->err)
 		{
 			zbx_strlcpy(error, h->err, max_error_len);

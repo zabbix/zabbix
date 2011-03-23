@@ -263,11 +263,10 @@ int	node_process_command(zbx_sock_t *sock, const char *data, struct zbx_json_par
 	}
 
 	alarm(CONFIG_TIMEOUT);
-	if (zbx_tcp_send_raw(sock, send) != SUCCEED)
+	if (SUCCEED != zbx_tcp_send_raw(sock, send))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Error sending result of command to node %d",
-			CONFIG_NODEID,
-			nodeid);
+				CONFIG_NODEID, nodeid);
 	}
 	alarm(0);
 

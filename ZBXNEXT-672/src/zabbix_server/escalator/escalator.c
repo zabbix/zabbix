@@ -401,9 +401,9 @@ static int	get_dynamic_hostid(DB_EVENT *event, DC_HOST *host, char *error, size_
 
 static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_t operationid, int esc_step)
 {
-	const char		*__function_name = "execute_commands";
-	DB_RESULT		result;
-	DB_ROW			row;
+	const char	*__function_name = "execute_commands";
+	DB_RESULT	result;
+	DB_ROW		row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
