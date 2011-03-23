@@ -323,7 +323,7 @@ class CAction extends CZBXAPI{
 			$sql_parts['from']['opmessage_usr'] = 'opcommand oc';
 			$sql_parts['from']['operations'] = 'operations o';
 
-			$sql_parts['where'][] = '('.DBcondition('oc.scriptid', $options['scriptids']).' AND oc.type='.ZBX_SCRIPT_TYPE_USER_SCRIPT.')' ;
+			$sql_parts['where'][] = '('.DBcondition('oc.scriptid', $options['scriptids']).' AND oc.type='.ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT.')' ;
 			$sql_parts['where']['ao'] = 'a.actionid=o.actionid';
 			$sql_parts['where']['ooc'] = 'o.operationid=oc.operationid';
 		}
@@ -508,7 +508,7 @@ class CAction extends CZBXAPI{
 					' FROM operations o, opcommand oc'.
 					' WHERE o.operationid=oc.operationid'.
 						' AND '.DBcondition('o.actionid', $actionids).
-						' AND oc.type='.ZBX_SCRIPT_TYPE_USER_SCRIPT;
+						' AND oc.type='.ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT;
 			$db_scripts = DBselect($sql);
 			while($script = DBfetch($db_scripts)){
 				if(!isset($scripts[$script['scriptid']])) $scripts[$script['scriptid']] = array();
@@ -1491,7 +1491,7 @@ COpt::memoryPick();
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Not specified command type for operation.'));
 
 					if((!isset($operation['opcommand']['command']) || zbx_empty(trim($operation['opcommand']['command']))) &&
-						($operation['opcommand']['type'] != ZBX_SCRIPT_TYPE_USER_SCRIPT)
+						($operation['opcommand']['type'] != ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT)
 					){
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Not specified command for action operation.'));
 					}
@@ -1499,7 +1499,7 @@ COpt::memoryPick();
 					switch($operation['opcommand']['type']){
 						case ZBX_SCRIPT_TYPE_IPMI:
 							break;
-						case ZBX_SCRIPT_TYPE_SCRIPT:
+						case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
 							if(!isset($operation['opcommand']['execute_on']))
 								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Not specified execution target action operation command "%s".',$operation['opcommand']['command']));
 
@@ -1525,11 +1525,12 @@ COpt::memoryPick();
 								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Not specified authentication user name for action operation command "%s".',$operation['opcommand']['command']));
 
 							break;
-						case ZBX_SCRIPT_TYPE_USER_SCRIPT:
+						case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
 							if(!isset($operation['opcommand']['scriptid']) || zbx_empty($operation['opcommand']['scriptid']))
 								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Not specified scriptid for action operation command "%s".',$operation['opcommand']['command']));
 
 							$scripts = API::Script()->get(array(
+								'output' => array('scriptid','name'),
 								'scriptids' => $operation['opcommand']['scriptid'],
 								'preservekeys' => true
 							));
@@ -1567,8 +1568,12 @@ COpt::memoryPick();
 						}
 					}
 
-					if(empty($groupids) && empty($hostids) && $without_current)
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('You did not specify targets for action operation command "%s".',$operation['opcommand']['command']));
+					if(empty($groupids) && empty($hostids) && $without_current){
+						if($operation['opcommand']['type'] == ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT)
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('You did not specify targets for action operation global script "%s".', $scripts[$operation['opcommand']['scriptid']]['name']));
+						else
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('You did not specify targets for action operation command "%s".',$operation['opcommand']['command']));
+					}
 
 					$hostIdsAll = array_merge($hostIdsAll, $hostids);
 					$hostGroupIdsAll = array_merge($hostGroupIdsAll, $groupids);

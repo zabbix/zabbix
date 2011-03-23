@@ -67,6 +67,7 @@ class CScript extends CZBXAPI{
 			'groupids'				=> null,
 			'hostids'				=> null,
 			'scriptids'				=> null,
+			'usrgrpids'				=> null,
 			'editable'				=> null,
 			'nopermissions'			=> null,
 
@@ -90,6 +91,19 @@ class CScript extends CZBXAPI{
 		);
 
 		$options = zbx_array_merge($def_options, $options);
+
+		if(is_array($options['output'])){
+			unset($sql_parts['select']['scripts']);
+
+			$dbTable = DB::getSchema('scripts');
+			$sql_parts['select']['scriptid'] = 's.scriptid';
+			foreach($options['output'] as $key => $field){
+				if(isset($dbTable['fields'][$field]))
+					$sql_parts['select'][$field] = 's.'.$field;
+			}
+
+			$options['output'] = API_OUTPUT_CUSTOM;
+		}
 
 // editable + PERMISSION CHECK
 		if(USER_TYPE_SUPER_ADMIN == $user_type){
@@ -127,6 +141,18 @@ class CScript extends CZBXAPI{
 			$sql_parts['where'][] = '('.DBcondition('s.groupid', $options['groupids']).' OR s.groupid IS NULL)';
 		}
 
+// usrgrpids
+		if(!is_null($options['usrgrpids'])){
+			zbx_value2array($options['usrgrpids']);
+
+			$options['usrgrpids'][] = 0;		// include ALL usrgrps scripts
+
+			if($options['output'] != API_OUTPUT_SHORTEN){
+				$sql_parts['select']['usrgrpid'] = 's.usrgrpid';
+			}
+
+			$sql_parts['where'][] = '('.DBcondition('s.usrgrpid', $options['usrgrpids']).' OR s.usrgrpid IS NULL)';
+		}
 // hostids
 		if(!is_null($options['hostids'])){
 			zbx_value2array($options['hostids']);

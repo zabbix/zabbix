@@ -44,7 +44,7 @@ $fields = array(
 // form
 	'name'=>			array(T_ZBX_STR, O_OPT,  NULL,			NOT_EMPTY,	'isset({save})'),
 	'type'=>			array(T_ZBX_INT, O_OPT,  NULL,			IN('0,1'),	'isset({save})'),
-	'execute_on'=>		array(T_ZBX_INT, O_OPT,  NULL,			IN('0,1'),	'isset({save})&&{type}=='.ZBX_SCRIPT_TYPE_SCRIPT),
+	'execute_on'=>		array(T_ZBX_INT, O_OPT,  NULL,			IN('0,1'),	'isset({save})&&{type}=='.ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT),
 	'command'=>			array(T_ZBX_STR, O_OPT,  NULL,			NOT_EMPTY,	'isset({save})'),
 	'description'=>		array(T_ZBX_STR, O_OPT,  NULL,			NULL,	'isset({save})'),
 	'access'=>			array(T_ZBX_INT, O_OPT,  NULL,			IN('0,1,2,3'),	'isset({save})'),
@@ -176,7 +176,7 @@ if($sid = get_request('scriptid')){
 
 		if(!$data['scriptid'] || isset($_REQUEST['form_refresh'])){
 			$data['name'] = get_request('name', '');
-			$data['type'] = get_request('type', ZBX_SCRIPT_TYPE_SCRIPT);
+			$data['type'] = get_request('type', ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT);
 			$data['execute_on'] = get_request('execute_on', ZBX_SCRIPT_EXECUTE_ON_SERVER);
 			$data['command'] = get_request('command', '');
 			$data['description'] = get_request('description', '');
@@ -269,7 +269,7 @@ if($sid = get_request('scriptid')){
 				$host_group_name = _('All');
 			}
 
-			if($script['type'] == ZBX_SCRIPT_TYPE_SCRIPT){
+			if($script['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT){
 				switch($script['execute_on']){
 					case ZBX_SCRIPT_EXECUTE_ON_AGENT:
 						$scriptExecuteOn = _('Agent');
@@ -288,7 +288,7 @@ if($sid = get_request('scriptid')){
 				new CCheckBox('scripts['.$script['scriptid'].']', 'no', NULL, $script['scriptid']),
 				new CLink($script['name'], 'scripts.php?form=1'.'&scriptid='.$script['scriptid']),
 				$scriptExecuteOn,
-				htmlspecialchars($script['command'], ENT_COMPAT, 'UTF-8'),
+				zbx_nl2br(htmlspecialchars($script['command'], ENT_COMPAT, 'UTF-8')),
 				$user_group_name,
 				$host_group_name,
 				((PERM_READ_WRITE == $script['host_access']) ? _('Write') : _('Read'))

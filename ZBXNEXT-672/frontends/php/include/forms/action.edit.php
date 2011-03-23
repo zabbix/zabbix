@@ -568,7 +568,7 @@ require_once('include/templates/action.js.php');
 				if(!isset($new_operation['opcommand'])){
 					$new_operation['opcommand_grp'] = array();
 					$new_operation['opcommand'] = array(
-						'type' => ZBX_SCRIPT_TYPE_SCRIPT,
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 						'execute_on' => ZBX_SCRIPT_EXECUTE_ON_AGENT,
 						'port' => '',
 						'authtype' => ZBX_SCRIPT_EXECUTE_ON_AGENT,
@@ -648,10 +648,10 @@ require_once('include/templates/action.js.php');
 // TYPE
 				$typeCB = new CComboBox('new_operation[opcommand][type]', $new_operation['opcommand']['type'], 'javascript: showOpTypeForm();');
 				$typeCB->addItem(ZBX_SCRIPT_TYPE_IPMI, _('IPMI'));
-				$typeCB->addItem(ZBX_SCRIPT_TYPE_SCRIPT, _('Script'));
+				$typeCB->addItem(ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, _('Custom script'));
 				$typeCB->addItem(ZBX_SCRIPT_TYPE_SSH, _('SSH'));
 				$typeCB->addItem(ZBX_SCRIPT_TYPE_TELNET, _('Telnet'));
-				$typeCB->addItem(ZBX_SCRIPT_TYPE_USER_SCRIPT, _('User script'));
+				$typeCB->addItem(ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT, _('Global script'));
 
 				$userScriptId = new CVar('new_operation[opcommand][scriptid]', $new_operation['opcommand']['scriptid']);
 				$userScriptName = new CTextBox('new_operation[opcommand][script]', $new_operation['opcommand']['script'], 30, true);
@@ -672,8 +672,8 @@ require_once('include/templates/action.js.php');
 
 // SSH
 				$cmbAuthType = new CComboBox('new_operation[opcommand][authtype]', $new_operation['opcommand']['authtype'], 'javascript: showOpTypeAuth();');
-				$cmbAuthType->addItem(ITEM_AUTHTYPE_PASSWORD,_('Password'));
-				$cmbAuthType->addItem(ITEM_AUTHTYPE_PUBLICKEY,('Public key'));
+				$cmbAuthType->addItem(ITEM_AUTHTYPE_PASSWORD, _('Password'));
+				$cmbAuthType->addItem(ITEM_AUTHTYPE_PUBLICKEY, _('Public key'));
 
 				$tblOper->addRow(array(_('Authentication method'), $cmbAuthType), 'class_authentication_method hidden');
 
@@ -687,7 +687,7 @@ require_once('include/templates/action.js.php');
 				$tblOper->addRow(array(_('Port'), new CTextBox('new_operation[opcommand][port]', $new_operation['opcommand']['port'])), 'class_opcommand_port hidden');
 
 // Command
-				$tblOper->addRow(array(_('Command'), new CTextArea('new_operation[opcommand][command]', $new_operation['opcommand']['command'], 77, 7)), 'class_opcommand_command hidden');
+				$tblOper->addRow(array(_('Commands'), new CTextArea('new_operation[opcommand][command]', $new_operation['opcommand']['command'], 77, 7)), 'class_opcommand_command hidden');
 
 				break;
 			case OPERATION_TYPE_HOST_ADD:
