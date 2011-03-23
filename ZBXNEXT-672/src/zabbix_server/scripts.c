@@ -349,7 +349,8 @@ int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, char **result, char 
 			break;
 		case ZBX_SCRIPT_TYPE_IPMI:
 			if (SUCCEED == (ret = zbx_execute_ipmi_command(host, script->command, error, max_error_len)))
-				*result = zbx_strdup(*result, "IPMI command successfully executed");
+				if (NULL != result)
+					*result = zbx_strdup(*result, "IPMI command successfully executed");
 			break;
 		case ZBX_SCRIPT_TYPE_SSH:
 			substitute_simple_macros(NULL, NULL, host, NULL, &script->publickey,
