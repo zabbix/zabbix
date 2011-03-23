@@ -678,6 +678,7 @@ ret:
 
 static void	process_active_checks(char *server, unsigned short port)
 {
+	const char	*__function_name = "process_active_checks";
 	register int	i, s_count, p_count;
 	char		**pvalue;
 	int		now, send_err = SUCCEED, ret;
@@ -701,7 +702,7 @@ static void	process_active_checks(char *server, unsigned short port)
 
 	AGENT_RESULT	result;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In process_active_checks('%s',%hu)", server, port);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s('%s',%hu)", __function_name, server, port);
 
 	init_result(&result);
 
@@ -771,9 +772,9 @@ static void	process_active_checks(char *server, unsigned short port)
 					if (SUCCEED == send_err)
 						active_metrics[i].lastlogsize = lastlogsize;
 					else
-					{ /* buffer is full, stop processing the log till the buffer is cleared */
+					{ /* buffer is full, stop processing active checks till the buffer is cleared */
 						lastlogsize = active_metrics[i].lastlogsize;
-						break;
+						goto ret;
 					}
 
 					/* do not flood Zabbix server if file grows too fast */
@@ -860,10 +861,10 @@ static void	process_active_checks(char *server, unsigned short port)
 						active_metrics[i].mtime = mtime;
 					}
 					else
-					{ /* buffer is full, stop processing the log till the buffer is cleared */
+					{ /* buffer is full, stop processing active checks till the buffer is cleared */
 						lastlogsize = active_metrics[i].lastlogsize;
 						mtime = active_metrics[i].mtime;
-						break;
+						goto ret;
 					}
 
 					/* do not flood Zabbix server if file grows too fast */
@@ -985,9 +986,9 @@ static void	process_active_checks(char *server, unsigned short port)
 					if (SUCCEED == send_err)
 						active_metrics[i].lastlogsize = lastlogsize;
 					else
-					{ /* buffer is full, stop processing the log till the buffer is cleared */
+					{ /* buffer is full, stop processing active checks till the buffer is cleared */
 						lastlogsize = active_metrics[i].lastlogsize;
-						break;
+						goto ret;
 					}
 
 					/* do not flood Zabbix server if file grows too fast */
@@ -1043,6 +1044,8 @@ static void	process_active_checks(char *server, unsigned short port)
 		}
 		active_metrics[i].nextcheck = (int)time(NULL) + active_metrics[i].refresh;
 	}
+ret:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 ZBX_THREAD_ENTRY(active_checks_thread, args)
