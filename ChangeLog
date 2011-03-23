@@ -107,7 +107,8 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
 
- - [ZBX-3075] Fixed a regex bug with zero-length strings (rudolfs)
+ - [ZBX-3628] fixed server crash while processing notification messages with an already deleted trigger (Sasha)
+ - [ZBX-3075] fixed a regex bug with zero-length strings (rudolfs)
  - [ZBX-3621] changed the maximum number of processes for Zabbix daemons (asaveljevs)
  - [ZBXNEXT-448] added trigger function logeventid that matches the last event ID to a regex (rudolfs)
  - [ZBX-1419] improve and fix database upgrade patches for older versions (Richlv)
