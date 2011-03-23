@@ -19,6 +19,10 @@ build/win32/project/resource.res
 /configure
 create/Makefile
 create/Makefile.in
+create/images/inkscape.log.txt
+create/images/output_png
+create/images/pngcrush.log.txt
+create/images/pngcrushoutput.txt
 create/schema/ibm_db2.sql
 create/schema/mysql.sql
 create/schema/oracle.sql
