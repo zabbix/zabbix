@@ -327,6 +327,10 @@ INSERT INTO opconditions
 		FROM t_opconditions c, t_operations o
 		WHERE c.operationid = o.operationid;
 
+UPDATE opconditions
+	SET opconditionid = (operationid / 100000000000) * 100000000000 + opconditionid
+	WHERE operationid >= 100000000000;
+
 DROP SEQUENCE optemplate_seq;
 DROP SEQUENCE opgroup_seq;
 DROP SEQUENCE opcommand_hst_seq;
