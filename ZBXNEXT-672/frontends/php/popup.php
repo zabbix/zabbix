@@ -789,7 +789,7 @@ include_once('include/page_header.php');
 			else{
 				$values = array(
 					$dstfld1 => $user[$srcfld1],
-					$dstfld2 => $user[$srcfld2],
+					$dstfld2 => isset($srcfld2) ? $user[$srcfld2] : null,
 				);
 
 				$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).','.zbx_jsvalue($values).'); close_window(); return false;';
