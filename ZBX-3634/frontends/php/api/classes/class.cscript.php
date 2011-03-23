@@ -443,7 +443,7 @@ class CScript extends CZBXAPI{
 			);
 			$scriptsDB = $this->get($options);
 			foreach($scriptsDB as $exScript){
-				if(!isset($scripts[$exScript['scriptid']]) || ($scripts[$exScript['scriptid']]['scriptid'] !== $exScript['scriptid'])){
+				if(!isset($scripts[$exScript['scriptid']]) || (bccomp($scripts[$exScript['scriptid']]['scriptid'],$exScript['scriptid']) != 0)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%s" already exists.', $exScript['name']));
 				}
 			}

@@ -674,7 +674,7 @@ COpt::memoryPick();
 			$groupsNames = zbx_toHash($groupsNames, 'name');
 
 			foreach($groups as $num => $group){
-				if(isset($group['name']) && isset($groupsNames[$group['name']]) && ($groupsNames[$group['name']]['groupid'] != $group['groupid'])){
+				if(isset($group['name']) && isset($groupsNames[$group['name']]) && (bccomp($groupsNames[$group['name']]['groupid'],$group['groupid']) != 0)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'HostGroup [ '.$group['name'].' ] already exists');
 				}
 

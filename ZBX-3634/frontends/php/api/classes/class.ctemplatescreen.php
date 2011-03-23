@@ -582,7 +582,7 @@ class CTemplateScreen extends CScreen{
 				}
 
 				$dbScreen = $updScreens[$screen['screenid']];
-				if(isset($screen['templateid']) && ($screen['templateid'] != $dbScreen['templateid'])){
+				if(isset($screen['templateid']) && (bccomp($screen['templateid'],$dbScreen['templateid']) != 0)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot change template for Screen [ '.$screen['name'].' ]');
 				}
 
@@ -599,7 +599,7 @@ class CTemplateScreen extends CScreen{
 					$exist_screens = $this->get($options);
 					$exist_screen = reset($exist_screens);
 
-					if($exist_screen && ($exist_screen['screenid'] != $screen['screenid']))
+					if($exist_screen && (bccomp($exist_screen['screenid'],$screen['screenid']) != 0))
 						self::exception(ZBX_API_ERROR_PERMISSIONS, S_SCREEN.' [ '.$screen['name'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 

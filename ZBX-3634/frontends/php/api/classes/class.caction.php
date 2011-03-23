@@ -822,7 +822,7 @@ COpt::memoryPick();
 					'preservekeys' => true,
 				);
 				$action_exists = $this->get($options);
-				if(($action_exist = reset($action_exists)) && ($action_exist['actionid'] != $action['actionid'])){
+				if(($action_exist = reset($action_exists)) && (bccomp($action_exist['actionid'],$action['actionid']) != 0)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" already exists.', $action['name']));
 				}
 //----

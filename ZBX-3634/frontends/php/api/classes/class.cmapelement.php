@@ -648,7 +648,7 @@ COpt::memoryPick();
 	return $result;
 	}
 
-	protected function checkSelementInput($selements, $method){
+	protected function checkSelementInput(&$selements, $method){
 		$create = ($method == 'createSelements');
 		$update = ($method == 'updateSelements');
 		$delete = ($method == 'deleteSelements');
@@ -693,7 +693,7 @@ COpt::memoryPick();
 				$dbSelement = $selement;
 			}
 
-			if(check_circle_elements_link($dbSelement['sysmapid'],$dbSelement['elementid'],$dbSelement['elementtype'])){
+			if($this->checkCircleSelementsLink($dbSelement['sysmapid'],$dbSelement['elementid'],$dbSelement['elementtype'])){
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_CIRCULAR_LINK_CANNOT_BE_CREATED.' "'.$dbSelement['label'].'"');
 			}
 		}
@@ -703,7 +703,7 @@ COpt::memoryPick();
 	}
 
 
-	protected function checkLinkInput($links, $method){
+	protected function checkLinkInput(&$links, $method){
 		$create = ($method == 'createLink');
 		$update = ($method == 'updateLink');
 		$delete = ($method == 'deleteLink');
