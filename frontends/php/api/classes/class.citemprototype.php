@@ -625,7 +625,7 @@ COpt::memoryPick();
 				'nopermissions' => 1
 			));
 			foreach($itemsExists as $inum => $itemExists){
-				if($itemExists['itemid'] != $item['itemid']){
+				if(bccomp($itemExists['itemid'],$item['itemid'])!=0){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Host with item [ '.$item['key_'].' ] already exists');
 				}
 			}
@@ -914,7 +914,7 @@ COpt::memoryPick();
 					if($exItem['flags'] != ZBX_FLAG_DISCOVERY_CHILD){
 						$this->errorInheritFlags($exItem['flags'], $exItem['key_'], $host['host']);
 					}
-					else if(($exItem['templateid'] > 0) && ($exItem['templateid'] != $item['itemid'])){
+					else if(($exItem['templateid'] > 0) && (bccomp($exItem['templateid'], $item['itemid']) != 0)){
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item "%1$s:%2$s" already exists, inherited from another template.', $host['host'], $exItem['key_']));
 					}
 				}

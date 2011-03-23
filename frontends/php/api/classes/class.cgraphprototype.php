@@ -1111,7 +1111,7 @@ COpt::memoryPick();
 			);
 			$graphsExists = API::Graph()->get($options);
 			foreach($graphsExists as $genum => $graphExists){
-				if(($update && ($graphExists['graphid'] != $graph['graphid'])) || !$update){
+				if(($update && (bccomp($graphExists['graphid'],$graph['graphid'])!=0)) || !$update){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph with name [ '.$graph['name'].' ] already exists');
 				}
 			}

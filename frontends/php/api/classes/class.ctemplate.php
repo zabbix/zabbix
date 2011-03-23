@@ -1338,7 +1338,7 @@ COpt::memoryPick();
 				$template_exists = $this->get($options);
 				$template_exist = reset($template_exists);
 
-				if($template_exist && ($template_exist['templateid'] != $cur_template['templateid'])){
+				if($template_exist && (bccomp($template_exist['templateid'],$cur_template['templateid']) != 0)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE . ' [ ' . $data['host'] . ' ] ' . S_ALREADY_EXISTS_SMALL);
 				}
 

@@ -519,7 +519,7 @@ COpt::memoryPick();
 	return !empty($objs);
 	}
 
-	public function checkInput($maps, $method){
+	public function checkInput(&$maps, $method){
 		$create = ($method == 'create');
 		$update = ($method == 'update');
 		$delete = ($method == 'delete');
@@ -720,21 +720,25 @@ COpt::memoryPick();
 			foreach($maps[$mnum]['selements'] as $snum => $selement)
 				$maps[$mnum]['selements'][$snum]['sysmapid'] = $sysmapid;
 
+			$newSelements = array_merge($newSelements, $maps[$mnum]['selements']);
+
 			foreach($maps[$mnum]['links'] as $lnum => $link)
 				$maps[$mnum]['links'][$lnum]['sysmapid'] = $sysmapid;
+
+			$newLinks = array_merge($newLinks, $maps[$mnum]['links']);
 		}
 
 		DB::insert('sysmap_url', $newUrls);
 
 		if(!empty($newSelements)){
-			$selementids = $this->addSelements($newSelements);
+			$selementids = $this->createSelements($newSelements);
 
 			if(empty($newLinks)) continue;
 
 // Links
 			$mapVirtSelements = array();
-			foreach($selementids as $snum => $selementid)
-				$mapVirtSelements[$newSelements['selementid']] = $selementid;
+			foreach($selementids['selementids'] as $snum => $selementid)
+				$mapVirtSelements[$newSelements[$snum]['selementid']] = $selementid;
 
 			foreach($newLinks as $lnum => $link){
 				$newLinks[$lnum]['selementid1'] = $mapVirtSelements[$newLinks[$lnum]['selementid1']];
@@ -742,11 +746,11 @@ COpt::memoryPick();
 			}
 			unset($mapVirtSelements);
 
-			$linkids = $this->addLinks($newLinks);
+			$linkids = $this->createLinks($newLinks);
 
 // linkTriggers
 			$newLinkTriggers = array();
-			foreach($linkids as $lnum => $linkid){
+			foreach($linkids['linkids'] as $lnum => $linkid){
 				if(!isset($newLinks[$lnum]['linktriggers'])) continue;
 
 				foreach($newLinks[$lnum]['linktriggers'] as $ltnum => $linktrigger){
@@ -756,7 +760,7 @@ COpt::memoryPick();
 			}
 
 			if(!empty($newLinkTriggers))
-				$this->addLinkTriggers($newLinkTriggers);
+				$this->createLinkTriggers($newLinkTriggers);
 		}
 
 		return array('sysmapids' => $sysmapids);
@@ -867,7 +871,7 @@ COpt::memoryPick();
 		if(!empty($linksToAdd)){
 			$mapVirtSelements = array();
 			foreach($newSelementIds['selementids'] as $snum => $selementid)
-				$mapVirtSelements[$selementsToAdd['selementid']] = $selementid;
+				$mapVirtSelements[$selementsToAdd[$snum]['selementid']] = $selementid;
 
 			foreach($linksToAdd as $lnum => $link){
 				$linksToAdd[$lnum]['selementid1'] = $mapVirtSelements[$linksToAdd[$lnum]['selementid1']];
@@ -921,7 +925,7 @@ COpt::memoryPick();
 		}
 
 		if(!empty($linkTriggersToAdd))
-			$this->addLinkTriggers($linkTriggersToAdd);
+			$this->createLinkTriggers($linkTriggersToAdd);
 
 		if(!empty($linkTriggersToUpdate))
 			$this->updateLinkTriggers($linkTriggersToUpdate);

@@ -703,8 +703,15 @@ class zbxXML{
 					$sysmap['backgroundid'] = 0;
 				}
 
-				if(!isset($sysmap['selements'])) $sysmap['selements'] = array();
-				if(!isset($sysmap['links'])) $sysmap['links'] = array();
+				if(!isset($sysmap['selements']))
+					$sysmap['selements'] = array();
+				else
+					$sysmap['selements'] = array_values($sysmap['selements']);
+
+				if(!isset($sysmap['links']))
+					$sysmap['links'] = array();
+				else
+					$sysmap['links'] = array_values($sysmap['links']);
 
 				foreach($sysmap['selements'] as $snum => &$selement){
 					$nodeCaption = isset($selement['elementid']['node'])?$selement['elementid']['node'].':':'';
@@ -802,51 +809,10 @@ class zbxXML{
 				if(isset($importMap['sysmapid'])){
 					$result = API::Map()->update($importMap);
 					$sysmapids = $result['sysmapids'];
-
-// Deleting all selements (with links)
-					$db_selementids = array();
-					$res = DBselect('SELECT selementid FROM sysmaps_elements WHERE sysmapid='.$sysmap['sysmapid']);
-					while($db_selement = DBfetch($res)){
-						$db_selementids[$db_selement['selementid']] = $db_selement['selementid'];
-					}
-					delete_sysmaps_element($db_selementids);
-//----
 				}
 				else{
 					$result = API::Map()->create($importMap);
 					$sysmapids = $result['sysmapids'];
-					$sysmap['sysmapid'] = reset($sysmapids);
-				}
-
-				$selements = $importMap['selements'];
-				$links = $importMap['links'];
-
-				foreach($selements as $id => $selement){
-					if(!isset($selement['elementid']) || ($selement['elementid'] == 0)){
-						$selement['elementid'] = 0;
-						$selement['elementtype'] = SYSMAP_ELEMENT_TYPE_IMAGE;
-					}
-
-					if(!isset($selement['iconid_off']) || ($selement['iconid_off'] == 0)){
-						throw new Exception(S_NO_ICON_FOR_MAP_ELEMENT.' '.$sysmap['name'].':'.$selement['label']);
-					}
-
-					$selement['sysmapid'] = $sysmap['sysmapid'];
-					$selementids = API::Map()->addElements($selement);
-					$selementid = reset($selementids);
-
-					foreach($links as $id => &$link){
-						if(bccomp($link['selementid1'],$selement['selementid']) == 0) $links[$id]['selementid1'] = $selementid;
-						else if(bccomp($link['selementid2'],$selement['selementid']) == 0) $links[$id]['selementid2'] = $selementid;
-					}
-					unset($link);
-				}
-
-				foreach($links as $id => $link){
-					if(!isset($link['linktriggers'])) $link['linktriggers'] = array();
-					$link['sysmapid'] = $sysmap['sysmapid'];
-
-					$result = API::Map()->addLinks($link);
 				}
 
 				if(isset($importMap['sysmapid'])){

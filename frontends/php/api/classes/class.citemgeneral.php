@@ -164,7 +164,7 @@ abstract class CItemGeneral extends CZBXAPI{
 				&& ($fullItem['flags'] != ZBX_FLAG_DISCOVERY_CHILD)
 			){
 				if(isset($item['interfaceid'])){
-					if(!isset($interfaces[$item['interfaceid']]) || ($interfaces[$item['interfaceid']]['hostid'] != $item['hostid']))
+					if(!isset($interfaces[$item['interfaceid']]) || (bccomp($interfaces[$item['interfaceid']]['hostid'],$item['hostid'])!=0))
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item uses Host interface from non parent host'));
 				}
 			}
