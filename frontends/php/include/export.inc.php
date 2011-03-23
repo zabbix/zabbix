@@ -670,7 +670,6 @@ class zbxXML{
 
 
 			$importMaps = $importMaps['zabbix_export']['sysmaps'];
-			$sysmaps = array();
 			foreach($importMaps as $mnum => &$sysmap){
 				unset($sysmap['sysmapid']);
 				$exists = API::Map()->exists(array('name' => $sysmap['name']));
@@ -713,7 +712,7 @@ class zbxXML{
 				else
 					$sysmap['links'] = array_values($sysmap['links']);
 
-				foreach($sysmap['selements'] as $snum => &$selement){
+				foreach($sysmap['selements'] as &$selement){
 					$nodeCaption = isset($selement['elementid']['node'])?$selement['elementid']['node'].':':'';
 
 					if(!isset($selement['elementid'])) $selement['elementid'] = 0;
@@ -760,7 +759,6 @@ class zbxXML{
 						break;
 						case SYSMAP_ELEMENT_TYPE_IMAGE:
 						default:
-						break;
 					}
 
 					$icons = array('iconid_off','iconid_on','iconid_disabled','iconid_maintenance');
@@ -784,10 +782,9 @@ class zbxXML{
 					if(!isset($link['linktriggers'])) continue;
 
 					foreach($link['linktriggers'] as $ltnum => &$linktrigger){
-						$nodeCaption = isset($linktrigger['triggerid']['node'])?$linktrigger['triggerid']['node'].':':'';
-
 						$db_triggers = API::Trigger()->getObjects($linktrigger['triggerid']);
 						if(empty($db_triggers)){
+							$nodeCaption = isset($linktrigger['triggerid']['node'])?$linktrigger['triggerid']['node'].':':'';
 							$error = S_CANNOT_FIND_TRIGGER.' "'.$nodeCaption.$linktrigger['triggerid']['host'].':'.$linktrigger['triggerid']['description'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
 							throw new Exception($error);
 						}
@@ -798,28 +795,28 @@ class zbxXML{
 					unset($linktrigger);
 				}
 				unset($link);
-
-				$sysmaps[] = $sysmap;
 			}
 			unset($sysmap);
 
-			$importMaps = $sysmaps;
-			foreach($importMaps as $mnum => $importMap){
-				$sysmap = $importMap;
+
+			foreach($importMaps as $importMap){
 				if(isset($importMap['sysmapid'])){
 					$result = API::Map()->update($importMap);
-					$sysmapids = $result['sysmapids'];
+					if($result === false){
+						throw new Exception(_s('Cannot update map "%s".', $importMap['name']));
+					}
+					else{
+						info(_s('Map "%s" updated.', $importMap['name']));
+					}
 				}
 				else{
 					$result = API::Map()->create($importMap);
-					$sysmapids = $result['sysmapids'];
-				}
-
-				if(isset($importMap['sysmapid'])){
-					info(S_MAP.' ['.$sysmap['name'].'] '.S_UPDATED_SMALL);
-				}
-				else{
-					info(S_MAP.' ['.$sysmap['name'].'] '.S_ADDED_SMALL);
+					if($result === false){
+						throw new Exception(_s('Cannot create map "%s".', $importMap['name']));
+					}
+					else{
+						info(_s('Map "%s" create.', $importMap['name']));
+					}
 				}
 			}
 

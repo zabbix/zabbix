@@ -56,6 +56,26 @@
 		else
 			return S_UNKNOWN;
 	}
+
+	function sysmapElementLabel($label=null){
+		$labels = array(
+			MAP_LABEL_TYPE_LABEL => _('Label'),
+			MAP_LABEL_TYPE_IP => _('IP address'),
+			MAP_LABEL_TYPE_NAME => _('Element name'),
+			MAP_LABEL_TYPE_STATUS => _('Status only'),
+			MAP_LABEL_TYPE_NOTHING => _('Nothing'),
+			MAP_LABEL_TYPE_CUSTOM => _('Custom label')
+		);
+
+		if(is_null($label)){
+			return $labels;
+		}
+		else if(isset($labels[$label]))
+			return $labels[$label];
+		else
+			return false;
+	}
+
 /*
  * Function: map_link_drawtype2str
  *
