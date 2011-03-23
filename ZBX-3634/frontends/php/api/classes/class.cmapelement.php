@@ -723,7 +723,7 @@ COpt::memoryPick();
 		if(!empty($urlsToAdd))
 			DB::insert('sysmap_element_url', $urlsToAdd);
 
-	return $selementids;
+	return array('selementids' => $selementids);
 	}
 
 /**

@@ -814,7 +814,6 @@ COpt::memoryPick();
 // Elements
 			if(isset($map['selements'])){
 				$selementDiff = zbx_array_diff($map['selements'], $dbMap['selements'], 'selementid');
-
 				foreach($selementDiff['first'] as $newSelement){
 					$newSelement['sysmapid'] = $map['sysmapid'];
 					$selementsToAdd[] = $newSelement;
@@ -827,7 +826,6 @@ COpt::memoryPick();
 // Links
 			if(isset($map['links'])){
 				$linkDiff = zbx_array_diff($map['links'], $dbMap['links'], 'linkid');
-
 				foreach($linkDiff['first'] as $newlink){
 					$newlink['sysmapid'] = $map['sysmapid'];
 					$linksToAdd[] = $newlink;
@@ -860,9 +858,13 @@ COpt::memoryPick();
 
 // Links
 		if(!empty($linksToAdd)){
+
 			$mapVirtSelements = array();
 			foreach($newSelementIds['selementids'] as $snum => $selementid)
 				$mapVirtSelements[$selementsToAdd[$snum]['selementid']] = $selementid;
+
+			foreach($selementsToUpdate as $selement)
+				$mapVirtSelements[$selement['selementid']] = $selement['selementid'];
 
 			foreach($linksToAdd as $lnum => $link){
 				$linksToAdd[$lnum]['selementid1'] = $mapVirtSelements[$linksToAdd[$lnum]['selementid1']];
@@ -894,7 +896,6 @@ COpt::memoryPick();
 		}
 
 		$dbLinks = array();
-
 
 		$linkTriggerResource = DBselect('SELECT * FROM sysmaps_link_triggers WHERE '.DBcondition('linkid',$updLinkIds['linkids']));
 		while($dbLinkTrigger = DBfetch($linkTriggerResource))
