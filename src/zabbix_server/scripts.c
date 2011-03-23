@@ -31,7 +31,7 @@
 
 extern int	CONFIG_TRAPPER_TIMEOUT;
 
-static int	zbx_execute_script_on_agent(DC_HOST *host, char *command, char **result,
+static int	zbx_execute_script_on_agent(DC_HOST *host, const char *command, char **result,
 		char *error, size_t max_error_len)
 {
 	const char	*__function_name = "zbx_execute_script_on_agent";
@@ -62,8 +62,6 @@ static int	zbx_execute_script_on_agent(DC_HOST *host, char *command, char **resu
 		zbx_snprintf(error, max_error_len, "Invalid port number [%s]", item.interface.port_orig);
 		goto fail;
 	}
-
-	dos2unix(command);	/* CR+LF (Windows) => LF (Unix) */
 
 	param = dyn_escape_param(command);
 	item.key = zbx_dsprintf(item.key, "system.run[\"%s\",\"%s\"]", param, NULL == result ? "nowait" : "wait");
@@ -332,6 +330,8 @@ int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, char **result, char 
 	switch (script->type)
 	{
 		case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
+			dos2unix(script->command);	/* CR+LF (Windows) => LF (Unix) */
+
 			switch (script->execute_on)
 			{
 				case ZBX_SCRIPT_EXECUTE_ON_AGENT:
