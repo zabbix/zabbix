@@ -481,7 +481,7 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 
 		if (SUCCEED == rc)
 		{
-			switch (script.type = (unsigned char)atoi(row[2]))
+			switch (script.type)
 			{
 				case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
 					script.execute_on = (unsigned char)atoi(row[4]);
