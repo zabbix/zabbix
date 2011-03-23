@@ -567,7 +567,7 @@ COpt::memoryPick();
 				if(isset($mapNames[$map['name']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate map name for map "%s".', $dbMap['name']));
 				else
-					$mapNames[$map['name']] = $map['sysmapid'];
+					$mapNames[$map['name']] = $update ? $map['sysmapid'] : 1;
 			}
 
 			if(isset($map['width']) && (($map['width'] > 65535) || ($map['width'] < 1)))

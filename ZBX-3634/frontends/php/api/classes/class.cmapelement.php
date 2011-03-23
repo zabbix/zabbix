@@ -526,6 +526,7 @@ COpt::memoryPick();
 				'sysmapid' => null,
 				'elementid' => null,
 				'elementtype' => null,
+				'iconid_off' => null,
 				'urls' => array()
 			);
 		}
@@ -539,14 +540,14 @@ COpt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 				}
 
-				if(!isset($selement['iconid_off']) || ($selement['iconid_off'] == 0)){
-					throw new Exception(_s('No icon for map element "%s"', $selement['label']));
-				}
-
 				$dbSelement = array_merge($dbSelements[$selement['selementid']], $selement);
 			}
 			else{
 				$dbSelement = $selement;
+			}
+
+			if(isset($selement['iconid_off']) && ($selement['iconid_off'] == 0)){
+				throw new Exception(_s('No icon for map element "%s"', $selement['label']));
 			}
 
 			if($this->checkCircleSelementsLink($dbSelement['sysmapid'],$dbSelement['elementid'],$dbSelement['elementtype'])){
