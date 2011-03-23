@@ -46,6 +46,9 @@ DROP SEQUENCE operations_seq;
 
 DROP FUNCTION zbx_unnest(anyarray);
 
+INSERT INTO t_opconditions
+	SELECT operationid, conditiontype, operator, value FROM opconditions;
+
 UPDATE t_operations
 	SET new_operationid = (operationid / 100000000000) * 100000000000 + new_operationid
 	WHERE operationid >= 100000000000;
@@ -88,9 +91,6 @@ UPDATE t_operations
 				AND (g.groupid / 100000000000000) = (t_operations.operationid / 100000000000000))
 	WHERE operationtype IN (1)	-- OPERATION_TYPE_COMMAND
 		AND is_host = 0;
-
-INSERT INTO t_opconditions
-	SELECT operationid, conditiontype, operator, value FROM opconditions;
 
 UPDATE t_operations
 	SET mediatypeid = NULL
