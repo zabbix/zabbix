@@ -32,7 +32,7 @@ include_once('include/page_header.php');
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'year'=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	NULL,						NULL),
-		'period'=>		array(T_ZBX_STR, O_OPT,	P_SYS|P_NZERO,	IN('"dayly","weekly","monthly","yearly"'),	NULL),
+		'period'=>		array(T_ZBX_STR, O_OPT,	P_SYS|P_NZERO,	IN('"daily","weekly","monthly","yearly"'),	NULL),
 		'media_type'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,							NULL)
 	);
 
@@ -42,9 +42,6 @@ include_once('include/page_header.php');
 	$year		= get_request('year', 		intval(date('Y')));
 	$period		= get_request('period',		'weekly');
 	$media_type	= get_request('media_type',	0);
-?>
-<?php
-
 ?>
 <?php
 	$_REQUEST['year']	= $year;
@@ -192,7 +189,7 @@ include_once('include/page_header.php');
 				$options['mediatypeids'] = $media_type;
 			}
 
-			//getting data throung API
+			//getting data through API
 			$alert_info = API::Alert()->get($options);
 
 			//counting alert count for each user and media type
