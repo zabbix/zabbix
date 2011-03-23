@@ -71,37 +71,19 @@
 
 #else /* not _WINDOWS */
 
-	#define MAX_CPU_HISTORY (15 * SEC_PER_MIN)
-
 	typedef struct
 	{
 		/* private */
-		int		clock[MAX_CPU_HISTORY];
-		zbx_uint64_t	h_user[MAX_CPU_HISTORY];
-		zbx_uint64_t	h_system[MAX_CPU_HISTORY];
-		zbx_uint64_t	h_nice[MAX_CPU_HISTORY];
-		zbx_uint64_t	h_idle[MAX_CPU_HISTORY];
-		zbx_uint64_t	h_interrupt[MAX_CPU_HISTORY];
-		zbx_uint64_t	h_iowait[MAX_CPU_HISTORY];
-		zbx_uint64_t	h_softirq[MAX_CPU_HISTORY];
-		zbx_uint64_t	h_steal[MAX_CPU_HISTORY];
-
-		/* public */
-		double	user[ZBX_AVGMAX];
-		double	system[ZBX_AVGMAX];
-		double	nice[ZBX_AVGMAX];
-		double	idle[ZBX_AVGMAX];
-		double	interrupt[ZBX_AVGMAX];
-		double	iowait[ZBX_AVGMAX];
-		double	softirq[ZBX_AVGMAX];
-		double	steal[ZBX_AVGMAX];
+		zbx_uint64_t	h_counter[ZBX_CPU_STATE_COUNT][MAX_COLLECTOR_HISTORY];
+		int		h_first;
+		int		h_count;
 	}
 	ZBX_SINGLE_CPU_STAT_DATA;
 
 	typedef struct
 	{
-		int	count;
-		ZBX_SINGLE_CPU_STAT_DATA *cpu; /* count + 1 */
+		ZBX_SINGLE_CPU_STAT_DATA	*cpu;
+		int				count;
 	}
 	ZBX_CPUS_STAT_DATA;
 
@@ -110,7 +92,10 @@
 #endif /* _WINDOWS */
 
 int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus);
-void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus);
 void	close_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus);
+void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus);
+#ifndef _WINDOWS
+int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode);
+#endif /* not _WINDOWS */
 
 #endif
