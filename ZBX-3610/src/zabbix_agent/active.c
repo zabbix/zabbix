@@ -450,8 +450,7 @@ static int	send_buffer(const char *host, unsigned short port)
 	int				ret = SUCCEED, i, now;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' port:%d values:%d/%d",
-			__function_name, host, port, buffer.count,
-			CONFIG_BUFFER_SIZE);
+			__function_name, host, port, buffer.count, CONFIG_BUFFER_SIZE);
 
 	if (0 == buffer.count)
 		goto ret;
@@ -459,7 +458,7 @@ static int	send_buffer(const char *host, unsigned short port)
 	now = (int)time(NULL);
 
 	if (CONFIG_BUFFER_SIZE / 2 > buffer.pcount && CONFIG_BUFFER_SIZE > buffer.count &&
-			CONFIG_BUFFER_SEND < now - buffer.lastsent)
+			CONFIG_BUFFER_SEND > now - buffer.lastsent)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Will not send now. Now %d lastsent %d < %d",
 				now, buffer.lastsent, CONFIG_BUFFER_SEND);
@@ -508,7 +507,7 @@ static int	send_buffer(const char *host, unsigned short port)
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "JSON back [%s]", buf);
 
-				if (NULL != buf || SUCCEED != check_response(buf))
+				if (NULL == buf || SUCCEED != check_response(buf))
 					zabbix_log(LOG_LEVEL_DEBUG, "NOT OK");
 				else
 					zabbix_log(LOG_LEVEL_DEBUG, "OK");
@@ -542,7 +541,6 @@ static int	send_buffer(const char *host, unsigned short port)
 		buffer.pcount = 0;
 		buffer.lastsent = now;
 	}
-
 ret:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -1095,6 +1093,9 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 			zbx_setproctitle("poller [processing active checks]");
 
 			process_active_checks(activechk_args.host, activechk_args.port);
+			if (CONFIG_BUFFER_SIZE / 2 <= buffer.pcount) /* failed to complete processing active checks */
+				continue;
+
 			nextcheck = get_min_nextcheck();
 			if (FAIL == nextcheck)
 				nextcheck = (int)time(NULL) + 60;
