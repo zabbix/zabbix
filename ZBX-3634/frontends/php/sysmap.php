@@ -172,7 +172,7 @@ include_once('include/page_header.php');
 							'grid_size' => $_REQUEST['grid_size'],
 							'grid_show' => $_REQUEST['grid_show'],
 							'grid_align' => $_REQUEST['grid_align'],
-							'links' => $links = $json->decode(get_request('links', '[]'), true),
+							'links' => $json->decode(get_request('links', '[]'), true),
 							'selements' => $json->decode(get_request('selements', '[]'), true)
 						);
 						$result = API::Map()->update($sysmap_to_update);
