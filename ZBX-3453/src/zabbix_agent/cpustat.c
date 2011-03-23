@@ -280,7 +280,7 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 		if ('0' <= line[3] && line[3] < '9')
 		{
 			cpu_num = atoi(line + 3) + 1;
-			if (1 >= cpu_num || cpu_num > pcpus->count)
+			if (1 > cpu_num || cpu_num > pcpus->count)
 				continue;
 		}
 		else if (' ' <= line[3])
@@ -303,7 +303,7 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 
 #elif defined(HAVE_SYS_PSTAT_H)
 
-	for (cpu_num = 0; cpu_num < pcpus->count; cpu_num++)
+	for (cpu_num = 0; cpu_num <= pcpus->count; cpu_num++)
 	{
 		memset(counter, 0, sizeof(counter));
 
@@ -360,7 +360,7 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 
 	memset(total, 0, sizeof(total));
 
-	for (cpu_num = 1; cpu_num < pcpus->count; cpu_num++)
+	for (cpu_num = 1; cpu_num <= pcpus->count; cpu_num++)
 	{
 		if (NULL == (k = kstat_lookup(kc, "cpu_stat", cpu_num - 1, NULL)))
 		{
@@ -392,7 +392,7 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 #elif defined(HAVE_FUNCTION_SYSCTL_KERN_CPTIME)
 	/* OpenBSD 4.3 */
 
-	for (cpu_num = 0; cpu_num < pcpus->count; cpu_num++)
+	for (cpu_num = 0; cpu_num <= pcpus->count; cpu_num++)
 	{
 		memset(counter, 0, sizeof(counter));
 
@@ -442,7 +442,7 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 #elif defined(HAVE_LIBPERFSTAT)
 	/* AIX 6.1 */
 
-	for (cpu_num = 0; cpu_num < pcpus->count; cpu_num++)
+	for (cpu_num = 0; cpu_num <= pcpus->count; cpu_num++)
 	{
 		if (0 == cpu_num)
 		{
