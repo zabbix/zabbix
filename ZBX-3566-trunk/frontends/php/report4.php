@@ -177,22 +177,22 @@ include_once('include/page_header.php');
 
 			$table_row = array(format_time($start),format_time2($end));
 
-			//getting all alerts in this period of time
+			// getting all alerts in this period of time
 			$options = array(
 				'output'=> array('mediatypeid', 'userid'),
 				'time_from'=>$start,
 				'time_till'=>$end
 			);
 
-			//if we must get only specific media type, no need to select the other ones
+			// if we must get only specific media type, no need to select the other ones
 			if ($media_type > 0){
 				$options['mediatypeids'] = $media_type;
 			}
 
-			//getting data through API
+			// getting data through API
 			$alert_info = API::Alert()->get($options);
 
-			//counting alert count for each user and media type
+			// counting alert count for each user and media type
 			$summary = array();
 			foreach($users as $userid => $alias){
 				$summary[$userid] = array();
