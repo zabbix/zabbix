@@ -1398,6 +1398,7 @@ COpt::memoryPick();
 			DB::delete('optemplate', array('operationid' => $optemplateDeleteByOpId));
 
 		DB::insert('opmessage', $opmessageCreate, false);
+		DB::insert('opcommand', $opcommandCreate, false);
 
 		DB::insert('opmessage_grp', $opmessage_grpCreate);
 		DB::insert('opmessage_usr', $opmessage_usrCreate);
