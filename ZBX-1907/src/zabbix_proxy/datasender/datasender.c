@@ -84,10 +84,11 @@ static void	host_availability_sender(struct zbx_json *j)
  ******************************************************************************/
 static void	history_sender(struct zbx_json *j, int *records)
 {
+	const char	*__function_name = "history_sender";
 	zbx_sock_t	sock;
 	zbx_uint64_t	lastid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In history_sender()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_json_clean(j);
 	zbx_json_addstring(j, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_HISTORY_DATA, ZBX_JSON_TYPE_STRING);
@@ -115,6 +116,8 @@ static void	history_sender(struct zbx_json *j, int *records)
 
 		disconnect_server(&sock);
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -134,10 +137,12 @@ static void	history_sender(struct zbx_json *j, int *records)
  ******************************************************************************/
 static void	dhistory_sender(struct zbx_json *j, int *records)
 {
+	const char	*__function_name = "dhistory_sender";
+
 	zbx_sock_t	sock;
 	zbx_uint64_t	lastid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In dhistory_sender()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_json_clean(j);
 	zbx_json_addstring(j, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_DISCOVERY_DATA, ZBX_JSON_TYPE_STRING);
@@ -165,6 +170,8 @@ static void	dhistory_sender(struct zbx_json *j, int *records)
 
 		disconnect_server(&sock);
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -184,10 +191,11 @@ static void	dhistory_sender(struct zbx_json *j, int *records)
  ******************************************************************************/
 static void	autoreg_host_sender(struct zbx_json *j, int *records)
 {
+	const char	*__function_name = "autoreg_host_sender";
 	zbx_sock_t	sock;
 	zbx_uint64_t	lastid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In autoreg_host_sender()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_json_clean(j);
 	zbx_json_addstring(j, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_AUTO_REGISTRATION_DATA, ZBX_JSON_TYPE_STRING);
@@ -215,6 +223,8 @@ static void	autoreg_host_sender(struct zbx_json *j, int *records)
 
 		disconnect_server(&sock);
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -262,26 +272,23 @@ retry_history:
 		history_sender(&j, &r);
 		records += r;
 
-		if (r == ZBX_MAX_HRECORDS)
+		if (ZBX_MAX_HRECORDS == r)
 			goto retry_history;
-
 retry_dhistory:
 		dhistory_sender(&j, &r);
 		records += r;
 
-		if (r == ZBX_MAX_HRECORDS)
+		if (ZBX_MAX_HRECORDS == r)
 			goto retry_dhistory;
-
 retry_autoreg_host:
 		autoreg_host_sender(&j, &r);
 		records += r;
 
-		if (r == ZBX_MAX_HRECORDS)
+		if (ZBX_MAX_HRECORDS == r)
 			goto retry_autoreg_host;
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Datasender spent " ZBX_FS_DBL " seconds while processing %3d values.",
-				zbx_time() - sec,
-				records);
+				zbx_time() - sec, records);
 
 		zbx_sleep_loop(CONFIG_PROXYDATA_FREQUENCY);
 	}
