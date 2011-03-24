@@ -550,7 +550,7 @@ COpt::memoryPick();
 				throw new Exception(_s('No icon for map element "%s"', $selement['label']));
 			}
 
-			if($this->checkCircleSelementsLink($dbSelement['sysmapid'],$dbSelement['elementid'],$dbSelement['elementtype'])){
+			if($this->checkCircleSelementsLink($dbSelement['sysmapid'], $dbSelement['elementid'], $dbSelement['elementtype'])){
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_CIRCULAR_LINK_CANNOT_BE_CREATED.' "'.$dbSelement['label'].'"');
 			}
 		}
@@ -595,7 +595,7 @@ COpt::memoryPick();
 			}
 
 			if($update || $delete){
-				if(!isset($dblinks[$link['linkid']]))
+				if(!isset($dbLinks[$link['linkid']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 
 				$dblink = array_merge($dbLinks[$link['linkid']], $link);
@@ -606,24 +606,25 @@ COpt::memoryPick();
 		}
 		unset($link);
 
-		return ($update || $delete) ? $dblinks : true;
+		return ($update || $delete) ? $dbLinks : true;
 	}
 
-	public function checkCircleSelementsLink($sysmapid,$elementid,$elementtype){
-		if($elementtype!=SYSMAP_ELEMENT_TYPE_MAP) return false;
+	public function checkCircleSelementsLink($sysmapid, $elementid, $elementtype){
+		if($elementtype != SYSMAP_ELEMENT_TYPE_MAP) return false;
 
-		if(bccomp($sysmapid ,$elementid)==0)	return TRUE;
+		if(bccomp($sysmapid, $elementid) ==0 ) return true;
 
 		$dbElements = DBselect('SELECT elementid, elementtype '.
 						' FROM sysmaps_elements '.
 						' WHERE sysmapid='.$elementid);
 
 		while($element = DBfetch($dbElements)){
-			if($this->checkCircleSelementsLink($sysmapid,$element['elementid'],$element['elementtype']))
-				return TRUE;
+			if($this->checkCircleSelementsLink($sysmapid, $element['elementid'], $element['elementtype']))
+				return true;
 		}
 		return false;
 	}
+
 /**
  * Add Element to Sysmap
  *
@@ -705,17 +706,17 @@ COpt::memoryPick();
 			foreach($diffUrls['both'] as $unum => $updUrl)
 				$urlsToUpdate[] = array(
 					'values' => $updUrl,
-					'where' => array('selementid='.zbx_dbstr($selement['selementid']),'name='.zbx_dbstr($updUrl['name']) )
+					'where' => array('selementid='.zbx_dbstr($selement['selementid']),'name='.zbx_dbstr($updUrl['name']))
 				);
 
 // delete url
-			$urlsToDelete[] = array('selementid'.$selement['selementid'], DBcondition('name', zbx_objectValues($diffUrls['second'],'name'))) ;
+			$urlsToDelete = array_merge($urlsToDelete, zbx_objectValues($diffUrls['second'], 'sysmapelementurlid'));
 		}
 
 		DB::update('sysmaps_elements', $update);
 
 		if(!empty($urlsToDelete))
-			DB::delete('sysmap_element_url', $urlsToDelete);
+			DB::delete('sysmap_element_url', array('sysmapelementurlid' => $urlsToDelete));
 
 		if(!empty($urlsToUpdate))
 			DB::update('sysmap_element_url', $urlsToUpdate);

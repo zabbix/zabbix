@@ -803,12 +803,12 @@ COpt::memoryPick();
 					);
 				}
 
-				foreach($urlDiff['second'] as $newUrl){
+				foreach($urlDiff['first'] as $newUrl){
 					$newUrl['sysmapid'] = $map['sysmapid'];
 					$urlsToAdd[] = $newUrl;
 				}
 
-				$urlidsToDelete = array_merge($urlidsToDelete, zbx_objectValues($urlDiff['first'], 'sysmapurlid'));
+				$urlidsToDelete = array_merge($urlidsToDelete, zbx_objectValues($urlDiff['second'], 'sysmapurlid'));
 			}
 
 // Elements
