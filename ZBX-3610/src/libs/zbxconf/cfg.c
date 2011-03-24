@@ -21,13 +21,13 @@
 #include "cfg.h"
 #include "log.h"
 
-char	*CONFIG_FILE			= NULL;
-int	CONFIG_ZABBIX_FORKS		= 3;
+char	*CONFIG_FILE		= NULL;
+int	CONFIG_ZABBIX_FORKS	= 3;
 
-char	*CONFIG_LOG_FILE		= NULL;
-int	CONFIG_LOG_FILE_SIZE		= 1;
-char	CONFIG_ALLOW_ROOT		= 0;
-int	CONFIG_TIMEOUT			= 3;
+char	*CONFIG_LOG_FILE	= NULL;
+int	CONFIG_LOG_FILE_SIZE	= 1;
+char	CONFIG_ALLOW_ROOT	= 0;
+int	CONFIG_TIMEOUT		= 3;
 
 static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level, int optional);
 
@@ -42,7 +42,8 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 	char		*incl_file = NULL;
 	int		result = SUCCEED;
 
-	if (stat(cfg_file, &sb) == -1) {
+	if (-1 == stat(cfg_file, &sb))
+	{
 		zbx_error("%s: %s\n", cfg_file, strerror(errno));
 		return FAIL;
 	}
@@ -50,25 +51,29 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 	if (!S_ISDIR(sb.st_mode))
 		return __parse_cfg_file(cfg_file, cfg, level, 0);
 
-	if (NULL == (dir = opendir(cfg_file))) {
+	if (NULL == (dir = opendir(cfg_file)))
+	{
 		zbx_error("%s: %s\n", cfg_file, strerror(errno));
 		return FAIL;
 	}
 
-	while (NULL != (d = readdir(dir))) {
+	while (NULL != (d = readdir(dir)))
+	{
 		incl_file = zbx_dsprintf(incl_file, "%s/%s", cfg_file, d->d_name);
 
-		if (stat(incl_file, &sb) == -1 || !S_ISREG(sb.st_mode))
+		if (-1 == stat(incl_file, &sb) || !S_ISREG(sb.st_mode))
 			continue;
 
-		if (__parse_cfg_file(incl_file, cfg, level, 0) == FAIL) {
+		if (FAIL == __parse_cfg_file(incl_file, cfg, level, 0))
+		{
 			result = FAIL;
 			break;
 		}
 	}
 	zbx_free(incl_file);
 
-	if (closedir(dir) == -1) {
+	if (-1 == closedir(dir))
+	{
 		zbx_error("%s: %s\n", cfg_file, strerror(errno));
 		return FAIL;
 	}
@@ -89,160 +94,148 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
  * Return value: SUCCEED - parsed successfully                                *
  *               FAIL - error processing config file                          *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *         Eugene Grigorjev                                                   *
+ * Author: Alexei Vladishev, Eugene Grigorjev                                 *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level, int optional)
 {
-	FILE	*file;
+#define ZBX_MAX_INCLUDE_LEVEL	10
 
-#define ZBX_MAX_INCLUDE_LEVEL 10
+#define ZBX_CFG_LTRIM_CHARS	"\t "
+#define ZBX_CFG_RTRIM_CHARS	ZBX_CFG_LTRIM_CHARS "\r\n"
 
-#define ZBX_CFG_LTRIM_CHARS "\t "
-#define ZBX_CFG_RTRIM_CHARS ZBX_CFG_LTRIM_CHARS "\r\n"
-
-	register int
-		i, lineno;
-
-	char
-		line[MAX_STRING_LEN],
-		*parameter,
-		*value;
-
+	FILE		*file;
+	int		i, lineno, result = SUCCEED;
+	char		line[MAX_STRING_LEN], *parameter, *value;
 	zbx_uint64_t	var;
-
-	int	result = SUCCEED;
 
 	assert(cfg);
 
 	if (++level > ZBX_MAX_INCLUDE_LEVEL)
 	{
-		zbx_error("Recursion detected! Skipped processing of '%s'", cfg_file);
+		zbx_error("Recursion detected! Skipped processing of '%s'.", cfg_file);
 		return FAIL;
 	}
 
-	if (cfg_file)
+	if (NULL != cfg_file)
 	{
-		if (NULL == (file = fopen(cfg_file,"r")))
+		if (NULL == (file = fopen(cfg_file, "r")))
+			goto cannot_open;
+
+		for (lineno = 1; NULL != fgets(line, sizeof(line), file); lineno++)
 		{
-			goto lbl_cannot_open;
-		}
-		else
-		{
-			for(lineno = 1; fgets(line,MAX_STRING_LEN,file) != NULL; lineno++)
+			zbx_ltrim(line, ZBX_CFG_LTRIM_CHARS);
+
+			if ('#' == *line)
+				continue;
+			if (strlen(line) < 3)
+				continue;
+
+			parameter = line;
+			value = strstr(line, "=");
+
+			if (NULL == value)
 			{
-				zbx_ltrim(line, ZBX_CFG_LTRIM_CHARS);
+				zbx_error("error in line [%d] \"%s\"", lineno, line);
+				result = FAIL;
+				break;
+			}
 
-				if(line[0]=='#')	continue;
-				if(strlen(line) < 3)	continue;
+			*value++ = '\0';
 
-				parameter	= line;
+			zbx_rtrim(parameter, ZBX_CFG_RTRIM_CHARS);
 
-				value		= strstr(line,"=");
-				if(NULL == value)
+			zbx_ltrim(value, ZBX_CFG_LTRIM_CHARS);
+			zbx_rtrim(value, ZBX_CFG_RTRIM_CHARS);
+
+			zabbix_log(LOG_LEVEL_DEBUG, "cfg: para: [%s] val [%s]", parameter, value);
+
+			if (0 == strcmp(parameter, "Include"))
+			{
+				if (FAIL == (result = parse_cfg_object(value, cfg, level)))
+					break;
+			}
+
+			for (i = 0; '\0' != value[i]; i++)
+			{
+				if ('\n' == value[i])
 				{
-					zbx_error("Error in line [%d] \"%s\"", lineno, line);
-					result = FAIL;
+					value[i] = '\0';
 					break;
 				}
-
-				*value = '\0';
-				value++;
-
-				zbx_rtrim(parameter, ZBX_CFG_RTRIM_CHARS);
-
-				zbx_ltrim(value, ZBX_CFG_LTRIM_CHARS);
-				zbx_rtrim(value, ZBX_CFG_RTRIM_CHARS);
-
-				zabbix_log(LOG_LEVEL_DEBUG, "cfg: para: [%s] val [%s]", parameter, value);
-
-				if(strcmp(parameter, "Include") == 0)
-				{
-					if (FAIL == (result = parse_cfg_object(value, cfg, level)))
-						break;
-				}
-
-				for(i = 0; value[i] != '\0'; i++)
-				{
-					if(value[i] == '\n')
-					{
-						value[i] = '\0';
-						break;
-					}
-				}
-
-
-				for(i = 0; cfg[i].parameter != 0; i++)
-				{
-					if(strcmp(cfg[i].parameter, parameter))
-						continue;
-
-					zabbix_log(LOG_LEVEL_DEBUG, "Accepted configuration parameter: '%s' = '%s'",parameter, value);
-
-					if(cfg[i].function != 0)
-					{
-						if(cfg[i].function(value) != SUCCEED)
-							goto lbl_incorrect_config;
-					}
-					else if(TYPE_INT == cfg[i].type)
-					{
-						if (FAIL == str2uint64(value, &var))
-							goto lbl_incorrect_config;
-
-						if ( (cfg[i].min && var < cfg[i].min) ||
-							(cfg[i].max && var > cfg[i].max) )
-								goto lbl_incorrect_config;
-
-						*((int*)cfg[i].variable) = var;
-					}
-					else
-					{
-						*((char **)cfg[i].variable) = strdup(value);
-					}
-				}
 			}
-			fclose(file);
+
+			for (i = 0; NULL != cfg[i].parameter; i++)
+			{
+				if (0 != strcmp(cfg[i].parameter, parameter))
+					continue;
+
+				zabbix_log(LOG_LEVEL_DEBUG, "accepted configuration parameter: '%s' = '%s'",parameter, value);
+
+				if (NULL != cfg[i].function)
+				{
+					if (SUCCEED != cfg[i].function(value))
+						goto incorrect_config;
+				}
+				else if (TYPE_INT == cfg[i].type)
+				{
+					if (FAIL == str2uint64(value, &var))
+						goto incorrect_config;
+
+					if ((cfg[i].min && var < cfg[i].min) || (cfg[i].max && var > cfg[i].max))
+						goto incorrect_config;
+
+					*((int *)cfg[i].variable) = var;
+				}
+				else if (TYPE_STRING == cfg[i].type)
+				{
+					*((char **)cfg[i].variable) = strdup(value);
+				}
+				else
+					assert(0);
+			}
 		}
+		fclose(file);
 	}
 
-	if (1 != level)	/* skip mandatory parameters check  for included files */
+	if (1 != level)	/* skip mandatory parameters check for included files */
 		return result;
 
-	/* Check for mandatory parameters */
-	for(i = 0; cfg[i].parameter != 0; i++)
+	for (i = 0; NULL != cfg[i].parameter; i++) /* check for mandatory parameters */
 	{
-		if(PARM_MAND != cfg[i].mandatory)
+		if (PARM_MAND != cfg[i].mandatory)
 			continue;
 
-		if(TYPE_INT == cfg[i].type)
+		if (TYPE_INT == cfg[i].type)
 		{
-			if(*((int*)cfg[i].variable) == 0)
-				goto lbl_missing_mandatory;
+			if (0 == *((int *)cfg[i].variable))
+				goto missing_mandatory;
 		}
-		else if(TYPE_STRING == cfg[i].type)
+		else if (TYPE_STRING == cfg[i].type)
 		{
-			if((*(char **)cfg[i].variable) == NULL)
-				goto lbl_missing_mandatory;
+			if (NULL == (*(char **)cfg[i].variable))
+				goto missing_mandatory;
 		}
+		else
+			assert(0);
 	}
 
 	return result;
 
-lbl_cannot_open:
+cannot_open:
 	if (optional)
 		return result;
-	zbx_error("Cannot open config file [%s] [%s].",cfg_file,strerror(errno));
+	zbx_error("cannot open config file [%s] [%s]", cfg_file, strerror(errno));
 	exit(1);
 
-lbl_missing_mandatory:
-	zbx_error("Missing mandatory parameter [%s].", cfg[i].parameter);
+missing_mandatory:
+	zbx_error("missing mandatory parameter [%s]", cfg[i].parameter);
 	exit(1);
 
-lbl_incorrect_config:
-	zbx_error("Wrong value for [%s] in line %d.", cfg[i].parameter, lineno);
+incorrect_config:
+	zbx_error("wrong value for [%s] in line %d", cfg[i].parameter, lineno);
 	exit(1);
 }
 
