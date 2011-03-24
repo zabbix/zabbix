@@ -12,6 +12,7 @@ New features:
 Bug fixes:
  - [ZBX-3623] fixed processing of nanoseconds for history data (Sasha)
  - [ZBX-3634] imporved zabbix map API methods (Aly)
+ - [ZBX-3579] fixed trigger popup menu in status of triggers (Vemdak)
  
 --------------------------------------------------------------------------------
 Changes for 1.9.2
