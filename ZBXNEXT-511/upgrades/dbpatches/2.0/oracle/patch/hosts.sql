@@ -46,6 +46,7 @@ INSERT INTO interface (interfaceid,hostid,main,type,ip,dns,useip,port)
 
 ---- Patching table `items`
 
+ALTER TABLE items RENAME COLUMN description to name;
 ALTER TABLE items MODIFY itemid DEFAULT NULL;
 ALTER TABLE items MODIFY hostid DEFAULT NULL;
 ALTER TABLE items MODIFY units nvarchar2(255);
@@ -58,6 +59,7 @@ ALTER TABLE items ADD flags number(10) DEFAULT '0' NOT NULL;
 ALTER TABLE items ADD filter nvarchar2(255) DEFAULT '';
 ALTER TABLE items ADD interfaceid number(20) NULL;
 ALTER TABLE items ADD port nvarchar2(64) DEFAULT '';
+ALTER TABLE items ADD description nclob DEFAULT '';
 
 UPDATE items SET templateid=NULL WHERE templateid=0;
 UPDATE items SET templateid=NULL WHERE templateid IS NOT NULL AND templateid NOT IN (SELECT itemid FROM items);
