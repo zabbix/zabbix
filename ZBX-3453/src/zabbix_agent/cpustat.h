@@ -47,8 +47,8 @@
 
 	typedef struct
 	{
-		int	count;
-		ZBX_SINGLE_CPU_STAT_DATA *cpu; /* count + 1 */
+		ZBX_SINGLE_CPU_STAT_DATA	*cpu;
+		int				count;
 
 		double	load1;
 		double	load5;
@@ -73,7 +73,6 @@
 
 	typedef struct
 	{
-		/* private */
 		zbx_uint64_t	h_counter[ZBX_CPU_STATE_COUNT][MAX_COLLECTOR_HISTORY];
 		int		h_first;
 		int		h_count;

@@ -135,7 +135,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&cpustats_lock, ZBX_MUTEX_CPUSTATS))
 	{
-		zbx_error("Unable to create mutex for cpu collector");
+		zbx_error("unable to create mutex for cpu collector");
 		exit(FAIL);
 	}
 
@@ -316,8 +316,6 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 			counter[ZBX_CPU_STATE_NICE] = (zbx_uint64_t)psd.psd_cpu_time[CP_NICE];
 			counter[ZBX_CPU_STATE_SYSTEM] = (zbx_uint64_t)psd.psd_cpu_time[CP_SYS];
 			counter[ZBX_CPU_STATE_IDLE] = (zbx_uint64_t)psd.psd_cpu_time[CP_IDLE];
-
-			update_cpu_counters(&pcpus->cpu[cpu_num], counter);
 		}
 		else
 		{
@@ -328,9 +326,9 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 			counter[ZBX_CPU_STATE_NICE] = (zbx_uint64_t)psp.psp_cpu_time[CP_NICE];
 			counter[ZBX_CPU_STATE_SYSTEM] = (zbx_uint64_t)psp.psp_cpu_time[CP_SYS];
 			counter[ZBX_CPU_STATE_IDLE] = (zbx_uint64_t)psp.psp_cpu_time[CP_IDLE];
-
-			update_cpu_counters(&pcpus->cpu[cpu_num], counter);
 		}
+
+		update_cpu_counters(&pcpus->cpu[cpu_num], counter);
 	}
 
 #elif defined(HAVE_FUNCTION_SYSCTLBYNAME) && defined(CPUSTATES)
@@ -413,8 +411,6 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 			counter[ZBX_CPU_STATE_SYSTEM] = (zbx_uint64_t)all_states[CP_SYS];
 			counter[ZBX_CPU_STATE_INTERRUPT] = (zbx_uint64_t)all_states[CP_INTR];
 			counter[ZBX_CPU_STATE_IDLE] = (zbx_uint64_t)all_states[CP_IDLE];
-
-			update_cpu_counters(&pcpus->cpu[cpu_num], counter);
 		}
 		else
 		{
@@ -434,9 +430,9 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 			counter[ZBX_CPU_STATE_SYSTEM] = (zbx_uint64_t)one_states[CP_SYS];
 			counter[ZBX_CPU_STATE_INTERRUPT] = (zbx_uint64_t)one_states[CP_INTR];
 			counter[ZBX_CPU_STATE_IDLE] = (zbx_uint64_t)one_states[CP_IDLE];
-
-			update_cpu_counters(&pcpus->cpu[cpu_num], counter);
 		}
+
+		update_cpu_counters(&pcpus->cpu[cpu_num], counter);
 	}
 
 #elif defined(HAVE_LIBPERFSTAT)
@@ -444,19 +440,17 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 
 	for (cpu_num = 0; cpu_num <= pcpus->count; cpu_num++)
 	{
+		memset(counter, 0, sizeof(counter));
+
 		if (0 == cpu_num)
 		{
 			if (-1 == perfstat_cpu_total(NULL, &ps_cpu_total, sizeof(ps_cpu_total), 1))
 				return;
 
-			memset(counter, 0, sizeof(counter));
-
 			counter[ZBX_CPU_STATE_USER] = (zbx_uint64_t)ps_cpu_total.user;
 			counter[ZBX_CPU_STATE_SYSTEM] = (zbx_uint64_t)ps_cpu_total.sys;
 			counter[ZBX_CPU_STATE_IDLE] = (zbx_uint64_t)ps_cpu_total.idle;
 			counter[ZBX_CPU_STATE_IOWAIT] = (zbx_uint64_t)ps_cpu_total.wait;
-
-			update_cpu_counters(&pcpus->cpu[cpu_num], counter);
 		}
 		else
 		{
@@ -465,15 +459,13 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 			if (-1 == perfstat_cpu(&ps_id, &ps_cpu, sizeof(ps_cpu), 1))
 				return;
 
-			memset(counter, 0, sizeof(counter));
-
 			counter[ZBX_CPU_STATE_USER] = (zbx_uint64_t)ps_cpu.user;
 			counter[ZBX_CPU_STATE_SYSTEM] = (zbx_uint64_t)ps_cpu.sys;
 			counter[ZBX_CPU_STATE_IDLE] = (zbx_uint64_t)ps_cpu.idle;
 			counter[ZBX_CPU_STATE_IOWAIT] = (zbx_uint64_t)ps_cpu.wait;
-
-			update_cpu_counters(&pcpus->cpu[cpu_num], counter);
 		}
+
+		update_cpu_counters(&pcpus->cpu[cpu_num], counter);
 	}
 
 #endif /* HAVE_LIBPERFSTAT */
