@@ -70,14 +70,8 @@
 	$sysmapList->addRow(_('Expand single problem'), new CCheckBox('expandproblem', $data['expandproblem'], null, 1));
 
 	$sysmapList->addRow(_('Advanced labels'), new CCheckBox('label_format', $data['label_format'], null, 1));
-	$labelTypes = array(
-		MAP_LABEL_TYPE_LABEL => _('Label'),
-		MAP_LABEL_TYPE_IP => _('IP address'),
-		MAP_LABEL_TYPE_NAME => _('Element name'),
-		MAP_LABEL_TYPE_STATUS => _('Status only'),
-		MAP_LABEL_TYPE_NOTHING => _('Nothing'),
-		MAP_LABEL_TYPE_CUSTOM => _('Custom label')
-	);
+	$labelTypes = sysmapElementLabel();
+
 // Advnaced Labels
 	$labelTypesLimited = $labelTypes;
 	unset($labelTypesLimited[MAP_LABEL_TYPE_IP]);
