@@ -1282,22 +1282,10 @@ Copt::memoryPick();
 
 		}
 
+		$hostNames = array();
 		foreach($hosts as $inum => &$host){
 			if(!check_db_fields($hostDBfields, $host)){
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for host "%s"', $host['host']));
-			}
-			// Check if host name isn't longer then 64 chars
-			if(!$delete && zbx_strlen($host['host']) > 64){
-				self::exception(
-					ZBX_API_ERROR_PARAMETERS,
-					_n(
-						'Maximum host name length is %2$d characters, "%3$s" is %1$d character.',
-						'Maximum host name length is %2$d characters, "%3$s" is %1$d characters.',
-						zbx_strlen($host['host']),
-						64,
-						$host['host']
-					)
-				);
 			}
 
 			if($update || $delete){
@@ -1333,30 +1321,59 @@ Copt::memoryPick();
 			}
 
 			if(isset($host['host'])){
+				// Check if host name isn't longer then 64 chars
+				if(zbx_strlen($host['host']) > 64){
+					self::exception(
+						ZBX_API_ERROR_PARAMETERS,
+						_n(
+							'Maximum host name length is %2$d characters, "%3$s" is %1$d character.',
+							'Maximum host name length is %2$d characters, "%3$s" is %1$d characters.',
+							zbx_strlen($host['host']),
+							64,
+							$host['host']
+						)
+					);
+				}
+
 				if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $host['host'])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Host name "%s"', $host['host']));
 				}
 
-				$hostsExists = $this->get(array(
-					'filter' => array('host' => $host['host'])
-				));
-				foreach($hostsExists as $exnum => $hostExists){
-					if(!$update || (bccomp($hostExists['hostid'],$host['hostid']) != 0)){
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' "'.$host['host'].'" '.S_ALREADY_EXISTS_SMALL);
-					}
-				}
+				if(isset($hostNames[$host['host']]))
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicated host name "%s" in data', $host['host']));
 
-				$templatesExists = API::Template()->get(array(
-					'filter' => array('host' => $host['host'])
-				));
-				foreach($templatesExists as $exnum => $templatesExists){
-					if(!$update || ($templatesExists['hostid'] != $host['hostid'])){
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' "'.$host['host'].'" '.S_ALREADY_EXISTS_SMALL);
-					}
-				}
+				$hostNames[$host['host']] = $update ? $host['hostid'] : 1;
 			}
 		}
 		unset($host);
+
+		if($update || $create){
+			$hostsExists = $this->get(array(
+				'output' => array('hostid', 'host'),
+				'filter' => array('host' => array_keys($hostNames)),
+				'nopermissions' => true,
+				'preservekeys' => true
+			));
+			foreach($hostsExists as $exnum => $hostExists){
+				if(!$update || (bccomp($hostExists['hostid'],$hostNames[$hostExists['host']]) != 0)){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host "%s" already exists.', $hostExists['host']));
+				}
+			}
+
+			$templatesExists = API::Template()->get(array(
+				'output' => array('hostid', 'host'),
+				'filter' => array('host' => array_keys($hostNames)),
+				'nopermissions' => true,
+				'preservekeys' => true
+			));
+			foreach($templatesExists as $exnum => $templatesExists){
+				if(!$update || (bccomp($templatesExists['templateid'],$hostNames[$templatesExists['host']]) != 0)){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template "%s" already exists.', $hostExists['host']));
+				}
+			}
+		}
+
+		return $update ? $dbHosts : $hosts;
 	}
 
 /**
@@ -1639,7 +1656,7 @@ Copt::memoryPick();
 				);
 				$host_exists = $this->get($options);
 				$host_exist = reset($host_exists);
-				if($host_exist && ($host_exist['hostid'] != $cur_host['hostid'])){
+				if($host_exist && (bccomp($host_exist['hostid'],$cur_host['hostid']) != 0)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 
@@ -1966,7 +1983,8 @@ Copt::memoryPick();
 			));
 
 // delete host from maps
-			delete_sysmaps_elements_with_hostid($hostids);
+			if(empty($hostids))
+				DB::delete('sysmaps_elements', array('elementtype' => SYSMAP_ELEMENT_TYPE_HOST, 'elementid' => $hostids));
 
 // disable actions
 // actions from conditions

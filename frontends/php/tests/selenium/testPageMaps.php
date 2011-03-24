@@ -62,17 +62,18 @@ class testPageMaps extends CWebTest{
 		$oldHashElements=DBhash($sql2);
 		$sql3="select * from sysmaps_links where sysmapid=$sysmapid order by linkid";
 		$oldHashLinks=DBhash($sql3);
-		$sql4="select * from sysmaps_link_triggers where linkid in (select linkid from sysmaps_links where sysmapid=$sysmapid) order by linktriggerid";
+		$sql4="SELECT slt.* FROM sysmaps_link_triggers slt, sysmaps_links sl WHERE slt.linkid = sl.linkid AND sl.sysmapid=$sysmapid ORDER BY slt.linktriggerid";
 		$oldHashLinkTriggers=DBhash($sql4);
 
 		$this->login('sysmaps.php');
 		$this->assertTitle('Network maps');
 		$this->click("link=$name");
 		$this->wait();
+
 		$this->button_click('sysmap_save');
-// TODO There must be a better solution
-		sleep(2);
-		$this->getConfirmation();
+
+		$this->waitForCondition("selenium.browserbot.getUserWindow().Ajax.activeRequestCount == 0", 3000);
+		$txt = $this->getConfirmation();
 
 		$this->wait();
 		$this->assertTitle('Network maps');

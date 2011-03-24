@@ -363,7 +363,7 @@ class CProxy extends CZBXAPI{
 					'filter' => array('host' => $proxy['host'])
 				));
 				foreach($proxiesExists as $exnum => $proxyExists){
-					if(!$update || ($proxyExists['proxyid'] != $proxy['proxyid'])){
+					if(!$update || (bccomp($proxyExists['proxyid'],$proxy['proxyid']) != 0)){
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host "%s" already exists.', $proxy['host']));
 					}
 				}
