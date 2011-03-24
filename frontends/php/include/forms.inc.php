@@ -2626,7 +2626,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 							' AND f.triggerid=t.triggerid';
 				$trig = DBfetch(DBselect($sql));
 
-				if($_REQUEST['triggerid'] != $trigid){
+				if(bccomp($_REQUEST['triggerid'],$trigid) != 0){
 					$caption[] = ' : ';
 					$caption[] = new CLink($trig['host'], 'triggers.php?form=update&triggerid='.$trig['triggerid'], 'highlight underline');
 				}

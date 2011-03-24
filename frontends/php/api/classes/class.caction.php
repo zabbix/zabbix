@@ -822,7 +822,7 @@ COpt::memoryPick();
 					'preservekeys' => true,
 				);
 				$action_exists = $this->get($options);
-				if(($action_exist = reset($action_exists)) && ($action_exist['actionid'] != $action['actionid'])){
+				if(($action_exist = reset($action_exists)) && (bccomp($action_exist['actionid'],$action['actionid']) != 0)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" already exists.', $action['name']));
 				}
 //----
@@ -1141,7 +1141,7 @@ COpt::memoryPick();
 							'where' => array('operationid='.$operation['operationid']),
 						);
 
-						$diff = zbx_array_diff($operationDb['opmessage_grp'], $operation['opmessage_grp'], 'usrgrpid');
+						$diff = zbx_array_diff($operation['opmessage_grp'], $operationDb['opmessage_grp'], 'usrgrpid');
 						$opmessage_grpCreate = array_merge($opmessage_grpCreate, $diff['second']);
 
 						foreach($diff['first'] as $omgrp){
@@ -1152,7 +1152,7 @@ COpt::memoryPick();
 						}
 
 
-						$diff = zbx_array_diff($operationDb['opmessage_usr'], $operation['opmessage_usr'], 'userid');
+						$diff = zbx_array_diff($operation['opmessage_usr'], $operationDb['opmessage_usr'], 'userid');
 						$opmessage_usrCreate = array_merge($opmessage_usrCreate, $diff['second']);
 						foreach($diff['first'] as $omusr){
 							DB::delete('opmessage_usr', array(
@@ -1183,7 +1183,7 @@ COpt::memoryPick();
 						$opcommand_hstCreate = array_merge($opcommand_hstCreate, $operation['opcommand_hst']);
 					}
 					else{
-						$diff = zbx_array_diff($operationDb['opcommand_grp'], $operation['opcommand_grp'], 'opcommand_grpid');
+						$diff = zbx_array_diff($operation['opcommand_grp'], $operationDb['opcommand_grp'], 'opcommand_grpid');
 						$opcommand_grpCreate = array_merge($opcommand_grpCreate, $diff['second']);
 						$opcommand_grpDelete = array_merge($opcommand_grpDelete, zbx_objectValues($diff['first'], 'opcommand_grpid'));
 						foreach($diff['both'] as $opcommand_grp){
@@ -1195,7 +1195,7 @@ COpt::memoryPick();
 							);
 						}
 
-						$diff = zbx_array_diff($operationDb['opcommand_hst'], $operation['opcommand_hst'], 'opcommand_hstid');
+						$diff = zbx_array_diff($operation['opcommand_hst'], $operationDb['opcommand_hst'], 'opcommand_hstid');
 						$opcommand_hstCreate = array_merge($opcommand_hstCreate, $diff['second']);
 						$opcommand_hstDelete = array_merge($opcommand_hstDelete, zbx_objectValues($diff['first'], 'opcommand_hstid'));
 						foreach($diff['both'] as $opcommand_hst){
@@ -1216,7 +1216,7 @@ COpt::memoryPick();
 
 					if(!isset($operationDb['opgroup'])) $operationDb['opgroup'] = array();
 
-					$diff = zbx_array_diff($operationDb['opgroup'], $operation['opgroup'], 'groupid');
+					$diff = zbx_array_diff($operation['opgroup'], $operationDb['opgroup'], 'groupid');
 					$opgroupCreate = array_merge($opgroupCreate, $diff['second']);
 					foreach($diff['first'] as $ogrp){
 						DB::delete('opgroup', array(
@@ -1232,7 +1232,7 @@ COpt::memoryPick();
 
 					if(!isset($operationDb['optemplate'])) $operationDb['optemplate'] = array();
 
-					$diff = zbx_array_diff($operationDb['optemplate'], $operation['optemplate'], 'templateid');
+					$diff = zbx_array_diff($operation['optemplate'], $operationDb['optemplate'], 'templateid');
 					$optemplateCreate = array_merge($optemplateCreate, $diff['second']);
 					foreach($diff['first'] as $otpl){
 						DB::delete('optemplate', array(
@@ -1251,7 +1251,7 @@ COpt::memoryPick();
 
 			$this->validateOperationConditions($operation['opconditions']);
 
-			$diff = zbx_array_diff($operationDb['opconditions'], $operation['opconditions'], 'opconditionid');
+			$diff = zbx_array_diff($operation['opconditions'], $operationDb['opconditions'], 'opconditionid');
 			$opconditionsCreate = array_merge($opconditionsCreate, $diff['second']);
 
 			$opconditionsidDelete = zbx_objectValues($diff['first'], 'opconditionid');
