@@ -279,7 +279,6 @@ switch($itemType) {
 			'ipmi_sensor'		=> get_request('ipmi_sensor'),
 			'data_type'		=> get_request('data_type'),
 			'applications' => $applications,
-			'flags' => ZBX_FLAG_DISCOVERY_CHILD,
 			'ruleid' => get_request('parent_discoveryid'),
 		);
 
