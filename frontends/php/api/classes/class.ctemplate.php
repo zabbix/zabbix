@@ -1147,7 +1147,8 @@ COpt::memoryPick();
 			DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid', $templateids)).' AND resourcetype='.SCREEN_RESOURCE_HOST_TRIGGERS;
 
 // delete host from maps
-			delete_sysmaps_elements_with_hostid($templateids);
+			if(empty($templateids))
+				DB::delete('sysmaps_elements', array('elementtype' => SYSMAP_ELEMENT_TYPE_HOST, 'elementid' => $templateids));
 
 // disable actions
 // actions from conditions
@@ -1337,7 +1338,7 @@ COpt::memoryPick();
 				$template_exists = $this->get($options);
 				$template_exist = reset($template_exists);
 
-				if($template_exist && ($template_exist['templateid'] != $cur_template['templateid'])){
+				if($template_exist && (bccomp($template_exist['templateid'],$cur_template['templateid']) != 0)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE . ' [ ' . $data['host'] . ' ] ' . S_ALREADY_EXISTS_SMALL);
 				}
 
