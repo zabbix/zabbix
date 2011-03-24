@@ -251,8 +251,8 @@ COpt::memoryPick();
 		if(!is_null($options['countOutput'])){
 			return $result;
 		}
-// Adding URLS
 
+// Adding URLS
 		if(!is_null($options['selectUrls']) && str_in_array($options['selectUrls'], $subselects_allowed_outputs)){
 			$sql = 'SELECT sysmapelementurlid, selementid, name, url  '.
 					' FROM sysmap_element_url '.
@@ -518,7 +518,7 @@ COpt::memoryPick();
 				'output' => API_OUTPUT_EXTEND,
 				'nopermissions' => true,
 				'preservekeys' => true,
-				'selectUrls' => true
+				'selectUrls' => API_OUTPUT_EXTEND
 			));
 		}
 		else{
@@ -695,17 +695,17 @@ COpt::memoryPick();
 
 			$diffUrls = zbx_array_diff($selement['urls'], $dbSelements[$selement['selementid']]['urls'], 'name');
 
-// Add url
+// Add
 			foreach($diffUrls['first'] as $newUrl){
 				$newUrl['selementid'] = $selement['selementid'];
 				$urlsToAdd[] = $newUrl;
 			}
 
 // update url
-			foreach($diffUrls['both'] as $unum => $new_url)
+			foreach($diffUrls['both'] as $unum => $updUrl)
 				$urlsToUpdate[] = array(
-					'values' => $new_url,
-					'where' => array('selementid='.zbx_dbstr($selement['selementid']),'name='.zbx_dbstr($new_url['name']) )
+					'values' => $updUrl,
+					'where' => array('selementid='.zbx_dbstr($selement['selementid']),'name='.zbx_dbstr($updUrl['name']) )
 				);
 
 // delete url
