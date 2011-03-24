@@ -354,7 +354,7 @@ Copt::memoryPick();
 			));
 		}
 		else{
-			$userDBfields = array('alias'=>null,'passwd'=>null,'usergrps'=>null,'user_medias'=>array());
+			$userDBfields = array('alias'=>null,'passwd'=>null,'usrgrps'=>null,'user_medias'=>array());
 		}
 
 		$alias = array();
@@ -420,7 +420,8 @@ Copt::memoryPick();
 				if(empty($user['usrgrps']))
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('User "%s" cannot be without user group.', $dbUser['alias']));
 
-				if(bccomp(self::$userData['userid'], $user['userid']) == 0){
+				// user cannot disable himself. No need to check this on creating a user.
+				if(!$create && bccomp(self::$userData['userid'], $user['userid']) == 0){
 					$usrgrps = API::UserGroup()->get(array(
 						'usrgrpids' => zbx_objectValues($user['usrgrps'], 'usrgrpid'),
 						'output' => API_OUTPUT_EXTEND,
