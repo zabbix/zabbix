@@ -226,7 +226,6 @@ switch($itemType) {
 			'privatekey' => get_request('privatekey'),
 			'params' => get_request('params'),
 			'ipmi_sensor' => get_request('ipmi_sensor'),
-			'flags' => ZBX_FLAG_DISCOVERY,
 			'filter' => $filter,
 		);
 

@@ -155,6 +155,7 @@ abstract class CItemGeneral extends CZBXAPI{
 
 				if(!isset($item['interfaceid']) && $this->itemTypeInterface($item['type'])
 					&& ($dbHosts[$item['hostid']]['status'] != HOST_STATUS_TEMPLATE)
+					&& ($fullItem['flags'] != ZBX_FLAG_DISCOVERY_CHILD)
 				){
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No interface for item.'));
 				}
@@ -201,7 +202,7 @@ abstract class CItemGeneral extends CZBXAPI{
 					}
 
 					if(isset($item['delay']) && isset($item['delay_flex'])){
-						$res = calculate_item_nextcheck(0, 0, $item['delay'], $item['delay_flex'], time());
+						$res = calculate_item_nextcheck(0, 0, $item['type'], $item['delay'], $item['delay_flex'], time());
 						if($res['delay'] == SEC_PER_YEAR && $item['type'] != ITEM_TYPE_ZABBIX_ACTIVE && $item['type'] != ITEM_TYPE_TRAPPER){
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Item will not be refreshed. Please enter a correct update interval.'));
 						}
