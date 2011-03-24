@@ -612,7 +612,7 @@ COpt::memoryPick();
 	public function checkCircleSelementsLink($sysmapid, $elementid, $elementtype){
 		if($elementtype != SYSMAP_ELEMENT_TYPE_MAP) return false;
 
-		if(bccomp($sysmapid, $elementid) ==0 ) return true;
+		if(bccomp($sysmapid, $elementid) == 0) return true;
 
 		$dbElements = DBselect('SELECT elementid, elementtype '.
 						' FROM sysmaps_elements '.
