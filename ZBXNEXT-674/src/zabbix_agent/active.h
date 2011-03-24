@@ -31,14 +31,12 @@ extern int	CONFIG_MAX_LINES_PER_SECOND;
 extern char	*CONFIG_LISTEN_IP;
 extern int	CONFIG_LISTEN_PORT;
 
-/*#define MAX_LINES_PER_SECOND	100*/	/*obsolete, configuration parameter must be used*/
-
-/*define minimal and maximal values of lines to send by agent*/
-/*per second for checks `log' and `eventlog', used to parse key parameters*/
+/* define minimal and maximal values of lines to send by agent */
+/* per second for checks `log' and `eventlog', used to parse key parameters */
 #define	MIN_VALUE_LINES	1
 #define	MAX_VALUE_LINES	1000
 
-/*Windows event types for `eventlog' check*/
+/* Windows event types for `eventlog' check */
 #if defined (_WINDOWS)
 #ifndef INFORMATION_TYPE
 #define INFORMATION_TYPE	"Information"
@@ -63,7 +61,7 @@ typedef struct zbx_active_metric_type
 	int	refresh;
 	int	nextcheck;
 	int	status;
-/* Must be long for fseek() */
+/* must be long for fseek() */
 	long	lastlogsize;
 	int	mtime;
 	unsigned char	skip_old_data;	/* for processing [event]log metrics */
