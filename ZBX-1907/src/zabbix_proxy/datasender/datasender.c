@@ -59,17 +59,9 @@ static void	host_availability_sender(struct zbx_json *j)
 
 	if (SUCCEED == get_host_availability_data(j))
 	{
-retry:
-		if (SUCCEED == connect_to_server(&sock, 600))	/* alarm !!! */
-		{
-			put_data_to_server(&sock, j);
-			disconnect_server(&sock);
-		}
-		else
-		{
-			sleep(CONFIG_PROXYDATA_FREQUENCY);
-			goto retry;
-		}
+		connect_to_server(&sock, 600, CONFIG_PROXYDATA_FREQUENCY); /* retry till have a connection */
+		put_data_to_server(&sock, j);
+		disconnect_server(&sock);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -111,25 +103,17 @@ static void	history_sender(struct zbx_json *j, int *records)
 
 	if (*records > 0)
 	{
-retry:
-		if (SUCCEED == connect_to_server(&sock, 600))	/* alarm !!! */
+		connect_to_server(&sock, 600, CONFIG_PROXYDATA_FREQUENCY); /* retry till have a connection */
+		if (SUCCEED == put_data_to_server(&sock, j))
 		{
-			if (SUCCEED == put_data_to_server(&sock, j))
-			{
-				DBbegin();
-				proxy_set_hist_lastid(lastid);
-				DBcommit();
-			}
-			else
-				*records = 0;
-
-			disconnect_server(&sock);
+			DBbegin();
+			proxy_set_hist_lastid(lastid);
+			DBcommit();
 		}
 		else
-		{
-			sleep(CONFIG_PROXYDATA_FREQUENCY);
-			goto retry;
-		}
+			*records = 0;
+
+		disconnect_server(&sock);
 	}
 }
 
@@ -169,25 +153,17 @@ static void	dhistory_sender(struct zbx_json *j, int *records)
 
 	if (*records > 0)
 	{
-retry:
-		if (SUCCEED == connect_to_server(&sock, 600))	/* alarm !!! */
+		connect_to_server(&sock, 600, CONFIG_PROXYDATA_FREQUENCY); /* retry till have a connection */
+		if (SUCCEED == put_data_to_server(&sock, j))
 		{
-			if (SUCCEED == put_data_to_server(&sock, j))
-			{
-				DBbegin();
-				proxy_set_dhis_lastid(lastid);
-				DBcommit();
-			}
-			else
-				*records = 0;
-
-			disconnect_server(&sock);
+			DBbegin();
+			proxy_set_dhis_lastid(lastid);
+			DBcommit();
 		}
 		else
-		{
-			sleep(CONFIG_PROXYDATA_FREQUENCY);
-			goto retry;
-		}
+			*records = 0;
+
+		disconnect_server(&sock);
 	}
 }
 
@@ -227,25 +203,17 @@ static void	autoreg_host_sender(struct zbx_json *j, int *records)
 
 	if (*records > 0)
 	{
-retry:
-		if (SUCCEED == connect_to_server(&sock, 600))	/* alarm !!! */
+		connect_to_server(&sock, 600, CONFIG_PROXYDATA_FREQUENCY); /* retry till have a connection */
+		if (SUCCEED == put_data_to_server(&sock, j))
 		{
-			if (SUCCEED == put_data_to_server(&sock, j))
-			{
-				DBbegin();
-				proxy_set_areg_lastid(lastid);
-				DBcommit();
-			}
-			else
-				*records = 0;
-
-			disconnect_server(&sock);
+			DBbegin();
+			proxy_set_areg_lastid(lastid);
+			DBcommit();
 		}
 		else
-		{
-			sleep(CONFIG_PROXYDATA_FREQUENCY);
-			goto retry;
-		}
+			*records = 0;
+
+		disconnect_server(&sock);
 	}
 }
 
