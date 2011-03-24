@@ -278,7 +278,7 @@ int	init_perf_collector(ZBX_PERF_STAT_DATA *pperf)
 
 /******************************************************************************
  *                                                                            *
- * Function: close_perf_collector                                             *
+ * Function: free_perf_collector                                              *
  *                                                                            *
  * Purpose: Clear state of data calculation                                   *
  *                                                                            *
@@ -291,7 +291,7 @@ int	init_perf_collector(ZBX_PERF_STAT_DATA *pperf)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	close_perf_collector()
+void	free_perf_collector()
 {
 	PERF_COUNTERS *cptr;
 

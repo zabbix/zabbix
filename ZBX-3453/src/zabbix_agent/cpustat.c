@@ -30,7 +30,7 @@
 #	define LOCK_CPUSTATS	zbx_mutex_lock(&cpustats_lock)
 #	define UNLOCK_CPUSTATS	zbx_mutex_unlock(&cpustats_lock)
 static ZBX_MUTEX	cpustats_lock;
-#endif /* _WINDOWS */
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -59,7 +59,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	PDH_COUNTER_PATH_ELEMENTS	cpe;
 	int				i;
 	DWORD				dwSize;
-#endif	/* _WINDOWS */
+#endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -131,13 +131,13 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 				strerror_from_module(status, TEXT("PDH.DLL")));
 		return 2;
 	}
-#endif /* _WINDOWS */
-
+#else	/* not _WINDOWS */
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&cpustats_lock, ZBX_MUTEX_CPUSTATS))
 	{
 		zbx_error("unable to create mutex for cpu collector");
 		exit(FAIL);
 	}
+#endif	/* _WINDOWS */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
@@ -146,7 +146,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 
 /******************************************************************************
  *                                                                            *
- * Function: close_cpu_collector                                              *
+ * Function: free_cpu_collector                                               *
  *                                                                            *
  * Purpose: Clear state of data calculation                                   *
  *                                                                            *
@@ -160,12 +160,12 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	close_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
+void	free_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 {
-	const char	*__function_name = "close_cpu_collector";
+	const char	*__function_name = "free_cpu_collector";
 #ifdef _WINDOWS
 	int		i;
-#endif	/* _WINDOWS */
+#endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -190,9 +190,9 @@ void	close_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 		PdhCloseQuery(pcpus->pdh_query);
 		pcpus->pdh_query = NULL;
 	}
-#else
+#else	/* not _WINDOWS */
 	zbx_mutex_destroy(&cpustats_lock);
-#endif	/* not _WINDOWS */
+#endif	/* _WINDOWS */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -277,13 +277,13 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 		if (0 != strncmp(line, "cpu", 3))
 			continue;
 
-		if ('0' <= line[3] && line[3] < '9')
+		if ('0' <= line[3] && line[3] <= '9')
 		{
 			cpu_num = atoi(line + 3) + 1;
 			if (1 > cpu_num || cpu_num > pcpus->count)
 				continue;
 		}
-		else if (' ' <= line[3])
+		else if (' ' == line[3])
 			cpu_num = 0;
 		else
 			continue;
@@ -379,7 +379,7 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 		total[ZBX_CPU_STATE_IDLE] += counter[ZBX_CPU_STATE_IDLE] = cpu->cpu_sysinfo.cpu[CPU_IDLE];
 		total[ZBX_CPU_STATE_USER] += counter[ZBX_CPU_STATE_USER] = cpu->cpu_sysinfo.cpu[CPU_USER];
 		total[ZBX_CPU_STATE_SYSTEM] += counter[ZBX_CPU_STATE_SYSTEM] = cpu->cpu_sysinfo.cpu[CPU_KERNEL];
-		total[ZBX_CPU_STATE_NICE] += counter[ZBX_CPU_STATE_NICE] = cpu->cpu_sysinfo.cpu[CPU_WAIT];
+		total[ZBX_CPU_STATE_IOWAIT] += counter[ZBX_CPU_STATE_IOWAIT] = cpu->cpu_sysinfo.cpu[CPU_WAIT];
 
 		update_cpu_counters(&pcpus->cpu[cpu_num], counter);
 	}
@@ -468,12 +468,12 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 		update_cpu_counters(&pcpus->cpu[cpu_num], counter);
 	}
 
-#endif /* HAVE_LIBPERFSTAT */
+#endif	/* HAVE_LIBPERFSTAT */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-#endif /* not _WINDOWS */
+#endif	/* not _WINDOWS */
 
 void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
 {
@@ -562,18 +562,18 @@ void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
 	
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
-#else /* not _WINDOWS */
+#else	/* not _WINDOWS */
 
 	update_cpustats(pcpus);
 
-#endif /* _WINDOWS */
+#endif	/* _WINDOWS */
 }
 
 #ifndef _WINDOWS
 
 int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode)
 {
-	int				i, time, idx_curr, idx_avg;
+	int				i, time, idx_curr, idx_base;
 	zbx_uint64_t			counter, total = 0;
 	ZBX_SINGLE_CPU_STAT_DATA	*cpu;
 
@@ -617,8 +617,8 @@ int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode)
 	if (MAX_COLLECTOR_HISTORY <= (idx_curr = (cpu->h_first + cpu->h_count - 1)))
 		idx_curr -= MAX_COLLECTOR_HISTORY;
 
-	if (0 > (idx_avg = idx_curr - MIN(cpu->h_count - 1, time)))
-		idx_avg += MAX_COLLECTOR_HISTORY;
+	if (0 > (idx_base = idx_curr - MIN(cpu->h_count - 1, time)))
+		idx_base += MAX_COLLECTOR_HISTORY;
 
 	if (1 == cpu->h_count)
 	{
@@ -629,8 +629,8 @@ int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode)
 	else
 	{
 		for (i = 0; i < ZBX_CPU_STATE_COUNT; i++)
-			total += cpu->h_counter[i][idx_curr] - cpu->h_counter[i][idx_avg];
-		counter = cpu->h_counter[state][idx_curr] - cpu->h_counter[state][idx_avg];
+			total += cpu->h_counter[i][idx_curr] - cpu->h_counter[i][idx_base];
+		counter = cpu->h_counter[state][idx_curr] - cpu->h_counter[state][idx_base];
 	}
 
 	UNLOCK_CPUSTATS;
@@ -640,4 +640,4 @@ int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode)
 	return SYSINFO_RET_OK;
 }
 
-#endif /* not _WINDOWS */
+#endif	/* not _WINDOWS */

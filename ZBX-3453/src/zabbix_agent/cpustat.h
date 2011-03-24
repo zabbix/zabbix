@@ -91,7 +91,7 @@
 #endif /* _WINDOWS */
 
 int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus);
-void	close_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus);
+void	free_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus);
 void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus);
 #ifndef _WINDOWS
 int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode);

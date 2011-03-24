@@ -57,7 +57,7 @@ void	perfs_list_free(void);
 
 int	init_perf_collector(ZBX_PERF_STAT_DATA *pperf);
 void	collect_perfstat();
-void	close_perf_collector();
+void	free_perf_collector();
 #endif /* _WINDOWS */
 
 #endif /* ZABBIX_PERFSTAT_H */

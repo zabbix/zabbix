@@ -34,13 +34,13 @@
 #else
 #	include "daemon.h"
 #	include "ipc.h"
-#endif /* _WINDOWS */
+#endif
 
 ZBX_COLLECTOR_DATA	*collector = NULL;
 
 #ifndef _WINDOWS
 static int	shm_id;
-#endif /* _WINDOWS */
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -164,7 +164,7 @@ void	init_collector_data()
 
 	init_perf_collector(&collector->perfs);
 
-#else /* not _WINDOWS */
+#else	/* not _WINDOWS */
 
 	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_COLLECTOR_ID)))
 	{
@@ -188,9 +188,9 @@ void	init_collector_data()
 	collector->cpus.count = cpu_count;
 #ifdef _AIX
 	memset(&collector->vmstat, 0, sizeof(collector->vmstat));
-#endif /* _AIX */
+#endif
 
-#endif /* _WINDOWS */
+#endif	/* _WINDOWS */
 }
 
 /******************************************************************************
@@ -214,7 +214,7 @@ void	free_collector_data()
 
 	zbx_free(collector);
 
-#else /* not _WINDOWS */
+#else	/* not _WINDOWS */
 
 	if (NULL == collector)
 		return;
@@ -222,7 +222,7 @@ void	free_collector_data()
 	if (-1 == shmctl(shm_id, IPC_RMID, 0))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot remove shared memory for collector [%s]", strerror(errno));
 
-#endif /* _WINDOWS */
+#endif	/* _WINDOWS */
 
 	collector = NULL;
 }
@@ -246,10 +246,10 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 {
 #if defined(ZABBIX_DAEMON)
 	set_child_signal_handler();
-#endif	/* ZABBIX_DAEMON */
+#endif
 
 	if (0 != init_cpu_collector(&(collector->cpus)))
-		close_cpu_collector(&(collector->cpus));
+		free_cpu_collector(&(collector->cpus));
 
 	collector_diskdevice_add("");
 
@@ -261,7 +261,7 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 			collect_cpustat(&(collector->cpus));
 #ifdef _WINDOWS
 		collect_perfstat();
-#endif /* _WINDOWS */
+#endif
 
 		collect_stats_diskdevices(&(collector->diskdevices));
 #ifdef _AIX
@@ -272,10 +272,10 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 	}
 
 #ifdef _WINDOWS
-	close_perf_collector();
-#endif /* _WINDOWS */
+	free_perf_collector();
+#endif
 	if (CPU_COLLECTOR_STARTED(collector))
-		close_cpu_collector(&(collector->cpus));
+		free_cpu_collector(&(collector->cpus));
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "zabbix_agentd collector stopped");
 
