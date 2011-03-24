@@ -407,8 +407,8 @@ Copt::memoryPick();
 					self::exception(
 						ZBX_API_ERROR_PARAMETERS,
 						_n(
-							'Maximum host name length is %2$d characters, "%3$s" is %1$d character.',
-							'Maximum host name length is %2$d characters, "%3$s" is %1$d characters.',
+							'Maximum alias length is %2$d characters, "%3$s" is %1$d character.',
+							'Maximum alias length is %2$d characters, "%3$s" is %1$d characters.',
 							zbx_strlen($user['alias']),
 							64,
 							$user['alias']

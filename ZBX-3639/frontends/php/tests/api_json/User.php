@@ -149,7 +149,7 @@ class API_JSON_User extends CZabbixTest
 						"rows_per_page" => "50"
 					),
 				'success_expected' => false,
-				'expected_error' => "Maximum host name length"
+				'expected_error' => "Maximum alias length"
 			),
 
 		);
