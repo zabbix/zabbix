@@ -345,7 +345,7 @@ function add_user_history($page){
 			return; // no need to change anything;
 	}
 	else{ // new page with new title is added
-		if(!CWebUser::$data['last_page']){
+		if($history5 === false){
 			$userhistoryid = get_dbid('user_history', 'userhistoryid');
 			$sql = 'INSERT INTO user_history (userhistoryid, userid, title5, url5)'.
 					' VALUES('.$userhistoryid.', '.$userid.', '.zbx_dbstr($title).', '.zbx_dbstr($url).')';

@@ -284,19 +284,28 @@ DB_DSERVICE;
 
 typedef struct
 {
+	zbx_uint64_t	triggerid;
+	char		description[TRIGGER_DESCRIPTION_LEN_MAX];
+	char		expression[TRIGGER_EXPRESSION_LEN_MAX];
+	char		*url;
+	char		*comments;
+	unsigned char	priority;
+	unsigned char	type;
+}
+DB_TRIGGER;
+
+typedef struct
+{
+	DB_TRIGGER	trigger;
 	zbx_uint64_t	eventid;
+	zbx_uint64_t	objectid;
+	zbx_uint64_t	ack_eventid;
 	int		source;
 	int		object;
-	zbx_uint64_t	objectid;
 	int		clock;
 	int		value;
 	int		value_changed;
 	int		acknowledged;
-	char		trigger_description[TRIGGER_DESCRIPTION_LEN_MAX];
-	int		trigger_priority;
-	char		*trigger_url;
-	char		*trigger_comments;
-	int		trigger_type;
 	int		ns;
 }
 DB_EVENT;
@@ -361,22 +370,6 @@ typedef struct
 	char	*passwd;
 }
 DB_MEDIATYPE;
-
-typedef struct
-{
-	zbx_uint64_t	triggerid;
-	char	expression[TRIGGER_EXPRESSION_LEN_MAX];
-	char	description[TRIGGER_DESCRIPTION_LEN_MAX];
-	char	*url;
-	char	*comments;
-	int	status;
-	int	value;
-	int	value_flags;
-	int	priority;
-	int	type;
-	char	error[TRIGGER_ERROR_LEN_MAX];
-}
-DB_TRIGGER;
 
 typedef struct
 {
@@ -586,7 +579,6 @@ int	DBadd_template_linkage(int hostid,int templateid,int items,int triggers,int 
 
 int	DBget_item_by_itemid(int itemid,DB_ITEM *item);
 
-int	DBget_trigger_by_triggerid(int triggerid,DB_TRIGGER *trigger);
 int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid);
 void	DBdelete_sysmaps_hosts_by_hostid(zbx_uint64_t hostid);
 
