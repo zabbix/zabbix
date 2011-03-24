@@ -80,7 +80,7 @@ static void	send_heartbeat()
  ******************************************************************************/
 void	main_heart_loop()
 {
-	int start, sleeptime;
+	int	start, sleeptime;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_heart_loop()");
 
