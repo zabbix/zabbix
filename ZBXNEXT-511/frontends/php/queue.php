@@ -91,7 +91,7 @@ include_once 'include/page_header.php';
 			ITEM_TYPE_TELNET,
 			ITEM_TYPE_CALCULATED);
 
-	$sql = 'SELECT i.itemid,i.lastclock,i.description,i.key_,i.type,h.host,h.hostid,h.proxy_hostid,i.delay,i.delay_flex'.
+	$sql = 'SELECT i.itemid,i.lastclock,i.name,i.key_,i.type,h.host,h.hostid,h.proxy_hostid,i.delay,i.delay_flex'.
 		' FROM items i,hosts h'.
 		' WHERE i.hostid=h.hostid'.
 			' AND h.status='.HOST_STATUS_MONITORED.
@@ -106,7 +106,7 @@ include_once 'include/page_header.php';
 				' OR (h.ipmi_available<>'.HOST_AVAILABLE_FALSE.' AND i.type in ('.implode(',',$ipmi_item_types).'))'.
 				')'.
 			' AND '.DBin_node('i.itemid', get_current_nodeid()).
-		' ORDER BY i.lastclock,h.host,i.description,i.key_';
+		' ORDER BY i.lastclock,h.host,i.name,i.key_';
 	$result = DBselect($sql);
 
 	$table = new CTableInfo(S_THE_QUEUE_IS_EMPTY);
@@ -224,12 +224,12 @@ include_once 'include/page_header.php';
 		$arr = array();
 
 		$table->setHeader(array(
-				S_NEXT_CHECK,
-				S_DELAYED_BY,
-				is_show_all_nodes() ? S_NODE : null,
-				S_HOST,
-				S_DESCRIPTION
-				));
+			S_NEXT_CHECK,
+			S_DELAYED_BY,
+			is_show_all_nodes() ? S_NODE : null,
+			S_HOST,
+			_('Name')
+		));
 		while($row=DBfetch($result)){
 			$res = calculate_item_nextcheck($row['itemid'], $row['type'], $row['delay'], $row['delay_flex'], $row['lastclock']);
 			if (0 != $row['proxy_hostid'])
@@ -239,7 +239,7 @@ include_once 'include/page_header.php';
 			if ($diff <= 5)
 				continue;
 
-			array_push($arr, array($res['nextcheck'], $row['hostid'], $row['host'], item_description($row)));
+			array_push($arr, array($res['nextcheck'], $row['hostid'], $row['host'], itemName($row)));
 		}
 
 		$rows = 0;

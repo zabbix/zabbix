@@ -42,6 +42,7 @@ switch($itemType) {
 }
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
+		'description_visible'=>			array(T_ZBX_STR, O_OPT,  null, null,           null),
 		'type_visible'=>			array(T_ZBX_STR, O_OPT,  null, null,           null),
 		'community_visible'=>		array(T_ZBX_STR, O_OPT,  null, null,           null),
 		'securityname_visible'=>	array(T_ZBX_STR, O_OPT,  null, null,           null),
@@ -78,7 +79,8 @@ switch($itemType) {
 		'copy_mode'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0'),	null),
 
 		'itemid'=>			array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))'),
-		'description'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
+		'name'=>			array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
+		'description'=>		array(T_ZBX_STR, O_OPT,  null,	null,		'isset({save})'),
 		'key'=>				array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,		'isset({save})'),
 		'delay'=>			array(T_ZBX_INT, O_OPT,  null,  '(('.BETWEEN(1,86400).
 				'(!isset({delay_flex}) || !({delay_flex}) || is_array({delay_flex}) && !count({delay_flex}))) ||'.
@@ -219,7 +221,7 @@ switch($itemType) {
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder('description', ZBX_SORT_UP);
+	validate_sort_and_sortorder('name', ZBX_SORT_UP);
 	$_REQUEST['go'] = get_request('go', 'none');
 
 // PERMISSIONS
@@ -408,6 +410,7 @@ switch($itemType) {
 		}
 
 		$item = array(
+			'name'	=> get_request('name'),
 			'description'	=> get_request('description'),
 			'key_'			=> get_request('key'),
 			'hostid'		=> get_request('form_hostid'),
@@ -510,6 +513,7 @@ switch($itemType) {
 
 		$item = array(
 			'interfaceid'	=> get_request('interfaceid'),
+			'description'	=> get_request('description'),
 			'delay'			=> get_request('delay'),
 			'history'		=> get_request('history'),
 			'status'		=> get_request('status'),
@@ -558,6 +562,7 @@ switch($itemType) {
 	else if(isset($_REQUEST['register'])){
 		if($_REQUEST['register']=='do'){
 			$item = array(
+				'name'	=> get_request('name'),
 				'description'	=> get_request('description'),
 				'key_'			=> get_request('key'),
 				'hostid'		=> get_request('hostid'),
@@ -742,7 +747,7 @@ switch($itemType) {
 
 		$group_itemid = $_REQUEST['group_itemid'];
 
-		$sql = 'SELECT h.host, i.itemid, i.description, i.key_, i.templateid, i.type'.
+		$sql = 'SELECT h.host, i.itemid, i.name, i.key_, i.templateid, i.type'.
 				' FROM items i, hosts h '.
 				' WHERE '.DBcondition('i.itemid',$group_itemid).
 					' AND h.hostid=i.hostid'.
@@ -751,12 +756,12 @@ switch($itemType) {
 		while($item = DBfetch($db_items)) {
 			if($item['templateid'] != ITEM_TYPE_ZABBIX) {
 				unset($group_itemid[$item['itemid']]);
-				error(S_ITEM.SPACE."'".$item['host'].':'.item_description($item)."'".SPACE.S_CANNOT_DELETE_ITEM.SPACE.'('.S_TEMPLATED_ITEM.')');
+				error(S_ITEM.SPACE."'".$item['host'].':'.itemName($item)."'".SPACE.S_CANNOT_DELETE_ITEM.SPACE.'('.S_TEMPLATED_ITEM.')');
 				continue;
 			}
 			else if($item['type'] == ITEM_TYPE_HTTPTEST) {
 				unset($group_itemid[$item['itemid']]);
-				error(S_ITEM.SPACE."'".$item['host'].':'.item_description($item)."'".SPACE.S_CANNOT_DELETE_ITEM.SPACE.'('.S_WEB_ITEM.')');
+				error(S_ITEM.SPACE."'".$item['host'].':'.itemName($item)."'".SPACE.S_CANNOT_DELETE_ITEM.SPACE.'('.S_WEB_ITEM.')');
 				continue;
 			}
 
@@ -820,7 +825,7 @@ switch($itemType) {
 // ----------------
 
 // Items Filter{
-		$sortfield = getPageSortField('description');
+		$sortfield = getPageSortField('name');
 		$sortorder = getPageSortOrder();
 		$options = array(
 			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
@@ -850,7 +855,7 @@ switch($itemType) {
 			$options['application'] = $_REQUEST['filter_application'];
 
 		if(isset($_REQUEST['filter_description']) && !zbx_empty($_REQUEST['filter_description']))
-			$options['search']['description'] = $_REQUEST['filter_description'];
+			$options['search']['name'] = $_REQUEST['filter_name'];
 
 		if(isset($_REQUEST['filter_type']) && !zbx_empty($_REQUEST['filter_type']) && ($_REQUEST['filter_type'] != -1))
 			$options['filter']['type'] = $_REQUEST['filter_type'];
@@ -923,7 +928,7 @@ switch($itemType) {
 			new CCheckBox('all_items',null,"checkAll('".$form->GetName()."','all_items','group_itemid');"),
 			S_WIZARD,
 			$show_host?S_HOST:null,
-			make_sorting_header(S_DESCRIPTION,'description'),
+			make_sorting_header(_('Name'),'name'),
 			S_TRIGGERS,
 			make_sorting_header(S_KEY,'key_'),
 			make_sorting_header(S_INTERVAL,'delay'),
@@ -1037,10 +1042,10 @@ switch($itemType) {
 				$description[] = new CLink($template_host['host'],'?hostid='.$template_host['hostid'], 'unknown');
 				$description[] = ':';
 			}
-			$item['description_expanded'] = item_description($item);
+			$item['description_expanded'] = itemName($item);
 
 			if(!empty($item['discoveryRule'])){
-				$description[] = new CLink($item['discoveryRule']['description'], 'disc_prototypes.php?parent_discoveryid='.
+				$description[] = new CLink($item['discoveryRule']['name'], 'disc_prototypes.php?parent_discoveryid='.
 					$item['discoveryRule']['itemid'], 'gold');
 				$description[] = ':'.$item['description_expanded'];
 			}

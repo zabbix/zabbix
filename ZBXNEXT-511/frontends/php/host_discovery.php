@@ -46,7 +46,8 @@ switch($itemType) {
 		'itemid'=>			array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))'),
 		'interfaceid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,	null, S_INTERFACE),
 
-		'description'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
+		'name'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
+		'description'=>		array(T_ZBX_STR, O_OPT,  null,	null,		'isset({save})'),
 		'item_filter_macro'=>		array(T_ZBX_STR, O_OPT,  null,	null,		'isset({save})'),
 		'item_filter_value'=>		array(T_ZBX_STR, O_OPT,  null,	null,		'isset({save})'),
 		'key'=>				array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,		'isset({save})'),
@@ -124,7 +125,7 @@ switch($itemType) {
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder('description', ZBX_SORT_UP);
+	validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go', 'none');
 
@@ -203,6 +204,7 @@ switch($itemType) {
 
 		$item = array(
 			'interfaceid' => get_request('interfaceid'),
+			'name' => get_request('name'),
 			'description' => get_request('description'),
 			'key_' => get_request('key'),
 			'hostid' => get_request('hostid'),
@@ -298,6 +300,7 @@ switch($itemType) {
 		$limited = false;
 
 
+		$name = get_request('name', '');
 		$description = get_request('description', '');
 		$key = get_request('key', '');
 		$delay = get_request('delay', 30);
@@ -346,6 +349,7 @@ switch($itemType) {
 		if((isset($_REQUEST['itemid']) && !isset($_REQUEST['form_refresh']))){
 			$interfaceid	= $item_data['interfaceid'];
 
+			$name = $item_data['name'];
 			$description = $item_data['description'];
 			$key = $item_data['key_'];
 			$type = $item_data['type'];
@@ -443,7 +447,8 @@ switch($itemType) {
 		}
 
 // Name
-		$frmItem->addRow(S_NAME, new CTextBox('description', $description, 40, $limited));
+		$frmItem->addRow(_('Name'), new CTextBox('name', $name, 40, $limited));
+		$frmItem->addRow(_('Description'), new CTextArea('description', $description));
 
 // Key
 		$frmItem->addRow(S_KEY, new CTextBox('key', $key, 40, $limited));
@@ -675,7 +680,7 @@ switch($itemType) {
 		$table = new CTableInfo();
 		$table->setHeader(array(
 			new CCheckBox('all_items',null,"checkAll('".$form->GetName()."','all_items','group_itemid');"),
-			make_sorting_header(S_NAME,'description', $sortlink),
+			make_sorting_header(S_NAME, 'name', $sortlink),
 			S_ITEMS,
 			S_TRIGGERS,
 			S_GRAPHS,
@@ -686,7 +691,7 @@ switch($itemType) {
 			S_ERROR
 		));
 
-		$sortfield = getPageSortField('description');
+		$sortfield = getPageSortField('name');
 		$sortorder = getPageSortOrder();
 		$options = array(
 			'hostids' => $_REQUEST['hostid'],
@@ -711,7 +716,7 @@ switch($itemType) {
 				$description[] = new CLink($template_host['host'],'?hostid='.$template_host['hostid'], 'unknown');
 				$description[] = ':';
 			}
-			$item['description_expanded'] = item_description($item);
+			$item['description_expanded'] = itemName($item);
 			$description[] = new CLink($item['description_expanded'], '?form=update&itemid='.$item['itemid']);
 
 
