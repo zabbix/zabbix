@@ -33,7 +33,8 @@
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-typedef struct {
+typedef struct
+{
 	zbx_uint64_t	gitemid, itemid;
 	char		key[ITEM_KEY_LEN_MAX];
 	int		drawtype;
@@ -43,7 +44,8 @@ typedef struct {
 	int		calc_fnc;
 	int		type;
 	int		periods_cnt;
-} ZBX_GRAPH_ITEMS;
+}
+ZBX_GRAPH_ITEMS;
 
 /******************************************************************************
  *                                                                            *

@@ -23,30 +23,32 @@
 #	include "gnuregex.h"
 #endif /* _WINDOWS */
 
-static	char	*zbx_regexp(const char *string, const char *pattern, int *len, int flags)
+static char	*zbx_regexp(const char *string, const char *pattern, int *len, int flags)
 {
-	char	*c = NULL;
+	char		*c = NULL;
+	regex_t		re;
+	regmatch_t	match;
 
-	regex_t	re;
-	regmatch_t match;
+	if (NULL != len)
+		*len = 0;
 
-	if(len) *len = 0;
-
-	if( string && string[0] )
+	if (NULL != string)
 	{
-		if ( 0 == regcomp(&re, pattern, flags) )
+		if (0 == regcomp(&re, pattern, flags))
 		{
-			if( 0 == regexec(&re, string, (size_t) 1, &match, 0) )
-			{ /* Matched */
-				c=(char *)string+match.rm_so;
-				if(len) *len = match.rm_eo - match.rm_so;
+			if (0 == regexec(&re, string, (size_t)1, &match, 0)) /* matched */
+			{
+				c = (char *)string + match.rm_so;
 
+				if (NULL != len)
+					*len = match.rm_eo - match.rm_so;
 			}
 
 			regfree(&re);
 		}
 	}
-	return	c;
+
+	return c;
 }
 
 char	*zbx_regexp_match(const char *string, const char *pattern, int *len)
@@ -84,11 +86,11 @@ void	add_regexp_ex(ZBX_REGEXP **regexps, int *regexps_alloc, int *regexps_num,
 			*regexps = zbx_realloc(*regexps, *regexps_alloc * sizeof(ZBX_REGEXP));
 	}
 
-	(*regexps)[*regexps_num].name			= strdup(name);
-	(*regexps)[*regexps_num].expression		= strdup(expression);
-	(*regexps)[*regexps_num].expression_type	= expression_type;
-	(*regexps)[*regexps_num].exp_delimiter		= exp_delimiter;
-	(*regexps)[*regexps_num].case_sensitive		= case_sensitive;
+	(*regexps)[*regexps_num].name = strdup(name);
+	(*regexps)[*regexps_num].expression = strdup(expression);
+	(*regexps)[*regexps_num].expression_type = expression_type;
+	(*regexps)[*regexps_num].exp_delimiter = exp_delimiter;
+	(*regexps)[*regexps_num].case_sensitive = case_sensitive;
 
 	(*regexps_num)++;
 }
@@ -104,7 +106,8 @@ int	regexp_match_ex(ZBX_REGEXP *regexps, int regexps_num, const char *string, co
 
 	if ('@' != *pattern)
 	{
-		switch (cs) {
+		switch (cs)
+		{
 			case ZBX_CASE_SENSITIVE:
 				if (NULL != zbx_regexp_match(string, pattern, NULL))
 					res = SUCCEED;
@@ -126,9 +129,11 @@ int	regexp_match_ex(ZBX_REGEXP *regexps, int regexps_num, const char *string, co
 
 		res = FAIL;
 
-		switch (regexps[i].expression_type) {
+		switch (regexps[i].expression_type)
+		{
 			case EXPRESSION_TYPE_INCLUDED:
-				switch (regexps[i].case_sensitive) {
+				switch (regexps[i].case_sensitive)
+				{
 					case ZBX_CASE_SENSITIVE:
 						if (NULL != strstr(string, regexps[i].expression))
 							res = SUCCEED;
@@ -140,13 +145,13 @@ int	regexp_match_ex(ZBX_REGEXP *regexps, int regexps_num, const char *string, co
 				}
 				break;
 			case EXPRESSION_TYPE_ANY_INCLUDED:
-				for (s = regexps[i].expression; *s != '\0' && res != SUCCEED;)
+				for (s = regexps[i].expression; '\0' != *s && SUCCEED != res;)
 				{
-
 					if (NULL != (c = strchr(s, regexps[i].exp_delimiter)))
 						*c = '\0';
 
-					switch (regexps[i].case_sensitive) {
+					switch (regexps[i].case_sensitive)
+					{
 						case ZBX_CASE_SENSITIVE:
 							if (NULL != strstr(string, s))
 								res = SUCCEED;
@@ -171,7 +176,8 @@ int	regexp_match_ex(ZBX_REGEXP *regexps, int regexps_num, const char *string, co
 					*c = regexps[i].exp_delimiter;
 				break;
 			case EXPRESSION_TYPE_NOT_INCLUDED:
-				switch (regexps[i].case_sensitive) {
+				switch (regexps[i].case_sensitive)
+				{
 					case ZBX_CASE_SENSITIVE:
 						if (NULL == strstr(string, regexps[i].expression))
 							res = SUCCEED;
@@ -183,7 +189,8 @@ int	regexp_match_ex(ZBX_REGEXP *regexps, int regexps_num, const char *string, co
 				}
 				break;
 			case EXPRESSION_TYPE_TRUE:
-				switch (regexps[i].case_sensitive) {
+				switch (regexps[i].case_sensitive)
+				{
 					case ZBX_CASE_SENSITIVE:
 						if (NULL != zbx_regexp_match(string, regexps[i].expression, NULL))
 							res = SUCCEED;
@@ -195,7 +202,8 @@ int	regexp_match_ex(ZBX_REGEXP *regexps, int regexps_num, const char *string, co
 				}
 				break;
 			case EXPRESSION_TYPE_FALSE:
-				switch (regexps[i].case_sensitive) {
+				switch (regexps[i].case_sensitive)
+				{
 					case ZBX_CASE_SENSITIVE:
 						if (NULL == zbx_regexp_match(string, regexps[i].expression, NULL))
 							res = SUCCEED;
@@ -208,7 +216,7 @@ int	regexp_match_ex(ZBX_REGEXP *regexps, int regexps_num, const char *string, co
 				break;
 		}
 
-		if (res == FAIL)
+		if (FAIL == res)
 			break;
 	}
 

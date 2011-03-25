@@ -669,7 +669,7 @@
 	'S_CREATE_MAINTENANCE_PERIOD'=>			'Criar período de manutenção',
 	'S_MAINTENANCE_TYPE'=>			'Tipo de manutenção',
 	'S_EXPIRED'=>			'Expirado',
-	'S_APPROACH'=>			'Abordagem',
+	'S_APPROACHING'=>			'Abordagem',
 	'S_WITH_DATA_COLLECTION'=>			'Com coleta de dados',
 	'S_NO_DATA_COLLECTION'=>			'Sem coleta de dados',
 	'S_NORMAL_MAINTENANCE'=>			'Manutenção normal',

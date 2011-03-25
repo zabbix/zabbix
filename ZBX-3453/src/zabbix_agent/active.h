@@ -29,14 +29,12 @@ extern int	CONFIG_BUFFER_SEND;
 extern int	CONFIG_BUFFER_SIZE;
 extern int	CONFIG_MAX_LINES_PER_SECOND;
 
-/*#define MAX_LINES_PER_SECOND	100*/	/*obsolete, configuration parameter must be used*/
-
-/*define minimal and maximal values of lines to send by agent*/
-/*per second for checks `log' and `eventlog', used to parse key parameters*/
+/* define minimal and maximal values of lines to send by agent */
+/* per second for checks `log' and `eventlog', used to parse key parameters */
 #define	MIN_VALUE_LINES	1
 #define	MAX_VALUE_LINES	1000
 
-/*Windows event types for `eventlog' check*/
+/* Windows event types for `eventlog' check */
 #ifdef _WINDOWS
 #	ifndef INFORMATION_TYPE
 #		define INFORMATION_TYPE	"Information"
@@ -61,7 +59,7 @@ typedef struct
 	int	refresh;
 	int	nextcheck;
 	int	status;
-/* Must be long for fseek() */
+/* must be long for fseek() */
 	long	lastlogsize;
 	int	mtime;
 }
