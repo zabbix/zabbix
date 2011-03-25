@@ -39,7 +39,7 @@
 		_endthreadex((unsigned int)(status)); \
 		return ((unsigned)(status))
 
-	#define zbx_sleep(sec) Sleep(((DWORD)(sec))*((DWORD)1000))
+	#define zbx_sleep(sec) Sleep(((DWORD)(sec)) * ((DWORD)1000))
 
 	#define zbx_thread_kill(h) TerminateThread(h, SUCCEED);
 
@@ -64,7 +64,7 @@
 
 	#define zbx_sleep(sec) sleep((sec))
 
-	#define zbx_thread_kill(h) kill(h,SIGTERM);
+	#define zbx_thread_kill(h) kill(h, SIGTERM);
 
 #endif /* _WINDOWS */
 
