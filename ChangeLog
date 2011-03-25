@@ -110,6 +110,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
 
+ - [ZBX-3453] improve performance of cpu collector (Sasha)
  - [ZBX-3610] fixed active agent full buffer bug - stop processing active checks till the buffer is sent (rudolfs)
  - [ZBX-3566] fixed error in administration->notifications and added a hint when no mediatypes are defined (KB)
  - [ZBX-3628] fixed server crash while processing notification messages with an already deleted trigger (Sasha)
