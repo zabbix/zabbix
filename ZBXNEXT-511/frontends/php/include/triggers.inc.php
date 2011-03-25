@@ -2126,7 +2126,7 @@ function utf8RawUrlDecode($source){
 
 			if(isset($ack_menu)) $tr_ov_menu[] = $ack_menu;
 
-			$sql = 'SELECT DISTINCT i.itemid, i.description, i.key_, i.value_type '.
+			$sql = 'SELECT DISTINCT i.itemid, i.name, i.key_, i.value_type '.
 					' FROM items i, functions f '.
 					' WHERE f.itemid=i.itemid '.
 						' AND f.triggerid='.$trhosts[$hostname]['triggerid'];
