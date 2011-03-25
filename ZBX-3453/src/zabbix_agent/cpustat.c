@@ -176,13 +176,13 @@ void	free_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 		pcpus->queue_counter = NULL;
 	}
 
-	for (i = 0; i < pcpus->count; i++)
+	for (i = 0; i <= pcpus->count; i++)
 	{
-		if (pcpus->cpu[i].usage_counter)
-		{
-			PdhRemoveCounter(pcpus->cpu[i].usage_counter);
-			pcpus->cpu[i].usage_counter = NULL;
-		}
+		if (NULL == pcpus->cpu[i].usage_counter)
+			continue;
+
+		PdhRemoveCounter(pcpus->cpu[i].usage_counter);
+		pcpus->cpu[i].usage_counter = NULL;
 	}
 
 	if (pcpus->pdh_query)

@@ -236,7 +236,7 @@ void	free_collector_data()
  *                                                                            *
  * Purpose: Collect system information                                        *
  *                                                                            *
- * Parameters:  args - skipped                                                *
+ * Parameters:                                                                *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
@@ -247,6 +247,10 @@ void	free_collector_data()
  ******************************************************************************/
 ZBX_THREAD_ENTRY(collector_thread, args)
 {
+	assert(args);
+
+	zabbix_log(LOG_LEVEL_WARNING, "agent #%d started [collector]", ((zbx_thread_args_t *)args)->server_num);
+
 #if defined(ZABBIX_DAEMON)
 	set_child_signal_handler();
 #endif
