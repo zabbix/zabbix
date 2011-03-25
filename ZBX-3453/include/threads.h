@@ -30,10 +30,10 @@
 	#define ZBX_THREAD_HANDLE_NULL NULL
 
 	#define ZBX_THREAD_ENTRY_POINTER(pointer_name) \
-		unsigned (__stdcall * pointer_name )(void *)
+		unsigned (__stdcall *pointer_name)(void *)
 
 	#define ZBX_THREAD_ENTRY(entry_name, arg_name)	\
-		unsigned __stdcall entry_name (void * arg_name)
+		unsigned __stdcall entry_name(void *arg_name)
 
 	#define zbx_thread_exit(status) \
 		_endthreadex((unsigned int)(status)); \
@@ -53,10 +53,10 @@
 	#define ZBX_THREAD_HANDLE_NULL 0
 
 	#define ZBX_THREAD_ENTRY_POINTER(pointer_name) \
-		unsigned (* pointer_name )(void *)
+		unsigned (* pointer_name)(void *)
 
 	#define ZBX_THREAD_ENTRY(entry_name, arg_name)	\
-		unsigned entry_name (void * arg_name )
+		unsigned entry_name(void *arg_name)
 
 	#define zbx_thread_exit(status) \
 		exit((int)(status)); \
