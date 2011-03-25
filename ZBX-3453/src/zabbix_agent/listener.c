@@ -75,11 +75,13 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 
 	zabbix_log(LOG_LEVEL_WARNING, "agent #%d started [listener]", ((zbx_thread_args_t *)args)->server_num);
 
+	memcpy(&s, (zbx_sock_t *)((zbx_thread_args_t *)args)->args, sizeof(zbx_sock_t));
+
+	zbx_free(args);
+
 #ifdef ZABBIX_DAEMON
 	set_child_signal_handler();
 #endif
-
-	memcpy(&s, (zbx_sock_t *)((zbx_thread_args_t *)args)->args, sizeof(zbx_sock_t));
 
 	while (ZBX_IS_RUNNING())
 	{

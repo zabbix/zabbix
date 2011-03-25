@@ -1076,12 +1076,15 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 	zabbix_log(LOG_LEVEL_WARNING, "agent #%d started [active checks]", ((zbx_thread_args_t *)args)->server_num);
 
+	activechk_args.host = zbx_strdup(NULL, ((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->host);
+	activechk_args.port = ((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->port;
+
+	zbx_free(args);
+
 #if defined(ZABBIX_DAEMON)
 	set_child_signal_handler();
 #endif	/* ZABBIX_DAEMON */
 
-	activechk_args.host = strdup(((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->host);
-	activechk_args.port = ((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->port;
 
 	if (NULL != (p = strchr(activechk_args.host, ',')))
 		*p = '\0';
