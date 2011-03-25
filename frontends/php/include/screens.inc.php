@@ -311,7 +311,7 @@ require_once('include/js.inc.php');
 		$host = get_host_by_itemid($itemid);
 
 		$table = new CTableInfo();
-		$table->setHeader(array(S_TIMESTAMP,$host['host'].': '.item_description($item)));
+		$table->setHeader(array(S_TIMESTAMP,$host['host'].': '.itemName($item)));
 
 		$options = array(
 			'history' => $item['value_type'],
@@ -553,9 +553,9 @@ require_once('include/js.inc.php');
 				$item['host'] = reset($item['hosts']);
 
 				if($item['host']['status'] != HOST_STATUS_TEMPLATE)
-					$caption = $item['host']['host'].':'.item_description($item);
+					$caption = $item['host']['host'].':'.itemName($item);
 				else
-					$caption = item_description($item);
+					$caption = itemName($item);
 
 				$nodeName = get_node_name_by_elid($item['itemid']);
 				if(!zbx_empty($nodeName))
@@ -569,13 +569,13 @@ require_once('include/js.inc.php');
 				$selectbtn = new CButton('select', S_SELECT,
 					"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName().
 							"&templated_hosts=1&only_hostid=".$screen['templateid']."&dstfld1=resourceid&".
-							"dstfld2=caption&srctbl=simple_graph&srcfld1=itemid&srcfld2=description&simpleName=1',800,450);");
+							"dstfld2=caption&srctbl=simple_graph&srcfld1=itemid&srcfld2=name&simpleName=1',800,450);");
 			}
 			else{
 				$selectbtn = new CButton('select', S_SELECT,
 					"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName().
 							"&real_hosts=1&dstfld1=resourceid&dstfld2=caption&srctbl=simple_graph&srcfld1=itemid".
-							"&srcfld2=description',800,450);");
+							"&srcfld2=name',800,450);");
 			}
 
 			$form->addRow(S_PARAMETER, array($textfield, SPACE, $selectbtn));
@@ -627,7 +627,7 @@ require_once('include/js.inc.php');
 				$item = reset($items);
 				$item['host'] = reset($item['hosts']);
 
-				$caption = item_description($item);
+				$caption = itemName($item);
 
 				$nodeName = get_node_name_by_elid($item['itemid']);
 				if(!zbx_empty($nodeName))
@@ -642,13 +642,13 @@ require_once('include/js.inc.php');
 				$selectbtn = new CButton('select', S_SELECT,
 					"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName().
 							"&templated_hosts=1&only_hostid=".$screen['templateid']."&dstfld1=resourceid&".
-							"dstfld2=caption&srctbl=plain_text&srcfld1=itemid&srcfld2=description', 800, 450);");
+							"dstfld2=caption&srctbl=plain_text&srcfld1=itemid&srcfld2=name', 800, 450);");
 			}
 			else{
 				$selectbtn = new CButton('select', S_SELECT,
 					"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName().
 							"&real_hosts=1&dstfld1=resourceid&dstfld2=caption&srctbl=plain_text&srcfld1=itemid".
-							"&srcfld2=description', 800, 450);");
+							"&srcfld2=name', 800, 450);");
 			}
 
 			$form->addRow(S_PARAMETER, array($textfield, SPACE, $selectbtn));
@@ -821,7 +821,7 @@ require_once('include/js.inc.php');
 				$items = API::Item()->get($options);
 				$item = reset($items);
 
-				$caption = $item['description'];
+				$caption = $item['name'];
 			}
 
 			$form->addVar('resourceid',$resourceid);
@@ -835,7 +835,7 @@ require_once('include/js.inc.php');
 
 			if(TIME_TYPE_HOST == $style){
 				$textfield = new CTextbox('caption',$caption,75,'yes');
-				$selectbtn = new CButton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=items&srcfld1=itemid&srcfld2=description',800,450);");
+				$selectbtn = new CButton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=items&srcfld1=itemid&srcfld2=name',800,450);");
 
 				$form->addRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
 			}

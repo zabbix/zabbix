@@ -118,7 +118,7 @@ class CChart extends CGraphDraw{
 
 		$item = get_item_by_itemid($itemid);
 		$this->items[$this->num] = $item;
-		$this->items[$this->num]['description'] = item_description($item);
+		$this->items[$this->num]['name'] = itemName($item);
 		$this->items[$this->num]['delay'] = getItemDelay($item['delay'], $item['delay_flex']);
 
 		if(strpos($item['units'], ',') !== false)
@@ -1630,8 +1630,8 @@ class CChart extends CGraphDraw{
 
 			$data = &$this->data[$this->items[$i]['itemid']][$this->items[$i]['calc_type']];
 
-			if($this->itemsHost) $item_caption = $this->items[$i]['description'];
-			else $item_caption = $this->items[$i]['host'].': '.$this->items[$i]['description'];
+			if($this->itemsHost) $item_caption = $this->items[$i]['name'];
+			else $item_caption = $this->items[$i]['host'].': '.$this->items[$i]['name'];
 
 			if(isset($data) && isset($data['min'])){
 				if($this->items[$i]['axisside'] == GRAPH_YAXIS_SIDE_LEFT)

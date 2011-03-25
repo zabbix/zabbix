@@ -143,7 +143,7 @@ class zbxXML{
 				'value_type'		=> ''
 			),
 			'elements' => array(
-				'description'		=> '',
+				'name'		=> 'description',
 				'ipmi_sensor'		=> '',
 				'delay'				=> '',
 				'history'			=> '',

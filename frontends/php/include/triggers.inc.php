@@ -2132,7 +2132,7 @@ function utf8RawUrlDecode($source){
 						' AND f.triggerid='.$trhosts[$hostname]['triggerid'];
 			$db_items = DBselect($sql);
 			while($item_data = DBfetch($db_items)){
-				$description = item_description($item_data);
+				$description = itemName($item_data);
 				switch($item_data['value_type']){
 					case ITEM_VALUE_TYPE_UINT64:
 					case ITEM_VALUE_TYPE_FLOAT:

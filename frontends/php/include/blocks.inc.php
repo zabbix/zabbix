@@ -70,9 +70,9 @@ function make_favorite_graphs(){
 			$item = $items[$sourceid];
 			$host = reset($item['hosts']);
 
-			$item['description'] = item_description($item);
+			$item['name'] = itemName($item);
 
-			$link = new CLink(get_node_name_by_elid($sourceid, null, ': ').$host['host'].':'.$item['description'],'history.php?action=showgraph&itemid='.$sourceid);
+			$link = new CLink(get_node_name_by_elid($sourceid, null, ': ').$host['host'].':'.$item['name'],'history.php?action=showgraph&itemid='.$sourceid);
 			$link->setTarget('blank');
 		}
 		else{
@@ -1218,10 +1218,10 @@ function make_graph_submenu(){
 			$item = $items[$sourceid];
 			$host = reset($item['hosts']);
 
-			$item['description'] = item_description($item);
+			$item['name'] = itemName($item);
 
 			$favGraphs[] = array(
-							'name'	=>	$host['host'].':'.$item['description'],
+							'name'	=>	$host['host'].':'.$item['name'],
 							'favobj'=>	'itemid',
 							'favid'	=>	$sourceid,
 							'action'=>	'remove'
