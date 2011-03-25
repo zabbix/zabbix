@@ -218,13 +218,14 @@ lbl_syntax_error:
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	perfs_list_free(void)
+void	perfs_list_free()
 {
 	PERF_COUNTERS	*cptr;
 
 	zbx_mutex_lock(&perfstat_access);
 
-	while (NULL != ppsd->pPerfCounterList) {
+	while (NULL != ppsd->pPerfCounterList)
+	{
 		cptr = ppsd->pPerfCounterList;
 		ppsd->pPerfCounterList = cptr->next;
 

@@ -121,9 +121,12 @@ static int	zbx_get_cpu_num()
 
 	return (int)ps_cpu_total.ncpus;
 #endif
+
+#if !defined(_WINDOWS)
 return_one:
 	zabbix_log(LOG_LEVEL_WARNING, "cannot determine number of CPUs, assuming 1");
 	return 1;
+#endif
 }
 
 /******************************************************************************
