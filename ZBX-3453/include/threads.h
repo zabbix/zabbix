@@ -70,7 +70,7 @@
 
 typedef struct
 {
-	int	server_num;
+	int	thread_num;
 	void	*args;
 }
 zbx_thread_args_t;
