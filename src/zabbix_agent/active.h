@@ -35,25 +35,25 @@ extern int	CONFIG_MAX_LINES_PER_SECOND;
 #define	MAX_VALUE_LINES	1000
 
 /* Windows event types for `eventlog' check */
-#if defined (_WINDOWS)
-#ifndef INFORMATION_TYPE
-#define INFORMATION_TYPE	"Information"
-#endif
-#ifndef WARNING_TYPE
-#define WARNING_TYPE		"Warning"
-#endif
-#ifndef ERROR_TYPE
-#define ERROR_TYPE		"Error"
-#endif
-#ifndef AUDIT_FAILURE
-#define AUDIT_FAILURE		"Failure Audit"
-#endif
-#ifndef AUDIT_SUCCESS
-#define AUDIT_SUCCESS		"Success Audit"
-#endif
-#endif	/*if defined (_WINDOWS)*/
+#ifdef _WINDOWS
+#	ifndef INFORMATION_TYPE
+#		define INFORMATION_TYPE	"Information"
+#	endif
+#	ifndef WARNING_TYPE
+#		define WARNING_TYPE	"Warning"
+#	endif
+#	ifndef ERROR_TYPE
+#		define ERROR_TYPE	"Error"
+#	endif
+#	ifndef AUDIT_FAILURE
+#		define AUDIT_FAILURE	"Failure Audit"
+#	endif
+#	ifndef AUDIT_SUCCESS
+#		define AUDIT_SUCCESS	"Success Audit"
+#	endif
+#endif	/* _WINDOWS */
 
-typedef struct zbx_active_metric_type
+typedef struct
 {
 	char	*key, *key_orig;
 	int	refresh;
@@ -62,35 +62,39 @@ typedef struct zbx_active_metric_type
 /* must be long for fseek() */
 	long	lastlogsize;
 	int	mtime;
-} ZBX_ACTIVE_METRIC;
+}
+ZBX_ACTIVE_METRIC;
 
-typedef struct active_check_args_type
+typedef struct
 {
 	char		*host;
 	unsigned short	port;
-} ZBX_THREAD_ACTIVECHK_ARGS;
+}
+ZBX_THREAD_ACTIVECHK_ARGS;
 
-typedef struct zbx_active_buffer_element_type
+typedef struct
 {
-	char	*host;
-	char	*key;
-	char	*value;
-	int	timestamp;
-	char	*source;
-	int	severity;
-	long	lastlogsize;
-	int	clock;
-	int	logeventid;
-	int	mtime;
+	char		*host;
+	char		*key;
+	char		*value;
+	int		timestamp;
+	char		*source;
+	int		severity;
+	long		lastlogsize;
+	int		clock;
+	int		logeventid;
+	int		mtime;
 	unsigned char	persistent;
-} ZBX_ACTIVE_BUFFER_ELEMENT;
+}
+ZBX_ACTIVE_BUFFER_ELEMENT;
 
-typedef struct zbx_active_buffer_type
+typedef struct
 {
 	ZBX_ACTIVE_BUFFER_ELEMENT	*data;
 	int	count, pcount, lastsent;
-} ZBX_ACTIVE_BUFFER;
+}
+ZBX_ACTIVE_BUFFER;
 
 ZBX_THREAD_ENTRY(active_checks_thread, args);
 
-#endif /* ZABBIX_ACTIVE_H */
+#endif	/* ZABBIX_ACTIVE_H */
