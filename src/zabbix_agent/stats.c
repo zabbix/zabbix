@@ -34,13 +34,13 @@
 #else
 #	include "daemon.h"
 #	include "ipc.h"
-#endif /* _WINDOWS */
+#endif
 
 ZBX_COLLECTOR_DATA	*collector = NULL;
 
 #ifndef _WINDOWS
 static int	shm_id;
-#endif /* _WINDOWS */
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -63,29 +63,27 @@ static int	zbx_get_cpu_num()
 
 	GetSystemInfo(&sysInfo);
 
-	return (int)(sysInfo.dwNumberOfProcessors);
+	return (int)sysInfo.dwNumberOfProcessors;
 #elif defined(HAVE_SYS_PSTAT_H)
-	struct pst_dynamic psd;
+	struct pst_dynamic	psd;
 
 	if (-1 == pstat_getdynamic(&psd, sizeof(struct pst_dynamic), 1, 0))
 		goto return_one;
 
-	return (int)(psd.psd_proc_cnt);
-return_one:
+	return (int)psd.psd_proc_cnt;
 #elif defined(_SC_NPROCESSORS_ONLN)
-	/* Solaris 10 x86 */
 	/* FreeBSD 7.0 x86 */
+	/* Solaris 10 x86 */
 	int	ncpu;
 
 	if (-1 == (ncpu = sysconf(_SC_NPROCESSORS_ONLN)))
 		goto return_one;
 
 	return ncpu;
-return_one:
 #elif defined(HAVE_FUNCTION_SYSCTL_HW_NCPU)
+	/* FreeBSD 6.2 x86; FreeBSD 7.0 x86 */
 	/* NetBSD 3.1 x86; NetBSD 4.0 x86 */
 	/* OpenBSD 4.2 x86 */
-	/* FreeBSD 6.2 x86; FreeBSD 7.0 x86 */
 	size_t	len;
 	int	mib[] = {CTL_HW, HW_NCPU}, ncpu;
 
@@ -95,7 +93,6 @@ return_one:
 		goto return_one;
 
 	return ncpu;
-return_one:
 #elif defined(HAVE_PROC_CPUINFO)
 	FILE	*f = NULL;
 	int	ncpu = 0;
@@ -103,19 +100,18 @@ return_one:
 	if (NULL == (file = fopen("/proc/cpuinfo", "r")))
 		goto return_one;
 
-	while (fgets(line, 1024, file) != NULL)
+	while (NULL != fgets(line, 1024, file))
 	{
-		if (strstr(line, "processor") == NULL)
+		if (NULL == strstr(line, "processor"))
 			continue;
 		ncpu++;
 	}
 	zbx_fclose(file);
 
-	if (ncpu == 0)
+	if (0 == ncpu)
 		goto return_one;
 
 	return ncpu;
-return_one:
 #elif defined(HAVE_LIBPERFSTAT)
 	/* AIX 6.1 */
 	perfstat_cpu_total_t	ps_cpu_total;
@@ -124,11 +120,13 @@ return_one:
 		goto return_one;
 
 	return (int)ps_cpu_total.ncpus;
-return_one:
 #endif
 
-	zabbix_log(LOG_LEVEL_WARNING, "Can not determine number of CPUs, adjust to 1");
+#if !defined(_WINDOWS)
+return_one:
+	zabbix_log(LOG_LEVEL_WARNING, "cannot determine number of CPUs, assuming 1");
 	return 1;
+#endif
 }
 
 /******************************************************************************
@@ -143,7 +141,7 @@ return_one:
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: Linux version allocates memory as shared.                        *
+ * Comments: Unix version allocates memory as shared.                         *
  *                                                                            *
  ******************************************************************************/
 void	init_collector_data()
@@ -169,33 +167,33 @@ void	init_collector_data()
 
 	init_perf_collector(&collector->perfs);
 
-#else /* not _WINDOWS */
+#else	/* not _WINDOWS */
 
 	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_COLLECTOR_ID)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Cannot create IPC key for collector");
+		zabbix_log(LOG_LEVEL_CRIT, "cannot create IPC key for collector");
 		exit(FAIL);
 	}
 
 	if (-1 == (shm_id = zbx_shmget(shm_key, sz + sz_cpu)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Cannot allocate shared memory for collector");
+		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate shared memory for collector");
 		exit(FAIL);
 	}
 
 	if ((void *)(-1) == (collector = shmat(shm_id, NULL, 0)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Cannot attach shared memory for collector [%s]", strerror(errno));
-		exit(1);
+		zabbix_log(LOG_LEVEL_CRIT, "cannot attach shared memory for collector [%s]", strerror(errno));
+		exit(FAIL);
 	}
 
 	collector->cpus.cpu = (ZBX_SINGLE_CPU_STAT_DATA *)(collector + 1);
 	collector->cpus.count = cpu_count;
 #ifdef _AIX
 	memset(&collector->vmstat, 0, sizeof(collector->vmstat));
-#endif /* _AIX */
+#endif
 
-#endif /* _WINDOWS */
+#endif	/* _WINDOWS */
 }
 
 /******************************************************************************
@@ -210,25 +208,24 @@ void	init_collector_data()
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: Linux version allocates memory as shared.                        *
+ * Comments: Unix version allocated memory as shared.                         *
  *                                                                            *
  ******************************************************************************/
 void	free_collector_data()
 {
-
 #if defined (_WINDOWS)
 
 	zbx_free(collector);
 
-#else /* not _WINDOWS */
+#else	/* not _WINDOWS */
 
 	if (NULL == collector)
 		return;
 
 	if (-1 == shmctl(shm_id, IPC_RMID, 0))
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot remove shared memory for collector [%s]", strerror(errno));
+		zabbix_log(LOG_LEVEL_WARNING, "cannot remove shared memory for collector [%s]", strerror(errno));
 
-#endif /* _WINDOWS */
+#endif	/* _WINDOWS */
 
 	collector = NULL;
 }
@@ -239,7 +236,7 @@ void	free_collector_data()
  *                                                                            *
  * Purpose: Collect system information                                        *
  *                                                                            *
- * Parameters:  args - skipped                                                *
+ * Parameters:                                                                *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
@@ -250,12 +247,18 @@ void	free_collector_data()
  ******************************************************************************/
 ZBX_THREAD_ENTRY(collector_thread, args)
 {
+	assert(args);
+
+	zabbix_log(LOG_LEVEL_WARNING, "agent #%d started [collector]", ((zbx_thread_args_t *)args)->thread_num);
+
+	zbx_free(args);
+
 #if defined(ZABBIX_DAEMON)
 	set_child_signal_handler();
-#endif	/* ZABBIX_DAEMON */
+#endif
 
 	if (0 != init_cpu_collector(&(collector->cpus)))
-		close_cpu_collector(&(collector->cpus));
+		free_cpu_collector(&(collector->cpus));
 
 	collector_diskdevice_add("");
 
@@ -267,7 +270,7 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 			collect_cpustat(&(collector->cpus));
 #ifdef _WINDOWS
 		collect_perfstat();
-#endif /* _WINDOWS */
+#endif
 
 		collect_stats_diskdevices(&(collector->diskdevices));
 #ifdef _AIX
@@ -278,10 +281,10 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 	}
 
 #ifdef _WINDOWS
-	close_perf_collector();
-#endif /* _WINDOWS */
+	free_perf_collector();
+#endif
 	if (CPU_COLLECTOR_STARTED(collector))
-		close_cpu_collector(&(collector->cpus));
+		free_cpu_collector(&(collector->cpus));
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "zabbix_agentd collector stopped");
 

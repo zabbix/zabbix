@@ -35,12 +35,12 @@ typedef struct c_single_diskdevice_data
 	zbx_uint64_t	w_sect[MAX_COLLECTOR_HISTORY];
 	zbx_uint64_t	w_oper[MAX_COLLECTOR_HISTORY];
 	zbx_uint64_t	w_byte[MAX_COLLECTOR_HISTORY];
-	double		r_sps[ZBX_AVGMAX];
-	double		r_ops[ZBX_AVGMAX];
-	double		r_bps[ZBX_AVGMAX];
-	double		w_sps[ZBX_AVGMAX];
-	double		w_ops[ZBX_AVGMAX];
-	double		w_bps[ZBX_AVGMAX];
+	double		r_sps[ZBX_AVG_COUNT];
+	double		r_ops[ZBX_AVG_COUNT];
+	double		r_bps[ZBX_AVG_COUNT];
+	double		w_sps[ZBX_AVG_COUNT];
+	double		w_ops[ZBX_AVG_COUNT];
+	double		w_bps[ZBX_AVG_COUNT];
 } ZBX_SINGLE_DISKDEVICE_DATA;
 
 typedef struct c_diskdevices_data

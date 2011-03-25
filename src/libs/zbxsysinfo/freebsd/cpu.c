@@ -118,14 +118,8 @@ int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, 
 
 int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char	tmp[32], type[32];
-	int	cpu_num, mode;
-
-	if (!CPU_COLLECTOR_STARTED(collector))
-	{
-		SET_MSG_RESULT(result, strdup("Collector is not started!"));
-		return SYSINFO_RET_OK;
-	}
+	char	tmp[16];
+	int	cpu_num, mode, state;
 
 	if (num_param(param) > 3)
 		return SYSINFO_RET_FAIL;
@@ -135,15 +129,24 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	if ('\0' == *tmp || 0 == strcmp(tmp, "all"))	/* default parameter */
 		cpu_num = 0;
-	else
-	{
-		cpu_num = atoi(tmp) + 1;
-		if (cpu_num < 1 || cpu_num > collector->cpus.count)
-			return SYSINFO_RET_FAIL;
-	}
+	else if (1 > (cpu_num = atoi(tmp) + 1))
+		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 2, type, sizeof(type)))
-		*type = '\0';
+	if (0 != get_param(param, 2, tmp, sizeof(tmp)))
+		*tmp = '\0';
+
+	if ('\0' == *tmp || 0 == strcmp(tmp, "user"))	/* default parameter */
+		state = ZBX_CPU_STATE_USER;
+	else if (0 == strcmp(tmp, "nice"))
+		state = ZBX_CPU_STATE_NICE;
+	else if (0 == strcmp(tmp, "system"))
+		state = ZBX_CPU_STATE_SYSTEM;
+	else if (0 == strcmp(tmp, "idle"))
+		state = ZBX_CPU_STATE_IDLE;
+	else if (0 == strcmp(tmp, "interrupt"))
+		state = ZBX_CPU_STATE_INTERRUPT;
+	else
+		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 3, tmp, sizeof(tmp)))
 		*tmp = '\0';
@@ -157,20 +160,7 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	else
 		return SYSINFO_RET_FAIL;
 
-	if ('\0' == *type || 0 == strcmp(type, "user"))	/* default parameter */
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].user[mode]);
-	else if (0 == strcmp(type, "nice"))
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].nice[mode]);
-	else if (0 == strcmp(type, "system"))
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].system[mode]);
-	else if (0 == strcmp(type, "idle"))
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].idle[mode]);
-	else if (0 == strcmp(type, "interrupt"))
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].interrupt[mode]);
-	else
-		return SYSINFO_RET_FAIL;
-
-	return SYSINFO_RET_OK;
+	return get_cpustat(result, cpu_num, state, mode);
 }
 
 int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -178,7 +168,7 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	/* FreeBSD 4.2 i386; FreeBSD 6.2 i386; FreeBSD 7.0 i386 */
 	char	tmp[32];
 	int	mode;
-	double	load[ZBX_AVGMAX];
+	double	load[ZBX_AVG_COUNT];
 
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
