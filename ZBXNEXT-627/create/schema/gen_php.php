@@ -50,22 +50,19 @@ function parse_schema($path){
 						$type = 'DB::FIELD_TYPE_FLOAT';
 						$length = 16;
 						break;
-					case 't_blob':
-					case 't_text':
-						$type = 'DB::FIELD_TYPE_CHAR';
-						$length = 2048;
-						break;
 					case 't_varchar':
 					case 't_char':
 						$type = 'DB::FIELD_TYPE_CHAR';
 						$length = $type_data['length'];
 						break;
+					case 't_blob':
+					case 't_text':
 					case 't_history_log':
 					case 't_history_text':
 					case 't_item_param':
 					case 't_cksum_text':
-						$type = 'DB::FIELD_TYPE_CHAR';
-						$length = 2048;
+						$type = 'DB::FIELD_TYPE_TEXT';
+						$length = false;
 						break;
 					case 't_image':
 						$type = 'DB::FIELD_TYPE_BLOB';
@@ -75,9 +72,12 @@ function parse_schema($path){
 
 				$data = array(
 					'null' => ($null == 'NULL' ? 'true' : 'false'),
-					'type' => $type,
-					'length' => $length,
+					'type' => $type
 				);
+
+				if($length){
+					$data['length'] = $length;
+				}
 
 				if(!empty($default)){
 					$data['default'] = $default;

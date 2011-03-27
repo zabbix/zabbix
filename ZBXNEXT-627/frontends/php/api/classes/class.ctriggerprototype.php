@@ -1401,7 +1401,7 @@ COpt::memoryPick();
 						break;
 					}
 				}
-				if($trigger_exist && ($trigger_exist['triggerid'] != $trigger['triggerid'])){
+				if($trigger_exist && (bccomp($trigger_exist['triggerid'],$trigger['triggerid']) != 0)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_TRIGGER.' ['.$trigger['description'].'] '.S_ALREADY_EXISTS_SMALL);
 				}
 			}

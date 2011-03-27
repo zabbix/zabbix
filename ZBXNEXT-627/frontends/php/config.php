@@ -274,7 +274,7 @@ include_once('include/page_header.php');
 					$val = array_pop($val);
 					$msg[] = S_GROUP_FOR_DISCOVERED_HOSTS.' ['.$val['name'].']';
 
-					if($val['groupid'] != $orig_config['discovery_groupid']){
+					if(bccomp($val['groupid'],$orig_config['discovery_groupid']) !=0 ){
 						setHostGroupInternal($orig_config['discovery_groupid'], ZBX_NOT_INTERNAL_GROUP);
 						setHostGroupInternal($val['groupid'], ZBX_INTERNAL_GROUP);
 					}

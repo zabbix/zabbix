@@ -16,9 +16,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-var allObj = {};
+var globalAllObjForViewSwitcher = {};
 var CViewSwitcher = Class.create({
-inAction:			false,
 mainObj:			null,
 depObjects:			{},
 lastValue:			null,
@@ -43,7 +42,7 @@ initialize : function(objId, objAction, confData){
 
 	addListener(this.mainObj, objAction, this.rebuildView.bindAsEventListener(this));
 
-	allObj[objId] = this;
+	globalAllObjForViewSwitcher[objId] = this;
 
 	this.hideAllObjs();
 	this.rebuildView();
@@ -52,30 +51,30 @@ initialize : function(objId, objAction, confData){
 rebuildView: function(e){
 	var myValue = this.objValue(this.mainObj);
 
-	if(myValue == this.lastValue){
-		this.inAction = false;
-		return true;
-	}
-
 	if(isset(this.lastValue, this.depObjects)) {
-		for(var key in this.depObjects[this.lastValue]) {
+		for(var key in this.depObjects[this.lastValue]){
 			if(empty(this.depObjects[this.lastValue][key])) continue;
 
 			this.hideObj(this.depObjects[this.lastValue][key]);
 
-			if(isset(this.depObjects[this.lastValue][key].id, allObj))
-				allObj[this.depObjects[this.lastValue][key].id].rebuildView();
+			if(isset(this.depObjects[this.lastValue][key].id, globalAllObjForViewSwitcher)){
+				for(var i in globalAllObjForViewSwitcher[this.depObjects[this.lastValue][key].id].depObjects){
+					for(var j in globalAllObjForViewSwitcher[this.depObjects[this.lastValue][key].id].depObjects[i]){
+						this.hideObj(globalAllObjForViewSwitcher[this.depObjects[this.lastValue][key].id].depObjects[i][j]);
+					}
+				}
+			}
 		}
 	}
 
-	if(isset(myValue, this.depObjects)) {
+	if(isset(myValue, this.depObjects)){
 		for(var key in this.depObjects[myValue]){
 			if(empty(this.depObjects[myValue][key])) continue;
 
 			this.showObj(this.depObjects[myValue][key]);
 
-			if(isset(this.depObjects[myValue][key].id, allObj))
-				allObj[this.depObjects[myValue][key].id].rebuildView();
+			if(isset(this.depObjects[myValue][key].id, globalAllObjForViewSwitcher))
+				globalAllObjForViewSwitcher[this.depObjects[myValue][key].id].rebuildView();
 		}
 	}
 

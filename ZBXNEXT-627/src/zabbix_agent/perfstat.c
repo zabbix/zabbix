@@ -218,13 +218,14 @@ lbl_syntax_error:
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	perfs_list_free(void)
+void	perfs_list_free()
 {
 	PERF_COUNTERS	*cptr;
 
 	zbx_mutex_lock(&perfstat_access);
 
-	while (NULL != ppsd->pPerfCounterList) {
+	while (NULL != ppsd->pPerfCounterList)
+	{
 		cptr = ppsd->pPerfCounterList;
 		ppsd->pPerfCounterList = cptr->next;
 
@@ -278,7 +279,7 @@ int	init_perf_collector(ZBX_PERF_STAT_DATA *pperf)
 
 /******************************************************************************
  *                                                                            *
- * Function: close_perf_collector                                             *
+ * Function: free_perf_collector                                              *
  *                                                                            *
  * Purpose: Clear state of data calculation                                   *
  *                                                                            *
@@ -291,7 +292,7 @@ int	init_perf_collector(ZBX_PERF_STAT_DATA *pperf)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	close_perf_collector()
+void	free_perf_collector()
 {
 	PERF_COUNTERS *cptr;
 

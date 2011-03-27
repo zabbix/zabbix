@@ -93,7 +93,7 @@ void	load_config()
 		{"DebugLevel",			&CONFIG_LOG_LEVEL,			NULL,
 			TYPE_INT,	PARM_OPT,	0,			4},
 		{"StartAgents",			&CONFIG_ZABBIX_FORKS,			NULL,
-			TYPE_INT,	PARM_OPT,	1,			25},
+			TYPE_INT,	PARM_OPT,	1,			100},
 		{"RefreshActiveChecks",		&CONFIG_REFRESH_ACTIVE_CHECKS,		NULL,
 			TYPE_INT,	PARM_OPT,	SEC_PER_MIN,		SEC_PER_HOUR},
 		{"MaxLinesPerSecond",		&CONFIG_MAX_LINES_PER_SECOND,		NULL,

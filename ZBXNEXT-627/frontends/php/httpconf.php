@@ -357,7 +357,7 @@ include_once('include/page_header.php');
 	$_REQUEST['steps'] = get_request('steps',array());
 	foreach($_REQUEST['steps'] as $s1id => $s1){
 		foreach($_REQUEST['steps'] as $s2id => $s2){
-			if((strcmp($s1['name'],$s2['name'])==0) && $s1id != $s2id){
+			if((strcmp($s1['name'],$s2['name'])==0) && (bccomp($s1id,$s2id) != 0)){
 				$_REQUEST['steps'][$s1id] = $_REQUEST['steps'][$s2id];
 				unset($_REQUEST['steps'][$s2id]);
 			}

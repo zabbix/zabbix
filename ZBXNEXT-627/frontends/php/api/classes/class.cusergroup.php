@@ -498,7 +498,7 @@ class CUserGroup extends CZBXAPI{
 						'output' => API_OUTPUT_SHORTEN,
 					));
 					$group_exists = reset($group_exists);
-					if($group_exists && ($group_exists['usrgrpid'] != $usrgrpid)){
+					if($group_exists && (bccomp($group_exists['usrgrpid'],$usrgrpid) != 0) ){
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_GROUP . ' ' . $data['name'] . ' ' . S_ALREADY_EXISTS_SMALL);
 					}
 				}

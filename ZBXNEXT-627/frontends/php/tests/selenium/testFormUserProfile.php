@@ -149,9 +149,9 @@ class testFormUserProfile extends CWebTest
 
 	public function testFormProfile_GlobalMessagingEnable(){
 		$this->login('profile.php');
-		$this->check('messages[enabled]');
+		$this->click('messages[enabled]');
 		// we wait for the first element after messaging checkbox to appear
-		$this->waitForElementPresent("xpath=///td[text()='Message&nbsp;timeout&nbsp;(seconds)']");
+		$this->waitForVisible('timeout_row');
 		// and then check that the remaining elements are there as well
 		$this->ok('Play sound');
 		$this->ok('Trigger severity');
