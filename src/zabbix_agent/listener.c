@@ -65,18 +65,23 @@ static void	process_listener(zbx_sock_t *s)
 		zabbix_log(LOG_LEVEL_DEBUG, "Process listener error: %s", zbx_tcp_strerror());
 }
 
-ZBX_THREAD_ENTRY(listener_thread, pSock)
+ZBX_THREAD_ENTRY(listener_thread, args)
 {
 	int		ret, local_request_failed = 0;
 	zbx_sock_t	s;
 
-	assert(pSock);
+	assert(args);
+	assert(((zbx_thread_args_t *)args)->args);
 
-#if defined(ZABBIX_DAEMON)
+	zabbix_log(LOG_LEVEL_WARNING, "agent #%d started [listener]", ((zbx_thread_args_t *)args)->thread_num);
+
+	memcpy(&s, (zbx_sock_t *)((zbx_thread_args_t *)args)->args, sizeof(zbx_sock_t));
+
+	zbx_free(args);
+
+#ifdef ZABBIX_DAEMON
 	set_child_signal_handler();
-#endif	/* ZABBIX_DAEMON */
-
-	memcpy(&s, ((zbx_sock_t *)pSock), sizeof(zbx_sock_t));
+#endif
 
 	while (ZBX_IS_RUNNING())
 	{

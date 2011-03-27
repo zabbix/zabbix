@@ -644,11 +644,9 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 		severity	= atoi(row[2]);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Trigger severity [%d] Media severity [%d] Period [%s]",
-			event->trigger_priority,
-			severity,
-			row[3]);
+				(int)event->trigger.priority, severity, row[3]);
 
-		if (((1 << event->trigger_priority) & severity) == 0)
+		if (((1 << event->trigger.priority) & severity) == 0)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Won't send message (severity)");
 			continue;
@@ -1044,19 +1042,19 @@ static int	get_event_info(zbx_uint64_t eventid, DB_EVENT *event)
 
 	if (res == SUCCEED && event->object == EVENT_OBJECT_TRIGGER)
 	{
-		result = DBselect("select description,priority,comments,url,type"
+		result = DBselect("select description,expression,priority,comments,url"
 				" from triggers where triggerid=" ZBX_FS_UI64,
 				event->objectid);
 
 		if (NULL != (row = DBfetch(result)))
 		{
-			zbx_strlcpy(event->trigger_description, row[0], sizeof(event->trigger_description));
-			event->trigger_priority = atoi(row[1]);
-			event->trigger_comments	= strdup(row[2]);
-			event->trigger_url	= strdup(row[3]);
-			event->trigger_type	= atoi(row[4]);
+			event->trigger.triggerid = event->objectid;
+			strscpy(event->trigger.description, row[0]);
+			strscpy(event->trigger.expression, row[1]);
+			event->trigger.priority = (unsigned char)atoi(row[2]);
+			event->trigger.comments = zbx_strdup(event->trigger.comments, row[3]);
+			event->trigger.url = zbx_strdup(event->trigger.url, row[4]);
 		}
-
 		DBfree_result(result);
 	}
 	return res;
@@ -1079,8 +1077,8 @@ static int	get_event_info(zbx_uint64_t eventid, DB_EVENT *event)
  ******************************************************************************/
 static void	free_event_info(DB_EVENT *event)
 {
-	zbx_free(event->trigger_comments);
-	zbx_free(event->trigger_url);
+	zbx_free(event->trigger.comments);
+	zbx_free(event->trigger.url);
 }
 
 static void	execute_escalation(DB_ESCALATION *escalation)

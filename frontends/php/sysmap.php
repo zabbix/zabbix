@@ -153,111 +153,48 @@ include_once('include/page_header.php');
 					print($action);
 					break;
 				case 'save':
-					$options = array(
-							'sysmapids'=> $sysmapid,
-							'editable'=>1,
-							'output'=> API_OUTPUT_EXTEND,
-							'select_selements'=>API_OUTPUT_EXTEND,
-							'select_links'=>API_OUTPUT_EXTEND
-						);
-					$sysmaps = API::Map()->get($options);
-					if(empty($sysmaps)) print('alert("Access denied!");');
-
-					$selements = get_request('selements', '[]');
-					$selements = $json->decode($selements, true);
-
-					$links = get_request('links', '[]');
-					$links = $json->decode($links, true);
-
 					@ob_start();
-
 					try{
-						$db_selementids = array();
-						$res = DBselect('SELECT selementid FROM sysmaps_elements WHERE sysmapid='.$sysmapid);
-						while($db_selement = DBfetch($res)){
-							$db_selementids[$db_selement['selementid']] = $db_selement['selementid'];
-						}
+						DBstart();
 
-						$transaction = DBstart();
+						$options = array(
+							'sysmapids' => $sysmapid,
+							'editable' => true,
+							'output' => API_OUTPUT_SHORTEN,
+						);
+						$sysmap = API::Map()->get($options);
+						$sysmap = reset($sysmap);
+						if($sysmap === false) throw new Exception(_('Access denied!')."\n\r");
 
-						// updating map parameters
+
 						$sysmap_to_update = array(
-							'sysmapid' => $sysmaps[0]['sysmapid'],
+							'sysmapid' => $sysmap['sysmapid'],
 							'grid_size' => $_REQUEST['grid_size'],
 							'grid_show' => $_REQUEST['grid_show'],
-							'grid_align' => $_REQUEST['grid_align']
+							'grid_align' => $_REQUEST['grid_align'],
+							'links' => $json->decode(get_request('links', '[]'), true),
+							'selements' => $json->decode(get_request('selements', '[]'), true)
 						);
-						API::Map()->update($sysmap_to_update);
+						$result = API::Map()->update($sysmap_to_update);
 
-
-						foreach($selements as $id => $selement){
-							if(isset($selement['urls'])){
-								foreach($selement['urls'] as $unum => $url){
-									if($url['name'] === '' && $url['url'] === '') unset($selement['urls'][$unum]);
-								}
-							}
-
-							if($selement['elementid'] == 0){
-								$selement['elementtype'] = SYSMAP_ELEMENT_TYPE_IMAGE;
-							}
-
-							if($selement['iconid_off'] == 0){
-								throw new Exception('Cannot save map. Map element "'.$selement['label'].'" contains no icon.');
-							}
-							if(isset($selement['new'])){
-								$selement['sysmapid'] = $sysmapid;
-								$selementids = API::Map()->addElements($selement);
-								$selementid = reset($selementids);
-
-								foreach($links as $id => $link){
-									if(bccomp($link['selementid1'],$selement['selementid']) == 0) $links[$id]['selementid1'] = $selementid;
-									else if(bccomp($link['selementid2'],$selement['selementid']) == 0) $links[$id]['selementid2'] = $selementid;
-								}
-							}
-							else{
-//SDII($selement);
-								$selement['sysmapid'] = $sysmapid;
-								$result = API::Map()->updateElements($selement);
-								unset($db_selementids[$selement['selementid']]);
-							}
-						}
-
-						delete_sysmaps_element($db_selementids);
-
-						$db_linkids = array();
-						$res = DBselect('SELECT linkid FROM sysmaps_links WHERE sysmapid='.$sysmapid);
-						while($db_link = DBfetch($res)){
-							$db_linkids[$db_link['linkid']] = $db_link['linkid'];
-						}
-
-						foreach($links as $id => $link){
-							$link['sysmapid'] = $sysmapid;
-							if(isset($link['new'])){
-								$result = add_link($link);
-							}
-							else{
-								$result = update_link($link);
-								unset($db_linkids[$link['linkid']]);
-							}
-						}
-
-						delete_link($db_linkids);
-
-						$result = DBend(true);
-
-						if($result)
-							print('if(Confirm("'.S_MAP_SAVED_RETURN_Q.'")){ location.href = "sysmaps.php"; }');
+						if($result !== false)
+							print('if(Confirm("'._('Map is saved! Return?').'")){ location.href = "sysmaps.php"; }');
 						else
-							throw new Exception(S_MAP_SAVE_OPERATION_FAILED."\n\r");
+							throw new Exception(_('Map save operation failed.')."\n\r");
+
+						DBend(true);
 					}
 					catch(Exception $e){
-						if(isset($transaction)) DBend(false);
-						$msg =  $e->getMessage()."\n\r";
+						DBend(false);
+						$msg = array($e->getMessage());
+						foreach(clear_messages() as $errMsg) $msg[] = $errMsg['type'].': '.$errMsg['message'];
 
 						ob_clean();
-						print('alert('.zbx_jsvalue($msg).');');
+
+						print('alert('.zbx_jsvalue(implode("\n\r", $msg)).');');
 					}
 					@ob_flush();
+					exit();
 					break;
 			}
 		}

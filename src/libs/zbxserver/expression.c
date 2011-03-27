@@ -31,7 +31,8 @@
  *                                                                            *
  * Purpose: get trigger severity name                                         *
  *                                                                            *
- * Parameters: severity   - [IN] a trigger severity; TRIGGER_SEVERITY_*       *
+ * Parameters: trigger    - [IN] a trigger data with priority field;          *
+ *                               TRIGGER_SEVERITY_*                           *
  *             replace_to - [OUT] pointer to a buffer that will receive       *
  *                          a null-terminated trigger severity string         *
  *                                                                            *
@@ -43,20 +44,23 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	DBget_trigger_severity_name(int severity, char **replace_to)
+static int	DBget_trigger_severity_name(DB_TRIGGER *trigger, char **replace_to)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		res = FAIL;
 
-	if (severity < 0 || severity >= TRIGGER_SEVERITY_COUNT)
+	if (0 == trigger->triggerid)
+		return res;
+
+	if (trigger->priority < 0 || trigger->priority >= TRIGGER_SEVERITY_COUNT)
 		return res;
 
 	result = DBselect(
 			"select severity_name_%d"
 			" from config"
 			" where 1=1" DB_NODE,
-			severity, DBnode_local("configid"));
+			trigger->priority, DBnode_local("configid"));
 
 	if (NULL != (row = DBfetch(result)))
 	{
@@ -127,8 +131,9 @@ static void	DBget_macro_value_by_triggerid(zbx_uint64_t triggerid, const char *m
  * Purpose: explode short trigger expression to normal mode                   *
  *          {11}=1 explode to {hostX:keyY.functionZ(parameterN)}=1            *
  *                                                                            *
- * Parameters: short_expression - null terminated trigger expression          *
- *                                {11}=1 & {2346734}>5                        *
+ * Parameters: trigger - [IN] trigger data with null terminated trigger       *
+ *                            expression '{11}=1 & {2346734}>5'               *
+ *             N_functionid - [IN] number of function in trigger expression   *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
@@ -137,7 +142,7 @@ static void	DBget_macro_value_by_triggerid(zbx_uint64_t triggerid, const char *m
  * Comments: !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-static int	trigger_get_N_functionid(char *short_expression, int n, zbx_uint64_t *functionid)
+static int	trigger_get_N_functionid(DB_TRIGGER *trigger, int N_functionid, zbx_uint64_t *functionid)
 {
 	const char	*__function_name = "trigger_get_N_functionid";
 
@@ -153,11 +158,13 @@ static int	trigger_get_N_functionid(char *short_expression, int n, zbx_uint64_t 
 	char		*p_functionid = NULL;
 	register char	*c;
 
-	assert(short_expression);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s' N_functionid:%d",
+			__function_name, trigger->expression, N_functionid);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() short_expression:'%s' n:%d", __function_name, short_expression, n);
+	if (0 == trigger->triggerid)
+		goto fail;
 
-	for (c = short_expression; '\0' != *c && ret != SUCCEED; c++)
+	for (c = trigger->expression; '\0' != *c && ret != SUCCEED; c++)
 	{
 		if ('{' == *c)
 		{
@@ -170,9 +177,10 @@ static int	trigger_get_N_functionid(char *short_expression, int n, zbx_uint64_t 
 
 			if (SUCCEED == is_uint64(p_functionid, functionid))
 			{
-				if (++num == n)
+				if (++num == N_functionid)
 				{
-					zabbix_log(LOG_LEVEL_DEBUG, "%s() functionid:" ZBX_FS_UI64, __function_name, *functionid);
+					zabbix_log(LOG_LEVEL_DEBUG, "%s() functionid:" ZBX_FS_UI64,
+							__function_name, *functionid);
 					ret = SUCCEED;
 				}
 			}
@@ -181,53 +189,7 @@ static int	trigger_get_N_functionid(char *short_expression, int n, zbx_uint64_t 
 			state = EXP_NONE;
 		}
 	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DBget_trigger_expression_by_triggerid                            *
- *                                                                            *
- * Purpose: retrieve trigger expression by triggerid                          *
- *                                                                            *
- * Parameters: triggerid - trigger identificator from database                *
- *             expression - result buffer                                     *
- *             max_expression_len - size of result buffer                     *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *               otherwise FAIL                                               *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-static int	DBget_trigger_expression_by_triggerid(zbx_uint64_t triggerid, char *expression, size_t max_expression_len)
-{
-	const char	*__function_name = "DBget_trigger_expression_by_triggerid";
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		ret = FAIL;
-
-	assert(expression);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64, __function_name, triggerid);
-
-	result = DBselect("select expression from triggers where triggerid=" ZBX_FS_UI64,
-			triggerid);
-
-	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
-	{
-		zbx_strlcpy(expression, row[0], max_expression_len);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() expression:'%s'", __function_name, expression);
-		ret = SUCCEED;
-	}
-
-	DBfree_result(result);
-
+fail:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -838,53 +800,6 @@ static void	expand_trigger_description_constants(char **data, zbx_uint64_t trigg
 
 /******************************************************************************
  *                                                                            *
- * Function: get_host_profile_value_by_triggerid                              *
- *                                                                            *
- * Purpose: request host profile value by triggerid and field name            *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *               otherwise FAIL                                               *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-static int	get_host_profile_value_by_triggerid(zbx_uint64_t triggerid, char **replace_to, int N_functionid, const char *fieldname)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		expression[TRIGGER_EXPRESSION_LEN_MAX];
-	zbx_uint64_t	functionid;
-	int		ret = FAIL;
-
-	if (FAIL == DBget_trigger_expression_by_triggerid(triggerid, expression, sizeof(expression)))
-		return FAIL;
-
-	if (FAIL == trigger_get_N_functionid(expression, N_functionid, &functionid))
-		return FAIL;
-
-	result = DBselect("select distinct p.%s from hosts_profiles p,items i,functions f"
-			" where p.hostid=i.hostid and i.itemid=f.itemid and f.functionid=" ZBX_FS_UI64,
-			fieldname,
-			functionid);
-
-	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
-	{
-		*replace_to = zbx_strdup(*replace_to, row[0]);
-
-		ret = SUCCEED;
-	}
-
-	DBfree_result(result);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: item_description                                                 *
  *                                                                            *
  * Purpose: substitute key parameters and user macros in                      *
@@ -965,6 +880,57 @@ static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 		zbx_free(*data);
 		*data = str_out;
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBget_host_profile_value                                         *
+ *                                                                            *
+ * Purpose: request host profile value by triggerid and field name            *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBget_host_profile_value(DB_TRIGGER *trigger, char **replace_to,
+		int N_functionid, const char *fieldname)
+{
+	const char	*__function_name = "DBget_host_profile_value";
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	functionid;
+	int		ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (FAIL == trigger_get_N_functionid(trigger, N_functionid, &functionid))
+		goto fail;
+
+	result = DBselect(
+			"select p.%s"
+			" from host_profile p,items i,functions f"
+			" where p.hostid=i.hostid"
+				" and i.itemid=f.itemid"
+				" and f.functionid=" ZBX_FS_UI64,
+			fieldname,
+			functionid);
+
+	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
+	{
+		*replace_to = zbx_strdup(*replace_to, row[0]);
+		ret = SUCCEED;
+	}
+	DBfree_result(result);
+fail:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
 }
 
 /******************************************************************************
@@ -1078,7 +1044,7 @@ static int	DBget_interface_value_by_hostid(zbx_uint64_t hostid, char **replace_t
 
 /******************************************************************************
  *                                                                            *
- * Function: DBget_trigger_value_by_triggerid                                 *
+ * Function: DBget_trigger_value                                              *
  *                                                                            *
  * Purpose: retrieve a particular value associated with the trigger's         *
  *          N_functionid'th function                                          *
@@ -1098,21 +1064,21 @@ static int	DBget_interface_value_by_hostid(zbx_uint64_t hostid, char **replace_t
 #define ZBX_REQUEST_ITEM_KEY		5
 #define ZBX_REQUEST_ITEM_KEY_ORIG	6
 #define ZBX_REQUEST_PROXY_NAME		7
-#define ZBX_REQUEST_HOST_HOST		7
-static int	DBget_trigger_value_by_triggerid(zbx_uint64_t triggerid, char **replace_to, int N_functionid, int request)
+#define ZBX_REQUEST_HOST_HOST		8
+static int	DBget_trigger_value(DB_TRIGGER *trigger, char **replace_to, int N_functionid, int request)
 {
+	const char	*__function_name = "DBget_trigger_value";
 	DB_RESULT	result;
 	DB_ROW		row;
 	DC_HOST		dc_host;
-	char		expression[TRIGGER_EXPRESSION_LEN_MAX], *key = NULL;
+	char		*key = NULL;
 	zbx_uint64_t	functionid, proxy_hostid, hostid;
 	int		ret = FAIL;
 
-	if (FAIL == DBget_trigger_expression_by_triggerid(triggerid, expression, sizeof(expression)))
-		return ret;
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (FAIL == trigger_get_N_functionid(expression, N_functionid, &functionid))
-		return ret;
+	if (FAIL == trigger_get_N_functionid(trigger, N_functionid, &functionid))
+		goto fail;
 
 	result = DBselect(
 			"select i.description,i.key_,h.hostid,h.host,h.proxy_hostid,h.name"
@@ -1180,6 +1146,8 @@ static int	DBget_trigger_value_by_triggerid(zbx_uint64_t triggerid, char **repla
 		}
 	}
 	DBfree_result(result);
+fail:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -1529,7 +1497,7 @@ static int	DBget_history_value(zbx_uint64_t itemid, char **replace_to,
 
 /******************************************************************************
  *                                                                            *
- * Function: DBget_history_log_value_by_triggerid                             *
+ * Function: DBget_history_log_value                                          *
  *                                                                            *
  * Purpose: retrieve a particular attribute of a log value                    *
  *                                                                            *
@@ -1543,20 +1511,19 @@ static int	DBget_history_value(zbx_uint64_t itemid, char **replace_to,
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	DBget_history_log_value_by_triggerid(zbx_uint64_t triggerid,
-		char **replace_to, int N_functionid, const char *fieldname, int clock, int ns)
+static int	DBget_history_log_value(DB_TRIGGER *trigger, char **replace_to,
+		int N_functionid, const char *fieldname, int clock, int ns)
 {
+	const char	*__function_name = "DBget_history_log_value";
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		expression[TRIGGER_EXPRESSION_LEN_MAX];
 	zbx_uint64_t	functionid, itemid;
 	int		value_type, ret = FAIL;
 
-	if (FAIL == DBget_trigger_expression_by_triggerid(triggerid, expression, sizeof(expression)))
-		return FAIL;
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (FAIL == trigger_get_N_functionid(expression, N_functionid, &functionid))
-		return FAIL;
+	if (FAIL == trigger_get_N_functionid(trigger, N_functionid, &functionid))
+		goto fail;
 
 	result = DBselect("select i.itemid,i.value_type from items i,functions f"
 			" where i.itemid=f.itemid and f.functionid=" ZBX_FS_UI64,
@@ -1570,17 +1537,19 @@ static int	DBget_history_log_value_by_triggerid(zbx_uint64_t triggerid,
 		if (value_type == ITEM_VALUE_TYPE_LOG)
 			ret = DBget_history_value(itemid, replace_to, "history_log", fieldname, clock, ns);
 	}
-
 	DBfree_result(result);
+fail:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: DBget_item_lastvalue_by_triggerid                                *
+ * Function: DBget_item_lastvalue                                             *
  *                                                                            *
- * Purpose: retrieve item lastvalue by triggerid                              *
+ * Purpose: retrieve item lastvalue by trigger expression                     *
+ *          and number of function                                            *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -1592,22 +1561,21 @@ static int	DBget_history_log_value_by_triggerid(zbx_uint64_t triggerid,
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	DBget_item_lastvalue_by_triggerid(zbx_uint64_t triggerid, char **lastvalue, int N_functionid)
+static int	DBget_item_lastvalue(DB_TRIGGER *trigger, char **lastvalue, int N_functionid)
 {
+	const char	*__function_name = "DBget_item_lastvalue";
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_RESULT	h_result;
 	DB_ROW		h_row;
-	char		expression[TRIGGER_EXPRESSION_LEN_MAX];
 	zbx_uint64_t	valuemapid, functionid;
 	int		value_type, ret = FAIL;
 	char		tmp[MAX_STRING_LEN];
 
-	if (FAIL == DBget_trigger_expression_by_triggerid(triggerid, expression, sizeof(expression)))
-		return FAIL;
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (FAIL == trigger_get_N_functionid(expression, N_functionid, &functionid))
-		return FAIL;
+	if (FAIL == trigger_get_N_functionid(trigger, N_functionid, &functionid))
+		goto fail;
 
 	result = DBselect(
 			"select i.itemid,i.value_type,i.valuemapid,i.units,i.lastvalue"
@@ -1658,17 +1626,18 @@ static int	DBget_item_lastvalue_by_triggerid(zbx_uint64_t triggerid, char **last
 		}
 		ret = SUCCEED;
 	}
-
 	DBfree_result(result);
+fail:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: DBget_item_value_by_triggerid                                    *
+ * Function: DBget_item_value                                                 *
  *                                                                            *
- * Purpose: retrieve item value by triggerid                                  *
+ * Purpose: retrieve item value by trigger expression and number of function  *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -1680,20 +1649,19 @@ static int	DBget_item_lastvalue_by_triggerid(zbx_uint64_t triggerid, char **last
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	DBget_item_value_by_triggerid(zbx_uint64_t triggerid, char **value, int N_functionid, int clock, int ns)
+static int	DBget_item_value(DB_TRIGGER *trigger, char **value, int N_functionid, int clock, int ns)
 {
+	const char	*__function_name = "DBget_item_value";
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		expression[TRIGGER_EXPRESSION_LEN_MAX];
 	zbx_uint64_t	functionid, itemid, valuemapid;
 	int		value_type, ret = FAIL;
 	char		tmp[MAX_STRING_LEN];
 
-	if (FAIL == DBget_trigger_expression_by_triggerid(triggerid, expression, sizeof(expression)))
-		return FAIL;
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (FAIL == trigger_get_N_functionid(expression, N_functionid, &functionid))
-		return FAIL;
+	if (FAIL == trigger_get_N_functionid(trigger, N_functionid, &functionid))
+		goto fail;
 
 	result = DBselect(
 			"select i.itemid,i.value_type,i.valuemapid,i.units"
@@ -1736,6 +1704,8 @@ static int	DBget_item_value_by_triggerid(zbx_uint64_t triggerid, char **value, i
 		}
 	}
 	DBfree_result(result);
+fail:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -1884,7 +1854,8 @@ static int	get_event_ack_history(DB_EVENT *event, char **replace_to)
 			" where eventid=" ZBX_FS_UI64 " order by clock",
 			event->eventid);
 
-	while (NULL != (row = DBfetch(result))) {
+	while (NULL != (row = DBfetch(result)))
+	{
 		now = atoi(row[0]);
 		ZBX_STR2UINT64(userid, row[1]);
 
@@ -1911,9 +1882,9 @@ static int	get_event_ack_history(DB_EVENT *event, char **replace_to)
 
 /******************************************************************************
  *                                                                            *
- * Function: get_node_value_by_triggerid                                      *
+ * Function: DBget_node_value                                                 *
  *                                                                            *
- * Purpose: request node value by triggerid                                   *
+ * Purpose: request node value by trigger expression and number of function   *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -1925,26 +1896,24 @@ static int	get_event_ack_history(DB_EVENT *event, char **replace_to)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	get_node_value_by_triggerid(zbx_uint64_t triggerid, char **replace_to, int N_functionid, const char *fieldname)
+static int	DBget_node_value(DB_TRIGGER *trigger, char **replace_to, int N_functionid, const char *fieldname)
 {
+	const char	*__function_name = "DBget_node_value";
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		expression[TRIGGER_EXPRESSION_LEN_MAX];
 	zbx_uint64_t	functionid;
 	int		nodeid, ret = FAIL;
 
-	if (FAIL == DBget_trigger_expression_by_triggerid(triggerid, expression, sizeof(expression)))
-		return FAIL;
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (FAIL == trigger_get_N_functionid(expression, N_functionid, &functionid))
-		return FAIL;
+	if (FAIL == trigger_get_N_functionid(trigger, N_functionid, &functionid))
+		goto fail;
 
 	nodeid = get_nodeid_by_id(functionid);
 
 	if (0 == strcmp(fieldname, "nodeid"))
 	{
 		*replace_to = zbx_dsprintf(*replace_to, "%d", nodeid);
-
 		ret = SUCCEED;
 	}
 	else
@@ -1954,12 +1923,12 @@ static int	get_node_value_by_triggerid(zbx_uint64_t triggerid, char **replace_to
 		if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
 		{
 			*replace_to = zbx_strdup(*replace_to, row[0]);
-
 			ret = SUCCEED;
 		}
-
 		DBfree_result(result);
 	}
+fail:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -2087,7 +2056,7 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 #define MVAR_TRIGGER_SEVERITY		"{TRIGGER.SEVERITY}"
 #define MVAR_TRIGGER_NSEVERITY		"{TRIGGER.NSEVERITY}"
 #define MVAR_TRIGGER_STATUS		"{TRIGGER.STATUS}"
-#define MVAR_TRIGGER_STATUS_OLD		"{STATUS}"
+#define MVAR_STATUS			"{STATUS}"			/* deprecated */
 #define MVAR_TRIGGER_VALUE		"{TRIGGER.VALUE}"
 #define MVAR_TRIGGER_URL		"{TRIGGER.URL}"
 
@@ -2096,17 +2065,80 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 #define MVAR_TRIGGER_EVENTS_PROBLEM_ACK		"{TRIGGER.EVENTS.PROBLEM.ACK}"
 #define MVAR_TRIGGER_EVENTS_PROBLEM_UNACK	"{TRIGGER.EVENTS.PROBLEM.UNACK}"
 
-#define MVAR_PROFILE_DEVICETYPE		"{PROFILE.DEVICETYPE}"
-#define MVAR_PROFILE_NAME		"{PROFILE.NAME}"
-#define MVAR_PROFILE_OS			"{PROFILE.OS}"
-#define MVAR_PROFILE_SERIALNO		"{PROFILE.SERIALNO}"
-#define MVAR_PROFILE_TAG		"{PROFILE.TAG}"
-#define MVAR_PROFILE_MACADDRESS		"{PROFILE.MACADDRESS}"
-#define MVAR_PROFILE_HARDWARE		"{PROFILE.HARDWARE}"
-#define MVAR_PROFILE_SOFTWARE		"{PROFILE.SOFTWARE}"
-#define MVAR_PROFILE_CONTACT		"{PROFILE.CONTACT}"
-#define MVAR_PROFILE_LOCATION		"{PROFILE.LOCATION}"
-#define MVAR_PROFILE_NOTES		"{PROFILE.NOTES}"
+#define MVAR_PROFILE				"{PROFILE."			/* a prefix for all profile macros */
+#define MVAR_PROFILE_TYPE			MVAR_PROFILE "TYPE}"
+#define MVAR_PROFILE_DEVICETYPE			MVAR_PROFILE "DEVICETYPE}"	/* deprecated */
+#define MVAR_PROFILE_TYPE_FULL			MVAR_PROFILE "TYPE.FULL}"
+#define MVAR_PROFILE_NAME			MVAR_PROFILE "NAME}"
+#define MVAR_PROFILE_ALIAS			MVAR_PROFILE "ALIAS}"
+#define MVAR_PROFILE_OS				MVAR_PROFILE "OS}"
+#define MVAR_PROFILE_OS_FULL			MVAR_PROFILE "OS.FULL}"
+#define MVAR_PROFILE_OS_SHORT			MVAR_PROFILE "OS.SHORT}"
+#define MVAR_PROFILE_SERIALNO_A			MVAR_PROFILE "SERIALNO.A}"
+#define MVAR_PROFILE_SERIALNO			MVAR_PROFILE "SERIALNO}"	/* deprecated */
+#define MVAR_PROFILE_SERIALNO_B			MVAR_PROFILE "SERIALNO.B}"
+#define MVAR_PROFILE_TAG			MVAR_PROFILE "TAG}"
+#define MVAR_PROFILE_ASSET_TAG			MVAR_PROFILE "ASSET.TAG}"
+#define MVAR_PROFILE_MACADDRESS_A		MVAR_PROFILE "MACADDRESS.A}"
+#define MVAR_PROFILE_MACADDRESS			MVAR_PROFILE "MACADDRESS}"	/* deprecated */
+#define MVAR_PROFILE_MACADDRESS_B		MVAR_PROFILE "MACADDRESS.B}"
+#define MVAR_PROFILE_HARDWARE			MVAR_PROFILE "HARDWARE}"
+#define MVAR_PROFILE_HARDWARE_FULL		MVAR_PROFILE "HARDWARE.FULL}"
+#define MVAR_PROFILE_SOFTWARE			MVAR_PROFILE "SOFTWARE}"
+#define MVAR_PROFILE_SOFTWARE_FULL		MVAR_PROFILE "SOFTWARE.FULL}"
+#define MVAR_PROFILE_SOFTWARE_APP_A		MVAR_PROFILE "SOFTWARE.APP.A}"
+#define MVAR_PROFILE_SOFTWARE_APP_B		MVAR_PROFILE "SOFTWARE.APP.B}"
+#define MVAR_PROFILE_SOFTWARE_APP_C		MVAR_PROFILE "SOFTWARE.APP.C}"
+#define MVAR_PROFILE_SOFTWARE_APP_D		MVAR_PROFILE "SOFTWARE.APP.D}"
+#define MVAR_PROFILE_SOFTWARE_APP_E		MVAR_PROFILE "SOFTWARE.APP.E}"
+#define MVAR_PROFILE_CONTACT			MVAR_PROFILE "CONTACT}"
+#define MVAR_PROFILE_LOCATION			MVAR_PROFILE "LOCATION}"
+#define MVAR_PROFILE_LOCATION_LAT		MVAR_PROFILE "LOCATION.LAT}"
+#define MVAR_PROFILE_LOCATION_LON		MVAR_PROFILE "LOCATION.LON}"
+#define MVAR_PROFILE_NOTES			MVAR_PROFILE "NOTES}"
+#define MVAR_PROFILE_CHASSIS			MVAR_PROFILE "CHASSIS}"
+#define MVAR_PROFILE_MODEL			MVAR_PROFILE "MODEL}"
+#define MVAR_PROFILE_HW_ARCH			MVAR_PROFILE "HW.ARCH}"
+#define MVAR_PROFILE_VENDOR			MVAR_PROFILE "VENDOR}"
+#define MVAR_PROFILE_CONTRACT_NUMBER		MVAR_PROFILE "CONTRACT.NUMBER}"
+#define MVAR_PROFILE_INSTALLER_NAME		MVAR_PROFILE "INSTALLER.NAME}"
+#define MVAR_PROFILE_DEPLOYMENT_STATUS		MVAR_PROFILE "DEPLOYMENT.STATUS}"
+#define MVAR_PROFILE_URL_A			MVAR_PROFILE "URL.A}"
+#define MVAR_PROFILE_URL_B			MVAR_PROFILE "URL.B}"
+#define MVAR_PROFILE_URL_C			MVAR_PROFILE "URL.C}"
+#define MVAR_PROFILE_HOST_NETWORKS		MVAR_PROFILE "HOST.NETWORKS}"
+#define MVAR_PROFILE_HOST_NETMASK		MVAR_PROFILE "HOST.NETMASK}"
+#define MVAR_PROFILE_HOST_ROUTER		MVAR_PROFILE "HOST.ROUTER}"
+#define MVAR_PROFILE_OOB_IP			MVAR_PROFILE "OOB.IP}"
+#define MVAR_PROFILE_OOB_NETMASK		MVAR_PROFILE "OOB.NETMASK}"
+#define MVAR_PROFILE_OOB_ROUTER			MVAR_PROFILE "OOB.ROUTER}"
+#define MVAR_PROFILE_HW_DATE_PURCHASE		MVAR_PROFILE "HW.DATE.PURCHASE}"
+#define MVAR_PROFILE_HW_DATE_INSTALL		MVAR_PROFILE "HW.DATE.INSTALL}"
+#define MVAR_PROFILE_HW_DATE_EXPIRY		MVAR_PROFILE "HW.DATE.EXPIRY}"
+#define MVAR_PROFILE_HW_DATE_DECOMM		MVAR_PROFILE "HW.DATE.DECOMM}"
+#define MVAR_PROFILE_SITE_ADDRESS_A		MVAR_PROFILE "SITE.ADDRESS.A}"
+#define MVAR_PROFILE_SITE_ADDRESS_B		MVAR_PROFILE "SITE.ADDRESS.B}"
+#define MVAR_PROFILE_SITE_ADDRESS_C		MVAR_PROFILE "SITE.ADDRESS.C}"
+#define MVAR_PROFILE_SITE_CITY			MVAR_PROFILE "SITE.CITY}"
+#define MVAR_PROFILE_SITE_STATE			MVAR_PROFILE "SITE.STATE}"
+#define MVAR_PROFILE_SITE_COUNTRY		MVAR_PROFILE "SITE.COUNTRY}"
+#define MVAR_PROFILE_SITE_ZIP			MVAR_PROFILE "SITE.ZIP}"
+#define MVAR_PROFILE_SITE_RACK			MVAR_PROFILE "SITE.RACK}"
+#define MVAR_PROFILE_SITE_NOTES			MVAR_PROFILE "SITE.NOTES}"
+#define MVAR_PROFILE_POC_PRIMARY_NAME		MVAR_PROFILE "POC.PRIMARY.NAME}"
+#define MVAR_PROFILE_POC_PRIMARY_EMAIL		MVAR_PROFILE "POC.PRIMARY.EMAIL}"
+#define MVAR_PROFILE_POC_PRIMARY_PHONE_A	MVAR_PROFILE "POC.PRIMARY.PHONE.A}"
+#define MVAR_PROFILE_POC_PRIMARY_PHONE_B	MVAR_PROFILE "POC.PRIMARY.PHONE.B}"
+#define MVAR_PROFILE_POC_PRIMARY_CELL		MVAR_PROFILE "POC.PRIMARY.CELL}"
+#define MVAR_PROFILE_POC_PRIMARY_SCREEN		MVAR_PROFILE "POC.PRIMARY.SCREEN}"
+#define MVAR_PROFILE_POC_PRIMARY_NOTES		MVAR_PROFILE "POC.PRIMARY.NOTES}"
+#define MVAR_PROFILE_POC_SECONDARY_NAME		MVAR_PROFILE "POC.SECONDARY.NAME}"
+#define MVAR_PROFILE_POC_SECONDARY_EMAIL	MVAR_PROFILE "POC.SECONDARY.EMAIL}"
+#define MVAR_PROFILE_POC_SECONDARY_PHONE_A	MVAR_PROFILE "POC.SECONDARY.PHONE.A}"
+#define MVAR_PROFILE_POC_SECONDARY_PHONE_B	MVAR_PROFILE "POC.SECONDARY.PHONE.B}"
+#define MVAR_PROFILE_POC_SECONDARY_CELL		MVAR_PROFILE "POC.SECONDARY.CELL}"
+#define MVAR_PROFILE_POC_SECONDARY_SCREEN	MVAR_PROFILE "POC.SECONDARY.SCREEN}"
+#define MVAR_PROFILE_POC_SECONDARY_NOTES	MVAR_PROFILE "POC.SECONDARY.NOTES}"
 
 #define MVAR_NODE_ID			"{NODE.ID}"
 #define MVAR_NODE_NAME			"{NODE.NAME}"
@@ -2123,19 +2155,202 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 
 #define STR_UNKNOWN_VARIABLE		"*UNKNOWN*"
 
-static const char	*ex_macros[] = {MVAR_PROFILE_DEVICETYPE, MVAR_PROFILE_NAME, MVAR_PROFILE_OS, MVAR_PROFILE_SERIALNO,
-				MVAR_PROFILE_TAG, MVAR_PROFILE_MACADDRESS, MVAR_PROFILE_HARDWARE, MVAR_PROFILE_SOFTWARE,
-				MVAR_PROFILE_CONTACT, MVAR_PROFILE_LOCATION, MVAR_PROFILE_NOTES,
-				MVAR_ITEM_NAME,
-				MVAR_HOST_HOST, MVAR_HOST_NAME, MVAR_HOSTNAME, MVAR_PROXY_NAME,
-				MVAR_TRIGGER_KEY,
-				MVAR_HOST_CONN, MVAR_HOST_DNS, MVAR_IPADDRESS,
-				MVAR_ITEM_LASTVALUE,
-				MVAR_ITEM_VALUE,
-				MVAR_ITEM_LOG_DATE, MVAR_ITEM_LOG_TIME, MVAR_ITEM_LOG_AGE, MVAR_ITEM_LOG_SOURCE,
-				MVAR_ITEM_LOG_SEVERITY, MVAR_ITEM_LOG_NSEVERITY, MVAR_ITEM_LOG_EVENTID,
-				MVAR_NODE_ID, MVAR_NODE_NAME,
-				NULL};
+static const char	*ex_macros[] =
+{
+	MVAR_PROFILE_TYPE, MVAR_PROFILE_DEVICETYPE, MVAR_PROFILE_TYPE_FULL,
+	MVAR_PROFILE_NAME, MVAR_PROFILE_ALIAS, MVAR_PROFILE_OS, MVAR_PROFILE_OS_FULL, MVAR_PROFILE_OS_SHORT,
+	MVAR_PROFILE_SERIALNO_A, MVAR_PROFILE_SERIALNO, MVAR_PROFILE_SERIALNO_B, MVAR_PROFILE_TAG,
+	MVAR_PROFILE_ASSET_TAG, MVAR_PROFILE_MACADDRESS_A, MVAR_PROFILE_MACADDRESS, MVAR_PROFILE_MACADDRESS_B,
+	MVAR_PROFILE_HARDWARE, MVAR_PROFILE_HARDWARE_FULL, MVAR_PROFILE_SOFTWARE, MVAR_PROFILE_SOFTWARE_FULL,
+	MVAR_PROFILE_SOFTWARE_APP_A, MVAR_PROFILE_SOFTWARE_APP_B, MVAR_PROFILE_SOFTWARE_APP_C,
+	MVAR_PROFILE_SOFTWARE_APP_D, MVAR_PROFILE_SOFTWARE_APP_E, MVAR_PROFILE_CONTACT, MVAR_PROFILE_LOCATION,
+	MVAR_PROFILE_LOCATION_LAT, MVAR_PROFILE_LOCATION_LON, MVAR_PROFILE_NOTES, MVAR_PROFILE_CHASSIS,
+	MVAR_PROFILE_MODEL, MVAR_PROFILE_HW_ARCH, MVAR_PROFILE_VENDOR, MVAR_PROFILE_CONTRACT_NUMBER,
+	MVAR_PROFILE_INSTALLER_NAME, MVAR_PROFILE_DEPLOYMENT_STATUS, MVAR_PROFILE_URL_A, MVAR_PROFILE_URL_B,
+	MVAR_PROFILE_URL_C, MVAR_PROFILE_HOST_NETWORKS, MVAR_PROFILE_HOST_NETMASK, MVAR_PROFILE_HOST_ROUTER,
+	MVAR_PROFILE_OOB_IP, MVAR_PROFILE_OOB_NETMASK, MVAR_PROFILE_OOB_ROUTER, MVAR_PROFILE_HW_DATE_PURCHASE,
+	MVAR_PROFILE_HW_DATE_INSTALL, MVAR_PROFILE_HW_DATE_EXPIRY, MVAR_PROFILE_HW_DATE_DECOMM,
+	MVAR_PROFILE_SITE_ADDRESS_A, MVAR_PROFILE_SITE_ADDRESS_B, MVAR_PROFILE_SITE_ADDRESS_C,
+	MVAR_PROFILE_SITE_CITY, MVAR_PROFILE_SITE_STATE, MVAR_PROFILE_SITE_COUNTRY, MVAR_PROFILE_SITE_ZIP,
+	MVAR_PROFILE_SITE_RACK, MVAR_PROFILE_SITE_NOTES, MVAR_PROFILE_POC_PRIMARY_NAME,
+	MVAR_PROFILE_POC_PRIMARY_EMAIL, MVAR_PROFILE_POC_PRIMARY_PHONE_A, MVAR_PROFILE_POC_PRIMARY_PHONE_B,
+	MVAR_PROFILE_POC_PRIMARY_CELL, MVAR_PROFILE_POC_PRIMARY_SCREEN, MVAR_PROFILE_POC_PRIMARY_NOTES,
+	MVAR_PROFILE_POC_SECONDARY_NAME, MVAR_PROFILE_POC_SECONDARY_EMAIL, MVAR_PROFILE_POC_SECONDARY_PHONE_A,
+	MVAR_PROFILE_POC_SECONDARY_PHONE_B, MVAR_PROFILE_POC_SECONDARY_CELL, MVAR_PROFILE_POC_SECONDARY_SCREEN,
+	MVAR_PROFILE_POC_SECONDARY_NOTES,
+	MVAR_ITEM_NAME,
+	MVAR_HOST_HOST, MVAR_HOST_NAME, MVAR_HOSTNAME, MVAR_PROXY_NAME,
+	MVAR_TRIGGER_KEY,
+	MVAR_HOST_CONN, MVAR_HOST_DNS, MVAR_IPADDRESS,
+	MVAR_ITEM_LASTVALUE,
+	MVAR_ITEM_VALUE,
+	MVAR_ITEM_LOG_DATE, MVAR_ITEM_LOG_TIME, MVAR_ITEM_LOG_AGE, MVAR_ITEM_LOG_SOURCE,
+	MVAR_ITEM_LOG_SEVERITY, MVAR_ITEM_LOG_NSEVERITY, MVAR_ITEM_LOG_EVENTID,
+	MVAR_NODE_ID, MVAR_NODE_NAME,
+	NULL
+};
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_host_profile                                                 *
+ *                                                                            *
+ * Purpose: request host profile value by macro and triggerid                 *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	get_host_profile(const char *macro, DB_TRIGGER *trigger, char **replace_to, int N_functionid)
+{
+	if (0 == strcmp(macro, MVAR_PROFILE_TYPE) || 0 == strcmp(macro, MVAR_PROFILE_DEVICETYPE))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "type");
+	else if (0 == strcmp(macro, MVAR_PROFILE_TYPE_FULL))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "type_full");
+	else if (0 == strcmp(macro, MVAR_PROFILE_NAME))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "name");
+	else if (0 == strcmp(macro, MVAR_PROFILE_ALIAS))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "alias");
+	else if (0 == strcmp(macro, MVAR_PROFILE_OS))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "os");
+	else if (0 == strcmp(macro, MVAR_PROFILE_OS_FULL))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "os_full");
+	else if (0 == strcmp(macro, MVAR_PROFILE_OS_SHORT))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "os_short");
+	else if (0 == strcmp(macro, MVAR_PROFILE_SERIALNO_A))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "serialno_a");
+	else if (0 == strcmp(macro, MVAR_PROFILE_SERIALNO) || 0 == strcmp(macro, MVAR_PROFILE_SERIALNO_B))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "serialno_b");
+	else if (0 == strcmp(macro, MVAR_PROFILE_TAG))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "tag");
+	else if (0 == strcmp(macro, MVAR_PROFILE_ASSET_TAG))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "asset_tag");
+	else if (0 == strcmp(macro, MVAR_PROFILE_MACADDRESS_A))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "macaddress_a");
+	else if (0 == strcmp(macro, MVAR_PROFILE_MACADDRESS) || 0 == strcmp(macro, MVAR_PROFILE_MACADDRESS_B))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "macaddress_b");
+	else if (0 == strcmp(macro, MVAR_PROFILE_HARDWARE))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "hardware");
+	else if (0 == strcmp(macro, MVAR_PROFILE_HARDWARE_FULL))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "hardware_full");
+	else if (0 == strcmp(macro, MVAR_PROFILE_SOFTWARE))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "software");
+	else if (0 == strcmp(macro, MVAR_PROFILE_SOFTWARE_FULL))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "software_full");
+	else if (0 == strcmp(macro, MVAR_PROFILE_SOFTWARE_APP_A))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "software_app_a");
+	else if (0 == strcmp(macro, MVAR_PROFILE_SOFTWARE_APP_B))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "software_app_b");
+	else if (0 == strcmp(macro, MVAR_PROFILE_SOFTWARE_APP_C))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "software_app_c");
+	else if (0 == strcmp(macro, MVAR_PROFILE_SOFTWARE_APP_D))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "software_app_d");
+	else if (0 == strcmp(macro, MVAR_PROFILE_SOFTWARE_APP_E))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "software_app_e");
+	else if (0 == strcmp(macro, MVAR_PROFILE_CONTACT))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "contact");
+	else if (0 == strcmp(macro, MVAR_PROFILE_LOCATION))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "location");
+	else if (0 == strcmp(macro, MVAR_PROFILE_LOCATION_LAT))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "location_lat");
+	else if (0 == strcmp(macro, MVAR_PROFILE_LOCATION_LON))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "location_lon");
+	else if (0 == strcmp(macro, MVAR_PROFILE_NOTES))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "notes");
+	else if (0 == strcmp(macro, MVAR_PROFILE_CHASSIS))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "chassis");
+	else if (0 == strcmp(macro, MVAR_PROFILE_MODEL))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "model");
+	else if (0 == strcmp(macro, MVAR_PROFILE_HW_ARCH))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "hw_arch");
+	else if (0 == strcmp(macro, MVAR_PROFILE_VENDOR))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "vendor");
+	else if (0 == strcmp(macro, MVAR_PROFILE_CONTRACT_NUMBER))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "contract_number");
+	else if (0 == strcmp(macro, MVAR_PROFILE_INSTALLER_NAME))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "installer_name");
+	else if (0 == strcmp(macro, MVAR_PROFILE_DEPLOYMENT_STATUS))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "deployment_status");
+	else if (0 == strcmp(macro, MVAR_PROFILE_URL_A))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "url_a");
+	else if (0 == strcmp(macro, MVAR_PROFILE_URL_B))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "url_b");
+	else if (0 == strcmp(macro, MVAR_PROFILE_URL_C))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "url_c");
+	else if (0 == strcmp(macro, MVAR_PROFILE_HOST_NETWORKS))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "host_networks");
+	else if (0 == strcmp(macro, MVAR_PROFILE_HOST_NETMASK))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "host_netmask");
+	else if (0 == strcmp(macro, MVAR_PROFILE_HOST_ROUTER))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "host_router");
+	else if (0 == strcmp(macro, MVAR_PROFILE_OOB_IP))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "oob_ip");
+	else if (0 == strcmp(macro, MVAR_PROFILE_OOB_NETMASK))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "oob_netmask");
+	else if (0 == strcmp(macro, MVAR_PROFILE_OOB_ROUTER))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "oob_router");
+	else if (0 == strcmp(macro, MVAR_PROFILE_HW_DATE_PURCHASE))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "date_hw_purchase");
+	else if (0 == strcmp(macro, MVAR_PROFILE_HW_DATE_INSTALL))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "date_hw_install");
+	else if (0 == strcmp(macro, MVAR_PROFILE_HW_DATE_EXPIRY))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "date_hw_expiry");
+	else if (0 == strcmp(macro, MVAR_PROFILE_HW_DATE_DECOMM))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "date_hw_decomm");
+	else if (0 == strcmp(macro, MVAR_PROFILE_SITE_ADDRESS_A))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "site_address_a");
+	else if (0 == strcmp(macro, MVAR_PROFILE_SITE_ADDRESS_B))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "site_address_b");
+	else if (0 == strcmp(macro, MVAR_PROFILE_SITE_ADDRESS_C))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "site_address_c");
+	else if (0 == strcmp(macro, MVAR_PROFILE_SITE_CITY))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "site_city");
+	else if (0 == strcmp(macro, MVAR_PROFILE_SITE_STATE))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "site_state");
+	else if (0 == strcmp(macro, MVAR_PROFILE_SITE_COUNTRY))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "site_country");
+	else if (0 == strcmp(macro, MVAR_PROFILE_SITE_ZIP))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "site_zip");
+	else if (0 == strcmp(macro, MVAR_PROFILE_SITE_RACK))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "site_rack");
+	else if (0 == strcmp(macro, MVAR_PROFILE_SITE_NOTES))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "site_notes");
+	else if (0 == strcmp(macro, MVAR_PROFILE_POC_PRIMARY_NAME))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "poc_1_name");
+	else if (0 == strcmp(macro, MVAR_PROFILE_POC_PRIMARY_EMAIL))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "poc_1_email");
+	else if (0 == strcmp(macro, MVAR_PROFILE_POC_PRIMARY_PHONE_A))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "poc_1_phone_a");
+	else if (0 == strcmp(macro, MVAR_PROFILE_POC_PRIMARY_PHONE_B))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "poc_1_phone_b");
+	else if (0 == strcmp(macro, MVAR_PROFILE_POC_PRIMARY_CELL))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "poc_1_cell");
+	else if (0 == strcmp(macro, MVAR_PROFILE_POC_PRIMARY_SCREEN))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "poc_1_screen");
+	else if (0 == strcmp(macro, MVAR_PROFILE_POC_PRIMARY_NOTES))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "poc_1_notes");
+	else if (0 == strcmp(macro, MVAR_PROFILE_POC_SECONDARY_NAME))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "poc_2_name");
+	else if (0 == strcmp(macro, MVAR_PROFILE_POC_SECONDARY_EMAIL))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "poc_2_email");
+	else if (0 == strcmp(macro, MVAR_PROFILE_POC_SECONDARY_PHONE_A))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "poc_2_phone_a");
+	else if (0 == strcmp(macro, MVAR_PROFILE_POC_SECONDARY_PHONE_B))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "poc_2_phone_b");
+	else if (0 == strcmp(macro, MVAR_PROFILE_POC_SECONDARY_CELL))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "poc_2_cell");
+	else if (0 == strcmp(macro, MVAR_PROFILE_POC_SECONDARY_SCREEN))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "poc_2_screen");
+	else if (0 == strcmp(macro, MVAR_PROFILE_POC_SECONDARY_NOTES))
+		return DBget_host_profile_value(trigger, replace_to, N_functionid, "poc_2_notes");
+
+	return SUCCEED;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -2162,7 +2377,7 @@ static const char	*ex_macros[] = {MVAR_PROFILE_DEVICETYPE, MVAR_PROFILE_NAME, MV
  *                      ^ - bl                                ^ - br          *
  *                                                                            *
  ******************************************************************************/
-static void	get_trigger_function_value(zbx_uint64_t triggerid, char **replace_to, char *bl, char **br)
+static void	get_trigger_function_value(DB_TRIGGER *trigger, char **replace_to, char *bl, char **br)
 {
 	char	*p, *host = NULL, *key = NULL, *function = NULL, *parameter = NULL;
 	int	N_functionid, res = SUCCEED;
@@ -2176,7 +2391,7 @@ static void	get_trigger_function_value(zbx_uint64_t triggerid, char **replace_to
 	{
 		N_functionid = ('}' == p[sz] ? 1 : p[sz] - '0');
 		p += sz + ('}' == p[sz] ? 1 : 2);
-		DBget_trigger_value_by_triggerid(triggerid, &host, N_functionid, ZBX_REQUEST_HOST_NAME);
+		DBget_trigger_value(trigger, &host, N_functionid, ZBX_REQUEST_HOST_NAME);
 	}
 	else
 		res = parse_host(&p, &host);
@@ -2191,7 +2406,7 @@ static void	get_trigger_function_value(zbx_uint64_t triggerid, char **replace_to
 	{
 		N_functionid = ('}' == p[sz] ? 1 : p[sz] - '0');
 		p += sz + ('}' == p[sz] ? 1 : 2);
-		DBget_trigger_value_by_triggerid(triggerid, &key, N_functionid, ZBX_REQUEST_ITEM_KEY_ORIG);
+		DBget_trigger_value(trigger, &key, N_functionid, ZBX_REQUEST_ITEM_KEY_ORIG);
 	}
 	else
 		res = parse_key(&p, &key);
@@ -2294,109 +2509,104 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 			{
 				if (0 == strcmp(m, MVAR_TRIGGER_NAME))
 				{
-					replace_to = zbx_strdup(replace_to, event->trigger_description);
-					substitute_simple_macros(event, hostid, dc_host, escalation, &replace_to,
-							MACRO_TYPE_TRIGGER_DESCRIPTION, error, maxerrlen);
+					if (0 != event->trigger.triggerid)
+					{
+						replace_to = zbx_strdup(replace_to, event->trigger.description);
+						substitute_simple_macros(event, hostid, dc_host, escalation, &replace_to,
+								MACRO_TYPE_TRIGGER_DESCRIPTION, error, maxerrlen);
+					}
+					else
+						ret = FAIL;
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_COMMENT))
-					replace_to = zbx_strdup(replace_to, event->trigger_comments);
-				else if (0 == strcmp(m, MVAR_PROFILE_DEVICETYPE))
-					ret = get_host_profile_value_by_triggerid(event->objectid, &replace_to, N_functionid, "devicetype");
-				else if (0 == strcmp(m, MVAR_PROFILE_NAME))
-					ret = get_host_profile_value_by_triggerid(event->objectid, &replace_to, N_functionid, "name");
-				else if (0 == strcmp(m, MVAR_PROFILE_OS))
-					ret = get_host_profile_value_by_triggerid(event->objectid, &replace_to, N_functionid, "os");
-				else if (0 == strcmp(m, MVAR_PROFILE_SERIALNO))
-					ret = get_host_profile_value_by_triggerid(event->objectid, &replace_to, N_functionid, "serialno");
-				else if (0 == strcmp(m, MVAR_PROFILE_TAG))
-					ret = get_host_profile_value_by_triggerid(event->objectid, &replace_to, N_functionid, "tag");
-				else if (0 == strcmp(m, MVAR_PROFILE_MACADDRESS))
-					ret = get_host_profile_value_by_triggerid(event->objectid, &replace_to, N_functionid, "macaddress");
-				else if (0 == strcmp(m, MVAR_PROFILE_HARDWARE))
-					ret = get_host_profile_value_by_triggerid(event->objectid, &replace_to, N_functionid, "hardware");
-				else if (0 == strcmp(m, MVAR_PROFILE_SOFTWARE))
-					ret = get_host_profile_value_by_triggerid(event->objectid, &replace_to, N_functionid, "software");
-				else if (0 == strcmp(m, MVAR_PROFILE_CONTACT))
-					ret = get_host_profile_value_by_triggerid(event->objectid, &replace_to, N_functionid, "contact");
-				else if (0 == strcmp(m, MVAR_PROFILE_LOCATION))
-					ret = get_host_profile_value_by_triggerid(event->objectid, &replace_to, N_functionid, "location");
-				else if (0 == strcmp(m, MVAR_PROFILE_NOTES))
-					ret = get_host_profile_value_by_triggerid(event->objectid, &replace_to, N_functionid, "notes");
+				{
+					if (0 != event->trigger.triggerid)
+						replace_to = zbx_strdup(replace_to, event->trigger.comments);
+					else
+						ret = FAIL;
+				}
+				else if (0 == strncmp(m, MVAR_PROFILE, sizeof(MVAR_PROFILE) - 1))
+					ret = get_host_profile(m, &event->trigger, &replace_to, N_functionid);
 				else if (0 == strcmp(m, MVAR_HOST_HOST))
-					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, N_functionid,
+					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_HOST);
 				else if (0 == strcmp(m, MVAR_HOSTNAME))
-					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, N_functionid,
+					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_NAME);
 				else if (0 == strcmp(m, MVAR_HOST_NAME))
-					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, N_functionid,
+					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_NAME);
 				else if (0 == strcmp(m, MVAR_ITEM_NAME))
-					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, N_functionid,
+					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_ITEM_NAME);
 				else if (0 == strcmp(m, MVAR_TRIGGER_KEY))
-					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, N_functionid,
+					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_ITEM_KEY);
 				else if (0 == strcmp(m, MVAR_IPADDRESS))
-					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, N_functionid,
+					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_IPADDRESS);
 				else if (0 == strcmp(m, MVAR_HOST_DNS))
-					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, N_functionid,
+					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_DNS);
 				else if (0 == strcmp(m, MVAR_HOST_CONN))
-					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, N_functionid,
+					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_CONN);
 				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
-					ret = DBget_item_lastvalue_by_triggerid(event->objectid, &replace_to, N_functionid);
+					ret = DBget_item_lastvalue(&event->trigger, &replace_to, N_functionid);
 				else if (0 == strcmp(m, MVAR_ITEM_VALUE))
-					ret = DBget_item_value_by_triggerid(event->objectid, &replace_to, N_functionid,
+					ret = DBget_item_value(&event->trigger, &replace_to, N_functionid,
 							event->clock, event->ns);
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_DATE))
 				{
-					if (SUCCEED == (ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to,
+					if (SUCCEED == (ret = DBget_history_log_value(&event->trigger, &replace_to,
 									N_functionid, "timestamp", event->clock, event->ns)))
 						replace_to = zbx_strdup(replace_to, zbx_date2str((time_t)atoi(replace_to)));
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_TIME))
 				{
-					if (SUCCEED == (ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to,
+					if (SUCCEED == (ret = DBget_history_log_value(&event->trigger, &replace_to,
 									N_functionid, "timestamp", event->clock, event->ns)))
 						replace_to = zbx_strdup(replace_to, zbx_time2str((time_t)atoi(replace_to)));
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_AGE))
 				{
-					if (SUCCEED == (ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to,
+					if (SUCCEED == (ret = DBget_history_log_value(&event->trigger, &replace_to,
 									N_functionid, "timestamp", event->clock, event->ns)))
 						replace_to = zbx_strdup(replace_to, zbx_age2str(time(NULL) - atoi(replace_to)));
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_SOURCE))
-					ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to,
-							N_functionid, "source", event->clock, event->ns);
+					ret = DBget_history_log_value(&event->trigger, &replace_to, N_functionid,
+							"source", event->clock, event->ns);
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_SEVERITY))
 				{
-					if (SUCCEED == (ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to,
+					if (SUCCEED == (ret = DBget_history_log_value(&event->trigger, &replace_to,
 									N_functionid, "severity", event->clock, event->ns)))
 						replace_to = zbx_strdup(replace_to,
 								zbx_item_logtype_string((zbx_item_logtype_t)atoi(replace_to)));
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_NSEVERITY))
-					ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to,
-							N_functionid, "severity", event->clock, event->ns);
+					ret = DBget_history_log_value(&event->trigger, &replace_to, N_functionid,
+							"severity", event->clock, event->ns);
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_EVENTID))
-					ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to,
-							N_functionid, "logeventid", event->clock, event->ns);
+					ret = DBget_history_log_value(&event->trigger, &replace_to, N_functionid,
+							"logeventid", event->clock, event->ns);
 				else if (0 == strcmp(m, MVAR_DATE))
 					replace_to = zbx_strdup(replace_to, zbx_date2str(time(NULL)));
 				else if (0 == strcmp(m, MVAR_TIME))
 					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL)));
-				else if (0 == strcmp(m, MVAR_TRIGGER_STATUS) || 0 == strcmp(m, MVAR_TRIGGER_STATUS_OLD))
+				else if (0 == strcmp(m, MVAR_TRIGGER_STATUS) || 0 == strcmp(m, MVAR_STATUS))
 					replace_to = zbx_strdup(replace_to, event->value == TRIGGER_VALUE_TRUE ? "PROBLEM" : "OK");
 				else if (0 == strcmp(m, MVAR_TRIGGER_ID))
 					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->objectid);
 				else if (0 == strcmp(m, MVAR_TRIGGER_VALUE))
 					replace_to = zbx_dsprintf(replace_to, "%d", event->value);
 				else if (0 == strcmp(m, MVAR_TRIGGER_URL))
-					replace_to = zbx_strdup(replace_to, event->trigger_url);
+				{
+					if (0 != event->trigger.triggerid)
+						replace_to = zbx_strdup(replace_to, event->trigger.url);
+					else
+						ret = FAIL;
+				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_EVENTS_ACK))
 					ret = DBget_trigger_event_count(event->objectid, &replace_to, 0, 1);
 				else if (0 == strcmp(m, MVAR_TRIGGER_EVENTS_UNACK))
@@ -2420,20 +2630,25 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 				else if (0 == strcmp(m, MVAR_ESC_HISTORY))
 					ret = get_escalation_history(event, escalation, &replace_to);
 				else if (0 == strcmp(m, MVAR_TRIGGER_SEVERITY))
-					ret = DBget_trigger_severity_name(event->trigger_priority, &replace_to);
+					ret = DBget_trigger_severity_name(&event->trigger, &replace_to);
 				else if (0 == strcmp(m, MVAR_TRIGGER_NSEVERITY))
-					replace_to = zbx_dsprintf(replace_to, "%d", event->trigger_priority);
+				{
+					if (0 != event->trigger.triggerid)
+						replace_to = zbx_dsprintf(replace_to, "%d", (int)event->trigger.priority);
+					else
+						ret = FAIL;
+				}
 				else if (0 == strcmp(m, MVAR_NODE_ID))
-					ret = get_node_value_by_triggerid(event->objectid, &replace_to, N_functionid, "nodeid");
+					ret = DBget_node_value(&event->trigger, &replace_to, N_functionid, "nodeid");
 				else if (0 == strcmp(m, MVAR_NODE_NAME))
-					ret = get_node_value_by_triggerid(event->objectid, &replace_to, N_functionid, "name");
+					ret = DBget_node_value(&event->trigger, &replace_to, N_functionid, "name");
 				else if (0 == strcmp(m, MVAR_PROXY_NAME))
-					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, N_functionid,
+					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_PROXY_NAME);
 				else
 				{
 					*br = c;
-					get_trigger_function_value(event->objectid, &replace_to, bl, &br);
+					get_trigger_function_value(&event->trigger, &replace_to, bl, &br);
 					c = *br;
 					*br = '\0';
 				}
@@ -2556,27 +2771,27 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 			if (EVENT_SOURCE_TRIGGERS == event->source)
 			{
 				if (0 == strcmp(m, MVAR_HOST_HOST))
-					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, N_functionid,
+					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_HOST);
 				else if (0 == strcmp(m, MVAR_HOSTNAME))
-					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, N_functionid,
+					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_NAME);
 				else if (0 == strcmp(m, MVAR_HOST_NAME))
-					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, N_functionid,
+					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_NAME);
 				else if (0 == strcmp(m, MVAR_IPADDRESS))
-					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, N_functionid,
+					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_IPADDRESS);
 				else if (0 == strcmp(m, MVAR_HOST_DNS))
-					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, N_functionid,
+					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_DNS);
 				else if (0 == strcmp(m, MVAR_HOST_CONN))
-					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, N_functionid,
+					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_CONN);
 				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
-					ret = DBget_item_lastvalue_by_triggerid(event->objectid, &replace_to, N_functionid);
+					ret = DBget_item_lastvalue(&event->trigger, &replace_to, N_functionid);
 				else if (0 == strcmp(m, MVAR_ITEM_VALUE))
-					ret = DBget_item_value_by_triggerid(event->objectid, &replace_to, N_functionid,
+					ret = DBget_item_value(&event->trigger, &replace_to, N_functionid,
 							event->clock, event->ns);
 				else if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 					DBget_macro_value_by_triggerid(event->objectid, m, &replace_to);

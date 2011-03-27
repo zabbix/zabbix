@@ -34,6 +34,18 @@ class testFormHost extends CWebTest{
 
 	public $host = "Test host";
 
+	public function testFormHost_Layout(){
+		$this->login('hosts.php?form=1');
+
+		$this->click('link=Host profile');
+
+		$profileFields = getHostProfiles();
+		foreach($profileFields as $fieldId => $fieldName){
+			$this->ok($fieldName);
+			$this->assertElementPresent('host_profile['.$fieldId.']');
+		}
+	}
+
 	public function testFormHost_Create(){
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid','Zabbix servers');
@@ -249,7 +261,6 @@ class testFormHost extends CWebTest{
 		$this->wait();
 		$this->assertTitle('Hosts');
 		$this->ok('Host updated');
-		// should check in the db that no items, triggers, apps or custom graphs exist on the host
 	}
 
 }

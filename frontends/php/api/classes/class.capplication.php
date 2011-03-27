@@ -481,7 +481,7 @@ COpt::memoryPick();
 					'nopermissions' => 1
 				));
 				foreach($applicationsExists as $applicationExists){
-					if(!$update || ($applicationExists['applicationid'] != $application['applicationid'])){
+					if(!$update || (bccomp($applicationExists['applicationid'], $application['applicationid']) != 0)){
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_APPLICATION.' ['.$application['name'].'] '.S_ALREADY_EXISTS_SMALL);
 					}
 				}
@@ -800,7 +800,7 @@ COpt::memoryPick();
 				if(isset($application['name']) && isset($exApplicationsNames[$application['name']])){
 					$exApplication = $exApplicationsNames[$application['name']];
 
-					if(($exApplication['templateid'] > 0) && ($exApplication['templateid'] != $application['applicationid'])){
+					if(($exApplication['templateid'] > 0) && (bccomp($exApplication['templateid'],$application['applicationid']) != 0)){
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_APPLICATION.' ['.$exApplication['name'].'] '.S_ALREADY_EXISTS_FOR_HOST_SMALL.' ['.$host['host'].']');
 					}
 				}

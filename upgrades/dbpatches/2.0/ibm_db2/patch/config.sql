@@ -22,51 +22,51 @@ ALTER TABLE config ADD ns_support integer WITH DEFAULT '0' NOT NULL
 /
 REORG TABLE config
 /
-ALTER TABLE config ADD severity_color_0 varchar(6) SET WITH DEFAULT 'DBDBDB' NOT NULL
+ALTER TABLE config ADD severity_color_0 varchar(6) WITH DEFAULT 'DBDBDB' NOT NULL
 /
 REORG TABLE config
 /
-ALTER TABLE config ADD severity_color_1 varchar(6) SET WITH DEFAULT 'D6F6FF' NOT NULL
+ALTER TABLE config ADD severity_color_1 varchar(6) WITH DEFAULT 'D6F6FF' NOT NULL
 /
 REORG TABLE config
 /
-ALTER TABLE config ADD severity_color_2 varchar(6) SET WITH DEFAULT 'FFF6A5' NOT NULL
+ALTER TABLE config ADD severity_color_2 varchar(6) WITH DEFAULT 'FFF6A5' NOT NULL
 /
 REORG TABLE config
 /
-ALTER TABLE config ADD severity_color_3 varchar(6) SET WITH DEFAULT 'FFB689' NOT NULL
+ALTER TABLE config ADD severity_color_3 varchar(6) WITH DEFAULT 'FFB689' NOT NULL
 /
 REORG TABLE config
 /
-ALTER TABLE config ADD severity_color_4 varchar(6) SET WITH DEFAULT 'FF9999' NOT NULL
+ALTER TABLE config ADD severity_color_4 varchar(6) WITH DEFAULT 'FF9999' NOT NULL
 /
 REORG TABLE config
 /
-ALTER TABLE config ADD severity_color_5 varchar(6) SET WITH DEFAULT 'FF3838' NOT NULL
+ALTER TABLE config ADD severity_color_5 varchar(6) WITH DEFAULT 'FF3838' NOT NULL
 /
 REORG TABLE config
 /
-ALTER TABLE config ADD severity_name_0 varchar(32) SET WITH DEFAULT 'Not classified' NOT NULL
+ALTER TABLE config ADD severity_name_0 varchar(32) WITH DEFAULT 'Not classified' NOT NULL
 /
 REORG TABLE config
 /
-ALTER TABLE config ADD severity_name_1 varchar(32) SET WITH DEFAULT 'Information' NOT NULL
+ALTER TABLE config ADD severity_name_1 varchar(32) WITH DEFAULT 'Information' NOT NULL
 /
 REORG TABLE config
 /
-ALTER TABLE config ADD severity_name_2 varchar(32) SET WITH DEFAULT 'Warning' NOT NULL
+ALTER TABLE config ADD severity_name_2 varchar(32) WITH DEFAULT 'Warning' NOT NULL
 /
 REORG TABLE config
 /
-ALTER TABLE config ADD severity_name_3 varchar(32) SET WITH DEFAULT 'Average' NOT NULL
+ALTER TABLE config ADD severity_name_3 varchar(32) WITH DEFAULT 'Average' NOT NULL
 /
 REORG TABLE config
 /
-ALTER TABLE config ADD severity_name_4 varchar(32) SET WITH DEFAULT 'High' NOT NULL
+ALTER TABLE config ADD severity_name_4 varchar(32) WITH DEFAULT 'High' NOT NULL
 /
 REORG TABLE config
 /
-ALTER TABLE config ADD severity_name_5 varchar(32) SET WITH DEFAULT 'Disaster' NOT NULL
+ALTER TABLE config ADD severity_name_5 varchar(32) WITH DEFAULT 'Disaster' NOT NULL
 /
 REORG TABLE config
 /

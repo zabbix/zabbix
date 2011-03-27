@@ -445,7 +445,7 @@ msgid "Apply"
 msgstr "Appliquer"
 
 #: include/locales/en_gb.inc.php:739
-msgid "Approach"
+msgid "Approaching"
 msgstr "Approche"
 
 #: include/locales/en_gb.inc.php:57
