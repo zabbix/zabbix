@@ -956,7 +956,7 @@ COpt::memoryPick();
 	}
 
 	public function exists($object){
-		$keyFields = array(array('templateid', 'host'));
+		$keyFields = array(array('templateid', 'host', 'name'));
 
 		$options = array(
 			'filter' => zbx_array_mintersect($keyFields, $object),
@@ -1015,7 +1015,7 @@ COpt::memoryPick();
 
 			foreach($templates as $tnum => $template){
 // If visible name is not given or empty it should be set to host name
-				if(!isset($template['name']) || (isset($template['name']) && '' == $template['name']))
+				if(!isset($template['name']) || (isset($template['name']) && zbx_empty(trim($template['name']))))
 				{
 					if(isset($template['host'])) $template['name'] = $template['host'];
 				}
@@ -1093,8 +1093,8 @@ COpt::memoryPick();
 			}
 
 			foreach($templates as $tnum => $template){
-// If visible name is not given or empty it should be set to host name
-				if(!isset($template['name']) || (isset($template['name']) && '' == $template['name']))
+// if visible name is not given or empty it should be set to host name
+				if(!isset($template['name']) || (isset($template['name']) && zbx_empty(trim($template['name']))))
 				{
 					if(isset($template['host'])) $template['name'] = $template['host'];
 				}
@@ -1368,14 +1368,14 @@ COpt::memoryPick();
 			if(isset($data['name']))
 			{
 // if visible name is empty replace it with host name
-				if('' == $data['name'] && isset($data['host']))
+				if(zbx_empty(trim($data['name'])) && isset($data['host']))
 				{
 					$sql_set[] = 'name=' . zbx_dbstr($data['host']);
 				}
 // we cannot have empty visible name
-				else if('' == $data['name'] && !isset($data['host']))
+				else if(zbx_empty(trim($data['name'])) && !isset($data['host']))
 				{
-					// do nothing
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot have empty visible template name'));
 				}
 				else
 				{

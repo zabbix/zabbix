@@ -276,5 +276,16 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 		$this->assertEquals(0, DBcount($sql), "Chuck Norris: There are items with interfaceid NULL not of types 2, 5, 7, 8, 9, 15");
 
 	}
+
+// Check that page does not have real (not visible) host or template names
+	public function checkNoRealHostnames()
+	{
+		$result = DBselect('select host from hosts where status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')');
+		while($row = DBfetch($result))
+		{
+			echo $row['host']."\n";
+			$this->nok($row['host']);
+		}
+	}
 }
 ?>
