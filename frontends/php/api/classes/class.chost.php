@@ -1321,7 +1321,7 @@ Copt::memoryPick();
 			}
 
 			if(isset($host['host'])){
-				// Check if host name isn't longer then 64 chars
+				// Check if host name isn't longer than 64 chars
 				if(zbx_strlen($host['host']) > 64){
 					self::exception(
 						ZBX_API_ERROR_PARAMETERS,
@@ -1369,7 +1369,7 @@ Copt::memoryPick();
 			}
 
 			if(isset($host['name'])){
-				// Check if visible name isn't longer then 64 chars
+				// Check if visible name isn't longer than 64 chars
 				if(zbx_strlen($host['name']) > 64){
 					self::exception(
 						ZBX_API_ERROR_PARAMETERS,
