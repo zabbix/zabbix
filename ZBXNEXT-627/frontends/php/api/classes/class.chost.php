@@ -1228,7 +1228,7 @@ Copt::memoryPick();
 	}
 
 	public function exists($object){
-		$keyFields = array(array('hostid', 'host'));
+		$keyFields = array(array('hostid', 'host', 'name'));
 
 		$options = array(
 			'filter' => zbx_array_mintersect($keyFields, $object),
@@ -1344,6 +1344,45 @@ Copt::memoryPick();
 
 				$hostNames[$host['host']] = $update ? $host['hostid'] : 1;
 			}
+
+// if visible name is not given or empty it should be set to host name
+			if($create)
+			{
+				if(!isset($host['name']) || (isset($host['name']) && zbx_empty(trim($host['name']))))
+				{
+					if(isset($host['host'])) $host['name'] = $host['host'];
+				}
+			}
+
+			if($update && isset($host['name']))
+			{
+// if visible name is empty replace it with host name
+				if(zbx_empty(trim($host['name'])) && isset($host['host']))
+				{
+					$host['name'] = $host['host'];
+				}
+// we cannot have empty visible name
+				else if(zbx_empty(trim($host['name'])) && !isset($host['host']))
+				{
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Visible name cannot be empty if missing host name'));
+				}
+			}
+
+			if(isset($host['name'])){
+				// Check if visible name isn't longer then 64 chars
+				if(zbx_strlen($host['name']) > 64){
+					self::exception(
+						ZBX_API_ERROR_PARAMETERS,
+						_n(
+							'Maximum visible host name length is %2$d characters, "%3$s" is %1$d character.',
+							'Maximum visible host name length is %2$d characters, "%3$s" is %1$d characters.',
+							zbx_strlen($host['name']),
+							64,
+							$host['name']
+						)
+					);
+				}
+			}
 		}
 		unset($host);
 
@@ -1401,11 +1440,6 @@ Copt::memoryPick();
 		$this->checkInput($hosts, __FUNCTION__);
 
 		foreach($hosts as $num => $host){
-// If visible name is not given or empty it should be set to host name
-			if(!isset($host['name']) || (isset($host['name']) && '' == $host['name']))
-			{
-				if(isset($host['host'])) $host['name'] = $host['host'];
-			}
 
 			$hostid = DB::insert('hosts', array($host));
 			$hostids[] = $hostid = reset($hostid);
@@ -1673,25 +1707,6 @@ Copt::memoryPick();
 
 			if(isset($data['host']) && !preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $data['host'])){
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Hostname "%s"', $data['host']));
-			}
-
-			if(isset($data['name']))
-			{
-// if visible name is empty replace it with host name
-				if('' == $data['name'] && isset($data['host']))
-				{
-					$data['name'] = $data['host'];
-				}
-// we cannot have empty visible name
-				else if('' == $data['name'] && !isset($data['host']))
-				{
-					// do not update empty visible name
-					unset($data['name']);
-				}
-				else
-				{
-					$sql_set[] = 'name=' . zbx_dbstr($data['name']);
-				}
 			}
 
 			$update = array(
