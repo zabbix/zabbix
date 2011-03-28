@@ -246,6 +246,7 @@
 	define('INTERFACE_TYPE_AGENT',		1);
 	define('INTERFACE_TYPE_SNMP',		2);
 	define('INTERFACE_TYPE_IPMI',		3);
+	define('INTERFACE_TYPE_JMX',		4);
 
 	define('MAINTENANCE_STATUS_ACTIVE',		0);
 	define('MAINTENANCE_STATUS_APPROACH',	1);
@@ -322,6 +323,7 @@
 	define('ITEM_TYPE_SSH',				13);
 	define('ITEM_TYPE_TELNET',			14);
 	define('ITEM_TYPE_CALCULATED',		15);
+	define('ITEM_TYPE_JMX',			16);
 
 	define('ITEM_VALUE_TYPE_FLOAT',		0);
 	define('ITEM_VALUE_TYPE_STR',		1);
@@ -332,6 +334,7 @@
 	define('ITEM_DATA_TYPE_DECIMAL',		0);
 	define('ITEM_DATA_TYPE_OCTAL',			1);
 	define('ITEM_DATA_TYPE_HEXADECIMAL',	2);
+	define('ITEM_DATA_TYPE_BOOLEAN',	3);
 
 	define('ITEM_STATUS_ACTIVE',		0);
 	define('ITEM_STATUS_DISABLED',		1);

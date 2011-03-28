@@ -469,7 +469,7 @@ div.thin_header{ background: #3C759B url(darkblue/images/ui-bg_inset-soft_25_3c7
 div.zabbix_logo{ background-image:url('../images/general/zabbix_bb.png'); }
 .iconzbxavailable{ background-image: url('../images/general/zabbix_available_bb.png'); }
 .iconsnmpavailable{ background-image: url('../images/general/snmp_available_bb.png'); }
-
+.iconjmxavailable{ background-image: url('../images/general/jmx_available_bb.png'); }
 .iconipmiavailable{ background-image: url('../images/general/ipmi_available_bb.png'); }
 .sla_green{ background-image: url('../images/gradients/sla_blue15.png'); }
 .icon_sortup{ background-image: url('../images/general/sort_up_blue.gif'); }

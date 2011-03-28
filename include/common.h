@@ -149,6 +149,7 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #define	NETWORK_ERROR	(-3)
 #define	TIMEOUT_ERROR	(-4)
 #define	AGENT_ERROR	(-5)
+#define	PROXY_ERROR	(-6)
 const char	*zbx_result_string(int result);
 
 #define MAX_ID_LEN	21
@@ -157,7 +158,7 @@ const char	*zbx_result_string(int result);
 
 #define ZBX_DM_DELIMITER	'\255'
 
-typedef struct zbx_timespec
+typedef struct
 {
 	int	sec;	/* seconds */
 	int	ns;	/* nanoseconds */
@@ -182,16 +183,19 @@ typedef enum
 	ITEM_TYPE_IPMI,
 	ITEM_TYPE_SSH,
 	ITEM_TYPE_TELNET,
-	ITEM_TYPE_CALCULATED
+	ITEM_TYPE_CALCULATED,
+	ITEM_TYPE_JMX
 }
 zbx_item_type_t;
+const char	*zbx_host_type_string(zbx_item_type_t item_type);
 
 typedef enum
 {
 	INTERFACE_TYPE_UNKNOWN = 0,
 	INTERFACE_TYPE_AGENT,
 	INTERFACE_TYPE_SNMP,
-	INTERFACE_TYPE_IPMI
+	INTERFACE_TYPE_IPMI,
+	INTERFACE_TYPE_JMX
 }
 zbx_interface_type_t;
 const char	*zbx_interface_type_string(zbx_interface_type_t type);
@@ -250,8 +254,10 @@ typedef enum
 {
 	ITEM_DATA_TYPE_DECIMAL = 0,
 	ITEM_DATA_TYPE_OCTAL,
-	ITEM_DATA_TYPE_HEXADECIMAL
+	ITEM_DATA_TYPE_HEXADECIMAL,
+	ITEM_DATA_TYPE_BOOLEAN
 } zbx_item_data_type_t;
+const char	*zbx_item_data_type_string(zbx_item_data_type_t data_type);
 
 /* HTTP test states */
 typedef enum
@@ -659,11 +665,13 @@ const char	*zbx_nodetype_string(unsigned char nodetype);
 #endif
 
 #define zbx_malloc(old, size)	zbx_malloc2(__FILE__, __LINE__, old, size)
-#define zbx_realloc(src, size)	zbx_realloc2(__FILE__, __LINE__, src, size)
+#define zbx_realloc(old, size)	zbx_realloc2(__FILE__, __LINE__, old, size)
 #define zbx_strdup(old, str)	zbx_strdup2(__FILE__, __LINE__, old, str)
 
+#define ZBX_STRDUP(var, str)	(var = zbx_strdup(var, str))
+
 void    *zbx_malloc2(const char *filename, int line, void *old, size_t size);
-void    *zbx_realloc2(const char *filename, int line, void *src, size_t size);
+void    *zbx_realloc2(const char *filename, int line, void *old, size_t size);
 char    *zbx_strdup2(const char *filename, int line, char *old, const char *str);
 
 #define zbx_free(ptr)		\
@@ -741,6 +749,7 @@ int	is_uint(const char *c);
 int	is_int_prefix(const char *c);
 int	is_uint64(const char *str, zbx_uint64_t *value);
 int	is_ushort(const char *str, unsigned short *value);
+int	is_boolean(const char *str, zbx_uint64_t *value);
 int	is_uoct(const char *str);
 int	is_uhex(const char *str);
 int	is_hex_string(const char *str);
@@ -764,8 +773,8 @@ const char	*get_string(const char *p, char *buf, size_t bufsize);
 int	get_key_param(char *param, int num, char *buf, int maxlen);
 int	num_key_param(char *param);
 char	*dyn_escape_param(const char *src);
-int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay,
-		const char *delay_flex, time_t now, int *effective_delay);
+int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int item_type,
+		int delay, const char *flex_intervals, time_t now, int *effective_delay);
 time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t now);
 int	check_time_period(const char *period, time_t now);
 char	zbx_num2hex(u_char c);
@@ -860,18 +869,18 @@ int	comms_parse_response(char *xml, char *host, int host_len, char *key, int key
 
 int 	parse_command(const char *command, char *cmd, int cmd_max_len, char *param, int param_max_len);
 
-typedef struct zbx_regexp_s
+typedef struct
 {
 	char			*name;
 	char			*expression;
 	int			expression_type;
 	char			exp_delimiter;
 	zbx_case_sensitive_t	case_sensitive;
-} ZBX_REGEXP;
+}
+ZBX_REGEXP;
 
 /* Regular expressions */
 char    *zbx_regexp_match(const char *string, const char *pattern, int *len);
-/* Non case sensitive */
 char    *zbx_iregexp_match(const char *string, const char *pattern, int *len);
 
 void	clean_regexps_ex(ZBX_REGEXP *regexps, int *regexps_num);
@@ -922,6 +931,7 @@ LPSTR	zbx_unicode_to_utf8(LPCTSTR wide_string);
 int	zbx_unicode_to_utf8_static(LPCTSTR wide_string, LPSTR utf8_string, int utf8_size);
 int	_wis_uint(LPCTSTR wide_string);
 #endif
+void	zbx_strlower(char *str);
 void	zbx_strupper(char *str);
 #if defined(_WINDOWS) || defined(HAVE_ICONV)
 char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);

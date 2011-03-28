@@ -637,6 +637,8 @@ class zbxXML{
 							$img = reset($imgs);
 
 							$image['imageid'] = $img['imageid'];
+
+							// image will be decoded in class.image.php
 							$image['image'] = $image['encodedImage'];
 							unset($image['encodedImage']);
 
