@@ -383,9 +383,15 @@ void	collect_perfstat()
 		if (ITEM_STATUS_NOTSUPPORTED == cptr->status)	/* Inactive counter? */
 			continue;
 
-		if (ERROR_SUCCESS != (status = PdhGetRawCounterValue(cptr->handle, NULL, &cptr->rawValueArray[cptr->CurrentCounter])))
+		if (ERROR_SUCCESS == (status = PdhGetRawCounterValue(cptr->handle, NULL, &cptr->rawValueArray[cptr->CurrentCounter])) ||
+			(PDH_CSTATUS_VALID_DATA != cptr->rawValueArray[cptr->CurrentCounter].CStatus &&
+			PDH_CSTATUS_NEW_DATA != cptr->rawValueArray[cptr->CurrentCounter].CStatus))
 		{
-			zabbix_log(LOG_LEVEL_ERR, "Call to PdhGetRawCounterValue() failed: %s", strerror_from_module(status, L"PDH.DLL"));
+			if (ERROR_SUCCESS == status)
+				status = cptr->rawValueArray[cptr->CurrentCounter].CStatus;
+
+			zabbix_log(LOG_LEVEL_DEBUG, "Can't get counter value \"%s\": %s",
+				cptr->counterPath, strerror_from_module(status, L"PDH.DLL"));
 			cptr->status = ITEM_STATUS_NOTSUPPORTED;
 			continue;
 		}
@@ -402,7 +408,8 @@ void	collect_perfstat()
 			);
 		if (ERROR_SUCCESS != status)
 		{
-			zabbix_log(LOG_LEVEL_ERR, "Call to PdhComputeCounterStatistics() failed: %s", strerror_from_module(status, L"PDH.DLL"));
+			zabbix_log(LOG_LEVEL_DEBUG, "Can't calculate counter statistics \"%s\": %s",
+				cptr->counterPath, strerror_from_module(status, L"PDH.DLL"));
 			cptr->status = ITEM_STATUS_NOTSUPPORTED;
 			continue;
 		}
