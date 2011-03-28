@@ -1300,7 +1300,7 @@ COpt::memoryPick();
 							));
 						}
 
-uuuu						$diff = zbx_array_diff($operation['opcommand_hst'], $operationDb['opcommand_hst'], 'opcommand_hstid');
+						$diff = zbx_array_diff($operation['opcommand_hst'], $operationDb['opcommand_hst'], 'opcommand_hstid');
 
 						$opcommand_hstCreate = array_merge($opcommand_hstCreate, $diff['second']);
 						foreach($diff['first'] as $omhst){
