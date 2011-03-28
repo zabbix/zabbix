@@ -44,9 +44,11 @@ function __autoload($class_name){
 		'chostinterface'=> 1,
 		'cimage' => 1,
 		'citem' => 1,
+		'citemgeneral' => 1,
 		'citemprototype' => 1,
 		'cmaintenance' => 1,
 		'cmap' => 1,
+		'cmapelement' => 1,
 		'cmediatype' => 1,
 		'cproxy' => 1,
 		'cscreen' => 1,
@@ -168,7 +170,7 @@ function __autoload($class_name){
 		else{
 			$show_warning = true;
 			define('ZBX_DISTRIBUTED', false);
-			define('ZBX_PAGE_NO_AUTHORIZATION', true);
+			if(!defined('ZBX_PAGE_NO_AUTHORIZATION')) define('ZBX_PAGE_NO_AUTHORIZATION', true);
 			error($config->error);
 		}
 
@@ -180,7 +182,7 @@ function __autoload($class_name){
 				$_REQUEST['message'] = $error;
 
 				define('ZBX_DISTRIBUTED', false);
-				define('ZBX_PAGE_NO_AUTHORIZATION', true);
+				if(!defined('ZBX_PAGE_NO_AUTHORIZATION')) define('ZBX_PAGE_NO_AUTHORIZATION', true);
 
 				$show_warning = true;
 			}
@@ -213,7 +215,7 @@ function __autoload($class_name){
 
 		require_once('include/db.inc.php');
 
-		define('ZBX_PAGE_NO_AUTHORIZATION', true);
+		if(!defined('ZBX_PAGE_NO_AUTHORIZATION')) define('ZBX_PAGE_NO_AUTHORIZATION', true);
 		define('ZBX_DISTRIBUTED', false);
 		$show_setup = true;
 	}
@@ -322,7 +324,7 @@ function __autoload($class_name){
 			$req = new Curl($_SERVER['REQUEST_URI']);
 			$req->setArgument('sid', null);
 
-			$table = new CTable(null, 'warning');
+			$table = new CTable(null, 'warningTable');
 			$table->setAlign('center');
 			$table->setHeader(new CCol(S_CONFIG_ERROR_YOU_ARE_NOT_LOGGED_IN_HEAD, 'left'),'header');
 
@@ -734,11 +736,11 @@ function __autoload($class_name){
 
 		if(is_null($format)) $format = $IMAGE_FORMAT_DEFAULT;
 
-		if(IMAGE_FORMAT_JPEG == $format)	Header( "Content-type:  image/jpeg");
-		if(IMAGE_FORMAT_TEXT == $format)	Header( "Content-type:  text/html");
-		else								Header( "Content-type:  image/png");
+		if(IMAGE_FORMAT_JPEG == $format)	header( "Content-type:  image/jpeg");
+		if(IMAGE_FORMAT_TEXT == $format)	header( "Content-type:  text/html");
+		else								header( "Content-type:  image/png");
 
-		Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT");
+		header("Expires:  Mon, 17 Aug 1998 12:51:50 GMT");
 	}
 
 	function ImageOut(&$image,$format=NULL){

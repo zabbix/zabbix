@@ -221,15 +221,51 @@ function update_config($configs){
 	if(isset($configs['work_period']) && !is_null($configs['work_period'])){
 		if(!validate_period($configs['work_period'])){
 			error(S_INCORRECT_WORK_PERIOD);
-			return NULL;
+			return false;
 		}
 	}
 	if(isset($configs['alert_usrgrpid']) && !is_null($configs['alert_usrgrpid'])){
 		if(($configs['alert_usrgrpid'] != 0) && !DBfetch(DBselect('select usrgrpid from usrgrp where usrgrpid='.$configs['alert_usrgrpid']))){
-			error(S_INCORRECT_GROUP);;
-			return NULL;
+			error(S_INCORRECT_GROUP);
+			return false;
 		}
 	}
+
+// check color value for each severity.
+	for($i=0; $i<TRIGGER_SEVERITY_COUNT; $i++){
+		$varName = 'severity_color_'.$i;
+		if(isset($configs[$varName]) && !is_null($configs[$varName])){
+			if(!preg_match('/[0-9a-f]{6}/i', $configs[$varName])){
+				error(_('Severity colour is not correct: expecting hexadecimal colour code (6 symbols).'));
+				return false;
+			}
+		}
+	}
+
+
+	$currentConfig = select_config();
+// check duplicate severity names and if name is empty.
+	$names = array();
+	for($i=0; $i<TRIGGER_SEVERITY_COUNT; $i++){
+		$varName = 'severity_name_'.$i;
+		if(!isset($configs[$varName]) || is_null($configs[$varName])){
+			$configs[$varName] = $currentConfig[$varName];
+		}
+
+		if($configs[$varName] == ''){
+			error(_s('Severity name cannot be empty.'));
+			return false;
+		}
+
+		if(isset($names[$configs[$varName]])){
+			error(_s('Duplicate severity name "%s".', $configs[$varName]));
+			return false;
+		}
+		else{
+			$names[$configs[$varName]] = 1;
+		}
+	}
+
 
 	foreach($configs as $key => $value){
 		if(!is_null($value)){
@@ -260,10 +296,10 @@ function get_user_history(){
 			FROM user_history WHERE userid='.CWebUser::$data['userid'];
 	$history = DBfetch(DBSelect($sql));
 
-	if($history)
+	if($history && !zbx_empty($history['url4']))
 		CWebUser::$data['last_page'] = array('title' => $history['title4'], 'url' => $history['url4']);
 	else
-		CWebUser::$data['last_page'] = false;
+		CWebUser::$data['last_page'] = array('title' => S_DASHBOARD, 'url' => 'dashboard.php');
 
 	for($i = 1; $i<6; $i++){
 		if(defined($history['title'.$i])){
@@ -309,7 +345,7 @@ function add_user_history($page){
 			return; // no need to change anything;
 	}
 	else{ // new page with new title is added
-		if(!CWebUser::$data['last_page']){
+		if($history5 === false){
 			$userhistoryid = get_dbid('user_history', 'userhistoryid');
 			$sql = 'INSERT INTO user_history (userhistoryid, userid, title5, url5)'.
 					' VALUES('.$userhistoryid.', '.$userid.', '.zbx_dbstr($title).', '.zbx_dbstr($url).')';

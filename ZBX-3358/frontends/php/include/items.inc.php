@@ -350,6 +350,7 @@
 				if(!isset($item['interfaceid'])){
 					error(_s('Item [%1$s:%2$s] cannot find interface on host [%3$s]', $item['description'], $item['key_'], $host['host']));
 					return false;
+
 				}
 			}
 
@@ -606,7 +607,7 @@
         }
 
 		if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $descr, $arr)){
-			$macros = API::UserMacro()->getMacros($arr[1], array('itemid' => $item['itemid']));
+			$macros = API::UserMacro()->getMacros(array('macros' => $arr[1], 'itemid' => $item['itemid']));
 
 			$search = array_keys($macros);
 			$values = array_values($macros);
@@ -759,7 +760,7 @@
 		$ack = null;
 		if(isset($ithosts[$hostname])){
 			if($ithosts[$hostname]['tr_value'] == TRIGGER_VALUE_TRUE){
-				$css_class = get_severity_style($ithosts[$hostname]['severity']);
+				$css_class = getSeverityStyle($ithosts[$hostname]['severity']);
 				$ack = get_last_event_by_triggerid($ithosts[$hostname]['triggerid']);
 				if ( 1 == $ack['acknowledged'] )
 					$ack = array(SPACE, new CImg('images/general/tick.png','ack'));
@@ -939,7 +940,7 @@
 			$lastvalue = nbsp(htmlspecialchars($lastvalue));
 		}
 		else{
-			$lastvalue=S_UNKNOWN_VALUE_TYPE;
+			$lastvalue=_('Unknown value type');
 		}
 		if($db_item["valuemapid"] > 0);
 			$lastvalue = replace_value_by_map($lastvalue, $db_item["valuemapid"]);

@@ -148,7 +148,6 @@
 		$cmbConfig->addItem('slides.php', S_SLIDESHOWS);
 //	$formHeader->addItem($cmbConfig);
 
-
 	$screens = API::TemplateScreen()->get(array(
 		'hostids' => $_REQUEST['hostid'],
 		'output' => API_OUTPUT_EXTEND

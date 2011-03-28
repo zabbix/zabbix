@@ -99,7 +99,7 @@ class CGraphPrototype extends CZBXAPI{
 			$dbTable = DB::getSchema('graphs');
 			foreach($options['output'] as $key => $field){
 				if(isset($dbTable['fields'][$field]))
-					$sql_parts['select'][$field] = ' g.'.$field;
+					$sql_parts['select'][$field] = 'g.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;
@@ -1010,8 +1010,10 @@ COpt::memoryPick();
 			while($graph = DBfetch($db_graphs)){
 				$created_graphs[$graph['graphid']] = $graph['graphid'];
 			}
-			$result = API::Graph()->delete($created_graphs, true);
-			if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete graph prototype'));
+			if(!empty($created_graphs)){
+				$result = API::Graph()->delete($created_graphs, true);
+				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete graph prototype'));
+			}
 
 
 			DB::delete('screens_items', array(
@@ -1109,7 +1111,7 @@ COpt::memoryPick();
 			);
 			$graphsExists = API::Graph()->get($options);
 			foreach($graphsExists as $genum => $graphExists){
-				if(($update && ($graphExists['graphid'] != $graph['graphid'])) || !$update){
+				if(($update && (bccomp($graphExists['graphid'],$graph['graphid'])!=0)) || !$update){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph with name [ '.$graph['name'].' ] already exists');
 				}
 			}

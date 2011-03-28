@@ -209,7 +209,7 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 	}
 	else if (condition->conditiontype == CONDITION_TYPE_TRIGGER_NAME)
 	{
-		tmp_str = zbx_dsprintf(tmp_str, "%s", event->trigger_description);
+		tmp_str = zbx_strdup(tmp_str, event->trigger.description);
 
 		substitute_simple_macros(event, NULL, NULL, NULL, &tmp_str, MACRO_TYPE_TRIGGER_DESCRIPTION, NULL, 0);
 
@@ -237,19 +237,19 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 		switch (condition->operator)
 		{
 		case CONDITION_OPERATOR_EQUAL:
-			if (event->trigger_priority == condition_value)
+			if (event->trigger.priority == condition_value)
 				ret = SUCCEED;
 			break;
 		case CONDITION_OPERATOR_NOT_EQUAL:
-			if (event->trigger_priority != condition_value)
+			if (event->trigger.priority != condition_value)
 				ret = SUCCEED;
 			break;
 		case CONDITION_OPERATOR_MORE_EQUAL:
-			if (event->trigger_priority >= condition_value)
+			if (event->trigger.priority >= condition_value)
 				ret = SUCCEED;
 			break;
 		case CONDITION_OPERATOR_LESS_EQUAL:
-			if (event->trigger_priority <= condition_value)
+			if (event->trigger.priority <= condition_value)
 				ret = SUCCEED;
 			break;
 		default:

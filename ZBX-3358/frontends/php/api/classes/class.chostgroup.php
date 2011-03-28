@@ -102,10 +102,10 @@ class CHostGroup extends CZBXAPI{
 			unset($sql_parts['select']['groups']);
 
 			$dbTable = DB::getSchema('groups');
-			$sql_parts['select']['groupid'] = ' g.groupid';
+			$sql_parts['select']['groupid'] = 'g.groupid';
 			foreach($options['output'] as $key => $field){
 				if(isset($dbTable['fields'][$field]))
-					$sql_parts['select'][$field] = ' g.'.$field;
+					$sql_parts['select'][$field] = 'g.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;
@@ -674,7 +674,7 @@ COpt::memoryPick();
 			$groupsNames = zbx_toHash($groupsNames, 'name');
 
 			foreach($groups as $num => $group){
-				if(isset($group['name']) && isset($groupsNames[$group['name']]) && ($groupsNames[$group['name']]['groupid'] != $group['groupid'])){
+				if(isset($group['name']) && isset($groupsNames[$group['name']]) && (bccomp($groupsNames[$group['name']]['groupid'],$group['groupid']) != 0)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'HostGroup [ '.$group['name'].' ] already exists');
 				}
 
@@ -745,8 +745,8 @@ COpt::memoryPick();
 			));
 
 // delete sysmap element
-			if(!delete_sysmaps_elements_with_groupid($groupids))
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete sysmap elements');
+			if(empty($groupids))
+				DB::delete('sysmaps_elements', array('elementtype' => SYSMAP_ELEMENT_TYPE_HOST_GROUP, 'elementid' => $groupids));
 
 // disable actions
 // actions from conditions

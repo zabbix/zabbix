@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-	define('ZABBIX_VERSION','1.9.2');
+	define('ZABBIX_VERSION','1.9.3');
 	define('ZABBIX_API_VERSION','1.2');
 /* USER DEFINES */
 
@@ -54,6 +54,12 @@
 	define('ZBX_HISTORY_DATA_UPKEEP',		-1); // in days; -1: disabled, 0: always use trends
 
 /* END OF USERS DEFINES */
+	define('ZBX_SCRIPT_TYPE_SCRIPT', 0);
+	define('ZBX_SCRIPT_TYPE_IPMI', 1);
+
+	define('ZBX_SCRIPT_EXECUTE_ON_AGENT', 0);
+	define('ZBX_SCRIPT_EXECUTE_ON_SERVER', 1);
+
 	define('ZBX_FLAG_DISCOVERY_NORMAL', 0x0);
 	define('ZBX_FLAG_DISCOVERY', 0x1);
 	define('ZBX_FLAG_DISCOVERY_CHILD', 0x2);
@@ -383,6 +389,9 @@
 	define('TRIGGER_SEVERITY_AVERAGE',			3);
 	define('TRIGGER_SEVERITY_HIGH',				4);
 	define('TRIGGER_SEVERITY_DISASTER',			5);
+
+	define('TRIGGER_SEVERITY_COUNT',			6);
+
 
 	define('ALERT_MAX_RETRIES',		3);
 

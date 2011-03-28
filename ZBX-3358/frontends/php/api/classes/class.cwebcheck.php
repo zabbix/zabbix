@@ -379,7 +379,7 @@ COpt::memoryPick();
 					$webcheck_exist = $this->get($options);
 					$webcheck_exist = reset($webcheck_exist);
 
-					if($webcheck_exist && ($webcheck_exist['webcheckid'] != $webcheck_exist['webcheckid']))
+					if($webcheck_exist && (bccomp($webcheck_exist['webcheckid'],$webcheck_exist['webcheckid']) != 0))
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario [%s] already exists.', $webcheck['name']));
 				}
 
@@ -498,7 +498,9 @@ COpt::memoryPick();
 				$itemids_del[] = $stepitem['itemid'];
 			}
 
-			API::Item()->delete($itemids_del, true);
+			if(!empty($itemids_del)){
+				API::Item()->delete($itemids_del, true);
+			}
 
 			DB::delete('httptest', array('httptestid' => $webcheckids));
 
@@ -760,7 +762,9 @@ COpt::memoryPick();
 
 		DB::delete('httpstep', array('httpstepid' => $webstepids));
 
-		API::Item()->delete($itemids, true);
+		if(!empty($itemids)){
+			API::Item()->delete($itemids, true);
+		}
 	}
 }
 ?>

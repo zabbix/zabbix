@@ -129,7 +129,7 @@ class CTrigger extends CZBXAPI{
 			$sql_parts['select']['triggerid'] = ' t.triggerid';
 			foreach($options['output'] as $key => $field){
 				if(isset($dbTable['fields'][$field]))
-					$sql_parts['select'][$field] = ' t.'.$field;
+					$sql_parts['select'][$field] = 't.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;
@@ -1024,7 +1024,7 @@ Copt::memoryPick();
 
 			foreach($result as $tnum => $trigger){
 				if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $trigger['description'], $arr)){
-					$macros = API::UserMacro()->getMacros($arr[1], array('triggerid' => $trigger['triggerid']));
+					$macros = API::UserMacro()->getMacros(array('macros' => $arr[1], 'triggerid' => $trigger['triggerid']));
 
 					$search = array_keys($macros);
 					$values = array_values($macros);
@@ -1581,6 +1581,7 @@ COpt::memoryPick();
 	}
 
 	protected function inherit($trigger, $hostids=null){
+
 		$triggerTemplate = API::Template()->get(array(
 			'triggerids' => $trigger['triggerid'],
 			'output' => API_OUTPUT_EXTEND,
@@ -1619,9 +1620,9 @@ COpt::memoryPick();
 		foreach($chd_hosts as $chd_host){
 			$newTrigger = $trigger;
 
-			if(isset($trigger['dependencies']) && !is_null($trigger['dependencies']))
+			if(isset($trigger['dependencies']) && !is_null($trigger['dependencies'])){
 				$newTrigger['dependencies'] = replace_template_dependencies($trigger['dependencies'], $chd_host['hostid']);
-
+			}
 			$newTrigger['templateid'] = $trigger['triggerid'];
 
 			$newTrigger['expression'] = str_replace('{'.$triggerTemplate['host'].':', '{'.$chd_host['host'].':', $trigger['expression']);
@@ -1735,11 +1736,18 @@ COpt::memoryPick();
 				'hostids' => $data['templateids'],
 				'preservekeys' => 1,
 				'output' => API_OUTPUT_EXTEND,
-				'select_dependencies' => API_OUTPUT_EXTEND
+				'select_dependencies' => API_OUTPUT_REFER
 			);
 			$triggers = $this->get($options);
 
 			foreach($triggers as $trigger){
+				// we must do this, because validateDependencies() expects plain array of ids
+				$currTriggerDependencies = array();
+				foreach($trigger['dependencies'] as $dep){
+					$currTriggerDependencies[] = $dep['triggerid'];
+				}
+				$trigger['dependencies'] = $currTriggerDependencies;
+
 				$trigger['expression'] = explode_exp($trigger['expression'], false);
 				$this->inherit($trigger, $data['hostids']);
 			}
@@ -1754,6 +1762,7 @@ COpt::memoryPick();
 
 // check circular dependency {{{
 			$triggeridDown = $trigger['dependencies'];
+
 			do{
 				$sql = 'SELECT triggerid_up, description '.
 						' FROM trigger_depends, triggers'.

@@ -30,16 +30,16 @@
 	#define ZBX_THREAD_HANDLE_NULL NULL
 
 	#define ZBX_THREAD_ENTRY_POINTER(pointer_name) \
-		unsigned (__stdcall * pointer_name )(void *)
+		unsigned (__stdcall *pointer_name)(void *)
 
 	#define ZBX_THREAD_ENTRY(entry_name, arg_name)	\
-		unsigned __stdcall entry_name (void * arg_name)
+		unsigned __stdcall entry_name(void *arg_name)
 
 	#define zbx_thread_exit(status) \
 		_endthreadex((unsigned int)(status)); \
 		return ((unsigned)(status))
 
-	#define zbx_sleep(sec) Sleep(((DWORD)(sec))*((DWORD)1000))
+	#define zbx_sleep(sec) Sleep(((DWORD)(sec)) * ((DWORD)1000))
 
 	#define zbx_thread_kill(h) TerminateThread(h, SUCCEED);
 
@@ -53,10 +53,10 @@
 	#define ZBX_THREAD_HANDLE_NULL 0
 
 	#define ZBX_THREAD_ENTRY_POINTER(pointer_name) \
-		unsigned (* pointer_name )(void *)
+		unsigned (* pointer_name)(void *)
 
 	#define ZBX_THREAD_ENTRY(entry_name, arg_name)	\
-		unsigned entry_name (void * arg_name )
+		unsigned entry_name(void *arg_name)
 
 	#define zbx_thread_exit(status) \
 		exit((int)(status)); \
@@ -64,13 +64,20 @@
 
 	#define zbx_sleep(sec) sleep((sec))
 
-	#define zbx_thread_kill(h) kill(h,SIGTERM);
+	#define zbx_thread_kill(h) kill(h, SIGTERM);
 
 #endif /* _WINDOWS */
 
-ZBX_THREAD_HANDLE zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), void *args);
-int zbx_thread_wait(ZBX_THREAD_HANDLE thread);
+typedef struct
+{
+	int	thread_num;
+	void	*args;
+}
+zbx_thread_args_t;
+
+ZBX_THREAD_HANDLE	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread_args_t *thread_args);
+int			zbx_thread_wait(ZBX_THREAD_HANDLE thread);
 /* zbx_thread_exit(status) -- declared as define !!! */
-long int zbx_get_thread_id(void);
+long int		zbx_get_thread_id();
 
 #endif /* ZABBIX_THREADS_H */

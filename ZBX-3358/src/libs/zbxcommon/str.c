@@ -2478,6 +2478,19 @@ char	*zbx_strcasestr(const char *haystack, const char *needle)
 	return NULL;
 }
 
+int	zbx_mismatch(const char *s1, const char *s2)
+{
+	int	i = 0;
+
+	while (s1[i] == s2[i])
+	{
+		if ('\0' == s1[i++])
+			return FAIL;
+	}
+
+	return i;
+}
+
 int	starts_with(const char *str, const char *prefix)
 {
 	const char	*p, *q;
@@ -2564,27 +2577,6 @@ const char	*zbx_result_string(int result)
 			return "TIMEOUT_ERROR";
 		case AGENT_ERROR:
 			return "AGENT_ERROR";
-		default:
-			return "unknown";
-	}
-}
-
-const char	*zbx_trigger_severity_string(zbx_trigger_severity_t severity)
-{
-	switch (severity)
-	{
-		case TRIGGER_SEVERITY_NOT_CLASSIFIED:
-			return "Not classified";
-		case TRIGGER_SEVERITY_INFORMATION:
-			return "Information";
-		case TRIGGER_SEVERITY_WARNING:
-			return "Warning";
-		case TRIGGER_SEVERITY_AVERAGE:
-			return "Average";
-		case TRIGGER_SEVERITY_HIGH:
-			return "High";
-		case TRIGGER_SEVERITY_DISASTER:
-			return "Disaster";
 		default:
 			return "unknown";
 	}
@@ -3097,7 +3089,7 @@ void	zbx_replace_invalid_utf8(char *text)
 	*out = '\0';
 }
 
-void	win2unix_eol(char *str)
+void	dos2unix(char *str)
 {
 	char	*o = str;
 

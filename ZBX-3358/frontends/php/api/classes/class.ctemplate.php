@@ -103,12 +103,12 @@ class CTemplate extends CZBXAPI{
 			unset($sql_parts['select']['templates']);
 
 			$dbTable = DB::getSchema('hosts');
-			$sql_parts['select']['hostid'] = ' h.hostid';
+			$sql_parts['select']['hostid'] = 'h.hostid';
 			foreach($options['output'] as $key => $field){
 				if($field == 'templateid') continue;
 
 				if(isset($dbTable['fields'][$field]))
-					$sql_parts['select'][$field] = ' h.'.$field;
+					$sql_parts['select'][$field] = 'h.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;
@@ -341,7 +341,6 @@ class CTemplate extends CZBXAPI{
 			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN)?ZBX_SORT_DOWN:ZBX_SORT_UP;
 
 			$sql_parts['order'][] = 'h.'.$options['sortfield'].' '.$sortorder;
-
 			if(!str_in_array('h.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('h.*', $sql_parts['select'])){
 				$sql_parts['select'][] = 'h.'.$options['sortfield'];
 			}
@@ -379,6 +378,7 @@ class CTemplate extends CZBXAPI{
 					$sql_where.
 				$sql_group.
 				$sql_order;
+//SDI($sql);
 		$res = DBselect($sql, $sql_limit);
 		while($template = DBfetch($res)){
 			if(!is_null($options['countOutput'])){
@@ -1023,7 +1023,7 @@ COpt::memoryPick();
 				}
 
 				if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $template['host'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Template name [ %1$s ]'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Template name [ %1$s ]', $template['host']));
 				}
 
 				if($this->exists(array('host' => $template['host']))){
@@ -1147,7 +1147,8 @@ COpt::memoryPick();
 			DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid', $templateids)).' AND resourcetype='.SCREEN_RESOURCE_HOST_TRIGGERS;
 
 // delete host from maps
-			delete_sysmaps_elements_with_hostid($templateids);
+			if(empty($templateids))
+				DB::delete('sysmaps_elements', array('elementtype' => SYSMAP_ELEMENT_TYPE_HOST, 'elementid' => $templateids));
 
 // disable actions
 // actions from conditions
@@ -1218,7 +1219,9 @@ COpt::memoryPick();
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			));
-			API::Application()->delete(array_keys($delApplications), true);
+			if(!empty($delApplications)){
+				API::Application()->delete(array_keys($delApplications), true);
+			}
 
 
 			DB::delete('hosts', array('hostid' => $templateids));
@@ -1335,7 +1338,7 @@ COpt::memoryPick();
 				$template_exists = $this->get($options);
 				$template_exist = reset($template_exists);
 
-				if($template_exist && ($template_exist['templateid'] != $cur_template['templateid'])){
+				if($template_exist && (bccomp($template_exist['templateid'],$cur_template['templateid']) != 0)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE . ' [ ' . $data['host'] . ' ] ' . S_ALREADY_EXISTS_SMALL);
 				}
 
@@ -1718,7 +1721,7 @@ COpt::memoryPick();
 		$start_points = array_merge($start_points, $targetids);
 		$start_points = array_unique($start_points);
 
-		foreach($start_points as $spnum => $start){
+		foreach($start_points as $start){
 			$path = array();
 			if(!$this->checkCircularLink($graph, $start, $path)){
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Circular link cannot be created'));
@@ -1737,53 +1740,45 @@ COpt::memoryPick();
 					}
 				}
 
-				$result = API::Application()->syncTemplates(array(
+				API::Application()->syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot sync applications'));
 
-				$result = API::DiscoveryRule()->syncTemplates(array(
+				API::DiscoveryRule()->syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot sync discovery rules'));
 
-				$result = API::Itemprototype()->syncTemplates(array(
+				API::Itemprototype()->syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot sync item prototypes'));
 
-				$result = API::Item()->syncTemplates(array(
+				API::Item()->syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot sync items'));
 
-				$result = API::Trigger()->syncTemplates(array(
+				API::Trigger()->syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot sync Triggers'));
 
-				$result = API::TriggerPrototype()->syncTemplates(array(
+				API::TriggerPrototype()->syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot sync Triggers prototypes'));
 
-				$result = API::GraphPrototype()->syncTemplates(array(
+				API::GraphPrototype()->syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot sync graph prototypes'));
 
-				$result = API::Graph()->syncTemplates(array(
+				API::Graph()->syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot sync graphs'));
 			}
 		}
 
@@ -2056,14 +2051,14 @@ COpt::memoryPick();
 		if(!is_null($targetids)){
 			$hosts = API::Host()->get(array(
 				'hostids' => $targetids,
-				'output' => array('hostid, host'),
+				'output' => array('hostid', 'host'),
 				'nopermissions' => true,
 			));
 		}
 		else{
 			$hosts = API::Host()->get(array(
 				'templateids' => $templateids,
-				'output' => array('hostid, host'),
+				'output' => array('hostid', 'host'),
 				'nopermissions' => true,
 			));
 		}
@@ -2071,7 +2066,7 @@ COpt::memoryPick();
 		if(!empty($hosts)){
 			$templates = API::Template()->get(array(
 				'templateids' => $templateids,
-				'output' => array('hostid, host'),
+				'output' => array('hostid', 'host'),
 				'nopermissions' => true,
 			));
 

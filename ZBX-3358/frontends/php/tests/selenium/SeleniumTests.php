@@ -29,7 +29,7 @@ require_once(dirname(__FILE__).'/testPageDiscovery.php');
 require_once(dirname(__FILE__).'/testPageEvents.php');
 require_once(dirname(__FILE__).'/testPageHosts.php');
 require_once(dirname(__FILE__).'/testPageInventory.php');
-require_once(dirname(__FILE__).'/testPageInventoryExtended.php');
+require_once(dirname(__FILE__).'/testPageItems.php');
 require_once(dirname(__FILE__).'/testPageMaintenance.php');
 require_once(dirname(__FILE__).'/testPageMaps.php');
 require_once(dirname(__FILE__).'/testPageMediaTypes.php');
@@ -46,20 +46,21 @@ require_once(dirname(__FILE__).'/testPageStatusOfZabbix.php');
 require_once(dirname(__FILE__).'/testPageTemplates.php');
 require_once(dirname(__FILE__).'/testPageUserGroups.php');
 require_once(dirname(__FILE__).'/testPageUsers.php');
+require_once(dirname(__FILE__).'/testFormConfigTriggerSeverity.php');
 require_once(dirname(__FILE__).'/testFormHost.php');
 require_once(dirname(__FILE__).'/testFormHostGroup.php');
 require_once(dirname(__FILE__).'/testFormLogin.php');
 require_once(dirname(__FILE__).'/testFormMap.php');
 require_once(dirname(__FILE__).'/testFormMediaType.php');
-require_once(dirname(__FILE__).'/testFormProfile.php');
+require_once(dirname(__FILE__).'/testFormUserProfile.php');
 require_once(dirname(__FILE__).'/testFormScreen.php');
 require_once(dirname(__FILE__).'/testFormTrigger.php');
+require_once(dirname(__FILE__).'/testFormScript.php');
 require_once(dirname(__FILE__).'/testFormSysmap.php');
+require_once(dirname(__FILE__).'/testFormTemplate.php');
 
-class SeleniumTests
-{
-	public static function suite()
-	{
+class SeleniumTests{
+	public static function suite(){
 		$suite = new PHPUnit_Framework_TestSuite('selenium');
 
 		$suite->addTestSuite('testGeneric');
@@ -72,7 +73,7 @@ class SeleniumTests
 		$suite->addTestSuite('testPageEvents');
 		$suite->addTestSuite('testPageHosts');
 		$suite->addTestSuite('testPageInventory');
-		$suite->addTestSuite('testPageInventoryExtended');
+		$suite->addTestSuite('testPageItems');
 		$suite->addTestSuite('testPageMaintenance');
 		$suite->addTestSuite('testPageMaps');
 		$suite->addTestSuite('testPageMediaTypes');
@@ -89,13 +90,16 @@ class SeleniumTests
 		$suite->addTestSuite('testPageTemplates');
 		$suite->addTestSuite('testPageUserGroups');
 		$suite->addTestSuite('testPageUsers');
+		$suite->addTestSuite('testFormConfigTriggerSeverity');
 		$suite->addTestSuite('testFormHost');
 		$suite->addTestSuite('testFormHostGroup');
 		$suite->addTestSuite('testFormLogin');
 		$suite->addTestSuite('testFormMediaType');
-		$suite->addTestSuite('testFormProfile');
+		$suite->addTestSuite('testFormUserProfile');
 		$suite->addTestSuite('testFormScreen');
+		$suite->addTestSuite('testFormScript');
 		$suite->addTestSuite('testFormMap');
+		$suite->addTestSuite('testFormTemplate');
 
 		return $suite;
 	}

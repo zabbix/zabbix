@@ -126,10 +126,10 @@ class CTriggerPrototype extends CZBXAPI{
 			unset($sql_parts['select']['triggers']);
 
 			$dbTable = DB::getSchema('triggers');
-			$sql_parts['select']['triggerid'] = ' t.triggerid';
+			$sql_parts['select']['triggerid'] = 't.triggerid';
 			foreach($options['output'] as $key => $field){
 				if(isset($dbTable['fields'][$field]))
-					$sql_parts['select'][$field] = ' t.'.$field;
+					$sql_parts['select'][$field] = 't.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;
@@ -984,7 +984,7 @@ Copt::memoryPick();
 
 			foreach($result as $tnum => $trigger){
 				if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $trigger['description'], $arr)){
-					$macros = API::UserMacro()->getMacros($arr[1], array('triggerid' => $trigger['triggerid']));
+					$macros = API::UserMacro()->getMacros(array('macros' => $arr[1], 'triggerid' => $trigger['triggerid']));
 
 					$search = array_keys($macros);
 					$values = array_values($macros);
@@ -1365,7 +1365,7 @@ COpt::memoryPick();
 						break;
 					}
 				}
-				if($trigger_exist && ($trigger_exist['triggerid'] != $trigger['triggerid'])){
+				if($trigger_exist && (bccomp($trigger_exist['triggerid'],$trigger['triggerid']) != 0)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_TRIGGER.' ['.$trigger['description'].'] '.S_ALREADY_EXISTS_SMALL);
 				}
 			}

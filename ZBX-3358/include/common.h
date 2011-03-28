@@ -117,8 +117,8 @@
 #define OFF	0
 
 #define	APPLICATION_NAME	"Zabbix Agent"
-#define	ZABBIX_REVDATE		"28 December 2010"
-#define	ZABBIX_VERSION		"1.9.2"
+#define	ZABBIX_REVDATE		"11 March 2011"
+#define	ZABBIX_VERSION		"1.9.3"
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
 #if defined(_WINDOWS)
@@ -151,6 +151,7 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #define	AGENT_ERROR	(-5)
 const char	*zbx_result_string(int result);
 
+#define MAX_ID_LEN	21
 #define MAX_STRING_LEN	2048
 #define MAX_BUFFER_LEN	65536
 
@@ -552,16 +553,13 @@ typedef enum
 #define TRIGGER_VALUE_CHANGED_YES	1
 
 /* Trigger severity */
-typedef enum
-{
-	TRIGGER_SEVERITY_NOT_CLASSIFIED = 0,
-	TRIGGER_SEVERITY_INFORMATION,
-	TRIGGER_SEVERITY_WARNING,
-	TRIGGER_SEVERITY_AVERAGE,
-	TRIGGER_SEVERITY_HIGH,
-	TRIGGER_SEVERITY_DISASTER
-} zbx_trigger_severity_t;
-const char	*zbx_trigger_severity_string(zbx_trigger_severity_t severity);
+#define TRIGGER_SEVERITY_NOT_CLASSIFIED	0
+#define TRIGGER_SEVERITY_INFORMATION	1
+#define TRIGGER_SEVERITY_WARNING	2
+#define TRIGGER_SEVERITY_AVERAGE	3
+#define TRIGGER_SEVERITY_HIGH		4
+#define TRIGGER_SEVERITY_DISASTER	5
+#define TRIGGER_SEVERITY_COUNT		6	/* number of trigger severities */
 
 typedef enum
 {
@@ -640,6 +638,12 @@ const char	*zbx_permission_string(int perm);
 #define	ZBX_NODE_MASTER	0
 #define	ZBX_NODE_SLAVE	1
 const char	*zbx_nodetype_string(unsigned char nodetype);
+
+#define ZBX_SCRIPT_TYPE_SCRIPT		0
+#define ZBX_SCRIPT_TYPE_IPMI		1
+
+#define ZBX_SCRIPT_EXECUTE_ON_AGENT	0
+#define ZBX_SCRIPT_EXECUTE_ON_SERVER	1
 
 #define POLLER_DELAY		5
 #define DISCOVERER_DELAY	60
@@ -898,8 +902,8 @@ char	*zbx_age2str(int age);
 char	*zbx_date2str(time_t date);
 char	*zbx_time2str(time_t time);
 
-/* Return the needle in the haystack (or NULL). */
 char	*zbx_strcasestr(const char *haystack, const char *needle);
+int	zbx_mismatch(const char *s1, const char *s2);
 int	starts_with(const char *str, const char *prefix);
 int	cmp_key_id(const char *key_1, const char *key_2);
 
@@ -928,7 +932,7 @@ int	zbx_strlen_utf8(const char *text);
 char	*zbx_replace_utf8(const char *text);
 void	zbx_replace_invalid_utf8(char *text);
 
-void	win2unix_eol(char *str);
+void	dos2unix(char *str);
 int	str2uint(const char *str);
 int	str2uint64(char *str, zbx_uint64_t *value);
 double	str2double(const char *str);
