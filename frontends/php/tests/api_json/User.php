@@ -207,7 +207,7 @@ class API_JSON_User extends CZabbixTest
 	{
 		$debug = null;
 
-		$affected_tables = array('users','users_groups');
+		$affected_tables = array('users','users_groups', 'opmessage_usr');
 		DBsave_tables($affected_tables);
 
 		// sending request
