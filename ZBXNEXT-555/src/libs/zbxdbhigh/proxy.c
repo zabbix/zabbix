@@ -350,12 +350,12 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 	{
 		{"globalmacro"},
 		{"hosts"},
-		{"interface"},
 		{"hosts_templates"},
 		{"hostmacro"},
 		{"items"},
 		{"drules"},
 		{"dchecks"},
+		{"interface"},
 		{NULL}
 	};
 
@@ -478,7 +478,7 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
  ******************************************************************************/
 static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tablename, struct zbx_json_parse *jp_obj)
 {
-	int			f, field_count, insert, is_null;
+	int			f, field_count, insert;
 	const ZBX_TABLE		*table = NULL;
 	const ZBX_FIELD		*fields[ZBX_MAX_FIELDS];
 	struct zbx_json_parse	jp_data, jp_row;
@@ -524,11 +524,23 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 
 	p = NULL;
 	field_count = 0;
-	while (NULL != (p = zbx_json_next_value(&jp_data, p, buf, sizeof(buf), NULL)))
+	while (NULL != (p = zbx_json_next(&jp_data, p)))
 	{
-		if (NULL == (fields[field_count] = DBget_field(table, buf)))
+		if (NULL == (p = zbx_json_decodevalue(p, buf, sizeof(buf))))
+			goto json_error;
+
+		fields[field_count] = NULL;
+		for(f = 0; table->fields[f].name != NULL; f++)
+			if (0 == strcmp(table->fields[f].name, buf))
+			{
+				fields[field_count] = &table->fields[f];
+				break;
+			}
+
+		if (NULL == fields[field_count])
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Invalid field name \"%s\"", buf);
+			zabbix_log(LOG_LEVEL_WARNING, "Invalid field name \"%s\"",
+					buf);
 			goto db_error;
 		}
 		field_count++;
@@ -568,14 +580,8 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 			goto json_error;
 
 		pf = NULL;
-		if (NULL == (pf = zbx_json_next_value(&jp_row, pf, buf, sizeof(buf), &is_null)))
+		if (NULL == (pf = zbx_json_next_value(&jp_row, pf, buf, sizeof(buf))))
 			goto json_error;
-
-		if (0 != is_null && 0 != (fields[0]->flags & ZBX_NOTNULL))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "Column '%s' cannot be null", fields[f]->name);
-			goto db_error;
-		}
 
 		ZBX_STR2UINT64(recid, buf);
 
@@ -599,7 +605,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 /* {"hosts":{"fields":["hostid","host",...],"data":[[1,"zbx01",...],[2,"zbx02",...],...]},"items":{...},...}
  *                                                   ^
  */		f = 1;
-		while (NULL != (pf = zbx_json_next_value(&jp_row, pf, buf, sizeof(buf), &is_null)))
+		while (NULL != (pf = zbx_json_next_value(&jp_row, pf, buf, sizeof(buf))))
 		{
 			if (f == field_count)
 			{
@@ -609,37 +615,22 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 				goto db_error;
 			}
 
-			if (0 == insert)
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ZBX_FIELDNAME_LEN + 2,
-						"%s=", fields[f]->name);
-
-			if (0 != is_null)
+			if (fields[f]->type == ZBX_TYPE_INT || fields[f]->type == ZBX_TYPE_UINT || fields[f]->type == ZBX_TYPE_ID ||
+					fields[f]->type == ZBX_TYPE_FLOAT)
 			{
-				if (0 != (fields[f]->flags & ZBX_NOTNULL))
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "Column '%s' cannot be null", fields[f]->name);
-					goto db_error;
-				}
+				if (0 == insert)
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, "%s=", fields[f]->name);
 
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "null,");
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, "%s,", buf);
 			}
 			else
 			{
-				switch (fields[f]->type)
-				{
-					case ZBX_TYPE_INT:
-					case ZBX_TYPE_UINT:
-					case ZBX_TYPE_ID:
-					case ZBX_TYPE_FLOAT:
-						zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ZBX_FIELDNAME_LEN + 2,
-								"%s,", buf);
-						break;
-					default:
-						esc = DBdyn_escape_string(buf);
-						zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, strlen(esc) + 4,
-								"'%s',", esc);
-						zbx_free(esc);
-				}
+				if (0 == insert)
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, "%s=", fields[f]->name);
+
+				esc = DBdyn_escape_string(buf);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, strlen(esc) + 8, "'%s',", esc);
+				zbx_free(esc);
 			}
 			f++;
 		}
