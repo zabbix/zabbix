@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "checks_internal.h"
+#include "checks_java.h"
 #include "log.h"
 #include "dbcache.h"
 #include "zbxself.h"
@@ -190,6 +191,17 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			goto not_supported;
 
 		SET_UI64_RESULT(result, i);
+	}
+	else if (0 == strcmp(tmp, "java"))		/* zabbix["java",...] */
+	{
+		int	res;
+
+		alarm(CONFIG_TIMEOUT);
+		res = get_value_java(ZBX_JAVA_PROXY_REQUEST_INTERNAL, item, result);
+		alarm(0);
+
+		if (SUCCEED != res)
+			goto not_supported;
 	}
 	else if (0 == strcmp(tmp, "process"))		/* zabbix["process",<type>,<mode>,<state>] */
 	{
@@ -385,11 +397,15 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		goto not_supported;
 
 	return SUCCEED;
-not_supported:
-	if (NULL == error)
-		error = zbx_strdup(error, "Internal check is not supported");
 
-	SET_MSG_RESULT(result, error);
+not_supported:
+	if (!ISSET_MSG(result))
+	{
+		if (NULL == error)
+			error = zbx_strdup(error, "Internal check is not supported");
+
+		SET_MSG_RESULT(result, error);
+	}
 
 	return NOTSUPPORTED;
 }

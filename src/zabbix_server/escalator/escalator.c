@@ -68,8 +68,12 @@ static int	check_perm2system(zbx_uint64_t userid)
 	DB_ROW		row;
 	int		res = SUCCEED;
 
-	result = DBselect( "select count(g.usrgrpid) from usrgrp g,users_groups ug where ug.userid=" ZBX_FS_UI64
-			" and g.usrgrpid = ug.usrgrpid and g.users_status=%d",
+	result = DBselect(
+			"select count(g.usrgrpid)"
+			" from usrgrp g,users_groups ug"
+			" where ug.userid=" ZBX_FS_UI64
+				" and g.usrgrpid=ug.usrgrpid"
+				" and g.users_status=%d",
 			userid,
 			GROUP_STATUS_DISABLED);
 

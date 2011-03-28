@@ -923,7 +923,7 @@ AC_ARG_ENABLE(static,[  --enable-static         Build statically linked binaries
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-static]) ;;
 esac])
 
-AC_ARG_ENABLE(server,[  --enable-server         Turn on build of server],
+AC_ARG_ENABLE(server,[  --enable-server         Turn on build of Zabbix server],
 [case "${enableval}" in
   yes) server=yes ;;
   no)  server=no ;;
@@ -941,7 +941,7 @@ esac],
 [proxy=no])
 AM_CONDITIONAL(PROXY, test x$proxy = xyes)
 
-AC_ARG_ENABLE(agent,[  --enable-agent          Turn on build of agent and client utilities],
+AC_ARG_ENABLE(agent,[  --enable-agent          Turn on build of Zabbix agent and client utilities],
 [case "${enableval}" in
   yes) agent=yes ;;
   no)  agent=no ;;
@@ -949,6 +949,15 @@ AC_ARG_ENABLE(agent,[  --enable-agent          Turn on build of agent and client
 esac],
 [agent=no])
 AM_CONDITIONAL(AGENT, test x$agent = xyes)
+
+AC_ARG_ENABLE(java,[  --enable-java           Turn on build of Zabbix Java proxy],
+[case "${enableval}" in
+  yes) java=yes ;;
+  no)  java=no ;;
+  *) AC_MSG_ERROR([bad value ${enableval} for --enable-java]) ;;
+esac],
+[java=no])
+AM_CONDITIONAL(JAVA, test x$java = xyes)
 
 AC_ARG_ENABLE(ipv6,[  --enable-ipv6           Turn on support of IPv6],
 [case "${enableval}" in
@@ -1267,6 +1276,17 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 
 fi
 
+if test "$java" = "yes"; then
+	AC_CHECK_PROGS([JAVAC], [javac], [no])
+	if test "x$JAVAC" == "xno"; then
+		AC_MSG_ERROR([Unable to find "javac" executable in path])
+	fi
+	AC_CHECK_PROGS([JAR], [jar], [no])
+	if test "x$JAR" == "xno"; then
+		AC_MSG_ERROR([Unable to find "jar" executable in path])
+	fi
+fi
+
 AM_CONDITIONAL(JABBER,  test "x$found_jabber" = "xyes")
 AM_CONDITIONAL(WITH_ODBC, test "x$have_odbc" != "xno")
 
@@ -1457,6 +1477,7 @@ AC_OUTPUT([
 	src/zabbix_proxy/housekeeper/Makefile
 	src/zabbix_proxy/proxyconfig/Makefile
 	src/zabbix_proxy/datasender/Makefile
+	src/zabbix_java/Makefile
 	upgrades/Makefile
 	man/Makefile
 	])
@@ -1511,6 +1532,17 @@ if test "x$agent" != "xno"; then
 echo "  Agent details:
     Linker flags:          ${LDFLAGS}
     Libraries:             ${LIBS}"
+
+fi
+
+echo "
+  Enable Java proxy:     ${java}"
+
+if test "x$java" != "xno"; then
+
+echo "  Java proxy details:
+    Java compiler:         ${JAVAC}
+    Java archiver:         ${JAR}"
 
 fi
 
