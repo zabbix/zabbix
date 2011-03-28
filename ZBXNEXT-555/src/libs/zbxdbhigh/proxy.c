@@ -540,7 +540,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 		goto json_error;
 
 	/* Special preprocessing for 'items' table. */
-	/* In order to eliminate the conflicts in the 'hostid,key_' unique index */
+	/* In order to eliminate the conflicts in the 'hostid,key_' unique index. */
 	if (0 == strcmp(tablename, "items"))
 	{
 #ifdef HAVE_MYSQL

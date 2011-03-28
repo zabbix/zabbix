@@ -1450,7 +1450,7 @@ const ZBX_TABLE *DBget_table(const char *tablename)
 {
 	int	t;
 
-	for (t = 0; tables[t].table != 0; t++ )
+	for (t = 0; NULL != tables[t].table; t++)
 		if (0 == strcmp(tables[t].table, tablename))
 			return &tables[t];
 	return NULL;
@@ -1460,7 +1460,7 @@ const ZBX_FIELD *DBget_field(const ZBX_TABLE *table, const char *fieldname)
 {
 	int	f;
 
-	for (f = 0; table->fields[f].name != 0; f++ )
+	for (f = 0; NULL != table->fields[f].name; f++)
 		if (0 == strcmp(table->fields[f].name, fieldname))
 			return &table->fields[f];
 	return NULL;
