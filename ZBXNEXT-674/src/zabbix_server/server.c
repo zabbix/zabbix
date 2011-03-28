@@ -506,6 +506,12 @@ int	MAIN_ZABBIX_ENTRY()
 	zabbix_log(LOG_LEVEL_INFORMATION, "IPv6 support:              " IPV6_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "******************************");
 
+	if (0 != CONFIG_NODEID)
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "NodeID:                    %3d", CONFIG_NODEID);
+		zabbix_log(LOG_LEVEL_INFORMATION, "******************************");
+	}
+
 #ifdef	HAVE_SQLITE3
 	zbx_create_sqlite3_mutex(CONFIG_DBNAME);
 #endif /* HAVE_SQLITE3 */
@@ -525,11 +531,15 @@ int	MAIN_ZABBIX_ENTRY()
 	}
 	DBfree_result(result);
 
-	result = DBselect("select masterid from nodes where nodeid=%d", CONFIG_NODEID);
+	if (0 != CONFIG_NODEID)
+	{
+		result = DBselect("select masterid from nodes where nodeid=%d",
+				CONFIG_NODEID);
 
-	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
-		CONFIG_MASTER_NODEID = atoi(row[0]);
-	DBfree_result(result);
+		if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
+			CONFIG_MASTER_NODEID = atoi(row[0]);
+		DBfree_result(result);
+	}
 
 	init_database_cache(ZBX_PROCESS_SERVER);
 	init_configuration_cache();
