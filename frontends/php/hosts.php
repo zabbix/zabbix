@@ -911,6 +911,19 @@ include_once('include/page_header.php');
 					break;
 			}
 
+			switch($host['jmx_available']){
+				case HOST_AVAILABLE_TRUE:
+					$jmx_available = new CDiv(SPACE, 'status_icon iconjmxavailable');
+					break;
+				case HOST_AVAILABLE_FALSE:
+					$jmx_available = new CDiv(SPACE, 'status_icon iconjmxunavailable');
+					$jmx_available->setHint($host['jmx_error'], '', 'on');
+					break;
+				case HOST_AVAILABLE_UNKNOWN:
+					$jmx_available = new CDiv(SPACE, 'status_icon iconjmxunknown');
+					break;
+			}
+
 			switch($host['ipmi_available']){
 				case HOST_AVAILABLE_TRUE:
 					$ipmi_available = new CDiv(SPACE, 'status_icon iconipmiavailable');
@@ -925,7 +938,7 @@ include_once('include/page_header.php');
 			}
 
 			$av_table = new CTable(null, 'invisible');
-			$av_table->addRow(array($zbx_available, $snmp_available, $ipmi_available));
+			$av_table->addRow(array($zbx_available, $snmp_available, $jmx_available, $ipmi_available));
 
 			if(empty($host['parentTemplates'])){
 				$hostTemplates = '-';

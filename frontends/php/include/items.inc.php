@@ -69,25 +69,25 @@
 	function item_type2str($type=null){
 		$types = array(
 			ITEM_TYPE_ZABBIX => S_ZABBIX_AGENT,
-			ITEM_TYPE_SNMPV1 => S_SNMPV1_AGENT,
-			ITEM_TYPE_TRAPPER => S_ZABBIX_TRAPPER,
-			ITEM_TYPE_SIMPLE => S_SIMPLE_CHECK,
-			ITEM_TYPE_SNMPV2C => S_SNMPV2_AGENT,
-			ITEM_TYPE_INTERNAL => S_ZABBIX_INTERNAL,
-			ITEM_TYPE_SNMPV3 => S_SNMPV3_AGENT,
 			ITEM_TYPE_ZABBIX_ACTIVE => S_ZABBIX_AGENT_ACTIVE,
+			ITEM_TYPE_SIMPLE => S_SIMPLE_CHECK,
+			ITEM_TYPE_SNMPV1 => S_SNMPV1_AGENT,
+			ITEM_TYPE_SNMPV2C => S_SNMPV2_AGENT,
+			ITEM_TYPE_SNMPV3 => S_SNMPV3_AGENT,
+			ITEM_TYPE_INTERNAL => S_ZABBIX_INTERNAL,
+			ITEM_TYPE_TRAPPER => S_ZABBIX_TRAPPER,
 			ITEM_TYPE_AGGREGATE => S_ZABBIX_AGGREGATE,
-			ITEM_TYPE_HTTPTEST => S_WEB_MONITORING,
 			ITEM_TYPE_EXTERNAL => S_EXTERNAL_CHECK,
 			ITEM_TYPE_DB_MONITOR => S_ZABBIX_DATABASE_MONITOR,
 			ITEM_TYPE_IPMI => S_IPMI_AGENT,
 			ITEM_TYPE_SSH => S_SSH_AGENT,
 			ITEM_TYPE_TELNET => S_TELNET_AGENT,
+			ITEM_TYPE_JMX => S_JMX_AGENT,
 			ITEM_TYPE_CALCULATED => S_CALCULATED,
+			ITEM_TYPE_HTTPTEST => S_WEB_MONITORING,
 		);
 
 		if(is_null($type)){
-			natsort($types);
 			return $types;
 		}
 		else if(isset($types[$type]))
@@ -117,13 +117,13 @@
 
 	function item_data_type2str($type=null){
 		$types = array(
-			ITEM_DATA_TYPE_DECIMAL => S_DECIMAL,
+			ITEM_DATA_TYPE_BOOLEAN => S_BOOLEAN,
 			ITEM_DATA_TYPE_OCTAL => S_OCTAL,
+			ITEM_DATA_TYPE_DECIMAL => S_DECIMAL,
 			ITEM_DATA_TYPE_HEXADECIMAL => S_HEXADECIMAL,
 		);
 
 		if(is_null($type)){
-			natsort($types);
 			return $types;
 		}
 		else if(isset($types[$type]))
@@ -184,6 +184,7 @@
 			case ITEM_TYPE_SNMPV2C: $type = INTERFACE_TYPE_SNMP; break;
 			case ITEM_TYPE_SNMPV3: $type = INTERFACE_TYPE_SNMP; break;
 			case ITEM_TYPE_IPMI: $type = INTERFACE_TYPE_IPMI; break;
+			case ITEM_TYPE_JMX: $type = INTERFACE_TYPE_JMX; break;
 			case ITEM_TYPE_ZABBIX:
 			default: $type = INTERFACE_TYPE_AGENT;
 		}
@@ -350,7 +351,6 @@
 				if(!isset($item['interfaceid'])){
 					error(_s('Item [%1$s:%2$s] cannot find interface on host [%3$s]', $item['description'], $item['key_'], $host['host']));
 					return false;
-
 				}
 			}
 
@@ -1266,7 +1266,7 @@
  * Comments:
  *     !!! Don't forget sync code with C !!!
  */
-	function calculate_item_nextcheck($itemid, $item_type, $delay, $flex_intervals, $now){
+	function calculate_item_nextcheck($interfaceid, $itemid, $item_type, $delay, $flex_intervals, $now){
 		if(0 == $delay) $delay = SEC_PER_YEAR;
 
 // Special processing of active items to see better view in queue
@@ -1294,7 +1294,8 @@
 			}
 
 			$delay = $current_delay;
-			$nextcheck = $delay * floor($now / $delay) + ($itemid % $delay);
+			$shift = ($item_type == ITEM_TYPE_JMX ? $interfaceid : $itemid);
+			$nextcheck = $delay * floor($now / $delay) + ($shift % $delay);
 
 			while($nextcheck <= $now) $nextcheck += $delay;
 		}

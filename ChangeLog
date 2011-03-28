@@ -3,6 +3,8 @@ Changes for 1.9.3
 
 New features:
 
+ - [ZBXNEXT-555] added remote monitoring of JMX counters through Java proxy (asaveljevs,Vedmak,Vlad)
+ - [ZBXNEXT-651] added "Boolean" data type for integer item value type (asaveljevs,Vedmak,Vlad)
  - [ZBXNEXT-675] added new icons and a script to create sql file (Elvis,Richlv)
  - [ZBX-1357] Updated Latvian and Russian translations; thanks to Zabbix translators (Richlv)
  - [ZBXNEXT-696] Added support for {IPADDRESS}, {HOST.DNS} and {HOST.CONN} macros in trigger names (rudolfs)
@@ -12,7 +14,7 @@ New features:
 Bug fixes:
  - [ZBX-3623] fixed processing of nanoseconds for history data (Sasha)
  - [ZBX-3634] improved zabbix map API methods (Aly)
- - [ZBX-3579] fixed trigger popup menu in status of triggers (Vemdak)
+ - [ZBX-3579] fixed trigger popup menu in status of triggers (Vedmak)
  
 --------------------------------------------------------------------------------
 Changes for 1.9.2
@@ -22,7 +24,7 @@ New features:
  - [ZBXNEXT-631] added custom trigger severities configuration (Sasha, Vedmak)
  - [ZBXNEXT-636] login screen redesign, frontend themes restyle (Aly, Elvis)
  - [ZBXNEXT-635] introduced API wrapper for Zabbix frontend (Vedmak, Aly)
- - [ZBXNEXT-575] added new design for action operation remote commands (Aly,asaveljevs,Sasha,Vedmak)
+ - [ZBXNEXT-575] added new design for action operation remote commands (Aly,Sasha,Vedmak)
  - [ZBXNEXT-628] added advanced label settings for maps (Aly)
  - [ZBXNEXT-626] added remembering of grid options for maps (KB)
  - [ZBXNEXT-630] added automatic filling of DNS name for discovered and auto-registered devices (Sasha)
@@ -74,7 +76,7 @@ Bug fixes:
 Changes for 1.9.1
 
 New features:
- - [ZBXNEXT-587] added support of multiple host interfaces (Aly,Sasha,Vedmak,asaveljevs)
+ - [ZBXNEXT-587] added support of multiple host interfaces (Aly,Sasha,Vedmak)
  - [ZBXNEXT-564] added new {IPADDRESS} and {HOST.PORT} macros in auto registration notifications (Sasha)
  - [ZBXNEXT-556] zabbix frontend translations are now handled by PHP gettext module (KB)
  - [ZBXNEXT-558] added support of monitoring auto-registered hosts with passive checks (Sasha)

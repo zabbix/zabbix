@@ -536,6 +536,14 @@ COpt::memoryPick();
 		return !empty($objs);
 	}
 
+	protected function checkInput(&$items, $update=false){
+		foreach($items as $inum => $item){
+			$items[$inum]['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
+		}
+
+		parent::checkInput($items, $update);
+	}
+
 /**
  * Add Itemprototype
  *
