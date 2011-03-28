@@ -724,7 +724,7 @@ COpt::memoryPick();
 						S_GROUP.' ['.$del_groups[$groupid]['name'].'] '.S_INTERNAL_AND_CANNOT_DELETED_SMALL);
 				else
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Group "%s" can not be deleted, due to some of inner hosts cannot be unlinked.', $del_groups[$groupid]['name']));
+						_s('Group "%s" cannot be deleted, because some hosts depend on it.', $del_groups[$groupid]['name']));
 			}
 		}
 
@@ -738,7 +738,7 @@ COpt::memoryPick();
 				if($script['groupid'] == 0) continue;
 
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Group "%s" can not be deleted, due to used in global script.', $del_groups[$script['groupid']]['name']));
+					_s('Group "%s" cannot be deleted, because it is used in a global script.', $del_groups[$script['groupid']]['name']));
 			}
 		}
 
