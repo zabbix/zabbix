@@ -64,27 +64,27 @@ int	PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	PERF_COUNTERS			*perfs;
 	LPTSTR				wcounter_path;
 
-	if (num_param(param) > 2)
+	if (2 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 1, counter_path, sizeof(counter_path)))
 		*counter_path = '\0';
 
-	if (*counter_path == '\0')
+	if ('\0' == *counter_path)
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 2, tmp, sizeof(tmp)))
 		*tmp = '\0';
 
-	if (*tmp != '\0' && FAIL == is_uint(tmp))
+	if ('\0' != *tmp && FAIL == is_uint(tmp))
 		return SYSINFO_RET_FAIL;
 
-	interval = *tmp == '\0' ? 1 : atoi(tmp);
+	interval = '\0' == *tmp ? 1 : atoi(tmp);
 
 	if (FAIL == check_counter_path(counter_path))
 		return SYSINFO_RET_FAIL;
 
-	if (interval > 1)
+	if (1 < interval)
 	{
 		if (!PERF_COLLECTOR_STARTED(collector))
 		{

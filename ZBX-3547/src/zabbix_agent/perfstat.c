@@ -66,7 +66,7 @@ int	add_perf_counter(const char *name, const char *counterPath, int interval)
 		return result;
 	}
 
-	if (interval < 1 || interval > 900)
+	if (1 > interval || 900 < interval)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "PerfCounter '%s' FAILED: Interval value out of range", counterPath);
 		return result;
@@ -164,7 +164,7 @@ int	add_perfs_from_config(const char *line)
 	
 	assert(line);
 
-	if (num_param(line) != 3)
+	if (3 != num_param(line))
 		goto lbl_syntax_error;
 
         if (0 != get_param(line, 1, name, sizeof(name)))
@@ -378,7 +378,7 @@ void	collect_perfstat()
 	}
 
 	/* Process user-defined counters */
-	for ( cptr = ppsd->pPerfCounterList; cptr != NULL; cptr = cptr->next )
+	for (cptr = ppsd->pPerfCounterList; cptr != NULL; cptr = cptr->next)
 	{
 		if (ITEM_STATUS_NOTSUPPORTED == cptr->status)	/* Inactive counter? */
 			continue;
@@ -410,7 +410,7 @@ void	collect_perfstat()
 		cptr->CurrentCounter = tmp;
 		cptr->lastValue = statData.mean.doubleValue;
 
-		if(cptr->CurrentNum < cptr->interval)
+		if (cptr->CurrentNum < cptr->interval)
 			cptr->CurrentNum++;
 	}
 }
