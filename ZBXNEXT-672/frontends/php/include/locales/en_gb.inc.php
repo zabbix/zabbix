@@ -1116,8 +1116,6 @@
 	'S_LINK_STATUS_INDICATOR'=>		_('Link status indicator'),
 	'S_CONFIGURATION_OF_NETWORK_MAPS'=>	_('Configuration of network maps'),
 	'S_CONFIGURATION_OF_NETWORK_MAPS_BIG'=>	_('CONFIGURATION OF NETWORK MAPS'),
-	'S_MAP_SAVED_RETURN_Q'=>		_('Map is saved! Return?'),
-	'S_MAP_SAVE_OPERATION_FAILED'=>		_('Map save operation failed.'),
 	'S_GET_IMG_ELEMENT_DATA_NOT_FOUND'=>	_('Get Img: Element data not found!'),
 
 	'S_ADD_ELEMENT'=>			_('Add element'),
@@ -1174,7 +1172,6 @@
 	'S_CANNOT_FIND_MAP'=>			_('Cannot find map'),
 	'S_CANNOT_FIND_SCREEN'=>		_('Cannot find screen'),
 	'S_USED_IN_EXPORTED_MAP_SMALL'=>_('used in exported map'),
-	'S_NO_ICON_FOR_MAP_ELEMENT'=>	_('No icon for map element'),
 
 	'S_INCORRECT_ELEMENT_MAP_LINK' => _('All links should have "Name" and "URL" specified'),
 	'S_EACH_URL_SHOULD_HAVE_UNIQUE' => _('Each URL should have a unique name. Please make sure there is only one URL named'),

@@ -670,7 +670,6 @@ class zbxXML{
 
 
 			$importMaps = $importMaps['zabbix_export']['sysmaps'];
-			$sysmaps = array();
 			foreach($importMaps as $mnum => &$sysmap){
 				unset($sysmap['sysmapid']);
 				$exists = API::Map()->exists(array('name' => $sysmap['name']));
@@ -703,10 +702,17 @@ class zbxXML{
 					$sysmap['backgroundid'] = 0;
 				}
 
-				if(!isset($sysmap['selements'])) $sysmap['selements'] = array();
-				if(!isset($sysmap['links'])) $sysmap['links'] = array();
+				if(!isset($sysmap['selements']))
+					$sysmap['selements'] = array();
+				else
+					$sysmap['selements'] = array_values($sysmap['selements']);
 
-				foreach($sysmap['selements'] as $snum => &$selement){
+				if(!isset($sysmap['links']))
+					$sysmap['links'] = array();
+				else
+					$sysmap['links'] = array_values($sysmap['links']);
+
+				foreach($sysmap['selements'] as &$selement){
 					$nodeCaption = isset($selement['elementid']['node'])?$selement['elementid']['node'].':':'';
 
 					if(!isset($selement['elementid'])) $selement['elementid'] = 0;
@@ -753,7 +759,6 @@ class zbxXML{
 						break;
 						case SYSMAP_ELEMENT_TYPE_IMAGE:
 						default:
-						break;
 					}
 
 					$icons = array('iconid_off','iconid_on','iconid_disabled','iconid_maintenance');
@@ -777,10 +782,9 @@ class zbxXML{
 					if(!isset($link['linktriggers'])) continue;
 
 					foreach($link['linktriggers'] as $ltnum => &$linktrigger){
-						$nodeCaption = isset($linktrigger['triggerid']['node'])?$linktrigger['triggerid']['node'].':':'';
-
 						$db_triggers = API::Trigger()->getObjects($linktrigger['triggerid']);
 						if(empty($db_triggers)){
+							$nodeCaption = isset($linktrigger['triggerid']['node'])?$linktrigger['triggerid']['node'].':':'';
 							$error = S_CANNOT_FIND_TRIGGER.' "'.$nodeCaption.$linktrigger['triggerid']['host'].':'.$linktrigger['triggerid']['description'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
 							throw new Exception($error);
 						}
@@ -791,69 +795,28 @@ class zbxXML{
 					unset($linktrigger);
 				}
 				unset($link);
-
-				$sysmaps[] = $sysmap;
 			}
 			unset($sysmap);
 
-			$importMaps = $sysmaps;
-			foreach($importMaps as $mnum => $importMap){
-				$sysmap = $importMap;
+
+			foreach($importMaps as $importMap){
 				if(isset($importMap['sysmapid'])){
 					$result = API::Map()->update($importMap);
-					$sysmapids = $result['sysmapids'];
-
-// Deleting all selements (with links)
-					$db_selementids = array();
-					$res = DBselect('SELECT selementid FROM sysmaps_elements WHERE sysmapid='.$sysmap['sysmapid']);
-					while($db_selement = DBfetch($res)){
-						$db_selementids[$db_selement['selementid']] = $db_selement['selementid'];
+					if($result === false){
+						throw new Exception(_s('Cannot update map "%s".', $importMap['name']));
 					}
-					delete_sysmaps_element($db_selementids);
-//----
+					else{
+						info(_s('Map "%s" updated.', $importMap['name']));
+					}
 				}
 				else{
 					$result = API::Map()->create($importMap);
-					$sysmapids = $result['sysmapids'];
-					$sysmap['sysmapid'] = reset($sysmapids);
-				}
-
-				$selements = $importMap['selements'];
-				$links = $importMap['links'];
-
-				foreach($selements as $id => $selement){
-					if(!isset($selement['elementid']) || ($selement['elementid'] == 0)){
-						$selement['elementid'] = 0;
-						$selement['elementtype'] = SYSMAP_ELEMENT_TYPE_IMAGE;
+					if($result === false){
+						throw new Exception(_s('Cannot create map "%s".', $importMap['name']));
 					}
-
-					if(!isset($selement['iconid_off']) || ($selement['iconid_off'] == 0)){
-						throw new Exception(S_NO_ICON_FOR_MAP_ELEMENT.' '.$sysmap['name'].':'.$selement['label']);
+					else{
+						info(_s('Map "%s" create.', $importMap['name']));
 					}
-
-					$selement['sysmapid'] = $sysmap['sysmapid'];
-					$selementids = API::Map()->addElements($selement);
-					$selementid = reset($selementids);
-
-					foreach($links as $id => &$link){
-						if(bccomp($link['selementid1'],$selement['selementid']) == 0) $links[$id]['selementid1'] = $selementid;
-						else if(bccomp($link['selementid2'],$selement['selementid']) == 0) $links[$id]['selementid2'] = $selementid;
-					}
-					unset($link);
-				}
-
-				foreach($links as $id => $link){
-					if(!isset($link['linktriggers'])) $link['linktriggers'] = array();
-					$link['sysmapid'] = $sysmap['sysmapid'];
-
-					$result = API::Map()->addLinks($link);
-				}
-
-				if(isset($importMap['sysmapid'])){
-					info(S_MAP.' ['.$sysmap['name'].'] '.S_UPDATED_SMALL);
-				}
-				else{
-					info(S_MAP.' ['.$sysmap['name'].'] '.S_ADDED_SMALL);
 				}
 			}
 

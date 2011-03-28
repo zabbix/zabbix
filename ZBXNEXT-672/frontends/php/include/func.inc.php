@@ -557,10 +557,9 @@ function zbx_is_int($var){
 return preg_match("/^\-?\d{1,20}+$/", $var);
 }
 
-function zbx_array_diff($array1, $array2, $field){
-
-	$fields1 = zbx_objectValues($array1, $field);
-	$fields2 = zbx_objectValues($array2, $field);
+function zbx_array_diff($primary, $secondary, $field){
+	$fields1 = zbx_objectValues($primary, $field);
+	$fields2 = zbx_objectValues($secondary, $field);
 
 	$first = array_diff($fields1, $fields2);
 	$first = zbx_toHash($first);
@@ -574,7 +573,7 @@ function zbx_array_diff($array1, $array2, $field){
 		'both' => array()
 	);
 
-	foreach($array1 as $array){
+	foreach($primary as $array){
 		if(!isset($array[$field]))
 			$result['first'][] = $array;
 		else if(isset($first[$array[$field]]))
@@ -583,13 +582,11 @@ function zbx_array_diff($array1, $array2, $field){
 			$result['both'][$array[$field]] = $array;
 	}
 
-	foreach($array2 as $array){
+	foreach($secondary as $array){
 		if(!isset($array[$field]))
 			$result['second'][] = $array;
 		else if(isset($second[$array[$field]]))
 			$result['second'][] = $array;
-		else
-			$result['both'][$array[$field]] = $array;
 	}
 
 	return $result;

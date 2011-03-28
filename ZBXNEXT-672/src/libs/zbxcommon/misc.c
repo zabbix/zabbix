@@ -89,12 +89,24 @@ int	get_nodeid_by_id(zbx_uint64_t id)
  ******************************************************************************/
 void	zbx_timespec(zbx_timespec_t *ts)
 {
+	static zbx_timespec_t	*last_ts = NULL;
+	static int		corr = 0;
 #ifdef _WINDOWS
-
 	LARGE_INTEGER	tickPerSecond, tick;
 	static int	boottime = 0;
 	BOOL		rc = FALSE;
+#else	/* not _WINDOWS */
+	struct timeval	tv;
+	int		rc = -1;
+#ifdef HAVE_TIME_CLOCK_GETTIME
+	struct timespec	tp;
+#endif	/* HAVE_TIME_CLOCK_GETTIME */
+#endif	/* not _WINDOWS */
 
+	if (NULL == last_ts)
+		last_ts = zbx_malloc(last_ts, sizeof(zbx_timespec_t));
+
+#ifdef _WINDOWS
 	if (TRUE == (rc = QueryPerformanceFrequency(&tickPerSecond)))
 	{
 		if (TRUE == (rc = QueryPerformanceCounter(&tick)))
@@ -119,14 +131,8 @@ void	zbx_timespec(zbx_timespec_t *ts)
 		ts->sec = (int)tb.time;
 		ts->ns = tb.millitm * 1000000;
 	}
-
 #else	/* not _WINDOWS */
-
-	struct timeval	tv;
-	int		rc = -1;
 #ifdef HAVE_TIME_CLOCK_GETTIME
-	struct timespec	tp;
-
 	if (0 == (rc = clock_gettime(CLOCK_REALTIME, &tp)))
 	{
 		ts->sec = (int)tp.tv_sec;
@@ -145,8 +151,24 @@ void	zbx_timespec(zbx_timespec_t *ts)
 		ts->sec = (int)time(NULL);
 		ts->ns = 0;
 	}
-
 #endif	/* not _WINDOWS */
+
+	if (last_ts->ns == ts->ns && last_ts->sec == ts->sec)
+	{
+		ts->ns += ++corr;
+
+		while (ts->ns >= 1000000000)
+		{
+			ts->sec++;
+			ts->ns -= 1000000000;
+		}
+	}
+	else
+	{
+		last_ts->sec = ts->sec;
+		last_ts->ns = ts->ns;
+		corr = 0;
+	}
 }
 
 /******************************************************************************
