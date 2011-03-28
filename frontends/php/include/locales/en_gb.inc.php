@@ -898,6 +898,7 @@
 	'S_SNMP' =>						_('SNMP'),
 	'S_INTERFACES' =>				_('Interfaces'),
 	'S_INTERFACE' =>				_('Interface'),
+	'S_JMX' =>						_('JMX'),
 
 // templates.php
 	'S_TEMPLATE_LIST'=>			_('Templates list'),
@@ -969,6 +970,7 @@
 	'S_IPMI_AGENT'=>					_('IPMI agent'),
 	'S_SSH_AGENT'=>						_('SSH agent'),
 	'S_TELNET_AGENT'=>					_('TELNET agent'),
+	'S_JMX_AGENT'=>					_('JMX agent'),
 	'S_ZABBIX_AGGREGATE'=>					_('Zabbix aggregate'),
 	'S_EXTERNAL_CHECK'=>					_('External check'),
 	'S_WEB_MONITORING'=>					_('Web monitoring'),
@@ -992,6 +994,7 @@
 	'S_DECIMAL'=>						_('Decimal'),
 	'S_OCTAL'=>						_('Octal'),
 	'S_HEXADECIMAL'=>					_('Hexadecimal'),
+	'S_BOOLEAN'=>					_('Boolean'),
 	'S_STORE_VALUE'=>					_('Store value'),
 	'S_SHOW_VALUE'=>					_('Show value'),
 	'S_NUMERIC_UINT64'=>					_('Numeric (integer 64bit)'),
@@ -1240,7 +1243,6 @@
 
 //	overview.php
 	'S_OVERVIEW'=>				_('Overview'),
-	'S_OVERVIEW_BY_PROXY'=>			_('Overview by proxy'),
 	'S_OVERVIEW_BIG'=>			_('OVERVIEW'),
 	'S_HOSTS_LOCATION'=>			_('Hosts location'),
 	'S_DATA'=>				_('Data'),
@@ -1251,9 +1253,6 @@
 	'S_15_MIN'=>				_('15 min'),
 
 //	queue.php
-	'S_QUEUE_OF_ITEMS_TO_BE_UPDATED_BIG'=>	_('QUEUE OF ITEMS TO BE UPDATED'),
-	'S_NEXT_CHECK'=>			_('Next check'),
-	'S_THE_QUEUE_IS_EMPTY'=>		_('The queue is empty'),
 	'S_TOTAL'=>				_('Total'),
 	'S_COUNT'=>				_('Count'),
 	'S_5_SECONDS'=>				_('5 seconds'),
@@ -1261,9 +1260,6 @@
 	'S_30_SECONDS'=>			_('30 seconds'),
 	'S_1_MINUTE'=>				_('1 minute'),
 	'S_5_MINUTES'=>				_('5 minutes'),
-	'S_MORE_THAN_10_MINUTES'=>		_('More than 10 minutes'),
-	'S_TRUNCATED'=>				_('Truncated'),
-	'S_DELAYED_BY'=>			_('Delayed by'),
 	'S_QUEUE_NODES_DATE_FORMAT'=>		_('d M Y H:i:s'),
 
 //	report1.php
