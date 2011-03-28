@@ -73,6 +73,11 @@ mselement: {
 	label_location:		3,
 	x:					0,
 	y:					0,
+	elementsubtype:		0,
+	areatype:			0,
+	width:				200,
+	height:				200,
+	viewtype:			0,
 	urls:				{},
 	html_obj:			null,			// reference to html obj
 	html_objid:			null,			// html elements id
@@ -247,6 +252,9 @@ addNewElement: function(){
 						'onFailure': function(){ document.location = url.getPath()+'?'+Object.toQueryString(params); }
 					}
 	);
+
+
+	var selem = new CSelement(this);
 },
 
 // CONNECTORS
@@ -417,7 +425,7 @@ alignSelement: function(selementid){
 
 add_selement: function(selement, update_icon){
 	this.debug('add_selement');
-
+//--
 	var selementid = 0;
 	if((typeof(selement['selementid']) == 'undefined') || (selement['selementid'] == 0)){
 		do{
@@ -3418,28 +3426,33 @@ updateMapView: function(e){
 });
 //]]
 
-/*
+//*
 // *******************************************************************
 //		SELEMENT object (unfinished)
 // *******************************************************************
 var CSelement = Class.create(CDebug, {
-sysmap:				null,		// sysmap object reference
+sysmap:					null,		// Parent sysmap reference
 
-data: {
+data:{
 	selementid:			0,			// ALWAYS must be a STRING (js doesn't support uint64)
 	elementtype:		4,			// 5-UNDEFINED
 	elementid:			0,			// ALWAYS must be a STRING (js doesn't support uint64)
 	elementName:		'',			// element name
 	iconid_off:			0,			// ALWAYS must be a STRING (js doesn't support uint64)
 	iconid_on:			0,			// ALWAYS must be a STRING (js doesn't support uint64)
-	iconid_maintenance:	0,		// ALWAYS must be a STRING (js doesn't support uint64)
+	iconid_maintenance:	0,			// ALWAYS must be a STRING (js doesn't support uint64)
 	iconid_disabled:	0,			// ALWAYS must be a STRING (js doesn't support uint64)
 	label:				locale['S_NEW_ELEMENT'],	// Element label
 	label_expanded:		locale['S_NEW_ELEMENT'],	// Element label macros expanded
 	label_location:		3,
 	x:					0,
 	y:					0,
-	url:				'',
+	elementsubtype:		0,
+	areatype:			0,
+	width:				200,
+	height:				200,
+	viewtype:			0,
+	urls:				{},
 	html_obj:			null,			// reference to html obj
 	html_objid:			null,			// html elements id
 	selected:			0				// element is not selected
@@ -3447,68 +3460,69 @@ data: {
 
 initialize: function($super, sysmap, params){
 	this.sysmap = sysmap;
-	$super('CSelement['+id+']');
+	$super('CSelement[0]');
 //--
 
-	if(typeof(params) == 'undefined'){
+	if(typeof(params) != 'undefined'){
+		this.create(params);
+	}
+	else{
 		var url = new Curl(location.href);
 		var params = {
 			'favobj': 	'selements',
-			'favid':	this.id,
-			'sysmapid':	this.sysmapid,
-			'action':	'new_selement'
+			'sysmapid':	this.sysmap.sysmapid,
+			'favid':	this.sysmap.id,
+			'action':	'create'
 		};
 
-		params['selements'] = Object.toJSON({'0': selement});
+		params['selements'] = Object.toJSON({'0': this.data});
 
-		new Ajax.Request(url.getPath()+'?output=ajax'+'&sid='+url.getArgument('sid'),
-						{
-							'method': 'post',
-							'parameters':params,
-							'onSuccess': function(resp){ },
-	//						'onSuccess': function(resp){ SDI(resp.responseText); },
-							'onFailure': function(){ document.location = url.getPath()+'?'+Object.toQueryString(params); }
-						}
-		);
-	}
-	else{
-		var selementid = 0;
-		if((typeof(params['selementid']) == 'undefined') || (params['selementid'] == 0)){
-			do{
-				selementid = parseInt(Math.random(1000000000) * 1000000000);
-				selementid = selementid.toString();
-			}while(isset(selementid, this.sysmap.selements));
-
-			params['new'] = 'new';
-			params['selementid'] = selementid;
-		}
-		else{
-			selementid = params.selementid;
-		}
-
-		if(typeof(this.selements[selementid]) == 'undefined'){
-			selement.selected = null;
-		}
-		else{
-			selement.selected = this.sysmap.selements[selementid].selected;
-		}
-
-		if(isset('updateIcon', params) && (params['updateIcon'] != 0)){
-			selement.html_obj = this.addImage(params);
-			selement.image = null;
-		}
-
-		for(var key in params){
-			if(is_null(params[key])) continue;
-
-			if(is_number(params[key])) params[key] = params[key].toString();
-			this.data[key] = params[key];
-		}
+		jQuery.ajax({
+			url: url.getPath()+'?output=json'+'&sid='+url.getArgument('sid'),
+			type: "POST",
+			data: params,
+			success: this.create.bind(this),
+//			success: function(data){ SDJ(data); },
+			error: function(result){ SDJ(result); }
+		});
 	}
 },
 
-updateOption: function(params){ // params = {'key': value, 'key': value}
-	this.debug('updateOption');
+create: function(selementData){
+	this.debug('create');
+//--
+
+	var selementid = 0;
+	if(!isset('selementid', selementData) || (selementData['selementid'] == 0)){
+		do{
+			selementid = parseInt(Math.random(1000000000) * 1000000000);
+			selementid = selementid.toString();
+		}while(isset(selementid, this.sysmap.selements));
+
+		selementData['new'] = 'new';
+		selementData['selementid'] = selementid;
+	}
+
+	selementData.selected = null;
+SDJ(selementData);
+
+	if(isset('updateIcon', selementData) && (selementData['updateIcon'] != 0)){
+//		selement.html_obj = this.addImage(selementData);
+		selement.image = null;
+	}
+
+	for(var key in selementData){
+		if(is_null(selementData[key])) continue;
+
+		if(is_number(selementData[key]))
+			selementData[key] = selementData[key].toString();
+
+		this.data[key] = selementData[key];
+	}
+},
+
+update: function(params){ // params = {'key': value, 'key': value}
+	this.debug('update');
 //--
 
 	for(var key in params){
@@ -3518,11 +3532,11 @@ updateOption: function(params){ // params = {'key': value, 'key': value}
 		this.data[key] = params[key];
 	}
 
-	this.update();
+	this.reload();
 },
 
-update: function(){
-	this.debug('update');
+reload: function(){
+	this.debug('reload');
 //--
 
 	var url = new Curl(location.href);
@@ -3536,15 +3550,14 @@ update: function(){
 
 	params['selements'] = Object.toJSON({'0': this.data});
 
-	new Ajax.Request(url.getPath()+'?output=ajax'+'&sid='+url.getArgument('sid'),
-					{
-						'method': 'post',
-						'parameters':params,
-						'onSuccess': function(resp){ },
-//						'onSuccess': function(resp){ SDI(resp.responseText); },
-						'onFailure': function(){ document.location = url.getPath()+'?'+Object.toQueryString(params); }
-					}
-	);
+	jQuery.post({
+		url: url.getPath()+'?output=json'+'&sid='+url.getArgument('sid'),
+		type: "POST",
+		data: params,
+//		success: this.udpate.bind(this),
+		success: function(data, textStatus, jqXHR){ SDJ(data); },
+		error: function(){ document.location = url.getPath()+'?'+Object.toQueryString(params); }
+	});
 },
 
 remove: function(){
@@ -3699,5 +3712,5 @@ makeDragable: function(){
 	});
 }
 });
-*/
+//*/
 //]]

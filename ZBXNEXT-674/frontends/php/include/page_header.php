@@ -45,12 +45,15 @@
 			if(!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
 			break;
 		case PAGE_TYPE_JS:
-		case PAGE_TYPE_JSON:
 			header('Content-Type: application/javascript; charset=UTF-8');
 			if(!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
 			break;
-		case PAGE_TYPE_JSON_RPC:
+		case PAGE_TYPE_JSON:
 			header('Content-Type: application/json');
+			if(!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
+			break;
+		case PAGE_TYPE_JSON_RPC:
+			header('Content-Type: application/json-rpc');
 			if(!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
 			break;
 		case PAGE_TYPE_CSS:

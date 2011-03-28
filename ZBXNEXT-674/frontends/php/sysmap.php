@@ -76,7 +76,7 @@ include_once('include/page_header.php');
 		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  null,	NULL),
 		'favcnt'=>		array(T_ZBX_INT, O_OPT,	null,	null,	null),
 
-		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'form','list','get','get_img','new_selement','save'"),NULL),
+		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	NOT_EMPTY,		NULL),
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("hat"=={favobj})'),
 
 		'selements'=>	array(T_ZBX_STR, O_OPT,	P_SYS,	DB_ID, NULL),
@@ -250,6 +250,25 @@ include_once('include/page_header.php');
 						print('ZBX_SYSMAPS['.$cmapid.'].map.info("'.S_GET_IMG_ELEMENT_DATA_NOT_FOUND.'"); ');
 					}
 				break;
+				case 'create':
+					$default_icon = get_default_image(false);
+
+					$selements = get_request('selements', '[]');
+					$selements = $json->decode($selements, true);
+					if(!empty($selements)){
+						$selement = reset($selements);
+
+						$selement['iconid_off']	= $default_icon['imageid'];
+
+//						$selement['image'] = get_base64_icon($element);
+						$selement['image'] = get_selement_iconid($selement);
+
+						print(zbx_jsvalue($selement, true));
+					}
+					else{
+						print('ZBX_SYSMAPS['.$cmapid.'].map.info("'.S_GET_IMG_ELEMENT_DATA_NOT_FOUND.'"); ');
+					}
+				break;
 			}
 		}
 
@@ -259,7 +278,7 @@ include_once('include/page_header.php');
 		}
 	}
 
-	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+	if(PAGE_TYPE_HTML != $page['type']){
 		include_once('include/page_footer.php');
 		exit();
 	}
