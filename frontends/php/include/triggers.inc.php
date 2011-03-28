@@ -1555,7 +1555,7 @@ function utf8RawUrlDecode($source){
 					break;
 				}
 			}
-			if($trigger_exist && ($trigger_exist['triggerid'] != $trigger['triggerid'])){
+			if($trigger_exist && (bccomp($trigger_exist['triggerid'],$trigger['triggerid']) != 0)){
 				error('Trigger with name "'.$trigger['description'].'" and expression "'.$expression.'" already exists.');
 				return false;
 			}
