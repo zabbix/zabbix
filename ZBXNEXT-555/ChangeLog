@@ -3,6 +3,8 @@ Changes for 1.9.3
 
 New features:
 
+ - [ZBXNEXT-555] added remote monitoring of JMX counters through Java proxy (asaveljevs,Vedmak,Vlad)
+ - [ZBXNEXT-651] added "Boolean" data type for integer item value type (asaveljevs,Vedmak,Vlad)
  - [ZBXNEXT-675] added new icons and a script to create sql file (Elvis,Richlv)
  - [ZBX-1357] Updated Latvian and Russian translations; thanks to Zabbix translators (Richlv)
  - [ZBXNEXT-696] Added support for {IPADDRESS}, {HOST.DNS} and {HOST.CONN} macros in trigger names (rudolfs)
@@ -12,7 +14,7 @@ New features:
 Bug fixes:
  - [ZBX-3623] fixed processing of nanoseconds for history data (Sasha)
  - [ZBX-3634] improved zabbix map API methods (Aly)
- - [ZBX-3579] fixed trigger popup menu in status of triggers (Vemdak)
+ - [ZBX-3579] fixed trigger popup menu in status of triggers (Vedmak)
  
 --------------------------------------------------------------------------------
 Changes for 1.9.2
