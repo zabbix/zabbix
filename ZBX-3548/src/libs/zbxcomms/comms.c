@@ -757,10 +757,11 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 			}
 
 #if defined(IPV6_V6ONLY)
-			if (PF_INET6 == current_ai->ai_family &&
 #ifdef _WINDOWS
+			if (PF_INET6 == current_ai->ai_family &&
 				ZBX_TCP_ERROR == setsockopt(s->sockets[s->num_socks], IPPROTO_IPV6, IPV6_V6ONLY, (void *)&on, sizeof(on)))
 #else
+			if (PF_INET6 == current_ai->ai_family &&
 				ZBX_TCP_ERROR == setsockopt(s->sockets[s->num_socks], SOL_IPV6, IPV6_V6ONLY, (void *)&on, sizeof(on)))
 #endif
 			{
