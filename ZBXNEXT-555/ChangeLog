@@ -2,6 +2,7 @@
 Changes for 1.9.3
 
 New features:
+
  - [ZBXNEXT-675] added new icons and a script to create sql file (Elvis,Richlv)
  - [ZBX-1357] Updated Latvian and Russian translations; thanks to Zabbix translators (Richlv)
  - [ZBXNEXT-696] Added support for {IPADDRESS}, {HOST.DNS} and {HOST.CONN} macros in trigger names (rudolfs)
@@ -10,7 +11,9 @@ New features:
 
 Bug fixes:
  - [ZBX-3623] fixed processing of nanoseconds for history data (Sasha)
-
+ - [ZBX-3634] improved zabbix map API methods (Aly)
+ - [ZBX-3579] fixed trigger popup menu in status of triggers (Vemdak)
+ 
 --------------------------------------------------------------------------------
 Changes for 1.9.2
 
@@ -35,6 +38,7 @@ New features:
  - [ZBX-3338] updated Ukrainian translation; thanks to zalex_ua (Richlv)
 
 Bug fixes:
+ - [ZBX-3496] fixed error when creating new user (KB)
  - [ZBX-3496] fixed saving templated items (Vedmak)
  - [ZBX-3538] action condition 'Trigger description' renamed to 'Trigger name' (Alexei)
  - [ZBX-976] fix and improve availability report dropdown captions (Richlv)
@@ -107,6 +111,8 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
 
+ - [ZBX-3453] improve performance of cpu collector (Sasha)
+ - [ZBX-3610] fixed active agent full buffer bug - stop processing active checks till the buffer is sent (rudolfs)
  - [ZBX-3566] fixed error in administration->notifications and added a hint when no mediatypes are defined (KB)
  - [ZBX-3628] fixed server crash while processing notification messages with an already deleted trigger (Sasha)
  - [ZBX-3075] fixed a regex bug with zero-length strings (rudolfs)

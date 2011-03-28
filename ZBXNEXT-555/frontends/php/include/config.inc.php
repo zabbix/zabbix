@@ -48,6 +48,7 @@ function __autoload($class_name){
 		'citemprototype' => 1,
 		'cmaintenance' => 1,
 		'cmap' => 1,
+		'cmapelement' => 1,
 		'cmediatype' => 1,
 		'cproxy' => 1,
 		'cscreen' => 1,
