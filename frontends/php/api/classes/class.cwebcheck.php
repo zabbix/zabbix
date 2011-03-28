@@ -379,7 +379,7 @@ COpt::memoryPick();
 					$webcheck_exist = $this->get($options);
 					$webcheck_exist = reset($webcheck_exist);
 
-					if($webcheck_exist && ($webcheck_exist['webcheckid'] != $webcheck_exist['webcheckid']))
+					if($webcheck_exist && (bccomp($webcheck_exist['webcheckid'],$webcheck_exist['webcheckid']) != 0))
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario [%s] already exists.', $webcheck['name']));
 				}
 
