@@ -185,6 +185,11 @@ include_once('include/page_header.php');
 			'urls' => get_request('urls', array())
 		);
 
+		foreach($map['urls'] as $unum => $url){
+			if(zbx_empty($url['name']) && zbx_empty($url['url']))
+				unset($map['urls'][$unum]);
+		}
+
 		if(isset($_REQUEST['sysmapid'])){
 // TODO check permission by new value.
 			$map['sysmapid'] = $_REQUEST['sysmapid'];

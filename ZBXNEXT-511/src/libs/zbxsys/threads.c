@@ -38,7 +38,7 @@
  *          Use this function instead of system fork function!                *
  *                                                                            *
  ******************************************************************************/
-#if !defined(_WINDOWS)
+#ifndef _WINDOWS
 int	zbx_fork()
 {
 	fflush(stdout);
@@ -64,41 +64,39 @@ int	zbx_fork()
  *          The zbx_thread_exit must be called from the handler!              *
  *                                                                            *
  ******************************************************************************/
-
-ZBX_THREAD_HANDLE zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), void *args)
+ZBX_THREAD_HANDLE	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread_args_t *thread_args)
 {
-	ZBX_THREAD_HANDLE thread = ZBX_THREAD_HANDLE_NULL;
+	ZBX_THREAD_HANDLE	thread = ZBX_THREAD_HANDLE_NULL;
 
-#if defined(_WINDOWS)
+#ifdef _WINDOWS
 
-	unsigned thrdaddr;
+	unsigned	thrdaddr;
 
-	if(0 == (thread = (ZBX_THREAD_HANDLE)_beginthreadex(NULL,0,handler,args,0,&thrdaddr))) /* NOTE: _beginthreadex returns 0 on failure, rather than 1 */
+	/* NOTE: _beginthreadex returns 0 on failure, rather than 1 */
+	if (0 == (thread = (ZBX_THREAD_HANDLE)_beginthreadex(NULL, 0, handler, thread_args, 0, &thrdaddr)))
 	{
 		zbx_error("Error on thread creation. [%s]", strerror_from_system(GetLastError()));
-		thread = (ZBX_THREAD_HANDLE)(ZBX_THREAD_ERROR);
+		thread = (ZBX_THREAD_HANDLE)ZBX_THREAD_ERROR;
 	}
 
-#else /* not _WINDOWS */
+#else	/* not _WINDOWS */
 
-	thread = zbx_fork();
-
-	if(thread == 0) /* child process */
+	if (0 == (thread = zbx_fork())) /* child process */
 	{
-		(*handler)(args);
+		(*handler)(thread_args);
 
-		/* The zbx_thread_exit must be called from the handler */
+		/* The zbx_thread_exit must be called from the handler. */
 		/* And in normal case the program will never reach this point. */
 		zbx_thread_exit(0);
-		/* Program will never reach this point. */
+		/* program will never reach this point */
 	}
-	else if(thread < 0)
+	else if (-1 == thread)
 	{
 		zbx_error("Error on thread creation.");
-		thread = (ZBX_THREAD_HANDLE)(ZBX_THREAD_ERROR);
+		thread = (ZBX_THREAD_HANDLE)ZBX_THREAD_ERROR;
 	}
 
-#endif /* _WINDOWS */
+#endif	/* _WINDOWS */
 
 	return thread;
 }
@@ -118,34 +116,33 @@ ZBX_THREAD_HANDLE zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), void *args
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-
-int zbx_thread_wait(ZBX_THREAD_HANDLE thread)
+int	zbx_thread_wait(ZBX_THREAD_HANDLE thread)
 {
-	int status = 0; /* significant 8 bits of the status */
+	int	status = 0; /* significant 8 bits of the status */
 
-#if defined(_WINDOWS)
+#ifdef _WINDOWS
 
-	if(WaitForSingleObject(thread, INFINITE) != WAIT_OBJECT_0)
+	if (WAIT_OBJECT_0 != WaitForSingleObject(thread, INFINITE))
 	{
 		zbx_error("Error on thread waiting. [%s]", strerror_from_system(GetLastError()));
 		return ZBX_THREAD_ERROR;
 	}
 
-	if( 0 == GetExitCodeThread(thread, &status) )
+	if (0 == GetExitCodeThread(thread, &status))
 	{
 		zbx_error("Error on thread exit code receiving. [%s]", strerror_from_system(GetLastError()));
 		return ZBX_THREAD_ERROR;
 	}
 
-	if(CloseHandle(thread) == 0)
+	if (0 == CloseHandle(thread))
 	{
 		zbx_error("Error on thread closing. [%s]", strerror_from_system(GetLastError()));
 		return ZBX_THREAD_ERROR;
 	}
 
-#else /* not _WINDOWS */
+#else	/* not _WINDOWS */
 
-	if(waitpid(thread, &status, 0) <= 0)
+	if (0 >= waitpid(thread, &status, 0))
 	{
 		zbx_error("Error on thread waiting.");
 		return ZBX_THREAD_ERROR;
@@ -153,20 +150,16 @@ int zbx_thread_wait(ZBX_THREAD_HANDLE thread)
 
 	status = WEXITSTATUS(status);
 
-#endif /* _WINDOWS */
+#endif	/* _WINDOWS */
 
 	return status;
 }
 
-long int zbx_get_thread_id(void)
+long int	zbx_get_thread_id()
 {
-#if defined(_WINDOWS)
-
-	return (long int) GetCurrentThreadId();
-
-#else /* not _WINDOWS */
-
-	return (long int) getpid();
-
-#endif /* _WINDOWS */
+#ifdef _WINDOWS
+	return (long int)GetCurrentThreadId();
+#else
+	return (long int)getpid();
+#endif
 }

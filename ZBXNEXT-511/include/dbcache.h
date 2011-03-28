@@ -31,7 +31,8 @@
 #define	ZBX_POLLER_TYPE_UNREACHABLE	1
 #define	ZBX_POLLER_TYPE_IPMI		2
 #define	ZBX_POLLER_TYPE_PINGER		3
-#define	ZBX_POLLER_TYPE_COUNT		4	/* number of poller types */
+#define	ZBX_POLLER_TYPE_JAVA		4
+#define	ZBX_POLLER_TYPE_COUNT		5	/* number of poller types */
 
 extern char	*CONFIG_FILE;
 extern int	CONFIG_TIMEOUT;
@@ -42,6 +43,7 @@ extern int	CONFIG_TEXT_CACHE_SIZE;
 extern int	CONFIG_POLLER_FORKS;
 extern int	CONFIG_UNREACHABLE_POLLER_FORKS;
 extern int	CONFIG_IPMIPOLLER_FORKS;
+extern int	CONFIG_JAVAPOLLER_FORKS;
 extern int	CONFIG_PINGER_FORKS;
 extern int	CONFIG_REFRESH_UNSUPPORTED;
 extern int	CONFIG_NS_SUPPORT;
@@ -86,6 +88,9 @@ typedef struct
 	unsigned char	ipmi_privilege;
 	char		ipmi_username[HOST_IPMI_USERNAME_LEN_MAX];
 	char		ipmi_password[HOST_IPMI_PASSWORD_LEN_MAX];
+	int		jmx_errors_from;
+	unsigned char	jmx_available;
+	int		jmx_disable_until;
 }
 DC_HOST;
 
