@@ -919,7 +919,7 @@ static void	process_active_checks(char *server, unsigned short port)
 					*key_logeventid = '\0';
 
 				if (0 != get_param(params, 6, maxlines_persec_str, sizeof(maxlines_persec_str) ||
-						'\0' == *maxlines_persec_str)
+						'\0' == *maxlines_persec_str))
 					maxlines_persec = CONFIG_MAX_LINES_PER_SECOND;
 				else if (MIN_VALUE_LINES > (maxlines_persec = atoi(maxlines_persec_str)) ||
 						MAX_VALUE_LINES < maxlines_persec)
