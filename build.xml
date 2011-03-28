@@ -57,6 +57,9 @@
 		<exec executable="make" dir="${builddir}" failonerror="on">
 			<arg line="dbschema"/>
 		</exec>
+		<exec executable="make" dir="${builddir}" failonerror="on">
+			<arg line="dist"/>
+		</exec>
 	</target>
 
 	<target name="init-sqlite3" depends="init-common">
