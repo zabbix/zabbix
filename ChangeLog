@@ -38,6 +38,7 @@ New features:
  - [ZBX-3338] updated Ukrainian translation; thanks to zalex_ua (Richlv)
 
 Bug fixes:
+ - [ZBX-3496] fixed error when creating new user (KB)
  - [ZBX-3496] fixed saving templated items (Vedmak)
  - [ZBX-3538] action condition 'Trigger description' renamed to 'Trigger name' (Alexei)
  - [ZBX-976] fix and improve availability report dropdown captions (Richlv)
