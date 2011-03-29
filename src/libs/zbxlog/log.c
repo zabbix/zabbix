@@ -157,7 +157,7 @@ int zabbix_open_log(int type, int level, const char *filename)
 	return	SUCCEED;
 }
 
-void zabbix_close_log(void)
+void zabbix_close_log()
 {
 	if(LOG_TYPE_SYSLOG == log_type)
 	{
@@ -411,17 +411,18 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 	}
 }
 
+#define ZBX_MESSAGE_BUF_SIZE	1024
+
 /*
  * Get system error string by call to FormatMessage
  */
- #define ZBX_MESSAGE_BUF_SIZE	1024
 
-char *strerror_from_system(unsigned long error)
+char	*strerror_from_system(unsigned long error)
 {
 #if defined(_WINDOWS)
 
 	TCHAR		wide_string[ZBX_MESSAGE_BUF_SIZE];
-	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];  /* !!! Attention static !!! not thread safely - Win32*/
+	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];  /* !!! Attention static !!! not thread safe - Win32 */
 
 	if (0 == FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, error,
 			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), wide_string, sizeof(wide_string), NULL))
@@ -450,10 +451,10 @@ char *strerror_from_system(unsigned long error)
  */
 
 #if defined(_WINDOWS)
-char *strerror_from_module(unsigned long error, LPCTSTR module)
+char	*strerror_from_module(unsigned long error, LPCTSTR module)
 {
 	TCHAR		wide_string[ZBX_MESSAGE_BUF_SIZE];
-	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];  /* !!! Attention static !!! not thread safely - Win32*/
+	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];  /* !!! Attention static !!! not thread safe - Win32 */
 	char		*strings[2];
 	HMODULE		hmodule;
 

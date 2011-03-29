@@ -218,6 +218,22 @@ ALTER TABLE hosts DROP COLUMN outbytes
 /
 REORG TABLE hosts
 /
+ALTER TABLE hosts ADD jmx_disable_until integer WITH DEFAULT '0' NOT NULL
+/
+REORG TABLE hosts
+/
+ALTER TABLE hosts ADD jmx_available integer WITH DEFAULT '0' NOT NULL
+/
+REORG TABLE hosts
+/
+ALTER TABLE hosts ADD jmx_errors_from integer WITH DEFAULT '0' NOT NULL
+/
+REORG TABLE hosts
+/
+ALTER TABLE hosts ADD jmx_error varchar(128) WITH DEFAULT '' NOT NULL
+/
+REORG TABLE hosts
+/
 ALTER TABLE hosts ADD name varchar(64) WITH DEFAULT '' NOT NULL
 /
 REORG TABLE hosts
