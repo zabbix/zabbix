@@ -2555,7 +2555,8 @@ function utf8RawUrlDecode($source){
 
 		$expression = explode_exp($trigger['expression'], 1, false, true);
 
-		$table->addRow(array(S_HOST, $trigger['host']));
+// Get visible name of the first host
+		$table->addRow(array(S_HOST, $trigger['hosts'][0]['name']));
 		$table->addRow(array(S_TRIGGER, $trigger['description']));
 		$table->addRow(array(S_SEVERITY, getSeverityCell($trigger['priority'])));
 		$table->addRow(array(S_EXPRESSION, $expression));

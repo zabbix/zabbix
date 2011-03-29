@@ -922,8 +922,7 @@ Copt::memoryPick();
 		}
 
 // expandDescription
-//		if(!is_null($options['expandDescription'])){
-		if(true){
+		if(!is_null($options['expandDescription'])){
 // Function compare values {{{
 			foreach($result as $tnum => $trigger){
 				preg_match_all('/\$([1-9])/u', $trigger['description'], $numbers);

@@ -341,7 +341,7 @@
 			$proxy = get_host_by_hostid($header_host['proxy_hostid']);
 			$description[] = $proxy['host'].':';
 		}
-		$description[] = $header_host['host'];
+		$description[] = $header_host['name'];
 
 		$list = new CList(null, 'objectlist');
 

@@ -92,7 +92,7 @@ else{
 
 	if($pageFilter->groupsSelected){
 		$options = array(
-			'output' => array('hostid', 'host'),
+			'output' => array('hostid', 'host', 'name'),
 			'selectProfile' => true,
 			'withProfiles' => true,
 			'selectGroups' => API_OUTPUT_EXTEND,

@@ -198,6 +198,8 @@ include_once('include/page_header.php');
 			'expandDescription' => true,
 			'expandData' => true,
 			'monitored' => true,
+// Rquired for getting visible host name
+			'selectHosts' => API_OUTPUT_EXTEND,
 			'filter' => array()
 		);
 
@@ -245,7 +247,7 @@ include_once('include/page_header.php');
 
 			$table->addRow(array(
 				get_node_name_by_elid($trigger['hostid']),
-				(($_REQUEST['hostid'] == 0) || (1 == $config)) ? $trigger['host'] : NULL,
+				(($_REQUEST['hostid'] == 0) || (1 == $config)) ? $trigger['hosts'][0]['name'] : NULL,
 				new CLink($trigger['description'], 'events.php?triggerid=' . $trigger['triggerid']),
 				$true,
 				$false,
