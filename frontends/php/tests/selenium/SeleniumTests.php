@@ -24,6 +24,7 @@ require_once(dirname(__FILE__).'/testClicks.php');
 require_once(dirname(__FILE__).'/testPageActionsAutoregistration.php');
 require_once(dirname(__FILE__).'/testPageActionsDiscovery.php');
 require_once(dirname(__FILE__).'/testPageActionsTriggers.php');
+require_once(dirname(__FILE__).'/testPageAvailabilityReport.php');
 require_once(dirname(__FILE__).'/testPageDashboard.php');
 require_once(dirname(__FILE__).'/testPageDiscovery.php');
 require_once(dirname(__FILE__).'/testPageEvents.php');
@@ -71,6 +72,7 @@ class SeleniumTests{
 		$suite->addTestSuite('testPageActionsAutoregistration');
 		$suite->addTestSuite('testPageActionsDiscovery');
 		$suite->addTestSuite('testPageActionsTriggers');
+		$suite->addTestSuite('testPageAvailabilityReport');
 		$suite->addTestSuite('testPageDashboard');
 		$suite->addTestSuite('testPageDiscovery');
 		$suite->addTestSuite('testPageEvents');

@@ -955,7 +955,7 @@ include_once('include/page_header.php');
 			'webitems' => true,
 			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => array('hostid','host'),
+			'selectHosts' => array('hostid','host','name'),
 			'preservekeys' => true
 		);
 
@@ -971,14 +971,14 @@ include_once('include/page_header.php');
 		order_result($items, 'description', ZBX_SORT_UP);
 
 		$jsItems = array();
-		foreach($items as $tnum => $row){
-			$host = reset($row['hosts']);
-			$row['host'] = $host['name'];
+		foreach($items as $tnum => $item){
+			$host = reset($item['hosts']);
+			$item['hostVisible'] = $host['name'];
 
 			$item['description'] = item_description($item);
 			$description = new CLink($item['description'],'#');
 
-			$item['description'] = $item['host'].':'.$item['description'];
+			$item['description'] = $item['hostVisible'].':'.$item['description'];
 
 			if($multiselect){
 				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", ".zbx_jsvalue($item['itemid']).");";
@@ -996,7 +996,7 @@ include_once('include/page_header.php');
 			$description->setAttribute('onclick', $js_action);
 
 			$table->addRow(array(
-				($hostid>0)?null:$item['host'],
+				($hostid>0)?null:$item['hostVisible'],
 				($multiselect ? new CCheckBox('items['.zbx_jsValue($item[$srcfld1]).']', NULL, NULL, $item['itemid']) : null),
 				$description,
 				$item['key_'],
@@ -1190,12 +1190,12 @@ include_once('include/page_header.php');
 
 		foreach($graphs as $gnum => $row){
 			$host = reset($row['hosts']);
-			$row['host'] = $host['host'];
+			$row['hostVisible'] = $host['name'];
 
 			$row['node_name'] = get_node_name_by_elid($row['graphid'], null, ': ');
 
 			if(!$simpleName)
-				$row['name'] = $row['node_name'].$row['host'].':'.$row['name'];
+				$row['name'] = $row['node_name'].$row['hostVisible'].':'.$row['name'];
 
 			$description = new CSpan($row['name'],'link');
 
@@ -1299,13 +1299,13 @@ include_once('include/page_header.php');
 
 		foreach($items as $tnum => $row){
 			$host = reset($row['hosts']);
-			$row['host'] = $host['host'];
+			$row['hostVisible'] = $host['name'];
 
 			$row['description'] = item_description($row);
 			$description = new CLink($row['description'],'#');
 
 			if(!$simpleName)
-				$row['description'] = $row['host'].':'.$row['description'];
+				$row['description'] = $row['hostVisible'].':'.$row['description'];
 
 			if($multiselect){
 				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", ".zbx_jsvalue($row['itemid']).");";
@@ -1326,7 +1326,7 @@ include_once('include/page_header.php');
 			}
 
 			$table->addRow(array(
-				($hostid>0)?null:$row['host'],
+				($hostid>0)?null:$row['hostVisible'],
 				$description,
 				item_type2str($row['type']),
 				item_value_type2str($row['value_type']),

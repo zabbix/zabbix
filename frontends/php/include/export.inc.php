@@ -28,6 +28,7 @@ class zbxXML{
 				'host' 				=> 'name'
 			),
 			'elements' => array(
+				'name'				=> '',
 				'proxy_hostid'		=> '',
 				'useip'				=> '',
 				'dns'				=> '',

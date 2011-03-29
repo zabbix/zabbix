@@ -49,7 +49,9 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 		"Use of undefined",
 		"You must login",
 		"DEBUG INFO",
-		"Cannot modify header"
+		"Cannot modify header",
+		"Parse error",
+		"syntax error"
 	);
 
 	// List of strings that SHOULD appear on every page
@@ -283,7 +285,6 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 		$result = DBselect('select host from hosts where status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')');
 		while($row = DBfetch($result))
 		{
-			echo $row['host']."\n";
 			$this->nok($row['host']);
 		}
 	}
