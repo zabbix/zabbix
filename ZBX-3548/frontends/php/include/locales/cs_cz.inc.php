@@ -748,7 +748,7 @@
 	'S_CREATE_MAINTENANCE_PERIOD'=>		'Vytvořit servisní okno',
 	'S_MAINTENANCE_TYPE'=>			'Typ servisního okna',
 	'S_EXPIRED'=>				'Vypršelo',
-	'S_APPROACH'=>				'Blíží se',
+	'S_APPROACHING'=>				'Blíží se',
 
 	'S_WITH_DATA_COLLECTION'=>		'se sběrem dat',
 	'S_NO_DATA_COLLECTION'=>		'bez sběru dat',
