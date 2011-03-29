@@ -258,7 +258,7 @@ include_once('include/page_header.php');
 
 //					$selement['image'] = get_base64_icon($element);
 					$selement['image'] = get_selement_iconid($selement);
-					$selement['label_expanded'] = expand_map_element_label_by_data($selement);
+					$selement['label_expanded'] = resolveMapLabelMacrosAll($selement);
 
 					$action = '';
 					$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.add_selement('.zbx_jsvalue($selement).',1);';
