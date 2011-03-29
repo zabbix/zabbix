@@ -152,7 +152,7 @@ int	PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 					if (ERROR_SUCCESS == status)
 						status = rawData.CStatus;
 
-					zabbix_log(LOG_LEVEL_DEBUG, "Can't get counter value \"%s\": %s",
+					zabbix_log(ERROR_SUCCESS == status ? LOG_LEVEL_ERR : LOG_LEVEL_DEBUG, "Can't get counter value \"%s\": %s",
 							counter_path, strerror_from_module(status, L"PDH.DLL"));
 				}
 			}
