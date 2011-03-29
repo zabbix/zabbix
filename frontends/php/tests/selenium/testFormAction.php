@@ -64,6 +64,8 @@ class testFormAction extends CWebTest {
 	 * @dataProvider providerNewActions
 	 */
 	public function testActionCreateSimple($action){
+		DBsave_tables(array('actions','conditions','opconditions','operations','opmessage','opmessage_grp','opmessage_usr','opcommand','opcommand_hst','opcommand_grp','opgroup','optemplate'));
+
 		$this->login('actionconf.php?form=1&eventsource=0');
 		$this->assertTitle('Configuration of actions');
 
@@ -107,6 +109,8 @@ class testFormAction extends CWebTest {
 
 			switch($operation['type']){
 				case 'Send message':
+					sleep(1);
+
 					$this->click("addusrgrpbtn");
 					$this->waitForPopUp("zbx_popup", "30000");
 					$this->selectWindow("name=zbx_popup");
@@ -138,9 +142,13 @@ class testFormAction extends CWebTest {
 
 		$this->wait();
 		$this->ok('Action added');
+
+		DBrestore_tables(array('actions','conditions','opconditions','operations','opmessage','opmessage_grp','opmessage_usr','opcommand','opcommand_hst','opcommand_grp','opgroup','optemplate'));
 	}
 
 	public function testActionCreate(){
+		DBsave_tables(array('actions','conditions','opconditions','operations','opmessage','opmessage_grp','opmessage_usr','opcommand','opcommand_hst','opcommand_grp','opgroup','optemplate'));
+
 		$this->login('actionconf.php?form=1&eventsource=0');
 		$this->assertTitle('Configuration of actions');
 
@@ -213,6 +221,8 @@ class testFormAction extends CWebTest {
 		$this->selectWindow("null");
 		$this->click("//input[@name='save']");
 
+		sleep(1);
+
 // add target group Zabbix servers
 		$this->click("add");
 		$this->select("opCmdTarget", "label=Host group");
@@ -249,6 +259,8 @@ class testFormAction extends CWebTest {
 		$this->click("save");
 		$this->wait();
 		$this->ok("Action added");
+
+		DBrestore_tables(array('actions','conditions','opconditions','operations','opmessage','opmessage_grp','opmessage_usr','opcommand','opcommand_hst','opcommand_grp','opgroup','optemplate'));
 	}
 
 }
