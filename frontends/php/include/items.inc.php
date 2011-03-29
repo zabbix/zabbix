@@ -553,7 +553,7 @@
 		$key =& $item['key_'];
 		$macStack = array();
 
-		$macroses = array('{HOSTNAME}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.HOST}','{HOST.NAME}');
+		$macroses = array('{HOSTNAME}', '{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.HOST}','{HOST.NAME}');
 
 		foreach($macroses as $macro){
 			$pos = 0;
@@ -586,6 +586,10 @@
 					case '{HOST.HOST}':
 						$key = str_replace('{HOSTNAME}', $host['host'], $key);
 					break;
+					case '{HOST.IP}':
+						$key = str_replace('{HOST.IP}', $interface['ip'], $key);
+					break;
+					/* deprecated */
 					case '{IPADDRESS}':
 						$key = str_replace('{IPADDRESS}', $interface['ip'], $key);
 					break;

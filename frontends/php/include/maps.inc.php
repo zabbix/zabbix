@@ -366,7 +366,7 @@
  * Function: expand_map_element_label_by_data
  *
  * Description:
- *     substitute simple macros {HOSTNAME}, {HOST.CONN}, {HOST.DNS}, {IPADDRESS} and
+ *     substitute simple macros {HOSTNAME}, {HOST.CONN}, {HOST.DNS}, {HOST.IP}, {IPADDRESS} and
  *     functions {hostname:key.min/max/avg/last(...)}
  *     in data string with real values
  *
@@ -385,6 +385,8 @@
 							zbx_strstr($label, '{HOST.DNS}') ||
 							zbx_strstr($label, '{HOST.HOST}') ||
 							zbx_strstr($label, '{HOST.NAME}') ||
+							zbx_strstr($label, '{HOST.IP}') ||
+							/* deprecated */
 							zbx_strstr($label, '{IPADDRESS}') ||
 							zbx_strstr($label, '{HOST.CONN}'))
 					{
@@ -424,6 +426,11 @@
 								$label = str_replace('{HOST.DNS}', $db_host['dns'], $label);
 							}
 
+							if(zbx_strstr($label, '{HOST.IP}')){
+								$label = str_replace('{HOST.IP}', $db_host['ip'], $label);
+							}
+
+							/* deprecated */
 							if(zbx_strstr($label, '{IPADDRESS}')){
 								$label = str_replace('{IPADDRESS}', $db_host['ip'], $label);
 							}

@@ -2032,7 +2032,7 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 #define MVAR_EVENT_ACK_HISTORY		"{EVENT.ACK.HISTORY}"
 #define MVAR_ESC_HISTORY		"{ESC.HISTORY}"
 #define MVAR_PROXY_NAME			"{PROXY.NAME}"
-#define MVAR_IPADDRESS			"{IPADDRESS}"
+#define MVAR_IPADDRESS			"{IPADDRESS}"			/* deprecated */
 #define MVAR_HOST_DNS			"{HOST.DNS}"
 #define MVAR_HOST_CONN			"{HOST.CONN}"
 #define MVAR_HOST_HOST			"{HOST.HOST}"
@@ -2541,7 +2541,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 				else if (0 == strcmp(m, MVAR_TRIGGER_KEY))
 					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_ITEM_KEY);
-				else if (0 == strcmp(m, MVAR_IPADDRESS) || 0 == strcmp(m, MVAR_HOST_IP))
+				else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
 					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_IPADDRESS);
 				else if (0 == strcmp(m, MVAR_HOST_DNS))
@@ -2745,7 +2745,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 					ret = get_node_value_by_event(event, &replace_to, "name");
 				else if (0 == strcmp(m, MVAR_HOST_HOST))
 					ret = get_autoreg_value_by_event(event, &replace_to, "host");
-				else if (0 == strcmp(m, MVAR_IPADDRESS) || 0 == strcmp(m, MVAR_HOST_IP))
+				else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
 					ret = get_autoreg_value_by_event(event, &replace_to, "listen_ip");
 				else if (0 == strcmp(m, MVAR_HOST_PORT))
 					ret = get_autoreg_value_by_event(event, &replace_to, "listen_port");
@@ -2775,7 +2775,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 				else if (0 == strcmp(m, MVAR_HOST_NAME) || 0 == strcmp(m, MVAR_HOSTNAME))
 					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_NAME);
-				else if (0 == strcmp(m, MVAR_IPADDRESS) || 0 == strcmp(m, MVAR_HOST_IP))
+				else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
 					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_IPADDRESS);
 				else if (0 == strcmp(m, MVAR_HOST_DNS))
@@ -2817,7 +2817,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 				replace_to = zbx_strdup(replace_to, dc_host->name);
 			else if (SUCCEED == (ret = DCconfig_get_interface_by_type(&interface, dc_host->hostid, INTERFACE_TYPE_AGENT)))
 			{
-				if (0 == strcmp(m, MVAR_IPADDRESS) || 0 == strcmp(m, MVAR_HOST_IP))
+				if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
 					replace_to = zbx_strdup(replace_to, interface.ip_orig);
 				else if	(0 == strcmp(m, MVAR_HOST_DNS))
 					replace_to = zbx_strdup(replace_to, interface.dns_orig);
@@ -2868,7 +2868,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 				replace_to = zbx_strdup(replace_to, dc_host->name);
 			else if (SUCCEED == (ret = DCconfig_get_interface_by_type(&interface, dc_host->hostid, INTERFACE_TYPE_AGENT)))
 			{
-				if (0 == strcmp(m, MVAR_IPADDRESS) || 0 == strcmp(m, MVAR_HOST_IP))
+				if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
 					replace_to = zbx_strdup(replace_to, interface.ip_orig);
 				else if	(0 == strcmp(m, MVAR_HOST_DNS))
 					replace_to = zbx_strdup(replace_to, interface.dns_orig);
