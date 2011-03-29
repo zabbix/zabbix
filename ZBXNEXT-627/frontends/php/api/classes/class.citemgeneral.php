@@ -155,6 +155,7 @@ abstract class CItemGeneral extends CZBXAPI{
 
 				if(!isset($item['interfaceid']) && $this->itemTypeInterface($item['type'])
 					&& ($dbHosts[$item['hostid']]['status'] != HOST_STATUS_TEMPLATE)
+					&& ($fullItem['flags'] != ZBX_FLAG_DISCOVERY_CHILD)
 				){
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No interface for item.'));
 				}
@@ -194,13 +195,14 @@ abstract class CItemGeneral extends CZBXAPI{
 				if(isset($item['type'])){
 					if(($item['type'] == ITEM_TYPE_DB_MONITOR && $item['key_'] == 'db.odbc.select[<unique short description>]') ||
 						($item['type'] == ITEM_TYPE_SSH && $item['key_'] == 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]') ||
-						($item['type'] == ITEM_TYPE_TELNET && $item['key_'] == 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]'))
+						($item['type'] == ITEM_TYPE_TELNET && $item['key_'] == 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]') ||
+						($item['type'] == ITEM_TYPE_JMX && $item['key_'] == 'jmx[<object name>,<attribute name>]'))
 					{
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Check the key, please. Default example was passed.'));
 					}
 
 					if(isset($item['delay']) && isset($item['delay_flex'])){
-						$res = calculate_item_nextcheck(0, $item['type'], $item['delay'], $item['delay_flex'], time());
+						$res = calculate_item_nextcheck(0, 0, $item['type'], $item['delay'], $item['delay_flex'], time());
 						if($res['delay'] == SEC_PER_YEAR && $item['type'] != ITEM_TYPE_ZABBIX_ACTIVE && $item['type'] != ITEM_TYPE_TRAPPER){
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Item will not be refreshed. Please enter a correct update interval.'));
 						}
@@ -218,7 +220,7 @@ abstract class CItemGeneral extends CZBXAPI{
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Type of information must be Log for log key.'));
 					}
 
-					if(($item['type'] == ITEM_TYPE_AGGREGATE) && ($item['value_type'] != ITEM_VALUE_TYPE_FLOAT)){
+					if(isset($item['type']) && ($item['type'] == ITEM_TYPE_AGGREGATE) && ($item['value_type'] != ITEM_VALUE_TYPE_FLOAT)){
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Value type must be Float for aggregate items.'));
 					}
 				}
@@ -261,6 +263,8 @@ abstract class CItemGeneral extends CZBXAPI{
 			case ITEM_TYPE_SSH:
 			case ITEM_TYPE_TELNET:
 				return INTERFACE_TYPE_AGENT;
+			case ITEM_TYPE_JMX:
+				return INTERFACE_TYPE_JMX;
 			default:
 				return false;
 		}

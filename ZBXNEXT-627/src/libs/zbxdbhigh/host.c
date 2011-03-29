@@ -355,7 +355,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_uint64_t templateid,
 			res = SUCCEED;
 	zbx_uint64_t	graphid;
 	unsigned char	t_flags, h_flags, type;
-	zbx_uint64_t	interfaceids[3];
+	zbx_uint64_t	interfaceids[4];
 
 	sql = zbx_malloc(sql, sql_alloc);
 
@@ -472,10 +472,10 @@ static int	validate_host(zbx_uint64_t hostid, zbx_uint64_t templateid,
 		tresult = DBselect(
 				"select type,interfaceid"
 				" from interface"
-				" where type in (%d,%d,%d)"
+				" where type in (%d,%d,%d,%d)"
 					" and main=1"
 					DB_NODE,
-				INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_IPMI,
+				INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_IPMI, INTERFACE_TYPE_JMX,
 				DBnode_local("interfaceid"));
 
 		while (NULL != (trow = DBfetch(tresult)))
@@ -2538,7 +2538,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 	int		appids_alloc = 0, appids_num,
 			protoids_alloc = 0, protoids_num = 0;
 	unsigned char	flags, type;
-	zbx_uint64_t	interfaceids[3], interfaceid;
+	zbx_uint64_t	interfaceids[4], interfaceid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -2547,10 +2547,10 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 	result = DBselect(
 			"select type,interfaceid"
 			" from interface"
-			" where type in (%d,%d,%d)"
+			" where type in (%d,%d,%d,%d)"
 				" and main=1"
 				DB_NODE,
-			INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_IPMI,
+			INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_IPMI, INTERFACE_TYPE_JMX,
 			DBnode_local("interfaceid"));
 
 	while (NULL != (row = DBfetch(result)))

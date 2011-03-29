@@ -964,7 +964,7 @@ static void	process_active_checks(char *server, unsigned short port)
 				if (0 != get_param(params, 5, key_logeventid, sizeof(key_logeventid)))
 					*key_logeventid = '\0';
 
-				if (0 != get_param(params, 6, maxlines_persec_str, sizeof(maxlines_persec_str) ||
+				if (0 != get_param(params, 6, maxlines_persec_str, sizeof(maxlines_persec_str)) ||
 						'\0' == *maxlines_persec_str)
 					maxlines_persec = CONFIG_MAX_LINES_PER_SECOND;
 				else if (MIN_VALUE_LINES > (maxlines_persec = atoi(maxlines_persec_str)) ||

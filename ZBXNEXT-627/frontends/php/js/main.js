@@ -627,7 +627,7 @@ createBox: function(obj, hint_text, width, className, byClick){
 	box.className = 'hintbox';
 
 	if(!empty(className)){
-		hint_text = "<span class=" + className + ">" + hint_text + "</"+"span>";
+		hint_text = "<span class=\"" + className + "\">" + hint_text + "</span>";
 	}
 
 	if(!empty(width)){
