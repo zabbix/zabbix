@@ -34,8 +34,10 @@ class InternalItemChecker extends ItemChecker
 	}
 
 	@Override
-	protected String getStringValue(ZabbixItem item) throws Exception
+	protected String getStringValue(String key) throws Exception
 	{
+		ZabbixItem item = new ZabbixItem(key);
+
 		if (item.getKeyId().equals("zabbix"))
 		{
 			if (3 != item.getArgumentCount() ||
