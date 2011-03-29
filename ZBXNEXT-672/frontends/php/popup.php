@@ -456,7 +456,8 @@ include_once('include/page_header.php');
 			$name = new CSpan($host['host'], 'link');
 			$action = get_window_opener($dstfrm, $dstfld1, $host[$srcfld1]).
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $host[$srcfld2]) : '');
-			$name->setAttribute('onclick', $action.' close_window();');
+			$name->attr('onclick', $action.' close_window();');
+			$name->attr('id', 'spanid'.$host['hostid']);
 
 			if($host['status'] == HOST_STATUS_MONITORED)
 				$status = new CSpan(S_MONITORED,'off');
@@ -586,7 +587,8 @@ include_once('include/page_header.php');
 			$group['node_name'] = isset($nodeName) ? '('.$nodeName.') ' : '';
 			$hostgroups[$gnum]['node_name'] = $group['node_name'];
 
-			$name = new CSpan(get_node_name_by_elid($group['groupid'], null, ': ').$group['name'],'link');
+			$name = new CSpan(get_node_name_by_elid($group['groupid'], null, ': ').$group['name'], 'link');
+			$name->attr('id', 'spanid'.$group['groupid']);
 
 			if($multiselect){
 				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", ".zbx_jsvalue($group['groupid']).");";
@@ -725,7 +727,8 @@ include_once('include/page_header.php');
 		order_result($usergroups, 'name');
 
 		foreach($usergroups as $ugnum => $usrgrp){
-			$name = new CSpan(get_node_name_by_elid($usrgrp['usrgrpid'], null, ': ').$usrgrp['name'],'link');
+			$name = new CSpan(get_node_name_by_elid($usrgrp['usrgrpid'], null, ': ').$usrgrp['name'], 'link');
+			$name->attr('id', 'spanid'.$usrgrp['usrgrpid']);
 
 			if($multiselect){
 				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", ".zbx_jsvalue($usrgrp['usrgrpid']).");";
@@ -783,6 +786,7 @@ include_once('include/page_header.php');
 
 		foreach($users as $unum => $user){
 			$alias = new CSpan(get_node_name_by_elid($user['userid'], null, ': ').$user['alias'], 'link');
+			$alias->attr('id', 'spanid'.$user['userid']);
 
 			if($multiselect){
 				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", ".zbx_jsvalue($user['userid']).");";

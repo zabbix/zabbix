@@ -154,21 +154,21 @@ class testFormAction extends CWebTest {
 		$this->type("new_condition_value", "trigger");
 		$this->click("add_condition");
 		$this->wait();
-		$this->assertTrue($this->isTextPresent("Trigger name like \"trigger\""));
+		$this->ok("Trigger name like \"trigger\"");
 
 		$this->select("new_condition_conditiontype", "label=Trigger severity");
 		$this->wait();
 		$this->select("new_condition_value", "label=Average");
 		$this->click("add_condition");
 		$this->wait();
-		$this->assertTrue($this->isTextPresent("Trigger severity = \"Average\""));
+		$this->ok("Trigger severity = \"Average\"");
 
 		$this->select("new_condition_conditiontype", "label=Application");
 		$this->wait();
 		$this->type("new_condition_value", "app");
 		$this->click("add_condition");
 		$this->wait();
-		$this->assertTrue($this->isTextPresent("Application = \"app\""));
+		$this->ok("Application = \"app\"");
 
 // adding operations
 		$this->click("link=Operations");
@@ -190,36 +190,42 @@ class testFormAction extends CWebTest {
 		$this->select("new_operation_opmessage_mediatypeid", "label=Jabber");
 		$this->click("add_operation");
 		$this->wait();
-		$this->assertTrue($this->isTextPresent("Send message to Users: Admin"));
-		$this->assertTrue($this->isTextPresent("Send message to Groups: Database administrators, Zabbix administrators"));
+		$this->ok("Send message to Users: Admin");
+		$this->ok("Send message to Groups: Database administrators, Zabbix administrators");
 		$this->click("new_operation");
 		$this->wait();
 		$this->select("new_operation_operationtype", "label=Remote command");
 		$this->wait();
+// add target current host
 		$this->click("add");
 		$this->click("//input[@name='save']");
+
+// add target host Zabbix server
 		$this->click("add");
 		$this->select("opCmdTarget", "label=Host");
 		$this->click("select");
 		$this->waitForPopUp("zbx_popup", "30000");
 		$this->selectWindow("name=zbx_popup");
-		$this->click("//span[@onclick=concat(\"try{window.opener.document.getElementById('opCmdTargetObjectId').value='10017'; } catch(e){throw(\",'\"Error: Target not found\")}\ntry{window.opener.document.getElementById(',\"'opCmdTargetObjectName').value='Zabbix server'; } catch(e){throw(\",'\"Error: Target not found\")}\n close_window();')]");
+		$this->dropdown_select_wait('groupid', 'Zabbix servers');
+		$this->click("spanid10017");
 		$this->selectWindow("null");
 		$this->click("//input[@name='save']");
+
+// add target group Zabbix servers
 		$this->click("add");
 		$this->select("opCmdTarget", "label=Host group");
 		$this->click("select");
 		$this->waitForPopUp("zbx_popup", "30000");
 		$this->selectWindow("name=zbx_popup");
-		$this->click("//span[@onclick=\"javascript: addValues('action.edit.php',{'opCmdTargetObjectId' : '4','opCmdTargetObjectName' : 'Zabbix servers'}); return false;\"]");
+		$this->click("spanid4");
 		$this->selectWindow("null");
 		$this->click("//input[@name='save']");
 		$this->type("new_operation_opcommand_command", "command");
 		$this->click("add_operation");
 		$this->wait();
-		$this->assertTrue($this->isTextPresent("Run remote command on current host"));
-		$this->assertTrue($this->isTextPresent("Run remote command on hosts: Zabbix server"));
-		$this->assertTrue($this->isTextPresent("Run remote command on host groups: Zabbix servers"));
+		$this->ok("Run remote commands on current host");
+		$this->ok("Run remote commands on hosts: Zabbix server");
+		$this->ok("Run remote commands on host groups: Zabbix servers");
 		$this->click("new_operation");
 		$this->wait();
 		$this->type("new_operation_esc_step_to", "2");
@@ -234,10 +240,10 @@ class testFormAction extends CWebTest {
 		$this->type("new_operation_opcommand_command", "command ssh");
 		$this->click("add_operation");
 		$this->wait();
-		$this->assertTrue($this->isTextPresent("Run remote command on current host"));
+		$this->ok("Run remote commands on current host");
 		$this->click("save");
 		$this->wait();
-		$this->assertTrue($this->isTextPresent("Action added"));
+		$this->ok("Action added");
 	}
 
 }
