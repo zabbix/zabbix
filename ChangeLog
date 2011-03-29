@@ -1,8 +1,15 @@
 --------------------------------------------------------------------------------
-Changes for 1.9.3
+Changes for 1.9.4
 
 New features:
 
+Bug fixes:
+ - [ZBX-3656] fixed item filter by data type boolean (Vedmak)
+ 
+--------------------------------------------------------------------------------
+Changes for 1.9.3
+
+New features:
  - [ZBXNEXT-555] added remote monitoring of JMX counters through Java proxy (asaveljevs,Vedmak,Vlad)
  - [ZBXNEXT-651] added "Boolean" data type for integer item value type (asaveljevs,Vedmak,Vlad)
  - [ZBXNEXT-675] added new icons and a script to create sql file (Elvis,Richlv)
