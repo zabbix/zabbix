@@ -132,7 +132,7 @@
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
 		case 'scripts':
-			$page['title'] = _('USER SCRIPTS');
+			$page['title'] = _('Global scripts');
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
 		default:
@@ -153,6 +153,7 @@ include_once('include/page_header.php');
 	}
 
 	if(defined($page['title'])) $page['title'] = constant($page['title']);
+
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -1829,7 +1830,7 @@ include_once('include/page_header.php');
 			$table->addRow(array(
 				$description,
 				$scriptExecuteOn,
-				htmlspecialchars($script['command'], ENT_COMPAT, 'UTF-8'),
+				zbx_nl2br(htmlspecialchars($script['command'], ENT_COMPAT, 'UTF-8')),
 			));
 		}
 

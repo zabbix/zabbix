@@ -1750,7 +1750,6 @@
 	'S_CANNOT_UPDATE_SCRIPT'=>		_('Cannot update script'),
 	'S_SCRIPT_DELETED'=>			_('Script deleted'),
 	'S_CANNOT_DELETE_SCRIPT'=>		_('Cannot delete script'),
-	'S_TOOLS'=>				_('Tools'),
 	'S_RESULT'=>				_('Result'),
 	'S_CLOSE'=>				_('Close'),
 	'S_DELETE_SELECTED_SCRIPTS_Q'=>		_('Delete selected scripts?'),

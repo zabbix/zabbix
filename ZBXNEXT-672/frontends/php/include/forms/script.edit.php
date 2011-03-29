@@ -57,7 +57,7 @@
 // COMMAND
 	$commandTA = new CTextArea('command', $data['command']);
 	$commandTA->addStyle('width: 50em; padding: 0;');
-	$scriptTab->addRow(_('Command'), $commandTA);
+	$scriptTab->addRow(_('Commands'), $commandTA);
 
 // DESCRIPTION
 	$descriptionTA = new CTextArea('description', $data['description']);
