@@ -22,16 +22,6 @@
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
 class testFormHost extends CWebTest{
-
-	// Returns all hosts
-	public static function allHosts(){
-		return DBdata('select * from hosts where status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')');
-	}
-
-	/**
-	* @dataProvider allHosts
-	*/
-
 	public $host = "Test host";
 
 	public function testFormHost_Layout(){
@@ -75,7 +65,7 @@ class testFormHost extends CWebTest{
 	public function testFormHost_SimpleUpdate(){
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid','Zabbix servers');
-		$this->click('link=Zabbix server');
+		$this->click('link=ЗАББИКС Сервер');
 		$this->wait();
 		$this->button_click('save');
 		$this->wait();
@@ -131,11 +121,12 @@ class testFormHost extends CWebTest{
 		// Clone Host
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid','all');
-		$this->click('link=Zabbix server');
+		$this->click('link=ЗАББИКС Сервер');
 		$this->wait();
 		$this->button_click('clone');
 		$this->wait();
 		$this->input_type('host',$this->host.'2');
+		$this->input_type('visiblename',$this->host.'2 (visible)');
 		$this->button_click('save');
 		$this->wait();
 		$this->assertTitle('Hosts');
@@ -148,7 +139,7 @@ class testFormHost extends CWebTest{
 		// Delete Host
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid','all');
-		$this->click('link='.$this->host.'2');
+		$this->click('link='.$this->host.'2 (visible)');
 		$this->wait();
 		$this->button_click('delete');
 		$this->wait();
@@ -161,11 +152,12 @@ class testFormHost extends CWebTest{
 		// Full clone Host
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid','all');
-		$this->click('link=Zabbix server');
+		$this->click('link=ЗАББИКС Сервер');
 		$this->wait();
 		$this->button_click('full_clone');
 		$this->wait();
 		$this->input_type('host',$this->host.'_fullclone');
+		$this->input_type('visiblename',$this->host.'_visible');
 		$this->button_click('save');
 		$this->wait();
 		$this->assertTitle('Hosts');
@@ -178,7 +170,7 @@ class testFormHost extends CWebTest{
 		// Delete Host
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid','all');
-		$this->click('link='.$this->host.'_fullclone');
+		$this->click('link='.$this->host.'_visible');
 		$this->wait();
 		$this->button_click('delete');
 		$this->wait();

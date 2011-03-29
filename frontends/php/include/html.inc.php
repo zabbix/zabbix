@@ -322,7 +322,7 @@
 		if(!$header_host = reset($header_hosts)){
 			$header_host = array(
 				'hostid' => 0,
-				'host' => ($current == 'host') ? S_NEW_HOST : _('New template'),
+				'name' => ($current == 'host') ? S_NEW_HOST : _('New template'),
 				'status' => ($current == 'host') ? HOST_STATUS_NOT_MONITORED : HOST_STATUS_TEMPLATE,
 				'available' => HOST_AVAILABLE_UNKNOWN,
 				'screens' => 0,
