@@ -2032,11 +2032,11 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 #define MVAR_EVENT_ACK_HISTORY		"{EVENT.ACK.HISTORY}"
 #define MVAR_ESC_HISTORY		"{ESC.HISTORY}"
 #define MVAR_PROXY_NAME			"{PROXY.NAME}"
-#define MVAR_IPADDRESS			"{IPADDRESS}"			/* deprecated */
 #define MVAR_HOST_DNS			"{HOST.DNS}"
 #define MVAR_HOST_CONN			"{HOST.CONN}"
 #define MVAR_HOST_HOST			"{HOST.HOST}"
 #define MVAR_HOST_IP			"{HOST.IP}"
+#define MVAR_IPADDRESS			"{IPADDRESS}"			/* deprecated */
 #define MVAR_HOST_NAME			"{HOST.NAME}"
 #define MVAR_HOSTNAME			"{HOSTNAME}"			/* deprecated */
 #define MVAR_HOST_PORT			"{HOST.PORT}"
@@ -2183,7 +2183,7 @@ static const char	*ex_macros[] =
 	MVAR_ITEM_NAME,
 	MVAR_HOST_HOST, MVAR_HOST_NAME, MVAR_HOSTNAME, MVAR_PROXY_NAME,
 	MVAR_TRIGGER_KEY,
-	MVAR_HOST_CONN, MVAR_HOST_DNS, MVAR_IPADDRESS, MVAR_HOST_IP,
+	MVAR_HOST_CONN, MVAR_HOST_DNS, MVAR_HOST_IP, MVAR_IPADDRESS,
 	MVAR_ITEM_LASTVALUE,
 	MVAR_ITEM_VALUE,
 	MVAR_ITEM_LOG_DATE, MVAR_ITEM_LOG_TIME, MVAR_ITEM_LOG_AGE, MVAR_ITEM_LOG_SOURCE,
@@ -2382,18 +2382,34 @@ static int	get_host_profile(const char *macro, DB_TRIGGER *trigger, char **repla
 static void	get_trigger_function_value(DB_TRIGGER *trigger, char **replace_to, char *bl, char **br)
 {
 	char	*p, *host = NULL, *key = NULL, *function = NULL, *parameter = NULL;
-	int	N_functionid, res = SUCCEED;
+	int	N_functionid, res = FAIL;
 	size_t	sz;
 
 	p = bl + 1;
-	sz = sizeof(MVAR_HOSTNAME) - 2;
 
-	if (0 == strncmp(p, MVAR_HOSTNAME, sz) && ('}' == p[sz] ||
-			('}' == p[sz + 1] && '1' <= p[sz] && p[sz] <= '9')))
+	sz = sizeof(MVAR_HOSTNAME) - 2;
+	if (0 == strncmp(p, MVAR_HOSTNAME, sz))
+		res = SUCCEED;
+
+	if (SUCCEED != res)
+	{
+		sz = sizeof(MVAR_HOST_NAME) - 2;
+		if (0 == strncmp(p, MVAR_HOST_NAME, sz))
+			res = SUCCEED;
+	}
+
+	if (SUCCEED != res)
+	{
+		sz = sizeof(MVAR_HOST_HOST) - 2;
+		if (0 == strncmp(p, MVAR_HOST_HOST, sz))
+			res = SUCCEED;
+	}
+
+	if (SUCCEED == res && ('}' == p[sz] || ('}' == p[sz + 1] && '1' <= p[sz] && p[sz] <= '9')))
 	{
 		N_functionid = ('}' == p[sz] ? 1 : p[sz] - '0');
 		p += sz + ('}' == p[sz] ? 1 : 2);
-		DBget_trigger_value(trigger, &host, N_functionid, ZBX_REQUEST_HOST_NAME);
+		DBget_trigger_value(trigger, &host, N_functionid, ZBX_REQUEST_HOST_HOST);
 	}
 	else
 		res = parse_host(&p, &host);
