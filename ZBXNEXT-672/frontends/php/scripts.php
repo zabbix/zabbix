@@ -228,7 +228,7 @@ if($sid = get_request('scriptid')){
 			new CCheckBox('all_scripts', null, "checkAll('".$form->getName()."','all_scripts','scripts');"),
 			make_sorting_header(_('Name'), 'name'),
 			_('Execute on'),
-			make_sorting_header(_('Command'), 'command'),
+			make_sorting_header(_('Commands'), 'command'),
 			_('User group'),
 			_('Host group'),
 			_('Host access')

@@ -175,12 +175,14 @@ class testFormAction extends CWebTest {
 		$this->click("new_operation");
 		$this->wait();
 		$this->click("addusrgrpbtn");
+		sleep(1);
 		$this->waitForPopUp("zbx_popup", "30000");
 		$this->selectWindow("name=zbx_popup");
 		$this->click("usrgrps_'7'");
 		$this->click("usrgrps_'2'");
 		$this->click("select");
 		$this->selectWindow("null");
+		sleep(1);
 		$this->click("adduserbtn");
 		$this->waitForPopUp("zbx_popup", "30000");
 		$this->selectWindow("name=zbx_popup");
@@ -219,6 +221,9 @@ class testFormAction extends CWebTest {
 		$this->selectWindow("name=zbx_popup");
 		$this->click("spanid4");
 		$this->selectWindow("null");
+
+		sleep(1);
+
 		$this->click("//input[@name='save']");
 		$this->type("new_operation_opcommand_command", "command");
 		$this->click("add_operation");
