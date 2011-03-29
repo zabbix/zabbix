@@ -93,8 +93,7 @@
 				$page_title .= constant($page['title']);
 			}
 			else{
-				$page_title .= 'ZABBIX';
-				$page['title'] = 'S_ZABBIX';
+				$page_title .= $page['title'];
 			}
 
 			if(ZBX_DISTRIBUTED){
