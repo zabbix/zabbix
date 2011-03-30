@@ -546,177 +546,182 @@
 		}
 	}
 
-function resolveMapLabelMacrosAll(array $selement){
-	$label = $selement['label'];
+	/**
+	 * Resolve macros and return expanded map label
+	 * @param array $selement
+	 * @return string
+	 */
+	function resolveMapLabelMacrosAll(array $selement){
+		$label = $selement['label'];
 
-	$resolveHostMacros = false;
-	if((($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST)
-		|| ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER))
-		&& ((zbx_strpos($label, '{HOSTNAME}') !== false)
-			|| (zbx_strpos($label, '{HOST.DNS}') !== false)
-			|| (zbx_strpos($label, '{IPADDRESS}') !== false)
-			|| (zbx_strpos($label, '{HOST.CONN}') !== false))
-	){
-		$resolveHostMacros = true;
+		$resolveHostMacros = false;
+		if((($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST)
+			|| ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER))
+			&& ((zbx_strpos($label, '{HOSTNAME}') !== false)
+				|| (zbx_strpos($label, '{HOST.DNS}') !== false)
+				|| (zbx_strpos($label, '{IPADDRESS}') !== false)
+				|| (zbx_strpos($label, '{HOST.CONN}') !== false))
+		){
+			$resolveHostMacros = true;
 
-		if($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST){
-			$sql = 'SELECT host, dns, ip, useip FROM hosts WHERE hostid='.$selement['elementid'];
-		}
-		else{
-			$sql ='SELECT h.host, h.dns, h.ip, h.useip'.
-				' FROM hosts h, items i, functions f'.
-				' WHERE h.hostid=i.hostid'.
-				' AND i.itemid=f.itemid'.
-				' AND f.triggerid='.$selement['elementid'];
-		}
-		$db_host = DBfetch(DBselect($sql));
-	}
-
-
-	$hostParam = ($resolveHostMacros && ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST)) ? $db_host['host'] : null;
-	$label = resolveMapLabelMacros($label, $hostParam);
-
-	if($resolveHostMacros){
-		$replace = array(
-			'{HOSTNAME}' => $db_host['host'],
-			'{HOST.DNS}' => $db_host['dns'],
-			'{IPADDRESS}' => $db_host['ip'],
-			'{HOST.CONN}' => ($db_host['useip'] ? $db_host['ip'] : $db_host['dns']),
-		);
-		$label = str_replace(array_keys($replace), $replace, $label);
-	}
-
-	switch($selement['elementtype']){
-		case SYSMAP_ELEMENT_TYPE_HOST:
-		case SYSMAP_ELEMENT_TYPE_MAP:
-		case SYSMAP_ELEMENT_TYPE_TRIGGER:
-		case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-			if(zbx_strpos($label, '{TRIGGERS.UNACK}') !== false){
-				$label = str_replace('{TRIGGERS.UNACK}', get_triggers_unacknowledged($selement), $label);
-			}
-			if(zbx_strpos($label, '{TRIGGERS.PROBLEM.UNACK}') !== false){
-				$label = str_replace('{TRIGGERS.PROBLEM.UNACK}', get_triggers_unacknowledged($selement, true), $label);
-			}
-			if(zbx_strpos($label, '{TRIGGER.EVENTS.UNACK}') !== false){
-				$label = str_replace('{TRIGGER.EVENTS.UNACK}', get_events_unacknowledged($selement), $label);
-			}
-			if(zbx_strpos($label, '{TRIGGER.EVENTS.PROBLEM.UNACK}') !== false){
-				$label = str_replace('{TRIGGER.EVENTS.PROBLEM.UNACK}', get_events_unacknowledged($selement, null, TRIGGER_VALUE_TRUE), $label);
-			}
-			if(zbx_strpos($label, '{TRIGGER.PROBLEM.EVENTS.PROBLEM.UNACK}') !== false){
-				$label = str_replace('{TRIGGER.PROBLEM.EVENTS.PROBLEM.UNACK}', get_events_unacknowledged($selement, TRIGGER_VALUE_TRUE, TRIGGER_VALUE_TRUE), $label);
-			}
-			if(zbx_strpos($label, '{TRIGGERS.ACK}') !== false){
-				$label = str_replace('{TRIGGERS.ACK}', get_triggers_unacknowledged($selement, null, true), $label);
-			}
-			if(zbx_strpos($label, '{TRIGGERS.PROBLEM.ACK}') !== false){
-				$label = str_replace('{TRIGGERS.PROBLEM.ACK}', get_triggers_unacknowledged($selement, true, true), $label);
-			}
-			if(zbx_strpos($label, '{TRIGGER.EVENTS.ACK}') !== false){
-				$label = str_replace('{TRIGGER.EVENTS.ACK}', get_events_unacknowledged($selement, null, null, true), $label);
-			}
-			if(zbx_strpos($label, '{TRIGGER.EVENTS.PROBLEM.ACK}') !== false){
-				$label = str_replace('{TRIGGER.EVENTS.PROBLEM.ACK}', get_events_unacknowledged($selement, null, TRIGGER_VALUE_TRUE, true), $label);
-			}
-			if(zbx_strpos($label, '{TRIGGER.PROBLEM.EVENTS.PROBLEM.ACK}') !== false){
-				$label = str_replace('{TRIGGER.PROBLEM.EVENTS.PROBLEM.ACK}', get_events_unacknowledged($selement, TRIGGER_VALUE_TRUE, TRIGGER_VALUE_TRUE, true), $label);
-			}
-			break;
-	}
-
-	return $label;
-}
-
-function resolveMapLabelMacros($label, $replaceHost=null){
-	if(null === $replaceHost)
-		$pattern = "/{".ZBX_PREG_HOST_FORMAT.":.+\.(last|max|min|avg)\([0-9]+\)}/Uu";
-	else
-		$pattern = "/{(".ZBX_PREG_HOST_FORMAT."|{HOSTNAME}):.+\.(last|max|min|avg)\([0-9]+\)}/Uu";
-
-	preg_match_all($pattern, $label, $matches);
-
-	foreach($matches[0] as $expr){
-		$macro = $expr;
-		if(($replaceHost !== null) && (zbx_strpos($macro, '{HOSTNAME}') == 1)){
-			$macro = substr_replace($macro, $replaceHost, 1, strlen($replaceHost));
-		}
-
-		$trigExpr = new CTriggerExpression(array('expression' => $macro));
-		if(!empty($trigExpr->errors)) continue;
-
-		$itemHost = reset($trigExpr->data['hosts']);
-		$key = reset($trigExpr->data['items']);
-		$function = reset($trigExpr->data['functions']);
-		$parameter = reset($trigExpr->data['functionParams']);
-
-		$item = CItem::get(array(
-			'filter' => array('host' => $itemHost, 'key_' => $key),
-			'output' => API_OUTPUT_EXTEND
-		));
-		$item = reset($item);
-		if(!$item){
-			$label = str_replace($expr, '???', $label);
-			continue;
-		}
-
-		switch($item['value_type']){
-			case ITEM_VALUE_TYPE_FLOAT:
-				$history_table = 'history';
-				break;
-			case ITEM_VALUE_TYPE_UINT64:
-				$history_table = 'history_uint';
-				break;
-			case ITEM_VALUE_TYPE_TEXT:
-				$history_table = 'history_text';
-				break;
-			case ITEM_VALUE_TYPE_LOG:
-				$history_table = 'history_log';
-				break;
-			case ITEM_VALUE_TYPE_STR:
-				$history_table = 'history_str';
-				break;
-			default:
-				$history_table = 'history_str';
-		}
-
-		if(0 == strcmp($function, 'last')){
-			if(null === $item['lastvalue']){
-				$label = str_replace($expr, '('.S_NO_DATA_SMALL.')', $label);
+			if($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST){
+				$sql = 'SELECT host, dns, ip, useip FROM hosts WHERE hostid='.$selement['elementid'];
 			}
 			else{
-				switch($item['value_type']){
-					case ITEM_VALUE_TYPE_FLOAT:
-					case ITEM_VALUE_TYPE_UINT64:
-						$value = convert_units($item['lastvalue'], $item['units']);
-						break;
-					default:
-						$value = $item['lastvalue'];
-				}
-
-				$label = str_replace($expr, $value, $label);
+				$sql ='SELECT h.host, h.dns, h.ip, h.useip'.
+					' FROM hosts h, items i, functions f'.
+					' WHERE h.hostid=i.hostid'.
+					' AND i.itemid=f.itemid'.
+					' AND f.triggerid='.$selement['elementid'];
 			}
+			$db_host = DBfetch(DBselect($sql));
 		}
-		else if((0 == strcmp($function, 'min')) || (0 == strcmp($function, 'max')) || (0 == strcmp($function, 'avg'))){
 
-			if($item['value_type'] != ITEM_VALUE_TYPE_FLOAT && $item['value_type'] != ITEM_VALUE_TYPE_UINT64){
+
+		$hostParam = ($resolveHostMacros && ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST)) ? $db_host['host'] : null;
+		$label = resolveMapLabelMacros($label, $hostParam);
+
+		if($resolveHostMacros){
+			$replace = array(
+				'{HOSTNAME}' => $db_host['host'],
+				'{HOST.DNS}' => $db_host['dns'],
+				'{IPADDRESS}' => $db_host['ip'],
+				'{HOST.CONN}' => ($db_host['useip'] ? $db_host['ip'] : $db_host['dns']),
+			);
+			$label = str_replace(array_keys($replace), $replace, $label);
+		}
+
+		switch($selement['elementtype']){
+			case SYSMAP_ELEMENT_TYPE_HOST:
+			case SYSMAP_ELEMENT_TYPE_MAP:
+			case SYSMAP_ELEMENT_TYPE_TRIGGER:
+			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+				if(zbx_strpos($label, '{TRIGGERS.UNACK}') !== false){
+					$label = str_replace('{TRIGGERS.UNACK}', get_triggers_unacknowledged($selement), $label);
+				}
+				if(zbx_strpos($label, '{TRIGGERS.PROBLEM.UNACK}') !== false){
+					$label = str_replace('{TRIGGERS.PROBLEM.UNACK}', get_triggers_unacknowledged($selement, true), $label);
+				}
+				if(zbx_strpos($label, '{TRIGGER.EVENTS.UNACK}') !== false){
+					$label = str_replace('{TRIGGER.EVENTS.UNACK}', get_events_unacknowledged($selement), $label);
+				}
+				if(zbx_strpos($label, '{TRIGGER.EVENTS.PROBLEM.UNACK}') !== false){
+					$label = str_replace('{TRIGGER.EVENTS.PROBLEM.UNACK}', get_events_unacknowledged($selement, null, TRIGGER_VALUE_TRUE), $label);
+				}
+				if(zbx_strpos($label, '{TRIGGER.PROBLEM.EVENTS.PROBLEM.UNACK}') !== false){
+					$label = str_replace('{TRIGGER.PROBLEM.EVENTS.PROBLEM.UNACK}', get_events_unacknowledged($selement, TRIGGER_VALUE_TRUE, TRIGGER_VALUE_TRUE), $label);
+				}
+				if(zbx_strpos($label, '{TRIGGERS.ACK}') !== false){
+					$label = str_replace('{TRIGGERS.ACK}', get_triggers_unacknowledged($selement, null, true), $label);
+				}
+				if(zbx_strpos($label, '{TRIGGERS.PROBLEM.ACK}') !== false){
+					$label = str_replace('{TRIGGERS.PROBLEM.ACK}', get_triggers_unacknowledged($selement, true, true), $label);
+				}
+				if(zbx_strpos($label, '{TRIGGER.EVENTS.ACK}') !== false){
+					$label = str_replace('{TRIGGER.EVENTS.ACK}', get_events_unacknowledged($selement, null, null, true), $label);
+				}
+				if(zbx_strpos($label, '{TRIGGER.EVENTS.PROBLEM.ACK}') !== false){
+					$label = str_replace('{TRIGGER.EVENTS.PROBLEM.ACK}', get_events_unacknowledged($selement, null, TRIGGER_VALUE_TRUE, true), $label);
+				}
+				if(zbx_strpos($label, '{TRIGGER.PROBLEM.EVENTS.PROBLEM.ACK}') !== false){
+					$label = str_replace('{TRIGGER.PROBLEM.EVENTS.PROBLEM.ACK}', get_events_unacknowledged($selement, TRIGGER_VALUE_TRUE, TRIGGER_VALUE_TRUE, true), $label);
+				}
+				break;
+		}
+
+		return $label;
+	}
+
+	function resolveMapLabelMacros($label, $replaceHost=null){
+		if(null === $replaceHost)
+			$pattern = "/{".ZBX_PREG_HOST_FORMAT.":.+\.(last|max|min|avg)\([0-9]+\)}/Uu";
+		else
+			$pattern = "/{(".ZBX_PREG_HOST_FORMAT."|{HOSTNAME}):.+\.(last|max|min|avg)\([0-9]+\)}/Uu";
+
+		preg_match_all($pattern, $label, $matches);
+
+		foreach($matches[0] as $expr){
+			$macro = $expr;
+			if(($replaceHost !== null) && (zbx_strpos($macro, '{HOSTNAME}') == 1)){
+				$macro = substr_replace($macro, $replaceHost, 1, strlen($replaceHost));
+			}
+
+			$trigExpr = new CTriggerExpression(array('expression' => $macro));
+			if(!empty($trigExpr->errors)) continue;
+
+			$itemHost = reset($trigExpr->data['hosts']);
+			$key = reset($trigExpr->data['items']);
+			$function = reset($trigExpr->data['functions']);
+			$parameter = reset($trigExpr->data['functionParams']);
+
+			$item = CItem::get(array(
+				'filter' => array('host' => $itemHost, 'key_' => $key),
+				'output' => API_OUTPUT_EXTEND
+			));
+			$item = reset($item);
+			if(!$item){
 				$label = str_replace($expr, '???', $label);
 				continue;
 			}
 
-			$sql = 'SELECT '.$function.'(value) as value '.
-					' FROM '.$history_table.
-					' WHERE clock>'.(time() - $parameter).
-					' AND itemid='.$item['itemid'];
-			$result = DBselect($sql);
-			if(null === ($row = DBfetch($result)) || null === $row['value'])
-				$label = str_replace($expr, '('.S_NO_DATA_SMALL.')', $label);
-			else
-				$label = str_replace($expr, convert_units($row['value'], $item['units']), $label);
-		}
-	}
+			switch($item['value_type']){
+				case ITEM_VALUE_TYPE_FLOAT:
+					$history_table = 'history';
+					break;
+				case ITEM_VALUE_TYPE_UINT64:
+					$history_table = 'history_uint';
+					break;
+				case ITEM_VALUE_TYPE_TEXT:
+					$history_table = 'history_text';
+					break;
+				case ITEM_VALUE_TYPE_LOG:
+					$history_table = 'history_log';
+					break;
+				case ITEM_VALUE_TYPE_STR:
+					$history_table = 'history_str';
+					break;
+				default:
+					$history_table = 'history_str';
+			}
 
-	return $label;
-}
+			if(0 == strcmp($function, 'last')){
+				if(null === $item['lastvalue']){
+					$label = str_replace($expr, '('.S_NO_DATA_SMALL.')', $label);
+				}
+				else{
+					switch($item['value_type']){
+						case ITEM_VALUE_TYPE_FLOAT:
+						case ITEM_VALUE_TYPE_UINT64:
+							$value = convert_units($item['lastvalue'], $item['units']);
+							break;
+						default:
+							$value = $item['lastvalue'];
+					}
+
+					$label = str_replace($expr, $value, $label);
+				}
+			}
+			else if((0 == strcmp($function, 'min')) || (0 == strcmp($function, 'max')) || (0 == strcmp($function, 'avg'))){
+
+				if($item['value_type'] != ITEM_VALUE_TYPE_FLOAT && $item['value_type'] != ITEM_VALUE_TYPE_UINT64){
+					$label = str_replace($expr, '???', $label);
+					continue;
+				}
+
+				$sql = 'SELECT '.$function.'(value) as value '.
+						' FROM '.$history_table.
+						' WHERE clock>'.(time() - $parameter).
+						' AND itemid='.$item['itemid'];
+				$result = DBselect($sql);
+				if(null === ($row = DBfetch($result)) || null === $row['value'])
+					$label = str_replace($expr, '('.S_NO_DATA_SMALL.')', $label);
+				else
+					$label = str_replace($expr, convert_units($row['value'], $item['units']), $label);
+			}
+		}
+
+		return $label;
+	}
 
 	function get_map_elements($db_element, &$elements){
 		switch($db_element['elementtype']){
