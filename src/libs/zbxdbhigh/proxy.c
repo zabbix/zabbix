@@ -72,7 +72,7 @@ static ZBX_HISTORY_TABLE dht = {
 		{"p.type",	ZBX_PROTO_TAG_TYPE,		ZBX_JSON_TYPE_INT,	NULL},
 		{"p.ip",	ZBX_PROTO_TAG_IP,		ZBX_JSON_TYPE_STRING,	NULL},
 		{"p.dns",	ZBX_PROTO_TAG_DNS,		ZBX_JSON_TYPE_STRING,	NULL},
-		{"p.port",	ZBX_PROTO_TAG_PORT,	 	ZBX_JSON_TYPE_INT,	"0"},
+		{"p.port",	ZBX_PROTO_TAG_PORT,		ZBX_JSON_TYPE_INT,	"0"},
 		{"p.key_",	ZBX_PROTO_TAG_KEY,		ZBX_JSON_TYPE_STRING,	""},
 		{"p.value",	ZBX_PROTO_TAG_VALUE,		ZBX_JSON_TYPE_STRING,	""},
 		{"p.status",	ZBX_PROTO_TAG_STATUS,		ZBX_JSON_TYPE_INT,	"0"},
@@ -319,8 +319,8 @@ void	get_proxy_monitored_hostids(zbx_uint64_t proxy_hostid, zbx_uint64_t **hosti
 		DBfree_result(result);
 	}
 
-	zbx_free(ids);	
-	zbx_free(sql);	
+	zbx_free(ids);
+	zbx_free(sql);
 }
 
 /******************************************************************************
@@ -350,12 +350,12 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 	{
 		{"globalmacro"},
 		{"hosts"},
+		{"interface"},
 		{"hosts_templates"},
 		{"hostmacro"},
 		{"items"},
 		{"drules"},
 		{"dchecks"},
-		{"interface"},
 		{NULL}
 	};
 
@@ -478,7 +478,7 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
  ******************************************************************************/
 static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tablename, struct zbx_json_parse *jp_obj)
 {
-	int			f, field_count, insert;
+	int			f, field_count, insert, is_null;
 	const ZBX_TABLE		*table = NULL;
 	const ZBX_FIELD		*fields[ZBX_MAX_FIELDS];
 	struct zbx_json_parse	jp_data, jp_row;
@@ -524,23 +524,11 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 
 	p = NULL;
 	field_count = 0;
-	while (NULL != (p = zbx_json_next(&jp_data, p)))
+	while (NULL != (p = zbx_json_next_value(&jp_data, p, buf, sizeof(buf), NULL)))
 	{
-		if (NULL == (p = zbx_json_decodevalue(p, buf, sizeof(buf))))
-			goto json_error;
-
-		fields[field_count] = NULL;
-		for(f = 0; table->fields[f].name != NULL; f++)
-			if (0 == strcmp(table->fields[f].name, buf))
-			{
-				fields[field_count] = &table->fields[f];
-				break;
-			}
-
-		if (NULL == fields[field_count])
+		if (NULL == (fields[field_count] = DBget_field(table, buf)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Invalid field name \"%s\"",
-					buf);
+			zabbix_log(LOG_LEVEL_WARNING, "Invalid field name \"%s\"", buf);
 			goto db_error;
 		}
 		field_count++;
@@ -580,7 +568,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 			goto json_error;
 
 		pf = NULL;
-		if (NULL == (pf = zbx_json_next_value(&jp_row, pf, buf, sizeof(buf))))
+		if (NULL == (pf = zbx_json_next_value(&jp_row, pf, buf, sizeof(buf), NULL)))
 			goto json_error;
 
 		ZBX_STR2UINT64(recid, buf);
@@ -605,32 +593,46 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 /* {"hosts":{"fields":["hostid","host",...],"data":[[1,"zbx01",...],[2,"zbx02",...],...]},"items":{...},...}
  *                                                   ^
  */		f = 1;
-		while (NULL != (pf = zbx_json_next_value(&jp_row, pf, buf, sizeof(buf))))
+		while (NULL != (pf = zbx_json_next_value(&jp_row, pf, buf, sizeof(buf), &is_null)))
 		{
 			if (f == field_count)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "Invalid number of fields \"%.*s\"",
-						jp_row.end - jp_row.start + 1,
-						jp_row.start);
+						jp_row.end - jp_row.start + 1, jp_row.start);
 				goto db_error;
 			}
 
-			if (fields[f]->type == ZBX_TYPE_INT || fields[f]->type == ZBX_TYPE_UINT || fields[f]->type == ZBX_TYPE_ID ||
-					fields[f]->type == ZBX_TYPE_FLOAT)
-			{
-				if (0 == insert)
-					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, "%s=", fields[f]->name);
+			if (0 == insert)
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ZBX_FIELDNAME_LEN + 2,
+						"%s=", fields[f]->name);
 
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, "%s,", buf);
+			if (0 != is_null)
+			{
+				if (0 != (fields[f]->flags & ZBX_NOTNULL))
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "Column '%s' cannot be null", fields[f]->name);
+					goto db_error;
+				}
+
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "null,");
 			}
 			else
 			{
-				if (0 == insert)
-					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, "%s=", fields[f]->name);
-
-				esc = DBdyn_escape_string(buf);
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, strlen(esc) + 8, "'%s',", esc);
-				zbx_free(esc);
+				switch (fields[f]->type)
+				{
+					case ZBX_TYPE_INT:
+					case ZBX_TYPE_UINT:
+					case ZBX_TYPE_ID:
+					case ZBX_TYPE_FLOAT:
+						zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, strlen(buf) + 2,
+								"%s,", buf);
+						break;
+					default:
+						esc = DBdyn_escape_string(buf);
+						zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, strlen(esc) + 4,
+								"'%s',", esc);
+						zbx_free(esc);
+				}
 			}
 			f++;
 		}
@@ -638,8 +640,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 		if (f != field_count)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Invalid number of fields \"%.*s\"",
-					jp_row.end - jp_row.start + 1,
-					jp_row.start);
+					jp_row.end - jp_row.start + 1, jp_row.start);
 			goto db_error;
 		}
 
@@ -977,7 +978,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 	{
 /* {"data":[{"hostid":12345,...,...},{...},...]}
  *          ^----------------------^
- */ 		if (SUCCEED != zbx_json_brackets_open(p, &jp_row))
+ */		if (SUCCEED != zbx_json_brackets_open(p, &jp_row))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Invalid host availability data. %s",
 					zbx_json_strerror());
@@ -1394,7 +1395,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 
 		if (0 == proxy_hostid && item.type != ITEM_TYPE_TRAPPER && item.type != ITEM_TYPE_ZABBIX_ACTIVE)
 			continue;
-			
+
 		if (item.type == ITEM_TYPE_TRAPPER && 0 == proxy_hostid &&
 				FAIL == zbx_tcp_check_security(sock, item.trapper_hosts, 1))
 		{
@@ -1438,7 +1439,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 				THIS_SHOULD_NEVER_HAPPEN; /* set_result_type() always sets MSG result if not SUCCEED */
 
 			free_result(&agent);
-	 	}
+		}
 	}
 
 	DCflush_nextchecks();
@@ -1478,7 +1479,7 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 {
 	const char		*__function_name = "process_hist_data";
 
-	struct zbx_json_parse   jp_data, jp_row;
+	struct zbx_json_parse	jp_data, jp_row;
 	const char		*p;
 	char			tmp[MAX_BUFFER_LEN];
 	int			ret = SUCCEED;
@@ -1541,12 +1542,8 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 	{
 /* {"request":"ZBX_SENDER_DATA","data":[{"key":"system.cpu.num",...,...},{...},...]}
  *                                      ^------------------------------^
- */ 		if (FAIL == (ret = zbx_json_brackets_open(p, &jp_row)))
+ */		if (FAIL == (ret = zbx_json_brackets_open(p, &jp_row)))
 			break;
-
-/*		zabbix_log(LOG_LEVEL_DEBUG, "Next \"%.*s\"",
-				jp_row.end - jp_row.start + 1,
-				jp_row.start);*/
 
 		av = &values[value_num];
 
@@ -2471,7 +2468,7 @@ static void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_it
 		p = NULL;
 /* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]}
  *                      ^
- */ 		while (NULL != (p = zbx_json_next(jp_data, p)))
+ */		while (NULL != (p = zbx_json_next(jp_data, p)))
 		{
 /* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]}
  *                      ^------------------^
@@ -2859,7 +2856,7 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 		p = NULL;
 /* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]}
  *                      ^
- */ 		while (NULL != (p = zbx_json_next(jp_data, p)))
+ */		while (NULL != (p = zbx_json_next(jp_data, p)))
 		{
 /* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]}
  *                      ^------------------^
@@ -2952,7 +2949,7 @@ static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid,
 
 	char			*sql = NULL, *key = NULL, *color_esc;
 	int			sql_alloc = 1024, sql_offset, i;
-	ZBX_GRAPH_ITEMS 	*gitems = NULL, *chd_gitems = NULL;
+	ZBX_GRAPH_ITEMS		*gitems = NULL, *chd_gitems = NULL;
 	int			gitems_alloc = 0, gitems_num = 0,
 				chd_gitems_alloc = 0, chd_gitems_num = 0,
 				res = SUCCEED;
@@ -3129,7 +3126,7 @@ static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid,
 				" where graphid=" ZBX_FS_UI64 ";\n",
 				name_esc, width, height, yaxismin, yaxismax,
 				(int)show_work_period, (int)show_triggers,
-				(int)graphtype, (int)show_legend, (int)show_3d, 
+				(int)graphtype, (int)show_legend, (int)show_3d,
 				percent_left, percent_right, (int)ymin_type, (int)ymax_type,
 				DBsql_id_ins(ymin_itemid), DBsql_id_ins(ymax_itemid),
 				ZBX_FLAG_DISCOVERY_CREATED, new_graphid);
@@ -3293,7 +3290,7 @@ static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_item
 		p = NULL;
 /* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]}
  *                      ^
- */	 	while (NULL != (p = zbx_json_next(jp_data, p)))
+ */		while (NULL != (p = zbx_json_next(jp_data, p)))
 		{
 /* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]}
  *                      ^------------------^
