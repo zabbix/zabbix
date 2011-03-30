@@ -52,6 +52,7 @@ static ZBX_HISTORY_TABLE ht = {
 		{"h.host",	ZBX_PROTO_TAG_HOST,		ZBX_JSON_TYPE_STRING,	NULL},
 		{"i.key_",	ZBX_PROTO_TAG_KEY,		ZBX_JSON_TYPE_STRING,	NULL},
 		{"p.clock",	ZBX_PROTO_TAG_CLOCK,		ZBX_JSON_TYPE_INT,	NULL},
+		{"p.ns",	ZBX_PROTO_TAG_NS,		ZBX_JSON_TYPE_INT,	NULL},
 		{"p.timestamp",	ZBX_PROTO_TAG_LOGTIMESTAMP,	ZBX_JSON_TYPE_INT,	"0"},
 		{"p.source",	ZBX_PROTO_TAG_LOGSOURCE,	ZBX_JSON_TYPE_STRING,	""},
 		{"p.severity",	ZBX_PROTO_TAG_LOGSEVERITY,	ZBX_JSON_TYPE_INT,	"0"},
@@ -1282,7 +1283,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 
 		if (item.host.maintenance_status == HOST_MAINTENANCE_STATUS_ON &&
 				item.host.maintenance_type == MAINTENANCE_TYPE_NODATA &&
-				item.host.maintenance_from <= values[i].clock)
+				item.host.maintenance_from <= values[i].ts.sec)
 			continue;
 
 		if (item.type == ITEM_TYPE_INTERNAL || item.type == ITEM_TYPE_AGGREGATE || item.type == ITEM_TYPE_CALCULATED)
@@ -1300,7 +1301,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 
 		if (0 == strcmp(values[i].value, "ZBX_NOTSUPPORTED"))
 		{
-			DCadd_nextcheck(item.itemid, (time_t)values[i].clock, values[i].value);
+			DCadd_nextcheck(item.itemid, (time_t)values[i].ts.sec, values[i].value);
 
 			if (NULL != processed)
 				(*processed)++;
@@ -1317,7 +1318,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 
 				if (NULL != values[i].source)
 					zbx_replace_invalid_utf8(values[i].source);
-				dc_add_history(item.itemid, item.value_type, &agent, values[i].clock,
+				dc_add_history(item.itemid, item.value_type, &agent, &values[i].ts,
 						values[i].timestamp, values[i].source, values[i].severity,
 						values[i].logeventid, values[i].lastlogsize, values[i].mtime);
 
@@ -1328,7 +1329,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "Item [%s:%s] error: %s",
 						item.host.host, item.key_orig, agent.msg);
-				DCadd_nextcheck(item.itemid, (time_t)values[i].clock, agent.msg);
+				DCadd_nextcheck(item.itemid, (time_t)values[i].ts.sec, agent.msg);
 			}
 			else
 				THIS_SHOULD_NEVER_HAPPEN; /* set_result_type() always sets MSG result if not SUCCEED */
@@ -1380,7 +1381,7 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 	int			ret = SUCCEED;
 	int			processed = 0;
 	double			sec;
-	time_t			now, proxy_timediff = 0;
+	zbx_timespec_t		ts, proxy_timediff;
 
 #define VALUES_MAX	256
 	static AGENT_VALUE	*values = NULL, *av;
@@ -1388,14 +1389,30 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	now = time(NULL);
 	sec = zbx_time();
+
+	zbx_timespec(&ts);
+	proxy_timediff.sec = 0;
+	proxy_timediff.ns = 0;
 
 	if (NULL == values)
 		values = zbx_malloc(values, VALUES_MAX * sizeof(AGENT_VALUE));
 
 	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp)))
-		proxy_timediff = now - atoi(tmp);
+	{
+		proxy_timediff.sec = ts.sec - atoi(tmp);
+
+		if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_NS, tmp, sizeof(tmp)))
+		{
+			proxy_timediff.ns = ts.ns - atoi(tmp);
+
+			if (proxy_timediff.ns < 0)
+			{
+				proxy_timediff.sec--;
+				proxy_timediff.ns += 1000000000;
+			}
+		}
+	}
 
 /* {"request":"ZBX_SENDER_DATA","data":[{"key":"system.cpu.num",...,...},{...},...]}
  *                                     ^
@@ -1433,9 +1450,24 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 		memset(av, 0, sizeof(AGENT_VALUE));
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp)))
-			av->clock = atoi(tmp) + proxy_timediff;
+		{
+			av->ts.sec = atoi(tmp) + proxy_timediff.sec;
+
+			if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_NS, tmp, sizeof(tmp)))
+			{
+				av->ts.ns = atoi(tmp) + proxy_timediff.ns;
+
+				if (av->ts.ns > 999999999)
+				{
+					av->ts.sec++;
+					av->ts.ns -= 1000000000;
+				}
+			}
+			else
+				av->ts.ns = -1;
+		}
 		else
-			av->clock = now;
+			zbx_timespec(&av->ts);
 
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOST, av->host_name, sizeof(av->host_name)))
 			continue;

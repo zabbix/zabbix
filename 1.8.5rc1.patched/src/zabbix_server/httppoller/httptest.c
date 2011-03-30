@@ -59,6 +59,7 @@ static int	process_value(zbx_uint64_t itemid, AGENT_RESULT *value)
 	const char	*__function_name = "process_value";
 	DB_RESULT	result;
 	DB_ROW		row;
+	zbx_timespec_t	ts;
 	int		ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, itemid);
@@ -82,7 +83,8 @@ static int	process_value(zbx_uint64_t itemid, AGENT_RESULT *value)
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		dc_add_history(itemid, (unsigned char)atoi(row[0]), value, time(NULL), 0, NULL, 0, 0, 0, 0);
+		zbx_timespec(&ts);
+		dc_add_history(itemid, (unsigned char)atoi(row[0]), value, &ts, 0, NULL, 0, 0, 0, 0);
 		ret = SUCCEED;
 	}
 	else

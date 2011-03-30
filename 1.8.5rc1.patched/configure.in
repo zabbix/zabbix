@@ -129,6 +129,7 @@ dnl *****************************************************************
 AC_SEARCH_LIBS(socket, socket)
 AC_SEARCH_LIBS(kstat_open, kstat)
 AC_SEARCH_LIBS(gethostbyname, nsl)
+AC_SEARCH_LIBS(clock_gettime, rt)
 
 dnl AIX
 AC_SEARCH_LIBS(perfstat_memory_total, perfstat, [AC_DEFINE([HAVE_LIBPERFSTAT], 1, [Define to 1 if you have the 'libperfstat' library (-lperfstat)])])
@@ -718,6 +719,21 @@ int	i[] = {CP_USER, CP_NICE, CP_SYS, CP_INTR, CP_IDLE};
 }
 ],
 AC_DEFINE(HAVE_FUNCTION_SYSCTL_KERN_CPTIME,1,[Define to 1 if 'KERN_CPTIME,KERN_CPTIME2' exists.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+AC_MSG_CHECKING(for function clock_gettime in time.h)
+AC_TRY_LINK([
+#ifdef HAVE_TIME_H
+#	include <time.h>
+#elif HAVE_SYS_TIME_H
+#	include <sys/time.h>
+#endif	/* HAVE_SYS_TIME_H */
+],
+[struct timespec tp;
+clock_gettime(CLOCK_REALTIME, &tp);
+],
+AC_DEFINE(HAVE_TIME_CLOCK_GETTIME,1,[Define to 1 if function 'clock_gettime' exists.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
