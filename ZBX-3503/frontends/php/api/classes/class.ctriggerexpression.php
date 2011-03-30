@@ -11,9 +11,18 @@ private $newExpr;
 
 private $allowed;
 
-	public function __construct($trigger){
+	public function __construct($triggerOrItem){
 		$this->initializeVars();
-		$this->checkExpression($trigger['expression']);
+		// our parameter can be trigger or item
+		if (isset($triggerOrItem['key_'])){
+			// if it's an item, we should parse it's key. To do that, we need some fake trigger expression
+			$this->checkExpression('{fake_host:'.$triggerOrItem['key_'].'.last(0)}=0');
+		}
+		else{
+			// if it's a trigger, parsing it's expression
+			$this->checkExpression($triggerOrItem['expression']);
+		}
+
 	}
 
 	public function checkExpression($expression){
@@ -22,20 +31,17 @@ private $allowed;
 
 		try{
 			if(zbx_empty(trim($expression)))
-				throw new Exception('Empty expression.');
+				throw new Exception(_('Empty expression.'));
 
 // Check expr start symbol
 			$startSymbol = zbx_substr(trim($expression), 0, 1);
 			if(($startSymbol != '(') && ($startSymbol != '{') && ($startSymbol != '-') && !zbx_ctype_digit($startSymbol))
-				throw new Exception('Incorrect trigger expression.');
-
+				throw new Exception(_('Incorrect trigger expression.'));
 
 			for($symbolNum = 0; $symbolNum < $length; $symbolNum++){
 				$symbol = zbx_substr($expression, $symbolNum, 1);
-// SDI($symbol);
 				$this->parseOpenParts($this->previous['last']);
 				$this->parseCloseParts($symbol);
-// SDII($this->currExpr);
 				if($this->inParameter($symbol)){
 					$this->setPreviousSymbol($symbol);
 					continue;
@@ -43,7 +49,6 @@ private $allowed;
 
 				$this->checkSymbolSequence($symbol);
 				$this->setPreviousSymbol($symbol);
-// SDII($this->symbols);
 			}
 
 			$symbolNum = 0;

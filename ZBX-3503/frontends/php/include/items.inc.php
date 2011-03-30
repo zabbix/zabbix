@@ -1116,30 +1116,37 @@
 		return $item['key_'];
 	}
 
+	/**
+	 * Parse item name to expand macros like $1, $2, $3 etc. and replace them with parameters from item key.
+	 * Example:
+	 *  item name = 'My item $1, $2, $3',
+	 *  item key = 'key[a, b, c]',
+	 *  result = 'My item a, b, c'
+	 *
+	 * @author Konstantin Buravcov
+	 * @see ZBX-3503
+	 * @since 1.8.5
+	 * @param array $item - should contain atleast 'key_' and 'description'
+	 * @return string - parsed item name
+	 */
 	function item_description($item){
-		$descr = $item['description'];
-		$key = expand_item_key_by_data($item);
+		$description = $item['description'];
+		// initializing trigger parser, and giving it an item instead of trigger
+		// it will see 'key_' parameter and parse it as an item
+		$parser = new CTriggerExpression($item);
 
-		/**
-		 * Regular string functions used below are changed to zbx_*
-		 * wrappers to allow users to name steps in non-ascii chars.
-		 * Also $str[$i] calls were replased by zbx_substr($str, $i, 1)
-		 * @see ZBX-2349
-		 * @author Konstantin Buravcov
-		 */
-        for($i=9;$i>0;$i--){
-            $descr = str_replace("$$i",get_n_param($key,$i),$descr);
-        }
+		// are item parameters found?
+		if (isset($parser->expressions[0]['itemParamList']) && count( $parser->expressions[0]['itemParamList']) > 0){
+			$keyParameters = $parser->expressions[0]['itemParamList'];
 
-        if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $descr, $arr)){
-            $macros = CuserMacro::getMacros($arr[1], array('itemid' => $item['itemid']));
+			// replacing macros one by one
+			foreach($keyParameters as $i=>$keyParameter){
+				$paramNo = $i + 1;
+				$description = str_replace('$'.$paramNo, $keyParameter, $description);
+			}
+		}
 
-            $search = array_keys($macros);
-            $values = array_values($macros);
-			$descr = str_replace($search, $values, $descr);
-        }
-
-	return $descr;
+		return $description;
 	}
 
 	function get_realhost_by_itemid($itemid){
