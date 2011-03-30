@@ -299,7 +299,7 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 	zabbix_log( LOG_LEVEL_INFORMATION, "zabbix_agentd collector started");
 
 	if (0 != init_cpu_collector(&(collector->cpus)))
-		close_cpu_collector(&(collector->cpus));
+		free_cpu_collector(&(collector->cpus));
 
 	while(ZBX_IS_RUNNING())
 	{
@@ -323,7 +323,7 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 	close_perf_collector();
 #endif /* _WINDOWS */
 	if (CPU_COLLECTOR_STARTED(collector))
-		close_cpu_collector(&(collector->cpus));
+		free_cpu_collector(&(collector->cpus));
 
 	zabbix_log( LOG_LEVEL_INFORMATION, "zabbix_agentd collector stopped");
 

@@ -161,11 +161,21 @@ typedef struct zbx_metric_type
 } ZBX_METRIC;
 
 /* collector */
-#define MAX_COLLECTOR_HISTORY 901 /* 15 min in seconds */
-#define ZBX_AVG1	0
-#define ZBX_AVG5	1
-#define ZBX_AVG15	2
-#define ZBX_AVGMAX	3
+#define MAX_COLLECTOR_HISTORY	(15 * SEC_PER_MIN + 1)
+#define ZBX_AVG1		0
+#define ZBX_AVG5		1
+#define ZBX_AVG15		2
+#define ZBX_AVG_COUNT		3
+
+#define ZBX_CPU_STATE_USER	0
+#define ZBX_CPU_STATE_SYSTEM	1
+#define ZBX_CPU_STATE_NICE	2
+#define ZBX_CPU_STATE_IDLE	3
+#define ZBX_CPU_STATE_INTERRUPT	4
+#define ZBX_CPU_STATE_IOWAIT	5
+#define ZBX_CPU_STATE_SOFTIRQ	6
+#define ZBX_CPU_STATE_STEAL	7
+#define ZBX_CPU_STATE_COUNT	8
 
 #define ZBX_PROC_STAT_ALL	0
 #define ZBX_PROC_STAT_RUN	1
