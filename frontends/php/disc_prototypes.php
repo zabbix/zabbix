@@ -247,7 +247,7 @@ switch($itemType) {
 		}
 
 		$item = array(
-			'name'	=> get_request('description'),
+			'name'	=> get_request('name'),
 			'description'	=> get_request('description'),
 			'key_'			=> get_request('key'),
 			'hostid'		=> get_request('hostid'),

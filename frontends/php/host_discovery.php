@@ -449,7 +449,6 @@ switch($itemType) {
 
 // Name
 		$frmItem->addRow(_('Name'), new CTextBox('name', $name, 40, $limited));
-		$frmItem->addRow(_('Description'), new CTextArea('description', $description));
 
 // Key
 		$frmItem->addRow(S_KEY, new CTextBox('key', $key, 40, $limited));
@@ -637,6 +636,7 @@ switch($itemType) {
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TRAPPER, 'trapper_hosts');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TRAPPER, 'row_trapper_hosts');
 
+		$frmItem->addRow(_('Description'), new CTextArea('description', $description));
 
 		$frmRow = array(new CSubmit('save', S_SAVE));
 		if(isset($_REQUEST['itemid'])){
