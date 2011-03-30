@@ -1,8 +1,17 @@
 --------------------------------------------------------------------------------
-Changes for 1.9.3
+Changes for 1.9.4
 
 New features:
 
+Bug fixes:
+ - [ZBX-3658] fixed the whole request to Java proxy failing if it contains an invalid key (asaveljevs)
+ - [ZBX-3657] fixed errors while updating proxy configuration data (Sasha)
+ - [ZBX-3656] fixed item filter by data type boolean (Vedmak)
+
+--------------------------------------------------------------------------------
+Changes for 1.9.3
+
+New features:
  - [ZBXNEXT-555] added remote monitoring of JMX counters through Java proxy (asaveljevs,Vedmak,Vlad)
  - [ZBXNEXT-651] added "Boolean" data type for integer item value type (asaveljevs,Vedmak,Vlad)
  - [ZBXNEXT-675] added new icons and a script to create sql file (Elvis,Richlv)
@@ -15,7 +24,7 @@ Bug fixes:
  - [ZBX-3623] fixed processing of nanoseconds for history data (Sasha)
  - [ZBX-3634] improved zabbix map API methods (Aly)
  - [ZBX-3579] fixed trigger popup menu in status of triggers (Vedmak)
- 
+
 --------------------------------------------------------------------------------
 Changes for 1.9.2
 
@@ -113,6 +122,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
 
+ - [ZBX-3548] added IPV6_V6ONLY flag (where defined) for binding IPv4 and IPv6 interfaces separately (rudolfs)
  - [ZBX-3626] fixed bugs on map export: duplicate image decoding and duplicate map elements insertation; thanks to Takanori Suzuki (KB)
  - [ZBX-3453] improve performance of cpu collector (Sasha)
  - [ZBX-3610] fixed active agent full buffer bug - stop processing active checks till the buffer is sent (rudolfs)
