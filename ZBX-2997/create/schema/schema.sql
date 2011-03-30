@@ -980,7 +980,7 @@ FIELD		|start_date	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 TABLE|regexps|regexpid|ZBX_SYNC
 FIELD		|regexpid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|name		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|test_string	|t_blob		|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|test_string	|t_blob		|''	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|name
 
 TABLE|user_history|userhistoryid|ZBX_SYNC
