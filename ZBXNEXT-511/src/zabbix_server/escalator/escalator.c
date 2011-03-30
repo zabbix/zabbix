@@ -1122,7 +1122,7 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 	if (NULL == error && EVENT_SOURCE_TRIGGERS == source)
 	{
 		/* Item disabled? */
-		result = DBselect("select i.description from items i,functions f,triggers t"
+		result = DBselect("select i.name from items i,functions f,triggers t"
 				" where t.triggerid=" ZBX_FS_UI64 " and f.triggerid=t.triggerid"
 				" and i.itemid=f.itemid and i.status=%d",
 				escalation->triggerid,
