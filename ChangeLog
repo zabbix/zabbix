@@ -7,6 +7,7 @@ Bug fixes:
  - [ZBX-3658] fixed the whole request to Java proxy failing if it contains an invalid key (asaveljevs)
  - [ZBX-3657] fixed errors while updating proxy configuration data (Sasha)
  - [ZBX-3656] fixed item filter by data type boolean (Vedmak)
+ - [ZBX-3620] fixed error when delete application used in webscenario (Vedmak)
 
 --------------------------------------------------------------------------------
 Changes for 1.9.3
