@@ -54,7 +54,7 @@ static void	send_heartbeat()
 	zbx_json_addstring(&j, "request", ZBX_PROTO_VALUE_PROXY_HEARTBEAT, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&j, "host", CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
 
-	if (FAIL == connect_to_server(&sock, CONFIG_HEARTBEAT_FREQUENCY)) /* alarm */
+	if (FAIL == connect_to_server(&sock, CONFIG_HEARTBEAT_FREQUENCY, 0)) /* do not retry */
 		return;
 
 	if (FAIL == put_data_to_server(&sock, &j))
