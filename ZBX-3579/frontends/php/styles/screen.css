@@ -1,7 +1,0 @@
-/* Normal screen CSS Document */
-
-.formrow .dt{ width: 20%; }
-.formrow .dd{ width: 77%; margin-left: 21%; }
-
-.formlist .text, .formlist textarea { padding: 3px; }
-.formlist select { padding: 2px; }
