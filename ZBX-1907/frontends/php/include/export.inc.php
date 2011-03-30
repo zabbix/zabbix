@@ -587,7 +587,8 @@ class zbxXML{
 							$img = reset($imgs);
 
 							$image['imageid'] = $img['imageid'];
-							$image['image'] = base64_decode($image['encodedImage']);
+							// image will be decoded in class.image.php
+							$image['image'] = $image['encodedImage'];
 							unset($image['encodedImage']);
 
 							$images_to_update[] = $image;
@@ -763,11 +764,16 @@ class zbxXML{
 //----
 				}
 				else{
-					$result = CMap::create($importMap);
+					// first we must create an empty map without any elements (they will be added below)
+					$mapToCreate = $importMap;
+					$mapToCreate['selements'] = array();
+					$mapToCreate['links'] = array();
+					$result = CMap::create($mapToCreate);
 					$sysmapids = $result['sysmapids'];
 					$sysmap['sysmapid'] = reset($sysmapids);
 				}
 
+				// adding elements and links
 				$selements = $importMap['selements'];
 				$links = $importMap['links'];
 

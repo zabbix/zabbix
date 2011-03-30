@@ -224,14 +224,13 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 
 int	MAIN_ZABBIX_ENTRY()
 {
+	zbx_thread_args_t		*thread_args;
 	ZBX_THREAD_ACTIVECHK_ARGS	activechk_args;
-	int		i = 0;
-	zbx_sock_t	listen_sock;
+	zbx_sock_t			listen_sock;
+	int				i, thread_num = 0;
 	
 	if (NULL == CONFIG_LOG_FILE || '\0' == *CONFIG_LOG_FILE)
-	{
 		zabbix_open_log(LOG_TYPE_SYSLOG, CONFIG_LOG_LEVEL, NULL);
-	}
 	else
 		zabbix_open_log(LOG_TYPE_FILE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
 
@@ -264,16 +263,18 @@ int	MAIN_ZABBIX_ENTRY()
 	threads = calloc(threads_num, sizeof(ZBX_THREAD_HANDLE));
 
 	/* Start the collector thread. */
-	zabbix_log(LOG_LEVEL_WARNING, "agent #%d started [collector]", i);
-
-	threads[i++] = zbx_thread_start(collector_thread, NULL);
+	thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
+	thread_args->thread_num = thread_num;
+	thread_args->args = NULL;
+	threads[thread_num++] = zbx_thread_start(collector_thread, thread_args);
 
 	/* start listeners */
-	for (; i <= CONFIG_ZABBIX_FORKS; i++)
+	for (i = 0; i < CONFIG_ZABBIX_FORKS; i++)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "agent #%d started [listener]", i);
-
-		threads[i] = zbx_thread_start(listener_thread, &listen_sock);
+		thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
+		thread_args->thread_num = thread_num;
+		thread_args->args = &listen_sock;
+		threads[thread_num++] = zbx_thread_start(listener_thread, thread_args);
 	}
 
 	/* start active check */
@@ -282,9 +283,10 @@ int	MAIN_ZABBIX_ENTRY()
 		activechk_args.host = CONFIG_HOSTS_ALLOWED;
 		activechk_args.port = (unsigned short)CONFIG_SERVER_PORT;
 
-		zabbix_log(LOG_LEVEL_WARNING, "agent #%d started [active checks]", i);
-
-		threads[i] = zbx_thread_start(active_checks_thread, &activechk_args);
+		thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
+		thread_args->thread_num = thread_num;
+		thread_args->args = &activechk_args;
+		threads[thread_num++] = zbx_thread_start(active_checks_thread, thread_args);
 	}
 
 	/* Must be called after all child processes loading. */
