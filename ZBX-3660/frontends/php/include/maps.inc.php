@@ -629,9 +629,9 @@ function resolveMapLabelMacrosAll(array $selement){
 
 function resolveMapLabelMacros($label, $replaceHost=null){
 	if(null === $replaceHost)
-		$pattern = "/{".ZBX_PREG_HOST_FORMAT.":.+\.\w+\(.+\)}/Uu";
+		$pattern = "/{".ZBX_PREG_HOST_FORMAT.":.+\.(last|max|min|avg)\([0-9]+\)}/Uu";
 	else
-		$pattern = "/{(".ZBX_PREG_HOST_FORMAT."|{HOSTNAME}):.+\.\w+\(.+\)}/Uu";
+		$pattern = "/{(".ZBX_PREG_HOST_FORMAT."|{HOSTNAME}):.+\.(last|max|min|avg)\([0-9]+\)}/Uu";
 
 	preg_match_all($pattern, $label, $matches);
 
@@ -712,10 +712,6 @@ function resolveMapLabelMacros($label, $replaceHost=null){
 				$label = str_replace($expr, '('.S_NO_DATA_SMALL.')', $label);
 			else
 				$label = str_replace($expr, convert_units($row['value'], $item['units']), $label);
-		}
-		else{
-			$label = str_replace($expr, '???', $label);
-			continue;
 		}
 	}
 

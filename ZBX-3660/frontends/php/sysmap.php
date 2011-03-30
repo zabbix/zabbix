@@ -96,7 +96,7 @@ include_once('include/page_header.php');
 
 					$options = array(
 						'sysmapids'=> $sysmapid,
-						'editable' => 1,
+						'editable' => true,
 						'output' => API_OUTPUT_EXTEND,
 						'select_selements' => API_OUTPUT_EXTEND,
 						'select_links' => API_OUTPUT_EXTEND
