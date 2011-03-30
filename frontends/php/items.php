@@ -194,7 +194,7 @@ switch($itemType) {
 		'filter_snmp_oid'=>			array(T_ZBX_STR, O_OPT,  null,  null,	null),
 		'filter_port'=>				array(T_ZBX_INT, O_OPT,  P_UNSET_EMPTY,  BETWEEN(0,65535),	null),
 		'filter_value_type'=>		array(T_ZBX_INT, O_OPT,  null,  IN('-1,0,1,2,3,4'),null),
-		'filter_data_type'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(-1,ITEM_DATA_TYPE_HEXADECIMAL),null),
+		'filter_data_type'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(-1,ITEM_DATA_TYPE_BOOLEAN),null),
 		'filter_delay'=>			array(T_ZBX_INT, O_OPT,  P_UNSET_EMPTY,  BETWEEN(0,86400),null),
 		'filter_history'=>			array(T_ZBX_INT, O_OPT,  P_UNSET_EMPTY,  BETWEEN(0,65535),null),
 		'filter_trends'=>			array(T_ZBX_INT, O_OPT,  P_UNSET_EMPTY,  BETWEEN(0,65535),null),
