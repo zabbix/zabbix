@@ -346,7 +346,7 @@ void	collect_perfstat()
 	{
 		for (cptr = ppsd->pPerfCounterList; cptr != NULL; cptr = cptr->next)
  		{
-			if (cptr->status != ITEM_STATUS_NOTSUPPORTED)
+			if (ITEM_STATUS_NOTSUPPORTED != cptr->status)
 				continue;
 
 			wcounterPath = zbx_utf8_to_unicode(cptr->counterPath);
@@ -390,8 +390,10 @@ void	collect_perfstat()
 			if (ERROR_SUCCESS == status)
 				status = cptr->rawValueArray[cptr->CurrentCounter].CStatus;
 
-			zabbix_log(ERROR_SUCCESS == status ? LOG_LEVEL_ERR : LOG_LEVEL_DEBUG, "Can't get counter value \"%s\": %s",
-				cptr->counterPath, strerror_from_module(status, L"PDH.DLL"));
+			cptr->error = zbx_dsprintf(cptr->error, "%s", strerror_from_module(status, L"PDH.DLL"));
+			zbx_rtrim(cptr->error, " \r\n");
+			zabbix_log(LOG_LEVEL_DEBUG, "Can't get counter value \"%s\": %s",
+					cptr->counterPath, strerror_from_module(status, L"PDH.DLL"));
 			cptr->status = ITEM_STATUS_NOTSUPPORTED;
 			continue;
 		}
@@ -408,8 +410,10 @@ void	collect_perfstat()
 			);
 		if (ERROR_SUCCESS != status)
 		{
-			zabbix_log(LOG_LEVEL_ERR, "Can't calculate counter statistics \"%s\": %s",
-				cptr->counterPath, strerror_from_module(status, L"PDH.DLL"));
+			cptr->error = zbx_dsprintf(cptr->error, "%s", strerror_from_module(status, L"PDH.DLL"));
+			zbx_rtrim(cptr->error, " \r\n");
+			zabbix_log(LOG_LEVEL_DEBUG, "Can't calculate counter statistics \"%s\": %s",
+					cptr->counterPath, strerror_from_module(status, L"PDH.DLL"));
 			cptr->status = ITEM_STATUS_NOTSUPPORTED;
 			continue;
 		}
