@@ -1726,7 +1726,6 @@
 		}
 
 		$frmItem->addRow(_('Name'), new CTextBox('name', $name, 40, $limited));
-		$frmItem->addRow(_('Description'), new CTextArea('description', $description));
 
 		if($limited){
 			$frmItem->addRow(S_TYPE,  new CTextBox('typename', item_type2str($type), 40, 'yes'));
@@ -2116,6 +2115,10 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		}
 		$frmItem->addRow(S_APPLICATIONS,$cmbApps);
 
+		$tarea = new CTextArea('description', $description);
+		$tarea->addStyle('margin-top: 5px;');
+		$frmItem->addRow(_('Description'), $tarea);
+
 		$frmRow = array(new CSubmit('save',S_SAVE));
 		if(isset($_REQUEST['itemid'])){
 			array_push($frmRow,
@@ -2268,9 +2271,6 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		// http items only for internal processes
 		unset($itemTypes[ITEM_TYPE_HTTPTEST]);
 
-		$frmItem->addRow(array( new CVisibilityBox('description_visible', get_request('description_visible'), 'description', S_ORIGINAL),
-			_('Description')), new CTextArea('description', $description));
-
 		$cmbType = new CComboBox('type',$type);
 		$cmbType->addItems($itemTypes);
 
@@ -2422,6 +2422,11 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		}
 		$frmItem->addRow(array( new CVisibilityBox('applications_visible', get_request('applications_visible'), 'applications[]',
 			S_ORIGINAL), S_APPLICATIONS),$cmbApps);
+
+		$tarea = new CTextArea('description', $description);
+		$tarea->addStyle('margin-top: 5px;');
+		$frmItem->addRow(array( new CVisibilityBox('description_visible', get_request('description_visible'), 'description', S_ORIGINAL),
+			_('Description')), $tarea);
 
 		$frmItem->addItemToBottomRow(array(new CSubmit("update",S_UPDATE),
 			SPACE, new CButtonCancel(url_param('groupid').url_param("hostid").url_param("config"))));
