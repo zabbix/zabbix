@@ -123,6 +123,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
 
+ - [ZBX-3659] API exists() methods now return true/false instead of true/error (KB)
  - [ZBX-2997] added global regular expression to be sent to proxies (for use with log, logrt and eventlog items) (rudolfs)
  - [ZBX-1907] changed logging  - when a proxy fails to connect to the server it logs "Still unable to connect" message max once a minute (rudolfs)
  - [ZBX-3548] added IPV6_V6ONLY flag (where defined) for binding IPv4 and IPv6 interfaces separately (rudolfs)
