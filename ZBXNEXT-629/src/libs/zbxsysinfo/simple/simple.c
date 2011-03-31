@@ -134,6 +134,34 @@ static int	check_ssh(const char *host, unsigned short port, int timeout, int *va
 	return SYSINFO_RET_OK;
 }
 
+static int	check_telnet(const char *host, unsigned short port, int timeout, int *value_int)
+{
+	zbx_sock_t	s;
+	char		buf[MAX_BUFFER_LEN];
+	size_t		sz, offset;
+	int		rc, ret = FAIL, flags;
+
+	*value_int = 0;
+
+	if (SUCCEED == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout))
+	{
+		flags = fcntl(s.socket, F_GETFL);
+		if (0 == (flags & O_NONBLOCK))
+			fcntl(s.socket, F_SETFL, flags | O_NONBLOCK);
+
+		if (SUCCEED == telnet_test_login(s.socket))
+			*value_int = 1;
+		else
+			zabbix_log(LOG_LEVEL_DEBUG,"Telnet check error: no login prompt");
+
+		zbx_tcp_close(&s);
+	}
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "Telnet check error: %s", zbx_tcp_strerror());
+
+	return SYSINFO_RET_OK;
+}
+
 static int	check_service(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result, int perf)
 {
 	unsigned short	port = 0;
@@ -223,6 +251,12 @@ static int	check_service(const char *cmd, const char *param, unsigned flags, AGE
 		if ('\0' == *str_port)
 			return ret;
 		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, NULL, NULL, &value_int);
+	}
+	else if (0 == strcmp(service, "telnet"))
+	{
+		if ('\0' == *str_port)
+			port = ZBX_DEFAULT_TELNET_PORT;
+		ret = check_telnet(ip, port, CONFIG_TIMEOUT, &value_int);
 	}
 	else
 		return SYSINFO_RET_FAIL;
