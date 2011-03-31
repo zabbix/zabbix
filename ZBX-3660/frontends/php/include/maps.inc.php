@@ -643,7 +643,7 @@
 		foreach($matches[0] as $expr){
 			$macro = $expr;
 			if(($replaceHost !== null) && (zbx_strpos($macro, '{HOSTNAME}') == 1)){
-				$macro = substr_replace($macro, $replaceHost, 1, strlen($replaceHost));
+				$macro = substr_replace($macro, $replaceHost, 1, 10);
 			}
 
 			$trigExpr = new CTriggerExpression(array('expression' => $macro));
