@@ -123,6 +123,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
 
+ - [ZBX-3673] fixed processing of operators & and | in trigger and calculated items expressions (Sasha)
  - [ZBX-3660] fixed macro resolving in map labels (Vedmak)
  - [ZBX-3659] API exists() methods now return true/false instead of true/error (KB)
  - [ZBX-2997] added global regular expression to be sent to proxies (for use with log, logrt and eventlog items) (rudolfs)
