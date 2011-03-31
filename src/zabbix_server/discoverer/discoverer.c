@@ -147,15 +147,16 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 
 	switch (dcheck->type)
 	{
-		case SVC_SSH:	service = "ssh"; break;
-		case SVC_LDAP:	service = "ldap"; break;
-		case SVC_SMTP:	service = "smtp"; break;
-		case SVC_FTP:	service = "ftp"; break;
-		case SVC_HTTP:	service = "http"; break;
-		case SVC_POP:	service = "pop"; break;
-		case SVC_NNTP:	service = "nntp"; break;
-		case SVC_IMAP:	service = "imap"; break;
-		case SVC_TCP:	service = "tcp"; break;
+		case SVC_SSH:		service = "ssh"; break;
+		case SVC_LDAP:		service = "ldap"; break;
+		case SVC_SMTP:		service = "smtp"; break;
+		case SVC_FTP:		service = "ftp"; break;
+		case SVC_HTTP:		service = "http"; break;
+		case SVC_POP:		service = "pop"; break;
+		case SVC_NNTP:		service = "nntp"; break;
+		case SVC_IMAP:		service = "imap"; break;
+		case SVC_TCP:		service = "tcp"; break;
+		case SVC_TELNET:	service = "telnet"; break;
 		case SVC_AGENT:
 		case SVC_SNMPv1:
 		case SVC_SNMPv2c:
@@ -183,6 +184,7 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 			case SVC_NNTP:
 			case SVC_IMAP:
 			case SVC_TCP:
+			case SVC_TELNET:
 				zbx_snprintf(key, sizeof(key), "net.tcp.service[%s,%s,%d]", service, ip, port);
 
 				if (SUCCEED == process(key, 0, &result))
