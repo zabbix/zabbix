@@ -92,7 +92,7 @@ class function_check_item_key extends PHPUnit_Framework_TestCase
 		if($itemCheck['valid'])
 			$this->assertEquals($itemCheck['valid'],$b);
 		else
-			$this->assertEquals($itemCheck['valid'],$b,$itemCheck['name']);
+			$this->assertEquals($itemCheck['valid'],$b,$itemCheck['description']);
 	}
 
 }

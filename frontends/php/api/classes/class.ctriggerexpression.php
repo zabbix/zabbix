@@ -85,7 +85,7 @@ private $allowed;
 
 		$itemCheck = check_item_key($item);
 		if(!$itemCheck['valid'])
-			throw new Exception('Incorrect item key "'.$item.'" is used in expression. '.$itemCheck['name']);
+			throw new Exception('Incorrect item key "'.$item.'" is used in expression. '.$itemCheck['description']);
 	}
 
 	public function checkFunction($expression){
