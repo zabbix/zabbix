@@ -1619,18 +1619,14 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 
 		continue;
 json_parse_error:
-		zabbix_log(LOG_LEVEL_WARNING, "Invalid discovery data. %s",
-				zbx_json_strerror());
-		zabbix_syslog("Invalid discovery data. %s",
-				zbx_json_strerror());
+		zabbix_log(LOG_LEVEL_WARNING, "Invalid discovery data. %s", zbx_json_strerror());
+		zabbix_syslog("Invalid discovery data. %s", zbx_json_strerror());
 	}
 exit:
 	if (SUCCEED != ret)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Invalid discovery data. %s",
-				zbx_json_strerror());
-		zabbix_syslog("Invalid discovery data. %s",
-				zbx_json_strerror());
+		zabbix_log(LOG_LEVEL_WARNING, "Invalid discovery data. %s", zbx_json_strerror());
+		zabbix_syslog("Invalid discovery data. %s", zbx_json_strerror());
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s",
@@ -1693,18 +1689,14 @@ void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
 
 		continue;
 json_parse_error:
-		zabbix_log(LOG_LEVEL_WARNING, "Invalid auto registration data. %s",
-				zbx_json_strerror());
-		zabbix_syslog("Invalid auto registration data. %s",
-				zbx_json_strerror());
+		zabbix_log(LOG_LEVEL_WARNING, "Invalid auto registration data. %s", zbx_json_strerror());
+		zabbix_syslog("Invalid auto registration data. %s", zbx_json_strerror());
 	}
 exit:
 	if (SUCCEED != ret)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Invalid auto registration data. %s",
-				zbx_json_strerror());
-		zabbix_syslog("Invalid auto registration data. %s",
-				zbx_json_strerror());
+		zabbix_log(LOG_LEVEL_WARNING, "Invalid auto registration data. %s", zbx_json_strerror());
+		zabbix_syslog("Invalid auto registration data. %s", zbx_json_strerror());
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s",
