@@ -113,359 +113,119 @@ fail:
  *           It is recursive function!                                        *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_simple(double *result,char *exp,char *error,int maxerrlen)
+static int	evaluate_simple(double *result, char *exp, char *error, int maxerrlen)
 {
-	double	value1,value2;
-	char	first[MAX_STRING_LEN],second[MAX_STRING_LEN];
-	char	*p;
+	const char	*__function_name = "evaluate_simple";
+	double		value1, value2;
+	char		*p, c;
+	int		ret = SUCCEED;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_simple(%s)",
-		exp);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() exp:'%s'", __function_name, exp);
 
-/* Remove left and right spaces */
+	/* remove left and right spaces */
 	lrtrim_spaces(exp);
 
-/* Compress repeating - and +. Add prefix N to negative numbers. */
+	/* compress repeating - and + and add prefix N to negative numbers */
 	compress_signs(exp);
 
-	/* We should process negative prefix, i.e. N123 == -123 */
-	if( exp[0]=='N' && is_double_prefix(exp+1) == SUCCEED )
+	/* we should process negative prefix, i.e. N123 == -123 */
+	if ('N' == *exp && SUCCEED == is_double_prefix(exp + 1))
 	{
-/* str2double support prefixes */
-		*result=-str2double(exp+1);
-		return SUCCEED;
+		/* str2double support suffixes */
+		*result = -str2double(exp + 1);
+		goto out;
 	}
-	else if( exp[0]!='N' && is_double_prefix(exp) == SUCCEED )
+	else if ('N' != *exp && SUCCEED == is_double_prefix(exp))
 	{
-/* str2double support prefixes */
-		*result=str2double(exp);
-		return SUCCEED;
+		/* str2double support suffixes */
+		*result = str2double(exp);
+		goto out;
 	}
 
-	/* Operators with lowest priority come first */
+	/* operators with lowest priority come first */
 	/* HIGHEST / * - + < > # = & | LOWEST */
-	if( (p = strchr(exp,'|')) != NULL )
+	if (NULL != (p = strchr(exp, '|')) || NULL != (p = strchr(exp, '&')) ||
+			NULL != (p = strchr(exp, '=')) || NULL != (p = strchr(exp, '#')) ||
+			NULL != (p = strchr(exp, '>')) || NULL != (p = strchr(exp, '<')) ||
+			NULL != (p = strchr(exp, '+')) || NULL != (p = strchr(exp, '-')) ||
+			NULL != (p = strchr(exp, '*')) || NULL != (p = strchr(exp, '/')))
 	{
-		*p=0;
-		strscpy( first, exp);
-		*p='|';
-		p++;
-		strscpy( second, p);
+		c = *p;
+		*p = '\0';
 
-		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
+		if (SUCCEED != evaluate_simple(&value1, exp, error, maxerrlen) ||
+				SUCCEED != evaluate_simple(&value2, p + 1, error, maxerrlen))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
-			zabbix_syslog("%s", error);
-			return FAIL;
+			*p = c;
+			ret = FAIL;
+			goto out;
 		}
-		if( value1 == 1)
-		{
-			*result=value1;
-			return SUCCEED;
-		}
-		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
-			zabbix_syslog("%s", error);
-			return FAIL;
-		}
-		if( value2 == 1)
-		{
-			*result=value2;
-			return SUCCEED;
-		}
-		*result=0;
-		return SUCCEED;
-	}
-	if( (p = strchr(exp,'&')) != NULL )
-	{
-		*p=0;
-		strscpy( first, exp);
-		*p='|';
-		p++;
-		strscpy( second, p);
-
-		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
-			zabbix_syslog("%s", error);
-			return FAIL;
-		}
-		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
-			zabbix_syslog("%s", error);
-			return FAIL;
-		}
-		if( (value1 == 1) && (value2 == 1) )
-		{
-			*result=1;
-		}
-		else
-		{
-			*result=0;
-		}
-		return SUCCEED;
-	}
-	if((p = strchr(exp,'=')) != NULL)
-	{
-		*p=0;
-		strscpy( first, exp);
-		*p='|';
-		p++;
-		strscpy( second, p);
-		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s",
-				error);
-			zabbix_syslog("%s",
-				error);
-			return FAIL;
-		}
-		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s",
-				error);
-			zabbix_syslog("%s",
-				error);
-			return FAIL;
-		}
-		if( cmp_double(value1,value2) ==0 )
-		{
-			*result=1;
-		}
-		else
-		{
-			*result=0;
-		}
-		return SUCCEED;
-	}
-	if((p = strchr(exp,'#')) != NULL)
-	{
-		*p=0;
-		strscpy( first, exp);
-		*p='|';
-		p++;
-		strscpy( second, p);
-		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s",
-				error);
-			zabbix_syslog("%s",
-				error);
-			return FAIL;
-		}
-		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s",
-				error);
-			zabbix_syslog("%s",
-				error);
-			return FAIL;
-		}
-		if( cmp_double(value1,value2) != 0 )
-		{
-			*result=1;
-		}
-		else
-		{
-			*result=0;
-		}
-		return SUCCEED;
-	}
-	if((p = strchr(exp,'>')) != NULL)
-	{
-		*p=0;
-		strscpy( first, exp);
-		*p='|';
-		p++;
-		strscpy( second, p);
-		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
-			zabbix_syslog("%s", error);
-			return FAIL;
-		}
-		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
-			zabbix_syslog("%s", error);
-			return FAIL;
-		}
-		if( value1 > value2 )
-		{
-			*result=1;
-		}
-		else
-		{
-			*result=0;
-		}
-		return SUCCEED;
-	}
-	if((p = strchr(exp,'<')) != NULL)
-	{
-		*p=0;
-		strscpy( first, exp);
-		*p='|';
-		p++;
-		strscpy( second, p);
-		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s",
-				error);
-			zabbix_syslog("%s",
-				error);
-			return FAIL;
-		}
-		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s",
-				error);
-			zabbix_syslog("%s",
-				error);
-			return FAIL;
-		}
-		if( value1 < value2 )
-		{
-			*result=1;
-		}
-		else
-		{
-			*result=0;
-		}
-		zabbix_log(LOG_LEVEL_DEBUG, "Result [" ZBX_FS_DBL "]",*result );
-		return SUCCEED;
-	}
-	if((p = strchr(exp,'+')) != NULL)
-	{
-		*p=0;
-		strscpy( first, exp);
-		*p='|';
-		p++;
-		strscpy( second, p);
-		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s",
-				error);
-			zabbix_syslog("%s",
-				error);
-			return FAIL;
-		}
-		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s",
-				error);
-			zabbix_syslog("%s",
-				error);
-			return FAIL;
-		}
-		*result=value1+value2;
-		return SUCCEED;
-	}
-	if((p = strrchr(exp,'-')) != NULL)
-	{
-		*p=0;
-		strscpy( first, exp);
-		*p='|';
-		p++;
-		strscpy( second, p);
-		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s",
-				error);
-			zabbix_syslog("%s",
-				error);
-			return FAIL;
-		}
-		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s",
-				error);
-			zabbix_syslog("%s",
-				error);
-			return FAIL;
-		}
-		*result=value1-value2;
-		return SUCCEED;
-	}
-	if((p = strchr(exp,'*')) != NULL)
-	{
-		*p=0;
-		strscpy( first, exp);
-		*p='|';
-		p++;
-		strscpy( second, p);
-		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s",
-				error);
-			zabbix_syslog("%s",
-				error);
-			return FAIL;
-		}
-		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s",
-				error);
-			zabbix_syslog("%s",
-				error);
-			return FAIL;
-		}
-		*result=value1*value2;
-		return SUCCEED;
-	}
-	if((p = strrchr(exp,'/')) != NULL)
-	{
-		*p=0;
-		strscpy( first, exp);
-		*p='|';
-		p++;
-		strscpy( second, p);
-		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s",
-				error);
-			zabbix_syslog("%s",
-				error);
-			return FAIL;
-		}
-		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s",
-				error);
-			zabbix_syslog("%s",
-				error);
-			return FAIL;
-		}
-		if(cmp_double(value2,0) == 0)
-		{
-			zbx_snprintf(error,maxerrlen,"Division by zero. Cannot evaluate expression [%s/%s]",
-				first,
-				second);
-			zabbix_log(LOG_LEVEL_WARNING, "%s",
-				error);
-			zabbix_syslog("%s",
-				error);
-			return FAIL;
-		}
-		else
-		{
-			*result=value1/value2;
-		}
-		return SUCCEED;
 	}
 	else
 	{
-		zbx_snprintf(error,maxerrlen,"Format error or unsupported operator. Exp: [%s]",
-			exp);
-		zabbix_log(LOG_LEVEL_WARNING, "%s",
-			error);
-		zabbix_syslog("%s",
-			error);
-		return FAIL;
+		zbx_snprintf(error, maxerrlen, "Format error or unsupported operator. Exp: [%s]", exp);
+		ret = FAIL;
+		goto out;
 	}
 
-	return SUCCEED;
+	*p = c;
+
+	switch (c)
+	{
+		case '|':
+			if (0 != cmp_double(value1, 0) || 0 != cmp_double(value2, 0))
+				*result = 1;
+			else
+				*result = 0;
+			break;
+		case '&':
+			if (0 != cmp_double(value1, 0) && 0 != cmp_double(value2, 0))
+				*result = 1;
+			else
+				*result = 0;
+			break;
+		case '=':
+			if (0 == cmp_double(value1, value2))
+				*result = 1;
+			else
+				*result = 0;
+			break;
+		case '#':
+			if (0 != cmp_double(value1, value2))
+				*result = 1;
+			else
+				*result = 0;
+			break;
+		case '>':
+			*result = (value1 > value2);
+			break;
+		case '<':
+			*result = (value1 < value2);
+			break;
+		case '+':
+			*result = value1 + value2;
+			break;
+		case '-':
+			*result = value1 - value2;
+			break;
+		case '*':
+			*result = value1 * value2;
+			break;
+		case '/':
+			if (0 == cmp_double(value2, 0))
+			{
+				zbx_snprintf(error, maxerrlen, "Division by zero. Cannot evaluate expression [%s]", exp);
+				ret = FAIL;
+				goto out;
+			}
+
+			*result = value1 / value2;
+			break;
+	}
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
 }
 
 /******************************************************************************
@@ -489,14 +249,14 @@ int	evaluate(double *value, char *exp, char *error, int maxerrlen)
 	const char	*__function_name = "evaluate";
 	char		*res, simple[MAX_STRING_LEN], tmp[MAX_STRING_LEN],
 			value_str[MAX_STRING_LEN], c;
-	int		i,l,r,t;
+	int		i, l, r, t;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, exp);
 
 	res = NULL;
 
 	strscpy(tmp, exp);
-	t=0;
+	t = 0;
 	while (NULL != strchr(tmp, ')'))
 	{
 		l=-1;
@@ -511,13 +271,8 @@ int	evaluate(double *value, char *exp, char *error, int maxerrlen)
 		}
 		if( l == -1 )
 		{
-			zbx_snprintf(error, maxerrlen, "Cannot find left bracket [(]. Expression:[%s]",
-				tmp);
-			zabbix_log(LOG_LEVEL_WARNING, "%s",
-				error);
-			zabbix_syslog("%s",
-				error);
-			return	FAIL;
+			zbx_snprintf(error, maxerrlen, "Cannot find left bracket [(]. Expression:[%s]", tmp);
+			return FAIL;
 		}
 		for(i=l+1;i<r;i++)
 		{
@@ -525,15 +280,8 @@ int	evaluate(double *value, char *exp, char *error, int maxerrlen)
 		}
 		simple[r-l-1]=0;
 
-		if( evaluate_simple( value, simple, error, maxerrlen ) != SUCCEED )
-		{
-			/* Changed to LOG_LEVEL_DEBUG */
-			zabbix_log( LOG_LEVEL_DEBUG, "%s",
-				error);
-			zabbix_syslog("%s",
-				error);
-			return	FAIL;
-		}
+		if (SUCCEED != evaluate_simple(value, simple, error, maxerrlen))
+			return FAIL;
 
 		/* res = first+simple+second */
 		c=tmp[l]; tmp[l]='\0';
@@ -549,14 +297,9 @@ int	evaluate(double *value, char *exp, char *error, int maxerrlen)
 
 		zbx_free(res); res = NULL;
 	}
-	if( evaluate_simple( value, tmp, error, maxerrlen ) != SUCCEED )
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s",
-			error);
-		zabbix_syslog("%s",
-			error);
-		return	FAIL;
-	}
+
+	if (SUCCEED != evaluate_simple(value, tmp, error, maxerrlen))
+		return FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() value:" ZBX_FS_DBL, __function_name, *value);
 
@@ -2573,12 +2316,6 @@ int	evaluate_expression(int *result, char **expression, time_t now,
 			}
 		}
 	}
-	zabbix_log(LOG_LEVEL_DEBUG, "Evaluation of expression [%s] failed [%s]",
-		*expression,
-		error);
-	zabbix_syslog("Evaluation of expression [%s] failed [%s]",
-		*expression,
-		error);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
