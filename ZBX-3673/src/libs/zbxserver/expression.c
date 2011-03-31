@@ -127,13 +127,13 @@ static int	evaluate_simple(double *result, char *exp, char *error, int maxerrlen
 	/* we should process negative prefix, i.e. N123 == -123 */
 	if ('N' == *exp && SUCCEED == is_double_prefix(exp + 1))
 	{
-		/* str2double support suffixes */
+		/* str2double supports suffixes */
 		*result = -str2double(exp + 1);
 		return SUCCEED;
 	}
 	else if ('N' != *exp && SUCCEED == is_double_prefix(exp))
 	{
-		/* str2double support suffixes */
+		/* str2double supports suffixes */
 		*result = str2double(exp);
 		return SUCCEED;
 	}
@@ -143,8 +143,8 @@ static int	evaluate_simple(double *result, char *exp, char *error, int maxerrlen
 	if (NULL != (p = strchr(exp, '|')) || NULL != (p = strchr(exp, '&')) ||
 			NULL != (p = strchr(exp, '=')) || NULL != (p = strchr(exp, '#')) ||
 			NULL != (p = strchr(exp, '>')) || NULL != (p = strchr(exp, '<')) ||
-			NULL != (p = strchr(exp, '+')) || NULL != (p = strchr(exp, '-')) ||
-			NULL != (p = strchr(exp, '*')) || NULL != (p = strchr(exp, '/')))
+			NULL != (p = strchr(exp, '+')) || NULL != (p = strrchr(exp, '-')) ||
+			NULL != (p = strchr(exp, '*')) || NULL != (p = strrchr(exp, '/')))
 	{
 		c = *p;
 		*p = '\0';
@@ -155,14 +155,14 @@ static int	evaluate_simple(double *result, char *exp, char *error, int maxerrlen
 			*p = c;
 			return FAIL;
 		}
+
+		*p = c;
 	}
 	else
 	{
 		zbx_snprintf(error, maxerrlen, "Format error or unsupported operator. Exp: [%s]", exp);
 		return FAIL;
 	}
-
-	*p = c;
 
 	switch (c)
 	{
