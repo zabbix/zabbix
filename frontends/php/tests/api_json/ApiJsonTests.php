@@ -32,6 +32,7 @@ class ApiJsonTests
 		$suite->addTestSuite('API_JSON_APIInfo');
 		$suite->addTestSuite('API_JSON_General');
 		$suite->addTestSuite('API_JSON_User');
+		$suite->addTestSuite('API_JSON_Host');
 
 		return $suite;
 	}
