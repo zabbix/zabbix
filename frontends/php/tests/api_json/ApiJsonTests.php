@@ -22,6 +22,7 @@
 require_once(dirname(__FILE__).'/APIInfo.php');
 require_once(dirname(__FILE__).'/General.php');
 require_once(dirname(__FILE__).'/User.php');
+require_once(dirname(__FILE__).'/CHost.php');
 
 class ApiJsonTests
 {
