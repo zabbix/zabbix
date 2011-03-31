@@ -115,12 +115,8 @@ fail:
  ******************************************************************************/
 static int	evaluate_simple(double *result, char *exp, char *error, int maxerrlen)
 {
-	const char	*__function_name = "evaluate_simple";
-	double		value1, value2;
-	char		*p, c;
-	int		ret = SUCCEED;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() exp:'%s'", __function_name, exp);
+	double	value1, value2;
+	char	*p, c;
 
 	/* remove left and right spaces */
 	lrtrim_spaces(exp);
@@ -133,13 +129,13 @@ static int	evaluate_simple(double *result, char *exp, char *error, int maxerrlen
 	{
 		/* str2double support suffixes */
 		*result = -str2double(exp + 1);
-		goto out;
+		return SUCCEED;
 	}
 	else if ('N' != *exp && SUCCEED == is_double_prefix(exp))
 	{
 		/* str2double support suffixes */
 		*result = str2double(exp);
-		goto out;
+		return SUCCEED;
 	}
 
 	/* operators with lowest priority come first */
@@ -157,15 +153,13 @@ static int	evaluate_simple(double *result, char *exp, char *error, int maxerrlen
 				SUCCEED != evaluate_simple(&value2, p + 1, error, maxerrlen))
 		{
 			*p = c;
-			ret = FAIL;
-			goto out;
+			return FAIL;
 		}
 	}
 	else
 	{
 		zbx_snprintf(error, maxerrlen, "Format error or unsupported operator. Exp: [%s]", exp);
-		ret = FAIL;
-		goto out;
+		return FAIL;
 	}
 
 	*p = c;
@@ -215,17 +209,14 @@ static int	evaluate_simple(double *result, char *exp, char *error, int maxerrlen
 			if (0 == cmp_double(value2, 0))
 			{
 				zbx_snprintf(error, maxerrlen, "Division by zero. Cannot evaluate expression [%s]", exp);
-				ret = FAIL;
-				goto out;
+				return FAIL;
 			}
 
 			*result = value1 / value2;
 			break;
 	}
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
-	return ret;
+	return SUCCEED;
 }
 
 /******************************************************************************
