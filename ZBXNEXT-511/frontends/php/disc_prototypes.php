@@ -410,10 +410,10 @@ switch($itemType) {
 				$description[] = new CLink($template_host['host'],'?parent_discoveryid='.$tpl_disc_ruleid, 'unknown');
 				$description[] = ':';
 			}
-			$item['description_expanded'] = itemName($item);
+			$item['name_expanded'] = itemName($item);
 
 			$disc_link = '&parent_discoveryid='.$_REQUEST['parent_discoveryid'];
-			$description[] = new CLink($item['description_expanded'], '?form=update&itemid='.$item['itemid'].$disc_link);
+			$description[] = new CLink($item['name_expanded'], '?form=update&itemid='.$item['itemid'].$disc_link);
 
 			$status = new CCol(new CLink(item_status2str($item['status']), '?group_itemid='.$item['itemid'].$disc_link.
 					'&go='.($item['status']? 'activate':'disable'), item_status2style($item['status'])));

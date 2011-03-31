@@ -497,7 +497,7 @@ include_once('include/page_header.php');
 			}
 
 			if(!empty($trigger['discoveryRule'])){
-				$description[] = new CLink($trigger['discoveryRule']['description'], 'trigger_prototypes.php?parent_discoveryid='.
+				$description[] = new CLink($trigger['discoveryRule']['name'], 'trigger_prototypes.php?parent_discoveryid='.
 					$trigger['discoveryRule']['itemid'],'gold');
 				$description[] = ':'.$trigger['description'];
 			}

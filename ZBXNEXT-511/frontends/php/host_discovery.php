@@ -721,8 +721,8 @@ switch($itemType) {
 				$description[] = new CLink($template_host['host'],'?hostid='.$template_host['hostid'], 'unknown');
 				$description[] = ':';
 			}
-			$item['description_expanded'] = itemName($item);
-			$description[] = new CLink($item['description_expanded'], '?form=update&itemid='.$item['itemid']);
+			$item['name_expanded'] = itemName($item);
+			$description[] = new CLink($item['name_expanded'], '?form=update&itemid='.$item['itemid']);
 
 
 			$status = new CCol(new CLink(item_status2str($item['status']), '?hostid='.$_REQUEST['hostid'].'&group_itemid='.$item['itemid'].'&go='.
