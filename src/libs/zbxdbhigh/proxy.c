@@ -356,6 +356,8 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 		{"items"},
 		{"drules"},
 		{"dchecks"},
+		{"regexps"},
+		{"expressions"},
 		{NULL}
 	};
 
