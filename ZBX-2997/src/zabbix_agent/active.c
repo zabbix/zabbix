@@ -918,7 +918,7 @@ static void	process_active_checks(char *server, unsigned short port)
 				if (0 != get_param(params, 5, key_logeventid, sizeof(key_logeventid)))
 					*key_logeventid = '\0';
 
-				if (0 != get_param(params, 6, maxlines_persec_str, sizeof(maxlines_persec_str) ||
+				if (0 != get_param(params, 6, maxlines_persec_str, sizeof(maxlines_persec_str)) ||
 						'\0' == *maxlines_persec_str)
 					maxlines_persec = CONFIG_MAX_LINES_PER_SECOND;
 				else if (MIN_VALUE_LINES > (maxlines_persec = atoi(maxlines_persec_str)) ||
@@ -1055,14 +1055,19 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	int	nextcheck = 0, nextrefresh = 0, nextsend = 0;
 	char	*p = NULL;
 
+	assert(args);
+	assert(((zbx_thread_args_t *)args)->args);
+
+	zabbix_log(LOG_LEVEL_WARNING, "agent #%d started [active checks]", ((zbx_thread_args_t *)args)->thread_num);
+
+	activechk_args.host = zbx_strdup(NULL, ((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->host);
+	activechk_args.port = ((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->port;
+
+	zbx_free(args);
+
 #ifdef ZABBIX_DAEMON
 	set_child_signal_handler();
-#endif	/* ZABBIX_DAEMON */
-
-	activechk_args.host = strdup(((ZBX_THREAD_ACTIVECHK_ARGS *)args)->host);
-	activechk_args.port = ((ZBX_THREAD_ACTIVECHK_ARGS *)args)->port;
-
-	assert(activechk_args.host);
+#endif
 
 	if (NULL != (p = strchr(activechk_args.host, ',')))
 		*p = '\0';

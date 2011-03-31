@@ -27,37 +27,37 @@
 #	define PERF_COLLECTOR_STARTED(collector)	((collector) && (collector)->perfs.pdh_query)
 #	define UNSUPPORTED_REFRESH_PERIOD		600
 
-struct zbx_perfs
+typedef struct perf_counters_s
 {
-   struct zbx_perfs	*next;
-   char			*name;
-   char			*counterPath;
-   int			interval;
-   PDH_RAW_COUNTER	*rawValueArray;
-   HCOUNTER		handle;
-   double		lastValue;
-   int			CurrentCounter;
-   int			CurrentNum;
-   int			status;
-   char			*error;
-};
+	struct perf_counters_s	*next;
+	char			*name;
+	char			*counterPath;
+	int			interval;
+	PDH_RAW_COUNTER		*rawValueArray;
+	HCOUNTER		handle;
+	double			lastValue;
+	int			CurrentCounter;
+	int			CurrentNum;
+	int			status;
+	char			*error;
+}
+PERF_COUNTERS;
 
-typedef struct zbx_perfs PERF_COUNTERS;
-
-typedef struct s_perfs_stat_data
+typedef struct
 {
 	PERF_COUNTERS	*pPerfCounterList;
 	HQUERY		pdh_query;
 	time_t		nextcheck;	/* refresh time of not supported counters */
-} ZBX_PERF_STAT_DATA;
+}
+ZBX_PERF_STAT_DATA;
 
 int	add_perf_counter(const char *name, const char *counterPath, int interval);
 int	add_perfs_from_config(const char *line);
-void	perfs_list_free(void);
+void	perfs_list_free();
 
 int	init_perf_collector(ZBX_PERF_STAT_DATA *pperf);
+void	free_perf_collector();
 void	collect_perfstat();
-void	close_perf_collector();
 #endif /* _WINDOWS */
 
 #endif /* ZABBIX_PERFSTAT_H */
