@@ -189,7 +189,7 @@
 
 		if($result && isset($dchecks)){
 			foreach($dchecks as $id => $data){
-				$data['dcheckid'] = add_discovery_check($druleid, $data['type'], $data['ports'], $data['key'],
+				$data['dcheckid'] = add_discovery_check($druleid, $data['type'], $data['ports'], $data['key_'],
 						$data['snmp_community'], $data['snmpv3_securityname'], $data['snmpv3_securitylevel'],
 						$data['snmpv3_authpassphrase'], $data['snmpv3_privpassphrase'],
 						($uniqueness_criteria == $id) ? 1 : 0);
