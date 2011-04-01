@@ -11,6 +11,7 @@
 		<!-- Build agent binaries -->
 		<exec executable="./configure" dir="${builddir}" failonerror="on">
 			<arg value="--enable-agent"/>
+			<arg value="--with-libcurl"/>
 		</exec>
 		<exec executable="make" dir="${builddir}" failonerror="on"/>
 	</target>
