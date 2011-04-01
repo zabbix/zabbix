@@ -503,12 +503,14 @@ COpt::memoryPick();
 
 			foreach($applications as $anum => $application){
 				$application_db_fields = $upd_applications[$application['applicationid']];
+				$host = reset($application_db_fields['hosts']);
 
 				if(!check_db_fields($application_db_fields, $application)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_FIELDS_FOR_APPLICATIONS);
 				}
 
-				$result = update_application($application['applicationid'], $application['name'], $application['hostid']);
+				$result = update_application($application['applicationid'], $application['name'], $host['hostid']);
+
 				if(!$result)
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_CANNOT_UPDATE_APPLICATION);
 			}

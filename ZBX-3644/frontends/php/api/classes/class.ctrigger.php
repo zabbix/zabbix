@@ -1095,6 +1095,7 @@ COpt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for trigger');
 				}
 
+// Permission check by trigger hosts {{{
 				$expressionData = new CTriggerExpression($trigger);
 				if(!empty($expressionData->errors)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, implode(' ', $expressionData->errors));
@@ -1112,6 +1113,7 @@ COpt::memoryPick();
 					if(!isset($hosts[$host]))
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 				}
+// }}} Permission check
 
 				$result = add_trigger(
 					$trigger['expression'],
