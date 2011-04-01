@@ -2183,6 +2183,7 @@ int	DCsync_history(int sync_type)
 		if (0 == history_num)
 			break;
 
+		init_mass_zabbix_syslog();
 		DCinit_nextchecks();
 
 		DBbegin();
@@ -2211,6 +2212,8 @@ int	DCsync_history(int sync_type)
 
 		UNLOCK_CACHE;
 
+		flush_mass_zabbix_syslog();
+
 		for (i = 0; i < history_num; i ++)
 		{
 			if (history[i].value_type == ITEM_VALUE_TYPE_STR
@@ -2231,7 +2234,8 @@ int	DCsync_history(int sync_type)
 					(double)total_num / (cache->history_num + total_num) * 100);
 			now = time(NULL);
 		}
-	} while (--syncs > 0 || sync_type == ZBX_SYNC_FULL || (skipped_clock != 0 && skipped_clock < max_delay));
+	}
+	while (--syncs > 0 || sync_type == ZBX_SYNC_FULL || (skipped_clock != 0 && skipped_clock < max_delay));
 finish:
 	if (ZBX_SYNC_FULL == sync_type)
 		zabbix_log(LOG_LEVEL_WARNING, "Syncing history data... done.");

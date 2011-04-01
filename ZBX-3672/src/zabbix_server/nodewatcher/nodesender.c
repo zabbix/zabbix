@@ -22,7 +22,6 @@
 #include "cfg.h"
 #include "db.h"
 #include "log.h"
-#include "zlog.h"
 
 #include "nodesender.h"
 #include "nodewatcher.h"

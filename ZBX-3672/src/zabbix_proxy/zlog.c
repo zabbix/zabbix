@@ -24,6 +24,54 @@
 
 #include "zlog.h"
 
+#define ZBX_SYSLOG_MODE_NORMAL	0
+#define ZBX_SYSLOG_MODE_MASS	1
+static char	**zbx_syslog = NULL;
+static int	zbx_syslog_alloc = 0, zbx_syslog_num = 0, zbx_syslog_mode = ZBX_SYSLOG_MODE_NORMAL;
+
+void	init_mass_zabbix_syslog()
+{
+	zbx_syslog_mode = ZBX_SYSLOG_MODE_MASS;
+}
+
+void	flush_mass_zabbix_syslog()
+{
+	const char	*__function_name = "flush_mass_zabbix_syslog";
+	int		i, s, num, now;
+	AGENT_RESULT	agent;
+	DC_ITEM		*items = NULL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() zbx_syslog_num:%d", __function_name, zbx_syslog_num);
+
+	if (NULL == zbx_syslog)
+		goto out;
+
+	init_result(&agent);
+
+	num = DCconfig_get_items(0, SERVER_ZABBIXLOG_KEY, &items);
+
+	for (s = 0; s < zbx_syslog_num; s++)
+	{
+		now = (int)time(NULL);
+
+		SET_STR_RESULT(&agent, zbx_syslog[s]);
+
+		for (i = 0; i < num; i++)
+			dc_add_history(items[i].itemid, items[i].value_type, &agent, now, 0, NULL, 0, 0, 0, 0);
+
+		free_result(&agent);
+	}
+
+	zbx_free(items);
+
+	zbx_free(zbx_syslog);
+	zbx_syslog_alloc = 0;
+	zbx_syslog_num = 0;
+	zbx_syslog_mode = ZBX_SYSLOG_MODE_NORMAL;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zabbix_syslog                                                    *
@@ -41,12 +89,9 @@
  ******************************************************************************/
 void	__zbx_zabbix_syslog(const char *fmt, ...)
 {
-	const char	*__function_name = "zabbix_log";
-	va_list		ap;
+	const char	*__function_name = "zabbix_syslog";
 	char		value_str[MAX_STRING_LEN];
-	DC_ITEM		*items = NULL;
-	int		i, num, now;
-	AGENT_RESULT	agent;
+	va_list		ap;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -54,23 +99,28 @@ void	__zbx_zabbix_syslog(const char *fmt, ...)
 	if (0 == CONFIG_ENABLE_LOG)
 		return;
 
-	init_result(&agent);
-
-	now = (int)time(NULL);
-
-	va_start(ap,fmt);
+	va_start(ap, fmt);
 	vsnprintf(value_str, sizeof(value_str), fmt, ap);
-	value_str[MAX_STRING_LEN - 1] = '\0';
 	va_end(ap);
 
-	SET_STR_RESULT(&agent, strdup(value_str));
+	if (ZBX_SYSLOG_MODE_MASS == zbx_syslog_mode)
+	{
+		if (zbx_syslog_num == zbx_syslog_alloc)
+		{
+			zbx_syslog_alloc += 16;
+			zbx_syslog = zbx_realloc(zbx_syslog, zbx_syslog_alloc * sizeof(char *));
+		}
 
-	num = DCconfig_get_items(0, SERVER_ZABBIXLOG_KEY, &items);
-	for (i = 0; i < num; i++)
-		dc_add_history(items[i].itemid, items[i].value_type, &agent, now, 0, NULL, 0, 0, 0, 0);
+		zbx_syslog[zbx_syslog_num++] = zbx_strdup(NULL, value_str);
+	}
+	else
+	{
+		zbx_syslog_alloc = 1;
+		zbx_syslog = zbx_malloc(zbx_syslog, zbx_syslog_alloc * sizeof(char *));
+		zbx_syslog[zbx_syslog_num++] = zbx_strdup(NULL, value_str);
 
-	zbx_free(items);
-	free_result(&agent);
+		flush_mass_zabbix_syslog();
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

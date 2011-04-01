@@ -20,7 +20,6 @@
 #include "zbxdb.h"
 #include "db.h"
 #include "log.h"
-#include "zlog.h"
 #include "common.h"
 #include "events.h"
 #include "threads.h"
