@@ -23,7 +23,6 @@
 #include "zbxserver.h"
 #include "db.h"
 #include "log.h"
-#include "zlog.h"
 #include "zbxexec.h"
 #include "../poller/checks_ipmi.h"
 #include "../poller/checks_agent.h"
