@@ -683,7 +683,18 @@ COpt::memoryPick();
 		try{
 			self::BeginTransaction(__METHOD__);
 
+			$dbHosts = CHost::get(array(
+				'output' => API_OUTPUT_SHORTEN,
+				'hostids' => zbx_objectValues($items, 'hostid'),
+				'templated_hosts' => true,
+				'editable' => true,
+				'preservekeys' => true
+			));
+
 			foreach($items as $inum => $item){
+				if(!isset($dbHosts[$item['hostid']]))
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+
 				$result = add_item($item);
 
 				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot create Item');

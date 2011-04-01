@@ -1095,6 +1095,24 @@ COpt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for trigger');
 				}
 
+				$expressionData = new CTriggerExpression($trigger);
+				if(!empty($expressionData->errors)){
+					self::exception(ZBX_API_ERROR_PARAMETERS, implode(' ', $expressionData->errors));
+				}
+
+				$hosts = CHost::get(array(
+					'filter' => array('host' => $expressionData->data['hosts']),
+					'editable' => true,
+					'output' => array('hostid', 'host'),
+					'templated_hosts' => true,
+					'preservekeys' => true
+				));
+				$hosts = zbx_toHash($hosts, 'host');
+				foreach($expressionData->data['hosts'] as $host){
+					if(!isset($hosts[$host]))
+						self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+				}
+
 				$result = add_trigger(
 					$trigger['expression'],
 					$trigger['description'],
