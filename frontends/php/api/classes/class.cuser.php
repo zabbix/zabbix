@@ -98,7 +98,7 @@ class CUser extends CZBXAPI{
 			$sql_parts['select']['userid'] = ' u.userid';
 			foreach($options['output'] as $key => $field){
 				if(isset($dbTable['fields'][$field]))
-					$sql_parts['select'][$field] = ' u.'.$field;
+					$sql_parts['select'][$field] = 'u.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;

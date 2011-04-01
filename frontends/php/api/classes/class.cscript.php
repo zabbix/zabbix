@@ -376,7 +376,6 @@ class CScript extends CZBXAPI{
 			if(isset($scriptNames[$script['name']])){
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate script name "%s"', $script['name']));
 			}
-		}
 
 			$scriptNames[$script['name']] = $script['name'];
 		}
@@ -457,7 +456,7 @@ class CScript extends CZBXAPI{
 			unset($script['scriptid']);
 			$update[] = array(
 				'values' => $script,
-				'where' => array('scriptid='.$scriptid),
+				'where' => array('scriptid'=>$scriptid),
 			);
 		}
 		DB::update('scripts', $update);

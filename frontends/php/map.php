@@ -50,8 +50,8 @@ set_time_limit(10);
 
 	$options = array(
 		'sysmapids' => $_REQUEST['sysmapid'],
-		'select_selements' => API_OUTPUT_EXTEND,
-		'select_links' => API_OUTPUT_EXTEND,
+		'selectSelements' => API_OUTPUT_EXTEND,
+		'selectLinks' => API_OUTPUT_EXTEND,
 		'output' => API_OUTPUT_EXTEND
 	);
 	$maps = API::Map()->get($options);

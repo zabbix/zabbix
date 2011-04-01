@@ -1171,12 +1171,10 @@ COpt::memoryPick();
 				$actionids[$db_action['actionid']] = $db_action['actionid'];
 
 			if(!empty($actionids)){
-				$update = array();
-				$update[] = array(
+				DB::update('actions', array(
 					'values' => array('status' => ACTION_STATUS_DISABLED),
 					'where' => array('actionid' => $actionids)
-				);
-				DB::update('actions', $update);
+				));
 			}
 
 // delete action conditions
@@ -1827,7 +1825,7 @@ COpt::memoryPick();
 			else{
 				DB::update('items', array(
 					'values' => array('templateid' => 0),
-					'where' => array('itemid' =>  array_keys($items[ZBX_FLAG_DISCOVERY]))
+					'where' => array('itemid' => array_keys($items[ZBX_FLAG_DISCOVERY]))
 				));
 
 				foreach($items[ZBX_FLAG_DISCOVERY] as $discoveryRule){

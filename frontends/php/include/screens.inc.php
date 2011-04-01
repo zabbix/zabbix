@@ -1281,7 +1281,7 @@ require_once('include/js.inc.php');
 						$options = array(
 							'sysmapids' => $resourceid,
 							'output' => API_OUTPUT_EXTEND,
-							'select_selements' => API_OUTPUT_EXTEND,
+							'selectSelements' => API_OUTPUT_EXTEND,
 							'nopermissions' => 1
 						);
 						$sysmaps = API::Map()->get($options);

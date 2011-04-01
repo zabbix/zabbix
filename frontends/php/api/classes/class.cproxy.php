@@ -65,7 +65,7 @@ class CProxy extends CZBXAPI{
 // filter
 			'filter'					=> null,
 			'search'					=> null,
-			'searchByAny'			=> null,
+			'searchByAny'				=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 

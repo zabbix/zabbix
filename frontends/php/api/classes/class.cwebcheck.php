@@ -58,7 +58,7 @@ class CWebCheck extends CZBXAPI{
 			'filter'				=> null,
 			'search'				=> null,
 			'searchByAny'			=> null,
-			'startSearch'				=> null,
+			'startSearch'			=> null,
 			'exludeSearch'			=> null,
 
 // OutPut
@@ -385,11 +385,11 @@ COpt::memoryPick();
 
 				$webcheck['curstate'] = HTTPTEST_STATE_UNKNOWN;
 				$webcheck['error'] = '';
-				$update = array(
+
+				DB::update('httptest', array(
 					'values' => $webcheck,
 					'where' => array('httptestid' => $webcheck['webcheckid'])
-				);
-				DB::update('httptest', $update);
+				));
 
 
 				$checkitems_update = $update_fields = array();
@@ -693,14 +693,14 @@ COpt::memoryPick();
 			if($webstep['no'] <= 0)
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Scenario step number cannot be less than 1'));
 
-			$update = array(
+			DB::update('httpstep', array(
 				'values' => $webstep,
 				'where' => array('httpstepid' => $webstep['webstepid'])
-			);
-			DB::update('httpstep', $update);
+			));
 
 
 // update item keys
+			$itemids = array();
 			$stepitems_update = $update_fields = array();
 			$sql = 'SELECT i.itemid, hi.type'.
 				' FROM items i, httpstepitem hi '.

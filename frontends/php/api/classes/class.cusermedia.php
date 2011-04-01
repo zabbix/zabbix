@@ -98,7 +98,7 @@ class CUserMedia extends CZBXAPI{
 			$sql_parts['select']['mediaid'] = 'm.mediaid';
 			foreach($options['output'] as $key => $field){
 				if(isset($dbTable['fields'][$field]))
-					$sql_parts['select'][$field] = ' m.'.$field;
+					$sql_parts['select'][$field] = 'm.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;
