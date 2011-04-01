@@ -80,7 +80,7 @@ else{
 	$table = new CTableInfo();
 	$table->setHeader(array(
 		is_show_all_nodes() ? make_sorting_header(_('Node'), 'hostid') : null,
-		make_sorting_header(_('Host'), 'host'),
+		make_sorting_header(_('Host'), 'name'),
 		_('Group'),
 		make_sorting_header(_('Name'), 'pr_name'),
 		make_sorting_header(_('Type'), 'pr_type'),
@@ -92,7 +92,7 @@ else{
 
 	if($pageFilter->groupsSelected){
 		$options = array(
-			'output' => array('hostid', 'host', 'name'),
+			'output' => array('hostid', 'name'),
 			'selectProfile' => true,
 			'withProfiles' => true,
 			'selectGroups' => API_OUTPUT_EXTEND,

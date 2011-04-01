@@ -713,7 +713,7 @@ switch($itemType) {
 			$description = array();
 			if($item['templateid']){
 				$template_host = get_realhost_by_itemid($item['templateid']);
-				$description[] = new CLink($template_host['host'],'?hostid='.$template_host['hostid'], 'unknown');
+				$description[] = new CLink($template_host['name'],'?hostid='.$template_host['hostid'], 'unknown');
 				$description[] = ':';
 			}
 			$item['description_expanded'] = item_description($item);

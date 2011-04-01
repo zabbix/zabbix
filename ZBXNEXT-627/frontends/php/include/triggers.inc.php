@@ -471,7 +471,7 @@ function getSeverityCell($severity, $text=null, $force_normal=false){
 //SDII($triggerParent);
 			$options = array(
 				'triggerids' => zbx_objectValues($triggers, 'templateid'),
-				'selectHosts' => array('hostid','host','status'),
+				'selectHosts' => array('hostid','host','name','status'),
 				'output' => array('triggerid','templateid'),
 				'filter' => array('flags' => null),
 				'nopermissions' => true
@@ -968,7 +968,6 @@ function utf8RawUrlDecode($source){
 						$function_data['parameter'] = $function_data['expression'];
 					}
 
-//SDII($function_data);
 					if($html == 0){
 						$exp.='{'.$function_data['host'].':'.$function_data['key_'].'.'.$function_data['function'].'('.$function_data['parameter'].')}';
 					}

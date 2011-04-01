@@ -358,7 +358,7 @@ include_once('include/page_header.php');
 				else{
 					$template_host = get_realhost_by_applicationid($application['templateid']);
 					$name = array(
-						new CLink($template_host['host'], 'applications.php?hostid='.$template_host['hostid']),
+						new CLink($template_host['name'], 'applications.php?hostid='.$template_host['hostid']),
 						':',
 						$application['name']
 					);
