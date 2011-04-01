@@ -6,7 +6,7 @@
 #
 # Mandatory: no
 # Default:
-# LISTEN_IP="192.168.3.14"
+# LISTEN_IP="0.0.0.0"
 
 ### Option: zabbix.listenPort
 #	Port to listen on.
