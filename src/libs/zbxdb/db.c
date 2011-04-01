@@ -22,7 +22,6 @@
 #include "db.h"
 #include "zbxdb.h"
 #include "log.h"
-#include "zlog.h"
 
 /* Transaction level. Must be 1 for all queries. */
 static int	txn_level = 0;
