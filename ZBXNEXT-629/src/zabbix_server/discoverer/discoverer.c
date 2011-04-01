@@ -169,7 +169,7 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 			break;
 	}
 
-	if (ret == SUCCEED)
+	if (SUCCEED == ret)
 	{
 		alarm(10);
 
@@ -193,7 +193,7 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 				{
 					if (GET_UI64_RESULT(&result))
 					{
-						if (result.ui64 == 0)
+						if (0 == result.ui64)
 							ret = FAIL;
 					}
 					else
@@ -233,7 +233,7 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 						item.type = ITEM_TYPE_ZABBIX;
 				}
 
-				if (dcheck->type == SVC_AGENT)
+				if (SVC_AGENT == dcheck->type)
 				{
 					if(SUCCEED == get_value_agent(&item, &result))
 					{

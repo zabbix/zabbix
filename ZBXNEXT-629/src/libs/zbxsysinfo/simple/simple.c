@@ -37,7 +37,6 @@ ZBX_METRIC	parameters_simple[] =
 	};
 
 #ifdef HAVE_LDAP
-
 static int    check_ldap(const char *host, unsigned short port, int timeout, int *value_int)
 {
 	LDAP		*ldap	= NULL;
@@ -49,8 +48,6 @@ static int    check_ldap(const char *host, unsigned short port, int timeout, int
 	char	*attr	 = NULL;
 	char	**valRes = NULL;
 	int	ldapErr = 0;
-
-	*value_int = 0;
 
 	alarm(timeout);
 
@@ -76,7 +73,6 @@ static int    check_ldap(const char *host, unsigned short port, int timeout, int
 	valRes = ldap_get_values(ldap, msg, attr);
 
 	*value_int = 1;
-
 lbl_ret:
 	alarm(0);
 
@@ -93,18 +89,13 @@ lbl_ret:
 
 	return SYSINFO_RET_OK;
 }
-
 #endif	/* HAVE_LDAP */
 
 static int	check_ssh(const char *host, unsigned short port, int timeout, int *value_int)
 {
 	int		ret;
 	zbx_sock_t	s;
-	char		send_buf[MAX_BUFFER_LEN];
-	char		*recv_buf;
-	char		*ssh_server, *ssh_proto;
-
-	*value_int = 0;
+	char		send_buf[MAX_BUFFER_LEN], *recv_buf, *ssh_server, *ssh_proto;
 
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout)))
 	{
@@ -141,8 +132,6 @@ static int	check_https(const char *host, unsigned short port, int timeout, int *
 	int		err, opt;
 	char		https_host[MAX_BUFFER_LEN];
 	CURL            *easyhandle = NULL;
-
-	*value_int = 0;
 
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
@@ -182,8 +171,6 @@ static int	check_telnet(const char *host, unsigned short port, int timeout, int 
 	size_t		sz, offset;
 	int		rc, ret = FAIL, flags;
 
-	*value_int = 0;
-
 	if (SUCCEED == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout))
 	{
 		flags = fcntl(s.socket, F_GETFL);
@@ -216,7 +203,7 @@ static int	check_service(const char *cmd, const char *param, unsigned flags, AGE
 
 	check_time = zbx_time();
 
-	if (num_param(param) > 3)
+	if (3 < num_param(param))
 		return ret;
 
 	if (0 != get_param(param, 1, service, sizeof(service)))
