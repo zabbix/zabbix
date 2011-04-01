@@ -1652,7 +1652,7 @@ require_once('include/js.inc.php');
 								'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid']
 							),
 							$value,
-							new CCol(get_severity_description($trigger['priority']), get_severity_style($trigger['priority'])),
+							getSeverityCell($trigger['priority']),
 						));
 					}
 

@@ -32,14 +32,16 @@
 #define LOG_TYPE_SYSLOG		1
 #define LOG_TYPE_FILE		2
 
-typedef enum {
+typedef enum
+{
 	ERR_Z3001 = 3001,
 	ERR_Z3002,
 	ERR_Z3003,
 	ERR_Z3004,
 	ERR_Z3005,
 	ERR_Z3006
-} zbx_err_codes_t;
+}
+zbx_err_codes_t;
 
 extern int	CONFIG_LOG_FILE_SIZE;
 
@@ -54,7 +56,7 @@ int zabbix_open_log(int type,int level, const char *filename);
 void zabbix_errlog(zbx_err_codes_t err, ...);
 void __zbx_zabbix_log(int level, const char *fmt, ...);
 
-void zabbix_close_log(void);
+void zabbix_close_log();
 void zabbix_set_log_level(int level);
 
 char *strerror_from_system(unsigned long error);

@@ -93,9 +93,9 @@ int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	if (0 != get_param(param, 2, tmp, sizeof(tmp)))
 		*tmp = '\0';
 
-	if ('\0' == *tmp || 0 == strcmp(tmp,"bps"))	/* default parameter */
+	if ('\0' == *tmp || 0 == strcmp(tmp, "bps"))	/* default parameter */
 		type = ZBX_DSTAT_TYPE_BPS;
-	else if (0 == strcmp(tmp,"ops"))
+	else if (0 == strcmp(tmp, "ops"))
 		type = ZBX_DSTAT_TYPE_OPS;
 	else if (0 == strcmp(tmp, "bytes"))
 		type = ZBX_DSTAT_TYPE_BYTE;
@@ -175,9 +175,9 @@ int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	if (0 != get_param(param, 2, tmp, sizeof(tmp)))
 		*tmp = '\0';
 
-	if ('\0' == *tmp || 0 == strcmp(tmp,"bps"))	/* default parameter */
+	if ('\0' == *tmp || 0 == strcmp(tmp, "bps"))	/* default parameter */
 		type = ZBX_DSTAT_TYPE_BPS;
-	else if (0 == strcmp(tmp,"ops"))
+	else if (0 == strcmp(tmp, "ops"))
 		type = ZBX_DSTAT_TYPE_OPS;
 	else if (0 == strcmp(tmp, "bytes"))
 		type = ZBX_DSTAT_TYPE_BYTE;

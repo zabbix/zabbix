@@ -20,7 +20,7 @@
 #include "common.h"
 #include "mutexs.h"
 
-#include "log.h"
+#include "log.h" /* required for strerror_from_system() on Windows */
 
 #if !defined(_WINDOWS)
 
@@ -73,8 +73,6 @@ int zbx_mutex_create_ext(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, unsigned char fo
 		zbx_error("Error on mutex creating. [%s]", strerror_from_system(GetLastError()));
 		return ZBX_MUTEX_ERROR;
 	}
-
-	/* NOTE: if(ERROR_ALREADY_EXISTS == GetLastError()) info("Successfully opened existed mutex!"); */
 
 #else /* not _WINDOWS */
 

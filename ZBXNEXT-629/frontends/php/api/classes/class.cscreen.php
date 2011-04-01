@@ -92,7 +92,7 @@ class CScreen extends CZBXAPI{
 			$dbTable = DB::getSchema('screens');
 			foreach($options['output'] as $key => $field){
 				if(isset($dbTable['fields'][$field]))
-					$sql_parts['select'][$field] = ' s.'.$field;
+					$sql_parts['select'][$field] = 's.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;
@@ -676,7 +676,7 @@ SDI('/////////////////////////////////');
 				$exist_screen = $this->get($options);
 				$exist_screen = reset($exist_screen);
 
-				if($exist_screen && ($exist_screen['screenid'] != $screen['screenid']))
+				if($exist_screen && (bccomp($exist_screen['screenid'],$screen['screenid']) != 0))
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_SCREEN.' [ '.$screen['name'].' ] '.S_ALREADY_EXISTS_SMALL);
 			}
 

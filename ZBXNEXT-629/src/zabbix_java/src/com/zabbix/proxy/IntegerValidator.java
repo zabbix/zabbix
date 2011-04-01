@@ -17,38 +17,37 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#ifndef ZABBIX_INTERFACES_H
-#define ZABBIX_INTERFACES_H
+package com.zabbix.proxy;
 
-#define	MAX_INTERFACE	(16)
-
-typedef struct s_single_interface_data
+class IntegerValidator implements InputValidator
 {
-	char    *name;
-	int	clock[60*15];
-	double	sent[60*15];
-	double	received[60*15];
-} ZBX_SINGLE_INTERFACE_DATA;
+	private int lo;
+	private int hi;
 
-typedef struct s_interfaces_data
-{
-	ZBX_SINGLE_INTERFACE_DATA intfs[MAX_INTERFACE];
-} ZBX_INTERFACES_DATA;
+	public IntegerValidator(int lo, int hi)
+	{
+		if (lo > hi)
+			throw new IllegalArgumentException("bad validation bounds: " + lo + " and " + hi);
 
-void	collect_stats_interfaces(ZBX_INTERFACES_DATA *pinterfaces);
+		this.lo = lo;
+		this.hi = hi;
+	}
 
-/*
-#define	MAX_INTERFACE	16
+	public boolean validate(Object value)
+	{
+		if (value instanceof Integer)
+		{
+			Integer integer = (Integer)value;
 
-#define INTERFACE struct interface_type
-INTERFACE
-{
-	char    *interface;
-	int	clock[60*15];
-	double	sent[60*15];
-	double	received[60*15];
-};
+			if (!(Integer.valueOf(lo).compareTo(integer) <= 0))
+				return false;
 
-void	collect_stats_interfaces(FILE *outfile);
-*/
-#endif
+			if (!(integer.compareTo(Integer.valueOf(hi)) <= 0))
+				return false;
+
+			return true;
+		}
+		else
+			return false;
+	}
+}

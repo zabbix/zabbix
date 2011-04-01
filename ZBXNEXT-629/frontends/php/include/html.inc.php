@@ -405,7 +405,7 @@
 	}
 
 
-	function makeFormFooter($main, $other){
+	function makeFormFooter($main, $other=array()){
 		$mainBttns = new CDiv();
 		foreach($main as $bttn){
 			$bttn->addClass('main');
@@ -413,12 +413,17 @@
 
 			$mainBttns->addItem($bttn);
 		}
-		$space = new CDiv($mainBttns, 'dt right');
 
 		$otherBttns = new CDiv($other);
 		$otherBttns->useJQueryStyle();
 
-		$space = new CDiv($mainBttns, 'dt floatleft right');
+		if(empty($other)){
+			$space = new CDiv($mainBttns, 'dt right');
+		}
+		else{
+			$space = new CDiv($mainBttns, 'dt floatleft right');
+		}
+
 		$buttons = new CDiv(array($otherBttns), 'dd');
 
 		$footer = new CDiv(new CDiv(array($space, $buttons),'formrow'), 'objectgroup footer min-width ui-widget-content ui-corner-all');

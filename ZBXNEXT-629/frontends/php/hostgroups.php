@@ -142,8 +142,7 @@ include_once('include/page_header.php');
 					add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_GROUP, $group['groupid'], $group['name'], null, null, null);
 				}
 			}
-			if($result === false) error(API::HostGroup()->resetErrors());
-			$result = ($result) ? true : false;
+
 			$result = DBend($result);
 
 			$msg_ok		= S_GROUP_ADDED;

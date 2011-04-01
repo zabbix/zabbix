@@ -92,18 +92,27 @@
 
 		if(!defined('ZBX_PAGE_NO_MENU') && !defined('ZBX_PAGE_NO_FOOTER')){
 			$table = new CTable(NULL,"textwhite bold maxwidth ui-widget-header ui-corner-all page_footer");
+
+			if(CWebUser::$data['userid'] == 0){
+				$conString = _('Not connected');
+			}
+			else if(ZBX_DISTRIBUTED){
+				$conString = _s('Connected as \'%1$s\' from \'%2$s\'', CWebUser::$data['alias'], CWebUser::$data['node']['name']);
+			}
+			else{
+				$conString = _s('Connected as \'%1$s\'', CWebUser::$data['alias']);
+			}
+
+
 			$table->addRow(array(
 				new CCol(new CLink(
-					S_ZABBIX.SPACE.ZABBIX_VERSION.SPACE.S_COPYRIGHT_BY.SPACE.S_SIA_ZABBIX,
-					'http://www.zabbix.com', 'highlight', null, true),
-					'center'),
+					_s('Zabbix %s Copyright 2001-2011 by Zabbix SIA', ZABBIX_VERSION),
+					'http://www.zabbix.com', 'highlight', null, true), 'center'),
 				new CCol(array(
-						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE,'divider'),
-						new CSpan((CWebUser::$data['userid'] == 0)?S_NOT_CONNECTED:S_CONNECTED_AS.SPACE."'".CWebUser::$data['alias']."'".
-						(ZBX_DISTRIBUTED ? SPACE.S_FROM_SMALL.SPACE."'".CWebUser::$data['node']['name']."'" : ''),'footer_sign')
-					),
-					'right')
-				));
+					new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
+					new CSpan($conString, 'footer_sign')
+				), 'right')
+			));
 			$table->show();
 		}
 

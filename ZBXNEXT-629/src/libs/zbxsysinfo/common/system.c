@@ -105,7 +105,7 @@ int	SYSTEM_USERS_NUM(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	zbx_snprintf(counter_path, sizeof(counter_path), "\\%d\\%d", PCI_TERMINAL_SERVICES, PCI_TOTAL_SESSIONS);
 
-	return PERF_MONITOR(cmd, counter_path, flags, result);
+	return PERF_COUNTER(cmd, counter_path, flags, result);
 #else
 	return EXECUTE_INT(cmd, "who|wc -l", flags, result);
 #endif /* _WINDOWS */

@@ -52,7 +52,6 @@ class CDHost extends CZBXAPI{
  * @param boolean $options['selectGraphs'] select Graphs
  * @param boolean $options['selectApplications'] select Applications
  * @param boolean $options['selectMacros'] select Macros
- * @param boolean $options['select_profile'] select Profile
  * @param int $options['count'] count Hosts, returned column name is rowscount
  * @param string $options['pattern'] search hosts by pattern in Host name
  * @param string $options['extendPattern'] search hosts by pattern in Host name, ip and DNS
@@ -120,7 +119,7 @@ class CDHost extends CZBXAPI{
 			$dbTable = DB::getSchema('dhosts');
 			foreach($options['output'] as $key => $field){
 				if(isset($dbTable['fields'][$field]))
-					$sql_parts['select'][$field] = ' dh.'.$field;
+					$sql_parts['select'][$field] = 'dh.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;

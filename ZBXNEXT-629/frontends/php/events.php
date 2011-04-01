@@ -629,7 +629,7 @@ include_once('include/page_header.php');
 					$_REQUEST['hostid'] == 0 ? $host['host'] : null,
 					new CSpan($tr_desc, 'link_menu'),
 					new CCol(trigger_value2str($event['value']), get_trigger_value_style($event['value'])),
-					new CCol(get_severity_description($trigger['priority']), get_severity_style($trigger['priority'],$event['value'])),
+					getSeverityCell($trigger['priority'], null, !$event['value']),
 					$event['duration'],
 					($config['event_ack_enable'])?$ack:NULL,
 					$actions
@@ -642,7 +642,7 @@ include_once('include/page_header.php');
 						$_REQUEST['hostid'] == 0 ? $host['host'] : null,
 						$description,
 						trigger_value2str($event['value']),
-						get_severity_description($trigger['priority']),
+						getSeverityCaption($trigger['priority']),
 						$event['duration'],
 						($config['event_ack_enable'])? ($event['acknowledges']?S_YES:S_NO) :NULL, // ($config['event_ack_enable'])? $ack :NULL,
 						strip_tags( (string)$actions )

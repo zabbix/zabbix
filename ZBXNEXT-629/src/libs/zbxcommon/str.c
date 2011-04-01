@@ -2478,6 +2478,19 @@ char	*zbx_strcasestr(const char *haystack, const char *needle)
 	return NULL;
 }
 
+int	zbx_mismatch(const char *s1, const char *s2)
+{
+	int	i = 0;
+
+	while (s1[i] == s2[i])
+	{
+		if ('\0' == s1[i++])
+			return FAIL;
+	}
+
+	return i;
+}
+
 int	starts_with(const char *str, const char *prefix)
 {
 	const char	*p, *q;
@@ -2513,6 +2526,25 @@ const char	*zbx_permission_string(int perm)
 	}
 }
 
+const char	*zbx_host_type_string(zbx_item_type_t item_type)
+{
+	switch (item_type)
+	{
+		case ITEM_TYPE_ZABBIX:
+			return "Zabbix";
+		case ITEM_TYPE_SNMPv1:
+		case ITEM_TYPE_SNMPv2c:
+		case ITEM_TYPE_SNMPv3:
+			return "SNMP";
+		case ITEM_TYPE_IPMI:
+			return "IPMI";
+		case ITEM_TYPE_JMX:
+			return "JMX";
+		default:
+			return "generic";
+	}
+}
+
 const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type)
 {
 	switch (value_type)
@@ -2532,6 +2564,23 @@ const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type)
 	}
 }
 
+const char	*zbx_item_data_type_string(zbx_item_data_type_t data_type)
+{
+	switch (data_type)
+	{
+		case ITEM_DATA_TYPE_DECIMAL:
+			return "Decimal";
+		case ITEM_DATA_TYPE_OCTAL:
+			return "Octal";
+		case ITEM_DATA_TYPE_HEXADECIMAL:
+			return "Hexadecimal";
+		case ITEM_DATA_TYPE_BOOLEAN:
+			return "Boolean";
+		default:
+			return "unknown";
+	}
+}
+
 const char	*zbx_interface_type_string(zbx_interface_type_t type)
 {
 	switch (type)
@@ -2542,6 +2591,8 @@ const char	*zbx_interface_type_string(zbx_interface_type_t type)
 			return "SNMP";
 		case INTERFACE_TYPE_IPMI:
 			return "IPMI";
+		case INTERFACE_TYPE_JMX:
+			return "JMX";
 		case INTERFACE_TYPE_UNKNOWN:
 		default:
 			return "unknown";
@@ -2564,27 +2615,8 @@ const char	*zbx_result_string(int result)
 			return "TIMEOUT_ERROR";
 		case AGENT_ERROR:
 			return "AGENT_ERROR";
-		default:
-			return "unknown";
-	}
-}
-
-const char	*zbx_trigger_severity_string(zbx_trigger_severity_t severity)
-{
-	switch (severity)
-	{
-		case TRIGGER_SEVERITY_NOT_CLASSIFIED:
-			return "Not classified";
-		case TRIGGER_SEVERITY_INFORMATION:
-			return "Information";
-		case TRIGGER_SEVERITY_WARNING:
-			return "Warning";
-		case TRIGGER_SEVERITY_AVERAGE:
-			return "Average";
-		case TRIGGER_SEVERITY_HIGH:
-			return "High";
-		case TRIGGER_SEVERITY_DISASTER:
-			return "Disaster";
+		case PROXY_ERROR:
+			return "PROXY_ERROR";
 		default:
 			return "unknown";
 	}
@@ -2811,10 +2843,16 @@ int	zbx_unicode_to_utf8_static(LPCTSTR wide_string, LPSTR utf8_string, int utf8_
 }
 #endif
 
+void	zbx_strlower(char *str)
+{
+	for (; '\0' != *str; str++)
+		*str = tolower(*str);
+}
+
 void	zbx_strupper(char *str)
 {
 	for (; '\0' != *str; str++)
-		*str = toupper((int)*str);
+		*str = toupper(*str);
 }
 
 #if defined(_WINDOWS)
@@ -3097,7 +3135,7 @@ void	zbx_replace_invalid_utf8(char *text)
 	*out = '\0';
 }
 
-void	win2unix_eol(char *str)
+void	dos2unix(char *str)
 {
 	char	*o = str;
 

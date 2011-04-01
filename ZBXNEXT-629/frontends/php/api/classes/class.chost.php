@@ -52,7 +52,7 @@ class CHost extends CZBXAPI{
  * @param boolean $options['selectGraphs'] select Graphs
  * @param boolean $options['selectApplications'] select Applications
  * @param boolean $options['selectMacros'] select Macros
- * @param boolean $options['select_profile'] select Profile
+ * @param boolean $options['selectProfile'] select Profile
  * @param int $options['count'] count Hosts, returned column name is rowscount
  * @param string $options['pattern'] search hosts by pattern in Host name
  * @param string $options['extendPattern'] search hosts by pattern in Host name, ip and DNS
@@ -107,6 +107,7 @@ class CHost extends CZBXAPI{
 			'with_httptests'			=> null,
 			'with_monitored_httptests'	=> null,
 			'with_graphs'				=> null,
+			'withProfiles'				=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
 
@@ -131,7 +132,7 @@ class CHost extends CZBXAPI{
 			'selectMacros'				=> null,
 			'selectScreens'				=> null,
 			'selectInterfaces'			=> null,
-			'select_profile'			=> null,
+			'selectProfile'				=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -148,10 +149,10 @@ class CHost extends CZBXAPI{
 			unset($sql_parts['select']['hosts']);
 
 			$dbTable = DB::getSchema('hosts');
-			$sql_parts['select']['hostid'] = ' h.hostid';
+			$sql_parts['select']['hostid'] = 'h.hostid';
 			foreach($options['output'] as $key => $field){
 				if(isset($dbTable['fields'][$field]))
-					$sql_parts['select'][$field] = ' h.'.$field;
+					$sql_parts['select'][$field] = 'h.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;
@@ -484,6 +485,13 @@ class CHost extends CZBXAPI{
 						' AND i.itemid=gi.itemid)';
 		}
 
+// withProfiles
+		if(!is_null($options['withProfiles']) && $options['withProfiles']){
+			$sql_parts['where'][] = ' h.hostid IN ( '.
+					' SELECT hp.hostid '.
+					' FROM host_profile hp )';
+//			AND exists ( SELECT hp.hostid FROM host_profile hp WHERE h.hostid=hp.hostid)
+		}
 
 // search
 		if(is_array($options['search'])){
@@ -599,9 +607,8 @@ class CHost extends CZBXAPI{
 					if(!is_null($options['selectDiscoveries']) && !isset($result[$host['hostid']]['discoveries'])){
 						$result[$host['hostid']]['discoveries'] = array();
 					}
-					if(!is_null($options['select_profile']) && !isset($result[$host['hostid']]['profile'])){
+					if(!is_null($options['selectProfile']) && !isset($result[$host['hostid']]['profile'])){
 						$result[$host['hostid']]['profile'] = array();
-						$result[$host['hostid']]['profile_ext'] = array();
 					}
 					if(!is_null($options['selectTriggers']) && !isset($result[$host['hostid']]['triggers'])){
 						$result[$host['hostid']]['triggers'] = array();
@@ -762,21 +769,13 @@ Copt::memoryPick();
 		}
 
 // Adding Profiles
-		if(!is_null($options['select_profile'])){
+		if(!is_null($options['selectProfile']) && $options['selectProfile']){
 			$sql = 'SELECT hp.* '.
-				' FROM hosts_profiles hp '.
+				' FROM host_profile hp '.
 				' WHERE '.DBcondition('hp.hostid', $hostids);
 			$db_profile = DBselect($sql);
 			while($profile = DBfetch($db_profile))
 				$result[$profile['hostid']]['profile'] = $profile;
-
-
-			$sql = 'SELECT hpe.* '.
-				' FROM hosts_profiles_ext hpe '.
-				' WHERE '.DBcondition('hpe.hostid', $hostids);
-			$db_profile_ext = DBselect($sql);
-			while($profile_ext = DBfetch($db_profile_ext))
-				$result[$profile_ext['hostid']]['profile_ext'] = $profile_ext;
 		}
 
 // Adding Templates
@@ -1285,22 +1284,10 @@ Copt::memoryPick();
 
 		}
 
+		$hostNames = array();
 		foreach($hosts as $inum => &$host){
 			if(!check_db_fields($hostDBfields, $host)){
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for host "%s"', $host['host']));
-			}
-			// Check if host name isn't longer then 64 chars
-			if(!$delete && zbx_strlen($host['host']) > 64){
-				self::exception(
-					ZBX_API_ERROR_PARAMETERS,
-					_n(
-						'Maximum host name length is %2$d characters, "%3$s" is %1$d character.',
-						'Maximum host name length is %2$d characters, "%3$s" is %1$d characters.',
-						zbx_strlen($host['host']),
-						64,
-						$host['host']
-					)
-				);
 			}
 
 			if($update || $delete){
@@ -1336,30 +1323,59 @@ Copt::memoryPick();
 			}
 
 			if(isset($host['host'])){
+				// Check if host name isn't longer then 64 chars
+				if(zbx_strlen($host['host']) > 64){
+					self::exception(
+						ZBX_API_ERROR_PARAMETERS,
+						_n(
+							'Maximum host name length is %2$d characters, "%3$s" is %1$d character.',
+							'Maximum host name length is %2$d characters, "%3$s" is %1$d characters.',
+							zbx_strlen($host['host']),
+							64,
+							$host['host']
+						)
+					);
+				}
+
 				if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $host['host'])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Host name "%s"', $host['host']));
 				}
 
-				$hostsExists = $this->get(array(
-					'filter' => array('host' => $host['host'])
-				));
-				foreach($hostsExists as $exnum => $hostExists){
-					if(!$update || (bccomp($hostExists['hostid'],$host['hostid']) != 0)){
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' "'.$host['host'].'" '.S_ALREADY_EXISTS_SMALL);
-					}
-				}
+				if(isset($hostNames[$host['host']]))
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicated host name "%s" in data', $host['host']));
 
-				$templatesExists = API::Template()->get(array(
-					'filter' => array('host' => $host['host'])
-				));
-				foreach($templatesExists as $exnum => $templatesExists){
-					if(!$update || ($templatesExists['hostid'] != $host['hostid'])){
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' "'.$host['host'].'" '.S_ALREADY_EXISTS_SMALL);
-					}
-				}
+				$hostNames[$host['host']] = $update ? $host['hostid'] : 1;
 			}
 		}
 		unset($host);
+
+		if($update || $create){
+			$hostsExists = $this->get(array(
+				'output' => array('hostid', 'host'),
+				'filter' => array('host' => array_keys($hostNames)),
+				'nopermissions' => true,
+				'preservekeys' => true
+			));
+			foreach($hostsExists as $exnum => $hostExists){
+				if(!$update || (bccomp($hostExists['hostid'],$hostNames[$hostExists['host']]) != 0)){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host "%s" already exists.', $hostExists['host']));
+				}
+			}
+
+			$templatesExists = API::Template()->get(array(
+				'output' => array('hostid', 'host'),
+				'filter' => array('host' => array_keys($hostNames)),
+				'nopermissions' => true,
+				'preservekeys' => true
+			));
+			foreach($templatesExists as $exnum => $templatesExists){
+				if(!$update || (bccomp($templatesExists['templateid'],$hostNames[$templatesExists['host']]) != 0)){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template "%s" already exists.', $hostExists['host']));
+				}
+			}
+		}
+
+		return $update ? $dbHosts : $hosts;
 	}
 
 /**
@@ -1396,7 +1412,6 @@ Copt::memoryPick();
 			$options['hosts'] = $host;
 
 
-
 			foreach($host['groups'] as $group){
 				$hostgroupid = get_dbid('hosts_groups', 'hostgroupid');
 				$result = DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES ($hostgroupid, $hostid, {$group['groupid']})");
@@ -1426,17 +1441,7 @@ Copt::memoryPick();
 				$values = array_map('zbx_dbstr', $host['profile']);
 				$values = implode(', ', $values);
 
-				DBexecute('INSERT INTO hosts_profiles (hostid, '.$fields.') VALUES ('.$hostid.', '.$values.')');
-			}
-
-			if(isset($host['extendedProfile']) && !empty($host['extendedProfile'])){
-				$fields = array_keys($host['extendedProfile']);
-				$fields = implode(', ', $fields);
-
-				$values = array_map('zbx_dbstr', $host['extendedProfile']);
-				$values = implode(', ', $values);
-
-				DBexecute('INSERT INTO hosts_profiles_ext (hostid, '.$fields.') VALUES ('.$hostid.', '.$values.')');
+				DBexecute('INSERT INTO host_profile (hostid, '.$fields.') VALUES ('.$hostid.', '.$values.')');
 			}
 		}
 
@@ -1653,7 +1658,7 @@ Copt::memoryPick();
 			);
 			$host_exists = $this->get($options);
 			$host_exist = reset($host_exists);
-			if($host_exist && ($host_exist['hostid'] != $cur_host['hostid'])){
+			if($host_exist && (bccomp($host_exist['hostid'],$cur_host['hostid']) != 0)){
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 			}
 
@@ -1818,103 +1823,38 @@ Copt::memoryPick();
 
 
 // PROFILE {{{
-		if(isset($data['profile']) && !is_null($data['profile'])){
-			if(empty($data['profile'])){
-				$sql = 'DELETE FROM hosts_profiles WHERE '.DBcondition('hostid', $hostids);
-				if(!DBexecute($sql))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete profile'));
-			}
-			else{
-				$existing_profiles = array();
-				$existing_profiles_db = DBselect('SELECT hostid FROM hosts_profiles WHERE '.DBcondition('hostid', $hostids));
-				while($existing_profile = DBfetch($existing_profiles_db)){
-					$existing_profiles[] = $existing_profile['hostid'];
+			if(isset($data['profile']) && !is_null($data['profile'])){
+				if(empty($data['profile'])){
+					$sql = 'DELETE FROM host_profile WHERE '.DBcondition('hostid', $hostids);
+					if(!DBexecute($sql))
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete profile'));
 				}
+				else{
+					$existing_profiles = array();
+					$existing_profiles_db = DBselect('SELECT hostid FROM host_profile WHERE '.DBcondition('hostid', $hostids));
+					while($existing_profile = DBfetch($existing_profiles_db)){
+						$existing_profiles[] = $existing_profile['hostid'];
+					}
 
 				$hostids_without_profile = array_diff($hostids, $existing_profiles);
 
-				$fields = array_keys($data['profile']);
-				$fields = implode(', ', $fields);
-
-				$values = array_map('zbx_dbstr', $data['profile']);
-				$values = implode(', ', $values);
-
-				foreach($hostids_without_profile as $hostid){
-					$sql = 'INSERT INTO hosts_profiles (hostid, '.$fields.') VALUES ('.$hostid.', '.$values.')';
-					if(!DBexecute($sql))
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot create profile');
-				}
-
-				if(!empty($existing_profiles)){
-					$host_profile_fields = array('devicetype', 'name', 'os', 'serialno', 'tag','macaddress', 'hardware', 'software',
-						'contact', 'location', 'notes');
-					$sql_set = array();
-					foreach($host_profile_fields as $field){
-						if(isset($data['profile'][$field])) $sql_set[] = $field.'='.zbx_dbstr($data['profile'][$field]);
+					foreach($hostids_without_profile as $hostid){
+						$data['profile']['hostid'] = $hostid;
+						DB::insert('host_profile', array($data['profile']), false);
 					}
 
-					$sql = 'UPDATE hosts_profiles SET ' . implode(', ', $sql_set) . ' WHERE '.DBcondition('hostid', $existing_profiles);
-					if(!DBexecute($sql))
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update profile'));
+					if(!empty($existing_profiles)){
+						DB::update('host_profile', array(
+							'values' => $data['profile'],
+							'where' => array(DBcondition('hostid', $existing_profiles))
+						));
+					}
 				}
 			}
 		}
 // }}} PROFILE
 
-
-// EXTENDED PROFILE {{{
-		if(isset($data['extendedProfile']) && !is_null($data['extendedProfile'])){
-			if(empty($data['extendedProfile'])){
-				$sql = 'DELETE FROM hosts_profiles_ext WHERE '.DBcondition('hostid', $hostids);
-				if(!DBexecute($sql))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete extended profile'));
-			}
-			else{
-				$existing_profiles = array();
-				$existing_profiles_db = DBselect('SELECT hostid FROM hosts_profiles_ext WHERE '.DBcondition('hostid', $hostids));
-				while($existing_profile = DBfetch($existing_profiles_db)){
-					$existing_profiles[] = $existing_profile['hostid'];
-				}
-
-				$hostids_without_profile = array_diff($hostids, $existing_profiles);
-
-				$fields = array_keys($data['extendedProfile']);
-				$fields = implode(', ', $fields);
-
-				$values = array_map('zbx_dbstr', $data['extendedProfile']);
-				$values = implode(', ', $values);
-
-				foreach($hostids_without_profile as $hostid){
-					$sql = 'INSERT INTO hosts_profiles_ext (hostid, '.$fields.') VALUES ('.$hostid.', '.$values.')';
-					if(!DBexecute($sql))
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot create extended profile'));
-				}
-
-				if(!empty($existing_profiles)){
-
-					$host_profile_ext_fields = array('device_alias','device_type','device_chassis','device_os','device_os_short',
-						'device_hw_arch','device_serial','device_model','device_tag','device_vendor','device_contract',
-						'device_who','device_status','device_app_01','device_app_02','device_app_03','device_app_04',
-						'device_app_05','device_url_1','device_url_2','device_url_3','device_networks','device_notes',
-						'device_hardware','device_software','ip_subnet_mask','ip_router','ip_macaddress','oob_ip',
-						'oob_subnet_mask','oob_router','date_hw_buy','date_hw_install','date_hw_expiry','date_hw_decomm','site_street_1',
-						'site_street_2','site_street_3','site_city','site_state','site_country','site_zip','site_rack','site_notes',
-						'poc_1_name','poc_1_email','poc_1_phone_1','poc_1_phone_2','poc_1_cell','poc_1_screen','poc_1_notes','poc_2_name',
-						'poc_2_email','poc_2_phone_1','poc_2_phone_2','poc_2_cell','poc_2_screen','poc_2_notes');
-
-					$sql_set = array();
-					foreach($host_profile_ext_fields as $field){
-						if(isset($data['extendedProfile'][$field])) $sql_set[] = $field.'='.zbx_dbstr($data['extendedProfile'][$field]);
-					}
-
-					$sql = 'UPDATE hosts_profiles_ext SET ' . implode(', ', $sql_set) . ' WHERE '.DBcondition('hostid', $existing_profiles);
-					if(!DBexecute($sql))
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update extended profile'));
-				}
-			}
-		}
-// }}} EXTENDED PROFILE
-
+			return array('hostids' => $hostids);
 		return array('hostids' => $hostids);
 	}
 
@@ -2015,14 +1955,20 @@ Copt::memoryPick();
 			'nopermissions' => 1,
 			'preservekeys' => 1
 		));
-
 		if(!empty($delItems)){
 			$delItemIds = zbx_objectValues($delItems, 'itemid');
 			API::Item()->delete($delItemIds, true);
 		}
 
-// delete host interfaces
-		DB::delete('interface', array('hostid'=>$hostids));
+		$delRules = API::DiscoveryRule()->get(array(
+			'hostids' => $hostids,
+			'nopermissions' => 1,
+			'preservekeys' => 1
+		));
+		if(!empty($delRules)){
+			$delRulesIds = zbx_objectValues($delRules, 'itemid');
+			API::DiscoveryRule()->delete($delRulesIds, true);
+		}
 
 // delete web tests
 		$del_httptests = array();
@@ -2042,16 +1988,8 @@ Copt::memoryPick();
 		));
 
 // delete host from maps
-		delete_sysmaps_elements_with_hostid($hostids);
-
-// delete host from maintenances
-		DB::delete('maintenances_hosts', array('hostid'=>$hostids));
-
-// delete host from group
-		DB::delete('hosts_groups', array('hostid'=>$hostids));
-
-// delete host from template linkages
-		DB::delete('hosts_templates', array('hostid'=>$hostids));
+		if(empty($hostids))
+			DB::delete('sysmaps_elements', array('elementtype' => SYSMAP_ELEMENT_TYPE_HOST, 'elementid' => $hostids));
 
 // disable actions
 // actions from conditions
@@ -2116,8 +2054,7 @@ Copt::memoryPick();
 		));
 
 // delete host profile
-		DB::delete('hosts_profiles', array('hostid'=>$hostids));
-		DB::delete('hosts_profiles_ext', array('hostid'=>$hostids));
+			DB::delete('host_profile', array('hostid'=>$hostids));
 
 // delete host applications
 		DB::delete('applications', array('hostid'=>$hostids));
@@ -2126,7 +2063,7 @@ Copt::memoryPick();
 		DB::delete('hosts', array('hostid'=>$hostids));
 
 // TODO: remove info from API
-		foreach($hosts as $hnum => $host){
+		foreach($hosts as $host){
 			info(_s('Host "%s" deleted.', $host['host']));
 			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $host['hostid'], $host['host'], 'hosts', NULL, NULL);
 		}
