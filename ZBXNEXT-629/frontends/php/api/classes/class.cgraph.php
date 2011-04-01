@@ -755,7 +755,10 @@ COpt::memoryPick();
 	}
 
 	protected function updateReal($graph){
-		$data = array(array('values' => $graph, 'where'=> array('graphid'=>$graph['graphid'])));
+		$data = array(array(
+			'values' => $graph,
+			'where'=> array('graphid'=>$graph['graphid'])
+		));
 		DB::update('graphs', $data);
 
 		if(isset($graph['gitems'])){

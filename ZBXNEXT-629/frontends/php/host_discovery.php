@@ -697,7 +697,7 @@ switch($itemType) {
 			'hostids' => $_REQUEST['hostid'],
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1,
-			'select_prototypes' => API_OUTPUT_COUNT,
+			'selectPrototypes' => API_OUTPUT_COUNT,
 			'selectGraphs' => API_OUTPUT_COUNT,
 			'selectTriggers' => API_OUTPUT_COUNT,
 			'sortfield' => $sortfield,

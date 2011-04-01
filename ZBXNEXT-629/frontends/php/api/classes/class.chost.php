@@ -126,8 +126,8 @@ class CHost extends CZBXAPI{
 			'selectDiscoveries'			=> null,
 			'selectTriggers'			=> null,
 			'selectGraphs'				=> null,
-			'select_dhosts'				=> null,
-			'select_dservices'			=> null,
+			'selectDHosts'				=> null,
+			'selectDServices'			=> null,
 			'selectApplications'		=> null,
 			'selectMacros'				=> null,
 			'selectScreens'				=> null,
@@ -616,10 +616,10 @@ class CHost extends CZBXAPI{
 					if(!is_null($options['selectGraphs']) && !isset($result[$host['hostid']]['graphs'])){
 						$result[$host['hostid']]['graphs'] = array();
 					}
-					if(!is_null($options['select_dhosts']) && !isset($result[$host['hostid']]['dhosts'])){
+					if(!is_null($options['selectDHosts']) && !isset($result[$host['hostid']]['dhosts'])){
 						$result[$host['hostid']]['dhosts'] = array();
 					}
-					if(!is_null($options['select_dservices']) && !isset($result[$host['hostid']]['dservices'])){
+					if(!is_null($options['selectDServices']) && !isset($result[$host['hostid']]['dservices'])){
 						$result[$host['hostid']]['dservices'] = array();
 					}
 					if(!is_null($options['selectApplications']) && !isset($result[$host['hostid']]['applications'])){
@@ -711,7 +711,7 @@ class CHost extends CZBXAPI{
 					}
 
 // dhostids
-					if(isset($host['dhostid']) && is_null($options['select_dhosts'])){
+					if(isset($host['dhostid']) && is_null($options['selectDHosts'])){
 						if(!isset($result[$host['hostid']]['dhosts']))
 							$result[$host['hostid']]['dhosts'] = array();
 
@@ -720,7 +720,7 @@ class CHost extends CZBXAPI{
 					}
 
 // dserviceids
-					if(isset($host['dserviceid']) && is_null($options['select_dservices'])){
+					if(isset($host['dserviceid']) && is_null($options['selectDServices'])){
 						if(!isset($result[$host['hostid']]['dservices']))
 							$result[$host['hostid']]['dservices'] = array();
 
@@ -1045,7 +1045,7 @@ Copt::memoryPick();
 		}
 
 // Adding discovery hosts
-		if(!is_null($options['select_dhosts'])){
+		if(!is_null($options['selectDHosts'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'hostids' => $hostids,
@@ -1053,8 +1053,8 @@ Copt::memoryPick();
 				'preservekeys' => 1
 			);
 
-			if(is_array($options['select_dhosts']) || str_in_array($options['select_dhosts'], $subselects_allowed_outputs)){
-				$obj_params['output'] = $options['select_dhosts'];
+			if(is_array($options['selectDHosts']) || str_in_array($options['selectDHosts'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['selectDHosts'];
 				$dhosts = API::DHost()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($dhosts, 'dhostid');
@@ -1075,7 +1075,7 @@ Copt::memoryPick();
 					}
 				}
 			}
-			else if(API_OUTPUT_COUNT == $options['select_dhosts']){
+			else if(API_OUTPUT_COUNT == $options['selectDHosts']){
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
@@ -1823,38 +1823,36 @@ Copt::memoryPick();
 
 
 // PROFILE {{{
-			if(isset($data['profile']) && !is_null($data['profile'])){
-				if(empty($data['profile'])){
-					$sql = 'DELETE FROM host_profile WHERE '.DBcondition('hostid', $hostids);
-					if(!DBexecute($sql))
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete profile'));
+		if(isset($data['profile']) && !is_null($data['profile'])){
+			if(empty($data['profile'])){
+				$sql = 'DELETE FROM host_profile WHERE '.DBcondition('hostid', $hostids);
+				if(!DBexecute($sql))
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete profile'));
+			}
+			else{
+				$existing_profiles = array();
+				$existing_profiles_db = DBselect('SELECT hostid FROM host_profile WHERE '.DBcondition('hostid', $hostids));
+				while($existing_profile = DBfetch($existing_profiles_db)){
+					$existing_profiles[] = $existing_profile['hostid'];
 				}
-				else{
-					$existing_profiles = array();
-					$existing_profiles_db = DBselect('SELECT hostid FROM host_profile WHERE '.DBcondition('hostid', $hostids));
-					while($existing_profile = DBfetch($existing_profiles_db)){
-						$existing_profiles[] = $existing_profile['hostid'];
-					}
 
 				$hostids_without_profile = array_diff($hostids, $existing_profiles);
 
-					foreach($hostids_without_profile as $hostid){
-						$data['profile']['hostid'] = $hostid;
-						DB::insert('host_profile', array($data['profile']), false);
-					}
+				foreach($hostids_without_profile as $hostid){
+					$data['profile']['hostid'] = $hostid;
+					DB::insert('host_profile', array($data['profile']), false);
+				}
 
-					if(!empty($existing_profiles)){
-						DB::update('host_profile', array(
-							'values' => $data['profile'],
-							'where' => array(DBcondition('hostid', $existing_profiles))
-						));
-					}
+				if(!empty($existing_profiles)){
+					DB::update('host_profile', array(
+						'values' => $data['profile'],
+						'where' => array('hostid' => $existing_profiles)
+					));
 				}
 			}
 		}
 // }}} PROFILE
 
-			return array('hostids' => $hostids);
 		return array('hostids' => $hostids);
 	}
 

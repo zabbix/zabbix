@@ -73,7 +73,7 @@ class CDiscoveryRule extends CItemGeneral{
 			'selectHosts'			=> null,
 			'selectTriggers'		=> null,
 			'selectGraphs'			=> null,
-			'select_prototypes'		=> null,
+			'selectPrototypes'		=> null,
 			'countOutput'			=> null,
 			'groupCount'			=> null,
 			'preservekeys'			=> null,
@@ -305,7 +305,7 @@ class CDiscoveryRule extends CItemGeneral{
 					if(!is_null($options['selectGraphs']) && !isset($result[$item['itemid']]['graphs'])){
 						$result[$item['itemid']]['graphs'] = array();
 					}
-					if(!is_null($options['select_prototypes']) && !isset($result[$item['itemid']]['prototypes'])){
+					if(!is_null($options['selectPrototypes']) && !isset($result[$item['itemid']]['prototypes'])){
 						$result[$item['itemid']]['prototypes'] = array();
 					}
 
@@ -450,7 +450,7 @@ COpt::memoryPick();
 		}
 
 // Adding prototypes
-		if(!is_null($options['select_prototypes'])){
+		if(!is_null($options['selectPrototypes'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'discoveryids' => $itemids,
@@ -458,8 +458,8 @@ COpt::memoryPick();
 				'preservekeys' => 1,
 			);
 
-			if(is_array($options['select_prototypes']) || str_in_array($options['select_prototypes'], $subselects_allowed_outputs)){
-				$obj_params['output'] = $options['select_prototypes'];
+			if(is_array($options['selectPrototypes']) || str_in_array($options['selectPrototypes'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['selectPrototypes'];
 				$prototypes = API::Item()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($prototypes, 'description');
@@ -478,7 +478,7 @@ COpt::memoryPick();
 					}
 				}
 			}
-			else if(API_OUTPUT_COUNT == $options['select_prototypes']){
+			else if(API_OUTPUT_COUNT == $options['selectPrototypes']){
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
