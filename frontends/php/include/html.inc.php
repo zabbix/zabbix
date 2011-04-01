@@ -59,9 +59,8 @@
 		$pos = zbx_stripos($haystack,$needle);
 		if($pos !== FALSE){
 			$start = zbx_substring($haystack, 0, $pos);
-//			$middle = substr($haystack, $pos, zbx_strlen($needle));
 			$middle = $needle;
-			$end = substr($haystack, $pos+zbx_strlen($needle));
+			$end = mb_substr($haystack, $pos+zbx_strlen($needle));
 
 			if(is_null($class)){
 				$result = array($start, bold($middle), $end);

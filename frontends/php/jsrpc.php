@@ -53,8 +53,8 @@ include_once('include/page_header.php');
 			$options = array(
 				'startSearch' => 1,
 				'search' => $search,
-				'output' => array('hostid', 'host'),
-				'sortfield' => 'host',
+				'output' => array('hostid', 'host', 'name'),
+				'sortfield' => 'name',
 				'limit' => 15
 			);
 

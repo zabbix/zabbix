@@ -372,7 +372,7 @@ include_once('include/page_header.php');
 	$db_hosts = array();
 	$db_hostids = array();
 
-	$sql = 'SELECT DISTINCT h.host,h.hostid '.
+	$sql = 'SELECT DISTINCT h.name,h.hostid '.
 			' FROM hosts h'.$sql_from.', items i '.
 				' LEFT JOIN items_applications ia ON ia.itemid=i.itemid'.
 			' WHERE ia.itemid is NULL '.
@@ -382,7 +382,7 @@ include_once('include/page_header.php');
 				' AND i.status='.ITEM_STATUS_ACTIVE.
 				' AND '.DBcondition('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
 				' AND '.DBcondition('h.hostid',$available_hosts).
-			' ORDER BY h.host';
+			' ORDER BY h.name';
 
 	$db_host_res = DBselect($sql);
 	while($db_host = DBfetch($db_host_res)){
@@ -394,7 +394,7 @@ include_once('include/page_header.php');
 
 	$tab_rows = array();
 
-	$sql = 'SELECT DISTINCT h.host,h.hostid,i.* '.
+	$sql = 'SELECT DISTINCT h.host as hostname,h.hostid,i.* '.
 			' FROM hosts h'.$sql_from.', items i '.
 				' LEFT JOIN items_applications ia ON ia.itemid=i.itemid'.
 			' WHERE ia.itemid is NULL '.
@@ -461,7 +461,7 @@ include_once('include/page_header.php');
 		array_push($app_rows, new CRow(array(
 			SPACE,
 			is_show_all_nodes()?($db_host['item_cnt']?SPACE:get_node_name_by_elid($db_item['itemid'])):null,
-			$_REQUEST['hostid']?NULL:($db_host['item_cnt']?SPACE:$db_item['host']),
+			$_REQUEST['hostid']?NULL:($db_host['item_cnt']?SPACE:$db_item['hostname']),
 			SPACE.SPACE.$description,
 			$lastclock,
 			new CCol($lastvalue),
@@ -513,7 +513,7 @@ include_once('include/page_header.php');
 		$table->addRow(array(
 			$link,
 			get_node_name_by_elid($db_host['hostid']),
-			($_REQUEST['hostid'] > 0)?NULL:$db_host['host'],
+			($_REQUEST['hostid'] > 0)?NULL:$db_host['name'],
 			$col
 		));
 

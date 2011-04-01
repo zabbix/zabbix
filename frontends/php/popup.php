@@ -521,19 +521,19 @@ include_once('include/page_header.php');
 			'nodeids' => $nodeid,
 			'groupids' => $groupid,
 			'output' => API_OUTPUT_EXTEND,
-			'sortfield' => 'host'
+			'sortfield' => 'name'
 		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 
 		$template_list = API::Template()->get($options);
 		foreach($template_list as $tnum => $host){
 
-			$chk = new CCheckBox('templates['.$host['hostid'].']', isset($templates[$host['hostid']]), null, $host['host']);
+			$chk = new CCheckBox('templates['.$host['hostid'].']', isset($templates[$host['hostid']]), null, $host['name']);
 			$chk->setEnabled(!isset($existed_templates[$host['hostid']]) && !isset($excludeids[$host['hostid']]));
 
 			$table->addRow(array(array(
 				$chk,
-				$host['host'])
+				$host['name'])
 			));
 		}
 

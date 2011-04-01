@@ -3151,7 +3151,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 					$do_down->onClick("return create_var('".$frmGraph->getName()."','move_down',".$gid.", true);");
 				}
 
-				$description = new CSpan($host['host'].': '.item_description($item),'link');
+				$description = new CSpan($host['name'].': '.item_description($item),'link');
 				$description->onClick(
 					'return PopUp("popup_gitem.php?list_name=items&dstfrm='.$frmGraph->getName().
 					url_param($only_hostid, false, 'only_hostid').
