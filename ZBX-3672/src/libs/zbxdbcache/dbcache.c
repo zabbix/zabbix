@@ -2214,7 +2214,7 @@ int	DCsync_history(int sync_type)
 
 		flush_mass_zabbix_syslog();
 
-		for (i = 0; i < history_num; i ++)
+		for (i = 0; i < history_num; i++)
 		{
 			if (history[i].value_type == ITEM_VALUE_TYPE_STR
 					|| history[i].value_type == ITEM_VALUE_TYPE_TEXT
