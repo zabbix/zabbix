@@ -92,8 +92,8 @@ class JMXItemChecker extends ItemChecker
 			jmxc = JMXConnectorFactory.connect(url, env);
 			mbsc = jmxc.getMBeanServerConnection();
 
-			for (ZabbixItem item : items)
-				values.put(getJSONValue(item));
+			for (String key : keys)
+				values.put(getJSONValue(key));
 		}
 		catch (Exception e)
 		{
@@ -111,8 +111,10 @@ class JMXItemChecker extends ItemChecker
 	}
 
 	@Override
-	protected String getStringValue(ZabbixItem item) throws Exception
+	protected String getStringValue(String key) throws Exception
 	{
+		ZabbixItem item = new ZabbixItem(key);
+
 		if (item.getKeyId().equals("jmx"))
 		{
 			if (2 != item.getArgumentCount())

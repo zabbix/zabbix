@@ -4,8 +4,11 @@ Changes for 1.9.4
 New features:
 
 Bug fixes:
+ - [ZBX-3658] fixed the whole request to Java proxy failing if it contains an invalid key (asaveljevs)
+ - [ZBX-3657] fixed errors while updating proxy configuration data (Sasha)
  - [ZBX-3656] fixed item filter by data type boolean (Vedmak)
- 
+ - [ZBX-3620] fixed error when delete application used in webscenario (Vedmak)
+
 --------------------------------------------------------------------------------
 Changes for 1.9.3
 
@@ -22,7 +25,7 @@ Bug fixes:
  - [ZBX-3623] fixed processing of nanoseconds for history data (Sasha)
  - [ZBX-3634] improved zabbix map API methods (Aly)
  - [ZBX-3579] fixed trigger popup menu in status of triggers (Vedmak)
- 
+
 --------------------------------------------------------------------------------
 Changes for 1.9.2
 
@@ -120,6 +123,11 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.5rc1
 
+ - [ZBX-3673] fixed processing of operators & and | in trigger and calculated items expressions (Sasha)
+ - [ZBX-3660] fixed macro resolving in map labels (Vedmak)
+ - [ZBX-3659] API exists() methods now return true/false instead of true/error (KB)
+ - [ZBX-2997] added global regular expression to be sent to proxies (for use with log, logrt and eventlog items) (rudolfs)
+ - [ZBX-1907] changed logging  - when a proxy fails to connect to the server it logs "Still unable to connect" message max once a minute (rudolfs)
  - [ZBX-3548] added IPV6_V6ONLY flag (where defined) for binding IPv4 and IPv6 interfaces separately (rudolfs)
  - [ZBX-3626] fixed bugs on map export: duplicate image decoding and duplicate map elements insertation; thanks to Takanori Suzuki (KB)
  - [ZBX-3453] improve performance of cpu collector (Sasha)
