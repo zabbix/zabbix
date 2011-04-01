@@ -66,7 +66,7 @@ static ssize_t	telnet_socket_read(int socket_fd, void *buf, size_t count)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%d errno:%d error:[%s]", __function_name, rc, errno, strerror(errno));
 
-		if (errno == EAGAIN)
+		if (EAGAIN == errno)
 		{
 			/* Wait a bit. If there is still an error or there is no error, but still */
 			/* no input available, we assume the other side has nothing more to say.  */
@@ -102,7 +102,7 @@ static ssize_t	telnet_socket_write(int socket_fd, const void *buf, size_t count)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%d errno:%d error:[%s]", __function_name, rc, errno, strerror(errno));
 
-		if (errno == EAGAIN)
+		if (EAGAIN == errno)
 		{
 			telnet_waitsocket(socket_fd, WAIT_WRITE);
 			continue;
@@ -188,7 +188,7 @@ static ssize_t	telnet_read(int socket_fd, char *buf, size_t *buf_left, size_t *b
 			}
 			break;
 		default:
-			if (*buf_left > 0)
+			if (0 < *buf_left)
 			{
 				buf[(*buf_offset)++] = (char)c1;
 				(*buf_left)--;
@@ -213,21 +213,21 @@ static void	convert_telnet_to_unix_eol(char *buf, size_t *offset)
 
 	for (i = 0; i < sz; i++)
 	{
-		if (i + 1 < sz && buf[i] == '\r' && buf[i + 1] == '\n')		/* CR+LF (Windows) */
+		if (i + 1 < sz && '\r' == buf[i] && '\n' == buf[i + 1])		/* CR+LF (Windows) */
 		{
 			buf[new_offset++] = '\n';
 			i++;
 		}
-		else if (i + 1 < sz && buf[i] == '\r' && buf[i + 1] == '\0')	/* CR+NUL */
+		else if (i + 1 < sz && '\r' == buf[i] && '\0' == buf[i + 1])	/* CR+NUL */
 		{
 			i++;
 		}
-		else if (i + 1 < sz && buf[i] == '\n' && buf[i + 1] == '\r')	/* LF+CR */
+		else if (i + 1 < sz && '\n' == buf[i] && '\r' == buf[i + 1])	/* LF+CR */
 		{
 			buf[new_offset++] = '\n';
 			i++;
 		}
-		else if (buf[i] == '\r')					/* CR */
+		else if ('\r' == buf[i])					/* CR */
 		{
 			buf[new_offset++] = '\n';
 		}
@@ -246,7 +246,7 @@ static void	convert_unix_to_telnet_eol(const char *buf, size_t offset, char *out
 
 	for (i = 0; i < offset; i++)
 	{
-		if (buf[i] != '\n')
+		if ('\n' != buf[i])
 		{
 			out_buf[(*out_offset)++] = buf[i];
 		}
@@ -260,7 +260,7 @@ static void	convert_unix_to_telnet_eol(const char *buf, size_t offset, char *out
 
 static char	telnet_lastchar(const char *buf, size_t offset)
 {
-	while (offset > 0)
+	while (0 < offset)
 	{
 		offset--;
 		if (buf[offset] != ' ')
@@ -287,7 +287,7 @@ static void	telnet_rm_prompt(const char *buf, size_t *offset)
 {
 	unsigned char	state = 0;	/* 0 - init, 1 - prompt */
 
-	while (*offset > 0)
+	while (0 < *offset)
 	{
 		(*offset)--;
 		if (0 == state && buf[*offset] == prompt_char)
@@ -448,7 +448,7 @@ int	telnet_execute(int socket_fd, const char *command, AGENT_RESULT *result, con
 	/* the middle of the output, but we still try to be helpful by	*/
 	/* removing additional prompts at least from the beginning	*/
 	for (i = 0; i < offset_lf; i++)
-		if (command_lf[i] == '\n')
+		if ('\n' == command_lf[i])
 			if (SUCCEED != telnet_rm_echo(buf, &offset, "$ ", 2) &&
 				SUCCEED != telnet_rm_echo(buf, &offset, "# ", 2) &&
 				SUCCEED != telnet_rm_echo(buf, &offset, "> ", 2) &&
