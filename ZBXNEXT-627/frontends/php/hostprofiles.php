@@ -113,7 +113,7 @@ else{
 			$hosts[$num]['pr_macaddress_a'] = $host['profile']['macaddress_a'];
 		}
 
-		order_result($hosts, getPageSortField('host'), getPageSortOrder());
+		order_result($hosts, getPageSortField('name'), getPageSortOrder());
 		$paging = getPagingLine($hosts);
 
 		foreach($hosts as $host){
