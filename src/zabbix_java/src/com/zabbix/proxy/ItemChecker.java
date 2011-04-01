@@ -48,7 +48,7 @@ abstract class ItemChecker
 	public static final String JSON_RESPONSE_SUCCESS = "success";
 
 	protected JSONObject request;
-	protected Vector<ZabbixItem> items;
+	protected Vector<String> keys;
 
 	protected ItemChecker(JSONObject request) throws ZabbixException
 	{
@@ -56,11 +56,11 @@ abstract class ItemChecker
 
 		try
 		{
-			JSONArray keys = request.getJSONArray(JSON_TAG_KEYS);
-			items = new Vector<ZabbixItem>();
+			JSONArray jsonKeys = request.getJSONArray(JSON_TAG_KEYS);
+			keys = new Vector<String>();
 
-			for (int i = 0; i < keys.length(); i++)
-				items.add(new ZabbixItem(keys.getString(i)));
+			for (int i = 0; i < jsonKeys.length(); i++)
+				keys.add(jsonKeys.getString(i));
 		}
 		catch (Exception e)
 		{
@@ -72,28 +72,28 @@ abstract class ItemChecker
 	{
 		JSONArray values = new JSONArray();
 
-		for (ZabbixItem item : items)
-			values.put(getJSONValue(item));
+		for (String key : keys)
+			values.put(getJSONValue(key));
 
 		return values;
 	}
 
-	protected final JSONObject getJSONValue(ZabbixItem item)
+	protected final JSONObject getJSONValue(String key)
 	{
 		JSONObject value = new JSONObject();
 
 		try
 		{
-			logger.debug("getting value for item '{}'", item.getKey());
-			String text = getStringValue(item);
-			logger.debug("received value '{}' for item '{}'", text, item.getKey());
+			logger.debug("getting value for item '{}'", key);
+			String text = getStringValue(key);
+			logger.debug("received value '{}' for item '{}'", text, key);
 			value.put(JSON_TAG_VALUE, text);
 		}
 		catch (Exception e1)
 		{
 			try
 			{
-				logger.debug("caught exception for item '{}'", item.getKey(), e1);
+				logger.debug("caught exception for item '{}'", key, e1);
 				value.put(JSON_TAG_ERROR, e1.getMessage());
 			}
 			catch (JSONException e2)
@@ -106,5 +106,5 @@ abstract class ItemChecker
 		return value;
 	}
 
-	protected abstract String getStringValue(ZabbixItem item) throws Exception;
+	protected abstract String getStringValue(String key) throws Exception;
 }

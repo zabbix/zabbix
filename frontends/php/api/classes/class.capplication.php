@@ -625,7 +625,7 @@ COpt::memoryPick();
 			);
 			$del_application_childs = $this->get($options);
 
-			$del_applications = array_merge($del_applications, $del_application_childs);
+			$del_applications = zbx_array_merge($del_applications, $del_application_childs);
 			$applicationids = array_merge($applicationids, $child_applicationids);
 
 //check if app is used by web scenario

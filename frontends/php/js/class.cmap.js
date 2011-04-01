@@ -59,6 +59,8 @@ selection: {
 menu_active: 0,						// To recognize D&D
 debug_status: 0,
 
+saved: false,						// sysmap save state (incorrect, used only in Selenium tests)
+
 mselement: {
 	selementid:			0,			// ALWAYS must be a STRING (js doesn't support uint64)
 	elementtype:		4,			// 5-UNDEFINED
@@ -289,6 +291,10 @@ add_empty_link: function(e){
 	this.update_linkContainer(e);
 },
 
+sysmapSaved: function(){
+	this.saved = true;
+},
+
 // SYSMAP FORM
 saveSysmap: function(){
 	this.debug('saveSysmap');
@@ -309,7 +315,7 @@ saveSysmap: function(){
 					{
 						'method': 'post',
 						'parameters':params,
-						'onSuccess': function(){ },
+						'onSuccess': this.sysmapSaved.bind(this),
 //						'onSuccess': function(resp){ SDI(resp.responseText); },
 						'onFailure': function(){ document.location = url.getPath()+'?'+Object.toQueryString(params); }
 					}
