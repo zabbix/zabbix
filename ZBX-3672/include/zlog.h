@@ -24,9 +24,6 @@
 
 extern int	CONFIG_ENABLE_LOG;
 
-void	init_mass_zabbix_syslog();
-void	flush_mass_zabbix_syslog();
-
 #ifdef HAVE___VA_ARGS__
 #	define zabbix_syslog(fmt, ...) __zbx_zabbix_syslog(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
 #else

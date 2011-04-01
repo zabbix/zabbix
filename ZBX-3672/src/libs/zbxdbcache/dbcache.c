@@ -2183,7 +2183,6 @@ int	DCsync_history(int sync_type)
 		if (0 == history_num)
 			break;
 
-		init_mass_zabbix_syslog();
 		DCinit_nextchecks();
 
 		DBbegin();
@@ -2211,8 +2210,6 @@ int	DCsync_history(int sync_type)
 			uint64_array_remove(cache->itemids, &cache->itemids_num, &history[i].itemid, 1);
 
 		UNLOCK_CACHE;
-
-		flush_mass_zabbix_syslog();
 
 		for (i = 0; i < history_num; i++)
 		{
