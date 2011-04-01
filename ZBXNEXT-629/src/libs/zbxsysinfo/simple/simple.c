@@ -134,6 +134,47 @@ static int	check_ssh(const char *host, unsigned short port, int timeout, int *va
 	return SYSINFO_RET_OK;
 }
 
+#ifdef	HAVE_LIBCURL
+static int	check_https(const char *host, unsigned short port, int timeout, int *value_int)
+{
+	const char	*__function_name = "check_https";
+	int		err, opt;
+	char		https_host[MAX_BUFFER_LEN];
+	CURL            *easyhandle = NULL;
+
+	*value_int = 0;
+
+	if (NULL == (easyhandle = curl_easy_init()))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: could not init cURL library", __function_name);
+		goto clean;
+	}
+
+	zbx_snprintf(https_host, sizeof(https_host), "%s%s", (0 == strncmp(host, "https://", 8)) ? "" : "https://", host);
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_URL, https_host)) ||
+		CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_PORT, port)) ||
+		CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_NOBODY, 1)) ||
+		CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYPEER, 0)) ||
+		CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYHOST, 0)) ||
+		CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_TIMEOUT, timeout)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: could not set cURL option [%d]: %s",
+				__function_name, opt, curl_easy_strerror(err));
+		goto clean;
+	}
+
+	if (CURLE_OK == (err = curl_easy_perform(easyhandle)))
+		*value_int = 1;
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: curl_easy_perform failed for [%s:%d]: %s",
+				__function_name, host, port, curl_easy_strerror(err));
+clean:
+	curl_easy_cleanup(easyhandle);
+	return SYSINFO_RET_OK;
+}
+#endif	/* HAVE_LIBCURL */
+
 static int	check_telnet(const char *host, unsigned short port, int timeout, int *value_int)
 {
 	zbx_sock_t	s;
@@ -252,6 +293,14 @@ static int	check_service(const char *cmd, const char *param, unsigned flags, AGE
 			return ret;
 		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, NULL, NULL, &value_int);
 	}
+#ifdef	HAVE_LIBCURL
+	else if (0 == strcmp(service, "https"))
+	{
+		if ('\0' == *str_port)
+			port = ZBX_DEFAULT_HTTPS_PORT;
+		ret = check_https(ip, port, CONFIG_TIMEOUT, &value_int);
+	}
+#endif	/* HAVE_LIBCURL */
 	else if (0 == strcmp(service, "telnet"))
 	{
 		if ('\0' == *str_port)
