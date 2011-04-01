@@ -168,7 +168,6 @@ function addPopupValues(list){
 					jQuery("#uniqList").append(tpl.evaluate(value));
 				}
 
-				uniqList
 				break;
 //			if(in_array($data['type'], array(SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2, SVC_SNMPv3)))
 //				$cmbUniquenessCriteria->addItem($id, $data['name']);
