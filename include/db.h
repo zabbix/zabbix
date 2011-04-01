@@ -561,7 +561,7 @@ int	DBget_row_count(const char *table_name);
 int	DBget_items_unsupported_count();
 int	DBget_queue_count(int from, int to);
 double	DBget_requiredperformance();
-zbx_uint64_t DBget_proxy_lastaccess(const char *hostname);
+int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error);
 
 char	*DBdyn_escape_string(const char *src);
 char	*DBdyn_escape_string_len(const char *src, int max_src_len);

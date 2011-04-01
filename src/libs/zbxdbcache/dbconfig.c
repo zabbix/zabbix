@@ -19,7 +19,6 @@
 
 #include "common.h"
 #include "log.h"
-#include "zlog.h"
 #include "threads.h"
 
 #include "dbcache.h"

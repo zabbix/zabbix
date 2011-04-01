@@ -24,7 +24,6 @@
 #include "db.h"
 #include "dbcache.h"
 #include "log.h"
-#include "zlog.h"
 #include "zbxgetopt.h"
 #include "mutexs.h"
 
