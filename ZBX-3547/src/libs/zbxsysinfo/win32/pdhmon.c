@@ -61,7 +61,7 @@ int	PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	char				counter_path[PDH_MAX_COUNTER_PATH],
 					tmp[MAX_STRING_LEN];
 	int				ret = SYSINFO_RET_FAIL, interval;
-	PERF_COUNTERS			*perfs;
+	PERF_COUNTERS			*perfs = NULL;
 	LPTSTR				wcounter_path;
 
 	if (2 < num_param(param))
@@ -88,8 +88,8 @@ int	PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	{
 		if (!PERF_COLLECTOR_STARTED(collector))
 		{
-			SET_MSG_RESULT(result, strdup("Collector is not started!"));
-			return SYSINFO_RET_OK;
+			zabbix_log(LOG_LEVEL_DEBUG, "Collector is not started!");
+			return SYSINFO_RET_FAIL;
 		}
 
 		for (perfs = collector->perfs.pPerfCounterList; perfs != NULL; perfs = perfs->next)
@@ -97,14 +97,14 @@ int	PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 			if (NULL == perfs->name && 0 == strcmp(perfs->counterPath, counter_path) && perfs->interval == interval)
 			{
 				if (ITEM_STATUS_NOTSUPPORTED == perfs->status)
-					SET_MSG_RESULT(result, strdup(perfs->error));
-				else
-					SET_DBL_RESULT(result, perfs->lastValue);
+					break;
+
+				SET_DBL_RESULT(result, perfs->lastValue);
 				return SYSINFO_RET_OK;
 			}
 		}
 
-		if (FAIL == add_perf_counter(NULL, counter_path, interval))
+		if (NULL == perfs && FAIL == add_perf_counter(NULL, counter_path, interval))
 			return SYSINFO_RET_FAIL;
 	}
 
@@ -140,6 +140,14 @@ int	PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 
 					if (ERROR_SUCCESS == status)
 					{
+						if (NULL != perfs)
+						{
+							perfs->status = ITEM_STATUS_ACTIVE;
+							perfs->lastValue = counterValue.doubleValue;
+							perfs->CurrentCounter++;
+							perfs->CurrentNum++;
+						}
+
 						SET_DBL_RESULT(result, counterValue.doubleValue);
 						ret = SYSINFO_RET_OK;
 					}
