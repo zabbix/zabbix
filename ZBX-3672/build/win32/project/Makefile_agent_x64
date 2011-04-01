@@ -22,7 +22,7 @@ $(PROGNAME): $(MESSAGES_H) $(OBJS) $(RESOURCE_H)
 	$(MT) /outputresource:"$(PROGNAME);#1" /manifest zabbix_agentd.exe.manifest /nologo
 
 $(MESSAGES_H): messages.mc
-	$(MC) -U -s -h ".\\" -r ".\\" messages.mc
+	$(MC) -U -h ".\\" -r ".\\" messages.mc
 
 $(RESOURCE_H): resource.rc
 	$(RC) /d "NDEBUG" /d "_VC80_UPGRADE=0x0600" /l 0x419 /fo"$(RESOURCE_H)" resource.rc
