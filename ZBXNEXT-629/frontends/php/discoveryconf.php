@@ -69,28 +69,26 @@ include_once('include/page_header.php');
 ?>
 <?php
 	if(inarr_isset('save')){
+		DBstart();
 		if(inarr_isset('druleid')){ /* update */
 			$msg_ok = S_DISCOVERY_RULE_UPDATED;
 			$msg_fail = S_CANNOT_UPDATE_DISCOVERY_RULE;
 
-			DBstart();
 			$result = update_discovery_rule($_REQUEST["druleid"], $_REQUEST["proxy_hostid"], $_REQUEST['name'],
 				$_REQUEST['iprange'], $_REQUEST['delay'], $_REQUEST['status'], $_REQUEST['dchecks'],
 				$_REQUEST['uniqueness_criteria']);
 
-			$result = DBend($result);
 			$druleid = $_REQUEST["druleid"];
 		}
 		else{ /* add new */
 			$msg_ok = S_DISCOVERY_RULE_ADDED;
 			$msg_fail = S_CANNOT_ADD_DISCOVERY_RULE;
 
-			DBstart();
-			$druleid = add_discovery_rule($_REQUEST["proxy_hostid"], $_REQUEST['name'], $_REQUEST['iprange'],
+			$result = $druleid = add_discovery_rule($_REQUEST["proxy_hostid"], $_REQUEST['name'], $_REQUEST['iprange'],
 				$_REQUEST['delay'], $_REQUEST['status'], $_REQUEST['dchecks'], $_REQUEST['uniqueness_criteria']);
-
-			$result = $result = DBend($druleid);
 		}
+
+		$result = DBend($result);
 
 		show_messages($result, $msg_ok, $msg_fail);
 
@@ -158,7 +156,12 @@ include_once('include/page_header.php');
 	$form_button = new CForm('get');
 	if(!isset($_REQUEST['form'])){
 		$form_button->cleanItems();
-		$form_button->addItem(new CSubmit('form', S_CREATE_RULE));
+
+		$buttons = new CDiv(array(
+			new CSubmit('form', S_CREATE_RULE)
+		));
+		$buttons->useJQueryStyle();
+		$form_button->addItem($buttons);
 	}
 
 	$dscry_wdgt = new CWidget();
@@ -203,7 +206,7 @@ include_once('include/page_header.php');
 		$numrows->setAttribute('name', 'numrows');
 
 		$dscry_wdgt->addHeader(S_DISCOVERY_BIG);
-		$dscry_wdgt->addHeader($numrows);
+		$dscry_wdgt->addHeader($numrows, $form_button);
 /* table */
 		$form = new CForm();
 		$form->setName('frmdrules');
