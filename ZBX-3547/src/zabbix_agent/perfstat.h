@@ -39,7 +39,6 @@ struct zbx_perfs
    int			CurrentCounter;
    int			CurrentNum;
    int			status;
-   char			*error;
 };
 
 typedef struct zbx_perfs PERF_COUNTERS;

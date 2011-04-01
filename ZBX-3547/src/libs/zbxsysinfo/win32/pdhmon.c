@@ -26,13 +26,12 @@
 int	USER_PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	PERF_COUNTERS	*perfs = NULL;
-
-	int	ret = SYSINFO_RET_FAIL;
+	int		ret = SYSINFO_RET_FAIL;
 
 	if (!PERF_COLLECTOR_STARTED(collector))
 	{
-		SET_MSG_RESULT(result, strdup("Collector is not started!"));
-		return SYSINFO_RET_OK;
+		zabbix_log(LOG_LEVEL_DEBUG, "Collector is not started!");
+		return ret;
 	}
 
 	for (perfs = collector->perfs.pPerfCounterList; perfs; perfs=perfs->next)
@@ -40,9 +39,9 @@ int	USER_PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_
 		if (NULL != perfs->name && 0 == strcmp(perfs->name, param))
 		{
 			if (ITEM_STATUS_NOTSUPPORTED == perfs->status)
-				SET_MSG_RESULT(result, strdup(perfs->error));
-			else
-				SET_DBL_RESULT(result, perfs->lastValue);
+				return ret;
+
+			SET_DBL_RESULT(result, perfs->lastValue);
 			ret = SYSINFO_RET_OK;
 			break;
 		}
@@ -53,16 +52,15 @@ int	USER_PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_
 
 int	PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	HQUERY				query;
-	HCOUNTER			counter;
-	PDH_STATUS			status;
-	PDH_RAW_COUNTER			rawData, rawData2;
-	PDH_FMT_COUNTERVALUE		counterValue;
-	char				counter_path[PDH_MAX_COUNTER_PATH],
-					tmp[MAX_STRING_LEN];
-	int				ret = SYSINFO_RET_FAIL, interval;
-	PERF_COUNTERS			*perfs = NULL;
-	LPTSTR				wcounter_path;
+	HQUERY			query;
+	HCOUNTER		counter;
+	PDH_STATUS		status;
+	PDH_RAW_COUNTER		rawData, rawData2;
+	PDH_FMT_COUNTERVALUE	counterValue;
+	char			counter_path[PDH_MAX_COUNTER_PATH], tmp[MAX_STRING_LEN];
+	int			ret = SYSINFO_RET_FAIL, interval;
+	PERF_COUNTERS		*perfs = NULL;
+	LPTSTR			wcounter_path;
 
 	if (2 < num_param(param))
 		return SYSINFO_RET_FAIL;
