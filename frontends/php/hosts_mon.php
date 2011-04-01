@@ -52,7 +52,7 @@ include_once('include/page_header.php');
 
 // OUTER DATA
 	check_fields($fields);
-	validate_sort_and_sortorder('host', ZBX_SORT_UP);
+	validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go', 'none');
 
@@ -160,7 +160,7 @@ include_once('include/page_header.php');
 // table HOSTS
 	$table = new CTableInfo(S_NO_HOSTS_DEFINED);
 	$table->setHeader(array(
-		make_sorting_header(S_NAME, 'host'),
+		make_sorting_header(S_NAME, 'name'),
 		S_APPLICATIONS,
 		S_ITEMS,
 		S_TRIGGERS,
@@ -170,7 +170,7 @@ include_once('include/page_header.php');
 	));
 
 // get Hosts
-	$sortfield = getPageSortField('host');
+	$sortfield = getPageSortField('name');
 	$sortorder = getPageSortOrder();
 
 	if($pageFilter->groupsSelected){
