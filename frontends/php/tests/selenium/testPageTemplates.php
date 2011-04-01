@@ -35,7 +35,7 @@ class testPageTemplates extends CWebTest
 	public function testPageTemplates_SimpleTest($template)
 	{
 		$this->login('templates.php');
-		$this->dropdown_select('groupid','Templates');
+		$this->dropdown_select_wait('groupid','Templates');
 //		$this->wait();
 		$this->assertTitle('Templates');
 		$this->ok('CONFIGURATION OF TEMPLATES');

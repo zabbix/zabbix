@@ -578,7 +578,7 @@ void	DBupdate_triggers_status_after_restart()
 	DB_RESULT	result2;
 	DB_ROW		row;
 	DB_ROW		row2;
-	zbx_uint64_t	itemid, triggerid;
+	zbx_uint64_t	interfaceid, itemid, triggerid;
 	int		trigger_type, trigger_value, trigger_flags,
 			type, lastclock, delay, nextcheck, min_nextcheck, now;
 	const char	*trigger_error;
@@ -618,7 +618,7 @@ void	DBupdate_triggers_status_after_restart()
 		trigger_error = row[4];
 
 		result2 = DBselect(
-				"select distinct i.itemid,i.type,i.lastclock,i.delay,i.delay_flex"
+				"select distinct i.itemid,i.type,i.lastclock,i.delay,i.delay_flex,i.interfaceid"
 				" from items i,functions f,triggers t"
 				" where i.itemid=f.itemid"
 					" and f.triggerid=t.triggerid"
@@ -632,13 +632,11 @@ void	DBupdate_triggers_status_after_restart()
 		{
 			ZBX_STR2UINT64(itemid, row2[0]);
 			type = atoi(row2[1]);
-			if (SUCCEED == DBis_null(row2[2]))
-				lastclock = 0;
-			else
-				lastclock = atoi(row2[2]);
+			lastclock = (SUCCEED == DBis_null(row2[2]) ? 0 : atoi(row2[2]));
 			delay = atoi(row2[3]);
+			ZBX_DBROW2UINT64(interfaceid, row2[5]);
 
-			nextcheck = calculate_item_nextcheck(itemid, type, delay, row2[4], lastclock, NULL);
+			nextcheck = calculate_item_nextcheck(interfaceid, itemid, type, delay, row2[4], lastclock, NULL);
 			if (-1 == min_nextcheck || nextcheck < min_nextcheck)
 				min_nextcheck = nextcheck;
 		}
@@ -830,7 +828,7 @@ int	DBget_queue_count(int from, int to)
 	int		count = 0, now;
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	itemid, proxy_hostid;
+	zbx_uint64_t	interfaceid, itemid, proxy_hostid;
 	int		item_type, delay, effective_delay, nextcheck;
 	char		*delay_flex;
 	time_t		lastclock;
@@ -840,7 +838,7 @@ int	DBget_queue_count(int from, int to)
 	now = time(NULL);
 
 	result = DBselect(
-			"select i.itemid,i.type,i.delay,i.delay_flex,i.lastclock,h.proxy_hostid"
+			"select i.itemid,i.type,i.delay,i.delay_flex,i.lastclock,i.interfaceid,h.proxy_hostid"
 			" from items i,hosts h"
 			" where i.hostid=h.hostid"
 				" and h.status=%d"
@@ -856,6 +854,7 @@ int	DBget_queue_count(int from, int to)
 					" or (h.available<>%d and i.type in (%d))"
 					" or (h.snmp_available<>%d and i.type in (%d,%d,%d))"
 					" or (h.ipmi_available<>%d and i.type in (%d))"
+					" or (h.jmx_available<>%d and i.type in (%d))"
 					")"
 				DB_NODE,
 			HOST_STATUS_MONITORED,
@@ -872,19 +871,25 @@ int	DBget_queue_count(int from, int to)
 				ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3,
 			HOST_AVAILABLE_FALSE,
 				ITEM_TYPE_IPMI,
+			HOST_AVAILABLE_FALSE,
+				ITEM_TYPE_JMX,
 			DBnode_local("i.itemid"));
+
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(itemid, row[0]);
 		item_type	= atoi(row[1]);
 		delay		= atoi(row[2]);
 		delay_flex	= row[3];
-		ZBX_DBROW2UINT64(proxy_hostid, row[5]);
+		ZBX_DBROW2UINT64(interfaceid, row[5]);
+		ZBX_DBROW2UINT64(proxy_hostid, row[6]);
 
 		if (FAIL == (lastclock = DCget_item_lastclock(itemid)))
 			lastclock = (time_t)atoi(row[4]);
 
-		nextcheck = calculate_item_nextcheck(itemid, item_type, delay, delay_flex, lastclock, &effective_delay);
+		nextcheck = calculate_item_nextcheck(interfaceid, itemid, item_type,
+				delay, delay_flex, lastclock, &effective_delay);
+
 		if (0 != proxy_hostid)
 			nextcheck = lastclock + effective_delay;
 
@@ -1445,7 +1450,7 @@ const ZBX_TABLE *DBget_table(const char *tablename)
 {
 	int	t;
 
-	for (t = 0; tables[t].table != 0; t++ )
+	for (t = 0; NULL != tables[t].table; t++)
 		if (0 == strcmp(tables[t].table, tablename))
 			return &tables[t];
 	return NULL;
@@ -1455,7 +1460,7 @@ const ZBX_FIELD *DBget_field(const ZBX_TABLE *table, const char *fieldname)
 {
 	int	f;
 
-	for (f = 0; table->fields[f].name != 0; f++ )
+	for (f = 0; NULL != table->fields[f].name; f++)
 		if (0 == strcmp(table->fields[f].name, fieldname))
 			return &table->fields[f];
 	return NULL;

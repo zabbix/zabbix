@@ -31,7 +31,8 @@ class CAPIObject{
 		if(!isset(CWebUser::$data['sessionid']))
 			CWebUser::$data['sessionid'] = null;
 
-		$result = czbxrpc::call($this->_name.'.'.$method, $params[0], CWebUser::$data['sessionid']);
+		$param = empty($params) ? null : reset($params);
+		$result = czbxrpc::call($this->_name.'.'.$method, $param, CWebUser::$data['sessionid']);
 
 		if(isset($result['result'])){
 			return $result['result'];

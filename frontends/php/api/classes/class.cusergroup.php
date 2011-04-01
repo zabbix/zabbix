@@ -90,10 +90,10 @@ class CUserGroup extends CZBXAPI{
 			unset($sql_parts['select']['usrgrp']);
 
 			$dbTable = DB::getSchema('usrgrp');
-			$sql_parts['select']['usrgrpid'] = ' g.usrgrpid';
+			$sql_parts['select']['usrgrpid'] = 'g.usrgrpid';
 			foreach($options['output'] as $key => $field){
 				if(isset($dbTable['fields'][$field]))
-					$sql_parts['select'][$field] = ' g.'.$field;
+					$sql_parts['select'][$field] = 'g.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;
@@ -498,7 +498,7 @@ class CUserGroup extends CZBXAPI{
 						'output' => API_OUTPUT_SHORTEN,
 					));
 					$group_exists = reset($group_exists);
-					if($group_exists && ($group_exists['usrgrpid'] != $usrgrpid)){
+					if($group_exists && (bccomp($group_exists['usrgrpid'],$usrgrpid) != 0) ){
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_GROUP . ' ' . $data['name'] . ' ' . S_ALREADY_EXISTS_SMALL);
 					}
 				}

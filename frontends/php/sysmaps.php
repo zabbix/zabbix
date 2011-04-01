@@ -160,12 +160,6 @@ include_once('include/page_header.php');
 
 	if(isset($_REQUEST['save'])){
 
-		$urls = get_request('urls', array());
-		foreach($urls as $unum => $url){
-			if($url['name'] === '' && $url['url'] === '')
-				unset($urls[$unum]);
-		}
-
 		$map = array(
 			'name' => $_REQUEST['name'],
 			'width' => $_REQUEST['width'],
@@ -188,8 +182,13 @@ include_once('include/page_header.php');
 			'label_type' => $_REQUEST['label_type'],
 			'label_location' => $_REQUEST['label_location'],
 			'show_unack' => get_request('show_unack', 0),
-			'urls' => $urls
+			'urls' => get_request('urls', array())
 		);
+
+		foreach($map['urls'] as $unum => $url){
+			if(zbx_empty($url['name']) && zbx_empty($url['url']))
+				unset($map['urls'][$unum]);
+		}
 
 		if(isset($_REQUEST['sysmapid'])){
 // TODO check permission by new value.
@@ -206,8 +205,9 @@ include_once('include/page_header.php');
 			$result = API::Map()->create($map);
 
 			add_audit_if($result, AUDIT_ACTION_ADD,AUDIT_RESOURCE_MAP, 'Name ['.$_REQUEST['name'].']');
-			show_messages($result, S_MAP_ADDED,S_CANNOT_ADD_MAP);
+			show_messages($result, S_MAP_ADDED, S_CANNOT_ADD_MAP);
 		}
+
 		if($result){
 			unset($_REQUEST['form']);
 		}

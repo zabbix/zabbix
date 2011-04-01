@@ -416,7 +416,7 @@ class CImage extends CZBXAPI{
 			$image_exists = $this->get($options);
 			$image_exists = reset($image_exists);
 
-			if($image_exists && ($image_exists['imageid'] != $image['imageid'])){
+			if($image_exists && (bccomp($image_exists['imageid'],$image['imageid']) != 0)){
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_IMAGE.' [ '.$image['name'].' ] '.S_ALREADY_EXISTS_SMALL);
 			}
 

@@ -340,6 +340,14 @@ class CScript extends CZBXAPI{
 	return $result;
 	}
 
+	private function _clearData(&$scripts){
+		foreach($scripts as $snum => $script){
+			if(isset($script['type']) && $script['type'] == ZBX_SCRIPT_TYPE_IPMI){
+				unset($scripts[$snum]['execute_on']);
+			}
+		}
+	}
+
 /**
  * Add Scripts
  *
@@ -349,14 +357,14 @@ class CScript extends CZBXAPI{
  * @return boolean
  */
 	public function create($scripts){
-
 		$scripts = zbx_toArray($scripts);
 
 		if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
 			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 		}
 
-		foreach($scripts as $snum => $script){
+		$scriptNames = array();
+		foreach($scripts as $script){
 			$script_db_fields = array(
 				'name' => null,
 				'command' => null,
@@ -364,8 +372,27 @@ class CScript extends CZBXAPI{
 			if(!check_db_fields($script_db_fields, $script)){
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for script'));
 			}
+
+			if(isset($scriptNames[$script['name']])){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate script name "%s"', $script['name']));
+			}
 		}
 
+			$scriptNames[$script['name']] = $script['name'];
+		}
+
+		$options = array(
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => true,
+			'filter' => array('name' => $scriptNames),
+			'limit' => 1,
+		);
+		$scriptsDB = $this->get($options);
+		if($exScript = reset($scriptsDB)){
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%s" already exists.', $exScript['name']));
+		}
+
+		$this->_clearData($scripts);
 		$scriptids = DB::insert('scripts', $scripts);
 
 		return array('scriptids' => $scriptids);
@@ -380,8 +407,8 @@ class CScript extends CZBXAPI{
  * @return boolean
  */
 	public function update($scripts){
-		$scripts = zbx_toArray($scripts);
-		$scriptids = zbx_objectValues($scripts, 'scriptid');
+		$scripts = zbx_toHash($scripts, 'scriptid');
+		$scriptids = array_keys($scripts);
 
 		if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
 			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -390,20 +417,47 @@ class CScript extends CZBXAPI{
 		$options = array(
 			'scriptids' => $scriptids,
 			'output' => API_OUTPUT_SHORTEN,
-			'preservekeys' => 1
+			'preservekeys' => true
 		);
 		$upd_scripts = $this->get($options);
-		foreach($scripts as $snum => $script){
+		$scriptNames = array();
+		foreach($scripts as $script){
 			if(!isset($upd_scripts[$script['scriptid']])){
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script with scriptid [%s] does not exist.', $script['scriptid']));
 			}
+
+			if(isset($script['name'])){
+				if(isset($scriptNames[$script['name']])){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate script name "%s"', $script['name']));
+				}
+
+				$scriptNames[$script['name']] = $script['name'];
+			}
 		}
 
+
+		if(!empty($scriptNames)){
+			$options = array(
+				'output' => API_OUTPUT_EXTEND,
+				'preservekeys' => true,
+				'filter' => array('name' => $scriptNames),
+			);
+			$scriptsDB = $this->get($options);
+			foreach($scriptsDB as $exScript){
+				if(!isset($scripts[$exScript['scriptid']]) || (bccomp($scripts[$exScript['scriptid']]['scriptid'],$exScript['scriptid']) != 0)){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%s" already exists.', $exScript['name']));
+				}
+			}
+		}
+
+		$this->_clearData($scripts);
 		$update = array();
-		foreach($scripts as $num => $script){
+		foreach($scripts as $script){
+			$scriptid = $script['scriptid'];
+			unset($script['scriptid']);
 			$update[] = array(
 				'values' => $script,
-				'where' => array('scriptid'=>$script['scriptid']),
+				'where' => array('scriptid='.$scriptid),
 			);
 		}
 		DB::update('scripts', $update);
@@ -478,7 +532,7 @@ class CScript extends CZBXAPI{
 			'request' => 'command',
 			'nodeid' => id2nodeid($hostid),
 			'scriptid' => $scriptid,
-			'hostid' => $hostid
+			'hostid' => $hostid,
 		);
 		$dataToSend = $json->encode($array, false);
 
@@ -511,7 +565,6 @@ class CScript extends CZBXAPI{
 		}
 
 		if(strlen($response) > 0){
-			$json = new CJSON();
 			$rcv = $json->decode($response, true);
 		}
 		else{

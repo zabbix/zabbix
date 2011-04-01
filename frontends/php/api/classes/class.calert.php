@@ -105,10 +105,10 @@ class CAlert extends CZBXAPI{
 			unset($sql_parts['select']['alerts']);
 
 			$dbTable = DB::getSchema('alerts');
-			$sql_parts['select']['alertid'] = ' a.alertid';
+			$sql_parts['select']['alertid'] = 'a.alertid';
 			foreach($options['output'] as $key => $field){
 				if(isset($dbTable['fields'][$field]))
-					$sql_parts['select'][$field] = ' a.'.$field;
+					$sql_parts['select'][$field] = 'a.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;

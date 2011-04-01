@@ -381,17 +381,11 @@ if(isset($_REQUEST['sform'])){
 
 //	$frmTRLog->addRow(S_MULTIPLE_EVENTS,new CCheckBox('type', (($type == TRIGGER_MULT_EVENT_ENABLED)?'yes':'no'), null,1));
 
-	$sev_select = new CComboBox('priority',null);
-		$sev_select->addItem(TRIGGER_SEVERITY_NOT_CLASSIFIED,S_NOT_CLASSIFIED,(($priority == TRIGGER_SEVERITY_NOT_CLASSIFIED)?'on':'off'));
-		$sev_select->addItem(TRIGGER_SEVERITY_INFORMATION,S_INFORMATION,(($priority == TRIGGER_SEVERITY_INFORMATION)?'on':'off'));
-		$sev_select->addItem(TRIGGER_SEVERITY_WARNING,S_WARNING,(($priority == TRIGGER_SEVERITY_WARNING)?'on':'off'));
-		$sev_select->addItem(TRIGGER_SEVERITY_AVERAGE,S_AVERAGE,(($priority == TRIGGER_SEVERITY_AVERAGE)?'on':'off'));
-		$sev_select->addItem(TRIGGER_SEVERITY_HIGH,S_HIGH,(($priority == TRIGGER_SEVERITY_HIGH)?'on':'off'));
-		$sev_select->addItem(TRIGGER_SEVERITY_DISASTER,S_DISASTER,(($priority == TRIGGER_SEVERITY_DISASTER)?'on':'off'));
+	$sev_select = new CComboBox('priority', $priority);
+	$sev_select->addItems(getSeverityCaption());
+	$frmTRLog->addRow(S_SEVERITY, $sev_select);
 
-	$frmTRLog->addRow(S_SEVERITY,$sev_select);
-
-	$frmTRLog->addRow(S_COMMENTS,new CTextArea('comments',$comments));
+	$frmTRLog->addRow(S_COMMENTS, new CTextArea('comments',$comments));
 
 	$frmTRLog->addRow(S_URL,new CTextBox('url',$url,80));
 

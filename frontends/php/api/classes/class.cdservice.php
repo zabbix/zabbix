@@ -52,7 +52,6 @@ class CDService extends CZBXAPI{
  * @param boolean $options['selectGraphs'] select Graphs
  * @param boolean $options['selectApplications'] select Applications
  * @param boolean $options['selectMacros'] select Macros
- * @param boolean $options['select_profile'] select Profile
  * @param int $options['count'] count Services, returned column name is rowscount
  * @param string $options['pattern'] search hosts by pattern in Service name
  * @param string $options['extendPattern'] search hosts by pattern in Service name, ip and DNS
@@ -120,7 +119,7 @@ class CDService extends CZBXAPI{
 			$dbTable = DB::getSchema('dservices');
 			foreach($options['output'] as $key => $field){
 				if(isset($dbTable['fields'][$field]))
-					$sql_parts['select'][$field] = ' ds.'.$field;
+					$sql_parts['select'][$field] = 's.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;

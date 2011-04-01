@@ -89,12 +89,12 @@ class CProxy extends CZBXAPI{
 			unset($sql_parts['select']['hosts']);
 
 			$dbTable = DB::getSchema('hosts');
-			$sql_parts['select']['hostid'] = ' h.hostid';
+			$sql_parts['select']['hostid'] = 'h.hostid';
 			foreach($options['output'] as $key => $field){
 				if($field == 'proxyid') continue;
 
 				if(isset($dbTable['fields'][$field]))
-					$sql_parts['select'][$field] = ' h.'.$field;
+					$sql_parts['select'][$field] = 'h.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;
@@ -363,7 +363,7 @@ class CProxy extends CZBXAPI{
 					'filter' => array('host' => $proxy['host'])
 				));
 				foreach($proxiesExists as $exnum => $proxyExists){
-					if(!$update || ($proxyExists['proxyid'] != $proxy['proxyid'])){
+					if(!$update || (bccomp($proxyExists['proxyid'],$proxy['proxyid']) != 0)){
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host "%s" already exists.', $proxy['host']));
 					}
 				}

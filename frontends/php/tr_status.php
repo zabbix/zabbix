@@ -213,12 +213,12 @@ require_once('include/templates/scriptConfirm.js.php');
 	$severity_select = new CComboBox('show_severity', $show_severity);
 	$cb_items = array(
 		-1 => S_ALL_S,
-		TRIGGER_SEVERITY_NOT_CLASSIFIED => S_NOT_CLASSIFIED,
-		TRIGGER_SEVERITY_INFORMATION => S_INFORMATION,
-		TRIGGER_SEVERITY_WARNING => S_WARNING,
-		TRIGGER_SEVERITY_AVERAGE => S_AVERAGE,
-		TRIGGER_SEVERITY_HIGH => S_HIGH,
-		TRIGGER_SEVERITY_DISASTER => S_DISASTER,
+		TRIGGER_SEVERITY_NOT_CLASSIFIED => getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED),
+		TRIGGER_SEVERITY_INFORMATION => getSeverityCaption(TRIGGER_SEVERITY_INFORMATION),
+		TRIGGER_SEVERITY_WARNING => getSeverityCaption(TRIGGER_SEVERITY_WARNING),
+		TRIGGER_SEVERITY_AVERAGE => getSeverityCaption(TRIGGER_SEVERITY_AVERAGE),
+		TRIGGER_SEVERITY_HIGH => getSeverityCaption(TRIGGER_SEVERITY_HIGH),
+		TRIGGER_SEVERITY_DISASTER => getSeverityCaption(TRIGGER_SEVERITY_DISASTER),
 	);
 	$severity_select->addItems($cb_items);
 	$filterForm->addRow(S_MIN_SEVERITY, $severity_select);
@@ -298,7 +298,7 @@ require_once('include/templates/scriptConfirm.js.php');
 	$options = array(
 		'nodeids' => get_current_nodeid(),
 		'filter' => array(),
-		'active' => 1,
+		'monitored' => 1,
 		'output' => API_OUTPUT_EXTEND,
 		'skipDependent' => 1,
 		'sortfield' => $sortfield,
@@ -460,8 +460,9 @@ require_once('include/templates/scriptConfirm.js.php');
 
 		$menu_trigger_conf = 'null';
 		if($admin_links && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL){
-			$menu_trigger_conf = "['".S_CONFIGURATION_OF_TRIGGERS."',\"javascript:
-				redirect('triggers.php?form=update&triggerid=".$trigger['triggerid'].'&switch_node='.id2nodeid($trigger['triggerid'])."')\",
+			$str_tmp = zbx_jsvalue('javascript: redirect("triggers.php?form=update&triggerid='.
+					$trigger['triggerid'].'&switch_node='.id2nodeid($trigger['triggerid']).'")');
+			$menu_trigger_conf = "['".S_CONFIGURATION_OF_TRIGGERS."',". $str_tmp .",
 				null, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 		}
 		$menu_trigger_url = 'null';
@@ -623,7 +624,7 @@ require_once('include/templates/scriptConfirm.js.php');
 		}
 
 
-		$severity_col = new CCol(get_severity_description($trigger['priority']), get_severity_style($trigger['priority'], $trigger['value']));
+		$severity_col = getSeverityCell($trigger['priority'], null, !$trigger['value']);
 		if($show_event_col) $severity_col->setColSpan(2);
 
 

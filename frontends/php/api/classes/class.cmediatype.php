@@ -391,7 +391,7 @@ Copt::memoryPick();
 					$exist_mediatypes = $this->get($options);
 					$exist_mediatype = reset($exist_mediatypes);
 
-					if($exist_mediatype && ($exist_mediatype['mediatypeid'] != $mediatype['mediatypeid']))
+					if($exist_mediatype && (bccomp($exist_mediatype['mediatypeid'],$mediatype['mediatypeid']) != 0))
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_MEDIATYPE_ALREADY_EXISTS . ' ' . $mediatype['description']);
 				}
 

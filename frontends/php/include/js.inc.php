@@ -36,6 +36,26 @@ function zbx_jsvalue($value, $object = null){
 		return '['.implode(',',$value).']';
 }
 
+function encodeValues(&$value, $encodeTwice=true){
+	if(is_string($value)){
+		$value = htmlentities($value, ENT_COMPAT, 'UTF-8');
+
+		if($encodeTwice){
+			$value = htmlentities($value, ENT_COMPAT, 'UTF-8');
+		}
+	}
+	else if(is_array(($value))){
+		foreach($value as $key => $elem){
+			encodeValues($value[$key]);
+		}
+	}
+	else if(is_object(($value))){
+		foreach($value->items as $key => $item){
+			encodeValues($value->items[$key], false);
+		}
+	}
+}
+
 /* function:
  *     zbx_add_post_js
  *

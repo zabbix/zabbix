@@ -28,7 +28,7 @@ int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 
 	zbx_snprintf(counter_path, sizeof(counter_path), "\\%d\\%d", PCI_SYSTEM, PCI_SYSTEM_UP_TIME);
 
-	if (SYSINFO_RET_FAIL == PERF_MONITOR(cmd, counter_path, flags, result))
+	if (SYSINFO_RET_FAIL == PERF_COUNTER(cmd, counter_path, flags, result))
 		return SYSINFO_RET_FAIL;
 
 	/* result must be integer to correctly interpret it in frontend (uptime) */

@@ -364,10 +364,6 @@ include_once('include/page_header.php');
 			$template['templates_clear'] = $templates_clear;
 
 			$result = API::Template()->update($template);
-			if(!$result){
-				error(API::Template()->resetErrors());
-				$result = false;
-			}
 
 			$msg_ok = S_TEMPLATE_UPDATED;
 			$msg_fail = S_CANNOT_UPDATE_TEMPLATE;
@@ -376,13 +372,9 @@ include_once('include/page_header.php');
 			$created = 1;
 			$result = API::Template()->create($template);
 
-			if($result){
+			if($result)
 				$templateid = reset($result['templateids']);
-			}
-			else{
-				error(API::Template()->resetErrors());
-				$result = false;
-			}
+
 			$msg_ok = S_TEMPLATE_ADDED;
 			$msg_fail = S_CANNOT_ADD_TEMPLATE;
 		}

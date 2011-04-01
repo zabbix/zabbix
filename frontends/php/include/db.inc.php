@@ -1048,6 +1048,7 @@ if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
 		const FIELD_TYPE_FLOAT = 'float';
 		const FIELD_TYPE_UINT = 'uint';
 		const FIELD_TYPE_BLOB = 'blob';
+		const FIELD_TYPE_TEXT = 'text';
 
 		private static $schema = null;
 
@@ -1126,6 +1127,7 @@ if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
 		}
 
 		public static function checkValueTypes(&$tableSchema, &$values){
+			global $DB;
 			unset($values[$tableSchema['key']]);
 
 			foreach($values as $field => $value){
@@ -1141,7 +1143,6 @@ if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
 						$values[$field] = $tableSchema['fields'][$field]['default'];
 					else
 						self::exception(self::DBEXECUTE_ERROR, _s('Mandatory field "%1$s" is missing in table "%2$s".', $field, $table));
-
 				}
 
 				if(isset($tableSchema['fields'][$field]['ref_table'])){
@@ -1157,25 +1158,42 @@ if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
 				else{
 					switch($tableSchema['fields'][$field]['type']){
 						case self::FIELD_TYPE_CHAR:
-							if(zbx_strlen($values[$field]) > $tableSchema['fields'][$field]['length']){
-								self::exception(self::SCHEMA_ERROR, _s('Value "%1$s" is too long for field "%2$s" - %3$d characters. Allowed length is %4$d characters.',
-									$values[$field], $field, zbx_strlen($values[$field]), $tableSchema['fields'][$field]['length']));
-							}
-
 							$values[$field] = zbx_dbstr($values[$field]);
+
+// -2 is not to count ' around string
+							$length = zbx_strlen($values[$field]) - 2;
+
+							if($length > $tableSchema['fields'][$field]['length']){
+								self::exception(self::SCHEMA_ERROR, _s('Value "%1$s" is too long for field "%2$s" - %3$d characters. Allowed length is %4$d characters.',
+									$values[$field], $field, $length, $tableSchema['fields'][$field]['length']));
+							}
 							break;
 						case self::FIELD_TYPE_ID:
 						case self::FIELD_TYPE_UINT:
 							if(!zbx_ctype_digit($values[$field]))
 								self::exception(self::DBEXECUTE_ERROR, _s('Incorrect value "%1$s" for unsigned int field "%2$s".', $values[$field], $field));
+							$values[$field] = zbx_dbstr($values[$field]);
 							break;
 						case self::FIELD_TYPE_INT:
 							if(!zbx_is_int($values[$field]))
 								self::exception(self::DBEXECUTE_ERROR, _s('Incorrect value "%1$s" for int field "%2$s".', $values[$field], $field));
+							$values[$field] = zbx_dbstr($values[$field]);
 							break;
 						case self::FIELD_TYPE_FLOAT:
 							if(!is_numeric($values[$field]))
 								self::exception(self::DBEXECUTE_ERROR, _s('Incorrect value "%1$s" for float field "%2$s".', $values[$field], $field));
+							$values[$field] = zbx_dbstr($values[$field]);
+							break;
+						case self::FIELD_TYPE_TEXT:
+							$values[$field] = zbx_dbstr($values[$field]);
+
+							if(($DB['TYPE'] == ZBX_DB_DB2)){
+								$length = zbx_strlen($values[$field]) - 2;
+								if($length > 2048){
+									self::exception(self::SCHEMA_ERROR, _s('Value "%1$s" is too long for field "%2$s" - %3$d characters. Allowed length is 2048 characters.',
+										$values[$field], $field, $length));
+								}
+							}
 							break;
 					}
 				}
@@ -1232,7 +1250,7 @@ if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
 			$tableSchema = self::getSchema($table);
 
 			$data = zbx_toArray($data);
-			foreach($data as $dnum => $row){
+			foreach($data as $row){
 // check
 				self::checkValueTypes($tableSchema, $row['values']);
 				if(empty($row['values']))

@@ -541,16 +541,6 @@ include_once('include/page_header.php');
 				$error = new CDiv(SPACE,'status_icon iconok');
 			}
 
-			switch($trigger['priority']){
-				case 0: $priority = S_NOT_CLASSIFIED; break;
-				case 1: $priority = new CCol(S_INFORMATION, 'information'); break;
-				case 2: $priority = new CCol(S_WARNING, 'warning'); break;
-				case 3: $priority = new CCol(S_AVERAGE, 'average'); break;
-				case 4: $priority = new CCol(S_HIGH, 'high'); break;
-				case 5: $priority = new CCol(S_DISASTER, 'disaster'); break;
-				default: $priority = $trigger['priority'];
-			}
-
 			$status_link = 'triggers.php?go='.(($trigger['status'] == TRIGGER_STATUS_DISABLED) ? 'activate' : 'disable').
 				'&g_triggerid%5B%5D='.$triggerid;
 
@@ -575,7 +565,7 @@ include_once('include/page_header.php');
 
 			$table->addRow(array(
 				$cb,
-				$priority,
+				getSeverityCell($trigger['priority']),
 				$status,
 				$hosts,
 				$description,
