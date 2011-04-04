@@ -44,18 +44,18 @@
 </tr>
 <tr id="newCheckComunityRow" class="hidden">
 	<td><label for="new_check_comunity"><?php print(_('SNMP Comunity')); ?></label></td>
-	<td><input type="text" id="new_check_ports" name="new_check_comunity" value="" class="input text" size="20" maxlength="255"></td>
+	<td><input type="text" id="new_check_comunity" name="new_check_comunity" value="" class="input text" size="20" maxlength="255"></td>
 </tr>
 <tr id="newCheckKeyRow" class="hidden">
 	<td><label for="new_check_key_"><?php print(_('SNMP Key')); ?></label></td>
 	<td><input type="text" id="new_check_key_" name="new_check_key_" value="" class="input text" size="20" maxlength="255"></td>
 </tr>
 <tr id="newCheckSecNameRow" class="hidden">
-	<td><label for="new_check_securityname"><?php print(_('SNMPv3 Security name')); ?></label></td>
+	<td><label for="new_check_snmpv3_securityname"><?php print(_('SNMPv3 Security name')); ?></label></td>
 	<td><input type="text" id="new_check_snmpv3_securityname" name="new_check_snmpv3_securityname" value="" class="input text" size="20" maxlength="64"></td>
 </tr>
 <tr id="newCheckSecLevRow" class="hidden">
-	<td><label for="new_check_seclev"><?php print(_('SNMPv3 Security level')); ?></label></td>
+	<td><label for="new_check_snmpv3_securitylevel"><?php print(_('SNMPv3 Security level')); ?></label></td>
 	<td><select id="new_check_snmpv3_securitylevel" name="new_check_snmpv3_securitylevel" class="input select" size="1">
 		<option value="0"><?php print('noAuthNoPriv'); ?> </option>
 		<option value="1"><?php print('authNoPriv'); ?> </option>
