@@ -1,3 +1,7 @@
+Changes for 1.8.5
+
+ - [ZBX-3686] updated French translation; thanks to Joseph Bueno (Richlv)
+
 Changes for 1.8.5rc1
 
  - [ZBX-3672] fixed possible hang of history syncers when a zabbix[log] message added during process a history data (Sasha)
