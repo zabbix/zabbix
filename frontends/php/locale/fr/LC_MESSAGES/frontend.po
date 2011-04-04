@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-04-04 19:59+0300\n"
+"POT-Creation-Date: 2011-04-04 21:19+0300\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1159,7 +1159,7 @@ msgstr ""
 
 #: api/classes/class.chost.php:1800 config.php:555
 msgid "Cannot remove macro"
-msgstr ""
+msgstr "Impossible de supprimer la macro"
 
 #: include/locales/en_gb.inc.php:2132
 msgid "Cannot rename guest user"
@@ -1268,7 +1268,7 @@ msgstr "Impossible d'actualiser l'élément"
 #: api/classes/class.chost.php:1807 api/classes/class.ctemplate.php:1513
 #: config.php:560
 msgid "Cannot update macro"
-msgstr ""
+msgstr "Impossible de modifier la macro"
 
 #: include/locales/en_gb.inc.php:809
 msgid "Cannot update macros"
@@ -1719,7 +1719,7 @@ msgstr "Créer script"
 
 #: include/locales/en_gb.inc.php:2201
 msgid "Create trigger"
-msgstr ""
+msgstr "Créer le journal du déclencheur"
 
 #: config.php:648 include/locales/en_gb.inc.php:467
 msgid "Create value map"
@@ -2187,7 +2187,7 @@ msgstr "Supprimer les expressions régulières ?"
 
 #: screenconf.php:361
 msgid "Delete selected screens?"
-msgstr ""
+msgstr "Supprimer les écrans sélectionnés ?"
 
 #: include/locales/en_gb.inc.php:1752 scripts.php:303
 msgid "Delete selected scripts?"
@@ -2521,7 +2521,7 @@ msgstr "Ne pas conserver les tendances de plus de (en jours)"
 
 #: include/locales/en_gb.inc.php:2202
 msgid "Do you wish to replace the conditional expression?"
-msgstr ""
+msgstr "Remplacer l'expression conditionnelle ?"
 
 #: include/locales/en_gb.inc.php:412
 msgid "Dot"
@@ -2770,7 +2770,7 @@ msgstr "Description de l'erreur"
 
 #: include/locales/en_gb.inc.php:2018
 msgid "Error adding dependencies. Following dependencies are not allowed: 1) from a host trigger to a template trigger; 2) from a template trigger to a host trigger; 3) between template triggers, where templates have links to other templates."
-msgstr ""
+msgstr "Erreur à l'ajout de dépendances. Les dépendances suivantes ne sont pas autorisées: 1) depuis un déclencheur d'hôte vers un déclencheur de modèle; 2) depuis un déclencheur de modèle vers un déclencheur d'hôte; 3) entre déclencheurs de modèles, lorsque les modèles ont des liens vers d'autres modèles."
 
 #: include/locales/en_gb.inc.php:1341
 msgid "Error adding service time"
@@ -3576,7 +3576,7 @@ msgstr ""
 #: api/classes/class.chost.php:1500 api/classes/class.chost.php:1505
 #: api/classes/class.chost.php:1510 api/classes/class.chost.php:1519
 msgid "Host update failed"
-msgstr ""
+msgstr "La modification de l'hôte a échoué"
 
 #: hosts.php:452
 msgid "Host updated"
@@ -4318,7 +4318,7 @@ msgstr ""
 
 #: include/items.inc.php:1500
 msgid "Invalid key format"
-msgstr ""
+msgstr "Format de clé invalide"
 
 #: api/rpc/class.cjsonrpc.php:178
 msgid "Invalid method parameters."
@@ -4575,7 +4575,7 @@ msgstr "Clé"
 
 #: include/items.inc.php:1321
 msgid "Key cannot be empty"
-msgstr ""
+msgstr "La clé ne peut pas être vide"
 
 #: api/classes/class.citemgeneral.php:215
 msgid "Key does not match <grpmax|grpmin|grpsum|grpavg>[\"group\",\"key\",\"<last|min|max|avg|sum|count>\",\"numeric param\"]."
@@ -4584,13 +4584,13 @@ msgstr ""
 #: include/items.inc.php:1329
 #, php-format
 msgid "Key is too large: maximum %d characters"
-msgstr ""
+msgstr "La clé est trop longue: %d caractères maximum"
 
 #: include/items.inc.php:1351 include/items.inc.php:1391
 #: include/items.inc.php:1413 include/items.inc.php:1441
 #: include/items.inc.php:1490
 msgid "Key is valid"
-msgstr ""
+msgstr "La clé est valide"
 
 #: include/locales/en_gb.inc.php:1871
 msgid "Keyword"
@@ -4602,7 +4602,7 @@ msgstr "Kilo"
 
 #: include/locales/en_gb.inc.php:1799
 msgid "Korean (KO)"
-msgstr ""
+msgstr "Koréen (KO)"
 
 #: include/locales/en_gb.inc.php:603
 msgid "LATEST DATA"
@@ -5519,7 +5519,7 @@ msgstr ""
 
 #: popup.php:1714
 msgid "No discovery checks defined"
-msgstr ""
+msgstr "Aucun test de découverte défini"
 
 #: include/locales/en_gb.inc.php:102
 msgid "No discovery rules defined"
@@ -6043,7 +6043,7 @@ msgstr "Seuls les Super Admins peuvent créer des types de media"
 #. GETTEXT: Api exception
 #: api/classes/class.cusergroup.php:641
 msgid "Only Super Admins can delete User Groups."
-msgstr ""
+msgstr "Seuls les Super Admins peuvent supprimer des Groupes d'Utilisateurs."
 
 #: include/locales/en_gb.inc.php:2122
 msgid "Only Super Admins can delete Users"
@@ -6346,7 +6346,7 @@ msgstr "Aperçu"
 #: include/locales/en_gb.inc.php:241 include/locales/en_gb.inc.php:2218
 #: include/locales/en_gb.inc.php:2220
 msgid "Previous"
-msgstr "Précédent"
+msgstr "Précédents"
 
 #: include/hosts.inc.php:92
 msgid "Primary POC cell"
@@ -6800,7 +6800,7 @@ msgstr "SCENARIOS"
 
 #: include/locales/en_gb.inc.php:1472 screens.php:171 screens.php:211
 msgid "SCREENS"
-msgstr ""
+msgstr "ÉCRANS"
 
 #: include/locales/en_gb.inc.php:1754
 msgid "SCRIPT ERROR"
@@ -7030,12 +7030,12 @@ msgstr "Écran actualisé"
 #: include/locales/en_gb.inc.php:1484
 #, php-format
 msgid "Screen with id \"%d\" does not exist"
-msgstr ""
+msgstr "L'écran avec l'identifiant \"%d\" n'existe pas"
 
 #: include/locales/en_gb.inc.php:1483
 #, php-format
 msgid "Screen with name \"%s\" does not exist"
-msgstr ""
+msgstr "L'écran avec le nom \"%s\" n'existe pas"
 
 #: include/locales/en_gb.inc.php:1382 include/menu.inc.php:72
 #: include/menu.inc.php:180
@@ -7460,7 +7460,7 @@ msgstr "Diaporama modifié"
 
 #: include/locales.inc.php:73
 msgid "Slovak (SK)"
-msgstr ""
+msgstr "Slovaque (SK)"
 
 #: include/locales/en_gb.inc.php:1782
 msgid "Snooze"
@@ -8049,7 +8049,7 @@ msgstr "Description déclencheur"
 
 #: include/locales/en_gb.inc.php:1606
 msgid "Trigger form"
-msgstr ""
+msgstr "Formulaire déclencheur journal"
 
 #: api/classes/class.ctemplate.php:1657
 #, php-format
@@ -8470,7 +8470,7 @@ msgstr "Groupe d'utilisateurs"
 #: api/classes/class.cusergroup.php:654
 #, php-format
 msgid "User group [%1$s] is used in script [%2$s]."
-msgstr ""
+msgstr "Le groupe d'utilisateurs [%1$s] est utilisé dans le script [%2$s]."
 
 #: include/locales/en_gb.inc.php:510
 msgid "User group for database down message"
@@ -8927,7 +8927,7 @@ msgstr ""
 
 #: api/classes/class.chost.php:1546
 msgid "You do not have enough rights for operation"
-msgstr ""
+msgstr "Vous n'avez pas les permissions nécessaires pour cette opération"
 
 #: include/locales/en_gb.inc.php:2180
 msgid "You do not have permission to perform this operation"
@@ -9289,18 +9289,18 @@ msgstr "in"
 #: include/items.inc.php:1399 include/items.inc.php:1456
 #, php-format
 msgid "incorrect syntax near '%1$s' at position %2$d"
-msgstr ""
+msgstr "syntaxe incorrecte près de '%1$s' à la position %2$d"
 
 #: include/items.inc.php:1407 include/items.inc.php:1447
 #: include/items.inc.php:1484
 #, php-format
 msgid "incorrect usage of bracket symbols. '%s' found after final bracket."
-msgstr ""
+msgstr "utilisation incorrecte des crochets. '%s' trouvé après le crochet final."
 
 #: include/items.inc.php:1507
 #, php-format
 msgid "invalid character '%1$s' at position %2$d"
-msgstr ""
+msgstr "caractère invalide '%1$s' à la position %2$d"
 
 #: include/locales/en_gb.inc.php:2084
 msgid "is a minimal PHP memory limitation"
@@ -9624,14 +9624,80 @@ msgstr "yes"
 msgid "µ"
 msgstr "µ"
 
+#~ msgid "\""
+#~ msgstr "\""
+
+#~ msgid "\" deleted from host"
+#~ msgstr "\" supprimé de l'hôte"
+
+#~ msgid "(inherited from another template)."
+#~ msgstr "(hérité d'un autre modèle)."
+
+#~ msgid "(items are not identical)."
+#~ msgstr "(les éléments sont identiques)."
+
+#~ msgid "(seconds)"
+#~ msgstr "(secondes)"
+
+#~ msgid "(year"
+#~ msgstr "(année"
+
+#~ msgid ")"
+#~ msgstr ")"
+
+#~ msgid "- all -"
+#~ msgstr "- tous -"
+
+#~ msgid "Account is blocked for"
+#~ msgstr "Compte bloqué pour"
+
+#~ msgid "Action conditions"
+#~ msgstr "Conditions d'action"
+
+#~ msgid "Added new application"
+#~ msgstr "Nouvelle application ajoutée"
+
+#~ msgid "Added new item"
+#~ msgstr "Nouvel élément ajouté"
+
+#~ msgid "An item key must be used in trigger expression"
+#~ msgstr "une clé d'élément doit être utilisée dans l'expression du déclencheur"
+
 #~ msgid "An item with the Key"
 #~ msgstr "Un élément avec la clé"
 
 #~ msgid "Asset Tag"
 #~ msgstr "Etiquette d'Immobilisation"
 
+#~ msgid "Average problem"
+#~ msgstr "Problème moyen"
+
+#~ msgid "Can not use multiple host items for template graph"
+#~ msgstr "Impossible d'utiliser des élements de plusieurs hôtes pour un graphique modèle"
+
+#~ msgid "Cannot create application"
+#~ msgstr "Impossible de créer l'application"
+
+#~ msgid "Cannot delete selected actions."
+#~ msgstr "Impossible de supprimer les actions sélectionnées"
+
+#~ msgid "Cannot sync template"
+#~ msgstr "Impossible de synchroniser le modèle"
+
+#~ msgid "Cannot_update slideshow"
+#~ msgstr "Impossible de modifier le diaporama"
+
 #~ msgid "Check the key, please. Default example was passed"
 #~ msgstr "Merci de vérifier la clé. La valeur de l'exemple a été utilisée"
+
+#~ msgid "Connected as"
+#~ msgstr "Connecté en tant que"
+
+#~ msgid "Create Host"
+#~ msgstr "Créer hôte"
+
+#~ msgid "Create Template"
+#~ msgstr "Créer modèle"
 
 #~ msgid "Date HW Decommissioned"
 #~ msgstr "Date de retrait du matériel"
@@ -9644,6 +9710,9 @@ msgstr "µ"
 
 #~ msgid "Date HW Purchased"
 #~ msgstr "Date d'achat du matériel"
+
+#~ msgid "Delete selected action?"
+#~ msgstr "Supprimer les actions sélectionnées ?"
 
 #~ msgid "Device Chassis"
 #~ msgstr "Chassis de l'équipement"
@@ -9672,17 +9741,65 @@ msgstr "µ"
 #~ msgid "Device type"
 #~ msgstr "Type périphérique"
 
+#~ msgid "Do not add"
+#~ msgstr "Ne pas ajouter"
+
+#~ msgid "Download"
+#~ msgstr "Télécharger"
+
+#~ msgid "Download newly created locale file by pressing \"Download\"."
+#~ msgstr "Télécharger la nouvelle traduction en cliquant sur \"Télécharger\"."
+
+#~ msgid "Download speed for step \"%1$s\" of scenario \"%2$s\""
+#~ msgstr "Vitesse de chargement pour l'étape \"%1$s\" du scenario \"%2$s\""
+
+#~ msgid "Edit operation"
+#~ msgstr "Editer opération"
+
+#~ msgid "Edit trigger"
+#~ msgstr "Modifier déclencheur"
+
+#~ msgid "Enable escalations"
+#~ msgstr "Activer les escalades"
+
 #~ msgid "Enable selected hosts?"
 #~ msgstr "Activer les hôtes sélectionnés ?"
 
+#~ msgid "Error in item key:"
+#~ msgstr "Erreur dans la clé de l'élément:"
+
+#~ msgid "Escalation rules"
+#~ msgstr "Règles d'escalade"
+
+#~ msgid "Extend this array with Your locale like \"your_prefix\" => \"display_like\"."
+#~ msgstr "Etendre ce tableau avec votre langue \"votre_prefixe\" => \"Affichage\"."
+
 #~ msgid "Extended host profile"
 #~ msgstr "Profil d'hôte étendu"
+
+#~ msgid "Fill with default value"
+#~ msgstr "Remplir avec valeur par défaut"
+
+#~ msgid "For example see implementation of other locales."
+#~ msgstr "Pour des exemples, voir l'implémentation des autres traductions."
+
+#~ msgid "Found"
+#~ msgstr "Trouvé"
+
+#~ msgid "Graph \""
+#~ msgstr "Graphique \""
+
+#~ msgid "Graph \"%1$s\" already exists on \"%2$s\"."
+#~ msgstr "Le graphique \"%1$s\" existe déjà sur \"%2$s\"."
 
 #~ msgid "Group function"
 #~ msgstr "Fonction de groupe"
 
 #~ msgid "HW Architecture"
 #~ msgstr "Architecture HW"
+
+#~ msgid "Hide unknown"
+#~ msgstr "Cacher les inconnus"
 
 #~ msgid "Host MAC Address"
 #~ msgstr "Hôte - Adresse MAC"
@@ -9693,11 +9810,68 @@ msgstr "µ"
 #~ msgid "Host Subnet Mask"
 #~ msgstr "Hôte - Masque de sous-réseau"
 
+#~ msgid "Host group \"%1$s\" can not be deleted, because it is used in script \"%2$s\"."
+#~ msgstr "Le groupe d'hôtes \"%1$s\" ne peut pas être supprimé car il est utilisé dans le script \"%2$s\"."
+
+#~ msgid "Host name must not be longer than %1$d characters, [ %2$s ] is %3$d"
+#~ msgstr "Le nom de l'hôte ne doit pas dépasser %1$d caractères, [ %2$s ] est %3$d"
+
+#~ msgid "IPMI IP address"
+#~ msgstr "Adresse IP IPMI"
+
+#~ msgid "IPMI port"
+#~ msgstr "Port IPMI"
+
+#~ msgid "Icon highlighting"
+#~ msgstr "Mise en évidence de l'icône"
+
+#~ msgid "Import Host"
+#~ msgstr "Importer l'Hôte"
+
+#~ msgid "Import Template"
+#~ msgstr "Importer le Modèle"
+
+#~ msgid "Incorrect command"
+#~ msgstr "commande incorrecte"
+
+#~ msgid "Incorrect escalation period"
+#~ msgstr "Période d'escalade incorrecte"
+
+#~ msgid "Incorrect fields for application"
+#~ msgstr "Champs incorrects pour l'application"
+
 #~ msgid "Incorrect key format"
 #~ msgstr "Format de clé incorrect"
 
+#~ msgid "Incorrect object type"
+#~ msgstr "Type d'objet incorrect"
+
+#~ msgid "Incorrect operation type"
+#~ msgstr "Type d'opération incorrecte"
+
+#~ msgid "Incorrect parameter used for Conditions"
+#~ msgstr "Paramètre utilisé incorrect pour Conditions"
+
+#~ msgid "Incorrect steps"
+#~ msgstr "Etapes incorrectes"
+
+#~ msgid "Incorrect user"
+#~ msgstr "Utilisateur incorrect"
+
+#~ msgid "Infinity"
+#~ msgstr "Infini"
+
 #~ msgid "Installer Name"
 #~ msgstr "Installateur"
+
+#~ msgid "Internal Zabbix error"
+#~ msgstr "Erreur Zabbix interne"
+
+#~ msgid "Invalid SNMP port"
+#~ msgstr "Port SNMP invalide"
+
+#~ msgid "Item \"%s\" unlinked"
+#~ msgstr "Elément \"%s\" délié"
 
 #~ msgid "Item function"
 #~ msgstr "Elément / Fonction"
@@ -9705,14 +9879,59 @@ msgstr "µ"
 #~ msgid "Key does not match"
 #~ msgstr "La clé ne correspond pas"
 
+#~ msgid "Last failed attempt was from"
+#~ msgstr "La dernière tentative de connexion provenait de"
+
+#~ msgid "Leave empty"
+#~ msgstr "Laisser vide"
+
+#~ msgid "Link with template"
+#~ msgstr "Lien avec le modèle"
+
+#~ msgid "Locale to extend"
+#~ msgstr "Traduction à étendre"
+
+#~ msgid "Locales"
+#~ msgstr "Traductions"
+
 #~ msgid "MAC Address"
 #~ msgstr "Addresse MAC"
+
+#~ msgid "Mark elements on triggers status change"
+#~ msgstr "Marquer les éléments lors du changement d'état des déclencheurs"
+
+#~ msgid "Minor problem"
+#~ msgstr "Problème mineur"
 
 #~ msgid "Model Number"
 #~ msgstr "Modèle"
 
+#~ msgid "New entries"
+#~ msgstr "Nouvelles entrées"
+
+#~ msgid "No groups for host [ %s ]"
+#~ msgstr "Pas de groupe pour l'hôte [ %s ]"
+
 #~ msgid "No icon for map element"
 #~ msgstr "Pas d'icône pour l'élément de la carte"
+
+#~ msgid "No permissions !"
+#~ msgstr "Pas de permissions !"
+
+#~ msgid "No permissions or map does not exist."
+#~ msgstr "Pas de permission ou la carte n'existe pas"
+
+#~ msgid "No such host"
+#~ msgstr "Pas d'hôte correspondant"
+
+#~ msgid "No such monitored parameter"
+#~ msgstr "Pad de paramètre surveillé correspondant"
+
+#~ msgid "No templates linked"
+#~ msgstr "Pas de modèle lié"
+
+#~ msgid "Not acknowledged"
+#~ msgstr "Non acquitté"
 
 #~ msgid "OOB IP Address"
 #~ msgstr "Hôte - Adresse IP OOB"
@@ -9725,6 +9944,12 @@ msgstr "µ"
 
 #~ msgid "OS (Full Details)"
 #~ msgstr "OS (Détaillé)"
+
+#~ msgid "Only Super Admins can create Users"
+#~ msgstr "Seuls les Super Admins peuvent créer des utilisateurs"
+
+#~ msgid "Place it to \"/PATH_TO_ZABBIX_FRONTEND/include/locales\"."
+#~ msgstr "La placer dans \"/PATH_TO_ZABBIX_FRONTEND/include/locales\"."
 
 #~ msgid "Primary POC Cell"
 #~ msgstr "Contact Principal - Mobile"
@@ -9747,6 +9972,36 @@ msgstr "µ"
 #~ msgid "Primary POC Screen Name"
 #~ msgstr "Contact Principal - Identifiant"
 
+#~ msgid "Replace previous locale file with one you have downloaded."
+#~ msgstr "Remplacer la traduction précédente par celle que vous avez téléchargé."
+
+#~ msgid "Required host"
+#~ msgstr "Hôte requis"
+
+#~ msgid "Response code for step \"%1$s\" of scenario \"%2$s\""
+#~ msgstr "Code de réponse pour l'étape \"%1$s\" du scenario \"%2$s\""
+
+#~ msgid "Response time for step \"%1$s\" of scenario \"%2$s\""
+#~ msgstr "Temps de réponse pour l'étape \"%1$s\" du scenario \"%2$s\""
+
+#~ msgid "Run remote commands"
+#~ msgstr "Lancement commande à distance"
+
+#~ msgid "SIA Zabbix"
+#~ msgstr "SIA Zabbix"
+
+#~ msgid "SNMP port"
+#~ msgstr "port SNMP"
+
+#~ msgid "Scenario step name should contain"
+#~ msgstr "Le nom de l'étape de scénario doit contenir"
+
+#~ msgid "Scenario with name"
+#~ msgstr "Scénario avec le nom"
+
+#~ msgid "Schema"
+#~ msgstr "Schéma"
+
 #~ msgid "Secondary POC Cell"
 #~ msgstr "Contact Secondaire - Mobile"
 
@@ -9768,11 +10023,20 @@ msgstr "µ"
 #~ msgid "Secondary POC Screen Name"
 #~ msgstr "Contact Secondaire - Identifiant"
 
+#~ msgid "Selected actions deleted."
+#~ msgstr "Actons sélectionnées supprimées"
+
 #~ msgid "Serial Number"
 #~ msgstr "Numéro de série"
 
 #~ msgid "SerialNo"
 #~ msgstr "Numéro de série"
+
+#~ msgid "Serious problem"
+#~ msgstr "Probème sérieux"
+
+#~ msgid "Single user"
+#~ msgstr "Simple utilisateur"
 
 #~ msgid "Site Address 1"
 #~ msgstr "Site - Adresse 1"
@@ -9801,6 +10065,9 @@ msgstr "µ"
 #~ msgid "Site Zip / Postal"
 #~ msgstr "Site - Code postal"
 
+#~ msgid "Skip existing items"
+#~ msgstr "Sauter les éléments existants"
+
 #~ msgid "Software Application #1"
 #~ msgstr "Logiciel Application #1"
 
@@ -9816,8 +10083,32 @@ msgstr "µ"
 #~ msgid "Software Application #5"
 #~ msgstr "Logiciel Application #5"
 
+#~ msgid "Spanish (SP)"
+#~ msgstr "Espagnol (SP)"
+
+#~ msgid "Take for default locale"
+#~ msgstr "Utiliser comme langue par défaut"
+
+#~ msgid "Templated trigger"
+#~ msgstr "Déclencheur modèle"
+
 #~ msgid "The key must be unique."
 #~ msgstr "La clé doit être unique"
+
+#~ msgid "The locale file name must be made of a prefix: \"ISO 639-1 language code\"_\"ISO 3166-1 alpha-2 country code\". Like \"en_gb\""
+#~ msgstr "Le fichier de traduction doit être composé d'un préfixe \"code langue ISO 639-1\"_\"code pays ISO 3166-1 alpha-2\". Comme \"en_gb\""
+
+#~ msgid "There You will find an array containing \"keys\" => \"values\"."
+#~ msgstr "Y localiser le tableau contenant \"keys\" => \"values\"."
+
+#~ msgid "To make new locale visible by Zabbix frontend - extend the php script \"/PATH_TO_ZABBIX_FRONTEND/include/locales.inc.php\"."
+#~ msgstr "Pour rendre une nouvelle langue visible dans l'interface Zabbix, modifier le script PHP \"/PATH_TO_ZABBIX_FRONTEND/include/locales.inc.php\"."
+
+#~ msgid "Too many hosts"
+#~ msgstr "Trop d'hôtes"
+
+#~ msgid "Trigger \"%s\" unlinked"
+#~ msgstr "Déclencheur \"%s\" délié"
 
 #~ msgid "Type of information must be Log for log key"
 #~ msgstr "Le type de donnée doit être Journal pour une clé log"
@@ -9831,102 +10122,6 @@ msgstr "µ"
 #~ msgid "URL #3"
 #~ msgstr "URL #3"
 
-#~ msgid "Use extended profile"
-#~ msgstr "Utiliser le profil étendu"
-
-#~ msgid "Value type must be Float for aggregate items"
-#~ msgstr "Le type de donnée doit être flottant pour des éléments agrégés"
-
-#~ msgid "is not one of"
-#~ msgstr "n'est pas un de"
-
-#~ msgid "Connected as"
-#~ msgstr "Connecté en tant que"
-
-#~ msgid "Zabbix SIA"
-#~ msgstr "Zabbix SIA"
-
-#~ msgid "with template host can not contain items from other hosts."
-#~ msgstr "avec un modèle d'hôte ne peut pas contenir des éléments d'autres hôtes."
-
-#~ msgid "- all -"
-#~ msgstr "- tous -"
-
-#~ msgid "Account is blocked for"
-#~ msgstr "Compte bloqué pour"
-
-#~ msgid "Action conditions"
-#~ msgstr "Conditions d'action"
-
-#~ msgid "An item key must be used in trigger expression"
-#~ msgstr "une clé d'élément doit être utilisée dans l'expression du déclencheur"
-
-#~ msgid "Average problem"
-#~ msgstr "Problème moyen"
-
-#~ msgid "Delete selected action?"
-#~ msgstr "Supprimer les actions sélectionnées ?"
-
-#~ msgid "Edit operation"
-#~ msgstr "Editer opération"
-
-#~ msgid "Enable escalations"
-#~ msgstr "Activer les escalades"
-
-#~ msgid "Escalation rules"
-#~ msgstr "Règles d'escalade"
-
-#~ msgid "Icon highlighting"
-#~ msgstr "Mise en évidence de l'icône"
-
-#~ msgid "Incorrect command"
-#~ msgstr "commande incorrecte"
-
-#~ msgid "Incorrect object type"
-#~ msgstr "Type d'objet incorrect"
-
-#~ msgid "Incorrect operation type"
-#~ msgstr "Type d'opération incorrecte"
-
-#~ msgid "Incorrect parameter used for Conditions"
-#~ msgstr "Paramètre utilisé incorrect pour Conditions"
-
-#~ msgid "Incorrect steps"
-#~ msgstr "Etapes incorrectes"
-
-#~ msgid "Incorrect user"
-#~ msgstr "Utilisateur incorrect"
-
-#~ msgid "Infinity"
-#~ msgstr "Infini"
-
-#~ msgid "Last failed attempt was from"
-#~ msgstr "La dernière tentative de connexion provenait de"
-
-#~ msgid "Mark elements on triggers status change"
-#~ msgstr "Marquer les éléments lors du changement d'état des déclencheurs"
-
-#~ msgid "Minor problem"
-#~ msgstr "Problème mineur"
-
-#~ msgid "No such host"
-#~ msgstr "Pas d'hôte correspondant"
-
-#~ msgid "No such monitored parameter"
-#~ msgstr "Pad de paramètre surveillé correspondant"
-
-#~ msgid "Run remote commands"
-#~ msgstr "Lancement commande à distance"
-
-#~ msgid "Serious problem"
-#~ msgstr "Probème sérieux"
-
-#~ msgid "Single user"
-#~ msgstr "Simple utilisateur"
-
-#~ msgid "Too many hosts"
-#~ msgstr "Trop d'hôtes"
-
 #~ msgid "Unknown function"
 #~ msgstr "Fonction inconnue"
 
@@ -9936,26 +10131,92 @@ msgstr "µ"
 #~ msgid "Unknown host name"
 #~ msgstr "Nom d'hôte inconnu"
 
+#~ msgid "Updated application"
+#~ msgstr "Application mise à jour"
+
+#~ msgid "Use IPMI"
+#~ msgstr "Utiliser IPMI"
+
+#~ msgid "Use extended profile"
+#~ msgstr "Utiliser le profil étendu"
+
 #~ msgid "User medias"
 #~ msgstr "Medias utilisateur"
+
+#~ msgid "Value type must be Float for aggregate items"
+#~ msgstr "Le type de donnée doit être flottant pour des éléments agrégés"
+
+#~ msgid "You can set \"display_like\" value in new locale file by adding it or You may leave it as hardcoded string."
+#~ msgstr "Vous pouvez définir \"Affichage\" dans le nouveau fichier de traduction en l'y ajoutant ou vous pouvez la coder directement dans le source."
+
+#~ msgid "You must use items only from host"
+#~ msgstr "Vous devez utiliser uniquement des éléments de l'hôte"
+
+#~ msgid "Zabbix agent port"
+#~ msgstr "Port de l'agent Zabbix"
+
+#~ msgid "already exists in linked hosts"
+#~ msgstr "existe déjà dans les hôtes liés"
+
+#~ msgid "and a postfix \".inc.php\". Like \"en_gb.inc.php\"."
+#~ msgstr "et un suffixe \".inc.php\". Comme \"en_gb.inc.php\"."
+
+#~ msgid "deleted"
+#~ msgstr "supprimé"
 
 #~ msgid "failed login attempts logged."
 #~ msgstr "tentatives échouées de connexion enregistrées"
 
+#~ msgid "for template graph"
+#~ msgstr "pour le graphique modèle"
+
+#~ msgid "from host"
+#~ msgstr "depuis l'hôte"
+
 #~ msgid "in command"
 #~ msgstr "dans la commande"
+
+#~ msgid "incorrect parameters for"
+#~ msgstr "paramètres incorrects pour"
+
+#~ msgid "is not one of"
+#~ msgstr "n'est pas un de"
+
+#~ msgid "locale"
+#~ msgstr "traduction"
+
+#~ msgid "new"
+#~ msgstr "nouveau"
 
 #~ msgid "of key"
 #~ msgstr "de la clé"
 
-#~ msgid "m.d.Y H:i:s"
-#~ msgstr "m.d.Y H:i:s"
+#~ msgid "only printable characters"
+#~ msgstr "uniquement des caractères imprimables"
 
-#~ msgid "\""
-#~ msgstr "\""
+#~ msgid "permissions"
+#~ msgstr "permissions"
 
-#~ msgid "\" deleted from host"
-#~ msgstr "\" supprimé de l'hôte"
+#~ msgid "sec at"
+#~ msgstr "sec à"
+
+#~ msgid "unlinked"
+#~ msgstr "délié"
+
+#~ msgid "update existing non linked items"
+#~ msgstr "modifier les éléments non liés existants"
+
+#~ msgid "updated for hosts"
+#~ msgstr "mis à jour pour les hôtes"
+
+#~ msgid "used by item"
+#~ msgstr "utilisé par l'élément"
+
+#~ msgid "used in web scenario"
+#~ msgstr "utilisé dans le scénario web"
+
+#~ msgid "with template host can not contain items from other hosts."
+#~ msgstr "avec un modèle d'hôte ne peut pas contenir des éléments d'autres hôtes."
 
 #~ msgid "Actions deleted"
 #~ msgstr "Actions supprimées"
@@ -9966,23 +10227,14 @@ msgstr "µ"
 #~ msgid "Added host group"
 #~ msgstr "Groupe d'hôtes ajouté"
 
-#~ msgid "Added new application"
-#~ msgstr "Nouvelle application ajoutée"
-
 #~ msgid "Added new host"
 #~ msgstr "Nouvel hôte ajouté"
-
-#~ msgid "Added new item"
-#~ msgstr "Nouvel élément ajouté"
 
 #~ msgid "An action type with description"
 #~ msgstr "Un type d'action avec la description"
 
 #~ msgid "Back"
 #~ msgstr "Retour"
-
-#~ msgid "Can not use multiple host items for template graph"
-#~ msgstr "Impossible d'utiliser des élements de plusieurs hôtes pour un graphique modèle"
 
 #~ msgid "Can't delete media types"
 #~ msgstr "Impossible de supprimer les types de media"
@@ -9996,29 +10248,17 @@ msgstr "µ"
 #~ msgid "Cannot connect to Zabbix server"
 #~ msgstr "Impossible de se connecter au serveur Zabbix"
 
-#~ msgid "Cannot create application"
-#~ msgstr "Impossible de créer l'application"
-
 #~ msgid "Cannot delete actions"
 #~ msgstr "Suppression actions impossible"
 
 #~ msgid "Cannot delete macros"
 #~ msgstr "Impossible de supprimer les macros"
 
-#~ msgid "Create Host"
-#~ msgstr "Créer hôte"
+#~ msgid "Create Log Trigger"
+#~ msgstr "Créer le journal du déclencheur"
 
-#~ msgid "Create Template"
-#~ msgstr "Créer modèle"
-
-#~ msgid "Do not add"
-#~ msgstr "Ne pas ajouter"
-
-#~ msgid "Download"
-#~ msgstr "Télécharger"
-
-#~ msgid "Download newly created locale file by pressing \"Download\"."
-#~ msgstr "Télécharger la nouvelle traduction en cliquant sur \"Télécharger\"."
+#~ msgid "Do you replace the conditional expression?"
+#~ msgstr "Remplacer l'expression conditionnelle ?"
 
 #~ msgid "EXPORT"
 #~ msgstr "EXPORTER"
@@ -10050,35 +10290,14 @@ msgstr "µ"
 #~ msgid "Export/Import"
 #~ msgstr "Import/Export"
 
-#~ msgid "Extend this array with Your locale like \"your_prefix\" => \"display_like\"."
-#~ msgstr "Etendre ce tableau avec votre langue \"votre_prefixe\" => \"Affichage\"."
-
 #~ msgid "Favourite"
 #~ msgstr "Favori"
-
-#~ msgid "Fill with default value"
-#~ msgstr "Remplir avec valeur par défaut"
-
-#~ msgid "For example see implementation of other locales."
-#~ msgstr "Pour des exemples, voir l'implémentation des autres traductions."
-
-#~ msgid "Found"
-#~ msgstr "Trouvé"
-
-#~ msgid "Graph \""
-#~ msgstr "Graphique \""
 
 #~ msgid "Host macro"
 #~ msgstr "Macro hôte"
 
 #~ msgid "IMPORT"
 #~ msgstr "IMPORTER"
-
-#~ msgid "Import Host"
-#~ msgstr "Importer l'Hôte"
-
-#~ msgid "Import Template"
-#~ msgstr "Importer le Modèle"
 
 #~ msgid "Incorrect characters used for DNS"
 #~ msgstr "Caractères incorrects utilisés dans le nom DNS"
@@ -10089,26 +10308,8 @@ msgstr "µ"
 #~ msgid "Incorrect description"
 #~ msgstr "Description incorrecte"
 
-#~ msgid "Incorrect fields for application"
-#~ msgstr "Champs incorrects pour l'application"
-
-#~ msgid "Internal Zabbix error"
-#~ msgstr "Erreur Zabbix interne"
-
-#~ msgid "Invalid SNMP port"
-#~ msgstr "Port SNMP invalide"
-
-#~ msgid "Leave empty"
-#~ msgstr "Laisser vide"
-
-#~ msgid "Link with template"
-#~ msgstr "Lien avec le modèle"
-
-#~ msgid "Locale to extend"
-#~ msgstr "Traduction à étendre"
-
-#~ msgid "Locales"
-#~ msgstr "Traductions"
+#~ msgid "Log trigger form"
+#~ msgstr "Formulaire déclencheur journal"
 
 #~ msgid "Loop"
 #~ msgstr "Boucle"
@@ -10127,9 +10328,6 @@ msgstr "µ"
 
 #~ msgid "Memory leak"
 #~ msgstr "Fuite mémoire"
-
-#~ msgid "New entries"
-#~ msgstr "Nouvelles entrées"
 
 #~ msgid "New macro"
 #~ msgstr "Nouvelle macro"
@@ -10152,26 +10350,14 @@ msgstr "µ"
 #~ msgid "No media with"
 #~ msgstr "Pas de media avec"
 
-#~ msgid "No permissions !"
-#~ msgstr "Pas de permissions !"
-
 #~ msgid "No sysmap element with"
 #~ msgstr "Pas d'élément de carte système avec"
-
-#~ msgid "No templates linked"
-#~ msgstr "Pas de modèle lié"
-
-#~ msgid "Not acknowledged"
-#~ msgstr "Non acquitté"
 
 #~ msgid "OFF"
 #~ msgstr "INACTF"
 
 #~ msgid "Only Super Admins can create Scripts"
 #~ msgstr "Seuls les Super Admin peuvent créer des Scripts"
-
-#~ msgid "Only Super Admins can create Users"
-#~ msgstr "Seuls les Super Admins peuvent créer des utilisateurs"
 
 #~ msgid "Only Super Admins can delete Scripts"
 #~ msgstr "Seuls les Super Admin peuvent supprimer des Scripts"
@@ -10191,29 +10377,14 @@ msgstr "µ"
 #~ msgid "Pause"
 #~ msgstr "Pause"
 
-#~ msgid "Place it to \"/PATH_TO_ZABBIX_FRONTEND/include/locales\"."
-#~ msgstr "La placer dans \"/PATH_TO_ZABBIX_FRONTEND/include/locales\"."
-
 #~ msgid "QUEUE"
 #~ msgstr "FILE D'ATTENTE"
 
 #~ msgid "Refresh"
 #~ msgstr "Rafraichir"
 
-#~ msgid "Replace previous locale file with one you have downloaded."
-#~ msgstr "Remplacer la traduction précédente par celle que vous avez téléchargé."
-
-#~ msgid "Required host"
-#~ msgstr "Hôte requis"
-
-#~ msgid "SNMP port"
-#~ msgstr "port SNMP"
-
-#~ msgid "Scenario step name should contain"
-#~ msgstr "Le nom de l'étape de scénario doit contenir"
-
-#~ msgid "Scenario with name"
-#~ msgstr "Scénario avec le nom"
+#~ msgid "SCREENS 45645645"
+#~ msgstr "ÉCRANS"
 
 #~ msgid "Select graph to display"
 #~ msgstr "Sélectionnez le graphique à afficher"
@@ -10236,35 +10407,17 @@ msgstr "µ"
 #~ msgid "Show triggers with unacknowledged events"
 #~ msgstr "Montrer les déclencheurs avec des événements non acquittés"
 
-#~ msgid "Skip existing items"
-#~ msgstr "Sauter les éléments existants"
-
 #~ msgid "Sound"
 #~ msgstr "Son"
 
 #~ msgid "Specify the conditional expression for the target."
 #~ msgstr "Spécifier l'expression conditionnelle pour la cible."
 
-#~ msgid "Take for default locale"
-#~ msgstr "Utiliser comme langue par défaut"
-
 #~ msgid "Templated graph"
 #~ msgstr "Graphe modèle"
 
-#~ msgid "Templated trigger"
-#~ msgstr "Déclencheur modèle"
-
-#~ msgid "The locale file name must be made of a prefix: \"ISO 639-1 language code\"_\"ISO 3166-1 alpha-2 country code\". Like \"en_gb\""
-#~ msgstr "Le fichier de traduction doit être composé d'un préfixe \"code langue ISO 639-1\"_\"code pays ISO 3166-1 alpha-2\". Comme \"en_gb\""
-
-#~ msgid "There You will find an array containing \"keys\" => \"values\"."
-#~ msgstr "Y localiser le tableau contenant \"keys\" => \"values\"."
-
 #~ msgid "Timezone for PHP is not set. Please set \"date.timezone\" option in php.ini."
 #~ msgstr "Le fuseau horaire PHP n'est pas défini. Merci de définir l'option \"date.timezone\" dans php.ini"
-
-#~ msgid "To make new locale visible by Zabbix frontend - extend the php script \"/PATH_TO_ZABBIX_FRONTEND/include/locales.inc.php\"."
-#~ msgstr "Pour rendre une nouvelle langue visible dans l'interface Zabbix, modifier le script PHP \"/PATH_TO_ZABBIX_FRONTEND/include/locales.inc.php\"."
 
 #~ msgid "Trigger in template"
 #~ msgstr "Déclencheur dans le modèle"
@@ -10278,9 +10431,6 @@ msgstr "µ"
 #~ msgid "Unknown macro"
 #~ msgstr "Macro inconnue"
 
-#~ msgid "Updated application"
-#~ msgstr "Application mise à jour"
-
 #~ msgid "Updated host group"
 #~ msgstr "Groupe d'hôtes mis à jour"
 
@@ -10290,26 +10440,14 @@ msgstr "µ"
 #~ msgid "Wrong type"
 #~ msgstr "Type incorrect"
 
-#~ msgid "You can set \"display_like\" value in new locale file by adding it or You may leave it as hardcoded string."
-#~ msgstr "Vous pouvez définir \"Affichage\" dans le nouveau fichier de traduction en l'y ajoutant ou vous pouvez la coder directement dans le source."
-
 #~ msgid "You can't delete template for an application that is used in a web scenario"
 #~ msgstr "Vous ne pouvez pas supprimer une application utilisée sans un scénario Web"
 
-#~ msgid "You must use items only from host"
-#~ msgstr "Vous devez utiliser uniquement des éléments de l'hôte"
-
-#~ msgid "Zabbix agent port"
-#~ msgstr "Port de l'agent Zabbix"
+#~ msgid "Zabbix SIA"
+#~ msgstr "Zabbix SIA"
 
 #~ msgid "Zabbix config"
 #~ msgstr "config Zabbix"
-
-#~ msgid "already exists in linked hosts"
-#~ msgstr "existe déjà dans les hôtes liés"
-
-#~ msgid "and a postfix \".inc.php\". Like \"en_gb.inc.php\"."
-#~ msgstr "et un suffixe \".inc.php\". Comme \"en_gb.inc.php\"."
 
 #~ msgid "can not exist without group"
 #~ msgstr "ne peut pas exister sans groupe"
@@ -10317,86 +10455,26 @@ msgstr "µ"
 #~ msgid "characters only"
 #~ msgstr "lettres uniquement"
 
-#~ msgid "deleted"
-#~ msgstr "supprimé"
-
 #~ msgid "doesn't exist"
 #~ msgstr "n'existe pas"
-
-#~ msgid "for template graph"
-#~ msgstr "pour le graphique modèle"
-
-#~ msgid "from host"
-#~ msgstr "depuis l'hôte"
 
 #~ msgid "has dependency with trigger in template"
 #~ msgstr "a une dépendance avec un déclencheur dans le modèle"
 
-#~ msgid "incorrect parameters for"
-#~ msgstr "paramètres incorrects pour"
-
 #~ msgid "is not the highest level template"
 #~ msgstr "n'est pas le modèle de plus haut niveau"
-
-#~ msgid "locale"
-#~ msgstr "traduction"
 
 #~ msgid "log files"
 #~ msgstr "fichiers journaux"
 
+#~ msgid "m.d.Y H:i:s"
+#~ msgstr "m.d.Y H:i:s"
+
 #~ msgid "must be linked to at least one host group"
 #~ msgstr "doit ête lié à au moins un groupe d'hôtes"
-
-#~ msgid "new"
-#~ msgstr "nouveau"
-
-#~ msgid "permissions"
-#~ msgstr "permissions"
 
 #~ msgid "template"
 #~ msgstr "modèle"
 
-#~ msgid "unlinked"
-#~ msgstr "délié"
-
-#~ msgid "update existing non linked items"
-#~ msgstr "modifier les éléments non liés existants"
-
-#~ msgid "updated for hosts"
-#~ msgstr "mis à jour pour les hôtes"
-
-#~ msgid "used by item"
-#~ msgstr "utilisé par l'élément"
-
 #~ msgid "year"
 #~ msgstr "année"
-
-#~ msgid "Cannot_update slideshow"
-#~ msgstr "Impossible de modifier le diaporama"
-
-#~ msgid "Use IPMI"
-#~ msgstr "Utiliser IPMI"
-
-#~ msgid "IPMI IP address"
-#~ msgstr "Adresse IP IPMI"
-
-#~ msgid "IPMI port"
-#~ msgstr "Port IPMI"
-
-#~ msgid "(year"
-#~ msgstr "(année"
-
-#~ msgid ")"
-#~ msgstr ")"
-
-#~ msgid "SCREENS 45645645"
-#~ msgstr "ÉCRANS"
-
-#~ msgid "Log trigger form"
-#~ msgstr "Formulaire déclencheur journal"
-
-#~ msgid "Create Log Trigger"
-#~ msgstr "Créer le journal du déclencheur"
-
-#~ msgid "Do you replace the conditional expression?"
-#~ msgstr "Remplacer l'expression conditionnelle ?"
