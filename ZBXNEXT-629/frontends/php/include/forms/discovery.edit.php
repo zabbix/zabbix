@@ -24,49 +24,49 @@ require_once('include/templates/discovery.js.php');
 ?>
 <?php
 	$data = $data;
-	$inputLength = 60;
 
-	$divTabs = new CTabView(array('remember'=>1));
+	$divTabs = new CTabView(array('remember' => 1));
 	if(!isset($_REQUEST['form_refresh'])) $divTabs->setSelected(0);
 
 	$formDsc = new CForm();
 	$formDsc->setName('discovery.edit');
 
-	$from_rfr = get_request('form_refresh',0);
+	$from_rfr = get_request('form_refresh', 0);
 	$formDsc->addVar('form_refresh', $from_rfr+1);
 	$formDsc->addVar('form', get_request('form', 1));
 
 	if(isset($_REQUEST['druleid'])) $formDsc->addVar('druleid', $_REQUEST['druleid']);
 
 	if(isset($data['druleid']))
-		$formDsc->setTitle(_s('Discovery rule "%s"',$data['name']));
+		$formDsc->setTitle(_s('Discovery rule "%s"', $data['name']));
 	else
 		$formDsc->setTitle(_('Discovery rule'));
 
+// Name
 	$discoveryList = new CFormList('actionlist');
-	$discoveryList->addRow(_('Name'), new CTextBox('name', $data['name'], $inputLength));
+	$discoveryList->addRow(_('Name'), new CTextBox('name', $data['name'], 60));
 
-
+// Discovery by proxy
 	$cmbProxy = new CComboBox('proxy_hostid', $data['proxy_hostid']);
 	$cmbProxy->addItem(0, _('No proxy'));
 
 	$proxies = API::Proxy()->get(array(
 		'output' => API_OUTPUT_EXTEND
 	));
-
-	order_result($proxies,'host');
-	foreach($proxies as $pnum => $proxy){
+	order_result($proxies, 'host');
+	foreach($proxies as $proxy){
 		$cmbProxy->addItem($proxy['proxyid'], $proxy['host']);
 	}
-
 	$discoveryList->addRow(_('Discovery by proxy'), $cmbProxy);
 
-
+// IP range
 	$discoveryList->addRow(_('IP range'), new CTextBox('iprange', $data['iprange'], 27));
+
+// Delay (seconds)
 	$discoveryList->addRow(_('Delay (seconds)'), new CNumericBox('delay', $data['delay'], 8));
 
-// DChecks
-	$dcheckList = new CTable(null, "formElementTable");
+// Checks
+	$dcheckList = new CTable(null, 'formElementTable');
 	$addDCheckBtn = new CButton('newCheck', _('New'), null, 'link_menu');
 
 	$col = new CCol($addDCheckBtn);
@@ -74,21 +74,21 @@ require_once('include/templates/discovery.js.php');
 
 	$buttonRow = new CRow($col);
 	$buttonRow->setAttribute('id', 'dcheckListFooter');
-
 	$dcheckList->addRow($buttonRow);
 
-// Add Discovery Checks
-	foreach($data['dchecks'] as $id => $dcheck)
+	// Add Discovery Checks
+	foreach($data['dchecks'] as $id => $dcheck){
 		$data['dchecks'][$id]['name'] = discovery_check2str($data['dchecks'][$id]['type'], $data['dchecks'][$id]['snmp_community'], $data['dchecks'][$id]['key_'], $data['dchecks'][$id]['ports']);
-
+	}
 	order_result($data['dchecks'], 'name');
 
 	$jsInsert = '';
-	$jsInsert.= 'addPopupValues('.zbx_jsvalue(array('object'=>'dcheckid', 'values'=>array_values($data['dchecks']))).');';
+	$jsInsert.= 'addPopupValues('.zbx_jsvalue(array('object' => 'dcheckid', 'values' => array_values($data['dchecks']))).');';
 
 	$discoveryList->addRow(_('Checks'), new CDiv($dcheckList, 'objectgroup inlineblock border_dotted ui-corner-all', 'dcheckList'));
-// -------
+	// -------
 
+// Device uniqueness criteria
 	$cmbUniquenessCriteria = new CRadioButton('uniqueness_criteria', $data['uniqueness_criteria']);
 	$cmbUniquenessCriteria->addValue(_('IP address'), -1);
 
@@ -96,11 +96,11 @@ require_once('include/templates/discovery.js.php');
 
 	$jsInsert.= 'jQuery("input:radio[name=uniqueness_criteria][value='.zbx_jsvalue($data['uniqueness_criteria']).']").attr("checked", "checked");';
 
+// Status
 	$cmbStatus = new CComboBox('status', $data['status']);
-	foreach(array(DRULE_STATUS_ACTIVE, DRULE_STATUS_DISABLED) as $st)
-		$cmbStatus->addItem($st, discovery_status2str($st));
-
+	$cmbStatus->addItems(discovery_status2str());
 	$discoveryList->addRow(_('Status'), $cmbStatus);
+
 
 	$divTabs->addTab('druleTab', _('Discovery rule'), $discoveryList);
 	$formDsc->addItem($divTabs);
