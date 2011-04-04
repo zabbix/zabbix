@@ -139,11 +139,9 @@ int	PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 					if (ERROR_SUCCESS == status)
 					{
 						if (NULL != perfs)
-						{
+						{ /* update only status and lastValue for the statistics to be accurate */
 							perfs->status = ITEM_STATUS_ACTIVE;
 							perfs->lastValue = counterValue.doubleValue;
-							perfs->CurrentCounter++;
-							perfs->CurrentNum++;
 						}
 
 						SET_DBL_RESULT(result, counterValue.doubleValue);
