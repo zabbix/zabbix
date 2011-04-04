@@ -112,13 +112,19 @@
 	return '';
 	}
 
-	function discovery_status2str($status_int){
-		switch($status_int){
-			case DRULE_STATUS_ACTIVE:	$status = S_ACTIVE;		break;
-			case DRULE_STATUS_DISABLED:	$status = S_DISABLED;	break;
-			default:					$status = S_UNKNOWN;	break;
+	function discovery_status2str($status=null){
+		$discovery_statuses = array(
+			DRULE_STATUS_ACTIVE => _('Active'),
+			DRULE_STATUS_DISABLED => _('Disabled'),
+		);
+
+		if(is_null($status)){
+			return $discovery_statuses;
 		}
-		return $status;
+		else if(isset($discovery_statuses[$status]))
+			return $discovery_statuses[$status];
+		else
+			return _('Unknown');
 	}
 
 	function discovery_status2style($status){
