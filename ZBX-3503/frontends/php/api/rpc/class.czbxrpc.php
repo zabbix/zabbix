@@ -90,7 +90,7 @@ class czbxrpc{
 		}
 
 		call_user_func(array('czbxrpc', $resource), $action, $params);
-		if(self::$result !== false){
+		if(self::$result !== false || $action == 'exists'){
 			self::$result = array('result' => self::$result);
 		}
 		else{

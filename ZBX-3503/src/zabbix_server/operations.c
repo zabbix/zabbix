@@ -35,7 +35,6 @@
 #include "comms.h"
 #include "db.h"
 #include "log.h"
-#include "zlog.h"
 
 #include "operations.h"
 
