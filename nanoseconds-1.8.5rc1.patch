@@ -137,7 +137,7 @@ Index: src/zabbix_proxy/proxy.c
 ===================================================================
 --- src/zabbix_proxy/proxy.c	(revision 18797)
 +++ src/zabbix_proxy/proxy.c	(revision 18798)
-@@ -175,6 +175,7 @@
+@@ -174,6 +174,7 @@
  int	CONFIG_ENABLE_LOG		= 1;
  
  int	CONFIG_REFRESH_UNSUPPORTED	= 600;
@@ -315,7 +315,7 @@ Index: src/zabbix_server/events.c
 ===================================================================
 --- src/zabbix_server/events.c	(revision 18797)
 +++ src/zabbix_server/events.c	(revision 18798)
-@@ -300,13 +300,14 @@
+@@ -299,13 +299,14 @@
  	if (0 == event->eventid)
  		event->eventid = DBget_maxid("events");
  
@@ -336,7 +336,7 @@ Index: src/zabbix_server/server.c
 ===================================================================
 --- src/zabbix_server/server.c	(revision 18797)
 +++ src/zabbix_server/server.c	(revision 18798)
-@@ -171,6 +171,7 @@
+@@ -170,6 +170,7 @@
  
  /* From table config */
  int	CONFIG_REFRESH_UNSUPPORTED	= 0;
@@ -344,7 +344,7 @@ Index: src/zabbix_server/server.c
  
  /* Zabbix server startup time */
  int	CONFIG_SERVER_STARTUP_TIME	= 0;
-@@ -517,11 +518,14 @@
+@@ -516,11 +517,14 @@
  
  	DBconnect(ZBX_DB_CONNECT_EXIT);
  
@@ -400,7 +400,7 @@ Index: src/zabbix_server/poller/poller.c
 ===================================================================
 --- src/zabbix_server/poller/poller.c	(revision 18797)
 +++ src/zabbix_server/poller/poller.c	(revision 18798)
-@@ -153,7 +153,7 @@
+@@ -148,7 +148,7 @@
  	return res;
  }
  
@@ -409,7 +409,7 @@ Index: src/zabbix_server/poller/poller.c
  {
  	const char	*__function_name = "update_key_status";
  	DC_ITEM		*items = NULL;
-@@ -169,7 +169,7 @@
+@@ -164,7 +164,7 @@
  		init_result(&agent);
  		SET_UI64_RESULT(&agent, host_status);
  
@@ -418,7 +418,7 @@ Index: src/zabbix_server/poller/poller.c
  
  		free_result(&agent);
  	}
-@@ -177,7 +177,7 @@
+@@ -172,7 +172,7 @@
  	zbx_free(items);
  }
  
@@ -427,7 +427,7 @@ Index: src/zabbix_server/poller/poller.c
  {
  	const char	*__function_name = "update_triggers_status_to_unknown";
  	DB_RESULT	result;
-@@ -214,14 +214,14 @@
+@@ -209,14 +209,14 @@
  		trigger_error = row[3];
  
  		DBupdate_trigger_value(triggerid, trigger_type, trigger_value,
@@ -444,7 +444,7 @@ Index: src/zabbix_server/poller/poller.c
  {
  	char		sql[MAX_STRING_LEN], error_msg[MAX_STRING_LEN];
  	int		offset = 0, *errors_from, *disable_until;
-@@ -290,7 +290,7 @@
+@@ -285,7 +285,7 @@
  				fld_available, *available);
  
  		if (available == &item->host.available)
@@ -453,7 +453,7 @@ Index: src/zabbix_server/poller/poller.c
  	}
  
  	*errors_from = 0;
-@@ -307,7 +307,7 @@
+@@ -302,7 +302,7 @@
  	DBcommit();
  }
  
@@ -462,7 +462,7 @@ Index: src/zabbix_server/poller/poller.c
  {
  	char		sql[MAX_STRING_LEN], *error_esc, error_msg[MAX_STRING_LEN];
  	int		offset = 0, *errors_from, *disable_until;
-@@ -355,7 +355,7 @@
+@@ -350,7 +350,7 @@
  			return;
  	}
  
@@ -471,7 +471,7 @@ Index: src/zabbix_server/poller/poller.c
  		return;
  
  	*error_msg = '\0';
-@@ -368,24 +368,24 @@
+@@ -363,24 +363,24 @@
  		zbx_snprintf(error_msg, sizeof(error_msg), "%s Host [%s]: first network error, wait for %d seconds",
  				type, item->host.host, CONFIG_UNREACHABLE_DELAY);
  
@@ -501,7 +501,7 @@ Index: src/zabbix_server/poller/poller.c
  
  			if (HOST_AVAILABLE_FALSE != *available)
  			{
-@@ -398,9 +398,9 @@
+@@ -393,9 +393,9 @@
  						fld_available, *available);
  
  				if (available == &item->host.available)
@@ -513,7 +513,7 @@ Index: src/zabbix_server/poller/poller.c
  			}
  
  			error_esc = DBdyn_escape_string_len(error, HOST_ERROR_LEN);
-@@ -447,12 +447,13 @@
+@@ -442,12 +442,13 @@
  	zbx_uint64_t	*ids = NULL, *snmpids = NULL, *ipmiids = NULL;
  	int		ids_alloc = 0, snmpids_alloc = 0, ipmiids_alloc = 0,
  			ids_num = 0, snmpids_num = 0, ipmiids_num = 0,
@@ -528,7 +528,7 @@ Index: src/zabbix_server/poller/poller.c
  
  	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
  
-@@ -611,15 +612,15 @@
+@@ -606,15 +607,15 @@
  		init_result(&agent);
  
  		res = get_value(&items[i], &agent);
@@ -548,7 +548,7 @@ Index: src/zabbix_server/poller/poller.c
  		}
  		else if (res == NOTSUPPORTED || res == AGENT_ERROR)
  		{
-@@ -631,14 +632,14 @@
+@@ -626,14 +627,14 @@
  						items[i].host.host, items[i].key_orig);
  			}
  
@@ -640,7 +640,7 @@ Index: src/libs/zbxserver/expression.c
 ===================================================================
 --- src/libs/zbxserver/expression.c	(revision 18797)
 +++ src/libs/zbxserver/expression.c	(revision 18798)
-@@ -1194,6 +1194,140 @@
+@@ -927,6 +927,140 @@
  
  /******************************************************************************
   *                                                                            *
@@ -781,7 +781,7 @@ Index: src/libs/zbxserver/expression.c
   * Function: DBget_history_log_value                                          *
   *                                                                            *
   * Purpose: retrieve a particular attribute of a log value                    *
-@@ -1209,16 +1343,13 @@
+@@ -942,16 +1076,13 @@
   *                                                                            *
   ******************************************************************************/
  static int	DBget_history_log_value(DB_TRIGGER *trigger, char **replace_to,
@@ -800,7 +800,7 @@ Index: src/libs/zbxserver/expression.c
  
  	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
  
-@@ -1231,25 +1362,11 @@
+@@ -964,25 +1095,11 @@
  
  	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
  	{
@@ -828,7 +828,7 @@ Index: src/libs/zbxserver/expression.c
  	}
  	DBfree_result(result);
  fail:
-@@ -1363,14 +1480,12 @@
+@@ -1096,14 +1213,12 @@
   * Comments:                                                                  *
   *                                                                            *
   ******************************************************************************/
@@ -845,7 +845,7 @@ Index: src/libs/zbxserver/expression.c
  	int		value_type, ret = FAIL;
  	char		tmp[MAX_STRING_LEN];
  
-@@ -1388,42 +1503,36 @@
+@@ -1121,42 +1236,36 @@
  
  	if (NULL != (row = DBfetch(result)))
  	{
@@ -902,7 +902,7 @@ Index: src/libs/zbxserver/expression.c
  	}
  	DBfree_result(result);
  fail:
-@@ -2037,38 +2146,39 @@
+@@ -1770,38 +1879,39 @@
  				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
  					ret = DBget_item_lastvalue(&event->trigger, &replace_to, N_functionid);
  				else if (0 == strcmp(m, MVAR_ITEM_VALUE))
@@ -950,7 +950,7 @@ Index: src/libs/zbxserver/expression.c
  				else if (0 == strcmp(m, MVAR_DATE))
  					replace_to = zbx_strdup(replace_to, zbx_date2str(time(NULL)));
  				else if (0 == strcmp(m, MVAR_TIME))
-@@ -2255,7 +2365,8 @@
+@@ -1988,7 +2098,8 @@
  				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
  					ret = DBget_item_lastvalue(&event->trigger, &replace_to, N_functionid);
  				else if (0 == strcmp(m, MVAR_ITEM_VALUE))
@@ -1014,7 +1014,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  				break;
  			}
  		}
-@@ -950,13 +957,13 @@
+@@ -950,23 +957,23 @@
  
  	for (i = 0; i < tr_num; i++)
  	{
@@ -1029,9 +1029,7 @@ Index: src/libs/zbxdbcache/dbcache.c
 +		if (SUCCEED != evaluate_expression(&exp_value, &tr[i].exp, tr[i].ts.sec,
  					tr[i].triggerid, tr[i].value, error, sizeof(error)))
  		{
- 			zabbix_log(LOG_LEVEL_WARNING, "Expression [%s] cannot be evaluated: %s",
-@@ -965,11 +972,11 @@
- 					tr[i].exp, error);
+ 			zabbix_log(LOG_LEVEL_WARNING, "Expression [%s] cannot be evaluated: %s", tr[i].exp, error);
  
  			DBupdate_trigger_value(tr[i].triggerid, tr[i].type, tr[i].value,
 -					tr[i].error, TRIGGER_VALUE_UNKNOWN, tr[i].clock, error);
@@ -1044,7 +1042,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  
  		zbx_free(tr[i].error);
  		zbx_free(tr[i].exp);
-@@ -1027,7 +1034,7 @@
+@@ -1024,7 +1031,7 @@
  		uint64_array_add(&ids, &ids_alloc, &ids_num, history[i].itemid, 64);
  
  	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
@@ -1053,7 +1051,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  			" from items"
  			" where");
  
-@@ -1068,6 +1075,10 @@
+@@ -1065,6 +1072,10 @@
  			item.lastclock	= atoi(row[2]);
  		else
  			item.lastclock	= 0;
@@ -1064,7 +1062,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  		if (SUCCEED != DBis_null(row[3]))
  		{
  			item.prevorgvalue_null	= 0;
-@@ -1102,8 +1113,8 @@
+@@ -1099,8 +1110,8 @@
  
  		status = ITEM_STATUS_ACTIVE;
  
@@ -1075,7 +1073,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  
  		switch (h->value_type) {
  		case ITEM_VALUE_TYPE_FLOAT:
-@@ -1124,9 +1135,11 @@
+@@ -1121,9 +1132,11 @@
  				}
  				break;
  			case ITEM_STORE_SPEED_PER_SECOND:
@@ -1089,7 +1087,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  					h->value.value_float = DBmultiply_value_float(&item, h->value.value_float);
  
  					if (SUCCEED == DBchk_double(h->value.value_float))
-@@ -1222,9 +1235,11 @@
+@@ -1215,9 +1228,11 @@
  						h->value.value_uint64);
  				break;
  			case ITEM_STORE_SPEED_PER_SECOND:
@@ -1103,7 +1101,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  					h->value.value_uint64 = DBmultiply_value_uint64(&item, h->value.value_uint64);
  					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
  							",prevvalue=lastvalue,prevorgvalue='" ZBX_FS_UI64 "'"
-@@ -1405,10 +1420,19 @@
+@@ -1394,10 +1409,19 @@
  	zbx_uint64_t	id;
  #ifdef HAVE_MULTIROW_INSERT
  	int		tmp_offset;
@@ -1123,7 +1121,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  #ifdef HAVE_ORACLE
  	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "begin\n");
  #endif
-@@ -1419,7 +1443,8 @@
+@@ -1408,7 +1432,8 @@
  #ifdef HAVE_MULTIROW_INSERT
  	tmp_offset = sql_offset;
  	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
@@ -1133,7 +1131,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  #endif
  
  	for (i = 0; i < history_num; i++)
-@@ -1433,20 +1458,20 @@
+@@ -1422,20 +1447,20 @@
  		if (0 != history[i].value_null)
  			continue;
  
@@ -1163,7 +1161,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  	}
  
  #ifdef HAVE_MULTIROW_INSERT
-@@ -1464,7 +1489,8 @@
+@@ -1453,7 +1478,8 @@
  #ifdef HAVE_MULTIROW_INSERT
  		tmp_offset = sql_offset;
  		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
@@ -1173,7 +1171,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  #endif
  
  		for (i = 0; i < history_num; i++)
-@@ -1478,22 +1504,21 @@
+@@ -1467,22 +1493,21 @@
  			if (0 != history[i].value_null)
  				continue;
  
@@ -1205,7 +1203,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  		}
  
  #ifdef HAVE_MULTIROW_INSERT
-@@ -1513,7 +1538,8 @@
+@@ -1502,7 +1527,8 @@
  #ifdef HAVE_MULTIROW_INSERT
  	tmp_offset = sql_offset;
  	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
@@ -1215,7 +1213,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  #endif
  
  	for (i = 0; i < history_num; i++)
-@@ -1527,20 +1553,20 @@
+@@ -1516,20 +1542,20 @@
  		if (0 != history[i].value_null)
  			continue;
  
@@ -1245,7 +1243,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  	}
  
  #ifdef HAVE_MULTIROW_INSERT
-@@ -1558,7 +1584,8 @@
+@@ -1547,7 +1573,8 @@
  #ifdef HAVE_MULTIROW_INSERT
  		tmp_offset = sql_offset;
  		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
@@ -1255,7 +1253,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  #endif
  
  		for (i = 0; i < history_num; i++)
-@@ -1572,22 +1599,21 @@
+@@ -1561,22 +1588,21 @@
  			if (0 != history[i].value_null)
  				continue;
  
@@ -1287,7 +1285,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  		}
  
  #ifdef HAVE_MULTIROW_INSERT
-@@ -1607,7 +1633,8 @@
+@@ -1596,7 +1622,8 @@
  #ifdef HAVE_MULTIROW_INSERT
  	tmp_offset = sql_offset;
  	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
@@ -1297,7 +1295,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  #endif
  
  	for (i = 0; i < history_num; i++)
-@@ -1622,20 +1649,20 @@
+@@ -1611,20 +1638,20 @@
  			continue;
  
  		value_esc = DBdyn_escape_string_len(history[i].value_orig.value_str, HISTORY_STR_VALUE_LEN);
@@ -1327,7 +1325,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  		zbx_free(value_esc);
  	}
  
-@@ -1654,7 +1681,8 @@
+@@ -1643,7 +1670,8 @@
  #ifdef HAVE_MULTIROW_INSERT
  		tmp_offset = sql_offset;
  		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
@@ -1337,7 +1335,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  #endif
  
  		for (i = 0; i < history_num; i++)
-@@ -1669,22 +1697,21 @@
+@@ -1658,22 +1686,21 @@
  				continue;
  
  			value_esc = DBdyn_escape_string_len(history[i].value_orig.value_str, HISTORY_STR_VALUE_LEN);
@@ -1369,7 +1367,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  			zbx_free(value_esc);
  		}
  
-@@ -1718,7 +1745,8 @@
+@@ -1707,7 +1734,8 @@
  #ifdef HAVE_MULTIROW_INSERT
  		tmp_offset = sql_offset;
  		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
@@ -1379,7 +1377,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  #endif
  
  		for (i = 0; i < history_num; i++)
-@@ -1733,22 +1761,21 @@
+@@ -1722,22 +1750,21 @@
  				continue;
  
  			value_esc = DBdyn_escape_string(history[i].value_orig.value_str);
@@ -1412,7 +1410,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  			zbx_free(value_esc);
  			id++;
  		}
-@@ -1774,7 +1801,8 @@
+@@ -1763,7 +1790,8 @@
  #ifdef HAVE_MULTIROW_INSERT
  		tmp_offset = sql_offset;
  		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
@@ -1422,7 +1420,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  #endif
  
  		for (i = 0; i < history_num; i++)
-@@ -1790,9 +1818,13 @@
+@@ -1779,9 +1807,13 @@
  
  			source_esc = DBdyn_escape_string_len(history[i].source, HISTORY_LOG_SOURCE_LEN);
  			value_esc = DBdyn_escape_string(history[i].value_orig.value_str);
@@ -1438,7 +1436,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  					id,
  					history[i].itemid,
  					history[i].clock,
-@@ -1801,19 +1833,10 @@
+@@ -1790,19 +1822,10 @@
  					history[i].severity,
  					value_esc,
  					history[i].logeventid);
@@ -1462,7 +1460,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  			zbx_free(value_esc);
  			zbx_free(source_esc);
  			id++;
-@@ -1862,6 +1885,9 @@
+@@ -1851,6 +1874,9 @@
  	char		*value_esc, *source_esc;
  #ifdef HAVE_MULTIROW_INSERT
  	int		tmp_offset;
@@ -1472,7 +1470,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  #endif
  
  	zabbix_log(LOG_LEVEL_DEBUG, "In DCmass_proxy_add_history()");
-@@ -1872,104 +1898,58 @@
+@@ -1861,104 +1887,58 @@
  
  #ifdef HAVE_MULTIROW_INSERT
  	tmp_offset = sql_offset;
@@ -1619,7 +1617,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  		}
  	}
  
-@@ -1985,80 +1965,36 @@
+@@ -1974,80 +1954,36 @@
  
  #ifdef HAVE_MULTIROW_INSERT
  	tmp_offset = sql_offset;
@@ -1722,7 +1720,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  	}
  
  #ifdef HAVE_MULTIROW_INSERT
-@@ -2379,6 +2315,17 @@
+@@ -2372,6 +2308,17 @@
  	return history;
  }
  
@@ -1740,7 +1738,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  /******************************************************************************
   *                                                                            *
   * Function: DCadd_history                                                    *
-@@ -2394,16 +2341,19 @@
+@@ -2387,16 +2334,19 @@
   * Comments:                                                                  *
   *                                                                            *
   ******************************************************************************/
@@ -1762,7 +1760,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  	history->value_type		= ITEM_VALUE_TYPE_FLOAT;
  	history->value_orig.value_float	= value_orig;
  	history->value.value_float	= 0;
-@@ -2432,16 +2382,19 @@
+@@ -2425,16 +2375,19 @@
   * Comments:                                                                  *
   *                                                                            *
   ******************************************************************************/
@@ -1784,7 +1782,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  	history->value_type			= ITEM_VALUE_TYPE_UINT64;
  	history->value_orig.value_uint64	= value_orig;
  	history->value.value_uint64		= 0;
-@@ -2470,19 +2423,22 @@
+@@ -2463,19 +2416,22 @@
   * Comments:                                                                  *
   *                                                                            *
   ******************************************************************************/
@@ -1809,7 +1807,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  	history->value_type		= ITEM_VALUE_TYPE_STR;
  	history->value_orig.value_str	= cache->last_text;
  	history->value.value_str	= NULL;
-@@ -2513,19 +2469,22 @@
+@@ -2506,19 +2462,22 @@
   * Comments:                                                                  *
   *                                                                            *
   ******************************************************************************/
@@ -1834,7 +1832,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  	history->value_type		= ITEM_VALUE_TYPE_TEXT;
  	history->value_orig.value_str	= cache->last_text;
  	history->value.value_str	= NULL;
-@@ -2556,14 +2515,16 @@
+@@ -2549,14 +2508,16 @@
   * Comments:                                                                  *
   *                                                                            *
   ******************************************************************************/
@@ -1853,7 +1851,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  	if (HISTORY_LOG_VALUE_LEN_MAX < (len1 = strlen(value_orig) + 1))
  		len1 = HISTORY_LOG_VALUE_LEN_MAX;
  	if (HISTORY_LOG_SOURCE_LEN_MAX < (len2 = (NULL != source && *source != '\0') ? strlen(source) + 1 : 0))
-@@ -2571,7 +2532,8 @@
+@@ -2564,7 +2525,8 @@
  	history = DCget_history_ptr(itemid, len1 + len2);
  
  	history->itemid			= itemid;
@@ -1863,7 +1861,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  	history->value_type		= ITEM_VALUE_TYPE_LOG;
  	history->value_orig.value_str	= cache->last_text;
  	history->value.value_str	= NULL;
-@@ -2615,31 +2577,31 @@
+@@ -2608,31 +2570,31 @@
   * Comments:                                                                  *
   *                                                                            *
   ******************************************************************************/
@@ -1901,7 +1899,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  			break;
  		default:
  			zabbix_log(LOG_LEVEL_ERR, "Unknown value type [%d] for itemid [" ZBX_FS_UI64 "]",
-@@ -2748,6 +2710,8 @@
+@@ -2741,6 +2703,8 @@
  	zbx_mem_create(&trend_mem, trend_shm_key, ZBX_NO_MUTEX, sz, "trend cache", "TrendCacheSize");
  
  	cache->trends_num = 0;
@@ -1922,7 +1920,7 @@ Index: src/libs/zbxdbhigh/proxy.c
  		{"p.timestamp",	ZBX_PROTO_TAG_LOGTIMESTAMP,	ZBX_JSON_TYPE_INT,	"0"},
  		{"p.source",	ZBX_PROTO_TAG_LOGSOURCE,	ZBX_JSON_TYPE_STRING,	""},
  		{"p.severity",	ZBX_PROTO_TAG_LOGSEVERITY,	ZBX_JSON_TYPE_INT,	"0"},
-@@ -1282,7 +1283,7 @@
+@@ -1284,7 +1285,7 @@
  
  		if (item.host.maintenance_status == HOST_MAINTENANCE_STATUS_ON &&
  				item.host.maintenance_type == MAINTENANCE_TYPE_NODATA &&
@@ -1931,7 +1929,7 @@ Index: src/libs/zbxdbhigh/proxy.c
  			continue;
  
  		if (item.type == ITEM_TYPE_INTERNAL || item.type == ITEM_TYPE_AGGREGATE || item.type == ITEM_TYPE_CALCULATED)
-@@ -1300,7 +1301,7 @@
+@@ -1302,7 +1303,7 @@
  
  		if (0 == strcmp(values[i].value, "ZBX_NOTSUPPORTED"))
  		{
@@ -1940,7 +1938,7 @@ Index: src/libs/zbxdbhigh/proxy.c
  
  			if (NULL != processed)
  				(*processed)++;
-@@ -1317,7 +1318,7 @@
+@@ -1319,7 +1320,7 @@
  
  				if (NULL != values[i].source)
  					zbx_replace_invalid_utf8(values[i].source);
@@ -1949,7 +1947,7 @@ Index: src/libs/zbxdbhigh/proxy.c
  						values[i].timestamp, values[i].source, values[i].severity,
  						values[i].logeventid, values[i].lastlogsize, values[i].mtime);
  
-@@ -1328,7 +1329,7 @@
+@@ -1330,7 +1331,7 @@
  			{
  				zabbix_log(LOG_LEVEL_DEBUG, "Item [%s:%s] error: %s",
  						item.host.host, item.key_orig, agent.msg);
@@ -1958,7 +1956,7 @@ Index: src/libs/zbxdbhigh/proxy.c
  			}
  			else
  				THIS_SHOULD_NEVER_HAPPEN; /* set_result_type() always sets MSG result if not SUCCEED */
-@@ -1380,7 +1381,7 @@
+@@ -1382,7 +1383,7 @@
  	int			ret = SUCCEED;
  	int			processed = 0;
  	double			sec;
@@ -1967,7 +1965,7 @@ Index: src/libs/zbxdbhigh/proxy.c
  
  #define VALUES_MAX	256
  	static AGENT_VALUE	*values = NULL, *av;
-@@ -1388,15 +1389,31 @@
+@@ -1390,15 +1391,31 @@
  
  	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
  
@@ -2001,7 +1999,7 @@ Index: src/libs/zbxdbhigh/proxy.c
  /* {"request":"ZBX_SENDER_DATA","data":[{"key":"system.cpu.num",...,...},{...},...]}
   *                                     ^
   */	if (NULL == (p = zbx_json_pair_by_name(jp, ZBX_PROTO_TAG_DATA)))
-@@ -1433,9 +1450,24 @@
+@@ -1435,9 +1452,24 @@
  		memset(av, 0, sizeof(AGENT_VALUE));
  
  		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp)))
@@ -2032,7 +2030,7 @@ Index: src/libs/zbxdbhigh/db.c
 ===================================================================
 --- src/libs/zbxdbhigh/db.c	(revision 18797)
 +++ src/libs/zbxdbhigh/db.c	(revision 18798)
-@@ -480,7 +480,7 @@
+@@ -479,7 +479,7 @@
  }
  
  int	DBupdate_trigger_value(zbx_uint64_t triggerid, int trigger_type, int trigger_value,
@@ -2041,7 +2039,7 @@ Index: src/libs/zbxdbhigh/db.c
  {
  	const char	*__function_name = "update_trigger_value";
  	int		ret = SUCCEED;
-@@ -490,10 +490,10 @@
+@@ -489,10 +489,10 @@
  
  	if (reason == NULL)
  		zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64 " old:%d new:%d now:%d",
@@ -2054,7 +2052,7 @@ Index: src/libs/zbxdbhigh/db.c
  
  	switch (trigger_type)
  	{
-@@ -522,7 +522,7 @@
+@@ -521,7 +521,7 @@
  							"lastchange=%d,"
  							"error=''"
  						" where triggerid=" ZBX_FS_UI64,
@@ -2063,7 +2061,7 @@ Index: src/libs/zbxdbhigh/db.c
  			}
  			else
  			{
-@@ -532,7 +532,7 @@
+@@ -531,7 +531,7 @@
  							"lastchange=%d,"
  							"error='%s'"
  						" where triggerid=" ZBX_FS_UI64,
@@ -2072,7 +2070,7 @@ Index: src/libs/zbxdbhigh/db.c
  				zbx_free(reason_esc);
  			}
  
-@@ -541,8 +541,9 @@
+@@ -540,8 +540,9 @@
  			event.source = EVENT_SOURCE_TRIGGERS;
  			event.object = EVENT_OBJECT_TRIGGER;
  			event.objectid = triggerid;
@@ -2083,7 +2081,7 @@ Index: src/libs/zbxdbhigh/db.c
  
  			/* Processing event */
  			if (FAIL == (ret = process_event(&event, 0)))
-@@ -632,6 +633,7 @@
+@@ -631,6 +632,7 @@
  	int		trigger_type, trigger_value, type, lastclock, delay,
  			nextcheck, min_nextcheck, now;
  	const char	*trigger_error;
@@ -2091,7 +2089,7 @@ Index: src/libs/zbxdbhigh/db.c
  
  	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
  
-@@ -695,8 +697,11 @@
+@@ -694,8 +696,11 @@
  		if (-1 == min_nextcheck || min_nextcheck >= now)
  			continue;
  
@@ -12902,7 +12900,7 @@ Index: upgrades/Makefile.am
 Index: upgrades/dbpatches/2.0/postgresql/patch/items.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/postgresql/patch/items.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/postgresql/patch/items.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/postgresql/patch/items.sql	(revision 0)
 @@ -0,0 +1 @@
 +ALTER TABLE items ADD lastns integer NULL;
 
@@ -12914,7 +12912,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/postgresql/patch/proxy_history.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/postgresql/patch/proxy_history.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/postgresql/patch/proxy_history.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/postgresql/patch/proxy_history.sql	(revision 0)
 @@ -0,0 +1 @@
 +ALTER TABLE proxy_history ADD ns integer DEFAULT '0' NOT NULL;
 
@@ -12926,7 +12924,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/postgresql/patch/events.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/postgresql/patch/events.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/postgresql/patch/events.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/postgresql/patch/events.sql	(revision 0)
 @@ -0,0 +1 @@
 +ALTER TABLE events ADD ns integer DEFAULT '0' NOT NULL;
 
@@ -12938,7 +12936,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/postgresql/patch/config.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/postgresql/patch/config.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/postgresql/patch/config.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/postgresql/patch/config.sql	(revision 0)
 @@ -0,0 +1 @@
 +ALTER TABLE config ADD ns_support integer DEFAULT '0' NOT NULL;
 
@@ -12950,7 +12948,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/postgresql/optional/history.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/postgresql/optional/history.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/postgresql/optional/history.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/postgresql/optional/history.sql	(revision 0)
 @@ -0,0 +1 @@
 +ALTER TABLE history ADD ns integer DEFAULT '0' NOT NULL;
 
@@ -12962,7 +12960,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/postgresql/optional/history_log.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/postgresql/optional/history_log.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/postgresql/optional/history_log.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/postgresql/optional/history_log.sql	(revision 0)
 @@ -0,0 +1 @@
 +ALTER TABLE history_log ADD ns integer DEFAULT '0' NOT NULL;
 
@@ -12974,7 +12972,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/postgresql/optional/config.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/postgresql/optional/config.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/postgresql/optional/config.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/postgresql/optional/config.sql	(revision 0)
 @@ -0,0 +1 @@
 +UPDATE config SET ns_support=1;
 
@@ -12986,7 +12984,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/postgresql/optional/history_str_sync.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/postgresql/optional/history_str_sync.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/postgresql/optional/history_str_sync.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/postgresql/optional/history_str_sync.sql	(revision 0)
 @@ -0,0 +1 @@
 +ALTER TABLE history_str_sync ADD ns integer DEFAULT '0' NOT NULL;
 
@@ -12998,7 +12996,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/postgresql/optional/history_text.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/postgresql/optional/history_text.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/postgresql/optional/history_text.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/postgresql/optional/history_text.sql	(revision 0)
 @@ -0,0 +1 @@
 +ALTER TABLE history_text ADD ns integer DEFAULT '0' NOT NULL;
 
@@ -13010,7 +13008,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/postgresql/optional/history_str.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/postgresql/optional/history_str.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/postgresql/optional/history_str.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/postgresql/optional/history_str.sql	(revision 0)
 @@ -0,0 +1 @@
 +ALTER TABLE history_str ADD ns integer DEFAULT '0' NOT NULL;
 
@@ -13022,7 +13020,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/postgresql/optional/history_uint_sync.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/postgresql/optional/history_uint_sync.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/postgresql/optional/history_uint_sync.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/postgresql/optional/history_uint_sync.sql	(revision 0)
 @@ -0,0 +1 @@
 +ALTER TABLE history_uint_sync ADD ns integer DEFAULT '0' NOT NULL;
 
@@ -13034,7 +13032,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/postgresql/optional/history_sync.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/postgresql/optional/history_sync.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/postgresql/optional/history_sync.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/postgresql/optional/history_sync.sql	(revision 0)
 @@ -0,0 +1 @@
 +ALTER TABLE history_sync ADD ns integer DEFAULT '0' NOT NULL;
 
@@ -13046,7 +13044,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/postgresql/optional/history_uint.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/postgresql/optional/history_uint.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/postgresql/optional/history_uint.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/postgresql/optional/history_uint.sql	(revision 0)
 @@ -0,0 +1 @@
 +ALTER TABLE history_uint ADD ns integer DEFAULT '0' NOT NULL;
 
@@ -13058,7 +13056,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/mysql/patch/items.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/mysql/patch/items.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/mysql/patch/items.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/mysql/patch/items.sql	(revision 0)
 @@ -0,0 +1 @@
 +ALTER TABLE items ADD lastns integer NULL;
 
@@ -13070,7 +13068,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/mysql/patch/proxy_history.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/mysql/patch/proxy_history.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/mysql/patch/proxy_history.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/mysql/patch/proxy_history.sql	(revision 0)
 @@ -0,0 +1 @@
 +ALTER TABLE proxy_history ADD ns integer DEFAULT '0' NOT NULL;
 
@@ -13082,7 +13080,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/mysql/patch/events.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/mysql/patch/events.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/mysql/patch/events.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/mysql/patch/events.sql	(revision 0)
 @@ -0,0 +1 @@
 +ALTER TABLE events ADD ns integer DEFAULT '0' NOT NULL;
 
@@ -13094,7 +13092,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/mysql/patch/config.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/mysql/patch/config.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/mysql/patch/config.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/mysql/patch/config.sql	(revision 0)
 @@ -0,0 +1 @@
 +ALTER TABLE config ADD ns_support integer DEFAULT '0' NOT NULL;
 
@@ -13106,7 +13104,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/mysql/optional/history.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/mysql/optional/history.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/mysql/optional/history.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/mysql/optional/history.sql	(revision 0)
 @@ -0,0 +1 @@
 +ALTER TABLE history ADD ns integer DEFAULT '0' NOT NULL;
 
@@ -13118,7 +13116,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/mysql/optional/history_log.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/mysql/optional/history_log.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/mysql/optional/history_log.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/mysql/optional/history_log.sql	(revision 0)
 @@ -0,0 +1 @@
 +ALTER TABLE history_log ADD ns integer DEFAULT '0' NOT NULL;
 
@@ -13130,7 +13128,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/mysql/optional/config.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/mysql/optional/config.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/mysql/optional/config.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/mysql/optional/config.sql	(revision 0)
 @@ -0,0 +1 @@
 +UPDATE config SET ns_support=1;
 
@@ -13142,7 +13140,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/mysql/optional/history_str_sync.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/mysql/optional/history_str_sync.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/mysql/optional/history_str_sync.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/mysql/optional/history_str_sync.sql	(revision 0)
 @@ -0,0 +1 @@
 +ALTER TABLE history_str_sync ADD ns integer DEFAULT '0' NOT NULL;
 
@@ -13154,7 +13152,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/mysql/optional/history_text.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/mysql/optional/history_text.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/mysql/optional/history_text.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/mysql/optional/history_text.sql	(revision 0)
 @@ -0,0 +1 @@
 +ALTER TABLE history_text ADD ns integer DEFAULT '0' NOT NULL;
 
@@ -13166,7 +13164,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/mysql/optional/history_str.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/mysql/optional/history_str.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/mysql/optional/history_str.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/mysql/optional/history_str.sql	(revision 0)
 @@ -0,0 +1 @@
 +ALTER TABLE history_str ADD ns integer DEFAULT '0' NOT NULL;
 
@@ -13178,7 +13176,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/mysql/optional/history_uint_sync.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/mysql/optional/history_uint_sync.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/mysql/optional/history_uint_sync.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/mysql/optional/history_uint_sync.sql	(revision 0)
 @@ -0,0 +1 @@
 +ALTER TABLE history_uint_sync ADD ns integer DEFAULT '0' NOT NULL;
 
@@ -13190,7 +13188,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/mysql/optional/history_sync.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/mysql/optional/history_sync.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/mysql/optional/history_sync.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/mysql/optional/history_sync.sql	(revision 0)
 @@ -0,0 +1 @@
 +ALTER TABLE history_sync ADD ns integer DEFAULT '0' NOT NULL;
 
@@ -13202,7 +13200,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/mysql/optional/history_uint.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/mysql/optional/history_uint.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/mysql/optional/history_uint.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/mysql/optional/history_uint.sql	(revision 0)
 @@ -0,0 +1 @@
 +ALTER TABLE history_uint ADD ns integer DEFAULT '0' NOT NULL;
 
@@ -13214,7 +13212,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/oracle/patch/items.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/oracle/patch/items.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/oracle/patch/items.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/oracle/patch/items.sql	(revision 0)
 @@ -0,0 +1 @@
 +ALTER TABLE items ADD lastns number(10) NULL;
 
@@ -13226,7 +13224,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/oracle/patch/proxy_history.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/oracle/patch/proxy_history.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/oracle/patch/proxy_history.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/oracle/patch/proxy_history.sql	(revision 0)
 @@ -0,0 +1 @@
 +ALTER TABLE proxy_history ADD ns number(10) DEFAULT '0' NOT NULL;
 
@@ -13238,7 +13236,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/oracle/patch/events.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/oracle/patch/events.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/oracle/patch/events.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/oracle/patch/events.sql	(revision 0)
 @@ -0,0 +1 @@
 +ALTER TABLE events ADD ns number(10) DEFAULT '0' NOT NULL;
 
@@ -13250,7 +13248,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/oracle/patch/config.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/oracle/patch/config.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/oracle/patch/config.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/oracle/patch/config.sql	(revision 0)
 @@ -0,0 +1 @@
 +ALTER TABLE config ADD ns_support number(10) DEFAULT '0' NOT NULL;
 
@@ -13262,7 +13260,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/oracle/optional/history.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/oracle/optional/history.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/oracle/optional/history.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/oracle/optional/history.sql	(revision 0)
 @@ -0,0 +1 @@
 +ALTER TABLE history ADD ns number(10) DEFAULT '0' NOT NULL;
 
@@ -13274,7 +13272,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/oracle/optional/history_log.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/oracle/optional/history_log.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/oracle/optional/history_log.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/oracle/optional/history_log.sql	(revision 0)
 @@ -0,0 +1 @@
 +ALTER TABLE history_log ADD ns number(10) DEFAULT '0' NOT NULL;
 
@@ -13286,7 +13284,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/oracle/optional/config.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/oracle/optional/config.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/oracle/optional/config.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/oracle/optional/config.sql	(revision 0)
 @@ -0,0 +1 @@
 +UPDATE config SET ns_support=1;
 
@@ -13298,7 +13296,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/oracle/optional/history_str_sync.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/oracle/optional/history_str_sync.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/oracle/optional/history_str_sync.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/oracle/optional/history_str_sync.sql	(revision 0)
 @@ -0,0 +1 @@
 +ALTER TABLE history_str_sync ADD ns number(10) DEFAULT '0' NOT NULL;
 
@@ -13310,7 +13308,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/oracle/optional/history_text.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/oracle/optional/history_text.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/oracle/optional/history_text.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/oracle/optional/history_text.sql	(revision 0)
 @@ -0,0 +1 @@
 +ALTER TABLE history_text ADD ns number(10) DEFAULT '0' NOT NULL;
 
@@ -13322,7 +13320,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/oracle/optional/history_str.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/oracle/optional/history_str.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/oracle/optional/history_str.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/oracle/optional/history_str.sql	(revision 0)
 @@ -0,0 +1 @@
 +ALTER TABLE history_str ADD ns number(10) DEFAULT '0' NOT NULL;
 
@@ -13334,7 +13332,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/oracle/optional/history_uint_sync.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/oracle/optional/history_uint_sync.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/oracle/optional/history_uint_sync.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/oracle/optional/history_uint_sync.sql	(revision 0)
 @@ -0,0 +1 @@
 +ALTER TABLE history_uint_sync ADD ns number(10) DEFAULT '0' NOT NULL;
 
@@ -13346,7 +13344,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/oracle/optional/history_sync.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/oracle/optional/history_sync.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/oracle/optional/history_sync.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/oracle/optional/history_sync.sql	(revision 0)
 @@ -0,0 +1 @@
 +ALTER TABLE history_sync ADD ns number(10) DEFAULT '0' NOT NULL;
 
@@ -13358,7 +13356,7 @@ Added: svn:eol-style
 Index: upgrades/dbpatches/2.0/oracle/optional/history_uint.sql
 ===================================================================
 --- upgrades/dbpatches/2.0/oracle/optional/history_uint.sql	(revision 0)
-+++ upgrades/dbpatches/2.0/oracle/optional/history_uint.sql	(revision 18798)
++++ upgrades/dbpatches/2.0/oracle/optional/history_uint.sql	(revision 0)
 @@ -0,0 +1 @@
 +ALTER TABLE history_uint ADD ns number(10) DEFAULT '0' NOT NULL;
 
