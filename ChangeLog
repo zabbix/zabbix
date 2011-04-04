@@ -2,6 +2,7 @@
 Changes for 1.9.4
 
 New features:
+ - [ZBX-1357] updated Latvian, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
  - [ZBX-3658] fixed the whole request to Java proxy failing if it contains an invalid key (asaveljevs)
