@@ -121,19 +121,14 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			res = get_value_calculated(item, result);
 			break;
 		default:
-			zabbix_log(LOG_LEVEL_WARNING, "Not supported item type:%d",
-					item->type);
-			zabbix_syslog("Not supported item type:%d",
-					item->type);
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Not supported item type:%d", item->type));
 			res = NOTSUPPORTED;
 	}
 
 	if (SUCCEED != res && ISSET_MSG(result))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Item [%s:%s] error: %s",
-				item->host.host, item->key_orig, result->msg);
-		zabbix_syslog("Item [%s:%s] error: %s",
-				item->host.host, item->key_orig, result->msg);
+		zabbix_log(LOG_LEVEL_DEBUG, "Item [%s:%s] error: %s", item->host.host, item->key_orig, result->msg);
+		zabbix_syslog("Item [%s:%s] error: %s", item->host.host, item->key_orig, result->msg);
 	}
 
 	/* remove formatting symbols from the end of the result */

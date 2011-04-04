@@ -24,7 +24,6 @@
 #include "db.h"
 #include "dbcache.h"
 #include "log.h"
-#include "zlog.h"
 #include "zbxgetopt.h"
 #include "mutexs.h"
 #include "proxy.h"
@@ -461,7 +460,7 @@ int	MAIN_ZABBIX_ENTRY()
 
 	int		server_num = 0;
 
-	if(CONFIG_LOG_FILE == NULL || '\0' == *CONFIG_LOG_FILE)
+	if (NULL == CONFIG_LOG_FILE || '\0' == *CONFIG_LOG_FILE)
 	{
 		zabbix_open_log(LOG_TYPE_SYSLOG,CONFIG_LOG_LEVEL,NULL);
 	}

@@ -21,7 +21,6 @@
 
 #include "db.h"
 #include "log.h"
-#include "zlog.h"
 #include "dbcache.h"
 
 /******************************************************************************
@@ -672,12 +671,7 @@ static void	DBupdate_services_rec(zbx_uint64_t serviceid, int clock)
 				serviceupid);
 		}
 		else
-		{
-			zabbix_log( LOG_LEVEL_ERR, "Unknown calculation algorithm of service status [%d]",
-				algorithm);
-			zabbix_syslog("Unknown calculation algorithm of service status [%d]",
-				algorithm);
-		}
+			zabbix_log(LOG_LEVEL_ERR, "Unknown calculation algorithm of service status [%d]", algorithm);
 	}
 	DBfree_result(result);
 

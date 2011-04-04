@@ -22,7 +22,6 @@
 #include "zbxmacros.h"
 #include "db.h"
 #include "log.h"
-#include "zlog.h"
 
 #define ZBX_MACRO_ALLOC_STEP		4
 #define ZBX_MACRO_UPDATE_INTERVAL	300	/* refresh macros every 5min */
