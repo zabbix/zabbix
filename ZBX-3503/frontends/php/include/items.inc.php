@@ -1142,6 +1142,7 @@
 		 */
 		for($paramNo=1; $paramNo<=9; $paramNo++){
 			$replaceMarcoTo = isset($itemParams[$paramNo - 1]) ? $itemParams[$paramNo - 1] : '';
+			$replaceMarcoTo = str_replace('\"', '"', $replaceMarcoTo);
 			$description = str_replace('$'.$paramNo, $replaceMarcoTo, $description);
 		}
 		return $description;
