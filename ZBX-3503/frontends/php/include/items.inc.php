@@ -1142,7 +1142,13 @@
 		 */
 		for($paramNo=1; $paramNo<=9; $paramNo++){
 			$replaceMarcoTo = isset($itemParams[$paramNo - 1]) ? $itemParams[$paramNo - 1] : '';
-			$replaceMarcoTo = str_replace('\"', '"', $replaceMarcoTo);
+			// if this is a quoted parameter (e.g. "abc")
+			if(preg_match('/^".*?"$/u', $replaceMarcoTo)){
+				// removing quotes from the sides: '"abc"' becomes 'abc'
+				$replaceMarcoTo = mb_substr($replaceMarcoTo, 1, mb_strlen($replaceMarcoTo) - 2);
+				// removing escaped quotes
+				$replaceMarcoTo = str_replace('\"', '"', $replaceMarcoTo);
+			}
 			$description = str_replace('$'.$paramNo, $replaceMarcoTo, $description);
 		}
 		return $description;
