@@ -370,6 +370,12 @@ void	collect_perfstat()
 
 	if (ERROR_SUCCESS != (status = PdhCollectQueryData(ppsd->pdh_query)))
 	{
+		for (cptr = ppsd->pPerfCounterList; cptr != NULL; cptr = cptr->next)
+		{
+			cptr->status = ITEM_STATUS_NOTSUPPORTED;
+			cptr->CurrentCounter = 0;
+			cptr->CurrentNum = 1;
+		}
 		zabbix_log(LOG_LEVEL_DEBUG, "Call to PdhCollectQueryData() failed: %s", strerror_from_module(status, L"PDH.DLL"));
 		return;
 	}
