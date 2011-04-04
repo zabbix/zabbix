@@ -1134,13 +1134,15 @@
 		// initializing item key parser
 		$parser = new CItemKeyExpression($item);
 		$itemParams = $parser->expressions[0]['params']['item'];
-		// are item parameters found?
-		if (count($itemParams)){
-			// replacing macros one by one
-			foreach($itemParams as $i=>$keyParameter){
-				$paramNo = $i + 1;
-				$description = str_replace('$'.$paramNo, $keyParameter, $description);
-			}
+
+		// according to zabbix docs, we need to replace $1 to $9 with key parameters
+		// if item key has less then 9 parameters, other $x macros are replaces by ''
+		/*
+		 * @todo macros should not be replaces by '' if parameter does not exist (this should also be done on server side)
+		 */
+		for($paramNo=1; $paramNo<=9; $paramNo++){
+			$replaceMarcoTo = isset($itemParams[$paramNo - 1]) ? $itemParams[$paramNo - 1] : '';
+			$description = str_replace('$'.$paramNo, $replaceMarcoTo, $description);
 		}
 		return $description;
 	}
