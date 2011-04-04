@@ -35,7 +35,7 @@ abstract class CExpression{
 		if(zbx_empty($host))
 			throw new Exception('Empty host name provided in expression.');
 
-		if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $host))
+		if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $host))
 			throw new Exception('Incorrect host name "'.$host.'" provided in expression.');
 	}
 
