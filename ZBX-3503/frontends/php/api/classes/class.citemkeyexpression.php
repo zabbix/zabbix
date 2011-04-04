@@ -1,9 +1,9 @@
 <?php
-class CTriggerExpression extends CExpression {
+class CItemKeyExpression extends CExpression {
 
-	public function __construct($trigger){
+	public function __construct($item){
 		$this->initializeVars();
-		$this->checkExpression($trigger['expression']);
+		$this->checkExpression($item['key_']);
 	}
 
 
@@ -27,7 +27,7 @@ class CTriggerExpression extends CExpression {
 				'expression' => false,
 				'usermacro' => false,
 				'host' => false,
-				'item' => false,
+				'item' => true,  // we are at item already
 				'itemParam' => false,
 				'function' => false,
 				'functionParam' => false,
@@ -106,16 +106,16 @@ class CTriggerExpression extends CExpression {
 
 	public function checkExpression($expression){
 		$length = zbx_strlen($expression);
-		$symbolNum = 0;
-
+		
 		try{
 			if(zbx_empty(trim($expression)))
-				throw new Exception('Empty expression.');
+				throw new Exception('Empty key.');
 
-// Check expr start symbol
-			$startSymbol = zbx_substr(trim($expression), 0, 1);
-			if(($startSymbol != '(') && ($startSymbol != '{') && ($startSymbol != '-') && !zbx_ctype_digit($startSymbol))
-				throw new Exception('Incorrect trigger expression.');
+			// checking if item key is valid
+			$check_result = check_item_key($expression);
+			if (!$check_result['valid']) {
+				throw new Exception($check_result['description']);
+			}
 
 			for($symbolNum = 0; $symbolNum < $length; $symbolNum++){
 				$symbol = zbx_substr($expression, $symbolNum, 1);
@@ -130,18 +130,10 @@ class CTriggerExpression extends CExpression {
 				$this->setPreviousSymbol($symbol);
 			}
 
-			$symbolNum = 0;
-
-			$simpleExpression = $expression;
-			$this->checkBraces();
-			$this->checkParts($simpleExpression);
-			$this->checkSimpleExpression($simpleExpression);
+			$this->expressions[] = $this->currExpr;
 		}
 		catch(Exception $e){
-			$symbolNum = ($symbolNum > 0) ? --$symbolNum : $symbolNum;
-
 			$this->errors[] = $e->getMessage();
-			$this->errors[] = 'Check expression part starting from " '.zbx_substr($expression, $symbolNum).' "';
 		}
 	}
 

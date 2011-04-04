@@ -1126,26 +1126,22 @@
 	 * @author Konstantin Buravcov
 	 * @see ZBX-3503
 	 * @since 1.8.5
-	 * @param array $item - should contain atleast 'key_' and 'description'
+	 * @param array $item - should contain at least 'key_' and 'description'
 	 * @return string - parsed item name
 	 */
 	function item_description($item){
 		$description = $item['description'];
-		// initializing trigger parser, and giving it an item instead of trigger
-		// it will see 'key_' parameter and parse it as an item
-		$parser = new CTriggerExpression($item);
-
+		// initializing item key parser
+		$parser = new CItemKeyExpression($item);
+		$itemParams = $parser->expressions[0]['params']['item'];
 		// are item parameters found?
-		if (isset($parser->expressions[0]['itemParamList']) && count( $parser->expressions[0]['itemParamList']) > 0){
-			$keyParameters = $parser->expressions[0]['itemParamList'];
-
+		if (count($itemParams)){
 			// replacing macros one by one
-			foreach($keyParameters as $i=>$keyParameter){
+			foreach($itemParams as $i=>$keyParameter){
 				$paramNo = $i + 1;
 				$description = str_replace('$'.$paramNo, $keyParameter, $description);
 			}
 		}
-
 		return $description;
 	}
 
