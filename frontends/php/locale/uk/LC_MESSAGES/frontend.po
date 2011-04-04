@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-17 12:42+0200\n"
-"PO-Revision-Date: 2011-02-06 21:09+0200\n"
+"PO-Revision-Date: 2011-04-03 23:32+0200\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
@@ -35,9 +35,9 @@ msgstr "%1$s (рік %2$s)"
 #, php-format
 msgid "%d device"
 msgid_plural "%d devices"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%d пристрій"
+msgstr[1] "%d пристрої"
+msgstr[2] "%d пристроїв"
 
 #: include/locales/en_gb.inc.php:378
 msgid "&"
@@ -53,11 +53,11 @@ msgstr "' не приймає параметри."
 
 #: include/forms/action.edit.php:451
 msgid "(0 - infinitely)"
-msgstr ""
+msgstr "(0 - нескінченно)"
 
 #: include/forms/action.edit.php:458
 msgid "(minimum 60 seconds, 0 - use action default)"
-msgstr ""
+msgstr "(мінімум 60 секунд, 0 - використовувати замовчування з властивостей дії)"
 
 #: include/locales/en_gb.inc.php:108
 msgid "(no proxy)"
@@ -194,7 +194,7 @@ msgstr "Підтвердження"
 
 #: include/forms/sysmap.edit.php:135
 msgid "Acknowledging disabled"
-msgstr ""
+msgstr "Підтвердження відключено"
 
 #: include/forms/action.edit.php:343 include/forms/action.edit.php:346
 #: include/locales/en_gb.inc.php:1858
@@ -205,12 +205,12 @@ msgstr "Дія"
 #: api/classes/class.caction.php:807 api/classes/class.caction.php:826
 #, php-format
 msgid "Action \"%s\" already exists."
-msgstr ""
+msgstr "Дія \"%s\" вже існує."
 
 #: api/classes/class.caction.php:701 api/classes/class.caction.php:801
 #, php-format
 msgid "Action \"%s\" has incorrect value for \"esc_period\" (minimum 60 seconds)."
-msgstr ""
+msgstr "В дії \"%s\" вказано некоректне значення для \"esc_period\" (мінімум 60 секунд)."
 
 #: api/classes/class.caction.php:856
 #, php-format

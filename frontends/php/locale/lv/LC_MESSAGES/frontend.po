@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-17 12:42+0200\n"
-"PO-Revision-Date: 2011-03-17 12:37+0200\n"
+"PO-Revision-Date: 2011-03-17 12:59+0200\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: lv\n"
@@ -210,7 +210,7 @@ msgstr "Darbība \"%s\" jau eksistē."
 #: api/classes/class.caction.php:701 api/classes/class.caction.php:801
 #, php-format
 msgid "Action \"%s\" has incorrect value for \"esc_period\" (minimum 60 seconds)."
-msgstr "Darbībai \"%s\" ir nepareiza \"esc_period\" vērtība (minimālā vērtība - sekundes)."
+msgstr "Darbībai \"%s\" ir nepareiza \"esc_period\" vērtība (minimālā vērtība - 60 sekundes)."
 
 #: api/classes/class.caction.php:856
 #, php-format
@@ -452,7 +452,7 @@ msgstr "Tuvojas"
 
 #: include/locales/en_gb.inc.php:57
 msgid "Apr"
-msgstr "Tuv"
+msgstr "Apr"
 
 #: include/locales/en_gb.inc.php:70 include/locales/en_gb.inc.php:774
 msgid "April"
