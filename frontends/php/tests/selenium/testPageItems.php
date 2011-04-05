@@ -48,7 +48,7 @@ class testPageItems extends CWebTest{
 		$this->ok('Displaying');
 		$this->ok('Hosts list');
 		// Header
-		$this->ok(array('Wizard', 'Description', 'Triggers', 'Key', 'Interval', 'History', 'Trends', 'Type', 'Status', 'Applications', 'Error'));
+		$this->ok(array('Wizard', 'Name', 'Triggers', 'Key', 'Interval', 'History', 'Trends', 'Type', 'Status', 'Applications', 'Error'));
 		// someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
 
 		$this->dropdown_select('go', 'Activate selected');

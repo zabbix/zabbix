@@ -181,7 +181,7 @@
 		if(!empty($hostItems)){
 			$itemsList = array();
 			foreach($hostItems as $hostItem){
-				$itemsList[$hostItem['itemid']] = item_description($hostItem);
+				$itemsList[$hostItem['itemid']] = itemName($hostItem);
 			}
 			order_result($itemsList);
 
@@ -244,7 +244,7 @@
 		if(!empty($hostDiscoveryRules)){
 			$discoveryRuleList = array();
 			foreach($hostDiscoveryRules as $discoveryRule){
-				$discoveryRuleList[$discoveryRule['itemid']] = item_description($discoveryRule);
+				$discoveryRuleList[$discoveryRule['itemid']] = itemName($discoveryRule);
 			}
 			order_result($discoveryRuleList);
 			$hostDiscoveryRuleids = array_keys($discoveryRuleList);
@@ -265,7 +265,7 @@
 			if(!empty($hostItemPrototypes)){
 				$prototypeList = array();
 				foreach($hostItemPrototypes as $itemPrototype){
-					$prototypeList[$itemPrototype['itemid']] = item_description($itemPrototype);
+					$prototypeList[$itemPrototype['itemid']] = itemName($itemPrototype);
 				}
 				order_result($prototypeList);
 

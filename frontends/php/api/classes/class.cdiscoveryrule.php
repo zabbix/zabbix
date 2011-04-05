@@ -38,7 +38,7 @@ class CDiscoveryRule extends CItemGeneral{
 		$user_type = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
-		$sort_columns = array('itemid','description','key_','delay','type','status'); // allowed columns for sorting
+		$sort_columns = array('itemid','name','key_','delay','type','status'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM); // allowed output options for [ select_* ] params
 
 		$sql_parts = array(
@@ -462,7 +462,7 @@ COpt::memoryPick();
 				$obj_params['output'] = $options['select_prototypes'];
 				$prototypes = API::Item()->get($obj_params);
 
-				if(!is_null($options['limitSelects'])) order_result($prototypes, 'description');
+				if(!is_null($options['limitSelects'])) order_result($prototypes, 'name');
 				foreach($prototypes as $itemid => $subrule){
 					unset($prototypes[$itemid]['discoveries']);
 					$count = array();
@@ -772,7 +772,7 @@ COpt::memoryPick();
 
 // TODO: remove info from API
 			foreach($del_rules as $item){
-				info(_s('Discovery rule [%1$s:%2$s] deleted.', $item['description'], $item['key_']));
+				info(_s('Discovery rule [%1$s:%2$s] deleted.', $item['name'], $item['key_']));
 			}
 
 			return array('ruleids' => $ruleids);

@@ -98,7 +98,7 @@ function condition_value2str($conditiontype, $value){
 		case CONDITION_TYPE_TRIGGER:
 			$trigs = API::Trigger()->get(array(
 				'triggerids' => $value,
-				'expandTriggerDescriptions' => true,
+				'expandDescription' => true,
 				'output' => API_OUTPUT_EXTEND,
 				'selectHosts' => array('host'),
 				'nodeids' => get_current_nodeid(true),

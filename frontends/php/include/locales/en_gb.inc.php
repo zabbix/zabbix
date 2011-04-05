@@ -1024,7 +1024,6 @@
 	'S_TARGET'=>						_('Target'),
 	'S_TARGET_TYPE'=>					_('Target type'),
 	'S_COPY'=>						_('Copy'),
-	'S_SHOW_ITEMS_WITH_DESCRIPTION_LIKE'=>			_('Show items with description like'),
 	'S_HISTORY_CLEARING_CAN_TAKE_A_LONG_TIME_CONTINUE_Q'=>	_('History clearing can take a long time. Continue?'),
 	'S_MASS_UPDATE'=>					_('Mass update'),
 	'S_SEARCH'=>						_('Search'),

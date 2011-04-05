@@ -2519,12 +2519,12 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	template_itemid, itemid, itemappid, valuemapid;
-	char		*description_esc, *key_esc, *delay_flex_esc, *trapper_hosts_esc,
+	char		*name_esc, *key_esc, *delay_flex_esc, *trapper_hosts_esc,
 			*units_esc, *formula_esc, *logtimefmt_esc, *params_esc,
 			*ipmi_sensor_esc, *snmp_community_esc, *snmp_oid_esc,
 			*snmpv3_securityname_esc, *snmpv3_authpassphrase_esc,
 			*snmpv3_privpassphrase_esc, *username_esc, *password_esc,
-			*publickey_esc, *privatekey_esc, *filter_esc;
+			*publickey_esc, *privatekey_esc, *filter_esc, *description_esc;
 	char		*sql = NULL;
 	int		sql_offset = 0, sql_alloc = 16384,
 			i, res = SUCCEED;
@@ -2555,7 +2555,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 	DBfree_result(result);
 
 	result = DBselect(
-			"select ti.itemid,ti.description,ti.key_,ti.type,ti.value_type,"
+			"select ti.itemid,ti.name,ti.key_,ti.type,ti.value_type,"
 				"ti.data_type,ti.delay,ti.delay_flex,ti.history,ti.trends,"
 				"ti.status,ti.trapper_hosts,ti.units,ti.multiplier,"
 				"ti.delta,ti.formula,ti.logtimefmt,ti.valuemapid,"
@@ -2563,7 +2563,8 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 				"ti.snmpv3_securityname,ti.snmpv3_securitylevel,"
 				"ti.snmpv3_authpassphrase,ti.snmpv3_privpassphrase,"
 				"ti.authtype,ti.username,ti.password,ti.publickey,"
-				"ti.privatekey,ti.flags,ti.filter,hi.itemid"
+				"ti.privatekey,ti.flags,ti.filter,ti.description,"
+				"hi.itemid"
 			" from items ti"
 			" left join items hi on hi.key_=ti.key_"
 				" and hi.hostid=" ZBX_FS_UI64
@@ -2582,7 +2583,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 		type = (unsigned char)atoi(row[3]);
 		ZBX_DBROW2UINT64(valuemapid, row[17]);
 
-		description_esc			= DBdyn_escape_string(row[1]);
+		name_esc			= DBdyn_escape_string(row[1]);
 		delay_flex_esc			= DBdyn_escape_string(row[7]);
 		trapper_hosts_esc		= DBdyn_escape_string(row[11]);
 		units_esc			= DBdyn_escape_string(row[12]);
@@ -2601,6 +2602,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 		privatekey_esc			= DBdyn_escape_string(row[30]);
 		flags				= (unsigned char)atoi(row[31]);
 		filter_esc			= DBdyn_escape_string(row[32]);
+		description_esc			= DBdyn_escape_string(row[33]);
 
 		switch (type)
 		{
@@ -2615,13 +2617,13 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 				interfaceid = interfaceids[get_interface_type_by_item_type(type) - 1];
 		}
 
-		if (SUCCEED != (DBis_null(row[33])))
+		if (SUCCEED != (DBis_null(row[34])))
 		{
-			ZBX_STR2UINT64(itemid, row[33]);
+			ZBX_STR2UINT64(itemid, row[34]);
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8192,
 					"update items"
-						" set description='%s',"
+						" set name='%s',"
 						"type=%d,"
 						"value_type=%s,"
 						"data_type=%s,"
@@ -2653,9 +2655,10 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 						"templateid=" ZBX_FS_UI64 ","
 						"flags=%d,"
 						"filter='%s',"
+						"description='%s',"
 						"interfaceid=%s"
 					" where itemid=" ZBX_FS_UI64 ";\n",
-					description_esc,
+					name_esc,
 					(int)type,
 					row[4],		/* value_type */
 					row[5],		/* data_type */
@@ -2687,6 +2690,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 					template_itemid,
 					(int)flags,
 					filter_esc,
+					description_esc,
 					DBsql_id_ins(interfaceid),
 					itemid);
 		}
@@ -2698,21 +2702,21 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8192,
 					"insert into items"
-						" (itemid,description,key_,hostid,type,value_type,data_type,"
+						" (itemid,name,key_,hostid,type,value_type,data_type,"
 						"delay,delay_flex,history,trends,status,trapper_hosts,units,"
 						"multiplier,delta,formula,logtimefmt,valuemapid,params,"
 						"ipmi_sensor,snmp_community,snmp_oid,"
 						"snmpv3_securityname,snmpv3_securitylevel,"
 						"snmpv3_authpassphrase,snmpv3_privpassphrase,"
 						"authtype,username,password,publickey,privatekey,templateid,"
-						"flags,filter,interfaceid)"
+						"flags,filter,description,interfaceid)"
 					" values"
 						" (" ZBX_FS_UI64 ",'%s','%s'," ZBX_FS_UI64 ",%d,%s,%s,"
 						"%s,'%s',%s,%s,%s,'%s','%s',%s,%s,'%s','%s',%s,'%s','%s',"
 						"'%s','%s','%s',%s,'%s','%s',%s,'%s','%s','%s',"
-						"'%s'," ZBX_FS_UI64 ",%d,'%s',%s);\n",
+						"'%s'," ZBX_FS_UI64 ",%d,'%s','%s',%s);\n",
 					itemid,
-					description_esc,
+					name_esc,
 					key_esc,
 					hostid,
 					(int)type,
@@ -2746,6 +2750,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 					template_itemid,
 					(int)flags,
 					filter_esc,
+					description_esc,
 					DBsql_id_ins(interfaceid));
 
 			zbx_free(key_esc);
@@ -2756,6 +2761,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 
 		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 
+		zbx_free(description_esc);
 		zbx_free(filter_esc);
 		zbx_free(privatekey_esc);
 		zbx_free(publickey_esc);
@@ -2773,7 +2779,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 		zbx_free(units_esc);
 		zbx_free(trapper_hosts_esc);
 		zbx_free(delay_flex_esc);
-		zbx_free(description_esc);
+		zbx_free(name_esc);
 
 		appids_num = 0;
 
