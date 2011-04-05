@@ -347,7 +347,7 @@ require_once('include/templates/scriptConfirm.js.php');
 		'nodeids' => get_current_nodeid(),
 		'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => array('hostid', 'host', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid'),
+		'selectHosts' => array('hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid'),
 		'selectItems' => API_OUTPUT_EXTEND,
 		'select_dependencies' => API_OUTPUT_EXTEND
 	);
