@@ -676,7 +676,7 @@ include_once('include/page_header.php');
 			'nodeids' => $nodeid,
 			'groupids' => $groupid,
 			'output' => API_OUTPUT_EXTEND,
-			'sortfield'=>'host'
+			'sortfield'=>'name'
 		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 
@@ -688,7 +688,7 @@ include_once('include/page_header.php');
 		$objects = array_merge($templates, $hosts);
 
 		foreach($objects as $row){
-			$name = new CSpan($row['host'], 'link');
+			$name = new CSpan($row['name'], 'link');
 			$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
 			(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
 
