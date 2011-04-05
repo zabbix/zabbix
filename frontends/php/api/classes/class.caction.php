@@ -1290,7 +1290,12 @@ COpt::memoryPick();
 						$opcommand_hstCreate = array_merge($opcommand_hstCreate, $operation['opcommand_hst']);
 					}
 					else{
-						$diff = zbx_array_diff($operation['opcommand_grp'], $operationDb['opcommand_grp'], 'opcommand_grpid');
+						$opcommandUpdate[] = array(
+							'values' => $operation['opcommand'],
+							'where' => array('operationid='.$operation['operationid']),
+						);
+
+						$diff = zbx_array_diff($operation['opcommand_grp'], $operationDb['opcommand_grp'], 'groupid');
 						$opcommand_grpCreate = array_merge($opcommand_grpCreate, $diff['second']);
 
 						foreach($diff['first'] as $omgrp){
@@ -1300,8 +1305,7 @@ COpt::memoryPick();
 							));
 						}
 
-						$diff = zbx_array_diff($operation['opcommand_hst'], $operationDb['opcommand_hst'], 'opcommand_hstid');
-
+						$diff = zbx_array_diff($operation['opcommand_hst'], $operationDb['opcommand_hst'], 'hostid');
 						$opcommand_hstCreate = array_merge($opcommand_hstCreate, $diff['second']);
 						foreach($diff['first'] as $omhst){
 							DB::delete('opcommand_hst', array(
