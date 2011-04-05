@@ -88,6 +88,7 @@ var ZBX_SVC_PORT = {
 	'pop': <?php print(SVC_POP);?>,
 	'nntp': <?php print(SVC_NNTP);?>,
 	'imap': <?php print(SVC_IMAP);?>,
+	'tcp': <?php print(SVC_TCP);?>,
 	'agent': <?php print(SVC_AGENT);?>,
 	'snmpv1': <?php print(SVC_SNMPv1);?>,
 	'snmpv2': <?php print(SVC_SNMPv2);?>,
@@ -108,6 +109,7 @@ function discoveryCheckDefaultPort(service){
 	defPorts[ZBX_SVC_PORT.pop] = '110';
 	defPorts[ZBX_SVC_PORT.nntp] = '119';
 	defPorts[ZBX_SVC_PORT.imap] = '143';
+	defPorts[ZBX_SVC_PORT.tcp] = '0';
 	defPorts[ZBX_SVC_PORT.agent] = '10050';
 	defPorts[ZBX_SVC_PORT.snmpv1] = '161';
 	defPorts[ZBX_SVC_PORT.snmpv2] = '161';
@@ -125,6 +127,7 @@ function discoveryCheckTypeToString(svcPort){
 	defPorts[ZBX_SVC_PORT.http] = "<?php echo _('HTTP');?>";
 	defPorts[ZBX_SVC_PORT.https] = "<?php echo _('HTTPS');?>";
 	defPorts[ZBX_SVC_PORT.imap] = "<?php echo _('IMAP');?>";
+	defPorts[ZBX_SVC_PORT.tcp] = "<?php echo _('TCP');?>";
 	defPorts[ZBX_SVC_PORT.ldap] = "<?php echo _('LDAP');?>";
 	defPorts[ZBX_SVC_PORT.nntp] = "<?php echo _('NNTP');?>";
 	defPorts[ZBX_SVC_PORT.pop] = "<?php echo _('POP');?>";
@@ -177,6 +180,10 @@ function addPopupValues(list){
 
 function removeDCheckRow(dcheckid){
 	jQuery('#dcheckRow_'+dcheckid).remove();
+	if(jQuery('#uniqueness_criteria_'+dcheckid).is(':checked')){
+		console.log('sdf');
+		jQuery('#uniqueness_criteria_1').attr('checked', 'checked');
+	}
 	jQuery('#uniqueness_criteria_row_'+dcheckid).remove();
 }
 
@@ -267,7 +274,7 @@ function saveNewDCheckForm(e){
 		'name': jQuery('#new_check_type :selected').text()
 	};
 
-	while(jQuery("#dcheckRow_"+dCheck.dcheckid).length)
+	while(jQuery("#uniqueness_criteria_"+dCheck.dcheckid).length)
 		dCheck.dcheckid++;
 
 	for(var key in formData){
@@ -278,7 +285,7 @@ function saveNewDCheckForm(e){
 	}
 
 	if(dCheck.ports != discoveryCheckDefaultPort(dCheck.type))
-		dCheck.name += ' ('+dCheck.ports+')'
+		dCheck.name += ' ('+dCheck.ports+')';
 
 	addPopupValues({'object': 'dcheckid', 'values': [dCheck]});
 	jQuery('#new_check_form').remove();
