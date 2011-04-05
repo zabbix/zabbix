@@ -2625,7 +2625,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			$caption = array();
 			$trigid = $_REQUEST['triggerid'];
 			do{
-				$sql = 'SELECT t.triggerid, t.templateid, h.host'.
+				$sql = 'SELECT t.triggerid, t.templateid, h.name'.
 						' FROM triggers t, functions f, items i, hosts h'.
 						' WHERE t.triggerid='.$trigid.
 							' AND h.hostid=i.hostid'.
@@ -2635,7 +2635,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 				if(bccomp($_REQUEST['triggerid'],$trigid) != 0){
 					$caption[] = ' : ';
-					$caption[] = new CLink($trig['host'], 'triggers.php?form=update&triggerid='.$trig['triggerid'], 'highlight underline');
+					$caption[] = new CLink($trig['name'], 'triggers.php?form=update&triggerid='.$trig['triggerid'], 'highlight underline');
 				}
 
 				$trigid = $trig['templateid'];
