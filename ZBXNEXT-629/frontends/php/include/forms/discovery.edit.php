@@ -37,11 +37,6 @@ require_once('include/templates/discovery.js.php');
 
 	if(isset($_REQUEST['druleid'])) $formDsc->addVar('druleid', $_REQUEST['druleid']);
 
-	if(isset($data['druleid']))
-		$formDsc->setTitle(_s('Discovery rule "%s"', $data['name']));
-	else
-		$formDsc->setTitle(_('Discovery rule'));
-
 // Name
 	$discoveryList = new CFormList('actionlist');
 	$discoveryList->addRow(_('Name'), new CTextBox('name', $data['name'], 60));
