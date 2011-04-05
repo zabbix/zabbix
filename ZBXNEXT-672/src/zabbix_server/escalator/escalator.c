@@ -65,8 +65,12 @@ static int	check_perm2system(zbx_uint64_t userid)
 	DB_ROW		row;
 	int		res = SUCCEED;
 
-	result = DBselect( "select count(g.usrgrpid) from usrgrp g,users_groups ug where ug.userid=" ZBX_FS_UI64
-			" and g.usrgrpid = ug.usrgrpid and g.users_status=%d",
+	result = DBselect(
+			"select count(g.usrgrpid)"
+			" from usrgrp g,users_groups ug"
+			" where ug.userid=" ZBX_FS_UI64
+				" and g.usrgrpid=ug.usrgrpid"
+				" and g.users_status=%d",
 			userid,
 			GROUP_STATUS_DISABLED);
 
@@ -1030,7 +1034,7 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 	if (NULL == error && EVENT_SOURCE_TRIGGERS == source)
 	{
 		/* Item disabled? */
-		result = DBselect("select i.description from items i,functions f,triggers t"
+		result = DBselect("select i.name from items i,functions f,triggers t"
 				" where t.triggerid=" ZBX_FS_UI64 " and f.triggerid=t.triggerid"
 				" and i.itemid=f.itemid and i.status=%d",
 				escalation->triggerid,

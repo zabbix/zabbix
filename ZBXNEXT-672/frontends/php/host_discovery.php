@@ -35,7 +35,7 @@ include_once('include/page_header.php');
 // needed type to know which field name to use
 $itemType = get_request('type', 0);
 switch($itemType) {
-	case ITEM_TYPE_SSH: case ITEM_TYPE_TELNET: $paramsFieldName = S_EXECUTED_SCRIPT; break;
+	case ITEM_TYPE_SSH: case ITEM_TYPE_TELNET: case ITEM_TYPE_JMX: $paramsFieldName = S_EXECUTED_SCRIPT; break;
 	case ITEM_TYPE_DB_MONITOR: $paramsFieldName = S_PARAMS; break;
 	case ITEM_TYPE_CALCULATED: $paramsFieldName = S_FORMULA; break;
 	default: $paramsFieldName = 'params';
@@ -46,7 +46,8 @@ switch($itemType) {
 		'itemid'=>			array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))'),
 		'interfaceid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,	null, S_INTERFACE),
 
-		'description'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
+		'name'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
+		'description'=>		array(T_ZBX_STR, O_OPT,  null,	null,		'isset({save})'),
 		'item_filter_macro'=>		array(T_ZBX_STR, O_OPT,  null,	null,		'isset({save})'),
 		'item_filter_value'=>		array(T_ZBX_STR, O_OPT,  null,	null,		'isset({save})'),
 		'key'=>				array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,		'isset({save})'),
@@ -62,14 +63,16 @@ switch($itemType) {
 				IN(array(-1,ITEM_TYPE_ZABBIX,ITEM_TYPE_SNMPV1,ITEM_TYPE_TRAPPER,ITEM_TYPE_SIMPLE,
 					ITEM_TYPE_SNMPV2C,ITEM_TYPE_INTERNAL,ITEM_TYPE_SNMPV3,ITEM_TYPE_ZABBIX_ACTIVE,
 					ITEM_TYPE_AGGREGATE,ITEM_TYPE_EXTERNAL,ITEM_TYPE_DB_MONITOR,
-					ITEM_TYPE_IPMI,ITEM_TYPE_SSH,ITEM_TYPE_TELNET,ITEM_TYPE_CALCULATED)),'isset({save})'),
+					ITEM_TYPE_IPMI,ITEM_TYPE_SSH,ITEM_TYPE_TELNET,ITEM_TYPE_JMX,ITEM_TYPE_CALCULATED)),'isset({save})'),
 		'authtype'=>		array(T_ZBX_INT, O_OPT,  NULL,	IN(ITEM_AUTHTYPE_PASSWORD.','.ITEM_AUTHTYPE_PUBLICKEY),
 											'isset({save})&&isset({type})&&({type}=='.ITEM_TYPE_SSH.')'),
 		'username'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,		'isset({save})&&isset({type})&&'.IN(
 												ITEM_TYPE_SSH.','.
+												ITEM_TYPE_JMX.','.
 												ITEM_TYPE_TELNET, 'type')),
 		'password'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,		'isset({save})&&isset({type})&&'.IN(
 												ITEM_TYPE_SSH.','.
+												ITEM_TYPE_JMX.','.
 												ITEM_TYPE_TELNET, 'type')),
 		'publickey'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,		'isset({save})&&isset({type})&&({type})=='.ITEM_TYPE_SSH.'&&({authtype})=='.ITEM_AUTHTYPE_PUBLICKEY),
 		'privatekey'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,		'isset({save})&&isset({type})&&({type})=='.ITEM_TYPE_SSH.'&&({authtype})=='.ITEM_AUTHTYPE_PUBLICKEY),
@@ -124,7 +127,7 @@ switch($itemType) {
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder('description', ZBX_SORT_UP);
+	validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go', 'none');
 
@@ -203,6 +206,7 @@ switch($itemType) {
 
 		$item = array(
 			'interfaceid' => get_request('interfaceid'),
+			'name' => get_request('name'),
 			'description' => get_request('description'),
 			'key_' => get_request('key'),
 			'hostid' => get_request('hostid'),
@@ -224,7 +228,6 @@ switch($itemType) {
 			'privatekey' => get_request('privatekey'),
 			'params' => get_request('params'),
 			'ipmi_sensor' => get_request('ipmi_sensor'),
-			'flags' => ZBX_FLAG_DISCOVERY,
 			'filter' => $filter,
 		);
 
@@ -298,6 +301,7 @@ switch($itemType) {
 		$limited = false;
 
 
+		$name = get_request('name', '');
 		$description = get_request('description', '');
 		$key = get_request('key', '');
 		$delay = get_request('delay', 30);
@@ -346,6 +350,7 @@ switch($itemType) {
 		if((isset($_REQUEST['itemid']) && !isset($_REQUEST['form_refresh']))){
 			$interfaceid	= $item_data['interfaceid'];
 
+			$name = $item_data['name'];
 			$description = $item_data['description'];
 			$key = $item_data['key_'];
 			$type = $item_data['type'];
@@ -443,7 +448,7 @@ switch($itemType) {
 		}
 
 // Name
-		$frmItem->addRow(S_NAME, new CTextBox('description', $description, 40, $limited));
+		$frmItem->addRow(_('Name'), new CTextBox('name', $name, 40, $limited));
 
 // Key
 		$frmItem->addRow(S_KEY, new CTextBox('key', $key, 40, $limited));
@@ -525,6 +530,8 @@ switch($itemType) {
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'row_username');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'username');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'row_username');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'username');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'row_username');
 
 // Public key
 		$frmItem->addRow(S_PUBLIC_KEY_FILE, new CTextBox('publickey',$publickey,16), null, 'row_publickey');
@@ -542,6 +549,8 @@ switch($itemType) {
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'row_password');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'password');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'row_password');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'password');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'row_password');
 
 		$spanEC = new CSpan(S_EXECUTED_SCRIPT);
 		$spanEC->setAttribute('id', 'label_executed_script');
@@ -627,6 +636,7 @@ switch($itemType) {
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TRAPPER, 'trapper_hosts');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TRAPPER, 'row_trapper_hosts');
 
+		$frmItem->addRow(_('Description'), new CTextArea('description', $description));
 
 		$frmRow = array(new CSubmit('save', S_SAVE));
 		if(isset($_REQUEST['itemid'])){
@@ -675,7 +685,7 @@ switch($itemType) {
 		$table = new CTableInfo();
 		$table->setHeader(array(
 			new CCheckBox('all_items',null,"checkAll('".$form->GetName()."','all_items','group_itemid');"),
-			make_sorting_header(S_NAME,'description', $sortlink),
+			make_sorting_header(S_NAME, 'name', $sortlink),
 			S_ITEMS,
 			S_TRIGGERS,
 			S_GRAPHS,
@@ -686,7 +696,7 @@ switch($itemType) {
 			S_ERROR
 		));
 
-		$sortfield = getPageSortField('description');
+		$sortfield = getPageSortField('name');
 		$sortorder = getPageSortOrder();
 		$options = array(
 			'hostids' => $_REQUEST['hostid'],
@@ -711,8 +721,8 @@ switch($itemType) {
 				$description[] = new CLink($template_host['host'],'?hostid='.$template_host['hostid'], 'unknown');
 				$description[] = ':';
 			}
-			$item['description_expanded'] = item_description($item);
-			$description[] = new CLink($item['description_expanded'], '?form=update&itemid='.$item['itemid']);
+			$item['name_expanded'] = itemName($item);
+			$description[] = new CLink($item['name_expanded'], '?form=update&itemid='.$item['itemid']);
 
 
 			$status = new CCol(new CLink(item_status2str($item['status']), '?hostid='.$_REQUEST['hostid'].'&group_itemid='.$item['itemid'].'&go='.

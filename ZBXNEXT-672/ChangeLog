@@ -1,8 +1,22 @@
 --------------------------------------------------------------------------------
+Changes for 1.9.4
+
+New features:
+ - [ZBX-1357] updated Latvian, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
+ - [ZBXNEXT-511] renamed item description to name, for description introduced new field (asaveljevs, Vedmak)
+
+Bug fixes:
+ - [ZBX-3658] fixed the whole request to Java proxy failing if it contains an invalid key (asaveljevs)
+ - [ZBX-3657] fixed errors while updating proxy configuration data (Sasha)
+ - [ZBX-3656] fixed item filter by data type boolean (Vedmak)
+ - [ZBX-3620] fixed error when delete application used in webscenario (Vedmak)
+
+--------------------------------------------------------------------------------
 Changes for 1.9.3
 
 New features:
-
+ - [ZBXNEXT-555] added remote monitoring of JMX counters through Java proxy (asaveljevs,Vedmak,Vlad)
+ - [ZBXNEXT-651] added "Boolean" data type for integer item value type (asaveljevs,Vedmak,Vlad)
  - [ZBXNEXT-675] added new icons and a script to create sql file (Elvis,Richlv)
  - [ZBX-1357] Updated Latvian and Russian translations; thanks to Zabbix translators (Richlv)
  - [ZBXNEXT-696] Added support for {IPADDRESS}, {HOST.DNS} and {HOST.CONN} macros in trigger names (rudolfs)
@@ -12,8 +26,8 @@ New features:
 Bug fixes:
  - [ZBX-3623] fixed processing of nanoseconds for history data (Sasha)
  - [ZBX-3634] improved zabbix map API methods (Aly)
- - [ZBX-3579] fixed trigger popup menu in status of triggers (Vemdak)
- 
+ - [ZBX-3579] fixed trigger popup menu in status of triggers (Vedmak)
+
 --------------------------------------------------------------------------------
 Changes for 1.9.2
 
@@ -22,7 +36,7 @@ New features:
  - [ZBXNEXT-631] added custom trigger severities configuration (Sasha, Vedmak)
  - [ZBXNEXT-636] login screen redesign, frontend themes restyle (Aly, Elvis)
  - [ZBXNEXT-635] introduced API wrapper for Zabbix frontend (Vedmak, Aly)
- - [ZBXNEXT-575] added new design for action operation remote commands (Aly,asaveljevs,Sasha,Vedmak)
+ - [ZBXNEXT-575] added new design for action operation remote commands (Aly,Sasha,Vedmak)
  - [ZBXNEXT-628] added advanced label settings for maps (Aly)
  - [ZBXNEXT-626] added remembering of grid options for maps (KB)
  - [ZBXNEXT-630] added automatic filling of DNS name for discovered and auto-registered devices (Sasha)
@@ -74,7 +88,7 @@ Bug fixes:
 Changes for 1.9.1
 
 New features:
- - [ZBXNEXT-587] added support of multiple host interfaces (Aly,Sasha,Vedmak,asaveljevs)
+ - [ZBXNEXT-587] added support of multiple host interfaces (Aly,Sasha,Vedmak)
  - [ZBXNEXT-564] added new {IPADDRESS} and {HOST.PORT} macros in auto registration notifications (Sasha)
  - [ZBXNEXT-556] zabbix frontend translations are now handled by PHP gettext module (KB)
  - [ZBXNEXT-558] added support of monitoring auto-registered hosts with passive checks (Sasha)
@@ -109,8 +123,21 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.5
+
+ - [ZBX-3686] updated French translation; thanks to Joseph Bueno (Richlv)
+
 Changes for 1.8.5rc1
 
+ - [ZBX-3672] fixed possible hang of history syncers when a zabbix[log] message added during process a history data (Sasha)
+ - [ZBX-3644] fixed api permission checks for applications, items and triggers (Vedmak)
+ - [ZBX-3673] fixed processing of operators & and | in trigger and calculated items expressions (Sasha)
+ - [ZBX-3660] fixed macro resolving in map labels (Vedmak)
+ - [ZBX-3659] API exists() methods now return true/false instead of true/error (KB)
+ - [ZBX-2997] added global regular expression to be sent to proxies (for use with log, logrt and eventlog items) (rudolfs)
+ - [ZBX-1907] changed logging  - when a proxy fails to connect to the server it logs "Still unable to connect" message max once a minute (rudolfs)
+ - [ZBX-3548] added IPV6_V6ONLY flag (where defined) for binding IPv4 and IPv6 interfaces separately (rudolfs)
+ - [ZBX-3626] fixed bugs on map export: duplicate image decoding and duplicate map elements insertation; thanks to Takanori Suzuki (KB)
  - [ZBX-3453] improve performance of cpu collector (Sasha)
  - [ZBX-3610] fixed active agent full buffer bug - stop processing active checks till the buffer is sent (rudolfs)
  - [ZBX-3566] fixed error in administration->notifications and added a hint when no mediatypes are defined (KB)

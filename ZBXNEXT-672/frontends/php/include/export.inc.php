@@ -143,7 +143,7 @@ class zbxXML{
 				'value_type'		=> ''
 			),
 			'elements' => array(
-				'description'		=> '',
+				'name'		=> 'description',
 				'ipmi_sensor'		=> '',
 				'delay'				=> '',
 				'history'			=> '',
@@ -637,6 +637,8 @@ class zbxXML{
 							$img = reset($imgs);
 
 							$image['imageid'] = $img['imageid'];
+
+							// image will be decoded in class.image.php
 							$image['image'] = $image['encodedImage'];
 							unset($image['encodedImage']);
 
