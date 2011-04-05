@@ -237,7 +237,7 @@ function get_operation_desc($type, $data){
 
 				$hosts = API::Host()->get(array(
 					'hostids' => zbx_objectValues($data['opcommand_hst'],'hostid'),
-					'output' => array('hostid', 'host')
+					'output' => array('hostid', 'name')
 				));
 
 				foreach($data['opcommand_hst'] as $num => $cmd){
@@ -248,10 +248,10 @@ function get_operation_desc($type, $data){
 				}
 
 				if(!empty($hosts)){
-					order_result($hosts, 'host');
+					order_result($hosts, 'name');
 
 					$result[] = bold(_('Run remote command on hosts: '));
-					$result[] = array(implode(', ', zbx_objectValues($hosts,'host')), BR());
+					$result[] = array(implode(', ', zbx_objectValues($hosts,'name')), BR());
 				}
 
 

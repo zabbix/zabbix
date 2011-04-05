@@ -438,17 +438,17 @@ include_once('include/page_header.php');
 		$options = array(
 			'nodeids' => $nodeid,
 			'groupids' => $groupid,
-			'output' => API_OUTPUT_EXTEND,
-			'selectInterfaces' => API_OUTPUT_EXTEND,
+			'output' => array('hostid', 'name', 'status', 'available'),
+			'selectInterfaces' => array('dns', 'ip', 'useip', 'port'),
 		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 		if(!is_null($host_status)) $options[$host_status] = 1;
 
 		$hosts = API::Host()->get($options);
-		order_result($hosts, 'host');
+		order_result($hosts, 'name');
 
 		foreach($hosts as $hnum => $host){
-			$name = new CSpan($host['host'], 'link');
+			$name = new CSpan($host['name'], 'link');
 			$action = get_window_opener($dstfrm, $dstfld1, $host[$srcfld1]).
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $host[$srcfld2]) : '');
 			$name->setAttribute('onclick', $action.' close_window();');
@@ -587,10 +587,9 @@ include_once('include/page_header.php');
 				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", ".zbx_jsvalue($group['groupid']).");";
 			}
 			else{
-				$values = array(
-					$dstfld1 => $group[$srcfld1],
-					$dstfld2 => isset($srcfld2) ? $group[$srcfld2] : '',
-				);
+				$values = array($dstfld1 => $group[$srcfld1]);
+				if (isset($srcfld2))
+					$values[$dstfld2] = $group[$srcfld2];
 
 				$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).','.zbx_jsvalue($values).'); return false;';
 			}
