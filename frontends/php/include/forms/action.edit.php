@@ -357,8 +357,8 @@ require_once('include/templates/action.js.php');
 		$opid = isset($operation['operationid']) ? $operation['operationid'] : $id;
 		$operation['id'] = $opid;
 
-		$oper_details = new CSpan(get_operation_desc(SHORT_DESCRITION, $operation));
-		$oper_details->setHint(get_operation_desc(LONG_DESCRITION, $operation));
+		$oper_details = new CSpan(get_operation_desc(SHORT_DESCRIPTION, $operation));
+		$oper_details->setHint(get_operation_desc(LONG_DESCRIPTION, $operation));
 
 		$esc_steps_txt = null;
 		$esc_period_txt = null;
