@@ -566,8 +566,8 @@
 		if(!empty($macStack)){
 			$dbItems = API::Item()->get(array(
 				'itemids' => $item['itemid'],
-				'selectInterfaces' => API_OUTPUT_EXTEND,
-				'selectHosts' => array('host'),
+				'selectInterfaces' => array('ip', 'dns', 'useip'),
+				'selectHosts' => array('host', 'name'),
 				'output' => API_OUTPUT_REFER
 			));
 			$dbItem = reset($dbItems);
@@ -579,26 +579,25 @@
 				switch($macro){
 					case '{HOST.NAME}':
 						$key = str_replace('{HOST.NAME}', $host['name'], $key);
-					break;
-					case '{HOSTNAME}':
+						break;
+					case '{HOSTNAME}':	/* deprecated */
 						$key = str_replace('{HOSTNAME}', $host['name'], $key);
-					break;
+						break;
 					case '{HOST.HOST}':
-						$key = str_replace('{HOSTNAME}', $host['host'], $key);
-					break;
+						$key = str_replace('{HOST.HOST}', $host['host'], $key);
+						break;
 					case '{HOST.IP}':
 						$key = str_replace('{HOST.IP}', $interface['ip'], $key);
-					break;
-					/* deprecated */
-					case '{IPADDRESS}':
+						break;
+					case '{IPADDRESS}':	/* deprecated */
 						$key = str_replace('{IPADDRESS}', $interface['ip'], $key);
-					break;
+						break;
 					case '{HOST.DNS}':
 						$key = str_replace('{HOST.DNS}', $interface['dns'], $key);
-					break;
+						break;
 					case '{HOST.CONN}':
 						$key = str_replace('{HOST.CONN}', $interface['useip'] ? $interface['ip'] : $interface['dns'], $key);
-					break;
+						break;
 				}
 			}
 		}
