@@ -524,7 +524,7 @@ COpt::memoryPick();
 		$checkitems = array(
 			array(
 				// GETTEXT: Legend below graph
-				'description'		=> _s('Download speed for scenario \'%s\'', '$1'),
+				'name'		=> _s('Download speed for scenario \'%s\'', '$1'),
 				'key_'				=> 'web.test.in['.$webcheck['name'].',,bps]',
 				'value_type'		=> ITEM_VALUE_TYPE_FLOAT,
 				'units'				=> 'Bps',
@@ -532,7 +532,7 @@ COpt::memoryPick();
 			),
 			array(
 				// GETTEXT: Legend below graph
-				'description'		=> _s('Failed step of scenario \'%s\'', '$1'),
+				'name'		=> _s('Failed step of scenario \'%s\'', '$1'),
 				'key_'				=> 'web.test.fail['.$webcheck['name'].']',
 				'value_type'		=> ITEM_VALUE_TYPE_UINT64,
 				'units'				=> '',
@@ -613,21 +613,21 @@ COpt::memoryPick();
 
 			$stepitems = array(
 				array(
-					'description'		=> _s('Download speed for step \'%1$s\' of scenario \'%2$s\'', '$2', '$1'),
+					'name'		=> _s('Download speed for step \'%1$s\' of scenario \'%2$s\'', '$2', '$1'),
 					'key_'				=> 'web.test.in['.$webcheck['name'].','.$webstep['name'].',bps]',
 					'value_type'		=> ITEM_VALUE_TYPE_FLOAT,
 					'units'				=> 'Bps',
 					'httpstepitemtype'	 => HTTPSTEP_ITEM_TYPE_IN
 				),
 				array(
-					'description'		=> _s('Response time for step \'%1$s\' of scenario \'%2$s\'', '$2', '$1'),
+					'name'		=> _s('Response time for step \'%1$s\' of scenario \'%2$s\'', '$2', '$1'),
 					'key_'				=> 'web.test.time['.$webcheck['name'].','.$webstep['name'].',resp]',
 					'value_type'		=> ITEM_VALUE_TYPE_FLOAT,
 					'units'				=> 's',
 					'httpstepitemtype' 	=> HTTPSTEP_ITEM_TYPE_TIME
 				),
 				array(
-					'description'		=> _s('Response code for step \'%1$s\' of scenario \'%2$s\'', '$2', '$1'),
+					'name'		=> _s('Response code for step \'%1$s\' of scenario \'%2$s\'', '$2', '$1'),
 					'key_'				=> 'web.test.rspcode['.$webcheck['name'].','.$webstep['name'].']',
 					'value_type'		=> ITEM_VALUE_TYPE_UINT64,
 					'units'				=> '',

@@ -39,7 +39,7 @@ class CPie extends CGraphDraw{
 	public function addItem($itemid, $calc_fnc=CALC_FNC_AVG,$color=null, $type=null, $periods_cnt=null){
 
 		$this->items[$this->num] = get_item_by_itemid($itemid);
-		$this->items[$this->num]['description']=item_description($this->items[$this->num]);
+		$this->items[$this->num]['name']=itemName($this->items[$this->num]);
 		$host=get_host_by_hostid($this->items[$this->num]['hostid']);
 
 		$this->items[$this->num]['host'] = $host['host'];
@@ -275,11 +275,11 @@ class CPie extends CGraphDraw{
 		$shiftY = $this->shiftY + $this->shiftYLegend;
 
 		$max_host_len=0;
-		$max_desc_len=0;
+		$max_name_len=0;
 
 		for($i=0;$i<$this->num;$i++){
-			if(zbx_strlen($this->items[$i]['host'])>$max_host_len)		$max_host_len=zbx_strlen($this->items[$i]['host']);
-			if(zbx_strlen($this->items[$i]['description'])>$max_desc_len)	$max_desc_len=zbx_strlen($this->items[$i]['description']);
+			if(zbx_strlen($this->items[$i]['host'])>$max_host_len) $max_host_len=zbx_strlen($this->items[$i]['host']);
+			if(zbx_strlen($this->items[$i]['name'])>$max_name_len) $max_name_len=zbx_strlen($this->items[$i]['name']);
 		}
 
 		for($i=0;$i<$this->num;$i++){
@@ -314,14 +314,14 @@ class CPie extends CGraphDraw{
 
 				$str = sprintf('%s: %s [%s] ',
 						str_pad($this->items[$i]['host'],$max_host_len,' '),
-						str_pad($this->items[$i]['description'],$max_desc_len,' '),
+						str_pad($this->items[$i]['name'],$max_name_len,' '),
 						$fnc_name);
 			}
 			else{
 				$strvalue = sprintf(S_VALUE.': '.S_NO_DATA_SMALL);
 				$str = sprintf('%s: %s [ '.S_NO_DATA_SMALL.' ]',
 					str_pad($this->items[$i]['host'],$max_host_len,' '),
-					str_pad($this->items[$i]['description'],$max_desc_len,' '));
+					str_pad($this->items[$i]['name'],$max_name_len,' '));
 			}
 
 

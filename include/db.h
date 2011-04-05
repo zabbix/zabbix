@@ -39,12 +39,15 @@ extern int	CONFIG_REFRESH_UNSUPPORTED;
 extern int	CONFIG_UNAVAILABLE_DELAY;
 extern int	CONFIG_LOG_SLOW_QUERIES;
 
-typedef enum {
+typedef enum
+{
 	GRAPH_TYPE_NORMAL = 0,
 	GRAPH_TYPE_STACKED = 1
-} zbx_graph_types;
+}
+zbx_graph_types;
 
-typedef enum {
+typedef enum
+{
 	SCREEN_RESOURCE_GRAPH = 0,
 	SCREEN_RESOURCE_SIMPLE_GRAPH,
 	SCREEN_RESOURCE_MAP,
@@ -62,19 +65,24 @@ typedef enum {
 	SCREEN_RESOURCE_HOSTGROUP_TRIGGERS,
 	SCREEN_RESOURCE_SYSTEM_STATUS,
 	SCREEN_RESOURCE_HOST_TRIGGERS
-} zbx_screen_resources;
+}
+zbx_screen_resources;
 
-typedef enum {
+typedef enum
+{
 	CALC_FNC_MIN = 1,
 	CALC_FNC_AVG = 2,
 	CALC_FNC_MAX = 4,
 	CALC_FNC_ALL = 7
-} zbx_graph_item_calc_function;
+}
+zbx_graph_item_calc_function;
 
-typedef enum {
+typedef enum
+{
 	GRAPH_ITEM_SIMPLE = 0,
 	GRAPH_ITEM_AGGREGATED = 1
-} zbx_graph_item_type;
+}
+zbx_graph_item_type;
 
 #define	ZBX_DB_CONNECT_NORMAL	0
 #define	ZBX_DB_CONNECT_EXIT	1

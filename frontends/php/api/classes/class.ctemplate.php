@@ -659,7 +659,7 @@ Copt::memoryPick();
 				$obj_params['output'] = $options['selectItems'];
 				$items = API::Item()->get($obj_params);
 
-				if(!is_null($options['limitSelects'])) order_result($items, 'description');
+				if(!is_null($options['limitSelects'])) order_result($items, 'name');
 
 				$count = array();
 				foreach($items as $itemid => $item){
@@ -702,7 +702,7 @@ Copt::memoryPick();
 				$obj_params['output'] = $options['selectDiscoveries'];
 				$items = API::Item()->get($obj_params);
 
-				if(!is_null($options['limitSelects'])) order_result($items, 'description');
+				if(!is_null($options['limitSelects'])) order_result($items, 'name');
 				foreach($items as $itemid => $item){
 					unset($items[$itemid]['hosts']);
 					foreach($item['hosts'] as $hnum => $host){
@@ -1803,7 +1803,7 @@ COpt::memoryPick();
 		if(!is_null($targetids)){
 			$sql_where .= ' AND '.DBCondition('i1.hostid', $targetids);
 		}
-		$sql = 'SELECT DISTINCT i1.itemid, i1.key_, i1.flags, i1.description'.
+		$sql = 'SELECT DISTINCT i1.itemid, i1.key_, i1.flags, i1.name'.
 				' FROM '.$sql_from.
 				' WHERE '.$sql_where;
 		$db_items = DBSelect($sql);
@@ -1814,7 +1814,7 @@ COpt::memoryPick();
 		);
 		while($item = DBfetch($db_items)){
 			$items[$item['flags']][$item['itemid']] = array(
-				'description' => $item['description'],
+				'name' => $item['name'],
 				'key_' => $item['key_'],
 			);
 		}
@@ -1831,7 +1831,7 @@ COpt::memoryPick();
 				));
 
 				foreach($items[ZBX_FLAG_DISCOVERY] as $discoveryRule){
-					info(_s('Discovery rule [%1$s:%2$s] unlinked.', $discoveryRule['description'], $discoveryRule['key_']));
+					info(_s('Discovery rule [%1$s:%2$s] unlinked.', $discoveryRule['name'], $discoveryRule['key_']));
 				}
 			}
 		}
@@ -1849,7 +1849,7 @@ COpt::memoryPick();
 				));
 
 				foreach($items[ZBX_FLAG_DISCOVERY_NORMAL] as $item){
-					info(_s('Item [%1$s:%2$s] unlinked.', $item['description'], $item['key_']));
+					info(_s('Item [%1$s:%2$s] unlinked.', $item['name'], $item['key_']));
 				}
 			}
 		}
@@ -1867,7 +1867,7 @@ COpt::memoryPick();
 				));
 
 				foreach($items[ZBX_FLAG_DISCOVERY_CHILD] as $item){
-					info(_s('Item prototype [%1$s:%2$s] unlinked.', $item['description'], $item['key_']));
+					info(_s('Item prototype [%1$s:%2$s] unlinked.', $item['name'], $item['key_']));
 				}
 			}
 		}

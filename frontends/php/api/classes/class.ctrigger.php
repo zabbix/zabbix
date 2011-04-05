@@ -1504,6 +1504,9 @@ COpt::memoryPick();
 				delete_function_by_triggerid($trigger['triggerid']);
 
 				$trigger['expression'] = implode_exp($expression_full, $trigger['triggerid']);
+				if(is_null($trigger['expression'])){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot implode expression "%s".', $expression_full));
+				}
 
 				if(isset($trigger['status']) && ($trigger['status'] != TRIGGER_STATUS_ENABLED)){
 					if($trigger['value_flags'] == TRIGGER_VALUE_FLAG_NORMAL){

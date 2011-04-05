@@ -55,7 +55,8 @@ switch($itemType) {
 		'copy_type'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0,1'),	'isset({copy})'),
 		'copy_mode'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0'),	null),
 
-		'description'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
+		'name'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
+		'description'=>		array(T_ZBX_STR, O_OPT,  null,	null,		'isset({save})'),
 		'key'=>				array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,		'isset({save})'),
 		'delay'=>			array(T_ZBX_INT, O_OPT,  null,  '(('.BETWEEN(1,86400).
 				'(!isset({delay_flex}) || !({delay_flex}) || is_array({delay_flex}) && !count({delay_flex}))) ||'.
@@ -161,7 +162,7 @@ switch($itemType) {
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder('description', ZBX_SORT_UP);
+	validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go', 'none');
 
@@ -246,6 +247,7 @@ switch($itemType) {
 		}
 
 		$item = array(
+			'name'	=> get_request('name'),
 			'description'	=> get_request('description'),
 			'key_'			=> get_request('key'),
 			'hostid'		=> get_request('hostid'),
@@ -355,7 +357,7 @@ switch($itemType) {
 		$numrows = new CDiv();
 		$numrows->setAttribute('name', 'numrows');
 
-		$items_wdgt->addHeader(array(S_ITEM_PROTOTYPES_OF_BIG.SPACE, new CSpan($discovery_rule['description'], 'gold')));
+		$items_wdgt->addHeader(array(S_ITEM_PROTOTYPES_OF_BIG.SPACE, new CSpan($discovery_rule['name'], 'gold')));
 		$items_wdgt->addHeader($numrows, SPACE);
 
 		$items_wdgt->addItem(get_header_host_table($_REQUEST['hostid']));
@@ -371,7 +373,7 @@ switch($itemType) {
 		$table = new CTableInfo();
 		$table->setHeader(array(
 			new CCheckBox('all_items',null,"checkAll('".$form->GetName()."','all_items','group_itemid');"),
-			make_sorting_header(S_DESCRIPTION,'description', $sortlink),
+			make_sorting_header(_('Name'),'name', $sortlink),
 			make_sorting_header(S_KEY,'key_', $sortlink),
 			make_sorting_header(S_INTERVAL,'delay', $sortlink),
 			make_sorting_header(S_HISTORY,'history', $sortlink),
@@ -383,7 +385,7 @@ switch($itemType) {
 		));
 
 
-		$sortfield = getPageSortField('description');
+		$sortfield = getPageSortField('name');
 		$sortorder = getPageSortOrder();
 		$options = array(
 			'discoveryids' => $_REQUEST['parent_discoveryid'],
@@ -408,10 +410,10 @@ switch($itemType) {
 				$description[] = new CLink($template_host['host'],'?parent_discoveryid='.$tpl_disc_ruleid, 'unknown');
 				$description[] = ':';
 			}
-			$item['description_expanded'] = item_description($item);
+			$item['name_expanded'] = itemName($item);
 
 			$disc_link = '&parent_discoveryid='.$_REQUEST['parent_discoveryid'];
-			$description[] = new CLink($item['description_expanded'], '?form=update&itemid='.$item['itemid'].$disc_link);
+			$description[] = new CLink($item['name_expanded'], '?form=update&itemid='.$item['itemid'].$disc_link);
 
 			$status = new CCol(new CLink(item_status2str($item['status']), '?group_itemid='.$item['itemid'].$disc_link.
 					'&go='.($item['status']? 'activate':'disable'), item_status2style($item['status'])));
