@@ -99,7 +99,7 @@ include_once 'include/page_header.php';
 	);
 
 	$sql = 'SELECT i.itemid,i.lastclock,i.description,i.key_,i.type,h.name as hostname,'.
-			'h.host,h.hostid,h.proxy_hostid,i.delay,i.delay_flex,i.interfaceid'.
+			'h.hostid,h.proxy_hostid,i.delay,i.delay_flex,i.interfaceid'.
 		' FROM items i,hosts h'.
 		' WHERE i.hostid=h.hostid'.
 			' AND h.status='.HOST_STATUS_MONITORED.
