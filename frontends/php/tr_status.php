@@ -436,17 +436,17 @@ require_once('include/templates/scriptConfirm.js.php');
 		$used_host_count = count($used_hosts);
 
 		foreach($trigger['items'] as $inum => $item){
-			$item_description = item_description($item);
+			$item_name = itemName($item);
 
 			//if we have items from different hosts, we must prefix a host name
 			if ($used_host_count > 1) {
-				$item_description = $used_hosts[$item['hostid']].':'.$item_description;
+				$item_name = $used_hosts[$item['hostid']].':'.$item_name;
 			}
 
 			$items[$inum]['itemid'] = $item['itemid'];
 			$items[$inum]['value_type'] = $item['value_type']; //ZBX-3059: So it would be possible to show different caption for history for chars and numbers (KB)
 			$items[$inum]['action'] = str_in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64)) ? 'showgraph' : 'showvalues';
-			$items[$inum]['description'] = $item_description;
+			$items[$inum]['name'] = $item_name;
 		}
 		$trigger['items'] = $items;
 

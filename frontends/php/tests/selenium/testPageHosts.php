@@ -129,7 +129,7 @@ class testPageHosts extends CWebTest{
 		$this->assertTitle('Configuration of items');
 		$this->ok('Displaying');
 		// Header
-		$this->ok(array('Wizard','Description','Triggers','Key','Interval','History','Trends','Type','Status','Applications','Error'));
+		$this->ok(array('Wizard','Name','Triggers','Key','Interval','History','Trends','Type','Status','Applications','Error'));
 	}
 
 	public function testPageHosts_MassExportAll(){

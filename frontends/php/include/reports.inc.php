@@ -304,7 +304,7 @@ function bar_report_form(){
 					url_param($gid,false,'gid').
 					'",550,400,"graph_item_form");');
 
-			$description = $host['host'].': '.item_description($item);
+			$description = $host['host'].': '.itemName($item);
 
 			$items_table->addRow(array(
 					new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
@@ -442,7 +442,7 @@ function bar_report_form2(){
 					url_param($gid,false,'gid').
 					'",550,400,"graph_item_form");');
 
-			$description = $host['host'].': '.item_description($item);
+			$description = $host['host'].': '.itemName($item);
 
 			$items_table->addRow(array(
 					new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
@@ -678,15 +678,15 @@ function bar_report_form3(){
 	if(count($items) && ($items[0]['itemid'] > 0)){
 		$itemid = $items[0]['itemid'];
 		$description = get_item_by_itemid($itemid);
-		$description = item_description($description);
+		$description = itemName($description);
 	}
 	$reportForm->addVar('items[0][itemid]',$itemid);
 
-	$txtCondVal = new CTextBox('items[0][description]',$description,50,'yes');
+	$txtCondVal = new CTextBox('items[0][name]',$description,50,'yes');
 	$btnSelect = new CButton('btn1',S_SELECT,
 			"return PopUp('popup.php?dstfrm=".$reportForm->GetName().
-			"&dstfld1=items[0][itemid]&dstfld2=items[0][description]&".
-			"srctbl=items&srcfld1=itemid&srcfld2=description&monitored_hosts=1');",
+			"&dstfld1=items_0_itemid&dstfld2=items_0_description&".
+			"srctbl=items&srcfld1=itemid&srcfld2=name&monitored_hosts=1');",
 			'T');
 
 	$reportForm->addRow(S_ITEM , array($txtCondVal,$btnSelect));

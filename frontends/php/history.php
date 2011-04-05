@@ -186,9 +186,9 @@ include_once('include/page_header.php');
 	);
 
 	if(count($items) == 1){
-		$ptData['header'][] = $item['host'].': '.item_description($item);
+		$ptData['header'][] = $item['host'].': '.itemName($item);
 
-		$header['left'] = array(new CLink($item['host'],'latest.php?hostid='.$item['hostid']),': ',item_description($item));
+		$header['left'] = array(new CLink($item['host'],'latest.php?hostid='.$item['hostid']),': ',itemName($item));
 
 		if('showgraph' == $_REQUEST['action']){
 			$header['right'][] = get_icon('favourite', array(
@@ -246,7 +246,7 @@ include_once('include/page_header.php');
 				}
 
 				$host = reset($item['hosts']);
-				$cmbitemlist->addItem($itemid,$host['host'].': '.item_description($item));
+				$cmbitemlist->addItem($itemid,$host['host'].': '.itemName($item));
 			}
 
 			$addItemBttn = new CButton('add_log',S_ADD,"return PopUp('popup.php?multiselect=1".'&reference=itemid&srctbl=items&value_types[]='.$item['value_type']."&srcfld1=itemid');");
@@ -359,7 +359,7 @@ include_once('include/page_header.php');
 				$row = array(nbsp(zbx_date2str(S_HISTORY_LOG_ITEM_DATE_FORMAT, $data['clock'])));
 
 				if($fewItems)
-					$row[] = $host['host'].':'.item_description($item);
+					$row[] = $host['host'].':'.itemName($item);
 
 				if($logItem){
 					$row[] = ($data['timestamp'] == 0) ? '-' : zbx_date2str(S_HISTORY_LOG_LOCALTIME_DATE_FORMAT, $data['timestamp']);
