@@ -942,7 +942,7 @@
 		$filter_group			= $_REQUEST['filter_group'];
 		$filter_host			= $_REQUEST['filter_host'];
 		$filter_application		= $_REQUEST['filter_application'];
-		$filter_description		= $_REQUEST['filter_description'];
+		$filter_name		= $_REQUEST['filter_name'];
 		$filter_type			= $_REQUEST['filter_type'];
 		$filter_key			= $_REQUEST['filter_key'];
 		$filter_snmp_community		= $_REQUEST['filter_snmp_community'];
@@ -1008,8 +1008,9 @@
 					new CButton('btn_app', S_SELECT, 'return PopUp("popup.php?dstfrm='.$form->getName().
 						'&dstfld1=filter_application&srctbl=applications&srcfld1=name",400,300,"application");', 'A'))
 		));
-		$col_table1->addRow(array(array(bold(S_DESCRIPTION),SPACE.S_LIKE_SMALL.': '),
-			new CTextBox("filter_description", $filter_description, 30)));
+		$col_table1->addRow(array(array(bold(_('Name')),SPACE.S_LIKE_SMALL.': '),
+			new CTextBox("filter_name", $filter_name, 30)));
+
 		$col_table1->addRow(array(array(bold(S_KEY),SPACE.S_LIKE_SMALL.': '),
 			new CTextBox("filter_key", $filter_key, 30)));
 
@@ -1448,7 +1449,6 @@
 
 // Insert form for Item information
 	function insert_item_form(){
-
 		$frmItem = new CFormTable(S_ITEM);
 		$frmItem->setAttribute('style','visibility: hidden;');
 		$frmItem->setHelp('web.items.item.php');
@@ -1470,6 +1470,7 @@
 			$hostid = get_request('form_hostid', 0);
 
 		$interfaceid = get_request('interfaceid', 0);
+		$name = get_request('name', '');
 		$description = get_request('description', '');
 		$key = get_request('key', '');
 		$host = get_request('host', null);
@@ -1545,6 +1546,7 @@
 		}
 
 		if((isset($_REQUEST['itemid']) && !isset($_REQUEST['form_refresh'])) || $limited){
+			$name		= $item_data['name'];
 			$description		= $item_data['description'];
 			$key			= $item_data['key_'];
 			$interfaceid	= $item_data['interfaceid'];
@@ -1668,7 +1670,7 @@
 			$caption[] = ($parent_discoveryid) ? S_ITEM_PROTOTYPE.' "' : S_ITEM.' "';
 			$caption = array_reverse($caption);
 			$caption[] = ': ';
-			$caption[] = $item_data['description'];
+			$caption[] = $item_data['name'];
 			$caption[] = '"';
 			$frmItem->setTitle($caption);
 		}
@@ -1724,7 +1726,7 @@
 			}
 		}
 
-		$frmItem->addRow(S_DESCRIPTION, new CTextBox('description',$description,40, $limited));
+		$frmItem->addRow(_('Name'), new CTextBox('name', $name, 40, $limited));
 
 		if($limited){
 			$frmItem->addRow(S_TYPE,  new CTextBox('typename', item_type2str($type), 40, 'yes'));
@@ -2114,6 +2116,10 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		}
 		$frmItem->addRow(S_APPLICATIONS,$cmbApps);
 
+		$tarea = new CTextArea('description', $description);
+		$tarea->addStyle('margin-top: 5px;');
+		$frmItem->addRow(_('Description'), $tarea);
+
 		$frmRow = array(new CSubmit('save',S_SAVE));
 		if(isset($_REQUEST['itemid'])){
 			array_push($frmRow,
@@ -2183,8 +2189,8 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$frmItem->addVar('massupdate',1);
 
 		$frmItem->addVar('group_itemid', $itemids);
-		$frmItem->addVar('config',get_request('config',0));
 
+		$description = get_request('description', '');
 		$delay		= get_request('delay'		,30);
 		$history	= get_request('history'		,90);
 		$status		= get_request('status'		,0);
@@ -2417,6 +2423,11 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		}
 		$frmItem->addRow(array( new CVisibilityBox('applications_visible', get_request('applications_visible'), 'applications[]',
 			S_ORIGINAL), S_APPLICATIONS),$cmbApps);
+
+		$tarea = new CTextArea('description', $description);
+		$tarea->addStyle('margin-top: 5px;');
+		$frmItem->addRow(array( new CVisibilityBox('description_visible', get_request('description_visible'), 'description', S_ORIGINAL),
+			_('Description')), $tarea);
 
 		$frmItem->addItemToBottomRow(array(new CSubmit("update",S_UPDATE),
 			SPACE, new CButtonCancel(url_param('groupid').url_param("hostid").url_param("config"))));
@@ -3148,7 +3159,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 					$do_down->onClick("return create_var('".$frmGraph->getName()."','move_down',".$gid.", true);");
 				}
 
-				$description = new CSpan($host['host'].': '.item_description($item),'link');
+				$description = new CSpan($host['host'].': '.itemName($item),'link');
 				$description->onClick(
 					'return PopUp("popup_gitem.php?list_name=items&dstfrm='.$frmGraph->getName().
 					url_param($only_hostid, false, 'only_hostid').
@@ -3238,7 +3249,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 				if($ymin_itemid > 0){
 					$min_host = get_host_by_itemid($ymin_itemid);
 					$min_item = get_item_by_itemid($ymin_itemid);
-					$ymin_name = $min_host['host'].':'.item_description($min_item);
+					$ymin_name = $min_host['host'].':'.itemName($min_item);
 				}
 
 				if(count($items)){
@@ -3251,7 +3262,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 							"&dstfld2=ymin_name".
 							"&srctbl=items".
 							"&srcfld1=itemid".
-							"&srcfld2=description',0,0,'zbx_popup_item');");
+							"&srcfld2=name',0,0,'zbx_popup_item');");
 				}
 				else{
 					$yaxis_min[] = S_ADD_GRAPH_ITEMS;
@@ -3282,7 +3293,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 				if($ymax_itemid > 0){
 					$max_host = get_host_by_itemid($ymax_itemid);
 					$max_item = get_item_by_itemid($ymax_itemid);
-					$ymax_name = $max_host['host'].':'.item_description($max_item);
+					$ymax_name = $max_host['host'].':'.itemName($max_item);
 				}
 
 				if(count($items)){
@@ -3295,7 +3306,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 							"&dstfld2=ymax_name".
 							"&srctbl=items".
 							"&srcfld1=itemid".
-							"&srcfld2=description',0,0,'zbx_popup_item');"
+							"&srcfld2=name',0,0,'zbx_popup_item');"
 					);
 				}
 				else{

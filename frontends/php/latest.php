@@ -143,7 +143,7 @@ include_once('include/page_header.php');
 	$filterForm->setAttribute('name','zbx_filter');
 	$filterForm->setAttribute('id','zbx_filter');
 
-	$filterForm->addRow(S_SHOW_ITEMS_WITH_DESCRIPTION_LIKE, new CTextBox('select',$_REQUEST['select'],20));
+	$filterForm->addRow(_('Show items with name like'), new CTextBox('select',$_REQUEST['select'],20));
 
 	$reset = new CButton("filter_rst",S_RESET,'javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
 
@@ -153,7 +153,7 @@ include_once('include/page_header.php');
 	$latest_wdgt->addFlicker($filterForm, CProfile::get('web.latest.filter.state',1));
 //-------
 
-	validate_sort_and_sortorder('i.description',ZBX_SORT_UP);
+	validate_sort_and_sortorder('i.name',ZBX_SORT_UP);
 
 	$_REQUEST['groupbyapp'] = get_request('groupbyapp',CProfile::get('web.latest.groupbyapp',1));
 	CProfile::update('web.latest.groupbyapp',$_REQUEST['groupbyapp'],PROFILE_TYPE_INT);
@@ -206,7 +206,7 @@ include_once('include/page_header.php');
 		$link,
 		is_show_all_nodes()?make_sorting_header(S_NODE,'h.hostid') : null,
 		($_REQUEST['hostid'] ==0)?make_sorting_header(S_HOST,'h.host') : NULL,
-		make_sorting_header(S_DESCRIPTION,'i.description'),
+		make_sorting_header(_('Name'), 'i.name'),
 		make_sorting_header(S_LAST_CHECK,'i.lastclock'),
 		S_LAST_VALUE,
 		S_CHANGE,
@@ -251,11 +251,11 @@ include_once('include/page_header.php');
 				' AND i.itemid=ia.itemid AND i.lastvalue IS NOT NULL'.
 				' AND (i.status='.ITEM_STATUS_ACTIVE. ' OR i.status='.ITEM_STATUS_NOTSUPPORTED.')'.
 				' AND '.DBcondition('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
-			order_by('i.description,i.itemid,i.lastclock');
+			order_by('i.name,i.itemid,i.lastclock');
 //SDI($sql);
 	$db_items = DBselect($sql);
 	while($db_item = DBfetch($db_items)){
-		$description = item_description($db_item);
+		$description = itemName($db_item);
 
 		if(!empty($_REQUEST['select']) && !zbx_stristr($description, $_REQUEST['select']) ) continue;
 
@@ -404,11 +404,11 @@ include_once('include/page_header.php');
 				' AND i.status='.ITEM_STATUS_ACTIVE.
 				' AND '.DBcondition('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
 				' AND '.DBcondition('h.hostid',$db_hostids).
-			' ORDER BY i.description,i.itemid';
+			' ORDER BY i.name,i.itemid';
 	$db_items = DBselect($sql);
 	while($db_item = DBfetch($db_items)){
 
-		$description = item_description($db_item);
+		$description = itemName($db_item);
 
 		if(!empty($_REQUEST['select']) && !zbx_stristr($description, $_REQUEST['select']) ) continue;
 

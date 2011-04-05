@@ -256,7 +256,7 @@
 				if ($result){
 					$host=get_host_by_hostid($row['hostid']);
 					$item_new = get_item_by_itemid($row['itemid']);
-					add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, $row['itemid'], $host['host'].':'.$row['description'], 'items', $row, $item_new);
+					add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, $row['itemid'], $host['host'].':'.$row['name'], 'items', $row, $item_new);
 				}
 			}
 		}
@@ -349,7 +349,7 @@
 				}
 
 				if(!isset($item['interfaceid'])){
-					error(_s('Item [%1$s:%2$s] cannot find interface on host [%3$s]', $item['description'], $item['key_'], $host['host']));
+					error(_s('Item [%1$s:%2$s] cannot find interface on host [%3$s]', $item['name'], $item['key_'], $host['host']));
 					return false;
 				}
 			}
@@ -451,11 +451,11 @@
 	}
 
 	function get_item_by_itemid_limited($itemid){
-		$sql = 'SELECT itemid,interfaceid,description,key_,hostid,delay,history,status,type,'.
+		$sql = 'SELECT itemid,interfaceid,name,key_,hostid,delay,history,status,type,'.
 					'snmp_community,snmp_oid,value_type,data_type,trapper_hosts,port,units,multiplier,delta,'.
 					'snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,'.
 					'formula,trends,logtimefmt,valuemapid,delay_flex,params,ipmi_sensor,templateid,'.
-					'authtype,username,password,publickey,privatekey,flags, filter '.
+					'authtype,username,password,publickey,privatekey,flags, filter, description '.
 			' FROM items '.
 			' WHERE itemid='.$itemid;
 		$row = DBfetch(DBselect($sql));
@@ -598,8 +598,8 @@
 	return $item['key_'];
 	}
 
-	function item_description($item){
-		$descr = $item['description'];
+	function itemName($item){
+		$descr = $item['name'];
 		$key = expand_item_key_by_data($item);
 
         for($i=9;$i>0;$i--){
@@ -659,7 +659,7 @@
 
 // COpt::profiling_start('prepare_data');
 		$result = DBselect('SELECT DISTINCT h.hostid, h.host,i.itemid, i.key_, i.value_type, i.lastvalue, i.units, i.lastclock,'.
-				' i.description, t.priority, i.valuemapid, t.value as tr_value, t.triggerid '.
+				' i.name, t.priority, i.valuemapid, t.value as tr_value, t.triggerid '.
 			' FROM hosts h, items i '.
 				' LEFT JOIN functions f on f.itemid=i.itemid '.
 				' LEFT JOIN triggers t on t.triggerid=f.triggerid and t.status='.TRIGGER_STATUS_ENABLED.
@@ -668,14 +668,14 @@
 				' AND h.hostid=i.hostid '.
 				' AND i.status='.ITEM_STATUS_ACTIVE.
 				' AND '.DBcondition('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
-			' ORDER BY i.description,i.itemid');
+			' ORDER BY i.name,i.itemid');
 
 		unset($items);
 		unset($hosts);
 // get rid of warnings about $triggers undefined
 		$items = array();
 		while($row = DBfetch($result)){
-			$descr = item_description($row);
+			$descr = itemName($row);
 			$row['host'] = get_node_name_by_elid($row['hostid'], null, ': ').$row['host'];
 			$hosts[zbx_strtolower($row['host'])] = $row['host'];
 
@@ -697,7 +697,7 @@
 					'lastvalue'	=> $row['lastvalue'],
 					'lastclock'	=> $row['lastclock'],
 					'units'		=> $row['units'],
-					'description'=> $row['description'],
+					'name'=> $row['name'],
 					'valuemapid' => $row['valuemapid'],
 					'severity'	=> $row['priority'],
 					'tr_value'	=> $row['tr_value'],
