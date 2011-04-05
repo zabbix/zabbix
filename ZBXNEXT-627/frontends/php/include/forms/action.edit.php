@@ -179,11 +179,11 @@ require_once('include/templates/action.js.php');
 		case CONDITION_TYPE_HOST_TEMPLATE:
 			$conditionList->addItem(new CVar('new_condition[value]','0'));
 			$rowCondition[] = array(
-				new CTextBox('host','',40,'yes'),
+				new CTextBox('hostname','',40,'yes'),
 				new CButton('btn1',_('Select'),
 					"return PopUp('popup.php?writeonly=1&dstfrm=".$frmAction->getName().
-					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=host&srctbl=host_templates".
-					"&srcfld1=hostid&srcfld2=host',450,450);",
+					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=hostname&srctbl=host_templates".
+					"&srcfld1=templateid&srcfld2=name',450,450);",
 					'link_menu'));
 			break;
 		case CONDITION_TYPE_HOST:
@@ -668,7 +668,7 @@ require_once('include/templates/action.js.php');
 				$templateList = new CTable();
 				$templateList->setAttribute('id', 'opTemplateList');
 
-				$addUsrgrpBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm='.S_ACTION.'&srctbl=host_templates&srcfld1=templateid&srcfld2=host&multiselect=1&reference=dsc_templateid'.'",450,450)','link_menu');
+				$addUsrgrpBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm='.S_ACTION.'&srctbl=host_templates&srcfld1=templateid&srcfld2=name&multiselect=1&reference=dsc_templateid'.'",450,450)','link_menu');
 
 				$col = new CCol($addUsrgrpBtn);
 				$col->setAttribute('colspan', 2);
@@ -683,8 +683,8 @@ require_once('include/templates/action.js.php');
 					zbx_objectValues($new_operation['optemplate'], 'templateid') :
 					array();
 
-				$templates = API::Template()->get(array('templateids' => $templateids, 'output' => array('templateid','host')));
-				order_result($templates, 'host');
+				$templates = API::Template()->get(array('templateids' => $templateids, 'output' => array('templateid', 'name')));
+				order_result($templates, 'name');
 
 				$jsInsert = '';
 				$jsInsert.= 'addPopupValues('.zbx_jsvalue(array('object'=>'dsc_templateid', 'values'=>$templates)).');';
