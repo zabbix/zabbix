@@ -1475,7 +1475,7 @@
 		$interfaceid = get_request('interfaceid', 0);
 		$description = get_request('description', '');
 		$key = get_request('key', '');
-		$host = get_request('host', null);
+		$hostname = get_request('hostname', null);
 		$delay = get_request('delay', 30);
 		$history = get_request('history', 90);
 		$status = get_request('status', 0);
@@ -1532,19 +1532,19 @@
 			$limited = ($item_data['templateid'] != 0);
 		}
 
-		if(is_null($host)){
+		if(is_null($hostname)){
 			if($hostid > 0){
 				$options = array(
 					'hostids' => $hostid,
-					'output' => API_OUTPUT_EXTEND,
+					'output' => array('name'),
 					'templated_hosts' => 1
 				);
 				$host_info = API::Host()->get($options);
 				$host_info = reset($host_info);
-				$host = $host_info['host'];
+				$hostname = $host_info['name'];
 			}
 			else
-				$host = S_NOT_SELECTED_SMALL;
+				$hostname = S_NOT_SELECTED_SMALL;
 		}
 
 		if((isset($_REQUEST['itemid']) && !isset($_REQUEST['form_refresh'])) || $limited){
@@ -1648,7 +1648,7 @@
 			$caption = array();
 			$itemid = $_REQUEST['itemid'];
 			do{
-				$sql = 'SELECT i.itemid, i.templateid, h.host'.
+				$sql = 'SELECT i.itemid, i.templateid, h.name'.
 						' FROM items i, hosts h'.
 						' WHERE i.itemid='.$itemid.
 							' AND h.hostid=i.hostid';
@@ -1656,11 +1656,11 @@
 				if($itemFromDb){
 					if(bccomp($_REQUEST['itemid'], $itemid) == 0){
 						$caption[] = SPACE;
-						$caption[] = $itemFromDb['host'];
+						$caption[] = $itemFromDb['name'];
 					}
 					else{
 						$caption[] = ' : ';
-						$caption[] = new CLink($itemFromDb['host'], 'items.php?form=update&itemid='.$itemFromDb['itemid'], 'highlight underline');
+						$caption[] = new CLink($itemFromDb['name'], 'items.php?form=update&itemid='.$itemFromDb['itemid'], 'highlight underline');
 					}
 
 					$itemid = $itemFromDb['templateid'];
@@ -1676,15 +1676,15 @@
 			$frmItem->setTitle($caption);
 		}
 		else
-			$frmItem->setTitle(S_ITEM." $host : $description");
+			$frmItem->setTitle(S_ITEM." $hostname : $description");
 
 		if(!$parent_discoveryid){
 			$frmItem->addVar('form_hostid', $hostid);
-			$frmItem->addRow(S_HOST,array(
-				new CTextBox('host',$host,32,true),
+			$frmItem->addRow(S_HOST, array(
+				new CTextBox('hostname', $hostname, 32, true),
 				new CButton('btn_host', S_SELECT,
 					"return PopUp('popup.php?dstfrm=".$frmItem->getName().
-					"&dstfld1=host&dstfld2=form_hostid&srctbl=hosts_and_templates&srcfld1=host&srcfld2=hostid',450,450);",
+					"&dstfld1=hostname&dstfld2=form_hostid&srctbl=hosts_and_templates&srcfld1=name&srcfld2=hostid',450,450);",
 					'H')
 			));
 

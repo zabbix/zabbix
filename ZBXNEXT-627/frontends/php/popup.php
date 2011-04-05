@@ -675,7 +675,7 @@ include_once('include/page_header.php');
 		$options = array(
 			'nodeids' => $nodeid,
 			'groupids' => $groupid,
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array('hostid', 'name'),
 			'sortfield'=>'name'
 		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
