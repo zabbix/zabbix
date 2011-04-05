@@ -15,7 +15,7 @@
 <tr id="opTemplateRow_#{templateid}">
 <td>
 	<input name="new_operation[optemplate][#{templateid}][templateid]" type="hidden" value="#{templateid}" />
-	<span style="font-size: 1.1em; font-weight: bold;"> #{host} </span>
+	<span style="font-size: 1.1em; font-weight: bold;"> #{name} </span>
 </td>
 <td>
 	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="javascript: removeOpTemplateRow(#{templateid});" />

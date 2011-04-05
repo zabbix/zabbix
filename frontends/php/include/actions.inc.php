@@ -254,7 +254,6 @@ function get_operation_desc($type, $data){
 					$result[] = array(implode(', ', zbx_objectValues($hosts,'name')), BR());
 				}
 
-
 				$groups = API::HostGroup()->get(array(
 					'groupids' => zbx_objectValues($data['opcommand_grp'],'groupid'),
 					'output' => array('groupid', 'name')
@@ -305,18 +304,18 @@ function get_operation_desc($type, $data){
 
 				$templates = API::Template()->get(array(
 					'templateids' => zbx_objectValues($data['optemplate'],'templateid'),
-					'output' => array('hostid', 'host')
+					'output' => array('hostid', 'name')
 				));
 
 				if(!empty($templates)){
-					order_result($templates, 'host');
+					order_result($templates, 'name');
 
 					if(OPERATION_TYPE_TEMPLATE_ADD == $data['operationtype'])
 						$result[] = bold(_('Link to templates: '));
 					else
 						$result[] = bold(_('Unlink from templates: '));
 
-					$result[] = array(implode(', ', zbx_objectValues($templates,'host')), BR());
+					$result[] = array(implode(', ', zbx_objectValues($templates, 'name')), BR());
 				}
 				break;
 			default:
@@ -354,10 +353,10 @@ function get_operation_desc($type, $data){
 
 				$hosts = API::Host()->get(array(
 					'hostids' => zbx_objectValues($data['opcommand_hst'],'hostid'),
-					'output' => array('hostid', 'host'),
+					'output' => array('hostid', 'name'),
 					'preservekeys' => true
 				));
-				order_result($hosts, 'host');
+				order_result($hosts, 'name');
 				foreach($data['opcommand_hst'] as $cnum => $command){
 					if($command['hostid'] > 0) continue;
 					$result[] = _s('Current host: ');
@@ -367,7 +366,7 @@ function get_operation_desc($type, $data){
 
 				foreach($data['opcommand_hst'] as $cnum => $command){
 					if($command['hostid'] == 0) continue;
-					$result[] = _s('Host "%1$s": ', $hosts[$command['hostid']]['host']);
+					$result[] = _s('Host "%1$s": ', $hosts[$command['hostid']]['name']);
 
 					$result[] = italic(zbx_nl2br($command['command']));
 				}

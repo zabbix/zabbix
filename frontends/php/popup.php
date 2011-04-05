@@ -626,16 +626,16 @@ include_once('include/page_header.php');
 		$options = array(
 			'nodeids' => $nodeid,
 			'groupids' => $groupid,
-			'output' => array('templateid', 'host'),
+			'output' => array('templateid', 'name'),
 			'preservekeys' => true
 		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 
 		$templates = API::Template()->get($options);
-		order_result($templates, 'host');
+		order_result($templates, 'name');
 
 		foreach($templates as $tnum => $template){
-			$name = new CSpan(get_node_name_by_elid($template['templateid'], null, ': ').$template['host'],'link');
+			$name = new CSpan(get_node_name_by_elid($template['templateid'], null, ': ').$template['name'],'link');
 
 			if($multiselect){
 				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", ".zbx_jsvalue($template['templateid']).");";
