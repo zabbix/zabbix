@@ -98,7 +98,7 @@ include_once 'include/page_header.php';
 		ITEM_TYPE_CALCULATED
 	);
 
-	$sql = 'SELECT i.itemid,i.lastclock,i.description,i.key_,i.type,'.
+	$sql = 'SELECT i.itemid,i.lastclock,i.name,i.key_,i.type,'.
 			'h.host,h.hostid,h.proxy_hostid,i.delay,i.delay_flex,i.interfaceid'.
 		' FROM items i,hosts h'.
 		' WHERE i.hostid=h.hostid'.
@@ -115,7 +115,7 @@ include_once 'include/page_header.php';
 				' OR (h.jmx_available<>'.HOST_AVAILABLE_FALSE.' AND i.type IN ('.implode(',',$jmx_item_types).'))'.
 				')'.
 			' AND '.DBin_node('i.itemid', get_current_nodeid()).
-		' ORDER BY i.lastclock,h.host,i.description,i.key_';
+		' ORDER BY i.lastclock,h.host,i.name,i.key_';
 	$result = DBselect($sql);
 
 	$table = new CTableInfo(_('The queue is empty'));
@@ -247,7 +247,7 @@ include_once 'include/page_header.php';
 			_('Delayed by'),
 			is_show_all_nodes() ? _('Node') : null,
 			_('Host'),
-			_('Description')
+			_('Name')
 		));
 
 		while($row = DBfetch($result)){
@@ -260,7 +260,7 @@ include_once 'include/page_header.php';
 			if($diff <= 5)
 				continue;
 
-			$arr[] = array($res['nextcheck'], $row['hostid'], $row['host'], item_description($row));
+			$arr[] = array($res['nextcheck'], $row['hostid'], $row['host'], itemName($row));
 		}
 
 		$rows = 0;

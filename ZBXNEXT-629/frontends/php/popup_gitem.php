@@ -148,7 +148,7 @@ include_once('include/page_header.php');
 		$description = '';
 		if($itemid > 0){
 			$description = get_item_by_itemid($itemid);
-			$description = item_description($description);
+			$description = itemName($description);
 		}
 
 		$frmGItem->addVar('graphid',$graphid);
@@ -158,7 +158,7 @@ include_once('include/page_header.php');
 		$frmGItem->addVar('graphtype',$graphtype);
 		$frmGItem->addVar('only_hostid',$only_hostid);
 
-		$txtCondVal = new CTextBox('description',$description,50,'yes');
+		$txtCondVal = new CTextBox('name',$description,50,'yes');
 
 		$host_condition = '';
 		if(isset($only_hostid)){// graph for template must use only one host
@@ -173,8 +173,8 @@ include_once('include/page_header.php');
 		if($parent_discoveryid){
 			$btnSelect = new CSubmit('btn1',S_SELECT,
 				"return PopUp('popup.php?writeonly=1&dstfrm=".$frmGItem->GetName().
-						"&dstfld1=itemid&dstfld2=description&".
-						"srctbl=prototypes&srcfld1=itemid&srcfld2=description&parent_discoveryid=".$parent_discoveryid.
+						"&dstfld1=itemid&dstfld2=name&".
+						"srctbl=prototypes&srcfld1=itemid&srcfld2=name&parent_discoveryid=".$parent_discoveryid.
 						"', 800, 600);",
 				'T'
 			);
@@ -182,8 +182,8 @@ include_once('include/page_header.php');
 		else{
 			$btnSelect = new CSubmit('btn1',S_SELECT,
 				"return PopUp('popup.php?writeonly=1&dstfrm=".$frmGItem->GetName().
-						"&dstfld1=itemid&dstfld2=description".$normal_only.
-						"&srctbl=items&srcfld1=itemid&srcfld2=description".$host_condition."', 800, 600);",
+						"&dstfld1=itemid&dstfld2=name".$normal_only.
+						"&srctbl=items&srcfld1=itemid&srcfld2=name".$host_condition."', 800, 600);",
 				'T'
 			);
 		}

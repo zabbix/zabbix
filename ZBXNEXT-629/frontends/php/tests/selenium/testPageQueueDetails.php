@@ -30,7 +30,7 @@ class testPageQueueDetails extends CWebTest
 		$this->ok('Queue');
 		$this->ok('QUEUE OF ITEMS TO BE UPDATED');
 		// Header
-		$this->ok(array('Next check','Delayed by','Host','Description'));
+		$this->ok(array('Next check','Delayed by','Host','Name'));
 		$this->ok('Total:');
 	}
 

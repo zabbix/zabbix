@@ -46,7 +46,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	zbx_uint64_t	i;
 	char		params[MAX_STRING_LEN], *error = NULL;
 	char		tmp[MAX_STRING_LEN], tmp1[HOST_HOST_LEN_MAX];
-	int		nparams;
+	int		nparams, lastaccess;
 
 	init_result(result);
 
@@ -184,13 +184,13 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 		if (0 == strcmp(tmp, "lastaccess"))
 		{
-			if (FAIL == (i = DBget_proxy_lastaccess(tmp1)))
+			if (FAIL == DBget_proxy_lastaccess(tmp1, &lastaccess, &error))
 				goto not_supported;
 		}
 		else
 			goto not_supported;
 
-		SET_UI64_RESULT(result, i);
+		SET_UI64_RESULT(result, lastaccess);
 	}
 	else if (0 == strcmp(tmp, "java"))		/* zabbix["java",...] */
 	{
