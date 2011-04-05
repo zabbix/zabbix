@@ -202,7 +202,7 @@ define('SHORT_DESCRIPTION', 1);
 function get_operation_desc($type, $data){
 	$result = array();
 
-	if($type == SHORT_DESCRITION){
+	if($type == SHORT_DESCRIPTION){
 		switch($data['operationtype']){
 			case OPERATION_TYPE_MESSAGE:
 				if(!isset($data['opmessage_usr'])) $data['opmessage_usr'] = array();
