@@ -189,11 +189,11 @@ require_once('include/templates/action.js.php');
 		case CONDITION_TYPE_HOST:
 			$conditionList->addItem(new CVar('new_condition[value]','0'));
 			$rowCondition[] = array(
-				new CTextBox('host','',40,'yes'),
+				new CTextBox('hostname','',40,'yes'),
 				new CButton('btn1',_('Select'),
 					"return PopUp('popup.php?writeonly=1&dstfrm=".$frmAction->getName().
-					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=host&srctbl=hosts".
-					"&srcfld1=hostid&srcfld2=host',450,450);",
+					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=hostname&srctbl=hosts".
+					"&srcfld1=hostid&srcfld2=name',450,450);",
 					'link_menu'));
 			break;
 		case CONDITION_TYPE_TRIGGER:

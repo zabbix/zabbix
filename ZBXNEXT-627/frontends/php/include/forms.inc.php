@@ -943,7 +943,7 @@
 	function get_item_filter_form(&$items){
 
 		$filter_group			= $_REQUEST['filter_group'];
-		$filter_host			= $_REQUEST['filter_host'];
+		$filter_hostname		= $_REQUEST['filter_hostname'];
 		$filter_application		= $_REQUEST['filter_application'];
 		$filter_description		= $_REQUEST['filter_description'];
 		$filter_type			= $_REQUEST['filter_type'];
@@ -1002,9 +1002,9 @@
 						'&dstfld1=filter_group&srctbl=host_group&srcfld1=name",450,450);', 'G'))
 		));
 		$col_table1->addRow(array(bold(S_HOST.': '),
-				array(new CTextBox('filter_host', $filter_host, 20),
+				array(new CTextBox('filter_hostname', $filter_hostname, 20),
 					new CButton('btn_host', S_SELECT, 'return PopUp("popup.php?dstfrm='.$form->getName().
-						'&dstfld1=filter_host&srctbl=hosts_and_templates&srcfld1=host",450,450);', 'H'))
+						'&dstfld1=filter_hostname&srctbl=hosts_and_templates&srcfld1=name",450,450);', 'H'))
 		));
 		$col_table1->addRow(array(bold(S_APPLICATION.': '),
 				array(new CTextBox('filter_application', $filter_application, 20),
@@ -1209,12 +1209,12 @@
 
 // generate array with values for subfilters of selected items
 		foreach($items as $num => $item){
-			if(zbx_empty($filter_host)){
+			if(zbx_empty($filter_hostname)){
 // hosts
 				$host = reset($item['hosts']);
 
 				if(!isset($item_params['hosts'][$host['hostid']]))
-					$item_params['hosts'][$host['hostid']] = array('name' => $host['host'], 'count' => 0);
+					$item_params['hosts'][$host['hostid']] = array('name' => $host['name'], 'count' => 0);
 
 				$show_item = true;
 				foreach($item['subfilters'] as $name => $value){
@@ -1393,7 +1393,7 @@
 		}
 
 // output
-		if(zbx_empty($filter_host) && (count($item_params['hosts']) > 1)){
+		if(zbx_empty($filter_hostname) && (count($item_params['hosts']) > 1)){
 			$hosts_output = prepare_subfilter_output($item_params['hosts'], $subfilter_hosts, 'subfilter_hosts');
 			$table_subfilter->addRow(array(S_HOSTS, $hosts_output));
 		}

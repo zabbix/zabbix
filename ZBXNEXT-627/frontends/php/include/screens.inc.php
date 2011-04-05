@@ -700,7 +700,7 @@ require_once('include/js.inc.php');
 				$form->addVar('resourceid',$id);
 
 				$textfield = new CTextbox('caption',$caption,60,'yes');
-				$selectbtn = new CButton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=hosts&srcfld1=hostid&srcfld2=host',800,450);");
+				$selectbtn = new CButton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=hosts&srcfld1=hostid&srcfld2=name',800,450);");
 
 				$form->addRow(S_HOST,array($textfield,SPACE,$selectbtn));
 			}
