@@ -1,4 +1,0 @@
-ALTER TABLE ONLY auditlog ALTER auditid DROP DEFAULT,
-			  ALTER userid DROP DEFAULT;
-DELETE FROM auditlog WHERE NOT userid IN (SELECT userid FROM users);
-ALTER TABLE ONLY auditlog ADD CONSTRAINT c_auditlog_1 FOREIGN KEY (userid) REFERENCES users (userid) ON DELETE CASCADE;

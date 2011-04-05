@@ -1,1 +1,0 @@
-ALTER TABLE screens MODIFY screenid DEFAULT NULL;
