@@ -279,14 +279,14 @@ if(isset($_REQUEST['sform'])){
 			$item = $template_host['host'].':';
 		}
 
-		$item .= item_description($db_item,$db_item['key_']);
+		$item .= itemName($db_item,$db_item['key_']);
 	}
 
 	$ctb = new CTextBox('item',$item,80);
 	$ctb->setAttribute('id','item');
 	$ctb->setAttribute('disabled','disabled');
 
-	$script = "javascript: return PopUp('popup.php?dstfrm=".$frmTRLog->getName()."&dstfld1=itemid&dstfld2=item&srctbl=items&srcfld1=itemid&srcfld2=description',800,450);";
+	$script = "javascript: return PopUp('popup.php?dstfrm=".$frmTRLog->getName()."&dstfld1=itemid&dstfld2=item&srctbl=items&srcfld1=itemid&srcfld2=name',800,450);";
 	$cbtn = new CSubmit('select_item',S_SELECT,$script);
 
 	$frmTRLog->addRow(S_ITEM,array($ctb, $cbtn));

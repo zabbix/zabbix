@@ -2,6 +2,8 @@
 Changes for 1.9.4
 
 New features:
+ - [ZBX-1357] updated Latvian, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
+ - [ZBXNEXT-511] renamed item description to name, for description introduced new field (asaveljevs, Vedmak)
 
 Bug fixes:
  - [ZBX-3658] fixed the whole request to Java proxy failing if it contains an invalid key (asaveljevs)
@@ -121,8 +123,14 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.5
+
+ - [ZBX-3686] updated French translation; thanks to Joseph Bueno (Richlv)
+
 Changes for 1.8.5rc1
 
+ - [ZBX-3672] fixed possible hang of history syncers when a zabbix[log] message added during process a history data (Sasha)
+ - [ZBX-3644] fixed api permission checks for applications, items and triggers (Vedmak)
  - [ZBX-3673] fixed processing of operators & and | in trigger and calculated items expressions (Sasha)
  - [ZBX-3660] fixed macro resolving in map labels (Vedmak)
  - [ZBX-3659] API exists() methods now return true/false instead of true/error (KB)

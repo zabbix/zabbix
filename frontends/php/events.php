@@ -597,7 +597,7 @@ include_once('include/page_header.php');
 					$i['itemid'] = $item['itemid'];
 					$i['value_type'] = $item['value_type']; //ZBX-3059: So it would be possible to show different caption for history for chars and numbers (KB)
 					$i['action'] = str_in_array($item['value_type'],array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64))? 'showgraph':'showvalues';
-					$i['description'] = item_description($item);
+					$i['name'] = itemName($item);
 					$items[] = $i;
 				}
 

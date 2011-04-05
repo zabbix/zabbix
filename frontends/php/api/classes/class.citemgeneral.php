@@ -38,7 +38,8 @@ abstract class CItemGeneral extends CZBXAPI{
 			'snmp_community'		=> array(),
 			'snmp_oid'				=> array('template' => 1),
 			'hostid'				=> array(),
-			'description' 			=> array('template' => 1),
+			'name' 					=> array('template' => 1),
+			'description' 			=> array(),
 			'key_'					=> array('template' => 1),
 			'delay'					=> array(),
 			'history'				=> array(),
@@ -111,7 +112,7 @@ abstract class CItemGeneral extends CZBXAPI{
 			));
 		}
 		else{
-			$item_db_fields = array('description' => null, 'key_' => null, 'hostid' => null, 'type' => null);
+			$item_db_fields = array('name' => null, 'key_' => null, 'hostid' => null, 'type' => null);
 
 			$dbHosts = API::Host()->get(array(
 				'output' => array('hostid', 'host', 'status'),
@@ -178,7 +179,7 @@ abstract class CItemGeneral extends CZBXAPI{
 				|| preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/u', $item['port']))
 			){
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Item "%1$s:%2$s" has invalid port: "%3$s".', $fullItem['description'], $fullItem['key_'], $item['port']));
+					_s('Item "%1$s:%2$s" has invalid port: "%3$s".', $fullItem['name'], $fullItem['key_'], $item['port']));
 			}
 
 			if(isset($item['value_type'])){

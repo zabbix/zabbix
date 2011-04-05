@@ -2513,7 +2513,7 @@ static void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_it
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, const char *description_proto,
+static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, const char *name_proto,
 		const char *key_proto, unsigned char type, unsigned char value_type, unsigned char data_type,
 		int delay, const char *delay_flex_esc, int history, int trends, unsigned char status,
 		const char *trapper_hosts_esc, const char *units_esc, int multiplier, int delta,
@@ -2523,7 +2523,7 @@ static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, co
 		unsigned char snmpv3_securitylevel, const char *snmpv3_authpassphrase_esc,
 		const char *snmpv3_privpassphrase_esc, unsigned char authtype, const char *username_esc,
 		const char *password_esc, const char *publickey_esc, const char *privatekey_esc,
-		zbx_uint64_t interfaceid, struct zbx_json_parse *jp_row, char **error)
+		const char *description_esc, zbx_uint64_t interfaceid, struct zbx_json_parse *jp_row, char **error)
 {
 	const char	*__function_name = "DBlld_update_item";
 
@@ -2531,7 +2531,7 @@ static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, co
 	DB_ROW		row;
 	zbx_uint64_t	new_itemid = 0, itemdiscoveryid, itemappid;
 	char		*key = NULL, *key_esc, *key_proto_esc,
-			*description = NULL, *description_esc,
+			*name = NULL, *name_esc,
 			*snmp_oid = NULL, *snmp_oid_esc,
 			*sql = NULL;
 	int		sql_offset = 0, sql_alloc = 16384,
@@ -2548,9 +2548,9 @@ static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, co
 	key_esc = DBdyn_escape_string(key);
 	key_proto_esc = DBdyn_escape_string(key_proto);
 
-	description = zbx_strdup(description, description_proto);
-	substitute_discovery_macros(&description, jp_row);
-	description_esc = DBdyn_escape_string(description);
+	name = zbx_strdup(name, name_proto);
+	substitute_discovery_macros(&name, jp_row);
+	name_esc = DBdyn_escape_string(name);
 
 	snmp_oid = zbx_strdup(snmp_oid, snmp_oid_proto);
 	substitute_discovery_macros(&snmp_oid, jp_row);
@@ -2646,26 +2646,26 @@ static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, co
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8192,
 				"insert into items"
-					" (itemid,description,key_,hostid,type,value_type,data_type,"
+					" (itemid,name,key_,hostid,type,value_type,data_type,"
 					"delay,delay_flex,history,trends,status,trapper_hosts,units,"
 					"multiplier,delta,formula,logtimefmt,valuemapid,params,"
 					"ipmi_sensor,snmp_community,snmp_oid,port,"
 					"snmpv3_securityname,snmpv3_securitylevel,"
 					"snmpv3_authpassphrase,snmpv3_privpassphrase,"
 					"authtype,username,password,publickey,privatekey,"
-					"interfaceid,flags)"
+					"description,interfaceid,flags)"
 				" values"
 					" (" ZBX_FS_UI64 ",'%s','%s'," ZBX_FS_UI64 ",%d,%d,%d,"
 					"%d,'%s',%d,%d,%d,'%s','%s',%d,%d,'%s','%s',%s,'%s','%s',"
 					"'%s','%s','%s','%s',%d,'%s','%s',%d,'%s','%s','%s',"
-					"'%s'," ZBX_FS_UI64 ",%d);\n",
-				new_itemid, description_esc, key_esc, hostid, (int)type, (int)value_type, (int)data_type,
+					"'%s','%s'," ZBX_FS_UI64 ",%d);\n",
+				new_itemid, name_esc, key_esc, hostid, (int)type, (int)value_type, (int)data_type,
 				delay, delay_flex_esc, history, trends, (int)status, trapper_hosts_esc, units_esc,
 				multiplier, delta, formula_esc, logtimefmt_esc, DBsql_id_ins(valuemapid), params_esc,
 				ipmi_sensor_esc, snmp_community_esc, snmp_oid_esc, port_esc,
 				snmpv3_securityname_esc, (int)snmpv3_securitylevel, snmpv3_authpassphrase_esc,
 				snmpv3_privpassphrase_esc, (int)authtype, username_esc, password_esc, publickey_esc,
-				privatekey_esc, interfaceid, ZBX_FLAG_DISCOVERY_CREATED);
+				privatekey_esc, description_esc, interfaceid, ZBX_FLAG_DISCOVERY_CREATED);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256 + strlen(key_proto_esc),
 				"insert into item_discovery"
@@ -2680,7 +2680,7 @@ static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, co
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8192,
 				"update items"
-					" set description='%s',"
+					" set name='%s',"
 					"key_='%s',"
 					"type=%d,"
 					"value_type=%d,"
@@ -2710,16 +2710,17 @@ static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, co
 					"password='%s',"
 					"publickey='%s',"
 					"privatekey='%s',"
+					"description='%s',"
 					"interfaceid=" ZBX_FS_UI64 ","
 					"flags=%d"
 				" where itemid=" ZBX_FS_UI64 ";\n",
-				description_esc, key_esc, (int)type, (int)value_type, (int)data_type,
+				name_esc, key_esc, (int)type, (int)value_type, (int)data_type,
 				delay, delay_flex_esc, history, trends, trapper_hosts_esc, units_esc,
 				multiplier, delta, formula_esc, logtimefmt_esc, DBsql_id_ins(valuemapid), params_esc,
 				ipmi_sensor_esc, snmp_community_esc, snmp_oid_esc, port_esc,
 				snmpv3_securityname_esc, (int)snmpv3_securitylevel, snmpv3_authpassphrase_esc,
 				snmpv3_privpassphrase_esc, (int)authtype, username_esc, password_esc, publickey_esc,
-				privatekey_esc, interfaceid, ZBX_FLAG_DISCOVERY_CREATED, new_itemid);
+				privatekey_esc, description_esc, interfaceid, ZBX_FLAG_DISCOVERY_CREATED, new_itemid);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256 + strlen(key_proto_esc),
 				"update item_discovery"
@@ -2771,8 +2772,8 @@ out:
 	zbx_free(sql);
 	zbx_free(snmp_oid_esc);
 	zbx_free(snmp_oid);
-	zbx_free(description_esc);
-	zbx_free(description);
+	zbx_free(name_esc);
+	zbx_free(name);
 	zbx_free(key_proto_esc);
 	zbx_free(key_esc);
 	zbx_free(key);
@@ -2788,11 +2789,7 @@ out:
  *                                                                            *
  * Purpose: add or update items for discovered items                          *
  *                                                                            *
- * Parameters: parent_itemid - [IN] discovery item identificator              *
- *                                  from database                             *
- *             key_orig      - [IN] original template item key                *
- *             key_last      - [IN] previous original template item key       *
- *             jp_data       - [IN] received discovery data                   *
+ * Parameters:                                                                *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
@@ -2819,14 +2816,15 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect(
-			"select i.itemid,i.description,i.key_,i.lastvalue,i.type,"
+			"select i.itemid,i.name,i.key_,i.lastvalue,i.type,"
 				"i.value_type,i.data_type,i.delay,i.delay_flex,"
 				"i.history,i.trends,i.status,i.trapper_hosts,"
 				"i.units,i.multiplier,i.delta,i.formula,"
 				"i.logtimefmt,i.valuemapid,i.params,"
 				"i.ipmi_sensor,i.snmp_oid,"
 				"i.authtype,i.username,"
-				"i.password,i.publickey,i.privatekey"
+				"i.password,i.publickey,i.privatekey,"
+				"i.description"
 			" from items i,item_discovery d"
 			" where i.itemid=d.itemid"
 				" and i.hostid=" ZBX_FS_UI64
@@ -2838,7 +2836,7 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 		zbx_uint64_t	itemid, valuemapid;
 		char		*delay_flex_esc, *trapper_hosts_esc, *units_esc, *formula_esc,
 				*logtimefmt_esc, *params_esc, *ipmi_sensor_esc, *username_esc,
-				*password_esc, *publickey_esc, *privatekey_esc;
+				*password_esc, *publickey_esc, *privatekey_esc, *description_esc;
 
 		ZBX_STR2UINT64(itemid, row[0]);
 		ZBX_DBROW2UINT64(valuemapid, row[18]);
@@ -2854,6 +2852,7 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 		password_esc		= DBdyn_escape_string(row[24]);
 		publickey_esc		= DBdyn_escape_string(row[25]);
 		privatekey_esc		= DBdyn_escape_string(row[26]);
+		description_esc		= DBdyn_escape_string(row[27]);
 
 		p = NULL;
 /* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]}
@@ -2869,7 +2868,7 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 				continue;
 
 			DBlld_update_item(hostid, itemid,
-					row[1],				/* description */
+					row[1],				/* name */
 					row[2],				/* key */
 					(unsigned char)atoi(row[4]),	/* type */
 					(unsigned char)atoi(row[5]),	/* value_type */
@@ -2900,11 +2899,13 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 					password_esc,
 					publickey_esc,
 					privatekey_esc,
+					description_esc,
 					interfaceid,
 					&jp_row,
 					error);
 		}
 
+		zbx_free(description_esc);
 		zbx_free(privatekey_esc);
 		zbx_free(publickey_esc);
 		zbx_free(password_esc);

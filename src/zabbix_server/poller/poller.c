@@ -415,8 +415,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			res = get_value_calculated(item, result);
 			break;
 		default:
-			zabbix_log(LOG_LEVEL_WARNING, "Not supported item type:%d", item->type);
-			zabbix_syslog("Not supported item type:%d", item->type);
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Not supported item type:%d", item->type));
 			res = NOTSUPPORTED;
 	}
 
