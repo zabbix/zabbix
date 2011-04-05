@@ -580,6 +580,14 @@ require_once('include/templates/action.js.php');
 						'command' => '',
 					);
 				}
+				$new_operation['opcommand']['scriptid'] = isset($new_operation['opcommand']['scriptid'])
+						? $new_operation['opcommand']['scriptid'] : '';
+				$new_operation['opcommand']['execute_on'] = isset($new_operation['opcommand']['execute_on'])
+						? $new_operation['opcommand']['execute_on'] : '';
+				$new_operation['opcommand']['publickey'] = isset($new_operation['opcommand']['publickey'])
+						? $new_operation['opcommand']['privatekey'] : '';
+				$new_operation['opcommand']['privatekey'] = isset($new_operation['opcommand']['privatekey'])
+						? $new_operation['opcommand']['privatekey'] : '';
 
 				$new_operation['opcommand']['script'] = '';
 				if(!zbx_empty($new_operation['opcommand']['scriptid'])){
@@ -687,7 +695,14 @@ require_once('include/templates/action.js.php');
 				$tblOper->addRow(array(_('Port'), new CTextBox('new_operation[opcommand][port]', $new_operation['opcommand']['port'])), 'class_opcommand_port hidden');
 
 // Command
-				$tblOper->addRow(array(_('Commands'), new CTextArea('new_operation[opcommand][command]', $new_operation['opcommand']['command'], 77, 7)), 'class_opcommand_command hidden');
+				$commandTextArea = new CTextArea('new_operation[opcommand][command]', $new_operation['opcommand']['command'], 77, 7);
+				$commandTextArea->addStyle('width: 40em;');
+				$tblOper->addRow(array(_('Commands'), $commandTextArea), 'class_opcommand_command hidden');
+
+				$commandIpmiTextBox = new CTextBox('new_operation[opcommand][command]', $new_operation['opcommand']['command']);
+				$commandIpmiTextBox->addStyle('width: 40em;');
+				$commandIpmiTextBox->attr('id', 'opcommand_command_ipmi');
+				$tblOper->addRow(array(_('Commands'), $commandIpmiTextBox), 'class_opcommand_command_ipmi hidden');
 
 				break;
 			case OPERATION_TYPE_HOST_ADD:

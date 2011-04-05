@@ -6,7 +6,7 @@
 	<span style="font-size: 1.1em; font-weight: bold;"> #{name} </span>
 </td>
 <td>
-	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="javascript: removeOpGroupRow(#{groupid});" />
+	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="removeOpGroupRow(#{groupid});" />
 </td>
 </tr>
 </script>
@@ -18,7 +18,7 @@
 	<span style="font-size: 1.1em; font-weight: bold;"> #{host} </span>
 </td>
 <td>
-	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="javascript: removeOpTemplateRow(#{templateid});" />
+	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="removeOpTemplateRow(#{templateid});" />
 </td>
 </tr>
 </script>
@@ -30,7 +30,7 @@
 	<span style="font-size: 1.1em; font-weight: bold;"> #{name} </span>
 </td>
 <td>
-	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="javascript: removeOpmsgUsrgrpRow(#{usrgrpid});" />
+	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="removeOpmsgUsrgrpRow(#{usrgrpid});" />
 </td>
 </tr>
 </script>
@@ -42,7 +42,7 @@
 	<span style="font-size: 1.1em; font-weight: bold;"> #{alias} </span>
 </td>
 <td>
-	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="javascript: removeOpmsgUserRow(#{userid});" />
+	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="removeOpmsgUserRow(#{userid});" />
 </td>
 </tr>
 </script>
@@ -56,7 +56,7 @@
 	<span class="bold"> #{name} </span>
 </td>
 <td>
-	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="javascript: removeOpCmdRow(#{groupid}, 'groupid');" />
+	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="removeOpCmdRow(#{groupid}, 'groupid');" />
 </td>
 </tr>
 </script>
@@ -70,7 +70,7 @@
 	<span class="bold"> #{host} </span>
 </td>
 <td>
-	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="javascript: removeOpCmdRow(#{hostid}, 'hostid');" />
+	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="removeOpCmdRow(#{hostid}, 'hostid');" />
 </td>
 </tr>
 </script>
@@ -307,7 +307,8 @@ function showOpTypeForm(){
 		'class_opcommand_userscript': [ZBX_SCRIPT_TYPES.userscript],
 		'class_opcommand_execute_on': [ZBX_SCRIPT_TYPES.script],
 		'class_opcommand_port': [ZBX_SCRIPT_TYPES.ssh,ZBX_SCRIPT_TYPES.telnet],
-		'class_opcommand_command': [ZBX_SCRIPT_TYPES.script,ZBX_SCRIPT_TYPES.ipmi,ZBX_SCRIPT_TYPES.ssh,ZBX_SCRIPT_TYPES.telnet],
+		'class_opcommand_command': [ZBX_SCRIPT_TYPES.script,ZBX_SCRIPT_TYPES.ssh,ZBX_SCRIPT_TYPES.telnet],
+		'class_opcommand_command_ipmi': [ZBX_SCRIPT_TYPES.ipmi],
 		'class_authentication_method': [ZBX_SCRIPT_TYPES.ssh],
 		'class_authentication_username': [ZBX_SCRIPT_TYPES.ssh,ZBX_SCRIPT_TYPES.telnet],
 		'class_authentication_publickey': [],
@@ -317,7 +318,7 @@ function showOpTypeForm(){
 
 	var showFields = [];
 	for(var fieldClass in opTypeFields){
-		jQuery("#operationlist ."+fieldClass).toggleClass("hidden", true).attr("disabled", "disabled");
+		jQuery("#operationlist ."+fieldClass).toggleClass("hidden", true).find(':input').attr("disabled", "disabled");
 
 		for(var f=0; f < opTypeFields[fieldClass].length; f++)
 			if(currentOpType == opTypeFields[fieldClass][f]) showFields.push(fieldClass);
@@ -325,7 +326,7 @@ function showOpTypeForm(){
 
 	for(var f=0; f < showFields.length; f++){
 		if(showFields[f] == 'class_authentication_method') showOpTypeAuth();
-		jQuery("#operationlist ."+showFields[f]).toggleClass("hidden", false).removeAttr("disabled");
+		jQuery("#operationlist ."+showFields[f]).toggleClass("hidden", false).find(':input').removeAttr("disabled");
 	}
 }
 
