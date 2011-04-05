@@ -955,7 +955,7 @@ include_once('include/page_header.php');
 			'webitems' => true,
 			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => array('hostid','host','name'),
+			'selectHosts' => array('hostid','name'),
 			'preservekeys' => true
 		);
 
@@ -970,7 +970,10 @@ include_once('include/page_header.php');
 		$items = API::Item()->get($options);
 		order_result($items, 'description', ZBX_SORT_UP);
 
-		$jsItems = array();
+		if($multiselect){
+			$jsItems = array();
+		}
+
 		foreach($items as $tnum => $item){
 			$host = reset($item['hosts']);
 			$item['hostVisible'] = $host['name'];
@@ -1006,14 +1009,16 @@ include_once('include/page_header.php');
 				));
 
 // made to save memmory usage
-			$jsItems[$item['itemid']] = array(
-				'itemid' => $item['itemid'],
-				'description' => $item['description'],
-				'key_' => $item['key_'],
-				'type' => $item['type'],
-				'value_type' => $item['value_type'],
-				'host' => $item['host'],
-			);
+			if($multiselect){
+				$jsItems[$item['itemid']] = array(
+					'itemid' => $item['itemid'],
+					'description' => $item['description'],
+					'key_' => $item['key_'],
+					'type' => $item['type'],
+					'value_type' => $item['value_type'],
+					'host' => $item['hostVisible'],
+				);
+			}
 		}
 
 		if($multiselect){
