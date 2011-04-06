@@ -848,7 +848,7 @@ include_once('include/page_header.php');
 			'nodeids' => $nodeid,
 			'hostids' => $hostid,
 			'output' => array('triggerid', 'description', 'expression', 'priority', 'status'),
-			'selectHosts' => array('hostid','host'),
+			'selectHosts' => array('hostid','name'),
 			'select_dependencies' => API_OUTPUT_EXTEND,
 			'expandDescription' => true
 		);
@@ -859,13 +859,16 @@ include_once('include/page_header.php');
 		$triggers = API::Trigger()->get($options);
 		order_result($triggers, 'description');
 
-		$jsTriggers = array();
+		if($multiselect){
+			$jsTriggers = array();
+		}
+
 		foreach($triggers as $tnum => $trigger){
 			$host = reset($trigger['hosts']);
-			$trigger['host'] = $host['host'];
+			$trigger['hostname'] = $host['name'];
 
 			$description = new CSpan($trigger['description'], 'link');
-			$trigger['description'] = $trigger['host'].':'.$trigger['description'];
+			$trigger['description'] = $trigger['hostname'].':'.$trigger['description'];
 
 			if($multiselect){
 				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", ".zbx_jsvalue($trigger['triggerid']).");";
@@ -908,14 +911,16 @@ include_once('include/page_header.php');
 			));
 
 // made to save memmory usage
-			$jsTriggers[$trigger['triggerid']] = array(
-				'triggerid' => $trigger['triggerid'],
-				'description' => $trigger['description'],
-				'expression' => $trigger['expression'],
-				'priority' => $trigger['priority'],
-				'status' => $trigger['status'],
-				'host' => $trigger['host'],
-			);
+			if($multiselect){
+				$jsTriggers[$trigger['triggerid']] = array(
+					'triggerid' => $trigger['triggerid'],
+					'description' => $trigger['description'],
+					'expression' => $trigger['expression'],
+					'priority' => $trigger['priority'],
+					'status' => $trigger['status'],
+					'host' => $trigger['hostname'],
+				);
+			}
 		}
 
 		if($multiselect){
