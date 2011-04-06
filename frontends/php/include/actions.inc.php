@@ -478,7 +478,7 @@ function operation_type2str($type=null){
 		OPERATION_TYPE_HOST_ENABLE => _('Enable host'),
 		OPERATION_TYPE_HOST_DISABLE => _('Disable host'),
 		OPERATION_TYPE_GROUP_ADD => _('Add to group'),
-		OPERATION_TYPE_GROUP_REMOVE => _('Delete from group'),
+		OPERATION_TYPE_GROUP_REMOVE => _('Remove from group'),
 		OPERATION_TYPE_TEMPLATE_ADD => _('Link to template'),
 		OPERATION_TYPE_TEMPLATE_REMOVE => _('Unlink from template'),
 	);
