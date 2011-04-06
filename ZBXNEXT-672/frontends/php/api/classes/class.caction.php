@@ -1213,7 +1213,7 @@ COpt::memoryPick();
 
 			if(!isset($operation['operationtype']))
 				$operation['operationtype'] = $operationDb['operationtype'];
-sdii($operation);
+
 			switch($operation['operationtype']){
 				case OPERATION_TYPE_MESSAGE:
 					if(!isset($operation['opmessage_grp']))
