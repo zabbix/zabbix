@@ -583,13 +583,13 @@ require_once('include/templates/action.js.php');
 				$new_operation['opcommand']['scriptid'] = isset($new_operation['opcommand']['scriptid'])
 						? $new_operation['opcommand']['scriptid'] : '';
 				$new_operation['opcommand']['execute_on'] = isset($new_operation['opcommand']['execute_on'])
-						? $new_operation['opcommand']['execute_on'] : '';
+						? $new_operation['opcommand']['execute_on'] : 0;
 				$new_operation['opcommand']['publickey'] = isset($new_operation['opcommand']['publickey'])
 						? $new_operation['opcommand']['publickey'] : '';
 				$new_operation['opcommand']['privatekey'] = isset($new_operation['opcommand']['privatekey'])
 						? $new_operation['opcommand']['privatekey'] : '';
 				$new_operation['opcommand']['authtype'] = isset($new_operation['opcommand']['authtype'])
-						? $new_operation['opcommand']['authtype'] : '';
+						? $new_operation['opcommand']['authtype'] : 0;
 				$new_operation['opcommand']['username'] = isset($new_operation['opcommand']['username'])
 						? $new_operation['opcommand']['username'] : '';
 				$new_operation['opcommand']['password'] = isset($new_operation['opcommand']['password'])
