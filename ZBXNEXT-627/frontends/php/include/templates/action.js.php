@@ -73,9 +73,9 @@
 	<input name="new_operation[opcommand_hst][#{opcommand_hstid}][action]" type="hidden" value="#{action}" />
 	<input name="new_operation[opcommand_hst][#{opcommand_hstid}][opcommand_hstid]" type="hidden" value="#{opcommand_hstid}" />
 	<input name="new_operation[opcommand_hst][#{opcommand_hstid}][hostid]" type="hidden" value="#{hostid}" />
-	<input name="new_operation[opcommand_hst][#{opcommand_hstid}][host]" type="hidden" value="#{host}" />
+	<input name="new_operation[opcommand_hst][#{opcommand_hstid}][name]" type="hidden" value="#{name}" />
 	#{objectCaption}
-	<span class="bold"> #{host} </span>
+	<span class="bold"> #{name} </span>
 </td>
 <td>
 	<textarea name="new_operation[opcommand_hst][#{opcommand_hstid}][command]" class="hidden">#{command}</textarea>
@@ -187,7 +187,7 @@ function addPopupValues(list){
 				if(value.hostid.toString() != '0')
 					value.objectCaption = "<?php print(_('Host').': '); ?>";
 				else
-					value.host = "<?php print(_('Current host')); ?>";
+					value.name = "<?php print(_('Current host')); ?>";
 
 				if(!isset('action', value))
 					value.action = isset('opcommand_hstid', value) ? 'update' : 'create';
@@ -255,7 +255,7 @@ function showOpCmdForm(opCmdId, object){
 
 		objectTPL.opcmdid = opCmdId;
 		objectTPL.objectid = jQuery(objectRow).find('input[name="new_operation[opcommand_hst]['+opCmdId+'][hostid]"]').val();
-		objectTPL.name = jQuery(objectRow).find('input[name="new_operation[opcommand_hst]['+opCmdId+'][host]"]').val();
+		objectTPL.name = jQuery(objectRow).find('input[name="new_operation[opcommand_hst]['+opCmdId+'][name]"]').val();
 		objectTPL.target = (objectTPL.objectid == 0) ? 0 : 1;
 		objectTPL.command = jQuery(objectRow).find('textarea[name="new_operation[opcommand_hst]['+opCmdId+'][command]"]').val();
 		objectTPL.operationName = '<?php print(_('Update'));?>';
@@ -329,9 +329,9 @@ function saveOpCmdForm(){
 		object.object = 'hostid';
 		object.opcommand_hstid = jQuery(objectForm).find('input[name="opCmdId"]').val();
 		object.hostid = jQuery(objectForm).find('input[name="opCmdTargetObjectId"]').val();
-		object.host = jQuery(objectForm).find('input[name="opCmdTargetObjectName"]').val();
+		object.name = jQuery(objectForm).find('input[name="opCmdTargetObjectName"]').val();
 
-		if((object.target.toString() != '0') && empty(object.host)){
+		if((object.target.toString() != '0') && empty(object.name)){
 			alert("<?php print(_('You did not specify host for operation.')); ?>");
 			return true;
 		}
