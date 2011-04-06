@@ -144,13 +144,12 @@ function condition_value2str($conditiontype, $value){
 			$str_val = $drule['name'];
 			break;
 		case CONDITION_TYPE_DCHECK:
-			$sql = 'SELECT DISTINCT dr.name,c.dcheckid,c.type,c.key_,c.snmp_community,c.ports'.
+			$sql = 'SELECT DISTINCT dr.name,c.dcheckid,c.type,c.key_,c.ports'.
 					' FROM drules dr,dchecks c '.
 					' WHERE dr.druleid=c.druleid '.
 						' AND c.dcheckid='.$value;
 			$row = DBfetch(DBselect($sql));
-			$str_val = $row['name'].':'.discovery_check2str($row['type'],
-					$row['snmp_community'], $row['key_'], $row['ports']);
+			$str_val = $row['name'].':'.discovery_check2str($row['type'], $row['key_'], $row['ports']);
 			break;
 		case CONDITION_TYPE_DOBJECT:
 			$str_val = discovery_object2str($value);

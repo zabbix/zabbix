@@ -1714,11 +1714,10 @@ include_once('include/page_header.php');
 		$table = new CTableInfo(_('No discovery checks defined'));
 		$table->setHeader(S_NAME);
 
-		$result = DBselect('SELECT DISTINCT r.name,c.dcheckid,c.type,c.key_,c.snmp_community,c.ports FROM drules r,dchecks c'.
+		$result = DBselect('SELECT DISTINCT r.name,c.dcheckid,c.type,c.key_,c.ports FROM drules r,dchecks c'.
 				' WHERE r.druleid=c.druleid and '.DBin_node('r.druleid', $nodeid));
 		while($row = DBfetch($result)){
-			$row['name'] = $row['name'].':'.discovery_check2str($row['type'],
-					$row['snmp_community'], $row['key_'], $row['ports']);
+			$row['name'] = $row['name'].':'.discovery_check2str($row['type'], $row['key_'], $row['ports']);
 			$name = new CSpan($row["name"],'link');
 
 			$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).

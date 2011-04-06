@@ -145,7 +145,6 @@
 	'S_DOWN_TIME'=>				_('Downtime'),
 	'S_DISCOVERED_DEVICE'=>			_('Discovered device'),
 	'S_MONITORED_HOST'=>			_('Monitored host'),
-	'S_INCORRECT_IP_RANGE'=>		_('Incorrect IP range.'),
 
 //	auditacts.php
 	'S_AUDITACTS_DESCRIPTION_DATE_FORMAT'=>	_('d M Y H:i:s'),

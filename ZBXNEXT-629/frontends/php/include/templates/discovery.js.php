@@ -287,6 +287,9 @@ function saveNewDCheckForm(e){
 	if(dCheck.ports != discoveryCheckDefaultPort(dCheck.type))
 		dCheck.name += ' ('+dCheck.ports+')';
 
+	if(!empty(dCheck.key_)) dCheck.name += ' "'+dCheck.key_+'"';
+
+
 	addPopupValues({'object': 'dcheckid', 'values': [dCheck]});
 	jQuery('#new_check_form').remove();
 }
