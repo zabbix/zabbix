@@ -1526,7 +1526,8 @@
  */
 	function parseItemKey($key){
 		// if key is not valid, it's not worth parsing
-		if (!check_item_key($key)){
+		$checkResult = check_item_key($key);
+		if (!$checkResult['valid']){
 			return false;
 		}
 
