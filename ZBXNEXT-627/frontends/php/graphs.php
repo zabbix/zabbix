@@ -425,7 +425,7 @@ include_once('include/page_header.php');
 // get Graphs
 		$graphs = array();
 
-		$sortfield = getPageSortField('description');
+		$sortfield = getPageSortField('name');
 		$sortorder = getPageSortOrder();
 
 		if($pageFilter->hostsSelected){
@@ -496,7 +496,7 @@ include_once('include/page_header.php');
 				$name[] = ':'.$graph['name'];
 			}
 			else if(!empty($graph['discoveryRule'])){
-				$name[] = new CLink($graph['discoveryRule']['description'], 'graph_prototypes.php?parent_discoveryid='.
+				$name[] = new CLink($graph['discoveryRule']['name'], 'graph_prototypes.php?parent_discoveryid='.
 						$graph['discoveryRule']['itemid'],'gold');
 				$name[] = ':'.$graph['name'];
 			}

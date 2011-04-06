@@ -46,7 +46,8 @@ INSERT INTO interface (interfaceid,hostid,main,type,ip,dns,useip,port)
 
 ---- Patching table `items`
 
-ALTER TABLE items MODIFY itemid bigint unsigned NOT NULL,
+ALTER TABLE items CHANGE COLUMN description name VARCHAR(255) NOT NULL DEFAULT '',
+		  MODIFY itemid bigint unsigned NOT NULL,
 		  MODIFY hostid bigint unsigned NOT NULL,
 		  MODIFY units varchar(255) DEFAULT '' NOT NULL,
 		  MODIFY templateid bigint unsigned NULL,
@@ -55,7 +56,8 @@ ALTER TABLE items MODIFY itemid bigint unsigned NOT NULL,
 		  ADD flags integer DEFAULT '0' NOT NULL,
 		  ADD filter varchar(255) DEFAULT '' NOT NULL,
 		  ADD interfaceid bigint unsigned NULL,
-		  ADD port varchar(64) DEFAULT '' NOT NULL;
+		  ADD port varchar(64) DEFAULT '' NOT NULL,
+		  ADD description text NOT NULL;
 
 UPDATE items SET templateid=NULL WHERE templateid=0;
 CREATE TEMPORARY TABLE tmp_items_itemid (itemid bigint unsigned PRIMARY KEY);

@@ -59,17 +59,9 @@ static void	host_availability_sender(struct zbx_json *j)
 
 	if (SUCCEED == get_host_availability_data(j))
 	{
-retry:
-		if (SUCCEED == connect_to_server(&sock, 600))	/* alarm !!! */
-		{
-			put_data_to_server(&sock, j);
-			disconnect_server(&sock);
-		}
-		else
-		{
-			sleep(CONFIG_PROXYDATA_FREQUENCY);
-			goto retry;
-		}
+		connect_to_server(&sock, 600, CONFIG_PROXYDATA_FREQUENCY); /* retry till have a connection */
+		put_data_to_server(&sock, j);
+		disconnect_server(&sock);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -92,10 +84,11 @@ retry:
  ******************************************************************************/
 static void	history_sender(struct zbx_json *j, int *records)
 {
+	const char	*__function_name = "history_sender";
 	zbx_sock_t	sock;
 	zbx_uint64_t	lastid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In history_sender()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_json_clean(j);
 	zbx_json_addstring(j, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_HISTORY_DATA, ZBX_JSON_TYPE_STRING);
@@ -111,26 +104,20 @@ static void	history_sender(struct zbx_json *j, int *records)
 
 	if (*records > 0)
 	{
-retry:
-		if (SUCCEED == connect_to_server(&sock, 600))	/* alarm !!! */
+		connect_to_server(&sock, 600, CONFIG_PROXYDATA_FREQUENCY); /* retry till have a connection */
+		if (SUCCEED == put_data_to_server(&sock, j))
 		{
-			if (SUCCEED == put_data_to_server(&sock, j))
-			{
-				DBbegin();
-				proxy_set_hist_lastid(lastid);
-				DBcommit();
-			}
-			else
-				*records = 0;
-
-			disconnect_server(&sock);
+			DBbegin();
+			proxy_set_hist_lastid(lastid);
+			DBcommit();
 		}
 		else
-		{
-			sleep(CONFIG_PROXYDATA_FREQUENCY);
-			goto retry;
-		}
+			*records = 0;
+
+		disconnect_server(&sock);
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -150,10 +137,11 @@ retry:
  ******************************************************************************/
 static void	dhistory_sender(struct zbx_json *j, int *records)
 {
+	const char	*__function_name = "dhistory_sender";
 	zbx_sock_t	sock;
 	zbx_uint64_t	lastid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In dhistory_sender()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_json_clean(j);
 	zbx_json_addstring(j, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_DISCOVERY_DATA, ZBX_JSON_TYPE_STRING);
@@ -169,26 +157,20 @@ static void	dhistory_sender(struct zbx_json *j, int *records)
 
 	if (*records > 0)
 	{
-retry:
-		if (SUCCEED == connect_to_server(&sock, 600))	/* alarm !!! */
+		connect_to_server(&sock, 600, CONFIG_PROXYDATA_FREQUENCY); /* retry till have a connection */
+		if (SUCCEED == put_data_to_server(&sock, j))
 		{
-			if (SUCCEED == put_data_to_server(&sock, j))
-			{
-				DBbegin();
-				proxy_set_dhis_lastid(lastid);
-				DBcommit();
-			}
-			else
-				*records = 0;
-
-			disconnect_server(&sock);
+			DBbegin();
+			proxy_set_dhis_lastid(lastid);
+			DBcommit();
 		}
 		else
-		{
-			sleep(CONFIG_PROXYDATA_FREQUENCY);
-			goto retry;
-		}
+			*records = 0;
+
+		disconnect_server(&sock);
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -208,10 +190,11 @@ retry:
  ******************************************************************************/
 static void	autoreg_host_sender(struct zbx_json *j, int *records)
 {
+	const char	*__function_name = "autoreg_host_sender";
 	zbx_sock_t	sock;
 	zbx_uint64_t	lastid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In autoreg_host_sender()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_json_clean(j);
 	zbx_json_addstring(j, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_AUTO_REGISTRATION_DATA, ZBX_JSON_TYPE_STRING);
@@ -227,26 +210,20 @@ static void	autoreg_host_sender(struct zbx_json *j, int *records)
 
 	if (*records > 0)
 	{
-retry:
-		if (SUCCEED == connect_to_server(&sock, 600))	/* alarm !!! */
+		connect_to_server(&sock, 600, CONFIG_PROXYDATA_FREQUENCY); /* retry till have a connection */
+		if (SUCCEED == put_data_to_server(&sock, j))
 		{
-			if (SUCCEED == put_data_to_server(&sock, j))
-			{
-				DBbegin();
-				proxy_set_areg_lastid(lastid);
-				DBcommit();
-			}
-			else
-				*records = 0;
-
-			disconnect_server(&sock);
+			DBbegin();
+			proxy_set_areg_lastid(lastid);
+			DBcommit();
 		}
 		else
-		{
-			sleep(CONFIG_PROXYDATA_FREQUENCY);
-			goto retry;
-		}
+			*records = 0;
+
+		disconnect_server(&sock);
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -294,26 +271,23 @@ retry_history:
 		history_sender(&j, &r);
 		records += r;
 
-		if (r == ZBX_MAX_HRECORDS)
+		if (ZBX_MAX_HRECORDS == r)
 			goto retry_history;
-
 retry_dhistory:
 		dhistory_sender(&j, &r);
 		records += r;
 
-		if (r == ZBX_MAX_HRECORDS)
+		if (ZBX_MAX_HRECORDS == r)
 			goto retry_dhistory;
-
 retry_autoreg_host:
 		autoreg_host_sender(&j, &r);
 		records += r;
 
-		if (r == ZBX_MAX_HRECORDS)
+		if (ZBX_MAX_HRECORDS == r)
 			goto retry_autoreg_host;
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Datasender spent " ZBX_FS_DBL " seconds while processing %3d values.",
-				zbx_time() - sec,
-				records);
+				zbx_time() - sec, records);
 
 		zbx_sleep_loop(CONFIG_PROXYDATA_FREQUENCY);
 	}
