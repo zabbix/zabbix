@@ -376,10 +376,11 @@
 		if((($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST)
 			|| ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER))
 			&& ((zbx_strpos($label, '{HOST.NAME}') !== false)
-				|| (zbx_strpos($label, '{HOSTNAME}') !== false)
+				|| (zbx_strpos($label, '{HOSTNAME}') !== false)	/* deprecated */
 				|| (zbx_strpos($label, '{HOST.HOST}') !== false)
 				|| (zbx_strpos($label, '{HOST.DNS}') !== false)
-				|| (zbx_strpos($label, '{IPADDRESS}') !== false)
+				|| (zbx_strpos($label, '{HOST.IP}') !== false)
+				|| (zbx_strpos($label, '{IPADDRESS}') !== false)	/* deprecated */
 				|| (zbx_strpos($label, '{HOST.CONN}') !== false))
 		){
 			$resolveHostMacros = true;
@@ -410,6 +411,7 @@
 				'{HOSTNAME}' => $db_host['name'],
 				'{HOST.HOST}' => $db_host['host'],
 				'{HOST.DNS}' => $db_host['dns'],
+				'{HOST.IP}' => $db_host['ip'],
 				'{IPADDRESS}' => $db_host['ip'],
 				'{HOST.CONN}' => ($db_host['useip'] ? $db_host['ip'] : $db_host['dns']),
 			);
@@ -1248,7 +1250,7 @@
 		}
 		if(!empty($elems['hosts']) && $hlabel){
 			foreach($elems['hosts'] as $elem){
-				$info[$elem['selementid']]['name'] = $all_hosts[$elem['elementid']]['host'];;
+				$info[$elem['selementid']]['name'] = $all_hosts[$elem['elementid']]['name'];;
 			}
 		}
 
@@ -1565,7 +1567,7 @@
 	}
 
 
-	function drawMapSelemetsMarks(&$im, &$map, &$map_info){
+	function drawMapSelementsMarks(&$im, &$map, &$map_info){
 		global $colors;
 
 		$selements = $map['selements'];
