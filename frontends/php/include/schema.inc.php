@@ -3371,7 +3371,7 @@ return array(
 				'ref_table' => 'hosts',
 				'ref_field' => 'hostid',
 			),
-			'description' => array(
+			'name' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
@@ -3606,6 +3606,11 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
+				'default' => '',
+			),
+			'description' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 		),

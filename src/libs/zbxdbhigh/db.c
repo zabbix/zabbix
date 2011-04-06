@@ -20,7 +20,6 @@
 #include "zbxdb.h"
 #include "db.h"
 #include "log.h"
-#include "zlog.h"
 #include "common.h"
 #include "events.h"
 #include "threads.h"
@@ -765,29 +764,19 @@ int	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock)
 int	DBget_row_count(const char *table_name)
 {
 	const char	*__function_name = "DBget_row_count";
-	int		count;
+	int		count = 0;
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): %s", __function_name, table_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table_name:'%s'", __function_name, table_name);
 
 	result = DBselect("select count(*) from %s", table_name);
 
-	row = DBfetch(result);
-
-	if (NULL == row || SUCCEED == DBis_null(row[0]))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query");
-		zabbix_syslog("Cannot execute query");
-		DBfree_result(result);
-		return 0;
-	}
-
-	count = atoi(row[0]);
-
+	if (NULL != (row = DBfetch(result)))
+		count = atoi(row[0]);
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %s %d", __function_name, table_name, count);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, count);
 
 	return count;
 }
@@ -795,7 +784,7 @@ int	DBget_row_count(const char *table_name)
 int	DBget_items_unsupported_count()
 {
 	const char	*__function_name = "DBget_items_unsupported_count";
-	int		count;
+	int		count = 0;
 	DB_RESULT	result;
 	DB_ROW		row;
 
@@ -803,21 +792,11 @@ int	DBget_items_unsupported_count()
 
 	result = DBselect("select count(*) from items where status=%d", ITEM_STATUS_NOTSUPPORTED);
 
-	row = DBfetch(result);
-
-	if (NULL == row || SUCCEED == DBis_null(row[0]))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query");
-		zabbix_syslog("Cannot execute query");
-		DBfree_result(result);
-		return 0;
-	}
-
-	count = atoi(row[0]);
-
+	if (NULL != (row = DBfetch(result)))
+		count = atoi(row[0]);
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %d", __function_name, count);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, count);
 
 	return count;
 }
@@ -926,39 +905,33 @@ double	DBget_requiredperformance()
 	return qps_total;
 }
 
-zbx_uint64_t	DBget_proxy_lastaccess(const char *hostname)
+int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error)
 {
 	const char	*__function_name = "DBget_proxy_lastaccess";
-	zbx_uint64_t	lastaccess;
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*host_esc;
+	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	host_esc = DBdyn_escape_string(hostname);
 	result = DBselect("select lastaccess from hosts where host='%s' and status in (%d,%d)",
-			host_esc,
-			HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE);
+			host_esc, HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE);
 	zbx_free(host_esc);
 
-	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
+	if (NULL != (row = DBfetch(result)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Proxy \"%s\" does not exist",
-				hostname);
-		zabbix_syslog("Proxy \"%s\" does not exist",
-				hostname);
-		DBfree_result(result);
-		return FAIL;
+		*lastaccess = atoi(row[0]);
+		ret = SUCCEED;
 	}
-
-	ZBX_STR2UINT64(lastaccess, row[0]);
-
+	else
+		*error = zbx_dsprintf(*error, "Proxy \"%s\" does not exist", hostname);
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): " ZBX_FS_UI64, __function_name, lastaccess);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
-	return lastaccess;
+	return ret;
 }
 
 int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid)

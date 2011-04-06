@@ -21,7 +21,6 @@
 #include "comms.h"
 #include "zbxjson.h"
 #include "log.h"
-#include "zlog.h"
 
 /******************************************************************************
  *                                                                            *
