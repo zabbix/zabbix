@@ -328,14 +328,14 @@ require_once('include/templates/action.js.php');
 	$esc_step_from = array();
 	$esc_step_to = array();
 	$esc_period = array();
-	$esc_keys = array();
+	$operationTypes = array();
 	foreach($data['operations'] as $key => $operation) {
 		$esc_step_from[$key] = $operation['esc_step_from'];
 		$esc_step_to[$key] = $operation['esc_step_to'];
 		$esc_period[$key] = $operation['esc_period'];
-		$esc_keys[$key] = $key;
+		$operationTypes[$key] = $operation['operationtype'];
 	}
-	array_multisort($esc_step_from, SORT_ASC, $esc_step_to, SORT_ASC, $esc_period, SORT_ASC, $esc_keys, SORT_ASC, $data['operations']);
+	array_multisort($esc_step_from, SORT_ASC, $esc_step_to, SORT_ASC, $esc_period, SORT_ASC, $operationTypes, SORT_ASC, $data['operations']);
 // --
 
 	if(EVENT_SOURCE_TRIGGERS == $data['eventsource'])
@@ -349,13 +349,10 @@ require_once('include/templates/action.js.php');
 	$tblOper->setHeader($operationsHeader);
 
 	$delay = count_operations_delay($data['operations'],$data['esc_period']);
-	foreach($data['operations'] as $id => $operation){
+	foreach($data['operations'] as $opid => $operation){
 		if(!str_in_array($operation['operationtype'], $allowedOperations)) continue;
 		if(!isset($operation['opconditions'])) $operation['opconditions'] = array();
 		if(!isset($operation['mediatypeid'])) $operation['mediatypeid'] = 0;
-
-		$opid = isset($operation['operationid']) ? $operation['operationid'] : $id;
-		$operation['id'] = $opid;
 
 		$oper_details = new CSpan(get_operation_desc(SHORT_DESCRITION, $operation));
 		$oper_details->setHint(get_operation_desc(LONG_DESCRITION, $operation));

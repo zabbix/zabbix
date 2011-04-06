@@ -238,13 +238,11 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		if(API::Action()->validateOperations($new_operation)){
 			$_REQUEST['operations'] = get_request('operations', array());
 
-			if(!isset($new_operation['id']) && !str_in_array($new_operation, $_REQUEST['operations'])){
-				array_push($_REQUEST['operations'], $new_operation);
+			if(isset($new_operation['id'])){
+				$_REQUEST['operations'][$new_operation['id']] = $new_operation;
 			}
 			else{
-				$id = $new_operation['id'];
-				unset($new_operation['id']);
-				$_REQUEST['operations'][$id] = $new_operation;
+				$_REQUEST['operations'][] = $new_operation;
 			}
 			unset($_REQUEST['new_operation']);
 		}
