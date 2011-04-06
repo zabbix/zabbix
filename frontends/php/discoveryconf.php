@@ -69,34 +69,40 @@ include_once('include/page_header.php');
 ?>
 <?php
 	if(inarr_isset('save')){
-		DBstart();
-		if(inarr_isset('druleid')){ /* update */
-			$msg_ok = S_DISCOVERY_RULE_UPDATED;
-			$msg_fail = S_CANNOT_UPDATE_DISCOVERY_RULE;
-
-			$result = update_discovery_rule($_REQUEST["druleid"], $_REQUEST["proxy_hostid"], $_REQUEST['name'],
-				$_REQUEST['iprange'], $_REQUEST['delay'], $_REQUEST['status'], $_REQUEST['dchecks'],
-				$_REQUEST['uniqueness_criteria']);
-
-			$druleid = $_REQUEST["druleid"];
+		if(empty($_REQUEST['dchecks'])){
+			error(_('Rule without checks cannot be saved.'));
+			show_messages();
 		}
-		else{ /* add new */
-			$msg_ok = S_DISCOVERY_RULE_ADDED;
-			$msg_fail = S_CANNOT_ADD_DISCOVERY_RULE;
+		else{
+			DBstart();
+			if(inarr_isset('druleid')){ /* update */
+				$msg_ok = S_DISCOVERY_RULE_UPDATED;
+				$msg_fail = S_CANNOT_UPDATE_DISCOVERY_RULE;
 
-			$result = $druleid = add_discovery_rule($_REQUEST["proxy_hostid"], $_REQUEST['name'], $_REQUEST['iprange'],
-				$_REQUEST['delay'], $_REQUEST['status'], $_REQUEST['dchecks'], $_REQUEST['uniqueness_criteria']);
-		}
+				$result = update_discovery_rule($_REQUEST["druleid"], $_REQUEST["proxy_hostid"], $_REQUEST['name'],
+					$_REQUEST['iprange'], $_REQUEST['delay'], $_REQUEST['status'], $_REQUEST['dchecks'],
+					$_REQUEST['uniqueness_criteria']);
 
-		$result = DBend($result);
+				$druleid = $_REQUEST["druleid"];
+			}
+			else{ /* add new */
+				$msg_ok = S_DISCOVERY_RULE_ADDED;
+				$msg_fail = S_CANNOT_ADD_DISCOVERY_RULE;
 
-		show_messages($result, $msg_ok, $msg_fail);
+				$result = $druleid = add_discovery_rule($_REQUEST["proxy_hostid"], $_REQUEST['name'], $_REQUEST['iprange'],
+					$_REQUEST['delay'], $_REQUEST['status'], $_REQUEST['dchecks'], $_REQUEST['uniqueness_criteria']);
+			}
 
-		if($result){ // result - OK
-			add_audit(!isset($_REQUEST['druleid']) ? AUDIT_ACTION_ADD : AUDIT_ACTION_UPDATE,
-				AUDIT_RESOURCE_DISCOVERY_RULE, '['.$druleid.'] '.$_REQUEST['name']);
+			$result = DBend($result);
 
-			unset($_REQUEST['form']);
+			show_messages($result, $msg_ok, $msg_fail);
+
+			if($result){ // result - OK
+				add_audit(!isset($_REQUEST['druleid']) ? AUDIT_ACTION_ADD : AUDIT_ACTION_UPDATE,
+					AUDIT_RESOURCE_DISCOVERY_RULE, '['.$druleid.'] '.$_REQUEST['name']);
+
+				unset($_REQUEST['form']);
+			}
 		}
 	}
 	else if(inarr_isset(array('clone','druleid'))){
