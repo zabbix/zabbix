@@ -184,9 +184,22 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		if(!isset($new_condition['value'])) $new_condition['value'] = '';
 
 		if(validate_condition($new_condition['conditiontype'], $new_condition['value'])){
-			$_REQUEST['conditions'] = get_request('conditions',array());
-			if(!str_in_array($new_condition, $_REQUEST['conditions']))
+			$_REQUEST['conditions'] = get_request('conditions', array());
+
+			$exists = false;
+			foreach($_REQUEST['conditions'] as $condition){
+				if(($new_condition['conditiontype'] === $condition['conditiontype'])
+					&& ($new_condition['operator'] === $condition['operator'])
+					&& ($new_condition['value'] === $condition['value'])
+				){
+					$exists = true;
+					break;
+				}
+			}
+
+			if(!$exists){
 				array_push($_REQUEST['conditions'],$new_condition);
+			}
 		}
 	}
 	else if(inarr_isset(array('del_condition','g_conditionid'))){
