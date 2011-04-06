@@ -446,6 +446,10 @@ COpt::memoryPick();
  * @return boolean
  */
 	public function create(array $dRules){
+
+/*
+	// TODE: implement api for rules
+
 		$dRules = zbx_toArray($dRules);
 
 		foreach($dRules as $dRule){
@@ -488,6 +492,8 @@ COpt::memoryPick();
 		DB::insert('dchecks', $dChecksUpdate);
 
 		return array('druleids' => $druleids);
+
+ */
 	}
 
 /**
