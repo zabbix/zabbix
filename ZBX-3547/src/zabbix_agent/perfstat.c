@@ -96,6 +96,11 @@ int	add_perf_counter(const char *name, const char *counterPath, int interval)
 				zabbix_log(LOG_LEVEL_ERR, "Unable to add performance counter '%s' to query: %s",
 						cptr->counterPath, strerror_from_module(status, L"PDH.DLL"));
 			}
+			else if (ERROR_SUCCESS != (status = PdhValidatePath(wcounterPath)))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "PerfCounter '%s' (interval: %d) added with error: %s",
+						cptr->counterPath, interval, strerror_from_module(status, L"PDH.DLL"));
+			}
 			else
 			{
 				cptr->status = ITEM_STATUS_ACTIVE;
@@ -354,6 +359,11 @@ void	collect_perfstat()
 				cptr->status = ITEM_STATUS_NOTSUPPORTED;
 				zabbix_log(LOG_LEVEL_ERR, "Unable to add performance counter '%s' to query: %s",
 						cptr->counterPath, strerror_from_module(status, L"PDH.DLL"));
+			}
+			else if (ERROR_SUCCESS != (status = PdhValidatePath(wcounterPath)))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "PerfCounter '%s' (interval: %d) added with error: %s",
+						cptr->counterPath, cptr->interval, strerror_from_module(status, L"PDH.DLL"));
 			}
 			else
 			{
