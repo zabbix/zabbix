@@ -596,6 +596,8 @@ require_once('include/templates/action.js.php');
 						? $new_operation['opcommand']['password'] : '';
 				$new_operation['opcommand']['port'] = isset($new_operation['opcommand']['port'])
 						? $new_operation['opcommand']['port'] : '';
+				$new_operation['opcommand']['command'] = isset($new_operation['opcommand']['command'])
+						? $new_operation['opcommand']['command'] : '';
 
 				$new_operation['opcommand']['script'] = '';
 				if(!zbx_empty($new_operation['opcommand']['scriptid'])){
