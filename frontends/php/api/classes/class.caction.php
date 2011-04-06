@@ -1296,9 +1296,9 @@ COpt::memoryPick();
 						);
 
 						$diff = zbx_array_diff($operation['opcommand_grp'], $operationDb['opcommand_grp'], 'groupid');
-						$opcommand_grpCreate = array_merge($opcommand_grpCreate, $diff['second']);
+						$opcommand_grpCreate = array_merge($opcommand_grpCreate, $diff['first']);
 
-						foreach($diff['first'] as $omgrp){
+						foreach($diff['second'] as $omgrp){
 							DB::delete('opcommand_grp', array(
 								'groupid' => $omgrp['groupid'],
 								'operationid' => $operation['operationid'],
@@ -1306,8 +1306,8 @@ COpt::memoryPick();
 						}
 
 						$diff = zbx_array_diff($operation['opcommand_hst'], $operationDb['opcommand_hst'], 'hostid');
-						$opcommand_hstCreate = array_merge($opcommand_hstCreate, $diff['second']);
-						foreach($diff['first'] as $omhst){
+						$opcommand_hstCreate = array_merge($opcommand_hstCreate, $diff['first']);
+						foreach($diff['second'] as $omhst){
 							DB::delete('opcommand_hst', array(
 								'hostid' => $omhst['hostid'],
 								'operationid' => $operation['operationid'],
@@ -1359,9 +1359,9 @@ COpt::memoryPick();
 			$this->validateOperationConditions($operation['opconditions']);
 
 			$diff = zbx_array_diff($operation['opconditions'], $operationDb['opconditions'], 'opconditionid');
-			$opconditionsCreate = array_merge($opconditionsCreate, $diff['second']);
+			$opconditionsCreate = array_merge($opconditionsCreate, $diff['first']);
 
-			$opconditionsidDelete = zbx_objectValues($diff['first'], 'opconditionid');
+			$opconditionsidDelete = zbx_objectValues($diff['second'], 'opconditionid');
 			if(!empty($opconditionsidDelete))
 				DB::delete('opconditions', array('opconditionid' => $opconditionsidDelete));
 
