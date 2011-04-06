@@ -745,15 +745,15 @@ function get_history_of_actions($limit,&$last_clock=null,$sql_cond=''){
 	$clock = array();
 	$table = new CTableInfo(S_NO_ACTIONS_FOUND);
 	$table->setHeader(array(
-			is_show_all_nodes() ? make_sorting_header(S_NODES,'a.alertid') : null,
-			make_sorting_header(S_TIME,'clock'),
-			make_sorting_header(S_TYPE,'description'),
-			make_sorting_header(S_STATUS,'status'),
-			make_sorting_header(S_RETRIES_LEFT,'retries'),
-			make_sorting_header(S_RECIPIENTS,'sendto'),
+		is_show_all_nodes() ? make_sorting_header(S_NODES,'a.alertid') : null,
+		make_sorting_header(S_TIME,'clock'),
+		make_sorting_header(S_TYPE,'description'),
+		make_sorting_header(S_STATUS,'status'),
+		make_sorting_header(S_RETRIES_LEFT,'retries'),
+		make_sorting_header(S_RECIPIENTS,'sendto'),
 		_('Message'),
-			S_ERROR
-			));
+		S_ERROR
+	));
 
 	$sql = 'SELECT a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error '.
 			' FROM events e, alerts a '.
