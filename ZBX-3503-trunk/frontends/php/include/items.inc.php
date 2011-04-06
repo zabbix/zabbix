@@ -518,36 +518,6 @@
 	return false;
 	}
 
-	/*
-	 * Function: get_n_param
-	 *
-	 * Description:
-	 *     Return key parameter by index
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments: indexes between 1-x
-	 *
-	 */
-	function get_n_param($key, $num){
-		$param="";
-
-        $num--;
-		if(preg_match('/^'.ZBX_PREG_ITEM_KEY_FORMAT.'$/', $key, $arr)){
-			if(!isset($arr[ZBX_KEY_PARAM_ID])){
-				$arr[ZBX_KEY_PARAM_ID] = false;
-			}
-
-			$params = zbx_get_params($arr[ZBX_KEY_PARAM_ID]);
-
-			if(isset($params[$num])){
-				$param = $params[$num];
-			}
-		}
-
-		return $param;
-	}
 
 	function expand_item_key_by_data($item){
 		$key =& $item['key_'];
@@ -598,23 +568,41 @@
 	return $item['key_'];
 	}
 
+	/**
+	 * Expand macros inside key name and return it
+	 * Example:
+	 *   key: 'test.key[a, b, "{HOSTNAME}"]'
+	 *   name: 'Test item $1, $2, $3'
+	 *   result: 'Test item a, b, Zabbix-server'
+	 *
+	 * @author Konstantin Buravcov
+	 * @see ZBX-3503
+	 * @param array $item
+	 * @return string
+	 */
 	function itemName($item){
-		$descr = $item['name'];
+		$name = $item['name'];
 		$key = expand_item_key_by_data($item);
 
-        for($i=9;$i>0;$i--){
-            $descr = str_replace('$'.$i,get_n_param($key,$i),$descr);
-        }
+		// parsing key to get the parameters out of it
+		$parsedItemKey = parseItemKey($key);
 
-		if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $descr, $arr)){
-			$macros = API::UserMacro()->getMacros(array('macros' => $arr[1], 'itemid' => $item['itemid']));
+		if($parsedItemKey === false){
+			// key seems to be invalid (parser was not able to parse it)
+			return $name;
+		}
 
-			$search = array_keys($macros);
-			$values = array_values($macros);
-			$descr = str_replace($search, $values, $descr);
-        }
+		// according to zabbix docs we must replace $1 to $9 macros with item key parameters
+		for($paramNo = 9; $paramNo > 0; $paramNo--){
+			/**
+			 * @todo parameters that do not exist should not be replaced by ''
+			 * this was not implemented, because this change also should be reflected on a server side
+			 */
+			$replaceTo = isset($parsedItemKey['parameters'][$paramNo - 1]) ? $parsedItemKey['parameters'][$paramNo - 1] : '';
+			$name = str_replace('$'.$paramNo, $replaceTo, $name);
+		}
 
-	return $descr;
+		return str_replace(' ', SPACE, $name);
 	}
 
 	function get_realhost_by_itemid($itemid){
@@ -1543,7 +1531,6 @@
 			'key_id' => '',
 			'parameters' => array()
 		);
-		$current = null;
 		$previous = null;
 		$currParamNo = 0;
 		$state = 0; // 0 - outside of parameters
