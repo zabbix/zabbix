@@ -334,12 +334,16 @@ function showOpTypeAuth(){
 	var currentOpTypeAuth = parseInt(jQuery('#new_operation_opcommand_authtype').val(), 10);
 
 	if(currentOpTypeAuth === <?php echo(ITEM_AUTHTYPE_PASSWORD); ?>){
-		jQuery('#operationlist .class_authentication_publickey').toggleClass("hidden", true).attr("disabled", "disabled");
-		jQuery('#operationlist .class_authentication_privatekey').toggleClass("hidden", true).attr("disabled", "disabled");
+		jQuery('#operationlist .class_authentication_publickey').toggleClass("hidden", true);
+		jQuery('#new_operation_opcommand_publickey').attr("disabled", "disabled");
+		jQuery('#operationlist .class_authentication_privatekey').toggleClass("hidden", true);
+		jQuery('#new_operation_opcommand_privatekey').attr("disabled", "disabled");
 	}
 	else{
 		jQuery('#operationlist .class_authentication_publickey').toggleClass("hidden", false).removeAttr("disabled");
+		jQuery('#new_operation_opcommand_publickey').removeAttr("disabled");
 		jQuery('#operationlist .class_authentication_privatekey').toggleClass("hidden", false).removeAttr("disabled");
+		jQuery('#new_operation_opcommand_privatekey').removeAttr("disabled");
 	}
 }
 
