@@ -150,18 +150,18 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			$action['actionid']= $_REQUEST['actionid'];
 
 			$result = API::Action()->update($action);
-			show_messages($result,S_ACTION_UPDATED,S_CANNOT_UPDATE_ACTION);
+			show_messages($result, _('Action updated'), _('Cannot update action'));
 		}
 		else{
 			$result = API::Action()->create($action);
-			show_messages($result,S_ACTION_ADDED,S_CANNOT_ADD_ACTION);
+			show_messages($result, _('Action added'), _('Cannot add action'));
 		}
 
 		$result = DBend($result);
 		if($result){
 			add_audit(!isset($_REQUEST['actionid'])?AUDIT_ACTION_ADD:AUDIT_ACTION_UPDATE,
 				AUDIT_RESOURCE_ACTION,
-				S_NAME.': '.$_REQUEST['name']);
+				_('Name').': '.$_REQUEST['name']);
 
 			unset($_REQUEST['form']);
 		}
@@ -172,7 +172,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 
 		$result = API::Action()->delete($_REQUEST['actionid']);
 
-		show_messages($result,S_ACTION_DELETED,S_CANNOT_DELETE_ACTION);
+		show_messages($result, _('Action deleted'), _('Cannot delete action'));
 		if($result){
 			unset($_REQUEST['form']);
 			unset($_REQUEST['actionid']);
@@ -277,7 +277,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		$go_result = DBend($res);
 
 		if($go_result && isset($res)){
-			show_messages($go_result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
+			show_messages($go_result, _('Status updated'), _('Cannot update status'));
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',',$actionids).'] '.$status_name);
 		}
 	}
@@ -304,9 +304,9 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 	$form->cleanItems();
 	$form->addVar('eventsource', $_REQUEST['eventsource']);
 	if(!isset($_REQUEST['form'])){
-		$form->addItem(new CSubmit('form', S_CREATE_ACTION));
+		$form->addItem(new CSubmit('form', _('Create Action')));
 	}
-	$action_wdgt->addPageHeader(S_CONFIGURATION_OF_ACTIONS_BIG, $form);
+	$action_wdgt->addPageHeader(_('CONFIGURATION OF ACTIONS'), $form);
 
 	if(isset($_REQUEST['form'])){
 		$action = null;
@@ -359,28 +359,28 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		$form = new CForm('get');
 
 		$cmbSource = new CComboBox('eventsource',$_REQUEST['eventsource'],'submit()');
-		$cmbSource->addItem(EVENT_SOURCE_TRIGGERS,S_TRIGGERS);
-		$cmbSource->addItem(EVENT_SOURCE_DISCOVERY,S_DISCOVERY);
-		$cmbSource->addItem(EVENT_SOURCE_AUTO_REGISTRATION,S_AUTO_REGISTRATION);
-		$form->addItem(array(S_EVENT_SOURCE, SPACE, $cmbSource));
+		$cmbSource->addItem(EVENT_SOURCE_TRIGGERS, _('Triggers'));
+		$cmbSource->addItem(EVENT_SOURCE_DISCOVERY, _('Discovery'));
+		$cmbSource->addItem(EVENT_SOURCE_AUTO_REGISTRATION, _('Auto registration'));
+		$form->addItem(array(_('Event source'), SPACE, $cmbSource));
 
 		$numrows = new CDiv();
 		$numrows->setAttribute('name', 'numrows');
 
-		$action_wdgt->addHeader(S_ACTIONS_BIG, $form);
+		$action_wdgt->addHeader(_('ACTIONS'), $form);
 		$action_wdgt->addHeader($numrows);
 
 // table
 		$form = new CForm();
 		$form->setName('actions');
 
-		$tblActions = new CTableInfo(S_NO_ACTIONS_DEFINED);
+		$tblActions = new CTableInfo(_('No actions defined'));
 		$tblActions->setHeader(array(
 			new CCheckBox('all_items',null,"checkAll('".$form->getName()."','all_items','g_actionid');"),
-			make_sorting_header(S_NAME, 'name'),
-			S_CONDITIONS,
-			S_OPERATIONS,
-			make_sorting_header(S_STATUS, 'status')
+			make_sorting_header(_('Name'), 'name'),
+			_('Conditions'),
+			_('Operations'),
+			make_sorting_header(_('Status'), 'status')
 		));
 
 
@@ -434,12 +434,12 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			}
 
 			if($action['status'] == ACTION_STATUS_DISABLED){
-				$status= new CLink(S_DISABLED,
+				$status= new CLink(_('Disabled'),
 					'actionconf.php?go=activate&g_actionid%5B%5D='.$action['actionid'].url_param('eventsource'),
 					'disabled');
 			}
 			else{
-				$status= new CLink(S_ENABLED,
+				$status= new CLink(_('Enabled'),
 					'actionconf.php?go=disable&g_actionid%5B%5D='.$action['actionid'].url_param('eventsource'),
 					'enabled');
 			}
@@ -455,20 +455,20 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 
 //----- GO ------
 		$goBox = new CComboBox('go');
-		$goOption = new CComboItem('activate',S_ENABLE_SELECTED);
-		$goOption->setAttribute('confirm',S_ENABLE.' '.S_SELECTED_ACTIONS);
+		$goOption = new CComboItem('activate', _('Enable selected'));
+		$goOption->setAttribute('confirm', _('Enable selected actions?'));
 		$goBox->addItem($goOption);
 
-		$goOption = new CComboItem('disable',S_DISABLE_SELECTED);
-		$goOption->setAttribute('confirm',S_DISABLE.' '.S_SELECTED_ACTIONS);
+		$goOption = new CComboItem('disable', _('Disable selected'));
+		$goOption->setAttribute('confirm', _('Disable selected actions?'));
 		$goBox->addItem($goOption);
 
-		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
-		$goOption->setAttribute('confirm',S_DELETE.' '.S_SELECTED_ACTIONS);
+		$goOption = new CComboItem('delete', _('Delete selected'));
+		$goOption->setAttribute('confirm', _('Delete selected actions?'));
 		$goBox->addItem($goOption);
 
-		$goButton = new CSubmit('goButton',S_GO);
-		$goButton->setAttribute('id','goButton');
+		$goButton = new CSubmit('goButton', _('Go'));
+		$goButton->setAttribute('id', 'goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "g_actionid";');
 
 		$footer = get_table_header(array($goBox, $goButton));

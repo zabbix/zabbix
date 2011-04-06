@@ -98,7 +98,7 @@ class CAction extends CZBXAPI{
 
 			$dbTable = DB::getSchema('actions');
 			$sql_parts['select']['actionid'] = 'a.actionid';
-			foreach($options['output'] as $key => $field){
+			foreach($options['output'] as $field){
 				if(isset($dbTable['fields'][$field]))
 					$sql_parts['select'][$field] = 'a.'.$field;
 			}
@@ -785,7 +785,7 @@ COpt::memoryPick();
 				'evaltype' => null,
 			);
 			$duplicates = array();
-			foreach($actions as $anum => $action){
+			foreach($actions as $action){
 				if(!check_db_fields($action_db_fields, $action))
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect parameter is used for action "%s"', $action['name']));
 
@@ -805,7 +805,7 @@ COpt::memoryPick();
 				'nopermissions' => 1
 			);
 			$dbActions = $this->get($options);
-			foreach($dbActions as $anum => $dbAction){
+			foreach($dbActions as $dbAction){
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" already exists.', $dbAction['name']));
 			}
 //------
@@ -822,7 +822,7 @@ COpt::memoryPick();
 				}
 
 				if(!isset($action['operations']) || empty($action['operations'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_PARAMETER_USED_FOR_ACTION.' [ '.$action['name'].' ]');
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect parameter used for action "%s".', $action['name']));
 				}
 				else{
 					foreach($action['operations'] as $operation){
@@ -871,7 +871,7 @@ COpt::memoryPick();
 				'selectConditions' => API_OUTPUT_EXTEND,
 			);
 			$updActions = $this->get($options);
-			foreach($actions as $anum => $action){
+			foreach($actions as $action){
 				if(isset($action['actionid']) && !isset($updActions[$action['actionid']])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
 				}
@@ -879,7 +879,7 @@ COpt::memoryPick();
 
 // Check fields
 			$duplicates = array();
-			foreach($actions as $anum => $action){
+			foreach($actions as $action){
 				if(!check_db_fields(array('actionid' => null), $action)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect parameters are used for action update method "%s"',$action['name']));
 				}
@@ -904,7 +904,7 @@ COpt::memoryPick();
 
 			$operationsCreate = $operationsUpdate = $operationidsDelete = array();
 			$conditionsCreate = $conditionsUpdate = $conditionidsDelete = array();
-			foreach($actions as $anum => $action){
+			foreach($actions as $action){
 // Existance
 				$options = array(
 					'filter' => array( 'name' => $action['name'] ),
@@ -1034,7 +1034,7 @@ COpt::memoryPick();
 				'operationtype' => null,
 			);
 			if(!check_db_fields($operationDbFields, $operation)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_PARAMETER_USED_FOR_OPERATIONS);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameter used for Operations'));
 			}
 		}
 

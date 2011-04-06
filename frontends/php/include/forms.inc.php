@@ -2161,10 +2161,10 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			$frmItem->addRow(S_GROUP,$cmbGroups);
 
 			$cmbAction = new CComboBox('action');
-			$cmbAction->addItem('add to group',S_ADD_TO_GROUP);
+			$cmbAction->addItem('add to group', _('Add to group'));
 			if(isset($_REQUEST['itemid'])){
 				$cmbAction->addItem('update in group',S_UPDATE_IN_GROUP);
-				$cmbAction->addItem('delete FROM group',S_DELETE_FROM_GROUP);
+				$cmbAction->addItem('delete FROM group', _('Delete from group'));
 			}
 			$frmItem->addItemToBottomRow(array($cmbAction, SPACE, new CSubmit('register',S_DO)));
 		}
