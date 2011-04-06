@@ -1335,7 +1335,7 @@ Copt::memoryPick();
 					);
 				}
 
-				if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $host['host'])){
+				if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $host['host'])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Host name "%s"', $host['host']));
 				}
 
@@ -1343,7 +1343,7 @@ Copt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate host. Host with the same host name "%s" already exists in data', $host['host']));
 
 				if(isset($hostNames['name'][$host['name']]))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate host. Host with the same visible name "%s" already exists in data', $host['host']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate host. Host with the same visible name "%s" already exists in data', $host['name']));
 
 				$hostNames['host'][$host['host']] = $update ? $host['hostid'] : 1;
 				$hostNames['name'][$host['name']] = $update ? $host['hostid'] : 1;
@@ -1403,7 +1403,7 @@ Copt::memoryPick();
 			foreach($hostsExists as $exnum => $hostExists){
 				if(isset($hostNames['host'][$hostExists['host']])){
 					if(!$update || (bccomp($hostExists['hostid'],$hostNames['host'][$hostExists['host']]) != 0)){
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host "%s" already exists.', $hostExists['host']));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host "%s" already exists.!!', $hostExists['host']));
 					}
 				}
 			}
@@ -1424,17 +1424,17 @@ Copt::memoryPick();
 				'nopermissions' => true,
 				'preservekeys' => true
 			));
-			foreach($templatesExists as $exnum => $templatesExists){
-				if(isset($hostNames['host'][$templatesExists['host']])){
-					if(!$update || (bccomp($templatesExists['templateid'],$hostNames['host'][$templatesExists['host']]) != 0)){
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template "%s" already exists.', $hostExists['host']));
+			foreach($templatesExists as $exnum => $templateExists){
+				if(isset($hostNames['host'][$templateExists['host']])){
+					if(!$update || (bccomp($templateExists['templateid'],$hostNames['host'][$templateExists['host']]) != 0)){
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template "%s" already exists.', $templateExists['host']));
 					}
 				}
 			}
-			foreach($templatesExists as $exnum => $templatesExists){
-				if(isset($hostNames['name'][$templatesExists['name']])){
-					if(!$update || (bccomp($templatesExists['templateid'],$hostNames['name'][$templatesExists['name']]) != 0)){
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template with the same visible name "%s" already exists.', $templatesExists['host']));
+			foreach($templatesExists as $exnum => $templateExists){
+				if(isset($hostNames['name'][$templateExists['name']])){
+					if(!$update || (bccomp($templateExists['templateid'],$hostNames['name'][$templateExists['name']]) != 0)){
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template with the same visible name "%s" already exists.', $templateExists['name']));
 					}
 				}
 			}
@@ -1733,7 +1733,7 @@ Copt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$cur_host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 			}
 
-			if(isset($data['host']) && !preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $data['host'])){
+			if(isset($data['host']) && !preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $data['host'])){
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Hostname "%s"', $data['host']));
 			}
 
