@@ -111,7 +111,7 @@ function getHostProfiles(){
 		if($row){
 			return $row;
 		}
-		error(S_NO_HOST_GROUPS_WITH." groupid=[$groupid]");
+		error(_s('No host groups with groupid "%s".', $groupid));
 		return  false;
 	}
 

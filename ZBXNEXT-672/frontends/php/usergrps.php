@@ -425,7 +425,7 @@ include_once('include/page_header.php');
 // goBox
 		$goBox = new CComboBox('go');
 
-		$goOption = new CComboItem('enable_status',S_ENABLE_SELECTED);
+		$goOption = new CComboItem('enable_status', _('Enable selected'));
 		$goOption->setAttribute('confirm',S_ENABLE_SELECTED_GROUPS_Q);
 		$goBox->addItem($goOption);
 
