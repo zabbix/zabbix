@@ -582,15 +582,15 @@ require_once('include/templates/action.js.php');
 
 				$hosts = API::Host()->get(array(
 					'hostids' => zbx_objectValues($new_operation['opcommand_hst'], 'hostid'),
-					'output' => array('hostid','host'),
+					'output' => array('hostid','name'),
 					'preservekeys' => true,
 					'editable' => true,
 				));
 
 				$new_operation['opcommand_hst'] = array_values($new_operation['opcommand_hst']);
 				foreach($new_operation['opcommand_hst'] as $ohnum => $cmd)
-					$new_operation['opcommand_hst'][$ohnum]['host'] = ($cmd['hostid'] > 0) ? $hosts[$cmd['hostid']]['host'] : '';
-				morder_result($new_operation['opcommand_hst'], array('host', 'opcommand_hstid'));
+					$new_operation['opcommand_hst'][$ohnum]['name'] = ($cmd['hostid'] > 0) ? $hosts[$cmd['hostid']]['name'] : '';
+				morder_result($new_operation['opcommand_hst'], array('name', 'opcommand_hstid'));
 
 				$groups = API::HostGroup()->get(array(
 					'groupids' => zbx_objectValues($new_operation['opcommand_grp'], 'groupid'),
