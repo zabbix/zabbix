@@ -1323,8 +1323,8 @@ COpt::memoryPick();
 					if(!isset($operationDb['opgroup'])) $operationDb['opgroup'] = array();
 
 					$diff = zbx_array_diff($operation['opgroup'], $operationDb['opgroup'], 'groupid');
-					$opgroupCreate = array_merge($opgroupCreate, $diff['second']);
-					foreach($diff['first'] as $ogrp){
+					$opgroupCreate = array_merge($opgroupCreate, $diff['first']);
+					foreach($diff['second'] as $ogrp){
 						DB::delete('opgroup', array(
 							'groupid' => $ogrp['groupid'],
 							'operationid' => $operation['operationid'],
@@ -1339,8 +1339,9 @@ COpt::memoryPick();
 					if(!isset($operationDb['optemplate'])) $operationDb['optemplate'] = array();
 
 					$diff = zbx_array_diff($operation['optemplate'], $operationDb['optemplate'], 'templateid');
-					$optemplateCreate = array_merge($optemplateCreate, $diff['second']);
-					foreach($diff['first'] as $otpl){
+					$optemplateCreate = array_merge($optemplateCreate, $diff['first']);
+
+					foreach($diff['second'] as $otpl){
 						DB::delete('optemplate', array(
 							'templateid' => $otpl['templateid'],
 							'operationid' => $operation['operationid'],
@@ -1379,6 +1380,8 @@ COpt::memoryPick();
 
 		if(!empty($opmessageDeleteByOpId))
 			DB::delete('opmessage', array('operationid' => $opmessageDeleteByOpId));
+		if(!empty($opcommandDeleteByOpId))
+			DB::delete('opcommand', array('operationid' => $opcommandDeleteByOpId));
 		if(!empty($opmessage_grpDeleteByOpId))
 			DB::delete('opmessage_grp', array('operationid' => $opmessage_grpDeleteByOpId));
 		if(!empty($opmessage_usrDeleteByOpId))
