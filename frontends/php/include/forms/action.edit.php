@@ -468,7 +468,7 @@ require_once('include/templates/action.js.php');
 			$cmbOpType->addItem($oper, operation_type2str($oper));
 
 		$tblOper->addRow(array(_('Operation type'), $cmbOpType));
-		switch($new_operation['operationtype']) {
+		switch($new_operation['operationtype']){
 			case OPERATION_TYPE_MESSAGE:
 				if(!isset($new_operation['opmessage'])){
 					$new_operation['opmessage_usr'] = array();
@@ -563,30 +563,20 @@ require_once('include/templates/action.js.php');
 				break;
 			case OPERATION_TYPE_COMMAND:
 				if(!isset($new_operation['opcommand'])){
-					$new_operation['opcommand_grp'] = array();
-					$new_operation['opcommand'] = array(
-						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-						'execute_on' => ZBX_SCRIPT_EXECUTE_ON_AGENT,
-						'port' => '',
-						'authtype' => ZBX_SCRIPT_EXECUTE_ON_AGENT,
-						'scriptid' => '0',
-						'username' => '',
-						'privatekey' => '',
-						'publickey' => '',
-						'password' => '',
-						'command' => '',
-					);
+					$new_operation['opcommand'] = array();
 				}
+				$new_operation['opcommand']['type'] = isset($new_operation['opcommand']['type'])
+						? $new_operation['opcommand']['type'] : ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT;
 				$new_operation['opcommand']['scriptid'] = isset($new_operation['opcommand']['scriptid'])
 						? $new_operation['opcommand']['scriptid'] : '';
 				$new_operation['opcommand']['execute_on'] = isset($new_operation['opcommand']['execute_on'])
-						? $new_operation['opcommand']['execute_on'] : 0;
+						? $new_operation['opcommand']['execute_on'] : ZBX_SCRIPT_EXECUTE_ON_AGENT;
 				$new_operation['opcommand']['publickey'] = isset($new_operation['opcommand']['publickey'])
 						? $new_operation['opcommand']['publickey'] : '';
 				$new_operation['opcommand']['privatekey'] = isset($new_operation['opcommand']['privatekey'])
 						? $new_operation['opcommand']['privatekey'] : '';
 				$new_operation['opcommand']['authtype'] = isset($new_operation['opcommand']['authtype'])
-						? $new_operation['opcommand']['authtype'] : 0;
+						? $new_operation['opcommand']['authtype'] : ITEM_AUTHTYPE_PASSWORD;
 				$new_operation['opcommand']['username'] = isset($new_operation['opcommand']['username'])
 						? $new_operation['opcommand']['username'] : '';
 				$new_operation['opcommand']['password'] = isset($new_operation['opcommand']['password'])

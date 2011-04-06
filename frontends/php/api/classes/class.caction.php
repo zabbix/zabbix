@@ -1530,7 +1530,7 @@ COpt::memoryPick();
 							break;
 						case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
 							if(!isset($operation['opcommand']['scriptid']) || zbx_empty($operation['opcommand']['scriptid']))
-								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Not specified scriptid for action operation command "%s".',$operation['opcommand']['command']));
+								self::exception(ZBX_API_ERROR_PARAMETERS, _('Not specified scriptid for action operation command.'));
 
 							$scripts = API::Script()->get(array(
 								'output' => array('scriptid','name'),
@@ -1539,7 +1539,7 @@ COpt::memoryPick();
 							));
 
 							if(!isset($scripts[$operation['opcommand']['scriptid']]))
-								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Specified script does not exists or you do not have rights on it for action operation command "%s".',$operation['opcommand']['command']));
+								self::exception(ZBX_API_ERROR_PARAMETERS, _('Specified script does not exists or you do not have rights on it for action operation command.'));
 							break;
 						default:
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation command type.'));
