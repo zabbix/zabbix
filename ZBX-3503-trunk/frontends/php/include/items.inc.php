@@ -1309,7 +1309,6 @@
  *
  * @param string $key item key, e.g. system.run[cat /etc/passwd | awk -F: '{ print $1 }']
  * @return array
- *
  */
 	function check_item_key($key){
 		$key_strlen = zbx_strlen($key);
@@ -1509,4 +1508,144 @@
 		}
 
 	}
+
+
+/**
+ * Parse item key and return an array containing parameters and key_id used
+ * Example:
+ * print_r(parseItemKey('key[a, b, c]'));
+ * array(
+ *     'key_id' => 'key',
+ *     'parameters' => array('a', 'b', 'c')
+ * )
+ *
+ * @author Konstantin Buravcov
+ * @see ZBX-3503
+ * @param string $key
+ * @return bool|array
+ */
+	function parseItemKey($key){
+		// if key is not valid, it's not worth parsing
+		if (!check_item_key($key)){
+			return false;
+		}
+
+		$keyLen = zbx_strlen($key);
+		$characters = array();
+
+		//gathering characters into array
+		for($i = 0; $i < $keyLen; $i++){
+			$characters[] = zbx_substr($key, $i, 1);
+		}
+
+		$result = array(
+			'key_id' => '',
+			'parameters' => array()
+		);
+		$current = null;
+		$previous = null;
+		$currParamNo = 0;
+		$state = 0; // 0 - outside of parameters
+					// 1 - inside unquoted param
+					// 2 - just entered quoted param
+					// 3 - inside quoted param
+					// 4 - ignored whitespace
+
+		foreach($characters as $charNo=>$current){
+			if ($charNo != 0){
+				$previous = $characters[$charNo - 1];
+			}
+			$next = isset($characters[$charNo + 1]) ? $characters[$charNo + 1] : null;
+
+			switch($state){
+				// outside of parameters
+				case 0:
+					// going inside parameters
+					if($current == '['){
+						switch($next){
+							case '"': $state = 2; break;
+							case ' ': $state = 4; break; // whitespace before parameter is ignored
+							default: $state = 1; break;
+						}
+					}
+					// still going through key id
+					else{
+						$result['key_id'] .= $current;
+					}
+				break;
+
+				// inside unquoted param
+				case 1:
+					// end of parameters
+					if ($current == ']'){
+						// zzzzzzz, doing nothing
+					}
+					// end of parameter
+					elseif($current == ','){
+						// moving to next parameter
+						switch($next){
+							case '"': $state = 2; break;
+							case ' ': $state = 4; break; // whitespace before parameter is ignored
+							default: $state = 1; break;
+						}
+						$currParamNo++;
+					}
+					else{
+						// we are still inside of parameter
+						if(!isset($result['parameters'][$currParamNo])){
+							$result['parameters'][$currParamNo] = $current;
+						}
+						else{
+							$result['parameters'][$currParamNo] .= $current;
+						}
+					}
+				break;
+
+				// just entered quoted param
+				case 2:
+					// passing opening quote and going inside quoted param
+					$state = 3;
+				break;
+
+				// inside quoted param
+				case 3:
+					// end of quoted param
+					if($current == '"' && $previous != '\\'){
+						// ignoring whitespace after quotes
+						$state = $next == ' ' ? 4 : 1;
+					}
+					else{
+						if(
+							!($current == '\\' && $next == '"') // `\` should be removed from `\"`
+							&& !($current == '"' && $previous != '\\') // quoted param `"a"` should look like `a`
+						)
+						// we are still inside of quoted parameter and this symbol is part of the parameter
+						if(!isset($result['parameters'][$currParamNo])){
+							$result['parameters'][$currParamNo] = $current;
+						}
+						else{
+							$result['parameters'][$currParamNo] .= $current;
+						}
+					}
+				break;
+
+				// ignored whitespace
+				case 4:
+					// end of ignored whitespace
+					if($next != ' '){
+						switch($next){
+							case '"': $state = 2; break;
+							case ' ': $state = 4; break; // whitespace before parameter is ignored
+							default: $state = 1; break;
+						}
+					}
+				break;
+			}
+		}
+
+
+		return $result;
+	}
+
+
 ?>
