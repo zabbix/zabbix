@@ -20,6 +20,7 @@
 ?>
 <?php
 require_once(dirname(__FILE__).'/function_check_item_key.php');
+require_once(dirname(__FILE__).'/function_parseItemKey.php');
 require_once(dirname(__FILE__).'/function_DBcommit.php');
 require_once(dirname(__FILE__).'/function_DBcondition.php');
 require_once(dirname(__FILE__).'/function_DBconnect.php');
@@ -41,6 +42,7 @@ class GeneralTests
 		$suite = new PHPUnit_Framework_TestSuite('general');
 
 		$suite->addTestSuite('function_check_item_key');
+		$suite->addTestSuite('function_parseItemKey');
 		$suite->addTestSuite('function_DBcommit');
 		$suite->addTestSuite('function_DBcondition');
 		$suite->addTestSuite('function_DBconnect');
