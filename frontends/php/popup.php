@@ -1772,13 +1772,13 @@ include_once('include/page_header.php');
 			$header = array(
 				array(new CCheckBox("all_scripts", NULL, "javascript: checkAll('".$form->getName()."', 'all_scripts','scripts');"), _('Name')),
 				_('Execute on'),
-				_('Command')
+				_('Commands')
 			);
 		else
 			$header = array(
 				_('Name'),
 				_('Execute on'),
-				_('Command')
+				_('Commands')
 			);
 
 		$table->setHeader($header);
