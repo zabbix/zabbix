@@ -127,13 +127,18 @@ int	PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 					{
 						zbx_sleep(1);
 						PdhCollectQueryData(query);
-						PdhGetRawCounterValue(counter, NULL, &rawData2);
-						status = PdhCalculateCounterFromRawValue(
-							counter,
-							PDH_FMT_DOUBLE,
-							&rawData2,
-							&rawData,
-							&counterValue);
+						if (ERROR_SUCCESS == (status = PdhGetRawCounterValue(counter, NULL, &rawData2)))
+						{
+							if (rawData2.CStatus == PDH_CSTATUS_VALID_DATA || rawData2.CStatus == PDH_CSTATUS_NEW_DATA)
+								status = PdhCalculateCounterFromRawValue(
+									counter,
+									PDH_FMT_DOUBLE,
+									&rawData2,
+									&rawData,
+									&counterValue);
+							else
+								status = rawData2.CStatus;
+						}
 					}
 
 					if (ERROR_SUCCESS == status)
