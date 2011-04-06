@@ -423,12 +423,71 @@ COpt::memoryPick();
 /**
  * Create new drules
  *
- * @param array $drules
+ * @param array(
+ *  	name => string,
+ *  	proxy_hostid => int,
+ *  	iprange => string,
+ *  	delay => string,
+ *  	status => int,
+ *  	dchecks => array(
+ *  		array(
+ *  			type => int,
+ *  			ports => string,
+ *  			key_ => string,
+ *  			snmp_community => string,
+ *  			snmpv3_securityname => string,
+ *  			snmpv3_securitylevel => int,
+ *  			snmpv3_authpassphrase => string,
+ *  			snmpv3_privpassphrase => string,
+ *  			uniq => int,
+ *  		), ...
+ *  	)
+ * ) $drules
  * @return boolean
  */
-	public function create($drules){
+	public function create(array $dRules){
+		$dRules = zbx_toArray($dRules);
 
+		foreach($dRules as $dRule){
+			if(!isset($dRule['iprange']) || !validate_ip_range($dRule['iprange'])){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect IP range "%s".', $dRule['iprange']));
+			}
 
+			if(empty($dRule['dchecks'])){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot save discovery rule without checks.'));
+			}
+
+			$uniq = 0;
+			foreach($dRule['dchecks'] as $dCheck){
+				if($dCheck['uniq'] == 1) $uniq++;
+			}
+			if($uniq > 1){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one check can be unique.'));
+			}
+		}
+
+		$druleids = DB::insert('drules', $dRules);
+
+		$dChecksUpdate = array();
+		foreach($dRules as $dNum => $dRule){
+			foreach($dRule['dchecks'] as $dCheck){
+				// no need to store those items in DB if they will not be used
+				switch($dCheck['snmpv3_securitylevel']){
+					case ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV:
+						$dCheck['snmpv3_authpassphrase'] = $dCheck['snmpv3_privpassphrase'] = '';
+						break;
+					case ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV:
+						$dCheck['snmpv3_privpassphrase'] = '';
+						break;
+				}
+
+				$dCheck['druleid'] = $druleids[$dNum];
+				$dChecksUpdate[] = $dCheck;
+			}
+		}
+		DB::insert('dchecks', $dChecksUpdate);
+
+		return array('druleids' => $druleids);
 	}
 
 /**
@@ -438,7 +497,6 @@ COpt::memoryPick();
  * @return boolean
  */
 	public function update($drules){
-
 
 	}
 

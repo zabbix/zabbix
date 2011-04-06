@@ -83,16 +83,18 @@
 			return S_UNKNOWN;
 	}
 
-	function discovery_check2str($type, $snmp_community, $key_, $port){
+	function discovery_check2str($type, $key_, $port){
 		$external_param = '';
 
-		switch($type){
-			case SVC_SNMPv1:
-			case SVC_SNMPv2:
-			case SVC_SNMPv3:
-			case SVC_AGENT:
-				$external_param = ' "'.$key_.'"';
-				break;
+		if(!empty($key)){
+			switch($type){
+				case SVC_SNMPv1:
+				case SVC_SNMPv2:
+				case SVC_SNMPv3:
+				case SVC_AGENT:
+					$external_param = ' "'.$key_.'"';
+					break;
+			}
 		}
 		$result = discovery_check_type2str($type);
 		if((svc_default_port($type) != $port) || ($type == SVC_TCP))
@@ -185,7 +187,7 @@
 
 	function add_discovery_rule($proxy_hostid, $name, $iprange, $delay, $status, $dchecks, $uniqueness_criteria){
 		if( !validate_ip_range($iprange) ){
-			error(S_INCORRECT_IP_RANGE);
+			error(_('Incorrect IP range.'));
 			return false;
 		}
 
@@ -208,7 +210,7 @@
 
 	function update_discovery_rule($druleid, $proxy_hostid, $name, $iprange, $delay, $status, $dchecks,	$uniqueness_criteria){
 		if(!validate_ip_range($iprange)){
-			error(S_INCORRECT_IP_RANGE);
+			error(_('Incorrect IP range.'));
 			return false;
 		}
 
