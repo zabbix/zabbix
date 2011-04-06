@@ -1213,7 +1213,7 @@ COpt::memoryPick();
 
 			if(!isset($operation['operationtype']))
 				$operation['operationtype'] = $operationDb['operationtype'];
-
+sdii($operation);
 			switch($operation['operationtype']){
 				case OPERATION_TYPE_MESSAGE:
 					if(!isset($operation['opmessage_grp']))
@@ -1246,9 +1246,9 @@ COpt::memoryPick();
 						);
 
 						$diff = zbx_array_diff($operation['opmessage_grp'], $operationDb['opmessage_grp'], 'usrgrpid');
-						$opmessage_grpCreate = array_merge($opmessage_grpCreate, $diff['second']);
+						$opmessage_grpCreate = array_merge($opmessage_grpCreate, $diff['first']);
 
-						foreach($diff['first'] as $omgrp){
+						foreach($diff['second'] as $omgrp){
 							DB::delete('opmessage_grp', array(
 								'usrgrpid' => $omgrp['usrgrpid'],
 								'operationid' => $operation['operationid'],
@@ -1257,8 +1257,8 @@ COpt::memoryPick();
 
 
 						$diff = zbx_array_diff($operation['opmessage_usr'], $operationDb['opmessage_usr'], 'userid');
-						$opmessage_usrCreate = array_merge($opmessage_usrCreate, $diff['second']);
-						foreach($diff['first'] as $omusr){
+						$opmessage_usrCreate = array_merge($opmessage_usrCreate, $diff['first']);
+						foreach($diff['second'] as $omusr){
 							DB::delete('opmessage_usr', array(
 								'userid' => $omusr['userid'],
 								'operationid' => $operation['operationid'],
