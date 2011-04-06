@@ -98,6 +98,7 @@ int	add_perf_counter(const char *name, const char *counterPath, int interval)
 			}
 			else if (ERROR_SUCCESS != (status = PdhValidatePath(wcounterPath)))
 			{
+				cptr->status = ITEM_STATUS_NOTSUPPORTED;
 				zabbix_log(LOG_LEVEL_DEBUG, "PerfCounter '%s' (interval: %d) added with error: %s",
 						cptr->counterPath, interval, strerror_from_module(status, L"PDH.DLL"));
 			}
@@ -356,7 +357,6 @@ void	collect_perfstat()
 			/* Add user counters to query */
 			if (ERROR_SUCCESS != (status = PdhAddCounter(ppsd->pdh_query, wcounterPath, 0, &cptr->handle)))
 			{
-				cptr->status = ITEM_STATUS_NOTSUPPORTED;
 				zabbix_log(LOG_LEVEL_ERR, "Unable to add performance counter '%s' to query: %s",
 						cptr->counterPath, strerror_from_module(status, L"PDH.DLL"));
 			}
