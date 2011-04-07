@@ -324,19 +324,7 @@ require_once('include/templates/action.js.php');
 
 	$allowedOperations = get_operations_by_eventsource($data['eventsource']);
 
-// sorting
-	$esc_step_from = array();
-	$esc_step_to = array();
-	$esc_period = array();
-	$operationTypes = array();
-	foreach($data['operations'] as $key => $operation) {
-		$esc_step_from[$key] = $operation['esc_step_from'];
-		$esc_step_to[$key] = $operation['esc_step_to'];
-		$esc_period[$key] = $operation['esc_period'];
-		$operationTypes[$key] = $operation['operationtype'];
-	}
-	array_multisort($esc_step_from, SORT_ASC, $esc_step_to, SORT_ASC, $esc_period, SORT_ASC, $operationTypes, SORT_ASC, $data['operations']);
-// --
+	sortOperations($data['operations']);
 
 	if(EVENT_SOURCE_TRIGGERS == $data['eventsource'])
 		$operationsHeader = array(new CCheckBox('all_operations',null,'checkAll("'.$frmAction->getName().'","all_operations","g_operationid");'),

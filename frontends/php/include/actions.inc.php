@@ -490,6 +490,20 @@ function operation_type2str($type=null){
 	else return _('Unknown');
 }
 
+function sortOperations(&$operations){
+	$esc_step_from = array();
+	$esc_step_to = array();
+	$esc_period = array();
+	$operationTypes = array();
+	foreach($operations as $key => $operation) {
+		$esc_step_from[$key] = $operation['esc_step_from'];
+		$esc_step_to[$key] = $operation['esc_step_to'];
+		$esc_period[$key] = $operation['esc_period'];
+		$operationTypes[$key] = $operation['operationtype'];
+	}
+	array_multisort($esc_step_from, SORT_ASC, $esc_step_to, SORT_ASC, $esc_period, SORT_ASC, $operationTypes, SORT_ASC, $operations);
+}
+
 function get_operators_by_conditiontype($conditiontype){
 	$operators[CONDITION_TYPE_HOST_GROUP] = array(
 			CONDITION_OPERATOR_EQUAL,
