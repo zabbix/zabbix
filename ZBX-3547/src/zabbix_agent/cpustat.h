@@ -24,50 +24,33 @@
 
 #if defined (_WINDOWS)
 
+#include "perfmon.h"
+#include "perfstat.h"
+
 	#define MAX_CPU_HISTORY 900 /* 15 min in seconds */
 
 	typedef struct s_single_cpu_stat_data
 	{
-		PDH_HCOUNTER	usage_counter;
-		PDH_RAW_COUNTER	usage;
-		PDH_RAW_COUNTER	usage_old;
-
-		double	util1;
-		double	util5;
-		double	util15;
-
-		LONG	util1sum;
-		LONG	util5sum;
-		LONG	util15sum;
-
-		LONG	h_usage[MAX_CPU_HISTORY]; /* usage history */
-		int	h_usage_index;
+		PERF_COUNTERS	*usage_counter;
+		double		util1;
+		double		util5;
+		double		util15;
 	}
 	ZBX_SINGLE_CPU_STAT_DATA;
 
 	typedef struct s_cpus_stat_data
 	{
-		int	count;
-		ZBX_SINGLE_CPU_STAT_DATA *cpu; /* count + 1 */
+		int				count;
+		ZBX_SINGLE_CPU_STAT_DATA	*cpu; /* count + 1 */
+		PERF_COUNTERS			*queue_counter;
 
 		double	load1;
 		double	load5;
 		double	load15;
-
-		LONG	load1sum;
-		LONG	load5sum;
-		LONG	load15sum;
-
-		LONG	h_queue[MAX_CPU_HISTORY]; /* queue history */
-		int	h_queue_index;
-
-		HQUERY		pdh_query;
-		PDH_RAW_COUNTER	queue;
-		PDH_HCOUNTER	queue_counter;
 	}
 	ZBX_CPUS_STAT_DATA;
 
-#	define CPU_COLLECTOR_STARTED(collector)	((collector) && (collector)->cpus.pdh_query)
+#	define CPU_COLLECTOR_STARTED(collector)	((collector) && (collector)->cpus.queue_counter)
 
 #else /* not _WINDOWS */
 

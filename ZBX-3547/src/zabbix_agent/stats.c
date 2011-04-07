@@ -254,8 +254,10 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 	set_child_signal_handler();
 #endif	/* ZABBIX_DAEMON */
 
+#ifdef _WINDOWS
 	if (0 != init_cpu_collector(&(collector->cpus)))
 		close_cpu_collector(&(collector->cpus));
+#endif /* _WINDOWS */
 
 	collector_diskdevice_add("");
 

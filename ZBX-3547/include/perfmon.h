@@ -27,7 +27,6 @@
 /*
  * Performance Counter Indexes
  */
-
 #define PCI_SYSTEM			(2)
 #define PCI_PROCESSOR			(238)
 #define PCI_PROCESSOR_TIME		(6)
@@ -39,7 +38,6 @@
 /*
  * Performance Countername structure
  */
-
 struct perfcounter
 {
 	struct perfcounter *next;
@@ -50,11 +48,36 @@ struct perfcounter
 	/* of sizeof function                               */
 };
 
+typedef enum
+{
+	PERF_COUNTER_NOTSUPPORTED = 0,
+	PERF_COUNTER_INITIALIZED,
+	PERF_COUNTER_ACTIVE,
+} zbx_perf_counter_t;
+	
+typedef struct zbx_perfs
+{
+   struct zbx_perfs	*next;
+   char			*name;
+   char			*counterpath;
+   int			interval;
+   PDH_RAW_COUNTER	*rawValueArray;
+   HCOUNTER		handle;
+   int			CurrentCounter;
+   int			CurrentNum;
+   int			status;
+} PERF_COUNTERS;
+
 typedef struct perfcounter PERFCOUNTER;
 
 extern PERFCOUNTER *PerfCounterList;
 
-LPTSTR	GetCounterName(DWORD pdhIndex);
-int	check_counter_path(char *counterPath);
+PDH_STATUS	zbx_PdhMakeCounterPath(const char *function, PDH_COUNTER_PATH_ELEMENTS *cpe, char *counterpath);
+PDH_STATUS	zbx_PdhOpenQuery(const char *function, PDH_HQUERY query);
+PDH_STATUS	zbx_PdhAddCounter(const char *function, PERF_COUNTERS *counter, PDH_HQUERY query, const char *counterpath, PDH_HCOUNTER *handle);
+PDH_STATUS	zbx_PdhCollectQueryData(const char *function, const char *counterpath, PDH_HQUERY query);
+PDH_STATUS	zbx_PdhGetRawCounterValue(const char *function, const char *counterpath, PDH_HCOUNTER handle, PPDH_RAW_COUNTER value);
+LPTSTR		GetCounterName(DWORD pdhIndex);
+int		check_counter_path(char *counterPath);
 
 #endif /* ZABBIX_PERFMON_H */
