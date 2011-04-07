@@ -220,6 +220,48 @@ class function_parseItemKey extends PHPUnit_Framework_TestCase
 					'parameters'=>array('', 'abc')
 				)
 			),
+			array(
+				'key[["a", "b", "c"], "d"]',
+				array(
+					'key_id'=>'key',
+					'parameters'=>array('"a", "b", "c"', 'd')
+				)
+			),
+			array(
+				'key["a", ["b", "c"], "d"]',
+				array(
+					'key_id'=>'key',
+					'parameters'=>array('a', '"b", "c"', 'd')
+				)
+			),
+			array(
+				'key[[a, b, c], d]',
+				array(
+					'key_id'=>'key',
+					'parameters'=>array('a, b, c', 'd')
+				)
+			),
+			array(
+				'key[a, [b, c], d]',
+				array(
+					'key_id'=>'key',
+					'parameters'=>array('a', 'b, c', 'd')
+				)
+			),
+			array(
+				'key["a", "b", "c"]["d"]',
+				array(
+					'key_id'=>'key',
+					'parameters'=>array('a', 'b', 'c', 'd')
+				)
+			),
+			array(
+				'key[a, b, c][d]',
+				array(
+					'key_id'=>'key',
+					'parameters'=>array('a', 'b', 'c', 'd')
+				)
+			),
 		);
 	}
 
