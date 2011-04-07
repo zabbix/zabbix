@@ -582,27 +582,27 @@
 	 */
 	function itemName($item){
 		$name = $item['name'];
-		$key = expand_item_key_by_data($item);
+		// if item name contains $1..$9 macros, we need to expand them
+		if(preg_match('/\$[1-9]/', $name)){
+			$key = expand_item_key_by_data($item);
 
-		// parsing key to get the parameters out of it
-		$parsedItemKey = parseItemKey($key);
+			// parsing key to get the parameters out of it
+			$parsedItemKey = parseItemKey($key);
 
-		if($parsedItemKey === false){
-			// key seems to be invalid (parser was not able to parse it)
-			return $name;
+			if($parsedItemKey != false){
+				// according to zabbix docs we must replace $1 to $9 macros with item key parameters
+				for($paramNo = 9; $paramNo > 0; $paramNo--){
+					/**
+					 * @todo parameters that do not exist should not be replaced by ''
+					 * this was not implemented, because this change also should be reflected on a server side
+					 */
+					$replaceTo = isset($parsedItemKey['parameters'][$paramNo - 1]) ? $parsedItemKey['parameters'][$paramNo - 1] : '';
+					$name = str_replace('$'.$paramNo, $replaceTo, $name);
+				}
+			}
 		}
 
-		// according to zabbix docs we must replace $1 to $9 macros with item key parameters
-		for($paramNo = 9; $paramNo > 0; $paramNo--){
-			/**
-			 * @todo parameters that do not exist should not be replaced by ''
-			 * this was not implemented, because this change also should be reflected on a server side
-			 */
-			$replaceTo = isset($parsedItemKey['parameters'][$paramNo - 1]) ? $parsedItemKey['parameters'][$paramNo - 1] : '';
-			$name = str_replace('$'.$paramNo, $replaceTo, $name);
-		}
-
-		return str_replace(' ', SPACE, $name);
+		return zbx_space_to_nbsp($name);
 	}
 
 	function get_realhost_by_itemid($itemid){
