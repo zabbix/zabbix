@@ -45,8 +45,8 @@ data: null,							// local sysmap DB :)
 
 container: null,					// selements and links HTML container (D&D droppable area)
 mapimg: null,						// HTML element map img
-
-grid: null,							// grid object
+form:	null,
+grid:	null,						// grid object
 
 selements: null,					// map selements array
 links:	null,						// map links array
@@ -57,7 +57,7 @@ selection: {
 },
 
 menuActive: 0,						// To recognize D&D
-debug_status: 2,
+debug_status: 0,
 
 mlinktrigger: {
 	linktriggerid:	0,					// ALWAYS must be a STRING (js doesn't support uint64)
@@ -162,18 +162,22 @@ save: function(){
 	this.debug('save');
 //--
 
+	this.data.grid_size = this.grid.gridSize;
+	this.data.grid_show = this.grid.gridShow;
+	this.data.grid_align = this.grid.gridAlign;
+
 	var url = new Curl(location.href);
 	jQuery.ajax({
-		"url":			url.getPath()+'?output=ajax'+'&sid='+url.getArgument('sid'),
-		"favobj":		"sysmap",
-		"action":		"save",
-		"favid":		this.id,
-		"sysmapid":		this.sysmapid,
-		"grid_size":	this.grid.gridSize,
-		"grid_show":	this.grid.showGrid ? "1" : "0",
-		"grid_align":	this.grid.autoAlign ? "1" : "0",
-		"sysmap":		Object.toJSON(this.data),
-		"error":		function(){document.location = url.getPath()+'?'+Object.toQueryString(params);}
+		url:	url.getPath()+'?output=ajax'+'&sid='+url.getArgument('sid'),
+		type:	"POST",
+		data:	{
+			favobj:			"sysmap",
+			action:			"save",
+			favid:			this.id,
+			sysmapid:		this.sysmapid,
+			sysmap:			Object.toJSON(this.data)
+		},
+		error:	function(){document.location = url.getPath()+'?'+Object.toQueryString(params);}
 	});
 },
 
@@ -264,7 +268,9 @@ removeSelements: function(e){
 			this.selements[selementid].remove();
 		}
 
-		this.form.hide(e);
+		if(!is_null(this.form))
+			this.form.hide(e);
+
 		this.updateImage();
 	}
 },
@@ -304,7 +310,8 @@ createLink: function(e, linkData){
 	this.links[linkData.linkid].create();
 
 // update form
-	this.form.update_linkContainer(e);
+	if(!is_null(this.form))
+		this.form.update_linkContainer(e);
 
 // link created by event (need to update sysmap)
 	if(!is_null(e))
@@ -341,7 +348,9 @@ removeLinks: function(e){
 			this.links[linkids[i]].remove();
 		}
 
-		this.form.hide(e);
+		if(!is_null(this.form))
+			this.form.hide(e);
+
 		this.updateImage();
 	}
 },
@@ -434,7 +443,8 @@ showMenu: function(e){
 	this.selements[selementid].toggleSelect((e.ctrlKey || e.shiftKey));
 
 	if(this.selection.count == 0){
-		this.form.hide(e);
+		if(!is_null(this.form))
+			this.form.hide(e);
 	}
 	else{
 		if(is_null(this.form)) this.form = new CForm(this);
@@ -632,7 +642,7 @@ add_link: function(mlink, update_map){
 	}
 
 	mlink.status = 1;
-	this.links[linkid] = mlink;
+	this.data = mlink;
 
 	if((typeof(update_map) != 'undefined') && (update_map == 1)){
 		this.updateImage();
@@ -681,15 +691,12 @@ reload: function(data){
 	this.sysmap.updateImage();
 },
 
-createLinkTrigger: function(linktrigger, update_map){
+createLinkTrigger: function(linktrigger){
 	this.debug('createLinkTrigger');
 //--
 
-	if(!isset(linkid,this.links) || empty(this.links[linkid])) return false;
-
-	for(var ltid in this.links[linkid].linktriggers){
-		if(!isset(ltid, this.links[linkid].linktriggers)) continue;
-		if(this.links[linkid].linktriggers[ltid].triggerid === linktrigger.triggerid){
+	for(var ltid in this.data.linktriggers){
+		if(this.data.linktriggers[ltid].triggerid === linktrigger.triggerid){
 			linktrigger.linktriggerid = ltid;
 			break;
 		}
@@ -700,56 +707,35 @@ createLinkTrigger: function(linktrigger, update_map){
 		do{
 			linktriggerid = parseInt(Math.random(1000000000) * 1000000000);
 			linktriggerid = linktriggerid.toString();
-		}while(typeof(this.links[linkid].linktriggers[linktriggerid]) != 'undefined');
+		}while(typeof(this.data.linktriggers[linktriggerid]) != 'undefined');
 
-		linktrigger['new'] = 'new';
 		linktrigger['linktriggerid'] = linktriggerid;
 	}
 	else{
 		linktriggerid = linktrigger.linktriggerid;
 	}
 
-	this.links[linkid].linktriggers[linktriggerid] = linktrigger;
-
-	if((typeof(update_map) != 'undefined') && (update_map == 1)){
-		this.updateImage();
-	}
+	this.data.linktriggers[linktriggerid] = linktrigger;
 },
 
-updateLinkTrigger: function(linktriggerid, params, update_map){
+updateLinkTrigger: function(linktriggerid, params){
 	this.debug('updateLinkTrigger');
 //--
 
-	if(!isset(linkid,this.links) || empty(this.links[linkid])) return false;
-
-
-//SDI(key+' : '+value);
 	for(var key in params){
 		if(is_null(params[key])) continue;
-		if(!isset(linktriggerid, this.links[linkid].linktriggers) || empty(this.links[linkid].linktriggers[linktriggerid])) continue;
 
 		if(is_number(params[key])) params[key] = params[key].toString();
-		this.links[linkid].linktriggers[linktriggerid][pair.key] = params[key];
-	}
-
-	if((typeof(update_map) != 'undefined') && (update_map == 1)){
-		this.updateImage();
+		this.data.linktriggers[linktriggerid][key] = params[key];
 	}
 },
 
-removeLinkTrigger: function(linktriggerid, update_map){
+removeLinkTrigger: function(linktriggerid){
 	this.debug('removeLinkTrigger');
 //--
 
-	if(!isset(linkid,this.links) || empty(this.links[linkid])) return false;
-	if(!isset(linktriggerid, this.links[linkid].linktriggers) || empty(this.links[linkid].linktriggers[linktriggerid])) return false;
-//SDI(key+' : '+value);
-	this.links[linkid].linktriggers[linktriggerid] = null;
-	delete(this.links[linkid].linktriggers[linktriggerid]);
-
-	if((typeof(update_map) != 'undefined') && (update_map == 1)){
-		this.updateImage();
-	}
+	this.data.linktriggers[linktriggerid] = null;
+	delete(this.data.linktriggers[linktriggerid]);
 }
 });
 //*
@@ -765,7 +751,7 @@ data:			null,
 domNode:		null,			// dom reference to html obj
 selected:		false,			// element is not selected
 
-debug_status:	2,
+debug_status:	0,
 
 //----------------------------------------------------------------------------------------------
 
@@ -3220,7 +3206,7 @@ form_link_save: function(e){
 
 // LINK INDICATORS
 	for(var linktriggerid in maplink.linktriggers){
-		this.removeLinkTrigger(maplink.linkid, linktriggerid);
+		this.sysmap.links[maplink.linkid].removeLinkTrigger(linktriggerid);
 	}
 
 	var triggerid = null;
@@ -3248,7 +3234,7 @@ form_link_save: function(e){
 		if(!is_null(linktriggerid))
 			linktrigger.linktriggerid = linktriggerid.value;
 
-		this.createLinkTrigger(linkid, linktrigger);
+		this.sysmap.links[linkid].createLinkTrigger(linktrigger);
 	}
 //--
 
