@@ -592,10 +592,6 @@
 			if($parsedItemKey != false){
 				// according to zabbix docs we must replace $1 to $9 macros with item key parameters
 				for($paramNo = 9; $paramNo > 0; $paramNo--){
-					/**
-					 * @todo parameters that do not exist should not be replaced by ''
-					 * this was not implemented, because this change also should be reflected on a server side
-					 */
 					$replaceTo = isset($parsedItemKey['parameters'][$paramNo - 1]) ? $parsedItemKey['parameters'][$paramNo - 1] : '';
 					$name = str_replace('$'.$paramNo, $replaceTo, $name);
 				}
