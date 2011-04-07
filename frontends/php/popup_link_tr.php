@@ -33,7 +33,7 @@ include_once('include/page_header.php');
 <?php
 //			VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields = array(
-		'mapid'=>				array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
+		'mapid'=>				array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,			null),
 		'linktriggers'=>		array(T_ZBX_INT, O_OPT,  P_SYS, DB_ID, 			'isset({save})'),
 		'new_linktriggers'=>	array(T_ZBX_INT, O_OPT,  P_SYS, DB_ID, 			null),
 		'del_linktriggers'=>	array(T_ZBX_INT, O_OPT,  NULL, 	DB_ID, 			null),
@@ -200,7 +200,7 @@ function addLinkTriggers(mapid,triggers,drawtype,color){
 			'color': color
 		};
 
-		window.opener.ZBX_SYSMAPS[mapid].map.form_link_addLinktrigger(linktrigger);
+		window.opener.ZBX_SYSMAPS[mapid].map.form.form_link_addLinktrigger(linktrigger);
 	}
 
 	window.close();
