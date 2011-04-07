@@ -36,67 +36,28 @@ function create_map(container,sysmapid,id){
 
 
 	ZBX_SYSMAPS[id] = new Object;
-	ZBX_SYSMAPS[id].map = new Cmap(container,sysmapid,id);
+	ZBX_SYSMAPS[id].map = new CMap(container,sysmapid,id);
 }
 
-var Cmap = Class.create(CDebug,{
+var CMap = Class.create(CDebug,{
 id:	null,							// own id
-sysmapid: null,						// sysmapid
+data: null,							// local sysmap DB :)
+
 container: null,					// selements and links HTML container (D&D droppable area)
 mapimg: null,						// HTML element map img
 
 grid: null,							// grid object
 
-sysmap:	{},							// map data
-selements: {},						// map selements array
-links:	{},							// map links array
+selements: null,					// map selements array
+links:	null,						// map links array
 
 selection: {
 	count: 0,						// number of selected elements
 	selements: {}					// selected SElements
 },
 
-menu_active: 0,						// To recognize D&D
-debug_status: 0,
-
-mselement: {
-	selementid:			0,			// ALWAYS must be a STRING (js doesn't support uint64)
-	elementtype:		4,			// 5-UNDEFINED
-	elementid:			0,			// ALWAYS must be a STRING (js doesn't support uint64)
-	elementName:		'',			// element name
-	iconid_off:			0,			// ALWAYS must be a STRING (js doesn't support uint64)
-	iconid_on:			0,			// ALWAYS must be a STRING (js doesn't support uint64)
-	iconid_maintenance:	0,		// ALWAYS must be a STRING (js doesn't support uint64)
-	iconid_disabled:	0,			// ALWAYS must be a STRING (js doesn't support uint64)
-	label:				locale['S_NEW_ELEMENT'],	// Element label
-	label_expanded:		locale['S_NEW_ELEMENT'],	// Element label macros expanded
-	label_location:		3,
-	x:					0,
-	y:					0,
-	elementsubtype:		0,
-	areatype:			0,
-	width:				200,
-	height:				200,
-	viewtype:			0,
-	urls:				{},
-	html_obj:			null,			// reference to html obj
-	html_objid:			null,			// html elements id
-	selected:			0				// element is not selected
-},
-
-mlink: {
-	linkid:			0,				// ALWAYS must be a STRING (js doesn't support uint64)
-	label:			'',				// Link label
-	label_expanded: '',				// Link label (Expand macros)
-	selementid1:	0,				// ALWAYS must be a STRING (js doesn't support uint64)
-	selementid2:	0,				// ALWAYS must be a STRING (js doesn't support uint64)
-	linktriggers:	null,			// ALWAYS must be a STRING (js doesn't support uint64)
-	tr_desc:		locale['S_SELECT'],		// default trigger caption
-	drawtype:		0,
-	color:			'00CC00',
-	status:			1				// status of link 1 - active, 2 - passive
-},
-
+menuActive: 0,						// To recognize D&D
+debug_status: 2,
 
 mlinktrigger: {
 	linktriggerid:	0,					// ALWAYS must be a STRING (js doesn't support uint64)
@@ -106,22 +67,18 @@ mlinktrigger: {
 	color:			'CC0000'
 },
 
-selementForm:		{},					// container for Selement form dom objects
-linkForm:			{},					// container for link form dom objects
-
 initialize: function($super, container, sysmapid, id){
 	this.id = id;
 	$super('CMap['+id+']');
+//--
+	this.data = {};
+	this.selements = {};
+	this.links = {};
 
 	this.container = $(container);
-
 	if(is_null(this.container)){
 		this.container = document.body;
 //		this.error('Map initialization failed. Unavailable container.');
-	}
-	else{
-//		var pos = getPosition(this.container);
-//		this.container.style.position = 'relative'; //absolute; top:'+pos.top+'px; left:'+pos.left+'px;');
 	}
 
 	if(typeof(sysmapid) != 'undefined'){
@@ -129,7 +86,7 @@ initialize: function($super, container, sysmapid, id){
 
 // add event listeners
 // sysmap
-		addListener($('sysmap_save'), 'click', this.saveSysmap.bindAsEventListener(this), false);
+		addListener($('sysmap_save'), 'click', this.save.bindAsEventListener(this), false);
 
 // grid
 		var gridCtrlElemetns = {
@@ -142,16 +99,14 @@ initialize: function($super, container, sysmapid, id){
 		this.grid = new CGrid(this.id, gridCtrlElemetns);
 
 // selement
-		addListener($('selement_add'), 'click', this.addNewElement.bindAsEventListener(this), false);
-		addListener($('selement_rmv'), 'click', this.remove_selements.bindAsEventListener(this), false);
+		addListener($('selement_add'), 'click', this.createSelement.bindAsEventListener(this), false);
+		addListener($('selement_rmv'), 'click', this.removeSelements.bindAsEventListener(this), false);
 // link
-		addListener($('link_add'), 'click', this.add_empty_link.bindAsEventListener(this), false);
-		addListener($('link_rmv'), 'click', this.remove_links.bindAsEventListener(this), false);
-
-
+		addListener($('link_add'), 'click', this.createLink.bindAsEventListener(this), false);
+		addListener($('link_rmv'), 'click', this.removeLinks.bindAsEventListener(this), false);
 //------
 
-		this.getSysmapBySysmapid(this.sysmapid);
+		this.create();
 	}
 
 	Position.includeScrollOffsets = true;
@@ -159,447 +114,503 @@ initialize: function($super, container, sysmapid, id){
 
 
 // SYSMAP
-getSysmapBySysmapid: function(){
-	this.debug('getSysmapBySysmapid');
-
-	var url = new Curl(location.href);
-	var params = {
-		'favobj': 	'sysmap',
-		'favid':	this.id,
-		'sysmapid': this.sysmapid,
-		'action':	'get'
-	};
-
-	new Ajax.Request(url.getPath()+'?output=ajax'+'&sid='+url.getArgument('sid'),
-					{
-						'method': 'post',
-						'parameters':params,
-//						'onSuccess': function(resp){ SDI(resp.responseText); },
-						'onSuccess': function(){ },
-						'onFailure': function(){ throw('Get selements FAILED.'); }
-					}
-	);
-},
-
-selementDragEnd: function(e, ui){
-	this.debug('selementDragEnd');
-
-	this.deactivate_menu();
-
-	ui.helper.context.style.left = ui.position.left+'px';
-	ui.helper.context.style.top = ui.position.top+'px';
-	var element = ui.helper.context;
-
-	var element_id = element.id.split('_');
-	var selementid = element_id[(element_id.length - 1)];
-
-	var pos = new Array();
-	pos.x = parseInt(element.style.left,10);
-	pos.y = parseInt(element.style.top,10);
-
-	this.selements[selementid].y = pos.y;
-	this.selements[selementid].x = pos.x;
-
-	this.alignSelement(selementid);
-
-	if(isset('selementid', this.selementForm) && isset('x', this.selementForm) && isset('y', this.selementForm)){
-		if(this.selementForm.selementid.value == selementid){
-			this.selementForm.x.value = this.selements[selementid].x;
-			this.selementForm.y.value = this.selements[selementid].y;
-		}
-	}
-
-	this.sysmapUpdate();
-},
-
-sysmapUpdate: function(){
-	this.debug('sysmapUpdate');
-	this.updateMapImage();
-//	alert(id+' : '+this.selementids[id]);
-},
-
-// ---------- FORMS ------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------
-
-//ELEMENTS
-addNewElement: function(){
-	this.debug('addNewElement');
-
-//	var selement = this.mselement;
-
-	var selement = {};
-	for(var key in this.mselement){
-		selement[key] = this.mselement[key];
-	}
-
-	var url = new Curl(location.href);
-
-	var params = {
-		'favobj': 	'selements',
-		'favid':	this.id,
-		'sysmapid':	this.sysmapid,
-		'action':	'new_selement'
-	};
-
-	params['selements'] = Object.toJSON({'0': selement});
-
-	new Ajax.Request(url.getPath()+'?output=ajax'+'&sid='+url.getArgument('sid'),
-					{
-						'method': 'post',
-						'parameters':params,
-						'onSuccess': function(){ },
-//						'onSuccess': function(resp){ SDI(resp.responseText); },
-						'onFailure': function(){ document.location = url.getPath()+'?'+Object.toQueryString(params); }
-					}
-	);
-
-
-	var selem = new CSelement(this);
-},
-
-// CONNECTORS
-add_empty_link: function(e){
-	this.debug('add_empty_link');
+create: function(data){
+	this.debug('create');
 //--
 
-	if(this.selection.count == 2){
-		var selementid1 = null;
-		var selementid2 = null;
+	if(typeof(data) == "undefined"){
+		var url = new Curl(location.href);
+		var params = {
+			'favobj': 	'sysmap',
+			'favid':	this.id,
+			'sysmapid': this.sysmapid,
+			'action':	'get'
+		};
 
-		for(var selementid in this.selection.selements){
-			if(!isset(selementid, this.selements)) continue;
-
-			if(is_null(selementid1)){
-				selementid1 = selementid;
-			}
-			else{
-				selementid2 = selementid;
-				break;
-			}
-		}
+		jQuery.ajax({
+			url: url.getPath()+'?output=json&sid='+url.getArgument('sid'),
+			type: 'POST',
+			data: params,
+			success: this.update.bind(this),
+			error: function(){throw('Get selements FAILED.');}
+		})
+		return;
 	}
-	else{
-		this.info(locale['S_TWO_ELEMENTS_SHOULD_BE_SELECTED']);
-		return false;
-	}
-
-	var mlink = {};
-	for(var key in this.mlink){
-		mlink[key] = this.mlink[key];
-	}
-
-	mlink['selementid1'] = selementid1;
-	mlink['selementid2'] = selementid2;
-
-	mlink['linktriggers'] = {};
-
-	this.add_link(mlink,1);
-	this.update_linkContainer(e);
 },
 
-// SYSMAP FORM
-saveSysmap: function(){
-	this.debug('saveSysmap');
+update: function(mapData){
+	this.debug('update');
+//--
+
+	if(typeof(mapData) != "undefined"){
+		for(var key in mapData){
+			this.data[key] = mapData[key];
+		}
+
+
+		for(var selementid in this.data.selements)
+			this.createSelement(null, this.data.selements[selementid]);
+
+		for(var linkid in this.data.links)
+			this.createLink(null, this.data.links[linkid])
+	}
+
+	this.updateImage();
+},
+
+save: function(){
+	this.debug('save');
+//--
 
 	var url = new Curl(location.href);
-	var params = {
-		'favobj': 	'sysmap',
-		'favid':	this.id,
-		'sysmapid':	this.sysmapid,
-		'grid_size': this.grid.gridSize,
-		'grid_show': this.grid.showGrid ? '1' : '0',
-		'grid_align': this.grid.autoAlign ? '1' : '0',
-		'action':	'save'
-	};
-
-	params = this.get_update_params(params);
-	new Ajax.Request(url.getPath()+'?output=ajax'+'&sid='+url.getArgument('sid'),
-					{
-						'method': 'post',
-						'parameters':params,
-						'onSuccess': function(){ },
-//						'onSuccess': function(resp){ SDI(resp.responseText); },
-						'onFailure': function(){ document.location = url.getPath()+'?'+Object.toQueryString(params); }
-					}
-	);
+	jQuery.ajax({
+		"url":			url.getPath()+'?output=ajax'+'&sid='+url.getArgument('sid'),
+		"favobj":		"sysmap",
+		"action":		"save",
+		"favid":		this.id,
+		"sysmapid":		this.sysmapid,
+		"grid_size":	this.grid.gridSize,
+		"grid_show":	this.grid.showGrid ? "1" : "0",
+		"grid_align":	this.grid.autoAlign ? "1" : "0",
+		"sysmap":		Object.toJSON(this.data),
+		"error":		function(){document.location = url.getPath()+'?'+Object.toQueryString(params);}
+	});
 },
-//------------------------------------------------------------------------
+
+updateImage: function(){
+	this.debug('updateImage');
+//--
+
+	var url = new Curl(location.href);
+	var urlText = 'map.php'+'?sid='+url.getArgument('sid');
+
+// grid
+	if(this.grid.showGrid)
+		urlText += '&grid='+this.grid.gridSize;
+
+	jQuery.ajax({
+			url: urlText,
+		type: 'post',
+		data: {
+			'output': 'json',
+			'sysmapid': this.sysmapid,
+			'noselements':	1,
+			'nolinks':	1,
+			'selements': Object.toJSON(this.data.selements),
+			'links': Object.toJSON(this.data.links)
+		},
+		success: this.setImage.bind(this),
+		error: function(){info('Map image update failed');}
+	});
+},
+
+setImage: function(data){
+	this.debug('setImage');
+//--
+
+	if(is_null(this.mapimg)){
+		this.mapimg = $('sysmap_img');
+//		this.container.appendChild(this.mapimg);
+
+		this.mapimg.setAttribute('alt','Sysmap');
+		this.mapimg.setAttribute('id','mapimg_'+this.sysmapid);
+		this.mapimg.className = 'image';
+
+		this.mapimg.style.zIndex = '1';
+
+		addListener(this.mapimg, 'load', this.setContainer.bindAsEventListener(this), false);
+		addListener(window, 'resize', this.setContainer.bindAsEventListener(this), false);
+	}
+
+//	this.mapimg.setAttribute('src','data:image/png;base64,'+data.result);
+	this.mapimg.setAttribute('src','imgstore.php?imageid='+data.result);
+},
 
 // ---------- ELEMENTS ------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------
-
-select_selement: function(selementid, multi){
-	this.debug('select_selement');
+createSelement: function(e, selementData){
+	this.debug('createSelement');
 //--
-	if(!isset(selementid, this.selements) || empty(this.selements[selementid])) return false;
+	var selementData = selementData || {};
 
-	var multi = multi || false;
-	var selement = this.selements[selementid];
-
-	if((typeof(this.selements[selementid]) != 'undefiend') && !empty(this.selements[selementid])){
-		if(is_null(this.selements[selementid].selected)){
-			this.selection.selements[selementid] = selementid;
-			this.selements[selementid].selected = selementid;
-
-			selement.html_obj.style.border = '1px #3333FF solid';
-			selement.html_obj.style.backgroundColor = '#00AAAA';
-			selement.html_obj.style.opacity = '.60';
-
-			this.selection.count++;
-		}
-		else if((this.selection.count > 1) && !multi){
-// if selected several selements and then we clicked on one of them
-		}
-		else{
-			this.selection.count--;
-
-			this.selection.selements[selement.selementid] = null;
-			delete(this.selection.selements[selement.selementid]);
-
-			this.selements[selementid].selected = null;
-
-			selement.html_obj.style.border = '0px';
-			selement.html_obj.style.backgroundColor = 'transparent';
-			selement.html_obj.style.opacity = '1';
-		}
-
-		if(!multi && (this.selection.count > 1)){
-
-			for(var selectedSelementid in this.selection.selements){
-				if(empty(this.selection.selements[selectedSelementid]) || (selectedSelementid == selementid)) continue;
-
-				this.selection.count--;
-
-				this.selements[selectedSelementid].selected = null;
-				this.selements[selectedSelementid].html_obj.style.border = '0px';
-				this.selements[selectedSelementid].html_obj.style.backgroundColor = 'transparent';
-				this.selements[selectedSelementid].html_obj.style.opacity = '1';
-
-				this.selection.selements[selectedSelementid] = null;
-				delete(this.selection.selements[selectedSelementid]);
-			}
-		}
-	}
-
-return false;
-},
-
-alignSelement: function(selementid){
-	this.debug('alignSelement');
-//--
-
-	if(!this.grid.autoAlign) return true;
-
-	if(!isset(selementid, this.selements) || empty(this.selements[selementid])) return false;
-
-	var selement = 	this.selements[selementid];
-
-	var dims = getDimensions(selement.html_obj);
-	var shiftX = Math.round(dims.width / 2);
-	var shiftY = Math.round(dims.height / 2);
-
-	var newX = parseInt(selement.x, 10) + shiftX;
-	var newY = parseInt(selement.y, 10) + shiftY;
-
-	newX = Math.floor(newX / this.grid.gridSize) * this.grid.gridSize;
-	newY = Math.floor(newY / this.grid.gridSize) * this.grid.gridSize;
-
-// centrillize
-	newX += Math.round(this.grid.gridSize / 2) - shiftX;
-	newY += Math.round(this.grid.gridSize / 2) - shiftY;
-
-// limits
-	if(newX < shiftX) newX = 0;
-	else if((newX + dims.width) > this.sysmap.width) newX = this.sysmap.width - dims.width;
-
-	if(newY < shiftY) newY = 0;
-	else if((newY + dims.height) > this.sysmap.height) newY = this.sysmap.height - dims.height;
-//--
-
-	this.selements[selementid].y = newY;
-	this.selements[selementid].x = newX;
-
-	this.selements[selementid].html_obj.style.top = newY+'px';
-	this.selements[selementid].html_obj.style.left = newX+'px';
-},
-
-add_selement: function(selement, update_icon){
-	this.debug('add_selement');
-//--
-	var selementid = 0;
-	if((typeof(selement['selementid']) == 'undefined') || (selement['selementid'] == 0)){
+	if(!isset('selementid', selementData) || (selementData.selementid == 0)){
 		do{
-			selementid = parseInt(Math.random(1000000000) * 1000000000);
-			selementid = selementid.toString();
-		}while(isset(selementid, this.selements));
+			selementData.selementid = parseInt(Math.random(1000000000) * 10000000);
+			selementData.selementid = selementData.selementid.toString();
+		}while(isset(selementData.selementid, this.data.selements));
 
-		selement['new'] = 'new';
-		selement['selementid'] = selementid;
+		selementData.label_location = this.data.label_location;
+		selementData.iconid_off = this.data.defaultSelementIconId;
+		selementData.image = this.data.defaultSelementIconId;
 	}
-	else{
-		selementid = selement.selementid;
-	}
-
-	if(typeof(this.selements[selementid]) == 'undefined'){
-		selement.selected = null;
-	}
-	else{
-		selement.selected = this.selements[selementid].selected;
-	}
-
-	if((typeof(update_icon) != 'undefined') && (update_icon != 0)){
-		selement.html_obj = this.addSelementImage(selement);
-		selement.image = null;
-	}
-
-	this.selements[selementid] = selement;
-},
-
-updateSelementOption: function(selementid, params){ // params = {'key': value, 'key': value}
-	this.debug('updateSelementOption');
 //--
 
-	if(!isset(selementid, this.selements) || empty(this.selements[selementid])) return false;
+	this.selements[selementData.selementid] = new CSelement(this, selementData);
+	this.selements[selementData.selementid].create();
 
-
-	for(var key in params){
-		if(empty(params[key])) continue;
-
-		if(key == 'urls'){
-			for(var urlname in params[key]){
-				if(empty(params[key][urlname])) continue;
-
-				if(isset(urlname, this.selements[selementid].urls)){
-					this.selements[selementid].urls[urlname].url = params[key][urlname].url;
-				}
-				else{
-					this.selements[selementid].urls[urlname] = params[key][urlname];
-					this.selements[selementid].urls[urlname]['new'] = 'new';
-				}
-			}
-		}
-
-		if(is_number(params[key])) params[key] = params[key].toString();
-		this.selements[selementid][key] = params[key];
-	}
-
-	this.updateSelement(this.selements[selementid]);
+// selement created by event (need to update sysmap)
+	if(!is_null(e))
+		this.update();
 },
 
-updateSelement: function(selement){
-	this.debug('updateSelement');
-//--
-
-	var url = new Curl(location.href);
-
-	var params = {
-		'favobj': 	'selements',
-		'favid':	this.id,
-		'sysmapid':	this.sysmapid,
-		'action':	'get_img'
-	};
-
-	params['selements'] = Object.toJSON({'0': selement});
-
-	new Ajax.Request(url.getPath()+'?output=ajax'+'&sid='+url.getArgument('sid'),
-					{
-						'method': 'post',
-						'parameters':params,
-//						'onSuccess': function(){ },
-//						'onSuccess': function(resp){ SDI(resp.responseText); },
-						'onFailure': function(){ document.location = url.getPath()+'?'+Object.toQueryString(params); }
-					}
-	);
-},
-
-remove_selements: function(e){
-	this.debug('remove_selements');
+removeSelements: function(e){
+	this.debug('removeSelements');
 //--
 
 	if(Confirm(locale['S_DELETE_SELECTED_ELEMENTS_Q'])){
 		for(var selementid in this.selection.selements){
 			if(!isset(selementid, this.selements)) continue;
 
-			this.remove_selement(selementid);
+			this.removeLinksBySelementId(selementid);
+			this.selements[selementid].remove();
 		}
 
-		this.formHide(e);
-		this.updateMapImage();
+		this.form.hide(e);
+		this.updateImage();
 	}
 },
 
-remove_selement: function(selementid, update_map){
-	this.debug('remove_selement');
+// CONNECTORS
+createLink: function(e, linkData){
+	this.debug('createLink');
 //--
 
-	if(!isset(selementid, this.selements) || empty(this.selements[selementid])) return false;
+	var linkData = linkData || {};
 
-// Unselect
-	this.selection.count--;
-	this.selection.selements[selementid] = null;
-	delete(this.selection.selements[selementid]);
+	if(!isset('linkid', linkData) || (linkData['linkid'] == 0)){
+		if(this.selection.count != 2){
+			this.info(locale['S_TWO_ELEMENTS_SHOULD_BE_SELECTED']);
+			return false;
+		}
 
-// Remove related links
-	this.remove_links_by_selementid(selementid);
-// remove icon
-	this.remove_selement_img(this.selements[selementid]);
+		do{
+			linkData.linkid = parseInt(Math.random(1000000000) * 1000000000);
+			linkData.linkid = linkData.linkid.toString();
+		} while(isset(linkData.linkid, this.links));
 
-//		this.selements[selementid].html_obj.remove();
-// remove selement
-	this.selements[selementid] = null;
-	delete(this.selements[selementid]);
+		linkData.selementid1 = null;
+		linkData.selementid2 = null;
 
+		for(var selementid in this.selection.selements){
+			if(!is_null(linkData.selementid2)) break;
 
-	if((typeof(update_map) != 'undefined') && (update_map != 0)){
-		this.updateMapImage();
+			if(is_null(linkData.selementid1))
+				linkData.selementid1 = selementid;
+			else
+				linkData.selementid2 = selementid;
+		}
+	}
+
+	this.links[linkData.linkid] = new CLink(this, linkData);
+	this.links[linkData.linkid].create();
+
+// update form
+	this.form.update_linkContainer(e);
+
+// link created by event (need to update sysmap)
+	if(!is_null(e))
+		this.update();
+},
+
+removeLinks: function(e){
+	this.debug('removeLinks');
+//--
+
+	if(this.selection.count != 2){
+		this.info(locale['S_PLEASE_SELECT_TWO_ELEMENTS']);
+		return false;
+	}
+
+	var selementid1 = null;
+	var selementid2 = null;
+
+	for(var selementid in this.selection.selements){
+		if(!is_null(selementid2)) break;
+
+		if(is_null(selementid1))
+			selementid1 = selementid;
+		else
+			selementid2 = selementid;
+	}
+
+	var linkids = this.getLinksBySelementIds(selementid1,selementid2);
+
+	if(linkids.length == 0) return false;
+
+	if(Confirm(locale['S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q'])){
+		for(var i=0; i<linkids.length;i++){
+			this.links[linkids[i]].remove();
+		}
+
+		this.form.hide(e);
+		this.updateImage();
 	}
 },
 
-// ---------- CONNECTORS ------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------
 
-get_linkid_by_selementids: function(selementid1,selementid2){
-	this.debug('get_linkid_by_selementids');
+removeLinksBySelementId: function(selementid){
+	this.debug('removeLinksBySelementId');
+
+	var linkids = this.getLinksBySelementIds(selementid);
+	for(var i=0; i<linkids.length;i++){
+		this.links[linkids[i]].remove();
+	}
+},
+
+
+getLinksBySelementIds: function(selementid1,selementid2){
+	this.debug('getLinksBySelementIds');
 //--
 
 	if(typeof(selementid2) == 'undefined') selementid2 = null;
 
-	var links = {};
-	for(var linkid in this.links){
-		if(empty(this.links[linkid])) continue;
+	var links = [];
+	for(var linkid in this.data.links){
+		if(empty(this.data.links[linkid])) continue;
 
 		if(is_null(selementid2)){
-			if((this.links[linkid].selementid1 == selementid1) || (this.links[linkid].selementid2 == selementid1))
-				links[linkid] = linkid;
+			if((this.data.links[linkid].selementid1 == selementid1) || (this.data.links[linkid].selementid2 == selementid1))
+				links.push(linkid);
 		}
 		else{
-			if((this.links[linkid].selementid1 == selementid1) && (this.links[linkid].selementid2 == selementid2))
-				links[linkid] = linkid;
-			else if((this.links[linkid].selementid1 == selementid2) && (this.links[linkid].selementid2 == selementid1))
-				links[linkid] = linkid;
+			if((this.data.links[linkid].selementid1 == selementid1) && (this.data.links[linkid].selementid2 == selementid2))
+				links.push(linkid);
+			else if((this.data.links[linkid].selementid1 == selementid2) && (this.data.links[linkid].selementid2 == selementid1))
+				links.push(linkid);
 		}
 	}
 
 return links;
 },
 
+//--------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
+
+setContainer: function(event){
+	var sysmap_pn = getPosition(this.mapimg);
+	var sysmap_ds = Element.getDimensions(this.mapimg);
+
+	var container_pn = getPosition(this.container);
+	var container_ds = Element.getDimensions(this.container);
+
+	if((container_pn.top != sysmap_pn.top) ||
+		(container_pn.left != sysmap_pn.left) ||
+		(container_ds.height != sysmap_ds.height) ||
+		(container_ds.width != sysmap_ds.width))
+	{
+		this.container.style.top = sysmap_pn.top+'px';
+		this.container.style.left = sysmap_pn.left+'px';
+		this.container.style.height = sysmap_ds.height+'px';
+		this.container.style.width = sysmap_ds.width+'px';
+	}
+
+	Event.stop(event)
+},
+
+activateMenu: function(){
+	this.debug('activateMenu');
+	this.menuActive = 1;
+},
+
+deactivateMenu: function(){
+	this.debug('deactivateMenu');
+	this.menuActive = 0;
+},
+
+
+//------------------------------------------------------------------------------------------------------
+// ---------- MENU ------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------
+
+showMenu: function(e){
+	this.debug('showMenu');
+	if(this.menuActive != 1) return true;
+
+	var e = e || window.event;
+	var element = Event.element(e);
+	var element_id = element.id.split('_');
+	var selementid = element_id[(element_id.length - 1)];
+
+
+	this.selements[selementid].toggleSelect((e.ctrlKey || e.shiftKey));
+
+	if(this.selection.count == 0){
+		this.form.hide(e);
+	}
+	else{
+		if(is_null(this.form)) this.form = new CForm(this);
+
+		this.form.show(e, selementid);
+	}
+}
+
+
+//  Form  ------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------
+
+
+
+//**************************************************************************************************************
+//**************************************************************************************************************
+//**************************************************************************************************************
+//**************************************************************************************************************
+});
+
+var CGrid = Class.create(CDebug, {
+mapObjectId:	null,						// own id
+sysmapid:	null,				// sysmapid
+showGrid:	true,				// grid On|Off
+autoAlign:	true,				// align icons on drag end
+gridSize:	'50',				// grid size
+
+initialize: function($super, id, params){
+	this.mapObjectId = id;
+
+	// setting map grid params to default ones
+	var gridSizeDropDownValue = params.gridsize.value.split('x');
+	this.gridSize = gridSizeDropDownValue[0];
+	this.showGrid = params.gridshow.innerHTML == locale['S_SHOWN'];
+	this.autoAlign = params.gridautoalign.innerHTML == locale['S_ON'];
+
+	$super('CGrid['+id+']');
+
+	if(!params) var params = {};
+
+	if(isset('gridsize', params))
+		addListener(params.gridsize, 'change', this.setGridSize.bindAsEventListener(this), false);
+	if(isset('gridautoalign', params))
+		addListener(params.gridautoalign, 'click', this.setGridAutoAlign.bindAsEventListener(this), false);
+	if(isset('gridshow', params))
+		addListener(params.gridshow, 'click', this.setGridView.bindAsEventListener(this), false);
+	if(isset('gridalignall', params))
+		addListener(params.gridalignall, 'click', this.gridAlignIcons.bindAsEventListener(this), false);
+},
+
+setGridSize: function(e){
+	this.debug('setGridSize');
+//--
+
+	var domObject = Event.element(e);
+	var tmpGS = domObject.options[domObject.selectedIndex].value.split('x');
+
+	if(!isset(0, tmpGS)) this.gridSize = 50;
+	else this.gridSize = tmpGS[0];
+
+	this.updateMapView(e);
+},
+
+setGridAutoAlign: function(e){
+	this.debug('setGridAutoAlign');
+//--
+
+	var domObject = Event.element(e);
+	if(this.autoAlign){
+		this.autoAlign = false;
+		domObject.update(locale['S_OFF']);
+	}
+	else{
+		this.autoAlign = true;
+		domObject.update(locale['S_ON']);
+	}
+},
+
+setGridView: function(e){
+	this.debug('setGridView');
+//--
+	var domObject = Event.element(e);
+	if(this.showGrid){
+		this.showGrid = false;
+		$(domObject).update(locale['S_HIDDEN']);
+	}
+	else{
+		this.showGrid = true;
+		$(domObject).update(locale['S_SHOWN']);
+	}
+
+	this.updateMapView(e);
+},
+
+// ACTION
+gridAlignIcons: function(e){
+	this.debug('gridAlignIcons');
+
+	var tmpAutoAlign = this.autoAlign;
+	this.autoAlign = true;
+
+	for(var selementid in ZBX_SYSMAPS[this.mapObjectId].map.selements){
+		if(empty(ZBX_SYSMAPS[this.mapObjectId].map.selements[selementid])) continue;
+
+		ZBX_SYSMAPS[this.mapObjectId].map.selements[selementid].align();
+	}
+
+	this.autoAlign = tmpAutoAlign;
+	this.updateMapView(e);
+},
+
+// Update
+updateMapView: function(e){
+	this.debug('setGridView');
+//--
+
+	ZBX_SYSMAPS[this.mapObjectId].map.updateImage();
+}
+});
+//]]
+//*
+// *******************************************************************
+//		SELEMENT object (unfinished)
+// *******************************************************************
+var CLink = Class.create(CDebug, {
+id:				null,			// selement id
+sysmap:			null,			// Parent sysmap reference
+
+data:			null,
+
+debug_status:	0,
+
+//----------------------------------------------------------------------------------------------
+
+initialize: function($super, sysmap, linkData){
+	this.id = linkData.linkid;
+	$super('CLink['+this.id+']');
+//--
+	this.sysmap = sysmap;
+
+	this.data = {
+		linkid:			0,				// ALWAYS must be a STRING (js doesn't support uint64)
+		label:			'',				// Link label
+		label_expanded: '',				// Link label (Expand macros)
+		selementid1:	0,				// ALWAYS must be a STRING (js doesn't support uint64)
+		selementid2:	0,				// ALWAYS must be a STRING (js doesn't support uint64)
+		linktriggers:	{},				// linktriggers list
+		tr_desc:		locale['S_SELECT'],		// default trigger caption
+		drawtype:		0,
+		color:			'00CC00',
+		status:			1				// status of link 1 - active, 2 - passive
+	};
+
+	for(var key in linkData){
+		if(is_null(linkData[key])) continue;
+
+		if(is_number(linkData[key]))
+			linkData[key] = linkData[key].toString();
+
+		this.data[key] = linkData[key];
+	}
+},
+
+create: function(e){
+	this.debug('create');
+//--
+
+// assign by reference!!
+	this.sysmap.data.links[this.id] = this.data;
+	//this.sysmap.links[this.id] = this;
+//--
+},
+
 add_link: function(mlink, update_map){
 	this.debug('add_link');
 //--
-
-	var linkid = 0;
-	if(!isset('linkid', mlink) || (mlink['linkid'] == 0)){
-		do{
-			linkid = parseInt(Math.random(1000000000) * 1000000000);
-			linkid = linkid.toString();
-		}while(isset(linkid, this.links));
-
-		mlink['new'] = 'new';
-		mlink['linkid'] = linkid;
-	}
-	else{
-		linkid = mlink.linkid;
-	}
 
 	if(is_array(mlink.linktriggers)){
 		var tmp_lts = {};
@@ -624,109 +635,54 @@ add_link: function(mlink, update_map){
 	this.links[linkid] = mlink;
 
 	if((typeof(update_map) != 'undefined') && (update_map == 1)){
-		this.updateMapImage();
+		this.updateImage();
 	}
 },
 
 
-update_link_option: function(linkid, params, update_map){ // params = [{'key': key, 'value':value},{'key': key, 'value':value},...]
-	this.debug('update_link_option');
+update: function(params){ // params = [{'key': key, 'value':value},{'key': key, 'value':value},...]
+	this.debug('update');
 //--
 
-	if(!isset(linkid, this.links) || empty(this.links[linkid])) return false;
-//SDI(key+' : '+value);
 	for(var key in params){
 		if(is_null(params[key])) continue;
 
+//SDI(key+' : '+params[key]);
 		if(key == 'selementid1'){
-			if(this.links[linkid]['selementid2'] == params[key])
+			if(this.data.selementid2 == params[key])
 			return false;
 		}
 
 		if(key == 'selementid2'){
-			if(this.links[linkid]['selementid1'] == params[key])
+			if(this.data.selementid1 == params[key])
 			return false;
 		}
 
 		if(is_number(params[key])) params[key] = params[key].toString();
-		this.links[linkid][key] = params[key];
-//SDI(key+' : '+value);
-	}
-
-	if((typeof(update_map) != 'undefined') && (update_map == 1)){
-		this.updateMapImage();
+		this.data[key] = params[key];
 	}
 },
 
-remove_links: function(e){
-	this.debug('remove_links');
+remove: function(){
+	this.debug('remove');
 //--
 
-	if(this.selection.count == 2){
-		var selementid1 = null;
-		var selementid2 = null;
-
-		for(var selementid in this.selection.selements){
-			if(!isset(selementid, this.selements)) continue;
-
-			if(is_null(selementid1)){
-				selementid1 = selementid;
-			}
-			else{
-				selementid2 = selementid;
-				break;
-			}
-		}
-	}
-	else{
-		this.info(locale['S_PLEASE_SELECT_TWO_ELEMENTS']);
-		return false;
-	}
-
-	var linkids = this.get_linkid_by_selementids(selementid1,selementid2);
-
-	if(linkids !== false){
-		if(Confirm(locale['S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q'])){
-			for(var linkid in linkids){
-				this.remove_link(linkid);
-			}
-
-			this.formHide(e);
-			this.updateMapImage();
-		}
-	}
+	this.sysmap.links[this.id] = null;
+	delete(this.sysmap.links[this.id]);
 },
 
-
-remove_link: function(linkid, update_map){
-	this.debug('remove_link');
+reload: function(data){
+	this.debug('reload');
 //--
 
-	if(!isset(linkid, this.links) || empty(this.links[linkid])) return false;
+	if(typeof(data) != "undefined")
+		this.update(data);
 
-	this.links[linkid] = null;
-	delete(this.links[linkid]);
-
-	if((typeof(update_map) != 'undefined') && (update_map == 1)){
-		this.updateMapImage();
-	}
+	this.sysmap.updateImage();
 },
 
-
-remove_links_by_selementid: function(selementid){
-	this.debug('remove_links_by_selementid');
-
-	for(var linkid in this.links){
-		if(empty(this.links[linkid])) continue;
-
-		if((this.links[linkid].selementid1 == selementid) || (this.links[linkid].selementid2 == selementid)){
-			this.remove_link(linkid);
-		}
-	}
-},
-
-add_linktrigger: function(linkid, linktrigger, update_map){
-	this.debug('add_linktrigger');
+createLinkTrigger: function(linktrigger, update_map){
+	this.debug('createLinkTrigger');
 //--
 
 	if(!isset(linkid,this.links) || empty(this.links[linkid])) return false;
@@ -756,12 +712,12 @@ add_linktrigger: function(linkid, linktrigger, update_map){
 	this.links[linkid].linktriggers[linktriggerid] = linktrigger;
 
 	if((typeof(update_map) != 'undefined') && (update_map == 1)){
-		this.updateMapImage();
+		this.updateImage();
 	}
 },
 
-update_linktrigger_option: function(linkid, linktriggerid, params, update_map){
-	this.debug('update_linktrigger_option');
+updateLinkTrigger: function(linktriggerid, params, update_map){
+	this.debug('updateLinkTrigger');
 //--
 
 	if(!isset(linkid,this.links) || empty(this.links[linkid])) return false;
@@ -777,12 +733,12 @@ update_linktrigger_option: function(linkid, linktriggerid, params, update_map){
 	}
 
 	if((typeof(update_map) != 'undefined') && (update_map == 1)){
-		this.updateMapImage();
+		this.updateImage();
 	}
 },
 
-remove_linktrigger: function(linkid, linktriggerid, update_map){
-	this.debug('remove_linktrigger');
+removeLinkTrigger: function(linktriggerid, update_map){
+	this.debug('removeLinkTrigger');
 //--
 
 	if(!isset(linkid,this.links) || empty(this.links[linkid])) return false;
@@ -792,277 +748,379 @@ remove_linktrigger: function(linkid, linktriggerid, update_map){
 	delete(this.links[linkid].linktriggers[linktriggerid]);
 
 	if((typeof(update_map) != 'undefined') && (update_map == 1)){
-		this.updateMapImage();
+		this.updateImage();
+	}
+}
+});
+//*
+// *******************************************************************
+//		SELEMENT object (unfinished)
+// *******************************************************************
+var CSelement = Class.create(CDebug, {
+id:				null,			// selement id
+sysmap:			null,			// Parent sysmap reference
+
+data:			null,
+
+domNode:		null,			// dom reference to html obj
+selected:		false,			// element is not selected
+
+debug_status:	2,
+
+//----------------------------------------------------------------------------------------------
+
+initialize: function($super, sysmap, selementData){
+	this.id = selementData.selementid;
+	$super('CSelement['+this.id+']');
+//--
+	this.sysmap = sysmap;
+
+	this.data = {
+		selementid:			0,			// ALWAYS must be a STRING (js doesn't support uint64)
+		elementtype:		4,			// 5-UNDEFINED
+		elementid:			0,			// ALWAYS must be a STRING (js doesn't support uint64)
+		elementName:		'',			// element name
+		iconid_off:			0,			// ALWAYS must be a STRING (js doesn't support uint64)
+		iconid_on:			0,			// ALWAYS must be a STRING (js doesn't support uint64)
+		iconid_maintenance:	0,			// ALWAYS must be a STRING (js doesn't support uint64)
+		iconid_disabled:	0,			// ALWAYS must be a STRING (js doesn't support uint64)
+		label:				locale['S_NEW_ELEMENT'],	// Element label
+		label_expanded:		locale['S_NEW_ELEMENT'],	// Element label macros expanded
+		label_location:		3,
+		x:					0,
+		y:					0,
+		elementsubtype:		0,
+		areatype:			0,
+		width:				200,
+		height:				200,
+		viewtype:			0,
+		urls:				{}
+	};
+
+	for(var key in selementData){
+		if(is_null(selementData[key])) continue;
+
+		if(is_number(selementData[key]))
+			selementData[key] = selementData[key].toString();
+
+		this.data[key] = selementData[key];
 	}
 },
-// ---------- IMAGES MANIPULATION ------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------
 
-// ELEMENTS
-addSelementImage: function(selement){
-	this.debug('addSelementImage');
+create: function(){
+	this.debug('update');
+//--
 
-	var dom_id = 'selement_'+selement.selementid;
+// assign by reference!!
+	this.sysmap.data.selements[this.id] = this.data;
+//	this.sysmap.selements[this.id] = this;
+//--
 
-	var selement_div = $(dom_id);
-	if(is_null(selement_div)){
-//		var selement_div = document.createElement('img');
-		var selement_div = document.createElement('div');
-		this.container.appendChild(selement_div);
-
-		selement_div.setAttribute('id',dom_id);
-//		selement_div.setAttribute('alt','selement_'+selement.id);
-		selement_div.style.position = 'absolute';
-		selement_div.style.visibility = 'hidden';
-
-		this.makeSelementDragable(selement_div);
-	}
-
-	var position = {};
-	position.top = parseInt(selement.y,10);
-	position.left = parseInt(selement.x,10);
-
-//	selement_div.setAttribute('src','data:image/png;base64,'+selement.image);
-//	selement_div.setAttribute('src','imgstore.php?iconid='+selement.image);
-	selement_div.className = 'pointer sysmap_iconid_'+selement.image;
-
-	selement_div.style.zIndex = '10';
-	selement_div.style.position = 'absolute';
-	selement_div.style.top = position.top+'px';
-	selement_div.style.left = position.left+'px';
-	selement_div.style.visibility = 'visible';
-
-	if(!is_null(selement.selected)){
-		selement_div.style.border = '1px #3333FF solid';
-		selement_div.style.backgroundColor = '#00AAAA';
-		selement_div.style.opacity = '.60';
-	}
-
-return selement_div;
+	this.reload();
 },
 
-updateSelementsIcon: function(){
-	this.debug('updateSelementsIcon');
+update: function(params){ // params = {'key': value, 'key': value}
+	this.debug('update');
+//--
 
-	if(is_null(this.mapimg)){
-		setTimeout('ZBX_SYSMAPS['+this.id+'].map.updateSelementsIcon();',500);
+// must be before any update
+	this.data.image = null;
+//--
+
+	for(var key in params){
+		if(is_null(params[key])) continue;
+
+		if(key == 'urls'){
+			for(var urlname in params[key]){
+				if(empty(params[key][urlname])) continue;
+
+				if(isset(urlname, this.data.urls)){
+					this.data.urls[urlname].url = params[key][urlname].url;
+				}
+				else{
+					this.data.urls[urlname] = params[key][urlname];
+					this.data.urls[urlname]['new'] = 'new';
+				}
+			}
+			continue;
+		}
+
+		if(is_number(params[key])) params[key] = params[key].toString();
+		this.data[key] = params[key];
+	}
+},
+
+
+reload: function(data){
+	this.debug('reload');
+//--
+	if(typeof(data) != "undefined")
+		this.update(data);
+
+	if(!isset('image', this.data) || empty(this.data.image)){
+		var url = new Curl(location.href);
+
+		jQuery.ajax({
+			url: url.getPath()+'?sid='+url.getArgument('sid'),
+			type: "POST",
+			data: {
+				"output":		"json",
+				"favobj":		"selements",
+				"favid":		this.sysmap.id,
+				"sysmapid":		this.sysmap.sysmapid,
+				"action":		"getIcon",
+				"selements":	Object.toJSON([this.data])
+			},
+			dataType: "json",
+			success: this.reload.bind(this),
+			error: function(){document.location = url.getPath()+'?'+Object.toQueryString(params);}
+		});
+
+		return;
+	}
+
+	this.updateIcon();
+},
+
+remove: function(){
+	this.debug('remove');
+//--
+	this.toggleSelect(false,false);
+
+	jQuery(this.domNode).draggable('destroy');
+	jQuery(this.domNode).remove();
+
+	this.sysmap.selements[this.id] = null;
+	this.sysmap.data.selements[this.id] = null;
+	delete(this.sysmap.selements[this.data.selementid]);
+	delete(this.sysmap.data.selements[this.id]);
+
+	this.domNode = null;
+	this.selected = null;
+	this.data = null;
+	delete(this.data);
+
+	this.sysmap = null;
+},
+
+
+toggleSelect: function(multi, state){
+	this.debug('select');
+//--
+	var multi = multi || false;
+	var state = state || !this.selected;
+
+	if(state){
+		this.sysmap.selection.count++;
+
+		this.sysmap.selection.selements[this.id] = this;
+		this.selected = true;
+	}
+	else if(!multi && (this.sysmap.selection.count > 1)){
+// if selected several selements and then we clicked on one of them
 	}
 	else{
-		for(var selementid in this.selements){
-			if(empty(this.selements[selementid])) continue;
+		this.sysmap.selection.count--;
 
-			this.selements[selementid].html_obj = this.addSelementImage(this.selements[selementid]);
-			this.selements[selementid].image = null;
+		this.sysmap.selection.selements[this.id] = null;
+		delete(this.sysmap.selection.selements[this.id]);
+
+		this.selected = false;
+	}
+
+	this.updateIcon();
+
+	if(!multi && (this.sysmap.selection.count > 1)){
+		for(var selementId in this.sysmap.selection.selements){
+			this.sysmap.selection.count--;
+
+			this.sysmap.selection.selements[selementId].toggleSelect(false,false);
 		}
 	}
 },
 
-remove_selement_img: function(selement){
-	this.debug('remove_selement_img');
+align: function(){
+	this.debug('align');
+//--
+	if(!this.sysmap.grid.autoAlign) return true;
 
-	jQuery(selement.html_obj).draggable('destroy')	;
-	selement.html_obj.remove();
+	var dims = {
+		height: jQuery(this.domNode).height(),
+		width: jQuery(this.domNode).width()
+	};
+
+	var shiftX = Math.round(dims.width / 2);
+	var shiftY = Math.round(dims.height / 2);
+
+	var newX = parseInt(this.data.x, 10) + shiftX;
+	var newY = parseInt(this.data.y, 10) + shiftY;
+
+	var gridSize = parseInt(this.sysmap.grid.gridSize, 10);
+
+	newX = Math.floor(newX / gridSize) * gridSize;
+	newY = Math.floor(newY / gridSize) * gridSize;
+
+// centrillize
+	newX += Math.round(gridSize / 2) - shiftX;
+	newY += Math.round(gridSize / 2) - shiftY;
+
+// limits
+	if(newX < shiftX)
+		newX = 0;
+	else if((newX + dims.width) > this.sysmap.data.width)
+		newX = this.sysmap.data.width - dims.width;
+
+	if(newY < shiftY)
+		newY = 0;
+	else if((newY + dims.height) > this.sysmap.data.height)
+		newY = this.sysmap.data.height - dims.height;
+//--
+
+	this.data.y = newY;
+	this.data.x = newX;
+
+	jQuery(this.domNode).css({
+		"top": newY+"px",
+		"left": newX+"px"
+	});
 },
 
-makeSelementDragable: function(selement){
-	this.debug('makeSelementDragable');
+// PRIVATE METHODS
+//------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------
 
-//	addListener(selement, 'click', this.select_selement.bindAsEventListener(this), false);
-	addListener(selement, 'click', this.show_menu.bindAsEventListener(this), false);
-	addListener(selement, 'mousedown', this.activate_menu.bindAsEventListener(this), false);
+// private, call reload() instead
+createIcon: function(){
+	this.debug('createIcon');
+//--
+	if(!isset('image', this.data) || empty(this.data.image)){
+		this.reload();
+		return ;
+	}
 
-	jQuery(selement).draggable({
+	var dom_id = '#selement_'+this.data.selementid;
+
+	this.domNode = jQuery(dom_id);
+	if(this.domNode.length == 0){
+		this.domNode = jQuery('<div></div>')
+			.appendTo(this.sysmap.container)
+			.attr("id", dom_id)
+			.css({
+				"position": "absolute",
+				"visibility": "hidden"
+			});
+
+		this.makeDragable();
+	}
+
+	this.updateIcon();
+},
+
+// private, call reload() instead
+updateIcon: function(){
+	this.debug('updateIcon');
+//--
+	if(is_null(this.domNode)){
+		this.createIcon();
+		return;
+	}
+
+	if(is_null(this.sysmap.mapimg)){
+		setTimeout(this.updateIcon.bind(this),500);
+	}
+	else{
+		var position = {};
+		position.top = parseInt(this.data.y,10);
+		position.left = parseInt(this.data.x,10);
+
+//	selement_div.setAttribute('src','data:image/png;base64,'+selement.image);
+
+		jQuery(this.domNode)
+			.removeClass()
+			.addClass('pointer sysmap_iconid_'+this.data.image)
+			.css({
+				"z-index": 10,
+				"position": 'absolute',
+				"top": position.top+'px',
+				"left": position.left+'px',
+				"visibility": 'visible'
+			});
+
+		jQuery(this.domNode).toggleClass("selected", this.selected);
+	}
+},
+
+makeDragable: function(){
+	this.debug('makeDragable');
+//--
+
+	jQuery(this.domNode)
+		.click(this.sysmap.showMenu.bindAsEventListener(this.sysmap))
+		.mousedown(this.sysmap.activateMenu.bindAsEventListener(this.sysmap));
+
+	jQuery(this.domNode).draggable({
 		containment: 'parent',
 		opacity: 0.5,
 		helper: 'clone',
-		stop: this.selementDragEnd.bind(this)
+		stop: this.dragEnd.bind(this)
+	});
+},
+
+dragEnd: function(e, data){
+	this.debug('dragEnd');
+//--
+//SDI(data);
+	this.data.x = data.position.left;
+	this.data.y = data.position.top;
+
+	jQuery(this.domNode).css({
+		"left": data.position.left+"px",
+		"top": data.position.top+"px"
 	});
 
-},
+	this.sysmap.deactivateMenu();
+	this.align();
 
-// MAP
-
-updateMapImage: function(){
-	this.debug('updateMapImage');
-//--
-
-// grid
-	var urlGrid = '';
-	if(this.grid.showGrid){
-		urlGrid += '&grid='+this.grid.gridSize;
-	}
-//--
-
-	var params = {
-		'output': 'text',
-		'sysmapid': this.sysmapid,
-		'noselements':	1,
-		'nolinks':	1
-	};
-
-	params = this.get_update_params(params);
-//SDJ(params);
-
-	var url = new Curl(location.href);
-	new Ajax.Request('map.php'+'?sid='+url.getArgument('sid')+urlGrid,
-					{
-						'method': 'post',
-						'parameters':params,
-//						'onSuccess': function(resp){SDI(resp.responseText);},
-						'onSuccess': this.set_mapimg.bind(this),
-						'onFailure': function(){ alert('failed'); }
-					}
-	);
-},
-
-set_mapimg: function(resp){
-	this.debug('set_mapimg');
-//--
-
-//SDI(resp.responseText);
-	if(is_null(this.mapimg)){
-		this.mapimg = $('sysmap_img');
-//		this.container.appendChild(this.mapimg);
-
-		this.mapimg.setAttribute('alt','Sysmap');
-		this.mapimg.setAttribute('id','mapimg_'+this.sysmapid);
-		this.mapimg.className = 'image';
-
-		this.mapimg.style.zIndex = '1';
-
-		addListener(this.mapimg, 'load', this.set_container.bindAsEventListener(this), false);
-		addListener(window, 'resize', this.set_container.bindAsEventListener(this), false);
-	}
-
-//	this.mapimg.setAttribute('src','data:image/png;base64,'+resp.responseText);
-	this.mapimg.setAttribute('src','imgstore.php?imageid='+resp.responseText);
-},
-
-set_container: function(event){
-	var sysmap_pn = getPosition(this.mapimg);
-	var sysmap_ds = Element.getDimensions(this.mapimg);
-
-	var container_pn = getPosition(this.container);
-	var container_ds = Element.getDimensions(this.container);
-
-	if((container_pn.top != sysmap_pn.top) ||
-		(container_pn.left != sysmap_pn.left) ||
-		(container_ds.height != sysmap_ds.height) ||
-		(container_ds.width != sysmap_ds.width))
-	{
-		this.container.style.top = sysmap_pn.top+'px';
-		this.container.style.left = sysmap_pn.left+'px';
-		this.container.style.height = sysmap_ds.height+'px';
-		this.container.style.width = sysmap_ds.width+'px';
-	}
-
-	Event.stop(event)
-},
-//--------------------------------------------------------------------------------
-
-// ---------- MISC FUNCTIONS ------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------
-get_update_params: function(params){
-	this.debug('get_update_params');
-
-	if(typeof(params) == 'undefined'){
-		params = {};
-	}
-
-	params = this.get_selements_params(params);
-	params = this.get_links_params(params);
-
-return params;
-},
-
-get_selements_params: function(params, selementid){
-	this.debug('get_selements_params');
-
-	if(typeof(params) == 'undefined'){
-		params = {};
-	}
-
-	if(typeof(selementid) != 'undefined'){
-		if(isset(selementid, this.selements)){
-			params['selements['+selementid+']'] = Object.toJSON(this.selements[selementid]);
+	if(isset('selementid', this.sysmap.selementForm) && isset('x', this.sysmap.selementForm) && isset('y', this.sysmap.selementForm)){
+		if(this.sysmap.selementForm.selementid.value == this.id){
+			this.sysmap.selementForm.x.value = this.data.x;
+			this.sysmap.selementForm.y.value = this.data.y;
 		}
 	}
-	else{
-		params['selements'] = Object.toJSON(this.selements);
-	}
 
-return params;
+	this.sysmap.update();
+}
+});
+
+//*
+// *******************************************************************
+//		SELEMENT object (unfinished)
+// *******************************************************************
+var CForm = Class.create(CDebug, {
+id:					null,		// selement id
+sysmap:				null,		// Parent sysmap reference
+
+selements:			{},				// list of updated selementes
+
+selementForm:		{},					// container for Selement form dom objects
+linkForm:			{},					// container for link form dom objects
+
+
+debug_status: 2,
+
+//----------------------------------------------------------------------------------------------
+
+initialize: function($super, sysmap){
+	this.id = sysmap.id;
+	$super('CForm['+this.id+']');
+//--
+
+	this.sysmap = sysmap;
 },
 
-get_links_params: function(params, linkid){
-	this.debug('get_links_params');
-
-	if(typeof(params) == 'undefined'){
-		params = {};
-	}
-
-	if(typeof(linkid) != 'undefined'){
-		if(isset(linkid, this.links)){
-			params['links['+linkid+']'] = Object.toJSON(this.links[linkid]);
-		}
-	}
-	else{
-		params['links'] = Object.toJSON(this.links);
-	}
-
-return params;
-},
-
-activate_menu: function(){
-	this.debug('activate_menu');
-	this.menu_active = 1;
-},
-
-deactivate_menu: function(){
-	this.debug('deactivate_menu');
-	this.menu_active = 0;
-},
-
-
-//------------------------------------------------------------------------------------------------------
-// ---------- MENU ------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------
-
-show_menu: function(e){
-	this.debug('show_menu');
-	if(this.menu_active != 1) return true;
-
-	var e = e || window.event;
-	var element = Event.element(e);
-	var element_id = element.id.split('_');
-	var selementid = element_id[(element_id.length - 1)];
-
-	if(e.ctrlKey || e.shiftKey){
-		this.select_selement(selementid, true);
-	}
-	else{
-		this.select_selement(selementid);
-	}
-
-	if(this.selection.count == 0){
-		this.formHide(e);
-	}
-	else{
-		for(var selementid in this.selection.selements){
-			if(!isset(selementid, this.selements)) continue;
-			break;
-		}
-
-		this.formShow(e, selementid);
-	}
-},
-
-
-//  Form  ------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------
-
-formShow: function(e, selementid){
-	this.debug('formShow');
+show: function(e, selementid){
+	this.debug('show');
 //--
 
 	var divForm = document.getElementById('divSelementForm');
@@ -1078,8 +1136,6 @@ formShow: function(e, selementid){
 		divForm.style.position = 'absolute';
 		divForm.style.top = '50px';
 		divForm.style.left = '500px';
-
-
 
 		divForm.style.border = '1px #999999 solid';
 	}
@@ -1100,16 +1156,14 @@ formShow: function(e, selementid){
 	$(divForm).show();
 },
 
-formHide: function(e){
-	this.debug('formHide');
+hide: function(e){
+	this.debug('hide');
 
 	var divForm = $('divSelementForm');
 	if(!is_null(divForm)) divForm.hide();
 
-	for(var selementid in this.selection.selements){
-		if(!isset(selementid, this.selements)) continue;
-
-		this.select_selement(selementid, true);
+	for(var selementid in this.sysmap.selection.selements){
+		this.sysmap.selection.selements[selementid].toggleSelect(true, false);
 	}
 },
 
@@ -1117,7 +1171,7 @@ formHide: function(e){
 //  Multi Container  ------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------
 
-create_multiContainer: function(e, selementid){
+create_multiContainer: function(e){
 	this.debug('create_multiContainer');
 //--
 
@@ -1207,11 +1261,11 @@ update_multiContainer: function(e){
 
 	var count = 0;
 	var selement = null;
-	for(var selementid in this.selection.selements){
-		if(!isset(selementid, this.selements)) continue;
+	for(var selementid in this.sysmap.selection.selements){
+		if(!isset(selementid, this.sysmap.selements)) continue;
 
 		count++;
-		selement = this.selements[selementid];
+		selement = this.sysmap.data.selements[selementid];
 
 		if(count > 4) this.multiContainer.container.style.height = '127px';
 		else this.multiContainer.container.style.height = 'auto';
@@ -1234,12 +1288,12 @@ update_multiContainer: function(e){
 
 		var elementtypeText = '';
 		switch(selement.elementtype){
-			case '0': elementtypeText = locale['S_HOST']; break;
-			case '1': elementtypeText = locale['S_MAP']; break;
-			case '2': elementtypeText = locale['S_TRIGGER']; break;
-			case '3': elementtypeText = locale['S_HOST_GROUP']; break;
+			case '0':elementtypeText = locale['S_HOST'];break;
+			case '1':elementtypeText = locale['S_MAP'];break;
+			case '2':elementtypeText = locale['S_TRIGGER'];break;
+			case '3':elementtypeText = locale['S_HOST_GROUP'];break;
 			case '4':
-			default: elementtypeText = locale['S_IMAGE']; break;
+			default:elementtypeText = locale['S_IMAGE'];break;
 		}
 
 		var e_td_4 = document.createElement('td');
@@ -1353,14 +1407,12 @@ update_linkContainer: function(e){
 
 	var selementid = 0;
 	var linkids = {};
-	for(var selementid in this.selection.selements){
-		if(!isset(selementid, this.selements)) continue;
+	for(var selementid in this.sysmap.selection.selements){
+		if(!isset(selementid, this.sysmap.selements)) continue;
 
-		var current_linkids = this.get_linkid_by_selementids(selementid);
-		for(var linkid in current_linkids){
-			if(empty(current_linkids[linkid])) continue;
-
-			linkids[linkid] = current_linkids[linkid];
+		var current_linkids = this.sysmap.getLinksBySelementIds(selementid);
+		for(var i=0; i<current_linkids.length;i++){
+			linkids[current_linkids[i]] = current_linkids[i];
 		}
 	}
 
@@ -1369,10 +1421,10 @@ update_linkContainer: function(e){
 	var count = 0;
 	var maplink = null;
 	for(var linkid in linkids){
-		if(!isset(linkid, this.links)) continue;
+		if(!isset(linkid, this.sysmap.links)) continue;
 
 		count++;
-		maplink = this.links[linkid];
+		maplink = this.sysmap.data.links[linkid];
 
 		if(count > 4) this.linkContainer.container.style.height = '120px';
 
@@ -1393,12 +1445,12 @@ update_linkContainer: function(e){
 
 
 		var e_td_4 = document.createElement('td');
-		e_td_4.appendChild(document.createTextNode(this.selements[maplink.selementid1].label_expanded));
+		e_td_4.appendChild(document.createTextNode(this.sysmap.data.selements[maplink.selementid1].label_expanded));
 		e_tr_3.appendChild(e_td_4);
 
 
 		var e_td_4 = document.createElement('td');
-		e_td_4.appendChild(document.createTextNode(this.selements[maplink.selementid2].label_expanded));
+		e_td_4.appendChild(document.createTextNode(this.sysmap.data.selements[maplink.selementid2].label_expanded));
 		e_tr_3.appendChild(e_td_4);
 
 
@@ -1445,7 +1497,8 @@ form_selement_newUrl: function(e){
 },
 
 form_selement_create: function(e){
-this.debug('form_selement_create');
+	this.debug('form_selement_create');
+//--
 
 // var initialization of diferent types of form
 	this.selementForm.typeDOM = {};
@@ -2088,7 +2141,7 @@ this.selementForm.urls = e_tr_4;
 	e_input_6.className = "input button shadow";
 	e_input_6.setAttribute('value',locale['S_CLOSE']);
 
-	addListener(e_input_6, 'click', this.formHide.bindAsEventListener(this));
+	addListener(e_input_6, 'click', this.hide.bindAsEventListener(this));
 
 	e_td_5.appendChild(e_input_6);
 },
@@ -2111,73 +2164,14 @@ form_selement_update: function(e, selementid){
 	$(this.selementForm.urls).select('tr[id^=urlrow]').each(function(e){$(e).remove();});
 //--
 
-	if(this.selection.count == 1){
-		var selement = this.selements[selementid];
-// SELEMENT
-		this.selementForm.selementid.value = selementid;
+	if(this.sysmap.selection.count == 1){
+		var selement = this.sysmap.data.selements[selementid];
 
-// Element Type
-		this.selementForm.elementtype.selectedIndex = selement.elementtype;
-
-// Label
-		this.selementForm.label.value = selement.label;
-
-// Label Location
-		this.selementForm.label_location.selectedIndex = parseInt(selement.label_location,10)+1;
-
-// Element
-		this.selementForm.elementid.value = selement.elementid;
-		this.selementForm.elementName.value = selement.elementName;
-
-// Icon OK
-		for(var i=0; i<this.selementForm.iconid_off.options.length; i++){
-			if(!isset(i, this.selementForm.iconid_off.options)) continue;
-
-			if(this.selementForm.iconid_off.options[i].value === selement.iconid_off){
-				this.selementForm.iconid_off.options[i].selected = true;
-			}
-		}
-
-		var advanced_icons = false;
-
-// Icon PROBLEM
-		advanced_icons = advanced_icons || (selement.iconid_on != 0);
-		for(var i=0; i<this.selementForm.iconid_on.options.length; i++){
-			if(!isset(i, this.selementForm.iconid_on.options)) continue;
-
-			if(this.selementForm.iconid_on.options[i].value === selement.iconid_on){
-				this.selementForm.iconid_on.options[i].selected = true;
-			}
-		}
-
-// Icon MAINTENANCE
-		advanced_icons = advanced_icons || (selement.iconid_maintenance != 0);
-		for(var i=0; i<this.selementForm.iconid_maintenance.options.length; i++){
-			if(!isset(i, this.selementForm.iconid_maintenance.options)) continue;
-
-			if(this.selementForm.iconid_maintenance.options[i].value === selement.iconid_maintenance){
-				this.selementForm.iconid_maintenance.options[i].selected = true;
-			}
-		}
-
-// Icon DISABLED
-
-		advanced_icons = advanced_icons || (selement.iconid_disabled != 0);
-		for(var i=0; i<this.selementForm.iconid_disabled.options.length; i++){
-			if(!isset(i, this.selementForm.iconid_disabled.options)) continue;
-
-			if(this.selementForm.iconid_disabled.options[i].value === selement.iconid_disabled){
-				this.selementForm.iconid_disabled.options[i].selected = true;
-			}
-		}
+		jQuery(this.selementForm.form).populate(this.sysmap.data.selements[selementid]);
 
 // ADVANCED ICONS
+		var advanced_icons = (selement.iconid_on != 0) || (selement.iconid_maintenance != 0) || (selement.iconid_disabled != 0);
 		this.selementForm.advanced_icons.checked = (advanced_icons != 0);
-
-
-// X & Y
-		$(this.selementForm.x).value = selement.x;
-		$(this.selementForm.y).value = selement.y;
 
 // URLS
 		var emptyUrls = true;
@@ -2196,25 +2190,13 @@ form_selement_update: function(e, selementid){
 		this.form_selement_updateByType(e, false);
 	}
 	else{
-// SELEMENT
+
 		this.selementForm.selementid.value = selementid;
-
-// Label
 		this.selementForm.label.value = '';
-
-// Label Location
 		this.selementForm.label_location.selectedIndex = 0;
-
-// Icon OK
 		this.selementForm.iconid_off.selectedIndex = 0;
-
-// Icon PROBLEM
 		this.selementForm.iconid_on.selectedIndex = 0;
-
-// Icon MAINTENANCE
 		this.selementForm.iconid_maintenance.selectedIndex = 0;
-
-// Icon DISABLED
 		this.selementForm.iconid_disabled.selectedIndex = 0;
 
 		this.form_selement_updateByType(e,true);
@@ -2303,7 +2285,7 @@ form_selement_updateByType: function(e, multi){
 	var selementid = this.selementForm.selementid.value;
 	var elementtype = this.selementForm.elementtype.selectedIndex;
 
-	if(this.selements[selementid].elementtype != elementtype){
+	if(this.sysmap.data.selements[selementid].elementtype != elementtype){
 		this.selementForm.elementName.value = '';
 		this.selementForm.elementid.value = '0';
 	}
@@ -2396,7 +2378,7 @@ form_selement_updateByType: function(e, multi){
 
 		if(elementtype.toString() == '1') popup_url+= '&excludeids[]='+this.sysmapid;
 
-		this.selementForm.elementTypeSelect.onclick =  function(){ PopUp(popup_url,450,450);};
+		this.selementForm.elementTypeSelect.onclick =  function(){PopUp(popup_url,450,450);};
 	}
 
 	this.form_selement_updateByIcons(e);
@@ -2406,19 +2388,13 @@ form_selement_save: function(e){
 	this.debug('form_selement_save');
 //--
 
-	if(this.selection.count == 1){
+	if(this.sysmap.selection.count == 1){
 		var selementid = this.selementForm.selementid.value;
 		var params = {};
 
-// Element Type
 		params.elementtype = this.selementForm.elementtype.selectedIndex;
-
-// Label
 		params.label = this.selementForm.label.value;
-
-// Label Location
 		params.label_location = parseInt(this.selementForm.label_location.selectedIndex, 10) - 1;
-
 
 // Element
 		params.elementid = this.selementForm.elementid.value;
@@ -2427,30 +2403,22 @@ form_selement_save: function(e){
 		if((params.elementid == 0) && (params.elementtype != 4)){
 			switch(params.elementtype.toString()){
 //host
-				case '0': this.info('Host is not selected.'); return false; break;
+				case '0':this.info('Host is not selected.');return false;break;
 //map
-				case '1': this.info('Map is not selected.'); return false; break;
+				case '1':this.info('Map is not selected.');return false;break;
 //tr
-				case '2': this.info('Trigger is not selected.'); return false; break;
+				case '2':this.info('Trigger is not selected.');return false;break;
 //hg
-				case '3': this.info('Host group is not selected.'); return false; break;
+				case '3':this.info('Host group is not selected.');return false;break;
 // image
 				case '4':
 				default:
 			}
 		}
 
-
-// Icon OK
 		params.iconid_off = this.selementForm.iconid_off.options[this.selementForm.iconid_off.selectedIndex].value;
-
-// Icon PROBLEM
 		params.iconid_on = this.selementForm.iconid_on.options[this.selementForm.iconid_on.selectedIndex].value;
-
-// Icon MAINTENANCE
 		params.iconid_maintenance = this.selementForm.iconid_maintenance.options[this.selementForm.iconid_maintenance.selectedIndex].value;
-
-// Icon DISABLED
 		params.iconid_disabled = this.selementForm.iconid_disabled.options[this.selementForm.iconid_disabled.selectedIndex].value;
 
 // Advanced icons
@@ -2461,7 +2429,10 @@ form_selement_save: function(e){
 		}
 
 // X & Y
-		var dims = getDimensions(this.selements[selementid].html_obj);
+		var dims = {
+			height: jQuery(this.sysmap.selements[selementid].domNode).height(),
+			width: jQuery(this.sysmap.selements[selementid].domNode).width()
+		}
 
 		params.x = parseInt(this.selementForm.x.value, 10);
 		params.y = parseInt(this.selementForm.y.value, 10);
@@ -2502,7 +2473,6 @@ form_selement_save: function(e){
 				return false;
 			}
 
-
 			if(empty(url.name) || empty(url.url)){
 				alert(locale['S_INCORRECT_ELEMENT_MAP_LINK']);
 				return false;
@@ -2511,7 +2481,7 @@ form_selement_save: function(e){
 			params.urls[url.name] = url;
 		}
 
-		this.updateSelementOption(selementid, params);
+		this.sysmap.selements[selementid].reload(params);
 	}
 	else{
 		var params = {};
@@ -2540,14 +2510,13 @@ form_selement_save: function(e){
 		if(this.selementForm.massEdit.chkboxIconid_disabled.checked)
 			params.iconid_disabled = this.selementForm.iconid_disabled.options[this.selementForm.iconid_disabled.selectedIndex].value;
 
-		for(var selementid in this.selection.selements){
-			if(!isset(selementid, this.selements)) continue;
-			this.updateSelementOption(selementid, params);
+		for(var selementid in this.sysmap.selection.selements){
+			if(!isset(selementid, this.sysmap.selements)) continue;
+			this.sysmap.selements[selementid].reload(params);
 		}
-		this.updateSelementOption(selementid, params);
 	}
 
-	this.updateMapImage();
+	this.sysmap.updateImage();
 	this.update_multiContainer(e);
 //	this.formHide();
 },
@@ -2556,8 +2525,7 @@ form_selement_delete: function(e){
 	this.debug('form_selement_delete');
 //--
 	//removing all selected elements
-	this.remove_selements();
-
+	this.sysmap.removeSelements();
 },
 
 //**************************************************************************************************************************************************
@@ -2845,7 +2813,7 @@ this.linkForm.colorPicker = e_div_6;
 	e_div_6.setAttribute('id',"lbl_color");
 	e_div_6.setAttribute('name',"lbl_color");
 	e_div_6.className = "pointer";
-	addListener(e_div_6, 'click', function(){ show_color_picker('color');});
+	addListener(e_div_6, 'click', function(){show_color_picker('color');});
 	// e_div_6.setAttribute('onclick',"javascript: show_color_picker('color')");
 
 	e_div_6.style.marginLeft = '2px';
@@ -2912,14 +2880,14 @@ form_link_update: function(e, linkid){
 	this.debug('form_link_update');
 //--
 
-	if(!isset(linkid, this.links)) return false;
+	if(!isset(linkid, this.sysmap.links)) return false;
 
 	if(is_null($('linkForm'))){
 		this.form_link_create(e);
 		$('divSelementForm').appendChild(this.linkForm.form);
 	}
 
-	var maplink = this.links[linkid];
+	var maplink = this.sysmap.data.links[linkid];
 
 // LINKID
 	this.linkForm.linkid.value = linkid;
@@ -2930,8 +2898,8 @@ form_link_update: function(e, linkid){
 
 // SELEMENTID1
 	$(this.linkForm.selementid1).update();
-	for(var selementid in this.selements){
-		if(empty(this.selements[selementid])) continue;
+	for(var selementid in this.sysmap.selements){
+		if(empty(this.sysmap.selements[selementid])) continue;
 
 		var e_option_7 = document.createElement('option');
 
@@ -2943,7 +2911,7 @@ form_link_update: function(e, linkid){
 		}
 
 		e_option_7.setAttribute('value', selementid);
-		e_option_7.appendChild(document.createTextNode(this.selements[selementid].label_expanded));
+		e_option_7.appendChild(document.createTextNode(this.sysmap.data.selements[selementid].label_expanded));
 
 		this.linkForm.selementid1.appendChild(e_option_7);
 	}
@@ -2951,8 +2919,8 @@ form_link_update: function(e, linkid){
 
 // SELEMENTID2
 	$(this.linkForm.selementid2).update();
-	for(var selementid in this.selements){
-		if(empty(this.selements[selementid])) continue;
+	for(var selementid in this.sysmap.selements){
+		if(empty(this.sysmap.selements[selementid])) continue;
 
 		var e_option_7 = document.createElement('option');
 
@@ -2964,7 +2932,7 @@ form_link_update: function(e, linkid){
 		}
 
 		e_option_7.setAttribute('value', selementid);
-		e_option_7.appendChild(document.createTextNode(this.selements[selementid].label_expanded));
+		e_option_7.appendChild(document.createTextNode(this.sysmap.data.selements[selementid].label_expanded));
 
 		this.linkForm.selementid2.appendChild(e_option_7);
 	}
@@ -3039,7 +3007,7 @@ this.linkForm.linkIndicatorsBody = e_tbody_7;
 	this.linkForm.linkIndicatorsTable.appendChild(e_input_6);
 
 	var url = 'popup_link_tr.php?form=1&mapid='+this.id;
-	addListener(e_input_6, 'click', function(){ PopUp(url,640, 420, 'ZBX_Link_Indicator'); });
+	addListener(e_input_6, 'click', function(){PopUp(url,640, 420, 'ZBX_Link_Indicator');});
 
 
 	var e_input_6 = document.createElement('input');
@@ -3050,7 +3018,7 @@ this.linkForm.linkIndicatorsBody = e_tbody_7;
 	e_input_6.className = "input button link_menu";
 	this.linkForm.linkIndicatorsTable.appendChild(e_input_6);
 
-	addListener(e_input_6, 'click', function(){ remove_childs('linkForm','link_triggerids','tr'); });
+	addListener(e_input_6, 'click', function(){remove_childs('linkForm','link_triggerids','tr');});
 //----
 
 
@@ -3207,7 +3175,7 @@ form_link_addLinktrigger: function(linktrigger){
 	e_div_10.setAttribute('id',"lbl_link_triggers["+triggerid+"][color]");
 	e_div_10.setAttribute('name',"lbl_link_triggers["+triggerid+"][color]");
 	e_div_10.className = "pointer";
-	addListener(e_div_10, 'click', function(){ show_color_picker("link_triggers["+triggerid+"][color]");});
+	addListener(e_div_10, 'click', function(){show_color_picker("link_triggers["+triggerid+"][color]");});
 	// e_div_10.setAttribute('onclick',"javascript: show_color_picker('color')");
 
 	e_div_10.style.marginLeft = '2px';
@@ -3227,9 +3195,9 @@ form_link_save: function(e){
 //--
 
 	var linkid = this.linkForm.linkid.value;
-	if(!isset(linkid, this.links)) return false;
+	if(!isset(linkid, this.sysmap.data.links)) return false;
 
-	var maplink = this.links[linkid];
+	var maplink = this.sysmap.data.links[linkid];
 
 
 	var params = {};
@@ -3252,7 +3220,7 @@ form_link_save: function(e){
 
 // LINK INDICATORS
 	for(var linktriggerid in maplink.linktriggers){
-		this.remove_linktrigger(maplink.linkid, linktriggerid);
+		this.removeLinkTrigger(maplink.linkid, linktriggerid);
 	}
 
 	var triggerid = null;
@@ -3280,13 +3248,13 @@ form_link_save: function(e){
 		if(!is_null(linktriggerid))
 			linktrigger.linktriggerid = linktriggerid.value;
 
-		this.add_linktrigger(linkid, linktrigger);
+		this.createLinkTrigger(linkid, linktrigger);
 	}
 //--
 
 //SDJ(params);
-	this.update_link_option(linkid, params);
-//SDJ(this.links[linkid]);
+	this.sysmap.links[linkid].update(params);
+//SDJ(this.sysmap.data.links[linkid]);
 
 	this.update_linkContainer(e);
 
@@ -3298,7 +3266,7 @@ form_link_save: function(e){
 	 */
 	//this.form_link_hide(e);
 
-	this.updateMapImage();
+	this.sysmap.updateImage();
 },
 
 form_link_delete: function(e){
@@ -3306,411 +3274,94 @@ form_link_delete: function(e){
 //--
 
 	var linkid = this.linkForm.linkid.value;
-	if(!isset(linkid, this.links)) return false;
+	if(!isset(linkid, this.sysmap.data.links)) return false;
 
-	var maplink = this.links[linkid];
+	var maplink = this.sysmap.data.links[linkid];
 
-	if(Confirm('Remove link between "'+this.selements[maplink.selementid1].label+'" and "'+this.selements[maplink.selementid2].label+'"?')){
-		this.remove_link(linkid, true);
+	if(Confirm('Remove link between "'+this.sysmap.data.selements[maplink.selementid1].label+'" and "'+this.sysmap.data.selements[maplink.selementid2].label+'"?')){
+		this.sysmap.remove_link(linkid, true);
 		this.update_linkContainer(e);
 		this.form_link_hide(e);
 	}
 	else
 		return false;
 }
-
-//**************************************************************************************************************
-//**************************************************************************************************************
-//**************************************************************************************************************
-//**************************************************************************************************************
-});
-
-var CGrid = Class.create(CDebug, {
-mapObjectId:	null,						// own id
-sysmapid:	null,				// sysmapid
-showGrid:	true,				// grid On|Off
-autoAlign:	true,				// align icons on drag end
-gridSize:	'50',				// grid size
-
-initialize: function($super, id, params){
-	this.mapObjectId = id;
-
-	// setting map grid params to default ones
-	var gridSizeDropDownValue = params.gridsize.value.split('x');
-	this.gridSize = gridSizeDropDownValue[0];
-	this.showGrid = params.gridshow.innerHTML == locale['S_SHOWN'];
-	this.autoAlign = params.gridautoalign.innerHTML == locale['S_ON'];
-
-	$super('CGrid['+id+']');
-
-	if(!params) var params = {};
-
-	if(isset('gridsize', params))
-		addListener(params.gridsize, 'change', this.setGridSize.bindAsEventListener(this), false);
-	if(isset('gridautoalign', params))
-		addListener(params.gridautoalign, 'click', this.setGridAutoAlign.bindAsEventListener(this), false);
-	if(isset('gridshow', params))
-		addListener(params.gridshow, 'click', this.setGridView.bindAsEventListener(this), false);
-	if(isset('gridalignall', params))
-		addListener(params.gridalignall, 'click', this.gridAlignIcons.bindAsEventListener(this), false);
-},
-
-setGridSize: function(e){
-	this.debug('setGridSize');
-//--
-
-	var domObject = Event.element(e);
-	var tmpGS = domObject.options[domObject.selectedIndex].value.split('x');
-
-	if(!isset(0, tmpGS)) this.gridSize = 50;
-	else this.gridSize = tmpGS[0];
-
-	this.updateMapView(e);
-},
-
-setGridAutoAlign: function(e){
-	this.debug('setGridAutoAlign');
-//--
-
-	var domObject = Event.element(e);
-	if(this.autoAlign){
-		this.autoAlign = false;
-		domObject.update(locale['S_OFF']);
-	}
-	else{
-		this.autoAlign = true;
-		domObject.update(locale['S_ON']);
-	}
-},
-
-setGridView: function(e){
-	this.debug('setGridView');
-//--
-	var domObject = Event.element(e);
-	if(this.showGrid){
-		this.showGrid = false;
-		$(domObject).update(locale['S_HIDDEN']);
-	}
-	else{
-		this.showGrid = true;
-		$(domObject).update(locale['S_SHOWN']);
-	}
-
-	this.updateMapView(e);
-},
-
-// ACTION
-gridAlignIcons: function(e){
-	this.debug('gridAlignIcons');
-
-	var tmpAutoAlign = this.autoAlign;
-	this.autoAlign = true;
-
-	for(var selementid in ZBX_SYSMAPS[this.mapObjectId].map.selements){
-		if(empty(ZBX_SYSMAPS[this.mapObjectId].map.selements[selementid])) continue;
-
-		ZBX_SYSMAPS[this.mapObjectId].map.alignSelement(selementid);
-	}
-
-	this.autoAlign = tmpAutoAlign;
-	this.updateMapView(e);
-},
-
-// Update
-updateMapView: function(e){
-	this.debug('setGridView');
-//--
-
-	ZBX_SYSMAPS[this.mapObjectId].map.updateMapImage();
-}
-});
-//]]
-
-//*
-// *******************************************************************
-//		SELEMENT object (unfinished)
-// *******************************************************************
-var CSelement = Class.create(CDebug, {
-sysmap:					null,		// Parent sysmap reference
-
-data:{
-	selementid:			0,			// ALWAYS must be a STRING (js doesn't support uint64)
-	elementtype:		4,			// 5-UNDEFINED
-	elementid:			0,			// ALWAYS must be a STRING (js doesn't support uint64)
-	elementName:		'',			// element name
-	iconid_off:			0,			// ALWAYS must be a STRING (js doesn't support uint64)
-	iconid_on:			0,			// ALWAYS must be a STRING (js doesn't support uint64)
-	iconid_maintenance:	0,			// ALWAYS must be a STRING (js doesn't support uint64)
-	iconid_disabled:	0,			// ALWAYS must be a STRING (js doesn't support uint64)
-	label:				locale['S_NEW_ELEMENT'],	// Element label
-	label_expanded:		locale['S_NEW_ELEMENT'],	// Element label macros expanded
-	label_location:		3,
-	x:					0,
-	y:					0,
-	elementsubtype:		0,
-	areatype:			0,
-	width:				200,
-	height:				200,
-	viewtype:			0,
-	urls:				{},
-	html_obj:			null,			// reference to html obj
-	html_objid:			null,			// html elements id
-	selected:			0				// element is not selected
-},
-
-initialize: function($super, sysmap, params){
-	this.sysmap = sysmap;
-	$super('CSelement[0]');
-//--
-
-	if(typeof(params) != 'undefined'){
-		this.create(params);
-	}
-	else{
-		var url = new Curl(location.href);
-		var params = {
-			'favobj': 	'selements',
-			'sysmapid':	this.sysmap.sysmapid,
-			'favid':	this.sysmap.id,
-			'action':	'create'
-		};
-
-		params['selements'] = Object.toJSON({'0': this.data});
-
-		jQuery.ajax({
-			url: url.getPath()+'?output=json'+'&sid='+url.getArgument('sid'),
-			type: "POST",
-			data: params,
-			success: this.create.bind(this),
-//			success: function(data){ SDJ(data); },
-			error: function(result){ SDJ(result); }
-		});
-	}
-},
-
-create: function(selementData){
-	this.debug('create');
-//--
-
-	var selementid = 0;
-	if(!isset('selementid', selementData) || (selementData['selementid'] == 0)){
-		do{
-			selementid = parseInt(Math.random(1000000000) * 1000000000);
-			selementid = selementid.toString();
-		}while(isset(selementid, this.sysmap.selements));
-
-		selementData['new'] = 'new';
-		selementData['selementid'] = selementid;
-	}
-
-	selementData.selected = null;
-SDJ(selementData);
-
-	if(isset('updateIcon', selementData) && (selementData['updateIcon'] != 0)){
-//		selement.html_obj = this.addImage(selementData);
-		selement.image = null;
-	}
-
-	for(var key in selementData){
-		if(is_null(selementData[key])) continue;
-
-		if(is_number(selementData[key]))
-			selementData[key] = selementData[key].toString();
-
-		this.data[key] = selementData[key];
-	}
-},
-
-update: function(params){ // params = {'key': value, 'key': value}
-	this.debug('update');
-//--
-
-	for(var key in params){
-		if(is_null(params[key])) continue;
-
-		if(is_number(params[key])) params[key] = params[key].toString();
-		this.data[key] = params[key];
-	}
-
-	this.reload();
-},
-
-reload: function(){
-	this.debug('reload');
-//--
-
-	var url = new Curl(location.href);
-
-	var params = {
-		'favobj': 	'selements',
-		'favid':	this.sysmap.id,
-		'sysmapid':	this.sysmap.sysmapid,
-		'action':	'get_img'
-	}
-
-	params['selements'] = Object.toJSON({'0': this.data});
-
-	jQuery.post({
-		url: url.getPath()+'?output=json'+'&sid='+url.getArgument('sid'),
-		type: "POST",
-		data: params,
-//		success: this.udpate.bind(this),
-		success: function(data, textStatus, jqXHR){ SDJ(data); },
-		error: function(){ document.location = url.getPath()+'?'+Object.toQueryString(params); }
-	});
-},
-
-remove: function(){
-	this.debug('remove');
-//--
-
-	this.removeImage();
-
-// remove selement
-	this.sysmap.selements[selementid] = null;
-	delete(this.sysmap.selements[selementid]);
-
-	this.sysmap.updateMapImage();
-},
-
-select: function(multi){
-	this.debug('select');
-//--
-
-	var multi = multi || false;
-
-	var position = null;
-
-	if(is_null(this.selected)){
-		position = this.sysmap.selection.position;
-
-		this.sysmap.selection.selements[position] = selementid;
-		this.selected = position;
-
-		this.html_obj.style.border = '1px #3333FF solid';
-		this.html_obj.style.backgroundColor = '#00AAAA';
-		this.html_obj.style.opacity = '.60';
-
-		this.sysmap.selection.count++;
-		this.sysmap.selection.position++;
-	}
-	else if((this.sysmap.selection.count > 1) && !multi){
-// if selected several selements and then we clicked on one of them
-	}
-	else{
-		this.sysmap.selection.count--;
-		position = this.selected;
-
-		this.sysmap.selection.selements[position] = null;
-		delete(this.sysmap.selection.selements[position]);
-
-		this.sysmap.selements[selementid].selected = null;
-
-		this.html_obj.style.border = '0px';
-		this.html_obj.style.backgroundColor = 'transparent';
-		this.html_obj.style.opacity = '1';
-	}
-
-	if(!multi && (this.sysmap.selection.count > 1)){
-		for(var i=0; i<this.sysmap.selection.position; i++){
-			if(!isset(i,this.sysmap.selection.selements) || (this.sysmap.selection.selements[i] == selementid)) continue;;
-
-			this.sysmap.selection.count--;
-
-			var tmp_selementid = this.sysmap.selection.selements[i];
-
-			this.sysmap.selements[this.selection.selements[i]].selected = null;
-			this.sysmap.selements[this.selection.selements[i]].html_obj.style.border = '0px';
-			this.sysmap.selements[this.selection.selements[i]].html_obj.style.backgroundColor = 'transparent';
-			this.sysmap.selements[this.selection.selements[i]].html_obj.style.opacity = '1';
-
-			this.sysmap.selection.selements[i] = null;
-			delete(this.sysmap.selection.selements[i]);
-		}
-	}
-
-return false;
-},
-
-// ELEMENTS
-addImage: function(){
-	this.debug('addImage');
-
-	var dom_id = 'selement_'+this.selementid;
-
-	var selement_div = $(dom_id);
-	if(is_null(selement_div)){
-//		var selement_div = document.createElement('img');
-		var selement_div = document.createElement('div');
-		this.container.appendChild(selement_div);
-
-		selement_div.setAttribute('id',dom_id);
-//		selement_div.setAttribute('alt','selement_'+selement.id);
-		selement_div.style.position = 'absolute';
-		selement_div.style.visibility = 'hidden';
-
-		this.makeSelementDragable(selement_div);
-	}
-
-	var position = {};
-	position.top = parseInt(selement.y,10);
-	position.left = parseInt(selement.x,10);
-
-//	selement_div.setAttribute('src','data:image/png;base64,'+selement.image);
-//	selement_div.setAttribute('src','imgstore.php?iconid='+selement.image);
-	selement_div.className = 'pointer sysmap_iconid_'+selement.image;
-
-	selement_div.style.zIndex = '10';
-	selement_div.style.position = 'absolute';
-	selement_div.style.top = position.top+'px';
-	selement_div.style.left = position.left+'px';
-	selement_div.style.visibility = 'visible';
-
-	if(!is_null(selement.selected)){
-		selement_div.style.border = '1px #3333FF solid';
-		selement_div.style.backgroundColor = '#00AAAA';
-		selement_div.style.opacity = '.60';
-	}
-
-return selement_div;
-},
-
-updateIcon: function(){
-	this.debug('updateSelementsIcon');
-
-	if(is_null(this.mapimg)){
-		setTimeout('ZBX_SYSMAPS['+this.id+'].map.updateSelementsIcon();',500);
-	}
-	else{
-		for(var selementid in this.selements){
-			if(empty(this.selements[selementid])) continue;
-
-			this.selements[selementid].html_obj = this.addSelementImage(this.selements[selementid]);
-			this.selements[selementid].image = null;
-		}
-	}
-},
-
-removeImage: function(){
-	this.debug('remove_selement_img');
-
-	jQuery(this.html_obj).draggable('destroy');
-	this.html_obj.remove();
-},
-
-makeDragable: function(){
-	this.debug('makeSelementDragable');
-
-	addListener(selement, 'click', this.sysmap.show_menu.bindAsEventListener(this.sysmap), false);
-	addListener(selement, 'mousedown', this.sysmap.activate_menu.bindAsEventListener(this.sysmap), false);
-
-	jQuery(selement).draggable({
-		containment: 'parent',
-		opacity: 0.5,
-		helper: 'clone',
-		stop: this.sysmap.sysmapUpdate.bind(this.sysmap)
-	});
-}
 });
 //*/
 //]]
+
+
+
+jQuery.fn.populate = function(obj, options) {
+	var populateFormElement = function(form, name, value){
+		var element	= form[name];
+
+		if(element == undefined){
+			// look for the element
+			element = jQuery('#' + name, form);
+			if(element){
+				element.html(value);
+				return true;
+			}
+
+			return false;
+		}
+
+// to array
+		elements = element.type == undefined && element.length ? element : [element];
+
+		for(var e = 0; e < elements.length; e++){
+			var element = elements[e];
+
+			if(!element || typeof element == 'undefined' || typeof element == 'function')
+				continue;
+
+			switch(element.type || element.tagName){
+				case 'radio':
+					element.checked = (element.value != '' && value.toString() == element.value);
+				case 'checkbox':
+					var values = value.constructor == Array ? value : [value];
+					for(var j = 0; j < values.length; j++)
+						element.checked |= element.value == values[j];
+
+					//element.checked = (element.value != '' && value.toString().toLowerCase() == element.value.toLowerCase());
+					break;
+				case 'select-multiple':
+					var values = value.constructor == Array ? value : [value];
+					for(var i = 0; i < element.options.length; i++){
+						for(var j = 0; j < values.length; j++)
+							element.options[i].selected |= element.options[i].value == values[j];
+					}
+					break;
+				case 'select':
+				case 'select-one':
+					element.value = value.toString() || value;
+					break;
+				case 'text':
+				case 'button':
+				case 'textarea':
+				case 'submit':
+				default:
+					element.value	= (value == null) ? "" : value;
+			}
+		}
+	}
+
+	// options & setup
+	if (obj === undefined) return this;
+
+	// options
+	var options = jQuery.extend({resetForm: true,identifier: 'id'},options);
+
+	// main process function
+	this.each(
+		function(){
+			var tagName	= this.tagName.toLowerCase();
+			if(tagName == 'form' && options.resetForm)
+				this.reset();
+
+			for(var i in obj) populateFormElement(this, i, obj[i]);
+		});
+
+	return this;
+};
