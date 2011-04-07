@@ -42,9 +42,9 @@
 	<td><label for="new_check_ports"><?php print(_('Ports')); ?></label></td>
 	<td><input type="text" id="new_check_ports" name="new_check_ports" value="" class="input text" size="16" maxlength="255"></td>
 </tr>
-<tr id="newCheckComunityRow" class="hidden">
-	<td><label for="new_check_comunity"><?php print(_('SNMP Comunity')); ?></label></td>
-	<td><input type="text" id="new_check_comunity" name="new_check_comunity" value="" class="input text" size="20" maxlength="255"></td>
+<tr id="newCheckCommunityRow" class="hidden">
+	<td><label for="new_check_snmp_community"><?php print(_('SNMP Community')); ?></label></td>
+	<td><input type="text" id="new_check_snmp_community" name="new_check_snmp_community" value="" class="input text" size="20" maxlength="255"></td>
 </tr>
 <tr id="newCheckKeyRow" class="hidden">
 	<td><label for="new_check_key_"><?php print(_('SNMP Key')); ?></label></td>
@@ -98,6 +98,8 @@ var ZBX_SVC_PORT = {
 	'telnet': <?php print(SVC_TELNET);?>
 };
 
+var ZBX_CHECKLIST = {};
+
 function discoveryCheckDefaultPort(service){
 	service = service.toString();
 	var defPorts = {};
@@ -147,6 +149,7 @@ function discoveryCheckTypeToString(svcPort){
 	return isset(svcPort, defPorts) ? defPorts[svcPort] : _('Unknown');
 }
 
+
 function addPopupValues(list){
 	var uniqTypeList = {};
 	uniqTypeList[ZBX_SVC_PORT.agent] = true;
@@ -158,22 +161,40 @@ function addPopupValues(list){
 		if(empty(list.values[i])) continue;
 		var value = list.values[i];
 
-		switch(list.object){
-			case 'dcheckid':
-				if(jQuery("#dcheckRow_"+value.dcheckid).length) continue;
-
-				var tpl = new Template(jQuery('#dcheckRowTPL').html());
-				jQuery("#dcheckListFooter").before(tpl.evaluate(value));
-
-
-				if(isset(parseInt(value.type, 10), uniqTypeList)){
-					var tpl = new Template(jQuery('#uniqRowTPL').html());
-					jQuery("#uniqList").append(tpl.evaluate(value));
-				}
-
+		var exists = false;
+		for(var dcheckid in ZBX_CHECKLIST){
+			if(ZBX_CHECKLIST[dcheckid]["key_"] == value["key_"]
+				&& ZBX_CHECKLIST[dcheckid]["type"] == value["type"]
+				&& ZBX_CHECKLIST[dcheckid]["name"] == value["name"]
+				&& ZBX_CHECKLIST[dcheckid]["ports"] == value["ports"]
+				&& ZBX_CHECKLIST[dcheckid]["snmp_community"] == value["snmp_community"]
+				&& ZBX_CHECKLIST[dcheckid]["snmpv3_authpassphrase"] == value["snmpv3_authpassphrase"]
+				&& ZBX_CHECKLIST[dcheckid]["snmpv3_privpassphrase"] == value["snmpv3_privpassphrase"]
+				&& ZBX_CHECKLIST[dcheckid]["snmpv3_securitylevel"] == value["snmpv3_securitylevel"]
+				&& ZBX_CHECKLIST[dcheckid]["snmpv3_securityname"] == value["snmpv3_securityname"]
+			){
+				exists = true;
 				break;
-//			if(in_array($data['type'], array(SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2, SVC_SNMPv3)))
-//				$cmbUniquenessCriteria->addItem($id, $data['name']);
+			}
+		}
+
+		if(!exists){
+			ZBX_CHECKLIST[value.dcheckid] = value;
+
+			var dcheckRowTpl = new Template(jQuery('#dcheckRowTPL').html());
+			var uniqRowTpl = new Template(jQuery('#uniqRowTPL').html());
+
+			switch(list.object){
+				case 'dcheckid':
+					if(jQuery("#dcheckRow_"+value.dcheckid).length) continue;
+
+					jQuery("#dcheckListFooter").before(dcheckRowTpl.evaluate(value));
+
+					if(isset(parseInt(value.type, 10), uniqTypeList)){
+						jQuery("#uniqList").append(uniqRowTpl.evaluate(value));
+					}
+					break;
+			}
 		}
 	}
 }
@@ -181,10 +202,11 @@ function addPopupValues(list){
 function removeDCheckRow(dcheckid){
 	jQuery('#dcheckRow_'+dcheckid).remove();
 	if(jQuery('#uniqueness_criteria_'+dcheckid).is(':checked')){
-		console.log('sdf');
 		jQuery('#uniqueness_criteria_1').attr('checked', 'checked');
 	}
 	jQuery('#uniqueness_criteria_row_'+dcheckid).remove();
+
+	delete(ZBX_CHECKLIST[dcheckid]);
 }
 
 function showNewCheckForm(e, dcheckType){
@@ -221,13 +243,13 @@ function showNewCheckForm(e, dcheckType){
 function updateNewDCheckType(e){
 	var dcheckType = parseInt(jQuery("#new_check_type").val(), 10);
 
-	var keyRowTypes = {}
+	var keyRowTypes = {};
 	keyRowTypes[ZBX_SVC_PORT.agent] = true;
 	keyRowTypes[ZBX_SVC_PORT.snmpv1] = true;
 	keyRowTypes[ZBX_SVC_PORT.snmpv2] = true;
 	keyRowTypes[ZBX_SVC_PORT.snmpv3] = true;
 
-	var ComRowTypes = {}
+	var ComRowTypes = {};
 	ComRowTypes[ZBX_SVC_PORT.snmpv1] = true;
 	ComRowTypes[ZBX_SVC_PORT.snmpv2] = true;
 
@@ -241,7 +263,7 @@ function updateNewDCheckType(e){
 		jQuery('#newCheckKeyRow label').text(caption);
 	}
 
-	jQuery('#newCheckComunityRow').toggle(isset(dcheckType, ComRowTypes));
+	jQuery('#newCheckCommunityRow').toggle(isset(dcheckType, ComRowTypes));
 	jQuery('#newCheckSecNameRow').toggle(isset(dcheckType, SecNameRowTypes));
 	jQuery('#newCheckSecLevRow').toggle(isset(dcheckType, SecNameRowTypes));
 
@@ -274,7 +296,7 @@ function saveNewDCheckForm(e){
 		'name': jQuery('#new_check_type :selected').text()
 	};
 
-	while(jQuery("#uniqueness_criteria_"+dCheck.dcheckid).length)
+	while(jQuery("#uniqueness_criteria_"+dCheck.dcheckid).length || jQuery("#dcheckRow_"+dCheck.dcheckid).length)
 		dCheck.dcheckid++;
 
 	for(var key in formData){
