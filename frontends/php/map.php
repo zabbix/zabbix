@@ -169,7 +169,6 @@ set_time_limit(10);
 
 	imageOut($im);
 	imagedestroy($im);
-
 ?>
 <?php
 

@@ -83,13 +83,14 @@ include_once('include/page_header.php');
 		}
 	}
 	else if(isset($_REQUEST['imageid'])){
-		session_start();
 		$imageid = get_request('imageid',0);
 
+		session_start();
 		if(isset($_SESSION['image_id'][$imageid])){
 			echo $_SESSION['image_id'][$imageid];
 			unset($_SESSION['image_id'][$imageid]);
 		}
+		session_write_close();
 	}
 ?>
 <?php

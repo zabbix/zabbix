@@ -18,6 +18,14 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **
 */
+/************************************************************/
+/*					ZABBIX MAPS								*/
+/************************************************************/
+#sysmap_cnt .selected{
+	border: 1px #3333FF solid;
+	background-color: #00AAAA;
+	opacity: .60;
+}
 
 /************************************************************/
 /*					ZABBIX MESSAGING						*/
