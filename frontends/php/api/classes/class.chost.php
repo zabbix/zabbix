@@ -1477,7 +1477,6 @@ Copt::memoryPick();
 			$options = array();
 			$options['hosts'] = $host;
 
-
 			foreach($host['groups'] as $group){
 				$hostgroupid = get_dbid('hosts_groups', 'hostgroupid');
 				$result = DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES ($hostgroupid, $hostid, {$group['groupid']})");
