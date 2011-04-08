@@ -18,32 +18,10 @@
 **/
 
 #include "common.h"
+#include "stats.h"
 #include "cpustat.h"
-
 #include "log.h"
 
-#ifdef _WINDOWS
-	#include "perfmon.h"
-#endif /* _WINDOWS */
-
-/******************************************************************************
- *                                                                            *
- * Function: init_cpu_collector                                               *
- *                                                                            *
- * Purpose: Initialize statistic structure and prepare state                  *
- *          for data calculation                                              *
- *                                                                            *
- * Parameters:  pcpus - pointer to the structure                              *
- *                      of ZBX_CPUS_STAT_DATA type                            *
- *                                                                            *
- * Return value: If the function succeeds, return 0,                          *
- *               bigger than 0 on an error                                    *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
 int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 {
 #ifdef	_WINDOWS
@@ -57,11 +35,11 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	cpe.szMachineName = NULL;
-	cpe.szObjectName = GetCounterName(PCI_PROCESSOR);
+	cpe.szObjectName = get_counter_name(PCI_PROCESSOR);
 	cpe.szInstanceName = cpu;
 	cpe.szParentInstance = NULL;
 	cpe.dwInstanceIndex = -1;
-	cpe.szCounterName = GetCounterName(PCI_PROCESSOR_TIME);
+	cpe.szCounterName = get_counter_name(PCI_PROCESSOR_TIME);
 
 	for(i = 0; i <= pcpus->count; i++)
 	{
@@ -73,13 +51,13 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 		if (ERROR_SUCCESS != zbx_PdhMakeCounterPath(__function_name, &cpe, counterPath))
 			goto clean;
 
-		if (NULL == (pcpus->cpu[i].usage_counter = add_perf_counter(NULL, counterPath, MAX_CPU_HISTORY)))
+		if (NULL == (pcpus->cpu_counter[i] = add_perf_counter(NULL, counterPath, MAX_CPU_HISTORY)))
 			goto clean;
 	}
 
-	cpe.szObjectName = GetCounterName(PCI_SYSTEM);
+	cpe.szObjectName = get_counter_name(PCI_SYSTEM);
 	cpe.szInstanceName = NULL;
-	cpe.szCounterName = GetCounterName(PCI_PROCESSOR_QUEUE_LENGTH);
+	cpe.szCounterName = get_counter_name(PCI_PROCESSOR_QUEUE_LENGTH);
 
 	if (ERROR_SUCCESS != zbx_PdhMakeCounterPath(__function_name, &cpe, counterPath))
 		goto clean;
@@ -96,22 +74,6 @@ clean:
 #endif	/* _WINDOWS */
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: close_cpu_collector                                              *
- *                                                                            *
- * Purpose: Clear state of data calculation                                   *
- *                                                                            *
- * Parameters:  pcpus - pointer to the structure                              *
- *                      of ZBX_CPUS_STAT_DATA type                            *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
 void	close_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 {
 #ifdef _WINDOWS
@@ -125,15 +87,15 @@ void	close_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 
 	for (i = 0; i < pcpus->count; i++)
 	{
-		remove_perf_counter(pcpus->cpu[i].usage_counter);
-		pcpus->cpu[i].usage_counter = NULL;
+		remove_perf_counter(pcpus->cpu_counter[i]);
+		pcpus->cpu_counter[i] = NULL;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 #endif /* _WINDOWS */
 }
 
-#if !defined(_WINDOWS)
+#ifndef _WINDOWS
 
 static int	get_cpustat(
 		int cpuid,
@@ -513,55 +475,7 @@ static void	apply_cpustat(
 
 void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
 {
-#ifdef _WINDOWS
-	const char			*__function_name = "collect_cpustat";
-	int				i;
-	double				value;
-	ZBX_SINGLE_CPU_STAT_DATA	*curr_cpu;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	/* Calculate average CPU usage */
-	for (i = 0; i <= pcpus->count; i++)
-	{
-		curr_cpu = &pcpus->cpu[i];
-
-		if (!curr_cpu->usage_counter)
-			continue;
-
-		value = compute_counter_statistics(__function_name, curr_cpu->usage_counter, USE_DEFAULT_INTERVAL);
-		if (PERF_COUNTER_ACTIVE == curr_cpu->usage_counter->status)
-			curr_cpu->util15 = value;
-
-		value = compute_counter_statistics(__function_name, curr_cpu->usage_counter, (5 * SEC_PER_MIN));
-		if (PERF_COUNTER_ACTIVE == curr_cpu->usage_counter->status)
-			curr_cpu->util5 = value;
-
-		value = compute_counter_statistics(__function_name, curr_cpu->usage_counter, (1 * SEC_PER_MIN));
-		if (PERF_COUNTER_ACTIVE == curr_cpu->usage_counter->status)
-			curr_cpu->util1 = value;
-	}
-
-	/* Calculate average processor load */
-	if (pcpus->queue_counter)
-	{
-		value = compute_counter_statistics(__function_name, pcpus->queue_counter, USE_DEFAULT_INTERVAL);
-		if (PERF_COUNTER_ACTIVE == pcpus->queue_counter->status)
-			pcpus->load15 = value;
-		
-		value = compute_counter_statistics(__function_name, pcpus->queue_counter, (5 * SEC_PER_MIN));
-		if (PERF_COUNTER_ACTIVE == pcpus->queue_counter->status)
-			pcpus->load5 = value;
-
-		value = compute_counter_statistics(__function_name, pcpus->queue_counter, (1 * SEC_PER_MIN));
-		if (PERF_COUNTER_ACTIVE == pcpus->queue_counter->status)
-			pcpus->load1 = value;
-	}
-	
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-
-#else /* not _WINDOWS */
-
+#ifndef _WINDOWS
 	register int	i = 0;
 	int		now = 0;
 
@@ -574,6 +488,5 @@ void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
 
 		apply_cpustat(pcpus, i, now, cpu_user, cpu_system, cpu_nice, cpu_idle, cpu_interrupt, cpu_iowait, cpu_softirq, cpu_steal);
 	}
-
 #endif /* _WINDOWS */
 }

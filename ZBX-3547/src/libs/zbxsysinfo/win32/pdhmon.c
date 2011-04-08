@@ -39,7 +39,7 @@ int	USER_PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_
 		return ret;
 	}
 
-	for (perfs = collector->perfs.pPerfCounterList; perfs; perfs=perfs->next)
+	for (perfs = collector->perfs.pPerfCounterList; NULL != perfs; perfs=perfs->next)
 	{
 		if (NULL != perfs->name && 0 == strcmp(perfs->name, param))
 		{
@@ -53,13 +53,11 @@ int	USER_PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_
 		}
 	}
 
-	if (SYSINFO_RET_OK != ret)
+	if (SYSINFO_RET_OK != ret && NULL != perfs)
 	{
 		if (ERROR_SUCCESS == calculate_counter_value(__function_name, perfs->counterpath, PDH_FMT_DOUBLE, &counterValue))
 		{
-			if (NULL != perfs)
-				perfs->status = PERF_COUNTER_INITIALIZED;
-
+			perfs->status = PERF_COUNTER_INITIALIZED;
 			SET_DBL_RESULT(result, counterValue.doubleValue);
 			ret = SYSINFO_RET_OK;
 		}
@@ -83,19 +81,15 @@ int	PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	if (2 < num_param(param))
 		goto clean;
 
-	if (0 != get_param(param, 1, counterpath, sizeof(counterpath)))
-		*counterpath = '\0';
-
-	if ('\0' == *counterpath)
+	if (0 != get_param(param, 1, counterpath, sizeof(counterpath)) || '\0' == *counterpath)
 		goto clean;
 
-	if (0 != get_param(param, 2, tmp, sizeof(tmp)))
-		*tmp = '\0';
-
-	if ('\0' != *tmp && FAIL == is_uint(tmp))
+	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp)
+		interval = 1;
+	else if (FAIL == is_uint(tmp))
 		goto clean;
-
-	interval = '\0' == *tmp ? 1 : atoi(tmp);
+	else
+		interval = atoi(tmp);
 
 	if (FAIL == check_counter_path(counterpath))
 		goto clean;
@@ -108,9 +102,9 @@ int	PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 			goto clean;
 		}
 
-		for (perfs = collector->perfs.pPerfCounterList; perfs != NULL; perfs = perfs->next)
+		for (perfs = collector->perfs.pPerfCounterList; NULL != perfs; perfs = perfs->next)
 		{
-			if (NULL == perfs->name && 0 == strcmp(perfs->counterpath, counterpath) && perfs->interval == interval)
+			if (0 == strcmp(perfs->counterpath, counterpath) && perfs->interval == interval)
 			{
 				value = compute_counter_statistics(__function_name, perfs, USE_DEFAULT_INTERVAL);
 				if (PERF_COUNTER_ACTIVE == perfs->status)
@@ -123,7 +117,7 @@ int	PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 			}
 		}
 
-		if (NULL == perfs && NULL == add_perf_counter(NULL, counterpath, interval))
+		if (NULL == perfs && NULL == (perfs = add_perf_counter(NULL, counterpath, interval)))
 			goto clean;
 	}
 

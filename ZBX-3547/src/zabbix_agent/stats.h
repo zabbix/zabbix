@@ -21,9 +21,12 @@
 #define ZABBIX_STATS_H
 
 #include "threads.h"
-#include "cpustat.h"
-#include "perfstat.h"
 #include "diskdevices.h"
+#ifdef _WINDOWS
+#	include "perfmon.h"
+#	include "perfstat.h"
+#endif	/* _WINDOWS */
+#include "cpustat.h"
 #ifdef _AIX
 #	include "vmstats.h"
 #endif	/* _AIX */

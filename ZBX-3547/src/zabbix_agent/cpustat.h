@@ -22,31 +22,14 @@
 
 #include "sysinfo.h"
 
-#if defined (_WINDOWS)
-
-#include "perfmon.h"
-#include "perfstat.h"
-
-	#define MAX_CPU_HISTORY 900 /* 15 min in seconds */
-
-	typedef struct s_single_cpu_stat_data
-	{
-		PERF_COUNTERS	*usage_counter;
-		double		util1;
-		double		util5;
-		double		util15;
-	}
-	ZBX_SINGLE_CPU_STAT_DATA;
+#ifdef _WINDOWS
+#	define MAX_CPU_HISTORY 900 /* 15 min in seconds */
 
 	typedef struct s_cpus_stat_data
 	{
-		int				count;
-		ZBX_SINGLE_CPU_STAT_DATA	*cpu; /* count + 1 */
-		PERF_COUNTERS			*queue_counter;
-
-		double	load1;
-		double	load5;
-		double	load15;
+		int		count;
+		PERF_COUNTERS	**cpu_counter;
+		PERF_COUNTERS	*queue_counter;
 	}
 	ZBX_CPUS_STAT_DATA;
 

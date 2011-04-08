@@ -20,41 +20,32 @@
 #ifndef ZABBIX_PERFMON_H
 #define ZABBIX_PERFMON_H
 
-#if !defined(_WINDOWS)
-#	error "This module allowed only for Windows OS"
-#endif /* _WINDOWS */
+#ifdef _WINDOWS
 
-/*
- * Performance Counter Indexes
- */
-#define PCI_SYSTEM			(2)
-#define PCI_PROCESSOR			(238)
-#define PCI_PROCESSOR_TIME		(6)
-#define PCI_PROCESSOR_QUEUE_LENGTH	(44)
-#define PCI_SYSTEM_UP_TIME		(674)
-#define PCI_TERMINAL_SERVICES		(2176)
-#define PCI_TOTAL_SESSIONS		(2178)
-
-/*
- * Performance Countername structure
- */
-struct perfcounter
-{
-	struct perfcounter *next;
-	unsigned long	pdhIndex;
-	TCHAR		name[PDH_MAX_COUNTER_NAME];
-	/* must be character array! if you want to rewrite  */
-	/* to use dynamic memory allocation CHECK for usage */
-	/* of sizeof function                               */
-};
+#	define PCI_SYSTEM			(2)
+#	define PCI_PROCESSOR			(238)
+#	define PCI_PROCESSOR_TIME		(6)
+#	define PCI_PROCESSOR_QUEUE_LENGTH	(44)
+#	define PCI_SYSTEM_UP_TIME		(674)
+#	define PCI_TERMINAL_SERVICES		(2176)
+#	define PCI_TOTAL_SESSIONS		(2178)
 
 typedef enum
 {
 	PERF_COUNTER_NOTSUPPORTED = 0,
 	PERF_COUNTER_INITIALIZED,
 	PERF_COUNTER_ACTIVE,
-} zbx_perf_counter_t;
-	
+};
+
+typedef struct perfcounter /* Performance Countername structure */
+{
+	struct perfcounter	*next;
+	unsigned long		pdhIndex;
+	TCHAR			name[PDH_MAX_COUNTER_NAME];
+	/* must be character array for usage with sizeof function */
+}
+PERFCOUNTER;
+
 typedef struct zbx_perfs
 {
    struct zbx_perfs	*next;
@@ -66,18 +57,18 @@ typedef struct zbx_perfs
    int			CurrentCounter;
    int			CurrentNum;
    int			status;
-} PERF_COUNTERS;
-
-typedef struct perfcounter PERFCOUNTER;
-
-extern PERFCOUNTER *PerfCounterList;
+}
+PERF_COUNTERS;
 
 PDH_STATUS	zbx_PdhMakeCounterPath(const char *function, PDH_COUNTER_PATH_ELEMENTS *cpe, char *counterpath);
 PDH_STATUS	zbx_PdhOpenQuery(const char *function, PDH_HQUERY query);
 PDH_STATUS	zbx_PdhAddCounter(const char *function, PERF_COUNTERS *counter, PDH_HQUERY query, const char *counterpath, PDH_HCOUNTER *handle);
 PDH_STATUS	zbx_PdhCollectQueryData(const char *function, const char *counterpath, PDH_HQUERY query);
 PDH_STATUS	zbx_PdhGetRawCounterValue(const char *function, const char *counterpath, PDH_HCOUNTER handle, PPDH_RAW_COUNTER value);
-LPTSTR		GetCounterName(DWORD pdhIndex);
+PDH_STATUS	calculate_counter_value(const char *function, const char *counterpath, DWORD dwFormat, PPDH_FMT_COUNTERVALUE value);
+LPTSTR		get_counter_name(DWORD pdhIndex);
 int		check_counter_path(char *counterPath);
+
+#endif /* _WINDOWS */
 
 #endif /* ZABBIX_PERFMON_H */

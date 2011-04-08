@@ -19,14 +19,9 @@
 
 #include "common.h"
 #include "stats.h"
-
 #include "log.h"
 #include "zbxconf.h"
-
 #include "diskdevices.h"
-#include "cpustat.h"
-#include "perfstat.h"
-#include "log.h"
 #include "cfg.h"
 
 #if defined(_WINDOWS)
@@ -155,21 +150,21 @@ void	init_collector_data()
 #endif
 
 	cpu_count = zbx_get_cpu_num();
-
 	sz = sizeof(ZBX_COLLECTOR_DATA);
-	sz_cpu = sizeof(ZBX_SINGLE_CPU_STAT_DATA) * (cpu_count + 1);
 
 #ifdef _WINDOWS
+	sz_cpu = sizeof(PERF_COUNTERS*) * (cpu_count + 1);
 
 	collector = zbx_malloc(collector, sz + sz_cpu);
 	memset(collector, 0, sz + sz_cpu);
 
-	collector->cpus.cpu = (ZBX_SINGLE_CPU_STAT_DATA *)(collector + 1);
+	collector->cpus.cpu_counter = (PERF_COUNTERS **)(collector + 1);
 	collector->cpus.count = cpu_count;
 
 	init_perf_collector(&collector->perfs);
 
 #else /* not _WINDOWS */
+	sz_cpu = sizeof(ZBX_SINGLE_CPU_STAT_DATA) * (cpu_count + 1);
 
 	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_COLLECTOR_ID)))
 	{
@@ -265,10 +260,11 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 	{
 		zbx_setproctitle("collector [processing data]");
 
-		if (CPU_COLLECTOR_STARTED(collector))
-			collect_cpustat(&(collector->cpus));
 #ifdef _WINDOWS
 		collect_perfstat();
+#else
+		if (CPU_COLLECTOR_STARTED(collector))
+			collect_cpustat(&(collector->cpus));
 #endif /* _WINDOWS */
 
 		collect_stats_diskdevices(&(collector->diskdevices));
@@ -279,11 +275,11 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 		zbx_sleep(1);
 	}
 
-#ifdef _WINDOWS
-	close_perf_collector();
-#endif /* _WINDOWS */
 	if (CPU_COLLECTOR_STARTED(collector))
 		close_cpu_collector(&(collector->cpus));
+#ifdef _WINDOWS /* cpu_collector must be closed before closing perf_collector */
+	close_perf_collector();
+#endif /* _WINDOWS */
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "zabbix_agentd collector stopped");
 

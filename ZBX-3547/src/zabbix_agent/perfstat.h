@@ -22,25 +22,23 @@
 
 #ifdef _WINDOWS
 
-#	include "perfmon.h"
-
-#	define PERF_COLLECTOR_STARTED(collector)	((collector) && (collector)->perfs.pdh_query)
-#	define UNSUPPORTED_REFRESH_PERIOD		600
-#	define USE_DEFAULT_INTERVAL			0
+#define PERF_COLLECTOR_STARTED(collector)	((collector) && (collector)->perfs.pdh_query)
+#define UNSUPPORTED_REFRESH_PERIOD		600
+#define USE_DEFAULT_INTERVAL			0
 
 typedef struct s_perfs_stat_data
 {
 	PERF_COUNTERS	*pPerfCounterList;
-	HQUERY		pdh_query;
+	PDH_HQUERY	pdh_query;
 	time_t		nextcheck;	/* refresh time of not supported counters */
-} ZBX_PERF_STAT_DATA;
+}
+ZBX_PERF_STAT_DATA;
 
-PDH_STATUS	calculate_counter_value(const char *function, const char *counterpath, DWORD dwFormat, PPDH_FMT_COUNTERVALUE value);
-double		compute_counter_statistics(const char *function, PERF_COUNTERS *counter, int interval);
 PERF_COUNTERS	*add_perf_counter(const char *name, const char *counterpath, int interval);
 int		add_perfs_from_config(const char *line);
 void		remove_perf_counter(PERF_COUNTERS *counter);
 void		perfs_list_free(void);
+double		compute_counter_statistics(const char *function, PERF_COUNTERS *counter, int interval);
 
 int		init_perf_collector(ZBX_PERF_STAT_DATA *pperf);
 void		collect_perfstat();

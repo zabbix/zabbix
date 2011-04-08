@@ -24,7 +24,7 @@
 #include "log.h"
 #include "alias.h"
 #include "sysinfo.h"
-#include "perfstat.h"
+#include "stats.h"
 
 #if defined(ZABBIX_DAEMON)
 #	include "daemon.h"
