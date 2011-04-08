@@ -304,7 +304,7 @@ BEGIN
 										v_esc_step_from, v_esc_step_to, v_evaltype);
 
 								INSERT INTO opconditions
-									SELECT @new_opconditionid := @new_opconditionid + 1,												new_operationid, conditiontype,
+									SELECT @new_opconditionid := @new_opconditionid + 1, new_operationid, conditiontype,
 											operator, value
 										FROM t_opconditions
 										WHERE operationid = v_operationid;
