@@ -241,15 +241,6 @@ zbx_graph_item_type;
 
 typedef struct
 {
-	char		*command;
-	zbx_uint64_t	groupid;
-	unsigned char	type;
-	unsigned char	execute_on;
-}
-DB_SCRIPT;
-
-typedef struct
-{
 	zbx_uint64_t	druleid;
 	char		*iprange;
 	char		*name;

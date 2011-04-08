@@ -126,7 +126,7 @@
 					new CButton('select_screen',S_SELECT,
 						'return PopUp("popup.php?dstfrm='.$form->getName().'&srctbl=screens'.
 						'&dstfld1=screen_name&srcfld1=name'.
-						'&dstfld2=new_step%5Bscreenid%5D&srcfld2=screenid");'),
+						'&dstfld2=new_step_screenid&srcfld2=screenid");'),
 					BR(),
 					new CSubmit('add_step', isset($new_step['sid']) ? S_SAVE : S_ADD),
 					new CSubmit('cancel_step', S_CANCEL)
@@ -574,7 +574,7 @@
 			$newRow = $frmUser->addRow(S_TRIGGER_SEVERITY, $triggers);
 			$newRow->setAttribute('id', 'triggers_row');
 
-			zbx_add_post_js("var userMessageSwitcher = new CViewSwitcher('messages[enabled]', 'click', ".zbx_jsvalue($msgVisibility, true).");");
+			zbx_add_post_js("var userMessageSwitcher = new CViewSwitcher('messages_enabled', 'click', ".zbx_jsvalue($msgVisibility, true).");");
  		}
 
 		$frmUser->addItemToBottomRow(new CSubmit('save',S_SAVE));
@@ -2161,10 +2161,10 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			$frmItem->addRow(S_GROUP,$cmbGroups);
 
 			$cmbAction = new CComboBox('action');
-			$cmbAction->addItem('add to group',S_ADD_TO_GROUP);
+			$cmbAction->addItem('add to group', _('Add to group'));
 			if(isset($_REQUEST['itemid'])){
 				$cmbAction->addItem('update in group',S_UPDATE_IN_GROUP);
-				$cmbAction->addItem('delete FROM group',S_DELETE_FROM_GROUP);
+				$cmbAction->addItem('delete FROM group', _('Delete from group'));
 			}
 			$frmItem->addItemToBottomRow(array($cmbAction, SPACE, new CSubmit('register',S_DO)));
 		}
@@ -2421,7 +2421,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 				$cmbApps->addItem($db_app["applicationid"],$db_app["name"]);
 			}
 		}
-		$frmItem->addRow(array( new CVisibilityBox('applications_visible', get_request('applications_visible'), 'applications[]',
+		$frmItem->addRow(array( new CVisibilityBox('applications_visible', get_request('applications_visible'), 'applications_',
 			S_ORIGINAL), S_APPLICATIONS),$cmbApps);
 
 		$tarea = new CTextArea('description', $description);

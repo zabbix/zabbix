@@ -44,8 +44,9 @@ $fields = array(
 // form
 	'name'=>			array(T_ZBX_STR, O_OPT,  NULL,			NOT_EMPTY,	'isset({save})'),
 	'type'=>			array(T_ZBX_INT, O_OPT,  NULL,			IN('0,1'),	'isset({save})'),
-	'execute_on'=>		array(T_ZBX_INT, O_OPT,  NULL,			IN('0,1'),	'isset({save})&&{type}=='.ZBX_SCRIPT_TYPE_SCRIPT),
-	'command'=>			array(T_ZBX_STR, O_OPT,  NULL,			NOT_EMPTY,	'isset({save})'),
+	'execute_on'=>		array(T_ZBX_INT, O_OPT,  NULL,			IN('0,1'),	'isset({save})&&{type}=='.ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT),
+	'command'=>			array(T_ZBX_STR, O_OPT,  NULL,			null,	'isset({save})'),
+	'commandipmi'=>			array(T_ZBX_STR, O_OPT,  NULL,		null,	'isset({save})'),
 	'description'=>		array(T_ZBX_STR, O_OPT,  NULL,			NULL,	'isset({save})'),
 	'access'=>			array(T_ZBX_INT, O_OPT,  NULL,			IN('0,1,2,3'),	'isset({save})'),
 	'groupid'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,			DB_ID,		'isset({save})'),
@@ -81,8 +82,13 @@ if($sid = get_request('scriptid')){
 		$confirmation = get_request('confirmation', '');
 		$enableConfirmation = get_request('enableConfirmation', false);
 
+		$command = ($_REQUEST['type'] == ZBX_SCRIPT_TYPE_IPMI) ? $_REQUEST['commandipmi'] : $_REQUEST['command'];
 		if($enableConfirmation && zbx_empty($confirmation)){
 			error(_('Please enter confirmation text.'));
+			show_messages(null, null, _('Cannot add script'));
+		}
+		else if(zbx_empty($command)){
+			error(_('Command cannot be empty.'));
 			show_messages(null, null, _('Cannot add script'));
 		}
 		else{
@@ -90,7 +96,7 @@ if($sid = get_request('scriptid')){
 				'name' => $_REQUEST['name'],
 				'type' => $_REQUEST['type'],
 				'execute_on' => $_REQUEST['execute_on'],
-				'command' => $_REQUEST['command'],
+				'command' => $command,
 				'description' => $_REQUEST['description'],
 				'usrgrpid' => $_REQUEST['usrgrpid'],
 				'groupid' => $_REQUEST['groupid'],
@@ -176,9 +182,10 @@ if($sid = get_request('scriptid')){
 
 		if(!$data['scriptid'] || isset($_REQUEST['form_refresh'])){
 			$data['name'] = get_request('name', '');
-			$data['type'] = get_request('type', ZBX_SCRIPT_TYPE_SCRIPT);
+			$data['type'] = get_request('type', ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT);
 			$data['execute_on'] = get_request('execute_on', ZBX_SCRIPT_EXECUTE_ON_SERVER);
 			$data['command'] = get_request('command', '');
+			$data['commandipmi'] = get_request('commandipmi', '');
 			$data['description'] = get_request('description', '');
 			$data['usrgrpid'] = get_request('usrgrpid',	0);
 			$data['groupid'] = get_request('groupid', 0);
@@ -196,7 +203,7 @@ if($sid = get_request('scriptid')){
 			$data['name'] = $script['name'];
 			$data['type'] = $script['type'];
 			$data['execute_on'] = $script['execute_on'];
-			$data['command']  = $script['command'];
+			$data['command'] = $data['commandipmi'] = $script['command'];
 			$data['description'] = $script['description'];
 			$data['usrgrpid'] = $script['usrgrpid'];
 			$data['groupid'] = $script['groupid'];
@@ -228,7 +235,7 @@ if($sid = get_request('scriptid')){
 			new CCheckBox('all_scripts', null, "checkAll('".$form->getName()."','all_scripts','scripts');"),
 			make_sorting_header(_('Name'), 'name'),
 			_('Execute on'),
-			make_sorting_header(_('Command'), 'command'),
+			make_sorting_header(_('Commands'), 'command'),
 			_('User group'),
 			_('Host group'),
 			_('Host access')
@@ -269,7 +276,7 @@ if($sid = get_request('scriptid')){
 				$host_group_name = _('All');
 			}
 
-			if($script['type'] == ZBX_SCRIPT_TYPE_SCRIPT){
+			if($script['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT){
 				switch($script['execute_on']){
 					case ZBX_SCRIPT_EXECUTE_ON_AGENT:
 						$scriptExecuteOn = _('Agent');
@@ -288,7 +295,7 @@ if($sid = get_request('scriptid')){
 				new CCheckBox('scripts['.$script['scriptid'].']', 'no', NULL, $script['scriptid']),
 				new CLink($script['name'], 'scripts.php?form=1'.'&scriptid='.$script['scriptid']),
 				$scriptExecuteOn,
-				htmlspecialchars($script['command'], ENT_COMPAT, 'UTF-8'),
+				zbx_nl2br(htmlspecialchars($script['command'], ENT_COMPAT, 'UTF-8')),
 				$user_group_name,
 				$host_group_name,
 				((PERM_READ_WRITE == $script['host_access']) ? _('Write') : _('Read'))

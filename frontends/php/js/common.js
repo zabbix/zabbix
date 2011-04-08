@@ -293,7 +293,7 @@ function create_var(form_name, var_name, var_val, subm){
 		frmForm.appendChild(objVar);
 
 		objVar.setAttribute('name',	var_name);
-		objVar.setAttribute('id',	var_name);
+		objVar.setAttribute('id',	var_name.replace("]","").replace("[","_"));
 	}
 
 	if(is_null(var_val)){

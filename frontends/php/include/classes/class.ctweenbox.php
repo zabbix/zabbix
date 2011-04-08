@@ -71,8 +71,8 @@ class CTweenBox{
 
 	public function get($caption_l=S_IN,$caption_r=S_OTHER){
 		$grp_tab = new CTable();
-		$grp_tab->setAttribute('name',$this->name);
-		$grp_tab->setAttribute('id',$this->name);
+		$grp_tab->attr('name',$this->name);
+		$grp_tab->attr('id', zbx_formatDomId($this->name));
 
 		$grp_tab->setCellSpacing(0);
 		$grp_tab->setCellPadding(0);
