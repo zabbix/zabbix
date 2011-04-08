@@ -38,8 +38,8 @@ class CTabView extends CDiv{
 		if(isset($data['selected'])) $this->setSelected($data['selected']);
 
 		parent::__construct();
-		$this->setAttribute('id', $this->id);
-		$this->setAttribute('class', 'min-width hidden');
+		$this->attr('id', zbx_formatDomId($this->id));
+		$this->attr('class', 'min-width hidden');
 	}
 
 	public function setRemember($remember){
@@ -54,7 +54,7 @@ class CTabView extends CDiv{
 		$this->headers[$id] = $header;
 
 		$this->tabs[$id] = new CDiv($body);
-		$this->tabs[$id]->setAttribute('id', $id);
+		$this->tabs[$id]->attr('id', zbx_formatDomId($id));
 	}
 
 	public static function setFooter($main, $others){

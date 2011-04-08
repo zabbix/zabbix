@@ -44,7 +44,7 @@
 // TYPE
 	$typeCB = new CComboBox('type', $data['type']);
 	$typeCB->addItem(ZBX_SCRIPT_TYPE_IPMI, _('IPMI'));
-	$typeCB->addItem(ZBX_SCRIPT_TYPE_SCRIPT, _('Script'));
+	$typeCB->addItem(ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, _('Script'));
 	$scriptTab->addRow(_('Type'), $typeCB);
 
 // EXECUTE ON
@@ -57,7 +57,12 @@
 // COMMAND
 	$commandTA = new CTextArea('command', $data['command']);
 	$commandTA->addStyle('width: 50em; padding: 0;');
-	$scriptTab->addRow(_('Command'), $commandTA);
+	$scriptTab->addRow(_('Commands'), $commandTA, $data['type'] == ZBX_SCRIPT_TYPE_IPMI);
+
+// COMMAND IPMI
+	$commandIpmiTB = new CTextBox('commandipmi', $data['commandipmi']);
+	$commandIpmiTB->addStyle('width: 50em;');
+	$scriptTab->addRow(_('Command'), $commandIpmiTB, $data['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT);
 
 // DESCRIPTION
 	$descriptionTA = new CTextArea('description', $data['description']);

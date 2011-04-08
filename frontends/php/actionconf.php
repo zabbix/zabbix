@@ -147,35 +147,21 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		}
 		DBstart();
 		if(isset($_REQUEST['actionid'])){
-			foreach($action['operations'] as $opnum => $operation){
-				if(isset($operation['opcommand_grp']))
-					foreach($operation['opcommand_grp'] as $ognum => $cmd){
-						if(isset($cmd['action']) && ($cmd['action'] != 'update')) unset($action['operations'][$opnum]['opcommand_grp'][$ognum]['opcommand_grpid']);
-						unset($action['operations'][$opnum]['opcommand_grp'][$ognum]['action']);
-					}
-
-				if(isset($operation['opcommand_hst']))
-					foreach($operation['opcommand_hst'] as $ohnum => $cmd){
-						if(isset($cmd['action']) && ($cmd['action'] != 'update')) unset($action['operations'][$opnum]['opcommand_hst'][$ohnum]['opcommand_hstid']);
-						unset($action['operations'][$opnum]['opcommand_hst'][$ohnum]['action']);
-					}
-			}
-
 			$action['actionid']= $_REQUEST['actionid'];
 
 			$result = API::Action()->update($action);
-			show_messages($result,S_ACTION_UPDATED,S_CANNOT_UPDATE_ACTION);
+			show_messages($result, _('Action updated'), _('Cannot update action'));
 		}
 		else{
 			$result = API::Action()->create($action);
-			show_messages($result,S_ACTION_ADDED,S_CANNOT_ADD_ACTION);
+			show_messages($result, _('Action added'), _('Cannot add action'));
 		}
 
 		$result = DBend($result);
 		if($result){
 			add_audit(!isset($_REQUEST['actionid'])?AUDIT_ACTION_ADD:AUDIT_ACTION_UPDATE,
 				AUDIT_RESOURCE_ACTION,
-				S_NAME.': '.$_REQUEST['name']);
+				_('Name').': '.$_REQUEST['name']);
 
 			unset($_REQUEST['form']);
 		}
@@ -186,7 +172,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 
 		$result = API::Action()->delete($_REQUEST['actionid']);
 
-		show_messages($result,S_ACTION_DELETED,S_CANNOT_DELETE_ACTION);
+		show_messages($result, _('Action deleted'), _('Cannot delete action'));
 		if($result){
 			unset($_REQUEST['form']);
 			unset($_REQUEST['actionid']);
@@ -198,9 +184,22 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		if(!isset($new_condition['value'])) $new_condition['value'] = '';
 
 		if(validate_condition($new_condition['conditiontype'], $new_condition['value'])){
-			$_REQUEST['conditions'] = get_request('conditions',array());
-			if(!str_in_array($new_condition, $_REQUEST['conditions']))
+			$_REQUEST['conditions'] = get_request('conditions', array());
+
+			$exists = false;
+			foreach($_REQUEST['conditions'] as $condition){
+				if(($new_condition['conditiontype'] === $condition['conditiontype'])
+					&& ($new_condition['operator'] === $condition['operator'])
+					&& ($new_condition['value'] === $condition['value'])
+				){
+					$exists = true;
+					break;
+				}
+			}
+
+			if(!$exists){
 				array_push($_REQUEST['conditions'],$new_condition);
+			}
 		}
 	}
 	else if(inarr_isset(array('del_condition','g_conditionid'))){
@@ -234,25 +233,41 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		$_REQUEST['new_operation'] = $new_operation;
 	}
 	else if(inarr_isset(array('add_operation','new_operation'))){
-		try{
-			$new_operation = $_REQUEST['new_operation'];
+		$new_operation = $_REQUEST['new_operation'];
+		$result = true;
 
-			API::Action()->validateOperations($new_operation);
-
+		if(API::Action()->validateOperations($new_operation)){
 			$_REQUEST['operations'] = get_request('operations', array());
 
-			if(!isset($new_operation['id']) && !str_in_array($new_operation, $_REQUEST['operations'])){
-				array_push($_REQUEST['operations'], $new_operation);
+			$uniqOperations = array(
+				OPERATION_TYPE_HOST_ADD => 0,
+				OPERATION_TYPE_HOST_REMOVE => 0,
+				OPERATION_TYPE_HOST_ENABLE => 0,
+				OPERATION_TYPE_HOST_DISABLE => 0,
+			);
+			if(isset($uniqOperations[$new_operation['operationtype']])){
+				foreach($_REQUEST['operations'] as $operation){
+					if(isset($uniqOperations[$operation['operationtype']]))
+						$uniqOperations[$operation['operationtype']]++;
+				}
+				if($uniqOperations[$new_operation['operationtype']]){
+					$result = false;
+					info(_s('Operation "%s" already exists.', operation_type2str($new_operation['operationtype'])));
+					show_messages();
+				}
 			}
-			else{
-				$id = $new_operation['id'];
-				unset($new_operation['id']);
-				$_REQUEST['operations'][$id] = $new_operation;
+
+			if($result){
+				if(isset($new_operation['id'])){
+					$_REQUEST['operations'][$new_operation['id']] = $new_operation;
+				}
+				else{
+					$_REQUEST['operations'][] = $new_operation;
+					sortOperations($_REQUEST['operations']);
+				}
 			}
+
 			unset($_REQUEST['new_operation']);
-		}
-		catch(APIException $e){
-			error($e->getMessage());
 		}
 	}
 	else if(inarr_isset(array('del_operation','g_operationid'))){
@@ -260,11 +275,12 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		foreach($_REQUEST['g_operationid'] as $condition){
 			unset($_REQUEST['operations'][$condition]);
 		}
+		sortOperations($_REQUEST['operations']);
 	}
 	else if(inarr_isset(array('edit_operationid'))){
 		$_REQUEST['edit_operationid'] = array_keys($_REQUEST['edit_operationid']);
-		$edit_operationid = $_REQUEST['edit_operationid'] =array_pop($_REQUEST['edit_operationid']);
-		$_REQUEST['operations'] = get_request('operations',array());
+		$edit_operationid = $_REQUEST['edit_operationid'] = array_pop($_REQUEST['edit_operationid']);
+		$_REQUEST['operations'] = get_request('operations', array());
 
 		if(isset($_REQUEST['operations'][$edit_operationid])){
 			$_REQUEST['new_operation'] = $_REQUEST['operations'][$edit_operationid];
@@ -296,7 +312,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		$go_result = DBend($res);
 
 		if($go_result && isset($res)){
-			show_messages($go_result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
+			show_messages($go_result, _('Status updated'), _('Cannot update status'));
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',',$actionids).'] '.$status_name);
 		}
 	}
@@ -323,9 +339,9 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 	$form->cleanItems();
 	$form->addVar('eventsource', $_REQUEST['eventsource']);
 	if(!isset($_REQUEST['form'])){
-		$form->addItem(new CSubmit('form', S_CREATE_ACTION));
+		$form->addItem(new CSubmit('form', _('Create Action')));
 	}
-	$action_wdgt->addPageHeader(S_CONFIGURATION_OF_ACTIONS_BIG, $form);
+	$action_wdgt->addPageHeader(_('CONFIGURATION OF ACTIONS'), $form);
 
 	if(isset($_REQUEST['form'])){
 		$action = null;
@@ -349,60 +365,58 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		}
 
 		if(isset($action['actionid']) && !isset($_REQUEST['form_refresh'])){
+			sortOperations($action['operations']);
 		}
 		else{
 			if(isset($_REQUEST['escalation']) && (0 == $_REQUEST['esc_period']))
 				$_REQUEST['esc_period'] = 3600;
 
-			$action['name']			= get_request('name');
-			$action['eventsource']	= get_request('eventsource');
-			$action['evaltype']		= get_request('evaltype', 0);
-			$action['esc_period']	= get_request('esc_period', 3600);
-			$action['status']		= get_request('status', isset($_REQUEST['form_refresh']) ? 1 : 0);
-			$action['def_shortdata']= get_request('def_shortdata', ACTION_DEFAULT_SUBJ);
-			$action['def_longdata']	= get_request('def_longdata', ACTION_DEFAULT_MSG);
-			$action['recovery_msg']	= get_request('recovery_msg',0);
-			$action['r_shortdata']	= get_request('r_shortdata', ACTION_DEFAULT_SUBJ);
-			$action['r_longdata']	= get_request('r_longdata', ACTION_DEFAULT_MSG);
+			$action['name'] = get_request('name');
+			$action['eventsource'] = get_request('eventsource');
+			$action['evaltype'] = get_request('evaltype', 0);
+			$action['esc_period'] = get_request('esc_period', 3600);
+			$action['status'] = get_request('status', isset($_REQUEST['form_refresh']) ? 1 : 0);
+			$action['def_shortdata'] = get_request('def_shortdata', ACTION_DEFAULT_SUBJ);
+			$action['def_longdata'] = get_request('def_longdata', ACTION_DEFAULT_MSG);
+			$action['recovery_msg'] = get_request('recovery_msg',0);
+			$action['r_shortdata'] = get_request('r_shortdata', ACTION_DEFAULT_SUBJ);
+			$action['r_longdata'] = get_request('r_longdata', ACTION_DEFAULT_MSG);
 
-			$action['conditions']	= get_request('conditions',array());
-			$action['operations']	= get_request('operations',array());
+			$action['conditions'] = get_request('conditions',array());
+			$action['operations'] = get_request('operations',array());
 		}
 
 		$actionForm = new CGetForm('action.edit', $action);
 		$action_wdgt->addItem($actionForm->render());
 
-
 		show_messages();
-
-//		$action_wdgt->addItem($frmAction);
 	}
 	else{
 		$form = new CForm('get');
 
 		$cmbSource = new CComboBox('eventsource',$_REQUEST['eventsource'],'submit()');
-		$cmbSource->addItem(EVENT_SOURCE_TRIGGERS,S_TRIGGERS);
-		$cmbSource->addItem(EVENT_SOURCE_DISCOVERY,S_DISCOVERY);
-		$cmbSource->addItem(EVENT_SOURCE_AUTO_REGISTRATION,S_AUTO_REGISTRATION);
-		$form->addItem(array(S_EVENT_SOURCE, SPACE, $cmbSource));
+		$cmbSource->addItem(EVENT_SOURCE_TRIGGERS, _('Triggers'));
+		$cmbSource->addItem(EVENT_SOURCE_DISCOVERY, _('Discovery'));
+		$cmbSource->addItem(EVENT_SOURCE_AUTO_REGISTRATION, _('Auto registration'));
+		$form->addItem(array(_('Event source'), SPACE, $cmbSource));
 
 		$numrows = new CDiv();
 		$numrows->setAttribute('name', 'numrows');
 
-		$action_wdgt->addHeader(S_ACTIONS_BIG, $form);
+		$action_wdgt->addHeader(_('ACTIONS'), $form);
 		$action_wdgt->addHeader($numrows);
 
 // table
 		$form = new CForm();
 		$form->setName('actions');
 
-		$tblActions = new CTableInfo(S_NO_ACTIONS_DEFINED);
+		$tblActions = new CTableInfo(_('No actions defined'));
 		$tblActions->setHeader(array(
 			new CCheckBox('all_items',null,"checkAll('".$form->getName()."','all_items','g_actionid');"),
-			make_sorting_header(S_NAME, 'name'),
-			S_CONDITIONS,
-			S_OPERATIONS,
-			make_sorting_header(S_STATUS, 'status')
+			make_sorting_header(_('Name'), 'name'),
+			_('Conditions'),
+			_('Operations'),
+			make_sorting_header(_('Status'), 'status')
 		));
 
 
@@ -438,30 +452,19 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 				);
 			}
 
-		$esc_step_from = array();
-		$esc_step_to = array();
-		$esc_period = array();
-		$esc_keys = array();
-		foreach($action['operations'] as $key => $operation) {
-			$esc_step_from[$key] = $operation['esc_step_from'];
-			$esc_step_to[$key] = $operation['esc_step_to'];
-			$esc_period[$key] = $operation['esc_period'];
-			$esc_keys[$key] = $key;
-		}
-		array_multisort($esc_step_from, SORT_ASC, $esc_step_to, SORT_ASC, $esc_period, SORT_ASC, $esc_keys, SORT_ASC, $action['operations']);
-
-			$operations=array();
+			sortOperations($action['operations']);
+			$operations = array();
 			foreach($action['operations'] as $onum => $operation){
 				$operations[] = get_operation_desc(SHORT_DESCRITION, $operation);
 			}
 
 			if($action['status'] == ACTION_STATUS_DISABLED){
-				$status= new CLink(S_DISABLED,
+				$status= new CLink(_('Disabled'),
 					'actionconf.php?go=activate&g_actionid%5B%5D='.$action['actionid'].url_param('eventsource'),
 					'disabled');
 			}
 			else{
-				$status= new CLink(S_ENABLED,
+				$status= new CLink(_('Enabled'),
 					'actionconf.php?go=disable&g_actionid%5B%5D='.$action['actionid'].url_param('eventsource'),
 					'enabled');
 			}
@@ -477,20 +480,20 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 
 //----- GO ------
 		$goBox = new CComboBox('go');
-		$goOption = new CComboItem('activate',S_ENABLE_SELECTED);
-		$goOption->setAttribute('confirm',S_ENABLE.' '.S_SELECTED_ACTIONS);
+		$goOption = new CComboItem('activate', _('Enable selected'));
+		$goOption->setAttribute('confirm', _('Enable selected actions?'));
 		$goBox->addItem($goOption);
 
-		$goOption = new CComboItem('disable',S_DISABLE_SELECTED);
-		$goOption->setAttribute('confirm',S_DISABLE.' '.S_SELECTED_ACTIONS);
+		$goOption = new CComboItem('disable', _('Disable selected'));
+		$goOption->setAttribute('confirm', _('Disable selected actions?'));
 		$goBox->addItem($goOption);
 
-		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
-		$goOption->setAttribute('confirm',S_DELETE.' '.S_SELECTED_ACTIONS);
+		$goOption = new CComboItem('delete', _('Delete selected'));
+		$goOption->setAttribute('confirm', _('Delete selected actions?'));
 		$goBox->addItem($goOption);
 
-		$goButton = new CSubmit('goButton',S_GO);
-		$goButton->setAttribute('id','goButton');
+		$goButton = new CSubmit('goButton', _('Go'));
+		$goButton->setAttribute('id', 'goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "g_actionid";');
 
 		$footer = get_table_header(array($goBox, $goButton));

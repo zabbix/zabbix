@@ -32,7 +32,7 @@ require_once('include/templates/action.js.php');
 	if(!isset($_REQUEST['form_refresh'])) $divTabs->setSelected(0);
 
 	$frmAction = new CForm();
-	$frmAction->setName('action.edit.php');
+	$frmAction->setName('action.edit');
 	$frmAction->addVar('form', get_request('form', 1));
 
 	$from_rfr = get_request('form_refresh',0);
@@ -44,24 +44,24 @@ require_once('include/templates/action.js.php');
 // ACTION FORM {{{
 	$actionList = new CFormList('actionlist');
 
-	$actionList->addRow(S_NAME, new CTextBox('name', $data['name'], $inputLength));
+	$actionList->addRow(_('Name'), new CTextBox('name', $data['name'], $inputLength));
 
 	if(EVENT_SOURCE_TRIGGERS == $data['eventsource']){
-		$actionList->addRow(_('Period (minimum 60 seconds)'), array(new CNumericBox('esc_period', $data['esc_period'], 6, 'no'), ' ('.S_SECONDS_SMALL.')'));
+		$actionList->addRow(_('Period (minimum 60 seconds)'), array(new CNumericBox('esc_period', $data['esc_period'], 6, 'no'), ' ('._('seconds').')'));
 	}
 	else{
 		$frmAction->addVar('esc_period', 0);
 	}
 
 
-	$actionList->addRow(S_DEFAULT_SUBJECT, new CTextBox('def_shortdata', $data['def_shortdata'], $inputLength));
-	$actionList->addRow(S_DEFAULT_MESSAGE, new CTextArea('def_longdata', $data['def_longdata'], $inputLength, 5));
+	$actionList->addRow(_('Default subject'), new CTextBox('def_shortdata', $data['def_shortdata'], $inputLength));
+	$actionList->addRow(_('Default message'), new CTextArea('def_longdata', $data['def_longdata'], $inputLength, 5));
 
 	if(EVENT_SOURCE_TRIGGERS == $data['eventsource']){
-		$actionList->addRow(S_RECOVERY_MESSAGE, new CCheckBox('recovery_msg',$data['recovery_msg'],'javascript: submit();',1));
+		$actionList->addRow(_('Recovery message'), new CCheckBox('recovery_msg',$data['recovery_msg'],'javascript: submit();',1));
 		if($data['recovery_msg']){
-			$actionList->addRow(S_RECOVERY_SUBJECT, new CTextBox('r_shortdata', $data['r_shortdata'], $inputLength));
-			$actionList->addRow(S_RECOVERY_MESSAGE, new CTextArea('r_longdata', $data['r_longdata'], $inputLength, 5));
+			$actionList->addRow(_('Recovery subject'), new CTextBox('r_shortdata', $data['r_shortdata'], $inputLength));
+			$actionList->addRow(_('Recovery message'), new CTextArea('r_longdata', $data['r_longdata'], $inputLength, 5));
 		}
 		else{
 			$frmAction->addVar('r_shortdata', $data['r_shortdata']);
@@ -69,9 +69,9 @@ require_once('include/templates/action.js.php');
 		}
 	}
 
-	$actionList->addRow(S_ENABLED, new CCheckBox('status', !$data['status'], null, ACTION_STATUS_ENABLED));
+	$actionList->addRow(_('Enabled'), new CCheckBox('status', !$data['status'], null, ACTION_STATUS_ENABLED));
 
-	$divTabs->addTab('actionTab', S_ACTION, $actionList);
+	$divTabs->addTab('actionTab', _('Action'), $actionList);
 // }}} ACTION_FORM
 
 // CONDITIONS FORM {{{
@@ -81,7 +81,7 @@ require_once('include/templates/action.js.php');
 	morder_result($data['conditions'], array('conditiontype','operator'), ZBX_SORT_DOWN);
 
 // group conditions by type
-	$condElements = new CTable(S_NO_CONDITIONS_DEFINED);
+	$condElements = new CTable(_('No conditions defined'), 'formElementTable');
 
 	$i=0;
 	$grouped_conditions = array();
@@ -94,7 +94,7 @@ require_once('include/templates/action.js.php');
 
 		$label = chr(ord('A') + $i);
 		$condElements->addRow(array('('.$label.')',array(
-			new CCheckBox('g_conditionid[]', 'no', null,$i),
+			new CCheckBox('g_conditionid[]', 'no', null,$i), SPACE,
 			get_condition_desc($condition['conditiontype'], $condition['operator'], $condition['value']))
 		));
 
@@ -109,14 +109,14 @@ require_once('include/templates/action.js.php');
 // prepare condition calcuation type selector
 		switch($data['evaltype']){
 			case ACTION_EVAL_TYPE_AND:
-				$group_op = $glog_op = S_AND;
+				$group_op = $glog_op = _('and');
 			break;
 			case ACTION_EVAL_TYPE_OR:
-				$group_op = $glog_op = S_OR;
+				$group_op = $glog_op = _('or');
 			break;
 			default:
-				$group_op = S_OR;
-				$glog_op = S_AND;
+				$group_op = _('or');
+				$glog_op = _('and');
 		}
 
 		foreach($grouped_conditions as $id => $condition)
@@ -125,10 +125,10 @@ require_once('include/templates/action.js.php');
 		$grouped_conditions = implode(' '.$glog_op.' ', $grouped_conditions);
 
 		$cmb_calc_type = new CComboBox('evaltype', $data['evaltype'], 'submit()');
-		$cmb_calc_type->addItem(ACTION_EVAL_TYPE_AND_OR, S_AND_OR_BIG);
-		$cmb_calc_type->addItem(ACTION_EVAL_TYPE_AND, S_AND_BIG);
-		$cmb_calc_type->addItem(ACTION_EVAL_TYPE_OR, S_OR_BIG);
-		$conditionList->addRow(S_TYPE_OF_CALCULATION, array($cmb_calc_type, new CSpan($grouped_conditions)));
+		$cmb_calc_type->addItem(ACTION_EVAL_TYPE_AND_OR, _('AND / OR'));
+		$cmb_calc_type->addItem(ACTION_EVAL_TYPE_AND, _('AND'));
+		$cmb_calc_type->addItem(ACTION_EVAL_TYPE_OR, _('OR'));
+		$conditionList->addRow(_('Type of calculation'), array($cmb_calc_type, new CSpan($grouped_conditions)));
 	}
 	else{
 		$frmAction->addVar('evaltype', $data['evaltype']);
@@ -136,10 +136,10 @@ require_once('include/templates/action.js.php');
 
 	$removeCondition = null;
 	if($condElements->ItemsCount() > 0){
-		$removeCondition = new CSubmit('del_condition', S_DELETE_SELECTED, null, 'link_menu');
+		$removeCondition = new CSubmit('del_condition', _('Delete selected'), null, 'link_menu');
 	}
 
-	$conditionList->addRow(S_CONDITIONS, new CDiv(array($condElements, $removeCondition), 'objectgroup inlineblock border_dotted ui-corner-all'));
+	$conditionList->addRow(_('Conditions'), new CDiv(array($condElements, $removeCondition), 'objectgroup inlineblock border_dotted ui-corner-all'));
 
 // NEW CONDITION
 
@@ -172,7 +172,7 @@ require_once('include/templates/action.js.php');
 				new CTextBox('group','',40,'yes'),
 				new CButton('btn1',_('Select'),
 					"return PopUp('popup.php?writeonly=1&dstfrm=".$frmAction->getName().
-					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=group&srctbl=host_group".
+					"&dstfld1=new_condition_value&dstfld2=group&srctbl=host_group".
 					"&srcfld1=groupid&srcfld2=name',450,450);",
 					'link_menu'));
 			break;
@@ -182,7 +182,7 @@ require_once('include/templates/action.js.php');
 				new CTextBox('host','',40,'yes'),
 				new CButton('btn1',_('Select'),
 					"return PopUp('popup.php?writeonly=1&dstfrm=".$frmAction->getName().
-					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=host&srctbl=host_templates".
+					"&dstfld1=new_condition_value&dstfld2=host&srctbl=host_templates".
 					"&srcfld1=hostid&srcfld2=host',450,450);",
 					'link_menu'));
 			break;
@@ -192,7 +192,7 @@ require_once('include/templates/action.js.php');
 				new CTextBox('host','',40,'yes'),
 				new CButton('btn1',_('Select'),
 					"return PopUp('popup.php?writeonly=1&dstfrm=".$frmAction->getName().
-					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=host&srctbl=hosts".
+					"&dstfld1=new_condition_value&dstfld2=host&srctbl=hosts".
 					"&srcfld1=hostid&srcfld2=host',450,450);",
 					'link_menu'));
 			break;
@@ -203,7 +203,7 @@ require_once('include/templates/action.js.php');
 				new CTextBox('trigger','',40,'yes'),
 				new CButton('btn1',_('Select'),
 					"return PopUp('popup.php?writeonly=1&dstfrm=".$frmAction->getName().
-					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=trigger&srctbl=triggers".
+					"&dstfld1=new_condition_value&dstfld2=trigger&srctbl=triggers".
 					"&srcfld1=triggerid&srcfld2=description');",
 					'link_menu'));
 			break;
@@ -226,7 +226,7 @@ require_once('include/templates/action.js.php');
 			$rowCondition[] = $cmbCondVal;
 			break;
 		case CONDITION_TYPE_MAINTENANCE:
-			$rowCondition[] = new CCol(S_MAINTENANCE_SMALL);
+			$rowCondition[] = new CCol(_('maintenance'));
 			break;
 		case CONDITION_TYPE_NODE:
 			$conditionList->addItem(new CVar('new_condition[value]','0'));
@@ -234,7 +234,7 @@ require_once('include/templates/action.js.php');
 				new CTextBox('node','',40,'yes'),
 				new CButton('btn1',_('Select'),
 					"return PopUp('popup.php?writeonly=1&dstfrm=".$frmAction->getName().
-					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=node&srctbl=nodes".
+					"&dstfld1=new_condition_value&dstfld2=node&srctbl=nodes".
 					"&srcfld1=nodeid&srcfld2=name',450,450);",
 					'link_menu'));
 			break;
@@ -244,7 +244,7 @@ require_once('include/templates/action.js.php');
 				new CTextBox('drule','',40,'yes'),
 				new CButton('btn1',_('Select'),
 					"return PopUp('popup.php?dstfrm=".$frmAction->getName().
-					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=drule&srctbl=drules".
+					"&dstfld1=new_condition_value&dstfld2=drule&srctbl=drules".
 					"&srcfld1=druleid&srcfld2=name',450,450);",
 					'link_menu'));
 			break;
@@ -254,7 +254,7 @@ require_once('include/templates/action.js.php');
 				new CTextBox('dcheck','',40,'yes'),
 				new CButton('btn1',_('Select'),
 					"return PopUp('popup.php?writeonly=1&dstfrm=".$frmAction->getName().
-					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=dcheck&srctbl=dchecks".
+					"&dstfld1=new_condition_value&dstfld2=dcheck&srctbl=dchecks".
 					"&srcfld1=dcheckid&srcfld2=name',450,450);",
 					'link_menu'));
 			break;
@@ -264,7 +264,7 @@ require_once('include/templates/action.js.php');
 				new CTextBox('proxy','',40,'yes'),
 				new CButton('btn1',_('Select'),
 					"return PopUp('popup.php?writeonly=1&dstfrm=".$frmAction->getName().
-					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=proxy&srctbl=proxies".
+					"&dstfld1=new_condition_value&dstfld2=proxy&srctbl=proxies".
 					"&srcfld1=hostid&srcfld2=host',450,450);",
 					'link_menu'));
 			break;
@@ -314,7 +314,7 @@ require_once('include/templates/action.js.php');
 		'objectgroup inlineblock border_dotted ui-corner-all'
 	);
 
-	$conditionList->addRow(S_NEW_CONDITION, $newCond);
+	$conditionList->addRow(_('New condition'), $newCond);
 
 	$divTabs->addTab('conditionTab', _('Conditions'), $conditionList);
 // }}} CONDITION FORM
@@ -323,20 +323,6 @@ require_once('include/templates/action.js.php');
 	$operationList = new CFormList('operationlist');
 
 	$allowedOperations = get_operations_by_eventsource($data['eventsource']);
-
-// sorting
-	$esc_step_from = array();
-	$esc_step_to = array();
-	$esc_period = array();
-	$esc_keys = array();
-	foreach($data['operations'] as $key => $operation) {
-		$esc_step_from[$key] = $operation['esc_step_from'];
-		$esc_step_to[$key] = $operation['esc_step_to'];
-		$esc_period[$key] = $operation['esc_period'];
-		$esc_keys[$key] = $key;
-	}
-	array_multisort($esc_step_from, SORT_ASC, $esc_step_to, SORT_ASC, $esc_period, SORT_ASC, $esc_keys, SORT_ASC, $data['operations']);
-// --
 
 	if(EVENT_SOURCE_TRIGGERS == $data['eventsource'])
 		$operationsHeader = array(new CCheckBox('all_operations',null,'checkAll("'.$frmAction->getName().'","all_operations","g_operationid");'),
@@ -349,13 +335,10 @@ require_once('include/templates/action.js.php');
 	$tblOper->setHeader($operationsHeader);
 
 	$delay = count_operations_delay($data['operations'],$data['esc_period']);
-	foreach($data['operations'] as $id => $operation){
+	foreach($data['operations'] as $opid => $operation){
 		if(!str_in_array($operation['operationtype'], $allowedOperations)) continue;
 		if(!isset($operation['opconditions'])) $operation['opconditions'] = array();
 		if(!isset($operation['mediatypeid'])) $operation['mediatypeid'] = 0;
-
-		$opid = isset($operation['operationid']) ? $operation['operationid'] : $id;
-		$operation['id'] = $opid;
 
 		$oper_details = new CSpan(get_operation_desc(SHORT_DESCRITION, $operation));
 		$oper_details->setHint(get_operation_desc(LONG_DESCRITION, $operation));
@@ -371,8 +354,8 @@ require_once('include/templates/action.js.php');
 		$esc_steps_txt = ($operation['esc_step_from']==$operation['esc_step_to'])?
 			$operation['esc_step_from']:$operation['esc_step_from'].' - '.$operation['esc_step_to'];
 
-		$esc_period_txt = $operation['esc_period']?$operation['esc_period']:S_DEFAULT;
-		$esc_delay_txt = $delay[$operation['esc_step_from']]?convert_units($delay[$operation['esc_step_from']],'uptime'):S_IMMEDIATELY;
+		$esc_period_txt = $operation['esc_period']?$operation['esc_period']:_('Default');
+		$esc_delay_txt = $delay[$operation['esc_step_from']]?convert_units($delay[$operation['esc_step_from']],'uptime'):_('Immediately');
 
 		if(EVENT_SOURCE_TRIGGERS == $data['eventsource'])
 			$operationRow = array(
@@ -393,8 +376,8 @@ require_once('include/templates/action.js.php');
 
 		$operation['opmessage_grp'] = zbx_toHash($operation['opmessage_grp'], 'usrgrpid');
 		$operation['opmessage_usr'] = zbx_toHash($operation['opmessage_usr'], 'userid');
-		$operation['opcommand_grp'] = zbx_toHash($operation['opcommand_grp'], 'opcommand_grpid');
-		$operation['opcommand_hst'] = zbx_toHash($operation['opcommand_hst'], 'opcommand_hstid');
+		$operation['opcommand_grp'] = zbx_toHash($operation['opcommand_grp'], 'groupid');
+		$operation['opcommand_hst'] = zbx_toHash($operation['opcommand_hst'], 'hostid');
 
 		$tblOper->addItem(new CVar('operations['.$opid.']', $operation));
 	}
@@ -423,7 +406,7 @@ require_once('include/templates/action.js.php');
 				'operationtype' => 0,
 				'esc_period' => 0,
 				'esc_step_from' => 1,
-				'esc_step_to' => 0,
+				'esc_step_to' => 1,
 				'evaltype' => 0
 			);
 		}
@@ -443,9 +426,9 @@ require_once('include/templates/action.js.php');
 			$step_from = new CNumericBox('new_operation[esc_step_from]', $new_operation['esc_step_from'],4);
 			$step_from->addAction('onchange','javascript:'.$step_from->getAttribute('onchange').' if(this.value == 0) this.value=1;');
 
-			$tblStep->addRow(array(S_FROM, $step_from));
+			$tblStep->addRow(array(_('From'), $step_from));
 			$tblStep->addRow(array(
-				S_TO,
+				_('To'),
 				new CCol(array(
 					new CNumericBox('new_operation[esc_step_to]', $new_operation['esc_step_to'], 4),
 					_('(0 - infinitely)')))
@@ -458,7 +441,7 @@ require_once('include/templates/action.js.php');
 					_('(minimum 60 seconds, 0 - use action default)')))
 			));
 
-			$tblOper->addRow(array(S_STEP, $tblStep));
+			$tblOper->addRow(array(_('Step'), $tblStep));
 		}
 		else{
 			$tblOper->addItem(new CVar('new_operation[esc_step_from]', 1));
@@ -470,8 +453,8 @@ require_once('include/templates/action.js.php');
 		foreach($allowedOperations as $oper)
 			$cmbOpType->addItem($oper, operation_type2str($oper));
 
-		$tblOper->addRow(array(S_OPERATION_TYPE, $cmbOpType));
-		switch($new_operation['operationtype']) {
+		$tblOper->addRow(array(_('Operation type'), $cmbOpType));
+		switch($new_operation['operationtype']){
 			case OPERATION_TYPE_MESSAGE:
 				if(!isset($new_operation['opmessage'])){
 					$new_operation['opmessage_usr'] = array();
@@ -489,7 +472,8 @@ require_once('include/templates/action.js.php');
 				$usrgrpList = new CTable();
 				$usrgrpList->setAttribute('id', 'opmsgUsrgrpList');
 
-				$addUsrgrpBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm='.S_ACTION.'&srctbl=usrgrp'.'&srcfld1=usrgrpid'.'&srcfld2=name'.'&multiselect=1'.'",450,450)','link_menu');
+				$addUsrgrpBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name&multiselect=1",450,450)', 'link_menu');
+				$addUsrgrpBtn->attr('id', 'addusrgrpbtn');
 
 				$col = new CCol($addUsrgrpBtn);
 				$col->setAttribute('colspan', 2);
@@ -503,7 +487,8 @@ require_once('include/templates/action.js.php');
 				$userList = new CTable();
 				$userList->setAttribute('id', 'opmsgUserList');
 
-				$addUserBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm='.S_ACTION.'&srctbl=users'.'&srcfld1=userid'.'&srcfld2=alias'.'&multiselect=1'.'",450,450)','link_menu');
+				$addUserBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=users&srcfld1=userid&srcfld2=alias&multiselect=1",450,450)', 'link_menu');
+				$addUserBtn->attr('id', 'adduserbtn');
 
 				$col = new CCol($addUserBtn);
 				$col->setAttribute('colspan', 2);
@@ -551,7 +536,7 @@ require_once('include/templates/action.js.php');
 
 				$tblOper->addRow(array(_('Send only to'), $cmbMediaType));
 
-				$tblOper->addRow(array(S_DEFAULT_MESSAGE, new CCheckBox('new_operation[opmessage][default_msg]', $new_operation['opmessage']['default_msg'], 'javascript: submit();', 1)));
+				$tblOper->addRow(array(_('Default message'), new CCheckBox('new_operation[opmessage][default_msg]', $new_operation['opmessage']['default_msg'], 'javascript: submit();', 1)));
 
 				if(!$new_operation['opmessage']['default_msg']){
 					$tblOper->addRow(array(_('Subject'), new CTextBox('new_operation[opmessage][subject]', $new_operation['opmessage']['subject'], 77)));
@@ -563,8 +548,42 @@ require_once('include/templates/action.js.php');
 				}
 				break;
 			case OPERATION_TYPE_COMMAND:
-				$cmdList = new CTable();
-				$cmdList->addRow(array(_('Target'), _('Command'), SPACE));
+				if(!isset($new_operation['opcommand'])){
+					$new_operation['opcommand'] = array();
+				}
+				$new_operation['opcommand']['type'] = isset($new_operation['opcommand']['type'])
+						? $new_operation['opcommand']['type'] : ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT;
+				$new_operation['opcommand']['scriptid'] = isset($new_operation['opcommand']['scriptid'])
+						? $new_operation['opcommand']['scriptid'] : '';
+				$new_operation['opcommand']['execute_on'] = isset($new_operation['opcommand']['execute_on'])
+						? $new_operation['opcommand']['execute_on'] : ZBX_SCRIPT_EXECUTE_ON_AGENT;
+				$new_operation['opcommand']['publickey'] = isset($new_operation['opcommand']['publickey'])
+						? $new_operation['opcommand']['publickey'] : '';
+				$new_operation['opcommand']['privatekey'] = isset($new_operation['opcommand']['privatekey'])
+						? $new_operation['opcommand']['privatekey'] : '';
+				$new_operation['opcommand']['authtype'] = isset($new_operation['opcommand']['authtype'])
+						? $new_operation['opcommand']['authtype'] : ITEM_AUTHTYPE_PASSWORD;
+				$new_operation['opcommand']['username'] = isset($new_operation['opcommand']['username'])
+						? $new_operation['opcommand']['username'] : '';
+				$new_operation['opcommand']['password'] = isset($new_operation['opcommand']['password'])
+						? $new_operation['opcommand']['password'] : '';
+				$new_operation['opcommand']['port'] = isset($new_operation['opcommand']['port'])
+						? $new_operation['opcommand']['port'] : '';
+				$new_operation['opcommand']['command'] = isset($new_operation['opcommand']['command'])
+						? $new_operation['opcommand']['command'] : '';
+
+				$new_operation['opcommand']['script'] = '';
+				if(!zbx_empty($new_operation['opcommand']['scriptid'])){
+					$userScripts = API::Script()->get(array(
+						'scriptids' => $new_operation['opcommand']['scriptid'],
+						'output' => API_OUTPUT_EXTEND
+					));
+					if($userScript = reset($userScripts))
+						$new_operation['opcommand']['script'] = $userScript['name'];
+				}
+
+				$cmdList = new CTable(null, 'formElementTable');
+				$cmdList->addRow(array(_('Target'), _('Action')));
 
 				$addCmdBtn = new CButton('add', _('New'), "javascript: showOpCmdForm(0,'new');",'link_menu');
 
@@ -590,7 +609,7 @@ require_once('include/templates/action.js.php');
 				$new_operation['opcommand_hst'] = array_values($new_operation['opcommand_hst']);
 				foreach($new_operation['opcommand_hst'] as $ohnum => $cmd)
 					$new_operation['opcommand_hst'][$ohnum]['host'] = ($cmd['hostid'] > 0) ? $hosts[$cmd['hostid']]['host'] : '';
-				morder_result($new_operation['opcommand_hst'], array('host', 'opcommand_hstid'));
+				order_result($new_operation['opcommand_hst'], 'host');
 
 				$groups = API::HostGroup()->get(array(
 					'groupids' => zbx_objectValues($new_operation['opcommand_grp'], 'groupid'),
@@ -602,7 +621,8 @@ require_once('include/templates/action.js.php');
 				$new_operation['opcommand_grp'] = array_values($new_operation['opcommand_grp']);
 				foreach($new_operation['opcommand_grp'] as $ognum => $cmd)
 					$new_operation['opcommand_grp'][$ognum]['name'] = $groups[$cmd['groupid']]['name'];
-				morder_result($new_operation['opcommand_grp'], array('name', 'opcommand_grpid'));
+				order_result($new_operation['opcommand_grp'], 'name');
+
 // JS Add commands
 				$jsInsert = '';
 				$jsInsert.= 'addPopupValues('.zbx_jsvalue(array('object'=>'hostid', 'values'=>$new_operation['opcommand_hst'])).');';
@@ -610,10 +630,63 @@ require_once('include/templates/action.js.php');
 
 				zbx_add_post_js($jsInsert);
 
-				$cmdList = new CDiv($cmdList, 'objectgroup border_dotted ui-corner-all');
+// Target list
+				$cmdList = new CDiv($cmdList, 'objectgroup border_dotted ui-corner-all inlineblock');
 				$cmdList->setAttribute('id', 'opCmdList');
 
-				$tblOper->addRow(array(_('Remote commands'), $cmdList));
+				$tblOper->addRow(array(_('Target list'), $cmdList));
+
+// TYPE
+				$typeCB = new CComboBox('new_operation[opcommand][type]', $new_operation['opcommand']['type'], 'javascript: showOpTypeForm();');
+				$typeCB->addItem(ZBX_SCRIPT_TYPE_IPMI, _('IPMI'));
+				$typeCB->addItem(ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, _('Custom script'));
+				$typeCB->addItem(ZBX_SCRIPT_TYPE_SSH, _('SSH'));
+				$typeCB->addItem(ZBX_SCRIPT_TYPE_TELNET, _('Telnet'));
+				$typeCB->addItem(ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT, _('Global script'));
+
+				$userScriptId = new CVar('new_operation[opcommand][scriptid]', $new_operation['opcommand']['scriptid']);
+				$userScriptName = new CTextBox('new_operation[opcommand][script]', $new_operation['opcommand']['script'], 30, true);
+				$userScriptSelect = new CButton('select_opcommand_script',_('Select'), null, 'link_menu');
+
+				$userScript = new CDiv(array($userScriptId,$userScriptName, SPACE, $userScriptSelect), 'class_opcommand_userscript inlineblock hidden');
+
+				$tblOper->addRow(array(_('Type'), array($typeCB,SPACE,$userScript)));
+
+// Script
+				$executeOnRb = new CRadioButton('new_operation[opcommand][execute_on]', $new_operation['opcommand']['execute_on']);
+				$executeOnRb->makeVertical();
+
+				$executeOnRb->addValue(_('Zabbix agent'),ZBX_SCRIPT_EXECUTE_ON_AGENT);
+				$executeOnRb->addValue(_('Zabbix server'),ZBX_SCRIPT_EXECUTE_ON_SERVER);
+
+				$tblOper->addRow(array(_('Execute on'), new CDiv($executeOnRb, 'objectgroup border_dotted ui-corner-all inlineblock')), 'class_opcommand_execute_on hidden');
+
+// SSH
+				$cmbAuthType = new CComboBox('new_operation[opcommand][authtype]', $new_operation['opcommand']['authtype'], 'javascript: showOpTypeAuth();');
+				$cmbAuthType->addItem(ITEM_AUTHTYPE_PASSWORD, _('Password'));
+				$cmbAuthType->addItem(ITEM_AUTHTYPE_PUBLICKEY, _('Public key'));
+
+				$tblOper->addRow(array(_('Authentication method'), $cmbAuthType), 'class_authentication_method hidden');
+
+				$tblOper->addRow(array(_('User name'), new CTextBox('new_operation[opcommand][username]',$new_operation['opcommand']['username'])), 'class_authentication_username hidden');
+				$tblOper->addRow(array(_('Public key file'),new CTextBox('new_operation[opcommand][publickey]',$new_operation['opcommand']['publickey'])), 'class_authentication_publickey hidden');
+				$tblOper->addRow(array(_('Private key file'),new CTextBox('new_operation[opcommand][privatekey]',$new_operation['opcommand']['privatekey'])), 'class_authentication_privatekey hidden');
+				$tblOper->addRow(array(_('Password'),new CTextBox('new_operation[opcommand][password]',$new_operation['opcommand']['password'])), 'class_authentication_password hidden');
+
+
+// SSH && Telnet
+				$tblOper->addRow(array(_('Port'), new CTextBox('new_operation[opcommand][port]', $new_operation['opcommand']['port'])), 'class_opcommand_port hidden');
+
+// Command
+				$commandTextArea = new CTextArea('new_operation[opcommand][command]', $new_operation['opcommand']['command'], 77, 7);
+				$commandTextArea->addStyle('width: 40em;');
+				$tblOper->addRow(array(_('Commands'), $commandTextArea), 'class_opcommand_command hidden');
+
+				$commandIpmiTextBox = new CTextBox('new_operation[opcommand][command]', $new_operation['opcommand']['command']);
+				$commandIpmiTextBox->addStyle('width: 40em;');
+				$commandIpmiTextBox->attr('id', 'opcommand_command_ipmi');
+				$tblOper->addRow(array(_('Commands'), $commandIpmiTextBox), 'class_opcommand_command_ipmi hidden');
+
 				break;
 			case OPERATION_TYPE_HOST_ADD:
 			case OPERATION_TYPE_HOST_REMOVE:
@@ -633,7 +706,7 @@ require_once('include/templates/action.js.php');
 				$groupList = new CTable();
 				$groupList->setAttribute('id', 'opGroupList');
 
-				$addUsrgrpBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm='.S_ACTION.'&srctbl=host_group&srcfld1=groupid&srcfld2=name&multiselect=1&reference=dsc_groupid'.'",450,450)','link_menu');
+				$addUsrgrpBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=host_group&srcfld1=groupid&srcfld2=name&multiselect=1&reference=dsc_groupid",450,450)', 'link_menu');
 
 				$col = new CCol($addUsrgrpBtn);
 				$col->setAttribute('colspan', 2);
@@ -668,7 +741,7 @@ require_once('include/templates/action.js.php');
 				$templateList = new CTable();
 				$templateList->setAttribute('id', 'opTemplateList');
 
-				$addUsrgrpBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm='.S_ACTION.'&srctbl=host_templates&srcfld1=templateid&srcfld2=host&multiselect=1&reference=dsc_templateid'.'",450,450)','link_menu');
+				$addUsrgrpBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=host_templates&srcfld1=templateid&srcfld2=host&multiselect=1&reference=dsc_templateid",450,450)', 'link_menu');
 
 				$col = new CCol($addUsrgrpBtn);
 				$col->setAttribute('colspan', 2);
@@ -766,12 +839,12 @@ require_once('include/templates/action.js.php');
 				$grouped_opconditions = implode(' ' . $glog_op . ' ', $grouped_opconditions);
 
 				$cmb_calc_type = new CComboBox('new_operation[evaltype]', $evaltype, 'submit()');
-				$cmb_calc_type->addItem(ACTION_EVAL_TYPE_AND_OR, S_AND_OR_BIG);
-				$cmb_calc_type->addItem(ACTION_EVAL_TYPE_AND, S_AND_BIG);
-				$cmb_calc_type->addItem(ACTION_EVAL_TYPE_OR, S_OR_BIG);
+				$cmb_calc_type->addItem(ACTION_EVAL_TYPE_AND_OR, _('AND / OR'));
+				$cmb_calc_type->addItem(ACTION_EVAL_TYPE_AND, _('AND'));
+				$cmb_calc_type->addItem(ACTION_EVAL_TYPE_OR, _('OR'));
 
 				$tblOper->addRow(array(
-					S_TYPE_OF_CALCULATION,
+					_('Type of calculation'),
 					array($cmb_calc_type, new CTextBox('preview', $grouped_opconditions, 60, 'yes'))
 				));
 			}
@@ -782,7 +855,7 @@ require_once('include/templates/action.js.php');
 			$tblCond->addRow($cond_el);
 			$tblCond->addRow(new CCol($cond_buttons));
 
-			$tblOper->addRow(array(S_CONDITIONS, $tblCond));
+			$tblOper->addRow(array(_('Conditions'), $tblCond));
 			unset($grouped_opconditions, $cond_el, $cond_buttons, $tblCond);
 		}
 
@@ -827,8 +900,8 @@ require_once('include/templates/action.js.php');
 			switch($new_opcondition['conditiontype']){
 				case CONDITION_TYPE_EVENT_ACKNOWLEDGED:
 					$cmbCondVal = new CComboBox('new_opcondition[value]',$new_opcondition['value']);
-					$cmbCondVal->addItem(0, S_NOT_ACK);
-					$cmbCondVal->addItem(1, S_ACK);
+					$cmbCondVal->addItem(0, _('Not Ack'));
+					$cmbCondVal->addItem(1, _('Ack'));
 					$rowCondition[] = $cmbCondVal;
 					break;
 			}

@@ -252,7 +252,7 @@ include_once('include/page_header.php');
 		}
 
 		$go_result = DBend($go_result);
-		show_messages($go_result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
+		show_messages($go_result, _('Status updated'), _('Cannot update status'));
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['g_triggerid'])){
 		$go_result = API::TriggerPrototype()->delete($_REQUEST['g_triggerid']);
