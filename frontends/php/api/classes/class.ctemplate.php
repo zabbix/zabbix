@@ -1032,12 +1032,24 @@ COpt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Template name [ %1$s ]', $template['host']));
 				}
 
-				if($this->exists(array('host' => $template['host']))){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$template['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+				if(isset($template['host'])){
+					if($this->exists(array('host' => $template['host']))){
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template "%s" already exists.', $template['host']));
+					}
+
+					if(API::Host()->exists(array('host' => $template['host']))){
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host "%s" already exists.', $template['host']));
+					}
 				}
 
-				if(API::Host()->exists(array('host' => $template['host']))){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$template['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+				if(isset($template['name'])){
+					if($this->exists(array('name' => $template['name']))){
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template with the same visible name "%s" already exists.', $template['name']));
+					}
+
+					if(API::Host()->exists(array('name' => $template['name']))){
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host with the same visible name "%s" already exists.', $template['name']));
+					}
 				}
 
 				$templateid = DB::insert('hosts', array(array('host' => $template['host'],'name' => $template['name'], 'status' => HOST_STATUS_TEMPLATE,)));
