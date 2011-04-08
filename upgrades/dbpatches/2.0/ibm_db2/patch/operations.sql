@@ -77,7 +77,7 @@ CREATE TABLE operations (
 	operationtype            integer         WITH DEFAULT '0'          NOT NULL,
 	esc_period               integer         WITH DEFAULT '0'          NOT NULL,
 	esc_step_from            integer         WITH DEFAULT '1'          NOT NULL,
-	esc_step_to              integer         WITH DEFAULT '0'          NOT NULL,
+	esc_step_to              integer         WITH DEFAULT '1'          NOT NULL,
 	evaltype                 integer         WITH DEFAULT '0'          NOT NULL,
 	PRIMARY KEY (operationid)
 )
