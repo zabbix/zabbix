@@ -20,21 +20,17 @@
 #ifndef ZABBIX_TELNET_H
 #define ZABBIX_TELNET_H
 
-#include "common.h"
-#include "dbcache.h"
 #include "sysinfo.h"
 
-#define	WAIT_READ	0
-#define	WAIT_WRITE	1
+#define WAIT_READ	0
+#define WAIT_WRITE	1
 
-#define	CMD_IAC		255
-#define	CMD_WILL	251
-#define	CMD_WONT	252
-#define	CMD_DO		253
-#define	CMD_DONT	254
-#define	OPT_SGA		3
-
-static char	prompt_char = '\0';
+#define CMD_IAC		255
+#define CMD_WILL	251
+#define CMD_WONT	252
+#define CMD_DO		253
+#define CMD_DONT	254
+#define OPT_SGA		3
 
 int	telnet_test_login(int socket_fd);
 int	telnet_login(int socket_fd, const char *username, const char *password, AGENT_RESULT *result);

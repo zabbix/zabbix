@@ -22,6 +22,8 @@
 #include "comms.h"
 #include "log.h"
 
+static char	prompt_char = '\0';
+
 static int	telnet_waitsocket(int socket_fd, int mode)
 {
 	const char	*__function_name = "telnet_waitsocket";
@@ -299,7 +301,7 @@ static void	telnet_rm_prompt(const char *buf, size_t *offset)
 
 int	telnet_test_login(int socket_fd)
 {
-	const char	*__function_name = "telnet_login";
+	const char	*__function_name = "telnet_test_login";
 	char		buf[MAX_BUFFER_LEN];
 	size_t		sz, offset;
 	int		rc, ret = FAIL;
