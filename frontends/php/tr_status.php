@@ -550,7 +550,7 @@ require_once('include/templates/scriptConfirm.js.php');
 				}
 			}
 			if(!empty($scripts_by_hosts)){
-				$menus = "[".zbx_jsvalue(S_TOOLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus;
+				$menus = "[".zbx_jsvalue(_('Scripts')).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus;
 			}
 
 			$menus.= "[".zbx_jsvalue(S_LINKS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";

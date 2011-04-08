@@ -149,7 +149,9 @@ INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (7, 14
 INSERT INTO opmessage_usr (opmessage_usrid, operationid, userid) VALUES (2, 12, 1);
 INSERT INTO opmessage_usr (opmessage_usrid, operationid, userid) VALUES (3, 15, 1);
 
-INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid, command) VALUES (1, 16, NULL, '/sbin/shutdown -r');
+INSERT INTO opcommand (operationid, type, command) VALUES (16, 0, '/sbin/shutdown -r');
+
+INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid) VALUES (1, 16, NULL);
 
 INSERT INTO opconditions (opconditionid, operationid, conditiontype, operator, value) VALUES (1,11,14,0,'0');
 INSERT INTO opconditions (opconditionid, operationid, conditiontype, operator, value) VALUES (2,11,14,0,'1');
@@ -197,8 +199,11 @@ INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (9, 18
 INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (10, 24, 1);
 INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (11, 25, 4);
 
-INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid, command) VALUES (2, 19, NULL, 'echo TEST');
-INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid, command) VALUES (3, 26, NULL, 'echo TEST');
+INSERT INTO opcommand (operationid, type, command) VALUES (19, 0, 'echo TEST');
+INSERT INTO opcommand (operationid, type, command) VALUES (26, 0, 'echo TEST');
+
+INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid) VALUES (2, 19, NULL);
+INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid) VALUES (3, 26, NULL);
 
 INSERT INTO opgroup (opgroupid, operationid, groupid) VALUES (3, 22, 5);
 INSERT INTO opgroup (opgroupid, operationid, groupid) VALUES (4, 29, 5);

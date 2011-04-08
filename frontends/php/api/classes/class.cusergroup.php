@@ -632,7 +632,11 @@ class CUserGroup extends CZBXAPI{
 
 
 		$usrgrpids = zbx_toArray($usrgrpids);
-
+		$dbUsrgrps = $this->get(array(
+			'output' => array('usrgrpid','name'),
+			'usrgrpids' => $usrgrpids,
+			'preservekeys' => true
+		));
 
 		if(empty($usrgrpids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
 
@@ -642,19 +646,18 @@ class CUserGroup extends CZBXAPI{
 			}
 
 			//we must check, if this user group is used in one of the scripts. If so, it cannot be deleted
-			$error_array = array();
-			$sql = 'SELECT s.name AS script_name, ug.name AS group_name '.
-					' FROM scripts s, usrgrp ug'.
-					' WHERE '.
-						' ug.usrgrpid = s.usrgrpid '.
-						' AND '.DBcondition('s.usrgrpid', $usrgrpids);
-			$res = DBselect($sql);
-			while($group = DBfetch($res)){
-				//GETTEXT: User gets this error message when tries to delete user group used in script
-				$error_array[] = sprintf(_('User group [%1$s] is used in script [%2$s].'), $group['group_name'], $group['script_name']);
+			$dbScripts = API::Script()->get(array(
+				'output' => array('scriptid','name','usrgrpid'),
+				'usrgrpids' => $usrgrpids,
+				'nopermissions' => true
+			));
+			if(!empty($dbScripts)){
+				foreach($dbScripts as $snum => $script){
+					if($script['usrgrpid'] == 0) continue;
+
+					self::exception(ZBX_API_ERROR_PARAMETERS,_s('User group "%1$s" is used in script "%2$s".', $dbUsrgrps[$script['usrgrpid']]['name'], $script['name']));
+				}
 			}
-			if(!empty($error_array))
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error_array);
 
 // delete action operation msg
 			$operationids = array();
