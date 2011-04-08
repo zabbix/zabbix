@@ -125,13 +125,13 @@ static int	check_ssh(const char *host, unsigned short port, int timeout, int *va
 	return SYSINFO_RET_OK;
 }
 
-#ifdef	HAVE_LIBCURL
+#ifdef HAVE_LIBCURL
 static int	check_https(const char *host, unsigned short port, int timeout, int *value_int)
 {
 	const char	*__function_name = "check_https";
 	int		err, opt;
 	char		https_host[MAX_BUFFER_LEN];
-	CURL            *easyhandle = NULL;
+	CURL            *easyhandle;
 
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
@@ -156,7 +156,7 @@ static int	check_https(const char *host, unsigned short port, int timeout, int *
 	if (CURLE_OK == (err = curl_easy_perform(easyhandle)))
 		*value_int = 1;
 	else
-		zabbix_log(LOG_LEVEL_DEBUG, "%s: curl_easy_perform failed for [%s:%d]: %s",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: curl_easy_perform failed for [%s:%hu]: %s",
 				__function_name, host, port, curl_easy_strerror(err));
 clean:
 	curl_easy_cleanup(easyhandle);
@@ -180,7 +180,7 @@ static int	check_telnet(const char *host, unsigned short port, int timeout, int 
 		if (SUCCEED == telnet_test_login(s.socket))
 			*value_int = 1;
 		else
-			zabbix_log(LOG_LEVEL_DEBUG,"Telnet check error: no login prompt");
+			zabbix_log(LOG_LEVEL_DEBUG, "Telnet check error: no login prompt");
 
 		zbx_tcp_close(&s);
 	}
@@ -280,7 +280,7 @@ static int	check_service(const char *cmd, const char *param, unsigned flags, AGE
 			return ret;
 		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, NULL, NULL, &value_int);
 	}
-#ifdef	HAVE_LIBCURL
+#ifdef HAVE_LIBCURL
 	else if (0 == strcmp(service, "https"))
 	{
 		if ('\0' == *str_port)

@@ -147,17 +147,39 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 
 	switch (dcheck->type)
 	{
-		case SVC_SSH:		service = "ssh"; break;
-		case SVC_LDAP:		service = "ldap"; break;
-		case SVC_SMTP:		service = "smtp"; break;
-		case SVC_FTP:		service = "ftp"; break;
-		case SVC_HTTP:		service = "http"; break;
-		case SVC_POP:		service = "pop"; break;
-		case SVC_NNTP:		service = "nntp"; break;
-		case SVC_IMAP:		service = "imap"; break;
-		case SVC_TCP:		service = "tcp"; break;
-		case SVC_HTTPS:		service = "https"; break;
-		case SVC_TELNET:	service = "telnet"; break;
+		case SVC_SSH:
+			service = "ssh";
+			break;
+		case SVC_LDAP:
+			service = "ldap";
+			break;
+		case SVC_SMTP:
+			service = "smtp";
+			break;
+		case SVC_FTP:
+			service = "ftp";
+			break;
+		case SVC_HTTP:
+			service = "http";
+			break;
+		case SVC_POP:
+			service = "pop";
+			break;
+		case SVC_NNTP:
+			service = "nntp";
+			break;
+		case SVC_IMAP:
+			service = "imap";
+			break;
+		case SVC_TCP:
+			service = "tcp";
+			break;
+		case SVC_HTTPS:
+			service = "https";
+			break;
+		case SVC_TELNET:
+			service = "telnet";
+			break;
 		case SVC_AGENT:
 		case SVC_SNMPv1:
 		case SVC_SNMPv2c:
@@ -171,11 +193,11 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 
 	if (SUCCEED == ret)
 	{
-		alarm(10);
+		alarm(CONFIG_TIMEOUT);
 
-		switch(dcheck->type)
+		switch (dcheck->type)
 		{
-			/* Simple checks */
+			/* simple checks */
 			case SVC_SSH:
 			case SVC_LDAP:
 			case SVC_SMTP:
@@ -202,7 +224,7 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 				else
 					ret = FAIL;
 				break;
-			/* Agent and SNMP checks */
+			/* agent and SNMP checks */
 			case SVC_AGENT:
 			case SVC_SNMPv1:
 			case SVC_SNMPv2c:
@@ -235,7 +257,7 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 
 				if (SVC_AGENT == dcheck->type)
 				{
-					if(SUCCEED == get_value_agent(&item, &result))
+					if (SUCCEED == get_value_agent(&item, &result))
 					{
 						if (GET_STR_RESULT(&result))
 							zbx_strlcpy(value, result.str, DSERVICE_VALUE_LEN_MAX);
@@ -271,7 +293,7 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 								&item.snmpv3_privpassphrase, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 					}
 
-					if(SUCCEED == get_value_snmp(&item, &result))
+					if (SUCCEED == get_value_snmp(&item, &result))
 					{
 						if (GET_STR_RESULT(&result))
 							zbx_strlcpy(value, result.str, DSERVICE_VALUE_LEN_MAX);
@@ -311,6 +333,7 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 			default:
 				break;
 		}
+
 		alarm(0);
 	}
 	free_result(&result);
