@@ -324,8 +324,6 @@ require_once('include/templates/action.js.php');
 
 	$allowedOperations = get_operations_by_eventsource($data['eventsource']);
 
-	sortOperations($data['operations']);
-
 	if(EVENT_SOURCE_TRIGGERS == $data['eventsource'])
 		$operationsHeader = array(new CCheckBox('all_operations',null,'checkAll("'.$frmAction->getName().'","all_operations","g_operationid");'),
 			_('Steps'), _('Details'), _('Period (sec)'), _('Delay'), _('Action'));

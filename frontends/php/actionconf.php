@@ -263,6 +263,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 				}
 				else{
 					$_REQUEST['operations'][] = $new_operation;
+					sortOperations($_REQUEST['operations']);
 				}
 			}
 
@@ -274,11 +275,12 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		foreach($_REQUEST['g_operationid'] as $condition){
 			unset($_REQUEST['operations'][$condition]);
 		}
+		sortOperations($_REQUEST['operations']);
 	}
 	else if(inarr_isset(array('edit_operationid'))){
 		$_REQUEST['edit_operationid'] = array_keys($_REQUEST['edit_operationid']);
 		$edit_operationid = $_REQUEST['edit_operationid'] = array_pop($_REQUEST['edit_operationid']);
-		$_REQUEST['operations'] = get_request('operations',array());
+		$_REQUEST['operations'] = get_request('operations', array());
 
 		if(isset($_REQUEST['operations'][$edit_operationid])){
 			$_REQUEST['new_operation'] = $_REQUEST['operations'][$edit_operationid];
@@ -363,24 +365,25 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		}
 
 		if(isset($action['actionid']) && !isset($_REQUEST['form_refresh'])){
+			sortOperations($action['operations']);
 		}
 		else{
 			if(isset($_REQUEST['escalation']) && (0 == $_REQUEST['esc_period']))
 				$_REQUEST['esc_period'] = 3600;
 
-			$action['name']			= get_request('name');
-			$action['eventsource']	= get_request('eventsource');
-			$action['evaltype']		= get_request('evaltype', 0);
-			$action['esc_period']	= get_request('esc_period', 3600);
-			$action['status']		= get_request('status', isset($_REQUEST['form_refresh']) ? 1 : 0);
-			$action['def_shortdata']= get_request('def_shortdata', ACTION_DEFAULT_SUBJ);
-			$action['def_longdata']	= get_request('def_longdata', ACTION_DEFAULT_MSG);
-			$action['recovery_msg']	= get_request('recovery_msg',0);
-			$action['r_shortdata']	= get_request('r_shortdata', ACTION_DEFAULT_SUBJ);
-			$action['r_longdata']	= get_request('r_longdata', ACTION_DEFAULT_MSG);
+			$action['name'] = get_request('name');
+			$action['eventsource'] = get_request('eventsource');
+			$action['evaltype'] = get_request('evaltype', 0);
+			$action['esc_period'] = get_request('esc_period', 3600);
+			$action['status'] = get_request('status', isset($_REQUEST['form_refresh']) ? 1 : 0);
+			$action['def_shortdata'] = get_request('def_shortdata', ACTION_DEFAULT_SUBJ);
+			$action['def_longdata'] = get_request('def_longdata', ACTION_DEFAULT_MSG);
+			$action['recovery_msg'] = get_request('recovery_msg',0);
+			$action['r_shortdata'] = get_request('r_shortdata', ACTION_DEFAULT_SUBJ);
+			$action['r_longdata'] = get_request('r_longdata', ACTION_DEFAULT_MSG);
 
-			$action['conditions']	= get_request('conditions',array());
-			$action['operations']	= get_request('operations',array());
+			$action['conditions'] = get_request('conditions',array());
+			$action['operations'] = get_request('operations',array());
 		}
 
 		$actionForm = new CGetForm('action.edit', $action);
