@@ -162,10 +162,10 @@
 	}
 
 	$hostList->addRow(_('Groups'),$grp_tb->get(_('In groups'), _('Other groups')));
-	$hostList->addRow(array(
-			new CLabel(_('New group'), 'newgroup'), BR(),
-			new CTextBox('newgroup',$newgroup)
-		));
+
+	$newgroupTB = new CTextBox('newgroup', $newgroup);
+	$newgroupTB->setAttribute('maxlength', 64);
+	$hostList->addRow(array(new CLabel(_('New group'), 'newgroup'), BR(), $newgroupTB));
 
 // interfaces
 	if(empty($interfaces)){

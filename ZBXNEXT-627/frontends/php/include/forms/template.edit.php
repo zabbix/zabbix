@@ -113,8 +113,13 @@
 	$templateList = new CFormList('hostlist');
 
 // FORM ITEM : Template name text box [  ]
-	$templateList->addRow(_('Template name'), new CTextBox('template_name', $host, 54));
-	$templateList->addRow(_('Visible name'), new CTextBox('visiblename', $visiblename, 54));
+	$template_nameTB = new CTextBox('template_name', $host, 54);
+	$template_nameTB->setAttribute('maxlength', 64);
+	$templateList->addRow(_('Template name'), $template_nameTB);
+
+	$visiblenameTB = new CTextBox('visiblename', $visiblename, 54);
+	$visiblenameTB->setAttribute('maxlength', 64);
+	$templateList->addRow(_('Visible name'), $visiblenameTB);
 
 // FORM ITEM : Groups tween box [  ] [  ]
 // get all Groups
@@ -128,9 +133,10 @@
 	}
 	$templateList->addRow(S_GROUPS, $group_tb->get(S_IN.SPACE.S_GROUPS,S_OTHER.SPACE.S_GROUPS));
 
-
 // FORM ITEM : new group text box [  ]
-	$templateList->addRow(array(S_NEW_GROUP, BR(), new CTextBox('newgroup', $newgroup)));
+	$newgroupTB = new CTextBox('newgroup', $newgroup);
+	$newgroupTB->setAttribute('maxlength', 64);
+	$templateList->addRow(array(new CLabel(_('New group'), 'newgroup'), BR(), $newgroupTB));
 
 // FORM ITEM : linked Hosts tween box [  ] [  ]
 	$twb_groupid = get_request('twb_groupid', 0);
