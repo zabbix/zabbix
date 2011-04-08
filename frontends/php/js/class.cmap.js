@@ -618,38 +618,6 @@ create: function(e){
 //--
 },
 
-add_link: function(mlink, update_map){
-	this.debug('add_link');
-//--
-
-	if(is_array(mlink.linktriggers)){
-		var tmp_lts = {};
-		for(var i=0; i<mlink.linktriggers.length; i++){
-			if(!isset(i, mlink.linktriggers) || empty(mlink.linktriggers[i])) continue;
-			var tmp_lt = mlink.linktriggers[i];
-
-			tmp_lts[tmp_lt.linktriggerid] = {};
-
-			tmp_lts[tmp_lt.linktriggerid].linktriggerid = tmp_lt.linktriggerid;
-			tmp_lts[tmp_lt.linktriggerid].linkid = tmp_lt.linkid;
-			tmp_lts[tmp_lt.linktriggerid].triggerid = tmp_lt.triggerid;
-			tmp_lts[tmp_lt.linktriggerid].drawtype = tmp_lt.drawtype;
-			tmp_lts[tmp_lt.linktriggerid].color = tmp_lt.color;
-			tmp_lts[tmp_lt.linktriggerid].desc_exp = tmp_lt.desc_exp;
-		}
-
-		mlink.linktriggers = tmp_lts;
-	}
-
-	mlink.status = 1;
-	this.data = mlink;
-
-	if((typeof(update_map) != 'undefined') && (update_map == 1)){
-		this.updateImage();
-	}
-},
-
-
 update: function(params){ // params = [{'key': key, 'value':value},{'key': key, 'value':value},...]
 	this.debug('update');
 //--
@@ -775,11 +743,11 @@ initialize: function($super, sysmap, selementData){
 		label_location:		3,
 		x:					0,
 		y:					0,
-		elementsubtype:		0,
-		areatype:			0,
-		width:				200,
-		height:				200,
-		viewtype:			0,
+		elementsubtype:		0,			// host group view types: 0 - host group, 1 - host group elements
+		areatype:			0,			// how to show area: 0 - fit to map, 1 - custom size
+		width:				200,		// area height
+		height:				200,		// area width
+		viewtype:			0,			// how to align icons inside area: 0 - 'left->right, top->bottom, evenly aligned'
 		urls:				{}
 	};
 
@@ -1093,7 +1061,7 @@ selementForm:		{},					// container for Selement form dom objects
 linkForm:			{},					// container for link form dom objects
 
 
-debug_status: 2,
+debug_status:		0,
 
 //----------------------------------------------------------------------------------------------
 
@@ -1560,7 +1528,7 @@ this.selementForm.dragHandler = e_td_5;
 
 	e_td_5.appendChild(document.createTextNode(locale['S_EDIT_MAP_ELEMENT']));
 
-
+// TYPE
 	var e_tr_4 = document.createElement('tr');
 this.selementForm.massEdit.elementtype = e_tr_4;
 
@@ -1619,6 +1587,168 @@ this.selementForm.elementtype = e_select_6;
 	e_option_7.setAttribute('value',"4");
 	e_option_7.appendChild(document.createTextNode(locale['S_IMAGE']));
 	e_select_6.appendChild(e_option_7);
+
+// SUBTYPE
+	var e_tr_4 = document.createElement('tr');
+this.selementForm.typeDOM.elementsubtype = e_tr_4;
+//	jQuery(e_tr_4).toggleClass("hidden", true);
+
+	e_tr_4.className = "even_row";
+	e_tbody_3.appendChild(e_tr_4);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_l";
+	e_td_5.appendChild(document.createTextNode(locale['S_SHOW']));
+	e_tr_4.appendChild(e_td_5);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_r";
+	e_tr_4.appendChild(e_td_5);
+
+	var e_div_6 = document.createElement('div');
+this.selementForm.elementsubtype = e_div_6;
+
+	e_div_6.setAttribute('id',"elementsubtype_box");
+	e_div_6.className = "objectgroup inlineblock border_dotted ui-corner-all";
+
+	e_td_5.appendChild(e_div_6);
+
+	var e_rb_7 = jQuery("<input/>").attr({
+		"type":		"radio",
+		"class":	"input radio",
+		"name":		"elementsubtype",
+		"id":		"elementsubtype_0",
+		"value":	"0"
+	}).appendTo(e_div_6);
+
+	jQuery(e_div_6).append(jQuery("<label>Host group</label><br/>").attr({"for": "elementsubtype_0"}));
+
+	var e_rb_7 = jQuery("<input/>").attr({
+		"type":		"radio",
+		"class":	"input radio",
+		"name":		"elementsubtype",
+		"id":		"elementsubtype_1",
+		"value":	"1"
+	}).appendTo(e_div_6);
+
+	jQuery(e_div_6).append(jQuery("<label>Host group elements</label>").attr({"for": "elementsubtype_1"}));
+
+
+// AREATYPE
+	var e_tr_4 = document.createElement('tr');
+this.selementForm.typeDOM.areatype = e_tr_4;
+//	jQuery(e_tr_4).toggleClass("hidden", true);
+
+	e_tr_4.className = "even_row";
+	e_tbody_3.appendChild(e_tr_4);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_l";
+	e_td_5.appendChild(document.createTextNode("Area size"));
+	e_tr_4.appendChild(e_td_5);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_r";
+	e_tr_4.appendChild(e_td_5);
+
+	var e_div_6 = document.createElement('div');
+this.selementForm.areatype = e_div_6;
+
+	e_div_6.setAttribute('id',"areatype_box");
+	e_div_6.className = "objectgroup border_dotted ui-corner-all";
+
+	e_td_5.appendChild(e_div_6);
+
+	var e_rb_7 = jQuery("<input/>").attr({
+		"type":		"radio",
+		"class":	"input radio",
+		"name":		"areatype",
+		"id":		"areatype_0",
+		"value":	"0"
+	}).appendTo(e_div_6);
+
+	jQuery(e_div_6).append(jQuery("<label>Fit to map</label><br/>").attr({"for": "areatype_0"}));
+
+	var e_rb_7 = jQuery("<input/>").attr({
+		"type":		"radio",
+		"class":	"input radio",
+		"name":		"areatype",
+		"id":		"areatype_1",
+		"value":	"1"
+	}).appendTo(e_div_6);
+
+	jQuery(e_div_6).append(jQuery("<label>Custom size</label>").attr({"for": "areatype_1"}));
+
+// AREA SIZE
+	var e_div_6 = document.createElement('div');
+this.selementForm.areasize = e_div_6;
+
+	e_div_6.setAttribute('id',"areasize_box");
+	e_div_6.className = "objectgroup border_dotted ui-corner-all";
+
+	e_td_5.appendChild(e_div_6);
+
+	jQuery(e_div_6).append(jQuery("<label>Width</label>").attr({"for": "areatype_width"}));
+
+	var e_input_7 = jQuery("<input/>").attr({
+		"type":		"text",
+		"class":	"input text",
+		"name":		"width",
+		"id":		"areatype_width",
+		"value":	"200",
+		"size":		"4"
+	}).appendTo(e_div_6);
+
+	jQuery(e_div_6).append(jQuery("&nbsp;&nbsp;&nbsp;<label>Height</label>").attr({"for": "areatype_height"}));
+
+	var e_input_7 = jQuery("<input/>").attr({
+		"type":		"text",
+		"class":	"input text",
+		"name":		"height",
+		"id":		"areatype_height",
+		"value":	"200",
+		"size":		"4"
+	}).appendTo(e_div_6);
+
+// VIEWTYPE
+	var e_tr_4 = document.createElement('tr');
+this.selementForm.typeDOM.viewtype = e_tr_4;
+//	jQuery(e_tr_4).toggleClass("hidden", true);
+
+	e_tr_4.className = "even_row";
+	e_tbody_3.appendChild(e_tr_4);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_l";
+	e_td_5.appendChild(document.createTextNode("Placing algorithm"));
+	e_tr_4.appendChild(e_td_5);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_r";
+	e_tr_4.appendChild(e_td_5);
+
+	var e_div_6 = document.createElement('div');
+this.selementForm.elementsubtype = e_div_6;
+
+	e_div_6.setAttribute('id',"elementsubtype_box");
+
+	e_td_5.appendChild(e_div_6);
+
+	var e_rb_7 = jQuery("<input/>").attr({
+		"type":		"radio",
+		"class":	"input radio",
+		"name":		"viewtype",
+		"id":		"viewtype_0",
+		"value":	"0"
+	}).appendTo(e_div_6);
+
+	jQuery(e_div_6).append(jQuery("<label>Grid</label><br/>").attr({"for": "viewtype_0"}));
 
 // LABEL
 	var e_tr_4 = document.createElement('tr');
@@ -2276,11 +2406,14 @@ form_selement_updateByType: function(e, multi){
 		this.selementForm.elementid.value = '0';
 	}
 
+
+	jQuery(this.selementForm.typeDOM.elementsubtype).toggleClass("hidden", true);
+	jQuery(this.selementForm.typeDOM.areatype).toggleClass("hidden", true);
+	jQuery(this.selementForm.typeDOM.viewtype).toggleClass("hidden", true);
+
 	var srctbl = '';
 	var srcfld1 = '';
 	var srcfld2 = '';
-
-
 	switch(elementtype.toString()){
 		case '0':
 // host
@@ -2333,6 +2466,10 @@ form_selement_updateByType: function(e, multi){
 			var srcfld1 = 'groupid';
 			var srcfld2 = 'name';
 			$(this.selementForm.typeDOM.elementCaption).update(locale['S_HOST_GROUP']);
+
+			jQuery(this.selementForm.typeDOM.elementsubtype).toggleClass("hidden", false);
+			jQuery(this.selementForm.typeDOM.areatype).toggleClass("hidden", false);
+			jQuery(this.selementForm.typeDOM.viewtype).toggleClass("hidden", false);
 
 			this.selementForm.typeDOM.elementName.style.display = display_style;
 			this.selementForm.typeDOM.iconid_off.style.display = display_style;
