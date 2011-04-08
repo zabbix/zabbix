@@ -408,7 +408,7 @@ require_once('include/templates/action.js.php');
 				'operationtype' => 0,
 				'esc_period' => 0,
 				'esc_step_from' => 1,
-				'esc_step_to' => 0,
+				'esc_step_to' => 1,
 				'evaltype' => 0
 			);
 		}

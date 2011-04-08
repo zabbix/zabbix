@@ -65,7 +65,7 @@ CREATE TABLE operations (
 	operationtype            number(10)      DEFAULT '0'               NOT NULL,
 	esc_period               number(10)      DEFAULT '0'               NOT NULL,
 	esc_step_from            number(10)      DEFAULT '1'               NOT NULL,
-	esc_step_to              number(10)      DEFAULT '0'               NOT NULL,
+	esc_step_to              number(10)      DEFAULT '1'               NOT NULL,
 	evaltype                 number(10)      DEFAULT '0'               NOT NULL,
 	PRIMARY KEY (operationid)
 );

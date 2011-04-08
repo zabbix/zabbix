@@ -65,7 +65,7 @@ CREATE TABLE operations (
 	operationtype            integer         DEFAULT '0'               NOT NULL,
 	esc_period               integer         DEFAULT '0'               NOT NULL,
 	esc_step_from            integer         DEFAULT '1'               NOT NULL,
-	esc_step_to              integer         DEFAULT '0'               NOT NULL,
+	esc_step_to              integer         DEFAULT '1'               NOT NULL,
 	evaltype                 integer         DEFAULT '0'               NOT NULL,
 	PRIMARY KEY (operationid)
 ) ENGINE=InnoDB;
