@@ -1460,22 +1460,20 @@ Copt::memoryPick();
 
 		$this->checkInput($hosts, __FUNCTION__);
 
+		$groupsToAdd = array();
+
 		foreach($hosts as $num => $host){
 			$hostid = DB::insert('hosts', array($host));
 			$hostids[] = $hostid = reset($hostid);
 
 			$host['hostid'] = $hostid;
 
+			foreach($host['groups'] as $group){
+				$groupsToAdd[] = array('hostid' => $hostid, 'groupid' => $group['groupid']);
+			}
+
 			$options = array();
 			$options['hosts'] = $host;
-
-			foreach($host['groups'] as $group){
-				$hostgroupid = get_dbid('hosts_groups', 'hostgroupid');
-				$result = DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES ($hostgroupid, $hostid, {$group['groupid']})");
-				if(!$result){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-				}
-			}
 
 			if(isset($host['templates']) && !is_null($host['templates']))
 				$options['templates'] = $host['templates'];
@@ -1501,6 +1499,8 @@ Copt::memoryPick();
 				DBexecute('INSERT INTO host_profile (hostid, '.$fields.') VALUES ('.$hostid.', '.$values.')');
 			}
 		}
+
+		DB::insert('hosts_groups', $groupsToAdd);
 
 		return array('hostids' => $hostids);
 	}
