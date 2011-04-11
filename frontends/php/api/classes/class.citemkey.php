@@ -1,5 +1,33 @@
 <?php
+/*
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+**/
+?>
+<?php
 
+/**
+ * Class is used to validate and parse item keys
+ * Example of usage:
+ *      $itemKey = new cItemKey('test.key[a, b, c]');
+ *      echo $itemKey->isValid(); // true
+ *      echo $itemKey->getKeyId(); // test.key
+ *      print_r($itemKey->parameters()); // array('a', 'b', 'c')
+ */
 class cItemKey{
 
 	private $key;
@@ -302,6 +330,10 @@ class cItemKey{
 	}
 
 
+	/**
+	 * Create an empty parameter at current number if it hasn't been already created
+	 * @return void
+	 */
 	private function emptyParam(){
 		if (!isset($this->parameters[$this->currParamNo])){
 			$this->parameters[$this->currParamNo] = '';
@@ -317,6 +349,7 @@ class cItemKey{
 		return $this->isValid;
 	}
 
+
 	/**
 	 * Get the error if key is invalid
 	 * @return string
@@ -325,10 +358,20 @@ class cItemKey{
 		return $this->error;
 	}
 
+
+	/**
+	 * Get the list of key parameters
+	 * @return array
+	 */
 	public function getParameters(){
 		return $this->parameters;
 	}
 
+
+	/**
+	 * Get the key id (first part of the key)
+	 * @return string
+	 */
 	public function getKeyId(){
 		return $this->keyId;
 	}
