@@ -52,6 +52,7 @@ ZBX_METRIC	parameters_specific[] =
 	{"system.cpu.util",	CF_USEUPARAM,	SYSTEM_CPU_UTIL,	NULL,	"all,user,avg1"},
 	{"system.cpu.load",	CF_USEUPARAM,	SYSTEM_CPU_LOAD,	NULL,	"all,avg1"},
 	{"system.cpu.num",	CF_USEUPARAM,	SYSTEM_CPU_NUM,		NULL,	"online"},
+	{"system.cpu.info",	0,		SYSTEM_CPU_INFO,	NULL,	NULL},
 
 	{"system.swap.size",	CF_USEUPARAM,	SYSTEM_SWAP_SIZE,	NULL,	"all,free"},
 	{"system.swap.in",	CF_USEUPARAM,	SYSTEM_SWAP_IN,		NULL,	"all"},
@@ -62,17 +63,13 @@ ZBX_METRIC	parameters_specific[] =
 
 	{"sensor",		CF_USEUPARAM,	GET_SENSOR,		NULL,	"w83781d-i2c-0-2d,temp1"},
 
-//Done
-	{"system.cpu.info",	0,		SYSTEM_CPU_INFO,	NULL,	NULL},
+	{"host.arch",		0,		HOST_ARCH,		NULL,	NULL},
 	{"host.device",		CF_USEUPARAM,	HOST_DEVICE,		NULL,	"name"}, //type, vendor, chassis, model
+	{"host.lspci",		0,		HOST_LSPCI,		NULL,	NULL},
 	{"host.macs",		0,		HOST_MACS,		NULL,	NULL},
 	{"host.name",		0,		HOST_NAME,		NULL,	NULL},
 	{"host.os",		CF_USEUPARAM,	HOST_OS,		NULL,	NULL},
 	{"host.packages",	0,		HOST_PACKAGES,		NULL,	NULL},
-
-//TO DO
-	{"host.lspci",		0,		HOST_LSPCI,		NULL,	NULL},
-//	{"host.hardware",	CF_USEUPARAM,	HOST_ARCHITECTURE,	NULL,	"cpu"}, //architecture
 
 	{0}
 };

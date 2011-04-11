@@ -21,6 +21,7 @@
 #include "sysinfo.h"
 #include "log.h"
 #include <sys/mman.h>
+#include <sys/utsname.h>
 
 #define DEV_MEM "/dev/mem"
 #define SMBIOS_ENTRY_POINT_SIZE 0x20
@@ -34,6 +35,16 @@
 #define HOST_OS_SHORT "/proc/version_signature"
 #define HOST_OS_FULL "/proc/version"
 #define DPKG_STATUS_FILE "/var/lib/dpkg/status"
+
+int	HOST_ARCH(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	struct utsname	name;
+	if (-1 == uname(&name))
+		return SYSINFO_RET_FAIL;
+
+	SET_STR_RESULT(result, strdup(name.machine));
+	return SYSINFO_RET_OK;
+}
 
 /* read the string #num from data into buf */
 int	set_dmi_string(char *buf, int bufsize, unsigned char *data, int num)
