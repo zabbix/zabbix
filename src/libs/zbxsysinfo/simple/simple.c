@@ -51,6 +51,8 @@ static int    check_ldap(const char *host, unsigned short port, int timeout, int
 
 	alarm(timeout);
 
+	*value_int = 0;
+
 	if (NULL == (ldap = ldap_init(host, port)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "LDAP - initialization failed [%s:%hu]", host, port);
@@ -95,7 +97,9 @@ static int	check_ssh(const char *host, unsigned short port, int timeout, int *va
 {
 	int		ret;
 	zbx_sock_t	s;
-	char		send_buf[MAX_BUFFER_LEN], *recv_buf, *ssh_server, *ssh_proto;
+	char		send_buf[MAX_STRING_LEN], *recv_buf, *ssh_server, *ssh_proto;
+
+	*value_int = 0;
 
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout)))
 	{
@@ -130,8 +134,10 @@ static int	check_https(const char *host, unsigned short port, int timeout, int *
 {
 	const char	*__function_name = "check_https";
 	int		err, opt;
-	char		https_host[MAX_BUFFER_LEN];
+	char		https_host[MAX_STRING_LEN];
 	CURL            *easyhandle;
+
+	*value_int = 0;
 
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
@@ -168,9 +174,9 @@ clean:
 static int	check_telnet(const char *host, unsigned short port, int timeout, int *value_int)
 {
 	zbx_sock_t	s;
-	char		buf[MAX_BUFFER_LEN];
-	size_t		sz, offset;
-	int		rc, ret = FAIL, flags;
+	int		flags;
+
+	*value_int = 0;
 
 	if (SUCCEED == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout))
 	{
@@ -195,7 +201,7 @@ static int	check_service(const char *cmd, const char *param, unsigned flags, AGE
 {
 	unsigned short	port = 0;
 	char		service[16], ip[64], str_port[8];
-	int		value_int = 0, ret = SYSINFO_RET_FAIL;
+	int		value_int, ret = SYSINFO_RET_FAIL;
 	double		check_time;
 
 	assert(result);
