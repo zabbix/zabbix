@@ -587,12 +587,13 @@
 			$key = expand_item_key_by_data($item);
 
 			// parsing key to get the parameters out of it
-			$parsedItemKey = parseItemKey($key);
+			$ItemKey = new cItemKey($key);
 
-			if($parsedItemKey != false){
+			if($ItemKey->isValid()){
+				$keyParameters = $ItemKey->getParameters();
 				// according to zabbix docs we must replace $1 to $9 macros with item key parameters
 				for($paramNo = 9; $paramNo > 0; $paramNo--){
-					$replaceTo = isset($parsedItemKey['parameters'][$paramNo - 1]) ? $parsedItemKey['parameters'][$paramNo - 1] : '';
+					$replaceTo = isset($keyParameters[$paramNo - 1]) ? $keyParameters[$paramNo - 1] : '';
 					$name = str_replace('$'.$paramNo, $replaceTo, $name);
 				}
 			}
@@ -1289,189 +1290,307 @@
 
 
 /**
+ * Check if given character is a valid key id char
+ * this function is a copy of is_key_char() from /src/libs/zbxcommon/misc.c
+ * don't forget to take look in there before changing anything
+ *
+ * @author Konstantin Buravcov
+ * @param string $char
+ * @return bool
+ */
+	function isKeyIdChar($char){
+		return (
+			($char >= 'a' && $char <= 'z')
+			|| ($char >= 'A' && $char <= 'Z')
+			|| ($char == '.' || $char == ',' || $char == '_' || $char == '-')
+			|| ($char >= '0' && $char <= '9')
+		);
+	}
+/**
  * Check item key and return info about an error if one is present
  *
  * @param string $key item key, e.g. system.run[cat /etc/passwd | awk -F: '{ print $1 }']
  * @return array
  */
-	function check_item_key($key){
-		$key_strlen = zbx_strlen($key);
+	function parseItemKey($key){
 
-		//empty string
-		if($key_strlen == 0){
-			return array(
-				'valid' => false,   //is key valid?
-				'description' => _("Key cannot be empty") //result description
-			);
+		$result = array(
+			'valid' => true, // is key a valid one?
+			'error' => '', // error description (if key is invalid)
+			'key_id' => '',
+			'parameters' => array()
+		);
+
+		$keyLength = zbx_strlen($key);
+		$keyByteCnt = strlen($key);
+
+		// empty string
+		if($keyLength == 0){
+			$result['valid'] = false;
+			$result['error'] = _("Key cannot be empty.");
+			return $result;
 		}
 
-		//key is larger then 255 chars
-		if($key_strlen > 255){
-			return array(
-				'valid' => false,   //is key valid?
-				'description' => sprintf(_("Key is too large: maximum %d characters"), 255) //result description
-			);
+		// key is larger then 255 chars
+		if($keyLength > 255){
+			$result['valid'] = false;
+			$result['error'] = sprintf(_("Key is too large: maximum %d characters."), 255);
+			return $result;
 		}
 
-		$characters = array();
-
-		//gathering characters into array, because we can't just work with them ar one if it's a unicode string
-		for($i = 0; $i < $key_strlen; $i++){
-			$characters[] = zbx_substr($key, $i, 1);
-		}
-
-		//checking every character, one by one
-		for($current_char = 0; $current_char < $key_strlen; $current_char++) {
-			if(!preg_match("/".ZBX_PREG_KEY_NAME."/", $characters[$current_char])) {
-				break; //$current_char now points to a first 'not a key name' char
+		// checking every byte, one by one, until first 'not key_id' char is reached
+		for($currentByte = 0; $currentByte < $keyByteCnt; $currentByte++) {
+			if(!isKeyIdChar($key[$currentByte])) {
+				break; // $currentByte now points to a first 'not a key name' char
 			}
+			$result['key_id'] .= $key[$currentByte];
 		}
 
-		//no function specified?
-		if ($current_char == $key_strlen) {
-			return array(
-				'valid' => true,   //is key valid?
-				'description' => _("Key is valid") //result description
-			);
+		// no function specified?
+		if ($currentByte == $keyByteCnt) {
+			return $result;
 		}
-		//function with parameter, e.g. system.run[...]
-		else if($characters[$current_char] == '[') {
+		// function with parameter, e.g. system.run[...]
+		else if($key[$currentByte] == '[') {
 
-			$state = 0; //0 - initial, 1 - inside quoted param, 2 - inside unquoted param
-			$nest_level = 0;
+			$state = 0; // 0 - initial
+						// 1 - inside quoted param
+						// 2 - inside unquoted param
+			$nestLevel = 0;
+			$currParamNo = 0;
 
-			//for every char, starting after '['
-			for($i = $current_char+1; $i < $key_strlen; $i++) {
+			// for every byte, starting after '['
+			for($currentByte++; $currentByte < $keyByteCnt; $currentByte++) {
 				switch($state){
-					//initial state
+					// initial state
 					case 0:
-						if($characters[$i] == ',') {
-							//do nothing
-						}
-						//Zapcat: '][' is treated as ','
-						else if($characters[$i] == ']' && isset($characters[$i+1]) && $characters[$i+1] == '[' && $nest_level == 0) {
-							$i++;
-						}
-						//entering quotes
-						else if($characters[$i] == '"') {
-							$state = 1;
-						}
-						//next nesting level
-						else if($characters[$i] == '[') {
-							$nest_level++;
-						}
-						//one of the nested sets ended
-						else if($characters[$i] == ']' && $nest_level != 0) {
-							$nest_level--;
-							//skipping spaces
-							while(isset($characters[$i+1]) && $characters[$i+1] == ' ') {
-								$i++;
+						if($key[$currentByte] == ',') {
+							// empty parameter
+							if (!isset($result['parameters'][$currParamNo])){
+								$result['parameters'][$currParamNo] = '';
 							}
-							//all nestings are closed correctly
-							if ($nest_level == 0 && isset($characters[$i+1]) && $characters[$i+1] == ']' && !isset($characters[$i+2])) {
-								return array(
-									'valid' => true,   //is key valid?
-									'description' => _("Key is valid") //result description
-								);
+							if($nestLevel == 0){
+								$currParamNo++;
+							}
+							else{
+								if(!isset($result['parameters'][$currParamNo])){
+									$result['parameters'][$currParamNo] = $key[$currentByte];
+								}
+								else{
+									$result['parameters'][$currParamNo] .= $key[$currentByte];
+								}
+							}
+						}
+						// Zapcat: '][' is treated as ','
+						else if($key[$currentByte] == ']' && isset($key[$currentByte+1]) && $key[$currentByte+1] == '[' && $nestLevel == 0) {
+							if($nestLevel == 0){
+								$currParamNo++;
+							}
+							else{
+								if(!isset($result['parameters'][$currParamNo])){
+									$result['parameters'][$currParamNo] = $key[$currentByte];
+								}
+								else{
+									$result['parameters'][$currParamNo] .= $key[$currentByte];
+								}
+							}
+							$currentByte++;
+						}
+						// entering quotes
+						else if($key[$currentByte] == '"') {
+							$state = 1;
+							// in key[["a"]] param is "a"
+							if($nestLevel != 0){
+								if(!isset($result['parameters'][$currParamNo])){
+									$result['parameters'][$currParamNo] = $key[$currentByte];
+								}
+								else{
+									$result['parameters'][$currParamNo] .= $key[$currentByte];
+								}
+							}
+						}
+						// next nesting level
+						else if($key[$currentByte] == '[') {
+							if($nestLevel > 0){
+								if(!isset($result['parameters'][$currParamNo])){
+									$result['parameters'][$currParamNo] = $key[$currentByte];
+								}
+								else{
+									$result['parameters'][$currParamNo] .= $key[$currentByte];
+								}
+							}
+							$nestLevel++;
+						}
+						// one of the nested sets ended
+						else if($key[$currentByte] == ']' && $nestLevel != 0) {
+							$nestLevel--;
+							if($nestLevel > 0){
+								if(!isset($result['parameters'][$currParamNo])){
+									$result['parameters'][$currParamNo] = $key[$currentByte];
+								}
+								else{
+									$result['parameters'][$currParamNo] .= $key[$currentByte];
+								}
 							}
 
-							if((!isset($characters[$i+1]) || $characters[$i+1] != ',')
-								&& !($nest_level !=0 && isset($characters[$i+1]) && $characters[$i+1] == ']')) {
-								return array(
-									'valid' => false,   //is key valid?
-									'description' => sprintf(_('incorrect syntax near \'%1$s\' at position %2$d'), $characters[$current_char], $current_char) //result description
-								);
+							// skipping spaces
+							while(isset($key[$currentByte+1]) && $key[$currentByte+1] == ' ') {
+								$currentByte++;
+								if($nestLevel > 0){
+									if(!isset($result['parameters'][$currParamNo])){
+										$result['parameters'][$currParamNo] = $key[$currentByte];
+									}
+									else{
+										$result['parameters'][$currParamNo] .= $key[$currentByte];
+									}
+								}
+							}
+							// all nestings are closed correctly
+							if ($nestLevel == 0 && isset($key[$currentByte+1]) && $key[$currentByte+1] == ']' && !isset($key[$currentByte+2])) {
+								return $result;
+							}
+
+							if((!isset($key[$currentByte+1]) || $key[$currentByte+1] != ',')
+								&& !($nestLevel !=0 && isset($key[$currentByte+1]) && $key[$currentByte+1] == ']')) {
+								$result['valid'] = false;
+								$result['error'] = sprintf(_('incorrect syntax near \'%1$s\' at position %2$d'), $key[$currentByte], $currentByte);
+								return $result;
 							}
 						}
-						else if($characters[$i] == ']' && $nest_level == 0) {
-							if (isset($characters[$i+1])){
-								return array(
-									'valid' => false,   //is key valid?
-									'description' => sprintf(_('incorrect usage of bracket symbols. \'%s\' found after final bracket.'), $characters[$i+1]) //result description
-								);
+						// looks like we have reaches final ']'
+						else if($key[$currentByte] == ']' && $nestLevel == 0) {
+							if (isset($key[$currentByte+1])){
+								// nothing else is allowed after final ']'
+								$result['valid'] = false;
+								$result['error'] = sprintf(_('incorrect usage of bracket symbols. \'%s\' found after final bracket.'), $key[$currentByte+1]);
+								return $result;
 							}
 							else {
-								return array(
-									'valid' => true,   //is key valid?
-									'description' => _("Key is valid") //result description
-								);
+								// with 'key[a,]' the last param considered empty
+								if($key[$currentByte-1] == ','){
+									$result['parameters'][$currParamNo] = '';
+								}
+								// no symbols after the final ']' - everything is ok
+								return $result;
 							}
 						}
-						else if($characters[$i] != ' ') {
+						else if($key[$currentByte] != ' ') {
 							$state = 2;
+							// this is a first symbol of unquoted param
+							if(!isset($result['parameters'][$currParamNo])){
+								$result['parameters'][$currParamNo] = $key[$currentByte];
+							}
+							else{
+								$result['parameters'][$currParamNo] .= $key[$currentByte];
+							}
+						}
+						else if($nestLevel > 0){
+							if(!isset($result['parameters'][$currParamNo])){
+								$result['parameters'][$currParamNo] = $key[$currentByte];
+							}
+							else{
+								$result['parameters'][$currParamNo] .= $key[$currentByte];
+							}
 						}
 
 					break;
 
-					//quoted
+					// quoted
 					case 1:
-						//ending quote is reached
-						if($characters[$i] == '"'){
-							//skipping spaces
-							while(isset($characters[$i+1]) && $characters[$i+1] == ' ') {
-								$i++;
+						// ending quote is reached
+						if($key[$currentByte] == '"' && $key[$currentByte-1] != '\\'){
+							// skipping spaces
+							while(isset($key[$currentByte+1]) && $key[$currentByte+1] == ' ') {
+								$currentByte++;
+								if($nestLevel > 0){
+									if(!isset($result['parameters'][$currParamNo])){
+										$result['parameters'][$currParamNo] = $key[$currentByte];
+									}
+									else{
+										$result['parameters'][$currParamNo] .= $key[$currentByte];
+									}
+								}
 							}
 
-							//Zapcat
-							if($nest_level == 0 && isset($characters[$i+1]) && isset($characters[$i+2]) && $characters[$i+1] == ']' && $characters[$i+2] == '['){
+							// Zapcat
+							if($nestLevel == 0 && isset($key[$currentByte+1]) && isset($key[$currentByte+2]) && $key[$currentByte+1] == ']' && $key[$currentByte+2] == '['){
 								$state = 0;
 								break;
 							}
 
-							if ($nest_level == 0 && isset($characters[$i+1]) && $characters[$i+1] == ']' && !isset($characters[$i+2])){
-								return array(
-									'valid' => true,   //is key valid?
-									'description' => _("Key is valid") //result description
-								);
+							if ($nestLevel == 0 && isset($key[$currentByte+1]) && $key[$currentByte+1] == ']' && !isset($key[$currentByte+2])){
+								return $result;
 							}
-							else if($nest_level == 0 && $characters[$i+1] == ']' && isset($characters[$i+2])){
-								return array(
-									'valid' => false,   //is key valid?
-									'description' => sprintf(_('incorrect usage of bracket symbols. \'%s\' found after final bracket.'), $characters[$i+2]) //result description
-								);
+							else if($nestLevel == 0 && $key[$currentByte+1] == ']' && isset($key[$currentByte+2])){
+								// nothing else is allowed after final ']'
+								$result['valid'] = false;
+								$result['error'] = sprintf(_('incorrect usage of bracket symbols. \'%s\' found after final bracket.'), $key[$currentByte+1]);
+								return $result;
 							}
 
-							if ((!isset($characters[$i+1]) || $characters[$i+1] != ',') //if next symbol is not ','
-								&& !($nest_level != 0 && isset($characters[$i+1]) && $characters[$i+1] == ']'))
+							if ((!isset($key[$currentByte+1]) || $key[$currentByte+1] != ',') //if next symbol is not ','
+								&& !($nestLevel != 0 && isset($key[$currentByte+1]) && $key[$currentByte+1] == ']'))
 							{
-								return array(
-									'valid' => false,   //is key valid?
-									'description' => sprintf(_('incorrect syntax near \'%1$s\' at position %2$d'), $characters[$current_char], $current_char) //result description
-								);
+								// nothing else is allowed after final ']'
+								$result['valid'] = false;
+								$result['error'] = sprintf(_('incorrect syntax near \'%1$s\' at position %2$d'), $key[$currentByte], $currentByte);
+								return $result;
+							}
+
+							// in key[["a"]] param is "a"
+							if($nestLevel != 0){
+								if(!isset($result['parameters'][$currParamNo])){
+									$result['parameters'][$currParamNo] = $key[$currentByte];
+								}
+								else{
+									$result['parameters'][$currParamNo] .= $key[$currentByte];
+								}
 							}
 
 							$state = 0;
 						}
 						//escaped quote (\")
-						else if($characters[$i] == '\\' && isset($characters[$i+1]) && $characters[$i+1] == '"') {
-							$i++;
+						else if($key[$currentByte] == '\\' && isset($key[$currentByte+1]) && $key[$currentByte+1] == '"') {
+							// $currentByte++;
 						}
-
+						else{
+							if(!isset($result['parameters'][$currParamNo])){
+								$result['parameters'][$currParamNo] = $key[$currentByte];
+							}
+							else{
+								$result['parameters'][$currParamNo] .= $key[$currentByte];
+							}
+						}
 					break;
 
-					//unquoted
+					// unquoted
 					case 2:
-						//Zapcat
-						if($nest_level == 0 && $characters[$i] == ']' && isset($characters[$i+1]) && $characters[$i+1] =='[' ){
-							$i--;
+						// Zapcat
+						if($nestLevel == 0 && $key[$currentByte] == ']' && isset($key[$currentByte+1]) && $key[$currentByte+1] =='[' ){
+							$currentByte--;
 							$state = 0;
 						}
-						else if($characters[$i] == ',' || ($characters[$i] == ']' && $nest_level != 0)) {
-							$i--;
+						else if($key[$currentByte] == ',' || ($key[$currentByte] == ']' && $nestLevel != 0)) {
+							$currentByte--;
 							$state = 0;
 						}
-						else if($characters[$i] == ']' && $nest_level == 0) {
-							if (isset($characters[$i+1])){
-								return array(
-									'valid' => false,   //is key valid?
-									'description' => sprintf(_('incorrect usage of bracket symbols. \'%s\' found after final bracket.'), $characters[$i+1]) //result description
-								);
+						else if($key[$currentByte] == ']' && $nestLevel == 0) {
+							if (isset($key[$currentByte+1])){
+								// nothing else is allowed after final ']'
+								$result['valid'] = false;
+								$result['error'] = sprintf(_('incorrect usage of bracket symbols. \'%s\' found after final bracket.'), $key[$currentByte+1]);
+								return $result;
 							}
 							else {
-								return array(
-									'valid' => true,   //is key valid?
-									'description' => _("Key is valid") //result description
-								);
+								return $result;
+							}
+						}
+						else{
+							if(!isset($result['parameters'][$currParamNo])){
+								$result['parameters'][$currParamNo] = $key[$currentByte];
+							}
+							else{
+								$result['parameters'][$currParamNo] .= $key[$currentByte];
 							}
 						}
 					break;
@@ -1480,14 +1599,14 @@
 
 			return array(
 				'valid' => false,   //is key valid?
-				'description' => _('Invalid key format') //result description
+				'error' => _('Invalid key format') //result description
 			);
 
 		}
 		else {
 			return array(
 				'valid' => false,   //is key valid?
-				'description' => sprintf(_('invalid character \'%1$s\' at position %2$d'), $characters[$current_char], $current_char) //result description
+				'error' => sprintf(_('invalid character \'%1$s\' at position %2$d'), $key[$currentByte], $currentByte) //result description
 			);
 		}
 
@@ -1508,20 +1627,14 @@
  * @param string $key
  * @return bool|array
  */
-	function parseItemKey($key){
+	function parseItemKey__($key){
 		// if key is not valid, it's not worth parsing
 		$checkResult = check_item_key($key);
 		if (!$checkResult['valid']){
 			return false;
 		}
 
-		$keyLen = zbx_strlen($key);
-		$characters = array();
-
-		//gathering characters into array
-		for($i = 0; $i < $keyLen; $i++){
-			$characters[] = zbx_substr($key, $i, 1);
-		}
+		$keyLen = strlen($key);
 
 		$result = array(
 			'key_id' => '',
@@ -1535,12 +1648,12 @@
 					// 3 - inside quoted param
 					// 4 - ignored whitespace
 
-		foreach($characters as $charNo=>$current){
-			if ($charNo != 0){
-				$previous = $characters[$charNo - 1];
+		for($byteNo = 0; $byteNo < $keyLen; $byteNo++){
+			if ($byteNo != 0){
+				$previous = $key[$byteNo - 1];
 			}
-			$next = isset($characters[$charNo + 1]) ? $characters[$charNo + 1] : null;
-
+			$current = $key[$byteNo];
+			$next = isset($key[$byteNo + 1]) ? $key[$byteNo + 1] : null;
 			switch($state){
 				// outside of parameters
 				case 0:
@@ -1572,7 +1685,9 @@
 							case ' ': $state = 4; break; // whitespace before parameter is ignored
 							default: $state = 1; break;
 						}
-						$currParamNo++;
+						if($nestLevel == 0){
+							$currParamNo++;
+						}
 					}
 					else{
 						// we are still inside of parameter
@@ -1630,6 +1745,4 @@
 
 		return $result;
 	}
-
-
 ?>
