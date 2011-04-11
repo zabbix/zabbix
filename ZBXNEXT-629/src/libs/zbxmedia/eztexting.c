@@ -209,8 +209,7 @@ int	send_ez_texting(const char *username, const char *password, const char *send
 			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_POSTFIELDS, postfields)) ||
 			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_POST, 1)) ||
 			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_URL, EZ_TEXTING_API_URL)) ||
-			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_TIMEOUT, EZ_TEXTING_TIMEOUT)) ||
-			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_CONNECTTIMEOUT, EZ_TEXTING_TIMEOUT)))
+			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_TIMEOUT, EZ_TEXTING_TIMEOUT)))
 	{
 		zbx_snprintf(error, max_error_len, "Could not set cURL option %d: [%s]", opt, curl_easy_strerror(err));
 		goto clean;
