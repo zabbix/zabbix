@@ -257,6 +257,7 @@ int	SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGENT_RE
 int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	SYSTEM_CPU_INFO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	SYSTEM_SWAP_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	SYSTEM_SWAP_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
@@ -268,6 +269,12 @@ int	VFS_FS_INODE(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	HOST_DEVICE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	HOST_LSPCI(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	HOST_MACS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	HOST_NAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	HOST_OS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	HOST_PACKAGES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
 #if defined(_WINDOWS)
 int	USER_PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
