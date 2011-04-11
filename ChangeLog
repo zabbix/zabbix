@@ -8,6 +8,7 @@ New features:
  - [ZBXNEXT-511] renamed item description to name, for description introduced new field (asaveljevs, Vedmak)
 
 Bug fixes:
+ - [ZBX-3709] fixed agree checkbox in setup (Vedmak)
  - [ZBX-3658] fixed the whole request to Java proxy failing if it contains an invalid key (asaveljevs)
  - [ZBX-3657] fixed errors while updating proxy configuration data (Sasha)
  - [ZBX-3656] fixed item filter by data type boolean (Vedmak)
