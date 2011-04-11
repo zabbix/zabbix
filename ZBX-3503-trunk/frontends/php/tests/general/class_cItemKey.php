@@ -489,6 +489,30 @@ class class_cItemKey extends PHPUnit_Framework_TestCase
 					'parameters'=>array('', 'abc')
 				)
 			),
+			array(
+				'key[][abc]',
+				array(
+					'valid'=>true,
+					'key_id'=>'key',
+					'parameters'=>array('', 'abc')
+				)
+			),
+			array(
+				'key[ab"\"c]',
+				array(
+					'valid'=>true,
+					'key_id'=>'key',
+					'parameters'=>array('ab"\"c')
+				)
+			),
+			array(
+				'key[[a, b, c]][a]',
+				array(
+					'valid'=>true,
+					'key_id'=>'key',
+					'parameters'=>array('a, b, c', 'a')
+				)
+			),
 
 			// invalid keys
 			array('key[["a",]', false),
@@ -505,7 +529,9 @@ class class_cItemKey extends PHPUnit_Framework_TestCase
 			array('0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', false),
 			// UTF8 chars
 			array('ГУГЛ', false),
-			array('', false)
+			array('', false),
+			array('telnet,1023[]', false),
+			array('[]', false)
 		);
 	}
 
