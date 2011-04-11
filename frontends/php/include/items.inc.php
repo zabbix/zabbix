@@ -1301,8 +1301,8 @@
 	function isKeyIdChar($char){
 		return (
 			($char >= 'a' && $char <= 'z')
-			|| ($char >= 'A' && $char <= 'Z')
 			|| ($char == '.' || $char == ',' || $char == '_' || $char == '-')
+			|| ($char >= 'A' && $char <= 'Z')
 			|| ($char >= '0' && $char <= '9')
 		);
 	}
@@ -1350,8 +1350,9 @@
 		if ($currentByte == $keyByteCnt) {
 			return $result;
 		}
+
 		// function with parameter, e.g. system.run[...]
-		else if($key[$currentByte] == '[') {
+		if($key[$currentByte] == '[') {
 
 			$state = 0; // 0 - initial
 						// 1 - inside quoted param
