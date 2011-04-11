@@ -269,6 +269,7 @@ int	VFS_FS_INODE(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	HOST_ARCH(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	HOST_DEVICE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	HOST_LSPCI(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	HOST_MACS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
