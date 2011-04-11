@@ -27,12 +27,11 @@ table { border-collapse:collapse; border-spacing:0; }
 body{
 	background-color:  #EBEFF2;
 	margin: 1px;
-	padding: 0px;
+	padding: 0;
 	color: #2F2F2F;
 	font-family: verdana, arial, helvetica, sans-serif;
 	font-size: 10px;
 	line-height: 1.8em;
-	margin: 1px;
 }
 
 label{ cursor: pointer; }
@@ -42,11 +41,8 @@ iframe { border: 0; }
 table{ border-spacing: 0;}
 td,tr{ color: inherit; text-decoration: none; padding: 0;}
 
-a{text-decoration: underline;}
-a:link 		{	color:#3C3089;  }
-a:visited 	{	color:#3C3089;  }
-a:hover 	{	color:#6C80B9;  }
-a:active 	{	color:#3C3089;  }
+a{ text-decoration: underline; color:#3C3089; }
+a:hover{ color:#6C80B9; }
 
 ul{ margin-left: 0; padding-left: 1em; }
 
@@ -81,10 +77,10 @@ form { margin: 0 }
 .marginless {margin: 0;}
 /* COLOR */
 
-.img 		{	border-color:black; border-width:1px;		}
-img.top		{	vertical-align:text-top;			}
-img.bottom	{	vertical-align:text-bottom;			}
-img.borderless	{	border-width: 0; vertical-align: bottom;	}
+.img{ border: 1px black; }
+img.top { vertical-align:text-top; }
+img.bottom { vertical-align:text-bottom; }
+img.borderless { border-width: 0; vertical-align: bottom; }
 
 
 .vert{ width:1px;}
@@ -141,7 +137,9 @@ a.underline:active  { text-decoration: underline; }
 
 
 /* CSS LIST */
-ul.itservices{ margin: 0; margin-left: 5px; }
+ul.itservices{
+	margin: 0 0 0 5px;
+}
 
 ul li.linear{ float: left; list-style-type: none; margin-right: 2px; }
 ul.formlist { list-style-type: none; margin: 0; padding: 0; }
@@ -688,9 +686,9 @@ table.suggest tr td{ text-align: left; padding-left: 4px; line-height: 2.2em; fo
 .dservice_disabled { background: #A00F0F; }
 /********** END OF DISCOVERY STATUS *********/
 
-.loginBG{ background-color: #AABBCC; background-image: url(../images/gradients/texture_diagonal.gif); }
-.loginForm{ margin: auto; padding: 15px; height: 260px; width: 582px; background-image: url(../images/general/login/background.png); background-repeat: no-repeat; *position: relative; *top: -50%;}
-.loginLogo{ height: 53px; width: 163px; background-image: url(../images/general/login/logo.png); background-repeat: no-repeat; }
+.loginBG{ background: #AABBCC url(../images/gradients/texture_diagonal.gif); }
+.loginForm{ margin: auto; padding: 15px; height: 260px; width: 582px; background: url(../images/general/login/background.png) no-repeat; *position: relative; *top: -50%; }
+.loginLogo{ height: 53px; width: 163px; background: url(../images/general/login/logo.png) no-repeat; }
 
 .vertical-middle {width: 100%; display: table-cell; vertical-align: middle; *position: absolute; *top: 50%;}
 
