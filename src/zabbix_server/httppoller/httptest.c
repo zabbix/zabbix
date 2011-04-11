@@ -360,8 +360,7 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 			zabbix_log(LOG_LEVEL_DEBUG, "WEBMonitor: go to URL [%s]", httpstep.url);
 
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_URL, httpstep.url)) ||
-					CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_TIMEOUT, httpstep.timeout)) ||
-					CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_CONNECTTIMEOUT, httpstep.timeout)))
+					CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_TIMEOUT, httpstep.timeout)))
 			{
 				zabbix_log(LOG_LEVEL_ERR, "Web scenario step [%s:%s] error: could not set cURL option [%d]: %s",
 						httptest->name, httpstep.name, opt, curl_easy_strerror(err));
