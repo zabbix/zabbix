@@ -149,7 +149,7 @@ INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (7, 14
 INSERT INTO opmessage_usr (opmessage_usrid, operationid, userid) VALUES (2, 12, 1);
 INSERT INTO opmessage_usr (opmessage_usrid, operationid, userid) VALUES (3, 15, 1);
 
-INSERT INTO opcommand (operationid, type, command) VALUES (16, 0, '/sbin/shutdown -r');
+INSERT INTO opcommand (operationid, type, scriptid, execute_on, port, authtype, username, password, publickey, privatekey, command) VALUES (16, 0, NULL, 0, '', 0, '', '', '', '', '/sbin/shutdown -r');
 
 INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid) VALUES (1, 16, NULL);
 
