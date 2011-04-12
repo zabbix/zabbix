@@ -278,7 +278,7 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 
 	if (CPU_COLLECTOR_STARTED(collector))
 		free_cpu_collector(&(collector->cpus));
-#ifdef _WINDOWS /* cpu_collector must be freed before perf_collector is freed*/
+#ifdef _WINDOWS /* cpu_collector must be freed before perf_collector is freed */
 	free_perf_collector();
 #endif /* _WINDOWS */
 

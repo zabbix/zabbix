@@ -51,4 +51,4 @@ ZBX_THREAD_ENTRY(collector_thread, pSemColectorStarted);
 void	init_collector_data();
 void	free_collector_data();
 
-#endif
+#endif	/* ZABBIX_STATS_H */

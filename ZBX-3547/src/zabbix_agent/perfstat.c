@@ -30,6 +30,7 @@
 static ZBX_PERF_STAT_DATA *ppsd = NULL;
 static ZBX_MUTEX perfstat_access;
 
+/* counter failed or disappeared, dismiss all previous values */
 static void	deactivate_perf_counter(PERF_COUNTERS *counter)
 {
 	counter->status = PERF_COUNTER_NOTSUPPORTED;
@@ -37,6 +38,7 @@ static void	deactivate_perf_counter(PERF_COUNTERS *counter)
 	counter->CurrentNum = 0;
 }
 
+/* if the specified exists or a new is successfully added, a pointer to that counter is returned, NULL otherwise  */
 PERF_COUNTERS	*add_perf_counter(const char *name, const char *counterpath, int interval)
 {
 	const char	*__function_name = "add_perf_counter";
@@ -148,6 +150,7 @@ lbl_syntax_error:
 	return FAIL;
 }
 
+/* counter is removed from the collector and the memory is freed - do not use it again */
 void	remove_perf_counter(PERF_COUNTERS *counter)
 {
 	PERF_COUNTERS	*cptr;
@@ -199,6 +202,7 @@ void	perfs_list_free()
 	zbx_mutex_unlock(&perfstat_access);
 }
 
+/* if succeeds, counter->status is set to PERF_COUNTER_ACTIVE */
 double	compute_counter_statistics(const char *function, PERF_COUNTERS *counter, int interval)
 {
 	PDH_STATISTICS	statData;
@@ -219,14 +223,15 @@ double	compute_counter_statistics(const char *function, PERF_COUNTERS *counter, 
 		&statData
 		)))
 	{ /* rate counters need multiple values, deactivate otherwise */
-		if (1 < counter->CurrentNum || PDH_CSTATUS_INVALID_DATA != pdh_status)
+		if (1 == counter->CurrentNum && PDH_CSTATUS_INVALID_DATA == pdh_status)
+			counter->status = PERF_COUNTER_INITIALIZED;
+		else
 			deactivate_perf_counter(counter);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): Can't calculate counter statistics \"%s\": %s",
 				function, counter->counterpath, strerror_from_module(pdh_status, L"PDH.DLL"));
 		return 0;
 	}
-	counter->status = PERF_COUNTER_ACTIVE;
 
 	return statData.mean.doubleValue;
 }
@@ -281,10 +286,10 @@ void	collect_perfstat()
 	PDH_STATUS	pdh_status;
 	time_t		now;
 
-	if (NULL == ppsd->pdh_query)	/* collector is not started */
+	if (NULL == ppsd->pdh_query) /* collector is not started */
 		return;
 
-	if (NULL == ppsd->pPerfCounterList)	/* no counters */
+	if (NULL == ppsd->pPerfCounterList) /* no counters */
 		return;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -304,6 +309,7 @@ void	collect_perfstat()
 		ppsd->nextcheck = now + UNSUPPORTED_REFRESH_PERIOD;
 	}
 
+	/* query for new data */
 	if (ERROR_SUCCESS != (pdh_status = PdhCollectQueryData(ppsd->pdh_query)))
 	{
 		for (cptr = ppsd->pPerfCounterList; NULL != cptr; cptr = cptr->next)
@@ -315,7 +321,7 @@ void	collect_perfstat()
 		return;
 	}
 
-	/* process counters */
+	/* get the raw values */
 	for (cptr = ppsd->pPerfCounterList; NULL != cptr; cptr = cptr->next)
 	{
 		if (PERF_COUNTER_NOTSUPPORTED == cptr->status)

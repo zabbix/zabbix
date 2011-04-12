@@ -52,7 +52,7 @@ PDH_STATUS	zbx_PdhOpenQuery(const char *function, PDH_HQUERY query)
 	return pdh_status;
 }
 
-/* counter is NULL if it is not in collector, do not call for PERF_COUNTER_ACTIVE counters  */
+/* counter is NULL if it is not in the collector, do not call it for PERF_COUNTER_ACTIVE counters  */
 PDH_STATUS	zbx_PdhAddCounter(const char *function, PERF_COUNTERS *counter, PDH_HQUERY query, const char *counterpath, PDH_HCOUNTER *handle)
 {
 	PDH_STATUS	pdh_status;
@@ -101,6 +101,7 @@ PDH_STATUS	zbx_PdhGetRawCounterValue(const char *function, const char *counterpa
 	return pdh_status;
 }
 
+/* Get the value of a counter. If it is a rate counter, sleep 1 second to get the second value. */
 PDH_STATUS	calculate_counter_value(const char *function, const char *counterpath, DWORD dwFormat, PPDH_FMT_COUNTERVALUE value)
 {
 	PDH_HQUERY	query;
@@ -121,7 +122,7 @@ PDH_STATUS	calculate_counter_value(const char *function, const char *counterpath
 		goto remove_counter;
 
 	if (PDH_CSTATUS_INVALID_DATA == (pdh_status = PdhCalculateCounterFromRawValue(counter, dwFormat, &rawData, NULL, value)))
-	{
+	{ /* a rate counter, two raw values are required */
 		zbx_sleep(1);
 		if (ERROR_SUCCESS == (pdh_status = zbx_PdhCollectQueryData(function, counterpath, query)) &&
 			ERROR_SUCCESS == (pdh_status = zbx_PdhGetRawCounterValue(function, counterpath, counter, &rawData2)))
@@ -157,14 +158,12 @@ LPTSTR	get_counter_name(DWORD pdhIndex)
 	{
 		if (counterName->pdhIndex == pdhIndex)
 			break;
-
 		counterName = counterName->next;
 	}
 
 	if (NULL == counterName)
 	{
 		counterName = (PERFCOUNTER *)zbx_malloc(counterName, sizeof(PERFCOUNTER));
-
 		memset(counterName, 0, sizeof(PERFCOUNTER));
 		counterName->pdhIndex = pdhIndex;
 		counterName->next = PerfCounterList;
