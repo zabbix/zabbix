@@ -57,6 +57,7 @@ function __autoload($class_name){
 		'ctemplatescreen' => 1,
 		'ctrigger' => 1,
 		'ctriggerexpression' => 1,
+		'citemkey' => 1,
 		'ctriggerprototype' => 1,
 		'cuser' => 1,
 		'cusergroup' => 1,
