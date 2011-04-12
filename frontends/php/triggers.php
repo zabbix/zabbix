@@ -292,7 +292,7 @@ include_once('include/page_header.php');
 		}
 
 		$go_result = DBend($go_result);
-		show_messages($go_result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
+		show_messages($go_result, _('Status updated'), _('Cannot update status'));
 	}
 	else if(($_REQUEST['go'] == 'copy_to') && isset($_REQUEST['copy']) && isset($_REQUEST['g_triggerid'])){
 		if(isset($_REQUEST['copy_targetid']) && ($_REQUEST['copy_targetid'] > 0) && isset($_REQUEST['copy_type'])){

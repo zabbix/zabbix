@@ -85,17 +85,18 @@
 //			header('Last-Modified: ' . gmdate('D, d M Y H:i:s', time()) . " GMT");
 
 			$page_title = '';
+
 			if(isset($ZBX_SERVER_NAME) && !zbx_empty($ZBX_SERVER_NAME)){
 				$page_title = $ZBX_SERVER_NAME.': ';
 			}
 
-			if(isset($page['title']) && defined($page['title'])){
-				$page_title .= constant($page['title']);
-			}
-			else{
-				$page_title .= 'ZABBIX';
+			if(!isset($page['title']))
 				$page['title'] = 'S_ZABBIX';
-			}
+
+			if(defined($page['title']))
+				$page_title .= constant($page['title']);
+			else
+				$page_title .= $page['title'];
 
 			if(ZBX_DISTRIBUTED){
 				if(isset($ZBX_VIEWED_NODES) && ($ZBX_VIEWED_NODES['selected'] == 0)){ // ALL selected

@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2000-2011 Zabbix SIA
@@ -17,19 +16,19 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-?>
-<?php
-class CListBox extends CComboBox{
-/* public */
-	public function __construct($name='listbox',$value=NULL,$size=5,$action=NULL){
-		parent::__construct($name,NULL,$action);
-		$this->attr('multiple', 'multiple');
-		$this->attr('size', $size);
-		$this->setValue($value);
-	}
 
-	public function setSize($value){
-		$this->attr('size', $value);
-	}
+#include "common.h"
+#include "dbcache.h"
+
+void	zbx_script_init(zbx_script_t *script)
+{
 }
-?>
+
+void	zbx_script_clean(zbx_script_t *script)
+{
+}
+
+int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, char **result, char *error, size_t max_error_len)
+{
+	return SUCCEED;
+}

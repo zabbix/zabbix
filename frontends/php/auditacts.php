@@ -100,7 +100,7 @@ include_once('include/page_header.php');
 	$numrows = new CDiv();
 	$numrows->setAttribute('name', 'numrows');
 
-	$alerts_wdgt->addHeader(S_ACTIONS_BIG);
+	$alerts_wdgt->addHeader(_('ACTIONS'));
 	$alerts_wdgt->addHeader($numrows);
 //--------
 
@@ -141,7 +141,7 @@ include_once('include/page_header.php');
 		S_STATUS,
 		S_RETRIES_LEFT,
 		S_RECIPIENTS,
-		S_MESSAGE,
+		_('Message'),
 		S_ERROR
 	));
 
@@ -198,12 +198,12 @@ include_once('include/page_header.php');
 			$retries=new CSpan(ALERT_MAX_RETRIES - $row['retries'],'orange');
 		}
 		else{
-			$status=new CSpan(S_NOT_SENT,'red');
+			$status=new CSpan(_('not sent'), 'red');
 			$retries=new CSpan(0,'red');
 		}
 
 		if($row['alerttype'] == ALERT_TYPE_MESSAGE)
-			$message = array(bold(S_SUBJECT.': '), br(), $row['subject'], br(), br(), bold(S_MESSAGE.': '), br(), zbx_nl2br($row['message']));
+			$message = array(bold(_('Subject').': '), br(), $row['subject'], br(), br(), bold(_('Message').': '), br(), zbx_nl2br($row['message']));
 		else
 			$message = array(bold(S_COMMAND.': '), br(), zbx_nl2br($row['message']));
 

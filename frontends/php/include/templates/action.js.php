@@ -6,7 +6,7 @@
 	<span style="font-size: 1.1em; font-weight: bold;"> #{name} </span>
 </td>
 <td>
-	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="javascript: removeOpGroupRow(#{groupid});" />
+	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="removeOpGroupRow(#{groupid});" />
 </td>
 </tr>
 </script>
@@ -18,7 +18,7 @@
 	<span style="font-size: 1.1em; font-weight: bold;"> #{host} </span>
 </td>
 <td>
-	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="javascript: removeOpTemplateRow(#{templateid});" />
+	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="removeOpTemplateRow(#{templateid});" />
 </td>
 </tr>
 </script>
@@ -30,7 +30,7 @@
 	<span style="font-size: 1.1em; font-weight: bold;"> #{name} </span>
 </td>
 <td>
-	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="javascript: removeOpmsgUsrgrpRow(#{usrgrpid});" />
+	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="removeOpmsgUsrgrpRow(#{usrgrpid});" />
 </td>
 </tr>
 </script>
@@ -42,48 +42,35 @@
 	<span style="font-size: 1.1em; font-weight: bold;"> #{alias} </span>
 </td>
 <td>
-	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="javascript: removeOpmsgUserRow(#{userid});" />
+	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="removeOpmsgUserRow(#{userid});" />
 </td>
 </tr>
 </script>
 
 <script type="text/x-jquery-tmpl" id="opCmdGroupRowTPL">
-<tr id="opCmdGroupRow_#{opcommand_grpid}">
-<td><input name="new_operation[opcommand_grp][#{opcommand_grpid}][action]" type="hidden" value="#{action}" />
-	<input name="new_operation[opcommand_grp][#{opcommand_grpid}][opcommand_grpid]" type="hidden" value="#{opcommand_grpid}" />
-	<input name="new_operation[opcommand_grp][#{opcommand_grpid}][groupid]" type="hidden" value="#{groupid}" />
-	<input name="new_operation[opcommand_grp][#{opcommand_grpid}][name]" type="hidden" value="#{name}" />
+<tr id="opCmdGroupRow_#{groupid}">
+<td>
+	<input name="new_operation[opcommand_grp][#{groupid}][groupid]" type="hidden" value="#{groupid}" />
+	<input name="new_operation[opcommand_grp][#{groupid}][name]" type="hidden" value="#{name}" />
 	#{objectCaption}
 	<span class="bold"> #{name} </span>
 </td>
 <td>
-	<textarea name="new_operation[opcommand_grp][#{opcommand_grpid}][command]" class="hidden">#{command}</textarea>
-	<span class="italic" title="#{command}"> #{commandLine} </span>
-</td>
-<td>
-	<input type="button" class="input link_menu" name="edit" value="<?php print(_('Edit'));?>" onclick="javascript: showOpCmdForm(#{opcommand_grpid}, 'groupid');" />
-	&nbsp;<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="javascript: removeOpCmdRow(#{opcommand_grpid}, 'groupid');" />
+	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="removeOpCmdRow(#{groupid}, 'groupid');" />
 </td>
 </tr>
 </script>
 
 <script type="text/x-jquery-tmpl" id="opCmdHostRowTPL">
-<tr id="opCmdHostRow_#{opcommand_hstid}">
+<tr id="opCmdHostRow_#{hostid}">
 <td>
-	<input name="new_operation[opcommand_hst][#{opcommand_hstid}][action]" type="hidden" value="#{action}" />
-	<input name="new_operation[opcommand_hst][#{opcommand_hstid}][opcommand_hstid]" type="hidden" value="#{opcommand_hstid}" />
-	<input name="new_operation[opcommand_hst][#{opcommand_hstid}][hostid]" type="hidden" value="#{hostid}" />
-	<input name="new_operation[opcommand_hst][#{opcommand_hstid}][host]" type="hidden" value="#{host}" />
+	<input name="new_operation[opcommand_hst][#{hostid}][hostid]" type="hidden" value="#{hostid}" />
+	<input name="new_operation[opcommand_hst][#{hostid}][host]" type="hidden" value="#{host}" />
 	#{objectCaption}
 	<span class="bold"> #{host} </span>
 </td>
 <td>
-	<textarea name="new_operation[opcommand_hst][#{opcommand_hstid}][command]" class="hidden">#{command}</textarea>
-	<span class="italic" title="#{command}"> #{commandLine} </span>
-</td>
-<td>
-	<input type="button" class="input link_menu" name="edit" value="<?php print(_('Edit'));?>" onclick="javascript: showOpCmdForm(#{opcommand_hstid}, 'hostid');" />
-	&nbsp;<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="javascript: removeOpCmdRow(#{opcommand_hstid}, 'hostid');" />
+	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="removeOpCmdRow(#{hostid}, 'hostid');" />
 </td>
 </tr>
 </script>
@@ -104,21 +91,44 @@
 			<input name="opCmdId" type="hidden" value="#{opcmdid}" />
 			<input name="opCmdTargetObjectId" id="opCmdTargetObjectId" type="hidden" value="#{objectid}" />
 			<input name="opCmdTargetObjectName" id="opCmdTargetObjectName" type="text" class="input text" value="#{name}" readonly="readonly" size="30"/>
-			<input type="button" class="input link_menu" name="select" value="<?php print(_('select'));?>" />
+			<input type="button" class="input link_menu" name="select" value="<?php print(_('Select'));?>" />
 		</div>
 	</td>
 </tr>
 <tr>
-	<td> <?php print(_('Command')); ?> </td>
-	<td><textarea name="opCmdTargetObjectCommand" class="input textarea" style="width: 320px; height: 60px;">#{command}</textarea></td>
+	<td colspan="2">
+		<input type="button" class="input link_menu" name="save" value="#{operationName}" />
+		&nbsp;<input type="button" class="input link_menu" name="cancel" value="<?php print(_('Cancel')); ?>" />
+	</td>
 </tr>
 </tbody></table>
-<div>
-	<input type="button" class="input link_menu" name="save" value="#{operationName}" />
-	&nbsp;<input type="button" class="input link_menu" name="cancel" value="<?php print(_('Cancel')); ?>" />
-</div>
 </div>
 </script>
+
+<script type="text/x-jquery-tmpl" id="operationTypesTPL">
+<!-- Script -->
+<tr id="operationTypeScriptElements" class="hidden">
+<td>
+	<?php echo(_('Execute on')); ?>
+</td>
+<td>
+	<div class="objectgroup inlineblock border_dotted ui-corner-all" id="uniqList">
+		<div>
+			<input type="radio" id="execute_on_agent" name="execute_on" value="0" class="input radio">
+			<label for="execute_on_agent"><?php echo(_('Zabbix agent')); ?></label>
+		</div>
+
+		<div>
+			<input type="radio" id="execute_on_server" name="execute_on" value="1" class="input radio">
+			<label for="execute_on_server"><?php echo(_('Zabbix server')); ?></label>
+		</div>
+	</div>
+</td>
+</tr>
+
+</script>
+
+
 
 <script type="text/javascript">
 //<!--<![CDATA[
@@ -157,27 +167,7 @@ function addPopupValues(list){
 
 				value.objectCaption = "<?php print(_('Host group').': '); ?>";
 
-				if(!isset('action', value))
-					value.action = isset('opcommand_grpid', value) ? 'update' : 'create';
-
-				value.commandLine = value.command;
-				var cmdLines = value.command.split("\n");
-
-				if((value.command.length > 48) || (cmdLines.length > 1))
-					value.commandLine = cmdLines[0].toString().substr(0,45) + '...';
-
-				if(jQuery("#opCmdDraft").length){
-					jQuery("#opCmdDraft").replaceWith(tpl.evaluate(value));
-				}
-				else{
-					if(!isset('opcommand_grpid', value)){
-						value.opcommand_grpid = jQuery("#opCmdList tr[id^=opCmdGroupRow_]").length;
-						while(jQuery("#opCmdGroupRow_"+value.opcommand_grpid).length){
-							value.opcommand_grpid++;
-						}
-					}
-
-					value.newValue = "create";
+				if(jQuery("#opCmdGroupRow_"+value.groupid).length == 0){
 					jQuery("#opCmdListFooter").before(tpl.evaluate(value));
 				}
 				break;
@@ -189,27 +179,7 @@ function addPopupValues(list){
 				else
 					value.host = "<?php print(_('Current host')); ?>";
 
-				if(!isset('action', value))
-					value.action = isset('opcommand_hstid', value) ? 'update' : 'create';
-
-				value.commandLine = value.command;
-				var cmdLines = value.command.split("\n");
-
-				if((value.command.length > 48) || (cmdLines.length > 1))
-					value.commandLine = cmdLines[0].toString().substr(0,45) + '...';
-
-				if(jQuery("#opCmdDraft").length){
-					jQuery("#opCmdDraft").replaceWith(tpl.evaluate(value));
-				}
-				else{
-					if(!isset('opcommand_hstid', value)){
-						value.opcommand_hstid = jQuery("#opCmdList tr[id^=opCmdHostRow_]").length;
-						while(jQuery("#opCmdHostRow_"+value.opcommand_hstid).length){
-							value.opcommand_hstid++;
-						}
-					}
-
-					value.newValue = "create";
+				if(jQuery("#opCmdHostRow_"+value.hostid).length == 0){
 					jQuery("#opCmdListFooter").before(tpl.evaluate(value));
 				}
 				break;
@@ -239,52 +209,19 @@ function removeOpCmdRow(opCmdRowId, object){
 	}
 }
 
-function showOpCmdForm(opCmdId, object){
+function showOpCmdForm(opCmdId){
 	if(jQuery("#opcmdEditForm").length > 0){
 		if(!closeOpCmdForm()) return true;
 	}
 
 	var objectTPL = {};
-	if(object == 'hostid'){
-		var objectRow = jQuery('#opCmdHostRow_'+opCmdId);
-		objectRow.attr('origid', objectRow.attr('id'));
-		objectRow.attr('id', 'opCmdDraft');
 
-//#new_operation[opcommand_hst][#{opcommand_hstid}][opcommand_hstid]')
-		objectTPL.action = jQuery(objectRow).find('input[name="new_operation[opcommand_hst]['+opCmdId+'][action]"]').val();
-
-		objectTPL.opcmdid = opCmdId;
-		objectTPL.objectid = jQuery(objectRow).find('input[name="new_operation[opcommand_hst]['+opCmdId+'][hostid]"]').val();
-		objectTPL.name = jQuery(objectRow).find('input[name="new_operation[opcommand_hst]['+opCmdId+'][host]"]').val();
-		objectTPL.target = (objectTPL.objectid == 0) ? 0 : 1;
-		objectTPL.command = jQuery(objectRow).find('textarea[name="new_operation[opcommand_hst]['+opCmdId+'][command]"]').val();
-		objectTPL.operationName = '<?php print(_('Update'));?>';
-	}
-	else if(object == 'groupid'){
-		objectTPL.action = jQuery(objectRow).find('input[name="new_operation[opcommand_hst]['+opCmdId+'][action]"]').val();
-
-		var objectRow = jQuery('#opCmdGroupRow_'+opCmdId);
-		objectRow.attr('origid', objectRow.attr('id'));
-		objectRow.attr('id', 'opCmdDraft');
-//#new_operation[opcommand_hst][#{opcommand_hstid}][opcommand_hstid]')
-
-		objectTPL.opcmdid = opCmdId;
-		objectTPL.objectid = jQuery(objectRow).find('input[name="new_operation[opcommand_grp]['+opCmdId+'][groupid]"]').val();
-		objectTPL.name = jQuery(objectRow).find('input[name="new_operation[opcommand_grp]['+opCmdId+'][name]"]').val();
-		objectTPL.target = 2;
-		objectTPL.command = jQuery(objectRow).find('textarea[name="new_operation[opcommand_grp]['+opCmdId+'][command]"]').val();
-		objectTPL.operationName = '<?php print(_('Update'));?>';
-	}
-	else{
-// new
-		objectTPL.action = 'create';
-		objectTPL.opcmdid = 'new';
-		objectTPL.objectid = 0;
-		objectTPL.name = '';
-		objectTPL.target = 0;
-		objectTPL.command = '';
-		objectTPL.operationName = '<?php print(_('Add'));?>';
-	}
+	objectTPL.action = 'create';
+	objectTPL.opcmdid = 'new';
+	objectTPL.objectid = 0;
+	objectTPL.name = '';
+	objectTPL.target = 0;
+	objectTPL.operationName = '<?php print(_('Add'));?>';
 
 	var tpl = new Template(jQuery('#opcmdEditFormTPL').html());
 	jQuery("#opCmdList").after(tpl.evaluate(objectTPL));
@@ -305,12 +242,6 @@ function saveOpCmdForm(){
 	var object = {};
 	object.action = jQuery(objectForm).find('input[name="action"]').val();
 	object.target = jQuery(objectForm).find('select[name="opCmdTarget"]').val();
-	object.command = jQuery(objectForm).find('textarea[name="opCmdTargetObjectCommand"]').val();
-
-	if(empty(jQuery.trim(object.command))){
-		alert("<?php print(_('Command field is empty. Please provide some instructions for operation.')); ?>");
-		return true;
-	}
 
 	if(object.target.toString() == '2'){
 		object.object = 'groupid';
@@ -346,9 +277,9 @@ function saveOpCmdForm(){
 function selectOpCmdTarget(){
 	var target = jQuery('#opcmdEditForm select[name="opCmdTarget"]').val();
 	if(target.toString() == '2')
-		PopUp("popup.php?dstfrm=action.edit.php&srctbl=host_group&srcfld1=groupid&srcfld2=name&dstfld1=opCmdTargetObjectId&dstfld2=opCmdTargetObjectName&writeonly=1",480,480);
+		PopUp("popup.php?dstfrm=action.edit&srctbl=host_group&srcfld1=groupid&srcfld2=name&dstfld1=opCmdTargetObjectId&dstfld2=opCmdTargetObjectName&writeonly=1",480,480);
 	else
-		PopUp("popup.php?dstfrm=action.edit.php&srctbl=hosts&srcfld1=hostid&srcfld2=host&dstfld1=opCmdTargetObjectId&dstfld2=opCmdTargetObjectName&writeonly=1",780,480);
+		PopUp("popup.php?dstfrm=action.edit&srctbl=hosts&srcfld1=hostid&srcfld2=host&dstfld1=opCmdTargetObjectId&dstfld2=opCmdTargetObjectName&writeonly=1",780,480);
 }
 
 function changeOpCmdTarget(){
@@ -367,6 +298,62 @@ function closeOpCmdForm(){
 	return false;
 }
 
+function showOpTypeForm(){
+	if(jQuery('#new_operation_opcommand_type').length == 0) return;
+
+	var currentOpType = jQuery('#new_operation_opcommand_type').val();
+
+	var opTypeFields = {
+		'class_opcommand_userscript': [ZBX_SCRIPT_TYPES.userscript],
+		'class_opcommand_execute_on': [ZBX_SCRIPT_TYPES.script],
+		'class_opcommand_port': [ZBX_SCRIPT_TYPES.ssh,ZBX_SCRIPT_TYPES.telnet],
+		'class_opcommand_command': [ZBX_SCRIPT_TYPES.script,ZBX_SCRIPT_TYPES.ssh,ZBX_SCRIPT_TYPES.telnet],
+		'class_opcommand_command_ipmi': [ZBX_SCRIPT_TYPES.ipmi],
+		'class_authentication_method': [ZBX_SCRIPT_TYPES.ssh],
+		'class_authentication_username': [ZBX_SCRIPT_TYPES.ssh,ZBX_SCRIPT_TYPES.telnet],
+		'class_authentication_publickey': [],
+		'class_authentication_privatekey': [],
+		'class_authentication_password': [ZBX_SCRIPT_TYPES.ssh,ZBX_SCRIPT_TYPES.telnet]
+	}
+
+	var showFields = [];
+	for(var fieldClass in opTypeFields){
+		jQuery("#operationlist ."+fieldClass).toggleClass("hidden", true).find(':input').attr("disabled", "disabled");
+
+		for(var f=0; f < opTypeFields[fieldClass].length; f++)
+			if(currentOpType == opTypeFields[fieldClass][f]) showFields.push(fieldClass);
+	}
+
+	for(var f=0; f < showFields.length; f++){
+		if(showFields[f] == 'class_authentication_method') showOpTypeAuth();
+		jQuery("#operationlist ."+showFields[f]).toggleClass("hidden", false).find(':input').removeAttr("disabled");
+	}
+}
+
+function showOpTypeAuth(){
+	var currentOpTypeAuth = parseInt(jQuery('#new_operation_opcommand_authtype').val(), 10);
+
+	if(currentOpTypeAuth === <?php echo(ITEM_AUTHTYPE_PASSWORD); ?>){
+		jQuery('#operationlist .class_authentication_publickey').toggleClass("hidden", true);
+		jQuery('#new_operation_opcommand_publickey').attr("disabled", "disabled");
+		jQuery('#operationlist .class_authentication_privatekey').toggleClass("hidden", true);
+		jQuery('#new_operation_opcommand_privatekey').attr("disabled", "disabled");
+	}
+	else{
+		jQuery('#operationlist .class_authentication_publickey').toggleClass("hidden", false).removeAttr("disabled");
+		jQuery('#new_operation_opcommand_publickey').removeAttr("disabled");
+		jQuery('#operationlist .class_authentication_privatekey').toggleClass("hidden", false).removeAttr("disabled");
+		jQuery('#new_operation_opcommand_privatekey').removeAttr("disabled");
+	}
+}
+
+var ZBX_SCRIPT_TYPES = {};
+ZBX_SCRIPT_TYPES['script'] = <?php echo ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT; ?>;
+ZBX_SCRIPT_TYPES['ipmi'] = <?php echo ZBX_SCRIPT_TYPE_IPMI; ?>;
+ZBX_SCRIPT_TYPES['telnet'] = <?php echo ZBX_SCRIPT_TYPE_TELNET; ?>;
+ZBX_SCRIPT_TYPES['ssh'] = <?php echo ZBX_SCRIPT_TYPE_SSH; ?>;
+ZBX_SCRIPT_TYPES['userscript'] = <?php echo ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT; ?>;
+
 jQuery(document).ready(function(){
 	setTimeout(function(){jQuery("#name").focus()}, 10);
 //	jQuery("#name").focus();
@@ -378,6 +365,13 @@ jQuery(document).ready(function(){
 		jQuery("#cancel").addClass('ui-corner-left');
 		jQuery("#name").focus();
 	});
+
+// new operation form command type
+	showOpTypeForm();
+
+	jQuery('#select_opcommand_script').click(function(){
+		PopUp("popup.php?dstfrm=action.edit&srctbl=scripts&srcfld1=scriptid&srcfld2=name&dstfld1=new_operation_opcommand_scriptid&dstfld2=new_operation_opcommand_script",480,720);
+	})
 });
 
 //]]> -->

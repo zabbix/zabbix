@@ -28,21 +28,21 @@ class CInput extends CTag{
 
 		$this->setType($type);
 
-		$this->setAttribute('id', $name);
-		$this->setAttribute('name', $name);
+		$this->attr('id', zbx_formatDomId($name));
+		$this->attr('name', $name);
 
-		$this->setAttribute('value', $value);
+		$this->attr('value', $value);
 
 		$class = !is_null($class) ? $class : $type;
 		if($class == 'button' || $class == 'submit') $class.= ' shadow ui-corner-all';
 
-		$this->setAttribute('class', 'input '.$class);
+		$this->addClass('input '.$class);
 
 	return $this;
 	}
 
 	public function setType($type){
-		$this->setAttribute('type', $type);
+		$this->attr('type', $type);
 		return $this;
 	}
 
@@ -51,11 +51,11 @@ class CInput extends CTag{
 			(is_string($value) && ($value=='yes' || $value=='checked' || $value=='on') || $value=='1') ||
 			(is_int($value) && $value<>0) || ($value === true)
 		){
-			$this->setAttribute('readonly', 'readonly');
+			$this->attr('readonly', 'readonly');
 			return $this;
 		}
 
-		$this->removeAttribute('readonly');
+		$this->removeAttr('readonly');
 		return $this;
 	}
 
@@ -64,11 +64,11 @@ class CInput extends CTag{
 			(is_string($value) && ($value=='yes' || $value=='checked' || $value=='on') || $value=='1') ||
 			(is_int($value) && $value<>0) || ($value === true)
 		){
-			$this->removeAttribute('disabled');
+			$this->removeAttr('disabled');
 			return $this;
 		}
 
-		$this->setAttribute('disabled','disabled');
+		$this->attr('disabled','disabled');
 
 	return $this;
 	}
@@ -76,7 +76,7 @@ class CInput extends CTag{
 
 	public function useJQueryStyle(){
 		$this->jQuery = true;
-		$this->setAttribute('class', 'jqueryinput '.$this->getAttribute('class'));
+		$this->attr('class', 'jqueryinput '.$this->getAttribute('class'));
 
 		if(!defined('ZBX_JQUERY_INPUT')){
 			define('ZBX_JQUERY_INPUT', true);

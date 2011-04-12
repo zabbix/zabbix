@@ -699,7 +699,6 @@ COpt::memoryPick();
  * @return boolean
  */
 	public function delete($groupids){
-
 			if(empty($groupids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
 
 			$groupids = zbx_toArray($groupids);
@@ -725,11 +724,23 @@ COpt::memoryPick();
 								S_GROUP.' ['.$del_groups[$groupid]['name'].'] '.S_INTERNAL_AND_CANNOT_DELETED_SMALL);
 					else
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-								S_GROUP.' ['.$del_groups[$groupid]['name'].'] '.S_CANNOT_DELETED_INNER_HOSTS_CANNOT_UNLINKED_SMALL);
+						_s('Group "%s" cannot be deleted, because some hosts depend on it.', $del_groups[$groupid]['name']));
+			}
+		}
 
+		$dbScripts = API::Script()->get(array(
+			'groupids' => $groupids,
+			'nopermissions' => true
+		));
+
+		if(!empty($dbScripts)){
+			foreach($dbScripts as $snum => $script){
+				if($script['groupid'] == 0) continue;
+
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Group "%s" cannot be deleted, because it is used in a global script.', $del_groups[$script['groupid']]['name']));
 				}
 			}
-
 
 // delete screens items
 			$resources = array(
@@ -745,7 +756,7 @@ COpt::memoryPick();
 			));
 
 // delete sysmap element
-			if(empty($groupids))
+		if(!empty($groupids))
 				DB::delete('sysmaps_elements', array('elementtype' => SYSMAP_ELEMENT_TYPE_HOST_GROUP, 'elementid' => $groupids));
 
 // disable actions

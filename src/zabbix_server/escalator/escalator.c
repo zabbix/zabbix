@@ -20,17 +20,14 @@
 #include "common.h"
 #include "db.h"
 #include "log.h"
-#include "zlog.h"
 #include "daemon.h"
 #include "zbxserver.h"
 #include "zbxself.h"
 
 #include "escalator.h"
 #include "../operations.h"
-#include "../events.h"
 #include "../actions.h"
-#include "../poller/checks_agent.h"
-#include "../poller/checks_ipmi.h"
+#include "../scripts.h"
 
 #define CONFIG_ESCALATOR_FREQUENCY	3
 
@@ -255,127 +252,7 @@ static void	add_object_msg(zbx_uint64_t operationid, zbx_uint64_t mediatypeid, Z
 	DBfree_result(result);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: run_remote_command                                               *
- *                                                                            *
- * Purpose: run remote command on specific host                               *
- *                                                                            *
- * Parameters: item          - [IN] DC_ITEM structure with valid              *
- *                             item->host.hostid, item->host.host,            *
- *                             item->host.ipmi_authtype,                      *
- *                             item->host.ipmi_privilege,                     *
- *                             item->host.ipmi_username,                      *
- *                             item->host.ipmi_password values                *
- *             command       - [IN] remote command                            *
- *             error         - [OUT] buffer for message if error occurred     *
- *             max_error_len - [IN] length of error buffer                    *
- *                                                                            *
- * Return value: nothing                                                      *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-static int	run_remote_command(DC_ITEM *item, char *command, char *error, size_t max_error_len)
-{
-	const char	*__function_name = "run_remote_command";
-
-	int		ret = FAIL;
-	AGENT_RESULT	agent_result;
-	char		*param, *port;
-#ifdef HAVE_OPENIPMI
-	int		val;
-#endif
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostname:'%s' command:'%s'", __function_name, item->host.host, command);
-
-	*error = '\0';
-
-#ifdef HAVE_OPENIPMI
-	if (0 == strncmp(command, "IPMI", 4))
-	{
-		command += 5;
-
-		if (SUCCEED == (ret = DCconfig_get_interface_by_type(&item->interface, item->host.hostid,
-				INTERFACE_TYPE_IPMI)))
-		{
-			item->interface.addr = strdup(item->interface.useip ? item->interface.ip_orig :
-					item->interface.dns_orig);
-			substitute_simple_macros(NULL, NULL, &item->host, NULL,
-					&item->interface.addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
-
-			port = strdup(item->interface.port_orig);
-			substitute_simple_macros(NULL, &item->host.hostid, NULL, NULL,
-					&port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
-			if (SUCCEED == (ret = is_ushort(port, &item->interface.port)))
-			{
-				if (SUCCEED == (ret = parse_ipmi_command(command, item->ipmi_sensor, &val, error, max_error_len)))
-				{
-					item->key = item->ipmi_sensor;
-					ret = set_ipmi_control_value(item, val, error, max_error_len);
-				}
-			}
-			else
-				zbx_snprintf(error, max_error_len, "Invalid port number [%s]",
-						item->interface.port_orig);
-
-			zbx_free(port);
-			zbx_free(item->interface.addr);
-		}
-		else
-			zbx_snprintf(error, max_error_len, "IPMI interface is not defined for host [%s]", item->host.host);
-	}
-	else
-	{
-#endif
-		if (SUCCEED == (ret = DCconfig_get_interface_by_type(&item->interface, item->host.hostid,
-				INTERFACE_TYPE_AGENT)))
-		{
-			item->interface.addr = (item->interface.useip ? item->interface.ip_orig :
-					item->interface.dns_orig);
-
-			port = strdup(item->interface.port_orig);
-			substitute_simple_macros(NULL, &item->host.hostid, NULL, NULL,
-					&port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
-			if (SUCCEED == (ret = is_ushort(port, &item->interface.port)))
-			{
-				dos2unix(command);	/* CR+LF (Windows) => LF (Unix) */
-
-				param = dyn_escape_param(command);
-				item->key = zbx_dsprintf(NULL, "system.run[\"%s\",\"nowait\"]", param);
-				zbx_free(param);
-
-				init_result(&agent_result);
-
-				alarm(CONFIG_TIMEOUT);
-				if (SUCCEED != (ret = get_value_agent(item, &agent_result)) && ISSET_MSG(&agent_result))
-					zbx_strlcpy(error, agent_result.msg, max_error_len);
-				alarm(0);
-
-				free_result(&agent_result);
-
-				zbx_free(item->key);
-			}
-			else
-				zbx_snprintf(error, max_error_len, "Invalid port number [%s]",
-						item->interface.port_orig);
-
-			zbx_free(port);
-		}
-		else
-			zbx_snprintf(error, max_error_len, "Zabbix Agent interface is not defined for host [%s]", item->host.host);
-#ifdef HAVE_OPENIPMI
-	}
-#endif
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
-}
-
-static void	add_command_alert(DC_ITEM *item, zbx_uint64_t eventid, zbx_uint64_t actionid,
+static void	add_command_alert(DC_HOST *host, zbx_uint64_t eventid, zbx_uint64_t actionid,
 		int esc_step, const char *command, zbx_alert_status_t status, const char *error)
 {
 	const char	*__function_name = "add_command_alert";
@@ -387,7 +264,7 @@ static void	add_command_alert(DC_ITEM *item, zbx_uint64_t eventid, zbx_uint64_t 
 
 	alertid = DBget_maxid("alerts");
 	now = (int)time(NULL);
-	tmp = zbx_dsprintf(tmp, "%s:%s", item->host.host, command);
+	tmp = zbx_dsprintf(tmp, "%s:%s", host->host, NULL == command ? "" : command);
 	command_esc = DBdyn_escape_string_len(tmp, ALERT_MESSAGE_LEN);
 	error_esc = DBdyn_escape_string_len(error, ALERT_ERROR_LEN);
 	zbx_free(tmp);
@@ -405,12 +282,15 @@ static void	add_command_alert(DC_ITEM *item, zbx_uint64_t eventid, zbx_uint64_t 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static int	get_dynamic_hostid(DB_EVENT *event, DC_ITEM *item, char *error, size_t max_error_len)
+static int	get_dynamic_hostid(DB_EVENT *event, DC_HOST *host, char *error, size_t max_error_len)
 {
+	const char	*__function_name = "get_dynamic_hostid";
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		sql[512];
 	int		offset, ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	offset = zbx_snprintf(sql, sizeof(sql),
 			"select distinct h.hostid,h.host"
@@ -474,18 +354,18 @@ static int	get_dynamic_hostid(DB_EVENT *event, DC_ITEM *item, char *error, size_
 			return FAIL;
 	}
 
-	item->host.hostid = 0;
+	host->hostid = 0;
 
 	result = DBselect("%s", sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		if (0 != item->host.hostid)
+		if (0 != host->hostid)
 		{
 			switch (event->source)
 			{
 				case EVENT_SOURCE_TRIGGERS:
-					zbx_strlcpy(error, "Too many hosts in trigger expression", max_error_len);
+					zbx_strlcpy(error, "Too many hosts in a trigger expression", max_error_len);
 					break;
 				case EVENT_SOURCE_DISCOVERY:
 					zbx_strlcpy(error, "Too many hosts with same IP addreses", max_error_len);
@@ -494,114 +374,146 @@ static int	get_dynamic_hostid(DB_EVENT *event, DC_ITEM *item, char *error, size_
 			ret = FAIL;
 			break;
 		}
-		ZBX_STR2UINT64(item->host.hostid, row[0]);
-		strscpy(item->host.host, row[1]);
+		ZBX_STR2UINT64(host->hostid, row[0]);
+		strscpy(host->host, row[1]);
 #ifdef HAVE_OPENIPMI
-		item->host.ipmi_authtype = (signed char)atoi(row[2]);
-		item->host.ipmi_privilege = (unsigned char)atoi(row[3]);
-		strscpy(item->host.ipmi_username, row[4]);
-		strscpy(item->host.ipmi_password, row[5]);
+		host->ipmi_authtype = (signed char)atoi(row[2]);
+		host->ipmi_privilege = (unsigned char)atoi(row[3]);
+		strscpy(host->ipmi_username, row[4]);
+		strscpy(host->ipmi_password, row[5]);
 #endif
 	}
 	DBfree_result(result);
 
 	if (FAIL == ret)
 	{
-		item->host.hostid = 0;
-		*item->host.host = '\0';
+		host->hostid = 0;
+		*host->host = '\0';
 	}
-	else if (0 == item->host.hostid)
+	else if (0 == host->hostid)
 	{
-		*item->host.host = '\0';
+		*host->host = '\0';
 
-		zbx_strlcpy(error, "Cannot find corresponding host", max_error_len);
+		zbx_strlcpy(error, "Cannot find a corresponding host", max_error_len);
 		ret = FAIL;
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
 
 static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_t operationid, int esc_step)
 {
-	const char		*__function_name = "execute_commands";
-	DB_RESULT		result;
-	DB_ROW			row;
-	DC_ITEM			item;
-	char			*command = NULL, error[ALERT_ERROR_LEN_MAX];
-	int			rc;
-	zbx_alert_status_t	status;
+	const char	*__function_name = "execute_commands";
+	DB_RESULT	result;
+	DB_ROW		row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	memset(&item, 0, sizeof(item));
-
 	result = DBselect(
-			"select distinct h.hostid,h.host,o.command"
+			"select distinct h.hostid,h.host,o.type,o.scriptid,o.execute_on,o.port"
+				",o.authtype,o.username,o.password,o.publickey,o.privatekey,o.command"
 #ifdef HAVE_OPENIPMI
 				",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
 #endif
-			" from opcommand_grp o,hosts_groups hg,hosts h"
-			" where o.groupid=hg.groupid"
+			" from opcommand o,opcommand_grp og,hosts_groups hg,hosts h"
+			" where o.operationid=og.operationid"
+				" and og.groupid=hg.groupid"
 				" and hg.hostid=h.hostid"
 				" and o.operationid=" ZBX_FS_UI64
 				" and h.status=%d"
 			" union "
-			"select distinct h.hostid,h.host,o.command"
+			"select distinct h.hostid,h.host,o.type,o.scriptid,o.execute_on,o.port"
+				",o.authtype,o.username,o.password,o.publickey,o.privatekey,o.command"
 #ifdef HAVE_OPENIPMI
 				",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
 #endif
-			" from opcommand_hst o,hosts h"
-			" where o.hostid=h.hostid"
+			" from opcommand o,opcommand_hst oh,hosts h"
+			" where o.operationid=oh.operationid"
+				" and oh.hostid=h.hostid"
 				" and o.operationid=" ZBX_FS_UI64
 				" and h.status=%d"
 			" union "
-			"select distinct 0,null,command"
+			"select distinct 0,null,o.type,o.scriptid,o.execute_on,o.port"
+				",o.authtype,o.username,o.password,o.publickey,o.privatekey,o.command"
 #ifdef HAVE_OPENIPMI
 				",0,2,null,null"
 #endif
-			" from opcommand_hst"
-			" where operationid=" ZBX_FS_UI64
-				" and hostid is null",
+			" from opcommand o,opcommand_hst oh"
+			" where o.operationid=oh.operationid"
+				" and o.operationid=" ZBX_FS_UI64
+				" and oh.hostid is null",
 			operationid, HOST_STATUS_MONITORED,
 			operationid, HOST_STATUS_MONITORED,
 			operationid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(item.host.hostid, row[0]);
+		int			rc = SUCCEED;
+		char			error[ALERT_ERROR_LEN_MAX];
+		DC_HOST			host;
+		zbx_script_t		script;
+		zbx_alert_status_t	status;
 
-		if (0 != item.host.hostid)
+		*error = '\0';
+		memset(&host, 0, sizeof(host));
+		zbx_script_init(&script);
+
+		ZBX_STR2UINT64(host.hostid, row[0]);
+
+		if (0 != host.hostid)
 		{
-			strscpy(item.host.host, row[1]);
+			strscpy(host.host, row[1]);
 #ifdef HAVE_OPENIPMI
-			item.host.ipmi_authtype = (signed char)atoi(row[3]);
-			item.host.ipmi_privilege = (unsigned char)atoi(row[4]);
-			strscpy(item.host.ipmi_username, row[5]);
-			strscpy(item.host.ipmi_password, row[6]);
+			host.ipmi_authtype = (signed char)atoi(row[12]);
+			host.ipmi_privilege = (unsigned char)atoi(row[13]);
+			strscpy(host.ipmi_username, row[14]);
+			strscpy(host.ipmi_password, row[15]);
 #endif
-			rc = SUCCEED;
 		}
 		else
-			rc = get_dynamic_hostid(event, &item, error, sizeof(error));
+			rc = get_dynamic_hostid(event, &host, error, sizeof(error));
 
-		command = zbx_strdup(command, row[2]);
-		substitute_simple_macros(event, NULL, NULL, NULL, &command, MACRO_TYPE_MESSAGE, NULL, 0);
+		script.type = (unsigned char)atoi(row[2]);
+
+		if (ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT != script.type)
+		{
+			script.command = zbx_strdup(script.command, row[11]);
+			substitute_simple_macros(event, NULL, NULL, NULL, &script.command, MACRO_TYPE_MESSAGE, NULL, 0);
+		}
 
 		if (SUCCEED == rc)
-			rc = run_remote_command(&item, command, error, sizeof(error));
+		{
+			switch (script.type)
+			{
+				case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
+					script.execute_on = (unsigned char)atoi(row[4]);
+					break;
+				case ZBX_SCRIPT_TYPE_SSH:
+					script.authtype = (unsigned char)atoi(row[6]);
+					script.publickey = zbx_strdup(script.publickey, row[9]);
+					script.privatekey = zbx_strdup(script.privatekey, row[10]);
+				case ZBX_SCRIPT_TYPE_TELNET:
+					script.port = zbx_strdup(script.port, row[5]);
+					script.username = zbx_strdup(script.username, row[7]);
+					script.password = zbx_strdup(script.password, row[8]);
+					break;
+				case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
+					ZBX_DBROW2UINT64(script.scriptid, row[3]);
+					break;
+			}
 
-		if (SUCCEED != rc && '\0' != *error)
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot execute remote command [%s]: %s", command, error);
+			rc = zbx_execute_script(&host, &script, NULL, error, sizeof(error));
+		}
 
 		status = (SUCCEED != rc ? ALERT_STATUS_FAILED : ALERT_STATUS_SENT);
-		if (ALERT_STATUS_SENT == status)
-			*error = '\0';
 
-		add_command_alert(&item, event->eventid, actionid, esc_step, command, status, error);
+		add_command_alert(&host, event->eventid, actionid, esc_step, script.command, status, error);
+
+		zbx_script_clean(&script);
 	}
 	DBfree_result(result);
-
-	zbx_free(command);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

@@ -22,8 +22,8 @@
 class CDiv extends CTag{
 	public function __construct($items=null,$class=null,$id=null){
 		parent::__construct('div','yes');
-		$this->setAttribute('class', $class);
-		$this->setAttribute('id', $id);
+		$this->attr('class', $class);
+		$this->attr('id', zbx_formatDomId($id));
 		$this->addItem($items);
 
 		$this->tag_body_start = '';
