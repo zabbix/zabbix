@@ -17,11 +17,14 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#ifndef ZABBIX_EVENTS_H
-#define ZABBIX_EVENTS_H
+#ifndef ZABBIX_SCRIPTS_H
+#define ZABBIX_SCRIPTS_H
 
-#include "db.h"
+#include "common.h"
+#include "dbcache.h"
 
-int	process_event(DB_EVENT *event, int force_actions);
+void	zbx_script_init(zbx_script_t *script);
+void	zbx_script_clean(zbx_script_t *script);
+int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, char **result, char *error, size_t max_error_len);
 
 #endif

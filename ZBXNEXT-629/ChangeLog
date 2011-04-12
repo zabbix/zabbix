@@ -2,10 +2,14 @@
 Changes for 1.9.4
 
 New features:
+ - [ZBXNEXT-672] advanced options for remote commands (Aly, asaveljevs, Sasha, Vedmak)
  - [ZBX-1357] updated Latvian, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
+ - [ZBX-2756] renamed macro {TRIGGER.KEY<1-9>} to {ITEM.KEY<1-9>} (asaveljevs)
  - [ZBXNEXT-511] renamed item description to name, for description introduced new field (asaveljevs, Vedmak)
 
 Bug fixes:
+ - [ZBX-3687] fixed link color for lld rules (Vedmak)
+ - [ZBX-3709] fixed agree checkbox in setup (Vedmak)
  - [ZBX-3658] fixed the whole request to Java proxy failing if it contains an invalid key (asaveljevs)
  - [ZBX-3657] fixed errors while updating proxy configuration data (Sasha)
  - [ZBX-3656] fixed item filter by data type boolean (Vedmak)
@@ -125,6 +129,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.5
 
+ - [ZBX-3503] fixed "incorrect usage of quotes" error (KB)
  - [ZBX-3686] updated French translation; thanks to Joseph Bueno (Richlv)
 
 Changes for 1.8.5rc1
