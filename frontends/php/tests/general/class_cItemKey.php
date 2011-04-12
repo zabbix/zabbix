@@ -513,6 +513,23 @@ class class_cItemKey extends PHPUnit_Framework_TestCase
 					'parameters'=>array('a, b, c', 'a')
 				)
 			),
+			array(
+				'key[["a", "b", "c"]]',
+				array(
+					'valid'=>true,
+					'key_id'=>'key',
+					'parameters'=>array('"a", "b", "c"')
+				)
+			),
+			array(
+				'key[["\"a\"", "\"b\"", "\"c\""]]',
+				array(
+					'valid'=>true,
+					'key_id'=>'key',
+					'parameters'=>array('"\"a\"", "\"b\"", "\"c\""')
+				)
+			),
+
 
 			// invalid keys
 			array('key[["a",]', false),
