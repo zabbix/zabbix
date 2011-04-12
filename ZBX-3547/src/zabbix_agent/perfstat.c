@@ -83,7 +83,7 @@ PERF_COUNTERS	*add_perf_counter(const char *name, const char *counterpath, int i
 			ppsd->pPerfCounterList = cptr;
 			zbx_mutex_unlock(&perfstat_access);
 
-			if (ERROR_SUCCESS == pdh_status || PDH_CSTATUS_NO_INSTANCE == pdh_status)
+			if (ERROR_SUCCESS != pdh_status && PDH_CSTATUS_NO_INSTANCE != pdh_status)
 				cptr = NULL; /* indicate a failure */
 
 			result = SUCCEED;
