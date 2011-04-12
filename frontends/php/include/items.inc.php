@@ -599,7 +599,7 @@
 			}
 		}
 
-		return zbx_space_to_nbsp($name);
+		return nbsp($name);
 	}
 
 	function get_realhost_by_itemid($itemid){
