@@ -382,8 +382,12 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			$action['r_shortdata'] = get_request('r_shortdata', ACTION_DEFAULT_SUBJ);
 			$action['r_longdata'] = get_request('r_longdata', ACTION_DEFAULT_MSG);
 
-			$action['conditions'] = get_request('conditions',array());
-			$action['operations'] = get_request('operations',array());
+			$action['conditions'] = get_request('conditions', array(array(
+				'conditiontype' => 5,
+				'operator' => 0,
+				'value' => 1
+			)));
+			$action['operations'] = get_request('operations', array());
 		}
 
 		$actionForm = new CGetForm('action.edit', $action);
