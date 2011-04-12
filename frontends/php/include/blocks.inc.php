@@ -882,13 +882,11 @@ function make_latest_issues($filter = array()){
 						')');
 
 				$menus.= "[".zbx_jsvalue($script['name']).", ".$str_tmp.", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
-
-//				$menus.= "[".zbx_jsvalue($script['name']).",\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$trigger['hostid']."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 			}
 		}
 
 		if(!empty($scripts_by_hosts[$trigger['hostid']])){
-			$menus = "['".S_TOOLS."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus;
+			$menus = "['"._('Scripts')."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus;
 		}
 
 		if(isset($thosts_cache[$trigger['hostid']])){
