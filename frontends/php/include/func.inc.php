@@ -629,6 +629,10 @@ function zbx_htmlstr($str){
 	return str_replace(array('<','>','"'),array('&lt;','&gt;','&quot;'), $str);
 }
 
+function zbx_formatDomId($value){
+	return str_replace(array('[',']'),array('_',''), $value);
+}
+
 function zbx_strlen($str){
 	if(defined('ZBX_MBSTRINGS_ENABLED')){
 		return mb_strlen($str);

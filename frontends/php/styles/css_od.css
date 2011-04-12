@@ -1,48 +1,18 @@
 /* CSS Document */
 /* Dark Orange Theme by Aly */
 @import "darkorange/jquery-ui.css";
+@media print { body{ background-color:#A5A5A5; } }
+@media screen { body{ background-color:#1A1A1A; color: #FF5500; } }
 
-@media print {
-	body{
-		background-color:#A5A5A5;
-	}
-}
+.delimiter { color:#AAF; }
+.textcolorstyles { color: #FF5500; }
+.textblackwhite{ color: #EAEAEA; }
+.pum_oheader { background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left; }
+.right_header { border-color: #222222; }
+.unknown { color: #999999; }
+.normal	{ background-color: #AADDDD; }
 
-@media screen {
-	body{
-		background-color:#1A1A1A;
-		color: #FF5500;
-	}
-}
-
-.delimiter{
-	color:#AAF;
-}
-
-.textcolorstyles{
-	color: #FF5500;
-}
-
-.textblackwhite{
-	color: #EAEAEA;
-}
-
-.pum_oheader {
-	background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left;
-}
-
-.right_header {
-	border-color: #222222;
-}
-
-
-
-.unknown	{
-	color: #999999;
-}
-.normal		{
-	background-color: #AADDDD;
-}
+.disaster, .high, .average, .warning, .information, .unknown_trigger, .normal { color: #222; }
 
 /*////////////////	LINKS	////////////////////*/
 a:link 		{	color:#FF5500;  }

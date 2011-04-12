@@ -254,7 +254,7 @@ include_once('include/page_header.php');
 
 			if(count($items) > 1){
 				insert_js_function('removeSelectedItems');
-				$delItemBttn = new CButton('remove_log',S_REMOVE_SELECTED, "javascript: removeSelectedItems('cmbitemlist[]', 'itemid')");
+				$delItemBttn = new CSubmit('remove_log',S_REMOVE_SELECTED, "javascript: removeSelectedItems('cmbitemlist_', 'itemid')");
 			}
 
 			$filterForm->addRow(S_ITEMS_LIST, array($cmbitemlist, BR(), $addItemBttn, $delItemBttn));

@@ -29,8 +29,8 @@ class CFormList extends CDiv{
 		$this->formList = new CList(null, 'formlist');
 
 		parent::__construct();
-		$this->setAttribute('id', $id);
-		$this->setAttribute('class', $class);
+		$this->attr('id', zbx_formatDomId($id));
+		$this->attr('class', $class);
 	}
 
 	public function addRow($term, $description=null, $hidden=false){

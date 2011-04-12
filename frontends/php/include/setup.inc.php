@@ -146,8 +146,8 @@
 				$license = zbx_nl2br(nbsp(file_get_contents($LICENCE_FILE)));
 
 			$action = <<<JS
-if(this.checked) $("next[1]").writeAttribute('disabled', false);
-else $("next[1]").writeAttribute('disabled', 'disabled');
+if(this.checked) $("next_1").writeAttribute('disabled', false);
+else $("next_1").writeAttribute('disabled', 'disabled');
 JS;
 
 			return array(
