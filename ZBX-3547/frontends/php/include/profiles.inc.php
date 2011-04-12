@@ -257,10 +257,10 @@ function get_user_history(){
 			FROM user_history WHERE userid='.$USER_DETAILS['userid'];
 	$history = DBfetch(DBSelect($sql));
 
-	if($history)
+	if($history && !zbx_empty($history['url4']))
 		$USER_DETAILS['last_page'] = array('title' => $history['title4'], 'url' => $history['url4']);
 	else
-		$USER_DETAILS['last_page'] = false;
+		$USER_DETAILS['last_page'] = array('title' => S_DASHBOARD, 'url' => 'dashboard.php');
 
 	for($i = 1; $i<6; $i++){
 		if(defined($history['title'.$i])){
@@ -308,7 +308,7 @@ function add_user_history($page){
 			return; // no need to change anything;
 	}
 	else{ // new page with new title is added
-		if(!$USER_DETAILS['last_page']){
+		if($history5 === false){
 			$userhistoryid = get_dbid('user_history', 'userhistoryid');
 			$sql = 'INSERT INTO user_history (userhistoryid, userid, title5, url5)'.
 					' VALUES('.$userhistoryid.', '.$userid.', '.zbx_dbstr($title).', '.zbx_dbstr($url).')';

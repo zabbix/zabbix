@@ -301,7 +301,7 @@ include_once('include/page_header.php');
 	$options = array(
 		'nodeids' => get_current_nodeid(),
 		'filter' => array(),
-		'active' => 1,
+		'monitored' => 1,
 		'output' => API_OUTPUT_EXTEND,
 		'skipDependent' => 1,
 		'sortfield' => $sortfield,

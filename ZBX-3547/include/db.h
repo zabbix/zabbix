@@ -270,20 +270,28 @@ DB_DSERVICE;
 
 typedef struct
 {
+	zbx_uint64_t	triggerid;
+	char		description[TRIGGER_DESCRIPTION_LEN_MAX];
+	char		expression[TRIGGER_EXPRESSION_LEN_MAX];
+	char		*url;
+	char		*comments;
+	unsigned char	priority;
+	unsigned char	type;
+}
+DB_TRIGGER;
+
+typedef struct
+{
+	DB_TRIGGER	trigger;
 	zbx_uint64_t	eventid;
+	zbx_uint64_t	objectid;
+	zbx_uint64_t	ack_eventid;
 	int		source;
 	int		object;
-	zbx_uint64_t	objectid;
 	int		clock;
 	int		value;
 	int		acknowledged;
 	int		skip_actions;
-	char		trigger_description[TRIGGER_DESCRIPTION_LEN_MAX];
-	int		trigger_priority;
-	char		*trigger_url;
-	char		*trigger_comments;
-	int		trigger_type;
-	zbx_uint64_t	ack_eventid;
 }
 DB_EVENT;
 
@@ -373,21 +381,6 @@ typedef struct
 	char	*passwd;
 }
 DB_MEDIATYPE;
-
-typedef struct
-{
-	zbx_uint64_t	triggerid;
-	char	expression[TRIGGER_EXPRESSION_LEN_MAX];
-	char	description[TRIGGER_DESCRIPTION_LEN_MAX];
-	char	*url;
-	char	*comments;
-	int	status;
-	int	value;
-	int	priority;
-	int	type;
-	char	error[TRIGGER_ERROR_LEN_MAX];
-}
-DB_TRIGGER;
 
 typedef struct
 {
@@ -561,7 +554,7 @@ int	DBget_row_count(const char *table_name);
 int	DBget_items_unsupported_count();
 int	DBget_queue_count(int from, int to);
 double	DBget_requiredperformance();
-zbx_uint64_t DBget_proxy_lastaccess(const char *hostname);
+int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error);
 
 char	*DBdyn_escape_string(const char *src);
 char	*DBdyn_escape_string_len(const char *src, int max_src_len);
@@ -580,7 +573,6 @@ int	DBadd_template_linkage(int hostid,int templateid,int items,int triggers,int 
 
 int	DBget_item_by_itemid(int itemid,DB_ITEM *item);
 
-int	DBget_trigger_by_triggerid(int triggerid,DB_TRIGGER *trigger);
 int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid);
 void	DBdelete_sysmaps_hosts_by_hostid(zbx_uint64_t hostid);
 

@@ -331,6 +331,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp,
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY_ORIG, item.key_orig, ZBX_JSON_TYPE_STRING);
 		zbx_snprintf(tmp, sizeof(tmp), "%d", item.delay);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_DELAY, tmp, ZBX_JSON_TYPE_STRING);
+		/* The agent expects ALWAYS to have lastlogsize and mtime tags. Removing those would cause older agents to fail. */
 		zbx_snprintf(tmp, sizeof(tmp), "%d", item.lastlogsize);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_LOGLASTSIZE, tmp, ZBX_JSON_TYPE_STRING);
 		zbx_snprintf(tmp, sizeof(tmp), "%d", item.mtime);

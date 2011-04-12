@@ -24,7 +24,6 @@
 #include "db.h"
 #include "dbcache.h"
 #include "log.h"
-#include "zlog.h"
 #include "zbxgetopt.h"
 #include "mutexs.h"
 
@@ -206,21 +205,21 @@ static void	init_config()
 		/* PARAMETER,			VAR,					FUNC,
 			TYPE,		MANDATORY,	MIN,			MAX */
 		{"StartDBSyncers",		&CONFIG_HISTSYNCER_FORKS,		NULL,
-			TYPE_INT,	PARM_OPT,	1,			64},
+			TYPE_INT,	PARM_OPT,	1,			100},
 		{"StartDiscoverers",		&CONFIG_DISCOVERER_FORKS,		NULL,
-			TYPE_INT,	PARM_OPT,	0,			255},
+			TYPE_INT,	PARM_OPT,	0,			250},
 		{"StartHTTPPollers",		&CONFIG_HTTPPOLLER_FORKS,		NULL,
-			TYPE_INT,	PARM_OPT,	0,			255},
+			TYPE_INT,	PARM_OPT,	0,			1000},
 		{"StartPingers",		&CONFIG_PINGER_FORKS,			NULL,
-			TYPE_INT,	PARM_OPT,	0,			255},
+			TYPE_INT,	PARM_OPT,	0,			1000},
 		{"StartPollers",		&CONFIG_POLLER_FORKS,			NULL,
-			TYPE_INT,	PARM_OPT,	0,			255},
+			TYPE_INT,	PARM_OPT,	0,			1000},
 		{"StartPollersUnreachable",	&CONFIG_UNREACHABLE_POLLER_FORKS,	NULL,
-			TYPE_INT,	PARM_OPT,	0,			255},
+			TYPE_INT,	PARM_OPT,	0,			1000},
 		{"StartIPMIPollers",		&CONFIG_IPMIPOLLER_FORKS,		NULL,
-			TYPE_INT,	PARM_OPT,	0,			255},
+			TYPE_INT,	PARM_OPT,	0,			1000},
 		{"StartTrappers",		&CONFIG_TRAPPER_FORKS,			NULL,
-			TYPE_INT,	PARM_OPT,	0,			255},
+			TYPE_INT,	PARM_OPT,	0,			1000},
 		{"CacheSize",			&CONFIG_CONF_CACHE_SIZE,		NULL,
 			TYPE_INT,	PARM_OPT,	128 * ZBX_KIBIBYTE,	ZBX_GIBIBYTE},
 		{"HistoryCacheSize",		&CONFIG_HISTORY_CACHE_SIZE,		NULL,
@@ -300,7 +299,7 @@ static void	init_config()
 		{"LogSlowQueries",		&CONFIG_LOG_SLOW_QUERIES,		NULL,
 			TYPE_INT,	PARM_OPT,	0,			3600000},
 		{"StartProxyPollers",		&CONFIG_PROXYPOLLER_FORKS,		NULL,
-			TYPE_INT,	PARM_OPT,	0,			255},
+			TYPE_INT,	PARM_OPT,	0,			250},
 		{"ProxyConfigFrequency",	&CONFIG_PROXYCONFIG_FREQUENCY,		NULL,
 			TYPE_INT,	PARM_OPT,	1,			SEC_PER_WEEK},
 		{"ProxyDataFrequency",		&CONFIG_PROXYDATA_FREQUENCY,		NULL,
@@ -505,6 +504,12 @@ int	MAIN_ZABBIX_ENTRY()
 	zabbix_log(LOG_LEVEL_INFORMATION, "IPv6 support:              " IPV6_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "******************************");
 
+	if (0 != CONFIG_NODEID)
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "NodeID:                    %3d", CONFIG_NODEID);
+		zabbix_log(LOG_LEVEL_INFORMATION, "******************************");
+	}
+
 #ifdef	HAVE_SQLITE3
 	zbx_create_sqlite3_mutex(CONFIG_DBNAME);
 #endif /* HAVE_SQLITE3 */
@@ -518,12 +523,15 @@ int	MAIN_ZABBIX_ENTRY()
 		CONFIG_REFRESH_UNSUPPORTED = atoi(row[0]);
 	DBfree_result(result);
 
-	result = DBselect("select masterid from nodes where nodeid=%d",
-			CONFIG_NODEID);
+	if (0 != CONFIG_NODEID)
+	{
+		result = DBselect("select masterid from nodes where nodeid=%d",
+				CONFIG_NODEID);
 
-	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
-		CONFIG_MASTER_NODEID = atoi(row[0]);
-	DBfree_result(result);
+		if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
+			CONFIG_MASTER_NODEID = atoi(row[0]);
+		DBfree_result(result);
+	}
 
 	init_database_cache(ZBX_PROCESS_SERVER);
 	init_configuration_cache();

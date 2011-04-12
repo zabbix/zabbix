@@ -769,7 +769,7 @@
 	'S_CREATE_MAINTENANCE_PERIOD'=>		'Create maintenance period',
 	'S_MAINTENANCE_TYPE'=>			'Maintenance type',
 	'S_EXPIRED'=>				'Expired',
-	'S_APPROACH'=>				'Approach',
+	'S_APPROACHING'=>				'Approaching',
 
 	'S_WITH_DATA_COLLECTION'=>		'With data collection',
 	'S_NO_DATA_COLLECTION'=>		'No data collection',
@@ -1584,7 +1584,7 @@
 	'S_MAP'=>					'Map',
 	'S_AS_PLAIN_TEXT'=>			'As plain text',
 	'S_PLAIN_TEXT'=>			'Plain text',
-	'S_PLAIN_TEXT_BIG'=>			'PLAINT TEXT',
+	'S_PLAIN_TEXT_BIG'=>			'PLAIN TEXT',
 	'S_COLUMN_SPAN'=>			'Column span',
 	'S_ROW_SPAN'=>				'Row span',
 	'S_SHOW_LINES'=>			'Show lines',

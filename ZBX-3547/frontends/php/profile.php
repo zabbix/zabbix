@@ -96,13 +96,12 @@ $fields=array(
 
 //Primary Actions
 	else if(isset($_REQUEST['cancel'])){
-		$url = CProfile::get('web.paging.lastpage', 'profile.php');
 		ob_end_clean();
-		redirect($url);
+		redirect($USER_DETAILS['last_page']['url']);
 	}
 	else if(isset($_REQUEST['save'])){
 		$auth_type = get_user_system_auth($USER_DETAILS['userid']);
-		
+
 		if(ZBX_AUTH_INTERNAL != $auth_type){
 			$_REQUEST['password1'] = $_REQUEST['password2'] = null;
 		}
@@ -110,7 +109,7 @@ $fields=array(
 			$_REQUEST['password1'] = get_request('password1', null);
 			$_REQUEST['password2'] = get_request('password2', null);
 		}
-		
+
 		if($_REQUEST['password1'] != $_REQUEST['password2']){
 			show_error_message(S_CANNOT_UPDATE_USER_BOTH_PASSWORDS);
 		}
@@ -146,7 +145,7 @@ $fields=array(
 
 			DBstart();
 			updateMessageSettings($messages);
-			
+
 			$result = CUser::updateProfile($user);
 			if($result && ($USER_DETAILS['type'] > USER_TYPE_ZABBIX_USER)){
 				$data = array(
@@ -164,10 +163,8 @@ $fields=array(
 					'User alias ['.$USER_DETAILS['alias'].'] Name ['.$USER_DETAILS['name'].']'.
 					' Surname ['.$USER_DETAILS['surname'].'] profile id ['.$USER_DETAILS['userid'].']');
 
-				$url = CProfile::get('web.paging.lastpage', 'profile.php');
-				
 				ob_end_clean();
-				redirect($url);
+				redirect($USER_DETAILS['last_page']['url']);
 			}
 			else{
 				show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);

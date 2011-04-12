@@ -24,7 +24,6 @@
 #include "db.h"
 #include "dbcache.h"
 #include "log.h"
-#include "zlog.h"
 #include "zbxgetopt.h"
 #include "mutexs.h"
 #include "proxy.h"
@@ -215,21 +214,21 @@ static void	init_config()
 		{"Hostname",			&CONFIG_HOSTNAME,			NULL,
 			TYPE_STRING,	PARM_OPT,	0,			0},
 		{"StartDBSyncers",		&CONFIG_HISTSYNCER_FORKS,		NULL,
-			TYPE_INT,	PARM_OPT,	1,			64},
+			TYPE_INT,	PARM_OPT,	1,			100},
 		{"StartDiscoverers",		&CONFIG_DISCOVERER_FORKS,		NULL,
-			TYPE_INT,	PARM_OPT,	0,			255},
+			TYPE_INT,	PARM_OPT,	0,			250},
 		{"StartHTTPPollers",		&CONFIG_HTTPPOLLER_FORKS,		NULL,
-			TYPE_INT,	PARM_OPT,	0,			255},
+			TYPE_INT,	PARM_OPT,	0,			1000},
 		{"StartPingers",		&CONFIG_PINGER_FORKS,			NULL,
-			TYPE_INT,	PARM_OPT,	0,			255},
+			TYPE_INT,	PARM_OPT,	0,			1000},
 		{"StartPollers",		&CONFIG_POLLER_FORKS,			NULL,
-			TYPE_INT,	PARM_OPT,	0,			255},
+			TYPE_INT,	PARM_OPT,	0,			1000},
 		{"StartPollersUnreachable",	&CONFIG_UNREACHABLE_POLLER_FORKS,	NULL,
-			TYPE_INT,	PARM_OPT,	0,			255},
+			TYPE_INT,	PARM_OPT,	0,			1000},
 		{"StartIPMIPollers",		&CONFIG_IPMIPOLLER_FORKS,		NULL,
-			TYPE_INT,	PARM_OPT,	0,			255},
+			TYPE_INT,	PARM_OPT,	0,			1000},
 		{"StartTrappers",		&CONFIG_TRAPPER_FORKS,			NULL,
-			TYPE_INT,	PARM_OPT,	0,			255},
+			TYPE_INT,	PARM_OPT,	0,			1000},
 		{"CacheSize",			&CONFIG_CONF_CACHE_SIZE,		NULL,
 			TYPE_INT,	PARM_OPT,	128 * ZBX_KIBIBYTE,	ZBX_GIBIBYTE},
 		{"HistoryCacheSize",		&CONFIG_HISTORY_CACHE_SIZE,		NULL,
@@ -460,7 +459,7 @@ int	MAIN_ZABBIX_ENTRY()
 
 	int		server_num = 0;
 
-	if(CONFIG_LOG_FILE == NULL || '\0' == *CONFIG_LOG_FILE)
+	if (NULL == CONFIG_LOG_FILE || '\0' == *CONFIG_LOG_FILE)
 	{
 		zabbix_open_log(LOG_TYPE_SYSLOG,CONFIG_LOG_LEVEL,NULL);
 	}

@@ -21,7 +21,6 @@
 
 #include "db.h"
 #include "log.h"
-#include "zlog.h"
 #include "dbcache.h"
 
 /******************************************************************************
@@ -33,7 +32,8 @@
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-typedef struct {
+typedef struct
+{
 	zbx_uint64_t	gitemid, itemid;
 	char		key[ITEM_KEY_LEN_MAX];
 	int		drawtype;
@@ -43,7 +43,8 @@ typedef struct {
 	int		calc_fnc;
 	int		type;
 	int		periods_cnt;
-} ZBX_GRAPH_ITEMS;
+}
+ZBX_GRAPH_ITEMS;
 
 /******************************************************************************
  *                                                                            *
@@ -670,12 +671,7 @@ static void	DBupdate_services_rec(zbx_uint64_t serviceid, int clock)
 				serviceupid);
 		}
 		else
-		{
-			zabbix_log( LOG_LEVEL_ERR, "Unknown calculation algorithm of service status [%d]",
-				algorithm);
-			zabbix_syslog("Unknown calculation algorithm of service status [%d]",
-				algorithm);
-		}
+			zabbix_log(LOG_LEVEL_ERR, "Unknown calculation algorithm of service status [%d]", algorithm);
 	}
 	DBfree_result(result);
 

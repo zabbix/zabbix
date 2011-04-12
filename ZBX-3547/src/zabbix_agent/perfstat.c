@@ -180,7 +180,7 @@ void	remove_perf_counter(PERF_COUNTERS *counter)
 	zbx_free(counter);
 }
 
-void	perfs_list_free(void)
+void	perfs_list_free()
 {
 	PERF_COUNTERS	*cptr;
 
@@ -253,7 +253,7 @@ int	init_perf_collector(ZBX_PERF_STAT_DATA *pperf)
 	return SUCCEED;
 }
 
-void	close_perf_collector()
+void	free_perf_collector()
 {
 	PERF_COUNTERS *cptr;
 

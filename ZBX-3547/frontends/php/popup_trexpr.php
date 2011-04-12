@@ -223,13 +223,19 @@
 			'params' => $param2_val_sec,
 			'allowed_types' => $allowed_types_str
 		),
+		'logeventid' => array(
+			'description' => 'N {OP} X, where X is 1 - last Event ID matches regular expression T, 0 - otherwise.',
+			'operators' => $limited_operators,
+			'params' => $param1_str,
+			'allowed_types' => $allowed_types_log
+		),
 		'logseverity' => array(
 			'description' => 'Log severity of the last log entry is {OP} N',
 			'operators' => $operators,
 			'allowed_types' => $allowed_types_log
 		),
 		'logsource' => array(
-			'description' => 'N {OP} X, where X is 1 - last log source of the last log entry matches T',
+			'description' => 'N {OP} X, where X is 1 - last log source of the last log entry matches T, 0 - otherwise.',
 			'operators' => $limited_operators,
 			'params' => $param1_str,
 			'allowed_types' => $allowed_types_log

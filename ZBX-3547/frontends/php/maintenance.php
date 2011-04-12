@@ -670,7 +670,7 @@ include_once('include/page_header.php');
 					$mnt_status = new CSpan(S_EXPIRED,'red');
 					break;
 				case MAINTENANCE_STATUS_APPROACH:
-					$mnt_status = new CSpan(S_APPROACH,'blue');
+					$mnt_status = new CSpan(S_APPROACHING,'blue');
 					break;
 				case MAINTENANCE_STATUS_ACTIVE:
 					$mnt_status = new CSpan(S_ACTIVE,'green');
