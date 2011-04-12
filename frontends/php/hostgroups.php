@@ -148,6 +148,7 @@ include_once('include/page_header.php');
 			$msg_ok		= S_GROUP_ADDED;
 			$msg_fail	= S_CANNOT_ADD_GROUP;
 		}
+
 		show_messages($result, $msg_ok, $msg_fail);
 		if($result){
 			unset($_REQUEST['form']);
@@ -159,16 +160,20 @@ include_once('include/page_header.php');
 		$result = API::HostGroup()->delete($_REQUEST['groupid']);
 		$result = DBend($result);
 
-		unset($_REQUEST['form']);
 		show_messages($result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
-		unset($_REQUEST['groupid']);
+
+		if($result){
+			unset($_REQUEST['form']);
+		}
+		unset($_REQUEST['delete']);
 	}
 // --------- GO  ----------
 	else if($_REQUEST['go'] == 'delete'){
-			$groups = get_request('groups', array());
-			$go_result = API::HostGroup()->delete($groups);
-			show_messages($go_result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
-		}
+		$groups = get_request('groups', array());
+		$go_result = API::HostGroup()->delete($groups);
+
+		show_messages($go_result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
+	}
 	else if(str_in_array($_REQUEST['go'], array('activate', 'disable'))){
 
 		$status = ($_REQUEST['go'] == 'activate') ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;

@@ -499,7 +499,7 @@ include_once('include/page_header.php');
 
 // gobox
 		$goBox = new CComboBox('go');
-		$goOption = new CComboItem('activate',S_ENABLE_SELECTED);
+		$goOption = new CComboItem('activate', _('Enable selected'));
 		$goOption->setAttribute('confirm',S_ENABLE_SELECTED_DISCOVERY_RULES);
 		$goBox->addItem($goOption);
 

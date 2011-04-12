@@ -43,7 +43,7 @@ include_once('include/page_header.php');
 		'copy_mode'	=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0'),NULL),
 
 		'type'=>			array(T_ZBX_INT, O_OPT,  NULL, 		IN('0,1'),	'isset({save})'),
-		'description'=>		array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,'isset({save})'),
+		'description'=>		array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,'isset({save})', _('Name')),
 		'expression'=>		array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,'isset({save})'),
 		'priority'=>		array(T_ZBX_INT, O_OPT,  NULL,  IN('0,1,2,3,4,5'),'isset({save})'),
 		'comments'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,'isset({save})'),
@@ -292,7 +292,7 @@ include_once('include/page_header.php');
 		}
 
 		$go_result = DBend($go_result);
-		show_messages($go_result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
+		show_messages($go_result, _('Status updated'), _('Cannot update status'));
 	}
 	else if(($_REQUEST['go'] == 'copy_to') && isset($_REQUEST['copy']) && isset($_REQUEST['g_triggerid'])){
 		if(isset($_REQUEST['copy_targetid']) && ($_REQUEST['copy_targetid'] > 0) && isset($_REQUEST['copy_type'])){
@@ -497,7 +497,7 @@ include_once('include/page_header.php');
 			}
 
 			if(!empty($trigger['discoveryRule'])){
-				$description[] = new CLink($trigger['discoveryRule']['description'], 'trigger_prototypes.php?parent_discoveryid='.
+				$description[] = new CLink($trigger['discoveryRule']['name'], 'trigger_prototypes.php?parent_discoveryid='.
 					$trigger['discoveryRule']['itemid'],'gold');
 				$description[] = ':'.$trigger['description'];
 			}

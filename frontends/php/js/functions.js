@@ -292,7 +292,7 @@ function swapNodes(n1, n2){
 		p1.replaceChild(n2, n1); // new,old
 		if(b){
 // n1 - the node which we insert
-// b - the node before which we insert 
+// b - the node before which we insert
 			p2.insertBefore(n1, b);
 		}
 		else {
@@ -731,7 +731,7 @@ function create_mon_trigger_menu(e, args, items){
 	// for(var i=0; i < items.length; i++){
 	for(var itemid in items){
 		if(!isset(itemid, items)) continue;
-		tr_menu.push([items[itemid].description,'history.php?action='+items[itemid].action+'&itemid='+items[itemid].itemid,null]);
+		tr_menu.push([items[itemid].name,'history.php?action='+items[itemid].action+'&itemid='+items[itemid].itemid,null]);
 	}
 
 //to create a copy of array, but not references!!!!

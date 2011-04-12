@@ -6,8 +6,29 @@ jQuery(document).ready(function(){
 
 // Type change
 	jQuery("#type").change(function(){
-		jQuery("#execute_on").closest('li').toggle((jQuery(this).val() == '0'));
-	}).change();
+		var ipmi = jQuery(this).val() == '1';
+
+		jQuery("#execute_on").closest('li').toggle(!ipmi);
+
+		if(ipmi){
+			jQuery("#commandipmi")
+					.val(jQuery("#command").val())
+					.closest('li')
+					.toggle(true);
+			jQuery("#command")
+					.closest('li')
+					.toggle(false);
+		}
+		else{
+			jQuery("#command")
+					.val(jQuery("#commandipmi").val())
+					.closest('li')
+					.toggle(true);
+			jQuery("#commandipmi")
+					.closest('li')
+					.toggle(false);
+		}
+	});
 
 // Clone button
 	jQuery("#clone").click(function(){
