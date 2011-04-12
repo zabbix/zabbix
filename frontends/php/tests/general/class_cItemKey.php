@@ -537,6 +537,7 @@ class class_cItemKey extends PHPUnit_Framework_TestCase
 			array('key["a"]654', false),
 			array('key[a][[b]', false),
 			array('key["a"][["b"]', false),
+			array('key["a"] ["b"]', false),
 			array('key(a)', false),
 			array('key[a]]', false),
 			array('key["a"]]', false),
