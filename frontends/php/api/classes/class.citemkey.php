@@ -146,13 +146,8 @@ class cItemKey{
 					}
 					// Zapcat: '][' is treated as ','
 					else if($this->key[$this->currentByte] == ']' && isset($this->key[$this->currentByte+1]) && $this->key[$this->currentByte+1] == '[' && $this->nestLevel == 0) {
-						if($this->nestLevel == 0){
-							$this->currParamNo++;
-							$this->parameters[$this->currParamNo] = '';
-						}
-						else{
-							$this->parameters[$this->currParamNo] .= $this->key[$this->currentByte];
-						}
+						$this->currParamNo++;
+						$this->parameters[$this->currParamNo] = '';
 						$this->currentByte++;
 					}
 					// entering quotes
@@ -161,9 +156,6 @@ class cItemKey{
 						// in key[["a"]] param is "a"
 						if($this->nestLevel > 0){
 							$this->parameters[$this->currParamNo] .= $this->key[$this->currentByte];
-						}
-						else{
-							$this->parameters[$this->currParamNo] = '';
 						}
 					}
 					// next nesting level
@@ -174,7 +166,7 @@ class cItemKey{
 						$this->nestLevel++;
 					}
 					// one of the nested sets ended
-					else if($this->key[$this->currentByte] == ']' && $this->nestLevel != 0) {
+					else if($this->key[$this->currentByte] == ']' && $this->nestLevel > 0) {
 
 						$this->nestLevel--;
 
@@ -213,21 +205,14 @@ class cItemKey{
 					}
 					// looks like we have reached final ']'
 					else if($this->key[$this->currentByte] == ']' && $this->nestLevel == 0) {
-						if (isset($this->key[$this->currentByte+1])){
-							// nothing else is allowed after final ']'
-							$this->isValid = false;
-							$this->error = sprintf(_('incorrect usage of bracket symbols. \'%s\' found after final bracket.'), $this->key[$this->currentByte+1]);
+						if (!isset($this->key[$this->currentByte+1])){
 							return;
 						}
-						else {
-							// with 'key[a,]' the last param considered empty
-							if($this->key[$this->currentByte-1] == ','){
-								$result['parameters'][$this->currParamNo] = '';
-							}
-							// no symbols after the final ']' - everything is ok
-							$this->parameters[$this->currParamNo] = '';
-							return;
-						}
+
+						// nothing else is allowed after final ']'
+						$this->isValid = false;
+						$this->error = sprintf(_('incorrect usage of bracket symbols. \'%s\' found after final bracket.'), $this->key[$this->currentByte+1]);
+						return;
 					}
 					else if($this->key[$this->currentByte] != ' ') {
 						$this->state = 2;
@@ -278,7 +263,7 @@ class cItemKey{
 						}
 
 						// in key[["a"]] param is "a"
-						if($this->nestLevel != 0){
+						if($this->nestLevel > 0){
 							$this->parameters[$this->currParamNo] .= $this->key[$this->currentByte];
 						}
 
@@ -302,7 +287,7 @@ class cItemKey{
 						$this->currentByte--;
 						$this->state = 0;
 					}
-					else if($this->key[$this->currentByte] == ',' || ($this->key[$this->currentByte] == ']' && $this->nestLevel != 0)) {
+					else if($this->key[$this->currentByte] == ',' || ($this->key[$this->currentByte] == ']' && $this->nestLevel > 0)) {
 						$this->currentByte--;
 						$this->state = 0;
 					}
