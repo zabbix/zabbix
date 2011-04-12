@@ -188,9 +188,9 @@ abstract class CItemGeneral extends CZBXAPI{
 			}
 
 			if(isset($item['key_'])){
-				$itemCheck = check_item_key($item['key_']);
-				if(!$itemCheck['valid']){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Error in item key: %s', $itemCheck['description']));
+				$itemKey = new cItemKey($item['key_']);
+				if(!$itemKey->isValid()){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Error in item key: %s', $itemKey->getError()));
 				}
 
 				if(isset($item['type'])){

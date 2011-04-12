@@ -2225,10 +2225,10 @@ int	is_key_char(char c)
 	if (c >= 'a' && c <= 'z')
 		return SUCCEED;
 
-	if (c >= 'A' && c <= 'Z')
+	if (c == '.' || c == ',' || c == '_' || c == '-')
 		return SUCCEED;
 
-	if (c == '.' || c == ',' || c == '_' || c == '-')
+	if (c >= 'A' && c <= 'Z')
 		return SUCCEED;
 
 	if (c >= '0' && c <= '9')
