@@ -39,7 +39,6 @@ class cItemKey{
 	private $currParamNo;
 	private $keyIdHasComma = false; // this is required, because key ids with "," cannot have params (simple checks)
 	// key info (is available after parsing)
-	private $keyLength;
 	private $keyByteCnt;
 	private $isValid = true;        // let's hope for the best :)
 	private $error = '';            // if key is invalid
@@ -55,7 +54,6 @@ class cItemKey{
 		$this->key = $key;
 
 		// get key length
-		$this->keyLength = zbx_strlen($this->key);
 		$this->keyByteCnt = strlen($this->key);
 
 		// checking if key is empty
@@ -78,7 +76,7 @@ class cItemKey{
 	 */
 	private function checkLength(){
 		// empty string
-		if($this->keyLength == 0){
+		if($this->keyByteCnt == 0){
 			$this->isValid = false;
 			$this->error = _("Key cannot be empty.");
 
