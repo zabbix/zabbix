@@ -23,18 +23,18 @@
 #include <sys/mman.h>
 #include <sys/utsname.h>
 
-#define DEV_MEM "/dev/mem"
-#define SMBIOS_ENTRY_POINT_SIZE 0x20
-#define DMI_HEADER_SIZE 4
-#define DMI_GET_VENDOR	0x01
-#define DMI_GET_CHASSIS	0x02
-#define DMI_GET_MODEL	0x04
-#define DMI_GET_SERIAL	0x08
+#define DEV_MEM			"/dev/mem"
+#define SMBIOS_ENTRY_POINT_SIZE	0x20
+#define DMI_HEADER_SIZE		4
+#define DMI_GET_VENDOR		0x01
+#define DMI_GET_CHASSIS		0x02
+#define DMI_GET_MODEL		0x04
+#define DMI_GET_SERIAL		0x08
 
-#define HOST_OS_NAME "/etc/issue.net"
-#define HOST_OS_SHORT "/proc/version_signature"
-#define HOST_OS_FULL "/proc/version"
-#define DPKG_STATUS_FILE "/var/lib/dpkg/status"
+#define HOST_OS_NAME		"/etc/issue.net"
+#define HOST_OS_SHORT		"/proc/version_signature"
+#define HOST_OS_FULL		"/proc/version"
+#define DPKG_STATUS_FILE	"/var/lib/dpkg/status"
 
 int	HOST_ARCH(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
@@ -212,13 +212,21 @@ int	HOST_DEVICE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 int	HOST_LSPCI(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	int		offset = 0;
+	int		ret = SYSINFO_RET_FAIL, offset;
 	char		buffer[MAX_BUFFER_LEN];
-//TODO: list PCI devices
+	FILE		*f;
 
-	zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "TODO: list PCI devices");
-	SET_TEXT_RESULT(result, strdup(buffer));
-	return SYSINFO_RET_OK;
+	if (NULL == (f = popen("lspci -mm 2>/dev/null", "r"))) /* machine readable format */
+		return ret;
+
+	if (1 < (offset = fread(buffer, 1, sizeof(buffer), f)))
+	{
+		buffer[offset - 1] = '\0'; /* remove '\n' */
+		ret = SYSINFO_RET_OK;
+		SET_TEXT_RESULT(result, strdup(buffer));
+	}
+
+	return ret;
 }
 
 int     HOST_MACS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
