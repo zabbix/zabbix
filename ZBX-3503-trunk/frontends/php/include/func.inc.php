@@ -771,9 +771,6 @@ function zbx_strrpos($haystack, $needle){
 	}
 }
 
-function zbx_space_to_nbsp($string){
-	return str_replace(' ', SPACE, $string);
-}
 // }}} STRING FUNCTIONS
 
 
