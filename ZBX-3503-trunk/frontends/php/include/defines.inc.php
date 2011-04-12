@@ -54,8 +54,12 @@
 	define('ZBX_HISTORY_DATA_UPKEEP',		-1); // in days; -1: disabled, 0: always use trends
 
 /* END OF USERS DEFINES */
-	define('ZBX_SCRIPT_TYPE_SCRIPT', 0);
-	define('ZBX_SCRIPT_TYPE_IPMI', 1);
+	define('ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT',	0);
+	define('ZBX_SCRIPT_TYPE_IPMI',			1);
+	define('ZBX_SCRIPT_TYPE_SSH',			2);
+	define('ZBX_SCRIPT_TYPE_TELNET',		3);
+	define('ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT',	4);
+
 
 	define('ZBX_SCRIPT_EXECUTE_ON_AGENT', 0);
 	define('ZBX_SCRIPT_EXECUTE_ON_SERVER', 1);
