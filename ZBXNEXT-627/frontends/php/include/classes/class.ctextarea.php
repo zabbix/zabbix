@@ -25,11 +25,11 @@ class CTextArea extends CTag{
 		parent::__construct('textarea','yes');
 		$this->attributes['class'] = 'input textarea';
 
-		$this->attributes['id'] = $name;
-		$this->attributes['name'] = $name;
+		$this->attr('id', zbx_formatDomId($name));
+		$this->attr('name', $name);
+		$this->attr('rows', $rows);
+		$this->attr('cols', $cols);
 
-		$this->attributes['rows'] = $rows;
-		$this->attributes['cols'] = $cols;
 		$this->setReadonly($readonly);
 
 		$this->addItem($value);
