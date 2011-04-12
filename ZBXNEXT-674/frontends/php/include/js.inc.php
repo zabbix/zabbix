@@ -36,6 +36,26 @@ function zbx_jsvalue($value, $object = null){
 		return '['.implode(',',$value).']';
 }
 
+function encodeValues(&$value, $encodeTwice=true){
+	if(is_string($value)){
+		$value = htmlentities($value, ENT_COMPAT, 'UTF-8');
+
+		if($encodeTwice){
+			$value = htmlentities($value, ENT_COMPAT, 'UTF-8');
+		}
+	}
+	else if(is_array(($value))){
+		foreach($value as $key => $elem){
+			encodeValues($value[$key]);
+		}
+	}
+	else if(is_object(($value))){
+		foreach($value->items as $key => $item){
+			encodeValues($value->items[$key], false);
+		}
+	}
+}
+
 /* function:
  *     zbx_add_post_js
  *
@@ -206,7 +226,7 @@ function insert_javascript_for_tweenbox(){
 						result &= create_var(formname, objname+"["+from.options[i].value+"]", from.options[i].value, false);
 					}
 					else if(action.toLowerCase() == "rmv"){
-						result &= remove_element(objname+"["+from.options[i].value+"]","input");
+						result &= remove_element(objname+"_"+from.options[i].value,"input");
 					}
 
 					while(true){
@@ -556,13 +576,15 @@ function insert_js_function($fnct_name){
 		case 'removeSelectedItems':
 			insert_js('function removeSelectedItems(formobject, name){
 					formobject = $(formobject);
+
 					if(is_null(formobject)) return false;
 
 					for(var i=0; i < formobject.options.length; i++){
 						if(!isset(i, formobject.options)) continue;
 
 						if(formobject.options[i].selected){
-							var obj = $(name+"["+formobject.options[i].value+"]");
+							var obj = $(name+"_"+formobject.options[i].value);
+
 							if(!is_null(obj)) obj.remove();
 						}
 					}

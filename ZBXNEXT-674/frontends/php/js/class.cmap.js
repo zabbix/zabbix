@@ -59,6 +59,7 @@ selection: {
 menuActive: 0,						// To recognize D&D
 debug_status: 0,
 
+
 mlinktrigger: {
 	linktriggerid:	0,					// ALWAYS must be a STRING (js doesn't support uint64)
 	triggerid:		0,					// ALWAYS must be a STRING (js doesn't support uint64)
@@ -322,9 +323,11 @@ removeLinks: function(e){
 	this.debug('removeLinks');
 //--
 
+
 	if(this.selection.count != 2){
 		this.info(locale['S_PLEASE_SELECT_TWO_ELEMENTS']);
 		return false;
+
 	}
 
 	var selementid1 = null;

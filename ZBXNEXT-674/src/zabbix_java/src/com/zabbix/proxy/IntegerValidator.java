@@ -17,11 +17,37 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#ifndef ZABBIX_EVENTS_H
-#define ZABBIX_EVENTS_H
+package com.zabbix.proxy;
 
-#include "db.h"
+class IntegerValidator implements InputValidator
+{
+	private int lo;
+	private int hi;
 
-int	process_event(DB_EVENT *event, int force_actions);
+	public IntegerValidator(int lo, int hi)
+	{
+		if (lo > hi)
+			throw new IllegalArgumentException("bad validation bounds: " + lo + " and " + hi);
 
-#endif
+		this.lo = lo;
+		this.hi = hi;
+	}
+
+	public boolean validate(Object value)
+	{
+		if (value instanceof Integer)
+		{
+			Integer integer = (Integer)value;
+
+			if (!(Integer.valueOf(lo).compareTo(integer) <= 0))
+				return false;
+
+			if (!(integer.compareTo(Integer.valueOf(hi)) <= 0))
+				return false;
+
+			return true;
+		}
+		else
+			return false;
+	}
+}

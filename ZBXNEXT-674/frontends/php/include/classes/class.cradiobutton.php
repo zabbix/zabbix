@@ -44,10 +44,10 @@ class CRadioButton extends CDiv{
 		$id = str_replace(array('[', ']'), array('_'), $this->name).'_'.$this->count;
 
 		$radio = new CInput('radio', $this->name, $value);
-		$radio->setAttribute('id', $id);
+		$radio->attr('id', zbx_formatDomId($id));
 
 		if((strcmp($value,$this->value) == 0) || !is_null($checked) || $checked){
-			$radio->setAttribute('checked', 'checked');
+			$radio->attr('checked', 'checked');
 		}
 
 		$label = new CLabel($name, $id);

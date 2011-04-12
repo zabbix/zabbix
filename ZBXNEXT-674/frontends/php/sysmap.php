@@ -77,7 +77,7 @@ include_once('include/page_header.php');
 
 					$options = array(
 						'sysmapids'=> $sysmapid,
-						'editable' => 1,
+						'editable' => true,
 						'output' => API_OUTPUT_EXTEND,
 						'select_selements' => API_OUTPUT_EXTEND,
 						'select_links' => API_OUTPUT_EXTEND,
@@ -177,7 +177,7 @@ include_once('include/page_header.php');
 
 					$resultData = array(
 						'image' => get_selement_iconid($selement),
-						'label_expanded' => expand_map_element_label_by_data($selement)
+						'label_expanded' => resolveMapLabelMacrosAll($selement)
 					);
 
 					print(zbx_jsvalue($resultData, true));

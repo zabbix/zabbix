@@ -126,7 +126,7 @@
 					new CButton('select_screen',S_SELECT,
 						'return PopUp("popup.php?dstfrm='.$form->getName().'&srctbl=screens'.
 						'&dstfld1=screen_name&srcfld1=name'.
-						'&dstfld2=new_step%5Bscreenid%5D&srcfld2=screenid");'),
+						'&dstfld2=new_step_screenid&srcfld2=screenid");'),
 					BR(),
 					new CSubmit('add_step', isset($new_step['sid']) ? S_SAVE : S_ADD),
 					new CSubmit('cancel_step', S_CANCEL)
@@ -574,7 +574,7 @@
 			$newRow = $frmUser->addRow(S_TRIGGER_SEVERITY, $triggers);
 			$newRow->setAttribute('id', 'triggers_row');
 
-			zbx_add_post_js("var userMessageSwitcher = new CViewSwitcher('messages[enabled]', 'click', ".zbx_jsvalue($msgVisibility, true).");");
+			zbx_add_post_js("var userMessageSwitcher = new CViewSwitcher('messages_enabled', 'click', ".zbx_jsvalue($msgVisibility, true).");");
  		}
 
 		$frmUser->addItemToBottomRow(new CSubmit('save',S_SAVE));
@@ -942,7 +942,7 @@
 		$filter_group			= $_REQUEST['filter_group'];
 		$filter_host			= $_REQUEST['filter_host'];
 		$filter_application		= $_REQUEST['filter_application'];
-		$filter_description		= $_REQUEST['filter_description'];
+		$filter_name		= $_REQUEST['filter_name'];
 		$filter_type			= $_REQUEST['filter_type'];
 		$filter_key			= $_REQUEST['filter_key'];
 		$filter_snmp_community		= $_REQUEST['filter_snmp_community'];
@@ -1008,8 +1008,9 @@
 					new CButton('btn_app', S_SELECT, 'return PopUp("popup.php?dstfrm='.$form->getName().
 						'&dstfld1=filter_application&srctbl=applications&srcfld1=name",400,300,"application");', 'A'))
 		));
-		$col_table1->addRow(array(array(bold(S_DESCRIPTION),SPACE.S_LIKE_SMALL.': '),
-			new CTextBox("filter_description", $filter_description, 30)));
+		$col_table1->addRow(array(array(bold(_('Name')),SPACE.S_LIKE_SMALL.': '),
+			new CTextBox("filter_name", $filter_name, 30)));
+
 		$col_table1->addRow(array(array(bold(S_KEY),SPACE.S_LIKE_SMALL.': '),
 			new CTextBox("filter_key", $filter_key, 30)));
 
@@ -1127,9 +1128,7 @@
 
 		$field321 = new CComboBox('filter_data_type', $filter_data_type);//, 'submit()');
 		$field321->addItem(-1, S_ALL_SMALL);
-		$field321->addItem(ITEM_DATA_TYPE_DECIMAL, item_data_type2str(ITEM_DATA_TYPE_DECIMAL));
-		$field321->addItem(ITEM_DATA_TYPE_OCTAL, item_data_type2str(ITEM_DATA_TYPE_OCTAL));
-		$field321->addItem(ITEM_DATA_TYPE_HEXADECIMAL, item_data_type2str(ITEM_DATA_TYPE_HEXADECIMAL));
+		$field321->addItems(item_data_type2str());
 		$field321->setEnabled('no');
 
 		$col_table3->addRow(array(array($label321, SPACE), array($field321, SPACE)));
@@ -1450,7 +1449,6 @@
 
 // Insert form for Item information
 	function insert_item_form(){
-
 		$frmItem = new CFormTable(S_ITEM);
 		$frmItem->setAttribute('style','visibility: hidden;');
 		$frmItem->setHelp('web.items.item.php');
@@ -1472,6 +1470,7 @@
 			$hostid = get_request('form_hostid', 0);
 
 		$interfaceid = get_request('interfaceid', 0);
+		$name = get_request('name', '');
 		$description = get_request('description', '');
 		$key = get_request('key', '');
 		$host = get_request('host', null);
@@ -1547,6 +1546,7 @@
 		}
 
 		if((isset($_REQUEST['itemid']) && !isset($_REQUEST['form_refresh'])) || $limited){
+			$name		= $item_data['name'];
 			$description		= $item_data['description'];
 			$key			= $item_data['key_'];
 			$interfaceid	= $item_data['interfaceid'];
@@ -1670,7 +1670,7 @@
 			$caption[] = ($parent_discoveryid) ? S_ITEM_PROTOTYPE.' "' : S_ITEM.' "';
 			$caption = array_reverse($caption);
 			$caption[] = ': ';
-			$caption[] = $item_data['description'];
+			$caption[] = $item_data['name'];
 			$caption[] = '"';
 			$frmItem->setTitle($caption);
 		}
@@ -1721,10 +1721,12 @@
 				zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'interfaceid');
 				zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'interface_row');
 				zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'interfaceid');
+				zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'interface_row');
+				zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'interfaceid');
 			}
 		}
 
-		$frmItem->addRow(S_DESCRIPTION, new CTextBox('description',$description,40, $limited));
+		$frmItem->addRow(_('Name'), new CTextBox('name', $name, 40, $limited));
 
 		if($limited){
 			$frmItem->addRow(S_TYPE,  new CTextBox('typename', item_type2str($type), 40, 'yes'));
@@ -1816,13 +1818,16 @@
 				case ITEM_TYPE_DB_MONITOR:
 					zbx_subarray_push($typeVisibility, $it, array('id'=>'key','defaultValue'=> 'db.odbc.select[<unique short description>]'));
 					zbx_subarray_push($typeVisibility, $it, array('id'=>'params_dbmonitor','defaultValue'=> "DSN=<database source name>\nuser=<user name>\npassword=<password>\nsql=<query>"));
-				break;
+					break;
 				case ITEM_TYPE_SSH:
 					zbx_subarray_push($typeVisibility, $it, array('id'=>'key','defaultValue'=> 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]'));
-				break;
+					break;
 				case ITEM_TYPE_TELNET:
 					zbx_subarray_push($typeVisibility, $it, array('id'=>'key', 'defaultValue'=> 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]'));
-				break;
+					break;
+				case ITEM_TYPE_JMX:
+					zbx_subarray_push($typeVisibility, $it, array('id'=>'key', 'defaultValue'=> 'jmx[<object name>,<attribute name>]'));
+					break;
 				default:
 					zbx_subarray_push($typeVisibility, $it, array('id'=>'key', 'defaultValue'=> ''));
 			}
@@ -1852,6 +1857,9 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'row_username');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'username');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'row_username');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'username');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'row_username');
+
 
 		$row = new CRow(array(new CCol(S_PUBLIC_KEY_FILE,'form_row_l'), new CCol(new CTextBox('publickey',$publickey,16),'form_row_r')));
 		$row->setAttribute('id', 'row_publickey');
@@ -1872,6 +1880,8 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'row_password');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'password');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'row_password');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'password');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'row_password');
 
 		$spanEC = new CSpan(S_EXECUTED_SCRIPT);
 		$spanEC->setAttribute('id', 'label_executed_script');
@@ -1931,9 +1941,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		}
 		else{
 			$cmbDataType = new CComboBox('data_type', $data_type);
-			$cmbDataType->addItem(ITEM_DATA_TYPE_DECIMAL,		item_data_type2str(ITEM_DATA_TYPE_DECIMAL));
-			$cmbDataType->addItem(ITEM_DATA_TYPE_OCTAL,		item_data_type2str(ITEM_DATA_TYPE_OCTAL));
-			$cmbDataType->addItem(ITEM_DATA_TYPE_HEXADECIMAL, 	item_data_type2str(ITEM_DATA_TYPE_HEXADECIMAL));
+			$cmbDataType->addItems(item_data_type2str());
 		}
 
 		$row = new CRow(array(new CCol(S_DATA_TYPE,'form_row_l'), new CCol($cmbDataType,'form_row_r')));
@@ -1950,7 +1958,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'units');
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_units');
 
-		$mltpbox = Array();
+		$mltpbox = array();
 		if($limited){
 			$frmItem->addVar('multiplier', $multiplier);
 
@@ -2108,6 +2116,10 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		}
 		$frmItem->addRow(S_APPLICATIONS,$cmbApps);
 
+		$tarea = new CTextArea('description', $description);
+		$tarea->addStyle('margin-top: 5px;');
+		$frmItem->addRow(_('Description'), $tarea);
+
 		$frmRow = array(new CSubmit('save',S_SAVE));
 		if(isset($_REQUEST['itemid'])){
 			array_push($frmRow,
@@ -2149,10 +2161,10 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			$frmItem->addRow(S_GROUP,$cmbGroups);
 
 			$cmbAction = new CComboBox('action');
-			$cmbAction->addItem('add to group',S_ADD_TO_GROUP);
+			$cmbAction->addItem('add to group', _('Add to group'));
 			if(isset($_REQUEST['itemid'])){
 				$cmbAction->addItem('update in group',S_UPDATE_IN_GROUP);
-				$cmbAction->addItem('delete FROM group',S_DELETE_FROM_GROUP);
+				$cmbAction->addItem('delete FROM group', _('Delete from group'));
 			}
 			$frmItem->addItemToBottomRow(array($cmbAction, SPACE, new CSubmit('register',S_DO)));
 		}
@@ -2177,8 +2189,8 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$frmItem->addVar('massupdate',1);
 
 		$frmItem->addVar('group_itemid', $itemids);
-		$frmItem->addVar('config',get_request('config',0));
 
+		$description = get_request('description', '');
 		$delay		= get_request('delay'		,30);
 		$history	= get_request('history'		,90);
 		$status		= get_request('status'		,0);
@@ -2298,9 +2310,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			S_TYPE_OF_INFORMATION), $cmbValType);
 
 		$cmbDataType = new CComboBox('data_type',$data_type);
-		$cmbDataType->addItem(ITEM_DATA_TYPE_DECIMAL,		item_data_type2str(ITEM_DATA_TYPE_DECIMAL));
-		$cmbDataType->addItem(ITEM_DATA_TYPE_OCTAL,		item_data_type2str(ITEM_DATA_TYPE_OCTAL));
-		$cmbDataType->addItem(ITEM_DATA_TYPE_HEXADECIMAL, 	item_data_type2str(ITEM_DATA_TYPE_HEXADECIMAL));
+		$cmbDataType->addItems(item_data_type2str());
 		$frmItem->addRow(array( new CVisibilityBox('data_type_visible', get_request('data_type_visible'), 'data_type', S_ORIGINAL),
 			S_DATA_TYPE), $cmbDataType);
 
@@ -2411,8 +2421,13 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 				$cmbApps->addItem($db_app["applicationid"],$db_app["name"]);
 			}
 		}
-		$frmItem->addRow(array( new CVisibilityBox('applications_visible', get_request('applications_visible'), 'applications[]',
+		$frmItem->addRow(array( new CVisibilityBox('applications_visible', get_request('applications_visible'), 'applications_',
 			S_ORIGINAL), S_APPLICATIONS),$cmbApps);
+
+		$tarea = new CTextArea('description', $description);
+		$tarea->addStyle('margin-top: 5px;');
+		$frmItem->addRow(array( new CVisibilityBox('description_visible', get_request('description_visible'), 'description', S_ORIGINAL),
+			_('Description')), $tarea);
 
 		$frmItem->addItemToBottomRow(array(new CSubmit("update",S_UPDATE),
 			SPACE, new CButtonCancel(url_param('groupid').url_param("hostid").url_param("config"))));
@@ -3144,7 +3159,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 					$do_down->onClick("return create_var('".$frmGraph->getName()."','move_down',".$gid.", true);");
 				}
 
-				$description = new CSpan($host['host'].': '.item_description($item),'link');
+				$description = new CSpan($host['host'].': '.itemName($item),'link');
 				$description->onClick(
 					'return PopUp("popup_gitem.php?list_name=items&dstfrm='.$frmGraph->getName().
 					url_param($only_hostid, false, 'only_hostid').
@@ -3234,7 +3249,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 				if($ymin_itemid > 0){
 					$min_host = get_host_by_itemid($ymin_itemid);
 					$min_item = get_item_by_itemid($ymin_itemid);
-					$ymin_name = $min_host['host'].':'.item_description($min_item);
+					$ymin_name = $min_host['host'].':'.itemName($min_item);
 				}
 
 				if(count($items)){
@@ -3247,7 +3262,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 							"&dstfld2=ymin_name".
 							"&srctbl=items".
 							"&srcfld1=itemid".
-							"&srcfld2=description',0,0,'zbx_popup_item');");
+							"&srcfld2=name',0,0,'zbx_popup_item');");
 				}
 				else{
 					$yaxis_min[] = S_ADD_GRAPH_ITEMS;
@@ -3278,7 +3293,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 				if($ymax_itemid > 0){
 					$max_host = get_host_by_itemid($ymax_itemid);
 					$max_item = get_item_by_itemid($ymax_itemid);
-					$ymax_name = $max_host['host'].':'.item_description($max_item);
+					$ymax_name = $max_host['host'].':'.itemName($max_item);
 				}
 
 				if(count($items)){
@@ -3291,7 +3306,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 							"&dstfld2=ymax_name".
 							"&srctbl=items".
 							"&srcfld1=itemid".
-							"&srcfld2=description',0,0,'zbx_popup_item');"
+							"&srcfld2=name',0,0,'zbx_popup_item');"
 					);
 				}
 				else{

@@ -111,7 +111,7 @@ function getHostProfiles(){
 		if($row){
 			return $row;
 		}
-		error(S_NO_HOST_GROUPS_WITH." groupid=[$groupid]");
+		error(_s('No host groups with groupid "%s".', $groupid));
 		return  false;
 	}
 
@@ -940,9 +940,8 @@ return $result;
 		$hostids = getUnlinkableHosts($groupids);
 
 		$sql_where = '';
-		if(!is_null($groupids)){
+		if(!is_null($groupids))
 			$sql_where.= ' AND '.DBcondition('g.groupid', $groupids);
-		}
 
 		$sql = 'SELECT DISTINCT g.groupid '.
 				' FROM groups g '.
@@ -952,7 +951,7 @@ return $result;
 						'SELECT hg.groupid '.
 						' FROM hosts_groups hg '.
 						' WHERE g.groupid=hg.groupid '.
-							' AND '.DBcondition('hg.hostid', $hostids, true).
+							(!empty($hostids) ? ' AND '.DBcondition('hg.hostid', $hostids, true) : '').
 						')';
 		$res = DBselect($sql);
 		while($group = DBfetch($res)){

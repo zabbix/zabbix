@@ -324,12 +324,17 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 	clock = trends[0].clock;
 	value_type = trends[0].value_type;
 
-	switch (value_type) {
-	case ITEM_VALUE_TYPE_FLOAT: table_name = "trends"; break;
-	case ITEM_VALUE_TYPE_UINT64: table_name = "trends_uint"; break;
-	default:
-		zbx_error("Unsupported value type for trends");
-		assert(0 == 1);
+	switch (value_type)
+	{
+		case ITEM_VALUE_TYPE_FLOAT:
+			table_name = "trends";
+			break;
+		case ITEM_VALUE_TYPE_UINT64:
+			table_name = "trends_uint";
+			break;
+		default:
+			zbx_error("Unsupported value type for trends: %d", (int)value_type);
+			assert(0);
 	}
 
 	ids = zbx_malloc(ids, ids_alloc * sizeof(zbx_uint64_t));
@@ -985,10 +990,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 		if (SUCCEED != evaluate_expression(&exp_value, &tr[i].exp, tr[i].ts.sec,
 					tr[i].triggerid, tr[i].value, error, sizeof(error)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Expression [%s] cannot be evaluated: %s",
-					tr[i].exp, error);
-			zabbix_syslog("Expression [%s] cannot be evaluated: %s",
-					tr[i].exp, error);
+			zabbix_log(LOG_LEVEL_WARNING, "Expression [%s] cannot be evaluated: %s", tr[i].exp, error);
 
 			DBupdate_trigger_value(tr[i].triggerid, tr[i].type, tr[i].value, tr[i].value_flags,
 					tr[i].error, tr[i].value, TRIGGER_VALUE_FLAG_UNKNOWN, &tr[i].ts, error);
@@ -1225,19 +1227,15 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 
 				hostkey_name = zbx_host_key_string(h->itemid);
 
-				message = zbx_dsprintf(message, "Type of received value"
-						" [" ZBX_FS_DBL "] is not suitable for value type [%s]",
+				message = zbx_dsprintf(message, "Received value [" ZBX_FS_DBL "]"
+						" is not suitable for value type [%s]",
 						h->value.value_float,
 						zbx_item_value_type_string(h->value_type));
 
 				zabbix_log(LOG_LEVEL_WARNING, "Item [%s] error: %s", hostkey_name, message);
-				zabbix_syslog("Item [%s] error: %s", hostkey_name, message);
 
 				if (ITEM_STATUS_NOTSUPPORTED != item.status)
-				{
 					zabbix_log(LOG_LEVEL_WARNING, "Item [%s] is not supported", hostkey_name);
-					zabbix_syslog("Item [%s] is not supported", hostkey_name);
-				}
 
 				DCadd_nextcheck(h->itemid, h->clock, message);	/* update error & status field in items table */
 				DCrequeue_reachable_item(h->itemid, ITEM_STATUS_NOTSUPPORTED, h->clock);
@@ -1317,11 +1315,7 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 		/* Update item status if required */
 		if (item.status == ITEM_STATUS_NOTSUPPORTED && status == ITEM_STATUS_ACTIVE)
 		{
-			message = zbx_dsprintf(message, "Parameter [" ZBX_FS_UI64 "][%s] became supported",
-					item.itemid, zbx_host_key_string(item.itemid));
-			zabbix_log(LOG_LEVEL_WARNING, "%s", message);
-			zabbix_syslog("%s", message);
-			zbx_free(message);
+			zabbix_log(LOG_LEVEL_WARNING, "Item [%s] became supported", zbx_host_key_string(item.itemid));
 
 			item.status = ITEM_STATUS_ACTIVE;
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 32, ",status=%d,error=''",
@@ -2066,6 +2060,9 @@ int	DCsync_history(int sync_type)
 			cache->history_first,
 			cache->history_num);
 
+	/* disable processing of the zabbix_syslog() calls */
+	CONFIG_ENABLE_LOG = 0;
+
 	if (ZBX_SYNC_FULL == sync_type)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Syncing history data...");
@@ -2168,7 +2165,7 @@ int	DCsync_history(int sync_type)
 
 		UNLOCK_CACHE;
 
-		for (i = 0; i < history_num; i ++)
+		for (i = 0; i < history_num; i++)
 		{
 			if (history[i].value_type == ITEM_VALUE_TYPE_STR
 					|| history[i].value_type == ITEM_VALUE_TYPE_TEXT
@@ -2188,7 +2185,8 @@ int	DCsync_history(int sync_type)
 					(double)total_num / (cache->history_num + total_num) * 100);
 			now = time(NULL);
 		}
-	} while (--syncs > 0 || sync_type == ZBX_SYNC_FULL || (skipped_clock != 0 && skipped_clock < max_delay));
+	}
+	while (--syncs > 0 || sync_type == ZBX_SYNC_FULL || (skipped_clock != 0 && skipped_clock < max_delay));
 finish:
 	if (ZBX_SYNC_FULL == sync_type)
 		zabbix_log(LOG_LEVEL_WARNING, "Syncing history data... done.");

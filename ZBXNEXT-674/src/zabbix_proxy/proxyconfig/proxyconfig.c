@@ -56,14 +56,7 @@ static void	process_configuration_sync()
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	while (FAIL == connect_to_server(&sock, 600))	/* alarm */
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Connect to the server failed."
-				" Retry after %d seconds",
-				CONFIG_PROXYCONFIG_RETRY);
-
-		sleep(CONFIG_PROXYCONFIG_RETRY);
-	}
+	connect_to_server(&sock, 600, CONFIG_PROXYCONFIG_RETRY); /* retry till have a connection */
 
 	if (FAIL == get_data_from_server(&sock,
 			ZBX_PROTO_VALUE_PROXY_CONFIG, &data))

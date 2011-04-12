@@ -877,7 +877,7 @@ Copt::memoryPick();
 				$obj_params['output'] = $options['selectItems'];
 				$items = API::Item()->get($obj_params);
 
-				if(!is_null($options['limitSelects'])) order_result($items, 'description');
+				if(!is_null($options['limitSelects'])) order_result($items, 'name');
 				$count = array();
 				foreach($items as $itemid => $item){
 					if(!is_null($options['limitSelects'])){
@@ -918,7 +918,7 @@ Copt::memoryPick();
 				$obj_params['output'] = $options['selectDiscoveries'];
 				$items = API::DiscoveryRule()->get($obj_params);
 
-				if(!is_null($options['limitSelects'])) order_result($items, 'description');
+				if(!is_null($options['limitSelects'])) order_result($items, 'name');
 
 				$count = array();
 				foreach($items as $itemid => $item){
@@ -1983,7 +1983,7 @@ Copt::memoryPick();
 			));
 
 // delete host from maps
-			if(empty($hostids))
+			if(!empty($hostids))
 				DB::delete('sysmaps_elements', array('elementtype' => SYSMAP_ELEMENT_TYPE_HOST, 'elementid' => $hostids));
 
 // disable actions
