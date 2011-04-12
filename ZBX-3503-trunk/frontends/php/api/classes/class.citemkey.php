@@ -57,29 +57,17 @@ class cItemKey{
 		$this->keyByteCnt = strlen($this->key);
 
 		// checking if key is empty
-		$this->checkLength();
-
-		if($this->isValid){
+		if($this->keyByteCnt == 0){
+			$this->isValid = false;
+			$this->error = _("Key cannot be empty.");
+		}
+		else{
 			// getting key id out of the key
 			$this->parseKeyId();
 			if($this->isValid){
 				// and parameters ($currentByte now points to start of parameters)
 				$this->parseKeyParameters();
 			}
-		}
-	}
-
-
-	/**
-	 * Check if key is empty or too large
-	 * @return void
-	 */
-	private function checkLength(){
-		// empty string
-		if($this->keyByteCnt == 0){
-			$this->isValid = false;
-			$this->error = _("Key cannot be empty.");
-
 		}
 	}
 
