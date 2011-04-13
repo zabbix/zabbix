@@ -25,7 +25,7 @@
 	function check_right_on_discovery($permission){
 		global $USER_DETAILS;
 
-		if( $USER_DETAILS['type'] >= USER_TYPE_ZABBIX_ADMIN ){
+		if($USER_DETAILS['type'] >= USER_TYPE_ZABBIX_ADMIN){
 			if(count(get_accessible_nodes_by_user($USER_DETAILS, $permission, PERM_RES_IDS_ARRAY)))
 				return true;
 		}
@@ -83,7 +83,7 @@
 			return S_UNKNOWN;
 	}
 
-	function discovery_check2str($type, $key_, $port){
+	function discovery_check2str($type, $key, $port){
 		$external_param = '';
 
 		if(!empty($key)){
@@ -92,7 +92,7 @@
 				case SVC_SNMPv2:
 				case SVC_SNMPv3:
 				case SVC_AGENT:
-					$external_param = ' "'.$key_.'"';
+					$external_param = ' "'.$key.'"';
 					break;
 			}
 		}
@@ -158,133 +158,6 @@
 
 	function get_discovery_rule_by_druleid($druleid){
 		return DBfetch(DBselect('select * from drules where druleid='.$druleid));
-	}
-
-	function add_discovery_check($druleid, $type, $ports, $key, $snmp_community,
-			$snmpv3_securityname, $snmpv3_securitylevel, $snmpv3_authpassphrase, $snmpv3_privpassphrase, $uniq=0)
-	{
-		// no need to store those items in DB if they will not be used
-		if($snmpv3_securitylevel == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV){
-			$snmpv3_authpassphrase = '';
-			$snmpv3_privpassphrase = '';
-		}
-		if($snmpv3_securitylevel == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV){
-			$snmpv3_privpassphrase = '';
-		}
-
-		$dcheckid = get_dbid('dchecks', 'dcheckid');
-		$result = DBexecute('insert into dchecks (dcheckid,druleid,type,ports,key_,snmp_community'.
-				',snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,uniq) '.
-				' values ('.$dcheckid.','.$druleid.','.$type.','.zbx_dbstr($ports).','.
-				zbx_dbstr($key).','.zbx_dbstr($snmp_community).','.zbx_dbstr($snmpv3_securityname).','.
-				$snmpv3_securitylevel.','.zbx_dbstr($snmpv3_authpassphrase).','.zbx_dbstr($snmpv3_privpassphrase).','.$uniq.')');
-
-		if(!$result)
-			return $result;
-
-		return $dcheckid;
-	}
-
-	function add_discovery_rule($proxy_hostid, $name, $iprange, $delay, $status, $dchecks, $uniqueness_criteria){
-		if( !validate_ip_range($iprange) ){
-			error(_('Incorrect IP range.'));
-			return false;
-		}
-
-		$druleid = get_dbid('drules', 'druleid');
-		$result = DBexecute('insert into drules (druleid,proxy_hostid,name,iprange,delay,status) '.
-			' values ('.$druleid.','.zero2null($proxy_hostid).','.zbx_dbstr($name).','.zbx_dbstr($iprange).','.$delay.','.$status.')');
-
-		if($result && isset($dchecks)){
-			foreach($dchecks as $id => $data){
-				$data['dcheckid'] = add_discovery_check($druleid, $data['type'], $data['ports'], $data['key_'],
-						$data['snmp_community'], $data['snmpv3_securityname'], $data['snmpv3_securitylevel'],
-						$data['snmpv3_authpassphrase'], $data['snmpv3_privpassphrase'],
-						($uniqueness_criteria == $id) ? 1 : 0);
-			}
-			$result = $druleid;
-		}
-
-		return $result;
-	}
-
-	function update_discovery_rule($druleid, $proxy_hostid, $name, $iprange, $delay, $status, $dchecks,	$uniqueness_criteria){
-		if(!validate_ip_range($iprange)){
-			error(_('Incorrect IP range.'));
-			return false;
-		}
-
-		$drules = API::DRule()->get(array(
-			'druleids' => $_REQUEST['druleid'],
-			'output' => API_OUTPUT_EXTEND,
-			'selectDChecks' => API_OUTPUT_EXTEND,
-			'editable' => true
-		));
-		$drule = reset($drules);
-		$result = DBexecute('update drules set proxy_hostid='.zero2null($proxy_hostid).',name='.zbx_dbstr($name).',iprange='.zbx_dbstr($iprange).','.
-			'delay='.$delay.',status='.$status.' where druleid='.$druleid);
-
-		if($result && isset($dchecks)){
-			$dchecksDiff = zbx_array_diff($dchecks, $drule['dchecks'], 'dcheckid');
-
-			$addChecks = $dchecksDiff['first'];
-			$addChecks = zbx_toHash($addChecks, 'dcheckid');
-
-			$deleteChecks = zbx_objectValues($dchecksDiff['second'], 'dcheckid');
-			$upadteChecks = $dchecksDiff['both'];
-
-			$unique_dcheckid = 0;
-			foreach($dchecks as $id => $data){
-				if(isset($addChecks[$id])){
-					$data['dcheckid'] = add_discovery_check($druleid, $data['type'], $data['ports'], $data['key_'],
-							$data['snmp_community'], $data['snmpv3_securityname'], $data['snmpv3_securitylevel'],
-							$data['snmpv3_authpassphrase'], $data['snmpv3_privpassphrase']);
-				}
-
-				if($uniqueness_criteria == $id && $data['dcheckid'])
-					$unique_dcheckid = $data['dcheckid'];
-			}
-
-			$sql = 'UPDATE dchecks SET uniq=0 WHERE druleid='.$druleid;
-			DBexecute($sql);
-
-			if($unique_dcheckid){
-				$sql = 'UPDATE dchecks SET uniq=1 WHERE dcheckid='.$unique_dcheckid;
-				DBexecute($sql);
-			}
-		}
-
-		if($result && !empty($deleteChecks))
-			delete_discovery_check($deleteChecks);
-
-	return $result;
-	}
-
-	function delete_discovery_check($dcheckids){
-		$actionids = array();
-// conditions
-		$sql = 'SELECT DISTINCT actionid '.
-				' FROM conditions '.
-				' WHERE conditiontype='.CONDITION_TYPE_DCHECK.
-					' AND '.DBcondition('value', $dcheckids);
-
-		$db_actions = DBselect($sql);
-		while($db_action = DBfetch($db_actions))
-			$actionids[] = $db_action['actionid'];
-
-// disabling actions with deleted conditions
-		if (!empty($actionids)){
-			DBexecute('UPDATE actions '.
-					' SET status='.ACTION_STATUS_DISABLED.
-					' WHERE '.DBcondition('actionid', $actionids));
-
-// delete action conditions
-			DBexecute('DELETE FROM conditions '.
-					' WHERE conditiontype='.CONDITION_TYPE_DCHECK.
-					' AND '.DBcondition('value', $dcheckids));
-		}
-
-		DBexecute('DELETE FROM dchecks WHERE '.DBcondition('dcheckid', $dcheckids));
 	}
 
 	function delete_discovery_rule($druleid){

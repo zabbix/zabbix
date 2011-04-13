@@ -65,40 +65,41 @@ include_once('include/page_header.php');
 ?>
 <?php
 	if(inarr_isset('save')){
-		if(empty($_REQUEST['dchecks'])){
-			error(_('Rule without checks cannot be saved.'));
-			show_messages();
+		foreach($_REQUEST['dchecks'] as $dcnum => $check){
+			$_REQUEST['dchecks'][$dcnum]['uniq'] = ($_REQUEST['uniqueness_criteria'] == $dcnum ? 1 : 0);
+		}
+
+		$discoveryRule = array(
+			'name' => $_REQUEST['name'],
+			'proxy_hostid' => $_REQUEST['proxy_hostid'],
+			'iprange' => $_REQUEST['iprange'],
+			'delay' => $_REQUEST['delay'],
+			'status' => $_REQUEST['status'],
+			'dchecks' => $_REQUEST['dchecks'],
+		);
+
+		if(isset($_REQUEST['druleid'])){
+			$discoveryRule['druleid'] = $_REQUEST['druleid'];
+			$result = API::drule()->update($discoveryRule);
+
+			$msg_ok = _('Discovery rule updated.');
+			$msg_fail = _('Cannot update discovery rule.');
 		}
 		else{
-			DBstart();
-			if(inarr_isset('druleid')){ /* update */
-				$msg_ok = S_DISCOVERY_RULE_UPDATED;
-				$msg_fail = S_CANNOT_UPDATE_DISCOVERY_RULE;
+			$result = API::drule()->create($discoveryRule);
 
-				$result = update_discovery_rule($_REQUEST["druleid"], $_REQUEST["proxy_hostid"], $_REQUEST['name'],
-					$_REQUEST['iprange'], $_REQUEST['delay'], $_REQUEST['status'], $_REQUEST['dchecks'],
-					$_REQUEST['uniqueness_criteria']);
+			$msg_ok = _('Discovery rule created.');
+			$msg_fail = _('Cannot create discovery rule.');
+		}
 
-				$druleid = $_REQUEST["druleid"];
-			}
-			else{ /* add new */
-				$msg_ok = S_DISCOVERY_RULE_ADDED;
-				$msg_fail = S_CANNOT_ADD_DISCOVERY_RULE;
+		show_messages($result, $msg_ok, $msg_fail);
 
-				$result = $druleid = add_discovery_rule($_REQUEST["proxy_hostid"], $_REQUEST['name'], $_REQUEST['iprange'],
-					$_REQUEST['delay'], $_REQUEST['status'], $_REQUEST['dchecks'], $_REQUEST['uniqueness_criteria']);
-			}
+		if($result){
+			$druleid = reset($result['druleids']);
+			add_audit(isset($_REQUEST['druleid']) ? AUDIT_ACTION_UPDATE : AUDIT_ACTION_ADD,
+				AUDIT_RESOURCE_DISCOVERY_RULE, '['.$druleid.'] '.$_REQUEST['name']);
 
-			$result = DBend($result);
-
-			show_messages($result, $msg_ok, $msg_fail);
-
-			if($result){ // result - OK
-				add_audit(!isset($_REQUEST['druleid']) ? AUDIT_ACTION_ADD : AUDIT_ACTION_UPDATE,
-					AUDIT_RESOURCE_DISCOVERY_RULE, '['.$druleid.'] '.$_REQUEST['name']);
-
-				unset($_REQUEST['form']);
-			}
+			unset($_REQUEST['form']);
 		}
 	}
 	else if(inarr_isset(array('clone','druleid'))){
@@ -110,10 +111,10 @@ include_once('include/page_header.php');
 	}
 	else if(inarr_isset(array('delete', 'druleid'))){
 		$result = delete_discovery_rule($_REQUEST['druleid']);
-		show_messages($result,S_DISCOVERY_RULE_DELETED,S_CANNOT_DELETE_DISCOVERY_RULE);
+		show_messages($result, _('Discovery rule deleted.'), _('Cannot delete discovery rule.'));
+
 		if($result){
-			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_DISCOVERY_RULE,
-				'['.$_REQUEST['druleid'].']');
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_DISCOVERY_RULE, '['.$_REQUEST['druleid'].']');
 			unset($_REQUEST['form']);
 			unset($_REQUEST['druleid']);
 		}
@@ -132,7 +133,7 @@ include_once('include/page_header.php');
 				$go_result = true;
 			}
 		}
-		show_messages($go_result,S_DISCOVERY_RULES_UPDATED);
+		show_messages($go_result, _('Discovery rules updated.'));
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['g_druleid'])){
 		$go_result = false;
@@ -143,7 +144,7 @@ include_once('include/page_header.php');
 				$go_result = true;
 			}
 		}
-		show_messages($go_result,S_DISCOVERY_RULES_DELETED);
+		show_messages($go_result, _('Discovery rules deleted.'));
 	}
 
 	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
@@ -272,19 +273,19 @@ include_once('include/page_header.php');
 // gobox
 		$goBox = new CComboBox('go');
 		$goOption = new CComboItem('activate', _('Enable selected'));
-		$goOption->setAttribute('confirm',S_ENABLE_SELECTED_DISCOVERY_RULES);
+		$goOption->setAttribute('confirm', _('Enable selected discovery rules?'));
 		$goBox->addItem($goOption);
 
-		$goOption = new CComboItem('disable',S_DISABLE_SELECTED);
-		$goOption->setAttribute('confirm',S_DISABLE_SELECTED_DISCOVERY_RULES);
+		$goOption = new CComboItem('disable', S_DISABLE_SELECTED);
+		$goOption->setAttribute('confirm', _('Disable selected discovery rules?'));
 		$goBox->addItem($goOption);
 
-		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
-		$goOption->setAttribute('confirm',S_DELETE_SELECTED_DISCOVERY_RULES);
+		$goOption = new CComboItem('delete', S_DELETE_SELECTED);
+		$goOption->setAttribute('confirm', _('Delete selected discovery rules?'));
 		$goBox->addItem($goOption);
 
 		// goButton name is necessary!!!
-		$goButton = new CSubmit('goButton',S_GO.' (0)');
+		$goButton = new CSubmit('goButton', S_GO.' (0)');
 		$goButton->setAttribute('id','goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "g_druleid";');
