@@ -120,20 +120,8 @@
 	'S_ICMPPING'=>				_('ICMP Ping'),
 	'S_PORTS_SMALL'=>			_('ports'),
 
-	'S_DISCOVERY_RULES_DELETED'=>		_('Discovery rules deleted'),
-	'S_DISCOVERY_RULE_DELETED'=>		_('Discovery rule deleted'),
-	'S_CANNOT_DELETE_DISCOVERY_RULE'=>	_('Cannot delete discovery rule'),
-	'S_DISCOVERY_RULES_UPDATED'=>		_('Discovery rules updated'),
-	'S_DISCOVERY_RULE_UPDATED'=>		_('Discovery rule updated'),
-	'S_CANNOT_UPDATE_DISCOVERY_RULE'=>	_('Cannot update discovery rule'),
-	'S_DISCOVERY_RULE_ADDED'=>		_('Discovery rule added'),
-	'S_CANNOT_ADD_DISCOVERY_RULE'=>		_('Cannot add discovery rule'),
 	'S_STATUS_OF_DISCOVERY_BIG'=>		_('STATUS OF DISCOVERY'),
 	'S_STATUS_OF_DISCOVERY'=>		_('Status of discovery'),
-	'S_ENABLE_SELECTED_DISCOVERY_RULES'=>	_('Enable selected discovery rules?'),
-	'S_DISABLE_SELECTED_DISCOVERY_RULES'=>	_('Disable selected discovery rules?'),
-	'S_DELETE_SELECTED_DISCOVERY_RULES'=>	_('Delete selected discovery rules?'),
-
 	'S_DISCOVERED'=>			_('Discovered'),
 	'S_LOST'=>				_('Lost'),
 

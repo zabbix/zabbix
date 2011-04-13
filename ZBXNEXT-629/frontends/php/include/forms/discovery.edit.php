@@ -73,7 +73,7 @@ require_once('include/templates/discovery.js.php');
 
 	// Add Discovery Checks
 	foreach($data['dchecks'] as $id => $dcheck){
-		$data['dchecks'][$id]['name'] = discovery_check2str($data['dchecks'][$id]['type'], $data['dchecks'][$id]['key_'], $data['dchecks'][$id]['ports']);
+		$data['dchecks'][$id]['name'] = discovery_check2str($dcheck['type'], $dcheck['key_'], $dcheck['ports']);
 	}
 	order_result($data['dchecks'], 'name');
 
