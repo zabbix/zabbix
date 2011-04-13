@@ -21,9 +21,6 @@
 #include "sysinfo.h"
 #include "stats.h"
 
-#define CPU_MAX_FREQ_FILE "/sys/devices/system/cpu/cpu%d/cpufreq/cpuinfo_max_freq"
-#define CPU_INFO_FILE "/proc/cpuinfo"
-
 int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	mode[32];
@@ -190,65 +187,5 @@ int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGEN
 	}
 	zbx_fclose(f);
 
-	return ret;
-}
-
-static int get_cpu_max_speed(int cpu_num)
-{
-	int result = -1;
-	char filename[MAX_BUFFER_LEN];
-	FILE		*f;
-
-	zbx_snprintf(filename, sizeof(filename), CPU_MAX_FREQ_FILE, cpu_num);
-
-	f = fopen(filename, "r");
-	if (NULL != f)
-	{
-		if (1 != fscanf(f, "%d", &result))
-			result = -1;
-		fclose(f);
-	}
-
-	return result;
-}
-
-int     SYSTEM_CPU_INFO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	int		ret = SYSINFO_RET_FAIL, val, offset = 0;
-	char		line[MAX_STRING_LEN], name[MAX_STRING_LEN], value[MAX_STRING_LEN], buf[MAX_BUFFER_LEN], *c;
-	FILE		*f;
-
-	if (NULL == (f = fopen(CPU_INFO_FILE, "r")))
-		return ret;
-
-	*buf = '\0';
-
-	while (NULL != fgets(line, sizeof(line), f))
-	{
-		if (2  != sscanf(line, "%[^:]: %[^\n]", name, value))
-			continue;
-
-		if (0 == strncmp(name, "processor", 9))
-		{
-			val = atoi(value);
-			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, "%sprocessor %d:", 0 == offset ? "" : "\n", val);
-
-			if (-1 != (val = get_cpu_max_speed(val)))
-				offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, " %dMHz", val / 1000);
-
-			continue;
-		} else if (0 == strncmp(name, "model name", 10))
-		{
-			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, " \"%s\"", value);
-		} else if (0 == strncmp(name, "cpu cores", 9))
-		{
-			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, " %s", value);
-		}
-
-	}
-	zbx_fclose(f);
-	ret = SYSINFO_RET_OK;
-
-	SET_TEXT_RESULT(result, strdup(buf));
 	return ret;
 }

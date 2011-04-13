@@ -26,25 +26,13 @@
 #define DEV_MEM			"/dev/mem"
 #define SMBIOS_ENTRY_POINT_SIZE	0x20
 #define DMI_HEADER_SIZE		4
-#define DMI_GET_VENDOR		0x01
-#define DMI_GET_CHASSIS		0x02
+#define DMI_GET_TYPE		0x01
+#define DMI_GET_VENDOR		0x02
 #define DMI_GET_MODEL		0x04
 #define DMI_GET_SERIAL		0x08
 
-#define HOST_OS_NAME		"/etc/issue.net"
-#define HOST_OS_SHORT		"/proc/version_signature"
-#define HOST_OS_FULL		"/proc/version"
-#define DPKG_STATUS_FILE	"/var/lib/dpkg/status"
-
-int	HOST_ARCH(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	struct utsname	name;
-	if (-1 == uname(&name))
-		return SYSINFO_RET_FAIL;
-
-	SET_STR_RESULT(result, strdup(name.machine));
-	return SYSINFO_RET_OK;
-}
+#define CPU_MAX_FREQ_FILE "/sys/devices/system/cpu/cpu%d/cpufreq/cpuinfo_max_freq"
+#define CPU_INFO_FILE "/proc/cpuinfo"
 
 /* read the string #num from data into buf */
 int	set_dmi_string(char *buf, int bufsize, unsigned char *data, int num)
@@ -164,7 +152,7 @@ static int	get_dmi_info(char *buf, int bufsize, int flags)
 			if (SYSINFO_RET_OK == ret)
 				break;
 		}
-		else if (3 == data[0] && 0 != (flags & DMI_GET_CHASSIS)) /* chassis */
+		else if (3 == data[0] && 0 != (flags & DMI_GET_TYPE)) /* chassis */
 		{
 			if (SYSINFO_RET_OK == (ret = set_chassis_type(buf, bufsize, data[5])))
 				break;
@@ -184,7 +172,7 @@ clean:
 	return ret;
 }
 
-int	HOST_DEVICE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	SYSTEM_HW_CHASSIS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	tmp[MAX_STRING_LEN], buf[MAX_STRING_LEN];
 	int	ret = SYSINFO_RET_FAIL;
@@ -193,12 +181,12 @@ int	HOST_DEVICE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		return ret;
 
 	if (0 != get_param(param, 1, tmp, sizeof(tmp)))
-		return ret;
+		*tmp = '\0';
 
-	if (0 == strcmp(tmp, "vendor"))
+	if (0 == strcmp(tmp, "type") || '\0' == *tmp)
+		ret = get_dmi_info(buf, sizeof(buf), DMI_GET_TYPE);
+	else if (0 == strcmp(tmp, "vendor"))
 		ret = get_dmi_info(buf, sizeof(buf), DMI_GET_VENDOR);
-	else if (0 == strcmp(tmp, "chassis"))
-		ret = get_dmi_info(buf, sizeof(buf), DMI_GET_CHASSIS);
 	else if (0 == strcmp(tmp, "model"))
 		ret = get_dmi_info(buf, sizeof(buf), DMI_GET_MODEL);
 	else if (0 == strcmp(tmp, "serial"))
@@ -210,7 +198,67 @@ int	HOST_DEVICE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	return ret;
 }
 
-int	HOST_LSPCI(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int get_cpu_max_speed(int cpu_num)
+{
+	int	result = -1;
+	char	filename[MAX_BUFFER_LEN];
+	FILE	*f;
+
+	zbx_snprintf(filename, sizeof(filename), CPU_MAX_FREQ_FILE, cpu_num);
+
+	f = fopen(filename, "r");
+	if (NULL != f)
+	{
+		if (1 != fscanf(f, "%d", &result))
+			result = -1;
+		fclose(f);
+	}
+
+	return result;
+}
+
+int     SYSTEM_HW_CPU(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	int	ret = SYSINFO_RET_FAIL, val, offset = 0;
+	char	line[MAX_STRING_LEN], name[MAX_STRING_LEN], tmp[MAX_STRING_LEN], buf[MAX_BUFFER_LEN], *c;
+	FILE	*f;
+
+	if (NULL == (f = fopen(CPU_INFO_FILE, "r")))
+		return ret;
+
+	*buf = '\0';
+
+	while (NULL != fgets(line, sizeof(line), f))
+	{
+		if (2  != sscanf(line, "%[^:]: %[^\n]", name, tmp))
+			continue;
+
+		if (0 == strncmp(name, "processor", 9))
+		{
+			val = atoi(tmp);
+			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, "%sprocessor %d:", 0 == offset ? "" : "\n", val);
+
+			if (-1 != (val = get_cpu_max_speed(val)))
+				offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, " %dMHz", val / 1000);
+
+			continue;
+		} else if (0 == strncmp(name, "model name", 10))
+		{
+			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, " \"%s\"", tmp);
+		} else if (0 == strncmp(name, "cpu cores", 9))
+		{
+			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, " %s", tmp);
+		}
+
+	}
+	zbx_fclose(f);
+	ret = SYSINFO_RET_OK;
+
+	SET_TEXT_RESULT(result, strdup(buf));
+	return ret;
+}
+
+int	SYSTEM_HW_DEVICES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	int		ret = SYSINFO_RET_FAIL, offset;
 	char		buffer[MAX_BUFFER_LEN];
@@ -229,7 +277,7 @@ int	HOST_LSPCI(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 	return ret;
 }
 
-int     HOST_MACS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int     SYSTEM_HW_MACADDR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	int		offset = 0, s, i;
 	char		buf[1024], buffer[MAX_BUFFER_LEN];
@@ -264,84 +312,5 @@ int     HOST_MACS(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 		buffer[offset - 2] = '\0';
 	SET_TEXT_RESULT(result, strdup(buffer));
 
-	return SYSINFO_RET_OK;
-}
-
-int     HOST_NAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	int	ret = SYSINFO_RET_FAIL;
-	char	tmp[MAX_STRING_LEN];
-
-	if (0 == gethostname(tmp, sizeof(tmp)))
-	{
-		SET_STR_RESULT(result, strdup(tmp));
-		ret = SYSINFO_RET_OK;
-	}
-
-	return ret;
-}
-
-int     HOST_OS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char	type[MAX_STRING_LEN], line[MAX_STRING_LEN];
-	int	ret = SYSINFO_RET_FAIL;
-	FILE	*f = NULL;
-
-	if (1 < num_param(param))
-		return ret;
-
-	if (0 != get_param(param, 1, type, sizeof(type)))
-		*type = '\0';
-
-	if (0 == strcmp(type, "short"))
-		f = fopen(HOST_OS_SHORT, "r");
-	else if (0 == strcmp(type, "full"))
-		f = fopen(HOST_OS_FULL, "r");
-	else /* default */
-		f = fopen(HOST_OS_NAME, "r");
-
-	if (NULL == f)
-		return ret;
-
-	if (NULL != fgets(line, sizeof(line), f))
-	{
-		zbx_rtrim(line, " \r\n");
-		SET_STR_RESULT(result, strdup(line));
-		ret = SYSINFO_RET_OK;
-	}
-	zbx_fclose(f);
-
-	return ret;
-}
-
-int     HOST_PACKAGES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	int		offset = 0;
-	char		line[MAX_STRING_LEN], package[MAX_STRING_LEN], status[MAX_STRING_LEN], buffer[MAX_BUFFER_LEN];
-	FILE		*f;
-
-	if (NULL == (f = fopen(DPKG_STATUS_FILE, "r")))
-		return SYSINFO_RET_FAIL;
-
-	while (NULL != fgets(line, sizeof(line), f))
-	{
-		if (1 != sscanf(line, "Package: %s", package))
-			continue;
-next_line:	/* find "Status:" line, might not be the next one */
-		if (NULL == fgets(line, sizeof(line), f))
-			break;
-		if (1 != sscanf(line, "Status: %[^\n]", status))
-			goto next_line;
-
-		if (0 == strcmp(status, "install ok installed"))
-			offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%s, ", package);
-	}
-
-	zbx_fclose(f);
-
-	if (0 < offset)
-		buffer[offset - 2] = '\0';
-
-	SET_TEXT_RESULT(result, strdup(buffer));
 	return SYSINFO_RET_OK;
 }
