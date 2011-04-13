@@ -295,6 +295,7 @@ frontends/php/styles/originalblue/images/ui-icons_d40000_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_ffffff_256x240.png -text
 frontends/php/tests/api_json/APIInfo.php -text
 frontends/php/tests/api_json/ApiJsonTests.php -text
+frontends/php/tests/api_json/CHost.php -text
 frontends/php/tests/api_json/CMap.php -text
 frontends/php/tests/api_json/General.php -text
 frontends/php/tests/api_json/User.php -text
