@@ -217,7 +217,7 @@ double	compute_counter_statistics(const char *function, PERF_COUNTERS *counter, 
 	if (ERROR_SUCCESS != (pdh_status = PdhComputeCounterStatistics(
 		counter->handle,
 		PDH_FMT_DOUBLE,
-		(counter->CurrentNum < interval) ? 0 : (counter->CurrentCounter - interval) % counter->interval,
+		(counter->CurrentNum < interval) ? 0 : (counter->CurrentCounter - interval + counter->interval) % counter->interval,
 		(counter->CurrentNum < interval) ? counter->CurrentNum : interval,
 		counter->rawValueArray,
 		&statData
