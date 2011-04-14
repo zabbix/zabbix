@@ -506,7 +506,8 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 	$userid = $USER_DETAILS['userid'];
 
 	$def_sql = array(
-				'select' =>	array('h.hostid','h.host'),
+				// hostname to avoid confusion with node name
+				'select' =>	array('h.hostid','h.name as hostname'),
 				'from' =>	array('hosts h'),
 				'where' =>	array(),
 				'order' =>	array(),
@@ -665,7 +666,7 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 										' AND i.itemid=gi.itemid)';
 	}
 //------
-	$def_sql['order'][] = 'h.host';
+	$def_sql['order'][] = 'h.name';
 
 	foreach($sql as $key => $value){
 		zbx_value2array($value);
@@ -695,7 +696,7 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 			' ORDER BY '.$sql_order;
 	$res = DBselect($sql);
 	while($host = DBfetch($res)){
-		$hosts[$host['hostid']] = $host['host'];
+		$hosts[$host['hostid']] = $host['hostname'];
 		$hostids[$host['hostid']] = $host['hostid'];
 
 		if(bccomp($_REQUEST['hostid'],$host['hostid']) == 0) $result['selected'] = $host['hostid'];

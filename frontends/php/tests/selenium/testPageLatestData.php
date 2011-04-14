@@ -21,29 +21,24 @@
 <?php
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageDashboard extends CWebTest
+class testPageLatestData extends CWebTest
 {
-	public function testPageDashboard_SimpleTest()
+	public function testPageLatestData_SimpleTest()
 	{
-		$this->login('dashboard.php');
-		$this->assertTitle('Dashboard');
-		$this->ok('PERSONAL DASHBOARD');
-		$this->ok('Favourite graphs');
-		$this->ok('Favourite screens');
-		$this->ok('Favourite maps');
-		$this->ok('Status of Zabbix');
-		$this->ok('System status');
-		$this->ok('Host status');
-		$this->ok('Last 20 issues');
-		$this->ok('Web monitoring');
-		$this->ok('Updated:');
+		$this->login('latest.php');
+		$this->assertTitle('Latest data \[refreshed every 30 sec\]');
+		$this->ok('LATEST DATA');
+		$this->ok('ITEMS');
+		$this->ok(array('Host','Group'));
+		$this->ok('Filter');
+		$this->ok(array('Host','Name','Last check','Last value','Change','History'));
 	}
 
 // Check that no real host or template names displayed
-	public function testPageDashboard_NoHostNames()
+	public function testPageLatestData_NoHostNames()
 	{
-		$this->login('dashboard.php');
-		$this->assertTitle('Dashboard');
+		$this->login('latest.php');
+		$this->assertTitle('Latest data \[refreshed every 30 sec\]');
 		$this->checkNoRealHostnames();
 	}
 }

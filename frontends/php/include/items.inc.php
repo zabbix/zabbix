@@ -523,7 +523,7 @@
 		$key =& $item['key_'];
 		$macStack = array();
 
-		$macroses = array('{HOSTNAME}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}');
+		$macroses = array('{HOSTNAME}', '{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.HOST}','{HOST.NAME}');
 
 		foreach($macroses as $macro){
 			$pos = 0;
@@ -536,8 +536,8 @@
 		if(!empty($macStack)){
 			$dbItems = API::Item()->get(array(
 				'itemids' => $item['itemid'],
-				'selectInterfaces' => API_OUTPUT_EXTEND,
-				'selectHosts' => array('host'),
+				'selectInterfaces' => array('ip', 'dns', 'useip'),
+				'selectHosts' => array('host', 'name'),
 				'output' => API_OUTPUT_REFER
 			));
 			$dbItem = reset($dbItems);
@@ -547,18 +547,27 @@
 
 			foreach($macStack as $macro){
 				switch($macro){
-					case '{HOSTNAME}':
-						$key = str_replace('{HOSTNAME}', $host['host'], $key);
-					break;
-					case '{IPADDRESS}':
+					case '{HOST.NAME}':
+						$key = str_replace('{HOST.NAME}', $host['name'], $key);
+						break;
+					case '{HOSTNAME}':	/* deprecated */
+						$key = str_replace('{HOSTNAME}', $host['name'], $key);
+						break;
+					case '{HOST.HOST}':
+						$key = str_replace('{HOST.HOST}', $host['host'], $key);
+						break;
+					case '{HOST.IP}':
+						$key = str_replace('{HOST.IP}', $interface['ip'], $key);
+						break;
+					case '{IPADDRESS}':	/* deprecated */
 						$key = str_replace('{IPADDRESS}', $interface['ip'], $key);
-					break;
+						break;
 					case '{HOST.DNS}':
 						$key = str_replace('{HOST.DNS}', $interface['dns'], $key);
-					break;
+						break;
 					case '{HOST.CONN}':
 						$key = str_replace('{HOST.CONN}', $interface['useip'] ? $interface['ip'] : $interface['dns'], $key);
-					break;
+						break;
 				}
 			}
 		}
@@ -643,7 +652,7 @@
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
 
 // COpt::profiling_start('prepare_data');
-		$result = DBselect('SELECT DISTINCT h.hostid, h.host,i.itemid, i.key_, i.value_type, i.lastvalue, i.units, i.lastclock,'.
+		$result = DBselect('SELECT DISTINCT h.hostid, h.name as hostname,i.itemid, i.key_, i.value_type, i.lastvalue, i.units, i.lastclock, '.
 				' i.name, t.priority, i.valuemapid, t.value as tr_value, t.triggerid '.
 			' FROM hosts h, items i '.
 				' LEFT JOIN functions f on f.itemid=i.itemid '.
@@ -661,22 +670,22 @@
 		$items = array();
 		while($row = DBfetch($result)){
 			$descr = itemName($row);
-			$row['host'] = get_node_name_by_elid($row['hostid'], null, ': ').$row['host'];
-			$hosts[zbx_strtolower($row['host'])] = $row['host'];
+			$row['hostname'] = get_node_name_by_elid($row['hostid'], null, ': ').$row['hostname'];
+			$hosts[zbx_strtolower($row['hostname'])] = $row['hostname'];
 
 // A little tricky check for attempt to overwrite active trigger (value=1) with
 // inactive or active trigger with lower priority.
-			if (!isset($items[$descr][$row['host']]) ||
+			if (!isset($items[$descr][$row['hostname']]) ||
 				(
-					(($items[$descr][$row['host']]['tr_value'] == TRIGGER_VALUE_FALSE) && ($row['tr_value'] == TRIGGER_VALUE_TRUE)) ||
+					(($items[$descr][$row['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE) && ($row['tr_value'] == TRIGGER_VALUE_TRUE)) ||
 					(
-						(($items[$descr][$row['host']]['tr_value'] == TRIGGER_VALUE_FALSE) || ($row['tr_value'] == TRIGGER_VALUE_TRUE)) &&
-						($row['priority'] > $items[$descr][$row['host']]['severity'])
+						(($items[$descr][$row['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE) || ($row['tr_value'] == TRIGGER_VALUE_TRUE)) &&
+						($row['priority'] > $items[$descr][$row['hostname']]['severity'])
 					)
 				)
 			)
 			{
-				$items[$descr][$row['host']] = array(
+				$items[$descr][$row['hostname']] = array(
 					'itemid'	=> $row['itemid'],
 					'value_type'=> $row['value_type'],
 					'lastvalue'	=> $row['lastvalue'],

@@ -37,7 +37,7 @@ $fields=array(
 );
 
 check_fields($fields);
-validate_sort_and_sortorder('host', ZBX_SORT_UP);
+validate_sort_and_sortorder('name', ZBX_SORT_UP);
 ?>
 <?php
 
@@ -80,7 +80,7 @@ else{
 	$table = new CTableInfo();
 	$table->setHeader(array(
 		is_show_all_nodes() ? make_sorting_header(_('Node'), 'hostid') : null,
-		make_sorting_header(_('Host'), 'host'),
+		make_sorting_header(_('Host'), 'name'),
 		_('Group'),
 		make_sorting_header(_('Name'), 'pr_name'),
 		make_sorting_header(_('Type'), 'pr_type'),
@@ -90,10 +90,9 @@ else{
 		make_sorting_header(_('MAC address A'), 'pr_macaddress_a'))
 	);
 
-
 	if($pageFilter->groupsSelected){
 		$options = array(
-			'output' => array('hostid', 'host'),
+			'output' => array('hostid', 'name'),
 			'selectProfile' => true,
 			'withProfiles' => true,
 			'selectGroups' => API_OUTPUT_EXTEND,
@@ -114,7 +113,7 @@ else{
 			$hosts[$num]['pr_macaddress_a'] = $host['profile']['macaddress_a'];
 		}
 
-		order_result($hosts, getPageSortField('host'), getPageSortOrder());
+		order_result($hosts, getPageSortField('name'), getPageSortOrder());
 		$paging = getPagingLine($hosts);
 
 		foreach($hosts as $host){
@@ -127,7 +126,7 @@ else{
 
 			$row = array(
 				get_node_name_by_elid($host['hostid']),
-				new CLink($host['host'],'?hostid='.$host['hostid'].url_param('groupid')),
+				new CLink($host['name'],'?hostid='.$host['hostid'].url_param('groupid')),
 				$host_groups,
 				zbx_str2links($host['profile']['name']),
 				zbx_str2links($host['profile']['type']),

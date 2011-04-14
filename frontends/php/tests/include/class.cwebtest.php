@@ -49,7 +49,9 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 		"Use of undefined",
 		"You must login",
 		"DEBUG INFO",
-		"Cannot modify header"
+		"Cannot modify header",
+		"Parse error",
+		"syntax error"
 	);
 
 	// List of strings that SHOULD appear on every page
@@ -200,7 +202,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 	public function templateLink($host,$template){
 		// $template = "Template_Linux";
 		// $host = "Zabbix server";
-		$sql = "select hostid from hosts where host='".$host."' and status in (".HOST_STATUS_MONITORED.",".HOST_STATUS_NOT_MONITORED.")";
+		$sql = "select hostid from hosts where name='".$host."' and status in (".HOST_STATUS_MONITORED.",".HOST_STATUS_NOT_MONITORED.")";
 		$this->assertEquals(1,DBcount($sql),"Chuck Norris: No such host:$host");
 		$row = DBfetch(DBselect($sql));
 		$hostid = $row['hostid'];
@@ -275,6 +277,16 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 
 		$this->assertEquals(0, DBcount($sql), "Chuck Norris: There are items with interfaceid NULL not of types 2, 5, 7, 8, 9, 15");
 
+	}
+
+// Check that page does not have real (not visible) host or template names
+	public function checkNoRealHostnames()
+	{
+		$result = DBselect('select host from hosts where status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')');
+		while($row = DBfetch($result))
+		{
+			$this->nok($row['host']);
+		}
 	}
 }
 ?>

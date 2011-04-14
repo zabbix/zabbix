@@ -28,6 +28,7 @@ class zbxXML{
 				'host' 				=> 'name'
 			),
 			'elements' => array(
+				'name'				=> '',
 				'proxy_hostid'		=> '',
 				'useip'				=> '',
 				'dns'				=> '',
@@ -1357,7 +1358,9 @@ class zbxXML{
 						foreach($triggers as $trigger){
 							$trigger_db = self::mapXML2arr($trigger, XML_TAG_TRIGGER);
 
-							$trigger_db['expression'] = str_replace('{{HOSTNAME}:', '{'.$host_db['host'].':', $trigger_db['expression']);
+							// {HOSTNAME} is here for backward compatibility
+							$trigger_db['expression'] = str_replace('{{HOSTNAME}:', '{'.$host_db['name'].':', $trigger_db['expression']);
+							$trigger_db['expression'] = str_replace('{{HOST.HOST}:', '{'.$host_db['host'].':', $trigger_db['expression']);
 							$trigger_db['hostid'] = $current_hostid;
 
 							if($current_trigger = API::Trigger()->exists($trigger_db)){
@@ -1450,7 +1453,9 @@ class zbxXML{
 
 								$data = explode(':', $gitem_db['host_key_']);
 								$gitem_host = array_shift($data);
+								// {HOSTNAME} is here for backward compatibility
 								$gitem_db['host'] = ($gitem_host == '{HOSTNAME}') ? $host_db['host'] : $gitem_host;
+								$gitem_db['host'] = ($gitem_host == '{HOST.HOST}') ? $host_db['host'] : $gitem_host;
 								$gitem_db['key_'] = implode(':', $data);
 
 								if($current_item = API::Item()->exists($gitem_db)){

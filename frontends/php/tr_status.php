@@ -347,11 +347,12 @@ require_once('include/templates/scriptConfirm.js.php');
 		'nodeids' => get_current_nodeid(),
 		'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => array('hostid', 'host', 'maintenance_status', 'maintenance_type', 'maintenanceid'),
+		'selectHosts' => array('hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid'),
 		'selectItems' => API_OUTPUT_EXTEND,
 		'select_dependencies' => API_OUTPUT_EXTEND
 	);
 	$triggers = API::Trigger()->get($options);
+
 	$triggers = zbx_toHash($triggers, 'triggerid');
 
 	order_result($triggers, $sortfield, $sortorder);
@@ -431,7 +432,7 @@ require_once('include/templates/scriptConfirm.js.php');
 
 		$used_hosts = array();
 		foreach($trigger['hosts'] as $th){
-			$used_hosts[$th['hostid']] = $th['host'];
+			$used_hosts[$th['hostid']] = $th['name'];
 		}
 		$used_host_count = count($used_hosts);
 
@@ -579,7 +580,7 @@ require_once('include/templates/scriptConfirm.js.php');
 				$maint_span->setHint($maint_hint);
 			}
 
-			$hosts_span = new CSpan($trigger_host['host'], 'link_menu');
+			$hosts_span = new CSpan($trigger_host['name'], 'link_menu');
 			$hosts_span->setAttribute('onclick','javascript: '.$menus);
 			$hosts_list[] = $hosts_span;
 			$hosts_list[] = $maint_span;

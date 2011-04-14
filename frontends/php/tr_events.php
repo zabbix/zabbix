@@ -71,6 +71,8 @@
 		'triggerids' => $_REQUEST['triggerid'],
 		'expandData' => 1,
 		'expandDescription' => 1,
+// Required for getting visible host name
+		'selectHosts' => API_OUTPUT_EXTEND,
 		'output' => API_OUTPUT_EXTEND
 	);
 	$triggers = API::Trigger()->get($options);
