@@ -19,8 +19,6 @@
 
 #include "common.h"
 #include "sysinfo.h"
-#include "log.h"
-#include <sys/mman.h>
 #include <sys/utsname.h>
 
 #define HOST_OS_NAME		"/etc/issue.net"

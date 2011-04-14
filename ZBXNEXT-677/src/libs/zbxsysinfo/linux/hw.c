@@ -19,20 +19,12 @@
 
 #include "common.h"
 #include "sysinfo.h"
-#include "log.h"
 #include <sys/mman.h>
-#include <sys/utsname.h>
 
-#define DEV_MEM			"/dev/mem"
-#define SMBIOS_ENTRY_POINT_SIZE	0x20
-#define DMI_HEADER_SIZE		4
 #define DMI_GET_TYPE		0x01
 #define DMI_GET_VENDOR		0x02
 #define DMI_GET_MODEL		0x04
 #define DMI_GET_SERIAL		0x08
-
-#define CPU_MAX_FREQ_FILE "/sys/devices/system/cpu/cpu%d/cpufreq/cpuinfo_max_freq"
-#define CPU_INFO_FILE "/proc/cpuinfo"
 
 /* read the string #num from data into buf */
 int	set_dmi_string(char *buf, int bufsize, unsigned char *data, int num)
@@ -53,10 +45,10 @@ int	set_dmi_string(char *buf, int bufsize, unsigned char *data, int num)
 	return SYSINFO_RET_OK;
 }
 
-#define CHASSIS_TYPE_BITS 0x7F	/* bits 0-6 represent the chassis type */
-#define MAX_CHASSIS_TYPE 0x18
 int	set_chassis_type(char *buf, int bufsize, int type)
 {
+#define CHASSIS_TYPE_BITS 0x7F	/* bits 0-6 represent the chassis type */
+#define MAX_CHASSIS_TYPE 0x18
 	static const char *chassis_type[] =
 	{
 		"",			/* 0x00 */
@@ -97,6 +89,9 @@ int	set_chassis_type(char *buf, int bufsize, int type)
 
 static int	get_dmi_info(char *buf, int bufsize, int flags)
 {
+#define DEV_MEM			"/dev/mem"
+#define SMBIOS_ENTRY_POINT_SIZE	0x20
+#define DMI_HEADER_SIZE		4
 	int		ret = SYSINFO_RET_FAIL, fd;
 	unsigned char	membuf[SMBIOS_ENTRY_POINT_SIZE], *smbuf, *data;
 	size_t		len, fp, smbios_len, smbios = 0;
@@ -200,6 +195,7 @@ int	SYSTEM_HW_CHASSIS(const char *cmd, const char *param, unsigned flags, AGENT_
 
 static int get_cpu_max_speed(int cpu_num)
 {
+#define CPU_MAX_FREQ_FILE "/sys/devices/system/cpu/cpu%d/cpufreq/cpuinfo_max_freq"
 	int	result = -1;
 	char	filename[MAX_BUFFER_LEN];
 	FILE	*f;
@@ -219,42 +215,86 @@ static int get_cpu_max_speed(int cpu_num)
 
 int     SYSTEM_HW_CPU(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	int	ret = SYSINFO_RET_FAIL, val, offset = 0;
+#define HW_CPU_FILE		"/proc/cpuinfo"
+#define HW_CPU_ALL_CPUS		0x01
+#define HW_CPU_FULL_INFO	0x02
+#define HW_CPU_MAXSPEED		0x04
+#define HW_CPU_VENDOR		0x08
+#define HW_CPU_MODEL		0x10
+#define HW_CPU_CURSPEED		0x20
+#define HW_CPU_CORES		0x40
+	int	ret = SYSINFO_RET_FAIL, val, offset = 0, curcpu = -1, cpu = -2, show = 0;
 	char	line[MAX_STRING_LEN], name[MAX_STRING_LEN], tmp[MAX_STRING_LEN], buf[MAX_BUFFER_LEN], *c;
 	FILE	*f;
 
-	if (NULL == (f = fopen(CPU_INFO_FILE, "r")))
+	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "all"))
+		show |= HW_CPU_ALL_CPUS; /* show all CPUs by default */
+	else if (FAIL == is_uint(tmp))
+		return ret;
+	else
+		cpu = atoi(tmp);
+
+	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "all"))
+		show |= HW_CPU_FULL_INFO; /* show full info by default */
+	else if (0 == strcmp(tmp, "maxspeed"))
+		show |= HW_CPU_MAXSPEED;
+	else if (0 == strcmp(tmp, "vendor"))
+		show |= HW_CPU_VENDOR;
+	else if (0 == strcmp(tmp, "model"))
+		show |= HW_CPU_MODEL;
+	else if (0 == strcmp(tmp, "curspeed"))
+		show |= HW_CPU_CURSPEED;
+	else if (0 == strcmp(tmp, "cores"))
+		show |= HW_CPU_CORES;
+	else
+		return ret;
+
+	if (NULL == (f = fopen(HW_CPU_FILE, "r")))
 		return ret;
 
 	*buf = '\0';
 
 	while (NULL != fgets(line, sizeof(line), f))
 	{
-		if (2  != sscanf(line, "%[^:]: %[^\n]", name, tmp))
+		if (2 != sscanf(line, "%[^:]: %[^\n]", name, tmp))
 			continue;
 
 		if (0 == strncmp(name, "processor", 9))
 		{
 			val = atoi(tmp);
-			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, "%sprocessor %d:", 0 == offset ? "" : "\n", val);
+			curcpu = val;
 
-			if (-1 != (val = get_cpu_max_speed(val)))
+			if (0 == (show & HW_CPU_ALL_CPUS) && cpu != curcpu)
+				continue;
+
+			if (0 != (show & (HW_CPU_ALL_CPUS | HW_CPU_FULL_INFO)))
+				offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, "\nprocessor %d:", val);
+
+			if (0 != (show & (HW_CPU_MAXSPEED | HW_CPU_FULL_INFO)) && -1 != (val = get_cpu_max_speed(val)))
 				offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, " %dMHz", val / 1000);
-
-			continue;
-		} else if (0 == strncmp(name, "model name", 10))
-		{
-			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, " \"%s\"", tmp);
-		} else if (0 == strncmp(name, "cpu cores", 9))
-		{
-			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, " %s", tmp);
 		}
+
+		if (0 == (show & HW_CPU_ALL_CPUS) && cpu != curcpu)
+			continue;
+
+		if (0 == strncmp(name, "vendor_id", 9) && 0 != (show & (HW_CPU_VENDOR | HW_CPU_FULL_INFO)))
+			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, " %s", tmp);
+		else if (0 == strncmp(name, "model name", 10) && 0 != (show & (HW_CPU_MODEL | HW_CPU_FULL_INFO)))
+			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, " %s", tmp);
+		else if (0 == strncmp(name, "cpu MHz", 7) && 0 != (show & (HW_CPU_CURSPEED | HW_CPU_FULL_INFO)))
+			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, " %dMHz", atoi(tmp));
+		else if (0 == strncmp(name, "cpu cores", 9) && 0 != (show & (HW_CPU_CORES | HW_CPU_FULL_INFO)))
+			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, " %s", tmp);
 
 	}
 	zbx_fclose(f);
-	ret = SYSINFO_RET_OK;
 
-	SET_TEXT_RESULT(result, strdup(buf));
+	if (0 < offset)
+	{
+		ret = SYSINFO_RET_OK;
+		SET_TEXT_RESULT(result, strdup(buf + 1)); /* first symbol is a space or '\n' */
+	}
+
 	return ret;
 }
 
