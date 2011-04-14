@@ -147,7 +147,21 @@ class testFormAction extends CWebTest {
 	}
 
 	public function testActionCreate(){
-		DBsave_tables(array('actions','conditions','opconditions','operations','opmessage','opmessage_grp','opmessage_usr','opcommand','opcommand_hst','opcommand_grp','opgroup','optemplate'));
+		$affected_tables = array(
+			'actions',
+			'conditions',
+			'operations',
+			'opconditions',
+			'opmessage',
+			'opmessage_grp',
+			'opmessage_usr',
+			'opcommand',
+			'opcommand_hst',
+			'opcommand_grp',
+			'opgroup',
+			'optemplate'
+		);
+		DBsave_tables($affected_tables);
 
 		$this->login('actionconf.php?form=1&eventsource=0');
 		$this->assertTitle('Configuration of actions');
@@ -260,7 +274,7 @@ class testFormAction extends CWebTest {
 		$this->wait();
 		$this->ok("Action added");
 
-		DBrestore_tables(array('actions','conditions','opconditions','operations','opmessage','opmessage_grp','opmessage_usr','opcommand','opcommand_hst','opcommand_grp','opgroup','optemplate'));
+		DBrestore_tables($affected_tables);
 	}
 
 }
