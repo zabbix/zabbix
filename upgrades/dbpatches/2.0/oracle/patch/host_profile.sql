@@ -73,6 +73,7 @@ CREATE TABLE host_profile (
 	poc_2_cell               nvarchar2(64)   DEFAULT ''                ,
 	poc_2_screen             nvarchar2(64)   DEFAULT ''                ,
 	poc_2_notes              nclob           DEFAULT ''                ,
+	profile_mode             number(10)      DEFAULT '0'               NOT NULL,
 	PRIMARY KEY (hostid)
 );
 ALTER TABLE host_profile ADD CONSTRAINT c_host_profile_1 FOREIGN KEY (hostid) REFERENCES hosts (hostid) ON DELETE CASCADE;
