@@ -55,7 +55,6 @@ class testPageAvailabilityReport extends CWebTest
 	public function testPageAvailabilityReport_ByTriggerTemplate_NoHostNames()
 	{
 		$this->login('report2.php?config=1');
-		$this->dropdown_select_wait('config','By trigger template');
 		$this->checkNoRealHostnames();
 	}
 }

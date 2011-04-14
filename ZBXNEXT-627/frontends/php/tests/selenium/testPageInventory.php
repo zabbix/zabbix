@@ -32,8 +32,8 @@ class testPageInventory extends CWebTest{
 	*/
 	public function testPageInventory_SimpleTest($inventory){
 		$hostid = $inventory['hostid'];
-		$host = DBfetch(DBselect("select host from hosts where hostid=$hostid"));
-		$name = $host['host'];
+		$host = DBfetch(DBselect("select name from hosts where hostid=$hostid"));
+		$name = $host['name'];
 
 		$this->login('hostprofiles.php');
 

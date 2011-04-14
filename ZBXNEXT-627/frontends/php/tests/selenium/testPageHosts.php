@@ -108,7 +108,7 @@ class testPageHosts extends CWebTest{
 		$this->click('css=span.link_menu');
 		$this->click('filter');
 		$this->wait();
-		$this->ok($host['host']);
+		$this->ok($host['name']);
 	}
 
 	/**

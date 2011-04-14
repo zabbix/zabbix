@@ -31,7 +31,7 @@ class testPageLatestData extends CWebTest
 		$this->ok('ITEMS');
 		$this->ok(array('Host','Group'));
 		$this->ok('Filter');
-		$this->ok(array('Host','Description','Last check','Last value','Change','History'));
+		$this->ok(array('Host','Name','Last check','Last value','Change','History'));
 	}
 
 // Check that no real host or template names displayed
