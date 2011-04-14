@@ -332,38 +332,60 @@ int	SYSTEM_HW_DEVICES(const char *cmd, const char *param, unsigned flags, AGENT_
 
 int     SYSTEM_HW_MACADDR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	int		offset = 0, s, i;
-	char		buf[1024], buffer[MAX_BUFFER_LEN];
+#define HW_MACADDR_LIST	0x01
+#define HW_MACADDR_FULL	0x02
+	int		ret = SYSINFO_RET_FAIL, offset = 0, s, i, show = 0;
+	char		tmp[MAX_STRING_LEN], buf[MAX_STRING_LEN], buffer[MAX_STRING_LEN];
 	struct ifreq	ifr, *IFR;
 	struct ifconf	ifc;
 
-	if (-1 == (s = socket(AF_INET, SOCK_DGRAM, 0)))
-		return SYSINFO_RET_FAIL;
+	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "list"))
+		show |= HW_MACADDR_LIST;
+	else if (0 == strcmp(tmp, "full"))
+		show |= HW_MACADDR_FULL;
+	/* else show MAC address only for tmp interface */
 
+	if (-1 == (s = socket(AF_INET, SOCK_DGRAM, 0)))
+		return ret;
+
+	/* get the interface list */
 	ifc.ifc_len = sizeof(buf);
 	ifc.ifc_buf = buf;
 	ioctl(s, SIOCGIFCONF, &ifc);
 	IFR = ifc.ifc_req;
 
-	for (i = ifc.ifc_len / sizeof(struct ifreq); --i >= 0; IFR++) {
+	/* go through the list */
+	for (i = ifc.ifc_len / sizeof(struct ifreq); 0 <= --i; IFR++)
+	{
+		if (0 == (show & (HW_MACADDR_FULL | HW_MACADDR_LIST)) && 0 != strcmp(tmp, IFR->ifr_name))
+			continue;
+
 		strcpy(ifr.ifr_name, IFR->ifr_name);
-		if (0 == ioctl(s, SIOCGIFFLAGS, &ifr))
-			if (0 == (ifr.ifr_flags & IFF_LOOPBACK))
-				if (0 == ioctl(s, SIOCGIFHWADDR, &ifr))
-					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%.2x:%.2x:%.2x:%.2x:%.2x:%.2x, ",
-						(unsigned char)ifr.ifr_hwaddr.sa_data[0],
-						(unsigned char)ifr.ifr_hwaddr.sa_data[1],
-						(unsigned char)ifr.ifr_hwaddr.sa_data[2],
-						(unsigned char)ifr.ifr_hwaddr.sa_data[3],
-						(unsigned char)ifr.ifr_hwaddr.sa_data[4],
-						(unsigned char)ifr.ifr_hwaddr.sa_data[5]);
+		if (0 == ioctl(s, SIOCGIFFLAGS, &ifr) /* get the interface */
+			&& 0 == (ifr.ifr_flags & IFF_LOOPBACK) /* skip loopback interface */
+			&& 0 == ioctl(s, SIOCGIFHWADDR, &ifr)) /* get the MAC address */
+		{
+			if (0 != (show & HW_MACADDR_FULL))
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%s:", ifr.ifr_name);
+
+			offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%.2x:%.2x:%.2x:%.2x:%.2x:%.2x, ",
+				(unsigned char)ifr.ifr_hwaddr.sa_data[0],
+				(unsigned char)ifr.ifr_hwaddr.sa_data[1],
+				(unsigned char)ifr.ifr_hwaddr.sa_data[2],
+				(unsigned char)ifr.ifr_hwaddr.sa_data[3],
+				(unsigned char)ifr.ifr_hwaddr.sa_data[4],
+				(unsigned char)ifr.ifr_hwaddr.sa_data[5]);
+		}
 	}
 
 	close(s);
 
 	if (0 < offset)
+	{
 		buffer[offset - 2] = '\0';
-	SET_TEXT_RESULT(result, strdup(buffer));
+		ret = SYSINFO_RET_OK;
+		SET_STR_RESULT(result, strdup(buffer));
+	}
 
-	return SYSINFO_RET_OK;
+	return ret;
 }
