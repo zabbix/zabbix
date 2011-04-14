@@ -227,6 +227,9 @@ int     SYSTEM_HW_CPU(const char *cmd, const char *param, unsigned flags, AGENT_
 	char	line[MAX_STRING_LEN], name[MAX_STRING_LEN], tmp[MAX_STRING_LEN], buf[MAX_BUFFER_LEN], *c;
 	FILE	*f;
 
+	if (2 < num_param(param))
+		return ret;
+
 	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "all"))
 		show |= HW_CPU_ALL_CPUS; /* show all CPUs by default */
 	else if (FAIL == is_uint(tmp))
@@ -300,11 +303,21 @@ int     SYSTEM_HW_CPU(const char *cmd, const char *param, unsigned flags, AGENT_
 
 int	SYSTEM_HW_DEVICES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	int		ret = SYSINFO_RET_FAIL, offset;
-	char		buffer[MAX_BUFFER_LEN];
-	FILE		*f;
+	int	ret = SYSINFO_RET_FAIL, offset;
+	char	tmp[MAX_STRING_LEN], buffer[MAX_BUFFER_LEN];
+	FILE	*f;
 
-	if (NULL == (f = popen("lspci -mm 2>/dev/null", "r"))) /* machine readable format */
+	if (1 < num_param(param))
+		return ret;
+
+	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "pci"))
+		zbx_snprintf(tmp, sizeof(tmp), "lspci 2>/dev/null"); /* list PCI devices by default */
+	else if (0 == strcmp(tmp, "usb"))
+		zbx_snprintf(tmp, sizeof(tmp), "lsusb 2>/dev/null");
+	else
+		return ret;
+
+	if (NULL == (f = popen(tmp, "r")))
 		return ret;
 
 	if (1 < (offset = fread(buffer, 1, sizeof(buffer), f)))
