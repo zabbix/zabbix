@@ -730,6 +730,7 @@ FIELD		|poc_2_phone_b	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|poc_2_cell	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|poc_2_screen	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|poc_2_notes	|t_text		|''	|NOT NULL	|ZBX_SYNC
+FIELD		|profile_mode	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 
 TABLE|hosts_templates|hosttemplateid|ZBX_SYNC
 FIELD		|hosttemplateid	|t_id		|	|NOT NULL	|0
@@ -798,6 +799,7 @@ FIELD		|filter		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|interfaceid	|t_id		|	|NULL		|ZBX_SYNC,ZBX_PROXY	|4|interface	|		|RESTRICT
 FIELD		|port		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|description	|t_text		|''	|NOT NULL	|ZBX_SYNC
+FIELD		|profile_link	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 UNIQUE		|1		|hostid,key_
 INDEX		|3		|status
 INDEX		|4		|templateid

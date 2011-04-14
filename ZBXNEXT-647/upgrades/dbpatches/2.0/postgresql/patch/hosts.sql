@@ -59,7 +59,8 @@ ALTER TABLE ONLY items ALTER itemid DROP DEFAULT,
 		       ADD filter varchar(255) DEFAULT '' NOT NULL,
 		       ADD interfaceid bigint NULL,
 		       ADD port varchar(64) DEFAULT '' NOT NULL,
-		       ADD description text DEFAULT '' NOT NULL;
+		       ADD description text DEFAULT '' NOT NULL,
+		       ADD profile_link integer DEFAULT '0' NOT NULL;
 
 UPDATE items SET templateid=NULL WHERE templateid=0;
 UPDATE items SET templateid=NULL WHERE NOT templateid IS NULL AND NOT templateid IN (SELECT itemid FROM items);

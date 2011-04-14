@@ -75,6 +75,7 @@ CREATE TABLE host_profile (
 	poc_2_cell               varchar(64)     WITH DEFAULT ''           NOT NULL,
 	poc_2_screen             varchar(64)     WITH DEFAULT ''           NOT NULL,
 	poc_2_notes              varchar(2048)   WITH DEFAULT ''           NOT NULL,
+	profile_mode             integer         WITH DEFAULT '0'          NOT NULL,
 	PRIMARY KEY (hostid)
 )
 /
