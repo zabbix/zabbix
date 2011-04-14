@@ -100,7 +100,7 @@ function condition_value2str($conditiontype, $value){
 				'triggerids' => $value,
 				'expandDescription' => true,
 				'output' => API_OUTPUT_EXTEND,
-				'selectHosts' => array('host'),
+				'selectHosts' => array('name'),
 				'nodeids' => get_current_nodeid(true),
 				'limit' => 1
 			));
@@ -110,14 +110,14 @@ function condition_value2str($conditiontype, $value){
 			if(id2nodeid($value) != get_current_nodeid())
 				$str_val = get_node_name_by_elid($value, true, ': ');
 
-			$str_val .= $host['host'].':'.$trig['description'];
+			$str_val .= $host['name'].':'.$trig['description'];
 			break;
 		case CONDITION_TYPE_HOST:
 		case CONDITION_TYPE_HOST_TEMPLATE:
 			$host = get_host_by_hostid($value);
 			$str_val = '';
 			if(id2nodeid($value) != get_current_nodeid()) $str_val = get_node_name_by_elid($value, true, ': ');
-			$str_val.= $host['host'];
+			$str_val.= $host['name'];
 			break;
 		case CONDITION_TYPE_TRIGGER_NAME:
 		case CONDITION_TYPE_HOST_NAME:
@@ -196,13 +196,13 @@ function get_condition_desc($conditiontype, $operator, $value){
 		condition_value2str($conditiontype, $value);
 }
 
-define('LONG_DESCRITION', 0);
-define('SHORT_DESCRITION', 1);
+define('LONG_DESCRIPTION', 0);
+define('SHORT_DESCRIPTION', 1);
 
 function get_operation_desc($type, $data){
 	$result = array();
 
-	if($type == SHORT_DESCRITION){
+	if($type == SHORT_DESCRIPTION){
 		switch($data['operationtype']){
 			case OPERATION_TYPE_MESSAGE:
 				if(!isset($data['opmessage_usr'])) $data['opmessage_usr'] = array();
@@ -237,7 +237,7 @@ function get_operation_desc($type, $data){
 
 				$hosts = API::Host()->get(array(
 					'hostids' => zbx_objectValues($data['opcommand_hst'],'hostid'),
-					'output' => array('hostid', 'host')
+					'output' => array('hostid', 'name')
 				));
 
 				foreach($data['opcommand_hst'] as $num => $cmd){
@@ -248,12 +248,11 @@ function get_operation_desc($type, $data){
 				}
 
 				if(!empty($hosts)){
-					order_result($hosts, 'host');
+					order_result($hosts, 'name');
 
 					$result[] = bold(_('Run remote commands on hosts: '));
-					$result[] = array(implode(', ', zbx_objectValues($hosts,'host')), BR());
+					$result[] = array(implode(', ', zbx_objectValues($hosts,'name')), BR());
 				}
-
 
 				$groups = API::HostGroup()->get(array(
 					'groupids' => zbx_objectValues($data['opcommand_grp'],'groupid'),
@@ -305,18 +304,18 @@ function get_operation_desc($type, $data){
 
 				$templates = API::Template()->get(array(
 					'templateids' => zbx_objectValues($data['optemplate'],'templateid'),
-					'output' => array('hostid', 'host')
+					'output' => array('hostid', 'name')
 				));
 
 				if(!empty($templates)){
-					order_result($templates, 'host');
+					order_result($templates, 'name');
 
 					if(OPERATION_TYPE_TEMPLATE_ADD == $data['operationtype'])
 						$result[] = bold(_('Link to templates: '));
 					else
 						$result[] = bold(_('Unlink from templates: '));
 
-					$result[] = array(implode(', ', zbx_objectValues($templates,'host')), BR());
+					$result[] = array(implode(', ', zbx_objectValues($templates, 'name')), BR());
 				}
 				break;
 			default:

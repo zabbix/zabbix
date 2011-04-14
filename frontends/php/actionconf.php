@@ -455,7 +455,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			sortOperations($action['operations']);
 			$operations = array();
 			foreach($action['operations'] as $onum => $operation){
-				$operations[] = get_operation_desc(SHORT_DESCRITION, $operation);
+				$operations[] = get_operation_desc(SHORT_DESCRIPTION, $operation);
 			}
 
 			if($action['status'] == ACTION_STATUS_DISABLED){

@@ -38,7 +38,8 @@ class testFormTemplate extends CWebTest{
 	}
 
 	public function testFormTemplate_CreateLongTemplateName(){
-		$template="01234567890123456789012345678901234567890123456789012345678901234";
+// 64 character long template name
+		$template="000000000011111111112222222222333333333344444444445555555555666";
 		$this->login('templates.php');
 		$this->dropdown_select_wait('groupid','Templates');
 		$this->button_click('form');
@@ -47,7 +48,8 @@ class testFormTemplate extends CWebTest{
 		$this->button_click('save');
 		$this->wait();
 		$this->assertTitle('Templates');
-		$this->ok('ERROR');
+		$this->ok('New template added');
+		$this->ok($template);
 	}
 
 	public function testFormTemplate_SimpleUpdate(){

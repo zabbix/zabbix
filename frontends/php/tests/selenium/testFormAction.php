@@ -23,6 +23,21 @@ require_once(dirname(__FILE__) . '/../include/class.cwebtest.php');
 
 class testFormAction extends CWebTest {
 
+	public $tables = array(
+		'actions',
+		'conditions',
+		'operations',
+		'opconditions',
+		'opmessage',
+		'opmessage_grp',
+		'opmessage_usr',
+		'opcommand',
+		'opcommand_hst',
+		'opcommand_grp',
+		'opgroup',
+		'optemplate'
+	);
+
 
 	public static function providerNewActions(){
 		$data = array(
@@ -64,7 +79,7 @@ class testFormAction extends CWebTest {
 	 * @dataProvider providerNewActions
 	 */
 	public function testActionCreateSimple($action){
-		DBsave_tables(array('actions','conditions','operations','opconditions','opmessage','opmessage_grp','opmessage_usr','opcommand','opcommand_hst','opcommand_grp','opgroup','optemplate'));
+		DBsave_tables($this->tables);
 
 		$this->login('actionconf.php?form=1&eventsource=0');
 		$this->assertTitle('Configuration of actions');
@@ -143,25 +158,11 @@ class testFormAction extends CWebTest {
 		$this->wait();
 		$this->ok('Action added');
 
-		DBrestore_tables(array('actions','conditions','operations','opconditions','opmessage','opmessage_grp','opmessage_usr','opcommand','opcommand_hst','opcommand_grp','opgroup','optemplate'));
+		DBrestore_tables($this->tables);
 	}
 
 	public function testActionCreate(){
-		$affected_tables = array(
-			'actions',
-			'conditions',
-			'operations',
-			'opconditions',
-			'opmessage',
-			'opmessage_grp',
-			'opmessage_usr',
-			'opcommand',
-			'opcommand_hst',
-			'opcommand_grp',
-			'opgroup',
-			'optemplate'
-		);
-		DBsave_tables($affected_tables);
+		DBsave_tables($this->tables);
 
 		$this->login('actionconf.php?form=1&eventsource=0');
 		$this->assertTitle('Configuration of actions');
@@ -253,7 +254,7 @@ class testFormAction extends CWebTest {
 		$this->click("add_operation");
 		$this->wait();
 		$this->ok("Run remote commands on current host");
-		$this->ok("Run remote commands on hosts: Zabbix server");
+		$this->ok("Run remote commands on hosts: ЗАББИКС Сервер");
 		$this->ok("Run remote commands on host groups: Zabbix servers");
 		$this->click("new_operation");
 		$this->wait();
@@ -274,7 +275,7 @@ class testFormAction extends CWebTest {
 		$this->wait();
 		$this->ok("Action added");
 
-		DBrestore_tables($affected_tables);
+		DBrestore_tables($this->tables);
 	}
 
 }

@@ -56,12 +56,11 @@
 	function make_decoration($haystack, $needle, $class=null){
 		$result = $haystack;
 
-		$pos = stripos($haystack,$needle);
+		$pos = zbx_stripos($haystack,$needle);
 		if($pos !== FALSE){
 			$start = zbx_substring($haystack, 0, $pos);
-//			$middle = substr($haystack, $pos, zbx_strlen($needle));
 			$middle = $needle;
-			$end = substr($haystack, $pos+zbx_strlen($needle));
+			$end = mb_substr($haystack, $pos+zbx_strlen($needle));
 
 			if(is_null($class)){
 				$result = array($start, bold($middle), $end);
@@ -322,7 +321,7 @@
 		if(!$header_host = reset($header_hosts)){
 			$header_host = array(
 				'hostid' => 0,
-				'host' => ($current == 'host') ? S_NEW_HOST : _('New template'),
+				'name' => ($current == 'host') ? S_NEW_HOST : _('New template'),
 				'status' => ($current == 'host') ? HOST_STATUS_NOT_MONITORED : HOST_STATUS_TEMPLATE,
 				'available' => HOST_AVAILABLE_UNKNOWN,
 				'screens' => 0,
@@ -341,7 +340,7 @@
 			$proxy = get_host_by_hostid($header_host['proxy_hostid']);
 			$description[] = $proxy['host'].':';
 		}
-		$description[] = $header_host['host'];
+		$description[] = $header_host['name'];
 
 		$list = new CList(null, 'objectlist');
 

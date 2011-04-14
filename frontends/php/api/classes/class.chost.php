@@ -68,7 +68,7 @@ class CHost extends CZBXAPI{
 		$user_type = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
-		$sort_columns = array('hostid', 'host', 'status'); // allowed columns for sorting
+		$sort_columns = array('hostid', 'host', 'name', 'status'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM); // allowed output options for [ select_* ] params
 
 
@@ -1228,7 +1228,7 @@ Copt::memoryPick();
 	}
 
 	public function exists($object){
-		$keyFields = array(array('hostid', 'host'));
+		$keyFields = array(array('hostid', 'host', 'name'));
 
 		$options = array(
 			'filter' => zbx_array_mintersect($keyFields, $object),
@@ -1260,7 +1260,7 @@ Copt::memoryPick();
 		}
 
 		if($update || $delete){
-			$hostDBfields = array('hostid'=> null);
+			$hostDBfields = array('hostid' => null);
 			$dbHosts = $this->get(array(
 				'output' => array('hostid', 'host'),
 				'hostids' => zbx_objectValues($hosts, 'hostid'),
@@ -1269,7 +1269,7 @@ Copt::memoryPick();
 			));
 		}
 		else{
-			$hostDBfields = array('host'=>null);
+			$hostDBfields = array('host' => null);
 		}
 
 		if(!empty($groupids)){
@@ -1285,7 +1285,7 @@ Copt::memoryPick();
 		$hostNames = array();
 		foreach($hosts as $inum => &$host){
 			if(!check_db_fields($hostDBfields, $host)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for host "%s"', $host['host']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for host "%s"', isset($host['host']) ? $host['host'] : ''));
 			}
 
 			if($update || $delete){
@@ -1295,6 +1295,11 @@ Copt::memoryPick();
 				if($delete) $host['host'] = $dbHosts[$host['hostid']]['host'];
 			}
 			else{
+				// if visible name is not given or empty it should be set to host name
+				if(!isset($host['name']) || zbx_empty(trim($host['name']))){
+					$host['name'] = $host['host'];
+				}
+
 				if(!isset($host['groups']))
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host "%s"', $host['host']));
 
@@ -1321,7 +1326,7 @@ Copt::memoryPick();
 			}
 
 			if(isset($host['host'])){
-				// Check if host name isn't longer then 64 chars
+				// Check if host name isn't longer than 64 chars
 				if(zbx_strlen($host['host']) > 64){
 					self::exception(
 						ZBX_API_ERROR_PARAMETERS,
@@ -1335,40 +1340,95 @@ Copt::memoryPick();
 					);
 				}
 
-				if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $host['host'])){
+				if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $host['host'])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Host name "%s"', $host['host']));
 				}
 
-				if(isset($hostNames[$host['host']]))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicated host name "%s" in data', $host['host']));
+				if(isset($hostNames['host'][$host['host']]))
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate host. Host with the same host name "%s" already exists in data', $host['host']));
 
-				$hostNames[$host['host']] = $update ? $host['hostid'] : 1;
+				$hostNames['host'][$host['host']] = $update ? $host['hostid'] : 1;
+			}
+
+			if(isset($host['name'])){
+				if($update){
+					// if visible name is empty replace it with host name
+					if(zbx_empty(trim($host['name']))){
+						if(!isset($host['host'])){
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Visible name cannot be empty if missing host name'));
+						}
+						$host['name'] = $host['host'];
+					}
+				}
+
+				// Check if visible name isn't longer than 64 chars
+				if(zbx_strlen($host['name']) > 64){
+					self::exception(
+						ZBX_API_ERROR_PARAMETERS,
+						_n(
+							'Maximum visible host name length is %2$d characters, "%3$s" is %1$d character.',
+							'Maximum visible host name length is %2$d characters, "%3$s" is %1$d characters.',
+							zbx_strlen($host['name']),
+							64,
+							$host['name']
+						)
+					);
+				}
+
+				if(isset($hostNames['name'][$host['name']]))
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate host. Host with the same visible name "%s" already exists in data', $host['name']));
+
+				$hostNames['name'][$host['name']] = $update ? $host['hostid'] : 1;
 			}
 		}
 		unset($host);
 
 		if($update || $create){
-			$hostsExists = $this->get(array(
-				'output' => array('hostid', 'host'),
-				'filter' => array('host' => array_keys($hostNames)),
-				'nopermissions' => true,
-				'preservekeys' => true
-			));
-			foreach($hostsExists as $exnum => $hostExists){
-				if(!$update || (bccomp($hostExists['hostid'],$hostNames[$hostExists['host']]) != 0)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host "%s" already exists.', $hostExists['host']));
-				}
-			}
+			if(isset($hostNames['host']) || isset($hostNames['name'])){
+				$filter = array();
+				if(isset($hostNames['host']))
+					$filter['host'] = array_keys($hostNames['host']);
+				if(isset($hostNames['name']))
+					$filter['name'] = array_keys($hostNames['name']);
 
-			$templatesExists = API::Template()->get(array(
-				'output' => array('hostid', 'host'),
-				'filter' => array('host' => array_keys($hostNames)),
-				'nopermissions' => true,
-				'preservekeys' => true
-			));
-			foreach($templatesExists as $exnum => $templatesExists){
-				if(!$update || (bccomp($templatesExists['templateid'],$hostNames[$templatesExists['host']]) != 0)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template "%s" already exists.', $hostExists['host']));
+				$options = array(
+					'output' => array('hostid', 'host', 'name'),
+					'filter' => $filter,
+					'searchByAny' => true,
+					'nopermissions' => true,
+					'preservekeys' => true
+				);
+
+				$hostsExists = $this->get($options);
+
+				foreach($hostsExists as $exnum => $hostExists){
+					if(isset($hostNames['host'][$hostExists['host']])){
+						if(!$update || bccomp($hostExists['hostid'], $hostNames['host'][$hostExists['host']]) != 0){
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host with the same name "%s" already exists.', $hostExists['host']));
+						}
+					}
+
+					if(isset($hostNames['name'][$hostExists['name']])){
+						if(!$update || bccomp($hostExists['hostid'], $hostNames['name'][$hostExists['name']]) != 0){
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host with the same visible name "%s" already exists.', $hostExists['name']));
+						}
+					}
+				}
+
+				$templatesExists = API::Template()->get($options);
+
+				foreach($templatesExists as $exnum => $templateExists){
+					if(isset($hostNames['host'][$templateExists['host']])){
+						if(!$update || bccomp($templateExists['templateid'], $hostNames['host'][$templateExists['host']]) != 0){
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template with the same name "%s" already exists.', $templateExists['host']));
+						}
+					}
+
+					if(isset($hostNames['name'][$templateExists['name']])){
+						if(!$update || bccomp($templateExists['templateid'], $hostNames['name'][$templateExists['name']]) != 0){
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template with the same visible name "%s" already exists.', $templateExists['name']));
+						}
+					}
 				}
 			}
 		}
@@ -1400,23 +1460,20 @@ Copt::memoryPick();
 
 		$this->checkInput($hosts, __FUNCTION__);
 
+		$groupsToAdd = array();
+
 		foreach($hosts as $num => $host){
 			$hostid = DB::insert('hosts', array($host));
 			$hostids[] = $hostid = reset($hostid);
 
 			$host['hostid'] = $hostid;
 
+			foreach($host['groups'] as $group){
+				$groupsToAdd[] = array('hostid' => $hostid, 'groupid' => $group['groupid']);
+			}
+
 			$options = array();
 			$options['hosts'] = $host;
-
-
-			foreach($host['groups'] as $group){
-				$hostgroupid = get_dbid('hosts_groups', 'hostgroupid');
-				$result = DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES ($hostgroupid, $hostid, {$group['groupid']})");
-				if(!$result){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-				}
-			}
 
 			if(isset($host['templates']) && !is_null($host['templates']))
 				$options['templates'] = $host['templates'];
@@ -1442,6 +1499,8 @@ Copt::memoryPick();
 				DBexecute('INSERT INTO host_profile (hostid, '.$fields.') VALUES ('.$hostid.', '.$values.')');
 			}
 		}
+
+		DB::insert('hosts_groups', $groupsToAdd);
 
 		return array('hostids' => $hostids);
 	}
@@ -1640,6 +1699,12 @@ Copt::memoryPick();
 
 
 // UPDATE HOSTS PROPERTIES {{{
+			if(isset($data['name'])){
+				if(count($hosts) > 1){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot mass update visible host name'));
+				}
+			}
+
 			if(isset($data['host'])){
 				if(count($hosts) > 1){
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot mass update host name'));
@@ -1665,7 +1730,7 @@ Copt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$cur_host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 			}
 
-			if(isset($data['host']) && !preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $data['host'])){
+			if(isset($data['host']) && !preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $data['host'])){
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Hostname "%s"', $data['host']));
 			}
 

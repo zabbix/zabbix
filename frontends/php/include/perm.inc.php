@@ -466,12 +466,12 @@ function get_accessible_hosts_by_rights(&$rights,$user_type,$perm,$perm_res=null
 	if(!is_null($nodeid))	array_push($where, DBin_node('h.hostid', $nodeid));
 	$where = count($where)?$where = ' WHERE '.implode(' AND ',$where):'';
 
-	$sql = 'SELECT n.nodeid as nodeid,n.name as node_name,hg.groupid as groupid,h.hostid, h.host '.
+	$sql = 'SELECT n.nodeid as nodeid,n.name as node_name,hg.groupid as groupid,h.hostid,h.host,h.name as host_name,h.status '.
 				' FROM hosts h '.
 					' LEFT JOIN hosts_groups hg ON hg.hostid=h.hostid '.
 					' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('h.hostid').
 				$where.
-				' ORDER BY n.name,h.host';
+				' ORDER BY n.name,h.name';
 
 	$perm_by_host = array();
 	$db_hosts = DBselect($sql);

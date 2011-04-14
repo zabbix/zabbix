@@ -798,7 +798,6 @@
 	'S_MINUS_ALL_GROUPS_MINUS'=>			_(' - all groups - '),
 	'S_ALL_GROUPS'=>				_('All groups'),
 	'S_NO_GROUPS_DEFINED'=>				_('No groups defined'),
-	'S_NEW_GROUP'=>					_('New group'),
 	'S_DNS_NAME'=>					_('DNS name'),
 	'S_IP_ADDRESS'=>				_('IP address'),
 	'S_LINK_ADDITIONAL_TEMPLATES'=>			_('Link additional templates'),

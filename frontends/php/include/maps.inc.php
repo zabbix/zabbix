@@ -375,21 +375,24 @@
 		$resolveHostMacros = false;
 		if((($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST)
 			|| ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER))
-			&& ((zbx_strpos($label, '{HOSTNAME}') !== false)
+			&& ((zbx_strpos($label, '{HOST.NAME}') !== false)
+				|| (zbx_strpos($label, '{HOSTNAME}') !== false)	/* deprecated */
+				|| (zbx_strpos($label, '{HOST.HOST}') !== false)
 				|| (zbx_strpos($label, '{HOST.DNS}') !== false)
-				|| (zbx_strpos($label, '{IPADDRESS}') !== false)
+				|| (zbx_strpos($label, '{HOST.IP}') !== false)
+				|| (zbx_strpos($label, '{IPADDRESS}') !== false)	/* deprecated */
 				|| (zbx_strpos($label, '{HOST.CONN}') !== false))
 		){
 			$resolveHostMacros = true;
 
 			if($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST){
-				$sql = 'SELECT hi.ip, hi.dns, hi.useip, h.host'.
+				$sql = 'SELECT hi.ip, hi.dns, hi.useip, h.host, h.name'.
 					' FROM interface hi, hosts h'.
 					' WHERE hi.hostid=h.hostid'.
 						' AND hi.hostid='.$selement['elementid'];
 			}
 			else{
-				$sql = 'SELECT hi.ip, hi.dns, hi.useip, h.host'.
+				$sql = 'SELECT hi.ip, hi.dns, hi.useip, h.host, h.name'.
 					' FROM interface hi,items i,functions f,hosts h'.
 					' WHERE h.hostid=hi.hostid'.
 						' AND hi.hostid=i.hostid'.
@@ -404,8 +407,11 @@
 
 		if($resolveHostMacros){
 			$replace = array(
-				'{HOSTNAME}' => $db_host['host'],
+				'{HOST.NAME}' => $db_host['name'],
+				'{HOSTNAME}' => $db_host['name'],
+				'{HOST.HOST}' => $db_host['host'],
 				'{HOST.DNS}' => $db_host['dns'],
+				'{HOST.IP}' => $db_host['ip'],
 				'{IPADDRESS}' => $db_host['ip'],
 				'{HOST.CONN}' => ($db_host['useip'] ? $db_host['ip'] : $db_host['dns']),
 			);
@@ -457,14 +463,19 @@
 		if(null === $replaceHost)
 			$pattern = "/{".ZBX_PREG_HOST_FORMAT.":.+\.(last|max|min|avg)\([0-9]+\)}/Uu";
 		else
-			$pattern = "/{(".ZBX_PREG_HOST_FORMAT."|{HOSTNAME}):.+\.(last|max|min|avg)\([0-9]+\)}/Uu";
+			$pattern = "/{(".ZBX_PREG_HOST_FORMAT."|{HOST.NAME}|{HOSTNAME}|{HOST.HOST}):.+\.(last|max|min|avg)\([0-9]+\)}/Uu";
 
 		preg_match_all($pattern, $label, $matches);
 
 		foreach($matches[0] as $expr){
 			$macro = $expr;
-			if(($replaceHost !== null) && (zbx_strpos($macro, '{HOSTNAME}') == 1)){
-				$macro = substr_replace($macro, $replaceHost, 1, 10);
+			if($replaceHost !== null){
+				if(zbx_strpos($macro, '{HOST.NAME}') == 1)
+					$macro = substr_replace($macro, $replaceHost, 1, 11);
+				else if(zbx_strpos($macro, '{HOSTNAME}') == 1)
+					$macro = substr_replace($macro, $replaceHost, 1, 10);
+				else if(zbx_strpos($macro, '{HOST.HOST}') == 1)
+					$macro = substr_replace($macro, $replaceHost, 1, 11);
 			}
 
 			$trigExpr = new CTriggerExpression(array('expression' => $macro));
@@ -1239,7 +1250,7 @@
 		}
 		if(!empty($elems['hosts']) && $hlabel){
 			foreach($elems['hosts'] as $elem){
-				$info[$elem['selementid']]['name'] = $all_hosts[$elem['elementid']]['host'];;
+				$info[$elem['selementid']]['name'] = $all_hosts[$elem['elementid']]['name'];;
 			}
 		}
 
@@ -1556,7 +1567,7 @@
 	}
 
 
-	function drawMapSelemetsMarks(&$im, &$map, &$map_info){
+	function drawMapSelementsMarks(&$im, &$map, &$map_info){
 		global $colors;
 
 		$selements = $map['selements'];

@@ -39,7 +39,7 @@ class testPageHosts extends CWebTest{
 		// Header
 		$this->ok(array('Name','Applications','Items','Triggers','Graphs','Discovery','Interface','Templates','Status','Availability'));
 		// Data
-		$this->ok(array($host['host']));
+		$this->ok(array($host['name']));
 		$this->dropdown_select('go','Export selected');
 		$this->dropdown_select('go','Mass update');
 		$this->dropdown_select('go','Activate selected');
@@ -53,12 +53,12 @@ class testPageHosts extends CWebTest{
 	public function testPageHosts_FilterHost($host){
 		$this->login('hosts.php');
 		$this->click('flicker_icon_l');
-		$this->input_type('filter_host',$host['host']);
+		$this->input_type('filter_host',$host['name']);
 		$this->input_type('filter_ip','');
 		$this->input_type('filter_port','');
 		$this->click('filter');
 		$this->wait();
-		$this->ok($host['host']);
+		$this->ok($host['name']);
 	}
 
 	// Filter returns nothing
@@ -108,7 +108,7 @@ class testPageHosts extends CWebTest{
 		$this->click('css=span.link_menu');
 		$this->click('filter');
 		$this->wait();
-		$this->ok($host['host']);
+		$this->ok($host['name']);
 	}
 
 	/**
