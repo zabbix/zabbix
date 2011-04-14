@@ -21,29 +21,24 @@
 <?php
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageDashboard extends CWebTest
+class testPageStatusOfTriggers extends CWebTest
 {
-	public function testPageDashboard_SimpleTest()
+	public function testPageStatusOfTriggers_SimpleTest()
 	{
-		$this->login('dashboard.php');
-		$this->assertTitle('Dashboard');
-		$this->ok('PERSONAL DASHBOARD');
-		$this->ok('Favourite graphs');
-		$this->ok('Favourite screens');
-		$this->ok('Favourite maps');
-		$this->ok('Status of Zabbix');
-		$this->ok('System status');
-		$this->ok('Host status');
-		$this->ok('Last 20 issues');
-		$this->ok('Web monitoring');
-		$this->ok('Updated:');
+		$this->login('tr_status.php');
+		$this->assertTitle('Status of triggers \[refreshed every 30 sec\]');
+		$this->ok('STATUS OF TRIGGERS');
+		$this->ok('Triggers');
+		$this->ok('Displaying');
+		$this->ok(array('Group','Host'));
+		$this->ok(array('Severity','Status','Info','Last change','Age','Acknowledged','Host','Name','Comments'));
 	}
 
 // Check that no real host or template names displayed
-	public function testPageDashboard_NoHostNames()
+	public function testPageStatusOfTriggers_NoHostNames()
 	{
-		$this->login('dashboard.php');
-		$this->assertTitle('Dashboard');
+		$this->login('tr_status.php');
+		$this->assertTitle('Status of triggers \[refreshed every 30 sec\]');
 		$this->checkNoRealHostnames();
 	}
 }

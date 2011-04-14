@@ -21,29 +21,23 @@
 <?php
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageDashboard extends CWebTest
+class testPageWeb extends CWebTest
 {
-	public function testPageDashboard_SimpleTest()
+	public function testPageWeb_SimpleTest()
 	{
-		$this->login('dashboard.php');
-		$this->assertTitle('Dashboard');
-		$this->ok('PERSONAL DASHBOARD');
-		$this->ok('Favourite graphs');
-		$this->ok('Favourite screens');
-		$this->ok('Favourite maps');
-		$this->ok('Status of Zabbix');
-		$this->ok('System status');
-		$this->ok('Host status');
-		$this->ok('Last 20 issues');
-		$this->ok('Web monitoring');
-		$this->ok('Updated:');
+		$this->login('httpmon.php');
+		$this->assertTitle('Status of Web monitoring');
+		$this->ok('STATUS OF WEB MONITORING');
+		$this->ok('WEB CHECKS');
+		$this->ok(array('Group','Host'));
+		$this->ok(array('Host','Name','Number of steps','State','Last check','Status'));
 	}
 
 // Check that no real host or template names displayed
-	public function testPageDashboard_NoHostNames()
+	public function testPageWeb_NoHostNames()
 	{
-		$this->login('dashboard.php');
-		$this->assertTitle('Dashboard');
+		$this->login('httpmon.php');
+		$this->assertTitle('Status of Web monitoring');
 		$this->checkNoRealHostnames();
 	}
 }

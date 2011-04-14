@@ -62,9 +62,10 @@ $frmHost->addRow(array(
 	S_GROUPS
 ), $grp_tb->get(_('In groups'), _('Other groups')));
 
+$newgroupTB = new CTextBox('newgroup', $newgroup);
+$newgroupTB->setAttribute('maxlength', 64);
 $frmHost->addRow(array(new CVisibilityBox('visible[newgroup]', isset($visible['newgroup']),
-	'newgroup', S_ORIGINAL),S_NEW_GROUP
-), new CTextBox('newgroup',$newgroup), 'new');
+	'newgroup', _('Original')), _('New group')), $newgroupTB, 'new');
 
 //Proxy
 $cmbProxy = new CComboBox('proxy_hostid', $proxy_hostid);

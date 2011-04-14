@@ -15,7 +15,7 @@
 <tr id="opTemplateRow_#{templateid}">
 <td>
 	<input name="new_operation[optemplate][#{templateid}][templateid]" type="hidden" value="#{templateid}" />
-	<span style="font-size: 1.1em; font-weight: bold;"> #{host} </span>
+	<span style="font-size: 1.1em; font-weight: bold;"> #{name} </span>
 </td>
 <td>
 	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="removeOpTemplateRow(#{templateid});" />
@@ -65,9 +65,9 @@
 <tr id="opCmdHostRow_#{hostid}">
 <td>
 	<input name="new_operation[opcommand_hst][#{hostid}][hostid]" type="hidden" value="#{hostid}" />
-	<input name="new_operation[opcommand_hst][#{hostid}][host]" type="hidden" value="#{host}" />
+	<input name="new_operation[opcommand_hst][#{hostid}][name]" type="hidden" value="#{name}" />
 	#{objectCaption}
-	<span class="bold"> #{host} </span>
+	<span class="bold"> #{name} </span>
 </td>
 <td>
 	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="removeOpCmdRow(#{hostid}, 'hostid');" />
@@ -177,7 +177,7 @@ function addPopupValues(list){
 				if(value.hostid.toString() != '0')
 					value.objectCaption = "<?php print(_('Host').': '); ?>";
 				else
-					value.host = "<?php print(_('Current host')); ?>";
+					value.name = "<?php print(_('Current host')); ?>";
 
 				if(jQuery("#opCmdHostRow_"+value.hostid).length == 0){
 					jQuery("#opCmdListFooter").before(tpl.evaluate(value));
@@ -260,9 +260,9 @@ function saveOpCmdForm(){
 		object.object = 'hostid';
 		object.opcommand_hstid = jQuery(objectForm).find('input[name="opCmdId"]').val();
 		object.hostid = jQuery(objectForm).find('input[name="opCmdTargetObjectId"]').val();
-		object.host = jQuery(objectForm).find('input[name="opCmdTargetObjectName"]').val();
+		object.name = jQuery(objectForm).find('input[name="opCmdTargetObjectName"]').val();
 
-		if((object.target.toString() != '0') && empty(object.host)){
+		if((object.target.toString() != '0') && empty(object.name)){
 			alert("<?php print(_('You did not specify host for operation.')); ?>");
 			return true;
 		}
@@ -279,7 +279,7 @@ function selectOpCmdTarget(){
 	if(target.toString() == '2')
 		PopUp("popup.php?dstfrm=action.edit&srctbl=host_group&srcfld1=groupid&srcfld2=name&dstfld1=opCmdTargetObjectId&dstfld2=opCmdTargetObjectName&writeonly=1",480,480);
 	else
-		PopUp("popup.php?dstfrm=action.edit&srctbl=hosts&srcfld1=hostid&srcfld2=host&dstfld1=opCmdTargetObjectId&dstfld2=opCmdTargetObjectName&writeonly=1",780,480);
+		PopUp("popup.php?dstfrm=action.edit&srctbl=hosts&srcfld1=hostid&srcfld2=name&dstfld1=opCmdTargetObjectId&dstfld2=opCmdTargetObjectName&writeonly=1",780,480);
 }
 
 function changeOpCmdTarget(){

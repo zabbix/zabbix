@@ -247,11 +247,11 @@ include_once('include/page_header.php');
 
 		$db_host = get_host_by_hostid($apphostid,1 /* no error message */);
 		if($db_host){
-			$apphost = $db_host["host"];
+			$hostname = $db_host['name'];
 		}
 		else{
-			$apphost = '';
 			$apphostid = 0;
+			$hostname = '';
 		}
 
 		$frmApp = new CFormTable($frm_title);
@@ -267,10 +267,10 @@ include_once('include/page_header.php');
 		if(!isset($_REQUEST["applicationid"])){
 // any new application can SELECT host
 			$frmApp->addRow(S_HOST,array(
-				new CTextBox("apphost",$apphost,32,'yes'),
-				new CButton("btn1",S_SELECT,
+				new CTextBox('hostname', $hostname, 32, 'yes'),
+				new CButton('btn1', S_SELECT,
 					"return PopUp('popup.php?dstfrm=".$frmApp->getName().
-					"&dstfld1=apphostid&dstfld2=apphost&srctbl=hosts_and_templates&srcfld1=hostid&srcfld2=host',450,450);",
+					"&dstfld1=apphostid&dstfld2=hostname&srctbl=hosts_and_templates&srcfld1=hostid&srcfld2=name',450,450);",
 					'T')
 				));
 		}
@@ -358,7 +358,7 @@ include_once('include/page_header.php');
 				else{
 					$template_host = get_realhost_by_applicationid($application['templateid']);
 					$name = array(
-						new CLink($template_host['host'], 'applications.php?hostid='.$template_host['hostid']),
+						new CLink($template_host['name'], 'applications.php?hostid='.$template_host['hostid']),
 						':',
 						$application['name']
 					);
