@@ -1,6 +1,5 @@
--- Activate Zabbix Server
-UPDATE hosts SET status=0 WHERE host='Zabbix server';
-UPDATE hosts SET name='ЗАББИКС Сервер' WHERE host='Zabbix server';
+-- Activate Zabbix Server, set visible name and make it a more unique name
+UPDATE hosts SET status=0,name='ЗАББИКС Сервер',host='Test host' WHERE host='Zabbix server';
 
 -- Enabling debug mode
 UPDATE usrgrp SET debug_mode = 1 WHERE usrgrpid = 7;

@@ -1344,6 +1344,33 @@ COpt::memoryPick();
 
 
 // UPDATE TEMPLATES PROPERTIES {{{
+			if(isset($data['name'])){
+				if(count($templates) > 1){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot mass update visible template name'));
+				}
+
+				$cur_template = reset($templates);
+
+				$options = array(
+					'filter' => array(
+						'name' => $cur_template['name']),
+					'output' => API_OUTPUT_SHORTEN,
+					'editable' => 1,
+					'nopermissions' => 1
+				);
+				$template_exists = $this->get($options);
+				$template_exist = reset($template_exists);
+
+				if($template_exist && (bccomp($template_exist['templateid'],$cur_template['templateid']) != 0)){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template with the same visible name "%s" already exists.', $cur_template['name']));
+				}
+
+//can't set the same name as existing host
+				if(API::Host()->exists(array('name' => $cur_template['name']))){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host with the same visible name "%s" already exists.', $cur_template['name']));
+				}
+			}
+
 			if(isset($data['host'])){
 				if(count($templates) > 1){
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot mass update template name'));
@@ -1362,12 +1389,12 @@ COpt::memoryPick();
 				$template_exist = reset($template_exists);
 
 				if($template_exist && (bccomp($template_exist['templateid'],$cur_template['templateid']) != 0)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE . ' [ ' . $data['host'] . ' ] ' . S_ALREADY_EXISTS_SMALL);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template with the same name "%s" already exists.', $cur_template['host']));
 				}
 
 //can't set the same name as existing host
 				if(API::Host()->exists(array('host' => $cur_template['host']))){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$template['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host with the same name "%s" already exists.', $cur_template['host']));
 				}
 			}
 

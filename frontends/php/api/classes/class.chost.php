@@ -1404,7 +1404,7 @@ Copt::memoryPick();
 				foreach($hostsExists as $exnum => $hostExists){
 					if(isset($hostNames['host'][$hostExists['host']])){
 						if(!$update || bccomp($hostExists['hostid'], $hostNames['host'][$hostExists['host']]) != 0){
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host "%s" already exists.', $hostExists['host']));
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host with the same name "%s" already exists.', $hostExists['host']));
 						}
 					}
 
@@ -1420,7 +1420,7 @@ Copt::memoryPick();
 				foreach($templatesExists as $exnum => $templateExists){
 					if(isset($hostNames['host'][$templateExists['host']])){
 						if(!$update || bccomp($templateExists['templateid'], $hostNames['host'][$templateExists['host']]) != 0){
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template "%s" already exists.', $templateExists['host']));
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template with the same name "%s" already exists.', $templateExists['host']));
 						}
 					}
 
@@ -1699,6 +1699,12 @@ Copt::memoryPick();
 
 
 // UPDATE HOSTS PROPERTIES {{{
+			if(isset($data['name'])){
+				if(count($hosts) > 1){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot mass update visible host name'));
+				}
+			}
+
 			if(isset($data['host'])){
 				if(count($hosts) > 1){
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot mass update host name'));

@@ -202,7 +202,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 	public function templateLink($host,$template){
 		// $template = "Template_Linux";
 		// $host = "Zabbix server";
-		$sql = "select hostid from hosts where host='".$host."' and status in (".HOST_STATUS_MONITORED.",".HOST_STATUS_NOT_MONITORED.")";
+		$sql = "select hostid from hosts where name='".$host."' and status in (".HOST_STATUS_MONITORED.",".HOST_STATUS_NOT_MONITORED.")";
 		$this->assertEquals(1,DBcount($sql),"Chuck Norris: No such host:$host");
 		$row = DBfetch(DBselect($sql));
 		$hostid = $row['hostid'];
