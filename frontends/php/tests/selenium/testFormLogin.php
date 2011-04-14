@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,13 +23,12 @@ require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
 class testFormLogin extends CWebTest
 {
-	public function testFormLogin_LoginOK()
-	{
+	public function testFormLogin_LoginOK(){
 		$this->login('dashboard.php');
 		$this->assertTitle('Dashboard');
 		$this->click('link=Logout');
 		$this->wait();
-		$this->ok('Login name');
+		$this->ok('Username');
 		$this->ok('Password');
 
 		$this->input_type('name','Admin');
@@ -41,13 +40,12 @@ class testFormLogin extends CWebTest
 		$this->nok('Login name');
 	}
 
-	public function testFormLogin_LoginIncorrectPassword()
-	{
+	public function testFormLogin_LoginIncorrectPassword(){
 		$this->login('dashboard.php');
 		$this->assertTitle('Dashboard');
 		$this->click('link=Logout');
 		$this->wait();
-		$this->ok('Login name');
+		$this->ok('Username');
 		$this->ok('Password');
 
 		$this->input_type('name','Admin');
@@ -66,21 +64,18 @@ class testFormLogin extends CWebTest
 		$this->assertEquals(1,DBcount($sql),"Chuck Norris: Field users.attempt_ip should not be empty after incorrect login.");
 	}
 
-	public function testFormLogin_LoginAfterIncorrectLogin()
-	{
+	public function testFormLogin_LoginAfterIncorrectLogin(){
 		// TODO
 		// Make sure to check for 'N  failed login attempts logged. Last failed attempt was from';
 		$this->markTestIncomplete();
 	}
 
-	public function testFormLogin_BlockAccount()
-	{
+	public function testFormLogin_BlockAccount(){
 		// TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testFormLogin_BlockAccountAndRecoverAfter30Seconds()
-	{
+	public function testFormLogin_BlockAccountAndRecoverAfter30Seconds(){
 		// TODO
 		$this->markTestIncomplete();
 	}

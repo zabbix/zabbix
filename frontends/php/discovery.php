@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ include_once('include/page_header.php');
 	$dscvry_wdgt = new CWidget('hat_discovery');
 
 // HEADER
-	$r_form = new CForm(null, 'get');
+	$r_form = new CForm('get');
 
 	$fullscreen = get_request('fullscreen', 0);
 	$druleid = get_request('druleid', 0);
@@ -81,7 +81,7 @@ include_once('include/page_header.php');
 		),
 		'output' => API_OUTPUT_EXTEND
 	);
-	$drules = CDRule::get($options);
+	$drules = API::DRule()->get($options);
 
 	order_result($drules, 'name');
 	foreach($drules as $dnum => $drule){
@@ -104,9 +104,9 @@ include_once('include/page_header.php');
 	);
 	if($druleid > 0) $options['druleids'] = $druleid;
 	else $options['druleids'] = zbx_objectValues($drules, 'druleid');
-	$dservices = CDService::get($options);
+	$dservices = API::DService()->get($options);
 
-	$gMacros = CUserMacro::get(array(
+	$gMacros = API::UserMacro()->get(array(
 		'output' => API_OUTPUT_EXTEND,
 		'globalmacro' => 1
 	));
@@ -136,9 +136,8 @@ include_once('include/page_header.php');
 	);
 
 	$css = getUserTheme($USER_DETAILS);
-	$vTextColor = ($css == 'css_od.css')?'&color=white':'';
 	foreach($services as $name => $foo) {
-		$header[] = new CImg('vtext.php?text='.$name.$vTextColor);
+		$header[] = new CImg('vtext.php?text='.$name.'&theme='.$css);
 	}
 
 	$table = new CTableInfo();
@@ -153,7 +152,7 @@ include_once('include/page_header.php');
 	);
 	if($druleid>0) $options['druleids'] = $druleid;
 
-	$drules = CDRule::get($options);
+	$drules = API::DRule()->get($options);
 	order_result($drules, 'name');
 
 	$options = array(
@@ -161,7 +160,7 @@ include_once('include/page_header.php');
 		'selectDServices' => API_OUTPUT_REFER,
 		'output' => API_OUTPUT_REFER
 	);
-	$db_dhosts = CDHost::get($options);
+	$db_dhosts = API::DHost()->get($options);
 	$db_dhosts = zbx_toHash($db_dhosts, 'dhostid');
 
 	$db_dservices = zbx_toHash($dservices, 'dserviceid');

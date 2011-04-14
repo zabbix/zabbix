@@ -1,6 +1,6 @@
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,31 +23,23 @@
 #include "threads.h"
 #include "cpustat.h"
 #include "perfstat.h"
-#include "interfaces.h"
 #include "diskdevices.h"
 #ifdef _AIX
 #	include "vmstats.h"
 #endif	/* _AIX */
 
-/* NOTE:
- *   Mandatory static structure,
- *   don't use dinamic allocation
- *   for structure elements.
- *   Cause data for collector allocated once
- *   in init_collector_data.
- */
-typedef struct s_collector_data
+typedef struct
 {
 	ZBX_CPUS_STAT_DATA	cpus;
-	ZBX_INTERFACES_DATA	interfaces;
 	ZBX_DISKDEVICES_DATA	diskdevices;
 #ifdef _WINDOWS
 	ZBX_PERF_STAT_DATA	perfs;
-#endif /* _WINDOWS */
+#endif	/* _WINDOWS */
 #ifdef _AIX
 	ZBX_VMSTAT_DATA		vmstat;
 #endif	/* _AIX */
-} ZBX_COLLECTOR_DATA;
+}
+ZBX_COLLECTOR_DATA;
 
 extern ZBX_COLLECTOR_DATA	*collector;
 

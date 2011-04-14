@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -128,27 +128,40 @@
 		return $status;
 	}
 
-	function discovery_object_status2str($status){
+	function discovery_object_status2str($status=null){
 		$statuses = array(
 			DOBJECT_STATUS_UP => S_UP,
 			DOBJECT_STATUS_DOWN => S_DOWN,
 			DOBJECT_STATUS_DISCOVER => S_DISCOVERED,
 			DOBJECT_STATUS_LOST => S_LOST,
 		);
-		return isset($statuses[$status]) ? $statuses[$status] : S_UNKNOWN;
+
+		if(is_null($status)){
+			order_result($statuses);
+			return $statuses;
+		}
+		else if(isset($statuses[$status]))
+			return $statuses[$status];
+		else
+			return S_UNKNOWN;
 	}
 
 	function get_discovery_rule_by_druleid($druleid){
 		return DBfetch(DBselect('select * from drules where druleid='.$druleid));
 	}
 
-	function set_discovery_rule_status($druleid, $status){
-		return DBexecute('update drules set status='.$status.' where druleid='.$druleid);
-	}
-
 	function add_discovery_check($druleid, $type, $ports, $key, $snmp_community,
 			$snmpv3_securityname, $snmpv3_securitylevel, $snmpv3_authpassphrase, $snmpv3_privpassphrase, $uniq=0)
 	{
+		// no need to store those items in DB if they will not be used
+		if($snmpv3_securitylevel == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV){
+			$snmpv3_authpassphrase = '';
+			$snmpv3_privpassphrase = '';
+		}
+		if($snmpv3_securitylevel == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV){
+			$snmpv3_privpassphrase = '';
+		}
+
 		$dcheckid = get_dbid('dchecks', 'dcheckid');
 		$result = DBexecute('insert into dchecks (dcheckid,druleid,type,ports,key_,snmp_community'.
 				',snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,uniq) '.
@@ -227,7 +240,7 @@
 		$sql = 'SELECT DISTINCT actionid '.
 				' FROM conditions '.
 				' WHERE conditiontype='.CONDITION_TYPE_DCHECK.
-					' AND '.DBcondition('value', $dcheckids, false, true);	// FIXED[POSIBLE value type violation]!!!
+					' AND '.DBcondition('value', $dcheckids);
 
 		$db_actions = DBselect($sql);
 		while($db_action = DBfetch($db_actions))
@@ -242,7 +255,7 @@
 // delete action conditions
 			DBexecute('DELETE FROM conditions '.
 					' WHERE conditiontype='.CONDITION_TYPE_DCHECK.
-					' AND '.DBcondition('value', $dcheckids, false, true));	// FIXED[POSIBLE value type violation]!!!
+					' AND '.DBcondition('value', $dcheckids));
 		}
 
 		DBexecute('DELETE FROM dchecks WHERE '.DBcondition('dcheckid', $dcheckids));

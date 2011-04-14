@@ -1,6 +1,6 @@
 /*
-** ZABBIX
-** Copyright (C) 2000-2007 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,22 +26,31 @@
 #define ZBX_SYNC_PARTIAL	0
 #define	ZBX_SYNC_FULL		1
 
+#define	ZBX_NO_POLLER			255
+#define	ZBX_POLLER_TYPE_NORMAL		0
+#define	ZBX_POLLER_TYPE_UNREACHABLE	1
+#define	ZBX_POLLER_TYPE_IPMI		2
+#define	ZBX_POLLER_TYPE_PINGER		3
+#define	ZBX_POLLER_TYPE_JAVA		4
+#define	ZBX_POLLER_TYPE_COUNT		5	/* number of poller types */
+
 extern char	*CONFIG_FILE;
 extern int	CONFIG_TIMEOUT;
-extern int	CONFIG_DBCONFIG_SIZE;
+extern int	CONFIG_CONF_CACHE_SIZE;
 extern int	CONFIG_HISTORY_CACHE_SIZE;
 extern int	CONFIG_TRENDS_CACHE_SIZE;
 extern int	CONFIG_TEXT_CACHE_SIZE;
 extern int	CONFIG_POLLER_FORKS;
 extern int	CONFIG_UNREACHABLE_POLLER_FORKS;
 extern int	CONFIG_IPMIPOLLER_FORKS;
+extern int	CONFIG_JAVAPOLLER_FORKS;
 extern int	CONFIG_PINGER_FORKS;
 extern int	CONFIG_REFRESH_UNSUPPORTED;
 extern int	CONFIG_NS_SUPPORT;
 extern int	CONFIG_UNAVAILABLE_DELAY;
 extern int	CONFIG_UNREACHABLE_PERIOD;
 extern int	CONFIG_UNREACHABLE_DELAY;
-extern int	CONFIG_DBSYNCER_FORKS;
+extern int	CONFIG_HISTSYNCER_FORKS;
 extern int	CONFIG_PROXYCONFIG_FREQUENCY;
 extern int	CONFIG_PROXYDATA_FREQUENCY;
 
@@ -79,6 +88,9 @@ typedef struct
 	unsigned char	ipmi_privilege;
 	char		ipmi_username[HOST_IPMI_USERNAME_LEN_MAX];
 	char		ipmi_password[HOST_IPMI_PASSWORD_LEN_MAX];
+	int		jmx_errors_from;
+	unsigned char	jmx_available;
+	int		jmx_disable_until;
 }
 DC_HOST;
 
@@ -170,8 +182,7 @@ void	free_configuration_cache();
 int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid);
 int	DCconfig_get_item_by_key(DC_ITEM *item, zbx_uint64_t proxy_hostid, const char *hostname, const char *key);
 int	DCconfig_get_item_by_itemid(DC_ITEM *item, zbx_uint64_t itemid);
-int	DCconfig_get_interface_by_type(DC_INTERFACE *interface, zbx_uint64_t hostid,
-		unsigned char type, unsigned char main);
+int	DCconfig_get_interface_by_type(DC_INTERFACE *interface, zbx_uint64_t hostid, unsigned char type);
 int	DCconfig_get_poller_nextcheck(unsigned char poller_type);
 int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max_items);
 int	DCconfig_get_items(zbx_uint64_t hostid, const char *key, DC_ITEM **items);
@@ -191,7 +202,7 @@ void	DCconfig_set_maintenance(zbx_uint64_t hostid, int maintenance_status,
 void	*DCconfig_get_stats(int request);
 
 int	DCconfig_get_proxypoller_hosts(DC_PROXY *proxies, int max_hosts);
-int	DCconfig_get_proxy_nextcheck();
+int	DCconfig_get_proxypoller_nextcheck();
 void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck);
 
 void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, char **replace_to);

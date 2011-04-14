@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -80,7 +80,7 @@ include_once('include/page_header.php');
 
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
-	$scripts_by_hosts = CScript::getScriptsByHosts($available_hosts);
+	$scripts_by_hosts = API::Script()->getScriptsByHosts($available_hosts);
 
 	$triggers = array();
 	$triggerids = array();
@@ -113,7 +113,7 @@ include_once('include/page_header.php');
 	while($row = DBfetch($result)){
 		$item['itemid'] = $row['itemid'];
 		$item['action'] = str_in_array($row['value_type'],array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64))?'showgraph':'showvalues';
-		$item['description'] = item_description($row);
+		$item['name'] = itemName($row);
 		$item['value_type'] = $row['value_type']; //ZBX-3059: So it would be possible to show different caption for history for chars and numbers (KB)
 
 		$triggers[$row['triggerid']]['items'][$row['itemid']] = $item;
@@ -127,16 +127,16 @@ include_once('include/page_header.php');
 		foreach($scripts_by_hosts[$row['hostid']] as $id => $script){
 			$script_nodeid = id2nodeid($script['scriptid']);
 			if( (bccomp($host_nodeid ,$script_nodeid ) == 0))
-				$menus.= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$row['hostid']."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+				$menus.= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$row['hostid']."&scriptid=".$script['scriptid']."','Global script',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 		}
 
 		$menus.= "[".zbx_jsvalue(S_LINKS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
 		$menus.= "['".S_LATEST_DATA."',\"javascript: redirect('latest.php?hostid=".$row['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 
 		$menus = rtrim($menus,',');
-		$menus="show_popup_menu(event,[[".zbx_jsvalue(S_TOOLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus."],180);";
+		$menus="show_popup_menu(event,[[".zbx_jsvalue(_('Scripts')).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus."],180);";
 
-		$host = new CSpan($row['host']);
+		$host = new CSpan($row['host'],'link_menu');
 		$host->setAttribute('onclick','javascript: '.$menus);
 		$host->setAttribute('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
@@ -145,7 +145,7 @@ include_once('include/page_header.php');
 			$tr_conf_link = "['".S_CONFIGURATION_OF_TRIGGERS."',\"javascript: redirect('triggers.php?form=update&triggerid=".$row['triggerid']."&hostid=".$row['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 
 
-		$tr_desc = new CSpan($description,'pointer');
+		$tr_desc = new CSpan($description,'link_menu');
 		$tr_desc->addAction('onclick',"create_mon_trigger_menu(event, ".
 										" new Array({'triggerid': '".$row['triggerid']."', 'lastchange': '".$row['lastchange']."'},".$tr_conf_link."),".
 										zbx_jsvalue($row['items'], true).");");
@@ -154,7 +154,7 @@ include_once('include/page_header.php');
 			get_node_name_by_elid($row['triggerid']),
 			$host,
 			$tr_desc,
-			new CCol(get_severity_description($row['priority']),get_severity_style($row['priority'])),
+			getSeverityCell($row['priority']),
 			$row['cnt_event'],
 		));
 	}

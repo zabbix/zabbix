@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ class CTag extends CObject{
 			$this->addItem($body);
 		}
 
-		$this->setAttribute('class', $class);
+		$this->addClass($class);
 	}
 
 	public function showStart(){	echo $this->startToString();}
@@ -118,6 +118,14 @@ class CTag extends CObject{
 	return $this->attributes['class'];
 	}
 
+// jQuery style alias
+	public function attr($name, $value=null){
+		if(is_null($value))
+			$this->getAttribute($name);
+		else
+			$this->setAttribute($name, $value);
+	}
+
 	public function getAttribute($name){
 		$ret = NULL;
 		if(isset($this->attributes[$name]))
@@ -127,13 +135,17 @@ class CTag extends CObject{
 	}
 
 	public function setAttribute($name, $value){
-		if(is_object($value)){
-			$this->attributes[$name] = unpack_object($value);
-		}
-		else if(isset($value))
-			$this->attributes[$name] = htmlspecialchars(str_replace(array("\r", "\n"), '', strval($value)), ENT_COMPAT, 'UTF-8');
+		if(is_object($value))
+			$value = unpack_object($value);
+
+		if(!is_null($value))
+			$this->attributes[$name] = $value;
 		else
-			unset($this->attributes[$name]);
+			$this->removeAttribute($name);
+	}
+
+	public function removeAttr($name){
+		$this->removeAttribute($name);
 	}
 
 	public function removeAttribute($name){
@@ -147,6 +159,7 @@ class CTag extends CObject{
 	public function setHint($text, $width='', $class='', $byclick=true){
 		if(empty($text)) return false;
 
+		encodeValues($text);
 		$text = unpack_object($text);
 
 		$this->addAction('onmouseover',	"javascript: hintBox.showOver(event,this,".zbx_jsvalue($text).",'".$width."','".$class."');");
@@ -183,8 +196,8 @@ class CTag extends CObject{
 		return 1;
 	}
 
-	public function getForm($action=NULL, $method='post', $enctype=NULL){
-		$form = new CForm($action, $method, $enctype);
+	public function getForm($method='post', $action=null, $enctype=null){
+		$form = new CForm($method, $action, $enctype);
 		$form->addItem($this);
 	return $form;
 	}

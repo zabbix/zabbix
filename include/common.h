@@ -1,6 +1,6 @@
 /*
-** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -117,8 +117,8 @@
 #define OFF	0
 
 #define	APPLICATION_NAME	"Zabbix Agent"
-#define	ZABBIX_REVDATE		"28 December 2010"
-#define	ZABBIX_VERSION		"1.9.2"
+#define	ZABBIX_REVDATE		"28 March 2011"
+#define	ZABBIX_VERSION		"1.9.4"
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
 #if defined(_WINDOWS)
@@ -149,14 +149,16 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #define	NETWORK_ERROR	(-3)
 #define	TIMEOUT_ERROR	(-4)
 #define	AGENT_ERROR	(-5)
+#define	PROXY_ERROR	(-6)
 const char	*zbx_result_string(int result);
 
+#define MAX_ID_LEN	21
 #define MAX_STRING_LEN	2048
 #define MAX_BUFFER_LEN	65536
 
 #define ZBX_DM_DELIMITER	'\255'
 
-typedef struct zbx_timespec
+typedef struct
 {
 	int	sec;	/* seconds */
 	int	ns;	/* nanoseconds */
@@ -181,16 +183,19 @@ typedef enum
 	ITEM_TYPE_IPMI,
 	ITEM_TYPE_SSH,
 	ITEM_TYPE_TELNET,
-	ITEM_TYPE_CALCULATED
+	ITEM_TYPE_CALCULATED,
+	ITEM_TYPE_JMX
 }
 zbx_item_type_t;
+const char	*zbx_host_type_string(zbx_item_type_t item_type);
 
 typedef enum
 {
 	INTERFACE_TYPE_UNKNOWN = 0,
 	INTERFACE_TYPE_AGENT,
 	INTERFACE_TYPE_SNMP,
-	INTERFACE_TYPE_IPMI
+	INTERFACE_TYPE_IPMI,
+	INTERFACE_TYPE_JMX
 }
 zbx_interface_type_t;
 const char	*zbx_interface_type_string(zbx_interface_type_t type);
@@ -249,8 +254,10 @@ typedef enum
 {
 	ITEM_DATA_TYPE_DECIMAL = 0,
 	ITEM_DATA_TYPE_OCTAL,
-	ITEM_DATA_TYPE_HEXADECIMAL
+	ITEM_DATA_TYPE_HEXADECIMAL,
+	ITEM_DATA_TYPE_BOOLEAN
 } zbx_item_data_type_t;
+const char	*zbx_item_data_type_string(zbx_item_data_type_t data_type);
 
 /* HTTP test states */
 typedef enum
@@ -552,16 +559,13 @@ typedef enum
 #define TRIGGER_VALUE_CHANGED_YES	1
 
 /* Trigger severity */
-typedef enum
-{
-	TRIGGER_SEVERITY_NOT_CLASSIFIED = 0,
-	TRIGGER_SEVERITY_INFORMATION,
-	TRIGGER_SEVERITY_WARNING,
-	TRIGGER_SEVERITY_AVERAGE,
-	TRIGGER_SEVERITY_HIGH,
-	TRIGGER_SEVERITY_DISASTER
-} zbx_trigger_severity_t;
-const char	*zbx_trigger_severity_string(zbx_trigger_severity_t severity);
+#define TRIGGER_SEVERITY_NOT_CLASSIFIED	0
+#define TRIGGER_SEVERITY_INFORMATION	1
+#define TRIGGER_SEVERITY_WARNING	2
+#define TRIGGER_SEVERITY_AVERAGE	3
+#define TRIGGER_SEVERITY_HIGH		4
+#define TRIGGER_SEVERITY_DISASTER	5
+#define TRIGGER_SEVERITY_COUNT		6	/* number of trigger severities */
 
 typedef enum
 {
@@ -641,16 +645,32 @@ const char	*zbx_permission_string(int perm);
 #define	ZBX_NODE_SLAVE	1
 const char	*zbx_nodetype_string(unsigned char nodetype);
 
+typedef struct
+{
+	unsigned char	type;
+	unsigned char	execute_on;
+	char		*port;
+	unsigned char	authtype;
+	char		*username;
+	char		*password;
+	char		*publickey;
+	char		*privatekey;
+	char		*command;
+	zbx_uint64_t	scriptid;
+}
+zbx_script_t;
+
+#define ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT	0
+#define ZBX_SCRIPT_TYPE_IPMI		1
+#define ZBX_SCRIPT_TYPE_SSH		2
+#define ZBX_SCRIPT_TYPE_TELNET		3
+#define ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT	4
+
+#define ZBX_SCRIPT_EXECUTE_ON_AGENT	0
+#define ZBX_SCRIPT_EXECUTE_ON_SERVER	1
+
 #define POLLER_DELAY		5
 #define DISCOVERER_DELAY	60
-
-#define	ZBX_NO_POLLER			255
-#define	ZBX_POLLER_TYPE_NORMAL		0
-#define	ZBX_POLLER_TYPE_UNREACHABLE	1
-#define	ZBX_POLLER_TYPE_IPMI		2
-#define	ZBX_POLLER_TYPE_PINGER		3
-#define	ZBX_POLLER_TYPE_COUNT		4	/* number of poller types */
-const char	*zbx_poller_type_string(int poller_type);
 
 #define	GET_SENDER_TIMEOUT	60
 
@@ -663,11 +683,13 @@ const char	*zbx_poller_type_string(int poller_type);
 #endif
 
 #define zbx_malloc(old, size)	zbx_malloc2(__FILE__, __LINE__, old, size)
-#define zbx_realloc(src, size)	zbx_realloc2(__FILE__, __LINE__, src, size)
+#define zbx_realloc(old, size)	zbx_realloc2(__FILE__, __LINE__, old, size)
 #define zbx_strdup(old, str)	zbx_strdup2(__FILE__, __LINE__, old, str)
 
+#define ZBX_STRDUP(var, str)	(var = zbx_strdup(var, str))
+
 void    *zbx_malloc2(const char *filename, int line, void *old, size_t size);
-void    *zbx_realloc2(const char *filename, int line, void *src, size_t size);
+void    *zbx_realloc2(const char *filename, int line, void *old, size_t size);
 char    *zbx_strdup2(const char *filename, int line, char *old, const char *str);
 
 #define zbx_free(ptr)		\
@@ -745,6 +767,7 @@ int	is_uint(const char *c);
 int	is_int_prefix(const char *c);
 int	is_uint64(const char *str, zbx_uint64_t *value);
 int	is_ushort(const char *str, unsigned short *value);
+int	is_boolean(const char *str, zbx_uint64_t *value);
 int	is_uoct(const char *str);
 int	is_uhex(const char *str);
 int	is_hex_string(const char *str);
@@ -768,8 +791,8 @@ const char	*get_string(const char *p, char *buf, size_t bufsize);
 int	get_key_param(char *param, int num, char *buf, int maxlen);
 int	num_key_param(char *param);
 char	*dyn_escape_param(const char *src);
-int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay,
-		const char *delay_flex, time_t now, int *effective_delay);
+int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int item_type,
+		int delay, const char *flex_intervals, time_t now, int *effective_delay);
 time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t now);
 int	check_time_period(const char *period, time_t now);
 char	zbx_num2hex(u_char c);
@@ -790,6 +813,10 @@ int	str_in_list(const char *list, const char *value, char delimiter);
 #	define zbx_setproctitle __zbx_zbx_setproctitle
 #endif /* HAVE___VA_ARGS__ */
 void	__zbx_zbx_setproctitle(const char *fmt, ...);
+
+#define ZBX_KIBIBYTE		1024
+#define ZBX_MEBIBYTE		1048576
+#define ZBX_GIBIBYTE		1073741824
 
 #define SEC_PER_MIN		60
 #define SEC_PER_HOUR		3600
@@ -860,18 +887,18 @@ int	comms_parse_response(char *xml, char *host, int host_len, char *key, int key
 
 int 	parse_command(const char *command, char *cmd, int cmd_max_len, char *param, int param_max_len);
 
-typedef struct zbx_regexp_s
+typedef struct
 {
 	char			*name;
 	char			*expression;
 	int			expression_type;
 	char			exp_delimiter;
 	zbx_case_sensitive_t	case_sensitive;
-} ZBX_REGEXP;
+}
+ZBX_REGEXP;
 
 /* Regular expressions */
 char    *zbx_regexp_match(const char *string, const char *pattern, int *len);
-/* Non case sensitive */
 char    *zbx_iregexp_match(const char *string, const char *pattern, int *len);
 
 void	clean_regexps_ex(ZBX_REGEXP *regexps, int *regexps_num);
@@ -902,8 +929,8 @@ char	*zbx_age2str(int age);
 char	*zbx_date2str(time_t date);
 char	*zbx_time2str(time_t time);
 
-/* Return the needle in the haystack (or NULL). */
 char	*zbx_strcasestr(const char *haystack, const char *needle);
+int	zbx_mismatch(const char *s1, const char *s2);
 int	starts_with(const char *str, const char *prefix);
 int	cmp_key_id(const char *key_1, const char *key_2);
 
@@ -922,6 +949,7 @@ LPSTR	zbx_unicode_to_utf8(LPCTSTR wide_string);
 int	zbx_unicode_to_utf8_static(LPCTSTR wide_string, LPSTR utf8_string, int utf8_size);
 int	_wis_uint(LPCTSTR wide_string);
 #endif
+void	zbx_strlower(char *str);
 void	zbx_strupper(char *str);
 #if defined(_WINDOWS) || defined(HAVE_ICONV)
 char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);
@@ -932,7 +960,7 @@ int	zbx_strlen_utf8(const char *text);
 char	*zbx_replace_utf8(const char *text);
 void	zbx_replace_invalid_utf8(char *text);
 
-void	win2unix_eol(char *text);
+void	dos2unix(char *str);
 int	str2uint(const char *str);
 int	str2uint64(char *str, zbx_uint64_t *value);
 double	str2double(const char *str);
@@ -943,7 +971,7 @@ int	__zbx_open(const char *pathname, int flags);
 #endif	/* _WINDOWS && _UNICODE */
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
 
-int	MAIN_ZABBIX_ENTRY(void);
+int	MAIN_ZABBIX_ENTRY();
 
 zbx_uint64_t	zbx_letoh_uint64(zbx_uint64_t data);
 zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data);
@@ -963,5 +991,7 @@ int	parse_host_key(char *exp, char **host, char **key);
 void	make_hostname(char *host);
 
 unsigned char	get_interface_type_by_item_type(unsigned char type);
+
+int	calculate_sleeptime(int nextcheck, int max_sleeptime);
 
 #endif

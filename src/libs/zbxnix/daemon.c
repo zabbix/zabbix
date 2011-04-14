@@ -1,6 +1,6 @@
 /*
-** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@
 #include "common.h"
 #include "daemon.h"
 
-#include "mutexs.h"
 #include "pid.h"
 #include "cfg.h"
 #include "log.h"
@@ -36,7 +35,7 @@ static int	exiting = 0;
 #define CHECKED_FIELD(siginfo, field)			(NULL == siginfo ? -1 : siginfo->field)
 #define CHECKED_FIELD_TYPE(siginfo, field, type)	(NULL == siginfo ? (type)-1 : siginfo->field)
 
-void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
+static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
 	if (NULL == siginfo)
 		zabbix_log(LOG_LEVEL_DEBUG, "Received [signal:%d(%s)] with NULL siginfo.",
@@ -150,106 +149,86 @@ int	daemon_start(int allow_root)
 	struct sigaction	phan;
 	char			user[7] = "zabbix";
 
-	/* running as root ?*/
-	if((0 == allow_root) && (0 == getuid() || 0 == getgid()))
+	if (0 == allow_root && (0 == getuid() || 0 == getgid())) /* running as root? */
 	{
 		pwd = getpwnam(user);
+
 		if (NULL == pwd)
 		{
-			zbx_error("User %s does not exist.",
-				user);
-			zbx_error("Cannot run as root !");
+			zbx_error("user %s does not exist", user);
+			zbx_error("cannot run as root!");
 			exit(FAIL);
 		}
-		if(setgid(pwd->pw_gid) == -1)
+
+		if (-1 == setgid(pwd->pw_gid))
 		{
-			zbx_error("Cannot setgid to %s [%s].",
-				user,
-				strerror(errno));
+			zbx_error("cannot setgid to %s [%s]", user, strerror(errno));
 			exit(FAIL);
 		}
+
 #ifdef HAVE_FUNCTION_INITGROUPS
-		if(initgroups(user, pwd->pw_gid) == -1)
+		if (-1 == initgroups(user, pwd->pw_gid))
 		{
-			zbx_error("Cannot initgroups to %s [%s].",
-				user,
-				strerror(errno));
+			zbx_error("cannot initgroups to %s [%s]", user, strerror(errno));
 			exit(FAIL);
 		}
 #endif /* HAVE_FUNCTION_INITGROUPS */
-		if(setuid(pwd->pw_uid) == -1)
+
+		if (-1 == setuid(pwd->pw_uid))
 		{
-			zbx_error("Cannot setuid to %s [%s].",
-				user,
-				strerror(errno));
+			zbx_error("cannot setuid to %s [%s]", user, strerror(errno));
 			exit(FAIL);
 		}
 
 #ifdef HAVE_FUNCTION_SETEUID
-		if( (setegid(pwd->pw_gid) ==-1) || (seteuid(pwd->pw_uid) == -1) )
+		if (-1 == setegid(pwd->pw_gid) || -1 == seteuid(pwd->pw_uid))
 		{
-			zbx_error("Cannot setegid or seteuid to zabbix [%s].", strerror(errno));
+			zbx_error("cannot setegid or seteuid to %s [%s]", user, strerror(errno));
 			exit(FAIL);
 		}
 #endif /* HAVE_FUNCTION_SETEUID */
-
 	}
 
-	if( (pid = zbx_fork()) != 0 )
-	{
-		exit( 0 );
-	}
+	if (0 != (pid = zbx_fork()))
+		exit(0);
 
 	setsid();
 
-	signal( SIGHUP, SIG_IGN );
+	signal(SIGHUP, SIG_IGN);
 
-	if( (pid = zbx_fork()) !=0 )
-	{
-		exit( 0 );
-	}
+	if (0 != (pid = zbx_fork()))
+		exit(0);
 
-	/* This is to eliminate warning: ignoring return value of chdir */
-	if(-1 == chdir("/"))
-	{
+	if (-1 == chdir("/")) /* this is to eliminate warning: ignoring return value of chdir */
 		assert(0);
-	}
+
 	umask(0002);
 
 	redirect_std(CONFIG_LOG_FILE);
 
 #ifdef HAVE_SYS_RESOURCE_SETPRIORITY
-
-	if(setpriority(PRIO_PROCESS,0,5)!=0)
-	{
+	if (0 != setpriority(PRIO_PROCESS, 0, 5))
 		zbx_error("Unable to set process priority to 5. Leaving default.");
-	}
-
 #endif /* HAVE_SYS_RESOURCE_SETPRIORITY */
 
-/*------------------------------------------------*/
-
-	if( FAIL == create_pid_file(CONFIG_PID_FILE))
-	{
+	if (FAIL == create_pid_file(CONFIG_PID_FILE))
 		exit(FAIL);
-	}
 
 	parent_pid = (int)getpid();
 
-/*	phan.sa_handler = child_signal_handler;*/
 	phan.sa_sigaction = child_signal_handler;
 	sigemptyset(&phan.sa_mask);
 	phan.sa_flags = SA_SIGINFO;
 
-	sigaction(SIGINT,	&phan, NULL);
-	sigaction(SIGQUIT,	&phan, NULL);
-	sigaction(SIGTERM,	&phan, NULL);
-	sigaction(SIGPIPE,	&phan, NULL);
+	sigaction(SIGINT, &phan, NULL);
+	sigaction(SIGQUIT, &phan, NULL);
+	sigaction(SIGTERM, &phan, NULL);
+	sigaction(SIGPIPE, &phan, NULL);
 
-	sigaction(SIGILL,	&phan, NULL);
-	sigaction(SIGFPE,	&phan, NULL);
-	sigaction(SIGSEGV,	&phan, NULL);
-	sigaction(SIGBUS,	&phan, NULL);
+	sigaction(SIGILL, &phan, NULL);
+	sigaction(SIGFPE, &phan, NULL);
+	sigaction(SIGSEGV, &phan, NULL);
+	sigaction(SIGBUS, &phan, NULL);
 
 	zbx_setproctitle("main process");
 
@@ -261,17 +240,24 @@ void	daemon_stop()
 	drop_pid_file(CONFIG_PID_FILE);
 }
 
-void	init_main_process()
+void	set_parent_signal_handler()
 {
 	struct sigaction	phan;
 
-	parent = 1; /* signalize signal_handler that this process is a PARENT process */
+	parent = 1; /* signalize signal handler that this process is a PARENT process */
 
-/*	phan.sa_handler = parent_signal_handler;*/
 	phan.sa_sigaction = parent_signal_handler;
 	sigemptyset(&phan.sa_mask);
 	phan.sa_flags = SA_SIGINFO;
+	sigaction(SIGCHLD, &phan, NULL); /* for parent only, to avoid problems with EXECUTE_INT/DBL/STR and others */
+}
 
-	/* For parent only. To avoid problems with EXECUTE_INT */
-	sigaction(SIGCHLD,	&phan, NULL);
+void	set_child_signal_handler()
+{
+	struct sigaction	phan;
+
+	phan.sa_sigaction = child_signal_handler;
+	sigemptyset(&phan.sa_mask);
+	phan.sa_flags = SA_SIGINFO;
+	sigaction(SIGALRM, &phan, NULL);
 }

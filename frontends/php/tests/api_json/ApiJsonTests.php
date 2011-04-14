@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 require_once(dirname(__FILE__).'/APIInfo.php');
 require_once(dirname(__FILE__).'/General.php');
 require_once(dirname(__FILE__).'/User.php');
+require_once(dirname(__FILE__).'/CHost.php');
 
 class ApiJsonTests
 {
@@ -32,6 +33,7 @@ class ApiJsonTests
 		$suite->addTestSuite('API_JSON_APIInfo');
 		$suite->addTestSuite('API_JSON_General');
 		$suite->addTestSuite('API_JSON_User');
+		$suite->addTestSuite('API_JSON_Host');
 
 		return $suite;
 	}

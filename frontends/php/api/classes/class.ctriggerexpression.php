@@ -83,9 +83,9 @@ private $allowed;
 		if(zbx_empty($item))
 			throw new Exception('Empty item key "'.$item.'" is used in expression.');
 
-		$itemCheck = check_item_key($item);
-		if(!$itemCheck['valid'])
-			throw new Exception('Incorrect item key "'.$item.'" is used in expression. '.$itemCheck['description']);
+		$itemKey = new cItemKey($item);
+		if(!$itemKey->isValid())
+			throw new Exception('Incorrect item key "'.$item.'" is used in expression. '.$itemKey->getError());
 	}
 
 	public function checkFunction($expression){
@@ -233,6 +233,7 @@ private $allowed;
 
 				$this->data['hosts'][] = $expr['host'];
 				$this->data['items'][] = $expr['item'];
+				$this->data['itemParams'][] = $expr['itemParam'];
 				$this->data['functions'][] = $expr['functionName'];
 				$this->data['functionParams'][] = $expr['functionParam'];
 
@@ -672,7 +673,7 @@ private $allowed;
 
 		$this->errors = array();
 		$this->expressions = array();
-		$this->data = array('hosts'=>array(),'usermacros'=>array(),'macros'=>array(),'items'=>array(),'functions'=>array());
+		$this->data = array('hosts'=>array(),'usermacros'=>array(),'macros'=>array(),'items'=>array(),'itemParams'=>array(),'functions'=>array(),'functionParams'=>array());
 
 		$this->newExpr = array(
 			'part' => array(

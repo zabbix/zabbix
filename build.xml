@@ -57,6 +57,9 @@
 		<exec executable="make" dir="${builddir}" failonerror="on">
 			<arg line="dbschema"/>
 		</exec>
+		<exec executable="make" dir="${builddir}" failonerror="on">
+			<arg line="dist"/>
+		</exec>
 	</target>
 
 	<target name="init-sqlite3" depends="init-common">
@@ -102,26 +105,32 @@
 		<!-- Create PostgreSQL database -->
 		<exec executable="psql" failonerror="on">
 			<arg line="-1"/>
+			<arg line="--set ON_ERROR_STOP=1"/>
 			<arg line="template1 -c 'drop database if exists ${dbname};'"/>
 		</exec>
 		<exec executable="psql" failonerror="on">
 			<arg line="-1"/>
+			<arg line="--set ON_ERROR_STOP=1"/>
 			<arg line="template1 -c 'create database ${dbname};'"/>
 		</exec>
 		<exec executable="psql" input="${builddir}/create/schema/postgresql.sql" failonerror="on">
 			<arg line="-1"/>
+			<arg line="--set ON_ERROR_STOP=1"/>
 			<arg line="${dbname}"/>
 		</exec>
 		<exec executable="psql" input="${builddir}/create/data/images_postgresql.sql" failonerror="on">
 			<arg line="-1"/>
+			<arg line="--set ON_ERROR_STOP=1"/>
 			<arg line="${dbname}"/>
 		</exec>
 		<exec executable="psql" input="${builddir}/create/data/data.sql" failonerror="on">
 			<arg line="-1"/>
+			<arg line="--set ON_ERROR_STOP=1"/>
 			<arg line="${dbname}"/>
 		</exec>
 		<exec executable="psql" input="${builddir}/tests/data/data_test.sql" failonerror="on">
 			<arg line="-1"/>
+			<arg line="--set ON_ERROR_STOP=1"/>
 			<arg line="${dbname}"/>
 		</exec>
 

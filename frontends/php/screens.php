@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,9 +36,6 @@
 	}
 
 	include_once('include/page_header.php');
-
-// js templates
-require_once('include/templates/scriptConfirm.js.php');
 
 ?>
 <?php
@@ -117,17 +114,19 @@ require_once('include/templates/scriptConfirm.js.php');
 	}
 ?>
 <?php
+// js templates
+	require_once('include/templates/scriptConfirm.js.php');
 
-	//whether we should use screen name to fetch a screen (if this is false, elementid is used)
+// whether we should use screen name to fetch a screen (if this is false, elementid is used)
 	$use_screen_name = isset($_REQUEST['screenname']);
 
-	// getting element id from GET parameters
+// getting element id from GET parameters
 	$elementid = $_REQUEST['elementid'] = get_request('elementid', false);
-	//if none is provided
+// if none is provided
 	if($elementid === false && !$use_screen_name){
-		//get element id saved in profile from the last visit
+// get element id saved in profile from the last visit
 		$elementid = CProfile::get('web.screens.elementid', null);
-		//this flag will be used in case this element does not exist
+// this flag will be used in case this element does not exist
 		$id_has_been_fetched_from_profile = true;
 	}
 	else{
@@ -147,7 +146,7 @@ require_once('include/templates/scriptConfirm.js.php');
 	$formHeader->addItem($cmbConfig);
 
 
-	$screens = CScreen::get(array(
+	$screens = API::Screen()->get(array(
 		'nodeids' => get_current_nodeid(),
 		'output' => API_OUTPUT_EXTEND,
 		'select_screenitems' => API_OUTPUT_EXTEND
@@ -215,7 +214,7 @@ require_once('include/templates/scriptConfirm.js.php');
 
 
 // HEADER {{{
-		$form = new CForm(null, 'get');
+		$form = new CForm('get');
 		$form->addVar('fullscreen', $_REQUEST['fullscreen']);
 
 		$cmbElements = new CComboBox('elementid', $screen['screenid'], 'submit()');

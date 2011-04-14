@@ -1,3 +1,4 @@
+/.aly_data.sql.swp
 /.buildpath
 /.project
 /.settings
@@ -19,6 +20,10 @@ build/win32/project/resource.res
 /configure
 create/Makefile
 create/Makefile.in
+create/images/inkscape.log.txt
+create/images/output_png
+create/images/pngcrush.log.txt
+create/images/pngcrushoutput.txt
 create/schema/ibm_db2.sql
 create/schema/mysql.sql
 create/schema/oracle.sql
@@ -32,6 +37,7 @@ frontends/php/images/general/*.db
 frontends/php/images/general/bar/*.db
 frontends/php/images/general/bttn/*.db
 frontends/php/images/general/tree/*.db
+frontends/php/images/gradients/*.db
 frontends/php/locale/POTFILES.in
 frontends/php/locale/cs/LC_MESSAGES/frontend.mo
 frontends/php/locale/de/LC_MESSAGES/frontend.mo
@@ -51,6 +57,7 @@ frontends/php/locale/sk/LC_MESSAGES/frontend.mo
 frontends/php/locale/sv/LC_MESSAGES/frontend.mo
 frontends/php/locale/uk/LC_MESSAGES/frontend.mo
 frontends/php/locale/zh_CN/LC_MESSAGES/frontend.mo
+frontends/php/tests/bootstrap.php
 include/config.h
 include/config.h.in
 include/stamp-h1
@@ -114,9 +121,9 @@ src/libs/zbxmemory/Makefile.in
 src/libs/zbxnix/.deps
 src/libs/zbxnix/Makefile
 src/libs/zbxnix/Makefile.in
-src/libs/zbxplugin/.deps
-src/libs/zbxplugin/Makefile
-src/libs/zbxplugin/Makefile.in
+src/libs/zbxself/.deps
+src/libs/zbxself/Makefile
+src/libs/zbxself/Makefile.in
 src/libs/zbxserver/.deps
 src/libs/zbxserver/Makefile
 src/libs/zbxserver/Makefile.in
@@ -171,6 +178,11 @@ src/zabbix_get/.deps
 src/zabbix_get/Makefile
 src/zabbix_get/Makefile.in
 src/zabbix_get/zabbix_get
+src/zabbix_java/.deps
+src/zabbix_java/Makefile
+src/zabbix_java/Makefile.in
+src/zabbix_java/bin/zabbix-java-proxy-*.jar
+src/zabbix_java/class
 src/zabbix_proxy/.deps
 src/zabbix_proxy/Makefile
 src/zabbix_proxy/Makefile.in
@@ -227,6 +239,9 @@ src/zabbix_server/poller/Makefile.in
 src/zabbix_server/proxypoller/.deps
 src/zabbix_server/proxypoller/Makefile
 src/zabbix_server/proxypoller/Makefile.in
+src/zabbix_server/selfmon/.deps
+src/zabbix_server/selfmon/Makefile
+src/zabbix_server/selfmon/Makefile.in
 src/zabbix_server/timer/.deps
 src/zabbix_server/timer/Makefile
 src/zabbix_server/timer/Makefile.in

@@ -1,6 +1,6 @@
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,8 +19,10 @@
 
 #include "common.h"
 #include "checks_internal.h"
+#include "checks_java.h"
 #include "log.h"
 #include "dbcache.h"
+#include "zbxself.h"
 
 /******************************************************************************
  *                                                                            *
@@ -44,7 +46,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	zbx_uint64_t	i;
 	char		params[MAX_STRING_LEN], *error = NULL;
 	char		tmp[MAX_STRING_LEN], tmp1[HOST_HOST_LEN_MAX];
-	int		nparams;
+	int		nparams, lastaccess;
 
 	init_result(result);
 
@@ -104,7 +106,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		i = DBget_row_count(tmp);
 		SET_UI64_RESULT(result, i);
 	}
-	else if (0 == strcmp(tmp, "queue"))		/* zabbix["queue"<,from><,to>] */
+	else if (0 == strcmp(tmp, "queue"))		/* zabbix["queue",<from>,<to>] */
 	{
 		int	from = 6, to = (-1);
 
@@ -117,7 +119,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 				goto not_supported;
 			else if (*tmp != '\0' && is_uint_prefix(tmp) == FAIL)
 			{
-				error = zbx_dsprintf(error, "Second argument is badly formatted");
+				error = zbx_strdup(error, "Second parameter is badly formatted");
 				goto not_supported;
 			}
 			else
@@ -130,7 +132,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 				goto not_supported;
 			else if (*tmp != '\0' && is_uint_prefix(tmp) == FAIL)
 			{
-				error = zbx_dsprintf(error, "Third argument is badly formatted");
+				error = zbx_strdup(error, "Third parameter is badly formatted");
 				goto not_supported;
 			}
 			else
@@ -139,7 +141,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 		if (from > to && -1 != to)
 		{
-			error = zbx_dsprintf(error, "Arguments represent an invalid interval");
+			error = zbx_strdup(error, "Parameters represent an invalid interval");
 			goto not_supported;
 		}
 
@@ -182,13 +184,117 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 		if (0 == strcmp(tmp, "lastaccess"))
 		{
-			if (FAIL == (i = DBget_proxy_lastaccess(tmp1)))
+			if (FAIL == DBget_proxy_lastaccess(tmp1, &lastaccess, &error))
 				goto not_supported;
 		}
 		else
 			goto not_supported;
 
-		SET_UI64_RESULT(result, i);
+		SET_UI64_RESULT(result, lastaccess);
+	}
+	else if (0 == strcmp(tmp, "java"))		/* zabbix["java",...] */
+	{
+		int	res;
+
+		alarm(CONFIG_TIMEOUT);
+		res = get_value_java(ZBX_JAVA_PROXY_REQUEST_INTERNAL, item, result);
+		alarm(0);
+
+		if (SUCCEED != res)
+			goto not_supported;
+	}
+	else if (0 == strcmp(tmp, "process"))		/* zabbix["process",<type>,<mode>,<state>] */
+	{
+		unsigned char	process_type;
+		int		process_forks;
+		double		value;
+
+		if (nparams > 4)
+		{
+			error = zbx_strdup(error, "Too many parameters");
+			goto not_supported;
+		}
+
+		if (0 != get_param(params, 2, tmp, sizeof(tmp)))
+		{
+			error = zbx_strdup(error, "Required second parameter missing");
+			goto not_supported;
+		}
+
+		for (process_type = 0; process_type < ZBX_PROCESS_TYPE_COUNT; process_type++)
+			if (0 == strcmp(tmp, get_process_type_string(process_type)))
+				break;
+
+		if (ZBX_PROCESS_TYPE_COUNT == process_type)
+		{
+			error = zbx_strdup(error, "Invalid second parameter");
+			goto not_supported;
+		}
+
+		process_forks = get_process_type_forks(process_type);
+
+		if (0 != get_param(params, 3, tmp, sizeof(tmp)))
+			*tmp = '\0';
+
+		if (0 == strcmp(tmp, "count"))
+		{
+			if (nparams > 3)
+			{
+				error = zbx_strdup(error, "Too many parameters");
+				goto not_supported;
+			}
+
+			SET_UI64_RESULT(result, process_forks);
+		}
+		else
+		{
+			unsigned char	aggr_func, state;
+			unsigned short	process_num = 0;
+
+			if ('\0' == *tmp || 0 == strcmp(tmp, "avg"))
+				aggr_func = ZBX_AGGR_FUNC_AVG;
+			else if (0 == strcmp(tmp, "max"))
+				aggr_func = ZBX_AGGR_FUNC_MAX;
+			else if (0 == strcmp(tmp, "min"))
+				aggr_func = ZBX_AGGR_FUNC_MIN;
+			else if (SUCCEED == is_ushort(tmp, &process_num) && process_num > 0)
+				aggr_func = ZBX_AGGR_FUNC_ONE;
+			else
+			{
+				error = zbx_strdup(error, "Invalid third parameter");
+				goto not_supported;
+			}
+
+			if (0 == process_forks)
+			{
+				error = zbx_dsprintf(error, "No \"%s\" processes started",
+						get_process_type_string(process_type));
+				goto not_supported;
+			}
+			else if (process_num > process_forks)
+			{
+				error = zbx_dsprintf(error, "\"%s\" #%d is not started",
+						get_process_type_string(process_type), process_num);
+				goto not_supported;
+			}
+
+			if (0 != get_param(params, 4, tmp, sizeof(tmp)))
+				*tmp = '\0';
+
+			if ('\0' == *tmp || 0 == strcmp(tmp, "busy"))
+				state = ZBX_PROCESS_STATE_BUSY;
+			else if (0 == strcmp(tmp, "idle"))
+				state = ZBX_PROCESS_STATE_IDLE;
+			else
+			{
+				error = zbx_strdup(error, "Invalid fourth parameter");
+				goto not_supported;
+			}
+
+			get_selfmon_stats(process_type, aggr_func, process_num, state, &value);
+
+			SET_DBL_RESULT(result, value);
+		}
 	}
 	else if (0 == strcmp(tmp, "wcache"))
 	{
@@ -291,11 +397,15 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		goto not_supported;
 
 	return SUCCEED;
-not_supported:
-	if (NULL == error)
-		error = zbx_dsprintf(error, "Internal check is not supported");
 
-	SET_MSG_RESULT(result, error);
+not_supported:
+	if (!ISSET_MSG(result))
+	{
+		if (NULL == error)
+			error = zbx_strdup(error, "Internal check is not supported");
+
+		SET_MSG_RESULT(result, error);
+	}
 
 	return NOTSUPPORTED;
 }

@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ if(isset($_REQUEST['execute'])){
 			' WHERE scriptid='.$scriptid;
 	$script_info = DBfetch(DBselect($sql));
 
-	$result = CScript::execute(array('hostid' => $hostid, 'scriptid' => $scriptid));
+	$result = API::Script()->execute(array('hostid' => $hostid, 'scriptid' => $scriptid));
 	if($result === false){
 		show_messages(false, '', S_SCRIPT_ERROR);
 	}

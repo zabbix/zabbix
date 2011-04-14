@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,14 +21,34 @@
 <?php
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testFormHost extends CWebTest
-{
+class testFormHost extends CWebTest{
+
+	// Returns all hosts
+	public static function allHosts(){
+		return DBdata('select * from hosts where status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')');
+	}
+
+	/**
+	* @dataProvider allHosts
+	*/
+
 	public $host = "Test host";
 
-	public function testFormHost_Create()
-	{
+	public function testFormHost_Layout(){
+		$this->login('hosts.php?form=1');
+
+		$this->click('link=Host profile');
+
+		$profileFields = getHostProfiles();
+		foreach($profileFields as $fieldId => $fieldName){
+			$this->ok($fieldName);
+			$this->assertElementPresent('host_profile['.$fieldId.']');
+		}
+	}
+
+	public function testFormHost_Create(){
 		$this->login('hosts.php');
-		$this->dropdown_select('groupid','Zabbix servers');
+		$this->dropdown_select_wait('groupid','Zabbix servers');
 		$this->button_click('form');
 		$this->wait();
 		$this->input_type('host',$this->host);
@@ -39,11 +59,10 @@ class testFormHost extends CWebTest
 		$this->ok($this->host);
 	}
 
-	public function testFormHost_CreateLongHostName()
-	{
+	public function testFormHost_CreateLongHostName(){
 		$host="01234567890123456789012345678901234567890123456789012345678901234";
 		$this->login('hosts.php');
-		$this->dropdown_select('groupid','Zabbix servers');
+		$this->dropdown_select_wait('groupid','Zabbix servers');
 		$this->button_click('form');
 		$this->wait();
 		$this->input_type('host',$host);
@@ -53,10 +72,9 @@ class testFormHost extends CWebTest
 		$this->ok('ERROR');
 	}
 
-	public function testFormHost_SimpleUpdate()
-	{
+	public function testFormHost_SimpleUpdate(){
 		$this->login('hosts.php');
-		$this->dropdown_select('groupid','Zabbix servers');
+		$this->dropdown_select_wait('groupid','Zabbix servers');
 		$this->click('link=Zabbix server');
 		$this->wait();
 		$this->button_click('save');
@@ -66,11 +84,10 @@ class testFormHost extends CWebTest
 		$this->ok($this->host);
 	}
 
-	public function testFormHost_UpdateHostName()
-	{
+	public function testFormHost_UpdateHostName(){
 		// Update Host
 		$this->login('hosts.php');
-		$this->dropdown_select('groupid','all');
+		$this->dropdown_select_wait('groupid','all');
 		$this->click('link='.$this->host);
 		$this->wait();
 		$this->input_type('host',$this->host.'2');
@@ -80,13 +97,27 @@ class testFormHost extends CWebTest
 		$this->ok('Host updated');
 	}
 
-	public function testFormHost_Delete()
-	{
+	public function testFormHost_CreateExistingHostNoGroups(){
+		// Attempt to create a host with a name that already exists and not add it to any groups
+		// In future should also check these conditions individually
+		$this->login('hosts.php');
+		$this->dropdown_select_wait('groupid','all');
+		$this->button_click('form');
+		$this->wait();
+		$this->input_type('host','Zabbix server');
+		$this->button_click('save');
+		$this->wait();
+		$this->assertTitle('Hosts');
+		$this->ok('No groups for host');
+		$this->assertEquals(1,DBcount("select * from hosts where host='Zabbix server'"));
+	}
+
+	public function testFormHost_Delete(){
 		$this->chooseOkOnNextConfirmation();
 
 		// Delete Host
 		$this->login('hosts.php');
-		$this->dropdown_select('groupid','all');
+		$this->dropdown_select_wait('groupid','all');
 		$this->click('link='.$this->host.'2');
 		$this->wait();
 		$this->button_click('delete');
@@ -96,11 +127,10 @@ class testFormHost extends CWebTest
 		$this->ok('Host deleted');
 	}
 
-	public function testFormHost_CloneHost()
-	{
-		// Update Host
+	public function testFormHost_CloneHost(){
+		// Clone Host
 		$this->login('hosts.php');
-		$this->dropdown_select('groupid','all');
+		$this->dropdown_select_wait('groupid','all');
 		$this->click('link=Zabbix server');
 		$this->wait();
 		$this->button_click('clone');
@@ -112,13 +142,12 @@ class testFormHost extends CWebTest
 		$this->ok('Host added');
 	}
 
-	public function testFormHost_DeleteClonedHost()
-	{
+	public function testFormHost_DeleteClonedHost(){
 		$this->chooseOkOnNextConfirmation();
 
 		// Delete Host
 		$this->login('hosts.php');
-		$this->dropdown_select('groupid','all');
+		$this->dropdown_select_wait('groupid','all');
 		$this->click('link='.$this->host.'2');
 		$this->wait();
 		$this->button_click('delete');
@@ -128,11 +157,10 @@ class testFormHost extends CWebTest
 		$this->ok('Host deleted');
 	}
 
-	public function testFormHost_FullCloneHost()
-	{
-		// Update Host
+	public function testFormHost_FullCloneHost(){
+		// Full clone Host
 		$this->login('hosts.php');
-		$this->dropdown_select('groupid','all');
+		$this->dropdown_select_wait('groupid','all');
 		$this->click('link=Zabbix server');
 		$this->wait();
 		$this->button_click('full_clone');
@@ -144,13 +172,12 @@ class testFormHost extends CWebTest
 		$this->ok('Host added');
 	}
 
-	public function testFormHost_DeleteFullClonedHost()
-	{
+	public function testFormHost_DeleteFullClonedHost(){
 		$this->chooseOkOnNextConfirmation();
 
 		// Delete Host
 		$this->login('hosts.php');
-		$this->dropdown_select('groupid','all');
+		$this->dropdown_select_wait('groupid','all');
 		$this->click('link='.$this->host.'_fullclone');
 		$this->wait();
 		$this->button_click('delete');
@@ -159,5 +186,82 @@ class testFormHost extends CWebTest
 		$this->assertTitle('Hosts');
 		$this->ok('Host deleted');
 	}
+
+	public function testFormHost_TemplateLink(){
+		$this->templateLink("Template linkage test host","Template_Linux");
+	}
+
+
+	public function testFormHost_TemplateUnlink(){
+		// Unlink a template from a host from host properties page
+
+		$template = "Template_Linux";
+		$host = "Template linkage test host";
+
+		$sql = "select hostid from hosts where host='".$host."' and status in (".HOST_STATUS_MONITORED.",".HOST_STATUS_NOT_MONITORED.")";
+		$this->assertEquals(1,DBcount($sql),"Chuck Norris: No such host:$host");
+		$row = DBfetch(DBselect($sql));
+		$hostid = $row['hostid'];
+
+		$this->login('hosts.php');
+		$this->dropdown_select_wait('groupid','all');
+		$this->click('link=Template linkage test host');
+		$this->wait();
+		$this->tab_switch("Templates");
+		$this->ok("$template");
+		// clicks button named "Unlink" next to a template by name
+		$this->click("xpath=//div[text()='$template']/../div[@class='dd']/input[@value='Unlink']");
+
+		$this->wait();
+		$this->nok("$template");
+		$this->button_click('save');
+		$this->wait();
+		$this->assertTitle('Hosts');
+		$this->ok('Host updated');
+
+		// this should be a separate test
+		// should check that items, triggers, graphs and applications are not linked to the template anymore
+		$this->href_click("items.php?filter_set=1&hostid=$hostid&sid=");
+		$this->wait();
+		$this->nok("$template");
+		// using "host navigation bar" at the top of entity list
+		$this->href_click("triggers.php?hostid=$hostid&sid=");
+		$this->wait();
+		$this->nok("$template");
+		$this->href_click("graphs.php?hostid=$hostid&sid=");
+		$this->wait();
+		$this->nok("$template");
+		$this->href_click("applications.php?hostid=$hostid&sid=");
+		$this->wait();
+		$this->nok("$template");
+	}
+
+	public function testFormHost_TemplateLinkUpdate(){
+		$this->templateLink("Template linkage test host","Template_Linux");
+	}
+
+	public function testFormHost_TemplateUnlinkAndClear(){
+		// Unlink and clear a template from a host from host properties page
+
+		$template = "Template_Linux";
+
+		$this->login('hosts.php');
+		$this->dropdown_select_wait('groupid','all');
+		$this->click('link=Template linkage test host');
+		$this->wait();
+		$this->tab_switch("Templates");
+		$this->ok("$template");
+
+		// clicks button named "Unlink and clear" next to template named $template
+		$this->click("xpath=//div[text()='$template']/../div[@class='dd']/input[@value='Unlink']/../input[@value='Unlink and clear']");
+
+		$this->wait();
+		$this->nok("$template");
+		$this->button_click('save');
+		$this->wait();
+		$this->assertTitle('Hosts');
+		$this->ok('Host updated');
+	}
+
 }
 ?>

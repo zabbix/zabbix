@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -98,7 +98,7 @@ class CZabbixTest extends PHPUnit_Framework_TestCase
 
 		$data = array(
 			'jsonrpc' => '2.0',
-			'method' => 'user.authenticate',
+			'method' => 'user.login',
 			'params' => array('user'=>'Admin', 'password'=>'zabbix'),
 			'id'=> $this->ID
 		);

@@ -1,12 +1,39 @@
-ALTER TABLE hosts_templates ALTER COLUMN hosttemplateid SET WITH DEFAULT NULL;
-REORG TABLE hosts_templates;
-ALTER TABLE hosts_templates ALTER COLUMN hostid SET WITH DEFAULT NULL;
-REORG TABLE hosts_templates;
-ALTER TABLE hosts_templates ALTER COLUMN templateid SET WITH DEFAULT NULL;
-REORG TABLE hosts_templates;
-DELETE FROM hosts_templates WHERE NOT hostid IN (SELECT hostid FROM hosts);
-DELETE FROM hosts_templates WHERE NOT templateid IN (SELECT hostid FROM hosts);
-ALTER TABLE hosts_templates ADD CONSTRAINT c_hosts_templates_1 FOREIGN KEY (hostid) REFERENCES hosts (hostid) ON DELETE CASCADE;
-REORG TABLE hosts_templates;
-ALTER TABLE hosts_templates ADD CONSTRAINT c_hosts_templates_2 FOREIGN KEY (templateid) REFERENCES hosts (hostid) ON DELETE CASCADE;
-REORG TABLE hosts_templates;
+DELETE FROM hosts_templates WHERE hostid NOT IN (SELECT hostid FROM hosts)
+/
+DELETE FROM hosts_templates WHERE templateid NOT IN (SELECT hostid FROM hosts)
+/
+
+CREATE TABLE t_hosts_templates (
+	hosttemplateid           bigint                                    NOT NULL,
+	hostid                   bigint                                    NOT NULL,
+	templateid               bigint                                    NOT NULL
+)
+/
+
+INSERT INTO t_hosts_templates (SELECT hosttemplateid, hostid, templateid FROM hosts_templates)
+/
+
+DROP TABLE hosts_templates
+/
+
+CREATE TABLE hosts_templates (
+	hosttemplateid           bigint                                    NOT NULL,
+	hostid                   bigint                                    NOT NULL,
+	templateid               bigint                                    NOT NULL,
+	PRIMARY KEY (hosttemplateid)
+)
+/
+CREATE UNIQUE INDEX hosts_templates_1 ON hosts_templates (hostid,templateid)
+/
+CREATE INDEX hosts_templates_2 ON hosts_templates (templateid)
+/
+ALTER TABLE hosts_templates ADD CONSTRAINT c_hosts_templates_1 FOREIGN KEY (hostid) REFERENCES hosts (hostid) ON DELETE CASCADE
+/
+ALTER TABLE hosts_templates ADD CONSTRAINT c_hosts_templates_2 FOREIGN KEY (templateid) REFERENCES hosts (hostid) ON DELETE CASCADE
+/
+
+INSERT INTO hosts_templates (SELECT hosttemplateid, hostid, templateid FROM t_hosts_templates)
+/
+
+DROP TABLE t_hosts_templates
+/

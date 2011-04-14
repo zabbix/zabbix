@@ -1,6 +1,6 @@
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -75,7 +75,7 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 		command = zbx_dsprintf(command, "%s/%s %s",
 				CONFIG_EXTERNALSCRIPTS, item->key, item->interface.addr);
 
-	if (SUCCEED == zbx_execute(command, &buf, error, sizeof(error)))
+	if (SUCCEED == zbx_execute(command, &buf, error, sizeof(error), CONFIG_TIMEOUT))
 	{
 		/* we only care about the first line */
 		if (NULL != (p = strchr(buf, '\n')))
@@ -88,8 +88,8 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Script returned nothing"));
 			ret = NOTSUPPORTED;
 		}
-		else
-			ret = set_result_type(result, item->value_type, item->data_type, buf);
+		else if (SUCCEED != set_result_type(result, item->value_type, item->data_type, buf))
+			ret = NOTSUPPORTED;
 	}
 	else
 	{

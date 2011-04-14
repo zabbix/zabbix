@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -92,7 +92,7 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 	$_REQUEST['groupid'] = $pageFilter->groupid;
 
 
-	$form = new CForm(null, 'get');
+	$form = new CForm('get');
 	$form->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB(true)));
 
 	$cmbType = new CComboBox('type', $_REQUEST['type'], 'submit()');
@@ -108,8 +108,9 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 		$help_table->addRow(array(new CCol(SPACE, 'normal'), S_DISABLED));
 	}
 
-	foreach(array(1,2,3,4,5) as $tr_severity)
-		$help_table->addRow(array(new CCol(get_severity_description($tr_severity),get_severity_style($tr_severity)),S_ENABLED));
+	for($i=0; $i<TRIGGER_SEVERITY_COUNT; $i++){
+		$help_table->addRow(array(getSeverityCell($i), S_ENABLED));
+	}
 
 	$help_table->addRow(array(new CCol(SPACE, 'unknown_trigger'), S_UNKNOWN));
 
@@ -136,7 +137,7 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 	$over_wdgt->addPageHeader(S_OVERVIEW_BIG, array($fs_icon, $help));
 
 // 2nd heder
-	$form_l = new CForm(null, 'get');
+	$form_l = new CForm('get');
 	$form_l->addVar('groupid',$_REQUEST['groupid']);
 
 	$cmbStyle = new CComboBox('view_style',$_REQUEST['view_style'],'submit()');

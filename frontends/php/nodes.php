@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -112,7 +112,7 @@
 
 	$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST, null, null, false);
 
-	$frmForm = new CForm(null, 'get');
+	$frmForm = new CForm('get');
 	$cmbConf = new CComboBox('config', 'nodes.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
 		$cmbConf->addItem('nodes.php', S_NODES);
 		$cmbConf->addItem('proxies.php', S_PROXIES);

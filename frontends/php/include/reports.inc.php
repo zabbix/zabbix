@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,8 +44,8 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 		$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid, null, ': ').$name);
 	}
 
-	$filterForm->addRow(S_GROUP,$cmbGroups);
-	$filterForm->addRow(S_HOST,$cmbHosts);
+	$filterForm->addRow(_('Template group'),$cmbGroups);
+	$filterForm->addRow(_('Template'),$cmbHosts);
 
 	if(1 == $config){
 		$cmbTrigs = new CComboBox('tpl_triggerid',get_request('tpl_triggerid',0),'submit()');
@@ -103,8 +103,8 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 					);
 		}
 
-		$filterForm->addRow(S_TRIGGER,$cmbTrigs);
-		$filterForm->addRow(S_FILTER.SPACE.S_HOST_GROUP,$cmbHGrps);
+		$filterForm->addRow(_('Template trigger'),$cmbTrigs);
+		$filterForm->addRow(_('Filter by host group'),$cmbHGrps);
 	}
 
 //*
@@ -304,7 +304,7 @@ function bar_report_form(){
 					url_param($gid,false,'gid').
 					'",550,400,"graph_item_form");');
 
-			$description = $host['host'].': '.item_description($item);
+			$description = $host['host'].': '.itemName($item);
 
 			$items_table->addRow(array(
 					new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
@@ -442,7 +442,7 @@ function bar_report_form2(){
 					url_param($gid,false,'gid').
 					'",550,400,"graph_item_form");');
 
-			$description = $host['host'].': '.item_description($item);
+			$description = $host['host'].': '.itemName($item);
 
 			$items_table->addRow(array(
 					new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
@@ -531,7 +531,7 @@ function bar_report_form3(){
 		'output' => 'extend'
 	);
 
-	$db_groups = CHostGroup::get($options);
+	$db_groups = API::HostGroup()->get($options);
 	order_result($db_groups, 'name');
 	foreach($db_groups as $gnum => $group){
 		$groupids[$group['groupid']] = $group['groupid'];
@@ -563,7 +563,7 @@ function bar_report_form3(){
 	if($groupid > 0){
 		$options['groupids'] = $groupid;
 	}
-	$db_hosts = CHost::get($options);
+	$db_hosts = API::Host()->get($options);
 	$db_hosts = zbx_toHash($db_hosts, 'hostid');
 	order_result($db_hosts, 'host');
 
@@ -576,7 +576,7 @@ function bar_report_form3(){
 		'output' => array('hostid', 'host'),
 		'hostids' => $hostids,
 	);
-	$db_hosts2 = CHost::get($options);
+	$db_hosts2 = API::Host()->get($options);
 	order_result($db_hosts2, 'host');
 	foreach($db_hosts2 as $hnum => $host){
 		if(!isset($db_hosts[$host['hostid']]))
@@ -678,15 +678,15 @@ function bar_report_form3(){
 	if(count($items) && ($items[0]['itemid'] > 0)){
 		$itemid = $items[0]['itemid'];
 		$description = get_item_by_itemid($itemid);
-		$description = item_description($description);
+		$description = itemName($description);
 	}
 	$reportForm->addVar('items[0][itemid]',$itemid);
 
-	$txtCondVal = new CTextBox('items[0][description]',$description,50,'yes');
+	$txtCondVal = new CTextBox('items[0][name]',$description,50,'yes');
 	$btnSelect = new CButton('btn1',S_SELECT,
 			"return PopUp('popup.php?dstfrm=".$reportForm->GetName().
-			"&dstfld1=items[0][itemid]&dstfld2=items[0][description]&".
-			"srctbl=items&srcfld1=itemid&srcfld2=description&monitored_hosts=1');",
+			"&dstfld1=items_0_itemid&dstfld2=items_0_description&".
+			"srctbl=items&srcfld1=itemid&srcfld2=name&monitored_hosts=1');",
 			'T');
 
 	$reportForm->addRow(S_ITEM , array($txtCondVal,$btnSelect));

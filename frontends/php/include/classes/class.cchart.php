@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -118,7 +118,7 @@ class CChart extends CGraphDraw{
 
 		$item = get_item_by_itemid($itemid);
 		$this->items[$this->num] = $item;
-		$this->items[$this->num]['description'] = item_description($item);
+		$this->items[$this->num]['name'] = itemName($item);
 		$this->items[$this->num]['delay'] = getItemDelay($item['delay'], $item['delay_flex']);
 
 		if(strpos($item['units'], ',') !== false)
@@ -460,7 +460,7 @@ class CChart extends CGraphDraw{
 
 				if($fnc_cnt['cnt'] != 1) continue;
 
-				CUserMacro::resolveTrigger($trigger);
+				$trigger = API::UserMacro()->resolveTrigger($trigger);
 				if(!preg_match('/\{([0-9]{1,})\}([\<\>\=]{1})([0-9\.]{1,})([K|M|G]{0,1})/i', $trigger['expression'], $arr)) continue;
 
 				$val = $arr[3];
@@ -471,22 +471,13 @@ class CChart extends CGraphDraw{
 				$minY = $this->m_minY[$this->items[$inum]['axisside']];
 				$maxY = $this->m_maxY[$this->items[$inum]['axisside']];
 
-				switch($trigger['priority']){
-					case TRIGGER_SEVERITY_DISASTER:	$color = 'Priority Disaster'; break;
-					case TRIGGER_SEVERITY_HIGH: $color = 'Priority High'; break;
-					case TRIGGER_SEVERITY_AVERAGE: $color = 'Priority Average'; break;
-					case TRIGGER_SEVERITY_WARNING: $color = 'Priority Warning'; break;
-					case TRIGGER_SEVERITY_INFORMATION: $color = 'Priority Information'; break;
-					default: $color = 'Priority';
-				}
-
-				array_push($this->triggers,array(
+				array_push($this->triggers, array(
 					'skipdraw' => ($val <= $minY || $val >= $maxY),
 					'y' => $this->sizeY - (($val-$minY) / ($maxY-$minY)) * $this->sizeY + $this->shiftY,
-					'color' => $color,
+					'color' => getSeverityColor($trigger['priority']),
 					'description' => S_TRIGGER.': '.expand_trigger_description_by_data($trigger),
 					'constant' => '['.$arr[2].' '.$arr[3].$arr[4].']'
-					));
+				));
 				++$cnt;
 			}
 		}
@@ -1639,8 +1630,8 @@ class CChart extends CGraphDraw{
 
 			$data = &$this->data[$this->items[$i]['itemid']][$this->items[$i]['calc_type']];
 
-			if($this->itemsHost) $item_caption = $this->items[$i]['description'];
-			else $item_caption = $this->items[$i]['host'].': '.$this->items[$i]['description'];
+			if($this->itemsHost) $item_caption = $this->items[$i]['name'];
+			else $item_caption = $this->items[$i]['host'].': '.$this->items[$i]['name'];
 
 			if(isset($data) && isset($data['min'])){
 				if($this->items[$i]['axisside'] == GRAPH_YAXIS_SIDE_LEFT)
@@ -1998,8 +1989,6 @@ class CChart extends CGraphDraw{
 		$start_time=getmicrotime();
 
 		set_image_header();
-
-		check_authorisation();
 
 		$this->selectData();
 

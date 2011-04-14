@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,11 +29,11 @@ class CFormList extends CDiv{
 		$this->formList = new CList(null, 'formlist');
 
 		parent::__construct();
-		$this->setAttribute('id', $id);
-		$this->setAttribute('class', $class);
+		$this->attr('id', zbx_formatDomId($id));
+		$this->attr('class', $class);
 	}
 
-	public function addRow($term, $description=null){
+	public function addRow($term, $description=null, $hidden=false){
 		$label = $term;
 		if(is_object($description)){
 			$inputClass = zbx_strtolower(get_class($description));
@@ -42,10 +42,19 @@ class CFormList extends CDiv{
 			}
 		}
 
+		$class = $hidden ? 'formrow hidden' : 'formrow';
 		if(!is_null($description))
-			$this->formList->addItem(array(new CDiv($label, 'dt'), new CDiv($description, 'dd')));
+			$this->formList->addItem(array(new CDiv($label, 'dt floatleft right'), new CDiv($description, 'dd')), $class);
 		else
-			$this->formList->addItem(array(new CDiv(SPACE, 'dt'), new CDiv($label, 'dd')));
+			$this->formList->addItem(array(new CDiv(SPACE, 'dt floatleft right'), new CDiv($label, 'dd')), $class);
+	}
+
+	public function addInfo($text){
+		$infoDiv = new CDiv(_('Info'), 'dt right listInfoLabel');
+
+		$textDiv = new CDiv($text, 'objectgroup inlineblock border_dotted ui-corner-all listInfoText');
+
+		$this->formList->addItem(array($infoDiv, $textDiv), 'formrow listInfo');
 	}
 
 	public function toString($destroy=true){

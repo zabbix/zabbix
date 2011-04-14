@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -86,11 +86,11 @@ if(isset($_REQUEST['save_trigger'])){
 				'output' => API_OUTPUT_EXTEND,
 				'select_dependencies' => API_OUTPUT_REFER
 			);
-			$triggersData = CTrigger::get($options);
+			$triggersData = API::Trigger()->get($options);
 			$triggerData = reset($triggersData);
 
 // Saving dependencies
-// TODO: add dependencies to CTrigger::update
+// TODO: add dependencies to API::Trigger()->update
 			$deps = array();
 			foreach($triggerData['dependencies'] as $dnum => $depTrigger){
 				$deps[] = array(
@@ -115,9 +115,9 @@ if(isset($_REQUEST['save_trigger'])){
 			$trigger['url'] = $_REQUEST['url'];
 
 			DBstart();
-			$result = CTrigger::update($trigger);
+			$result = API::Trigger()->update($trigger);
 
-			$result &= CTrigger::addDependencies($deps);
+			$result &= API::Trigger()->addDependencies($deps);
 //REVERT
 			$result = DBend($result);
 
@@ -137,13 +137,13 @@ if(isset($_REQUEST['save_trigger'])){
 			$trigger['url'] = $_REQUEST['url'];
 
 			DBstart();
-			if($result = CTrigger::create($trigger)){
+			if($result = API::Trigger()->create($trigger)){
 				if($result !== false){
 					$options = array(
 						'triggerids' => $result['triggerids'],
 						'output' => API_OUTPUT_EXTEND
 					);
-					$db_triggers = CTrigger::get($options);
+					$db_triggers = API::Trigger()->get($options);
 
 					$result = true;
 					$db_triggers = reset($db_triggers);
@@ -279,14 +279,14 @@ if(isset($_REQUEST['sform'])){
 			$item = $template_host['host'].':';
 		}
 
-		$item .= item_description($db_item,$db_item['key_']);
+		$item .= itemName($db_item,$db_item['key_']);
 	}
 
 	$ctb = new CTextBox('item',$item,80);
 	$ctb->setAttribute('id','item');
 	$ctb->setAttribute('disabled','disabled');
 
-	$script = "javascript: return PopUp('popup.php?dstfrm=".$frmTRLog->getName()."&dstfld1=itemid&dstfld2=item&srctbl=items&srcfld1=itemid&srcfld2=description',800,450);";
+	$script = "javascript: return PopUp('popup.php?dstfrm=".$frmTRLog->getName()."&dstfld1=itemid&dstfld2=item&srctbl=items&srcfld1=itemid&srcfld2=name',800,450);";
 	$cbtn = new CSubmit('select_item',S_SELECT,$script);
 
 	$frmTRLog->addRow(S_ITEM,array($ctb, $cbtn));
@@ -321,9 +321,13 @@ if(isset($_REQUEST['sform'])){
 	$maxid=0;
 
 	$bExprResult = true;
-
+	$exprData = new CTriggerExpression(array(
+		'expression'=> empty($expressions) ? '' : construct_expression($itemid,$expressions)
+	));
 	if(isset($_REQUEST['triggerid']) && !isset($_REQUEST['save_trigger'])
-			&& !validate_expression(construct_expression($itemid,$expressions)) && !isset($_REQUEST['form_refresh'])){
+			&& !empty($exprData->errors) && !isset($_REQUEST['form_refresh'])){
+
+		info($exprData->errors);
 
 		unset($expressions);
 		$expressions[0]['value'] = $expr_incase;
@@ -377,17 +381,11 @@ if(isset($_REQUEST['sform'])){
 
 //	$frmTRLog->addRow(S_MULTIPLE_EVENTS,new CCheckBox('type', (($type == TRIGGER_MULT_EVENT_ENABLED)?'yes':'no'), null,1));
 
-	$sev_select = new CComboBox('priority',null);
-		$sev_select->addItem(TRIGGER_SEVERITY_NOT_CLASSIFIED,S_NOT_CLASSIFIED,(($priority == TRIGGER_SEVERITY_NOT_CLASSIFIED)?'on':'off'));
-		$sev_select->addItem(TRIGGER_SEVERITY_INFORMATION,S_INFORMATION,(($priority == TRIGGER_SEVERITY_INFORMATION)?'on':'off'));
-		$sev_select->addItem(TRIGGER_SEVERITY_WARNING,S_WARNING,(($priority == TRIGGER_SEVERITY_WARNING)?'on':'off'));
-		$sev_select->addItem(TRIGGER_SEVERITY_AVERAGE,S_AVERAGE,(($priority == TRIGGER_SEVERITY_AVERAGE)?'on':'off'));
-		$sev_select->addItem(TRIGGER_SEVERITY_HIGH,S_HIGH,(($priority == TRIGGER_SEVERITY_HIGH)?'on':'off'));
-		$sev_select->addItem(TRIGGER_SEVERITY_DISASTER,S_DISASTER,(($priority == TRIGGER_SEVERITY_DISASTER)?'on':'off'));
+	$sev_select = new CComboBox('priority', $priority);
+	$sev_select->addItems(getSeverityCaption());
+	$frmTRLog->addRow(S_SEVERITY, $sev_select);
 
-	$frmTRLog->addRow(S_SEVERITY,$sev_select);
-
-	$frmTRLog->addRow(S_COMMENTS,new CTextArea('comments',$comments));
+	$frmTRLog->addRow(S_COMMENTS, new CTextArea('comments',$comments));
 
 	$frmTRLog->addRow(S_URL,new CTextBox('url',$url,80));
 

@@ -1,6 +1,6 @@
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,8 @@
 #include "common.h"
 #include "db.h"
 
+extern int	CONFIG_TIMEOUT;
+
 void	op_template_add(DB_EVENT *event, zbx_uint64_t templateid);
 void	op_template_del(DB_EVENT *event, zbx_uint64_t templateid);
 void	op_group_add(DB_EVENT *event, zbx_uint64_t groupid);
@@ -31,6 +33,5 @@ void	op_host_add(DB_EVENT *event);
 void	op_host_del(DB_EVENT *event);
 void	op_host_enable(DB_EVENT *event);
 void	op_host_disable(DB_EVENT *event);
-void    op_run_commands(char *cmd_list);
 
 #endif

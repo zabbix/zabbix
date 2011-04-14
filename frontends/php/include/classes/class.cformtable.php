@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ class CFormTable extends CForm{
 
 	public function __construct($title=null, $action=null, $method=null, $enctype=null, $form_variable=null){
 		$method = is_null($method) ? 'post' : $method;
-		parent::__construct($action, $method, $enctype);
+		parent::__construct($method, $action, $enctype);
 
 		$this->setTitle($title);
 		$this->setHelp();
@@ -58,8 +58,8 @@ class CFormTable extends CForm{
 		if(!is_string($value)){
 			return $this->error('Incorrect value for setAlign ['.$value.']');
 		}
-		$this->setAttribute('name',$value);
-		$this->setAttribute('id',$value);
+		$this->attr('name', $value);
+		$this->attr('id', zbx_formatDomId($value));
 	return true;
 	}
 
@@ -117,7 +117,7 @@ class CFormTable extends CForm{
 		}
 
 		if(!is_null($id))
-			$item1->setAttribute('id', $id);
+			$item1->attr('id', zbx_formatDomId($id));
 
 		array_push($this->center_items, $item1);
 

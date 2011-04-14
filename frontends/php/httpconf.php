@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -168,7 +168,7 @@ include_once('include/page_header.php');
 	else if(isset($_REQUEST['delete'])&&isset($_REQUEST['httptestid'])){
 		$result = false;
 		if($httptest_data = get_httptest_by_httptestid($_REQUEST['httptestid'])){
-			$result = CWebCheck::delete($_REQUEST['httptestid']);
+			$result = API::WebCheck()->delete($_REQUEST['httptestid']);
 		}
 		show_messages($result, S_SCENARIO_DELETED, S_CANNOT_DELETE_SCENARIO);
 		if($result){
@@ -227,7 +227,7 @@ include_once('include/page_header.php');
 				$webcheck['applicationid'] = $applicationid['applicationid'];
 			}
 			else{
-				$result = CApplication::create(array(
+				$result = API::Application()->create(array(
 					'name' => $_REQUEST['application'],
 					'hostid' => $_REQUEST['hostid']
 				));
@@ -251,12 +251,12 @@ include_once('include/page_header.php');
 
 			if(isset($_REQUEST['httptestid'])){
 				$webcheck['webcheckid'] = $httptestid = $_REQUEST['httptestid'];
-				$result = CWebCheck::update($webcheck);
+				$result = API::WebCheck()->update($webcheck);
 				if(!$result)
 					throw new Exception();
 			}
 			else{
-				$result = CWebCheck::create($webcheck);
+				$result = API::WebCheck()->create($webcheck);
 				if(!$result)
 					throw new Exception();
 
@@ -341,7 +341,7 @@ include_once('include/page_header.php');
 		show_messages($go_result, S_HISTORY_CLEARED, $go_result);
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_httptestid'])){
-		$go_result = CWebCheck::delete($_REQUEST['group_httptestid']);
+		$go_result = API::WebCheck()->delete($_REQUEST['group_httptestid']);
 		show_messages($go_result, S_SCENARIO_DELETED, null);
 	}
 
@@ -357,7 +357,7 @@ include_once('include/page_header.php');
 	$_REQUEST['steps'] = get_request('steps',array());
 	foreach($_REQUEST['steps'] as $s1id => $s1){
 		foreach($_REQUEST['steps'] as $s2id => $s2){
-			if((strcmp($s1['name'],$s2['name'])==0) && $s1id != $s2id){
+			if((strcmp($s1['name'],$s2['name'])==0) && (bccomp($s1id,$s2id) != 0)){
 				$_REQUEST['steps'][$s1id] = $_REQUEST['steps'][$s2id];
 				unset($_REQUEST['steps'][$s2id]);
 			}
@@ -367,7 +367,7 @@ include_once('include/page_header.php');
 
 
 	if (!isset($_REQUEST['form'])){
-		$form_button = new CForm(null, 'get');
+		$form_button = new CForm('get');
 		$form_button->addVar('hostid', $_REQUEST['hostid']);
 		//if host is selected
 		if(!isset($_REQUEST['form']) && ($_REQUEST['hostid'] > 0)){
@@ -551,7 +551,7 @@ include_once('include/page_header.php');
 				'");');
 
 			if(zbx_strlen($s['url']) > 70){
-				$url = new CTag('span','yes', substr($s['url'],0,35).SPACE.'...'.SPACE.substr($s['url'],zbx_strlen($s['url'])-25,25));
+				$url = new CSpan(substr($s['url'],0,35).SPACE.'...'.SPACE.substr($s['url'],zbx_strlen($s['url'])-25,25));
 				$url->setHint($s['url']);
 			}
 			else{
@@ -591,7 +591,7 @@ include_once('include/page_header.php');
 		$http_wdgt->addItem($form);
 	}
 	else{
-		$form = new CForm(null, 'get');
+		$form = new CForm('get');
 
 		$form->addItem(array(S_GROUP.SPACE,$pageFilter->getGroupsCB()));
 		$form->addItem(array(SPACE.S_HOST.SPACE,$pageFilter->getHostsCB()));

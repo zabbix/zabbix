@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 	$page['title']	= 'S_CONFIGURATION_OF_DISCOVERY';
 	$page['file']	= 'discoveryconf.php';
 	$page['hist_arg'] = array('');
+	$page['scripts'] = array('class.cviewswitcher.js');
 
 include_once('include/page_header.php');
 
@@ -176,7 +177,7 @@ include_once('include/page_header.php');
 
 		$go_result = false;
 		foreach($_REQUEST['g_druleid'] as $drid){
-			if(set_discovery_rule_status($drid,$status)){
+			if(DBexecute('update drules set status='.$status.' where druleid='.$drid)){
 				$rule_data = get_discovery_rule_by_druleid($drid);
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_DISCOVERY_RULE,
 					'['.$drid.'] '.$rule_data['name']);
@@ -206,7 +207,7 @@ include_once('include/page_header.php');
 ?>
 <?php
 /* header */
-	$form_button = new CForm(null, 'get');
+	$form_button = new CForm('get');
 	if(!isset($_REQUEST['form'])){
 		$form_button->addItem(new CSubmit('form', S_CREATE_RULE));
 	}
@@ -357,8 +358,15 @@ include_once('include/page_header.php');
 				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,'authPriv');
 
 				$external_param->addRow(array(S_SNMPV3_SECURITY_LEVEL, $cmbSecLevel));
-				$external_param->addRow(array(S_SNMPV3_AUTH_PASSPHRASE, new CTextBox('new_check_snmpv3_authpassphrase', $new_check_snmpv3_authpassphrase)));
-				$external_param->addRow(array(S_SNMPV3_PRIV_PASSPHRASE, new CTextBox('new_check_snmpv3_privpassphrase', $new_check_snmpv3_privpassphrase), BR()));
+
+				// adding id to <tr> elements so they could be then hidden by cviewswitcher.js
+				$row = new CRow(array(S_SNMPV3_AUTH_PASSPHRASE, new CTextBox('new_check_snmpv3_authpassphrase', $new_check_snmpv3_authpassphrase)));
+				$row->setAttribute('id', 'row_snmpv3_authpassphrase');
+				$external_param->addRow($row);
+
+				$row = new CRow(array(S_SNMPV3_PRIV_PASSPHRASE, new CTextBox('new_check_snmpv3_privpassphrase', $new_check_snmpv3_privpassphrase)));
+				$row->setAttribute('id', 'row_snmpv3_privpassphrase');
+				$external_param->addRow($row);
 			break;
 			case SVC_AGENT:
 				$form->addVar('new_check_snmp_community', '');
@@ -406,6 +414,13 @@ include_once('include/page_header.php');
 		$form->addItemToBottomRow(new CButtonCancel());
 
 		$dscry_wdgt->addItem($form);
+
+		// adding javascript, so that auth fields would be hidden if they are not used in specific auth type
+		$securityLevelVisibility = array();
+		zbx_subarray_push($securityLevelVisibility, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, 'row_snmpv3_authpassphrase');
+		zbx_subarray_push($securityLevelVisibility, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'row_snmpv3_authpassphrase');
+		zbx_subarray_push($securityLevelVisibility, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'row_snmpv3_privpassphrase');
+		zbx_add_post_js("var securityLevelSwitcher = new CViewSwitcher('new_check_snmpv3_securitylevel', 'change', ".zbx_jsvalue($securityLevelVisibility, true).");");
 	}
 	else{
 		$numrows = new CDiv();
@@ -484,7 +499,7 @@ include_once('include/page_header.php');
 
 // gobox
 		$goBox = new CComboBox('go');
-		$goOption = new CComboItem('activate',S_ENABLE_SELECTED);
+		$goOption = new CComboItem('activate', _('Enable selected'));
 		$goOption->setAttribute('confirm',S_ENABLE_SELECTED_DISCOVERY_RULES);
 		$goBox->addItem($goOption);
 
