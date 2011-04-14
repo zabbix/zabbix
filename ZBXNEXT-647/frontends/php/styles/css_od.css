@@ -1,48 +1,18 @@
 /* CSS Document */
 /* Dark Orange Theme by Aly */
-@import "darkorange/jquery-ui-1.8.6.custom.css";
+@import "darkorange/jquery-ui.css";
+@media print { body{ background-color:#A5A5A5; } }
+@media screen { body{ background-color:#1A1A1A; color: #FF5500; } }
 
-@media print {
-	body{
-		background-color:#A5A5A5;
-	}
-}
+.delimiter { color:#AAF; }
+.textcolorstyles { color: #FF5500; }
+.textblackwhite{ color: #EAEAEA; }
+.pum_oheader { background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left; }
+.right_header { border-color: #222222; }
+.unknown { color: #999999; }
+.normal	{ background-color: #AADDDD; }
 
-@media screen {
-	body{
-		background-color:#1A1A1A;
-		color: #FF5500;
-	}
-}
-
-.delimiter{
-	color:#AAF;
-}
-
-.textcolorstyles{
-	color: #FF5500;
-}
-
-.textblackwhite{
-	color: #EAEAEA;
-}
-
-.pum_oheader {
-	background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left;
-}
-
-.right_header {
-	border-color: #222222;
-}
-
-
-
-.unknown	{
-	color: #999999;
-}
-.normal		{
-	background-color: #AADDDD;
-}
+.disaster, .high, .average, .warning, .information, .unknown_trigger, .normal { color: #222; }
 
 /*////////////////	LINKS	////////////////////*/
 a:link 		{	color:#FF5500;  }
@@ -161,7 +131,7 @@ table.filter .subfilter_active{
 
 table.tableinfo{
 	color: #DFDFDF;
-	background-color: #5A5A5A;
+	background-color: #1F1F1F;
 }
 
 table.tableinfo tr td {
@@ -184,8 +154,8 @@ table.tableinfo tr.vertical_header td {
 	background-color:#111111;
 }
 
-table.tableinfo tr.selected > td { background-color: #6F6F6F; }
-table.tableinfo tr.selected:hover > td { background-color: #6F6F6F; }
+table.tableinfo tr.selected > td { background-color: #553020; }
+table.tableinfo tr.selected:hover > td { background-color: #6F3F00; }
 
 table.tableinfo tr.odd_row > td { background-color: #1F1F1F; }
 table.tableinfo tr.odd_row:hover > td { background-color: #6F3F00; }
@@ -193,45 +163,6 @@ table.tableinfo tr.odd_row:hover > td { background-color: #6F3F00; }
 table.tableinfo tr.even_row > td { background-color: #2F2F2F; }
 table.tableinfo tr.even_row:hover > td{ background-color: #6F3F00; }
 
-
-table.tableinfo tr > td.disaster_empty { border: 1px #FF0000 solid; }
-table.tableinfo tr:hover > td.disaster_empty { border: 1px #FF0000 solid; }
-
-table.tableinfo tr > td.disaster { background-color: #FF0000;	border: 1px #FF0000 solid; }
-table.tableinfo tr:hover > td.disaster { background-color: #FA0000;	border: 1px #FA0000 solid; }
-
-table.tableinfo tr > td.high_empty { border: 1px #FF8888 solid; }
-table.tableinfo tr:hover > td.high_empty { border: 1px #FF8888 solid; }
-
-table.tableinfo tr > td.high				{	background-color: #FF8888;	border: 1px #FF8888 solid; }
-table.tableinfo tr:hover > td.high			{	background-color: #FA8388;	border: 1px #FA8388 solid; }
-
-table.tableinfo tr > td.average_empty			{	border: 1px #DDAAAA solid; }
-table.tableinfo tr:hover > td.average_empty		{	border: 1px #DDAAAA solid; }
-
-table.tableinfo tr > td.average				{	background-color: #DDAAAA;	border: 1px #DDAAAA solid; }
-table.tableinfo tr:hover > td.average			{	background-color: #D8A5AA;	border: 1px #D8A5AA solid; }
-
-table.tableinfo tr > td.warning_empty			{	border: 1px #EFEFCC solid; }
-table.tableinfo tr:hover > td.warning_empty		{	border: 1px #EAEACC solid; }
-
-table.tableinfo tr > td.warning				{	background-color: #EFEFCC;	border: 1px #EFEFCC solid; }
-table.tableinfo tr:hover > td.warning			{	background-color: #EAEACC;	border: 1px #EAEACC solid; }
-
-table.tableinfo tr > td.information_empty			{	border: 1px #BBE2BB solid; }
-table.tableinfo tr:hover > td.information_empty		{	border: 1px #B7DDBB solid; }
-
-table.tableinfo tr > td.information			{	background-color: #BBE2BB;	border: 1px #CCE2CC solid; }
-table.tableinfo tr:hover > td.information			{	background-color: #B7DDBB;	border: 1px #C7DDCC solid; }
-
-table.tableinfo tr > td.unknown_trigger_empty		{	border: 1px #ACACAC solid; }
-table.tableinfo tr:hover > td.unknown_trigger_empty	{	border: 1px #ACA7AC solid; }
-
-table.tableinfo tr > td.unknown_trigger			{	background-color: #BCBCBC;	border: 1px #BCBCBC solid; }
-table.tableinfo tr:hover > td.unknown_trigger		{	background-color: #BCB7BC;	border: 1px #BCB7BC solid; }
-
-table.tableinfo tr > td.normal				{	background-color: #AAFFAA;	border: 1px #AAFFAA solid; }
-table.tableinfo tr:hover > td.normal			{	background-color: #AAF9AA;	border: 1px #AAF9AA solid; }
 
 table.tableinfo tr > td.active				{	background-color: #AADDAA;	border: 1px #AADDAA solid; }
 table.tableinfo tr:hover > td.active			{	background-color: #AAD9AA;	border: 1px #AAD9AA solid; }
@@ -276,7 +207,7 @@ table.tablestripped tr.footer td {
 
 table.header{
 	background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left;
-	border: 1px solid #5A5A5A;;
+	border: 1px solid #5A5A5A;
 }
 
 table.header tr td.header_l{
@@ -408,7 +339,7 @@ table.calendartab tr td{
 	background-color:#1F1F1F;
 	color: #FF5500;
 }
-table.calendartab tr td.hollyday{
+table.calendartab tr td.holiday{
 	background-color:#2F2F2F;
 }
 table.calendartab tr td.selected{
@@ -500,7 +431,7 @@ div.thin_header{ background: #1A1A1A url('../images/gradients/table_head2_bb.gif
 div.zabbix_logo{ background-image:url('../images/general/zabbix_od.png'); }
 .iconzbxavailable{ background-image: url('../images/general/zabbix_available_bb.png'); }
 .iconsnmpavailable{ background-image: url('../images/general/snmp_available_bb.png'); }
-
+.iconjmxavailable{ background-image: url('../images/general/jmx_available_bb.png'); }
 .iconipmiavailable{ background-image: url('../images/general/ipmi_available_bb.png'); }
 .sla_green{ background-image: url('../images/gradients/sla_blue15.png'); }
 .icon_sortup{ background-image: url('../images/general/sort_up_od.gif'); }

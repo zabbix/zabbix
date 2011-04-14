@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ public $emptyList;
 		parent::__construct('ul','yes');
 		$this->tag_end = '';
 		$this->addItem($value);
-		$this->setAttribute('class', $class);
+		$this->addClass($class);
 
 		if(is_null($value)){
 			$this->addItem(_('List is empty'), 'empty');

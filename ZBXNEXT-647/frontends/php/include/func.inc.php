@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -552,11 +552,53 @@ function zbx_is_int($var){
 	if(is_string($var))
 		if(ctype_digit($var) || (strcmp(intval($var), $var) == 0)) return true;
 	else
-		if(($var>0) && ctype_digit(strval($var))) return true;
+		if(($var>0) && zbx_ctype_digit($var)) return true;
 
 return preg_match("/^\-?\d{1,20}+$/", $var);
 }
 
+function zbx_array_diff($primary, $secondary, $field){
+	$fields1 = zbx_objectValues($primary, $field);
+	$fields2 = zbx_objectValues($secondary, $field);
+
+	$first = array_diff($fields1, $fields2);
+	$first = zbx_toHash($first);
+
+	$second = array_diff($fields2, $fields1);
+	$second = zbx_toHash($second);
+
+	$result = array(
+		'first' => array(),
+		'second' => array(),
+		'both' => array()
+	);
+
+	foreach($primary as $array){
+		if(!isset($array[$field]))
+			$result['first'][] = $array;
+		else if(isset($first[$array[$field]]))
+			$result['first'][] = $array;
+		else
+			$result['both'][$array[$field]] = $array;
+	}
+
+	foreach($secondary as $array){
+		if(!isset($array[$field]))
+			$result['second'][] = $array;
+		else if(isset($second[$array[$field]]))
+			$result['second'][] = $array;
+	}
+
+	return $result;
+}
+
+function zbx_array_push(&$array, $add){
+	foreach($array as $key => $value){
+		foreach($add as $newKey => $newValue){
+			$array[$key][$newKey] = $newValue;
+		}
+	}
+}
 
 // STRING FUNCTIONS {{{
 if(!function_exists('zbx_stripslashes')){
@@ -585,6 +627,10 @@ return $str_res;
 
 function zbx_htmlstr($str){
 	return str_replace(array('<','>','"'),array('&lt;','&gt;','&quot;'), $str);
+}
+
+function zbx_formatDomId($value){
+	return str_replace(array('[',']'),array('_',''), $value);
 }
 
 function zbx_strlen($str){
@@ -728,6 +774,7 @@ function zbx_strrpos($haystack, $needle){
 		return strrpos($haystack, $needle);
 	}
 }
+
 // }}} STRING FUNCTIONS
 
 
@@ -809,13 +856,12 @@ function sortSub($data, $sortorder){
 	$keys = array_keys($data);
 	natcasesort($keys);
 
-
 	if($sortorder != ZBX_SORT_UP)
 		$keys = array_reverse($keys);
 
 	foreach($keys as $key){
 		$tst = reset($data[$key]);
-		if(isset($tst[0]) && !is_array($tst[0])){
+		if(is_array($tst) && isset($tst[0]) && !is_array($tst[0])){
 			$data[$key] = sortSub($data[$key], $sortorder);
 		}
 
@@ -849,7 +895,6 @@ function morder_result(&$data, $sortfields, $sortorder=ZBX_SORT_UP){
 	$data = $result;
 	return true;
 }
-
 
 function order_result(&$data, $sortfield=null, $sortorder=ZBX_SORT_UP){
 	if(empty($data)) return false;
@@ -902,6 +947,12 @@ return ' ORDER BY '.$tabfield.' '.$sortorder.$allways;
 }
 /************* END SORT *************/
 
+function unsetExcept(&$array, $allowedFields){
+	foreach($array as $key => $value){
+		if(!isset($allowedFields[$key])) unset($array[$key]);
+	}
+}
+
 function zbx_implodeHash($glue1, $glue2, $hash){
 	if(is_null($glue2)) $glue2 = $glue1;
 	$str = '';
@@ -932,12 +983,6 @@ return $result;
 }
 
 function uint_in_array($needle,$haystack){
-//TODO: REMOVE
-//	if(!empty($haystack) && !is_numeric(key($haystack))){
-//		info('uint_in_array: possible pasted associated array');
-//	}
-//----
-
 	foreach($haystack as $id => $value)
 		if(bccomp($needle,$value) == 0) return true;
 
@@ -1048,11 +1093,14 @@ function zbx_toArray($value){
 	if(!is_array($value)){
 		$result = array($value);
 	}
-	else if(zbx_ctype_digit(key($value))){
-		$result = array_values($value);
-	}
-	else if(!empty($value)){
-		$result = array($value);
+	else{
+// reset() is needed to move internal array pointer to the beginning of the array
+		reset($value);
+
+		if(zbx_ctype_digit(key($value)))
+			$result = array_values($value);
+		else if(!empty($value))
+			$result = array($value);
 	}
 
 return $result;
@@ -1086,8 +1134,11 @@ return $result;
 }
 
 function zbx_cleanHashes(&$value){
-	if(is_array($value) && ctype_digit((string) key($value))){
-		$value = array_values($value);
+	if(is_array($value)){
+// reset() is needed to move internal array pointer to the beginning of the array
+		reset($value);
+		if(zbx_ctype_digit(key($value)))
+			$value = array_values($value);
 	}
 
 return $value;
@@ -1248,7 +1299,7 @@ function zbx_subarray_push(&$mainArray, $sIndex, $element = null) {
 
 /************* PAGING *************/
 function getPagingLine(&$items, $autotrim=true){
-	global $USER_DETAILS, $page;
+	global $page;
 	$config = select_config();
 
 	$search_limit = '';
@@ -1264,7 +1315,7 @@ function getPagingLine(&$items, $autotrim=true){
 		$start = ($last_page == $page['file']) ? CProfile::get('web.paging.start', 0) : 0;
 	}
 
-	$rows_per_page = $USER_DETAILS['rows_per_page'];
+	$rows_per_page = CWebUser::$data['rows_per_page'];
 
 	$cnt_items = count($items);
 	$cnt_pages = ceil($cnt_items / $rows_per_page);

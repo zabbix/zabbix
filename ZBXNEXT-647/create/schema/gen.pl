@@ -1,7 +1,7 @@
 #!/usr/bin/perl
-# 
-# ZABBIX
-# Copyright (C) 2000-2011 SIA Zabbix
+#
+# Zabbix
+# Copyright (C) 2000-2011 Zabbix SIA
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as
@@ -77,12 +77,12 @@ local $uniq;
 	"t_blob"	=>	"ZBX_TYPE_BLOB",
 	"t_text"	=>	"ZBX_TYPE_TEXT",
 	"t_item_param"	=>	"ZBX_TYPE_TEXT",
-	"t_cksum_text"	=>	"ZBX_TYPE_TEXT"  
+	"t_cksum_text"	=>	"ZBX_TYPE_TEXT"
 );
 
-$c{"before"}="/* 
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+$c{"before"}="/*
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -122,9 +122,9 @@ const ZBX_TABLE	tables[]={
 	"t_history_log"	=>	"nclob",
 	"t_history_text"=>	"nclob",
 	"t_blob"	=>	"nvarchar2(2048)",
-	"t_text"	=>	"nvarchar2(2048)",
+	"t_text"	=>	"nclob",
 	"t_item_param"	=>	"nvarchar2(2048)",
-	"t_cksum_text"	=>	"nclob"  
+	"t_cksum_text"	=>	"nclob"
 );
 
 %ibm_db2=("t_bigint"	=>	"bigint",
@@ -170,7 +170,7 @@ const ZBX_TABLE	tables[]={
 	"t_blob"	=>	"text",
 	"t_text"	=>	"text",
 	"t_item_param"	=>	"text",
-	"t_cksum_text"	=>	"text"  
+	"t_cksum_text"	=>	"text"
 );
 
 %sqlite3=("t_bigint"	=>	"bigint",
@@ -192,7 +192,7 @@ const ZBX_TABLE	tables[]={
 	"t_blob"	=>	"blob",
 	"t_text"	=>	"text",
 	"t_item_param"	=>	"text",
-	"t_cksum_text"	=>	"text"  
+	"t_cksum_text"	=>	"text"
 );
 
 sub rtrim($)
@@ -328,7 +328,7 @@ sub process_field
 				$default = "DEFAULT $default";
 			}
 		}
-		
+
 		if ($output{"database"} eq "mysql")
 		{
 			@text_fields = ('blob', 'longblob', 'text', 'longtext');
@@ -396,7 +396,7 @@ sub process_field
 
 # RESTRICT may contains new line chars we need to clean them out
 			$fk_flags = rtrim ($fk_flags);
-			
+
 			if ($fk_flags eq "")
 			{
 				$fk_flags = " ON DELETE CASCADE";
@@ -424,7 +424,7 @@ sub process_field
 			else
 			{
 				$references = "";
-				
+
 				$fkeys = "${fkeys}${fk_bol}ALTER TABLE${only} ${table_name} ADD CONSTRAINT ${cname} FOREIGN KEY (${name}) REFERENCES ${fk_table} (${fk_field})${fk_flags}${fk_eol}\n";
 
 				if ($output{"database"} eq "mysql")
@@ -467,7 +467,7 @@ sub process_index
 		if (1 == $unique) { $unique = " UNIQUE"; }
 		else { $unique = ""; }
 
-		print "CREATE${unique} INDEX ${table_name}_$name\ on $table_name ($fields);${eol}\n";
+		print "CREATE${unique} INDEX ${table_name}_$name\ ON $table_name ($fields);${eol}\n";
 	}
 }
 

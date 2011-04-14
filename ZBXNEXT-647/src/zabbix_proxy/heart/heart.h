@@ -1,6 +1,6 @@
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,8 +20,8 @@
 #ifndef ZABBIX_HEART_H
 #define ZABBIX_HEART_H
 
-extern int CONFIG_HEARTBEAT_FREQUENCY;
+extern int	CONFIG_HEARTBEAT_FREQUENCY;
 
-void main_heart_loop();
+void	main_heart_loop();
 
 #endif

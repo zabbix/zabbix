@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -134,7 +134,7 @@ include_once('include/page_header.php');
 
 	$available_hosts = $pageFilter->hostsSelected ? array_keys($pageFilter->hosts) : array();
 
-	$r_form = new CForm(null, 'get');
+	$r_form = new CForm('get');
 	$r_form->addVar('fullscreen',$_REQUEST['fullscreen']);
 
 	$r_form->addItem(array(S_GROUP.SPACE,$pageFilter->getGroupsCB(true)));
@@ -144,7 +144,7 @@ include_once('include/page_header.php');
 	$httpmon_wdgt->addItem(SPACE);
 
 // TABLE
-	$form = new CForm(null, 'get');
+	$form = new CForm('get');
 	$form->setName('scenarios');
 	$form->addVar('hostid', $_REQUEST['hostid']);
 

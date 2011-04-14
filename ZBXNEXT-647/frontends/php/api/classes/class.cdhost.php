@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,12 +30,6 @@ class CDHost extends CZBXAPI{
 /**
  * Get Host data
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param _array $options
  * @param array $options['nodeids'] Node IDs
  * @param array $options['groupids'] HostGroup IDs
@@ -51,7 +45,6 @@ class CDHost extends CZBXAPI{
  * @param boolean $options['with_monitored_httptests'] only with monitored http tests
  * @param boolean $options['with_graphs'] only with graphs
  * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
- * @param int $options['extendoutput'] return all fields for Hosts
  * @param boolean $options['selectGroups'] select HostGroups
  * @param boolean $options['select_templates'] select Templates
  * @param boolean $options['selectItems'] select Items
@@ -59,7 +52,6 @@ class CDHost extends CZBXAPI{
  * @param boolean $options['select_graphs'] select Graphs
  * @param boolean $options['select_applications'] select Applications
  * @param boolean $options['selectMacros'] select Macros
- * @param boolean $options['select_profile'] select Profile
  * @param int $options['count'] count Hosts, returned column name is rowscount
  * @param string $options['pattern'] search hosts by pattern in Host name
  * @param string $options['extendPattern'] search hosts by pattern in Host name, ip and DNS
@@ -68,12 +60,11 @@ class CDHost extends CZBXAPI{
  * @param string $options['sortorder'] sort order
  * @return array|boolean Host data as array or false if error
  */
-	public static function get($options=array()){
-		global $USER_DETAILS;
+	public function get($options=array()){
 
 		$result = array();
 		$nodeCheck = false;
-		$user_type = $USER_DETAILS['type'];
+		$user_type = self::$userData['type'];
 
 		$sort_columns = array('dhostid', 'druleid'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM); // allowed output options for [ select_* ] params
@@ -124,8 +115,11 @@ class CDHost extends CZBXAPI{
 
 		if(is_array($options['output'])){
 			unset($sql_parts['select']['dhosts']);
+
+			$dbTable = DB::getSchema('dhosts');
 			foreach($options['output'] as $key => $field){
-				$sql_parts['select'][$field] = ' dh.'.$field;
+				if(isset($dbTable['fields'][$field]))
+					$sql_parts['select'][$field] = 'dh.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;
@@ -134,9 +128,9 @@ class CDHost extends CZBXAPI{
 // editable + PERMISSION CHECK
 		if(USER_TYPE_SUPER_ADMIN == $user_type){
 		}
-		else if(is_null($options['editable']) && ($USER_DETAILS['type'] == USER_TYPE_ZABBIX_ADMIN)){
+		else if(is_null($options['editable']) && (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN)){
 		}
-		else if(!is_null($options['editable']) && ($USER_DETAILS['type']!=USER_TYPE_SUPER_ADMIN)){
+		else if(!is_null($options['editable']) && (self::$userData['type']!=USER_TYPE_SUPER_ADMIN)){
 			return array();
 		}
 
@@ -394,7 +388,6 @@ class CDHost extends CZBXAPI{
 
 Copt::memoryPick();
 		if(!is_null($options['countOutput'])){
-			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 
@@ -409,7 +402,7 @@ Copt::memoryPick();
 
 			if(is_array($options['selectDRules']) || str_in_array($options['selectDRules'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['selectDRules'];
-				$drules = CDRule::get($obj_params);
+				$drules = API::DRule()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($drules, 'name');
 				foreach($drules as $druleid => $drule){
@@ -431,7 +424,7 @@ Copt::memoryPick();
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$drules = CDRule::get($obj_params);
+				$drules = API::DRule()->get($obj_params);
 				$drules = zbx_toHash($drules, 'dhostid');
 				foreach($result as $dhostid => $dhost){
 					if(isset($drules[$dhostid]))
@@ -452,7 +445,7 @@ Copt::memoryPick();
 
 			if(is_array($options['selectDServices']) || str_in_array($options['selectDServices'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['selectDServices'];
-				$dservices = CDService::get($obj_params);
+				$dservices = API::DService()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($dservices, 'name');
 				foreach($dservices as $dserviceid => $dservice){
@@ -473,7 +466,7 @@ Copt::memoryPick();
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$dservices = CDService::get($obj_params);
+				$dservices = API::DService()->get($obj_params);
 				$dservices = zbx_toHash($dservices, 'dhostid');
 				foreach($result as $dhostid => $dhost){
 					if(isset($dservices[$dhostid]))
@@ -492,7 +485,7 @@ Copt::memoryPick();
 					'hostids' => $dhostids,
 					'preservekeys' => 1
 				);
-			$groups = CHostgroup::get($obj_params);
+			$groups = API::HostGroup()->get($obj_params);
 
 			foreach($groups as $groupid => $group){
 				$ghosts = $group['hosts'];
@@ -513,7 +506,7 @@ Copt::memoryPick();
 
 			if(is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['selectHosts'];
-				$hosts = CHost::get($obj_params);
+				$hosts = API::Host()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($hosts, 'host');
 
@@ -535,7 +528,7 @@ Copt::memoryPick();
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$hosts = CHost::get($obj_params);
+				$hosts = API::Host()->get($obj_params);
 				$hosts = zbx_toHash($hosts, 'hostid');
 				foreach($result as $dhostid => $dhost){
 					if(isset($hosts[$dhostid]))
@@ -555,7 +548,7 @@ Copt::memoryPick();
 	return $result;
 	}
 
-	public static function exists($object){
+	public function exists($object){
 		$keyFields = array(array('dhostid'));
 
 		$options = array(
@@ -569,7 +562,7 @@ Copt::memoryPick();
 		else if(isset($object['nodeids']))
 			$options['nodeids'] = $object['nodeids'];
 
-		$objs = self::get($options);
+		$objs = $this->get($options);
 
 	return !empty($objs);
 	}
@@ -577,82 +570,30 @@ Copt::memoryPick();
 /**
  * Add Host
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param _array $dhosts multidimensional array with Hosts data
  */
-	public static function create($dhosts){
-		$errors = array();
-		$dhosts = zbx_toArray($dhosts);
-		$dhostids = array();
-		$result = false;
+	public function create($dhosts){
 
-		if($result){
-			return array('dhostids' => $dhostids);
-		}
-		else{
-			self::setMethodErrors(__METHOD__, $errors);
-			return false;
-		}
 	}
 
 /**
  * Update DHost
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param _array $dhosts multidimensional array with Hosts data
  */
-	public static function update($dhosts){
-		$dhosts = zbx_toArray($dhosts);
-		$dhostids = zbx_objectValues($dhosts, 'hostid');
+	public function update($dhosts){
 
-		try{
-			return array('dhostids' => $dhostids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-
-			$error = $e->getErrors();
-			$error = reset($error);
-
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
 	}
 
 /**
  * Delete Discovered Host
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param array $dhosts
  * @param array $dhosts[0, ...]['hostid'] Host ID to delete
  * @return array|boolean
  */
-	public static function delete($dhostids){
-		$result = false;
-		$dhostids = zbx_toArray($dhostids);
+	public function delete($dhostids){
 
-		if($result){
-			return array('hostids' => $dhostids);
-		}
-		else{
-			self::setError(__METHOD__);
-			return false;
-		}
 	}
 }
 ?>

@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,10 +23,11 @@ class CTextBox extends CInput{
 	private $caption;
 	public function __construct($name='textbox',$value='',$size=20,$readonly='no'){
 		parent::__construct('text', $name, $value);
-		$this->setReadonly($readonly);		
+		$this->setReadonly($readonly);
 		$this->caption = null;
 		$this->tag_body_start = '';
 		$this->setAttribute('size', $size);
+		$this->setAttribute('maxlength', '255');
 	}
 }
 ?>

@@ -15,7 +15,8 @@ SUBDIRS = \
 	utils \
 	watchdog \
 	escalator \
-	proxypoller
+	proxypoller \
+	selfmon
 
 sbin_PROGRAMS = zabbix_server
 
@@ -23,6 +24,7 @@ zabbix_server_SOURCES = \
 	actions.c actions.h \
 	operations.c operations.h \
 	events.c events.h \
+	scripts.c scripts.h \
 	zlog.c \
 	server.c
 
@@ -42,6 +44,7 @@ zabbix_server_LDADD = \
 	watchdog/libzbxwatchdog.a \
 	escalator/libzbxescalator.a \
 	proxypoller/libzbxproxypoller.a \
+	selfmon/libzbxselfmon.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspecsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
@@ -60,6 +63,7 @@ zabbix_server_LDADD = \
 	$(top_srcdir)/src/libs/zbxcommshigh/libzbxcommshigh.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
+	$(top_srcdir)/src/libs/zbxself/libzbxself.a \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxicmpping/libzbxicmpping.a \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \

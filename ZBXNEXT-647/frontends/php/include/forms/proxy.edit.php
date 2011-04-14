@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@
 
 	$interfaces = get_request('interfaces',array());
 
-	$frmProxy = new CForm('proxies.php');
+	$frmProxy = new CForm();
 	$frmProxy->addVar('form', get_request('form', 1));
 	$frmProxy->addVar('form_refresh', get_request('form_refresh',0)+1);
 
@@ -39,7 +39,7 @@
 	$proxyList = new CFormList('proxylist');
 
 	if($_REQUEST['hostid'] > 0){
-		$proxies = CProxy::get(array(
+		$proxies = API::Proxy()->get(array(
 			'proxyids' => $_REQUEST['hostid'],
 			'selectInterfaces' => API_OUTPUT_EXTEND,
 			'selectHosts' => array('hostid', 'host'),
@@ -66,7 +66,7 @@
 	$statusBox = new CComboBox('status', $status, 'submit()');
 	$statusBox->addItem(HOST_STATUS_PROXY_ACTIVE, S_PROXY_ACTIVE);
 	$statusBox->addItem(HOST_STATUS_PROXY_PASSIVE, S_PROXY_PASSIVE);
-	
+
 	$proxyList->addRow(S_PROXY_MODE, $statusBox);
 
 	if($status == HOST_STATUS_PROXY_PASSIVE){
@@ -85,7 +85,7 @@
 
 		$ifTab = new CTable();
 		$ifTab->addRow(array(
-			S_IP_ADDRESS, 
+			S_IP_ADDRESS,
 			S_DNS_NAME,
 			S_CONNECT_TO,
 			S_PORT
@@ -114,7 +114,7 @@
 			$db_host['hostid'],
 			$db_host['host'],
 			NULL,
-			($db_host['proxy_hostid'] == 0 || ($_REQUEST['hostid']>0) && ($db_host['proxy_hostid'] == $_REQUEST['hostid']))
+			($db_host['proxy_hostid'] == 0 || ($_REQUEST['hostid']>0) && (bccomp($db_host['proxy_hostid'],$_REQUEST['hostid']) == 0))
 		);
 	}
 	$proxyList->addRow(S_HOSTS,$cmbHosts->Get(S_PROXY.SPACE.S_HOSTS,S_OTHER.SPACE.S_HOSTS));
@@ -136,6 +136,6 @@
 
 	$frmProxy->addItem(makeFormFooter($main, $others));
 
-	
+
 return $frmProxy;
 ?>

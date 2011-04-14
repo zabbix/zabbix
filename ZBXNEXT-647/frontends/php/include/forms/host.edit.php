@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 ?>
 <?php
 // include JS + templates
-	include('include/templates/hosts.js.php');
+	include('include/templates/host.js.php');
 	include('include/templates/macros.js.php');
 ?>
 <?php
@@ -44,49 +44,36 @@
 	$ipmi_username	= get_request('ipmi_username','');
 	$ipmi_password	= get_request('ipmi_password','');
 
-	$useprofile = get_request('useprofile','no');
-
-	$devicetype	= get_request('devicetype','');
-	$name		= get_request('name','');
-	$os			= get_request('os','');
-	$serialno	= get_request('serialno','');
-	$tag		= get_request('tag','');
-	$macaddress	= get_request('macaddress','');
-	$hardware	= get_request('hardware','');
-	$software	= get_request('software','');
-	$contact	= get_request('contact','');
-	$location	= get_request('location','');
-	$notes		= get_request('notes','');
-
 	$_REQUEST['hostid'] = get_request('hostid', 0);
-// BEGIN: HOSTS PROFILE EXTENDED Section
-	$useprofile_ext		= get_request('useprofile_ext','no');
-	$ext_host_profiles	= get_request('ext_host_profiles',array());
-// END:   HOSTS PROFILE EXTENDED Section
+
+	$useprofile		= get_request('useprofile', 'no');
+	$host_profile	= get_request('host_profile',array());
 
 	$macros = get_request('macros',array());
 	$interfaces = get_request('interfaces',array());
 	$templates = get_request('templates',array());
-	$clear_templates = get_request('clear_templates',array());
+	$clear_templates = get_request('clear_templates', array());
 
-	$frm_title = S_HOST;
+	$frm_title = _('Host');
 	if($_REQUEST['hostid']>0){
-		$dbHosts = CHost::get(array(
+		$dbHosts = API::Host()->get(array(
 			'hostids' => $_REQUEST['hostid'],
 			'selectGroups' => API_OUTPUT_EXTEND,
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
 			'selectMacros' => API_OUTPUT_EXTEND,
-			'select_profile' => API_OUTPUT_EXTEND,
+			'selectProfile' => true,
 			'output' => API_OUTPUT_EXTEND
 		));
 		$dbHost = reset($dbHosts);
 
-		$dbHost['interfaces'] = CHostInterface::get(array(
+		$dbHost['interfaces'] = API::HostInterface()->get(array(
 			'hostids' => $dbHost['hostid'],
 			'output' => API_OUTPUT_EXTEND,
 			'selectItems' => API_OUTPUT_COUNT,
-			'preserveKeys' => true
+			'preserveKeys' => true,
 		));
+
+		morder_result($dbHost['interfaces'], array('type', 'interfaceid'));
 
 		$frm_title	.= SPACE.' ['.$dbHost['host'].']';
 		$original_templates = $dbHost['parentTemplates'];
@@ -121,29 +108,10 @@
 		$interfaces = $dbHost['interfaces'];
 		$host_groups = zbx_objectValues($dbHost['groups'], 'groupid');
 
-// read profile
-		$useprofile = 'no';
-		$db_profile = $dbHost['profile'];
-		if(!empty($db_profile)){
-			$useprofile = 'yes';
 
-			$devicetype	= $db_profile['devicetype'];
-			$name		= $db_profile['name'];
-			$os			= $db_profile['os'];
-			$serialno	= $db_profile['serialno'];
-			$tag		= $db_profile['tag'];
-			$macaddress	= $db_profile['macaddress'];
-			$hardware	= $db_profile['hardware'];
-			$software	= $db_profile['software'];
-			$contact	= $db_profile['contact'];
-			$location	= $db_profile['location'];
-			$notes		= $db_profile['notes'];
-		}
+		$host_profile = $dbHost['profile'];
+		$useprofile = empty($host_profile) ? 'no' : 'yes';
 
-// BEGIN: HOSTS PROFILE EXTENDED Section
-		$ext_host_profiles = $dbHost['profile_ext'];
-		$useprofile_ext = empty($ext_host_profiles) ? 'no' : 'yes';
-// END:   HOSTS PROFILE EXTENDED Section
 
 		$templates = array();
 		foreach($original_templates as $tnum => $tpl){
@@ -151,78 +119,11 @@
 		}
 	}
 
-	$ext_profiles_fields = array(
-		'device_alias'=>S_DEVICE_ALIAS,
-		'device_type'=>S_DEVICE_TYPE,
-		'device_chassis'=>S_DEVICE_CHASSIS,
-		'device_os'=>S_DEVICE_OS,
-		'device_os_short'=>S_DEVICE_OS_SHORT,
-		'device_hw_arch'=>S_DEVICE_HW_ARCH,
-		'device_serial'=>S_DEVICE_SERIAL,
-		'device_model'=>S_DEVICE_MODEL,
-		'device_tag'=>S_DEVICE_TAG,
-		'device_vendor'=>S_DEVICE_VENDOR,
-		'device_contract'=>S_DEVICE_CONTRACT,
-		'device_who'=>S_DEVICE_WHO,
-		'device_status'=>S_DEVICE_STATUS,
-		'device_app_01'=>S_DEVICE_APP_01,
-		'device_app_02'=>S_DEVICE_APP_02,
-		'device_app_03'=>S_DEVICE_APP_03,
-		'device_app_04'=>S_DEVICE_APP_04,
-		'device_app_05'=>S_DEVICE_APP_05,
-		'device_url_1'=>S_DEVICE_URL_1,
-		'device_url_2'=>S_DEVICE_URL_2,
-		'device_url_3'=>S_DEVICE_URL_3,
-		'device_networks'=>S_DEVICE_NETWORKS,
-		'device_notes'=>S_DEVICE_NOTES,
-		'device_hardware'=>S_DEVICE_HARDWARE,
-		'device_software'=>S_DEVICE_SOFTWARE,
-		'ip_subnet_mask'=>S_IP_SUBNET_MASK,
-		'ip_router'=>S_IP_ROUTER,
-		'ip_macaddress'=>S_IP_MACADDRESS,
-		'oob_ip'=>S_OOB_IP,
-		'oob_subnet_mask'=>S_OOB_SUBNET_MASK,
-		'oob_router'=>S_OOB_ROUTER,
-		'date_hw_buy'=>S_DATE_HW_BUY,
-		'date_hw_install'=>S_DATE_HW_INSTALL,
-		'date_hw_expiry'=>S_DATE_HW_EXPIRY,
-		'date_hw_decomm'=>S_DATE_HW_DECOMM,
-		'site_street_1'=>S_SITE_STREET_1,
-		'site_street_2'=>S_SITE_STREET_2,
-		'site_street_3'=>S_SITE_STREET_3,
-		'site_city'=>S_SITE_CITY,
-		'site_state'=>S_SITE_STATE,
-		'site_country'=>S_SITE_COUNTRY,
-		'site_zip'=>S_SITE_ZIP,
-		'site_rack'=>S_SITE_RACK,
-		'site_notes'=>S_SITE_NOTES,
-		'poc_1_name'=>S_POC_1_NAME,
-		'poc_1_email'=>S_POC_1_EMAIL,
-		'poc_1_phone_1'=>S_POC_1_PHONE_1,
-		'poc_1_phone_2'=>S_POC_1_PHONE_2,
-		'poc_1_cell'=>S_POC_1_CELL,
-		'poc_1_screen'=>S_POC_1_SCREEN,
-		'poc_1_notes'=>S_POC_1_NOTES,
-		'poc_2_name'=>S_POC_2_NAME,
-		'poc_2_email'=>S_POC_2_EMAIL,
-		'poc_2_phone_1'=>S_POC_2_PHONE_1,
-		'poc_2_phone_2'=>S_POC_2_PHONE_2,
-		'poc_2_cell'=>S_POC_2_CELL,
-		'poc_2_screen'=>S_POC_2_SCREEN,
-		'poc_2_notes'=>S_POC_2_NOTES
-	);
-
-	foreach($ext_profiles_fields as $field => $caption){
-		if(!isset($ext_host_profiles[$field])){
-			$ext_host_profiles[$field] = '';
-		}
-	}
-
 	$clear_templates = array_intersect($clear_templates, array_keys($original_templates));
 	$clear_templates = array_diff($clear_templates,array_keys($templates));
 	natcasesort($templates);
 
-	$frmHost = new CForm('hosts.php');
+	$frmHost = new CForm();
 	$frmHost->setName('web.hosts.host.php.');
 	$frmHost->addVar('form', get_request('form', 1));
 
@@ -240,7 +141,7 @@
 	$hostList->addRow(S_NAME, new CTextBox('host',$host,54));
 
 	$grp_tb = new CTweenBox($frmHost, 'groups', $host_groups, 10);
-	$all_groups = CHostGroup::get(array(
+	$all_groups = API::HostGroup()->get(array(
 		'editable' => 1,
 		'output' => API_OUTPUT_EXTEND
 	));
@@ -267,7 +168,7 @@
 		));
 	}
 
-	$ifTab = new CTable();
+	$ifTab = new CTable(null, 'formElementTable');
 	$ifTab->addRow(array(S_IP_ADDRESS,S_DNS_NAME,S_CONNECT_TO,S_PORT,S_TYPE));
 	$ifTab->setAttribute('id', 'hostInterfaces');
 
@@ -275,7 +176,7 @@
 	foreach($interfaces as $inum => $interface){
 		$jsInsert.= 'addInterfaceRow('.zbx_jsvalue($interface).');';
 	}
-	zbx_add_post_js('setTimeout(function(){'.$jsInsert.'}, 20);');
+	zbx_add_post_js('setTimeout(function(){'.$jsInsert.'}, 1);');
 
 	$addButton = new CButton('add', S_ADD, 'javascript: addInterfaceRow({});');
 	$addButton->setAttribute('class', 'link_menu');
@@ -295,7 +196,7 @@
 	$cmbProxy->addItem(0, S_NO_PROXY);
 
 	$options = array('output' => API_OUTPUT_EXTEND);
-	$db_proxies = CProxy::get($options);
+	$db_proxies = API::Proxy()->get($options);
 	order_result($db_proxies, 'host');
 
 	foreach($db_proxies as $proxy){
@@ -313,7 +214,7 @@
 
 	if($_REQUEST['form'] == 'full_clone'){
 // Items
-		$hostItems = CItem::get(array(
+		$hostItems = API::Item()->get(array(
 			'hostids' => $_REQUEST['hostid'],
 			'inherited' => false,
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
@@ -322,7 +223,7 @@
 		if(!empty($hostItems)){
 			$itemsList = array();
 			foreach($hostItems as $hostItem){
-				$itemsList[$hostItem['itemid']] = item_description($hostItem);
+				$itemsList[$hostItem['itemid']] = itemName($hostItem);
 			}
 			order_result($itemsList);
 
@@ -334,7 +235,7 @@
 		}
 
 // Triggers
-		$hostTriggers = CTrigger::get(array(
+		$hostTriggers = API::Trigger()->get(array(
 			'inherited' => false,
 			'hostids' => $_REQUEST['hostid'],
 			'output' => API_OUTPUT_EXTEND,
@@ -356,7 +257,7 @@
 		}
 
 // Graphs
-		$hostGraphs = CGraph::get(array(
+		$hostGraphs = API::Graph()->get(array(
 			'inherited' => false,
 			'hostids' => $_REQUEST['hostid'],
 			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)),
@@ -382,7 +283,7 @@
 // Discovery rules
 		$hostDiscoveryRuleids = array();
 
-		$hostDiscoveryRules = CDiscoveryRule::get(array(
+		$hostDiscoveryRules = API::DiscoveryRule()->get(array(
 			'inherited' => false,
 			'hostids' => $_REQUEST['hostid'],
 			'output' => API_OUTPUT_EXTEND,
@@ -390,7 +291,7 @@
 		if(!empty($hostDiscoveryRules)){
 			$discoveryRuleList = array();
 			foreach($hostDiscoveryRules as $discoveryRule){
-				$discoveryRuleList[$discoveryRule['itemid']] = item_description($discoveryRule);
+				$discoveryRuleList[$discoveryRule['itemid']] = itemName($discoveryRule);
 			}
 			order_result($discoveryRuleList);
 			$hostDiscoveryRuleids = array_keys($discoveryRuleList);
@@ -403,7 +304,7 @@
 		}
 
 // Item prototypes
-		$hostItemPrototypes = CItemPrototype::get(array(
+		$hostItemPrototypes = API::Itemprototype()->get(array(
 			'hostids' => $_REQUEST['hostid'],
 			'discoveryids' => $hostDiscoveryRuleids,
 			'inherited' => false,
@@ -412,7 +313,7 @@
 		if(!empty($hostItemPrototypes)){
 			$prototypeList = array();
 			foreach($hostItemPrototypes as $itemPrototype){
-				$prototypeList[$itemPrototype['itemid']] = item_description($itemPrototype);
+				$prototypeList[$itemPrototype['itemid']] = itemName($itemPrototype);
 			}
 			order_result($prototypeList);
 
@@ -424,7 +325,7 @@
 		}
 
 // Trigger prototypes
-		$hostTriggerPrototypes = CTriggerPrototype::get(array(
+		$hostTriggerPrototypes = API::TriggerPrototype()->get(array(
 			'hostids' => $_REQUEST['hostid'],
 			'discoveryids' => $hostDiscoveryRuleids,
 			'inherited' => false,
@@ -446,7 +347,7 @@
 		}
 
 // Graph prototypes
-		$hostGraphPrototypes = CGraphPrototype::get(array(
+		$hostGraphPrototypes = API::GraphPrototype()->get(array(
 			'hostids' => $_REQUEST['hostid'],
 			'discoveryids' => $hostDiscoveryRuleids,
 			'inherited' => false,
@@ -538,7 +439,7 @@
 		));
 	}
 
-	$macroTab = new CTable();
+	$macroTab = new CTable(null,'formElementTable');
 	$macroTab->addRow(array(S_MACRO, SPACE, S_VALUE));
 	$macroTab->setAttribute('id', 'userMacros');
 
@@ -572,31 +473,30 @@
 	$profileList = new CFormList('profilelist');
 	$profileList->addRow(array(new CLabel(SPACE, 'useprofile'), new CCheckBox('useprofile', $useprofile)));
 
-	$profileList->addRow(S_DEVICE_TYPE,new CTextBox('devicetype',$devicetype,61));
-	$profileList->addRow(S_NAME,new CTextBox('name',$name,61));
-	$profileList->addRow(S_OS,new CTextBox('os',$os,61));
-	$profileList->addRow(S_SERIALNO,new CTextBox('serialno',$serialno,61));
-	$profileList->addRow(S_TAG,new CTextBox('tag',$tag,61));
-	$profileList->addRow(S_MACADDRESS,new CTextBox('macaddress',$macaddress,61));
-	$profileList->addRow(S_HARDWARE,new CTextArea('hardware',$hardware,60,4));
-	$profileList->addRow(S_SOFTWARE,new CTextArea('software',$software,60,4));
-	$profileList->addRow(S_CONTACT,new CTextArea('contact',$contact,60,4));
-	$profileList->addRow(S_LOCATION,new CTextArea('location',$location,60,4));
-	$profileList->addRow(S_NOTES,new CTextArea('notes',$notes,60,4));
 
-	$divTabs->addTab('profileTab', S_HOST_PROFILE, $profileList);
-// } PROFILE WIDGET
+	$hostProfileTable = DB::getSchema('host_profile');
+	$host_profile_fields = getHostProfiles();
 
-// EXT PROFILE WIDGET {
-	$profileexlist =  new CFormList('profileexlist');
-	$profileexlist->addRow(array(new CLabel(SPACE, 'useprofile_ext'), new CCheckBox('useprofile_ext', $useprofile_ext)));
+	foreach($host_profile_fields as $profileName => $profileCaption){
+		if(!isset($host_profile[$profileName])){
+			$host_profile[$profileName] = '';
+		}
 
-	foreach($ext_profiles_fields as $prof_field => $caption){
-		$profileexlist->addRow($caption, new CTextBox('ext_host_profiles['.$prof_field.']',$ext_host_profiles[$prof_field],80));
+		if($hostProfileTable['fields'][$profileName]['type'] == DB::FIELD_TYPE_TEXT){
+			$input = new CTextArea('host_profile['.$profileName.']', $host_profile[$profileName]);
+			$input->addStyle('width: 64em;');
+		}
+		else{
+			$fieldLength = $hostProfileTable['fields'][$profileName]['length'];
+			$input = new CTextBox('host_profile['.$profileName.']', $host_profile[$profileName]);
+			$input->setAttribute('maxlength', $fieldLength);
+			$input->addStyle('width: '.($fieldLength > 64 ? 64 : $fieldLength).'em;');
+		}
+		$profileList->addRow($profileCaption, $input);
 	}
 
-	$divTabs->addTab('profileExTab', S_EXTENDED_HOST_PROFILE, $profileexlist);
-// } EXT PROFILE WIDGET
+	$divTabs->addTab('profileTab', _('Host profile'), $profileList);
+// } PROFILE WIDGET
 
 	$frmHost->addItem($divTabs);
 

@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -190,7 +190,7 @@ include_once('include/page_header.php');
 	}
 ?>
 <?php
-	$form = new CForm(null, 'get');
+	$form = new CForm('get');
 	$form->addItem(new CSubmit("form", S_CREATE_SLIDESHOW));
 
 	$slide_wdgt = new CWidget();

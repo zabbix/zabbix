@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ include_once('include/page_header.php');
 // needed type to know which field name to use
 $itemType = get_request('type', 0);
 switch($itemType) {
-	case ITEM_TYPE_SSH: case ITEM_TYPE_TELNET: $paramsFieldName = S_EXECUTED_SCRIPT; break;
+	case ITEM_TYPE_SSH: case ITEM_TYPE_TELNET: case ITEM_TYPE_JMX: $paramsFieldName = S_EXECUTED_SCRIPT; break;
 	case ITEM_TYPE_DB_MONITOR: $paramsFieldName = S_PARAMS; break;
 	case ITEM_TYPE_CALCULATED: $paramsFieldName = S_FORMULA; break;
 	default: $paramsFieldName = 'params';
@@ -46,7 +46,8 @@ switch($itemType) {
 		'itemid'=>			array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))'),
 		'interfaceid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,	null, S_INTERFACE),
 
-		'description'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
+		'name'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
+		'description'=>		array(T_ZBX_STR, O_OPT,  null,	null,		'isset({save})'),
 		'item_filter_macro'=>		array(T_ZBX_STR, O_OPT,  null,	null,		'isset({save})'),
 		'item_filter_value'=>		array(T_ZBX_STR, O_OPT,  null,	null,		'isset({save})'),
 		'key'=>				array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,		'isset({save})'),
@@ -62,14 +63,16 @@ switch($itemType) {
 				IN(array(-1,ITEM_TYPE_ZABBIX,ITEM_TYPE_SNMPV1,ITEM_TYPE_TRAPPER,ITEM_TYPE_SIMPLE,
 					ITEM_TYPE_SNMPV2C,ITEM_TYPE_INTERNAL,ITEM_TYPE_SNMPV3,ITEM_TYPE_ZABBIX_ACTIVE,
 					ITEM_TYPE_AGGREGATE,ITEM_TYPE_EXTERNAL,ITEM_TYPE_DB_MONITOR,
-					ITEM_TYPE_IPMI,ITEM_TYPE_SSH,ITEM_TYPE_TELNET,ITEM_TYPE_CALCULATED)),'isset({save})'),
+					ITEM_TYPE_IPMI,ITEM_TYPE_SSH,ITEM_TYPE_TELNET,ITEM_TYPE_JMX,ITEM_TYPE_CALCULATED)),'isset({save})'),
 		'authtype'=>		array(T_ZBX_INT, O_OPT,  NULL,	IN(ITEM_AUTHTYPE_PASSWORD.','.ITEM_AUTHTYPE_PUBLICKEY),
 											'isset({save})&&isset({type})&&({type}=='.ITEM_TYPE_SSH.')'),
 		'username'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,		'isset({save})&&isset({type})&&'.IN(
 												ITEM_TYPE_SSH.','.
+												ITEM_TYPE_JMX.','.
 												ITEM_TYPE_TELNET, 'type')),
 		'password'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,		'isset({save})&&isset({type})&&'.IN(
 												ITEM_TYPE_SSH.','.
+												ITEM_TYPE_JMX.','.
 												ITEM_TYPE_TELNET, 'type')),
 		'publickey'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,		'isset({save})&&isset({type})&&({type})=='.ITEM_TYPE_SSH.'&&({authtype})=='.ITEM_AUTHTYPE_PUBLICKEY),
 		'privatekey'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,		'isset({save})&&isset({type})&&({type})=='.ITEM_TYPE_SSH.'&&({authtype})=='.ITEM_AUTHTYPE_PUBLICKEY),
@@ -96,8 +99,8 @@ switch($itemType) {
 													ITEM_TYPE_SNMPV3,'type')),
 		'snmpv3_securitylevel'=>array(T_ZBX_INT, O_OPT,  null,  IN('0,1,2'),	'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
 		'snmpv3_securityname'=>	array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
-		'snmpv3_authpassphrase'=>array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
-		'snmpv3_privpassphrase'=>array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
+		'snmpv3_authpassphrase'=>array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.')&&({snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.'||{snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV.'))'),
+		'snmpv3_privpassphrase'=>array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.')&&({snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.'))'),
 
 		'ipmi_sensor'=>		array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,	'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_IPMI.'))', S_IPMI_SENSOR),
 		'trapper_hosts'=>	array(T_ZBX_STR, O_OPT,  null,  null,			'isset({save})&&isset({type})&&({type}==2)'),
@@ -124,7 +127,7 @@ switch($itemType) {
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder('description', ZBX_SORT_UP);
+	validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go', 'none');
 
@@ -135,7 +138,7 @@ switch($itemType) {
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1
 		);
-		$item = CDiscoveryRule::get($options);
+		$item = API::DiscoveryRule()->get($options);
 		$item = reset($item);
 		if(!$item) access_deny();
 		$_REQUEST['hostid'] = $item['hostid'];
@@ -147,7 +150,7 @@ switch($itemType) {
 			'templated_hosts' => 1,
 			'editable' => 1
 		);
-		$hosts = CHost::get($options);
+		$hosts = API::Host()->get($options);
 		if(empty($hosts)) access_deny();
 	}
 ?>
@@ -178,7 +181,7 @@ switch($itemType) {
 		array_push($_REQUEST['delay_flex'],$_REQUEST['new_delay_flex']);
 	}
 	else if(isset($_REQUEST['delete'])&&isset($_REQUEST['itemid'])){
-		$result = CDiscoveryRule::delete($_REQUEST['itemid']);
+		$result = API::DiscoveryRule()->delete($_REQUEST['itemid']);
 		show_messages($result, _('Discovery rule deleted'), _('Cannot delete discovery rule'));
 
 		unset($_REQUEST['itemid']);
@@ -203,6 +206,7 @@ switch($itemType) {
 
 		$item = array(
 			'interfaceid' => get_request('interfaceid'),
+			'name' => get_request('name'),
 			'description' => get_request('description'),
 			'key_' => get_request('key'),
 			'hostid' => get_request('hostid'),
@@ -224,7 +228,6 @@ switch($itemType) {
 			'privatekey' => get_request('privatekey'),
 			'params' => get_request('params'),
 			'ipmi_sensor' => get_request('ipmi_sensor'),
-			'flags' => ZBX_FLAG_DISCOVERY,
 			'filter' => $filter,
 		);
 
@@ -238,12 +241,12 @@ switch($itemType) {
 
 			$item['itemid'] = $_REQUEST['itemid'];
 
-			$result = CDiscoveryRule::update($item);
+			$result = API::DiscoveryRule()->update($item);
 			$result = DBend($result);
 			show_messages($result, _('Discovery rule updated'), _('Cannot update discovery rule'));
 		}
 		else{
-			$result = CDiscoveryRule::create(array($item));
+			$result = API::DiscoveryRule()->create(array($item));
 			show_messages($result, _('Discovery rule created'), _('Cannot add discovery rule'));
 		}
 
@@ -263,7 +266,7 @@ switch($itemType) {
 		show_messages($go_result, ($_REQUEST['go'] == 'activate') ? _('Discovery rules activated') : _('Discovery rules disabled'), null);
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_itemid'])){
-		$go_result = CDiscoveryRule::delete($_REQUEST['group_itemid']);
+		$go_result = API::DiscoveryRule()->delete($_REQUEST['group_itemid']);
 		show_messages($go_result, _('Discovery rule deleted'), _('Cannot delete discovery rule'));
 	}
 
@@ -278,7 +281,7 @@ switch($itemType) {
 
 	$form = null;
 	if(!isset($_REQUEST['form'])){
-		$form = new CForm(null, 'get');
+		$form = new CForm('get');
 		$form->addVar('hostid', $_REQUEST['hostid']);
 		$form->addItem(new CSubmit('form', S_CREATE_RULE));
 	}
@@ -298,6 +301,7 @@ switch($itemType) {
 		$limited = false;
 
 
+		$name = get_request('name', '');
 		$description = get_request('description', '');
 		$key = get_request('key', '');
 		$delay = get_request('delay', 30);
@@ -337,7 +341,7 @@ switch($itemType) {
 				'output' => API_OUTPUT_EXTEND,
 				'editable' => 1,
 			);
-			$item_data = CItem::get($options);
+			$item_data = API::Item()->get($options);
 			$item_data = reset($item_data);
 
 			$limited = ($item_data['templateid'] != 0);
@@ -346,6 +350,7 @@ switch($itemType) {
 		if((isset($_REQUEST['itemid']) && !isset($_REQUEST['form_refresh']))){
 			$interfaceid	= $item_data['interfaceid'];
 
+			$name = $item_data['name'];
 			$description = $item_data['description'];
 			$key = $item_data['key_'];
 			$type = $item_data['type'];
@@ -427,7 +432,7 @@ switch($itemType) {
 
 
 // Interfaces
-		$interfaces = CHostInterface::get(array(
+		$interfaces = API::HostInterface()->get(array(
 			'hostids' => $hostid,
 			'output' => API_OUTPUT_EXTEND,
 		));
@@ -443,7 +448,7 @@ switch($itemType) {
 		}
 
 // Name
-		$frmItem->addRow(S_NAME, new CTextBox('description', $description, 40, $limited));
+		$frmItem->addRow(_('Name'), new CTextBox('name', $name, 40, $limited));
 
 // Key
 		$frmItem->addRow(S_KEY, new CTextBox('key', $key, 40, $limited));
@@ -482,7 +487,7 @@ switch($itemType) {
 
 // SNMPv3 security level
 		$cmbSecLevel = new CComboBox('snmpv3_securitylevel', $snmpv3_securitylevel);
-		$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, 'noAuthPriv');
+		$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, 'noAuthNoPriv');
 		$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, 'authNoPriv');
 		$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'authPriv');
 		$frmItem->addRow(S_SNMPV3_SECURITY_LEVEL, $cmbSecLevel, null, 'row_snmpv3_securitylevel');
@@ -492,13 +497,9 @@ switch($itemType) {
 
 // SNMPv3 auth passphrase
 		$frmItem->addRow(S_SNMPV3_AUTH_PASSPHRASE, new CTextBox('snmpv3_authpassphrase',$snmpv3_authpassphrase,64), null, 'row_snmpv3_authpassphrase');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'snmpv3_authpassphrase');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmpv3_authpassphrase');
 
 // SNMPv3 priv passphrase
 		$frmItem->addRow(S_SNMPV3_PRIV_PASSPHRASE, new CTextBox('snmpv3_privpassphrase',$snmpv3_privpassphrase,64), null, 'row_snmpv3_privpassphrase');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'snmpv3_privpassphrase');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmpv3_privpassphrase');
 
 // SNMP port
 		$frmItem->addRow(S_PORT, new CNumericBox('port',$port,5), null, 'row_port');
@@ -529,6 +530,8 @@ switch($itemType) {
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'row_username');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'username');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'row_username');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'username');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'row_username');
 
 // Public key
 		$frmItem->addRow(S_PUBLIC_KEY_FILE, new CTextBox('publickey',$publickey,16), null, 'row_publickey');
@@ -546,6 +549,8 @@ switch($itemType) {
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'row_password');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'password');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'row_password');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'password');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'row_password');
 
 		$spanEC = new CSpan(S_EXECUTED_SCRIPT);
 		$spanEC->setAttribute('id', 'label_executed_script');
@@ -631,6 +636,7 @@ switch($itemType) {
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TRAPPER, 'trapper_hosts');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TRAPPER, 'row_trapper_hosts');
 
+		$frmItem->addRow(_('Description'), new CTextArea('description', $description));
 
 		$frmRow = array(new CSubmit('save', S_SAVE));
 		if(isset($_REQUEST['itemid'])){
@@ -640,9 +646,21 @@ switch($itemType) {
 		$frmRow[] = new CButtonCancel(url_param('groupid').url_param('hostid'));
 		$frmItem->addItemToBottomRow($frmRow);
 
+		// adding javascript, so that auth fields would be hidden if they are not used in specific auth type
+		$securityLevelVisibility = array();
+		zbx_subarray_push($securityLevelVisibility, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, 'row_snmpv3_authpassphrase');
+		zbx_subarray_push($securityLevelVisibility, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, 'snmpv3_authpassphrase');
+
+		zbx_subarray_push($securityLevelVisibility, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'row_snmpv3_authpassphrase');
+		zbx_subarray_push($securityLevelVisibility, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'snmpv3_authpassphrase');
+		zbx_subarray_push($securityLevelVisibility, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'row_snmpv3_privpassphrase');
+		zbx_subarray_push($securityLevelVisibility, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'snmpv3_privpassphrase');
+
+		zbx_add_post_js("var securityLevelSwitcher = new CViewSwitcher('snmpv3_securitylevel', 'change', ".zbx_jsvalue($securityLevelVisibility, true).");");
 		zbx_add_post_js("var authTypeSwitcher = new CViewSwitcher('authtype', 'change', ".zbx_jsvalue($authTypeVisibility, true).");");
 		zbx_add_post_js("var typeSwitcher = new CViewSwitcher('type', 'change', ".zbx_jsvalue($typeVisibility, true).(isset($_REQUEST['itemid'])? ', true': '').');');
 		zbx_add_post_js("var mnFrmTbl = document.getElementById('".$frmItem->getName()."'); if(mnFrmTbl) mnFrmTbl.style.visibility = 'visible';");
+
 
 		$items_wdgt->addItem($frmItem);
 	}
@@ -667,7 +685,7 @@ switch($itemType) {
 		$table = new CTableInfo();
 		$table->setHeader(array(
 			new CCheckBox('all_items',null,"checkAll('".$form->GetName()."','all_items','group_itemid');"),
-			make_sorting_header(S_NAME,'description', $sortlink),
+			make_sorting_header(S_NAME, 'name', $sortlink),
 			S_ITEMS,
 			S_TRIGGERS,
 			S_GRAPHS,
@@ -678,7 +696,7 @@ switch($itemType) {
 			S_ERROR
 		));
 
-		$sortfield = getPageSortField('description');
+		$sortfield = getPageSortField('name');
 		$sortorder = getPageSortOrder();
 		$options = array(
 			'hostids' => $_REQUEST['hostid'],
@@ -691,7 +709,7 @@ switch($itemType) {
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
-		$items = CDiscoveryRule::get($options);
+		$items = API::DiscoveryRule()->get($options);
 
 		order_result($items, $sortfield, $sortorder);
 		$paging = getPagingLine($items);
@@ -703,8 +721,8 @@ switch($itemType) {
 				$description[] = new CLink($template_host['host'],'?hostid='.$template_host['hostid'], 'unknown');
 				$description[] = ':';
 			}
-			$item['description_expanded'] = item_description($item);
-			$description[] = new CLink($item['description_expanded'], '?form=update&itemid='.$item['itemid']);
+			$item['name_expanded'] = itemName($item);
+			$description[] = new CLink($item['name_expanded'], '?form=update&itemid='.$item['itemid']);
 
 
 			$status = new CCol(new CLink(item_status2str($item['status']), '?hostid='.$_REQUEST['hostid'].'&group_itemid='.$item['itemid'].'&go='.
@@ -712,10 +730,10 @@ switch($itemType) {
 
 
 			if(zbx_empty($item['error'])){
-				$error = new CDiv(SPACE, 'iconok');
+				$error = new CDiv(SPACE, 'status_icon iconok');
 			}
 			else{
-				$error = new CDiv(SPACE, 'iconerror');
+				$error = new CDiv(SPACE, 'status_icon iconerror');
 				$error->setHint($item['error'], '', 'on');
 			}
 

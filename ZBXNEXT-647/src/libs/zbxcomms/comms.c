@@ -1,6 +1,6 @@
 /*
-** ZABBIX
-** Copyright (C) 2000-2006 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -81,21 +81,12 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
+
 #define ZBX_TCP_MAX_STRERROR	255
-
-int	zbx_tcp_error(void)
-{
-	if (ZBX_SOCK_ERR_TIMEDOUT == zbx_sock_last_error())
-	{
-		return ZBX_TCP_ERR_TIMEOUT;
-	}
-
-	return ZBX_TCP_ERR_NETWORK;
-}
 
 static char	zbx_tcp_strerror_message[ZBX_TCP_MAX_STRERROR];
 
-const char	*zbx_tcp_strerror(void)
+const char	*zbx_tcp_strerror()
 {
 	zbx_tcp_strerror_message[ZBX_TCP_MAX_STRERROR - 1] = '\0'; /* force terminate string */
 	return (&zbx_tcp_strerror_message[0]);
@@ -106,7 +97,7 @@ const char	*zbx_tcp_strerror(void)
 #else
 #	define zbx_set_tcp_strerror __zbx_zbx_set_tcp_strerror
 #endif /* HAVE___VA_ARGS__ */
-static void __zbx_zbx_set_tcp_strerror(const char *fmt, ...)
+static void	__zbx_zbx_set_tcp_strerror(const char *fmt, ...)
 {
 	va_list args;
 
@@ -241,7 +232,7 @@ struct hostent	*zbx_gethost(const char *hostname)
 
 /* static (winXX threads require OFF) */ int	tcp_started = FAIL;
 
-static int	zbx_tcp_start(void)
+static int	zbx_tcp_start()
 {
 	WSADATA sockInfo;
 
@@ -333,24 +324,22 @@ void	zbx_tcp_init(zbx_sock_t *s, ZBX_SOCKET o)
  ******************************************************************************/
 static void	zbx_tcp_timeout_set(zbx_sock_t *s, int timeout)
 {
-	if (0 != timeout)
-	{
-		s->timeout = timeout;
+	s->timeout = timeout;
 #if defined(_WINDOWS)
-		timeout *= 1000;
-		if (setsockopt(s->socket, SOL_SOCKET, SO_RCVTIMEO,
-				(const char *)&timeout, sizeof(timeout)) == ZBX_TCP_ERROR)
-			zbx_set_tcp_strerror("setsockopt() failed with error %d: %s",
-					zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
+	timeout *= 1000;
 
-		if (setsockopt(s->socket, SOL_SOCKET, SO_SNDTIMEO,
-				(const char *)&timeout, sizeof(timeout)) == ZBX_TCP_ERROR)
-			zbx_set_tcp_strerror("setsockopt() failed with error %d: %s",
-					zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
+	if (setsockopt(s->socket, SOL_SOCKET, SO_RCVTIMEO,
+			(const char *)&timeout, sizeof(timeout)) == ZBX_TCP_ERROR)
+		zbx_set_tcp_strerror("setsockopt() failed with error %d: %s",
+				zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
+
+	if (setsockopt(s->socket, SOL_SOCKET, SO_SNDTIMEO,
+			(const char *)&timeout, sizeof(timeout)) == ZBX_TCP_ERROR)
+		zbx_set_tcp_strerror("setsockopt() failed with error %d: %s",
+				zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
 #else
-		alarm(timeout);
+	alarm(timeout);
 #endif
-	}
 }
 
 /******************************************************************************
@@ -372,7 +361,10 @@ static void	zbx_tcp_timeout_cleanup(zbx_sock_t *s)
 {
 #if !defined(_WINDOWS)
 	if (0 != s->timeout)
+	{
 		alarm(0);
+		s->timeout = 0;
+	}
 #endif
 }
 
@@ -448,7 +440,8 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 		}
 	}
 
-	zbx_tcp_timeout_set(s, timeout);
+	if (0 != timeout)
+		zbx_tcp_timeout_set(s, timeout);
 
 	if (ZBX_TCP_ERROR == connect(s->socket, ai->ai_addr, ai->ai_addrlen))
 	{
@@ -509,7 +502,8 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 		}
 	}
 
-	zbx_tcp_timeout_set(s, timeout);
+	if (0 != timeout)
+		zbx_tcp_timeout_set(s, timeout);
 
 	if (ZBX_TCP_ERROR == connect(s->socket, (struct sockaddr *)&servaddr_in, sizeof(ZBX_SOCKADDR)))
 	{
@@ -553,7 +547,8 @@ int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags, int t
 
 	ZBX_TCP_START();
 
-	zbx_tcp_timeout_set(s, timeout);
+	if (0 != timeout)
+		zbx_tcp_timeout_set(s, timeout);
 
 	if( flags & ZBX_TCP_NEW_PROTOCOL )
 	{
@@ -588,7 +583,8 @@ int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags, int t
 		written += i;
 	}
 cleanup:
-	zbx_tcp_timeout_cleanup(s);
+	if (0 != timeout)
+		zbx_tcp_timeout_cleanup(s);
 
 	return ret;
 }
@@ -633,7 +629,7 @@ void	zbx_tcp_close(zbx_sock_t *s)
  * Return value: SUCCEED - success                                            *
  *               FAIL - an error occurred                                     *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -641,8 +637,8 @@ void	zbx_tcp_close(zbx_sock_t *s)
 #ifdef HAVE_IPV6
 int	get_address_family(const char *addr, int *family, char *error, int max_error_len)
 {
-	struct	addrinfo hints, *ai = NULL;
-	int	err, res = FAIL;
+	struct addrinfo	hints, *ai = NULL;
+	int		err, res = FAIL;
 
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = PF_UNSPEC;
@@ -655,7 +651,7 @@ int	get_address_family(const char *addr, int *family, char *error, int max_error
 		goto out;
 	}
 
-	if (ai->ai_family != PF_INET && ai->ai_family != PF_INET6)
+	if (PF_INET != ai->ai_family && PF_INET6 != ai->ai_family)
 	{
 		zbx_snprintf(error, max_error_len, "%s: Unsupported address family", addr);
 		goto out;
@@ -751,16 +747,29 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 			fcntl(s->sockets[s->num_socks], F_SETFD, FD_CLOEXEC);
 #endif
 
-			/* Enable address reuse */
-			/* This is to immediately use the address even if it is in TIME_WAIT state */
+			/* enable address reuse */
+			/* this is to immediately use the address even if it is in TIME_WAIT state */
 			/* http://www-128.ibm.com/developerworks/linux/library/l-sockpit/index.html */
 			on = 1;
-			if (ZBX_TCP_ERROR == setsockopt(s->sockets[s->num_socks], SOL_SOCKET,
-							SO_REUSEADDR, (void *)&on, sizeof(on)))
+			if (ZBX_TCP_ERROR == setsockopt(s->sockets[s->num_socks], SOL_SOCKET, SO_REUSEADDR, (void *)&on, sizeof(on)))
 			{
-				zbx_set_tcp_strerror("setsockopt() for [[%s]:%s] failed with error %d: %s",
+				zbx_set_tcp_strerror("setsockopt() with SO_REUSEADDR for [[%s]:%s] failed with error %d: %s",
 						ip ? ip : "-", port, zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
 			}
+
+#if defined(IPV6_V6ONLY)
+#ifdef _WINDOWS
+			if (PF_INET6 == current_ai->ai_family &&
+				ZBX_TCP_ERROR == setsockopt(s->sockets[s->num_socks], IPPROTO_IPV6, IPV6_V6ONLY, (void *)&on, sizeof(on)))
+#else
+			if (PF_INET6 == current_ai->ai_family &&
+				ZBX_TCP_ERROR == setsockopt(s->sockets[s->num_socks], SOL_IPV6, IPV6_V6ONLY, (void *)&on, sizeof(on)))
+#endif
+			{
+				zbx_set_tcp_strerror("setsockopt() with IPV6_V6ONLY for [[%s]:%s] failed with error %d: %s",
+						ip ? ip : "-", port, zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
+			}
+#endif	/* IPV6_V6ONLY */
 
 			if (ZBX_TCP_ERROR == bind(s->sockets[s->num_socks], current_ai->ai_addr, current_ai->ai_addrlen))
 			{
@@ -1054,7 +1063,7 @@ void	zbx_tcp_free(zbx_sock_t *s)
  ******************************************************************************/
 int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeout)
 {
-#define ZBX_BUF_LEN	ZBX_STAT_BUF_LEN*8
+#define ZBX_BUF_LEN	ZBX_STAT_BUF_LEN * 8
 
 	ssize_t		nbytes, left;
 	ssize_t		read_bytes;
@@ -1065,7 +1074,8 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeou
 
 	ZBX_TCP_START();
 
-	zbx_tcp_timeout_set(s, timeout);
+	if (0 != timeout)
+		zbx_tcp_timeout_set(s, timeout);
 
 	zbx_free(s->buf_dyn);
 
@@ -1163,7 +1173,8 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeou
 		ret = FAIL;
 	}
 cleanup:
-	zbx_tcp_timeout_cleanup(s);
+	if (0 != timeout)
+		zbx_tcp_timeout_cleanup(s);
 
 	return ret;
 }

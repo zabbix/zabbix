@@ -6,7 +6,8 @@ DIST_SUBDIRS = \
 	zabbix_get \
 	zabbix_sender \
 	zabbix_proxy \
-	zabbix_server
+	zabbix_server \
+	zabbix_java
 
 if AGENT
 AGENT_SUBDIRS = \
@@ -33,12 +34,19 @@ PROXY_SUBDIRS = \
 	zabbix_server/poller \
 	zabbix_server/trapper \
 	zabbix_server/nodewatcher \
+	zabbix_server/selfmon \
 	zabbix_proxy
 endif
+endif
+
+if JAVA
+JAVA_SUBDIRS = \
+	zabbix_java
 endif
 
 SUBDIRS = \
 	libs \
 	$(AGENT_SUBDIRS) \
 	$(SERVER_SUBDIRS) \
-	$(PROXY_SUBDIRS)
+	$(PROXY_SUBDIRS) \
+	$(JAVA_SUBDIRS)

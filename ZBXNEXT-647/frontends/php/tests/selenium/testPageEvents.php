@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,8 @@ class testPageEvents extends CWebTest
 	public function testPageEvents_Triggers_SimpleTest()
 	{
 		$this->login('events.php');
-		$this->dropdown_select('source','Trigger');
+
+		$this->dropdown_select_wait('source','Trigger');
 
 		$this->assertTitle('Latest events');
 		$this->ok('HISTORY OF EVENTS');
@@ -35,9 +36,30 @@ class testPageEvents extends CWebTest
 		$this->ok('Host');
 		$this->ok('Source');
 		$this->ok('Filter');
-		$this->ok('Displaying 0 of 0 found');
+		$this->ok('Displaying');
 		// table header
-		$this->ok(array('Time','Description','Status','Severity','Duration','Ack','Actions'));
+		if(0 == DBcount('select * from events where source='.EVENT_SOURCE_TRIGGERS))
+			$this->ok('No events found');
+		else
+			$this->ok(array('Time','IP','DNS','Description','Status'));
+	}
+
+	public function testPageEvents_Discovery_SimpleTest()
+	{
+		$this->login('events.php');
+
+		$this->dropdown_select_wait('source','Discovery');
+
+		$this->assertTitle('Latest events');
+		$this->ok('HISTORY OF EVENTS');
+		$this->ok('Source');
+		$this->ok('Filter');
+		$this->ok('Displaying');
+		// table header
+		if(0 == DBcount('select * from events where source='.EVENT_SOURCE_DISCOVERY))
+			$this->ok('No events found');
+		else
+			$this->ok(array('Time','IP','DNS','Description','Status'));
 	}
 
 	public function testPageEvents_Triggers_Sorting()

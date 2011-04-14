@@ -1,6 +1,6 @@
 /*
-** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@
 #include "db.h"
 #include "zbxdb.h"
 #include "log.h"
-#include "zlog.h"
 
 /* Transaction level. Must be 1 for all queries. */
 static int	txn_level = 0;

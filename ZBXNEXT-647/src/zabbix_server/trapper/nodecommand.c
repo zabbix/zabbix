@@ -1,6 +1,6 @@
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,43 +23,7 @@
 #include "zbxserver.h"
 #include "db.h"
 #include "log.h"
-#include "zlog.h"
-#include "zbxexec.h"
-#include "../poller/checks_ipmi.h"
-
-/******************************************************************************
- *                                                                            *
- * Function: get_command_by_scriptid                                          *
- *                                                                            *
- * Purpose: get script by scriptid                                            *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value: NULL if script not found                                     *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-static char	*get_command_by_scriptid(zbx_uint64_t scriptid)
-{
-	DB_RESULT	db_result;
-	DB_ROW		db_row;
-	char		*command = NULL;
-
-	db_result = DBselect(
-			"select command"
-			" from scripts"
-			" where scriptid=" ZBX_FS_UI64,
-			scriptid);
-
-	if (NULL != (db_row = DBfetch(db_result)))
-		command = strdup(db_row[0]);
-	DBfree_result(db_result);
-
-	return command;
-}
+#include "../scripts.h"
 
 /******************************************************************************
  *                                                                            *
@@ -79,103 +43,41 @@ static char	*get_command_by_scriptid(zbx_uint64_t scriptid)
  ******************************************************************************/
 static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, char **result)
 {
-	char		*p, *command, error[MAX_STRING_LEN];
+	const char	*__function_name = "execute_script";
+	char		error[MAX_STRING_LEN];
 	int		ret = FAIL;
-	DC_ITEM		item;
-#ifdef HAVE_OPENIPMI
-	int		val;
-	char		*port;
-#endif
+	DC_HOST		host;
+	zbx_script_t	script;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In execute_script() scriptid:" ZBX_FS_UI64
-			" hostid:" ZBX_FS_UI64, scriptid, hostid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() scriptid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64,
+			__function_name, scriptid, hostid);
 
-	memset(&item, 0, sizeof(item));
+	*error = '\0';
 
-	if (FAIL == DCget_host_by_hostid(&item.host, hostid))
+	if (SUCCEED != DCget_host_by_hostid(&host, hostid))
 	{
-		*result = zbx_dsprintf(*result, "NODE %d: Unknown Host ID [" ZBX_FS_UI64 "]",
-				CONFIG_NODEID, hostid);
-		return ret;
+		zbx_snprintf(error, sizeof(error), "Unknown Host ID [" ZBX_FS_UI64 "]", hostid);
+		goto fail;
 	}
 
-	if (NULL == (command = get_command_by_scriptid(scriptid)))
+	zbx_script_init(&script);
+
+	script.type = ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT;
+	script.scriptid = scriptid;
+
+	ret = zbx_execute_script(&host, &script, result, error, sizeof(error));
+
+	zbx_script_clean(&script);
+fail:
+	if (SUCCEED != ret)
 	{
-		*result = zbx_dsprintf(*result, "NODE %d: Unknown Script ID [" ZBX_FS_UI64 "]",
-				CONFIG_NODEID, scriptid);
-		return ret;
-	}
-
-	substitute_simple_macros(NULL, NULL, &item.host, NULL,
-			&command, MACRO_TYPE_SCRIPT, NULL, 0);
-
-	zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Executing command: '%s'",
-			CONFIG_NODEID, command);
-
-	p = command;
-	while (*p == ' ' && *p != '\0')
-		p++;
-
-#ifdef HAVE_OPENIPMI
-	if (0 == strncmp(p, "IPMI", 4))
-	{
-		if (SUCCEED == (ret = DCconfig_get_interface_by_type(&item.interface, item.host.hostid,
-				INTERFACE_TYPE_IPMI, 1)))
-		{
-			item.interface.addr = strdup(item.interface.useip ? item.interface.ip_orig : item.interface.dns_orig);
-			substitute_simple_macros(NULL, NULL, &item.host, NULL,
-					&item.interface.addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
-
-			port = strdup(item.interface.port_orig);
-			substitute_simple_macros(NULL, &item.host.hostid, NULL, NULL,
-					&port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
-			if (SUCCEED == (ret = is_ushort(port, &item.interface.port)))
-			{
-				if (SUCCEED == (ret = parse_ipmi_command(p, item.ipmi_sensor, &val)))
-				{
-					if (SUCCEED == (ret = set_ipmi_control_value(&item, val,
-							error, sizeof(error))))
-					{
-						*result = zbx_dsprintf(*result, "NODE %d: IPMI command successfully executed",
-								CONFIG_NODEID);
-					}
-					else
-					{
-						*result = zbx_dsprintf(*result, "NODE %d: Cannot execute IPMI command: %s",
-								CONFIG_NODEID, error);
-						ret = FAIL;
-					}
-				}
-				else
-					 *result = zbx_dsprintf(*result, "NODE %d: Cannot parse IPMI command",
-							CONFIG_NODEID);
-			}
-			else
-				*result = zbx_dsprintf(*result, "NODE %d: Invalid port number [%s]",
-						CONFIG_NODEID, item.interface.port_orig);
-
-			zbx_free(port);
-			zbx_free(item.interface.addr);
-		}
+		if (0 != CONFIG_NODEID)
+			*result = zbx_dsprintf(*result, "NODE %d: %s", CONFIG_NODEID, error);
 		else
-			*result = zbx_dsprintf(*result, "NODE %d: IPMI host interface is not defined for host [%s]",
-					CONFIG_NODEID, item.host.host);
+			*result = zbx_strdup(*result, error);
 	}
-	else
-	{
-#endif
-		alarm(CONFIG_TRAPPER_TIMEOUT);
 
-		if (SUCCEED != (ret = zbx_execute(p, result, error, sizeof(error))))
-			*result = zbx_dsprintf(*result, "NODE %d: Cannot execute command: %s",
-					CONFIG_NODEID, error);
-
-		alarm(0);
-#ifdef HAVE_OPENIPMI
-	}
-#endif
-
-	zbx_free(command);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -361,11 +263,10 @@ int	node_process_command(zbx_sock_t *sock, const char *data, struct zbx_json_par
 	}
 
 	alarm(CONFIG_TIMEOUT);
-	if (zbx_tcp_send_raw(sock, send) != SUCCEED)
+	if (SUCCEED != zbx_tcp_send_raw(sock, send))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Error sending result of command to node %d",
-			CONFIG_NODEID,
-			nodeid);
+				CONFIG_NODEID, nodeid);
 	}
 	alarm(0);
 

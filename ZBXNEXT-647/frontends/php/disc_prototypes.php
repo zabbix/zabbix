@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,7 +55,8 @@ switch($itemType) {
 		'copy_type'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0,1'),	'isset({copy})'),
 		'copy_mode'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0'),	null),
 
-		'description'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
+		'name'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
+		'description'=>		array(T_ZBX_STR, O_OPT,  null,	null,		'isset({save})'),
 		'key'=>				array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,		'isset({save})'),
 		'delay'=>			array(T_ZBX_INT, O_OPT,  null,  '(('.BETWEEN(1,86400).
 				'(!isset({delay_flex}) || !({delay_flex}) || is_array({delay_flex}) && !count({delay_flex}))) ||'.
@@ -69,9 +70,9 @@ switch($itemType) {
 				IN(array(-1,ITEM_TYPE_ZABBIX,ITEM_TYPE_SNMPV1,ITEM_TYPE_TRAPPER,ITEM_TYPE_SIMPLE,
 					ITEM_TYPE_SNMPV2C,ITEM_TYPE_INTERNAL,ITEM_TYPE_SNMPV3,ITEM_TYPE_ZABBIX_ACTIVE,
 					ITEM_TYPE_AGGREGATE,ITEM_TYPE_EXTERNAL,ITEM_TYPE_DB_MONITOR,
-					ITEM_TYPE_IPMI,ITEM_TYPE_SSH,ITEM_TYPE_TELNET,ITEM_TYPE_CALCULATED)),'isset({save})'),
+					ITEM_TYPE_IPMI,ITEM_TYPE_SSH,ITEM_TYPE_TELNET,ITEM_TYPE_JMX,ITEM_TYPE_CALCULATED)),'isset({save})'),
 		'value_type'=>		array(T_ZBX_INT, O_OPT,  null,  IN('0,1,2,3,4'),	'isset({save})'),
-		'data_type'=>		array(T_ZBX_INT, O_OPT,  null,  IN(ITEM_DATA_TYPE_DECIMAL.','.ITEM_DATA_TYPE_OCTAL.','.ITEM_DATA_TYPE_HEXADECIMAL),
+		'data_type'=>		array(T_ZBX_INT, O_OPT,  null,  IN(ITEM_DATA_TYPE_DECIMAL.','.ITEM_DATA_TYPE_OCTAL.','.ITEM_DATA_TYPE_HEXADECIMAL.','.ITEM_DATA_TYPE_BOOLEAN),
 					'isset({save})&&(isset({value_type})&&({value_type}=='.ITEM_VALUE_TYPE_UINT64.'))'),
 		'valuemapid'=>		array(T_ZBX_INT, O_OPT,	 null,	DB_ID,		'isset({save})&&isset({value_type})&&'.IN(
 												ITEM_VALUE_TYPE_FLOAT.','.
@@ -110,8 +111,8 @@ switch($itemType) {
 
 		'snmpv3_securitylevel'=>array(T_ZBX_INT, O_OPT,  null,  IN('0,1,2'),	'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
 		'snmpv3_securityname'=>	array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
-		'snmpv3_authpassphrase'=>array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
-		'snmpv3_privpassphrase'=>array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
+		'snmpv3_authpassphrase'=>array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.')&&({snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.'||{snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV.'))'),
+		'snmpv3_privpassphrase'=>array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.')&&({snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.'))'),
 
 		'ipmi_sensor'=>		array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,	'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_IPMI.'))', S_IPMI_SENSOR),
 
@@ -161,7 +162,7 @@ switch($itemType) {
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder('description', ZBX_SORT_UP);
+	validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go', 'none');
 
@@ -172,7 +173,7 @@ switch($itemType) {
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1
 		);
-		$discovery_rule = CDiscoveryRule::get($options);
+		$discovery_rule = API::DiscoveryRule()->get($options);
 		$discovery_rule = reset($discovery_rule);
 		if(!$discovery_rule) access_deny();
 		$_REQUEST['hostid'] = $discovery_rule['hostid'];
@@ -209,7 +210,7 @@ switch($itemType) {
 	}
 	else if(isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])){
 		DBstart();
-		$result = CItemPrototype::delete($_REQUEST['itemid']);
+		$result = API::Itemprototype()->delete($_REQUEST['itemid']);
 		$result = DBend($result);
 		show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
 
@@ -235,7 +236,7 @@ switch($itemType) {
 		if($fapp == 0) array_shift($applications);
 
 		if(!zbx_empty($_REQUEST['new_application'])){
-			$new_appid = CApplication::create(array(
+			$new_appid = API::Application()->create(array(
 				'name' => $_REQUEST['new_application'],
 				'hostid' => $_REQUEST['hostid']
 			));
@@ -246,6 +247,7 @@ switch($itemType) {
 		}
 
 		$item = array(
+			'name'	=> get_request('name'),
 			'description'	=> get_request('description'),
 			'key_'			=> get_request('key'),
 			'hostid'		=> get_request('hostid'),
@@ -279,7 +281,6 @@ switch($itemType) {
 			'ipmi_sensor'		=> get_request('ipmi_sensor'),
 			'data_type'		=> get_request('data_type'),
 			'applications' => $applications,
-			'flags' => ZBX_FLAG_DISCOVERY_CHILD,
 			'ruleid' => get_request('parent_discoveryid'),
 		);
 
@@ -294,12 +295,12 @@ switch($itemType) {
 
 			$item['itemid'] = $_REQUEST['itemid'];
 
-			$result = CItemPrototype::update($item);
+			$result = API::Itemprototype()->update($item);
 
 			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 		}
 		else{
-			$result = CItemPrototype::create($item);
+			$result = API::Itemprototype()->create($item);
 			show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 		}
 
@@ -323,7 +324,7 @@ switch($itemType) {
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_itemid'])){
 		$group_itemid = $_REQUEST['group_itemid'];
 		DBstart();
-		$go_result = CItemPrototype::delete($group_itemid);
+		$go_result = API::Itemprototype()->delete($group_itemid);
 		$go_result = DBend($go_result);
 		show_messages($go_result, S_ITEMS_DELETED, S_CANNOT_DELETE_ITEMS);
 	}
@@ -341,7 +342,7 @@ switch($itemType) {
 
 	$form = null;
 	if(!isset($_REQUEST['form'])){
-		$form = new CForm(null, 'get');
+		$form = new CForm('get');
 		$form->addVar('parent_discoveryid', $_REQUEST['parent_discoveryid']);
 		$form->addItem(new CSubmit('form', S_CREATE_PROTOTYPE));
 	}
@@ -356,7 +357,7 @@ switch($itemType) {
 		$numrows = new CDiv();
 		$numrows->setAttribute('name', 'numrows');
 
-		$items_wdgt->addHeader(array(S_ITEM_PROTOTYPES_OF_BIG.SPACE, new CSpan($discovery_rule['description'], 'discoveryName')));
+		$items_wdgt->addHeader(array(S_ITEM_PROTOTYPES_OF_BIG.SPACE, new CSpan($discovery_rule['name'], 'gold')));
 		$items_wdgt->addHeader($numrows, SPACE);
 
 		$items_wdgt->addItem(get_header_host_table($_REQUEST['hostid']));
@@ -372,7 +373,7 @@ switch($itemType) {
 		$table = new CTableInfo();
 		$table->setHeader(array(
 			new CCheckBox('all_items',null,"checkAll('".$form->GetName()."','all_items','group_itemid');"),
-			make_sorting_header(S_DESCRIPTION,'description', $sortlink),
+			make_sorting_header(_('Name'),'name', $sortlink),
 			make_sorting_header(S_KEY,'key_', $sortlink),
 			make_sorting_header(S_INTERVAL,'delay', $sortlink),
 			make_sorting_header(S_HISTORY,'history', $sortlink),
@@ -384,7 +385,7 @@ switch($itemType) {
 		));
 
 
-		$sortfield = getPageSortField('description');
+		$sortfield = getPageSortField('name');
 		$sortorder = getPageSortOrder();
 		$options = array(
 			'discoveryids' => $_REQUEST['parent_discoveryid'],
@@ -395,7 +396,7 @@ switch($itemType) {
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
-		$items = CItemPrototype::get($options);
+		$items = API::Itemprototype()->get($options);
 
 		order_result($items, $sortfield, $sortorder);
 		$paging = getPagingLine($items);
@@ -409,20 +410,20 @@ switch($itemType) {
 				$description[] = new CLink($template_host['host'],'?parent_discoveryid='.$tpl_disc_ruleid, 'unknown');
 				$description[] = ':';
 			}
-			$item['description_expanded'] = item_description($item);
+			$item['name_expanded'] = itemName($item);
 
 			$disc_link = '&parent_discoveryid='.$_REQUEST['parent_discoveryid'];
-			$description[] = new CLink($item['description_expanded'], '?form=update&itemid='.$item['itemid'].$disc_link);
+			$description[] = new CLink($item['name_expanded'], '?form=update&itemid='.$item['itemid'].$disc_link);
 
 			$status = new CCol(new CLink(item_status2str($item['status']), '?group_itemid='.$item['itemid'].$disc_link.
 					'&go='.($item['status']? 'activate':'disable'), item_status2style($item['status'])));
 
 
 			if(zbx_empty($item['error'])){
-				$error = new CDiv(SPACE, 'iconok');
+				$error = new CDiv(SPACE, 'status_icon iconok');
 			}
 			else{
-				$error = new CDiv(SPACE, 'iconerror');
+				$error = new CDiv(SPACE, 'status_icon iconerror');
 				$error->setHint($item['error'], '', 'on');
 			}
 

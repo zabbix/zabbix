@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,6 +27,82 @@
 	return $result;
 	}
 
+function getHostProfiles(){
+	$profiles = array(
+		'type' => _('Type'),
+		'type_full' => _('Type (Full details)'),
+		'name' => _('Name'),
+		'alias' => _('Alias'),
+		'os' => _('OS'),
+		'os_full' => _('OS (Full details)'),
+		'os_short' => _('OS (Short)'),
+		'serialno_a' => _('Serial number A'),
+		'serialno_b' => _('Serial number B'),
+		'tag' => _('Tag'),
+		'asset_tag' => _('Asset tag'),
+		'macaddress_a' => _('MAC address A'),
+		'macaddress_b' => _('MAC address B'),
+		'hardware' => _('Hardware'),
+		'hardware_full' => _('Hardware (Full details)'),
+		'software' => _('Software'),
+		'software_full' => _('Software (Full details)'),
+		'software_app_a' => _('Software application A'),
+		'software_app_b' => _('Software application B'),
+		'software_app_c' => _('Software application C'),
+		'software_app_d' => _('Software application D'),
+		'software_app_e' => _('Software application E'),
+		'contact' => _('Contact'),
+		'location' => _('Location'),
+		'location_lat' => _('Location latitude'),
+		'location_lon' => _('Location longitude'),
+		'notes' => _('Notes'),
+		'chassis' => _('Chassis'),
+		'model' => _('Model'),
+		'hw_arch' => _('HW architecture'),
+		'vendor' => _('Vendor'),
+		'contract_number' => _('Contract number'),
+		'installer_name' => _('Installer name'),
+		'deployment_status' => _('Deployment status'),
+		'url_a' => _('URL A'),
+		'url_b' => _('URL B'),
+		'url_c' => _('URL C'),
+		'host_networks' => _('Host networks'),
+		'host_netmask' => _('Host subnet mask'),
+		'host_router' => _('Host router'),
+		'oob_ip' => _('OOB IP address'),
+		'oob_netmask' => _('OOB subnet mask'),
+		'oob_router' => _('OOB router'),
+		'date_hw_purchase' => _('Date HW purchased'),
+		'date_hw_install' => _('Date HW installed'),
+		'date_hw_expiry' => _('Date HW maintenance expires'),
+		'date_hw_decomm' => _('Date hw decommissioned'),
+		'site_address_a' => _('Site address A'),
+		'site_address_b' => _('Site address B'),
+		'site_address_c' => _('Site address C'),
+		'site_city' => _('Site city'),
+		'site_state' => _('Site state / province'),
+		'site_country' => _('Site country'),
+		'site_zip' => _('Site ZIP / postal'),
+		'site_rack' => _('Site rack location'),
+		'site_notes' => _('Site notes'),
+		'poc_1_name' => _('Primary POC name'),
+		'poc_1_email' => _('Primary POC email'),
+		'poc_1_phone_a' => _('Primary POC phone A'),
+		'poc_1_phone_b' => _('Primary POC phone B'),
+		'poc_1_cell' => _('Primary POC cell'),
+		'poc_1_screen' => _('Primary POC screen name'),
+		'poc_1_notes' => _('Primary POC notes'),
+		'poc_2_name' => _('Secondary POC name'),
+		'poc_2_email' => _('Secondary POC email'),
+		'poc_2_phone_a' => _('Secondary POC phone A'),
+		'poc_2_phone_b' => _('Secondary POC phone B'),
+		'poc_2_cell' => _('Secondary POC cell'),
+		'poc_2_screen' => _('Secondary POC screen name'),
+		'poc_2_notes' => _('Secondary POC notes'),
+	);
+
+	return $profiles;
+}
 
 
 	function get_hostgroup_by_groupid($groupid){
@@ -35,7 +111,7 @@
 		if($row){
 			return $row;
 		}
-		error(S_NO_HOST_GROUPS_WITH." groupid=[$groupid]");
+		error(_s('No host groups with groupid "%s".', $groupid));
 		return  false;
 	}
 
@@ -78,7 +154,7 @@
 			return $row;
 		}
 		if($no_error_message == 0)
-			error(S_NO_HOST_WITH.' with hostid=['.$hostid.']');
+			error(_s('No host with hostid "%s".', $hostid));
 
 	return	false;
 	}
@@ -864,9 +940,8 @@ return $result;
 		$hostids = getUnlinkableHosts($groupids);
 
 		$sql_where = '';
-		if(!is_null($groupids)){
+		if(!is_null($groupids))
 			$sql_where.= ' AND '.DBcondition('g.groupid', $groupids);
-		}
 
 		$sql = 'SELECT DISTINCT g.groupid '.
 				' FROM groups g '.
@@ -876,7 +951,7 @@ return $result;
 						'SELECT hg.groupid '.
 						' FROM hosts_groups hg '.
 						' WHERE g.groupid=hg.groupid '.
-							' AND '.DBcondition('hg.hostid', $hostids, true).
+							(!empty($hostids) ? ' AND '.DBcondition('hg.hostid', $hostids, true) : '').
 						')';
 		$res = DBselect($sql);
 		while($group = DBfetch($res)){

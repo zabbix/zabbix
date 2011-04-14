@@ -10,9 +10,10 @@ sbin_PROGRAMS = zabbix_proxy
 
 zabbix_proxy_SOURCES = \
 	servercomms.c servercomms.h \
-	events.c events.h \
+	events.c \
 	zlog.c \
-	proxy.c
+	proxy.c \
+	scripts.c
 
 zabbix_proxy_LDADD = \
 	heart/libzbxheart.a \
@@ -26,6 +27,7 @@ zabbix_proxy_LDADD = \
 	$(top_srcdir)/src/zabbix_server/trapper/libzbxtrapper.a \
 	$(top_srcdir)/src/zabbix_server/nodewatcher/libzbxnodewatcher.a \
 	datasender/libzbxdatasender.a \
+	$(top_srcdir)/src/zabbix_server/selfmon/libzbxselfmon.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspecsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
@@ -43,6 +45,7 @@ zabbix_proxy_LDADD = \
 	$(top_srcdir)/src/libs/zbxcommshigh/libzbxcommshigh.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
+	$(top_srcdir)/src/libs/zbxself/libzbxself.a \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxicmpping/libzbxicmpping.a \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \

@@ -1,6 +1,6 @@
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,9 +24,12 @@
 #include "daemon.h"
 #include "zbxjson.h"
 #include "proxy.h"
+#include "zbxself.h"
 
 #include "datasender.h"
 #include "../servercomms.h"
+
+extern unsigned char	process_type;
 
 /******************************************************************************
  *                                                                            *
@@ -38,7 +41,7 @@
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -56,17 +59,9 @@ static void	host_availability_sender(struct zbx_json *j)
 
 	if (SUCCEED == get_host_availability_data(j))
 	{
-retry:
-		if (SUCCEED == connect_to_server(&sock, 600))	/* alarm !!! */
-		{
-			put_data_to_server(&sock, j);
-			disconnect_server(&sock);
-		}
-		else
-		{
-			sleep(CONFIG_PROXYDATA_FREQUENCY);
-			goto retry;
-		}
+		connect_to_server(&sock, 600, CONFIG_PROXYDATA_FREQUENCY); /* retry till have a connection */
+		put_data_to_server(&sock, j);
+		disconnect_server(&sock);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -82,17 +77,18 @@ retry:
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	history_sender(struct zbx_json *j, int *records)
 {
+	const char	*__function_name = "history_sender";
 	zbx_sock_t	sock;
 	zbx_uint64_t	lastid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In history_sender()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_json_clean(j);
 	zbx_json_addstring(j, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_HISTORY_DATA, ZBX_JSON_TYPE_STRING);
@@ -108,26 +104,20 @@ static void	history_sender(struct zbx_json *j, int *records)
 
 	if (*records > 0)
 	{
-retry:
-		if (SUCCEED == connect_to_server(&sock, 600))	/* alarm !!! */
+		connect_to_server(&sock, 600, CONFIG_PROXYDATA_FREQUENCY); /* retry till have a connection */
+		if (SUCCEED == put_data_to_server(&sock, j))
 		{
-			if (SUCCEED == put_data_to_server(&sock, j))
-			{
-				DBbegin();
-				proxy_set_hist_lastid(lastid);
-				DBcommit();
-			}
-			else
-				*records = 0;
-
-			disconnect_server(&sock);
+			DBbegin();
+			proxy_set_hist_lastid(lastid);
+			DBcommit();
 		}
 		else
-		{
-			sleep(CONFIG_PROXYDATA_FREQUENCY);
-			goto retry;
-		}
+			*records = 0;
+
+		disconnect_server(&sock);
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -140,17 +130,18 @@ retry:
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	dhistory_sender(struct zbx_json *j, int *records)
 {
+	const char	*__function_name = "dhistory_sender";
 	zbx_sock_t	sock;
 	zbx_uint64_t	lastid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In dhistory_sender()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_json_clean(j);
 	zbx_json_addstring(j, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_DISCOVERY_DATA, ZBX_JSON_TYPE_STRING);
@@ -166,26 +157,20 @@ static void	dhistory_sender(struct zbx_json *j, int *records)
 
 	if (*records > 0)
 	{
-retry:
-		if (SUCCEED == connect_to_server(&sock, 600))	/* alarm !!! */
+		connect_to_server(&sock, 600, CONFIG_PROXYDATA_FREQUENCY); /* retry till have a connection */
+		if (SUCCEED == put_data_to_server(&sock, j))
 		{
-			if (SUCCEED == put_data_to_server(&sock, j))
-			{
-				DBbegin();
-				proxy_set_dhis_lastid(lastid);
-				DBcommit();
-			}
-			else
-				*records = 0;
-
-			disconnect_server(&sock);
+			DBbegin();
+			proxy_set_dhis_lastid(lastid);
+			DBcommit();
 		}
 		else
-		{
-			sleep(CONFIG_PROXYDATA_FREQUENCY);
-			goto retry;
-		}
+			*records = 0;
+
+		disconnect_server(&sock);
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -198,17 +183,18 @@ retry:
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	autoreg_host_sender(struct zbx_json *j, int *records)
 {
+	const char	*__function_name = "autoreg_host_sender";
 	zbx_sock_t	sock;
 	zbx_uint64_t	lastid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In autoreg_host_sender()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_json_clean(j);
 	zbx_json_addstring(j, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_AUTO_REGISTRATION_DATA, ZBX_JSON_TYPE_STRING);
@@ -224,26 +210,20 @@ static void	autoreg_host_sender(struct zbx_json *j, int *records)
 
 	if (*records > 0)
 	{
-retry:
-		if (SUCCEED == connect_to_server(&sock, 600))	/* alarm !!! */
+		connect_to_server(&sock, 600, CONFIG_PROXYDATA_FREQUENCY); /* retry till have a connection */
+		if (SUCCEED == put_data_to_server(&sock, j))
 		{
-			if (SUCCEED == put_data_to_server(&sock, j))
-			{
-				DBbegin();
-				proxy_set_areg_lastid(lastid);
-				DBcommit();
-			}
-			else
-				*records = 0;
-
-			disconnect_server(&sock);
+			DBbegin();
+			proxy_set_areg_lastid(lastid);
+			DBcommit();
 		}
 		else
-		{
-			sleep(CONFIG_PROXYDATA_FREQUENCY);
-			goto retry;
-		}
+			*records = 0;
+
+		disconnect_server(&sock);
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -256,37 +236,33 @@ retry:
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-int	main_datasender_loop()
+void	main_datasender_loop()
 {
-	struct sigaction	phan;
-	int			now, sleeptime,
-				records, r;
-	double			sec;
-	struct zbx_json		j;
+	int		now, records, r;
+	double		sec;
+	struct zbx_json	j;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_datasender_loop()");
 
-	phan.sa_sigaction = child_signal_handler;
-	sigemptyset(&phan.sa_mask);
-	phan.sa_flags = SA_SIGINFO;
-	sigaction(SIGALRM, &phan, NULL);
+	set_child_signal_handler();
 
-	zbx_setproctitle("data sender [connecting to the database]");
+	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	zbx_json_init(&j, 16*1024);
+	zbx_json_init(&j, 16 * ZBX_KIBIBYTE);
 
-	for (;;) {
+	for (;;)
+	{
 		now = time(NULL);
 		sec = zbx_time();
 
-		zbx_setproctitle("data sender [sending data]");
+		zbx_setproctitle("%s [sending data]", get_process_type_string(process_type));
 
 		host_availability_sender(&j);
 
@@ -295,39 +271,24 @@ retry_history:
 		history_sender(&j, &r);
 		records += r;
 
-		if (r == ZBX_MAX_HRECORDS)
+		if (ZBX_MAX_HRECORDS == r)
 			goto retry_history;
-
 retry_dhistory:
 		dhistory_sender(&j, &r);
 		records += r;
 
-		if (r == ZBX_MAX_HRECORDS)
+		if (ZBX_MAX_HRECORDS == r)
 			goto retry_dhistory;
-
 retry_autoreg_host:
 		autoreg_host_sender(&j, &r);
 		records += r;
 
-		if (r == ZBX_MAX_HRECORDS)
+		if (ZBX_MAX_HRECORDS == r)
 			goto retry_autoreg_host;
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Datasender spent " ZBX_FS_DBL " seconds while processing %3d values.",
-				zbx_time() - sec,
-				records);
+				zbx_time() - sec, records);
 
-		sleeptime = CONFIG_PROXYDATA_FREQUENCY;
-
-		if (sleeptime > 0) {
-			zbx_setproctitle("data sender [sleeping for %d seconds]",
-					sleeptime);
-			zabbix_log(LOG_LEVEL_DEBUG, "Sleeping for %d seconds",
-					sleeptime);
-			sleep(sleeptime);
-		}
+		zbx_sleep_loop(CONFIG_PROXYDATA_FREQUENCY);
 	}
-
-	zbx_json_free(&j);
-
-	DBclose();
 }

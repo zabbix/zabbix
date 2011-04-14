@@ -1,6 +1,6 @@
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -103,6 +103,9 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 		SET_MSG_RESULT(result, strdup("Failure initializing SSH session"));
 		goto tcp_close;
 	}
+
+	/* set blocking mode on session */
+	libssh2_session_set_blocking(session, 1);
 
 	/* Create a session instance and start it up. This will trade welcome
 	 * banners, exchange keys, and setup crypto, compression, and MAC layers
@@ -215,7 +218,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 		}
 	}
 
-	win2unix_eol(item->params);	/* CR+LF (Windows) => LF (Unix) */
+	dos2unix(item->params);	/* CR+LF (Windows) => LF (Unix) */
 	/* request a shell on a channel and execute command */
 	while (0 != (rc = libssh2_channel_exec(channel, item->params)))
 	{

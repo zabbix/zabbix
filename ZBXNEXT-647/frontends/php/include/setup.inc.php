@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@
 
 			$this->EventHandler();
 
-			parent::__construct(null, 'post');
+			parent::__construct('post');
 		}
 
 		function getConfig($name, $default = null){
@@ -129,7 +129,7 @@
 		}
 
 		function stage0(){
-			return new CTag('div', 'yes', array('Welcome to the Zabbix frontend installation wizard.',BR(),BR(),
+			return new CDiv(array('Welcome to the Zabbix frontend installation wizard.',BR(),BR(),
 				'This installation wizard will guide you through the installation of Zabbix frontend',BR(),BR(),
 				'Click the "Next" button to proceed to the next screen. If you want to change something '.
 				'on a previous screen, click "Previous" button',BR(),BR(),
@@ -146,14 +146,14 @@
 				$license = zbx_nl2br(nbsp(file_get_contents($LICENCE_FILE)));
 
 			$action = <<<JS
-if(this.checked) $("next[1]").writeAttribute('disabled', false);
-else $("next[1]").writeAttribute('disabled', 'disabled');
+if(this.checked) $("next_1").writeAttribute('disabled', false);
+else $("next_1").writeAttribute('disabled', 'disabled');
 JS;
 
 			return array(
 				new CDiv(new CSpan($license), 'licence'),
 				BR(),
-				new CDiv(array(new CCheckBox('agree', 'no', $action), new CLabel('I agree', 'agree')), 'center')
+				new CDiv(array(new CCheckBox('agree', 'no', $action), new CLabel('I agree', 'agree')), 'maxwidth center')
 			);
 		}
 

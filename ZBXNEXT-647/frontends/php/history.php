@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,6 @@ if(isset($_REQUEST['plaintext'])) define('ZBX_PAGE_NO_MENU', 1);
 else if(PAGE_TYPE_HTML == $page['type']) define('ZBX_PAGE_DO_REFRESH', 1);
 
 include_once('include/page_header.php');
-
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -147,7 +146,7 @@ include_once('include/page_header.php');
 		'output' => API_OUTPUT_EXTEND
 	);
 
-	$items = CItem::get($options);
+	$items = API::Item()->get($options);
 	$items = zbx_toHash($items, 'itemid');
 
 	foreach($_REQUEST['itemid'] as $inum =>  $itemid){
@@ -187,9 +186,9 @@ include_once('include/page_header.php');
 	);
 
 	if(count($items) == 1){
-		$ptData['header'][] = $item['host'].': '.item_description($item);
+		$ptData['header'][] = $item['host'].': '.itemName($item);
 
-		$header['left'] = array(new CLink($item['host'],'latest.php?hostid='.$item['hostid']),': ',item_description($item));
+		$header['left'] = array(new CLink($item['host'],'latest.php?hostid='.$item['hostid']),': ',itemName($item));
 
 		if('showgraph' == $_REQUEST['action']){
 			$header['right'][] = get_icon('favourite', array(
@@ -200,8 +199,8 @@ include_once('include/page_header.php');
 		}
 	}
 
-	$form = new CForm(null, 'get');
-	$form->addVar('itemid',$_REQUEST['itemid']);
+	$form = new CForm('get');
+	$form->addVar('itemid', $_REQUEST['itemid']);
 
 	if(isset($_REQUEST['filter_task']))	$form->addVar('filter_task',$_REQUEST['filter_task']);
 	if(isset($_REQUEST['filter']))		$form->addVar('filter',$_REQUEST['filter']);
@@ -226,7 +225,6 @@ include_once('include/page_header.php');
 	$itemid = $item['itemid'];
 
 	if($_REQUEST['action']=='showvalues' || $_REQUEST['action']=='showlatest'){
-
 // Filter
 		if(isset($iv_string[$item['value_type']])){
 			$filter_task = get_request('filter_task',0);
@@ -248,7 +246,7 @@ include_once('include/page_header.php');
 				}
 
 				$host = reset($item['hosts']);
-				$cmbitemlist->addItem($itemid,$host['host'].': '.item_description($item));
+				$cmbitemlist->addItem($itemid,$host['host'].': '.itemName($item));
 			}
 
 			$addItemBttn = new CButton('add_log',S_ADD,"return PopUp('popup.php?multiselect=1".'&reference=itemid&srctbl=items&value_types[]='.$item['value_type']."&srcfld1=itemid');");
@@ -256,7 +254,7 @@ include_once('include/page_header.php');
 
 			if(count($items) > 1){
 				insert_js_function('removeSelectedItems');
-				$delItemBttn = new CButton('remove_log',S_REMOVE_SELECTED, "javascript: removeSelectedItems('cmbitemlist[]', 'itemid')");
+				$delItemBttn = new CSubmit('remove_log',S_REMOVE_SELECTED, "javascript: removeSelectedItems('cmbitemlist_', 'itemid')");
 			}
 
 			$filterForm->addRow(S_ITEMS_LIST, array($cmbitemlist, BR(), $addItemBttn, $delItemBttn));
@@ -301,7 +299,7 @@ include_once('include/page_header.php');
 			$options['limit'] = 500;
 		}
 		else if($_REQUEST['action']=='showvalues'){
-			$options['time_from'] = $time - 10; // some seconds to take script execued
+			$options['time_from'] = $time - 10; // some seconds to allow script to execute
 			$options['time_till'] = $till;
 
 			$options['limit'] = $config['search_limit'];
@@ -310,16 +308,19 @@ include_once('include/page_header.php');
 // TEXT LOG
 		if(isset($iv_string[$item['value_type']])){
 			$logItem = ($item['value_type'] == ITEM_VALUE_TYPE_LOG);
+			// is this an eventlog item? If so, we must show some additional columns
+			$eventLogItem = (strpos($item['key_'], 'eventlog[') === 0);
 
 			$table = new CTableInfo('...');
 			$table->setHeader(array(
-					S_TIMESTAMP,
-					$fewItems?S_ITEM:null,
-					$logItem?S_LOCAL_TIME:null,
-					$logItem?S_SOURCE:null,
-					$logItem?S_SEVERITY:null,
-					$logItem?S_EVENT_ID:null,
-					S_VALUE),'header');
+				S_TIMESTAMP,
+				$fewItems ? S_ITEM : null,
+				$logItem ? S_LOCAL_TIME : null,
+				(($eventLogItem && $logItem) ? S_SOURCE : null),
+				(($eventLogItem && $logItem) ? S_SEVERITY : null),
+				(($eventLogItem && $logItem) ? S_EVENT_ID : null),
+				S_VALUE
+			), 'header');
 
 			if(isset($_REQUEST['filter']) && !zbx_empty($_REQUEST['filter']) && in_array($_REQUEST['filter_task'], array(FILTER_TASK_SHOW, FILTER_TASK_HIDE))){
 				$options['search'] = array('value' => $_REQUEST['filter']);
@@ -329,7 +330,7 @@ include_once('include/page_header.php');
 			}
 
 			$options['sortfield'] = 'id';
-			$hData = CHistory::get($options);
+			$hData = API::History()->get($options);
 
 			foreach($hData as $hnum => $data){
 				$color_style = null;
@@ -338,10 +339,7 @@ include_once('include/page_header.php');
 				$host = reset($item['hosts']);
 
 				if(isset($_REQUEST['filter']) && !zbx_empty($_REQUEST['filter'])){
-					$contain = zbx_stristr($data['value'],$_REQUEST['filter']) ? TRUE : FALSE;
-
-//					if($_REQUEST['filter_task'] == FILTER_TASK_SHOW && !$contain) continue;
-//					if($_REQUEST['filter_task'] == FILTER_TASK_HIDE && $contain) continue;
+					$contain = zbx_stristr($data['value'], $_REQUEST['filter']);
 
 					if(!isset($_REQUEST['mark_color'])) $_REQUEST['mark_color'] = MARK_COLOR_RED;
 
@@ -358,32 +356,26 @@ include_once('include/page_header.php');
 					}
 				}
 
-				$row = array(nbsp(zbx_date2str(S_HISTORY_LOG_ITEM_DATE_FORMAT,$data['clock'])));
+				$row = array(nbsp(zbx_date2str(S_HISTORY_LOG_ITEM_DATE_FORMAT, $data['clock'])));
 
-				if($fewItems) $row[] = $host['host'].':'.item_description($item);
+				if($fewItems)
+					$row[] = $host['host'].':'.itemName($item);
 
 				if($logItem){
-					if($data['timestamp'] == 0) $row[] = new CCol(' - ');
-					else $row[] = zbx_date2str(S_HISTORY_LOG_LOCALTIME_DATE_FORMAT,$data['timestamp']);
+					$row[] = ($data['timestamp'] == 0) ? '-' : zbx_date2str(S_HISTORY_LOG_LOCALTIME_DATE_FORMAT, $data['timestamp']);
 
-					if(zbx_empty($data['source'])) $row[] = new CCol(' - ');
-					else $row[] = $data['source'];
-
-					$row[] = new CCol(get_item_logtype_description($data['severity']),get_item_logtype_style($data['severity']));
-
-					if(zbx_empty($data['source']) && ($data['logeventid'] == '0'))
-						$row[] = new CCol(' - ');
-					else
-						$row[] = $data['logeventid'];
+					// if this is a eventLog item, showing additional info
+					if($eventLogItem){
+						$row[] = zbx_empty($data['source']) ? '-' : $data['source'];
+						$row[] = ($data['severity'] == 0)
+								? '-'
+								: new CCol(get_item_logtype_description($data['severity']), get_item_logtype_style($data['severity']));
+						$row[] = ($data['logeventid'] == 0) ? '-' : $data['logeventid'];
+					}
 				}
 
-				$data['value'] = trim($data['value'],"\r\n");
-				$data['value'] = encode_log($data['value']);
-				
-//				$data['value'] = str_replace(' ', '&nbsp;', $data['value']);
-//				$data['value'] = str_replace("\t", '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', $data['value']);
-//				$data['value'] = zbx_nl2br($data['value']);
-				array_push($row, new CCol($data['value'], 'pre'));
+				$data['value'] = encode_log(trim($data['value'], "\r\n"));
+				$row[] = new CCol($data['value'], 'pre');
 
 				$crow = new CRow($row);
 				if(is_null($color_style)){
@@ -400,7 +392,7 @@ include_once('include/page_header.php');
 
 				$table->addRow($crow);
 
-// Plaint Text
+// Plain Text
 				if(!isset($_REQUEST['plaintext'])) continue;
 
 				$ptData['body'][] = zbx_date2str(S_HISTORY_LOG_ITEM_PLAINTEXT,$data['clock']);
@@ -413,7 +405,7 @@ include_once('include/page_header.php');
 			$table->setHeader(array(S_TIMESTAMP, S_VALUE));
 
 			$options['sortfield'] = 'clock';
-			$hData = CHistory::get($options);
+			$hData = API::History()->get($options);
 			foreach($hData as $hnum => $data){
 				$item = $items[$data['itemid']];
 				$host = reset($item['hosts']);
@@ -556,7 +548,7 @@ function addPopupValues(list){
 		for(var i=0; i < list.values.length; i++){
 			if(!isset(i, list.values) || empty(list.values[i])) continue;
 
-			create_var('zbx_filter', 'itemid['+list.values[i]+']', list.values[i], false);
+			create_var('zbx_filter', 'itemid['+list.values[i].itemid+']', list.values[i].itemid, false);
 		}
 
 		$('zbx_filter').submit();

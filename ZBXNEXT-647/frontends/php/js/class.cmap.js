@@ -1,7 +1,7 @@
 // JavaScript Document
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,6 +58,8 @@ selection: {
 
 menu_active: 0,						// To recognize D&D
 debug_status: 0,
+
+saved: false,						// sysmap save state (incorrect, used only in Selenium tests)
 
 mselement: {
 	selementid:			0,			// ALWAYS must be a STRING (js doesn't support uint64)
@@ -289,6 +291,10 @@ add_empty_link: function(e){
 	this.update_linkContainer(e);
 },
 
+sysmapSaved: function(){
+	this.saved = true;
+},
+
 // SYSMAP FORM
 saveSysmap: function(){
 	this.debug('saveSysmap');
@@ -298,16 +304,18 @@ saveSysmap: function(){
 		'favobj': 	'sysmap',
 		'favid':	this.id,
 		'sysmapid':	this.sysmapid,
+		'grid_size': this.grid.gridSize,
+		'grid_show': this.grid.showGrid ? '1' : '0',
+		'grid_align': this.grid.autoAlign ? '1' : '0',
 		'action':	'save'
 	};
 
 	params = this.get_update_params(params);
-//SDJ(params);
 	new Ajax.Request(url.getPath()+'?output=ajax'+'&sid='+url.getArgument('sid'),
 					{
 						'method': 'post',
 						'parameters':params,
-						'onSuccess': function(){ },
+						'onSuccess': this.sysmapSaved.bind(this),
 //						'onSuccess': function(resp){ SDI(resp.responseText); },
 						'onFailure': function(){ document.location = url.getPath()+'?'+Object.toQueryString(params); }
 					}
@@ -375,7 +383,7 @@ return false;
 },
 
 alignSelement: function(selementid){
-	this.debug('placeSelement');
+	this.debug('alignSelement');
 //--
 
 	if(!this.grid.autoAlign) return true;
@@ -3324,6 +3332,12 @@ gridSize:	'50',				// grid size
 
 initialize: function($super, id, params){
 	this.mapObjectId = id;
+
+	// setting map grid params to default ones
+	var gridSizeDropDownValue = params.gridsize.value.split('x');
+	this.gridSize = gridSizeDropDownValue[0];
+	this.showGrid = params.gridshow.innerHTML == locale['S_SHOWN'];
+	this.autoAlign = params.gridautoalign.innerHTML == locale['S_ON'];
 
 	$super('CGrid['+id+']');
 

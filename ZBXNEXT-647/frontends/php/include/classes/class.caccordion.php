@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,8 +36,8 @@ class CAccordion extends CDiv{
 		$this->tabs = array();
 
 		parent::__construct();
-		$this->setAttribute('id',$this->id);
-		$this->setAttribute('class','accordion');
+		$this->attr('id', zbx_formatDomId($this->id));
+		$this->attr('class','accordion');
 	}
 
 	public function setMultiView($multiview){
@@ -46,7 +46,7 @@ class CAccordion extends CDiv{
 
 	public function addTab($header, $body){
 		$head = new CTag('h3', 'yes', new CLink($header, '#'));
-		$head->setAttribute('class', 'head');
+		$head->addClass('head');
 
 		parent::addItem($head);
 		parent::addItem(new CDiv($body));

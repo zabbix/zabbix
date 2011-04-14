@@ -1,6 +1,6 @@
 /*
-** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -364,7 +364,7 @@ void	zbx_json_addstring(struct zbx_json *j, const char *name, const char *string
 
 void	zbx_json_adduint64(struct zbx_json *j, const char *name, zbx_uint64_t value)
 {
-	char	buffer[21];	/* strlen(MAX_UINT64) == 20 */
+	char	buffer[MAX_ID_LEN];
 
 	zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, value);
 	zbx_json_addstring(j, name, buffer, ZBX_JSON_TYPE_INT);
@@ -611,17 +611,6 @@ const char	*zbx_json_next(struct zbx_json_parse *jp, const char *p)
 	return NULL;
 }
 
-const char	*zbx_json_next_value(struct zbx_json_parse *jp, const char *p, char *string, size_t len)
-{
-	if (NULL == (p = zbx_json_next(jp, p)))
-		return NULL;
-
-	if (NULL == zbx_json_decodevalue(p, string, len))
-		return NULL;
-
-	return p;
-}
-
 static size_t	zbx_json_string_size(const char *p)
 {
 	int	state = 0; /* 0 - init; 1 - inside string */
@@ -773,6 +762,14 @@ static const char	*zbx_json_decodeint(const char *p, char *string, size_t len)
 	return NULL;
 }
 
+static const char	*zbx_json_decodenull(const char *p)
+{
+	if ('n' == p[0] && 'u' == p[1] && 'l' == p[2] && 'l' == p[3])
+		return p + 4;
+
+	return NULL;
+}
+
 static size_t	zbx_json_value_size(const char *p, zbx_json_type_t jt)
 {
 	switch (jt)
@@ -786,14 +783,23 @@ static size_t	zbx_json_value_size(const char *p, zbx_json_type_t jt)
 	}
 }
 
-const char	*zbx_json_decodevalue(const char *p, char *string, size_t len)
+static const char	*zbx_json_decodevalue(const char *p, char *string, size_t len, int *is_null)
 {
 	switch (__zbx_json_type(p))
 	{
 		case ZBX_JSON_TYPE_STRING:
+			if (NULL != is_null)
+				*is_null = 0;
 			return zbx_json_decodestring(p, string, len);
 		case ZBX_JSON_TYPE_INT:
+			if (NULL != is_null)
+				*is_null = 0;
 			return zbx_json_decodeint(p, string, len);
+		case ZBX_JSON_TYPE_NULL:
+			if (NULL != is_null)
+				*is_null = 1;
+			*string = '\0';
+			return zbx_json_decodenull(p);
 		default:
 			return NULL;
 	}
@@ -878,6 +884,29 @@ const char	*zbx_json_pair_by_name(struct zbx_json_parse *jp, const char *name)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_json_next_value                                              *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+const char	*zbx_json_next_value(struct zbx_json_parse *jp, const char *p, char *string, size_t len, int *is_null)
+{
+	if (NULL == (p = zbx_json_next(jp, p)))
+		return NULL;
+
+	return zbx_json_decodevalue(p, string, len, is_null);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_json_value_by_name                                           *
  *                                                                            *
  * Purpose: return value by pair name                                         *
@@ -893,12 +922,12 @@ const char	*zbx_json_pair_by_name(struct zbx_json_parse *jp, const char *name)
  ******************************************************************************/
 int	zbx_json_value_by_name(struct zbx_json_parse *jp, const char *name, char *string, size_t len)
 {
-	const char	*p = NULL;
+	const char	*p;
 
 	if (NULL == (p = zbx_json_pair_by_name(jp, name)))
 		return FAIL;
 
-	if (NULL == zbx_json_decodevalue(p, string, len))
+	if (NULL == zbx_json_decodevalue(p, string, len, NULL))
 		return FAIL;
 
 	return SUCCEED;
@@ -921,7 +950,7 @@ int	zbx_json_value_by_name(struct zbx_json_parse *jp, const char *name, char *st
  ******************************************************************************/
 int	zbx_json_value_by_name_dyn(struct zbx_json_parse *jp, const char *name, char **string, size_t *string_alloc)
 {
-	const char	*p = NULL;
+	const char	*p;
 
 	if (NULL == (p = zbx_json_pair_by_name(jp, name)))
 		return FAIL;

@@ -1,7 +1,7 @@
 <?php
 /*
-** ZABBIX
-** Copyright (C) 2000-2011 SIA Zabbix
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -143,7 +143,7 @@ class zbxXML{
 				'value_type'		=> ''
 			),
 			'elements' => array(
-				'description'		=> '',
+				'name'		=> 'description',
 				'ipmi_sensor'		=> '',
 				'delay'				=> '',
 				'history'			=> '',
@@ -157,17 +157,17 @@ class zbxXML{
 				'lastlogsize'		=> '',
 				'logtimefmt'		=> '',
 				'delay_flex'		=> '',
-				'authtype'		=> '',
-				'username'		=> '',
-				'password'		=> '',
-				'publickey'		=> '',
+				'authtype'			=> '',
+				'username'			=> '',
+				'password'			=> '',
+				'publickey'			=> '',
 				'privatekey'		=> '',
 				'params'			=> '',
 				'trapper_hosts'		=> '',
 				'snmp_community'	=> '',
 				'snmp_oid'			=> '',
-				'port'			=> '',
-				'snmp_port' => '',
+				'port'				=> '',
+				'snmp_port'			=> '',
 				'snmpv3_securityname'	=> '',
 				'snmpv3_securitylevel'	=> '',
 				'snmpv3_authpassphrase'	=> '',
@@ -223,6 +223,55 @@ class zbxXML{
 			)
 		)
 	);
+
+	protected static function mapProfileName($name){
+		$map = array(
+			'devicetype' => 'type',
+			'serialno' => 'serialno_a',
+			'macaddress' => 'macaddress_a',
+			'hardware' => 'hardware_full',
+			'software' => 'software_full',
+			'device_type' => 'type_full',
+			'device_alias' => 'alias',
+			'device_os' => 'os_full',
+			'device_os_short' => 'os_short',
+			'device_serial' => 'serialno_b',
+			'device_tag' => 'asset_tag',
+			'ip_macaddress' => 'macaddress_b',
+			'device_hardware' => 'hardware',
+			'device_software' => 'software',
+			'device_app_01' => 'software_app_a',
+			'device_app_02' => 'software_app_b',
+			'device_app_03' => 'software_app_c',
+			'device_app_04' => 'software_app_d',
+			'device_app_05' => 'software_app_e',
+			'device_chassis' => 'chassis',
+			'device_model' => 'model',
+			'device_hw_arch' => 'hw_arch',
+			'device_vendor' => 'vendor',
+			'device_contract' => 'contract_number',
+			'device_who' => 'installer_name',
+			'device_status' => 'deployment_status',
+			'device_url_1' => 'url_a',
+			'device_url_2' => 'url_b',
+			'device_url_3' => 'url_c',
+			'device_networks' => 'host_networks',
+			'ip_subnet_mask' => 'host_netmask',
+			'ip_router' => 'host_router',
+			'oob_subnet_mask' => 'oob_netmask',
+			'date_hw_buy' => 'date_hw_purchase',
+			'site_street_1' => 'site_address_a',
+			'site_street_2' => 'site_address_b',
+			'site_street_3' => 'site_address_c',
+			'poc_1_phone_1' => 'poc_1_phone_a',
+			'poc_1_phone_2' => 'poc_1_phone_b',
+			'poc_2_phone_1' => 'poc_2_phone_a',
+			'poc_2_phone_2' => 'poc_2_phone_b',
+			'device_notes' => 'notes',
+		);
+
+		return isset($map[$name]) ? $map[$name] : $name;
+	}
 
 	protected static function createDOMDocument(){
 		$doc = new DOMDocument('1.0', 'UTF-8');
@@ -430,17 +479,17 @@ class zbxXML{
 
 			foreach($importScreens as $mnum => &$screen){
 				unset($screen['screenid']);
-				$exists = CScreen::exists(array('name' => $screen['name']));
+				$exists = API::Screen()->exists(array('name' => $screen['name']));
 
-				if($exists && isset($rules['screens']['exist'])){
-					$db_screens = CScreen::get(array('filter' => array('name' => $screen['name'])));
+				if($exists && isset($rules['screen']['exist'])){
+					$db_screens = API::Screen()->get(array('filter' => array('name' => $screen['name'])));
 					if(empty($db_screens)) throw new Exception(S_NO_PERMISSIONS_FOR_SCREEN.' "'.$screen['name'].'" import');
 
 					$db_screen = reset($db_screens);
 
 					$screen['screenid'] = $db_screen['screenid'];
 				}
-				else if($exists || !isset($rules['screens']['missed'])){
+				else if($exists || !isset($rules['screen']['missed'])){
 					info('Screen ['.$screen['name'].'] skipped - user rule');
 					unset($importScreens[$mnum]);
 					continue; // break if not update exist
@@ -460,7 +509,7 @@ class zbxXML{
 							case SCREEN_RESOURCE_DATA_OVERVIEW:
 							case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
 								if(is_array($screenitem['resourceid'])){
-									$db_hostgroups = CHostgroup::getObjects($screenitem['resourceid']);
+									$db_hostgroups = API::HostGroup()->getObjects($screenitem['resourceid']);
 									if(empty($db_hostgroups)){
 										$error = S_CANNOT_FIND_HOSTGROUP.' "'.$nodeCaption.$screenitem['resourceid']['name'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
 										throw new Exception($error);
@@ -471,7 +520,7 @@ class zbxXML{
 								}
 							break;
 							case SCREEN_RESOURCE_HOST_TRIGGERS:
-								$db_hosts = CHost::getObjects($screenitem['resourceid']);
+								$db_hosts = API::Host()->getObjects($screenitem['resourceid']);
 								if(empty($db_hosts)){
 									$error = S_CANNOT_FIND_HOST.' "'.$nodeCaption.$screenitem['resourceid']['host'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
 									throw new Exception($error);
@@ -481,7 +530,7 @@ class zbxXML{
 								$screenitem['resourceid'] = $tmp['hostid'];
 							break;
 							case SCREEN_RESOURCE_GRAPH:
-								$db_graphs = CGraph::getObjects($screenitem['resourceid']);
+								$db_graphs = API::Graph()->getObjects($screenitem['resourceid']);
 								if(empty($db_graphs)){
 									$error = S_CANNOT_FIND_GRAPH.' "'.$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['name'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
 									throw new Exception($error);
@@ -492,7 +541,7 @@ class zbxXML{
 							break;
 							case SCREEN_RESOURCE_SIMPLE_GRAPH:
 							case SCREEN_RESOURCE_PLAIN_TEXT:
-								$db_items = CItem::getObjects($screenitem['resourceid']);
+								$db_items = API::Item()->getObjects($screenitem['resourceid']);
 //SDII($db_items);
 								if(empty($db_items)){
 									$error = S_CANNOT_FIND_ITEM.' "'.$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['key_'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
@@ -503,7 +552,7 @@ class zbxXML{
 								$screenitem['resourceid'] = $tmp['itemid'];
 							break;
 							case SCREEN_RESOURCE_MAP:
-								$db_sysmaps = CMap::getObjects($screenitem['resourceid']);
+								$db_sysmaps = API::Map()->getObjects($screenitem['resourceid']);
 								if(empty($db_sysmaps)){
 									$error = S_CANNOT_FIND_MAP.' "'.$nodeCaption.$screenitem['resourceid']['name'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
 									throw new Exception($error);
@@ -513,7 +562,7 @@ class zbxXML{
 								$screenitem['resourceid'] = $tmp['sysmapid'];
 							break;
 							case SCREEN_RESOURCE_SCREEN:
-								$db_screens = CScreen::get(array('screenids' => $screenitem['resourceid']));
+								$db_screens = API::Screen()->get(array('screenids' => $screenitem['resourceid']));
 								if(empty($db_screens)){
 									$error = S_CANNOT_FIND_SCREEN.' "'.$nodeCaption.$screenitem['resourceid']['name'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
 									throw new Exception($error);
@@ -538,10 +587,10 @@ class zbxXML{
 
 			foreach($importScreens as $mnum => $screen){
 				if(isset($screen['screenid'])){
-					$result = CScreen::update($screen);
+					$result = API::Screen()->update($screen);
 				}
 				else{
-					$result = CScreen::create($screen);
+					$result = API::Screen()->create($screen);
 				}
 
 				if(isset($screen['screenid'])){
@@ -575,7 +624,7 @@ class zbxXML{
 				$images_to_add = array();
 				$images_to_update = array();
 				foreach($images as $inum => $image){
-					if(CImage::exists($image)){
+					if(API::Image()->exists($image)){
 						if((($image['imagetype'] == IMAGE_TYPE_ICON) && isset($rules['icons']['exist']))
 							|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && (isset($rules['background']['exist']))))
 						{
@@ -584,10 +633,12 @@ class zbxXML{
 								'filter' => array('name' => $image['name']),
 								'output' => API_OUTPUT_SHORTEN
 							);
-							$imgs = CImage::get($options);
+							$imgs = API::Image()->get($options);
 							$img = reset($imgs);
 
 							$image['imageid'] = $img['imageid'];
+
+							// image will be decoded in class.image.php
 							$image['image'] = $image['encodedImage'];
 							unset($image['encodedImage']);
 
@@ -609,25 +660,24 @@ class zbxXML{
 				}
 //sdi($images_to_add);
 				if(!empty($images_to_add)){
-					$result = CImage::create($images_to_add);
+					$result = API::Image()->create($images_to_add);
 					if(!$result) throw new Exception(S_CANNOT_ADD_IMAGE);
 				}
 //sdi($images_to_update);
 				if(!empty($images_to_update)){
-					$result = CImage::update($images_to_update);
+					$result = API::Image()->update($images_to_update);
 					if(!$result) throw new Exception(S_CANNOT_UPDATE_IMAGE);
 				}
 			}
 
 
 			$importMaps = $importMaps['zabbix_export']['sysmaps'];
-			$sysmaps = array();
 			foreach($importMaps as $mnum => &$sysmap){
 				unset($sysmap['sysmapid']);
-				$exists = CMap::exists(array('name' => $sysmap['name']));
+				$exists = API::Map()->exists(array('name' => $sysmap['name']));
 
 				if($exists && isset($rules['maps']['exist'])){
-					$db_maps = CMap::getObjects(array('name' => $sysmap['name']));
+					$db_maps = API::Map()->getObjects(array('name' => $sysmap['name']));
 					if(empty($db_maps)) throw new Exception(S_NO_PERMISSIONS_FOR_MAP.' ['.$sysmap['name'].'] import');
 
 					$db_map = reset($db_maps);
@@ -654,16 +704,23 @@ class zbxXML{
 					$sysmap['backgroundid'] = 0;
 				}
 
-				if(!isset($sysmap['selements'])) $sysmap['selements'] = array();
-				if(!isset($sysmap['links'])) $sysmap['links'] = array();
+				if(!isset($sysmap['selements']))
+					$sysmap['selements'] = array();
+				else
+					$sysmap['selements'] = array_values($sysmap['selements']);
 
-				foreach($sysmap['selements'] as $snum => &$selement){
+				if(!isset($sysmap['links']))
+					$sysmap['links'] = array();
+				else
+					$sysmap['links'] = array_values($sysmap['links']);
+
+				foreach($sysmap['selements'] as &$selement){
 					$nodeCaption = isset($selement['elementid']['node'])?$selement['elementid']['node'].':':'';
 
 					if(!isset($selement['elementid'])) $selement['elementid'] = 0;
 					switch($selement['elementtype']){
 						case SYSMAP_ELEMENT_TYPE_MAP:
-							$db_sysmaps = CMap::getObjects($selement['elementid']);
+							$db_sysmaps = API::Map()->getObjects($selement['elementid']);
 							if(empty($db_sysmaps)){
 								$error = S_CANNOT_FIND_MAP.' "'.$nodeCaption.$selement['elementid']['name'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
 								throw new Exception($error);
@@ -673,7 +730,7 @@ class zbxXML{
 							$selement['elementid'] = $tmp['sysmapid'];
 						break;
 						case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-							$db_hostgroups = CHostgroup::getObjects($selement['elementid']);
+							$db_hostgroups = API::HostGroup()->getObjects($selement['elementid']);
 							if(empty($db_hostgroups)){
 								$error = S_CANNOT_FIND_HOSTGROUP.' "'.$nodeCaption.$selement['elementid']['name'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
 								throw new Exception($error);
@@ -683,7 +740,7 @@ class zbxXML{
 							$selement['elementid'] = $tmp['groupid'];
 						break;
 						case SYSMAP_ELEMENT_TYPE_HOST:
-							$db_hosts = CHost::getObjects($selement['elementid']);
+							$db_hosts = API::Host()->getObjects($selement['elementid']);
 							if(empty($db_hosts)){
 								$error = S_CANNOT_FIND_HOST.' "'.$nodeCaption.$selement['elementid']['host'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
 								throw new Exception($error);
@@ -693,7 +750,7 @@ class zbxXML{
 							$selement['elementid'] = $tmp['hostid'];
 						break;
 						case SYSMAP_ELEMENT_TYPE_TRIGGER:
-							$db_triggers = CTrigger::getObjects($selement['elementid']);
+							$db_triggers = API::Trigger()->getObjects($selement['elementid']);
 							if(empty($db_triggers)){
 								$error = S_CANNOT_FIND_TRIGGER.' "'.$nodeCaption.$selement['elementid']['host'].':'.$selement['elementid']['description'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
 								throw new Exception($error);
@@ -704,7 +761,6 @@ class zbxXML{
 						break;
 						case SYSMAP_ELEMENT_TYPE_IMAGE:
 						default:
-						break;
 					}
 
 					$icons = array('iconid_off','iconid_on','iconid_disabled','iconid_maintenance');
@@ -728,10 +784,9 @@ class zbxXML{
 					if(!isset($link['linktriggers'])) continue;
 
 					foreach($link['linktriggers'] as $ltnum => &$linktrigger){
-						$nodeCaption = isset($linktrigger['triggerid']['node'])?$linktrigger['triggerid']['node'].':':'';
-
-						$db_triggers = CTrigger::getObjects($linktrigger['triggerid']);
+						$db_triggers = API::Trigger()->getObjects($linktrigger['triggerid']);
 						if(empty($db_triggers)){
+							$nodeCaption = isset($linktrigger['triggerid']['node'])?$linktrigger['triggerid']['node'].':':'';
 							$error = S_CANNOT_FIND_TRIGGER.' "'.$nodeCaption.$linktrigger['triggerid']['host'].':'.$linktrigger['triggerid']['description'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
 							throw new Exception($error);
 						}
@@ -742,69 +797,28 @@ class zbxXML{
 					unset($linktrigger);
 				}
 				unset($link);
-
-				$sysmaps[] = $sysmap;
 			}
 			unset($sysmap);
 
-			$importMaps = $sysmaps;
-			foreach($importMaps as $mnum => $importMap){
-				$sysmap = $importMap;
-				if(isset($importMap['sysmapid'])){
-					$result = CMap::update($importMap);
-					$sysmapids = $result['sysmapids'];
 
-// Deleting all selements (with links)
-					$db_selementids = array();
-					$res = DBselect('SELECT selementid FROM sysmaps_elements WHERE sysmapid='.$sysmap['sysmapid']);
-					while($db_selement = DBfetch($res)){
-						$db_selementids[$db_selement['selementid']] = $db_selement['selementid'];
+			foreach($importMaps as $importMap){
+				if(isset($importMap['sysmapid'])){
+					$result = API::Map()->update($importMap);
+					if($result === false){
+						throw new Exception(_s('Cannot update map "%s".', $importMap['name']));
 					}
-					delete_sysmaps_element($db_selementids);
-//----
+					else{
+						info(_s('Map "%s" updated.', $importMap['name']));
+					}
 				}
 				else{
-					$result = CMap::create($importMap);
-					$sysmapids = $result['sysmapids'];
-					$sysmap['sysmapid'] = reset($sysmapids);
-				}
-
-				$selements = $importMap['selements'];
-				$links = $importMap['links'];
-
-				foreach($selements as $id => $selement){
-					if(!isset($selement['elementid']) || ($selement['elementid'] == 0)){
-						$selement['elementid'] = 0;
-						$selement['elementtype'] = SYSMAP_ELEMENT_TYPE_IMAGE;
+					$result = API::Map()->create($importMap);
+					if($result === false){
+						throw new Exception(_s('Cannot create map "%s".', $importMap['name']));
 					}
-
-					if(!isset($selement['iconid_off']) || ($selement['iconid_off'] == 0)){
-						throw new Exception(S_NO_ICON_FOR_MAP_ELEMENT.' '.$sysmap['name'].':'.$selement['label']);
+					else{
+						info(_s('Map "%s" create.', $importMap['name']));
 					}
-
-					$selement['sysmapid'] = $sysmap['sysmapid'];
-					$selementids = CMap::addElements($selement);
-					$selementid = reset($selementids);
-
-					foreach($links as $id => &$link){
-						if($link['selementid1'] == $selement['selementid']) $links[$id]['selementid1'] = $selementid;
-						else if($link['selementid2'] == $selement['selementid']) $links[$id]['selementid2'] = $selementid;
-					}
-					unset($link);
-				}
-
-				foreach($links as $id => $link){
-					if(!isset($link['linktriggers'])) $link['linktriggers'] = array();
-					$link['sysmapid'] = $sysmap['sysmapid'];
-
-					$result = CMap::addLinks($link);
-				}
-
-				if(isset($importMap['sysmapid'])){
-					info(S_MAP.' ['.$sysmap['name'].'] '.S_UPDATED_SMALL);
-				}
-				else{
-					info(S_MAP.' ['.$sysmap['name'].'] '.S_ADDED_SMALL);
 				}
 			}
 
@@ -820,17 +834,19 @@ class zbxXML{
 		$triggers_for_dependencies = array();
 
 		try{
-
 			if(isset($rules['host']['exist']) || isset($rules['host']['missed'])){
 				$xpath = new DOMXPath(self::$xml);
 
 				$hosts = $xpath->query('hosts/host');
 
-				foreach($hosts as $hnum => $host){
+				foreach($hosts as $host){
 					$host_db = self::mapXML2arr($host, XML_TAG_HOST);
 
 					if(!isset($host_db['status'])) $host_db['status'] = HOST_STATUS_TEMPLATE;
-					$current_host = ($host_db['status'] == HOST_STATUS_TEMPLATE) ? CTemplate::exists($host_db) : CHost::exists($host_db);
+					$current_host = ($host_db['status'] == HOST_STATUS_TEMPLATE)
+							? API::Template()->exists($host_db)
+							: API::Host()->exists($host_db);
+
 					if(!$current_host && !isset($rules['host']['missed'])){
 						info('Host ['.$host_db['host'].'] skipped - user rule');
 						continue; // break if update nonexist
@@ -921,9 +937,9 @@ class zbxXML{
 							'selectInterfaces' => API_OUTPUT_EXTEND
 						);
 						if($host_db['status'] == HOST_STATUS_TEMPLATE)
-							$current_host = CTemplate::get($options);
+							$current_host = API::Template()->get($options);
 						else
-							$current_host = CHost::get($options);
+							$current_host = API::Host()->get($options);
 
 						if(empty($current_host)){
 							throw new Exception('No permission for host ['.$host_db['host'].']');
@@ -977,7 +993,7 @@ class zbxXML{
 					}
 
 					foreach($groups_to_parse as $group){
-						$current_group = CHostGroup::exists($group);
+						$current_group = API::HostGroup()->exists($group);
 
 						if($current_group){
 							$options = array(
@@ -985,7 +1001,7 @@ class zbxXML{
 								'output' => API_OUTPUT_EXTEND,
 								'editable' => 1
 							);
-							$current_group = CHostGroup::get($options);
+							$current_group = API::HostGroup()->get($options);
 							if(empty($current_group)){
 								throw new Exception('No permissions for group '. $group['name']);
 							}
@@ -993,7 +1009,7 @@ class zbxXML{
 							$host_db['groups'][] = reset($current_group);
 						}
 						else{
-							$result = CHostGroup::create($group);
+							$result = API::HostGroup()->create($group);
 							if(!$result){
 								throw new Exception();
 							}
@@ -1002,7 +1018,7 @@ class zbxXML{
 								'groupids' => $result['groupids'],
 								'output' => API_OUTPUT_EXTEND
 							);
-							$new_group = CHostgroup::get($options);
+							$new_group = API::HostGroup()->get($options);
 
 							$host_db['groups'][] = reset($new_group);
 						}
@@ -1033,7 +1049,7 @@ class zbxXML{
 								'output' => API_OUTPUT_EXTEND,
 								'editable' => 1
 							);
-							$current_template = CTemplate::get($options);
+							$current_template = API::Template()->get($options);
 
 							if(empty($current_template)){
 								throw new Exception('No permission for Template ['.$template->nodeValue.']');
@@ -1058,26 +1074,41 @@ class zbxXML{
 
 
 // HOST PROFILES {{{
-					$profile_node = $xpath->query('host_profile/*', $host);
-					if($profile_node->length > 0){
+					if($old_version_input){
 						$host_db['profile'] = array();
-						foreach($profile_node as $num => $field){
-							$host_db['profile'][$field->nodeName] = $field->nodeValue;
+						$profile_node = $xpath->query('host_profile/*', $host);
+						if($profile_node->length > 0){
+							foreach($profile_node as $field){
+								$newProfileName = self::mapProfileName($field->nodeName);
+								if(isset($host_db['profile'][$newProfileName])){
+									$host_db['profile'][$newProfileName] .= "\n";
+									$host_db['profile'][$newProfileName] .= $field->nodeValue;
+								}
+								else{
+									$host_db['profile'][$newProfileName] = $field->nodeValue;
+								}
+							}
 						}
-					}
 
-					$profile_ext_node = $xpath->query('host_profiles_ext/*', $host);
-					if($profile_ext_node->length > 0){
-						$host_db['extendedProfile'] = array();
-						foreach($profile_ext_node as $num => $field){
-							$host_db['extendedProfile'][$field->nodeName] = $field->nodeValue;
+						$profile_ext_node = $xpath->query('host_profiles_ext/*', $host);
+						if($profile_ext_node->length > 0){
+							foreach($profile_ext_node as $field){
+								$newProfileName = self::mapProfileName($field->nodeName);
+								if(isset($host_db['profile'][$newProfileName])){
+									$host_db['profile'][$newProfileName] .= "\n";
+									$host_db['profile'][$newProfileName] .= $field->nodeValue;
+								}
+								else{
+									$host_db['profile'][$newProfileName] = $field->nodeValue;
+								}
+							}
 						}
 					}
 // }}} HOST PROFILES
 
 // HOSTS
 					if(isset($host_db['proxy_hostid'])){
-						$proxy_exists = CProxy::get(array('proxyids' => $host_db['proxy_hostid']));
+						$proxy_exists = API::Proxy()->get(array('proxyids' => $host_db['proxy_hostid']));
 						if(empty($proxy_exists))
 							$host_db['proxy_hostid'] = 0;
 					}
@@ -1085,11 +1116,11 @@ class zbxXML{
 					if($current_host && isset($rules['host']['exist'])){
 						if($host_db['status'] == HOST_STATUS_TEMPLATE){
 							$host_db['templateid'] = $current_host['hostid'];
-							$result = CTemplate::update($host_db);
+							$result = API::Template()->update($host_db);
 						}
 						else{
 							$host_db['hostid'] = $current_host['hostid'];
-							$result = CHost::update($host_db);
+							$result = API::Host()->update($host_db);
 						}
 						if(!$result)
 							throw new Exception();
@@ -1098,13 +1129,13 @@ class zbxXML{
 
 					if(!$current_host && isset($rules['host']['missed'])){
 						if($host_db['status'] == HOST_STATUS_TEMPLATE){
-							$result = CTemplate::create($host_db);
+							$result = API::Template()->create($host_db);
 							if(!$result)
 								throw new Exception();
 							$current_hostid = reset($result['templateids']);
 						}
 						else{
-							$result = CHost::create($host_db);
+							$result = API::Host()->create($host_db);
 							if(!$result)
 								throw new Exception();
 							$current_hostid = reset($result['hostids']);
@@ -1125,7 +1156,7 @@ class zbxXML{
 									if(!isset($interface['interfaceid'])){
 										// creating interface
 										$interface['hostid'] = $current_hostid;
-										$ids = CHostInterface::create($interface);
+										$ids = API::HostInterface()->create($interface);
 										if($ids === false) throw new Exception();
 										$interfaces[$i]['interfaceid'] = reset($ids['interfaceids']);
 									}
@@ -1136,7 +1167,7 @@ class zbxXML{
 									'hostids' => $current_hostid,
 									'output' => API_OUTPUT_EXTEND
 								);
-								$interfaces = CHostInterface::get($options);
+								$interfaces = API::HostInterface()->get($options);
 							}
 
 
@@ -1218,7 +1249,7 @@ class zbxXML{
 								'output' => API_OUTPUT_EXTEND,
 								'editable' => 1
 							);
-							$current_item = CItem::get($options);
+							$current_item = API::Item()->get($options);
 							$current_item = reset($current_item);
 
 							if(!$current_item && !isset($rules['item']['missed'])){
@@ -1243,7 +1274,7 @@ class zbxXML{
 									'hostid' => $current_hostid
 								);
 
-								$current_application = CApplication::get(array(
+								$current_application = API::Application()->get(array(
 									'filter' => $application_db,
 									'output' => API_OUTPUT_EXTEND
 								));
@@ -1257,7 +1288,7 @@ class zbxXML{
 							}
 
 							if(!empty($applications_to_add)){
-								$result = CApplication::create($applications_to_add);
+								$result = API::Application()->create($applications_to_add);
 								if(!$result){
 									throw new Exception();
 								}
@@ -1266,7 +1297,7 @@ class zbxXML{
 									'applicationids' => $result['applicationids'],
 									'output' => API_OUTPUT_EXTEND
 								);
-								$new_applications = CApplication::get($options);
+								$new_applications = API::Application()->get($options);
 
 								$item_applications = array_merge($item_applications, $new_applications);
 							}
@@ -1274,7 +1305,7 @@ class zbxXML{
 
 							if($current_item && isset($rules['item']['exist'])){
 								$item_db['itemid'] = $current_item['itemid'];
-								$result = CItem::update($item_db);
+								$result = API::Item()->update($item_db);
 								if(!$result){
 									throw new Exception();
 								}
@@ -1284,12 +1315,12 @@ class zbxXML{
 									'webitems' => 1,
 									'output' => API_OUTPUT_EXTEND
 								);
-								$current_item = CItem::get($options);
+								$current_item = API::Item()->get($options);
 							}
 
 
 							if(!$current_item && isset($rules['item']['missed'])){
-								$result = CItem::create($item_db);
+								$result = API::Item()->create($item_db);
 								if(!$result){
 									throw new Exception();
 								}
@@ -1299,11 +1330,11 @@ class zbxXML{
 									'webitems' => 1,
 									'output' => API_OUTPUT_EXTEND
 								);
-								$current_item = CItem::get($options);
+								$current_item = API::Item()->get($options);
 							}
 
 							if(!empty($item_applications)){
-								$r = CApplication::massAdd(array(
+								$r = API::Application()->massAdd(array(
 									'applications' => $item_applications,
 									'items' => $current_item
 								));
@@ -1329,8 +1360,8 @@ class zbxXML{
 							$trigger_db['expression'] = str_replace('{{HOSTNAME}:', '{'.$host_db['host'].':', $trigger_db['expression']);
 							$trigger_db['hostid'] = $current_hostid;
 
-							if($current_trigger = CTrigger::exists($trigger_db)){
-								$ctriggers = CTrigger::get(array(
+							if($current_trigger = API::Trigger()->exists($trigger_db)){
+								$ctriggers = API::Trigger()->get(array(
 									'filter' => array(
 										'description' => $trigger_db['description']
 									),
@@ -1372,7 +1403,7 @@ class zbxXML{
 						}
 
 						if(!empty($triggers_to_upd)){
-							$result = CTrigger::update($triggers_to_upd);
+							$result = API::Trigger()->update($triggers_to_upd);
 							if(!$result){
 								throw new Exception();
 							}
@@ -1381,12 +1412,12 @@ class zbxXML{
 								'triggerids' => $result['triggerids'],
 								'output' => API_OUTPUT_EXTEND
 							);
-							$r = CTrigger::get($options);
+							$r = API::Trigger()->get($options);
 
 							$triggers_for_dependencies = array_merge($triggers_for_dependencies, $r);
 						}
 						if(!empty($triggers_to_add)){
-							$result = CTrigger::create($triggers_to_add);
+							$result = API::Trigger()->create($triggers_to_add);
 							if(!$result){
 								throw new Exception();
 							}
@@ -1395,7 +1426,7 @@ class zbxXML{
 								'triggerids' => $result['triggerids'],
 								'output' => API_OUTPUT_EXTEND
 							);
-							$r = CTrigger::get($options);
+							$r = API::Trigger()->get($options);
 							$triggers_for_dependencies = array_merge($triggers_for_dependencies, $r);
 						}
 					}
@@ -1422,8 +1453,8 @@ class zbxXML{
 								$gitem_db['host'] = ($gitem_host == '{HOSTNAME}') ? $host_db['host'] : $gitem_host;
 								$gitem_db['key_'] = implode(':', $data);
 
-								if($current_item = CItem::exists($gitem_db)){
-									$current_item = CItem::get(array(
+								if($current_item = API::Item()->exists($gitem_db)){
+									$current_item = API::Item()->get(array(
 										'filter' => array(
 											'key_' => $gitem_db['key_'],
 											'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED),
@@ -1451,10 +1482,18 @@ class zbxXML{
 							$graph_db = self::mapXML2arr($graph, XML_TAG_GRAPH);
 							$graph_db['hostids'] = $graph_hostids;
 
-							$current_graph = CGraph::exists($graph_db);
+
+							// do we need to show the graph legend, after it is imported?
+							// in 1.8, this setting was present only for pie and exploded graphs
+							// for other graph types we are always showing the legend
+							if ($graph_db['graphtype'] != GRAPH_TYPE_PIE && $graph_db['graphtype'] != GRAPH_TYPE_EXPLODED){
+								$graph_db['show_legend'] = 1;
+							}
+
+							$current_graph = API::Graph()->exists($graph_db);
 
 							if($current_graph){
-								$current_graph = CGraph::get(array(
+								$current_graph = API::Graph()->get(array(
 									'filter' => array('name' => $graph_db['name']),
 									'hostids' => $graph_db['hostids'],
 									'output' => API_OUTPUT_EXTEND,
@@ -1491,7 +1530,7 @@ class zbxXML{
 								}
 
 								if(!$item = get_item_by_key($item_data[1], $item_data[0])){
-									throw new APIException(1, 'Missed item ['.$graph_db['ymin_item_key'].'] for host ['.$host_db['host'].']');
+									throw new APIException(1, 'Missing item ['.$graph_db['ymin_item_key'].'] for host ['.$host_db['host'].']');
 								}
 
 								$graph_db['ymin_itemid'] = $item['itemid'];
@@ -1504,7 +1543,7 @@ class zbxXML{
 								}
 
 								if(!$item = get_item_by_key($item_data[1], $item_data[0])){
-									throw new APIException(1, 'Missed item ['.$graph_db['ymax_item_key'].'] for host ['.$host_db['host'].']');
+									throw new APIException(1, 'Missing item ['.$graph_db['ymax_item_key'].'] for host ['.$host_db['host'].']');
 								}
 
 								$graph_db['ymax_itemid'] = $item['itemid'];
@@ -1521,15 +1560,14 @@ class zbxXML{
 							}
 						}
 
-
 						if(!empty($graphs_to_add)){
-							$r = CGraph::create($graphs_to_add);
+							$r = API::Graph()->create($graphs_to_add);
 							if($r === false){
 								throw new Exception();
 							}
 						}
 						if(!empty($graphs_to_upd)){
-							$r = CGraph::update($graphs_to_upd);
+							$r = API::Graph()->update($graphs_to_upd);
 							if($r === false){
 								throw new Exception();
 							}
@@ -1545,7 +1583,7 @@ class zbxXML{
 
 							foreach($importScreens as $mnum => $screen){
 
-								$current_screen = CTemplateScreen::get(array(
+								$current_screen = API::TemplateScreen()->get(array(
 									'filter' => array('name' => $screen['name']),
 									'templateids' => $current_hostid,
 									'output' => API_OUTPUT_EXTEND,
@@ -1572,7 +1610,7 @@ class zbxXML{
 										if(is_array($screenitem['resourceid'])){
 											switch($screenitem['resourcetype']){
 												case SCREEN_RESOURCE_GRAPH:
-													$db_graphs = CGraph::getObjects($screenitem['resourceid']);
+													$db_graphs = API::Graph()->getObjects($screenitem['resourceid']);
 
 													if(empty($db_graphs)){
 														$error = S_CANNOT_FIND_GRAPH.' "'.$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['name'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
@@ -1584,7 +1622,7 @@ class zbxXML{
 												break;
 												case SCREEN_RESOURCE_SIMPLE_GRAPH:
 												case SCREEN_RESOURCE_PLAIN_TEXT:
-													$db_items = CItem::getObjects($screenitem['resourceid']);
+													$db_items = API::Item()->getObjects($screenitem['resourceid']);
 
 													if(empty($db_items)){
 														$error = S_CANNOT_FIND_ITEM.' "'.$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['key_'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
@@ -1606,13 +1644,13 @@ class zbxXML{
 								if($current_screen){
 									$screen['screenid'] = $current_screen['screenid'];
 
-									$result = CTemplateScreen::update($screen);
+									$result = API::TemplateScreen()->update($screen);
 									if(!$result) throw new Exception('Cannot update screen');
 
 									info('['.$current_hostname.'] '.S_SCREEN.' ['.$screen['name'].'] '.S_UPDATED_SMALL);
 								}
 								else{
-									$result = CTemplateScreen::create($screen);
+									$result = API::TemplateScreen()->create($screen);
 									if(!$result) throw new Exception('Cannot create screen');
 
 									info('['.$current_hostname.'] '.S_SCREEN.' ['.$screen['name'].'] '.S_ADDED_SMALL);
@@ -1646,7 +1684,7 @@ class zbxXML{
 									$triggers_to_add_dep[] = $depends_triggerid['triggerid'];
 								}
 							}
-							$r = CTrigger::update(array(
+							$r = API::Trigger()->update(array(
 								'triggerid' => $current_triggerid['triggerid'],
 								'dependencies' => $triggers_to_add_dep,
 							));
@@ -1742,7 +1780,7 @@ class zbxXML{
 				$screens_node = $host_node->appendChild(new DOMElement(XML_TAG_SCREENS));
 
 				foreach($data['screens'] as $screen){
-					if($screen['templateid'] == $host['hostid']){
+					if(bccomp($screen['templateid'],$host['hostid']) == 0){
 						unset($screen['screenid'], $screen['templateid']);
 						self::arrayToDOM($screens_node, $screen, XML_TAG_SCREEN);
 					}
@@ -1767,11 +1805,11 @@ class zbxXML{
 					'templated_hosts' => 1,
 					'nopermissions' => 1
 				);
-				$itemminmaxs = CItem::get($options);
+				$itemminmaxs = API::Item()->get($options);
 				$itemminmaxs = zbx_toHash($itemminmaxs, 'itemid');
 
 
-				$hostminmaxs = CHost::get($options);
+				$hostminmaxs = API::Host()->get($options);
 				$hostminmaxs = zbx_toHash($hostminmaxs, 'hostid');
 
 
@@ -1838,7 +1876,6 @@ class zbxXML{
 
 		return self::outputXML($root);
 	}
-
 
 }
 
