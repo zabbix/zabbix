@@ -237,7 +237,7 @@ int     SYSTEM_HW_CPU(const char *cmd, const char *param, unsigned flags, AGENT_
 	else
 		cpu = atoi(tmp);
 
-	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "all"))
+	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "full"))
 		show |= HW_CPU_FULL_INFO; /* show full info by default */
 	else if (0 == strcmp(tmp, "maxspeed"))
 		show |= HW_CPU_MAXSPEED;
