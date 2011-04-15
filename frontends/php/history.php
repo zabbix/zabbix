@@ -246,7 +246,7 @@ include_once('include/page_header.php');
 				}
 
 				$host = reset($item['hosts']);
-				$cmbitemlist->addItem($itemid,$host['hostname'].': '.itemName($item));
+				$cmbitemlist->addItem($itemid,$host['name'].': '.itemName($item));
 			}
 
 			$addItemBttn = new CButton('add_log',S_ADD,"return PopUp('popup.php?multiselect=1".'&reference=itemid&srctbl=items&value_types[]='.$item['value_type']."&srcfld1=itemid');");
