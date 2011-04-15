@@ -21,11 +21,6 @@
 #include "sysinfo.h"
 #include <sys/utsname.h>
 
-#define HOST_OS_NAME		"/etc/issue.net"
-#define HOST_OS_SHORT		"/proc/version_signature"
-#define HOST_OS_FULL		"/proc/version"
-#define DPKG_STATUS_FILE	"/var/lib/dpkg/status"
-
 int	SYSTEM_SW_ARCH(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct utsname	name;
@@ -38,9 +33,12 @@ int	SYSTEM_SW_ARCH(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 int     SYSTEM_SW_OS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char	type[MAX_STRING_LEN], line[MAX_STRING_LEN];
-	int	ret = SYSINFO_RET_FAIL;
-	FILE	*f = NULL;
+#define SW_OS_NAME	"/etc/issue.net"
+#define SW_OS_SHORT	"/proc/version_signature"
+#define SW_OS_FULL	"/proc/version"
+	char		type[MAX_STRING_LEN], line[MAX_STRING_LEN];
+	int		ret = SYSINFO_RET_FAIL;
+	FILE		*f = NULL;
 
 	if (1 < num_param(param))
 		return ret;
@@ -49,11 +47,11 @@ int     SYSTEM_SW_OS(const char *cmd, const char *param, unsigned flags, AGENT_R
 		*type = '\0';
 
 	if (0 == strcmp(type, "name")  || '\0' == *type)
-		f = fopen(HOST_OS_NAME, "r");
+		f = fopen(SW_OS_NAME, "r");
 	else if (0 == strcmp(type, "short"))
-		f = fopen(HOST_OS_SHORT, "r");
+		f = fopen(SW_OS_SHORT, "r");
 	else if (0 == strcmp(type, "full"))
-		f = fopen(HOST_OS_FULL, "r");
+		f = fopen(SW_OS_FULL, "r");
 
 	if (NULL == f)
 		return ret;
@@ -61,8 +59,8 @@ int     SYSTEM_SW_OS(const char *cmd, const char *param, unsigned flags, AGENT_R
 	if (NULL != fgets(line, sizeof(line), f))
 	{
 		zbx_rtrim(line, " \r\n");
-		SET_STR_RESULT(result, strdup(line));
 		ret = SYSINFO_RET_OK;
+		SET_STR_RESULT(result, strdup(line));
 	}
 	zbx_fclose(f);
 
@@ -71,18 +69,19 @@ int     SYSTEM_SW_OS(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 int     SYSTEM_SW_PACKAGES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	int		offset = 0;
-	char		line[MAX_STRING_LEN], package[MAX_STRING_LEN], status[MAX_STRING_LEN], buffer[MAX_BUFFER_LEN];
-	FILE		*f;
+#define SW_PACKAGES_FILE	"/var/lib/dpkg/status"
+	int			ret = SYSINFO_RET_FAIL, offset = 0;
+	char			line[MAX_STRING_LEN], package[MAX_STRING_LEN], status[MAX_STRING_LEN], buffer[MAX_BUFFER_LEN];
+	FILE			*f;
 
-	if (NULL == (f = fopen(DPKG_STATUS_FILE, "r")))
-		return SYSINFO_RET_FAIL;
+	if (NULL == (f = fopen(SW_PACKAGES_FILE, "r")))
+		return ret;
 
 	while (NULL != fgets(line, sizeof(line), f))
 	{
 		if (1 != sscanf(line, "Package: %s", package))
 			continue;
-next_line:	/* find "Status:" line, might not be the next one */
+next_line: /* find "Status:" line, might not be the next one */
 		if (NULL == fgets(line, sizeof(line), f))
 			break;
 		if (1 != sscanf(line, "Status: %[^\n]", status))
@@ -95,8 +94,11 @@ next_line:	/* find "Status:" line, might not be the next one */
 	zbx_fclose(f);
 
 	if (0 < offset)
-		buffer[offset - 2] = '\0';
+	{
+		buffer[offset - 2] = '\0'; /* remove ", " */
+		ret = SYSINFO_RET_OK;
+		SET_TEXT_RESULT(result, strdup(buffer));
+	}
 
-	SET_TEXT_RESULT(result, strdup(buffer));
-	return SYSINFO_RET_OK;
+	return ret;
 }
