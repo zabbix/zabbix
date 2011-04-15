@@ -67,7 +67,7 @@ static size_t	HEADERFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userda
 #define EZ_TEXTING_LENGTH_USA		160
 #define EZ_TEXTING_LENGTH_CANADA	136
 
-#define EZ_TEXTING_TIMEOUT		15
+#define EZ_TEXTING_TIMEOUT		15L
 #define EZ_TEXTING_API_URL		"https://app.eztexting.com/api/sending"
 
 #endif	/* HAVE_LIBCURL */
@@ -201,13 +201,13 @@ int	send_ez_texting(const char *username, const char *password, const char *send
 			username_esc, password_esc, sendto_esc, message_esc);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_USERAGENT, "Zabbix " ZABBIX_VERSION)) ||
-			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_FOLLOWLOCATION, 1)) ||
+			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_FOLLOWLOCATION, 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_WRITEFUNCTION, WRITEFUNCTION2)) ||
 			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_HEADERFUNCTION, HEADERFUNCTION2)) ||
-			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_SSL_VERIFYPEER, 1)) ||
-			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_SSL_VERIFYHOST, 1)) ||
+			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_SSL_VERIFYPEER, 1L)) ||
+			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_SSL_VERIFYHOST, 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_POSTFIELDS, postfields)) ||
-			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_POST, 1)) ||
+			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_POST, 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_URL, EZ_TEXTING_API_URL)) ||
 			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_TIMEOUT, EZ_TEXTING_TIMEOUT)))
 	{
