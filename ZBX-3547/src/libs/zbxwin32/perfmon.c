@@ -209,12 +209,12 @@ LPTSTR	get_counter_name(DWORD pdhIndex)
 			zabbix_log(LOG_LEVEL_ERR, "PdhLookupPerfNameByIndex failed: %s",
 					strerror_from_system(GetLastError()));
 			zbx_free(counterName);
-			zabbix_log(LOG_LEVEL_DEBUG, "End of %s():'UnknownPerformanceCounter'", __function_name);
+			zabbix_log(LOG_LEVEL_DEBUG, "End of %s():FAIL", __function_name);
 			return L"UnknownPerformanceCounter";
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():'%s'", __function_name, counterName->name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():SUCCEED", __function_name);
 
 	return counterName->name;
 }
