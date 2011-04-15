@@ -212,8 +212,6 @@ include_once('include/page_header.php');
 		else $sysmap = reset($maps);
 	}
 
-?>
-<?php
 	echo SBR;
 
 // ELEMENTS
@@ -245,8 +243,6 @@ include_once('include/page_header.php');
 	$save_btn->setAttribute('id','sysmap_save');
 
 	$elcn_tab = new CTable(null,'textwhite');
-	$menuRow = array();
-
 	$gridShow = new CSpan(
 		$sysmap['grid_show'] == SYSMAP_GRID_SHOW_ON ? S_SHOWN : S_HIDDEN,
 		'whitelink'
@@ -260,18 +256,16 @@ include_once('include/page_header.php');
 	$gridAutoAlign->setAttribute('id', 'gridautoalign');
 
 
-	$gridSize = new CComboBox('gridsize');
-
 	// possible grid sizes, selecting the one saved to DB
-	$possibleGridSizes = array(20, 40, 50, 75, 100);
-	foreach($possibleGridSizes as $possibleGridSize){
-
-		$gridSize->addItem(
-			$possibleGridSize.'x'.$possibleGridSize,
-			$possibleGridSize.'x'.$possibleGridSize,
-			($sysmap['grid_size'] == $possibleGridSize ? 'yes' : NULL) // is selected
-		);
-	}
+	$possibleGridSizes = array(
+		20 => '20x20',
+		40 => '40x40',
+		50 => '50x50',
+		75 => '75x75',
+		100 => '100x100'
+	);
+	$gridSize = new CComboBox('gridsize', $sysmap['grid_size']);
+	$gridSize->addItems($possibleGridSizes);
 
 	$gridAlignAll = new CSubmit('gridalignall', S_ALIGN_ICONS);
 	$gridAlignAll->setAttribute('id', 'gridalignall');
@@ -279,6 +273,7 @@ include_once('include/page_header.php');
 	$gridForm = new CDiv(array($gridSize, $gridAlignAll));
 	$gridForm->setAttribute('id', 'gridalignblock');
 
+	$menuRow = array();
 	array_push($menuRow, S_MAP . ' "'.$sysmap['name'].'"');
 	array_push($menuRow, SPACE.SPACE);
 	array_push($menuRow, S_ICON.' [',$el_add,$el_rmv,']');
@@ -289,7 +284,6 @@ include_once('include/page_header.php');
 	array_push($menuRow, SPACE, $gridForm);
 
 	$elcn_tab->addRow($menuRow);
-//	show_table_header($map['name'], $save_btn);
 	show_table_header($elcn_tab, $save_btn);
 
 
@@ -297,7 +291,6 @@ include_once('include/page_header.php');
 	$sysmap_img->setAttribute('id', 'sysmap_img');
 
 	$table = new CTable(NULL,'map');
-//	$table->addRow(array($td, $sysmap_img));
 	$table->addRow($sysmap_img);
 	$table->Show();
 
@@ -306,13 +299,29 @@ include_once('include/page_header.php');
 	$container->setAttribute('style','position: absolute;');
 	$container->Show();
 
-	insert_js(get_selement_icons());
+
+// ICONS
+	$el_form_menu = array();
+
+	$result = DBselect('SELECT imageid, name FROM images WHERE imagetype=1 AND '.DBin_node('imageid'));
+	while($row = DBfetch($result)){
+		$row['name'] = get_node_name_by_elid($row['imageid']) . $row['name'];
+		$el_form_menu[$row['imageid']] = $row['name'];
+	}
+	$menu = 'var zbxSelementIcons = '.zbx_jsvalue($el_form_menu, true).';';
+	insert_js($menu);
+
 	insert_show_color_picker_javascript();
 
-	zbx_add_post_js('create_map("sysmap_cnt", "'.$sysmap['sysmapid'].'");');
+	$sysmapOptions = array(
+		'sysmapid' => $sysmap['sysmapid'],
+		'gridSize' => $sysmap['grid_size'],
+		'showGrid' => $sysmap['grid_show'],
+		'autoAlign' => $sysmap['grid_align']
+	);
+	zbx_add_post_js('create_map("sysmap_cnt", '.zbx_jsvalue($sysmapOptions, true).');');
 
-?>
-<?php
+
 
 include_once('include/page_footer.php');
 

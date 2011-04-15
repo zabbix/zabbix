@@ -25,7 +25,7 @@
 var ZBX_SYSMAPS = new Array();			// sysmaps obj reference
 
 // sysmapid ALWAYS must be a STRING (js doesn't support uint64) !!!!
-function create_map(container,sysmapid,id){
+function create_map(container, sysmapid, id){
 	if(typeof(id) == 'undefined'){
 		id = ZBX_SYSMAPS.length;
 	}
@@ -36,7 +36,7 @@ function create_map(container,sysmapid,id){
 
 
 	ZBX_SYSMAPS[id] = new Object;
-	ZBX_SYSMAPS[id].map = new CMap(container,sysmapid,id);
+	ZBX_SYSMAPS[id].map = new CMap(container, sysmapid, id);
 }
 
 var CMap = Class.create(CDebug,{
@@ -68,7 +68,7 @@ mlinktrigger: {
 	color:			'CC0000'
 },
 
-initialize: function($super, container, sysmapid, id){
+initialize: function($super, container, params, id){
 	this.id = id;
 	$super('CMap['+id+']');
 //--
@@ -82,22 +82,20 @@ initialize: function($super, container, sysmapid, id){
 //		this.error('Map initialization failed. Unavailable container.');
 	}
 
-	if(typeof(sysmapid) != 'undefined'){
-		this.sysmapid = sysmapid;
+	if(typeof(params.sysmapid) != 'undefined'){
+		this.sysmapid = params.sysmapid;
 
 // add event listeners
 // sysmap
 		addListener($('sysmap_save'), 'click', this.save.bindAsEventListener(this), false);
 
 // grid
-		var gridCtrlElemetns = {
-			'gridsize': $('gridsize'),
-			'gridautoalign': $('gridautoalign'),
-			'gridshow': $('gridshow'),
-			'gridalignall': $('gridalignall')
+		var gridParams = {
+			'gridSize': params.gridSize,
+			'showGrid': (params.showGrid =="1" ? 1 : 0),
+			'autoAlign': (params.autoAlign == "1" ? 1 : 0)
 		};
-
-		this.grid = new CGrid(this.id, gridCtrlElemetns);
+		this.grid = new CGrid(this, gridParams);
 
 // selement
 		addListener($('selement_add'), 'click', this.createSelement.bindAsEventListener(this), false);
@@ -117,37 +115,32 @@ initialize: function($super, container, sysmapid, id){
 // SYSMAP
 create: function(data){
 	this.debug('create');
-//--
 
 	if(typeof(data) == "undefined"){
 		var url = new Curl(location.href);
-		var params = {
-			'favobj': 	'sysmap',
-			'favid':	this.id,
-			'sysmapid': this.sysmapid,
-			'action':	'get'
-		};
 
 		jQuery.ajax({
 			url: url.getPath()+'?output=json&sid='+url.getArgument('sid'),
 			type: 'POST',
-			data: params,
+			data: {
+				'favobj': 	'sysmap',
+				'favid':	this.id,
+				'sysmapid': this.sysmapid,
+				'action':	'get'
+			},
 			success: this.update.bind(this),
 			error: function(){throw('Get selements FAILED.');}
-		})
-		return;
+		});
 	}
 },
 
 update: function(mapData){
 	this.debug('update');
-//--
 
 	if(typeof(mapData) != "undefined"){
 		for(var key in mapData){
 			this.data[key] = mapData[key];
 		}
-
 
 		for(var selementid in this.data.selements)
 			this.createSelement(null, this.data.selements[selementid]);
@@ -164,8 +157,8 @@ save: function(){
 //--
 
 	this.data.grid_size = this.grid.gridSize;
-	this.data.grid_show = this.grid.gridShow;
-	this.data.grid_align = this.grid.gridAlign;
+	this.data.grid_show = this.grid.showGrid;
+	this.data.grid_align = this.grid.autoAlign;
 
 	var url = new Curl(location.href);
 	jQuery.ajax({
@@ -178,7 +171,7 @@ save: function(){
 			sysmapid:		this.sysmapid,
 			sysmap:			Object.toJSON(this.data)
 		},
-		error:	function(){document.location = url.getPath()+'?'+Object.toQueryString(params);}
+		error: function(){document.location = url.getPath()+'?'+Object.toQueryString(params);}
 	});
 },
 
@@ -186,7 +179,7 @@ updateImage: function(){
 	this.debug('updateImage');
 //--
 
-	var url = new Curl(location.href);
+	var url = new Curl();
 	var urlText = 'map.php'+'?sid='+url.getArgument('sid');
 
 // grid
@@ -194,7 +187,7 @@ updateImage: function(){
 		urlText += '&grid='+this.grid.gridSize;
 
 	jQuery.ajax({
-			url: urlText,
+		url: urlText,
 		type: 'post',
 		data: {
 			'output': 'json',
@@ -235,7 +228,7 @@ setImage: function(data){
 createSelement: function(e, selementData){
 	this.debug('createSelement');
 //--
-	var selementData = selementData || {};
+	selementData = selementData || {};
 
 	if(!isset('selementid', selementData) || (selementData.selementid == 0)){
 		do{
@@ -281,7 +274,7 @@ createLink: function(e, linkData){
 	this.debug('createLink');
 //--
 
-	var linkData = linkData || {};
+	linkData = linkData || {};
 
 	if(!isset('linkid', linkData) || (linkData['linkid'] == 0)){
 		if(this.selection.count != 2){
@@ -456,121 +449,74 @@ showMenu: function(e){
 	}
 }
 
-
-//  Form  ------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------
-
-
-
-//**************************************************************************************************************
-//**************************************************************************************************************
-//**************************************************************************************************************
-//**************************************************************************************************************
 });
 
-var CGrid = Class.create(CDebug, {
-mapObjectId:	null,						// own id
-sysmapid:	null,				// sysmapid
-showGrid:	true,				// grid On|Off
-autoAlign:	true,				// align icons on drag end
-gridSize:	'50',				// grid size
 
-initialize: function($super, id, params){
-	this.mapObjectId = id;
+function CGrid(sysmap, params){
+	this.sysmap = sysmap;
 
-	// setting map grid params to default ones
-	var gridSizeDropDownValue = params.gridsize.value.split('x');
-	this.gridSize = gridSizeDropDownValue[0];
-	this.showGrid = params.gridshow.innerHTML == locale['S_SHOWN'];
-	this.autoAlign = params.gridautoalign.innerHTML == locale['S_ON'];
-
-	$super('CGrid['+id+']');
-
-	if(!params) var params = {};
-
-	if(isset('gridsize', params))
-		addListener(params.gridsize, 'change', this.setGridSize.bindAsEventListener(this), false);
-	if(isset('gridautoalign', params))
-		addListener(params.gridautoalign, 'click', this.setGridAutoAlign.bindAsEventListener(this), false);
-	if(isset('gridshow', params))
-		addListener(params.gridshow, 'click', this.setGridView.bindAsEventListener(this), false);
-	if(isset('gridalignall', params))
-		addListener(params.gridalignall, 'click', this.gridAlignIcons.bindAsEventListener(this), false);
-},
-
-setGridSize: function(e){
-	this.debug('setGridSize');
-//--
-
-	var domObject = Event.element(e);
-	var tmpGS = domObject.options[domObject.selectedIndex].value.split('x');
-
-	if(!isset(0, tmpGS)) this.gridSize = 50;
-	else this.gridSize = tmpGS[0];
-
-	this.updateMapView(e);
-},
-
-setGridAutoAlign: function(e){
-	this.debug('setGridAutoAlign');
-//--
-
-	var domObject = Event.element(e);
-	if(this.autoAlign){
-		this.autoAlign = false;
-		domObject.update(locale['S_OFF']);
-	}
-	else{
-		this.autoAlign = true;
-		domObject.update(locale['S_ON']);
-	}
-},
-
-setGridView: function(e){
-	this.debug('setGridView');
-//--
-	var domObject = Event.element(e);
-	if(this.showGrid){
-		this.showGrid = false;
-		$(domObject).update(locale['S_HIDDEN']);
-	}
-	else{
-		this.showGrid = true;
-		$(domObject).update(locale['S_SHOWN']);
-	}
-
-	this.updateMapView(e);
-},
-
-// ACTION
-gridAlignIcons: function(e){
-	this.debug('gridAlignIcons');
-
-	var tmpAutoAlign = this.autoAlign;
-	this.autoAlign = true;
-
-	for(var selementid in ZBX_SYSMAPS[this.mapObjectId].map.selements){
-		if(empty(ZBX_SYSMAPS[this.mapObjectId].map.selements[selementid])) continue;
-
-		ZBX_SYSMAPS[this.mapObjectId].map.selements[selementid].align();
-	}
-
-	this.autoAlign = tmpAutoAlign;
-	this.updateMapView(e);
-},
-
-// Update
-updateMapView: function(e){
-	this.debug('setGridView');
-//--
-
-	ZBX_SYSMAPS[this.mapObjectId].map.updateImage();
+	this.showGrid = params.showGrid;
+	this.autoAlign = params.autoAlign;
+	this.gridSize = params.gridSize;
+	this.bindActions();
 }
-});
+CGrid.prototype = {
+	showGrid: null,
+	autoAlign: null,
+	gridSize: '50',
+
+	bindActions: function(){
+		var that = this;
+
+		jQuery('#gridsize').change(function(){
+			that.setGridSize(jQuery(this).val());
+		});
+
+		jQuery('#gridautoalign').click(function(){
+			var autoAlign = that.switchAutoAlign();
+			jQuery(this).html(autoAlign ? locale['S_ON'] : locale['S_OFF']);
+		});
+
+		jQuery('#gridshow').click(function(){
+			var showGrid = that.switchGridView();
+			jQuery(this).html(showGrid ? locale['S_SHOWN'] : locale['S_HIDDEN']);
+		});
+
+		jQuery('#gridalignall').click(function(){
+			that.alignAll()
+		});
+	},
+	setGridSize: function(value){
+		if(value !== value){
+			this.gridSize = value;
+			this.sysmap.updateImage();
+		}
+	},
+	switchAutoAlign: function(){
+		this.autoAlign = this.autoAlign ? 0 : 1;
+		return this.autoAlign;
+	},
+	switchGridView: function(){
+		this.showGrid = this.showGrid ? 0 : 1;
+		this.sysmap.updateImage();
+		return this.showGrid;
+	},
+	alignAll: function(){
+		for(var selementid in this.sysmap.selements){
+			if(empty(this.sysmap.selements[selementid])) continue;
+
+			this.sysmap.selements[selementid].align(true);
+		}
+
+		this.sysmap.updateImage();
+	}
+
+};
+
 //]]
 //*
 // *******************************************************************
-//		SELEMENT object (unfinished)
+//		LINK object (unfinished)
 // *******************************************************************
 var CLink = Class.create(CDebug, {
 id:				null,			// selement id
@@ -896,10 +842,11 @@ toggleSelect: function(multi, state){
 	}
 },
 
-align: function(){
+align: function(force){
 	this.debug('align');
 //--
-	if(!this.sysmap.grid.autoAlign) return true;
+	force = force || false;
+	if(!force && !this.sysmap.grid.autoAlign) return true;
 
 	var dims = {
 		height: jQuery(this.domNode).height(),
@@ -1052,7 +999,7 @@ dragEnd: function(e, data){
 
 //*
 // *******************************************************************
-//		SELEMENT object (unfinished)
+//		FORM object (unfinished)
 // *******************************************************************
 var CForm = Class.create(CDebug, {
 id:					null,		// selement id
@@ -1968,7 +1915,7 @@ this.selementForm.advanced_icons = e_input_6;
 	e_td_5.appendChild(e_input_6);
 	addListener(e_input_6, 'click', this.form_selement_updateByIcons.bindAsEventListener(this));
 
-	var icons = zbxSelementIcons['icons'];
+	var icons = zbxSelementIcons;
 	for(var iconid in icons){
 		if(empty(icons[iconid])) continue;
 
@@ -2024,7 +1971,7 @@ this.selementForm.iconid_on = e_select_6;
 	e_select_6.appendChild(e_option_7);
 
 
-	var icons = zbxSelementIcons['icons'];
+	var icons = zbxSelementIcons;
 	for(var iconid in icons){
 		if(empty(icons[iconid])) continue;
 
@@ -2078,7 +2025,7 @@ this.selementForm.iconid_maintenance = e_select_6;
 	e_select_6.appendChild(e_option_7);
 
 
-	var icons = zbxSelementIcons['icons'];
+	var icons = zbxSelementIcons;
 	for(var iconid in icons){
 		if(empty(icons[iconid])) continue;
 
@@ -2133,7 +2080,7 @@ this.selementForm.iconid_disabled = e_select_6;
 	e_select_6.appendChild(e_option_7);
 
 
-	var icons = zbxSelementIcons['icons'];
+	var icons = zbxSelementIcons;
 	for(var iconid in icons){
 		if(empty(icons[iconid])) continue;
 

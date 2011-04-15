@@ -325,22 +325,6 @@
 	return $info['iconid'];
 	}
 
-	function get_selement_icons(){
-// ICONS
-		$el_form_menu = array();
-		$el_form_menu['icons'] = array();
-
-		$result = DBselect('SELECT * FROM images WHERE imagetype=1 AND '.DBin_node('imageid').' ORDER BY name');
-		while($row=DBfetch($result)){
-			$row['name'] = get_node_name_by_elid($row['imageid']).$row['name'];
-			$el_form_menu['icons'][$row['imageid']] = $row['name'];
-		}
-
-		$menu = 'var zbxSelementIcons = '.zbx_jsvalue($el_form_menu, true).';';
-
-	return $menu;
-	}
-
 	function convertColor($im,$color){
 
 		$RGB = array(
