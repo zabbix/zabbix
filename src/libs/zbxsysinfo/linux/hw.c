@@ -47,9 +47,9 @@ int	set_dmi_string(char *buf, int bufsize, unsigned char *data, int num)
 
 int	set_chassis_type(char *buf, int bufsize, int type)
 {
-#define CHASSIS_TYPE_BITS 0x7F	/* bits 0-6 represent the chassis type */
-#define MAX_CHASSIS_TYPE 0x18
-	static const char *chassis_type[] =
+#define CHASSIS_TYPE_BITS	0x7F	/* bits 0-6 represent the chassis type */
+#define MAX_CHASSIS_TYPE	0x18
+	static const char 	*chassis_type[] =
 	{
 		"",			/* 0x00 */
 		"Other",
@@ -92,10 +92,10 @@ static int	get_dmi_info(char *buf, int bufsize, int flags)
 #define DEV_MEM			"/dev/mem"
 #define SMBIOS_ENTRY_POINT_SIZE	0x20
 #define DMI_HEADER_SIZE		4
-	int		ret = SYSINFO_RET_FAIL, fd;
-	unsigned char	membuf[SMBIOS_ENTRY_POINT_SIZE], *smbuf, *data;
-	size_t		len, fp, smbios_len, smbios = 0;
-	void		*mmp = NULL;
+	int			ret = SYSINFO_RET_FAIL, fd;
+	unsigned char		membuf[SMBIOS_ENTRY_POINT_SIZE], *smbuf, *data;
+	size_t			len, fp, smbios_len, smbios = 0;
+	void			*mmp = NULL;
 
 	if (-1 == (fd = open(DEV_MEM, O_RDONLY)))
 		return ret;
@@ -120,7 +120,7 @@ static int	get_dmi_info(char *buf, int bufsize, int flags)
 		}
 	}
 
-	if (0 == smbios)
+	if (0 == smbios) /* smbios points to the SMBIOS table if present */
 		goto clean;
 
 	smbuf = zbx_malloc(smbuf, smbios_len);
@@ -178,7 +178,7 @@ int	SYSTEM_HW_CHASSIS(const char *cmd, const char *param, unsigned flags, AGENT_
 	if (0 != get_param(param, 1, tmp, sizeof(tmp)))
 		*tmp = '\0';
 
-	if (0 == strcmp(tmp, "type") || '\0' == *tmp)
+	if (0 == strcmp(tmp, "type") || '\0' == *tmp) /* show chassis type by default */
 		ret = get_dmi_info(buf, sizeof(buf), DMI_GET_TYPE);
 	else if (0 == strcmp(tmp, "vendor"))
 		ret = get_dmi_info(buf, sizeof(buf), DMI_GET_VENDOR);
@@ -195,10 +195,10 @@ int	SYSTEM_HW_CHASSIS(const char *cmd, const char *param, unsigned flags, AGENT_
 
 static int get_cpu_max_speed(int cpu_num)
 {
-#define CPU_MAX_FREQ_FILE "/sys/devices/system/cpu/cpu%d/cpufreq/cpuinfo_max_freq"
-	int	result = -1;
-	char	filename[MAX_BUFFER_LEN];
-	FILE	*f;
+#define CPU_MAX_FREQ_FILE	"/sys/devices/system/cpu/cpu%d/cpufreq/cpuinfo_max_freq"
+	int			result = -1;
+	char			filename[MAX_BUFFER_LEN];
+	FILE			*f;
 
 	zbx_snprintf(filename, sizeof(filename), CPU_MAX_FREQ_FILE, cpu_num);
 
@@ -223,9 +223,9 @@ int     SYSTEM_HW_CPU(const char *cmd, const char *param, unsigned flags, AGENT_
 #define HW_CPU_MODEL		0x10
 #define HW_CPU_CURSPEED		0x20
 #define HW_CPU_CORES		0x40
-	int	ret = SYSINFO_RET_FAIL, val, offset = 0, curcpu = -1, cpu = -2, show = 0;
-	char	line[MAX_STRING_LEN], name[MAX_STRING_LEN], tmp[MAX_STRING_LEN], buf[MAX_BUFFER_LEN], *c;
-	FILE	*f;
+	int			ret = SYSINFO_RET_FAIL, val, offset = 0, curcpu = -1, cpu = -2, show = 0;
+	char			line[MAX_STRING_LEN], name[MAX_STRING_LEN], tmp[MAX_STRING_LEN], buf[MAX_BUFFER_LEN];
+	FILE			*f;
 
 	if (2 < num_param(param))
 		return ret;
@@ -271,9 +271,9 @@ int     SYSTEM_HW_CPU(const char *cmd, const char *param, unsigned flags, AGENT_
 				continue;
 
 			if (0 != (show & (HW_CPU_ALL_CPUS | HW_CPU_FULL_INFO)))
-				offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, "\nprocessor %d:", val);
+				offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, "\nprocessor %d:", curcpu);
 
-			if (0 != (show & (HW_CPU_MAXSPEED | HW_CPU_FULL_INFO)) && -1 != (val = get_cpu_max_speed(val)))
+			if (0 != (show & (HW_CPU_MAXSPEED | HW_CPU_FULL_INFO)) && -1 != (val = get_cpu_max_speed(curcpu)))
 				offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, " %dMHz", val / 1000);
 		}
 
@@ -336,7 +336,7 @@ int     SYSTEM_HW_MACADDR(const char *cmd, const char *param, unsigned flags, AG
 #define HW_MACADDR_FULL	0x02
 	int		ret = SYSINFO_RET_FAIL, offset = 0, s, i, show = 0;
 	char		tmp[MAX_STRING_LEN], buf[MAX_STRING_LEN], buffer[MAX_STRING_LEN];
-	struct ifreq	ifr, *IFR;
+	struct ifreq	*IFR;
 	struct ifconf	ifc;
 
 	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "list"))
@@ -355,26 +355,25 @@ int     SYSTEM_HW_MACADDR(const char *cmd, const char *param, unsigned flags, AG
 	IFR = ifc.ifc_req;
 
 	/* go through the list */
-	for (i = ifc.ifc_len / sizeof(struct ifreq); 0 <= --i; IFR++)
+	for (i = ifc.ifc_len / sizeof(struct ifreq); 0 < i--; IFR++)
 	{
 		if (0 == (show & (HW_MACADDR_FULL | HW_MACADDR_LIST)) && 0 != strcmp(tmp, IFR->ifr_name))
 			continue;
 
-		strcpy(ifr.ifr_name, IFR->ifr_name);
-		if (0 == ioctl(s, SIOCGIFFLAGS, &ifr) /* get the interface */
-			&& 0 == (ifr.ifr_flags & IFF_LOOPBACK) /* skip loopback interface */
-			&& 0 == ioctl(s, SIOCGIFHWADDR, &ifr)) /* get the MAC address */
+		if (0 == ioctl(s, SIOCGIFFLAGS, IFR) /* get the interface */
+			&& 0 == (IFR->ifr_flags & IFF_LOOPBACK) /* skip loopback interface */
+			&& 0 == ioctl(s, SIOCGIFHWADDR, IFR)) /* get the MAC address */
 		{
 			if (0 != (show & HW_MACADDR_FULL))
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%s:", ifr.ifr_name);
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%s:", IFR->ifr_name);
 
 			offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%.2x:%.2x:%.2x:%.2x:%.2x:%.2x, ",
-				(unsigned char)ifr.ifr_hwaddr.sa_data[0],
-				(unsigned char)ifr.ifr_hwaddr.sa_data[1],
-				(unsigned char)ifr.ifr_hwaddr.sa_data[2],
-				(unsigned char)ifr.ifr_hwaddr.sa_data[3],
-				(unsigned char)ifr.ifr_hwaddr.sa_data[4],
-				(unsigned char)ifr.ifr_hwaddr.sa_data[5]);
+				(unsigned char)IFR->ifr_hwaddr.sa_data[0],
+				(unsigned char)IFR->ifr_hwaddr.sa_data[1],
+				(unsigned char)IFR->ifr_hwaddr.sa_data[2],
+				(unsigned char)IFR->ifr_hwaddr.sa_data[3],
+				(unsigned char)IFR->ifr_hwaddr.sa_data[4],
+				(unsigned char)IFR->ifr_hwaddr.sa_data[5]);
 		}
 	}
 
@@ -382,7 +381,7 @@ int     SYSTEM_HW_MACADDR(const char *cmd, const char *param, unsigned flags, AG
 
 	if (0 < offset)
 	{
-		buffer[offset - 2] = '\0';
+		buffer[offset - 2] = '\0'; /* remove ", " */
 		ret = SYSINFO_RET_OK;
 		SET_STR_RESULT(result, strdup(buffer));
 	}
