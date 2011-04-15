@@ -82,7 +82,6 @@ create/images/old_images/Workstation.png -text svneol=unset#image/png
 create/images/old_images/Workstation_small.png -text svneol=unset#image/png
 create/images/png_to_sql.sh -text
 create/images/svg_to_png.sh svneol=native#text/x-sh
-create/images/svg_to_pngsql.sh svneol=native#text/x-sh
 frontends/php/audio/alarm_average.wav -text
 frontends/php/audio/alarm_disaster.wav -text
 frontends/php/audio/alarm_high.wav -text
