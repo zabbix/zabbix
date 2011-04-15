@@ -26,7 +26,7 @@
 int	USER_PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	const char		*__function_name = "USER_PERF_COUNTER";
-	PERF_COUNTERS		*perfs = NULL;
+	PERF_COUNTER_DATA	*perfs = NULL;
 	int			ret = SYSINFO_RET_FAIL;
 	double			value;
 	PDH_FMT_COUNTERVALUE	counterValue;
@@ -76,7 +76,7 @@ int	PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	char			counterpath[PDH_MAX_COUNTER_PATH], tmp[MAX_STRING_LEN];
 	int			ret = SYSINFO_RET_FAIL, interval;
 	double			value;
-	PERF_COUNTERS		*perfs = NULL;
+	PERF_COUNTER_DATA	*perfs = NULL;
 	PDH_FMT_COUNTERVALUE	counterValue;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);

@@ -39,31 +39,32 @@ typedef enum
 	PERF_COUNTER_ACTIVE,
 };
 
-typedef struct perf_counter
+typedef struct perf_counter_id
 {
-	struct perf_counter	*next;
+	struct perf_counter_id	*next;
 	unsigned long		pdhIndex;
 	TCHAR			name[PDH_MAX_COUNTER_NAME];
 }
-PERF_COUNTER;
+PERF_COUNTER_ID;
 
-typedef struct perf_counters
+typedef struct perf_counter_data
 {
-	struct perf_counters	*next;
-	char			*name;
-	char			*counterpath;
-	int			interval;
-	PDH_RAW_COUNTER		*rawValueArray;
-	HCOUNTER		handle;
-	int			CurrentCounter;
-	int			CurrentNum;
-	int			status;
+	struct perf_counter_data	*next;
+	char				*name;
+	char				*counterpath;
+	int				interval;
+	PDH_RAW_COUNTER			*rawValueArray;
+	HCOUNTER			handle;
+	int				CurrentCounter;
+	int				CurrentNum;
+	int				status;
 }
-PERF_COUNTERS;
+PERF_COUNTER_DATA;
 
 PDH_STATUS	zbx_PdhMakeCounterPath(const char *function, PDH_COUNTER_PATH_ELEMENTS *cpe, char *counterpath);
 PDH_STATUS	zbx_PdhOpenQuery(const char *function, PDH_HQUERY query);
-PDH_STATUS	zbx_PdhAddCounter(const char *function, PERF_COUNTERS *counter, PDH_HQUERY query, const char *counterpath, PDH_HCOUNTER *handle);
+PDH_STATUS	zbx_PdhAddCounter(const char *function, PERF_COUNTER_DATA *counter, PDH_HQUERY query,
+		const char *counterpath, PDH_HCOUNTER *handle);
 PDH_STATUS	zbx_PdhCollectQueryData(const char *function, const char *counterpath, PDH_HQUERY query);
 PDH_STATUS	zbx_PdhGetRawCounterValue(const char *function, const char *counterpath, PDH_HCOUNTER handle, PPDH_RAW_COUNTER value);
 

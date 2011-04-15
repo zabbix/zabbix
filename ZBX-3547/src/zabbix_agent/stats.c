@@ -151,12 +151,12 @@ void	init_collector_data()
 	sz = sizeof(ZBX_COLLECTOR_DATA);
 
 #ifdef _WINDOWS
-	sz_cpu = sizeof(PERF_COUNTERS *) * (cpu_count + 1);
+	sz_cpu = sizeof(PERF_COUNTER_DATA *) * (cpu_count + 1);
 
 	collector = zbx_malloc(collector, sz + sz_cpu);
 	memset(collector, 0, sz + sz_cpu);
 
-	collector->cpus.cpu_counter = (PERF_COUNTERS **)(collector + 1);
+	collector->cpus.cpu_counter = (PERF_COUNTER_DATA **)(collector + 1);
 	collector->cpus.count = cpu_count;
 
 	init_perf_collector(&collector->perfs);

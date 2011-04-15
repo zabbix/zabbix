@@ -34,7 +34,7 @@ static ZBX_MUTEX		perfstat_access;
  * Comments: counter failed or disappeared, dismiss all previous values       *
  *                                                                            *
  ******************************************************************************/
-static void	deactivate_perf_counter(PERF_COUNTERS *counter)
+static void	deactivate_perf_counter(PERF_COUNTER_DATA *counter)
 {
 	counter->status = PERF_COUNTER_NOTSUPPORTED;
 	counter->CurrentCounter = 0;
@@ -47,13 +47,13 @@ static void	deactivate_perf_counter(PERF_COUNTERS *counter)
  *           added, a pointer to that counter is returned, NULL otherwise     *
  *                                                                            *
  ******************************************************************************/
-PERF_COUNTERS	*add_perf_counter(const char *name, const char *counterpath, int interval)
+PERF_COUNTER_DATA	*add_perf_counter(const char *name, const char *counterpath, int interval)
 {
-	const char	*__function_name = "add_perf_counter";
-	PERF_COUNTERS	*cptr;
-	char		*alias_name;
-	PDH_STATUS	pdh_status;
-	int		result = FAIL;
+	const char		*__function_name = "add_perf_counter";
+	PERF_COUNTER_DATA	*cptr;
+	char			*alias_name;
+	PDH_STATUS		pdh_status;
+	int			result = FAIL;
 
 	assert(counterpath);
 
@@ -76,9 +76,9 @@ PERF_COUNTERS	*add_perf_counter(const char *name, const char *counterpath, int i
 		/* add new parameters */
 		if (NULL == cptr)
 		{
-			cptr = (PERF_COUNTERS *)zbx_malloc(cptr, sizeof(PERF_COUNTERS));
+			cptr = (PERF_COUNTER_DATA *)zbx_malloc(cptr, sizeof(PERF_COUNTER_DATA));
 
-			memset(cptr, 0, sizeof(PERF_COUNTERS));
+			memset(cptr, 0, sizeof(PERF_COUNTER_DATA));
 			if (NULL != name)
 				cptr->name = strdup(name);
 			cptr->counterpath = strdup(counterpath);
@@ -164,9 +164,9 @@ lbl_syntax_error:
  *           the memory is freed - do not use it again                        *
  *                                                                            *
  ******************************************************************************/
-void	remove_perf_counter(PERF_COUNTERS *counter)
+void	remove_perf_counter(PERF_COUNTER_DATA *counter)
 {
-	PERF_COUNTERS	*cptr;
+	PERF_COUNTER_DATA	*cptr;
 
 	if (NULL == counter || NULL == ppsd->pPerfCounterList)
 		return;
@@ -200,7 +200,7 @@ void	remove_perf_counter(PERF_COUNTERS *counter)
 
 static void	free_perf_counter_list()
 {
-	PERF_COUNTERS	*cptr;
+	PERF_COUNTER_DATA	*cptr;
 
 	zbx_mutex_lock(&perfstat_access);
 
@@ -223,7 +223,7 @@ static void	free_perf_counter_list()
  * Comments: if succeeds, counter->status is set to PERF_COUNTER_ACTIVE       *
  *                                                                            *
  ******************************************************************************/
-double	compute_counter_statistics(const char *function, PERF_COUNTERS *counter, int interval)
+double	compute_counter_statistics(const char *function, PERF_COUNTER_DATA *counter, int interval)
 {
 	PDH_STATISTICS	statData;
 	PDH_STATUS	pdh_status;
@@ -283,7 +283,7 @@ int	init_perf_collector(ZBX_PERF_STAT_DATA *pperf)
 
 void	free_perf_collector()
 {
-	PERF_COUNTERS	*cptr;
+	PERF_COUNTER_DATA	*cptr;
 
 	if (NULL == ppsd->pdh_query)
 		return;
@@ -307,10 +307,10 @@ void	free_perf_collector()
 
 void	collect_perfstat()
 {
-	const char	*__function_name = "collect_perfstat";
-	PERF_COUNTERS	*cptr;
-	PDH_STATUS	pdh_status;
-	time_t		now;
+	const char		*__function_name = "collect_perfstat";
+	PERF_COUNTER_DATA	*cptr;
+	PDH_STATUS		pdh_status;
+	time_t			now;
 
 	if (NULL == ppsd->pdh_query) /* collector is not started */
 		return;
