@@ -22,10 +22,9 @@
 #include "comms.h"
 #include "log.h"
 #include "cfg.h"
-
+#include "telnet.h"
 #include "../common/net.h"
 #include "ntp.h"
-
 #include "simple.h"
 
 ZBX_METRIC	parameters_simple[] =
@@ -173,16 +172,25 @@ clean:
 
 static int	check_telnet(const char *host, unsigned short port, int timeout, int *value_int)
 {
+	const char	*__function_name = "check_https";
 	zbx_sock_t	s;
+#ifdef _WINDOWS
+	u_long		argp = 1;
+#else
 	int		flags;
+#endif
 
 	*value_int = 0;
 
 	if (SUCCEED == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout))
 	{
+#ifdef _WINDOWS
+		ioctlsocket(s.socket, FIONBIO, &argp); /* non-zero value sets the socket to non-blocking */
+#else
 		flags = fcntl(s.socket, F_GETFL);
 		if (0 == (flags & O_NONBLOCK))
 			fcntl(s.socket, F_SETFL, flags | O_NONBLOCK);
+#endif
 
 		if (SUCCEED == telnet_test_login(s.socket))
 			*value_int = 1;
@@ -192,7 +200,7 @@ static int	check_telnet(const char *host, unsigned short port, int timeout, int 
 		zbx_tcp_close(&s);
 	}
 	else
-		zabbix_log(LOG_LEVEL_DEBUG, "Telnet check error: %s", zbx_tcp_strerror());
+		zabbix_log(LOG_LEVEL_DEBUG, "%s error: %s", __function_name, zbx_tcp_strerror());
 
 	return SYSINFO_RET_OK;
 }
