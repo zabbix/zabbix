@@ -23,8 +23,8 @@
 #include "system.h"
 
 #ifdef _WINDOWS
-	#include "perfmon.h"
-#endif /* _WINDOWS */
+#	include "perfmon.h"
+#endif
 
 int	SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {

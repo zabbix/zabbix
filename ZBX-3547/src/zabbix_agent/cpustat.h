@@ -23,45 +23,46 @@
 #include "sysinfo.h"
 
 #ifdef _WINDOWS
-#	define MAX_CPU_HISTORY	(15 * SEC_PER_MIN)
 
-	typedef struct
-	{
-		int		count;
-		PERF_COUNTERS	**cpu_counter;
-		PERF_COUNTERS	*queue_counter;
-	}
-	ZBX_CPUS_STAT_DATA;
+#define MAX_CPU_HISTORY	(15 * SEC_PER_MIN)
 
-#	define CPU_COLLECTOR_STARTED(collector)	((collector) && (collector)->cpus.queue_counter)
+typedef struct
+{
+	PERF_COUNTERS	**cpu_counter;
+	PERF_COUNTERS	*queue_counter;
+	int		count;
+}
+ZBX_CPUS_STAT_DATA;
+
+#define CPU_COLLECTOR_STARTED(collector)	((collector) && (collector)->cpus.queue_counter)
 
 #else /* not _WINDOWS */
 
-	typedef struct
-	{
-		zbx_uint64_t	h_counter[ZBX_CPU_STATE_COUNT][MAX_COLLECTOR_HISTORY];
-		int		h_first;
-		int		h_count;
-	}
-	ZBX_SINGLE_CPU_STAT_DATA;
+typedef struct
+{
+	zbx_uint64_t	h_counter[ZBX_CPU_STATE_COUNT][MAX_COLLECTOR_HISTORY];
+	int		h_first;
+	int		h_count;
+}
+ZBX_SINGLE_CPU_STAT_DATA;
 
-	typedef struct
-	{
-		ZBX_SINGLE_CPU_STAT_DATA	*cpu;
-		int				count;
-	}
-	ZBX_CPUS_STAT_DATA;
+typedef struct
+{
+	ZBX_SINGLE_CPU_STAT_DATA	*cpu;
+	int				count;
+}
+ZBX_CPUS_STAT_DATA;
 
-#	define CPU_COLLECTOR_STARTED(collector)	(collector)
+#define CPU_COLLECTOR_STARTED(collector)	(collector)
 
 #endif /* _WINDOWS */
 
 int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus);
 void	free_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus);
-void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus);
 
 #ifndef _WINDOWS
-	int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode);
+void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus);
+int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode);
 #endif /* not _WINDOWS */
 
 #endif

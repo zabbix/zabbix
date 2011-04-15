@@ -39,7 +39,6 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	PDH_COUNTER_PATH_ELEMENTS	cpe;
 	int				i;
 #endif
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 #ifdef _WINDOWS
@@ -84,7 +83,8 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 
 	ret = SUCCEED;
 clean:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
 	return ret;
 }
 
@@ -94,7 +94,6 @@ void	free_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 #ifdef _WINDOWS
 	int		i;
 #endif
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 #ifdef _WINDOWS
@@ -389,16 +388,10 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-#endif	/* not _WINDOWS */
-
 void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
 {
-#ifndef _WINDOWS
 	update_cpustats(pcpus);
-#endif	/* not _WINDOWS */
 }
-
-#ifndef _WINDOWS
 
 int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode)
 {
@@ -429,6 +422,7 @@ int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode)
 		SET_MSG_RESULT(result, strdup("Collector is not started!"));
 		return SYSINFO_RET_FAIL;
 	}
+
 	if (0 > cpu_num || cpu_num > collector->cpus.count)
 		return SYSINFO_RET_FAIL;
 

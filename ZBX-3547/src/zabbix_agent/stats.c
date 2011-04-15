@@ -29,7 +29,7 @@
 #else
 #	include "daemon.h"
 #	include "ipc.h"
-#endif	/* _WINDOWS */
+#endif
 
 ZBX_COLLECTOR_DATA	*collector = NULL;
 
@@ -151,7 +151,7 @@ void	init_collector_data()
 	sz = sizeof(ZBX_COLLECTOR_DATA);
 
 #ifdef _WINDOWS
-	sz_cpu = sizeof(PERF_COUNTERS*) * (cpu_count + 1);
+	sz_cpu = sizeof(PERF_COUNTERS *) * (cpu_count + 1);
 
 	collector = zbx_malloc(collector, sz + sz_cpu);
 	memset(collector, 0, sz + sz_cpu);
@@ -160,8 +160,7 @@ void	init_collector_data()
 	collector->cpus.count = cpu_count;
 
 	init_perf_collector(&collector->perfs);
-
-#else	/* not _WINDOWS */
+#else
 	sz_cpu = sizeof(ZBX_SINGLE_CPU_STAT_DATA) * (cpu_count + 1);
 
 	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_COLLECTOR_ID)))
@@ -248,11 +247,11 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 
 	zbx_free(args);
 
-#ifdef	ZABBIX_DAEMON
+#ifdef ZABBIX_DAEMON
 	set_child_signal_handler();
 #endif
 
-	if (0 != init_cpu_collector(&(collector->cpus)))
+	if (SUCCEED != init_cpu_collector(&(collector->cpus)))
 		free_cpu_collector(&(collector->cpus));
 
 	collector_diskdevice_add("");
@@ -260,14 +259,12 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 	while (ZBX_IS_RUNNING())
 	{
 		zbx_setproctitle("collector [processing data]");
-
 #ifdef _WINDOWS
 		collect_perfstat();
 #else
 		if (CPU_COLLECTOR_STARTED(collector))
 			collect_cpustat(&(collector->cpus));
-#endif /* _WINDOWS */
-
+#endif
 		collect_stats_diskdevices(&(collector->diskdevices));
 #ifdef _AIX
 		collect_vmstat_data(&collector->vmstat);
@@ -278,8 +275,9 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 
 	if (CPU_COLLECTOR_STARTED(collector))
 		free_cpu_collector(&(collector->cpus));
-#ifdef _WINDOWS /* cpu_collector must be freed before perf_collector is freed */
-	free_perf_collector();
+
+#ifdef _WINDOWS
+	free_perf_collector();	/* cpu_collector must be freed before perf_collector is freed */
 #endif /* _WINDOWS */
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "zabbix_agentd collector stopped");

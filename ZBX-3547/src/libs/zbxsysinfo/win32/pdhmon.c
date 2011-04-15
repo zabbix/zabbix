@@ -39,16 +39,18 @@ int	USER_PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_
 		return ret;
 	}
 
-	for (perfs = collector->perfs.pPerfCounterList; NULL != perfs; perfs=perfs->next)
+	for (perfs = collector->perfs.pPerfCounterList; NULL != perfs; perfs = perfs->next)
 	{
 		if (NULL != perfs->name && 0 == strcmp(perfs->name, param))
 		{
 			value = compute_counter_statistics(__function_name, perfs, USE_DEFAULT_INTERVAL);
+
 			if (PERF_COUNTER_ACTIVE == perfs->status)
 			{
 				SET_DBL_RESULT(result, value);
 				ret = SYSINFO_RET_OK;
 			}
+
 			break;
 		}
 	}
@@ -64,6 +66,7 @@ int	USER_PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
 	return ret;
 }
 
@@ -107,12 +110,14 @@ int	PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 			if (0 == strcmp(perfs->counterpath, counterpath) && perfs->interval == interval)
 			{
 				value = compute_counter_statistics(__function_name, perfs, USE_DEFAULT_INTERVAL);
+
 				if (PERF_COUNTER_ACTIVE == perfs->status)
 				{
 					SET_DBL_RESULT(result, value);
 					ret = SYSINFO_RET_OK;
 					goto clean;
 				}
+
 				break;
 			}
 		}
@@ -131,5 +136,6 @@ int	PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	}
 clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
 	return ret;
 }
