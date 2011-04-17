@@ -78,7 +78,7 @@ class SeleniumTests{
 		$suite->addTestSuite('testPageDashboard');
 		$suite->addTestSuite('testPageDiscovery');
 		$suite->addTestSuite('testPageEvents');
-		$suite->addTestSuite('testPageHistory.php');
+		$suite->addTestSuite('testPageHistory');
 		$suite->addTestSuite('testPageHosts');
 		$suite->addTestSuite('testPageInventory');
 		$suite->addTestSuite('testPageItems');
