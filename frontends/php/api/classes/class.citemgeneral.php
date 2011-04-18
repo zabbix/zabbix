@@ -79,6 +79,7 @@ abstract class CItemGeneral extends CZBXAPI{
 			'filter'				=> array(),
 			'interfaceid'			=> array('host' => 1),
 			'port'					=> array(),
+			'profile_link'          => array(),
 		);
 	}
 
@@ -173,6 +174,7 @@ abstract class CItemGeneral extends CZBXAPI{
 			else{
 				$item['interfaceid'] = 0;
 			}
+
 
 			if((isset($item['port']) && !zbx_empty($item['port']))
 				&& !((zbx_ctype_digit($item['port']) && ($item['port']>0) && ($item['port']<65535))

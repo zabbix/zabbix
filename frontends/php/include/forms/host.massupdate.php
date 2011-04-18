@@ -216,7 +216,7 @@ $frmHost->addRow(array(
 	new CCheckBox('useprofile',$useprofile,'submit()')
 );
 
-$profile_fields = getHostProfiles();
+$profile_fields = getHostProfileTitles();
 if($useprofile === 'yes'){
 	foreach($profile_fields as $field => $caption){
 		if(!isset($host_profile[$field])){

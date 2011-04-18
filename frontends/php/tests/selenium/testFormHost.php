@@ -39,7 +39,7 @@ class testFormHost extends CWebTest{
 
 		$this->click('link=Host profile');
 
-		$profileFields = getHostProfiles();
+		$profileFields = getHostProfileTitles();
 		foreach($profileFields as $fieldId => $fieldName){
 			$this->ok($fieldName);
 			$this->assertElementPresent('host_profile['.$fieldId.']');
