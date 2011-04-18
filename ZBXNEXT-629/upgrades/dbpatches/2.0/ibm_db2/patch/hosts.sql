@@ -241,9 +241,15 @@ ALTER TABLE hosts ADD jmx_error varchar(128) WITH DEFAULT '' NOT NULL
 /
 REORG TABLE hosts
 /
+ALTER TABLE hosts ADD name varchar(64) WITH DEFAULT '' NOT NULL
+/
+REORG TABLE hosts
+/
 UPDATE hosts SET proxy_hostid=NULL WHERE proxy_hostid=0
 /
 UPDATE hosts SET maintenanceid=NULL WHERE maintenanceid=0
+/
+UPDATE hosts SET name=host WHERE status in (0,1,3)
 /
 ALTER TABLE hosts ADD CONSTRAINT c_hosts_1 FOREIGN KEY (proxy_hostid) REFERENCES hosts (hostid)
 /

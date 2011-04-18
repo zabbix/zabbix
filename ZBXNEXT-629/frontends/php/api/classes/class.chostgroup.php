@@ -879,16 +879,17 @@ COpt::memoryPick();
 				$linked[$pair['groupid']][$pair['hostid']] = 1;
 			}
 
+			$insert = array();
 			foreach($groupids as $gnum => $groupid){
 				foreach($objectids as $hostid){
-					if(isset($linked[$groupid][$hostid])) continue;
-					$hostgroupid = get_dbid('hosts_groups', 'hostgroupid');
-					$result = DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES ($hostgroupid, $hostid, $groupid)");
-					if(!$result){
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-					}
+					if(isset($linked[$groupid][$hostid]))
+						continue;
+
+					$insert[] = array('hostid' => $hostid, 'groupid' => $groupid);
 				}
 			}
+
+			DB::insert('hosts_groups', $insert);
 
 			return array('groupids' => $groupids);
 	}

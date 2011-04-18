@@ -307,7 +307,7 @@ options = array(
 		else{
 			$def_options = array(
 				'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
-				'output' => array('hostid', 'host'),
+				'output' => array('hostid', 'name'),
 				'groupids' => (($this->groupid > 0) ? $this->groupid : null),
 			);
 			$options = zbx_array_merge($def_options, $options);
@@ -315,7 +315,7 @@ options = array(
 			order_result($hosts, 'host');
 
 			foreach($hosts as $host){
-				$this->data['hosts'][$host['hostid']] = $host['host'];
+				$this->data['hosts'][$host['hostid']] = $host['name'];
 			}
 
 			if(is_null($hostid)) $hostid = $this->_profileIds['hostid'];

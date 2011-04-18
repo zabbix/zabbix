@@ -179,17 +179,17 @@ require_once('include/templates/action.js.php');
 		case CONDITION_TYPE_HOST_TEMPLATE:
 			$conditionList->addItem(new CVar('new_condition[value]','0'));
 			$rowCondition[] = array(
-				new CTextBox('host','',40,'yes'),
+				new CTextBox('hostname','',40,'yes'),
 				new CButton('btn1',_('Select'),
 					"return PopUp('popup.php?writeonly=1&dstfrm=".$frmAction->getName().
-					"&dstfld1=new_condition_value&dstfld2=host&srctbl=host_templates".
-					"&srcfld1=hostid&srcfld2=host',450,450);",
+					"&dstfld1=new_condition_value&dstfld2=hostname&srctbl=host_templates".
+					"&srcfld1=templateid&srcfld2=name',450,450);",
 					'link_menu'));
 			break;
 		case CONDITION_TYPE_HOST:
 			$conditionList->addItem(new CVar('new_condition[value]','0'));
 			$rowCondition[] = array(
-				new CTextBox('host','',40,'yes'),
+				new CTextBox('hostname','',40,'yes'),
 				new CButton('btn1',_('Select'),
 					"return PopUp('popup.php?writeonly=1&dstfrm=".$frmAction->getName().
 					"&dstfld1=new_condition_value&dstfld2=host&srctbl=hosts".
@@ -340,8 +340,8 @@ require_once('include/templates/action.js.php');
 		if(!isset($operation['opconditions'])) $operation['opconditions'] = array();
 		if(!isset($operation['mediatypeid'])) $operation['mediatypeid'] = 0;
 
-		$oper_details = new CSpan(get_operation_desc(SHORT_DESCRITION, $operation));
-		$oper_details->setHint(get_operation_desc(LONG_DESCRITION, $operation));
+		$oper_details = new CSpan(get_operation_desc(SHORT_DESCRIPTION, $operation));
+		$oper_details->setHint(get_operation_desc(LONG_DESCRIPTION, $operation));
 
 		$esc_steps_txt = null;
 		$esc_period_txt = null;
@@ -601,15 +601,15 @@ require_once('include/templates/action.js.php');
 
 				$hosts = API::Host()->get(array(
 					'hostids' => zbx_objectValues($new_operation['opcommand_hst'], 'hostid'),
-					'output' => array('hostid','host'),
+					'output' => array('hostid','name'),
 					'preservekeys' => true,
 					'editable' => true,
 				));
 
 				$new_operation['opcommand_hst'] = array_values($new_operation['opcommand_hst']);
 				foreach($new_operation['opcommand_hst'] as $ohnum => $cmd)
-					$new_operation['opcommand_hst'][$ohnum]['host'] = ($cmd['hostid'] > 0) ? $hosts[$cmd['hostid']]['host'] : '';
-				order_result($new_operation['opcommand_hst'], 'host');
+					$new_operation['opcommand_hst'][$ohnum]['name'] = ($cmd['hostid'] > 0) ? $hosts[$cmd['hostid']]['name'] : '';
+				order_result($new_operation['opcommand_hst'], 'name');
 
 				$groups = API::HostGroup()->get(array(
 					'groupids' => zbx_objectValues($new_operation['opcommand_grp'], 'groupid'),
@@ -741,7 +741,7 @@ require_once('include/templates/action.js.php');
 				$templateList = new CTable();
 				$templateList->setAttribute('id', 'opTemplateList');
 
-				$addUsrgrpBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=host_templates&srcfld1=templateid&srcfld2=host&multiselect=1&reference=dsc_templateid",450,450)', 'link_menu');
+				$addUsrgrpBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=host_templates&srcfld1=templateid&srcfld2=name&multiselect=1&reference=dsc_templateid",450,450)', 'link_menu');
 
 				$col = new CCol($addUsrgrpBtn);
 				$col->setAttribute('colspan', 2);
@@ -756,8 +756,8 @@ require_once('include/templates/action.js.php');
 					zbx_objectValues($new_operation['optemplate'], 'templateid') :
 					array();
 
-				$templates = API::Template()->get(array('templateids' => $templateids, 'output' => array('templateid','host')));
-				order_result($templates, 'host');
+				$templates = API::Template()->get(array('templateids' => $templateids, 'output' => array('templateid', 'name')));
+				order_result($templates, 'name');
 
 				$jsInsert = '';
 				$jsInsert.= 'addPopupValues('.zbx_jsvalue(array('object'=>'dsc_templateid', 'values'=>$templates)).');';

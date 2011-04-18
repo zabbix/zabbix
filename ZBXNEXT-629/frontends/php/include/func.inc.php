@@ -766,6 +766,15 @@ function zbx_strpos($haystack, $needle, $offset=0){
 	}
 }
 
+function zbx_stripos($haystack, $needle, $offset=0){
+	if(defined('ZBX_MBSTRINGS_ENABLED')){
+		return mb_stripos($haystack, $needle, $offset);
+	}
+	else{
+		return stripos($haystack, $needle, $offset);
+	}
+}
+
 function zbx_strrpos($haystack, $needle){
 	if(defined('ZBX_MBSTRINGS_ENABLED')){
 		return mb_strrpos($haystack, $needle);

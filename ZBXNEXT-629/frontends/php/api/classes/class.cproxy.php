@@ -355,7 +355,7 @@ class CProxy extends CZBXAPI{
 			}
 
 			if(isset($proxy['host'])){
-				if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $proxy['host'])){
+				if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $proxy['host'])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Proxy name "%s".',$proxy['host']));
 				}
 

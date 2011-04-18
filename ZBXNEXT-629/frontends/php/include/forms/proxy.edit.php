@@ -103,7 +103,7 @@
 
 	$cmbHosts = new CTweenBox($frmProxy, 'hosts', $hosts);
 
-	$sql = 'SELECT hostid, proxy_hostid, host '.
+	$sql = 'SELECT hostid, proxy_hostid, name '.
 			' FROM hosts '.
 			' WHERE status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
 				' AND '.DBin_node('hostid').
@@ -112,7 +112,7 @@
 	while($db_host=DBfetch($db_hosts)){
 		$cmbHosts->addItem(
 			$db_host['hostid'],
-			$db_host['host'],
+			$db_host['name'],
 			NULL,
 			($db_host['proxy_hostid'] == 0 || ($_REQUEST['hostid']>0) && (bccomp($db_host['proxy_hostid'],$_REQUEST['hostid']) == 0))
 		);
