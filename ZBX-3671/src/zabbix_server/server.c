@@ -516,6 +516,12 @@ int	MAIN_ZABBIX_ENTRY()
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
 
+		DBexecute("update applications set name = 'новая апликация' where applicationid=176");
+		result = DBselect("select applicationid,name from applications");
+		while (NULL != (row = DBfetch(result)))
+			printf("%s|%s\n", row[0], row[1]);
+		DBfree_result(result);
+
 	result = DBselect("select refresh_unsupported from config where 1=1" DB_NODE,
 			DBnode_local("configid"));
 
