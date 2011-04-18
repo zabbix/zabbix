@@ -574,6 +574,7 @@ include_once('include/page_header.php');
 				$sql = 'SELECT DISTINCT i.itemid, i.description '.
 						' FROM items i '.
 						' WHERE i.hostid='.$clone_hostid.
+							' AND i.type<>'.ITEM_TYPE_HTTPTEST.
 							' AND i.templateid=0 '.
 						' ORDER BY i.description';
 

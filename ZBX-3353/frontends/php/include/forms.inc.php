@@ -4404,7 +4404,6 @@ JAVASCRIPT;
 				'inherited' => 0,
 				'hostids' => $_REQUEST['hostid'],
 				'output' => API_OUTPUT_EXTEND,
-				'webitems' => 1,
 			);
 			$host_items = CItem::get($options);
 
