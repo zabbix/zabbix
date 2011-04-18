@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-04-15 01:12+0300\n"
+"POT-Creation-Date: 2011-04-18 10:44+0300\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Konstantin \n"
 "Language-Team: Zabbix \n"
@@ -9561,7 +9561,7 @@ msgid "is a minimal limitation on input parse time for PHP scripts"
 msgstr "はPHPスクリプトの入力のパース時間の最小の設定値です"
 
 #: include/locales/en_gb.inc.php:1278
-msgid "is a wrong time format. Should be from 00:00 to 23:59."
+msgid "is a wrong time format. Should be from 00:00 to 24:00."
 msgstr "は誤った時間の形式です。00:00から24:00の間で設定してください。"
 
 #: include/locales/en_gb.inc.php:1898
