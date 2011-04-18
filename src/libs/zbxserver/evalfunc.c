@@ -459,7 +459,7 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 	if (ZBX_FLAG_SEC == flag)
 	{
 		offset = zbx_snprintf(sql, sizeof(sql),
-				"select count(value)"
+				"select count(*)"
 				" from %s"
 				" where itemid=" ZBX_FS_UI64,
 				get_table_by_value_type(item->value_type),
