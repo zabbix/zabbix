@@ -358,6 +358,8 @@ static zbx_task_t parse_commandline(int argc, char **argv)
 	return task;
 }
 
+/* sending a huge amount of values in a single connection is likely to */
+/* take long and hit timeout, so we limit values to 250 per connection */
 #define VALUES_MAX	250
 
 int main(int argc, char **argv)
