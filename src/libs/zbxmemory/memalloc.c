@@ -528,22 +528,22 @@ void	zbx_mem_create(zbx_mem_info_t **info, key_t shm_key, int lock_name, size_t 
 	descr = (NULL == descr ? "(null)" : descr);
 	param = (NULL == param ? "(null)" : param);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() descr:'%s' param:'%s' size:%lu",
-		       __function_name, descr, param, size);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() descr:'%s' param:'%s' size:" ZBX_FS_SIZE_T,
+			__function_name, descr, param, (zbx_fs_size_t)size);
 
 	/* allocate shared memory */
 
 	if (4 != ZBX_PTR_SIZE && 8 != ZBX_PTR_SIZE)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "failed assumption about pointer size (%lu not in {4, 8})",
-				ZBX_PTR_SIZE);
+		zabbix_log(LOG_LEVEL_CRIT, "failed assumption about pointer size (" ZBX_FS_SIZE_T " not in {4, 8})",
+				(zbx_fs_size_t)ZBX_PTR_SIZE);
 		exit(FAIL);
 	}
 
 	if (!(MEM_MIN_SIZE <= size && size <= MEM_MAX_SIZE))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "requested size %lu not within bounds [%d <= size <= %d]",
-				size, MEM_MIN_SIZE, MEM_MAX_SIZE);
+		zabbix_log(LOG_LEVEL_CRIT, "requested size " ZBX_FS_SIZE_T " not within bounds [%d <= size <= %d]",
+				(zbx_fs_size_t)size, MEM_MIN_SIZE, MEM_MAX_SIZE);
 		exit(FAIL);
 	}
 
@@ -625,10 +625,10 @@ void	zbx_mem_create(zbx_mem_info_t **info, key_t shm_key, int lock_name, size_t 
 	(*info)->used_size = 0;
 	(*info)->free_size = (*info)->total_size;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "valid user addresses: [%p, %p) total size: %lu",
+	zabbix_log(LOG_LEVEL_DEBUG, "valid user addresses: [%p, %p] total size: " ZBX_FS_SIZE_T,
 			(*info)->lo_bound + MEM_SIZE_FIELD,
 			(*info)->hi_bound - MEM_SIZE_FIELD,
-			(*info)->total_size);
+			(zbx_fs_size_t)(*info)->total_size);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -666,8 +666,8 @@ void	*__zbx_mem_malloc(const char *file, int line, zbx_mem_info_t *info, const v
 
 	if (0 == size || size > MEM_MAX_SIZE)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): asking for a bad number of bytes (%lu)",
-				file, line, __function_name, size);
+		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): asking for a bad number of bytes (" ZBX_FS_SIZE_T ")",
+				file, line, __function_name, (zbx_fs_size_t)size);
 		exit(FAIL);
 	}
 
@@ -679,8 +679,8 @@ void	*__zbx_mem_malloc(const char *file, int line, zbx_mem_info_t *info, const v
 
 	if (NULL == chunk)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): out of memory (requested %lu bytes)",
-				file, line, __function_name, size);
+		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): out of memory (requested " ZBX_FS_SIZE_T " bytes)",
+				file, line, __function_name, (zbx_fs_size_t)size);
 		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): please increase %s configuration parameter",
 				file, line, __function_name, info->mem_param);
 		exit(FAIL);
@@ -697,8 +697,8 @@ void	*__zbx_mem_realloc(const char *file, int line, zbx_mem_info_t *info, void *
 
 	if (0 == size || size > MEM_MAX_SIZE)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): asking for a bad number of bytes (%lu)",
-				file, line, __function_name, size);
+		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): asking for a bad number of bytes (" ZBX_FS_SIZE_T ")",
+				file, line, __function_name, (zbx_fs_size_t)size);
 		exit(FAIL);
 	}
 
@@ -713,8 +713,8 @@ void	*__zbx_mem_realloc(const char *file, int line, zbx_mem_info_t *info, void *
 
 	if (NULL == chunk)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): out of memory (requested %lu bytes)",
-				file, line, __function_name, size);
+		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): out of memory (requested " ZBX_FS_SIZE_T " bytes)",
+				file, line, __function_name, (zbx_fs_size_t)size);
 		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): please increase %s configuration parameter",
 				file, line, __function_name, info->mem_param);
 		exit(FAIL);
@@ -814,8 +814,8 @@ size_t	zbx_mem_required_size(size_t size, int chunks_num, const char *descr, con
 {
 	const char	*__function_name = "zbx_mem_required_size";
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() size:%lu chunks_num:%d descr:'%s' param:'%s'",
-			__function_name, size, chunks_num, descr, param);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() size:" ZBX_FS_SIZE_T " chunks_num:%d descr:'%s' param:'%s'",
+			__function_name, (zbx_fs_size_t)size, chunks_num, descr, param);
 
 	/* shared memory of what size should we allocate so that there is a guarantee */
 	/* that we will be able to get ourselves 'chunks_num' pieces of memory with a */
@@ -833,7 +833,7 @@ size_t	zbx_mem_required_size(size_t size, int chunks_num, const char *descr, con
 	size += (chunks_num - 1) * 8;			/* each additional chunk requires 8 bytes of overhead */
 	size += chunks_num * (MEM_MIN_ALLOC - 1);	/* each chunk has size of at least MEM_MIN_ALLOC bytes */
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() size:%lu", __function_name, size);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() size:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)size);
 
 	return size;
 }

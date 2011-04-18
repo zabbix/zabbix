@@ -93,15 +93,15 @@ int	zbx_shmget(key_t key, size_t size)
 
 		if (SUCCEED == ret && -1 == (shm_id = shmget(key, size, IPC_CREAT | IPC_EXCL | 0600)))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "Cannot allocate shared memory of size %lu [%s]",
-					size, strerror(errno));
+			zabbix_log(LOG_LEVEL_CRIT, "Cannot allocate shared memory of size " ZBX_FS_SIZE_T " [%s]",
+					(zbx_fs_size_t)size, strerror(errno));
 			ret = FAIL;
 		}
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Cannot allocate shared memory of size %lu [%s]",
-				size, strerror(errno));
+		zabbix_log(LOG_LEVEL_CRIT, "Cannot allocate shared memory of size " ZBX_FS_SIZE_T " [%s]",
+				(zbx_fs_size_t)size, strerror(errno));
 		ret = FAIL;
 	}
 
