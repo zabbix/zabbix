@@ -24,10 +24,12 @@
 int	SYSTEM_SW_ARCH(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct utsname	name;
+
 	if (-1 == uname(&name))
 		return SYSINFO_RET_FAIL;
 
-	SET_STR_RESULT(result, strdup(name.machine));
+	SET_STR_RESULT(result, zbx_strdup(NULL, name.machine));
+
 	return SYSINFO_RET_OK;
 }
 
@@ -36,7 +38,7 @@ int     SYSTEM_SW_OS(const char *cmd, const char *param, unsigned flags, AGENT_R
 #define SW_OS_NAME	"/etc/issue.net"
 #define SW_OS_SHORT	"/proc/version_signature"
 #define SW_OS_FULL	"/proc/version"
-	char		type[MAX_STRING_LEN], line[MAX_STRING_LEN];
+	char		type[8], line[MAX_STRING_LEN];
 	int		ret = SYSINFO_RET_FAIL;
 	FILE		*f = NULL;
 
@@ -46,7 +48,7 @@ int     SYSTEM_SW_OS(const char *cmd, const char *param, unsigned flags, AGENT_R
 	if (0 != get_param(param, 1, type, sizeof(type)))
 		*type = '\0';
 
-	if (0 == strcmp(type, "name")  || '\0' == *type)
+	if ('\0' == *type || 0 == strcmp(type, "name"))
 		f = fopen(SW_OS_NAME, "r");
 	else if (0 == strcmp(type, "short"))
 		f = fopen(SW_OS_SHORT, "r");
@@ -60,7 +62,7 @@ int     SYSTEM_SW_OS(const char *cmd, const char *param, unsigned flags, AGENT_R
 	{
 		zbx_rtrim(line, " \r\n");
 		ret = SYSINFO_RET_OK;
-		SET_STR_RESULT(result, strdup(line));
+		SET_STR_RESULT(result, zbx_strdup(NULL, line));
 	}
 	zbx_fclose(f);
 
@@ -81,7 +83,9 @@ int     SYSTEM_SW_PACKAGES(const char *cmd, const char *param, unsigned flags, A
 	{
 		if (1 != sscanf(line, "Package: %s", package))
 			continue;
-next_line: /* find "Status:" line, might not be the next one */
+
+		/* find "Status:" line, might not be the next one */
+next_line:
 		if (NULL == fgets(line, sizeof(line), f))
 			break;
 		if (1 != sscanf(line, "Status: %[^\n]", status))
@@ -90,14 +94,13 @@ next_line: /* find "Status:" line, might not be the next one */
 		if (0 == strcmp(status, "install ok installed"))
 			offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%s, ", package);
 	}
-
 	zbx_fclose(f);
 
 	if (0 < offset)
 	{
-		buffer[offset - 2] = '\0'; /* remove ", " */
+		buffer[offset - 2] = '\0';	/* remove ", " */
 		ret = SYSINFO_RET_OK;
-		SET_TEXT_RESULT(result, strdup(buffer));
+		SET_TEXT_RESULT(result, zbx_strdup(NULL, buffer));
 	}
 
 	return ret;
