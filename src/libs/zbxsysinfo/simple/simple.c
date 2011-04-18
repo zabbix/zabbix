@@ -185,7 +185,7 @@ static int	check_telnet(const char *host, unsigned short port, int timeout, int 
 	if (SUCCEED == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout))
 	{
 #ifdef _WINDOWS
-		ioctlsocket(s.socket, FIONBIO, &argp); /* non-zero value sets the socket to non-blocking */
+		ioctlsocket(s.socket, FIONBIO, &argp);	/* non-zero value sets the socket to non-blocking */
 #else
 		flags = fcntl(s.socket, F_GETFL);
 		if (0 == (flags & O_NONBLOCK))
