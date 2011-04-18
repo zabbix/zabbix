@@ -26,7 +26,7 @@
 		typedef int ssize_t;
 #	else
 		typedef long ssize_t;
-#	endif /* __INT_MAX__ */
+#	endif
 
 #	define ZBX_TCP_WRITE(s, b, bl)	((ssize_t)send((s), (b), (bl), 0))
 #	define ZBX_TCP_READ(s, b, bl)	((ssize_t)recv((s), (b), (bl), 0))
@@ -50,7 +50,7 @@
 
 #	define ZBX_SOCK_ERR_TIMEDOUT	EINTR
 
-#endif /* _WINDOWS */
+#endif
 
 #if defined(HAVE_IPV6)
 #	define ZBX_SOCKADDR struct sockaddr_storage
