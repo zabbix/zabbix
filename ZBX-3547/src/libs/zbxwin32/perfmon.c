@@ -149,9 +149,7 @@ PDH_STATUS	calculate_counter_value(const char *function, const char *counterpath
 		goto remove_counter;
 
 	if (PDH_CSTATUS_INVALID_DATA == (pdh_status = PdhCalculateCounterFromRawValue(counter, dwFormat, &rawData, NULL, value)))
-	{
-		/* a rate counter, two raw values are required */
-
+	{ /* some counters (e.g., rate counters), require two raw values - then PDH_CSTATUS_INVALID_DATA is returned */
 		zbx_sleep(1);
 
 		if (ERROR_SUCCESS == (pdh_status = zbx_PdhCollectQueryData(function, counterpath, query)) &&
