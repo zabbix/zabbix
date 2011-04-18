@@ -128,6 +128,10 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.6rc1
+
+ - [ZBX-3671] fixed ORACLE SQL error when processing of the trigger function count() (Sasha)
+
 Changes for 1.8.5
 
  - [ZBX-3503] fixed "incorrect usage of quotes" error (KB)
