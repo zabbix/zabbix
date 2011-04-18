@@ -155,7 +155,7 @@ set_time_limit(10);
 	drawMapLinkLabels($im, $map, $map_info);
 
 	if(!isset($_REQUEST['noselements']) && ($map['markelements'] == 1)){
-		drawMapSelemetsMarks($im, $map, $map_info);
+		drawMapSelementsMarks($im, $map, $map_info);
 	}
 //--
 

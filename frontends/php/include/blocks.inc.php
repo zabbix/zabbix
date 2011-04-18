@@ -72,7 +72,7 @@ function make_favorite_graphs(){
 
 			$item['name'] = itemName($item);
 
-			$link = new CLink(get_node_name_by_elid($sourceid, null, ': ').$host['host'].':'.$item['name'],'history.php?action=showgraph&itemid='.$sourceid);
+			$link = new CLink(get_node_name_by_elid($sourceid, null, ': ').$host['name'].':'.$item['name'],'history.php?action=showgraph&itemid='.$sourceid);
 			$link->setTarget('blank');
 		}
 		else{
@@ -81,7 +81,7 @@ function make_favorite_graphs(){
 			$graph = $graphs[$sourceid];
 			$ghost = reset($graph['hosts']);
 
-			$link = new CLink(get_node_name_by_elid($sourceid, null, ': ').$ghost['host'].':'.$graph['name'],'charts.php?graphid='.$sourceid);
+			$link = new CLink(get_node_name_by_elid($sourceid, null, ': ').$ghost['name'].':'.$graph['name'],'charts.php?graphid='.$sourceid);
 			$link->setTarget('blank');
 		}
 
@@ -214,7 +214,8 @@ function make_system_status($filter){
 		'groupids' => $groupids,
 		'monitored' => 1,
 		'maintenance' => $filter['maintenance'],
-		'expandData' => 1,
+// Deprecated method, use selectHosts instead
+//		'expandData' => 1,
 		'skipDependent' => 1,
 		'expandDescription' => 1,
 		'filter' => array(
@@ -222,6 +223,8 @@ function make_system_status($filter){
 			'value' => TRIGGER_VALUE_TRUE
 		),
 		'output' => API_OUTPUT_EXTEND,
+// Interested in host name
+		'selectHosts' => array('name')
 	);
 	if($filter['extAck'] == EXTACK_OPTION_UNACK) $options['withLastEventUnacknowledged'] = 1;
 	$triggers = API::Trigger()->get($options);
@@ -313,10 +316,10 @@ function make_system_status($filter){
 						$unknown->setHint($trigger['error'], '', 'on');
 					}
 //----
-
+					$trigger['hostname'] = $trigger['hosts'][0]['name'];
 					$table_inf->addRow(array(
 						get_node_name_by_elid($trigger['triggerid']),
-						$trigger['host'],
+						$trigger['hostname'],
 						new CCol($trigger['description'], getSeverityStyle($trigger['priority'])),
 						zbx_date2age($event['clock']),
 						$unknown,
@@ -438,7 +441,7 @@ function make_hoststat_summary($filter){
 		'groupids' => zbx_objectValues($groups, 'groupid'),
 		'monitored_hosts' => 1,
 		'filter' => array('maintenance_status' => $filter['maintenance']),
-		'output' => array('hostid', 'host')
+		'output' => array('hostid', 'name')
 	);
 	$hosts = API::Host()->get($options);
 	$hosts = zbx_toHash($hosts, 'hostid');
@@ -537,7 +540,7 @@ function make_hoststat_summary($filter){
 
 			if(!isset($problematic_host_list[$host['hostid']])){
 				$problematic_host_list[$host['hostid']] = array();
-				$problematic_host_list[$host['hostid']]['host'] = $host['host'];
+				$problematic_host_list[$host['hostid']]['host'] = $host['name'];
 				$problematic_host_list[$host['hostid']]['hostid'] = $host['hostid'];
 				$problematic_host_list[$host['hostid']]['severities'] = array();
 				$problematic_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_DISASTER] = 0;
@@ -820,7 +823,7 @@ function make_latest_issues($filter = array()){
 			'value' => TRIGGER_VALUE_TRUE,
 		),
 		'selectGroups' => API_OUTPUT_EXTEND,
-		'selectHosts' => array('hostid', 'host', 'maintenance_status', 'maintenanceid'),
+		'selectHosts' => array('hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid'),
 		'output' => API_OUTPUT_EXTEND,
 		'sortfield' => 'lastchange',
 		'sortorder' => ZBX_SORT_DOWN,
@@ -867,7 +870,7 @@ function make_latest_issues($filter = array()){
 		$host = reset($trigger['hosts']);
 
 		$trigger['hostid'] = $host['hostid'];
-		$trigger['host'] = $host['host'];
+		$trigger['hostname'] = $host['name'];
 
 		$host = null;
 		$menus = '';
@@ -912,7 +915,7 @@ function make_latest_issues($filter = array()){
 		$menus = rtrim($menus,',');
 		$menus = 'show_popup_menu(event,['.$menus.'],180);';
 
-		$host = new CSpan($trigger['host'], 'link_menu pointer');
+		$host = new CSpan($trigger['hostname'], 'link_menu pointer');
 		$host->setAttribute('onclick', 'javascript: '.$menus);
 		//$host = new CSpan($trigger['host'],'link_menu pointer');
 		//$host->setAttribute('onclick','javascript: '.$menus);
@@ -937,7 +940,7 @@ function make_latest_issues($filter = array()){
 			$text.=' ['.($trigger_host['maintenance_type'] ? S_NO_DATA_MAINTENANCE : S_NORMAL_MAINTENANCE).']';
 		}
 
-		$host = new CSpan($trigger['host'], $style.' pointer');
+		$host = new CSpan($trigger['hostname'], $style.' pointer');
 		$host->setAttribute('onclick','javascript: '.$menus);
 		if(!is_null($text)) $host->setHint($text, '', '', false);
 // }}} Maintenance

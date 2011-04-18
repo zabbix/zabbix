@@ -492,7 +492,7 @@ include_once('include/page_header.php');
 			if($graph['templateid'] != 0){
 				$real_hosts = get_realhosts_by_graphid($graph['templateid']);
 				$real_host = DBfetch($real_hosts);
-				$name[] = new CLink($real_host['host'], 'graphs.php?'.'hostid='.$real_host['hostid'], 'unknown');
+				$name[] = new CLink($real_host['name'], 'graphs.php?'.'hostid='.$real_host['hostid'], 'unknown');
 				$name[] = ':'.$graph['name'];
 			}
 			else if(!empty($graph['discoveryRule'])){

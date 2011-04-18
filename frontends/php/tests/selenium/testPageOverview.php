@@ -1,3 +1,4 @@
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2000-2011 Zabbix SIA
@@ -16,18 +17,28 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
+?>
+<?php
+require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-package com.zabbix.proxy;
-
-class GeneralInformation
+class testPageOverview extends CWebTest
 {
-	public static final String APPLICATION_NAME = "Zabbix Java Proxy";
-	public static final String REVISION_DATE = "11 March 2011";
-	public static final String REVISION = "{ZABBIX_REVISION}";
-	public static final String VERSION = "1.9.4";
-
-	public static void printVersion()
+	public function testPageOverview_SimpleTest()
 	{
-		System.out.printf("%s v%s (revision %s) (%s)\n", APPLICATION_NAME, VERSION, REVISION, REVISION_DATE);
+		$this->login('overview.php');
+		$this->assertTitle('Overview \[refreshed every 30 sec\]');
+		$this->ok('OVERVIEW');
+		$this->ok('Hosts location');
+		$this->ok('Group');
+		$this->ok('Type');
+	}
+
+// Check that no real host or template names displayed
+	public function testPageOverview_NoHostNames()
+	{
+		$this->login('overview.php');
+		$this->assertTitle('Overview \[refreshed every 30 sec\]');
+		$this->checkNoRealHostnames();
 	}
 }
+?>

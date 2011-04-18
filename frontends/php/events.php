@@ -626,7 +626,7 @@ include_once('include/page_header.php');
 						'action'
 						),
 					is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
-					$_REQUEST['hostid'] == 0 ? $host['host'] : null,
+					$_REQUEST['hostid'] == 0 ? $host['name'] : null,
 					new CSpan($tr_desc, 'link_menu'),
 					new CCol(trigger_value2str($event['value']), get_trigger_value_style($event['value'])),
 					getSeverityCell($trigger['priority'], null, !$event['value']),
@@ -639,7 +639,7 @@ include_once('include/page_header.php');
 					$csvRows[] = array(
 						zbx_date2str(S_EVENTS_ACTION_TIME_FORMAT,$event['clock']),
 						is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
-						$_REQUEST['hostid'] == 0 ? $host['host'] : null,
+						$_REQUEST['hostid'] == 0 ? $host['name'] : null,
 						$description,
 						trigger_value2str($event['value']),
 						getSeverityCaption($trigger['priority']),
