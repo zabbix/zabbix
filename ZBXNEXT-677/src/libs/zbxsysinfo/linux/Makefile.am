@@ -9,13 +9,13 @@ libspecsysinfo_a_SOURCES = \
 	cpu.c \
 	diskio.c \
 	diskspace.c \
-	hw.c \
+	hardware.c \
 	inodes.c \
 	kernel.c \
 	memory.c \
 	net.c \
 	proc.c \
 	sensors.c \
-	sw.c \
+	software.c \
 	swap.c \
 	uptime.c
