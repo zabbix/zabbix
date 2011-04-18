@@ -475,7 +475,7 @@
 
 
 	$hostProfileTable = DB::getSchema('host_profile');
-	$host_profile_fields = getHostProfiles();
+	$host_profile_fields = getHostProfileTitles();
 
 	foreach($host_profile_fields as $profileName => $profileCaption){
 		if(!isset($host_profile[$profileName])){

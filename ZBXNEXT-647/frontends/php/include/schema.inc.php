@@ -3388,6 +3388,12 @@ return array(
 				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
+			'profile_mode' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			),
 		),
 	),
 	'hosts_templates' => array(
@@ -3745,6 +3751,12 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
+			),
+			'profile_link' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
 			),
 		),
 	),
