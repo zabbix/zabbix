@@ -285,8 +285,6 @@ function updateNewDCheckType(e){
 
 	if(ZBX_SVC.icmp != dcheckType)
 		jQuery('#new_check_ports').val(discoveryCheckDefaultPort(dcheckType));
-	else
-		jQuery('#new_check_ports').val(0);
 
 	updateNewDCheckSNMPType(e);
 }
@@ -326,7 +324,7 @@ function saveNewDCheckForm(e){
 		dCheck[name[1]] = formData[key];
 	}
 
-	if(dCheck.ports != discoveryCheckDefaultPort(dCheck.type))
+	if((typeof dCheck.ports != 'undefined') && (dCheck.ports != discoveryCheckDefaultPort(dCheck.type)))
 		dCheck.name += ' ('+dCheck.ports+')';
 
 	if(!empty(dCheck.key_)) dCheck.name += ' "'+dCheck.key_+'"';
