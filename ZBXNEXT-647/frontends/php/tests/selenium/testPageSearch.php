@@ -26,7 +26,7 @@ class testPageSearch extends CWebTest
 	public function testPageHosts_FindZabbixServer()
 	{
 		$this->login('dashboard.php');
-		$this->input_type('search',"Zabbix server");
+		$this->input_type('search',"ЗАББИКС Сервер");
 		$this->keyPress('search',"\\13");
 		$this->wait();
 		$this->assertTitle('Search');
@@ -35,7 +35,8 @@ class testPageSearch extends CWebTest
 		$this->ok('Displaying 0 of 0 found');
 		$this->ok('Host groups');
 		$this->ok('Templates');
-		$this->ok('Zabbix server');
+		$this->ok('ЗАББИКС Сервер');
+		$this->nok('Test server');
 		$this->ok('127.0.0.1');
 		$this->ok('Latest data');
 		$this->ok('Triggers');
@@ -54,7 +55,7 @@ class testPageSearch extends CWebTest
 		$this->wait();
 		$this->assertTitle('Search');
 		$this->nok('Displaying 1 of 1 found');
-		$this->nok('Zabbix server');
+		$this->nok('ЗАББИКС Сервер');
 		$this->ok('Displaying 0 of 0 found');
 		$this->ok('...');
 	}
@@ -67,7 +68,7 @@ class testPageSearch extends CWebTest
 		$this->wait();
 		$this->assertTitle('Search');
 		$this->nok('Displaying 1 of 1 found');
-		$this->nok('Zabbix server');
+		$this->nok('ЗАББИКС Сервер');
 		$this->ok('Displaying 0 of 0 found');
 		$this->ok('...');
 	}

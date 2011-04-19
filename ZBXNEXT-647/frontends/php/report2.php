@@ -159,14 +159,14 @@ include_once('include/page_header.php');
 
 			$host = reset($trigger_data['hosts']);
 			$trigger_data['hostid'] = $host['hostid'];
-			$trigger_data['host'] = $host['host'];
+			$trigger_data['hostname'] = $host['name'];
 		}
 	}
 
 
 	if(isset($_REQUEST['triggerid'])){
 		$rep2_wdgt->addHeader(array(
-			new CLink($trigger_data['host'], '?filter_groupid=' . $_REQUEST['groupid'] . '&filter_hostid=' . $trigger_data['hostid']),
+			new CLink($trigger_data['hostname'], '?filter_groupid=' . $_REQUEST['groupid'] . '&filter_hostid=' . $trigger_data['hostid']),
 			' : ',
 			expand_trigger_description_by_data($trigger_data)
 				), SPACE);
@@ -198,6 +198,8 @@ include_once('include/page_header.php');
 			'expandDescription' => true,
 			'expandData' => true,
 			'monitored' => true,
+// Rquired for getting visible host name
+			'selectHosts' => API_OUTPUT_EXTEND,
 			'filter' => array()
 		);
 
@@ -220,7 +222,6 @@ include_once('include/page_header.php');
 				$options['filter']['templateid'] = $_REQUEST['tpl_triggerid'];
 			}
 		}
-
 
 		$triggers = API::Trigger()->get($options);
 		morder_result($triggers, array('host', 'description'));
@@ -246,7 +247,7 @@ include_once('include/page_header.php');
 
 			$table->addRow(array(
 				get_node_name_by_elid($trigger['hostid']),
-				(($_REQUEST['hostid'] == 0) || (1 == $config)) ? $trigger['host'] : NULL,
+				(($_REQUEST['hostid'] == 0) || (1 == $config)) ? $trigger['hosts'][0]['name'] : NULL,
 				new CLink($trigger['description'], 'events.php?triggerid=' . $trigger['triggerid']),
 				$true,
 				$false,

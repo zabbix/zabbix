@@ -304,7 +304,7 @@ function bar_report_form(){
 					url_param($gid,false,'gid').
 					'",550,400,"graph_item_form");');
 
-			$description = $host['host'].': '.itemName($item);
+			$description = $host['name'].': '.itemName($item);
 
 			$items_table->addRow(array(
 					new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
@@ -442,7 +442,7 @@ function bar_report_form2(){
 					url_param($gid,false,'gid').
 					'",550,400,"graph_item_form");');
 
-			$description = $host['host'].': '.itemName($item);
+			$description = $host['name'].': '.itemName($item);
 
 			$items_table->addRow(array(
 					new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
@@ -558,29 +558,29 @@ function bar_report_form3(){
 
 	$options = array(
 		'real_hosts' => 1,
-		'output' => array('hostid', 'host')
+		'output' => array('hostid', 'name')
 	);
 	if($groupid > 0){
 		$options['groupids'] = $groupid;
 	}
 	$db_hosts = API::Host()->get($options);
 	$db_hosts = zbx_toHash($db_hosts, 'hostid');
-	order_result($db_hosts, 'host');
+	order_result($db_hosts, 'name');
 
 	foreach($db_hosts as $hnum => $host){
-		$host_tb->addItem($host['hostid'],$host['host']);
+		$host_tb->addItem($host['hostid'],$host['name']);
 	}
 
 	$options = array(
 		'real_hosts' => 1,
-		'output' => array('hostid', 'host'),
+		'output' => array('hostid', 'name'),
 		'hostids' => $hostids,
 	);
 	$db_hosts2 = API::Host()->get($options);
-	order_result($db_hosts2, 'host');
+	order_result($db_hosts2, 'name');
 	foreach($db_hosts2 as $hnum => $host){
 		if(!isset($db_hosts[$host['hostid']]))
-			$host_tb->addItem($host['hostid'],$host['host']);
+			$host_tb->addItem($host['hostid'],$host['name']);
 	}
 
 	$reportForm->addRow(S_HOSTS, $host_tb->Get(S_SELECTED_HOSTS,array(S_OTHER.SPACE.S_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE,$cmbGroups)));

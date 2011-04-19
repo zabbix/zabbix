@@ -2837,6 +2837,12 @@ return array(
 				'length' => 128,
 				'default' => '',
 			),
+			'name' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
+			),
 		),
 	),
 	'interface' => array(

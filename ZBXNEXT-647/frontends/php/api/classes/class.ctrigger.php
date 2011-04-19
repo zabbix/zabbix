@@ -941,6 +941,21 @@ Copt::memoryPick();
 			$triggers_to_expand_items2 = array();
 			foreach($result as $tnum => $trigger){
 
+				preg_match_all('/{HOST\.NAME([1-9]?)}/u', $trigger['description'], $hnums);
+				if(!empty($hnums[1])){
+					preg_match_all('/{([0-9]+)}/u', $trigger['expression'], $funcs);
+					$funcs = $funcs[1];
+
+					foreach($hnums[1] as $fnum){
+						$fnum = $fnum ? $fnum : 1;
+						if(isset($funcs[$fnum-1])){
+							$functionid = $funcs[$fnum-1];
+							$functionids[$functionid] = $functionid;
+							$triggers_to_expand_hosts[$trigger['triggerid']][$functionid] = $fnum;
+						}
+					}
+				}
+
 				preg_match_all('/{HOSTNAME([1-9]?)}/u', $trigger['description'], $hnums);
 				if(!empty($hnums[1])){
 					preg_match_all('/{([0-9]+)}/u', $trigger['expression'], $funcs);
@@ -956,7 +971,22 @@ Copt::memoryPick();
 					}
 				}
 
-				preg_match_all('/{ITEM.LASTVALUE([1-9]?)}/u', $trigger['description'], $inums);
+				preg_match_all('/{HOST\.HOST([1-9]?)}/u', $trigger['description'], $hnums);
+				if(!empty($hnums[1])){
+					preg_match_all('/{([0-9]+)}/u', $trigger['expression'], $funcs);
+					$funcs = $funcs[1];
+
+					foreach($hnums[1] as $fnum){
+						$fnum = $fnum ? $fnum : 1;
+						if(isset($funcs[$fnum-1])){
+							$functionid = $funcs[$fnum-1];
+							$functionids[$functionid] = $functionid;
+							$triggers_to_expand_hosts[$trigger['triggerid']][$functionid] = $fnum;
+						}
+					}
+				}
+
+				preg_match_all('/{ITEM\.LASTVALUE([1-9]?)}/u', $trigger['description'], $inums);
 				if(!empty($inums[1])){
 					preg_match_all('/{([0-9]+)}/u', $trigger['expression'], $funcs);
 					$funcs = $funcs[1];
@@ -971,7 +1001,7 @@ Copt::memoryPick();
 					}
 				}
 
-				preg_match_all('/{ITEM.VALUE([1-9]?)}/u', $trigger['description'], $inums);
+				preg_match_all('/{ITEM\.VALUE([1-9]?)}/u', $trigger['description'], $inums);
 				if(!empty($inums[1])){
 					preg_match_all('/{([0-9]+)}/u', $trigger['expression'], $funcs);
 					$funcs = $funcs[1];
@@ -988,7 +1018,7 @@ Copt::memoryPick();
 			}
 
 			if(!empty($functionids)){
-				$sql = 'SELECT DISTINCT f.triggerid, f.functionid, h.host, i.lastvalue'.
+				$sql = 'SELECT DISTINCT f.triggerid, f.functionid, h.host, h.name, i.lastvalue'.
 						' FROM functions f,items i,hosts h'.
 						' WHERE f.itemid=i.itemid'.
 							' AND i.hostid=h.hostid'.
@@ -1000,9 +1030,15 @@ Copt::memoryPick();
 
 						$fnum = $triggers_to_expand_hosts[$func['triggerid']][$func['functionid']];
 						if($fnum == 1)
-							$result[$func['triggerid']]['description'] = str_replace('{HOSTNAME}', $func['host'], $result[$func['triggerid']]['description']);
+						{
+							$result[$func['triggerid']]['description'] = str_replace('{HOSTNAME}', $func['name'], $result[$func['triggerid']]['description']);
+							$result[$func['triggerid']]['description'] = str_replace('{HOST.NAME}', $func['name'], $result[$func['triggerid']]['description']);
+							$result[$func['triggerid']]['description'] = str_replace('{HOST.HOST}', $func['host'], $result[$func['triggerid']]['description']);
+						}
 
-						$result[$func['triggerid']]['description'] = str_replace('{HOSTNAME'.$fnum.'}', $func['host'], $result[$func['triggerid']]['description']);
+						$result[$func['triggerid']]['description'] = str_replace('{HOSTNAME'.$fnum.'}', $func['name'], $result[$func['triggerid']]['description']);
+						$result[$func['triggerid']]['description'] = str_replace('{HOST.NAME'.$fnum.'}', $func['name'], $result[$func['triggerid']]['description']);
+						$result[$func['triggerid']]['description'] = str_replace('{HOST.HOST'.$fnum.'}', $func['host'], $result[$func['triggerid']]['description']);
 					}
 
 					if(isset($triggers_to_expand_items[$func['triggerid']][$func['functionid']])){

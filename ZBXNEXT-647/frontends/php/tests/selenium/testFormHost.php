@@ -22,17 +22,7 @@
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
 class testFormHost extends CWebTest{
-
-	// Returns all hosts
-	public static function allHosts(){
-		return DBdata('select * from hosts where status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')');
-	}
-
-	/**
-	* @dataProvider allHosts
-	*/
-
-	public $host = "Test host";
+	public $host = "Test host 001";
 
 	public function testFormHost_Layout(){
 		$this->login('hosts.php?form=1');
@@ -60,7 +50,8 @@ class testFormHost extends CWebTest{
 	}
 
 	public function testFormHost_CreateLongHostName(){
-		$host="01234567890123456789012345678901234567890123456789012345678901234";
+// 64 characters long name
+		$host="1234567890123456789012345678901234567890123456789012345678901234";
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid','Zabbix servers');
 		$this->button_click('form');
@@ -69,13 +60,14 @@ class testFormHost extends CWebTest{
 		$this->button_click('save');
 		$this->wait();
 		$this->assertTitle('Hosts');
-		$this->ok('ERROR');
+		$this->ok('Host added');
+		$this->ok($host);
 	}
 
 	public function testFormHost_SimpleUpdate(){
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid','Zabbix servers');
-		$this->click('link=Zabbix server');
+		$this->click('link=ЗАББИКС Сервер');
 		$this->wait();
 		$this->button_click('save');
 		$this->wait();
@@ -104,12 +96,12 @@ class testFormHost extends CWebTest{
 		$this->dropdown_select_wait('groupid','all');
 		$this->button_click('form');
 		$this->wait();
-		$this->input_type('host','Zabbix server');
+		$this->input_type('host','Test host');
 		$this->button_click('save');
 		$this->wait();
 		$this->assertTitle('Hosts');
 		$this->ok('No groups for host');
-		$this->assertEquals(1,DBcount("select * from hosts where host='Zabbix server'"));
+		$this->assertEquals(1,DBcount("select * from hosts where host='Test host'"));
 	}
 
 	public function testFormHost_Delete(){
@@ -131,11 +123,12 @@ class testFormHost extends CWebTest{
 		// Clone Host
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid','all');
-		$this->click('link=Zabbix server');
+		$this->click('link=ЗАББИКС Сервер');
 		$this->wait();
 		$this->button_click('clone');
 		$this->wait();
 		$this->input_type('host',$this->host.'2');
+		$this->input_type('visiblename',$this->host.'2 (visible)');
 		$this->button_click('save');
 		$this->wait();
 		$this->assertTitle('Hosts');
@@ -148,7 +141,7 @@ class testFormHost extends CWebTest{
 		// Delete Host
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid','all');
-		$this->click('link='.$this->host.'2');
+		$this->click('link='.$this->host.'2 (visible)');
 		$this->wait();
 		$this->button_click('delete');
 		$this->wait();
@@ -161,11 +154,12 @@ class testFormHost extends CWebTest{
 		// Full clone Host
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid','all');
-		$this->click('link=Zabbix server');
+		$this->click('link=ЗАББИКС Сервер');
 		$this->wait();
 		$this->button_click('full_clone');
 		$this->wait();
 		$this->input_type('host',$this->host.'_fullclone');
+		$this->input_type('visiblename',$this->host.'_visible');
 		$this->button_click('save');
 		$this->wait();
 		$this->assertTitle('Hosts');
@@ -178,7 +172,7 @@ class testFormHost extends CWebTest{
 		// Delete Host
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid','all');
-		$this->click('link='.$this->host.'_fullclone');
+		$this->click('link='.$this->host.'_visible');
 		$this->wait();
 		$this->button_click('delete');
 		$this->wait();
@@ -188,7 +182,7 @@ class testFormHost extends CWebTest{
 	}
 
 	public function testFormHost_TemplateLink(){
-		$this->templateLink("Template linkage test host","Template_Linux");
+		$this->templateLink("Test host for template linkage","Template_Linux");
 	}
 
 
@@ -205,7 +199,7 @@ class testFormHost extends CWebTest{
 
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid','all');
-		$this->click('link=Template linkage test host');
+		$this->click('link=Test host for template linkage');
 		$this->wait();
 		$this->tab_switch("Templates");
 		$this->ok("$template");
@@ -237,7 +231,7 @@ class testFormHost extends CWebTest{
 	}
 
 	public function testFormHost_TemplateLinkUpdate(){
-		$this->templateLink("Template linkage test host","Template_Linux");
+		$this->templateLink("Test host for template linkage","Template_Linux");
 	}
 
 	public function testFormHost_TemplateUnlinkAndClear(){
@@ -247,7 +241,7 @@ class testFormHost extends CWebTest{
 
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid','all');
-		$this->click('link=Template linkage test host');
+		$this->click('link=Test host for template linkage');
 		$this->wait();
 		$this->tab_switch("Templates");
 		$this->ok("$template");

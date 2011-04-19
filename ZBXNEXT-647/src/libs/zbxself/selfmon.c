@@ -236,7 +236,7 @@ void	init_selfmon_collector()
 		sz_total += sz_process[process_type] =
 			sizeof(zbx_stat_process_t) * get_process_type_forks(process_type);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() size:%d", __function_name, (int)sz_total);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() size:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)sz_total);
 
 	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_SELFMON_ID)))
 	{
