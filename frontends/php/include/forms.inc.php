@@ -2120,49 +2120,50 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		}
 		$frmItem->addRow(S_APPLICATIONS,$cmbApps);
 
+		// control to choose host_profile field, that will be populated by this item (if any)
+		if(!$parent_discoveryid){
+			$hostProfileFieldDropDown = new CComboBox('profile_link');
+			$possibleHostProfiles = getHostProfiles();
+
+			// which field are already being populated by other items
+			$options = array(
+				'output' => array('profile_link'),
+				'filter' => array('hostid' => $hostid),
+				'nopermissions' => true
+			);
+			$alreadyPopulated = API::item()->get($options);
+			$alreadyPopulated = zbx_objectValues($alreadyPopulated, 'profile_link');
+
+			// default option - do not populate
+			$hostProfileFieldDropDown->addItem(0, '-None-', $profile_link == '0' ? 'Yes' : null); // 'yes' means 'selected'
+			// a list of available host profile fields
+			foreach($possibleHostProfiles as $fieldNo => $fieldInfo){
+				$hostProfileFieldDropDown->addItem(
+					$fieldNo,
+					$fieldInfo['title'],
+					($profile_link == $fieldNo ? 'yes' : null), // selected?
+					//'yes'
+					(in_array($fieldNo, $alreadyPopulated) &&  $profile_link != $fieldNo ? 'no' : 'yes') // enabled?
+				);
+			}
+
+			$row =  new CRow(array(_('Item will populate host profile field'), $hostProfileFieldDropDown));
+			$row->setAttribute('id', 'row_profile_link');
+			$frmItem->addRow($row);
+			// profile link field should not be visible for all item value types except 'log'
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_STR, 'profile_link');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_STR, 'row_profile_link');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_TEXT, 'profile_link');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_TEXT, 'row_profile_link');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'profile_link');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'row_profile_link');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'profile_link');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_profile_link');
+		}
+
 		$tarea = new CTextArea('description', $description);
 		$tarea->addStyle('margin-top: 5px;');
 		$frmItem->addRow(_('Description'), $tarea);
-
-		// control to choose host_profile field, that will be populated by this item (if any)
-		$hostProfileFieldDropDown = new CComboBox('profile_link');
-		$possibleHostProfiles = getHostProfiles();
-
-		// which field are already being populated by other items
-		$options = array(
-			'output' => array('profile_link'),
-			'filter' => array('hostid' => $hostid),
-			'nopermissions' => true
-		);
-		$alreadyPopulated = API::item()->get($options);
-		$alreadyPopulated = zbx_objectValues($alreadyPopulated, 'profile_link');
-
-		// default option - do not populate
-		$hostProfileFieldDropDown->addItem(0, '-None-', $profile_link == '0' ? 'Yes' : null); // 'yes' means 'selected'
-		// a list of available host profile fields
-		foreach($possibleHostProfiles as $fieldNo => $fieldInfo){
-			$hostProfileFieldDropDown->addItem(
-				$fieldNo,
-				$fieldInfo['title'],
-				($profile_link == $fieldNo ? 'yes' : null), // selected?
-				//'yes'
-				(in_array($fieldNo, $alreadyPopulated) &&  $profile_link != $fieldNo ? 'no' : 'yes') // enabled?
-			);
-		}
-
-		$row =  new CRow(array(_('Item will populate host profile field'), $hostProfileFieldDropDown));
-		$row->setAttribute('id', 'row_profile_link');
-		$frmItem->addRow($row);
-		// profile link field should not be visible for all item value types except 'log'
-		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_STR, 'profile_link');
-		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_STR, 'row_profile_link');
-		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_TEXT, 'profile_link');
-		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_TEXT, 'row_profile_link');
-		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'profile_link');
-		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'row_profile_link');
-		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'profile_link');
-		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_profile_link');
-
 
 		$frmRow = array(new CSubmit('save',S_SAVE));
 		if(isset($_REQUEST['itemid'])){

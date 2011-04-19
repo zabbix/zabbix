@@ -70,7 +70,7 @@ include_once('include/page_header.php');
 
 		'mass_clear_tpls'=>		array(T_ZBX_STR, O_OPT, NULL, 			NULL,	NULL),
 
-		'useprofile'=>		array(T_ZBX_STR, O_OPT, NULL, 			NULL,	NULL),
+		'profile_mode'=>		array(T_ZBX_INT, O_OPT, NULL, IN(HOST_PROFILE_DISABLED.','.HOST_PROFILE_MANUAL.','.HOST_PROFILE_AUTOMATIC),	NULL),
 		'host_profile'=> 	array(T_ZBX_STR, O_OPT, P_UNSET_EMPTY,	NULL,   NULL),
 
 		'macros_rem'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   null,	null),
@@ -515,7 +515,8 @@ include_once('include/page_header.php');
 				'templates' => $templates,
 				'interfaces' => $interfaces,
 				'macros' => $macros,
-				'profile' => (get_request('useprofile', 'no') == 'yes') ? get_request('host_profile', array()) : array(),
+				'profile' => (get_request('profile_mode') != -1) ? get_request('host_profile', array()) : array(),
+				'profile_mode' => get_request('profile_mode')
 			);
 
 			if($create_new){
