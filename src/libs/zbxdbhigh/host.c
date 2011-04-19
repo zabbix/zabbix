@@ -237,16 +237,16 @@ static int	DBcmp_triggers(zbx_uint64_t triggerid1, const char *expression1,
 
 /******************************************************************************
  *                                                                            *
- * Function: validate_profle_links                                            *
+ * Function: validate_profile_links                                           *
  *                                                                            *
  * Description: Check collisions in item profile links                        *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Parameters: hostid     - [IN] host identificator from database             *
  *             templateid - [IN] template identificator from database         *
  *                                                                            *
  * Return value: SUCCEED if no collisions found                               *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
@@ -485,7 +485,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_uint64_t templateid, char *err
 				zbx_snprintf(error, max_error_len,
 						"Graph [%s] already exists on the host (items are not identical)",
 						trow[1]);
-				break;	/* found graph with equal name, but items are not identical*/
+				break;	/* found graph with equal name, but items are not identical */
 			}
 		}
 		DBfree_result(hresult);
@@ -513,8 +513,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_uint64_t templateid, char *err
 		DBfree_result(tresult);
 	}
 
-	/* Interfaces */
-
+	/* interfaces */
 	if (SUCCEED == res)
 	{
 		memset(&interfaceids, 0, sizeof(interfaceids));
@@ -3395,13 +3394,13 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_uint64_t templateid)
 
 	if (SUCCEED != (res = validate_template(templateids, templateids_num, error, sizeof(error))))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Can not link template '%s': %s", zbx_host_string(templateid), error);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot link template '%s': %s", zbx_host_string(templateid), error);
 		goto clean;
 	}
 
 	if (SUCCEED != (res = validate_host(hostid, templateid, error, sizeof(error))))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Can not link template '%s': %s", zbx_host_string(templateid), error);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot link template '%s': %s", zbx_host_string(templateid), error);
 		goto clean;
 	}
 
