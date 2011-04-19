@@ -287,7 +287,7 @@ include_once('include/page_header.php');
 	show_table_header($elcn_tab, $save_btn);
 
 
-	$sysmap_img = new CImg('images/general/tree/zero.gif','sysmap');
+	$sysmap_img = new CImg('images/general/tree/zero.gif', 'Sysmap');
 	$sysmap_img->setAttribute('id', 'sysmap_img');
 
 	$table = new CTable(NULL,'map');
@@ -313,13 +313,7 @@ include_once('include/page_header.php');
 
 	insert_show_color_picker_javascript();
 
-	$sysmapOptions = array(
-		'sysmapid' => $sysmap['sysmapid'],
-		'gridSize' => $sysmap['grid_size'],
-		'showGrid' => $sysmap['grid_show'],
-		'autoAlign' => $sysmap['grid_align']
-	);
-	zbx_add_post_js('create_map("sysmap_cnt", '.zbx_jsvalue($sysmapOptions, true).');');
+	zbx_add_post_js('create_map("sysmap_cnt", "'.$sysmap['sysmapid'].'");');
 
 
 
