@@ -25,6 +25,64 @@
 
 #include "zbxmedia.h"
 
+/* Number of characters per line when wrapping Base64 data in Email  */
+#define ZBX_EMAIL_B64_MAXLINE 76
+
+/**
+ *
+ * str_linefeed()
+ *
+ * Wrap long string at specified position with linefeeds.
+ *
+ * Parameters:
+ *   src     - input string
+ *   maxline - line length
+ *
+ * Returns:
+ * Newly allocated copy of input string with linefeeds.
+ */
+static char *str_linefeed(const char *src, size_t maxline)
+{
+	size_t src_size = strlen(src);
+	int feeds       = src_size / maxline -
+		(src_size % maxline ? 0 : 1);             /* number of feeds, we don't want to feed last line */
+	size_t left     = src_size - feeds * maxline; /* what's left after last feed */
+	char *dst       = NULL;                       /* output string with linefeeds */
+	size_t dst_size = src_size + feeds * 2 + 1;   /* 2 symbols per linefeed */
+
+	const char *p_src = src;  /* working pointer to src */
+	char *p_dst       = NULL; /* working pointer to dst */
+
+	/* allocate memory for output */
+	dst = zbx_malloc(NULL, dst_size);
+	memset(dst, 0, dst_size);
+
+	p_dst = dst;
+
+	/* copy chunks appending linefeeds */
+	while (feeds--)
+	{
+		memcpy(p_dst, p_src, maxline);
+
+		p_dst += maxline;
+		p_src += maxline;
+
+		*p_dst++ = '\r';
+		*p_dst++ = '\n';
+	}
+
+	/* copy what's left */
+	if (left)
+	{
+		memcpy(p_dst, p_src, left);
+		p_src += left;
+		p_dst += left;
+	}
+
+	*p_dst = '\0';
+	return dst;
+}
+
 /*
  * smtp_readln reads until '\n'
  */
@@ -67,7 +125,7 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 	zbx_sock_t	s;
 	int		err, ret = FAIL;
 	char		cmd[MAX_STRING_LEN], *cmdp = NULL;
-	char		*tmp = NULL, *base64 = NULL;
+	char		*tmp = NULL, *base64 = NULL, *base64_lf;
 	char		*localsubject = NULL, *localbody = NULL;
 
 	char		str_time[MAX_STRING_LEN];
@@ -209,6 +267,12 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 	zbx_free(tmp);
 
 	str_base64_encode_dyn(localbody, &base64, strlen(localbody));
+
+	/* wrap base64 encoded data with linefeeds */
+	base64_lf = str_linefeed(base64, ZBX_EMAIL_B64_MAXLINE);
+	zbx_free(base64);
+	base64 = base64_lf;
+
 	zbx_free(localbody);
 	localbody = base64;
 	base64 = NULL;
