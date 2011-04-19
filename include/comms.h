@@ -28,10 +28,10 @@ typedef enum
 zbx_tcp_errors;
 
 #if defined(SOCKET) || defined(_WINDOWS)
-	typedef SOCKET ZBX_SOCKET;
-#else /* not SOCKET && not _WINDOWS */
-	typedef int ZBX_SOCKET;
-#endif /* SOCKET || _WINDOWS */
+typedef SOCKET ZBX_SOCKET;
+#else
+typedef int ZBX_SOCKET;
+#endif
 
 typedef enum
 {

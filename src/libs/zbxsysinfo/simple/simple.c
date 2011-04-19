@@ -172,7 +172,7 @@ clean:
 
 static int	check_telnet(const char *host, unsigned short port, int timeout, int *value_int)
 {
-	const char	*__function_name = "check_https";
+	const char	*__function_name = "check_telnet";
 	zbx_sock_t	s;
 #ifdef _WINDOWS
 	u_long		argp = 1;
