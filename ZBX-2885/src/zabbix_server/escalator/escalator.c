@@ -66,13 +66,12 @@ static int	check_perm2system(zbx_uint64_t userid)
 	int		res = SUCCEED;
 
 	result = DBselect(
-			"select count(g.usrgrpid)"
+			"select count(*)"
 			" from usrgrp g,users_groups ug"
 			" where ug.userid=" ZBX_FS_UI64
 				" and g.usrgrpid=ug.usrgrpid"
 				" and g.users_status=%d",
-			userid,
-			GROUP_STATUS_DISABLED);
+			userid, GROUP_STATUS_DISABLED);
 
 	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]) && atoi(row[0]) > 0)
 		res = FAIL;

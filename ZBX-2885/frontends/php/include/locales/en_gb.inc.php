@@ -86,13 +86,8 @@
 
 //	dicoveryconf.php
 	'S_CREATED_SMALL' => _('created'),
-	'S_HOST_IP'=>				_('Host IP'),
-	'S_SERVICE_TYPE'=>			_('Service type'),
-	'S_SERVICE_PORT'=>			_('Service port'),
 	'S_DISCOVERY_STATUS'=>			_('Discovery status'),
-	'S_RECEIVED_VALUE'=>			_('Received value'),
 
-	'S_UPTIME_DOWNTIME'=>			_('Uptime/Downtime'),
 
 	'S_DISCOVERY_RULE'=>			_('Discovery rule'),
 	'S_DISCOVERY'=>				_('Discovery'),
@@ -175,7 +170,6 @@
 //	httpconf.php
 	'S_SORT'=>					_('Sort'),
 	'S_STATUS_CODES'=>				_('Status codes'),
-	'S_WEB'=>					_('Web'),
 	'S_CONFIGURATION_OF_WEB_MONITORING'=>		_('Configuration of Web monitoring'),
 	'S_CONFIGURATION_OF_WEB_MONITORING_BIG'=>	_('CONFIGURATION OF WEB MONITORING'),
 	'S_SCENARIO'=>					_('Scenario'),
@@ -266,7 +260,6 @@
 	'S_CANNOT_ADD_NODE'=>			_('Cannot add node'),
 	'S_NODE_DELETED'=>			_('Node deleted'),
 	'S_CANNOT_DELETE_NODE'=>		_('Cannot delete node'),
-	'S_CURRENT_NODE'=>			_('Current node'),
 	'S_SELECT_NODES'=>			_('Select Nodes'),
 
 //	acknow.php
@@ -290,19 +283,12 @@
 	'S_CONFIGURATION_OF_ACTIONS'=>		_('Configuration of actions'),
 	'S_FILTER'=>				_('Filter'),
 	'S_TRIGGER_SEVERITY'=>			_('Trigger severity'),
-	'S_TRIGGER_VALUE'=>			_('Trigger value'),
 	'S_TIME_PERIOD'=>			_('Time period'),
-	'S_MAINTENANCE_STATUS'=>		_('Maintenance status'),
 	'S_MAX_VALUE_SMALL'=>			_('max value'),
 	'S_MIN_VALUE_SMALL'=>			_('min value'),
-	'S_TRIGGER_DESCRIPTION'=>		_('Trigger description'),
-	'S_HOST_NAME'=>				_('Host name'),
 	'S_CONDITION'=>				_('Condition'),
 	'S_NEW'=>				_('New'),
-	'S_HOST_TEMPLATE'=>			_('Host template'),
 	'S_EVENT_ACKNOWLEDGED'=>		_('Event acknowledged'),
-	'S_DISCOVERY_CHECK'=>			_('Discovery check'),
-	'S_DISCOVERED_OBJECT'=>			_('Discovered object'),
 
 //	actions.php
 	'S_ACTIONS'=>				_('Actions'),
@@ -317,12 +303,8 @@
 	'S_USER_GROUP'=>			_('User group'),
 	'S_GROUP'=>				_('Group'),
 	'S_USER'=>				_('User'),
-	'S_NOT_CLASSIFIED'=>			_('Not classified'),
 	'S_INFORMATION'=>			_('Information'),
 	'S_WARNING'=>				_('Warning'),
-	'S_AVERAGE'=>				_('Average'),
-	'S_HIGH'=>				_('High'),
-	'S_DISASTER'=>				_('Disaster'),
 	'S_AND_BIG'=>				_('AND'),
 	'S_AND_SYMB'=>				_('&'),
 	'S_OR_BIG'=>				_('OR'),
@@ -384,7 +366,6 @@
 	'S_DROPDOWN_REMEMBER_SELECTED'=>		_('remember selected'),
 	'S_MAX_IN_TABLE' =>				_('Max count of elements to show inside table cell'),
 	'S_SEARCH_LIMIT' =>				_('Search/Filter elements limit'),
-	'S_THEMES'=>					_('Themes'),
 	'S_SYSTEM_DEFAULT'=>				_('System default'),
 	'S_BLACK_AND_BLUE'=>				_('Black & Blue'),
 	'S_ORIGINAL_BLUE'=>				_('Original blue'),
@@ -402,12 +383,10 @@
 	'S_CANNNOT_DELETE_VALUE_MAP'=>			_('Cannot delete value map'),
 	'S_VALUE_MAP_UPDATED'=>				_('Value map updated'),
 	'S_VALUE_MAPPING_BIG'=>				_('VALUE MAPPING'),
-	'S_VALUE_MAPPING'=>				_('Value mapping'),
 	'S_VALUE_MAP'=>					_('Value map'),
 	'S_MAPPING'=>					_('Mapping'),
 	'S_NEW_MAPPING'=>				_('New mapping'),
 	'S_NO_MAPPING_DEFINED'=>			_('No mapping defined'),
-	'S_CREATE_VALUE_MAP'=>				_('Create value map'),
 	'S_CONFIGURATION_OF_ZABBIX'=>			_('Configuration of Zabbix'),
 	'S_CONFIGURATION_OF_ZABBIX_BIG'=>		_('CONFIGURATION OF ZABBIX'),
 	'S_CONFIGURATION_UPDATED'=>			_('Configuration updated'),
@@ -418,8 +397,6 @@
 	'S_MEDIA_TYPE_WAS_NOT_UPDATED'=>		_('Media type was not updated'),
 	'S_MEDIA_TYPE_DELETED'=>			_('Media type deleted'),
 	'S_MEDIA_TYPE_WAS_NOT_DELETED'=>		_('Media type was not deleted'),
-	'S_CONFIGURATION'=>				_('Configuration'),
-	'S_ADMINISTRATION'=>				_('Administration'),
 	'S_DO_NOT_KEEP_ACTIONS_OLDER_THAN'=>		_('Do not keep actions older than (in days)'),
 	'S_DO_NOT_KEEP_EVENTS_OLDER_THAN'=>		_('Do not keep events older than (in days)'),
 	'S_SMTP_SERVER'=>				_('SMTP server'),
@@ -431,7 +408,6 @@
 	'S_HOUSEKEEPER'=>				_('Housekeeper'),
 	'S_MEDIA_TYPES'=>				_('Media types'),
 	'S_DEFAULT'=>					_('Default'),
-	'S_IMAGES'=>					_('Images'),
 	'S_IMAGE'=>					_('Image'),
 	'S_IMAGES_BIG'=>				_('IMAGES'),
 	'S_ICON'=>					_('Icon'),
@@ -448,7 +424,6 @@
 	'S_OTHER_PARAMETERS'=>				_('Other parameters'),
 	'S_REFRESH_UNSUPPORTED_ITEMS'=>			_('Refresh unsupported items (in sec)'),
 	'S_CREATE_MEDIA_TYPE'=>				_('Create Media Type'),
-	'S_CREATE_IMAGE'=>				_('Create Image'),
 	'S_WORKING_TIME'=>				_('Working time'),
 	'S_USER_GROUP_FOR_DATABASE_DOWN_MESSAGE'=>	_('User group for database down message'),
 	'S_NOTHING_TO_DO'=>				_('Nothing to do'),
@@ -477,7 +452,6 @@
 	'S_TEST_STRING'=>				_('Test string'),
 	'S_INCORRECT_EXPRESSION'=>			_('Incorrect expression'),
 
-	'S_NEW_REGULAR_EXPRESSION'=>			_('New regular expression'),
 	'S_REGULAR_EXPRESSION_ADDED'=>			_('Regular expression added'),
 	'S_CANNOT_ADD_REGULAR_EXPRESSION'=>		_('Cannot add regular expression'),
 
@@ -501,7 +475,6 @@
 //	nodes.php
 	'S_NOT_DM_SETUP'=>			_('Your setup is not configured for distributed monitoring'),
 	'S_CONFIGURATION_OF_NODES'=>		_('CONFIGURATION OF NODES'),
-	'S_DM'=>				_('DM'),	// Distributed Monitoring
 	'S_NODE'=>				_('Node'),
 	'S_NODES'=>				_('Nodes'),
 	'S_NODES_BIG'=>				_('NODES'),
@@ -530,8 +503,6 @@
 	'S_BIND_DN'=>					_('Bind DN'),
 	'S_BIND_PASSWORD'=>				_('Bind Password'),
 	'S_SEARCH_ATTRIBUTE'=>			_('Search attribute'),
-	'S_WAS_NOT'=>					_('was not'),
-	'S_SUCCESSFUL_SMALL'=>			_('successful'),
 	'S_MUST_BE_VALID_SMALL'=>		_('must be valid'),
 	'S_LDAP_AUTH'=>					_('LDAP Authentication'),
 	'S_HTTP_AUTH'=>					_('HTTP Authentication'),
@@ -551,7 +522,6 @@
 
 //	Footer
 	'S_ZABBIX'=>				_('Zabbix'),
-	'S_COPYRIGHT_BY'=>			_('Copyright 2001-2011 by'),
 
 //	graph.php
 	'S_GRAPHS_COPIED'=>			_('Graphs copied'),
@@ -750,8 +720,6 @@
 	'S_MACROS_UPDATED'=>				_('Macros updated'),
 	'S_CANNOT_UPDATE_MACROS'=>				_('Cannot update macros'),
 	'S_HOST_LIST'=>					_('Hosts list'),
-	'S_OTHER_GROUPS' => _('Other groups'),
-	'S_IN_GROUPS' => _('In groups'),
 	'S_IN'=>					_('In'),
 	'S_APPLICATION'=>				_('Application'),
 	'S_APPLICATIONS'=>				_('Applications'),
@@ -1191,10 +1159,6 @@
 //	queue.php
 	'S_TOTAL'=>				_('Total'),
 	'S_COUNT'=>				_('Count'),
-	'S_5_SECONDS'=>				_('5 seconds'),
-	'S_10_SECONDS'=>			_('10 seconds'),
-	'S_30_SECONDS'=>			_('30 seconds'),
-	'S_1_MINUTE'=>				_('1 minute'),
 	'S_5_MINUTES'=>				_('5 minutes'),
 	'S_QUEUE_NODES_DATE_FORMAT'=>		_('d M Y H:i:s'),
 
@@ -1243,9 +1207,7 @@
 	'S_IT_SERVICES_AVAILABILITY_REPORT'=>		_('IT services availability report'),
 	'S_IT_SERVICES_AVAILABILITY_REPORT_BIG'=>	_('IT SERVICES AVAILABILITY REPORT'),
 	'S_FROM'=>					_('From'),
-	'S_FROM_SMALL'=>				_('from'),
 	'S_TILL'=>					_('Till'),
-	'S_TO'=>					_('To'),
 	'S_OK'=>					_('Ok'),
 	'S_RESOLVED'=>				_('Resolved'),
 	'S_PROBLEM'=>					_('Problem'),
@@ -1282,7 +1244,6 @@
 
 
 //	report4.php
-	'S_NOTIFICATIONS'=>			_('Notifications'),
 	'S_NOTIFICATIONS_BIG'=>			_('NOTIFICATIONS'),
 	'S_IT_NOTIFICATIONS'=>			_('Notification report'),
 	'S_REPORT4_ANNUALLY_DATE_FORMAT'=>	_('Y'),
@@ -1448,7 +1409,6 @@
 	'S_LINK_TO_TRIGGER_Q'=>			_('Link to trigger?'),
 	'S_SORT_ORDER_0_999'=>			_('Sort order (0->999)'),
 	'S_TRIGGER'=>				_('Trigger'),
-	'S_SERVER'=>				_('Server'),
 	'S_DELETE'=>				_('Delete'),
 	'S_CLONE'=>				_('Clone'),
 	'S_FULL_CLONE'=>			_('Full clone'),
@@ -1604,13 +1564,10 @@
 	'S_CANNOT_UNBLOCK_USERS'=>			_('Cannot unblock users'),
 	'S_GUI_ACCESS_UPDATED'=>			_('GUI access updated'),
 	'S_CANNOT_UPDATE_GUI_ACCESS'=>			_('Cannot update GUI access'),
-	'S_API_ACCESS_UPDATED'=>			_('API access updated'),
-	'S_CANNOT_UPDATE_API_ACCESS'=>			_('Cannot update API access'),
 	'S_DEBUG_MODE_UPDATED'=>			_('Debug mode updated'),
 	'S_CANNOT_UPDATE_DEBUG_MODE'=>			_('Cannot update debug mode'),
 	'S_USER_CANNOT_CHANGE_STATUS'=>			_('User cannot change status of himself'),
 	'S_USER_CANNOT_CHANGE_GUI_ACCESS'=>		_('User cannot change GUI access for himself'),
-	'S_USER_CANNOT_DELETE_ITSELF'=>			_('User cannot delete himself'),
 	'S_CONFIGURATION_OF_USERS_AND_USER_GROUPS'=>	_('CONFIGURATION OF USERS AND USER GROUPS'),
 	'S_USER_GROUPS_BIG'=>				_('USER GROUPS'),
 	'S_USERS_BIG'=>					_('USERS'),
@@ -1624,7 +1581,6 @@
 	'S_NO_USERS_DEFINED'=>				_('No users defined'),
 	'S_RIGHTS'=>					_('Rights'),
 	'S_GUI_ACCESS'=>				_('GUI access'),
-	'S_API_ACCESS'=>				_('API access'),
 	'S_DEBUG'=>					_('Debug'),
 	'S_DEBUG_MODE'=>				_('Debug mode'),
 	'S_USERS_STATUS'=>				_('Users status'),
@@ -1637,7 +1593,6 @@
 	'S_CHANGE_PASSWORD'=>				_('Change password'),
 	'S_PASSWORD_ONCE_AGAIN'=>			_('Password (once again)'),
 	'S_URL_AFTER_LOGIN'=>				_('URL (after login)'),
-	'S_AUTO_LOGIN'=>				_('Auto-login'),
 	'S_AUTO_LOGOUT'=>				_('Auto-logout (min 90 seconds)'),
 	'S_SCREEN_REFRESH'=>				_('Refresh (in seconds)'),
 	'S_CREATE_USER'=>				_('Create User'),
@@ -1647,8 +1602,6 @@
 	'S_REMOVE_FROM'=>				_('Remove from'),
 	'S_INTERNAL_S'=>				_('Internal'),
 	'S_ROWS_PER_PAGE'=>				_('Rows per page'),
-	'S_ENABLE_API'=>				_('Enable API'),
-	'S_DISABLE_API'=>				_('Disable API'),
 	'S_ENABLE_DEBUG'=>				_('Enable DEBUG'),
 	'S_DISABLE_DEBUG'=>				_('Disable DEBUG'),
 	'S_BLOCKED'=>					_('Blocked'),
@@ -1659,30 +1612,15 @@
 //  usergrps.php
 	'S_ENABLE_SELECTED_GROUPS_Q'=>			_('Enable selected groups?'),
 	'S_DISABLE_SELECTED_GROUPS_Q'=>			_('Disable selected groups?'),
-	'S_ENABLE_API_SELECTED_GROUPS_Q'=>		_('Enable API access in selected groups?'),
-	'S_DISABLE_API_SELECTED_GROUPS_Q'=>		_('Disable API access in selected groups?'),
 	'S_ENABLE_DEBUG_SELECTED_GROUPS_Q'=>		_('Enable debug mode in selected groups?'),
 	'S_DISABLE_DEBUG_SELECTED_GROUPS_Q'=>		_('Disable debug mode in selected groups?'),
 	'S_DELETE_SELECTED_GROUPS_Q'=>			_('Delete selected groups?'),
 
 //scripts.php
-	'S_SCRIPTS_CONFIGURATION_BIG'=>		_('CONFIGURATION OF SCRIPTS'),
 	'S_SCRIPTS'=>				_('Scripts'),
-	'S_SCRIPTS_BIG'=>			_('SCRIPTS'),
 	'S_COMMAND'=>				_('Command'),
-	'S_READ'=>				_('Read'),
-	'S_WRITE'=>				_('Write'),
-	'S_NO_SCRIPTS_DEFINED'=>		_('No scripts defined'),
-	'S_HOST_ACCESS'=>			_('Host access'),
-	'S_SCRIPT_ADDED'=>			_('Script added'),
-	'S_CANNOT_ADD_SCRIPT'=>			_('Cannot add script'),
-	'S_SCRIPT_UPDATED'=>			_('Script updated'),
-	'S_CANNOT_UPDATE_SCRIPT'=>		_('Cannot update script'),
-	'S_SCRIPT_DELETED'=>			_('Script deleted'),
-	'S_CANNOT_DELETE_SCRIPT'=>		_('Cannot delete script'),
 	'S_RESULT'=>				_('Result'),
 	'S_CLOSE'=>				_('Close'),
-	'S_DELETE_SELECTED_SCRIPTS_Q'=>		_('Delete selected scripts?'),
 
 	'S_SCRIPT_ERROR'=>			_('SCRIPT ERROR'),
 	'S_SCRIPT_ERROR_DESCRIPTION'=>		_('Error Description'),
@@ -1745,14 +1683,10 @@
 
 //	index.php
 	'S_ZABBIX_BIG'=>			_('ZABBIX'),
-	'S_WELCOME'=>				_('Welcome to Zabbix! You are connected as'),
-	'S_LOGIN_NAME'=> _('Login name'),
 
 //	hostprofiles.php
 	'S_HOST_PROFILES'=>			_('Host profiles'),
-	'S_HOST_PROFILES_BIG'=>			_('HOST PROFILES'),
 	'S_EXTENDED_PROFILE'=>		_('Extended profile'),
-	'S_EXTENDED'=>				_('Extended'),
 
 //	search.php
 	'S_EDIT_HOSTS' => _('Edit hosts'),
@@ -1881,7 +1815,6 @@
 	'S_DO'=>				_('Do'),
 	'S_INCORRECT_LIST_OF_ITEMS'=>		_('Incorrect list of items.'),
 	'S_DELETE_TRIGGER_Q'=>			_('Delete trigger?'),
-	'S_PROFILE_FOR_THIS_HOST_IS_MISSING'=>	_('Profile for this host is missing'),
 
 //	items.inc.php
 	'S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION'=>	_('Incorrect arguments passed to function'),
@@ -1896,8 +1829,6 @@
 //	hosts.inc.php
 	'S_CIRCULAR_LINK_CANNOT_BE_CREATED'=>		_('Circular link can not be created'),
 	'S_INTERNAL_AND_CANNOT_DELETED_SMALL'=>		_('is internal and can not be deleted'),
-	'S_CANNOT_DELETED_INNER_HOSTS_CANNOT_UNLINKED_SMALL'=>_('can not be deleted, due to inner hosts can not be unlinked'),
-	'S_NO_HOST_GROUPS_WITH'=>			_('No host groups with'),
 	'S_NO_HOST_WITH'=>				_('No host with'),
 	'S_USED_BY_SCENARIO_SMALL'=>			_('used by scenario'),
 	'S_NO_APPLICATION_WITH'=>			_('No application with'),
@@ -1923,7 +1854,6 @@
 	'S_IS_MANDATORY_SMALL'=>			_('is mandatory'),
 	'S_MUST_BE_MISSING_SMALL'=>			_('must be missing'),
 	'S_OPERATION_CANNOT_PERFORMED_UNAUTH_REQUEST'=>	_('Operation cannot be performed due to unauthorized request'),
-	'S_INCORRECT_VALUE_FOR'=>			_('Incorrect value for'),
 
 //	triggers.inc.php
 	'S_NO_TRIGGER_WITH'=>					_('No trigger with'),
@@ -1954,7 +1884,6 @@
 	'S_TRANSACTION_HAVE_NOT_BEEN_CLOSED_ABORTING'=>	_('Transaction has not been closed. Aborting..'),
 
 //	maps.inc.php
-	'S_NO_SYSTEM_MAP_WITH'=>		_('No system map with'),
 	'S_SUBMAP'=>			_('Submap'),
 
 //	screens.inc.php
@@ -2049,22 +1978,13 @@
 	'S_REQUIRED_GETTEXT_MODULE' => _('Required gettext module'),
 
 //	class.cuser.php
-	'S_CUSER_ERROR_SESSION_TERMINATED'=>			_('Session terminated, please re-login!'),
-	'S_CUSER_ERROR_TABLE_USERS_EMPTY'=>			_('Table users is empty. Possible database corruption.'),
-	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_UPDATE_USERS'=>		_('Only Super Admins can update Users'),
-	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_DELETE_USERS'=>		_('Only Super Admins can delete Users'),
 	'S_CUSER_ERROR_ONLY_ADMIN_CAN_ADD_USER_MEDIAS'=>	_('Only Zabbix Admins can add user Medias'),
 	'S_CUSER_ERROR_ONLY_ADMIN_CAN_REMOVE_USER_MEDIAS'=>	_('Only Zabbix Admins can remove user Medias'),
 	'S_CUSER_ERROR_ONLY_ADMIN_CAN_CHANGE_USER_MEDIAS'=>	_('Only Zabbix Admins can change user Medias'),
 	'S_CUSER_ERROR_CANT_DELETE_USER_MEDIAS'=>		_('Can\'t delete user medias'),
 	'S_CUSER_ERROR_CANT_UPDATE_USER_MEDIAS'=>		_('Can\'t update user medias'),
 	'S_CUSER_ERROR_CANT_INSERT_USER_MEDIAS'=>		_('Can\'t insert user medias'),
-	'S_CUSER_ERROR_WRONG_FIELD_FOR_USER'=>			_('Wrong fields for user'),
-	'S_CUSER_ERROR_USER_EXISTS_FIRST_PART'=>		_('User ['),
-	'S_CUSER_ERROR_USER_EXISTS_SECOND_PART'=>		_('] already exists'),
 	'S_CUSER_ERROR_CANT_RENAME_GUEST_USER'=>		_('Cannot rename guest user'),
-	'S_CUSER_ERROR_USER_UNABLE_RESTRICT_SELF_GUI_ACCESS_PART1'=>	_('User cannot restrict access to GUI for himself. Group "'),
-	'S_CUSER_ERROR_USER_CANT_DISABLE_SELF_PART1'=>		_('User cannot disable himself. Group "'),
 	'S_CUSER_ERROR_INCORRECT_TIME_PERIOD'=>			_('Incorrect time period'),
 	'S_CUSER_ERROR_WRONG_PERIOD_PART1'=>			_('Wrong period ['),
 	'S_CUSER_ERROR_WRONG_PERIOD_PART2'=>			_(']'),
@@ -2090,21 +2010,15 @@
 
 //	Menu
 
-	'S_HELP'=>				_('Help'),
 	'S_PROFILE'=>				_('Profile'),
-	'S_GET_SUPPORT'=>			_('Get support'),
-	'S_MONITORING'=>			_('Monitoring'),
-	'S_INVENTORY'=>				_('Inventory'),
 	'S_QUEUE'=>				_('Queue'),
 	'S_EVENTS'=>				_('Events'),
 	'S_EVENTS_BIG'=>			_('EVENTS'),
 	'S_MAPS'=>				_('Maps'),
 	'S_REPORT'=>				_('Report'),
 	'S_REPORTS'=>				_('Reports'),
-	'S_GENERAL'=>				_('General'),
 	'S_LOGIN'=>				_('Login'),
 	'S_LOGOUT'=>				_('Logout'),
-	'S_PRINT'=>				_('Print'),
 	'S_LATEST_DATA'=>			_('Latest data'),
 
 //	Errors

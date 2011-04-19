@@ -114,12 +114,8 @@ int send_to_node(const char *name, int dest_nodeid, int nodeid, char *data)
 	zbx_sock_t	sock;
 	char		*answer;
 
-	zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Sending %s of node %d to node %d datalen %zd",
-		CONFIG_NODEID,
-		name,
-		nodeid,
-		dest_nodeid,
-		strlen(data));
+	zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Sending %s of node %d to node %d datalen " ZBX_FS_SIZE_T,
+			CONFIG_NODEID, name, nodeid, dest_nodeid, (zbx_fs_size_t)strlen(data));
 
 	if (FAIL == connect_to_node(dest_nodeid, &sock))
 		return FAIL;
