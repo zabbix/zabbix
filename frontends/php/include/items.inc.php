@@ -608,7 +608,7 @@
 			}
 		}
 
-		return nbsp($name);
+		return $name;
 	}
 
 	function get_realhost_by_itemid($itemid){
