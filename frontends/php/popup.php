@@ -1712,7 +1712,7 @@ include_once('include/page_header.php');
 		$table->show();
 	}
 	else if($srctbl == 'drules'){
-		$table = new CTableInfo(S_NO_DISCOVERY_RULES_DEFINED);
+		$table = new CTableInfo(_('No discovery rules defined'));
 		$table->setHeader(S_NAME);
 
 		$result = DBselect('SELECT DISTINCT * FROM drules WHERE '.DBin_node('druleid', $nodeid));

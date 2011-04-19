@@ -80,7 +80,7 @@
 		else if(isset($discovery_types[$type]))
 			return $discovery_types[$type];
 		else
-			return S_UNKNOWN;
+			return false;
 	}
 
 	function discovery_check2str($type, $key, $port){
