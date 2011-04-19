@@ -31,6 +31,7 @@
 <script type="text/x-jquery-tmpl" id="newDCheckTPL">
 <div id="new_check_form">
 <div class="objectgroup inlineblock border_dotted ui-corner-all">
+	<div id="newCheckErrors" class="ajaxError"></div>
 <table class="formElementTable"><tbody>
 <tr>
 	<td><label for="new_check_type"><?php print(_('Check type')); ?></label></td>
@@ -79,7 +80,7 @@
 
 <script type="text/javascript">
 //<!--<![CDATA[
-var ZBX_SVC_PORT = {
+var ZBX_SVC = {
 	'ssh': <?php print(SVC_SSH);?>,
 	'ldap': <?php print(SVC_LDAP);?>,
 	'smtp': <?php print(SVC_SMTP);?>,
@@ -103,21 +104,22 @@ var ZBX_CHECKLIST = {};
 function discoveryCheckDefaultPort(service){
 	service = service.toString();
 	var defPorts = {};
-	defPorts[ZBX_SVC_PORT.ssh] = '22';
-	defPorts[ZBX_SVC_PORT.ldap] = '389';
-	defPorts[ZBX_SVC_PORT.smtp] = '25';
-	defPorts[ZBX_SVC_PORT.ftp] = '21';
-	defPorts[ZBX_SVC_PORT.http] = '80';
-	defPorts[ZBX_SVC_PORT.pop] = '110';
-	defPorts[ZBX_SVC_PORT.nntp] = '119';
-	defPorts[ZBX_SVC_PORT.imap] = '143';
-	defPorts[ZBX_SVC_PORT.tcp] = '0';
-	defPorts[ZBX_SVC_PORT.agent] = '10050';
-	defPorts[ZBX_SVC_PORT.snmpv1] = '161';
-	defPorts[ZBX_SVC_PORT.snmpv2] = '161';
-	defPorts[ZBX_SVC_PORT.snmpv3] = '161';
-	defPorts[ZBX_SVC_PORT.https] = '443';
-	defPorts[ZBX_SVC_PORT.telnet] = '23';
+	defPorts[ZBX_SVC.ssh] = '22';
+	defPorts[ZBX_SVC.ldap] = '389';
+	defPorts[ZBX_SVC.smtp] = '25';
+	defPorts[ZBX_SVC.ftp] = '21';
+	defPorts[ZBX_SVC.http] = '80';
+	defPorts[ZBX_SVC.pop] = '110';
+	defPorts[ZBX_SVC.nntp] = '119';
+	defPorts[ZBX_SVC.imap] = '143';
+	defPorts[ZBX_SVC.tcp] = '0';
+	defPorts[ZBX_SVC.icmp] = '0';
+	defPorts[ZBX_SVC.agent] = '10050';
+	defPorts[ZBX_SVC.snmpv1] = '161';
+	defPorts[ZBX_SVC.snmpv2] = '161';
+	defPorts[ZBX_SVC.snmpv3] = '161';
+	defPorts[ZBX_SVC.https] = '443';
+	defPorts[ZBX_SVC.telnet] = '23';
 
 
 	return isset(service, defPorts) ? defPorts[service] : 0;
@@ -125,21 +127,22 @@ function discoveryCheckDefaultPort(service){
 
 function discoveryCheckTypeToString(svcPort){
 	var defPorts = {};
-	defPorts[ZBX_SVC_PORT.ftp] = "<?php echo _('FTP');?>";
-	defPorts[ZBX_SVC_PORT.http] = "<?php echo _('HTTP');?>";
-	defPorts[ZBX_SVC_PORT.https] = "<?php echo _('HTTPS');?>";
-	defPorts[ZBX_SVC_PORT.imap] = "<?php echo _('IMAP');?>";
-	defPorts[ZBX_SVC_PORT.tcp] = "<?php echo _('TCP');?>";
-	defPorts[ZBX_SVC_PORT.ldap] = "<?php echo _('LDAP');?>";
-	defPorts[ZBX_SVC_PORT.nntp] = "<?php echo _('NNTP');?>";
-	defPorts[ZBX_SVC_PORT.pop] = "<?php echo _('POP');?>";
-	defPorts[ZBX_SVC_PORT.snmpv1] = "<?php echo _('SNMPv1 agent');?>";
-	defPorts[ZBX_SVC_PORT.snmpv2] = "<?php echo _('SNMPv2 agent');?>";
-	defPorts[ZBX_SVC_PORT.snmpv3] = "<?php echo _('SNMPv3 agent');?>";
-	defPorts[ZBX_SVC_PORT.smtp] = "<?php echo _('SMTP');?>";
-	defPorts[ZBX_SVC_PORT.ssh] = "<?php echo _('SSH');?>";
-	defPorts[ZBX_SVC_PORT.telnet] = "<?php echo _('Telnet');?>";
-	defPorts[ZBX_SVC_PORT.agent] = "<?php echo _('Zabbix agent');?>";
+	defPorts[ZBX_SVC.ftp] = "<?php echo _('FTP');?>";
+	defPorts[ZBX_SVC.http] = "<?php echo _('HTTP');?>";
+	defPorts[ZBX_SVC.https] = "<?php echo _('HTTPS');?>";
+	defPorts[ZBX_SVC.icmp] = "<?php echo _('ICMP ping');?>";
+	defPorts[ZBX_SVC.imap] = "<?php echo _('IMAP');?>";
+	defPorts[ZBX_SVC.tcp] = "<?php echo _('TCP');?>";
+	defPorts[ZBX_SVC.ldap] = "<?php echo _('LDAP');?>";
+	defPorts[ZBX_SVC.nntp] = "<?php echo _('NNTP');?>";
+	defPorts[ZBX_SVC.pop] = "<?php echo _('POP');?>";
+	defPorts[ZBX_SVC.snmpv1] = "<?php echo _('SNMPv1 agent');?>";
+	defPorts[ZBX_SVC.snmpv2] = "<?php echo _('SNMPv2 agent');?>";
+	defPorts[ZBX_SVC.snmpv3] = "<?php echo _('SNMPv3 agent');?>";
+	defPorts[ZBX_SVC.smtp] = "<?php echo _('SMTP');?>";
+	defPorts[ZBX_SVC.ssh] = "<?php echo _('SSH');?>";
+	defPorts[ZBX_SVC.telnet] = "<?php echo _('Telnet');?>";
+	defPorts[ZBX_SVC.agent] = "<?php echo _('Zabbix agent');?>";
 
 
 	if(typeof(svcPort) == 'undefined')
@@ -149,13 +152,22 @@ function discoveryCheckTypeToString(svcPort){
 	return isset(svcPort, defPorts) ? defPorts[svcPort] : _('Unknown');
 }
 
+function toggleInputs(id, state){
+	jQuery('#'+id).toggle(state);
+	if(state){
+		jQuery('#'+id+' :input').removeAttr('disabled');
+	}
+	else{
+		jQuery('#'+id+' :input').attr('disabled', 'disabled');
+	}
+}
 
 function addPopupValues(list){
 	var uniqTypeList = {};
-	uniqTypeList[ZBX_SVC_PORT.agent] = true;
-	uniqTypeList[ZBX_SVC_PORT.snmpv1] = true;
-	uniqTypeList[ZBX_SVC_PORT.snmpv2] = true;
-	uniqTypeList[ZBX_SVC_PORT.snmpv3] = true;
+	uniqTypeList[ZBX_SVC.agent] = true;
+	uniqTypeList[ZBX_SVC.snmpv1] = true;
+	uniqTypeList[ZBX_SVC.snmpv2] = true;
+	uniqTypeList[ZBX_SVC.snmpv3] = true;
 
 	for(var i=0; i < list.values.length; i++){
 		if(empty(list.values[i])) continue;
@@ -214,7 +226,10 @@ function showNewCheckForm(e, dcheckType){
 		var tpl = new Template(jQuery('#newDCheckTPL').html());
 		jQuery("#dcheckList").after(tpl.evaluate());
 
-		jQuery("#new_check_type").change(updateNewDCheckType);
+		jQuery("#new_check_type").change(function(){
+			updateNewDCheckType();
+			jQuery('#newCheckErrors').empty();
+		});
 		jQuery("#new_check_snmpv3_securitylevel").change(updateNewDCheckSNMPType);
 		jQuery("#add_new_dcheck").click(saveNewDCheckForm);
 		jQuery("#cancel_new_dcheck").click(function(){ jQuery('#new_check_form').remove(); });
@@ -244,31 +259,34 @@ function updateNewDCheckType(e){
 	var dcheckType = parseInt(jQuery("#new_check_type").val(), 10);
 
 	var keyRowTypes = {};
-	keyRowTypes[ZBX_SVC_PORT.agent] = true;
-	keyRowTypes[ZBX_SVC_PORT.snmpv1] = true;
-	keyRowTypes[ZBX_SVC_PORT.snmpv2] = true;
-	keyRowTypes[ZBX_SVC_PORT.snmpv3] = true;
+	keyRowTypes[ZBX_SVC.agent] = true;
+	keyRowTypes[ZBX_SVC.snmpv1] = true;
+	keyRowTypes[ZBX_SVC.snmpv2] = true;
+	keyRowTypes[ZBX_SVC.snmpv3] = true;
 
 	var ComRowTypes = {};
-	ComRowTypes[ZBX_SVC_PORT.snmpv1] = true;
-	ComRowTypes[ZBX_SVC_PORT.snmpv2] = true;
+	ComRowTypes[ZBX_SVC.snmpv1] = true;
+	ComRowTypes[ZBX_SVC.snmpv2] = true;
 
 	var SecNameRowTypes = {};
-	SecNameRowTypes[ZBX_SVC_PORT.snmpv3] = true;
+	SecNameRowTypes[ZBX_SVC.snmpv3] = true;
 
-	jQuery('#newCheckPortsRow').toggle((ZBX_SVC_PORT.icmp != dcheckType));
-	jQuery('#newCheckKeyRow').toggle(isset(dcheckType, keyRowTypes));
+	toggleInputs('newCheckPortsRow', (ZBX_SVC.icmp != dcheckType));
+	toggleInputs('newCheckKeyRow', isset(dcheckType, keyRowTypes));
+
 	if(isset(dcheckType, keyRowTypes)){
-		var caption = (dcheckType == ZBX_SVC_PORT.agent)? "<?php print(_('Key')); ?>" : "<?php print(_('SNMP OID')); ?>";
+		var caption = (dcheckType == ZBX_SVC.agent) ? "<?php print(_('Key')); ?>" : "<?php print(_('SNMP OID')); ?>";
 		jQuery('#newCheckKeyRow label').text(caption);
 	}
 
-	jQuery('#newCheckCommunityRow').toggle(isset(dcheckType, ComRowTypes));
-	jQuery('#newCheckSecNameRow').toggle(isset(dcheckType, SecNameRowTypes));
-	jQuery('#newCheckSecLevRow').toggle(isset(dcheckType, SecNameRowTypes));
+	toggleInputs('newCheckCommunityRow', isset(dcheckType, ComRowTypes));
+	toggleInputs('newCheckSecNameRow', isset(dcheckType, SecNameRowTypes));
+	toggleInputs('newCheckSecLevRow', isset(dcheckType, SecNameRowTypes));
 
-	if(ZBX_SVC_PORT.icmp != dcheckType)
+	if(ZBX_SVC.icmp != dcheckType)
 		jQuery('#new_check_ports').val(discoveryCheckDefaultPort(dcheckType));
+	else
+		jQuery('#new_check_ports').val(0);
 
 	updateNewDCheckSNMPType(e);
 }
@@ -278,22 +296,24 @@ function updateNewDCheckSNMPType(e){
 	var dcheckSecLevType = parseInt(jQuery("#new_check_snmpv3_securitylevel").val(), 10);
 
 	var SecNameRowTypes = {};
-	SecNameRowTypes[ZBX_SVC_PORT.snmpv3] = true;
+	SecNameRowTypes[ZBX_SVC.snmpv3] = true;
 
 	var showAuthPass = (isset(dcheckType, SecNameRowTypes) && ((dcheckSecLevType == <?php print(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV); ?>) || (dcheckSecLevType == <?php print(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV); ?>)));
 	var showPrivPass = (isset(dcheckType, SecNameRowTypes) && (dcheckSecLevType == <?php print(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV); ?>));
 
-	jQuery('#newCheckAuthPassRow').toggle(showAuthPass);
-	jQuery('#newCheckPrivPassRow').toggle(showPrivPass);
-
+	toggleInputs('newCheckAuthPassRow', showAuthPass);
+	toggleInputs('newCheckPrivPassRow', showPrivPass);
 }
 
 function saveNewDCheckForm(e){
+	jQuery("#add_new_dcheck").attr('disabled', 'disabled');
+	jQuery('#newCheckErrors').empty();
+
 	var formData = jQuery('#new_check_form').find('input,select').serializeJSON();
 
 	var dCheck = {
-		'dcheckid': jQuery("#dcheckList tr[id^=dcheckRow_]").length,
-		'name': jQuery('#new_check_type :selected').text()
+		dcheckid: jQuery("#dcheckList tr[id^=dcheckRow_]").length,
+		name: jQuery('#new_check_type :selected').text()
 	};
 
 	while(jQuery("#uniqueness_criteria_"+dCheck.dcheckid).length || jQuery("#dcheckRow_"+dCheck.dcheckid).length)
@@ -311,15 +331,34 @@ function saveNewDCheckForm(e){
 
 	if(!empty(dCheck.key_)) dCheck.name += ' "'+dCheck.key_+'"';
 
+	var url = new Curl();
+	var params = {
+		ajaxaction: 'validate',
+		ajaxdata: jQuery('#new_check_form :input').serializeJSON()
+	};
+	jQuery.post(url.getPath()+'?output=ajax&sid='+url.getArgument('sid'), params, function(result){
+		if(result.result){
+			addPopupValues({
+				object: 'dcheckid',
+				values: [dCheck]
+			});
+			jQuery('#new_check_form').remove();
+		}
+		else{
+			jQuery.each(result.errors, function(i, val){
+				jQuery('#newCheckErrors').append(val.error+'\n');
+			});
+		}
 
-	addPopupValues({'object': 'dcheckid', 'values': [dCheck]});
-	jQuery('#new_check_form').remove();
+		jQuery("#add_new_dcheck").removeAttr('disabled');
+	}, 'json');
 }
 
 jQuery(document).ready(function(){
 	setTimeout(function(){jQuery("#name").focus()}, 10);
 
 	jQuery("#newCheck").click(showNewCheckForm);
+
 // Clone button
 	jQuery("#clone").click(function(){
 		jQuery("#druleid, #delete, #clone").remove();

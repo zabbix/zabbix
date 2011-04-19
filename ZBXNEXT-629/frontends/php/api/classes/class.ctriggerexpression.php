@@ -83,7 +83,7 @@ private $allowed;
 		if(zbx_empty($item))
 			throw new Exception('Empty item key "'.$item.'" is used in expression.');
 
-		$itemKey = new cItemKey($item);
+		$itemKey = new CItemKey($item);
 		if(!$itemKey->isValid())
 			throw new Exception('Incorrect item key "'.$item.'" is used in expression. '.$itemKey->getError());
 	}

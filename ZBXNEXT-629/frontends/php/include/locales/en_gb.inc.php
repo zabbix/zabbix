@@ -91,12 +91,8 @@
 
 	'S_DISCOVERY_RULE'=>			_('Discovery rule'),
 	'S_DISCOVERY'=>				_('Discovery'),
-	'S_DISCOVERY_BIG'=>			_('DISCOVERY'),
 	'S_CONFIGURATION_OF_DISCOVERY'=>	_('Configuration of discovery'),
 	'S_CONFIGURATION_OF_DISCOVERY_BIG'=>	_('CONFIGURATION OF DISCOVERY'),
-	'S_NO_DISCOVERY_RULES_DEFINED'=>	_('No discovery rules defined'),
-	'S_IP_RANGE'=>				_('IP range'),
-	'S_CHECKS'=>				_('Checks'),
 	'S_CREATE_RULE'=>			_('Create rule'),
 	'S_DELETE_RULE_Q'=>			_('Delete rule?'),
 	'S_DISCOVERY_BY_PROXY'=>		_('Discovery by proxy'),

@@ -596,7 +596,7 @@
 			$key = expand_item_key_by_data($item);
 
 			// parsing key to get the parameters out of it
-			$ItemKey = new cItemKey($key);
+			$ItemKey = new CItemKey($key);
 
 			if($ItemKey->isValid()){
 				$keyParameters = $ItemKey->getParameters();
