@@ -315,6 +315,13 @@ frontends/php/tests/general/function_DBstart.php -text
 frontends/php/tests/include/class.cwebtest.php -text
 frontends/php/tests/include/class.czabbixtest.php -text
 frontends/php/tests/include/dbfunc.php -text
+frontends/php/tests/selenium/testFormAction.php -text
+frontends/php/tests/selenium/testPageAvailabilityReport.php -text
+frontends/php/tests/selenium/testPageHistory.php -text
+frontends/php/tests/selenium/testPageLatestData.php -text
+frontends/php/tests/selenium/testPageOverview.php -text
+frontends/php/tests/selenium/testPageStatusOfTriggers.php -text
+frontends/php/tests/selenium/testPageWeb.php -text
 m4/ax_lib_ibm_db2.m4 -text
 m4/ax_lib_oracle_oci.m4 -text
 m4/iconv.m4 -text

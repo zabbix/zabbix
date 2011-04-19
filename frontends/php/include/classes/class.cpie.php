@@ -42,7 +42,7 @@ class CPie extends CGraphDraw{
 		$this->items[$this->num]['name']=itemName($this->items[$this->num]);
 		$host=get_host_by_hostid($this->items[$this->num]['hostid']);
 
-		$this->items[$this->num]['host'] = $host['host'];
+		$this->items[$this->num]['host'] = $host['name'];
 		$this->items[$this->num]['color'] = is_null($color) ? 'Dark Green' : $color;
 		$this->items[$this->num]['calc_fnc'] = is_null($calc_fnc) ? CALC_FNC_AVG : $calc_fnc;
 		$this->items[$this->num]['calc_type'] = is_null($type) ? GRAPH_ITEM_SIMPLE : $type;

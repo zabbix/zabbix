@@ -35,7 +35,8 @@ class testPageActionsTriggers extends CWebTest
 		'opcommand_hst',
 		'opconditions',
 		'opmessage_grp',
-		'opmessage_usr'
+		'opmessage_usr',
+		'opcommand'
 	);
 	// Returns all trigger actions
 	public static function allActions()

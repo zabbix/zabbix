@@ -41,7 +41,7 @@ class CTemplate extends CZBXAPI{
 		$user_type = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
-		$sort_columns = array('hostid', 'host'); // allowed columns for sorting
+		$sort_columns = array('hostid', 'host', 'name'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
 
 		$sql_parts = array(
@@ -956,7 +956,7 @@ COpt::memoryPick();
 	}
 
 	public function exists($object){
-		$keyFields = array(array('templateid', 'host'));
+		$keyFields = array(array('templateid', 'host', 'name'));
 
 		$options = array(
 			'filter' => zbx_array_mintersect($keyFields, $object),
@@ -1014,6 +1014,12 @@ COpt::memoryPick();
 // }}} PERMISSIONS
 
 			foreach($templates as $tnum => $template){
+// If visible name is not given or empty it should be set to host name
+				if(!isset($template['name']) || (isset($template['name']) && zbx_empty(trim($template['name']))))
+				{
+					if(isset($template['host'])) $template['name'] = $template['host'];
+				}
+
 	 			$template_db_fields = array(
 					'host' => null
 				);
@@ -1022,18 +1028,31 @@ COpt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "host" is mandatory'));
 				}
 
-				if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $template['host'])){
+				if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $template['host'])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Template name [ %1$s ]', $template['host']));
 				}
 
-				if($this->exists(array('host' => $template['host']))){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$template['host'].' ] '.S_ALREADY_EXISTS_SMALL);
-				}
-				if(API::Host()->exists(array('host' => $template['host']))){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$template['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+				if(isset($template['host'])){
+					if($this->exists(array('host' => $template['host']))){
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template "%s" already exists.', $template['host']));
+					}
+
+					if(API::Host()->exists(array('host' => $template['host']))){
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host "%s" already exists.', $template['host']));
+					}
 				}
 
-				$templateid = DB::insert('hosts', array(array('host' => $template['host'],'status' => HOST_STATUS_TEMPLATE,)));
+				if(isset($template['name'])){
+					if($this->exists(array('name' => $template['name']))){
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template with the same visible name "%s" already exists.', $template['name']));
+					}
+
+					if(API::Host()->exists(array('name' => $template['name']))){
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host with the same visible name "%s" already exists.', $template['name']));
+					}
+				}
+
+				$templateid = DB::insert('hosts', array(array('host' => $template['host'],'name' => $template['name'], 'status' => HOST_STATUS_TEMPLATE,)));
 				$templateids[] = $templateid = reset($templateid);
 
 
@@ -1086,6 +1105,11 @@ COpt::memoryPick();
 			}
 
 			foreach($templates as $tnum => $template){
+// if visible name is not given or empty it should be set to host name
+				if(!isset($template['name']) || (isset($template['name']) && zbx_empty(trim($template['name']))))
+				{
+					if(isset($template['host'])) $template['name'] = $template['host'];
+				}
 				$tpl_tmp = $template;
 
 				$template['templates_link'] = isset($template['templates']) ? $template['templates'] : null;
@@ -1095,7 +1119,6 @@ COpt::memoryPick();
 				unset($tpl_tmp['templates']);
 
 				$template['templates'] = array($tpl_tmp);
-
 				$result = $this->massUpdate($template);
 				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Failed to update template'));
 			}
@@ -1321,6 +1344,33 @@ COpt::memoryPick();
 
 
 // UPDATE TEMPLATES PROPERTIES {{{
+			if(isset($data['name'])){
+				if(count($templates) > 1){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot mass update visible template name'));
+				}
+
+				$cur_template = reset($templates);
+
+				$options = array(
+					'filter' => array(
+						'name' => $cur_template['name']),
+					'output' => API_OUTPUT_SHORTEN,
+					'editable' => 1,
+					'nopermissions' => 1
+				);
+				$template_exists = $this->get($options);
+				$template_exist = reset($template_exists);
+
+				if($template_exist && (bccomp($template_exist['templateid'],$cur_template['templateid']) != 0)){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template with the same visible name "%s" already exists.', $cur_template['name']));
+				}
+
+//can't set the same name as existing host
+				if(API::Host()->exists(array('name' => $cur_template['name']))){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host with the same visible name "%s" already exists.', $cur_template['name']));
+				}
+			}
+
 			if(isset($data['host'])){
 				if(count($templates) > 1){
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot mass update template name'));
@@ -1339,21 +1389,38 @@ COpt::memoryPick();
 				$template_exist = reset($template_exists);
 
 				if($template_exist && (bccomp($template_exist['templateid'],$cur_template['templateid']) != 0)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE . ' [ ' . $data['host'] . ' ] ' . S_ALREADY_EXISTS_SMALL);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template with the same name "%s" already exists.', $cur_template['host']));
 				}
 
 //can't set the same name as existing host
 				if(API::Host()->exists(array('host' => $cur_template['host']))){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$template['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host with the same name "%s" already exists.', $cur_template['host']));
 				}
 			}
 
-			if(isset($data['host']) && !preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $data['host'])){
+			if(isset($data['host']) && !preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $data['host'])){
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Hostname [ %s ]', $data['host']));
 			}
 
 			$sql_set = array();
 			if(isset($data['host'])) $sql_set[] = 'host=' . zbx_dbstr($data['host']);
+			if(isset($data['name']))
+			{
+// if visible name is empty replace it with host name
+				if(zbx_empty(trim($data['name'])) && isset($data['host']))
+				{
+					$sql_set[] = 'name=' . zbx_dbstr($data['host']);
+				}
+// we cannot have empty visible name
+				else if(zbx_empty(trim($data['name'])) && !isset($data['host']))
+				{
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot have empty visible template name'));
+				}
+				else
+				{
+					$sql_set[] = 'name=' . zbx_dbstr($data['name']);
+				}
+			}
 
 			if(!empty($sql_set)){
 				$sql = 'UPDATE hosts SET ' . implode(', ', $sql_set) . ' WHERE ' . DBcondition('hostid', $templateids);

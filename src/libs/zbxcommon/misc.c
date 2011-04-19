@@ -253,7 +253,8 @@ void    *zbx_malloc2(const char *filename, int line, void *old, size_t size)
 	if (NULL != ptr)
 		return ptr;
 
-	zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_malloc: out of memory. Requested %lu bytes.", filename, line, size);
+	zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_malloc: out of memory. Requested " ZBX_FS_SIZE_T " bytes.",
+			filename, line, (zbx_fs_size_t)size);
 	exit(FAIL);
 
 	/* Program will never reach this point. */
@@ -290,7 +291,8 @@ void    *zbx_realloc2(const char *filename, int line, void *old, size_t size)
 	if (NULL != ptr)
 		return ptr;
 
-	zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_realloc: out of memory. Requested %lu bytes.", filename, line, size);
+	zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_realloc: out of memory. Requested " ZBX_FS_SIZE_T " bytes.",
+			filename, line, (zbx_fs_size_t)size);
 	exit(FAIL);
 
 	/* Program will never reach this point. */
@@ -310,7 +312,8 @@ char    *zbx_strdup2(const char *filename, int line, char *old, const char *str)
 	if (NULL != ptr)
 		return ptr;
 
-	zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_strdup: out of memory. Requested %lu bytes.", filename, line, strlen(str) + 1);
+	zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_strdup: out of memory. Requested " ZBX_FS_SIZE_T " bytes.",
+			filename, line, (zbx_fs_size_t)(strlen(str) + 1));
 	exit(FAIL);
 
 	/* Program will never reach this point. */

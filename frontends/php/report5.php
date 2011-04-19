@@ -84,7 +84,7 @@ include_once('include/page_header.php');
 
 	$triggers = array();
 	$triggerids = array();
-	$sql = 'SELECT h.host, MAX(h.hostid) as hostid, t.triggerid, t.description, t.expression, '.
+	$sql = 'SELECT h.name as hostname, MAX(h.hostid) as hostid, t.triggerid, t.description, t.expression, '.
 				' MAX(t.lastchange) as lastchange, t.priority, count(distinct e.eventid) as cnt_event '.
 			' FROM hosts h, triggers t, functions f, items i, events e'.
 			' WHERE h.hostid = i.hostid '.
@@ -96,8 +96,8 @@ include_once('include/page_header.php');
 				' and e.value_changed='.TRIGGER_VALUE_CHANGED_YES.
 				' and '.DBcondition('t.triggerid',$available_triggers).
 				' and '.DBin_node('t.triggerid').
-			' GROUP BY h.host,t.triggerid,t.description,t.expression,t.priority '.
-			' ORDER BY cnt_event desc, h.host, t.description, t.triggerid';
+			' GROUP BY h.name,t.triggerid,t.description,t.expression,t.priority '.
+			' ORDER BY cnt_event desc, h.name, t.description, t.triggerid';
 	$result=DBselect($sql, 100);
 	while($row=DBfetch($result)){
 		$row['items'] = array();
@@ -136,7 +136,7 @@ include_once('include/page_header.php');
 		$menus = rtrim($menus,',');
 		$menus="show_popup_menu(event,[[".zbx_jsvalue(_('Scripts')).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus."],180);";
 
-		$host = new CSpan($row['host'],'link_menu');
+		$host = new CSpan($row['hostname'],'link_menu');
 		$host->setAttribute('onclick','javascript: '.$menus);
 		$host->setAttribute('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
