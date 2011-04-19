@@ -540,8 +540,6 @@ int	NET_TCP_DNS_QUERY(const char *cmd, const char *param, unsigned flags, AGENT_
 	if (offset != 0)
 		buffer[--offset] = '\0';
 
-	/*zabbix_log(LOG_LEVEL_CRIT, "== [%zd] %s", strlen(buffer), buffer);*/
-
 	SET_TEXT_RESULT(result, strdup(buffer));
 
 	return SYSINFO_RET_OK;
