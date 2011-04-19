@@ -1434,9 +1434,11 @@ Copt::memoryPick();
 
 			if(isset($host['profile']) && !empty($host['profile'])){
 				$fields = array_keys($host['profile']);
+				$fields[] = 'profile_mode';
 				$fields = implode(', ', $fields);
 
 				$values = array_map('zbx_dbstr', $host['profile']);
+				$values[] = $host['profile_mode'];
 				$values = implode(', ', $values);
 
 				DBexecute('INSERT INTO host_profile (hostid, '.$fields.') VALUES ('.$hostid.', '.$values.')');
@@ -1833,6 +1835,8 @@ Copt::memoryPick();
 					while($existing_profile = DBfetch($existing_profiles_db)){
 						$existing_profiles[] = $existing_profile['hostid'];
 					}
+
+					$data['profile']['profile_mode'] = $data['profile_mode'];
 
 					$hostids_without_profile = array_diff($hostids, $existing_profiles);
 					foreach($hostids_without_profile as $hostid){
