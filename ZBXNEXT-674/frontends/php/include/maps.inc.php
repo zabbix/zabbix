@@ -239,7 +239,7 @@
 				imageline($image,$x1,$y1,$x2,$y2,IMG_COLOR_STYLED);
 			}
 			else{
-				ImageDashedLine($image,$x1,$y1,$x2,$y2,$color);
+				imagedashedline($image,$x1,$y1,$x2,$y2,$color);
 			}
 		}
 		else if($drawtype == MAP_LINK_DRAWTYPE_DOT && function_exists('imagesetstyle')){
