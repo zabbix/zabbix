@@ -69,8 +69,7 @@ static int	telnet_waitsocket(ZBX_SOCKET socket_fd, int mode)
 	else
 		writefd = &fd;
 
-	/* the first argument is ignored for _WINDOWS, no need for casting */
-	rc = select(socket_fd + 1, readfd, writefd, NULL, &tv);
+	rc = select((int)(socket_fd + 1), readfd, writefd, NULL, &tv);
 
 	if (ZBX_TCP_ERROR == rc)
 	{
@@ -152,7 +151,7 @@ static ssize_t	telnet_read(ZBX_SOCKET socket_fd, char *buf, size_t *buf_left, si
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	for ( ;; )
+	for (;;)
 	{
 		if (1 > (rc = telnet_socket_read(socket_fd, &c1, 1)))
 			break;
@@ -230,7 +229,7 @@ end:
 
 /******************************************************************************
  *                                                                            *
- * Comments: converts CR+LF to Unix LF and clear CR+NUL                        *
+ * Comments: converts CR+LF to Unix LF and clears CR+NUL                      *
  *                                                                            *
  ******************************************************************************/
 static void	convert_telnet_to_unix_eol(char *buf, size_t *offset)
