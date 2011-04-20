@@ -339,7 +339,7 @@ REORG TABLE t_host_profile
 /
 
 -- copy data from temporary table
-INSERT INTO host_profile SELECT * FROM t_host_profile
+INSERT INTO host_profile SELECT *, 0 FROM t_host_profile
 /
 
 DROP TABLE t_host_profile
