@@ -540,7 +540,7 @@
 			$input->setAttribute('maxlength', $fieldLength);
 			$input->addStyle('width: '.($fieldLength > 64 ? 64 : $fieldLength).'em;');
 		}
-		if($profile_mode == HOST_PROFILE_MANUAL){
+		if($profile_mode == HOST_PROFILE_DISABLED){
 			$input->setAttribute('disabled', 'disabled');
 		}
 
