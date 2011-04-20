@@ -296,7 +296,6 @@ function saveNewDCheckForm(e){
 		};
 
 		for(var dcheckid in ZBX_CHECKLIST){
-			console.log(ZBX_CHECKLIST[dcheckid]);
 			if(((typeof dCheck["key_"] == 'undefined') || (ZBX_CHECKLIST[dcheckid]["key_"] === dCheck["key_"]))
 					&& ((typeof dCheck["type"] == 'undefined') || (ZBX_CHECKLIST[dcheckid]["type"] === dCheck["type"]))
 					&& ((typeof dCheck["ports"] == 'undefined') || (ZBX_CHECKLIST[dcheckid]["ports"] === dCheck["ports"]))
@@ -309,7 +308,6 @@ function saveNewDCheckForm(e){
 				throw '<?php echo _('Check already exists.'); ?>';
 			}
 		}
-		console.log(dCheck);
 
 		switch(parseInt(dCheck.type, 10)){
 			case ZBX_SVC.agent:
