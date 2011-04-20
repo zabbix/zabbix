@@ -10,6 +10,7 @@ New features:
 
 Bug fixes:
  - [ZBX-3729] fixed server crash when failing to resolve interface-related macros in item keys (asaveljevs)
+ - [ZBX-2885] fixed 00:00-23:59 vs. 00:00-24:00 inconsistency for periods (dimir)
  - [ZBX-3687] fixed link color for lld rules (Vedmak)
  - [ZBX-3709] fixed agree checkbox in setup (Vedmak)
  - [ZBX-3658] fixed the whole request to Java proxy failing if it contains an invalid key (asaveljevs)
