@@ -320,7 +320,6 @@ class class_cItemKey extends PHPUnit_Framework_TestCase
 					'key_id'=>'key',
 					'parameters'=>array('a\"')
 				)
-
 			),
 			array(
 				'key["\""]',
@@ -329,7 +328,30 @@ class class_cItemKey extends PHPUnit_Framework_TestCase
 					'key_id'=>'key',
 					'parameters'=>array('"')
 				)
-
+			),
+			array(
+				'key["\\""]',
+				array(
+					'valid'=>true,
+					'key_id'=>'key',
+					'parameters'=>array('\"')
+				)
+			),
+			array(
+				'key["\\\""]',
+				array(
+					'valid'=>true,
+					'key_id'=>'key',
+					'parameters'=>array('\\"')
+				)
+			),
+			array(
+				'key["\\\\""]',
+				array(
+					'valid'=>true,
+					'key_id'=>'key',
+					'parameters'=>array('\\\"')
+				)
 			),
 			array(
 				'key[a,]',
@@ -338,7 +360,6 @@ class class_cItemKey extends PHPUnit_Framework_TestCase
 					'key_id'=>'key',
 					'parameters'=>array('a', '')
 				)
-
 			),
 			array(
 				'key["a",]',
@@ -347,7 +368,6 @@ class class_cItemKey extends PHPUnit_Framework_TestCase
 					'key_id'=>'key',
 					'parameters'=>array('a', '')
 				)
-
 			),
 			array(
 				'system.run["echo \'a\"b\' | cut -d\'\"\' -f1"]',
@@ -356,7 +376,6 @@ class class_cItemKey extends PHPUnit_Framework_TestCase
 					'key_id'=>'system.run',
 					'parameters'=>array('echo \'a"b\' | cut -d\'"\' -f1')
 				)
-
 			),
 			array(
 				'012345',
@@ -365,7 +384,6 @@ class class_cItemKey extends PHPUnit_Framework_TestCase
 					'key_id'=>'012345',
 					'parameters'=>array()
 				)
-
 			),
 			array(
 				'key[ГУГЛ]',
@@ -374,7 +392,6 @@ class class_cItemKey extends PHPUnit_Framework_TestCase
 					'key_id'=>'key',
 					'parameters'=>array('ГУГЛ')
 				)
-
 			),
 			array(
 				'key["ГУГЛ"]',
@@ -383,7 +400,6 @@ class class_cItemKey extends PHPUnit_Framework_TestCase
 					'key_id'=>'key',
 					'parameters'=>array('ГУГЛ')
 				)
-
 			),
 			array(
 				'key[["a", "b", "c"], "d"]',
@@ -530,7 +546,6 @@ class class_cItemKey extends PHPUnit_Framework_TestCase
 				)
 			),
 
-
 			// invalid keys
 			array('key[["a",]', false),
 			array('key[a]654', false),
@@ -572,6 +587,5 @@ class class_cItemKey extends PHPUnit_Framework_TestCase
 			$this->assertEquals($result, $expectedResult, "I was expecting: \n".print_r($expectedResult, true).", but got: \n".print_r($result, true).' for key '.$key);
 		}
 	}
-
 }
 ?>
