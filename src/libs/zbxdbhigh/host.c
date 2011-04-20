@@ -30,12 +30,12 @@
  *                                                                            *
  * Description: Check collisions between templates                            *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  * Parameters: templateids - array of templates identificators from database  *
  *             templateids_num - templates count in templateids array         *
  *                                                                            *
  * Return value: SUCCEED if no collisions found                               *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
@@ -266,13 +266,13 @@ static int	validate_profile_links(zbx_uint64_t hostid, zbx_uint64_t templateid, 
 				" and ti.hostid=" ZBX_FS_UI64
 				" and i.hostid=" ZBX_FS_UI64
 				" and ti.profile_link<>0"
-				" and exists ("
+				" and not exists ("
 					"select *"
-					" from items hi"
-					" where hi.hostid=" ZBX_FS_UI64
-						" and hi.key_=ti.key_"
+					" from items"
+					" where items.hostid=" ZBX_FS_UI64
+						" and items.key_=i.key_"
 					")",
-			templateid, hostid, hostid);
+			templateid, hostid, templateid);
 
 	result = DBselectN(sql, 1);
 
