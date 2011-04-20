@@ -18,3 +18,9 @@ libzbxdbhigh_a_SOURCES = \
 	discovery.c
 
 libzbxdbhigh_a_CFLAGS = -I@top_srcdir@/src/zabbix_server/
+
+dbschema.c: @top_srcdir@/create/schema/schema.sql
+	@top_srcdir@/create/schema/gen.pl c > @top_srcdir@/src/libs/zbxdbhigh/dbschema.c
+	echo -e "\n#ifdef HAVE_SQLITE3\nconst char *db_schema= {\"\\" >> @top_srcdir@/src/libs/zbxdbhigh/dbschema.c
+	@top_srcdir@/create/schema/gen.pl sqlite|tr -s '\t' ' '|sed -e 's/$$/\\/' >> @top_srcdir@/src/libs/zbxdbhigh/dbschema.c
+	echo -e "\"};\n#endif /* HAVE_SQLITE3 */\n" >> @top_srcdir@/src/libs/zbxdbhigh/dbschema.c
