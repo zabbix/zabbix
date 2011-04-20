@@ -354,6 +354,42 @@ class class_cItemKey extends PHPUnit_Framework_TestCase
 				)
 			),
 			array(
+				'key["\ "]',
+				array(
+					'valid'=>true,
+					'key_id'=>'key',
+					'parameters'=>array('\ ')
+				)
+			),
+			array(
+				'key["\\ "]',
+				array(
+					'valid'=>true,
+					'key_id'=>'key',
+					'parameters'=>array('\\ ')
+				)
+			),
+			array(
+				'key["\\\ "]',
+				array(
+					'valid'=>true,
+					'key_id'=>'key',
+					'parameters'=>array('\\\ ')
+				)
+			),
+			array(
+				'key["\\\\ "]',
+				array(
+					'valid'=>true,
+					'key_id'=>'key',
+					'parameters'=>array('\\\\ ')
+				)
+			),
+			array('key["\"]', false),
+			array('key["\\"]', false),
+			array('key["\\\"]', false),
+			array('key["\\\\"]', false),
+			array(
 				'key[a,]',
 				array(
 					'valid'=>true,
