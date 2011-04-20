@@ -25,33 +25,42 @@
 
 #include "zbxmedia.h"
 
-/* Number of characters per line when wrapping Base64 data in Email  */
-#define ZBX_EMAIL_B64_MAXLINE 76
+/* number of characters per line when wrapping Base64 data in Email */
+#define ZBX_EMAIL_B64_MAXLINE	76
 
-/**
- *
- * str_linefeed()
- *
- * Wrap long string at specified position with linefeeds.
- *
- * Parameters:
- *   src     - input string
- *   maxline - line length
- *
- * Returns:
- * Newly allocated copy of input string with linefeeds.
- */
-static char *str_linefeed(const char *src, size_t maxline)
+/******************************************************************************
+ *                                                                            *
+ * Function: str_linefeed                                                     *
+ *                                                                            *
+ * Purpose: wrap long string at specified position with linefeeds             *
+ *                                                                            *
+ * Parameters: src     - input string                                         *
+ *             maxline - maximum length of a line                             *
+ *                                                                            *
+ * Return value: newly allocated copy of input string with linefeeds          *
+ *                                                                            *
+ * Author: Vladimir Levijev                                                   *
+ *                                                                            *
+ * Comments: allocates memory                                                 *
+ *                                                                            *
+ ******************************************************************************/
+static char	*str_linefeed(const char *src, size_t maxline)
 {
-	size_t src_size = strlen(src);
-	int feeds       = src_size / maxline -
-		(src_size % maxline ? 0 : 1);             /* number of feeds, we don't want to feed last line */
-	size_t left     = src_size - feeds * maxline; /* what's left after last feed */
-	char *dst       = NULL;                       /* output string with linefeeds */
-	size_t dst_size = src_size + feeds * 2 + 1;   /* 2 symbols per linefeed */
+	size_t	src_size;	/* input length */
+	size_t	dst_size;	/* output length */
+	int	feeds;	/* number of feeds */
+	size_t	left;	/* what's left after last feed */
+	char	*dst = NULL;	/* output with linefeeds */
 
-	const char *p_src = src;  /* working pointer to src */
-	char *p_dst       = NULL; /* working pointer to dst */
+	const char	*p_src = NULL;	/* working pointer to input */
+	char	*p_dst = NULL;	/* working pointer to output */
+
+	src_size = strlen(src);
+	feeds = src_size / maxline - (src_size % maxline ? 0 : 1);	/* we don't want to feed the last line */
+	left = src_size - feeds * maxline;
+	dst_size = src_size + feeds * 2 + 1;	/* 2 symbols per linefeed */
+
+	p_src = src;
 
 	/* allocate memory for output */
 	dst = zbx_malloc(NULL, dst_size);
@@ -71,9 +80,10 @@ static char *str_linefeed(const char *src, size_t maxline)
 		*p_dst++ = '\n';
 	}
 
-	/* copy what's left */
-	if (left)
+	if (0 < left)
 	{
+		/* copy what's left */
+
 		memcpy(p_dst, p_src, left);
 		p_src += left;
 		p_dst += left;
