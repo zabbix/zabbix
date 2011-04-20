@@ -107,7 +107,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 #define ZBX_CFG_RTRIM_CHARS	ZBX_CFG_LTRIM_CHARS "\r\n"
 
 	FILE		*file;
-	int		i, lineno, result = SUCCEED;
+	int		i, lineno, result = SUCCEED, param_valid;
 	char		line[MAX_STRING_LEN], *parameter, *value;
 	zbx_uint64_t	var;
 
@@ -127,28 +127,24 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 		for (lineno = 1; NULL != fgets(line, sizeof(line), file); lineno++)
 		{
 			zbx_ltrim(line, ZBX_CFG_LTRIM_CHARS);
+			zbx_rtrim(line, ZBX_CFG_RTRIM_CHARS);
 
 			if ('#' == *line)
 				continue;
-			if (strlen(line) < 3)
+			if (0 == strlen(line))
 				continue;
 
 			parameter = line;
 			value = strstr(line, "=");
 
 			if (NULL == value)
-			{
-				zbx_error("error in line [%d] \"%s\"", lineno, line);
-				result = FAIL;
-				break;
-			}
+				goto garbage;
 
 			*value++ = '\0';
 
 			zbx_rtrim(parameter, ZBX_CFG_RTRIM_CHARS);
 
 			zbx_ltrim(value, ZBX_CFG_LTRIM_CHARS);
-			zbx_rtrim(value, ZBX_CFG_RTRIM_CHARS);
 
 			zabbix_log(LOG_LEVEL_DEBUG, "cfg: para: [%s] val [%s]", parameter, value);
 
@@ -167,10 +163,13 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 				}
 			}
 
+			param_valid = 0;
 			for (i = 0; NULL != cfg[i].parameter; i++)
 			{
 				if (0 != strcmp(cfg[i].parameter, parameter))
 					continue;
+
+				param_valid = 1;
 
 				zabbix_log(LOG_LEVEL_DEBUG, "accepted configuration parameter: '%s' = '%s'",parameter, value);
 
@@ -196,6 +195,9 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 				else
 					assert(0);
 			}
+
+			if (!param_valid)
+				goto unknown_parameter;
 		}
 		fclose(file);
 	}
@@ -235,7 +237,18 @@ missing_mandatory:
 	exit(1);
 
 incorrect_config:
+	fclose(file);
 	zbx_error("wrong value for [%s] in line %d", cfg[i].parameter, lineno);
+	exit(1);
+
+unknown_parameter:
+	fclose(file);
+	zbx_error("unknown parameter [%s] in line %d", parameter, lineno);
+	exit(1);
+
+garbage:
+	fclose(file);
+	zbx_error("garbage in configuration file [%s] in line %d", line, lineno);
 	exit(1);
 }
 
