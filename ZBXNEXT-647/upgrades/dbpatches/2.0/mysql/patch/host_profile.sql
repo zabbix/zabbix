@@ -257,7 +257,7 @@ UPDATE t_host_profile SET notes=notes_ext WHERE notes='';
 ALTER TABLE t_host_profile DROP COLUMN notes_ext;
 
 -- copy data from temporary table
-INSERT INTO host_profile SELECT * FROM t_host_profile;
+INSERT INTO host_profile SELECT *, 0 FROM t_host_profile;
 
 DROP TABLE t_host_profile;
 DROP TABLE hosts_profiles;
