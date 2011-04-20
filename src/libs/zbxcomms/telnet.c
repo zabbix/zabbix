@@ -22,31 +22,6 @@
 #include "telnet.h"
 #include "log.h"
 
-#if defined(_WINDOWS)
-#	if defined(__INT_MAX__) && __INT_MAX__ == 2147483647
-		typedef int ssize_t;
-#	else
-		typedef long ssize_t;
-#	endif
-
-#	define ZBX_TCP_WRITE(s, b, bl)	((ssize_t)send((s), (b), (bl), 0))
-#	define ZBX_TCP_READ(s, b, bl)	((ssize_t)recv((s), (b), (bl), 0))
-
-#	define ZBX_TCP_ERROR		SOCKET_ERROR
-#	define EAGAIN			WSAEWOULDBLOCK
-
-#	define zbx_sock_last_error()	WSAGetLastError()
-
-#else
-#	define ZBX_TCP_WRITE(s, b, bl)	((ssize_t)write((s), (b), (bl)))
-#	define ZBX_TCP_READ(s, b, bl)	((ssize_t)read((s), (b), (bl)))
-
-#	define ZBX_TCP_ERROR		-1
-
-#	define zbx_sock_last_error()	errno
-
-#endif
-
 static char	prompt_char = '\0';
 
 static int	telnet_waitsocket(ZBX_SOCKET socket_fd, int mode)
