@@ -20,7 +20,6 @@
 #ifndef ZABBIX_COMMS_H
 #define ZABBIX_COMMS_H
 
-
 #if defined(_WINDOWS)
 #	if defined(__INT_MAX__) && __INT_MAX__ == 2147483647
 typedef int	ssize_t;
@@ -53,7 +52,6 @@ typedef SOCKET	ZBX_SOCKET;
 #else
 typedef int	ZBX_SOCKET;
 #endif
-
 
 typedef enum
 {
