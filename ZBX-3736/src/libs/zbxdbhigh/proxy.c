@@ -411,7 +411,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 	DB_RESULT		result;
 	DB_ROW			row;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [tablename:%s]", __function_name, tablename);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tablename:'%s'", __function_name, tablename);
 
 	if (NULL == (table = DBget_table(tablename)))
 	{
@@ -476,7 +476,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 			goto json_error;
 
 		fields[field_count] = NULL;
-		for(f = 0; NULL != table->fields[f].name; f++)
+		for (f = 0; NULL != table->fields[f].name; f++)
 		{
 			if (0 == strcmp(table->fields[f].name, buf))
 			{
@@ -572,6 +572,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, strlen(esc) + 8, "'%s',", esc);
 				zbx_free(esc);
 			}
+
 			f++;
 		}
 
@@ -583,7 +584,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 		}
 
 		sql_offset--;
-		if (insert)
+		if (0 != insert)
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 4, ");\n");
 		}
@@ -625,7 +626,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 			goto db_error;
 	}
 
-	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		if (ZBX_DB_OK > DBexecute("%s", sql))
 			goto db_error;
 
@@ -677,7 +678,7 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 	{
 		if (FAIL == zbx_json_brackets_open(p, &jp_obj))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Can't process table \"%s\". %s", buf, zbx_json_strerror());
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot process table \"%s\". %s", buf, zbx_json_strerror());
 			ret = FAIL;
 			break;
 		}
@@ -970,8 +971,9 @@ void	process_host_availability(struct zbx_json_parse *jp)
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
 #endif
 
-	if (16 < sql_offset) /* in ORACLE always present begin..end; */
+	if (sql_offset > 16) /* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
+
 	DBcommit();
 
 	zbx_free(sql);
@@ -1145,7 +1147,7 @@ static int	proxy_get_history_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *h
 
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d, lastid:" ZBX_FS_UI64, __function_name, records, *lastid);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d lastid:" ZBX_FS_UI64, __function_name, records, *lastid);
 
 	return records;
 }
