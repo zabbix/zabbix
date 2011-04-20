@@ -731,6 +731,7 @@ function zbx_strrpos($haystack, $needle){
 		return strrpos($haystack, $needle);
 	}
 }
+
 // }}} STRING FUNCTIONS
 
 
