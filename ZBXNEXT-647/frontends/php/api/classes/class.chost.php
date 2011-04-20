@@ -1888,37 +1888,86 @@ Copt::memoryPick();
 
 
 // PROFILE {{{
+
 			if(isset($data['profile']) && !is_null($data['profile'])){
-				if(empty($data['profile'])){
+
+				if($data['profile_mode'] == HOST_PROFILE_DISABLED){
 					$sql = 'DELETE FROM host_profile WHERE '.DBcondition('hostid', $hostids);
 					if(!DBexecute($sql))
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete profile'));
 				}
 				else{
-					$existing_profiles = array();
+					$hostsWithProfiles = array();
 					$existing_profiles_db = DBselect('SELECT hostid FROM host_profile WHERE '.DBcondition('hostid', $hostids));
 					while($existing_profile = DBfetch($existing_profiles_db)){
-						$existing_profiles[] = $existing_profile['hostid'];
+						$hostsWithProfiles[] = $existing_profile['hostid'];
 					}
 
 					$data['profile']['profile_mode'] = $data['profile_mode'];
 
-					$hostids_without_profile = array_diff($hostids, $existing_profiles);
-					foreach($hostids_without_profile as $hostid){
-						$data['profile']['hostid'] = $hostid;
-						DB::insert('host_profile', array($data['profile']), false);
+					// when hosts are being updated to use automatic mode for host profiles,
+					// we must check if some items are set to populate profile fields of every host.
+					// if they do, mass update for those fields should be ignored
+					if($data['profile_mode'] == HOST_PROFILE_AUTOMATIC){
+						// getting all items on all affected hosts
+						$options = array(
+							'output' => array('profile_link', 'hostid'),
+							'filter' => array('hostid' => $hostids),
+							'nopermissions' => true
+						);
+						$itemsToProfiles = API::item()->get($options);
+
+						// gathering links to array: 'hostid'=>array('profile_name_1'=>true, 'profile_name_2'=>true)
+						$profileLinksOnHosts = array();
+						$profileFields = getHostProfiles();
+						foreach($itemsToProfiles as $pr){
+							if($pr['profile_link'] != 0){ // 0 means 'no link'
+								if(isset($profileLinksOnHosts[$pr['hostid']])){
+									$profileLinksOnHosts[$pr['hostid']][$profileFields[$pr['profile_link']]['db_field']] = true;
+								}else{
+									$profileLinksOnHosts[$pr['hostid']] = array($profileFields[$pr['profile_link']]['db_field']=>true);
+								}
+							}
+						}
+
+						// now we have all info we need to determine, which profile fields should be saved
+						$profilesToSave = array();
+						foreach($hostids as $hostid){
+							$profilesToSave[$hostid] = $data['profile'];
+							$profilesToSave[$hostid]['hostid'] = $hostid;
+							foreach($data['profile'] as $profileName=>$pr){
+								if(isset($profileLinksOnHosts[$hostid][$profileName])){
+									unset($profilesToSave[$hostid][$profileName]);
+								}
+							}
+						}
+					}
+					else{
+						// if mode is not automatic, all the fields can be saved
+						$profilesToSave = array();
+						foreach($hostids as $hostid){
+							$profilesToSave[$hostid] = $data['profile'];
+							$profilesToSave[$hostid]['hostid'] = $hostid;
+						}
 					}
 
-					if(!empty($existing_profiles)){
+					$hostsWithoutProfile = array_diff($hostids, $hostsWithProfiles);
+
+					// hosts that have no profiles yet, need profiles to be inserted
+					foreach($hostsWithoutProfile as $hostid){
+						DB::insert('host_profile', array($profilesToSave[$hostid]), false);
+					}
+
+					// those hosts that already have a profile, need their profiles to be updated
+					foreach($hostsWithProfiles as $hostid){
 						DB::update('host_profile', array(
-							'values' => $data['profile'],
-							'where' => array(DBcondition('hostid', $existing_profiles))
+							'values' => $profilesToSave[$hostid],
+							'where' => array(DBcondition('hostid',array($hostid)))
 						));
 					}
 				}
 			}
 // }}} PROFILE
-
 			return array('hostids' => $hostids);
 	}
 

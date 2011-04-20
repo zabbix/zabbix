@@ -360,8 +360,9 @@ include_once('include/page_header.php');
 			}
 
 // PROFILES {{{
-			if(isset($visible['useprofile'])){
-				$new_values['profile'] = get_request('useprofile', false) ? get_request('host_profile', array()) : array();
+			if(isset($visible['profile_mode'])){
+				$new_values['profile_mode'] = get_request('profile_mode', HOST_PROFILE_DISABLED);
+				$new_values['profile'] = $new_values['profile_mode'] != HOST_PROFILE_DISABLED ? get_request('host_profile', array()) : array();
 			}
 // }}} PROFILES
 
