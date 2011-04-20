@@ -217,7 +217,7 @@ require_once('include/templates/action.js.php');
 			$rowCondition[] = $cmbCondVal;
 			break;
 		case CONDITION_TYPE_TIME_PERIOD:
-			$rowCondition[] = new CTextBox('new_condition[value]', "1-7,00:00-23:59", 40);
+			$rowCondition[] = new CTextBox('new_condition[value]', ZBX_DEFAULT_INTERVAL, 40);
 			break;
 		case CONDITION_TYPE_TRIGGER_SEVERITY:
 			$cmbCondVal = new CComboBox('new_condition[value]');

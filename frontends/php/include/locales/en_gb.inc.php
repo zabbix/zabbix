@@ -1237,7 +1237,7 @@
 	'S_SERVICES_ONETIME_DOWNTIME_DATE_FORMAT'=>	_('d M Y H:i'),
 	'S_ADD_SMALL'=>								_('add'),
 	'S_ERROR_ADDING_SERVICE_TIME' => _('Error adding service time'),
-	'S_IS_A_WRONG_TIME_FORMAT' => _('is a wrong time format. Should be from 00:00 to 23:59.'),
+	'S_IS_A_WRONG_TIME_FORMAT' => _('is a wrong time format. Should be from 00:00 to 24:00.'),
 
 //	locales.php
 	'S_CREATE'=>				_('Create'),
