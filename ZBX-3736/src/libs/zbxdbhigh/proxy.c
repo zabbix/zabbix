@@ -442,7 +442,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 	/*   3  |                 "fields": [               | list of table's columns       */
 	/*   4  |                         "hostid",         | first column                  */
 	/*   5  |                         "host",           | second column                 */
-	/*   6  |                         ...               | ...column names               */
+	/*   6  |                         ...               | ...columns                    */
 	/*   7  |                 ],                        |                               */
 	/*   8  |                 "data": [                 | the table data                */
 	/*   9  |                         [                 | first entry                   */
@@ -494,8 +494,8 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 		field_count++;
 	}
 
-	/* get table entries (lines 8-20 in T1) */
-	if (FAIL == zbx_json_brackets_by_name(jp_obj, "data", &jp_data))
+	/* get the entries (line 8 in T1) */
+	if (FAIL == zbx_json_brackets_by_name(jp_obj, ZBX_PROTO_TAG_DATA, &jp_data))
 		goto json_error;
 
 	/* special preprocessing for 'items' table */
@@ -632,7 +632,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 	ret = SUCCEED;
 json_error:
 	if (SUCCEED != ret)
-		zabbix_log(LOG_LEVEL_DEBUG, "Can't process table \"%s\". %s", tablename, zbx_json_strerror());
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot process table \"%s\": %s", tablename, zbx_json_strerror());
 db_error:
 	zbx_free(sq2);
 	zbx_free(sql);
@@ -870,6 +870,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	/* "data" tag lists the hosts */
 	if (SUCCEED != zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Received invalid host availability data. %s", zbx_json_strerror());
@@ -887,11 +888,9 @@ void	process_host_availability(struct zbx_json_parse *jp)
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
 #endif
 
-	while (NULL != (p = zbx_json_next(&jp_data, p)))
+	while (NULL != (p = zbx_json_next(&jp_data, p)))	/* iterate the host entries */
 	{
-/* {"data":[{"hostid":12345,...,...},{...},...]}
- *          ^----------------------^
- */ 		if (SUCCEED != zbx_json_brackets_open(p, &jp_row))
+		if (SUCCEED != zbx_json_brackets_open(p, &jp_row))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Invalid host availability data. %s", zbx_json_strerror());
 			continue;
@@ -954,7 +953,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 			continue;
 		}
 
-		if (FAIL == is_uint64(tmp, &hostid) || 1 == no_data)
+		if (SUCCEED != is_uint64(tmp, &hostid) || 1 == no_data)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Invalid host availability data.");
 			sql_offset = tmp_offset;
@@ -1219,7 +1218,7 @@ static void	calc_timestamp(char *line, int *timestamp, char *format)
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() %02d:%02d:%02d %02d/%02d/%04d",
 			__function_name, hh, mm, ss, MM, dd, yyyy);
 
-	/* Seconds can be ignored. No ssc here. */
+	/* seconds can be ignored, no ssc here */
 	if (0 != hhc && 0 != mmc && 0 != yyyyc && 0 != ddc && 0 != MMc)
 	{
 		tm.tm_sec = ss;
@@ -1367,18 +1366,15 @@ static void	clean_agent_values(AGENT_VALUE *values, int value_num)
 int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 		const zbx_uint64_t proxy_hostid, char *info, int max_info_size)
 {
+#define VALUES_MAX	256
 	const char		*__function_name = "process_hist_data";
 	struct zbx_json_parse   jp_data, jp_row;
 	const char		*p;
 	char			tmp[MAX_BUFFER_LEN];
-	int			ret = SUCCEED;
-	int			processed = 0;
+	int			ret = FAIL, processed = 0, value_num = 0, total_num = 0;
 	double			sec;
 	time_t			now, proxy_timediff = 0;
-
-#define VALUES_MAX	256
 	static AGENT_VALUE	*values = NULL, *av;
-	int			value_num = 0, total_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1391,36 +1387,19 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp)))
 		proxy_timediff = now - atoi(tmp);
 
-/* {"request":"ZBX_SENDER_DATA","data":[{"key":"system.cpu.num",...,...},{...},...]}
- *                                     ^
- */	if (NULL == (p = zbx_json_pair_by_name(jp, ZBX_PROTO_TAG_DATA)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Can't find \"data\" pair");
-		ret = FAIL;
-	}
+	/* "data" tag lists the item keys */
+	if (NULL == (p = zbx_json_pair_by_name(jp, ZBX_PROTO_TAG_DATA)))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot find \"data\" pair");
+	else if (FAIL == zbx_json_brackets_open(p, &jp_data))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot process json request: %s", zbx_json_strerror());
+	else
+		ret = SUCCEED;
 
-	if(SUCCEED == ret)
+	p = NULL;
+	while (SUCCEED == ret && NULL != (p = zbx_json_next(&jp_data, p)))	/* iterate the item key entries */
 	{
-/* {"request":"ZBX_SENDER_DATA","data":[{"key":"system.cpu.num",...,...},{...},...]}
- *                                     ^------------------------------------------^
- */		if (FAIL == (ret = zbx_json_brackets_open(p, &jp_data)))
-			zabbix_log(LOG_LEVEL_WARNING, "Can't process json request. %s",
-					zbx_json_strerror());
-	}
-
-/* {"request":"ZBX_SENDER_DATA","data":[{"key":"system.cpu.num",...,...},{...},...]}
- *                                      ^
- */	p = NULL;
-	while (SUCCEED == ret && NULL != (p = zbx_json_next(&jp_data, p)))
-	{
-/* {"request":"ZBX_SENDER_DATA","data":[{"key":"system.cpu.num",...,...},{...},...]}
- *                                      ^------------------------------^
- */ 		if (FAIL == (ret = zbx_json_brackets_open(p, &jp_row)))
+		if (FAIL == (ret = zbx_json_brackets_open(p, &jp_row)))
 			break;
-
-/*		zabbix_log(LOG_LEVEL_DEBUG, "Next \"%.*s\"",
-				jp_row.end - jp_row.start + 1,
-				jp_row.start);*/
 
 		av = &values[value_num];
 
@@ -1514,7 +1493,7 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 	DB_DHOST		dhost;
 	zbx_uint64_t		last_druleid = 0;
 	struct zbx_json_parse	jp_data, jp_row;
-	int			port, status, ret = SUCCEED;
+	int			port, status, ret;
 	const char		*p = NULL;
 	char			last_ip[HOST_IP_LEN_MAX], ip[HOST_IP_LEN_MAX], key_[ITEM_KEY_LEN_MAX],
 				tmp[MAX_STRING_LEN], value[DSERVICE_VALUE_LEN_MAX];
@@ -1596,11 +1575,10 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 			zbx_strlcpy(last_ip, ip, HOST_IP_LEN_MAX);
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() druleid:" ZBX_FS_UI64 " dcheckid:" ZBX_FS_UI64  " unique_dcheckid:" ZBX_FS_UI64
-				" type:%d time:'%s %s' ip:'%s' port:%d key:'%s' value:'%s'",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() druleid:" ZBX_FS_UI64 " dcheckid:" ZBX_FS_UI64  " unique_dcheckid:"
+				ZBX_FS_UI64 " type:%d time:'%s %s' ip:'%s' port:%d key:'%s' value:'%s'",
 				__function_name, drule.druleid, dcheck.dcheckid, drule.unique_dcheckid, dcheck.type,
-				zbx_date2str(itemtime), zbx_time2str(itemtime),
-				ip, port, dcheck.key_, value);
+				zbx_date2str(itemtime), zbx_time2str(itemtime), ip, port, dcheck.key_, value);
 
 		DBbegin();
 		if (dcheck.type == -1)
