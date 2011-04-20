@@ -33,7 +33,7 @@ class CDRule extends CZBXAPI{
 * @param array $options
 * @return array
 */
-	public function get($options=array()){
+	public function get(array $options=array()){
 
 		$nodeCheck = false;
 		$user_type = self::$userData['type'];
@@ -399,7 +399,7 @@ COpt::memoryPick();
 	}
 
 
-	public function exists($object){
+	public function exists(array $object){
 		$options = array(
 			'filter' => array(),
 			'output' => API_OUTPUT_SHORTEN,
@@ -434,24 +434,52 @@ COpt::memoryPick();
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot save discovery rule without checks.'));
 			}
 
-			$uniq = 0;
-			foreach($dRule['dchecks'] as &$dCheck){
-				if($dCheck['uniq'] == 1) $uniq++;
+			$this->validateDChecks($dRule['dchecks']);
+		}
+	}
 
-				switch($dCheck['snmpv3_securitylevel']){
-					case ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV:
-						$dCheck['snmpv3_authpassphrase'] = $dCheck['snmpv3_privpassphrase'] = '';
-						break;
-					case ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV:
-						$dCheck['snmpv3_privpassphrase'] = '';
-						break;
-				}
-			}
-			unset($dCheck);
+	protected function validateDChecks(array &$dChecks){
+		$uniq = 0;
+		foreach($dChecks as $dcnum => $dCheck){
+			if($dCheck['uniq'] == 1) $uniq++;
 
-			if($uniq > 1){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one check can be unique.'));
+			if(isset($dCheck['ports']) && !validate_port_list($dCheck['ports'])){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect port.'));
 			}
+
+			switch($dCheck['type']){
+				case SVC_AGENT:
+					$itemKey = new CItemKey($dCheck['key_']);
+					if(!$itemKey->isValid())
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Key is not valid: %s', $itemKey->getError()));
+					break;
+
+				case SVC_SNMPv1:
+				case SVC_SNMPv2:
+					if(!isset($dCheck['snmp_community']) || zbx_empty($dCheck['snmp_community']))
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('SNMP Community cannot be empty.'));
+				case SVC_SNMPv3:
+					if(!isset($dCheck['key_']) || zbx_empty($dCheck['key_']))
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('SNMP OID cannot be empty.'));
+					break;
+			}
+
+
+			if(!isset($dCheck['snmpv3_securitylevel'])){
+				$dCheck['snmpv3_securitylevel'] = ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV;
+			}
+			switch($dCheck['snmpv3_securitylevel']){
+				case ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV:
+					$dChecks[$dcnum]['snmpv3_authpassphrase'] = $dChecks[$dcnum]['snmpv3_privpassphrase'] = '';
+					break;
+				case ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV:
+					$dChecks[$dcnum]['snmpv3_privpassphrase'] = '';
+					break;
+			}
+		}
+
+		if($uniq > 1){
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one check can be unique.'));
 		}
 	}
 
@@ -493,6 +521,7 @@ COpt::memoryPick();
 				$dChecksCreate[] = $dCheck;
 			}
 		}
+
 		DB::insert('dchecks', $dChecksCreate);
 
 		return array('druleids' => $druleids);
@@ -558,13 +587,15 @@ COpt::memoryPick();
 
 			foreach($dChecksDiff['both'] as $checkUpdate){
 				$dChecksUpdate[] = array(
-					'values' => $checkUpdate,
+					'values' => array('uniq' => $checkUpdate['uniq']),
 					'where' => array('dcheckid' => $checkUpdate['dcheckid'])
 				);
 			}
 		}
 
-		$this->deleteChecks($dCheckidsDelete);
+		if(!empty($dCheckidsDelete)){
+			$this->deleteChecks($dCheckidsDelete);
+		}
 		DB::update('drules', $dRulesUpdate);
 		DB::update('dchecks', $dChecksUpdate);
 		DB::insert('dchecks', $dChecksCreate);
@@ -636,7 +667,7 @@ COpt::memoryPick();
 					' AND '.DBcondition('value', $checkids));
 		}
 
-		DBexecute('DELETE FROM dchecks WHERE '.DBcondition('dcheckid', $checkids));
+		DB::delete('dchecks', array('dcheckid' => $checkids));
 	}
 
 }
