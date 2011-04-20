@@ -1962,4 +1962,25 @@
 		}
 
 	}
+
+/*
+ * Function: httpitems_exists
+ *
+ * Description:
+ *     Function returns true if http items exists in the $items array.
+ *     The array should contain a field 'type'
+ *
+ * Author:
+ *     Alexander Vladishev
+ *
+ * Comments:
+ *
+ */
+	function httpitems_exists($items){
+		foreach($items as $item)
+			if ($item['type'] == ITEM_TYPE_HTTPTEST)
+				return true;
+
+		return false;
+	}
 ?>

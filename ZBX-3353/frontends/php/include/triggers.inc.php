@@ -1175,11 +1175,11 @@ function utf8RawUrlDecode($source){
  * Comments: !!! Don't forget sync code with C !!!							*
  *																			*
  ******************************************************************************/
-	function explode_exp($expression, $html,$template=false,$resolve_macro=false){
+	function explode_exp($expression, $html = false, $resolve_macro = false, $src_host = null, $dst_host = null){
 //		echo "EXPRESSION:",$expression,"<Br>";
 		$functionid='';
 		$macros = '';
-		if(0 == $html){
+		if(!$html){
 			$exp='';
 		}
 		else{
@@ -1211,7 +1211,7 @@ function utf8RawUrlDecode($source){
 						$macros = $function_data['expression'];
 					}
 
-					if(1 == $html) array_push($exp,$macros);
+					if($html) array_push($exp,$macros);
 					else $exp.=$macros;
 
 					$macros = '';
@@ -1227,12 +1227,10 @@ function utf8RawUrlDecode($source){
 							' AND h.hostid=i.hostid';
 
 				if($functionid=='TRIGGER.VALUE'){
-					if(0 == $html) $exp.='{'.$functionid.'}';
+					if(!$html) $exp.='{'.$functionid.'}';
 					else array_push($exp,'{'.$functionid.'}');
 				}
 				else if(is_numeric($functionid) && $function_data = DBfetch(DBselect($sql))){
-					if($template) $function_data['host'] = '{HOSTNAME}';
-
 					if($resolve_macro){
 						$trigger = $function_data;
 						CUserMacro::resolveItem($function_data);
@@ -1242,8 +1240,11 @@ function utf8RawUrlDecode($source){
 						$function_data['parameter'] = $function_data['expression'];
 					}
 
+					if (!is_null($src_host) && !is_null($dst_host) && strcmp($src_host, $function_data['host']) == 0)
+						$function_data['host'] = $dst_host;
+
 //SDII($function_data);
-					if($html == 0){
+					if(!$html){
 						$exp.='{'.$function_data['host'].':'.$function_data['key_'].'.'.$function_data['function'].'('.$function_data['parameter'].')}';
 					}
 					else{
@@ -1267,7 +1268,7 @@ function utf8RawUrlDecode($source){
 					}
 				}
 				else{
-					if(1 == $html){
+					if($html){
 						array_push($exp, new CSpan('*ERROR*', 'on'));
 					}
 					else{
@@ -1286,7 +1287,7 @@ function utf8RawUrlDecode($source){
 				continue;
 			}
 
-			if(1 == $html) array_push($exp,$expression[$i]);
+			if($html) array_push($exp,$expression[$i]);
 			else $exp.=$expression[$i];
 		}
 //SDII($exp);
@@ -1822,12 +1823,12 @@ function utf8RawUrlDecode($source){
 
 // Restore expression
 		if(is_null($expression)){
-			$expression = explode_exp($trigger['expression'],0);
+			$expression = explode_exp($trigger['expression']);
 			$expr = new CTriggerExpression(array('expression' => $expression));
 		}
 		else{
 			$expr = new CTriggerExpression(array('expression' => $expression));
-			$event_to_unknown = (empty($expr->errors) && $expression != explode_exp($trigger['expression'],0));
+			$event_to_unknown = (empty($expr->errors) && $expression != explode_exp($trigger['expression']));
 		}
 
 		if(!empty($expr->errors)){
@@ -1857,7 +1858,7 @@ function utf8RawUrlDecode($source){
 
 			$trigger_exist = false;
 			foreach($triggers_exist as $tnum => $tr){
-				$tmp_exp = explode_exp($tr['expression'], false);
+				$tmp_exp = explode_exp($tr['expression']);
 				if(strcmp($tmp_exp, $expression) == 0){
 					$trigger_exist = $tr;
 					break;
@@ -3856,28 +3857,27 @@ function utf8RawUrlDecode($source){
 		try{
 			$options = array(
 				'hostids' => $srcid,
-				'output' => API_OUTPUT_EXTEND,
+				'output' => array('host'),
 				'templated_hosts' => 1
 			);
 			$src = CHost::get($options);
 			if(empty($src)) throw new Exception();
 			$src = reset($src);
 
-
 			$options = array(
 				'hostids' => $destid,
-				'output' => API_OUTPUT_EXTEND,
+				'output' => array('host'),
 				'templated_hosts' => 1
 			);
 			$dest = CHost::get($options);
 			if(empty($dest)) throw new Exception();
 			$dest = reset($dest);
 
-
 			$options = array(
 				'hostids' => $srcid,
 				'output' => API_OUTPUT_EXTEND,
 				'inherited' => 0,
+				'select_items' => API_OUTPUT_EXTEND,
 				'select_dependencies' => API_OUTPUT_EXTEND
 			);
 			$triggers = CTrigger::get($options);
@@ -3885,9 +3885,10 @@ function utf8RawUrlDecode($source){
 			$hash = array();
 
 			foreach($triggers as $trigger){
-				$expr = explode_exp($trigger['expression'], 0);
-				$expr = str_replace($src['host'].':', $dest['host'].':', $expr);
-				$trigger['expression'] = $expr;
+				if (httpitems_exists($trigger['items']))
+					continue;
+
+				$trigger['expression'] = explode_exp($trigger['expression'], false, false, $src['host'], $dest['host']);
 
 				$result = CTrigger::create($trigger);
 
@@ -3897,6 +3898,9 @@ function utf8RawUrlDecode($source){
 			}
 
 			foreach($triggers as $trigger){
+				if (httpitems_exists($trigger['items']))
+					continue;
+
 				foreach($trigger['dependencies'] as $dep){
 					if(isset($hash[$dep['triggerid']])){
 						$dep = $hash[$dep['triggerid']];

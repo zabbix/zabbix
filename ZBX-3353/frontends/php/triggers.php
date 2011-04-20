@@ -169,7 +169,7 @@ include_once('include/page_header.php');
 				$triggerData = get_trigger_by_triggerid($_REQUEST['triggerid']);
 				if($triggerData['templateid']){
 					$_REQUEST['description'] = $triggerData['description'];
-					$_REQUEST['expression'] = explode_exp($triggerData['expression'],0);
+					$_REQUEST['expression'] = explode_exp($triggerData['expression']);
 				}
 
 				$current_deps = get_trigger_dependencies_by_triggerid($_REQUEST['triggerid']);
@@ -655,7 +655,6 @@ include_once('include/page_header.php');
 				$hosts,
 				$description,
 				triggerExpression($trigger,1),
-//				explode_exp($trigger['expression'], 1),
 				$error
 			));
 

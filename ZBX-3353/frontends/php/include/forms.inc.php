@@ -2599,7 +2599,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		if((isset($_REQUEST['triggerid']) && !isset($_REQUEST['form_refresh']))  || isset($limited)){
 			$description	= $trigger['description'];
 
-			$expression	= explode_exp($trigger['expression'],0);
+			$expression	= explode_exp($trigger['expression']);
 
 			if(!isset($limited) || !isset($_REQUEST['form_refresh'])){
 				$type = $trigger['type'];
@@ -4399,7 +4399,7 @@ JAVASCRIPT;
 		}
 
 		if($_REQUEST['form'] == 'full_clone'){
-// Host items
+			// host items
 			$options = array(
 				'inherited' => 0,
 				'hostids' => $_REQUEST['hostid'],
@@ -4416,13 +4416,15 @@ JAVASCRIPT;
 					$items_lbx->addItem($hitem['itemid'], item_description($hitem));
 				}
 				$host_tbl->addRow(array(S_ITEMS, $items_lbx));
+				unset($items_lbx);
 			}
 
-// Host triggers
+			// host triggers
 			$options = array(
 				'inherited' => 0,
 				'hostids' => $_REQUEST['hostid'],
-				'output' => API_OUTPUT_EXTEND,
+				'output' => array('triggerid', 'description'),
+				'select_items' => API_OUTPUT_EXTEND,
 				'expandDescription' => true,
 			);
 			$host_triggers = CTrigger::get($options);
@@ -4433,15 +4435,23 @@ JAVASCRIPT;
 
 				order_result($host_triggers, 'description');
 				foreach($host_triggers as $htrigger){
+					if (httpitems_exists($htrigger['items']))
+						continue;
+
 					$trig_lbx->addItem($htrigger['triggerid'], $htrigger['description']);
 				}
-				$host_tbl->addRow(array(S_TRIGGERS, $trig_lbx));
+
+				if($trig_lbx->itemsCount() > 0)
+					$host_tbl->addRow(array(S_TRIGGERS, $trig_lbx));
+				unset($trig_lbx);
 			}
-// Host graphs
+
+			// host graphs
 			$options = array(
 				'inherited' => 0,
 				'hostids' => $_REQUEST['hostid'],
 				'select_hosts' => API_OUTPUT_REFER,
+				'select_items' => API_OUTPUT_EXTEND,
 				'output' => API_OUTPUT_EXTEND,
 			);
 			$host_graphs = CGraph::get($options);
@@ -4452,12 +4462,18 @@ JAVASCRIPT;
 
 				order_result($host_graphs, 'name');
 				foreach($host_graphs as $hgraph){
-					if(count($hgraph['hosts']) > 1) continue;
+					if(count($hgraph['hosts']) > 1)
+						continue;
+
+					if (httpitems_exists($hgraph['items']))
+						continue;
+
 					$graphs_lbx->addItem($hgraph['graphid'], $hgraph['name']);
 				}
 
-				if($graphs_lbx->ItemsCount() > 1)
+				if($graphs_lbx->ItemsCount())
 					$host_tbl->addRow(array(S_GRAPHS, $graphs_lbx));
+				unset($graphs_lbx);
 			}
 		}
 
