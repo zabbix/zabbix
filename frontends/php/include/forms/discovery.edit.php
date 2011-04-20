@@ -77,8 +77,7 @@ require_once('include/templates/discovery.js.php');
 	}
 	order_result($data['dchecks'], 'name');
 
-	$jsInsert = '';
-	$jsInsert.= 'addPopupValues('.zbx_jsvalue(array('object' => 'dcheckid', 'values' => array_values($data['dchecks']))).');';
+	$jsInsert = 'addPopupValues('.zbx_jsvalue(array_values($data['dchecks'])).');';
 
 	$discoveryList->addRow(_('Checks'), new CDiv($dcheckList, 'objectgroup inlineblock border_dotted ui-corner-all', 'dcheckList'));
 	// -------
@@ -89,7 +88,7 @@ require_once('include/templates/discovery.js.php');
 
 	$discoveryList->addRow(_('Device uniqueness criteria'), new CDiv($cmbUniquenessCriteria, 'objectgroup inlineblock border_dotted ui-corner-all', 'uniqList'));
 
-	$jsInsert.= 'jQuery("input:radio[name=uniqueness_criteria][value='.zbx_jsvalue($data['uniqueness_criteria']).']").attr("checked", "checked");';
+	$jsInsert .= 'jQuery("input:radio[name=uniqueness_criteria][value='.zbx_jsvalue($data['uniqueness_criteria']).']").attr("checked", "checked");';
 
 // Status
 	$cmbStatus = new CComboBox('status', $data['status']);

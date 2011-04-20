@@ -11,13 +11,12 @@ class ajaxResponse {
 /**
  * Add error to ajax response. All errors are returned as array in 'errors' part of response.
  *
- * @param string $id id of related element
  * @param string $error error text
  * @return void
  */
-	public function error($id, $error){
+	public function error($error){
 		$this->_result = false;
-		$this->_errors[] = array('id' => $id, 'error' => $error);
+		$this->_errors[] = array('error' => $error);
 	}
 
 /**

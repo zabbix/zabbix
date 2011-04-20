@@ -69,36 +69,26 @@ $_REQUEST['dchecks'] = get_request('dchecks', array());
 ?>
 <?php
 if(get_request('output') == 'ajax'){
-	$ajaxdata = get_request('ajaxdata', array());
 	$ajaxResponse = new ajaxResponse;
 
 	if(get_request('ajaxaction') && get_request('ajaxaction') == 'validate'){
-		if(isset($ajaxdata['new_check_ports']) && !validate_port_list($ajaxdata['new_check_ports'])){
-			$ajaxResponse->error('new_check_ports', 'Incorrect port.');
-		}
-
-		if(isset($ajaxdata['new_check_type'])){
-			switch($ajaxdata['new_check_type']){
-				case SVC_AGENT:
-					$itemKey = new CItemKey($ajaxdata['new_check_key_']);
-					if(!$itemKey->isValid())
-						$ajaxResponse->error('new_check_key_', 'Key is not valid: '.$itemKey->getError());
+		$ajaxdata = get_request('ajaxdata', array());
+		foreach($ajaxdata as $check){
+			switch($check['field']){
+				case 'port':
+					if(!validate_port_list($check['value']))
+						$ajaxResponse->error(_('Incorrect port.'));
 					break;
-
-				case SVC_SNMPv1:
-				case SVC_SNMPv2:
-					if(!isset($ajaxdata['new_check_snmp_community']) || zbx_empty($ajaxdata['new_check_snmp_community']))
-						$ajaxResponse->error('new_check_snmp_community', 'SNMP Community cannot be empty.');
-				case SVC_SNMPv3:
-					if(!isset($ajaxdata['new_check_key_']) || zbx_empty($ajaxdata['new_check_key_']))
-						$ajaxResponse->error('new_check_key_', 'SNMP OID cannot be empty.');
+				case 'itemKey':
+					$itemKey = new CItemKey($check['value']);
+					if(!$itemKey->isValid())
+						$ajaxResponse->error(_('Key is not valid: '.$itemKey->getError()));
 					break;
 			}
 		}
-
-		$ajaxResponse->send();
 	}
 
+	$ajaxResponse->send();
 
 	require_once('include/page_footer.php');
 	exit();

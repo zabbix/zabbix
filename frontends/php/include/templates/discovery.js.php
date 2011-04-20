@@ -1,23 +1,12 @@
 <!-- Discovery -->
 <script type="text/x-jquery-tmpl" id="dcheckRowTPL">
 <tr id="dcheckRow_#{dcheckid}">
-<td>
-	<input name="dchecks[#{dcheckid}][dcheckid]" type="hidden" value="#{dcheckid}" />
-	<input name="dchecks[#{dcheckid}][name]" type="hidden" value="#{name}" />
-	<input name="dchecks[#{dcheckid}][type]" type="hidden" value="#{type}" />
-	<input name="dchecks[#{dcheckid}][key_]" type="hidden" value="#{key_}" />
-	<input name="dchecks[#{dcheckid}][ports]" type="hidden" value="#{ports}" />
-	<input name="dchecks[#{dcheckid}][snmp_community]" type="hidden" value="#{snmp_community}" />
-	<input name="dchecks[#{dcheckid}][snmpv3_securityname]" type="hidden" value="#{snmpv3_securityname}" />
-	<input name="dchecks[#{dcheckid}][snmpv3_securitylevel]" type="hidden" value="#{snmpv3_securitylevel}" />
-	<input name="dchecks[#{dcheckid}][snmpv3_authpassphrase]" type="hidden" value="#{snmpv3_authpassphrase}" />
-	<input name="dchecks[#{dcheckid}][snmpv3_privpassphrase]" type="hidden" value="#{snmpv3_privpassphrase}" />
-	<input name="dchecks[#{dcheckid}][uniq]" type="hidden" value="#{uniq}" />
-	<span class="bold"> #{name} </span>
-</td>
-<td>
-	<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="javascript: removeDCheckRow(#{dcheckid});" />
-</td>
+	<td id="dcheckCell_#{dcheckid}">
+		<span class="bold"> #{name} </span>
+	</td>
+	<td>
+		<input type="button" class="input link_menu" name="remove" value="<?php print(_('Remove'));?>" onclick="javascript: removeDCheckRow(#{dcheckid});" />
+	</td>
 </tr>
 </script>
 
@@ -29,53 +18,65 @@
 </script>
 
 <script type="text/x-jquery-tmpl" id="newDCheckTPL">
-<div id="new_check_form">
-<div class="objectgroup inlineblock border_dotted ui-corner-all">
-	<div id="newCheckErrors" class="ajaxError"></div>
-<table class="formElementTable"><tbody>
-<tr>
-	<td><label for="new_check_type"><?php print(_('Check type')); ?></label></td>
-	<td>
-	<select id="new_check_type" name="new_check_type" class="input select"></select>
-	</td>
-</tr>
-<tr id="newCheckPortsRow" class="hidden">
-	<td><label for="new_check_ports"><?php print(_('Ports')); ?></label></td>
-	<td><input type="text" id="new_check_ports" name="new_check_ports" value="" class="input text" size="16" maxlength="255"></td>
-</tr>
-<tr id="newCheckCommunityRow" class="hidden">
-	<td><label for="new_check_snmp_community"><?php print(_('SNMP Community')); ?></label></td>
-	<td><input type="text" id="new_check_snmp_community" name="new_check_snmp_community" value="" class="input text" size="20" maxlength="255"></td>
-</tr>
-<tr id="newCheckKeyRow" class="hidden">
-	<td><label for="new_check_key_"><?php print(_('SNMP Key')); ?></label></td>
-	<td><input type="text" id="new_check_key_" name="new_check_key_" value="" class="input text" size="20" maxlength="255"></td>
-</tr>
-<tr id="newCheckSecNameRow" class="hidden">
-	<td><label for="new_check_snmpv3_securityname"><?php print(_('SNMPv3 Security name')); ?></label></td>
-	<td><input type="text" id="new_check_snmpv3_securityname" name="new_check_snmpv3_securityname" value="" class="input text" size="20" maxlength="64"></td>
-</tr>
-<tr id="newCheckSecLevRow" class="hidden">
-	<td><label for="new_check_snmpv3_securitylevel"><?php print(_('SNMPv3 Security level')); ?></label></td>
-	<td><select id="new_check_snmpv3_securitylevel" name="new_check_snmpv3_securitylevel" class="input select" size="1">
-		<option value="0"><?php print('noAuthNoPriv'); ?> </option>
-		<option value="1"><?php print('authNoPriv'); ?> </option>
-		<option value="2"><?php print('authPriv'); ?> </option>
-	</select></td>
-</tr>
-<tr id="newCheckAuthPassRow" class="hidden">
-	<td><label for="new_check_snmpv3_authpassphrase"><?php print(_('SNMPv3 auth passphrase')); ?></label></td>
-	<td><input type="text" id="new_check_snmpv3_authpassphrase" name="new_check_snmpv3_authpassphrase" value="" class="input text" size="20" maxlength="64"></td>
-</tr>
-<tr id="newCheckPrivPassRow" class="hidden">
-	<td><label for="new_check_snmpv3_authpassphrase"><?php print(_('SNMPv3 priv passphrase')); ?></label></td>
-	<td><input type="text" id="new_check_snmpv3_privpassphrase" name="new_check_snmpv3_privpassphrase" value="" class="input text" size="20" maxlength="64"></td>
-</tr>
-</tbody></table>
-<input type="button" id="add_new_dcheck" name="add_new_dcheck" value="<?php print(_('Add'));?>" class="input button link_menu">
-&nbsp;&nbsp;<input type="button" id="cancel_new_dcheck" name="cancel_new_dcheck" value="<?php print(_('Cancel'));?>" class="input button link_menu">
-</div>
-</div>
+	<div id="new_check_form">
+		<div class="objectgroup inlineblock border_dotted ui-corner-all">
+			<table class="formElementTable">
+				<tbody>
+				<tr>
+					<td><label for="type"><?php print(_('Check type')); ?></label></td>
+					<td>
+						<select id="type" name="type" class="input select"></select>
+					</td>
+				</tr>
+				<tr id="newCheckPortsRow" class="hidden">
+					<td><label for="ports"><?php print(_('Ports')); ?></label></td>
+					<td><input type="text" id="ports" name="ports" value="" class="input text"
+							size="16" maxlength="255"></td>
+				</tr>
+				<tr id="newCheckCommunityRow" class="hidden">
+					<td><label for="snmp_community"><?php print(_('SNMP Community')); ?></label></td>
+					<td><input type="text" id="snmp_community" name="snmp_community" value=""
+							class="input text" size="20" maxlength="255"></td>
+				</tr>
+				<tr id="newCheckKeyRow" class="hidden">
+					<td><label for="key_"><?php print(_('SNMP Key')); ?></label></td>
+					<td><input type="text" id="key_" name="key_" value="" class="input text"
+							size="20" maxlength="255"></td>
+				</tr>
+				<tr id="newCheckSecNameRow" class="hidden">
+					<td><label for="snmpv3_securityname"><?php print(_('SNMPv3 Security name')); ?></label>
+					</td>
+					<td><input type="text" id="snmpv3_securityname" name="snmpv3_securityname"
+							value="" class="input text" size="20" maxlength="64"></td>
+				</tr>
+				<tr id="newCheckSecLevRow" class="hidden">
+					<td><label for="snmpv3_securitylevel"><?php print(_('SNMPv3 Security level')); ?></label>
+					</td>
+					<td><select id="snmpv3_securitylevel" name="snmpv3_securitylevel"
+							class="input select" size="1">
+						<option value="0"><?php print('noAuthNoPriv'); ?> </option>
+						<option value="1"><?php print('authNoPriv'); ?> </option>
+						<option value="2"><?php print('authPriv'); ?> </option>
+					</select></td>
+				</tr>
+				<tr id="newCheckAuthPassRow" class="hidden">
+					<td><label for="snmpv3_authpassphrase"><?php print(_('SNMPv3 auth passphrase')); ?></label></td>
+					<td><input type="text" id="snmpv3_authpassphrase" name="snmpv3_authpassphrase"
+							value="" class="input text" size="20" maxlength="64"></td>
+				</tr>
+				<tr id="newCheckPrivPassRow" class="hidden">
+					<td><label for="snmpv3_authpassphrase"><?php print(_('SNMPv3 priv passphrase')); ?></label></td>
+					<td><input type="text" id="snmpv3_privpassphrase" name="snmpv3_privpassphrase"
+							value="" class="input text" size="20" maxlength="64"></td>
+				</tr>
+				</tbody>
+			</table>
+			<input type="button" id="add_new_dcheck" name="add_new_dcheck" value="<?php print(_('Add'));?>"
+					class="input button link_menu">
+			&nbsp;&nbsp;<input type="button" id="cancel_new_dcheck" name="cancel_new_dcheck"
+				value="<?php print(_('Cancel'));?>" class="input button link_menu">
+		</div>
+	</div>
 </script>
 
 <script type="text/javascript">
@@ -163,50 +164,25 @@ function toggleInputs(id, state){
 }
 
 function addPopupValues(list){
-	var uniqTypeList = {};
-	uniqTypeList[ZBX_SVC.agent] = true;
-	uniqTypeList[ZBX_SVC.snmpv1] = true;
-	uniqTypeList[ZBX_SVC.snmpv2] = true;
-	uniqTypeList[ZBX_SVC.snmpv3] = true;
+	var uniqTypeList = Array(ZBX_SVC.agent, ZBX_SVC.snmpv1, ZBX_SVC.snmpv2, ZBX_SVC.snmpv3);
 
-	for(var i=0; i < list.values.length; i++){
-		if(empty(list.values[i])) continue;
-		var value = list.values[i];
+	var dcheckRowTpl = new Template(jQuery('#dcheckRowTPL').html());
+	var uniqRowTpl = new Template(jQuery('#uniqRowTPL').html());
 
-		var exists = false;
-		for(var dcheckid in ZBX_CHECKLIST){
-			if(ZBX_CHECKLIST[dcheckid]["key_"] == value["key_"]
-				&& ZBX_CHECKLIST[dcheckid]["type"] == value["type"]
-				&& ZBX_CHECKLIST[dcheckid]["name"] == value["name"]
-				&& ZBX_CHECKLIST[dcheckid]["ports"] == value["ports"]
-				&& ZBX_CHECKLIST[dcheckid]["snmp_community"] == value["snmp_community"]
-				&& ZBX_CHECKLIST[dcheckid]["snmpv3_authpassphrase"] == value["snmpv3_authpassphrase"]
-				&& ZBX_CHECKLIST[dcheckid]["snmpv3_privpassphrase"] == value["snmpv3_privpassphrase"]
-				&& ZBX_CHECKLIST[dcheckid]["snmpv3_securitylevel"] == value["snmpv3_securitylevel"]
-				&& ZBX_CHECKLIST[dcheckid]["snmpv3_securityname"] == value["snmpv3_securityname"]
-			){
-				exists = true;
-				break;
-			}
+	for(var i=0; i<list.length; i++){
+		if(empty(list[i])) continue;
+		var value = list[i];
+
+		ZBX_CHECKLIST[value.dcheckid] = value;
+
+		jQuery("#dcheckListFooter").before(dcheckRowTpl.evaluate(value));
+		for(var fieldname in value){
+			jQuery("#dcheckCell_"+value.dcheckid)
+					.append('<input name="dchecks['+value.dcheckid+']['+fieldname+']" type="hidden" value="'+value[fieldname]+'" />');
 		}
 
-		if(!exists){
-			ZBX_CHECKLIST[value.dcheckid] = value;
-
-			var dcheckRowTpl = new Template(jQuery('#dcheckRowTPL').html());
-			var uniqRowTpl = new Template(jQuery('#uniqRowTPL').html());
-
-			switch(list.object){
-				case 'dcheckid':
-					if(jQuery("#dcheckRow_"+value.dcheckid).length) continue;
-
-					jQuery("#dcheckListFooter").before(dcheckRowTpl.evaluate(value));
-
-					if(isset(parseInt(value.type, 10), uniqTypeList)){
-						jQuery("#uniqList").append(uniqRowTpl.evaluate(value));
-					}
-					break;
-			}
+		if(jQuery.inArray(parseInt(value.type, 10), uniqTypeList) !== -1){
+			jQuery("#uniqList").append(uniqRowTpl.evaluate(value));
 		}
 	}
 }
@@ -226,11 +202,8 @@ function showNewCheckForm(e, dcheckType){
 		var tpl = new Template(jQuery('#newDCheckTPL').html());
 		jQuery("#dcheckList").after(tpl.evaluate());
 
-		jQuery("#new_check_type").change(function(){
-			updateNewDCheckType();
-			jQuery('#newCheckErrors').empty();
-		});
-		jQuery("#new_check_snmpv3_securitylevel").change(updateNewDCheckSNMPType);
+		jQuery("#type").change(updateNewDCheckType);
+		jQuery("#snmpv3_securitylevel").change(updateNewDCheckSNMPType);
 		jQuery("#add_new_dcheck").click(saveNewDCheckForm);
 		jQuery("#cancel_new_dcheck").click(function(){ jQuery('#new_check_form').remove(); });
 
@@ -242,21 +215,19 @@ function showNewCheckForm(e, dcheckType){
 			portNameOrder.push(svcPorts[key]);
 			portNameSvcValue[svcPorts[key]] = key;
 		}
-
 		portNameOrder.sort();
 // ---
 		for(var i=0; i < portNameOrder.length; i++){
 			var portName = portNameOrder[i];
-			jQuery('#new_check_type').append(jQuery('<option>').attr({'value': portNameSvcValue[portName]}).text(portName));
+			jQuery('#type').append(jQuery('<option>').attr({'value': portNameSvcValue[portName]}).text(portName));
 		}
-
 	}
 
 	updateNewDCheckType(e);
 }
 
 function updateNewDCheckType(e){
-	var dcheckType = parseInt(jQuery("#new_check_type").val(), 10);
+	var dcheckType = parseInt(jQuery("#type").val(), 10);
 
 	var keyRowTypes = {};
 	keyRowTypes[ZBX_SVC.agent] = true;
@@ -284,14 +255,14 @@ function updateNewDCheckType(e){
 	toggleInputs('newCheckSecLevRow', isset(dcheckType, SecNameRowTypes));
 
 	if(ZBX_SVC.icmp != dcheckType)
-		jQuery('#new_check_ports').val(discoveryCheckDefaultPort(dcheckType));
+		jQuery('#ports').val(discoveryCheckDefaultPort(dcheckType));
 
 	updateNewDCheckSNMPType(e);
 }
 
 function updateNewDCheckSNMPType(e){
-	var dcheckType = parseInt(jQuery("#new_check_type").val(), 10);
-	var dcheckSecLevType = parseInt(jQuery("#new_check_snmpv3_securitylevel").val(), 10);
+	var dcheckType = parseInt(jQuery("#type").val(), 10);
+	var dcheckSecLevType = parseInt(jQuery("#snmpv3_securitylevel").val(), 10);
 
 	var SecNameRowTypes = {};
 	SecNameRowTypes[ZBX_SVC.snmpv3] = true;
@@ -305,51 +276,91 @@ function updateNewDCheckSNMPType(e){
 
 function saveNewDCheckForm(e){
 	jQuery("#add_new_dcheck").attr('disabled', 'disabled');
-	jQuery('#newCheckErrors').empty();
 
-	var formData = jQuery('#new_check_form').find('input,select').serializeJSON();
+	var dCheck = jQuery('#new_check_form :input:enabled').serializeJSON();
 
-	var dCheck = {
-		dcheckid: jQuery("#dcheckList tr[id^=dcheckRow_]").length,
-		name: jQuery('#new_check_type :selected').text()
-	};
-
+	dCheck.dcheckid = jQuery("#dcheckList tr[id^=dcheckRow_]").length;
 	while(jQuery("#uniqueness_criteria_"+dCheck.dcheckid).length || jQuery("#dcheckRow_"+dCheck.dcheckid).length)
 		dCheck.dcheckid++;
 
-	for(var key in formData){
-		var name = key.split('new_check_');
-		if(name.length != 2) continue;
-
-		dCheck[name[1]] = formData[key];
-	}
-
+	dCheck.name = jQuery('#type :selected').text();
 	if((typeof dCheck.ports != 'undefined') && (dCheck.ports != discoveryCheckDefaultPort(dCheck.type)))
 		dCheck.name += ' ('+dCheck.ports+')';
+	if(dCheck.key_) dCheck.name += ' "'+dCheck.key_+'"';
 
-	if(!empty(dCheck.key_)) dCheck.name += ' "'+dCheck.key_+'"';
 
-	var url = new Curl();
-	var params = {
-		ajaxaction: 'validate',
-		ajaxdata: jQuery('#new_check_form :input').serializeJSON()
-	};
-	jQuery.post(url.getPath()+'?output=ajax&sid='+url.getArgument('sid'), params, function(result){
-		if(result.result){
-			addPopupValues({
-				object: 'dcheckid',
-				values: [dCheck]
+	try{
+		var ajaxChecks = {
+			ajaxaction: 'validate',
+			ajaxdata: new Array()
+		};
+
+		for(var dcheckid in ZBX_CHECKLIST){
+			console.log(ZBX_CHECKLIST[dcheckid]);
+			if(((typeof dCheck["key_"] == 'undefined') || (ZBX_CHECKLIST[dcheckid]["key_"] === dCheck["key_"]))
+					&& ((typeof dCheck["type"] == 'undefined') || (ZBX_CHECKLIST[dcheckid]["type"] === dCheck["type"]))
+					&& ((typeof dCheck["ports"] == 'undefined') || (ZBX_CHECKLIST[dcheckid]["ports"] === dCheck["ports"]))
+					&& ((typeof dCheck["snmp_community"] == 'undefined') || (ZBX_CHECKLIST[dcheckid]["snmp_community"] === dCheck["snmp_community"]))
+					&& ((typeof dCheck["snmpv3_authpassphrase"] == 'undefined') || (ZBX_CHECKLIST[dcheckid]["snmpv3_authpassphrase"] === dCheck["snmpv3_authpassphrase"]))
+					&& ((typeof dCheck["snmpv3_privpassphrase"] == 'undefined') || (ZBX_CHECKLIST[dcheckid]["snmpv3_privpassphrase"] === dCheck["snmpv3_privpassphrase"]))
+					&& ((typeof dCheck["snmpv3_securitylevel"] == 'undefined') || (ZBX_CHECKLIST[dcheckid]["snmpv3_securitylevel"] === dCheck["snmpv3_securitylevel"]))
+					&& ((typeof dCheck["snmpv3_securityname"] == 'undefined') || (ZBX_CHECKLIST[dcheckid]["snmpv3_securityname"] === dCheck["snmpv3_securityname"]))
+			){
+				throw '<?php echo _('Check already exists.'); ?>';
+			}
+		}
+		console.log(dCheck);
+
+		switch(parseInt(dCheck.type, 10)){
+			case ZBX_SVC.agent:
+				ajaxChecks.ajaxdata.push({
+					field: 'itemKey',
+					value: dCheck.key_
+				});
+				break;
+			case ZBX_SVC.snmpv1:
+			case ZBX_SVC.snmpv2:
+				if(dCheck.snmp_community == '')
+					throw '<?php echo _('SNMP Community cannot be empty.'); ?>';
+			case ZBX_SVC.snmpv3:
+				if(dCheck.key_ == '')
+				throw '<?php echo _('SNMP OID cannot be empty.'); ?>';
+				break;
+		}
+
+		if(dCheck.type != ZBX_SVC.icmp){
+			ajaxChecks.ajaxdata.push({
+				field: 'port',
+				value: dCheck.ports
 			});
-			jQuery('#new_check_form').remove();
+		}
+
+		if(ajaxChecks.ajaxdata.length){
+			var url = new Curl();
+			jQuery.post(url.getPath()+'?output=ajax&sid='+url.getArgument('sid'), ajaxChecks, function(result){
+				if(result.result){
+					addPopupValues([dCheck]);
+					jQuery('#new_check_form').remove();
+				}
+				else{
+					var errors = new Array;
+					jQuery.each(result.errors, function(i, val){
+						errors.push(val.error);
+					});
+					alert(errors.join('\n'));
+					jQuery("#add_new_dcheck").removeAttr('disabled');
+				}
+			}, 'json');
 		}
 		else{
-			jQuery.each(result.errors, function(i, val){
-				jQuery('#newCheckErrors').append(val.error+'\n');
-			});
+			addPopupValues([dCheck]);
+			jQuery('#new_check_form').remove();
 		}
-
+	}
+	catch(error){
+		alert(error);
 		jQuery("#add_new_dcheck").removeAttr('disabled');
-	}, 'json');
+	}
 }
 
 jQuery(document).ready(function(){

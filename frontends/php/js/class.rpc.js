@@ -41,7 +41,7 @@ rpcurl: function(rpcurl_){
 	if('undefined' == typeof(rpcurl_)) return this._rpcurl;
 	else this._rpcurl = rpcurl_;
 }
-}
+};
 
 RPC.Base = Class.create({
 // PRIVATE
@@ -61,7 +61,7 @@ initialize: function(userParams){
 		'request':	{},
 		'onSucces': function(){},
 		'onFailure': function(){}
-	}
+	};
 
 	Object.extend(this.userParams, userParams || { });
 
@@ -99,18 +99,18 @@ call: function(){
 //---
 	var header = {
 		'Content-type': 'application/json-rpc'
-	}
+	};
 
 	var body = {
 		'jsonrpc': '2.0',
 		'method': this.userParams.method,
 		'params': this.userParams.params,
 		'auth': this.auth
-	}
+	};
 
 	var request = {
 		'requestHeaders': header
-	}
+	};
 
 	if(this.userParams.notification == 0){
 		body.id = this.callid;
@@ -147,13 +147,11 @@ processError: function(resp){
 // JSON request failed OR server responded with incorrect JSON
 	if(is_null(resp) || !isset('responseJSON', resp)){
 		throw('RPC call ['+this.userParams.method+'] request failed');
-		return true;
 	}
 
 // JSON have wrong header or no respond at all
 	if(empty(resp.responseJSON)){
 		throw('RPC: Server call ['+this.userParams.method+'] responded with incorrect JSON.');
-		return true;
 	}
 
 // RPC responded with error || with incorrect JSON
@@ -163,10 +161,9 @@ processError: function(resp){
 	}
 	else if(!isset('result', resp.responseJSON)){
 		throw('RPC: Server call ['+this.userParams.method+'] responded with incorrect JSON.');
-		return true;
 	}
 
-return false;
+	return false;
 }
 }
 );
