@@ -101,7 +101,7 @@ if(isset($_REQUEST['save_trigger'])){
 //---
 			if($triggerData['templateid']){
 				$_REQUEST['description'] = $triggerData['description'];
-				$expression = explode_exp($triggerData['expression'],0);
+				$expression = explode_exp($triggerData['expression']);
 			}
 
 			$trigger = array();
