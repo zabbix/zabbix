@@ -30,69 +30,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: str_linefeed                                                     *
- *                                                                            *
- * Purpose: wrap long string at specified position with linefeeds             *
- *                                                                            *
- * Parameters: src     - input string                                         *
- *             maxline - maximum length of a line                             *
- *                                                                            *
- * Return value: newly allocated copy of input string with linefeeds          *
- *                                                                            *
- * Author: Vladimir Levijev                                                   *
- *                                                                            *
- * Comments: allocates memory                                                 *
- *                                                                            *
- ******************************************************************************/
-static char	*str_linefeed(const char *src, size_t maxline)
-{
-	size_t	src_size;	/* input length */
-	size_t	dst_size;	/* output length */
-	int	feeds;		/* number of feeds */
-	size_t	left;		/* what's left after last feed */
-	char	*dst = NULL;	/* output with linefeeds */
-
-	const char	*p_src;	/* working pointer to input */
-	char		*p_dst;	/* working pointer to output */
-
-	src_size = strlen(src);
-	feeds = src_size / maxline - (0 != src_size % maxline ? 0 : 1);	/* we don't want to feed the last line */
-	left = src_size - feeds * maxline;
-	dst_size = src_size + feeds * 2 + 1;	/* 2 symbols per linefeed */
-
-	/* allocate memory for output */
-	dst = zbx_malloc(dst, dst_size);
-
-	p_src = src;
-	p_dst = dst;
-
-	/* copy chunks appending linefeeds */
-	while (0 < feeds--)
-	{
-		memcpy(p_dst, p_src, maxline);
-
-		p_dst += maxline;
-		p_src += maxline;
-
-		*p_dst++ = '\r';
-		*p_dst++ = '\n';
-	}
-
-	if (0 < left)
-	{
-		/* copy what's left */
-
-		memcpy(p_dst, p_src, left);
-		p_dst += left;
-	}
-
-	*p_dst = '\0';
-
-	return dst;
-}
-
-/******************************************************************************
- *                                                                            *
  * Comments: reads until '\n'                                                 *
  *                                                                            *
  ******************************************************************************/
@@ -276,7 +213,7 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 	str_base64_encode_dyn(localbody, &base64, strlen(localbody));
 
 	/* wrap base64 encoded data with linefeeds */
-	base64_lf = str_linefeed(base64, ZBX_EMAIL_B64_MAXLINE);
+	base64_lf = str_linefeed(base64, ZBX_EMAIL_B64_MAXLINE, "\r\n");
 	zbx_free(base64);
 	base64 = base64_lf;
 
