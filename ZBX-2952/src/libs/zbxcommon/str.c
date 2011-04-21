@@ -3161,9 +3161,8 @@ char	*str_linefeed(const char *src, size_t maxline, const char *delim)
 	while (0 < feeds--)
 	{
 		memcpy(p_dst, p_src, maxline);
-
-		p_dst += maxline;
 		p_src += maxline;
+		p_dst += maxline;
 
 		memcpy(p_dst, delim, delim_size);
 		p_dst += delim_size;
