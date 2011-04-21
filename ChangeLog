@@ -9,6 +9,7 @@ New features:
  - [ZBXNEXT-511] renamed item description to name, for description introduced new field (asaveljevs, Vedmak)
 
 Bug fixes:
+ - [ZBX-3704] added default condition trigger value = problem for new actions (Vedmak)
  - [ZBX-3729] fixed server crash when failing to resolve interface-related macros in item keys (asaveljevs)
  - [ZBX-2885] fixed 00:00-23:59 vs. 00:00-24:00 inconsistency for periods (dimir)
  - [ZBX-3687] fixed link color for lld rules (Vedmak)
