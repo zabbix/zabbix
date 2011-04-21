@@ -129,15 +129,11 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 			zbx_ltrim(line, ZBX_CFG_LTRIM_CHARS);
 			zbx_rtrim(line, ZBX_CFG_RTRIM_CHARS);
 
-			if ('#' == *line)
-				continue;
-			if (0 == strlen(line))
+			if ('#' == *line || '\0' == *line)
 				continue;
 
 			parameter = line;
-			value = strstr(line, "=");
-
-			if (NULL == value)
+			if (NULL == (value = strchr(line, '=')))
 				goto garbage;
 
 			*value++ = '\0';
