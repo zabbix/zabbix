@@ -1281,7 +1281,7 @@ class CItem extends CItemGeneral{
 
 	/**
 	 * Check, if items that are about to be inserted or updated violate the rule:
-	 * only one item can be linked to a profile filed
+	 * only one item can be linked to a profile filed.
 	 * If everything is ok, function return true or throws Exception otherwise
 	 * @static
 	 * @param array $items
@@ -1347,7 +1347,7 @@ class CItem extends CItemGeneral{
 			$hostIds = zbx_objectValues($items, 'hostid');
 		}
 
-		// getting all this profile links on every affected host
+		// getting all profile links on every affected host
 		$options = array(
 			'output' => array('profile_link', 'hostid'),
 			'filter' => array(
@@ -1373,7 +1373,9 @@ class CItem extends CItemGeneral{
 
 		// now, when we have all required info, checking it against every item
 		foreach($items as $item){
-			if(($update && $item['profile_link'] != 0) || ($item['profile_link'] != 0 && $item['value_type'] != 2) // for log items check is not needed (value_type != 2)
+			if(
+				($update && $item['profile_link'] != 0)
+				|| ($item['profile_link'] != 0 && $item['value_type'] != 2) // for log items check is not needed (value_type != 2)
 			){
 				// does profile field with provided number exists?
 				if(!isset($possibleHostProfiles[$item['profile_link']])){
@@ -1384,7 +1386,11 @@ class CItem extends CItemGeneral{
 				}
 
 				// is this field already populated by another item on this host?
-				if(isset($linksOnHosts[$item['hostid']]) && in_array($item['profile_link'], $linksOnHosts[$item['hostid']])){
+				if(
+					isset($linksOnHosts[$item['hostid']])
+					&& in_array($item['profile_link'], $linksOnHosts[$item['hostid']])
+					&& (!$update || $item['templateid'] == 0) // when linking template, we need to check only those items, that are not present in template, others will be overwritten anyway
+				){
 					self::exception(
 						ZBX_API_ERROR_PARAMETERS,
 						_('Two items cannot populate one host profile field, this would lead to a conflict. Chosen field is already being populated by item another item.')
