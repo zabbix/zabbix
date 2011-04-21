@@ -48,28 +48,26 @@ static char	*str_linefeed(const char *src, size_t maxline)
 {
 	size_t	src_size;	/* input length */
 	size_t	dst_size;	/* output length */
-	int	feeds;	/* number of feeds */
-	size_t	left;	/* what's left after last feed */
+	int	feeds;		/* number of feeds */
+	size_t	left;		/* what's left after last feed */
 	char	*dst = NULL;	/* output with linefeeds */
 
-	const char	*p_src = NULL;	/* working pointer to input */
-	char	*p_dst = NULL;	/* working pointer to output */
+	const char	*p_src;	/* working pointer to input */
+	char		*p_dst;	/* working pointer to output */
 
 	src_size = strlen(src);
-	feeds = src_size / maxline - (src_size % maxline ? 0 : 1);	/* we don't want to feed the last line */
+	feeds = src_size / maxline - (0 != src_size % maxline ? 0 : 1);	/* we don't want to feed the last line */
 	left = src_size - feeds * maxline;
 	dst_size = src_size + feeds * 2 + 1;	/* 2 symbols per linefeed */
 
-	p_src = src;
-
 	/* allocate memory for output */
-	dst = zbx_malloc(NULL, dst_size);
-	memset(dst, 0, dst_size);
+	dst = zbx_malloc(dst, dst_size);
 
+	p_src = src;
 	p_dst = dst;
 
 	/* copy chunks appending linefeeds */
-	while (feeds--)
+	while (0 < feeds--)
 	{
 		memcpy(p_dst, p_src, maxline);
 
@@ -85,17 +83,19 @@ static char	*str_linefeed(const char *src, size_t maxline)
 		/* copy what's left */
 
 		memcpy(p_dst, p_src, left);
-		p_src += left;
 		p_dst += left;
 	}
 
 	*p_dst = '\0';
+
 	return dst;
 }
 
-/*
- * smtp_readln reads until '\n'
- */
+/******************************************************************************
+ *                                                                            *
+ * Comments: reads until '\n'                                                 *
+ *                                                                            *
+ ******************************************************************************/
 ssize_t smtp_readln(int fd, char *buf, int buf_len)
 {
 	ssize_t	nbytes, read_bytes;
@@ -124,9 +124,6 @@ ssize_t smtp_readln(int fd, char *buf, int buf_len)
 	return read_bytes;
 }
 
-/*
- * Send email
- */
 int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_email, const char *mailto,
 		const char *mailsubject, const char *mailbody, char *error, int max_error_len)
 {
