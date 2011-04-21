@@ -599,7 +599,7 @@ include_once('include/page_header.php');
 					if(count($graph['hosts']) > 1)
 						continue;
 
-					if (httpitems_exists($graph['items']))
+					if (httpitemExists($graph['items']))
 						continue;
 
 					if(!copy_graph_to_host($graph['graphid'], $hostid, true))

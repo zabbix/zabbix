@@ -3885,7 +3885,7 @@ function utf8RawUrlDecode($source){
 			$hash = array();
 
 			foreach($triggers as $trigger){
-				if (httpitems_exists($trigger['items']))
+				if (httpitemExists($trigger['items']))
 					continue;
 
 				$trigger['expression'] = explode_exp($trigger['expression'], false, false, $src['host'], $dest['host']);
@@ -3898,7 +3898,7 @@ function utf8RawUrlDecode($source){
 			}
 
 			foreach($triggers as $trigger){
-				if (httpitems_exists($trigger['items']))
+				if (httpitemExists($trigger['items']))
 					continue;
 
 				foreach($trigger['dependencies'] as $dep){

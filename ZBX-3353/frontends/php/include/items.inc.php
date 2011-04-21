@@ -1754,7 +1754,7 @@
 	}
 
 /*
- * Function: httpitems_exists
+ * Function: httpitemExists
  *
  * Description:
  *     Function returns true if http items exists in the $items array.
@@ -1766,7 +1766,7 @@
  * Comments:
  *
  */
-	function httpitems_exists($items){
+	function httpitemExists($items){
 		foreach($items as $item)
 			if ($item['type'] == ITEM_TYPE_HTTPTEST)
 				return true;

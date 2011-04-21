@@ -4435,13 +4435,13 @@ JAVASCRIPT;
 
 				order_result($host_triggers, 'description');
 				foreach($host_triggers as $htrigger){
-					if (httpitems_exists($htrigger['items']))
+					if (httpitemExists($htrigger['items']))
 						continue;
 
 					$trig_lbx->addItem($htrigger['triggerid'], $htrigger['description']);
 				}
 
-				if($trig_lbx->itemsCount() > 0)
+				if($trig_lbx->itemsCount())
 					$host_tbl->addRow(array(S_TRIGGERS, $trig_lbx));
 				unset($trig_lbx);
 			}
@@ -4465,13 +4465,13 @@ JAVASCRIPT;
 					if(count($hgraph['hosts']) > 1)
 						continue;
 
-					if (httpitems_exists($hgraph['items']))
+					if (httpitemExists($hgraph['items']))
 						continue;
 
 					$graphs_lbx->addItem($hgraph['graphid'], $hgraph['name']);
 				}
 
-				if($graphs_lbx->ItemsCount())
+				if($graphs_lbx->itemsCount())
 					$host_tbl->addRow(array(S_GRAPHS, $graphs_lbx));
 				unset($graphs_lbx);
 			}
