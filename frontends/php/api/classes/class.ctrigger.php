@@ -56,7 +56,7 @@ class CTrigger extends CZBXAPI{
 
 		$sort_columns = array('triggerid', 'description', 'status', 'priority', 'lastchange'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
-
+		$fields_to_unset = array();
 
 		$sql_parts = array(
 			'select' => array('triggers' => 't.triggerid'),
@@ -125,7 +125,6 @@ class CTrigger extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
-
 		if(!is_null($options['extendoutput'])){
 			$options['output'] = API_OUTPUT_EXTEND;
 
@@ -144,6 +143,16 @@ class CTrigger extends CZBXAPI{
 			unset($sql_parts['select']['triggers']);
 			foreach($options['output'] as $key => $field){
 				$sql_parts['select'][$field] = ' t.'.$field;
+			}
+
+			if (!is_null($options['expandDescription'])){
+				if(!str_in_array('description', $options['output'])){
+					$options['expandDescription'] = null;
+				}
+				else if(!str_in_array('expression', $options['output'])){
+					$sql_parts['select']['expression'] = ' t.expression';
+					$fields_to_unset[] = 'expression';
+				}
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;
@@ -981,12 +990,19 @@ Copt::memoryPick();
 			}
 		}
 
+		if (!empty($fields_to_unset)){
+			foreach($result as $tnum => $trigger){
+				foreach($fields_to_unset as $field_to_unset){
+					unset($result[$tnum][$field_to_unset]);
+				}
+			}
+		}
+
 COpt::memoryPick();
 // removing keys (hash -> array)
 		if(is_null($options['preservekeys'])){
 			$result = zbx_cleanHashes($result);
 		}
-
 	return $result;
 	}
 
@@ -1015,7 +1031,7 @@ COpt::memoryPick();
 		$result = self::get($options);
 		if(isset($triggerData['expression'])){
 			foreach($result as $tnum => $trigger){
-				$tmp_exp = explode_exp($trigger['expression'], false);
+				$tmp_exp = explode_exp($trigger['expression']);
 
 				if(strcmp(trim($tmp_exp,' '), trim($triggerData['expression'],' ')) != 0) {
 					unset($result[$tnum]);
@@ -1054,7 +1070,7 @@ COpt::memoryPick();
 
 		$triggers = self::get($options);
 		foreach($triggers as $tnum => $trigger){
-			$tmp_exp = explode_exp($trigger['expression'], false);
+			$tmp_exp = explode_exp($trigger['expression']);
 			if(strcmp($tmp_exp, $object['expression']) == 0){
 				$result = true;
 				break;
@@ -1174,7 +1190,7 @@ COpt::memoryPick();
 			foreach($triggers as $tnum => $trigger){
 
 				$trigger_db_fields = $upd_triggers[$trigger['triggerid']];
-				$trigger_db_fields['expression'] = explode_exp($trigger_db_fields['expression'], false);
+				$trigger_db_fields['expression'] = explode_exp($trigger_db_fields['expression']);
 				if(!check_db_fields($trigger_db_fields, $trigger)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for trigger');
 				}

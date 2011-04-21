@@ -191,7 +191,7 @@ include_once('include/page_header.php');
 		);
 		$triggers = CTrigger::get($params);
 		foreach($triggers as $tnum => $trigger){
-			$triggers[$trigger['triggerid']]['expression'] = explode_exp($trigger['expression'], false);
+			$triggers[$trigger['triggerid']]['expression'] = explode_exp($trigger['expression']);
 		}
 
 // SELECT TRIGGER DEPENDENCIES
