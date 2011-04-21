@@ -39,6 +39,18 @@ class CGetForm{
 		$this->data = $data;
 	}
 
+	public function set($var, $value){
+		$this->data[$var] = $value;
+	}
+
+	public function get($var){
+		return isset($this->data[$var]) ? $this->data[$var] : '';
+	}
+
+	public function getArray($var){
+		return isset($this->data[$var]) ? $this->data[$var] : array();
+	}
+
 	public function render(){
 		$data = $this->data;
 
