@@ -224,7 +224,7 @@
 	$hostList->addRow(_('Status'),$cmbStatus);
 
 	if($_REQUEST['form'] == 'full_clone'){
-// Items
+		// host items
 		$hostItems = API::Item()->get(array(
 			'hostids' => $_REQUEST['hostid'],
 			'inherited' => false,
@@ -245,42 +245,56 @@
 			$hostList->addRow(_('Items'), $listBox);
 		}
 
-// Triggers
+		// host triggers
 		$hostTriggers = API::Trigger()->get(array(
 			'inherited' => false,
 			'hostids' => $_REQUEST['hostid'],
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array('triggerid', 'description'),
+			'selectItems' => API_OUTPUT_EXTEND,
 			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)),
 			'expandDescription' => true,
 		));
+
 		if(!empty($hostTriggers)){
 			$triggersList = array();
+
 			foreach($hostTriggers as $hostTrigger){
+				if (httpitemExists($hostTrigger['items']))
+					continue;
+
 				$triggersList[$hostTrigger['triggerid']] = $hostTrigger['description'];
 			}
-			order_result($triggersList);
 
-			$listBox = new CListBox('triggers', null, 8);
-			$listBox->setAttribute('disabled', 'disabled');
-			$listBox->addItems($triggersList);
+			if(!empty($hostTriggers)){
+				order_result($triggersList);
 
-			$hostList->addRow(_('Triggers'), $listBox);
+				$listBox = new CListBox('triggers', null, 8);
+				$listBox->setAttribute('disabled', 'disabled');
+				$listBox->addItems($triggersList);
+
+				$hostList->addRow(_('Triggers'), $listBox);
+			}
 		}
 
-// Graphs
+		// host graphs
 		$hostGraphs = API::Graph()->get(array(
 			'inherited' => false,
 			'hostids' => $_REQUEST['hostid'],
 			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)),
 			'selectHosts' => API_OUTPUT_REFER,
+			'selectItems' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND,
 		));
 		if(!empty($hostGraphs)){
 			$graphsList = array();
 			foreach($hostGraphs as $hostGraph){
-				if(count($hostGraph['hosts']) == 1){
-					$graphsList[$hostGraph['graphid']] = $hostGraph['name'];
-				}
+				if(count($hostGraph['hosts']) > 1)
+					continue;
+
+				if (httpitemExists($hostGraph['items']))
+					continue;
+
+				$graphsList[$hostGraph['graphid']] = $hostGraph['name'];
 			}
 			order_result($graphsList);
 

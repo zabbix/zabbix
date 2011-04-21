@@ -2035,7 +2035,7 @@ COpt::memoryPick();
 		while($trigger = DBfetch($db_triggers)){
 			$triggers[$trigger['flags']][$trigger['triggerid']] = array(
 				'description' => $trigger['description'],
-				'expression' => explode_exp($trigger['expression'], false),
+				'expression' => explode_exp($trigger['expression']),
 			);
 		}
 
