@@ -36,6 +36,7 @@ typedef enum
 {
 	PERF_COUNTER_NOTSUPPORTED = 0,
 	PERF_COUNTER_INITIALIZED,
+	PERF_COUNTER_GET_SECOND_VALUE,	/* waiting for the second raw value (needed for some, e.g. rate, counters) */
 	PERF_COUNTER_ACTIVE,
 };
 
@@ -53,11 +54,13 @@ typedef struct perf_counter_data
 	char				*name;
 	char				*counterpath;
 	int				interval;
-	PDH_RAW_COUNTER			*rawValueArray;
-	HCOUNTER			handle;
-	int				CurrentCounter;
-	int				CurrentNum;
 	int				status;
+	HCOUNTER			handle;
+	PDH_RAW_COUNTER			rawValues[2];	/* rate counters need two raw values */
+	int				olderRawValue;	/* index of the older of both values */
+	double				*value_array;	/* a circular buffer of values */
+	int				value_current;	/* index of the last stored value */
+	int				value_count;	/* number of values in the array */
 }
 PERF_COUNTER_DATA;
 
@@ -68,7 +71,7 @@ PDH_STATUS	zbx_PdhAddCounter(const char *function, PERF_COUNTER_DATA *counter, P
 PDH_STATUS	zbx_PdhCollectQueryData(const char *function, const char *counterpath, PDH_HQUERY query);
 PDH_STATUS	zbx_PdhGetRawCounterValue(const char *function, const char *counterpath, PDH_HCOUNTER handle, PPDH_RAW_COUNTER value);
 
-PDH_STATUS	calculate_counter_value(const char *function, const char *counterpath, DWORD dwFormat, PPDH_FMT_COUNTERVALUE value);
+PDH_STATUS	calculate_counter_value(const char *function, const char *counterpath, double *value);
 LPTSTR		get_counter_name(DWORD pdhIndex);
 int		check_counter_path(char *counterPath);
 

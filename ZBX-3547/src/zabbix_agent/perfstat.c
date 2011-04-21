@@ -37,8 +37,9 @@ static ZBX_MUTEX		perfstat_access;
 static void	deactivate_perf_counter(PERF_COUNTER_DATA *counter)
 {
 	counter->status = PERF_COUNTER_NOTSUPPORTED;
-	counter->CurrentCounter = 0;
-	counter->CurrentNum = 0;
+	counter->value_count = 0;
+	counter->value_current = -1;
+	counter->olderRawValue = 0;
 }
 
 /******************************************************************************
@@ -78,12 +79,14 @@ PERF_COUNTER_DATA	*add_perf_counter(const char *name, const char *counterpath, i
 		{
 			cptr = (PERF_COUNTER_DATA *)zbx_malloc(cptr, sizeof(PERF_COUNTER_DATA));
 
+			/* initialize the counter */
 			memset(cptr, 0, sizeof(PERF_COUNTER_DATA));
 			if (NULL != name)
 				cptr->name = strdup(name);
 			cptr->counterpath = strdup(counterpath);
 			cptr->interval = interval;
-			cptr->rawValueArray = (PDH_RAW_COUNTER *)zbx_malloc(cptr->rawValueArray, sizeof(PDH_RAW_COUNTER) * interval);
+			cptr->value_current = -1;
+			cptr->value_array = (double *)zbx_malloc(cptr->value_array, sizeof(double) * interval);
 
 			/* add the counter to the query */
 			pdh_status = zbx_PdhAddCounter(__function_name, cptr, ppsd->pdh_query, counterpath, &cptr->handle);
@@ -94,7 +97,7 @@ PERF_COUNTER_DATA	*add_perf_counter(const char *name, const char *counterpath, i
 			zbx_mutex_unlock(&perfstat_access);
 
 			if (ERROR_SUCCESS != pdh_status && PDH_CSTATUS_NO_INSTANCE != pdh_status)
-				cptr = NULL; /* indicate a failure */
+				cptr = NULL;	/* indicate a failure */
 
 			result = SUCCEED;
 			break;
@@ -194,7 +197,7 @@ void	remove_perf_counter(PERF_COUNTER_DATA *counter)
 	PdhRemoveCounter(counter->handle);
 	zbx_free(counter->name);
 	zbx_free(counter->counterpath);
-	zbx_free(counter->rawValueArray);
+	zbx_free(counter->value_array);
 	zbx_free(counter);
 }
 
@@ -211,7 +214,7 @@ static void	free_perf_counter_list()
 
 		zbx_free(cptr->name);
 		zbx_free(cptr->counterpath);
-		zbx_free(cptr->rawValueArray);
+		zbx_free(cptr->value_array);
 		zbx_free(cptr);
 	}
 
@@ -220,41 +223,29 @@ static void	free_perf_counter_list()
 
 /******************************************************************************
  *                                                                            *
- * Comments: if succeeds, counter->status is set to PERF_COUNTER_ACTIVE       *
+ * Comments: must be called only for PERF_COUNTER_ACTIVE counters,            *
+ *           interval must less than counter->interval                        *
  *                                                                            *
  ******************************************************************************/
 double	compute_counter_statistics(const char *function, PERF_COUNTER_DATA *counter, int interval)
 {
-	PDH_STATISTICS	statData;
-	PDH_STATUS	pdh_status;
+	double sum = 0;
+	int i, j, count;
 
-	if (PERF_COUNTER_ACTIVE != counter->status)
+	if (PERF_COUNTER_ACTIVE != counter->status || interval > counter->interval)
 		return 0;
 
 	if (USE_DEFAULT_INTERVAL == interval)
 		interval = counter->interval;
 
-	if (ERROR_SUCCESS != (pdh_status = PdhComputeCounterStatistics(
-		counter->handle,
-		PDH_FMT_DOUBLE,
-		(counter->CurrentNum < interval ? 0 : (counter->CurrentCounter - interval + counter->interval) % counter->interval),
-		(counter->CurrentNum < interval ? counter->CurrentNum : interval),
-		counter->rawValueArray,
-		&statData
-		)))
-	{
-		/* rate counters need multiple values, deactivate otherwise */
-		if (1 == counter->CurrentNum && PDH_CSTATUS_INVALID_DATA == pdh_status)
-			counter->status = PERF_COUNTER_INITIALIZED;
-		else
-			deactivate_perf_counter(counter);
+	i = counter->value_current;
+	count = (counter->value_count < interval ? counter->value_count : interval);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot calculate counter statistics \"%s\": %s",
-				function, counter->counterpath, strerror_from_module(pdh_status, L"PDH.DLL"));
-		return 0;
-	}
+	/* cycle backwards through the circular buffer of values */
+	for (j = 0; j < count; j++, i = (0 < i ? i - 1 : counter->interval - 1))
+		sum += counter->value_array[i];
 
-	return statData.mean.doubleValue;
+	return (sum / (double)count);
 }
 
 int	init_perf_collector(ZBX_PERF_STAT_DATA *pperf)
@@ -311,11 +302,12 @@ void	collect_perfstat()
 	PERF_COUNTER_DATA	*cptr;
 	PDH_STATUS		pdh_status;
 	time_t			now;
+	PDH_FMT_COUNTERVALUE	value;
 
-	if (NULL == ppsd->pdh_query) /* collector is not started */
+	if (NULL == ppsd->pdh_query)	/* collector is not started */
 		return;
 
-	if (NULL == ppsd->pPerfCounterList) /* no counters */
+	if (NULL == ppsd->pPerfCounterList)	/* no counters */
 		return;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -345,7 +337,8 @@ void	collect_perfstat()
 				deactivate_perf_counter(cptr);
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "call to PdhCollectQueryData() failed: %s", strerror_from_module(pdh_status, L"PDH.DLL"));
+		zabbix_log(LOG_LEVEL_DEBUG, "call to PdhCollectQueryData() failed: %s",
+				strerror_from_module(pdh_status, L"PDH.DLL"));
 
 		return;
 	}
@@ -357,17 +350,41 @@ void	collect_perfstat()
 			continue;
 
 		if (ERROR_SUCCESS != zbx_PdhGetRawCounterValue(__function_name, cptr->counterpath,
-				cptr->handle, &cptr->rawValueArray[cptr->CurrentCounter]))
+				cptr->handle, &cptr->rawValues[cptr->olderRawValue]))
 		{
 			deactivate_perf_counter(cptr);
 			continue;
 		}
+		cptr->olderRawValue = (cptr->olderRawValue + 1) % 2;
 
-		cptr->status = PERF_COUNTER_ACTIVE;
-		cptr->CurrentCounter = (cptr->CurrentCounter + 1) % cptr->interval;
-		if (cptr->CurrentNum < cptr->interval)
-			cptr->CurrentNum++;
+		pdh_status = PdhCalculateCounterFromRawValue(
+				cptr->handle,
+				PDH_FMT_DOUBLE,
+				&cptr->rawValues[(cptr->olderRawValue + 1) % 2],						/* the new value */
+				(PERF_COUNTER_INITIALIZED < cptr->status ? &cptr->rawValues[cptr->olderRawValue] : NULL),	/* the older value */
+				&value);
+
+		if (ERROR_SUCCESS == pdh_status)
+		{
+			cptr->status = PERF_COUNTER_ACTIVE;
+			cptr->value_current = (cptr->value_current + 1) % cptr->interval;
+			cptr->value_array[cptr->value_current] = value.doubleValue;
+			if (cptr->value_count < cptr->interval)
+				cptr->value_count++;
+		}
+		else if (PDH_CSTATUS_INVALID_DATA == pdh_status)
+		{
+			/* some (e.g., rate) counters require two raw values, MSDN lacks documentation */
+			/* about what happens but tests show that PDH_CSTATUS_INVALID_DATA is returned */
+
+			cptr->status = PERF_COUNTER_GET_SECOND_VALUE;
+		}
+		else
+		{
+			deactivate_perf_counter(cptr);
+			continue;
+		}
 	}
 }
 
-#endif /* _WINDOWS */
+#endif	/* _WINDOWS */

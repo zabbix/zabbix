@@ -29,7 +29,6 @@ int	USER_PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_
 	PERF_COUNTER_DATA	*perfs = NULL;
 	int			ret = SYSINFO_RET_FAIL;
 	double			value;
-	PDH_FMT_COUNTERVALUE	counterValue;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -43,11 +42,9 @@ int	USER_PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_
 	{
 		if (NULL != perfs->name && 0 == strcmp(perfs->name, param))
 		{
-			value = compute_counter_statistics(__function_name, perfs, USE_DEFAULT_INTERVAL);
-
 			if (PERF_COUNTER_ACTIVE == perfs->status)
 			{
-				SET_DBL_RESULT(result, value);
+				SET_DBL_RESULT(result, compute_counter_statistics(__function_name, perfs, USE_DEFAULT_INTERVAL));
 				ret = SYSINFO_RET_OK;
 			}
 
@@ -57,10 +54,10 @@ int	USER_PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_
 
 	if (SYSINFO_RET_OK != ret && NULL != perfs)
 	{
-		if (ERROR_SUCCESS == calculate_counter_value(__function_name, perfs->counterpath, PDH_FMT_DOUBLE, &counterValue))
+		if (ERROR_SUCCESS == calculate_counter_value(__function_name, perfs->counterpath, &value))
 		{
 			perfs->status = PERF_COUNTER_INITIALIZED;
-			SET_DBL_RESULT(result, counterValue.doubleValue);
+			SET_DBL_RESULT(result, value);
 			ret = SYSINFO_RET_OK;
 		}
 	}
@@ -77,7 +74,6 @@ int	PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	int			ret = SYSINFO_RET_FAIL, interval;
 	double			value;
 	PERF_COUNTER_DATA	*perfs = NULL;
-	PDH_FMT_COUNTERVALUE	counterValue;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -109,16 +105,12 @@ int	PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 		{
 			if (0 == strcmp(perfs->counterpath, counterpath) && perfs->interval == interval)
 			{
-				value = compute_counter_statistics(__function_name, perfs, USE_DEFAULT_INTERVAL);
+				if (PERF_COUNTER_ACTIVE != perfs->status)
+					break;
 
-				if (PERF_COUNTER_ACTIVE == perfs->status)
-				{
-					SET_DBL_RESULT(result, value);
-					ret = SYSINFO_RET_OK;
-					goto clean;
-				}
-
-				break;
+				SET_DBL_RESULT(result, compute_counter_statistics(__function_name, perfs, USE_DEFAULT_INTERVAL));
+				ret = SYSINFO_RET_OK;
+				goto clean;
 			}
 		}
 
@@ -126,12 +118,12 @@ int	PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 			goto clean;
 	}
 
-	if (ERROR_SUCCESS == calculate_counter_value(__function_name, counterpath, PDH_FMT_DOUBLE, &counterValue))
+	if (ERROR_SUCCESS == calculate_counter_value(__function_name, counterpath, &value))
 	{
 		if (NULL != perfs)
 			perfs->status = PERF_COUNTER_INITIALIZED;
 
-		SET_DBL_RESULT(result, counterValue.doubleValue);
+		SET_DBL_RESULT(result, value);
 		ret = SYSINFO_RET_OK;
 	}
 clean:

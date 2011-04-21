@@ -81,6 +81,9 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		return SYSINFO_RET_OK;
 	}
 
+	if (PERF_COUNTER_ACTIVE != collector->cpus.cpu_counter[cpu_num]->status)
+		return SYSINFO_RET_FAIL;
+
 	if ('\0' == *tmp || 0 == strcmp(tmp, "avg1"))
 		value = compute_counter_statistics(__function_name, collector->cpus.cpu_counter[cpu_num], 1 * SEC_PER_MIN);
 	else if (0 == strcmp(tmp, "avg5"))
@@ -88,9 +91,6 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	else if (0 == strcmp(tmp, "avg15"))
 		value = compute_counter_statistics(__function_name, collector->cpus.cpu_counter[cpu_num], USE_DEFAULT_INTERVAL);
 	else
-		return SYSINFO_RET_FAIL;
-
-	if (PERF_COUNTER_ACTIVE != collector->cpus.cpu_counter[cpu_num]->status)
 		return SYSINFO_RET_FAIL;
 
 	SET_DBL_RESULT(result, value);
@@ -123,6 +123,9 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		return SYSINFO_RET_OK;
 	}
 
+	if (PERF_COUNTER_ACTIVE != collector->cpus.queue_counter->status)
+		return SYSINFO_RET_FAIL;
+
 	if ('\0' == *mode || 0 == strcmp(mode, "avg1"))
 		value = compute_counter_statistics(__function_name, collector->cpus.queue_counter, 1 * SEC_PER_MIN);
 	else if (0 == strcmp(mode, "avg5"))
@@ -130,9 +133,6 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	else if (0 == strcmp(mode, "avg15"))
 		value = compute_counter_statistics(__function_name, collector->cpus.queue_counter, USE_DEFAULT_INTERVAL);
 	else
-		return SYSINFO_RET_FAIL;
-
-	if (PERF_COUNTER_ACTIVE != collector->cpus.queue_counter->status)
 		return SYSINFO_RET_FAIL;
 
 	SET_DBL_RESULT(result, value);
