@@ -34,7 +34,6 @@ typedef long	ssize_t;
 
 #	define ZBX_TCP_ERROR		SOCKET_ERROR
 #	define ZBX_SOCK_ERROR		INVALID_SOCKET
-#	define ZBX_SOCK_ERR_TIMEDOUT	WSAETIMEDOUT
 #	define EAGAIN			WSAEWOULDBLOCK
 #else
 #	define ZBX_TCP_WRITE(s, b, bl)	((ssize_t)write((s), (b), (bl)))
@@ -44,7 +43,6 @@ typedef long	ssize_t;
 
 #	define ZBX_TCP_ERROR		-1
 #	define ZBX_SOCK_ERROR		-1
-#	define ZBX_SOCK_ERR_TIMEDOUT	EINTR
 #endif
 
 #if defined(SOCKET) || defined(_WINDOWS)
