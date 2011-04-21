@@ -135,6 +135,7 @@ Changes for 1.8.6rc1
 
  - [ZBX-3681] fixed API to leave internal PHP encoding in UTF-8 (Alexei)
  - [ZBX-3353] fixed skipping web items in the host "Full clone" operation (Sasha)
+ - [ZBX-3503] fixed "incorrect usage of quotes" error (KB)
  - [ZBX-3740] fixed compilation errors due to undefined SOL_IPV6 (asaveljevs,rudolfs,Sasha)
  - [ZBX-2952] added Base64 data line wrapping in Email notifications (dimir)
  - [ZBX-3698] fixed error in log wizard when expression had internal parentheses (KB)
@@ -143,7 +144,6 @@ Changes for 1.8.6rc1
 
 Changes for 1.8.5
 
- - [ZBX-3503] fixed "incorrect usage of quotes" error (KB)
  - [ZBX-3686] updated French translation; thanks to Joseph Bueno (Richlv)
 
 Changes for 1.8.5rc1
