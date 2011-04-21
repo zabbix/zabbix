@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-04-15 01:12+0300\n"
+"POT-Creation-Date: 2011-04-18 10:44+0300\n"
 "PO-Revision-Date: 2011-04-03 23:32+0200\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -9572,8 +9572,8 @@ msgid "is a minimal limitation on input parse time for PHP scripts"
 msgstr "це мінімальне значення для обмеження часу обробки вводу PHP скриптів"
 
 #: include/locales/en_gb.inc.php:1278
-msgid "is a wrong time format. Should be from 00:00 to 23:59."
-msgstr "це невірний формат часу. Має бути від 00:00 до 23:59."
+msgid "is a wrong time format. Should be from 00:00 to 24:00."
+msgstr "це невірний формат часу. Має бути від 00:00 до 24:00."
 
 #: include/locales/en_gb.inc.php:1898
 msgid "is internal and can not be deleted"
