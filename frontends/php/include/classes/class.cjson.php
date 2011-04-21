@@ -228,7 +228,6 @@ class CJSON{
 	 *
 	 */
 	public function decode($encodedValue, $asArray = false){
-
 		if(!$this->_config['bypass_ext'] && function_exists('json_decode')){
 			return json_decode($encodedValue, (bool) $asArray);
 		}
