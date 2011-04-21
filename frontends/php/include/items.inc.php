@@ -523,9 +523,9 @@
 		$key =& $item['key_'];
 		$macStack = array();
 
-		$macroses = array('{HOSTNAME}', '{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.HOST}','{HOST.NAME}');
+		$macros = array('{HOSTNAME}', '{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.HOST}', '{HOST.NAME}');
 
-		foreach($macroses as $macro){
+		foreach($macros as $macro){
 			$pos = 0;
 			while($pos = zbx_strpos($key, $macro, $pos)){
 				$pos++;
