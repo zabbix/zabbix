@@ -2218,7 +2218,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 
 	if (NULL == data || NULL == *data || '\0' == **data)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:NULL", __function_name);
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:EMPTY", __function_name);
 		return res;
 	}
 
@@ -2639,8 +2639,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 
 		if (FAIL == ret)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "No %s in %s(). Triggerid [" ZBX_FS_UI64 "]",
-					bl, __function_name, event->objectid);
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot resolve macro '%s'", bl);
 			replace_to = zbx_strdup(replace_to, STR_UNKNOWN_VARIABLE);
 		}
 

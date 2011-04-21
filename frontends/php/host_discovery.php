@@ -612,7 +612,7 @@ switch($itemType) {
 // New flexible interval
 		$frmItem->addRow(S_NEW_FLEXIBLE_INTERVAL, array(
 			S_DELAY, SPACE,	new CNumericBox('new_delay_flex[delay]', '50', 5),
-			S_PERIOD, SPACE, new CTextBox('new_delay_flex[period]', '1-7,00:00-23:59', 27),
+			S_PERIOD, SPACE, new CTextBox('new_delay_flex[period]', ZBX_DEFAULT_INTERVAL, 27),
 			BR(),
 			new CSubmit('add_delay_flex', S_ADD)
 		), 'new', 'row_new_delay_flex');
