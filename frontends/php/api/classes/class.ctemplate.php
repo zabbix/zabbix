@@ -2108,10 +2108,9 @@ COpt::memoryPick();
 /* }}} APPLICATIONS */
 
 
-		DB::delete('hosts_templates', array(
-			'templateid' => $templateids,
-			'hostid' => $targetids
-		));
+		$cond = array('templateid' => $templateids);
+		if(!is_null($targetids)) $cond['hostid'] =  $targetids;
+		DB::delete('hosts_templates', $cond);
 
 		if(!is_null($targetids)){
 			$hosts = API::Host()->get(array(

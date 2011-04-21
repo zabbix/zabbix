@@ -422,8 +422,9 @@ COpt::memoryPick();
 	public function checkInput(array &$dRules){
 		$dRules = zbx_toArray($dRules);
 
-		if(!check_right_on_discovery(PERM_READ_WRITE)){
-			self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+		if(self::$userData['type'] >= USER_TYPE_ZABBIX_ADMIN){
+			if(!count(get_accessible_nodes_by_user(self::$userData, PERM_READ_WRITE, PERM_RES_IDS_ARRAY)))
+				self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 		}
 
 		foreach($dRules as $dRule){
