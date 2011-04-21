@@ -62,6 +62,9 @@ static void	process_configuration_sync()
 			ZBX_PROTO_VALUE_PROXY_CONFIG, &data))
 		goto exit;
 
+	zabbix_log(LOG_LEVEL_WARNING, "Received configuration data from server. Datalen " ZBX_FS_SIZE_T,
+			(zbx_fs_size_t)strlen(data));
+
 	if (FAIL == zbx_json_open(data, &jp))
 		goto exit;
 

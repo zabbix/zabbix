@@ -83,9 +83,9 @@ private $allowed;
 		if(zbx_empty($item))
 			throw new Exception('Empty item key "'.$item.'" is used in expression.');
 
-		$itemCheck = check_item_key($item);
-		if(!$itemCheck['valid'])
-			throw new Exception('Incorrect item key "'.$item.'" is used in expression. '.$itemCheck['description']);
+		$itemKey = new cItemKey($item);
+		if(!$itemKey->isValid())
+			throw new Exception('Incorrect item key "'.$item.'" is used in expression. '.$itemKey->getError());
 	}
 
 	public function checkFunction($expression){

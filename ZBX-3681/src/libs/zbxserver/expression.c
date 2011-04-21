@@ -22,7 +22,6 @@
 #include "evalfunc.h"
 #include "db.h"
 #include "log.h"
-#include "zlog.h"
 
 static DB_MACROS	*macros = NULL;
 
@@ -2243,7 +2242,6 @@ error:
 	zbx_free(out);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() error:'%s'", __function_name, error);
-	zabbix_syslog("%s", error);
 
 	return FAIL;
 }

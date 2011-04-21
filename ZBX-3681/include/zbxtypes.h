@@ -23,6 +23,9 @@
 #define	ZBX_FS_DBL		"%lf"
 #define	ZBX_FS_DBL_EXT(p)	"%." #p "lf"
 
+#define ZBX_FS_SIZE_T		"%u"
+#define zbx_fs_size_t		unsigned int	/* use this type only in calls to printf() for formatting size_t */
+
 #define ZBX_PTR_SIZE		sizeof(void *)
 
 #if defined(_WINDOWS)
