@@ -1491,12 +1491,12 @@ COpt::memoryPick();
 					break;
 				case OPERATION_TYPE_COMMAND:
 					if(!isset($operation['opcommand']['type']))
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Not specified command type for operation.'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('No command type specified for action operation.'));
 
 					if((!isset($operation['opcommand']['command']) || zbx_empty(trim($operation['opcommand']['command']))) &&
 						($operation['opcommand']['type'] != ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT)
 					){
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Not specified command for action operation.'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('No command specified for action operation..'));
 					}
 
 					switch($operation['opcommand']['type']){
@@ -1504,33 +1504,33 @@ COpt::memoryPick();
 							break;
 						case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
 							if(!isset($operation['opcommand']['execute_on']))
-								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Not specified execution target action operation command "%s".',$operation['opcommand']['command']));
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s('No execution target specified for action operation command "%s".',$operation['opcommand']['command']));
 
 							break;
 						case ZBX_SCRIPT_TYPE_SSH:
 							if(!isset($operation['opcommand']['authtype']) || zbx_empty($operation['opcommand']['authtype']))
-								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Not specified authentication type for action operation command "%s".',$operation['opcommand']['command']));
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s('No authentication type specified for action operation command "%s".',$operation['opcommand']['command']));
 
 							if(!isset($operation['opcommand']['username']) || zbx_empty($operation['opcommand']['username']))
-								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Not specified authentication user name for action operation command "%s".',$operation['opcommand']['command']));
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s('No authentication user name specified for action operation command "%s".',$operation['opcommand']['command']));
 
 							if($operation['opcommand']['authtype'] == ITEM_AUTHTYPE_PUBLICKEY){
 								if(!isset($operation['opcommand']['publickey']) || zbx_empty($operation['opcommand']['publickey']))
-									self::exception(ZBX_API_ERROR_PARAMETERS, _s('Not specified public key file for action operation command "%s".',$operation['opcommand']['command']));
+									self::exception(ZBX_API_ERROR_PARAMETERS, _s('No public key file specified for action operation command "%s".',$operation['opcommand']['command']));
 
 								if(!isset($operation['opcommand']['privatekey']) || zbx_empty($operation['opcommand']['privatekey']))
-									self::exception(ZBX_API_ERROR_PARAMETERS, _s('Not specified private key file for action operation command "%s".',$operation['opcommand']['command']));
+									self::exception(ZBX_API_ERROR_PARAMETERS, _s('No private key file specified for action operation command "%s".',$operation['opcommand']['command']));
 							}
 
 							break;
 						case ZBX_SCRIPT_TYPE_TELNET:
 							if(!isset($operation['opcommand']['username']) || zbx_empty($operation['opcommand']['username']))
-								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Not specified authentication user name for action operation command "%s".',$operation['opcommand']['command']));
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s('No authentication user name specified for action operation command "%s".',$operation['opcommand']['command']));
 
 							break;
 						case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
 							if(!isset($operation['opcommand']['scriptid']) || zbx_empty($operation['opcommand']['scriptid']))
-								self::exception(ZBX_API_ERROR_PARAMETERS, _('Not specified scriptid for action operation command.'));
+								self::exception(ZBX_API_ERROR_PARAMETERS, _('No scriptid specified for action operation command.'));
 
 							$scripts = API::Script()->get(array(
 								'output' => array('scriptid','name'),
@@ -1539,7 +1539,7 @@ COpt::memoryPick();
 							));
 
 							if(!isset($scripts[$operation['opcommand']['scriptid']]))
-								self::exception(ZBX_API_ERROR_PARAMETERS, _('Specified script does not exists or you do not have rights on it for action operation command.'));
+								self::exception(ZBX_API_ERROR_PARAMETERS, _('Specified script does not exist or you do not have rights on it for action operation command.'));
 							break;
 						default:
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation command type.'));
