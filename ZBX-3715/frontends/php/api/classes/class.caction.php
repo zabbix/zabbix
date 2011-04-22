@@ -1530,7 +1530,7 @@ COpt::memoryPick();
 							break;
 						case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
 							if(!isset($operation['opcommand']['scriptid']) || zbx_empty($operation['opcommand']['scriptid']))
-								self::exception(ZBX_API_ERROR_PARAMETERS, _('No scriptid specified for action operation command.'));
+								self::exception(ZBX_API_ERROR_PARAMETERS, _('No script specified for action operation command.'));
 
 							$scripts = API::Script()->get(array(
 								'output' => array('scriptid','name'),
