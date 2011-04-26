@@ -153,6 +153,7 @@ PDH_STATUS	calculate_counter_value(const char *function, const char *counterpath
 	{
 		/* some (e.g., rate) counters require two raw values, MSDN lacks documentation */
 		/* about what happens but tests show that PDH_CSTATUS_INVALID_DATA is returned */
+
 		zbx_sleep(1);
 
 		if (ERROR_SUCCESS == (pdh_status = zbx_PdhCollectQueryData(function, counterpath, query)) &&

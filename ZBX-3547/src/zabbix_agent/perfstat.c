@@ -224,13 +224,13 @@ static void	free_perf_counter_list()
 /******************************************************************************
  *                                                                            *
  * Comments: must be called only for PERF_COUNTER_ACTIVE counters,            *
- *           interval must less than counter->interval                        *
+ *           interval must be less than or equal to counter->interval         *
  *                                                                            *
  ******************************************************************************/
 double	compute_counter_statistics(const char *function, PERF_COUNTER_DATA *counter, int interval)
 {
-	double sum = 0;
-	int i, j, count;
+	double	sum = 0;
+	int	i, j, count;
 
 	if (PERF_COUNTER_ACTIVE != counter->status || interval > counter->interval)
 		return 0;
@@ -245,7 +245,7 @@ double	compute_counter_statistics(const char *function, PERF_COUNTER_DATA *count
 	for (j = 0; j < count; j++, i = (0 < i ? i - 1 : counter->interval - 1))
 		sum += counter->value_array[i];
 
-	return (sum / (double)count);
+	return sum / (double)count;
 }
 
 int	init_perf_collector(ZBX_PERF_STAT_DATA *pperf)
@@ -355,6 +355,7 @@ void	collect_perfstat()
 			deactivate_perf_counter(cptr);
 			continue;
 		}
+
 		cptr->olderRawValue = (cptr->olderRawValue + 1) % 2;
 
 		pdh_status = PdhCalculateCounterFromRawValue(
@@ -380,10 +381,7 @@ void	collect_perfstat()
 			cptr->status = PERF_COUNTER_GET_SECOND_VALUE;
 		}
 		else
-		{
 			deactivate_perf_counter(cptr);
-			continue;
-		}
 	}
 }
 
