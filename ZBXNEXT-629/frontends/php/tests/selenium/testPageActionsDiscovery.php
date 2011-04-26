@@ -103,10 +103,8 @@ class testPageActionsDiscovery extends CWebTest
 	/**
 	* @dataProvider allActions
 	*/
-	public function testPageActionsDiscovery_SingleEnableDisable($action)
-	{
+	public function testPageActionsDiscovery_SingleEnableDisable($action){
 		$actionid=$action['actionid'];
-		$name=$action['name'];
 
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_DISCOVERY);
 		$this->assertTitle('Configuration of actions');

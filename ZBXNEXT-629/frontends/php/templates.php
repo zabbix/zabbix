@@ -517,7 +517,7 @@ include_once('include/page_header.php');
 		$numrows = new CDiv();
 		$numrows->setAttribute('name', 'numrows');
 
-		$template_wdgt->addHeader(S_CONFIGURATION_OF_TEMPLATES, $frmGroup);
+		$template_wdgt->addHeader(_('TEMPLATES'), $frmGroup);
 		$template_wdgt->addHeader($numrows, $frmForm);
 //------
 

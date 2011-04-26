@@ -1126,9 +1126,10 @@ if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
 				self::exception(self::SCHEMA_ERROR, _s('Table "%s" does not exist.', $table));
 		}
 
-		public static function checkValueTypes(&$tableSchema, &$values){
+		public static function checkValueTypes($table, &$values){
 			global $DB;
-			unset($values[$tableSchema['key']]);
+
+			$tableSchema = self::getSchema($table);
 
 			foreach($values as $field => $value){
 				if(!isset($tableSchema['fields'][$field])){
@@ -1217,7 +1218,7 @@ if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
 			$tableSchema = self::getSchema($table);
 
 			foreach($values as $key => $row){
-				self::checkValueTypes($tableSchema, $row);
+				self::checkValueTypes($table, $row);
 
 				if($getids){
 					$resultIds[$key] = $id;
@@ -1252,7 +1253,7 @@ if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
 			$data = zbx_toArray($data);
 			foreach($data as $row){
 // check
-				self::checkValueTypes($tableSchema, $row['values']);
+				self::checkValueTypes($table, $row['values']);
 				if(empty($row['values']))
 					self::exception(self::DBEXECUTE_ERROR, _s('Cannot perform update statement on table "%s" without values.', $table));
 
