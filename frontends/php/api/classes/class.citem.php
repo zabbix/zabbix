@@ -890,7 +890,7 @@ class CItem extends CItemGeneral{
 				'nopermissions' => 1
 			));
 			foreach($itemsExists as $inum => $itemExists){
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Host with item ['.$item['key_'].'] already exists');
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Item with key "'.$item['key_'].'" already exists on given host.');
 			}
 		}
 

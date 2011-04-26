@@ -3813,8 +3813,8 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 	function insert_host_profile_form(){
 		$frmHostP = new CFormTable(_('Host Profile'));
 
-		$table_titles = getHostProfileTitles();
-
+		$table_titles = getHostProfiles();
+		$table_titles = zbx_toHash($table_titles, 'db_field');
 		$sql_fields = implode(', ', array_keys($table_titles));
 
 		$sql = 'SELECT '.$sql_fields.' FROM host_profile WHERE hostid='.$_REQUEST['hostid'];
