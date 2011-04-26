@@ -3,6 +3,7 @@ DELETE FROM hosts_profiles_ext WHERE NOT hostid IN (SELECT hostid FROM hosts);
 
 CREATE TABLE host_profile (
 	hostid                   number(20)                                NOT NULL,
+	profile_mode             number(10)      DEFAULT '0'               NOT NULL,
 	type                     nvarchar2(64)   DEFAULT ''                ,
 	type_full                nvarchar2(64)   DEFAULT ''                ,
 	name                     nvarchar2(64)   DEFAULT ''                ,
@@ -73,7 +74,6 @@ CREATE TABLE host_profile (
 	poc_2_cell               nvarchar2(64)   DEFAULT ''                ,
 	poc_2_screen             nvarchar2(64)   DEFAULT ''                ,
 	poc_2_notes              nclob           DEFAULT ''                ,
-	profile_mode             number(10)      DEFAULT '0'               NOT NULL,
 	PRIMARY KEY (hostid)
 );
 ALTER TABLE host_profile ADD CONSTRAINT c_host_profile_1 FOREIGN KEY (hostid) REFERENCES hosts (hostid) ON DELETE CASCADE;
@@ -81,6 +81,7 @@ ALTER TABLE host_profile ADD CONSTRAINT c_host_profile_1 FOREIGN KEY (hostid) RE
 -- create temporary t_host_profile table
 CREATE TABLE t_host_profile (
 	hostid                   number(20),
+	profile_mode             number(10),
 	type                     nvarchar2(64),
 	type_full                nvarchar2(64),
 	name                     nvarchar2(64),
@@ -156,7 +157,7 @@ CREATE TABLE t_host_profile (
 
 -- select all profiles into temporary table
 INSERT INTO t_host_profile
-	SELECT p.hostid, p.devicetype, ep.device_type, p.name, ep.device_alias, p.os, ep.device_os, ep.device_os_short, p.serialno, ep.device_serial,
+	SELECT p.hostid, 0, p.devicetype, ep.device_type, p.name, ep.device_alias, p.os, ep.device_os, ep.device_os_short, p.serialno, ep.device_serial,
 		p.tag, ep.device_tag, p.macaddress, ep.ip_macaddress, ep.device_hardware, p.hardware, ep.device_software, p.software,
 		ep.device_app_01, ep.device_app_02, ep.device_app_03, ep.device_app_04, ep.device_app_05, p.contact, p.location, '', '',
 		p.notes, ep.device_chassis, ep.device_model, ep.device_hw_arch,	ep.device_vendor, ep.device_contract, ep.device_who,
@@ -167,7 +168,7 @@ INSERT INTO t_host_profile
 		ep.poc_2_name, ep.poc_2_email, ep.poc_2_phone_1, ep.poc_2_phone_2, ep.poc_2_cell, ep.poc_2_screen, ep.poc_2_notes, ep.device_notes
 	FROM hosts_profiles p LEFT JOIN hosts_profiles_ext ep on p.hostid=ep.hostid
 	UNION ALL
-	SELECT ep.hostid, p.devicetype, ep.device_type, p.name, ep.device_alias, p.os, ep.device_os, ep.device_os_short, p.serialno, ep.device_serial,
+	SELECT ep.hostid, 0, p.devicetype, ep.device_type, p.name, ep.device_alias, p.os, ep.device_os, ep.device_os_short, p.serialno, ep.device_serial,
 		p.tag, ep.device_tag, p.macaddress, ep.ip_macaddress, ep.device_hardware, p.hardware, ep.device_software, p.software,
 		ep.device_app_01, ep.device_app_02, ep.device_app_03, ep.device_app_04, ep.device_app_05, p.contact, p.location, '', '',
 		p.notes, ep.device_chassis, ep.device_model, ep.device_hw_arch,	ep.device_vendor, ep.device_contract, ep.device_who,
@@ -185,7 +186,7 @@ UPDATE t_host_profile SET notes = notes_ext WHERE notes IS NULL;
 ALTER TABLE t_host_profile DROP COLUMN notes_ext;
 
 -- copy data from temporary table
-INSERT INTO host_profile SELECT *, 0 FROM t_host_profile;
+INSERT INTO host_profile SELECT * FROM t_host_profile;
 
 DROP TABLE t_host_profile;
 DROP TABLE hosts_profiles;
