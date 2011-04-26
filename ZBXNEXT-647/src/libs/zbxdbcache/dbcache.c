@@ -1036,6 +1036,7 @@ static int	DBchk_double(double value)
  ******************************************************************************/
 static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 {
+	const char	*__function_name = "DCmass_update_items";
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_ITEM		item;
@@ -1044,9 +1045,10 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	ZBX_DC_HISTORY	*h;
 	zbx_uint64_t	*ids = NULL;
 	int		ids_alloc, ids_num = 0;
-	unsigned char	status;
+	unsigned char	status, profile_link;
+	const char	*profile_field;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In DCmass_update_items()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	ids_alloc = history_num;
 	ids = zbx_malloc(ids, ids_alloc * sizeof(zbx_uint64_t));
@@ -1054,14 +1056,17 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	for (i = 0; i < history_num; i++)
 		uint64_array_add(&ids, &ids_alloc, &ids_num, history[i].itemid, 64);
 
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
-			"select itemid,status,lastclock,prevorgvalue,delta,multiplier,formula,history,trends,lastns"
-			" from items"
+	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 218,
+			"select i.itemid,i.status,i.lastclock,i.prevorgvalue,i.delta,i.multiplier,i.formula,"
+				"i.history,i.trends,i.lastns,i.hostid,i.profile_link,hp.profile_mode"
+			" from items i"
+				" left join host_profile hp"
+					" on hp.hostid=i.hostid"
 			" where");
 
-	DBadd_condition_alloc(&sql, &sql_allocated, &sql_offset, "itemid", ids, ids_num);
+	DBadd_condition_alloc(&sql, &sql_allocated, &sql_offset, "i.itemid", ids, ids_num);
 
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 20, " order by itemid");
+	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 20, " order by i.itemid");
 
 	zbx_free(ids);
 
@@ -1091,18 +1096,18 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 		if (NULL == h)
 			continue;
 
-		item.status	= atoi(row[1]);
+		item.status = atoi(row[1]);
 		if (SUCCEED != DBis_null(row[2]))
-			item.lastclock	= atoi(row[2]);
+			item.lastclock = atoi(row[2]);
 		else
-			item.lastclock	= 0;
+			item.lastclock = 0;
 		if (SUCCEED != DBis_null(row[9]))
-			item.lastns	= atoi(row[9]);
+			item.lastns = atoi(row[9]);
 		else
-			item.lastns	= 0;
+			item.lastns = 0;
 		if (SUCCEED != DBis_null(row[3]))
 		{
-			item.prevorgvalue_null	= 0;
+			item.prevorgvalue_null = 0;
 			switch (h->value_type) {
 			case ITEM_VALUE_TYPE_FLOAT:
 				item.prevorgvalue_dbl = atof(row[3]);
@@ -1114,11 +1119,17 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 		}
 		else
 			item.prevorgvalue_null = 1;
-		item.delta	= atoi(row[4]);
-		item.multiplier	= atoi(row[5]);
-		item.formula	= row[6];
-		item.history	= atoi(row[7]);
-		item.trends	= atoi(row[8]);
+		item.delta = atoi(row[4]);
+		item.multiplier = atoi(row[5]);
+		item.formula = row[6];
+		item.history = atoi(row[7]);
+		item.trends = atoi(row[8]);
+		ZBX_STR2UINT64(item.hostid, row[10]);
+
+		if (SUCCEED != DBis_null(row[12]) && HOST_PROFILE_AUTOMATIC == (unsigned char)atoi(row[12]))
+			profile_link = (unsigned char)atoi(row[11]);
+		else
+			profile_link = 0;
 
 		if (0 != (zbx_process & ZBX_PROCESS_PROXY))
 		{
@@ -1293,21 +1304,15 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 				break;
 			}
 			break;
+		case ITEM_VALUE_TYPE_LOG:
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 42, ",lastlogsize=%d,mtime=%d",
+					h->lastlogsize, h->mtime);
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
 			value_esc = DBdyn_escape_string_len(h->value_orig.value_str, ITEM_LASTVALUE_LEN);
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 34 + strlen(value_esc),
 					",prevvalue=lastvalue,lastvalue='%s'",
 					value_esc);
-			zbx_free(value_esc);
-			break;
-		case ITEM_VALUE_TYPE_LOG:
-			value_esc = DBdyn_escape_string_len(h->value_orig.value_str, ITEM_LASTVALUE_LEN);
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 74 + strlen(value_esc),
-					",prevvalue=lastvalue,lastvalue='%s',lastlogsize=%d,mtime=%d",
-					value_esc,
-					h->lastlogsize,
-					h->mtime);
 			zbx_free(value_esc);
 			break;
 		}
@@ -1325,6 +1330,37 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, " where itemid=" ZBX_FS_UI64 ";\n",
 				item.itemid);
 
+		if (1 != h->value_null && NULL != (profile_field = DBget_profile_field(profile_link)))
+		{
+			unsigned short	profile_field_len;
+
+			value_esc = NULL;
+			profile_field_len = DBget_profile_field_len(profile_link);
+
+			switch (h->value_type)
+			{
+				case ITEM_VALUE_TYPE_FLOAT:
+					value_esc = zbx_dsprintf(value_esc, ZBX_FS_DBL, h->value.value_float);
+					break;
+				case ITEM_VALUE_TYPE_UINT64:
+					value_esc = zbx_dsprintf(value_esc, ZBX_FS_UI64, h->value.value_uint64);
+					break;
+				case ITEM_VALUE_TYPE_STR:
+				case ITEM_VALUE_TYPE_TEXT:
+					value_esc = DBdyn_escape_string_len(h->value_orig.value_str, profile_field_len);
+					break;
+			}
+
+			if (NULL != value_esc)
+			{
+				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128 + strlen(value_esc),
+						"update host_profile set %s='%s' where hostid=" ZBX_FS_UI64 ";\n",
+						profile_field, value_esc, item.hostid);
+				zbx_free(value_esc);
+			}
+		}
+
+
 		DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
 	}
 	DBfree_result(result);
@@ -1335,6 +1371,8 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 
 	if (sql_offset > 16) /* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
