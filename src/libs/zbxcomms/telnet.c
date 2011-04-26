@@ -316,12 +316,11 @@ int	telnet_test_login(ZBX_SOCKET socket_fd)
 			break;
 	}
 
+	convert_telnet_to_unix_eol(buf, &offset);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() login prompt:'%.*s'", __function_name, offset, buf);
+
 	if (ZBX_TCP_ERROR != rc)
-	{
-		convert_telnet_to_unix_eol(buf, &offset);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() login prompt:'%.*s'", __function_name, offset, buf);
 		ret = SUCCEED;
-	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -345,14 +344,14 @@ int	telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *passwor
 			break;
 	}
 
+	convert_telnet_to_unix_eol(buf, &offset);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() login prompt:'%.*s'", __function_name, offset, buf);
+
 	if (ZBX_TCP_ERROR == rc)
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "No login prompt"));
 		goto fail;
 	}
-
-	convert_telnet_to_unix_eol(buf, &offset);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() login prompt:'%.*s'", __function_name, offset, buf);
 
 	telnet_socket_write(socket_fd, username, strlen(username));
 	telnet_socket_write(socket_fd, "\r\n", 2);
@@ -365,14 +364,14 @@ int	telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *passwor
 			break;
 	}
 
+	convert_telnet_to_unix_eol(buf, &offset);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() password prompt:'%.*s'", __function_name, offset, buf);
+
 	if (ZBX_TCP_ERROR == rc)
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "No password prompt"));
 		goto fail;
 	}
-
-	convert_telnet_to_unix_eol(buf, &offset);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() password prompt:'%.*s'", __function_name, offset, buf);
 
 	telnet_socket_write(socket_fd, password, strlen(password));
 	telnet_socket_write(socket_fd, "\r\n", 2);
@@ -388,14 +387,14 @@ int	telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *passwor
 		}
 	}
 
+	convert_telnet_to_unix_eol(buf, &offset);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() prompt:'%.*s'", __function_name, offset, buf);
+
 	if (ZBX_TCP_ERROR == rc)
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Login failed"));
 		goto fail;
 	}
-
-	convert_telnet_to_unix_eol(buf, &offset);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() prompt:'%.*s'", __function_name, offset, buf);
 
 	ret = SUCCEED;
 fail:
@@ -437,14 +436,14 @@ int	telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *resu
 			break;
 	}
 
+	convert_telnet_to_unix_eol(buf, &offset);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() command output:'%.*s'", __function_name, offset, buf);
+
 	if (ZBX_TCP_ERROR == rc)
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "No prompt: %s", zbx_tcp_strerror()));
 		goto fail;
 	}
-
-	convert_telnet_to_unix_eol(buf, &offset);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() command output:'%.*s'", __function_name, offset, buf);
 
 	telnet_rm_echo(buf, &offset, command_lf, offset_lf);
 
