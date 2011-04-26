@@ -24,6 +24,8 @@
 	include('include/templates/scriptConfirm.js.php');
 ?>
 <?php
+	$scripts_wdgt = new CWidget();
+
 	$scriptTab = new CFormList('scriptsTab');
 	$frmScr = new CForm();
 	$frmScr->setName('scripts');
@@ -122,6 +124,7 @@
 	$footer = makeFormFooter($main, $others);
 	$frmScr->addItem($footer);
 
+	$scripts_wdgt->addItem($frmScr);
 
-	return $frmScr;
+	return $scripts_wdgt;
 ?>

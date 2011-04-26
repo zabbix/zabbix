@@ -109,19 +109,19 @@ if($sid){
 				$result = API::Script()->update($script);
 				show_messages($result, _('Script updated'), _('Cannot update script'));
 
-				$audit_acrion = AUDIT_ACTION_UPDATE;
+				$audit_action = AUDIT_ACTION_UPDATE;
 			}
 			else{
 				$result = API::Script()->create($script);
 
 				show_messages($result, _('Script added'), _('Cannot add script'));
 
-				$audit_acrion = AUDIT_ACTION_ADD;
+				$audit_action = AUDIT_ACTION_ADD;
 			}
 
 			$scriptid = isset($result['scriptids']) ? reset($result['scriptids']) : null;
 
-			add_audit_if($result,$audit_acrion,AUDIT_RESOURCE_SCRIPT,' Name ['.$_REQUEST['name'].'] id ['.$scriptid.']');
+			add_audit_if($result,$audit_action,AUDIT_RESOURCE_SCRIPT,' Name ['.$_REQUEST['name'].'] id ['.$scriptid.']');
 
 			if($result){
 				unset($_REQUEST['action']);
@@ -239,10 +239,7 @@ if($sid){
 		order_result($usergroups, 'name');
 		$scriptForm->set('usergroups',$usergroups);
 
-		// TODO Why use CWidget here
-		$scripts_wdgt = new CWidget();
-		$scripts_wdgt->addItem($scriptForm->render());
-		$scripts_wdgt->show();
+		$scriptForm->show();
 	}
 	else{
 // List of scripts
@@ -257,15 +254,8 @@ if($sid){
 		$scripts = API::Script()->get($options);
 		$scriptList->set('scripts',$scripts);
 
-		// TODO CWidget should not be here because it's already defined in script.list
-		// TODO Why use CWidget here
-		$scripts_wdgt = new CWidget();
-		$scripts_wdgt->addItem($scriptList->render());
-		$scripts_wdgt->show();
+		$scriptList->show();
 	}
-
-
-
 ?>
 <?php
 include_once('include/page_footer.php');
