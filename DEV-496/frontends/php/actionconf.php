@@ -384,7 +384,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			$action['operations'] = get_request('operations',array());
 		}
 
-		$actionForm = new CGetForm('action.edit', $action);
+		$actionForm = new CGetView('configuration.action.edit', $action);
 		$action_wdgt->addItem($actionForm->render());
 
 		show_messages();

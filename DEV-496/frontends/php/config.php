@@ -1212,7 +1212,7 @@ include_once('include/page_header.php');
 		}
 
 
-		$triggerSeverityForm = new CGetForm('triggerSeverity.edit', $data);
+		$triggerSeverityForm = new CGetView('administration.general.triggerSeverity.edit', $data);
 		$cnf_wdgt->addItem($triggerSeverityForm->render());
 	}
 

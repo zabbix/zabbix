@@ -210,7 +210,7 @@ if($sid){
 			$data['enableConfirmation'] = !empty($script['confirmation']);
 		}
 
-		$scriptForm = new CGetForm('script.edit');
+		$scriptForm = new CGetView('administration.script.edit');
 
 		$scriptForm->set('form',$data['form']);
 		$scriptForm->set('form_refresh',$data['form_refresh']);
@@ -243,7 +243,7 @@ if($sid){
 	}
 	else{
 // List of scripts
-		$scriptList = new CGetForm('script.list');
+		$scriptList = new CGetView('administration.script.list');
 
 		// List of scripts
 		$options = array(
