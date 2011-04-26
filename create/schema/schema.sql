@@ -662,6 +662,7 @@ INDEX		|2		|groupid
 
 TABLE|host_profile|hostid|ZBX_SYNC
 FIELD		|hostid		|t_id		|	|NOT NULL	|0			|1|hosts
+FIELD		|profile_mode	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|type		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|type_full	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
@@ -732,7 +733,6 @@ FIELD		|poc_2_phone_b	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|poc_2_cell	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|poc_2_screen	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|poc_2_notes	|t_text		|''	|NOT NULL	|ZBX_SYNC
-FIELD		|profile_mode	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 
 TABLE|hosts_templates|hosttemplateid|ZBX_SYNC
 FIELD		|hosttemplateid	|t_id		|	|NOT NULL	|0
