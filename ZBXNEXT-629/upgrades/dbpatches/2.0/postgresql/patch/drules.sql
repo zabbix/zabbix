@@ -1,5 +1,7 @@
 ALTER TABLE ONLY dchecks ALTER dcheckid DROP DEFAULT,
 			 ALTER druleid DROP DEFAULT,
+			 ALTER key_ SET DEFAULT '',
+			 ALTER snmp_community SET DEFAULT '',
 			 ADD uniq integer DEFAULT '0' NOT NULL;
 DELETE FROM dchecks WHERE NOT EXISTS (SELECT 1 FROM drules WHERE drules.druleid=dchecks.druleid);
 ALTER TABLE ONLY dchecks ADD CONSTRAINT c_dchecks_1 FOREIGN KEY (druleid) REFERENCES drules (druleid) ON DELETE CASCADE;

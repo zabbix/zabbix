@@ -1,5 +1,7 @@
 ALTER TABLE dchecks MODIFY dcheckid DEFAULT NULL;
 ALTER TABLE dchecks MODIFY druleid DEFAULT NULL;
+ALTER TABLE dchecks MODIFY key_ DEFAULT '';
+ALTER TABLE dchecks MODIFY snmp_community DEFAULT '';
 ALTER TABLE dchecks ADD uniq number(10) DEFAULT '0' NOT NULL;
 DELETE FROM dchecks WHERE NOT druleid IN (SELECT druleid FROM drules);
 ALTER TABLE dchecks ADD CONSTRAINT c_dchecks_1 FOREIGN KEY (druleid) REFERENCES drules (druleid) ON DELETE CASCADE;
