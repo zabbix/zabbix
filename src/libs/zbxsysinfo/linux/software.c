@@ -19,7 +19,6 @@
 
 #include "sysinfo.h"
 #include <sys/utsname.h>
-#include "../common/common.h"
 
 int	SYSTEM_SW_ARCH(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {

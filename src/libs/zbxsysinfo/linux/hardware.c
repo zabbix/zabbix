@@ -17,10 +17,9 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#include "common.h"
+#include "../common/common.h"
 #include "sysinfo.h"
 #include <sys/mman.h>
-
 
 #define DMI_GET_TYPE	0x01
 #define DMI_GET_VENDOR	0x02
