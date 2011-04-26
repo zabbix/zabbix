@@ -428,7 +428,6 @@ int     SYSTEM_HW_MACADDR(const char *cmd, const char *param, unsigned flags, AG
 				(unsigned short int)(unsigned char)ifr->ifr_hwaddr.sa_data[4],
 				(unsigned short int)(unsigned char)ifr->ifr_hwaddr.sa_data[5]);
 		}
-
 	}
 
 	close(s);
