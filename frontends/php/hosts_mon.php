@@ -117,7 +117,7 @@ include_once('include/page_header.php');
 ?>
 <?php
 	$hosts_wdgt = new CWidget();
-	$hosts_wdgt->addPageHeader(S_CONFIGURATION_OF_HOSTS);
+	$hosts_wdgt->addPageHeader(_('HOSTS'));
 
 
 	$frmForm = new CForm();

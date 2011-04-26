@@ -295,11 +295,11 @@ else{
 	$goOption->setAttribute('confirm', _('Enable selected discovery rules?'));
 	$goBox->addItem($goOption);
 
-	$goOption = new CComboItem('disable', _('Disable selected?'));
+	$goOption = new CComboItem('disable', _('Disable selected'));
 	$goOption->setAttribute('confirm', _('Disable selected discovery rules?'));
 	$goBox->addItem($goOption);
 
-	$goOption = new CComboItem('delete', _('Delete selected?'));
+	$goOption = new CComboItem('delete', _('Delete selected'));
 	$goOption->setAttribute('confirm', _('Delete selected discovery rules?'));
 	$goBox->addItem($goOption);
 
