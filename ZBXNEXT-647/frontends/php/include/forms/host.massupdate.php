@@ -221,9 +221,11 @@ $frmHost->addRow(array(
 	$profileModesCC
 );
 
-$profile_fields = getHostProfileTitles();
+$profile_fields = getHostProfiles();
+$profile_fields = zbx_toHash($profile_fields, 'db_field');
 if($profile_mode != HOST_PROFILE_DISABLED){
 	foreach($profile_fields as $field => $caption){
+		$caption = $caption['title'];
 		if(!isset($host_profile[$field])){
 			$host_profile[$field] = '';
 		}

@@ -316,10 +316,10 @@ if(defined('USE_PROFILING')){
 				$debug_str.= OBR;
 
 				foreach(self::$api_calls as $i=>$apiCall){
-					$debug_str .= '<div style="border-bottom: 1px dotted gray; margin-bottom: 10px;">';
+					$debug_str .= '<div style="border-bottom: 1px dotted gray; margin-bottom: 20px;">';
 					list($class, $method, $params, $result, $file, $line) = $apiCall;
 					// api method
-					$debug_str .= '<div style="padding-bottom: 20px;">';
+					$debug_str .= '<div style="padding-bottom: 10px;">';
 					$debug_str .= ($i + 1).'. <b>'.$class.'->'.$method.'</b> ['.$file.':'.$line.']';
 					$debug_str .= '</div>';
 					// parameters
