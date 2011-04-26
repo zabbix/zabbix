@@ -2178,11 +2178,11 @@ const char	*DBget_profile_field(unsigned char profile_link)
 	static const char	*profile_fields[ZBX_MAX_PROFILE_FIELDS] =
 	{
 		"type", "type_full", "name", "alias", "os", "os_full", "os_short", "serialno_a", "serialno_b", "tag",
-		"assetag", "macaddress_a", "macaddress_b", "hardware", "hardware_full", "software", "software_full",
+		"asset_tag", "macaddress_a", "macaddress_b", "hardware", "hardware_full", "software", "software_full",
 		"software_app_a", "software_app_b", "software_app_c", "software_app_d", "software_app_e", "contact",
 		"location", "location_lat", "location_lon", "notes", "chassis", "model", "hw_arch", "vendor",
-		"contracnumber", "installer_name", "deploymenstatus", "url_a", "url_b", "url_c", "hosnetworks",
-		"hosnetmask", "hosrouter", "oob_ip", "oob_netmask", "oob_router", "date_hw_purchaset",
+		"contract_number", "installer_name", "deployment_status", "url_a", "url_b", "url_c", "host_networks",
+		"host_netmask", "host_router", "oob_ip", "oob_netmask", "oob_router", "date_hw_purchase",
 		"date_hw_install", "date_hw_expiry", "date_hw_decomm", "site_address_a", "site_address_b",
 		"site_address_c", "site_city", "site_state", "site_country", "site_zip", "site_rack", "site_notes",
 		"poc_1_name", "poc_1_email", "poc_1_phone_a", "poc_1_phone_b", "poc_1_cell", "poc_1_screen",
@@ -2232,7 +2232,7 @@ unsigned short	DBget_profile_field_len(unsigned char profile_link)
 	if (0 != profile_field_len[profile_link])
 		return profile_field_len[profile_link];
 
-	profile_field = DBget_profile_field(profile_link);
+	profile_field = DBget_profile_field(profile_link + 1);
 	assert(table = DBget_table("host_profile"));
 	assert(field = DBget_field(table, profile_field));
 
