@@ -21,14 +21,15 @@
 #include "sysinfo.h"
 #include <sys/mman.h>
 
+
 #define DMI_GET_TYPE	0x01
 #define DMI_GET_VENDOR	0x02
 #define DMI_GET_MODEL	0x04
 #define DMI_GET_SERIAL	0x08
 
-#define	SMBIOS_INIT	1
-#define	SMBIOS_ERROR	2
-#define	SMBIOS_FOUND	3
+#define SMBIOS_INIT	1
+#define SMBIOS_ERROR	2
+#define SMBIOS_FOUND	3
 
 static int	smbios_status = SMBIOS_INIT;
 static size_t	smbios_len, smbios;	/* length and address of SMBIOS table (if found) */
@@ -41,7 +42,6 @@ static size_t	smbios_len, smbios;	/* length and address of SMBIOS table (if foun
 static size_t	get_dmi_string(char *buf, int bufsize, unsigned char *data, int num)
 {
 	char	*c = (char *)data;
-	size_t	len;
 
 	if (0 == num)
 		return 0;
@@ -62,7 +62,6 @@ static size_t	get_chassis_type(char *buf, int bufsize, int type)
 {
 #define CHASSIS_TYPE_BITS	0x7f	/* bits 0-6 represent the chassis type */
 #define MAX_CHASSIS_TYPE	0x1d
-	size_t	len;
 
 	/* from System Management BIOS (SMBIOS) Reference Specification v2.7.1 */
 	static const char 	*chassis_type[] =
@@ -135,7 +134,7 @@ static int	get_dmi_info(char *buf, int bufsize, int flags)
 			memcpy(membuf, mmp + len, sizeof(membuf));
 			munmap(mmp, len + SMBIOS_ENTRY_POINT_SIZE);
 
-			if (0 == strncmp(membuf, "_DMI_", 5))	/* entry point found */
+			if (0 == strncmp((char *)membuf, "_DMI_", 5))	/* entry point found */
 			{
 				smbios_len = membuf[7] << 8 | membuf[6];
 				smbios = membuf[11] << 24 | membuf[10] << 16 | membuf[9] << 8 | membuf[8];
@@ -423,13 +422,14 @@ int     SYSTEM_HW_MACADDR(const char *cmd, const char *param, unsigned flags, AG
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%s: ", ifr->ifr_name);
 
 			offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%.2hx:%.2hx:%.2hx:%.2hx:%.2hx:%.2hx, ",
-				(unsigned int)(unsigned char)ifr->ifr_hwaddr.sa_data[0],
-				(unsigned int)(unsigned char)ifr->ifr_hwaddr.sa_data[1],
-				(unsigned int)(unsigned char)ifr->ifr_hwaddr.sa_data[2],
-				(unsigned int)(unsigned char)ifr->ifr_hwaddr.sa_data[3],
-				(unsigned int)(unsigned char)ifr->ifr_hwaddr.sa_data[4],
-				(unsigned int)(unsigned char)ifr->ifr_hwaddr.sa_data[5]);
+				(unsigned short int)(unsigned char)ifr->ifr_hwaddr.sa_data[0],
+				(unsigned short int)(unsigned char)ifr->ifr_hwaddr.sa_data[1],
+				(unsigned short int)(unsigned char)ifr->ifr_hwaddr.sa_data[2],
+				(unsigned short int)(unsigned char)ifr->ifr_hwaddr.sa_data[3],
+				(unsigned short int)(unsigned char)ifr->ifr_hwaddr.sa_data[4],
+				(unsigned short int)(unsigned char)ifr->ifr_hwaddr.sa_data[5]);
 		}
+
 	}
 
 	close(s);
