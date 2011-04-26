@@ -234,7 +234,7 @@ include_once('include/page_header.php');
 		);
 		$triggers = API::Trigger()->get($params);
 		foreach($triggers as $tnum => $trigger){
-			$triggers[$trigger['triggerid']]['expression'] = explode_exp($trigger['expression'], false);
+			$triggers[$trigger['triggerid']]['expression'] = explode_exp($trigger['expression']);
 		}
 
 // SELECT TRIGGER DEPENDENCIES
@@ -573,6 +573,7 @@ include_once('include/page_header.php');
 // Host graphs
 				$options = array(
 					'hostids' => $clone_hostid,
+					'selectItems' => API_OUTPUT_EXTEND,
 					'output' => API_OUTPUT_EXTEND,
 					'inherited' => false,
 					'selectHosts' => API_OUTPUT_SHORTEN,
@@ -580,8 +581,14 @@ include_once('include/page_header.php');
 				);
 				$graphs = API::Graph()->get($options);
 				foreach($graphs as $gnum => $graph){
-					if(count($graph['hosts']) > 1) continue;
-						if(!copy_graph_to_host($graph['graphid'], $hostid)) throw new Exception();
+					if(count($graph['hosts']) > 1)
+						continue;
+
+					if (httpitemExists($graph['items']))
+						continue;
+
+					if(!copy_graph_to_host($graph['graphid'], $hostid))
+						throw new Exception();
 				}
 			}
 // }}} FULL CLONE
