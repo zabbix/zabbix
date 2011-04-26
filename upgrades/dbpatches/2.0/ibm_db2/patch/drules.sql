@@ -6,6 +6,14 @@ ALTER TABLE dchecks ALTER COLUMN druleid SET WITH DEFAULT NULL
 /
 REORG TABLE dchecks
 /
+ALTER TABLE dchecks ALTER COLUMN key_ SET WITH DEFAULT ''
+/
+REORG TABLE dchecks
+/
+ALTER TABLE dchecks ALTER COLUMN snmp_community SET WITH DEFAULT ''
+/
+REORG TABLE dchecks
+/
 ALTER TABLE dchecks ADD uniq integer DEFAULT '0' NOT NULL
 /
 REORG TABLE dchecks
