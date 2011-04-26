@@ -409,7 +409,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$search_div = null;
 
 		if(($page['file'] != 'index.php') && (CWebUser::$data['userid'] > 0)){
-			$searchForm = new CGetForm('gsearch.edit');
+			$searchForm = new CGetView('general.gsearch.edit');
 			$search_div = $searchForm->render();
 		}
 

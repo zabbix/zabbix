@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-class CGetForm{
+class CGetView{
 	private $file;
 	private $data;
 	private $form;
@@ -35,7 +35,7 @@ class CGetForm{
 			return false;
 		}
 
-		$this->file = './include/forms/'.$file.'.php';
+		$this->file = './include/views/'.$file.'.php';
 		$this->data = $data;
 	}
 
