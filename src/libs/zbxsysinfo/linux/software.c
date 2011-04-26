@@ -17,9 +17,9 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#include "common.h"
 #include "sysinfo.h"
 #include <sys/utsname.h>
+#include "../common/common.h"
 
 int	SYSTEM_SW_ARCH(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
