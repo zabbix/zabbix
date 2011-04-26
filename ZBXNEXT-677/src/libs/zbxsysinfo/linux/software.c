@@ -72,16 +72,26 @@ int     SYSTEM_SW_OS(const char *cmd, const char *param, unsigned flags, AGENT_R
 int     SYSTEM_SW_PACKAGES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #define SW_PACKAGES_FILE	"/var/lib/dpkg/status"
-	int			ret = SYSINFO_RET_FAIL, offset = 0;
-	char			line[MAX_STRING_LEN], package[MAX_STRING_LEN], status[MAX_STRING_LEN], buffer[MAX_BUFFER_LEN];
+	int			offset = 0;
+	char			line[MAX_STRING_LEN], package[MAX_STRING_LEN], status[MAX_STRING_LEN],
+				buffer[MAX_BUFFER_LEN], regex[MAX_STRING_LEN];
 	FILE			*f;
 
+	if (1 < num_param(param))
+		return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 1, regex, sizeof(regex)))
+		*regex = '\0';
+
 	if (NULL == (f = fopen(SW_PACKAGES_FILE, "r")))
-		return ret;
+		return SYSINFO_RET_FAIL;
 
 	while (NULL != fgets(line, sizeof(line), f))
 	{
 		if (1 != sscanf(line, "Package: %s", package))
+			continue;
+
+		if ('\0' != *regex && NULL == zbx_regexp_match(package, regex, NULL))
 			continue;
 
 		/* find "Status:" line, might not be the next one */
@@ -97,11 +107,9 @@ next_line:
 	zbx_fclose(f);
 
 	if (0 < offset)
-	{
-		buffer[offset - 2] = '\0';	/* remove ", " */
-		ret = SYSINFO_RET_OK;
-		SET_TEXT_RESULT(result, zbx_strdup(NULL, buffer));
-	}
+		zbx_rtrim(buffer, ", ");
 
-	return ret;
+	SET_TEXT_RESULT(result, zbx_strdup(NULL, buffer));
+
+	return SYSINFO_RET_OK;
 }
