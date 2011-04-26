@@ -48,7 +48,7 @@ class CGetForm{
 	}
 
 	public function getArray($var){
-		return isset($this->data[$var]) ? $this->data[$var] : array();
+		return isset($this->data[$var]) && is_array($this->data[$var]) ? $this->data[$var] : array();
 	}
 
 	public function render(){
@@ -60,6 +60,17 @@ class CGetForm{
 
 		print($this->scripts);
 		return $this->form;
+	}
+	/**
+	 * The method outputs HTML code based on rendered template.
+	 * It calls render() if not called already.
+	 * @return NULL
+	 */
+	public function show(){
+		if(!isset($this->form)){
+			$this->render();
+		}
+		$this->form->show();
 	}
 }
 ?>

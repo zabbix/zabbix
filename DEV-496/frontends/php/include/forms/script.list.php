@@ -38,6 +38,7 @@
 	$table->setHeader(array(
 		new CCheckBox('all_scripts', null, "checkAll('".$form->getName()."','all_scripts','scripts');"),
 		make_sorting_header(_('Name'), 'name'),
+		_('Type'),
 		_('Execute on'),
 		make_sorting_header(_('Commands'), 'command'),
 		_('User group'),
@@ -75,6 +76,18 @@
 			$host_group_name = _('All');
 		}
 
+		switch($script['type']){
+		case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
+			$scriptType = _('Script');
+			break;
+		case ZBX_SCRIPT_TYPE_IPMI:
+			$scriptType = _('IPMI');
+			break;
+		default:
+			$scriptType = '';
+			break;
+		}
+
 		if($script['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT){
 			switch($script['execute_on']){
 				case ZBX_SCRIPT_EXECUTE_ON_AGENT:
@@ -89,10 +102,10 @@
 			$scriptExecuteOn = '';
 		}
 
-
 		$table->addRow(array(
 			new CCheckBox('scripts['.$script['scriptid'].']', 'no', NULL, $script['scriptid']),
 			new CLink($script['name'], 'scripts.php?form=1'.'&scriptid='.$script['scriptid']),
+			$scriptType,
 			$scriptExecuteOn,
 			zbx_nl2br(htmlspecialchars($script['command'], ENT_COMPAT, 'UTF-8')),
 			$user_group_name,

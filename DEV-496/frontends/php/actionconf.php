@@ -360,8 +360,6 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			$eventsource = get_request('eventsource');
 			$evaltype = get_request('evaltype');
 			$esc_period	= get_request('esc_period');
-//SDII($action);
-//SDII($_REQUEST);
 		}
 
 		if(isset($action['actionid']) && !isset($_REQUEST['form_refresh'])){
