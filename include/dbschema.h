@@ -49,10 +49,11 @@
 typedef struct
 {
 	const char    	*name;
-	unsigned char	type;
-	unsigned char	flags;
 	const char	*fk_table;
 	const char	*fk_field;
+	unsigned short	length;
+	unsigned char	type;
+	unsigned char	flags;
 	unsigned char	fk_flags;
 }
 ZBX_FIELD;
