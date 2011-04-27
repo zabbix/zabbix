@@ -431,6 +431,9 @@ COpt::memoryPick();
 			if(!isset($dRule['iprange']) || !validate_ip_range($dRule['iprange'])){
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect IP range "%s".', $dRule['iprange']));
 			}
+			if(isset($dRule['delay']) && $dRule['delay'] < 0){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect delay.'));
+			}
 			if(empty($dRule['dchecks'])){
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot save discovery rule without checks.'));
 			}
@@ -452,16 +455,16 @@ COpt::memoryPick();
 				case SVC_AGENT:
 					$itemKey = new CItemKey($dCheck['key_']);
 					if(!$itemKey->isValid())
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Key is not valid: %s', $itemKey->getError()));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect key: %s', $itemKey->getError()));
 					break;
 
 				case SVC_SNMPv1:
 				case SVC_SNMPv2:
 					if(!isset($dCheck['snmp_community']) || zbx_empty($dCheck['snmp_community']))
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('SNMP Community cannot be empty.'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect SNMP Community.'));
 				case SVC_SNMPv3:
 					if(!isset($dCheck['key_']) || zbx_empty($dCheck['key_']))
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('SNMP OID cannot be empty.'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect SNMP OID.'));
 					break;
 			}
 
@@ -481,6 +484,23 @@ COpt::memoryPick();
 
 		if($uniq > 1){
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one check can be unique.'));
+		}
+	}
+
+	protected function validateRequiredFields($dRules, $on){
+		if($on == 'update'){
+			foreach($dRules as $dRule){
+				if(!isset($dRule['druleid']) || zbx_empty($dRule['druleid'])){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Field "druleid" is required.'));
+				}
+			}
+		}
+		else{
+			foreach($dRules as $dRule){
+				if(!isset($dRule['name']) || zbx_empty($dRule['name'])){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Field "name" is required.'));
+				}
+			}
 		}
 	}
 
@@ -512,6 +532,7 @@ COpt::memoryPick();
 	public function create(array $dRules){
 
 		$this->checkInput($dRules);
+		$this->validateRequiredFields($dRules, __FUNCTION__);
 
 		$druleids = DB::insert('drules', $dRules);
 
@@ -559,6 +580,7 @@ COpt::memoryPick();
 		$dRuleids = zbx_objectValues($dRules, 'druleid');
 
 		$this->checkInput($dRules);
+		$this->validateRequiredFields($dRules, __FUNCTION__);
 
 		$dRulesDb = API::DRule()->get(array(
 			'druleids' => $dRuleids,
@@ -613,10 +635,10 @@ COpt::memoryPick();
 	public function delete(array $druleids){
 		$druleids = zbx_toArray($druleids);
 
-		if(!check_right_on_discovery(PERM_READ_WRITE)){
-			self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+		if(self::$userData['type'] >= USER_TYPE_ZABBIX_ADMIN){
+			if(!count(get_accessible_nodes_by_user(self::$userData, PERM_READ_WRITE, PERM_RES_IDS_ARRAY)))
+				self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 		}
-
 
 		$actionids = array();
 		$sql = 'SELECT DISTINCT actionid '.
