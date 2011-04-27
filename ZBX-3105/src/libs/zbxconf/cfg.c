@@ -96,7 +96,9 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
  *                                                                            *
  * Author: Alexei Vladishev, Eugene Grigorjev                                 *
  *                                                                            *
- * Comments:                                                                  *
+ * Comments: "optional" would ignore:                                         *
+ *           - configuration file read errors                                 *
+ *           - unknown parameters                                             *
  *                                                                            *
  ******************************************************************************/
 static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level, int optional)
@@ -186,13 +188,18 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 				}
 				else if (TYPE_STRING == cfg[i].type)
 				{
+					/* free previous value memory */
+					char *p = *((char **)cfg[i].variable);
+					if (NULL != p)
+						zbx_free(p);
+
 					*((char **)cfg[i].variable) = strdup(value);
 				}
 				else
 					assert(0);
 			}
 
-			if (!param_valid)
+			if (0 != optional && 0 == param_valid)
 				goto unknown_parameter;
 		}
 		fclose(file);

@@ -133,10 +133,7 @@ int	main(int argc, char **argv)
 	init_metrics();
 
 	if (ZBX_TASK_START == task)
-	{
-		load_config();
-		load_user_parameters(0);
-	}
+		load_config(0);
 
 	/* Do not create debug files */
 	zabbix_open_log(LOG_TYPE_SYSLOG, LOG_LEVEL_EMPTY, NULL);
@@ -144,12 +141,12 @@ int	main(int argc, char **argv)
 	switch (task)
 	{
 		case ZBX_TASK_PRINT_SUPPORTED:
-			load_user_parameters(1);
+			load_config(1);
 			test_parameters();
 			exit(-1);
 			break;
 		case ZBX_TASK_TEST_METRIC:
-			load_user_parameters(1);
+			load_config(1);
 			test_parameter(TEST_METRIC, PROCESS_TEST);
 			exit(-1);
 			break;

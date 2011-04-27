@@ -33,8 +33,9 @@ extern char	*CONFIG_LISTEN_IP;
 extern int	CONFIG_LOG_LEVEL;
 extern int	CONFIG_MAX_LINES_PER_SECOND;
 
-void    load_config();
-void    load_user_parameters(int optional);
+void	load_config(int optional);
+void	load_config_hostname();
+void	ensure_hostname();
 
 #ifdef _AIX
 void	tl_version();

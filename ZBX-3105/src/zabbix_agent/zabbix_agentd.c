@@ -246,10 +246,6 @@ int	MAIN_ZABBIX_ENTRY()
 		}
 	}
 
-	init_collector_data();
-
-	load_user_parameters(0);
-
 	/* --- START THREADS ---*/
 
 	if (1 == CONFIG_DISABLE_PASSIVE)
@@ -374,8 +370,42 @@ int	main(int argc, char **argv)
 
 	init_metrics(); /* Must be before load_config().  load_config - use metrics!!! */
 
-	if (ZBX_TASK_START == t.task || ZBX_TASK_INSTALL_SERVICE == t.task || ZBX_TASK_UNINSTALL_SERVICE == t.task || ZBX_TASK_START_SERVICE == t.task || ZBX_TASK_STOP_SERVICE == t.task)
-		load_config();
+	if (ZBX_TASK_SHOW_USAGE == t.task)
+	{
+		usage();
+		exit(FAIL);
+	}
+
+	/* load configuration */
+
+	if (ZBX_TASK_START == t.task)
+	{
+		/* start agent */
+
+#if defined (_WINDOWS)
+		init_collector_data();	/* required for reading PerfCounter */
+#endif /* _WINDOWS */
+
+		load_config(0);
+	}
+#if defined (_WINDOWS)
+	else if (ZBX_TASK_INSTALL_SERVICE == t.task || ZBX_TASK_UNINSTALL_SERVICE == t.task || ZBX_TASK_START_SERVICE == t.task || ZBX_TASK_STOP_SERVICE == t.task)
+	{
+		/* service tasks, these need only hostname */
+
+		load_config_hostname();
+	}
+#endif /* _WINDOWS */
+	else
+	{
+		/* other tasks */
+
+#if defined (_WINDOWS)
+		init_collector_data();	/* required for reading PerfCounter */
+#endif /* _WINDOWS */
+
+		load_config(1);	/* optional */
+	}
 
 #if defined (_WINDOWS)
 	if (t.flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS)
@@ -402,25 +432,15 @@ int	main(int argc, char **argv)
 			break;
 #endif /* _WINDOWS */
 		case ZBX_TASK_PRINT_SUPPORTED:
-#if defined (_WINDOWS)
-			init_collector_data(); /* required for reading PerfCounter */
-#endif /* _WINDOWS */
-			load_user_parameters(1);
 			test_parameters();
 			free_metrics();
+			free_collector_data();
 			exit(SUCCEED);
 			break;
 		case ZBX_TASK_TEST_METRIC:
-#if defined (_WINDOWS)
-			init_collector_data(); /* required for reading PerfCounter */
-#endif /* _WINDOWS */
-			load_user_parameters(1);
 			test_parameter(TEST_METRIC, PROCESS_TEST);
+			free_collector_data();
 			exit(SUCCEED);
-			break;
-		case ZBX_TASK_SHOW_USAGE:
-			usage();
-			exit(FAIL);
 			break;
 		default:
 			/* do nothing */

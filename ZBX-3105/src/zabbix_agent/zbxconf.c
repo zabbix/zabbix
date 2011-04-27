@@ -50,11 +50,10 @@ int	CONFIG_BUFFER_SEND		= 5;
 
 int	CONFIG_MAX_LINES_PER_SECOND	= 100;
 
-void	load_config()
-{
-	AGENT_RESULT	result;
-	char		**value = NULL;
+static int	add_parameter(char *key);
 
+void	load_config(int optional)
+{
 	struct cfg_line	cfg[] =
 	{
 		/* PARAMETER,			VAR,					FUNC,
@@ -99,12 +98,27 @@ void	load_config()
 			TYPE_INT,	PARM_OPT,	1,			1000},
 		{"AllowRoot",			&CONFIG_ALLOW_ROOT,			NULL,
 			TYPE_INT,	PARM_OPT,	0,			1},
+		{"EnableRemoteCommands",	&CONFIG_ENABLE_REMOTE_COMMANDS,		NULL,
+			TYPE_INT,	PARM_OPT,	0,			1},
+		{"LogRemoteCommands",		&CONFIG_LOG_REMOTE_COMMANDS,		NULL,
+			TYPE_INT,	PARM_OPT,	0,			1},
+		{"UnsafeUserParameters",	&CONFIG_UNSAFE_USER_PARAMETERS,		NULL,
+			TYPE_INT,	PARM_OPT,	0,			1},
+		{"Alias",			NULL,					&add_alias_from_config,
+			TYPE_STRING,	PARM_OPT,	0,			0},
+		{"UserParameter",		NULL,					&add_parameter,
+			0,		0,		0,			0},
+#ifdef _WINDOWS
+		{"PerfCounter",			NULL,					&add_perfs_from_config,
+			TYPE_STRING,	PARM_OPT,	0,			0},
+#endif	/* _WINDOWS */
 		{NULL}
 	};
 
-	memset(&result, 0, sizeof(AGENT_RESULT));
-
-	parse_cfg_file(CONFIG_FILE, cfg);
+	if (optional)
+		parse_opt_cfg_file(CONFIG_FILE, cfg);
+	else
+		parse_cfg_file(CONFIG_FILE, cfg);
 
 #ifdef USE_PID_FILE
 	if (NULL == CONFIG_PID_FILE)
@@ -112,6 +126,70 @@ void	load_config()
 		CONFIG_PID_FILE = "/tmp/zabbix_agentd.pid";
 	}
 #endif	/* USE_PID_FILE */
+
+	/* set default hostname if empty */
+	ensure_hostname();
+
+	if (1 == CONFIG_DISABLE_ACTIVE && 1 == CONFIG_DISABLE_PASSIVE)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Either active or passive checks must be enabled");
+		exit(1);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: load_config_hostname                                             *
+ *                                                                            *
+ * Purpose: get hostname from configuration file, use default if empty        *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Vladimir Levijev                                                   *
+ *                                                                            *
+ * Comments: hostname configuration parameter is optional                     *
+ *                                                                            *
+ ******************************************************************************/
+void	load_config_hostname()
+{
+	struct cfg_line	cfg[] =
+	{
+		/* PARAMETER,			VAR,					FUNC,
+			TYPE,		MANDATORY,	MIN,			MAX */
+		{"Hostname",			&CONFIG_HOSTNAME,			NULL,
+			TYPE_STRING,	PARM_OPT,	0,			0},
+		{NULL}
+	};
+
+	parse_opt_cfg_file(CONFIG_FILE, cfg);
+
+	/* set default hostname if empty */
+	ensure_hostname();
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: ensure_hostname                                                  *
+ *                                                                            *
+ * Purpose: set default hostname if empty                                     *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Vladimir Levijev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	ensure_hostname()
+{
+	AGENT_RESULT	result;
+	char		**value = NULL;
+
+	memset(&result, 0, sizeof(AGENT_RESULT));
 
 	if (NULL == CONFIG_HOSTNAME || '\0'== *CONFIG_HOSTNAME)
 	{
@@ -148,11 +226,7 @@ void	load_config()
 		}
 	}
 
-	if (1 == CONFIG_DISABLE_ACTIVE && 1 == CONFIG_DISABLE_PASSIVE)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "Either active or passive checks must be enabled");
-		exit(1);
-	}
+	zabbix_log(LOG_LEVEL_DEBUG, "  VL: ensure_hostname: result [%s]", CONFIG_HOSTNAME);
 }
 
 static int	add_parameter(char *key)
@@ -165,35 +239,6 @@ static int	add_parameter(char *key)
 	*command++ = '\0';
 
 	return add_user_parameter(key, command);
-}
-
-void	load_user_parameters(int optional)
-{
-	struct cfg_line	cfg[] =
-	{
-		/* PARAMETER,			VAR,					FUNC,
-			TYPE,		MANDATORY,	MIN,			MAX */
-		{"EnableRemoteCommands",	&CONFIG_ENABLE_REMOTE_COMMANDS,		NULL,
-			TYPE_INT,	PARM_OPT,	0,			1},
-		{"LogRemoteCommands",		&CONFIG_LOG_REMOTE_COMMANDS,		NULL,
-			TYPE_INT,	PARM_OPT,	0,			1},
-		{"UnsafeUserParameters",	&CONFIG_UNSAFE_USER_PARAMETERS,		NULL,
-			TYPE_INT,	PARM_OPT,	0,			1},
-		{"Alias",			NULL,					&add_alias_from_config,
-			TYPE_STRING,	PARM_OPT,	0,			0},
-		{"UserParameter",		NULL,					&add_parameter,
-			0,		0,		0,			0},
-#ifdef _WINDOWS
-		{"PerfCounter",			NULL,					&add_perfs_from_config,
-			TYPE_STRING,	PARM_OPT,	0,			0},
-#endif	/* _WINDOWS */
-		{NULL}
-	};
-
-	if (!optional)
-		parse_cfg_file(CONFIG_FILE, cfg);
-	else
-		parse_opt_cfg_file(CONFIG_FILE, cfg);
 }
 
 #ifdef _AIX
