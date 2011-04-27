@@ -307,13 +307,13 @@ typedef enum
 #define OPERATION_OBJECT_USER	0
 #define OPERATION_OBJECT_GROUP	1
 
-/* condition types */
+/* condition evaluation types */
 typedef enum
 {
 	ACTION_EVAL_TYPE_AND_OR	= 0,
 	ACTION_EVAL_TYPE_AND,
 	ACTION_EVAL_TYPE_OR
-}	zbx_action_eval_type_t;
+} zbx_action_eval_type_t;
 
 /* condition types */
 typedef enum
@@ -728,7 +728,7 @@ void	usage();
 void	version();
 
 /* max length of base64 data */
-#define ZBX_MAX_B64_LEN 16*1024
+#define ZBX_MAX_B64_LEN 16 * 1024
 
 const char	*get_program_name(const char *path);
 
