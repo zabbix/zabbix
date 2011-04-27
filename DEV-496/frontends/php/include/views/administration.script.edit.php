@@ -20,8 +20,8 @@
 ?>
 <?php
 // include JS + templates
-	include('include/templates/script.js.php');
-	include('include/templates/scriptConfirm.js.php');
+	include('include/views/js/administration.script.edit.js.php');
+	include('include/views/js/administration.script.edit.confirm.js.php');
 ?>
 <?php
 	$scripts_wdgt = new CWidget();

@@ -51,7 +51,7 @@ $page['file']	= 'index.php';
 		CWebUser::logout($sessionid);
 		clear_messages(1);
 
-		$loginForm = new CGetView('general.login');
+		$loginForm = new CView('general.login');
 		$loginForm->render();
 		exit();
 	}
@@ -113,7 +113,7 @@ $page['file']	= 'index.php';
 					$_REQUEST['message'] = $messages['message'];
 				}
 
-				$loginForm = new CGetView('general.login');
+				$loginForm = new CView('general.login');
 				$loginForm->render();
 		}
 	}

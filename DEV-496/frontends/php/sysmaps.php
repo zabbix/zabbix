@@ -294,7 +294,7 @@ include_once('include/page_header.php');
 				$sysmap['urls'] = get_request('urls', array());
 			}
 
-			$formLoad = new CGetView('configuration.sysmap.edit', $sysmap);
+			$formLoad = new CView('configuration.sysmap.edit', $sysmap);
 			$map_wdgt->addItem($formLoad->render());
 		}
 	}

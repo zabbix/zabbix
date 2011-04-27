@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-include('include/templates/triggerSeverity.js.php');
+include('include/views/administration.general.triggerSeverity.js.php');
 
 
 $severityTab = new CFormList('scriptsTab');

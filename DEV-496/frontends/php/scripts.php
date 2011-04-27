@@ -210,7 +210,7 @@ if($sid){
 			$data['enableConfirmation'] = !empty($script['confirmation']);
 		}
 
-		$scriptForm = new CGetView('administration.script.edit');
+		$scriptForm = new CView('administration.script.edit');
 
 		$scriptForm->set('form',$data['form']);
 		$scriptForm->set('form_refresh',$data['form_refresh']);
@@ -239,11 +239,12 @@ if($sid){
 		order_result($usergroups, 'name');
 		$scriptForm->set('usergroups',$usergroups);
 
+		$scriptForm->render();
 		$scriptForm->show();
 	}
 	else{
 // List of scripts
-		$scriptList = new CGetView('administration.script.list');
+		$scriptList = new CView('administration.script.list');
 
 		// List of scripts
 		$options = array(
@@ -254,6 +255,7 @@ if($sid){
 		$scripts = API::Script()->get($options);
 		$scriptList->set('scripts',$scripts);
 
+		$scriptList->render();
 		$scriptList->show();
 	}
 ?>
