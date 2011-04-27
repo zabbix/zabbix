@@ -520,6 +520,7 @@ COpt::memoryPick();
 				'nodeids' => $nodeids,
 				'output' => $options['selectItems'],
 				'graphids' => $graphids,
+				'webitems' => 1,
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
