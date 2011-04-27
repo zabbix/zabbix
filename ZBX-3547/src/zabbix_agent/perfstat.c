@@ -40,6 +40,7 @@ static void	deactivate_perf_counter(PERF_COUNTER_DATA *counter)
 	counter->value_count = 0;
 	counter->value_current = -1;
 	counter->olderRawValue = 0;
+	counter->sum = 0;
 }
 
 /******************************************************************************
@@ -227,7 +228,7 @@ static void	free_perf_counter_list()
  *           interval must be less than or equal to counter->interval         *
  *                                                                            *
  ******************************************************************************/
-double	compute_counter_statistics(const char *function, PERF_COUNTER_DATA *counter, int interval)
+double	compute_average_value(const char *function, PERF_COUNTER_DATA *counter, int interval)
 {
 	double	sum = 0;
 	int	i, j, count;
@@ -236,8 +237,9 @@ double	compute_counter_statistics(const char *function, PERF_COUNTER_DATA *count
 		return 0;
 
 	if (USE_DEFAULT_INTERVAL == interval)
-		interval = counter->interval;
+		return counter->sum / (double)counter->value_count;
 
+	/* compute the average manually for custom intervals */
 	i = counter->value_current;
 	count = (counter->value_count < interval ? counter->value_count : interval);
 
@@ -369,7 +371,10 @@ void	collect_perfstat()
 		{
 			cptr->status = PERF_COUNTER_ACTIVE;
 			cptr->value_current = (cptr->value_current + 1) % cptr->interval;
+			if (cptr->value_count == cptr->interval)
+				cptr->sum -= cptr->value_array[cptr->value_current];	/* remove the oldest value, value_count will not increase */
 			cptr->value_array[cptr->value_current] = value.doubleValue;
+			cptr->sum += cptr->value_array[cptr->value_current];
 			if (cptr->value_count < cptr->interval)
 				cptr->value_count++;
 		}
