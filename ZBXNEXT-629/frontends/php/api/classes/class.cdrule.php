@@ -448,7 +448,7 @@ COpt::memoryPick();
 			if($dCheck['uniq'] == 1) $uniq++;
 
 			if(isset($dCheck['ports']) && !validate_port_list($dCheck['ports'])){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect port.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect port range.'));
 			}
 
 			switch($dCheck['type']){
