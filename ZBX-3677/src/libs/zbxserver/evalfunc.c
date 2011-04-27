@@ -25,6 +25,9 @@
 
 #include "evalfunc.h"
 
+/* list of units that shouldn't be modified with suffix */
+const char	*ZBX_UNIT_BLACKLIST[] = { "%", "ms", "rpm", NULL };
+
 const char	*get_table_by_value_type(int value_type)
 {
 	switch (value_type)
@@ -2317,13 +2320,28 @@ int	add_value_suffix(char *value, int max_len, const char *units, int value_type
 {
 	const char	*__function_name = "add_value_suffix";
 
-	int		ret = FAIL;
+	int		ret = FAIL, i;
 	struct tm	*local_time = NULL;
 	time_t		time;
 	char		tmp[256];
 
+	const char	*p_bl;	/* a pointer to unit blacklist entry */
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() value:'%s' units:'%s'",
 			__function_name, value, units);
+
+	/* mind the unit blacklist */
+	i = 0;
+	while (NULL != (p_bl = ZBX_UNIT_BLACKLIST[i++]))
+	{
+		if (0 == strcasecmp(p_bl, units))
+		{
+			/* units blacklisted */
+			zbx_snprintf(tmp, sizeof(tmp), "%s %s", value, units);
+			zbx_strlcpy(value, tmp, max_len);
+			return SUCCEED;
+		}
+	}
 
 	switch (value_type)
 	{
