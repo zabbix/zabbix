@@ -2125,6 +2125,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 		// control to choose host_profile field, that will be populated by this item (if any)
 		if(!$parent_discoveryid){
+			$itemCloned = isset($_REQUEST['clone']);
 			$hostProfileFieldDropDown = new CComboBox('profile_link');
 			$possibleHostProfiles = getHostProfiles();
 
@@ -2138,15 +2139,14 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			$alreadyPopulated = zbx_objectValues($alreadyPopulated, 'profile_link');
 
 			// default option - do not populate
-			$hostProfileFieldDropDown->addItem(0, '-None-', $profile_link == '0' ? 'Yes' : null); // 'yes' means 'selected'
+			$hostProfileFieldDropDown->addItem(0, '-None-', $profile_link == '0' || $itemCloned ? 'Yes' : null); // 'yes' means 'selected'
 			// a list of available host profile fields
 			foreach($possibleHostProfiles as $fieldNo => $fieldInfo){
 				$hostProfileFieldDropDown->addItem(
 					$fieldNo,
 					$fieldInfo['title'],
-					($profile_link == $fieldNo ? 'yes' : null), // selected?
-					//'yes'
-					(in_array($fieldNo, $alreadyPopulated) &&  $profile_link != $fieldNo ? 'no' : 'yes') // enabled?
+					($profile_link == $fieldNo && !$itemCloned ? 'yes' : null), // selected?
+					((in_array($fieldNo, $alreadyPopulated) &&  $profile_link != $fieldNo) || ($itemCloned && $profile_link == $fieldNo) ? 'no' : 'yes') // enabled?
 				);
 			}
 
