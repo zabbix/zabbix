@@ -50,6 +50,8 @@ public class JavaProxy
 		{
 			ConfigurationManager.parseConfiguration();
 
+			daemonize();
+
 			InetAddress listenIP = (InetAddress)ConfigurationManager.getParameter(ConfigurationManager.LISTEN_IP).getValue();
 			int listenPort = ConfigurationManager.getIntegerParameterValue(ConfigurationManager.LISTEN_PORT);
 
@@ -65,8 +67,6 @@ public class JavaProxy
 					new ArrayBlockingQueue<Runnable>(startPollers),
 					new ThreadPoolExecutor.CallerRunsPolicy());
 			logger.debug("created a thread pool of {} pollers", startPollers);
-
-			daemonize();
 
 			while (true)
 				threadPool.execute(new SocketProcessor(socket.accept()));
