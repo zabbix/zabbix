@@ -2161,7 +2161,7 @@ char	*DBsql_id_ins(zbx_uint64_t id)
  *                                                                            *
  * Function: DBget_profile_field                                              *
  *                                                                            *
- * Purpose: get correspond host_profile field name                            *
+ * Purpose: get corresponding host_profile field name                         *
  *                                                                            *
  * Parameters: profile_link - [IN] field number; 1..ZBX_MAX_PROFILE_FIELDS    *
  *                                                                            *
@@ -2200,11 +2200,11 @@ const char	*DBget_profile_field(unsigned char profile_link)
  *                                                                            *
  * Function: DBget_profile_field_len                                          *
  *                                                                            *
- * Purpose: get host_profile field lenght by profile_link                     *
+ * Purpose: get host_profile field length by profile_link                     *
  *                                                                            *
  * Parameters: profile_link - [IN] field number; 1..ZBX_MAX_PROFILE_FIELDS    *
  *                                                                            *
- * Return value: field lenght                                                 *
+ * Return value: field length                                                 *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
