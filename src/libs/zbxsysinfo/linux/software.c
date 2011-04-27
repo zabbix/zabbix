@@ -19,6 +19,7 @@
 
 #include "sysinfo.h"
 #include <sys/utsname.h>
+#include "zbxalgo.h"
 
 int	SYSTEM_SW_ARCH(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
@@ -70,11 +71,12 @@ int     SYSTEM_SW_OS(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 int     SYSTEM_SW_PACKAGES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#define SW_PACKAGES_FILE	"/var/lib/dpkg/status"
-	int			offset = 0;
+#define DPKG_PACKAGES		"/var/lib/dpkg/status"
+	int			offset = 0, i;
 	char			line[MAX_STRING_LEN], package[MAX_STRING_LEN], status[MAX_STRING_LEN],
 				buffer[MAX_BUFFER_LEN], regex[MAX_STRING_LEN];
 	FILE			*f;
+	zbx_vector_str_t	packages;
 
 	if (1 < num_param(param))
 		return SYSINFO_RET_FAIL;
@@ -82,8 +84,10 @@ int     SYSTEM_SW_PACKAGES(const char *cmd, const char *param, unsigned flags, A
 	if (0 != get_param(param, 1, regex, sizeof(regex)))
 		*regex = '\0';
 
-	if (NULL == (f = fopen(SW_PACKAGES_FILE, "r")))
+	if (NULL == (f = fopen(DPKG_PACKAGES, "r")))
 		return SYSINFO_RET_FAIL;
+
+	zbx_vector_str_create(&packages);
 
 	while (NULL != fgets(line, sizeof(line), f))
 	{
@@ -101,9 +105,19 @@ next_line:
 			goto next_line;
 
 		if (0 == strcmp(status, "install ok installed"))
-			offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%s, ", package);
+			zbx_vector_str_append(&packages, zbx_strdup(NULL, package));
 	}
 	zbx_fclose(f);
+
+	zbx_vector_str_sort(&packages, ZBX_DEFAULT_STR_COMPARE_FUNC);
+
+	for (i = 0; i < packages.values_num; i++)
+	{
+		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%s, ", packages.values[i]);
+		zbx_free(packages.values[i]);
+	}
+
+	zbx_vector_str_destroy(&packages);
 
 	if (0 < offset)
 		zbx_rtrim(buffer, ", ");
