@@ -1317,7 +1317,7 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 			break;
 		}
 
-		/* Update item status if required */
+		/* update item status if required */
 		if (item.status == ITEM_STATUS_NOTSUPPORTED && status == ITEM_STATUS_ACTIVE)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Item [%s] became supported", zbx_host_key_string(item.itemid));
@@ -1359,7 +1359,6 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 				zbx_free(value_esc);
 			}
 		}
-
 
 		DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
 	}
