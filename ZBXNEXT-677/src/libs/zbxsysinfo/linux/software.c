@@ -20,6 +20,8 @@
 #include "sysinfo.h"
 #include <sys/utsname.h>
 #include "zbxalgo.h"
+#include "zbxexec.h"
+#include "cfg.h"
 
 int	SYSTEM_SW_ARCH(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
@@ -71,12 +73,17 @@ int     SYSTEM_SW_OS(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 int     SYSTEM_SW_PACKAGES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#define DPKG_PACKAGES		"/var/lib/dpkg/status"
+#define DPKG_PACKAGES_FILE	"/var/lib/dpkg/status"
+#define SLACKWARE_PACKAGES_DIR	"/var/log/packages/"
+#define RPM_PACKAGES_CMD	"rpm -qa | sort"
+#define RPM_TEST_CMD		"rpm --version"
 	int			offset = 0, i;
-	char			line[MAX_STRING_LEN], package[MAX_STRING_LEN], status[MAX_STRING_LEN],
-				buffer[MAX_BUFFER_LEN], regex[MAX_STRING_LEN];
+	char			line[MAX_STRING_LEN], package[MAX_STRING_LEN], tmp[MAX_STRING_LEN],
+				buffer[MAX_BUFFER_LEN], regex[MAX_STRING_LEN], *cmdbuf = NULL, *c;
 	FILE			*f;
 	zbx_vector_str_t	packages;
+	DIR			*dir;
+	struct dirent		*entry;
 
 	if (1 < num_param(param))
 		return SYSINFO_RET_FAIL;
@@ -84,30 +91,74 @@ int     SYSTEM_SW_PACKAGES(const char *cmd, const char *param, unsigned flags, A
 	if (0 != get_param(param, 1, regex, sizeof(regex)))
 		*regex = '\0';
 
-	if (NULL == (f = fopen(DPKG_PACKAGES, "r")))
-		return SYSINFO_RET_FAIL;
-
 	zbx_vector_str_create(&packages);
 
-	while (NULL != fgets(line, sizeof(line), f))
+	if (NULL != (f = fopen(DPKG_PACKAGES_FILE, "r")))
 	{
-		if (1 != sscanf(line, "Package: %s", package))
-			continue;
+		/* DPKG package manager */
 
-		if ('\0' != *regex && NULL == zbx_regexp_match(package, regex, NULL))
-			continue;
+		while (NULL != fgets(line, sizeof(line), f))
+		{
+			if (1 != sscanf(line, "Package: %s", package))
+				continue;
 
-		/* find "Status:" line, might not be the next one */
+			if ('\0' != *regex && NULL == zbx_regexp_match(package, regex, NULL))
+				continue;
+
+			/* find "Status:" line, might not be the next one */
 next_line:
-		if (NULL == fgets(line, sizeof(line), f))
-			break;
-		if (1 != sscanf(line, "Status: %[^\n]", status))
-			goto next_line;
+			if (NULL == fgets(line, sizeof(line), f))
+				break;
+			if (1 != sscanf(line, "Status: %[^\n]", tmp))
+				goto next_line;
 
-		if (0 == strcmp(status, "install ok installed"))
-			zbx_vector_str_append(&packages, zbx_strdup(NULL, package));
+			if (0 == strcmp(tmp, "install ok installed"))
+				zbx_vector_str_append(&packages, zbx_strdup(NULL, package));
+		}
+
+		zbx_fclose(f);
 	}
-	zbx_fclose(f);
+	else if (NULL != (dir = opendir(SLACKWARE_PACKAGES_DIR)))
+	{
+		/* check SLACKWARE_PACKAGES_DIR before using RPM since RPM can also be used on slackware */
+
+		while (NULL != (entry = readdir(dir)))
+		{
+			if (0 == strcmp(entry->d_name, ".") || 0 == strcmp(entry->d_name, ".."))
+				continue;
+
+			if ('\0' == *regex || NULL != zbx_regexp_match(entry->d_name, regex, NULL))
+				zbx_vector_str_append(&packages, zbx_strdup(NULL, entry->d_name));
+		}
+
+		closedir(dir);
+	}
+	else if (SUCCEED == zbx_execute(RPM_TEST_CMD, &cmdbuf, tmp, sizeof(tmp), CONFIG_TIMEOUT) &&
+			0 < strlen(cmdbuf))
+	{
+		/* RPM package manager */
+
+		zbx_free(cmdbuf);
+		if (SUCCEED == zbx_execute(RPM_PACKAGES_CMD, &cmdbuf, tmp, sizeof(tmp), CONFIG_TIMEOUT))
+		{
+			c = strtok(cmdbuf, "\n");
+			while (NULL != c)
+			{
+				if ('\0' == *regex || NULL != zbx_regexp_match(c, regex, NULL))
+					zbx_vector_str_append(&packages, zbx_strdup(NULL, c));
+				c = strtok(NULL, "\n");
+			}
+
+			zbx_free(cmdbuf);
+		}
+	}
+	else
+	{
+		/* unsupported package manager */
+
+		zbx_free(cmdbuf);
+		return SYSINFO_RET_FAIL;
+	}
 
 	zbx_vector_str_sort(&packages, ZBX_DEFAULT_STR_COMPARE_FUNC);
 
