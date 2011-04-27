@@ -757,19 +757,14 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 						ip ? ip : "-", port, zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
 			}
 
-#if defined(IPV6_V6ONLY)
-#ifdef _WINDOWS
+#if defined(IPPROTO_IPV6) && defined(IPV6_V6ONLY)
 			if (PF_INET6 == current_ai->ai_family &&
 				ZBX_TCP_ERROR == setsockopt(s->sockets[s->num_socks], IPPROTO_IPV6, IPV6_V6ONLY, (void *)&on, sizeof(on)))
-#else
-			if (PF_INET6 == current_ai->ai_family &&
-				ZBX_TCP_ERROR == setsockopt(s->sockets[s->num_socks], SOL_IPV6, IPV6_V6ONLY, (void *)&on, sizeof(on)))
-#endif
 			{
 				zbx_set_tcp_strerror("setsockopt() with IPV6_V6ONLY for [[%s]:%s] failed with error %d: %s",
 						ip ? ip : "-", port, zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
 			}
-#endif	/* IPV6_V6ONLY */
+#endif
 
 			if (ZBX_TCP_ERROR == bind(s->sockets[s->num_socks], current_ai->ai_addr, current_ai->ai_addrlen))
 			{

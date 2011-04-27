@@ -143,7 +143,7 @@ function triggerIdents($triggerids){
 			'node' => get_node_name_by_elid($host['hostid'], true),
 			'host' => $host['host'],
 			'description' => $trigger['description'],
-			'expression' => explode_exp($trigger['expression'], false)
+			'expression' => explode_exp($trigger['expression'])
 		);
 	}
 
