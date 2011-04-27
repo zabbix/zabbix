@@ -9,6 +9,7 @@ UPDATE dchecks SET uniq=1 WHERE EXISTS (SELECT 1 FROM drules WHERE drules.unique
 ALTER TABLE ONLY drules ALTER druleid DROP DEFAULT,
 			ALTER proxy_hostid DROP DEFAULT,
 			ALTER proxy_hostid DROP NOT NULL,
+			ALTER delay SET DEFAULT '3600',
 			DROP unique_dcheckid;
 UPDATE drules SET proxy_hostid=NULL WHERE NOT EXISTS (SELECT 1 FROM hosts WHERE hosts.hostid=drules.proxy_hostid);
 ALTER TABLE ONLY drules ADD CONSTRAINT c_drules_1 FOREIGN KEY (proxy_hostid) REFERENCES hosts (hostid);

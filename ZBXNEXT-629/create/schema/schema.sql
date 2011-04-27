@@ -39,7 +39,7 @@ FIELD		|druleid	|t_id		|	|NOT NULL	|0
 FIELD		|proxy_hostid	|t_id		|	|NULL		|ZBX_SYNC		|1|hosts	|hostid		|RESTRICT
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|iprange	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|delay		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|delay		|t_integer	|'3600'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|nextcheck	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 
