@@ -77,7 +77,7 @@ if(get_request('output') == 'ajax'){
 			switch($check['field']){
 				case 'port':
 					if(!validate_port_list($check['value']))
-						$ajaxResponse->error(_('Incorrect port.'));
+						$ajaxResponse->error(_('Incorrect port range.'));
 					break;
 				case 'itemKey':
 					$itemKey = new CItemKey($check['value']);
