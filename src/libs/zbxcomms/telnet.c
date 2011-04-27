@@ -61,15 +61,16 @@ static ssize_t	telnet_socket_read(ZBX_SOCKET socket_fd, void *buf, size_t count)
 {
 	const char	*__function_name = "telnet_socket_read";
 	ssize_t		rc;
+	int		error;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	while (ZBX_TCP_ERROR == (rc = ZBX_TCP_READ(socket_fd, buf, count)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%d errno:%d error:[%s]", __function_name, rc,
-				zbx_sock_last_error(), strerror(zbx_sock_last_error()));
+		error = zbx_sock_last_error();	/* zabbix_log resets the error code */
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%d errno:%d error:[%s]", __function_name, rc, error, strerror(error));
 
-		if (EAGAIN == zbx_sock_last_error())
+		if (EAGAIN == error)
 		{
 			/* wait and if there is still an error or no input available */
 			/* we assume the other side has nothing more to say */
@@ -96,15 +97,16 @@ static ssize_t	telnet_socket_write(ZBX_SOCKET socket_fd, const void *buf, size_t
 {
 	const char	*__function_name = "telnet_socket_write";
 	ssize_t		rc;
+	int		error;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	while (ZBX_TCP_ERROR == (rc = ZBX_TCP_WRITE(socket_fd, buf, count)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%d errno:%d error:[%s]", __function_name, rc,
-				zbx_sock_last_error(), strerror(zbx_sock_last_error()));
+		error = zbx_sock_last_error();	/* zabbix_log resets the error code */
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%d errno:%d error:[%s]", __function_name, rc, error, strerror(error));
 
-		if (EAGAIN == zbx_sock_last_error())
+		if (EAGAIN == error)
 		{
 			telnet_waitsocket(socket_fd, WAIT_WRITE);
 			continue;
