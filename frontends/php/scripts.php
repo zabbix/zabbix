@@ -225,7 +225,7 @@ if($sid){
 		$scriptForm->set('groupid',$data['groupid']);
 		$scriptForm->set('access',$data['access']);
 		$scriptForm->set('confirmation',$data['confirmation']);
-		$scriptForm->set('enableConfigmation',$data['enableConfirmation']);
+		$scriptForm->set('enableConfirmation',$data['enableConfirmation']);
 		// Get list of all groups
 		$groups = API::HostGroup()->get(array(
 			'output' => array('groupid','name')
