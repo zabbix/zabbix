@@ -1050,9 +1050,9 @@
 		$key =& $item['key_'];
 		$macStack = array();
 
-		$macroses = array('{HOSTNAME}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}');
+		$macros = array('{HOSTNAME}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}');
 
-		foreach($macroses as $macro){
+		foreach($macros as $macro){
 			$pos = 0;
 			while($pos = zbx_strpos($key, $macro, $pos)){
 				$pos++;
@@ -1751,5 +1751,26 @@
 			|| ($char >= 'A' && $char <= 'Z')
 			|| ($char >= '0' && $char <= '9')
 		);
+	}
+
+/*
+ * Function: httpitemExists
+ *
+ * Description:
+ *     Function returns true if http items exists in the $items array.
+ *     The array should contain a field 'type'
+ *
+ * Author:
+ *     Alexander Vladishev
+ *
+ * Comments:
+ *
+ */
+	function httpitemExists($items){
+		foreach($items as $item)
+			if ($item['type'] == ITEM_TYPE_HTTPTEST)
+				return true;
+
+		return false;
 	}
 ?>
