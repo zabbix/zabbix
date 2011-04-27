@@ -1375,7 +1375,7 @@ class zbxXML{
 
 								$current_trigger = false;
 								foreach($ctriggers as $tnum => $ct){
-									$tmp_exp = explode_exp($ct['expression'], false);
+									$tmp_exp = explode_exp($ct['expression']);
 									if(strcmp($trigger_db['expression'], $tmp_exp) == 0){
 										$current_trigger = $ct;
 										break;
