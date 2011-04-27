@@ -67,7 +67,7 @@ static ssize_t	telnet_socket_read(ZBX_SOCKET socket_fd, void *buf, size_t count)
 
 	while (ZBX_TCP_ERROR == (rc = ZBX_TCP_READ(socket_fd, buf, count)))
 	{
-		error = zbx_sock_last_error();	/* zabbix_log resets the error code */
+		error = zbx_sock_last_error();	/* zabbix_log() resets the error code */
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%d errno:%d error:[%s]", __function_name, rc, error, strerror(error));
 
 		if (EAGAIN == error)
@@ -103,7 +103,7 @@ static ssize_t	telnet_socket_write(ZBX_SOCKET socket_fd, const void *buf, size_t
 
 	while (ZBX_TCP_ERROR == (rc = ZBX_TCP_WRITE(socket_fd, buf, count)))
 	{
-		error = zbx_sock_last_error();	/* zabbix_log resets the error code */
+		error = zbx_sock_last_error();	/* zabbix_log() resets the error code */
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%d errno:%d error:[%s]", __function_name, rc, error, strerror(error));
 
 		if (EAGAIN == error)
