@@ -25,9 +25,14 @@
 
 #include "zbxmedia.h"
 
-/*
- * smtp_readln reads until '\n'
- */
+/* number of characters per line when wrapping Base64 data in Email */
+#define ZBX_EMAIL_B64_MAXLINE	76
+
+/******************************************************************************
+ *                                                                            *
+ * Comments: reads until '\n'                                                 *
+ *                                                                            *
+ ******************************************************************************/
 ssize_t smtp_readln(int fd, char *buf, int buf_len)
 {
 	ssize_t	nbytes, read_bytes;
@@ -56,9 +61,6 @@ ssize_t smtp_readln(int fd, char *buf, int buf_len)
 	return read_bytes;
 }
 
-/*
- * Send email
- */
 int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_email, const char *mailto,
 		const char *mailsubject, const char *mailbody, char *error, int max_error_len)
 {
@@ -67,7 +69,7 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 	zbx_sock_t	s;
 	int		err, ret = FAIL;
 	char		cmd[MAX_STRING_LEN], *cmdp = NULL;
-	char		*tmp = NULL, *base64 = NULL;
+	char		*tmp = NULL, *base64 = NULL, *base64_lf;
 	char		*localsubject = NULL, *localbody = NULL;
 
 	char		str_time[MAX_STRING_LEN];
@@ -209,6 +211,12 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 	zbx_free(tmp);
 
 	str_base64_encode_dyn(localbody, &base64, strlen(localbody));
+
+	/* wrap base64 encoded data with linefeeds */
+	base64_lf = str_linefeed(base64, ZBX_EMAIL_B64_MAXLINE, "\r\n");
+	zbx_free(base64);
+	base64 = base64_lf;
+
 	zbx_free(localbody);
 	localbody = base64;
 	base64 = NULL;

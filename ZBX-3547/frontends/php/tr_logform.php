@@ -101,7 +101,7 @@ if(isset($_REQUEST['save_trigger'])){
 //---
 			if($triggerData['templateid']){
 				$_REQUEST['description'] = $triggerData['description'];
-				$expression = explode_exp($triggerData['expression'],0);
+				$expression = explode_exp($triggerData['expression']);
 			}
 
 			$trigger = array();
@@ -229,7 +229,7 @@ if(isset($_REQUEST['sform'])){
 			}
 
 			$value = preg_replace('/([=|#]0)/','',$expr);
-			$value = preg_replace('/\((.*?)\)/u','$1',$value);
+			$value = preg_replace('/^\((.*)\)$/u','$1',$value); // removing wrapping parentheses
 
 			$expressions[$id]['value'] = trim($value);
 			$expressions[$id]['type'] = (zbx_strpos($expr,'#0',zbx_strlen($expr)-3) === false)?(REGEXP_EXCLUDE):(REGEXP_INCLUDE);

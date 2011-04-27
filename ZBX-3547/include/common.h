@@ -117,8 +117,8 @@
 #define OFF	0
 
 #define	APPLICATION_NAME	"Zabbix Agent"
-#define	ZABBIX_REVDATE		"1 April 2011"
-#define	ZABBIX_VERSION		"1.8.5rc1"
+#define	ZABBIX_REVDATE		"15 April 2011"
+#define	ZABBIX_VERSION		"1.8.5"
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
 #if defined(_WINDOWS)
@@ -758,6 +758,7 @@ int	zbx_pg_unescape_bytea(u_char *io);
 #endif
 int	zbx_get_next_field(const char **line, char **output, int *olen, char separator);
 int	str_in_list(const char *list, const char *value, char delimiter);
+char	*str_linefeed(const char *src, size_t maxline, const char *delim);
 
 #ifdef HAVE___VA_ARGS__
 #	define zbx_setproctitle(fmt, ...) __zbx_zbx_setproctitle(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)

@@ -228,8 +228,6 @@ class CJSON{
 	 *
 	 */
 	public function decode($encodedValue, $asArray = false){
-		mb_internal_encoding('ASCII');
-
 		$first_char = substr(ltrim($encodedValue), 0, 1);
 		if($first_char != '{' && $first_char != '['){
 			return null;
@@ -243,15 +241,16 @@ class CJSON{
 		ini_set('pcre.backtrack_limit', '10000000');
 		
 		$this->_level = 0;
+		$result = null;
+
+// Required for internal parser, it operates with ASCII data
+		mb_internal_encoding('ASCII');
 		if($this->isValid($encodedValue)){
 			$result = $this->_json_decode($encodedValue, (bool) $asArray);
-			mb_internal_encoding('UTF-8');
+		}
+		mb_internal_encoding('UTF-8');
 
-			return $result;
-		}
-		else {
-			return null;
-		}
+		return $result;
 	}
 
 	/**

@@ -50,6 +50,7 @@ function __autoload($class_name){
 		'ctemplate' => 1,
 		'ctrigger' => 1,
 		'ctriggerexpression' => 1,
+		'citemkey' => 1,
 		'cuser' => 1,
 		'cusergroup' => 1,
 		'cusermacro' => 1,

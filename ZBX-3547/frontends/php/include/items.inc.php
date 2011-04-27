@@ -384,9 +384,9 @@
 		}
 
 		//validating item key
-		$checkResult = check_item_key($item['key_']);
-		if(!$checkResult['valid']){
-			error(S_ERROR_IN_ITEM_KEY.SPACE.$checkResult['description']);
+		$itemKey = new CItemKey($item['key_']);
+		if(!$itemKey->isValid()){
+			error(S_ERROR_IN_ITEM_KEY.SPACE.$itemKey->getError());
 			return false;
 		}
 
@@ -598,9 +598,9 @@
 		}
 
 		//validating item key
-		$checkResult = check_item_key($item['key_']);
-		if(!$checkResult['valid']){
-			error(S_ERROR_IN_ITEM_KEY.SPACE.$checkResult['description']);
+		$itemKey = new CItemKey($item['key_']);
+		if(!$itemKey->isValid()){
+			error(S_ERROR_IN_ITEM_KEY.SPACE.$itemKey->getError());
 			return false;
 		}
 
@@ -1045,44 +1045,14 @@
 	return $result;
 	}
 
-	/*
-	 * Function: get_n_param
-	 *
-	 * Description:
-	 *     Return key parameter by index
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments: indexes between 1-x
-	 *
-	 */
-	function get_n_param($key, $num){
-		$param="";
-
-        $num--;
-		if(preg_match('/^'.ZBX_PREG_ITEM_KEY_FORMAT.'$/', $key, $arr)){
-			if(!isset($arr[ZBX_KEY_PARAM_ID])){
-				$arr[ZBX_KEY_PARAM_ID] = false;
-			}
-
-			$params = zbx_get_params($arr[ZBX_KEY_PARAM_ID]);
-
-			if(isset($params[$num])){
-				$param = $params[$num];
-			}
-		}
-
-		return $param;
-	}
 
 	function expand_item_key_by_data($item){
 		$key =& $item['key_'];
 		$macStack = array();
 
-		$macroses = array('{HOSTNAME}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}');
+		$macros = array('{HOSTNAME}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}');
 
-		foreach($macroses as $macro){
+		foreach($macros as $macro){
 			$pos = 0;
 			while($pos = zbx_strpos($key, $macro, $pos)){
 				$pos++;
@@ -1116,30 +1086,38 @@
 		return $item['key_'];
 	}
 
+
+	/**
+	 * Expand macros inside key name and return it
+	 * Example:
+	 *   key: 'test.key[a, b, "{HOSTNAME}"]'
+	 *   name: 'Test item $1, $2, $3'
+	 *   result: 'Test item a, b, Zabbix-server'
+	 *
+	 * @author Konstantin Buravcov
+	 * @see ZBX-3503
+	 * @param array $item
+	 * @return string
+	 */
 	function item_description($item){
-		$descr = $item['description'];
-		$key = expand_item_key_by_data($item);
+		$name = $item['description'];
+		// if item name contains $1..$9 macros, we need to expand them
+		if(preg_match('/\$[1-9]/', $name)){
+			$key = expand_item_key_by_data($item);
 
-		/**
-		 * Regular string functions used below are changed to zbx_*
-		 * wrappers to allow users to name steps in non-ascii chars.
-		 * Also $str[$i] calls were replased by zbx_substr($str, $i, 1)
-		 * @see ZBX-2349
-		 * @author Konstantin Buravcov
-		 */
-        for($i=9;$i>0;$i--){
-            $descr = str_replace("$$i",get_n_param($key,$i),$descr);
-        }
+			// parsing key to get the parameters out of it
+			$ItemKey = new cItemKey($key);
 
-        if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $descr, $arr)){
-            $macros = CuserMacro::getMacros($arr[1], array('itemid' => $item['itemid']));
-
-            $search = array_keys($macros);
-            $values = array_values($macros);
-			$descr = str_replace($search, $values, $descr);
-        }
-
-	return $descr;
+			if($ItemKey->isValid()){
+				$keyParameters = $ItemKey->getParameters();
+				// according to zabbix docs we must replace $1 to $9 macros with item key parameters
+				for($paramNo = 9; $paramNo > 0; $paramNo--){
+					$replaceTo = isset($keyParameters[$paramNo - 1]) ? $keyParameters[$paramNo - 1] : '';
+					$name = str_replace('$'.$paramNo, $replaceTo, $name);
+				}
+			}
+		}
+		return $name;
 	}
 
 	function get_realhost_by_itemid($itemid){
@@ -1757,209 +1735,42 @@
 	}
 
 
-/**
- * Check item key and return info about an error if one is present
+	/**
+	 * Check if given character is a valid key id char
+	 * this function is a copy of is_key_char() from /src/libs/zbxcommon/misc.c
+	 * don't forget to take look in there before changing anything
+	 *
+	 * @author Konstantin Buravcov
+	 * @param string $char
+	 * @return bool
+	 */
+	function isKeyIdChar($char){
+		return (
+			($char >= 'a' && $char <= 'z')
+			|| ($char == '.' || $char == ',' || $char == '_' || $char == '-')
+			|| ($char >= 'A' && $char <= 'Z')
+			|| ($char >= '0' && $char <= '9')
+		);
+	}
+
+/*
+ * Function: httpitemExists
  *
- * @param string $key item key, e.g. system.run[cat /etc/passwd | awk -F: '{ print $1 }']
- * @return array
+ * Description:
+ *     Function returns true if http items exists in the $items array.
+ *     The array should contain a field 'type'
+ *
+ * Author:
+ *     Alexander Vladishev
+ *
+ * Comments:
  *
  */
-	function check_item_key($key){
-		$key_strlen = zbx_strlen($key);
+	function httpitemExists($items){
+		foreach($items as $item)
+			if ($item['type'] == ITEM_TYPE_HTTPTEST)
+				return true;
 
-		//empty string
-		if($key_strlen == 0){
-			return array(
-				false,   //is key valid?
-				S_KEY_CANNOT_BE_EMPTY //result description
-			);
-		}
-
-		//key is larger then 255 chars
-		if($key_strlen > 255){
-			return array(
-				false,   //is key valid?
-				sprintf(S_KEY_TOO_LARGE, 255) //result description
-			);
-		}
-
-		$characters = array();
-
-		//gathering characters into array, because we can't just work with them ar one if it's a unicode string
-		for($i = 0; $i < $key_strlen; $i++){
-			$characters[] = zbx_substr($key, $i, 1);
-		}
-
-		//checking every character, one by one
-		for($current_char = 0; $current_char < $key_strlen; $current_char++) {
-			if(!preg_match("/".ZBX_PREG_KEY_NAME."/", $characters[$current_char])) {
-				break; //$current_char now points to a first 'not a key name' char
-			}
-		}
-
-		//no function specified?
-		if ($current_char == $key_strlen) {
-			return array(
-				'valid' => true,   //is key valid?
-				'description' => S_KEY_IS_VALID //result description
-			);
-		}
-		//function with parameter, e.g. system.run[...]
-		else if($characters[$current_char] == '[') {
-
-			$state = 0; //0 - initial, 1 - inside quoted param, 2 - inside unquoted param
-			$nest_level = 0;
-
-			//for every char, starting after '['
-			for($i = $current_char+1; $i < $key_strlen; $i++) {
-				switch($state){
-					//initial state
-					case 0:
-						if($characters[$i] == ',') {
-							//do nothing
-						}
-						//Zapcat: '][' is treated as ','
-						else if($characters[$i] == ']' && isset($characters[$i+1]) && $characters[$i+1] == '[' && $nest_level == 0) {
-							$i++;
-						}
-						//entering quotes
-						else if($characters[$i] == '"') {
-							$state = 1;
-						}
-						//next nesting level
-						else if($characters[$i] == '[') {
-							$nest_level++;
-						}
-						//one of the nested sets ended
-						else if($characters[$i] == ']' && $nest_level != 0) {
-							$nest_level--;
-							//skipping spaces
-							while(isset($characters[$i+1]) && $characters[$i+1] == ' ') {
-								$i++;
-							}
-							//all nestings are closed correctly
-							if ($nest_level == 0 && isset($characters[$i+1]) && $characters[$i+1] == ']' && !isset($characters[$i+2])) {
-								return array(
-									'valid' => true,   //is key valid?
-									'description' => S_KEY_IS_VALID //result description
-								);
-							}
-
-							if((!isset($characters[$i+1]) || $characters[$i+1] != ',')
-								&& !($nest_level !=0 && isset($characters[$i+1]) && $characters[$i+1] == ']')) {
-								return array(
-									'valid' => false,   //is key valid?
-									'description' => sprintf(S_INCORRECT_SYNTAX_NEAR, $characters[$current_char], $current_char) //result description
-								);
-							}
-						}
-						else if($characters[$i] == ']' && $nest_level == 0) {
-							if (isset($characters[$i+1])){
-								return array(
-									'valid' => false,   //is key valid?
-									'description' => sprintf(S_INCORRECT_USAGE_OF_BRACKETS, $characters[$i+1]) //result description
-								);
-							}
-							else {
-								return array(
-									'valid' => true,   //is key valid?
-									'description' => S_KEY_IS_VALID //result description
-								);
-							}
-						}
-						else if($characters[$i] != ' ') {
-							$state = 2;
-						}
-
-					break;
-
-					//quoted
-					case 1:
-						//ending quote is reached
-						if($characters[$i] == '"'){
-							//skipping spaces
-							while(isset($characters[$i+1]) && $characters[$i+1] == ' ') {
-								$i++;
-							}
-
-							//Zapcat
-							if($nest_level == 0 && isset($characters[$i+1]) && isset($characters[$i+2]) && $characters[$i+1] == ']' && $characters[$i+2] == '['){
-								$state = 0;
-								break;
-							}
-
-							if ($nest_level == 0 && isset($characters[$i+1]) && $characters[$i+1] == ']' && !isset($characters[$i+2])){
-								return array(
-									'valid' => true,   //is key valid?
-									'description' => S_KEY_IS_VALID //result description
-								);
-							}
-							else if($nest_level == 0 && $characters[$i+1] == ']' && isset($characters[$i+2])){
-								return array(
-									'valid' => false,   //is key valid?
-									'description' => sprintf(S_INCORRECT_USAGE_OF_BRACKETS, $characters[$i+2]) //result description
-								);
-							}
-
-							if ((!isset($characters[$i+1]) || $characters[$i+1] != ',') //if next symbol is not ','
-								&& !($nest_level != 0 && isset($characters[$i+1]) && $characters[$i+1] == ']'))
-							{
-								return array(
-									'valid' => false,   //is key valid?
-									'description' => sprintf(S_INCORRECT_SYNTAX_NEAR, $characters[$current_char], $current_char) //result description
-								);
-							}
-
-							$state = 0;
-						}
-						//escaped quote (\")
-						else if($characters[$i] == '\\' && isset($characters[$i+1]) && $characters[$i+1] == '"') {
-							$i++;
-						}
-
-					break;
-
-					//unquoted
-					case 2:
-						//Zapcat
-						if($nest_level == 0 && $characters[$i] == ']' && isset($characters[$i+1]) && $characters[$i+1] =='[' ){
-							$i--;
-							$state = 0;
-						}
-						else if($characters[$i] == ',' || ($characters[$i] == ']' && $nest_level != 0)) {
-							$i--;
-							$state = 0;
-						}
-						else if($characters[$i] == ']' && $nest_level == 0) {
-							if (isset($characters[$i+1])){
-								return array(
-									'valid' => false,   //is key valid?
-									'description' => sprintf(S_INCORRECT_USAGE_OF_BRACKETS, $characters[$i+1]) //result description
-								);
-							}
-							else {
-								return array(
-									'valid' => true,   //is key valid?
-									'description' => S_KEY_IS_VALID //result description
-								);
-							}
-						}
-					break;
-				}
-			}
-
-			return array(
-				'valid' => false,   //is key valid?
-				'description' => S_INVALID_KEY_FORMAT //result description
-			);
-
-		}
-		else {
-			return array(
-				'valid' => false,   //is key valid?
-				'description' => sprintf(S_INVALID_CHARACTER_AT_POSITION, $characters[$current_char], $current_char) //result description
-			);
-		}
-
+		return false;
 	}
 ?>
