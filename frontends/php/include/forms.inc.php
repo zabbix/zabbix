@@ -3823,7 +3823,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$row = DBfetch($result);
 		foreach($row as $key => $value){
 			if(!zbx_empty($value)){
-				$frmHostP->addRow($table_titles[$key], new CSpan(zbx_str2links($value), 'pre'));
+				$frmHostP->addRow($table_titles[$key]['title'], new CSpan(zbx_str2links($value), 'pre'));
 			}
 		}
 

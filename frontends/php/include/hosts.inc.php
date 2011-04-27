@@ -39,7 +39,7 @@
 	 */
 	function getHostProfiles(){
 		/**
-		 * WARNING! Before modifying this array, make sure changes are cynced with C
+		 * WARNING! Before modifying this array, make sure changes are synced with C
 		 * C analog in placed in
 		 */
 		$profileFields = array(
@@ -399,7 +399,7 @@
 		/*
 		// code below look at schema and gets field numbers from there
 		// we decided to use hard coded array (above) instead of this approach
-		// uncomment this block to fall back to chema approach (if needed)
+		// uncomment this block to fall back to schema approach (if needed)
 
 		$profileSchema = DB::getSchema('host_profile');
 		$profileTitles = array(
