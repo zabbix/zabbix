@@ -137,6 +137,7 @@ jQuery(document).ready(function(){
 			break;
 			case '<?php echo HOST_PROFILE_AUTOMATIC ?>':
 				// disabling all input fields
+				profileFields.removeAttr("disabled");
 				profileFields.filter('.linked_to_item').attr("disabled", "disabled"); // disabling all input fields
 				jQuery('.populating_item').show();
 			break;
