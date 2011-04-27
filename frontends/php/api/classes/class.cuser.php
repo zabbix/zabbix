@@ -46,9 +46,7 @@ class CUser extends CZBXAPI{
  */
 	public function get($options=array()){
 		$result = array();
-		$nodeCheck = false;
 		$user_type = self::$userData['type'];
-		$userid = self::$userData['userid'];
 
 		$sort_columns = array('userid', 'alias'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
@@ -310,13 +308,13 @@ Copt::memoryPick();
 			$obj_params = array(
 				'output' => $options['selectUsrgrps'],
 				'userids' => $userids,
-				'preservekeys' => 1
+				'preservekeys' => true
 			);
 			$usrgrps = API::UserGroup()->get($obj_params);
-			foreach($usrgrps as $usrgrpid => $usrgrp){
+			foreach($usrgrps as $usrgrp){
 				$uusers = $usrgrp['users'];
 				unset($usrgrp['users']);
-				foreach($uusers as $num => $user){
+				foreach($uusers as $user){
 					$result[$user['userid']]['usrgrps'][] = $usrgrp;
 				}
 			}

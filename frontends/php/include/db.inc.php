@@ -1066,15 +1066,14 @@ if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
 			$min = bcadd(bcmul($nodeid,'100000000000000'), bcmul($ZBX_LOCALNODEID,'100000000000'), 0);
 			$max = bcadd(bcadd(bcmul($nodeid,'100000000000000'), bcmul($ZBX_LOCALNODEID,'100000000000')),'99999999999', 0);
 
-			$sql = 'SELECT nextid '.
-				' FROM ids '.
+			$sql = 'SELECT nextid'.
+				' FROM ids'.
 				' WHERE nodeid='.$nodeid .
 					' AND table_name='.zbx_dbstr($table).
 					' AND field_name='.zbx_dbstr($id_name);
 
 			// SQLite3 does not support this syntax. Since we are in transation, it can be ignored.
-			if($DB['TYPE'] != ZBX_DB_SQLITE3)
-			{
+			if($DB['TYPE'] != ZBX_DB_SQLITE3){
 				$sql  = $sql.' FOR UPDATE';
 			}
 
@@ -1090,7 +1089,7 @@ if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
 					' WHERE nodeid='.$nodeid.
 						' AND table_name='.zbx_dbstr($table).
 						' AND field_name='.zbx_dbstr($id_name);
-				if(!DBexecute($sql)) self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
+				if(!DBexecute($sql)) self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR ids update');
 			}
 			else{
 				$sql = 'SELECT max('.$id_name.') AS id'.
@@ -1106,7 +1105,7 @@ if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
 
 				$nextid = bcadd($nextid, 1, 0);
 
-				if(!DBexecute($sql)) self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
+				if(!DBexecute($sql)) self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR ids insert');
 			}
 
 			return $nextid;

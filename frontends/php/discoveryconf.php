@@ -38,10 +38,10 @@ $fields=array(
 	'druleid'=>				array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,		null),
 	'name'=>				array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,	'isset({save})'),
 	'proxy_hostid'=>		array(T_ZBX_INT, O_OPT,	 null,	DB_ID,		'isset({save})'),
-	'iprange'=>				array(T_ZBX_IP_RANGE, O_OPT,  null,	NOT_EMPTY,	'isset({save})'),
+	'iprange'=>				array(T_ZBX_STR, O_OPT,  null,	null,		'isset({save})'),
 	'delay'=>				array(T_ZBX_INT, O_OPT,	 null,	null, 		'isset({save})'),
 	'status'=>				array(T_ZBX_INT, O_OPT,	 null,	IN('0,1'), 	'isset({save})'),
-	'uniqueness_criteria'=>	array(T_ZBX_INT, O_OPT,  null, NULL,		'isset({save})', _('Device uniqueness criteria')),
+	'uniqueness_criteria'=>	array(T_ZBX_INT, O_OPT,  null, NULL,		'isset({save})', _('Device uniqueness criteria.')),
 	'g_druleid'=>			array(T_ZBX_INT, O_OPT,  null,	DB_ID,		null),
 	'dchecks'=>				array(null, O_OPT, null, null, null),
 // Actions
@@ -82,7 +82,7 @@ if(get_request('output') == 'ajax'){
 				case 'itemKey':
 					$itemKey = new CItemKey($check['value']);
 					if(!$itemKey->isValid())
-						$ajaxResponse->error(_('Key is not valid: '.$itemKey->getError()));
+						$ajaxResponse->error(_('Incorrect key: '.$itemKey->getError()));
 					break;
 			}
 		}
@@ -96,21 +96,23 @@ if(get_request('output') == 'ajax'){
 
 
 if(get_request('save')){
-	foreach($_REQUEST['dchecks'] as $dcnum => $check){
-		$_REQUEST['dchecks'][$dcnum]['uniq'] = ($_REQUEST['uniqueness_criteria'] == $dcnum ? 1 : 0);
+	$dChecks = get_request('dchecks', array());
+	$uniq = get_request('uniqueness_criteria', 0);
+	foreach($dChecks as $dcnum => $check){
+		$dChecks[$dcnum]['uniq'] = ($uniq == $dcnum ? 1 : 0);
 	}
 
 	$discoveryRule = array(
-		'name' => $_REQUEST['name'],
-		'proxy_hostid' => $_REQUEST['proxy_hostid'],
-		'iprange' => $_REQUEST['iprange'],
-		'delay' => $_REQUEST['delay'],
-		'status' => $_REQUEST['status'],
-		'dchecks' => $_REQUEST['dchecks'],
+		'name' => get_request('name'),
+		'proxy_hostid' => get_request('proxy_hostid'),
+		'iprange' => get_request('iprange'),
+		'delay' => get_request('delay'),
+		'status' => get_request('status'),
+		'dchecks' => $dChecks,
 	);
 
 	if(isset($_REQUEST['druleid'])){
-		$discoveryRule['druleid'] = $_REQUEST['druleid'];
+		$discoveryRule['druleid'] = get_request('druleid');
 		$result = API::drule()->update($discoveryRule);
 
 		$msg_ok = _('Discovery rule updated.');
@@ -127,8 +129,8 @@ if(get_request('save')){
 
 	if($result){
 		$druleid = reset($result['druleids']);
-		add_audit(isset($_REQUEST['druleid']) ? AUDIT_ACTION_UPDATE : AUDIT_ACTION_ADD,
-			AUDIT_RESOURCE_DISCOVERY_RULE, '['.$druleid.'] '.$_REQUEST['name']);
+		add_audit(isset($discoveryRule['druleid']) ? AUDIT_ACTION_UPDATE : AUDIT_ACTION_ADD,
+			AUDIT_RESOURCE_DISCOVERY_RULE, '['.$druleid.'] '.$discoveryRule['name']);
 
 		unset($_REQUEST['form']);
 	}
