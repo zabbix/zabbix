@@ -37,7 +37,7 @@ if($page['type'] == PAGE_TYPE_HTML){
 include_once('include/page_header.php');
 
 // js templates
-require_once('include/templates/scriptConfirm.js.php');
+require_once('include/views/js/general.script.confirm.js.php');
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION

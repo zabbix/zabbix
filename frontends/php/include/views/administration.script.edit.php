@@ -21,7 +21,7 @@
 <?php
 // include JS + templates
 	include('include/views/js/administration.script.edit.js.php');
-	include('include/views/js/administration.script.edit.confirm.js.php');
+	include('include/views/js/general.script.confirm.js.php');
 ?>
 <?php
 	$scripts_wdgt = new CWidget();
