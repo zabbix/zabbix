@@ -49,9 +49,11 @@ typedef int (*zbx_compare_func_t)(const void *d1, const void *d2);
 
 int	zbx_default_int_compare_func(const void *d1, const void *d2);
 int	zbx_default_uint64_compare_func(const void *d1, const void *d2);
+int	zbx_default_str_compare_func(const void *d1, const void *d2);
 
 #define	ZBX_DEFAULT_INT_COMPARE_FUNC	zbx_default_int_compare_func
 #define	ZBX_DEFAULT_UINT64_COMPARE_FUNC	zbx_default_uint64_compare_func
+#define	ZBX_DEFAULT_STR_COMPARE_FUNC	zbx_default_str_compare_func
 
 typedef void *(*zbx_mem_malloc_func_t)(void *old, size_t size);
 typedef void *(*zbx_mem_realloc_func_t)(void *old, size_t size);
@@ -251,5 +253,6 @@ void	zbx_vector_ ## __id ## _reserve(zbx_vector_ ## __id ## _t *vector, size_t s
 void	zbx_vector_ ## __id ## _clear(zbx_vector_ ## __id ## _t *vector);
 
 ZBX_VECTOR_DECL(uint64, zbx_uint64_t);
+ZBX_VECTOR_DECL(str, char*);
 
 #endif

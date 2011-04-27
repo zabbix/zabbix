@@ -256,6 +256,11 @@ int	zbx_default_uint64_compare_func(const void *d1, const void *d2)
 	return 0;
 }
 
+int	zbx_default_str_compare_func(const void *d1, const void *d2)
+{
+	return strcmp(*(const char **)d1, *(const char **)d2);
+}
+
 /* default memory management functions */
 
 void	*zbx_default_mem_malloc_func(void *old, size_t size)
