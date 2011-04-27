@@ -1139,8 +1139,8 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 		}
 		else
 		{
-			h->keep_history = (unsigned char)(item.history ? 1 : 0);
-			h->keep_trends = (unsigned char)(item.trends ? 1 : 0);
+			h->keep_history = (item.history ? 1 : 0);
+			h->keep_trends = (item.trends ? 1 : 0);
 		}
 
 		status = ITEM_STATUS_ACTIVE;

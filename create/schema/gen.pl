@@ -271,7 +271,7 @@ sub process_field
 		{
 			for ($length)
 			{
-				s/\)//g;
+				s/\)//;
 			}
 		}
 		elsif ($type eq "ZBX_TYPE_TEXT")
@@ -326,7 +326,7 @@ sub process_field
 			$fk_flags = "0";
 		}
 
-		print "\t\t{\"${name}\",\t${fk_table},\t${fk_field},\t${length}, \t$type,\t${flags},\t${fk_flags}}";
+		print "\t\t{\"${name}\",\t${fk_table},\t${fk_field},\t${length},\t$type,\t${flags},\t${fk_flags}}";
 	}
 	else
 	{
