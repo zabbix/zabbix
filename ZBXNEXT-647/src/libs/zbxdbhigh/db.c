@@ -2157,6 +2157,8 @@ char	*DBsql_id_ins(zbx_uint64_t id)
 	return buf[n];
 }
 
+#define ZBX_MAX_PROFILE_FIELDS	70
+
 /******************************************************************************
  *                                                                            *
  * Function: DBget_profile_field                                              *
@@ -2172,7 +2174,6 @@ char	*DBsql_id_ins(zbx_uint64_t id)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-#define ZBX_MAX_PROFILE_FIELDS	70
 const char	*DBget_profile_field(unsigned char profile_link)
 {
 	static const char	*profile_fields[ZBX_MAX_PROFILE_FIELDS] =
@@ -2240,3 +2241,5 @@ unsigned short	DBget_profile_field_len(unsigned char profile_link)
 
 	return profile_field_len[profile_link];
 }
+
+#undef ZBX_MAX_PROFILE_FIELDS
