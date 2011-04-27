@@ -570,7 +570,6 @@ include_once('include/page_header.php');
 				$hosts,
 				$description,
 				triggerExpression($trigger,1),
-//				explode_exp($trigger['expression'], 1),
 				$error
 			));
 

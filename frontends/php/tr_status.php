@@ -485,7 +485,7 @@ require_once('include/templates/scriptConfirm.js.php');
 			$font = new CTag('font', 'yes');
 			$font->setAttribute('color', '#000');
 			$font->setAttribute('size', '-2');
-			$font->addItem(explode_exp($trigger['expression'], 1, false, true));
+			$font->addItem(explode_exp($trigger['expression'], true, true));
 			$description = array($description, BR(), $font);
 		}
 
