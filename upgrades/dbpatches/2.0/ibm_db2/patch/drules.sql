@@ -36,6 +36,10 @@ ALTER TABLE drules ALTER COLUMN proxy_hostid DROP NOT NULL
 /
 REORG TABLE drules
 /
+ALTER TABLE drules ALTER COLUMN delay SET WITH DEFAULT '3600'
+/
+REORG TABLE drules
+/
 ALTER TABLE drules DROP COLUMN unique_dcheckid
 /
 REORG TABLE drules
