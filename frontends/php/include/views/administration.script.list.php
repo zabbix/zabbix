@@ -58,24 +58,6 @@
 	foreach($scripts as $snum => $script){
 		$scriptid = $script['scriptid'];
 
-		if($script['usrgrpid'] > 0){
-			$user_group = API::UserGroup()->get(array('usrgrpids' => $script['usrgrpid'], 'output' => API_OUTPUT_EXTEND));
-			$user_group = reset($user_group);
-
-			$user_group_name = $user_group['name'];
-		}
-		else{
-			$user_group_name = _('All');
-		}
-
-		if($script['groupid'] > 0){
-			$group = array_pop($script['groups']);
-			$host_group_name = $group['name'];
-		}
-		else{
-			$host_group_name = _('All');
-		}
-
 		switch($script['type']){
 		case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
 			$scriptType = _('Script');
@@ -108,8 +90,8 @@
 			$scriptType,
 			$scriptExecuteOn,
 			zbx_nl2br(htmlspecialchars($script['command'], ENT_COMPAT, 'UTF-8')),
-			$user_group_name,
-			$host_group_name,
+			('' == $script['userGroupName']) ? _('All') : $script['userGroupName'],
+			('' == $script['hostGroupName']) ? _('All') : $script['hostGroupName'],
 			((PERM_READ_WRITE == $script['host_access']) ? _('Write') : _('Read'))
 		));
 	}
