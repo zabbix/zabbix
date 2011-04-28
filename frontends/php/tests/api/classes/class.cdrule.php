@@ -501,19 +501,6 @@ class CDRuleTest extends PHPUnit_Framework_TestCase{
 					)
 				)
 			),
-			array(
-				// #12 update with check that already exists in "createValidRules #2"
-				array(
-					'name' => 'api create',
-					'iprange' => '192.168.1.1-255',
-					'dchecks' => array(
-						array(
-							'type' => SVC_FTP,
-							'ports' => '10050'
-						),
-					)
-				)
-			),
 		);
 	}
 
