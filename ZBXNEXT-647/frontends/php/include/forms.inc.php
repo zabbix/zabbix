@@ -2129,7 +2129,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			$hostProfileFieldDropDown = new CComboBox('profile_link');
 			$possibleHostProfiles = getHostProfiles();
 
-			// which field are already being populated by other items
+			// which fields are already being populated by other items
 			$options = array(
 				'output' => array('profile_link'),
 				'filter' => array('hostid' => $hostid),
@@ -2137,9 +2137,8 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			);
 			$alreadyPopulated = API::item()->get($options);
 			$alreadyPopulated = zbx_objectValues($alreadyPopulated, 'profile_link');
-
 			// default option - do not populate
-			$hostProfileFieldDropDown->addItem(0, '-None-', $profile_link == '0' || $itemCloned ? 'Yes' : null); // 'yes' means 'selected'
+			$hostProfileFieldDropDown->addItem(0, '-'._('None').'-', $profile_link == '0' || $itemCloned ? 'Yes' : null); // 'yes' means 'selected'
 			// a list of available host profile fields
 			foreach($possibleHostProfiles as $fieldNo => $fieldInfo){
 				$hostProfileFieldDropDown->addItem(
@@ -2528,7 +2527,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 				'templated_hosts' => 1
 			);
 			$hosts = API::Host()->get($options);
-			order_result($hosts, 'host');
+			order_result($hosts, 'name');
 
 			foreach($hosts as $num => $host){
 				$hostid = $host['hostid'];
@@ -2539,7 +2538,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 						null,
 						$hostid),
 					SPACE,
-					$host['host'],
+					$host['name'],
 					BR()
 				));
 			}
