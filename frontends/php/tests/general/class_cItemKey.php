@@ -330,15 +330,15 @@ class class_cItemKey extends PHPUnit_Framework_TestCase
 				)
 			),
 			array(
-				'key["\\""]',
+				'key["\\""]', // key["\""]
 				array(
 					'valid'=>true,
 					'key_id'=>'key',
-					'parameters'=>array('\"')
+					'parameters'=>array('"')
 				)
 			),
 			array(
-				'key["\\\""]',
+				'key["\\\""]', // key["\\""]
 				array(
 					'valid'=>true,
 					'key_id'=>'key',
@@ -346,11 +346,11 @@ class class_cItemKey extends PHPUnit_Framework_TestCase
 				)
 			),
 			array(
-				'key["\\\\""]',
+				'key["\\\\""]', // key["\\""]
 				array(
 					'valid'=>true,
 					'key_id'=>'key',
-					'parameters'=>array('\\\"')
+					'parameters'=>array('\"')
 				)
 			),
 			array(
@@ -362,7 +362,7 @@ class class_cItemKey extends PHPUnit_Framework_TestCase
 				)
 			),
 			array(
-				'key["\\ "]',
+				'key["\\ "]', // key["\ "]
 				array(
 					'valid'=>true,
 					'key_id'=>'key',
@@ -370,15 +370,7 @@ class class_cItemKey extends PHPUnit_Framework_TestCase
 				)
 			),
 			array(
-				'key["\\\ "]',
-				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('\\\ ')
-				)
-			),
-			array(
-				'key["\\\\ "]',
+				'key["\\\\ "]',  // key["\\ "]
 				array(
 					'valid'=>true,
 					'key_id'=>'key',
@@ -620,7 +612,7 @@ class class_cItemKey extends PHPUnit_Framework_TestCase
 		}
 		else{
 			unset($result['error']); // no error descriptions in data providers
-			$this->assertEquals($result, $expectedResult, "I was expecting: \n".print_r($expectedResult, true).", but got: \n".print_r($result, true).' for key '.$key);
+			$this->assertEquals($result, $expectedResult, "I was expecting: \n".print_r($expectedResult, true)."but got: \n".print_r($result, true).' for key '.$key);
 		}
 	}
 }
