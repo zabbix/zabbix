@@ -25,9 +25,6 @@
 
 #include "evalfunc.h"
 
-/* list of units that shouldn't be modified with suffix */
-const char	*ZBX_UNIT_BLACKLIST[] = { "%", "ms", "rpm", NULL };
-
 const char	*get_table_by_value_type(int value_type)
 {
 	switch (value_type)
@@ -2259,7 +2256,7 @@ static void	add_value_suffix_normal(char *value, int max_len, const char *units)
 
 	base = (0 == strcmp(units, "B") || 0 == strcmp(units, "Bps") ? 1024 : 1000);
 
-	if (value_double < base)
+	if (value_double < base || SUCCEED == str_in_list("%,ms,rpm,RPM", units, ','))
 	{
 		strscpy(kmgt, "");
 	}
@@ -2320,28 +2317,13 @@ int	add_value_suffix(char *value, int max_len, const char *units, int value_type
 {
 	const char	*__function_name = "add_value_suffix";
 
-	int		ret = FAIL, i;
+	int		ret = FAIL;
 	struct tm	*local_time = NULL;
 	time_t		time;
 	char		tmp[256];
 
-	const char	*p_bl;	/* a pointer to unit blacklist entry */
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() value:'%s' units:'%s'",
 			__function_name, value, units);
-
-	/* mind the unit blacklist */
-	i = 0;
-	while (NULL != (p_bl = ZBX_UNIT_BLACKLIST[i++]))
-	{
-		if (0 == strcasecmp(p_bl, units))
-		{
-			/* units blacklisted */
-			zbx_snprintf(tmp, sizeof(tmp), "%s %s", value, units);
-			zbx_strlcpy(value, tmp, max_len);
-			return SUCCEED;
-		}
-	}
 
 	switch (value_type)
 	{
@@ -2528,7 +2510,7 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 		}
 	}
 
-	DBfree_result(result); /* Cannot call DBfree_result until evaluate_FUNC. */
+	DBfree_result(result); /* cannot call DBfree_result until evaluate_FUNC */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s value:'%s'", __function_name,
 			zbx_result_string(res), value);
