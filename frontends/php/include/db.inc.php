@@ -1125,6 +1125,18 @@ if(isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']){
 				self::exception(self::SCHEMA_ERROR, _s('Table "%s" does not exist.', $table));
 		}
 
+		public static function getDefaults($table){
+			$table = self::getSchema($table);
+
+			$defaults = array();
+			foreach($table['fields'] as $name => $field){
+				if(isset($field['default']))
+					$defaults[$name] = $field['default'];
+			}
+
+			return $defaults;
+		}
+
 		public static function checkValueTypes($table, &$values){
 			global $DB;
 
