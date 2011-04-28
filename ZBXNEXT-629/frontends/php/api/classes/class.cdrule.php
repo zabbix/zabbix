@@ -422,30 +422,62 @@ COpt::memoryPick();
 	public function checkInput(array &$dRules){
 		$dRules = zbx_toArray($dRules);
 
+		if(empty($dRules)){
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input.'));
+		}
+
 		if(self::$userData['type'] >= USER_TYPE_ZABBIX_ADMIN){
 			if(!count(get_accessible_nodes_by_user(self::$userData, PERM_READ_WRITE, PERM_RES_IDS_ARRAY)))
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 		}
 
+		$proxies = array();
 		foreach($dRules as $dRule){
-			if(!isset($dRule['iprange']) || !validate_ip_range($dRule['iprange'])){
+			if(!isset($dRule['iprange'])){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('IP range cannot be empty.'));
+			}
+			else if(!validate_ip_range($dRule['iprange'])){
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect IP range "%s".', $dRule['iprange']));
 			}
+
 			if(isset($dRule['delay']) && $dRule['delay'] < 0){
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect delay.'));
 			}
+
+			if(isset($dRule['status']) && (($dRule['status'] != DRULE_STATUS_DISABLED) && ($dRule['status'] != DRULE_STATUS_ACTIVE))){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect status.'));
+			}
+
 			if(empty($dRule['dchecks'])){
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot save discovery rule without checks.'));
 			}
 
 			$this->validateDChecks($dRule['dchecks']);
+
+			if(isset($dRule['proxy_hostid']) && $dRule['proxy_hostid']){
+				$proxies[] = $dRule['proxy_hostid'];
+			}
+		}
+
+		if(!empty($proxies)){
+			$proxiesDB = API::proxy()->get(array(
+				'proxyids' => $proxies,
+				'output' => API_OUTPUT_SHORTEN,
+				'preservekeys' => true,
+			));
+			foreach($proxies as $proxy){
+				if(!isset($proxiesDB[$proxy])){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect proxyid.'));
+				}
+			}
 		}
 	}
 
 	protected function validateDChecks(array &$dChecks){
 		$uniq = 0;
+
 		foreach($dChecks as $dcnum => $dCheck){
-			if($dCheck['uniq'] == 1) $uniq++;
+			if(isset($dCheck['uniq']) && ($dCheck['uniq'] == 1)) $uniq++;
 
 			if(isset($dCheck['ports']) && !validate_port_list($dCheck['ports'])){
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect port range.'));
@@ -453,11 +485,14 @@ COpt::memoryPick();
 
 			switch($dCheck['type']){
 				case SVC_AGENT:
+					if(!isset($dCheck['key_'])){
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect key.'));
+					}
+
 					$itemKey = new CItemKey($dCheck['key_']);
 					if(!$itemKey->isValid())
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect key: %s', $itemKey->getError()));
 					break;
-
 				case SVC_SNMPv1:
 				case SVC_SNMPv2:
 					if(!isset($dCheck['snmp_community']) || zbx_empty($dCheck['snmp_community']))
@@ -472,6 +507,7 @@ COpt::memoryPick();
 			if(!isset($dCheck['snmpv3_securitylevel'])){
 				$dCheck['snmpv3_securitylevel'] = ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV;
 			}
+
 			switch($dCheck['snmpv3_securitylevel']){
 				case ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV:
 					$dChecks[$dcnum]['snmpv3_authpassphrase'] = $dChecks[$dcnum]['snmpv3_privpassphrase'] = '';
@@ -480,11 +516,15 @@ COpt::memoryPick();
 					$dChecks[$dcnum]['snmpv3_privpassphrase'] = '';
 					break;
 			}
+
+			$this->validateDuplicateChecks($dChecks);
 		}
 
 		if($uniq > 1){
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one check can be unique.'));
 		}
+
+
 	}
 
 	protected function validateRequiredFields($dRules, $on){
@@ -500,6 +540,28 @@ COpt::memoryPick();
 				if(!isset($dRule['name']) || zbx_empty($dRule['name'])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Field "name" is required.'));
 				}
+			}
+		}
+	}
+
+	protected function validateDuplicateChecks(array $dChecks){
+		$defaultValues = DB::getDefaults('dchecks');
+		foreach($dChecks as &$dCheck){
+			$dCheck += $defaultValues;
+			unset($dCheck['uniq']);
+		}
+		unset($dCheck);
+
+		while($current = array_pop($dChecks)){
+			foreach($dChecks as $dCheck){
+				$equal = true;
+				foreach($dCheck as $fieldName => $dCheckField){
+					if(isset($current[$fieldName]) && (strcmp($dCheckField, $current[$fieldName]) !== 0)){
+						$equal = false;
+						break;
+					}
+				}
+				if($equal) self::exception(ZBX_API_ERROR_PARAMETERS, _('Checks should be unique.'));
 			}
 		}
 	}
@@ -577,10 +639,10 @@ COpt::memoryPick();
  * @return array
  */
 	public function update(array $dRules){
-		$dRuleids = zbx_objectValues($dRules, 'druleid');
-
 		$this->checkInput($dRules);
 		$this->validateRequiredFields($dRules, __FUNCTION__);
+
+		$dRuleids = zbx_objectValues($dRules, 'druleid');
 
 		$dRulesDb = API::DRule()->get(array(
 			'druleids' => $dRuleids,
@@ -590,7 +652,9 @@ COpt::memoryPick();
 			'preservekeys' => true,
 		));
 
-		$dRulesUpdate = $dChecksUpdate = $dCheckidsDelete = $dChecksCreate = array();
+		$defaultValues = DB::getDefaults('dchecks');
+
+		$dRulesUpdate = $dCheckidsDelete = $dChecksCreate = array();
 		foreach($dRules as $dRule){
 
 			$dRulesUpdate[] = array(
@@ -598,29 +662,44 @@ COpt::memoryPick();
 				'where' => array('druleid' => $dRule['druleid'])
 			);
 
-			$dChecksDiff = zbx_array_diff($dRule['dchecks'], $dRulesDb[$dRule['druleid']]['dchecks'], 'dcheckid');
 
-			foreach($dChecksDiff['first'] as $dCheck){
+			$dbChecks = $dRulesDb[$dRule['druleid']]['dchecks'];
+			$newChecks = $dRule['dchecks'];
+			foreach($newChecks as &$dCheck){
+				$dCheck += $defaultValues;
+			}
+			unset($dCheck);
+
+			foreach($newChecks as $newnum => $newdCheck){
+				foreach($dbChecks as $exnum => $exdCheck){
+					$equal = true;
+					foreach($exdCheck as $fieldName => $dCheckField){
+						if(isset($newdCheck[$fieldName]) && (strcmp($dCheckField, $newdCheck[$fieldName]) !== 0)){
+							$equal = false;
+							break;
+						}
+					}
+					if($equal){
+						unset($dRule['dchecks'][$newnum]);
+						unset($dbChecks[$exnum]);
+					}
+				}
+			}
+
+			foreach($dRule['dchecks'] as $dCheck){
 				$dCheck['druleid'] = $dRule['druleid'];
 				$dChecksCreate[] = $dCheck;
 			}
 
-			$dCheckidsDelete = array_merge($dCheckidsDelete, zbx_objectValues($dChecksDiff['second'], 'dcheckid'));
-
-
-			foreach($dChecksDiff['both'] as $checkUpdate){
-				$dChecksUpdate[] = array(
-					'values' => array('uniq' => $checkUpdate['uniq']),
-					'where' => array('dcheckid' => $checkUpdate['dcheckid'])
-				);
-			}
+			$dCheckidsDelete = array_merge($dCheckidsDelete, zbx_objectValues($dbChecks, 'dcheckid'));
 		}
+
+		DB::update('drules', $dRulesUpdate);
 
 		if(!empty($dCheckidsDelete)){
 			$this->deleteChecks($dCheckidsDelete);
 		}
-		DB::update('drules', $dRulesUpdate);
-		DB::update('dchecks', $dChecksUpdate);
+
 		DB::insert('dchecks', $dChecksCreate);
 
 		return array('druleids' => $dRuleids);
