@@ -381,21 +381,23 @@ int	SYSTEM_HW_DEVICES(const char *cmd, const char *param, unsigned flags, AGENT_
 
 int     SYSTEM_HW_MACADDR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#define HW_MACADDR_LIST	1
-#define HW_MACADDR_FULL	2	/* indicate name for each MAC address */
-	int		ret = SYSINFO_RET_FAIL, offset = 0, s, i, show = 0;
-	char		tmp[MAX_STRING_LEN], buf[MAX_STRING_LEN], buffer[MAX_STRING_LEN];
+	int		ret = SYSINFO_RET_FAIL, offset = 0, s, i, show_names;
+	char		tmp[MAX_STRING_LEN], regex[MAX_STRING_LEN], buf[MAX_STRING_LEN], buffer[MAX_STRING_LEN];
 	struct ifreq	*ifr;
 	struct ifconf	ifc;
 
-	if (1 < num_param(param))
+	if (2 < num_param(param))
 		return ret;
 
-	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "list"))
-		show = HW_MACADDR_LIST;	/* list only addresses by default */
-	else if (0 == strcmp(tmp, "full"))
-		show = HW_MACADDR_FULL;
-	/* else show MAC address only for the indicated interface */
+	if (0 != get_param(param, 1, regex, sizeof(regex)))
+		*regex = '\0';
+
+	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "shownames"))
+		show_names = 1;
+	else if (0 == strcmp(tmp, "onlymacs"))
+		show_names = 0;
+	else
+		return ret;
 
 	if (-1 == (s = socket(AF_INET, SOCK_DGRAM, 0)))
 		return ret;
@@ -410,14 +412,14 @@ int     SYSTEM_HW_MACADDR(const char *cmd, const char *param, unsigned flags, AG
 	/* go through the list */
 	for (i = ifc.ifc_len / sizeof(struct ifreq); 0 < i--; ifr++)
 	{
-		if ((HW_MACADDR_FULL != show && HW_MACADDR_LIST != show) && 0 != strcmp(tmp, ifr->ifr_name))
+		if ('\0' != *regex && NULL == zbx_regexp_match(ifr->ifr_name, regex, NULL))
 			continue;
 
 		if (-1 != ioctl(s, SIOCGIFFLAGS, ifr) &&		/* get the interface */
 				0 == (ifr->ifr_flags & IFF_LOOPBACK) &&	/* skip loopback interface */
 				-1 != ioctl(s, SIOCGIFHWADDR, ifr))	/* get the MAC address */
 		{
-			if (HW_MACADDR_FULL == show)
+			if (1 == show_names)
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%s: ", ifr->ifr_name);
 
 			offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%.2hx:%.2hx:%.2hx:%.2hx:%.2hx:%.2hx, ",
