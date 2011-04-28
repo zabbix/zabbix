@@ -253,6 +253,32 @@ if($sid){
 			'selectGroups' => API_OUTPUT_EXTEND
 		);
 		$scripts = API::Script()->get($options);
+
+// Find script host group name and user group name. Set to '' if all host/user groups used.
+		foreach($scripts as $snum => $script){
+			$scriptid = $script['scriptid'];
+
+			if($script['usrgrpid'] > 0){
+				$user_group = API::UserGroup()->get(array('usrgrpids' => $script['usrgrpid'], 'output' => API_OUTPUT_EXTEND));
+				$user_group = reset($user_group);
+
+				$scripts[$snum]['userGroupName'] = $user_group['name'];
+			}
+			else{
+				// All user groups
+				$scripts[$snum]['userGroupName'] = '';
+			}
+
+			if($script['groupid'] > 0){
+				$group = array_pop($script['groups']);
+				$scripts[$snum]['hostGroupName'] = $group['name'];
+			}
+			else{
+				// All host groups
+				$scripts[$snum]['hostGroupName'] = '';
+			}
+		}
+
 		$scriptList->set('scripts',$scripts);
 
 		$scriptList->render();
