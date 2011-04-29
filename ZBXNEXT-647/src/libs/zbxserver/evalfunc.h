@@ -31,9 +31,6 @@ extern  int     CONFIG_SERVER_STARTUP_TIME;
 int	evaluate_macro_function(char *value, const char *host, const char *key,
 		const char *function, const char *parameter);
 
-void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
-		const char *units, unsigned char value_type);
-
 const char	*get_table_by_value_type(int value_type);
 const char	*get_key_by_value_type(int value_type);
 
