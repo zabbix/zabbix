@@ -20,10 +20,26 @@
 ?>
 <?php
 class CView{
-	private $file;
+	/**
+	 * @var string - name of the template file without extension, for example 'general.search'
+	 */
+	private $filePath;
+	/**
+	 * @var array - hash of 'variable_name'=>'variable_value' to be used inside template
+	 */
 	private $data;
-	private $form;
+	/**
+	 * @var object - actual template object being shown
+	 */
+	private $template;
+	/**
+	 * @var string - scripts on page
+	 */
 	private $scripts;
+	/**
+	 * @var string - directory where views are stored
+	 */
+	private $viewsDir = 'include/views';
 
 	/**
 	 * Creates a new view based on provided template file.
@@ -36,11 +52,15 @@ class CView{
 
 	public function assign($file, $data){
 		if(!preg_match("/[a-z\.]+/", $file)){
-			throw new Exception(_s('Invalid view name given \'%s\'', $file));
+			throw new Exception(_s('Invalid view name given "%s". Allowed chars: "a-z" and "."', $file));
 		}
 
-		$this->file = './include/views/'.$file.'.php';
+		$this->filePath = $this->viewsDir.'/'.$file.'.php';
 		$this->data = $data;
+
+		if(!file_exists($this->filePath)){
+			throw new Exception(_s('File provided to a view does not exist. Tried to find "%s"', $this->filePath));
+		}
 	}
 
 	/**
@@ -79,18 +99,18 @@ class CView{
 	 * @return object GUI object.
 	 */
 	public function render(){
+		// $data this variable will be used in included file
 		$data = $this->data;
-
 		ob_start();
-		$this->form = include($this->file);
-		if(FALSE === $this->form){
-			throw new Exception(_s('Cannot include view file \'%s\'', $this->file));
+		$this->template = include($this->filePath);
+		if(false === $this->template){
+			throw new Exception(_s('Cannot include view file "%s".', $this->filePath));
 		}
 		$this->scripts = ob_get_clean();
 
 		/* TODO It is for output of JS code. Should be moved to show() method. */
 		print($this->scripts);
-		return $this->form;
+		return $this->template;
 	}
 
 	/**
@@ -99,10 +119,10 @@ class CView{
 	 * @return NULL
 	 */
 	public function show(){
-		if(!isset($this->form)){
-			throw new Exception(_('View is not rendered'));
+		if(!isset($this->template)){
+			throw new Exception(_('View is not rendered.'));
 		}
-		$this->form->show();
+		$this->template->show();
 	}
 }
 ?>
