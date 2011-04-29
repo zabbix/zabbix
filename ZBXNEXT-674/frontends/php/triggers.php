@@ -491,7 +491,7 @@ include_once('include/page_header.php');
 				else{
 					$real_hosts = $realHosts[$triggerid];
 					$real_host = reset($real_hosts);
-					$description[] = new CLink($real_host['host'], 'triggers.php?&hostid='.$real_host['hostid'], 'unknown');
+					$description[] = new CLink($real_host['name'], 'triggers.php?&hostid='.$real_host['hostid'], 'unknown');
 					$description[] = ':';
 				}
 			}
@@ -515,7 +515,7 @@ include_once('include/page_header.php');
 
 					$hosts = get_hosts_by_triggerid($dep_trigger['triggerid']);
 					while($host = DBfetch($hosts)){
-						$description[] = $host['host'];
+						$description[] = $host['name'];
 						$description[] = ', ';
 					}
 
@@ -556,7 +556,7 @@ include_once('include/page_header.php');
 				$hosts = array();
 				foreach($trigger['hosts'] as $hostid => $host){
 					if(!empty($hosts)) $hosts[] = ', ';
-					$hosts[] = $host['host'];
+					$hosts[] = $host['name'];
 				}
 			}
 
@@ -570,7 +570,6 @@ include_once('include/page_header.php');
 				$hosts,
 				$description,
 				triggerExpression($trigger,1),
-//				explode_exp($trigger['expression'], 1),
 				$error
 			));
 

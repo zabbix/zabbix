@@ -72,6 +72,7 @@ typedef struct
 	zbx_uint64_t	hostid;
 	zbx_uint64_t	proxy_hostid;
 	char		host[HOST_HOST_LEN_MAX];
+	char		name[HOST_HOST_LEN_MAX];
 	unsigned char	maintenance_status;
 	unsigned char	maintenance_type;
 	int		maintenance_from;

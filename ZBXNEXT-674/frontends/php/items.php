@@ -181,7 +181,7 @@ switch($itemType) {
 		'filter_set' =>		array(T_ZBX_STR, O_OPT,	P_ACT,	null,	null),
 
 		'filter_group'=>			array(T_ZBX_STR, O_OPT,  null,	null,		null),
-		'filter_host'=>				array(T_ZBX_STR, O_OPT,  null,	null,		null),
+		'filter_hostname'=>			array(T_ZBX_STR, O_OPT,  null,	null,		null),
 		'filter_hostid'=>			array(T_ZBX_INT, O_OPT,  null,	DB_ID,		null),
 		'filter_application'=>		array(T_ZBX_STR, O_OPT,  null,	null,		null),
 		'filter_name'=>		array(T_ZBX_STR, O_OPT,  null,	null,		null),
@@ -264,15 +264,15 @@ switch($itemType) {
 
 	$hostid = get_request('hostid', 0);
 	if($hostid > 0){
-		$_REQUEST['filter_host'] = reset($hosts);
-		$_REQUEST['filter_host'] = $_REQUEST['filter_host']['host'];
+		$_REQUEST['filter_hostname'] = reset($hosts);
+		$_REQUEST['filter_hostname'] = $_REQUEST['filter_hostname']['name'];
 		$_REQUEST['filter_set'] = 1;
 	}
 
 /* FILTER */
 	if(isset($_REQUEST['filter_set'])){
 		$_REQUEST['filter_group'] = get_request('filter_group');
-		$_REQUEST['filter_host'] = get_request('filter_host');
+		$_REQUEST['filter_hostname'] = get_request('filter_hostname');
 		$_REQUEST['filter_application'] = get_request('filter_application');
 		$_REQUEST['filter_name'] = get_request('filter_name');
 		$_REQUEST['filter_type'] = get_request('filter_type', -1);
@@ -292,7 +292,7 @@ switch($itemType) {
 		$_REQUEST['filter_ipmi_sensor'] = get_request('filter_ipmi_sensor');
 
 		CProfile::update('web.items.filter_group', $_REQUEST['filter_group'], PROFILE_TYPE_STR);
-		CProfile::update('web.items.filter_host', $_REQUEST['filter_host'], PROFILE_TYPE_STR);
+		CProfile::update('web.items.filter_hostname', $_REQUEST['filter_hostname'], PROFILE_TYPE_STR);
 		CProfile::update('web.items.filter_application', $_REQUEST['filter_application'], PROFILE_TYPE_STR);
 		CProfile::update('web.items.filter_name', $_REQUEST['filter_name'], PROFILE_TYPE_STR);
 		CProfile::update('web.items.filter_type', $_REQUEST['filter_type'], PROFILE_TYPE_INT);
@@ -313,7 +313,7 @@ switch($itemType) {
 	}
 	else{
 		$_REQUEST['filter_group'] = CProfile::get('web.items.filter_group');
-		$_REQUEST['filter_host'] = CProfile::get('web.items.filter_host');
+		$_REQUEST['filter_hostname'] = CProfile::get('web.items.filter_hostname');
 		$_REQUEST['filter_application'] = CProfile::get('web.items.filter_application');
 		$_REQUEST['filter_name'] = CProfile::get('web.items.filter_name');
 		$_REQUEST['filter_type'] = CProfile::get('web.items.filter_type', -1);
@@ -333,10 +333,10 @@ switch($itemType) {
 		$_REQUEST['filter_ipmi_sensor'] = CProfile::get('web.items.filter_ipmi_sensor');
 	}
 
-	if(isset($_REQUEST['filter_host']) && !zbx_empty($_REQUEST['filter_host'])){
-		$hostid = API::Host()->getObjects(array('host' => $_REQUEST['filter_host']));
+	if(isset($_REQUEST['filter_hostname']) && !zbx_empty($_REQUEST['filter_hostname'])){
+		$hostid = API::Host()->getObjects(array('name' => $_REQUEST['filter_hostname']));
 		if(empty($hostid))
-			$hostid = API::Template()->getObjects(array('host' => $_REQUEST['filter_host']));
+			$hostid = API::Template()->getObjects(array('name' => $_REQUEST['filter_hostname']));
 
 		$hostid = reset($hostid);
 
@@ -489,8 +489,8 @@ switch($itemType) {
 				' WHERE itemid='.$_REQUEST['itemid']);
 
 			$host = get_host_by_hostid($item['hostid']);
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
-				S_ITEM.' ['.$item['key_'].'] ['.$_REQUEST['itemid'].'] '.S_HOST.' ['.$host['host'].'] '.S_HISTORY_CLEARED);
+			add_audit(T_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
+				S_ITEM.' ['.$item['key_'].'] ['.$_REQUEST['itemid'].'] '.S_HOST.' ['.$host['name'].'] '.S_HISTORY_CLEARED);
 		}
 		show_messages($result, S_HISTORY_CLEARED, S_CANNOT_CLEAR_HISTORY);
 
@@ -735,7 +735,7 @@ switch($itemType) {
 			if($cur_result){
 				$host = get_host_by_hostid($item['hostid']);
 				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
-					S_ITEM.' ['.$item['key_'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].'] '.S_HISTORY_CLEARED);
+					S_ITEM.' ['.$item['key_'].'] ['.$id.'] '.S_HOST.' ['.$host['name'].'] '.S_HISTORY_CLEARED);
 			}
 		}
 		$go_result = DBend($go_result);
@@ -749,7 +749,7 @@ switch($itemType) {
 
 		$group_itemid = $_REQUEST['group_itemid'];
 
-		$sql = 'SELECT h.host, i.itemid, i.name, i.key_, i.templateid, i.type'.
+		$sql = 'SELECT h.name AS hostname,i.itemid,i.name,i.key_,i.templateid,i.type'.
 				' FROM items i, hosts h '.
 				' WHERE '.DBcondition('i.itemid',$group_itemid).
 					' AND h.hostid=i.hostid'.
@@ -758,16 +758,16 @@ switch($itemType) {
 		while($item = DBfetch($db_items)) {
 			if($item['templateid'] != ITEM_TYPE_ZABBIX) {
 				unset($group_itemid[$item['itemid']]);
-				error(S_ITEM.SPACE."'".$item['host'].':'.itemName($item)."'".SPACE.S_CANNOT_DELETE_ITEM.SPACE.'('.S_TEMPLATED_ITEM.')');
+				error(S_ITEM.SPACE."'".$item['hostname'].':'.itemName($item)."'".SPACE.S_CANNOT_DELETE_ITEM.SPACE.'('.S_TEMPLATED_ITEM.')');
 				continue;
 			}
 			else if($item['type'] == ITEM_TYPE_HTTPTEST) {
 				unset($group_itemid[$item['itemid']]);
-				error(S_ITEM.SPACE."'".$item['host'].':'.itemName($item)."'".SPACE.S_CANNOT_DELETE_ITEM.SPACE.'('.S_WEB_ITEM.')');
+				error(S_ITEM.SPACE."'".$item['hostname'].':'.itemName($item)."'".SPACE.S_CANNOT_DELETE_ITEM.SPACE.'('.S_WEB_ITEM.')');
 				continue;
 			}
 
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$item['itemid'].'] '.S_HOST.' ['.$item['host'].']');
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$item['itemid'].'] '.S_HOST.' ['.$item['hostname'].']');
 		}
 
 		$go_result &= !empty($group_itemid);
@@ -850,8 +850,8 @@ switch($itemType) {
 		if(isset($_REQUEST['filter_group']) && !zbx_empty($_REQUEST['filter_group']))
 			$options['group'] = $_REQUEST['filter_group'];
 
-		if(isset($_REQUEST['filter_host']) && !zbx_empty($_REQUEST['filter_host']))
-			$options['host'] = $_REQUEST['filter_host'];
+		if(isset($_REQUEST['filter_hostname']) && !zbx_empty($_REQUEST['filter_hostname']))
+			$options['name'] = $_REQUEST['filter_hostname'];
 
 		if(isset($_REQUEST['filter_application']) && !zbx_empty($_REQUEST['filter_application']))
 			$options['application'] = $_REQUEST['filter_application'];
@@ -1019,7 +1019,7 @@ switch($itemType) {
 			'triggerids' => $itemTriggerIds,
 			'expandDescription' => true,
 			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => array('hostid','host','status'),
+			'selectHosts' => array('hostid','name','host'),
 			'select_functions' => API_OUTPUT_EXTEND,
 			'selectItems' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
@@ -1031,7 +1031,7 @@ switch($itemType) {
 
 			if($show_host){
 				$host = reset($item['hosts']);
-				$host = $host['host'];
+				$host = $host['name'];
 			}
 			else{
 				$host = null;
@@ -1041,7 +1041,7 @@ switch($itemType) {
 			if($item['templateid']){
 				$template_host = get_realhost_by_itemid($item['templateid']);
 
-				$description[] = new CLink($template_host['host'],'?hostid='.$template_host['hostid'], 'unknown');
+				$description[] = new CLink($template_host['name'],'?hostid='.$template_host['hostid'], 'unknown');
 				$description[] = ':';
 			}
 			$item['name_expanded'] = itemName($item);
@@ -1104,7 +1104,7 @@ switch($itemType) {
 					else{
 						$real_hosts = $trigRealHosts[$triggerid];
 						$real_host = reset($real_hosts);
-						$tr_description[] = new CLink($real_host['host'], 'triggers.php?&hostid='.$real_host['hostid'], 'unknown');
+						$tr_description[] = new CLink($real_host['name'], 'triggers.php?&hostid='.$real_host['hostid'], 'unknown');
 						$tr_description[] = ':';
 					}
 				}

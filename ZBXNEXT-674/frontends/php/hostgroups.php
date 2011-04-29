@@ -294,7 +294,7 @@ include_once('include/page_header.php');
 			//get all hosts from all groups
 			$params = array(
 				'templated_hosts' => 1,
-				'sortfield' => 'host',
+				'sortfield' => 'name',
 				'editable' => 1,
 				'output' => API_OUTPUT_EXTEND
 			);
@@ -305,7 +305,7 @@ include_once('include/page_header.php');
 			$params = array(
 				'groupids' => $twb_groupid,
 				'templated_hosts' => 1,
-				'sortfield' => 'host',
+				'sortfield' => 'name',
 				'editable' => 1,
 				'output' => API_OUTPUT_EXTEND
 			);
@@ -316,7 +316,7 @@ include_once('include/page_header.php');
 		foreach($db_hosts as $num => $db_host){
 // add all except selected hosts
 			if(!isset($hosts[$db_host['hostid']]))
-				$cmbHosts->addItem($db_host['hostid'], $db_host['host']);
+				$cmbHosts->addItem($db_host['hostid'], $db_host['name']);
 		}
 
 // select selected hosts and add them
@@ -405,8 +405,8 @@ include_once('include/page_header.php');
 // Data
 		$options = array(
 			'groupids' => zbx_objectValues($groups, 'groupid'),
-			'selectHosts' => array('hostid','host','status'),
-			'select_templates' => array('hostid','host','status'),
+			'selectHosts' => array('hostid','name','status'),
+			'select_templates' => array('hostid','name','status'),
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => 1,
 			'limitSelects' => $config['max_in_table']+1
@@ -432,7 +432,7 @@ include_once('include/page_header.php');
 				}
 
 				$url = 'templates.php?form=update&templateid='.$template['hostid'].'&groupid='.$group['groupid'];
-				$hosts_output[] = new CLink($template['host'], $url, 'unknown');
+				$hosts_output[] = new CLink($template['name'], $url, 'unknown');
 				$hosts_output[] = ', ';
 			}
 			if(!empty($hosts_output)){
@@ -459,7 +459,7 @@ include_once('include/page_header.php');
 						$url = 'hosts.php?form=update&hostid='.$host['hostid'].'&groupid='.$group['groupid'];
 					break;
 				}
-				$hosts_output[] = new CLink($host['host'], $url, $style);
+				$hosts_output[] = new CLink($host['name'], $url, $style);
 				$hosts_output[] = ', ';
 
 			}

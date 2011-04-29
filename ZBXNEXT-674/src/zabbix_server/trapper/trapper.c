@@ -220,7 +220,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 	zbx_rtrim(s, " \r\n");
 
 	datalen = strlen(s);
-	zabbix_log(LOG_LEVEL_DEBUG, "Trapper got [%s] len %zd", s, datalen);
+	zabbix_log(LOG_LEVEL_DEBUG, "Trapper got [%s] len " ZBX_FS_SIZE_T, s, (zbx_fs_size_t)datalen);
 
 	if (0 == strncmp(s, "ZBX_GET_ACTIVE_CHECKS", 21))	/* Request for list of active checks */
 	{
@@ -251,11 +251,11 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 				if (SUCCEED == res && NULL != (data = DMget_config_data(nodeid, ZBX_NODE_SLAVE)))
 				{
 					zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Sending configuration changes"
-							" to slave node %d for node %d datalen %d",
+							" to slave node %d for node %d datalen " ZBX_FS_SIZE_T,
 							CONFIG_NODEID,
 							sender_nodeid,
 							nodeid,
-							strlen(data));
+							(zbx_fs_size_t)strlen(data));
 					alarm(CONFIG_TRAPPER_TIMEOUT);
 					res = send_data_to_node(sender_nodeid, sock, data);
 					zbx_free(data);
@@ -298,7 +298,11 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 					if (0 != (zbx_process & ZBX_PROCESS_SERVER))
 						send_proxyconfig(sock, &jp);
 					else if (0 != (zbx_process & ZBX_PROCESS_PROXY_PASSIVE))
+					{
+						zabbix_log(LOG_LEVEL_WARNING, "Received configuration data from server."
+								" Datalen " ZBX_FS_SIZE_T, (zbx_fs_size_t)datalen);
 						recv_proxyconfig(sock, &jp);
+					}
 				}
 				else if (0 == strcmp(value, ZBX_PROTO_VALUE_AGENT_DATA) ||
 					0 == strcmp(value, ZBX_PROTO_VALUE_SENDER_DATA))

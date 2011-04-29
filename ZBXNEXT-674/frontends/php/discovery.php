@@ -96,7 +96,7 @@ include_once('include/page_header.php');
 
 	$dscvry_wdgt->addHeader(S_DISCOVERY_RULES_BIG, $r_form);
 	$options = array(
-		'selectHosts' => array('hostid', 'host', 'status'),
+		'selectHosts' => array('hostid', 'name', 'status'),
 		'output' => API_OUTPUT_EXTEND,
 		'sortfield' => getPageSortField('ip'),
 		'sortorder' => getPageSortOrder(),
@@ -190,7 +190,7 @@ include_once('include/page_header.php');
 				$hostName = '';
 
 				$host = reset($db_dservices[$dservice['dserviceid']]['hosts']);
-				if(!is_null($host)) $hostName = $host['host'];
+				if(!is_null($host)) $hostName = $host['name'];
 
 				if(isset($primary_ip)){
 					if($primary_ip === $dservice['ip']) $htype = 'primary';
