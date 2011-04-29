@@ -1056,9 +1056,10 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	for (i = 0; i < history_num; i++)
 		uint64_array_add(&ids, &ids_alloc, &ids_num, history[i].itemid, 64);
 
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 218,
+	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 240,
 			"select i.itemid,i.status,i.lastclock,i.prevorgvalue,i.delta,i.multiplier,i.formula,"
-				"i.history,i.trends,i.lastns,i.hostid,i.profile_link,hp.profile_mode"
+				"i.history,i.trends,i.lastns,i.hostid,i.profile_link,hp.profile_mode,i.valuemapid,"
+				"i.units"
 			" from items i"
 				" left join host_profile hp"
 					" on hp.hostid=i.hostid"
@@ -1332,27 +1333,36 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 
 		if (1 != h->value_null && NULL != (profile_field = DBget_profile_field(profile_link)))
 		{
-			unsigned short	profile_field_len;
-
-			value_esc = NULL;
-			profile_field_len = DBget_profile_field_len(profile_link);
+			char	value[MAX_BUFFER_LEN];
+			int	update_profile = 0;
 
 			switch (h->value_type)
 			{
 				case ITEM_VALUE_TYPE_FLOAT:
-					value_esc = zbx_dsprintf(value_esc, ZBX_FS_DBL, h->value.value_float);
+					zbx_snprintf(value, sizeof(value), ZBX_FS_DBL, h->value.value_float);
+					update_profile = 1;
 					break;
 				case ITEM_VALUE_TYPE_UINT64:
-					value_esc = zbx_dsprintf(value_esc, ZBX_FS_UI64, h->value.value_uint64);
+					zbx_snprintf(value, sizeof(value), ZBX_FS_UI64, h->value.value_uint64);
+					update_profile = 1;
 					break;
 				case ITEM_VALUE_TYPE_STR:
 				case ITEM_VALUE_TYPE_TEXT:
-					value_esc = DBdyn_escape_string_len(h->value_orig.value_str, profile_field_len);
+					strscpy(value, h->value_orig.value_str);
+					update_profile = 1;
 					break;
 			}
 
-			if (NULL != value_esc)
+			if (1 == update_profile)
 			{
+				unsigned short	profile_field_len;
+
+				ZBX_DBROW2UINT64(item.valuemapid, row[13]);
+
+				zbx_format_value(value, sizeof(value), item.valuemapid, row[14], h->value_type);
+
+				profile_field_len = DBget_profile_field_len(profile_link);
+				value_esc = DBdyn_escape_string_len(value, profile_field_len);
 				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128 + strlen(value_esc),
 						"update host_profile set %s='%s' where hostid=" ZBX_FS_UI64 ";\n",
 						profile_field, value_esc, item.hostid);

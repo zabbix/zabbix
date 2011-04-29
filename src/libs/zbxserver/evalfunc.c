@@ -2117,7 +2117,7 @@ static void	add_value_suffix_uptime(char *value, size_t max_len)
 
 	double	days, hours, mins, secs;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() value:'%s'", __function_name, value);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (0 > (secs = atof(value)))
 		goto clean;
@@ -2137,7 +2137,7 @@ static void	add_value_suffix_uptime(char *value, size_t max_len)
 		zbx_snprintf(value, max_len, "%d days, %02d:%02d:%02d", (int)days, (int)hours, (int)mins, (int)secs);
 
 clean:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() value:'%s'", __function_name, value);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -2163,7 +2163,7 @@ static void	add_value_suffix_s(char *value, size_t max_len)
 	double	secs, n;
 	size_t	offset = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() value:'%s'", __function_name, value);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (0 > (secs = atof(value)))
 		goto clean;
@@ -2202,7 +2202,7 @@ static void	add_value_suffix_s(char *value, size_t max_len)
 	del_zeroes(value);
 	zbx_strlcat(value, "s", max_len);
 clean:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() value:'%s'", __function_name, value);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -2232,7 +2232,7 @@ static void	add_value_suffix_normal(char *value, size_t max_len, const char *uni
 	double		base;
 	double		value_double;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() value:'%s' units:'%s'", __function_name, value, units);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (0 > (value_double = atof(value)))
 	{
@@ -2277,7 +2277,7 @@ static void	add_value_suffix_normal(char *value, size_t max_len, const char *uni
 
 	zbx_snprintf(value, max_len, "%s%s %s%s", minus, tmp, kmgt, units);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() value:'%s'", __function_name, value);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -2296,14 +2296,15 @@ static void	add_value_suffix_normal(char *value, size_t max_len, const char *uni
  * Comments: !!! Don't forget sync code with PHP (function convert_units) !!! *
  *                                                                            *
  ******************************************************************************/
-static void	add_value_suffix(char *value, size_t max_len, const char *units, int value_type)
+static void	add_value_suffix(char *value, size_t max_len, const char *units, unsigned char value_type)
 {
 	const char	*__function_name = "add_value_suffix";
 
 	struct tm	*local_time = NULL;
 	time_t		time;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() value:'%s' units:'%s'", __function_name, value, units);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() value:'%s' units:'%s' value_type:%d",
+			__function_name, value, units, (int)value_type);
 
 	switch (value_type)
 	{
@@ -2327,7 +2328,7 @@ static void	add_value_suffix(char *value, size_t max_len, const char *units, int
 			;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() value:'%s'", __function_name, value);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() value:'%s'", __function_name);
 }
 
 /******************************************************************************
@@ -2356,7 +2357,7 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 	char		orig_value[MAX_BUFFER_LEN], *value_esc;
 	int		ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() value:'%s' valuemapid:" ZBX_FS_UI64, __function_name, value, valuemapid);
 
 	if (0 == valuemapid)
 		goto clean;
@@ -2391,7 +2392,7 @@ clean:
  *                                                                            *
  * Function: zbx_format_value                                                 *
  *                                                                            *
- * Purpose: replace value by mapping value or by units                        *
+ * Purpose: replace value by value mapping or by units                        *
  *                                                                            *
  * Parameters: value      - [IN/OUT] value for replacing                      *
  *             valuemapid - [IN] identificator of value map                   *
