@@ -20,7 +20,7 @@
 ?>
 <?php
 // include JS + templates
-require_once('include/templates/action.js.php');
+require_once('include/views/js/configuration.action.edit.js.php');
 ?>
 <?php
 // TODO
