@@ -1340,28 +1340,16 @@ static int	DBget_item_lastvalue(DB_TRIGGER *trigger, char **lastvalue, int N_fun
 				h_result = DBselectN(tmp, 1);
 
 				if (NULL != (h_row = DBfetch(h_result)))
-					*lastvalue = zbx_strdup(*lastvalue, h_row[0]);
+					ZBX_STRDUP(*lastvalue, h_row[0]);
 				else
-					*lastvalue = zbx_strdup(*lastvalue, row[4]);
+					ZBX_STRDUP(*lastvalue, row[4]);
 
 				DBfree_result(h_result);
 				break;
-			case ITEM_VALUE_TYPE_STR:
-				zbx_strlcpy(tmp, row[4], sizeof(tmp));
-
-				replace_value_by_map(tmp, sizeof(tmp), valuemapid);
-
-				*lastvalue = zbx_strdup(*lastvalue, tmp);
-				break;
 			default:
 				zbx_strlcpy(tmp, row[4], sizeof(tmp));
-
-				if (ITEM_VALUE_TYPE_FLOAT == value_type)
-					del_zeroes(tmp);
-				if (SUCCEED != replace_value_by_map(tmp, sizeof(tmp), valuemapid))
-					add_value_suffix(tmp, sizeof(tmp), row[3], value_type);
-
-				*lastvalue = zbx_strdup(*lastvalue, tmp);
+				zbx_format_value(tmp, sizeof(tmp), valuemapid, row[3], value_type);
+				ZBX_STRDUP(*lastvalue, tmp);
 				break;
 		}
 		ret = SUCCEED;
@@ -1422,21 +1410,10 @@ static int	DBget_item_value(DB_TRIGGER *trigger, char **value, int N_functionid,
 			{
 				case ITEM_VALUE_TYPE_FLOAT:
 				case ITEM_VALUE_TYPE_UINT64:
-					zbx_strlcpy(tmp, *value, sizeof(tmp));
-
-					if (ITEM_VALUE_TYPE_FLOAT == value_type)
-						del_zeroes(tmp);
-					if (SUCCEED != replace_value_by_map(tmp, sizeof(tmp), valuemapid))
-						add_value_suffix(tmp, sizeof(tmp), row[3], value_type);
-
-					*value = zbx_strdup(*value, tmp);
-					break;
 				case ITEM_VALUE_TYPE_STR:
 					zbx_strlcpy(tmp, *value, sizeof(tmp));
-
-					replace_value_by_map(tmp, sizeof(tmp), valuemapid);
-
-					*value = zbx_strdup(*value, tmp);
+					zbx_format_value(tmp, sizeof(tmp), valuemapid, row[3], value_type);
+					ZBX_STRDUP(*value, tmp);
 					break;
 				default:
 					;
