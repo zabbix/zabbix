@@ -93,7 +93,7 @@ var ZBX_SVC = {
 	'tcp': <?php print(SVC_TCP);?>,
 	'agent': <?php print(SVC_AGENT);?>,
 	'snmpv1': <?php print(SVC_SNMPv1);?>,
-	'snmpv2': <?php print(SVC_SNMPv2);?>,
+	'snmpv2': <?php print(SVC_SNMPv2c);?>,
 	'snmpv3': <?php print(SVC_SNMPv3);?>,
 	'icmp': <?php print(SVC_ICMPPING);?>,
 	'https': <?php print(SVC_HTTPS);?>,
