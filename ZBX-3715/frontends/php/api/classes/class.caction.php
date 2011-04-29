@@ -787,7 +787,7 @@ COpt::memoryPick();
 			$duplicates = array();
 			foreach($actions as $action){
 				if(!check_db_fields($action_db_fields, $action))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect parameter is used for action "%s"', $action['name']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect parameter is used for action "%s".', $action['name']));
 
 				if(isset($action['esc_period']) && ($action['esc_period'] < 60) && (EVENT_SOURCE_TRIGGERS == $action['eventsource']))
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" has incorrect value for "esc_period" (minimum 60 seconds).', $action['name']));
@@ -881,7 +881,7 @@ COpt::memoryPick();
 			$duplicates = array();
 			foreach($actions as $action){
 				if(!check_db_fields(array('actionid' => null), $action)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect parameters are used for action update method "%s"',$action['name']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect parameters are used for action update method "%s".',$action['name']));
 				}
 
 // check if user change esc_period or eventsource
@@ -1496,7 +1496,7 @@ COpt::memoryPick();
 					if((!isset($operation['opcommand']['command']) || zbx_empty(trim($operation['opcommand']['command']))) &&
 						($operation['opcommand']['type'] != ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT)
 					){
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('No command specified for action operation..'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('No command specified for action operation.'));
 					}
 
 					switch($operation['opcommand']['type']){
@@ -1548,10 +1548,10 @@ COpt::memoryPick();
 					if(isset($operation['opcommand']['port']) && !zbx_empty($operation['opcommand']['port'])){
 						if(zbx_ctype_digit($operation['opcommand']['port'])){
 							if($operation['opcommand']['port'] > 65535 || $operation['opcommand']['port'] < 1)
-								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect action operation port "%s"', $operation['opcommand']['port']));
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect action operation port "%s".', $operation['opcommand']['port']));
 						}
 						else if(!preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $operation['opcommand']['port'])){
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect action operation port "%s"', $operation['opcommand']['port']));
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect action operation port "%s".', $operation['opcommand']['port']));
 						}
 					}
 
