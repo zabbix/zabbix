@@ -1285,7 +1285,7 @@ class CItem extends CItemGeneral{
 	 * If everything is ok, function return true or throws Exception otherwise
 	 * @static
 	 * @param array $items
-	 * @param bool $update whether his is update operation
+	 * @param bool $update whether this is update operation
 	 * @return bool
 	 */
 	public static function validateProfileLinks($items, $update=false){
@@ -1301,16 +1301,15 @@ class CItem extends CItemGeneral{
 			$itemsWithNoHostId = array();
 			$itemsWithHostIdButNoProfileLink = array();
 			foreach($items as $i=>$item){
-				if(isset($item['profile_link']) || isset($item['hostid'])){
-					if(!isset($item['hostid'])){
-						$itemsWithNoHostId[] = $item['itemid'];
-					}
-					else{
-						$hostIds[] = $item['hostid'];
-						if(!isset($item['profile_link'])){
-							$itemsWithHostIdButNoProfileLink[] = $item['itemid'];
-						}
-					}
+				if(isset($item['hostid']) && isset($item['profile_link'])){
+					$hostIds[] = $item['hostid'];
+				}
+				else if(isset($item['hostid'])){
+					$hostIds[] = $item['hostid'];
+					$itemsWithHostIdButNoProfileLink[] = $item['itemid'];
+				}
+				else if(isset($item['profile_link'])){
+					$itemsWithNoHostId[] = $item['itemid'];
 				}
 				else{
 					unset($items[$i]); // profile link field is not being updated, so why bother?
@@ -1393,7 +1392,7 @@ class CItem extends CItemGeneral{
 				){
 					self::exception(
 						ZBX_API_ERROR_PARAMETERS,
-						_('Two items cannot populate one host profile field, this would lead to a conflict. Chosen field is already being populated by item another item.')
+						_('Two items cannot populate one host profile field, this would lead to a conflict. Chosen field is already being populated by another item.')
 					);
 				}
 			}

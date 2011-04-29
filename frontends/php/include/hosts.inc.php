@@ -40,7 +40,7 @@
 	function getHostProfiles(){
 		/**
 		 * WARNING! Before modifying this array, make sure changes are synced with C
-		 * C analog in placed in
+		 * C analog is located in function DBget_profile_field() in src/libs/zbxdbhigh/db.c
 		 */
 		$profileFields = array(
 			1 => array(
@@ -79,8 +79,8 @@
 				'title' => _('OS (Short)'),
 			),
 			8 => array(
-				'nr' =>
-				8, 'db_field' => 'serialno_a',
+				'nr' => 8,
+				'db_field' => 'serialno_a',
 				'title' => _('Serial number A'),
 			),
 			9 => array(
@@ -480,7 +480,7 @@
 			if($field['type'] != 'id' && $field_name != 'profile_mode'){
 				$result[$fieldNo] = array(
 					'db_field' => $field_name,
-					// if no title is defined in getHostProfileTitles() funstion for this field, we assume that title is equal to DB field name
+					// if no title is defined in getHostProfileTitles() function for this field, we assume that title is equal to DB field name
 					'title' => isset($profileTitles[$field_name]) ? $profileTitles[$field_name] : $field_name
 				);
 			}

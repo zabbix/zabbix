@@ -490,7 +490,6 @@ class CHost extends CZBXAPI{
 			$sql_parts['where'][] = ' h.hostid IN ( '.
 					' SELECT hp.hostid '.
 					' FROM host_profile hp )';
-//			AND exists ( SELECT hp.hostid FROM host_profile hp WHERE h.hostid=hp.hostid)
 		}
 
 // output
