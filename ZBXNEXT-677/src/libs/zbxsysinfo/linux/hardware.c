@@ -20,18 +20,7 @@
 #include "../common/common.h"
 #include "sysinfo.h"
 #include <sys/mman.h>
-
-#define DMI_GET_TYPE	0x01
-#define DMI_GET_VENDOR	0x02
-#define DMI_GET_MODEL	0x04
-#define DMI_GET_SERIAL	0x08
-
-#define SMBIOS_INIT	1
-#define SMBIOS_ERROR	2
-#define SMBIOS_FOUND	3
-
-static int	smbios_status = SMBIOS_INIT;
-static size_t	smbios_len, smbios;	/* length and address of SMBIOS table (if found) */
+#include "hardware.h"
 
 /******************************************************************************
  *                                                                            *
@@ -59,57 +48,16 @@ static size_t	get_dmi_string(char *buf, int bufsize, unsigned char *data, int nu
 
 static size_t	get_chassis_type(char *buf, int bufsize, int type)
 {
-#define CHASSIS_TYPE_BITS	0x7f	/* bits 0-6 represent the chassis type */
-#define MAX_CHASSIS_TYPE	0x1d
-
-	/* from System Management BIOS (SMBIOS) Reference Specification v2.7.1 */
-	static const char 	*chassis_type[] =
-	{
-		"",			/* 0x00 */
-		"Other",
-		"Unknown",
-		"Desktop",
-		"Low Profile Desktop",
-		"Pizza Box",
-		"Mini Tower",
-		"Tower",
-		"Portable",
-		"LapTop",
-		"Notebook",
-		"Hand Held",
-		"Docking Station",
-		"All in One",
-		"Sub Notebook",
-		"Space-saving",
-		"Lunch Box",
-		"Main Server Chassis",
-		"Expansion Chassis",
-		"SubChassis",
-		"Bus Expansion Chassis",
-		"Peripheral Chassis",
-		"RAID Chassis",
-		"Rack Mount Chassis",
-		"Sealed-case PC",
-		"Multi-system chassis",
-		"Compact PCI",
-		"Advanced TCA",
-		"Blade",
-		"Blade Enclosure",	/* 0x1d */
-	};
-
 	type = CHASSIS_TYPE_BITS & type;
 
 	if (1 > type || MAX_CHASSIS_TYPE < type)
 		return 0;
 
-	return zbx_snprintf(buf, bufsize, " %s", chassis_type[type]);
+	return zbx_snprintf(buf, bufsize, " %s", chassis_types[type]);
 }
 
 static int	get_dmi_info(char *buf, int bufsize, int flags)
 {
-#define DEV_MEM			"/dev/mem"
-#define SMBIOS_ENTRY_POINT_SIZE	0x20
-#define DMI_HEADER_SIZE		4
 	int			ret = SYSINFO_RET_FAIL, fd, offset = 0;
 	unsigned char		membuf[SMBIOS_ENTRY_POINT_SIZE], *smbuf = NULL, *data;
 	size_t			len, fp;
@@ -119,7 +67,7 @@ static int	get_dmi_info(char *buf, int bufsize, int flags)
 	if (-1 == (fd = open(DEV_MEM, O_RDONLY)))
 		return ret;
 
-	if (SMBIOS_INIT == smbios_status)	/* look for SMBIOS table only once */
+	if (SMBIOS_STATUS_UNKNOWN == smbios_status)	/* look for SMBIOS table only once */
 	{
 		/* find smbios entry point - located between 0xF0000 and 0xFFFFF (according to the specs) */
 		for (fp = 0xf0000; 0xfffff > fp; fp += 16)
@@ -137,15 +85,15 @@ static int	get_dmi_info(char *buf, int bufsize, int flags)
 			{
 				smbios_len = membuf[7] << 8 | membuf[6];
 				smbios = membuf[11] << 24 | membuf[10] << 16 | membuf[9] << 8 | membuf[8];
-				smbios_status = SMBIOS_FOUND;
+				smbios_status = SMBIOS_STATUS_OK;
 				break;
 			}
 		}
 	}
 
-	if (SMBIOS_FOUND != smbios_status)
+	if (SMBIOS_STATUS_OK != smbios_status)
 	{
-		smbios_status = SMBIOS_ERROR;
+		smbios_status = SMBIOS_STATUS_ERROR;
 		goto close;
 	}
 
@@ -232,7 +180,6 @@ int	SYSTEM_HW_CHASSIS(const char *cmd, const char *param, unsigned flags, AGENT_
 
 static int	get_cpu_max_speed(int cpu_num)
 {
-#define CPU_MAX_FREQ_FILE	"/sys/devices/system/cpu/cpu%d/cpufreq/cpuinfo_max_freq"
 	int			result = -1;
 	char			filename[MAX_STRING_LEN];
 	FILE			*f;
@@ -254,14 +201,6 @@ static int	get_cpu_max_speed(int cpu_num)
 
 int     SYSTEM_HW_CPU(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#define HW_CPU_FILE	"/proc/cpuinfo"
-#define ALL_CPUS	-1
-#define SHOW_ALL	1
-#define SHOW_MAXSPEED	2
-#define SHOW_VENDOR	3
-#define SHOW_MODEL	4
-#define SHOW_CURSPEED	5
-#define SHOW_CORES	6
 	int		ret = SYSINFO_RET_FAIL, filter, val, cpu, cur_cpu = -2, offset = 0;
 	char		line[MAX_STRING_LEN], name[MAX_STRING_LEN], tmp[MAX_STRING_LEN], buf[MAX_BUFFER_LEN];
 	FILE		*f;
@@ -270,24 +209,24 @@ int     SYSTEM_HW_CPU(const char *cmd, const char *param, unsigned flags, AGENT_
 		return ret;
 
 	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "all"))
-		cpu = ALL_CPUS;	/* show all CPUs by default */
+		cpu = HW_CPU_ALL_CPUS;	/* show all CPUs by default */
 	else if (FAIL == is_uint(tmp))
 		return ret;
 	else
 		cpu = atoi(tmp);
 
 	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "full"))
-		filter = SHOW_ALL;	/* show full info by default */
+		filter = HW_CPU_SHOW_ALL;	/* show full info by default */
 	else if (0 == strcmp(tmp, "maxspeed"))
-		filter = SHOW_MAXSPEED;
+		filter = HW_CPU_SHOW_MAXSPEED;
 	else if (0 == strcmp(tmp, "vendor"))
-		filter = SHOW_VENDOR;
+		filter = HW_CPU_SHOW_VENDOR;
 	else if (0 == strcmp(tmp, "model"))
-		filter = SHOW_MODEL;
+		filter = HW_CPU_SHOW_MODEL;
 	else if (0 == strcmp(tmp, "curspeed"))
-		filter = SHOW_CURSPEED;
+		filter = HW_CPU_SHOW_CURSPEED;
 	else if (0 == strcmp(tmp, "cores"))
-		filter = SHOW_CORES;
+		filter = HW_CPU_SHOW_CORES;
 	else
 		return ret;
 
@@ -306,17 +245,17 @@ int     SYSTEM_HW_CPU(const char *cmd, const char *param, unsigned flags, AGENT_
 			val = atoi(tmp);
 			cur_cpu = val;
 
-			if (ALL_CPUS != cpu && cpu != cur_cpu)
+			if (HW_CPU_ALL_CPUS != cpu && cpu != cur_cpu)
 				continue;
 
-			if (ALL_CPUS == cpu || SHOW_ALL == filter)
+			if (HW_CPU_ALL_CPUS == cpu || HW_CPU_SHOW_ALL == filter)
 				offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, "\nprocessor %d:", cur_cpu);
 
 
-			if ((SHOW_ALL == filter || SHOW_MAXSPEED == filter) &&
+			if ((HW_CPU_SHOW_ALL == filter || HW_CPU_SHOW_MAXSPEED == filter) &&
 				-1 != (val = get_cpu_max_speed(cur_cpu)))
 			{
-				if (SHOW_ALL != filter && ALL_CPUS != cpu)
+				if (HW_CPU_SHOW_ALL != filter && HW_CPU_ALL_CPUS != cpu)
 				{
 					offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, " %d", val);
 					break;
@@ -326,20 +265,20 @@ int     SYSTEM_HW_CPU(const char *cmd, const char *param, unsigned flags, AGENT_
 			}
 		}
 
-		if (ALL_CPUS != cpu && cpu != cur_cpu)
+		if (HW_CPU_ALL_CPUS != cpu && cpu != cur_cpu)
 			continue;
 
-		if (0 == strncmp(name, "vendor_id", 9) && (SHOW_ALL == filter || SHOW_VENDOR == filter))
+		if (0 == strncmp(name, "vendor_id", 9) && (HW_CPU_SHOW_ALL == filter || HW_CPU_SHOW_VENDOR == filter))
 		{
 			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, " %s", tmp);
 		}
-		else if (0 == strncmp(name, "model name", 10) && (SHOW_ALL == filter || SHOW_MODEL == filter))
+		else if (0 == strncmp(name, "model name", 10) && (HW_CPU_SHOW_ALL == filter || HW_CPU_SHOW_MODEL == filter))
 		{
 			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, " %s", tmp);
 		}
-		else if (0 == strncmp(name, "cpu MHz", 7) && (SHOW_ALL == filter || SHOW_CURSPEED == filter))
+		else if (0 == strncmp(name, "cpu MHz", 7) && (HW_CPU_SHOW_ALL == filter || HW_CPU_SHOW_CURSPEED == filter))
 		{
-			if (SHOW_ALL != filter && ALL_CPUS != cpu)
+			if (HW_CPU_SHOW_ALL != filter && HW_CPU_ALL_CPUS != cpu)
 			{
 				offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, " %d", atoi(tmp) * 1000);
 				break;
@@ -347,7 +286,7 @@ int     SYSTEM_HW_CPU(const char *cmd, const char *param, unsigned flags, AGENT_
 
 			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, " %dMHz", atoi(tmp));
 		}
-		else if (0 == strncmp(name, "cpu cores", 9) && (SHOW_ALL == filter || SHOW_CORES == filter))
+		else if (0 == strncmp(name, "cpu cores", 9) && (HW_CPU_SHOW_ALL == filter || HW_CPU_SHOW_CORES == filter))
 		{
 			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, " %s", tmp);
 		}
@@ -372,9 +311,9 @@ int	SYSTEM_HW_DEVICES(const char *cmd, const char *param, unsigned flags, AGENT_
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "pci"))
-		return EXECUTE_STR(cmd, "lspci 2>/dev/null", flags, result);	/* list PCI devices by default */
+		return EXECUTE_STR(cmd, "lspci", flags, result);	/* list PCI devices by default */
 	else if (0 == strcmp(tmp, "usb"))
-		return EXECUTE_STR(cmd, "lsusb 2>/dev/null", flags, result);
+		return EXECUTE_STR(cmd, "lsusb", flags, result);
 
 	return SYSINFO_RET_FAIL;
 }

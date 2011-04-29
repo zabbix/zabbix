@@ -22,6 +22,7 @@
 #include "zbxalgo.h"
 #include "zbxexec.h"
 #include "cfg.h"
+#include "software.h"
 
 int	SYSTEM_SW_ARCH(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
@@ -37,12 +38,9 @@ int	SYSTEM_SW_ARCH(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 int     SYSTEM_SW_OS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#define SW_OS_NAME	"/etc/issue.net"
-#define SW_OS_SHORT	"/proc/version_signature"
-#define SW_OS_FULL	"/proc/version"
-	char		type[8], line[MAX_STRING_LEN];
-	int		ret = SYSINFO_RET_FAIL;
-	FILE		*f = NULL;
+	char	type[8], line[MAX_STRING_LEN];
+	int	ret = SYSINFO_RET_FAIL;
+	FILE	*f = NULL;
 
 	if (1 < num_param(param))
 		return ret;
@@ -50,12 +48,12 @@ int     SYSTEM_SW_OS(const char *cmd, const char *param, unsigned flags, AGENT_R
 	if (0 != get_param(param, 1, type, sizeof(type)))
 		*type = '\0';
 
-	if ('\0' == *type || 0 == strcmp(type, "name"))
-		f = fopen(SW_OS_NAME, "r");
+	if ('\0' == *type || 0 == strcmp(type, "full"))
+		f = fopen(SW_OS_FULL, "r");
 	else if (0 == strcmp(type, "short"))
 		f = fopen(SW_OS_SHORT, "r");
-	else if (0 == strcmp(type, "full"))
-		f = fopen(SW_OS_FULL, "r");
+	else if (0 == strcmp(type, "name"))
+		f = fopen(SW_OS_NAME, "r");
 
 	if (NULL == f)
 		return ret;
@@ -71,109 +69,100 @@ int     SYSTEM_SW_OS(const char *cmd, const char *param, unsigned flags, AGENT_R
 	return ret;
 }
 
+int	dpkg_parser(char *line, char *package)
+{
+	char tmp[20];
+
+	if (2 != sscanf(line, "%s %s", package, tmp) || 0 != strcmp(tmp, "install"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 int     SYSTEM_SW_PACKAGES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#define DPKG_PACKAGES_FILE	"/var/lib/dpkg/status"
-#define SLACKWARE_PACKAGES_DIR	"/var/log/packages/"
-#define RPM_PACKAGES_CMD	"rpm -qa | sort"
-#define RPM_TEST_CMD		"rpm --version"
-	int			offset = 0, i;
-	char			line[MAX_STRING_LEN], package[MAX_STRING_LEN], tmp[MAX_STRING_LEN],
-				buffer[MAX_BUFFER_LEN], regex[MAX_STRING_LEN], *cmdbuf = NULL, *c;
-	FILE			*f;
+	int			ret = SYSINFO_RET_FAIL, show_pm, offset = 0, i;
+	char			tmp[MAX_STRING_LEN], buffer[MAX_BUFFER_LEN], regex[MAX_STRING_LEN],
+				*buf = NULL, *c, *package;
 	zbx_vector_str_t	packages;
-	DIR			*dir;
-	struct dirent		*entry;
+	ZBX_PACKAGE_MANAGER	*mng;
 
-	if (1 < num_param(param))
-		return SYSINFO_RET_FAIL;
+	if (2 < num_param(param))
+		return ret;
 
 	if (0 != get_param(param, 1, regex, sizeof(regex)))
 		*regex = '\0';
 
+	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "onlylist"))
+		show_pm = 0;
+	else if (0 == strcmp(tmp, "showPM"))
+		show_pm = 1;
+	else
+		return ret;
+
 	zbx_vector_str_create(&packages);
 
-	if (NULL != (f = fopen(DPKG_PACKAGES_FILE, "r")))
+	for (i = 0; NULL != package_managers[i].name; i++)
 	{
-		/* DPKG package manager */
+		mng = &package_managers[i];
 
-		while (NULL != fgets(line, sizeof(line), f))
+		if (SUCCEED == (ret = zbx_execute(mng->test_cmd, &buf, NULL, 0, CONFIG_TIMEOUT)) &&
+				0 < strlen(buf))
 		{
-			if (1 != sscanf(line, "Package: %s", package))
-				continue;
+			/* package management system is present */
 
-			if ('\0' != *regex && NULL == zbx_regexp_match(package, regex, NULL))
-				continue;
+			ret = SYSINFO_RET_OK;
+			zbx_free(buf);
 
-			/* find "Status:" line, might not be the next one */
-next_line:
-			if (NULL == fgets(line, sizeof(line), f))
-				break;
-			if (1 != sscanf(line, "Status: %[^\n]", tmp))
-				goto next_line;
+			ret = zbx_execute(mng->list_cmd, &buf, NULL, 0, CONFIG_TIMEOUT);
 
-			if (0 == strcmp(tmp, "install ok installed"))
-				zbx_vector_str_append(&packages, zbx_strdup(NULL, package));
-		}
+			c = strtok(buf, "\n");
 
-		zbx_fclose(f);
-	}
-	else if (NULL != (dir = opendir(SLACKWARE_PACKAGES_DIR)))
-	{
-		/* check SLACKWARE_PACKAGES_DIR before using RPM since RPM can also be used on slackware */
-
-		while (NULL != (entry = readdir(dir)))
-		{
-			if (0 == strcmp(entry->d_name, ".") || 0 == strcmp(entry->d_name, ".."))
-				continue;
-
-			if ('\0' == *regex || NULL != zbx_regexp_match(entry->d_name, regex, NULL))
-				zbx_vector_str_append(&packages, zbx_strdup(NULL, entry->d_name));
-		}
-
-		closedir(dir);
-	}
-	else if (SUCCEED == zbx_execute(RPM_TEST_CMD, &cmdbuf, tmp, sizeof(tmp), CONFIG_TIMEOUT) &&
-			0 < strlen(cmdbuf))
-	{
-		/* RPM package manager */
-
-		zbx_free(cmdbuf);
-		if (SUCCEED == zbx_execute(RPM_PACKAGES_CMD, &cmdbuf, tmp, sizeof(tmp), CONFIG_TIMEOUT))
-		{
-			c = strtok(cmdbuf, "\n");
 			while (NULL != c)
 			{
-				if ('\0' == *regex || NULL != zbx_regexp_match(c, regex, NULL))
-					zbx_vector_str_append(&packages, zbx_strdup(NULL, c));
+				if (NULL != mng->parser)
+				{
+					if (SUCCEED == mng->parser(c, tmp))
+						c = tmp;
+					else
+						goto next;
+				}
+
+				if ('\0' != *regex && NULL == zbx_regexp_match(c, regex, NULL))
+					goto next;
+
+				if (1 == show_pm)
+					package = zbx_dsprintf(NULL, "[%s]%s", mng->name, c);
+				else
+					package = zbx_strdup(NULL, c);
+
+				zbx_vector_str_append(&packages, package);
+next:
 				c = strtok(NULL, "\n");
 			}
-
-			zbx_free(cmdbuf);
 		}
-	}
-	else
-	{
-		/* unsupported package manager */
-
-		zbx_free(cmdbuf);
-		return SYSINFO_RET_FAIL;
+		zbx_free(buf);
 	}
 
-	zbx_vector_str_sort(&packages, ZBX_DEFAULT_STR_COMPARE_FUNC);
 
-	for (i = 0; i < packages.values_num; i++)
+	if (SYSINFO_RET_OK == ret)
 	{
-		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%s, ", packages.values[i]);
-		zbx_free(packages.values[i]);
+		zbx_vector_str_sort(&packages, ZBX_DEFAULT_STR_COMPARE_FUNC);
+
+		for (i = 0; i < packages.values_num; i++)
+		{
+			offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%s, ", packages.values[i]);
+			zbx_free(packages.values[i]);
+		}
+
+
+		if (0 < offset)
+			zbx_rtrim(buffer, ", ");
+
+		SET_TEXT_RESULT(result, zbx_strdup(NULL, buffer));
 	}
 
 	zbx_vector_str_destroy(&packages);
 
-	if (0 < offset)
-		zbx_rtrim(buffer, ", ");
-
-	SET_TEXT_RESULT(result, zbx_strdup(NULL, buffer));
-
-	return SYSINFO_RET_OK;
+	return ret;
 }
