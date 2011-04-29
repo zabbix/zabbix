@@ -129,7 +129,7 @@ class CChart extends CGraphDraw{
 
 		$host = get_host_by_hostid($item['hostid']);
 
-		$this->items[$this->num]['host'] = $host['host'];
+		$this->items[$this->num]['hostname'] = $host['name'];
 		$this->items[$this->num]['color'] = is_null($color) ? 'Dark Green' : $color;
 		$this->items[$this->num]['drawtype'] = is_null($drawtype) ? GRAPH_ITEM_DRAWTYPE_LINE : $drawtype;
 		$this->items[$this->num]['axisside'] = is_null($axis) ? GRAPH_YAXIS_SIDE_DEFAULT : $axis;
@@ -1631,7 +1631,7 @@ class CChart extends CGraphDraw{
 			$data = &$this->data[$this->items[$i]['itemid']][$this->items[$i]['calc_type']];
 
 			if($this->itemsHost) $item_caption = $this->items[$i]['name'];
-			else $item_caption = $this->items[$i]['host'].': '.$this->items[$i]['name'];
+			else $item_caption = $this->items[$i]['hostname'].': '.$this->items[$i]['name'];
 
 			if(isset($data) && isset($data['min'])){
 				if($this->items[$i]['axisside'] == GRAPH_YAXIS_SIDE_LEFT)

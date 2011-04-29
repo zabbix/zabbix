@@ -59,7 +59,7 @@ include_once('include/page_header.php');
 					'nodeids' => get_current_nodeid(true),
 					'triggerids'=> $_REQUEST['linktriggers'],
 					'editable'=> 1,
-					'selectHosts' => array('hostid', 'host'),
+					'selectHosts' => array('hostid', 'name'),
 					'output' => API_OUTPUT_EXTEND
 				);
 
@@ -69,7 +69,7 @@ include_once('include/page_header.php');
 			foreach($dbTriggers as $tnum => $trigger){
 				$host = reset($trigger['hosts']);
 
-				$triggers[$trigger['triggerid']] = $host['host'].':'.expand_trigger_description_by_data($trigger);
+				$triggers[$trigger['triggerid']] = $host['name'].':'.expand_trigger_description_by_data($trigger);
 			}
 		}
 
@@ -106,7 +106,7 @@ include_once('include/page_header.php');
 					'nodeids' => get_current_nodeid(true),
 					'triggerids'=> $_REQUEST['linktriggers'],
 					'editable'=> 1,
-					'selectHosts' => array('hostid', 'host'),
+					'selectHosts' => array('hostid', 'name'),
 					'output' => API_OUTPUT_EXTEND
 				);
 
@@ -153,7 +153,7 @@ include_once('include/page_header.php');
 			order_result($dbTriggers, 'description');
 
 			$host = reset($trigger['hosts']);
-			$trList->addItem($trigger['triggerid'], $host['host'].':'.expand_trigger_description_by_data($trigger));
+			$trList->addItem($trigger['triggerid'], $host['name'].':'.expand_trigger_description_by_data($trigger));
 		}
 
 		$frmCnct->addRow(S_TRIGGERS, array($trList, BR(), $btnSelect, $btnRemove));

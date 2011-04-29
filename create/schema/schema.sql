@@ -622,9 +622,11 @@ FIELD		|jmx_disable_until|t_integer	|'0'	|NOT NULL	|0
 FIELD		|jmx_available	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|jmx_errors_from|t_integer	|'0'	|NOT NULL	|0
 FIELD		|jmx_error	|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|host
 INDEX		|2		|status
 INDEX		|3		|proxy_hostid
+INDEX		|4		|name
 
 TABLE|interface|interfaceid|ZBX_SYNC
 FIELD		|interfaceid	|t_id		|	|NOT NULL	|0

@@ -3160,3 +3160,71 @@ int	is_ascii_string(const char *str)
 
 	return SUCCEED;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: str_linefeed                                                     *
+ *                                                                            *
+ * Purpose: wrap long string at specified position with linefeeds             *
+ *                                                                            *
+ * Parameters: src     - input string                                         *
+ *             maxline - maximum length of a line                             *
+ *             delim   - delimiter to use as linefeed (default "\n" if NULL)  *
+ *                                                                            *
+ * Return value: newly allocated copy of input string with linefeeds          *
+ *                                                                            *
+ * Author: Vladimir Levijev                                                   *
+ *                                                                            *
+ * Comments: allocates memory                                                 *
+ *                                                                            *
+ ******************************************************************************/
+char	*str_linefeed(const char *src, size_t maxline, const char *delim)
+{
+	size_t	src_size;	/* input length */
+	size_t	dst_size;	/* output length */
+	size_t	delim_size;	/* delimiter length */
+	int	feeds;		/* number of feeds */
+	size_t	left;		/* what's left after last feed */
+	char	*dst = NULL;	/* output with linefeeds */
+
+	const char	*p_src;	/* working pointer to input */
+	char		*p_dst;	/* working pointer to output */
+
+	if (NULL == delim)
+		delim = "\n";
+
+	src_size = strlen(src);
+	delim_size = strlen(delim);
+	feeds = src_size / maxline - (0 != src_size % maxline ? 0 : 1);	/* we don't want to feed the last line */
+	left = src_size - feeds * maxline;
+	dst_size = src_size + feeds * delim_size + 1;
+
+	/* allocate memory for output */
+	dst = zbx_malloc(dst, dst_size);
+
+	p_src = src;
+	p_dst = dst;
+
+	/* copy chunks appending linefeeds */
+	while (0 < feeds--)
+	{
+		memcpy(p_dst, p_src, maxline);
+		p_src += maxline;
+		p_dst += maxline;
+
+		memcpy(p_dst, delim, delim_size);
+		p_dst += delim_size;
+	}
+
+	if (0 < left)
+	{
+		/* copy what's left */
+
+		memcpy(p_dst, p_src, left);
+		p_dst += left;
+	}
+
+	*p_dst = '\0';
+
+	return dst;
+}

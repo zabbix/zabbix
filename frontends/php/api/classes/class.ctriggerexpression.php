@@ -75,7 +75,7 @@ private $allowed;
 		if(zbx_empty($host))
 			throw new Exception('Empty host name provided in expression.');
 
-		if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $host))
+		if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $host))
 			throw new Exception('Incorrect host name "'.$host.'" provided in expression.');
 	}
 
@@ -83,9 +83,9 @@ private $allowed;
 		if(zbx_empty($item))
 			throw new Exception('Empty item key "'.$item.'" is used in expression.');
 
-		$itemCheck = check_item_key($item);
-		if(!$itemCheck['valid'])
-			throw new Exception('Incorrect item key "'.$item.'" is used in expression. '.$itemCheck['description']);
+		$itemKey = new cItemKey($item);
+		if(!$itemKey->isValid())
+			throw new Exception('Incorrect item key "'.$item.'" is used in expression. '.$itemKey->getError());
 	}
 
 	public function checkFunction($expression){
@@ -265,9 +265,9 @@ private $allowed;
 // STATE
 	private function isSlashed($pre=false){
 		if($pre)
-			return (($this->previous['prelast'] == '\\') && ($this->previous['sequence'] % 2 == 1));
+			return $this->previous['prelast'] == '\\';
 		else
-			return (($this->previous['last'] == '\\') && ($this->symbols['sequence'] % 2 == 1));
+			return $this->previous['last'] == '\\';
 	}
 
 	private function inQuotes($symbol=''){
@@ -401,8 +401,6 @@ private $allowed;
 		if($this->currExpr['part']['itemParam'] || $this->currExpr['part']['functionParam']){
 			if($this->inParameter()){
 				if($this->inQuotes()){
-// SDI('Open.inParameter.inQuotes: '.$symbol.' ');
-
  					if(($symbol == '"') && !$this->isSlashed(true)){
 						$this->symbols['params'][$symbol]++;
 						$this->currExpr['params']['quoteClose'] = true;
@@ -411,7 +409,6 @@ private $allowed;
 					$this->writeParams($symbol);
 				}
 				else{
-// SDI('Open.inParameter: '.$symbol.' ');
 					if(($symbol == ']') && $this->currExpr['part']['itemParam'])
 						$this->symbols['params'][$symbol]++;
 					else if(($symbol == ')') && $this->currExpr['part']['functionParam']){

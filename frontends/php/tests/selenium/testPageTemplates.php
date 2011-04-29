@@ -43,7 +43,7 @@ class testPageTemplates extends CWebTest
 		// Header
 		$this->ok(array('Templates','Applications','Items','Triggers','Graphs','Screens','Discovery','Linked templates','Linked to'));
 		// Data
-		$this->ok(array($template['host']));
+		$this->ok(array($template['name']));
 		$this->dropdown_select('go','Export selected');
 		$this->dropdown_select('go','Delete selected');
 		$this->dropdown_select('go','Delete selected with linked elements');
@@ -54,9 +54,10 @@ class testPageTemplates extends CWebTest
 	*/
 	public function testPageTemplates_SimpleUpdate($template)
 	{
-		$name=$template['host'];
+		$host=$template['host'];
+		$name=$template['name'];
 
-		$sql1="select * from hosts where host='$name'";
+		$sql1="select * from hosts where host='$host'";
 		$oldHashTemplate=DBhash($sql1);
 		$sql2="select * from hosts order by hostid";
 		$oldHashHosts=DBhash($sql2);

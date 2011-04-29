@@ -89,7 +89,7 @@ include_once('include/page_header.php');
 	$params = array(
 		'nodeids'=> get_current_nodeid(true),
 		'search' => array(
-			'host' => $search,
+			'name' => $search,
 			'dns' => $search,
 			'ip' => $search
 		),
@@ -100,14 +100,14 @@ include_once('include/page_header.php');
 		'select_triggers' => API_OUTPUT_COUNT,
 		'select_graphs' => API_OUTPUT_COUNT,
 		'select_applications' => API_OUTPUT_COUNT,
-		'output' => array('host','status'),
+		'output' => array('name','status'),
 		'searchByAny' => true
 	);
 	$db_hosts = API::Host()->get($params);
 
-	order_result($db_hosts, 'host');
+	order_result($db_hosts, 'name');
 
-	$hosts = selectByPattern($db_hosts, 'host', $search, $rows_per_page);
+	$hosts = selectByPattern($db_hosts, 'name', $search, $rows_per_page);
 	$hostids = zbx_objectValues($hosts, 'hostid');
 
 	$params = array(
@@ -121,7 +121,7 @@ include_once('include/page_header.php');
 	$params = array(
 		'nodeids'=> get_current_nodeid(true),
 		'search' => array(
-			'host' => $search,
+			'name' => $search,
 			'dns' => $search,
 			'ip' => $search
 		),
@@ -170,7 +170,7 @@ include_once('include/page_header.php');
 		$group = reset($host['groups']);
 		$link = 'groupid='.$group['groupid'].'&hostid='.$hostid.'&switch_node='.id2nodeid($hostid);
 
-		$caption = make_decoration($host['host'], $search);
+		$caption = make_decoration($host['name'], $search);
 
 		if(isset($rw_hosts[$hostid])){
 			$host_link = new CLink($caption,'hosts.php?form=update&'.$link, $style);
@@ -303,10 +303,10 @@ include_once('include/page_header.php');
 	if($admin){
 		$params = array(
 			'nodeids'=> get_current_nodeid(true),
-			'search' => array('host' => $search),
-			'output' => array('host'),
+			'search' => array('name' => $search),
+			'output' => array('name'),
 			'selectGroups' => API_OUTPUT_REFER,
-			'sortfield' => 'host',
+			'sortfield' => 'name',
 			'selectItems' => API_OUTPUT_COUNT,
 			'select_triggers' => API_OUTPUT_COUNT,
 			'select_graphs' => API_OUTPUT_COUNT,
@@ -314,9 +314,9 @@ include_once('include/page_header.php');
 			'limit' => $rows_per_page
 		);
 		$db_templates = API::Template()->get($params);
-		order_result($db_templates, 'host');
+		order_result($db_templates, 'name');
 
-		$templates = selectByPattern($db_templates, 'host', $search, $rows_per_page);
+		$templates = selectByPattern($db_templates, 'name', $search, $rows_per_page);
 		$templateids = zbx_objectValues($templates, 'templateid');
 
 		$params = array(
@@ -329,7 +329,7 @@ include_once('include/page_header.php');
 
 		$params = array(
 			'nodeids'=> get_current_nodeid(true),
-			'search' => array('host' => $search),
+			'search' => array('name' => $search),
 			'countOutput' => 1,
 			'editable' => 1
 		);
@@ -355,7 +355,7 @@ include_once('include/page_header.php');
 			$group = reset($template['groups']);
 			$link = 'groupid='.$group['groupid'].'&hostid='.$templateid.'&switch_node='.id2nodeid($templateid);
 
-			$caption = make_decoration($template['host'], $search);
+			$caption = make_decoration($template['name'], $search);
 
 			if(isset($rw_templates[$templateid])){
 				$template_link = new CLink($caption,'templates.php?form=update&'.'&templateid='.$templateid.'&switch_node='.id2nodeid($templateid));
