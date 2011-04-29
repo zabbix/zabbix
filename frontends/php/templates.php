@@ -503,7 +503,7 @@ include_once('include/page_header.php');
 		else{
 			$template_wdgt->addItem(get_header_host_table(get_request('templateid',0), 'template'));
 
-			$templateForm = new CGetForm('template.edit');
+			$templateForm = new CView('configuration.template.edit');
 			$template_wdgt->addItem($templateForm->render());
 		}
 	}
