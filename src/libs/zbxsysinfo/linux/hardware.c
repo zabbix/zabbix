@@ -24,7 +24,7 @@
 
 /******************************************************************************
  *                                                                            *
- * Comments: read the string #num from data into buf                          *
+ * Comments: read the string #num from dmi data into a buffer                 *
  *                                                                            *
  ******************************************************************************/
 static size_t	get_dmi_string(char *buf, int bufsize, unsigned char *data, int num)
@@ -58,11 +58,11 @@ static size_t	get_chassis_type(char *buf, int bufsize, int type)
 
 static int	get_dmi_info(char *buf, int bufsize, int flags)
 {
-	int			ret = SYSINFO_RET_FAIL, fd, offset = 0;
-	unsigned char		membuf[SMBIOS_ENTRY_POINT_SIZE], *smbuf = NULL, *data;
-	size_t			len, fp;
-	void			*mmp = NULL;
-	long			pagesize = sysconf(_SC_PAGESIZE);
+	int		ret = SYSINFO_RET_FAIL, fd, offset = 0;
+	unsigned char	membuf[SMBIOS_ENTRY_POINT_SIZE], *smbuf = NULL, *data;
+	size_t		len, fp;
+	void		*mmp = NULL;
+	long		pagesize = sysconf(_SC_PAGESIZE);
 
 	if (-1 == (fd = open(DEV_MEM, O_RDONLY)))
 		return ret;
@@ -180,9 +180,9 @@ int	SYSTEM_HW_CHASSIS(const char *cmd, const char *param, unsigned flags, AGENT_
 
 static int	get_cpu_max_speed(int cpu_num)
 {
-	int			result = -1;
-	char			filename[MAX_STRING_LEN];
-	FILE			*f;
+	int	result = -1;
+	char	filename[MAX_STRING_LEN];
+	FILE	*f;
 
 	zbx_snprintf(filename, sizeof(filename), CPU_MAX_FREQ_FILE, cpu_num);
 
@@ -201,9 +201,9 @@ static int	get_cpu_max_speed(int cpu_num)
 
 int     SYSTEM_HW_CPU(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	int		ret = SYSINFO_RET_FAIL, filter, val, cpu, cur_cpu = -2, offset = 0;
-	char		line[MAX_STRING_LEN], name[MAX_STRING_LEN], tmp[MAX_STRING_LEN], buf[MAX_BUFFER_LEN];
-	FILE		*f;
+	int	ret = SYSINFO_RET_FAIL, filter, val, cpu, cur_cpu = -2, offset = 0;
+	char	line[MAX_STRING_LEN], name[MAX_STRING_LEN], tmp[MAX_STRING_LEN], buf[MAX_BUFFER_LEN];
+	FILE	*f;
 
 	if (2 < num_param(param))
 		return ret;
@@ -230,7 +230,7 @@ int     SYSTEM_HW_CPU(const char *cmd, const char *param, unsigned flags, AGENT_
 	else
 		return ret;
 
-	if (NULL == (f = fopen(HW_CPU_FILE, "r")))
+	if (NULL == (f = fopen(HW_CPU_INFO_FILE, "r")))
 		return ret;
 
 	*buf = '\0';
@@ -297,10 +297,11 @@ int     SYSTEM_HW_CPU(const char *cmd, const char *param, unsigned flags, AGENT_
 		}
 
 	}
+
 	zbx_fclose(f);
 
 	if (SYSINFO_RET_OK == ret)
-		SET_TEXT_RESULT(result, zbx_strdup(NULL, buf + 1));	/* first symbol is a space or '\n' */
+		SET_TEXT_RESULT(result, zbx_strdup(NULL, buf + 1));	/* buf has a leading space or '\n' */
 
 	return ret;
 }
