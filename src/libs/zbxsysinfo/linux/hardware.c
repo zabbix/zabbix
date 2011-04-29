@@ -255,6 +255,7 @@ int     SYSTEM_HW_CPU(const char *cmd, const char *param, unsigned flags, AGENT_
 			if ((HW_CPU_SHOW_ALL == filter || HW_CPU_SHOW_MAXSPEED == filter) &&
 				-1 != (val = get_cpu_max_speed(cur_cpu)))
 			{
+				ret = SYSINFO_RET_OK;
 				if (HW_CPU_SHOW_ALL != filter && HW_CPU_ALL_CPUS != cpu)
 				{
 					offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, " %d", val);
@@ -270,14 +271,17 @@ int     SYSTEM_HW_CPU(const char *cmd, const char *param, unsigned flags, AGENT_
 
 		if (0 == strncmp(name, "vendor_id", 9) && (HW_CPU_SHOW_ALL == filter || HW_CPU_SHOW_VENDOR == filter))
 		{
+			ret = SYSINFO_RET_OK;
 			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, " %s", tmp);
 		}
 		else if (0 == strncmp(name, "model name", 10) && (HW_CPU_SHOW_ALL == filter || HW_CPU_SHOW_MODEL == filter))
 		{
+			ret = SYSINFO_RET_OK;
 			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, " %s", tmp);
 		}
 		else if (0 == strncmp(name, "cpu MHz", 7) && (HW_CPU_SHOW_ALL == filter || HW_CPU_SHOW_CURSPEED == filter))
 		{
+			ret = SYSINFO_RET_OK;
 			if (HW_CPU_SHOW_ALL != filter && HW_CPU_ALL_CPUS != cpu)
 			{
 				offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, " %d", atoi(tmp) * 1000);
@@ -288,17 +292,15 @@ int     SYSTEM_HW_CPU(const char *cmd, const char *param, unsigned flags, AGENT_
 		}
 		else if (0 == strncmp(name, "cpu cores", 9) && (HW_CPU_SHOW_ALL == filter || HW_CPU_SHOW_CORES == filter))
 		{
+			ret = SYSINFO_RET_OK;
 			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, " %s", tmp);
 		}
 
 	}
 	zbx_fclose(f);
 
-	if (0 < offset)
-	{
-		ret = SYSINFO_RET_OK;
+	if (SYSINFO_RET_OK == ret)
 		SET_TEXT_RESULT(result, zbx_strdup(NULL, buf + 1));	/* first symbol is a space or '\n' */
-	}
 
 	return ret;
 }
