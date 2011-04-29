@@ -37,26 +37,27 @@ class CView{
 	 */
 	private $scripts;
 	/**
-	 * @var string - directory where views are stored
+	 * @const string - directory where views are stored
 	 */
-	private $viewsDir = 'include/views';
+	const viewsDir = 'include/views';
 
 	/**
 	 * Creates a new view based on provided template file.
-	 * @param string $file name of a view, located under include/views
+	 * @param string $view name of a view, located under include/views
 	 * @param array $data deprecated parameter, use set() and get() methods for passing variables to views
+	 * @example $scriptForm = new CView('administration.script.edit');
 	 */
-	public function __construct($file, $data=array()){
-		$this->assign($file, $data);
+	public function __construct($view, $data=array()){
+		$this->assign($view, $data);
+		$this->data = $data;
 	}
 
-	public function assign($file, $data){
-		if(!preg_match("/[a-z\.]+/", $file)){
-			throw new Exception(_s('Invalid view name given "%s". Allowed chars: "a-z" and "."', $file));
+	public function assign($view){
+		if(!preg_match("/[a-z\.]+/", $view)){
+			throw new Exception(_s('Invalid view name given "%s". Allowed chars: "a-z" and "."', $view));
 		}
 
-		$this->filePath = $this->viewsDir.'/'.$file.'.php';
-		$this->data = $data;
+		$this->filePath = self::viewsDir.'/'.$view.'.php';
 
 		if(!file_exists($this->filePath)){
 			throw new Exception(_s('File provided to a view does not exist. Tried to find "%s"', $this->filePath));
