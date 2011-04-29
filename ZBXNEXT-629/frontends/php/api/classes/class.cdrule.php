@@ -494,7 +494,7 @@ COpt::memoryPick();
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect key: %s', $itemKey->getError()));
 					break;
 				case SVC_SNMPv1:
-				case SVC_SNMPv2:
+				case SVC_SNMPv2c:
 					if(!isset($dCheck['snmp_community']) || zbx_empty($dCheck['snmp_community']))
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect SNMP Community.'));
 				case SVC_SNMPv3:

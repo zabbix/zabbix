@@ -44,7 +44,7 @@
 			SVC_IMAP =>		'143',
 			SVC_AGENT =>	'10050',
 			SVC_SNMPv1 =>	'161',
-			SVC_SNMPv2 =>	'161',
+			SVC_SNMPv2c =>	'161',
 			SVC_SNMPv3 =>	'161',
 			SVC_HTTPS =>	'443',
 			SVC_TELNET =>	'23',
@@ -66,7 +66,7 @@
 			SVC_TCP => S_TCP,
 			SVC_AGENT => S_ZABBIX_AGENT,
 			SVC_SNMPv1 => S_SNMPV1_AGENT,
-			SVC_SNMPv2 => S_SNMPV2_AGENT,
+			SVC_SNMPv2c => S_SNMPV2_AGENT,
 			SVC_SNMPv3 => S_SNMPV3_AGENT,
 			SVC_ICMPPING => S_ICMPPING,
 			SVC_TELNET => _('Telnet'),
@@ -89,7 +89,7 @@
 		if(!empty($key)){
 			switch($type){
 				case SVC_SNMPv1:
-				case SVC_SNMPv2:
+				case SVC_SNMPv2c:
 				case SVC_SNMPv3:
 				case SVC_AGENT:
 					$external_param = ' "'.$key.'"';
