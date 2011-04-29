@@ -145,18 +145,6 @@ jQuery(document).ready(function(){
 
 	});
 
-
-	jQuery("#useprofile_ext").change(function(){
-		if(this.checked){
-			jQuery("#useprofile_ext").button("option", "label", "<?php print(_('Disable extended profile'));?>");
-			jQuery("#profileexlist :input:gt(0)").removeAttr("disabled");
-		}
-		else{
-			jQuery("#useprofile_ext").button("option", "label", "<?php print(_('Enable extended profile'));?>");
-			jQuery("#profileexlist :input:gt(0)").attr("disabled", "disabled");
-		}
-	}).button().change();
-
 	jQuery('#name').focus();
 });
 

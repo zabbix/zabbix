@@ -323,15 +323,15 @@ if(defined('USE_PROFILING')){
 					$debug_str .= ($i + 1).'. <b>'.$class.'->'.$method.'</b> ['.$file.':'.$line.']';
 					$debug_str .= '</div>';
 					// parameters
-					$debug_str .= '<div style="width: 300px; float: left;">Parameters:';
+					$debug_str .= '<table><tr><td width="300" valign="top">Parameters:';
 					foreach($params as $p){
 						$debug_str .= '<pre>'.print_r($p, true).'</pre>';
 					}
-					$debug_str .= '</div>';
+					$debug_str .= '</td>';
 					// result
-					$debug_str .= '<div style="margin-left: 300px;">Result:<pre>'.print_r($result, true).'</pre></div>';
+					$debug_str .= '<td valign="top">Result:<pre>'.print_r($result, true).'</pre></td>';
 
-					$debug_str .= '</div>';
+					$debug_str .= '</tr></table>';
 				}
 
 			}
