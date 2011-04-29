@@ -464,7 +464,7 @@ else{
 		static function showmemoryusage($descr=null) {}
 		static function compare_files_with_menu($menu=null) {}
 		static function counter_up($type=NULL) {}
-		public static function saveApiCall($method, $params) {} // sic
+		public static function saveApiCall($method, $params) {}
 	}
 }
 

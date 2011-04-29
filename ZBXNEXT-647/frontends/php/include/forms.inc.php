@@ -2145,7 +2145,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 					$fieldNo,
 					$fieldInfo['title'],
 					($profile_link == $fieldNo && !$itemCloned ? 'yes' : null), // selected?
-					((in_array($fieldNo, $alreadyPopulated) &&  $profile_link != $fieldNo) || ($itemCloned && $profile_link == $fieldNo) ? 'no' : 'yes') // enabled?
+					((in_array($fieldNo, $alreadyPopulated) && $profile_link != $fieldNo) || ($itemCloned && $profile_link == $fieldNo) ? 'no' : 'yes') // enabled?
 				);
 			}
 
