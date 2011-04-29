@@ -71,7 +71,7 @@ int     SYSTEM_SW_OS(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 int	dpkg_parser(char *line, char *package)
 {
-	char tmp[20];
+	char	tmp[20];
 
 	if (2 != sscanf(line, "%s %s", package, tmp) || 0 != strcmp(tmp, "install"))
 		return FAIL;
@@ -83,7 +83,7 @@ int     SYSTEM_SW_PACKAGES(const char *cmd, const char *param, unsigned flags, A
 {
 	int			ret = SYSINFO_RET_FAIL, show_pm, offset = 0, i;
 	char			tmp[MAX_STRING_LEN], buffer[MAX_BUFFER_LEN], regex[MAX_STRING_LEN],
-				*buf = NULL, *c, *package;
+				*buf = NULL, *package;
 	zbx_vector_str_t	packages;
 	ZBX_PACKAGE_MANAGER	*mng;
 
@@ -95,7 +95,7 @@ int     SYSTEM_SW_PACKAGES(const char *cmd, const char *param, unsigned flags, A
 
 	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "onlylist"))
 		show_pm = 0;
-	else if (0 == strcmp(tmp, "showPM"))
+	else if (0 == strcmp(tmp, "showpms"))
 		show_pm = 1;
 	else
 		return ret;
@@ -107,38 +107,36 @@ int     SYSTEM_SW_PACKAGES(const char *cmd, const char *param, unsigned flags, A
 		mng = &package_managers[i];
 
 		if (SUCCEED == (ret = zbx_execute(mng->test_cmd, &buf, NULL, 0, CONFIG_TIMEOUT)) &&
-				0 < strlen(buf))
+				0 < strlen(buf))	/* consider PMS present, if test_cmd outputs anything to strout */
 		{
-			/* package management system is present */
-
 			ret = SYSINFO_RET_OK;
 			zbx_free(buf);
 
 			ret = zbx_execute(mng->list_cmd, &buf, NULL, 0, CONFIG_TIMEOUT);
 
-			c = strtok(buf, "\n");
+			package = strtok(buf, "\n");
 
-			while (NULL != c)
+			while (NULL != package)
 			{
-				if (NULL != mng->parser)
+				if (NULL != mng->parser)	/* check if the package name needs to be parsed */
 				{
-					if (SUCCEED == mng->parser(c, tmp))
-						c = tmp;
+					if (SUCCEED == mng->parser(package, tmp))
+						package = tmp;
 					else
 						goto next;
 				}
 
-				if ('\0' != *regex && NULL == zbx_regexp_match(c, regex, NULL))
+				if ('\0' != *regex && NULL == zbx_regexp_match(package, regex, NULL))
 					goto next;
 
 				if (1 == show_pm)
-					package = zbx_dsprintf(NULL, "[%s]%s", mng->name, c);
+					package = zbx_dsprintf(NULL, "[%s] %s", mng->name, package);
 				else
-					package = zbx_strdup(NULL, c);
+					package = zbx_strdup(NULL, package);
 
 				zbx_vector_str_append(&packages, package);
 next:
-				c = strtok(NULL, "\n");
+				package = strtok(NULL, "\n");
 			}
 		}
 		zbx_free(buf);

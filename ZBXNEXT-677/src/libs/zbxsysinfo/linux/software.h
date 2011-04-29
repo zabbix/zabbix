@@ -20,13 +20,9 @@
 #ifndef ZABBIX_SOFTWARE_H
 #define ZABBIX_SOFTWARE_H
 
-#define SW_OS_NAME		"/etc/issue.net"
-#define SW_OS_SHORT		"/proc/version_signature"
 #define SW_OS_FULL		"/proc/version"
-
-#define DPKG_PACKAGES_FILE	"/var/lib/dpkg/status"
-
-#define SLACKWARE_PACKAGES_DIR	"/var/log/packages/"
+#define SW_OS_SHORT		"/proc/version_signature"
+#define SW_OS_NAME		"/etc/issue.net"
 
 typedef struct
 {
@@ -43,7 +39,7 @@ ZBX_PACKAGE_MANAGER	package_managers[] =
 /*	NAME		TEST_CMD					LIST_CMD			PARSER_FUNC */
 {
 	{"dpkg",	"dpkg --version",				"dpkg --get-selections",	dpkg_parser},
-	{"slack",	"[ -d /var/log/packages ] && echo 'true'",	"ls /var/log/packages",		NULL},
+	{"pkgtools",	"[ -d /var/log/packages ] && echo 'true'",	"ls /var/log/packages",		NULL},
 	{"rpm",		"rpm --version",				"rpm -qa",			NULL},
 	{"pacman",	"pacman --version",				"pacman -Q",			NULL},
 	{0}
