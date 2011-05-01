@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-05-01 04:34+0300\n"
-"PO-Revision-Date: 2011-04-14 13:30+0200\n"
+"PO-Revision-Date: 2011-04-27 14:18+0200\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -2910,9 +2910,10 @@ msgstr "Выполняемый скрипт"
 msgid "Execution confirmation"
 msgstr "Подтверждение выполнения"
 
+# с маленькой - потому что это второе слово в словосочетании "Обновить существующее". Больше нигде не используется - проверялось.
 #: include/locales/en_gb.inc.php:217
 msgid "Existing"
-msgstr "Существующее"
+msgstr "существующее"
 
 #: include/views/configuration.sysmap.edit.php:70
 msgid "Expand single problem"
@@ -6369,7 +6370,7 @@ msgstr "Версия PHP"
 
 #: include/locales/en_gb.inc.php:1332
 msgid "PLAIN TEXT"
-msgstr "ТЕКСТ"
+msgstr "ОБЫЧНЫЙ ТЕКСТ"
 
 #: include/locales/en_gb.inc.php:111
 msgid "POP"
@@ -6705,6 +6706,7 @@ msgstr "Обновлять экран (секунды)"
 msgid "Refresh time in seconds"
 msgstr "Время обновления в секундах"
 
+# это в поп-апе при просмотре слайдшоу
 #: include/locales/en_gb.inc.php:220
 msgid "Refresh time multiplier"
 msgstr "Множитель времени обновления"
