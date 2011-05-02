@@ -65,7 +65,7 @@
 							value="" class="input text" size="20" maxlength="64"></td>
 				</tr>
 				<tr id="newCheckPrivPassRow" class="hidden">
-					<td><label for="snmpv3_authpassphrase"><?php print(_('SNMPv3 priv passphrase')); ?></label></td>
+					<td><label for="snmpv3_privpassphrase"><?php print(_('SNMPv3 priv passphrase')); ?></label></td>
 					<td><input type="text" id="snmpv3_privpassphrase" name="snmpv3_privpassphrase"
 							value="" class="input text" size="20" maxlength="64"></td>
 				</tr>
