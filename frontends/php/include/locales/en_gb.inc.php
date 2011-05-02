@@ -218,9 +218,6 @@
 	'S_MISSING'=>				_('Missing'),
 	'S_REFRESH_TIME_IN_SECONDS'=> _('Refresh time in seconds'),
 	'S_REFRESH_TIME_MULTIPLIER' => _('Refresh time multiplier'),
-	'S_IMPORTED'=>				_('Imported'),
-	'S_SUCCESSEFULLY_SMALL'=>		_('successfully'),
-	'S_FAILED_SMALL'=>			_('failed'),
 	'S_LOCAL_BIG'=>				_('LOCAL'),
 	'S_SERVER_BIG'=>			_('SERVER'),
 

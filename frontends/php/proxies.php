@@ -186,7 +186,7 @@
 
 
 	if(isset($_REQUEST['form'])){
-		$proxyForm = new CGetForm('proxy.edit');
+		$proxyForm = new CView('administration.proxy.edit');
 		$proxies_wdgt->addItem($proxyForm->render());
 		$proxies_wdgt->show();
 	}

@@ -61,12 +61,8 @@ function resetGetParams($params, $newURL=null){
 }
 
 function get_request($name, $def=NULL){
-	if(isset($_REQUEST[$name]))
-		return $_REQUEST[$name];
-	else
-		return $def;
+	return isset($_REQUEST[$name]) ? $_REQUEST[$name] : $def;
 }
-
 
 function inarr_isset($keys, $array=null){
 	if(is_null($array)) $array =& $_REQUEST;
