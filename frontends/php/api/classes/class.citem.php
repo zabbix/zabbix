@@ -1372,10 +1372,8 @@ class CItem extends CItemGeneral{
 
 		// now, when we have all required info, checking it against every item
 		foreach($items as $item){
-			if(
-				($update && $item['profile_link'] != 0)
-				|| ($item['profile_link'] != 0 && $item['value_type'] != ITEM_VALUE_TYPE_LOG) // for log items check is not needed
-			){
+			// for log items check is not needed
+			if($update || $item['value_type'] != ITEM_VALUE_TYPE_LOG){
 				// does profile field with provided number exists?
 				if(!isset($possibleHostProfiles[$item['profile_link']])){
 					self::exception(
