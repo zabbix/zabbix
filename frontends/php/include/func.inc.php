@@ -431,9 +431,9 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 // Any other unit
 //-------------------
 // black list wich do not require units metrics..
-	$blackList = array('%','ms','rpm');
+	$blackList = array('%','ms','rpm','RPM');
 
-	if(in_array(strtolower($units), $blackList) || (zbx_empty($units) && (($convert == ITEM_CONVERT_WITH_UNITS) || ($value < 1)))){
+	if(in_array($units, $blackList) || (zbx_empty($units) && (($convert == ITEM_CONVERT_WITH_UNITS) || ($value < 1)))){
 		if(abs($value) >= ZBX_UNITS_ROUNDOFF_THRESHOLD)
 			$value = round($value, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT);
 		$value = sprintf('%.'.ZBX_UNITS_ROUNDOFF_LOWER_LIMIT.'f', $value);
