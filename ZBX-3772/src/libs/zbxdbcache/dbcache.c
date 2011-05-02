@@ -2125,10 +2125,9 @@ int	DCsync_history(int sync_type)
 		LOCK_CACHE;
 
 		history_num = 0;
-		f = cache->history_first;
 		skipped_clock = 0;
 
-		for (n = cache->history_num; n > 0 && history_num < ZBX_SYNC_MAX; n--, f++)
+		for (n = cache->history_num, f = cache->history_first; n > 0 && history_num < ZBX_SYNC_MAX; n--, f++)
 		{
 			if (ZBX_HISTORY_SIZE == f)
 				f = 0;
@@ -2381,8 +2380,11 @@ static void	DCvacuum_text()
 	cache->text_gap_num = 0;
 	cache->last_text = cache->text;
 
-	for (n = cache->history_num, f = cache->history_first; n > 0; n--)
+	for (n = cache->history_num, f = cache->history_first; n > 0; n--, f++)
 	{
+		if (ZBX_HISTORY_SIZE == f)
+			f = 0;
+
 		if (ITEM_VALUE_TYPE_STR == cache->history[f].value_type ||
 				ITEM_VALUE_TYPE_TEXT == cache->history[f].value_type ||
 				ITEM_VALUE_TYPE_LOG == cache->history[f].value_type)
@@ -2408,9 +2410,6 @@ static void	DCvacuum_text()
 				cache->last_text += sz;
 			}
 		}
-
-		if (ZBX_HISTORY_SIZE == ++f)
-			f = 0;
 	}
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
