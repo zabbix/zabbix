@@ -20,7 +20,7 @@
 ?>
 <?php
 // include JS + templates
-require_once('include/templates/action.js.php');
+require_once('include/views/js/configuration.action.edit.js.php');
 ?>
 <?php
 // TODO
@@ -653,7 +653,7 @@ require_once('include/templates/action.js.php');
 				$tblOper->addRow(array(_('Type'), array($typeCB,SPACE,$userScript)));
 
 // Script
-				$executeOnRb = new CRadioButtonList('new_operation[opcommand][execute_on]', $new_operation['opcommand']['execute_on']);
+				$executeOnRb = new CRadioButton('new_operation[opcommand][execute_on]', $new_operation['opcommand']['execute_on']);
 				$executeOnRb->makeVertical();
 
 				$executeOnRb->addValue(_('Zabbix agent'),ZBX_SCRIPT_EXECUTE_ON_AGENT);

@@ -38,6 +38,8 @@ frontends/php/images/general/bar/*.db
 frontends/php/images/general/bttn/*.db
 frontends/php/images/general/tree/*.db
 frontends/php/images/gradients/*.db
+frontends/php/include/views/.administration.script.edit.php.swp
+frontends/php/include/views/.configuration.host.edit.php.swp
 frontends/php/locale/POTFILES.in
 frontends/php/locale/cs/LC_MESSAGES/frontend.mo
 frontends/php/locale/de/LC_MESSAGES/frontend.mo

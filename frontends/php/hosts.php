@@ -697,7 +697,7 @@ include_once('include/page_header.php');
 ?>
 <?php
 	if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['hosts'])){
-		$hostForm = new CGetForm('host.massupdate');
+		$hostForm = new CView('configuration.host.massupdate');
 		$hosts_wdgt->addItem($hostForm->render());
 	}
 	else if(isset($_REQUEST['form'])){
@@ -706,7 +706,7 @@ include_once('include/page_header.php');
 		else{
 			$hosts_wdgt->addItem(get_header_host_table($_REQUEST['hostid'], 'host'));
 
-			$hostForm = new CGetForm('host.edit');
+			$hostForm = new CView('configuration.host.edit');
 			$hosts_wdgt->addItem($hostForm->render());
 		}
 	}
