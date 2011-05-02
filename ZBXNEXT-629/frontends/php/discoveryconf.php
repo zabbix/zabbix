@@ -227,7 +227,7 @@ if(isset($_REQUEST['form'])){
 		$drule['uniqueness_criteria'] = get_request('uniqueness_criteria', -1);
 	}
 
-	$discoveryForm = new CGetForm('discovery.edit', $drule);
+	$discoveryForm = new CView('configuration.discovery.edit', $drule);
 	$dscry_wdgt->addItem($discoveryForm->render());
 }
 else{
