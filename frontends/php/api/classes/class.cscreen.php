@@ -523,7 +523,7 @@ SDI('/////////////////////////////////');
 			));
 			foreach($hostgroups as $id){
 				if(!isset($result[$id]))
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect Host group identity "%s" provided for Screens item resource', $id));
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect host group ID "%s" provided for screen element.', $id));
 			}
 		}
 		if(!empty($hosts)){
@@ -534,7 +534,7 @@ SDI('/////////////////////////////////');
 			));
 			foreach($hosts as $id){
 				if(!isset($result[$id]))
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect Host identity "%s" provided for Screens item resource', $id));
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect host ID "%s" provided for screen element.', $id));
 			}
 		}
 		if(!empty($graphs)){
@@ -545,7 +545,7 @@ SDI('/////////////////////////////////');
 			));
 			foreach($graphs as $id){
 				if(!isset($result[$id]))
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect Graph identity "%s" provided for Screens item resource', $id));
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect graph ID "%s" provided for screen element.', $id));
 			}
 		}
 		if(!empty($items)){
@@ -557,7 +557,7 @@ SDI('/////////////////////////////////');
 			));
 			foreach($items as $id){
 				if(!isset($result[$id]))
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect Item identity "%s" provided for Screens item resource', $id));
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect item ID "%s" provided for screen element.', $id));
 			}
 		}
 		if(!empty($maps)){
@@ -568,7 +568,7 @@ SDI('/////////////////////////////////');
 			));
 			foreach($maps as $id){
 				if(!isset($result[$id]))
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect Map identity "%s" provided for Screens item resource', $id));
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect map ID "%s" provided for screen element.', $id));
 			}
 		}
 		if(!empty($screens)){
@@ -579,7 +579,7 @@ SDI('/////////////////////////////////');
 			));
 			foreach($screens as $id){
 				if(!isset($result[$id]))
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect Screen identity "%s" provided for Screens item resource', $id));
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect screen ID "%s" provided for screen element.', $id));
 			}
 		}
 	}
