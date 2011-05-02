@@ -1294,14 +1294,17 @@ class CItem extends CItemGeneral{
 		}
 		$possibleHostProfiles = getHostProfiles();
 		$hostIds = array();
-		// when we are updating item, we might not have a host id
 		if($update){
 			// some of the items (which changed host) can already have a host id
 			// we should find out, which do not
 			$itemsWithNoHostId = array();
 			$itemsWithHostIdButNoProfileLink = array();
 			foreach($items as $i=>$item){
-				if(isset($item['hostid']) && isset($item['profile_link'])){
+				if(!isset($item['profile_link']) || $item['profile_link'] == 0){
+					// profile link field is not being updated, or being updated to 0, no need to validate anything then
+					unset($items[$i]);
+				}
+				else if(isset($item['hostid']) && isset($item['profile_link'])){
 					$hostIds[] = $item['hostid'];
 				}
 				else if(isset($item['hostid'])){
@@ -1310,9 +1313,6 @@ class CItem extends CItemGeneral{
 				}
 				else if(isset($item['profile_link'])){
 					$itemsWithNoHostId[] = $item['itemid'];
-				}
-				else{
-					unset($items[$i]); // profile link field is not being updated, so why bother?
 				}
 			}
 			$itemsToFind = array_merge($itemsWithNoHostId, $itemsWithHostIdButNoProfileLink);
