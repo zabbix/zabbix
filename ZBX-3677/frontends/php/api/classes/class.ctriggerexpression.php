@@ -265,9 +265,9 @@ private $allowed;
 // STATE
 	private function isSlashed($pre=false){
 		if($pre)
-			return (($this->previous['prelast'] == '\\') && ($this->previous['sequence'] % 2 == 1));
+			return $this->previous['prelast'] == '\\';
 		else
-			return (($this->previous['last'] == '\\') && ($this->symbols['sequence'] % 2 == 1));
+			return $this->previous['last'] == '\\';
 	}
 
 	private function inQuotes($symbol=''){
