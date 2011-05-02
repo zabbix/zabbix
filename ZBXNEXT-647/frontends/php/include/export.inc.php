@@ -1111,6 +1111,8 @@ class zbxXML{
 								}
 							}
 						}
+
+						$host_db['profile_mode'] = isset($host_db['profile']) ? HOST_PROFILE_MANUAL : HOST_PROFILE_DISABLED;
 					}
 // }}} HOST PROFILES
 
