@@ -1,6 +1,3 @@
-<script type="text/x-jquery-tmpl" id="mapLabelTypeCustom">
-</script>
-
 <script type="text/javascript">
 function toggleAdvancedLabels(toggle){
 	var inputs = ['label_type_hostgroup','label_type_host','label_type_trigger','label_type_map','label_type_image'];

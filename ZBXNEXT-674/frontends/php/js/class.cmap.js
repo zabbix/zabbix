@@ -622,7 +622,7 @@ removeLinkTrigger: function(linktriggerid){
 	delete(this.data.linktriggers[linktriggerid]);
 }
 });
-//*
+
 // *******************************************************************
 //		SELEMENT object (unfinished)
 // *******************************************************************
@@ -1019,6 +1019,12 @@ show: function(e, selementid){
 	this.form_link_hide(e);
 //---
 
+	var sw = new formSwitcher(optmap111);
+	sw.buildForm('divSelementForm');
+	jQuery('#elementtype').change(function(){sw.build(this)});
+	jQuery('#subtypeHostGroup, #subtypeHostGroupElements, #areaTypeAuto, #areaTypeCustom').click(function(){sw.build(this)});
+
+
 	jQuery(divForm).draggable({
 		handle: this.selementForm.dragHandler,
 		containment: [0,0,3200,3200]
@@ -1142,7 +1148,6 @@ update_multiContainer: function(e){
 		else this.multiContainer.container.style.height = 'auto';
 
 		var e_tr_3 = document.createElement('tr');
-		e_tr_3.className = "even_row";
 		e_tbody_2.appendChild(e_tr_3);
 
 
@@ -1300,7 +1305,6 @@ update_linkContainer: function(e){
 		if(count > 4) this.linkContainer.container.style.height = '120px';
 
 		var e_tr_3 = document.createElement('tr');
-		e_tr_3.className = "even_row";
 		e_tbody_2.appendChild(e_tr_3);
 
 
@@ -1337,7 +1341,6 @@ update_linkContainer: function(e){
 
 	if(count == 0){
 		var e_tr_3 = document.createElement('tr');
-		e_tr_3.className = "even_row";
 		e_tbody_2.appendChild(e_tr_3);
 
 		var e_td_4 = document.createElement('td');
@@ -1436,18 +1439,15 @@ this.selementForm.dragHandler = e_td_5;
 	var e_tr_4 = document.createElement('tr');
 this.selementForm.massEdit.elementtype = e_tr_4;
 
-	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
 	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_l";
 	e_td_5.appendChild(document.createTextNode(locale['S_TYPE']));
 	e_tr_4.appendChild(e_td_5);
 
 
 	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_r";
 	e_tr_4.appendChild(e_td_5);
 
 
@@ -1493,175 +1493,14 @@ this.selementForm.elementtype = e_select_6;
 	e_select_6.appendChild(e_option_7);
 
 // SUBTYPE
-	var e_tr_4 = document.createElement('tr');
-this.selementForm.typeDOM.elementsubtype = e_tr_4;
-//	jQuery(e_tr_4).toggleClass("hidden", true);
-
-	e_tr_4.className = "even_row";
-	e_tbody_3.appendChild(e_tr_4);
-
-
-	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_l";
-	e_td_5.appendChild(document.createTextNode(locale['S_SHOW']));
-	e_tr_4.appendChild(e_td_5);
-
-
-	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_r";
-	e_tr_4.appendChild(e_td_5);
-
-	var e_div_6 = document.createElement('div');
-this.selementForm.elementsubtype = e_div_6;
-
-	e_div_6.setAttribute('id',"elementsubtype_box");
-	e_div_6.className = "objectgroup inlineblock border_dotted ui-corner-all";
-
-	e_td_5.appendChild(e_div_6);
-
-	var e_rb_7 = jQuery("<input/>").attr({
-		"type":		"radio",
-		"class":	"input radio",
-		"name":		"elementsubtype",
-		"id":		"elementsubtype_0",
-		"value":	"0"
-	}).appendTo(e_div_6);
-
-	jQuery(e_div_6).append(jQuery("<label>Host group</label><br/>").attr({"for": "elementsubtype_0"}));
-
-	var e_rb_7 = jQuery("<input/>").attr({
-		"type":		"radio",
-		"class":	"input radio",
-		"name":		"elementsubtype",
-		"id":		"elementsubtype_1",
-		"value":	"1"
-	}).appendTo(e_div_6);
-
-	jQuery(e_div_6).append(jQuery("<label>Host group elements</label>").attr({"for": "elementsubtype_1"}));
-
-
-// AREATYPE
-	var e_tr_4 = document.createElement('tr');
-this.selementForm.typeDOM.areatype = e_tr_4;
-//	jQuery(e_tr_4).toggleClass("hidden", true);
-
-	e_tr_4.className = "even_row";
-	e_tbody_3.appendChild(e_tr_4);
-
-
-	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_l";
-	e_td_5.appendChild(document.createTextNode("Area size"));
-	e_tr_4.appendChild(e_td_5);
-
-
-	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_r";
-	e_tr_4.appendChild(e_td_5);
-
-	var e_div_6 = document.createElement('div');
-this.selementForm.areatype = e_div_6;
-
-	e_div_6.setAttribute('id',"areatype_box");
-	e_div_6.className = "objectgroup border_dotted ui-corner-all";
-
-	e_td_5.appendChild(e_div_6);
-
-	var e_rb_7 = jQuery("<input/>").attr({
-		"type":		"radio",
-		"class":	"input radio",
-		"name":		"areatype",
-		"id":		"areatype_0",
-		"value":	"0"
-	}).appendTo(e_div_6);
-
-	jQuery(e_div_6).append(jQuery("<label>Fit to map</label><br/>").attr({"for": "areatype_0"}));
-
-	var e_rb_7 = jQuery("<input/>").attr({
-		"type":		"radio",
-		"class":	"input radio",
-		"name":		"areatype",
-		"id":		"areatype_1",
-		"value":	"1"
-	}).appendTo(e_div_6);
-
-	jQuery(e_div_6).append(jQuery("<label>Custom size</label>").attr({"for": "areatype_1"}));
-
-// AREA SIZE
-	var e_div_6 = document.createElement('div');
-this.selementForm.areasize = e_div_6;
-
-	e_div_6.setAttribute('id',"areasize_box");
-	e_div_6.className = "objectgroup border_dotted ui-corner-all";
-
-	e_td_5.appendChild(e_div_6);
-
-	jQuery(e_div_6).append(jQuery("<label>Width</label>").attr({"for": "areatype_width"}));
-
-	var e_input_7 = jQuery("<input/>").attr({
-		"type":		"text",
-		"class":	"input text",
-		"name":		"width",
-		"id":		"areatype_width",
-		"value":	"200",
-		"size":		"4"
-	}).appendTo(e_div_6);
-
-	jQuery(e_div_6).append(jQuery("&nbsp;&nbsp;&nbsp;<label>Height</label>").attr({"for": "areatype_height"}));
-
-	var e_input_7 = jQuery("<input/>").attr({
-		"type":		"text",
-		"class":	"input text",
-		"name":		"height",
-		"id":		"areatype_height",
-		"value":	"200",
-		"size":		"4"
-	}).appendTo(e_div_6);
-
-// VIEWTYPE
-	var e_tr_4 = document.createElement('tr');
-this.selementForm.typeDOM.viewtype = e_tr_4;
-//	jQuery(e_tr_4).toggleClass("hidden", true);
-
-	e_tr_4.className = "even_row";
-	e_tbody_3.appendChild(e_tr_4);
-
-
-	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_l";
-	e_td_5.appendChild(document.createTextNode("Placing algorithm"));
-	e_tr_4.appendChild(e_td_5);
-
-
-	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_r";
-	e_tr_4.appendChild(e_td_5);
-
-	var e_div_6 = document.createElement('div');
-this.selementForm.elementsubtype = e_div_6;
-
-	e_div_6.setAttribute('id',"elementsubtype_box");
-
-	e_td_5.appendChild(e_div_6);
-
-	var e_rb_7 = jQuery("<input/>").attr({
-		"type":		"radio",
-		"class":	"input radio",
-		"name":		"viewtype",
-		"id":		"viewtype_0",
-		"value":	"0"
-	}).appendTo(e_div_6);
-
-	jQuery(e_div_6).append(jQuery("<label>Grid</label><br/>").attr({"for": "viewtype_0"}));
+	jQuery(e_tbody_3).append(jQuery('#mapElementSubtype').text());
 
 // LABEL
 	var e_tr_4 = document.createElement('tr');
-	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
 	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_l";
 
 	var e_input_6 = document.createElement('input');
 this.selementForm.massEdit.chkboxLabel = e_input_6
@@ -1677,7 +1516,6 @@ this.selementForm.massEdit.chkboxLabel = e_input_6
 
 
 	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_r";
 	e_tr_4.appendChild(e_td_5);
 
 
@@ -1692,12 +1530,10 @@ this.selementForm.label = e_textarea_6;
 
 // LABEL LOCATION
 	var e_tr_4 = document.createElement('tr');
-	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
 	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_l";
 
 
 	var e_input_6 = document.createElement('input');
@@ -1715,7 +1551,6 @@ this.selementForm.massEdit.chkboxLabelLocation = e_input_6
 
 
 	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_r";
 	e_tr_4.appendChild(e_td_5);
 
 
@@ -1763,20 +1598,17 @@ this.selementForm.label_location = e_select_6;
 this.selementForm.typeDOM.elementName = e_tr_4;
 this.selementForm.massEdit.elementName = e_tr_4;
 
-	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
 	var e_td_5 = document.createElement('td');
 this.selementForm.typeDOM.elementCaption = e_td_5;
 
-	e_td_5.className = "form_row_l";
 	e_td_5.appendChild(document.createTextNode(locale['S_HOST']));
 	e_tr_4.appendChild(e_td_5);
 
 
 	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_r";
 	e_tr_4.appendChild(e_td_5);
 
 
@@ -1804,12 +1636,10 @@ this.selementForm.elementTypeSelect = e_span_6;
 	var e_tr_4 = document.createElement('tr');
 this.selementForm.typeDOM.iconid_off = e_tr_4;
 
-	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
 	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_l";
 
 
 	var e_input_6 = document.createElement('input');
@@ -1827,7 +1657,6 @@ this.selementForm.massEdit.chkboxIconid_off = e_input_6
 
 
 	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_r";
 	e_tr_4.appendChild(e_td_5);
 
 
@@ -1843,19 +1672,15 @@ this.selementForm.iconid_off = e_select_6;
 // ADVANCED ICONS
 	var e_tr_4 = document.createElement('tr');
 this.selementForm.typeDOM.advanced_icons = e_tr_4;
-
-	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
 	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_l";
 	e_td_5.appendChild(document.createTextNode(locale['S_USE_ADVANCED_ICONS']));
 	e_tr_4.appendChild(e_td_5);
 
 
 	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_r";
 	e_tr_4.appendChild(e_td_5);
 
 
@@ -1885,12 +1710,10 @@ this.selementForm.advanced_icons = e_input_6;
 	var e_tr_4 = document.createElement('tr');
 this.selementForm.typeDOM.iconid_on = e_tr_4;
 
-	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
 	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_l";
 
 	var e_input_6 = document.createElement('input');
 this.selementForm.massEdit.chkboxIconid_on = e_input_6;
@@ -1906,7 +1729,6 @@ this.selementForm.massEdit.chkboxIconid_on = e_input_6;
 
 
 	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_r";
 	e_tr_4.appendChild(e_td_5);
 
 
@@ -1939,12 +1761,10 @@ this.selementForm.iconid_on = e_select_6;
 	var e_tr_4 = document.createElement('tr');
 this.selementForm.typeDOM.iconid_maintenance = e_tr_4;
 
-	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
 	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_l";
 
 	var e_input_6 = document.createElement('input');
 this.selementForm.massEdit.chkboxIconid_maintenance = e_input_6;
@@ -1960,7 +1780,6 @@ this.selementForm.massEdit.chkboxIconid_maintenance = e_input_6;
 
 
 	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_r";
 	e_tr_4.appendChild(e_td_5);
 
 
@@ -1994,12 +1813,10 @@ this.selementForm.iconid_maintenance = e_select_6;
 	var e_tr_4 = document.createElement('tr');
 this.selementForm.typeDOM.iconid_disabled = e_tr_4;
 
-	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
 	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_l";
 
 	var e_input_6 = document.createElement('input');
 this.selementForm.massEdit.chkboxIconid_disabled = e_input_6;
@@ -2015,7 +1832,6 @@ this.selementForm.massEdit.chkboxIconid_disabled = e_input_6;
 
 
 	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_r";
 	e_tr_4.appendChild(e_td_5);
 
 
@@ -2047,18 +1863,15 @@ this.selementForm.iconid_disabled = e_select_6;
 // X
 	var e_tr_4 = document.createElement('tr');
 this.selementForm.massEdit.x = e_tr_4;
-	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
 	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_l";
 	e_td_5.appendChild(document.createTextNode(locale['S_COORDINATE_X']));
 	e_tr_4.appendChild(e_td_5);
 
 
 	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_r";
 	e_tr_4.appendChild(e_td_5);
 
 
@@ -2078,18 +1891,15 @@ this.selementForm.x = e_input_6;
 // Y
 	var e_tr_4 = document.createElement('tr');
 this.selementForm.massEdit.y = e_tr_4;
-	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
 	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_l";
 	e_td_5.appendChild(document.createTextNode(locale['S_COORDINATE_Y']));
 	e_tr_4.appendChild(e_td_5);
 
 
 	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_r";
 	e_tr_4.appendChild(e_td_5);
 
 
@@ -2110,7 +1920,6 @@ this.selementForm.y = e_input_6;
 // URLS
 	var e_tr_4 = document.createElement('tr');
 this.selementForm.urls = e_tr_4;
-	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
@@ -2164,6 +1973,7 @@ this.selementForm.urls = e_tr_4;
 	addListener(e_input_6, 'click', this.hide.bindAsEventListener(this));
 
 	e_td_5.appendChild(e_input_6);
+
 },
 
 form_selement_update: function(e, selementid){
@@ -2415,9 +2225,10 @@ form_selement_save: function(e){
 	this.debug('form_selement_save');
 //--
 
+	var params = {};
+
 	if(this.sysmap.selection.count == 1){
 		var selementid = this.selementForm.selementid.value;
-		var params = {};
 
 		params.elementtype = this.selementForm.elementtype.selectedIndex;
 		params.label = this.selementForm.label.value;
@@ -2459,7 +2270,7 @@ form_selement_save: function(e){
 		var dims = {
 			height: jQuery(this.sysmap.selements[selementid].domNode).height(),
 			width: jQuery(this.sysmap.selements[selementid].domNode).width()
-		}
+		};
 
 		params.x = parseInt(this.selementForm.x.value, 10);
 		params.y = parseInt(this.selementForm.y.value, 10);
@@ -2511,8 +2322,6 @@ form_selement_save: function(e){
 		this.sysmap.selements[selementid].reload(params);
 	}
 	else{
-		var params = {};
-
 // Label
 		if(this.selementForm.massEdit.chkboxLabel.checked)
 			params.label = this.selementForm.label.value;
@@ -2642,18 +2451,15 @@ this.linkForm.linkid = e_input_4;
 
 // LABEL
 	var e_tr_4 = document.createElement('tr');
-	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
 	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_l";
 	e_td_5.appendChild(document.createTextNode(locale['S_LABEL']));
 	e_tr_4.appendChild(e_td_5);
 
 
 	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_r";
 	e_tr_4.appendChild(e_td_5);
 
 
@@ -2670,18 +2476,15 @@ this.linkForm.linklabel = e_textarea_6;
 
 // SELEMENTID1
 	var e_tr_4 = document.createElement('tr');
-	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
 	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_l";
 	e_td_5.appendChild(document.createTextNode(locale['S_ELEMENT']+' 1'));
 	e_tr_4.appendChild(e_td_5);
 
 
 	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_r";
 	e_tr_4.appendChild(e_td_5);
 
 
@@ -2695,12 +2498,10 @@ this.linkForm.selementid1 = e_select_6;
 
 // SELEMENTID2
 	var e_tr_4 = document.createElement('tr');
-	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
 	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_l";
 	e_tr_4.appendChild(e_td_5);
 
 
@@ -2708,7 +2509,6 @@ this.linkForm.selementid1 = e_select_6;
 
 
 	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_r";
 	e_tr_4.appendChild(e_td_5);
 
 
@@ -2723,12 +2523,10 @@ this.linkForm.selementid2 = e_select_6;
 
 // LINK STATUS INDICATORS
 	var e_tr_4 = document.createElement('tr');
-	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
 	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_l";
 	e_td_5.appendChild(document.createTextNode(locale['S_LINK_INDICATORS']));
 	e_tr_4.appendChild(e_td_5);
 
@@ -2736,23 +2534,19 @@ this.linkForm.selementid2 = e_select_6;
 	var e_td_5 = document.createElement('td');
 this.linkForm.linkIndicatorsTable = e_td_5;
 
-	e_td_5.className = "form_row_r";
 	e_tr_4.appendChild(e_td_5);
 
 // LINE TYPE OK
 	var e_tr_4 = document.createElement('tr');
-	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
 	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_l";
 	e_tr_4.appendChild(e_td_5);
 	e_td_5.appendChild(document.createTextNode(locale['S_TYPE_OK']));
 
 
 	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_r";
 	e_tr_4.appendChild(e_td_5);
 
 
@@ -2790,18 +2584,15 @@ this.linkForm.drawtype = e_select_6;
 
 // Colour OK
 	var e_tr_4 = document.createElement('tr');
-	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
 	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_l";
 	e_td_5.appendChild(document.createTextNode(locale['S_COLOR_OK']));
 	e_tr_4.appendChild(e_td_5);
 
 
 	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_r";
 	e_tr_4.appendChild(e_td_5);
 
 
@@ -3069,7 +2860,6 @@ form_link_addLinktrigger: function(linktrigger){
 
 // ADD Linktrigger
 	var e_tr_8 = document.createElement('tr');
-	e_tr_8.className = "even_row";
 	this.linkForm.linkIndicatorsBody.appendChild(e_tr_8);
 
 
