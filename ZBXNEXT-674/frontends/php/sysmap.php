@@ -197,7 +197,7 @@ include_once('include/page_header.php');
 	}
 
 // include JS + templates
-include('include/templates/sysmaps.js.php');
+include('include/views/js/configuration.sysmaps.js.php');
 
 ?>
 <?php
