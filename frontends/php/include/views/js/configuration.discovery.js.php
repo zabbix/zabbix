@@ -332,13 +332,22 @@ function saveNewDCheckForm(e){
 			jQuery("#add_new_dcheck").attr('disabled', 'disabled');
 			var url = new Curl();
 
-			return jQuery.post(url.getPath()+'?output=ajax&sid='+url.getArgument('sid'), ajaxChecks, function(result){
-				if(!result.result){
-					jQuery.each(result.errors, function(i, val){
-						validationErrors.push(val.error);
-					});
-				}
-			}, 'json');
+			return jQuery.ajax({
+				url: url.getPath()+'?output=ajax&sid='+url.getArgument('sid'),
+				data: ajaxChecks,
+				success: function(result){
+					if(!result.result){
+						jQuery.each(result.errors, function(i, val){
+							validationErrors.push(val.error);
+						});
+					}
+				},
+				error: function(){
+					alert('AJAX request error');
+					jQuery("#add_new_dcheck").removeAttr('disabled');
+				},
+				dataType: 'json'
+			});
 		}
 		else{
 			return true;
