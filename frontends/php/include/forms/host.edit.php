@@ -94,7 +94,7 @@
 		// getting items that populate host profile fields
 		$hostItemsToProfile = API::Item()->get(array(
 			'filter' => array('hostid'=>$dbHost['hostid']),
-			'output' => array('profile_link', 'name'),
+			'output' => array('profile_link', 'name', 'key_'),
 			'preserveKeys' => true,
 			'nopermissions' => true
 		));
@@ -560,7 +560,7 @@
 
 		// link to populating item at the right side (if any)
 		if(isset($hostItemsToProfile[$profileNo])){
-			$populatingLink = new CLink($hostItemsToProfile[$profileNo]['name'], 'items.php?form=update&itemid='.$hostItemsToProfile[$profileNo]['itemid']);
+			$populatingLink = new CLink(itemName($hostItemsToProfile[$profileNo]), 'items.php?form=update&itemid='.$hostItemsToProfile[$profileNo]['itemid']);
 			$populatingLink->setAttribute('title', _s('This field is automatically populated by item "%s"', $hostItemsToProfile[$profileNo]['name']));
 			$populatingItemCell = array(' &larr; ', $populatingLink);
 			$input->addClass('linked_to_item'); // this will be used for disabling fields via jquery
