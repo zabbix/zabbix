@@ -87,7 +87,7 @@ static int	print_packages(char *buffer, int size, zbx_vector_str_t *packages)
 
 	for (i = 0; i < packages->values_num; i++)
 	{
-		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%s, ", packages->values[i]);
+		offset += zbx_snprintf(buffer + offset, size - offset, "%s, ", packages->values[i]);
 		zbx_free(packages->values[i]);
 	}
 
