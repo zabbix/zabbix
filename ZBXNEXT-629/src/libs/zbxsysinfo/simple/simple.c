@@ -311,7 +311,7 @@ static int	check_service(const char *cmd, const char *param, unsigned flags, AGE
 		ret = check_telnet(ip, port, CONFIG_TIMEOUT, &value_int);
 	}
 	else
-		return SYSINFO_RET_FAIL;
+		return ret;
 
 	if (SYSINFO_RET_OK == ret)
 	{
