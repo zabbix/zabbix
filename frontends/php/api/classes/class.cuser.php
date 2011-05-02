@@ -430,10 +430,10 @@ Copt::memoryPick();
 					));
 					foreach($usrgrps as $groupid => $group){
 						if($group['gui_access'] == GROUP_GUI_ACCESS_DISABLED)
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('User is disallowed to alter GUI access to him self by linking to user group "%s".', $group['name']));
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('User may not modify GUI access for himself by becoming a member of user group "%s".', $group['name']));
 
 						if($group['users_status'] == GROUP_STATUS_DISABLED)
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('User is disallowed to alter system status to him self by linking to user group "%s".', $group['name']));
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('User may not modify system status for himself by becoming a member of user group "%s".', $group['name']));
 					}
 				}
 			}
