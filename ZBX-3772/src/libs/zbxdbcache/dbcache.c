@@ -92,8 +92,7 @@ ZBX_DC_HISTORY
 {
 	zbx_uint64_t	itemid;
 	history_value_t	value_orig;
-	history_value_t	value;
-	char		*source;
+	history_value_t	value;			/* used as source for log items */
 	int		clock;
 	int		timestamp;
 	int		severity;
@@ -1779,7 +1778,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 			if (0 != history[i].value_null)
 				continue;
 
-			source_esc = DBdyn_escape_string_len(history[i].source, HISTORY_LOG_SOURCE_LEN);
+			source_esc = DBdyn_escape_string_len(history[i].value.value_str, HISTORY_LOG_SOURCE_LEN);
 			value_esc = DBdyn_escape_string(history[i].value_orig.value_str);
 #ifdef HAVE_MULTIROW_INSERT
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc),
@@ -2023,7 +2022,7 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 	{
 		if (history[i].value_type == ITEM_VALUE_TYPE_LOG)
 		{
-			source_esc = DBdyn_escape_string_len(history[i].source, HISTORY_LOG_SOURCE_LEN);
+			source_esc = DBdyn_escape_string_len(history[i].value.value_str, HISTORY_LOG_SOURCE_LEN);
 			value_esc = DBdyn_escape_string(history[i].value_orig.value_str);
 #ifdef HAVE_MULTIROW_INSERT
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc),
@@ -2165,14 +2164,14 @@ int	DCsync_history(int sync_type)
 			switch (history[history_num].value_type)
 			{
 				case ITEM_VALUE_TYPE_LOG:
-					if (NULL != cache->history[f].source)
+					if (NULL != cache->history[f].value.value_str)
 					{
-						history[history_num].source =
-								zbx_strdup(NULL, cache->history[f].source);
-						cache->text_gap_num += strlen(cache->history[f].source) + 1;
+						history[history_num].value.value_str =
+								zbx_strdup(NULL, cache->history[f].value.value_str);
+						cache->text_gap_num += strlen(cache->history[f].value.value_str) + 1;
 					}
 					else
-						history[history_num].source = NULL;
+						history[history_num].value.value_str = NULL;
 				case ITEM_VALUE_TYPE_STR:
 				case ITEM_VALUE_TYPE_TEXT:
 					history[history_num].value_orig.value_str =
@@ -2253,7 +2252,7 @@ int	DCsync_history(int sync_type)
 			switch (history[i].value_type)
 			{
 				case ITEM_VALUE_TYPE_LOG:
-					zbx_free(history[i].source);
+					zbx_free(history[i].value.value_str);
 				case ITEM_VALUE_TYPE_STR:
 				case ITEM_VALUE_TYPE_TEXT:
 					zbx_free(history[i].value_orig.value_str);
@@ -2397,14 +2396,14 @@ static void	DCvacuum_text()
 			}
 			cache->last_text += sz;
 
-			if (ITEM_VALUE_TYPE_LOG == cache->history[f].value_type && NULL != cache->history[f].source)
+			if (ITEM_VALUE_TYPE_LOG == cache->history[f].value_type && NULL != cache->history[f].value.value_str)
 			{
-				sz = strlen(cache->history[f].source) + 1;
+				sz = strlen(cache->history[f].value.value_str) + 1;
 
-				if (cache->last_text != cache->history[f].source)
+				if (cache->last_text != cache->history[f].value.value_str)
 				{
-					memmove(cache->last_text, cache->history[f].source, sz);
-					cache->history[f].source = cache->last_text;
+					memmove(cache->last_text, cache->history[f].value.value_str, sz);
+					cache->history[f].value.value_str = cache->last_text;
 				}
 				cache->last_text += sz;
 			}
@@ -2698,12 +2697,12 @@ static void	DCadd_history_log(zbx_uint64_t itemid, char *value_orig, int clock, 
 
 	if (0 != len2)
 	{
-		history->source		= cache->last_text;
+		history->value.value_str = cache->last_text;
 		zbx_strlcpy(cache->last_text, source, len2);
 		cache->last_text	+= len2;
 	}
 	else
-		history->source		= NULL;
+		history->value.value_str = NULL;
 
 	history->severity		= severity;
 	history->logeventid		= logeventid;
