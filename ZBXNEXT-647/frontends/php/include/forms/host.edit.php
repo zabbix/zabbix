@@ -505,7 +505,6 @@
 	$profileList = new CFormList('profilelist');
 
 	// radio buttons for profile type choice
-	$radioContainer = new CDiv();
 	$profileTypeRadio = array(
 		new CRadioButton(
 			'profile_mode',
@@ -560,8 +559,9 @@
 
 		// link to populating item at the right side (if any)
 		if(isset($hostItemsToProfile[$profileNo])){
-			$populatingLink = new CLink(itemName($hostItemsToProfile[$profileNo]), 'items.php?form=update&itemid='.$hostItemsToProfile[$profileNo]['itemid']);
-			$populatingLink->setAttribute('title', _s('This field is automatically populated by item "%s"', $hostItemsToProfile[$profileNo]['name']));
+			$itemName = itemName($hostItemsToProfile[$profileNo]);
+			$populatingLink = new CLink($itemName, 'items.php?form=update&itemid='.$hostItemsToProfile[$profileNo]['itemid']);
+			$populatingLink->setAttribute('title', _s('This field is automatically populated by item "%s"', $itemName));
 			$populatingItemCell = array(' &larr; ', $populatingLink);
 			$input->addClass('linked_to_item'); // this will be used for disabling fields via jquery
 			if($profile_mode == HOST_PROFILE_AUTOMATIC){

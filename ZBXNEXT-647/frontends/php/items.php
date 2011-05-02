@@ -601,6 +601,7 @@ switch($itemType) {
 				'ipmi_sensor'		=> get_request('ipmi_sensor'),
 //				'applications'		=> $applications
 				'data_type'		=> get_request('data_type'),
+				'profile_link'  => get_request('profile_link'),
 			);
 
 			if($_REQUEST['action']=='add to group'){
