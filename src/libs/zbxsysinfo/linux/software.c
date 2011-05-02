@@ -79,9 +79,26 @@ int	dpkg_parser(char *line, char *package)
 	return SUCCEED;
 }
 
+static int	print_packages(char *buffer, int size, zbx_vector_str_t *packages)
+{
+	int	i, offset = 0;
+
+	zbx_vector_str_sort(packages, ZBX_DEFAULT_STR_COMPARE_FUNC);
+
+	for (i = 0; i < packages->values_num; i++)
+	{
+		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%s, ", packages->values[i]);
+		zbx_free(packages->values[i]);
+	}
+
+	packages->values_num = 0;
+
+	return offset;
+}
+
 int     SYSTEM_SW_PACKAGES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	int			ret = SYSINFO_RET_FAIL, show_pm, offset = 0, i, j;
+	int			ret = SYSINFO_RET_FAIL, show_pm, offset = 0, i;
 	char			tmp[MAX_STRING_LEN], buffer[MAX_BUFFER_LEN], regex[MAX_STRING_LEN],
 				*buf = NULL, *package;
 	zbx_vector_str_t	packages;
@@ -112,9 +129,6 @@ int     SYSTEM_SW_PACKAGES(const char *cmd, const char *param, unsigned flags, A
 		{
 			zbx_free(buf);
 
-			if (1 == show_pm)
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "[%s] ", mng->name);
-
 			if (SUCCEED != zbx_execute(mng->list_cmd, &buf, NULL, 0, CONFIG_TIMEOUT))
 				continue;
 
@@ -137,17 +151,17 @@ next:
 				package = strtok(NULL, "\n");
 			}
 
-			zbx_vector_str_sort(&packages, ZBX_DEFAULT_STR_COMPARE_FUNC);
-
-			for (j = 0; j < packages.values_num; j++)
+			if (1 == show_pm)
 			{
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%s, ", packages.values[j]);
-				zbx_free(packages.values[j]);
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "[%s] ", mng->name);
+				offset += print_packages(buffer + offset, sizeof(buffer) - offset, &packages);
 			}
-			packages.values_num = 0;
 		}
 		zbx_free(buf);
 	}
+
+	if (0 == show_pm)
+		offset += print_packages(buffer + offset, sizeof(buffer) - offset, &packages);
 
 	zbx_vector_str_destroy(&packages);
 
