@@ -225,7 +225,7 @@ include_once('include/page_header.php');
 	}
 
 // js templates
-	require_once('include/templates/scriptConfirm.js.php');
+	require_once('include/views/js/general.script.confirm.js.php');
 
 //	$time = new CSpan(date("[H:i:s]",time()));
 //	$time->setAttribute('id','refreshed');
