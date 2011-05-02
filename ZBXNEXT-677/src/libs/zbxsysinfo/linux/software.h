@@ -38,10 +38,10 @@ int	dpkg_parser(char *line, char *package);
 ZBX_PACKAGE_MANAGER	package_managers[] =
 /*	NAME		TEST_CMD					LIST_CMD			PARSER_FUNC */
 {
-	{"dpkg",	"dpkg --version",				"dpkg --get-selections",	dpkg_parser},
+	{"dpkg",	"dpkg --version 2>/dev/null",			"dpkg --get-selections",	dpkg_parser},
 	{"pkgtools",	"[ -d /var/log/packages ] && echo 'true'",	"ls /var/log/packages",		NULL},
-	{"rpm",		"rpm --version",				"rpm -qa",			NULL},
-	{"pacman",	"pacman --version",				"pacman -Q",			NULL},
+	{"rpm",		"rpm --version 2>/dev/null",			"rpm -qa",			NULL},
+	{"pacman",	"pacman --version 2>/dev/null",			"pacman -Q",			NULL},
 	{0}
 };
 

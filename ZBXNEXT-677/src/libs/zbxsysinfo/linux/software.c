@@ -81,7 +81,7 @@ int	dpkg_parser(char *line, char *package)
 
 int     SYSTEM_SW_PACKAGES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	int			ret = SYSINFO_RET_FAIL, show_pm, offset = 0, i;
+	int			ret = SYSINFO_RET_FAIL, show_pm, offset = 0, i, j;
 	char			tmp[MAX_STRING_LEN], buffer[MAX_BUFFER_LEN], regex[MAX_STRING_LEN],
 				*buf = NULL, *package;
 	zbx_vector_str_t	packages;
@@ -93,10 +93,10 @@ int     SYSTEM_SW_PACKAGES(const char *cmd, const char *param, unsigned flags, A
 	if (0 != get_param(param, 1, regex, sizeof(regex)))
 		*regex = '\0';
 
-	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "onlylist"))
-		show_pm = 0;
-	else if (0 == strcmp(tmp, "showpms"))
+	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "showpms"))
 		show_pm = 1;
+	else if (0 == strcmp(tmp, "onlylist"))
+		show_pm = 0;
 	else
 		return ret;
 
@@ -107,16 +107,18 @@ int     SYSTEM_SW_PACKAGES(const char *cmd, const char *param, unsigned flags, A
 	{
 		mng = &package_managers[i];
 
-		if (SUCCEED == (ret = zbx_execute(mng->test_cmd, &buf, NULL, 0, CONFIG_TIMEOUT)) &&
+		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, NULL, 0, CONFIG_TIMEOUT) &&
 				0 < strlen(buf))	/* consider PMS present, if test_cmd outputs anything to strout */
 		{
-			ret = SYSINFO_RET_OK;
 			zbx_free(buf);
 
-			ret = zbx_execute(mng->list_cmd, &buf, NULL, 0, CONFIG_TIMEOUT);
+			if (1 == show_pm)
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "[%s] ", mng->name);
+
+			if (SUCCEED != zbx_execute(mng->list_cmd, &buf, NULL, 0, CONFIG_TIMEOUT))
+				continue;
 
 			package = strtok(buf, "\n");
-
 			while (NULL != package)
 			{
 				if (NULL != mng->parser)	/* check if the package name needs to be parsed */
@@ -130,38 +132,31 @@ int     SYSTEM_SW_PACKAGES(const char *cmd, const char *param, unsigned flags, A
 				if ('\0' != *regex && NULL == zbx_regexp_match(package, regex, NULL))
 					goto next;
 
-				if (1 == show_pm)
-					package = zbx_dsprintf(NULL, "[%s] %s", mng->name, package);
-				else
-					package = zbx_strdup(NULL, package);
-
-				zbx_vector_str_append(&packages, package);
+				zbx_vector_str_append(&packages, zbx_strdup(NULL, package));
 next:
 				package = strtok(NULL, "\n");
 			}
+
+			zbx_vector_str_sort(&packages, ZBX_DEFAULT_STR_COMPARE_FUNC);
+
+			for (j = 0; j < packages.values_num; j++)
+			{
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%s, ", packages.values[j]);
+				zbx_free(packages.values[j]);
+			}
+			packages.values_num = 0;
 		}
 		zbx_free(buf);
 	}
 
+	zbx_vector_str_destroy(&packages);
 
-	if (SYSINFO_RET_OK == ret)
+	if (0 < offset)
 	{
-		zbx_vector_str_sort(&packages, ZBX_DEFAULT_STR_COMPARE_FUNC);
-
-		for (i = 0; i < packages.values_num; i++)
-		{
-			offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%s, ", packages.values[i]);
-			zbx_free(packages.values[i]);
-		}
-
-
-		if (0 < offset)
-			zbx_rtrim(buffer, ", ");
-
+		ret = SYSINFO_RET_OK;
+		zbx_rtrim(buffer, ", ");
 		SET_TEXT_RESULT(result, zbx_strdup(NULL, buffer));
 	}
-
-	zbx_vector_str_destroy(&packages);
 
 	return ret;
 }
