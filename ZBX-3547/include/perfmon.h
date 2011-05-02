@@ -61,7 +61,7 @@ typedef struct perf_counter_data
 	double				*value_array;	/* a circular buffer of values */
 	int				value_current;	/* index of the last stored value */
 	int				value_count;	/* number of values in the array */
-	double				sum;		/* sum of last value_count values*/
+	double				sum;		/* sum of last value_count values */
 }
 PERF_COUNTER_DATA;
 
