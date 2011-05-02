@@ -377,9 +377,9 @@ int	main(int argc, char **argv)
 
 	/* activate user configuration (not needed for service actions) */
 	if (ZBX_TASK_INSTALL_SERVICE != t.task &&
-		ZBX_TASK_UNINSTALL_SERVICE != t.task &&
-		ZBX_TASK_START_SERVICE != t.task &&
-		ZBX_TASK_STOP_SERVICE != t.task)
+			ZBX_TASK_UNINSTALL_SERVICE != t.task &&
+			ZBX_TASK_START_SERVICE != t.task &&
+			ZBX_TASK_STOP_SERVICE != t.task)
 		activate_user_config();
 
 #if defined (_WINDOWS)

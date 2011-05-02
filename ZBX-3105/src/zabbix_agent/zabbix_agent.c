@@ -143,7 +143,7 @@ int	main(int argc, char **argv)
 	activate_user_config();
 
 	/* do not create debug files */
-	//zabbix_open_log(LOG_TYPE_SYSLOG, LOG_LEVEL_EMPTY, NULL);
+	zabbix_open_log(LOG_TYPE_SYSLOG, LOG_LEVEL_EMPTY, NULL);
 
 	switch (task)
 	{
