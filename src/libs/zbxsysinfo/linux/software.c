@@ -144,9 +144,7 @@ next:
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%s, ", packages.values[j]);
 				zbx_free(packages.values[j]);
 			}
-
 			packages.values_num = 0;
-			zbx_rtrim(buffer, ", ");
 		}
 		zbx_free(buf);
 	}
@@ -156,6 +154,7 @@ next:
 	if (0 < offset)
 	{
 		ret = SYSINFO_RET_OK;
+		zbx_rtrim(buffer, ", ");
 		SET_TEXT_RESULT(result, zbx_strdup(NULL, buffer));
 	}
 
