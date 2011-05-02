@@ -100,6 +100,7 @@ int     SYSTEM_SW_PACKAGES(const char *cmd, const char *param, unsigned flags, A
 	else
 		return ret;
 
+	*buffer = '\0';
 	zbx_vector_str_create(&packages);
 
 	for (i = 0; NULL != package_managers[i].name; i++)
