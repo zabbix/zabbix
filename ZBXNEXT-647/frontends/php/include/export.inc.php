@@ -1085,7 +1085,7 @@ class zbxXML{
 							$host_db['profile'] = array();
 							foreach($profile_node as $field){
 								$newProfileName = self::mapProfileName($field->nodeName);
-								if(isset($host_db['profile'][$newProfileName])){
+								if(isset($host_db['profile'][$newProfileName]) && $field->nodeValue !== ''){
 									$host_db['profile'][$newProfileName] .= "\n";
 									$host_db['profile'][$newProfileName] .= $field->nodeValue;
 								}
@@ -1102,7 +1102,7 @@ class zbxXML{
 							}
 							foreach($profile_ext_node as $field){
 								$newProfileName = self::mapProfileName($field->nodeName);
-								if(isset($host_db['profile'][$newProfileName])){
+								if(isset($host_db['profile'][$newProfileName]) && $field->nodeValue !== ''){
 									$host_db['profile'][$newProfileName] .= "\n";
 									$host_db['profile'][$newProfileName] .= $field->nodeValue;
 								}

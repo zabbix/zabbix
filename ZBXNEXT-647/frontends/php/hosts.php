@@ -518,7 +518,7 @@ include_once('include/page_header.php');
 				'templates' => $templates,
 				'interfaces' => $interfaces,
 				'macros' => $macros,
-				'profile' => (get_request('profile_mode') != -1) ? get_request('host_profile', array()) : array(),
+				'profile' => (get_request('profile_mode') != HOST_PROFILE_DISABLED) ? get_request('host_profile', array()) : array(),
 				'profile_mode' => get_request('profile_mode')
 			);
 
