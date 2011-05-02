@@ -217,7 +217,7 @@ $profileModesCC->addItem(HOST_PROFILE_DISABLED, _('Disabled'));
 $profileModesCC->addItem(HOST_PROFILE_MANUAL, _('Manual'));
 $profileModesCC->addItem(HOST_PROFILE_AUTOMATIC, _('Automatic'));
 $frmHost->addRow(array(
-	new CVisibilityBox('visible[profile_mode]', isset($visible['profile_mode']), 'profile_mode', S_ORIGINAL), S_USE_PROFILE),
+	new CVisibilityBox('visible[profile_mode]', isset($visible['profile_mode']), 'profile_mode', S_ORIGINAL), _('Profile mode')),
 	$profileModesCC
 );
 
