@@ -261,7 +261,7 @@ include_once('include/page_header.php');
 		$result = zbxXML::import($_FILES['import_file']['tmp_name']);
 		if($result) $result = zbxXML::parseMain($rules);
 		$result = DBend($result);
-		show_messages($result, S_IMPORTED.SPACE.S_SUCCESSEFULLY_SMALL, S_IMPORT.SPACE.S_FAILED_SMALL);
+		show_messages($result, _('Imported successfully'), _('Import failed'));
 	}
 ?>
 <?php
@@ -503,7 +503,7 @@ include_once('include/page_header.php');
 		else{
 			$template_wdgt->addItem(get_header_host_table(get_request('templateid',0), 'template'));
 
-			$templateForm = new CGetForm('template.edit');
+			$templateForm = new CView('configuration.template.edit');
 			$template_wdgt->addItem($templateForm->render());
 		}
 	}

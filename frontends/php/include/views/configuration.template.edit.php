@@ -20,7 +20,7 @@
 ?>
 <?php
 // include JS + templates
-	include('include/templates/macros.js.php');
+	include('include/views/js/configuration.host.edit.macros.js.php');
 ?>
 <?php
 	$divTabs = new CTabView(array('remember'=>1));

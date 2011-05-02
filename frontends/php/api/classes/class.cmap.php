@@ -597,7 +597,7 @@ COpt::memoryPick();
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect %1$s label type value for map "%2$s".', $labelData['typeName'], $dbMap['name']));
 
 					if(!isset($map[$labelData['string']]) || zbx_empty($map[$labelData['string']]))
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot be empty %1$s element custom label for map "%2$s".', $labelData['typeName'], $dbMap['name']));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Custom label for map "%2$s" elements of type "%1$s" may not be empty.', $labelData['typeName'], $dbMap['name']));
 				}
 
 				if(($labelName == 'label_type_image') && (MAP_LABEL_TYPE_STATUS == $map[$labelName]))
