@@ -138,6 +138,7 @@ ZBX_DC_CACHE
 	char		*last_text;
 	int		history_first;
 	int		history_num;
+	int		history_gap_num;
 	int		trends_num;
 	int		itemids_alloc, itemids_num;
 };
@@ -2089,16 +2090,16 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
  ******************************************************************************/
 int	DCsync_history(int sync_type)
 {
+	const char		*__function_name = "DCsync_history";
 	static ZBX_DC_HISTORY	*history = NULL;
-	int			i, j, history_num, n, f;
+	int			i, history_num, n, f;
 	int			syncs;
 	int			total_num = 0;
 	int			skipped_clock, max_delay;
 	time_t			now = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In DCsync_history(history_first:%d history_num:%d)",
-			cache->history_first,
-			cache->history_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_first:%d history_num:%d",
+			__function_name, cache->history_first, cache->history_num);
 
 	/* disable processing of the zabbix_syslog() calls */
 	CONFIG_ENABLE_LOG = 0;
@@ -2124,52 +2125,84 @@ int	DCsync_history(int sync_type)
 		LOCK_CACHE;
 
 		history_num = 0;
-		n = cache->history_num;
 		f = cache->history_first;
 		skipped_clock = 0;
 
-		while (n > 0 && history_num < ZBX_SYNC_MAX)
+		for (n = cache->history_num; n > 0 && history_num < ZBX_SYNC_MAX; n--)
 		{
-			if (0 != (zbx_process & ZBX_PROCESS_PROXY) ||
-					FAIL == uint64_array_exists(cache->itemids, cache->itemids_num, cache->history[f].itemid))
+			if (ZBX_HISTORY_SIZE == ++f)
+				f = 0;
+
+			if (0 == cache->history[f].itemid)
 			{
+				if (f == cache->history_first)
+				{
+					cache->history_num--;
+					cache->history_gap_num--;
+					if (ZBX_HISTORY_SIZE == ++cache->history_first)
+						cache->history_first = 0;
+				}
+				continue;
+			}
+
+			if (0 != (zbx_process & ZBX_PROCESS_SERVER))
+			{
+				if (SUCCEED == uint64_array_exists(cache->itemids, cache->itemids_num,
+						cache->history[f].itemid))
+				{
+					if (skipped_clock == 0)
+						skipped_clock = cache->history[f].clock;
+					continue;
+				}
+
 				uint64_array_add(&cache->itemids, &cache->itemids_alloc,
 						&cache->itemids_num, cache->history[f].itemid, 0);
-
-				memcpy(&history[history_num], &cache->history[f], sizeof(ZBX_DC_HISTORY));
-				if (history[history_num].value_type == ITEM_VALUE_TYPE_STR
-						|| history[history_num].value_type == ITEM_VALUE_TYPE_TEXT
-						|| history[history_num].value_type == ITEM_VALUE_TYPE_LOG)
-				{
-					history[history_num].value_orig.value_str = strdup(cache->history[f].value_orig.value_str);
-
-					if (history[history_num].value_type == ITEM_VALUE_TYPE_LOG)
-					{
-						if (NULL != cache->history[f].source)
-							history[history_num].source = strdup(cache->history[f].source);
-						else
-							history[history_num].source = NULL;
-					}
-				}
-
-				for (j = f; j != cache->history_first; j = (j == 0 ? ZBX_HISTORY_SIZE : j) - 1)
-				{
-					i = (j == 0 ? ZBX_HISTORY_SIZE : j) - 1;
-					memcpy(&cache->history[j], &cache->history[i], sizeof(ZBX_DC_HISTORY));
-				}
-
-				cache->history_num--;
-				cache->history_first++;
-				cache->history_first = cache->history_first % ZBX_HISTORY_SIZE;
-
-				history_num++;
 			}
-			else if (skipped_clock == 0)
-				skipped_clock = cache->history[f].clock;
 
-			n--;
-			f++;
-			f = f % ZBX_HISTORY_SIZE;
+			memcpy(&history[history_num], &cache->history[f], sizeof(ZBX_DC_HISTORY));
+
+			switch (history[history_num].value_type)
+			{
+				case ITEM_VALUE_TYPE_LOG:
+					if (NULL != cache->history[f].source)
+						history[history_num].source = zbx_strdup(NULL, cache->history[f].source);
+					else
+						history[history_num].source = NULL;
+				case ITEM_VALUE_TYPE_STR:
+				case ITEM_VALUE_TYPE_TEXT:
+					history[history_num].value_orig.value_str = strdup(cache->history[f].value_orig.value_str);
+					break;
+			}
+
+			if (f == cache->history_first)
+			{
+				cache->history_num--;
+				if (ZBX_HISTORY_SIZE == ++cache->history_first)
+					cache->history_first = 0;
+			}
+			else
+			{
+				cache->history[f].itemid = 0;
+				cache->history_gap_num++;
+			}
+
+			history_num++;
+		}
+
+		if (ZBX_HISTORY_SIZE <= (f = cache->history_first + cache->history_num))
+			f -= ZBX_HISTORY_SIZE;
+
+		for (n = cache->history_num; n > 0; n--)
+		{
+			if (0 == f)
+				f = ZBX_HISTORY_SIZE;
+			f--;
+
+			if (0 != cache->history[f].itemid)
+				break;
+
+			cache->history_num--;
+			cache->history_gap_num--;
 		}
 
 		UNLOCK_CACHE;
@@ -2198,25 +2231,29 @@ int	DCsync_history(int sync_type)
 
 		DCflush_nextchecks();
 
-		LOCK_CACHE;
+		if (0 != (zbx_process & ZBX_PROCESS_SERVER))
+		{
+			LOCK_CACHE;
 
-		for (i = 0; i < history_num; i ++)
-			uint64_array_remove(cache->itemids, &cache->itemids_num, &history[i].itemid, 1);
+			for (i = 0; i < history_num; i ++)
+				uint64_array_remove(cache->itemids, &cache->itemids_num, &history[i].itemid, 1);
 
-		UNLOCK_CACHE;
+			UNLOCK_CACHE;
+		}
 
 		for (i = 0; i < history_num; i++)
 		{
-			if (history[i].value_type == ITEM_VALUE_TYPE_STR
-					|| history[i].value_type == ITEM_VALUE_TYPE_TEXT
-					|| history[i].value_type == ITEM_VALUE_TYPE_LOG)
+			switch (history[i].value_type)
 			{
-				zbx_free(history[i].value_orig.value_str);
-
-				if (history[i].value_type == ITEM_VALUE_TYPE_LOG && NULL != history[i].source)
+				case ITEM_VALUE_TYPE_LOG:
 					zbx_free(history[i].source);
+				case ITEM_VALUE_TYPE_STR:
+				case ITEM_VALUE_TYPE_TEXT:
+					zbx_free(history[i].value_orig.value_str);
+					break;
 			}
 		}
+
 		total_num += history_num;
 
 		if (ZBX_SYNC_FULL == sync_type && time(NULL) - now >= 10)
@@ -2234,6 +2271,79 @@ finish:
 	return total_num;
 }
 
+static void	DCmove_history(int src, int n_data, int n_gap)
+{
+	int	dst, n_data1, n_data2;
+
+	dst = src + n_gap;
+
+	if (ZBX_HISTORY_SIZE <= dst || ZBX_HISTORY_SIZE >= dst + n_data)
+	{
+		if (ZBX_HISTORY_SIZE <= dst)
+			dst -= ZBX_HISTORY_SIZE;
+		memmove(&cache->history[dst], &cache->history[src], n_data * sizeof(ZBX_DC_HISTORY));
+	}
+	else
+	{
+		n_data2 = dst + n_data - ZBX_HISTORY_SIZE;
+		n_data1 = n_data - n_data2;
+		memmove(&cache->history[0], &cache->history[src + n_data1], n_data2 * sizeof(ZBX_DC_HISTORY));
+		memmove(&cache->history[dst], &cache->history[src], n_data1 * sizeof(ZBX_DC_HISTORY));
+	}
+}
+
+static void	DCvacuum_history()
+{
+	const char	*__function_name = "DCvacuum_history";
+	int		n, f, n_gap = 0, n_data = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_gap_num:%d/%d",
+			__function_name, cache->history_gap_num, ZBX_HISTORY_SIZE);
+
+	if (cache->history_gap_num <= ZBX_HISTORY_SIZE / 100)
+		goto end;
+
+	if (ZBX_HISTORY_SIZE <= (f = cache->history_first + cache->history_num))
+		f -= ZBX_HISTORY_SIZE;
+
+	for (n = cache->history_num; n > 0; n--)
+	{
+		if (0 == f)
+			f = ZBX_HISTORY_SIZE;
+		f--;
+
+		if (0 == cache->history[f].itemid)
+		{
+			if (0 != n_data)
+			{
+				DCmove_history(f + 1, n_data, n_gap);
+				n_data = 0;
+			}
+			n_gap++;
+		}
+		else if (0 != n_gap)
+		{
+			n_data++;
+
+			if (0 == f)
+			{
+				DCmove_history(f, n_data, n_gap);
+				n_data = 0;
+			}
+		}
+	}
+
+	if (0 != n_data)
+		DCmove_history(f, n_data, n_gap);
+
+	cache->history_num -= n_gap;
+	cache->history_gap_num -= n_gap;
+	if (ZBX_HISTORY_SIZE <= (cache->history_first += n_gap))
+		cache->history_first -= ZBX_HISTORY_SIZE;
+end:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: DCvacuum_text                                                    *
@@ -2249,26 +2359,29 @@ finish:
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void DCvacuum_text()
+static void	DCvacuum_text()
 {
-	char	*first_text;
-	int	i, index;
+	const char	*__function_name = "DCvacuum_text";
+
+	char	*first_text = NULL;
+	int	n, f;
 	size_t	offset;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In DCvacuum_text()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	/* vacuuming text buffer */
-	first_text = NULL;
-	for (i = 0; i < cache->history_num; i++)
+	for (n = cache->history_num, f = cache->history_first; n > 0; n--)
 	{
-		index = (cache->history_first + i) % ZBX_HISTORY_SIZE;
-		if (cache->history[index].value_type == ITEM_VALUE_TYPE_STR
-				|| cache->history[index].value_type == ITEM_VALUE_TYPE_TEXT
-				|| cache->history[index].value_type == ITEM_VALUE_TYPE_LOG)
+		if (ITEM_VALUE_TYPE_STR == cache->history[f].value_type ||
+				ITEM_VALUE_TYPE_TEXT == cache->history[f].value_type ||
+				ITEM_VALUE_TYPE_LOG == cache->history[f].value_type)
 		{
-			first_text = cache->history[index].value_orig.value_str;
+			first_text = cache->history[f].value_orig.value_str;
 			break;
 		}
+
+		if (ZBX_HISTORY_SIZE == ++f)
+			f = 0;
 	}
 
 	if (NULL != first_text)
@@ -2278,18 +2391,20 @@ static void DCvacuum_text()
 
 		memmove(cache->text, first_text, CONFIG_TEXT_CACHE_SIZE - offset);
 
-		for (i = 0; i < cache->history_num; i++)
+		for (n = cache->history_num, f = cache->history_first; n > 0; n--)
 		{
-			index = (cache->history_first + i) % ZBX_HISTORY_SIZE;
-			if (cache->history[index].value_type == ITEM_VALUE_TYPE_STR
-					|| cache->history[index].value_type == ITEM_VALUE_TYPE_TEXT
-					|| cache->history[index].value_type == ITEM_VALUE_TYPE_LOG)
+			if (ITEM_VALUE_TYPE_STR == cache->history[f].value_type ||
+					ITEM_VALUE_TYPE_TEXT == cache->history[f].value_type ||
+					ITEM_VALUE_TYPE_LOG ==  cache->history[f].value_type)
 			{
-				cache->history[index].value_orig.value_str -= offset;
+				cache->history[f].value_orig.value_str -= offset;
 
-				if (cache->history[index].value_type == ITEM_VALUE_TYPE_LOG && NULL != cache->history[index].source)
-					cache->history[index].source -= offset;
+				if (ITEM_VALUE_TYPE_LOG == cache->history[f].value_type && NULL != cache->history[f].source)
+					cache->history[f].source -= offset;
 			}
+
+			if (ZBX_HISTORY_SIZE == ++f)
+				f = 0;
 		}
 		cache->last_text -= offset;
 	}
@@ -2297,7 +2412,7 @@ static void DCvacuum_text()
 		cache->last_text = cache->text;
 
 quit:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of DCvacuum_text()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -2324,14 +2439,19 @@ static ZBX_DC_HISTORY	*DCget_history_ptr(zbx_uint64_t itemid, size_t text_len)
 retry:
 	if (cache->history_num >= ZBX_HISTORY_SIZE)
 	{
-		UNLOCK_CACHE;
+		DCvacuum_history();
 
-		zabbix_log(LOG_LEVEL_DEBUG, "History buffer is full. Sleeping for 1 second.");
-		sleep(1);
+		if (cache->history_num >= ZBX_HISTORY_SIZE)
+		{
+			UNLOCK_CACHE;
 
-		LOCK_CACHE;
+			zabbix_log(LOG_LEVEL_DEBUG, "History buffer is full. Sleeping for 1 second.");
+			sleep(1);
 
-		goto retry;
+			LOCK_CACHE;
+
+			goto retry;
+		}
 	}
 
 	if (0 != text_len)
@@ -2364,7 +2484,8 @@ retry:
 		}
 	}
 
-	index = (cache->history_first + cache->history_num) % ZBX_HISTORY_SIZE;
+	if (ZBX_HISTORY_SIZE <= (index = (cache->history_first + cache->history_num)))
+		index -= ZBX_HISTORY_SIZE;
 	history = &cache->history[index];
 
 	cache->history_num++;
