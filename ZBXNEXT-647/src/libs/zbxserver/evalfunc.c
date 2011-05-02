@@ -2242,7 +2242,7 @@ static void	add_value_suffix_normal(char *value, size_t max_len, const char *uni
 
 	base = (0 == strcmp(units, "B") || 0 == strcmp(units, "Bps") ? 1024 : 1000);
 
-	if (value_double < base)
+	if (value_double < base || SUCCEED == str_in_list("%,ms,rpm,RPM", units, ','))
 	{
 		strscpy(kmgt, "");
 	}
@@ -2509,7 +2509,7 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 		}
 	}
 
-	DBfree_result(result); /* Cannot call DBfree_result until evaluate_FUNC. */
+	DBfree_result(result); /* cannot call DBfree_result until evaluate_FUNC */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s value:'%s'", __function_name,
 			zbx_result_string(res), value);
