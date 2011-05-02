@@ -208,3 +208,136 @@ hideAllObjs: function(){
 }
 
 });
+
+
+var optmap111 = {
+	elementtype: {
+		0: {
+			hide: ['subtypeRow']
+		},
+		1: {
+			hide: ['subtypeRow']
+		},
+		2: {
+			hide: ['subtypeRow']
+		},
+		3: {
+			show: ['subtypeRow']
+		},
+		4: {
+			hide: ['subtypeRow']
+		},
+		5: {
+			hide: ['subtypeRow']
+		}
+	},
+	subtypeHostGroup: {
+		checked: {
+			hide: ['areaTypeRow', 'areaPlacingRow']
+		}
+	},
+	subtypeHostGroupElements: {
+		checked: {
+			show: ['areaTypeRow', 'areaPlacingRow']
+		}
+	},
+	areaTypeAuto: {
+		checked: {
+			hide: ['areaSizeRow']
+		}
+	},
+	areaTypeCustom: {
+		checked: {
+			show: ['areaSizeRow']
+		}
+	}
+
+};
+
+function formSwitcher(elements){
+	this.elements = elements || {};
+}
+formSwitcher.prototype = {
+
+	getValue: function(elem){
+		var type = elem.attr('type');
+
+		if((type == 'radio') || (type == 'checkbox')){
+			return elem.attr('checked') === true ? 'checked' : 'unchecked';
+		}
+		else{
+			return elem.val();
+		}
+	},
+
+	getAllActions: function(elem){
+		var id = elem.attr('id');
+		if(typeof this.elements[id] == 'undefined'){
+			return null;
+		}
+
+		var value = this.getValue(elem);
+		if(typeof this.elements[id][value] != 'undefined'){
+			return this.elements[id][value];
+		}
+		return null;
+	},
+
+	getActionData: function(elem, action){
+		var actions = this.getAllActions(elem);
+		if(actions && (typeof actions[action] != 'undefined')){
+			return actions[action];
+		}
+		return null;
+	},
+
+	build: function(elem){
+		elem = jQuery(elem);
+
+		var elemActions = this.getAllActions(elem);
+		if(elemActions){
+			for(var key in elemActions){
+				switch(key){
+					case 'show': this.show(elemActions.show); break;
+					case 'hide': this.hide(elemActions.hide); break;
+				}
+			}
+		}
+	},
+
+	buildForm: function(id){
+		var that = this;
+		jQuery('#'+id+' :input:enabled').each(function(){that.build(this)});
+	},
+
+	show: function(data){
+		var that = this;
+
+		for(var i=0; i<data.length; i++){
+			jQuery('#'+data[i])
+					.toggle(true)
+					.find(':input').each(function(){
+						that.build(this);
+					})
+					.removeAttr('disabled');
+		}
+	},
+
+	hide: function(data){
+		var that = this;
+
+		for(i=0; i<data.length; i++){
+			jQuery('#'+data[i])
+					.toggle(false)
+					.find(':input').each(function(){
+						var childsToHide = that.getActionData(jQuery(this), 'show');
+						if(childsToHide){
+							that.hide(childsToHide)
+						}
+					})
+					.attr('disabled', 'disabled');
+		}
+	}
+
+
+};

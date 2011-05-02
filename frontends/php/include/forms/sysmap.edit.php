@@ -20,9 +20,8 @@
 ?>
 <?php
 // include JS + templates
-	include('include/templates/sysmap.js.php');
-?>
-<?php
+	include('include/templates/sysmap.edit.js.php');
+
 	$config = select_config();
 
 	$data = $data;
