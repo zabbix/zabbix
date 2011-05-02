@@ -332,6 +332,7 @@ if(defined('USE_PROFILING')){
 					$debug_str .= '<td valign="top">Result:<pre>'.print_r($result, true).'</pre></td>';
 
 					$debug_str .= '</tr></table>';
+					$debug_str .= '</div>';
 				}
 
 			}

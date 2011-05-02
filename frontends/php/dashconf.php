@@ -247,7 +247,6 @@ include_once('include/page_header.php');
 //-----
 
 	$divTabs->addTab('dashFilterTab', S_FILTER, $dashList);
-// } EXT PROFILE WIDGET
 
 	$dashForm->addItem($divTabs);
 
