@@ -73,16 +73,18 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	if (NULL == (pcpus->queue_counter = add_perf_counter(NULL, counterPath, MAX_CPU_HISTORY)))
 		goto clean;
 
+	ret = SUCCEED;
+clean:
 #else	/* not _WINDOWS */
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&cpustats_lock, ZBX_MUTEX_CPUSTATS))
 	{
 		zbx_error("unable to create mutex for cpu collector");
 		exit(FAIL);
 	}
-#endif	/* _WINDOWS */
 
 	ret = SUCCEED;
-clean:
+#endif	/* _WINDOWS */
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
