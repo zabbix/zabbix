@@ -20,7 +20,7 @@
 ?>
 <?php
 // include JS + templates
-require_once('include/templates/gsearch.js.php');
+require_once('include/views/js/general.search.js.php');
 ?>
 <?php
 //	$hosts_wdgt->addItem();

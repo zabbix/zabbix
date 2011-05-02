@@ -20,90 +20,85 @@
 ?>
 <?php
 // include JS + templates
-	include('include/templates/script.js.php');
-	include('include/templates/scriptConfirm.js.php');
+	include('include/views/js/administration.script.edit.js.php');
+	include('include/views/js/general.script.confirm.js.php');
 ?>
 <?php
+	$scripts_wdgt = new CWidget();
+
 	$scriptTab = new CFormList('scriptsTab');
 	$frmScr = new CForm();
 	$frmScr->setName('scripts');
 
-	$frmScr->addVar('form', $data['form']);
-	$frmScr->addVar('form_refresh', $data['form_refresh'] + 1);
+	$frmScr->addVar('form', $this->get('form'));
+	$frmScr->addVar('form_refresh', $this->get('form_refresh') + 1);
 
-
-	if($data['scriptid']) $frmScr->addVar('scriptid', $data['scriptid']);
+	if($this->get('scriptid')) $frmScr->addVar('scriptid', $this->get('scriptid'));
 
 
 // NAME
-	$nameTB = new CTextBox('name', $data['name']);
+	$nameTB = new CTextBox('name', $this->get('name'));
 	$nameTB->setAttribute('maxlength', 255);
 	$nameTB->addStyle('width: 50em');
 	$scriptTab->addRow(_('Name'), $nameTB);
 
 // TYPE
-	$typeCB = new CComboBox('type', $data['type']);
+	$typeCB = new CComboBox('type', $this->get('type'));
 	$typeCB->addItem(ZBX_SCRIPT_TYPE_IPMI, _('IPMI'));
 	$typeCB->addItem(ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, _('Script'));
 	$scriptTab->addRow(_('Type'), $typeCB);
 
 // EXECUTE ON
-	$typeRB = new CRadioButton('execute_on', $data['execute_on']);
+	$typeRB = new CRadioButton('execute_on', $this->get('execute_on'));
 	$typeRB->makeVertical();
 	$typeRB->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT);
 	$typeRB->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER);
 	$scriptTab->addRow(_('Execute on'), new CDiv($typeRB, 'objectgroup inlineblock border_dotted ui-corner-all'), ($data['type'] == ZBX_SCRIPT_TYPE_IPMI));
 
 // COMMAND
-	$commandTA = new CTextArea('command', $data['command']);
+	$commandTA = new CTextArea('command', $this->get('command'));
 	$commandTA->addStyle('width: 50em; padding: 0;');
-	$scriptTab->addRow(_('Commands'), $commandTA, $data['type'] == ZBX_SCRIPT_TYPE_IPMI);
+	$scriptTab->addRow(_('Commands'), $commandTA, $this->get('type') == ZBX_SCRIPT_TYPE_IPMI);
 
 // COMMAND IPMI
-	$commandIpmiTB = new CTextBox('commandipmi', $data['commandipmi']);
+	$commandIpmiTB = new CTextBox('commandipmi', $this->get('commandipmi'));
 	$commandIpmiTB->addStyle('width: 50em;');
-	$scriptTab->addRow(_('Command'), $commandIpmiTB, $data['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT);
+	$scriptTab->addRow(_('Command'), $commandIpmiTB, $this->get('type') == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT);
 
 // DESCRIPTION
-	$descriptionTA = new CTextArea('description', $data['description']);
+	$descriptionTA = new CTextArea('description', $this->get('description'));
 	$descriptionTA->addStyle('width: 50em; padding: 0;');
 	$scriptTab->addRow(_('Description'), $descriptionTA);
 
 // USER GROUPS
-	$usr_groups = new CCombobox('usrgrpid', $data['usrgrpid']);
+	$usr_groups = new CCombobox('usrgrpid', $this->get('usrgrpid'));
 	$usr_groups->addItem(0, _('All'));
-	$usrgrps = API::UserGroup()->get(array(
-		'output' => API_OUTPUT_EXTEND,
-	));
-	order_result($usrgrps, 'name');
-	foreach($usrgrps as $ugnum => $usr_group){
+	$usergroups = $this->getArray('usergroups');
+	foreach($usergroups as $ugnum => $usr_group){
 		$usr_groups->addItem($usr_group['usrgrpid'], $usr_group['name']);
 	}
 	$scriptTab->addRow(_('User groups'), $usr_groups);
 
 // HOST GROUPS
-	$host_groups = new CCombobox('groupid', $data['groupid']);
+	$host_groups = new CCombobox('groupid', $this->get('groupid'));
 	$host_groups->addItem(0, _('All'));
-	$groups = API::HostGroup()->get(array(
-		'output' => API_OUTPUT_EXTEND,
-	));
-	order_result($groups, 'name');
+	$groups = $this->getArray('groups');
 	foreach($groups as $gnum => $group){
 		$host_groups->addItem($group['groupid'], $group['name']);
 	}
 	$scriptTab->addRow(_('Host groups'), $host_groups);
 
 // PERMISSIONS
-	$select_acc = new CCombobox('access', $data['access']);
+	$select_acc = new CCombobox('access', $this->get('access'));
 	$select_acc->addItem(PERM_READ_ONLY, _('Read'));
 	$select_acc->addItem(PERM_READ_WRITE, _('Write'));
 	$scriptTab->addRow(_('Required host permissions'), $select_acc);
 
 // CONFIRMATION
-	$enableQuestCB = new CCheckBox('enableConfirmation', $data['enableConfirmation']);
+	$enableQuestCB = new CCheckBox('enableConfirmation', $this->get('enableConfirmation'));
 	$scriptTab->addRow(new CLabel(_('Enable confirmation'), 'enableConfirmation'), array($enableQuestCB, SPACE));
 
-	$confirmationTB = new CTextBox('confirmation', $data['confirmation']);
+	$confirmationTB = new CTextBox('confirmation', $this->get('confirmation'));
 	$confirmationTB->addStyle('width: 50em;');
 	$confirmationTB->setAttribute('maxlength', 255);
 
@@ -117,7 +112,6 @@
 	$scriptView->addTab('scripts', _('Script'), $scriptTab);
 	$frmScr->addItem($scriptView);
 
-
 // Footer
 	$main = array(new CSubmit('save', _('Save')));
 	$others = array();
@@ -130,6 +124,7 @@
 	$footer = makeFormFooter($main, $others);
 	$frmScr->addItem($footer);
 
+	$scripts_wdgt->addItem($frmScr);
 
-	return $frmScr;
+	return $scripts_wdgt;
 ?>
