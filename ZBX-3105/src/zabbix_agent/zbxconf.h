@@ -32,10 +32,12 @@ extern int	CONFIG_REFRESH_ACTIVE_CHECKS;
 extern char	*CONFIG_LISTEN_IP;
 extern int	CONFIG_LOG_LEVEL;
 extern int	CONFIG_MAX_LINES_PER_SECOND;
+extern char	**CONFIG_ALIASES;
+extern char	**CONFIG_USER_PARAMETERS;
+extern char	**CONFIG_PERF_COUNTERS;
 
-void	load_config(int optional);
-void	load_config_hostname();
-void	ensure_hostname();
+void	load_config();
+void	free_config();
 
 #ifdef _AIX
 void	tl_version();

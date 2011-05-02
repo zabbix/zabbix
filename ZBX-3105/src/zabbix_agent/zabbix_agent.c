@@ -130,29 +130,35 @@ int	main(int argc, char **argv)
 	if (CONFIG_FILE == NULL)
 		CONFIG_FILE = DEFAULT_CONFIG_FILE;
 
-	init_metrics();
+	if (ZBX_TASK_SHOW_USAGE == task)
+	{
+		usage();
+		exit(FAIL);
+	}
 
-	if (ZBX_TASK_START == task)
-		load_config(0);
+	/* load configuration */
+	load_config();
 
-	/* Do not create debug files */
-	zabbix_open_log(LOG_TYPE_SYSLOG, LOG_LEVEL_EMPTY, NULL);
+	/* activate user configuration */
+	activate_user_config();
+
+	/* do not create debug files */
+	//zabbix_open_log(LOG_TYPE_SYSLOG, LOG_LEVEL_EMPTY, NULL);
 
 	switch (task)
 	{
 		case ZBX_TASK_PRINT_SUPPORTED:
-			load_config(1);
 			test_parameters();
-			exit(-1);
+			free_config();
+			exit(SUCCEED);
 			break;
 		case ZBX_TASK_TEST_METRIC:
-			load_config(1);
 			test_parameter(TEST_METRIC, PROCESS_TEST);
-			exit(-1);
+			free_config();
+			exit(SUCCEED);
 			break;
-		case ZBX_TASK_SHOW_USAGE:
-			usage();
-			exit(-1);
+		default:
+			/* do nothing */
 			break;
 	}
 
@@ -199,8 +205,7 @@ int	main(int argc, char **argv)
 
 	fflush(stdout);
 
-	free_metrics();
-	alias_list_free();
+	free_config();
 
 	alarm(0);
 

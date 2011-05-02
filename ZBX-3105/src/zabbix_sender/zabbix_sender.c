@@ -249,9 +249,9 @@ static void    init_config(const char* config_file)
 		{0}
 	};
 
-	if( config_file )
+	if (config_file)
 	{
-		parse_cfg_file(config_file, cfg);
+		parse_opt_cfg_file(config_file, cfg);	/* don't complain about unknown parameters */
 
 		if (NULL != config_source_ip_from_conf)
 		{

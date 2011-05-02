@@ -25,25 +25,46 @@
 
 static ALIAS *aliasList=NULL;
 
-
-/*
- * Add alias to the list
- * Returns 1 on success or 0 if alias with that name already exists
-*/
-int	add_alias_from_config(char *line)
+/******************************************************************************
+ *                                                                            *
+ * Function: add_aliases_from_config                                          *
+ *                                                                            *
+ * Purpose: initialize aliases from configuration                             *
+ *                                                                            *
+ * Parameters: lines - aliase entries from configuration file                 *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Vladimir Levijev                                                   *
+ *                                                                            *
+ * Comments: calls add_alias() for each entry                                 *
+ *                                                                            *
+ ******************************************************************************/
+void	add_aliases_from_config(char **lines)
 {
 	char	*name = NULL,
-		*value = NULL;
+		*value = NULL,
+		**pline; /* a pointer to line */
 
-	name = line;
-	value = strchr(line,':');
-	if(NULL == value)
-		return FAIL;
+	pline = lines;
+	while (NULL != *pline)
+	{
+		name = *pline;
+		value = strchr(name, ':');
+		if (NULL == value)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "ignoring Alias \"%s\": not colon-separated", name);
+			pline++;
+			continue;
+		}
 
-	*value = '\0';
-	value++;
+		*value = '\0';
+		value++;
 
-	return add_alias(name, value);
+		add_alias(name, value);
+
+		pline++;
+	}
 }
 
 int	add_alias(const char *name, const char *value)
@@ -64,12 +85,10 @@ int	add_alias(const char *name, const char *value)
 			zbx_strlcpy(alias->name, name, MAX_ALIAS_NAME-1);
 
 			alias->value = strdup(value);
-
 			alias->next=aliasList;
-
 			aliasList=alias;
 
-			zabbix_log( LOG_LEVEL_DEBUG, "Alias added. [%s] -> [%s]", name, value);
+			zabbix_log(LOG_LEVEL_DEBUG, "alias added: [%s] -> [%s]", name, value);
 			return SUCCEED;
 		}
 
@@ -77,22 +96,13 @@ int	add_alias(const char *name, const char *value)
 		if (strcmp(alias->name, name) == 0)
 		{
 			zbx_free(alias->value);
-
-			memset(alias, 0, sizeof(ALIAS));
-
-			zbx_strlcpy(alias->name, name, MAX_ALIAS_NAME-1);
-
 			alias->value = strdup(value);
 
-			alias->next = aliasList;
-
-			aliasList = alias;
-
-			zabbix_log( LOG_LEVEL_DEBUG, "Alias replaced. [%s] -> [%s]", name, value);
+			zabbix_log(LOG_LEVEL_DEBUG, "alias replaced: [%s] -> [%s]", name, value);
 			return SUCCEED;
 		}
 	}
-	zabbix_log( LOG_LEVEL_WARNING, "Alias FAILED. [%s] -> [%s]", name, value);
+	zabbix_log(LOG_LEVEL_WARNING, "alias handling FAILED: [%s] -> [%s]", name, value);
 	return FAIL;
 }
 

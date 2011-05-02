@@ -52,7 +52,7 @@ typedef struct
 ZBX_PERF_STAT_DATA;
 
 int	add_perf_counter(const char *name, const char *counterPath, int interval);
-int	add_perfs_from_config(const char *line);
+int	add_perfs_from_config(const char **lines);
 void	perfs_list_free();
 
 int	init_perf_collector(ZBX_PERF_STAT_DATA *pperf);

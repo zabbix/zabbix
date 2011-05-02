@@ -89,16 +89,17 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
  * Purpose: parse configuration file                                          *
  *                                                                            *
  * Parameters: cfg_file - full name of config file                            *
- *             cfg - pointer to configuration parameter structure             *
+ *             cfg      - pointer to configuration parameter structure        *
+ *             level    - a level of included file                            *
+ *             optional - do not treat missing configuration file or unknown  *
+ *                        parameters as error                                 *
  *                                                                            *
  * Return value: SUCCEED - parsed successfully                                *
  *               FAIL - error processing config file                          *
  *                                                                            *
  * Author: Alexei Vladishev, Eugene Grigorjev                                 *
  *                                                                            *
- * Comments: "optional" would ignore:                                         *
- *           - configuration file read errors                                 *
- *           - unknown parameters                                             *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level, int optional)
@@ -195,11 +196,15 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 
 					*((char **)cfg[i].variable) = strdup(value);
 				}
+				else if (TYPE_MULTISTRING == cfg[i].type)
+				{
+					zbx_strarr_add(cfg[i].variable, value);
+				}
 				else
 					assert(0);
 			}
 
-			if (0 != optional && 0 == param_valid)
+			if (0 == param_valid && 0 == optional)
 				goto unknown_parameter;
 		}
 		fclose(file);
@@ -236,22 +241,22 @@ cannot_open:
 	exit(1);
 
 missing_mandatory:
-	zbx_error("missing mandatory parameter [%s]", cfg[i].parameter);
+	zbx_error("missing mandatory parameter [%s] in config file [%s]", cfg[i].parameter, cfg_file);
 	exit(1);
 
 incorrect_config:
 	fclose(file);
-	zbx_error("wrong value for [%s] in line %d", cfg[i].parameter, lineno);
+	zbx_error("wrong value of [%s] in config file [%s], line %d", cfg[i].parameter, cfg_file, lineno);
 	exit(1);
 
 unknown_parameter:
 	fclose(file);
-	zbx_error("unknown parameter [%s] in line %d", parameter, lineno);
+	zbx_error("unknown parameter [%s] in config file [%s], line %d", parameter, cfg_file, lineno);
 	exit(1);
 
 garbage:
 	fclose(file);
-	zbx_error("garbage in configuration file [%s] in line %d", line, lineno);
+	zbx_error("garbage [%s] in config file [%s], line %d", line, cfg_file, lineno);
 	exit(1);
 }
 

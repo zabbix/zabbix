@@ -333,16 +333,14 @@ void	zbx_on_exit()
 
 #endif /* USE_PID_FILE */
 
-	free_metrics();
-	free_collector_data();
-	alias_list_free();
-
 	zbx_sleep(2); /* wait for all threads closing */
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent stopped. Zabbix %s (revision %s).",
 			ZABBIX_VERSION, ZABBIX_REVISION);
 
 	zabbix_close_log();
+
+	free_config();
 
 	exit(SUCCEED);
 }
@@ -368,8 +366,6 @@ int	main(int argc, char **argv)
 
 	import_symbols();
 
-	init_metrics(); /* Must be before load_config().  load_config - use metrics!!! */
-
 	if (ZBX_TASK_SHOW_USAGE == t.task)
 	{
 		usage();
@@ -377,35 +373,14 @@ int	main(int argc, char **argv)
 	}
 
 	/* load configuration */
+	load_config();
 
-	if (ZBX_TASK_START == t.task)
-	{
-		/* start agent */
-
-#if defined (_WINDOWS)
-		init_collector_data();	/* required for reading PerfCounter */
-#endif /* _WINDOWS */
-
-		load_config(0);
-	}
-#if defined (_WINDOWS)
-	else if (ZBX_TASK_INSTALL_SERVICE == t.task || ZBX_TASK_UNINSTALL_SERVICE == t.task || ZBX_TASK_START_SERVICE == t.task || ZBX_TASK_STOP_SERVICE == t.task)
-	{
-		/* service tasks, these need only hostname */
-
-		load_config_hostname();
-	}
-#endif /* _WINDOWS */
-	else
-	{
-		/* other tasks */
-
-#if defined (_WINDOWS)
-		init_collector_data();	/* required for reading PerfCounter */
-#endif /* _WINDOWS */
-
-		load_config(1);	/* optional */
-	}
+	/* activate user configuration (not needed for service actions) */
+	if (ZBX_TASK_INSTALL_SERVICE != t.task &&
+		ZBX_TASK_UNINSTALL_SERVICE != t.task &&
+		ZBX_TASK_START_SERVICE != t.task &&
+		ZBX_TASK_STOP_SERVICE != t.task)
+		activate_user_config();
 
 #if defined (_WINDOWS)
 	if (t.flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS)
@@ -433,13 +408,12 @@ int	main(int argc, char **argv)
 #endif /* _WINDOWS */
 		case ZBX_TASK_PRINT_SUPPORTED:
 			test_parameters();
-			free_metrics();
-			free_collector_data();
+			free_config();
 			exit(SUCCEED);
 			break;
 		case ZBX_TASK_TEST_METRIC:
 			test_parameter(TEST_METRIC, PROCESS_TEST);
-			free_collector_data();
+			free_config();
 			exit(SUCCEED);
 			break;
 		default:

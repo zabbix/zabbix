@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "zbxconf.h"
+#include "db.h"	/* HOST_HOST_LEN */
 
 #include "cfg.h"
 #include "log.h"
@@ -50,75 +51,87 @@ int	CONFIG_BUFFER_SEND		= 5;
 
 int	CONFIG_MAX_LINES_PER_SECOND	= 100;
 
-static int	add_parameter(char *key);
+char	**CONFIG_ALIASES                = NULL;
+char	**CONFIG_USER_PARAMETERS        = NULL;
+char	**CONFIG_PERF_COUNTERS          = NULL;
 
-void	load_config(int optional)
+static void	add_parameters_from_config(char **lines);
+static void	set_defaults();
+
+void	load_config()
 {
+	init_metrics();
+
+	/* initialize multistrings */
+	zbx_strarr_init(&CONFIG_ALIASES);
+	zbx_strarr_init(&CONFIG_USER_PARAMETERS);
+	zbx_strarr_init(&CONFIG_PERF_COUNTERS);
+
+	/* set defaults */
+	set_defaults();
+
 	struct cfg_line	cfg[] =
 	{
-		/* PARAMETER,			VAR,					FUNC,
-			TYPE,		MANDATORY,	MIN,			MAX */
-		{"Server",			&CONFIG_HOSTS_ALLOWED,			NULL,
-			TYPE_STRING,	PARM_MAND,	0,			0},
-		{"Hostname",			&CONFIG_HOSTNAME,			NULL,
-			TYPE_STRING,	PARM_OPT,	0,			0},
-		{"BufferSize",			&CONFIG_BUFFER_SIZE,			NULL,
-			TYPE_INT,	PARM_OPT,	2,			65535},
-		{"BufferSend",			&CONFIG_BUFFER_SEND,			NULL,
-			TYPE_INT,	PARM_OPT,	1,			SEC_PER_HOUR},
+		/* PARAMETER,				VAR,					FUNC,
+			TYPE,			MANDATORY,	MIN,			MAX */
+		{"Server",				&CONFIG_HOSTS_ALLOWED,			NULL,
+			TYPE_STRING,		PARM_MAND,	0,			0},
+		{"Hostname",				&CONFIG_HOSTNAME,			NULL,
+			TYPE_STRING,		PARM_OPT,	0,			0},
+		{"BufferSize",				&CONFIG_BUFFER_SIZE,			NULL,
+			TYPE_INT,		PARM_OPT,	2,			65535},
+		{"BufferSend",				&CONFIG_BUFFER_SEND,			NULL,
+			TYPE_INT,		PARM_OPT,	1,			SEC_PER_HOUR},
 #ifdef USE_PID_FILE
-		{"PidFile",			&CONFIG_PID_FILE,			NULL,
-			TYPE_STRING,	PARM_OPT,	0,			0},
+		{"PidFile",				&CONFIG_PID_FILE,			NULL,
+			TYPE_STRING,		PARM_OPT,	0,			0},
 #endif	/* USE_PID_FILE */
-		{"LogFile",			&CONFIG_LOG_FILE,			NULL,
-			TYPE_STRING,	PARM_OPT,	0,			0},
-		{"LogFileSize",			&CONFIG_LOG_FILE_SIZE,			NULL,
-			TYPE_INT,	PARM_OPT,	0,			1024},
-		{"DisableActive",		&CONFIG_DISABLE_ACTIVE,			NULL,
-			TYPE_INT,	PARM_OPT,	0,			1},
-		{"DisablePassive",		&CONFIG_DISABLE_PASSIVE,		NULL,
-			TYPE_INT,	PARM_OPT,	0,			1},
-		{"Timeout",			&CONFIG_TIMEOUT,			NULL,
-			TYPE_INT,	PARM_OPT,	1,			30},
-		{"ListenPort",			&CONFIG_LISTEN_PORT,			NULL,
-			TYPE_INT,	PARM_OPT,	1024,			32767},
-		{"ServerPort",			&CONFIG_SERVER_PORT,			NULL,
-			TYPE_INT,	PARM_OPT,	1024,			32767},
-		{"ListenIP",			&CONFIG_LISTEN_IP,			NULL,
-			TYPE_STRING,	PARM_OPT,	0,			0},
-		{"SourceIP",			&CONFIG_SOURCE_IP,			NULL,
-			TYPE_STRING,	PARM_OPT,	0,			0},
-		{"DebugLevel",			&CONFIG_LOG_LEVEL,			NULL,
-			TYPE_INT,	PARM_OPT,	0,			4},
-		{"StartAgents",			&CONFIG_ZABBIX_FORKS,			NULL,
-			TYPE_INT,	PARM_OPT,	1,			100},
-		{"RefreshActiveChecks",		&CONFIG_REFRESH_ACTIVE_CHECKS,		NULL,
-			TYPE_INT,	PARM_OPT,	SEC_PER_MIN,		SEC_PER_HOUR},
-		{"MaxLinesPerSecond",		&CONFIG_MAX_LINES_PER_SECOND,		NULL,
-			TYPE_INT,	PARM_OPT,	1,			1000},
-		{"AllowRoot",			&CONFIG_ALLOW_ROOT,			NULL,
-			TYPE_INT,	PARM_OPT,	0,			1},
-		{"EnableRemoteCommands",	&CONFIG_ENABLE_REMOTE_COMMANDS,		NULL,
-			TYPE_INT,	PARM_OPT,	0,			1},
-		{"LogRemoteCommands",		&CONFIG_LOG_REMOTE_COMMANDS,		NULL,
-			TYPE_INT,	PARM_OPT,	0,			1},
-		{"UnsafeUserParameters",	&CONFIG_UNSAFE_USER_PARAMETERS,		NULL,
-			TYPE_INT,	PARM_OPT,	0,			1},
-		{"Alias",			NULL,					&add_alias_from_config,
-			TYPE_STRING,	PARM_OPT,	0,			0},
-		{"UserParameter",		NULL,					&add_parameter,
-			0,		0,		0,			0},
+		{"LogFile",				&CONFIG_LOG_FILE,			NULL,
+			TYPE_STRING,		PARM_OPT,	0,			0},
+		{"LogFileSize",				&CONFIG_LOG_FILE_SIZE,			NULL,
+			TYPE_INT,		PARM_OPT,	0,			1024},
+		{"DisableActive",			&CONFIG_DISABLE_ACTIVE,			NULL,
+			TYPE_INT,		PARM_OPT,	0,			1},
+		{"DisablePassive",			&CONFIG_DISABLE_PASSIVE,		NULL,
+			TYPE_INT,		PARM_OPT,	0,			1},
+		{"Timeout",				&CONFIG_TIMEOUT,			NULL,
+			TYPE_INT,		PARM_OPT,	1,			30},
+		{"ListenPort",				&CONFIG_LISTEN_PORT,			NULL,
+			TYPE_INT,		PARM_OPT,	1024,			32767},
+		{"ServerPort",				&CONFIG_SERVER_PORT,			NULL,
+			TYPE_INT,		PARM_OPT,	1024,			32767},
+		{"ListenIP",				&CONFIG_LISTEN_IP,			NULL,
+			TYPE_STRING,		PARM_OPT,	0,			0},
+		{"SourceIP",				&CONFIG_SOURCE_IP,			NULL,
+			TYPE_STRING,		PARM_OPT,	0,			0},
+		{"DebugLevel",				&CONFIG_LOG_LEVEL,			NULL,
+			TYPE_INT,		PARM_OPT,	0,			4},
+		{"StartAgents",				&CONFIG_ZABBIX_FORKS,			NULL,
+			TYPE_INT,		PARM_OPT,	1,			100},
+		{"RefreshActiveChecks",			&CONFIG_REFRESH_ACTIVE_CHECKS,		NULL,
+			TYPE_INT,		PARM_OPT,	SEC_PER_MIN,		SEC_PER_HOUR},
+		{"MaxLinesPerSecond",			&CONFIG_MAX_LINES_PER_SECOND,		NULL,
+			TYPE_INT,		PARM_OPT,	1,			1000},
+		{"AllowRoot",				&CONFIG_ALLOW_ROOT,			NULL,
+			TYPE_INT,		PARM_OPT,	0,			1},
+		{"EnableRemoteCommands",		&CONFIG_ENABLE_REMOTE_COMMANDS,		NULL,
+			TYPE_INT,		PARM_OPT,	0,			1},
+		{"LogRemoteCommands",			&CONFIG_LOG_REMOTE_COMMANDS,		NULL,
+			TYPE_INT,		PARM_OPT,	0,			1},
+		{"UnsafeUserParameters",		&CONFIG_UNSAFE_USER_PARAMETERS,		NULL,
+			TYPE_INT,		PARM_OPT,	0,			1},
+		{"Alias",				&CONFIG_ALIASES,			NULL,
+			TYPE_MULTISTRING,	PARM_OPT,	0,			0},
+		{"UserParameter",			&CONFIG_USER_PARAMETERS,		NULL,
+			TYPE_MULTISTRING,	PARM_OPT,	0,			0},
 #ifdef _WINDOWS
-		{"PerfCounter",			NULL,					&add_perfs_from_config,
-			TYPE_STRING,	PARM_OPT,	0,			0},
+		{"PerfCounter",				&CONFIG_PERF_COUNTERS,			NULL,
+			TYPE_MULTISTRING,	PARM_OPT,	0,			0},
 #endif	/* _WINDOWS */
 		{NULL}
 	};
 
-	if (optional)
-		parse_opt_cfg_file(CONFIG_FILE, cfg);
-	else
-		parse_cfg_file(CONFIG_FILE, cfg);
+	parse_cfg_file(CONFIG_FILE, cfg);
 
 #ifdef USE_PID_FILE
 	if (NULL == CONFIG_PID_FILE)
@@ -126,9 +139,6 @@ void	load_config(int optional)
 		CONFIG_PID_FILE = "/tmp/zabbix_agentd.pid";
 	}
 #endif	/* USE_PID_FILE */
-
-	/* set default hostname if empty */
-	ensure_hostname();
 
 	if (1 == CONFIG_DISABLE_ACTIVE && 1 == CONFIG_DISABLE_PASSIVE)
 	{
@@ -139,41 +149,9 @@ void	load_config(int optional)
 
 /******************************************************************************
  *                                                                            *
- * Function: load_config_hostname                                             *
+ * Function: free_config                                                      *
  *                                                                            *
- * Purpose: get hostname from configuration file, use default if empty        *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Vladimir Levijev                                                   *
- *                                                                            *
- * Comments: hostname configuration parameter is optional                     *
- *                                                                            *
- ******************************************************************************/
-void	load_config_hostname()
-{
-	struct cfg_line	cfg[] =
-	{
-		/* PARAMETER,			VAR,					FUNC,
-			TYPE,		MANDATORY,	MIN,			MAX */
-		{"Hostname",			&CONFIG_HOSTNAME,			NULL,
-			TYPE_STRING,	PARM_OPT,	0,			0},
-		{NULL}
-	};
-
-	parse_opt_cfg_file(CONFIG_FILE, cfg);
-
-	/* set default hostname if empty */
-	ensure_hostname();
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: ensure_hostname                                                  *
- *                                                                            *
- * Purpose: set default hostname if empty                                     *
+ * Purpose: free configuration memory                                         *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -184,61 +162,114 @@ void	load_config_hostname()
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	ensure_hostname()
+void	free_config()
+{
+	zbx_strarr_free(CONFIG_ALIASES);
+	zbx_strarr_free(CONFIG_USER_PARAMETERS);
+	zbx_strarr_free(CONFIG_PERF_COUNTERS);
+
+	free_metrics();
+	alias_list_free();
+#if defined (_WINDOWS)
+	free_collector_data();
+#endif /* _WINDOWS */
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: activate_user_config                                             *
+ *                                                                            *
+ * Purpose: activate user specific parameters specified in configuration file *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Vladimir Levijev                                                   *
+ *                                                                            *
+ * Comments: activates next parameters:                                       *
+ *           - UserParameter                                                  *
+ *           - Alias                                                          *
+ *           - PerfCounter                                                    *
+ *                                                                            *
+ ******************************************************************************/
+void	activate_user_config()
+{
+	/* parameters */
+	add_parameters_from_config(CONFIG_USER_PARAMETERS);
+
+	/* aliases */
+	add_aliases_from_config(CONFIG_ALIASES);
+
+#if defined (_WINDOWS)
+	/* performance counters */
+	init_collector_data();	/* required for reading PerfCounter */
+
+	add_perfs_from_config(CONFIG_PERF_COUNTERS);
+#endif /* _WINDOWS */
+}
+
+static void	add_parameters_from_config(char **lines)
+{
+	char	**pparam;	/* pointer to parameter */
+	char	*command;
+
+	pparam = lines;
+	while (NULL != *pparam)
+	{
+		if (NULL == (command = strchr(*pparam, ',')))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "ignoring UserParameter \"%s\": not comma-separated", *pparam);
+			pparam++;
+			continue;
+		}
+		*command++ = '\0';
+
+		add_user_parameter(*pparam, command);
+
+		pparam++;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: set_defaults                                                     *
+ *                                                                            *
+ * Purpose: set non-static configuration defaults                             *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Vladimir Levijev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	set_defaults()
 {
 	AGENT_RESULT	result;
 	char		**value = NULL;
 
 	memset(&result, 0, sizeof(AGENT_RESULT));
 
-	if (NULL == CONFIG_HOSTNAME || '\0'== *CONFIG_HOSTNAME)
+	/* hostname */
+	if (NULL != CONFIG_HOSTNAME) zbx_free(CONFIG_HOSTNAME);
+	if (SUCCEED == process("system.hostname", 0, &result))
 	{
-		if (NULL != CONFIG_HOSTNAME)
-			zbx_free(CONFIG_HOSTNAME);
-
-		if (SUCCEED == process("system.hostname", 0, &result))
+		if (NULL == (value = GET_STR_RESULT(&result)))
 		{
-			if (NULL != (value = GET_STR_RESULT(&result)))
-			{
-				CONFIG_HOSTNAME = strdup(*value);
-
-				/* If auto registration is used, our CONFIG_HOSTNAME will make it into the  */
-				/* server's database, where it is limited by HOST_HOST_LEN (currently, 64), */
-				/* so to make it work properly we need to truncate our hostname.            */
-				if (strlen(CONFIG_HOSTNAME) > 64)
-					CONFIG_HOSTNAME[64] = '\0';
-			}
+			zabbix_log(LOG_LEVEL_CRIT, "failed to get default hostname (system.hostname)");
+			exit(FAIL);
 		}
-		free_result(&result);
 
-		if (NULL == CONFIG_HOSTNAME)
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "Hostname is not defined");
-			exit(1);
-		}
+		assert(*value);
+
+		CONFIG_HOSTNAME = zbx_strdup(CONFIG_HOSTNAME, *value);
+		if (strlen(CONFIG_HOSTNAME) > HOST_HOST_LEN)
+			CONFIG_HOSTNAME[HOST_HOST_LEN] = '\0';
 	}
-	else
-	{
-		if (strlen(CONFIG_HOSTNAME) > 64)
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "Hostname too long");
-			exit(1);
-		}
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "  VL: ensure_hostname: result [%s]", CONFIG_HOSTNAME);
-}
-
-static int	add_parameter(char *key)
-{
-	char	*command;
-
-	if (NULL == (command = strchr(key, ',')))
-		return FAIL;
-
-	*command++ = '\0';
-
-	return add_user_parameter(key, command);
+	free_result(&result);
 }
 
 #ifdef _AIX

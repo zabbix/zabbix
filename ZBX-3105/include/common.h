@@ -759,6 +759,9 @@ int	zbx_pg_unescape_bytea(u_char *io);
 int	zbx_get_next_field(const char **line, char **output, int *olen, char separator);
 int	str_in_list(const char *list, const char *value, char delimiter);
 char	*str_linefeed(const char *src, size_t maxline, const char *delim);
+void	zbx_strarr_init(char ***arr);
+void	zbx_strarr_add(char ***arr, const char *entry);
+void	zbx_strarr_free(char **arr);
 
 #ifdef HAVE___VA_ARGS__
 #	define zbx_setproctitle(fmt, ...) __zbx_zbx_setproctitle(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)

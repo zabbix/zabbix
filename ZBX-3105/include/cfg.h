@@ -20,8 +20,9 @@
 #ifndef ZABBIX_CFG_H
 #define ZABBIX_CFG_H
 
-#define	TYPE_INT	0
-#define	TYPE_STRING	1
+#define	TYPE_INT		0
+#define	TYPE_STRING		1
+#define	TYPE_MULTISTRING	2
 
 #define	PARM_OPT	0
 #define	PARM_MAND	1

@@ -147,62 +147,66 @@ int	add_perf_counter(const char *name, const char *counterPath, int interval)
  *                                                                            *
  * Function: add_perfs_from_config                                            *
  *                                                                            *
- * Purpose: parse config parameter 'PerfCounter'                              *
+ * Purpose: parse config parameters 'PerfCounter'                             *
  *                                                                            *
- * Parameters: line - line for parsing                                        *
+ * Parameters: lines - lines for parsing                                      *
  *                                                                            *
- * Return value: SUCCEED on success or FAIL in other cases                    *
+ * Return value:                                                              *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
+ * Author: Eugene Grigorjev, Vladimir Levijev                                 *
  *                                                                            *
  * Comments: format of input line is - name,"perfcounter name",interval       *
  *                                                                            *
  ******************************************************************************/
-int	add_perfs_from_config(const char *line)
+void	add_perfs_from_config(const char **lines)
 {
 	char	name[MAX_STRING_LEN],
 		counterPath[PDH_MAX_COUNTER_PATH],
-		interval[MAX_STRING_LEN];
+		interval[MAX_STRING_LEN],
+		*line,
+		**pline; /* a pointer to line */
 	LPTSTR	wcounterPath = NULL;
-	
-	assert(line);
 
-	if (num_param(line) != 3)
-		goto lbl_syntax_error;
-
-        if (0 != get_param(line, 1, name, sizeof(name)))
-		goto lbl_syntax_error;
-
-        if (0 != get_param(line, 2, counterPath, sizeof(counterPath)))
-		goto lbl_syntax_error;
-
-	if (NULL == (wcounterPath = zbx_acp_to_unicode(counterPath)))
+	pline = lines;
+	while (NULL != (line = *pline))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "PerfCounter \"%s\" could not be converted to UNICODE.", counterPath);
-		return FAIL;
-	}
-	
-	if (FAIL == zbx_unicode_to_utf8_static(wcounterPath, counterPath, PDH_MAX_COUNTER_PATH))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "PerfCounter \"%s\" could not be converted to UTF-8.", counterPath);
+		if (num_param(line) != 3)
+			goto lbl_syntax_error;
+
+		if (0 != get_param(line, 1, name, sizeof(name)))
+			goto lbl_syntax_error;
+
+		if (0 != get_param(line, 2, counterPath, sizeof(counterPath)))
+			goto lbl_syntax_error;
+
+		if (NULL == (wcounterPath = zbx_acp_to_unicode(counterPath)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "PerfCounter \"%s\" could not be converted to UNICODE.", counterPath);
+			goto next;
+		}
+
+		if (FAIL == zbx_unicode_to_utf8_static(wcounterPath, counterPath, PDH_MAX_COUNTER_PATH))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "PerfCounter \"%s\" could not be converted to UTF-8.", counterPath);
+			zbx_free(wcounterPath);
+			goto next;
+		}
+
 		zbx_free(wcounterPath);
-		return FAIL;
-	}
-	
-	zbx_free(wcounterPath);
 
-        if (0 != get_param(line, 3, interval, sizeof(interval)))
-		goto lbl_syntax_error;
+		if (0 != get_param(line, 3, interval, sizeof(interval)))
+			goto lbl_syntax_error;
 
-	if (FAIL == check_counter_path(counterPath))
-		goto lbl_syntax_error;
+		if (FAIL == check_counter_path(counterPath))
+			goto lbl_syntax_error;
 
-	return add_perf_counter(name, counterPath, atoi(interval));
+		add_perf_counter(name, counterPath, atoi(interval));
+
 lbl_syntax_error:
-	zabbix_log(LOG_LEVEL_WARNING, "PerfCounter \"%s\" FAILED: Invalid format.",
-			line);
-
-	return FAIL;
+		zabbix_log(LOG_LEVEL_WARNING, "PerfCounter \"%s\" FAILED: Invalid format.", line);
+next:
+		pline++;
+	}
 }
 
 /******************************************************************************
