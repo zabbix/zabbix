@@ -1686,7 +1686,6 @@
 
 //	hostprofiles.php
 	'S_HOST_PROFILES'=>			_('Host profiles'),
-	'S_EXTENDED_PROFILE'=>		_('Extended profile'),
 
 //	search.php
 	'S_EDIT_HOSTS' => _('Edit hosts'),

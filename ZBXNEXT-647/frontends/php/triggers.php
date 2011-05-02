@@ -334,6 +334,7 @@ include_once('include/page_header.php');
 		}
 		else{
 			error('No target selection.');
+			$go_result = false;
 		}
 		show_messages($go_result, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
 	}
