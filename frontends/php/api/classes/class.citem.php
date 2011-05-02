@@ -1374,7 +1374,7 @@ class CItem extends CItemGeneral{
 		foreach($items as $item){
 			if(
 				($update && $item['profile_link'] != 0)
-				|| ($item['profile_link'] != 0 && $item['value_type'] != 2) // for log items check is not needed (value_type != 2)
+				|| ($item['profile_link'] != 0 && $item['value_type'] != ITEM_VALUE_TYPE_LOG) // for log items check is not needed
 			){
 				// does profile field with provided number exists?
 				if(!isset($possibleHostProfiles[$item['profile_link']])){

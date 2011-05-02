@@ -486,9 +486,10 @@
 			}
 			$fieldNo++;
 		}
-		*/
 
 		return $result;
+		*/
+
 	}
 
 

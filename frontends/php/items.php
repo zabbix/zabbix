@@ -122,7 +122,7 @@ switch($itemType) {
 												ITEM_TYPE_DB_MONITOR.','.
 												ITEM_TYPE_TELNET.','.
 												ITEM_TYPE_CALCULATED,'type'), $paramsFieldName),
-		'profile_link' =>       array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),'isset({save})&&{value_type}!=2'),
+		'profile_link' =>       array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),'isset({save})&&{value_type}!='.ITEM_VALUE_TYPE_LOG),
 
 		//hidden fields for better gui
 		'params_script'=>	array(T_ZBX_STR, O_OPT, NULL, NULL, NULL),
