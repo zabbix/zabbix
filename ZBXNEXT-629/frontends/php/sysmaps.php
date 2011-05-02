@@ -151,7 +151,7 @@ include_once('include/page_header.php');
 		if($result) $result = zbxXML::parseMap($rules);
 
 		$result = DBend($result);
-		show_messages($result, S_IMPORTED.SPACE.S_SUCCESSEFULLY_SMALL, S_IMPORT.SPACE.S_FAILED_SMALL);
+		show_messages($result, _('Imported successfully'), _('Import failed'));
 	}
 
 ?>
@@ -294,7 +294,7 @@ include_once('include/page_header.php');
 				$sysmap['urls'] = get_request('urls', array());
 			}
 
-			$formLoad = new CGetForm('sysmap.edit', $sysmap);
+			$formLoad = new CView('configuration.sysmap.edit', $sysmap);
 			$map_wdgt->addItem($formLoad->render());
 		}
 	}
