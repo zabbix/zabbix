@@ -561,7 +561,7 @@
 		if(isset($hostItemsToProfile[$profileNo])){
 			$itemName = itemName($hostItemsToProfile[$profileNo]);
 			$populatingLink = new CLink($itemName, 'items.php?form=update&itemid='.$hostItemsToProfile[$profileNo]['itemid']);
-			$populatingLink->setAttribute('title', _s('This field is automatically populated by item "%s"', $itemName));
+			$populatingLink->setAttribute('title', _s('This field is automatically populated by item "%s".', $itemName));
 			$populatingItemCell = array(' &larr; ', $populatingLink);
 			$input->addClass('linked_to_item'); // this will be used for disabling fields via jquery
 			if($profile_mode == HOST_PROFILE_AUTOMATIC){
