@@ -25,7 +25,7 @@
 #include "log.h"
 #include "alias.h"
 #include "sysinfo.h"
-#include "perfstat.h"
+#include "stats.h"
 
 #if defined(ZABBIX_DAEMON)
 #	include "daemon.h"
@@ -205,7 +205,7 @@ void	activate_user_config()
 	/* performance counters */
 	init_collector_data();	/* required for reading PerfCounter */
 
-	add_perfs_from_config(CONFIG_PERF_COUNTERS);
+	add_perf_counters_from_config(CONFIG_PERF_COUNTERS);
 #endif /* _WINDOWS */
 }
 

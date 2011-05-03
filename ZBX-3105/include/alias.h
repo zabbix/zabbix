@@ -22,18 +22,17 @@
 
 #define MAX_ALIAS_NAME        120
 
-struct zbx_alias
+typedef struct zbx_alias
 {
-   struct zbx_alias *next;
-   char name[MAX_ALIAS_NAME];
-   char *value;
-};
-
-typedef struct zbx_alias ALIAS;
+	struct zbx_alias	*next;
+	char			name[MAX_ALIAS_NAME];
+	char			*value;
+}
+ALIAS;
 
 int	add_alias(const char *name, const char *value);
 void	add_aliases_from_config(char **lines);
-void	alias_list_free(void);
+void	alias_list_free();
 void	alias_expand(const char *orig, char *expanded, int exp_buf_len);
 
-#endif /* ZABBIX_ALIAS_H */
+#endif	/* ZABBIX_ALIAS_H */
