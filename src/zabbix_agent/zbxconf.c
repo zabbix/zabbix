@@ -24,7 +24,7 @@
 #include "log.h"
 #include "alias.h"
 #include "sysinfo.h"
-#include "perfstat.h"
+#include "stats.h"
 #include "comms.h"
 
 #if defined(ZABBIX_DAEMON)
@@ -185,7 +185,7 @@ void	load_user_parameters(int optional)
 		{"UserParameter",		NULL,					&add_parameter,
 			0,		0,		0,			0},
 #ifdef _WINDOWS
-		{"PerfCounter",			NULL,					&add_perfs_from_config,
+		{"PerfCounter",			NULL,					&add_perf_counter_from_config,
 			TYPE_STRING,	PARM_OPT,	0,			0},
 #endif	/* _WINDOWS */
 		{NULL}
