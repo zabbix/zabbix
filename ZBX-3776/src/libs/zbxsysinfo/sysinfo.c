@@ -97,7 +97,7 @@ int	add_user_parameter(char *key, char *command)
 
 	for (i = 0; ; i++)
 	{
-		/* Add new parameters */
+		/* add new parameters */
 		if (NULL == commands[i].key)
 		{
 			commands[i].key = strdup(usr_cmd);
@@ -110,19 +110,12 @@ int	add_user_parameter(char *key, char *command)
 			break;
 		}
 
-		/* Replace existing parameters */
-		if (0 == strcmp(commands[i].key, key))
+		/* treat duplicate UserParameters as error */
+		if (0 == strcmp(commands[i].key, usr_cmd))
 		{
-			if (commands[i].main_param)
-				zbx_free(commands[i].main_param);
-			if (commands[i].test_param)
-				zbx_free(commands[i].test_param);
-
-			commands[i].flags = flag;
-			commands[i].function = &EXECUTE_STR;
-			commands[i].main_param = strdup(command);
-			commands[i].test_param = 0;
-			break;
+			zabbix_log(LOG_LEVEL_CRIT, "Duplicate UserParameter key \"%s\" in configuration. "
+				"Previous entry exists: \"%s,%s\"", key, key, commands[i].main_param);
+			exit(FAIL);
 		}
 	}
 
