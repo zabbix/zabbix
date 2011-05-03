@@ -575,6 +575,7 @@
 			$populatingItemCell,
 			'populating_item'
 		);
+		$input->addStyle('float: left;');
 		// those links are visible only in automatic mode
 		if($profile_mode != HOST_PROFILE_AUTOMATIC){
 			$populatingItem->addStyle("display:none");
