@@ -187,7 +187,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 					if ((cfg[i].min && var < cfg[i].min) || (cfg[i].max && var > cfg[i].max))
 						goto incorrect_config;
 
-					*((int *)cfg[i].variable) = var;
+					*((int *)cfg[i].variable) = (int)var;
 				}
 				else if (TYPE_STRING == cfg[i].type)
 				{

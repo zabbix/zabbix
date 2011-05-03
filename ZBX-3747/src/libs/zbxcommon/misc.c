@@ -2152,7 +2152,7 @@ int	calculate_sleeptime(int nextcheck, int max_sleeptime)
 	if (FAIL == nextcheck)
 		return max_sleeptime;
 
-	sleeptime = nextcheck - time(NULL);
+	sleeptime = nextcheck - (int)time(NULL);
 
 	if (sleeptime < 0)
 		return 0;
