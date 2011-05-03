@@ -19,14 +19,9 @@
 
 #include "common.h"
 #include "stats.h"
-
 #include "log.h"
 #include "zbxconf.h"
-
 #include "diskdevices.h"
-#include "cpustat.h"
-#include "perfstat.h"
-#include "log.h"
 #include "cfg.h"
 
 #if defined(_WINDOWS)
@@ -153,21 +148,20 @@ void	init_collector_data()
 #endif
 
 	cpu_count = zbx_get_cpu_num();
-
 	sz = sizeof(ZBX_COLLECTOR_DATA);
-	sz_cpu = sizeof(ZBX_SINGLE_CPU_STAT_DATA) * (cpu_count + 1);
 
 #ifdef _WINDOWS
+	sz_cpu = sizeof(PERF_COUNTER_DATA *) * (cpu_count + 1);
 
 	collector = zbx_malloc(collector, sz + sz_cpu);
 	memset(collector, 0, sz + sz_cpu);
 
-	collector->cpus.cpu = (ZBX_SINGLE_CPU_STAT_DATA *)(collector + 1);
+	collector->cpus.cpu_counter = (PERF_COUNTER_DATA **)(collector + 1);
 	collector->cpus.count = cpu_count;
 
 	init_perf_collector(&collector->perfs);
-
-#else	/* not _WINDOWS */
+#else
+	sz_cpu = sizeof(ZBX_SINGLE_CPU_STAT_DATA) * (cpu_count + 1);
 
 	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_COLLECTOR_ID)))
 	{
@@ -253,11 +247,11 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 
 	zbx_free(args);
 
-#if defined(ZABBIX_DAEMON)
+#ifdef ZABBIX_DAEMON
 	set_child_signal_handler();
 #endif
 
-	if (0 != init_cpu_collector(&(collector->cpus)))
+	if (SUCCEED != init_cpu_collector(&(collector->cpus)))
 		free_cpu_collector(&(collector->cpus));
 
 	collector_diskdevice_add("");
@@ -265,13 +259,12 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 	while (ZBX_IS_RUNNING())
 	{
 		zbx_setproctitle("collector [processing data]");
-
-		if (CPU_COLLECTOR_STARTED(collector))
-			collect_cpustat(&(collector->cpus));
 #ifdef _WINDOWS
 		collect_perfstat();
+#else
+		if (CPU_COLLECTOR_STARTED(collector))
+			collect_cpustat(&(collector->cpus));
 #endif
-
 		collect_stats_diskdevices(&(collector->diskdevices));
 #ifdef _AIX
 		collect_vmstat_data(&collector->vmstat);
@@ -280,11 +273,12 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 		zbx_sleep(1);
 	}
 
-#ifdef _WINDOWS
-	free_perf_collector();
-#endif
 	if (CPU_COLLECTOR_STARTED(collector))
 		free_cpu_collector(&(collector->cpus));
+
+#ifdef _WINDOWS
+	free_perf_collector();	/* cpu_collector must be freed before perf_collector is freed */
+#endif /* _WINDOWS */
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "zabbix_agentd collector stopped");
 
