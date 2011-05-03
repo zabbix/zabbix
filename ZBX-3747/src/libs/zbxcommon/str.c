@@ -152,19 +152,13 @@ void	__zbx_zbx_error(const char *fmt, ...)
  ******************************************************************************/
 int	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...)
 {
-	va_list	args;
 	int	writen_len = 0;
+	va_list	args;
 
 	assert(str);
 
 	va_start(args, fmt);
-
-	writen_len = vsnprintf(str, count, fmt, args);
-	writen_len = MIN(writen_len, ((int)count) - 1);
-	writen_len = MAX(writen_len, 0);
-
-	str[writen_len] = '\0';
-
+	zbx_vsnprintf(str, count, fmt, args);
 	va_end(args);
 
 	return writen_len;
