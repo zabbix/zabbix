@@ -50,7 +50,7 @@ class CRadioButton extends CDiv{
 			$radio->attr('checked', 'checked');
 		}
 
-		$label = new CLabel($name, $id);
+		$label = new CLabel(' '.$name, $id);
 
 		$outerDiv = new CDiv(array($radio, $label));
 		if($this->orientation == self::ORIENTATION_HORIZONTAL){

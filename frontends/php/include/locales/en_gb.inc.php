@@ -91,12 +91,7 @@
 
 	'S_DISCOVERY_RULE'=>			_('Discovery rule'),
 	'S_DISCOVERY'=>				_('Discovery'),
-	'S_DISCOVERY_BIG'=>			_('DISCOVERY'),
 	'S_CONFIGURATION_OF_DISCOVERY'=>	_('Configuration of discovery'),
-	'S_CONFIGURATION_OF_DISCOVERY_BIG'=>	_('CONFIGURATION OF DISCOVERY'),
-	'S_NO_DISCOVERY_RULES_DEFINED'=>	_('No discovery rules defined'),
-	'S_IP_RANGE'=>				_('IP range'),
-	'S_CHECKS'=>				_('Checks'),
 	'S_CREATE_RULE'=>			_('Create rule'),
 	'S_DELETE_RULE_Q'=>			_('Delete rule?'),
 	'S_DISCOVERY_BY_PROXY'=>		_('Discovery by proxy'),
@@ -115,20 +110,8 @@
 	'S_ICMPPING'=>				_('ICMP Ping'),
 	'S_PORTS_SMALL'=>			_('ports'),
 
-	'S_DISCOVERY_RULES_DELETED'=>		_('Discovery rules deleted'),
-	'S_DISCOVERY_RULE_DELETED'=>		_('Discovery rule deleted'),
-	'S_CANNOT_DELETE_DISCOVERY_RULE'=>	_('Cannot delete discovery rule'),
-	'S_DISCOVERY_RULES_UPDATED'=>		_('Discovery rules updated'),
-	'S_DISCOVERY_RULE_UPDATED'=>		_('Discovery rule updated'),
-	'S_CANNOT_UPDATE_DISCOVERY_RULE'=>	_('Cannot update discovery rule'),
-	'S_DISCOVERY_RULE_ADDED'=>		_('Discovery rule added'),
-	'S_CANNOT_ADD_DISCOVERY_RULE'=>		_('Cannot add discovery rule'),
 	'S_STATUS_OF_DISCOVERY_BIG'=>		_('STATUS OF DISCOVERY'),
 	'S_STATUS_OF_DISCOVERY'=>		_('Status of discovery'),
-	'S_ENABLE_SELECTED_DISCOVERY_RULES'=>	_('Enable selected discovery rules?'),
-	'S_DISABLE_SELECTED_DISCOVERY_RULES'=>	_('Disable selected discovery rules?'),
-	'S_DELETE_SELECTED_DISCOVERY_RULES'=>	_('Delete selected discovery rules?'),
-
 	'S_DISCOVERED'=>			_('Discovered'),
 	'S_LOST'=>				_('Lost'),
 
@@ -137,7 +120,6 @@
 	'S_DOWN_TIME'=>				_('Downtime'),
 	'S_DISCOVERED_DEVICE'=>			_('Discovered device'),
 	'S_MONITORED_HOST'=>			_('Monitored host'),
-	'S_INCORRECT_IP_RANGE'=>		_('Incorrect IP range.'),
 
 //	auditacts.php
 	'S_AUDITACTS_DESCRIPTION_DATE_FORMAT'=>	_('d M Y H:i:s'),
@@ -739,10 +721,6 @@
 	'S_CANNOT_UPDATE_HOST'=>			_('Cannot update host'),
 	'S_CANNOT_UPDATE'=>				_('Cannot update'),
 	'S_HOST_STATUS_UPDATED'=>			_('Host status updated'),
-	'S_CONFIGURATION_OF_HOSTS'=>			_('CONFIGURATION OF HOSTS'),
-	'S_CONFIGURATION_OF_TEMPLATES'=>		_('CONFIGURATION OF TEMPLATES'),
-	'S_CONFIGURATION_OF_APPLICATIONS'=>		_('CONFIGURATION OF APPLICATIONS'),
-	'S_CONFIGURATION_OF_MAINTENANCE_PERIODS'=>	_('CONFIGURATION OF MAINTENANCE PERIODS'),
 	'S_HOST_GROUPS_BIG'=>				_('HOST GROUPS'),
 	'S_NO_HOST_GROUPS_DEFINED'=>			_('No host groups defined'),
 	'S_NO_HOSTS_DEFINED'=>				_('No hosts defined'),

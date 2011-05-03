@@ -105,14 +105,11 @@ class CMaintenance extends CZBXAPI{
 					$sql = ' SELECT mmg.maintenanceid '.
 						' FROM maintenances_groups mmg '.
 						' WHERE '.DBcondition('mmg.groupid', $options['groupids']);
-
-
 					$res = DBselect($sql);
 					while($maintenance = DBfetch($res)){
 						$maintenanceids[] = $maintenance['maintenanceid'];
 					}
 				}
-
 
 				$sql = ' SELECT mmh.maintenanceid '.
 					' FROM maintenances_hosts mmh, hosts_groups hg '.
@@ -138,57 +135,52 @@ class CMaintenance extends CZBXAPI{
 		else{
 			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
 
-
-
-			$sql =
-				'SELECT DISTINCT m.maintenanceid'.
-					' FROM maintenances m'.
-					' WHERE'.
-					 ' NOT EXISTS ('.
-					  ' SELECT mh3.maintenanceid'.
-					  ' FROM maintenances_hosts mh3, rights r3, users_groups ug3, hosts_groups hg3'.
-					  ' WHERE mh3.maintenanceid = m.maintenanceid'.
-					   ' AND r3.groupid = ug3.usrgrpid'.
-					   ' AND hg3.hostid = mh3.hostid'.
-					   ' AND r3.id = hg3.groupid'.
-					   ' AND ug3.userid = '.$userid.
-					   ' AND r3.permission < '.$permission.
-					 ' ) '.
-					 ' AND NOT EXISTS ( '.
-					  ' SELECT mh4.maintenanceid '.
-					  ' FROM maintenances_hosts mh4 '.
-					  ' WHERE mh4.maintenanceid = m.maintenanceid '.
-					   ' AND NOT EXISTS( '.
-						' SELECT r5.id '.
-						' FROM rights r5, users_groups ug5, hosts_groups hg5 '.
-						' WHERE r5.groupid = ug5.usrgrpid '.
-						 ' AND hg5.hostid = mh4.hostid '.
-						 ' AND r5.id = hg5.groupid '.
-						 ' AND ug5.userid = '.$userid.
-					  ' ) '.
-					 ' ) '.
-					 ' AND NOT EXISTS ( '.
-					  ' SELECT mg2.maintenanceid '.
-					  ' FROM maintenances_groups mg2, rights r3, users_groups ug3 '.
-					  ' WHERE mg2.maintenanceid = m.maintenanceid '.
-					   ' AND r3.groupid = ug3.usrgrpid '.
-					   ' AND r3.id = mg2.groupid '.
-					   ' AND ug3.userid = '.$userid.
-					   ' AND r3.permission < '.$permission.
-					 ' ) '.
-
-					 ' AND NOT EXISTS ( '.
-					  ' SELECT mg3.maintenanceid '.
-					  ' FROM maintenances_groups mg3 '.
-					  ' WHERE mg3.maintenanceid = m.maintenanceid '.
-					   ' AND NOT EXISTS( '.
-						' SELECT r5.id '.
-						' FROM rights r5, users_groups ug5, hosts_groups hg5 '.
-						' WHERE r5.groupid = ug5.usrgrpid '.
-						 ' AND r5.id = mg3.groupid '.
-						 ' AND ug5.userid = '.$userid.
-					  ' ) '.
-					 ' ) ';
+			$sql = 'SELECT DISTINCT m.maintenanceid' .
+					' FROM maintenances m' .
+					' WHERE NOT EXISTS (' .
+						' SELECT mh3.maintenanceid' .
+						' FROM maintenances_hosts mh3, rights r3, users_groups ug3, hosts_groups hg3' .
+						' WHERE mh3.maintenanceid = m.maintenanceid' .
+							' AND r3.groupid = ug3.usrgrpid' .
+							' AND hg3.hostid = mh3.hostid' .
+							' AND r3.id = hg3.groupid' .
+							' AND ug3.userid = ' . $userid .
+							' AND r3.permission < ' . $permission .
+					' ) ' .
+					' AND NOT EXISTS ( ' .
+						' SELECT mh4.maintenanceid ' .
+						' FROM maintenances_hosts mh4 ' .
+						' WHERE mh4.maintenanceid = m.maintenanceid ' .
+							' AND NOT EXISTS( ' .
+								' SELECT r5.id ' .
+								' FROM rights r5, users_groups ug5, hosts_groups hg5 ' .
+								' WHERE r5.groupid = ug5.usrgrpid ' .
+									' AND hg5.hostid = mh4.hostid ' .
+									' AND r5.id = hg5.groupid ' .
+									' AND ug5.userid = ' . $userid .
+							' ) ' .
+					' ) ' .
+					' AND NOT EXISTS ( ' .
+						' SELECT mg2.maintenanceid ' .
+						' FROM maintenances_groups mg2, rights r3, users_groups ug3 ' .
+						' WHERE mg2.maintenanceid = m.maintenanceid ' .
+							' AND r3.groupid = ug3.usrgrpid ' .
+							' AND r3.id = mg2.groupid ' .
+							' AND ug3.userid = ' . $userid .
+							' AND r3.permission < ' . $permission .
+					' ) ' .
+					' AND NOT EXISTS ( ' .
+						' SELECT mg3.maintenanceid ' .
+						' FROM maintenances_groups mg3 ' .
+						' WHERE mg3.maintenanceid = m.maintenanceid ' .
+							' AND NOT EXISTS( ' .
+								' SELECT r5.id ' .
+								' FROM rights r5, users_groups ug5, hosts_groups hg5 ' .
+								' WHERE r5.groupid = ug5.usrgrpid ' .
+									' AND r5.id = mg3.groupid ' .
+									' AND ug5.userid = ' . $userid .
+							' ) ' .
+					' ) ';
 
 			if(!is_null($options['groupids'])){
 				zbx_value2array($options['groupids']);
@@ -579,218 +571,215 @@ Copt::memoryPick();
 		$maintenances = zbx_toArray($maintenances);
 		$maintenanceids = zbx_objectValues($maintenances, 'maintenanceid');
 
-			if(self::$userData['type'] == USER_TYPE_ZABBIX_USER){
+		if(self::$userData['type'] == USER_TYPE_ZABBIX_USER){
+			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+		}
+
+// Maintenance permissions
+		$hostids = array();
+		$groupids = array();
+		$options = array(
+			'maintenanceids' => zbx_objectValues($maintenances, 'maintenanceid'),
+			'editable' => 1,
+			'output' => API_OUTPUT_EXTEND,
+			'selectGroups' => API_OUTPUT_REFER,
+			'selectHosts' => API_OUTPUT_REFER,
+			'preservekeys' => 1,
+		);
+		$updMaintenances = $this->get($options);
+		foreach($maintenances as $maintenance){
+			if(!isset($updMaintenances[$maintenance['maintenanceid']])){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
 
-// Maintenance permissions
-			$hostids = array();
-			$groupids = array();
-			$options = array(
-				'maintenanceids' => zbx_objectValues($maintenances, 'maintenanceid'),
-				'editable' => 1,
-				'output' => API_OUTPUT_EXTEND,
-				'selectGroups' => API_OUTPUT_REFER,
-				'selectHosts' => API_OUTPUT_REFER,
-				'preservekeys' => 1,
-			);
-			$updMaintenances = $this->get($options);
-			foreach($maintenances as $maintenance){
-				if(!isset($updMaintenances[$maintenance['maintenanceid']])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+// checking whether a maintenance with this name already exists
+// first, getting all maintenances with the same name as this
+			$received_maintenaces = API::Maintenance()->get(array(
+				'filter' => array('name'=>$maintenance['name'])
+			));
+// now going though a result, to find records with different id, then our object
+			foreach($received_maintenaces as $r_maintenace){
+				if(bccomp($r_maintenace['maintenanceid'],$maintenance['maintenanceid']) != 0){
+//error! Maintenance with this name already exists
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_MAINTENANCE.' [ '.$maintenance['name'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
-
-				// checking whether a maintenance with this name already exists
-				// first, getting all maintenances with the same name as this
-				$options = array(
-					'filter' => array(
-									'name'=>$maintenance['name']
-								)
-				);
-				$received_maintenaces = API::Maintenance()->get($options);
-				// now going though a result, to find records with different id, then our object
-				foreach($received_maintenaces as $r_maintenace){
-					if(bccomp($r_maintenace['maintenanceid'],$maintenance['maintenanceid']) != 0){
-						//error! Maintenance with this name already exists
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_MAINTENANCE.' [ '.$maintenance['name'].' ] '.S_ALREADY_EXISTS_SMALL);
-					}
-				}
-
-				$hostids = array_merge($hostids, $maintenance['hostids']);
-				$groupids = array_merge($groupids, $maintenance['groupids']);
 			}
 
-			if(empty($hostids) && empty($groupids)){
-				self::exception(ZBX_API_ERROR_PERMISSIONS, S_GROUP_OR_HOST_NEEDED);
-			}
+			$hostids = array_merge($hostids, $maintenance['hostids']);
+			$groupids = array_merge($groupids, $maintenance['groupids']);
+		}
+
+		if(empty($hostids) && empty($groupids)){
+			self::exception(ZBX_API_ERROR_PERMISSIONS, S_GROUP_OR_HOST_NEEDED);
+		}
 // hosts permissions
-			$options = array(
-				'hostids' => $hostids,
-				'editable' => 1,
-				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1,
-			);
-			$upd_hosts = API::Host()->get($options);
-			foreach($hostids as $hostid){
-				if(!isset($upd_hosts[$hostid])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				}
+		$options = array(
+			'hostids' => $hostids,
+			'editable' => 1,
+			'output' => API_OUTPUT_SHORTEN,
+			'preservekeys' => 1,
+		);
+		$upd_hosts = API::Host()->get($options);
+		foreach($hostids as $hostid){
+			if(!isset($upd_hosts[$hostid])){
+				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
+		}
 // groups permissions
-			$options = array(
-				'groupids' => $groupids,
-				'editable' => 1,
-				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1,
+		$options = array(
+			'groupids' => $groupids,
+			'editable' => 1,
+			'output' => API_OUTPUT_SHORTEN,
+			'preservekeys' => 1,
+		);
+		$upd_groups = API::HostGroup()->get($options);
+		foreach($groupids as $groupid){
+			if(!isset($upd_groups[$groupid])){
+				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+			}
+		}
+
+
+		$tid = 0;
+		$update = array();
+		$timeperiods = array();
+		$insert_timeperiods = array();
+		foreach($maintenances as $mnum => $maintenance){
+			$db_fields = array(
+				'maintenanceid' => null,
 			);
-			$upd_groups = API::HostGroup()->get($options);
-			foreach($groupids as $groupid){
-				if(!isset($upd_groups[$groupid])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+			if(!check_db_fields($db_fields, $maintenance)){
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect parameters used for Maintenance');
+			}
+
+			$update[$mnum] = array(
+				'values' => $maintenance,
+				'where' => array('maintenanceid'=>$maintenance['maintenanceid']),
+			);
+
+			// getting current time periods
+			$timeperiodids = $timeperiods = array();
+			$sql = 'SELECT tp.* '.
+			' FROM timeperiods tp, maintenances_windows mw '.
+			' WHERE '.DBcondition('mw.maintenanceid',array($maintenance['maintenanceid'])).
+				' AND tp.timeperiodid=mw.timeperiodid ';
+			$db_timeperiods = DBselect($sql);
+			while($timeperiod = DBfetch($db_timeperiods)){
+				$timeperiodids[] = $timeperiod['timeperiodid']; // list of ids
+				$timeperiods[] = $timeperiod; // list of objects
+			}
+
+			// have time periods changed?
+			$timePeriodsChanged = false;
+			if(count($timeperiods) != count($maintenance['timeperiods'])){
+				$timePeriodsChanged = true;
+			}
+			else{
+				foreach($maintenance['timeperiods'] as $i=>$currentTimePeriod){
+					// if records are not completely identical
+					if(
+						$currentTimePeriod['timeperiod_type'] != $timeperiods[$i]['timeperiod_type']
+						|| $currentTimePeriod['every'] != $timeperiods[$i]['every']
+						|| $currentTimePeriod['month'] != $timeperiods[$i]['month']
+						|| $currentTimePeriod['dayofweek'] != $timeperiods[$i]['dayofweek']
+						|| $currentTimePeriod['day'] != $timeperiods[$i]['day']
+						|| $currentTimePeriod['start_time'] != $timeperiods[$i]['start_time']
+						|| $currentTimePeriod['start_date'] != $timeperiods[$i]['start_date']
+						|| $currentTimePeriod['period'] != $timeperiods[$i]['period']
+					){
+						// this means, that time periods have changed (at least one of them)
+						$timePeriodsChanged = true;
+						break;
+					}
 				}
 			}
 
+			// if time periods have changed
+			if($timePeriodsChanged){
+				// wiping the out to insert new ones
+				DB::delete('timeperiods', array('timeperiodid'=>$timeperiodids));
+				DB::delete('maintenances_windows', array('maintenanceid'=>$maintenance['maintenanceid']));
 
-			$tid = 0;
-			$update = array();
-			$timeperiods = array();
-			$insert_timeperiods = array();
-			foreach($maintenances as $mnum => $maintenance){
-				$db_fields = array(
-					'maintenanceid' => null,
-				);
-				if(!check_db_fields($db_fields, $maintenance)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect parameters used for Maintenance');
+				// gathering the new ones to create
+				$insert_timeperiods = array();
+				foreach($maintenance['timeperiods'] as $timeperiod){
+					$tid++;
+					$insert_timeperiods[$tid] = $timeperiod;
+					$timeperiods[$tid] = $mnum;
 				}
 
-				$update[$mnum] = array(
-					'values' => $maintenance,
-					'where' => array('maintenanceid='.$maintenance['maintenanceid']),
-				);
+				// inserting them and getting back id's that were just inserted
+				$insertedTimepePiodids = DB::insert('timeperiods', $insert_timeperiods);
 
-				// getting current time periods
-				$timeperiodids = $timeperiods = array();
-				$sql = 'SELECT tp.* '.
-				' FROM timeperiods tp, maintenances_windows mw '.
-				' WHERE '.DBcondition('mw.maintenanceid',array($maintenance['maintenanceid'])).
-					' AND tp.timeperiodid=mw.timeperiodid ';
-				$db_timeperiods = DBselect($sql);
-				while($timeperiod = DBfetch($db_timeperiods)){
-					$timeperiodids[] = $timeperiod['timeperiodid']; // list of ids
-					$timeperiods[] = $timeperiod; // list of objects
+				// inserting references to maintenances_windows table
+				$insertWindows = array();
+				foreach($insertedTimepePiodids as $insertedTimepePiodid){
+					$insertWindows[] = array(
+						'timeperiodid' => $insertedTimepePiodid,
+						'maintenanceid' => $maintenance['maintenanceid'],
+					);
 				}
-
-				// have time periods changed?
-				$timePeriodsChanged = false;
-				if(count($timeperiods) != count($maintenance['timeperiods'])){
-					$timePeriodsChanged = true;
-				}
-				else{
-					foreach($maintenance['timeperiods'] as $i=>$currentTimePeriod){
-						// if records are not completely identical
-						if(
-							$currentTimePeriod['timeperiod_type'] != $timeperiods[$i]['timeperiod_type']
-							|| $currentTimePeriod['every'] != $timeperiods[$i]['every']
-							|| $currentTimePeriod['month'] != $timeperiods[$i]['month']
-							|| $currentTimePeriod['dayofweek'] != $timeperiods[$i]['dayofweek']
-							|| $currentTimePeriod['day'] != $timeperiods[$i]['day']
-							|| $currentTimePeriod['start_time'] != $timeperiods[$i]['start_time']
-							|| $currentTimePeriod['start_date'] != $timeperiods[$i]['start_date']
-							|| $currentTimePeriod['period'] != $timeperiods[$i]['period']
-						){
-							// this means, that time periods have changed (at least one of them)
-							$timePeriodsChanged = true;
-							break;
-						}
-					}
-				}
-
-				// if time periods have changed
-				if($timePeriodsChanged){
-					// wiping the out to insert new ones
-					DB::delete('timeperiods', array('timeperiodid'=>$timeperiodids));
-					DB::delete('maintenances_windows', array('maintenanceid'=>$maintenance['maintenanceid']));
-
-					// gathering the new ones to create
-					$insert_timeperiods = array();
-					foreach($maintenance['timeperiods'] as $timeperiod){
-						$tid++;
-						$insert_timeperiods[$tid] = $timeperiod;
-						$timeperiods[$tid] = $mnum;
-					}
-
-					// inserting them and getting back id's that were just inserted
-					$insertedTimepePiodids = DB::insert('timeperiods', $insert_timeperiods);
-
-					// inserting references to maintenances_windows table
-					$insertWindows = array();
-					foreach($insertedTimepePiodids as $insertedTimepePiodid){
-						$insertWindows[] = array(
-							'timeperiodid' => $insertedTimepePiodid,
-							'maintenanceid' => $maintenance['maintenanceid'],
-						);
-					}
-					DB::insert('maintenances_windows', $insertWindows);
-				}
+				DB::insert('maintenances_windows', $insertWindows);
 			}
-			DB::update('maintenances', $update);
+		}
+		DB::update('maintenances', $update);
 
-			// some of the hosts and groups bound to maintenance must be deleted, other inserted and others left alone
-			$insertHosts = array();
-			$insertGroups = array();
+		// some of the hosts and groups bound to maintenance must be deleted, other inserted and others left alone
+		$insertHosts = array();
+		$insertGroups = array();
 
-			foreach($maintenances as $mnum => $maintenance){
+		foreach($maintenances as $mnum => $maintenance){
 
-				// putting apart those host<->maintenance connections that should be inserted, deleted and not changed
-				// $hostDiff['first'] - new hosts, that should be inserted
-				// $hostDiff['second'] - hosts, that should be deleted
-				// $hostDiff['both'] - hosts, that should not be touched
-				$hostDiff = zbx_array_diff(
-					zbx_toObject($maintenance['hostids'], 'hostid'),
-					$updMaintenances[$maintenance['maintenanceid']]['hosts'],
-					'hostid'
+// putting apart those host<->maintenance connections that should be inserted, deleted and not changed
+// $hostDiff['first'] - new hosts, that should be inserted
+// $hostDiff['second'] - hosts, that should be deleted
+// $hostDiff['both'] - hosts, that should not be touched
+			$hostDiff = zbx_array_diff(
+				zbx_toObject($maintenance['hostids'], 'hostid'),
+				$updMaintenances[$maintenance['maintenanceid']]['hosts'],
+				'hostid'
+			);
+
+			foreach($hostDiff['first'] as $host){
+				$insertHosts[] = array(
+					'hostid' => $host['hostid'],
+					'maintenanceid' => $maintenance['maintenanceid'],
 				);
-
-				foreach($hostDiff['first'] as $host){
-					$insertHosts[] = array(
-						'hostid' => $host['hostid'],
-						'maintenanceid' => $maintenance['maintenanceid'],
-					);
-				}
-				foreach($hostDiff['second'] as $host){
-					$deleteHosts = array(
-						'hostid' => $host['hostid'],
-						'maintenanceid' => $maintenance['maintenanceid'],
-					);
-					DB::delete('maintenances_hosts', $deleteHosts);
-				}
-
-				// now the same with the groups
-				$groupDiff = zbx_array_diff(
-					zbx_toObject($maintenance['groupids'], 'groupid'),
-					$updMaintenances[$maintenance['maintenanceid']]['groups'],
-					'groupid'
+			}
+			foreach($hostDiff['second'] as $host){
+				$deleteHosts = array(
+					'hostid' => $host['hostid'],
+					'maintenanceid' => $maintenance['maintenanceid'],
 				);
-
-				foreach($groupDiff['first'] as $group){
-					$insertGroups[] = array(
-						'groupid' => $group['groupid'],
-						'maintenanceid' => $maintenance['maintenanceid'],
-					);
-				}
-				foreach($groupDiff['second'] as $group){
-					$deleteGroups = array(
-						'groupid' => $group['groupid'],
-						'maintenanceid' => $maintenance['maintenanceid'],
-					);
-					DB::delete('maintenances_groups', $deleteGroups);
-				}
+				DB::delete('maintenances_hosts', $deleteHosts);
 			}
 
-			DB::insert('maintenances_hosts', $insertHosts);
-			DB::insert('maintenances_groups', $insertGroups);
+			// now the same with the groups
+			$groupDiff = zbx_array_diff(
+				zbx_toObject($maintenance['groupids'], 'groupid'),
+				$updMaintenances[$maintenance['maintenanceid']]['groups'],
+				'groupid'
+			);
 
-			return array('maintenanceids'=> $maintenanceids);
+			foreach($groupDiff['first'] as $group){
+				$insertGroups[] = array(
+					'groupid' => $group['groupid'],
+					'maintenanceid' => $maintenance['maintenanceid'],
+				);
+			}
+			foreach($groupDiff['second'] as $group){
+				$deleteGroups = array(
+					'groupid' => $group['groupid'],
+					'maintenanceid' => $maintenance['maintenanceid'],
+				);
+				DB::delete('maintenances_groups', $deleteGroups);
+			}
+		}
+
+		DB::insert('maintenances_hosts', $insertHosts);
+		DB::insert('maintenances_groups', $insertGroups);
+
+		return array('maintenanceids'=> $maintenanceids);
 	}
 
 /**

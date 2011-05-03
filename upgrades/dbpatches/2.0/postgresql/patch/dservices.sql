@@ -1,6 +1,8 @@
 ALTER TABLE ONLY dservices ALTER dserviceid DROP DEFAULT,
 			   ALTER dhostid DROP DEFAULT,
 			   ALTER dcheckid DROP DEFAULT,
+			   ALTER key_ SET DEFAULT '',
+			   ALTER value SET DEFAULT '',
 			   ADD dns varchar(64) DEFAULT '' NOT NULL;
 DELETE FROM dservices WHERE NOT EXISTS (SELECT 1 FROM dhosts WHERE dhosts.dhostid=dservices.dhostid);
 DELETE FROM dservices WHERE NOT EXISTS (SELECT 1 FROM dchecks WHERE dchecks.dcheckid=dservices.dcheckid);

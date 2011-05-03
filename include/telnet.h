@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2000-2011 Zabbix SIA
@@ -17,23 +16,25 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-?>
-<?php
-//require_once 'Framework/ClassTest.php';
-require_once(dirname(__FILE__).'/classes/class.cdrule.php');
-require_once(dirname(__FILE__).'/classes/class.triggerexpressionTest.php');
-// ...
 
-//class Package_GeneralTests
-class ApiTests
-{
-	public static function suite()
-	{
-		$suite = new PHPUnit_Framework_TestSuite('api');
-		$suite->addTestSuite('class_triggerexpressionTest');
-		$suite->addTestSuite('CDRuleTest');
+#ifndef ZABBIX_TELNET_H
+#define ZABBIX_TELNET_H
 
-		return $suite;
-	}
-}
-?>
+#include "sysinfo.h"
+#include "comms.h"
+
+#define WAIT_READ	0
+#define WAIT_WRITE	1
+
+#define CMD_IAC		255
+#define CMD_WILL	251
+#define CMD_WONT	252
+#define CMD_DO		253
+#define CMD_DONT	254
+#define OPT_SGA		3
+
+int	telnet_test_login(ZBX_SOCKET socket_fd);
+int	telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *password, AGENT_RESULT *result);
+int	telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *result, const char *encoding);
+
+#endif

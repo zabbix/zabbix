@@ -93,7 +93,7 @@ class CEvent extends CZBXAPI{
 			'output'				=> API_OUTPUT_REFER,
 			'selectHosts'			=> null,
 			'selectItems'			=> null,
-			'select_triggers'		=> null,
+			'selectTriggers'		=> null,
 			'select_alerts'			=> null,
 			'select_acknowledges'	=> null,
 			'countOutput'			=> null,
@@ -328,7 +328,7 @@ class CEvent extends CZBXAPI{
 		}
 
 // select_********
-		if(($options['output'] != API_OUTPUT_EXTEND) && (!is_null($options['selectHosts']) || !is_null($options['select_triggers']) || !is_null($options['selectItems'])))
+		if(($options['output'] != API_OUTPUT_EXTEND) && (!is_null($options['selectHosts']) || !is_null($options['selectTriggers']) || !is_null($options['selectItems'])))
 		{
 			$sql_parts['select']['events'][] = 'e.object';
 			$sql_parts['select']['events'][] = 'e.objectid';
@@ -383,7 +383,7 @@ class CEvent extends CZBXAPI{
 						$result[$event['eventid']]['hosts'] = array();
 					}
 
-					if(!is_null($options['select_triggers']) && !isset($result[$event['eventid']]['triggers'])){
+					if(!is_null($options['selectTriggers']) && !isset($result[$event['eventid']]['triggers'])){
 						$result[$event['eventid']]['triggers'] = array();
 					}
 
@@ -408,7 +408,7 @@ class CEvent extends CZBXAPI{
 					}
 
 // triggerids
-					if(isset($event['triggerid']) && is_null($options['select_triggers'])){
+					if(isset($event['triggerid']) && is_null($options['selectTriggers'])){
 						if(!isset($result[$event['eventid']]['triggers'])) $result[$event['eventid']]['triggers'] = array();
 
 						$result[$event['eventid']]['triggers'][] = array('triggerid' => $event['triggerid']);
@@ -469,10 +469,10 @@ Copt::memoryPick();
 		}
 
 // Adding triggers
-		if(!is_null($options['select_triggers']) && str_in_array($options['select_triggers'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectTriggers']) && str_in_array($options['selectTriggers'], $subselects_allowed_outputs)){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'output' => $options['select_triggers'],
+				'output' => $options['selectTriggers'],
 				'triggerids' => $triggerids,
 				'nopermissions' => 1,
 				'preservekeys' => 1
@@ -526,7 +526,7 @@ Copt::memoryPick();
 		if(!is_null($options['select_alerts']) && str_in_array($options['select_alerts'], $subselects_allowed_outputs)){
 			$obj_params = array(
 				'output' => $options['select_alerts'],
-				'select_mediatypes' => API_OUTPUT_EXTEND,
+				'selectMediatypes' => API_OUTPUT_EXTEND,
 				'nodeids' => $nodeids,
 				'eventids' => $eventids,
 				'nopermissions' => 1,
@@ -705,7 +705,7 @@ Copt::memoryPick();
 			$options = array(
 				'eventids' => $eventids,
 				'output' => API_OUTPUT_EXTEND,
-				'select_triggers' => API_OUTPUT_EXTEND,
+				'selectTriggers' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1
 			);
 			$allowedEvents = $this->get($options);
