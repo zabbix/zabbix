@@ -99,6 +99,7 @@ ZBX_DC_HISTORY
 	int		logeventid;
 	int		lastlogsize;
 	int		mtime;
+	int		num;			/* number of continuous values with a same itemid */
 	unsigned char	value_type;
 	unsigned char	value_null;
 	unsigned char	keep_history;
@@ -2073,6 +2074,38 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 		DBexecute("%s", sql);
 }
 
+static int	DCskip_items(int index, int n)
+{
+	zbx_uint64_t	itemid;
+	int		f, num;
+
+	itemid = cache->history[index].itemid;
+	num = cache->history[index].num;
+
+	while (0 < n - num)
+	{
+		if (ZBX_HISTORY_SIZE <= (f = index + num))
+			f -= ZBX_HISTORY_SIZE;
+
+		if (itemid != cache->history[f].itemid)
+			break;
+
+		num += cache->history[f].num;
+	}
+
+	cache->history[index].num = num;
+
+	if (num > 1)
+	{
+		if (ZBX_HISTORY_SIZE == (f = index + 1))
+			f = 0;
+
+		cache->history[f].num = num - 1;
+	}
+
+	return num;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: DCsync                                                           *
@@ -2127,36 +2160,46 @@ int	DCsync_history(int sync_type)
 		history_num = 0;
 		skipped_clock = 0;
 
-		for (n = cache->history_num, f = cache->history_first; n > 0 && history_num < ZBX_SYNC_MAX; n--, f++)
+		for (n = cache->history_num, f = cache->history_first; n > 0 && history_num < ZBX_SYNC_MAX;)
 		{
-			if (ZBX_HISTORY_SIZE == f)
-				f = 0;
+			int	num;
 
-			if (0 == cache->history[f].itemid)
-			{
-				if (f == cache->history_first)
-				{
-					cache->history_num--;
-					cache->history_gap_num--;
-					if (ZBX_HISTORY_SIZE == ++cache->history_first)
-						cache->history_first = 0;
-				}
-				continue;
-			}
+			if (ZBX_HISTORY_SIZE <= f)
+				f -= ZBX_HISTORY_SIZE;
 
 			if (0 != (zbx_process & ZBX_PROCESS_SERVER))
 			{
+				num = DCskip_items(f, n);
+
+				if (0 == cache->history[f].itemid)
+				{
+					if (f == cache->history_first)
+					{
+						cache->history_num -= num;
+						cache->history_gap_num -= num;
+						if (ZBX_HISTORY_SIZE <= (cache->history_first += num))
+							cache->history_first -= ZBX_HISTORY_SIZE;
+					}
+					n -= num;
+					f += num;
+					continue;
+				}
+
 				if (SUCCEED == uint64_array_exists(cache->itemids, cache->itemids_num,
 						cache->history[f].itemid))
 				{
 					if (skipped_clock == 0)
 						skipped_clock = cache->history[f].clock;
+					n -= num;
+					f += num;
 					continue;
 				}
 
 				uint64_array_add(&cache->itemids, &cache->itemids_alloc,
 						&cache->itemids_num, cache->history[f].itemid, 0);
 			}
+			else
+				num = 1;
 
 			memcpy(&history[history_num], &cache->history[f], sizeof(ZBX_DC_HISTORY));
 
@@ -2188,10 +2231,13 @@ int	DCsync_history(int sync_type)
 			else
 			{
 				cache->history[f].itemid = 0;
+				cache->history[f].num = 1;
 				cache->history_gap_num++;
 			}
 
 			history_num++;
+			n -= num;
+			f += num;
 		}
 
 		if (ZBX_HISTORY_SIZE <= (f = cache->history_first + cache->history_num))
@@ -2374,7 +2420,7 @@ static void	DCvacuum_text()
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() text_gap_num:%d/%d",
 			__function_name, cache->text_gap_num, CONFIG_TEXT_CACHE_SIZE);
 
-	if (cache->text_gap_num <= CONFIG_TEXT_CACHE_SIZE / 100)
+	if (cache->text_gap_num <= CONFIG_TEXT_CACHE_SIZE / 1024)
 		goto exit;
 
 	cache->text_gap_num = 0;
@@ -2430,10 +2476,10 @@ exit:
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static ZBX_DC_HISTORY	*DCget_history_ptr(zbx_uint64_t itemid, size_t text_len)
+static ZBX_DC_HISTORY	*DCget_history_ptr(size_t text_len)
 {
 	ZBX_DC_HISTORY	*history;
-	int		index;
+	int		f;
 	size_t		free_len;
 
 retry:
@@ -2484,9 +2530,10 @@ retry:
 		}
 	}
 
-	if (ZBX_HISTORY_SIZE <= (index = (cache->history_first + cache->history_num)))
-		index -= ZBX_HISTORY_SIZE;
-	history = &cache->history[index];
+	if (ZBX_HISTORY_SIZE <= (f = (cache->history_first + cache->history_num)))
+		f -= ZBX_HISTORY_SIZE;
+	history = &cache->history[f];
+	history->num = 1;
 
 	cache->history_num++;
 
@@ -2514,7 +2561,7 @@ static void	DCadd_history(zbx_uint64_t itemid, double value_orig, int clock)
 
 	LOCK_CACHE;
 
-	history = DCget_history_ptr(itemid, 0);
+	history = DCget_history_ptr(0);
 
 	history->itemid			= itemid;
 	history->clock			= clock;
@@ -2552,7 +2599,7 @@ static void	DCadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value_orig, int
 
 	LOCK_CACHE;
 
-	history = DCget_history_ptr(itemid, 0);
+	history = DCget_history_ptr(0);
 
 	history->itemid				= itemid;
 	history->clock				= clock;
@@ -2593,7 +2640,7 @@ static void	DCadd_history_str(zbx_uint64_t itemid, char *value_orig, int clock)
 
 	if (HISTORY_STR_VALUE_LEN_MAX < (len = strlen(value_orig) + 1))
 		len = HISTORY_STR_VALUE_LEN_MAX;
-	history = DCget_history_ptr(itemid, len);
+	history = DCget_history_ptr(len);
 
 	history->itemid			= itemid;
 	history->clock			= clock;
@@ -2636,7 +2683,7 @@ static void	DCadd_history_text(zbx_uint64_t itemid, char *value_orig, int clock)
 
 	if (HISTORY_TEXT_VALUE_LEN_MAX < (len = strlen(value_orig) + 1))
 		len = HISTORY_TEXT_VALUE_LEN_MAX;
-	history = DCget_history_ptr(itemid, len);
+	history = DCget_history_ptr(len);
 
 	history->itemid			= itemid;
 	history->clock			= clock;
@@ -2682,7 +2729,7 @@ static void	DCadd_history_log(zbx_uint64_t itemid, char *value_orig, int clock, 
 		len1 = HISTORY_LOG_VALUE_LEN_MAX;
 	if (HISTORY_LOG_SOURCE_LEN_MAX < (len2 = (NULL != source && *source != '\0') ? strlen(source) + 1 : 0))
 		len2 = HISTORY_LOG_SOURCE_LEN_MAX;
-	history = DCget_history_ptr(itemid, len1 + len2);
+	history = DCget_history_ptr(len1 + len2);
 
 	history->itemid			= itemid;
 	history->clock			= clock;
