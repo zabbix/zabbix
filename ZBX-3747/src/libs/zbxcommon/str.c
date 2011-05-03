@@ -801,19 +801,21 @@ char	*zbx_dvsprintf(char *dest, const char *f, va_list args)
 		string = zbx_malloc(string, size);
 
 		va_copy(curr, args);
-		n = vsnprintf(string, size, f, curr);
+		n = zbx_vsnprintf(string, size, f, curr);
 		va_end(curr);
 
-		if(n >= 0 && n < size)
+		if (0 <= n && n < size)
 			break;
 
-		if(n >= size)	size = n + 1;
-		else		size = size * 3 / 2 + 1;
+		if (n >= size)
+			size = n + 1;
+		else
+			size = size * 3 / 2 + 1;
 
 		zbx_free(string);
 	}
 
-	if(dest) zbx_free(dest);
+	zbx_free(dest);
 
 	return string;
 }
