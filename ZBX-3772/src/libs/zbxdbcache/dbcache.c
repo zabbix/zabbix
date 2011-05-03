@@ -99,7 +99,7 @@ ZBX_DC_HISTORY
 	int		logeventid;
 	int		lastlogsize;
 	int		mtime;
-	int		num;			/* number of continuous values with a same itemid */
+	int		num;			/* number of continuous values with the same itemid */
 	unsigned char	value_type;
 	unsigned char	value_null;
 	unsigned char	keep_history;
@@ -2095,7 +2095,7 @@ static int	DCskip_items(int index, int n)
 
 	cache->history[index].num = num;
 
-	if (num > 1)
+	if (1 < num)
 	{
 		if (ZBX_HISTORY_SIZE == (f = index + 1))
 			f = 0;
@@ -2108,7 +2108,7 @@ static int	DCskip_items(int index, int n)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCsync                                                           *
+ * Function: DCsync_history                                                   *
  *                                                                            *
  * Purpose: writes updates and new data from pool to database                 *
  *                                                                            *
@@ -2160,7 +2160,7 @@ int	DCsync_history(int sync_type)
 		history_num = 0;
 		skipped_clock = 0;
 
-		for (n = cache->history_num, f = cache->history_first; n > 0 && history_num < ZBX_SYNC_MAX;)
+		for (n = cache->history_num, f = cache->history_first; 0 < n && ZBX_SYNC_MAX > history_num;)
 		{
 			int	num;
 
@@ -2188,7 +2188,7 @@ int	DCsync_history(int sync_type)
 				if (SUCCEED == uint64_array_exists(cache->itemids, cache->itemids_num,
 						cache->history[f].itemid))
 				{
-					if (skipped_clock == 0)
+					if (0 == skipped_clock)
 						skipped_clock = cache->history[f].clock;
 					n -= num;
 					f += num;
@@ -2243,7 +2243,7 @@ int	DCsync_history(int sync_type)
 		if (ZBX_HISTORY_SIZE <= (f = cache->history_first + cache->history_num))
 			f -= ZBX_HISTORY_SIZE;
 
-		for (n = cache->history_num; n > 0; n--)
+		for (n = cache->history_num; 0 < n; n--)
 		{
 			if (0 == f)
 				f = ZBX_HISTORY_SIZE;
@@ -2351,13 +2351,13 @@ static void	DCvacuum_history()
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_gap_num:%d/%d",
 			__function_name, cache->history_gap_num, ZBX_HISTORY_SIZE);
 
-	if (cache->history_gap_num <= ZBX_HISTORY_SIZE / 100)
+	if (ZBX_HISTORY_SIZE / 100 >= cache->history_gap_num)
 		goto exit;
 
 	if (ZBX_HISTORY_SIZE <= (f = cache->history_first + cache->history_num))
 		f -= ZBX_HISTORY_SIZE;
 
-	for (n = cache->history_num; n > 0; n--)
+	for (n = cache->history_num; 0 < n; n--)
 	{
 		if (0 == f)
 			f = ZBX_HISTORY_SIZE;
@@ -2370,6 +2370,7 @@ static void	DCvacuum_history()
 				DCmove_history(f + 1, n_data, n_gap);
 				n_data = 0;
 			}
+
 			n_gap++;
 		}
 		else if (0 != n_gap)
@@ -2420,13 +2421,13 @@ static void	DCvacuum_text()
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() text_gap_num:%d/%d",
 			__function_name, cache->text_gap_num, CONFIG_TEXT_CACHE_SIZE);
 
-	if (cache->text_gap_num <= CONFIG_TEXT_CACHE_SIZE / 1024)
+	if (CONFIG_TEXT_CACHE_SIZE / 1024 >= cache->text_gap_num)
 		goto exit;
 
 	cache->text_gap_num = 0;
 	cache->last_text = cache->text;
 
-	for (n = cache->history_num, f = cache->history_first; n > 0; n--, f++)
+	for (n = cache->history_num, f = cache->history_first; 0 < n; n--, f++)
 	{
 		if (ZBX_HISTORY_SIZE == f)
 			f = 0;
@@ -2481,7 +2482,6 @@ static ZBX_DC_HISTORY	*DCget_history_ptr(size_t text_len)
 	ZBX_DC_HISTORY	*history;
 	int		f;
 	size_t		free_len;
-
 retry:
 	if (cache->history_num == ZBX_HISTORY_SIZE)
 	{
