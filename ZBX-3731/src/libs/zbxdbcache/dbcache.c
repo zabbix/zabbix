@@ -389,8 +389,6 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 				}
 			}
 		}
-
-		ids_num = 0;
 	}
 
 	for (i = 0; i < trends_to; i++)
@@ -400,7 +398,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 		if (clock != trend->clock || value_type != trend->value_type)
 			continue;
 
-		if (trend->disable_from != 0 && trend->disable_from <= clock)
+		if (0 != trend->disable_from && trend->disable_from <= clock)
 			continue;
 
 		uint64_array_add(&ids, &ids_alloc, &ids_num, trend->itemid, 64);
@@ -524,7 +522,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 				continue;
 
 			if (NULL != (trend = zbx_hashset_search(&cache->trends, &trends[i].itemid)))
-				trend->disable_from = clock + 3600;
+				trend->disable_from = clock + SEC_PER_HOUR;
 		}
 
 		UNLOCK_TRENDS;
@@ -707,7 +705,7 @@ static void	DCadd_trend(ZBX_DC_HISTORY *history, ZBX_DC_TREND **trends, int *tre
 	ZBX_DC_TREND	*trend = NULL;
 	int		hour;
 
-	hour = history->clock - history->clock % 3600;
+	hour = history->clock - history->clock % SEC_PER_HOUR;
 
 	trend = DCget_trend(history->itemid);
 
