@@ -370,23 +370,41 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 	}
 }
 
+#if !defined(_WINDOWS)
+/******************************************************************************
+ *                                                                            *
+ * Comments: replace strerror to print also the error number                  *
+ *                                                                            *
+ ******************************************************************************/
+char *zbx_strerror(int errnum)
+{
+	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];
+
+	zbx_snprintf(utf8_string, sizeof(utf8_string), "[0x%08X] %s", errnum, strerror(errnum));
+
+	return utf8_string;
+}
+#endif	/* not _WINDOWS */
+
 char *strerror_from_system(unsigned long error)
 {
 #ifdef _WINDOWS
+	int		offset = 0;
 	TCHAR		wide_string[ZBX_MESSAGE_BUF_SIZE];
 	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];	/* !!! Attention: static !!! Not thread-safe for Win32 */
+
+	offset += zbx_snprintf(utf8_string, sizeof(utf8_string), "[0x%08lX]", error);
 
 	if (0 == FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, error,
 			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), wide_string, sizeof(wide_string), NULL))
 	{
-		zbx_snprintf(utf8_string, sizeof(utf8_string), "3. MSG 0x%08X - Unable to find message text [0x%X]",
-				error, GetLastError());
+		zbx_snprintf(utf8_string + offset, sizeof(utf8_string) - offset,
+			"Unable to find message text [0x%lX]", GetLastError());
+
 		return utf8_string;
 	}
 
-	if (FAIL == zbx_unicode_to_utf8_static(wide_string, utf8_string, sizeof(utf8_string)))
-		*utf8_string = '\0';
-
+	zbx_unicode_to_utf8_static(wide_string, utf8_string + offset, sizeof(utf8_string) - offset);
 	zbx_rtrim(utf8_string, "\r\n ");
 
 	return utf8_string;
@@ -399,6 +417,7 @@ char *strerror_from_system(unsigned long error)
 #ifdef _WINDOWS
 char *strerror_from_module(unsigned long error, LPCTSTR module)
 {
+	int		offset = 0;
 	TCHAR		wide_string[ZBX_MESSAGE_BUF_SIZE];
 	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];	/* !!! Attention: static !!! not thread-safe for Win32 */
 	char		*strings[2];
@@ -408,17 +427,18 @@ char *strerror_from_module(unsigned long error, LPCTSTR module)
 	*utf8_string = '\0';
 	hmodule = GetModuleHandle(module);
 
+	offset += zbx_snprintf(utf8_string, sizeof(utf8_string), "[0x%08lX]", error);
+
 	if (0 == FormatMessage(FORMAT_MESSAGE_FROM_HMODULE | FORMAT_MESSAGE_ARGUMENT_ARRAY, hmodule, error,
 			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), wide_string, sizeof(wide_string), strings))
 	{
-		zbx_snprintf(utf8_string, sizeof(utf8_string), "3. MSG 0x%08X - Unable to find message text [%s]",
-				error, strerror_from_system(GetLastError()));
+		zbx_snprintf(utf8_string + offset, sizeof(utf8_string) - offset,
+			"Unable to find message text [0x%lX]", GetLastError());
+
 		return utf8_string;
 	}
 
-	if (FAIL == zbx_unicode_to_utf8_static(wide_string, utf8_string, sizeof(utf8_string)))
-		*utf8_string = '\0';
-
+	zbx_unicode_to_utf8_static(wide_string, utf8_string + offset, sizeof(utf8_string) - offset);
 	zbx_rtrim(utf8_string, "\r\n ");
 
 	return utf8_string;
