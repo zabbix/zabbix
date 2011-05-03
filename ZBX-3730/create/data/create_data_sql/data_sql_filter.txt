@@ -1,0 +1,3 @@
+# table field value1 value2...
+# we filter profiles table to only grab favourites from it
+profiles idx web.favorite.graphids web.favorite.screenids web.favorite.sysmapids web.messages
