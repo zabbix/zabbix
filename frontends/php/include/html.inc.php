@@ -310,9 +310,9 @@
 			'templated_hosts' => 1,
 		);
 		if(isset($elements['items'])) $header_host_opt['selectItems'] = API_OUTPUT_COUNT;
-		if(isset($elements['triggers'])) $header_host_opt['select_triggers'] = API_OUTPUT_COUNT;
-		if(isset($elements['graphs'])) $header_host_opt['select_graphs'] = API_OUTPUT_COUNT;
-		if(isset($elements['applications'])) $header_host_opt['select_applications'] = API_OUTPUT_COUNT;
+		if(isset($elements['triggers'])) $header_host_opt['selectTriggers'] = API_OUTPUT_COUNT;
+		if(isset($elements['graphs'])) $header_host_opt['selectGraphs'] = API_OUTPUT_COUNT;
+		if(isset($elements['applications'])) $header_host_opt['selectApplications'] = API_OUTPUT_COUNT;
 		if(isset($elements['screens'])) $header_host_opt['selectScreens'] = API_OUTPUT_COUNT;
 		if(isset($elements['discoveries'])) $header_host_opt['selectDiscoveries'] = API_OUTPUT_COUNT;
 

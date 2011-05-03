@@ -330,7 +330,7 @@ include_once('include/page_header.php');
 	}
 
 	$maintenance_wdgt = new CWidget();
-	$maintenance_wdgt->addPageHeader(S_CONFIGURATION_OF_MAINTENANCE_PERIODS, $frmForm);
+	$maintenance_wdgt->addPageHeader(_('CONFIGURATION OF MAINTENANCE PERIODS'), $frmForm);
 ?>
 <?php
 	if(isset($_REQUEST['form'])){

@@ -482,7 +482,7 @@ class CScript extends CZBXAPI{
 			unset($script['scriptid']);
 			$update[] = array(
 				'values' => $script,
-				'where' => array('scriptid='.$scriptid),
+				'where' => array('scriptid'=>$scriptid),
 			);
 		}
 		DB::update('scripts', $update);
@@ -605,36 +605,36 @@ class CScript extends CZBXAPI{
 		return $rcv;
 
 /*
-			$dataToSend = $json->encode($array, false);
+		$dataToSend = $json->encode($array, false);
 
 
-			if(fwrite($socket, $dataToSend) === false){
-				self::exception(ZBX_API_ERROR_INTERNAL, S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_SEND_ERROR);
-			}
+		if(fwrite($socket, $dataToSend) === false){
+			self::exception(ZBX_API_ERROR_INTERNAL, S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_SEND_ERROR);
+		}
 
-			stream_set_blocking($socket, true);
-			stream_set_timeout($socket, ZBX_SCRIPT_TIMEOUT);
-			$response = stream_get_contents($socket, ZBX_SCRIPT_BYTES_LIMIT);
+		stream_set_blocking($socket, true);
+		stream_set_timeout($socket, ZBX_SCRIPT_TIMEOUT);
+		$response = stream_get_contents($socket, ZBX_SCRIPT_BYTES_LIMIT);
 
-			$info = stream_get_meta_data($socket);
+		$info = stream_get_meta_data($socket);
 
-   			if($info['timed_out']){
-				self::exception(S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_TIMEOUT_ERROR);
-			}
-			if(false === $response){
-				self::exception(ZBX_API_ERROR_INTERNAL, S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_READ_ERROR);
-			}
-			if(strlen($response) == 0){
-				self::exception(ZBX_API_ERROR_INTERNAL, S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_ERROR_EMPTY_RESPONSE);
-			}
-			if(!feof($socket)){
-				self::exception(ZBX_API_ERROR_INTERNAL, S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_BYTES_LIMIT_ERROR);
-			}
+		if($info['timed_out']){
+			self::exception(S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_TIMEOUT_ERROR);
+		}
+		if(false === $response){
+			self::exception(ZBX_API_ERROR_INTERNAL, S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_READ_ERROR);
+		}
+		if(strlen($response) == 0){
+			self::exception(ZBX_API_ERROR_INTERNAL, S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_ERROR_EMPTY_RESPONSE);
+		}
+		if(!feof($socket)){
+			self::exception(ZBX_API_ERROR_INTERNAL, S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_BYTES_LIMIT_ERROR);
+		}
 
 
-			fclose($socket);
+		fclose($socket);
 
-			return $json->decode($response, true);
+		return $json->decode($response, true);
 */
 	}
 

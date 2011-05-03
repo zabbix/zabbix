@@ -86,7 +86,7 @@ include_once('include/page_header.php');
 		'screenids' => $_REQUEST['screenid'],
 		'editable' => 1,
 		'output' => API_OUTPUT_EXTEND,
-		'select_screenitems' => API_OUTPUT_EXTEND
+		'selectScreenItems' => API_OUTPUT_EXTEND
 	);
 	$screens = API::Screen()->get($options);
 	if(empty($screens)){

@@ -395,7 +395,7 @@ include_once('include/page_header.php');
 		$options = array(
 			'groupids' => zbx_objectValues($groups, 'groupid'),
 			'selectHosts' => API_OUTPUT_COUNT,
-			'select_templates' => API_OUTPUT_COUNT,
+			'selectTemplates' => API_OUTPUT_COUNT,
 			'nopermissions' => 1
 		);
 		$groupCounts = API::HostGroup()->get($options);
@@ -406,7 +406,7 @@ include_once('include/page_header.php');
 		$options = array(
 			'groupids' => zbx_objectValues($groups, 'groupid'),
 			'selectHosts' => array('hostid','name','status'),
-			'select_templates' => array('hostid','name','status'),
+			'selectTemplates' => array('hostid','name','status'),
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => 1,
 			'limitSelects' => $config['max_in_table']+1

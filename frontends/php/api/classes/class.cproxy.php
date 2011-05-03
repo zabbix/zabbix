@@ -65,7 +65,7 @@ class CProxy extends CZBXAPI{
 // filter
 			'filter'					=> null,
 			'search'					=> null,
-			'searchByAny'			=> null,
+			'searchByAny'				=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 
@@ -377,35 +377,35 @@ class CProxy extends CZBXAPI{
 		$proxies = zbx_toArray($proxies);
 		$proxyids = array();
 
-			$this->checkInput($proxies, __FUNCTION__);
+		$this->checkInput($proxies, __FUNCTION__);
 
-			$proxyids = DB::insert('hosts', $proxies);
+		$proxyids = DB::insert('hosts', $proxies);
 
-			$hostUpdate = array();
-			foreach($proxies as $pnum => $proxy){
-				if(!isset($proxy['hosts'])) continue;
+		$hostUpdate = array();
+		foreach($proxies as $pnum => $proxy){
+			if(!isset($proxy['hosts'])) continue;
 
-				$hostids = zbx_objectValues($proxy['hosts'], 'hostid');
-				$hostUpdate[] = array(
-					'values' => array('proxy_hostid' => $proxyids[$pnum]),
-					'where' => array(DBCondition('hostid', $hostids))
-				);
+			$hostids = zbx_objectValues($proxy['hosts'], 'hostid');
+			$hostUpdate[] = array(
+				'values' => array('proxy_hostid' => $proxyids[$pnum]),
+				'where' => array('hostid'=>$hostids)
+			);
 
-				if($proxy['status'] == HOST_STATUS_PROXY_ACTIVE) continue;
+			if($proxy['status'] == HOST_STATUS_PROXY_ACTIVE) continue;
 
 // INTERFACES
-				foreach($proxy['interfaces'] as $ifnum => &$interface){
-					$interface['hostid'] = $proxyids[$pnum];
-				}
-				unset($interface);
-
-				$result = API::HostInterface()->create($proxy['interfaces']);
-				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Proxy interface creation failed');
+			foreach($proxy['interfaces'] as $ifnum => &$interface){
+				$interface['hostid'] = $proxyids[$pnum];
 			}
+			unset($interface);
 
-			DB::update('hosts', $hostUpdate);
+			$result = API::HostInterface()->create($proxy['interfaces']);
+			if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Proxy interface creation failed');
+		}
 
-			return array('proxyids' => $proxyids);
+		DB::update('hosts', $hostUpdate);
+
+		return array('proxyids' => $proxyids);
 	}
 
 
@@ -413,53 +413,53 @@ class CProxy extends CZBXAPI{
 		$proxies = zbx_toArray($proxies);
 		$proxyids = array();
 
-			$this->checkInput($proxies, __FUNCTION__);
+		$this->checkInput($proxies, __FUNCTION__);
 
-			$proxyUpdate = array();
-			$hostUpdate = array();
-			foreach($proxies as $pnum => $proxy){
-				$proxyids[] = $proxy['proxyid'];
+		$proxyUpdate = array();
+		$hostUpdate = array();
+		foreach($proxies as $pnum => $proxy){
+			$proxyids[] = $proxy['proxyid'];
 
-				$proxyUpdate[] = array(
-					'values' => $proxy,
-					'where' => array('hostid='.$proxy['proxyid'])
-				);
+			$proxyUpdate[] = array(
+				'values' => $proxy,
+				'where' => array('hostid' => $proxy['proxyid'])
+			);
 
-				if(!isset($proxy['hosts'])) continue;
+			if(!isset($proxy['hosts'])) continue;
 
-				$hostUpdate[] = array(
-					'values' => array('proxy_hostid' => 0),
-					'where' => array('proxy_hostid='.$proxy['proxyid'])
-				);
+			$hostUpdate[] = array(
+				'values' => array('proxy_hostid' => 0),
+				'where' => array('proxy_hostid' => $proxy['proxyid'])
+			);
 
-				$hostids = zbx_objectValues($proxy['hosts'], 'hostid');
-				$hostUpdate[] = array(
-					'values' => array('proxy_hostid' => $proxy['proxyid']),
-					'where' => array(DBCondition('hostid', $hostids))
-				);
+			$hostids = zbx_objectValues($proxy['hosts'], 'hostid');
+			$hostUpdate[] = array(
+				'values' => array('proxy_hostid' => $proxy['proxyid']),
+				'where' => array('hostid' => $hostids)
+			);
 
 // INTERFACES
-				if(isset($proxy['interfaces']) && is_array($proxy['interfaces'])){
-					foreach($proxy['interfaces'] as $inum => &$interface){
-						$interface['hostid'] = $proxy['hostid'];
-					}
+			if(isset($proxy['interfaces']) && is_array($proxy['interfaces'])){
+				foreach($proxy['interfaces'] as $inum => &$interface){
+					$interface['hostid'] = $proxy['hostid'];
+				}
 
-					if(isset($interface['interfaceid']))
-						$result = API::HostInterface()->update($proxy['interfaces']);
-					else
-						$result = API::HostInterface()->create($proxy['interfaces']);
+				if(isset($interface['interfaceid']))
+					$result = API::HostInterface()->update($proxy['interfaces']);
+				else
+					$result = API::HostInterface()->create($proxy['interfaces']);
 
-					if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Proxy interface update failed');
+				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Proxy interface update failed');
 
 // unset after foreach with pointer
-					unset($interface);
-				}
+				unset($interface);
 			}
+		}
 
-			DB::update('hosts', $proxyUpdate);
-			DB::update('hosts', $hostUpdate);
+		DB::update('hosts', $proxyUpdate);
+		DB::update('hosts', $hostUpdate);
 
-			return array('proxyids' => $proxyids);
+		return array('proxyids' => $proxyids);
 	}
 
 /**
@@ -471,64 +471,64 @@ class CProxy extends CZBXAPI{
  */
 	public function delete($proxies){
 
-			if(empty($proxies)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+		if(empty($proxies)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
 
-			$proxies = zbx_toArray($proxies);
-			$proxyids = zbx_objectValues($proxies, 'proxyid');
+		$proxies = zbx_toArray($proxies);
+		$proxyids = zbx_objectValues($proxies, 'proxyid');
 
-			$this->checkInput($proxies, __FUNCTION__);
+		$this->checkInput($proxies, __FUNCTION__);
 
 // disable actions
-			$actionids = array();
+		$actionids = array();
 
 // conditions
 
-			$sql = 'SELECT DISTINCT actionid '.
-					' FROM conditions '.
-					' WHERE conditiontype='.CONDITION_TYPE_PROXY.
-						' AND '.DBcondition('value',$proxyids);
-			$db_actions = DBselect($sql);
-			while($db_action = DBfetch($db_actions)){
-				$actionids[$db_action['actionid']] = $db_action['actionid'];
-			}
+		$sql = 'SELECT DISTINCT actionid '.
+				' FROM conditions '.
+				' WHERE conditiontype='.CONDITION_TYPE_PROXY.
+					' AND '.DBcondition('value',$proxyids);
+		$db_actions = DBselect($sql);
+		while($db_action = DBfetch($db_actions)){
+			$actionids[$db_action['actionid']] = $db_action['actionid'];
+		}
 
-			if(!empty($actionids)){
-				$update = array();
-				$update[] = array(
-					'values' => array('status' => ACTION_STATUS_DISABLED),
-					'where' => array(DBcondition('actionid',$actionids))
-				);
-				DB::update('actions', $update);
-			}
-
-// delete action conditions
-			DB::delete('conditions', array(
-				'conditiontype'=>CONDITION_TYPE_PROXY,
-				'value'=>$proxyids
-			));
-
-// interfaces
-			DB::delete('interface', array('hostid'=>$proxyids));
-
-// Proxies
+		if(!empty($actionids)){
 			$update = array();
 			$update[] = array(
-				'values' => array('proxy_hostid' => 0),
-				'where' => array(DBcondition('proxy_hostid',$proxyids))
+				'values' => array('status' => ACTION_STATUS_DISABLED),
+				'where' => array('actionid'=>$actionids)
 			);
-			DB::update('hosts', $update);
+			DB::update('actions', $update);
+		}
+
+// delete action conditions
+		DB::delete('conditions', array(
+			'conditiontype'=>CONDITION_TYPE_PROXY,
+			'value'=>$proxyids
+		));
+
+// interfaces
+		DB::delete('interface', array('hostid'=>$proxyids));
+
+// Proxies
+		$update = array();
+		$update[] = array(
+			'values' => array('proxy_hostid' => 0),
+			'where' => array('proxy_hostid' => $proxyids)
+		);
+		DB::update('hosts', $update);
 
 
 // delete host
-			DB::delete('hosts', array('hostid'=>$proxyids));
+		DB::delete('hosts', array('hostid'=>$proxyids));
 
 // TODO: remove info from API
-			foreach($proxies as $hnum => $proxy) {
-				info(S_HOST_HAS_BEEN_DELETED_MSG_PART1.SPACE.$proxy['host'].SPACE.S_HOST_HAS_BEEN_DELETED_MSG_PART2);
-				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_PROXY,'['.$proxy['host'].' ] ['.$proxy['hostid'].']');
-			}
+		foreach($proxies as $hnum => $proxy) {
+			info(S_HOST_HAS_BEEN_DELETED_MSG_PART1.SPACE.$proxy['host'].SPACE.S_HOST_HAS_BEEN_DELETED_MSG_PART2);
+			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_PROXY,'['.$proxy['host'].' ] ['.$proxy['hostid'].']');
+		}
 
-			return array('proxyids' => $proxyids);
+		return array('proxyids' => $proxyids);
 	}
 }
 ?>
