@@ -74,8 +74,8 @@ class CMediatype extends CZBXAPI{
 			'excludeSearch'				=> null,
 // OutPut
 			'output'					=> API_OUTPUT_REFER,
-			'select_users'				=> null,
-			'select_medias'				=> null,
+			'selectUsers'				=> null,
+			'selectMedias'				=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -239,7 +239,7 @@ class CMediatype extends CZBXAPI{
 					if(!isset($result[$mediatype['mediatypeid']])) $result[$mediatype['mediatypeid']]= array();
 
 // mediaids
-					if(isset($mediatype['mediaid'])  && is_null($options['select_medias'])){
+					if(isset($mediatype['mediaid'])  && is_null($options['selectMedias'])){
 						if(!isset($result[$mediatype['mediatypeid']]['medias']))
 							$result[$mediatype['mediatypeid']]['medias'] = array();
 
@@ -248,7 +248,7 @@ class CMediatype extends CZBXAPI{
 					}
 
 // userids
-					if(isset($mediatype['userid'])  && is_null($options['select_users'])){
+					if(isset($mediatype['userid'])  && is_null($options['selectUsers'])){
 						if(!isset($result[$mediatype['mediatypeid']]['users']))
 							$result[$mediatype['mediatypeid']]['users'] = array();
 
@@ -270,9 +270,9 @@ Copt::memoryPick();
 
 // Adding Objects
 // Adding users
-		if(!is_null($options['select_users']) && str_in_array($options['select_users'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectUsers']) && str_in_array($options['selectUsers'], $subselects_allowed_outputs)){
 			$obj_params = array(
-				'output' => $options['select_users'],
+				'output' => $options['selectUsers'],
 				'mediatypeids' => $mediatypeids,
 				'preservekeys' => 1
 			);
@@ -409,7 +409,7 @@ Copt::memoryPick();
 				if(!empty($mediatype)){
 					$update[] = array(
 						'values' => $mediatype,
-						'where' => array('mediatypeid='.$mediatypeid),
+						'where' => array('mediatypeid'=>$mediatypeid),
 					);
 				}
 			}

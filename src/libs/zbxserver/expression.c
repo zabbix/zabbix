@@ -52,7 +52,7 @@ static int	DBget_trigger_severity_name(DB_TRIGGER *trigger, char **replace_to)
 	if (0 == trigger->triggerid)
 		return res;
 
-	if (trigger->priority < 0 || trigger->priority >= TRIGGER_SEVERITY_COUNT)
+	if (TRIGGER_SEVERITY_COUNT <= trigger->priority)
 		return res;
 
 	result = DBselect(

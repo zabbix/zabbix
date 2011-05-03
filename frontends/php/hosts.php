@@ -229,7 +229,7 @@ include_once('include/page_header.php');
 			'output' => API_OUTPUT_EXTEND,
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 			'preservekeys' => 1,
-			'select_dependencies' => API_OUTPUT_EXTEND,
+			'selectDependencies' => API_OUTPUT_EXTEND,
 			'expandData' => 1
 		);
 		$triggers = API::Trigger()->get($params);
@@ -717,7 +717,7 @@ include_once('include/page_header.php');
 		$numrows = new CDiv();
 		$numrows->setAttribute('name', 'numrows');
 
-		$hosts_wdgt->addHeader(_('CONFIGURATION OF HOSTS'), $frmGroup);
+		$hosts_wdgt->addHeader(_('HOSTS'), $frmGroup);
 		$hosts_wdgt->addHeader($numrows, $frmForm);
 
 // HOSTS FILTER {{{
@@ -810,9 +810,9 @@ include_once('include/page_header.php');
 			'selectInterfaces' => API_OUTPUT_EXTEND,
 			'selectItems' => API_OUTPUT_COUNT,
 			'selectDiscoveries' => API_OUTPUT_COUNT,
-			'select_triggers' => API_OUTPUT_COUNT,
-			'select_graphs' => API_OUTPUT_COUNT,
-			'select_applications' => API_OUTPUT_COUNT
+			'selectTriggers' => API_OUTPUT_COUNT,
+			'selectGraphs' => API_OUTPUT_COUNT,
+			'selectApplications' => API_OUTPUT_COUNT
 		);
 		$hosts = API::Host()->get($options);
 // sorting && paging

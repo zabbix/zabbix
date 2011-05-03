@@ -10,6 +10,14 @@ ALTER TABLE dservices ALTER COLUMN dcheckid SET WITH DEFAULT NULL
 /
 REORG TABLE dservices
 /
+ALTER TABLE dservices ALTER COLUMN key_ SET WITH DEFAULT ''
+/
+REORG TABLE dservices
+/
+ALTER TABLE dservices ALTER COLUMN value SET WITH DEFAULT ''
+/
+REORG TABLE dservices
+/
 ALTER TABLE dservices ADD dns varchar(64) WITH DEFAULT '' NOT NULL
 /
 REORG TABLE dservices
