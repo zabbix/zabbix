@@ -1288,7 +1288,7 @@ class CItem extends CItemGeneral{
 	 * @param bool $update whether this is update operation
 	 * @return bool
 	 */
-	public static function validateProfileLinks($items, $update=false){
+	public static function validateProfileLinks(array $items, $update=false){
 		if(zbx_empty($items)){
 			return true;
 		}
@@ -1343,6 +1343,11 @@ class CItem extends CItemGeneral{
 			}
 		}
 		else{
+			foreach($items as $i=>$item){
+				if($item['profile_link'] == 0){
+					unset($items[$i]);
+				}
+			}
 			$hostIds = zbx_objectValues($items, 'hostid');
 		}
 
@@ -1378,7 +1383,7 @@ class CItem extends CItemGeneral{
 				if(!isset($possibleHostProfiles[$item['profile_link']])){
 					self::exception(
 						ZBX_API_ERROR_PARAMETERS,
-						_s('Wrong value for profile_link. Item "%s" cannot populate field that does not exist.', $item['name'])
+						_s('Item "%s" cannot populate hot profile field with number "%s" that does not exist.', $item['name'], $item['profile_link'])
 					);
 				}
 
@@ -1386,11 +1391,52 @@ class CItem extends CItemGeneral{
 				if(
 					isset($linksOnHosts[$item['hostid']])
 					&& in_array($item['profile_link'], $linksOnHosts[$item['hostid']])
-					&& (!$update || $item['templateid'] == 0) // when linking template, we need to check only those items, that are not present in template, others will be overwritten anyway
+					// when linking template, we need to check only those items, that are not present in template, others will be overwritten anyway
+					&& (!$update || $item['templateid'] == 0)
 				){
+					// getting names of two items: that gave an error and that populates field already
+					// to give user a descriptive error message
+
+					// name of item that we are trying to add/update
+					if(isset($item['name'])){
+						$thisItemName =	$item['name'];
+					}
+					else{
+						$options = array(
+							'output' => array('name'),
+							'filter' => array(
+								'itemid' => $item['itemid'],
+							),
+							'nopermissions' => true
+						);
+						$thisItem = API::Item()->get($options);
+						$thisItemName = isset($thisItem[0]['name']) ? $thisItem[0]['name'] : '';
+					}
+
+					// name of the original item that already populates the field
+					$options = array(
+						'output' => array('name'),
+						'filter' => array(
+							'hostid' => $item['hostid'],
+							'profile_link' => $item['profile_link']
+						),
+						'nopermissions' => true
+					);
+					$originalItem = API::Item()->get($options);
+					$originalItemName = isset($originalItem[0]['name']) ? $originalItem[0]['name'] : '';
+
+					// name of the profile
+					$profileName = $possibleHostProfiles[$item['profile_link']]['title'];
+
+					// now we can give all the details user needs to know
 					self::exception(
 						ZBX_API_ERROR_PARAMETERS,
-						_('Two items cannot populate one host profile field, this would lead to a conflict. Chosen field is already being populated by another item.')
+						_s(
+							'Cannot save item "%s", because it cannot populate host profile field "%s": it is already being populated by item "%s". Two items cannot populate one host profile field, this would lead to a conflict.',
+							$thisItemName,
+							$profileName,
+							$originalItemName
+						)
 					);
 				}
 			}

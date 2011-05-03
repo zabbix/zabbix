@@ -510,28 +510,28 @@
 			'profile_mode',
 			HOST_PROFILE_DISABLED,
 			null, // class
-			'user_profile_radio_'.HOST_PROFILE_DISABLED,
+			'host_profile_radio_'.HOST_PROFILE_DISABLED,
 			$profile_mode == HOST_PROFILE_DISABLED // checked?
 		),
-		new CLabel(_('Disabled'), 'user_profile_radio_'.HOST_PROFILE_DISABLED),
+		new CLabel(_('Disabled'), 'host_profile_radio_'.HOST_PROFILE_DISABLED),
 
 		new CRadioButton(
 			'profile_mode',
 			HOST_PROFILE_MANUAL,
 			null,
-			'user_profile_radio_'.HOST_PROFILE_MANUAL,
+			'host_profile_radio_'.HOST_PROFILE_MANUAL,
 			$profile_mode == HOST_PROFILE_MANUAL
 		),
-		new CLabel(_('Manual'), 'user_profile_radio_'.HOST_PROFILE_MANUAL),
+		new CLabel(_('Manual'), 'host_profile_radio_'.HOST_PROFILE_MANUAL),
 
 		new CRadioButton(
 			'profile_mode',
 			HOST_PROFILE_AUTOMATIC,
 			null,
-			'user_profile_radio_'.HOST_PROFILE_AUTOMATIC,
+			'host_profile_radio_'.HOST_PROFILE_AUTOMATIC,
 			$profile_mode == HOST_PROFILE_AUTOMATIC
 		),
-		new CLabel(_('Automatic'), 'user_profile_radio_'.HOST_PROFILE_AUTOMATIC),
+		new CLabel(_('Automatic'), 'host_profile_radio_'.HOST_PROFILE_AUTOMATIC),
 	);
 	$profileList->addRow(new CDiv($profileTypeRadio, 'jqueryinputset'));
 
