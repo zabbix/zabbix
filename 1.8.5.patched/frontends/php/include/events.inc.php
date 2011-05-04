@@ -28,7 +28,7 @@
 	}
 
 	function get_tr_event_by_eventid($eventid){
-		$sql = 'SELECT e.*,t.triggerid, t.description,t.priority,t.status,t.type '.
+		$sql = 'SELECT e.*,t.triggerid, t.description,t.expression,t.priority,t.status,t.type '.
 				' FROM events e,triggers t '.
 				' WHERE e.eventid='.$eventid.
 					' AND e.object='.EVENT_OBJECT_TRIGGER.
@@ -280,7 +280,7 @@ function make_event_details($eventid){
 
 	$table = new CTableInfo();
 
-	$table->AddRow(array(S_EVENT, expand_trigger_description($event['triggerid'])));
+	$table->AddRow(array(S_EVENT, expand_trigger_description_by_data($event, ZBX_FLAG_EVENT)));
 	$table->AddRow(array(S_TIME, zbx_date2str(S_EVENTS_EVENT_DETAILS_DATE_FORMAT,$event['clock'])));
 
 	$duration = zbx_date2age($event['clock']);
@@ -494,7 +494,7 @@ function getLastEvents($options){
 		'skipDependent'	=> 1,
 		'select_hosts' => array('hostid', 'host'),
 		'output' => API_OUTPUT_EXTEND,
-		'expandDescription' => 1,
+//		'expandDescription' => 0,
 		'sortfield' => 'lastchange',
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => $options['limit']
@@ -540,6 +540,10 @@ function getLastEvents($options){
 
 		$sortClock[$enum] = $event['clock'];
 		$sortEvent[$enum] = $event['eventid'];
+
+		//expanding description for the state where event was
+		$merged_event = array_merge($event, $triggers[$event['objectid']]);
+		$events[$enum]['trigger']['description'] = expandTriggerDescription($merged_event, ZBX_FLAG_EVENT);
 	}
 
 	array_multisort($sortClock, SORT_DESC, $sortEvent, SORT_DESC, $events);

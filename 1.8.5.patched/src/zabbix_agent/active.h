@@ -81,7 +81,7 @@ typedef struct
 	char		*source;
 	int		severity;
 	long		lastlogsize;
-	int		clock;
+	zbx_timespec_t	ts;
 	int		logeventid;
 	int		mtime;
 	unsigned char	persistent;

@@ -979,7 +979,7 @@ function make_latest_issues($filter = array()){
 
 // }}} Maintenance
 
-		$event_sql = 'SELECT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged'.
+		$event_sql = 'SELECT e.eventid, e.value, e.clock, e.ns, e.objectid as triggerid, e.acknowledged'.
 					' FROM events e'.
 					' WHERE e.object='.EVENT_OBJECT_TRIGGER.
 						' AND e.objectid='.$trigger['triggerid'].
@@ -1002,7 +1002,7 @@ function make_latest_issues($filter = array()){
 			}
 
 //			$description = expand_trigger_description($row['triggerid']);
-			$description = expand_trigger_description_by_data(zbx_array_merge($trigger, array('clock'=>$row_event['clock'])),ZBX_FLAG_EVENT);
+			$description = expand_trigger_description_by_data(zbx_array_merge($trigger, array('clock'=>$row_event['clock'], 'ns'=>$row_event['ns'])),ZBX_FLAG_EVENT);
 
 //actions
 			$actions = get_event_actions_stat_hints($row_event['eventid']);
