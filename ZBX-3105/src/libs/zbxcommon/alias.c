@@ -40,26 +40,21 @@ static ALIAS	*aliasList = NULL;
  ******************************************************************************/
 void	add_aliases_from_config(char **lines)
 {
-	char	*name, *value, **pline; /* a pointer to line */
+	char	*name, *value, **pline;
 
-	pline = lines;
-	while (NULL != *pline)
+	for (pline = lines; NULL != *pline; pline++)
 	{
 		name = *pline;
-		value = strchr(name, ':');
-		if (NULL == value)
+
+		if (NULL == (value = strchr(name, ':')))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "ignoring Alias \"%s\": not colon-separated", name);
-			pline++;
 			continue;
 		}
 
-		*value = '\0';
-		value++;
+		*value++ = '\0';
 
 		add_alias(name, value);
-
-		pline++;
 	}
 }
 
