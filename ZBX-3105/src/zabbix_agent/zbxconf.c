@@ -55,7 +55,6 @@ char	**CONFIG_ALIASES                = NULL;
 char	**CONFIG_USER_PARAMETERS        = NULL;
 char	**CONFIG_PERF_COUNTERS          = NULL;
 
-static void	add_parameters_from_config(char **lines);
 static void	set_defaults();
 
 void	load_config()
@@ -177,6 +176,70 @@ void	free_config()
 
 /******************************************************************************
  *                                                                            *
+ * Function: add_aliases_from_config                                          *
+ *                                                                            *
+ * Purpose: initialize aliases from configuration                             *
+ *                                                                            *
+ * Parameters: lines - aliase entries from configuration file                 *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Vladimir Levijev                                                   *
+ *                                                                            *
+ * Comments: calls add_alias() for each entry                                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	add_aliases_from_config(char **lines)
+{
+	char	*value, **pline;
+
+	for (pline = lines; NULL != *pline; pline++)
+	{
+		if (NULL == (value = strchr(*pline, ':')))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "ignoring Alias \"%s\": not colon-separated", *pline);
+			continue;
+		}
+		*value++ = '\0';
+
+		add_alias(*pline, value);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: add_parameters_from_config                                       *
+ *                                                                            *
+ * Purpose: initialize user parameters from configuration                     *
+ *                                                                            *
+ * Parameters: lines - user parameter entries from configuration file         *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Vladimir Levijev                                                   *
+ *                                                                            *
+ * Comments: calls add_user_parameter() for each entry                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	add_parameters_from_config(char **lines)
+{
+	char	*command, **pline;
+
+	for (pline = lines; NULL != *pline; pline++)
+	{
+		if (NULL == (command = strchr(*pline, ',')))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "ignoring UserParameter \"%s\": not comma-separated", *pline);
+			continue;
+		}
+		*command++ = '\0';
+
+		add_user_parameter(*pline, command);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: activate_user_config                                             *
  *                                                                            *
  * Purpose: activate user specific parameters specified in configuration file *
@@ -201,34 +264,12 @@ void	activate_user_config()
 	/* aliases */
 	add_aliases_from_config(CONFIG_ALIASES);
 
-#if defined (_WINDOWS)
+#if defined(_WINDOWS)
 	/* performance counters */
 	init_collector_data();	/* required for reading PerfCounter */
 
 	add_perf_counters_from_config(CONFIG_PERF_COUNTERS);
-#endif /* _WINDOWS */
-}
-
-static void	add_parameters_from_config(char **lines)
-{
-	char	**pparam;	/* pointer to parameter */
-	char	*command;
-
-	pparam = lines;
-	while (NULL != *pparam)
-	{
-		if (NULL == (command = strchr(*pparam, ',')))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "ignoring UserParameter \"%s\": not comma-separated", *pparam);
-			pparam++;
-			continue;
-		}
-		*command++ = '\0';
-
-		add_user_parameter(*pparam, command);
-
-		pparam++;
-	}
+#endif	/* _WINDOWS */
 }
 
 /******************************************************************************

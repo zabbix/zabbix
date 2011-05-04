@@ -23,41 +23,6 @@
 
 static ALIAS	*aliasList = NULL;
 
-/******************************************************************************
- *                                                                            *
- * Function: add_aliases_from_config                                          *
- *                                                                            *
- * Purpose: initialize aliases from configuration                             *
- *                                                                            *
- * Parameters: lines - aliase entries from configuration file                 *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Vladimir Levijev                                                   *
- *                                                                            *
- * Comments: calls add_alias() for each entry                                 *
- *                                                                            *
- ******************************************************************************/
-void	add_aliases_from_config(char **lines)
-{
-	char	*name, *value, **pline;
-
-	for (pline = lines; NULL != *pline; pline++)
-	{
-		name = *pline;
-
-		if (NULL == (value = strchr(name, ':')))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "ignoring Alias \"%s\": not colon-separated", name);
-			continue;
-		}
-
-		*value++ = '\0';
-
-		add_alias(name, value);
-	}
-}
-
 int	add_alias(const char *name, const char *value)
 {
 	ALIAS	*alias = NULL;
