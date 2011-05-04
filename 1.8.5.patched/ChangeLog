@@ -1,3 +1,7 @@
+Changes for 1.8.6rc1
+
+ - [ZBX-3772] improved performance of the history syncer (sasha)
+
 Changes for 1.8.5
 
  - [ZBX-3686] updated French translation; thanks to Joseph Bueno (Richlv)
