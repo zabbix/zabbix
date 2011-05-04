@@ -136,6 +136,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.6rc1
 
+ - [ZBX-3772] improved performance of the history syncer (sasha)
  - [ZBX-3547] Rewrote performance counters and cpu stats collection for Windows (rudolfs)
  - [ZBX-3677] added unit blacklist on the server side (dimir)
  - [ZBX-3746] Fixed parsing of trigger expressions containing \\ (KB)
