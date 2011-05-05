@@ -376,7 +376,7 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
  ******************************************************************************/
 char *zbx_strerror(int errnum)
 {
-	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];
+	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];	/* !!! Attention: static !!! Not thread-safe for Win32 */
 
 	zbx_snprintf(utf8_string, sizeof(utf8_string), "[0x%08X] %s", errnum, strerror(errnum));
 
