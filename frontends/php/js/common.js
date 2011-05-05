@@ -622,48 +622,6 @@ function showHideByName(name, style){
 	}
 }
 
-function showHideEffect(obj, eff, time, cb_afterFinish){
-	obj = $(obj);
-	if(!obj){
-		throw 'showHideEffect(): Object not found.';
-	}
-
-	if(typeof(Effect) == 'undefined'){
-		eff = 'none';
-	}
-
-	if(typeof(cb_afterFinish) == 'undefined'){
-		cb_afterFinish = function(){};
-	}
-
-	var timeShow = (typeof(time) == 'undefined')?0.5:(parseInt(time)/1000);
-	var show = (obj.style.display != 'none')?0:1;
-
-	switch(eff){
-		case 'blind':
-			if(show)
-				Effect.BlindDown(obj, { afterFinish: cb_afterFinish, duration: timeShow, queue: {position: 'end',scope: eff,limit: 2}} );
-			else
-				Effect.BlindUp(obj, { afterFinish: cb_afterFinish, duration: timeShow, queue: {position: 'end',scope: eff,limit: 2}} );
-			break;
-		case 'slide':
-			if(show)
-				Effect.SlideDown(obj, { afterFinish: cb_afterFinish, duration: timeShow, queue: {position: 'end',scope: eff,limit: 2}} );
-			else
-				Effect.SlideUp(obj, { afterFinish: cb_afterFinish, duration: timeShow, queue: {position: 'end',scope: eff,limit: 2}} );
-			break;
-		default:
-			if(show)
-				obj.show();
-			else
-				obj.hide();
-
-			cb_afterFinish();
-			break;
-	}
-return show;
-}
-
 function switchElementsClass(obj,class1,class2){
 	obj = $(obj);
 	if(!obj) return false;
