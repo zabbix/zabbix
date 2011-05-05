@@ -502,10 +502,10 @@
 	$divTabs->addTab('macroTab', _('Macros'), $macrolist);
 // } MACROS WIDGET
 
-	$profileList = new CFormList('profilelist');
+	$profileFormList = new CFormList('profilelist');
 
 	// radio buttons for profile type choice
-	$profileTypeRadio = array(
+	$profileTypeRadioButton = array(
 		new CRadioButton(
 			'profile_mode',
 			HOST_PROFILE_DISABLED,
@@ -533,7 +533,7 @@
 		),
 		new CLabel(_('Automatic'), 'host_profile_radio_'.HOST_PROFILE_AUTOMATIC),
 	);
-	$profileList->addRow(new CDiv($profileTypeRadio, 'jqueryinputset'));
+	$profileFormList->addRow(new CDiv($profileTypeRadioButton, 'jqueryinputset'));
 
 	$hostProfileTable = DB::getSchema('host_profile');
 	$hostProfileFields = getHostProfiles();
@@ -581,10 +581,15 @@
 			$populatingItem->addStyle("display:none");
 		}
 
-		$profileList->addRow($profileInfo['title'], array($input, $populatingItem));
+		$profileFormList->addRow($profileInfo['title'], array($input, $populatingItem));
 	}
 
-	$divTabs->addTab('profileTab', _('Host profile'), $profileList);
+	// clearing the float
+	$clearFixDiv = new CDiv();
+	$clearFixDiv->addStyle("clear: both;");
+	$profileFormList->addRow('', $clearFixDiv);
+
+	$divTabs->addTab('profileTab', _('Host profile'), $profileFormList);
 // } PROFILE WIDGET
 
 	$frmHost->addItem($divTabs);
