@@ -937,7 +937,7 @@
 						$options = array(
 							'sysmapids' => $mapids,
 							'output' => API_OUTPUT_EXTEND,
-							'select_selements' => API_OUTPUT_EXTEND,
+							'selectSelements' => API_OUTPUT_EXTEND,
 							'nopermissions' => 1,
 							'nodeids' => get_current_nodeid(true)
 						);

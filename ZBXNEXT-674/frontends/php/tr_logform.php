@@ -84,7 +84,7 @@ if(isset($_REQUEST['save_trigger'])){
 			$options = array(
 				'triggerids' => $_REQUEST['triggerid'],
 				'output' => API_OUTPUT_EXTEND,
-				'select_dependencies' => API_OUTPUT_REFER
+				'selectDependencies' => API_OUTPUT_REFER
 			);
 			$triggersData = API::Trigger()->get($options);
 			$triggerData = reset($triggersData);

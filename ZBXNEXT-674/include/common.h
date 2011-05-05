@@ -282,7 +282,9 @@ typedef enum
 	SVC_SNMPv1,
 	SVC_SNMPv2c,
 	SVC_ICMPPING,
-	SVC_SNMPv3
+	SVC_SNMPv3,
+	SVC_HTTPS,
+	SVC_TELNET
 } zbx_dservice_type_t;
 const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 

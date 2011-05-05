@@ -117,7 +117,7 @@ function updateMessageSettings($messages){
 		else if($dbMessages[$key]['value'] != $value){
 			$updates[] = array(
 				'values' => $values,
-				'where' => array('profileid='.$dbMessages[$key]['profileid'])
+				'where' => array('profileid' => $dbMessages[$key]['profileid'])
 			);
 		}
 	}

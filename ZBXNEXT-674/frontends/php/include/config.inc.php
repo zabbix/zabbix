@@ -62,6 +62,7 @@ function __autoload($class_name){
 		'cuser' => 1,
 		'cusergroup' => 1,
 		'cusermacro' => 1,
+		'cusermedia' => 1,
 		'cwebcheck' => 1,
 		'czbxapi' => 1,
 	);
@@ -385,7 +386,6 @@ function __autoload($class_name){
 		$message = array();
 		$width = 0;
 		$height= 0;
-		$img_space = null;
 
 		if(!$bool && !is_null($errmsg))		$msg=S_CONFIG_ERROR_HEAD.': '.$errmsg;
 		else if($bool && !is_null($okmsg))	$msg=$okmsg;
@@ -425,8 +425,6 @@ function __autoload($class_name){
 
 					$msg_tab->addRow($row);
 					$msg_tab->show();
-
-					$img_space = new CImg('images/general/tree/zero.gif','space','100','2');
 					break;
 			}
 		}
@@ -494,8 +492,6 @@ function __autoload($class_name){
 			}
 			$ZBX_MESSAGES = null;
 		}
-
-		if(!is_null($img_space)) print(unpack_object($img_space));
 
 		if($page['type'] == PAGE_TYPE_IMAGE && count($message) > 0){
 			$width += 2;

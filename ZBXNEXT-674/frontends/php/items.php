@@ -835,8 +835,8 @@ switch($itemType) {
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1,
 			'selectHosts' => API_OUTPUT_EXTEND,
-			'select_triggers' => API_OUTPUT_REFER,
-			'select_applications' => API_OUTPUT_EXTEND,
+			'selectTriggers' => API_OUTPUT_REFER,
+			'selectApplications' => API_OUTPUT_EXTEND,
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
@@ -1020,7 +1020,7 @@ switch($itemType) {
 			'expandDescription' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => array('hostid','name','host'),
-			'select_functions' => API_OUTPUT_EXTEND,
+			'selectFunctions' => API_OUTPUT_EXTEND,
 			'selectItems' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		));

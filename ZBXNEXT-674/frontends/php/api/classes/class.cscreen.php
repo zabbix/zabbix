@@ -68,13 +68,13 @@ class CScreen extends CZBXAPI{
 // filter
 			'filter'					=> null,
 			'search'					=> null,
-			'searchByAny'			=> null,
+			'searchByAny'				=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 
 // OutPut
 			'output'					=> API_OUTPUT_REFER,
-			'select_screenitems'		=> null,
+			'selectScreenItems'			=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -208,11 +208,11 @@ class CScreen extends CZBXAPI{
 				else{
 					if(!isset($result[$screen['screenid']])) $result[$screen['screenid']]= array();
 
-					if(!is_null($options['select_screenitems']) && !isset($result[$screen['screenid']]['screenitems'])){
+					if(!is_null($options['selectScreenItems']) && !isset($result[$screen['screenid']]['screenitems'])){
 						$result[$screen['screenid']]['screenitems'] = array();
 					}
 
-					if(isset($screen['screenitemid']) && is_null($options['select_screenitems'])){
+					if(isset($screen['screenitemid']) && is_null($options['selectScreenItems'])){
 						if(!isset($result[$screen['screenid']]['screenitems']))
 							$result[$screen['screenid']]['screenitems'] = array();
 
@@ -415,7 +415,7 @@ SDI('/////////////////////////////////');
 
 
 // Adding ScreenItems
-		if(!is_null($options['select_screenitems']) && str_in_array($options['select_screenitems'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectScreenItems']) && str_in_array($options['selectScreenItems'], $subselects_allowed_outputs)){
 			if(!isset($screens_items)){
 				$screens_items = array();
 				$db_sitems = DBselect('SELECT * FROM screens_items WHERE '.DBcondition('screenid', $screenids));
@@ -650,56 +650,56 @@ SDI('/////////////////////////////////');
 		$screens = zbx_toArray($screens);
 		$update = array();
 
-			$options = array(
-				'screenids' => zbx_objectValues($screens, 'screenid'),
-				'editable' => 1,
-				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1,
-			);
-			$upd_screens = $this->get($options);
-			foreach($screens as $gnum => $screen){
-					if(!isset($screen['screenid'], $upd_screens[$screen['screenid']])){
-						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				}
+		$options = array(
+			'screenids' => zbx_objectValues($screens, 'screenid'),
+			'editable' => 1,
+			'output' => API_OUTPUT_SHORTEN,
+			'preservekeys' => 1,
+		);
+		$upd_screens = $this->get($options);
+		foreach($screens as $gnum => $screen){
+				if(!isset($screen['screenid'], $upd_screens[$screen['screenid']])){
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+			}
+		}
+
+		foreach($screens as $snum => $screen){
+			if(isset($screen['name'])){
+				$options = array(
+					'filter' => array(
+						'name' => $screen['name'],
+					),
+					'preservekeys' => 1,
+					'nopermissions' => 1,
+					'output' => API_OUTPUT_SHORTEN,
+				);
+				$exist_screen = $this->get($options);
+				$exist_screen = reset($exist_screen);
+
+				if($exist_screen && (bccomp($exist_screen['screenid'],$screen['screenid']) != 0))
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_SCREEN.' [ '.$screen['name'].' ] '.S_ALREADY_EXISTS_SMALL);
 			}
 
-			foreach($screens as $snum => $screen){
-				if(isset($screen['name'])){
-					$options = array(
-						'filter' => array(
-							'name' => $screen['name'],
-						),
-						'preservekeys' => 1,
-						'nopermissions' => 1,
-						'output' => API_OUTPUT_SHORTEN,
-					);
-					$exist_screen = $this->get($options);
-					$exist_screen = reset($exist_screen);
-
-					if($exist_screen && (bccomp($exist_screen['screenid'],$screen['screenid']) != 0))
-						self::exception(ZBX_API_ERROR_PERMISSIONS, S_SCREEN.' [ '.$screen['name'].' ] '.S_ALREADY_EXISTS_SMALL);
-				}
-
-				$screenid = $screen['screenid'];
-				unset($screen['screenid']);
-				if(!empty($screen)){
-					$update[] = array(
-						'values' => $screen,
-						'where' => array('screenid='.$screenid),
-					);
-				}
-
-				if(isset($screen['screenitems'])){
-					$update_items = array(
-						'screenids' => $screenid,
-						'screenitems' => $screen['screenitems'],
-					);
-					$this->updateItems($update_items);
-				}
+			$screenid = $screen['screenid'];
+			unset($screen['screenid']);
+			if(!empty($screen)){
+				$update[] = array(
+					'values' => $screen,
+					'where' => array('screenid' => $screenid),
+				);
 			}
-			DB::update('screens', $update);
 
-			return array('screenids' => zbx_objectValues($screens, 'screenid'));
+			if(isset($screen['screenitems'])){
+				$update_items = array(
+					'screenids' => $screenid,
+					'screenitems' => $screen['screenitems'],
+				);
+				$this->updateItems($update_items);
+			}
+		}
+		DB::update('screens', $update);
+
+		return array('screenids' => zbx_objectValues($screens, 'screenid'));
 	}
 
 /**
@@ -717,16 +717,18 @@ SDI('/////////////////////////////////');
 				'preservekeys' => 1,
 		);
 		$del_screens = $this->get($options);
-			foreach($screenids as $screenid){
-				if(!isset($del_screens[$screenid])) self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-			}
 
-			DB::delete('screens_items', array('screenid'=>$screenids));
-			DB::delete('screens_items', array('resourceid'=>$screenids, 'resourcetype'=>SCREEN_RESOURCE_SCREEN));
-			DB::delete('slides', array('screenid'=>$screenids));
-			DB::delete('screens', array('screenid'=>$screenids));
+		foreach($screenids as $screenid){
+			if(!isset($del_screens[$screenid]))
+				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+		}
 
-			return array('screenids' => $screenids);
+		DB::delete('screens_items', array('screenid'=>$screenids));
+		DB::delete('screens_items', array('resourceid'=>$screenids, 'resourcetype'=>SCREEN_RESOURCE_SCREEN));
+		DB::delete('slides', array('screenid'=>$screenids));
+		DB::delete('screens', array('screenid'=>$screenids));
+
+		return array('screenids' => $screenids);
 	}
 
 /**
@@ -774,7 +776,7 @@ SDI('/////////////////////////////////');
 			'screenids' => $screenids,
 			'nopermissions' => 1,
 			'output' => API_OUTPUT_EXTEND,
-			'select_screenitems' => API_OUTPUT_EXTEND,
+			'selectScreenItems' => API_OUTPUT_EXTEND,
 			'preservekeys' => 1,
 		);
 		$screens = $this->get($options);
@@ -802,9 +804,9 @@ SDI('/////////////////////////////////');
 
 						$tmpupd = array(
 							'where' => array(
-								'screenid='.$screen['screenid'],
-								'x='.$new_item['x'],
-								'y='.$new_item['y']
+								'screenid' => $screen['screenid'],
+								'x' => $new_item['x'],
+								'y' => $new_item['y']
 							)
 						);
 

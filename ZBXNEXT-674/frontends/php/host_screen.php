@@ -167,7 +167,7 @@
 			'screenids' => $screen['screenid'],
 			'hostids' => $_REQUEST['hostid'],
 			'output' => API_OUTPUT_EXTEND,
-			'select_screenitems' => API_OUTPUT_EXTEND
+			'selectScreenItems' => API_OUTPUT_EXTEND
 		));
 		$screen = reset($tmpScreens);
 
