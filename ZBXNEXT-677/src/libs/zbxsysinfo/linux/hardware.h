@@ -29,7 +29,7 @@
 #define DMI_HEADER_SIZE		4
 
 #define CHASSIS_TYPE_BITS	0x7f	/* bits 0-6 represent the chassis type */
-#define MAX_CHASSIS_TYPE	0x1d	/* see chassis_types[] */
+#define MAX_CHASSIS_TYPE	0x1d
 
 #define DMI_GET_TYPE		0x01
 #define DMI_GET_VENDOR		0x02
@@ -46,43 +46,5 @@
 #define HW_CPU_SHOW_MODEL	4
 #define HW_CPU_SHOW_CURSPEED	5
 #define HW_CPU_SHOW_CORES	6
-
-static int		smbios_status = SMBIOS_STATUS_UNKNOWN;
-static size_t		smbios_len, smbios;	/* length and address of SMBIOS table (if found) */
-
-/* from System Management BIOS (SMBIOS) Reference Specification v2.7.1 */
-static const char	*chassis_types[] =
-{
-	"",			/* 0x00 */
-	"Other",
-	"Unknown",
-	"Desktop",
-	"Low Profile Desktop",
-	"Pizza Box",
-	"Mini Tower",
-	"Tower",
-	"Portable",
-	"LapTop",
-	"Notebook",
-	"Hand Held",
-	"Docking Station",
-	"All in One",
-	"Sub Notebook",
-	"Space-saving",
-	"Lunch Box",
-	"Main Server Chassis",
-	"Expansion Chassis",
-	"SubChassis",
-	"Bus Expansion Chassis",
-	"Peripheral Chassis",
-	"RAID Chassis",
-	"Rack Mount Chassis",
-	"Sealed-case PC",
-	"Multi-system chassis",
-	"Compact PCI",
-	"Advanced TCA",
-	"Blade",
-	"Blade Enclosure",	/* 0x1d (MAX_CHASSIS_TYPE) */
-};
 
 #endif	/* ZABBIX_HARDWARE_H */

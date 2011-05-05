@@ -48,6 +48,41 @@ static size_t	get_dmi_string(char *buf, int bufsize, unsigned char *data, int nu
 
 static size_t	get_chassis_type(char *buf, int bufsize, int type)
 {
+	/* from System Management BIOS (SMBIOS) Reference Specification v2.7.1 */
+	static const char	*chassis_types[] =
+	{
+		"",			/* 0x00 */
+		"Other",
+		"Unknown",
+		"Desktop",
+		"Low Profile Desktop",
+		"Pizza Box",
+		"Mini Tower",
+		"Tower",
+		"Portable",
+		"LapTop",
+		"Notebook",
+		"Hand Held",
+		"Docking Station",
+		"All in One",
+		"Sub Notebook",
+		"Space-saving",
+		"Lunch Box",
+		"Main Server Chassis",
+		"Expansion Chassis",
+		"SubChassis",
+		"Bus Expansion Chassis",
+		"Peripheral Chassis",
+		"RAID Chassis",
+		"Rack Mount Chassis",
+		"Sealed-case PC",
+		"Multi-system chassis",
+		"Compact PCI",
+		"Advanced TCA",
+		"Blade",
+		"Blade Enclosure",	/* 0x1d (MAX_CHASSIS_TYPE) */
+	};
+
 	type = CHASSIS_TYPE_BITS & type;
 
 	if (1 > type || MAX_CHASSIS_TYPE < type)
@@ -62,13 +97,17 @@ static int	get_dmi_info(char *buf, int bufsize, int flags)
 	unsigned char	membuf[SMBIOS_ENTRY_POINT_SIZE], *smbuf = NULL, *data;
 	size_t		len, fp;
 	void		*mmp = NULL;
-	long		pagesize = sysconf(_SC_PAGESIZE);
+	static long	pagesize = 0;
+	static int	smbios_status = SMBIOS_STATUS_UNKNOWN;
+	static size_t	smbios_len, smbios;	/* length and address of SMBIOS table (if found) */
 
 	if (-1 == (fd = open(DEV_MEM, O_RDONLY)))
 		return ret;
 
 	if (SMBIOS_STATUS_UNKNOWN == smbios_status)	/* look for SMBIOS table only once */
 	{
+		pagesize = sysconf(_SC_PAGESIZE);
+
 		/* find smbios entry point - located between 0xF0000 and 0xFFFFF (according to the specs) */
 		for (fp = 0xf0000; 0xfffff > fp; fp += 16)
 		{
@@ -132,8 +171,8 @@ static int	get_dmi_info(char *buf, int bufsize, int flags)
 		if (0 == flags)
 			break;
 
-		data += data[1];	/* skip the main data */
-		while (data[0] || data[1])	/* string data ends with two nulls */
+		data += data[1];			/* skip the main data */
+		while (0 != data[0] || 0 != data[1])	/* string data ends with two nulls */
 		{
 			data++;
 		}
@@ -163,7 +202,7 @@ int	SYSTEM_HW_CHASSIS(const char *cmd, const char *param, unsigned flags, AGENT_
 
 	if ('\0' == *tmp || 0 == strcmp(tmp, "full"))	/* show full info by default */
 		ret = get_dmi_info(buf, sizeof(buf), DMI_GET_TYPE | DMI_GET_VENDOR | DMI_GET_MODEL | DMI_GET_SERIAL);
-	else if ('\0' == *tmp || 0 == strcmp(tmp, "type"))
+	else if (0 == strcmp(tmp, "type"))
 		ret = get_dmi_info(buf, sizeof(buf), DMI_GET_TYPE);
 	else if (0 == strcmp(tmp, "vendor"))
 		ret = get_dmi_info(buf, sizeof(buf), DMI_GET_VENDOR);
@@ -242,8 +281,7 @@ int     SYSTEM_HW_CPU(const char *cmd, const char *param, unsigned flags, AGENT_
 
 		if (0 == strncmp(name, "processor", 9))
 		{
-			val = atoi(tmp);
-			cur_cpu = val;
+			cur_cpu = atoi(tmp);
 
 			if (HW_CPU_ALL_CPUS != cpu && cpu != cur_cpu)
 				continue;
@@ -251,11 +289,11 @@ int     SYSTEM_HW_CPU(const char *cmd, const char *param, unsigned flags, AGENT_
 			if (HW_CPU_ALL_CPUS == cpu || HW_CPU_SHOW_ALL == filter)
 				offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, "\nprocessor %d:", cur_cpu);
 
-
 			if ((HW_CPU_SHOW_ALL == filter || HW_CPU_SHOW_MAXSPEED == filter) &&
-				-1 != (val = get_cpu_max_speed(cur_cpu)))
+					-1 != (val = get_cpu_max_speed(cur_cpu)))
 			{
 				ret = SYSINFO_RET_OK;
+
 				if (HW_CPU_SHOW_ALL != filter && HW_CPU_ALL_CPUS != cpu)
 				{
 					offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, " %d", val);
@@ -282,6 +320,7 @@ int     SYSTEM_HW_CPU(const char *cmd, const char *param, unsigned flags, AGENT_
 		else if (0 == strncmp(name, "cpu MHz", 7) && (HW_CPU_SHOW_ALL == filter || HW_CPU_SHOW_CURSPEED == filter))
 		{
 			ret = SYSINFO_RET_OK;
+
 			if (HW_CPU_SHOW_ALL != filter && HW_CPU_ALL_CPUS != cpu)
 			{
 				offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, " %d", atoi(tmp) * 1000);
@@ -295,7 +334,6 @@ int     SYSTEM_HW_CPU(const char *cmd, const char *param, unsigned flags, AGENT_
 			ret = SYSINFO_RET_OK;
 			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, " %s", tmp);
 		}
-
 	}
 
 	zbx_fclose(f);
@@ -362,7 +400,7 @@ int     SYSTEM_HW_MACADDR(const char *cmd, const char *param, unsigned flags, AG
 				-1 != ioctl(s, SIOCGIFHWADDR, ifr))	/* get the MAC address */
 		{
 			if (1 == show_names)
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%s: ", ifr->ifr_name);
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "[%s] ", ifr->ifr_name);
 
 			offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%.2hx:%.2hx:%.2hx:%.2hx:%.2hx:%.2hx, ",
 				(unsigned short int)(unsigned char)ifr->ifr_hwaddr.sa_data[0],
@@ -378,8 +416,8 @@ int     SYSTEM_HW_MACADDR(const char *cmd, const char *param, unsigned flags, AG
 
 	if (0 < offset)
 	{
-		zbx_rtrim(buffer, ", ");
 		ret = SYSINFO_RET_OK;
+		zbx_rtrim(buffer, ", ");
 		SET_STR_RESULT(result, zbx_strdup(NULL, buffer));
 	}
 

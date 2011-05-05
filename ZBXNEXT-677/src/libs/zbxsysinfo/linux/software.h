@@ -20,29 +20,17 @@
 #ifndef ZABBIX_SOFTWARE_H
 #define ZABBIX_SOFTWARE_H
 
-#define SW_OS_FULL		"/proc/version"
-#define SW_OS_SHORT		"/proc/version_signature"
-#define SW_OS_NAME		"/etc/issue.net"
+#define SW_OS_FULL	"/proc/version"
+#define SW_OS_SHORT	"/proc/version_signature"
+#define SW_OS_NAME	"/etc/issue.net"
 
 typedef struct
 {
-	char	*name;
-	char	*test_cmd;	/* if this shell command has strout output, package manager is present */
-	char	*list_cmd;	/* this command lists the installed packages */
-	int	(*parser)();	/* for non-standard list (package per line), add a parser function */
+	const char	*name;
+	const char	*test_cmd;	/* if this shell command has stdout output, package manager is present */
+	const char	*list_cmd;	/* this command lists the installed packages */
+	int		(*parser)();	/* for non-standard list (package per line), add a parser function */
 }
 ZBX_PACKAGE_MANAGER;
-
-int	dpkg_parser(char *line, char *package);
-
-ZBX_PACKAGE_MANAGER	package_managers[] =
-/*	NAME		TEST_CMD					LIST_CMD			PARSER_FUNC */
-{
-	{"dpkg",	"dpkg --version 2>/dev/null",			"dpkg --get-selections",	dpkg_parser},
-	{"pkgtools",	"[ -d /var/log/packages ] && echo 'true'",	"ls /var/log/packages",		NULL},
-	{"rpm",		"rpm --version 2>/dev/null",			"rpm -qa",			NULL},
-	{"pacman",	"pacman --version 2>/dev/null",			"pacman -Q",			NULL},
-	{0}
-};
 
 #endif	/* ZABBIX_SOFTWARE_H */
