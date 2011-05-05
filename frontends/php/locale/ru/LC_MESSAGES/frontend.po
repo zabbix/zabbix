@@ -3,14 +3,15 @@ msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-05-05 09:26+0300\n"
-"PO-Revision-Date: 2011-04-27 14:18+0200\n"
+"PO-Revision-Date: 2011-05-05 07:50+0200\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.1.4\n"
 "X-Poedit-Basepath: ../../\n"
 
@@ -156,7 +157,7 @@ msgstr "Допустимое SLA (в %)"
 
 #: sysmap.php:167
 msgid "Access denied!"
-msgstr ""
+msgstr "Доступ запрещен!"
 
 #: api/classes/class.cuser.php:923
 #, php-format
@@ -488,7 +489,7 @@ msgstr "Как простой текст"
 
 #: include/hosts.inc.php:42
 msgid "Asset tag"
-msgstr ""
+msgstr "Этикетка владельца"
 
 #: include/locales/en_gb.inc.php:659
 msgid "At"
@@ -2521,7 +2522,7 @@ msgstr "Проверка обнаружения"
 
 #: include/actions.inc.php:51
 msgid "Discovery object"
-msgstr ""
+msgstr "Объект обнаружения"
 
 #: include/actions.inc.php:49 include/locales/en_gb.inc.php:92
 #: include/views/configuration.discovery.edit.php:101
@@ -2671,7 +2672,7 @@ msgstr ""
 #: api/classes/class.cmap.php:568
 #, php-format
 msgid "Duplicate map name for map \"%s\"."
-msgstr "Дублированное имя карты для карты \"%s\"."
+msgstr "Дублированное имя карты сети для карты сети \"%s\"."
 
 #: api/classes/class.cscript.php:403 api/classes/class.cscript.php:456
 #, php-format
@@ -2686,7 +2687,7 @@ msgstr "Дублированное имя важности \"%s\"."
 #: api/classes/class.cuser.php:421
 #, php-format
 msgid "Duplicate user alias \"%s\"."
-msgstr "Дублировенный алиас пользователя \"%s\"."
+msgstr "Дублировенное имя пользователя \"%s\"."
 
 #: include/locales/en_gb.inc.php:298
 msgid "Duration"
@@ -6857,7 +6858,7 @@ msgstr "Время обновления в секундах"
 # это в поп-апе при просмотре слайдшоу
 #: include/locales/en_gb.inc.php:202
 msgid "Refresh time multiplier"
-msgstr "Множитель времени обновления"
+msgstr "Множитель интервала обновления"
 
 #: include/locales/en_gb.inc.php:404
 msgid "Refresh unsupported items (in sec)"
@@ -8147,7 +8148,7 @@ msgstr "Таблица \"%s\" не существует."
 
 #: hostprofiles.php:89 include/hosts.inc.php:41
 msgid "Tag"
-msgstr "Тэг"
+msgstr "Этикетка"
 
 #: include/locales/en_gb.inc.php:904
 #: include/views/configuration.action.edit.php:586
@@ -9370,12 +9371,12 @@ msgstr "Вы не указали команду в операции для уз�
 #: api/classes/class.caction.php:1578
 #, php-format
 msgid "You did not specify targets for action operation command \"%s\"."
-msgstr "Вы не указали узел сети для операции."
+msgstr "Вы не указали цели для команды \"%s\" в операции действия."
 
 #: api/classes/class.caction.php:1576
 #, php-format
 msgid "You did not specify targets for action operation global script \"%s\"."
-msgstr "Вы не указали группу узлов сети для операции."
+msgstr "Вы не указали цели глобального скрипта \"%s\" в операции действия."
 
 #: api/classes/class.chost.php:1607
 msgid "You do not have enough rights for operation"
