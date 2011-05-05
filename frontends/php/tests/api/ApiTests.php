@@ -20,7 +20,7 @@
 ?>
 <?php
 //require_once 'Framework/ClassTest.php';
-require_once(dirname(__FILE__).'/classes/class.cdrule.php');
+//require_once(dirname(__FILE__).'/classes/class.cdrule.php');
 require_once(dirname(__FILE__).'/classes/class.triggerexpressionTest.php');
 // ...
 
@@ -31,7 +31,7 @@ class ApiTests
 	{
 		$suite = new PHPUnit_Framework_TestSuite('api');
 		$suite->addTestSuite('class_triggerexpressionTest');
-		$suite->addTestSuite('CDRuleTest');
+//		$suite->addTestSuite('CDRuleTest');
 
 		return $suite;
 	}
