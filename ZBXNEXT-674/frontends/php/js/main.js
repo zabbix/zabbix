@@ -951,7 +951,6 @@ function change_flicker_state(divid){
 
 	var filter_state = ShowHide(divid);
 	switchArrows();
-//	var filter_state = showHideEffect(divid,'slide', eff_time, switchArrows);
 
 	if(false === filter_state) return false;
 
@@ -998,15 +997,12 @@ function changeHatStateUI(icon, divid){
 function change_hat_state(icon, divid){
 	deselectAll();
 
-	var eff_time = 500;
-
 	var switchIcon = function(){
 		switchElementsClass(icon,"arrowup","arrowdown");
-	}
+	};
 
 	var hat_state = ShowHide(divid);
 	switchIcon();
-//	var hat_state = showHideEffect(divid, 'slide', eff_time, switchIcon);
 
 	if(false === hat_state) return false;
 
@@ -1015,7 +1011,7 @@ function change_hat_state(icon, divid){
 		'favobj': 	'hat',
 		'favref': 	divid,
 		'state':	hat_state
-	}
+	};
 
 	send_params(params);
 }

@@ -210,134 +210,103 @@ hideAllObjs: function(){
 });
 
 
-var optmap111 = {
-	elementtype: {
-		0: {
-			hide: ['subtypeRow']
-		},
-		1: {
-			hide: ['subtypeRow']
-		},
-		2: {
-			hide: ['subtypeRow']
-		},
-		3: {
-			show: ['subtypeRow']
-		},
-		4: {
-			hide: ['subtypeRow']
-		},
-		5: {
-			hide: ['subtypeRow']
-		}
-	},
-	subtypeHostGroup: {
-		checked: {
-			hide: ['areaTypeRow', 'areaPlacingRow']
-		}
-	},
-	subtypeHostGroupElements: {
-		checked: {
-			show: ['areaTypeRow', 'areaPlacingRow']
-		}
-	},
-	areaTypeAuto: {
-		checked: {
-			hide: ['areaSizeRow']
-		}
-	},
-	areaTypeCustom: {
-		checked: {
-			show: ['areaSizeRow']
-		}
-	}
-
-};
-
-function formSwitcher(elements){
-	this.elements = elements || {};
+function ActionProcessor(actions){
+	this.actions = actions || {};
+	this.bindEvents();
 }
-formSwitcher.prototype = {
+ActionProcessor.prototype = {
 
-	getValue: function(elem){
+	bindEvents: function(){
+
+		var elementId,
+			elementsList = {};
+
+		for(var i=0; i<this.actions.length; i++){
+			var action = this.actions[i];
+
+			for(elementId in action.cond){
+				elementsList[elementId] = true;
+			}
+		}
+
+		var handler = jQuery.proxy(this.process, this);
+		for(elementId in elementsList){
+			var elem = jQuery('#'+elementId);
+
+			switch(elem.get(0).nodeName.toLowerCase()){
+				case 'select':
+					elem.change(handler);
+				break;
+				case 'input':
+					switch(elem.attr('type')){
+						case 'checkbox':
+						case 'text':
+							elem.change(handler);
+							break;
+						case 'radio':
+							var elemName = elem.attr('name');
+							jQuery('input[name='+elemName+']').click(handler);
+							break;
+						default:
+							elem.click(handler);
+					}
+				break;
+			}
+		}
+	},
+
+	getValue: function(elementId){
+		var elem = jQuery('#'+elementId);
 		var type = elem.attr('type');
 
 		if((type == 'radio') || (type == 'checkbox')){
-			return elem.attr('checked') === true ? 'checked' : 'unchecked';
+			return elem.prop('checked') === true ? 'checked' : 'unchecked';
 		}
 		else{
 			return elem.val();
 		}
 	},
 
-	getAllActions: function(elem){
-		var id = elem.attr('id');
-		if(typeof this.elements[id] == 'undefined'){
-			return null;
+	checkConditions: function(conditions){
+		for(var elementId in conditions){
+			if(this.getValue(elementId) !== conditions[elementId]){
+				return false;
+			}
 		}
-
-		var value = this.getValue(elem);
-		if(typeof this.elements[id][value] != 'undefined'){
-			return this.elements[id][value];
-		}
-		return null;
+		return true;
 	},
 
-	getActionData: function(elem, action){
-		var actions = this.getAllActions(elem);
-		if(actions && (typeof actions[action] != 'undefined')){
-			return actions[action];
-		}
-		return null;
-	},
+	process: function(){
+		var action;
 
-	build: function(elem){
-		elem = jQuery(elem);
+		for(var i=0; i<this.actions.length; i++){
+			action = this.actions[i];
 
-		var elemActions = this.getAllActions(elem);
-		if(elemActions){
-			for(var key in elemActions){
-				switch(key){
-					case 'show': this.show(elemActions.show); break;
-					case 'hide': this.hide(elemActions.hide); break;
-				}
+			switch(action.action){
+				case 'show':
+					if(this.checkConditions(action.cond)){
+						this.actionShow(action.value);
+					}
+					else{
+						this.actionHide(action.value);
+					}
+				break;
 			}
 		}
 	},
 
-	buildForm: function(id){
-		var that = this;
-		jQuery('#'+id+' :input:enabled').each(function(){that.build(this)});
+	actionShow: function(value){
+		jQuery(value)
+				.toggle(true)
+				.find(':input')
+				.attr('disabled', false);
 	},
 
-	show: function(data){
-		var that = this;
-
-		for(var i=0; i<data.length; i++){
-			jQuery('#'+data[i])
-					.toggle(true)
-					.find(':input').each(function(){
-						that.build(this);
-					})
-					.removeAttr('disabled');
-		}
-	},
-
-	hide: function(data){
-		var that = this;
-
-		for(i=0; i<data.length; i++){
-			jQuery('#'+data[i])
-					.toggle(false)
-					.find(':input').each(function(){
-						var childsToHide = that.getActionData(jQuery(this), 'show');
-						if(childsToHide){
-							that.hide(childsToHide)
-						}
-					})
-					.attr('disabled', 'disabled');
-		}
+	actionHide: function(value){
+		jQuery(value)
+				.toggle(false)
+				.find(':input')
+				.attr('disabled', true);
 	}
-
 
 };
