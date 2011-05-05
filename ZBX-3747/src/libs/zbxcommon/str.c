@@ -158,7 +158,7 @@ int	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...)
 	assert(str);
 
 	va_start(args, fmt);
-	zbx_vsnprintf(str, count, fmt, args);
+	writen_len = zbx_vsnprintf(str, count, fmt, args);
 	va_end(args);
 
 	return writen_len;
@@ -713,23 +713,26 @@ size_t	zbx_strlcpy(char *dst, const char *src, size_t siz)
 	const char *s = src;
 	size_t n = siz;
 
-	/* Copy as many bytes as will fit */
-	if (n != 0) {
-		while (--n != 0) {
+	/* copy as many bytes as will fit */
+	if (n != 0)
+	{
+		while (--n != 0)
+		{
 			if ((*d++ = *s++) == '\0')
 				break;
 		}
 	}
 
-	/* Not enough room in dst, add NUL and traverse rest of src */
-	if (n == 0) {
+	/* not enough room in dst, add NUL and traverse rest of src */
+	if (n == 0)
+	{
 		if (siz != 0)
-			*d = '\0';                /* NUL-terminate dst */
+			*d = '\0';	/* NUL-terminate dst */
 		while (*s++)
 		;
 	}
 
-	return(s - src - 1);        /* count does not include NUL */
+	return (s - src - 1);	/* count does not include NUL */
 }
 
 /******************************************************************************
@@ -863,19 +866,23 @@ char	*__zbx_zbx_dsprintf(char *dest, const char *f, ...)
  ******************************************************************************/
 char	*zbx_strdcat(char *dest, const char *src)
 {
-	int	len_dest, len_src;
+	size_t	len_dest, len_src;
 	char	*new_dest = NULL;
 
-	if (!src)	return dest;
-	if (!dest)	return strdup(src);
+	if (NULL == src)
+		return dest;
 
-	len_dest = (int)strlen(dest);
-	len_src = (int)strlen(src);
+	if (NULL == dest)
+		return strdup(src);
+
+	len_dest = strlen(dest);
+	len_src = strlen(src);
 
 	new_dest = zbx_malloc(new_dest, len_dest + len_src + 1);
 
-	strcpy(new_dest, dest);
-	strcpy(new_dest + len_dest, src);
+	zbx_strlcpy(new_dest, dest, len_dest + 1);
+	zbx_strlcpy(new_dest + len_dest, src, len_src + 1);
+
 	zbx_free(dest);
 
 	return new_dest;
@@ -897,15 +904,11 @@ char	*zbx_strdcat(char *dest, const char *src)
  ******************************************************************************/
 char	*__zbx_zbx_strdcatf(char *dest, const char *f, ...)
 {
-	char *string = NULL;
-	char *result = NULL;
-
+	char *string = NULL,  *result = NULL;
 	va_list args;
 
 	va_start(args, f);
-
 	string = zbx_dvsprintf(NULL, f, args);
-
 	va_end(args);
 
 	result = zbx_strdcat(dest, string);

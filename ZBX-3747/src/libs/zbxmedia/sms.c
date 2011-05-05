@@ -61,7 +61,7 @@ static int	check_modem_result(char *buffer, char **ebuf, char **sbuf, const char
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	strcpy(rcv, *sbuf);
+	zbx_strlcpy(rcv, *sbuf, sizeof(rcv));
 
 	do
 	{

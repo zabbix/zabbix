@@ -4909,14 +4909,7 @@ regerror (
   msg_size = strlen (msg) + 1; /* Includes the null.  */
 
   if (errbuf_size != 0)
-    {
-      if (msg_size > errbuf_size)
-        {
-          zbx_strlcpy (errbuf, msg, errbuf_size - 1);
-        }
-      else
-        strcpy (errbuf, msg);
-    }
+	zbx_strlcpy (errbuf, msg, errbuf_size - 1);
 
   return msg_size;
 }
