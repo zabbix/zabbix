@@ -117,7 +117,7 @@ include_once('include/page_header.php');
 ?>
 <?php
 	$hosts_wdgt = new CWidget();
-	$hosts_wdgt->addPageHeader(S_CONFIGURATION_OF_HOSTS);
+	$hosts_wdgt->addPageHeader(_('HOSTS'));
 
 
 	$frmForm = new CForm();
@@ -207,9 +207,9 @@ include_once('include/page_header.php');
 		'output' => API_OUTPUT_EXTEND,
 		'selectParentTemplates' => array('hostid', 'host'),
 		'selectItems' => API_OUTPUT_COUNT,
-		'select_triggers' => API_OUTPUT_COUNT,
-		'select_graphs' => API_OUTPUT_COUNT,
-		'select_applications' => API_OUTPUT_COUNT,
+		'selectTriggers' => API_OUTPUT_COUNT,
+		'selectGraphs' => API_OUTPUT_COUNT,
+		'selectApplications' => API_OUTPUT_COUNT,
 		'selectScreens' => API_OUTPUT_COUNT,
 		'nopermissions' => 1
 	);

@@ -82,7 +82,7 @@ include_once('include/page_header.php');
 			'screenids' => $_REQUEST['screenid'],
 			'editable' => 1,
 			'output' => API_OUTPUT_EXTEND,
-			'select_screenitems' => API_OUTPUT_EXTEND
+			'selectScreenItems' => API_OUTPUT_EXTEND
 		);
 		if(isset($_REQUEST['templateid']))
 			$screens = API::TemplateScreen()->get($options);
@@ -101,7 +101,7 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'screenids' => $screens,
-			'select_screenitems' => API_OUTPUT_EXTEND,
+			'selectScreenItems' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND
 		);
 		$screens = API::Screen()->get($options);
@@ -326,7 +326,7 @@ include_once('include/page_header.php');
 		$sortfield = getPageSortField('name');
 		$sortorder = getPageSortOrder();
 		$options = array(
-//				'select_screenitems' => API_OUTPUT_EXTEND,
+//				'selectScreenItems' => API_OUTPUT_EXTEND,
 			'editable' => 1,
 			'output' => API_OUTPUT_EXTEND,
 			'templateids' => $templateid,

@@ -154,7 +154,7 @@ include_once('include/page_header.php');
 		'time_from' => $from,
 		'time_till' => $till,
 		'output' => API_OUTPUT_EXTEND,
-		'select_mediatypes' => API_OUTPUT_EXTEND,
+		'selectMediatypes' => API_OUTPUT_EXTEND,
 		'sortfield' => 'alertid',
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => ($config['search_limit']+1)
@@ -171,7 +171,7 @@ include_once('include/page_header.php');
 	unset($options['userids']);
 	unset($options['time_from']);
 	unset($options['time_till']);
-	unset($options['select_mediatypes']);
+	unset($options['selectMediatypes']);
 	$options['limit'] = 1;
 	$options['sortorder'] = ZBX_SORT_UP;
 	$firstAlert = API::Alert()->get($options);
