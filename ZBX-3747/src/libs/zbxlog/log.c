@@ -164,25 +164,25 @@ void zabbix_errlog(zbx_err_codes_t err, ...)
 	switch (err)
 	{
 		case ERR_Z3001:
-			msg = "Connection to database '%s' failed: [%d] %s";
+			msg = "connection to database '%s' failed: [%d] %s";
 			break;
 		case ERR_Z3002:
-			msg = "Cannot create database '%s': [%d] %s";
+			msg = "cannot create database '%s': [%d] %s";
 			break;
 		case ERR_Z3003:
-			msg = "No connection to the database.";
+			msg = "no connection to the database";
 			break;
 		case ERR_Z3004:
-			msg = "Cannot close database: [%d] %s";
+			msg = "cannot close database: [%d] %s";
 			break;
 		case ERR_Z3005:
-			msg = "Query failed: [%d] %s [%s]";
+			msg = "query failed: [%d] %s [%s]";
 			break;
 		case ERR_Z3006:
-			msg = "Fetch failed: [%d] %s";
+			msg = "fetch failed: [%d] %s";
 			break;
 		default:
-			msg = "Unknown error";
+			msg = "unknown error";
 	}
 
 	va_start(ap, err);
@@ -369,7 +369,6 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 	}
 }
 
-#if !defined(_WINDOWS)
 /******************************************************************************
  *                                                                            *
  * Comments: replace strerror to print also the error number                  *
@@ -383,7 +382,6 @@ char *zbx_strerror(int errnum)
 
 	return utf8_string;
 }
-#endif	/* not _WINDOWS */
 
 char *strerror_from_system(unsigned long error)
 {
