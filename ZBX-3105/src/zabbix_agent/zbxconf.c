@@ -60,6 +60,7 @@ static void	set_defaults();
 void	load_config()
 {
 	init_metrics();
+	init_collector_data();
 
 	/* initialize multistrings */
 	zbx_strarr_init(&CONFIG_ALIASES);
@@ -169,9 +170,7 @@ void	free_config()
 
 	free_metrics();
 	alias_list_free();
-#if defined (_WINDOWS)
 	free_collector_data();
-#endif /* _WINDOWS */
 }
 
 /******************************************************************************
@@ -238,6 +237,59 @@ static void	add_parameters_from_config(char **lines)
 	}
 }
 
+#ifdef _WINDOWS
+/******************************************************************************
+ *                                                                            *
+ * Function: add_perf_counters_from_config                                    *
+ *                                                                            *
+ * Purpose: add performance counters from configuration                       *
+ *                                                                            *
+ * Parameters: lines - array of PerfCounter configuration entries             *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Vladimir Levijev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	add_perf_counters_from_config(const char **lines)
+{
+	char	name[MAX_STRING_LEN], counterpath[PDH_MAX_COUNTER_PATH], interval[8], **pline;
+	LPTSTR	wcounterPath;
+	int	ret = FAIL;
+
+	for (pline = lines; NULL != *pline; pline++)
+	{
+		if (3 < num_param(*pline))
+			goto lbl_syntax_error;
+
+		if (0 != get_param(*pline, 1, name, sizeof(name)))
+			goto lbl_syntax_error;
+
+		if (0 != get_param(*pline, 2, counterpath, sizeof(counterpath)))
+			goto lbl_syntax_error;
+
+		if (0 != get_param(*pline, 3, interval, sizeof(interval)))
+			goto lbl_syntax_error;
+
+		wcounterPath = zbx_acp_to_unicode(counterpath);
+		zbx_unicode_to_utf8_static(wcounterPath, counterpath, PDH_MAX_COUNTER_PATH);
+		zbx_free(wcounterPath);
+
+		if (FAIL == check_counter_path(counterpath))
+			goto lbl_syntax_error;
+
+		if (NULL == add_perf_counter(name, counterpath, atoi(interval)))
+			goto lbl_syntax_error;
+
+		continue;
+lbl_syntax_error:
+		zabbix_log(LOG_LEVEL_WARNING, "PerfCounter \"%s\" FAILED: invalid format", *pline);
+	}
+}
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: activate_user_config                                             *
@@ -266,8 +318,6 @@ void	activate_user_config()
 
 #if defined(_WINDOWS)
 	/* performance counters */
-	init_collector_data();	/* required for reading PerfCounter */
-
 	add_perf_counters_from_config(CONFIG_PERF_COUNTERS);
 #endif	/* _WINDOWS */
 }
