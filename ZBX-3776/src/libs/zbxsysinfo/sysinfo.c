@@ -73,14 +73,13 @@ void	add_metric(ZBX_METRIC *new)
 	}
 }
 
-int	add_user_parameter(char *key, char *command)
+int	add_user_parameter(const char *key, char *command)
 {
-	register int	i;
-	char		usr_cmd[MAX_STRING_LEN];
-	char		usr_param[MAX_STRING_LEN];
+	int		i;
+	char		usr_cmd[MAX_STRING_LEN], usr_param[MAX_STRING_LEN];
 	unsigned	flag = 0;
 
-	if (0 == (i = parse_command(key, usr_cmd, MAX_STRING_LEN, usr_param, MAX_STRING_LEN)))
+	if (0 == (i = parse_command(key, usr_cmd, sizeof(usr_cmd), usr_param, sizeof(usr_param))))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Can't add user specified key \"%s\". Can't parse key!", key);
 		return FAIL;
@@ -100,11 +99,12 @@ int	add_user_parameter(char *key, char *command)
 		/* add new parameters */
 		if (NULL == commands[i].key)
 		{
-			commands[i].key = strdup(usr_cmd);
+			commands[i].key = zbx_strdup(NULL, usr_cmd);
 			commands[i].flags = flag;
 			commands[i].function = &EXECUTE_STR;
-			commands[i].main_param = strdup(command);
+			commands[i].main_param = zbx_strdup(NULL, command);
 			commands[i].test_param = 0;
+
 			commands = zbx_realloc(commands, (i + 2) * sizeof(ZBX_METRIC));
 			commands[i + 1].key = NULL;
 			break;
@@ -114,7 +114,7 @@ int	add_user_parameter(char *key, char *command)
 		if (0 == strcmp(commands[i].key, usr_cmd))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "Duplicate UserParameter key \"%s\" in configuration. "
-				"Previous entry exists: \"%s,%s\"", key, key, commands[i].main_param);
+					"Previous entry exists: \"%s,%s\"", key, key, commands[i].main_param);
 			exit(FAIL);
 		}
 	}
