@@ -224,7 +224,7 @@ include_once('include/page_header.php');
 		$frmForm->addItem(new CSubmit('form', S_CREATE_APPLICATION));
 	}
 
-	$app_wdgt->addPageheader(S_CONFIGURATION_OF_APPLICATIONS, $frmForm);
+	$app_wdgt->addPageheader(_('CONFIGURATION OF APPLICATIONS'), $frmForm);
 ?>
 <?php
 	if(isset($_REQUEST['form'])){

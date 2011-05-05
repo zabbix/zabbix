@@ -391,7 +391,7 @@ switch($itemType) {
 			'discoveryids' => $_REQUEST['parent_discoveryid'],
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1,
-			'select_applications' => API_OUTPUT_EXTEND,
+			'selectApplications' => API_OUTPUT_EXTEND,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)

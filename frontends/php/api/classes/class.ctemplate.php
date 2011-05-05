@@ -78,13 +78,13 @@ class CTemplate extends CZBXAPI{
 			'output'					=> API_OUTPUT_REFER,
 			'selectGroups'				=> null,
 			'selectHosts'				=> null,
-			'select_templates'			=> null,
+			'selectTemplates'			=> null,
 			'selectParentTemplates'		=> null,
 			'selectItems'				=> null,
 			'selectDiscoveries'			=> null,
-			'select_triggers'			=> null,
-			'select_graphs'				=> null,
-			'select_applications'		=> null,
+			'selectTriggers'			=> null,
+			'selectGraphs'				=> null,
+			'selectApplications'		=> null,
 			'selectMacros'				=> null,
 			'selectScreens'				=> null,
 			'countOutput'				=> null,
@@ -400,7 +400,7 @@ class CTemplate extends CZBXAPI{
 					if(!is_null($options['selectGroups']) && !isset($result[$template['templateid']]['groups'])){
 						$template['groups'] = array();
 					}
-					if(!is_null($options['select_templates']) && !isset($result[$template['templateid']]['templates'])){
+					if(!is_null($options['selectTemplates']) && !isset($result[$template['templateid']]['templates'])){
 						$template['templates'] = array();
 					}
 					if(!is_null($options['selectHosts']) && !isset($result[$template['templateid']]['hosts'])){
@@ -415,13 +415,13 @@ class CTemplate extends CZBXAPI{
 					if(!is_null($options['selectDiscoveries']) && !isset($result[$template['hostid']]['discoveries'])){
 						$result[$template['hostid']]['discoveries'] = array();
 					}
-					if(!is_null($options['select_triggers']) && !isset($result[$template['templateid']]['triggers'])){
+					if(!is_null($options['selectTriggers']) && !isset($result[$template['templateid']]['triggers'])){
 						$template['triggers'] = array();
 					}
-					if(!is_null($options['select_graphs']) && !isset($result[$template['templateid']]['graphs'])){
+					if(!is_null($options['selectGraphs']) && !isset($result[$template['templateid']]['graphs'])){
 						$template['graphs'] = array();
 					}
-					if(!is_null($options['select_applications']) && !isset($result[$template['templateid']]['applications'])){
+					if(!is_null($options['selectApplications']) && !isset($result[$template['templateid']]['applications'])){
 						$template['applications'] = array();
 					}
 					if(!is_null($options['selectMacros']) && !isset($result[$template['templateid']]['macros'])){
@@ -467,7 +467,7 @@ class CTemplate extends CZBXAPI{
 					}
 
 // triggerids
-					if(isset($template['triggerid']) && is_null($options['select_triggers'])){
+					if(isset($template['triggerid']) && is_null($options['selectTriggers'])){
 						if(!isset($result[$template['hostid']]['triggers']))
 							$result[$template['hostid']]['triggers'] = array();
 
@@ -476,7 +476,7 @@ class CTemplate extends CZBXAPI{
 					}
 
 // graphids
-					if(isset($template['graphid']) && is_null($options['select_graphs'])){
+					if(isset($template['graphid']) && is_null($options['selectGraphs'])){
 						if(!isset($result[$template['templateid']]['graphs'])) $result[$template['templateid']]['graphs'] = array();
 
 						$result[$template['templateid']]['graphs'][] = array('graphid' => $template['graphid']);
@@ -514,15 +514,15 @@ Copt::memoryPick();
 		}
 
 // Adding Templates
-		if(!is_null($options['select_templates'])){
+		if(!is_null($options['selectTemplates'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'parentTemplateids' => $templateids,
 				'preservekeys' => 1
 			);
 
-			if(is_array($options['select_templates']) || str_in_array($options['select_templates'], $subselects_allowed_outputs)){
-				$obj_params['output'] = $options['select_templates'];
+			if(is_array($options['selectTemplates']) || str_in_array($options['selectTemplates'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['selectTemplates'];
 				$templates = API::Template()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($templates, 'host');
@@ -544,7 +544,7 @@ Copt::memoryPick();
 					}
 				}
 			}
-			else if(API_OUTPUT_COUNT == $options['select_templates']){
+			else if(API_OUTPUT_COUNT == $options['selectTemplates']){
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
@@ -630,7 +630,7 @@ Copt::memoryPick();
 					}
 				}
 			}
-			else if(API_OUTPUT_COUNT == $options['select_templates']){
+			else if(API_OUTPUT_COUNT == $options['selectTemplates']){
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
@@ -733,7 +733,7 @@ Copt::memoryPick();
 		}
 
 // Adding triggers
-		if(!is_null($options['select_triggers'])){
+		if(!is_null($options['selectTriggers'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'hostids' => $templateids,
@@ -741,8 +741,8 @@ Copt::memoryPick();
 				'preservekeys' => 1
 			);
 
-			if(is_array($options['select_triggers']) || str_in_array($options['select_triggers'], $subselects_allowed_outputs)){
-				$obj_params['output'] = $options['select_triggers'];
+			if(is_array($options['selectTriggers']) || str_in_array($options['selectTriggers'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['selectTriggers'];
 				$triggers = API::Trigger()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($triggers, 'description');
@@ -761,7 +761,7 @@ Copt::memoryPick();
 					}
 				}
 			}
-			else if(API_OUTPUT_COUNT == $options['select_triggers']){
+			else if(API_OUTPUT_COUNT == $options['selectTriggers']){
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
@@ -777,7 +777,7 @@ Copt::memoryPick();
 		}
 
 // Adding graphs
-		if(!is_null($options['select_graphs'])){
+		if(!is_null($options['selectGraphs'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'hostids' => $templateids,
@@ -785,8 +785,8 @@ Copt::memoryPick();
 				'preservekeys' => 1
 			);
 
-			if(is_array($options['select_graphs']) || str_in_array($options['select_graphs'], $subselects_allowed_outputs)){
-				$obj_params['output'] = $options['select_graphs'];
+			if(is_array($options['selectGraphs']) || str_in_array($options['selectGraphs'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['selectGraphs'];
 				$graphs = API::Graph()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($graphs, 'name');
@@ -805,7 +805,7 @@ Copt::memoryPick();
 					}
 				}
 			}
-			else if(API_OUTPUT_COUNT == $options['select_graphs']){
+			else if(API_OUTPUT_COUNT == $options['selectGraphs']){
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
@@ -821,7 +821,7 @@ Copt::memoryPick();
 		}
 
 // Adding applications
-		if(!is_null($options['select_applications'])){
+		if(!is_null($options['selectApplications'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'hostids' => $templateids,
@@ -829,8 +829,8 @@ Copt::memoryPick();
 				'preservekeys' => 1
 			);
 
-			if(is_array($options['select_applications']) || str_in_array($options['select_applications'], $subselects_allowed_outputs)){
-				$obj_params['output'] = $options['select_applications'];
+			if(is_array($options['selectApplications']) || str_in_array($options['selectApplications'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['selectApplications'];
 				$applications = API::Application()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($applications, 'name');
@@ -849,7 +849,7 @@ Copt::memoryPick();
 					}
 				}
 			}
-			else if(API_OUTPUT_COUNT == $options['select_applications']){
+			else if(API_OUTPUT_COUNT == $options['selectApplications']){
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
@@ -1194,12 +1194,10 @@ COpt::memoryPick();
 				$actionids[$db_action['actionid']] = $db_action['actionid'];
 
 			if(!empty($actionids)){
-				$update = array();
-				$update[] = array(
+				DB::update('actions', array(
 					'values' => array('status' => ACTION_STATUS_DISABLED),
-					'where' => array(DBcondition('actionid',$actionids))
-				);
-				DB::update('actions', $update);
+					'where' => array('actionid' => $actionids)
+				));
 			}
 
 // delete action conditions
@@ -1894,7 +1892,7 @@ COpt::memoryPick();
 			else{
 				DB::update('items', array(
 					'values' => array('templateid' => 0),
-					'where' => array(DBcondition('itemid', array_keys($items[ZBX_FLAG_DISCOVERY])))
+					'where' => array('itemid' => array_keys($items[ZBX_FLAG_DISCOVERY]))
 				));
 
 				foreach($items[ZBX_FLAG_DISCOVERY] as $discoveryRule){
@@ -1912,7 +1910,7 @@ COpt::memoryPick();
 			else{
 				DB::update('items', array(
 					'values' => array('templateid' => 0),
-					'where' => array(DBcondition('itemid', array_keys($items[ZBX_FLAG_DISCOVERY_NORMAL])))
+					'where' => array('itemid' => array_keys($items[ZBX_FLAG_DISCOVERY_NORMAL]))
 				));
 
 				foreach($items[ZBX_FLAG_DISCOVERY_NORMAL] as $item){
@@ -1930,7 +1928,7 @@ COpt::memoryPick();
 			else{
 				DB::update('items', array(
 					'values' => array('templateid' => 0),
-					'where' => array(DBcondition('itemid', array_keys($items[ZBX_FLAG_DISCOVERY_CHILD])))
+					'where' => array('itemid' => array_keys($items[ZBX_FLAG_DISCOVERY_CHILD]))
 				));
 
 				foreach($items[ZBX_FLAG_DISCOVERY_CHILD] as $item){
@@ -1978,7 +1976,7 @@ COpt::memoryPick();
 			else{
 				DB::update('graphs', array(
 					'values' => array('templateid' => 0),
-					'where' => array(DBcondition('graphid', array_keys($graphs[ZBX_FLAG_DISCOVERY_CHILD])))
+					'where' => array('graphid' => array_keys($graphs[ZBX_FLAG_DISCOVERY_CHILD]))
 				));
 
 				foreach($graphs[ZBX_FLAG_DISCOVERY_CHILD] as $graph){
@@ -1996,7 +1994,7 @@ COpt::memoryPick();
 			else{
 				DB::update('graphs', array(
 					'values' => array('templateid' => 0),
-					'where' => array(DBcondition('graphid', array_keys($graphs[ZBX_FLAG_DISCOVERY_NORMAL])))
+					'where' => array('graphid' => array_keys($graphs[ZBX_FLAG_DISCOVERY_NORMAL]))
 				));
 
 				foreach($graphs[ZBX_FLAG_DISCOVERY_NORMAL] as $graph){
@@ -2047,7 +2045,7 @@ COpt::memoryPick();
 			else{
 				DB::update('triggers', array(
 					'values' => array('templateid' => 0),
-					'where' => array(DBcondition('triggerid', array_keys($triggers[ZBX_FLAG_DISCOVERY_NORMAL])))
+					'where' => array('triggerid' => array_keys($triggers[ZBX_FLAG_DISCOVERY_NORMAL]))
 				));
 
 				foreach($triggers[ZBX_FLAG_DISCOVERY_NORMAL] as $trigger){
@@ -2064,7 +2062,7 @@ COpt::memoryPick();
 			else{
 				DB::update('triggers', array(
 					'values' => array('templateid' => 0),
-					'where' => array(DBcondition('triggerid', array_keys($triggers[ZBX_FLAG_DISCOVERY_CHILD])))
+					'where' => array('triggerid' => array_keys($triggers[ZBX_FLAG_DISCOVERY_CHILD]))
 				));
 
 				foreach($triggers[ZBX_FLAG_DISCOVERY_CHILD] as $trigger){
@@ -2099,7 +2097,7 @@ COpt::memoryPick();
 			else{
 				DB::update('applications', array(
 					'values' => array('templateid' => 0),
-					'where' => array(DBcondition('applicationid', array_keys($applications)))
+					'where' => array('applicationid' => array_keys($applications))
 				));
 
 				foreach($applications as $application){
@@ -2110,10 +2108,9 @@ COpt::memoryPick();
 /* }}} APPLICATIONS */
 
 
-		DB::delete('hosts_templates', array(
-			'templateid' => $templateids,
-			'hostid' => $targetids
-		));
+		$cond = array('templateid' => $templateids);
+		if(!is_null($targetids)) $cond['hostid'] =  $targetids;
+		DB::delete('hosts_templates', $cond);
 
 		if(!is_null($targetids)){
 			$hosts = API::Host()->get(array(

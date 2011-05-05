@@ -665,9 +665,11 @@
 	define('SVC_TCP',	8);
 	define('SVC_AGENT',	9);
 	define('SVC_SNMPv1',	10);
-	define('SVC_SNMPv2',	11);
+	define('SVC_SNMPv2c',	11);
 	define('SVC_ICMPPING',	12);
 	define('SVC_SNMPv3',	13);
+	define('SVC_HTTPS',		14);
+	define('SVC_TELNET',	15);
 
 	define('DHOST_STATUS_ACTIVE',		0);
 	define('DHOST_STATUS_DISABLED',		1);

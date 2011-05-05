@@ -160,7 +160,7 @@ options = array(
 			'graphids' => $options['graphid'],
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => API_OUTPUT_REFER,
-			'select_templates' => API_OUTPUT_REFER,
+			'selectTemplates' => API_OUTPUT_REFER,
 			'selectGroups' => API_OUTPUT_REFER,
 		));
 
@@ -223,7 +223,7 @@ options = array(
 			'triggerids' => $options['triggerid'],
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => API_OUTPUT_REFER,
-			'select_templates' => API_OUTPUT_REFER,
+			'selectTemplates' => API_OUTPUT_REFER,
 			'selectGroups' => API_OUTPUT_REFER,
 		));
 

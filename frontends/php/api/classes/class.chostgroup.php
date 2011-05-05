@@ -84,7 +84,7 @@ class CHostGroup extends CZBXAPI{
 // output
 			'output'					=> API_OUTPUT_REFER,
 			'selectHosts'				=> null,
-			'select_templates'			=> null,
+			'selectTemplates'			=> null,
 
 			'countOutput'				=> null,
 			'groupCount'				=> null,
@@ -403,7 +403,7 @@ class CHostGroup extends CZBXAPI{
 
 					if(!isset($result[$group['groupid']])) $result[$group['groupid']]= array();
 
-					if(!is_null($options['select_templates']) && !isset($result[$group['groupid']]['templates'])){
+					if(!is_null($options['selectTemplates']) && !isset($result[$group['groupid']]['templates'])){
 						$result[$group['groupid']]['templates'] = array();
 					}
 
@@ -504,15 +504,15 @@ COpt::memoryPick();
 		}
 
 // Adding templates
-		if(!is_null($options['select_templates'])){
+		if(!is_null($options['selectTemplates'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'groupids' => $groupids,
 				'preservekeys' => 1
 			);
 
-			if(is_array($options['select_templates']) || str_in_array($options['select_templates'], $subselects_allowed_outputs)){
-				$obj_params['output'] = $options['select_templates'];
+			if(is_array($options['selectTemplates']) || str_in_array($options['selectTemplates'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['selectTemplates'];
 				$templates = API::Template()->get($obj_params);
 				if(!is_null($options['limitSelects'])) order_result($templates, 'host');
 
@@ -532,7 +532,7 @@ COpt::memoryPick();
 					}
 				}
 			}
-			else if(API_OUTPUT_COUNT == $options['select_templates']){
+			else if(API_OUTPUT_COUNT == $options['selectTemplates']){
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
@@ -699,31 +699,31 @@ COpt::memoryPick();
  * @return boolean
  */
 	public function delete($groupids){
-		if(empty($groupids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+			if(empty($groupids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
 
-		$groupids = zbx_toArray($groupids);
+			$groupids = zbx_toArray($groupids);
 
-		$options = array(
-			'groupids' => $groupids,
-			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => 1
-		);
-		$del_groups = $this->get($options);
-		foreach($groupids as $groupid){
-			if(!isset($del_groups[$groupid])){
-				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+			$options = array(
+				'groupids' => $groupids,
+				'editable' => true,
+				'output' => API_OUTPUT_EXTEND,
+				'preservekeys' => 1
+			);
+			$del_groups = $this->get($options);
+			foreach($groupids as $groupid){
+				if(!isset($del_groups[$groupid])){
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				}
 			}
-		}
 
-		$dlt_groupids = getDeletableHostGroups($groupids);
-		if(count($groupids) != count($dlt_groupids)){
-			foreach($groupids as $num => $groupid){
-				if($del_groups[$groupid]['internal'] == ZBX_INTERNAL_GROUP)
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						S_GROUP.' ['.$del_groups[$groupid]['name'].'] '.S_INTERNAL_AND_CANNOT_DELETED_SMALL);
-				else
-					self::exception(ZBX_API_ERROR_PARAMETERS,
+			$dlt_groupids = getDeletableHostGroups($groupids);
+			if(count($groupids) != count($dlt_groupids)){
+				foreach($groupids as $num => $groupid){
+					if($del_groups[$groupid]['internal'] == ZBX_INTERNAL_GROUP)
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+								S_GROUP.' ['.$del_groups[$groupid]['name'].'] '.S_INTERNAL_AND_CANNOT_DELETED_SMALL);
+					else
+						self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Group "%s" cannot be deleted, because some hosts depend on it.', $del_groups[$groupid]['name']));
 			}
 		}
@@ -739,101 +739,101 @@ COpt::memoryPick();
 
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Group "%s" cannot be deleted, because it is used in a global script.', $del_groups[$script['groupid']]['name']));
+				}
 			}
-		}
 
 // delete screens items
-		$resources = array(
-			SCREEN_RESOURCE_HOSTGROUP_TRIGGERS,
-			SCREEN_RESOURCE_HOSTS_INFO,
-			SCREEN_RESOURCE_TRIGGERS_INFO,
-			SCREEN_RESOURCE_TRIGGERS_OVERVIEW,
-			SCREEN_RESOURCE_DATA_OVERVIEW
-		);
-		DB::delete('screens_items', array(
-			'resourceid'=>$groupids,
-			'resourcetype'=>$resources
-		));
+			$resources = array(
+				SCREEN_RESOURCE_HOSTGROUP_TRIGGERS,
+				SCREEN_RESOURCE_HOSTS_INFO,
+				SCREEN_RESOURCE_TRIGGERS_INFO,
+				SCREEN_RESOURCE_TRIGGERS_OVERVIEW,
+				SCREEN_RESOURCE_DATA_OVERVIEW
+			);
+			DB::delete('screens_items', array(
+				'resourceid'=>$groupids,
+				'resourcetype'=>$resources
+			));
 
 // delete sysmap element
 		if(!empty($groupids))
-			DB::delete('sysmaps_elements', array('elementtype' => SYSMAP_ELEMENT_TYPE_HOST_GROUP, 'elementid' => $groupids));
+				DB::delete('sysmaps_elements', array('elementtype' => SYSMAP_ELEMENT_TYPE_HOST_GROUP, 'elementid' => $groupids));
 
 // disable actions
 // actions from conditions
-		$actionids = array();
-		$sql = 'SELECT DISTINCT c.actionid '.
-				' FROM conditions c '.
-				' WHERE c.conditiontype='.CONDITION_TYPE_HOST_GROUP.
-					' AND '.DBcondition('c.value',$groupids);
-		$db_actions = DBselect($sql);
-		while($db_action = DBfetch($db_actions))
-			$actionids[$db_action['actionid']] = $db_action['actionid'];
+			$actionids = array();
+			$sql = 'SELECT DISTINCT c.actionid '.
+					' FROM conditions c '.
+					' WHERE c.conditiontype='.CONDITION_TYPE_HOST_GROUP.
+						' AND '.DBcondition('c.value',$groupids);
+			$db_actions = DBselect($sql);
+			while($db_action = DBfetch($db_actions))
+				$actionids[$db_action['actionid']] = $db_action['actionid'];
 
 // actions from operations
-		$sql = 'SELECT DISTINCT o.actionid '.
-				' FROM operations o, opgroup og '.
-				' WHERE o.operationid=og.operationid '.
-					' AND '.DBcondition('og.groupid',$groupids);
-		$db_actions = DBselect($sql);
-		while($db_action = DBfetch($db_actions))
-			$actionids[$db_action['actionid']] = $db_action['actionid'];
+			$sql = 'SELECT DISTINCT o.actionid '.
+					' FROM operations o, opgroup og '.
+					' WHERE o.operationid=og.operationid '.
+						' AND '.DBcondition('og.groupid',$groupids);
+			$db_actions = DBselect($sql);
+			while($db_action = DBfetch($db_actions))
+				$actionids[$db_action['actionid']] = $db_action['actionid'];
 
-		if(!empty($actionids)){
-			$update = array();
-			$update[] = array(
-				'values' => array('status' => ACTION_STATUS_DISABLED),
-				'where' => array(DBcondition('actionid',$actionids))
-			);
-			DB::update('actions', $update);
-		}
+			if(!empty($actionids)){
+				$update = array();
+				$update[] = array(
+					'values' => array('status' => ACTION_STATUS_DISABLED),
+					'where' => array('actionid' => $actionids)
+				);
+				DB::update('actions', $update);
+			}
 
 // delete action conditions
-		DB::delete('conditions', array(
-			'conditiontype'=>CONDITION_TYPE_HOST_GROUP,
-			'value'=>$groupids
-		));
+			DB::delete('conditions', array(
+				'conditiontype'=>CONDITION_TYPE_HOST_GROUP,
+				'value'=>$groupids
+			));
 
 // delete action operation commands
-		$operationids = array();
-		$sql = 'SELECT DISTINCT og.operationid '.
-				' FROM opgroup og '.
-				' WHERE '.DBcondition('og.groupid', $groupids);
-		$dbOperations = DBselect($sql);
-		while($dbOperation = DBfetch($dbOperations))
-			$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
+			$operationids = array();
+			$sql = 'SELECT DISTINCT og.operationid '.
+					' FROM opgroup og '.
+					' WHERE '.DBcondition('og.groupid', $groupids);
+			$dbOperations = DBselect($sql);
+			while($dbOperation = DBfetch($dbOperations))
+				$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
 
-		DB::delete('opgroup', array(
-			'groupid'=>$groupids,
-		));
+			DB::delete('opgroup', array(
+				'groupid'=>$groupids,
+			));
 
 // delete empty operations
-		$delOperationids = array();
-		$sql = 'SELECT DISTINCT o.operationid '.
-				' FROM operations o '.
-				' WHERE '.DBcondition('o.operationid', $operationids).
-					' AND NOT EXISTS(SELECT og.opgroupid FROM opgroup og WHERE og.operationid=o.operationid)';
-		$dbOperations = DBselect($sql);
-		while($dbOperation = DBfetch($dbOperations))
-			$delOperationids[$dbOperation['operationid']] = $dbOperation['operationid'];
+			$delOperationids = array();
+			$sql = 'SELECT DISTINCT o.operationid '.
+					' FROM operations o '.
+					' WHERE '.DBcondition('o.operationid', $operationids).
+						' AND NOT EXISTS(SELECT og.opgroupid FROM opgroup og WHERE og.operationid=o.operationid)';
+			$dbOperations = DBselect($sql);
+			while($dbOperation = DBfetch($dbOperations))
+				$delOperationids[$dbOperation['operationid']] = $dbOperation['operationid'];
 
-		DB::delete('operations', array(
-			'operationid'=>$delOperationids,
-		));
+			DB::delete('operations', array(
+				'operationid'=>$delOperationids,
+			));
 
 // Host groups
-		DB::delete('groups', array(
-			'groupid'=>$groupids
-		));
+			DB::delete('groups', array(
+				'groupid'=>$groupids
+			));
 
 
 // TODO: remove audit
-		foreach($groupids as $groupid){
-			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST_GROUP, $groupid, $del_groups[$groupid]['name'], 'groups', NULL, NULL);
-		}
+			foreach($groupids as $groupid){
+				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST_GROUP, $groupid, $del_groups[$groupid]['name'], 'groups', NULL, NULL);
+			}
 
 
-		return array('groupids' => $groupids);
+			return array('groupids' => $groupids);
 	}
 
 /**

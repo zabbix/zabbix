@@ -41,7 +41,7 @@ class testPageEvents extends CWebTest
 		if(0 == DBcount('select * from events where source='.EVENT_SOURCE_TRIGGERS))
 			$this->ok('No events found');
 		else
-			$this->ok(array('Time','IP','DNS','Description','Status'));
+			$this->ok(array('Time', 'Description', 'Status', 'Severity', 'Duration', 'Ack', 'Actions'));
 	}
 
 	public function testPageEvents_Discovery_SimpleTest()

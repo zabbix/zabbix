@@ -349,7 +349,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => array('hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid'),
 		'selectItems' => API_OUTPUT_EXTEND,
-		'select_dependencies' => API_OUTPUT_EXTEND
+		'selectDependencies' => API_OUTPUT_EXTEND
 	);
 	$triggers = API::Trigger()->get($options);
 

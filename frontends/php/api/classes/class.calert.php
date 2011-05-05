@@ -87,8 +87,8 @@ class CAlert extends CZBXAPI{
 
 // OutPut
 			'output'				=> API_OUTPUT_REFER,
-			'select_mediatypes'		=> null,
-			'select_users'			=> null,
+			'selectMediatypes'		=> null,
+			'selectUsers'			=> null,
 			'selectHosts'			=> null,
 			'countOutput'			=> null,
 			'preservekeys'			=> null,
@@ -355,11 +355,11 @@ class CAlert extends CZBXAPI{
 				else{
 					if(!isset($result[$alert['alertid']])) $result[$alert['alertid']]= array();
 
-					if(!is_null($options['select_mediatypes']) && !isset($result[$alert['alertid']]['mediatypes'])){
+					if(!is_null($options['selectMediatypes']) && !isset($result[$alert['alertid']]['mediatypes'])){
 						$result[$alert['alertid']]['mediatypes'] = array();
 					}
 
-					if(!is_null($options['select_users']) && !isset($result[$alert['alertid']]['users'])){
+					if(!is_null($options['selectUsers']) && !isset($result[$alert['alertid']]['users'])){
 						$result[$alert['alertid']]['users'] = array();
 					}
 
@@ -372,14 +372,14 @@ class CAlert extends CZBXAPI{
 //						unset($alert['hostid']);
 					}
 // userids
-					if(isset($alert['userid']) && is_null($options['select_users'])){
+					if(isset($alert['userid']) && is_null($options['selectUsers'])){
 						if(!isset($result[$alert['alertid']]['users']))
 							$result[$alert['alertid']]['users'] = array();
 
 						$result[$alert['alertid']]['users'][] = array('userid' => $alert['userid']);
 					}
 // mediatypeids
-					if(isset($alert['mediatypeid']) && is_null($options['select_mediatypes'])){
+					if(isset($alert['mediatypeid']) && is_null($options['selectMediatypes'])){
 						if(!isset($result[$alert['alertid']]['mediatypes']))
 							$result[$alert['alertid']]['mediatypes'] = array();
 
@@ -412,9 +412,9 @@ COpt::memoryPick();
 		}
 
 // Adding Users
-		if(!is_null($options['select_users']) && str_in_array($options['select_users'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectUsers']) && str_in_array($options['selectUsers'], $subselects_allowed_outputs)){
 			$obj_params = array(
-				'output' => $options['select_users'],
+				'output' => $options['selectUsers'],
 				'userids' => $userids,
 				'preservekeys' => 1
 			);
@@ -422,7 +422,7 @@ COpt::memoryPick();
 		}
 
 // Adding MediaTypes
-		if(!is_null($options['select_mediatypes']) && str_in_array($options['select_mediatypes'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectMediatypes']) && str_in_array($options['selectMediatypes'], $subselects_allowed_outputs)){
 			$sql = 'SELECT mt.* FROM media_type mt WHERE '.DBcondition('mt.mediatypeid', $mediatypeids);
 			$res = DBselect($sql);
 			while($media = DBfetch($res)){

@@ -38,8 +38,7 @@ class testPageDiscovery extends CWebTest
 		$this->assertTitle('Configuration of discovery');
 
 		$this->ok('DISCOVERY');
-		$this->ok('CONFIGURATION OF DISCOVERY');
-//		$this->ok('Displaying');
+		$this->ok('Displaying');
 		$this->ok(array('Name','IP range','Delay','Checks','Status'));
 		$this->ok($rule['name']);
 		$this->ok($rule['iprange']);
@@ -71,7 +70,7 @@ class testPageDiscovery extends CWebTest
 		$this->assertTitle('Configuration of discovery');
 		$this->ok('Discovery rule updated');
 		$this->ok("$name");
-		$this->ok('CONFIGURATION OF DISCOVERY');
+		$this->ok('DISCOVERY');
 
 		$this->assertEquals($oldHashRules,DBhash($sql1));
 		$this->assertEquals($oldHashChecks,DBhash($sql2));
