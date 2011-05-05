@@ -1381,9 +1381,10 @@ class CItem extends CItemGeneral{
 			if($update || $item['value_type'] != ITEM_VALUE_TYPE_LOG){
 				// does profile field with provided number exists?
 				if(!isset($possibleHostProfiles[$item['profile_link']])){
+					$maxVar = max(array_keys($possibleHostProfiles));
 					self::exception(
 						ZBX_API_ERROR_PARAMETERS,
-						_s('Item "%s" cannot populate host profile field with number "%s" that does not exist.', $item['name'], $item['profile_link'])
+						_s('Item "%1$s" cannot populate a missing host profile field number "%2$d". Choices are: from 0 (do not populate) to %3$d.', $item['name'], $item['profile_link'], $maxVar)
 					);
 				}
 
@@ -1432,7 +1433,7 @@ class CItem extends CItemGeneral{
 					self::exception(
 						ZBX_API_ERROR_PARAMETERS,
 						_s(
-							'Cannot save item "%s", because it cannot populate host profile field "%s": it is already being populated by item "%s". Two items cannot populate one host profile field, this would lead to a conflict.',
+							'Cannot save item "%1$s", because it cannot populate host profile field "%2$s": it is already being populated by item "%3$s". Two items cannot populate one host profile field, this would lead to a conflict.',
 							$thisItemName,
 							$profileName,
 							$originalItemName
