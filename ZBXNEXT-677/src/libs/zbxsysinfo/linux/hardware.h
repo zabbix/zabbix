@@ -41,10 +41,10 @@
 #define HW_CPU_INFO_FILE	"/proc/cpuinfo"
 #define HW_CPU_ALL_CPUS		-1
 #define HW_CPU_SHOW_ALL		1
-#define HW_CPU_SHOW_MAXSPEED	2
+#define HW_CPU_SHOW_MAXFREQ	2
 #define HW_CPU_SHOW_VENDOR	3
 #define HW_CPU_SHOW_MODEL	4
-#define HW_CPU_SHOW_CURSPEED	5
+#define HW_CPU_SHOW_CURFREQ	5
 #define HW_CPU_SHOW_CORES	6
 
 #endif	/* ZABBIX_HARDWARE_H */
