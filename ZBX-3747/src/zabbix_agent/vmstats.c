@@ -85,26 +85,26 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 #ifdef _AIXVERSION_530
 	if (-1 == perfstat_partition_total(NULL, &lparstats, sizeof(lparstats), 1))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "perfstat_partition_total: %s", strerror(errno));
+		zabbix_log(LOG_LEVEL_DEBUG, "perfstat_partition_total: %s", zbx_strerror(errno));
 		return;
 	}
 #endif
 
 	if (-1 == perfstat_cpu_total(NULL, &cpustats, sizeof(cpustats), 1))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "perfstat_cpu_total: %s", strerror(errno));
+		zabbix_log(LOG_LEVEL_DEBUG, "perfstat_cpu_total: %s", zbx_strerror(errno));
 		return;
 	}
 
 	if (-1 == perfstat_memory_total(NULL, &memstats, sizeof(memstats), 1))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "perfstat_memory_total: %s", strerror(errno));
+		zabbix_log(LOG_LEVEL_DEBUG, "perfstat_memory_total: %s", zbx_strerror(errno));
 		return;
 	}
 
 	if (-1 == perfstat_disk_total(NULL, &diskstats, sizeof(diskstats), 1))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "perfstat_disk_total: %s", strerror(errno));
+		zabbix_log(LOG_LEVEL_DEBUG, "perfstat_disk_total: %s", zbx_strerror(errno));
 		return;
 	}
 

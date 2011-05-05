@@ -185,7 +185,7 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 
 	if (NULL == (file = fopen("/proc/stat", "r")))
 	{
-		zbx_error("cannot open [%s] [%s]", "/proc/stat", strerror(errno));
+		zbx_error("cannot open [%s]: %s", "/proc/stat", zbx_strerror(errno));
 		return;
 	}
 

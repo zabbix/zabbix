@@ -44,8 +44,8 @@ key_t	zbx_ftok(char *path, int id)
 
 	if (-1 == (ipc_key = ftok(path, id)))
 	{
-		zbx_error("Cannot create IPC key for path [%s] id [%c] error [%s]",
-			path, (char)id, strerror(errno));
+		zbx_error("cannot create IPC key for path [%s] id [%c]: %s",
+			path, (char)id, zbx_strerror(errno));
 	}
 
 	return ipc_key;
@@ -75,33 +75,33 @@ int	zbx_shmget(key_t key, size_t size)
 	if (-1 != (shm_id = shmget(key, size, IPC_CREAT | IPC_EXCL | 0600)))
 		return shm_id;
 
-	/* If shared memory block exists, try to remove and re-create it */
+	/* if shared memory block exists, try to remove and re-create it */
 	if (EEXIST == errno)
 	{
-		/* Get ID of existing memory */
+		/* get ID of existing memory */
 		if (-1 == (shm_id = shmget(key, 0 /* get reference */, 0600)))
 		{
-			zbx_error("Cannot attach to existing shared memory [%s]", strerror(errno));
+			zbx_error("cannot attach to existing shared memory: %s", zbx_strerror(errno));
 			ret = FAIL;
 		}
 
 		if (SUCCEED == ret && -1 == shmctl(shm_id, IPC_RMID, 0))
 		{
-			zbx_error("Cannot remove existing shared memory [%s]", strerror(errno));
+			zbx_error("cannot remove existing shared memory: %s", zbx_strerror(errno));
 			ret = FAIL;
 		}
 
 		if (SUCCEED == ret && -1 == (shm_id = shmget(key, size, IPC_CREAT | IPC_EXCL | 0600)))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "Cannot allocate shared memory of size " ZBX_FS_SIZE_T " [%s]",
-					(zbx_fs_size_t)size, strerror(errno));
+			zabbix_log(LOG_LEVEL_CRIT, "cannot allocate shared memory of size " ZBX_FS_SIZE_T ": %s",
+					(zbx_fs_size_t)size, zbx_strerror(errno));
 			ret = FAIL;
 		}
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Cannot allocate shared memory of size " ZBX_FS_SIZE_T " [%s]",
-				(zbx_fs_size_t)size, strerror(errno));
+		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate shared memory of size " ZBX_FS_SIZE_T ": %s",
+				(zbx_fs_size_t)size, zbx_strerror(errno));
 		ret = FAIL;
 	}
 

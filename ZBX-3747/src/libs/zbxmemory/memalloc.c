@@ -549,15 +549,13 @@ void	zbx_mem_create(zbx_mem_info_t **info, key_t shm_key, int lock_name, size_t 
 
 	if (-1 == (shm_id = zbx_shmget(shm_key, size)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate shared memory for %s",
-				descr);
+		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate shared memory for %s", descr);
 		exit(FAIL);
 	}
 
 	if ((void *)(-1) == (base = shmat(shm_id, NULL, 0)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot attach shared memory for %s (error: %s)",
-				descr, strerror(errno));
+		zabbix_log(LOG_LEVEL_CRIT, "cannot attach shared memory for %s: %s", descr, zbx_strerror(errno));
 		exit(FAIL);
 	}
 
@@ -644,8 +642,8 @@ void	zbx_mem_destroy(zbx_mem_info_t *info)
 
 	if (-1 == shmctl(info->shm_id, IPC_RMID, 0))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot remove shared memory for %s (error: %s)",
-				info->mem_descr, strerror(errno));
+		zabbix_log(LOG_LEVEL_WARNING, "cannot remove shared memory for %s: %s",
+				info->mem_descr, zbx_strerror(errno));
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);

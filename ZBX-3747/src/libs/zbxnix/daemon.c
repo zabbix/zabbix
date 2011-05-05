@@ -155,39 +155,32 @@ int	daemon_start(int allow_root)
 		pwd = getpwnam(user);
 		if (NULL == pwd)
 		{
-			zbx_error("User %s does not exist.",
-				user);
-			zbx_error("Cannot run as root !");
+			zbx_error("user %s does not exist", user);
+			zbx_error("Cannot run as root!");
 			exit(FAIL);
 		}
 		if(setgid(pwd->pw_gid) == -1)
 		{
-			zbx_error("Cannot setgid to %s [%s].",
-				user,
-				strerror(errno));
+			zbx_error("cannot setgid to %s: %s", user, zbx_strerror(errno));
 			exit(FAIL);
 		}
 #ifdef HAVE_FUNCTION_INITGROUPS
 		if(initgroups(user, pwd->pw_gid) == -1)
 		{
-			zbx_error("Cannot initgroups to %s [%s].",
-				user,
-				strerror(errno));
+			zbx_error("cannot initgroups to %s: %s", user, zbx_strerror(errno));
 			exit(FAIL);
 		}
 #endif /* HAVE_FUNCTION_INITGROUPS */
 		if(setuid(pwd->pw_uid) == -1)
 		{
-			zbx_error("Cannot setuid to %s [%s].",
-				user,
-				strerror(errno));
+			zbx_error("cannot setuid to %s: %s", user, zbx_strerror(errno));
 			exit(FAIL);
 		}
 
 #ifdef HAVE_FUNCTION_SETEUID
 		if( (setegid(pwd->pw_gid) ==-1) || (seteuid(pwd->pw_uid) == -1) )
 		{
-			zbx_error("Cannot setegid or seteuid to zabbix [%s].", strerror(errno));
+			zbx_error("cannot setegid or seteuid to zabbix: %s", zbx_strerror(errno));
 			exit(FAIL);
 		}
 #endif /* HAVE_FUNCTION_SETEUID */

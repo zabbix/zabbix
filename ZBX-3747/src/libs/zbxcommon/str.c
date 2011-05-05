@@ -118,7 +118,7 @@ void	__zbx_zbx_error(const char *fmt, ...)
 	f = fopen(ZBX_STDERR_FILE, "a+");
 #else
 	f = stderr;
-#endif /* ZBX_STDERR_FILE */
+#endif
 
 	va_start(args, fmt);
 
@@ -131,7 +131,7 @@ void	__zbx_zbx_error(const char *fmt, ...)
 
 #if defined(ZBX_STDERR_FILE)
 	zbx_fclose(f);
-#endif /* ZBX_STDERR_FILE */
+#endif
 }
 
 /******************************************************************************

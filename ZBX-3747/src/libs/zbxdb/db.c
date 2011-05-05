@@ -313,7 +313,7 @@ void	zbx_create_sqlite3_mutex(const char *dbname)
 {
 	if (ZBX_MUTEX_ERROR == php_sem_get(&sqlite_access, dbname))
 	{
-		zbx_error("Unable to create mutex for sqlite");
+		zbx_error("unable to create mutex for sqlite");
 		exit(FAIL);
 	}
 }
@@ -326,8 +326,8 @@ void	zbx_db_init(char *host, char *user, char *password, char *dbname, char *dbs
 
 	if (0 != stat(dbname, &buf))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot open database file \"%s\": %s", dbname, strerror(errno));
-		zabbix_log(LOG_LEVEL_WARNING, "Creating database ...");
+		zabbix_log(LOG_LEVEL_WARNING, "cannot open database file \"%s\": %s", dbname, zbx_strerror(errno));
+		zabbix_log(LOG_LEVEL_WARNING, "creating database ...");
 
 		if (SQLITE_OK != sqlite3_open(dbname, &conn))
 		{

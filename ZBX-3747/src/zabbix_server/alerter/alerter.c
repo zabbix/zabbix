@@ -98,17 +98,13 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 			zbx_snprintf(full_path, sizeof(full_path), "%s/%s",
 					CONFIG_ALERT_SCRIPTS_PATH, mediatype->exec_path);
 
-			zabbix_log(LOG_LEVEL_DEBUG, "Before executing [%s]", full_path);
+			zabbix_log(LOG_LEVEL_DEBUG, "before executing [%s]", full_path);
 
 			if (-1 == execl(full_path, mediatype->exec_path, alert->sendto,
 						alert->subject, alert->message, (char *)NULL))
 			{
-				zabbix_log(LOG_LEVEL_ERR, "Error executing [%s] [%s]",
-					full_path,
-					strerror(errno));
-				zabbix_syslog("Error executing [%s] [%s]",
-					full_path,
-					strerror(errno));
+				zabbix_log(LOG_LEVEL_ERR, "error executing [%s]: %s", full_path, zbx_strerror(errno));
+				zabbix_syslog("error executing [%s]: %s", full_path, zbx_strerror(errno));
 				exit(FAIL);
 			}
 			else
@@ -117,13 +113,11 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Unsupported media type [%d] for alert ID [" ZBX_FS_UI64 "]",
-			mediatype->type,
-			alert->alertid);
-		zabbix_syslog("Unsupported media type [%d] for alert ID [" ZBX_FS_UI64 "]",
-			mediatype->type,
-			alert->alertid);
-		zbx_snprintf(error, max_error_len, "Unsupported media type [%d]",
+		zabbix_log(LOG_LEVEL_ERR, "unsupported media type [%d] for alert ID [" ZBX_FS_UI64 "]",
+			mediatype->type, alert->alertid);
+		zabbix_syslog("unsupported media type [%d] for alert ID [" ZBX_FS_UI64 "]",
+			mediatype->type, alert->alertid);
+		zbx_snprintf(error, max_error_len, "unsupported media type [%d]",
 			mediatype->type);
 		res = FAIL;
 	}
