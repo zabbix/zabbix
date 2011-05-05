@@ -93,6 +93,9 @@ static int	print_packages(char *buffer, int size, zbx_vector_str_t *packages)
 
 	packages->values_num = 0;
 
+	if (0 != offset)
+		buffer[offset -= 2] = '\0';
+
 	return offset;
 }
 
@@ -163,6 +166,7 @@ next:
 			{
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "[%s] ", mng->name);
 				offset += print_packages(buffer + offset, sizeof(buffer) - offset, &packages);
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "\n");
 			}
 		}
 		zbx_free(buf);
@@ -176,7 +180,6 @@ next:
 	if (0 < offset)
 	{
 		ret = SYSINFO_RET_OK;
-		zbx_rtrim(buffer, ", ");
 		SET_TEXT_RESULT(result, zbx_strdup(NULL, buffer));
 	}
 
