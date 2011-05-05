@@ -7,7 +7,7 @@ New features:
  - [ZBXNEXT-672] advanced options for remote commands (Aly, asaveljevs, Sasha, Vedmak)
  - [ZBX-1357] updated French, Latvian, Polish, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
  - [ZBX-2756] renamed macro {TRIGGER.KEY<1-9>} to {ITEM.KEY<1-9>} (asaveljevs)
- - [ZBXNEXT-511] renamed item description to name, for description introduced new field (asaveljevs, Vedmak)
+ - [ZBXNEXT-511] renamed item description to name, for description introduced a new field (asaveljevs, Vedmak)
 
 Bug fixes:
  - [ZBX-3715] improve frontend message style & grammar (Richlv)
@@ -31,10 +31,10 @@ New features:
  - [ZBXNEXT-675] added new icons and a script to create sql file (Elvis,Richlv)
  - [ZBX-1357] Updated Latvian and Russian translations; thanks to Zabbix translators (Richlv)
  - [ZBXNEXT-696] Added support for {IPADDRESS}, {HOST.DNS} and {HOST.CONN} macros in trigger names (rudolfs)
- - [ZBX-3495] fixed interfaceid updated to null when link template (Vedmak)
  - [ZBXNEXT-676] merged host profile and extended host profile (Sasha, Vedmak)
 
 Bug fixes:
+ - [ZBX-3495] fixed interfaceid updated to null when linking a template (Vedmak)
  - [ZBX-3623] fixed processing of nanoseconds for history data (Sasha)
  - [ZBX-3634] improved zabbix map API methods (Aly)
  - [ZBX-3579] fixed trigger popup menu in status of triggers (Vedmak)
