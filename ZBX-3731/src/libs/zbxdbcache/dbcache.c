@@ -521,6 +521,9 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 			if (clock != trends[i].clock || value_type != trends[i].value_type)
 				continue;
 
+			if (0 == trend->disable_from || trend->disable_from > clock)
+				continue;
+
 			if (NULL != (trend = zbx_hashset_search(&cache->trends, &trends[i].itemid)))
 				trend->disable_from = clock + SEC_PER_HOUR;
 		}
