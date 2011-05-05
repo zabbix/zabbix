@@ -19,7 +19,6 @@
 
 #include "common.h"
 #include "zbxconf.h"
-#include "db.h"	/* HOST_HOST_LEN */
 
 #include "cfg.h"
 #include "log.h"
@@ -359,8 +358,12 @@ static void	set_defaults()
 		assert(*value);
 
 		CONFIG_HOSTNAME = zbx_strdup(CONFIG_HOSTNAME, *value);
-		if (strlen(CONFIG_HOSTNAME) > HOST_HOST_LEN)
-			CONFIG_HOSTNAME[HOST_HOST_LEN] = '\0';
+
+		/* If auto registration is used, our CONFIG_HOSTNAME will make it into the  */
+		/* server's database, where it is limited by HOST_HOST_LEN (currently, 64), */
+		/* so to make it work properly we need to truncate our hostname.            */
+		if (strlen(CONFIG_HOSTNAME) > 64)
+			CONFIG_HOSTNAME[64] = '\0';
 	}
 	free_result(&result);
 }
