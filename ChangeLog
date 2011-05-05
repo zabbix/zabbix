@@ -10,6 +10,7 @@ New features:
  - [ZBXNEXT-511] renamed item description to name, for description introduced a new field (asaveljevs, Vedmak)
 
 Bug fixes:
+ - [ZBX-3689] fixed error when adding a new second-level IT Service (Alexei)
  - [ZBX-3715] improve frontend message style & grammar (Richlv)
  - [ZBX-3767] improve import status messages by avoiding concatenating individual words; thanks to zalex (Richlv)
  - [ZBX-3704] added default condition trigger value = problem for new actions (Vedmak)
