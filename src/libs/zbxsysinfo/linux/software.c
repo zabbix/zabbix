@@ -60,8 +60,8 @@ int     SYSTEM_SW_OS(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	if (NULL != fgets(line, sizeof(line), f))
 	{
-		zbx_rtrim(line, " \r\n");
 		ret = SYSINFO_RET_OK;
+		zbx_rtrim(line, ZBX_WHITESPACE);
 		SET_STR_RESULT(result, zbx_strdup(NULL, line));
 	}
 	zbx_fclose(f);
@@ -69,7 +69,7 @@ int     SYSTEM_SW_OS(const char *cmd, const char *param, unsigned flags, AGENT_R
 	return ret;
 }
 
-int	dpkg_parser(char *line, char *package)
+static int	dpkg_parser(const char *line, char *package)
 {
 	char	tmp[20];
 
@@ -95,6 +95,16 @@ static int	print_packages(char *buffer, int size, zbx_vector_str_t *packages)
 
 	return offset;
 }
+
+static ZBX_PACKAGE_MANAGER	package_managers[] =
+/*	NAME		TEST_CMD					LIST_CMD			PARSER */
+{
+	{"dpkg",	"dpkg --version 2> /dev/null",			"dpkg --get-selections",	dpkg_parser},
+	{"pkgtools",	"[ -d /var/log/packages ] && echo true",	"ls /var/log/packages",		NULL},
+	{"rpm",		"rpm --version 2> /dev/null",			"rpm -qa",			NULL},
+	{"pacman",	"pacman --version 2> /dev/null",		"pacman -Q",			NULL},
+	{0}
+};
 
 int     SYSTEM_SW_PACKAGES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
@@ -125,10 +135,8 @@ int     SYSTEM_SW_PACKAGES(const char *cmd, const char *param, unsigned flags, A
 		mng = &package_managers[i];
 
 		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, NULL, 0, CONFIG_TIMEOUT) &&
-				0 < strlen(buf))	/* consider PMS present, if test_cmd outputs anything to strout */
+				'\0' != *buf)	/* consider PMS present, if test_cmd outputs anything to stdout */
 		{
-			zbx_free(buf);
-
 			if (SUCCEED != zbx_execute(mng->list_cmd, &buf, NULL, 0, CONFIG_TIMEOUT))
 				continue;
 
