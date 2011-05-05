@@ -83,10 +83,10 @@ class CMap extends CMapElement{
 
 // OutPut
 			'output'					=> API_OUTPUT_REFER,
-			'select_selements'			=> null,
-			'select_links'				=> null,
+			'selectSelements'			=> null,
+			'selectLinks'				=> null,
 			'countOutput'				=> null,
-			'expand_urls' 				=> null,
+			'expandUrls' 				=> null,
 			'preservekeys'				=> null,
 
 			'sortfield'					=> '',
@@ -203,10 +203,10 @@ class CMap extends CMapElement{
 					// if(isset($sysmap['label_format']) && ($sysmap['label_format'] == SYSMAP_LABEL_ADVANCED_OFF)){
 					// 	unset($sysmap['label_string_hostgroup'],$sysmap['label_string_host'],$sysmap['label_string_trigger'],$sysmap['label_string_map'],$sysmap['label_string_image']);
 					// }
-					if(!is_null($options['select_selements']) && !isset($result[$sysmap['sysmapid']]['selements'])){
+					if(!is_null($options['selectSelements']) && !isset($result[$sysmap['sysmapid']]['selements'])){
 						$result[$sysmap['sysmapid']]['selements'] = array();
 					}
-					if(!is_null($options['select_links']) && !isset($result[$sysmap['sysmapid']]['links'])){
+					if(!is_null($options['selectLinks']) && !isset($result[$sysmap['sysmapid']]['links'])){
 						$result[$sysmap['sysmapid']]['links'] = array();
 					}
 					if(!isset($result[$sysmap['sysmapid']]['urls'])){
@@ -374,7 +374,7 @@ COpt::memoryPick();
 		}
 
 // Adding Elements
-		if(!is_null($options['select_selements']) && str_in_array($options['select_selements'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectSelements']) && str_in_array($options['selectSelements'], $subselects_allowed_outputs)){
 			if(!isset($selements)){
 				$selements = array();
 
@@ -388,7 +388,7 @@ COpt::memoryPick();
 				}
 			}
 
-			if(!is_null($options['expand_urls'])){
+			if(!is_null($options['expandUrls'])){
 				$sql = 'SELECT sysmapid, name, url, elementtype'.
 						' FROM sysmap_url'.
 						' WHERE '.DBcondition('sysmapid', $sysmapids);
@@ -407,7 +407,7 @@ COpt::memoryPick();
 					' WHERE '.DBcondition('selementid', array_keys($selements));
 			$db_selement_urls = DBselect($sql);
 			while($selement_url = DBfetch($db_selement_urls)){
-				if(is_null($options['expand_urls']))
+				if(is_null($options['expandUrls']))
 					$selements[$selement_url['selementid']]['urls'][] = $selement_url;
 				else
 				$selements[$selement_url['selementid']]['urls'][] = $this->expandUrlMacro($selement_url, $selements[$selement_url['selementid']]);
@@ -425,7 +425,7 @@ COpt::memoryPick();
 		}
 
 // Adding Links
-		if(!is_null($options['select_links']) && str_in_array($options['select_links'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectLinks']) && str_in_array($options['selectLinks'], $subselects_allowed_outputs)){
 			$linkids = array();
 			$map_links = array();
 
@@ -532,8 +532,8 @@ COpt::memoryPick();
 				'output' => API_OUTPUT_EXTEND,
 				'editable' => true,
 				'preservekeys' => true,
-				'select_links' => API_OUTPUT_EXTEND,
-				'select_selements' => API_OUTPUT_EXTEND,
+				'selectLinks' => API_OUTPUT_EXTEND,
+				'selectSelements' => API_OUTPUT_EXTEND,
 			));
 		}
 		else{
@@ -787,7 +787,7 @@ COpt::memoryPick();
 		foreach($maps as $map){
 			$updateMaps[] = array(
 				'values' => $map,
-				'where' => array('sysmapid='.$map['sysmapid']),
+				'where' => array('sysmapid' => $map['sysmapid']),
 			);
 
 			$dbMap = $dbMaps[$map['sysmapid']];
@@ -799,7 +799,7 @@ COpt::memoryPick();
 				foreach($urlDiff['both'] as $unum => $updUrl){
 					$urlsToUpdate[] = array(
 						'values' => $updUrl,
-						'where' => array('name='.zbx_dbstr($updUrl['name']), 'sysmapid='.zbx_dbstr($map['sysmapid']))
+						'where' => array('name' => $updUrl['name'], 'sysmapid' => $map['sysmapid'])
 					);
 				}
 

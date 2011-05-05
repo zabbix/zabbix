@@ -349,7 +349,7 @@
 		$graphs = API::Graph()->get(array(
 			'graphids' => $graphid,
 			'output' => API_OUTPUT_EXTEND,
-			'select_graph_items' => API_OUTPUT_EXTEND
+			'selectGraphItems' => API_OUTPUT_EXTEND
 		));
 		$graph = reset($graphs);
 		$gitems = $graph['gitems'];

@@ -93,8 +93,8 @@ require_once('include/views/js/general.script.confirm.js.php');
 	$options = array(
 		'output' => API_OUTPUT_EXTEND,
 		'nodeids' => get_current_nodeid(),
-		'expand_urls' => true,
-		'select_selements' => API_OUTPUT_EXTEND,
+		'expandUrls' => true,
+		'selectSelements' => API_OUTPUT_EXTEND,
 		'preservekeys' => true,
 	);
 	$maps = API::Map()->get($options);

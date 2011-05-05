@@ -35,7 +35,7 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 	if ('\0' == *mode || 0 == strcmp(mode, "online"))	/* default parameter */
 		sysinfo_name = _SC_NPROCESSORS_ONLN;
-	else if(0 == strcmp(mode, "max"))
+	else if (0 == strcmp(mode, "max"))
 		sysinfo_name = _SC_NPROCESSORS_CONF;
 	else
 		return SYSINFO_RET_FAIL;

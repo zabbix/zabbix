@@ -270,11 +270,11 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_COOKIEFILE, "")) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_USERAGENT, httptest->agent)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_FOLLOWLOCATION, 1)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_FOLLOWLOCATION, 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_WRITEFUNCTION, WRITEFUNCTION2)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HEADERFUNCTION, HEADERFUNCTION2)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYPEER, 0)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYHOST, 0)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYPEER, 0L)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYHOST, 0L)) ||
 			/* The pointed data are not copied by the library. As a consequence, the data */
 			/* must be preserved by the calling application until the transfer finishes. */
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, httpstep.posts)))
@@ -319,10 +319,10 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 		if ('\0' != *httpstep.posts)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "WEBMonitor: use post [%s]", httpstep.posts);
-			curl_easy_setopt(easyhandle, CURLOPT_POST, 1);
+			curl_easy_setopt(easyhandle, CURLOPT_POST, 1L);
 		}
 		else
-			curl_easy_setopt(easyhandle, CURLOPT_POST, 0);
+			curl_easy_setopt(easyhandle, CURLOPT_POST, 0L);
 
 		if (HTTPTEST_AUTH_NONE != httptest->authentication)
 		{
@@ -360,8 +360,7 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 			zabbix_log(LOG_LEVEL_DEBUG, "WEBMonitor: go to URL [%s]", httpstep.url);
 
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_URL, httpstep.url)) ||
-					CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_TIMEOUT, httpstep.timeout)) ||
-					CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_CONNECTTIMEOUT, httpstep.timeout)))
+					CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_TIMEOUT, (long)httpstep.timeout)))
 			{
 				zabbix_log(LOG_LEVEL_ERR, "Web scenario step [%s:%s] error: could not set cURL option [%d]: %s",
 						httptest->name, httpstep.name, opt, curl_easy_strerror(err));

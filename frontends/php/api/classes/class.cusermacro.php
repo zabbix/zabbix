@@ -87,14 +87,14 @@ class CUserMacro extends CZBXAPI{
 // filter
 			'filter'					=> null,
 			'search'					=> null,
-			'searchByAny'			=> null,
+			'searchByAny'				=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 // OutPut
 			'output'					=> API_OUTPUT_REFER,
 			'selectGroups'				=> null,
 			'selectHosts'				=> null,
-			'select_templates'			=> null,
+			'selectTemplates'			=> null,
 			'countOutput'				=> null,
 			'preservekeys'				=> null,
 
@@ -145,7 +145,7 @@ class CUserMacro extends CZBXAPI{
 			$options['itemids'] = null;
 
 			$options['selectGroups'] = null;
-			$options['select_templates'] = null;
+			$options['selectTemplates'] = null;
 			$options['selectHosts'] = null;
 		}
 
@@ -334,7 +334,7 @@ class CUserMacro extends CZBXAPI{
 							$result[$macro['hostmacroid']]['groups'] = array();
 						}
 // Templates
-						if($options['select_templates'] && !isset($result[$macro['hostmacroid']]['templates'])){
+						if($options['selectTemplates'] && !isset($result[$macro['hostmacroid']]['templates'])){
 							$result[$macro['hostmacroid']]['templates'] = array();
 						}
 // Hosts
@@ -400,9 +400,9 @@ class CUserMacro extends CZBXAPI{
 		}
 
 // Adding Templates
-		if(!is_null($options['select_templates']) && str_in_array($options['select_templates'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectTemplates']) && str_in_array($options['selectTemplates'], $subselects_allowed_outputs)){
 			$obj_params = array(
-				'output' => $options['select_templates'],
+				'output' => $options['selectTemplates'],
 				'hostids' => $hostids,
 				'preservekeys' => 1
 			);
@@ -568,7 +568,7 @@ class CUserMacro extends CZBXAPI{
 			foreach($globalmacros as $mnum => $gmacro){
 				$data[] = array(
 					'values'=> array('value' => $gmacro['value']),
-					'where'=> array('macro='.zbx_dbstr($gmacro['macro']))
+					'where'=> array('macro' => $gmacro['macro'])
 				);
 			}
 
@@ -858,7 +858,7 @@ class CUserMacro extends CZBXAPI{
 				$hostmacroids[] = $db_macro['hostmacroid'];
 				$data_update[] = array(
 					'values' => array('value' => $updateMacros[$db_macro['macro']]['value']),
-					'where' => array('hostmacroid='.$db_macro['hostmacroid'])
+					'where' => array('hostmacroid' => $db_macro['hostmacroid'])
 				);
 			}
 

@@ -129,25 +129,20 @@ function DBhash($sql)
 /**
  * Returns number of records in database result.
  */
-function DBcount($sql,$limit = null,$offset = null)
-{
-	global $DB;
-	$cnt=0;
+function DBcount($sql, $limit = null, $offset = null){
+	$cnt = 0;
 
-	if(isset($limit) && isset($offset))
-	{
-		$result=DBselect($sql,$limit,$offset);
+	if(isset($limit) && isset($offset)){
+		$result = DBselect($sql, $limit, $offset);
 	}
-	else if(isset($limit))
-	{
-		$result=DBselect($sql,$limit);
+	else if(isset($limit)){
+		$result = DBselect($sql,$limit);
 	}
-	else
-	{
-		$result=DBselect($sql);
+	else{
+		$result = DBselect($sql);
 	}
-	while($row = DBfetch($result))
-	{
+
+	while(DBfetch($result)){
 		$cnt++;
 	}
 

@@ -23,33 +23,35 @@
 #include "sysinfo.h"
 
 #ifdef _AIX
-	typedef struct s_vmstat_data
-	{
-		/* public */
-		unsigned char	shared_enabled; 	/* partition runs in shared mode */
-		unsigned char	pool_util_authority;	/* pool utilization available */
-		unsigned char	aix52stats;
-		/* - general -- */
-		double		ent;
-		/* --- kthr --- */
-		double		kthr_r, kthr_b/*, kthr_p*/;
-		/* --- page --- */
-		double		fi, fo, pi, po, fr, sr;
-		/* -- faults -- */
-		double		in, sy, cs;
-		/* --- cpu ---- */
-		double		cpu_us, cpu_sy, cpu_id, cpu_wa, cpu_pc, cpu_ec, cpu_lbusy, cpu_app;
-		/* --- disk --- */
-		zbx_uint64_t	disk_bps;
-		double		disk_tps;
-		/* -- memory -- */
-		zbx_uint64_t	mem_avm, mem_fre;
-	} ZBX_VMSTAT_DATA;
 
-#	define VMSTAT_COLLECTOR_STARTED(collector)	(collector)
+typedef struct
+{
+	/* public */
+	unsigned char	shared_enabled; 	/* partition runs in shared mode */
+	unsigned char	pool_util_authority;	/* pool utilization available */
+	unsigned char	aix52stats;
+	/* - general -- */
+	double		ent;
+	/* --- kthr --- */
+	double		kthr_r, kthr_b/*, kthr_p*/;
+	/* --- page --- */
+	double		fi, fo, pi, po, fr, sr;
+	/* -- faults -- */
+	double		in, sy, cs;
+	/* --- cpu ---- */
+	double		cpu_us, cpu_sy, cpu_id, cpu_wa, cpu_pc, cpu_ec, cpu_lbusy, cpu_app;
+	/* --- disk --- */
+	zbx_uint64_t	disk_bps;
+	double		disk_tps;
+	/* -- memory -- */
+	zbx_uint64_t	mem_avm, mem_fre;
+}
+ZBX_VMSTAT_DATA;
+
+#define VMSTAT_COLLECTOR_STARTED(collector)	(collector)
 
 void	collect_vmstat_data(ZBX_VMSTAT_DATA *vmstat);
+
 #endif /* _AIX */
 
 #endif
-
