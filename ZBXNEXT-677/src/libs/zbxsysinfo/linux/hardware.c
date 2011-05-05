@@ -151,16 +151,22 @@ static int	get_dmi_info(char *buf, int bufsize, int flags)
 		if (1 == data[0])	/* system information */
 		{
 			if (0 != (flags & DMI_GET_VENDOR))
+			{
 				offset += get_dmi_string(buf + offset, bufsize - offset, data, data[4]);
+				flags &= ~DMI_GET_VENDOR;
+			}
 
 			if (0 != (flags & DMI_GET_MODEL))
+			{
 				offset += get_dmi_string(buf + offset, bufsize - offset, data, data[5]);
+				flags &= ~DMI_GET_MODEL;
+			}
 
 			if (0 != (flags & DMI_GET_SERIAL))
+			{
 				offset += get_dmi_string(buf + offset, bufsize - offset, data, data[7]);
-
-			if (0 != (flags & DMI_GET_TYPE))
-				flags = DMI_GET_TYPE;
+				flags &= ~DMI_GET_SERIAL;
+			}
 		}
 		else if (3 == data[0] && 0 != (flags & DMI_GET_TYPE))	/* chassis */
 		{
