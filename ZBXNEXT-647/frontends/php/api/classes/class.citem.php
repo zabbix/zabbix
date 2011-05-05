@@ -1383,7 +1383,7 @@ class CItem extends CItemGeneral{
 				if(!isset($possibleHostProfiles[$item['profile_link']])){
 					self::exception(
 						ZBX_API_ERROR_PARAMETERS,
-						_s('Item "%s" cannot populate hot profile field with number "%s" that does not exist.', $item['name'], $item['profile_link'])
+						_s('Item "%s" cannot populate host profile field with number "%s" that does not exist.', $item['name'], $item['profile_link'])
 					);
 				}
 
