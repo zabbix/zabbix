@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-05-05 09:26+0300\n"
-"PO-Revision-Date: 2011-04-22 09:44+0200\n"
+"PO-Revision-Date: 2011-05-01 15:27+0200\n"
 "Last-Translator: gde <gde@cosmogol.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -1223,8 +1223,9 @@ msgid "Cannot save discovery rule without checks."
 msgstr ""
 
 #: api/classes/class.chostinterface.php:485
+#, fuzzy
 msgid "Cannot switch host for interface"
-msgstr ""
+msgstr "Impossible de remplacer l'hôte par l'interface"
 
 #: include/locales/en_gb.inc.php:1539
 msgid "Cannot unblock users"
@@ -1851,8 +1852,11 @@ msgid "Custom severity"
 msgstr "Sévérité personnalisées"
 
 #: include/views/administration.general.triggerSeverity.edit.php:82
+#, fuzzy
 msgid "Custom severity names affect all locales and require manual translation!"
 msgstr ""
+"Le nom de la sévérité personnalisée affect toutes les locales et demande une "
+"traduction manuelle!"
 
 #: include/locales/en_gb.inc.php:1359
 msgid "Custom slides"
@@ -2006,16 +2010,19 @@ msgid "Date HW decommissioned"
 msgstr ""
 
 #: include/hosts.inc.php:76
+#, fuzzy
 msgid "Date HW installed"
-msgstr ""
+msgstr "Date HW installée"
 
 #: include/hosts.inc.php:77
+#, fuzzy
 msgid "Date HW maintenance expires"
-msgstr ""
+msgstr "Date HW de maintenance expire"
 
 #: include/hosts.inc.php:75
+#, fuzzy
 msgid "Date HW purchased"
-msgstr ""
+msgstr "Date HW acheté"
 
 #: include/locales/en_gb.inc.php:1196
 msgid "Day"
@@ -3520,8 +3527,9 @@ msgid "HTTPS"
 msgstr ""
 
 #: include/hosts.inc.php:61
+#, fuzzy
 msgid "HW architecture"
-msgstr ""
+msgstr "Architecture HW"
 
 #: include/hosts.inc.php:45
 msgid "Hardware"
@@ -3630,8 +3638,9 @@ msgid "Host \"%s\" has \"use_ipmi\" parameter checked, but has no \"ipmi_ip\" pa
 msgstr "Hôte \"%s\" a \"utiliser_ipmi\" comme paramètre coché, mais aucune \"ip_ipmi\" n'a été fourni! L'adresse IP de l'hôte est utilisé pour l'interface IPMI."
 
 #: include/views/configuration.sysmap.edit.php:86
+#, fuzzy
 msgid "Host Group label type"
-msgstr ""
+msgstr "Type de label de groupe d'hôte"
 
 #: include/actions.inc.php:52
 msgid "Host IP"
@@ -3639,7 +3648,7 @@ msgstr "IP hôte"
 
 #: include/forms.inc.php:3769
 msgid "Host Profile"
-msgstr ""
+msgstr "Profil de l'hôte"
 
 #: include/views/administration.script.list.php:46
 msgid "Host access"
@@ -3682,20 +3691,22 @@ msgid "Host key does not exist."
 msgstr "La clé de l'hôte n'existe pas."
 
 #: include/views/configuration.sysmap.edit.php:92
+#, fuzzy
 msgid "Host label type"
-msgstr ""
+msgstr "Type de label hôte"
 
 #: include/views/configuration.host.massupdate.php:40
 msgid "Host mass update"
-msgstr ""
+msgstr "mise à jour massive de l'hôte"
 
 #: include/actions.inc.php:61 include/views/configuration.host.edit.php:148
 msgid "Host name"
 msgstr "Nom d'hôte"
 
 #: include/hosts.inc.php:69
+#, fuzzy
 msgid "Host networks"
-msgstr ""
+msgstr "Réseaux de l'hôte"
 
 #: include/views/configuration.host.edit.php:520
 msgid "Host profile"
@@ -3706,8 +3717,9 @@ msgid "Host profiles"
 msgstr "Profils serveurs"
 
 #: include/hosts.inc.php:71
+#, fuzzy
 msgid "Host router"
-msgstr ""
+msgstr "Routeur de l'hôte"
 
 #: include/locales/en_gb.inc.php:1345
 msgid "Host screens"
@@ -3978,8 +3990,9 @@ msgid "Image is used in Zabbix map"
 msgstr "L'image est utilisée dans une carte ZABBIX"
 
 #: include/views/configuration.sysmap.edit.php:110
+#, fuzzy
 msgid "Image label type"
-msgstr ""
+msgstr "Type étiquette image"
 
 #: include/locales/en_gb.inc.php:1905
 msgid "Image size must be less than 1MB"
@@ -4007,7 +4020,7 @@ msgstr "Importer carte"
 
 #: hosts.php:294 screenconf.php:135 sysmaps.php:154 templates.php:264
 msgid "Import failed"
-msgstr ""
+msgstr "Échec import"
 
 #: include/locales/en_gb.inc.php:191
 msgid "Import file"
@@ -4197,7 +4210,7 @@ msgstr "Caractères incorrects utilisés pour le nom d'hôte \"%s\""
 #: api/classes/class.ctemplate.php:1400
 #, php-format
 msgid "Incorrect characters used for Hostname [ %s ]"
-msgstr ""
+msgstr "Caractères incorrects utilisés pour le nom d'hôte [ %s ]"
 
 #: include/locales/en_gb.inc.php:1910
 msgid "Incorrect characters used for Node name"
@@ -4206,12 +4219,12 @@ msgstr "Caractères incorrects utilisés pour le nom du noeud"
 #: api/classes/class.cproxy.php:359
 #, php-format
 msgid "Incorrect characters used for Proxy name \"%s\"."
-msgstr ""
+msgstr "Caractère incorrecte dans le nom du serveur mandataire \"%s\"."
 
 #: api/classes/class.ctemplate.php:1032
 #, php-format
 msgid "Incorrect characters used for Template name [ %1$s ]"
-msgstr ""
+msgstr "Caractères incorrects utilisés pour le modèle [ %1$s ]"
 
 #: include/actions.inc.php:716
 msgid "Incorrect condition type"
@@ -4227,11 +4240,11 @@ msgstr "Dépendance incorrecte"
 
 #: include/actions.inc.php:679
 msgid "Incorrect discovery check."
-msgstr ""
+msgstr "Vérification découverte incorrecte."
 
 #: include/actions.inc.php:691 include/actions.inc.php:697
 msgid "Incorrect discovery status."
-msgstr ""
+msgstr "Statut découverte incorrect."
 
 #: include/locales/en_gb.inc.php:432
 msgid "Incorrect expression"
@@ -4243,8 +4256,9 @@ msgid "Incorrect field \"%1$s\" name or value in where statement for table \"%2$
 msgstr ""
 
 #: api/classes/class.cmap.php:553
+#, fuzzy
 msgid "Incorrect fields for sysmap"
-msgstr ""
+msgstr "Champs incorrect pour sysmap"
 
 #: api/classes/class.ctrigger.php:1200
 msgid "Incorrect fields for trigger"
