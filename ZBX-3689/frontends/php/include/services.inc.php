@@ -32,9 +32,9 @@
 
 		$serviceid=get_dbid("services","serviceid");
 
-		$result=DBexecute('INSERT INTO services (serviceid,name,status,triggerid,algorithm,showsla,goodsla,sortorder)'.
-							' VALUES ('.$serviceid.','.zbx_dbstr($name).',0 ,'.$triggerid.' ,'.zbx_dbstr($algorithm).
-								' ,'.$showsla.','.zbx_dbstr($goodsla).','.$sortorder.')');
+		$result = DBexecute('INSERT INTO services (serviceid,name,status,triggerid,algorithm,showsla,goodsla,sortorder)'.
+							' VALUES ('.$serviceid.','.zbx_dbstr($name).',0,'.$triggerid.','.zbx_dbstr($algorithm).
+								','.$showsla.','.zbx_dbstr($goodsla).','.$sortorder.')');
 		if(!$result) return FALSE;
 
 		remove_service_links($serviceid); //removes all links with current serviceid
