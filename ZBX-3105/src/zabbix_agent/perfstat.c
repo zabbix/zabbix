@@ -127,24 +127,22 @@ PERF_COUNTER_DATA	*add_perf_counter(const char *name, const char *counterpath, i
 
 void	add_perf_counters_from_config(const char **lines)
 {
-	char	name[MAX_STRING_LEN], counterpath[PDH_MAX_COUNTER_PATH], interval[MAX_STRING_LEN],
-		*line, **pline; /* a pointer to line */
+	char	name[MAX_STRING_LEN], counterpath[PDH_MAX_COUNTER_PATH], interval[8], **pline;
 	LPTSTR	wcounterPath;
 	int	ret = FAIL;
 
-	pline = lines;
-	while (NULL != (line = *pline++))
+	for (pline = lines; NULL != *pline; pline++)
 	{
-		if (3 < num_param(line))
+		if (3 < num_param(*pline))
 			goto lbl_syntax_error;
 
-		if (0 != get_param(line, 1, name, sizeof(name)))
+		if (0 != get_param(*pline, 1, name, sizeof(name)))
 			goto lbl_syntax_error;
 
-		if (0 != get_param(line, 2, counterpath, sizeof(counterpath)))
+		if (0 != get_param(*pline, 2, counterpath, sizeof(counterpath)))
 			goto lbl_syntax_error;
 
-		if (0 != get_param(line, 3, interval, sizeof(interval)))
+		if (0 != get_param(*pline, 3, interval, sizeof(interval)))
 			goto lbl_syntax_error;
 
 		wcounterPath = zbx_acp_to_unicode(counterpath);
@@ -158,9 +156,8 @@ void	add_perf_counters_from_config(const char **lines)
 			goto lbl_syntax_error;
 
 		continue;
-
 lbl_syntax_error:
-		zabbix_log(LOG_LEVEL_WARNING, "PerfCounter \"%s\" FAILED: Invalid format.", line);
+		zabbix_log(LOG_LEVEL_WARNING, "PerfCounter \"%s\" FAILED: invalid format", *pline);
 	}
 }
 
