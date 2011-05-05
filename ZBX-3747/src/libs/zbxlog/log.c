@@ -277,7 +277,7 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 	}	/* LOG_TYPE_FILE */
 
 	va_start(args, fmt);
-	zbx_vsnprintf(message, sizeof(message)-1, fmt, args);
+	zbx_vsnprintf(message, sizeof(message), fmt, args);
 	va_end(args);
 
 	if (LOG_TYPE_SYSLOG == log_type)

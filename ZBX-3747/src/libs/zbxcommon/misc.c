@@ -256,7 +256,7 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...)
 	va_list args;
 
 	va_start(args, fmt);
-	zbx_vsnprintf(title, MAX_STRING_LEN - 1, fmt, args);
+	zbx_vsnprintf(title, sizeof(title), fmt, args);
 	va_end(args);
 
 	setproctitle(title);
