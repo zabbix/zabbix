@@ -283,10 +283,8 @@ static ZBX_DC_TREND	*DCget_trend(zbx_uint64_t itemid)
 
 	memset(&trend, 0, sizeof(ZBX_DC_TREND));
 	trend.itemid = itemid;
-	ptr = (ZBX_DC_TREND *)zbx_hashset_insert(&cache->trends, &trend,
-			sizeof(ZBX_DC_TREND));
 
-	return ptr;
+	return (ZBX_DC_TREND *)zbx_hashset_insert(&cache->trends, &trend, sizeof(ZBX_DC_TREND));
 }
 
 /******************************************************************************
@@ -313,7 +311,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 	history_value_t	value_min, value_avg, value_max;
 	unsigned char	value_type;
 	zbx_uint64_t	*ids = NULL, itemid;
-	int		ids_alloc = ZBX_SYNC_MAX, ids_num = 0, trends_to = *trends_num;
+	int		ids_alloc, ids_num = 0, trends_to = *trends_num;
 	ZBX_DC_TREND	*trend = NULL;
 	const char	*table_name;
 
@@ -323,14 +321,20 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 	clock = trends[0].clock;
 	value_type = trends[0].value_type;
 
-	switch (value_type) {
-	case ITEM_VALUE_TYPE_FLOAT: table_name = "trends"; break;
-	case ITEM_VALUE_TYPE_UINT64: table_name = "trends_uint"; break;
-	default:
-		zbx_error("Unsupported value type for trends");
-		assert(0 == 1);
+	switch (value_type)
+	{
+		case ITEM_VALUE_TYPE_FLOAT:
+			table_name = "trends";
+			break;
+		case ITEM_VALUE_TYPE_UINT64:
+			table_name = "trends_uint";
+			break;
+		default:
+			zbx_error("Unsupported value type for trends");
+			assert(0);
 	}
 
+	ids_alloc = MIN(ZBX_SYNC_MAX, *trends_num);
 	ids = zbx_malloc(ids, ids_alloc * sizeof(zbx_uint64_t));
 
 	for (i = 0; i < *trends_num; i++)
@@ -340,7 +344,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 		if (clock != trend->clock || value_type != trend->value_type)
 			continue;
 
-		if (trend->disable_from != 0 && trend->disable_from <= clock)
+		if (0 != trend->disable_from)
 			continue;
 
 		uint64_array_add(&ids, &ids_alloc, &ids_num, trend->itemid, 64);
@@ -359,8 +363,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 				"select distinct itemid"
 				" from %s"
 				" where clock>=%d and",
-				table_name,
-				clock);
+				table_name, clock);
 
 		DBadd_condition_alloc(&sql, &sql_allocated, &sql_offset, "itemid", ids, ids_num);
 
@@ -369,7 +372,6 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 		while (NULL != (row = DBfetch(result)))
 		{
 			ZBX_STR2UINT64(itemid, row[0]);
-
 			uint64_array_remove(ids, &ids_num, &itemid, 1);
 		}
 		DBfree_result(result);
@@ -382,34 +384,14 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 			{
 				trend = &trends[i];
 
-				if (itemid == trend->itemid && clock == trend->clock &&
-						value_type == trend->value_type)
-					break;
-			}
-
-			if (i == trends_to)
-			{
-				THIS_SHOULD_NEVER_HAPPEN;
-				continue;
-			}
-
-			trend->disable_from = clock;
-
-			/* if 'trends' is not a primary trends buffer */
-			if (0 != update_cache)
-			{
-				LOCK_TRENDS;
-
-				/* we update it too */
-				if (NULL != (trend = zbx_hashset_search(&cache->trends, &itemid)))
+				if (itemid == trend->itemid && clock == trend->clock && value_type == trend->value_type)
+				{
 					trend->disable_from = clock;
-
-				UNLOCK_TRENDS;
+					break;
+				}
 			}
 		}
 	}
-
-	ids_num = 0;
 
 	for (i = 0; i < trends_to; i++)
 	{
@@ -418,7 +400,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 		if (clock != trend->clock || value_type != trend->value_type)
 			continue;
 
-		if (trend->disable_from != 0 && trend->disable_from <= clock)
+		if (0 != trend->disable_from && trend->disable_from <= clock)
 			continue;
 
 		uint64_array_add(&ids, &ids_alloc, &ids_num, trend->itemid, 64);
@@ -431,8 +413,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 				"select itemid,num,value_min,value_avg,value_max"
 				" from %s"
 				" where clock=%d and",
-				table_name,
-				clock);
+				table_name, clock);
 
 		DBadd_condition_alloc(&sql, &sql_allocated, &sql_offset, "itemid", ids, ids_num);
 
@@ -451,8 +432,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 			{
 				trend = &trends[i];
 
-				if (itemid == trend->itemid && clock == trend->clock &&
-						value_type == trend->value_type)
+				if (itemid == trend->itemid && clock == trend->clock && value_type == trend->value_type)
 					break;
 			}
 
@@ -528,6 +508,30 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 	}
 
 	zbx_free(ids);
+
+	/* if 'trends' is not a primary trends buffer */
+	if (0 != update_cache)
+	{
+		/* we update it too */
+		LOCK_TRENDS;
+
+		for (i = 0; i < trends_to; i++)
+		{
+			if (0 == trends[i].itemid)
+				continue;
+
+			if (clock != trends[i].clock || value_type != trends[i].value_type)
+				continue;
+
+			if (0 == trend[i].disable_from || trend[i].disable_from > clock)
+				continue;
+
+			if (NULL != (trend = zbx_hashset_search(&cache->trends, &trends[i].itemid)))
+				trend->disable_from = clock + SEC_PER_HOUR;
+		}
+
+		UNLOCK_TRENDS;
+	}
 
 	sql_offset = 0;
 
@@ -706,7 +710,7 @@ static void	DCadd_trend(ZBX_DC_HISTORY *history, ZBX_DC_TREND **trends, int *tre
 	ZBX_DC_TREND	*trend = NULL;
 	int		hour;
 
-	hour = history->clock - history->clock % 3600;
+	hour = history->clock - history->clock % SEC_PER_HOUR;
 
 	trend = DCget_trend(history->itemid);
 
