@@ -97,7 +97,7 @@ static int	print_packages(char *buffer, int size, zbx_vector_str_t *packages)
 	packages->values_num = 0;
 
 	if (0 != offset)
-		buffer[offset -= 2] = '\0';
+		offset -= zbx_rtrim(buffer + MAX(0, offset - 2), ", ");
 
 	return offset;
 }
