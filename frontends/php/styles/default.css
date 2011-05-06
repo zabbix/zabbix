@@ -474,10 +474,6 @@ table.right_table tr td.deny select { color: #CC0000; width: 320px;}
 
 table.graph{ width: 100%; text-align: center; }
 
-/**************** MAP ****************/
-
-table.map{ text-align: left; border-width:0; padding-top: 1px; padding-bottom: 5px;}
-
 /************* MENU ************/
 
 table.menu{ height: 2.8em; }

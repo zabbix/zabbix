@@ -105,28 +105,7 @@
 			<tr>
 				<td><label for="iconid_off"><?php echo _('Icon (default)'); ?></label></td>
 				<td>
-					<select class="input" name="iconid_off" id="iconid_off">
-						<option value="1"><?php echo _('Hub'); ?></option>
-						<option value="2"><?php echo _('Hub (small)'); ?></option>
-						<option value="3"><?php echo _('Network'); ?></option>
-						<option value="4"><?php echo _('Network (default)'); ?></option>
-						<option value="5"><?php echo _('Notebook'); ?></option>
-						<option value="6"><?php echo _('Notebook (small)'); ?></option>
-						<option value="7"><?php echo _('Phone'); ?></option>
-						<option value="8"><?php echo _('Phone (default)'); ?></option>
-						<option value="9"><?php echo _('Printer'); ?></option>
-						<option value="10"><?php echo _('Printer (small)'); ?></option>
-						<option value="11"><?php echo _('Router'); ?></option>
-						<option value="12"><?php echo _('Router (small)'); ?></option>
-						<option value="13"><?php echo _('Satellite'); ?></option>
-						<option value="14"><?php echo _('Satellite (default)'); ?></option>
-						<option value="15"><?php echo _('Server'); ?></option>
-						<option value="16"><?php echo _('Server (default)'); ?></option>
-						<option value="17"><?php echo _('UPS'); ?></option>
-						<option value="18"><?php echo _('UPS (default)'); ?></option>
-						<option value="19"><?php echo _('Workstation'); ?></option>
-						<option value="20"><?php echo _('Workstation (default)'); ?></option>
-					</select>
+					<select class="input" name="iconid_off" id="iconid_off"></select>
 				</td>
 			</tr>
 			<tr>
@@ -136,81 +115,19 @@
 			<tr id="iconProblemRow">
 				<td><label for="iconid_on"><?php echo _('Icon (problem)'); ?></label></td>
 				<td>
-					<select class="input" name="iconid_on" id="iconid_on">
-						<option value="1"><?php echo _('Hub'); ?></option>
-						<option value="2"><?php echo _('Hub (small)'); ?></option>
-						<option value="3"><?php echo _('Network'); ?></option>
-						<option value="4"><?php echo _('Network (default)'); ?></option>
-						<option value="5"><?php echo _('Notebook'); ?></option>
-						<option value="6"><?php echo _('Notebook (small)'); ?></option>
-						<option value="7"><?php echo _('Phone'); ?></option>
-						<option value="8"><?php echo _('Phone (default)'); ?></option>
-						<option value="9"><?php echo _('Printer'); ?></option>
-						<option value="10"><?php echo _('Printer (small)'); ?></option>
-						<option value="11"><?php echo _('Router'); ?></option>
-						<option value="12"><?php echo _('Router (small)'); ?></option>
-						<option value="13"><?php echo _('Satellite'); ?></option>
-						<option value="14"><?php echo _('Satellite (default)'); ?></option>
-						<option value="15"><?php echo _('Server'); ?></option>
-						<option value="16"><?php echo _('Server (default)'); ?></option>
-						<option value="17"><?php echo _('UPS'); ?></option>
-						<option value="18"><?php echo _('UPS (default)'); ?></option>
-						<option value="19"><?php echo _('Workstation'); ?></option>
-						<option value="20"><?php echo _('Workstation (default)'); ?></option>
-					</select>
+					<select class="input" name="iconid_on" id="iconid_on"></select>
 				</td>
 			</tr>
 			<tr id="iconMainetnanceRow">
 				<td><label for="iconid_maintenance"><?php echo _('Icon (maintenance)'); ?></label></td>
 				<td>
-					<select class="input" name="iconid_maintenance" id="iconid_maintenance">
-						<option value="1"><?php echo _('Hub'); ?></option>
-						<option value="2"><?php echo _('Hub (small)'); ?></option>
-						<option value="3"><?php echo _('Network'); ?></option>
-						<option value="4"><?php echo _('Network (default)'); ?></option>
-						<option value="5"><?php echo _('Notebook'); ?></option>
-						<option value="6"><?php echo _('Notebook (small)'); ?></option>
-						<option value="7"><?php echo _('Phone'); ?></option>
-						<option value="8"><?php echo _('Phone (default)'); ?></option>
-						<option value="9"><?php echo _('Printer'); ?></option>
-						<option value="10"><?php echo _('Printer (small)'); ?></option>
-						<option value="11"><?php echo _('Router'); ?></option>
-						<option value="12"><?php echo _('Router (small)'); ?></option>
-						<option value="13"><?php echo _('Satellite'); ?></option>
-						<option value="14"><?php echo _('Satellite (default)'); ?></option>
-						<option value="15"><?php echo _('Server'); ?></option>
-						<option value="16"><?php echo _('Server (default)'); ?></option>
-						<option value="17"><?php echo _('UPS'); ?></option>
-						<option value="18"><?php echo _('UPS (default)'); ?></option>
-						<option value="19"><?php echo _('Workstation'); ?></option>
-						<option value="20"><?php echo _('Workstation (default)'); ?></option>
-					</select>
+					<select class="input" name="iconid_maintenance" id="iconid_maintenance"></select>
 				</td>
 			</tr>
 			<tr id="iconDisabledRow">
 				<td><label for="iconid_disabled"><?php echo _('Icon (disabled)'); ?></label></td>
 				<td>
 					<select class="input" name="iconid_disabled" id="iconid_disabled">
-						<option value="1"><?php echo _('Hub'); ?></option>
-						<option value="2"><?php echo _('Hub (small)'); ?></option>
-						<option value="3"><?php echo _('Network'); ?></option>
-						<option value="4"><?php echo _('Network (default)'); ?></option>
-						<option value="5"><?php echo _('Notebook'); ?></option>
-						<option value="6"><?php echo _('Notebook (small)'); ?></option>
-						<option value="7"><?php echo _('Phone'); ?></option>
-						<option value="8"><?php echo _('Phone (default)'); ?></option>
-						<option value="9"><?php echo _('Printer'); ?></option>
-						<option value="10"><?php echo _('Printer (small)'); ?></option>
-						<option value="11"><?php echo _('Router'); ?></option>
-						<option value="12"><?php echo _('Router (small)'); ?></option>
-						<option value="13"><?php echo _('Satellite'); ?></option>
-						<option value="14"><?php echo _('Satellite (default)'); ?></option>
-						<option value="15"><?php echo _('Server'); ?></option>
-						<option value="16"><?php echo _('Server (default)'); ?></option>
-						<option value="17"><?php echo _('UPS'); ?></option>
-						<option value="18"><?php echo _('UPS (default)'); ?></option>
-						<option value="19"><?php echo _('Workstation'); ?></option>
-						<option value="20"><?php echo _('Workstation (default)'); ?></option>
 					</select>
 				</td>
 			</tr>
