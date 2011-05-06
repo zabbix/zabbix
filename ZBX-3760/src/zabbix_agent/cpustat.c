@@ -227,7 +227,7 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 		if (0 == cpu_num)
 		{
 			if (-1 == pstat_getdynamic(&psd, sizeof(psd), 1, 0))
-				return;
+				continue;
 
 			counter[ZBX_CPU_STATE_USER] = (zbx_uint64_t)psd.psd_cpu_time[CP_USER];
 			counter[ZBX_CPU_STATE_NICE] = (zbx_uint64_t)psd.psd_cpu_time[CP_NICE];
@@ -237,7 +237,7 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 		else
 		{
 			if (-1 == pstat_getprocessor(&psp, sizeof(psp), 1, cpu_num - 1))
-				return;
+				continue;
 
 			counter[ZBX_CPU_STATE_USER] = (zbx_uint64_t)psp.psp_cpu_time[CP_USER];
 			counter[ZBX_CPU_STATE_NICE] = (zbx_uint64_t)psp.psp_cpu_time[CP_NICE];
@@ -278,16 +278,10 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 	for (cpu_num = 1; cpu_num <= pcpus->count; cpu_num++)
 	{
 		if (NULL == (k = kstat_lookup(kc, "cpu_stat", cpu_num - 1, NULL)))
-		{
-			kstat_close(kc);
-			return;
-		}
+			continue;
 
 		if (-1 == kstat_read(kc, k, NULL))
-		{
-			kstat_close(kc);
-			return;
-		}
+			continue;
 
 		cpu = (cpu_stat_t *)k->ks_data;
 
