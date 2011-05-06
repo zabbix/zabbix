@@ -58,8 +58,8 @@ class CFormTable extends CForm{
 		if(!is_string($value)){
 			return $this->error('Incorrect value for setAlign ['.$value.']');
 		}
-		$this->setAttribute('name',$value);
-		$this->setAttribute('id',$value);
+		$this->attr('name', $value);
+		$this->attr('id', zbx_formatDomId($value));
 	return true;
 	}
 
@@ -117,7 +117,7 @@ class CFormTable extends CForm{
 		}
 
 		if(!is_null($id))
-			$item1->setAttribute('id', $id);
+			$item1->attr('id', zbx_formatDomId($id));
 
 		array_push($this->center_items, $item1);
 

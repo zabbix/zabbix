@@ -42,7 +42,7 @@ include_once('include/page_header.php');
 		'copy_mode'	=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0'),NULL),
 
 		'type'=>			array(T_ZBX_INT, O_OPT,  NULL, 		IN('0,1'),	'isset({save})'),
-		'description'=>		array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,'isset({save})'),
+		'description'=>		array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,'isset({save})', _('Name')),
 		'expression'=>		array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,'isset({save})'),
 		'priority'=>		array(T_ZBX_INT, O_OPT,  NULL,  IN('0,1,2,3,4,5'),'isset({save})'),
 		'comments'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,'isset({save})'),
@@ -252,7 +252,7 @@ include_once('include/page_header.php');
 		}
 
 		$go_result = DBend($go_result);
-		show_messages($go_result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
+		show_messages($go_result, _('Status updated'), _('Cannot update status'));
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['g_triggerid'])){
 		$go_result = API::TriggerPrototype()->delete($_REQUEST['g_triggerid']);
@@ -296,7 +296,7 @@ include_once('include/page_header.php');
 				'trigger_prototypes.php?showdisabled='.($showdisabled?0:1).'&parent_discoveryid='.$_REQUEST['parent_discoveryid']);
 
 
-		$triggers_wdgt->addHeader(array(S_TRIGGER_PROTOTYPES_OF_BIG.SPACE, new CSpan($discovery_rule['description'], 'gold')));
+		$triggers_wdgt->addHeader(array(S_TRIGGER_PROTOTYPES_OF_BIG.SPACE, new CSpan($discovery_rule['name'], 'gold')));
 		$triggers_wdgt->addHeader($numrows, array('[ ',$tr_link,' ]'));
 
 		$triggers_wdgt->addItem(get_header_host_table($_REQUEST['hostid']));

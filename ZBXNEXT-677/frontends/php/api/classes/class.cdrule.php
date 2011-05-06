@@ -33,14 +33,13 @@ class CDRule extends CZBXAPI{
 * @param array $options
 * @return array
 */
-	public function get($options=array()){
+	public function get(array $options=array()){
 
-		$result = array();
 		$nodeCheck = false;
 		$user_type = self::$userData['type'];
 		$result = array();
 
-		$sort_columns = array('druleid','name'); // allowed columns for sorting
+		$sort_columns = array('druleid', 'name'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
 
 		$sql_parts = array(
@@ -306,8 +305,9 @@ COpt::memoryPick();
 		if(!is_null($options['selectDChecks'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'dhostids' => $dhostids,
-				'preservekeys' => 1
+				'druleids' => $druleids,
+				'nopermissions' => true,
+				'preservekeys' => true
 			);
 
 			if(is_array($options['selectDChecks']) || str_in_array($options['selectDChecks'], $subselects_allowed_outputs)){
@@ -315,19 +315,19 @@ COpt::memoryPick();
 				$dchecks = API::DCheck()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($dchecks, 'name');
+
+				$count = array();
 				foreach($dchecks as $dcheckid => $dcheck){
-					unset($dchecks[$dcheckid]['dhosts']);
-					$count = array();
-					foreach($dcheck['dhosts'] as $dnum => $dhost){
-						if(!is_null($options['limitSelects'])){
-							if(!isset($count[$dhost['dhostid']])) $count[$dhost['dhostid']] = 0;
-							$count[$dhost['dhostid']]++;
+					unset($dchecks[$dcheckid]['drules']);
 
-							if($count[$dhost['dhostid']] > $options['limitSelects']) continue;
-						}
+					if(!is_null($options['limitSelects'])){
+						if(!isset($count[$dcheck['druleid']])) $count[$dcheck['druleid']] = 0;
+						$count[$dcheck['druleid']]++;
 
-						$result[$dhost['dhostid']]['dchecks'][] = &$dchecks[$dcheckid];
+						if($count[$dcheck['druleid']] > $options['limitSelects']) continue;
 					}
+
+					$result[$dcheck['druleid']]['dchecks'][] = &$dchecks[$dcheckid];
 				}
 			}
 			else if(API_OUTPUT_COUNT == $options['selectDChecks']){
@@ -336,11 +336,11 @@ COpt::memoryPick();
 
 				$dchecks = API::DCheck()->get($obj_params);
 				$dchecks = zbx_toHash($dchecks, 'druleid');
-				foreach($result as $dhostid => $dhost){
+				foreach($result as $druleid => $drule){
 					if(isset($dchecks[$druleid]))
-						$result[$dhostid]['dchecks'] = $dchecks[$druleid]['rowscount'];
+						$result[$druleid]['dchecks'] = $dchecks[$druleid]['rowscount'];
 					else
-						$result[$dhostid]['dchecks'] = 0;
+						$result[$druleid]['dchecks'] = 0;
 				}
 			}
 		}
@@ -399,7 +399,7 @@ COpt::memoryPick();
 	}
 
 
-	public function exists($object){
+	public function exists(array $object){
 		$options = array(
 			'filter' => array(),
 			'output' => API_OUTPUT_SHORTEN,
@@ -419,186 +419,358 @@ COpt::memoryPick();
 	return !empty($objs);
 	}
 
+	public function checkInput(array &$dRules){
+		$dRules = zbx_toArray($dRules);
+
+		if(empty($dRules)){
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input.'));
+		}
+
+		if(self::$userData['type'] >= USER_TYPE_ZABBIX_ADMIN){
+			if(!count(get_accessible_nodes_by_user(self::$userData, PERM_READ_WRITE, PERM_RES_IDS_ARRAY)))
+				self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+		}
+
+		$proxies = array();
+		foreach($dRules as $dRule){
+			if(!isset($dRule['iprange'])){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('IP range cannot be empty.'));
+			}
+			else if(!validate_ip_range($dRule['iprange'])){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect IP range "%s".', $dRule['iprange']));
+			}
+
+			if(isset($dRule['delay']) && $dRule['delay'] < 0){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect delay.'));
+			}
+
+			if(isset($dRule['status']) && (($dRule['status'] != DRULE_STATUS_DISABLED) && ($dRule['status'] != DRULE_STATUS_ACTIVE))){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect status.'));
+			}
+
+			if(empty($dRule['dchecks'])){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot save discovery rule without checks.'));
+			}
+
+			$this->validateDChecks($dRule['dchecks']);
+
+			if(isset($dRule['proxy_hostid']) && $dRule['proxy_hostid']){
+				$proxies[] = $dRule['proxy_hostid'];
+			}
+		}
+
+		if(!empty($proxies)){
+			$proxiesDB = API::proxy()->get(array(
+				'proxyids' => $proxies,
+				'output' => API_OUTPUT_SHORTEN,
+				'preservekeys' => true,
+			));
+			foreach($proxies as $proxy){
+				if(!isset($proxiesDB[$proxy])){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect proxyid.'));
+				}
+			}
+		}
+	}
+
+	protected function validateDChecks(array &$dChecks){
+		$uniq = 0;
+
+		foreach($dChecks as $dcnum => $dCheck){
+			if(isset($dCheck['uniq']) && ($dCheck['uniq'] == 1)) $uniq++;
+
+			if(isset($dCheck['ports']) && !validate_port_list($dCheck['ports'])){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect port range.'));
+			}
+
+			switch($dCheck['type']){
+				case SVC_AGENT:
+					if(!isset($dCheck['key_'])){
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect key.'));
+					}
+
+					$itemKey = new CItemKey($dCheck['key_']);
+					if(!$itemKey->isValid())
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect key: %s', $itemKey->getError()));
+					break;
+				case SVC_SNMPv1:
+				case SVC_SNMPv2c:
+					if(!isset($dCheck['snmp_community']) || zbx_empty($dCheck['snmp_community']))
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect SNMP Community.'));
+				case SVC_SNMPv3:
+					if(!isset($dCheck['key_']) || zbx_empty($dCheck['key_']))
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect SNMP OID.'));
+					break;
+			}
+
+
+			if(!isset($dCheck['snmpv3_securitylevel'])){
+				$dCheck['snmpv3_securitylevel'] = ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV;
+			}
+
+			switch($dCheck['snmpv3_securitylevel']){
+				case ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV:
+					$dChecks[$dcnum]['snmpv3_authpassphrase'] = $dChecks[$dcnum]['snmpv3_privpassphrase'] = '';
+					break;
+				case ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV:
+					$dChecks[$dcnum]['snmpv3_privpassphrase'] = '';
+					break;
+			}
+
+			$this->validateDuplicateChecks($dChecks);
+		}
+
+		if($uniq > 1){
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one check can be unique.'));
+		}
+
+
+	}
+
+	protected function validateRequiredFields($dRules, $on){
+		if($on == 'update'){
+			foreach($dRules as $dRule){
+				if(!isset($dRule['druleid']) || zbx_empty($dRule['druleid'])){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Field "druleid" is required.'));
+				}
+			}
+		}
+		else{
+			foreach($dRules as $dRule){
+				if(!isset($dRule['name']) || zbx_empty($dRule['name'])){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Field "name" is required.'));
+				}
+			}
+		}
+	}
+
+	protected function validateDuplicateChecks(array $dChecks){
+		$defaultValues = DB::getDefaults('dchecks');
+		foreach($dChecks as &$dCheck){
+			$dCheck += $defaultValues;
+			unset($dCheck['uniq']);
+		}
+		unset($dCheck);
+
+		while($current = array_pop($dChecks)){
+			foreach($dChecks as $dCheck){
+				$equal = true;
+				foreach($dCheck as $fieldName => $dCheckField){
+					if(isset($current[$fieldName]) && (strcmp($dCheckField, $current[$fieldName]) !== 0)){
+						$equal = false;
+						break;
+					}
+				}
+				if($equal) self::exception(ZBX_API_ERROR_PARAMETERS, _('Checks should be unique.'));
+			}
+		}
+	}
+
 /**
- * Create new drules
+ * Create new discovery rules
  *
- * @param array $drules
- * @return boolean
+ * @param array(
+ *  name => string,
+ *  proxy_hostid => int,
+ *  iprange => string,
+ *  delay => string,
+ *  status => int,
+ *  dchecks => array(
+ *  	array(
+ *  		type => int,
+ *  		ports => string,
+ *  		key_ => string,
+ *  		snmp_community => string,
+ *  		snmpv3_securityname => string,
+ *  		snmpv3_securitylevel => int,
+ *  		snmpv3_authpassphrase => string,
+ *  		snmpv3_privpassphrase => string,
+ *  		uniq => int,
+ *  	), ...
+ *  )
+ * ) $drules
+ * @return array
  */
-	public function create($drules){
+	public function create(array $dRules){
 
+		$this->checkInput($dRules);
+		$this->validateRequiredFields($dRules, __FUNCTION__);
 
+		$druleids = DB::insert('drules', $dRules);
+
+		$dChecksCreate = array();
+		foreach($dRules as $dNum => $dRule){
+			foreach($dRule['dchecks'] as $dCheck){
+				$dCheck['druleid'] = $druleids[$dNum];
+				$dChecksCreate[] = $dCheck;
+			}
+		}
+
+		DB::insert('dchecks', $dChecksCreate);
+
+		return array('druleids' => $druleids);
 	}
 
 /**
  * Update existing drules
  *
- * @param array $drules
- * @return boolean
+ * @param array(
+ * 	druleid => int,
+ *  name => string,
+ *  proxy_hostid => int,
+ *  iprange => string,
+ *  delay => string,
+ *  status => int,
+ *  dchecks => array(
+ *  	array(
+ * 			dcheckid => int,
+ *  		type => int,
+ *  		ports => string,
+ *  		key_ => string,
+ *  		snmp_community => string,
+ *  		snmpv3_securityname => string,
+ *  		snmpv3_securitylevel => int,
+ *  		snmpv3_authpassphrase => string,
+ *  		snmpv3_privpassphrase => string,
+ *  		uniq => int,
+ *  	), ...
+ *  )
+ * ) $drules
+ * @return array
  */
-	public function update($drules){
+	public function update(array $dRules){
+		$this->checkInput($dRules);
+		$this->validateRequiredFields($dRules, __FUNCTION__);
+
+		$dRuleids = zbx_objectValues($dRules, 'druleid');
+
+		$dRulesDb = API::DRule()->get(array(
+			'druleids' => $dRuleids,
+			'output' => API_OUTPUT_EXTEND,
+			'selectDChecks' => API_OUTPUT_EXTEND,
+			'editable' => true,
+			'preservekeys' => true,
+		));
+
+		$defaultValues = DB::getDefaults('dchecks');
+
+		$dRulesUpdate = $dCheckidsDelete = $dChecksCreate = array();
+		foreach($dRules as $dRule){
+
+			$dRulesUpdate[] = array(
+				'values' => $dRule,
+				'where' => array('druleid' => $dRule['druleid'])
+			);
 
 
+			$dbChecks = $dRulesDb[$dRule['druleid']]['dchecks'];
+			$newChecks = $dRule['dchecks'];
+			foreach($newChecks as &$dCheck){
+				$dCheck += $defaultValues;
+			}
+			unset($dCheck);
+
+			foreach($newChecks as $newnum => $newdCheck){
+				foreach($dbChecks as $exnum => $exdCheck){
+					$equal = true;
+					foreach($exdCheck as $fieldName => $dCheckField){
+						if(isset($newdCheck[$fieldName]) && (strcmp($dCheckField, $newdCheck[$fieldName]) !== 0)){
+							$equal = false;
+							break;
+						}
+					}
+					if($equal){
+						unset($dRule['dchecks'][$newnum]);
+						unset($dbChecks[$exnum]);
+					}
+				}
+			}
+
+			foreach($dRule['dchecks'] as $dCheck){
+				$dCheck['druleid'] = $dRule['druleid'];
+				$dChecksCreate[] = $dCheck;
+			}
+
+			$dCheckidsDelete = array_merge($dCheckidsDelete, zbx_objectValues($dbChecks, 'dcheckid'));
+		}
+
+		DB::update('drules', $dRulesUpdate);
+
+		if(!empty($dCheckidsDelete)){
+			$this->deleteChecks($dCheckidsDelete);
+		}
+
+		DB::insert('dchecks', $dChecksCreate);
+
+		return array('druleids' => $dRuleids);
 	}
 
 /**
  * Delete drules
  *
- * @param array $drules
- * @param array $drules['druleids']
+ * @param array $druleids
  * @return boolean
  */
-	public function delete($druleids){
+	public function delete(array $druleids){
 		$druleids = zbx_toArray($druleids);
 
-// permissions
-			$options = array(
-				'druleids' => $druleids,
-				'editable' => 1,
-				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1
-			);
-			$del_drules = $this->get($options);
-			foreach($drules as $gnum => $drule){
-				if(!isset($del_drules[$drule['druleid']]))
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-			}
-//----
-//
-// Conditions
-			$sql = 'SELECT DISTINCT actionid, name '.
-					' FROM conditions '.
-					' WHERE conditiontype='.CONDITION_TYPE_DRULE.
-						' AND value='.zbx_dbstr($druleids);
-			$db_actions = DBselect($sql);
-			while($db_action = DBfetch($db_actions)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Discovery rule is used in Action condition ['.$db_action['name'].'].');
-			}
+		if(self::$userData['type'] >= USER_TYPE_ZABBIX_ADMIN){
+			if(!count(get_accessible_nodes_by_user(self::$userData, PERM_READ_WRITE, PERM_RES_IDS_ARRAY)))
+				self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+		}
 
+		$actionids = array();
+		$sql = 'SELECT DISTINCT actionid '.
+				' FROM conditions '.
+				' WHERE conditiontype='.CONDITION_TYPE_DRULE.
+				' AND '.DBcondition('value', $druleids);
+		$db_actions = DBselect($sql);
+		while($db_action = DBfetch($db_actions)){
+			$actionids[] = $db_action['actionid'];
+		}
 
-			$dhostids = array();
-			$sql = 'select dhostid '.
-					' from dhosts'.
-					' where '.DBcondition('druleid',$druleids).
-						' and '.DBin_node('dhostid');
-			$db_dhosts = DBselect($sql);
-			while($db_dhost = DBfetch($db_dhosts))
-				$dhostids[$db_dhost['dhostid']] = $db_dhost['dhostid'];
+		if(!empty($actionids)){
+			DB::update('actions', array(
+				'values' => array('status' => ACTION_STATUS_DISABLED),
+				'where' => array('actionid' => $actionids),
+			));
 
-			DBexecute('DELETE FROM dservices WHERE '.DBcondition('dhostid',$dhostids));
-			DBexecute('DELETE FROM dhosts WHERE '.DBcondition('druleid',$druleids));
-			DBexecute('DELETE FROM dchecks WHERE '.DBcondition('druleid',$druleids));
-			DBexecute('DELETE FROM drules WHERE '.DBcondition('druleid',$druleids));
+			DB::delete('conditions', array(
+				'conditiontype' => CONDITION_TYPE_DRULE,
+				'value' => $druleids
+			));
+		}
 
-			return array('druleids' => $druleids);
+		DB::delete('drules', array('druleid' => $druleids));
+
+		return array('druleids' => $druleids);
 	}
 
-// DEPRECATED
-	public function addChecks($checks){
+	protected function deleteChecks(array $checkids){
+		$actionids = array();
+		// conditions
+		$sql = 'SELECT DISTINCT actionid '.
+				' FROM conditions '.
+				' WHERE conditiontype='.CONDITION_TYPE_DCHECK.
+				' AND '.DBcondition('value', $checkids);
+		$db_actions = DBselect($sql);
+		while($db_action = DBfetch($db_actions))
+			$actionids[] = $db_action['actionid'];
 
-		$error = 'Unknown Zabbix internal error';
-		$result = false;
-		$tpl_drule = false;
+		// disabling actions with deleted conditions
+		if(!empty($actionids)){
+			DBexecute('UPDATE actions '.
+					' SET status='.ACTION_STATUS_DISABLED.
+					' WHERE '.DBcondition('actionid', $actionids));
 
-		$druleid = $checks['druleid'];
-		$checks_tmp = $checks['checks'];
-		$checks = array();
-		$checkids = array();
-
-		foreach($checks_tmp as $check){
-
-			$drule_db_fields = array(
-				'checkid'	=> null,
-				'color'		=> '000000',
-				'drawtype'	=> 0,
-				'sortorder'	=> 0,
-				'yaxisside'	=> 1,
-				'calc_fnc'	=> 2,
-				'type'		=> 0,
-				'periods_cnt'	=> 5
-			);
-
-			if(!check_db_fields($drule_db_fields, $check))
-				throw new APIException(ZBX_API_ERROR_INTERNAL, 'Wrong fields for check [ '.$check['checkid'].' ]');
-
-			$checks[$check['checkid']] = $check;
-			$checkids[$check['checkid']] = $check['checkid'];
+			// delete action conditions
+			DBexecute('DELETE FROM conditions '.
+					' WHERE conditiontype='.CONDITION_TYPE_DCHECK.
+					' AND '.DBcondition('value', $checkids));
 		}
 
-// check if drule is templated drule, then checks cannot be added
-		$drules = $this->getget(array('druleids' => $druleid,  'output' => API_OUTPUT_EXTEND));
-		$drule = reset($drules);
-
-		if($drule['templateid'] != 0)
-			throw new APIException(ZBX_API_ERROR_INTERNAL, 'Cannot edit templated drule : '.$drule['name']);
-
-		// check if drule belongs to template, if so, only checks from same template can be added
-		$tmp_hosts = get_hosts_by_druleid($druleid);
-		$host = DBfetch($tmp_hosts); // if drule belongs to template, only one host is possible
-
-		if($host["status"] == HOST_STATUS_TEMPLATE ){
-			$sql = 'SELECT DISTINCT count(i.hostid) as count
-					FROM checks i
-					WHERE i.hostid<>'.$host['hostid'].
-						' AND '.DBcondition('i.checkid', $checkids);
-
-			$host_count = DBfetch(DBselect($sql));
-			if($host_count['count'])
-				throw new APIException(ZBX_API_ERROR_INTERNAL, 'You must use checks only from host : '.$host['host'].' for template drule : '.$drule['name']);
-
-			$tpl_drule = true;
-		}
-
-		$result = $this->addchecks_rec($druleid, $checks, $tpl_drule);
-
-		return $result;
+		DB::delete('dchecks', array('dcheckid' => $checkids));
 	}
 
-// DEPRECATED
-	public function deleteChecks($check_list, $force=false){
-		$result = true;
-
-		$druleid = $check_list['druleid'];
-		$checks = $check_list['checks'];
-
-		if(!$force){
-			// check if drule is templated drule, then checks cannot be deleted
-			$drule = $this->get(array('druleids' => $druleid,  'output' => API_OUTPUT_EXTEND));
-			$drule = reset($drule);
-
-			if($drule['templateid'] != 0)
-				throw new APIException(ZBX_API_ERROR_INTERNAL, 'Cannot edit templated drule : '.$drule['name']);
-
-		}
-
-		$chd_drules = get_drules_by_templateid($druleid);
-		while($chd_drule = DBfetch($chd_drules)){
-			$check_list['druleid'] = $chd_drule['druleid'];
-			$result = $this->deletechecks($check_list, true);
-			if(!$result)
-				throw new APIException(ZBX_API_ERROR_INTERNAL, 'Cannot delete check');
-		}
-
-
-		$sql = 'SELECT curr.checkid
-				FROM drules_checks gi, checks curr, checks src
-				WHERE gi.druleid='.$druleid.
-					' AND gi.checkid=curr.checkid
-					AND curr.key_=src.key_
-					AND '.DBcondition('src.checkid', $checks);
-		$db_checks = DBselect($sql);
-		$gchecks = array();
-		while($curr_check = DBfetch($db_checks)){
-			$gchecks[$curr_check['checkid']] = $curr_check['checkid'];
-		}
-
-		$sql = 'DELETE
-				FROM drules_checks
-				WHERE druleid='.$druleid.
-					' AND '.DBcondition('checkid', $gchecks);
-		$result = DBselect($sql);
-
-		return $result;
-	}
 }
 ?>

@@ -38,5 +38,13 @@ class testPageDashboard extends CWebTest
 		$this->ok('Web monitoring');
 		$this->ok('Updated:');
 	}
+
+// Check that no real host or template names displayed
+	public function testPageDashboard_NoHostNames()
+	{
+		$this->login('dashboard.php');
+		$this->assertTitle('Dashboard');
+		$this->checkNoRealHostnames();
+	}
 }
 ?>

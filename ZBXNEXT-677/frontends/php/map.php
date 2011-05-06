@@ -50,8 +50,8 @@ set_time_limit(10);
 
 	$options = array(
 		'sysmapids' => $_REQUEST['sysmapid'],
-		'select_selements' => API_OUTPUT_EXTEND,
-		'select_links' => API_OUTPUT_EXTEND,
+		'selectSelements' => API_OUTPUT_EXTEND,
+		'selectLinks' => API_OUTPUT_EXTEND,
 		'output' => API_OUTPUT_EXTEND
 	);
 	$maps = API::Map()->get($options);
@@ -155,7 +155,7 @@ set_time_limit(10);
 	drawMapLinkLabels($im, $map, $map_info);
 
 	if(!isset($_REQUEST['noselements']) && ($map['markelements'] == 1)){
-		drawMapSelemetsMarks($im, $map, $map_info);
+		drawMapSelementsMarks($im, $map, $map_info);
 	}
 //--
 

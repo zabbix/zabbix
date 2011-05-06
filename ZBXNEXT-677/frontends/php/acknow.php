@@ -70,7 +70,7 @@ include_once('include/page_header.php');
 	if(!$bulk){
 		$options = array(
 			'output' => API_OUTPUT_EXTEND,
-			'select_triggers' => API_OUTPUT_EXTEND,
+			'selectTriggers' => API_OUTPUT_EXTEND,
 			'eventids' => $_REQUEST['eventid']
 		);
 		$events = API::Event()->get($options);
@@ -185,7 +185,7 @@ include_once('include/page_header.php');
 	}
 
 
-	$frmMsg->addRow(S_MESSAGE, new CTextArea('message', '', 80, 6));
+	$frmMsg->addRow(_('Message'), new CTextArea('message', '', 80, 6));
 	$frmMsg->addItemToBottomRow(new CSubmit('saveandreturn', $btn_txt2));
 	$bulk ? '' : $frmMsg->addItemToBottomRow(new CSubmit('save', $btn_txt));
 	$frmMsg->addItemToBottomRow(new CButtonCancel('&backurl='.$_REQUEST['backurl']));

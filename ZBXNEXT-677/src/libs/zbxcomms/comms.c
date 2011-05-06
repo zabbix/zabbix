@@ -21,37 +21,6 @@
 #include "comms.h"
 #include "log.h"
 
-#if defined(_WINDOWS)
-#	if defined(__INT_MAX__) && __INT_MAX__ == 2147483647
-		typedef int ssize_t;
-#	else
-		typedef long ssize_t;
-#	endif /* __INT_MAX__ */
-
-#	define ZBX_TCP_WRITE(s, b, bl)	((ssize_t)send((s), (b), (bl), 0))
-#	define ZBX_TCP_READ(s, b, bl)	((ssize_t)recv((s), (b), (bl), 0))
-
-#	define ZBX_TCP_ERROR		SOCKET_ERROR
-#	define ZBX_SOCK_ERROR		INVALID_SOCKET
-
-#	define zbx_sock_close(s)	if (ZBX_SOCK_ERROR != (s)) closesocket(s)
-#	define zbx_sock_last_error()	WSAGetLastError()
-
-#	define ZBX_SOCK_ERR_TIMEDOUT	WSAETIMEDOUT
-#else
-#	define ZBX_TCP_WRITE(s, b, bl)	((ssize_t)write((s), (b), (bl)))
-#	define ZBX_TCP_READ(s, b, bl)	((ssize_t)read((s), (b), (bl)))
-
-#	define ZBX_TCP_ERROR		-1
-#	define ZBX_SOCK_ERROR		-1
-
-#	define zbx_sock_close(s)	if (ZBX_SOCK_ERROR != (s)) close(s)
-#	define zbx_sock_last_error()	errno
-
-#	define ZBX_SOCK_ERR_TIMEDOUT	EINTR
-
-#endif /* _WINDOWS */
-
 #if defined(HAVE_IPV6)
 #	define ZBX_SOCKADDR struct sockaddr_storage
 #else
@@ -757,19 +726,14 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 						ip ? ip : "-", port, zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
 			}
 
-#if defined(IPV6_V6ONLY)
-#ifdef _WINDOWS
+#if defined(IPPROTO_IPV6) && defined(IPV6_V6ONLY)
 			if (PF_INET6 == current_ai->ai_family &&
 				ZBX_TCP_ERROR == setsockopt(s->sockets[s->num_socks], IPPROTO_IPV6, IPV6_V6ONLY, (void *)&on, sizeof(on)))
-#else
-			if (PF_INET6 == current_ai->ai_family &&
-				ZBX_TCP_ERROR == setsockopt(s->sockets[s->num_socks], SOL_IPV6, IPV6_V6ONLY, (void *)&on, sizeof(on)))
-#endif
 			{
 				zbx_set_tcp_strerror("setsockopt() with IPV6_V6ONLY for [[%s]:%s] failed with error %d: %s",
 						ip ? ip : "-", port, zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
 			}
-#endif	/* IPV6_V6ONLY */
+#endif
 
 			if (ZBX_TCP_ERROR == bind(s->sockets[s->num_socks], current_ai->ai_addr, current_ai->ai_addrlen))
 			{

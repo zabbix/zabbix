@@ -52,7 +52,7 @@ include_once('include/page_header.php');
 
 // OUTER DATA
 	check_fields($fields);
-	validate_sort_and_sortorder('host', ZBX_SORT_UP);
+	validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go', 'none');
 
@@ -117,7 +117,7 @@ include_once('include/page_header.php');
 ?>
 <?php
 	$hosts_wdgt = new CWidget();
-	$hosts_wdgt->addPageHeader(S_CONFIGURATION_OF_HOSTS);
+	$hosts_wdgt->addPageHeader(_('HOSTS'));
 
 
 	$frmForm = new CForm();
@@ -160,7 +160,7 @@ include_once('include/page_header.php');
 // table HOSTS
 	$table = new CTableInfo(S_NO_HOSTS_DEFINED);
 	$table->setHeader(array(
-		make_sorting_header(S_NAME, 'host'),
+		make_sorting_header(S_NAME, 'name'),
 		S_APPLICATIONS,
 		S_ITEMS,
 		S_TRIGGERS,
@@ -170,7 +170,7 @@ include_once('include/page_header.php');
 	));
 
 // get Hosts
-	$sortfield = getPageSortField('host');
+	$sortfield = getPageSortField('name');
 	$sortorder = getPageSortOrder();
 
 	if($pageFilter->groupsSelected){
@@ -178,7 +178,7 @@ include_once('include/page_header.php');
 			'with_monitored_items' => 1,
 			'output' => API_OUTPUT_SHORTEN,
 			'search' => array(
-				'host' => (empty($_REQUEST['filter_host']) ? null : $_REQUEST['filter_host']),
+				'name' => (empty($_REQUEST['filter_host']) ? null : $_REQUEST['filter_host']),
 				'ip' => (empty($_REQUEST['filter_ip']) ? null : $_REQUEST['filter_ip']),
 				'dns' => (empty($_REQUEST['filter_dns']) ? null : $_REQUEST['filter_dns']),
 			),
@@ -207,9 +207,9 @@ include_once('include/page_header.php');
 		'output' => API_OUTPUT_EXTEND,
 		'selectParentTemplates' => array('hostid', 'host'),
 		'selectItems' => API_OUTPUT_COUNT,
-		'select_triggers' => API_OUTPUT_COUNT,
-		'select_graphs' => API_OUTPUT_COUNT,
-		'select_applications' => API_OUTPUT_COUNT,
+		'selectTriggers' => API_OUTPUT_COUNT,
+		'selectGraphs' => API_OUTPUT_COUNT,
+		'selectApplications' => API_OUTPUT_COUNT,
 		'selectScreens' => API_OUTPUT_COUNT,
 		'nopermissions' => 1
 	);
@@ -238,7 +238,7 @@ include_once('include/page_header.php');
 			$description[] = $proxy['host'] . ':';
 		}
 
-		$description[] = new CLink($host['host'], 'hosts.php?form=update&hostid='.$host['hostid'].url_param('groupid'));
+		$description[] = new CLink($host['name'], 'hosts.php?form=update&hostid='.$host['hostid'].url_param('groupid'));
 
 
 		switch($host['available']){

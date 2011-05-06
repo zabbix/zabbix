@@ -256,7 +256,7 @@
 				if ($result){
 					$host=get_host_by_hostid($row['hostid']);
 					$item_new = get_item_by_itemid($row['itemid']);
-					add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, $row['itemid'], $host['host'].':'.$row['description'], 'items', $row, $item_new);
+					add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, $row['itemid'], $host['host'].':'.$row['name'], 'items', $row, $item_new);
 				}
 			}
 		}
@@ -323,7 +323,7 @@
 			'output' => API_OUTPUT_EXTEND,
 			'inherited' => false,
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
-			'select_applications' => API_OUTPUT_REFER,
+			'selectApplications' => API_OUTPUT_REFER,
 		);
 		$srcItems = API::Item()->get($options);
 
@@ -349,7 +349,7 @@
 				}
 
 				if(!isset($item['interfaceid'])){
-					error(_s('Item [%1$s:%2$s] cannot find interface on host [%3$s]', $item['description'], $item['key_'], $host['host']));
+					error(_s('Item [%1$s:%2$s] cannot find interface on host [%3$s]', $item['name'], $item['key_'], $host['host']));
 					return false;
 				}
 			}
@@ -451,11 +451,11 @@
 	}
 
 	function get_item_by_itemid_limited($itemid){
-		$sql = 'SELECT itemid,interfaceid,description,key_,hostid,delay,history,status,type,'.
+		$sql = 'SELECT itemid,interfaceid,name,key_,hostid,delay,history,status,type,'.
 					'snmp_community,snmp_oid,value_type,data_type,trapper_hosts,port,units,multiplier,delta,'.
 					'snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,'.
 					'formula,trends,logtimefmt,valuemapid,delay_flex,params,ipmi_sensor,templateid,'.
-					'authtype,username,password,publickey,privatekey,flags, filter '.
+					'authtype,username,password,publickey,privatekey,flags, filter, description '.
 			' FROM items '.
 			' WHERE itemid='.$itemid;
 		$row = DBfetch(DBselect($sql));
@@ -518,44 +518,14 @@
 	return false;
 	}
 
-	/*
-	 * Function: get_n_param
-	 *
-	 * Description:
-	 *     Return key parameter by index
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments: indexes between 1-x
-	 *
-	 */
-	function get_n_param($key, $num){
-		$param="";
-
-        $num--;
-		if(preg_match('/^'.ZBX_PREG_ITEM_KEY_FORMAT.'$/', $key, $arr)){
-			if(!isset($arr[ZBX_KEY_PARAM_ID])){
-				$arr[ZBX_KEY_PARAM_ID] = false;
-			}
-
-			$params = zbx_get_params($arr[ZBX_KEY_PARAM_ID]);
-
-			if(isset($params[$num])){
-				$param = $params[$num];
-			}
-		}
-
-		return $param;
-	}
 
 	function expand_item_key_by_data($item){
 		$key =& $item['key_'];
 		$macStack = array();
 
-		$macroses = array('{HOSTNAME}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}');
+		$macros = array('{HOSTNAME}', '{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.HOST}', '{HOST.NAME}');
 
-		foreach($macroses as $macro){
+		foreach($macros as $macro){
 			$pos = 0;
 			while($pos = zbx_strpos($key, $macro, $pos)){
 				$pos++;
@@ -566,8 +536,8 @@
 		if(!empty($macStack)){
 			$dbItems = API::Item()->get(array(
 				'itemids' => $item['itemid'],
-				'selectInterfaces' => API_OUTPUT_EXTEND,
-				'selectHosts' => array('host'),
+				'selectInterfaces' => array('ip', 'dns', 'useip'),
+				'selectHosts' => array('host', 'name'),
 				'output' => API_OUTPUT_REFER
 			));
 			$dbItem = reset($dbItems);
@@ -577,18 +547,27 @@
 
 			foreach($macStack as $macro){
 				switch($macro){
-					case '{HOSTNAME}':
-						$key = str_replace('{HOSTNAME}', $host['host'], $key);
-					break;
-					case '{IPADDRESS}':
+					case '{HOST.NAME}':
+						$key = str_replace('{HOST.NAME}', $host['name'], $key);
+						break;
+					case '{HOSTNAME}':	/* deprecated */
+						$key = str_replace('{HOSTNAME}', $host['name'], $key);
+						break;
+					case '{HOST.HOST}':
+						$key = str_replace('{HOST.HOST}', $host['host'], $key);
+						break;
+					case '{HOST.IP}':
+						$key = str_replace('{HOST.IP}', $interface['ip'], $key);
+						break;
+					case '{IPADDRESS}':	/* deprecated */
 						$key = str_replace('{IPADDRESS}', $interface['ip'], $key);
-					break;
+						break;
 					case '{HOST.DNS}':
 						$key = str_replace('{HOST.DNS}', $interface['dns'], $key);
-					break;
+						break;
 					case '{HOST.CONN}':
 						$key = str_replace('{HOST.CONN}', $interface['useip'] ? $interface['ip'] : $interface['dns'], $key);
-					break;
+						break;
 				}
 			}
 		}
@@ -598,23 +577,38 @@
 	return $item['key_'];
 	}
 
-	function item_description($item){
-		$descr = $item['description'];
-		$key = expand_item_key_by_data($item);
+	/**
+	 * Expand macros inside key name and return it
+	 * Example:
+	 *   key: 'test.key[a, b, "{HOSTNAME}"]'
+	 *   name: 'Test item $1, $2, $3'
+	 *   result: 'Test item a, b, Zabbix-server'
+	 *
+	 * @author Konstantin Buravcov
+	 * @see ZBX-3503
+	 * @param array $item
+	 * @return string
+	 */
+	function itemName($item){
+		$name = $item['name'];
+		// if item name contains $1..$9 macros, we need to expand them
+		if(preg_match('/\$[1-9]/', $name)){
+			$key = expand_item_key_by_data($item);
 
-        for($i=9;$i>0;$i--){
-            $descr = str_replace('$'.$i,get_n_param($key,$i),$descr);
-        }
+			// parsing key to get the parameters out of it
+			$ItemKey = new CItemKey($key);
 
-		if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $descr, $arr)){
-			$macros = API::UserMacro()->getMacros(array('macros' => $arr[1], 'itemid' => $item['itemid']));
+			if($ItemKey->isValid()){
+				$keyParameters = $ItemKey->getParameters();
+				// according to zabbix docs we must replace $1 to $9 macros with item key parameters
+				for($paramNo = 9; $paramNo > 0; $paramNo--){
+					$replaceTo = isset($keyParameters[$paramNo - 1]) ? $keyParameters[$paramNo - 1] : '';
+					$name = str_replace('$'.$paramNo, $replaceTo, $name);
+				}
+			}
+		}
 
-			$search = array_keys($macros);
-			$values = array_values($macros);
-			$descr = str_replace($search, $values, $descr);
-        }
-
-	return $descr;
+		return $name;
 	}
 
 	function get_realhost_by_itemid($itemid){
@@ -658,8 +652,8 @@
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
 
 // COpt::profiling_start('prepare_data');
-		$result = DBselect('SELECT DISTINCT h.hostid, h.host,i.itemid, i.key_, i.value_type, i.lastvalue, i.units, i.lastclock,'.
-				' i.description, t.priority, i.valuemapid, t.value as tr_value, t.triggerid '.
+		$result = DBselect('SELECT DISTINCT h.hostid, h.name as hostname,i.itemid, i.key_, i.value_type, i.lastvalue, i.units, i.lastclock, '.
+				' i.name, t.priority, i.valuemapid, t.value as tr_value, t.triggerid '.
 			' FROM hosts h, items i '.
 				' LEFT JOIN functions f on f.itemid=i.itemid '.
 				' LEFT JOIN triggers t on t.triggerid=f.triggerid and t.status='.TRIGGER_STATUS_ENABLED.
@@ -668,36 +662,36 @@
 				' AND h.hostid=i.hostid '.
 				' AND i.status='.ITEM_STATUS_ACTIVE.
 				' AND '.DBcondition('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
-			' ORDER BY i.description,i.itemid');
+			' ORDER BY i.name,i.itemid');
 
 		unset($items);
 		unset($hosts);
 // get rid of warnings about $triggers undefined
 		$items = array();
 		while($row = DBfetch($result)){
-			$descr = item_description($row);
-			$row['host'] = get_node_name_by_elid($row['hostid'], null, ': ').$row['host'];
-			$hosts[zbx_strtolower($row['host'])] = $row['host'];
+			$descr = itemName($row);
+			$row['hostname'] = get_node_name_by_elid($row['hostid'], null, ': ').$row['hostname'];
+			$hosts[zbx_strtolower($row['hostname'])] = $row['hostname'];
 
 // A little tricky check for attempt to overwrite active trigger (value=1) with
 // inactive or active trigger with lower priority.
-			if (!isset($items[$descr][$row['host']]) ||
+			if (!isset($items[$descr][$row['hostname']]) ||
 				(
-					(($items[$descr][$row['host']]['tr_value'] == TRIGGER_VALUE_FALSE) && ($row['tr_value'] == TRIGGER_VALUE_TRUE)) ||
+					(($items[$descr][$row['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE) && ($row['tr_value'] == TRIGGER_VALUE_TRUE)) ||
 					(
-						(($items[$descr][$row['host']]['tr_value'] == TRIGGER_VALUE_FALSE) || ($row['tr_value'] == TRIGGER_VALUE_TRUE)) &&
-						($row['priority'] > $items[$descr][$row['host']]['severity'])
+						(($items[$descr][$row['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE) || ($row['tr_value'] == TRIGGER_VALUE_TRUE)) &&
+						($row['priority'] > $items[$descr][$row['hostname']]['severity'])
 					)
 				)
 			)
 			{
-				$items[$descr][$row['host']] = array(
+				$items[$descr][$row['hostname']] = array(
 					'itemid'	=> $row['itemid'],
 					'value_type'=> $row['value_type'],
 					'lastvalue'	=> $row['lastvalue'],
 					'lastclock'	=> $row['lastclock'],
 					'units'		=> $row['units'],
-					'description'=> $row['description'],
+					'name'=> $row['name'],
 					'valuemapid' => $row['valuemapid'],
 					'severity'	=> $row['priority'],
 					'tr_value'	=> $row['tr_value'],
@@ -1305,208 +1299,41 @@
 
 
 /**
- * Check item key and return info about an error if one is present
+ * Check if given character is a valid key id char
+ * this function is a copy of is_key_char() from /src/libs/zbxcommon/misc.c
+ * don't forget to take look in there before changing anything
  *
- * @param string $key item key, e.g. system.run[cat /etc/passwd | awk -F: '{ print $1 }']
- * @return array
+ * @author Konstantin Buravcov
+ * @param string $char
+ * @return bool
+ */
+	function isKeyIdChar($char){
+		return (
+			($char >= 'a' && $char <= 'z')
+			|| ($char == '.' || $char == ',' || $char == '_' || $char == '-')
+			|| ($char >= 'A' && $char <= 'Z')
+			|| ($char >= '0' && $char <= '9')
+		);
+	}
+
+/*
+ * Function: httpitemExists
+ *
+ * Description:
+ *     Function returns true if http items exists in the $items array.
+ *     The array should contain a field 'type'
+ *
+ * Author:
+ *     Alexander Vladishev
+ *
+ * Comments:
  *
  */
-	function check_item_key($key){
-		$key_strlen = zbx_strlen($key);
+	function httpitemExists($items){
+		foreach($items as $item)
+			if ($item['type'] == ITEM_TYPE_HTTPTEST)
+				return true;
 
-		//empty string
-		if($key_strlen == 0){
-			return array(
-				'valid' => false,   //is key valid?
-				'description' => _("Key cannot be empty") //result description
-			);
-		}
-
-		//key is larger then 255 chars
-		if($key_strlen > 255){
-			return array(
-				'valid' => false,   //is key valid?
-				'description' => sprintf(_("Key is too large: maximum %d characters"), 255) //result description
-			);
-		}
-
-		$characters = array();
-
-		//gathering characters into array, because we can't just work with them ar one if it's a unicode string
-		for($i = 0; $i < $key_strlen; $i++){
-			$characters[] = zbx_substr($key, $i, 1);
-		}
-
-		//checking every character, one by one
-		for($current_char = 0; $current_char < $key_strlen; $current_char++) {
-			if(!preg_match("/".ZBX_PREG_KEY_NAME."/", $characters[$current_char])) {
-				break; //$current_char now points to a first 'not a key name' char
-			}
-		}
-
-		//no function specified?
-		if ($current_char == $key_strlen) {
-			return array(
-				'valid' => true,   //is key valid?
-				'description' => _("Key is valid") //result description
-			);
-		}
-		//function with parameter, e.g. system.run[...]
-		else if($characters[$current_char] == '[') {
-
-			$state = 0; //0 - initial, 1 - inside quoted param, 2 - inside unquoted param
-			$nest_level = 0;
-
-			//for every char, starting after '['
-			for($i = $current_char+1; $i < $key_strlen; $i++) {
-				switch($state){
-					//initial state
-					case 0:
-						if($characters[$i] == ',') {
-							//do nothing
-						}
-						//Zapcat: '][' is treated as ','
-						else if($characters[$i] == ']' && isset($characters[$i+1]) && $characters[$i+1] == '[' && $nest_level == 0) {
-							$i++;
-						}
-						//entering quotes
-						else if($characters[$i] == '"') {
-							$state = 1;
-						}
-						//next nesting level
-						else if($characters[$i] == '[') {
-							$nest_level++;
-						}
-						//one of the nested sets ended
-						else if($characters[$i] == ']' && $nest_level != 0) {
-							$nest_level--;
-							//skipping spaces
-							while(isset($characters[$i+1]) && $characters[$i+1] == ' ') {
-								$i++;
-							}
-							//all nestings are closed correctly
-							if ($nest_level == 0 && isset($characters[$i+1]) && $characters[$i+1] == ']' && !isset($characters[$i+2])) {
-								return array(
-									'valid' => true,   //is key valid?
-									'description' => _("Key is valid") //result description
-								);
-							}
-
-							if((!isset($characters[$i+1]) || $characters[$i+1] != ',')
-								&& !($nest_level !=0 && isset($characters[$i+1]) && $characters[$i+1] == ']')) {
-								return array(
-									'valid' => false,   //is key valid?
-									'description' => sprintf(_('incorrect syntax near \'%1$s\' at position %2$d'), $characters[$current_char], $current_char) //result description
-								);
-							}
-						}
-						else if($characters[$i] == ']' && $nest_level == 0) {
-							if (isset($characters[$i+1])){
-								return array(
-									'valid' => false,   //is key valid?
-									'description' => sprintf(_('incorrect usage of bracket symbols. \'%s\' found after final bracket.'), $characters[$i+1]) //result description
-								);
-							}
-							else {
-								return array(
-									'valid' => true,   //is key valid?
-									'description' => _("Key is valid") //result description
-								);
-							}
-						}
-						else if($characters[$i] != ' ') {
-							$state = 2;
-						}
-
-					break;
-
-					//quoted
-					case 1:
-						//ending quote is reached
-						if($characters[$i] == '"'){
-							//skipping spaces
-							while(isset($characters[$i+1]) && $characters[$i+1] == ' ') {
-								$i++;
-							}
-
-							//Zapcat
-							if($nest_level == 0 && isset($characters[$i+1]) && isset($characters[$i+2]) && $characters[$i+1] == ']' && $characters[$i+2] == '['){
-								$state = 0;
-								break;
-							}
-
-							if ($nest_level == 0 && isset($characters[$i+1]) && $characters[$i+1] == ']' && !isset($characters[$i+2])){
-								return array(
-									'valid' => true,   //is key valid?
-									'description' => _("Key is valid") //result description
-								);
-							}
-							else if($nest_level == 0 && $characters[$i+1] == ']' && isset($characters[$i+2])){
-								return array(
-									'valid' => false,   //is key valid?
-									'description' => sprintf(_('incorrect usage of bracket symbols. \'%s\' found after final bracket.'), $characters[$i+2]) //result description
-								);
-							}
-
-							if ((!isset($characters[$i+1]) || $characters[$i+1] != ',') //if next symbol is not ','
-								&& !($nest_level != 0 && isset($characters[$i+1]) && $characters[$i+1] == ']'))
-							{
-								return array(
-									'valid' => false,   //is key valid?
-									'description' => sprintf(_('incorrect syntax near \'%1$s\' at position %2$d'), $characters[$current_char], $current_char) //result description
-								);
-							}
-
-							$state = 0;
-						}
-						//escaped quote (\")
-						else if($characters[$i] == '\\' && isset($characters[$i+1]) && $characters[$i+1] == '"') {
-							$i++;
-						}
-
-					break;
-
-					//unquoted
-					case 2:
-						//Zapcat
-						if($nest_level == 0 && $characters[$i] == ']' && isset($characters[$i+1]) && $characters[$i+1] =='[' ){
-							$i--;
-							$state = 0;
-						}
-						else if($characters[$i] == ',' || ($characters[$i] == ']' && $nest_level != 0)) {
-							$i--;
-							$state = 0;
-						}
-						else if($characters[$i] == ']' && $nest_level == 0) {
-							if (isset($characters[$i+1])){
-								return array(
-									'valid' => false,   //is key valid?
-									'description' => sprintf(_('incorrect usage of bracket symbols. \'%s\' found after final bracket.'), $characters[$i+1]) //result description
-								);
-							}
-							else {
-								return array(
-									'valid' => true,   //is key valid?
-									'description' => _("Key is valid") //result description
-								);
-							}
-						}
-					break;
-				}
-			}
-
-			return array(
-				'valid' => false,   //is key valid?
-				'description' => _('Invalid key format') //result description
-			);
-
-		}
-		else {
-			return array(
-				'valid' => false,   //is key valid?
-				'description' => sprintf(_('invalid character \'%1$s\' at position %2$d'), $characters[$current_char], $current_char) //result description
-			);
-		}
-
+		return false;
 	}
 ?>

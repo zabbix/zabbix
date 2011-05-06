@@ -28,7 +28,7 @@ class API_JSON_Host extends CZabbixTest
 	public static function host_names()
 	{
 		return array(
-			array('Zabbix server', true),
+			array('Test host', true),
 			array('Fake host', false),
 		);
 	}

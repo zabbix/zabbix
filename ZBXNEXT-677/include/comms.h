@@ -20,18 +20,43 @@
 #ifndef ZABBIX_COMMS_H
 #define ZABBIX_COMMS_H
 
+#if defined(_WINDOWS)
+#	if defined(__INT_MAX__) && __INT_MAX__ == 2147483647
+typedef int	ssize_t;
+#	else
+typedef long	ssize_t;
+#	endif
+
+#	define ZBX_TCP_WRITE(s, b, bl)	((ssize_t)send((s), (b), (bl), 0))
+#	define ZBX_TCP_READ(s, b, bl)	((ssize_t)recv((s), (b), (bl), 0))
+#	define zbx_sock_close(s)	if (ZBX_SOCK_ERROR != (s)) closesocket(s)
+#	define zbx_sock_last_error()	WSAGetLastError()
+
+#	define ZBX_TCP_ERROR		SOCKET_ERROR
+#	define ZBX_SOCK_ERROR		INVALID_SOCKET
+#	define EAGAIN			WSAEWOULDBLOCK
+#else
+#	define ZBX_TCP_WRITE(s, b, bl)	((ssize_t)write((s), (b), (bl)))
+#	define ZBX_TCP_READ(s, b, bl)	((ssize_t)read((s), (b), (bl)))
+#	define zbx_sock_close(s)	if (ZBX_SOCK_ERROR != (s)) close(s)
+#	define zbx_sock_last_error()	errno
+
+#	define ZBX_TCP_ERROR		-1
+#	define ZBX_SOCK_ERROR		-1
+#endif
+
+#if defined(SOCKET) || defined(_WINDOWS)
+typedef SOCKET	ZBX_SOCKET;
+#else
+typedef int	ZBX_SOCKET;
+#endif
+
 typedef enum
 {
 	ZBX_TCP_ERR_NETWORK = 1,
 	ZBX_TCP_ERR_TIMEOUT
 }
 zbx_tcp_errors;
-
-#if defined(SOCKET) || defined(_WINDOWS)
-	typedef SOCKET ZBX_SOCKET;
-#else /* not SOCKET && not _WINDOWS */
-	typedef int ZBX_SOCKET;
-#endif /* SOCKET || _WINDOWS */
 
 typedef enum
 {
@@ -110,6 +135,7 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 #define	ZBX_DEFAULT_NTP_PORT	123
 #define	ZBX_DEFAULT_IMAP_PORT	143
 #define	ZBX_DEFAULT_LDAP_PORT	389
+#define	ZBX_DEFAULT_HTTPS_PORT	443
 #define	ZBX_DEFAULT_AGENT_PORT	10050
 #define	ZBX_DEFAULT_SERVER_PORT	10051
 

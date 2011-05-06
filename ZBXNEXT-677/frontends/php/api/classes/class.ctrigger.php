@@ -51,7 +51,7 @@ class CTrigger extends CZBXAPI{
 
 		$sort_columns = array('triggerid', 'description', 'status', 'priority', 'lastchange'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
-
+		$fields_to_unset = array();
 
 		$sql_parts = array(
 			'select' => array('triggers' => 't.triggerid'),
@@ -94,11 +94,11 @@ class CTrigger extends CZBXAPI{
 			'only_true'				=> null,
 			'min_severity'			=> null,
 
-			'filter'					=> null,
-			'search'					=> null,
+			'filter'				=> null,
+			'search'				=> null,
 			'searchByAny'			=> null,
-			'startSearch'				=> null,
-			'excludeSearch'				=> null,
+			'startSearch'			=> null,
+			'excludeSearch'			=> null,
 
 // OutPut
 			'expandData'			=> null,
@@ -107,8 +107,8 @@ class CTrigger extends CZBXAPI{
 			'selectGroups'			=> null,
 			'selectHosts'			=> null,
 			'selectItems'			=> null,
-			'select_functions'		=> null,
-			'select_dependencies'	=> null,
+			'selectFunctions'		=> null,
+			'selectDependencies'	=> null,
 			'selectDiscoveryRule'	=> null,
 			'countOutput'			=> null,
 			'groupCount'			=> null,
@@ -122,7 +122,6 @@ class CTrigger extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
-
 		if(is_array($options['output'])){
 			unset($sql_parts['select']['triggers']);
 
@@ -131,6 +130,16 @@ class CTrigger extends CZBXAPI{
 			foreach($options['output'] as $key => $field){
 				if(isset($dbTable['fields'][$field]))
 					$sql_parts['select'][$field] = 't.'.$field;
+			}
+
+			if (!is_null($options['expandDescription'])){
+				if(!str_in_array('description', $options['output'])){
+					$options['expandDescription'] = null;
+				}
+				else if(!str_in_array('expression', $options['output'])){
+					$sql_parts['select']['expression'] = ' t.expression';
+					$fields_to_unset[] = 'expression';
+				}
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;
@@ -626,10 +635,10 @@ class CTrigger extends CZBXAPI{
 					if(!is_null($options['selectItems']) && !isset($result[$trigger['triggerid']]['items'])){
 						$result[$trigger['triggerid']]['items'] = array();
 					}
-					if(!is_null($options['select_functions']) && !isset($result[$trigger['triggerid']]['functions'])){
+					if(!is_null($options['selectFunctions']) && !isset($result[$trigger['triggerid']]['functions'])){
 						$result[$trigger['triggerid']]['functions'] = array();
 					}
-					if(!is_null($options['select_dependencies']) && !isset($result[$trigger['triggerid']]['dependencies'])){
+					if(!is_null($options['selectDependencies']) && !isset($result[$trigger['triggerid']]['dependencies'])){
 						$result[$trigger['triggerid']]['dependencies'] = array();
 					}
 					if(!is_null($options['selectDiscoveryRule']) && !isset($result[$trigger['triggerid']]['discoveryRule'])){
@@ -751,7 +760,7 @@ Copt::memoryPick();
 
 // Adding Objects
 // Adding trigger dependencies
-		if(!is_null($options['select_dependencies']) && str_in_array($options['select_dependencies'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectDependencies']) && str_in_array($options['selectDependencies'], $subselects_allowed_outputs)){
 			$deps = array();
 			$depids = array();
 
@@ -767,7 +776,7 @@ Copt::memoryPick();
 
 			$obj_params = array(
 				'triggerids' => $depids,
-				'output' => $options['select_dependencies'],
+				'output' => $options['selectDependencies'],
 				'expandData' => 1,
 				'preservekeys' => 1
 			);
@@ -848,9 +857,9 @@ Copt::memoryPick();
 		}
 
 // Adding Functions
-		if(!is_null($options['select_functions']) && str_in_array($options['select_functions'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectFunctions']) && str_in_array($options['selectFunctions'], $subselects_allowed_outputs)){
 
-			if($options['select_functions'] == API_OUTPUT_EXTEND)
+			if($options['selectFunctions'] == API_OUTPUT_EXTEND)
 				$sql_select = 'f.*';
 			else
 				$sql_select = 'f.functionid, f.triggerid';
@@ -941,6 +950,21 @@ Copt::memoryPick();
 			$triggers_to_expand_items2 = array();
 			foreach($result as $tnum => $trigger){
 
+				preg_match_all('/{HOST\.NAME([1-9]?)}/u', $trigger['description'], $hnums);
+				if(!empty($hnums[1])){
+					preg_match_all('/{([0-9]+)}/u', $trigger['expression'], $funcs);
+					$funcs = $funcs[1];
+
+					foreach($hnums[1] as $fnum){
+						$fnum = $fnum ? $fnum : 1;
+						if(isset($funcs[$fnum-1])){
+							$functionid = $funcs[$fnum-1];
+							$functionids[$functionid] = $functionid;
+							$triggers_to_expand_hosts[$trigger['triggerid']][$functionid] = $fnum;
+						}
+					}
+				}
+
 				preg_match_all('/{HOSTNAME([1-9]?)}/u', $trigger['description'], $hnums);
 				if(!empty($hnums[1])){
 					preg_match_all('/{([0-9]+)}/u', $trigger['expression'], $funcs);
@@ -956,7 +980,22 @@ Copt::memoryPick();
 					}
 				}
 
-				preg_match_all('/{ITEM.LASTVALUE([1-9]?)}/u', $trigger['description'], $inums);
+				preg_match_all('/{HOST\.HOST([1-9]?)}/u', $trigger['description'], $hnums);
+				if(!empty($hnums[1])){
+					preg_match_all('/{([0-9]+)}/u', $trigger['expression'], $funcs);
+					$funcs = $funcs[1];
+
+					foreach($hnums[1] as $fnum){
+						$fnum = $fnum ? $fnum : 1;
+						if(isset($funcs[$fnum-1])){
+							$functionid = $funcs[$fnum-1];
+							$functionids[$functionid] = $functionid;
+							$triggers_to_expand_hosts[$trigger['triggerid']][$functionid] = $fnum;
+						}
+					}
+				}
+
+				preg_match_all('/{ITEM\.LASTVALUE([1-9]?)}/u', $trigger['description'], $inums);
 				if(!empty($inums[1])){
 					preg_match_all('/{([0-9]+)}/u', $trigger['expression'], $funcs);
 					$funcs = $funcs[1];
@@ -971,7 +1010,7 @@ Copt::memoryPick();
 					}
 				}
 
-				preg_match_all('/{ITEM.VALUE([1-9]?)}/u', $trigger['description'], $inums);
+				preg_match_all('/{ITEM\.VALUE([1-9]?)}/u', $trigger['description'], $inums);
 				if(!empty($inums[1])){
 					preg_match_all('/{([0-9]+)}/u', $trigger['expression'], $funcs);
 					$funcs = $funcs[1];
@@ -988,7 +1027,7 @@ Copt::memoryPick();
 			}
 
 			if(!empty($functionids)){
-				$sql = 'SELECT DISTINCT f.triggerid, f.functionid, h.host, i.lastvalue'.
+				$sql = 'SELECT DISTINCT f.triggerid, f.functionid, h.host, h.name, i.lastvalue'.
 						' FROM functions f,items i,hosts h'.
 						' WHERE f.itemid=i.itemid'.
 							' AND i.hostid=h.hostid'.
@@ -1000,9 +1039,15 @@ Copt::memoryPick();
 
 						$fnum = $triggers_to_expand_hosts[$func['triggerid']][$func['functionid']];
 						if($fnum == 1)
-							$result[$func['triggerid']]['description'] = str_replace('{HOSTNAME}', $func['host'], $result[$func['triggerid']]['description']);
+						{
+							$result[$func['triggerid']]['description'] = str_replace('{HOSTNAME}', $func['name'], $result[$func['triggerid']]['description']);
+							$result[$func['triggerid']]['description'] = str_replace('{HOST.NAME}', $func['name'], $result[$func['triggerid']]['description']);
+							$result[$func['triggerid']]['description'] = str_replace('{HOST.HOST}', $func['host'], $result[$func['triggerid']]['description']);
+						}
 
-						$result[$func['triggerid']]['description'] = str_replace('{HOSTNAME'.$fnum.'}', $func['host'], $result[$func['triggerid']]['description']);
+						$result[$func['triggerid']]['description'] = str_replace('{HOSTNAME'.$fnum.'}', $func['name'], $result[$func['triggerid']]['description']);
+						$result[$func['triggerid']]['description'] = str_replace('{HOST.NAME'.$fnum.'}', $func['name'], $result[$func['triggerid']]['description']);
+						$result[$func['triggerid']]['description'] = str_replace('{HOST.HOST'.$fnum.'}', $func['host'], $result[$func['triggerid']]['description']);
 					}
 
 					if(isset($triggers_to_expand_items[$func['triggerid']][$func['functionid']])){
@@ -1035,12 +1080,19 @@ Copt::memoryPick();
 			}
 		}
 
+		if (!empty($fields_to_unset)){
+			foreach($result as $tnum => $trigger){
+				foreach($fields_to_unset as $field_to_unset){
+					unset($result[$tnum][$field_to_unset]);
+				}
+			}
+		}
+
 COpt::memoryPick();
 // removing keys (hash -> array)
 		if(is_null($options['preservekeys'])){
 			$result = zbx_cleanHashes($result);
 		}
-
 	return $result;
 	}
 
@@ -1069,7 +1121,7 @@ COpt::memoryPick();
 		$result = $this->get($options);
 		if(isset($triggerData['expression'])){
 			foreach($result as $tnum => $trigger){
-				$tmp_exp = explode_exp($trigger['expression'], false);
+				$tmp_exp = explode_exp($trigger['expression']);
 
 				if(strcmp(trim($tmp_exp,' '), trim($triggerData['expression'],' ')) != 0) {
 					unset($result[$tnum]);
@@ -1107,7 +1159,7 @@ COpt::memoryPick();
 
 		$triggers = $this->get($options);
 		foreach($triggers as $tnum => $trigger){
-			$tmp_exp = explode_exp($trigger['expression'], false);
+			$tmp_exp = explode_exp($trigger['expression']);
 			if(strcmp($tmp_exp, $object['expression']) == 0){
 				$result = true;
 				break;
@@ -1161,7 +1213,7 @@ COpt::memoryPick();
 
 				if($dbTriggers[$trigger['triggerid']]['templateid'] != 0){
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Cannot delete templated trigger [%1$s:%2$s]', $dbTriggers[$trigger['triggerid']]['description'], explode_exp($dbTriggers[$trigger['triggerid']]['expression'], false))
+						_s('Cannot delete templated trigger [%1$s:%2$s]', $dbTriggers[$trigger['triggerid']]['description'], explode_exp($dbTriggers[$trigger['triggerid']]['expression']))
 					);
 				}
 
@@ -1225,8 +1277,8 @@ COpt::memoryPick();
 			if($create){
 				$existTrigger = API::Trigger()->exists(array(
 					'description' => $trigger['description'],
-					'expression' => $trigger['expression'])
-				);
+					'expression' => $trigger['expression']
+				));
 
 				if($existTrigger){
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Trigger [%1$s:%2$s] already exists.', $trigger['description'], $trigger['expression']));
@@ -1266,14 +1318,14 @@ COpt::memoryPick();
 		$triggers = zbx_toArray($triggers);
 		$triggerids = zbx_objectValues($triggers, 'triggerid');
 
-			$this->checkInput($triggers, __FUNCTION__);
+		$this->checkInput($triggers, __FUNCTION__);
 
-			$this->updateReal($triggers);
+		$this->updateReal($triggers);
 
-			foreach($triggers as $trigger)
-				$this->inherit($trigger);
+		foreach($triggers as $trigger)
+			$this->inherit($trigger);
 
-			return array('triggerids' => $triggerids);
+		return array('triggerids' => $triggerids);
 	}
 
 /**
@@ -1344,7 +1396,7 @@ COpt::memoryPick();
 
 // TODO: REMOVE info
 			foreach($del_triggers as $triggerid => $trigger){
-				info(_s('Trigger [%1$s:%2$s] deleted.', $trigger['description'], explode_exp($trigger['expression'], false)));
+				info(_s('Trigger [%1$s:%2$s] deleted.', $trigger['description'], explode_exp($trigger['expression'])));
 				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $trigger['triggerid'], $trigger['description'].':'.$trigger['expression'], NULL, NULL, NULL);
 			}
 
@@ -1418,7 +1470,7 @@ COpt::memoryPick();
 
 			DB::update('triggers', array(
 				'values' => array('expression' => $expression),
-				'where' => array('triggerid='.$triggerid)
+				'where' => array('triggerid' => $triggerid)
 			));
 
 			info(_s('Trigger [%1$s:%2$s] created.', $trigger['description'], $trigger['expression']));
@@ -1462,7 +1514,7 @@ COpt::memoryPick();
 				$trigger['description'] = $dbTrigger['description'];
 			}
 
-			$expression_full = explode_exp($dbTrigger['expression'], 0);
+			$expression_full = explode_exp($dbTrigger['expression']);
 			if(isset($trigger['expression']) && (strcmp($expression_full, $trigger['expression']) != 0)){
 				$expression_changed = true;
 				$expression_full = $trigger['expression'];
@@ -1488,7 +1540,7 @@ COpt::memoryPick();
 
 				$trigger_exist = false;
 				foreach($triggers_exist as $tnum => $tr){
-					$tmp_exp = explode_exp($tr['expression'], false);
+					$tmp_exp = explode_exp($tr['expression']);
 					if(strcmp($tmp_exp, $expression_full) == 0){
 						$trigger_exist = $tr;
 						break;
@@ -1499,11 +1551,13 @@ COpt::memoryPick();
 				}
 			}
 
-
 			if($expression_changed){
 				delete_function_by_triggerid($trigger['triggerid']);
 
 				$trigger['expression'] = implode_exp($expression_full, $trigger['triggerid']);
+				if(is_null($trigger['expression'])){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot implode expression "%s".', $expression_full));
+				}
 
 				if(isset($trigger['status']) && ($trigger['status'] != TRIGGER_STATUS_ENABLED)){
 					if($trigger['value_flags'] == TRIGGER_VALUE_FLAG_NORMAL){
@@ -1522,10 +1576,10 @@ COpt::memoryPick();
 
 			DB::update('triggers', array(
 				'values' => $trigger_update,
-				'where' => array('triggerid='.$trigger['triggerid'])
+				'where' => array('triggerid' => $trigger['triggerid'])
 			));
 
-			$expression = isset($trigger['expression']) ? $trigger['expression'] : explode_exp($dbTrigger['expression'], false);
+			$expression = isset($trigger['expression']) ? $trigger['expression'] : explode_exp($dbTrigger['expression']);
 			$trigger['expression'] = $expression;
 			info(_s('Trigger [%1$s:%2$s] updated.', $trigger['description'], $expression));
 		}
@@ -1569,7 +1623,7 @@ COpt::memoryPick();
 			if(!isset($trigger['description']))
 				$trigger['description'] = $dbTrigger['description'];
 			if(!isset($trigger['expression']))
-				$trigger['expression'] = explode_exp($dbTrigger['expression'], 0);
+				$trigger['expression'] = explode_exp($dbTrigger['expression']);
 		}
 
 
@@ -1602,7 +1656,7 @@ COpt::memoryPick();
 			));
 
 			if($childTrigger = reset($childTriggers)){
-				$childTrigger['expression'] = explode_exp($childTrigger['expression'], 0);
+				$childTrigger['expression'] = explode_exp($childTrigger['expression']);
 
 				if((strcmp($childTrigger['expression'], $newTrigger['expression']) != 0)
 					|| (strcmp($childTrigger['description'], $newTrigger['description']) != 0)
@@ -1639,7 +1693,7 @@ COpt::memoryPick();
 
 				$childTrigger = false;
 				foreach($childTriggers as $tnum => $tr){
-					$tmp_exp = explode_exp($tr['expression'], false);
+					$tmp_exp = explode_exp($tr['expression']);
 					if(strcmp($tmp_exp, $newTrigger['expression']) == 0){
 						$childTrigger = $tr;
 						break;
@@ -1702,12 +1756,12 @@ COpt::memoryPick();
 				'hostids' => $data['templateids'],
 				'preservekeys' => 1,
 				'output' => API_OUTPUT_EXTEND,
-				'select_dependencies' => true,
+				'selectDependencies' => true,
 			);
 			$triggers = $this->get($options);
 
 			foreach($triggers as $trigger){
-				$trigger['expression'] = explode_exp($trigger['expression'], false);
+				$trigger['expression'] = explode_exp($trigger['expression']);
 				$this->inherit($trigger, $data['hostids']);
 			}
 

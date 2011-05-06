@@ -425,7 +425,7 @@ include_once('include/page_header.php');
 // get Graphs
 		$graphs = array();
 
-		$sortfield = getPageSortField('description');
+		$sortfield = getPageSortField('name');
 		$sortorder = getPageSortOrder();
 
 		if($pageFilter->hostsSelected){
@@ -461,7 +461,7 @@ include_once('include/page_header.php');
 			'graphids' => $graphids,
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => API_OUTPUT_EXTEND,
-			'select_templates' => API_OUTPUT_EXTEND,
+			'selectTemplates' => API_OUTPUT_EXTEND,
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 		);
 		$graphs = API::Graph()->get($options);
@@ -492,11 +492,11 @@ include_once('include/page_header.php');
 			if($graph['templateid'] != 0){
 				$real_hosts = get_realhosts_by_graphid($graph['templateid']);
 				$real_host = DBfetch($real_hosts);
-				$name[] = new CLink($real_host['host'], 'graphs.php?'.'hostid='.$real_host['hostid'], 'unknown');
+				$name[] = new CLink($real_host['name'], 'graphs.php?'.'hostid='.$real_host['hostid'], 'unknown');
 				$name[] = ':'.$graph['name'];
 			}
 			else if(!empty($graph['discoveryRule'])){
-				$name[] = new CLink($graph['discoveryRule']['description'], 'graph_prototypes.php?parent_discoveryid='.
+				$name[] = new CLink($graph['discoveryRule']['name'], 'graph_prototypes.php?parent_discoveryid='.
 						$graph['discoveryRule']['itemid'],'gold');
 				$name[] = ':'.$graph['name'];
 			}

@@ -46,7 +46,8 @@ switch($itemType) {
 		'itemid'=>			array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))'),
 		'interfaceid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,	null, S_INTERFACE),
 
-		'description'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
+		'name'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
+		'description'=>		array(T_ZBX_STR, O_OPT,  null,	null,		'isset({save})'),
 		'item_filter_macro'=>		array(T_ZBX_STR, O_OPT,  null,	null,		'isset({save})'),
 		'item_filter_value'=>		array(T_ZBX_STR, O_OPT,  null,	null,		'isset({save})'),
 		'key'=>				array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,		'isset({save})'),
@@ -126,7 +127,7 @@ switch($itemType) {
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder('description', ZBX_SORT_UP);
+	validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go', 'none');
 
@@ -205,6 +206,7 @@ switch($itemType) {
 
 		$item = array(
 			'interfaceid' => get_request('interfaceid'),
+			'name' => get_request('name'),
 			'description' => get_request('description'),
 			'key_' => get_request('key'),
 			'hostid' => get_request('hostid'),
@@ -299,6 +301,7 @@ switch($itemType) {
 		$limited = false;
 
 
+		$name = get_request('name', '');
 		$description = get_request('description', '');
 		$key = get_request('key', '');
 		$delay = get_request('delay', 30);
@@ -347,6 +350,7 @@ switch($itemType) {
 		if((isset($_REQUEST['itemid']) && !isset($_REQUEST['form_refresh']))){
 			$interfaceid	= $item_data['interfaceid'];
 
+			$name = $item_data['name'];
 			$description = $item_data['description'];
 			$key = $item_data['key_'];
 			$type = $item_data['type'];
@@ -444,7 +448,7 @@ switch($itemType) {
 		}
 
 // Name
-		$frmItem->addRow(S_NAME, new CTextBox('description', $description, 40, $limited));
+		$frmItem->addRow(_('Name'), new CTextBox('name', $name, 40, $limited));
 
 // Key
 		$frmItem->addRow(S_KEY, new CTextBox('key', $key, 40, $limited));
@@ -608,7 +612,7 @@ switch($itemType) {
 // New flexible interval
 		$frmItem->addRow(S_NEW_FLEXIBLE_INTERVAL, array(
 			S_DELAY, SPACE,	new CNumericBox('new_delay_flex[delay]', '50', 5),
-			S_PERIOD, SPACE, new CTextBox('new_delay_flex[period]', '1-7,00:00-23:59', 27),
+			S_PERIOD, SPACE, new CTextBox('new_delay_flex[period]', ZBX_DEFAULT_INTERVAL, 27),
 			BR(),
 			new CSubmit('add_delay_flex', S_ADD)
 		), 'new', 'row_new_delay_flex');
@@ -632,6 +636,7 @@ switch($itemType) {
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TRAPPER, 'trapper_hosts');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TRAPPER, 'row_trapper_hosts');
 
+		$frmItem->addRow(_('Description'), new CTextArea('description', $description));
 
 		$frmRow = array(new CSubmit('save', S_SAVE));
 		if(isset($_REQUEST['itemid'])){
@@ -680,7 +685,7 @@ switch($itemType) {
 		$table = new CTableInfo();
 		$table->setHeader(array(
 			new CCheckBox('all_items',null,"checkAll('".$form->GetName()."','all_items','group_itemid');"),
-			make_sorting_header(S_NAME,'description', $sortlink),
+			make_sorting_header(S_NAME, 'name', $sortlink),
 			S_ITEMS,
 			S_TRIGGERS,
 			S_GRAPHS,
@@ -691,15 +696,15 @@ switch($itemType) {
 			S_ERROR
 		));
 
-		$sortfield = getPageSortField('description');
+		$sortfield = getPageSortField('name');
 		$sortorder = getPageSortOrder();
 		$options = array(
 			'hostids' => $_REQUEST['hostid'],
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1,
-			'select_prototypes' => API_OUTPUT_COUNT,
-			'select_graphs' => API_OUTPUT_COUNT,
-			'select_triggers' => API_OUTPUT_COUNT,
+			'selectPrototypes' => API_OUTPUT_COUNT,
+			'selectGraphs' => API_OUTPUT_COUNT,
+			'selectTriggers' => API_OUTPUT_COUNT,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
@@ -713,11 +718,11 @@ switch($itemType) {
 			$description = array();
 			if($item['templateid']){
 				$template_host = get_realhost_by_itemid($item['templateid']);
-				$description[] = new CLink($template_host['host'],'?hostid='.$template_host['hostid'], 'unknown');
+				$description[] = new CLink($template_host['name'],'?hostid='.$template_host['hostid'], 'unknown');
 				$description[] = ':';
 			}
-			$item['description_expanded'] = item_description($item);
-			$description[] = new CLink($item['description_expanded'], '?form=update&itemid='.$item['itemid']);
+			$item['name_expanded'] = itemName($item);
+			$description[] = new CLink($item['name_expanded'], '?form=update&itemid='.$item['itemid']);
 
 
 			$status = new CCol(new CLink(item_status2str($item['status']), '?hostid='.$_REQUEST['hostid'].'&group_itemid='.$item['itemid'].'&go='.

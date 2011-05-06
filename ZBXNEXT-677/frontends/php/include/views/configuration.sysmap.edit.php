@@ -20,7 +20,7 @@
 ?>
 <?php
 // include JS + templates
-	include('include/templates/sysmap.js.php');
+	include('include/views/js/configuration.sysmap.edit.js.php');
 ?>
 <?php
 	$config = select_config();

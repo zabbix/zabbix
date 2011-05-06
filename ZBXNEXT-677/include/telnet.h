@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2000-2011 Zabbix SIA
@@ -17,25 +16,25 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-?>
-<?php
-// include JS + templates
-require_once('include/templates/gsearch.js.php');
-?>
-<?php
-//	$hosts_wdgt->addItem();
-	$searchDiv = new CDiv();
-	$searchInputDiv = new CDiv();
-	$searchButtonDiv = new CDiv();
 
-	$search_form = new CForm('get','search.php');
-	$searchBox = new CTextBox('search', get_request('search'));
-	$searchBox->setAttribute('autocomplete', 'off');
-	$searchBox->addClass('search');
+#ifndef ZABBIX_TELNET_H
+#define ZABBIX_TELNET_H
 
-	$search_form->addItem(new CDiv(array(_('Search').': ', $searchBox)));
+#include "sysinfo.h"
+#include "comms.h"
 
-	$search_div = new CDiv(SPACE, 'zbx_search nowrap', 'zbx_search');
+#define WAIT_READ	0
+#define WAIT_WRITE	1
 
-return new CDiv(SPACE, 'zbx_search', 'zbx_search');
-?>
+#define CMD_IAC		255
+#define CMD_WILL	251
+#define CMD_WONT	252
+#define CMD_DO		253
+#define CMD_DONT	254
+#define OPT_SGA		3
+
+int	telnet_test_login(ZBX_SOCKET socket_fd);
+int	telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *password, AGENT_RESULT *result);
+int	telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *result, const char *encoding);
+
+#endif

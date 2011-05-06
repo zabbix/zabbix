@@ -459,7 +459,7 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 	if (ZBX_FLAG_SEC == flag)
 	{
 		offset = zbx_snprintf(sql, sizeof(sql),
-				"select count(value)"
+				"select count(*)"
 				" from %s"
 				" where itemid=" ZBX_FS_UI64,
 				get_table_by_value_type(item->value_type),
@@ -2256,7 +2256,7 @@ static void	add_value_suffix_normal(char *value, int max_len, const char *units)
 
 	base = (0 == strcmp(units, "B") || 0 == strcmp(units, "Bps") ? 1024 : 1000);
 
-	if (value_double < base)
+	if (value_double < base || SUCCEED == str_in_list("%,ms,rpm,RPM", units, ','))
 	{
 		strscpy(kmgt, "");
 	}
@@ -2509,7 +2509,7 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 		}
 	}
 
-	DBfree_result(result); /* Cannot call DBfree_result until evaluate_FUNC. */
+	DBfree_result(result); /* cannot call DBfree_result until evaluate_FUNC */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s value:'%s'", __function_name,
 			zbx_result_string(res), value);

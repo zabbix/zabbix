@@ -52,7 +52,7 @@ static int	DBget_trigger_severity_name(DB_TRIGGER *trigger, char **replace_to)
 	if (0 == trigger->triggerid)
 		return res;
 
-	if (trigger->priority < 0 || trigger->priority >= TRIGGER_SEVERITY_COUNT)
+	if (TRIGGER_SEVERITY_COUNT <= trigger->priority)
 		return res;
 
 	result = DBselect(
@@ -797,7 +797,9 @@ static int	DBget_interface_value_by_hostid(zbx_uint64_t hostid, char **replace_t
 #define ZBX_REQUEST_ITEM_NAME		4
 #define ZBX_REQUEST_ITEM_KEY		5
 #define ZBX_REQUEST_ITEM_KEY_ORIG	6
-#define ZBX_REQUEST_PROXY_NAME		7
+#define ZBX_REQUEST_ITEM_DESCRIPTION	7
+#define ZBX_REQUEST_PROXY_NAME		8
+#define ZBX_REQUEST_HOST_HOST		9
 static int	DBget_trigger_value(DB_TRIGGER *trigger, char **replace_to, int N_functionid, int request)
 {
 	const char	*__function_name = "DBget_trigger_value";
@@ -814,7 +816,8 @@ static int	DBget_trigger_value(DB_TRIGGER *trigger, char **replace_to, int N_fun
 		goto fail;
 
 	result = DBselect(
-			"select i.description,i.key_,h.hostid,h.host,h.proxy_hostid"
+			"select i.name,i.key_,i.description,"
+				"h.hostid,h.host,h.proxy_hostid,h.name"
 			" from hosts h,items i,functions f"
 			" where h.hostid=i.hostid"
 				" and i.itemid=f.itemid"
@@ -825,28 +828,32 @@ static int	DBget_trigger_value(DB_TRIGGER *trigger, char **replace_to, int N_fun
 	{
 		switch (request)
 		{
+			case ZBX_REQUEST_HOST_HOST:
+				*replace_to = zbx_strdup(*replace_to, row[4]);
+				ret = SUCCEED;
+				break;
 			case ZBX_REQUEST_HOST_NAME:
-				*replace_to = zbx_strdup(*replace_to, row[3]);
+				*replace_to = zbx_strdup(*replace_to, row[6]);
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_HOST_IPADDRESS:
 			case ZBX_REQUEST_HOST_DNS:
 			case ZBX_REQUEST_HOST_CONN:
-				ZBX_STR2UINT64(hostid, row[2]);
+				ZBX_STR2UINT64(hostid, row[3]);
 				ret = DBget_interface_value_by_hostid(hostid, replace_to, request);
 				break;
 			case ZBX_REQUEST_ITEM_NAME:
 			case ZBX_REQUEST_ITEM_KEY:
 				memset(&dc_host, 0, sizeof(dc_host));
-				ZBX_STR2UINT64(dc_host.hostid, row[2]);
-				strscpy(dc_host.host, row[3]);
+				ZBX_STR2UINT64(dc_host.hostid, row[3]);
+				strscpy(dc_host.host, row[4]);
 
 				key = zbx_strdup(key, row[1]);
 				substitute_simple_macros(NULL, NULL, &dc_host, NULL, &key, MACRO_TYPE_ITEM_KEY, NULL, 0);
 
 				if (ZBX_REQUEST_ITEM_NAME == request)
 				{
-					*replace_to = zbx_dsprintf(*replace_to, "%s", row[0]);
+					*replace_to = zbx_strdup(*replace_to, row[0]);
 					item_description(replace_to, key, dc_host.hostid);
 					zbx_free(key);
 				}
@@ -861,8 +868,12 @@ static int	DBget_trigger_value(DB_TRIGGER *trigger, char **replace_to, int N_fun
 				*replace_to = zbx_strdup(*replace_to, row[1]);
 				ret = SUCCEED;
 				break;
+			case ZBX_REQUEST_ITEM_DESCRIPTION:
+				*replace_to = zbx_strdup(*replace_to, row[2]);
+				ret = SUCCEED;
+				break;
 			case ZBX_REQUEST_PROXY_NAME:
-				ZBX_DBROW2UINT64(proxy_hostid, row[4]);
+				ZBX_DBROW2UINT64(proxy_hostid, row[5]);
 
 				if (0 == proxy_hostid)
 				{
@@ -1759,16 +1770,22 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 #define MVAR_EVENT_ACK_STATUS		"{EVENT.ACK.STATUS}"
 #define MVAR_EVENT_ACK_HISTORY		"{EVENT.ACK.HISTORY}"
 #define MVAR_ESC_HISTORY		"{ESC.HISTORY}"
-#define MVAR_HOSTNAME			"{HOSTNAME}"
 #define MVAR_PROXY_NAME			"{PROXY.NAME}"
-#define MVAR_IPADDRESS			"{IPADDRESS}"
 #define MVAR_HOST_DNS			"{HOST.DNS}"
 #define MVAR_HOST_CONN			"{HOST.CONN}"
+#define MVAR_HOST_HOST			"{HOST.HOST}"
+#define MVAR_HOST_IP			"{HOST.IP}"
+#define MVAR_IPADDRESS			"{IPADDRESS}"			/* deprecated */
+#define MVAR_HOST_NAME			"{HOST.NAME}"
+#define MVAR_HOSTNAME			"{HOSTNAME}"			/* deprecated */
 #define MVAR_HOST_PORT			"{HOST.PORT}"
 #define MVAR_TIME			"{TIME}"
 #define MVAR_ITEM_LASTVALUE		"{ITEM.LASTVALUE}"
 #define MVAR_ITEM_VALUE			"{ITEM.VALUE}"
 #define MVAR_ITEM_NAME			"{ITEM.NAME}"
+#define MVAR_ITEM_KEY			"{ITEM.KEY}"
+#define MVAR_TRIGGER_KEY		"{TRIGGER.KEY}"			/* deprecated */
+#define MVAR_ITEM_DESCRIPTION		"{ITEM.DESCRIPTION}"
 #define MVAR_ITEM_LOG_DATE		"{ITEM.LOG.DATE}"
 #define MVAR_ITEM_LOG_TIME		"{ITEM.LOG.TIME}"
 #define MVAR_ITEM_LOG_AGE		"{ITEM.LOG.AGE}"
@@ -1778,7 +1795,6 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 #define MVAR_ITEM_LOG_EVENTID		"{ITEM.LOG.EVENTID}"
 #define MVAR_TRIGGER_COMMENT		"{TRIGGER.COMMENT}"
 #define MVAR_TRIGGER_ID			"{TRIGGER.ID}"
-#define MVAR_TRIGGER_KEY		"{TRIGGER.KEY}"
 #define MVAR_TRIGGER_NAME		"{TRIGGER.NAME}"
 #define MVAR_TRIGGER_SEVERITY		"{TRIGGER.SEVERITY}"
 #define MVAR_TRIGGER_NSEVERITY		"{TRIGGER.NSEVERITY}"
@@ -1905,10 +1921,10 @@ static const char	*ex_macros[] =
 	MVAR_PROFILE_POC_SECONDARY_NAME, MVAR_PROFILE_POC_SECONDARY_EMAIL, MVAR_PROFILE_POC_SECONDARY_PHONE_A,
 	MVAR_PROFILE_POC_SECONDARY_PHONE_B, MVAR_PROFILE_POC_SECONDARY_CELL, MVAR_PROFILE_POC_SECONDARY_SCREEN,
 	MVAR_PROFILE_POC_SECONDARY_NOTES,
-	MVAR_ITEM_NAME,
-	MVAR_HOSTNAME, MVAR_PROXY_NAME,
-	MVAR_TRIGGER_KEY,
-	MVAR_HOST_CONN, MVAR_HOST_DNS, MVAR_IPADDRESS,
+	MVAR_HOST_HOST, MVAR_HOST_NAME, MVAR_HOSTNAME, MVAR_PROXY_NAME,
+	MVAR_HOST_CONN, MVAR_HOST_DNS, MVAR_HOST_IP, MVAR_IPADDRESS,
+	MVAR_ITEM_NAME, MVAR_ITEM_DESCRIPTION,
+	MVAR_ITEM_KEY, MVAR_TRIGGER_KEY,
 	MVAR_ITEM_LASTVALUE,
 	MVAR_ITEM_VALUE,
 	MVAR_ITEM_LOG_DATE, MVAR_ITEM_LOG_TIME, MVAR_ITEM_LOG_AGE, MVAR_ITEM_LOG_SOURCE,
@@ -2100,25 +2116,41 @@ static int	get_host_profile(const char *macro, DB_TRIGGER *trigger, char **repla
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: example: " {Zabbix server:{TRIGGER.KEY1}.last(0)} " to " 1.34 "  *
- *                      ^ - bl                                ^ - br          *
+ * Comments: example: " {Zabbix server:{ITEM.KEY1}.last(0)} " to " 1.34 "     *
+ *                      ^ - bl                             ^ - br             *
  *                                                                            *
  ******************************************************************************/
 static void	get_trigger_function_value(DB_TRIGGER *trigger, char **replace_to, char *bl, char **br)
 {
 	char	*p, *host = NULL, *key = NULL, *function = NULL, *parameter = NULL;
-	int	N_functionid, res = SUCCEED;
+	int	N_functionid, res = FAIL;
 	size_t	sz;
 
 	p = bl + 1;
-	sz = sizeof(MVAR_HOSTNAME) - 2;
 
-	if (0 == strncmp(p, MVAR_HOSTNAME, sz) && ('}' == p[sz] ||
-			('}' == p[sz + 1] && '1' <= p[sz] && p[sz] <= '9')))
+	sz = sizeof(MVAR_HOSTNAME) - 2;
+	if (0 == strncmp(p, MVAR_HOSTNAME, sz))
+		res = SUCCEED;
+
+	if (SUCCEED != res)
+	{
+		sz = sizeof(MVAR_HOST_NAME) - 2;
+		if (0 == strncmp(p, MVAR_HOST_NAME, sz))
+			res = SUCCEED;
+	}
+
+	if (SUCCEED != res)
+	{
+		sz = sizeof(MVAR_HOST_HOST) - 2;
+		if (0 == strncmp(p, MVAR_HOST_HOST, sz))
+			res = SUCCEED;
+	}
+
+	if (SUCCEED == res && ('}' == p[sz] || ('}' == p[sz + 1] && '1' <= p[sz] && p[sz] <= '9')))
 	{
 		N_functionid = ('}' == p[sz] ? 1 : p[sz] - '0');
 		p += sz + ('}' == p[sz] ? 1 : 2);
-		DBget_trigger_value(trigger, &host, N_functionid, ZBX_REQUEST_HOST_NAME);
+		DBget_trigger_value(trigger, &host, N_functionid, ZBX_REQUEST_HOST_HOST);
 	}
 	else
 		res = parse_host(&p, &host);
@@ -2126,10 +2158,9 @@ static void	get_trigger_function_value(DB_TRIGGER *trigger, char **replace_to, c
 	if (SUCCEED != res || ':' != *p++)
 		goto fail;
 
-	sz = sizeof(MVAR_TRIGGER_KEY) - 2;
-
-	if (0 == strncmp(p, MVAR_TRIGGER_KEY, sz) && ('}' == p[sz] ||
-			('}' == p[sz + 1] && '1' <= p[sz] && p[sz] <= '9')))
+	if ((0 == strncmp(p, MVAR_ITEM_KEY, sz = sizeof(MVAR_ITEM_KEY) - 2) ||
+				0 == strncmp(p, MVAR_TRIGGER_KEY, sz = sizeof(MVAR_TRIGGER_KEY) - 2)) &&
+			('}' == p[sz] || ('}' == p[sz + 1] && '1' <= p[sz] && p[sz] <= '9')))
 	{
 		N_functionid = ('}' == p[sz] ? 1 : p[sz] - '0');
 		p += sz + ('}' == p[sz] ? 1 : 2);
@@ -2187,7 +2218,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 
 	if (NULL == data || NULL == *data || '\0' == **data)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:NULL", __function_name);
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:EMPTY", __function_name);
 		return res;
 	}
 
@@ -2254,18 +2285,24 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 				}
 				else if (0 == strncmp(m, MVAR_PROFILE, sizeof(MVAR_PROFILE) - 1))
 					ret = get_host_profile(m, &event->trigger, &replace_to, N_functionid);
-				else if (0 == strcmp(m, MVAR_HOSTNAME))
+				else if (0 == strcmp(m, MVAR_HOST_HOST))
+					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
+							ZBX_REQUEST_HOST_HOST);
+				else if (0 == strcmp(m, MVAR_HOST_NAME) || 0 == strcmp(m, MVAR_HOSTNAME))
 					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_NAME);
 				else if (0 == strcmp(m, MVAR_ITEM_NAME))
 					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_ITEM_NAME);
-				else if (0 == strcmp(m, MVAR_TRIGGER_KEY))
+				else if (0 == strcmp(m, MVAR_ITEM_KEY) || 0 == strcmp(m, MVAR_TRIGGER_KEY))
 					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_ITEM_KEY);
-				else if (0 == strcmp(m, MVAR_IPADDRESS))
+				else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
 					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_IPADDRESS);
+				else if (0 == strcmp(m, MVAR_ITEM_DESCRIPTION))
+					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
+							ZBX_REQUEST_ITEM_DESCRIPTION);
 				else if (0 == strcmp(m, MVAR_HOST_DNS))
 					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_DNS);
@@ -2465,9 +2502,9 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 					ret = get_node_value_by_event(event, &replace_to, "nodeid");
 				else if (0 == strcmp(m, MVAR_NODE_NAME))
 					ret = get_node_value_by_event(event, &replace_to, "name");
-				else if (0 == strcmp(m, MVAR_HOSTNAME))
+				else if (0 == strcmp(m, MVAR_HOST_HOST))
 					ret = get_autoreg_value_by_event(event, &replace_to, "host");
-				else if (0 == strcmp(m, MVAR_IPADDRESS))
+				else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
 					ret = get_autoreg_value_by_event(event, &replace_to, "listen_ip");
 				else if (0 == strcmp(m, MVAR_HOST_PORT))
 					ret = get_autoreg_value_by_event(event, &replace_to, "listen_port");
@@ -2491,10 +2528,13 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 		{
 			if (EVENT_SOURCE_TRIGGERS == event->source)
 			{
-				if (0 == strcmp(m, MVAR_HOSTNAME))
+				if (0 == strcmp(m, MVAR_HOST_HOST))
+					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
+							ZBX_REQUEST_HOST_HOST);
+				else if (0 == strcmp(m, MVAR_HOST_NAME) || 0 == strcmp(m, MVAR_HOSTNAME))
 					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_NAME);
-				else if (0 == strcmp(m, MVAR_IPADDRESS))
+				else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
 					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_IPADDRESS);
 				else if (0 == strcmp(m, MVAR_HOST_DNS))
@@ -2530,16 +2570,18 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 		{
 			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				DCget_user_macro(&dc_host->hostid, 1, m, &replace_to);
-			else if (0 == strcmp(m, MVAR_HOSTNAME))
-				replace_to = zbx_dsprintf(replace_to, "%s", dc_host->host);
+			else if (0 == strcmp(m, MVAR_HOST_HOST))
+				replace_to = zbx_strdup(replace_to, dc_host->host);
+			else if (0 == strcmp(m, MVAR_HOST_NAME) || 0 == strcmp(m, MVAR_HOSTNAME))
+				replace_to = zbx_strdup(replace_to, dc_host->name);
 			else if (SUCCEED == (ret = DCconfig_get_interface_by_type(&interface, dc_host->hostid, INTERFACE_TYPE_AGENT)))
 			{
-				if (0 == strcmp(m, MVAR_IPADDRESS))
-					replace_to = zbx_dsprintf(replace_to, "%s", interface.ip_orig);
+				if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
+					replace_to = zbx_strdup(replace_to, interface.ip_orig);
 				else if	(0 == strcmp(m, MVAR_HOST_DNS))
-					replace_to = zbx_dsprintf(replace_to, "%s", interface.dns_orig);
+					replace_to = zbx_strdup(replace_to, interface.dns_orig);
 				else if (0 == strcmp(m, MVAR_HOST_CONN))
-					replace_to = zbx_dsprintf(replace_to, "%s",
+					replace_to = zbx_strdup(replace_to,
 							interface.useip ? interface.ip_orig : interface.dns_orig);
 			}
 		}
@@ -2579,24 +2621,25 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 		}
 		else if (macro_type & MACRO_TYPE_SCRIPT)
 		{
-			if (0 == strcmp(m, MVAR_HOSTNAME))
+			if (0 == strcmp(m, MVAR_HOST_HOST))
 				replace_to = zbx_strdup(replace_to, dc_host->host);
+			else if (0 == strcmp(m, MVAR_HOST_NAME) || 0 == strcmp(m, MVAR_HOSTNAME))
+				replace_to = zbx_strdup(replace_to, dc_host->name);
 			else if (SUCCEED == (ret = DCconfig_get_interface_by_type(&interface, dc_host->hostid, INTERFACE_TYPE_AGENT)))
 			{
-				if (0 == strcmp(m, MVAR_IPADDRESS))
-					replace_to = zbx_dsprintf(replace_to, "%s", interface.ip_orig);
+				if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
+					replace_to = zbx_strdup(replace_to, interface.ip_orig);
 				else if	(0 == strcmp(m, MVAR_HOST_DNS))
-					replace_to = zbx_dsprintf(replace_to, "%s", interface.dns_orig);
+					replace_to = zbx_strdup(replace_to, interface.dns_orig);
 				else if (0 == strcmp(m, MVAR_HOST_CONN))
-					replace_to = zbx_dsprintf(replace_to, "%s",
+					replace_to = zbx_strdup(replace_to,
 							interface.useip ? interface.ip_orig : interface.dns_orig);
 			}
 		}
 
 		if (FAIL == ret)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "No %s in %s(). Triggerid [" ZBX_FS_UI64 "]",
-					bl, __function_name, event->objectid);
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot resolve macro '%s'", bl);
 			replace_to = zbx_strdup(replace_to, STR_UNKNOWN_VARIABLE);
 		}
 
