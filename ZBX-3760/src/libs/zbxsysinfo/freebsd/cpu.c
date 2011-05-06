@@ -25,11 +25,11 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 {
 #if defined(_SC_NPROCESSORS_ONLN)
 	/* FreeBSD 6.2 i386; FreeBSD 7.0 i386 */
+	char	mode[8];
 	int	name;
 	long	ncpu;
-	char	mode[16];
 
-	if (num_param(param) > 1)
+	if (1 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 1, mode, sizeof(mode)))
@@ -42,7 +42,7 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	else
 		return SYSINFO_RET_FAIL;
 
-	if (-1 == (ncpu = sysconf(name)) && EINVAL == errno)
+	if (-1 == (ncpu = sysconf(name)))
 		return SYSINFO_RET_FAIL;
 
 	SET_UI64_RESULT(result, ncpu);
