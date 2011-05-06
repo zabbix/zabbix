@@ -20,6 +20,7 @@
 #include "../common/common.h"
 #include "sysinfo.h"
 #include <sys/mman.h>
+#include "zbxalgo.h"
 #include "hardware.h"
 
 /******************************************************************************
@@ -369,10 +370,11 @@ int	SYSTEM_HW_DEVICES(const char *cmd, const char *param, unsigned flags, AGENT_
 
 int     SYSTEM_HW_MACADDR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	int		ret = SYSINFO_RET_FAIL, offset = 0, s, i, show_names;
-	char		tmp[MAX_STRING_LEN], regex[MAX_STRING_LEN], buf[MAX_STRING_LEN], buffer[MAX_STRING_LEN];
-	struct ifreq	*ifr;
-	struct ifconf	ifc;
+	int			ret = SYSINFO_RET_FAIL, offset, s, i, show_names;
+	char			tmp[MAX_STRING_LEN], regex[MAX_STRING_LEN], buffer[MAX_STRING_LEN], address[MAX_STRING_LEN];
+	struct ifreq		*ifr;
+	struct ifconf		ifc;
+	zbx_vector_str_t	addresses;
 
 	if (2 < num_param(param))
 		return ret;
@@ -391,11 +393,13 @@ int     SYSTEM_HW_MACADDR(const char *cmd, const char *param, unsigned flags, AG
 		return ret;
 
 	/* get the interface list */
-	ifc.ifc_len = sizeof(buf);
-	ifc.ifc_buf = buf;
+	ifc.ifc_len = sizeof(buffer);
+	ifc.ifc_buf = buffer;
 	if (-1 == ioctl(s, SIOCGIFCONF, &ifc))
 		goto close;
 	ifr = ifc.ifc_req;
+
+	zbx_vector_str_create(&addresses);
 
 	/* go through the list */
 	for (i = ifc.ifc_len / sizeof(struct ifreq); 0 < i--; ifr++)
@@ -407,27 +411,47 @@ int     SYSTEM_HW_MACADDR(const char *cmd, const char *param, unsigned flags, AG
 				0 == (ifr->ifr_flags & IFF_LOOPBACK) &&	/* skip loopback interface */
 				-1 != ioctl(s, SIOCGIFHWADDR, ifr))	/* get the MAC address */
 		{
-			if (1 == show_names)
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "[%s] ", ifr->ifr_name);
+			offset = 0;
 
-			offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%.2hx:%.2hx:%.2hx:%.2hx:%.2hx:%.2hx, ",
-				(unsigned short int)(unsigned char)ifr->ifr_hwaddr.sa_data[0],
-				(unsigned short int)(unsigned char)ifr->ifr_hwaddr.sa_data[1],
-				(unsigned short int)(unsigned char)ifr->ifr_hwaddr.sa_data[2],
-				(unsigned short int)(unsigned char)ifr->ifr_hwaddr.sa_data[3],
-				(unsigned short int)(unsigned char)ifr->ifr_hwaddr.sa_data[4],
-				(unsigned short int)(unsigned char)ifr->ifr_hwaddr.sa_data[5]);
+			if (1 == show_names)
+				offset += zbx_snprintf(address + offset, sizeof(address) - offset, "[%s] ", ifr->ifr_name);
+
+			zbx_snprintf(address + offset, sizeof(address) - offset, "%.2hx:%.2hx:%.2hx:%.2hx:%.2hx:%.2hx",
+					(unsigned short int)(unsigned char)ifr->ifr_hwaddr.sa_data[0],
+					(unsigned short int)(unsigned char)ifr->ifr_hwaddr.sa_data[1],
+					(unsigned short int)(unsigned char)ifr->ifr_hwaddr.sa_data[2],
+					(unsigned short int)(unsigned char)ifr->ifr_hwaddr.sa_data[3],
+					(unsigned short int)(unsigned char)ifr->ifr_hwaddr.sa_data[4],
+					(unsigned short int)(unsigned char)ifr->ifr_hwaddr.sa_data[5]);
+
+			if (0 == show_names && FAIL != zbx_vector_str_search(&addresses, address, ZBX_DEFAULT_STR_COMPARE_FUNC))
+				continue;
+
+			zbx_vector_str_append(&addresses, zbx_strdup(NULL, address));
 		}
 	}
-close:
-	close(s);
 
-	if (0 < offset)
+	if (0 != addresses.values_num)
 	{
+		zbx_vector_str_sort(&addresses, ZBX_DEFAULT_STR_COMPARE_FUNC);
+
+		offset = 0;
+		buffer[offset] = '\0';
+
+		for (i = 0; i < addresses.values_num; i++)
+		{
+			offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%s, ", addresses.values[i]);
+			zbx_free(addresses.values[i]);
+		}
+
 		ret = SYSINFO_RET_OK;
-		zbx_rtrim(buffer + MAX(0, offset - 2), ", ");
+		zbx_rtrim(buffer + offset - 2, ", ");
 		SET_STR_RESULT(result, zbx_strdup(NULL, buffer));
 	}
+
+	zbx_vector_str_destroy(&addresses);
+close:
+	close(s);
 
 	return ret;
 }
