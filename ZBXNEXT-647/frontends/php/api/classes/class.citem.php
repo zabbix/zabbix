@@ -1289,38 +1289,43 @@ class CItem extends CItemGeneral{
 	 * @return bool
 	 */
 	public static function validateProfileLinks(array $items, $update=false){
+
+		// profile link field is not being updated, or being updated to 0, no need to validate anything then
+		foreach($items as $i=>$item){
+			if(!isset($item['profile_link']) || $item['profile_link'] == 0){
+				unset($items[$i]);
+			}
+		}
+
 		if(zbx_empty($items)){
 			return true;
 		}
+
 		$possibleHostProfiles = getHostProfiles();
-		$hostIds = array();
 		if($update){
-			// some of the items (which changed host) can already have a host id
-			// we should find out, which do not
+			// for successful validation we need three fields for each item: profile_link, hostid and key_
+			// problem is, that when we are updating an item, we might not have them, because they are not changed
+			// so, we need to find out what is missing and use API to get the lacking info
 			$itemsWithNoHostId = array();
 			$itemsWithHostIdButNoProfileLink = array();
-			foreach($items as $i=>$item){
-				if(!isset($item['profile_link']) || $item['profile_link'] == 0){
-					// profile link field is not being updated, or being updated to 0, no need to validate anything then
-					unset($items[$i]);
+			$itemsWithNoKeys = array();
+			foreach($items as $item){
+				if(!isset($item['profile_link'])){
+					$itemsWithHostIdButNoProfileLink[$item['itemid']] = $item['itemid'];
 				}
-				else if(isset($item['hostid']) && isset($item['profile_link'])){
-					$hostIds[] = $item['hostid'];
+				if(!isset($item['hostid'])){
+					$itemsWithNoHostId[$item['itemid']] = $item['itemid'];
 				}
-				else if(isset($item['hostid'])){
-					$hostIds[] = $item['hostid'];
-					$itemsWithHostIdButNoProfileLink[] = $item['itemid'];
-				}
-				else if(isset($item['profile_link'])){
-					$itemsWithNoHostId[] = $item['itemid'];
+				if(!isset($item['key_'])){
+					$itemsWithNoKeys[$item['itemid']] = $item['itemid'];
 				}
 			}
-			$itemsToFind = array_merge($itemsWithNoHostId, $itemsWithHostIdButNoProfileLink);
-			// are there any items with no hostids or profile_links?
+			$itemsToFind = array_merge($itemsWithNoHostId, $itemsWithHostIdButNoProfileLink, $itemsWithNoKeys);
+			// are there any items with lacking info?
 			if(!zbx_empty($itemsToFind)){
-				// getting the host ids for those items
+			// getting it
 				$options = array(
-					'output' => array('hostid', 'profile_link'),
+					'output' => array('hostid', 'profile_link', 'key_'),
 					'filter' => array(
 						'itemid' => $itemsToFind
 					),
@@ -1328,32 +1333,28 @@ class CItem extends CItemGeneral{
 				);
 				$missingInfo = API::Item()->get($options);
 				$missingInfo = zbx_toHash($missingInfo, 'itemid');
-				// appending host ids and profile_links where they are needed
+				// appending host ids, profile_links and keys where they are needed
 				foreach($items as $i=>$item){
 					if (isset($missingInfo[$item['itemid']])){
-						if(isset($items[$i]['hostid'])){
+						if(!isset($items[$i]['hostid'])){
+							$items[$i]['hostid'] = $missingInfo[$item['itemid']]['hostid'];
+						}
+						if(!isset($items[$i]['profile_link'])){
 							$items[$i]['profile_link'] = $missingInfo[$item['itemid']]['profile_link'];
 						}
-						else{
-							$items[$i]['hostid'] = $missingInfo[$item['itemid']]['hostid'];
-							$hostIds[] = $items[$i]['hostid'];
+						if(!isset($items[$i]['key_'])){
+							$items[$i]['key_'] = $missingInfo[$item['itemid']]['key_'];
 						}
 					}
 				}
 			}
 		}
-		else{
-			foreach($items as $i=>$item){
-				if($item['profile_link'] == 0){
-					unset($items[$i]);
-				}
-			}
-			$hostIds = zbx_objectValues($items, 'hostid');
-		}
+
+		$hostIds = zbx_objectValues($items, 'hostid');
 
 		// getting all profile links on every affected host
 		$options = array(
-			'output' => array('profile_link', 'hostid'),
+			'output' => array('key_', 'profile_link', 'hostid'),
 			'filter' => array(
 				'hostid' => $hostIds
 			),
@@ -1361,23 +1362,24 @@ class CItem extends CItemGeneral{
 		);
 		$profileLinksAndHostIds = API::Item()->get($options);
 
-		// now, changing array: 'hostid' => 'array of profile links'
-		$linksOnHosts = array();
+		// now, changing array: 'hostid' => array('key_'=>'profile_link')
+		$linksOnHostsCurr = array();
 		foreach($profileLinksAndHostIds as $linkAndHostId){
 			// 0 means no link - we are not interested in those ones
 			if($linkAndHostId['profile_link'] != 0){
-				if(!isset($linksOnHosts[$linkAndHostId['hostid']])){
-					$linksOnHosts[$linkAndHostId['hostid']] = array($linkAndHostId['profile_link']);
+				if(!isset($linksOnHostsCurr[$linkAndHostId['hostid']])){
+					$linksOnHostsCurr[$linkAndHostId['hostid']] = array($linkAndHostId['key_'] => $linkAndHostId['profile_link']);
 				}
 				else{
-					$linksOnHosts[$linkAndHostId['hostid']][] = $linkAndHostId['profile_link'];
+					$linksOnHostsCurr[$linkAndHostId['hostid']][$linkAndHostId['key_']] = $linkAndHostId['profile_link'];
 				}
 			}
 		}
 
-		// now, when we have all required info, checking it against every item
+		$linksOnHostsFuture = array();
+
 		foreach($items as $item){
-			// for log items check is not needed
+			// checking if profile_link value is a valid number
 			if($update || $item['value_type'] != ITEM_VALUE_TYPE_LOG){
 				// does profile field with provided number exists?
 				if(!isset($possibleHostProfiles[$item['profile_link']])){
@@ -1387,62 +1389,74 @@ class CItem extends CItemGeneral{
 						_s('Item "%1$s" cannot populate a missing host profile field number "%2$d". Choices are: from 0 (do not populate) to %3$d.', $item['name'], $item['profile_link'], $maxVar)
 					);
 				}
+			}
 
-				// is this field already populated by another item on this host?
-				if(
-					isset($linksOnHosts[$item['hostid']])
-					&& in_array($item['profile_link'], $linksOnHosts[$item['hostid']])
-					// when linking template, we need to check only those items, that are not present in template, others will be overwritten anyway
-					&& (!$update || $item['templateid'] == 0)
-				){
-					// getting names of two items: that gave an error and that populates field already
-					// to give user a descriptive error message
-
-					// name of item that we are trying to add/update
-					if(isset($item['name'])){
-						$thisItemName =	$item['name'];
-					}
-					else{
-						$options = array(
-							'output' => array('name'),
-							'filter' => array(
-								'itemid' => $item['itemid'],
-							),
-							'nopermissions' => true
-						);
-						$thisItem = API::Item()->get($options);
-						$thisItemName = isset($thisItem[0]['name']) ? $thisItem[0]['name'] : '';
-					}
-
-					// name of the original item that already populates the field
-					$options = array(
-						'output' => array('name'),
-						'filter' => array(
-							'hostid' => $item['hostid'],
-							'profile_link' => $item['profile_link']
-						),
-						'nopermissions' => true
-					);
-					$originalItem = API::Item()->get($options);
-					$originalItemName = isset($originalItem[0]['name']) ? $originalItem[0]['name'] : '';
-
-					// name of the profile
-					$profileName = $possibleHostProfiles[$item['profile_link']]['title'];
-
-					// now we can give all the details user needs to know
-					self::exception(
-						ZBX_API_ERROR_PARAMETERS,
-						_s(
-							'Cannot save item "%1$s", because it cannot populate host profile field "%2$s": it is already being populated by item "%3$s". Two items cannot populate one host profile field, this would lead to a conflict.',
-							$thisItemName,
-							$profileName,
-							$originalItemName
-						)
-					);
-				}
+			if(!isset($linksOnHostsFuture[$item['hostid']])){
+				$linksOnHostsFuture[$item['hostid']] = array($item['key_'] => $item['profile_link']);
+			}
+			else{
+				$linksOnHostsFuture[$item['hostid']][$item['key_']] = $item['profile_link'];
 			}
 		}
 
+		foreach($linksOnHostsFuture as $hostId => $linkFuture){
+			if(isset($linksOnHostsCurr[$hostId])){
+				$futureSituation = array_merge($linksOnHostsCurr[$hostId], $linksOnHostsFuture[$hostId]);
+			}
+			else{
+				$futureSituation = $linksOnHostsFuture[$hostId];
+			}
+			$valuesCount = array_count_values($futureSituation);
+			// if we have a duplicate profile links after merging - we are in trouble
+			if(max($valuesCount) > 1){
+				// what profile field caused this conflict?
+				$conflictedLink = array_keys($valuesCount, 2);
+				$conflictedLink = reset($conflictedLink);
+
+				// which of updated items populates this link?
+				$beingSavedItemName = '';
+				foreach($items as $item){
+					if($item['profile_link'] == $conflictedLink){
+						if(isset($item['name'])){
+							$beingSavedItemName = $item['name'];
+						}
+						else{
+							$options = array(
+								'output' => array('name'),
+								'filter' => array(
+									'itemid' => $item['itemid'],
+								),
+								'nopermissions' => true
+							);
+							$thisItem = API::Item()->get($options);
+							$beingSavedItemName = isset($thisItem[0]['name']) ? $thisItem[0]['name'] : '';
+						}
+					}
+				}
+
+				// name of the original item that already populates the field
+				$options = array(
+					'output' => array('name'),
+					'filter' => array(
+						'hostid' => $hostId,
+						'profile_link' => $conflictedLink
+					),
+					'nopermissions' => true
+				);
+				$originalItem = API::Item()->get($options);
+				$originalItemName = isset($originalItem[0]['name']) ? $originalItem[0]['name'] : '';
+
+				self::exception(
+					ZBX_API_ERROR_PARAMETERS,
+					_s(
+						'Two items ("%1$s" and "%2$s") cannot populate one host profile field "%3$s", this would lead to a conflict.',
+						$beingSavedItemName,
+						$originalItemName,
+						$possibleHostProfiles[$conflictedLink]['title']
+					)
+				);
+			}
+		}
 		return true;
 	}
 }
