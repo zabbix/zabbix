@@ -19,7 +19,6 @@
 
 package com.zabbix.proxy;
 
-import java.io.File;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.util.concurrent.*;
@@ -46,11 +45,19 @@ public class JavaProxy
 
 		logger.info("Zabbix Java Proxy {} (revision {}) has started", GeneralInformation.VERSION, GeneralInformation.REVISION);
 
+		Thread shutdownHook = new Thread()
+		{
+			public void run()
+			{
+				logger.info("Zabbix Java Proxy {} (revision {}) has stopped", GeneralInformation.VERSION, GeneralInformation.REVISION);
+			}
+		};
+
+		Runtime.getRuntime().addShutdownHook(shutdownHook);
+
 		try
 		{
 			ConfigurationManager.parseConfiguration();
-
-			daemonize();
 
 			InetAddress listenIP = (InetAddress)ConfigurationManager.getParameter(ConfigurationManager.LISTEN_IP).getValue();
 			int listenPort = ConfigurationManager.getIntegerParameterValue(ConfigurationManager.LISTEN_PORT);
@@ -75,29 +82,5 @@ public class JavaProxy
 		{
 			logger.error("caught fatal exception", e);
 		}
-	}
-
-	private static void daemonize() throws java.io.IOException
-	{
-		File pidFile = (File)ConfigurationManager.getParameter(ConfigurationManager.PID_FILE).getValue();
-
-		if (null != pidFile)
-		{
-			pidFile.deleteOnExit();
-
-			System.in.close();
-			System.out.close();
-			System.err.close();
-		}
-
-		Thread shutdownHook = new Thread()
-		{
-			public void run()
-			{
-				logger.info("Zabbix Java Proxy {} (revision {}) has stopped", GeneralInformation.VERSION, GeneralInformation.REVISION);
-			}
-		};
-
-		Runtime.getRuntime().addShutdownHook(shutdownHook);
 	}
 }
