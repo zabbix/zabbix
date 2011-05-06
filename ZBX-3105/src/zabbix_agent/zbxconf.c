@@ -58,17 +58,6 @@ static void	set_defaults();
 
 void	load_config()
 {
-	init_metrics();
-	init_collector_data();
-
-	/* initialize multistrings */
-	zbx_strarr_init(&CONFIG_ALIASES);
-	zbx_strarr_init(&CONFIG_USER_PARAMETERS);
-	zbx_strarr_init(&CONFIG_PERF_COUNTERS);
-
-	/* set defaults */
-	set_defaults();
-
 	struct cfg_line	cfg[] =
 	{
 		/* PARAMETER,				VAR,					FUNC,
@@ -129,6 +118,17 @@ void	load_config()
 #endif	/* _WINDOWS */
 		{NULL}
 	};
+
+	/* initialize these before parsing configuration */
+	init_metrics();
+	init_collector_data();
+
+	/* initialize multistrings */
+	zbx_strarr_init(&CONFIG_ALIASES);
+	zbx_strarr_init(&CONFIG_USER_PARAMETERS);
+	zbx_strarr_init(&CONFIG_PERF_COUNTERS);
+
+	set_defaults();
 
 	parse_cfg_file(CONFIG_FILE, cfg);
 
@@ -254,9 +254,10 @@ static void	add_parameters_from_config(char **lines)
  ******************************************************************************/
 static void	add_perf_counters_from_config(const char **lines)
 {
-	char	name[MAX_STRING_LEN], counterpath[PDH_MAX_COUNTER_PATH], interval[8], **pline;
-	LPTSTR	wcounterPath;
-	int	ret = FAIL;
+	char		name[MAX_STRING_LEN], counterpath[PDH_MAX_COUNTER_PATH], interval[8];
+	const char	**pline;
+	LPTSTR		wcounterPath;
+	int		ret = FAIL;
 
 	for (pline = lines; NULL != *pline; pline++)
 	{
