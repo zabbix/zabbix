@@ -69,11 +69,14 @@ int     SYSTEM_SW_OS(const char *cmd, const char *param, unsigned flags, AGENT_R
 	return ret;
 }
 
-static int	dpkg_parser(const char *line, char *package)
+static int	dpkg_parser(const char *line, char *package, size_t max_package_len)
 {
-	char	tmp[20];
+	char	fmt[32], tmp[32];
 
-	if (2 != sscanf(line, "%s %s", package, tmp) || 0 != strcmp(tmp, "install"))
+	zbx_snprintf(fmt, sizeof(fmt), "%%" ZBX_FS_SIZE_T "s %%" ZBX_FS_SIZE_T "s",
+			(zbx_fs_size_t)max_package_len, (zbx_fs_size_t)sizeof(tmp));
+
+	if (2 != sscanf(line, fmt, package, tmp) || 0 != strcmp(tmp, "install"))
 		return FAIL;
 
 	return SUCCEED;
@@ -148,7 +151,7 @@ int     SYSTEM_SW_PACKAGES(const char *cmd, const char *param, unsigned flags, A
 			{
 				if (NULL != mng->parser)	/* check if the package name needs to be parsed */
 				{
-					if (SUCCEED == mng->parser(package, tmp))
+					if (SUCCEED == mng->parser(package, tmp, sizeof(tmp)))
 						package = tmp;
 					else
 						goto next;
