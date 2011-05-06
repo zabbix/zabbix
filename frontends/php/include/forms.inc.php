@@ -2141,17 +2141,19 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			$hostProfileFieldDropDown->addItem(0, '-'._('None').'-', $profile_link == '0' || $itemCloned ? 'Yes' : null); // 'yes' means 'selected'
 			// a list of available host profile fields
 			foreach($possibleHostProfiles as $fieldNo => $fieldInfo){
-				$disabled = (
-								isset($alreadyPopulated[$fieldNo])
-								&& $profile_link != $fieldNo
-								&& (!isset($item_data['itemid']) || $item_data['itemid'] != $alreadyPopulated[$fieldNo]['itemid'])
-							)
-							|| ($itemCloned && $profile_link == $fieldNo);
+				if(isset($alreadyPopulated[$fieldNo])){
+					$enabled = isset($item_data['profile_link'])
+							? $item_data['profile_link'] == $fieldNo
+							: $profile_link == $fieldNo && !$itemCloned;
+				}
+				else{
+					$enabled = true;
+				}
 				$hostProfileFieldDropDown->addItem(
 					$fieldNo,
 					$fieldInfo['title'],
 					($profile_link == $fieldNo && !$itemCloned ? 'yes' : null), // selected?
-					$disabled ? 'no' : 'yes'
+					$enabled ? 'yes' : 'no'
 				);
 			}
 
