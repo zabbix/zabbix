@@ -113,8 +113,8 @@ int	add_user_parameter(const char *key, char *command)
 		/* treat duplicate UserParameters as error */
 		if (0 == strcmp(commands[i].key, usr_cmd))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "Duplicate UserParameter key \"%s\" in configuration. "
-					"Previous entry exists: \"%s,%s\"", key, key, commands[i].main_param);
+			zabbix_log(LOG_LEVEL_CRIT, "Failed to add UserParameter \"%s\": duplicate key",
+					key);
 			exit(FAIL);
 		}
 	}
