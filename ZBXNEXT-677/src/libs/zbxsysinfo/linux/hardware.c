@@ -371,7 +371,7 @@ int	SYSTEM_HW_DEVICES(const char *cmd, const char *param, unsigned flags, AGENT_
 int     SYSTEM_HW_MACADDR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	int			ret = SYSINFO_RET_FAIL, offset, s, i, show_names;
-	char			tmp[MAX_STRING_LEN], regex[MAX_STRING_LEN], buffer[MAX_STRING_LEN], address[MAX_STRING_LEN];
+	char			*p, regex[MAX_STRING_LEN], address[MAX_STRING_LEN], buffer[MAX_STRING_LEN];
 	struct ifreq		*ifr;
 	struct ifconf		ifc;
 	zbx_vector_str_t	addresses;
@@ -382,9 +382,9 @@ int     SYSTEM_HW_MACADDR(const char *cmd, const char *param, unsigned flags, AG
 	if (0 != get_param(param, 1, regex, sizeof(regex)))
 		*regex = '\0';
 
-	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "shownames"))
+	if (0 != get_param(param, 2, buffer, sizeof(buffer)) || '\0' == *buffer || 0 == strcmp(buffer, "shownames"))
 		show_names = 1;
-	else if (0 == strcmp(tmp, "onlymacs"))
+	else if (0 == strcmp(buffer, "onlymacs"))
 		show_names = 0;
 	else
 		return ret;
@@ -414,7 +414,7 @@ int     SYSTEM_HW_MACADDR(const char *cmd, const char *param, unsigned flags, AG
 			offset = 0;
 
 			if (1 == show_names)
-				offset += zbx_snprintf(address + offset, sizeof(address) - offset, "[%s] ", ifr->ifr_name);
+				offset += zbx_snprintf(address + offset, sizeof(address) - offset, "[%s  ", ifr->ifr_name);
 
 			zbx_snprintf(address + offset, sizeof(address) - offset, "%.2hx:%.2hx:%.2hx:%.2hx:%.2hx:%.2hx",
 					(unsigned short int)(unsigned char)ifr->ifr_hwaddr.sa_data[0],
@@ -440,6 +440,9 @@ int     SYSTEM_HW_MACADDR(const char *cmd, const char *param, unsigned flags, AG
 
 		for (i = 0; i < addresses.values_num; i++)
 		{
+			if (1 == show_names && NULL != (p = strchr(addresses.values[i], ' ')))
+				*p = ']';
+
 			offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%s, ", addresses.values[i]);
 			zbx_free(addresses.values[i]);
 		}
