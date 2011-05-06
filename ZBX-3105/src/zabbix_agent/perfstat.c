@@ -63,13 +63,13 @@ PERF_COUNTER_DATA	*add_perf_counter(const char *name, const char *counterpath, i
 
 	if (NULL == ppsd->pdh_query)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "PerfCounter '%s' FAILED: Collector is not started!", counterpath);
+		zabbix_log(LOG_LEVEL_WARNING, "PerfCounter '%s' FAILED: collector is not started!", counterpath);
 		return NULL;
 	}
 
 	if (1 > interval || 900 < interval)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "PerfCounter '%s' FAILED: Interval value out of range", counterpath);
+		zabbix_log(LOG_LEVEL_WARNING, "PerfCounter '%s' FAILED: interval value out of range", counterpath);
 		return NULL;
 	}
 
@@ -98,7 +98,10 @@ PERF_COUNTER_DATA	*add_perf_counter(const char *name, const char *counterpath, i
 			zbx_mutex_unlock(&perfstat_access);
 
 			if (ERROR_SUCCESS != pdh_status && PDH_CSTATUS_NO_INSTANCE != pdh_status)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "PerfCounter '%s' FAILED: invalid format");
 				cptr = NULL;	/* indicate a failure */
+			}
 
 			result = SUCCEED;
 			break;

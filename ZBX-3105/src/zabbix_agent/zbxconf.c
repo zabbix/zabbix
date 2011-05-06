@@ -237,6 +237,12 @@ static void	add_parameters_from_config(char **lines)
 }
 
 #ifdef _WINDOWS
+static void	add_perf_counters_fail(const char *pc, const char *err)
+{
+	zabbix_log(LOG_LEVEL_CRIT, "PerfCounter '%s' FAILED: %s", pc, err);
+	exit(FAIL);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: add_perf_counters_from_config                                    *
@@ -257,38 +263,33 @@ static void	add_perf_counters_from_config(const char **lines)
 	char		name[MAX_STRING_LEN], counterpath[PDH_MAX_COUNTER_PATH], interval[8];
 	const char	**pline;
 	LPTSTR		wcounterPath;
-	int		ret = FAIL;
 
 	for (pline = lines; NULL != *pline; pline++)
 	{
 		if (3 < num_param(*pline))
-			goto lbl_syntax_error;
+			add_perf_counters_fail(*pline, "line too short");
 
 		if (0 != get_param(*pline, 1, name, sizeof(name)))
-			goto lbl_syntax_error;
+			add_perf_counters_fail(*pline, "could not parse key");
 
 		if (0 != get_param(*pline, 2, counterpath, sizeof(counterpath)))
-			goto lbl_syntax_error;
+			add_perf_counters_fail(*pline, "could not parse counter path");
 
 		if (0 != get_param(*pline, 3, interval, sizeof(interval)))
-			goto lbl_syntax_error;
+			add_perf_counters_fail(*pline, "could not parse interval");
 
 		wcounterPath = zbx_acp_to_unicode(counterpath);
 		zbx_unicode_to_utf8_static(wcounterPath, counterpath, PDH_MAX_COUNTER_PATH);
 		zbx_free(wcounterPath);
 
 		if (FAIL == check_counter_path(counterpath))
-			goto lbl_syntax_error;
+			add_perf_counters_fail(*pline, "invalid counter path");
 
 		if (NULL == add_perf_counter(name, counterpath, atoi(interval)))
-			goto lbl_syntax_error;
-
-		continue;
-lbl_syntax_error:
-		zabbix_log(LOG_LEVEL_WARNING, "PerfCounter \"%s\" FAILED: invalid format", *pline);
+			add_perf_counters_fail(*pline, "could not add counter");
 	}
 }
-#endif
+#endif	/* _WINDOWS */
 
 /******************************************************************************
  *                                                                            *
