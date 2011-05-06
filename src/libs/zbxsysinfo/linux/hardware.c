@@ -400,6 +400,7 @@ int     SYSTEM_HW_MACADDR(const char *cmd, const char *param, unsigned flags, AG
 	ifr = ifc.ifc_req;
 
 	zbx_vector_str_create(&addresses);
+	zbx_vector_str_reserve(&addresses, 8);
 
 	/* go through the list */
 	for (i = ifc.ifc_len / sizeof(struct ifreq); 0 < i--; ifr++)

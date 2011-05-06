@@ -82,9 +82,12 @@ static int	dpkg_parser(const char *line, char *package, size_t max_package_len)
 	return SUCCEED;
 }
 
-static int	print_packages(char *buffer, int size, zbx_vector_str_t *packages)
+static int	print_packages(char *buffer, int size, zbx_vector_str_t *packages, const char *mng)
 {
 	int	i, offset = 0;
+
+	if (NULL != mng)
+		offset += zbx_snprintf(buffer, size, "[%s] ", mng);
 
 	zbx_vector_str_sort(packages, ZBX_DEFAULT_STR_COMPARE_FUNC);
 
@@ -96,8 +99,7 @@ static int	print_packages(char *buffer, int size, zbx_vector_str_t *packages)
 
 	packages->values_num = 0;
 
-	if (0 != offset)
-		offset -= zbx_rtrim(buffer + MAX(0, offset - 2), ", ");
+	offset -= zbx_rtrim(buffer + MAX(0, offset - 2), ", ");
 
 	return offset;
 }
@@ -167,16 +169,17 @@ next:
 
 			if (1 == show_pm)
 			{
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "[%s] ", mng->name);
-				offset += print_packages(buffer + offset, sizeof(buffer) - offset, &packages);
+				offset += print_packages(buffer + offset, sizeof(buffer) - offset, &packages, mng->name);
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "\n");
 			}
 		}
-		zbx_free(buf);
 	}
+	zbx_free(buf);
 
 	if (0 == show_pm)
-		offset += print_packages(buffer + offset, sizeof(buffer) - offset, &packages);
+		offset += print_packages(buffer + offset, sizeof(buffer) - offset, &packages, NULL);
+	else
+		offset -= zbx_rtrim(buffer + MAX(0, offset - 1), "\n");
 
 	zbx_vector_str_destroy(&packages);
 
