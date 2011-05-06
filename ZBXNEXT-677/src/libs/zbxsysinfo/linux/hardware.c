@@ -394,7 +394,7 @@ int     SYSTEM_HW_MACADDR(const char *cmd, const char *param, unsigned flags, AG
 	ifc.ifc_len = sizeof(buf);
 	ifc.ifc_buf = buf;
 	if (-1 == ioctl(s, SIOCGIFCONF, &ifc))
-		return ret;
+		goto close;
 	ifr = ifc.ifc_req;
 
 	/* go through the list */
@@ -419,13 +419,13 @@ int     SYSTEM_HW_MACADDR(const char *cmd, const char *param, unsigned flags, AG
 				(unsigned short int)(unsigned char)ifr->ifr_hwaddr.sa_data[5]);
 		}
 	}
-
+close:
 	close(s);
 
 	if (0 < offset)
 	{
 		ret = SYSINFO_RET_OK;
-		zbx_rtrim(buffer, ", ");
+		zbx_rtrim(buffer + MAX(0, offset - 2), ", ");
 		SET_STR_RESULT(result, zbx_strdup(NULL, buffer));
 	}
 
