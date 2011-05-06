@@ -19,6 +19,9 @@
 
 package com.zabbix.proxy;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,17 +29,46 @@ class ConfigurationManager
 {
 	private static final Logger logger = LoggerFactory.getLogger(ConfigurationManager.class);
 
+	public static final String PID_FILE = "pidFile"; // has to be parsed first so that we remove the file if other parameters are bad
 	public static final String LISTEN_IP = "listenIP";
 	public static final String LISTEN_PORT = "listenPort";
-	public static final String PID_FILE = "pidFile";
 	public static final String START_POLLERS = "startPollers";
 
 	private static ConfigurationParameter[] parameters =
 	{
-		new ConfigurationParameter(LISTEN_IP, ConfigurationParameter.TYPE_INETADDRESS, null, null),
-		new ConfigurationParameter(LISTEN_PORT, ConfigurationParameter.TYPE_INTEGER, 10051, new IntegerValidator(1024, 32767)),
-		new ConfigurationParameter(PID_FILE, ConfigurationParameter.TYPE_FILE, null, null),
-		new ConfigurationParameter(START_POLLERS, ConfigurationParameter.TYPE_INTEGER, 5, new IntegerValidator(1, 1000))
+		new ConfigurationParameter(PID_FILE, ConfigurationParameter.TYPE_FILE, null,
+				null,
+				new PostInputValidator()
+				{
+					public void execute(Object value)
+					{
+						logger.debug("received {} configuration parameter, daemonizing", PID_FILE);
+
+						File pidFile = (File)value;
+
+						pidFile.deleteOnExit();
+
+						try
+						{
+							System.in.close();
+							System.out.close();
+							System.err.close();
+						}
+						catch (IOException e)
+						{
+							throw new RuntimeException(e);
+						}
+					}
+				}),
+		new ConfigurationParameter(LISTEN_IP, ConfigurationParameter.TYPE_INETADDRESS, null,
+				null,
+				null),
+		new ConfigurationParameter(LISTEN_PORT, ConfigurationParameter.TYPE_INTEGER, 10051,
+				new IntegerValidator(1024, 32767),
+				null),
+		new ConfigurationParameter(START_POLLERS, ConfigurationParameter.TYPE_INTEGER, 5,
+				new IntegerValidator(1, 1000),
+				null)
 	};
 
 	public static void parseConfiguration()
