@@ -777,33 +777,31 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 #define SEC_PER_WEEK		(7 * SEC_PER_DAY)
 #define SEC_PER_MONTH		(30 * SEC_PER_DAY)
 #define SEC_PER_YEAR		(365 * SEC_PER_DAY)
-#define ZBX_JAN_1970_IN_SEC	2208988800.0        /* 1970 - 1900 in seconds */
+#define ZBX_JAN_1970_IN_SEC	2208988800.0	/* 1970 - 1900 in seconds */
 double	zbx_time();
 double	zbx_current_time();
 
 #ifdef HAVE___VA_ARGS__
 #	define zbx_error(fmt, ...) __zbx_zbx_error(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#	define zbx_snprintf(str, count, fmt, ...) __zbx_zbx_snprintf(str, count, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#	define zbx_snprintf_alloc(str, alloc_len, offset, max_len, fmt, ...) \
+       			__zbx_zbx_snprintf_alloc(str, alloc_len, offset, max_len, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
 #else
 #	define zbx_error __zbx_zbx_error
-#endif /* HAVE___VA_ARGS__ */
-void	__zbx_zbx_error(const char *fmt, ...);
-
-#ifdef HAVE___VA_ARGS__
-#	define zbx_snprintf(str, count, fmt, ...) __zbx_zbx_snprintf(str, count, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#else
 #	define zbx_snprintf __zbx_zbx_snprintf
-#endif /* HAVE___VA_ARGS__ */
-int	__zbx_zbx_snprintf(char* str, size_t count, const char *fmt, ...);
-
-int	zbx_vsnprintf(char* str, size_t count, const char *fmt, va_list args);
-
-#ifdef HAVE___VA_ARGS__
-#	define zbx_snprintf_alloc(str, alloc_len, offset, max_len, fmt, ...) \
-       		__zbx_zbx_snprintf_alloc(str, alloc_len, offset, max_len, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#else
 #	define zbx_snprintf_alloc __zbx_zbx_snprintf_alloc
-#endif /* HAVE___VA_ARGS__ */
+#endif
+void	__zbx_zbx_error(const char *fmt, ...);
+int	__zbx_zbx_snprintf(char* str, size_t count, const char *fmt, ...);
 void	__zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_len, const char *fmt, ...);
+
+#ifdef _WINDOWS
+#	define zbx_vsnprintf(str, count, fmt, args) MAX(vsnprintf_s(str, count, _TRUNCATE, fmt, args), 0)
+#else
+#	define zbx_vsnprintf __zbx_zbx_vsnprintf
+#endif
+int	__zbx_zbx_vsnprintf(char* str, size_t count, const char *fmt, va_list args);
+
 void	zbx_strcpy_alloc(char **str, int *alloc_len, int *offset, const char *src);
 void	zbx_chrcpy_alloc(char **str, int *alloc_len, int *offset, const char src);
 
@@ -816,18 +814,13 @@ char	*zbx_dvsprintf(char *dest, const char *f, va_list args);
 
 #ifdef HAVE___VA_ARGS__
 #	define zbx_dsprintf(dest, fmt, ...) __zbx_zbx_dsprintf(dest, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#else
-#	define zbx_dsprintf __zbx_zbx_dsprintf
-#endif /* HAVE___VA_ARGS__ */
-char	*__zbx_zbx_dsprintf(char *dest, const char *f, ...);
-
-char	*zbx_strdcat(char *dest, const char *src);
-
-#ifdef HAVE___VA_ARGS__
 #	define zbx_strdcatf(dest, fmt, ...) __zbx_zbx_strdcatf(dest, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
 #else
+#	define zbx_dsprintf __zbx_zbx_dsprintf
 #	define zbx_strdcatf __zbx_zbx_strdcatf
-#endif /* HAVE___VA_ARGS__ */
+#endif
+char	*__zbx_zbx_dsprintf(char *dest, const char *f, ...);
+char	*zbx_strdcat(char *dest, const char *src);
 char	* __zbx_zbx_strdcatf(char *dest, const char *f, ...);
 
 int	xml_get_data_dyn(const char *xml, const char *tag, char **data);
@@ -836,7 +829,6 @@ void	xml_free_data_dyn(char **data);
 int	comms_parse_response(char *xml, char *host, int host_len, char *key, int key_len, char *data, int data_len,
 		char *lastlogsize, int lastlogsize_len, char *timestamp, int timestamp_len,
 		char *source, int source_len, char *severity, int severity_len);
-
 int 	parse_command(const char *command, char *cmd, size_t cmd_max_len, char *param, size_t param_max_len);
 
 typedef struct zbx_regexp_s
@@ -846,11 +838,12 @@ typedef struct zbx_regexp_s
 	int			expression_type;
 	char			exp_delimiter;
 	zbx_case_sensitive_t	case_sensitive;
-} ZBX_REGEXP;
+}
+ZBX_REGEXP;
 
-/* Regular expressions */
+/* regular expressions */
 char    *zbx_regexp_match(const char *string, const char *pattern, int *len);
-/* Non case sensitive */
+/* non case sensitive */
 char    *zbx_iregexp_match(const char *string, const char *pattern, int *len);
 
 void	clean_regexps_ex(ZBX_REGEXP *regexps, int *regexps_num);

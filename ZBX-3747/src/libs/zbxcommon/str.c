@@ -166,37 +166,6 @@ int	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_vsnprintf                                                    *
- *                                                                            *
- * Purpose: Secure version of vsnprintf function.                             *
- *          Add zero character at the end of string.                          *
- *                                                                            *
- * Parameters: str - destination buffer pointer                               *
- *             count - size of destination buffer                             *
- *             fmt - format                                                   *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexei Vladishev (see also zbx_snprintf)                           *
- *                                                                            *
- ******************************************************************************/
-int	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args)
-{
-	int	writen_len = 0;
-
-	assert(str);
-
-	writen_len = vsnprintf(str, count, fmt, args);
-	writen_len = MIN(writen_len, ((int)count) - 1);
-	writen_len = MAX(writen_len, 0);
-
-	str[writen_len] = '\0';
-
-	return writen_len;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_snprintf_alloc                                               *
  *                                                                            *
  * Purpose: Secure version of snprintf function.                              *
@@ -238,6 +207,37 @@ void	__zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_l
 	*offset += zbx_vsnprintf(*str + *offset, max_len, fmt, args);
 
 	va_end(args);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_vsnprintf                                                    *
+ *                                                                            *
+ * Purpose: Secure version of vsnprintf function.                             *
+ *          Add zero character at the end of string.                          *
+ *                                                                            *
+ * Parameters: str - destination buffer pointer                               *
+ *             count - size of destination buffer                             *
+ *             fmt - format                                                   *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev (see also zbx_snprintf)                           *
+ *                                                                            *
+ ******************************************************************************/
+int	__zbx_zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args)
+{
+	int	writen_len = 0;
+
+	assert(str);
+
+	writen_len = vsnprintf(str, count, fmt, args);
+	writen_len = MIN(writen_len, ((int)count) - 1);
+	writen_len = MAX(writen_len, 0);
+
+	str[writen_len] = '\0';
+
+	return writen_len;
 }
 
 /******************************************************************************
