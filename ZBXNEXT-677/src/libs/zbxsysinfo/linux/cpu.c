@@ -139,16 +139,18 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	int		ret = SYSINFO_RET_FAIL;
-	char		line[MAX_STRING_LEN], name[32];
+	char		line[MAX_STRING_LEN], fmt[32], name[32];
 	zbx_uint64_t	value = 0;
 	FILE		*f;
 
 	if (NULL == (f = fopen("/proc/stat", "r")))
 		return SYSINFO_RET_FAIL;
 
+	zbx_snprintf(fmt, sizeof(fmt), "%%" ZBX_FS_SIZE_T "s " ZBX_FS_UI64, (zbx_fs_size_t)sizeof(name));
+
 	while (NULL != fgets(line, sizeof(line), f))
 	{
-		if (2 != sscanf(line, "%s " ZBX_FS_UI64, name, &value))
+		if (2 != sscanf(line, fmt, name, &value))
 			continue;
 
 		if (0 == strcmp(name, "ctxt"))
