@@ -23,12 +23,11 @@ ALTER TABLE sysmaps_elements MODIFY iconid_disabled NULL;
 ALTER TABLE sysmaps_elements MODIFY iconid_maintenance DEFAULT NULL;
 ALTER TABLE sysmaps_elements MODIFY iconid_maintenance NULL;
 ALTER TABLE sysmaps_elements DROP COLUMN url;
-
-ALTER TABLE sysmaps_elements ADD elementsubtype number(10) DEFAULT '1' NOT NULL,
-ALTER TABLE sysmaps_elements ADD areatype number(10) DEFAULT '1' NOT NULL,
-ALTER TABLE sysmaps_elements ADD width number(10) DEFAULT '200' NOT NULL,
-ALTER TABLE sysmaps_elements ADD height number(10) DEFAULT '200' NOT NULL,
-ALTER TABLE sysmaps_elements ADD viewtype number(10) DEFAULT '1' NOT NULL;
+ALTER TABLE sysmaps_elements ADD elementsubtype number(10) DEFAULT '0' NOT NULL;
+ALTER TABLE sysmaps_elements ADD areatype number(10) DEFAULT '0' NOT NULL;
+ALTER TABLE sysmaps_elements ADD width number(10) DEFAULT '200' NOT NULL;
+ALTER TABLE sysmaps_elements ADD height number(10) DEFAULT '200' NOT NULL;
+ALTER TABLE sysmaps_elements ADD viewtype number(10) DEFAULT '0' NOT NULL;
 
 DELETE FROM sysmaps_elements WHERE sysmapid NOT IN (SELECT sysmapid FROM sysmaps);
 UPDATE sysmaps_elements SET iconid_off=NULL WHERE iconid_off=0;
