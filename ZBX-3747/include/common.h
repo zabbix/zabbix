@@ -799,8 +799,8 @@ void	__zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_l
 #	define zbx_vsnprintf(str, count, fmt, args) MAX(vsnprintf_s(str, count, _TRUNCATE, fmt, args), 0)
 #else
 #	define zbx_vsnprintf __zbx_zbx_vsnprintf
-#endif
 int	__zbx_zbx_vsnprintf(char* str, size_t count, const char *fmt, va_list args);
+#endif
 
 void	zbx_strcpy_alloc(char **str, int *alloc_len, int *offset, const char *src);
 void	zbx_chrcpy_alloc(char **str, int *alloc_len, int *offset, const char src);

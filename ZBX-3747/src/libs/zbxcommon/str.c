@@ -209,6 +209,7 @@ void	__zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_l
 	va_end(args);
 }
 
+#if !defined(_WINDOWS)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_vsnprintf                                                    *
@@ -239,6 +240,7 @@ int	__zbx_zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args)
 
 	return writen_len;
 }
+#endif	/* _WINDOWS */
 
 /******************************************************************************
  *                                                                            *
