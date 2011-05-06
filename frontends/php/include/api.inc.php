@@ -338,6 +338,13 @@ class API{
 	}
 
 /**
+ * @return CUserMedia
+ */
+	public static function UserMedia(){
+		return self::getObject('usermedia');
+	}
+
+/**
  * @return CWebCheck
  */
 	public static function WebCheck(){

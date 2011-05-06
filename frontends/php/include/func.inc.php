@@ -61,12 +61,8 @@ function resetGetParams($params, $newURL=null){
 }
 
 function get_request($name, $def=NULL){
-	if(isset($_REQUEST[$name]))
-		return $_REQUEST[$name];
-	else
-		return $def;
+	return isset($_REQUEST[$name]) ? $_REQUEST[$name] : $def;
 }
-
 
 function inarr_isset($keys, $array=null){
 	if(is_null($array)) $array =& $_REQUEST;
@@ -435,9 +431,9 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 // Any other unit
 //-------------------
 // black list wich do not require units metrics..
-	$blackList = array('%','ms','rpm');
+	$blackList = array('%','ms','rpm','RPM');
 
-	if(in_array(strtolower($units), $blackList) || (zbx_empty($units) && (($convert == ITEM_CONVERT_WITH_UNITS) || ($value < 1)))){
+	if(in_array($units, $blackList) || (zbx_empty($units) && (($convert == ITEM_CONVERT_WITH_UNITS) || ($value < 1)))){
 		if(abs($value) >= ZBX_UNITS_ROUNDOFF_THRESHOLD)
 			$value = round($value, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT);
 		$value = sprintf('%.'.ZBX_UNITS_ROUNDOFF_LOWER_LIMIT.'f', $value);
@@ -629,6 +625,10 @@ function zbx_htmlstr($str){
 	return str_replace(array('<','>','"'),array('&lt;','&gt;','&quot;'), $str);
 }
 
+function zbx_formatDomId($value){
+	return str_replace(array('[',']'),array('_',''), $value);
+}
+
 function zbx_strlen($str){
 	if(defined('ZBX_MBSTRINGS_ENABLED')){
 		return mb_strlen($str);
@@ -762,6 +762,15 @@ function zbx_strpos($haystack, $needle, $offset=0){
 	}
 }
 
+function zbx_stripos($haystack, $needle, $offset=0){
+	if(defined('ZBX_MBSTRINGS_ENABLED')){
+		return mb_stripos($haystack, $needle, $offset);
+	}
+	else{
+		return stripos($haystack, $needle, $offset);
+	}
+}
+
 function zbx_strrpos($haystack, $needle){
 	if(defined('ZBX_MBSTRINGS_ENABLED')){
 		return mb_strrpos($haystack, $needle);
@@ -770,6 +779,7 @@ function zbx_strrpos($haystack, $needle){
 		return strrpos($haystack, $needle);
 	}
 }
+
 // }}} STRING FUNCTIONS
 
 

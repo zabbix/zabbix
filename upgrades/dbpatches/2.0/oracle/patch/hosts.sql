@@ -46,6 +46,7 @@ INSERT INTO interface (interfaceid,hostid,main,type,ip,dns,useip,port)
 
 ---- Patching table `items`
 
+ALTER TABLE items RENAME COLUMN description to name;
 ALTER TABLE items MODIFY itemid DEFAULT NULL;
 ALTER TABLE items MODIFY hostid DEFAULT NULL;
 ALTER TABLE items MODIFY units nvarchar2(255);
@@ -58,6 +59,7 @@ ALTER TABLE items ADD flags number(10) DEFAULT '0' NOT NULL;
 ALTER TABLE items ADD filter nvarchar2(255) DEFAULT '';
 ALTER TABLE items ADD interfaceid number(20) NULL;
 ALTER TABLE items ADD port nvarchar2(64) DEFAULT '';
+ALTER TABLE items ADD description nclob DEFAULT '';
 
 UPDATE items SET templateid=NULL WHERE templateid=0;
 UPDATE items SET templateid=NULL WHERE templateid IS NOT NULL AND templateid NOT IN (SELECT itemid FROM items);
@@ -120,7 +122,10 @@ ALTER TABLE hosts ADD jmx_disable_until number(10) DEFAULT '0' NOT NULL;
 ALTER TABLE hosts ADD jmx_available number(10) DEFAULT '0' NOT NULL;
 ALTER TABLE hosts ADD jmx_errors_from number(10) DEFAULT '0' NOT NULL;
 ALTER TABLE hosts ADD jmx_error nvarchar2(128) DEFAULT '';
+ALTER TABLE hosts ADD name nvarchar2(64) DEFAULT '';
 UPDATE hosts SET proxy_hostid=NULL WHERE proxy_hostid=0;
 UPDATE hosts SET maintenanceid=NULL WHERE maintenanceid=0;
+UPDATE hosts SET name=host WHERE status in (0,1,3);	-- MONITORED, NOT_MONITORED, TEMPLATE
+CREATE INDEX hosts_4 on hosts (name);
 ALTER TABLE hosts ADD CONSTRAINT c_hosts_1 FOREIGN KEY (proxy_hostid) REFERENCES hosts (hostid);
 ALTER TABLE hosts ADD CONSTRAINT c_hosts_2 FOREIGN KEY (maintenanceid) REFERENCES maintenances (maintenanceid);

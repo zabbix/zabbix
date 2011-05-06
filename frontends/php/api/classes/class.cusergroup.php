@@ -36,7 +36,7 @@ class CUserGroup extends CZBXAPI{
  * @param array $options['userids'] User IDs
  * @param boolean $options['status']
  * @param boolean $options['with_gui_access']
- * @param boolean $options['select_users']
+ * @param boolean $options['selectUsers']
  * @param int $options['count']
  * @param string $options['pattern']
  * @param int $options['limit'] limit selection
@@ -69,14 +69,14 @@ class CUserGroup extends CZBXAPI{
 // filter
 			'filter'					=> null,
 			'search'					=> null,
-			'searchByAny'			=> null,
+			'searchByAny'				=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 // OutPut
 			'editable'					=> null,
 			'output'					=> API_OUTPUT_REFER,
-			'select_users'				=> null,
-			'countOutput'						=> null,
+			'selectUsers'				=> null,
+			'countOutput'				=> null,
 			'preservekeys'				=> null,
 
 			'sortfield'					=> '',
@@ -224,12 +224,12 @@ class CUserGroup extends CZBXAPI{
 				else{
 					if(!isset($result[$usrgrp['usrgrpid']])) $result[$usrgrp['usrgrpid']]= array();
 
-					if(!is_null($options['select_users']) && !isset($result[$usrgrp['usrgrpid']]['users'])){
+					if(!is_null($options['selectUsers']) && !isset($result[$usrgrp['usrgrpid']]['users'])){
 						$result[$usrgrp['usrgrpid']]['users'] = array();
 					}
 
 // groupids
-					if(isset($usrgrp['userid']) && is_null($options['select_users'])){
+					if(isset($usrgrp['userid']) && is_null($options['selectUsers'])){
 						if(!isset($result[$usrgrp['usrgrpid']]['users']))
 							$result[$usrgrp['usrgrpid']]['users'] = array();
 
@@ -248,11 +248,11 @@ class CUserGroup extends CZBXAPI{
 
 // Adding Objects
 // Adding users
-		if(!is_null($options['select_users']) && str_in_array($options['select_users'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectUsers']) && str_in_array($options['selectUsers'], $subselects_allowed_outputs)){
 			$obj_params = array(
-				'output' => $options['select_users'],
+				'output' => $options['selectUsers'],
 				'usrgrpids' => $usrgrpids,
-				'get_access' => ($options['select_users'] == API_OUTPUT_EXTEND)?true:null,
+				'getAccess' => ($options['selectUsers'] == API_OUTPUT_EXTEND)?true:null,
 				'preservekeys' => 1
 			);
 			$users = API::User()->get($obj_params);
@@ -506,7 +506,7 @@ class CUserGroup extends CZBXAPI{
 				if(!empty($data)){
 					$update[] = array(
 						'values' => $data,
-						'where' => array('usrgrpid='.$usrgrpid),
+						'where' => array('usrgrpid' => $usrgrpid),
 					);
 				}
 			}
@@ -560,7 +560,6 @@ class CUserGroup extends CZBXAPI{
 					));
 			}
 
-
 			if(!is_null($rights)){
 				$linked_rights = array();
 				$sql = 'SELECT groupid, permission, id'.
@@ -587,7 +586,7 @@ class CUserGroup extends CZBXAPI{
 						else if($linked_rights[$usrgrpid][$right['id']] != $right['permission']){
 							$rights_update[] = array(
 								'values' => array('permission' => $right['permission']),
-								'where' => array('groupid='.$usrgrpid, 'id='.$right['id']),
+								'where' => array('groupid' => $usrgrpid, 'id' => $right['id']),
 							);
 						}
 						unset($linked_rights[$usrgrpid][$right['id']]);
@@ -632,7 +631,11 @@ class CUserGroup extends CZBXAPI{
 
 
 		$usrgrpids = zbx_toArray($usrgrpids);
-
+		$dbUsrgrps = $this->get(array(
+			'output' => array('usrgrpid','name'),
+			'usrgrpids' => $usrgrpids,
+			'preservekeys' => true
+		));
 
 		if(empty($usrgrpids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
 
@@ -642,19 +645,18 @@ class CUserGroup extends CZBXAPI{
 			}
 
 			//we must check, if this user group is used in one of the scripts. If so, it cannot be deleted
-			$error_array = array();
-			$sql = 'SELECT s.name AS script_name, ug.name AS group_name '.
-					' FROM scripts s, usrgrp ug'.
-					' WHERE '.
-						' ug.usrgrpid = s.usrgrpid '.
-						' AND '.DBcondition('s.usrgrpid', $usrgrpids);
-			$res = DBselect($sql);
-			while($group = DBfetch($res)){
-				//GETTEXT: User gets this error message when tries to delete user group used in script
-				$error_array[] = sprintf(_('User group [%1$s] is used in script [%2$s].'), $group['group_name'], $group['script_name']);
+			$dbScripts = API::Script()->get(array(
+				'output' => array('scriptid','name','usrgrpid'),
+				'usrgrpids' => $usrgrpids,
+				'nopermissions' => true
+			));
+			if(!empty($dbScripts)){
+				foreach($dbScripts as $snum => $script){
+					if($script['usrgrpid'] == 0) continue;
+
+					self::exception(ZBX_API_ERROR_PARAMETERS,_s('User group "%1$s" is used in script "%2$s".', $dbUsrgrps[$script['usrgrpid']]['name'], $script['name']));
+				}
 			}
-			if(!empty($error_array))
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error_array);
 
 // delete action operation msg
 			$operationids = array();

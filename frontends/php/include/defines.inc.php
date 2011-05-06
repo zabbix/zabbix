@@ -50,12 +50,18 @@
 	define('ZBX_UNITS_ROUNDOFF_UPPER_LIMIT', 2);
 	define('ZBX_UNITS_ROUNDOFF_LOWER_LIMIT', 6);
 
+	define('ZBX_DEFAULT_INTERVAL',		 	'1-7,00:00-24:00');
+
 // for partitioned DB installs!!
 	define('ZBX_HISTORY_DATA_UPKEEP',		-1); // in days; -1: disabled, 0: always use trends
 
 /* END OF USERS DEFINES */
-	define('ZBX_SCRIPT_TYPE_SCRIPT', 0);
-	define('ZBX_SCRIPT_TYPE_IPMI', 1);
+	define('ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT',	0);
+	define('ZBX_SCRIPT_TYPE_IPMI',			1);
+	define('ZBX_SCRIPT_TYPE_SSH',			2);
+	define('ZBX_SCRIPT_TYPE_TELNET',		3);
+	define('ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT',	4);
+
 
 	define('ZBX_SCRIPT_EXECUTE_ON_AGENT', 0);
 	define('ZBX_SCRIPT_EXECUTE_ON_SERVER', 1);
@@ -659,9 +665,11 @@
 	define('SVC_TCP',	8);
 	define('SVC_AGENT',	9);
 	define('SVC_SNMPv1',	10);
-	define('SVC_SNMPv2',	11);
+	define('SVC_SNMPv2c',	11);
 	define('SVC_ICMPPING',	12);
 	define('SVC_SNMPv3',	13);
+	define('SVC_HTTPS',		14);
+	define('SVC_TELNET',	15);
 
 	define('DHOST_STATUS_ACTIVE',		0);
 	define('DHOST_STATUS_DISABLED',		1);
@@ -701,7 +709,10 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	define('ZBX_PREG_SPACES', '(\s+){0,1}');
 	define('ZBX_PREG_MACRO_NAME', '([A-Z0-9\._]+)');
 	define('ZBX_PREG_INTERNAL_NAMES', '([0-9a-zA-Z_\. \-]+)');	/* !!! Don't forget sync code with C !!! */
+
+	// use isKeyChar() function if you need to check only one symbol
 	define('ZBX_PREG_KEY_NAME', '([0-9a-zA-Z_,.-]+)');	/* !!! Don't forget sync code with C !!! */
+
 	define('ZBX_PREG_PARAMS', '(['.ZBX_PREG_PRINT.']+?){0,1}');
 	define('ZBX_PREG_SIGN', '([&|><=+*\/#\-])');
 	define('ZBX_PREG_NUMBER', '([\-+]{0,1}[0-9]+[.]{0,1}[0-9]*[KMGTsmhdw]{0,1})');
@@ -723,7 +734,7 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 
 	define('ZBX_PREG_SIMPLE_EXPRESSION_FORMAT','(\{'.ZBX_PREG_HOST_FORMAT.'\:'.ZBX_PREG_ITEM_KEY_FORMAT.'\.'.ZBX_PREG_FUNCTION_FORMAT.'\})');
 	define('ZBX_PREG_MACRO_NAME_FORMAT', '(\{[A-Z\.]+\})');
-	define('ZBX_PREG_EXPRESSION_SIMPLE_MACROS', '(\{TRIGGER.VALUE\})');
+	define('ZBX_PREG_EXPRESSION_SIMPLE_MACROS', '(\{TRIGGER\.VALUE\})');
 	define('ZBX_PREG_EXPRESSION_USER_MACROS', '(\{\$'.ZBX_PREG_MACRO_NAME.'\})');
 //-------
 

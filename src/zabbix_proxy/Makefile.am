@@ -10,9 +10,10 @@ sbin_PROGRAMS = zabbix_proxy
 
 zabbix_proxy_SOURCES = \
 	servercomms.c servercomms.h \
-	events.c events.h \
+	events.c \
 	zlog.c \
-	proxy.c
+	proxy.c \
+	scripts.c
 
 zabbix_proxy_LDADD = \
 	heart/libzbxheart.a \

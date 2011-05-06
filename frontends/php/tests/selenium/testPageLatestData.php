@@ -1,3 +1,4 @@
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2000-2011 Zabbix SIA
@@ -16,12 +17,29 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
+?>
+<?php
+require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-#ifndef ZABBIX_EVENTS_H
-#define ZABBIX_EVENTS_H
+class testPageLatestData extends CWebTest
+{
+	public function testPageLatestData_SimpleTest()
+	{
+		$this->login('latest.php');
+		$this->assertTitle('Latest data \[refreshed every 30 sec\]');
+		$this->ok('LATEST DATA');
+		$this->ok('ITEMS');
+		$this->ok(array('Host','Group'));
+		$this->ok('Filter');
+		$this->ok(array('Host','Name','Last check','Last value','Change','History'));
+	}
 
-#include "db.h"
-
-int	process_event(DB_EVENT *event, int force_actions);
-
-#endif
+// Check that no real host or template names displayed
+	public function testPageLatestData_NoHostNames()
+	{
+		$this->login('latest.php');
+		$this->assertTitle('Latest data \[refreshed every 30 sec\]');
+		$this->checkNoRealHostnames();
+	}
+}
+?>

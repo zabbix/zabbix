@@ -23,7 +23,7 @@ class CListItem extends CTag{
 	public function __construct($value,$class=null){
 		parent::__construct('li','yes');
 
-		$this->setAttribute('class', $class);
+		$this->addClass($class);
 		$this->addItem($value);
 	}
 }

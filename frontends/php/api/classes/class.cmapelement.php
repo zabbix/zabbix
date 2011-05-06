@@ -688,7 +688,7 @@ COpt::memoryPick();
 		foreach($selements as $snumm => $selement){
 			$update[] = array(
 				'values' => $selement,
-				'where' => array('selementid='.$selement['selementid']),
+				'where' => array('selementid'=>$selement['selementid']),
 			);
 			$selementids[] = $selement['selementid'];
 
@@ -706,7 +706,7 @@ COpt::memoryPick();
 			foreach($diffUrls['both'] as $unum => $updUrl)
 				$urlsToUpdate[] = array(
 					'values' => $updUrl,
-					'where' => array('selementid='.zbx_dbstr($selement['selementid']),'name='.zbx_dbstr($updUrl['name']))
+					'where' => array('selementid'=>$selement['selementid'],'name'=>$updUrl['name'])
 				);
 
 // delete url
@@ -773,7 +773,7 @@ COpt::memoryPick();
 
 		$udpateLinks = array();
 		foreach($links as $lnum => $link)
-			$udpateLinks[] = array('values' => $link, 'where' => array('linkid='.zbx_dbstr($link['linkid'])));
+			$udpateLinks[] = array('values' => $link, 'where' => array('linkid'=>$link['linkid']));
 
 		DB::update('sysmaps_links', $udpateLinks);
 
@@ -841,7 +841,7 @@ COpt::memoryPick();
 
 			$updateLinkTriggers[] = array(
 				'values' => $linktrigger,
-				'where' => array('linktriggerid='.zbx_dbstr($linktrigger['linktriggerid']))
+				'where' => array('linktriggerid'=>$linktrigger['linktriggerid'])
 			);
 		}
 

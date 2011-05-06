@@ -54,6 +54,7 @@ include_once('include/page_header.php');
 		'groupid'=>			array(T_ZBX_INT, O_OPT,	P_SYS, 	DB_ID,				NULL),
 		'hostid'=>			array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,			'isset({form})&&({form}=="update")'),
 		'host'=>			array(T_ZBX_STR, O_OPT,	null,   NOT_EMPTY,		'isset({save})'),
+		'visiblename'=>		array(T_ZBX_STR, O_OPT,	null,   null,			'isset({save})'),
 		'proxy_hostid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,			'isset({save})'),
 		'status'=>			array(T_ZBX_INT, O_OPT,	null,	IN('0,1,3'),		'isset({save})'),
 
@@ -116,7 +117,7 @@ include_once('include/page_header.php');
 
 // OUTER DATA
 	check_fields($fields);
-	validate_sort_and_sortorder('host', ZBX_SORT_UP);
+	validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go', 'none');
 
@@ -156,7 +157,7 @@ include_once('include/page_header.php');
 			'selectProfile' => true
 		);
 		$hosts = API::Host()->get($params);
-		order_result($hosts, 'host');
+		order_result($hosts, 'name');
 
 // SELECT HOST GROUPS
 		$params = array(
@@ -228,12 +229,12 @@ include_once('include/page_header.php');
 			'output' => API_OUTPUT_EXTEND,
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 			'preservekeys' => 1,
-			'select_dependencies' => API_OUTPUT_EXTEND,
+			'selectDependencies' => API_OUTPUT_EXTEND,
 			'expandData' => 1
 		);
 		$triggers = API::Trigger()->get($params);
 		foreach($triggers as $tnum => $trigger){
-			$triggers[$trigger['triggerid']]['expression'] = explode_exp($trigger['expression'], false);
+			$triggers[$trigger['triggerid']]['expression'] = explode_exp($trigger['expression']);
 		}
 
 // SELECT TRIGGER DEPENDENCIES
@@ -505,6 +506,7 @@ include_once('include/page_header.php');
 
 			$host = array(
 				'host' => $_REQUEST['host'],
+				'name' => $_REQUEST['visiblename'],
 				'status' => $_REQUEST['status'],
 				'proxy_hostid' => get_request('proxy_hostid', 0),
 				'ipmi_authtype' => get_request('ipmi_authtype'),
@@ -569,6 +571,7 @@ include_once('include/page_header.php');
 // Host graphs
 				$options = array(
 					'hostids' => $clone_hostid,
+					'selectItems' => API_OUTPUT_EXTEND,
 					'output' => API_OUTPUT_EXTEND,
 					'inherited' => false,
 					'selectHosts' => API_OUTPUT_SHORTEN,
@@ -576,8 +579,14 @@ include_once('include/page_header.php');
 				);
 				$graphs = API::Graph()->get($options);
 				foreach($graphs as $gnum => $graph){
-					if(count($graph['hosts']) > 1) continue;
-						if(!copy_graph_to_host($graph['graphid'], $hostid)) throw new Exception();
+					if(count($graph['hosts']) > 1)
+						continue;
+
+					if (httpitemExists($graph['items']))
+						continue;
+
+					if(!copy_graph_to_host($graph['graphid'], $hostid))
+						throw new Exception();
 				}
 			}
 // }}} FULL CLONE
@@ -686,7 +695,7 @@ include_once('include/page_header.php');
 ?>
 <?php
 	if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['hosts'])){
-		$hostForm = new CGetForm('host.massupdate');
+		$hostForm = new CView('configuration.host.massupdate');
 		$hosts_wdgt->addItem($hostForm->render());
 	}
 	else if(isset($_REQUEST['form'])){
@@ -695,7 +704,7 @@ include_once('include/page_header.php');
 		else{
 			$hosts_wdgt->addItem(get_header_host_table($_REQUEST['hostid'], 'host'));
 
-			$hostForm = new CGetForm('host.edit');
+			$hostForm = new CView('configuration.host.edit');
 			$hosts_wdgt->addItem($hostForm->render());
 		}
 	}
@@ -708,13 +717,13 @@ include_once('include/page_header.php');
 		$numrows = new CDiv();
 		$numrows->setAttribute('name', 'numrows');
 
-		$hosts_wdgt->addHeader(_('CONFIGURATION OF HOSTS'), $frmGroup);
+		$hosts_wdgt->addHeader(_('HOSTS'), $frmGroup);
 		$hosts_wdgt->addHeader($numrows, $frmForm);
 
 // HOSTS FILTER {{{
 		$filter_table = new CTable('', 'filter_config');
 		$filter_table->addRow(array(
-			array(array(bold(S_HOST), SPACE.S_LIKE_SMALL.': '), new CTextBox('filter_host', $_REQUEST['filter_host'], 20)),
+			array(array(bold(S_NAME), SPACE.S_LIKE_SMALL.': '), new CTextBox('filter_host', $_REQUEST['filter_host'], 20)),
 			array(array(bold(S_DNS), SPACE.S_LIKE_SMALL.': '), new CTextBox('filter_dns', $_REQUEST['filter_dns'], 20)),
 			array(array(bold(S_IP), SPACE.S_LIKE_SMALL.': '), new CTextBox('filter_ip', $_REQUEST['filter_ip'], 20)),
 			array(bold(S_PORT.': '), new CTextBox('filter_port', $_REQUEST['filter_port'], 20))
@@ -746,7 +755,7 @@ include_once('include/page_header.php');
 		$table = new CTableInfo(_('No hosts defined'));
 		$table->setHeader(array(
 			new CCheckBox('all_hosts', null, "checkAll('" . $form->getName() . "','all_hosts','hosts');"),
-			make_sorting_header(_('Name'), 'host'),
+			make_sorting_header(_('Name'), 'name'),
 			_('Applications'),
 			_('Items'),
 			_('Triggers'),
@@ -761,7 +770,7 @@ include_once('include/page_header.php');
 // get Hosts
 		$hosts = array();
 
-		$sortfield = getPageSortField('host');
+		$sortfield = getPageSortField('name');
 		$sortorder = getPageSortOrder();
 
 		if($pageFilter->groupsSelected){
@@ -771,7 +780,7 @@ include_once('include/page_header.php');
 				'sortorder' => $sortorder,
 				'limit' => ($config['search_limit']+1),
 				'search' => array(
-					'host' => (empty($_REQUEST['filter_host']) ? null : $_REQUEST['filter_host']),
+					'name' => (empty($_REQUEST['filter_host']) ? null : $_REQUEST['filter_host']),
 					'ip' => (empty($_REQUEST['filter_ip']) ? null : $_REQUEST['filter_ip']),
 					'dns' => (empty($_REQUEST['filter_dns']) ? null : $_REQUEST['filter_dns']),
 				),
@@ -783,7 +792,6 @@ include_once('include/page_header.php');
 			if($pageFilter->groupid > 0) $options['groupids'] = $pageFilter->groupid;
 
 			$hosts = API::Host()->get($options);
-
 		}
 		else{
 			$hosts = array();
@@ -798,13 +806,13 @@ include_once('include/page_header.php');
 		$options = array(
 			'hostids' => zbx_objectValues($hosts, 'hostid'),
 			'output' => API_OUTPUT_EXTEND,
-			'selectParentTemplates' => array('hostid','host'),
+			'selectParentTemplates' => array('hostid','name'),
 			'selectInterfaces' => API_OUTPUT_EXTEND,
 			'selectItems' => API_OUTPUT_COUNT,
 			'selectDiscoveries' => API_OUTPUT_COUNT,
-			'select_triggers' => API_OUTPUT_COUNT,
-			'select_graphs' => API_OUTPUT_COUNT,
-			'select_applications' => API_OUTPUT_COUNT
+			'selectTriggers' => API_OUTPUT_COUNT,
+			'selectGraphs' => API_OUTPUT_COUNT,
+			'selectApplications' => API_OUTPUT_COUNT
 		);
 		$hosts = API::Host()->get($options);
 // sorting && paging
@@ -820,7 +828,7 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'templateids' => $templateids,
-			'selectParentTemplates' => array('hostid', 'host'),
+			'selectParentTemplates' => array('hostid', 'name'),
 		);
 		$templates = API::Template()->get($options);
 		$templates = zbx_toHash($templates, 'templateid');
@@ -850,7 +858,7 @@ include_once('include/page_header.php');
 				$description[] = $proxy['host'] . ':';
 			}
 
-			$description[] = new CLink($host['host'], 'hosts.php?form=update&hostid='.$host['hostid'].url_param('groupid'));
+			$description[] = new CLink($host['name'], 'hosts.php?form=update&hostid='.$host['hostid'].url_param('groupid'));
 
 			$hostIF = ($interface['useip'] == INTERFACE_USE_IP) ? $interface['ip'] : $interface['dns'];
 			$hostIF .= empty($interface['port']) ? '' : ': '.$interface['port'];
@@ -945,17 +953,17 @@ include_once('include/page_header.php');
 			}
 			else{
 				$hostTemplates = array();
-				order_result($host['parentTemplates'], 'host');
+				order_result($host['parentTemplates'], 'name');
 				foreach($host['parentTemplates'] as $htnum => $template){
 					$caption = array();
-					$caption[] = new CLink($template['host'],'templates.php?form=update&templateid='.$template['templateid'],'unknown');
+					$caption[] = new CLink($template['name'],'templates.php?form=update&templateid='.$template['templateid'],'unknown');
 
 					if(!empty($templates[$template['templateid']]['parentTemplates'])){
-						order_result($templates[$template['templateid']]['parentTemplates'], 'host');
+						order_result($templates[$template['templateid']]['parentTemplates'], 'name');
 
 						$caption[] = ' (';
 						foreach($templates[$template['templateid']]['parentTemplates'] as $tnum => $tpl){
-							$caption[] = new CLink($tpl['host'],'templates.php?form=update&templateid='.$tpl['templateid'], 'unknown');
+							$caption[] = new CLink($tpl['name'],'templates.php?form=update&templateid='.$tpl['templateid'], 'unknown');
 							$caption[] = ', ';
 						}
 						array_pop($caption);

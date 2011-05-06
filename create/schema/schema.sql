@@ -39,7 +39,7 @@ FIELD		|druleid	|t_id		|	|NOT NULL	|0
 FIELD		|proxy_hostid	|t_id		|	|NULL		|ZBX_SYNC		|1|hosts	|hostid		|RESTRICT
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|iprange	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|delay		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|delay		|t_integer	|'3600'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|nextcheck	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 
@@ -47,8 +47,8 @@ TABLE|dchecks|dcheckid|ZBX_SYNC
 FIELD		|dcheckid	|t_id		|	|NOT NULL	|0
 FIELD		|druleid	|t_id		|	|NOT NULL	|ZBX_SYNC,ZBX_PROXY	|1|drules
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|key_		|t_varchar(255)	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|snmp_community	|t_varchar(255)	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|snmp_community	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|ports		|t_varchar(255)	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|snmpv3_securityname|t_varchar(64)|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|snmpv3_securitylevel|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
@@ -69,8 +69,8 @@ TABLE|dservices|dserviceid|ZBX_SYNC
 FIELD		|dserviceid	|t_id		|	|NOT NULL	|0
 FIELD		|dhostid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|dhosts
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|key_		|t_varchar(255)	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|value		|t_varchar(255)	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|port		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lastup		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
@@ -376,7 +376,7 @@ FIELD		|actionid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|actions
 FIELD		|operationtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|esc_period	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|esc_step_from	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
-FIELD		|esc_step_to	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|esc_step_to	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|evaltype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|actionid
 
@@ -399,18 +399,29 @@ FIELD		|operationid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|operations
 FIELD		|userid		|t_id		|	|NOT NULL	|ZBX_SYNC		|2|users	|		|RESTRICT
 UNIQUE		|1		|operationid,userid
 
+TABLE|opcommand|operationid|ZBX_SYNC
+FIELD		|operationid	|t_id		|	|NOT NULL	|0			|1|operations
+FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|scriptid	|t_id		|	|NULL		|ZBX_SYNC		|2|scripts	|		|RESTRICT
+FIELD		|execute_on	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|port		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|authtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|username	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|password	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|publickey	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|privatekey	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|command	|t_text		|''	|NOT NULL	|ZBX_SYNC
+
 TABLE|opcommand_hst|opcommand_hstid|ZBX_SYNC
 FIELD		|opcommand_hstid|t_id		|	|NOT NULL	|0
 FIELD		|operationid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|operations
 FIELD		|hostid		|t_id		|	|NULL		|ZBX_SYNC		|2|hosts	|		|RESTRICT
-FIELD		|command	|t_text		|''	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|operationid
 
 TABLE|opcommand_grp|opcommand_grpid|ZBX_SYNC
 FIELD		|opcommand_grpid|t_id		|	|NOT NULL	|0
 FIELD		|operationid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|operations
 FIELD		|groupid	|t_id		|	|NOT NULL	|ZBX_SYNC		|2|groups	|		|RESTRICT
-FIELD		|command	|t_text		|''	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|operationid
 
 TABLE|opgroup|opgroupid|ZBX_SYNC
@@ -611,9 +622,11 @@ FIELD		|jmx_disable_until|t_integer	|'0'	|NOT NULL	|0
 FIELD		|jmx_available	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|jmx_errors_from|t_integer	|'0'	|NOT NULL	|0
 FIELD		|jmx_error	|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|host
 INDEX		|2		|status
 INDEX		|3		|proxy_hostid
+INDEX		|4		|name
 
 TABLE|interface|interfaceid|ZBX_SYNC
 FIELD		|interfaceid	|t_id		|	|NOT NULL	|0
@@ -746,7 +759,7 @@ FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|snmp_community	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|snmp_oid	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|hostid		|t_id		|	|NOT NULL	|ZBX_SYNC,ZBX_PROXY	|1|hosts
-FIELD		|description	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|delay		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|history	|t_integer	|'90'	|NOT NULL	|ZBX_SYNC
@@ -786,6 +799,7 @@ FIELD		|flags		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|filter		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|interfaceid	|t_id		|	|NULL		|ZBX_SYNC,ZBX_PROXY	|4|interface	|		|RESTRICT
 FIELD		|port		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|description	|t_text		|''	|NOT NULL	|ZBX_SYNC
 UNIQUE		|1		|hostid,key_
 INDEX		|3		|status
 INDEX		|4		|templateid

@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2000-2011 Zabbix SIA
@@ -17,37 +16,15 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-?>
-<?php
-class CGetForm{
-	private $file;
-	private $data;
-	private $form;
-	private $scripts;
 
-	public function __construct($file, $data=array()){
-		$this->assign($file, $data);
-	}
+#ifndef ZABBIX_SCRIPTS_H
+#define ZABBIX_SCRIPTS_H
 
-	public function assign($file, $data){
-		if(!preg_match("/[a-z\.]+/", $file)){
-			error('Invalid form name given ['.$file.']');
-			return false;
-		}
+#include "common.h"
+#include "dbcache.h"
 
-		$this->file = './include/forms/'.$file.'.php';
-		$this->data = $data;
-	}
+void	zbx_script_init(zbx_script_t *script);
+void	zbx_script_clean(zbx_script_t *script);
+int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, char **result, char *error, size_t max_error_len);
 
-	public function render(){
-		$data = $this->data;
-
-		ob_start();
-		$this->form = include($this->file);
-		$this->scripts = ob_get_clean();
-
-		print($this->scripts);
-		return $this->form;
-	}
-}
-?>
+#endif

@@ -41,7 +41,7 @@ class testPageEvents extends CWebTest
 		if(0 == DBcount('select * from events where source='.EVENT_SOURCE_TRIGGERS))
 			$this->ok('No events found');
 		else
-			$this->ok(array('Time','IP','DNS','Description','Status'));
+			$this->ok(array('Time', 'Description', 'Status', 'Severity', 'Duration', 'Ack', 'Actions'));
 	}
 
 	public function testPageEvents_Discovery_SimpleTest()
@@ -66,6 +66,26 @@ class testPageEvents extends CWebTest
 	{
 // TODO
 		$this->markTestIncomplete();
+	}
+
+// Check that no real host or template names displayed
+	public function testPageEvents_Triggers_NoHostNames()
+	{
+		$this->login('events.php');
+		$this->dropdown_select_wait('source','Trigger');
+		$this->assertTitle('Latest events');
+
+		$this->checkNoRealHostnames();
+	}
+
+// Check that no real host or template names displayed
+	public function testPageEvents_Discovery_NoHostNames()
+	{
+		$this->login('events.php');
+		$this->dropdown_select_wait('source','Discovery');
+		$this->assertTitle('Latest events');
+
+		$this->checkNoRealHostnames();
 	}
 }
 ?>

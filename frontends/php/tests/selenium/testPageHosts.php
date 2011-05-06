@@ -34,12 +34,12 @@ class testPageHosts extends CWebTest{
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid','Zabbix servers');
 		$this->assertTitle('Hosts');
-		$this->ok('CONFIGURATION OF HOSTS');
+		$this->ok('HOSTS');
 		$this->ok('Displaying');
 		// Header
 		$this->ok(array('Name','Applications','Items','Triggers','Graphs','Discovery','Interface','Templates','Status','Availability'));
 		// Data
-		$this->ok(array($host['host']));
+		$this->ok(array($host['name']));
 		$this->dropdown_select('go','Export selected');
 		$this->dropdown_select('go','Mass update');
 		$this->dropdown_select('go','Activate selected');
@@ -53,12 +53,12 @@ class testPageHosts extends CWebTest{
 	public function testPageHosts_FilterHost($host){
 		$this->login('hosts.php');
 		$this->click('flicker_icon_l');
-		$this->input_type('filter_host',$host['host']);
+		$this->input_type('filter_host',$host['name']);
 		$this->input_type('filter_ip','');
 		$this->input_type('filter_port','');
 		$this->click('filter');
 		$this->wait();
-		$this->ok($host['host']);
+		$this->ok($host['name']);
 	}
 
 	// Filter returns nothing
@@ -108,7 +108,7 @@ class testPageHosts extends CWebTest{
 		$this->click('css=span.link_menu');
 		$this->click('filter');
 		$this->wait();
-		$this->ok($host['host']);
+		$this->ok($host['name']);
 	}
 
 	/**
@@ -120,7 +120,7 @@ class testPageHosts extends CWebTest{
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid','all');
 		$this->assertTitle('Hosts');
-		$this->ok('CONFIGURATION OF HOSTS');
+		$this->ok('HOSTS');
 		$this->ok('Displaying');
 		// Go to the list of items
 		$this->href_click("items.php?filter_set=1&hostid=$hostid&sid=");
@@ -129,7 +129,7 @@ class testPageHosts extends CWebTest{
 		$this->assertTitle('Configuration of items');
 		$this->ok('Displaying');
 		// Header
-		$this->ok(array('Wizard','Description','Triggers','Key','Interval','History','Trends','Type','Status','Applications','Error'));
+		$this->ok(array('Wizard','Name','Triggers','Key','Interval','History','Trends','Type','Status','Applications','Error'));
 	}
 
 	public function testPageHosts_MassExportAll(){

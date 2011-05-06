@@ -282,7 +282,9 @@ typedef enum
 	SVC_SNMPv1,
 	SVC_SNMPv2c,
 	SVC_ICMPPING,
-	SVC_SNMPv3
+	SVC_SNMPv3,
+	SVC_HTTPS,
+	SVC_TELNET
 } zbx_dservice_type_t;
 const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 
@@ -645,8 +647,26 @@ const char	*zbx_permission_string(int perm);
 #define	ZBX_NODE_SLAVE	1
 const char	*zbx_nodetype_string(unsigned char nodetype);
 
-#define ZBX_SCRIPT_TYPE_SCRIPT		0
+typedef struct
+{
+	unsigned char	type;
+	unsigned char	execute_on;
+	char		*port;
+	unsigned char	authtype;
+	char		*username;
+	char		*password;
+	char		*publickey;
+	char		*privatekey;
+	char		*command;
+	zbx_uint64_t	scriptid;
+}
+zbx_script_t;
+
+#define ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT	0
 #define ZBX_SCRIPT_TYPE_IPMI		1
+#define ZBX_SCRIPT_TYPE_SSH		2
+#define ZBX_SCRIPT_TYPE_TELNET		3
+#define ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT	4
 
 #define ZBX_SCRIPT_EXECUTE_ON_AGENT	0
 #define ZBX_SCRIPT_EXECUTE_ON_SERVER	1
@@ -788,6 +808,7 @@ int	zbx_pg_unescape_bytea(u_char *io);
 #endif
 int	zbx_get_next_field(const char **line, char **output, int *olen, char separator);
 int	str_in_list(const char *list, const char *value, char delimiter);
+char	*str_linefeed(const char *src, size_t maxline, const char *delim);
 
 #ifdef HAVE___VA_ARGS__
 #	define zbx_setproctitle(fmt, ...) __zbx_zbx_setproctitle(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
