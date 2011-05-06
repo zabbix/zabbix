@@ -2136,16 +2136,22 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 				'nopermissions' => true
 			);
 			$alreadyPopulated = API::item()->get($options);
-			$alreadyPopulated = zbx_objectValues($alreadyPopulated, 'profile_link');
+			$alreadyPopulated = zbx_toHash($alreadyPopulated, 'profile_link');
 			// default option - do not populate
 			$hostProfileFieldDropDown->addItem(0, '-'._('None').'-', $profile_link == '0' || $itemCloned ? 'Yes' : null); // 'yes' means 'selected'
 			// a list of available host profile fields
 			foreach($possibleHostProfiles as $fieldNo => $fieldInfo){
+				$disabled = (
+								isset($alreadyPopulated[$fieldNo])
+								&& $profile_link != $fieldNo
+								&& (!isset($item_data['itemid']) || $item_data['itemid'] != $alreadyPopulated[$fieldNo]['itemid'])
+							)
+							|| ($itemCloned && $profile_link == $fieldNo);
 				$hostProfileFieldDropDown->addItem(
 					$fieldNo,
 					$fieldInfo['title'],
 					($profile_link == $fieldNo && !$itemCloned ? 'yes' : null), // selected?
-					((in_array($fieldNo, $alreadyPopulated) && $profile_link != $fieldNo) || ($itemCloned && $profile_link == $fieldNo) ? 'no' : 'yes') // enabled?
+					$disabled ? 'no' : 'yes'
 				);
 			}
 

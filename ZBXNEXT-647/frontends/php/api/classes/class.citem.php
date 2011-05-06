@@ -1307,11 +1307,11 @@ class CItem extends CItemGeneral{
 			// problem is, that when we are updating an item, we might not have them, because they are not changed
 			// so, we need to find out what is missing and use API to get the lacking info
 			$itemsWithNoHostId = array();
-			$itemsWithHostIdButNoProfileLink = array();
+			$itemsWithNoProfileLink = array();
 			$itemsWithNoKeys = array();
 			foreach($items as $item){
 				if(!isset($item['profile_link'])){
-					$itemsWithHostIdButNoProfileLink[$item['itemid']] = $item['itemid'];
+					$itemsWithNoProfileLink[$item['itemid']] = $item['itemid'];
 				}
 				if(!isset($item['hostid'])){
 					$itemsWithNoHostId[$item['itemid']] = $item['itemid'];
@@ -1320,7 +1320,7 @@ class CItem extends CItemGeneral{
 					$itemsWithNoKeys[$item['itemid']] = $item['itemid'];
 				}
 			}
-			$itemsToFind = array_merge($itemsWithNoHostId, $itemsWithHostIdButNoProfileLink, $itemsWithNoKeys);
+			$itemsToFind = array_merge($itemsWithNoHostId, $itemsWithNoProfileLink, $itemsWithNoKeys);
 			// are there any items with lacking info?
 			if(!zbx_empty($itemsToFind)){
 			// getting it
@@ -1360,18 +1360,18 @@ class CItem extends CItemGeneral{
 			),
 			'nopermissions' => true
 		);
-		$profileLinksAndHostIds = API::Item()->get($options);
+		$itemsOnHostsInfo = API::Item()->get($options);
 
-		// now, changing array: 'hostid' => array('key_'=>'profile_link')
+		// now, changing array to: 'hostid' => array('key_'=>'profile_link')
 		$linksOnHostsCurr = array();
-		foreach($profileLinksAndHostIds as $linkAndHostId){
+		foreach($itemsOnHostsInfo as $info){
 			// 0 means no link - we are not interested in those ones
-			if($linkAndHostId['profile_link'] != 0){
-				if(!isset($linksOnHostsCurr[$linkAndHostId['hostid']])){
-					$linksOnHostsCurr[$linkAndHostId['hostid']] = array($linkAndHostId['key_'] => $linkAndHostId['profile_link']);
+			if($info['profile_link'] != 0){
+				if(!isset($linksOnHostsCurr[$info['hostid']])){
+					$linksOnHostsCurr[$info['hostid']] = array($info['key_'] => $info['profile_link']);
 				}
 				else{
-					$linksOnHostsCurr[$linkAndHostId['hostid']][$linkAndHostId['key_']] = $linkAndHostId['profile_link'];
+					$linksOnHostsCurr[$info['hostid']][$info['key_']] = $info['profile_link'];
 				}
 			}
 		}
@@ -1429,8 +1429,9 @@ class CItem extends CItemGeneral{
 								'nopermissions' => true
 							);
 							$thisItem = API::Item()->get($options);
-							$beingSavedItemName = isset($thisItem[0]['name']) ? $thisItem[0]['name'] : '';
+							$beingSavedItemName = $thisItem[0]['name'];
 						}
+						break;
 					}
 				}
 
@@ -1444,7 +1445,7 @@ class CItem extends CItemGeneral{
 					'nopermissions' => true
 				);
 				$originalItem = API::Item()->get($options);
-				$originalItemName = isset($originalItem[0]['name']) ? $originalItem[0]['name'] : '';
+				$originalItemName = $originalItem[0]['name'];
 
 				self::exception(
 					ZBX_API_ERROR_PARAMETERS,
