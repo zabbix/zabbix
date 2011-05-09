@@ -82,14 +82,6 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 			SET_MSG_RESULT(result, strdup(buffer));
 			ret = AGENT_ERROR;
 		}
-		else if ('\0' == *buf)	/* this section should be improved */
-		{
-			zbx_snprintf(buffer, sizeof(buffer), "Got empty string from [%s]."
-					" Assuming that agent dropped connection because of access permissions",
-					item->interface.addr);
-			SET_MSG_RESULT(result, strdup(buffer));
-			ret = NETWORK_ERROR;
-		}
 		else if (SUCCEED != set_result_type(result, item->value_type, item->data_type, buf))
 			ret = NOTSUPPORTED;
 	}
