@@ -2138,7 +2138,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			$alreadyPopulated = API::item()->get($options);
 			$alreadyPopulated = zbx_toHash($alreadyPopulated, 'profile_link');
 			// default option - do not populate
-			$hostProfileFieldDropDown->addItem(0, '-'._('None').'-', $profile_link == '0' || $itemCloned ? 'Yes' : null); // 'yes' means 'selected'
+			$hostProfileFieldDropDown->addItem(0, '-'._('None').'-', $profile_link == '0' ? 'Yes' : null); // 'yes' means 'selected'
 			// a list of available host profile fields
 			foreach($possibleHostProfiles as $fieldNo => $fieldInfo){
 				if(isset($alreadyPopulated[$fieldNo])){
@@ -2152,7 +2152,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 				$hostProfileFieldDropDown->addItem(
 					$fieldNo,
 					$fieldInfo['title'],
-					($profile_link == $fieldNo && !$itemCloned ? 'yes' : null), // selected?
+					($profile_link == $fieldNo && $enabled  ? 'yes' : null), // selected?
 					$enabled ? 'yes' : 'no'
 				);
 			}
