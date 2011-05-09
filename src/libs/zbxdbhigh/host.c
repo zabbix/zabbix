@@ -30,18 +30,17 @@
  *                                                                            *
  * Description: Check collisions between templates                            *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  * Parameters: templateids - array of templates identificators from database  *
  *             templateids_num - templates count in templateids array         *
  *                                                                            *
  * Return value: SUCCEED if no collisions found                               *
  *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
  * Comments: !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-static int	validate_template(zbx_uint64_t *templateids, int templateids_num,
-		char *error, int max_error_len)
+static int	validate_template(zbx_uint64_t *templateids, int templateids_num, char *error, size_t max_error_len)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -236,6 +235,57 @@ static int	DBcmp_triggers(zbx_uint64_t triggerid1, const char *expression1,
 	return res;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: validate_profile_links                                           *
+ *                                                                            *
+ * Description: Check collisions in item profile links                        *
+ *                                                                            *
+ * Parameters: hostid     - [IN] host identificator from database             *
+ *             templateid - [IN] template identificator from database         *
+ *                                                                            *
+ * Return value: SUCCEED if no collisions found                               *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	validate_profile_links(zbx_uint64_t hostid, zbx_uint64_t templateid, char *error, size_t max_error_len)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		sql[320];
+	int		ret = SUCCEED;
+
+	zbx_snprintf(sql, sizeof(sql),
+			"select ti.itemid"
+			" from items ti,items i"
+			" where ti.key_<>i.key_"
+				" and ti.profile_link=i.profile_link"
+				" and ti.hostid=" ZBX_FS_UI64
+				" and i.hostid=" ZBX_FS_UI64
+				" and ti.profile_link<>0"
+				" and not exists ("
+					"select *"
+					" from items"
+					" where items.hostid=" ZBX_FS_UI64
+						" and items.key_=i.key_"
+					")",
+			templateid, hostid, templateid);
+
+	result = DBselectN(sql, 1);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		zbx_strlcpy(error, "Two items cannot populate one host profile field", max_error_len);
+		ret = FAIL;
+	}
+	DBfree_result(result);
+
+	return ret;
+}
+
 void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems,
 		int *gitems_alloc, int *gitems_num)
 {
@@ -339,8 +389,7 @@ clean:
  * Comments: !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-static int	validate_host(zbx_uint64_t hostid, zbx_uint64_t templateid,
-		char *error, int max_error_len)
+static int	validate_host(zbx_uint64_t hostid, zbx_uint64_t templateid, char *error, size_t max_error_len)
 {
 	DB_RESULT	tresult;
 	DB_RESULT	hresult;
@@ -350,11 +399,13 @@ static int	validate_host(zbx_uint64_t hostid, zbx_uint64_t templateid,
 	int		sql_offset, sql_alloc = 256;
 	ZBX_GRAPH_ITEMS *gitems = NULL, *chd_gitems = NULL;
 	int		gitems_alloc = 0, gitems_num = 0,
-			chd_gitems_alloc = 0, chd_gitems_num = 0,
-			res = SUCCEED;
+			chd_gitems_alloc = 0, chd_gitems_num = 0, res;
 	zbx_uint64_t	graphid;
 	unsigned char	t_flags, h_flags, type;
 	zbx_uint64_t	interfaceids[4];
+
+	if (SUCCEED != (res = validate_profile_links(hostid, templateid, error, max_error_len)))
+		return res;
 
 	sql = zbx_malloc(sql, sql_alloc);
 
@@ -434,7 +485,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_uint64_t templateid,
 				zbx_snprintf(error, max_error_len,
 						"Graph [%s] already exists on the host (items are not identical)",
 						trow[1]);
-				break;	/* found graph with equal name, but items are not identical*/
+				break;	/* found graph with equal name, but items are not identical */
 			}
 		}
 		DBfree_result(hresult);
@@ -462,8 +513,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_uint64_t templateid,
 		DBfree_result(tresult);
 	}
 
-	/* Interfaces */
-
+	/* interfaces */
 	if (SUCCEED == res)
 	{
 		memset(&interfaceids, 0, sizeof(interfaceids));
@@ -2564,7 +2614,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 				"ti.snmpv3_authpassphrase,ti.snmpv3_privpassphrase,"
 				"ti.authtype,ti.username,ti.password,ti.publickey,"
 				"ti.privatekey,ti.flags,ti.filter,ti.description,"
-				"hi.itemid"
+				"ti.profile_link,hi.itemid"
 			" from items ti"
 			" left join items hi on hi.key_=ti.key_"
 				" and hi.hostid=" ZBX_FS_UI64
@@ -2617,9 +2667,9 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 				interfaceid = interfaceids[get_interface_type_by_item_type(type) - 1];
 		}
 
-		if (SUCCEED != (DBis_null(row[34])))
+		if (SUCCEED != (DBis_null(row[35])))
 		{
-			ZBX_STR2UINT64(itemid, row[34]);
+			ZBX_STR2UINT64(itemid, row[35]);
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8192,
 					"update items"
@@ -2656,6 +2706,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 						"flags=%d,"
 						"filter='%s',"
 						"description='%s',"
+						"profile_link=%s,"
 						"interfaceid=%s"
 					" where itemid=" ZBX_FS_UI64 ";\n",
 					name_esc,
@@ -2691,6 +2742,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 					(int)flags,
 					filter_esc,
 					description_esc,
+					row[34],	/* profile_link */
 					DBsql_id_ins(interfaceid),
 					itemid);
 		}
@@ -2709,12 +2761,12 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 						"snmpv3_securityname,snmpv3_securitylevel,"
 						"snmpv3_authpassphrase,snmpv3_privpassphrase,"
 						"authtype,username,password,publickey,privatekey,templateid,"
-						"flags,filter,description,interfaceid)"
+						"flags,filter,description,profile_link,interfaceid)"
 					" values"
 						" (" ZBX_FS_UI64 ",'%s','%s'," ZBX_FS_UI64 ",%d,%s,%s,"
 						"%s,'%s',%s,%s,%s,'%s','%s',%s,%s,'%s','%s',%s,'%s','%s',"
 						"'%s','%s','%s',%s,'%s','%s',%s,'%s','%s','%s',"
-						"'%s'," ZBX_FS_UI64 ",%d,'%s','%s',%s);\n",
+						"'%s'," ZBX_FS_UI64 ",%d,'%s','%s',%s,%s);\n",
 					itemid,
 					name_esc,
 					key_esc,
@@ -2751,6 +2803,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 					(int)flags,
 					filter_esc,
 					description_esc,
+					row[34],	/* profile_link */
 					DBsql_id_ins(interfaceid));
 
 			zbx_free(key_esc);
@@ -3332,40 +3385,30 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_uint64_t templateid)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	get_templates_by_hostid(hostid, &templateids, &templateids_alloc,
-			&templateids_num);
+	get_templates_by_hostid(hostid, &templateids, &templateids_alloc, &templateids_num);
 
 	if (SUCCEED == uint64_array_exists(templateids, templateids_num, templateid))
 		goto clean;	/* template already linked */
 
-	uint64_array_add(&templateids, &templateids_alloc, &templateids_num,
-			templateid, 1);
+	uint64_array_add(&templateids, &templateids_alloc, &templateids_num, templateid, 1);
 
-	if (SUCCEED != (res = validate_template(templateids, templateids_num,
-			error, sizeof(error))))
+	if (SUCCEED != (res = validate_template(templateids, templateids_num, error, sizeof(error))))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Can not link template '%s': %s",
-				zbx_host_string(templateid), error);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot link template '%s': %s", zbx_host_string(templateid), error);
 		goto clean;
 	}
 
-	if (SUCCEED != (res = validate_host(hostid, templateid,
-			error, sizeof(error))))
+	if (SUCCEED != (res = validate_host(hostid, templateid, error, sizeof(error))))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Can not link template '%s': %s",
-				zbx_host_string(templateid), error);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot link template '%s': %s", zbx_host_string(templateid), error);
 		goto clean;
 	}
 
 	hosttemplateid = DBget_maxid("hosts_templates");
 
-	DBexecute("insert into hosts_templates"
-			" (hosttemplateid,hostid,templateid)"
-			" values"
-			" (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
-			hosttemplateid,
-			hostid,
-			templateid);
+	DBexecute("insert into hosts_templates (hosttemplateid,hostid,templateid)"
+			" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
+			hosttemplateid, hostid, templateid);
 
 	if (SUCCEED == (res = DBcopy_template_applications(hostid, templateid)))
 		if (SUCCEED == (res = DBcopy_template_items(hostid, templateid)))

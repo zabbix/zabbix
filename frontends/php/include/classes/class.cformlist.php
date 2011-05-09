@@ -43,10 +43,12 @@ class CFormList extends CDiv{
 		}
 
 		$class = $hidden ? 'formrow hidden' : 'formrow';
-		if(!is_null($description))
+		if(!is_null($description)){
 			$this->formList->addItem(array(new CDiv($label, 'dt floatleft right'), new CDiv($description, 'dd')), $class);
-		else
+		}
+		else{
 			$this->formList->addItem(array(new CDiv(SPACE, 'dt floatleft right'), new CDiv($label, 'dd')), $class);
+		}
 	}
 
 	public function addInfo($text){

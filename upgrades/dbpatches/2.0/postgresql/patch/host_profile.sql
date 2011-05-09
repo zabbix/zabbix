@@ -3,6 +3,7 @@ DELETE FROM hosts_profiles_ext WHERE NOT EXISTS (SELECT hostid FROM hosts WHERE 
 
 CREATE TABLE host_profile (
 	hostid                   bigint                                    NOT NULL,
+	profile_mode             integer         DEFAULT '0'               NOT NULL,
 	type                     varchar(64)     DEFAULT ''                NOT NULL,
 	type_full                varchar(64)     DEFAULT ''                NOT NULL,
 	name                     varchar(64)     DEFAULT ''                NOT NULL,
@@ -80,6 +81,7 @@ ALTER TABLE ONLY host_profile ADD CONSTRAINT c_host_profile_1 FOREIGN KEY (hosti
 -- create temporary t_host_profile table
 CREATE TABLE t_host_profile (
 	hostid                   bigint,
+	profile_mode             integer,
 	type                     varchar(64),
 	type_full                varchar(64),
 	name                     varchar(64),
@@ -155,7 +157,7 @@ CREATE TABLE t_host_profile (
 
 -- select all profiles into temporary table
 INSERT INTO t_host_profile
-	SELECT p.hostid, p.devicetype, ep.device_type, p.name, ep.device_alias, p.os, ep.device_os, ep.device_os_short, p.serialno, ep.device_serial,
+	SELECT p.hostid, 0, p.devicetype, ep.device_type, p.name, ep.device_alias, p.os, ep.device_os, ep.device_os_short, p.serialno, ep.device_serial,
 		p.tag, ep.device_tag, p.macaddress, ep.ip_macaddress, ep.device_hardware, p.hardware, ep.device_software, p.software,
 		ep.device_app_01, ep.device_app_02, ep.device_app_03, ep.device_app_04, ep.device_app_05, p.contact, p.location, '', '',
 		p.notes, ep.device_chassis, ep.device_model, ep.device_hw_arch,	ep.device_vendor, ep.device_contract, ep.device_who,
@@ -166,7 +168,7 @@ INSERT INTO t_host_profile
 		ep.poc_2_name, ep.poc_2_email, ep.poc_2_phone_1, ep.poc_2_phone_2, ep.poc_2_cell, ep.poc_2_screen, ep.poc_2_notes, ep.device_notes
 	FROM hosts_profiles p LEFT JOIN hosts_profiles_ext ep on p.hostid=ep.hostid
 	UNION ALL
-	SELECT ep.hostid, p.devicetype, ep.device_type, p.name, ep.device_alias, p.os, ep.device_os, ep.device_os_short, p.serialno, ep.device_serial,
+	SELECT ep.hostid, 0, p.devicetype, ep.device_type, p.name, ep.device_alias, p.os, ep.device_os, ep.device_os_short, p.serialno, ep.device_serial,
 		p.tag, ep.device_tag, p.macaddress, ep.ip_macaddress, ep.device_hardware, p.hardware, ep.device_software, p.software,
 		ep.device_app_01, ep.device_app_02, ep.device_app_03, ep.device_app_04, ep.device_app_05, p.contact, p.location, '', '',
 		p.notes, ep.device_chassis, ep.device_model, ep.device_hw_arch,	ep.device_vendor, ep.device_contract, ep.device_who,
