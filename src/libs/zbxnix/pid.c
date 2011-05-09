@@ -120,6 +120,5 @@ void	drop_pid_file(const char *pidfile)
 	/* close pid file */
 	zbx_fclose(fpid);
 
-	if (-1 == unlink(pidfile))
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot remove PID file [%s] [%s]", pidfile, strerror(errno));
+	unlink(pidfile);
 }
