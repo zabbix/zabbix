@@ -214,6 +214,8 @@ int	daemon_start(int allow_root)
 	if (FAIL == create_pid_file(CONFIG_PID_FILE))
 		exit(FAIL);
 
+	atexit(daemon_stop);
+
 	parent_pid = (int)getpid();
 
 	phan.sa_sigaction = child_signal_handler;
@@ -237,6 +239,12 @@ int	daemon_start(int allow_root)
 
 void	daemon_stop()
 {
+	/* this function is registered using atexit() to be called when we terminate */
+	/* there should be nothing like logging or calls to exit() beyond this point */
+
+	if (parent_pid != (int)getpid())
+		return;
+
 	drop_pid_file(CONFIG_PID_FILE);
 }
 
