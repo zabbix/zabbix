@@ -73,7 +73,7 @@ void	load_config()
 #ifdef USE_PID_FILE
 		{"PidFile",				&CONFIG_PID_FILE,			NULL,
 			TYPE_STRING,		PARM_OPT,	0,			0},
-#endif	/* USE_PID_FILE */
+#endif
 		{"LogFile",				&CONFIG_LOG_FILE,			NULL,
 			TYPE_STRING,		PARM_OPT,	0,			0},
 		{"LogFileSize",				&CONFIG_LOG_FILE_SIZE,			NULL,
@@ -115,7 +115,7 @@ void	load_config()
 #ifdef _WINDOWS
 		{"PerfCounter",				&CONFIG_PERF_COUNTERS,			NULL,
 			TYPE_MULTISTRING,	PARM_OPT,	0,			0},
-#endif	/* _WINDOWS */
+#endif
 		{NULL}
 	};
 
@@ -134,10 +134,8 @@ void	load_config()
 
 #ifdef USE_PID_FILE
 	if (NULL == CONFIG_PID_FILE)
-	{
 		CONFIG_PID_FILE = "/tmp/zabbix_agentd.pid";
-	}
-#endif	/* USE_PID_FILE */
+#endif
 
 	if (1 == CONFIG_DISABLE_ACTIVE && 1 == CONFIG_DISABLE_PASSIVE)
 	{
