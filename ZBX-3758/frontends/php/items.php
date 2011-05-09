@@ -122,6 +122,8 @@ switch($itemType) {
 												ITEM_TYPE_DB_MONITOR.','.
 												ITEM_TYPE_TELNET.','.
 												ITEM_TYPE_CALCULATED,'type'), $paramsFieldName),
+		'profile_link' =>       array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),'isset({save})&&{value_type}!='.ITEM_VALUE_TYPE_LOG),
+
 		//hidden fields for better gui
 		'params_script'=>	array(T_ZBX_STR, O_OPT, NULL, NULL, NULL),
 		'params_dbmonitor'=>	array(T_ZBX_STR, O_OPT, NULL, NULL, NULL),
@@ -447,6 +449,7 @@ switch($itemType) {
 			'ipmi_sensor'		=> get_request('ipmi_sensor'),
 			'data_type'		=> get_request('data_type'),
 			'applications' => $applications,
+			'profile_link' => get_request('profile_link'),
 		);
 
 		if(isset($_REQUEST['itemid'])){
@@ -598,6 +601,7 @@ switch($itemType) {
 				'ipmi_sensor'		=> get_request('ipmi_sensor'),
 //				'applications'		=> $applications
 				'data_type'		=> get_request('data_type'),
+				'profile_link'  => get_request('profile_link'),
 			);
 
 			if($_REQUEST['action']=='add to group'){
@@ -835,8 +839,8 @@ switch($itemType) {
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1,
 			'selectHosts' => API_OUTPUT_EXTEND,
-			'select_triggers' => API_OUTPUT_REFER,
-			'select_applications' => API_OUTPUT_EXTEND,
+			'selectTriggers' => API_OUTPUT_REFER,
+			'selectApplications' => API_OUTPUT_EXTEND,
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
@@ -1020,7 +1024,7 @@ switch($itemType) {
 			'expandDescription' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => array('hostid','name','host'),
-			'select_functions' => API_OUTPUT_EXTEND,
+			'selectFunctions' => API_OUTPUT_EXTEND,
 			'selectItems' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		));

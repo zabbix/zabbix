@@ -26,17 +26,17 @@ class testPageActionsTriggers extends CWebTest
 {
 	public $affectedTables = array(
 		'actions',
-		'operations',
 		'conditions',
-		'opmessage',
-		'opgroup',
-		'optemplate',
-		'opcommand_grp',
-		'opcommand_hst',
+		'operations',
 		'opconditions',
+		'opmessage',
 		'opmessage_grp',
 		'opmessage_usr',
-		'opcommand'
+		'opcommand',
+		'opcommand_hst',
+		'opcommand_grp',
+		'opgroup',
+		'optemplate'
 	);
 	// Returns all trigger actions
 	public static function allActions()

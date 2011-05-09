@@ -89,7 +89,7 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0',
+				'default' => '3600',
 			),
 			'nextcheck' => array(
 				'null' => false,
@@ -130,13 +130,13 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
-				'default' => '0',
+				'default' => '',
 			),
 			'snmp_community' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
-				'default' => '0',
+				'default' => '',
 			),
 			'ports' => array(
 				'null' => false,
@@ -236,13 +236,13 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
-				'default' => '0',
+				'default' => '',
 			),
 			'value' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
-				'default' => '0',
+				'default' => '',
 			),
 			'port' => array(
 				'null' => false,
@@ -2983,6 +2983,12 @@ return array(
 				'ref_table' => 'hosts',
 				'ref_field' => 'hostid',
 			),
+			'profile_mode' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			),
 			'type' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
@@ -3751,6 +3757,12 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
+			),
+			'profile_link' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
 			),
 		),
 	),

@@ -32,6 +32,11 @@
 
 		$serviceid=get_dbid("services","serviceid");
 
+		$result = DBexecute('INSERT INTO services (serviceid,name,status,triggerid,algorithm,showsla,goodsla,sortorder)'.
+							' VALUES ('.$serviceid.','.zbx_dbstr($name).',0,'.$triggerid.','.zbx_dbstr($algorithm).
+								','.$showsla.','.zbx_dbstr($goodsla).','.$sortorder.')');
+		if(!$result) return FALSE;
+
 		remove_service_links($serviceid); //removes all links with current serviceid
 
 		$result =($parentid != 0)?(add_service_link($serviceid,$parentid,0)):(true); //add parent
@@ -41,13 +46,6 @@
 			$result = add_service_link($child['serviceid'],$serviceid,$child['soft']);
 		}
 
-		if(!$result){
-			return FALSE;
-		}
-
-		$result=DBexecute('INSERT INTO services (serviceid,name,status,triggerid,algorithm,showsla,goodsla,sortorder)'.
-							' VALUES ('.$serviceid.','.zbx_dbstr($name).',0 ,'.$triggerid.' ,'.zbx_dbstr($algorithm).
-								' ,'.$showsla.','.zbx_dbstr($goodsla).','.$sortorder.')');
 		if(!$result) return FALSE;
 
 		update_services_status_all(); // updating status to all services by the dependency

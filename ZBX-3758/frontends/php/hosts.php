@@ -71,7 +71,7 @@ include_once('include/page_header.php');
 
 		'mass_clear_tpls'=>		array(T_ZBX_STR, O_OPT, NULL, 			NULL,	NULL),
 
-		'useprofile'=>		array(T_ZBX_STR, O_OPT, NULL, 			NULL,	NULL),
+		'profile_mode'=>		array(T_ZBX_INT, O_OPT, NULL, IN(HOST_PROFILE_DISABLED.','.HOST_PROFILE_MANUAL.','.HOST_PROFILE_AUTOMATIC),	NULL),
 		'host_profile'=> 	array(T_ZBX_STR, O_OPT, P_UNSET_EMPTY,	NULL,   NULL),
 
 		'macros_rem'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   null,	null),
@@ -229,7 +229,7 @@ include_once('include/page_header.php');
 			'output' => API_OUTPUT_EXTEND,
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 			'preservekeys' => 1,
-			'select_dependencies' => API_OUTPUT_EXTEND,
+			'selectDependencies' => API_OUTPUT_EXTEND,
 			'expandData' => 1
 		);
 		$triggers = API::Trigger()->get($params);
@@ -360,8 +360,9 @@ include_once('include/page_header.php');
 			}
 
 // PROFILES {{{
-			if(isset($visible['useprofile'])){
-				$new_values['profile'] = get_request('useprofile', false) ? get_request('host_profile', array()) : array();
+			if(isset($visible['profile_mode'])){
+				$new_values['profile_mode'] = get_request('profile_mode', HOST_PROFILE_DISABLED);
+				$new_values['profile'] = $new_values['profile_mode'] != HOST_PROFILE_DISABLED ? get_request('host_profile', array()) : array();
 			}
 // }}} PROFILES
 
@@ -517,7 +518,8 @@ include_once('include/page_header.php');
 				'templates' => $templates,
 				'interfaces' => $interfaces,
 				'macros' => $macros,
-				'profile' => (get_request('useprofile', 'no') == 'yes') ? get_request('host_profile', array()) : array(),
+				'profile' => (get_request('profile_mode') != HOST_PROFILE_DISABLED) ? get_request('host_profile', array()) : array(),
+				'profile_mode' => get_request('profile_mode')
 			);
 
 			if($create_new){
@@ -695,7 +697,7 @@ include_once('include/page_header.php');
 ?>
 <?php
 	if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['hosts'])){
-		$hostForm = new CGetForm('host.massupdate');
+		$hostForm = new CView('configuration.host.massupdate');
 		$hosts_wdgt->addItem($hostForm->render());
 	}
 	else if(isset($_REQUEST['form'])){
@@ -704,7 +706,7 @@ include_once('include/page_header.php');
 		else{
 			$hosts_wdgt->addItem(get_header_host_table($_REQUEST['hostid'], 'host'));
 
-			$hostForm = new CGetForm('host.edit');
+			$hostForm = new CView('configuration.host.edit');
 			$hosts_wdgt->addItem($hostForm->render());
 		}
 	}
@@ -717,7 +719,7 @@ include_once('include/page_header.php');
 		$numrows = new CDiv();
 		$numrows->setAttribute('name', 'numrows');
 
-		$hosts_wdgt->addHeader(_('CONFIGURATION OF HOSTS'), $frmGroup);
+		$hosts_wdgt->addHeader(_('HOSTS'), $frmGroup);
 		$hosts_wdgt->addHeader($numrows, $frmForm);
 
 // HOSTS FILTER {{{
@@ -810,9 +812,9 @@ include_once('include/page_header.php');
 			'selectInterfaces' => API_OUTPUT_EXTEND,
 			'selectItems' => API_OUTPUT_COUNT,
 			'selectDiscoveries' => API_OUTPUT_COUNT,
-			'select_triggers' => API_OUTPUT_COUNT,
-			'select_graphs' => API_OUTPUT_COUNT,
-			'select_applications' => API_OUTPUT_COUNT
+			'selectTriggers' => API_OUTPUT_COUNT,
+			'selectGraphs' => API_OUTPUT_COUNT,
+			'selectApplications' => API_OUTPUT_COUNT
 		);
 		$hosts = API::Host()->get($options);
 // sorting && paging

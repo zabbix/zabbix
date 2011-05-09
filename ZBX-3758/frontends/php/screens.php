@@ -115,7 +115,7 @@
 ?>
 <?php
 // js templates
-	require_once('include/templates/scriptConfirm.js.php');
+	require_once('include/views/js/general.script.confirm.js.php');
 
 // whether we should use screen name to fetch a screen (if this is false, elementid is used)
 	$use_screen_name = isset($_REQUEST['screenname']);
@@ -149,7 +149,7 @@
 	$screens = API::Screen()->get(array(
 		'nodeids' => get_current_nodeid(),
 		'output' => API_OUTPUT_EXTEND,
-		'select_screenitems' => API_OUTPUT_EXTEND
+		'selectScreenItems' => API_OUTPUT_EXTEND
 	));
 
 
