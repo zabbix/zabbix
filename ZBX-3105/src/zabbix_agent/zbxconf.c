@@ -345,10 +345,6 @@ static void	set_defaults()
 
 	memset(&result, 0, sizeof(AGENT_RESULT));
 
-	/* hostname */
-	if (NULL != CONFIG_HOSTNAME)
-		zbx_free(CONFIG_HOSTNAME);
-
 	if (SUCCEED == process("system.hostname", 0, &result))
 	{
 		if (NULL == (value = GET_STR_RESULT(&result)))
