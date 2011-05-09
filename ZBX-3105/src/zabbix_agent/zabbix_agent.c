@@ -89,12 +89,11 @@ int	main(int argc, char **argv)
 
 	AGENT_RESULT	result;
 
-	memset(&result, 0, sizeof(AGENT_RESULT));
-
 	progname = get_program_name(argv[0]);
 
 /* Parse the command-line. */
-	while ((ch = (char)zbx_getopt_long(argc, argv, "c:hVpt:", longopts, NULL)) != (char)EOF)
+	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, "c:hVpt:", longopts, NULL)))
+	{
 		switch (ch)
 		{
 			case 'c':
@@ -102,14 +101,14 @@ int	main(int argc, char **argv)
 				break;
 			case 'h':
 				help();
-				exit(-1);
+				exit(FAIL);
 				break;
 			case 'V':
 				version();
 #ifdef _AIX
 				tl_version();
 #endif /* _AIX */
-				exit(-1);
+				exit(FAIL);
 				break;
 			case 'p':
 				if (task == ZBX_TASK_START)
@@ -123,18 +122,14 @@ int	main(int argc, char **argv)
 				}
 				break;
 			default:
-				task = ZBX_TASK_SHOW_USAGE;
+				usage();
+				exit(FAIL);
 				break;
 		}
-
-	if (CONFIG_FILE == NULL)
-		CONFIG_FILE = DEFAULT_CONFIG_FILE;
-
-	if (ZBX_TASK_SHOW_USAGE == task)
-	{
-		usage();
-		exit(FAIL);
 	}
+
+	if (NULL == CONFIG_FILE)
+		CONFIG_FILE = DEFAULT_CONFIG_FILE;
 
 	/* load configuration */
 	load_config();
