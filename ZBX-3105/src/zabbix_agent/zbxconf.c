@@ -284,7 +284,7 @@ static void	add_perf_counters_from_config(const char **lines)
 
 		continue;
 pc_fail:
-		zabbix_log(LOG_LEVEL_CRIT, "PerfCounter '%s' FAILED: %s", pc, err);
+		zabbix_log(LOG_LEVEL_CRIT, "PerfCounter '%s' FAILED: %s", *pline, err);
 		exit(FAIL);
 	}
 #undef PC_FAIL
