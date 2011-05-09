@@ -136,12 +136,6 @@ void	load_config()
 	if (NULL == CONFIG_PID_FILE)
 		CONFIG_PID_FILE = "/tmp/zabbix_agentd.pid";
 #endif
-
-	if (1 == CONFIG_DISABLE_ACTIVE && 1 == CONFIG_DISABLE_PASSIVE)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "either active or passive checks must be enabled");
-		exit(1);
-	}
 }
 
 /******************************************************************************
@@ -325,6 +319,31 @@ void	activate_user_config()
 
 /******************************************************************************
  *                                                                            *
+ * Function: validate_config                                                  *
+ *                                                                            *
+ * Purpose: validate configuration parameters                                 *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Vladimir Levijev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	validate_config()
+{
+	/* hostname should be defined */
+	if (NULL == CONFIG_HOSTNAME)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "hostname not defined");
+		exit(FAIL);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: set_defaults                                                     *
  *                                                                            *
  * Purpose: set non-static configuration defaults                             *
@@ -345,23 +364,25 @@ static void	set_defaults()
 
 	memset(&result, 0, sizeof(AGENT_RESULT));
 
+	/* hostname */
 	if (SUCCEED == process("system.hostname", 0, &result))
 	{
 		if (NULL == (value = GET_STR_RESULT(&result)))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "failed to get default hostname (system.hostname)");
-			exit(FAIL);
+			zabbix_log(LOG_LEVEL_WARNING, "failed to get system hostname (system.hostname)");
 		}
+		else
+		{
+			assert(*value);
 
-		assert(*value);
+			CONFIG_HOSTNAME = zbx_strdup(CONFIG_HOSTNAME, *value);
 
-		CONFIG_HOSTNAME = zbx_strdup(CONFIG_HOSTNAME, *value);
-
-		/* If auto registration is used, our CONFIG_HOSTNAME will make it into the  */
-		/* server's database, where it is limited by HOST_HOST_LEN (currently, 64), */
-		/* so to make it work properly we need to truncate our hostname.            */
-		if (strlen(CONFIG_HOSTNAME) > 64)
-			CONFIG_HOSTNAME[64] = '\0';
+			/* If auto registration is used, our CONFIG_HOSTNAME will make it into the  */
+			/* server's database, where it is limited by HOST_HOST_LEN (currently, 64), */
+			/* so to make it work properly we need to truncate our hostname.            */
+			if (strlen(CONFIG_HOSTNAME) > 64)
+				CONFIG_HOSTNAME[64] = '\0';
+		}
 	}
 	free_result(&result);
 }

@@ -222,6 +222,16 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	}
 }
 
+static void	validate_daemon_config()
+{
+	/* make sure active or passive check is enabled */
+	if (1 == CONFIG_DISABLE_ACTIVE && 1 == CONFIG_DISABLE_PASSIVE)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "either active or passive checks must be enabled");
+		exit(FAIL);
+	}
+}
+
 int	MAIN_ZABBIX_ENTRY()
 {
 	zbx_thread_args_t		*thread_args;
@@ -374,6 +384,9 @@ int	main(int argc, char **argv)
 
 	/* load configuration */
 	load_config();
+
+	validate_config();
+	validate_daemon_config();
 
 	/* activate user configuration (not needed for service actions) */
 	if (ZBX_TASK_INSTALL_SERVICE != t.task &&

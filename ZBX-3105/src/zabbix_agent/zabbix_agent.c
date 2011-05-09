@@ -129,7 +129,8 @@ int	main(int argc, char **argv)
 	/* load configuration */
 	load_config();
 
-	/* activate user configuration */
+	validate_config();
+
 	activate_user_config();
 
 	/* do not create debug files */

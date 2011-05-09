@@ -37,6 +37,7 @@ extern char	**CONFIG_USER_PARAMETERS;
 extern char	**CONFIG_PERF_COUNTERS;
 
 void	load_config();
+void	validate_config();
 void	free_config();
 void	activate_user_config();
 
