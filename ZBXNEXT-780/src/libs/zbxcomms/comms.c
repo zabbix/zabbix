@@ -510,7 +510,6 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags, int timeout)
 {
 	zbx_uint64_t	len64;
-
 	ssize_t		i = 0, written = 0;
 	int		ret = SUCCEED;
 
@@ -519,10 +518,10 @@ int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags, int t
 	if (0 != timeout)
 		zbx_tcp_timeout_set(s, timeout);
 
-	if( flags & ZBX_TCP_NEW_PROTOCOL )
+	if (0 != (flags & ZBX_TCP_PROTOCOL))
 	{
-		/* Write header */
-		if( ZBX_TCP_ERROR == ZBX_TCP_WRITE(s->socket, ZBX_TCP_HEADER, ZBX_TCP_HEADER_LEN))
+		/* write header */
+		if (ZBX_TCP_ERROR == ZBX_TCP_WRITE(s->socket, ZBX_TCP_HEADER, ZBX_TCP_HEADER_LEN))
 		{
 			zbx_set_tcp_strerror("ZBX_TCP_WRITE() failed [%s]", strerror_from_system(zbx_sock_last_error()));
 			ret = FAIL;
@@ -532,8 +531,8 @@ int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags, int t
 		len64 = (zbx_uint64_t)strlen(data);
 		len64 = zbx_htole_uint64(len64);
 
-		/* Write data length */
-		if( ZBX_TCP_ERROR == ZBX_TCP_WRITE(s->socket, (char *) &len64, sizeof(len64)) )
+		/* write data length */
+		if (ZBX_TCP_ERROR == ZBX_TCP_WRITE(s->socket, (char *) &len64, sizeof(len64)))
 		{
 			zbx_set_tcp_strerror("ZBX_TCP_WRITE() failed [%s]", strerror_from_system(zbx_sock_last_error()));
 			ret = FAIL;
@@ -541,9 +540,9 @@ int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags, int t
 		}
 	}
 
-	while(written < (ssize_t)strlen(data))
+	while (written < (ssize_t)strlen(data))
 	{
-		if( ZBX_TCP_ERROR == (i = ZBX_TCP_WRITE(s->socket, data+written,(int)(strlen(data)-written))) )
+		if (ZBX_TCP_ERROR == (i = ZBX_TCP_WRITE(s->socket, data+written,(int)(strlen(data)-written))))
 		{
 			zbx_set_tcp_strerror("ZBX_TCP_WRITE() failed [%s]", strerror_from_system(zbx_sock_last_error()));
 			ret = FAIL;
@@ -1028,12 +1027,8 @@ void	zbx_tcp_free(zbx_sock_t *s)
 int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeout)
 {
 #define ZBX_BUF_LEN	ZBX_STAT_BUF_LEN * 8
-
-	ssize_t		nbytes, left;
-	ssize_t		read_bytes;
-
-	int		allocated, offset;
-	int		ret = SUCCEED;
+	ssize_t		nbytes, left, read_bytes;
+	int		ret = SUCCEED, allocated, offset;
 	zbx_uint64_t	expected_len;
 
 	ZBX_TCP_START();
@@ -1052,49 +1047,55 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeou
 	left = ZBX_TCP_HEADER_LEN;
 	nbytes = ZBX_TCP_READ(s->socket, s->buf_stat, left);
 
-	if( ZBX_TCP_HEADER_LEN == nbytes && 0 == strncmp(s->buf_stat, ZBX_TCP_HEADER, ZBX_TCP_HEADER_LEN) )
+	if (ZBX_TCP_HEADER_LEN == nbytes && 0 == strncmp(s->buf_stat, ZBX_TCP_HEADER, ZBX_TCP_HEADER_LEN))
 	{
-
 		left = sizeof(zbx_uint64_t);
 		nbytes = ZBX_TCP_READ(s->socket, (void *)&expected_len, left);
 		expected_len = zbx_letoh_uint64(expected_len);
 
-		/* The rest was already cleared */
+		/* the rest was already cleared */
 		memset(s->buf_stat, 0, ZBX_TCP_HEADER_LEN);
 
 		flags |= ZBX_TCP_READ_UNTIL_CLOSE;
 	}
-	else if( ZBX_TCP_ERROR != nbytes )
+	else if (ZBX_TCP_ERROR != nbytes)
 	{
-		read_bytes	= nbytes;
-		expected_len	= 16*1024*1024;
+		read_bytes = nbytes;
+		expected_len = 16 * ZBX_MEBIBYTE;
 	}
 
-	if( ZBX_TCP_ERROR != nbytes )
+	if (ZBX_TCP_ERROR != nbytes)
 	{
-		if( flags & ZBX_TCP_READ_UNTIL_CLOSE ) {
-			if(nbytes == 0)		goto cleanup;
-		} else {
-			if(nbytes < left)	goto cleanup;
+		if (0 != (flags & ZBX_TCP_READ_UNTIL_CLOSE))
+		{
+			if (0 == nbytes)
+				goto cleanup;
+		}
+		else
+		{
+			if (nbytes < left)
+				goto cleanup;
 		}
 
 		left = sizeof(s->buf_stat) - read_bytes - 1;
 
 		/* fill static buffer */
-		if ( s->buf_stat[ read_bytes - 1 ] != '\n' ) /* Don't try to read from an empty socket. */
+		if ('\n' != s->buf_stat[read_bytes - 1])	/* don't try to read from an empty socket */
 		{
-			while(	read_bytes < expected_len && left > 0
-				&& ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ( s->socket, s->buf_stat + read_bytes, left)))
+			while (read_bytes < expected_len && 0 < left &&
+					ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ( s->socket, s->buf_stat + read_bytes, left)))
 			{
 				read_bytes += nbytes;
 
-				if( flags & ZBX_TCP_READ_UNTIL_CLOSE )
+				if (0 != (flags & ZBX_TCP_READ_UNTIL_CLOSE))
 				{
-					if(nbytes == 0)	break;
+					if (0 == nbytes)
+						break;
 				}
 				else
 				{
-					if(nbytes < left) break;
+					if (nbytes < left)
+						break;
 				}
 
 				left -= nbytes;
@@ -1102,28 +1103,33 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeou
 		}
 
 		s->buf_stat[read_bytes] = '\0';
-		if( (sizeof(s->buf_stat) - 1) == read_bytes) /* static buffer is full */
+		if ((sizeof(s->buf_stat) - 1) == read_bytes)	/* static buffer is full */
 		{
-			allocated		= ZBX_BUF_LEN;
-
-			s->buf_type		= ZBX_BUF_TYPE_DYN;
-			s->buf_dyn		= zbx_malloc(s->buf_dyn, allocated);
+			allocated = ZBX_BUF_LEN;
+			s->buf_type = ZBX_BUF_TYPE_DYN;
+			s->buf_dyn = zbx_malloc(s->buf_dyn, allocated);
 
 			memset(s->buf_dyn, 0, allocated);
 			memcpy(s->buf_dyn, s->buf_stat, sizeof(s->buf_stat));
 
 			offset = read_bytes;
 			/* fill dynamic buffer */
-			while( read_bytes < expected_len && ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ(s->socket, s->buf_stat, sizeof(s->buf_stat)-1)) )
+			while (read_bytes < expected_len &&
+					ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ(s->socket, s->buf_stat, sizeof(s->buf_stat)-1)))
 			{
 				s->buf_stat[nbytes] = '\0';
 				zbx_snprintf_alloc(&(s->buf_dyn), &allocated, &offset, sizeof(s->buf_stat), "%s", s->buf_stat);
 				read_bytes += nbytes;
 
-				if( flags & ZBX_TCP_READ_UNTIL_CLOSE ) {
-					if(nbytes == 0)	break;
-				} else {
-					if(nbytes < sizeof(s->buf_stat) - 1) break;
+				if (0 != (flags & ZBX_TCP_READ_UNTIL_CLOSE))
+				{
+					if (0 == nbytes)
+						break;
+				}
+				else
+				{
+					if (nbytes < sizeof(s->buf_stat) - 1)
+						break;
 				}
 			}
 
@@ -1131,7 +1137,7 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeou
 		}
 	}
 
-	if( ZBX_TCP_ERROR == nbytes )
+	if (ZBX_TCP_ERROR == nbytes)
 	{
 		zbx_set_tcp_strerror("ZBX_TCP_READ() failed [%s]", strerror_from_system(zbx_sock_last_error()));
 		ret = FAIL;
