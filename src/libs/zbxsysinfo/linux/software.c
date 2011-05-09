@@ -87,7 +87,7 @@ static int	print_packages(char *buffer, int size, zbx_vector_str_t *packages, co
 	int	i, offset = 0;
 
 	if (NULL != manager)
-		offset += zbx_snprintf(buffer, size, "[%s] ", manager);
+		offset += zbx_snprintf(buffer + offset, size - offset, "[%s] ", manager);
 
 	zbx_vector_str_sort(packages, ZBX_DEFAULT_STR_COMPARE_FUNC);
 
@@ -117,18 +117,21 @@ static ZBX_PACKAGE_MANAGER	package_managers[] =
 int     SYSTEM_SW_PACKAGES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	int			ret = SYSINFO_RET_FAIL, show_pm, offset = 0, i;
-	char			tmp[MAX_STRING_LEN], buffer[MAX_BUFFER_LEN], regex[MAX_STRING_LEN],
-				*buf = NULL, *package;
+	char			buffer[MAX_BUFFER_LEN], regex[MAX_STRING_LEN], manager[MAX_STRING_LEN],
+				tmp[MAX_STRING_LEN], *buf = NULL, *package;
 	zbx_vector_str_t	packages;
 	ZBX_PACKAGE_MANAGER	*mng;
 
-	if (2 < num_param(param))
+	if (3 < num_param(param))
 		return ret;
 
 	if (0 != get_param(param, 1, regex, sizeof(regex)))
 		*regex = '\0';
 
-	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "showpms"))
+	if (0 != get_param(param, 2, manager, sizeof(manager)) || 0 == strcmp(manager, "all"))
+		*manager = '\0';
+
+	if (0 != get_param(param, 3, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "showpms"))
 		show_pm = 1;
 	else if (0 == strcmp(tmp, "onlylist"))
 		show_pm = 0;
@@ -141,6 +144,8 @@ int     SYSTEM_SW_PACKAGES(const char *cmd, const char *param, unsigned flags, A
 	for (i = 0; NULL != package_managers[i].name; i++)
 	{
 		mng = &package_managers[i];
+		if ('\0' != *manager && 0 != strcmp(manager, mng->name))
+			continue;
 
 		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, NULL, 0, CONFIG_TIMEOUT) &&
 				'\0' != *buf)	/* consider PMS present, if test_cmd outputs anything to stdout */
@@ -148,6 +153,7 @@ int     SYSTEM_SW_PACKAGES(const char *cmd, const char *param, unsigned flags, A
 			if (SUCCEED != zbx_execute(mng->list_cmd, &buf, NULL, 0, CONFIG_TIMEOUT))
 				continue;
 
+			ret = SYSINFO_RET_OK;
 			package = strtok(buf, "\n");
 			while (NULL != package)
 			{
@@ -184,11 +190,8 @@ next:
 
 	zbx_vector_str_destroy(&packages);
 
-	if (0 < offset)
-	{
-		ret = SYSINFO_RET_OK;
+	if (SYSINFO_RET_OK == ret)
 		SET_TEXT_RESULT(result, zbx_strdup(NULL, buffer));
-	}
 
 	return ret;
 }
