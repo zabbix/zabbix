@@ -92,8 +92,6 @@
 
 		if(!defined('ZBX_PAGE_NO_MENU') && !defined('ZBX_PAGE_NO_FOOTER')){
 			$table = new CTable(NULL,"textwhite bold maxwidth ui-widget-header ui-corner-all page_footer");
-			$table->setCellSpacing(0);
-			$table->setCellPadding(1);
 
 			if(CWebUser::$data['userid'] == 0){
 				$conString = _('Not connected');

@@ -23,12 +23,12 @@
 /**
  * Class is used to validate and parse item keys
  * Example of usage:
- *      $itemKey = new cItemKey('test.key[a, b, c]');
+ *      $itemKey = new CItemKey('test.key[a, b, c]');
  *      echo $itemKey->isValid(); // true
  *      echo $itemKey->getKeyId(); // test.key
  *      print_r($itemKey->parameters()); // array('a', 'b', 'c')
  */
-class cItemKey{
+class CItemKey{
 
 	private $key;
 
