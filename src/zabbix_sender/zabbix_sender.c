@@ -293,12 +293,14 @@ static void    init_config(const char* config_file)
 
 static zbx_task_t parse_commandline(int argc, char **argv)
 {
-	zbx_task_t      task    = ZBX_TASK_START;
-	char    ch      = '\0';
+	zbx_task_t      task = ZBX_TASK_START;
+	char    	ch = '\0';
 
 	/* Parse the command-line. */
-	while ((ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)) != (char)EOF)
-		switch (ch) {
+	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
+	{
+		switch (ch)
+		{
 			case 'c':
 				CONFIG_FILE = strdup(zbx_optarg);
 				break;
@@ -338,7 +340,7 @@ static zbx_task_t parse_commandline(int argc, char **argv)
 				REAL_TIME = 1;
 				break;
 			case 'v':
-				if(CONFIG_LOG_LEVEL == LOG_LEVEL_WARNING)
+				if (CONFIG_LOG_LEVEL == LOG_LEVEL_WARNING)
 					CONFIG_LOG_LEVEL = LOG_LEVEL_DEBUG;
 				else
 					CONFIG_LOG_LEVEL = LOG_LEVEL_WARNING;
@@ -348,6 +350,7 @@ static zbx_task_t parse_commandline(int argc, char **argv)
 				exit(FAIL);
 				break;
 		}
+	}
 
 	if (NULL == ZABBIX_SERVER && NULL == CONFIG_FILE)
 	{
