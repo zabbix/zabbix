@@ -37,7 +37,6 @@ struct cfg_line
 {
 	char	*parameter;
 	void	*variable;
-	int	(*function)();
 	int	type;
 	int	mandatory;
 	int	min;

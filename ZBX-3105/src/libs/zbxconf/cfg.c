@@ -172,12 +172,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 
 				zabbix_log(LOG_LEVEL_DEBUG, "accepted configuration parameter: '%s' = '%s'",parameter, value);
 
-				if (NULL != cfg[i].function)
-				{
-					if (SUCCEED != cfg[i].function(value))
-						goto incorrect_config;
-				}
-				else if (TYPE_INT == cfg[i].type)
+				if (TYPE_INT == cfg[i].type)
 				{
 					if (FAIL == str2uint64(value, &var))
 						goto incorrect_config;

@@ -241,11 +241,11 @@ static void    init_config(const char* config_file)
 
 	struct cfg_line cfg[]=
 	{
-		/* PARAMETER	,VAR				,FUNC	,TYPE(0i,1s)	,MANDATORY	,MIN			,MAX		*/
-		{"SourceIP"	,&config_source_ip_from_conf	,0	,TYPE_STRING	,PARM_OPT	,0			,0		},
-		{"Server"	,&zabbix_server_from_conf	,0	,TYPE_STRING	,PARM_OPT	,0			,0		},
-		{"ServerPort"	,&zabbix_server_port_from_conf	,0	,TYPE_INT	,PARM_OPT	,MIN_ZABBIX_PORT	,MAX_ZABBIX_PORT},
-		{"Hostname"	,&zabbix_hostname_from_conf	,0	,TYPE_STRING	,PARM_OPT	,0			,0		},
+		/* PARAMETER	,VAR				,TYPE(0i,1s)	,MANDATORY	,MIN			,MAX		*/
+		{"SourceIP"	,&config_source_ip_from_conf	,TYPE_STRING	,PARM_OPT	,0			,0		},
+		{"Server"	,&zabbix_server_from_conf	,TYPE_STRING	,PARM_OPT	,0			,0		},
+		{"ServerPort"	,&zabbix_server_port_from_conf	,TYPE_INT	,PARM_OPT	,MIN_ZABBIX_PORT	,MAX_ZABBIX_PORT},
+		{"Hostname"	,&zabbix_hostname_from_conf	,TYPE_STRING	,PARM_OPT	,0			,0		},
 		{0}
 	};
 
