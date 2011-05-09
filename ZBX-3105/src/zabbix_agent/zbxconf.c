@@ -251,16 +251,16 @@ void	add_perf_counters_from_config(const char **lines)
 	for (pline = lines; NULL != *pline; pline++)
 	{
 		if (3 < num_param(*pline))
-			PC_FAIL("line too short");
+			PC_FAIL("required parameter missing");
 
 		if (0 != get_param(*pline, 1, name, sizeof(name)))
-			PC_FAIL("could not parse key");
+			PC_FAIL("cannot parse key");
 
 		if (0 != get_param(*pline, 2, counterpath, sizeof(counterpath)))
-			PC_FAIL("could not parse counter path");
+			PC_FAIL("cannot parse counter path");
 
 		if (0 != get_param(*pline, 3, interval, sizeof(interval)))
-			PC_FAIL("could not parse interval");
+			PC_FAIL("cannot parse interval");
 
 		wcounterPath = zbx_acp_to_unicode(counterpath);
 		zbx_unicode_to_utf8_static(wcounterPath, counterpath, PDH_MAX_COUNTER_PATH);
@@ -270,7 +270,7 @@ void	add_perf_counters_from_config(const char **lines)
 			PC_FAIL("invalid counter path");
 
 		if (NULL == add_perf_counter(name, counterpath, atoi(interval)))
-			PC_FAIL("could not add counter");
+			PC_FAIL("cannot add counter");
 
 		continue;
 pc_fail:
