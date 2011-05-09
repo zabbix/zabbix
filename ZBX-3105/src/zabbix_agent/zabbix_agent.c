@@ -126,12 +126,19 @@ int	main(int argc, char **argv)
 	if (NULL == CONFIG_FILE)
 		CONFIG_FILE = DEFAULT_CONFIG_FILE;
 
+	/* initialize these before parsing configuration */
+	init_metrics();
+
 	/* load configuration */
 	load_config();
 
 	validate_config();
 
-	activate_user_config();
+	/* parameters */
+	add_parameters_from_config(CONFIG_USER_PARAMETERS);
+
+	/* aliases */
+	add_aliases_from_config(CONFIG_ALIASES);
 
 	/* do not create debug files */
 	zabbix_open_log(LOG_TYPE_SYSLOG, LOG_LEVEL_EMPTY, NULL);

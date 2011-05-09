@@ -382,6 +382,10 @@ int	main(int argc, char **argv)
 		exit(FAIL);
 	}
 
+	/* initialize these before parsing configuration */
+	init_metrics();
+	init_collector_data();
+
 	/* load configuration */
 	load_config();
 
@@ -393,7 +397,18 @@ int	main(int argc, char **argv)
 			ZBX_TASK_UNINSTALL_SERVICE != t.task &&
 			ZBX_TASK_START_SERVICE != t.task &&
 			ZBX_TASK_STOP_SERVICE != t.task)
-		activate_user_config();
+	{
+		/* parameters */
+		add_parameters_from_config(CONFIG_USER_PARAMETERS);
+
+		/* aliases */
+		add_aliases_from_config(CONFIG_ALIASES);
+
+#if defined(_WINDOWS)
+		/* performance counters */
+		add_perf_counters_from_config(CONFIG_PERF_COUNTERS);
+#endif	/* _WINDOWS */
+	}
 
 #if defined (_WINDOWS)
 	if (t.flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS)

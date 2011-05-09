@@ -119,10 +119,6 @@ void	load_config()
 		{NULL}
 	};
 
-	/* initialize these before parsing configuration */
-	init_metrics();
-	init_collector_data();
-
 	/* initialize multistrings */
 	zbx_strarr_init(&CONFIG_ALIASES);
 	zbx_strarr_init(&CONFIG_USER_PARAMETERS);
@@ -179,7 +175,7 @@ void	free_config()
  * Comments: calls add_alias() for each entry                                 *
  *                                                                            *
  ******************************************************************************/
-static void	add_aliases_from_config(char **lines)
+void	add_aliases_from_config(char **lines)
 {
 	char	*value, **pline;
 
@@ -211,7 +207,7 @@ static void	add_aliases_from_config(char **lines)
  * Comments: calls add_user_parameter() for each entry                        *
  *                                                                            *
  ******************************************************************************/
-static void	add_parameters_from_config(char **lines)
+void	add_parameters_from_config(char **lines)
 {
 	char	*command, **pline;
 
@@ -228,7 +224,7 @@ static void	add_parameters_from_config(char **lines)
 	}
 }
 
-#ifdef _WINDOWS
+#if defined(_WINDOWS)
 /******************************************************************************
  *                                                                            *
  * Function: add_perf_counters_from_config                                    *
@@ -244,7 +240,7 @@ static void	add_parameters_from_config(char **lines)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	add_perf_counters_from_config(const char **lines)
+void	add_perf_counters_from_config(const char **lines)
 {
 	char		name[MAX_STRING_LEN], counterpath[PDH_MAX_COUNTER_PATH], interval[8];
 	const char	**pline, *msg;
@@ -284,38 +280,6 @@ pc_fail:
 #undef PC_FAIL
 }
 #endif	/* _WINDOWS */
-
-/******************************************************************************
- *                                                                            *
- * Function: activate_user_config                                             *
- *                                                                            *
- * Purpose: activate user specific parameters specified in configuration file *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Vladimir Levijev                                                   *
- *                                                                            *
- * Comments: activates next parameters:                                       *
- *           - UserParameter                                                  *
- *           - Alias                                                          *
- *           - PerfCounter                                                    *
- *                                                                            *
- ******************************************************************************/
-void	activate_user_config()
-{
-	/* parameters */
-	add_parameters_from_config(CONFIG_USER_PARAMETERS);
-
-	/* aliases */
-	add_aliases_from_config(CONFIG_ALIASES);
-
-#if defined(_WINDOWS)
-	/* performance counters */
-	add_perf_counters_from_config(CONFIG_PERF_COUNTERS);
-#endif	/* _WINDOWS */
-}
 
 /******************************************************************************
  *                                                                            *
