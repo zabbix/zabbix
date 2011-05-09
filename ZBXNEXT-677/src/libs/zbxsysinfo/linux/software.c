@@ -82,12 +82,12 @@ static int	dpkg_parser(const char *line, char *package, size_t max_package_len)
 	return SUCCEED;
 }
 
-static int	print_packages(char *buffer, int size, zbx_vector_str_t *packages, const char *mng)
+static int	print_packages(char *buffer, int size, zbx_vector_str_t *packages, const char *manager)
 {
 	int	i, offset = 0;
 
-	if (NULL != mng)
-		offset += zbx_snprintf(buffer, size, "[%s] ", mng);
+	if (NULL != manager)
+		offset += zbx_snprintf(buffer, size, "[%s] ", manager);
 
 	zbx_vector_str_sort(packages, ZBX_DEFAULT_STR_COMPARE_FUNC);
 
@@ -174,6 +174,7 @@ next:
 			}
 		}
 	}
+
 	zbx_free(buf);
 
 	if (0 == show_pm)
