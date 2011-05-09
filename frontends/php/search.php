@@ -97,9 +97,9 @@ include_once('include/page_header.php');
 		'selectGroups' => API_OUTPUT_EXTEND,
 		'selectInterfaces' => API_OUTPUT_EXTEND,
 		'selectItems' => API_OUTPUT_COUNT,
-		'select_triggers' => API_OUTPUT_COUNT,
-		'select_graphs' => API_OUTPUT_COUNT,
-		'select_applications' => API_OUTPUT_COUNT,
+		'selectTriggers' => API_OUTPUT_COUNT,
+		'selectGraphs' => API_OUTPUT_COUNT,
+		'selectApplications' => API_OUTPUT_COUNT,
 		'output' => array('name','status'),
 		'searchByAny' => true
 	);
@@ -308,9 +308,9 @@ include_once('include/page_header.php');
 			'selectGroups' => API_OUTPUT_REFER,
 			'sortfield' => 'name',
 			'selectItems' => API_OUTPUT_COUNT,
-			'select_triggers' => API_OUTPUT_COUNT,
-			'select_graphs' => API_OUTPUT_COUNT,
-			'select_applications' => API_OUTPUT_COUNT,
+			'selectTriggers' => API_OUTPUT_COUNT,
+			'selectGraphs' => API_OUTPUT_COUNT,
+			'selectApplications' => API_OUTPUT_COUNT,
 			'limit' => $rows_per_page
 		);
 		$db_templates = API::Template()->get($params);

@@ -2,13 +2,20 @@
 Changes for 1.9.4
 
 New features:
+ - [ZBXNEXT-647] added automatic population of profile fields (KB, Sasha)
+ - [ZBXNEXT-629] redesigned discovery form and added https and telnet to discovery and net.tcp.service(.perf) (rudolfs, Vedmak, Aly)
  - [ZBXNEXT-627] support of visible host and template name (Sasha, Alexei)
  - [ZBXNEXT-672] advanced options for remote commands (Aly, asaveljevs, Sasha, Vedmak)
- - [ZBX-1357] updated French, Latvian, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
+ - [ZBX-1357] updated French, Latvian, Polish, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
  - [ZBX-2756] renamed macro {TRIGGER.KEY<1-9>} to {ITEM.KEY<1-9>} (asaveljevs)
- - [ZBXNEXT-511] renamed item description to name, for description introduced new field (asaveljevs, Vedmak)
+ - [ZBXNEXT-511] renamed item description to name, for description introduced a new field (asaveljevs, Vedmak)
 
 Bug fixes:
+ - [ZBX-3758] made Zabbix daemons remove their PID file upon unsuccessful startup (asaveljevs)
+ - [ZBX-3791] fixed item form caption after cloning item (Vedmak)
+ - [ZBX-3689] fixed error when adding a new second-level IT Service (Alexei)
+ - [ZBX-3715] improve frontend message style & grammar (Richlv)
+ - [ZBX-3767] improve import status messages by avoiding concatenating individual words; thanks to zalex (Richlv)
  - [ZBX-3704] added default condition trigger value = problem for new actions (Vedmak)
  - [ZBX-3729] fixed server crash when failing to resolve interface-related macros in item keys (asaveljevs)
  - [ZBX-2885] fixed 00:00-23:59 vs. 00:00-24:00 inconsistency for periods (dimir)
@@ -28,10 +35,10 @@ New features:
  - [ZBXNEXT-675] added new icons and a script to create sql file (Elvis,Richlv)
  - [ZBX-1357] Updated Latvian and Russian translations; thanks to Zabbix translators (Richlv)
  - [ZBXNEXT-696] Added support for {IPADDRESS}, {HOST.DNS} and {HOST.CONN} macros in trigger names (rudolfs)
- - [ZBX-3495] fixed interfaceid updated to null when link template (Vedmak)
  - [ZBXNEXT-676] merged host profile and extended host profile (Sasha, Vedmak)
 
 Bug fixes:
+ - [ZBX-3495] fixed interfaceid updated to null when linking a template (Vedmak)
  - [ZBX-3623] fixed processing of nanoseconds for history data (Sasha)
  - [ZBX-3634] improved zabbix map API methods (Aly)
  - [ZBX-3579] fixed trigger popup menu in status of triggers (Vedmak)
@@ -133,6 +140,14 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.6rc1
 
+ - [ZBX-3776] treat duplicate UserParameter as error (dimir)
+ - [ZBX-3728] fixed a warning message when removing a user script (Alexei)
+ - [ZBX-3731] fixed possible SQL errors when updating trends (Sasha)
+ - [ZBX-3772] improved performance of the history syncer (Sasha)
+ - [ZBX-3547] Rewrote performance counters and cpu stats collection for Windows (rudolfs)
+ - [ZBX-3677] added unit blacklist on the server side (dimir)
+ - [ZBX-3746] Fixed parsing of trigger expressions containing \\ (KB)
+ - [ZBX-3744] updated Japanese translation; thanks to Kodai Terashima (Richlv)
  - [ZBX-3681] fixed API to leave internal PHP encoding in UTF-8 (Alexei)
  - [ZBX-3353] fixed skipping web items in the host "Full clone" operation (Sasha)
  - [ZBX-3503] fixed "incorrect usage of quotes" error (KB)

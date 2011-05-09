@@ -165,7 +165,7 @@ include_once('include/page_header.php');
 // SELECT SCREENS
 		$params = array(
 			'templateids' => $templateids,
-			'select_screenitems' => API_OUTPUT_EXTEND,
+			'selectScreenItems' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND,
 			'noInheritance' => true
 		);
@@ -198,7 +198,7 @@ include_once('include/page_header.php');
 			'hostids' => $templateids,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => 1,
-			'select_dependencies' => API_OUTPUT_EXTEND,
+			'selectDependencies' => API_OUTPUT_EXTEND,
 			'expandData' => 1
 		);
 		$triggers = API::Trigger()->get($params);
@@ -261,7 +261,7 @@ include_once('include/page_header.php');
 		$result = zbxXML::import($_FILES['import_file']['tmp_name']);
 		if($result) $result = zbxXML::parseMain($rules);
 		$result = DBend($result);
-		show_messages($result, S_IMPORTED.SPACE.S_SUCCESSEFULLY_SMALL, S_IMPORT.SPACE.S_FAILED_SMALL);
+		show_messages($result, _('Imported successfully'), _('Import failed'));
 	}
 ?>
 <?php
@@ -503,7 +503,7 @@ include_once('include/page_header.php');
 		else{
 			$template_wdgt->addItem(get_header_host_table(get_request('templateid',0), 'template'));
 
-			$templateForm = new CGetForm('template.edit');
+			$templateForm = new CView('configuration.template.edit');
 			$template_wdgt->addItem($templateForm->render());
 		}
 	}
@@ -517,7 +517,7 @@ include_once('include/page_header.php');
 		$numrows = new CDiv();
 		$numrows->setAttribute('name', 'numrows');
 
-		$template_wdgt->addHeader(S_CONFIGURATION_OF_TEMPLATES, $frmGroup);
+		$template_wdgt->addHeader(_('TEMPLATES'), $frmGroup);
 		$template_wdgt->addHeader($numrows, $frmForm);
 //------
 
@@ -569,12 +569,12 @@ include_once('include/page_header.php');
 			'editable' => 1,
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => array('hostid','name','status'),
-			'select_templates' => array('hostid','name','status'),
+			'selectTemplates' => array('hostid','name','status'),
 			'selectParentTemplates' => array('hostid','name','status'),
 			'selectItems' => API_OUTPUT_COUNT,
-			'select_triggers' => API_OUTPUT_COUNT,
-			'select_graphs' => API_OUTPUT_COUNT,
-			'select_applications' => API_OUTPUT_COUNT,
+			'selectTriggers' => API_OUTPUT_COUNT,
+			'selectGraphs' => API_OUTPUT_COUNT,
+			'selectApplications' => API_OUTPUT_COUNT,
 			'selectDiscoveries' => API_OUTPUT_COUNT,
 			'selectScreens' => API_OUTPUT_COUNT,
 			'nopermissions' => 1,

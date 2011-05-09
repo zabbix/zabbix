@@ -83,7 +83,7 @@ private $allowed;
 		if(zbx_empty($item))
 			throw new Exception('Empty item key "'.$item.'" is used in expression.');
 
-		$itemKey = new cItemKey($item);
+		$itemKey = new CItemKey($item);
 		if(!$itemKey->isValid())
 			throw new Exception('Incorrect item key "'.$item.'" is used in expression. '.$itemKey->getError());
 	}
@@ -265,9 +265,9 @@ private $allowed;
 // STATE
 	private function isSlashed($pre=false){
 		if($pre)
-			return (($this->previous['prelast'] == '\\') && ($this->previous['sequence'] % 2 == 1));
+			return $this->previous['prelast'] == '\\';
 		else
-			return (($this->previous['last'] == '\\') && ($this->symbols['sequence'] % 2 == 1));
+			return $this->previous['last'] == '\\';
 	}
 
 	private function inQuotes($symbol=''){
@@ -401,8 +401,6 @@ private $allowed;
 		if($this->currExpr['part']['itemParam'] || $this->currExpr['part']['functionParam']){
 			if($this->inParameter()){
 				if($this->inQuotes()){
-// SDI('Open.inParameter.inQuotes: '.$symbol.' ');
-
  					if(($symbol == '"') && !$this->isSlashed(true)){
 						$this->symbols['params'][$symbol]++;
 						$this->currExpr['params']['quoteClose'] = true;
@@ -411,7 +409,6 @@ private $allowed;
 					$this->writeParams($symbol);
 				}
 				else{
-// SDI('Open.inParameter: '.$symbol.' ');
 					if(($symbol == ']') && $this->currExpr['part']['itemParam'])
 						$this->symbols['params'][$symbol]++;
 					else if(($symbol == ')') && $this->currExpr['part']['functionParam']){

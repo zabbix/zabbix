@@ -665,9 +665,11 @@
 	define('SVC_TCP',	8);
 	define('SVC_AGENT',	9);
 	define('SVC_SNMPv1',	10);
-	define('SVC_SNMPv2',	11);
+	define('SVC_SNMPv2c',	11);
 	define('SVC_ICMPPING',	12);
 	define('SVC_SNMPv3',	13);
+	define('SVC_HTTPS',		14);
+	define('SVC_TELNET',	15);
 
 	define('DHOST_STATUS_ACTIVE',		0);
 	define('DHOST_STATUS_DISABLED',		1);
@@ -681,6 +683,10 @@
 	define('EXPRESSION_TYPE_NOT_INCLUDED',	2);
 	define('EXPRESSION_TYPE_TRUE',			3);
 	define('EXPRESSION_TYPE_FALSE',			4);
+
+	define('HOST_PROFILE_DISABLED',		-1);
+	define('HOST_PROFILE_MANUAL',		0);
+	define('HOST_PROFILE_AUTOMATIC',		1);
 
 	define('EXPRESSION_VALUE_TYPE_UNKNOWN',	'#ERROR_VALUE_TYPE#');
 	define('EXPRESSION_HOST_UNKNOWN',	'#ERROR_HOST#');

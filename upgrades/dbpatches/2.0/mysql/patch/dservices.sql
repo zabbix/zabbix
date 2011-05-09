@@ -1,6 +1,8 @@
 ALTER TABLE dservices MODIFY dserviceid bigint unsigned NOT NULL,
 		      MODIFY dhostid bigint unsigned NOT NULL,
 		      MODIFY dcheckid bigint unsigned NOT NULL,
+		      MODIFY key_ varchar(255) DEFAULT '' NOT NULL,
+		      MODIFY value varchar(255) DEFAULT '' NOT NULL,
 		      ADD dns varchar(64) DEFAULT '' NOT NULL;
 DELETE FROM dservices WHERE NOT dhostid IN (SELECT dhostid FROM dhosts);
 DELETE FROM dservices WHERE NOT dcheckid IN (SELECT dcheckid FROM dchecks);

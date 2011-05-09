@@ -21,37 +21,6 @@
 #include "comms.h"
 #include "log.h"
 
-#if defined(_WINDOWS)
-#	if defined(__INT_MAX__) && __INT_MAX__ == 2147483647
-		typedef int ssize_t;
-#	else
-		typedef long ssize_t;
-#	endif /* __INT_MAX__ */
-
-#	define ZBX_TCP_WRITE(s, b, bl)	((ssize_t)send((s), (b), (bl), 0))
-#	define ZBX_TCP_READ(s, b, bl)	((ssize_t)recv((s), (b), (bl), 0))
-
-#	define ZBX_TCP_ERROR		SOCKET_ERROR
-#	define ZBX_SOCK_ERROR		INVALID_SOCKET
-
-#	define zbx_sock_close(s)	if (ZBX_SOCK_ERROR != (s)) closesocket(s)
-#	define zbx_sock_last_error()	WSAGetLastError()
-
-#	define ZBX_SOCK_ERR_TIMEDOUT	WSAETIMEDOUT
-#else
-#	define ZBX_TCP_WRITE(s, b, bl)	((ssize_t)write((s), (b), (bl)))
-#	define ZBX_TCP_READ(s, b, bl)	((ssize_t)read((s), (b), (bl)))
-
-#	define ZBX_TCP_ERROR		-1
-#	define ZBX_SOCK_ERROR		-1
-
-#	define zbx_sock_close(s)	if (ZBX_SOCK_ERROR != (s)) close(s)
-#	define zbx_sock_last_error()	errno
-
-#	define ZBX_SOCK_ERR_TIMEDOUT	EINTR
-
-#endif /* _WINDOWS */
-
 #if defined(HAVE_IPV6)
 #	define ZBX_SOCKADDR struct sockaddr_storage
 #else

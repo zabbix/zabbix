@@ -38,7 +38,7 @@ class testPageTemplates extends CWebTest
 		$this->dropdown_select_wait('groupid','Templates');
 //		$this->wait();
 		$this->assertTitle('Templates');
-		$this->ok('CONFIGURATION OF TEMPLATES');
+		$this->ok('TEMPLATES');
 		$this->ok('Displaying');
 		// Header
 		$this->ok(array('Templates','Applications','Items','Triggers','Graphs','Screens','Discovery','Linked templates','Linked to'));
@@ -79,7 +79,7 @@ class testPageTemplates extends CWebTest
 		$this->assertTitle('Templates');
 		$this->ok('Template updated');
 		$this->ok("$name");
-		$this->ok('CONFIGURATION OF TEMPLATES');
+		$this->ok('TEMPLATES');
 
 		$this->assertEquals($oldHashTemplate,DBhash($sql1));
 		$this->assertEquals($oldHashHosts,DBhash($sql2));

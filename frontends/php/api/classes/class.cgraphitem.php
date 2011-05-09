@@ -58,7 +58,7 @@ class CGraphItem extends CZBXAPI{
 			'editable'				=> null,
 			'nopermissions'			=> null,
 // output
-			'select_graphs'			=> null,
+			'selectGraphs'			=> null,
 			'output'				=> API_OUTPUT_REFER,
 			'expandData'			=> null,
 			'countOutput'			=> null,
@@ -206,7 +206,7 @@ class CGraphItem extends CZBXAPI{
 						$result[$gitem['gitemid']]= array();
 
 // graphids
-					if(isset($gitem['graphid']) && is_null($options['select_graphs'])){
+					if(isset($gitem['graphid']) && is_null($options['selectGraphs'])){
 						if(!isset($result[$gitem['gitemid']]['graphs'])) $result[$gitem['gitemid']]['graphs'] = array();
 
 						$result[$gitem['gitemid']]['graphs'][] = array('graphid' => $gitem['graphid']);
@@ -223,10 +223,10 @@ class CGraphItem extends CZBXAPI{
 		}
 
 // Adding graphs
-		if(!is_null($options['select_graphs']) && str_in_array($options['select_graphs'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectGraphs']) && str_in_array($options['selectGraphs'], $subselects_allowed_outputs)){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'output' => $options['select_graphs'],
+				'output' => $options['selectGraphs'],
 				'gitemids' => $gitemids,
 				'preservekeys' => 1
 			);

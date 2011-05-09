@@ -156,7 +156,7 @@
 #endif	/* HAVE_SQLITE3 */
 
 #ifdef HAVE_SQLITE3
-	/* We have to put double % here for sprintf */
+	/* we have to put double % here for sprintf */
 #	define ZBX_SQL_MOD(x, y) #x "%%" #y
 #else
 #	define ZBX_SQL_MOD(x, y) "mod(" #x "," #y ")"

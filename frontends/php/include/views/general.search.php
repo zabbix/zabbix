@@ -19,35 +19,23 @@
 **/
 ?>
 <?php
-class CGetForm{
-	private $file;
-	private $data;
-	private $form;
-	private $scripts;
+// include JS + templates
+require_once('include/views/js/general.search.js.php');
+?>
+<?php
+//	$hosts_wdgt->addItem();
+	$searchDiv = new CDiv();
+	$searchInputDiv = new CDiv();
+	$searchButtonDiv = new CDiv();
 
-	public function __construct($file, $data=array()){
-		$this->assign($file, $data);
-	}
+	$search_form = new CForm('get','search.php');
+	$searchBox = new CTextBox('search', get_request('search'));
+	$searchBox->setAttribute('autocomplete', 'off');
+	$searchBox->addClass('search');
 
-	public function assign($file, $data){
-		if(!preg_match("/[a-z\.]+/", $file)){
-			error('Invalid form name given ['.$file.']');
-			return false;
-		}
+	$search_form->addItem(new CDiv(array(_('Search').': ', $searchBox)));
 
-		$this->file = './include/forms/'.$file.'.php';
-		$this->data = $data;
-	}
+	$search_div = new CDiv(SPACE, 'zbx_search nowrap', 'zbx_search');
 
-	public function render(){
-		$data = $this->data;
-
-		ob_start();
-		$this->form = include($this->file);
-		$this->scripts = ob_get_clean();
-
-		print($this->scripts);
-		return $this->form;
-	}
-}
+return new CDiv(SPACE, 'zbx_search', 'zbx_search');
 ?>
