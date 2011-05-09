@@ -126,7 +126,7 @@ int	getPROC(char *file, int lineno, int fieldno, unsigned flags, AGENT_RESULT *r
 	return SYSINFO_RET_OK;
 #else
 	return SYSINFO_RET_FAIL;
-#endif /* HAVE_PROC */
+#endif	/* HAVE_PROC */
 }
 
 static int	AGENT_PING(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -231,7 +231,7 @@ static int	SYSTEM_RUN(const char *cmd, const char *param, unsigned flags, AGENT_
 	char			full_command[MAX_STRING_LEN];
 	LPTSTR			wcommand;
 	int			ret = SYSINFO_RET_FAIL;
-#else /* not _WINDOWS */
+#else
 	pid_t			pid;
 #endif
 
