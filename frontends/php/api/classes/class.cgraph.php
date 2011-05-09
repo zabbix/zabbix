@@ -74,10 +74,10 @@ class CGraph extends CZBXAPI{
 // output
 			'output'				=> API_OUTPUT_REFER,
 			'selectGroups'			=> null,
-			'select_templates'		=> null,
+			'selectTemplates'		=> null,
 			'selectHosts'			=> null,
 			'selectItems'			=> null,
-			'select_graph_items'	=> null,
+			'selectGraphItems'	=> null,
 			'selectDiscoveryRule'	=> null,
 			'countOutput'			=> null,
 			'groupCount'			=> null,
@@ -391,10 +391,10 @@ class CGraph extends CZBXAPI{
 					if(!is_null($options['selectHosts']) && !isset($result[$graph['graphid']]['hosts'])){
 						$result[$graph['graphid']]['hosts'] = array();
 					}
-					if(!is_null($options['select_graph_items']) && !isset($result[$graph['graphid']]['gitems'])){
+					if(!is_null($options['selectGraphItems']) && !isset($result[$graph['graphid']]['gitems'])){
 						$result[$graph['graphid']]['gitems'] = array();
 					}
-					if(!is_null($options['select_templates']) && !isset($result[$graph['graphid']]['templates'])){
+					if(!is_null($options['selectTemplates']) && !isset($result[$graph['graphid']]['templates'])){
 						$result[$graph['graphid']]['templates'] = array();
 					}
 					if(!is_null($options['selectItems']) && !isset($result[$graph['graphid']]['items'])){
@@ -432,10 +432,10 @@ COpt::memoryPick();
 		}
 
 // Adding GraphItems
-		if(!is_null($options['select_graph_items']) && str_in_array($options['select_graph_items'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectGraphItems']) && str_in_array($options['selectGraphItems'], $subselects_allowed_outputs)){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'output' => $options['select_graph_items'],
+				'output' => $options['selectGraphItems'],
 				'graphids' => $graphids,
 				'nopermissions' => 1,
 				'preservekeys' => 1
@@ -496,10 +496,10 @@ COpt::memoryPick();
 		}
 
 // Adding Templates
-		if(!is_null($options['select_templates']) && str_in_array($options['select_templates'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectTemplates']) && str_in_array($options['selectTemplates'], $subselects_allowed_outputs)){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'output' => $options['select_templates'],
+				'output' => $options['selectTemplates'],
 				'graphids' => $graphids,
 				'nopermissions' => 1,
 				'preservekeys' => 1
@@ -689,7 +689,7 @@ COpt::memoryPick();
 				'editable' => 1,
 				'preservekeys' => 1,
 				'output' => API_OUTPUT_SHORTEN,
-				'select_graph_items'=> API_OUTPUT_EXTEND
+				'selectGraphItems'=> API_OUTPUT_EXTEND
 			);
 			$upd_graphs = $this->get($options);
 
@@ -756,7 +756,10 @@ COpt::memoryPick();
 	}
 
 	protected function updateReal($graph){
-		$data = array(array('values' => $graph, 'where'=> array('graphid='.$graph['graphid'])));
+		$data = array(array(
+			'values' => $graph,
+			'where'=> array('graphid'=>$graph['graphid'])
+		));
 		DB::update('graphs', $data);
 
 		if(isset($graph['gitems'])){
@@ -798,7 +801,7 @@ COpt::memoryPick();
 			'graphids' => $graph['graphid'],
 			'nopermissions' => 1,
 			'selectItems' => API_OUTPUT_EXTEND,
-			'select_graph_items' => API_OUTPUT_EXTEND,
+			'selectGraphItems' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND
 		);
 		$graph = $this->get($options);
@@ -949,7 +952,7 @@ COpt::memoryPick();
 				'hostids' => $data['templateids'],
 				'preservekeys' => 1,
 				'output' => API_OUTPUT_EXTEND,
-				'select_graph_items' => API_OUTPUT_EXTEND,
+				'selectGraphItems' => API_OUTPUT_EXTEND,
 			);
 			$graphs = $this->get($options);
 

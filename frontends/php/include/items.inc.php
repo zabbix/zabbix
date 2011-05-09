@@ -323,7 +323,7 @@
 			'output' => API_OUTPUT_EXTEND,
 			'inherited' => false,
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
-			'select_applications' => API_OUTPUT_REFER,
+			'selectApplications' => API_OUTPUT_REFER,
 		);
 		$srcItems = API::Item()->get($options);
 
@@ -596,7 +596,7 @@
 			$key = expand_item_key_by_data($item);
 
 			// parsing key to get the parameters out of it
-			$ItemKey = new cItemKey($key);
+			$ItemKey = new CItemKey($key);
 
 			if($ItemKey->isValid()){
 				$keyParameters = $ItemKey->getParameters();
