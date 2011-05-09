@@ -857,8 +857,12 @@ class zbxXML{
 						continue; // break if not update exist
 					}
 
+					// there were no host visible names in 1.8
+					if(!isset($host_db['name'])){
+						$host_db['name'] = $host_db['host'];
+					}
 
-					// host will have no interfaces - we will be creating them seperatly
+					// host will have no interfaces - we will be creating them separately
 					$host_db['interfaces'] = null;
 
 					// it is possible, that data is imported from 1.8, where there was only one network interface per host
@@ -1076,12 +1080,12 @@ class zbxXML{
 
 // HOST PROFILES {{{
 					if($old_version_input){
-						$host_db['profile'] = array();
 						$profile_node = $xpath->query('host_profile/*', $host);
 						if($profile_node->length > 0){
+							$host_db['profile'] = array();
 							foreach($profile_node as $field){
 								$newProfileName = self::mapProfileName($field->nodeName);
-								if(isset($host_db['profile'][$newProfileName])){
+								if(isset($host_db['profile'][$newProfileName]) && $field->nodeValue !== ''){
 									$host_db['profile'][$newProfileName] .= "\n";
 									$host_db['profile'][$newProfileName] .= $field->nodeValue;
 								}
@@ -1093,9 +1097,12 @@ class zbxXML{
 
 						$profile_ext_node = $xpath->query('host_profiles_ext/*', $host);
 						if($profile_ext_node->length > 0){
+							if(!isset($host_db['profile'])){
+								$host_db['profile'] = array();
+							}
 							foreach($profile_ext_node as $field){
 								$newProfileName = self::mapProfileName($field->nodeName);
-								if(isset($host_db['profile'][$newProfileName])){
+								if(isset($host_db['profile'][$newProfileName]) && $field->nodeValue !== ''){
 									$host_db['profile'][$newProfileName] .= "\n";
 									$host_db['profile'][$newProfileName] .= $field->nodeValue;
 								}
@@ -1104,6 +1111,8 @@ class zbxXML{
 								}
 							}
 						}
+
+						$host_db['profile_mode'] = isset($host_db['profile']) ? HOST_PROFILE_MANUAL : HOST_PROFILE_DISABLED;
 					}
 // }}} HOST PROFILES
 
@@ -1196,6 +1205,7 @@ class zbxXML{
 						foreach($items as $inum => $item){
 							$item_db = self::mapXML2arr($item, XML_TAG_ITEM);
 							$item_db['hostid'] = $current_hostid;
+							$item_db['profile_link'] = 0;
 
 							// item needs interfaces
 							if($old_version_input){

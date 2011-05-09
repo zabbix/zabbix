@@ -40,7 +40,7 @@ class API_JSON_Host extends CZabbixTest
 	{
 		$debug = null;
 
-		// creating map
+		// creating host
 		$result = $this->api_acall(
 			'host.exists',
 			array('host'=>$name),
