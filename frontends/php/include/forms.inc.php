@@ -1678,7 +1678,7 @@
 			$frmItem->setTitle($caption);
 		}
 		else
-			$frmItem->setTitle(S_ITEM." $hostname : $description");
+			$frmItem->setTitle(_s('Item %1$s : %2$s', $hostname, $name));
 
 		if(!$parent_discoveryid){
 			$frmItem->addVar('form_hostid', $hostid);
