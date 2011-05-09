@@ -2156,3 +2156,90 @@ char	*DBsql_id_ins(zbx_uint64_t id)
 
 	return buf[n];
 }
+
+#define ZBX_MAX_PROFILE_FIELDS	70
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBget_profile_field                                              *
+ *                                                                            *
+ * Purpose: get corresponding host_profile field name                         *
+ *                                                                            *
+ * Parameters: profile_link - [IN] field number; 1..ZBX_MAX_PROFILE_FIELDS    *
+ *                                                                            *
+ * Return value: field name or NULL if value of profile_link is incorrect     *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+const char	*DBget_profile_field(unsigned char profile_link)
+{
+	static const char	*profile_fields[ZBX_MAX_PROFILE_FIELDS] =
+	{
+		"type", "type_full", "name", "alias", "os", "os_full", "os_short", "serialno_a", "serialno_b", "tag",
+		"asset_tag", "macaddress_a", "macaddress_b", "hardware", "hardware_full", "software", "software_full",
+		"software_app_a", "software_app_b", "software_app_c", "software_app_d", "software_app_e", "contact",
+		"location", "location_lat", "location_lon", "notes", "chassis", "model", "hw_arch", "vendor",
+		"contract_number", "installer_name", "deployment_status", "url_a", "url_b", "url_c", "host_networks",
+		"host_netmask", "host_router", "oob_ip", "oob_netmask", "oob_router", "date_hw_purchase",
+		"date_hw_install", "date_hw_expiry", "date_hw_decomm", "site_address_a", "site_address_b",
+		"site_address_c", "site_city", "site_state", "site_country", "site_zip", "site_rack", "site_notes",
+		"poc_1_name", "poc_1_email", "poc_1_phone_a", "poc_1_phone_b", "poc_1_cell", "poc_1_screen",
+		"poc_1_notes", "poc_2_name", "poc_2_email", "poc_2_phone_a", "poc_2_phone_b", "poc_2_cell",
+		"poc_2_screen", "poc_2_notes"
+	};
+
+	if (1 > profile_link || profile_link > ZBX_MAX_PROFILE_FIELDS)
+		return NULL;
+
+	return profile_fields[profile_link - 1];
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBget_profile_field_len                                          *
+ *                                                                            *
+ * Purpose: get host_profile field length by profile_link                     *
+ *                                                                            *
+ * Parameters: profile_link - [IN] field number; 1..ZBX_MAX_PROFILE_FIELDS    *
+ *                                                                            *
+ * Return value: field length                                                 *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+unsigned short	DBget_profile_field_len(unsigned char profile_link)
+{
+	static unsigned short	*profile_field_len = NULL;
+	const char		*profile_field;
+	const ZBX_TABLE		*table;
+	const ZBX_FIELD		*field;
+
+	if (1 > profile_link || profile_link > ZBX_MAX_PROFILE_FIELDS)
+		assert(0);
+
+	profile_link--;
+
+	if (NULL == profile_field_len)
+	{
+		profile_field_len = zbx_malloc(profile_field_len, ZBX_MAX_PROFILE_FIELDS * sizeof(unsigned short));
+		memset(profile_field_len, 0, ZBX_MAX_PROFILE_FIELDS * sizeof(unsigned short));
+	}
+
+	if (0 != profile_field_len[profile_link])
+		return profile_field_len[profile_link];
+
+	profile_field = DBget_profile_field(profile_link + 1);
+	assert(table = DBget_table("host_profile"));
+	assert(field = DBget_field(table, profile_field));
+
+	profile_field_len[profile_link] = field->length;
+
+	return profile_field_len[profile_link];
+}
+
+#undef ZBX_MAX_PROFILE_FIELDS
