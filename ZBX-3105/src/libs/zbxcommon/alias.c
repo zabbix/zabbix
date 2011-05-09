@@ -32,7 +32,7 @@ int	add_alias(const char *name, const char *value)
 
 	for (alias = aliasList; ; alias = alias->next)
 	{
-		/* add new parameters */
+		/* add new Alias */
 		if (NULL == alias)
 		{
 			alias = (ALIAS *)zbx_malloc(alias, sizeof(ALIAS));
@@ -44,22 +44,19 @@ int	add_alias(const char *name, const char *value)
 			alias->next = aliasList;
 			aliasList = alias;
 
-			zabbix_log(LOG_LEVEL_DEBUG, "alias added: [%s] -> [%s]", name, value);
+			zabbix_log(LOG_LEVEL_DEBUG, "Alias added: \"%s\" -> \"%s\"", name, value);
 			return SUCCEED;
 		}
 
-		/* replace existing parameters */
+		/* treat duplicate Alias as error */
 		if (0 == strcmp(alias->name, name))
 		{
-			zbx_free(alias->value);
-			alias->value = strdup(value);
-
-			zabbix_log(LOG_LEVEL_DEBUG, "alias replaced: [%s] -> [%s]", name, value);
-			return SUCCEED;
+			zabbix_log(LOG_LEVEL_CRIT, "Failed to add Alias \"%s\": duplicate name", name);
+			exit(FAIL);
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_WARNING, "alias handling FAILED: [%s] -> [%s]", name, value);
+	zabbix_log(LOG_LEVEL_WARNING, "Alias handling FAILED: \"%s\" -> \"%s\"", name, value);
 
 	return FAIL;
 }

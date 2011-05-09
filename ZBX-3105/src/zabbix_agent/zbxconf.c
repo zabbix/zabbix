@@ -195,8 +195,8 @@ static void	add_aliases_from_config(char **lines)
 	{
 		if (NULL == (value = strchr(*pline, ':')))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "ignoring Alias \"%s\": not colon-separated", *pline);
-			continue;
+			zabbix_log(LOG_LEVEL_CRIT, "Alias \"%s\" FAILED: not colon-separated", *pline);
+			exit(FAIL);
 		}
 		*value++ = '\0';
 
@@ -227,8 +227,8 @@ static void	add_parameters_from_config(char **lines)
 	{
 		if (NULL == (command = strchr(*pline, ',')))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "ignoring UserParameter \"%s\": not comma-separated", *pline);
-			continue;
+			zabbix_log(LOG_LEVEL_CRIT, "UserParameter \"%s\" FAILED: not comma-separated", *pline);
+			exit(FAIL);
 		}
 		*command++ = '\0';
 
@@ -237,12 +237,6 @@ static void	add_parameters_from_config(char **lines)
 }
 
 #ifdef _WINDOWS
-static void	add_perf_counters_fail(const char *pc, const char *err)
-{
-	zabbix_log(LOG_LEVEL_CRIT, "PerfCounter '%s' FAILED: %s", pc, err);
-	exit(FAIL);
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: add_perf_counters_from_config                                    *
@@ -261,33 +255,41 @@ static void	add_perf_counters_fail(const char *pc, const char *err)
 static void	add_perf_counters_from_config(const char **lines)
 {
 	char		name[MAX_STRING_LEN], counterpath[PDH_MAX_COUNTER_PATH], interval[8];
-	const char	**pline;
+	const char	**pline, *msg;
 	LPTSTR		wcounterPath;
+
+#define PC_FAIL(_msg) {msg = _msg; goto pc_fail;}
 
 	for (pline = lines; NULL != *pline; pline++)
 	{
 		if (3 < num_param(*pline))
-			add_perf_counters_fail(*pline, "line too short");
+			PC_FAIL("line too short");
 
 		if (0 != get_param(*pline, 1, name, sizeof(name)))
-			add_perf_counters_fail(*pline, "could not parse key");
+			PC_FAIL("could not parse key");
 
 		if (0 != get_param(*pline, 2, counterpath, sizeof(counterpath)))
-			add_perf_counters_fail(*pline, "could not parse counter path");
+			PC_FAIL("could not parse counter path");
 
 		if (0 != get_param(*pline, 3, interval, sizeof(interval)))
-			add_perf_counters_fail(*pline, "could not parse interval");
+			PC_FAIL("could not parse interval");
 
 		wcounterPath = zbx_acp_to_unicode(counterpath);
 		zbx_unicode_to_utf8_static(wcounterPath, counterpath, PDH_MAX_COUNTER_PATH);
 		zbx_free(wcounterPath);
 
 		if (FAIL == check_counter_path(counterpath))
-			add_perf_counters_fail(*pline, "invalid counter path");
+			PC_FAIL("invalid counter path");
 
 		if (NULL == add_perf_counter(name, counterpath, atoi(interval)))
-			add_perf_counters_fail(*pline, "could not add counter");
+			PC_FAIL("could not add counter");
+
+		continue;
+pc_fail:
+		zabbix_log(LOG_LEVEL_CRIT, "PerfCounter '%s' FAILED: %s", pc, err);
+		exit(FAIL);
 	}
+#undef PC_FAIL
 }
 #endif	/* _WINDOWS */
 
@@ -353,7 +355,7 @@ static void	set_defaults()
 	{
 		if (NULL == (value = GET_STR_RESULT(&result)))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "failed to get default hostname (system.hostname)");
+			zabbix_log(LOG_LEVEL_CRIT, "Failed to get default hostname (system.hostname)");
 			exit(FAIL);
 		}
 
