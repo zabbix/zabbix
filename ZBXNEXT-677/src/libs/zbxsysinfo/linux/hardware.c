@@ -399,6 +399,8 @@ int     SYSTEM_HW_MACADDR(const char *cmd, const char *param, unsigned flags, AG
 		goto close;
 	ifr = ifc.ifc_req;
 
+	*buffer = '\0';
+	ret = SYSINFO_RET_OK;
 	zbx_vector_str_create(&addresses);
 	zbx_vector_str_reserve(&addresses, 8);
 
@@ -448,10 +450,11 @@ int     SYSTEM_HW_MACADDR(const char *cmd, const char *param, unsigned flags, AG
 			zbx_free(addresses.values[i]);
 		}
 
-		ret = SYSINFO_RET_OK;
 		zbx_rtrim(buffer + offset - 2, ", ");
-		SET_STR_RESULT(result, zbx_strdup(NULL, buffer));
 	}
+
+	if (SYSINFO_RET_OK == ret)
+		SET_STR_RESULT(result, zbx_strdup(NULL, buffer));
 
 	zbx_vector_str_destroy(&addresses);
 close:
