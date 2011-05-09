@@ -51,7 +51,7 @@ int	add_alias(const char *name, const char *value)
 		/* treat duplicate Alias as error */
 		if (0 == strcmp(alias->name, name))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "Failed to add Alias \"%s\": duplicate name", name);
+			zabbix_log(LOG_LEVEL_CRIT, "failed to add Alias \"%s\": duplicate name", name);
 			exit(FAIL);
 		}
 	}

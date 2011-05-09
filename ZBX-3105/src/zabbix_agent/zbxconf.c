@@ -139,7 +139,7 @@ void	load_config()
 
 	if (1 == CONFIG_DISABLE_ACTIVE && 1 == CONFIG_DISABLE_PASSIVE)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Either active or passive checks must be enabled");
+		zabbix_log(LOG_LEVEL_CRIT, "either active or passive checks must be enabled");
 		exit(1);
 	}
 }
@@ -349,7 +349,7 @@ static void	set_defaults()
 	{
 		if (NULL == (value = GET_STR_RESULT(&result)))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "Failed to get default hostname (system.hostname)");
+			zabbix_log(LOG_LEVEL_CRIT, "failed to get default hostname (system.hostname)");
 			exit(FAIL);
 		}
 
