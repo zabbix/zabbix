@@ -684,7 +684,7 @@ static int	process_value(
 		el->mtime = *mtime;
 	if (NULL != timestamp)
 		el->timestamp = *timestamp;
-	if NULL != (logeventid)
+	if (NULL != logeventid)
 		el->logeventid = (int)*logeventid;
 
 	zbx_timespec(&el->ts);

@@ -270,7 +270,7 @@ static void    init_config(const char* config_file)
 			zbx_free(zabbix_server_from_conf);
 		}
 
-		if (NULL == ZABBIX_SERVER_PORT && NULL != zabbix_server_port_from_conf )
+		if (0 == ZABBIX_SERVER_PORT && 0 != zabbix_server_port_from_conf )
 			ZABBIX_SERVER_PORT = zabbix_server_port_from_conf;
 
 		if (NULL != zabbix_hostname_from_conf)
