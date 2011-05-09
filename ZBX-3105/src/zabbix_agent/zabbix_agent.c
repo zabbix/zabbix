@@ -61,17 +61,12 @@ struct zbx_option longopts[] =
 	{0,0,0,0}
 };
 
-void	child_signal_handler( int sig )
+void	child_signal_handler(int sig)
 {
-	if( SIGALRM == sig )
-	{
-		signal( SIGALRM, child_signal_handler );
-	}
+	if (SIGALRM == sig)
+		signal(SIGALRM, child_signal_handler);
 
-	if( SIGQUIT == sig || SIGINT == sig || SIGTERM == sig )
-	{
-	}
-	exit( FAIL );
+	exit(FAIL);
 }
 
 static char	DEFAULT_CONFIG_FILE[] = "/etc/zabbix/zabbix_agent.conf";
@@ -107,7 +102,7 @@ int	main(int argc, char **argv)
 				version();
 #ifdef _AIX
 				tl_version();
-#endif /* _AIX */
+#endif
 				exit(FAIL);
 				break;
 			case 'p':
@@ -167,9 +162,9 @@ int	main(int argc, char **argv)
 	zbx_tcp_init(&s_in, (ZBX_SOCKET)fileno(stdin));
 	zbx_tcp_init(&s_out, (ZBX_SOCKET)fileno(stdout));
 
-	if( SUCCEED == (ret = zbx_tcp_check_security(&s_in, CONFIG_HOSTS_ALLOWED, 0)) )
+	if (SUCCEED == (ret = zbx_tcp_check_security(&s_in, CONFIG_HOSTS_ALLOWED, 0)))
 	{
-		if( SUCCEED == (ret = zbx_tcp_recv(&s_in, &command)) )
+		if (SUCCEED == (ret = zbx_tcp_recv(&s_in, &command)))
 		{
 			zbx_rtrim(command, "\r\n");
 
@@ -179,10 +174,10 @@ int	main(int argc, char **argv)
 
 			process(command, 0, &result);
 
-			if( NULL == (value = GET_TEXT_RESULT(&result)) )
+			if (NULL == (value = GET_TEXT_RESULT(&result)))
 				value = GET_MSG_RESULT(&result);
 
-			if(value)
+			if (NULL != value)
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "Sending back [%s]", *value);
 
@@ -192,10 +187,8 @@ int	main(int argc, char **argv)
 			free_result(&result);
 		}
 
-		if( FAIL == ret )
-		{
+		if (FAIL == ret)
 			zabbix_log(LOG_LEVEL_DEBUG, "Processing error: %s", zbx_tcp_strerror());
-		}
 	}
 
 	fflush(stdout);
