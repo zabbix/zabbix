@@ -138,6 +138,8 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.6rc1
 
+ - [ZBX-3776] treat duplicate UserParameter as error (dimir)
+ - [ZBX-3728] fixed a warning message when removing a user script (Alexei)
  - [ZBX-3731] fixed possible SQL errors when updating trends (Sasha)
  - [ZBX-3772] improved performance of the history syncer (Sasha)
  - [ZBX-3547] Rewrote performance counters and cpu stats collection for Windows (rudolfs)
