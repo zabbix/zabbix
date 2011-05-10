@@ -165,6 +165,7 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 	FILE		*file;
 	char		line[1024];
 	unsigned char	*cpu_status = NULL;
+	const char	*filename = "/proc/stat";
 
 #elif defined(HAVE_SYS_PSTAT_H)
 
@@ -206,9 +207,9 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 
 #if defined(HAVE_PROC_STAT)
 
-	if (NULL == (file = fopen("/proc/stat", "r")))
+	if (NULL == (file = fopen(filename, "r")))
 	{
-		zbx_error("cannot open [%s] [%s]", "/proc/stat", strerror(errno));
+		zbx_error("cannot open [%s]: %s", filename, strerror(errno));
 		ZBX_SET_CPUS_NOTSUPPORTED();
 		goto exit;
 	}
