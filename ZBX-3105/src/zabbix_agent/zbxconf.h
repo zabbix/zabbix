@@ -36,9 +36,6 @@ extern char	**CONFIG_ALIASES;
 extern char	**CONFIG_USER_PARAMETERS;
 extern char	**CONFIG_PERF_COUNTERS;
 
-void	load_config();
-void	free_config();
-
 void	load_aliases(char **lines);
 void	load_user_parameters(char **lines);
 #if defined(_WINDOWS)

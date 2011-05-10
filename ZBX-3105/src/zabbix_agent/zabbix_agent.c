@@ -71,6 +71,68 @@ void	child_signal_handler(int sig)
 
 static char	DEFAULT_CONFIG_FILE[] = "/etc/zabbix/zabbix_agent.conf";
 
+/******************************************************************************
+ *                                                                            *
+ * Function: load_config                                                      *
+ *                                                                            *
+ * Purpose: load configuration from config file                               *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Vladimir Levijev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	load_config()
+{
+	struct cfg_line	cfg[] =
+	{
+		/* PARAMETER,			VAR,					TYPE,
+			MANDATORY,	MIN,			MAX */
+		{"Server",			&CONFIG_HOSTS_ALLOWED,			TYPE_STRING,
+			PARM_MAND,	0,			0},
+		{"Timeout",			&CONFIG_TIMEOUT,			TYPE_INT,
+			PARM_OPT,	1,			30},
+		{"UnsafeUserParameters",	&CONFIG_UNSAFE_USER_PARAMETERS,		TYPE_INT,
+			PARM_OPT,	0,			1},
+		{"Alias",			&CONFIG_ALIASES,			TYPE_MULTISTRING,
+			PARM_OPT,	0,			0},
+		{"UserParameter",		&CONFIG_USER_PARAMETERS,		TYPE_MULTISTRING,
+			PARM_OPT,	0,			0},
+		{NULL}
+	};
+
+	/* initialize multistrings */
+	zbx_strarr_init(&CONFIG_ALIASES);
+	zbx_strarr_init(&CONFIG_USER_PARAMETERS);
+
+	parse_cfg_file(CONFIG_FILE, cfg);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_free_config                                                  *
+ *                                                                            *
+ * Purpose: free configuration memory                                         *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Vladimir Levijev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_free_config()
+{
+	zbx_strarr_free(CONFIG_ALIASES);
+	zbx_strarr_free(CONFIG_USER_PARAMETERS);
+}
+
 int	main(int argc, char **argv)
 {
 	char		ch;
@@ -126,11 +188,11 @@ int	main(int argc, char **argv)
 	if (NULL == CONFIG_FILE)
 		CONFIG_FILE = DEFAULT_CONFIG_FILE;
 
-	/* this is needed to set default hostname in load_config() */
-	init_metrics();
-
 	/* load configuration */
 	load_config();
+
+	/* metrics should be initialized befor loading user parameters */
+	init_metrics();
 
 	/* user parameters */
 	load_user_parameters(CONFIG_USER_PARAMETERS);
@@ -138,7 +200,7 @@ int	main(int argc, char **argv)
 	/* aliases */
 	load_aliases(CONFIG_ALIASES);
 
-	free_config();
+	zbx_free_config();
 
 	/* do not create debug files */
 	zabbix_open_log(LOG_TYPE_SYSLOG, LOG_LEVEL_EMPTY, NULL);
