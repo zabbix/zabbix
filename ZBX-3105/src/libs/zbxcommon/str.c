@@ -3220,19 +3220,17 @@ void	zbx_strarr_init(char ***arr)
  ******************************************************************************/
 void	zbx_strarr_add(char ***arr, const char *entry)
 {
-	char	**p;
-	int	sz = 0;
+	int	i;
 
-	if (NULL == entry)
-		return;
+	assert(entry);
 
-	for (p = *arr; NULL != *p; p++, sz++);
+	for (i = 0; NULL != (*arr)[i]; i++)
+		;
 
-	*arr = zbx_realloc(*arr, sizeof(char **) * (sz + 2));
-	assert(*arr);
+	*arr = zbx_realloc(*arr, sizeof(char **) * (i + 2));
 
-	(*arr)[sz++] = strdup(entry);
-	(*arr)[sz] = NULL;
+	(*arr)[i] = zbx_strdup((*arr)[i], entry);
+	(*arr)[++i] = NULL;
 }
 
 /******************************************************************************
@@ -3254,11 +3252,7 @@ void	zbx_strarr_free(char **arr)
 {
 	char	**p;
 
-	p = arr;
-	while (NULL != *p)
-	{
+	for (p = arr; NULL != *p; p++)
 		zbx_free(*p);
-		p++;
-	}
 	zbx_free(arr);
 }
