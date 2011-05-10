@@ -144,6 +144,7 @@ int     SYSTEM_SW_PACKAGES(const char *cmd, const char *param, unsigned flags, A
 	for (i = 0; NULL != package_managers[i].name; i++)
 	{
 		mng = &package_managers[i];
+
 		if ('\0' != *manager && 0 != strcmp(manager, mng->name))
 			continue;
 
@@ -154,7 +155,9 @@ int     SYSTEM_SW_PACKAGES(const char *cmd, const char *param, unsigned flags, A
 				continue;
 
 			ret = SYSINFO_RET_OK;
+
 			package = strtok(buf, "\n");
+
 			while (NULL != package)
 			{
 				if (NULL != mng->parser)	/* check if the package name needs to be parsed */
