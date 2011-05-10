@@ -283,31 +283,6 @@ pc_fail:
 
 /******************************************************************************
  *                                                                            *
- * Function: validate_config                                                  *
- *                                                                            *
- * Purpose: validate configuration parameters                                 *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Vladimir Levijev                                                   *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-void	validate_config()
-{
-	/* hostname should be defined */
-	if (NULL == CONFIG_HOSTNAME)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "hostname not defined");
-		exit(FAIL);
-	}
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: set_defaults                                                     *
  *                                                                            *
  * Purpose: set non-static configuration defaults                             *

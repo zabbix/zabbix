@@ -222,8 +222,30 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	}
 }
 
-static void	validate_daemon_config()
+/******************************************************************************
+ *                                                                            *
+ * Function: validate_config                                                  *
+ *                                                                            *
+ * Purpose: validate configuration parameters                                 *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Vladimir Levijev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	validate_config()
 {
+	/* hostname */
+	if (NULL == CONFIG_HOSTNAME)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "hostname not defined");
+		exit(FAIL);
+	}
+
 	/* make sure active or passive check is enabled */
 	if (1 == CONFIG_DISABLE_ACTIVE && 1 == CONFIG_DISABLE_PASSIVE)
 	{
@@ -390,7 +412,6 @@ int	main(int argc, char **argv)
 	load_config();
 
 	validate_config();
-	validate_daemon_config();
 
 	/* activate user configuration (not needed for service actions) */
 	if (ZBX_TASK_INSTALL_SERVICE != t.task &&

@@ -132,8 +132,6 @@ int	main(int argc, char **argv)
 	/* load configuration */
 	load_config();
 
-	validate_config();
-
 	/* parameters */
 	add_parameters_from_config(CONFIG_USER_PARAMETERS);
 
