@@ -323,13 +323,7 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 
 	for (cpu_num = 1; cpu_num <= pcpus->count; cpu_num++)
 	{
-		if (NULL == (k = kstat_lookup(kc, "cpu_stat", cpu_num - 1, NULL)))
-		{
-			update_cpu_counters(&pcpus->cpu[cpu_num], NULL);
-			continue;
-		}
-
-		if (-1 == kstat_read(kc, k, NULL))
+		if (NULL == (k = kstat_lookup(kc, "cpu_stat", cpu_num - 1, NULL)) || -1 == kstat_read(kc, k, NULL))
 		{
 			update_cpu_counters(&pcpus->cpu[cpu_num], NULL);
 			continue;
@@ -363,13 +357,8 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 			mib[1] = KERN_CPTIME;
 
 			sz = sizeof(all_states);
-			if (-1 == sysctl(mib, 2, &all_states, &sz, NULL, 0))
-			{
-				update_cpu_counters(&pcpus->cpu[cpu_num], NULL);
-				continue;
-			}
 
-			if (sz != sizeof(all_states))
+			if (-1 == sysctl(mib, 2, &all_states, &sz, NULL, 0) || sz != sizeof(all_states))
 			{
 				update_cpu_counters(&pcpus->cpu[cpu_num], NULL);
 				continue;
@@ -388,13 +377,8 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 			mib[2] = cpu_num - 1;
 
 			sz = sizeof(one_states);
-			if (-1 == sysctl(mib, 3, &one_states, &sz, NULL, 0))
-			{
-				update_cpu_counters(&pcpus->cpu[cpu_num], NULL);
-				continue;
-			}
 
-			if (sz != sizeof(one_states))
+			if (-1 == sysctl(mib, 3, &one_states, &sz, NULL, 0) || sz != sizeof(one_states))
 			{
 				update_cpu_counters(&pcpus->cpu[cpu_num], NULL);
 				continue;
