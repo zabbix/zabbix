@@ -39,10 +39,10 @@ extern char	**CONFIG_PERF_COUNTERS;
 void	load_config();
 void	free_config();
 
-void	add_aliases_from_config(char **lines);
-void	add_parameters_from_config(char **lines);
+void	load_aliases(char **lines);
+void	load_user_parameters(char **lines);
 #if defined(_WINDOWS)
-void	add_perf_counters_from_config(const char **lines);
+void	load_perf_counters(const char **lines);
 #endif
 
 #ifdef _AIX

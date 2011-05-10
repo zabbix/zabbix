@@ -52,7 +52,9 @@ int	CONFIG_MAX_LINES_PER_SECOND	= 100;
 
 char	**CONFIG_ALIASES                = NULL;
 char	**CONFIG_USER_PARAMETERS        = NULL;
+#if defined(_WINDOWS)
 char	**CONFIG_PERF_COUNTERS          = NULL;
+#endif
 
 static void	set_defaults();
 
@@ -112,7 +114,7 @@ void	load_config()
 			PARM_OPT,	0,			0},
 		{"UserParameter",		&CONFIG_USER_PARAMETERS,		TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
-#ifdef _WINDOWS
+#if defined(_WINDOWS)
 		{"PerfCounter",			&CONFIG_PERF_COUNTERS,			TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
 #endif
@@ -122,7 +124,9 @@ void	load_config()
 	/* initialize multistrings */
 	zbx_strarr_init(&CONFIG_ALIASES);
 	zbx_strarr_init(&CONFIG_USER_PARAMETERS);
+#if defined(_WINDOWS)
 	zbx_strarr_init(&CONFIG_PERF_COUNTERS);
+#endif
 
 	set_defaults();
 
@@ -153,7 +157,9 @@ void	free_config()
 {
 	zbx_strarr_free(CONFIG_ALIASES);
 	zbx_strarr_free(CONFIG_USER_PARAMETERS);
+#if defined(_WINDOWS)
 	zbx_strarr_free(CONFIG_PERF_COUNTERS);
+#endif
 
 	free_metrics();
 	alias_list_free();
@@ -162,9 +168,9 @@ void	free_config()
 
 /******************************************************************************
  *                                                                            *
- * Function: add_aliases_from_config                                          *
+ * Function: load_aliases                                                     *
  *                                                                            *
- * Purpose: initialize aliases from configuration                             *
+ * Purpose: load aliases from configuration                                   *
  *                                                                            *
  * Parameters: lines - aliase entries from configuration file                 *
  *                                                                            *
@@ -175,7 +181,7 @@ void	free_config()
  * Comments: calls add_alias() for each entry                                 *
  *                                                                            *
  ******************************************************************************/
-void	add_aliases_from_config(char **lines)
+void	load_aliases(char **lines)
 {
 	char	*value, **pline;
 
@@ -194,9 +200,9 @@ void	add_aliases_from_config(char **lines)
 
 /******************************************************************************
  *                                                                            *
- * Function: add_parameters_from_config                                       *
+ * Function: load_user_parameters                                             *
  *                                                                            *
- * Purpose: initialize user parameters from configuration                     *
+ * Purpose: load user parameters from configuration                           *
  *                                                                            *
  * Parameters: lines - user parameter entries from configuration file         *
  *                                                                            *
@@ -207,7 +213,7 @@ void	add_aliases_from_config(char **lines)
  * Comments: calls add_user_parameter() for each entry                        *
  *                                                                            *
  ******************************************************************************/
-void	add_parameters_from_config(char **lines)
+void	load_user_parameters(char **lines)
 {
 	char	*command, **pline;
 
@@ -227,9 +233,9 @@ void	add_parameters_from_config(char **lines)
 #if defined(_WINDOWS)
 /******************************************************************************
  *                                                                            *
- * Function: add_perf_counters_from_config                                    *
+ * Function: load_perf_counters                                               *
  *                                                                            *
- * Purpose: add performance counters from configuration                       *
+ * Purpose: load performance counters from configuration                      *
  *                                                                            *
  * Parameters: lines - array of PerfCounter configuration entries             *
  *                                                                            *
@@ -240,7 +246,7 @@ void	add_parameters_from_config(char **lines)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	add_perf_counters_from_config(const char **lines)
+void	load_perf_counters(const char **lines)
 {
 	char		name[MAX_STRING_LEN], counterpath[PDH_MAX_COUNTER_PATH], interval[8];
 	const char	**pline, *msg;

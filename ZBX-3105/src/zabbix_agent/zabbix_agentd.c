@@ -419,15 +419,15 @@ int	main(int argc, char **argv)
 			ZBX_TASK_START_SERVICE != t.task &&
 			ZBX_TASK_STOP_SERVICE != t.task)
 	{
-		/* parameters */
-		add_parameters_from_config(CONFIG_USER_PARAMETERS);
+		/* user parameters */
+		load_user_parameters(CONFIG_USER_PARAMETERS);
 
 		/* aliases */
-		add_aliases_from_config(CONFIG_ALIASES);
+		load_aliases(CONFIG_ALIASES);
 
 #if defined(_WINDOWS)
 		/* performance counters */
-		add_perf_counters_from_config(CONFIG_PERF_COUNTERS);
+		load_perf_counters(CONFIG_PERF_COUNTERS);
 #endif	/* _WINDOWS */
 	}
 

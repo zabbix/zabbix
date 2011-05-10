@@ -133,10 +133,10 @@ int	main(int argc, char **argv)
 	load_config();
 
 	/* parameters */
-	add_parameters_from_config(CONFIG_USER_PARAMETERS);
+	load_user_parameters(CONFIG_USER_PARAMETERS);
 
 	/* aliases */
-	add_aliases_from_config(CONFIG_ALIASES);
+	load_aliases(CONFIG_ALIASES);
 
 	/* do not create debug files */
 	zabbix_open_log(LOG_TYPE_SYSLOG, LOG_LEVEL_EMPTY, NULL);
