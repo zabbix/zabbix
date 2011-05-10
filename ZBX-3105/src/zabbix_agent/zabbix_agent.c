@@ -126,17 +126,19 @@ int	main(int argc, char **argv)
 	if (NULL == CONFIG_FILE)
 		CONFIG_FILE = DEFAULT_CONFIG_FILE;
 
-	/* initialize these before parsing configuration */
+	/* this is needed to set default hostname in load_config() */
 	init_metrics();
 
 	/* load configuration */
 	load_config();
 
-	/* parameters */
+	/* user parameters */
 	load_user_parameters(CONFIG_USER_PARAMETERS);
 
 	/* aliases */
 	load_aliases(CONFIG_ALIASES);
+
+	free_config();
 
 	/* do not create debug files */
 	zabbix_open_log(LOG_TYPE_SYSLOG, LOG_LEVEL_EMPTY, NULL);
@@ -145,12 +147,14 @@ int	main(int argc, char **argv)
 	{
 		case ZBX_TASK_PRINT_SUPPORTED:
 			test_parameters();
-			free_config();
+			free_metrics();
+			alias_list_free();
 			exit(SUCCEED);
 			break;
 		case ZBX_TASK_TEST_METRIC:
 			test_parameter(TEST_METRIC, PROCESS_TEST);
-			free_config();
+			free_metrics();
+			alias_list_free();
 			exit(SUCCEED);
 			break;
 		default:
@@ -199,11 +203,12 @@ int	main(int argc, char **argv)
 
 	fflush(stdout);
 
-	free_config();
-
 	alarm(0);
 
 	zabbix_close_log();
+
+	free_metrics();
+	alias_list_free();
 
 	return SUCCEED;
 }

@@ -160,10 +160,6 @@ void	free_config()
 #if defined(_WINDOWS)
 	zbx_strarr_free(CONFIG_PERF_COUNTERS);
 #endif
-
-	free_metrics();
-	alias_list_free();
-	free_collector_data();
 }
 
 /******************************************************************************

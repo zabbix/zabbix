@@ -372,7 +372,9 @@ void	zbx_on_exit()
 
 	zabbix_close_log();
 
-	free_config();
+	free_metrics();
+	alias_list_free();
+	free_collector_data();
 
 	exit(SUCCEED);
 }
@@ -387,8 +389,8 @@ int	main(int argc, char **argv)
 	/* The system does not display the critical-error-handler message box. */
 	/* Instead, the system sends the error to the calling process.*/
 	SetErrorMode(SEM_FAILCRITICALERRORS);
-#endif /* _WINDOWS */	
-	
+#endif /* _WINDOWS */
+
 	memset(&t, 0, sizeof(t));
 	t.task = ZBX_TASK_START;
 
@@ -404,9 +406,8 @@ int	main(int argc, char **argv)
 		exit(FAIL);
 	}
 
-	/* initialize these before parsing configuration */
+	/* this is needed to set default hostname in load_config() */
 	init_metrics();
-	init_collector_data();
 
 	/* load configuration */
 	load_config();
@@ -425,11 +426,15 @@ int	main(int argc, char **argv)
 		/* aliases */
 		load_aliases(CONFIG_ALIASES);
 
+		/* this is needed to load performance counters but is not just windows-specific */
+		init_collector_data();
 #if defined(_WINDOWS)
 		/* performance counters */
 		load_perf_counters(CONFIG_PERF_COUNTERS);
 #endif	/* _WINDOWS */
 	}
+
+	free_config();
 
 #if defined (_WINDOWS)
 	if (t.flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS)
@@ -437,7 +442,7 @@ int	main(int argc, char **argv)
 		zbx_snprintf(ZABBIX_SERVICE_NAME, sizeof(ZABBIX_SERVICE_NAME), "%s [%s]", APPLICATION_NAME, CONFIG_HOSTNAME);
 		zbx_snprintf(ZABBIX_EVENT_SOURCE, sizeof(ZABBIX_EVENT_SOURCE), "%s [%s]", APPLICATION_NAME, CONFIG_HOSTNAME);
 	}
-#endif /* _WINDOWS */
+#endif	/* _WINDOWS */
 
 	switch (t.task)
 	{
@@ -454,15 +459,19 @@ int	main(int argc, char **argv)
 		case ZBX_TASK_STOP_SERVICE:
 			exit(ZabbixStopService());
 			break;
-#endif /* _WINDOWS */
+#endif	/* _WINDOWS */
 		case ZBX_TASK_PRINT_SUPPORTED:
 			test_parameters();
-			free_config();
+			free_metrics();
+			alias_list_free();
+			free_collector_data();
 			exit(SUCCEED);
 			break;
 		case ZBX_TASK_TEST_METRIC:
 			test_parameter(TEST_METRIC, PROCESS_TEST);
-			free_config();
+			free_metrics();
+			alias_list_free();
+			free_collector_data();
 			exit(SUCCEED);
 			break;
 		default:
