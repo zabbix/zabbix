@@ -81,11 +81,11 @@ clean:
 		exit(FAIL);
 	}
 
-	ret = SUCCEED;
-#endif	/* _WINDOWS */
-
 	for (cpu_num = 0; cpu_num <= pcpus->count; cpu_num++)
 		pcpus->cpu[cpu_num].status = SYSINFO_RET_FAIL;
+
+	ret = SUCCEED;
+#endif	/* _WINDOWS */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -356,7 +356,6 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 				update_cpu_counters(&pcpus->cpu[cpu_num], NULL);
 				continue;
 			}
-				continue;
 
 			counter[ZBX_CPU_STATE_USER] = (zbx_uint64_t)all_states[CP_USER];
 			counter[ZBX_CPU_STATE_NICE] = (zbx_uint64_t)all_states[CP_NICE];
