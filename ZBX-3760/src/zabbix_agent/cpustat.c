@@ -135,10 +135,10 @@ static void	update_cpu_counters(ZBX_SINGLE_CPU_STAT_DATA *cpu, zbx_uint64_t *cou
 		for (i = 0; i < ZBX_CPU_STATE_COUNT; i++)
 			cpu->h_counter[i][index] = counter[i];
 
-		cpu->status[index] = SYSINFO_RET_OK;
+		cpu->h_status[index] = SYSINFO_RET_OK;
 	}
 	else
-		cpu->status[index] = SYSINFO_RET_FAIL;
+		cpu->h_status[index] = SYSINFO_RET_FAIL;
 
 	UNLOCK_CPUSTATS;
 }
@@ -423,9 +423,11 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 	}
 
 #endif	/* HAVE_LIBPERFSTAT */
+
+#undef ZBX_SET_CPUS_NOTSUPPORTED
+
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-#undef ZBX_SET_CPUS_NOTSUPPORTED
 }
 
 void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
@@ -479,7 +481,7 @@ int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode)
 	if (MAX_COLLECTOR_HISTORY <= (idx_curr = (cpu->h_first + cpu->h_count - 1)))
 		idx_curr -= MAX_COLLECTOR_HISTORY;
 
-	if (SYSINFO_RET_FAIL == cpu->status[idx_curr])
+	if (SYSINFO_RET_FAIL == cpu->h_status[idx_curr])
 	{
 		UNLOCK_CPUSTATS;
 		return SYSINFO_RET_FAIL;
@@ -496,7 +498,7 @@ int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode)
 		if (0 > (idx_base = idx_curr - MIN(cpu->h_count - 1, time)))
 			idx_base += MAX_COLLECTOR_HISTORY;
 
-		while (SYSINFO_RET_OK != cpu->status[idx_base])
+		while (SYSINFO_RET_OK != cpu->h_status[idx_base])
 			if (MAX_COLLECTOR_HISTORY == ++idx_base)
 				idx_base -= MAX_COLLECTOR_HISTORY;
 
