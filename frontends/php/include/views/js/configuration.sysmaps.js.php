@@ -1,5 +1,5 @@
-<script type="text/x-jquery-tmpl" id="mapElementForm">
-	<form id="selementForm" name="selementForm" method="post">
+<script type="text/x-jquery-tmpl" id="mapElementFormTpl">
+	<form id="selementForm" name="selementForm" method="post" style="display: none;">
 		<input type="hidden" id="selementid" name="selementid">
 		<input type="hidden" id="elementid" name="elementid">
 		<table class="formtable">
@@ -78,7 +78,7 @@
 				<td><?php echo _('Host group'); ?></td>
 				<td>
 					<input readonly="readonly" size="56" id="elementNameHostGroup" name="elementName" class="input">
-					<span class="link" onclick="PopUp('popup.php?writeonly=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementName&srctbl=host_group&srcfld1=groupid&srcfld2=name',450,450)"><?php echo _('Select'); ?></span>
+					<span class="link" onclick="PopUp('popup.php?writeonly=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameHostGroup&srctbl=host_group&srcfld1=groupid&srcfld2=name',450,450)"><?php echo _('Select'); ?></span>
 				</td>
 			</tr>
 			<tr id="hostSelectRow">
@@ -92,7 +92,7 @@
 				<td><?php echo _('Trigger'); ?></td>
 				<td>
 					<input readonly="readonly" size="56" id="elementNameTrigger" name="elementName" class="input">
-					<span class="link" onclick="PopUp('popup.php?writeonly=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementName&srctbl=triggers&srcfld1=triggerid&srcfld2=description',450,450)"><?php echo _('Select'); ?></span>
+					<span class="link" onclick="PopUp('popup.php?writeonly=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameTrigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description',450,450)"><?php echo _('Select'); ?></span>
 				</td>
 			</tr>
 			<tr id="mapSelectRow">

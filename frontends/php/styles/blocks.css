@@ -21,10 +21,19 @@
 /************************************************************/
 /*					ZABBIX MAPS								*/
 /************************************************************/
+#sysmap_cnt .sysmap_element{
+	position: absolute;
+	z-index: 10;
+}
+
 #sysmap_cnt .selected{
 	border: 1px #3333FF solid;
 	background-color: #00AAAA;
-	opacity: .60;
+}
+
+#sysmap_cnt .ui-selecting{
+	border: 1px #3333FF solid;
+	background-color: #00AAAA;
 }
 
 /************************************************************/
