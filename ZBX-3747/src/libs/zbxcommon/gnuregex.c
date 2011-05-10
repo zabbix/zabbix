@@ -4905,10 +4905,7 @@ regerror (
 	if (NULL ==  msg)
 		msg = "Success";
 
-	if (0 == errbuf_size)
-		return 0;
-
-	return zbx_strlcpy(errbuf, msg, errbuf_size);
+	return zbx_strlcpy(errbuf, msg, errbuf_size) + 1;	/* include the null */
 }
 
 

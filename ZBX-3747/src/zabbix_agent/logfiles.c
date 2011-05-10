@@ -213,7 +213,7 @@ static int	split_filename(const char *filename, char **directory, char **format)
 struct st_logfile
 {
 	char	*filename;
-	time_t	mtime;
+	int	mtime;
 };
 
 /******************************************************************************
@@ -268,13 +268,12 @@ static void free_logfiles(struct st_logfile **logfiles, int *logfiles_alloc, int
  *           Do not forget to change process_log() accordingly!               *
  *                                                                            *
  ******************************************************************************/
-static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num, const char *filename, time_t mtime)
+static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num, const char *filename, int mtime)
 {
 	const char	*__function_name = "add_logfile";
 	int		i = 0, cmp = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' mtime:'%d'",
-			__function_name, filename, mtime);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' mtime:'%d'", __function_name, filename, mtime);
 
 	assert(logfiles);
 	assert(logfiles_alloc);
@@ -291,37 +290,32 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 				__function_name, *logfiles, *logfiles_alloc);
 	}
 
-	/*from the start go those, which mtimes are smaller*/
-	/*if mtimes are equal, then first go those, which filenames are bigger*/
-	/*the rule: the oldest is put first, the most current is at the end*/
-	/*
-		filename.log.3 mtime3, filename.log.2 mtime2, filename.log1 mtime1, filename.log mtime
-		--------------------------------------------------------------------------------------
-		mtime3 		<=	mtime2 		<=	mtime1 		<=	mtime
-		--------------------------------------------------------------------------------------
-		filename.log.3	>	filename.log.2	>	filename.log.1	>	filename.log
-		--------------------------------------------------------------------------------------
-		array[i=0]		array[i=1]		array[i=2]		array[i=3]
-	*/
-
-	/*the application is writing into filename.log; mtimes are more important than filenames*/
+	/************************************************************************************************/
+	/* (1) Sort by ascending mtimes                                                                 */
+	/* (2) If mtimes are equal, sort alphabetically by descending names                             */
+	/* The oldest is put first, the most current is at the end                                      */
+	/*                                                                                              */
+	/*      filename.log.3 mtime3, filename.log.2 mtime2, filename.log1 mtime1, filename.log mtime  */
+	/*      --------------------------------------------------------------------------------------  */
+	/*      mtime3          <=      mtime2          <=      mtime1          <=      mtime           */
+	/*      --------------------------------------------------------------------------------------  */
+	/*      filename.log.3  >      filename.log.2   >       filename.log.1  >       filename.log    */
+	/*      --------------------------------------------------------------------------------------  */
+	/*      array[i=0]             array[i=1]               array[i=2]              array[i=3]      */
+	/*                                                                                              */
+	/* Note: the application is writing into filename.log, mtimes are more important than filenames */
+	/************************************************************************************************/
 
 	for ( ; i < *logfiles_num; i++)
 	{
 		if (mtime > (*logfiles)[i].mtime)
-		{
-			/* this stays on place */
-			continue;
-		}
+			continue;	/* (1) sort by ascending mtime */
 
 		if (mtime == (*logfiles)[i].mtime)
 		{
-			cmp = strcmp(filename, (*logfiles)[i].filename);
-			if (0 > cmp)
-			{
-				/* bigger name stays on place */
-				continue;
-			}
+			if (0 > (cmp = strcmp(filename, (*logfiles)[i].filename)))
+				continue;	/* (2) sort by descending name */
+
 			if (0 == cmp)
 			{
 				/* the file already exists, quite impossible branch */
@@ -337,8 +331,7 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 
 	if (!(0 == i && 0 == *logfiles_num) && !(0 < *logfiles_num && *logfiles_num == i))
 	{
-		/* do not move if there are not logfiles yet */
-		/* do not move if we are appending the logfile */
+		/* do not move if there are no logfiles or we are appending the logfile */
 		memmove((void *)&(*logfiles)[i + 1], (const void *)&(*logfiles)[i],
 				(size_t)((*logfiles_num - i) * sizeof(struct st_logfile)));
 	}
@@ -369,22 +362,22 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
  *    Return SUCCEED and NULL value if end of file received.                  *
  *                                                                            *
  ******************************************************************************/
-int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, const char *encoding)
+int	process_logrt(char *filename, long *lastlogsize, time_t *mtime, char **value, const char *encoding)
 {
-	int		i = 0, nbytes, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, fd = 0, length = 0, j = 0;
-	char		buffer[MAX_BUFFER_LEN], *directory = NULL, *format = NULL, *logfile_candidate = NULL;
-	struct stat	file_buf;
+	int			i = 0, nbytes, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, fd = 0, length = 0, j = 0;
+	char			buffer[MAX_BUFFER_LEN], *directory = NULL, *format = NULL, *logfile_candidate = NULL;
+	struct stat		file_buf;
 	struct st_logfile	*logfiles = NULL;
 #ifdef _WINDOWS
-	char		*find_path = NULL;
-	intptr_t	find_handle;
+	char			*find_path = NULL;
+	intptr_t		find_handle;
 	struct _finddata_t	find_data;
 #else
-	DIR		*dir = NULL;
-	struct dirent	*d_ent = NULL;
+	DIR			*dir = NULL;
+	struct dirent		*d_ent = NULL;
 #endif
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In process_logrt() filename [%s] lastlogsize [%li] mtime [%i]",
+	zabbix_log(LOG_LEVEL_DEBUG, "In process_logrt() filename [%s] lastlogsize [%li] mtime [%d]",
 			filename, *lastlogsize, *mtime);
 
 	/* splitting filename */
@@ -420,7 +413,7 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 		else if (NULL != zbx_regexp_match(find_data.name, format, &length))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "adding the file [%s] to logfiles", logfile_candidate);
-			add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, find_data.name, file_buf.st_mtime);
+			add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, find_data.name, (int)file_buf.st_mtime);
 		}
 		else
 			zabbix_log(LOG_LEVEL_DEBUG, "[%s] does not match [%s]", logfile_candidate, format);
@@ -451,7 +444,7 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 		else if (NULL != zbx_regexp_match(d_ent->d_name, format, &length))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "adding the file [%s] to logfiles", logfile_candidate);
-			add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, d_ent->d_name, file_buf.st_mtime);
+			add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, d_ent->d_name, (int)file_buf.st_mtime);
 		}
 		else
 			zabbix_log(LOG_LEVEL_DEBUG, "[%s] does not match [%s]", logfile_candidate, format);
@@ -464,26 +457,18 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 	for (i = 0; i < logfiles_num; i++)
 	{
 		if (logfiles[i].mtime < *mtime)
-		{
 			continue;	/* not interested in mtimes less than the given mtime */
-		}
 		else
-		{
 			break;	/* the first occurrence is found */
-		}
 	}
 
 	/* escaping those with the same mtime, taking the latest one (without exceptions!) */
 	for (j = i + 1; j < logfiles_num; j++)
 	{
 		if (logfiles[j].mtime == logfiles[i].mtime)
-		{
 			i = j;	/* moving to the newer one */
-		}
 		else
-		{
 			break;	/* all next mtimes are bigger */
-		}
 	}
 
 	/* if all mtimes are less than the given one, take the latest file from existing ones */

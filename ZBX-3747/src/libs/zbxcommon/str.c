@@ -716,21 +716,21 @@ size_t	zbx_strlcpy(char *dst, const char *src, size_t siz)
 	size_t n = siz;
 
 	/* copy as many bytes as will fit */
-	if (n != 0)
+	if (0 != n)
 	{
-		while (--n != 0)
+		while (0 != --n)
 		{
-			if ((*d++ = *s++) == '\0')
+			if ('\0' == (*d++ = *s++))
 				break;
 		}
 	}
 
 	/* not enough room in dst, add NUL and traverse rest of src */
-	if (n == 0)
+	if (0 == n)
 	{
-		if (siz != 0)
+		if (0 != siz)
 			*d = '\0';	/* NUL-terminate dst */
-		while (*s++)
+		while ('\0' != *s++)
 			;
 	}
 
