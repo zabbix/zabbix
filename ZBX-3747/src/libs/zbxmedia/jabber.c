@@ -26,12 +26,12 @@
 
 static void	zbx_io_close(void *socket)
 {
-	int *sock = (int*)socket;
+	int	*sock = (int *)socket;
 
 	if (NULL == sock)
 		return;
 
-	close (*sock);
+	close(*sock);
 }
 
 static int		zbx_j_sock = -1;
@@ -44,7 +44,7 @@ static int	zbx_io_connect(iksparser *prs, void **socketptr, const char *server, 
 	struct addrinfo	hints, *addr_res, *addr_ptr;
 	char		port_str[6];
 
-	*socketptr = (void *) NULL;
+	*socketptr = (void *)NULL;
 
 	hints.ai_flags = AI_CANONNAME;
 	hints.ai_family = PF_UNSPEC;

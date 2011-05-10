@@ -263,7 +263,7 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 	zbx_snprintf(cmd, sizeof(cmd), "\r\n.\r\n");
 	if (-1 == write(s.socket, cmd, strlen(cmd)))
 	{
-		zbx_snprintf(error, max_error_len, "error sending '.' to mailserver: %s", zbx_strerror(errno));
+		zbx_snprintf(error, max_error_len, "error sending . to mailserver: %s", zbx_strerror(errno));
 		goto out;
 	}
 	if (-1 == smtp_readln(s.socket, cmd, sizeof(cmd)))
@@ -273,7 +273,7 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 	}
 	if (0 != strncmp(cmd, OK_250, strlen(OK_250)))
 	{
-		zbx_snprintf(error, max_error_len, "wrong answer on end of data: %s", cmd);
+		zbx_snprintf(error, max_error_len, "wrong answer on end of data [%s]", cmd);
 		goto out;
 	}
 

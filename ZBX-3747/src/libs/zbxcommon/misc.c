@@ -252,7 +252,6 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...)
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 
 	char	title[MAX_STRING_LEN];
-
 	va_list args;
 
 	va_start(args, fmt);

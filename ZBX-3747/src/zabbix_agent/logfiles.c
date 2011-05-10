@@ -218,35 +218,6 @@ struct st_logfile
 
 /******************************************************************************
  *                                                                            *
- * Function: init_logfiles                                                    *
- *                                                                            *
- * Purpose: allocates memory for logfiles for the first time                  *
- *                                                                            *
- * Parameters: logfiles - pointer to a new list of logfiles                   *
- *             logfiles_alloc - number of logfiles memory was allocated for   *
- *             logfiles_num - number of already inserted logfiles (0)         *
- *                                                                            *
- * Return value: none                                                         *
- *                                                                            *
- * Author: Dmitry Borovikov                                                   *
- *                                                                            *
- * Comments: Assertion can be deleted later for convenience.                  *
- *                                                                            *
- ******************************************************************************/
-/*static void init_logfiles(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num)
-{
-	zabbix_log(LOG_LEVEL_DEBUG, "In init_logfiles()");
-
-	assert(logfiles && NULL == *logfiles);
-	assert(logfiles_alloc && 0 == *logfiles_alloc);
-	assert(logfiles_num && 0 == *logfiles_num);
-
-	*logfiles_alloc = 64;
-	*logfiles = zbx_malloc(*logfiles, *logfiles_alloc * sizeof(struct st_logfile));
-}*/
-
-/******************************************************************************
- *                                                                            *
  * Function: free_logfiles                                                    *
  *                                                                            *
  * Purpose: releases memory allocated for logfiles                            *

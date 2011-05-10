@@ -440,7 +440,7 @@ static void	read_ipmi_sensor(zbx_ipmi_host_t *h, zbx_ipmi_sensor_t *s)
 		case IPMI_EVENT_READING_TYPE_THRESHOLD:
 			if (0 != (ret = ipmi_sensor_get_reading(s->sensor, got_thresh_reading, h)))
 			{
-				h->err = zbx_dsprintf(h->err, "cannot read sensor %s."
+				h->err = zbx_dsprintf(h->err, "Cannot read sensor %s."
 						" ipmi_sensor_get_reading() return error: 0x%x",
 						s->s_name, ret);
 				h->ret = NOTSUPPORTED;
@@ -623,7 +623,7 @@ static void	set_ipmi_control(zbx_ipmi_host_t *h, zbx_ipmi_control_t *c, int valu
 
 	if (0 == ipmi_control_is_settable(c->control))
 	{
-		h->err = zbx_dsprintf(h->err, "control is not settable.");
+		h->err = zbx_dsprintf(h->err, "control is not settable");
 		h->ret = NOTSUPPORTED;
 		goto out;
 	}
@@ -825,12 +825,12 @@ int	init_ipmi_handler()
 int	free_ipmi_handler()
 {
 	const char	*__function_name = "free_ipmi_handler";
-	int		i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	while (NULL != hosts)
 	{
+		int		i;
 		zbx_ipmi_host_t	*h;
 
 		h = hosts;
@@ -853,6 +853,7 @@ int	free_ipmi_handler()
 		zbx_free(h->username);
 		zbx_free(h->password);
 		zbx_free(h->err);
+
 		zbx_free(h);
 	}
 
@@ -880,7 +881,7 @@ static zbx_ipmi_host_t	*init_ipmi_host(const char *ip, int port, int authtype, i
 	{
 		if (1 == h->domain_up)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p'", __function_name, h);
+			zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, h);
 			return h;
 		}
 	}
@@ -936,7 +937,7 @@ out:
 	zbx_free(addrs[0]);
 	zbx_free(ports[0]);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p'", __function_name, h);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, h);
 
 	return h;
 }
@@ -1034,7 +1035,7 @@ int	parse_ipmi_command(char *command, char *c_name, int *val)
 			*val = atoi(p);
 		else
 		{
-			zabbix_log(LOG_LEVEL_ERR, "IPMI command Value is not supported [%s %s]", command, p);
+			zabbix_log(LOG_LEVEL_ERR, "IPMI command value is not supported [%s %s]", command, p);
 			return FAIL;
 		}
 	}

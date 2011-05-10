@@ -152,7 +152,7 @@ void	__zbx_zbx_error(const char *fmt, ...)
  ******************************************************************************/
 int	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...)
 {
-	int	writen_len = 0;
+	int	writen_len;
 	va_list	args;
 
 	assert(str);
@@ -228,12 +228,12 @@ void	__zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_l
  ******************************************************************************/
 int	__zbx_zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args)
 {
-	int	writen_len = 0;
+	int	writen_len;
 
 	assert(str);
 
 	writen_len = vsnprintf(str, count, fmt, args);
-	writen_len = MIN(writen_len, ((int)count) - 1);
+	writen_len = MIN(writen_len, (int)count - 1);
 	writen_len = MAX(writen_len, 0);
 
 	str[writen_len] = '\0';
@@ -731,10 +731,10 @@ size_t	zbx_strlcpy(char *dst, const char *src, size_t siz)
 		if (siz != 0)
 			*d = '\0';	/* NUL-terminate dst */
 		while (*s++)
-		;
+			;
 	}
 
-	return (s - src - 1);	/* count does not include NUL */
+	return s - src - 1;	/* count does not include NUL */
 }
 
 /******************************************************************************
@@ -875,7 +875,7 @@ char	*zbx_strdcat(char *dest, const char *src)
 		return dest;
 
 	if (NULL == dest)
-		return strdup(src);
+		return zbx_strdup(NULL, src);
 
 	len_dest = strlen(dest);
 	len_src = strlen(src);
@@ -906,8 +906,8 @@ char	*zbx_strdcat(char *dest, const char *src)
  ******************************************************************************/
 char	*__zbx_zbx_strdcatf(char *dest, const char *f, ...)
 {
-	char *string = NULL,  *result = NULL;
-	va_list args;
+	char	*string, *result;
+	va_list	args;
 
 	va_start(args, f);
 	string = zbx_dvsprintf(NULL, f, args);

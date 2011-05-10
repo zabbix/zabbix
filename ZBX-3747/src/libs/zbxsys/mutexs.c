@@ -198,7 +198,7 @@ void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex)
 
 	if (WAIT_OBJECT_0 != WaitForSingleObject(*mutex, INFINITE))
 	{
-		zbx_error("lock failed [file:'%s', line:%d, %s]",
+		zbx_error("[file:'%s',line:%d] lock failed: %s",
 				filename, line, strerror_from_system(GetLastError()));
 		exit(FAIL);
 	}
@@ -214,7 +214,7 @@ void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex)
 	{
 		if (EINTR != errno)
 		{
-			zbx_error("lock failed [file:'%s', line:%d, %s]",
+			zbx_error("[file:'%s',line:%d] lock failed: %s",
 					filename, line, zbx_strerror(errno));
 			exit(FAIL);
 		}
@@ -247,7 +247,7 @@ void	__zbx_mutex_unlock(const char *filename, int line, ZBX_MUTEX *mutex)
 
 	if (0 == ReleaseMutex(*mutex))
 	{
-		zbx_error("unlock failed [file:'%s', line:%d, %s]",
+		zbx_error("[file:'%s',line:%d] unlock failed: %s",
 				filename, line, strerror_from_system(GetLastError()));
 		exit(FAIL);
 	}
@@ -263,7 +263,7 @@ void	__zbx_mutex_unlock(const char *filename, int line, ZBX_MUTEX *mutex)
 	{
 		if (EINTR != errno)
 		{
-			zbx_error("unlock failed [file:'%s', line:%d, %s]",
+			zbx_error("[file:'%s',line:%d] unlock failed: %s",
 					filename, line, zbx_strerror(errno));
 			exit(FAIL);
 		}

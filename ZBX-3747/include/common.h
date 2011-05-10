@@ -792,20 +792,20 @@ double	zbx_current_time();
 #	define zbx_snprintf_alloc __zbx_zbx_snprintf_alloc
 #endif
 void	__zbx_zbx_error(const char *fmt, ...);
-int	__zbx_zbx_snprintf(char* str, size_t count, const char *fmt, ...);
+int	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...);
 void	__zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_len, const char *fmt, ...);
 
 #ifdef _WINDOWS
 #	define zbx_vsnprintf(str, count, fmt, args) MAX(vsnprintf_s(str, count, _TRUNCATE, fmt, args), 0)
 #else
 #	define zbx_vsnprintf __zbx_zbx_vsnprintf
-int	__zbx_zbx_vsnprintf(char* str, size_t count, const char *fmt, va_list args);
+int	__zbx_zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args);
 #endif
 
 void	zbx_strcpy_alloc(char **str, int *alloc_len, int *offset, const char *src);
 void	zbx_chrcpy_alloc(char **str, int *alloc_len, int *offset, const char src);
 
-/* Secure string copy */
+/* secure string copy */
 #define strscpy(x, y)	zbx_strlcpy(x, y, sizeof(x))
 size_t	zbx_strlcpy(char *dst, const char *src, size_t siz);
 size_t	zbx_strlcat(char *dst, const char *src, size_t siz);
@@ -829,6 +829,7 @@ void	xml_free_data_dyn(char **data);
 int	comms_parse_response(char *xml, char *host, int host_len, char *key, int key_len, char *data, int data_len,
 		char *lastlogsize, int lastlogsize_len, char *timestamp, int timestamp_len,
 		char *source, int source_len, char *severity, int severity_len);
+
 int 	parse_command(const char *command, char *cmd, size_t cmd_max_len, char *param, size_t param_max_len);
 
 typedef struct zbx_regexp_s
@@ -852,7 +853,7 @@ void	add_regexp_ex(ZBX_REGEXP **regexps, int *regexps_alloc, int *regexps_num,
 int	regexp_match_ex(ZBX_REGEXP *regexps, int regexps_num, const char *string, const char *pattern,
 		zbx_case_sensitive_t cs);
 
-/* Misc functions */
+/* misc functions */
 int	is_ip4(const char *ip);
 
 int	cmp_double(double a,double b);
@@ -864,11 +865,13 @@ int	get_nodeid_by_id(zbx_uint64_t id);
 int	int_in_list(char *list, int value);
 int	uint64_in_list(char *list, zbx_uint64_t value);
 int	ip_in_list(char *list, char *ip);
+
 #ifdef HAVE_IPV6
 int	expand_ipv6(const char *ip, char *str, size_t str_len);
 char	*collapse_ipv6(char *str, size_t str_len);
 #endif /* HAVE_IPV6 */
-/* Time related functions */
+
+/* time related functions */
 double	time_diff(struct timeval *from, struct timeval *to);
 char	*zbx_age2str(int age);
 char	*zbx_date2str(time_t date);

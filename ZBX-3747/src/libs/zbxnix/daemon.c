@@ -180,7 +180,7 @@ int	daemon_start(int allow_root)
 #ifdef HAVE_FUNCTION_SETEUID
 		if( (setegid(pwd->pw_gid) ==-1) || (seteuid(pwd->pw_uid) == -1) )
 		{
-			zbx_error("cannot setegid or seteuid to zabbix: %s", zbx_strerror(errno));
+			zbx_error("cannot setegid or seteuid to %s: %s", user, zbx_strerror(errno));
 			exit(FAIL);
 		}
 #endif /* HAVE_FUNCTION_SETEUID */

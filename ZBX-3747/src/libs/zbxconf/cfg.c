@@ -227,7 +227,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 cannot_open:
 	if (optional)
 		return result;
-	zbx_error("cannot open config file [%s] [%s]", cfg_file, zbx_strerror(errno));
+	zbx_error("cannot open config file [%s]: %s", cfg_file, zbx_strerror(errno));
 	exit(1);
 
 missing_mandatory:
