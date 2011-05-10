@@ -129,9 +129,9 @@ static void	update_cpu_counters(ZBX_SINGLE_CPU_STAT_DATA *cpu, zbx_uint64_t *cou
 		if (MAX_COLLECTOR_HISTORY <= (index = cpu->h_first + cpu->h_count))
 			index -= MAX_COLLECTOR_HISTORY;
 
-		if (cpu->h_count < MAX_COLLECTOR_HISTORY)
+		if (MAX_COLLECTOR_HISTORY > cpu->h_count)
 			cpu->h_count++;
-		else if (++cpu->h_first == MAX_COLLECTOR_HISTORY)
+		else if (MAX_COLLECTOR_HISTORY == ++cpu->h_first)
 			cpu->h_first = 0;
 
 		for (i = 0; i < ZBX_CPU_STATE_COUNT; i++)
@@ -140,7 +140,16 @@ static void	update_cpu_counters(ZBX_SINGLE_CPU_STAT_DATA *cpu, zbx_uint64_t *cou
 		cpu->status = SYSINFO_RET_OK;
 	}
 	else
+	{
+		if (0 != cpu->h_count)
+		{
+			cpu->h_count--;
+			if (MAX_COLLECTOR_HISTORY == ++cpu->h_first)
+				cpu->h_first = 0;
+		}
+
 		cpu->status = SYSINFO_RET_FAIL;
+	}
 
 	UNLOCK_CPUSTATS;
 }
@@ -191,12 +200,17 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+#define ZBX_SET_CPUS_NOTSUPPORTED()				\
+	for (cpu_num = 0; cpu_num <= pcpus->count; cpu_num++)	\
+		update_cpu_counters(&pcpus->cpu[cpu_num], NULL)
+
 #if defined(HAVE_PROC_STAT)
 
 	if (NULL == (file = fopen("/proc/stat", "r")))
 	{
 		zbx_error("cannot open [%s] [%s]", "/proc/stat", strerror(errno));
-		return;
+		ZBX_SET_CPUS_NOTSUPPORTED();
+		goto exit;
 	}
 
 	cpu_status = zbx_malloc(cpu_status, sizeof(unsigned char) * (pcpus->count + 1));
@@ -279,11 +293,11 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 #elif defined(HAVE_FUNCTION_SYSCTLBYNAME) && defined(CPUSTATES)
 	/* FreeBSD 7.0 */
 
-	if (-1 == sysctlbyname("kern.cp_time", &cp_time, &nlen, NULL, 0))
-		return;
-
-	if (nlen != sizeof(cp_time))
-		return;
+	if (-1 == sysctlbyname("kern.cp_time", &cp_time, &nlen, NULL, 0) || nlen != sizeof(cp_time))
+	{
+		ZBX_SET_CPUS_NOTSUPPORTED();
+		goto exit;
+	}
 
 	memset(counter, 0, sizeof(counter));
 
@@ -299,7 +313,10 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 	/* Solaris */
 
 	if (NULL == (kc = kstat_open()))
-		return;
+	{
+		ZBX_SET_CPUS_NOTSUPPORTED();
+		goto exit;
+	}
 
 	memset(total, 0, sizeof(total));
 
@@ -432,8 +449,9 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 	}
 
 #endif	/* HAVE_LIBPERFSTAT */
-
+exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+#undef ZBX_SET_CPUS_NOTSUPPORTED
 }
 
 void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
