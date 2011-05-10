@@ -209,7 +209,6 @@ void	__zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_l
 	va_end(args);
 }
 
-#if !defined(_WINDOWS)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_vsnprintf                                                    *
@@ -226,21 +225,25 @@ void	__zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_l
  * Author: Alexei Vladishev (see also zbx_snprintf)                           *
  *                                                                            *
  ******************************************************************************/
-int	__zbx_zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args)
+int	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args)
 {
 	int	writen_len;
 
 	assert(str);
 
+#ifdef _WINDOWS
+	written_len = vsnprintf_s(str, count, _TRUNCATE, fmt, args);
+	writen_len = MAX(writen_len, 0);
+#else
 	writen_len = vsnprintf(str, count, fmt, args);
 	writen_len = MIN(writen_len, (int)count - 1);
 	writen_len = MAX(writen_len, 0);
 
 	str[writen_len] = '\0';
+#endif
 
 	return writen_len;
 }
-#endif	/* _WINDOWS */
 
 /******************************************************************************
  *                                                                            *

@@ -106,7 +106,7 @@
 #ifdef vsprintf
 #undef vsprintf
 #endif
-#define vsprintf	ERROR_DO_NOT_USE_VSPRINTF_FUNCTION_TRY_TO_USE_VSNPRINTF
+#define vsprintf	ERROR_DO_NOT_USE_VSPRINTF_FUNCTION_TRY_TO_USE_ZBX_VSNPRINTF
 
 #ifdef strncat
 #undef strncat
@@ -795,12 +795,7 @@ void	__zbx_zbx_error(const char *fmt, ...);
 int	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...);
 void	__zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_len, const char *fmt, ...);
 
-#ifdef _WINDOWS
-#	define zbx_vsnprintf(str, count, fmt, args) MAX(vsnprintf_s(str, count, _TRUNCATE, fmt, args), 0)
-#else
-#	define zbx_vsnprintf __zbx_zbx_vsnprintf
-int	__zbx_zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args);
-#endif
+int	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args);
 
 void	zbx_strcpy_alloc(char **str, int *alloc_len, int *offset, const char *src);
 void	zbx_chrcpy_alloc(char **str, int *alloc_len, int *offset, const char src);

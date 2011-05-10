@@ -796,7 +796,7 @@ static void	my_vlog(os_handler_t *handler, const char *format, enum ipmi_log_typ
 		case IPMI_LOG_DEBUG_END		: *type = '\0'; break;
 	}
 
-	vsnprintf(str, sizeof(str), format, ap);
+	zbx_vsnprintf(str, sizeof(str), format, ap);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s%s", type, str);
 }

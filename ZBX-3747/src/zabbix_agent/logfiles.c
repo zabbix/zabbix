@@ -362,7 +362,7 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
  *    Return SUCCEED and NULL value if end of file received.                  *
  *                                                                            *
  ******************************************************************************/
-int	process_logrt(char *filename, long *lastlogsize, time_t *mtime, char **value, const char *encoding)
+int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, const char *encoding)
 {
 	int			i = 0, nbytes, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, fd = 0, length = 0, j = 0;
 	char			buffer[MAX_BUFFER_LEN], *directory = NULL, *format = NULL, *logfile_candidate = NULL;
