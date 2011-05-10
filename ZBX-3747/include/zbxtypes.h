@@ -66,7 +66,6 @@
 
 #	define stat		_stat64
 #	define snprintf		_snprintf
-#	define vsnprintf_s	_vsnprintf_s
 
 #	define alloca		_alloca
 
