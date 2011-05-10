@@ -342,7 +342,7 @@ static void	init_config()
 
 		if (NULL == CONFIG_HOSTNAME)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "Hostname is not defined");
+			zabbix_log(LOG_LEVEL_CRIT, "hostname is not defined");
 			exit(1);
 		}
 	}
@@ -350,7 +350,7 @@ static void	init_config()
 	{
 		if (strlen(CONFIG_HOSTNAME) > HOST_HOST_LEN)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "Hostname too long");
+			zabbix_log(LOG_LEVEL_CRIT, "hostname too long");
 			exit(1);
 		}
 	}

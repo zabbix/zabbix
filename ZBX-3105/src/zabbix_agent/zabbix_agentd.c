@@ -242,7 +242,7 @@ static void	validate_config()
 	/* hostname */
 	if (NULL == CONFIG_HOSTNAME)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "hostname not defined");
+		zabbix_log(LOG_LEVEL_CRIT, "hostname is not defined");
 		exit(FAIL);
 	}
 
