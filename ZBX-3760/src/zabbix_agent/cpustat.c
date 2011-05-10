@@ -32,11 +32,12 @@ static ZBX_MUTEX	cpustats_lock;
 int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 {
 	const char			*__function_name = "init_cpu_collector";
-	int				cpu_num, ret = FAIL;
+	int				ret = FAIL;
 #ifdef	_WINDOWS
 	TCHAR				cpu[8];
 	char				counterPath[PDH_MAX_COUNTER_PATH];
 	PDH_COUNTER_PATH_ELEMENTS	cpe;
+	int				cpu_num;
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -81,9 +82,6 @@ clean:
 		exit(FAIL);
 	}
 
-	for (cpu_num = 0; cpu_num <= pcpus->count; cpu_num++)
-		pcpus->cpu[cpu_num].status = SYSINFO_RET_FAIL;
-
 	ret = SUCCEED;
 #endif	/* _WINDOWS */
 
@@ -124,32 +122,23 @@ static void	update_cpu_counters(ZBX_SINGLE_CPU_STAT_DATA *cpu, zbx_uint64_t *cou
 
 	LOCK_CPUSTATS;
 
+	if (MAX_COLLECTOR_HISTORY <= (index = cpu->h_first + cpu->h_count))
+		index -= MAX_COLLECTOR_HISTORY;
+
+	if (MAX_COLLECTOR_HISTORY > cpu->h_count)
+		cpu->h_count++;
+	else if (MAX_COLLECTOR_HISTORY == ++cpu->h_first)
+		cpu->h_first = 0;
+
 	if (NULL != counter)
 	{
-		if (MAX_COLLECTOR_HISTORY <= (index = cpu->h_first + cpu->h_count))
-			index -= MAX_COLLECTOR_HISTORY;
-
-		if (MAX_COLLECTOR_HISTORY > cpu->h_count)
-			cpu->h_count++;
-		else if (MAX_COLLECTOR_HISTORY == ++cpu->h_first)
-			cpu->h_first = 0;
-
 		for (i = 0; i < ZBX_CPU_STATE_COUNT; i++)
 			cpu->h_counter[i][index] = counter[i];
 
-		cpu->status = SYSINFO_RET_OK;
+		cpu->status[index] = SYSINFO_RET_OK;
 	}
 	else
-	{
-		if (0 != cpu->h_count)
-		{
-			cpu->h_count--;
-			if (MAX_COLLECTOR_HISTORY == ++cpu->h_first)
-				cpu->h_first = 0;
-		}
-
-		cpu->status = SYSINFO_RET_FAIL;
-	}
+		cpu->status[index] = SYSINFO_RET_FAIL;
 
 	UNLOCK_CPUSTATS;
 }
@@ -479,9 +468,6 @@ int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode)
 
 	cpu = &collector->cpus.cpu[cpu_num];
 
-	if (SYSINFO_RET_FAIL == cpu->status)
-		return SYSINFO_RET_FAIL;
-
 	if (0 == cpu->h_count)
 	{
 		SET_DBL_RESULT(result, 0);
@@ -493,8 +479,11 @@ int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode)
 	if (MAX_COLLECTOR_HISTORY <= (idx_curr = (cpu->h_first + cpu->h_count - 1)))
 		idx_curr -= MAX_COLLECTOR_HISTORY;
 
-	if (0 > (idx_base = idx_curr - MIN(cpu->h_count - 1, time)))
-		idx_base += MAX_COLLECTOR_HISTORY;
+	if (SYSINFO_RET_FAIL == cpu->status[idx_curr])
+	{
+		UNLOCK_CPUSTATS;
+		return SYSINFO_RET_FAIL;
+	}
 
 	if (1 == cpu->h_count)
 	{
@@ -504,6 +493,13 @@ int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode)
 	}
 	else
 	{
+		if (0 > (idx_base = idx_curr - MIN(cpu->h_count - 1, time)))
+			idx_base += MAX_COLLECTOR_HISTORY;
+
+		while (SYSINFO_RET_OK != cpu->status[idx_base])
+			if (MAX_COLLECTOR_HISTORY == ++idx_base)
+				idx_base -= MAX_COLLECTOR_HISTORY;
+
 		for (i = 0; i < ZBX_CPU_STATE_COUNT; i++)
 			total += cpu->h_counter[i][idx_curr] - cpu->h_counter[i][idx_base];
 		counter = cpu->h_counter[state][idx_curr] - cpu->h_counter[state][idx_base];
