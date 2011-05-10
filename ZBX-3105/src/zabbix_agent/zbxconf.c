@@ -248,38 +248,38 @@ void	load_perf_counters(const char **lines)
 	const char	**pline, *msg;
 	LPTSTR		wcounterPath;
 
-#define PC_FAIL(_msg) {msg = _msg; goto pc_fail;}
+#define ZBX_PC_FAIL(_msg) {msg = _msg; goto pc_fail;}
 
 	for (pline = lines; NULL != *pline; pline++)
 	{
 		if (3 < num_param(*pline))
-			PC_FAIL("required parameter missing");
+			ZBX_PC_FAIL("required parameter missing");
 
 		if (0 != get_param(*pline, 1, name, sizeof(name)))
-			PC_FAIL("cannot parse key");
+			ZBX_PC_FAIL("cannot parse key");
 
 		if (0 != get_param(*pline, 2, counterpath, sizeof(counterpath)))
-			PC_FAIL("cannot parse counter path");
+			ZBX_PC_FAIL("cannot parse counter path");
 
 		if (0 != get_param(*pline, 3, interval, sizeof(interval)))
-			PC_FAIL("cannot parse interval");
+			ZBX_PC_FAIL("cannot parse interval");
 
 		wcounterPath = zbx_acp_to_unicode(counterpath);
 		zbx_unicode_to_utf8_static(wcounterPath, counterpath, PDH_MAX_COUNTER_PATH);
 		zbx_free(wcounterPath);
 
 		if (FAIL == check_counter_path(counterpath))
-			PC_FAIL("invalid counter path");
+			ZBX_PC_FAIL("invalid counter path");
 
 		if (NULL == add_perf_counter(name, counterpath, atoi(interval)))
-			PC_FAIL("cannot add counter");
+			ZBX_PC_FAIL("cannot add counter");
 
 		continue;
 pc_fail:
 		zabbix_log(LOG_LEVEL_CRIT, "PerfCounter '%s' FAILED: %s", *pline, err);
 		exit(FAIL);
 	}
-#undef PC_FAIL
+#undef ZBX_PC_FAIL
 }
 #endif	/* _WINDOWS */
 
