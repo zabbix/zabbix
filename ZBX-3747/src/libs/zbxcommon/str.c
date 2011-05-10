@@ -152,16 +152,16 @@ void	__zbx_zbx_error(const char *fmt, ...)
  ******************************************************************************/
 int	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...)
 {
-	int	writen_len;
+	int	written_len;
 	va_list	args;
 
 	assert(str);
 
 	va_start(args, fmt);
-	writen_len = zbx_vsnprintf(str, count, fmt, args);
+	written_len = zbx_vsnprintf(str, count, fmt, args);
 	va_end(args);
 
-	return writen_len;
+	return written_len;
 }
 
 /******************************************************************************
@@ -227,22 +227,22 @@ void	__zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_l
  ******************************************************************************/
 int	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args)
 {
-	int	writen_len;
+	int	written_len;
 
 	assert(str);
 
 #ifdef _WINDOWS
 	written_len = vsnprintf_s(str, count, _TRUNCATE, fmt, args);
-	writen_len = MAX(writen_len, 0);
+	written_len = MAX(written_len, 0);
 #else
-	writen_len = vsnprintf(str, count, fmt, args);
-	writen_len = MIN(writen_len, (int)count - 1);
-	writen_len = MAX(writen_len, 0);
+	written_len = vsnprintf(str, count, fmt, args);
+	written_len = MIN(written_len, (int)count - 1);
+	written_len = MAX(written_len, 0);
 
-	str[writen_len] = '\0';
+	str[written_len] = '\0';
 #endif
 
-	return writen_len;
+	return written_len;
 }
 
 /******************************************************************************
