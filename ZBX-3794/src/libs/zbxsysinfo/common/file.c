@@ -22,6 +22,9 @@
 #include "md5.h"
 #include "file.h"
 
+#define ZBX_CHKSUM_MAXFILE	32 * ZBX_MEBIBYTE	/*  max file size for checksum operations */
+#define ZBX_REGEX_MAXFILE	64 * ZBX_KIBIBYTE	/*  max file size for regex operations */
+
 int	VFS_FILE_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct stat	buf;
@@ -98,9 +101,10 @@ int	VFS_FILE_EXISTS(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char	filename[MAX_STRING_LEN], regexp[MAX_STRING_LEN], encoding[32];
-	char	buf[MAX_BUFFER_LEN], *utf8;
-	int	f, nbytes, len;
+	char			filename[MAX_STRING_LEN], regexp[MAX_STRING_LEN], encoding[32];
+	char			buf[MAX_BUFFER_LEN], *utf8;
+	int			f, nbytes, len;
+	register uint32_t	flen;
 
 	if (num_param(param) > 3)
 		return SYSINFO_RET_FAIL;
@@ -119,8 +123,17 @@ int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
 		return SYSINFO_RET_FAIL;
 
+	flen = 0;
+
 	while (0 < (nbytes = zbx_read(f, buf, sizeof(buf), encoding)))
 	{
+		/* mind file size limit */
+		if (ZBX_REGEX_MAXFILE < (flen += nbytes))
+		{
+			close(f);
+			return SYSINFO_RET_FAIL;
+		}
+
 		utf8 = convert_to_utf8(buf, nbytes, encoding);
 		if (NULL != zbx_regexp_match(utf8, regexp, &len))
 		{
@@ -144,9 +157,10 @@ int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char	filename[MAX_STRING_LEN], regexp[MAX_STRING_LEN], encoding[32];
-	char	buf[MAX_BUFFER_LEN], *utf8;
-	int	f, nbytes, len, res;
+	char			filename[MAX_STRING_LEN], regexp[MAX_STRING_LEN], encoding[32];
+	char			buf[MAX_BUFFER_LEN], *utf8;
+	int			f, nbytes, len, res;
+	register uint32_t	flen;
 
 	if (num_param(param) > 3)
 		return SYSINFO_RET_FAIL;
@@ -165,10 +179,17 @@ int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
 		return SYSINFO_RET_FAIL;
 
-	res = 0;
+	res = flen = 0;
 
 	while (0 == res && 0 < (nbytes = zbx_read(f, buf, sizeof(buf), encoding)))
 	{
+		/* mind file size limit */
+		if (ZBX_REGEX_MAXFILE < (flen += nbytes))
+		{
+			close(f);
+			return SYSINFO_RET_FAIL;
+		}
+
 		utf8 = convert_to_utf8(buf, nbytes, encoding);
 		if (NULL != zbx_regexp_match(utf8, regexp, &len))
 			res = 1;
@@ -188,14 +209,15 @@ int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_
 /* MD5 sum calculation */
 int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char		filename[MAX_STRING_LEN];
-	int		f, i, nbytes;
-	struct stat	buf_stat;
-	md5_state_t	state;
-	u_char		buf[16 * 1024];
-	char		*hashText = NULL;
-	size_t		sz;
-	md5_byte_t	hash[MD5_DIGEST_SIZE];
+	char			filename[MAX_STRING_LEN];
+	int			f, i, nbytes;
+	struct stat		buf_stat;
+	md5_state_t		state;
+	u_char			buf[16 * 1024];
+	char			*hashText = NULL;
+	size_t			sz;
+	md5_byte_t		hash[MD5_DIGEST_SIZE];
+	register uint32_t	flen;
 
 	if (num_param(param) > 1)
 		return SYSINFO_RET_FAIL;
@@ -214,8 +236,17 @@ int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	md5_init(&state);
 
+	flen = 0;
+
 	while ((nbytes = (int)read(f, buf, sizeof(buf))) > 0)
 	{
+		/* mind file size limit */
+		if (ZBX_CHKSUM_MAXFILE < (flen += nbytes))
+		{
+			close(f);
+			return SYSINFO_RET_FAIL;
+		}
+
 		md5_append(&state, (const md5_byte_t *)buf, nbytes);
 	}
 
@@ -312,7 +343,7 @@ int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	register int		i, nr;
 	/* AV Crashed under 64 platforms. Must be 32 bit!
 	 * register u_long crc, len; */
-	register uint32_t	crc, len;
+	register uint32_t	crc, flen;
 	u_char			buf[16 * 1024];
 	u_long			cval;
 	int			f;
@@ -326,11 +357,17 @@ int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
 		return SYSINFO_RET_FAIL;
 
-	crc = len = 0;
+	crc = flen = 0;
 
 	while ((nr = (int)read(f, buf, sizeof(buf))) > 0)
 	{
-		len += nr;
+		/* mind file size limit */
+		if (ZBX_CHKSUM_MAXFILE < (flen += nr))
+		{
+			close(f);
+			return SYSINFO_RET_FAIL;
+		}
+
 		for (i = 0; i < nr; i++)
 			crc = (crc << 8) ^ crctab[((crc >> 24) ^ buf[i]) & 0xff];
 	}
@@ -341,8 +378,8 @@ int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 		return SYSINFO_RET_FAIL;
 
 	/* Include the length of the file. */
-	for (; len != 0; len >>= 8)
-		crc = (crc << 8) ^ crctab[((crc >> 24) ^ len) & 0xff];
+	for (; flen != 0; flen >>= 8)
+		crc = (crc << 8) ^ crctab[((crc >> 24) ^ flen) & 0xff];
 
 	cval = ~crc;
 
