@@ -378,9 +378,15 @@ CMap.prototype = {
 		// FORM EVENTS
 		jQuery('#elementClose').click(jQuery.proxy(this.handlerCloseSelementForm, this));
 		jQuery('#elementDelete').click(jQuery.proxy(this.deleteSelectedElements, this));
-		jQuery('#elementApply').click(jQuery.proxy(this.deleteSelectedElements, this));
+		jQuery('#elementApply').click(jQuery.proxy(function(){
+			if(this.selection.count != 1) throw 'Try to single update element, when more than one selected.';
+
+			for(var selementid in this.selection.selements){
+				this.selements[selementid].update(this.form.getValues());
+			}
+		}, this));
 		jQuery('#newSelementUrl').click(jQuery.proxy(function(){
-			this.form.addUrls({empty: {}});
+			this.form.addUrls();
 		}, this));
 	},
 
@@ -605,49 +611,55 @@ var CSelement = function(sysmap, selementData){
 	this.sysmap = sysmap;
 
 	if(selementData){
-		this.data = selementData
+		this.image = selementData.image;
+		delete selementData.image;
 	}
 	else{
-		this.data = {
-			elementtype:		4,			// 5-UNDEFINED
-			elementid:			0,			// ALWAYS must be a STRING (js doesn't support uint64)
-			elementName:		'',			// element name
-			iconid_off:			0,			// ALWAYS must be a STRING (js doesn't support uint64)
-			iconid_on:			0,			// ALWAYS must be a STRING (js doesn't support uint64)
-			iconid_maintenance:	0,			// ALWAYS must be a STRING (js doesn't support uint64)
-			iconid_disabled:	0,			// ALWAYS must be a STRING (js doesn't support uint64)
-			label:				locale['S_NEW_ELEMENT'],	// Element label
-			label_expanded:		locale['S_NEW_ELEMENT'],	// Element label macros expanded
-			x:					0,
-			y:					0,
-			elementsubtype:		0,			// host group view types: 0 - host group, 1 - host group elements
-			areatype:			0,			// how to show area: 0 - fit to map, 1 - custom size
-			width:				200,		// area height
-			height:				200,		// area width
-			viewtype:			0,			// how to align icons inside area: 0 - 'left->right, top->bottom, evenly aligned'
-			urls:				{}
+		selementData = {
+			elementtype: 4,			// 5-UNDEFINED
+			elementid: 0,			// ALWAYS must be a STRING (js doesn't support uint64)
+			elementName: '',			// element name
+			iconid_off: 0,			// ALWAYS must be a STRING (js doesn't support uint64)
+			iconid_on: 0,			// ALWAYS must be a STRING (js doesn't support uint64)
+			iconid_maintenance: 0,			// ALWAYS must be a STRING (js doesn't support uint64)
+			iconid_disabled: 0,			// ALWAYS must be a STRING (js doesn't support uint64)
+			label: locale['S_NEW_ELEMENT'],	// Element label
+			label_expanded: locale['S_NEW_ELEMENT'],	// Element label macros expanded
+			x: 0,
+			y: 0,
+			elementsubtype: 0,			// host group view types: 0 - host group, 1 - host group elements
+			areatype: 0,			// how to show area: 0 - fit to map, 1 - custom size
+			width: 200,		// area height
+			height: 200,		// area width
+			viewtype: 0,			// how to align icons inside area: 0 - 'left->right, top->bottom, evenly aligned'
+			urls: {}
 		};
 
 		// generate random selementid
 		do{
-			this.data.selementid = parseInt(Math.random(1000000000) * 10000000);
-			this.data.selementid = this.data.selementid.toString();
-		} while(isset(this.data.selementid, this.sysmap.data.selements));
+			selementData.selementid = parseInt(Math.random(1000000000) * 10000000);
+			selementData.selementid = selementData.selementid.toString();
+		} while(isset(selementData.selementid, this.sysmap.data.selements));
 
-		this.data.label_location = this.sysmap.data.label_location;
+		// set default map label location
+		selementData.label_location = this.sysmap.data.label_location;
+
+		// take first available icon
+		this.image = this.sysmap.iconList[0].imageid;
 	}
+
+	this.update(selementData);
 
 	this.id = this.data.selementid;
 
-	// assign by reference
+// assign by reference
 	this.sysmap.data.selements[this.id] = this.data;
-
 
 	// create dom
 	this.domNode = jQuery('<div></div>')
 			.appendTo(this.sysmap.container)
 			.attr("id", '#selement_'+this.data.selementid)
-			.addClass('pointer sysmap_element sysmap_iconid_'+this.data.image)
+			.addClass('pointer sysmap_element sysmap_iconid_'+this.image)
 			.css({
 				top: this.data.y +'px',
 				left: this.data.x + 'px'
@@ -664,50 +676,33 @@ var CSelement = function(sysmap, selementData){
 
 			this.align();
 
-//			if(isset('selementid', this.sysmap.selementForm) && isset('x', this.sysmap.selementForm) && isset('y', this.sysmap.selementForm)){
-//				if(this.sysmap.selementForm.selementid.value == this.id){
-//					this.sysmap.selementForm.x.value = this.data.x;
-//					this.sysmap.selementForm.y.value = this.data.y;
-//				}
-//			}
-
 			this.sysmap.updateImage();
 		}, this)
 	});
+
+
+	// TODO: grid snap
 //	if(this.sysmap.auto_align){
 //		jQuery(this.domNode).draggable('option', 'grid', [this.sysmap.grid_size, this.sysmap.grid_size]);
 //	}
 };
 CSelement.prototype = {
-	id: null,			// selement id
-	sysmap: null,			// Parent sysmap reference
-	data: null,
-	domNode: null,			// dom reference to html obj
-	selected: false,			// element is not selected
+	id: null, // selement id
+	sysmap: null, // Parent sysmap reference
+	data: {},
+	domNode: null, // dom reference to html obj
+	selected: false, // element is not selected
 	image: null,
 
-	update: function(params){ // params = {'key': value, 'key': value}
-		for(var key in params){
-			if(key == 'urls'){
-				for(var urlname in params[key]){
-					if(empty(params[key][urlname])) continue;
+	update: function(params){
+		this.data = params;
 
-					if(isset(urlname, this.data.urls)){
-						this.data.urls[urlname].url = params[key][urlname].url;
-					}
-					else{
-						this.data.urls[urlname] = params[key][urlname];
-						this.data.urls[urlname]['new'] = 'new';
-					}
-				}
-				continue;
-			}
-
-			if(is_number(params[key])) params[key] = params[key].toString();
-			this.data[key] = params[key];
+		if(this.data.elementsubtype == '1'){
+			this.domNode.css({
+				width: this.data.width,
+				height: this.data.height
+			});
 		}
-
-		this.updateIcon();
 	},
 
 	remove: function(){
@@ -905,13 +900,43 @@ CElementForm.prototype = {
 	domNode: null, // jQuery dom object
 
 	show: function(){
-		jQuery(this.domNode).toggle(true);
+		this.domNode.toggle(true);
 	},
 
 	hide: function(){
-		jQuery(this.domNode).toggle(false);
+		this.domNode.toggle(false);
 	},
 
+	addUrls: function(urls){
+		urls = urls || {empty: {}};
+		var tpl = new Template(jQuery('#selementFormUrls').html());
+
+		for(var i in urls){
+			var url = urls[i];
+
+			// generate unique urlid
+			url.selementurlid = jQuery('#urlContainer tr[id^=urlrow]').length;
+			while(jQuery('#urlrow_'+url.selementurlid).length){
+				url.selementurlid++;
+			}
+
+			jQuery(tpl.evaluate(url)).insertBefore('#urlfooter');
+		}
+	},
+
+	setValues: function(selement){
+		this.domNode.populate(selement);
+		jQuery('#advanced_icons').attr('checked', (selement.iconid_on != 0) || (selement.iconid_maintenance != 0) || (selement.iconid_disabled != 0));
+
+		// clear urls
+		jQuery('#urlContainer tr[id^=urlrow]').remove();
+		if(!jQuery.isPlainObject(selement.urls)){
+			selement.urls = null;
+		}
+		this.addUrls(selement.urls);
+
+		this.actionProcessor.process();
+	},
 
 //  Multi Container  ------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------
@@ -1209,39 +1234,7 @@ CElementForm.prototype = {
 		$(this.linkContainer.container).update(e_table_1);
 	},
 
-//  SELEMENTS FORM ----------------------------------------------------------------------------
-//---------------------------------------------------------------------------------------------
-	addUrls: function(urls){
-		var tpl = new Template(jQuery('#selementFormUrls').html());
 
-		for(var i in urls){
-			var url = urls[i];
-
-			// generate unique urlid
-			url.selementurlid = jQuery('#urlContainer tr[id^=urlrow]').length;
-			while(jQuery('#urlrow_'+url.selementurlid).length){
-				url.selementurlid++;
-			}
-
-			jQuery(tpl.evaluate(url)).insertBefore('#urlfooter');
-		}
-	},
-
-	setValues: function(selement){
-		jQuery(this.domNode).populate(selement);
-		jQuery('#advanced_icons').attr('checked', (selement.iconid_on != 0) || (selement.iconid_maintenance != 0) || (selement.iconid_disabled != 0));
-
-		// clear urls
-		jQuery('#urlContainer tr[id^=urlrow]').remove();
-
-		if(!jQuery.isPlainObject(selement.urls)){
-			selement.urls = {empty: {}};
-		}
-		this.addUrls(selement.urls);
-
-
-		this.actionProcessor.process();
-	},
 
 	form_selement_save: function(e){
 		var params = {};
