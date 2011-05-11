@@ -22,15 +22,14 @@
 #include "md5.h"
 #include "file.h"
 
-#define ZBX_CHKSUM_MAXFILE	32 * ZBX_MEBIBYTE	/*  max file size for checksum operations */
-#define ZBX_REGEX_MAXFILE	64 * ZBX_KIBIBYTE	/*  max file size for regex operations */
+#define ZBX_MAX_FILE_SIZE	(64 * ZBX_MEBIBYTE)	/* maximum file size for regexp and checksum operations */
 
 int	VFS_FILE_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct stat	buf;
 	char		filename[MAX_STRING_LEN];
 
-	if (num_param(param) > 1)
+	if (1 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 1, filename, sizeof(filename)))
@@ -49,7 +48,7 @@ int	VFS_FILE_TIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	struct stat	buf;
 	char		filename[MAX_STRING_LEN], type[8];
 
-	if (num_param(param) > 2)
+	if (2 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 1, filename, sizeof(filename)))
@@ -62,17 +61,11 @@ int	VFS_FILE_TIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 		return SYSINFO_RET_FAIL;
 
 	if ('\0' == *type || 0 == strcmp(type, "modify"))	/* default parameter */
-	{
 		SET_UI64_RESULT(result, buf.st_mtime);
-	}
 	else if (0 == strcmp(type, "access"))
-	{
 		SET_UI64_RESULT(result, buf.st_atime);
-	}
 	else if (0 == strcmp(type, "change"))
-	{
 		SET_UI64_RESULT(result, buf.st_ctime);
-	}
 	else
 		return SYSINFO_RET_FAIL;
 
@@ -84,7 +77,7 @@ int	VFS_FILE_EXISTS(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	struct stat	buf;
 	char		filename[MAX_STRING_LEN];
 
-	if (num_param(param) > 1)
+	if (1 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 1, filename, sizeof(filename)))
@@ -92,8 +85,8 @@ int	VFS_FILE_EXISTS(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	SET_UI64_RESULT(result, 0);
 
-	if (0 == zbx_stat(filename, &buf))	/* File exists */
-		if (S_ISREG(buf.st_mode))	/* Regular file */
+	if (0 == zbx_stat(filename, &buf))
+		if (S_ISREG(buf.st_mode))
 			SET_UI64_RESULT(result, 1);
 
 	return SYSINFO_RET_OK;
@@ -101,12 +94,12 @@ int	VFS_FILE_EXISTS(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char			filename[MAX_STRING_LEN], regexp[MAX_STRING_LEN], encoding[32];
-	char			buf[MAX_BUFFER_LEN], *utf8;
-	int			f, nbytes, len;
-	register uint32_t	flen;
+	char		filename[MAX_STRING_LEN], regexp[MAX_STRING_LEN], encoding[32];
+	char		buf[MAX_BUFFER_LEN], *utf8;
+	int		f, nbytes, flen, len;
+	struct stat	buf_stat;
 
-	if (num_param(param) > 3)
+	if (3 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 1, filename, sizeof(filename)))
@@ -120,6 +113,9 @@ int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	zbx_strupper(encoding);
 
+	if (0 != zbx_stat(filename, &buf_stat) || ZBX_MAX_FILE_SIZE < buf_stat.st_size)
+		return SYSINFO_RET_FAIL;
+
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
 		return SYSINFO_RET_FAIL;
 
@@ -127,8 +123,8 @@ int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	while (0 < (nbytes = zbx_read(f, buf, sizeof(buf), encoding)))
 	{
-		/* mind file size limit */
-		if (ZBX_REGEX_MAXFILE < (flen += nbytes))
+		/* mind size limit if reading from a non-regular file */
+		if (ZBX_MAX_FILE_SIZE < (flen += nbytes))
 		{
 			close(f);
 			return SYSINFO_RET_FAIL;
@@ -157,12 +153,12 @@ int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char			filename[MAX_STRING_LEN], regexp[MAX_STRING_LEN], encoding[32];
-	char			buf[MAX_BUFFER_LEN], *utf8;
-	int			f, nbytes, len, res;
-	register uint32_t	flen;
+	char		filename[MAX_STRING_LEN], regexp[MAX_STRING_LEN], encoding[32];
+	char		buf[MAX_BUFFER_LEN], *utf8;
+	int		f, nbytes, flen, len, res;
+	struct stat	buf_stat;
 
-	if (num_param(param) > 3)
+	if (3 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 1, filename, sizeof(filename)))
@@ -176,6 +172,9 @@ int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_
 
 	zbx_strupper(encoding);
 
+	if (0 != zbx_stat(filename, &buf_stat) || ZBX_MAX_FILE_SIZE < buf_stat.st_size)
+		return SYSINFO_RET_FAIL;
+
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
 		return SYSINFO_RET_FAIL;
 
@@ -183,8 +182,8 @@ int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_
 
 	while (0 == res && 0 < (nbytes = zbx_read(f, buf, sizeof(buf), encoding)))
 	{
-		/* mind file size limit */
-		if (ZBX_REGEX_MAXFILE < (flen += nbytes))
+		/* mind size limit if reading from a non-regular file */
+		if (ZBX_MAX_FILE_SIZE < (flen += nbytes))
 		{
 			close(f);
 			return SYSINFO_RET_FAIL;
@@ -206,30 +205,25 @@ int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_
 	return SYSINFO_RET_OK;
 }
 
-/* MD5 sum calculation */
 int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char			filename[MAX_STRING_LEN];
-	int			f, i, nbytes;
-	struct stat		buf_stat;
-	md5_state_t		state;
-	u_char			buf[16 * 1024];
-	char			*hashText = NULL;
-	size_t			sz;
-	md5_byte_t		hash[MD5_DIGEST_SIZE];
-	register uint32_t	flen;
+	char		filename[MAX_STRING_LEN];
+	int		f, i, nbytes, flen;
+	struct stat	buf_stat;
+	md5_state_t	state;
+	u_char		buf[16 * ZBX_KIBIBYTE];
+	char		*hash_text = NULL;
+	size_t		sz;
+	md5_byte_t	hash[MD5_DIGEST_SIZE];
 
-	if (num_param(param) > 1)
+	if (1 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 1, filename, sizeof(filename)))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != zbx_stat(filename, &buf_stat))
-		return SYSINFO_RET_FAIL;	/* Cannot stat() file */
-
-	if (buf_stat.st_size > 64 * 1024 * 1024)
-		return SYSINFO_RET_FAIL;	/* Will not calculate MD5 for files larger than 64M */
+	if (0 != zbx_stat(filename, &buf_stat) || ZBX_MAX_FILE_SIZE < buf_stat.st_size)
+		return SYSINFO_RET_FAIL;
 
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
 		return SYSINFO_RET_FAIL;
@@ -238,10 +232,10 @@ int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	flen = 0;
 
-	while ((nbytes = (int)read(f, buf, sizeof(buf))) > 0)
+	while (0 < (nbytes = (int)read(f, buf, sizeof(buf))))
 	{
-		/* mind file size limit */
-		if (ZBX_CHKSUM_MAXFILE < (flen += nbytes))
+		/* mind size limit if reading from a non-regular file */
+		if (ZBX_MAX_FILE_SIZE < (flen += nbytes))
 		{
 			close(f);
 			return SYSINFO_RET_FAIL;
@@ -254,27 +248,26 @@ int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	close(f);
 
-	if (nbytes < 0)
+	if (0 > nbytes)
 		return SYSINFO_RET_FAIL;
 
-	/* Convert MD5 hash to text form */
+	/* convert MD5 hash to text form */
+
 	sz = MD5_DIGEST_SIZE * 2 + 1;
-	hashText = zbx_malloc(hashText, sz);
+	hash_text = zbx_malloc(hash_text, sz);
 
 	for (i = 0; i < MD5_DIGEST_SIZE; i++)
 	{
-		zbx_snprintf(&hashText[i << 1], sz - (i << 1), "%02x", hash[i]);
+		zbx_snprintf(&hash_text[i << 1], sz - (i << 1), "%02x", hash[i]);
 	}
 
-	SET_STR_RESULT(result, hashText);
+	SET_STR_RESULT(result, hash_text);
 
 	return SYSINFO_RET_OK;
 }
 
-/*
- * Code for cksum is based on code from cksum.c
- */
-static u_long crctab[] = {
+static u_long	crctab[] =
+{
 	0x0,
 	0x04c11db7, 0x09823b6e, 0x0d4326d9, 0x130476dc, 0x17c56b6b,
 	0x1a864db2, 0x1e475005, 0x2608edb8, 0x22c9f00f, 0x2f8ad6d6,
@@ -329,29 +322,28 @@ static u_long crctab[] = {
 	0xa2f33668, 0xbcb4666d, 0xb8757bda, 0xb5365d03, 0xb1f740b4
 };
 
-/*
- * Compute a POSIX 1003.2 checksum.  These routines have been broken out so
- * that other programs can use them.  The first routine, crc(), takes a file
- * descriptor to read from and locations to store the crc and the number of
- * bytes read.  The second routine, crc_buf(), takes a buffer and a length,
- * and a location to store the crc.  Both routines return 0 on success and 1
- * on failure.  Errno is set on failure.
- */
+/******************************************************************************
+ *                                                                            *
+ * Comments: computes POSIX 1003.2 checksum                                   *
+ *                                                                            *
+ ******************************************************************************/
 int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char			filename[MAX_STRING_LEN];
-	register int		i, nr;
-	/* AV Crashed under 64 platforms. Must be 32 bit!
-	 * register u_long crc, len; */
-	register uint32_t	crc, flen;
-	u_char			buf[16 * 1024];
-	u_long			cval;
-	int			f;
+	char		filename[MAX_STRING_LEN];
+	int		i, nr;
+	uint32_t	crc, flen;
+	u_char		buf[16 * ZBX_KIBIBYTE];
+	u_long		cval;
+	struct stat	buf_stat;
+	int		f;
 
-	if (num_param(param) > 1)
+	if (1 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 1, filename, sizeof(filename)))
+		return SYSINFO_RET_FAIL;
+
+	if (0 != zbx_stat(filename, &buf_stat) || ZBX_MAX_FILE_SIZE < buf_stat.st_size)
 		return SYSINFO_RET_FAIL;
 
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
@@ -359,10 +351,10 @@ int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 	crc = flen = 0;
 
-	while ((nr = (int)read(f, buf, sizeof(buf))) > 0)
+	while (0 < (nr = (int)read(f, buf, sizeof(buf))))
 	{
-		/* mind file size limit */
-		if (ZBX_CHKSUM_MAXFILE < (flen += nr))
+		/* mind size limit if reading from a non-regular file */
+		if (ZBX_MAX_FILE_SIZE < (flen += nr))
 		{
 			close(f);
 			return SYSINFO_RET_FAIL;
@@ -374,11 +366,11 @@ int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 	close(f);
 
-	if (nr < 0)
+	if (0 > nr)
 		return SYSINFO_RET_FAIL;
 
-	/* Include the length of the file. */
-	for (; flen != 0; flen >>= 8)
+	/* include the length of the file */
+	for (; 0 != flen; flen >>= 8)
 		crc = (crc << 8) ^ crctab[((crc >> 24) ^ flen) & 0xff];
 
 	cval = ~crc;
