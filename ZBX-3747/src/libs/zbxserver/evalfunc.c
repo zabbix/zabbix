@@ -2437,7 +2437,7 @@ clean:
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: used for evaluation of notification macros                       *
- *           output buffer value should MAX_BUFFER_LEN long                   *
+ *           output buffer size should be MAX_BUFFER_LEN                      *
  *                                                                            *
  ******************************************************************************/
 int	evaluate_macro_function(char *value, const char *host, const char *key, const char *function, const char *parameter)

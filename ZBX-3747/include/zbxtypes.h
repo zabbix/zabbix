@@ -40,17 +40,17 @@
 
 #ifdef UNICODE
 #	include <strsafe.h>
-#	define	zbx_wsnprintf StringCchPrintf
-#	define	zbx_strlen wcslen
-#	define	zbx_strchr wcschr
-#	define	zbx_strstr wcsstr
-#	define	zbx_fullpath _wfullpath
+#	define zbx_wsnprintf StringCchPrintf
+#	define zbx_strlen wcslen
+#	define zbx_strchr wcschr
+#	define zbx_strstr wcsstr
+#	define zbx_fullpath _wfullpath
 #else
-#	define	zbx_wsnprintf zbx_snprintf
-#	define	zbx_strlen strlen
-#	define	zbx_strchr strchr
-#	define	zbx_strstr strstr
-#	define	zbx_fullpath _fullpath
+#	define zbx_wsnprintf zbx_snprintf
+#	define zbx_strlen strlen
+#	define zbx_strchr strchr
+#	define zbx_strstr strstr
+#	define zbx_fullpath _fullpath
 #endif
 
 #ifndef __UINT64_C
@@ -61,8 +61,6 @@
 #	define ZBX_FS_UI64 "%I64u"
 #	define ZBX_FS_UO64 "%I64o"
 #	define ZBX_FS_UX64 "%I64x"
-
-#	define zbx_pid_t	int
 
 #	define stat		_stat64
 #	define snprintf		_snprintf
@@ -108,8 +106,6 @@
 #		endif
 #		define ZBX_OFFSET 10000000000000000ULL
 #	endif
-
-#	define zbx_pid_t	pid_t
 
 #ifndef PATH_SEPARATOR
 #	define PATH_SEPARATOR	'/'

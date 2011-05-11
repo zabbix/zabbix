@@ -291,9 +291,9 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 	}
 
 	/************************************************************************************************/
-	/* (1) Sort by ascending mtimes                                                                 */
-	/* (2) If mtimes are equal, sort alphabetically by descending names                             */
-	/* The oldest is put first, the most current is at the end                                      */
+	/* (1) sort by ascending mtimes                                                                 */
+	/* (2) if mtimes are equal, sort alphabetically by descending names                             */
+	/* the oldest is put first, the most current is at the end                                      */
 	/*                                                                                              */
 	/*      filename.log.3 mtime3, filename.log.2 mtime2, filename.log1 mtime1, filename.log mtime  */
 	/*      --------------------------------------------------------------------------------------  */
@@ -303,10 +303,10 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 	/*      --------------------------------------------------------------------------------------  */
 	/*      array[i=0]             array[i=1]               array[i=2]              array[i=3]      */
 	/*                                                                                              */
-	/* Note: the application is writing into filename.log, mtimes are more important than filenames */
+	/* note: the application is writing into filename.log, mtimes are more important than filenames */
 	/************************************************************************************************/
 
-	for ( ; i < *logfiles_num; i++)
+	for (; i < *logfiles_num; i++)
 	{
 		if (mtime > (*logfiles)[i].mtime)
 			continue;	/* (1) sort by ascending mtime */
@@ -322,6 +322,7 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 				zabbix_log(LOG_LEVEL_DEBUG, "End add_logfile(). The file already added.");
 				return;
 			}
+
 			/* filename is smaller, must insert here */
 		}
 
