@@ -571,8 +571,9 @@
 		$triggerids = array();
 		$mapids = array();
 		$hostgroupids = array();
+		$imageids = array();
 
-		foreach($selements as $snum => $selement){
+		foreach($selements as $selement){
 			switch($selement['elementtype']){
 				case SYSMAP_ELEMENT_TYPE_HOST:
 					$hostids[] = $selement['elementid'];
@@ -587,23 +588,51 @@
 					$hostgroupids[] = $selement['elementid'];
 					break;
 				case SYSMAP_ELEMENT_TYPE_IMAGE:
-				default:
+					$imageids[] = $selement['iconid_off'];
 					break;
 			}
 		}
 
 
-		$hosts = API::Host()->get(array('hostids'=>$hostids, 'output'=>API_OUTPUT_EXTEND, 'nopermissions'=>1, 'nodeids' => get_current_nodeid(true)));
-		$hosts = zbx_toHash($hosts, 'hostid');
+		$hosts = API::Host()->get(array(
+			'hostids' => $hostids,
+			'output' => array('name'),
+			'nopermissions' => true,
+			'nodeids' => get_current_nodeid(true),
+			'preservekeys' => true,
+		));
 
-		$maps = API::Map()->get(array('mapids'=>$mapids, 'output'=>API_OUTPUT_EXTEND, 'nopermissions'=>1, 'nodeids' => get_current_nodeid(true)));
-		$maps = zbx_toHash($maps, 'sysmapid');
+		$maps = API::Map()->get(array(
+			'mapids' => $mapids,
+			'output' => array('name'),
+			'nopermissions' => true,
+			'nodeids' => get_current_nodeid(true),
+			'preservekeys' => true,
+		));
 
-		$triggers = API::Trigger()->get(array('triggerids'=>$triggerids, 'output'=>API_OUTPUT_EXTEND, 'nopermissions'=>1, 'nodeids' => get_current_nodeid(true)));
-		$triggers = zbx_toHash($triggers, 'triggerid');
+		$triggers = API::Trigger()->get(array(
+			'triggerids' => $triggerids,
+			'output' => API_OUTPUT_EXTEND,
+			'nopermissions' => 1,
+			'nodeids' => get_current_nodeid(true),
+			'preservekeys' => true,
+		));
 
-		$hostgroups = API::HostGroup()->get(array('hostgroupids'=>$hostgroupids, 'output'=>API_OUTPUT_EXTEND, 'nopermissions'=>1, 'nodeids' => get_current_nodeid(true)));
-		$hostgroups = zbx_toHash($hostgroups, 'groupid');
+		$hostgroups = API::HostGroup()->get(array(
+			'hostgroupids' => $hostgroupids,
+			'output' => array('name'),
+			'nopermissions' => true,
+			'nodeids' => get_current_nodeid(true),
+			'preservekeys' => true,
+		));
+
+		$images = API::image()->get(array(
+			'imageids' => $imageids,
+			'output' => API_OUTPUT_EXTEND,
+			'nopermissions' => true,
+			'nodeids' => get_current_nodeid(true),
+			'preservekeys' => true,
+		));
 
 		foreach($selements as $snum => $selement){
 			switch($selement['elementtype']){
@@ -620,8 +649,8 @@
 					$selements[$snum]['elementName'] = $hostgroups[$selement['elementid']]['name'];
 					break;
 				case SYSMAP_ELEMENT_TYPE_IMAGE:
-				default:
-					$selements[$snum]['elementName'] = 'image';
+					$selements[$snum]['elementName'] = $images[$selement['iconid_off']]['name'];
+					break;
 			}
 		}
 	}

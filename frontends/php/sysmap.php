@@ -254,23 +254,27 @@ $gridAlignAll->setAttribute('id', 'gridalignall');
 $gridForm = new CDiv(array($gridSize, $gridAlignAll));
 $gridForm->setAttribute('id', 'gridalignblock');
 
-$menuRow = array();
-array_push($menuRow, _('Map') . ' "'.$sysmap['name'].'"');
-array_push($menuRow, SPACE.SPACE);
-array_push($menuRow, _('Icon').' [',$el_add,$el_rmv,']');
-array_push($menuRow, SPACE.SPACE);
-array_push($menuRow, _('Link').' [',$cn_add,$cn_rmv,']');
-array_push($menuRow, SPACE.SPACE);
-array_push($menuRow, _('Grid').' [',$gridShow,'|',$gridAutoAlign,']');
-array_push($menuRow, SPACE, $gridForm);
+$save_btn = new CSubmit('save', _('Save'));
+$save_btn->setAttribute('id', 'sysmap_save');
+
+$menuRow = array(
+	_s('Map "%s"', $sysmap['name']),
+	SPACE.SPACE,
+	_('Icon') . ' [', $el_add, $el_rmv, ']',
+	SPACE.SPACE,
+	_('Link') . ' [',$cn_add,$cn_rmv,']',
+	SPACE.SPACE,
+	_('Grid') . ' [', $gridShow, '|' , $gridAutoAlign, ']',
+	SPACE,
+	$gridForm,
+	SPACE.'|'.SPACE,
+	$save_btn,
+);
 
 $elcn_tab = new CTable(null, 'textwhite');
 $elcn_tab->addRow($menuRow);
 
-$save_btn = new CSubmit('save', _('Save'));
-$save_btn->setAttribute('id', 'sysmap_save');
-
-show_table_header($elcn_tab, $save_btn);
+show_table_header($elcn_tab);
 
 
 $sysmap_img = new CImg('images/general/tree/zero.gif', 'Sysmap');
