@@ -602,7 +602,6 @@ var CSelement = function(sysmap, selementData){
 		selementData = {
 			elementtype: 4,			// 5-UNDEFINED
 			elementid: 0,			// ALWAYS must be a STRING (js doesn't support uint64)
-			elementName: '',			// element name
 			iconid_off: 0,			// ALWAYS must be a STRING (js doesn't support uint64)
 			iconid_on: 0,			// ALWAYS must be a STRING (js doesn't support uint64)
 			iconid_maintenance: 0,			// ALWAYS must be a STRING (js doesn't support uint64)
@@ -627,6 +626,9 @@ var CSelement = function(sysmap, selementData){
 
 		// set default map label location
 		selementData.label_location = this.sysmap.data.label_location;
+
+		// element name is icon name
+		selementData.elementName = this.sysmap.iconList[0].name;
 
 		// take first available icon
 		this.image = this.sysmap.iconList[0].imageid;
@@ -814,7 +816,7 @@ function CElementForm(formContainer, sysmap){
 			.prepend('<option value="0">' + locale['S_DEFAULT'] + '</option>');
 
 	// apply jQuery UI elements
-	jQuery('#elementApply, #elementRemove, #elementClose').button();
+	jQuery('#elementApply, #elementRemove, #elementClose, #sysmap_save').button();
 
 
 	// create action processor
@@ -870,6 +872,13 @@ function CElementForm(formContainer, sysmap){
 			cond: {
 				advanced_icons: 'checked'
 			}
+		},
+		{
+			action: 'hide',
+			value: '#advancedIconsRow',
+			cond: {
+				elementType: '4'
+			}
 		}
 	];
 	this.actionProcessor = new ActionProcessor(formActions);
@@ -920,142 +929,51 @@ CElementForm.prototype = {
 		this.actionProcessor.process();
 	},
 
-//  Multi Container  ------------------------------------------------------------------------------------
-// ------------------------------------------------------------------------------------------------------
-
-	create_multiContainer: function(e){
-// var initialization
-		this.multiContainer = {};
-
-
-		var e_div_1 = document.createElement('div');
-		this.multiContainer.container = e_div_1;
-		e_div_1.setAttribute('id',"multiContainer");
-		e_div_1.style.overflow = 'auto';
-
-//	e_td_4.appendChild(e_div_1);
-	},
-
-	update_multiContainer: function(e){
-// Create if not exists
-		if(is_null($('multiContainer'))){
-// HEADER
-			var e_table_1 = document.createElement('table');
-			e_table_1.setAttribute('cellspacing',"0");
-			e_table_1.setAttribute('cellpadding',"1");
-			e_table_1.className = 'header';
-
-
-			var e_tbody_2 = document.createElement('tbody');
-			e_table_1.appendChild(e_tbody_2);
-
-
-			var e_tr_3 = document.createElement('tr');
-			e_tbody_2.appendChild(e_tr_3);
-
-
-			var e_td_4 = document.createElement('td');
-			e_td_4.className = 'header_l';
-			e_td_4.appendChild(document.createTextNode(locale['S_MAP_ELEMENTS']));
-			e_tr_3.appendChild(e_td_4);
-
-
-			var e_td_4 = document.createElement('td');
-			e_td_4.setAttribute('align',"right");
-			e_td_4.className = 'header_r';
-
-			e_tr_3.appendChild(e_td_4);
-
-			$('divSelementForm').appendChild(e_table_1);
-//-----------
-
-			this.create_multiContainer(e);
-			$('divSelementForm').appendChild(this.multiContainer.container);
-//		$('divSelementForm').appendChild(document.createElement('br'));
-		}
-//---
-
-		var e_table_1 = document.createElement('table');
-		e_table_1.setAttribute('cellSpacing',"1");
-		e_table_1.setAttribute('cellPadding',"3");
-		e_table_1.className = "tableinfo";
-
-
-		var e_tbody_2 = document.createElement('tbody');
-		e_table_1.appendChild(e_tbody_2);
-
-
-		var e_tr_3 = document.createElement('tr');
-		e_tr_3.className = "header";
-		e_tbody_2.appendChild(e_tr_3);
-
-
-		var e_td_4 = document.createElement('td');
-		e_tr_3.appendChild(e_td_4);
-		e_td_4.appendChild(document.createTextNode(locale['S_LABEL']));
-
-
-		var e_td_4 = document.createElement('td');
-		e_tr_3.appendChild(e_td_4);
-		e_td_4.appendChild(document.createTextNode(locale['S_TYPE']));
-
-
-		var e_td_4 = document.createElement('td');
-		e_tr_3.appendChild(e_td_4);
-		e_td_4.appendChild(document.createTextNode(locale['S_DESCRIPTION']));
-
-
-		var count = 0;
-		var selement = null;
-		for(var selementid in this.sysmap.selection.selements){
-			if(!isset(selementid, this.sysmap.selements)) continue;
-
-			count++;
-			selement = this.sysmap.data.selements[selementid];
-
-			if(count > 4) this.multiContainer.container.style.height = '127px';
-			else this.multiContainer.container.style.height = 'auto';
-
-			var e_tr_3 = document.createElement('tr');
-			e_tbody_2.appendChild(e_tr_3);
-
-
-			var e_td_4 = document.createElement('td');
-			e_tr_3.appendChild(e_td_4);
-
-
-			var e_span_5 = document.createElement('span');
-//		e_span_5.setAttribute('href',"sysmap.php?sysmapid=100100000000002&form=update&selementid=100100000000004&sid=791bd54e24454e2b");
-//		e_span_5.className = "link";
-			e_td_4.appendChild(e_span_5);
-
-			e_span_5.appendChild(document.createTextNode(selement.label_expanded));
-
-			var elementtypeText = '';
-			switch(selement.elementtype){
-				case '0':elementtypeText = locale['S_HOST'];break;
-				case '1':elementtypeText = locale['S_MAP'];break;
-				case '2':elementtypeText = locale['S_TRIGGER'];break;
-				case '3':elementtypeText = locale['S_HOST_GROUP'];break;
-				case '4':
-				default:elementtypeText = locale['S_IMAGE'];break;
-			}
-
-			var e_td_4 = document.createElement('td');
-			e_td_4.appendChild(document.createTextNode(elementtypeText));
-			e_tr_3.appendChild(e_td_4);
-
-			var e_td_4 = document.createElement('td');
-			e_td_4.appendChild(document.createTextNode(selement.elementName));
-			e_tr_3.appendChild(e_td_4);
-		}
-
-
-		$(this.multiContainer.container).update(e_table_1);
-	},
-
 // LINK CONTAINER
 //**************************************************************************************************************************************************
+	updateList: function(){
+		var tpl = new Template(jQuery('#mapElementsFormListRow').html());
+
+		jQuery('#formList').empty();
+		var list = new Array();
+		for(var id in this.sysmap.selection.selements){
+			var elementData = this.sysmap.selements[id].data;
+
+			var elementTypeText = '';
+			switch(elementData.elementtype){
+				case '0': elementTypeText = locale['S_HOST']; break;
+				case '1': elementTypeText = locale['S_MAP']; break;
+				case '2': elementTypeText = locale['S_TRIGGER']; break;
+				case '3': elementTypeText = locale['S_HOST_GROUP']; break;
+				case '4': elementTypeText = locale['S_IMAGE']; break;
+			}
+			list.push({
+				elementType: elementTypeText,
+				elementName: elementData.elementName
+			});
+		}
+
+		// sort by elementtype and then by element name
+		list.sort(function(a, b){
+			if(a.elementType < b.elementType){ return -1; }
+			if(a.elementType > b.elementType){ return 1; }
+			if(a.elementType == b.elementType){
+				var elementTypeA = a.elementName.toLowerCase();
+				var elementTypeB = b.elementName.toLowerCase();
+
+				if(elementTypeA < elementTypeB){ return -1; }
+				if(elementTypeA > elementTypeB){ return 1; }
+			}
+			return 0;
+		});
+		for(var i = 0; i < list.length; i++){
+			jQuery(tpl.evaluate(list[i])).appendTo('#massList');
+		}
+
+		jQuery('#massList tr:nth-child(odd)').addClass('odd_row');
+		jQuery('#massList tr:nth-child(even)').addClass('even_row');
+	},
+
 	create_linkContainer: function(e, selementid){
 // var initialization
 		this.linkContainer = {};
@@ -2051,17 +1969,62 @@ CMassForm.prototype = {
 		this.formContainer.draggable("option", "handle", '#massDragHandler');
 		jQuery('#massElementCount').text(this.sysmap.selection.count);
 		this.domNode.toggle(true);
+
+		this.updateList();
 	},
 
 	hide: function(){
-		this.clearValues();
 		this.domNode.toggle(false);
+		this.clearValues();
 	},
 
 	clearValues: function(){
 		jQuery(':checkbox', this.domNode).prop('checked', false);
 		jQuery('option', this.domNode).prop('selected', false);
 		jQuery('textarea', this.domNode).val('');
+	},
+
+	updateList: function(){
+		var tpl = new Template(jQuery('#mapMassFormListRow').html());
+
+		jQuery('#massList').empty();
+		var list = new Array();
+		for(var id in this.sysmap.selection.selements){
+			var elementData = this.sysmap.selements[id].data;
+
+			var elementTypeText = '';
+			switch(elementData.elementtype){
+				case '0': elementTypeText = locale['S_HOST']; break;
+				case '1': elementTypeText = locale['S_MAP']; break;
+				case '2': elementTypeText = locale['S_TRIGGER']; break;
+				case '3': elementTypeText = locale['S_HOST_GROUP']; break;
+				case '4': elementTypeText = locale['S_IMAGE']; break;
+			}
+			list.push({
+				elementType: elementTypeText,
+				elementName: elementData.elementName
+			});
+		}
+
+		// sort by elementtype and then by element name
+		list.sort(function(a, b){
+			if(a.elementType < b.elementType){ return -1; }
+			if(a.elementType > b.elementType){ return 1; }
+			if(a.elementType == b.elementType){
+				var elementTypeA = a.elementName.toLowerCase();
+				var elementTypeB = b.elementName.toLowerCase();
+
+				if(elementTypeA < elementTypeB){ return -1; }
+				if(elementTypeA > elementTypeB){ return 1; }
+			}
+			return 0;
+		});
+		for(var i = 0; i < list.length; i++){
+			jQuery(tpl.evaluate(list[i])).appendTo('#massList');
+		}
+
+		jQuery('#massList tr:nth-child(odd)').addClass('odd_row');
+		jQuery('#massList tr:nth-child(even)').addClass('even_row');
 	}
 
 };

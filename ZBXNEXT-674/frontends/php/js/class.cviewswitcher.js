@@ -291,6 +291,14 @@ ActionProcessor.prototype = {
 						this.actionHide(action.value);
 					}
 				break;
+				case 'hide':
+					if(this.checkConditions(action.cond)){
+						this.actionHide(action.value);
+					}
+					else{
+						this.actionShow(action.value);
+					}
+					break;
 			}
 		}
 	},

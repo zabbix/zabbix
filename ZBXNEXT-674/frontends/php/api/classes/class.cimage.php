@@ -46,11 +46,8 @@ class CImage extends CZBXAPI{
  * @return array|boolean image data as array or false if error
  */
 	public function get($options = array()){
-
 		$result = array();
-
 		$sort_columns = array('imageid', 'name'); // allowed columns for sorting
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
 
 		$sql_parts = array(
 			'select' => array('images' => 'i.imageid'),

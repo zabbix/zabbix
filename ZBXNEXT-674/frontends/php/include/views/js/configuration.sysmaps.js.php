@@ -1,8 +1,9 @@
 <script type="text/x-jquery-tmpl" id="mapElementFormTpl">
-	<form name="selementForm" method="post" style="display: none;">
+	<div class="floatWindow" style="display: none;">
+	<form name="selementForm" method="post">
 		<input type="hidden" id="selementid" name="selementid">
 		<input type="hidden" id="elementid" name="elementid">
-		<table class="formtable">
+		<table class="formtable" style="width:100%">
 			<tbody>
 			<tr class="header">
 				<td id="formDragHandler" colspan="2" class="form_row_first move"><?php echo _('Edit map element'); ?></td>
@@ -11,7 +12,7 @@
 				<td><label for="elementType"><?php echo _('Type'); ?></label></td>
 				<td>
 					<select size="1" class="input" name="elementtype" id="elementType">
-						<option value="0" selected="selected"><?php echo _('Host'); ?></option>
+						<option value="0"><?php echo _('Host'); ?></option>
 						<option value="1"><?php echo _('Map'); ?></option>
 						<option value="2"><?php echo _('Trigger'); ?></option>
 						<option value="3"><?php echo _('Host group'); ?></option>
@@ -108,7 +109,7 @@
 					<select class="input" name="iconid_off" id="iconid_off"></select>
 				</td>
 			</tr>
-			<tr>
+			<tr id="advancedIconsRow">
 				<td><label for="advanced_icons"><?php echo _('Use advanced icons'); ?></label></td>
 				<td><input type="checkbox" name="advanced_icons" id="advanced_icons" class="checkbox"></td>
 			</tr>
@@ -166,10 +167,29 @@
 			</tbody>
 		</table>
 	</form>
+	<div id="linkContainer" style="overflow-x: auto; overflow-y: auto; height: auto; ">
+		<table cellspacing="1" cellpadding="3" class="tableinfo">
+			<tbody>
+			<tr class="header">
+				<td>Link</td>
+				<td>Element</td>
+				<td>Link status indicator</td>
+			</tr>
+			<tr class="even_row">
+				<td><span class="link">Link 1</span></td>
+				<td>New element</td>
+				<td>Zabbix server:/etc/passwd has been changed on server Zabbix server<br>Zabbix server:/etc/services has been changed on server Zabbix server<br>Zabbix server:/etc/inetd.conf has been changed on server Zabbix server<br>
+				</td>
+			</tr>
+			</tbody>
+		</table>
+	</div>
+	</div>
 </script>
 
 <script type="text/x-jquery-tmpl" id="mapMassFormTpl">
-	<form method="post" style="display: none;">
+	<div class="floatWindow" style="display: none;">
+	<form method="post">
 		<table class="formtable">
 			<tbody>
 			<tr class="header">
@@ -238,11 +258,32 @@
 			</tbody>
 		</table>
 	</form>
+	<div style="border: 1px solid #AAAAAA; max-height: 128px; overflow-y: auto;">
+		<table class="tableinfo">
+		<tbody id="massList">
+		</tbody>
+		</table>
+	</div>
+	</div>
 </script>
 
-<script type="text/x-jquery-tmpl" id="mapElementsList">
-
+<script type="text/x-jquery-tmpl" id="mapMassFormListRow">
+	<tr>
+		<td>#{elementType}</td>
+		<td>#{elementName}</td>
+	</tr>
 </script>
+
+<script type="text/x-jquery-tmpl" id="mapElementsFormListRow">
+	<tr class="even_row">
+		<td><span class="link">#{linkName}</span></td>
+		<td>#{elementType}</td>
+		<td>#{elementName}</td>
+		<td>#{linkIndicators}<br>
+		</td>
+	</tr>
+</script>
+
 
 <script type="text/x-jquery-tmpl" id="selementFormUrls">
 	<tr id="urlrow_#{selementurlid}">
