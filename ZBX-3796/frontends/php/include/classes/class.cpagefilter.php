@@ -371,8 +371,7 @@ options = array(
 				// then let's take a look how the desired graph is named
 				$options = array(
 					'output' => API_OUTPUT_EXTEND,
-					'graphids' => array($graphid),
-					'hostids' => $this->hostid > 0 ? $this->hostid : null
+					'graphids' => array($graphid)
 				);
 				$selectedGraphInfo = CGraph::get($options);
 				$selectedGraphInfo = reset($selectedGraphInfo);
