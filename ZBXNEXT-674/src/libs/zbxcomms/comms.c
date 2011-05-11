@@ -777,7 +777,7 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 	if (0 == s->num_socks)
 	{
 		zbx_set_tcp_strerror("zbx_tcp_listen() Fatal error: unable to serve on any address. [[%s]:%hu]",
-				listen_ip, listen_port);
+				listen_ip ? listen_ip : "-", listen_port);
 		goto out;
 	}
 
@@ -880,7 +880,7 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 	if (0 == s->num_socks)
 	{
 		zbx_set_tcp_strerror("zbx_tcp_listen() Fatal error: unable to serve on any address. [[%s]:%hu]",
-				listen_ip, listen_port);
+				listen_ip ? listen_ip : "-", listen_port);
 		goto out;
 	}
 

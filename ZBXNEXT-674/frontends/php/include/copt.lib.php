@@ -95,6 +95,7 @@ define('USE_MEM_PROF',1);
 //define('USE_MENU_DETAILS',1);
 define('USE_SQLREQUEST_PROF',1);
 define('SHOW_SQLREQUEST_DETAILS',1);
+define('USE_APICALL_PROF',1);
 // What is considered long query
 define('LONG_QUERY',0.01);
 // WHat is limit on total time spent on all SQL queries
@@ -118,6 +119,7 @@ if(defined('USE_PROFILING')){
 		protected static $memory_limit_reached = false;
 		protected static $max_memory_bytes = null;
 		protected static $debug_info = array();
+		protected static $api_calls = array();
 
 		protected  static function getmicrotime() {
 			if(defined('USE_TIME_PROF')) {
@@ -246,6 +248,13 @@ if(defined('USE_PROFILING')){
 			}
 		}
 
+		public static function saveApiCall($class, $method, $params, $result){
+			$backtrace = debug_backtrace();
+			$file = basename($backtrace[2]['file']);
+			$line = basename($backtrace[2]['line']);
+			self::$api_calls[] = array($class, $method, $params, $result, $file, $line);
+		}
+
 		public static function profiling_stop($type=NULL){
 			global $starttime;
 			global $memorystamp;
@@ -264,7 +273,9 @@ if(defined('USE_PROFILING')){
 			$debug_str = '';
 			$debug_str.= '<a name="debug"></a>';
 			$debug_str.= "******************* ".S_STATS_FOR." $type *************************".OBR;
+
 			if(defined('USE_TIME_PROF')){
+				$debug_str.= OBR;
 				$time = $endtime - $starttime[$type];
 				if($time < TOTAL_TIME){
 					$debug_str.= S_TOTAL_TIME.': '.round($time,6).OBR;
@@ -275,6 +286,7 @@ if(defined('USE_PROFILING')){
 			}
 
 			if(defined('USE_MEM_PROF')){
+				$debug_str.= OBR;
 				$debug_str.= S_MEMORY_LIMIT.'	: '.ini_get('memory_limit').OBR;
 				$debug_str.= S_MEMORY_USAGE.'	: '.mem2str($memorystamp[$type]).' - '.mem2str($memory).
 						' ('.mem2str($memory - $memorystamp[$type]).')'.OBR;
@@ -282,6 +294,7 @@ if(defined('USE_PROFILING')){
 			}
 
 			if(defined('USE_VAR_MON')){
+				$debug_str.= OBR;
 				$curr_var_list = isset($GLOBALS) ? array_keys($GLOBALS) : array();
 				$var_diff = array_diff($curr_var_list, $var_list[$type]);
 				$debug_str.= ' Undeleted vars : '.count($var_diff).' [';
@@ -290,6 +303,7 @@ if(defined('USE_PROFILING')){
 			}
 
 			if(defined('USE_COUNTER_PROF')){
+				$debug_str.= OBR;
 				if(isset($perf_counter[$type])){
 					ksort($perf_counter[$type]);
 					foreach($perf_counter[$type] as $name => $value){
@@ -298,7 +312,33 @@ if(defined('USE_PROFILING')){
 				}
 			}
 
+			if(defined('USE_APICALL_PROF') && USE_APICALL_PROF){
+				$debug_str.= OBR;
+
+				foreach(self::$api_calls as $i=>$apiCall){
+					$debug_str .= '<div style="border-bottom: 1px dotted gray; margin-bottom: 20px;">';
+					list($class, $method, $params, $result, $file, $line) = $apiCall;
+					// api method
+					$debug_str .= '<div style="padding-bottom: 10px;">';
+					$debug_str .= ($i + 1).'. <b>'.$class.'->'.$method.'</b> ['.$file.':'.$line.']';
+					$debug_str .= '</div>';
+					// parameters
+					$debug_str .= '<table><tr><td width="300" valign="top">Parameters:';
+					foreach($params as $p){
+						$debug_str .= '<pre>'.print_r($p, true).'</pre>';
+					}
+					$debug_str .= '</td>';
+					// result
+					$debug_str .= '<td valign="top">Result:<pre>'.print_r($result, true).'</pre></td>';
+
+					$debug_str .= '</tr></table>';
+					$debug_str .= '</div>';
+				}
+
+			}
+
 			if(defined('USE_SQLREQUEST_PROF')){
+				$debug_str.= OBR;
 				if(defined('SHOW_SQLREQUEST_DETAILS')){
 					$requests_cnt = count($sqlrequests);
 					if(isset($DB) && isset($DB['SELECT_COUNT'])){
@@ -425,6 +465,7 @@ else{
 		static function showmemoryusage($descr=null) {}
 		static function compare_files_with_menu($menu=null) {}
 		static function counter_up($type=NULL) {}
+		public static function saveApiCall($method, $params) {}
 	}
 }
 

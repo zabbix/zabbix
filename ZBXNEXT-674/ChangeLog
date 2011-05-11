@@ -2,6 +2,7 @@
 Changes for 1.9.4
 
 New features:
+ - [ZBXNEXT-647] added automatic population of profile fields (KB, Sasha)
  - [ZBXNEXT-629] redesigned discovery form and added https and telnet to discovery and net.tcp.service(.perf) (rudolfs, Vedmak, Aly)
  - [ZBXNEXT-627] support of visible host and template name (Sasha, Alexei)
  - [ZBXNEXT-672] advanced options for remote commands (Aly, asaveljevs, Sasha, Vedmak)
@@ -10,6 +11,8 @@ New features:
  - [ZBXNEXT-511] renamed item description to name, for description introduced a new field (asaveljevs, Vedmak)
 
 Bug fixes:
+ - [ZBX-3758] made Zabbix daemons remove their PID file upon unsuccessful startup (asaveljevs)
+ - [ZBX-3791] fixed item form caption after cloning item (Vedmak)
  - [ZBX-3689] fixed error when adding a new second-level IT Service (Alexei)
  - [ZBX-3715] improve frontend message style & grammar (Richlv)
  - [ZBX-3767] improve import status messages by avoiding concatenating individual words; thanks to zalex (Richlv)
@@ -137,6 +140,10 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.6rc1
 
+ - [ZBX-3760] fixed the CPU collector for processing the non-contiguous CPU IDs (Sasha)
+ - [ZBX-3796] in monitorin->graphs, if we change host, graph with the same name is selected if it exists (KB)
+ - [ZBX-3776] treat duplicate UserParameter as error (dimir)
+ - [ZBX-3728] fixed a warning message when removing a user script (Alexei)
  - [ZBX-3731] fixed possible SQL errors when updating trends (Sasha)
  - [ZBX-3772] improved performance of the history syncer (Sasha)
  - [ZBX-3547] Rewrote performance counters and cpu stats collection for Windows (rudolfs)

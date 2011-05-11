@@ -75,8 +75,6 @@ class testGeneric extends CWebTest
 
 			// Inventory
 			array('hostprofiles.php','Host profiles'),
-			array('hostprofiles.php?prof_type=0','Host profiles'),
-			array('hostprofiles.php?prof_type=1','Host profiles'),
 
 			// Reports
 			// TODO Does not work under SQLite well. Extremely slow!
