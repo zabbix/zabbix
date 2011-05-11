@@ -140,6 +140,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.6rc1
 
+ - [ZBX-3760] fixed the CPU collector for processing the non-contiguous CPU IDs (Sasha)
  - [ZBX-3796] in monitorin->graphs, if we change host, graph with the same name is selected if it exists (KB)
  - [ZBX-3776] treat duplicate UserParameter as error (dimir)
  - [ZBX-3728] fixed a warning message when removing a user script (Alexei)
