@@ -572,12 +572,12 @@ void	zbx_mem_create(zbx_mem_info_t **info, key_t shm_key, int lock_name, size_t 
 	size -= (void *)((*info)->buckets + MEM_BUCKET_COUNT) - base;
 	base = (void *)((*info)->buckets + MEM_BUCKET_COUNT);
 
-	strcpy(base, descr);
+	zbx_strlcpy(base, descr, size);
 	(*info)->mem_descr = base;
 	size -= strlen(descr) + 1;
 	base += strlen(descr) + 1;
 
-	strcpy(base, param);
+	zbx_strlcpy(base, param, size);
 	(*info)->mem_param = base;
 	size -= strlen(param) + 1;
 	base += strlen(param) + 1;
