@@ -756,7 +756,6 @@
 	'S_PRIVILEGE_OEM'=>				_('OEM'),
 	'S_IPMI_USERNAME'=>				_('IPMI username'),
 	'S_IPMI_PASSWORD'=>				_('IPMI password'),
-	'S_USE_PROFILE'=>				_('Use profile'),
 	'S_DELETE_SELECTED_HOST_Q'=>			_('Delete selected host?'),
 	'S_DELETE_SELECTED_WITH_LINKED_ELEMENTS'=>	_('Delete selected with linked elements'),
 	'S_GROUP_NAME'=>				_('Group name'),
@@ -1656,7 +1655,6 @@
 
 //	hostprofiles.php
 	'S_HOST_PROFILES'=>			_('Host profiles'),
-	'S_EXTENDED_PROFILE'=>		_('Extended profile'),
 
 //	search.php
 	'S_EDIT_HOSTS' => _('Edit hosts'),

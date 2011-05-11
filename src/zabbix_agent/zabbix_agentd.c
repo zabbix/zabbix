@@ -331,12 +331,6 @@ void	zbx_on_exit()
 		zbx_free(threads);
 	}
 
-#ifdef USE_PID_FILE
-
-	daemon_stop();
-
-#endif /* USE_PID_FILE */
-
 	free_metrics();
 	free_collector_data();
 	alias_list_free();

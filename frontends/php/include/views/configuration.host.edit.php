@@ -47,7 +47,7 @@
 
 	$_REQUEST['hostid'] = get_request('hostid', 0);
 
-	$useprofile		= get_request('useprofile', 'no');
+	$profile_mode	= get_request('profile_mode', HOST_PROFILE_DISABLED);
 	$host_profile	= get_request('host_profile',array());
 
 	$macros = get_request('macros',array());
@@ -90,6 +90,15 @@
 				$interfaces[$hinum]['items'] = $dbHost['interfaces'][$interface['interfaceid']]['items'];
 			}
 		}
+
+		// getting items that populate host profile fields
+		$hostItemsToProfile = API::Item()->get(array(
+			'filter' => array('hostid'=>$dbHost['hostid']),
+			'output' => array('profile_link', 'name', 'key_'),
+			'preserveKeys' => true,
+			'nopermissions' => true
+		));
+		$hostItemsToProfile = zbx_toHash($hostItemsToProfile, 'profile_link');
 	}
 	else{
 		$original_templates = array();
@@ -115,7 +124,7 @@
 
 // BEGIN: HOSTS PROFILE Section
 		$host_profile = $dbHost['profile'];
-		$useprofile = empty($host_profile) ? 'no' : 'yes';
+		$profile_mode = empty($host_profile) ? HOST_PROFILE_DISABLED : $dbHost['profile']['profile_mode'];
 // END:   HOSTS PROFILE Section
 
 		$templates = array();
@@ -493,31 +502,94 @@
 	$divTabs->addTab('macroTab', _('Macros'), $macrolist);
 // } MACROS WIDGET
 
-	$profileList = new CFormList('profilelist');
-	$profileList->addRow(array(new CLabel(SPACE, 'useprofile'), new CCheckBox('useprofile', $useprofile)));
+	$profileFormList = new CFormList('profilelist');
+
+	// radio buttons for profile type choice
+	$profileTypeRadioButton = array(
+		new CRadioButton(
+			'profile_mode',
+			HOST_PROFILE_DISABLED,
+			null, // class
+			'host_profile_radio_'.HOST_PROFILE_DISABLED,
+			$profile_mode == HOST_PROFILE_DISABLED // checked?
+		),
+		new CLabel(_('Disabled'), 'host_profile_radio_'.HOST_PROFILE_DISABLED),
+
+		new CRadioButton(
+			'profile_mode',
+			HOST_PROFILE_MANUAL,
+			null,
+			'host_profile_radio_'.HOST_PROFILE_MANUAL,
+			$profile_mode == HOST_PROFILE_MANUAL
+		),
+		new CLabel(_('Manual'), 'host_profile_radio_'.HOST_PROFILE_MANUAL),
+
+		new CRadioButton(
+			'profile_mode',
+			HOST_PROFILE_AUTOMATIC,
+			null,
+			'host_profile_radio_'.HOST_PROFILE_AUTOMATIC,
+			$profile_mode == HOST_PROFILE_AUTOMATIC
+		),
+		new CLabel(_('Automatic'), 'host_profile_radio_'.HOST_PROFILE_AUTOMATIC),
+	);
+	$profileFormList->addRow(new CDiv($profileTypeRadioButton, 'jqueryinputset'));
 
 	$hostProfileTable = DB::getSchema('host_profile');
-	$host_profile_fields = getHostProfiles();
+	$hostProfileFields = getHostProfiles();
 
-	foreach($host_profile_fields as $profileName => $profileCaption){
-		if(!isset($host_profile[$profileName])){
-			$host_profile[$profileName] = '';
+	foreach($hostProfileFields as $profileNo => $profileInfo){
+		if(!isset($host_profile[$profileInfo['db_field']])){
+			$host_profile[$profileInfo['db_field']] = '';
 		}
 
-		if($hostProfileTable['fields'][$profileName]['type'] == DB::FIELD_TYPE_TEXT){
-			$input = new CTextArea('host_profile['.$profileName.']', $host_profile[$profileName]);
+		if($hostProfileTable['fields'][$profileInfo['db_field']]['type'] == DB::FIELD_TYPE_TEXT){
+			$input = new CTextArea('host_profile['.$profileInfo['db_field'].']', $host_profile[$profileInfo['db_field']]);
 			$input->addStyle('width: 64em;');
 		}
 		else{
-			$fieldLength = $hostProfileTable['fields'][$profileName]['length'];
-			$input = new CTextBox('host_profile['.$profileName.']', $host_profile[$profileName]);
+			$fieldLength = $hostProfileTable['fields'][$profileInfo['db_field']]['length'];
+			$input = new CTextBox('host_profile['.$profileInfo['db_field'].']', $host_profile[$profileInfo['db_field']]);
 			$input->setAttribute('maxlength', $fieldLength);
 			$input->addStyle('width: '.($fieldLength > 64 ? 64 : $fieldLength).'em;');
 		}
-		$profileList->addRow($profileCaption, $input);
+		if($profile_mode == HOST_PROFILE_DISABLED){
+			$input->setAttribute('disabled', 'disabled');
+		}
+
+		// link to populating item at the right side (if any)
+		if(isset($hostItemsToProfile[$profileNo])){
+			$itemName = itemName($hostItemsToProfile[$profileNo]);
+			$populatingLink = new CLink($itemName, 'items.php?form=update&itemid='.$hostItemsToProfile[$profileNo]['itemid']);
+			$populatingLink->setAttribute('title', _s('This field is automatically populated by item "%s".', $itemName));
+			$populatingItemCell = array(' &larr; ', $populatingLink);
+			$input->addClass('linked_to_item'); // this will be used for disabling fields via jquery
+			if($profile_mode == HOST_PROFILE_AUTOMATIC){
+				$input->setAttribute('disabled', 'disabled');
+			}
+		}
+		else{
+			$populatingItemCell = '';
+		}
+		$populatingItem = new CSpan(
+			$populatingItemCell,
+			'populating_item'
+		);
+		$input->addStyle('float: left;');
+		// those links are visible only in automatic mode
+		if($profile_mode != HOST_PROFILE_AUTOMATIC){
+			$populatingItem->addStyle("display:none");
+		}
+
+		$profileFormList->addRow($profileInfo['title'], array($input, $populatingItem));
 	}
 
-	$divTabs->addTab('profileTab', _('Host profile'), $profileList);
+	// clearing the float
+	$clearFixDiv = new CDiv();
+	$clearFixDiv->addStyle("clear: both;");
+	$profileFormList->addRow('', $clearFixDiv);
+
+	$divTabs->addTab('profileTab', _('Host profile'), $profileFormList);
 // } PROFILE WIDGET
 
 	$frmHost->addItem($divTabs);

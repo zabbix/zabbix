@@ -49,7 +49,7 @@
 	$scriptTab->addRow(_('Type'), $typeCB);
 
 // EXECUTE ON
-	$typeRB = new CRadioButton('execute_on', $this->get('execute_on'));
+	$typeRB = new CRadioButtonList('execute_on', $this->get('execute_on'));
 	$typeRB->makeVertical();
 	$typeRB->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT);
 	$typeRB->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER);
