@@ -1,5 +1,5 @@
 <script type="text/x-jquery-tmpl" id="mapElementFormTpl">
-	<form id="selementForm" name="selementForm" method="post" style="display: none;">
+	<form name="selementForm" method="post" style="display: none;">
 		<input type="hidden" id="selementid" name="selementid">
 		<input type="hidden" id="elementid" name="elementid">
 		<table class="formtable">
@@ -8,9 +8,9 @@
 				<td id="formDragHandler" colspan="2" class="form_row_first move"><?php echo _('Edit map element'); ?></td>
 			</tr>
 			<tr>
-				<td><label for="elementLabel"><?php echo _('Type'); ?></label></td>
+				<td><label for="elementType"><?php echo _('Type'); ?></label></td>
 				<td>
-					<select size="1" class="input" name="elementtype" id="elementtype">
+					<select size="1" class="input" name="elementtype" id="elementType">
 						<option value="0" selected="selected"><?php echo _('Host'); ?></option>
 						<option value="1"><?php echo _('Map'); ?></option>
 						<option value="2"><?php echo _('Trigger'); ?></option>
@@ -161,6 +161,78 @@
 					<input id="elementApply" type="button" name="apply" value="Apply">
 					<input id="elementRemove" type="button" name="remove" value="Remove">
 					<input id="elementClose" type="button" name="close" value="Close">
+				</td>
+			</tr>
+			</tbody>
+		</table>
+	</form>
+</script>
+
+<script type="text/x-jquery-tmpl" id="mapMassFormTpl">
+	<form method="post" style="display: none;">
+		<table class="formtable">
+			<tbody>
+			<tr class="header">
+				<td id="massDragHandler" colspan="2" class="form_row_first move">
+					<?php echo _('Mass update elements'); ?>&nbsp;
+					(<span id="massElementCount"></span>&nbsp;<?php echo _('elements'); ?>)
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<input type="checkbox" name="chkbox_label" id="chkboxLabel" class="checkbox" style="display: inline; ">
+					<label for="chkboxLabel"><?php echo _('Label'); ?></label>
+				</td>
+				<td><textarea cols="56" rows="4" name="label" class="input"></textarea></td>
+			</tr>
+			<tr>
+				<td>
+					<input type="checkbox" name="chkbox_label_location" id="chkboxLabelLocation" class="checkbox" style="display: inline; ">
+					<label for="chkboxLabelLocation"><?php echo _('Label location'); ?></label>
+				</td>
+				<td><select class="input" name="label_location">
+						<option value="-1">-</option>
+						<option value="0"><?php echo _('Bottom'); ?></option>
+						<option value="1"><?php echo _('Left'); ?></option>
+						<option value="2"><?php echo _('Right'); ?></option>
+						<option value="3"><?php echo _('Top'); ?></option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<input type="checkbox" name="chkbox_iconid_off" id="chkboxMassIconidOff" class="checkbox" style="display: inline; ">
+					<label for="chkboxMassIconidOff"><?php echo _('Icon (default)'); ?></label>
+				</td>
+				<td><select class="input" name="iconid_off" id="massIconidOff"></select></td>
+			</tr>
+			<tr>
+				<td>
+					<input type="checkbox" name="chkbox_iconid_on" id="chkboxMassIconidOn" class="checkbox" style="display: inline; ">
+					<label for="chkboxMassIconidOn"><?php echo _('Icon (problem)'); ?></label>
+				</td>
+				<td><select class="input" name="iconid_on" id="massIconidOn"></select></td>
+			</tr>
+			<tr>
+				<td>
+					<input type="checkbox" name="chkbox_iconid_maintenance" id="chkboxMassIconidMaintenance" class="checkbox" style="display: inline; ">
+					<label for="chkboxMassIconidMaintenance"><?php echo _('Icon (maintenance)'); ?></label>
+				</td>
+				<td><select class="input" name="iconid_maintenance" id="massIconidMaintenance"></select></td>
+			</tr>
+			<tr>
+				<td>
+					<input type="checkbox" name="chkbox_iconid_disabled" id="chkboxMassIconidDisabled" class="checkbox" style="display: inline; ">
+					<label for="chkboxMassIconidDisabled"><?php echo _('Icon (disabled)'); ?></label>
+				</td>
+				<td><select class="input" name="iconid_disabled" id="massIconidDisabled"></select>
+				</td>
+			</tr>
+			<tr class="footer">
+				<td colspan="2" class="form_row_last">
+					<input id="massApply" type="button" name="apply" value="Apply">
+					<input id="massRemove" type="button" name="remove" value="Remove">
+					<input id="massClose" type="button" name="close" value="Close">
 				</td>
 			</tr>
 			</tbody>

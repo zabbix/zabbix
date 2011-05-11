@@ -49,7 +49,10 @@ function CMap(containerid, sysmapid, id){
 				top: '50px',
 				left: '500px'
 			})
-			.appendTo('body');
+			.appendTo('body')
+			.draggable({
+				containment: [0,0,3200,3200]
+			});
 
 	this.mapimg = jQuery('#sysmap_img');
 
@@ -65,56 +68,68 @@ function CMap(containerid, sysmapid, id){
 		},
 		success: jQuery.proxy(function(result){
 			this.data = result.data.mapData;
-
-			for(var selementid in this.data.selements){
-				this.selements[selementid] = new CSelement(this, this.data.selements[selementid]);
-			}
-			for(var linkid in this.data.links){
-				this.createLink(null, this.data.links[linkid]);
-			}
-
-			this.updateImage();
-
 			this.iconList = result.data.iconList;
-			this.form = new CElementForm(this.formContainer, this);
 		}, this),
 		error: function(){
 			throw('Get selements FAILED.');
 		}
 	});
 
+	// perform initialization actions after data recieved from server
+	jQuery.when(ajaxData).then(jQuery.proxy(function(){
+		for(var selementid in this.data.selements){
+			this.selements[selementid] = new CSelement(this, this.data.selements[selementid]);
+		}
+		for(var linkid in this.data.links){
+			this.createLink(null, this.data.links[linkid]);
+		}
 
+		this.updateImage();
+		this.form = new CElementForm(this.formContainer, this);
+		this.massForm = new CMassForm(this.formContainer, this);
+		this.bindActions();
+	}, this));
+
+
+	// initialize SELECTABLE
 	this.container.selectable({
-		stop: jQuery.proxy(function(){
+		start: jQuery.proxy(function(event){
+			if(!event.ctrlKey)
+				this.clearSelection();
+		}, this),
+		stop: jQuery.proxy(function(event){
 			var selected = jQuery('.ui-selected', this.container);
 			var ids = new Array();
 			for(var i = 0; i < selected.length; i++){
 				ids.push(jQuery(selected[i]).data('id'));
+
+				// remove ui-selected class, to not confuse next selection
+				selected.removeClass('ui-selected');
 			}
-			this.selectElements(ids);
+			this.selectElements(ids, event.ctrlKey);
 		}, this)
 	});
-
-	// bind actions after data recieved and dom created
-	jQuery.when(ajaxData).then(jQuery.proxy(this.bindActions, this));
-
 }
 CMap.prototype = {
 	id:	null,							// own id
 	data: {},							// local sysmap DB :)
 	iconList: {}, // list of available icons [{imageid: name}, ...]
 
-	container: null,					// selements and links HTML container (D&D droppable area)
+	container: null, // selements and links HTML container (D&D droppable area)
 	formContainer: null, // jQuery dom object contining forms
-	mapimg: null,						// HTML element map img
-	form:	null,
+	mapimg: null, // HTML element map img
 
-	selements: {},					// map selements array
-	links:	{},						// map links array
+	// FORMS
+	form: null, // element form
+	listForm: null, // element list form
+	massForm: null, // element mass update form
+
+	selements: {}, // element objects
+	links:	{},	// map links array
 
 	selection: {
-		count: 0,						// number of selected elements
-		selements: {}					// selected SElements
+		count: 0, // number of selected elements
+		selements: {} // selected elements { elementid: elementid, ... }
 	},
 
 	mlinktrigger: {
@@ -146,11 +161,10 @@ CMap.prototype = {
 		var url = new Curl();
 		var urlText = 'map.php' + '?sid=' + url.getArgument('sid');
 
-// grid
+		// grid
 		if(this.data.grid_show == '1')
 			urlText += '&grid=' + this.data.grid_size;
 
-		var that = this;
 		jQuery.ajax({
 			url: urlText,
 			type: 'post',
@@ -162,13 +176,29 @@ CMap.prototype = {
 				'selements': Object.toJSON(this.data.selements),
 				'links': Object.toJSON(this.data.links)
 			},
-			success: function(data){
-				that.mapimg.attr('src', 'imgstore.php?imageid=' + data.result);
-			},
+			success: jQuery.proxy(function(data){
+				this.mapimg.attr('src', 'imgstore.php?imageid=' + data.result);
+			}, this),
 			error: function(){
 				alert('Map image update failed');
 			}
 		});
+	},
+	setContainer: function(){
+		var sysmap_pn = this.mapimg.position();
+		var sysmapHeight = this.mapimg.height();
+		var sysmapWidth = this.mapimg.width();
+
+		var container_pn = this.container.position();
+
+		if((container_pn.top != sysmap_pn.top) || (container_pn.left != sysmap_pn.left) || (this.container.height() != sysmapHeight) || (this.container.width() != sysmapWidth)){
+			this.container.css({
+				top: sysmap_pn.top + 'px',
+				left: sysmap_pn.left + 'px',
+				height: sysmapHeight + 'px',
+				width: sysmapWidth + 'px'
+			});
+		}
 	},
 
 // ---------- ELEMENTS ------------------------------------------------------------------------------------
@@ -289,23 +319,6 @@ CMap.prototype = {
 
 //--------------------------------------------------------------------------------
 
-	setContainer: function(){
-		var sysmap_pn = this.mapimg.position();
-		var sysmapHeight = this.mapimg.height();
-		var sysmapWidth = this.mapimg.width();
-
-		var container_pn = this.container.position();
-
-		if((container_pn.top != sysmap_pn.top) || (container_pn.left != sysmap_pn.left) || (this.container.height() != sysmapHeight) || (this.container.width() != sysmapWidth)){
-			this.container.css({
-				top: sysmap_pn.top + 'px',
-				left: sysmap_pn.left + 'px',
-				height: sysmapHeight + 'px',
-				width: sysmapWidth + 'px'
-			});
-		}
-	},
-
 	bindActions: function(){
 		var that = this;
 
@@ -320,24 +333,32 @@ CMap.prototype = {
 		// MAP PANEL EVENTS
 		// change grid size
 		jQuery('#gridsize').change(function(){
-			that.setGridSize(jQuery(this).val());
+			var value = jQuery(this).val();
+			if(that.data.grid_size != value){
+				that.data.grid_size = value;
+				that.updateImage();
+			}
 		});
 
 		// toggle autoalign
 		jQuery('#gridautoalign').click(function(){
-			var autoAlign = that.switchAutoAlign();
-			jQuery(this).html(autoAlign == '1' ? locale['S_ON'] : locale['S_OFF']);
+			that.data.grid_align = that.data.grid_align == '1' ? '0' : '1';
+			jQuery(this).html(that.data.grid_align == '1' ? locale['S_ON'] : locale['S_OFF']);
 		});
 
 		// toggle grid visibility
 		jQuery('#gridshow').click(function(){
-			var showGrid = that.switchGridView();
-			jQuery(this).html(showGrid == '1' ? locale['S_SHOWN'] : locale['S_HIDDEN']);
+			that.data.grid_show = that.data.grid_show == '1' ? '0' : '1';
+			jQuery(this).html(that.data.grid_show == '1' ? locale['S_SHOWN'] : locale['S_HIDDEN']);
+			that.updateImage();
 		});
 
 		// perform align all
 		jQuery('#gridalignall').click(function(){
-			that.alignAll()
+			for(var selementid in that.selements){
+				that.selements[selementid].align(true);
+			}
+			that.updateImage();
 		});
 
 		// save map
@@ -376,7 +397,11 @@ CMap.prototype = {
 
 
 		// FORM EVENTS
-		jQuery('#elementClose').click(jQuery.proxy(this.handlerCloseSelementForm, this));
+		// close element form
+		jQuery('#elementClose').click(function(){
+			that.clearSelection();
+			that.form.hide();
+		});
 		jQuery('#elementDelete').click(jQuery.proxy(this.deleteSelectedElements, this));
 		jQuery('#elementApply').click(jQuery.proxy(function(){
 			if(this.selection.count != 1) throw 'Try to single update element, when more than one selected.';
@@ -388,32 +413,14 @@ CMap.prototype = {
 		jQuery('#newSelementUrl').click(jQuery.proxy(function(){
 			this.form.addUrls();
 		}, this));
-	},
 
-	setGridSize: function(value){
-		if(this.data.grid_size != value){
-			this.data.grid_size = value;
-			this.updateImage();
-		}
-	},
-
-	switchAutoAlign: function(){
-		this.data.grid_align = this.data.grid_align == '1' ? '0' : '1';
-		return this.data.grid_align;
-	},
-
-	switchGridView: function(){
-		this.data.grid_show = this.data.grid_show == '1' ? '0' : '1';
-		this.updateImage();
-		return this.data.grid_show;
-	},
-
-	alignAll: function(){
-		for(var selementid in this.selements){
-			this.selements[selementid].align(true);
-		}
-
-		this.updateImage();
+		// close element form
+		jQuery('#massClose').click(function(){
+			that.clearSelection();
+			that.massForm.hide();
+		});
+		jQuery('#massDelete').click();
+		jQuery('#massApply').click();
 	},
 
 	clearSelection: function(){
@@ -422,26 +429,6 @@ CMap.prototype = {
 			this.selements[id].toggleSelect(false);
 			delete this.selection.selements[id];
 		}
-	},
-
-	toggleForm: function(){
-		if(this.selection.count == 0){
-			this.form.hide();
-		}
-		else if(this.selection.count == 1){
-			for(var selementid in this.selection.selements){
-				this.form.setValues(this.selements[selementid].data);
-				this.form.show();
-			}
-		}
-		else{
-
-		}
-	},
-
-	handlerCloseSelementForm: function(){
-		this.clearSelection();
-		this.form.hide();
 	},
 
 	selectElements: function(ids, addSelection){
@@ -463,29 +450,26 @@ CMap.prototype = {
 		}
 
 		this.toggleForm();
-	}
-/*
-	handlerElementSelect: function(event){
-		var selementid = jQuery(event.target).data('id');
+	},
 
-		// if we click on one already selected element, we should not deselect it
-		if(!(event.ctrlKey || event.shiftKey) && !((this.selection.count == 1) && (typeof this.selection.selements[selementid] != 'undefined'))){
-			this.clearSelection();
+	toggleForm: function(){
+		if(this.selection.count == 0){
+			this.form.hide();
+			this.massForm.hide();
 		}
-
-		var selected = this.selements[selementid].toggleSelect();
-		if(selected){
-			this.selection.count++;
-			this.selection.selements[selementid] = selementid;
+		else if(this.selection.count == 1){
+			for(var selementid in this.selection.selements){
+				this.form.setValues(this.selements[selementid].data);
+			}
+			this.massForm.hide();
+			this.form.show();
 		}
 		else{
-			this.selection.count--;
-			delete this.selection.selements[selementid];
+			this.form.hide();
+			this.massForm.show();
 		}
-
-		this.toggleForm();
 	}
-*/
+
 };
 
 
@@ -810,6 +794,7 @@ CSelement.prototype = {
 // *******************************************************************
 function CElementForm(formContainer, sysmap){
 	this.sysmap = sysmap;
+	this.formContainer = formContainer;
 
 	// create form
 	var formTplData = {
@@ -823,18 +808,13 @@ function CElementForm(formContainer, sysmap){
 	for(var i = 0; i < this.sysmap.iconList.length; i++){
 		var icon = this.sysmap.iconList[i];
 		jQuery('#iconid_off, #iconid_on, #iconid_maintenance, #iconid_disabled')
-				.append('<option value="' + icon.imageid + '">' + icon.name + '</option>')
+				.append('<option value="' + icon.imageid + '">' + icon.name + '</option>');
 	}
+	jQuery('#iconid_on, #iconid_maintenance, #iconid_disabled')
+			.prepend('<option value="0">' + locale['S_DEFAULT'] + '</option>');
 
 	// apply jQuery UI elements
 	jQuery('#elementApply, #elementRemove, #elementClose').button();
-
-
-	// meke form draggable
-	jQuery(this.domNode).draggable({
-		handle: jQuery('#formDragHandler'),
-		containment: [0,0,3200,3200]
-	});
 
 
 	// create action processor
@@ -843,35 +823,35 @@ function CElementForm(formContainer, sysmap){
 			action: 'show',
 			value: '#subtypeRow, #hostGroupSelectRow',
 			cond: {
-				elementtype: '3'
+				elementType: '3'
 			}
 		},
 		{
 			action: 'show',
 			value: '#hostSelectRow',
 			cond: {
-				elementtype: '0'
+				elementType: '0'
 			}
 		},
 		{
 			action: 'show',
 			value: '#triggerSelectRow',
 			cond: {
-				elementtype: '2'
+				elementType: '2'
 			}
 		},
 		{
 			action: 'show',
 			value: '#mapSelectRow',
 			cond: {
-				elementtype: '1'
+				elementType: '1'
 			}
 		},
 		{
 			action: 'show',
 			value: '#areaTypeRow, #areaPlacingRow',
 			cond: {
-				elementtype: '3',
+				elementType: '3',
 				subtypeHostGroupElements: 'checked'
 			}
 		},
@@ -879,7 +859,7 @@ function CElementForm(formContainer, sysmap){
 			action: 'show',
 			value: '#areaSizeRow',
 			cond: {
-				elementtype: '3',
+				elementType: '3',
 				subtypeHostGroupElements: 'checked',
 				areaTypeCustom: 'checked'
 			}
@@ -898,8 +878,10 @@ function CElementForm(formContainer, sysmap){
 CElementForm.prototype = {
 	sysmap: null, // reference to CMap object
 	domNode: null, // jQuery dom object
+	formContainer: null, // jQuery object
 
 	show: function(){
+		this.formContainer.draggable("option", "handle", '#formDragHandler');
 		this.domNode.toggle(true);
 	},
 
@@ -2033,6 +2015,53 @@ CElementForm.prototype = {
 		}
 		else
 			return false;
+	}
+
+};
+
+
+
+function CMassForm(formContainer, sysmap){
+	this.sysmap = sysmap;
+	this.formContainer = formContainer;
+
+	// create form
+	var tpl = new Template(jQuery('#mapMassFormTpl').html());
+	this.domNode = jQuery(tpl.evaluate()).appendTo(formContainer);
+
+
+	// populate icons selects
+	for(var i = 0; i < this.sysmap.iconList.length; i++){
+		var icon = this.sysmap.iconList[i];
+		jQuery('#massIconidOff, #massIconidOn, #massIconidMaintenance, #massIconidDisabled')
+				.append('<option value="' + icon.imageid + '">' + icon.name + '</option>')
+	}
+	jQuery('#massIconidOn, #massIconidMaintenance, #massIconidDisabled')
+			.prepend('<option value="0">' + locale['S_DEFAULT'] + '</option>');
+
+	// apply jQuery UI elements
+	jQuery('#massApply, #massRemove, #massClose').button();
+}
+CMassForm.prototype = {
+	sysmap: null, // reference to CMap object
+	domNode: null, // jQuery object
+	formContainer: null, // jQuery object
+
+	show: function(){
+		this.formContainer.draggable("option", "handle", '#massDragHandler');
+		jQuery('#massElementCount').text(this.sysmap.selection.count);
+		this.domNode.toggle(true);
+	},
+
+	hide: function(){
+		this.clearValues();
+		this.domNode.toggle(false);
+	},
+
+	clearValues: function(){
+		jQuery(':checkbox', this.domNode).prop('checked', false);
+		jQuery('option', this.domNode).prop('selected', false);
+		jQuery('textarea', this.domNode).val('');
 	}
 
 };
