@@ -369,10 +369,10 @@ options = array(
 			if(!isset($this->data['graphs'][$graphid])){
 				// then let's take a look how the desired graph is named
 				$options = array(
-					'output' => API_OUTPUT_EXTEND,
+					'output' => array('name'),
 					'graphids' => array($graphid)
 				);
-				$selectedGraphInfo = CGraph::get($options);
+				$selectedGraphInfo = API::Graph()->get($options);
 				$selectedGraphInfo = reset($selectedGraphInfo);
 				$graphid = 0;
 				// if there is a graph with the same name on new host, why not show it then?
