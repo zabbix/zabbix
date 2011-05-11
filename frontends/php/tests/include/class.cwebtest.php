@@ -247,7 +247,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 		// should check that items, triggers, graphs and applications exist on the host and are linked to the template
 		// should do that by looking in the db
 		// currently doing something very brutal - just looking whether Template_Linux is present on entity pages
-		$this->href_click("items.php?hostid=$hostid&sid=");
+		$this->href_click("items.php?filter_set=1&hostid=$hostid&sid=");
 		$this->wait();
 		$this->ok("$template:");
 		// using "host navigation bar" at the top of entity list
