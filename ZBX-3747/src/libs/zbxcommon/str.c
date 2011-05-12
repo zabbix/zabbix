@@ -232,8 +232,8 @@ int	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args)
 	assert(str);
 
 #ifdef _WINDOWS
-	written_len = vsnprintf_s(str, count, _TRUNCATE, fmt, args);
-	written_len = MAX(written_len, 0);
+	if (-1 == (written_len = vsnprintf_s(str, count, _TRUNCATE, fmt, args))
+		return count -1;	/* result was truncated */
 #else
 	written_len = vsnprintf(str, count, fmt, args);
 	written_len = MIN(written_len, (int)count - 1);

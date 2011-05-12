@@ -395,7 +395,7 @@ char *strerror_from_system(unsigned long error)
 			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), wide_string, sizeof(wide_string), NULL))
 	{
 		zbx_snprintf(utf8_string + offset, sizeof(utf8_string) - offset,
-				"unable to find message text [0x%ulX]", GetLastError());
+				"unable to find message text [0x%lX]", GetLastError());
 
 		return utf8_string;
 	}
