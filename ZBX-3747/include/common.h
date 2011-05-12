@@ -89,29 +89,34 @@
 #endif
 
 #ifdef snprintf
-#undef snprintf
+#	undef snprintf
 #endif
 #define snprintf	ERROR_DO_NOT_USE_SNPRINTF_FUNCTION_TRY_TO_USE_ZBX_SNPRINTF
 
 #ifdef sprintf
-#undef sprintf
+#	undef sprintf
 #endif
 #define sprintf		ERROR_DO_NOT_USE_SPRINTF_FUNCTION_TRY_TO_USE_ZBX_SNPRINTF
 
 #ifdef strncpy
-#undef strncpy
+#	undef strncpy
 #endif
 #define strncpy		ERROR_DO_NOT_USE_STRNCPY_FUNCTION_TRY_TO_USE_ZBX_STRLCPY
 
 #ifdef vsprintf
-#undef vsprintf
+#	undef vsprintf
 #endif
 #define vsprintf	ERROR_DO_NOT_USE_VSPRINTF_FUNCTION_TRY_TO_USE_ZBX_VSNPRINTF
 
 #ifdef strncat
-#undef strncat
+#	undef strncat
 #endif
 #define strncat		ERROR_DO_NOT_USE_STRNCAT_FUNCTION_TRY_TO_USE_ZBX_STRLCAT
+
+#ifdef strcpy
+#	undef strcpy
+#endif
+#define strcpy		ERROR_DO_NOT_USE_STRCPY_FUNCTION_TRY_TO_USE_ZBX_STRLCPY
 
 #define ON	1
 #define OFF	0
