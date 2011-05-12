@@ -103,6 +103,11 @@
 #endif
 #define strncpy		ERROR_DO_NOT_USE_STRNCPY_FUNCTION_TRY_TO_USE_ZBX_STRLCPY
 
+#ifdef strcpy
+#	undef strcpy
+#endif
+#define strcpy		ERROR_DO_NOT_USE_STRCPY_FUNCTION_TRY_TO_USE_ZBX_STRLCPY
+
 #ifdef vsprintf
 #	undef vsprintf
 #endif
@@ -112,11 +117,6 @@
 #	undef strncat
 #endif
 #define strncat		ERROR_DO_NOT_USE_STRNCAT_FUNCTION_TRY_TO_USE_ZBX_STRLCAT
-
-#ifdef strcpy
-#	undef strcpy
-#endif
-#define strcpy		ERROR_DO_NOT_USE_STRCPY_FUNCTION_TRY_TO_USE_ZBX_STRLCPY
 
 #define ON	1
 #define OFF	0
