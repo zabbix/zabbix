@@ -1660,12 +1660,15 @@ COpt::memoryPick();
 		if(empty($templateids)) return true;
 
 		//check if someone passed duplicate templates in the same query
-		$idCount = array_count_values($templateids);
-		arsort($idCount);
-		if(reset($idCount) > 1){
+		$templateIdDuplicates = zbx_arrayFindDuplicates($templateids);
+		if(!zbx_empty($templateIdDuplicates)){
+			$duplicatesFound = array();
+			foreach($templateIdDuplicates as $value => $count){
+				$duplicatesFound[] = _s('template ID "%1$s" is passed %2$s times', $value, $count);
+			}
 			self::exception(
 				ZBX_API_ERROR_PARAMETERS,
-				_s('Cannot pass duplicate template IDs for the linkage. Please check template ID "%s".', key($idCount))
+				_s('Cannot pass duplicate template IDs for the linkage: %s', implode(", ", $duplicatesFound))
 			);
 		}
 
