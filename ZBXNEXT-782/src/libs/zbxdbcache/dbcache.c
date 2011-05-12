@@ -1873,7 +1873,7 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (history[i].value_type != ITEM_VALUE_TYPE_FLOAT)
+		if (ITEM_VALUE_TYPE_FLOAT != history[i].value_type)
 			continue;
 
 #ifdef HAVE_MULTIROW_INSERT
@@ -1910,7 +1910,7 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (history[i].value_type != ITEM_VALUE_TYPE_UINT64)
+		if (ITEM_VALUE_TYPE_UINT64 != history[i].value_type)
 			continue;
 
 #ifdef HAVE_MULTIROW_INSERT
@@ -1947,7 +1947,7 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (history[i].value_type != ITEM_VALUE_TYPE_STR)
+		if (ITEM_VALUE_TYPE_STR != history[i].value_type)
 			continue;
 
 		value_esc = DBdyn_escape_string(history[i].value_orig.str);
@@ -1986,7 +1986,7 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (history[i].value_type != ITEM_VALUE_TYPE_TEXT)
+		if (ITEM_VALUE_TYPE_TEXT != history[i].value_type)
 			continue;
 
 		value_esc = DBdyn_escape_string(history[i].value_orig.str);
@@ -2025,7 +2025,7 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (history[i].value_type != ITEM_VALUE_TYPE_LOG)
+		if (ITEM_VALUE_TYPE_LOG != history[i].value_type)
 			continue;
 
 		source_esc = DBdyn_escape_string_len(history[i].value.str, HISTORY_LOG_SOURCE_LEN);
