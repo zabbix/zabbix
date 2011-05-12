@@ -22,56 +22,48 @@
 #include "md5.h"
 #include "file.h"
 
-#define ZBX_INIT_TO			\
-					\
-double ts;				\
-ts = zbx_time()
-
-#define ZBX_CHK_TO			\
-					\
-if (CONFIG_TIMEOUT < zbx_time() - ts)	\
-{					\
-	close(f);			\
-	return SYSINFO_RET_FAIL;	\
-}
-
 extern int CONFIG_TIMEOUT;
 
 int	VFS_FILE_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct stat	buf;
 	char		filename[MAX_STRING_LEN];
+	int		r = SYSINFO_RET_FAIL;
 
 	if (1 < num_param(param))
-		return SYSINFO_RET_FAIL;
+		goto err;
 
 	if (0 != get_param(param, 1, filename, sizeof(filename)))
-		return SYSINFO_RET_FAIL;
+		goto err;
 
 	if (0 != zbx_stat(filename, &buf))
-		return SYSINFO_RET_FAIL;
+		goto err;
 
 	SET_UI64_RESULT(result, buf.st_size);
 
-	return SYSINFO_RET_OK;
+	r = SYSINFO_RET_OK;
+err:
+
+	return r;
 }
 
 int	VFS_FILE_TIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct stat	buf;
 	char		filename[MAX_STRING_LEN], type[8];
+	int		r = SYSINFO_RET_FAIL;
 
 	if (2 < num_param(param))
-		return SYSINFO_RET_FAIL;
+		goto err;
 
 	if (0 != get_param(param, 1, filename, sizeof(filename)))
-		return SYSINFO_RET_FAIL;
+		goto err;
 
 	if (0 != get_param(param, 2, type, sizeof(type)))
 		*type = '\0';
 
 	if (0 != zbx_stat(filename, &buf))
-		return SYSINFO_RET_FAIL;
+		goto err;
 
 	if ('\0' == *type || 0 == strcmp(type, "modify"))	/* default parameter */
 		SET_UI64_RESULT(result, buf.st_mtime);
@@ -80,21 +72,25 @@ int	VFS_FILE_TIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	else if (0 == strcmp(type, "change"))
 		SET_UI64_RESULT(result, buf.st_ctime);
 	else
-		return SYSINFO_RET_FAIL;
+		goto err;
 
-	return SYSINFO_RET_OK;
+	r = SYSINFO_RET_OK;
+err:
+
+	return r;
 }
 
 int	VFS_FILE_EXISTS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct stat	buf;
 	char		filename[MAX_STRING_LEN];
+	int		r = SYSINFO_RET_FAIL;
 
 	if (1 < num_param(param))
-		return SYSINFO_RET_FAIL;
+		goto err;
 
 	if (0 != get_param(param, 1, filename, sizeof(filename)))
-		return SYSINFO_RET_FAIL;
+		goto err;
 
 	SET_UI64_RESULT(result, 0);
 
@@ -102,26 +98,29 @@ int	VFS_FILE_EXISTS(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		if (S_ISREG(buf.st_mode))
 			SET_UI64_RESULT(result, 1);
 
-	return SYSINFO_RET_OK;
+	r = SYSINFO_RET_OK;
+err:
+
+	return r;
 }
 
 int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	filename[MAX_STRING_LEN], regexp[MAX_STRING_LEN], encoding[32];
 	char	buf[MAX_BUFFER_LEN], *utf8;
-	int	f, nbytes, flen, len;
+	int	f, nbytes, flen, len, r = SYSINFO_RET_FAIL;
+	double	ts;
 
-	/* mind the timeout */
-	ZBX_INIT_TO;
+	ts = zbx_time();
 
 	if (3 < num_param(param))
-		return SYSINFO_RET_FAIL;
+		goto err;
 
 	if (0 != get_param(param, 1, filename, sizeof(filename)))
-		return SYSINFO_RET_FAIL;
+		goto err;
 
 	if (0 != get_param(param, 2, regexp, sizeof(regexp)))
-		return SYSINFO_RET_FAIL;
+		goto err;
 
 	if (0 != get_param(param, 3, encoding, sizeof(encoding)))
 		*encoding = '\0';
@@ -129,17 +128,17 @@ int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	zbx_strupper(encoding);
 
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
-		return SYSINFO_RET_FAIL;
+		goto err;
 
-	/* mind the timeout */
-	ZBX_CHK_TO;
+	if (CONFIG_TIMEOUT < zbx_time() - ts)
+		goto err;
 
 	flen = 0;
 
 	while (0 < (nbytes = zbx_read(f, buf, sizeof(buf), encoding)))
 	{
-		/* mind the timeout */
-		ZBX_CHK_TO;
+		if (CONFIG_TIMEOUT < zbx_time() - ts)
+			goto err;
 
 		utf8 = convert_to_utf8(buf, nbytes, encoding);
 		if (NULL != zbx_regexp_match(utf8, regexp, &len))
@@ -154,31 +153,34 @@ int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
  	close(f);
 
 	if (-1 == nbytes)	/* error occurred */
-		return SYSINFO_RET_FAIL;
+		goto err;
 
 	if (0 == nbytes)	/* EOF */
 		SET_STR_RESULT(result, strdup("EOF"));
 
-	return SYSINFO_RET_OK;
+	r = SYSINFO_RET_OK;
+err:
+
+	return r;
 }
 
 int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	filename[MAX_STRING_LEN], regexp[MAX_STRING_LEN], encoding[32];
 	char	buf[MAX_BUFFER_LEN], *utf8;
-	int	f, nbytes, flen, len, res;
+	int	f, nbytes, flen, len, res, r = SYSINFO_RET_FAIL;
+	double	ts;
 
-	/* mind the timeout */
-	ZBX_INIT_TO;
+	ts = zbx_time();
 
 	if (3 < num_param(param))
-		return SYSINFO_RET_FAIL;
+		goto err;
 
 	if (0 != get_param(param, 1, filename, sizeof(filename)))
-		return SYSINFO_RET_FAIL;
+		goto err;
 
 	if (0 != get_param(param, 2, regexp, sizeof(regexp)))
-		return SYSINFO_RET_FAIL;
+		goto err;
 
 	if (0 != get_param(param, 3, encoding, sizeof(encoding)))
 		*encoding = '\0';
@@ -186,17 +188,17 @@ int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_
 	zbx_strupper(encoding);
 
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
-		return SYSINFO_RET_FAIL;
+		goto err;
 
-	/* mind the timeout */
-	ZBX_CHK_TO;
+	if (CONFIG_TIMEOUT < zbx_time() - ts)
+		goto err;
 
 	res = flen = 0;
 
 	while (0 == res && 0 < (nbytes = zbx_read(f, buf, sizeof(buf), encoding)))
 	{
-		/* mind the timeout */
-		ZBX_CHK_TO;
+		if (CONFIG_TIMEOUT < zbx_time() - ts)
+			goto err;
 
 		utf8 = convert_to_utf8(buf, nbytes, encoding);
 		if (NULL != zbx_regexp_match(utf8, regexp, &len))
@@ -207,37 +209,40 @@ int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_
  	close(f);
 
 	if (-1 == nbytes)	/* error occurred */
-		return SYSINFO_RET_FAIL;
+		goto err;
 
 	SET_UI64_RESULT(result, res);
 
-	return SYSINFO_RET_OK;
+	r = SYSINFO_RET_OK;
+err:
+
+	return r;
 }
 
 int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char		filename[MAX_STRING_LEN];
-	int		f, i, nbytes, flen;
+	int		f, i, nbytes, flen, r = SYSINFO_RET_FAIL;
 	md5_state_t	state;
 	u_char		buf[16 * ZBX_KIBIBYTE];
 	char		*hash_text = NULL;
 	size_t		sz;
 	md5_byte_t	hash[MD5_DIGEST_SIZE];
+	double		ts;
 
-	/* mind the timeout */
-	ZBX_INIT_TO;
+	ts = zbx_time();
 
 	if (1 < num_param(param))
-		return SYSINFO_RET_FAIL;
+		goto err;
 
 	if (0 != get_param(param, 1, filename, sizeof(filename)))
-		return SYSINFO_RET_FAIL;
+		goto err;
 
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
-		return SYSINFO_RET_FAIL;
+		goto err;
 
-	/* mind the timeout */
-	ZBX_CHK_TO;
+	if (CONFIG_TIMEOUT < zbx_time() - ts)
+		goto err;
 
 	md5_init(&state);
 
@@ -245,8 +250,8 @@ int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	while (0 < (nbytes = (int)read(f, buf, sizeof(buf))))
 	{
-		/* mind the timeout */
-		ZBX_CHK_TO;
+		if (CONFIG_TIMEOUT < zbx_time() - ts)
+			goto err;
 
 		md5_append(&state, (const md5_byte_t *)buf, nbytes);
 	}
@@ -256,7 +261,7 @@ int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	close(f);
 
 	if (0 > nbytes)
-		return SYSINFO_RET_FAIL;
+		goto err;
 
 	/* convert MD5 hash to text form */
 
@@ -270,7 +275,10 @@ int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	SET_STR_RESULT(result, hash_text);
 
-	return SYSINFO_RET_OK;
+	r = SYSINFO_RET_OK;
+err:
+
+	return r;
 }
 
 static u_long	crctab[] =
@@ -337,33 +345,32 @@ static u_long	crctab[] =
 int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char		filename[MAX_STRING_LEN];
-	int		i, nr;
+	int		i, nr, f, r = SYSINFO_RET_FAIL;
 	uint32_t	crc, flen;
 	u_char		buf[16 * ZBX_KIBIBYTE];
 	u_long		cval;
-	int		f;
+	double		ts;
 
-	/* mind the timeout */
-	ZBX_INIT_TO;
+	ts = zbx_time();
 
 	if (1 < num_param(param))
-		return SYSINFO_RET_FAIL;
+		goto err;
 
 	if (0 != get_param(param, 1, filename, sizeof(filename)))
-		return SYSINFO_RET_FAIL;
+		goto err;
 
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
-		return SYSINFO_RET_FAIL;
+		goto err;
 
-	/* mind the timeout */
-	ZBX_CHK_TO;
+	if (CONFIG_TIMEOUT < zbx_time() - ts)
+		goto err;
 
 	crc = flen = 0;
 
 	while (0 < (nr = (int)read(f, buf, sizeof(buf))))
 	{
-		/* mind the timeout */
-		ZBX_CHK_TO;
+		if (CONFIG_TIMEOUT < zbx_time() - ts)
+			goto err;
 
 		for (i = 0; i < nr; i++)
 			crc = (crc << 8) ^ crctab[((crc >> 24) ^ buf[i]) & 0xff];
@@ -372,7 +379,7 @@ int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	close(f);
 
 	if (0 > nr)
-		return SYSINFO_RET_FAIL;
+		goto err;
 
 	/* include the length of the file */
 	for (; 0 != flen; flen >>= 8)
@@ -382,5 +389,8 @@ int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 	SET_UI64_RESULT(result, cval);
 
-	return SYSINFO_RET_OK;
+	r = SYSINFO_RET_OK;
+err:
+
+	return r;
 }
