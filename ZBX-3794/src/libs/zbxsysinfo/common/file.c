@@ -22,16 +22,18 @@
 #include "md5.h"
 #include "file.h"
 
-#define ZBX_INIT_TO	double ts = zbx_time();
+#define ZBX_INIT_TO			\
+					\
+double ts;				\
+ts = zbx_time()
 
-#define ZBX_CHK_TO				\
-						\
-do						\
-{						\
-	if (CONFIG_TIMEOUT < (zbx_time() - ts))	\
-		return SYSINFO_RET_FAIL;	\
-}						\
-while (0)
+#define ZBX_CHK_TO			\
+					\
+if (CONFIG_TIMEOUT < zbx_time() - ts)	\
+{					\
+	close(f);			\
+	return SYSINFO_RET_FAIL;	\
+}
 
 extern int CONFIG_TIMEOUT;
 
@@ -105,9 +107,9 @@ int	VFS_FILE_EXISTS(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char		filename[MAX_STRING_LEN], regexp[MAX_STRING_LEN], encoding[32];
-	char		buf[MAX_BUFFER_LEN], *utf8;
-	int		f, nbytes, flen, len;
+	char	filename[MAX_STRING_LEN], regexp[MAX_STRING_LEN], encoding[32];
+	char	buf[MAX_BUFFER_LEN], *utf8;
+	int	f, nbytes, flen, len;
 
 	/* mind the timeout */
 	ZBX_INIT_TO;
@@ -162,9 +164,9 @@ int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char		filename[MAX_STRING_LEN], regexp[MAX_STRING_LEN], encoding[32];
-	char		buf[MAX_BUFFER_LEN], *utf8;
-	int		f, nbytes, flen, len, res;
+	char	filename[MAX_STRING_LEN], regexp[MAX_STRING_LEN], encoding[32];
+	char	buf[MAX_BUFFER_LEN], *utf8;
+	int	f, nbytes, flen, len, res;
 
 	/* mind the timeout */
 	ZBX_INIT_TO;
