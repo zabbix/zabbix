@@ -1659,7 +1659,17 @@ COpt::memoryPick();
 	private function link($templateids, $targetids){
 		if(empty($templateids)) return true;
 
-// check if any templates linked to targets have more than one unique item key\application {{{
+		//check if someone passed duplicate templates in the same query
+		$idCount = array_count_values($templateids);
+		arsort($idCount);
+		if(reset($idCount) > 1){
+			self::exception(
+				ZBX_API_ERROR_PARAMETERS,
+				_s('Cannot pass duplicate template ids for the linkage. Please check templateid "%s"', key($idCount))
+			);
+		}
+
+		// check if any templates linked to targets have more than one unique item key\application {{{
 		foreach($targetids as $targetid){
 			$linkedTpls = $this->get(array(
 				'nopermissions' => 1,
