@@ -118,7 +118,7 @@ void	__zbx_zbx_error(const char *fmt, ...)
 	f = fopen(ZBX_STDERR_FILE, "a+");
 #else
 	f = stderr;
-#endif /* ZBX_STDERR_FILE */
+#endif
 
 	va_start(args, fmt);
 
@@ -131,7 +131,7 @@ void	__zbx_zbx_error(const char *fmt, ...)
 
 #if defined(ZBX_STDERR_FILE)
 	zbx_fclose(f);
-#endif /* ZBX_STDERR_FILE */
+#endif
 }
 
 /******************************************************************************
@@ -152,53 +152,16 @@ void	__zbx_zbx_error(const char *fmt, ...)
  ******************************************************************************/
 int	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...)
 {
+	int	written_len;
 	va_list	args;
-	int	writen_len = 0;
 
 	assert(str);
 
 	va_start(args, fmt);
-
-	writen_len = vsnprintf(str, count, fmt, args);
-	writen_len = MIN(writen_len, ((int)count) - 1);
-	writen_len = MAX(writen_len, 0);
-
-	str[writen_len] = '\0';
-
+	written_len = zbx_vsnprintf(str, count, fmt, args);
 	va_end(args);
 
-	return writen_len;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_vsnprintf                                                    *
- *                                                                            *
- * Purpose: Secure version of vsnprintf function.                             *
- *          Add zero character at the end of string.                          *
- *                                                                            *
- * Parameters: str - destination buffer pointer                               *
- *             count - size of destination buffer                             *
- *             fmt - format                                                   *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexei Vladishev (see also zbx_snprintf)                           *
- *                                                                            *
- ******************************************************************************/
-int	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args)
-{
-	int	writen_len = 0;
-
-	assert(str);
-
-	writen_len = vsnprintf(str, count, fmt, args);
-	writen_len = MIN(writen_len, ((int)count) - 1);
-	writen_len = MAX(writen_len, 0);
-
-	str[writen_len] = '\0';
-
-	return writen_len;
+	return written_len;
 }
 
 /******************************************************************************
@@ -244,6 +207,42 @@ void	__zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_l
 	*offset += zbx_vsnprintf(*str + *offset, max_len, fmt, args);
 
 	va_end(args);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_vsnprintf                                                    *
+ *                                                                            *
+ * Purpose: Secure version of vsnprintf function.                             *
+ *          Add zero character at the end of string.                          *
+ *                                                                            *
+ * Parameters: str - destination buffer pointer                               *
+ *             count - size of destination buffer                             *
+ *             fmt - format                                                   *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev (see also zbx_snprintf)                           *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args)
+{
+	int	written_len;
+
+	assert(str);
+
+#ifdef _WINDOWS
+	if (-1 == (written_len = vsnprintf_s(str, count, _TRUNCATE, fmt, args)))
+		written_len = (int)count - 1;	/* result was truncated */
+#else
+	written_len = vsnprintf(str, count, fmt, args);
+	written_len = MIN(written_len, (int)count - 1);
+	written_len = MAX(written_len, 0);
+
+	str[written_len] = '\0';
+#endif
+
+	return written_len;
 }
 
 /******************************************************************************
@@ -720,23 +719,26 @@ size_t	zbx_strlcpy(char *dst, const char *src, size_t siz)
 	const char *s = src;
 	size_t n = siz;
 
-	/* Copy as many bytes as will fit */
-	if (n != 0) {
-		while (--n != 0) {
-			if ((*d++ = *s++) == '\0')
+	/* copy as many bytes as will fit */
+	if (0 != n)
+	{
+		while (0 != --n)
+		{
+			if ('\0' == (*d++ = *s++))
 				break;
 		}
 	}
 
-	/* Not enough room in dst, add NUL and traverse rest of src */
-	if (n == 0) {
-		if (siz != 0)
-			*d = '\0';                /* NUL-terminate dst */
-		while (*s++)
-		;
+	/* not enough room in dst, add NUL and traverse rest of src */
+	if (0 == n)
+	{
+		if (0 != siz)
+			*d = '\0';	/* NUL-terminate dst */
+		while ('\0' != *s++)
+			;
 	}
 
-	return(s - src - 1);        /* count does not include NUL */
+	return s - src - 1;	/* count does not include NUL */
 }
 
 /******************************************************************************
@@ -808,19 +810,21 @@ char	*zbx_dvsprintf(char *dest, const char *f, va_list args)
 		string = zbx_malloc(string, size);
 
 		va_copy(curr, args);
-		n = vsnprintf(string, size, f, curr);
+		n = zbx_vsnprintf(string, size, f, curr);
 		va_end(curr);
 
-		if(n >= 0 && n < size)
+		if (0 <= n && n < size)
 			break;
 
-		if(n >= size)	size = n + 1;
-		else		size = size * 3 / 2 + 1;
+		if (n >= size)
+			size = n + 1;
+		else
+			size = size * 3 / 2 + 1;
 
 		zbx_free(string);
 	}
 
-	if(dest) zbx_free(dest);
+	zbx_free(dest);
 
 	return string;
 }
@@ -868,19 +872,23 @@ char	*__zbx_zbx_dsprintf(char *dest, const char *f, ...)
  ******************************************************************************/
 char	*zbx_strdcat(char *dest, const char *src)
 {
-	int	len_dest, len_src;
+	size_t	len_dest, len_src;
 	char	*new_dest = NULL;
 
-	if (!src)	return dest;
-	if (!dest)	return strdup(src);
+	if (NULL == src)
+		return dest;
 
-	len_dest = (int)strlen(dest);
-	len_src = (int)strlen(src);
+	if (NULL == dest)
+		return zbx_strdup(NULL, src);
+
+	len_dest = strlen(dest);
+	len_src = strlen(src);
 
 	new_dest = zbx_malloc(new_dest, len_dest + len_src + 1);
 
-	strcpy(new_dest, dest);
-	strcpy(new_dest + len_dest, src);
+	zbx_strlcpy(new_dest, dest, len_dest + 1);
+	zbx_strlcpy(new_dest + len_dest, src, len_src + 1);
+
 	zbx_free(dest);
 
 	return new_dest;
@@ -902,15 +910,11 @@ char	*zbx_strdcat(char *dest, const char *src)
  ******************************************************************************/
 char	*__zbx_zbx_strdcatf(char *dest, const char *f, ...)
 {
-	char *string = NULL;
-	char *result = NULL;
-
-	va_list args;
+	char	*string, *result;
+	va_list	args;
 
 	va_start(args, f);
-
 	string = zbx_dvsprintf(NULL, f, args);
-
 	va_end(args);
 
 	result = zbx_strdcat(dest, string);
