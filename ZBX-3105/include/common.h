@@ -683,8 +683,6 @@ const char	*get_program_name(const char *path);
 typedef enum
 {
 	ZBX_TASK_START = 0,
-	ZBX_TASK_SHOW_HELP,
-	ZBX_TASK_SHOW_VERSION,
 	ZBX_TASK_PRINT_SUPPORTED,
 	ZBX_TASK_TEST_METRIC,
 	ZBX_TASK_SHOW_USAGE,
@@ -693,7 +691,8 @@ typedef enum
 	ZBX_TASK_START_SERVICE,
 	ZBX_TASK_STOP_SERVICE,
 	ZBX_TASK_CHANGE_NODEID
-} zbx_task_t;
+}
+zbx_task_t;
 
 typedef enum
 {
@@ -704,12 +703,12 @@ typedef enum
 
 #define ZBX_TASK_FLAG_MULTIPLE_AGENTS 0x01
 
-#define ZBX_TASK_EX struct zbx_task_ex
-ZBX_TASK_EX
+typedef struct
 {
 	zbx_task_t	task;
 	int		flags;
-};
+}
+ZBX_TASK_EX;
 
 char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2);
 
