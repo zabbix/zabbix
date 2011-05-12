@@ -420,7 +420,7 @@ int	MAIN_ZABBIX_ENTRY()
 	ZBX_THREAD_ACTIVECHK_ARGS	activechk_args;
 	zbx_sock_t			listen_sock;
 	int				i, thread_num = 0;
-	
+
 	if (NULL == CONFIG_LOG_FILE || '\0' == *CONFIG_LOG_FILE)
 		zabbix_open_log(LOG_TYPE_SYSLOG, CONFIG_LOG_LEVEL, NULL);
 	else
@@ -621,17 +621,27 @@ int	main(int argc, char **argv)
 			break;
 #endif	/* _WINDOWS */
 		case ZBX_TASK_PRINT_SUPPORTED:
+#if defined (_WINDOWS)
+			init_collector_data();	/* required for reading PerfCounter */
+#endif
 			test_parameters();
 			free_metrics();
 			alias_list_free();
+#if defined (_WINDOWS)
 			free_collector_data();
+#endif
 			exit(SUCCEED);
 			break;
 		case ZBX_TASK_TEST_METRIC:
+#if defined (_WINDOWS)
+			init_collector_data();	/* required for reading PerfCounter */
+#endif
 			test_parameter(TEST_METRIC, PROCESS_TEST);
 			free_metrics();
 			alias_list_free();
+#if defined (_WINDOWS)
 			free_collector_data();
+#endif
 			exit(SUCCEED);
 			break;
 		default:
