@@ -53,8 +53,8 @@ int	create_pid_file(const char *pidfile)
 		if( -1 == (fd = open(pidfile, O_APPEND)))
 #endif /* HAVE_FCNTL_H */
 		{
-			zbx_error("Cannot open PID file [%s] [%s]", pidfile, strerror(errno));
-			zabbix_log( LOG_LEVEL_CRIT, "Cannot open PID file [%s] [%s]", pidfile, strerror(errno));
+			zbx_error("cannot open PID file [%s]: %s", pidfile, zbx_strerror(errno));
+			zabbix_log(LOG_LEVEL_CRIT, "cannot open PID file [%s]: %s", pidfile, zbx_strerror(errno));
 			return FAIL;
 		}
 #ifdef HAVE_FCNTL_H
@@ -63,8 +63,8 @@ int	create_pid_file(const char *pidfile)
 		if(-1 == flock(fd, LOCK_EX | LOCK_NB) && EWOULDBLOCK == errno)
 #endif /* HAVE_FCNTL_H */
 		{
-			zbx_error("File [%s] exists and is locked. Is this process already running ?", pidfile);
-			zabbix_log( LOG_LEVEL_CRIT, "File [%s] exists and is locked. Is this process already running ?", pidfile);
+			zbx_error("File [%s] exists and is locked. Is this process already running?", pidfile);
+			zabbix_log(LOG_LEVEL_CRIT, "File [%s] exists and is locked. Is this process already running?", pidfile);
 			close(fd);
 			return FAIL;
 		}
@@ -74,8 +74,8 @@ int	create_pid_file(const char *pidfile)
 	/* open pid file */
 	if( NULL == (fpid = fopen(pidfile, "w")))
 	{
-		zbx_error("Cannot create PID file [%s] [%s]", pidfile, strerror(errno));
-		zabbix_log( LOG_LEVEL_CRIT, "Cannot create PID file [%s] [%s]", pidfile, strerror(errno));
+		zbx_error("cannot create PID file [%s]: %s", pidfile, zbx_strerror(errno));
+		zabbix_log(LOG_LEVEL_CRIT, "cannot create PID file [%s]: %s", pidfile, zbx_strerror(errno));
 
 		return FAIL;
 	}
@@ -124,6 +124,6 @@ void	drop_pid_file(const char *pidfile)
 
 	if(-1 == unlink(pidfile))
 	{
-		zabbix_log( LOG_LEVEL_DEBUG, "Cannot remove PID file [%s] [%s]", pidfile, strerror(errno));
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot remove PID file [%s]: %s", pidfile, zbx_strerror(errno));
 	}
 }
