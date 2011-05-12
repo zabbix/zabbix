@@ -90,17 +90,19 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 
 	if (FAIL == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, smtp_server, ZBX_DEFAULT_SMTP_PORT, 0))
 	{
-		zbx_snprintf(error, max_error_len, "Cannot connect to SMTP server [%s] [%s]", smtp_server, zbx_tcp_strerror());
+		zbx_snprintf(error, max_error_len, "cannot connect to SMTP server [%s]: %s",
+				smtp_server, zbx_tcp_strerror());
 		goto close;
 	}
 	if (-1 == smtp_readln(s.socket, cmd, sizeof(cmd)))
 	{
-		zbx_snprintf(error, max_error_len, "Error receiving initial string from SMTP server [%s]", strerror(errno));
+		zbx_snprintf(error, max_error_len, "error receiving initial string from SMTP server: %s",
+				zbx_strerror(errno));
 		goto out;
 	}
 	if (0 != strncmp(cmd, OK_220, strlen(OK_220)))
 	{
-		zbx_snprintf(error, max_error_len, "No welcome message 220* from SMTP server [%s]", cmd);
+		zbx_snprintf(error, max_error_len, "no welcome message 220* from SMTP server [%s]", cmd);
 		goto out;
 	}
 
@@ -111,17 +113,19 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 		zbx_snprintf(cmd, sizeof(cmd), "HELO %s\r\n", smtp_helo);
 		if (-1 == write(s.socket, cmd, strlen(cmd)))
 		{
-			zbx_snprintf(error, max_error_len, "Error sending HELO to mailserver [%s]", strerror(errno));
+			zbx_snprintf(error, max_error_len, "error sending HELO to mailserver: %s",
+					zbx_strerror(errno));
 			goto out;
 		}
 		if (-1 == smtp_readln(s.socket, cmd, sizeof(cmd)))
 		{
-			zbx_snprintf(error, max_error_len, "Error receiving answer on HELO request [%s]", strerror(errno));
+			zbx_snprintf(error, max_error_len, "error receiving answer on HELO request: %s",
+					zbx_strerror(errno));
 			goto out;
 		}
 		if (0 != strncmp(cmd, OK_250, strlen(OK_250)))
 		{
-			zbx_snprintf(error, max_error_len, "Wrong answer on HELO [%s]", cmd);
+			zbx_snprintf(error, max_error_len, "wrong answer on HELO [%s]", cmd);
 			goto out;
 		}
 	}
@@ -131,17 +135,17 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 	zbx_snprintf(cmd, sizeof(cmd), "MAIL FROM: <%s>\r\n", smtp_email);
 	if (-1 == write(s.socket, cmd, strlen(cmd)))
 	{
-		zbx_snprintf(error, max_error_len, "Error sending MAIL FROM to mailserver [%s]", strerror(errno));
+		zbx_snprintf(error, max_error_len, "error sending MAIL FROM to mailserver: %s", zbx_strerror(errno));
 		goto out;
 	}
 	if (-1 == smtp_readln(s.socket, cmd, sizeof(cmd)))
 	{
-		zbx_snprintf(error, max_error_len, "Error receiving answer on MAIL FROM request [%s]", strerror(errno));
+		zbx_snprintf(error, max_error_len, "error receiving answer on MAIL FROM request: %s", zbx_strerror(errno));
 		goto out;
 	}
 	if (0 != strncmp(cmd, OK_250, strlen(OK_250)))
 	{
-		zbx_snprintf(error, max_error_len, "Wrong answer on MAIL FROM [%s]", cmd);
+		zbx_snprintf(error, max_error_len, "wrong answer on MAIL FROM [%s]", cmd);
 		goto out;
 	}
 
@@ -150,18 +154,18 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 	zbx_snprintf(cmd, sizeof(cmd), "RCPT TO: <%s>\r\n", mailto);
 	if (-1 == write(s.socket, cmd, strlen(cmd)))
 	{
-		zbx_snprintf(error, max_error_len, "Error sending RCPT TO to mailserver [%s]", strerror(errno));
+		zbx_snprintf(error, max_error_len, "error sending RCPT TO to mailserver: %s", zbx_strerror(errno));
 		goto out;
 	}
 	if (-1 == smtp_readln(s.socket, cmd, sizeof(cmd)))
 	{
-		zbx_snprintf(error, max_error_len, "Error receiving answer on RCPT TO request [%s]", strerror(errno));
+		zbx_snprintf(error, max_error_len, "error receiving answer on RCPT TO request: %s", zbx_strerror(errno));
 		goto out;
 	}
 	/* May return 251 as well: User not local; will forward to <forward-path>. See RFC825. */
 	if (0 != strncmp(cmd, OK_250, strlen(OK_250)) && 0 != strncmp(cmd, OK_251, strlen(OK_251)))
 	{
-		zbx_snprintf(error, max_error_len, "Wrong answer on RCPT TO [%s]", cmd);
+		zbx_snprintf(error, max_error_len, "wrong answer on RCPT TO [%s]", cmd);
 		goto out;
 	}
 
@@ -170,17 +174,17 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 	zbx_snprintf(cmd, sizeof(cmd), "DATA\r\n");
 	if (-1 == write(s.socket, cmd, strlen(cmd)))
 	{
-		zbx_snprintf(error, max_error_len, "Error sending DATA to mailserver [%s]", strerror(errno));
+		zbx_snprintf(error, max_error_len, "error sending DATA to mailserver: %s", zbx_strerror(errno));
 		goto out;
 	}
 	if (-1 == smtp_readln(s.socket, cmd, sizeof(cmd)))
 	{
-		zbx_snprintf(error, max_error_len, "Error receiving answer on DATA request [%s]", strerror(errno));
+		zbx_snprintf(error, max_error_len, "error receiving answer on DATA request: %s", zbx_strerror(errno));
 		goto out;
 	}
 	if (0 != strncmp(cmd, OK_354, strlen(OK_354)))
 	{
-		zbx_snprintf(error, max_error_len, "Wrong answer on DATA [%s]", cmd);
+		zbx_snprintf(error, max_error_len, "wrong answer on DATA [%s]", cmd);
 		goto out;
 	}
 
@@ -250,7 +254,7 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 
 	if (-1 == err)
 	{
-		zbx_snprintf(error, max_error_len, "Error sending headers and mail body to mailserver [%s]", strerror(errno));
+		zbx_snprintf(error, max_error_len, "error sending headers and mail body to mailserver: %s", zbx_strerror(errno));
 		goto out;
 	}
 
@@ -259,17 +263,17 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 	zbx_snprintf(cmd, sizeof(cmd), "\r\n.\r\n");
 	if (-1 == write(s.socket, cmd, strlen(cmd)))
 	{
-		zbx_snprintf(error, max_error_len, "Error sending . to mailserver [%s]", strerror(errno));
+		zbx_snprintf(error, max_error_len, "error sending . to mailserver: %s", zbx_strerror(errno));
 		goto out;
 	}
 	if (-1 == smtp_readln(s.socket, cmd, sizeof(cmd)))
 	{
-		zbx_snprintf(error, max_error_len, "Error receiving answer on . request [%s]", strerror(errno));
+		zbx_snprintf(error, max_error_len, "error receiving answer on . request: %s", zbx_strerror(errno));
 		goto out;
 	}
 	if (0 != strncmp(cmd, OK_250, strlen(OK_250)))
 	{
-		zbx_snprintf(error, max_error_len, "Wrong answer on end of data [%s]", cmd);
+		zbx_snprintf(error, max_error_len, "wrong answer on end of data [%s]", cmd);
 		goto out;
 	}
 
@@ -278,7 +282,7 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 	zbx_snprintf(cmd, sizeof(cmd), "QUIT\r\n");
 	if (-1 == write(s.socket, cmd, strlen(cmd)))
 	{
-		zbx_snprintf(error, max_error_len, "Error sending QUIT to mailserver [%s]", strerror(errno));
+		zbx_snprintf(error, max_error_len, "error sending QUIT to mailserver: %s", zbx_strerror(errno));
 		goto out;
 	}
 

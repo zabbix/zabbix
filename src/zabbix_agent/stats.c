@@ -177,7 +177,7 @@ void	init_collector_data()
 
 	if ((void *)(-1) == (collector = shmat(shm_id, NULL, 0)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot attach shared memory for collector [%s]", strerror(errno));
+		zabbix_log(LOG_LEVEL_CRIT, "cannot attach shared memory for collector: %s", zbx_strerror(errno));
 		exit(FAIL);
 	}
 
@@ -217,7 +217,7 @@ void	free_collector_data()
 		return;
 
 	if (-1 == shmctl(shm_id, IPC_RMID, 0))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot remove shared memory for collector [%s]", strerror(errno));
+		zabbix_log(LOG_LEVEL_WARNING, "cannot remove shared memory for collector: %s", zbx_strerror(errno));
 
 #endif	/* _WINDOWS */
 

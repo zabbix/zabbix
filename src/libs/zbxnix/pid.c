@@ -47,17 +47,17 @@ int	create_pid_file(const char *pidfile)
 		if (-1 == (fd = open(pidfile, O_WRONLY | O_APPEND)))
 #else
 		if (-1 == (fd = open(pidfile, O_APPEND)))
-#endif /* HAVE_FCNTL_H */
+#endif
 		{
-			zbx_error("cannot open PID file [%s] [%s]", pidfile, strerror(errno));
-			zabbix_log(LOG_LEVEL_CRIT, "cannot open PID file [%s] [%s]", pidfile, strerror(errno));
+			zbx_error("cannot open PID file [%s]: %s", pidfile, zbx_strerror(errno));
+			zabbix_log(LOG_LEVEL_CRIT, "cannot open PID file [%s]: %s", pidfile, zbx_strerror(errno));
 			return FAIL;
 		}
 #ifdef HAVE_FCNTL_H
 		if (-1 == fcntl(fd, F_SETLK, &fl) && EAGAIN == errno)
 #else
 		if (-1 == flock(fd, LOCK_EX | LOCK_NB) && EWOULDBLOCK == errno)
-#endif /* HAVE_FCNTL_H */
+#endif
 		{
 			close(fd);
 			zbx_error("File [%s] exists and is locked. Is this process already running?", pidfile);
@@ -71,8 +71,8 @@ int	create_pid_file(const char *pidfile)
 	/* open pid file */
 	if (NULL == (fpid = fopen(pidfile, "w")))
 	{
-		zbx_error("cannot create PID file [%s] [%s]", pidfile, strerror(errno));
-		zabbix_log(LOG_LEVEL_CRIT, "cannot create PID file [%s] [%s]", pidfile, strerror(errno));
+		zbx_error("cannot create PID file [%s]: %s", pidfile, zbx_strerror(errno));
+		zabbix_log(LOG_LEVEL_CRIT, "cannot create PID file [%s]: %s", pidfile, zbx_strerror(errno));
 		return FAIL;
 	}
 
@@ -87,7 +87,7 @@ int	create_pid_file(const char *pidfile)
 #else
 	if (-1 != fdpid)
 		flock(fdpid, LOCK_EX);
-#endif /* HAVE_FCNTL_H */
+#endif
 
 	/* write pid to file */
 	fprintf(fpid, "%li", zbx_get_thread_id());
@@ -106,7 +106,7 @@ void	drop_pid_file(const char *pidfile)
 	fl.l_start = 0;
 	fl.l_len = 0;
 	fl.l_pid = zbx_get_thread_id();
-#endif /* HAVE_FCNTL_H */
+#endif
 
 	/* unlock file */
 #ifdef HAVE_FCNTL_H
@@ -115,7 +115,7 @@ void	drop_pid_file(const char *pidfile)
 #else
 	if (-1 != fdpid)
 		flock(fdpid, LOCK_UN);
-#endif /* HAVE_FCNTL_H */
+#endif
 
 	/* close pid file */
 	zbx_fclose(fpid);
