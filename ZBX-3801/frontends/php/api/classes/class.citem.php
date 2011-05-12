@@ -1249,8 +1249,6 @@ COpt::memoryPick();
 					$newItem['applications'] = get_same_applications_for_host($item['applications'], $host['hostid']);
 				}
 //--
-
-
 				if($exItem){
 					$newItem['itemid'] = $exItem['itemid'];
 					$inheritedItems[] = $newItem;
