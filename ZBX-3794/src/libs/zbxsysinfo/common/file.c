@@ -22,7 +22,18 @@
 #include "md5.h"
 #include "file.h"
 
-#define ZBX_MAX_FILE_SIZE	(64 * ZBX_MEBIBYTE)	/* maximum file size for regexp and checksum operations */
+#define ZBX_INIT_TO	double ts = zbx_time();
+
+#define ZBX_CHK_TO				\
+						\
+do						\
+{						\
+	if (CONFIG_TIMEOUT < (zbx_time() - ts))	\
+		return SYSINFO_RET_FAIL;	\
+}						\
+while (0)
+
+extern int CONFIG_TIMEOUT;
 
 int	VFS_FILE_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
@@ -97,7 +108,9 @@ int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	char		filename[MAX_STRING_LEN], regexp[MAX_STRING_LEN], encoding[32];
 	char		buf[MAX_BUFFER_LEN], *utf8;
 	int		f, nbytes, flen, len;
-	struct stat	buf_stat;
+
+	/* mind the timeout */
+	ZBX_INIT_TO;
 
 	if (3 < num_param(param))
 		return SYSINFO_RET_FAIL;
@@ -113,22 +126,18 @@ int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	zbx_strupper(encoding);
 
-	if (0 != zbx_stat(filename, &buf_stat) || ZBX_MAX_FILE_SIZE < buf_stat.st_size)
-		return SYSINFO_RET_FAIL;
-
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
 		return SYSINFO_RET_FAIL;
+
+	/* mind the timeout */
+	ZBX_CHK_TO;
 
 	flen = 0;
 
 	while (0 < (nbytes = zbx_read(f, buf, sizeof(buf), encoding)))
 	{
-		/* mind size limit if reading from a non-regular file */
-		if (ZBX_MAX_FILE_SIZE < (flen += nbytes))
-		{
-			close(f);
-			return SYSINFO_RET_FAIL;
-		}
+		/* mind the timeout */
+		ZBX_CHK_TO;
 
 		utf8 = convert_to_utf8(buf, nbytes, encoding);
 		if (NULL != zbx_regexp_match(utf8, regexp, &len))
@@ -156,7 +165,9 @@ int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_
 	char		filename[MAX_STRING_LEN], regexp[MAX_STRING_LEN], encoding[32];
 	char		buf[MAX_BUFFER_LEN], *utf8;
 	int		f, nbytes, flen, len, res;
-	struct stat	buf_stat;
+
+	/* mind the timeout */
+	ZBX_INIT_TO;
 
 	if (3 < num_param(param))
 		return SYSINFO_RET_FAIL;
@@ -172,22 +183,18 @@ int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_
 
 	zbx_strupper(encoding);
 
-	if (0 != zbx_stat(filename, &buf_stat) || ZBX_MAX_FILE_SIZE < buf_stat.st_size)
-		return SYSINFO_RET_FAIL;
-
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
 		return SYSINFO_RET_FAIL;
+
+	/* mind the timeout */
+	ZBX_CHK_TO;
 
 	res = flen = 0;
 
 	while (0 == res && 0 < (nbytes = zbx_read(f, buf, sizeof(buf), encoding)))
 	{
-		/* mind size limit if reading from a non-regular file */
-		if (ZBX_MAX_FILE_SIZE < (flen += nbytes))
-		{
-			close(f);
-			return SYSINFO_RET_FAIL;
-		}
+		/* mind the timeout */
+		ZBX_CHK_TO;
 
 		utf8 = convert_to_utf8(buf, nbytes, encoding);
 		if (NULL != zbx_regexp_match(utf8, regexp, &len))
@@ -209,12 +216,14 @@ int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 {
 	char		filename[MAX_STRING_LEN];
 	int		f, i, nbytes, flen;
-	struct stat	buf_stat;
 	md5_state_t	state;
 	u_char		buf[16 * ZBX_KIBIBYTE];
 	char		*hash_text = NULL;
 	size_t		sz;
 	md5_byte_t	hash[MD5_DIGEST_SIZE];
+
+	/* mind the timeout */
+	ZBX_INIT_TO;
 
 	if (1 < num_param(param))
 		return SYSINFO_RET_FAIL;
@@ -222,11 +231,11 @@ int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	if (0 != get_param(param, 1, filename, sizeof(filename)))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != zbx_stat(filename, &buf_stat) || ZBX_MAX_FILE_SIZE < buf_stat.st_size)
-		return SYSINFO_RET_FAIL;
-
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
 		return SYSINFO_RET_FAIL;
+
+	/* mind the timeout */
+	ZBX_CHK_TO;
 
 	md5_init(&state);
 
@@ -234,12 +243,8 @@ int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	while (0 < (nbytes = (int)read(f, buf, sizeof(buf))))
 	{
-		/* mind size limit if reading from a non-regular file */
-		if (ZBX_MAX_FILE_SIZE < (flen += nbytes))
-		{
-			close(f);
-			return SYSINFO_RET_FAIL;
-		}
+		/* mind the timeout */
+		ZBX_CHK_TO;
 
 		md5_append(&state, (const md5_byte_t *)buf, nbytes);
 	}
@@ -334,8 +339,10 @@ int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	uint32_t	crc, flen;
 	u_char		buf[16 * ZBX_KIBIBYTE];
 	u_long		cval;
-	struct stat	buf_stat;
 	int		f;
+
+	/* mind the timeout */
+	ZBX_INIT_TO;
 
 	if (1 < num_param(param))
 		return SYSINFO_RET_FAIL;
@@ -343,22 +350,18 @@ int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	if (0 != get_param(param, 1, filename, sizeof(filename)))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != zbx_stat(filename, &buf_stat) || ZBX_MAX_FILE_SIZE < buf_stat.st_size)
-		return SYSINFO_RET_FAIL;
-
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
 		return SYSINFO_RET_FAIL;
+
+	/* mind the timeout */
+	ZBX_CHK_TO;
 
 	crc = flen = 0;
 
 	while (0 < (nr = (int)read(f, buf, sizeof(buf))))
 	{
-		/* mind size limit if reading from a non-regular file */
-		if (ZBX_MAX_FILE_SIZE < (flen += nr))
-		{
-			close(f);
-			return SYSINFO_RET_FAIL;
-		}
+		/* mind the timeout */
+		ZBX_CHK_TO;
 
 		for (i = 0; i < nr; i++)
 			crc = (crc << 8) ^ crctab[((crc >> 24) ^ buf[i]) & 0xff];
