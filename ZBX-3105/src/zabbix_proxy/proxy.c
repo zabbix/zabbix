@@ -196,7 +196,7 @@ ZBX_MUTEX	node_sync_access;
  * Comments: will terminate process if parsing fails                          *
  *                                                                            *
  ******************************************************************************/
-static void	init_config()
+static void	zbx_load_config()
 {
 	AGENT_RESULT	result;
 	char		**value = NULL;
@@ -441,7 +441,7 @@ int	main(int argc, char **argv)
 	/* Required for simple checks */
 	init_metrics();
 
-	init_config();
+	zbx_load_config();
 
 #ifdef HAVE_OPENIPMI
 	init_ipmi_handler();

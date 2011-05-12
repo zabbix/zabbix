@@ -94,7 +94,7 @@ static void	send_alerts()
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	init_config()
+static void	zbx_load_config()
 {
 	const char	*__function_name = "init_config";
 
@@ -208,7 +208,7 @@ void	main_watchdog_loop()
 
 	zbx_setproctitle("%s [initializing]", get_process_type_string(process_type));
 
-	init_config();
+	zbx_load_config();
 
 	DBclose();
 

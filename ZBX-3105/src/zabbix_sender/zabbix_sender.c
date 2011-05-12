@@ -231,7 +231,7 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	zbx_thread_exit(ret);
 }
 
-static void    init_config(const char* config_file)
+static void    zbx_load_config(const char* config_file)
 {
 	char*	config_source_ip_from_conf = NULL;
 	char*	zabbix_server_from_conf = NULL;
@@ -390,7 +390,7 @@ int main(int argc, char **argv)
 
 	task = parse_commandline(argc, argv);
 
-	init_config(CONFIG_FILE);
+	zbx_load_config(CONFIG_FILE);
 
 	zabbix_open_log(LOG_TYPE_UNDEFINED, CONFIG_LOG_LEVEL, NULL);
 

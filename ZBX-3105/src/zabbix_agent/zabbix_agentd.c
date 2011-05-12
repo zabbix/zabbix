@@ -267,7 +267,7 @@ static void	set_defaults()
 
 /******************************************************************************
  *                                                                            *
- * Function: load_config                                                      *
+ * Function: zbx_load_config                                                  *
  *                                                                            *
  * Purpose: load configuration from config file                               *
  *                                                                            *
@@ -278,7 +278,7 @@ static void	set_defaults()
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	load_config()
+static void	zbx_load_config()
 {
 	struct cfg_line	cfg[] =
 	{
@@ -566,11 +566,11 @@ int	main(int argc, char **argv)
 		exit(FAIL);
 	}
 
-	/* this is needed to set default hostname in load_config() */
+	/* this is needed to set default hostname in zbx_load_config() */
 	init_metrics();
 
 	/* load configuration */
-	load_config();
+	zbx_load_config();
 
 	validate_config();
 

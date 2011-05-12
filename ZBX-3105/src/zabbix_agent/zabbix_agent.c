@@ -73,7 +73,7 @@ static char	DEFAULT_CONFIG_FILE[] = "/etc/zabbix/zabbix_agent.conf";
 
 /******************************************************************************
  *                                                                            *
- * Function: load_config                                                      *
+ * Function: zbx_load_config                                                  *
  *                                                                            *
  * Purpose: load configuration from config file                               *
  *                                                                            *
@@ -86,7 +86,7 @@ static char	DEFAULT_CONFIG_FILE[] = "/etc/zabbix/zabbix_agent.conf";
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	load_config()
+static void	zbx_load_config()
 {
 	struct cfg_line	cfg[] =
 	{
@@ -189,7 +189,7 @@ int	main(int argc, char **argv)
 		CONFIG_FILE = DEFAULT_CONFIG_FILE;
 
 	/* load configuration */
-	load_config();
+	zbx_load_config();
 
 	/* metrics should be initialized befor loading user parameters */
 	init_metrics();
