@@ -338,11 +338,10 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...)
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 
 	char	title[MAX_STRING_LEN];
-
 	va_list args;
 
 	va_start(args, fmt);
-	vsnprintf(title, MAX_STRING_LEN - 1, fmt, args);
+	zbx_vsnprintf(title, sizeof(title), fmt, args);
 	va_end(args);
 
 	setproctitle(title);
@@ -2348,7 +2347,7 @@ int	calculate_sleeptime(int nextcheck, int max_sleeptime)
 	if (FAIL == nextcheck)
 		return max_sleeptime;
 
-	sleeptime = nextcheck - time(NULL);
+	sleeptime = nextcheck - (int)time(NULL);
 
 	if (sleeptime < 0)
 		return 0;

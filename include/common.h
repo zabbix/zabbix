@@ -89,27 +89,32 @@
 #endif
 
 #ifdef snprintf
-#undef snprintf
+#	undef snprintf
 #endif
 #define snprintf	ERROR_DO_NOT_USE_SNPRINTF_FUNCTION_TRY_TO_USE_ZBX_SNPRINTF
 
 #ifdef sprintf
-#undef sprintf
+#	undef sprintf
 #endif
 #define sprintf		ERROR_DO_NOT_USE_SPRINTF_FUNCTION_TRY_TO_USE_ZBX_SNPRINTF
 
 #ifdef strncpy
-#undef strncpy
+#	undef strncpy
 #endif
 #define strncpy		ERROR_DO_NOT_USE_STRNCPY_FUNCTION_TRY_TO_USE_ZBX_STRLCPY
 
-#ifdef vsprintf
-#undef vsprintf
+#ifdef strcpy
+#	undef strcpy
 #endif
-#define vsprintf	ERROR_DO_NOT_USE_VSPRINTF_FUNCTION_TRY_TO_USE_VSNPRINTF
+#define strcpy		ERROR_DO_NOT_USE_STRCPY_FUNCTION_TRY_TO_USE_ZBX_STRLCPY
+
+#ifdef vsprintf
+#	undef vsprintf
+#endif
+#define vsprintf	ERROR_DO_NOT_USE_VSPRINTF_FUNCTION_TRY_TO_USE_ZBX_VSNPRINTF
 
 #ifdef strncat
-#undef strncat
+#	undef strncat
 #endif
 #define strncat		ERROR_DO_NOT_USE_STRNCAT_FUNCTION_TRY_TO_USE_ZBX_STRLCAT
 
@@ -832,34 +837,27 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 #define SEC_PER_WEEK		(7 * SEC_PER_DAY)
 #define SEC_PER_MONTH		(30 * SEC_PER_DAY)
 #define SEC_PER_YEAR		(365 * SEC_PER_DAY)
-#define ZBX_JAN_1970_IN_SEC	2208988800.0        /* 1970 - 1900 in seconds */
+#define ZBX_JAN_1970_IN_SEC	2208988800.0	/* 1970 - 1900 in seconds */
 double	zbx_time();
 void	zbx_timespec(zbx_timespec_t *ts);
 double	zbx_current_time();
 
 #ifdef HAVE___VA_ARGS__
 #	define zbx_error(fmt, ...) __zbx_zbx_error(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#	define zbx_snprintf(str, count, fmt, ...) __zbx_zbx_snprintf(str, count, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#	define zbx_snprintf_alloc(str, alloc_len, offset, max_len, fmt, ...) \
+       			__zbx_zbx_snprintf_alloc(str, alloc_len, offset, max_len, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
 #else
 #	define zbx_error __zbx_zbx_error
-#endif /* HAVE___VA_ARGS__ */
-void	__zbx_zbx_error(const char *fmt, ...);
-
-#ifdef HAVE___VA_ARGS__
-#	define zbx_snprintf(str, count, fmt, ...) __zbx_zbx_snprintf(str, count, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#else
 #	define zbx_snprintf __zbx_zbx_snprintf
-#endif /* HAVE___VA_ARGS__ */
-int	__zbx_zbx_snprintf(char* str, size_t count, const char *fmt, ...);
-
-int	zbx_vsnprintf(char* str, size_t count, const char *fmt, va_list args);
-
-#ifdef HAVE___VA_ARGS__
-#	define zbx_snprintf_alloc(str, alloc_len, offset, max_len, fmt, ...) \
-       		__zbx_zbx_snprintf_alloc(str, alloc_len, offset, max_len, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#else
 #	define zbx_snprintf_alloc __zbx_zbx_snprintf_alloc
-#endif /* HAVE___VA_ARGS__ */
+#endif
+void	__zbx_zbx_error(const char *fmt, ...);
+int	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...);
 void	__zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_len, const char *fmt, ...);
+
+int	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args);
+
 void	zbx_strcpy_alloc(char **str, int *alloc_len, int *offset, const char *src);
 void	zbx_chrcpy_alloc(char **str, int *alloc_len, int *offset, const char src);
 
@@ -872,18 +870,13 @@ char	*zbx_dvsprintf(char *dest, const char *f, va_list args);
 
 #ifdef HAVE___VA_ARGS__
 #	define zbx_dsprintf(dest, fmt, ...) __zbx_zbx_dsprintf(dest, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#else
-#	define zbx_dsprintf __zbx_zbx_dsprintf
-#endif /* HAVE___VA_ARGS__ */
-char	*__zbx_zbx_dsprintf(char *dest, const char *f, ...);
-
-char	*zbx_strdcat(char *dest, const char *src);
-
-#ifdef HAVE___VA_ARGS__
 #	define zbx_strdcatf(dest, fmt, ...) __zbx_zbx_strdcatf(dest, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
 #else
+#	define zbx_dsprintf __zbx_zbx_dsprintf
 #	define zbx_strdcatf __zbx_zbx_strdcatf
-#endif /* HAVE___VA_ARGS__ */
+#endif
+char	*__zbx_zbx_dsprintf(char *dest, const char *f, ...);
+char	*zbx_strdcat(char *dest, const char *src);
 char	* __zbx_zbx_strdcatf(char *dest, const char *f, ...);
 
 int	xml_get_data_dyn(const char *xml, const char *tag, char **data);
@@ -893,7 +886,7 @@ int	comms_parse_response(char *xml, char *host, int host_len, char *key, int key
 		char *lastlogsize, int lastlogsize_len, char *timestamp, int timestamp_len,
 		char *source, int source_len, char *severity, int severity_len);
 
-int 	parse_command(const char *command, char *cmd, int cmd_max_len, char *param, int param_max_len);
+int 	parse_command(const char *command, char *cmd, size_t cmd_max_len, char *param, size_t param_max_len);
 
 typedef struct
 {
@@ -927,10 +920,12 @@ int	get_nodeid_by_id(zbx_uint64_t id);
 int	int_in_list(char *list, int value);
 int	uint64_in_list(char *list, zbx_uint64_t value);
 int	ip_in_list(char *list, char *ip);
+
 #ifdef HAVE_IPV6
 int	expand_ipv6(const char *ip, char *str, size_t str_len);
 char	*collapse_ipv6(char *str, size_t str_len);
-#endif /* HAVE_IPV6 */
+#endif
+
 /* time related functions */
 double	time_diff(struct timeval *from, struct timeval *to);
 char	*zbx_age2str(int age);

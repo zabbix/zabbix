@@ -696,7 +696,7 @@ static int	DBget_service_status(zbx_uint64_t serviceid, int algorithm, zbx_uint6
 
 	if (SERVICE_ALGORITHM_MAX == algorithm || SERVICE_ALGORITHM_MIN == algorithm)
 	{
-		strcpy(sort_order, (SERVICE_ALGORITHM_MAX == algorithm ? "desc" : "asc"));
+		zbx_strlcpy(sort_order, (SERVICE_ALGORITHM_MAX == algorithm ? "desc" : "asc"), sizeof(sort_order));
 
 		zbx_snprintf(sql, sizeof(sql), "select s.status"
 						" from services s,services_links l"

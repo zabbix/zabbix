@@ -162,31 +162,31 @@ int	daemon_start(int allow_root)
 
 		if (-1 == setgid(pwd->pw_gid))
 		{
-			zbx_error("cannot setgid to %s [%s]", user, strerror(errno));
+			zbx_error("cannot setgid to %s: %s", user, zbx_strerror(errno));
 			exit(FAIL);
 		}
 
 #ifdef HAVE_FUNCTION_INITGROUPS
 		if (-1 == initgroups(user, pwd->pw_gid))
 		{
-			zbx_error("cannot initgroups to %s [%s]", user, strerror(errno));
+			zbx_error("cannot initgroups to %s: %s", user, zbx_strerror(errno));
 			exit(FAIL);
 		}
-#endif /* HAVE_FUNCTION_INITGROUPS */
+#endif
 
 		if (-1 == setuid(pwd->pw_uid))
 		{
-			zbx_error("cannot setuid to %s [%s]", user, strerror(errno));
+			zbx_error("cannot setuid to %s: %s", user, zbx_strerror(errno));
 			exit(FAIL);
 		}
 
 #ifdef HAVE_FUNCTION_SETEUID
 		if (-1 == setegid(pwd->pw_gid) || -1 == seteuid(pwd->pw_uid))
 		{
-			zbx_error("cannot setegid or seteuid to %s [%s]", user, strerror(errno));
+			zbx_error("cannot setegid or seteuid to %s: %s", user, zbx_strerror(errno));
 			exit(FAIL);
 		}
-#endif /* HAVE_FUNCTION_SETEUID */
+#endif
 	}
 
 	if (0 != (pid = zbx_fork()))
@@ -199,7 +199,7 @@ int	daemon_start(int allow_root)
 	if (0 != (pid = zbx_fork()))
 		exit(0);
 
-	if (-1 == chdir("/")) /* this is to eliminate warning: ignoring return value of chdir */
+	if (-1 == chdir("/"))	/* this is to eliminate warning: ignoring return value of chdir */
 		assert(0);
 
 	umask(0002);
@@ -209,7 +209,7 @@ int	daemon_start(int allow_root)
 #ifdef HAVE_SYS_RESOURCE_SETPRIORITY
 	if (0 != setpriority(PRIO_PROCESS, 0, 5))
 		zbx_error("Unable to set process priority to 5. Leaving default.");
-#endif /* HAVE_SYS_RESOURCE_SETPRIORITY */
+#endif
 
 	if (FAIL == create_pid_file(CONFIG_PID_FILE))
 		exit(FAIL);

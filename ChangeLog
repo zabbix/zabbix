@@ -140,6 +140,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.6rc1
 
+ - [ZBX-3747] replaced strcpy() and vsnprintf() calls with safer ones and strerror() with zbx_strerror() which also prints the error code (rudolfs)
  - [ZBX-3760] fixed the CPU collector for processing the non-contiguous CPU IDs (Sasha)
  - [ZBX-3796] select a graph with the same name if it exists when changing host in monitoring -> graphs (KB)
  - [ZBX-3776] treat duplicate UserParameter as error (dimir)
