@@ -77,9 +77,9 @@ ZBX_DC_IDS		*ids = NULL;
 
 typedef union
 {
-	double		value_float;
-	zbx_uint64_t	value_uint64;
-	char		*value_str;
+	double		dbl;
+	zbx_uint64_t	u64;
+	char		*str;
 }
 history_value_t;
 
@@ -185,7 +185,7 @@ void	*DCget_stats(int request)
 					|| cache->history[index].value_type == ITEM_VALUE_TYPE_TEXT
 					|| cache->history[index].value_type == ITEM_VALUE_TYPE_LOG)
 			{
-				first_text = cache->history[index].value_orig.value_str;
+				first_text = cache->history[index].value_orig.str;
 				break;
 			}
 		}
@@ -446,49 +446,49 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 
 			if (value_type == ITEM_VALUE_TYPE_FLOAT)
 			{
-				value_min.value_float = atof(row[2]);
-				value_avg.value_float = atof(row[3]);
-				value_max.value_float = atof(row[4]);
+				value_min.dbl = atof(row[2]);
+				value_avg.dbl = atof(row[3]);
+				value_max.dbl = atof(row[4]);
 
-				if (value_min.value_float < trend->value_min.value_float)
-					trend->value_min.value_float = value_min.value_float;
-				if (value_max.value_float > trend->value_max.value_float)
-					trend->value_max.value_float = value_max.value_float;
-				trend->value_avg.value_float = (trend->num * trend->value_avg.value_float
-						+ num * value_avg.value_float) / (trend->num + num);
+				if (value_min.dbl < trend->value_min.dbl)
+					trend->value_min.dbl = value_min.dbl;
+				if (value_max.dbl > trend->value_max.dbl)
+					trend->value_max.dbl = value_max.dbl;
+				trend->value_avg.dbl = (trend->num * trend->value_avg.dbl
+						+ num * value_avg.dbl) / (trend->num + num);
 				trend->num += num;
 
 				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 						"update trends set num=%d,value_min=" ZBX_FS_DBL ",value_avg=" ZBX_FS_DBL
 						",value_max=" ZBX_FS_DBL " where itemid=" ZBX_FS_UI64 " and clock=%d;\n",
 						trend->num,
-						trend->value_min.value_float,
-						trend->value_avg.value_float,
-						trend->value_max.value_float,
+						trend->value_min.dbl,
+						trend->value_avg.dbl,
+						trend->value_max.dbl,
 						trend->itemid,
 						trend->clock);
 			}
 			else
 			{
-				ZBX_STR2UINT64(value_min.value_uint64, row[2]);
-				ZBX_STR2UINT64(value_avg.value_uint64, row[3]);
-				ZBX_STR2UINT64(value_max.value_uint64, row[4]);
+				ZBX_STR2UINT64(value_min.u64, row[2]);
+				ZBX_STR2UINT64(value_avg.u64, row[3]);
+				ZBX_STR2UINT64(value_max.u64, row[4]);
 
-				if (value_min.value_uint64 < trend->value_min.value_uint64)
-					trend->value_min.value_uint64 = value_min.value_uint64;
-				if (value_max.value_uint64 > trend->value_max.value_uint64)
-					trend->value_max.value_uint64 = value_max.value_uint64;
-				trend->value_avg.value_uint64 = (trend->num * trend->value_avg.value_uint64
-						+ num * value_avg.value_uint64) / (trend->num + num);
+				if (value_min.u64 < trend->value_min.u64)
+					trend->value_min.u64 = value_min.u64;
+				if (value_max.u64 > trend->value_max.u64)
+					trend->value_max.u64 = value_max.u64;
+				trend->value_avg.u64 = (trend->num * trend->value_avg.u64
+						+ num * value_avg.u64) / (trend->num + num);
 				trend->num += num;
 
 				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 						"update trends_uint set num=%d,value_min=" ZBX_FS_UI64 ",value_avg=" ZBX_FS_UI64
 						",value_max=" ZBX_FS_UI64 " where itemid=" ZBX_FS_UI64 " and clock=%d;\n",
 						trend->num,
-						trend->value_min.value_uint64,
-						trend->value_avg.value_uint64,
-						trend->value_max.value_uint64,
+						trend->value_min.u64,
+						trend->value_avg.u64,
+						trend->value_max.u64,
 						trend->itemid,
 						trend->clock);
 			}
@@ -564,9 +564,9 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 					trend->itemid,
 					trend->clock,
 					trend->num,
-					trend->value_min.value_float,
-					trend->value_avg.value_float,
-					trend->value_max.value_float);
+					trend->value_min.dbl,
+					trend->value_avg.dbl,
+					trend->value_max.dbl);
 #else
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 					"insert into trends (itemid,clock,num,value_min,value_avg,value_max)"
@@ -574,9 +574,9 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 					trend->itemid,
 					trend->clock,
 					trend->num,
-					trend->value_min.value_float,
-					trend->value_avg.value_float,
-					trend->value_max.value_float);
+					trend->value_min.dbl,
+					trend->value_avg.dbl,
+					trend->value_max.dbl);
 #endif
 			trend->itemid = 0;
 
@@ -612,9 +612,9 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 					trend->itemid,
 					trend->clock,
 					trend->num,
-					trend->value_min.value_uint64,
-					trend->value_avg.value_uint64,
-					trend->value_max.value_uint64);
+					trend->value_min.u64,
+					trend->value_avg.u64,
+					trend->value_max.u64);
 #else
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 256,
 					"insert into trends_uint (itemid,clock,num,value_min,value_avg,value_max)"
@@ -622,9 +622,9 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 					trend->itemid,
 					trend->clock,
 					trend->num,
-					trend->value_min.value_uint64,
-					trend->value_avg.value_uint64,
-					trend->value_max.value_uint64);
+					trend->value_min.u64,
+					trend->value_avg.u64,
+					trend->value_max.u64);
 #endif
 			trend->itemid = 0;
 
@@ -723,20 +723,20 @@ static void	DCadd_trend(ZBX_DC_HISTORY *history, ZBX_DC_TREND **trends, int *tre
 	switch (trend->value_type)
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
-			if (trend->num == 0 || history->value.value_float < trend->value_min.value_float)
-				trend->value_min.value_float = history->value.value_float;
-			if (trend->num == 0 || history->value.value_float > trend->value_max.value_float)
-				trend->value_max.value_float = history->value.value_float;
-			trend->value_avg.value_float = (trend->num * trend->value_avg.value_float
-				+ history->value.value_float) / (trend->num + 1);
+			if (trend->num == 0 || history->value.dbl < trend->value_min.dbl)
+				trend->value_min.dbl = history->value.dbl;
+			if (trend->num == 0 || history->value.dbl > trend->value_max.dbl)
+				trend->value_max.dbl = history->value.dbl;
+			trend->value_avg.dbl = (trend->num * trend->value_avg.dbl
+				+ history->value.dbl) / (trend->num + 1);
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
-			if (trend->num == 0 || history->value.value_uint64 < trend->value_min.value_uint64)
-				trend->value_min.value_uint64 = history->value.value_uint64;
-			if (trend->num == 0 || history->value.value_uint64 > trend->value_max.value_uint64)
-				trend->value_max.value_uint64 = history->value.value_uint64;
-			trend->value_avg.value_uint64 = (trend->num * trend->value_avg.value_uint64
-				+ history->value.value_uint64) / (trend->num + 1);
+			if (trend->num == 0 || history->value.u64 < trend->value_min.u64)
+				trend->value_min.u64 = history->value.u64;
+			if (trend->num == 0 || history->value.u64 > trend->value_max.u64)
+				trend->value_max.u64 = history->value.u64;
+			trend->value_avg.u64 = (trend->num * trend->value_avg.u64
+				+ history->value.u64) / (trend->num + 1);
 			break;
 	}
 	trend->num++;
@@ -1112,13 +1112,13 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 		case ITEM_VALUE_TYPE_FLOAT:
 			switch (item.delta) {
 			case ITEM_STORE_AS_IS:
-				h->value.value_float = DBmultiply_value_float(&item, h->value_orig.value_float);
+				h->value.dbl = DBmultiply_value_float(&item, h->value_orig.dbl);
 
-				if (SUCCEED == DBchk_double(h->value.value_float))
+				if (SUCCEED == DBchk_double(h->value.dbl))
 				{
 					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 							",prevvalue=lastvalue,prevorgvalue=NULL,lastvalue='" ZBX_FS_DBL "'",
-							h->value.value_float);
+							h->value.dbl);
 				}
 				else
 				{
@@ -1127,24 +1127,24 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 				}
 				break;
 			case ITEM_STORE_SPEED_PER_SECOND:
-				if (item.prevorgvalue_null == 0 && item.prevorgvalue_dbl <= h->value_orig.value_float && item.lastclock < h->clock)
+				if (item.prevorgvalue_null == 0 && item.prevorgvalue_dbl <= h->value_orig.dbl && item.lastclock < h->clock)
 				{
-					h->value.value_float = (h->value_orig.value_float - item.prevorgvalue_dbl) / (h->clock - item.lastclock);
-					h->value.value_float = DBmultiply_value_float(&item, h->value.value_float);
+					h->value.dbl = (h->value_orig.dbl - item.prevorgvalue_dbl) / (h->clock - item.lastclock);
+					h->value.dbl = DBmultiply_value_float(&item, h->value.dbl);
 
-					if (SUCCEED == DBchk_double(h->value.value_float))
+					if (SUCCEED == DBchk_double(h->value.dbl))
 					{
 						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 								",prevvalue=lastvalue,prevorgvalue='" ZBX_FS_DBL "'"
 								",lastvalue='" ZBX_FS_DBL "'",
-								h->value_orig.value_float,
-								h->value.value_float);
+								h->value_orig.dbl,
+								h->value.dbl);
 					}
 					else
 					{
 						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 								",prevorgvalue='" ZBX_FS_DBL "'",
-								h->value_orig.value_float);
+								h->value_orig.dbl);
 						status = ITEM_STATUS_NOTSUPPORTED;
 						h->value_null = 1;
 					}
@@ -1153,29 +1153,29 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 				{
 					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 							",prevorgvalue='" ZBX_FS_DBL "'",
-							h->value_orig.value_float);
+							h->value_orig.dbl);
 					h->value_null = 1;
 				}
 				break;
 			case ITEM_STORE_SIMPLE_CHANGE:
-				if (item.prevorgvalue_null == 0 && item.prevorgvalue_dbl <= h->value_orig.value_float)
+				if (item.prevorgvalue_null == 0 && item.prevorgvalue_dbl <= h->value_orig.dbl)
 				{
-					h->value.value_float = h->value_orig.value_float - item.prevorgvalue_dbl;
-					h->value.value_float = DBmultiply_value_float(&item, h->value.value_float);
+					h->value.dbl = h->value_orig.dbl - item.prevorgvalue_dbl;
+					h->value.dbl = DBmultiply_value_float(&item, h->value.dbl);
 
-					if (SUCCEED == DBchk_double(h->value.value_float))
+					if (SUCCEED == DBchk_double(h->value.dbl))
 					{
 						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 								",prevvalue=lastvalue,prevorgvalue='" ZBX_FS_DBL "'"
 								",lastvalue='" ZBX_FS_DBL "'",
-								h->value_orig.value_float,
-								h->value.value_float);
+								h->value_orig.dbl,
+								h->value.dbl);
 					}
 					else
 					{
 						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 								",prevorgvalue='" ZBX_FS_DBL "'",
-								h->value_orig.value_float);
+								h->value_orig.dbl);
 						status = ITEM_STATUS_NOTSUPPORTED;
 						h->value_null = 1;
 					}
@@ -1184,7 +1184,7 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 				{
 					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 							",prevorgvalue='" ZBX_FS_DBL "'",
-							h->value_orig.value_float);
+							h->value_orig.dbl);
 					h->value_null = 1;
 				}
 				break;
@@ -1198,7 +1198,7 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 
 				message = zbx_dsprintf(message, "Type of received value"
 						" [" ZBX_FS_DBL "] is not suitable for value type [%s]",
-						h->value.value_float,
+						h->value.dbl,
 						zbx_item_value_type_string(h->value_type));
 
 				zabbix_log(LOG_LEVEL_WARNING, "Item [%s] error: %s", hostkey_name, message);
@@ -1215,46 +1215,46 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 		case ITEM_VALUE_TYPE_UINT64:
 			switch (item.delta) {
 			case ITEM_STORE_AS_IS:
-				h->value.value_uint64 = DBmultiply_value_uint64(&item, h->value_orig.value_uint64);
+				h->value.u64 = DBmultiply_value_uint64(&item, h->value_orig.u64);
 				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 						",prevvalue=lastvalue,prevorgvalue=NULL,lastvalue='" ZBX_FS_UI64 "'",
-						h->value.value_uint64);
+						h->value.u64);
 				break;
 			case ITEM_STORE_SPEED_PER_SECOND:
-				if (item.prevorgvalue_null == 0 && item.prevorgvalue_uint64 <= h->value_orig.value_uint64 && item.lastclock < h->clock)
+				if (item.prevorgvalue_null == 0 && item.prevorgvalue_uint64 <= h->value_orig.u64 && item.lastclock < h->clock)
 				{
-					h->value.value_uint64 = (h->value_orig.value_uint64 - item.prevorgvalue_uint64) / (h->clock - item.lastclock);
-					h->value.value_uint64 = DBmultiply_value_uint64(&item, h->value.value_uint64);
+					h->value.u64 = (h->value_orig.u64 - item.prevorgvalue_uint64) / (h->clock - item.lastclock);
+					h->value.u64 = DBmultiply_value_uint64(&item, h->value.u64);
 					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 							",prevvalue=lastvalue,prevorgvalue='" ZBX_FS_UI64 "'"
 							",lastvalue='" ZBX_FS_UI64 "'",
-							h->value_orig.value_uint64,
-							h->value.value_uint64);
+							h->value_orig.u64,
+							h->value.u64);
 				}
 				else
 				{
 					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 							",prevorgvalue='" ZBX_FS_UI64 "'",
-							h->value_orig.value_uint64);
+							h->value_orig.u64);
 					h->value_null = 1;
 				}
 				break;
 			case ITEM_STORE_SIMPLE_CHANGE:
-				if (item.prevorgvalue_null == 0 && item.prevorgvalue_uint64 <= h->value_orig.value_uint64)
+				if (item.prevorgvalue_null == 0 && item.prevorgvalue_uint64 <= h->value_orig.u64)
 				{
-					h->value.value_uint64 = h->value_orig.value_uint64 - item.prevorgvalue_uint64;
-					h->value.value_uint64 = DBmultiply_value_uint64(&item, h->value.value_uint64);
+					h->value.u64 = h->value_orig.u64 - item.prevorgvalue_uint64;
+					h->value.u64 = DBmultiply_value_uint64(&item, h->value.u64);
 					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 							",prevvalue=lastvalue,prevorgvalue='" ZBX_FS_UI64 "'"
 							",lastvalue='" ZBX_FS_UI64 "'",
-							h->value_orig.value_uint64,
-							h->value.value_uint64);
+							h->value_orig.u64,
+							h->value.u64);
 				}
 				else
 				{
 					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 							",prevorgvalue='" ZBX_FS_UI64 "'",
-							h->value_orig.value_uint64);
+							h->value_orig.u64);
 					h->value_null = 1;
 				}
 				break;
@@ -1262,14 +1262,14 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 			break;
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
-			value_esc = DBdyn_escape_string_len(h->value_orig.value_str, ITEM_LASTVALUE_LEN);
+			value_esc = DBdyn_escape_string_len(h->value_orig.str, ITEM_LASTVALUE_LEN);
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 576,
 					",prevvalue=lastvalue,lastvalue='%s'",
 					value_esc);
 			zbx_free(value_esc);
 			break;
 		case ITEM_VALUE_TYPE_LOG:
-			value_esc = DBdyn_escape_string_len(h->value_orig.value_str, ITEM_LASTVALUE_LEN);
+			value_esc = DBdyn_escape_string_len(h->value_orig.str, ITEM_LASTVALUE_LEN);
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 600,
 					",prevvalue=lastvalue,lastvalue='%s',lastlogsize=%d,mtime=%d",
 					value_esc,
@@ -1433,14 +1433,14 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 				"(" ZBX_FS_UI64 ",%d," ZBX_FS_DBL "),",
 				history[i].itemid,
 				history[i].clock,
-				history[i].value.value_float);
+				history[i].value.dbl);
 #else
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 				"insert into history (itemid,clock,value) values "
 				"(" ZBX_FS_UI64 ",%d," ZBX_FS_DBL ");\n",
 				history[i].itemid,
 				history[i].clock,
-				history[i].value.value_float);
+				history[i].value.dbl);
 #endif
 	}
 
@@ -1479,7 +1479,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 					get_nodeid_by_id(history[i].itemid),
 					history[i].itemid,
 					history[i].clock,
-					history[i].value.value_float);
+					history[i].value.dbl);
 #else
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 					"insert into history_sync (nodeid,itemid,clock,value) values "
@@ -1487,7 +1487,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 					get_nodeid_by_id(history[i].itemid),
 					history[i].itemid,
 					history[i].clock,
-					history[i].value.value_float);
+					history[i].value.dbl);
 #endif
 		}
 
@@ -1527,14 +1527,14 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 				"(" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 "),",
 				history[i].itemid,
 				history[i].clock,
-				history[i].value.value_uint64);
+				history[i].value.u64);
 #else
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 				"insert into history_uint (itemid,clock,value) values "
 				"(" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ");\n",
 				history[i].itemid,
 				history[i].clock,
-				history[i].value.value_uint64);
+				history[i].value.u64);
 #endif
 	}
 
@@ -1573,7 +1573,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 					get_nodeid_by_id(history[i].itemid),
 					history[i].itemid,
 					history[i].clock,
-					history[i].value.value_uint64);
+					history[i].value.u64);
 #else
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 					"insert into history_uint_sync (nodeid,itemid,clock,value) values "
@@ -1581,7 +1581,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 					get_nodeid_by_id(history[i].itemid),
 					history[i].itemid,
 					history[i].clock,
-					history[i].value.value_uint64);
+					history[i].value.u64);
 #endif
 		}
 
@@ -1616,7 +1616,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 		if (0 != history[i].value_null)
 			continue;
 
-		value_esc = DBdyn_escape_string_len(history[i].value_orig.value_str, HISTORY_STR_VALUE_LEN);
+		value_esc = DBdyn_escape_string_len(history[i].value_orig.str, HISTORY_STR_VALUE_LEN);
 #ifdef HAVE_MULTIROW_INSERT
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 				"(" ZBX_FS_UI64 ",%d,'%s'),",
@@ -1663,7 +1663,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 			if (0 != history[i].value_null)
 				continue;
 
-			value_esc = DBdyn_escape_string_len(history[i].value_orig.value_str, HISTORY_STR_VALUE_LEN);
+			value_esc = DBdyn_escape_string_len(history[i].value_orig.str, HISTORY_STR_VALUE_LEN);
 #ifdef HAVE_MULTIROW_INSERT
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 					"(%d," ZBX_FS_UI64 ",%d,'%s'),",
@@ -1727,7 +1727,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 			if (0 != history[i].value_null)
 				continue;
 
-			value_esc = DBdyn_escape_string(history[i].value_orig.value_str);
+			value_esc = DBdyn_escape_string(history[i].value_orig.str);
 #ifdef HAVE_MULTIROW_INSERT
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc),
 					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s'),",
@@ -1783,8 +1783,8 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 			if (0 != history[i].value_null)
 				continue;
 
-			source_esc = DBdyn_escape_string_len(history[i].value.value_str, HISTORY_LOG_SOURCE_LEN);
-			value_esc = DBdyn_escape_string(history[i].value_orig.value_str);
+			source_esc = DBdyn_escape_string_len(history[i].value.str, HISTORY_LOG_SOURCE_LEN);
+			value_esc = DBdyn_escape_string(history[i].value_orig.str);
 #ifdef HAVE_MULTIROW_INSERT
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc),
 					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,'%s',%d,'%s',%d),",
@@ -1880,14 +1880,14 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 					"(" ZBX_FS_UI64 ",%d,'" ZBX_FS_DBL "'),",
 					history[i].itemid,
 					history[i].clock,
-					history[i].value_orig.value_float);
+					history[i].value_orig.dbl);
 #else
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 					"insert into proxy_history (itemid,clock,value) values "
 					"(" ZBX_FS_UI64 ",%d,'" ZBX_FS_DBL "');\n",
 					history[i].itemid,
 					history[i].clock,
-					history[i].value_orig.value_float);
+					history[i].value_orig.dbl);
 #endif
 		}
 	}
@@ -1917,14 +1917,14 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 					"(" ZBX_FS_UI64 ",%d,'" ZBX_FS_UI64 "'),",
 					history[i].itemid,
 					history[i].clock,
-					history[i].value_orig.value_uint64);
+					history[i].value_orig.u64);
 #else
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 					"insert into proxy_history (itemid,clock,value) values "
 					"(" ZBX_FS_UI64 ",%d,'" ZBX_FS_UI64 "');\n",
 					history[i].itemid,
 					history[i].clock,
-					history[i].value_orig.value_uint64);
+					history[i].value_orig.u64);
 #endif
 		}
 	}
@@ -1949,7 +1949,7 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 	{
 		if (history[i].value_type == ITEM_VALUE_TYPE_STR)
 		{
-			value_esc = DBdyn_escape_string(history[i].value_orig.value_str);
+			value_esc = DBdyn_escape_string(history[i].value_orig.str);
 #ifdef HAVE_MULTIROW_INSERT
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 					"(" ZBX_FS_UI64 ",%d,'%s'),",
@@ -1988,7 +1988,7 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 	{
 		if (history[i].value_type == ITEM_VALUE_TYPE_TEXT)
 		{
-			value_esc = DBdyn_escape_string(history[i].value_orig.value_str);
+			value_esc = DBdyn_escape_string(history[i].value_orig.str);
 #ifdef HAVE_MULTIROW_INSERT
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc),
 					"(" ZBX_FS_UI64 ",%d,'%s'),",
@@ -2027,8 +2027,8 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 	{
 		if (history[i].value_type == ITEM_VALUE_TYPE_LOG)
 		{
-			source_esc = DBdyn_escape_string_len(history[i].value.value_str, HISTORY_LOG_SOURCE_LEN);
-			value_esc = DBdyn_escape_string(history[i].value_orig.value_str);
+			source_esc = DBdyn_escape_string_len(history[i].value.str, HISTORY_LOG_SOURCE_LEN);
+			value_esc = DBdyn_escape_string(history[i].value_orig.str);
 #ifdef HAVE_MULTIROW_INSERT
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc),
 					"(" ZBX_FS_UI64 ",%d,%d,'%s',%d,'%s',%d),",
@@ -2210,19 +2210,19 @@ int	DCsync_history(int sync_type)
 			switch (history[history_num].value_type)
 			{
 				case ITEM_VALUE_TYPE_LOG:
-					if (NULL != cache->history[f].value.value_str)
+					if (NULL != cache->history[f].value.str)
 					{
-						history[history_num].value.value_str =
-								zbx_strdup(NULL, cache->history[f].value.value_str);
-						cache->text_gap_num += strlen(cache->history[f].value.value_str) + 1;
+						history[history_num].value.str =
+								zbx_strdup(NULL, cache->history[f].value.str);
+						cache->text_gap_num += strlen(cache->history[f].value.str) + 1;
 					}
 					else
-						history[history_num].value.value_str = NULL;
+						history[history_num].value.str = NULL;
 				case ITEM_VALUE_TYPE_STR:
 				case ITEM_VALUE_TYPE_TEXT:
-					history[history_num].value_orig.value_str =
-							zbx_strdup(NULL, cache->history[f].value_orig.value_str);
-					cache->text_gap_num += strlen(cache->history[f].value_orig.value_str) + 1;
+					history[history_num].value_orig.str =
+							zbx_strdup(NULL, cache->history[f].value_orig.str);
+					cache->text_gap_num += strlen(cache->history[f].value_orig.str) + 1;
 					break;
 			}
 
@@ -2301,10 +2301,10 @@ int	DCsync_history(int sync_type)
 			switch (history[i].value_type)
 			{
 				case ITEM_VALUE_TYPE_LOG:
-					zbx_free(history[i].value.value_str);
+					zbx_free(history[i].value.str);
 				case ITEM_VALUE_TYPE_STR:
 				case ITEM_VALUE_TYPE_TEXT:
-					zbx_free(history[i].value_orig.value_str);
+					zbx_free(history[i].value_orig.str);
 					break;
 			}
 		}
@@ -2440,23 +2440,23 @@ static void	DCvacuum_text()
 				ITEM_VALUE_TYPE_TEXT == cache->history[f].value_type ||
 				ITEM_VALUE_TYPE_LOG == cache->history[f].value_type)
 		{
-			sz = strlen(cache->history[f].value_orig.value_str) + 1;
+			sz = strlen(cache->history[f].value_orig.str) + 1;
 
-			if (cache->last_text != cache->history[f].value_orig.value_str)
+			if (cache->last_text != cache->history[f].value_orig.str)
 			{
-				memmove(cache->last_text, cache->history[f].value_orig.value_str, sz);
-				cache->history[f].value_orig.value_str = cache->last_text;
+				memmove(cache->last_text, cache->history[f].value_orig.str, sz);
+				cache->history[f].value_orig.str = cache->last_text;
 			}
 			cache->last_text += sz;
 
-			if (ITEM_VALUE_TYPE_LOG == cache->history[f].value_type && NULL != cache->history[f].value.value_str)
+			if (ITEM_VALUE_TYPE_LOG == cache->history[f].value_type && NULL != cache->history[f].value.str)
 			{
-				sz = strlen(cache->history[f].value.value_str) + 1;
+				sz = strlen(cache->history[f].value.str) + 1;
 
-				if (cache->last_text != cache->history[f].value.value_str)
+				if (cache->last_text != cache->history[f].value.str)
 				{
-					memmove(cache->last_text, cache->history[f].value.value_str, sz);
-					cache->history[f].value.value_str = cache->last_text;
+					memmove(cache->last_text, cache->history[f].value.str, sz);
+					cache->history[f].value.str = cache->last_text;
 				}
 				cache->last_text += sz;
 			}
@@ -2570,8 +2570,8 @@ static void	DCadd_history(zbx_uint64_t itemid, double value_orig, int clock)
 	history->itemid			= itemid;
 	history->clock			= clock;
 	history->value_type		= ITEM_VALUE_TYPE_FLOAT;
-	history->value_orig.value_float	= value_orig;
-	history->value.value_float	= 0;
+	history->value_orig.dbl = value_orig;
+	history->value.dbl = 0;
 	history->value_null		= 0;
 	history->keep_history		= 0;
 	history->keep_trends		= 0;
@@ -2608,8 +2608,8 @@ static void	DCadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value_orig, int
 	history->itemid				= itemid;
 	history->clock				= clock;
 	history->value_type			= ITEM_VALUE_TYPE_UINT64;
-	history->value_orig.value_uint64	= value_orig;
-	history->value.value_uint64		= 0;
+	history->value_orig.u64 = value_orig;
+	history->value.u64 = 0;
 	history->value_null			= 0;
 	history->keep_history			= 0;
 	history->keep_trends			= 0;
@@ -2649,8 +2649,8 @@ static void	DCadd_history_str(zbx_uint64_t itemid, char *value_orig, int clock)
 	history->itemid			= itemid;
 	history->clock			= clock;
 	history->value_type		= ITEM_VALUE_TYPE_STR;
-	history->value_orig.value_str	= cache->last_text;
-	history->value.value_str	= NULL;
+	history->value_orig.str = cache->last_text;
+	history->value.str = NULL;
 	zbx_strlcpy(cache->last_text, value_orig, len);
 	history->value_null		= 0;
 	cache->last_text		+= len;
@@ -2692,8 +2692,8 @@ static void	DCadd_history_text(zbx_uint64_t itemid, char *value_orig, int clock)
 	history->itemid			= itemid;
 	history->clock			= clock;
 	history->value_type		= ITEM_VALUE_TYPE_TEXT;
-	history->value_orig.value_str	= cache->last_text;
-	history->value.value_str	= NULL;
+	history->value_orig.str = cache->last_text;
+	history->value.str = NULL;
 	zbx_strlcpy(cache->last_text, value_orig, len);
 	history->value_null		= 0;
 	cache->last_text		+= len;
@@ -2738,8 +2738,8 @@ static void	DCadd_history_log(zbx_uint64_t itemid, char *value_orig, int clock, 
 	history->itemid			= itemid;
 	history->clock			= clock;
 	history->value_type		= ITEM_VALUE_TYPE_LOG;
-	history->value_orig.value_str	= cache->last_text;
-	history->value.value_str	= NULL;
+	history->value_orig.str = cache->last_text;
+	history->value.str = NULL;
 	zbx_strlcpy(cache->last_text, value_orig, len1);
 	history->value_null		= 0;
 	cache->last_text		+= len1;
@@ -2747,12 +2747,12 @@ static void	DCadd_history_log(zbx_uint64_t itemid, char *value_orig, int clock, 
 
 	if (0 != len2)
 	{
-		history->value.value_str = cache->last_text;
+		history->value.str = cache->last_text;
 		zbx_strlcpy(cache->last_text, source, len2);
 		cache->last_text	+= len2;
 	}
 	else
-		history->value.value_str = NULL;
+		history->value.str = NULL;
 
 	history->severity		= severity;
 	history->logeventid		= logeventid;
