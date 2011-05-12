@@ -77,7 +77,7 @@ static char	DEFAULT_CONFIG_FILE[] = "/etc/zabbix/zabbix_agent.conf";
  *                                                                            *
  * Purpose: load configuration from config file                               *
  *                                                                            *
- * Parameters:                                                                *
+ * Parameters: optional - do not produce error if config file missing         *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
@@ -86,7 +86,7 @@ static char	DEFAULT_CONFIG_FILE[] = "/etc/zabbix/zabbix_agent.conf";
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_load_config()
+static void	zbx_load_config(int optional)
 {
 	struct cfg_line	cfg[] =
 	{
@@ -109,7 +109,10 @@ static void	zbx_load_config()
 	zbx_strarr_init(&CONFIG_ALIASES);
 	zbx_strarr_init(&CONFIG_USER_PARAMETERS);
 
-	parse_cfg_file(CONFIG_FILE, cfg);
+	if (optional)
+		parse_opt_cfg_file(CONFIG_FILE, cfg);
+	else
+		parse_cfg_file(CONFIG_FILE, cfg);
 }
 
 /******************************************************************************
@@ -189,7 +192,10 @@ int	main(int argc, char **argv)
 		CONFIG_FILE = DEFAULT_CONFIG_FILE;
 
 	/* load configuration */
-	zbx_load_config();
+	if (ZBX_TASK_PRINT_SUPPORTED == task || ZBX_TASK_TEST_METRIC == task)
+		zbx_load_config(1);	/* optional */
+	else
+		zbx_load_config(0);
 
 	/* metrics should be initialized befor loading user parameters */
 	init_metrics();
@@ -207,14 +213,12 @@ int	main(int argc, char **argv)
 
 	switch (task)
 	{
-		case ZBX_TASK_PRINT_SUPPORTED:
-			test_parameters();
-			free_metrics();
-			alias_list_free();
-			exit(SUCCEED);
-			break;
 		case ZBX_TASK_TEST_METRIC:
-			test_parameter(TEST_METRIC, PROCESS_TEST);
+		case ZBX_TASK_PRINT_SUPPORTED:
+			if (ZBX_TASK_TEST_METRIC == task)
+				test_parameter(TEST_METRIC, PROCESS_TEST);
+			else
+				test_parameters();
 			free_metrics();
 			alias_list_free();
 			exit(SUCCEED);
