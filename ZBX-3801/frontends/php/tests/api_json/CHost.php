@@ -52,7 +52,7 @@ class API_JSON_Host extends CZabbixTest
 						array("groupid" => 5)
 					),
 					"templates" => array(
-						array("templateid" => 10025)
+						array("templateid" => 10001)
 					)
 				),
 				true
@@ -73,15 +73,15 @@ class API_JSON_Host extends CZabbixTest
 						array("groupid" => 5)
 					),
 					"templates" => array(
-						array("templateid" => 10025),
-						array("templateid" => 10025)
+						array("templateid" => 10001),
+						array("templateid" => 10001)
 					)
 				),
 				false
 			),
 			array(
 				array(
-				'host' => 'Host to test dup ids 2',
+				'host' => 'Host to test dup ids 3',
 				'interfaces'=> array(
 						array(
 							"type" => 1,
@@ -95,12 +95,10 @@ class API_JSON_Host extends CZabbixTest
 						array("groupid" => 5)
 					),
 					"templates" => array(
-						array("templateid" => 10024),
-						array("templateid" => 10027),
-						array("templateid" => 10026),
-						array("templateid" => 10025),
-						array("templateid" => 10025),
-						array("templateid" => 10023),
+						array("templateid" => 10043),
+						array("templateid" => 10001),
+						array("templateid" => 10001),
+						array("templateid" => 10002),
 					)
 				),
 				false

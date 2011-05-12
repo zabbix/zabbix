@@ -1665,7 +1665,7 @@ COpt::memoryPick();
 		if(reset($idCount) > 1){
 			self::exception(
 				ZBX_API_ERROR_PARAMETERS,
-				_s('Cannot pass duplicate template ids for the linkage. Please check templateid "%s"', key($idCount))
+				_s('Cannot pass duplicate template IDs for the linkage. Please check template ID "%s".', key($idCount))
 			);
 		}
 
