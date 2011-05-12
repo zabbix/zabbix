@@ -66,12 +66,12 @@ static int	zbx_get_cpu_num()
 		goto return_one;
 
 	return (int)psd.psd_proc_cnt;
-#elif defined(_SC_NPROCESSORS_ONLN)
+#elif defined(_SC_NPROCESSORS_CONF)
 	/* FreeBSD 7.0 x86 */
 	/* Solaris 10 x86 */
 	int	ncpu;
 
-	if (-1 == (ncpu = sysconf(_SC_NPROCESSORS_ONLN)))
+	if (-1 == (ncpu = sysconf(_SC_NPROCESSORS_CONF)))
 		goto return_one;
 
 	return ncpu;
