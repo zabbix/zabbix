@@ -1893,7 +1893,7 @@ COpt::memoryPick();
 
 		if(!empty($triggers[ZBX_FLAG_DISCOVERY_NORMAL])){
 			if($clear){
-				$result = API::Trigger()->delete(array_keys($triggers), true);
+				$result = API::Trigger()->delete(array_keys($triggers[ZBX_FLAG_DISCOVERY_NORMAL]), true);
 				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear triggers'));
 			}
 			else{
