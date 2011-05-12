@@ -143,7 +143,7 @@ class API_JSON_Host extends CZabbixTest
 
 		if($successExpected){
 			$this->assertTrue(
-				!array_key_exists('error', $result) || strpos($result['error']['data'], 'Cannot pass duplicate template ids') === false,
+				!array_key_exists('error', $result) || strpos($result['error']['data'], 'Cannot pass duplicate template') === false,
 				"Chuck Norris: I was expecting that host.create would not complain on duplicate ids. Result is: ".print_r($result, true)."\nDebug: ".print_r($debug, true)
 			);
 		}
