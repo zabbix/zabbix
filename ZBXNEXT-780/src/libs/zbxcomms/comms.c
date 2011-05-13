@@ -65,7 +65,7 @@ const char	*zbx_tcp_strerror()
 #	define zbx_set_tcp_strerror(fmt, ...) __zbx_zbx_set_tcp_strerror(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
 #else
 #	define zbx_set_tcp_strerror __zbx_zbx_set_tcp_strerror
-#endif /* HAVE___VA_ARGS__ */
+#endif
 static void	__zbx_zbx_set_tcp_strerror(const char *fmt, ...)
 {
 	va_list args;
@@ -1016,7 +1016,7 @@ void	zbx_tcp_free(zbx_sock_t *s)
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value: SUCCEED - success                                            *
+ * Return value: number of bytes received, *
  *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
@@ -1024,11 +1024,11 @@ void	zbx_tcp_free(zbx_sock_t *s)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeout)
+ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeout)
 {
 #define ZBX_BUF_LEN	ZBX_STAT_BUF_LEN * 8
-	ssize_t		nbytes, left, read_bytes;
-	int		ret = SUCCEED, allocated, offset;
+	ssize_t		nbytes, left, read_bytes, total_bytes;
+	int		allocated, offset;
 	zbx_uint64_t	expected_len;
 
 	ZBX_TCP_START();
@@ -1041,6 +1041,7 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeou
 	memset(s->buf_stat, 0, sizeof(s->buf_stat));
 	*data = s->buf_stat;
 
+	total_bytes = 0;
 	read_bytes = 0;
 	s->buf_type = ZBX_BUF_TYPE_STAT;
 
@@ -1049,6 +1050,8 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeou
 
 	if (ZBX_TCP_HEADER_LEN == nbytes && 0 == strncmp(s->buf_stat, ZBX_TCP_HEADER, ZBX_TCP_HEADER_LEN))
 	{
+		total_bytes += nbytes;
+
 		left = sizeof(zbx_uint64_t);
 		nbytes = ZBX_TCP_READ(s->socket, (void *)&expected_len, left);
 		expected_len = zbx_letoh_uint64(expected_len);
@@ -1113,6 +1116,7 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeou
 			memcpy(s->buf_dyn, s->buf_stat, sizeof(s->buf_stat));
 
 			offset = read_bytes;
+
 			/* fill dynamic buffer */
 			while (read_bytes < expected_len &&
 					ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ(s->socket, s->buf_stat, sizeof(s->buf_stat)-1)))
@@ -1140,13 +1144,15 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeou
 	if (ZBX_TCP_ERROR == nbytes)
 	{
 		zbx_set_tcp_strerror("ZBX_TCP_READ() failed [%s]", strerror_from_system(zbx_sock_last_error()));
-		ret = FAIL;
+		total_bytes = FAIL;
 	}
+	else
+		total_bytes += nbytes;
 cleanup:
 	if (0 != timeout)
 		zbx_tcp_timeout_cleanup(s);
 
-	return ret;
+	return total_bytes;
 }
 
 char	*get_ip_by_socket(zbx_sock_t *s)
