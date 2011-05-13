@@ -51,15 +51,30 @@ function DBdata($query)
 	return $objects;
 }
 
+$table_dependencies = array(
+	'actions' => array('actions', 'operations', 'conditions', 'opmessage', 'opgroup', 'optemplate',
+		'opcommand', 'opcommand_grp', 'opcommand_hst', 'opconditions', 'opmessage_grp', 'opmessage_usr'),
+	'config' => array('config'),
+	'drules' => array('drules','dchecks'),
+	'maintenances' => array('maintenances','timeperiods','maintenances_hosts','maintenances_groups','maintenances_windows'),
+	'media_type' => array('media_type','media','opmessage'),
+	'screens' => array('screens','screens_items','slides'),
+	'scripts' => array('scripts'),
+	'slideshows' => array('slideshows','slides'),
+	'triggers' => array('triggers', 'graphs', 'graphs_items', 'functions', 'items', 'item_discovery', 'trigger_discovery', 'graph_discovery'),
+	'sysmaps' => array('sysmaps', 'sysmaps_elements', 'sysmaps_links', 'sysmaps_link_triggers', 'sysmap_element_url', 'sysmap_url', 'screens_items'),
+	'users' => array('users','users_groups','media','opmessage_usr')
+);
+
 /**
- * Saves data of the specified tables in temporary tables. The tables can be in any order.
+ * Saves data of the specified table and all dependent tables in temporary storage.
+ * For example: DBsave_tables('users')
  */
-function DBsave_tables($tables)
+function DBsave_tables($topTable)
 {
-	global $DB;
+	global $DB, $table_dependencies;
 
-	if(!is_array($tables))	$tables=array($tables);
-
+	$tables=$table_dependencies[$topTable];
 
 	foreach($tables as $table)
 	{
@@ -81,15 +96,14 @@ function DBsave_tables($tables)
 }
 
 /**
- * Restores data from temporary tables. DBsave_tables() must be called first.
- * The tables should be ordered so that referenced tables come after main ones.
- * For example: DBrestore_tables(array('users','users_groups','media'))
+ * Restores data from temporary storage. DBsave_tables() must be called first.
+ * For example: DBrestore_tables('users')
  */
-function DBrestore_tables($tables)
+function DBrestore_tables($topTable)
 {
-	global $DB;
+	global $DB, $table_dependencies;
 
-	if(!is_array($tables))	$tables=array($tables);
+	$tables=$table_dependencies[$topTable];
 
 	$tables_reversed = array_reverse($tables);
 

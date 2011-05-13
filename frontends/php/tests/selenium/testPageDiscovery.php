@@ -83,7 +83,7 @@ class testPageDiscovery extends CWebTest
 	{
 		$druleid=$rule['druleid'];
 
-		DBsave_tables(array('drules','dchecks'));
+		DBsave_tables('drules');
 
 		$this->chooseOkOnNextConfirmation();
 
@@ -103,7 +103,7 @@ class testPageDiscovery extends CWebTest
 		$sql="select * from dchecks where druleid=$druleid";
 		$this->assertEquals(0,DBcount($sql));
 
-		DBrestore_tables(array('drules','dchecks'));
+		DBrestore_tables('drules');
 	}
 
 	/**
