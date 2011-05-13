@@ -108,7 +108,7 @@ int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 {
 	char	filename[MAX_STRING_LEN], regexp[MAX_STRING_LEN], encoding[32];
 	char	buf[MAX_BUFFER_LEN], *utf8;
-	int	f, nbytes, flen, len, r = SYSINFO_RET_FAIL;
+	int	nbytes, flen, len, f = -1, r = SYSINFO_RET_FAIL;
 	double	ts;
 
 	ts = zbx_time();
@@ -150,8 +150,6 @@ int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		zbx_free(utf8);
 	}
 
- 	close(f);
-
 	if (-1 == nbytes)	/* error occurred */
 		goto err;
 
@@ -161,6 +159,9 @@ int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	r = SYSINFO_RET_OK;
 err:
 
+	if (-1 != f)
+		close(f);
+
 	return r;
 }
 
@@ -168,7 +169,7 @@ int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_
 {
 	char	filename[MAX_STRING_LEN], regexp[MAX_STRING_LEN], encoding[32];
 	char	buf[MAX_BUFFER_LEN], *utf8;
-	int	f, nbytes, flen, len, res, r = SYSINFO_RET_FAIL;
+	int	nbytes, flen, len, res, f = -1, r = SYSINFO_RET_FAIL;
 	double	ts;
 
 	ts = zbx_time();
@@ -206,8 +207,6 @@ int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_
 		zbx_free(utf8);
 	}
 
- 	close(f);
-
 	if (-1 == nbytes)	/* error occurred */
 		goto err;
 
@@ -216,13 +215,16 @@ int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_
 	r = SYSINFO_RET_OK;
 err:
 
+	if (-1 != f)
+		close(f);
+
 	return r;
 }
 
 int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char		filename[MAX_STRING_LEN];
-	int		f, i, nbytes, flen, r = SYSINFO_RET_FAIL;
+	int		i, nbytes, flen, f = -1, r = SYSINFO_RET_FAIL;
 	md5_state_t	state;
 	u_char		buf[16 * ZBX_KIBIBYTE];
 	char		*hash_text = NULL;
@@ -258,8 +260,6 @@ int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	md5_finish(&state, hash);
 
-	close(f);
-
 	if (0 > nbytes)
 		goto err;
 
@@ -277,6 +277,9 @@ int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	r = SYSINFO_RET_OK;
 err:
+
+	if (-1 != f)
+		close(f);
 
 	return r;
 }
@@ -345,7 +348,7 @@ static u_long	crctab[] =
 int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char		filename[MAX_STRING_LEN];
-	int		i, nr, f, r = SYSINFO_RET_FAIL;
+	int		i, nr, f = -1, r = SYSINFO_RET_FAIL;
 	uint32_t	crc, flen;
 	u_char		buf[16 * ZBX_KIBIBYTE];
 	u_long		cval;
@@ -376,8 +379,6 @@ int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 			crc = (crc << 8) ^ crctab[((crc >> 24) ^ buf[i]) & 0xff];
 	}
 
-	close(f);
-
 	if (0 > nr)
 		goto err;
 
@@ -391,6 +392,9 @@ int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 	r = SYSINFO_RET_OK;
 err:
+
+	if (-1 != f)
+		close(f);
 
 	return r;
 }
