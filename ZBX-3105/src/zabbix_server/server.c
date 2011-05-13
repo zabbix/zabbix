@@ -309,7 +309,7 @@ static void	zbx_load_config()
 
 	CONFIG_SERVER_STARTUP_TIME = time(NULL);
 
-	parse_cfg_file(CONFIG_FILE, cfg);
+	parse_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_STRICT);
 
 	if (NULL == CONFIG_DBNAME)
 	{

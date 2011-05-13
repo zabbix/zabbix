@@ -110,9 +110,9 @@ static void	zbx_load_config(int optional)
 	zbx_strarr_init(&CONFIG_USER_PARAMETERS);
 
 	if (optional)
-		parse_opt_cfg_file(CONFIG_FILE, cfg);
+		parse_opt_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_STRICT);
 	else
-		parse_cfg_file(CONFIG_FILE, cfg);
+		parse_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_STRICT);
 }
 
 /******************************************************************************

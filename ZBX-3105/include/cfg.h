@@ -27,6 +27,9 @@
 #define	PARM_OPT	0
 #define	PARM_MAND	1
 
+#define	ZBX_CFG_NOT_STRICT	0
+#define	ZBX_CFG_STRICT		1
+
 extern int	CONFIG_ZABBIX_FORKS;	/* contains the number of listeners for processing passive checks */
 extern char	*CONFIG_FILE;
 extern char	*CONFIG_LOG_FILE;
@@ -43,7 +46,7 @@ struct cfg_line
 	int	max;
 };
 
-int	parse_cfg_file(const char *cfg_file, struct cfg_line *cfg);
-int	parse_opt_cfg_file(const char *cfg_file, struct cfg_line *cfg);
+int	parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int strict);
+int	parse_opt_cfg_file(const char *cfg_file, struct cfg_line *cfg, int strict);
 
 #endif

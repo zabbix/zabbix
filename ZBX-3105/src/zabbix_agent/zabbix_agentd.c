@@ -351,9 +351,9 @@ static void	zbx_load_config(int optional)
 	set_defaults();
 
 	if (optional)
-		parse_opt_cfg_file(CONFIG_FILE, cfg);
+		parse_opt_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_STRICT);
 	else
-		parse_cfg_file(CONFIG_FILE, cfg);
+		parse_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_STRICT);
 
 #ifdef USE_PID_FILE
 	if (NULL == CONFIG_PID_FILE)

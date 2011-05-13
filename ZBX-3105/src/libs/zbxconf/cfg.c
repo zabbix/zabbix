@@ -29,12 +29,12 @@ int	CONFIG_LOG_FILE_SIZE	= 1;
 char	CONFIG_ALLOW_ROOT	= 0;
 int	CONFIG_TIMEOUT		= 3;
 
-static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level, int optional);
+static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level, int optional, int strict);
 
-static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int level)
+static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int level, int strict)
 {
 #ifdef _WINDOWS
-	return __parse_cfg_file(cfg_file, cfg, level, 0);
+	return __parse_cfg_file(cfg_file, cfg, level, 0, strict);
 #else
 	DIR		*dir;
 	struct stat	sb;
@@ -49,7 +49,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 	}
 
 	if (!S_ISDIR(sb.st_mode))
-		return __parse_cfg_file(cfg_file, cfg, level, 0);
+		return __parse_cfg_file(cfg_file, cfg, level, 0, strict);
 
 	if (NULL == (dir = opendir(cfg_file)))
 	{
@@ -64,7 +64,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 		if (-1 == stat(incl_file, &sb) || !S_ISREG(sb.st_mode))
 			continue;
 
-		if (FAIL == __parse_cfg_file(incl_file, cfg, level, 0))
+		if (FAIL == __parse_cfg_file(incl_file, cfg, level, 0, strict))
 		{
 			result = FAIL;
 			break;
@@ -91,8 +91,8 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
  * Parameters: cfg_file - full name of config file                            *
  *             cfg      - pointer to configuration parameter structure        *
  *             level    - a level of included file                            *
- *             optional - do not treat missing configuration file or unknown  *
- *                        parameters as error                                 *
+ *             optional - do not treat missing configuration file as error    *
+ *             strict   - treat unknown parameters as error                   *
  *                                                                            *
  * Return value: SUCCEED - parsed successfully                                *
  *               FAIL - error processing config file                          *
@@ -102,7 +102,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level, int optional)
+static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level, int optional, int strict)
 {
 #define ZBX_MAX_INCLUDE_LEVEL	10
 
@@ -149,7 +149,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 
 			if (0 == strcmp(parameter, "Include"))
 			{
-				if (FAIL == (result = parse_cfg_object(value, cfg, level)))
+				if (FAIL == (result = parse_cfg_object(value, cfg, level, strict)))
 					break;
 			}
 
@@ -199,7 +199,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 					assert(0);
 			}
 
-			if (0 == param_valid && 0 == optional)
+			if (0 == param_valid && ZBX_CFG_STRICT == strict)
 				goto unknown_parameter;
 		}
 		fclose(file);
@@ -255,12 +255,12 @@ garbage:
 	exit(1);
 }
 
-int	parse_cfg_file(const char *cfg_file, struct cfg_line *cfg)
+int	parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int strict)
 {
-	return __parse_cfg_file(cfg_file, cfg, 0, 0);
+	return __parse_cfg_file(cfg_file, cfg, 0, 0, strict);
 }
 
-int	parse_opt_cfg_file(const char *cfg_file, struct cfg_line *cfg)
+int	parse_opt_cfg_file(const char *cfg_file, struct cfg_line *cfg, int strict)
 {
-	return __parse_cfg_file(cfg_file, cfg, 0, 1);
+	return __parse_cfg_file(cfg_file, cfg, 0, 1, strict);
 }
