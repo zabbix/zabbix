@@ -245,9 +245,9 @@ static zbx_uint64_t	get_cpu_max_freq(int cpu_num)
 	return freq;
 }
 
-static int print_freq(char *buffer, int size, int filter, int cpu, zbx_uint64_t maxfreq, zbx_uint64_t curfreq)
+static int	print_freq(char *buffer, int size, int filter, int cpu, zbx_uint64_t maxfreq, zbx_uint64_t curfreq)
 {
-	int offset = 0;
+	int	offset = 0;
 
 	if (HW_CPU_SHOW_MAXFREQ == filter && FAIL != maxfreq)
 	{
@@ -287,8 +287,10 @@ int     SYSTEM_HW_CPU(const char *cmd, const char *param, unsigned flags, AGENT_
 
 	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "all"))
 		cpu = HW_CPU_ALL_CPUS;	/* show all CPUs by default */
-	else if (FAIL == is_uint(tmp) || 0 > (cpu = atoi(tmp)))
+	else if (FAIL == is_uint(tmp))
 		return ret;
+	else
+		cpu = atoi(tmp);
 
 	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "full"))
 		filter = HW_CPU_SHOW_ALL;	/* show full info by default */
@@ -316,7 +318,7 @@ int     SYSTEM_HW_CPU(const char *cmd, const char *param, unsigned flags, AGENT_
 		if (0 == strncmp(name, "processor", 9))
 		{
 			if (-1 != cur_cpu && (HW_CPU_ALL_CPUS == cpu || cpu == cur_cpu))	/* print info about the previous cpu */
-				offset += print_freq(buffer + offset,  sizeof(buffer) - offset, filter, cpu, maxfreq, curfreq);
+				offset += print_freq(buffer + offset, sizeof(buffer) - offset, filter, cpu, maxfreq, curfreq);
 
 			curfreq = FAIL;
 			cur_cpu = atoi(tmp);
@@ -359,7 +361,7 @@ int     SYSTEM_HW_CPU(const char *cmd, const char *param, unsigned flags, AGENT_
 	if (SYSINFO_RET_OK == ret)
 	{
 		if (-1 != cur_cpu && (HW_CPU_ALL_CPUS == cpu || cpu == cur_cpu))	/* print info about the last cpu */
-			offset += print_freq(buffer + offset,  sizeof(buffer) - offset, filter, cpu, maxfreq, curfreq);
+			offset += print_freq(buffer + offset, sizeof(buffer) - offset, filter, cpu, maxfreq, curfreq);
 
 		SET_TEXT_RESULT(result, zbx_strdup(NULL, buffer + 1));	/* buf has a leading space or '\n' */
 	}
