@@ -31,6 +31,7 @@ class testPageActionsDiscovery extends CWebTest
 		'opmessage',
 		'opgroup',
 		'optemplate',
+		'opcommand',
 		'opcommand_grp',
 		'opcommand_hst',
 		'opconditions',
