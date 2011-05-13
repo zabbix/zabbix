@@ -108,6 +108,9 @@ int	VFS_FILE_CONTENTS(const char *cmd, const char *param, unsigned flags, AGENT_
 	int		contents_alloc = 512, contents_offset = 0;
 	int		nbytes, f = -1, ret = SYSINFO_RET_FAIL;
 	struct stat	stat_buf;
+	double		ts;
+
+	ts = zbx_time();
 
 	if (2 < num_param(param))
 		goto err;
@@ -129,10 +132,16 @@ int	VFS_FILE_CONTENTS(const char *cmd, const char *param, unsigned flags, AGENT_
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
 		goto err;
 
+	if (CONFIG_TIMEOUT < zbx_time() - ts)
+		goto err;
+
 	contents = zbx_malloc(contents, contents_alloc);
 
 	while (0 < (nbytes = zbx_read(f, read_buf, sizeof(read_buf), encoding)))
 	{
+		if (CONFIG_TIMEOUT < zbx_time() - ts)
+			goto err;
+
 		utf8 = convert_to_utf8(read_buf, nbytes, encoding);
 		zbx_strcpy_alloc(&contents, &contents_alloc, &contents_offset, utf8);
 		zbx_free(utf8);
