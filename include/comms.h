@@ -89,7 +89,7 @@ struct hostent	*zbx_gethost(const char *hostname);
 
 #if !defined(_WINDOWS)
 void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen);
-#endif /* WINDOWS */
+#endif
 
 void	zbx_tcp_init(zbx_sock_t *s, ZBX_SOCKET o);
 int     zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout);
@@ -106,7 +106,7 @@ void    zbx_tcp_close(zbx_sock_t *s);
 
 #if defined(HAVE_IPV6)
 int	get_address_family(const char *addr, int *family, char *error, int max_error_len);
-#endif /* HAVE_IPV6 */
+#endif
 
 int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_port);
 
@@ -120,7 +120,7 @@ void    zbx_tcp_free(zbx_sock_t *s);
 #define	zbx_tcp_recv(s, data) 			zbx_tcp_recv_ext(s, data, 0, 0)
 #define	zbx_tcp_recv_to(s, data, timeout) 	zbx_tcp_recv_ext(s, data, 0, timeout)
 
-int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeout);
+ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeout);
 
 char    *get_ip_by_socket(zbx_sock_t *s);
 int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empty);

@@ -49,6 +49,7 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 	zbx_sock_t	s;
 	char		*buf, buffer[MAX_STRING_LEN];
 	int		ret = SUCCEED;
+	ssize_t		received_len;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' key:'%s'",
 			__function_name, item->host.host, item->interface.addr, item->key);
@@ -60,7 +61,7 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 
 		/* send requests using old protocol */
 		if (SUCCEED == (ret = zbx_tcp_send_raw(&s, buffer)))
-			ret = zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE, 0);
+			ret = SUCCEED_OR_FAIL(received_len = zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE, 0));
 	}
 
 	if (SUCCEED == ret)
@@ -81,6 +82,14 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 			zbx_snprintf(buffer, sizeof(buffer), "Zabbix Agent non-critical error");
 			SET_MSG_RESULT(result, strdup(buffer));
 			ret = AGENT_ERROR;
+		}
+		else if (0 == received_len)
+		{
+			zbx_snprintf(buffer, sizeof(buffer), "Got empty string from [%s]."
+					" Assuming that agent dropped connection because of access permissions",
+			item->interface.addr);
+			SET_MSG_RESULT(result, strdup(buffer));
+			ret = NETWORK_ERROR;
 		}
 		else if (SUCCEED != set_result_type(result, item->value_type, item->data_type, buf))
 			ret = NOTSUPPORTED;
