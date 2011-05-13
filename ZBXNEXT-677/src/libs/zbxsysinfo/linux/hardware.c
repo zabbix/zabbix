@@ -319,6 +319,7 @@ int     SYSTEM_HW_CPU(const char *cmd, const char *param, unsigned flags, AGENT_
 				offset += print_freq(buffer + offset,  sizeof(buffer) - offset, filter, cpu, maxFreq, curFreq);
 
 			curFreq = FAIL;
+			maxFreq = FAIL;
 			cur_cpu = atoi(tmp);
 
 			if (HW_CPU_ALL_CPUS != cpu && cpu != cur_cpu)
