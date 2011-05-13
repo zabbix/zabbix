@@ -45,6 +45,5 @@
 #define HW_CPU_SHOW_VENDOR	3
 #define HW_CPU_SHOW_MODEL	4
 #define HW_CPU_SHOW_CURFREQ	5
-#define HW_CPU_SHOW_CORES	6
 
 #endif	/* ZABBIX_HARDWARE_H */

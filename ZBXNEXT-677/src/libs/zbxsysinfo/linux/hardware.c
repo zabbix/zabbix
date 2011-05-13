@@ -124,7 +124,7 @@ static int	get_dmi_info(char *buf, int bufsize, int flags)
 			if (0 == strncmp((char *)membuf, "_DMI_", 5))	/* entry point found */
 			{
 				smbios_len = membuf[7] << 8 | membuf[6];
-				smbios = membuf[11] << 24 | membuf[10] << 16 | membuf[9] << 8 | membuf[8];
+				smbios = (size_t)membuf[11] << 24 | (size_t)membuf[10] << 16 | (size_t)membuf[9] << 8 | membuf[8];
 				smbios_status = SMBIOS_STATUS_OK;
 				break;
 			}
@@ -249,7 +249,7 @@ int     SYSTEM_HW_CPU(const char *cmd, const char *param, unsigned flags, AGENT_
 {
 	int		ret = SYSINFO_RET_FAIL, filter, cpu, cur_cpu = -2, offset = 0;
 	zbx_uint64_t	freq;
-	char		line[MAX_STRING_LEN], name[MAX_STRING_LEN], tmp[MAX_STRING_LEN], buf[MAX_BUFFER_LEN];
+	char		line[MAX_STRING_LEN], name[MAX_STRING_LEN], tmp[MAX_STRING_LEN], buffer[MAX_BUFFER_LEN];
 	FILE		*f;
 
 	if (2 < num_param(param))
@@ -272,15 +272,13 @@ int     SYSTEM_HW_CPU(const char *cmd, const char *param, unsigned flags, AGENT_
 		filter = HW_CPU_SHOW_MODEL;
 	else if (0 == strcmp(tmp, "curfreq"))
 		filter = HW_CPU_SHOW_CURFREQ;
-	else if (0 == strcmp(tmp, "cores"))
-		filter = HW_CPU_SHOW_CORES;
 	else
 		return ret;
 
 	if (NULL == (f = fopen(HW_CPU_INFO_FILE, "r")))
 		return ret;
 
-	*buf = '\0';
+	*buffer = '\0';
 
 	while (NULL != fgets(line, sizeof(line), f))
 	{
@@ -295,7 +293,7 @@ int     SYSTEM_HW_CPU(const char *cmd, const char *param, unsigned flags, AGENT_
 				continue;
 
 			if (HW_CPU_ALL_CPUS == cpu || HW_CPU_SHOW_ALL == filter)
-				offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, "\nprocessor %d:", cur_cpu);
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "\nprocessor %d:", cur_cpu);
 
 			if ((HW_CPU_SHOW_ALL == filter || HW_CPU_SHOW_MAXFREQ == filter) &&
 					FAIL != (freq = get_cpu_max_freq(cur_cpu)))
@@ -304,11 +302,11 @@ int     SYSTEM_HW_CPU(const char *cmd, const char *param, unsigned flags, AGENT_
 
 				if (HW_CPU_SHOW_ALL != filter && HW_CPU_ALL_CPUS != cpu)
 				{
-					offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, " " ZBX_FS_UI64, freq * 1000);
+					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " " ZBX_FS_UI64, freq * 1000);
 					break;
 				}
 
-				offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, " " ZBX_FS_UI64 "MHz", freq / 1000);
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " " ZBX_FS_UI64 "MHz", freq / 1000);
 			}
 		}
 
@@ -318,12 +316,12 @@ int     SYSTEM_HW_CPU(const char *cmd, const char *param, unsigned flags, AGENT_
 		if (0 == strncmp(name, "vendor_id", 9) && (HW_CPU_SHOW_ALL == filter || HW_CPU_SHOW_VENDOR == filter))
 		{
 			ret = SYSINFO_RET_OK;
-			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, " %s", tmp);
+			offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", tmp);
 		}
 		else if (0 == strncmp(name, "model name", 10) && (HW_CPU_SHOW_ALL == filter || HW_CPU_SHOW_MODEL == filter))
 		{
 			ret = SYSINFO_RET_OK;
-			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, " %s", tmp);
+			offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", tmp);
 		}
 		else if (0 == strncmp(name, "cpu MHz", 7) && (HW_CPU_SHOW_ALL == filter || HW_CPU_SHOW_CURFREQ == filter))
 		{
@@ -332,23 +330,18 @@ int     SYSTEM_HW_CPU(const char *cmd, const char *param, unsigned flags, AGENT_
 
 			if (HW_CPU_SHOW_ALL != filter && HW_CPU_ALL_CPUS != cpu)
 			{
-				offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, " " ZBX_FS_UI64, freq * 1000000);
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " " ZBX_FS_UI64, freq * 1000000);
 				break;
 			}
 
-			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, " " ZBX_FS_UI64 "MHz", freq);
-		}
-		else if (0 == strncmp(name, "cpu cores", 9) && (HW_CPU_SHOW_ALL == filter || HW_CPU_SHOW_CORES == filter))
-		{
-			ret = SYSINFO_RET_OK;
-			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, " %s", tmp);
+			offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " " ZBX_FS_UI64 "MHz", freq);
 		}
 	}
 
 	zbx_fclose(f);
 
 	if (SYSINFO_RET_OK == ret)
-		SET_TEXT_RESULT(result, zbx_strdup(NULL, buf + 1));	/* buf has a leading space or '\n' */
+		SET_TEXT_RESULT(result, zbx_strdup(NULL, buffer + 1));	/* buf has a leading space or '\n' */
 
 	return ret;
 }
@@ -434,7 +427,7 @@ int     SYSTEM_HW_MACADDR(const char *cmd, const char *param, unsigned flags, AG
 	}
 
 	offset = 0;
-	buffer[offset] = '\0';
+	*buffer = '\0';
 
 	if (0 != addresses.values_num)
 	{
