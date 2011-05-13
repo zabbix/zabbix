@@ -87,7 +87,7 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 		{
 			zbx_snprintf(buffer, sizeof(buffer), "Got empty string from [%s]."
 					" Assuming that agent dropped connection because of access permissions",
-			item->interface.addr);
+					item->interface.addr);
 			SET_MSG_RESULT(result, strdup(buffer));
 			ret = NETWORK_ERROR;
 		}
