@@ -24,7 +24,6 @@ require_once(dirname(__FILE__) . '/../include/class.cwebtest.php');
 class testFormSysmap extends CWebTest {
 
 	public $mapName = "Test map 1";
-	public $affectedTables = array('sysmaps', 'sysmaps_elements', 'sysmaps_links', 'sysmaps_link_triggers', 'sysmap_element_url', 'sysmap_url');
 
 	/**
 	 * Returns all possible map name variants
@@ -60,7 +59,7 @@ class testFormSysmap extends CWebTest {
 	 */
 	public function testFormSysmapCreate($mapName, $successExpected) {
 
-		DBsave_tables($this->affectedTables);
+		DBsave_tables('sysmaps');
 
 		$this->login('sysmaps.php');
 		$this->button_click('form');
@@ -78,7 +77,7 @@ class testFormSysmap extends CWebTest {
 			$this->ok('ERROR');
 		}
 
-		DBrestore_tables($this->affectedTables);
+		DBrestore_tables('sysmaps');
 	}
 
 
@@ -100,7 +99,7 @@ class testFormSysmap extends CWebTest {
 	 */
 	public function testFormSysmapUpdateMapName($mapName, $successExpected) {
 		// Update Map
-		DBsave_tables($this->affectedTables);
+		DBsave_tables('sysmaps');
 
 		$this->login('sysmaps.php');
 		$this->click('//a[text()="' . $this->mapName . '"]/../../td/a[text()="Edit"]');
@@ -119,13 +118,13 @@ class testFormSysmap extends CWebTest {
 			$this->ok('ERROR');
 		}
 
-		DBrestore_tables($this->affectedTables);
+		DBrestore_tables('sysmaps');
 	}
 
 
 	public function testFormSysmapDelete() {
 
-		DBsave_tables($this->affectedTables);
+		DBsave_tables('sysmaps');
 
 		$this->chooseOkOnNextConfirmation();
 		// Delete Map
@@ -138,7 +137,7 @@ class testFormSysmap extends CWebTest {
 		$this->assertTitle('Network maps');
 		$this->ok('Network map deleted');
 
-		DBrestore_tables($this->affectedTables);
+		DBrestore_tables('sysmaps');
 	}
 
 
