@@ -23,21 +23,6 @@ require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
 class testPageActionsAutoregistration extends CWebTest
 {
-	public $affectedTables = array(
-		'actions',
-		'operations',
-		'conditions',
-		'opmessage',
-		'opgroup',
-		'optemplate',
-		'opcommand',
-		'opcommand_grp',
-		'opcommand_hst',
-		'opconditions',
-		'opmessage_grp',
-		'opmessage_usr'
-	);
-
 	// Returns all trigger actions
 	public static function allActions()
 	{
@@ -224,7 +209,7 @@ class testPageActionsAutoregistration extends CWebTest
 
 		$this->chooseOkOnNextConfirmation();
 
-		DBsave_tables($this->affectedTables);
+		DBsave_tables('actions');
 
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_AUTO_REGISTRATION);
 		$this->assertTitle('Configuration of actions');
@@ -246,7 +231,7 @@ class testPageActionsAutoregistration extends CWebTest
 		$sql="select * from conditions where actionid=$actionid";
 		$this->assertEquals(0,DBcount($sql));
 
-		DBrestore_tables($this->affectedTables);
+		DBrestore_tables('actions');
 	}
 
 	public function testPageActionsAutoregistration_Sorting()
