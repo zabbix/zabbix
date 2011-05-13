@@ -22,13 +22,13 @@
 #include "md5.h"
 #include "file.h"
 
-extern int CONFIG_TIMEOUT;
+extern int	CONFIG_TIMEOUT;
 
 int	VFS_FILE_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct stat	buf;
 	char		filename[MAX_STRING_LEN];
-	int		r = SYSINFO_RET_FAIL;
+	int		ret = SYSINFO_RET_FAIL;
 
 	if (1 < num_param(param))
 		goto err;
@@ -41,17 +41,16 @@ int	VFS_FILE_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 
 	SET_UI64_RESULT(result, buf.st_size);
 
-	r = SYSINFO_RET_OK;
+	ret = SYSINFO_RET_OK;
 err:
-
-	return r;
+	return ret;
 }
 
 int	VFS_FILE_TIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct stat	buf;
 	char		filename[MAX_STRING_LEN], type[8];
-	int		r = SYSINFO_RET_FAIL;
+	int		ret = SYSINFO_RET_FAIL;
 
 	if (2 < num_param(param))
 		goto err;
@@ -74,17 +73,16 @@ int	VFS_FILE_TIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	else
 		goto err;
 
-	r = SYSINFO_RET_OK;
+	ret = SYSINFO_RET_OK;
 err:
-
-	return r;
+	return ret;
 }
 
 int	VFS_FILE_EXISTS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct stat	buf;
 	char		filename[MAX_STRING_LEN];
-	int		r = SYSINFO_RET_FAIL;
+	int		ret = SYSINFO_RET_FAIL;
 
 	if (1 < num_param(param))
 		goto err;
@@ -98,17 +96,16 @@ int	VFS_FILE_EXISTS(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		if (S_ISREG(buf.st_mode))
 			SET_UI64_RESULT(result, 1);
 
-	r = SYSINFO_RET_OK;
+	ret = SYSINFO_RET_OK;
 err:
-
-	return r;
+	return ret;
 }
 
 int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	filename[MAX_STRING_LEN], regexp[MAX_STRING_LEN], encoding[32];
 	char	buf[MAX_BUFFER_LEN], *utf8;
-	int	nbytes, flen, len, f = -1, r = SYSINFO_RET_FAIL;
+	int	nbytes, len, f = -1, ret = SYSINFO_RET_FAIL;
 	double	ts;
 
 	ts = zbx_time();
@@ -132,8 +129,6 @@ int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	if (CONFIG_TIMEOUT < zbx_time() - ts)
 		goto err;
-
-	flen = 0;
 
 	while (0 < (nbytes = zbx_read(f, buf, sizeof(buf), encoding)))
 	{
@@ -154,22 +149,21 @@ int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		goto err;
 
 	if (0 == nbytes)	/* EOF */
-		SET_STR_RESULT(result, strdup("EOF"));
+		SET_STR_RESULT(result, zbx_strdup(NULL, "EOF"));
 
-	r = SYSINFO_RET_OK;
+	ret = SYSINFO_RET_OK;
 err:
-
 	if (-1 != f)
 		close(f);
 
-	return r;
+	return ret;
 }
 
 int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	filename[MAX_STRING_LEN], regexp[MAX_STRING_LEN], encoding[32];
 	char	buf[MAX_BUFFER_LEN], *utf8;
-	int	nbytes, flen, len, res, f = -1, r = SYSINFO_RET_FAIL;
+	int	nbytes, len, res, f = -1, ret = SYSINFO_RET_FAIL;
 	double	ts;
 
 	ts = zbx_time();
@@ -194,7 +188,7 @@ int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_
 	if (CONFIG_TIMEOUT < zbx_time() - ts)
 		goto err;
 
-	res = flen = 0;
+	res = 0;
 
 	while (0 == res && 0 < (nbytes = zbx_read(f, buf, sizeof(buf), encoding)))
 	{
@@ -212,19 +206,18 @@ int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_
 
 	SET_UI64_RESULT(result, res);
 
-	r = SYSINFO_RET_OK;
+	ret = SYSINFO_RET_OK;
 err:
-
 	if (-1 != f)
 		close(f);
 
-	return r;
+	return ret;
 }
 
 int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char		filename[MAX_STRING_LEN];
-	int		i, nbytes, flen, f = -1, r = SYSINFO_RET_FAIL;
+	int		i, nbytes, f = -1, ret = SYSINFO_RET_FAIL;
 	md5_state_t	state;
 	u_char		buf[16 * ZBX_KIBIBYTE];
 	char		*hash_text = NULL;
@@ -247,8 +240,6 @@ int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		goto err;
 
 	md5_init(&state);
-
-	flen = 0;
 
 	while (0 < (nbytes = (int)read(f, buf, sizeof(buf))))
 	{
@@ -275,13 +266,12 @@ int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	SET_STR_RESULT(result, hash_text);
 
-	r = SYSINFO_RET_OK;
+	ret = SYSINFO_RET_OK;
 err:
-
 	if (-1 != f)
 		close(f);
 
-	return r;
+	return ret;
 }
 
 static u_long	crctab[] =
@@ -348,7 +338,7 @@ static u_long	crctab[] =
 int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char		filename[MAX_STRING_LEN];
-	int		i, nr, f = -1, r = SYSINFO_RET_FAIL;
+	int		i, nr, f = -1, ret = SYSINFO_RET_FAIL;
 	uint32_t	crc, flen;
 	u_char		buf[16 * ZBX_KIBIBYTE];
 	u_long		cval;
@@ -390,11 +380,10 @@ int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 	SET_UI64_RESULT(result, cval);
 
-	r = SYSINFO_RET_OK;
+	ret = SYSINFO_RET_OK;
 err:
-
 	if (-1 != f)
 		close(f);
 
-	return r;
+	return ret;
 }
