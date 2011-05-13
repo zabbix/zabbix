@@ -119,7 +119,7 @@
 	$use_screen_name = isset($_REQUEST['screenname']);
 
 	//getiing element id from GET paramters
-	$elementid = $_REQUEST['elementid'] = get_request('elementid', false);
+	$elementid = get_request('elementid', false);
 	//if none is provided
 	if($elementid === false && !$use_screen_name){
 		//get element id saved in profile from the last visit
@@ -130,6 +130,7 @@
 	else{
 		$id_has_been_fetched_from_profile = false;
 	}
+	$_REQUEST['elementid'] = $elementid;
 
 	$screens_wdgt = new CWidget();
 
