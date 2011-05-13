@@ -212,10 +212,10 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 		{
 			if (SUCCEED == (tcp_ret = zbx_tcp_recv(&sock, &answer)))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "Answer [%s]", answer);
+				zabbix_log(LOG_LEVEL_DEBUG, "answer [%s]", answer);
 				if (NULL == answer || SUCCEED != check_response(answer))
 				{
-					zabbix_log(LOG_LEVEL_WARNING, "Incorrect answer from server [%s]", answer);
+					zabbix_log(LOG_LEVEL_WARNING, "incorrect answer from server [%s]", answer);
 				}
 				else
 					ret = SUCCEED;
@@ -226,7 +226,7 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	}
 
 	if (FAIL == tcp_ret)
-		zabbix_log(LOG_LEVEL_DEBUG, "Send value error: %s", zbx_tcp_strerror());
+		zabbix_log(LOG_LEVEL_DEBUG, "send value error: %s", zbx_tcp_strerror());
 
 	zbx_thread_exit(ret);
 }
@@ -432,7 +432,7 @@ int main(int argc, char **argv)
 		}
 		else if (NULL == (in = fopen(INPUT_FILE, "r")) )
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot open [%s] [%s]", INPUT_FILE, strerror(errno));
+			zabbix_log(LOG_LEVEL_WARNING, "cannot open [%s]: %s", INPUT_FILE, zbx_strerror(errno));
 			ret = FAIL;
 			goto exit;
 		}
@@ -515,8 +515,7 @@ int main(int argc, char **argv)
 
 				if (-1 == (read_more = select(1, &read_set, NULL, NULL, &tv)))
 				{
-					zabbix_log(LOG_LEVEL_WARNING, "select() failed with errno:%d error:[%s]",
-							errno, strerror(errno));
+					zabbix_log(LOG_LEVEL_WARNING, "select() failed: %s", zbx_strerror(errno));
 				}
 				else if (1 <= read_more)
 				{
