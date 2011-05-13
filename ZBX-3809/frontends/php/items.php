@@ -492,7 +492,7 @@ switch($itemType) {
 				' WHERE itemid='.$_REQUEST['itemid']);
 
 			$host = get_host_by_hostid($item['hostid']);
-			add_audit(T_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
 				S_ITEM.' ['.$item['key_'].'] ['.$_REQUEST['itemid'].'] '.S_HOST.' ['.$host['name'].'] '.S_HISTORY_CLEARED);
 		}
 		show_messages($result, S_HISTORY_CLEARED, S_CANNOT_CLEAR_HISTORY);
