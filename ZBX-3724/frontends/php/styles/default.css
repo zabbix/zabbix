@@ -184,21 +184,10 @@ div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonse
 .select{ cursor: pointer; margin: 1px 2px; }
 .selectShorten{ width: 200px; }
 
-
-.formrow .listInfoLabel{
-	vertical-align: middle;
-	display: table-cell;
-	height:100%;
-}
-
-.formrow .listInfoText{
-	margin-left: 1%;
-}
-
-.listInfo{
-	width: 100%;
-	display: table;
-}
+.radio{ margin: 2px 2px; vertical-align: top; }
+.formrow .listInfoLabel{ vertical-align: middle; display: table-cell; height:100%; }
+.formrow .listInfoText{ margin-left: 1%; }
+.listInfo{ width: 100%; display: table; }
 
 /******************* BUTTONS *********************/
 .button{ border: 1px solid #808080; vertical-align: top; margin: 1px 2px; background: #F0F0F0 url('../images/gradients/button.gif') repeat-x top left; }
@@ -254,17 +243,16 @@ div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonse
 .underline{ text-decoration: underline; }
 
 /* Sortable */
-.header{ height: 18px; line-height: 18px; font-size: 1.1em; font-weight: bold; padding: 3px; margin-bottom: 2px;}
-.column{ margin: 5px 0 5px 5px; min-width: 240px; padding-bottom: 100px; }
-.column .widget{ padding: 2px; margin-bottom: 5px; overflow: hidden;}
-.column .widget .header{ }
+.header{ height: 18px; line-height: 18px; font-size: 1.1em; font-weight: bold; margin-bottom: 2px;}
 
+.widget .header{ padding: 3px; }
 .widget .header .menu_icon{ float: right; margin-right: 2px; }
-
 .widget .footer { color: white; line-height: 12px; height: 12px; padding: 4px 4px; margin-top: 2px;}
 
-.inlineblock{ display: inline-block; }
+.column{ margin: 5px 0 5px 5px; min-width: 240px; padding-bottom: 100px; }
+.column .widget{ padding: 2px; margin-bottom: 5px; overflow: hidden; }
 
+.inlineblock{ display: inline-block; }
 
 span.footer_sign{ padding-right: 5px; padding-left: 5px; }
 span.divider{ color: #558; font-weight: normal;}
@@ -345,11 +333,11 @@ div.formElement_footer{ color: #FFFFFF;  background: #5c9ccc url(originalblue/im
 /* CSS Document */
 /**************** PAGE TABLE ****************/
 /* page_header */
-table.page_header{ background-color: #FFFFFF; border: 0 solid #000000; padding-right: 0; padding-left: 0; }
+table.page_header{ background-color: #FFFFFF; border: 0; padding-right: 0; padding-left: 0; }
 table.page_header tr td.page_header_l{ vertical-align: middle; padding: 0; }
 table.page_header tr td.page_header_r{ vertical-align: middle; text-align: right; }
 table.page_header tr td.page_header_r a{ margin: 0 5px; }
-table.page_footer{ margin-top: 20px;}
+table.page_footer{ margin-top: 20px; padding: 3px;}
 
 /********** FORM TABLE *************/
 table.formtable { background-color: #FFFFFF; color: #000000; border: 1px solid #AAAAAA; width: 50%; margin: auto;}

@@ -1064,7 +1064,7 @@ require_once('include/js.inc.php');
 							'graphids' => $resourceid,
 							'output' => API_OUTPUT_EXTEND,
 							'selectHosts' => API_OUTPUT_REFER,
-							'select_graph_items' => API_OUTPUT_EXTEND,
+							'selectGraphItems' => API_OUTPUT_EXTEND,
 						);
 						$graph = API::Graph()->get($options);
 						$graph = reset($graph);
@@ -1281,7 +1281,7 @@ require_once('include/js.inc.php');
 						$options = array(
 							'sysmapids' => $resourceid,
 							'output' => API_OUTPUT_EXTEND,
-							'select_selements' => API_OUTPUT_EXTEND,
+							'selectSelements' => API_OUTPUT_EXTEND,
 							'nopermissions' => 1
 						);
 						$sysmaps = API::Map()->get($options);
@@ -1578,7 +1578,7 @@ require_once('include/js.inc.php');
 					$subScreens = API::Screen()->get(array(
 						'screenids' => $resourceid,
 						'output' => API_OUTPUT_EXTEND,
-						'select_screenitems' => API_OUTPUT_EXTEND
+						'selectScreenItems' => API_OUTPUT_EXTEND
 					));
 					$subScreen = reset($subScreens);
 					$item = array(get_screen($subScreen, 2, $effectiveperiod));

@@ -102,8 +102,8 @@ include_once('include/page_header.php');
 						'sysmapids'=> $sysmapid,
 						'editable' => true,
 						'output' => API_OUTPUT_EXTEND,
-						'select_selements' => API_OUTPUT_EXTEND,
-						'select_links' => API_OUTPUT_EXTEND
+						'selectSelements' => API_OUTPUT_EXTEND,
+						'selectLinks' => API_OUTPUT_EXTEND
 					);
 
 					$sysmaps = API::Map()->get($options);

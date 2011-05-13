@@ -120,7 +120,7 @@ include_once('include/page_header.php');
 							$screens = API::Screen()->get(array(
 								'screenids' => $screen['screenid'],
 								'output' => API_OUTPUT_EXTEND,
-								'select_screenitems' => API_OUTPUT_EXTEND
+								'selectScreenItems' => API_OUTPUT_EXTEND
 							));
 							$cur_screen = reset($screens);
 							$element = get_screen($cur_screen,2,$effectiveperiod);

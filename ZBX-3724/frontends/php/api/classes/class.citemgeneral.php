@@ -79,6 +79,7 @@ abstract class CItemGeneral extends CZBXAPI{
 			'filter'				=> array(),
 			'interfaceid'			=> array('host' => 1),
 			'port'					=> array(),
+			'profile_link'          => array(),
 		);
 	}
 
@@ -188,7 +189,7 @@ abstract class CItemGeneral extends CZBXAPI{
 			}
 
 			if(isset($item['key_'])){
-				$itemKey = new cItemKey($item['key_']);
+				$itemKey = new CItemKey($item['key_']);
 				if(!$itemKey->isValid()){
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Error in item key: %s', $itemKey->getError()));
 				}

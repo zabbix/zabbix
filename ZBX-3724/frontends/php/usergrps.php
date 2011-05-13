@@ -344,7 +344,7 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'output' => API_OUTPUT_EXTEND,
-			'select_users' => API_OUTPUT_EXTEND,
+			'selectUsers' => API_OUTPUT_EXTEND,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
