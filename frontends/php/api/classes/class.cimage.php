@@ -523,15 +523,17 @@ class CImage extends CZBXAPI{
 					')';
 			$db_sysmaps = DBselect($sql);
 
+			$used_in_maps = array();
 			while($sysmap = DBfetch($db_sysmaps)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image is used in Zabbix map "%s"',
-						get_node_name_by_elid($sysmap['sysmapid'], true, ':').$sysmap['name']));
+				$used_in_maps[] = $sysmap['name'];
 			}
 
-			$sql = 'DELETE FROM images WHERE '.DBcondition('imageid', $imageids);
-			if(!DBexecute($sql)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-			}
+			if(!empty($used_in_maps))
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+						_n('The image is used in map %2$s', 'The image is used in maps %2$s',
+						count($used_in_maps), '"'.implode('", "', $used_in_maps).'"'));
+
+			DB::delete('images', array('imageid' => $imageids));
 
 			return array('imageids' => $imageids);
 	}
