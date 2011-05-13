@@ -814,24 +814,34 @@ COpt::memoryPick();
 // Elements
 			if(isset($map['selements'])){
 				$selementDiff = zbx_array_diff($map['selements'], $dbMap['selements'], 'selementid');
+				// We need sysmapid for add and update operations
 				foreach($selementDiff['first'] as $newSelement){
 					$newSelement['sysmapid'] = $map['sysmapid'];
 					$selementsToAdd[] = $newSelement;
 				}
 
-				$selementsToUpdate = array_merge($selementsToUpdate, $selementDiff['both']);
+				foreach($selementDiff['both'] as $existingSelement){
+					$existingSelement['sysmapid'] = $map['sysmapid'];
+					$selementsToUpdate[] = $existingSelement;
+				}
+
 				$selementsToDelete = array_merge($selementsToDelete, $selementDiff['second']);
 			}
 
 // Links
 			if(isset($map['links'])){
 				$linkDiff = zbx_array_diff($map['links'], $dbMap['links'], 'linkid');
-				foreach($linkDiff['first'] as $newlink){
-					$newlink['sysmapid'] = $map['sysmapid'];
-					$linksToAdd[] = $newlink;
+				// We need sysmapid for add and update operations
+				foreach($linkDiff['first'] as $newLink){
+					$newLink['sysmapid'] = $map['sysmapid'];
+					$linksToAdd[] = $newLink;
 				}
 
-				$linksToUpdate = array_merge($linksToUpdate, $linkDiff['both']);
+				foreach($linkDiff['both'] as $existingLink){
+					$existingLink['sysmapid'] = $map['sysmapid'];
+					$linksToUpdate[] = $existingLink;
+				}
+
 				$linksToDelete = array_merge($linksToDelete, $linkDiff['second']);
 			}
 		}
