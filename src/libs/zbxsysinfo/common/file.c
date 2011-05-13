@@ -19,7 +19,6 @@
 
 #include "common.h"
 #include "sysinfo.h"
-#include "log.h"
 #include "md5.h"
 #include "file.h"
 
@@ -107,14 +106,14 @@ int	VFS_FILE_CONTENTS(const char *cmd, const char *param, unsigned flags, AGENT_
 	char		filename[MAX_STRING_LEN], encoding[32];
 	char		read_buf[MAX_BUFFER_LEN], *utf8, *contents = NULL;
 	int		contents_alloc = 512, contents_offset = 0;
-	int		f, nbytes;
+	int		nbytes, f = -1, ret = SYSINFO_RET_FAIL;
 	struct stat	stat_buf;
 
-	if (num_param(param) > 2)
-		return SYSINFO_RET_FAIL;
+	if (2 < num_param(param))
+		goto err;
 
 	if (0 != get_param(param, 1, filename, sizeof(filename)))
-		return SYSINFO_RET_FAIL;
+		goto err;
 
 	if (0 != get_param(param, 2, encoding, sizeof(encoding)))
 		*encoding = '\0';
@@ -122,17 +121,13 @@ int	VFS_FILE_CONTENTS(const char *cmd, const char *param, unsigned flags, AGENT_
 	zbx_strupper(encoding);
 
 	if (0 != zbx_stat(filename, &stat_buf))
-		return SYSINFO_RET_FAIL;
+		goto err;
 
-	if (stat_buf.st_size > 65535)	/* files larger than 64 kB cannot be stored in the database */
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Item %s not supported: file too big (%lu bytes)",
-				cmd, (size_t)stat_buf.st_size);
-		return SYSINFO_RET_FAIL;
-	}
+	if (64 * ZBX_KIBIBYTE < stat_buf.st_size)	/* files larger than 64 KB cannot be stored in the database */
+		goto err;
 
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
-		return SYSINFO_RET_FAIL;
+		goto err;
 
 	contents = zbx_malloc(contents, contents_alloc);
 
@@ -143,12 +138,10 @@ int	VFS_FILE_CONTENTS(const char *cmd, const char *param, unsigned flags, AGENT_
 		zbx_free(utf8);
 	}
 
- 	close(f);
-
 	if (-1 == nbytes)	/* error occurred */
 	{
 		zbx_free(contents);
-		return SYSINFO_RET_FAIL;
+		goto err;
 	}
 
 	if (0 != contents_offset)
@@ -160,11 +153,16 @@ int	VFS_FILE_CONTENTS(const char *cmd, const char *param, unsigned flags, AGENT_
 	}
 
 	if (NULL == contents)	/* EOF */
-		contents = strdup("EOF");
+		contents = zbx_strdup(contents, "EOF");
 
 	SET_TEXT_RESULT(result, contents);
 
-	return SYSINFO_RET_OK;
+	ret = SYSINFO_RET_OK;
+err:
+	if (-1 != f)
+		close(f);
+
+	return ret;
 }
 
 int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
