@@ -143,6 +143,22 @@ static int	AGENT_VERSION(const char *cmd, const char *param, unsigned flags, AGE
 	return SYSINFO_RET_OK;
 }
 
+
+int	EXECUTE_USER_PARAM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	int ret = EXECUTE_STR(cmd, param, flags, result);
+
+	if (SYSINFO_RET_FAIL == ret && 0 == result->type)
+	{
+		/* only whitespace */
+
+		SET_TEXT_RESULT(result, zbx_strdup(NULL, ""));
+		ret = SYSINFO_RET_OK;
+	}
+
+	return ret;
+}
+
 int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	int	ret = SYSINFO_RET_FAIL;
@@ -152,28 +168,15 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 	init_result(result);
 
-	switch (zbx_execute(param, &cmd_result, error, sizeof(error), CONFIG_TIMEOUT))
+	if (SUCCEED != zbx_execute(param, &cmd_result, error, sizeof(error), CONFIG_TIMEOUT))
 	{
-		case SUCCEED:
-			ret = SYSINFO_RET_OK;
-			break;
-		default:
-			SET_MSG_RESULT(result, zbx_strdup(NULL, error));
-			ret = SYSINFO_RET_FAIL;
+		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
+		goto lbl_exit;
 	}
 
-	if (SYSINFO_RET_OK == ret)
-	{
-		zbx_rtrim(cmd_result, ZBX_WHITESPACE);
+	zbx_rtrim(cmd_result, ZBX_WHITESPACE);
 
-		/* we got whitespace only */
-		if ('\0' == *cmd_result)
-		{
-			ret = SYSINFO_RET_FAIL;
-			goto lbl_exit;
-		}
-	}
-	else
+	if ('\0' == *cmd_result)	/* we got whitespace only */
 		goto lbl_exit;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Run remote command [%s] Result [%d] [%.20s]...",
@@ -182,7 +185,6 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	SET_TEXT_RESULT(result, zbx_strdup(NULL, cmd_result));
 
 	ret = SYSINFO_RET_OK;
-
 lbl_exit:
 	zbx_free(cmd_result);
 
