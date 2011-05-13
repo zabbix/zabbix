@@ -117,8 +117,8 @@ void    zbx_tcp_free(zbx_sock_t *s);
 
 #define ZBX_TCP_READ_UNTIL_CLOSE 0x01
 
-#define	zbx_tcp_recv(s, data) 			zbx_tcp_recv_ext(s, data, 0, 0)
-#define	zbx_tcp_recv_to(s, data, timeout) 	zbx_tcp_recv_ext(s, data, 0, timeout)
+#define	zbx_tcp_recv(s, data) 			SUCCEED_OR_FAIL(zbx_tcp_recv_ext(s, data, 0, 0))
+#define	zbx_tcp_recv_to(s, data, timeout) 	SUCCEED_OR_FAIL(zbx_tcp_recv_ext(s, data, 0, timeout))
 
 ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeout);
 
