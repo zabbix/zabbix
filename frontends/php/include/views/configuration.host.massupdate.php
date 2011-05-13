@@ -30,7 +30,7 @@ $ipmi_authtype	= get_request('ipmi_authtype', -1);
 $ipmi_privilege	= get_request('ipmi_privilege', 2);
 $ipmi_username	= get_request('ipmi_username', '');
 $ipmi_password	= get_request('ipmi_password', '');
-$useprofile	= get_request('useprofile', 'no');
+$profile_mode	= get_request('profile_mode', HOST_PROFILE_DISABLED);
 $host_profile = get_request('host_profile', array());
 
 
@@ -212,19 +212,34 @@ $frmHost->addRow(array(
 	new CTextBox('ipmi_password', $ipmi_password, 20)
 );
 
+$profileModesCC = new CComboBox('profile_mode', $profile_mode, 'submit()');
+$profileModesCC->addItem(HOST_PROFILE_DISABLED, _('Disabled'));
+$profileModesCC->addItem(HOST_PROFILE_MANUAL, _('Manual'));
+$profileModesCC->addItem(HOST_PROFILE_AUTOMATIC, _('Automatic'));
 $frmHost->addRow(array(
-	new CVisibilityBox('visible[useprofile]', isset($visible['useprofile']), 'useprofile', S_ORIGINAL),S_USE_PROFILE),
-	new CCheckBox('useprofile',$useprofile,'submit()')
+	new CVisibilityBox('visible[profile_mode]', isset($visible['profile_mode']), 'profile_mode', S_ORIGINAL), _('Profile mode')),
+	$profileModesCC
 );
 
 $profile_fields = getHostProfiles();
-if($useprofile === 'yes'){
+$profile_fields = zbx_toHash($profile_fields, 'db_field');
+if($profile_mode != HOST_PROFILE_DISABLED){
 	foreach($profile_fields as $field => $caption){
+		$caption = $caption['title'];
 		if(!isset($host_profile[$field])){
 			$host_profile[$field] = '';
 		}
-		$frmHost->addRow(array(
-			new CVisibilityBox('visible['.$field.']', isset($visible[$field]), 'host_profile['.$field.']', S_ORIGINAL), $caption),
+
+		$frmHost->addRow(
+			array(
+				new CVisibilityBox(
+					'visible['.$field.']',
+					isset($visible[$field]),
+					'host_profile['.$field.']',
+					S_ORIGINAL
+				),
+				$caption
+			),
 			new CTextBox('host_profile['.$field.']', $host_profile[$field], 80)
 		);
 	}

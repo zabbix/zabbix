@@ -240,26 +240,26 @@ void	init_selfmon_collector()
 
 	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_SELFMON_ID)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Cannot create IPC key for a self-monitoring collector");
+		zabbix_log(LOG_LEVEL_CRIT, "cannot create IPC key for a self-monitoring collector");
 		exit(FAIL);
 	}
 
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&sm_lock, ZBX_MUTEX_SELFMON))
 	{
-		zbx_error("Unable to create mutex for a self-monitoring collector");
+		zbx_error("unable to create mutex for a self-monitoring collector");
 		exit(FAIL);
 	}
 
 	if (-1 == (shm_id = zbx_shmget(shm_key, sz_total)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Cannot allocate shared memory for a self-monitoring collector");
+		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate shared memory for a self-monitoring collector");
 		exit(FAIL);
 	}
 
 	if ((void *)(-1) == (p = shmat(shm_id, NULL, 0)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Cannot attach shared memory for a self-monitoring collector [%s]",
-				strerror(errno));
+		zabbix_log(LOG_LEVEL_CRIT, "cannot attach shared memory for a self-monitoring collector: %s",
+				zbx_strerror(errno));
 		exit(FAIL);
 	}
 
@@ -313,8 +313,10 @@ void	free_selfmon_collector()
 	collector = NULL;
 
 	if (-1 == shmctl(shm_id, IPC_RMID, 0))
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot remove shared memory for self-monitoring collector [%s]",
-				strerror(errno));
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot remove shared memory for self-monitoring collector: %s",
+				zbx_strerror(errno));
+	}
 
 	UNLOCK_SM;
 
