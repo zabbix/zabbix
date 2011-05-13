@@ -23,24 +23,24 @@
 
 int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char	mode[32];
-	int	sysinfo_name;
-	long	ncpu = 0;
+	char	mode[8];
+	int	name;
+	long	ncpu;
 
-	if (num_param(param) > 1)
+	if (1 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 1, mode, sizeof(mode)))
 		*mode = '\0';
 
 	if ('\0' == *mode || 0 == strcmp(mode, "online"))	/* default parameter */
-		sysinfo_name = _SC_NPROCESSORS_ONLN;
+		name = _SC_NPROCESSORS_ONLN;
 	else if (0 == strcmp(mode, "max"))
-		sysinfo_name = _SC_NPROCESSORS_CONF;
+		name = _SC_NPROCESSORS_CONF;
 	else
 		return SYSINFO_RET_FAIL;
 
-	if (-1 == (ncpu = sysconf(sysinfo_name)) && EINVAL == errno)
+	if (-1 == (ncpu = sysconf(name)))
 		return SYSINFO_RET_FAIL;
 
 	SET_UI64_RESULT(result, ncpu);

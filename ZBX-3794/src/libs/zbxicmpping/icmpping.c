@@ -102,7 +102,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	if (-1 == access(CONFIG_FPING_LOCATION, F_OK | X_OK))
 	{
 #ifndef HAVE_IPV6
-		zbx_snprintf(error, max_error_len, "%s: [%d] %s", CONFIG_FPING_LOCATION, errno, strerror(errno));
+		zbx_snprintf(error, max_error_len, "%s: %s", CONFIG_FPING_LOCATION, zbx_strerror(errno));
 		return ret;
 #endif	/* HAVE_IPV6 */
 	}
@@ -223,7 +223,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 	if (NULL == (f = fopen(filename, "w")))
 	{
-		zbx_snprintf(error, max_error_len, "%s: [%d] %s", filename, errno, strerror(errno));
+		zbx_snprintf(error, max_error_len, "%s: %s", filename, zbx_strerror(errno));
 		return ret;
 	}
 
@@ -241,7 +241,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 	if (NULL == (f = popen(tmp, "r")))
 	{
-		zbx_snprintf(error, max_error_len, "%s: [%d] %s", tmp, errno, strerror(errno));
+		zbx_snprintf(error, max_error_len, "%s: %s", tmp, zbx_strerror(errno));
 
 		unlink(filename);
 

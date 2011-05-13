@@ -44,7 +44,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 
 	if (-1 == stat(cfg_file, &sb))
 	{
-		zbx_error("%s: %s\n", cfg_file, strerror(errno));
+		zbx_error("%s: %s\n", cfg_file, zbx_strerror(errno));
 		return FAIL;
 	}
 
@@ -53,7 +53,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 
 	if (NULL == (dir = opendir(cfg_file)))
 	{
-		zbx_error("%s: %s\n", cfg_file, strerror(errno));
+		zbx_error("%s: %s\n", cfg_file, zbx_strerror(errno));
 		return FAIL;
 	}
 
@@ -74,7 +74,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 
 	if (-1 == closedir(dir))
 	{
-		zbx_error("%s: %s\n", cfg_file, strerror(errno));
+		zbx_error("%s: %s\n", cfg_file, zbx_strerror(errno));
 		return FAIL;
 	}
 
@@ -187,7 +187,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 					if ((cfg[i].min && var < cfg[i].min) || (cfg[i].max && var > cfg[i].max))
 						goto incorrect_config;
 
-					*((int *)cfg[i].variable) = var;
+					*((int *)cfg[i].variable) = (int)var;
 				}
 				else if (TYPE_STRING == cfg[i].type)
 				{
@@ -227,7 +227,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 cannot_open:
 	if (optional)
 		return result;
-	zbx_error("cannot open config file [%s] [%s]", cfg_file, strerror(errno));
+	zbx_error("cannot open config file [%s]: %s", cfg_file, zbx_strerror(errno));
 	exit(1);
 
 missing_mandatory:
