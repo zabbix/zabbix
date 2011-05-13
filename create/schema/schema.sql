@@ -39,7 +39,7 @@ FIELD		|druleid	|t_id		|	|NOT NULL	|0
 FIELD		|proxy_hostid	|t_id		|	|NULL		|ZBX_SYNC		|1|hosts	|hostid		|RESTRICT
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|iprange	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|delay		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|delay		|t_integer	|'3600'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|nextcheck	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 
@@ -47,8 +47,8 @@ TABLE|dchecks|dcheckid|ZBX_SYNC
 FIELD		|dcheckid	|t_id		|	|NOT NULL	|0
 FIELD		|druleid	|t_id		|	|NOT NULL	|ZBX_SYNC,ZBX_PROXY	|1|drules
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|key_		|t_varchar(255)	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|snmp_community	|t_varchar(255)	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|snmp_community	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|ports		|t_varchar(255)	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|snmpv3_securityname|t_varchar(64)|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|snmpv3_securitylevel|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
@@ -69,8 +69,8 @@ TABLE|dservices|dserviceid|ZBX_SYNC
 FIELD		|dserviceid	|t_id		|	|NOT NULL	|0
 FIELD		|dhostid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|dhosts
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|key_		|t_varchar(255)	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|value		|t_varchar(255)	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|port		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lastup		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
@@ -662,6 +662,7 @@ INDEX		|2		|groupid
 
 TABLE|host_profile|hostid|ZBX_SYNC
 FIELD		|hostid		|t_id		|	|NOT NULL	|0			|1|hosts
+FIELD		|profile_mode	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|type		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|type_full	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
@@ -800,6 +801,7 @@ FIELD		|filter		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|interfaceid	|t_id		|	|NULL		|ZBX_SYNC,ZBX_PROXY	|4|interface	|		|RESTRICT
 FIELD		|port		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|description	|t_text		|''	|NOT NULL	|ZBX_SYNC
+FIELD		|profile_link	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 UNIQUE		|1		|hostid,key_
 INDEX		|3		|status
 INDEX		|4		|templateid

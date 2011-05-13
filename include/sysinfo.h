@@ -163,8 +163,7 @@ extern int	CONFIG_UNSAFE_USER_PARAMETERS;
 typedef enum
 {
 	SYSINFO_RET_OK = 0,
-	SYSINFO_RET_FAIL,
-	SYSINFO_RET_TIMEOUT
+	SYSINFO_RET_FAIL
 }
 ZBX_SYSINFO_RET;
 
@@ -229,7 +228,7 @@ void	free_metrics();
 
 int	process(const char *in_command, unsigned flags, AGENT_RESULT *result);
 
-int	add_user_parameter(char *key, char *command);
+int	add_user_parameter(const char *key, char *command);
 void	test_parameters();
 void	test_parameter(const char *key, unsigned flags);
 

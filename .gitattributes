@@ -296,6 +296,7 @@ frontends/php/styles/originalblue/images/ui-icons_ffffff_256x240.png -text
 frontends/php/tests/api_json/APIInfo.php -text
 frontends/php/tests/api_json/ApiJsonTests.php -text
 frontends/php/tests/api_json/CHost.php -text
+frontends/php/tests/api_json/CItem.php -text
 frontends/php/tests/api_json/CMap.php -text
 frontends/php/tests/api_json/General.php -text
 frontends/php/tests/api_json/User.php -text
@@ -323,6 +324,7 @@ frontends/php/tests/selenium/testPageLatestData.php -text
 frontends/php/tests/selenium/testPageOverview.php -text
 frontends/php/tests/selenium/testPageStatusOfTriggers.php -text
 frontends/php/tests/selenium/testPageWeb.php -text
+include/telnet.h -text
 m4/ax_lib_ibm_db2.m4 -text
 m4/ax_lib_oracle_oci.m4 -text
 m4/iconv.m4 -text
@@ -345,6 +347,7 @@ misc/init.d/freebsd/zabbix_server -text
 misc/init.d/tru64/zabbix_server -text
 misc/init.d/ubuntu/zabbix-agent.conf -text
 misc/init.d/ubuntu/zabbix-server.conf -text
+src/libs/zbxcomms/telnet.c -text
 src/libs/zbxself/Makefile.am -text
 src/zabbix_java/lib/logback-classic-0.9.27.jar -text
 src/zabbix_java/lib/logback-console.xml -text

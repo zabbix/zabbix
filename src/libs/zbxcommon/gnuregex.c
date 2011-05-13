@@ -4889,7 +4889,6 @@ regerror (
     size_t errbuf_size)
 {
   const char *msg;
-  size_t msg_size;
 
   if (errcode < 0
       || errcode >= (sizeof (re_error_msg) / sizeof (re_error_msg[0])))
@@ -4903,22 +4902,10 @@ regerror (
 
   /* POSIX doesn't require that we do anything in this case, but why
      not be nice.  */
-  if (! msg)
-    msg = "Success";
+	if (NULL ==  msg)
+		msg = "Success";
 
-  msg_size = strlen (msg) + 1; /* Includes the null.  */
-
-  if (errbuf_size != 0)
-    {
-      if (msg_size > errbuf_size)
-        {
-          zbx_strlcpy (errbuf, msg, errbuf_size - 1);
-        }
-      else
-        strcpy (errbuf, msg);
-    }
-
-  return msg_size;
+	return zbx_strlcpy(errbuf, msg, errbuf_size) + 1;	/* include the null */
 }
 
 

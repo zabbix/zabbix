@@ -94,11 +94,11 @@ class CTrigger extends CZBXAPI{
 			'only_true'				=> null,
 			'min_severity'			=> null,
 
-			'filter'					=> null,
-			'search'					=> null,
+			'filter'				=> null,
+			'search'				=> null,
 			'searchByAny'			=> null,
-			'startSearch'				=> null,
-			'excludeSearch'				=> null,
+			'startSearch'			=> null,
+			'excludeSearch'			=> null,
 
 // OutPut
 			'expandData'			=> null,
@@ -107,8 +107,8 @@ class CTrigger extends CZBXAPI{
 			'selectGroups'			=> null,
 			'selectHosts'			=> null,
 			'selectItems'			=> null,
-			'select_functions'		=> null,
-			'select_dependencies'	=> null,
+			'selectFunctions'		=> null,
+			'selectDependencies'	=> null,
 			'selectDiscoveryRule'	=> null,
 			'countOutput'			=> null,
 			'groupCount'			=> null,
@@ -635,10 +635,10 @@ class CTrigger extends CZBXAPI{
 					if(!is_null($options['selectItems']) && !isset($result[$trigger['triggerid']]['items'])){
 						$result[$trigger['triggerid']]['items'] = array();
 					}
-					if(!is_null($options['select_functions']) && !isset($result[$trigger['triggerid']]['functions'])){
+					if(!is_null($options['selectFunctions']) && !isset($result[$trigger['triggerid']]['functions'])){
 						$result[$trigger['triggerid']]['functions'] = array();
 					}
-					if(!is_null($options['select_dependencies']) && !isset($result[$trigger['triggerid']]['dependencies'])){
+					if(!is_null($options['selectDependencies']) && !isset($result[$trigger['triggerid']]['dependencies'])){
 						$result[$trigger['triggerid']]['dependencies'] = array();
 					}
 					if(!is_null($options['selectDiscoveryRule']) && !isset($result[$trigger['triggerid']]['discoveryRule'])){
@@ -760,7 +760,7 @@ Copt::memoryPick();
 
 // Adding Objects
 // Adding trigger dependencies
-		if(!is_null($options['select_dependencies']) && str_in_array($options['select_dependencies'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectDependencies']) && str_in_array($options['selectDependencies'], $subselects_allowed_outputs)){
 			$deps = array();
 			$depids = array();
 
@@ -776,7 +776,7 @@ Copt::memoryPick();
 
 			$obj_params = array(
 				'triggerids' => $depids,
-				'output' => $options['select_dependencies'],
+				'output' => $options['selectDependencies'],
 				'expandData' => 1,
 				'preservekeys' => 1
 			);
@@ -857,9 +857,9 @@ Copt::memoryPick();
 		}
 
 // Adding Functions
-		if(!is_null($options['select_functions']) && str_in_array($options['select_functions'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectFunctions']) && str_in_array($options['selectFunctions'], $subselects_allowed_outputs)){
 
-			if($options['select_functions'] == API_OUTPUT_EXTEND)
+			if($options['selectFunctions'] == API_OUTPUT_EXTEND)
 				$sql_select = 'f.*';
 			else
 				$sql_select = 'f.functionid, f.triggerid';
@@ -1277,8 +1277,8 @@ COpt::memoryPick();
 			if($create){
 				$existTrigger = API::Trigger()->exists(array(
 					'description' => $trigger['description'],
-					'expression' => $trigger['expression'])
-				);
+					'expression' => $trigger['expression']
+				));
 
 				if($existTrigger){
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Trigger [%1$s:%2$s] already exists.', $trigger['description'], $trigger['expression']));
@@ -1318,14 +1318,14 @@ COpt::memoryPick();
 		$triggers = zbx_toArray($triggers);
 		$triggerids = zbx_objectValues($triggers, 'triggerid');
 
-			$this->checkInput($triggers, __FUNCTION__);
+		$this->checkInput($triggers, __FUNCTION__);
 
-			$this->updateReal($triggers);
+		$this->updateReal($triggers);
 
-			foreach($triggers as $trigger)
-				$this->inherit($trigger);
+		foreach($triggers as $trigger)
+			$this->inherit($trigger);
 
-			return array('triggerids' => $triggerids);
+		return array('triggerids' => $triggerids);
 	}
 
 /**
@@ -1470,7 +1470,7 @@ COpt::memoryPick();
 
 			DB::update('triggers', array(
 				'values' => array('expression' => $expression),
-				'where' => array('triggerid='.$triggerid)
+				'where' => array('triggerid' => $triggerid)
 			));
 
 			info(_s('Trigger [%1$s:%2$s] created.', $trigger['description'], $trigger['expression']));
@@ -1551,7 +1551,6 @@ COpt::memoryPick();
 				}
 			}
 
-
 			if($expression_changed){
 				delete_function_by_triggerid($trigger['triggerid']);
 
@@ -1577,7 +1576,7 @@ COpt::memoryPick();
 
 			DB::update('triggers', array(
 				'values' => $trigger_update,
-				'where' => array('triggerid='.$trigger['triggerid'])
+				'where' => array('triggerid' => $trigger['triggerid'])
 			));
 
 			$expression = isset($trigger['expression']) ? $trigger['expression'] : explode_exp($dbTrigger['expression']);
@@ -1757,7 +1756,7 @@ COpt::memoryPick();
 				'hostids' => $data['templateids'],
 				'preservekeys' => 1,
 				'output' => API_OUTPUT_EXTEND,
-				'select_dependencies' => true,
+				'selectDependencies' => true,
 			);
 			$triggers = $this->get($options);
 

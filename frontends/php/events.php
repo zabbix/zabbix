@@ -120,7 +120,7 @@ include_once('include/page_header.php');
 			'output' => array('triggerid', 'description', 'expression'),
 			'selectHosts' => array('hostid', 'host'),
 			'selectItems' => API_OUTPUT_EXTEND,
-			'select_functions' => API_OUTPUT_EXTEND,
+			'selectFunctions' => API_OUTPUT_EXTEND,
 			'triggerids' => $_REQUEST['triggerid'],
 		));
 
@@ -137,7 +137,7 @@ include_once('include/page_header.php');
 				'output' => array('triggerid', 'description', 'expression'),
 				'selectHosts' => array('hostid', 'host'),
 				'selectItems' => API_OUTPUT_EXTEND,
-				'select_functions' => API_OUTPUT_EXTEND,
+				'selectFunctions' => API_OUTPUT_EXTEND,
 				'filter' => array('description' => $oldTrigger['description']),
 				'hostids' => $hostid,
 			));
@@ -388,7 +388,7 @@ include_once('include/page_header.php');
 				'eventids' => zbx_objectValues($dsc_events,'eventid'),
 				'output' => API_OUTPUT_EXTEND,
 				'selectHosts' => API_OUTPUT_EXTEND,
-				'select_triggers' => API_OUTPUT_EXTEND,
+				'selectTriggers' => API_OUTPUT_EXTEND,
 				'selectItems' => API_OUTPUT_EXTEND,
 			);
 			$dsc_events = API::Event()->get($options);
@@ -580,7 +580,7 @@ include_once('include/page_header.php');
 			$triggersOptions = array(
 				'triggerids' => zbx_objectValues($events, 'objectid'),
 				'selectHosts' => API_OUTPUT_EXTEND,
-				'select_triggers' => API_OUTPUT_EXTEND,
+				'selectTriggers' => API_OUTPUT_EXTEND,
 				'selectItems' => API_OUTPUT_EXTEND,
 				'output' => API_OUTPUT_EXTEND
 			);

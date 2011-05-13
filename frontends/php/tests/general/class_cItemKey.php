@@ -601,7 +601,7 @@ class class_cItemKey extends PHPUnit_Framework_TestCase
 	*/
 	public function test_parseItemKey($key, $expectedResult){
 
-		$itemKey = new cItemKey($key);
+		$itemKey = new CItemKey($key);
 		$result = array(
 			'valid' => $itemKey->isValid(),
 			'key_id' => $itemKey->getKeyId(),
