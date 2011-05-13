@@ -11,7 +11,7 @@ New features:
  - [ZBXNEXT-511] renamed item description to name, for description introduced a new field (asaveljevs, Vedmak)
 
 Bug fixes:
- - [ZBX-3679] fixed applications unlinked when update item prototypes (Vedmak)
+ - [ZBX-3769] fixed applications unlinked when update item prototypes (Vedmak)
  - [ZBX-3678] fixed unlinking template with action triggers (Vedmak)
  - [ZBX-3758] made Zabbix daemons remove their PID file upon unsuccessful startup (asaveljevs)
  - [ZBX-3791] fixed item form caption after cloning item (Vedmak)
