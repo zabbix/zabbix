@@ -183,6 +183,7 @@ int	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...)
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
+#include "log.h"
 void	__zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_len, const char *fmt, ...)
 {
 	va_list	args;
@@ -220,7 +221,8 @@ void	__zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_l
  *             count - size of destination buffer                             *
  *             fmt - format                                                   *
  *                                                                            *
- * Return value:                                                              *
+ * Return value: the number of characters in the output buffer                *
+ *               (not including the trailing '\0')                            *
  *                                                                            *
  * Author: Alexei Vladishev (see also zbx_snprintf)                           *
  *                                                                            *
@@ -809,7 +811,7 @@ char	*zbx_dvsprintf(char *dest, const char *f, va_list args)
 		string = zbx_malloc(string, size);
 
 		va_copy(curr, args);
-		n = zbx_vsnprintf(string, size, f, curr);
+		n = vsnprintf(string, size, f, curr);
 		va_end(curr);
 
 		if (0 <= n && n < size)
