@@ -56,7 +56,7 @@ $table_dependencies = array(
 		'opcommand', 'opcommand_grp', 'opcommand_hst', 'opconditions', 'opmessage_grp', 'opmessage_usr'),
 	'config' => array('config'),
 	'drules' => array('drules','dchecks'),
-	'items' => array('items'),
+	'items' => array('items', 'functions'),
 	'maintenances' => array('maintenances','timeperiods','maintenances_hosts','maintenances_groups','maintenances_windows'),
 	'media_type' => array('media_type','media','opmessage'),
 	'screens' => array('screens','screens_items','slides'),
