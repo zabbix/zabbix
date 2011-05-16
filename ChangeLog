@@ -145,6 +145,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.6rc1
 
+ - [ZBX-3638] fixed displaying of vertical text in case of special HTML characters (Alexei)
  - [ZBX-3801] added check for duplicate template IDs when creating host through API (KB)
  - [ZBX-3802] fixed error when try to open custom screen from history link (Vedmak)
  - [ZBX-3794] added timeout support to vfs.file.* commands (dimir)
