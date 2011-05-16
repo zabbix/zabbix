@@ -170,7 +170,7 @@ void	load_perf_counters(const char **lines)
 
 		continue;
 pc_fail:
-		zabbix_log(LOG_LEVEL_CRIT, "PerfCounter '%s' FAILED: %s", *pline, err);
+		zabbix_log(LOG_LEVEL_CRIT, "PerfCounter '%s' FAILED: %s", *pline, msg);
 		exit(FAIL);
 	}
 #undef ZBX_PC_FAIL
