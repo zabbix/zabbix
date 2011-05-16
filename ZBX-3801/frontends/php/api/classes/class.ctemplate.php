@@ -1672,7 +1672,7 @@ COpt::memoryPick();
 			);
 		}
 
-		// check if any templates linked to targets have more than one unique item key\application {{{
+		// check if any templates linked to targets have more than one unique item key/application
 		foreach($targetids as $targetid){
 			$linkedTpls = $this->get(array(
 				'nopermissions' => 1,
@@ -1703,10 +1703,8 @@ COpt::memoryPick();
 					S_TEMPLATE_WITH_APPLICATION.' ['.htmlspecialchars($db_cnt['name']).'] '.S_ALREADY_LINKED_TO_HOST_SMALL);
 			}
 		}
-// }}} check if any templates linked to targets have more than one unique item key\application
 
-
-// CHECK TEMPLATE TRIGGERS DEPENDENCIES {{{
+		// CHECK TEMPLATE TRIGGERS DEPENDENCIES
 		foreach($templateids as $tnum => $templateid){
 			$triggerids = array();
 			$db_triggers = get_triggers_by_hostid($templateid);
@@ -1735,7 +1733,6 @@ COpt::memoryPick();
 					_s('Trigger in template [ %1$s ] has dependency with trigger in template [ %2$s ]', $tmp_tpl['host'], $db_dephost['host']));
 			}
 		}
-// }}} CHECK TEMPLATE TRIGGERS DEPENDENCIES
 
 
 		$linked = array();
@@ -1748,7 +1745,7 @@ COpt::memoryPick();
 			$linked[] = array($pair['hostid'] => $pair['templateid']);
 		}
 
-// add template linkages, if problems rollback later
+		// add template linkages, if problems rollback later
 		foreach($targetids as $targetid){
 			foreach($templateids as $tnum => $templateid){
 				foreach($linked as $lnum => $link){
@@ -1763,9 +1760,8 @@ COpt::memoryPick();
 			}
 		}
 
-// CHECK CIRCULAR LINKAGE {{{
-
-// get template linkage graph
+		// CHECK CIRCULAR LINKAGE
+		// get template linkage graph
 		$graph = array();
 		$sql = 'SELECT ht.hostid, ht.templateid'.
 			' FROM hosts_templates ht, hosts h'.
@@ -1777,7 +1773,7 @@ COpt::memoryPick();
 			$graph[$branch['hostid']][$branch['templateid']] = $branch['templateid'];
 		}
 
-// get points that have more than one parent templates
+		// get points that have more than one parent templates
 		$start_points = array();
 		$sql = 'SELECT max(ht.hostid) as hostid, ht.templateid'.
 			' FROM('.
@@ -1795,7 +1791,7 @@ COpt::memoryPick();
 			$graph[$start_point['hostid']][$start_point['templateid']] = $start_point['templateid'];
 		}
 
-// add to the start points also points which we add current templates
+		// add to the start points also points which we add current templates
 		$start_points = array_merge($start_points, $targetids);
 		$start_points = array_unique($start_points);
 
@@ -1805,9 +1801,6 @@ COpt::memoryPick();
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Circular link cannot be created'));
 			}
 		}
-
-// }}} CHECK CIRCULAR LINKAGE
-
 
 		foreach($targetids as $targetid){
 			foreach($templateids as $tnum => $templateid){
