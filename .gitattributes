@@ -357,6 +357,9 @@ src/zabbix_java/lib/org-json-2010-12-28.jar -text
 src/zabbix_java/lib/slf4j-api-1.6.1.jar -text
 src/zabbix_java/tests/junit-4.8.2.jar -text
 src/zabbix_server/selfmon/Makefile.am -text
+src/zabbix_server/snmptrapper/Makefile.am -text
+src/zabbix_server/snmptrapper/snmptrapper.c -text
+src/zabbix_server/snmptrapper/snmptrapper.h -text
 tests/data/README -text
 tests/data/data_test.sql -text
 tests/templates/sqlite3.init -text
