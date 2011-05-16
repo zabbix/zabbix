@@ -41,7 +41,7 @@ class testPageDiscoveryRules extends CWebTest{
 		$itemid = $rule['itemid'];
 		$this->chooseOkOnNextConfirmation();
 
-		DBsave_tables(array('triggers', 'graphs', 'graphs_items', 'functions', 'items', 'item_discovery', 'trigger_discovery', 'graph_discovery'));
+		DBsave_tables('triggers');
 
 		$this->login('host_discovery.php?&hostid='.$rule['hostid']);
 		$this->assertTitle('Configuration of discovery');
@@ -65,7 +65,7 @@ class testPageDiscoveryRules extends CWebTest{
 		$sql="SELECT f.functionid from functions f, item_discovery id WHERE f.itemid=id.itemid AND id.parent_itemid=$itemid";
 		$this->assertEquals(0,DBcount($sql));
 
-		DBrestore_tables(array('items', 'item_discovery', 'trigger_discovery', 'graph_discovery', 'triggers', 'functions', 'graphs', 'graphs_items'));
+		DBrestore_tables('triggers');
 	}
 
 }
