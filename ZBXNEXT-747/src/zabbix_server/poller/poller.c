@@ -37,8 +37,8 @@
 #include "checks_ipmi.h"
 #include "checks_db.h"
 #ifdef HAVE_SSH2
-#include "checks_ssh.h"
-#endif	/* HAVE_SSH2 */
+#	include "checks_ssh.h"
+#endif
 #include "checks_telnet.h"
 #include "checks_java.h"
 #include "checks_calculated.h"

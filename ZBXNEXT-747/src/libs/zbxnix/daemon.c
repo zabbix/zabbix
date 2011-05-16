@@ -149,7 +149,7 @@ int	daemon_start(int allow_root)
 	struct sigaction	phan;
 	char			user[7] = "zabbix";
 
-	if (0 == allow_root && (0 == getuid() || 0 == getgid())) /* running as root? */
+	if (0 == allow_root && (0 == getuid() || 0 == getgid()))	/* running as root? */
 	{
 		pwd = getpwnam(user);
 

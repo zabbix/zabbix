@@ -58,6 +58,7 @@ extern int	CONFIG_PINGER_FORKS;
 extern int	CONFIG_JAVAPOLLER_FORKS;
 extern int	CONFIG_HTTPPOLLER_FORKS;
 extern int	CONFIG_TRAPPER_FORKS;
+extern int	CONFIG_SNMPTRAPPER_FORKS;
 extern int	CONFIG_PROXYPOLLER_FORKS;
 extern int	CONFIG_ESCALATOR_FORKS;
 extern int	CONFIG_HISTSYNCER_FORKS;
@@ -105,6 +106,8 @@ int	get_process_type_forks(unsigned char process_type)
 			return CONFIG_HTTPPOLLER_FORKS;
 		case ZBX_PROCESS_TYPE_TRAPPER:
 			return CONFIG_TRAPPER_FORKS;
+		case ZBX_PROCESS_TYPE_SNMPTRAPPER:
+			return CONFIG_SNMPTRAPPER_FORKS;
 		case ZBX_PROCESS_TYPE_PROXYPOLLER:
 			return CONFIG_PROXYPOLLER_FORKS;
 		case ZBX_PROCESS_TYPE_ESCALATOR:
@@ -170,6 +173,8 @@ const char	*get_process_type_string(unsigned char process_type)
 			return "http poller";
 		case ZBX_PROCESS_TYPE_TRAPPER:
 			return "trapper";
+		case ZBX_PROCESS_TYPE_SNMPTRAPPER:
+			return "snmp trapper";
 		case ZBX_PROCESS_TYPE_PROXYPOLLER:
 			return "proxy poller";
 		case ZBX_PROCESS_TYPE_ESCALATOR:
