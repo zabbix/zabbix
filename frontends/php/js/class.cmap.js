@@ -660,6 +660,10 @@ var CSelement = function(sysmap, selementData){
 			this.data.x = data.position.left;
 			this.data.y = data.position.top;
 
+			this.domNode.css({
+				top: this.data.y +'px',
+				left: this.data.x + 'px'
+			});
 			this.align();
 
 			this.sysmap.updateImage();
@@ -680,6 +684,7 @@ CSelement.prototype = {
 	selected: false, // element is not selected
 	image: null,
 
+	// TODO: test/fix
 	update: function(params){
 		this.data = params;
 
@@ -816,7 +821,7 @@ function CElementForm(formContainer, sysmap){
 			.prepend('<option value="0">' + locale['S_DEFAULT'] + '</option>');
 
 	// apply jQuery UI elements
-	jQuery('#elementApply, #elementRemove, #elementClose, #sysmap_save').button();
+	jQuery('#elementApply, #elementRemove, #elementClose').button();
 
 
 	// create action processor
@@ -916,7 +921,10 @@ CElementForm.prototype = {
 	},
 
 	setValues: function(selement){
-		this.domNode.populate(selement);
+		for(var elementName in selement){
+			jQuery('[name='+elementName+']', this.domNode).val(selement[elementName]);
+		}
+
 		jQuery('#advanced_icons').attr('checked', (selement.iconid_on != 0) || (selement.iconid_maintenance != 0) || (selement.iconid_disabled != 0));
 
 		// clear urls
@@ -927,17 +935,23 @@ CElementForm.prototype = {
 		this.addUrls(selement.urls);
 
 		this.actionProcessor.process();
+
+		this.updateList(selement.selementid);
 	},
 
-// LINK CONTAINER
-//**************************************************************************************************************************************************
-	updateList: function(){
+	updateList: function(selementid){
 		var tpl = new Template(jQuery('#mapElementsFormListRow').html());
 
 		jQuery('#formList').empty();
+
+		var links = this.sysmap.getLinksBySelementIds(selementid);
+
 		var list = new Array();
-		for(var id in this.sysmap.selection.selements){
-			var elementData = this.sysmap.selements[id].data;
+		for(var i=0; i < links.length; i++){
+			var link = this.sysmap.links[links[i]].data;
+
+			var linkedSelementid = selementid == link.selementid1 ? link.selementid2 : link.selementid1;
+			var elementData = this.sysmap.selements[linkedSelementid].data;
 
 			var elementTypeText = '';
 			switch(elementData.elementtype){
@@ -949,12 +963,14 @@ CElementForm.prototype = {
 			}
 			list.push({
 				elementType: elementTypeText,
-				elementName: elementData.elementName
+				elementName: elementData.elementName,
+				linkName: 'link'
 			});
 		}
 
 		// sort by elementtype and then by element name
 		list.sort(function(a, b){
+			return 0;
 			if(a.elementType < b.elementType){ return -1; }
 			if(a.elementType > b.elementType){ return 1; }
 			if(a.elementType == b.elementType){
@@ -967,174 +983,12 @@ CElementForm.prototype = {
 			return 0;
 		});
 		for(var i = 0; i < list.length; i++){
-			jQuery(tpl.evaluate(list[i])).appendTo('#massList');
+			jQuery(tpl.evaluate(list[i])).appendTo('#formList');
 		}
 
-		jQuery('#massList tr:nth-child(odd)').addClass('odd_row');
-		jQuery('#massList tr:nth-child(even)').addClass('even_row');
+		jQuery('#formList tr:nth-child(odd)').addClass('odd_row');
+		jQuery('#formList tr:nth-child(even)').addClass('even_row');
 	},
-
-	create_linkContainer: function(e, selementid){
-// var initialization
-		this.linkContainer = {};
-
-
-// Down Stream
-
-		var e_div_1 = document.createElement('div');
-		this.linkContainer.container = e_div_1;
-		e_div_1.setAttribute('id',"linkContainer");
-		e_div_1.style.overflow = 'auto';
-
-//	e_td_4.appendChild(e_div_1);
-	},
-
-	update_linkContainer: function(e){
-// Create if not exists
-		if(is_null($('linkContainer'))){
-// HEADER
-			var e_table_1 = document.createElement('table');
-			e_table_1.setAttribute('cellspacing',"0");
-			e_table_1.setAttribute('cellpadding',"1");
-			e_table_1.className = 'header';
-
-
-			var e_tbody_2 = document.createElement('tbody');
-			e_table_1.appendChild(e_tbody_2);
-
-
-			var e_tr_3 = document.createElement('tr');
-			e_tbody_2.appendChild(e_tr_3);
-
-
-			var e_td_4 = document.createElement('td');
-			e_td_4.className = 'header_l';
-			e_td_4.appendChild(document.createTextNode(locale['S_CONNECTORS']));
-			e_tr_3.appendChild(e_td_4);
-
-
-			var e_td_4 = document.createElement('td');
-			e_td_4.setAttribute('align',"right");
-			e_td_4.className = 'header_r';
-
-			e_tr_3.appendChild(e_td_4);
-
-			$('divSelementForm').appendChild(e_table_1);
-//-----------
-
-			this.create_linkContainer(e);
-			$('divSelementForm').appendChild(this.linkContainer.container);
-//		$('divSelementForm').appendChild(document.createElement('br'));
-		}
-//---
-
-		var e_table_1 = document.createElement('table');
-		e_table_1.setAttribute('cellSpacing',"1");
-		e_table_1.setAttribute('cellPadding',"3");
-		e_table_1.className = "tableinfo";
-
-
-		var e_tbody_2 = document.createElement('tbody');
-		e_table_1.appendChild(e_tbody_2);
-
-
-		var e_tr_3 = document.createElement('tr');
-		e_tr_3.className = "header";
-		e_tbody_2.appendChild(e_tr_3);
-
-
-		var e_td_4 = document.createElement('td');
-		e_tr_3.appendChild(e_td_4);
-		e_td_4.appendChild(document.createTextNode(locale['S_LINK']));
-
-
-		var e_td_4 = document.createElement('td');
-		e_tr_3.appendChild(e_td_4);
-		e_td_4.appendChild(document.createTextNode(locale['S_ELEMENT']+' 1'));
-
-
-		var e_td_4 = document.createElement('td');
-		e_tr_3.appendChild(e_td_4);
-		e_td_4.appendChild(document.createTextNode(locale['S_ELEMENT']+' 2'));
-
-
-		var e_td_4 = document.createElement('td');
-		e_tr_3.appendChild(e_td_4);
-		e_td_4.appendChild(document.createTextNode(locale['S_LINK_STATUS_INDICATOR']));
-
-		var selementid = 0;
-		var linkids = {};
-		for(var selementid in this.sysmap.selection.selements){
-			if(!isset(selementid, this.sysmap.selements)) continue;
-
-			var current_linkids = this.sysmap.getLinksBySelementIds(selementid);
-			for(var i=0; i<current_linkids.length;i++){
-				linkids[current_linkids[i]] = current_linkids[i];
-			}
-		}
-
-		this.linkContainer.container.style.height = 'auto';
-
-		var count = 0;
-		var maplink = null;
-		for(var linkid in linkids){
-			if(!isset(linkid, this.sysmap.links)) continue;
-
-			count++;
-			maplink = this.sysmap.data.links[linkid];
-
-			if(count > 4) this.linkContainer.container.style.height = '120px';
-
-			var e_tr_3 = document.createElement('tr');
-			e_tbody_2.appendChild(e_tr_3);
-
-
-			var e_td_4 = document.createElement('td');
-			e_tr_3.appendChild(e_td_4);
-
-
-			var e_span_5 = document.createElement('span');
-			e_span_5.className = "link";
-			addListener(e_span_5, 'click', this.form_link_update.bindAsEventListener(this, linkid));
-			e_span_5.appendChild(document.createTextNode(locale['S_LINK']+' '+count));
-			e_td_4.appendChild(e_span_5);
-
-
-			var e_td_4 = document.createElement('td');
-			e_td_4.appendChild(document.createTextNode(this.sysmap.data.selements[maplink.selementid1].label_expanded));
-			e_tr_3.appendChild(e_td_4);
-
-
-			var e_td_4 = document.createElement('td');
-			e_td_4.appendChild(document.createTextNode(this.sysmap.data.selements[maplink.selementid2].label_expanded));
-			e_tr_3.appendChild(e_td_4);
-
-
-			var e_td_4 = document.createElement('td');
-			for(var linktriggerid in maplink.linktriggers){
-				if(empty(maplink.linktriggers[linktriggerid])) continue;
-
-				e_td_4.appendChild(document.createTextNode(maplink.linktriggers[linktriggerid].desc_exp));
-				e_td_4.appendChild(document.createElement('br'));
-			}
-			e_tr_3.appendChild(e_td_4);
-		}
-
-		if(count == 0){
-			var e_tr_3 = document.createElement('tr');
-			e_tbody_2.appendChild(e_tr_3);
-
-			var e_td_4 = document.createElement('td');
-			e_td_4.setAttribute('colSpan',4);
-			e_td_4.className = 'center';
-			e_td_4.appendChild(document.createTextNode(locale['S_NO_LINKS']));
-			e_tr_3.appendChild(e_td_4);
-		}
-
-		$(this.linkContainer.container).update(e_table_1);
-	},
-
-
 
 	form_selement_save: function(e){
 		var params = {};
@@ -1270,449 +1124,6 @@ CElementForm.prototype = {
 	},
 
 // LINK FORM
-//**************************************************************************************************************************************************
-//**************************************************************************************************************************************************
-
-	form_link_hide: function(e){
-		if(!isset('form', this.linkForm) || empty(this.linkForm.form)) return false;
-
-		this.linkForm.form.parentNode.removeChild(this.linkForm.form);
-		this.linkForm.form = null;
-	},
-
-	form_link_create: function(e){
-		var e_form_1 = document.createElement('form');
-		this.linkForm.form = e_form_1;
-
-		e_form_1.setAttribute('id',"linkForm");
-		e_form_1.setAttribute('name',"linkForm");
-		e_form_1.setAttribute('accept-charset',"utf-8");
-		e_form_1.setAttribute('action',"sysmap.php");
-		e_form_1.setAttribute('method',"post");
-
-
-		var e_table_2 = document.createElement('table');
-		e_table_2.setAttribute('cellSpacing',"0");
-		e_table_2.setAttribute('cellPadding',"1");
-		e_table_2.setAttribute('align',"center");
-		e_table_2.className = "formtable";
-		e_table_2.style.width = '100%';
-		e_form_1.appendChild(e_table_2);
-
-
-		var e_tbody_3 = document.createElement('tbody');
-		e_table_2.appendChild(e_tbody_3);
-
-
-		var e_tr_4 = document.createElement('tr');
-		e_tr_4.className = "header";
-		e_tbody_3.appendChild(e_tr_4);
-
-
-		var e_td_5 = document.createElement('td');
-		e_td_5.setAttribute('colSpan',"2");
-		e_td_5.className = "form_row_first";
-		e_tr_4.appendChild(e_td_5);
-
-		e_td_5.appendChild(document.createTextNode(locale['S_EDIT_CONNECTOR']));
-
-// HIDDEN
-		var e_input_4 = document.createElement('input');
-		this.linkForm.linkid = e_input_4;
-		e_input_4.setAttribute('type',"hidden");
-		e_input_4.setAttribute('value',"0");
-		e_input_4.setAttribute('id',"linkid");
-		e_input_4.setAttribute('name',"linkid");
-		e_tbody_3.appendChild(e_input_4);
-
-
-// LABEL
-		var e_tr_4 = document.createElement('tr');
-		e_tbody_3.appendChild(e_tr_4);
-
-
-		var e_td_5 = document.createElement('td');
-		e_td_5.appendChild(document.createTextNode(locale['S_LABEL']));
-		e_tr_4.appendChild(e_td_5);
-
-
-		var e_td_5 = document.createElement('td');
-		e_tr_4.appendChild(e_td_5);
-
-
-		var e_textarea_6 = document.createElement('textarea');
-		this.linkForm.linklabel = e_textarea_6;
-
-		e_textarea_6.setAttribute('cols',"48");
-		e_textarea_6.setAttribute('rows',"4");
-		e_textarea_6.setAttribute('name',"linklabel");
-		e_textarea_6.setAttribute('id',"linklabel");
-		e_textarea_6.className = "input";
-		e_td_5.appendChild(e_textarea_6);
-
-
-// SELEMENTID1
-		var e_tr_4 = document.createElement('tr');
-		e_tbody_3.appendChild(e_tr_4);
-
-
-		var e_td_5 = document.createElement('td');
-		e_td_5.appendChild(document.createTextNode(locale['S_ELEMENT']+' 1'));
-		e_tr_4.appendChild(e_td_5);
-
-
-		var e_td_5 = document.createElement('td');
-		e_tr_4.appendChild(e_td_5);
-
-
-		var e_select_6 = document.createElement('select');
-		this.linkForm.selementid1 = e_select_6;
-		e_select_6.setAttribute('size',"1");
-		e_select_6.className = "input";
-		e_select_6.setAttribute('name',"selementid1");
-		e_select_6.setAttribute('id',"selementid1");
-		e_td_5.appendChild(e_select_6);
-
-// SELEMENTID2
-		var e_tr_4 = document.createElement('tr');
-		e_tbody_3.appendChild(e_tr_4);
-
-
-		var e_td_5 = document.createElement('td');
-		e_tr_4.appendChild(e_td_5);
-
-
-		e_td_5.appendChild(document.createTextNode(locale['S_ELEMENT']+' 2'));
-
-
-		var e_td_5 = document.createElement('td');
-		e_tr_4.appendChild(e_td_5);
-
-
-		var e_select_6 = document.createElement('select');
-		this.linkForm.selementid2 = e_select_6;
-		e_select_6.setAttribute('size',"1");
-		e_select_6.className = "input";
-		e_select_6.setAttribute('name',"selementid2");
-		e_select_6.setAttribute('id',"selementid2");
-		e_td_5.appendChild(e_select_6);
-
-
-// LINK STATUS INDICATORS
-		var e_tr_4 = document.createElement('tr');
-		e_tbody_3.appendChild(e_tr_4);
-
-
-		var e_td_5 = document.createElement('td');
-		e_td_5.appendChild(document.createTextNode(locale['S_LINK_INDICATORS']));
-		e_tr_4.appendChild(e_td_5);
-
-
-		var e_td_5 = document.createElement('td');
-		this.linkForm.linkIndicatorsTable = e_td_5;
-
-		e_tr_4.appendChild(e_td_5);
-
-// LINE TYPE OK
-		var e_tr_4 = document.createElement('tr');
-		e_tbody_3.appendChild(e_tr_4);
-
-
-		var e_td_5 = document.createElement('td');
-		e_tr_4.appendChild(e_td_5);
-		e_td_5.appendChild(document.createTextNode(locale['S_TYPE_OK']));
-
-
-		var e_td_5 = document.createElement('td');
-		e_tr_4.appendChild(e_td_5);
-
-
-		var e_select_6 = document.createElement('select');
-		this.linkForm.drawtype = e_select_6;
-
-		e_select_6.setAttribute('size',"1");
-		e_select_6.className = "input";
-		e_select_6.setAttribute('name',"drawtype");
-		e_select_6.setAttribute('id',"drawtype");
-		e_td_5.appendChild(e_select_6);
-
-		var e_option_7 = document.createElement('option');
-		e_option_7.setAttribute('value',"0");
-		e_option_7.appendChild(document.createTextNode(locale['S_LINE']));
-		e_select_6.appendChild(e_option_7);
-
-
-		var e_option_7 = document.createElement('option');
-		e_option_7.setAttribute('value',"2");
-		e_option_7.appendChild(document.createTextNode(locale['S_BOLD_LINE']));
-		e_select_6.appendChild(e_option_7);
-
-
-		var e_option_7 = document.createElement('option');
-		e_option_7.setAttribute('value',"3");
-		e_option_7.appendChild(document.createTextNode(locale['S_DOT']));
-		e_select_6.appendChild(e_option_7);
-
-
-		var e_option_7 = document.createElement('option');
-		e_option_7.setAttribute('value',"4");
-		e_option_7.appendChild(document.createTextNode(locale['S_DASHED_LINE']));
-		e_select_6.appendChild(e_option_7);
-
-// Colour OK
-		var e_tr_4 = document.createElement('tr');
-		e_tbody_3.appendChild(e_tr_4);
-
-
-		var e_td_5 = document.createElement('td');
-		e_td_5.appendChild(document.createTextNode(locale['S_COLOR_OK']));
-		e_tr_4.appendChild(e_td_5);
-
-
-		var e_td_5 = document.createElement('td');
-		e_tr_4.appendChild(e_td_5);
-
-
-		var e_input_6 = document.createElement('input');
-		this.linkForm.color = e_input_6;
-		e_input_6.setAttribute('style',"margin-top: 0px; margin-bottom: 0px;");
-		e_input_6.setAttribute('onchange',"set_color_by_name('color',this.value)");
-		e_input_6.setAttribute('maxlength',"6");
-		e_input_6.setAttribute('value',"000055");
-		e_input_6.setAttribute('size',"7");
-		e_input_6.setAttribute('id',"color");
-		e_input_6.setAttribute('name',"color");
-		e_input_6.className = "input";
-		e_td_5.appendChild(e_input_6);
-
-
-		var e_div_6 = document.createElement('div');
-		this.linkForm.colorPicker = e_div_6;
-
-		e_div_6.setAttribute('title',"#000055");
-		e_div_6.setAttribute('id',"lbl_color");
-		e_div_6.setAttribute('name',"lbl_color");
-		e_div_6.className = "pointer";
-		addListener(e_div_6, 'click', function(){show_color_picker('color');});
-		// e_div_6.setAttribute('onclick',"javascript: show_color_picker('color')");
-
-		e_div_6.style.marginLeft = '2px';
-		e_div_6.style.border = '1px solid black';
-		e_div_6.style.display = 'inline';
-		e_div_6.style.width = '10px';
-		e_div_6.style.height = '10px';
-		e_div_6.style.textDecoration = 'none';
-		e_div_6.style.backgroundColor = '#000000';
-
-		e_div_6.innerHTML = '&nbsp;&nbsp;&nbsp;';
-		e_td_5.appendChild(e_div_6);
-
-
-// FOOTER
-		var e_tr_4 = document.createElement('tr');
-		e_tr_4.className = "footer";
-		e_tbody_3.appendChild(e_tr_4);
-
-
-		var e_td_5 = document.createElement('td');
-		e_td_5.setAttribute('colSpan',"2");
-		e_td_5.className = "form_row_last";
-		e_td_5.appendChild(document.createTextNode(' '));
-		e_tr_4.appendChild(e_td_5);
-
-
-		var e_input_6 = document.createElement('input');
-		e_input_6.setAttribute('type',"button");
-		e_input_6.setAttribute('name',"apply");
-		e_input_6.className = "input button shadow";
-		e_input_6.setAttribute('value',locale['S_APPLY']);
-		e_td_5.appendChild(e_input_6);
-		addListener(e_input_6, 'click', this.form_link_save.bindAsEventListener(this));
-
-
-		e_td_5.appendChild(document.createTextNode(' '));
-
-
-		var e_input_6 = document.createElement('input');
-		e_input_6.setAttribute('type',"button");
-		e_input_6.setAttribute('name',"remove");
-		e_input_6.className = "input button shadow";
-		e_input_6.setAttribute('value',locale['S_REMOVE']);
-		e_td_5.appendChild(e_input_6);
-		addListener(e_input_6, 'click', this.form_link_delete.bindAsEventListener(this));
-
-
-		e_td_5.appendChild(document.createTextNode(' '));
-
-
-		var e_input_6 = document.createElement('input');
-		e_input_6.setAttribute('type',"button");
-		e_input_6.setAttribute('name',"close");
-		e_input_6.className = "input button shadow";
-		e_input_6.setAttribute('value',locale['S_CLOSE']);
-		addListener(e_input_6, 'click', this.form_link_hide.bindAsEventListener(this));
-
-
-		e_td_5.appendChild(e_input_6);
-	},
-
-	form_link_update: function(e, linkid){
-		if(!isset(linkid, this.sysmap.links)) return false;
-
-		if(is_null($('linkForm'))){
-			this.form_link_create(e);
-			$('divSelementForm').appendChild(this.linkForm.form);
-		}
-
-		var maplink = this.sysmap.data.links[linkid];
-
-// LINKID
-		this.linkForm.linkid.value = linkid;
-
-
-// LABEL
-		this.linkForm.linklabel.value = maplink.label;
-
-// SELEMENTID1
-		$(this.linkForm.selementid1).update();
-		for(var selementid in this.sysmap.selements){
-			if(empty(this.sysmap.selements[selementid])) continue;
-
-			var e_option_7 = document.createElement('option');
-
-			if(maplink.selementid1 == selementid){
-				e_option_7.setAttribute('selected',"selected");
-			}
-			else if(maplink.selementid2 == selementid){
-				continue;
-			}
-
-			e_option_7.setAttribute('value', selementid);
-			e_option_7.appendChild(document.createTextNode(this.sysmap.data.selements[selementid].label_expanded));
-
-			this.linkForm.selementid1.appendChild(e_option_7);
-		}
-
-
-// SELEMENTID2
-		$(this.linkForm.selementid2).update();
-		for(var selementid in this.sysmap.selements){
-			if(empty(this.sysmap.selements[selementid])) continue;
-
-			var e_option_7 = document.createElement('option');
-
-			if(maplink.selementid2 == selementid){
-				e_option_7.setAttribute('selected',"selected");
-			}
-			else if(maplink.selementid1 == selementid){
-				continue;
-			}
-
-			e_option_7.setAttribute('value', selementid);
-			e_option_7.appendChild(document.createTextNode(this.sysmap.data.selements[selementid].label_expanded));
-
-			this.linkForm.selementid2.appendChild(e_option_7);
-		}
-
-
-// LINK INDICATOR TABLE
-		var e_table_6 = document.createElement('table');
-		e_table_6.setAttribute('cellSpacing',"1");
-		e_table_6.setAttribute('cellPadding',"3");
-		e_table_6.setAttribute('id',"linktriggers");
-		e_table_6.className = "tableinfo";
-
-
-		var e_tbody_7 = document.createElement('tbody');
-		this.linkForm.linkIndicatorsBody = e_tbody_7;
-		e_table_6.appendChild(e_tbody_7);
-
-
-		var e_tr_8 = document.createElement('tr');
-		e_tr_8.className = "header";
-		e_tbody_7.appendChild(e_tr_8);
-
-
-		var e_td_9 = document.createElement('td');
-		e_tr_8.appendChild(e_td_9);
-
-
-		var e_input_10 = document.createElement('input');
-		e_input_10.setAttribute('type',"checkbox");
-		e_input_10.setAttribute('onclick',"javascript: checkLocalAll('linkForm','all_link_triggerids','link_triggerids');");
-		e_input_10.setAttribute('id',"all_link_triggerids");
-		e_input_10.setAttribute('name',"all_link_triggerids");
-		e_input_10.setAttribute('value',"yes");
-		e_input_10.className = "checkbox";
-		e_td_9.appendChild(e_input_10);
-
-
-		var e_td_9 = document.createElement('td');
-		e_td_9.appendChild(document.createTextNode(locale['S_TRIGGERS']));
-		e_tr_8.appendChild(e_td_9);
-
-
-		var e_td_9 = document.createElement('td');
-		e_td_9.appendChild(document.createTextNode(locale['S_TYPE']));
-		e_tr_8.appendChild(e_td_9);
-
-
-		var e_td_9 = document.createElement('td');
-		e_td_9.appendChild(document.createTextNode(locale['S_COLOR']));
-		e_tr_8.appendChild(e_td_9);
-
-
-// Indicators
-		for(var linktriggerid in maplink.linktriggers){
-			if(empty(maplink.linktriggers[linktriggerid])) continue;
-
-			this.form_link_addLinktrigger(maplink.linktriggers[linktriggerid]);
-		}
-
-		$(this.linkForm.linkIndicatorsTable).update(e_table_6);
-
-		var e_br_6 = document.createElement('br');
-		this.linkForm.linkIndicatorsTable.appendChild(e_br_6);
-
-
-		var e_input_6 = document.createElement('input');
-		e_input_6.setAttribute('type',"button");
-		e_input_6.setAttribute('name',"Add");
-		e_input_6.setAttribute('value',locale['S_ADD']);
-		e_input_6.setAttribute('style',"margin: 2px 4px");
-		e_input_6.className = "input button link_menu";
-		this.linkForm.linkIndicatorsTable.appendChild(e_input_6);
-
-		var url = 'popup_link_tr.php?form=1&mapid='+this.id;
-		addListener(e_input_6, 'click', function(){PopUp(url,640, 420, 'ZBX_Link_Indicator');});
-
-
-		var e_input_6 = document.createElement('input');
-		e_input_6.setAttribute('type',"button");
-		e_input_6.setAttribute('name',"Remove");
-		e_input_6.setAttribute('value',locale['S_REMOVE']);
-		e_input_6.setAttribute('style',"margin: 2px 4px");
-		e_input_6.className = "input button link_menu";
-		this.linkForm.linkIndicatorsTable.appendChild(e_input_6);
-
-		addListener(e_input_6, 'click', function(){remove_childs('linkForm','link_triggerids','tr');});
-//----
-
-
-// Type ok
-		if(maplink.drawtype == 0) var dindex = 0; // S_LINE
-		if(maplink.drawtype == 2) var dindex = 1; // S_BOLD_LINE
-		if(maplink.drawtype == 3) var dindex = 2; // S_DOT
-		if(maplink.drawtype == 4) var dindex = 3; // S_DASHED_LINE
-		this.linkForm.drawtype.selectedIndex = dindex;
-
-
-// COLOR OK
-		this.linkForm.color.value = maplink.color;
-		this.linkForm.colorPicker.style.backgroundColor = '#'+maplink.color;
-	},
-
-
 	form_link_addLinktrigger: function(linktrigger){
 		var triggerid = linktrigger.triggerid;
 
@@ -1975,10 +1386,6 @@ CMassForm.prototype = {
 
 	hide: function(){
 		this.domNode.toggle(false);
-		this.clearValues();
-	},
-
-	clearValues: function(){
 		jQuery(':checkbox', this.domNode).prop('checked', false);
 		jQuery('option', this.domNode).prop('selected', false);
 		jQuery('textarea', this.domNode).val('');
@@ -2006,17 +1413,18 @@ CMassForm.prototype = {
 			});
 		}
 
-		// sort by elementtype and then by element name
+		// sort by element type and then by element name
 		list.sort(function(a, b){
-			if(a.elementType < b.elementType){ return -1; }
-			if(a.elementType > b.elementType){ return 1; }
-			if(a.elementType == b.elementType){
-				var elementTypeA = a.elementName.toLowerCase();
-				var elementTypeB = b.elementName.toLowerCase();
+			var elementTypeA = a.elementType.toLowerCase();
+			var elementTypeB = b.elementType.toLowerCase();
+			if(elementTypeA < elementTypeB){ return -1; }
+			if(elementTypeA > elementTypeB){ return 1; }
 
-				if(elementTypeA < elementTypeB){ return -1; }
-				if(elementTypeA > elementTypeB){ return 1; }
-			}
+			var elementNameA = a.elementName.toLowerCase();
+			var elementNameB = b.elementName.toLowerCase();
+			if(elementNameA < elementNameB){ return -1; }
+			if(elementNameA > elementNameB){ return 1; }
+
 			return 0;
 		});
 		for(var i = 0; i < list.length; i++){
@@ -2027,80 +1435,4 @@ CMassForm.prototype = {
 		jQuery('#massList tr:nth-child(even)').addClass('even_row');
 	}
 
-};
-
-
-
-jQuery.fn.populate = function(obj, options) {
-	var populateFormElement = function(form, name, value){
-		var element	= form[name];
-
-		if(element == undefined){
-			// look for the element
-			element = jQuery('#' + name, form);
-			if(element){
-				element.html(value);
-				return true;
-			}
-
-			return false;
-		}
-
-// to array
-		elements = element.type == undefined && element.length ? element : [element];
-
-		for(var e = 0; e < elements.length; e++){
-			var element = elements[e];
-
-			if(!element || typeof element == 'undefined' || typeof element == 'function')
-				continue;
-
-			switch(element.type || element.tagName){
-				case 'radio':
-					element.checked = (element.value != '' && value.toString() == element.value);
-				case 'checkbox':
-					var values = value.constructor == Array ? value : [value];
-					for(var j = 0; j < values.length; j++)
-						element.checked |= element.value == values[j];
-
-					//element.checked = (element.value != '' && value.toString().toLowerCase() == element.value.toLowerCase());
-					break;
-				case 'select-multiple':
-					var values = value.constructor == Array ? value : [value];
-					for(var i = 0; i < element.options.length; i++){
-						for(var j = 0; j < values.length; j++)
-							element.options[i].selected |= element.options[i].value == values[j];
-					}
-					break;
-				case 'select':
-				case 'select-one':
-					element.value = value.toString() || value;
-					break;
-				case 'text':
-				case 'button':
-				case 'textarea':
-				case 'submit':
-				default:
-					element.value	= (value == null) ? "" : value;
-			}
-		}
-	};
-
-	// options & setup
-	if (obj === undefined) return this;
-
-	// options
-	var options = jQuery.extend({resetForm: true,identifier: 'id'},options);
-
-	// main process function
-	this.each(
-		function(){
-			var tagName	= this.tagName.toLowerCase();
-			if(tagName == 'form' && options.resetForm)
-				this.reset();
-
-			for(var i in obj) populateFormElement(this, i, obj[i]);
-		});
-
-	return this;
 };
