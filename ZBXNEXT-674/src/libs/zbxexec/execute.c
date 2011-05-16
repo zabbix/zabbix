@@ -155,7 +155,7 @@ static int	zbx_popen(pid_t *pid, const char *command)
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() executing script", __function_name);
 
 	execl("/bin/sh", "sh", "-c", command, NULL);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot execute script [%s]: %s", __function_name, command, strerror(errno));
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot execute script [%s]: %s", __function_name, command, zbx_strerror(errno));
 	exit(FAIL);
 }
 
@@ -198,7 +198,7 @@ retry:
 		if (-1 == (rc = waitpid(pid, &status, WUNTRACED)))
 		{
 #endif
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() waitpid failure: %s", __function_name, strerror(errno));
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() waitpid failure: %s", __function_name, zbx_strerror(errno));
 			goto exit;
 		}
 
@@ -281,7 +281,7 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 	/* create a pipe for the child process's STDOUT */
 	if (0 == CreatePipe(&hRead, &hWrite, &sa, 0))
 	{
-		zbx_snprintf(error, max_error_len, "Unable to create pipe [%s]", strerror_from_system(GetLastError()));
+		zbx_snprintf(error, max_error_len, "unable to create pipe: %s", strerror_from_system(GetLastError()));
 		ret = FAIL;
 		goto lbl_exit;
 	}
@@ -300,7 +300,7 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 	/* create new process */
 	if (0 == CreateProcess(NULL, wcmd, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi))
 	{
-		zbx_snprintf(error, max_error_len, "Unable to create process: '%s' [%s]",
+		zbx_snprintf(error, max_error_len, "unable to create process: '%s': %s",
 				cmd, strerror_from_system(GetLastError()));
 		ret = FAIL;
 		goto lbl_exit;
@@ -385,9 +385,9 @@ lbl_exit:
 		if (-1 == rc)
 		{
 			if (EINTR == errno)
-				zbx_strlcpy(error, "Timeout while executing a shell script", max_error_len);
+				zbx_strlcpy(error, "timeout while executing a shell script", max_error_len);
 			else
-				zbx_strlcpy(error, strerror(errno), max_error_len);
+				zbx_strlcpy(error, zbx_strerror(errno), max_error_len);
 
 			kill(pid, SIGTERM);
 			zbx_waitpid(pid);
@@ -398,9 +398,9 @@ lbl_exit:
 			if (-1 == zbx_waitpid(pid))
 			{
 				if (EINTR == errno)
-					zbx_strlcpy(error, "Timeout while executing a shell script", max_error_len);
+					zbx_strlcpy(error, "timeout while executing a shell script", max_error_len);
 				else
-					zbx_strlcpy(error, strerror(errno), max_error_len);
+					zbx_strlcpy(error, zbx_strerror(errno), max_error_len);
 
 				kill(pid, SIGTERM);
 				zbx_waitpid(pid);
@@ -410,7 +410,7 @@ lbl_exit:
 	}
 	else
 	{
-		zbx_strlcpy(error, strerror(errno), max_error_len);
+		zbx_strlcpy(error, zbx_strerror(errno), max_error_len);
 		ret = FAIL;
 	}
 

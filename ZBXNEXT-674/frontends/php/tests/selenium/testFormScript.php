@@ -22,8 +22,6 @@
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
 class testFormScript extends CWebTest{
-	public $affectedTables = array('scripts');
-
 	// Data provider
 	public static function providerScripts(){
 		// data - values for form inputs
@@ -124,7 +122,7 @@ class testFormScript extends CWebTest{
 	 */
 	public function testCreate($data, $resultSave, $DBvalues){
 
-		DBsave_tables($this->affectedTables);
+		DBsave_tables('scripts');
 
 		$this->login('scripts.php?form=1');
 
@@ -172,7 +170,7 @@ class testFormScript extends CWebTest{
 			$this->assertEquals($DBhash, DBhash($sql), "DB fields changed after unsuccessful save.");
 		}
 
-		DBrestore_tables($this->affectedTables);
+		DBrestore_tables('scripts');
 	}
 
 }

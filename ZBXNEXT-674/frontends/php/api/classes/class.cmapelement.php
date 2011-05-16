@@ -508,9 +508,7 @@ COpt::memoryPick();
 // permissions
 		if($update || $delete){
 			$selementDbFields = array(
-				'sysmapid' => null,
 				'selementid' => null,
-				'iconid_off' => null,
 			);
 
 			$dbSelements = $this->getSelements(array(
@@ -533,7 +531,7 @@ COpt::memoryPick();
 
 		foreach($selements as &$selement){
 			if(!check_db_fields($selementDbFields, $selement))
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for element');
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for element'));
 
 			if($update || $delete){
 				if(!isset($dbSelements[$selement['selementid']])){
@@ -547,11 +545,11 @@ COpt::memoryPick();
 			}
 
 			if(isset($selement['iconid_off']) && ($selement['iconid_off'] == 0)){
-				throw new Exception(_s('No icon for map element "%s"', $selement['label']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('No icon for map element "%s"', $selement['label']));
 			}
 
 			if($this->checkCircleSelementsLink($dbSelement['sysmapid'], $dbSelement['elementid'], $dbSelement['elementtype'])){
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_CIRCULAR_LINK_CANNOT_BE_CREATED.' "'.$dbSelement['label'].'"');
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Circular link can not be created for map element "%s"', $dbSelement['label']));
 			}
 		}
 		unset($selement);
@@ -560,7 +558,7 @@ COpt::memoryPick();
 	}
 
 
-	protected function checkLinkInput(&$links, $method){
+	protected function checkLinkInput($links, $method){
 		$create = ($method == 'createLink');
 		$update = ($method == 'updateLink');
 		$delete = ($method == 'deleteLink');
@@ -573,7 +571,7 @@ COpt::memoryPick();
 
 			$dbLinks = $this->getLinks(array(
 				'selementids' => zbx_objectValues($links, 'linkid'),
-				'output' => API_OUTPUT_EXTEND,
+				'output' => API_OUTPUT_SHORTEN,
 				'nopermissions' => true,
 				'preservekeys' => true,
 			));
@@ -581,32 +579,23 @@ COpt::memoryPick();
 		else{
 			$linkDbFields = array(
 				'sysmapid' => null,
-				'label' => '',
 				'selementid1' => null,
 				'selementid2' => null,
-				'drawtype' => 2,
-				'color' => '00CC00'
 			);
 		}
 
-		foreach($links as $snum => &$link){
+		foreach($links as $link){
 			if(!check_db_fields($linkDbFields, $link)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for map link');
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for map link'));
 			}
 
 			if($update || $delete){
 				if(!isset($dbLinks[$link['linkid']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
-
-				$dblink = array_merge($dbLinks[$link['linkid']], $link);
-			}
-			else{
-				$dblink = $link;
 			}
 		}
-		unset($link);
 
-		return ($update || $delete) ? $dbLinks : true;
+		return true;
 	}
 
 	public function checkCircleSelementsLink($sysmapid, $elementid, $elementtype){

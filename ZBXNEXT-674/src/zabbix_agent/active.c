@@ -26,21 +26,21 @@
 #include "logfiles.h"
 #if defined (_WINDOWS)
 #	include "eventlog.h"
-#endif	/* _WINDOWS */
+#endif
 #include "comms.h"
 #include "threads.h"
 #include "zbxjson.h"
 
 #if defined(ZABBIX_SERVICE)
 #	include "service.h"
-#elif defined(ZABBIX_DAEMON)	/* ZABBIX_SERVICE */
+#elif defined(ZABBIX_DAEMON)
 #	include "daemon.h"
-#endif	/* ZABBIX_DAEMON */
+#endif
 
-static ZBX_ACTIVE_METRIC *active_metrics = NULL;
-static ZBX_ACTIVE_BUFFER buffer;
-static ZBX_REGEXP	*regexps = NULL;
-static int		regexps_alloc = 0, regexps_num = 0;
+static ZBX_ACTIVE_METRIC	*active_metrics = NULL;
+static ZBX_ACTIVE_BUFFER	buffer;
+static ZBX_REGEXP		*regexps = NULL;
+static int			regexps_alloc = 0, regexps_num = 0;
 
 static void	init_active_metrics()
 {

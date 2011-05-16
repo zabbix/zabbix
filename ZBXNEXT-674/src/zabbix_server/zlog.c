@@ -58,8 +58,7 @@ void	__zbx_zabbix_syslog(const char *fmt, ...)
 	init_result(&agent);
 
 	va_start(ap,fmt);
-	vsnprintf(value_str, sizeof(value_str), fmt, ap);
-	value_str[MAX_STRING_LEN - 1] = '\0';
+	zbx_vsnprintf(value_str, sizeof(value_str), fmt, ap);
 	va_end(ap);
 
 	SET_STR_RESULT(&agent, strdup(value_str));
