@@ -876,7 +876,7 @@ COpt::memoryPick();
 					'sysmapid' => null,
 					'elementid' => null,
 					'elementtype' => null,
-					'label' => 3,
+					'label' => '',
 					'x' => 50,
 					'y' => 50,
 					'iconid_off' => 15,
