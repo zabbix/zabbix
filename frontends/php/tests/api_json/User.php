@@ -207,8 +207,7 @@ class API_JSON_User extends CZabbixTest
 	{
 		$debug = null;
 
-		$affected_tables = array('users','users_groups', 'opmessage_usr');
-		DBsave_tables($affected_tables);
+		DBsave_tables('users');
 
 		// sending request
 		$result = $this->api_acall(
@@ -248,7 +247,7 @@ class API_JSON_User extends CZabbixTest
 
 
 
-		DBrestore_tables($affected_tables);
+		DBrestore_tables('users');
 	}
 
 

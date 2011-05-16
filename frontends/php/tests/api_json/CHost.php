@@ -33,6 +33,79 @@ class API_JSON_Host extends CZabbixTest
 		);
 	}
 
+	public static function dup_template_ids()
+	{
+		return array(
+			array(
+				array(
+				'host' => 'Host to test dup ids 1',
+				'interfaces'=> array(
+						array(
+							"type" => 1,
+							"useip" => 1,
+							"ip" => "192.168.3.1",
+							"dns" => "",
+							"port" => 567
+						)
+					),
+					"groups" => array(
+						array("groupid" => 5)
+					),
+					"templates" => array(
+						array("templateid" => 10001)
+					)
+				),
+				true
+			),
+			array(
+				array(
+				'host' => 'Host to test dup ids 2',
+				'interfaces'=> array(
+						array(
+							"type" => 1,
+							"useip" => 1,
+							"ip" => "192.168.3.1",
+							"dns" => "",
+							"port" => 567
+						)
+					),
+					"groups" => array(
+						array("groupid" => 5)
+					),
+					"templates" => array(
+						array("templateid" => 10001),
+						array("templateid" => 10001)
+					)
+				),
+				false
+			),
+			array(
+				array(
+				'host' => 'Host to test dup ids 3',
+				'interfaces'=> array(
+						array(
+							"type" => 1,
+							"useip" => 1,
+							"ip" => "192.168.3.1",
+							"dns" => "",
+							"port" => 567
+						)
+					),
+					"groups" => array(
+						array("groupid" => 5)
+					),
+					"templates" => array(
+						array("templateid" => 10043),
+						array("templateid" => 10001),
+						array("templateid" => 10001),
+						array("templateid" => 10002),
+					)
+				),
+				false
+			),
+		);
+	}
+
 	/**
 	* @dataProvider host_names
 	*/
@@ -40,7 +113,6 @@ class API_JSON_Host extends CZabbixTest
 	{
 		$debug = null;
 
-		// creating host
 		$result = $this->api_acall(
 			'host.exists',
 			array('host'=>$name),
@@ -53,6 +125,35 @@ class API_JSON_Host extends CZabbixTest
 			($result['result'] != $exists),
 			"Chuck Norris: Exists method returned wrong result. Result is: ".print_r($result, true)."\nDebug: ".print_r($debug, true)
 		);
+	}
+
+
+	/**
+	* @dataProvider dup_template_ids
+	*/
+	public function testCHostDuplicateTemplateIds($request, $successExpected)
+	{
+		$debug = null;
+
+		$result = $this->api_acall(
+			'host.create',
+			$request,
+			&$debug
+		);
+
+		if($successExpected){
+			$this->assertTrue(
+				!array_key_exists('error', $result) || strpos($result['error']['data'], 'Cannot pass duplicate template') === false,
+				"Chuck Norris: I was expecting that host.create would not complain on duplicate ids. Result is: ".print_r($result, true)."\nDebug: ".print_r($debug, true)
+			);
+		}
+		else{
+			$this->assertTrue(
+				array_key_exists('error', $result) && strpos($result['error']['data'], 'Cannot pass duplicate template ids') !== false,
+				"Chuck Norris: I was expecting that host.create to complain on duplicate ids. Result is: ".print_r($result, true)."\nDebug: ".print_r($debug, true)
+			);
+		}
+
 	}
 }
 ?>

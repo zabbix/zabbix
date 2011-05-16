@@ -1795,7 +1795,6 @@
 	'S_ADDED_SMALL'=>				_('added'),
 
 //	hosts.inc.php
-	'S_CIRCULAR_LINK_CANNOT_BE_CREATED'=>		_('Circular link can not be created'),
 	'S_INTERNAL_AND_CANNOT_DELETED_SMALL'=>		_('is internal and can not be deleted'),
 	'S_NO_HOST_WITH'=>				_('No host with'),
 	'S_USED_BY_SCENARIO_SMALL'=>			_('used by scenario'),
