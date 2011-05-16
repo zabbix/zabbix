@@ -610,15 +610,12 @@ function zbx_array_push(&$array, $add){
  * @param array $array
  * @return array
  */
-function zbx_arrayFindDuplicates($array){
-	if(zbx_empty($array)){
-		return array();
-	}
-	function moreThenOne($a){
+function zbx_arrayFindDuplicates(array $array){
+	function moreThanOne($a){
 		return $a > 1;
 	}
-	$countValues = array_count_values($array); // counting accurancies of every value in array
-	$countValues = array_filter($countValues, 'moreThenOne'); // removing all values that appear only once
+	$countValues = array_count_values($array); // counting occurrences of every value in array
+	$countValues = array_filter($countValues, 'moreThanOne'); // removing all values that appear only once
 	arsort($countValues); // sorting, so that the most duplicates would be at the top
 	return $countValues;
 }
