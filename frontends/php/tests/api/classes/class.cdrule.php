@@ -32,14 +32,19 @@ require_once(dirname(__FILE__).'/../../../include/copt.lib.php');
 require_once(dirname(__FILE__).'/../../../include/api.inc.php');
 require_once(dirname(__FILE__).'/../../../include/items.inc.php');
 require_once(dirname(__FILE__).'/../../../include/triggers.inc.php');
+require_once(dirname(__FILE__).'/../../../api/classes/class.apiexception.php');
 
 
-function error($error){
-	echo "\nError reported: $error\n";
-	return true;
+if(!function_exists('error')){
+	function error($error){
+		echo "\nError reported: $error\n";
+		return true;
+	}
 }
-function get_accessible_nodes_by_user(){
-	return true;
+if(!function_exists('get_accessible_nodes_by_user')){
+	function get_accessible_nodes_by_user(){
+		return true;
+	}
 }
 
 class CDRuleTest extends PHPUnit_Framework_TestCase{

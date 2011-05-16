@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2000-2011 Zabbix SIA
@@ -17,27 +16,10 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-?>
-<?php
-require_once(dirname(__FILE__).'/APIInfo.php');
-require_once(dirname(__FILE__).'/General.php');
-require_once(dirname(__FILE__).'/User.php');
-require_once(dirname(__FILE__).'/CHost.php');
-require_once(dirname(__FILE__).'/CItem.php');
 
-class ApiJsonTests
+package com.zabbix.proxy;
+
+interface PostInputValidator
 {
-	public static function suite()
-	{
-		$suite = new PHPUnit_Framework_TestSuite('API_JSON');
-
-		$suite->addTestSuite('API_JSON_APIInfo');
-		$suite->addTestSuite('API_JSON_General');
-		$suite->addTestSuite('API_JSON_User');
-		$suite->addTestSuite('API_JSON_Host');
-		$suite->addTestSuite('API_JSON_Item');
-
-		return $suite;
-	}
+	public void execute(Object value);
 }
-?>

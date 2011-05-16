@@ -30,8 +30,9 @@ class testFormHost extends CWebTest{
 		$this->click('link=Host profile');
 
 		$profileFields = getHostProfiles();
+		$profileFields = zbx_toHash($profileFields, 'db_field');
 		foreach($profileFields as $fieldId => $fieldName){
-			$this->ok($fieldName);
+			$this->ok($fieldName['title']);
 			$this->assertElementPresent('host_profile['.$fieldId.']');
 		}
 	}

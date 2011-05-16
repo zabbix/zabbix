@@ -34,6 +34,9 @@ class CAPIObject{
 		$param = empty($params) ? null : reset($params);
 		$result = czbxrpc::call($this->_name.'.'.$method, $param, CWebUser::$data['sessionid']);
 
+		// saving API call for the debug statement
+		COpt::saveApiCall($this->_name, $method, $params, isset($result['result']) ? $result['result'] : '');
+
 		if(isset($result['result'])){
 			return $result['result'];
 		}

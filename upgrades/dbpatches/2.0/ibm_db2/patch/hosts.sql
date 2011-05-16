@@ -109,6 +109,10 @@ ALTER TABLE items ADD description varchar(2048) WITH DEFAULT '' NOT NULL
 /
 REORG TABLE items
 /
+ALTER TABLE items ADD profile_link integer WITH DEFAULT '0' NOT NULL
+/
+REORG TABLE items
+/
 UPDATE items SET templateid=NULL WHERE templateid=0
 /
 UPDATE items SET templateid=NULL WHERE templateid IS NOT NULL AND templateid NOT IN (SELECT itemid FROM items)
