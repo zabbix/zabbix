@@ -756,7 +756,6 @@
 	'S_PRIVILEGE_OEM'=>				_('OEM'),
 	'S_IPMI_USERNAME'=>				_('IPMI username'),
 	'S_IPMI_PASSWORD'=>				_('IPMI password'),
-	'S_USE_PROFILE'=>				_('Use profile'),
 	'S_DELETE_SELECTED_HOST_Q'=>			_('Delete selected host?'),
 	'S_DELETE_SELECTED_WITH_LINKED_ELEMENTS'=>	_('Delete selected with linked elements'),
 	'S_GROUP_NAME'=>				_('Group name'),
@@ -1656,7 +1655,6 @@
 
 //	hostprofiles.php
 	'S_HOST_PROFILES'=>			_('Host profiles'),
-	'S_EXTENDED_PROFILE'=>		_('Extended profile'),
 
 //	search.php
 	'S_EDIT_HOSTS' => _('Edit hosts'),
@@ -1797,7 +1795,6 @@
 	'S_ADDED_SMALL'=>				_('added'),
 
 //	hosts.inc.php
-	'S_CIRCULAR_LINK_CANNOT_BE_CREATED'=>		_('Circular link can not be created'),
 	'S_INTERNAL_AND_CANNOT_DELETED_SMALL'=>		_('is internal and can not be deleted'),
 	'S_NO_HOST_WITH'=>				_('No host with'),
 	'S_USED_BY_SCENARIO_SMALL'=>			_('used by scenario'),

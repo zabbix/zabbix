@@ -135,7 +135,7 @@ class testPageMaps extends CWebTest{
 	public function testPageMaps_MassDelete($map){
 		$sysmapid=$map['sysmapid'];
 
-		DBsave_tables(array('sysmaps','sysmaps_elements','sysmaps_links','sysmaps_link_triggers','screens_items'));
+		DBsave_tables('sysmaps');
 
 		$this->chooseOkOnNextConfirmation();
 
@@ -161,7 +161,7 @@ class testPageMaps extends CWebTest{
 		$sql="select * from screens_items where resourcetype=".SCREEN_RESOURCE_MAP." and resourceid=$sysmapid;";
 		$this->assertEquals(0,DBcount($sql),'Data from screens_items table was not deleted');
 
-		DBrestore_tables(array('sysmaps','sysmaps_elements','sysmaps_links','sysmaps_link_triggers','screens_items'));
+		DBrestore_tables('sysmaps');
 	}
 
 	public function testPageMaps_MassExportAll(){

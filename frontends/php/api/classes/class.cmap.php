@@ -102,7 +102,7 @@ class CMap extends CMapElement{
 
 			$dbTable = DB::getSchema('sysmaps');
 			$sql_parts['select']['sysmapid'] = 's.sysmapid';
-			foreach($options['output'] as $key => $field){
+			foreach($options['output'] as $field){
 				if(isset($dbTable['fields'][$field]))
 					$sql_parts['select'][$field] = 's.'.$field;
 			}
@@ -413,7 +413,7 @@ COpt::memoryPick();
 				$selements[$selement_url['selementid']]['urls'][] = $this->expandUrlMacro($selement_url, $selements[$selement_url['selementid']]);
 			}
 
-			foreach($selements as $num => $selement){
+			foreach($selements as $selement){
 				if(!isset($result[$selement['sysmapid']]['selements'])){
 					$result[$selement['sysmapid']]['selements'] = array();
 				}
@@ -444,7 +444,7 @@ COpt::memoryPick();
 				$map_links[$link_trigger['linkid']]['linktriggers'][] = $link_trigger;
 			}
 
-			foreach($map_links as $num => $link){
+			foreach($map_links as $link){
 				if(!isset($result[$link['sysmapid']]['links'])){
 					$result[$link['sysmapid']]['links'] = array();
 				}
@@ -548,7 +548,7 @@ COpt::memoryPick();
 		}
 
 		$mapNames = array();
-		foreach($maps as $mnum => &$map){
+		foreach($maps as &$map){
 			if(!check_db_fields($mapDbFields, $map)){
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect fields for sysmap'));
 			}
@@ -631,7 +631,7 @@ COpt::memoryPick();
 // URLS
 			if(isset($map['urls']) && !empty($map['urls'])){
 				$urlNames = zbx_toHash($map['urls'], 'name');
-				foreach($map['urls'] as $unum => $url){
+				foreach($map['urls'] as $url){
 					if($url['name'] === '' || $url['url'] === '')
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Link should have both "name" and "url" fields for map "%s".', $dbMap['name']));
 
@@ -646,7 +646,7 @@ COpt::memoryPick();
 			if(!empty($map['links'])){
 				$mapSelements = zbx_toHash($map['selements'],'selementid');
 
-				foreach($map['links'] as $lnum => $link){
+				foreach($map['links'] as $link){
 					if(!isset($mapSelements[$link['selementid1']]))
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Link selementid1 field is pointing to non existant map selement ID "%1$s" for map "%2$s" .', $link['selementid1'], $dbMap['name']));
 
@@ -665,7 +665,7 @@ COpt::memoryPick();
 				'nopermissions' => true
 			);
 			$existDbMaps = $this->get($options);
-			foreach($existDbMaps as $dbmnum => $dbMap){
+			foreach($existDbMaps as $dbMap){
 				if($create || (bccomp($mapNames[$dbMap['name']], $dbMap['sysmapid']) != 0))
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Map with name "%s" already exists', $dbMap['name']));
 			}
@@ -743,7 +743,7 @@ COpt::memoryPick();
 				foreach($linkids['linkids'] as $lnum => $linkid){
 					if(!isset($newLinks[$lnum]['linktriggers'])) continue;
 
-					foreach($newLinks[$lnum]['linktriggers'] as $ltnum => $linktrigger){
+					foreach($newLinks[$lnum]['linktriggers'] as $linktrigger){
 						$linktrigger['linkid'] = $linkid;
 						$newLinkTriggers[] = $linktrigger;
 					}
@@ -796,7 +796,7 @@ COpt::memoryPick();
 			if(isset($map['urls'])){
 				$urlDiff = zbx_array_diff($map['urls'], $dbMap['urls'], 'name');
 
-				foreach($urlDiff['both'] as $unum => $updUrl){
+				foreach($urlDiff['both'] as $updUrl){
 					$urlsToUpdate[] = array(
 						'values' => $updUrl,
 						'where' => array('name' => $updUrl['name'], 'sysmapid' => $map['sysmapid'])
@@ -814,6 +814,7 @@ COpt::memoryPick();
 // Elements
 			if(isset($map['selements'])){
 				$selementDiff = zbx_array_diff($map['selements'], $dbMap['selements'], 'selementid');
+				// We need sysmapid for add operations
 				foreach($selementDiff['first'] as $newSelement){
 					$newSelement['sysmapid'] = $map['sysmapid'];
 					$selementsToAdd[] = $newSelement;
@@ -826,9 +827,10 @@ COpt::memoryPick();
 // Links
 			if(isset($map['links'])){
 				$linkDiff = zbx_array_diff($map['links'], $dbMap['links'], 'linkid');
-				foreach($linkDiff['first'] as $newlink){
-					$newlink['sysmapid'] = $map['sysmapid'];
-					$linksToAdd[] = $newlink;
+				// We need sysmapid for add operations
+				foreach($linkDiff['first'] as $newLink){
+					$newLink['sysmapid'] = $map['sysmapid'];
+					$linksToAdd[] = $newLink;
 				}
 
 				$linksToUpdate = array_merge($linksToUpdate, $linkDiff['both']);
@@ -846,12 +848,12 @@ COpt::memoryPick();
 			DB::delete('sysmap_url', array('sysmapurlid' => $urlidsToDelete));
 
 // Selements
-		$newSelementIds = $updSelementIds = array('selementids' => array());
+		$newSelementIds = array('selementids' => array());
 		if(!empty($selementsToAdd))
 			$newSelementIds = $this->createSelements($selementsToAdd);
 
 		if(!empty($selementsToUpdate))
-			$updSelementIds = $this->updateSelements($selementsToUpdate);
+			$this->updateSelements($selementsToUpdate);
 
 		if(!empty($selementsToDelete))
 			$this->deleteSelements($selementsToDelete);
@@ -889,7 +891,7 @@ COpt::memoryPick();
 		foreach($newLinkIds['linkids'] as $lnum => $linkid){
 			if(!isset($linksToAdd[$lnum]['linktriggers'])) continue;
 
-			foreach($linksToAdd[$lnum]['linktriggers'] as $ltnum => $linktrigger){
+			foreach($linksToAdd[$lnum]['linktriggers'] as $linktrigger){
 				$linktrigger['linkid'] = $linkid;
 				$linkTriggersToAdd[] = $linktrigger;
 			}
@@ -942,23 +944,23 @@ COpt::memoryPick();
 		$maps = zbx_toObject($sysmapids, 'sysmapid');
 		$this->checkInput($maps, __FUNCTION__);
 
-// delete maps from selements of other maps
+	// delete maps from selements of other maps
 		DB::delete('sysmaps_elements', array(
-			'elementid'=>$sysmapids,
-			'elementtype'=>SYSMAP_ELEMENT_TYPE_MAP
+			'elementid' => $sysmapids,
+			'elementtype' => SYSMAP_ELEMENT_TYPE_MAP
 		));
 
 		DB::delete('screens_items', array(
-			'resourceid'=>$sysmapids,
-			'resourcetype'=>SCREEN_RESOURCE_MAP
+			'resourceid' => $sysmapids,
+			'resourcetype' => SCREEN_RESOURCE_MAP
 		));
 
 		DB::delete('profiles', array(
-			'idx'=>'web.maps.sysmapid',
-			'value_id'=>$sysmapids
+			'idx' => 'web.maps.sysmapid',
+			'value_id' => $sysmapids
 		));
-//----
-		DB::delete('sysmaps', array('sysmapid'=>$sysmapids));
+		//----
+		DB::delete('sysmaps', array('sysmapid' => $sysmapids));
 
 		return array('sysmapids' => $sysmapids);
 	}

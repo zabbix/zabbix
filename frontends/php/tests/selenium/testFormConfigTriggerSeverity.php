@@ -22,8 +22,6 @@
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
 class testFormConfigTriggerSeverity extends CWebTest{
-	public $affectedTables = array('config');
-
 	// Data provider
 	public static function providerTriggerSeverity(){
 		// array of data, saveResult, db fields value
@@ -151,7 +149,7 @@ class testFormConfigTriggerSeverity extends CWebTest{
 	 * @dataProvider providerTriggerSeverity
 	 */
 	public function testFormTriggerSeverity_Update($data, $resultSave, $DBvalues){
-		DBsave_tables($this->affectedTables);
+		DBsave_tables('config');
 
 		$this->login('config.php');
 		$this->dropdown_select_wait('configDropDown', 'Trigger severities');
@@ -181,7 +179,7 @@ class testFormConfigTriggerSeverity extends CWebTest{
 			$this->assertEquals($DBhash, DBhash($sql), "DB fields changed after unsuccessful save.");
 		}
 
-		DBrestore_tables($this->affectedTables);
+		DBrestore_tables('config');
 	}
 
 }

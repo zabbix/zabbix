@@ -57,8 +57,7 @@ class API_JSON_User extends CZabbixTest
 	{
 		$debug = null;
 
-		$affected_tables = array('sysmaps','sysmaps_elements');
-		DBsave_tables($affected_tables);
+		DBsave_tables('sysmaps');
 
 		// creating map
 		$result = $this->api_acall(
@@ -90,7 +89,7 @@ class API_JSON_User extends CZabbixTest
 
 		}
 
-		DBrestore_tables($affected_tables);
+		DBrestore_tables('sysmaps');
 
 	}
 }

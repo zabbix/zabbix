@@ -446,13 +446,13 @@ static void	discovery_update_service_status(DB_DSERVICE *dservice, int status, c
 			dservice->lastdown	= 0;
 			dservice->lastup	= now;
 
-			strcpy(dservice->value, value);
+			zbx_strlcpy(dservice->value, value, sizeof(dservice->value));
 			discovery_update_dservice(dservice);
 			discovery_add_event(EVENT_OBJECT_DSERVICE, dservice->dserviceid, now, DOBJECT_STATUS_DISCOVER);
 		}
 		else if (0 != strcmp(dservice->value, value))
 		{
-			strcpy(dservice->value, value);
+			zbx_strlcpy(dservice->value, value, sizeof(dservice->value));
 			discovery_update_dservice_value(dservice);
 		}
 	}

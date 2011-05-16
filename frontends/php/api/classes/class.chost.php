@@ -490,7 +490,6 @@ class CHost extends CZBXAPI{
 			$sql_parts['where'][] = ' h.hostid IN ( '.
 					' SELECT hp.hostid '.
 					' FROM host_profile hp )';
-//			AND exists ( SELECT hp.hostid FROM host_profile hp WHERE h.hostid=hp.hostid)
 		}
 
 // search
@@ -1493,9 +1492,11 @@ Copt::memoryPick();
 
 			if(isset($host['profile']) && !empty($host['profile'])){
 				$fields = array_keys($host['profile']);
+				$fields[] = 'profile_mode';
 				$fields = implode(', ', $fields);
 
 				$values = array_map('zbx_dbstr', $host['profile']);
+				$values[] = $host['profile_mode'];
 				$values = implode(', ', $values);
 
 				DBexecute('INSERT INTO host_profile (hostid, '.$fields.') VALUES ('.$hostid.', '.$values.')');
@@ -1708,6 +1709,10 @@ Copt::memoryPick();
 			}
 
 		if(isset($data['host'])){
+			if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $data['host'])){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Hostname "%s"', $data['host']));
+			}
+
 			if(count($hosts) > 1){
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot mass update host name'));
 			}
@@ -1732,27 +1737,66 @@ Copt::memoryPick();
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$cur_host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 		}
 
-			if(isset($data['host']) && !preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $data['host'])){
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Hostname "%s"', $data['host']));
+
+		if(isset($data['groups'])){
+			$updateGroups = $data['groups'];
+			unset($data['groups']);
 		}
 
+		if(isset($data['interfaces'])){
+			$updateInterfaces = $data['interfaces'];
+			unset($data['interfaces']);
+		}
+
+		if(isset($data['templates_clear'])){
+			$updateTemplatesClear = zbx_toArray($data['templates_clear']);
+			unset($data['templates_clear']);
+		}
+
+		if(isset($data['templates'])){
+			$updateTemplates = $data['templates'];
+			unset($data['templates']);
+		}
+
+		if(isset($data['macros'])){
+			$updateMacros = $data['macros'];
+			unset($data['macros']);
+		}
+
+		if(isset($data['profile'])){
+			$updateProfile = $data['profile'];
+			$updateProfile['profile_mode'] = $data['profile_mode'];
+			unset($data['profile']);
+			unset($data['profile_mode']);
+		}
+
+		if(isset($data['status'])){
+			$updateStatus = $data['status'];
+			unset($data['status']);
+		}
+
+		unset($data['hosts']);
+		if(!zbx_empty($data)){
 		$update = array(
 			'values' => $data,
-			'where' => array('hostid'=> $hostids)
+				'where' => array('hostid'=> $hostids)
 		);
 		DB::update('hosts', $update);
-		if(isset($data['status']))
-			update_host_status($hostids, $data['status']);
+		}
+
+		if(isset($updateStatus)){
+			update_host_status($hostids, $updateStatus);
+		}
 
 // }}} UPDATE HOSTS PROPERTIES
 
 // UPDATE HOSTGROUPS LINKAGE {{{
-		if(isset($data['groups']) && !is_null($data['groups'])){
-			$data['groups'] = zbx_toArray($data['groups']);
+		if(isset($updateGroups)){
+			$updateGroups = zbx_toArray($updateGroups);
 
 			$host_groups = API::HostGroup()->get(array('hostids' => $hostids));
 			$host_groupids = zbx_objectValues($host_groups, 'groupid');
-			$new_groupids = zbx_objectValues($data['groups'], 'groupid');
+			$new_groupids = zbx_objectValues($updateGroups, 'groupid');
 
 			$groups_to_add = array_diff($new_groupids, $host_groupids);
 
@@ -1779,7 +1823,7 @@ Copt::memoryPick();
 
 
 // UPDATE INTERFACES {{{
-		if(isset($data['interfaces']) && !is_null($data['interfaces'])){
+		if(isset($updateInterfaces)){
 			$hostInterfaces = API::HostInterface()->get(array(
 				'hostids' => $hostids,
 				'output' => API_OUTPUT_EXTEND,
@@ -1788,24 +1832,27 @@ Copt::memoryPick();
 			));
 
 			$this->massRemove(array('hosts' => $hosts, 'interfaces' => $hostInterfaces));
-			$this->massAdd(array('hosts' => $hosts, 'interfaces' => $data['interfaces']));
+			$this->massAdd(array('hosts' => $hosts, 'interfaces' => $updateInterfaces));
 		}
 // }}} UPDATE INTERFACES
 
 
-		$data['templates_clear'] = isset($data['templates_clear']) ? zbx_toArray($data['templates_clear']) : array();
-		$templateids_clear = zbx_objectValues($data['templates_clear'], 'templateid');
-
-		if(!empty($data['templates_clear'])){
-			$result = $this->massRemove(array(
+		if(isset($updateTemplatesClear)){
+			$templateids_clear = zbx_objectValues($updateTemplatesClear, 'templateid');
+			if(!empty($updateTemplatesClear)){
+				$this->massRemove(array(
 				'hostids' => $hostids,
 				'templateids_clear' => $templateids_clear,
 			));
 		}
+		}
+		else{
+			$templateids_clear = array();
+		}
 
 
 // UPDATE TEMPLATE LINKAGE {{{
-		if(isset($data['templates']) && !is_null($data['templates'])){
+		if(isset($updateTemplates)){
 			$opt = array(
 				'hostids' => $hostids,
 				'output' => API_OUTPUT_SHORTEN,
@@ -1814,7 +1861,7 @@ Copt::memoryPick();
 			$host_templates = API::Template()->get($opt);
 
 			$host_templateids = array_keys($host_templates);
-			$new_templateids = zbx_objectValues($data['templates'], 'templateid');
+			$new_templateids = zbx_objectValues($updateTemplates, 'templateid');
 
 			$templates_to_del = array_diff($host_templateids, $new_templateids);
 			$templates_to_del = array_diff($templates_to_del, $templateids_clear);
@@ -1826,7 +1873,7 @@ Copt::memoryPick();
 				}
 			}
 
-			$result = $this->massAdd(array('hosts' => $hosts, 'templates' => $data['templates']));
+			$result = $this->massAdd(array('hosts' => $hosts, 'templates' => $updateTemplates));
 			if(!$result){
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_CANNOT_LINK_TEMPLATE);
 			}
@@ -1835,8 +1882,8 @@ Copt::memoryPick();
 
 
 // UPDATE MACROS {{{
-		if(isset($data['macros']) && !is_null($data['macros'])){
-			$macrosToAdd = zbx_toHash($data['macros'], 'macro');
+		if(isset($updateMacros)){
+			$macrosToAdd = zbx_toHash($updateMacros, 'macro');
 
 			$hostMacros = API::UserMacro()->get(array(
 				'hostids' => $hostids,
@@ -1888,36 +1935,84 @@ Copt::memoryPick();
 
 
 // PROFILE {{{
-		if(isset($data['profile']) && !is_null($data['profile'])){
-			if(empty($data['profile'])){
+		if(isset($updateProfile)){
+
+			if($updateProfile['profile_mode'] == HOST_PROFILE_DISABLED){
 				$sql = 'DELETE FROM host_profile WHERE '.DBcondition('hostid', $hostids);
 				if(!DBexecute($sql))
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete profile'));
 			}
+
 			else{
-				$existing_profiles = array();
+				$hostsWithProfiles = array();
 				$existing_profiles_db = DBselect('SELECT hostid FROM host_profile WHERE '.DBcondition('hostid', $hostids));
 				while($existing_profile = DBfetch($existing_profiles_db)){
-					$existing_profiles[] = $existing_profile['hostid'];
+					$hostsWithProfiles[] = $existing_profile['hostid'];
 				}
 
-				$hostids_without_profile = array_diff($hostids, $existing_profiles);
+				// when hosts are being updated to use automatic mode for host profiles,
+				// we must check if some items are set to populate profile fields of every host.
+				// if they do, mass update for those fields should be ignored
+				if($updateProfile['profile_mode'] == HOST_PROFILE_AUTOMATIC){
+					// getting all items on all affected hosts
+					$options = array(
+						'output' => array('profile_link', 'hostid'),
+						'filter' => array('hostid' => $hostids),
+						'nopermissions' => true
+					);
+					$itemsToProfiles = API::item()->get($options);
 
-				foreach($hostids_without_profile as $hostid){
-					$data['profile']['hostid'] = $hostid;
-					DB::insert('host_profile', array($data['profile']), false);
+					// gathering links to array: 'hostid'=>array('profile_name_1'=>true, 'profile_name_2'=>true)
+					$profileLinksOnHosts = array();
+					$profileFields = getHostProfiles();
+					foreach($itemsToProfiles as $pr){
+						if($pr['profile_link'] != 0){ // 0 means 'no link'
+							if(isset($profileLinksOnHosts[$pr['hostid']])){
+								$profileLinksOnHosts[$pr['hostid']][$profileFields[$pr['profile_link']]['db_field']] = true;
+							}else{
+								$profileLinksOnHosts[$pr['hostid']] = array($profileFields[$pr['profile_link']]['db_field']=>true);
+							}
+						}
+					}
+
+					// now we have all info we need to determine, which profile fields should be saved
+					$profilesToSave = array();
+					foreach($hostids as $hostid){
+						$profilesToSave[$hostid] = $updateProfile;
+						$profilesToSave[$hostid]['hostid'] = $hostid;
+						foreach($updateProfile as $profileName=>$pr){
+							if(isset($profileLinksOnHosts[$hostid][$profileName])){
+								unset($profilesToSave[$hostid][$profileName]);
+							}
+						}
+					}
+				}
+				else{
+					// if mode is not automatic, all the fields can be saved
+					$profilesToSave = array();
+					foreach($hostids as $hostid){
+						$profilesToSave[$hostid] = $updateProfile;
+						$profilesToSave[$hostid]['hostid'] = $hostid;
+					}
 				}
 
-				if(!empty($existing_profiles)){
+				$hostsWithoutProfile = array_diff($hostids, $hostsWithProfiles);
+
+				// hosts that have no profiles yet, need profiles to be inserted
+				foreach($hostsWithoutProfile as $hostid){
+					DB::insert('host_profile', array($profilesToSave[$hostid]), false);
+				}
+
+				// those hosts that already have a profile, need their profiles to be updated
+				foreach($hostsWithProfiles as $hostid){
 					DB::update('host_profile', array(
-						'values' => $data['profile'],
-						'where' => array('hostid' => $existing_profiles)
+						'values' => $profilesToSave[$hostid],
+						'where' => array('hostid' => $hostid)
 					));
 				}
 			}
 		}
 // }}} PROFILE
-
 		return array('hostids' => $hostids);
 	}
 
