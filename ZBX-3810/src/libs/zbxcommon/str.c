@@ -183,7 +183,6 @@ int	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...)
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-#include "log.h"
 void	__zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_len, const char *fmt, ...)
 {
 	va_list	args;
