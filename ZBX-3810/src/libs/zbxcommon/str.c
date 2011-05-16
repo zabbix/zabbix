@@ -232,16 +232,14 @@ int	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args)
 
 	assert(str);
 
-#ifdef _WINDOWS
-	if (-1 == (written_len = vsnprintf_s(str, count, _TRUNCATE, fmt, args)))
+	if (-1 == (written_len = vsnprintf(str, count, fmt, args)))
 		written_len = (int)count - 1;	/* result was truncated */
-#else
-	written_len = vsnprintf(str, count, fmt, args);
-	written_len = MIN(written_len, (int)count - 1);
+	else
+		written_len = MIN(written_len, (int)count - 1);
+
 	written_len = MAX(written_len, 0);
 
 	str[written_len] = '\0';
-#endif
 
 	return written_len;
 }
@@ -816,10 +814,11 @@ char	*zbx_dvsprintf(char *dest, const char *f, va_list args)
 		if (0 <= n && n < size)
 			break;
 
-		if (n >= size)
-			size = n + 1;
+		/* result was truncated */
+		if (-1 == n)
+			size = size * 3 / 2 + 1;	/* the length is unknown */
 		else
-			size = size * 3 / 2 + 1;
+			size = n + 1;	/* n bytes + trailing '\0' */
 
 		zbx_free(string);
 	}
