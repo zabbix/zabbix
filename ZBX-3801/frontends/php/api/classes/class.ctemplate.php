@@ -1668,7 +1668,7 @@ COpt::memoryPick();
 			}
 			self::exception(
 				ZBX_API_ERROR_PARAMETERS,
-				_s('Cannot pass duplicate template IDs for the linkage: %s', implode(", ", $duplicatesFound))
+				_s('Cannot pass duplicate template IDs for the linkage: %s.', implode(", ", $duplicatesFound))
 			);
 		}
 
