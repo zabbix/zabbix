@@ -84,7 +84,7 @@ class testPageScripts extends CWebTest
 	{
 		$scriptid=$script['scriptid'];
 
-		DBsave_tables(array('scripts'));
+		DBsave_tables('scripts');
 		$this->chooseOkOnNextConfirmation();
 
 		$this->login('scripts.php');
@@ -101,7 +101,7 @@ class testPageScripts extends CWebTest
 		$sql="select * from scripts where scriptid='$scriptid'";
 		$this->assertEquals(0,DBcount($sql));
 
-		DBrestore_tables(array('scripts'));
+		DBrestore_tables('scripts');
 	}
 
 	public function testPageScripts_Sorting()

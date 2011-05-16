@@ -969,7 +969,7 @@ class CItem extends CItemGeneral{
 			}
 		}
 
-		if(!empty($itemids)){
+		if(!empty($aids)){
 			DB::delete('items_applications', array('itemid' => $aids));
 			DB::insert('items_applications', $itemApplications);
 		}
