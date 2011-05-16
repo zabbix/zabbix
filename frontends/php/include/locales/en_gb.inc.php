@@ -2462,7 +2462,7 @@
 
 // class.ctemplate.php
 	'S_CANNOT_SYNC_TEMPLATE' => 'Cannot sync template',
-	'S_TEMPLATE_ID_X_IN_PASSED_N_TIMES' => 'template ID "%1$s" is passed %2$s times',
+	'S_TEMPLATE_ID_X_IS_PASSED_N_TIMES' => 'template ID "%1$s" is passed %2$s times',
 	'S_CANNOT_PASS_DUPLICATE_TEMPLATE_IDS' => 'Cannot pass duplicate template IDs for the linkage: %s.',
 
 // class.chost.php
