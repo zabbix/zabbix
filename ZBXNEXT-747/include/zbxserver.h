@@ -48,4 +48,7 @@ int	evaluate_expression(int *result, char **expression, time_t now,
 int	evaluate(double *value, char *exp, char *error, int maxerrlen);
 void	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row);
 
+void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
+		const char *units, unsigned char value_type);
+
 #endif
