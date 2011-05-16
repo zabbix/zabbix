@@ -128,6 +128,9 @@ int	VFS_FILE_CONTENTS(const char *cmd, const char *param, unsigned flags, AGENT_
 	if (0 != zbx_stat(filename, &stat_buf))
 		goto err;
 
+	if (CONFIG_TIMEOUT < zbx_time() - ts)
+		goto err;
+
 	if (ZBX_MAX_DB_FILE_SIZE < stat_buf.st_size)
 		goto err;
 
