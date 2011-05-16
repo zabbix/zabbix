@@ -645,10 +645,10 @@ COpt::memoryPick();
 
 		$itemids = array();
 		$itemApplications = array();
-		foreach($items as $key => $item){
-			$itemids[] = $item['itemid'];
-
+		foreach($items as $item){
 			if(!isset($item['applications'])) continue;
+
+			$itemids[] = $item['itemid'];
 			foreach($item['applications'] as $anum => $appid){
 				$itemApplications[] = array(
 					'applicationid' => $appid,

@@ -286,10 +286,8 @@ static ZBX_DC_TREND	*DCget_trend(zbx_uint64_t itemid)
 
 	memset(&trend, 0, sizeof(ZBX_DC_TREND));
 	trend.itemid = itemid;
-	ptr = (ZBX_DC_TREND *)zbx_hashset_insert(&cache->trends, &trend,
-			sizeof(ZBX_DC_TREND));
 
-	return ptr;
+	return (ZBX_DC_TREND *)zbx_hashset_insert(&cache->trends, &trend, sizeof(ZBX_DC_TREND));
 }
 
 /******************************************************************************
@@ -316,7 +314,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 	history_value_t	value_min, value_avg, value_max;
 	unsigned char	value_type;
 	zbx_uint64_t	*ids = NULL, itemid;
-	int		ids_alloc = ZBX_SYNC_MAX, ids_num = 0, trends_to = *trends_num;
+	int		ids_alloc, ids_num = 0, trends_to = *trends_num;
 	ZBX_DC_TREND	*trend = NULL;
 	const char	*table_name;
 
@@ -339,6 +337,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 			assert(0);
 	}
 
+	ids_alloc = MIN(ZBX_SYNC_MAX, *trends_num);
 	ids = zbx_malloc(ids, ids_alloc * sizeof(zbx_uint64_t));
 
 	for (i = 0; i < *trends_num; i++)
@@ -348,7 +347,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 		if (clock != trend->clock || value_type != trend->value_type)
 			continue;
 
-		if (trend->disable_from != 0 && trend->disable_from <= clock)
+		if (0 != trend->disable_from)
 			continue;
 
 		uint64_array_add(&ids, &ids_alloc, &ids_num, trend->itemid, 64);
@@ -367,8 +366,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 				"select distinct itemid"
 				" from %s"
 				" where clock>=%d and",
-				table_name,
-				clock);
+				table_name, clock);
 
 		DBadd_condition_alloc(&sql, &sql_allocated, &sql_offset, "itemid", ids, ids_num);
 
@@ -377,7 +375,6 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 		while (NULL != (row = DBfetch(result)))
 		{
 			ZBX_STR2UINT64(itemid, row[0]);
-
 			uint64_array_remove(ids, &ids_num, &itemid, 1);
 		}
 		DBfree_result(result);
@@ -390,34 +387,14 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 			{
 				trend = &trends[i];
 
-				if (itemid == trend->itemid && clock == trend->clock &&
-						value_type == trend->value_type)
-					break;
-			}
-
-			if (i == trends_to)
-			{
-				THIS_SHOULD_NEVER_HAPPEN;
-				continue;
-			}
-
-			trend->disable_from = clock;
-
-			/* if 'trends' is not a primary trends buffer */
-			if (0 != update_cache)
-			{
-				LOCK_TRENDS;
-
-				/* we update it too */
-				if (NULL != (trend = zbx_hashset_search(&cache->trends, &itemid)))
+				if (itemid == trend->itemid && clock == trend->clock && value_type == trend->value_type)
+				{
 					trend->disable_from = clock;
-
-				UNLOCK_TRENDS;
+					break;
+				}
 			}
 		}
 	}
-
-	ids_num = 0;
 
 	for (i = 0; i < trends_to; i++)
 	{
@@ -426,7 +403,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 		if (clock != trend->clock || value_type != trend->value_type)
 			continue;
 
-		if (trend->disable_from != 0 && trend->disable_from <= clock)
+		if (0 != trend->disable_from && trend->disable_from <= clock)
 			continue;
 
 		uint64_array_add(&ids, &ids_alloc, &ids_num, trend->itemid, 64);
@@ -439,8 +416,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 				"select itemid,num,value_min,value_avg,value_max"
 				" from %s"
 				" where clock=%d and",
-				table_name,
-				clock);
+				table_name, clock);
 
 		DBadd_condition_alloc(&sql, &sql_allocated, &sql_offset, "itemid", ids, ids_num);
 
@@ -459,8 +435,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 			{
 				trend = &trends[i];
 
-				if (itemid == trend->itemid && clock == trend->clock &&
-						value_type == trend->value_type)
+				if (itemid == trend->itemid && clock == trend->clock && value_type == trend->value_type)
 					break;
 			}
 
@@ -536,6 +511,30 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 	}
 
 	zbx_free(ids);
+
+	/* if 'trends' is not a primary trends buffer */
+	if (0 != update_cache)
+	{
+		/* we update it too */
+		LOCK_TRENDS;
+
+		for (i = 0; i < trends_to; i++)
+		{
+			if (0 == trends[i].itemid)
+				continue;
+
+			if (clock != trends[i].clock || value_type != trends[i].value_type)
+				continue;
+
+			if (0 == trend[i].disable_from || trend[i].disable_from > clock)
+				continue;
+
+			if (NULL != (trend = zbx_hashset_search(&cache->trends, &trends[i].itemid)))
+				trend->disable_from = clock + SEC_PER_HOUR;
+		}
+
+		UNLOCK_TRENDS;
+	}
 
 	sql_offset = 0;
 
@@ -714,7 +713,7 @@ static void	DCadd_trend(ZBX_DC_HISTORY *history, ZBX_DC_TREND **trends, int *tre
 	ZBX_DC_TREND	*trend = NULL;
 	int		hour;
 
-	hour = history->clock - history->clock % 3600;
+	hour = history->clock - history->clock % SEC_PER_HOUR;
 
 	trend = DCget_trend(history->itemid);
 
@@ -1038,6 +1037,7 @@ static int	DBchk_double(double value)
  ******************************************************************************/
 static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 {
+	const char	*__function_name = "DCmass_update_items";
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_ITEM		item;
@@ -1046,9 +1046,10 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	ZBX_DC_HISTORY	*h;
 	zbx_uint64_t	*ids = NULL;
 	int		ids_alloc, ids_num = 0;
-	unsigned char	status;
+	unsigned char	status, profile_link;
+	const char	*profile_field;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In DCmass_update_items()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	ids_alloc = history_num;
 	ids = zbx_malloc(ids, ids_alloc * sizeof(zbx_uint64_t));
@@ -1056,14 +1057,18 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	for (i = 0; i < history_num; i++)
 		uint64_array_add(&ids, &ids_alloc, &ids_num, history[i].itemid, 64);
 
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
-			"select itemid,status,lastclock,prevorgvalue,delta,multiplier,formula,history,trends,lastns"
-			" from items"
+	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 240,
+			"select i.itemid,i.status,i.lastclock,i.prevorgvalue,i.delta,i.multiplier,i.formula,"
+				"i.history,i.trends,i.lastns,i.hostid,i.profile_link,hp.profile_mode,i.valuemapid,"
+				"i.units"
+			" from items i"
+				" left join host_profile hp"
+					" on hp.hostid=i.hostid"
 			" where");
 
-	DBadd_condition_alloc(&sql, &sql_allocated, &sql_offset, "itemid", ids, ids_num);
+	DBadd_condition_alloc(&sql, &sql_allocated, &sql_offset, "i.itemid", ids, ids_num);
 
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 20, " order by itemid");
+	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 20, " order by i.itemid");
 
 	zbx_free(ids);
 
@@ -1093,18 +1098,18 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 		if (NULL == h)
 			continue;
 
-		item.status	= atoi(row[1]);
+		item.status = atoi(row[1]);
 		if (SUCCEED != DBis_null(row[2]))
-			item.lastclock	= atoi(row[2]);
+			item.lastclock = atoi(row[2]);
 		else
-			item.lastclock	= 0;
+			item.lastclock = 0;
 		if (SUCCEED != DBis_null(row[9]))
-			item.lastns	= atoi(row[9]);
+			item.lastns = atoi(row[9]);
 		else
-			item.lastns	= 0;
+			item.lastns = 0;
 		if (SUCCEED != DBis_null(row[3]))
 		{
-			item.prevorgvalue_null	= 0;
+			item.prevorgvalue_null = 0;
 			switch (h->value_type) {
 			case ITEM_VALUE_TYPE_FLOAT:
 				item.prevorgvalue_dbl = atof(row[3]);
@@ -1116,11 +1121,17 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 		}
 		else
 			item.prevorgvalue_null = 1;
-		item.delta	= atoi(row[4]);
-		item.multiplier	= atoi(row[5]);
-		item.formula	= row[6];
-		item.history	= atoi(row[7]);
-		item.trends	= atoi(row[8]);
+		item.delta = atoi(row[4]);
+		item.multiplier = atoi(row[5]);
+		item.formula = row[6];
+		item.history = atoi(row[7]);
+		item.trends = atoi(row[8]);
+		ZBX_STR2UINT64(item.hostid, row[10]);
+
+		if (SUCCEED != DBis_null(row[12]) && HOST_PROFILE_AUTOMATIC == (unsigned char)atoi(row[12]))
+			profile_link = (unsigned char)atoi(row[11]);
+		else
+			profile_link = 0;
 
 		if (0 != (zbx_process & ZBX_PROCESS_PROXY))
 		{
@@ -1130,8 +1141,8 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 		}
 		else
 		{
-			h->keep_history = (unsigned char)(item.history ? 1 : 0);
-			h->keep_trends = (unsigned char)(item.trends ? 1 : 0);
+			h->keep_history = (item.history ? 1 : 0);
+			h->keep_trends = (item.trends ? 1 : 0);
 		}
 
 		status = ITEM_STATUS_ACTIVE;
@@ -1295,6 +1306,9 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 				break;
 			}
 			break;
+		case ITEM_VALUE_TYPE_LOG:
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 42, ",lastlogsize=%d,mtime=%d",
+					h->lastlogsize, h->mtime);
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
 			value_esc = DBdyn_escape_string_len(h->value_orig.value_str, ITEM_LASTVALUE_LEN);
@@ -1303,18 +1317,9 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 					value_esc);
 			zbx_free(value_esc);
 			break;
-		case ITEM_VALUE_TYPE_LOG:
-			value_esc = DBdyn_escape_string_len(h->value_orig.value_str, ITEM_LASTVALUE_LEN);
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 74 + strlen(value_esc),
-					",prevvalue=lastvalue,lastvalue='%s',lastlogsize=%d,mtime=%d",
-					value_esc,
-					h->lastlogsize,
-					h->mtime);
-			zbx_free(value_esc);
-			break;
 		}
 
-		/* Update item status if required */
+		/* update item status if required */
 		if (item.status == ITEM_STATUS_NOTSUPPORTED && status == ITEM_STATUS_ACTIVE)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Item [%s] became supported", zbx_host_key_string(item.itemid));
@@ -1327,6 +1332,45 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, " where itemid=" ZBX_FS_UI64 ";\n",
 				item.itemid);
 
+		if (1 != h->value_null && NULL != (profile_field = DBget_profile_field(profile_link)))
+		{
+			char	value[MAX_BUFFER_LEN];
+			int	update_profile = 0;
+
+			switch (h->value_type)
+			{
+				case ITEM_VALUE_TYPE_FLOAT:
+					zbx_snprintf(value, sizeof(value), ZBX_FS_DBL, h->value.value_float);
+					update_profile = 1;
+					break;
+				case ITEM_VALUE_TYPE_UINT64:
+					zbx_snprintf(value, sizeof(value), ZBX_FS_UI64, h->value.value_uint64);
+					update_profile = 1;
+					break;
+				case ITEM_VALUE_TYPE_STR:
+				case ITEM_VALUE_TYPE_TEXT:
+					strscpy(value, h->value_orig.value_str);
+					update_profile = 1;
+					break;
+			}
+
+			if (1 == update_profile)
+			{
+				unsigned short	profile_field_len;
+
+				ZBX_DBROW2UINT64(item.valuemapid, row[13]);
+
+				zbx_format_value(value, sizeof(value), item.valuemapid, row[14], h->value_type);
+
+				profile_field_len = DBget_profile_field_len(profile_link);
+				value_esc = DBdyn_escape_string_len(value, profile_field_len);
+				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128 + strlen(value_esc),
+						"update host_profile set %s='%s' where hostid=" ZBX_FS_UI64 ";\n",
+						profile_field, value_esc, item.hostid);
+				zbx_free(value_esc);
+			}
+		}
+
 		DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
 	}
 	DBfree_result(result);
@@ -1337,6 +1381,8 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 
 	if (sql_offset > 16) /* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************

@@ -32,13 +32,15 @@ class ConfigurationParameter
 	private int type;
 	private Object value;
 	private InputValidator validator;
+	private PostInputValidator postValidator;
 
-	public ConfigurationParameter(String name, int type, Object defaultValue, InputValidator validator)
+	public ConfigurationParameter(String name, int type, Object defaultValue, InputValidator validator, PostInputValidator postValidator)
 	{
 		this.name = name;
 		this.type = type;
 		this.value = defaultValue;
 		this.validator = validator;
+		this.postValidator = postValidator;
 	}
 
 	public String getName()
@@ -82,6 +84,9 @@ class ConfigurationParameter
 
 		if (null != validator && !validator.validate(userValue))
 			throw new IllegalArgumentException("bad value for " + name + " parameter: '" + text + "'");
+
+		if (null != postValidator)
+			postValidator.execute(userValue);
 
 		this.value = userValue;
 	}
