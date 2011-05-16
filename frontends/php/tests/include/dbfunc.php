@@ -51,21 +51,34 @@ function DBdata($query)
 	return $objects;
 }
 
-$table_dependencies = array(
-	'actions' => array('actions', 'operations', 'conditions', 'opmessage', 'opgroup', 'optemplate',
-		'opcommand', 'opcommand_grp', 'opcommand_hst', 'opconditions', 'opmessage_grp', 'opmessage_usr'),
-	'config' => array('config'),
-	'drules' => array('drules','dchecks'),
-	'items' => array('items', 'functions'),
-	'maintenances' => array('maintenances','timeperiods','maintenances_hosts','maintenances_groups','maintenances_windows'),
-	'media_type' => array('media_type','media','opmessage'),
-	'screens' => array('screens','screens_items','slides'),
-	'scripts' => array('scripts'),
-	'slideshows' => array('slideshows','slides'),
-	'triggers' => array('triggers', 'graphs', 'graphs_items', 'functions', 'items', 'item_discovery', 'trigger_discovery', 'graph_discovery'),
-	'sysmaps' => array('sysmaps', 'sysmaps_elements', 'sysmaps_links', 'sysmaps_link_triggers', 'sysmap_element_url', 'sysmap_url', 'screens_items'),
-	'users' => array('users','users_groups','media','opmessage_usr')
-);
+/**
+ * The function returns list of all referenced tables sorted by dependency level
+ * For example: DBget_tables('users')
+ * Result: array(users,alerts,acknowledges,auditlog,auditlog_details,opmessage_usr,media,profiles,sessions,users_groups)
+ */
+function DBget_tables($topTable)
+{
+	$referencedTables = array($topTable);
+
+	$schema = include(dirname(__FILE__).'/../../include/schema.inc.php');
+	foreach($schema as $table => $tableData)
+	{
+		$fields = $schema[$table]['fields'];
+		foreach($fields as $field => $fieldData){
+			if(isset($fieldData['ref_table'])){
+				$refTable = $fieldData['ref_table'];
+				if($refTable == $topTable && $topTable != $table){
+					$referencedTables[] = $table;
+					$deeperTables=DBget_tables($table);
+					if(!empty($deeperTables)){
+						$referencedTables = array_merge($referencedTables, $deeperTables);
+					}
+				}
+			}
+		}
+	}
+	return array_unique($referencedTables);
+}
 
 /**
  * Saves data of the specified table and all dependent tables in temporary storage.
@@ -73,9 +86,9 @@ $table_dependencies = array(
  */
 function DBsave_tables($topTable)
 {
-	global $DB, $table_dependencies;
+	global $DB;
 
-	$tables=$table_dependencies[$topTable];
+	$tables=$DBget_tables[$topTable];
 
 	foreach($tables as $table)
 	{
@@ -102,9 +115,9 @@ function DBsave_tables($topTable)
  */
 function DBrestore_tables($topTable)
 {
-	global $DB, $table_dependencies;
+	global $DB;
 
-	$tables=$table_dependencies[$topTable];
+	$tables=$get_tables[$topTable];
 
 	$tables_reversed = array_reverse($tables);
 
