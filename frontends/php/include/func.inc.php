@@ -618,7 +618,7 @@ function zbx_arrayFindDuplicates($array){
 		return $a > 1;
 	}
 	$countValues = array_count_values($array); // counting accurancies of every value in array
-	array_reduce($countValues, 'moreThenOne'); // removing all values that appear only once
+	$countValues = array_filter($countValues, 'moreThenOne'); // removing all values that appear only once
 	arsort($countValues); // sorting, so that the most duplicates would be at the top
 	return $countValues;
 }
