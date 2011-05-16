@@ -137,7 +137,7 @@ include_once('include/page_header.php');
 
 	$css = getUserTheme($USER_DETAILS);
 	foreach($services as $name => $foo) {
-		$header[] = new CImg('vtext.php?text='.$name.'&theme='.$css);
+		$header[] = new CImg('vtext.php?text='.urlencode($name).'&theme='.$css);
 	}
 
 	$table = new CTableInfo();

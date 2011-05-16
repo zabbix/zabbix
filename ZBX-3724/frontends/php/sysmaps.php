@@ -218,7 +218,11 @@ include_once('include/page_header.php');
 			$sysmapids[] = $_REQUEST['sysmapid'];
 		}
 
-		$maps = API::Map()->get(array('sysmapids' => $sysmapids, 'output' => API_OUTPUT_EXTEND, 'editable => 1'));
+		$maps = API::Map()->get(array(
+			'sysmapids' => $sysmapids,
+			'output' => array('name'),
+			'editable' => true
+		));
 		$go_result = API::Map()->delete($sysmapids);
 
 		show_messages($go_result, S_MAP_DELETED, S_CANNOT_DELETE_MAP);
@@ -266,24 +270,22 @@ include_once('include/page_header.php');
 				$sysmap = reset($sysmaps);
 			}
 
-			if(isset($_REQUEST['sysmapid']) && !isset($_REQUEST['form_refresh'])){
-			}
-			else{
+			if(!isset($_REQUEST['sysmapid']) || isset($_REQUEST['form_refresh'])){
 				$sysmap['name'] = get_request('name', '');
 				$sysmap['width'] = get_request('width', 800);
 				$sysmap['height'] = get_request('height', 600);
 				$sysmap['backgroundid'] = get_request('backgroundid', 0);
-				$sysmap['label_format'] = get_request('label_format',0);
-				$sysmap['label_type_host'] = get_request('label_type_host',2);
-				$sysmap['label_type_hostgroup'] = get_request('label_type_hostgroup',2);
-				$sysmap['label_type_trigger'] = get_request('label_type_trigger',2);
-				$sysmap['label_type_map'] = get_request('label_type_map',2);
-				$sysmap['label_type_image'] = get_request('label_type_image',2);
-				$sysmap['label_string_host'] = get_request('label_string_host','');
-				$sysmap['label_string_hostgroup'] = get_request('label_string_hostgroup','');
-				$sysmap['label_string_trigger'] = get_request('label_string_trigger','');
-				$sysmap['label_string_map'] = get_request('label_string_map','');
-				$sysmap['label_string_image'] = get_request('label_string_image','');
+				$sysmap['label_format'] = get_request('label_format', 0);
+				$sysmap['label_type_host'] = get_request('label_type_host', 2);
+				$sysmap['label_type_hostgroup'] = get_request('label_type_hostgroup', 2);
+				$sysmap['label_type_trigger'] = get_request('label_type_trigger', 2);
+				$sysmap['label_type_map'] = get_request('label_type_map', 2);
+				$sysmap['label_type_image'] = get_request('label_type_image', 2);
+				$sysmap['label_string_host'] = get_request('label_string_host', '');
+				$sysmap['label_string_hostgroup'] = get_request('label_string_hostgroup', '');
+				$sysmap['label_string_trigger'] = get_request('label_string_trigger', '');
+				$sysmap['label_string_map'] = get_request('label_string_map', '');
+				$sysmap['label_string_image'] = get_request('label_string_image', '');
 				$sysmap['label_type'] = get_request('label_type', 0);
 				$sysmap['label_location'] = get_request('label_location', 0);
 				$sysmap['highlight'] = get_request('highlight', 0);

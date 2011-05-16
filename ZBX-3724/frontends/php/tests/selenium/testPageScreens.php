@@ -81,7 +81,7 @@ class testPageScreens extends CWebTest
 		$sql2="select * from screens_items where screenid=$screenid order by screenitemid";
 		$oldHashScreenItems=DBhash($sql2);
 
-		DBsave_tables(array('screens','screens_items','slides'));
+		DBsave_tables('screens');
 
 		$this->login('screenconf.php');
 		$this->assertTitle('Configuration of screens');
@@ -104,7 +104,7 @@ class testPageScreens extends CWebTest
 		$this->assertEquals($oldHashScreen,DBhash($sql1));
 		$this->assertEquals($oldHashScreenItems,DBhash($sql2));
 
-		DBrestore_tables(array('screens','screens_items','slides'));
+		DBrestore_tables('screens');
 	}
 
 	public function testPageScreens_Create()
@@ -164,7 +164,7 @@ class testPageScreens extends CWebTest
 
 		$this->chooseOkOnNextConfirmation();
 
-		DBsave_tables(array('screens','screens_items','slides'));
+		DBsave_tables('screens');
 
 		$this->login('screenconf.php');
 		$this->assertTitle('Configuration of screens');
@@ -186,7 +186,7 @@ class testPageScreens extends CWebTest
 		$sql="select * from slides where screenid=$screenid";
 		$this->assertEquals(0,DBcount($sql));
 
-		DBrestore_tables(array('screens','screens_items','slides'));
+		DBrestore_tables('screens');
 	}
 
 	public function testPageScreens_Sorting()
