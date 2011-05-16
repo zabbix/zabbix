@@ -11,7 +11,6 @@ New features:
  - [ZBXNEXT-511] renamed item description to name, for description introduced a new field (asaveljevs, Vedmak)
 
 Bug fixes:
- - [ZBX-3801] added check for duplicate template IDs when creating host through API (KB)
  - [ZBX-3809] fixed overwriting of existing elements and links when importing a map (Alexei)
  - [ZBX-954] typo in constant name, cause error when try to clear item history (Vedmak)
  - [ZBX-3769] fixed applications unlinked when update item prototypes (Vedmak)
@@ -145,6 +144,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.6rc1
 
+ - [ZBX-3801] added check for duplicate template IDs when creating host through API (KB)
  - [ZBX-3802] fixed error when try to open custom screen from history link (Vedmak)
  - [ZBX-3794] added timeout support to vfs.file.* commands (dimir)
  - [ZBX-3747] replaced strcpy() and vsnprintf() calls with safer ones and strerror() with zbx_strerror() which also prints the error code (rudolfs)
