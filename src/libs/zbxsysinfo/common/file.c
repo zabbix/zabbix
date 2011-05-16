@@ -22,7 +22,7 @@
 #include "md5.h"
 #include "file.h"
 
-#define	ZBX_MAX_DB_FILE_SIZE	64 * ZBX_KIBIBYTE	/* files larger than 64 KB cannot be stored in the database */
+#define ZBX_MAX_DB_FILE_SIZE	64 * ZBX_KIBIBYTE	/* files larger than 64 KB cannot be stored in the database */
 
 extern int	CONFIG_TIMEOUT;
 
@@ -128,7 +128,7 @@ int	VFS_FILE_CONTENTS(const char *cmd, const char *param, unsigned flags, AGENT_
 	if (0 != zbx_stat(filename, &stat_buf))
 		goto err;
 
-	if (ZBX_MAX_DB_FILE_SIZE < stat_buf.st_size)	/* file size limit */
+	if (ZBX_MAX_DB_FILE_SIZE < stat_buf.st_size)
 		goto err;
 
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
@@ -139,10 +139,11 @@ int	VFS_FILE_CONTENTS(const char *cmd, const char *param, unsigned flags, AGENT_
 
 	contents = zbx_malloc(contents, contents_alloc);
 
-	for (flen = 0; 0 < (nbytes = zbx_read(f, read_buf, sizeof(read_buf), encoding)); flen += nbytes)
+	flen = 0;
+
+	while (0 < (nbytes = zbx_read(f, read_buf, sizeof(read_buf), encoding)))
 	{
-		/* timeout or file size limit */
-		if (CONFIG_TIMEOUT < zbx_time() - ts || ZBX_MAX_DB_FILE_SIZE < flen)
+		if (CONFIG_TIMEOUT < zbx_time() - ts || ZBX_MAX_DB_FILE_SIZE < (flen += nbytes))
 			goto err;
 
 		utf8 = convert_to_utf8(read_buf, nbytes, encoding);
