@@ -1207,7 +1207,7 @@
 		if($view_style == STYLE_TOP){
 			$header=array(new CCol(S_ITEMS,'center'));
 			foreach($hosts as $hostname){
-				$header = array_merge($header,array(new CImg('vtext.php?text='.$hostname.$vTextColor)));
+				$header = array_merge($header,array(new CImg('vtext.php?text='.urlencode($hostname).$vTextColor)));
 			}
 
 			$table->SetHeader($header,'vertical_header');
@@ -1224,7 +1224,7 @@
 		else{
 			$header=array(new CCol(S_HOSTS,'center'));
 			foreach($items as $descr => $ithosts){
-				$header = array_merge($header,array(new CImg('vtext.php?text='.$descr.$vTextColor)));
+				$header = array_merge($header,array(new CImg('vtext.php?text='.urlencode($descr).$vTextColor)));
 			}
 
 			$table->SetHeader($header,'vertical_header');
