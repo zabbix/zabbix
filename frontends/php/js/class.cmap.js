@@ -2316,7 +2316,7 @@ form_selement_updateByType: function(e, multi){
 // host
 			var srctbl = 'hosts';
 			var srcfld1 = 'hostid';
-			var srcfld2 = 'host';
+			var srcfld2 = 'name';
 			$(this.selementForm.typeDOM.elementCaption).update(locale['S_HOST']);
 
 			this.selementForm.typeDOM.elementName.style.display = display_style;
