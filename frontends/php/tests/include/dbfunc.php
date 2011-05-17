@@ -88,7 +88,7 @@ function DBsave_tables($topTable)
 {
 	global $DB;
 
-	$tables=DBget_tables[$topTable];
+	$tables=DBget_tables($topTable);
 
 	foreach($tables as $table)
 	{
@@ -117,7 +117,7 @@ function DBrestore_tables($topTable)
 {
 	global $DB;
 
-	$tables=DBget_tables[$topTable];
+	$tables=DBget_tables($topTable);
 
 	$tables_reversed = array_reverse($tables);
 
