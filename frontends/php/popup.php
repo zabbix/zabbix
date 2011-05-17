@@ -1688,10 +1688,10 @@ include_once('include/page_header.php');
 			$row['node_name'] = get_node_name_by_elid($row['groupid']);
 
 			if(!$all){
-				$name = new CLink(bold(S_MINUS_ALL_GROUPS_MINUS),'#');
+				$name = new CLink(bold(_('- all groups -')),'#');
 
 				$action = get_window_opener($dstfrm, $dstfld1, create_id_by_nodeid(0,$nodeid)).
-					get_window_opener($dstfrm, $dstfld2, $row['node_name'].S_MINUS_ALL_GROUPS_MINUS);
+					get_window_opener($dstfrm, $dstfld2, $row['node_name']._('- all groups -'));
 
 				$name->setAttribute('onclick',$action." close_window(); return false;");
 
