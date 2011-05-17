@@ -308,7 +308,7 @@ static void	zbx_load_config()
 
 	CONFIG_SERVER_STARTUP_TIME = time(NULL);
 
-	parse_cfg_file(CONFIG_FILE, cfg, 0, ZBX_CFG_STRICT);
+	parse_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_STRICT);
 
 	if (ZBX_PROXYMODE_ACTIVE == CONFIG_PROXYMODE &&
 			(NULL == CONFIG_SERVER || '\0' == *CONFIG_SERVER))

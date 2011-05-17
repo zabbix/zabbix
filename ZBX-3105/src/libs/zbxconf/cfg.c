@@ -34,7 +34,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int level, int strict)
 {
 #ifdef _WINDOWS
-	return __parse_cfg_file(cfg_file, cfg, level, 0, strict);
+	return __parse_cfg_file(cfg_file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict);
 #else
 	DIR		*dir;
 	struct stat	sb;
@@ -49,7 +49,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 	}
 
 	if (!S_ISDIR(sb.st_mode))
-		return __parse_cfg_file(cfg_file, cfg, level, 0, strict);
+		return __parse_cfg_file(cfg_file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict);
 
 	if (NULL == (dir = opendir(cfg_file)))
 	{
@@ -64,7 +64,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 		if (-1 == stat(incl_file, &sb) || !S_ISREG(sb.st_mode))
 			continue;
 
-		if (FAIL == __parse_cfg_file(incl_file, cfg, level, 0, strict))
+		if (FAIL == __parse_cfg_file(incl_file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
 		{
 			result = FAIL;
 			break;

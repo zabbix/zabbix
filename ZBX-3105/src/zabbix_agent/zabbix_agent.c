@@ -190,9 +190,9 @@ int	main(int argc, char **argv)
 
 	/* load configuration */
 	if (ZBX_TASK_PRINT_SUPPORTED == task || ZBX_TASK_TEST_METRIC == task)
-		zbx_load_config(1);	/* optional */
+		zbx_load_config(ZBX_CFG_FILE_OPTIONAL);
 	else
-		zbx_load_config(0);
+		zbx_load_config(ZBX_CFG_FILE_REQUIRED);
 
 	/* metrics should be initialized befor loading user parameters */
 	init_metrics();

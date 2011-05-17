@@ -616,7 +616,7 @@ int	main(int argc, char **argv)
 		case ZBX_TASK_UNINSTALL_SERVICE:
 		case ZBX_TASK_START_SERVICE:
 		case ZBX_TASK_STOP_SERVICE:
-			zbx_load_config(0);
+			zbx_load_config(ZBX_CFG_FILE_REQUIRED);
 			zbx_validate_config();
 			zbx_free_config();
 
@@ -635,7 +635,7 @@ int	main(int argc, char **argv)
 #endif
 		case ZBX_TASK_TEST_METRIC:
 		case ZBX_TASK_PRINT_SUPPORTED:
-			zbx_load_config(1);	/* optional */
+			zbx_load_config(ZBX_CFG_FILE_OPTIONAL);
 #ifdef _WINDOWS
 			init_collector_data();	/* required for reading PerfCounter */
 			load_perf_counters(CONFIG_PERF_COUNTERS);
@@ -655,7 +655,7 @@ int	main(int argc, char **argv)
 			exit(SUCCEED);
 			break;
 		default:
-			zbx_load_config(0);
+			zbx_load_config(ZBX_CFG_FILE_REQUIRED);
 			zbx_validate_config();
 			break;
 	}
