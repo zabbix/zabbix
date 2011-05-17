@@ -10,7 +10,6 @@ if(isset($_GET['lang'])){
 		//initializing gettext translations depending on language selected by user
 		$locales = zbx_locale_variants($_GET['lang']);
 
-		$locale_found = false;
 		foreach($locales as $locale){
 			putenv('LC_ALL='.$locale);
 			putenv('LANG='.$locale);
