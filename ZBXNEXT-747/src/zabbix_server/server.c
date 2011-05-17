@@ -42,9 +42,9 @@
 #include "pinger/pinger.h"
 #include "poller/poller.h"
 #include "poller/checks_ipmi.h"
-#include "snmptrapper/snmptrapper.h"
 #include "timer/timer.h"
 #include "trapper/trapper.h"
+#include "snmptrapper/snmptrapper.h"
 #include "nodewatcher/nodewatcher.h"
 #include "watchdog/watchdog.h"
 #include "utils/nodechange.h"
@@ -112,7 +112,7 @@ int	CONFIG_HTTPPOLLER_FORKS		= 1;
 int	CONFIG_IPMIPOLLER_FORKS		= 0;
 int	CONFIG_TIMER_FORKS		= 1;
 int	CONFIG_TRAPPER_FORKS		= 5;
-int	CONFIG_SNMPTRAPPER_FORKS	= 5;
+int	CONFIG_SNMPTRAPPER_FORKS	= 1;
 int	CONFIG_JAVAPOLLER_FORKS		= 0;
 int	CONFIG_ESCALATOR_FORKS		= 1;
 int	CONFIG_SELFMON_FORKS		= 1;
@@ -132,10 +132,10 @@ int	CONFIG_HISTSYNCER_FORKS		= 4;
 int	CONFIG_HISTSYNCER_FREQUENCY	= 5;
 int	CONFIG_CONFSYNCER_FORKS		= 1;
 int	CONFIG_CONFSYNCER_FREQUENCY	= 60;
-int	CONFIG_CONF_CACHE_SIZE		= 8388608;	/* 8MB */
-int	CONFIG_HISTORY_CACHE_SIZE	= 8388608;	/* 8MB */
-int	CONFIG_TRENDS_CACHE_SIZE	= 4194304;	/* 4MB */
-int	CONFIG_TEXT_CACHE_SIZE		= 16777216;	/* 16MB */
+int	CONFIG_CONF_CACHE_SIZE		= 8 * ZBX_MEBIBYTE;
+int	CONFIG_HISTORY_CACHE_SIZE	= 8 * ZBX_MEBIBYTE;
+int	CONFIG_TRENDS_CACHE_SIZE	= 4 * ZBX_MEBIBYTE;
+int	CONFIG_TEXT_CACHE_SIZE		= 16 * ZBX_MEBIBYTE;
 int	CONFIG_DISABLE_HOUSEKEEPING	= 0;
 int	CONFIG_UNREACHABLE_PERIOD	= 45;
 int	CONFIG_UNREACHABLE_DELAY	= 15;
@@ -164,7 +164,7 @@ int	CONFIG_MASTER_NODEID		= 0;
 int	CONFIG_NODE_NOEVENTS		= 0;
 int	CONFIG_NODE_NOHISTORY		= 0;
 
-char	*CONFIG_SNMPTRAP_FILE	= NULL;
+char	*CONFIG_SNMPTRAP_FILE		= NULL;
 
 char	*CONFIG_JAVA_PROXY		= NULL;
 int	CONFIG_JAVA_PROXY_PORT		= ZBX_DEFAULT_SERVER_PORT;
