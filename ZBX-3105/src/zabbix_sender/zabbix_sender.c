@@ -251,10 +251,10 @@ static void    zbx_load_config(const char *config_file)
 		{NULL}
 	};
 
-	if (config_file)
+	if (NULL != config_file)
 	{
-		/* do not complain if file is missing or unknown parameters */
-		parse_cfg_file(config_file, cfg, ZBX_CFG_FILE_OPTIONAL, ZBX_CFG_NOT_STRICT);
+		/* do not complain about unknown parameters */
+		parse_cfg_file(config_file, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_NOT_STRICT);
 
 		if (NULL != cfg_source_ip)
 		{
