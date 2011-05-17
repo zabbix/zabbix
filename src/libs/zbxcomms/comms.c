@@ -1322,16 +1322,16 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 			*end = ',';
 	}
 #if defined(HAVE_IPV6)
-	if (0 == getnameinfo((struct sockaddr*)&name, sizeof(name), sname, sizeof(sname), NULL, 0, NI_NUMERICHOST))
+	if (0 == getnameinfo((struct sockaddr *)&name, sizeof(name), sname, sizeof(sname), NULL, 0, NI_NUMERICHOST))
 	{
-		zbx_set_tcp_strerror("Connection from [%s] rejected. Allowed server is [%s]", sname, ip_list);
+		zbx_set_tcp_strerror("Connection from [%s] rejected. Allowed server is [%s].", sname, ip_list);
 	}
 	else
 	{
-		zbx_set_tcp_strerror("Connection rejected. Allowed server is [%s]", ip_list);
+		zbx_set_tcp_strerror("Connection rejected. Allowed server is [%s].", ip_list);
 	}
 #else
-	zbx_set_tcp_strerror("Connection from [%s] rejected. Allowed server is [%s]", sname, ip_list);
+	zbx_set_tcp_strerror("Connection from [%s] rejected. Allowed server is [%s].", sname, ip_list);
 #endif
 	return	FAIL;
 }
