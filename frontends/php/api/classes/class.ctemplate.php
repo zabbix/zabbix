@@ -1659,7 +1659,20 @@ COpt::memoryPick();
 	private function link($templateids, $targetids){
 		if(empty($templateids)) return true;
 
-// check if any templates linked to targets have more than one unique item key\application {{{
+		//check if someone passed duplicate templates in the same query
+		$templateIdDuplicates = zbx_arrayFindDuplicates($templateids);
+		if(!zbx_empty($templateIdDuplicates)){
+			$duplicatesFound = array();
+			foreach($templateIdDuplicates as $value => $count){
+				$duplicatesFound[] = _s('template ID "%1$s" is passed %2$s times', $value, $count);
+			}
+			self::exception(
+				ZBX_API_ERROR_PARAMETERS,
+				_s('Cannot pass duplicate template IDs for the linkage: %s.', implode(", ", $duplicatesFound))
+			);
+		}
+
+		// check if any templates linked to targets have more than one unique item key/application
 		foreach($targetids as $targetid){
 			$linkedTpls = $this->get(array(
 				'nopermissions' => 1,
@@ -1690,10 +1703,8 @@ COpt::memoryPick();
 					S_TEMPLATE_WITH_APPLICATION.' ['.htmlspecialchars($db_cnt['name']).'] '.S_ALREADY_LINKED_TO_HOST_SMALL);
 			}
 		}
-// }}} check if any templates linked to targets have more than one unique item key\application
 
-
-// CHECK TEMPLATE TRIGGERS DEPENDENCIES {{{
+		// CHECK TEMPLATE TRIGGERS DEPENDENCIES
 		foreach($templateids as $tnum => $templateid){
 			$triggerids = array();
 			$db_triggers = get_triggers_by_hostid($templateid);
@@ -1722,7 +1733,6 @@ COpt::memoryPick();
 					_s('Trigger in template [ %1$s ] has dependency with trigger in template [ %2$s ]', $tmp_tpl['host'], $db_dephost['host']));
 			}
 		}
-// }}} CHECK TEMPLATE TRIGGERS DEPENDENCIES
 
 
 		$linked = array();
@@ -1735,7 +1745,7 @@ COpt::memoryPick();
 			$linked[] = array($pair['hostid'] => $pair['templateid']);
 		}
 
-// add template linkages, if problems rollback later
+		// add template linkages, if problems rollback later
 		foreach($targetids as $targetid){
 			foreach($templateids as $tnum => $templateid){
 				foreach($linked as $lnum => $link){
@@ -1750,9 +1760,8 @@ COpt::memoryPick();
 			}
 		}
 
-// CHECK CIRCULAR LINKAGE {{{
-
-// get template linkage graph
+		// CHECK CIRCULAR LINKAGE
+		// get template linkage graph
 		$graph = array();
 		$sql = 'SELECT ht.hostid, ht.templateid'.
 			' FROM hosts_templates ht, hosts h'.
@@ -1764,7 +1773,7 @@ COpt::memoryPick();
 			$graph[$branch['hostid']][$branch['templateid']] = $branch['templateid'];
 		}
 
-// get points that have more than one parent templates
+		// get points that have more than one parent templates
 		$start_points = array();
 		$sql = 'SELECT max(ht.hostid) as hostid, ht.templateid'.
 			' FROM('.
@@ -1782,7 +1791,7 @@ COpt::memoryPick();
 			$graph[$start_point['hostid']][$start_point['templateid']] = $start_point['templateid'];
 		}
 
-// add to the start points also points which we add current templates
+		// add to the start points also points which we add current templates
 		$start_points = array_merge($start_points, $targetids);
 		$start_points = array_unique($start_points);
 
@@ -1792,9 +1801,6 @@ COpt::memoryPick();
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Circular link cannot be created'));
 			}
 		}
-
-// }}} CHECK CIRCULAR LINKAGE
-
 
 		foreach($targetids as $targetid){
 			foreach($templateids as $tnum => $templateid){
@@ -1858,6 +1864,74 @@ COpt::memoryPick();
 		else{
 			$flags = array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY, ZBX_FLAG_DISCOVERY_CHILD);
 		}
+
+/* TRIGGERS {{{ */
+		$sql_from = 'triggers t';
+		$sql_where = ' EXISTS ('.
+				' SELECT ff.triggerid'.
+				' FROM functions ff, items ii'.
+				' WHERE ff.triggerid=t.templateid'.
+					' AND ii.itemid=ff.itemid'.
+					' AND '.DBCondition('ii.hostid', $templateids).')'.
+				' AND '.DBCondition('t.flags', $flags);
+
+
+		if(!is_null($targetids)){
+			$sql_from = 'triggers t, functions f, items i';
+			$sql_where .= ' AND '.DBCondition('i.hostid', $targetids).
+				' AND f.itemid=i.itemid'.
+				' AND t.triggerid=f.triggerid';
+		}
+		$sql = 'SELECT DISTINCT t.triggerid, t.description, t.flags, t.expression'.
+				' FROM '.$sql_from.
+				' WHERE '.$sql_where;
+		$db_triggers = DBSelect($sql);
+		$triggers = array(
+			ZBX_FLAG_DISCOVERY_NORMAL => array(),
+			ZBX_FLAG_DISCOVERY_CHILD => array(),
+		);
+		while($trigger = DBfetch($db_triggers)){
+			$triggers[$trigger['flags']][$trigger['triggerid']] = array(
+				'description' => $trigger['description'],
+				'expression' => explode_exp($trigger['expression']),
+			);
+		}
+
+		if(!empty($triggers[ZBX_FLAG_DISCOVERY_NORMAL])){
+			if($clear){
+				$result = API::Trigger()->delete(array_keys($triggers[ZBX_FLAG_DISCOVERY_NORMAL]), true);
+				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear triggers'));
+			}
+			else{
+				DB::update('triggers', array(
+					'values' => array('templateid' => 0),
+					'where' => array('triggerid' => array_keys($triggers[ZBX_FLAG_DISCOVERY_NORMAL]))
+				));
+
+				foreach($triggers[ZBX_FLAG_DISCOVERY_NORMAL] as $trigger){
+					info(_s('Trigger [%1$s:%2$s] unlinked.', $trigger['description'], $trigger['expression']));
+				}
+			}
+		}
+
+		if(!empty($triggers[ZBX_FLAG_DISCOVERY_CHILD])){
+			if($clear){
+				$result = API::TriggerPrototype()->delete(array_keys($triggers[ZBX_FLAG_DISCOVERY_CHILD]), true);
+				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear triggers'));
+			}
+			else{
+				DB::update('triggers', array(
+					'values' => array('templateid' => 0),
+					'where' => array('triggerid' => array_keys($triggers[ZBX_FLAG_DISCOVERY_CHILD]))
+				));
+
+				foreach($triggers[ZBX_FLAG_DISCOVERY_CHILD] as $trigger){
+					info(_s('Trigger prototype [%1$s:%2$s] unlinked.', $trigger['description'], $trigger['expression']));
+				}
+			}
+		}
+/* }}} TRIGGERS */
+
 
 /* ITEMS, DISCOVERY RULES {{{ */
 		$sql_from = 'items i1, items i2';
@@ -2003,74 +2077,6 @@ COpt::memoryPick();
 			}
 		}
 /* }}} GRAPHS */
-
-
-/* TRIGGERS {{{ */
-		$sql_from = 'triggers t';
-		$sql_where = ' EXISTS ('.
-				' SELECT ff.triggerid'.
-				' FROM functions ff, items ii'.
-				' WHERE ff.triggerid=t.templateid'.
-					' AND ii.itemid=ff.itemid'.
-					' AND '.DBCondition('ii.hostid', $templateids).')'.
-				' AND '.DBCondition('t.flags', $flags);
-
-
-		if(!is_null($targetids)){
-			$sql_from = 'triggers t, functions f, items i';
-			$sql_where .= ' AND '.DBCondition('i.hostid', $targetids).
-  				' AND f.itemid=i.itemid'.
-				' AND t.triggerid=f.triggerid';
-		}
-		$sql = 'SELECT DISTINCT t.triggerid, t.description, t.flags, t.expression'.
-				' FROM '.$sql_from.
-				' WHERE '.$sql_where;
-		$db_triggers = DBSelect($sql);
-		$triggers = array(
-			ZBX_FLAG_DISCOVERY_NORMAL => array(),
-			ZBX_FLAG_DISCOVERY_CHILD => array(),
-		);
-		while($trigger = DBfetch($db_triggers)){
-			$triggers[$trigger['flags']][$trigger['triggerid']] = array(
-				'description' => $trigger['description'],
-				'expression' => explode_exp($trigger['expression']),
-			);
-		}
-
-		if(!empty($triggers[ZBX_FLAG_DISCOVERY_NORMAL])){
-			if($clear){
-				$result = API::Trigger()->delete(array_keys($triggers), true);
-				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear triggers'));
-			}
-			else{
-				DB::update('triggers', array(
-					'values' => array('templateid' => 0),
-					'where' => array('triggerid' => array_keys($triggers[ZBX_FLAG_DISCOVERY_NORMAL]))
-				));
-
-				foreach($triggers[ZBX_FLAG_DISCOVERY_NORMAL] as $trigger){
-					info(_s('Trigger [%1$s:%2$s] unlinked.', $trigger['description'], $trigger['expression']));
-				}
-			}
-		}
-
-		if(!empty($triggers[ZBX_FLAG_DISCOVERY_CHILD])){
-			if($clear){
-				$result = API::TriggerPrototype()->delete(array_keys($triggers[ZBX_FLAG_DISCOVERY_CHILD]), true);
-				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear triggers'));
-			}
-			else{
-				DB::update('triggers', array(
-					'values' => array('templateid' => 0),
-					'where' => array('triggerid' => array_keys($triggers[ZBX_FLAG_DISCOVERY_CHILD]))
-				));
-
-				foreach($triggers[ZBX_FLAG_DISCOVERY_CHILD] as $trigger){
-					info(_s('Trigger prototype [%1$s:%2$s] unlinked.', $trigger['description'], $trigger['expression']));
-				}
-			}
-		}
-/* }}} TRIGGERS */
 
 
 /* APPLICATIONS {{{ */

@@ -172,7 +172,7 @@ void	free_result(AGENT_RESULT *result)
  *               1 - command without parameters;
  *               2 - command with parameters
  */
-int	parse_command(const char *command, char *cmd, int cmd_max_len, char *param, int param_max_len)
+int	parse_command(const char *command, char *cmd, size_t cmd_max_len, char *param, size_t param_max_len)
 {
 	char	*pl, *pr;
 	size_t	sz;

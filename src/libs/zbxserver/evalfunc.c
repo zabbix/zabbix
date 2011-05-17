@@ -250,9 +250,9 @@ static int	evaluate_LOGSOURCE(char *value, DB_ITEM *item, const char *function, 
 	else
 	{
 		if (0 == strcmp(row[0], arg1))
-			strcpy(value, "1");
+			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 		else
-			strcpy(value, "0");
+			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
 		res = SUCCEED;
 	}
 	DBfree_result(result);
@@ -307,7 +307,7 @@ static int	evaluate_LOGSEVERITY(char *value, DB_ITEM *item, const char *function
 		zabbix_log(LOG_LEVEL_DEBUG, "Result for LOGSEVERITY is empty");
 	else
 	{
-		strcpy(value, row[0]);
+		zbx_strlcpy(value, row[0], MAX_BUFFER_LEN);
 		res = SUCCEED;
 	}
 	DBfree_result(result);
@@ -1927,16 +1927,16 @@ static int	evaluate_FUZZYTIME(char *value, DB_ITEM *item, const char *function, 
 	if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
 	{
 		if (item->lastvalue_uint64 >= fuzlow && item->lastvalue_uint64 <= fuzhig)
-			strcpy(value, "1");
+			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 		else
-			strcpy(value, "0");
+			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
 	}
 	else
 	{
 		if (item->lastvalue_dbl >= fuzlow && item->lastvalue_dbl <= fuzhig)
-			strcpy(value, "1");
+			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 		else
-			strcpy(value, "0");
+			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
 	}
 
 	res = SUCCEED;
@@ -2447,7 +2447,8 @@ void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments: Used for evaluation of notification macros                       *
+ * Comments: used for evaluation of notification macros                       *
+ *           output buffer size should be MAX_BUFFER_LEN                      *
  *                                                                            *
  ******************************************************************************/
 int	evaluate_macro_function(char *value, const char *host, const char *key, const char *function, const char *parameter)

@@ -933,12 +933,6 @@ void	zbx_on_exit()
 		zbx_free(threads);
 	}
 
-#ifdef USE_PID_FILE
-
-	daemon_stop();
-
-#endif /* USE_PID_FILE */
-
 	free_metrics();
 
 	zbx_sleep(2); /* wait for all threads closing */

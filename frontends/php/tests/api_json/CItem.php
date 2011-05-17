@@ -26,8 +26,6 @@ require_once(dirname(__FILE__).'/../../include/hosts.inc.php');
 
 class API_JSON_Item extends CZabbixTest
 {
-	public $affected_tables = array('items');
-
 	public static function profile_links()
 	{
 		$data = array();
@@ -52,7 +50,7 @@ class API_JSON_Item extends CZabbixTest
 	 */
 	public function testCItem_create_profile_item($profileFieldNr, $successExpected)
 	{
-		DBsave_tables($this->affected_tables);
+		DBsave_tables('items');
 
 		$debug = null;
 
@@ -77,7 +75,7 @@ class API_JSON_Item extends CZabbixTest
 			$this->assertTrue(array_key_exists('error', $result),"Chuck Norris: I was expecting call to fail, but it did not. Result is: ".print_r($result, true)."\nDebug: ".print_r($debug, true));
 		}
 
-		DBrestore_tables($this->affected_tables);
+		DBrestore_tables('items');
 	}
 }
 ?>
