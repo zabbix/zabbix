@@ -11,31 +11,27 @@ if(isset($_GET['lang'])){
 		$locales = zbx_locale_variants($_GET['lang']);
 
 		$locale_found = false;
-		$locale = null;
 		foreach($locales as $locale){
 			putenv('LC_ALL='.$locale);
 			putenv('LANG='.$locale);
 			putenv('LANGUAGE='.$locale);
 
 			if(setlocale(LC_ALL, $locale)){
-				$locale_found = true;
 				break;
 			}
 		}
 
-		if(!$locale_found && $_GET['lang'] != 'en_GB' && $_GET['lang'] != 'en_gb'){
-			error('Locale for language "'.$_GET['lang'].'" is not found on the web server. Tried to set: '.implode(', ', $locales).'. Unable to translate zabbix interface.');
-		}
 		bindtextdomain('frontend', 'locale');
 		bind_textdomain_codeset('frontend', 'UTF-8');
 		textdomain('frontend');
 	}
 	// Numeric Locale to default
 	setLocale(LC_NUMERIC, array('en','en_US','en_US.UTF-8','English_United States.1252'));
-	require_once('include/locales/en_gb.inc.php');
 }
 
+require_once('include/locales/en_gb.inc.php');
 $translations = $TRANSLATION;
+
 // }}} get language translations
 
 // available scripts 'scriptFileName' => 'path relative to js/'
