@@ -52,14 +52,43 @@ function DBdata($query)
 }
 
 /**
- * Saves data of the specified tables in temporary tables. The tables can be in any order.
+ * The function returns list of all referenced tables sorted by dependency level
+ * For example: DBget_tables('users')
+ * Result: array(users,alerts,acknowledges,auditlog,auditlog_details,opmessage_usr,media,profiles,sessions,users_groups)
  */
-function DBsave_tables($tables)
+function DBget_tables($topTable)
+{
+	$referencedTables = array($topTable);
+
+	$schema = include(dirname(__FILE__).'/../../include/schema.inc.php');
+	foreach($schema as $table => $tableData)
+	{
+		$fields = $schema[$table]['fields'];
+		foreach($fields as $field => $fieldData){
+			if(isset($fieldData['ref_table'])){
+				$refTable = $fieldData['ref_table'];
+				if($refTable == $topTable && $topTable != $table){
+					$referencedTables[] = $table;
+					$deeperTables=DBget_tables($table);
+					if(!empty($deeperTables)){
+						$referencedTables = array_merge($referencedTables, $deeperTables);
+					}
+				}
+			}
+		}
+	}
+	return array_unique($referencedTables);
+}
+
+/**
+ * Saves data of the specified table and all dependent tables in temporary storage.
+ * For example: DBsave_tables('users')
+ */
+function DBsave_tables($topTable)
 {
 	global $DB;
 
-	if(!is_array($tables))	$tables=array($tables);
-
+	$tables=DBget_tables($topTable);
 
 	foreach($tables as $table)
 	{
@@ -81,15 +110,14 @@ function DBsave_tables($tables)
 }
 
 /**
- * Restores data from temporary tables. DBsave_tables() must be called first.
- * The tables should be ordered so that referenced tables come after main ones.
- * For example: DBrestore_tables(array('users','users_groups','media'))
+ * Restores data from temporary storage. DBsave_tables() must be called first.
+ * For example: DBrestore_tables('users')
  */
-function DBrestore_tables($tables)
+function DBrestore_tables($topTable)
 {
 	global $DB;
 
-	if(!is_array($tables))	$tables=array($tables);
+	$tables=DBget_tables($topTable);
 
 	$tables_reversed = array_reverse($tables);
 
@@ -129,25 +157,20 @@ function DBhash($sql)
 /**
  * Returns number of records in database result.
  */
-function DBcount($sql,$limit = null,$offset = null)
-{
-	global $DB;
-	$cnt=0;
+function DBcount($sql, $limit = null, $offset = null){
+	$cnt = 0;
 
-	if(isset($limit) && isset($offset))
-	{
-		$result=DBselect($sql,$limit,$offset);
+	if(isset($limit) && isset($offset)){
+		$result = DBselect($sql, $limit, $offset);
 	}
-	else if(isset($limit))
-	{
-		$result=DBselect($sql,$limit);
+	else if(isset($limit)){
+		$result = DBselect($sql,$limit);
 	}
-	else
-	{
-		$result=DBselect($sql);
+	else{
+		$result = DBselect($sql);
 	}
-	while($row = DBfetch($result))
-	{
+
+	while(DBfetch($result)){
 		$cnt++;
 	}
 

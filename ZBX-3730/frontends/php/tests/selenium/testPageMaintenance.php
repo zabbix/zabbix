@@ -103,7 +103,7 @@ class testPageMaintenance extends CWebTest
 	{
 		$maintenanceid=$maintenance['maintenanceid'];
 
-		DBsave_tables(array('maintenances','timeperiods','maintenances_hosts','maintenances_groups','maintenances_windows'));
+		DBsave_tables('maintenances');
 
 		$this->chooseOkOnNextConfirmation();
 
@@ -130,7 +130,7 @@ class testPageMaintenance extends CWebTest
 		$sql="select * from timeperiods where timeperiodid in (select timeperiodid from maintenances_windows where maintenanceid=$maintenanceid)";
 		$this->assertEquals(0,DBcount($sql));
 
-		DBrestore_tables(array('maintenances','timeperiods','maintenances_hosts','maintenances_groups','maintenances_windows'));
+		DBrestore_tables('maintenances');
 	}
 
 	public function testPageMaintenance_SingleEnable()

@@ -38,7 +38,7 @@ class testPageItems extends CWebTest{
 		$this->dropdown_select_wait('groupid','all');
 
 		$this->assertTitle('Hosts');
-		$this->ok('CONFIGURATION OF HOSTS');
+		$this->ok('HOSTS');
 		// Go to the list of items
 		$this->href_click("items.php?filter_set=1&hostid=$hostid&sid=");
 		$this->wait();

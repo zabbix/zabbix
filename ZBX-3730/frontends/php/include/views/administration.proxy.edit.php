@@ -78,7 +78,7 @@
 			$frmProxy->addVar('interfaces[0][hostid]', $interface['hostid']);
 		}
 
-		$cmbConnectBy = new CRadioButton('interfaces[0][useip]', $interface['useip']);
+		$cmbConnectBy = new CRadioButtonList('interfaces[0][useip]', $interface['useip']);
 		$cmbConnectBy->addValue(S_IP, 1);
 		$cmbConnectBy->addValue(S_DNS, 0);
 		$cmbConnectBy->useJQueryStyle();
