@@ -374,7 +374,7 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 
 	if (ZBX_SOCK_ERROR == (s->socket = socket(ai->ai_family, ai->ai_socktype | SOCK_CLOEXEC, ai->ai_protocol)))
 	{
-		zbx_set_tcp_strerror("cannot create socket [%s:%d]: %s", ip, port, strerror_from_system(zbx_sock_last_error()));
+		zbx_set_tcp_strerror("cannot create socket [[%s]:%d]: %s", ip, port, strerror_from_system(zbx_sock_last_error()));
 		goto out;
 	}
 
@@ -407,7 +407,7 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 
 	if (ZBX_TCP_ERROR == connect(s->socket, ai->ai_addr, ai->ai_addrlen))
 	{
-		zbx_set_tcp_strerror("cannot connect to [%s:%d]: %s", ip, port, strerror_from_system(zbx_sock_last_error()));
+		zbx_set_tcp_strerror("cannot connect to [[%s]:%d]: %s", ip, port, strerror_from_system(zbx_sock_last_error()));
 		zbx_tcp_close(s);
 		goto out;
 	}
@@ -441,7 +441,7 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 
 	if (ZBX_SOCK_ERROR == (s->socket = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0)))
 	{
-		zbx_set_tcp_strerror("cannot create socket [%s:%d]: %s", ip, port, strerror_from_system(zbx_sock_last_error()));
+		zbx_set_tcp_strerror("cannot create socket [[%s]:%d]: %s", ip, port, strerror_from_system(zbx_sock_last_error()));
 		return FAIL;
 	}
 
@@ -467,7 +467,7 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 
 	if (ZBX_TCP_ERROR == connect(s->socket, (struct sockaddr *)&servaddr_in, sizeof(ZBX_SOCKADDR)))
 	{
-		zbx_set_tcp_strerror("cannot connect to [%s:%d]: %s", ip, port, strerror_from_system(zbx_sock_last_error()));
+		zbx_set_tcp_strerror("cannot connect to [[%s]:%d]: %s", ip, port, strerror_from_system(zbx_sock_last_error()));
 		zbx_tcp_close(s);
 		return FAIL;
 	}
