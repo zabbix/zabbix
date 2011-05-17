@@ -28,10 +28,11 @@
 #define	PARM_MAND	1
 
 /* config file parsing options */
-#define	ZBX_CFG_NOT_STRICT	0
-#define	ZBX_CFG_STRICT		1
 #define	ZBX_CFG_FILE_REQUIRED	0
 #define	ZBX_CFG_FILE_OPTIONAL	1
+
+#define	ZBX_CFG_NOT_STRICT	0
+#define	ZBX_CFG_STRICT		1
 
 extern int	CONFIG_ZABBIX_FORKS;	/* contains the number of listeners for processing passive checks */
 extern char	*CONFIG_FILE;
