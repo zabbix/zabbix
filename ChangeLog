@@ -11,6 +11,7 @@ New features:
  - [ZBXNEXT-511] renamed item description to name, for description introduced a new field (asaveljevs, Vedmak)
 
 Bug fixes:
+ - [ZBX-3730] fixed bug with javascript translations - now js strings actually get translated (KB)
  - [ZBX-3752] fixed error in slides with system status (Vedmak)
  - [ZBX-3724] fixed broken images when importing and exporting maps with PostgreSQL (Alexei, Vedmak, Sasha)
  - [ZBX-3794] added timeout support to vfs.file.contents[] command (dimir)
