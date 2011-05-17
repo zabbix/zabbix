@@ -20,7 +20,8 @@
 #ifndef ZABBIX_SNMPTRAPPER_H
 #define ZABBIX_SNMPTRAPPER_H
 
-extern char	*CONFIG_SNMPTRAP_FILE;
+extern char		*CONFIG_SNMPTRAP_FILE;
+extern unsigned char	process_type;
 
 void	main_snmptrapper_loop(int server_num);
 

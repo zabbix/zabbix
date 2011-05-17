@@ -18,50 +18,20 @@
 **/
 
 #include "common.h"
-
-#include "comms.h"
-#include "log.h"
-#include "zlog.h"
-#include "zbxjson.h"
-#include "zbxserver.h"
 #include "dbcache.h"
-#include "proxy.h"
 #include "zbxself.h"
-
 #include "daemon.h"
+#include "log.h"
 
 #include "snmptrapper.h"
 
-extern unsigned char	process_type;
 static char		tmp_trap_file[MAX_STRING_LEN];
-
-/******************************************************************************
- *                                                                            *
- * Function: get_traps                                                        *
- *                                                                            *
- * Purpose: move the current list of received traps to a new file             *
- *                                                                            *
- * Return value:  SUCCEED - list saved to tmp_trap_file                       *
- *                FAIL - the current list is empty                            *
- *                                                                            *
- * Author: Rudolfs Kreicbergs                                                 *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-static int get_traps ()
-{
-	if (0 != rename(CONFIG_SNMPTRAP_FILE, tmp_trap_file))
-		return FAIL;	/* no file, no traps */
-
-	return SUCCEED;
-}
 
 /******************************************************************************
  *                                                                            *
  * Function: process_traps                                                    *
  *                                                                            *
- * Purpose: process the traps from tmp_trap_file (created in get_traps())     *
+ * Purpose: process the traps from tmp_trap_file                              *
  *                                                                            *
  * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
@@ -70,10 +40,17 @@ static int get_traps ()
  ******************************************************************************/
 static void process_traps()
 {
-	FILE	*f = NULL;
-	char 	line[MAX_STRING_LEN];
+	const char	*__function_name = "process_value";
+	FILE		*f = NULL;
+	char 		line[MAX_STRING_LEN];
 
-	f = fopen(tmp_trap_file, "r");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(), tmp file [%s]", __function_name, tmp_trap_file);
+
+	if (NULL == (f = fopen(tmp_trap_file, "r")))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "%s(): could not open [%s]", __function_name, tmp_trap_file);
+		goto close;
+	}
 
 	while (NULL != fgets(line, sizeof(line), f))
 	{
@@ -81,9 +58,11 @@ static void process_traps()
 		zabbix_log(LOG_LEVEL_ERR, "trap: %s", line);
 	}
 
+close:
 	zbx_fclose(f);
-
 	remove(tmp_trap_file);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 void	main_snmptrapper_loop(int server_num)
@@ -93,7 +72,6 @@ void	main_snmptrapper_loop(int server_num)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_snprintf(tmp_trap_file, sizeof(tmp_trap_file), "%s_%d", CONFIG_SNMPTRAP_FILE, server_num);
-	zabbix_log(LOG_LEVEL_ERR, "SNMPtrap tmp file: \"%s\"", tmp_trap_file);
 
 	set_child_signal_handler();
 
@@ -106,7 +84,8 @@ void	main_snmptrapper_loop(int server_num)
 		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 		zbx_setproctitle("%s [processing data]", get_process_type_string(process_type));
 
-		while (SUCCEED == get_traps())
+		/* if file exists, process the new traps */
+		while (0 == rename(CONFIG_SNMPTRAP_FILE, tmp_trap_file))
 			process_traps();
 
 		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
