@@ -146,6 +146,9 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.6rc1
 
+ - [ZBX-3806] fixed HTTP pollers being started on Zabbix proxy (asaveljevs)
+ - [ZBX-3808] updated Brazilian Portuguese translation; thanks to Murilo Moreira de Oliveira (Alexei)
+ - [ZBX-3682] fixed import of map elements having empty label; thanks to Takanori Suzuki (Alexei)
  - [ZBX-3679] fixed incorrect "No nodes defined" when screen selection popup has no elements (Alexei)
  - [ZBX-3638] fixed displaying of vertical text in case of special HTML characters (Alexei)
  - [ZBX-3801] added check for duplicate template IDs when creating host through API (KB)
