@@ -1039,6 +1039,8 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 
 	if (ZBX_TCP_HEADER_LEN == nbytes && 0 == strncmp(s->buf_stat, ZBX_TCP_HEADER, ZBX_TCP_HEADER_LEN))
 	{
+		/* ZBX header was received */
+
 		total_bytes += nbytes;
 
 		left = sizeof(zbx_uint64_t);
@@ -1071,24 +1073,28 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 
 		left = sizeof(s->buf_stat) - read_bytes - 1;
 
-		/* fill static buffer */
-		while (read_bytes < expected_len && 0 < left &&
-				ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ( s->socket, s->buf_stat + read_bytes, left)))
+		/* check for an empty socket if exactly ZBX_TCP_HEADER_LEN bytes (without a header) were sent */
+		if (0 == read_bytes  || '\n' != s->buf_stat[read_bytes - 1])	/* assume the data ends with a '\n' */
 		{
-			read_bytes += nbytes;
-
-			if (0 != (flags & ZBX_TCP_READ_UNTIL_CLOSE))
+			/* fill static buffer */
+			while (read_bytes < expected_len && 0 < left &&
+					ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ( s->socket, s->buf_stat + read_bytes, left)))
 			{
-				if (0 == nbytes)
-					break;
-			}
-			else
-			{
-				if (nbytes < left)
-					break;
-			}
+				read_bytes += nbytes;
 
-			left -= nbytes;
+				if (0 != (flags & ZBX_TCP_READ_UNTIL_CLOSE))
+				{
+					if (0 == nbytes)
+						break;
+				}
+				else
+				{
+					if (nbytes < left)
+						break;
+				}
+
+				left -= nbytes;
+			}
 		}
 
 		s->buf_stat[read_bytes] = '\0';
