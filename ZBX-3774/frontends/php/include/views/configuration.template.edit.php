@@ -159,11 +159,11 @@
 		'output' => API_OUTPUT_EXTEND
 	);
 	$db_hosts = API::Host()->get($params);
-	order_result($db_hosts, 'host');
+	order_result($db_hosts, 'name');
 
 	foreach($db_hosts as $hnum => $db_host){
 		if(isset($hosts_linked_to[$db_host['hostid']])) continue;// add all except selected hosts
-		$host_tb->addItem($db_host['hostid'], $db_host['host']);
+		$host_tb->addItem($db_host['hostid'], $db_host['name']);
 	}
 
 // select selected hosts and add them
@@ -174,9 +174,9 @@
 		'output' => API_OUTPUT_EXTEND
 	);
 	$db_hosts = API::Host()->get($params);
-	order_result($db_hosts, 'host');
+	order_result($db_hosts, 'name');
 	foreach($db_hosts as $hnum => $db_host){
-		$host_tb->addItem($db_host['hostid'], $db_host['host']);
+		$host_tb->addItem($db_host['hostid'], $db_host['name']);
 	}
 
 	$templateList->addRow(S_HOSTS.' / '.S_TEMPLATES, $host_tb->Get(S_IN, array(S_OTHER.SPACE.'|'.SPACE.S_GROUP.SPACE,$cmbGroups)));
