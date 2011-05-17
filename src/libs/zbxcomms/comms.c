@@ -1072,26 +1072,23 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 		left = sizeof(s->buf_stat) - read_bytes - 1;
 
 		/* fill static buffer */
-		if ('\n' != s->buf_stat[read_bytes - 1])	/* don't try to read from an empty socket */
+		while (read_bytes < expected_len && 0 < left &&
+				ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ( s->socket, s->buf_stat + read_bytes, left)))
 		{
-			while (read_bytes < expected_len && 0 < left &&
-					ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ( s->socket, s->buf_stat + read_bytes, left)))
+			read_bytes += nbytes;
+
+			if (0 != (flags & ZBX_TCP_READ_UNTIL_CLOSE))
 			{
-				read_bytes += nbytes;
-
-				if (0 != (flags & ZBX_TCP_READ_UNTIL_CLOSE))
-				{
-					if (0 == nbytes)
-						break;
-				}
-				else
-				{
-					if (nbytes < left)
-						break;
-				}
-
-				left -= nbytes;
+				if (0 == nbytes)
+					break;
 			}
+			else
+			{
+				if (nbytes < left)
+					break;
+			}
+
+			left -= nbytes;
 		}
 
 		s->buf_stat[read_bytes] = '\0';
@@ -1136,11 +1133,12 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 		zbx_set_tcp_strerror("ZBX_TCP_READ() failed: %s", strerror_from_system(zbx_sock_last_error()));
 		total_bytes = FAIL;
 	}
-	else
-		total_bytes += nbytes;
 cleanup:
 	if (0 != timeout)
 		zbx_tcp_timeout_cleanup(s);
+
+	if (FAIL != total_bytes)
+		total_bytes += read_bytes;
 
 	return total_bytes;
 }
