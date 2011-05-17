@@ -1608,7 +1608,7 @@ include_once('include/page_header.php');
 	else if($srctbl == 'screens2'){
 		require_once('include/screens.inc.php');
 
-		$table = new CTableInfo(S_NO_NODES_DEFINED);
+		$table = new CTableInfo(S_NO_SCREENS_DEFINED);
 		$table->setHeader(S_NAME);
 
 		$options = array(

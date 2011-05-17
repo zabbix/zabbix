@@ -430,7 +430,7 @@ int main(int argc, char **argv)
 		}
 		else if (NULL == (in = fopen(INPUT_FILE, "r")) )
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot open [%s] [%s]", INPUT_FILE, strerror(errno));
+			zabbix_log(LOG_LEVEL_WARNING, "cannot open [%s]: %s", INPUT_FILE, zbx_strerror(errno));
 			ret = FAIL;
 			goto exit;
 		}
@@ -513,8 +513,7 @@ int main(int argc, char **argv)
 
 				if (-1 == (read_more = select(1, &read_set, NULL, NULL, &tv)))
 				{
-					zabbix_log(LOG_LEVEL_WARNING, "select() failed with errno:%d error:[%s]",
-							errno, strerror(errno));
+					zabbix_log(LOG_LEVEL_WARNING, "select() failed: %s", zbx_strerror(errno));
 				}
 				else if (1 <= read_more)
 				{
