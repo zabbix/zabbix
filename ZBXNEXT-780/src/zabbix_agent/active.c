@@ -623,7 +623,7 @@ static int	process_value(
 
 	if (0 != persistent && CONFIG_BUFFER_SIZE / 2 <= buffer.pcount)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "buffer is full, can't store persistent value");
+		zabbix_log(LOG_LEVEL_WARNING, "buffer is full, cannot store persistent value");
 		goto ret;
 	}
 
