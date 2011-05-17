@@ -24,29 +24,27 @@
 
 #include <iksemel.h>
 
-static void
-zbx_io_close (void *socket)
+static void	zbx_io_close(void *socket)
 {
-	int *sock = (int*) socket;
+	int	*sock = (int *)socket;
 
-	if( !sock ) return;
+	if (NULL == sock)
+		return;
 
-	close (*sock);
+	close(*sock);
 }
 
 static int		zbx_j_sock = -1;
 static const char	*__module_name = "JABBER";
 
-static int
-zbx_io_connect (iksparser *prs, void **socketptr, const char *server, int port)
+static int	zbx_io_connect(iksparser *prs, void **socketptr, const char *server, int port)
 {
-	int tmp;
+	int		tmp;
 #ifdef HAVE_GETADDRINFO
-	struct addrinfo hints;
-	struct addrinfo *addr_res, *addr_ptr;
-	char port_str[6];
+	struct addrinfo	hints, *addr_res, *addr_ptr;
+	char		port_str[6];
 
-	*socketptr = (void *) NULL;
+	*socketptr = (void *)NULL;
 
 	hints.ai_flags = AI_CANONNAME;
 	hints.ai_family = PF_UNSPEC;
@@ -366,14 +364,13 @@ static int connect_jabber(const char *jabber_id, const char *password, int use_s
 
 	if (NULL == (jsess->prs = iks_stream_new(IKS_NS_CLIENT, jsess, (iksStreamHook *)on_stream)))
 	{
-		zbx_snprintf(jabber_error, jabber_error_len, "Cannot create iksemel parser: %s",
-				strerror(errno));
+		zbx_snprintf(jabber_error, jabber_error_len, "cannot create iksemel parser: %s", zbx_strerror(errno));
 		goto lbl_fail;
 	}
 
 #ifdef DEBUG
 	iks_set_log_hook (jsess->prs, (iksLogHook *)on_log);
-#endif /* DEBUG */
+#endif
 
 	jsess->acc = iks_id_new(iks_parser_stack(jsess->prs), jabber_id);
 
@@ -389,8 +386,7 @@ static int connect_jabber(const char *jabber_id, const char *password, int use_s
 
 	if (NULL == (jsess->my_filter = iks_filter_new()))
 	{
-		zbx_snprintf(jabber_error, jabber_error_len, "Cannot create filter: %s",
-				strerror(errno));
+		zbx_snprintf(jabber_error, jabber_error_len, "cannot create filter: %s", zbx_strerror(errno));
 		goto lbl_fail;
 	}
 

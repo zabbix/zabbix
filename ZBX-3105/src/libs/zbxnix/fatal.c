@@ -285,7 +285,7 @@ void	print_fatal_info(int sig, siginfo_t *siginfo, void *context)
 
 	if (NULL == bcktrc_syms)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "error in backtrace_symbols(): [%s]", strerror(errno));
+		zabbix_log(LOG_LEVEL_CRIT, "error in backtrace_symbols(): %s", zbx_strerror(errno));
 
 		for (i = 0; i < bcktrc_sz; i++)
 			zabbix_log(LOG_LEVEL_CRIT, "%d: %p", bcktrc_sz - i - 1, bcktrc[i]);

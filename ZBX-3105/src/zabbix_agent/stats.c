@@ -66,12 +66,12 @@ static int	zbx_get_cpu_num()
 		goto return_one;
 
 	return (int)psd.psd_proc_cnt;
-#elif defined(_SC_NPROCESSORS_ONLN)
+#elif defined(_SC_NPROCESSORS_CONF)
 	/* FreeBSD 7.0 x86 */
 	/* Solaris 10 x86 */
 	int	ncpu;
 
-	if (-1 == (ncpu = sysconf(_SC_NPROCESSORS_ONLN)))
+	if (-1 == (ncpu = sysconf(_SC_NPROCESSORS_CONF)))
 		goto return_one;
 
 	return ncpu;
@@ -177,7 +177,7 @@ void	init_collector_data()
 
 	if ((void *)(-1) == (collector = shmat(shm_id, NULL, 0)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot attach shared memory for collector [%s]", strerror(errno));
+		zabbix_log(LOG_LEVEL_CRIT, "cannot attach shared memory for collector: %s", zbx_strerror(errno));
 		exit(FAIL);
 	}
 
@@ -217,7 +217,7 @@ void	free_collector_data()
 		return;
 
 	if (-1 == shmctl(shm_id, IPC_RMID, 0))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot remove shared memory for collector [%s]", strerror(errno));
+		zabbix_log(LOG_LEVEL_WARNING, "cannot remove shared memory for collector: %s", zbx_strerror(errno));
 
 #endif	/* _WINDOWS */
 

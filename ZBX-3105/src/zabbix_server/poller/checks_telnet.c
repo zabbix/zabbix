@@ -55,7 +55,7 @@ static int	telnet_waitsocket(int socket_fd, int mode)
 	rc = select(socket_fd + 1, readfd, writefd, NULL, &tv);
 
 	if (-1 == rc)
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%d errno:%d error:[%s]", __function_name, rc, errno, strerror(errno));
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%d error: %s", __function_name, rc, zbx_strerror(errno));
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, rc);
 
@@ -71,7 +71,7 @@ static ssize_t	telnet_socket_read(int socket_fd, void *buf, size_t count)
 
 	while (-1 == (rc = read(socket_fd, buf, count)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%d errno:%d error:[%s]", __function_name, rc, errno, strerror(errno));
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%d error: %s", __function_name, rc, zbx_strerror(errno));
 
 		if (errno == EAGAIN)
 		{
@@ -108,7 +108,7 @@ static ssize_t	telnet_socket_write(int socket_fd, const void *buf, size_t count)
 
 	while (-1 == (rc = write(socket_fd, buf, count)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%d errno:%d error:[%s]", __function_name, rc, errno, strerror(errno));
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%d error: %s", __function_name, rc, zbx_strerror(errno));
 
 		if (errno == EAGAIN)
 		{
@@ -425,9 +425,7 @@ static int	telnet_execute(int socket_fd, const char *command,
 
 	if (-1 == rc)
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL,
-				"No prompt: %s",
-				zbx_tcp_strerror()));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "no prompt: %s", zbx_tcp_strerror()));
 		goto fail;
 	}
 
@@ -487,7 +485,7 @@ static int	telnet_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 
 	if (FAIL == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, conn, item->host.port, 0))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot connect to TELNET server: %s",
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "cannot connect to TELNET server: %s",
 				zbx_tcp_strerror()));
 		goto close;
 	}

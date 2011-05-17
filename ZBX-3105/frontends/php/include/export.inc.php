@@ -431,7 +431,7 @@ class zbxXML{
 				unset($screen['screenid']);
 				$exists = CScreen::exists(array('name' => $screen['name']));
 
-				if($exists && isset($rules['screens']['exist'])){
+				if($exists && isset($rules['screen']['exist'])){
 					$db_screens = CScreen::getObjects(array('name' => $screen['name']));
 					if(empty($db_screens)) throw new Exception(S_NO_PERMISSIONS_FOR_SCREEN.' "'.$screen['name'].'" import');
 
@@ -439,7 +439,7 @@ class zbxXML{
 
 					$screen['screenid'] = $db_screen['screenid'];
 				}
-				else if($exists || !isset($rules['screens']['missed'])){
+				else if($exists || !isset($rules['screen']['missed'])){
 					info('Screen ['.$screen['name'].'] skipped - user rule');
 					unset($importScreens[$mnum]);
 					continue; // break if not update exist
