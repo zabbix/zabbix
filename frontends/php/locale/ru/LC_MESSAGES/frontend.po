@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-05-17 20:13+0300\n"
-"PO-Revision-Date: 2011-05-05 07:50+0200\n"
+"PO-Revision-Date: 2011-05-17 16:06+0200\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -3522,7 +3522,7 @@ msgstr "Шестнадцатеричный"
 
 #: include/locales/en_gb.inc.php:976
 msgid "Hidden"
-msgstr "Скрыть"
+msgstr "Скрыта"
 
 #: include/locales/en_gb.inc.php:1558
 msgid "Hide"
@@ -7703,7 +7703,7 @@ msgstr "Имя важности не может быть пустым."
 
 #: include/locales/en_gb.inc.php:1159
 msgid "Show"
-msgstr "Показать"
+msgstr "Показана"
 
 #: include/locales/en_gb.inc.php:290
 msgid "Show all"
