@@ -798,7 +798,7 @@ require_once('include/js.inc.php');
 
 				while($row=DBfetch($result)){
 					$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
-					$caption = $row['node_name'].S_MINUS_ALL_GROUPS_MINUS;
+					$caption = $row['node_name']._('- all groups -');
 					$id = $resourceid;
 				}
 			}
