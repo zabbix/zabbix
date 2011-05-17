@@ -227,15 +227,15 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	zbx_thread_exit(ret);
 }
 
-static void    init_config(const char* config_file)
+static void    init_config(const char *config_file)
 {
-	char*	config_source_ip_from_conf = NULL;
-	char*	zabbix_server_from_conf = NULL;
+	char	*config_source_ip_from_conf = NULL;
+	char	*zabbix_server_from_conf = NULL;
 	int	zabbix_server_port_from_conf = 0;
-	char*	zabbix_hostname_from_conf = NULL;
-	char*	c = NULL;
+	char	*zabbix_hostname_from_conf = NULL;
+	char	*c = NULL;
 
-	struct cfg_line cfg[]=
+	struct cfg_line	cfg[]=
 	{
 		/* PARAMETER	,VAR				,FUNC	,TYPE(0i,1s)	,MANDATORY	,MIN			,MAX		*/
 		{"SourceIP"	,&config_source_ip_from_conf	,0	,TYPE_STRING	,PARM_OPT	,0			,0		},
@@ -251,10 +251,9 @@ static void    init_config(const char* config_file)
 
 		if (NULL != config_source_ip_from_conf)
 		{
-			if (NULL == CONFIG_SOURCE_IP)	/* apply parameter only if unset */
-			{
+			if (NULL == CONFIG_SOURCE_IP)
 				CONFIG_SOURCE_IP = strdup(config_source_ip_from_conf);
-			}
+
 			zbx_free(config_source_ip_from_conf);
 		}
 
@@ -267,11 +266,15 @@ static void    init_config(const char* config_file)
 
 				ZABBIX_SERVER = strdup(zabbix_server_from_conf);
 			}
+
 			zbx_free(zabbix_server_from_conf);
 		}
 
-		if (0 == ZABBIX_SERVER_PORT && 0 != zabbix_server_port_from_conf )
-			ZABBIX_SERVER_PORT = zabbix_server_port_from_conf;
+		if (0 != zabbix_server_port_from_conf)
+		{
+			if (0 == ZABBIX_SERVER_PORT)
+				ZABBIX_SERVER_PORT = zabbix_server_port_from_conf;
+		}
 
 		if (NULL != zabbix_hostname_from_conf)
 		{
@@ -332,7 +335,7 @@ static zbx_task_t parse_commandline(int argc, char **argv)
 				REAL_TIME = 1;
 				break;
 			case 'v':
-				if (CONFIG_LOG_LEVEL == LOG_LEVEL_WARNING)
+				if (LOG_LEVEL_WARNING == CONFIG_LOG_LEVEL)
 					CONFIG_LOG_LEVEL = LOG_LEVEL_DEBUG;
 				else
 					CONFIG_LOG_LEVEL = LOG_LEVEL_WARNING;

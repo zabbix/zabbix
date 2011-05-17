@@ -532,7 +532,7 @@ int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags, int t
 		len64 = zbx_htole_uint64(len64);
 
 		/* write data length */
-		if (ZBX_TCP_ERROR == ZBX_TCP_WRITE(s->socket, (char *) &len64, sizeof(len64)))
+		if (ZBX_TCP_ERROR == ZBX_TCP_WRITE(s->socket, (char *)&len64, sizeof(len64)))
 		{
 			zbx_set_tcp_strerror("ZBX_TCP_WRITE() failed [%s]", strerror_from_system(zbx_sock_last_error()));
 			ret = FAIL;
@@ -542,7 +542,7 @@ int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags, int t
 
 	while (written < (ssize_t)strlen(data))
 	{
-		if (ZBX_TCP_ERROR == (i = ZBX_TCP_WRITE(s->socket, data+written,(int)(strlen(data)-written))))
+		if (ZBX_TCP_ERROR == (i = ZBX_TCP_WRITE(s->socket, data + written, (int)(strlen(data) - written))))
 		{
 			zbx_set_tcp_strerror("ZBX_TCP_WRITE() failed [%s]", strerror_from_system(zbx_sock_last_error()));
 			ret = FAIL;
@@ -1016,7 +1016,7 @@ void	zbx_tcp_free(zbx_sock_t *s)
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value: number of bytes received, *
+ * Return value: number of bytes received - success,                          *
  *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
@@ -1106,7 +1106,8 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 		}
 
 		s->buf_stat[read_bytes] = '\0';
-		if ((sizeof(s->buf_stat) - 1) == read_bytes)	/* static buffer is full */
+
+		if (sizeof(s->buf_stat) - 1 == read_bytes)	/* static buffer is full */
 		{
 			allocated = ZBX_BUF_LEN;
 			s->buf_type = ZBX_BUF_TYPE_DYN;
@@ -1119,7 +1120,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 
 			/* fill dynamic buffer */
 			while (read_bytes < expected_len &&
-					ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ(s->socket, s->buf_stat, sizeof(s->buf_stat)-1)))
+					ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ(s->socket, s->buf_stat, sizeof(s->buf_stat) - 1)))
 			{
 				s->buf_stat[nbytes] = '\0';
 				zbx_snprintf_alloc(&(s->buf_dyn), &allocated, &offset, sizeof(s->buf_stat), "%s", s->buf_stat);
