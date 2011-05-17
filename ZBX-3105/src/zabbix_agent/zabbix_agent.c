@@ -109,10 +109,7 @@ static void	zbx_load_config(int optional)
 	zbx_strarr_init(&CONFIG_ALIASES);
 	zbx_strarr_init(&CONFIG_USER_PARAMETERS);
 
-	if (optional)
-		parse_opt_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_STRICT);
-	else
-		parse_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_STRICT);
+	parse_cfg_file(CONFIG_FILE, cfg, optional, ZBX_CFG_STRICT);
 }
 
 /******************************************************************************
@@ -151,7 +148,7 @@ int	main(int argc, char **argv)
 
 	progname = get_program_name(argv[0]);
 
-/* Parse the command-line. */
+	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, "c:hVpt:", longopts, NULL)))
 	{
 		switch (ch)
@@ -219,6 +216,7 @@ int	main(int argc, char **argv)
 				test_parameter(TEST_METRIC, PROCESS_TEST);
 			else
 				test_parameters();
+			zabbix_close_log();
 			free_metrics();
 			alias_list_free();
 			exit(SUCCEED);

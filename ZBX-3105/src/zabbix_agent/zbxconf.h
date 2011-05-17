@@ -34,16 +34,18 @@ extern int	CONFIG_LOG_LEVEL;
 extern int	CONFIG_MAX_LINES_PER_SECOND;
 extern char	**CONFIG_ALIASES;
 extern char	**CONFIG_USER_PARAMETERS;
+#ifdef _WINDOWS
 extern char	**CONFIG_PERF_COUNTERS;
+#endif
 
 void	load_aliases(char **lines);
 void	load_user_parameters(char **lines);
-#if defined(_WINDOWS)
+#ifdef _WINDOWS
 void	load_perf_counters(const char **lines);
 #endif
 
 #ifdef _AIX
 void	tl_version();
-#endif /* _AIX */
+#endif
 
 #endif /* ZABBIX_ZBXCONF_H */

@@ -236,19 +236,24 @@ static void    zbx_load_config(const char *config_file)
 	char	*cfg_source_ip = NULL, *cfg_server = NULL, *cfg_hostname = NULL, *c = NULL;
 	int	cfg_server_port = 0;
 
-	struct cfg_line cfg[]=
+	struct cfg_line	cfg[] =
 	{
-		/* PARAMETER	,VAR			,TYPE(0i,1s)	,MANDATORY	,MIN			,MAX		*/
-		{"SourceIP"	,&cfg_source_ip		,TYPE_STRING	,PARM_OPT	,0			,0		},
-		{"Server"	,&cfg_server		,TYPE_STRING	,PARM_OPT	,0			,0		},
-		{"ServerPort"	,&cfg_server_port	,TYPE_INT	,PARM_OPT	,MIN_ZABBIX_PORT	,MAX_ZABBIX_PORT},
-		{"Hostname"	,&cfg_hostname		,TYPE_STRING	,PARM_OPT	,0			,0		},
-		{0}
+		/* PARAMETER,			VAR,					TYPE,
+			MANDATORY,	MIN,			MAX */
+		{"SourceIP",			&cfg_source_ip,				TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"Server",			&cfg_server,				TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"ServerPort",			&cfg_server_port,			TYPE_INT,
+			PARM_OPT,	MIN_ZABBIX_PORT,	MAX_ZABBIX_PORT},
+		{"Hostname",			&cfg_hostname,				TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{NULL}
 	};
 
 	if (config_file)
 	{
-		parse_opt_cfg_file(config_file, cfg, ZBX_CFG_NOT_STRICT);	/* do not complain about unknown parameters */
+		parse_cfg_file(config_file, cfg, 1, ZBX_CFG_NOT_STRICT);	/* do not complain about unknown parameters */
 
 		if (NULL != cfg_source_ip)
 		{
@@ -289,7 +294,7 @@ static void    zbx_load_config(const char *config_file)
 	}
 }
 
-static zbx_task_t parse_commandline(int argc, char **argv)
+static zbx_task_t	parse_commandline(int argc, char **argv)
 {
 	zbx_task_t	task = ZBX_TASK_START;
 	char		ch = '\0';

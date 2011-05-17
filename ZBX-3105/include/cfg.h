@@ -46,7 +46,6 @@ struct cfg_line
 	int	max;
 };
 
-int	parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int strict);
-int	parse_opt_cfg_file(const char *cfg_file, struct cfg_line *cfg, int strict);
+int	parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int optional, int strict);
 
 #endif

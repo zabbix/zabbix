@@ -255,12 +255,7 @@ garbage:
 	exit(1);
 }
 
-int	parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int strict)
+int	parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int optional, int strict)
 {
-	return __parse_cfg_file(cfg_file, cfg, 0, 0, strict);
-}
-
-int	parse_opt_cfg_file(const char *cfg_file, struct cfg_line *cfg, int strict)
-{
-	return __parse_cfg_file(cfg_file, cfg, 0, 1, strict);
+	return __parse_cfg_file(cfg_file, cfg, 0, optional, strict);
 }

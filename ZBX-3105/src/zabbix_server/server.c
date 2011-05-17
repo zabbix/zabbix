@@ -185,7 +185,7 @@ ZBX_MUTEX	node_sync_access;
 
 /******************************************************************************
  *                                                                            *
- * Function: init_config                                                      *
+ * Function: zbx_load_config                                                  *
  *                                                                            *
  * Purpose: parse config file and update configuration parameters             *
  *                                                                            *
@@ -309,7 +309,7 @@ static void	zbx_load_config()
 
 	CONFIG_SERVER_STARTUP_TIME = time(NULL);
 
-	parse_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_STRICT);
+	parse_cfg_file(CONFIG_FILE, cfg, 0, ZBX_CFG_STRICT);
 
 	if (NULL == CONFIG_DBNAME)
 	{

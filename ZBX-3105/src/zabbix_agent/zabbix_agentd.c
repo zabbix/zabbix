@@ -45,9 +45,9 @@ const char	*progname = NULL;
 /* Default config file location */
 #ifdef _WINDOWS
 	static char	DEFAULT_CONFIG_FILE[]	= "C:\\zabbix_agentd.conf";
-#else /* not _WINDOWS */
+#else
 	static char	DEFAULT_CONFIG_FILE[]	= "/etc/zabbix/zabbix_agentd.conf";
-#endif /* _WINDOWS */
+#endif
 
 /* application TITLE */
 
@@ -70,9 +70,9 @@ const char	title_message[] = APPLICATION_NAME
 
 const char	usage_message[] =
 	"[-Vhp]"
-#if defined(_WINDOWS)
+#ifdef _WINDOWS
 	" [-idsx] [-m]"
-#endif /* _WINDOWS */
+#endif
 	" [-c <file>] [-t <item>]";
 
 /*end of application USAGE message */
@@ -91,7 +91,7 @@ const char	*help_message[] = {
 	"  -t --test <item>      test specified item and exit",
 /*	"  -u --usage <item>     test specified item and exit",	*/ /* !!! TODO - print item usage !!! */
 
-#if defined (_WINDOWS)
+#ifdef _WINDOWS
 
 	"",
 	"Functions:",
@@ -104,7 +104,7 @@ const char	*help_message[] = {
 
 	"  -m --multiple-agents  service name will include hostname",
 
-#endif /* _WINDOWS */
+#endif
 
 	0 /* end of text */
 };
@@ -125,7 +125,7 @@ static struct zbx_option longopts[] =
 	{"print",		0,	0,	'p'},
 	{"test",		1,	0,	't'},
 
-#if defined (_WINDOWS)
+#ifdef _WINDOWS
 
 	{"install",		0,	0,	'i'},
 	{"uninstall",		0,	0,	'd'},
@@ -135,7 +135,7 @@ static struct zbx_option longopts[] =
 
 	{"multiple-agents",	0,	0,	'm'},
 
-#endif /* _WINDOWS */
+#endif
 
 	{0,0,0,0}
 };
@@ -144,9 +144,9 @@ static struct zbx_option longopts[] =
 
 static char	shortopts[] =
 	"c:hVpt:"
-#if defined (_WINDOWS)
+#ifdef _WINDOWS
 	"idsxm"
-#endif /* _WINDOWS */
+#endif
 	;
 
 /* end of COMMAND LINE OPTIONS*/
@@ -177,7 +177,7 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 			version();
 #ifdef _AIX
 			tl_version();
-#endif /* _AIX */
+#endif
 			exit(FAIL);
 			break;
 		case 'p':
@@ -191,7 +191,7 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				TEST_METRIC = strdup(zbx_optarg);
 			}
 			break;
-#if defined (_WINDOWS)
+#ifdef _WINDOWS
 		case 'i':
 			t->task = ZBX_TASK_INSTALL_SERVICE;
 			break;
@@ -207,7 +207,7 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 		case 'm':
 			t->flags = ZBX_TASK_FLAG_MULTIPLE_AGENTS;
 			break;
-#endif /* _WINDOWS */
+#endif
 		default:
 			t->task = ZBX_TASK_SHOW_USAGE;
 			break;
@@ -334,7 +334,7 @@ static void	zbx_load_config(int optional)
 			PARM_OPT,	0,			0},
 		{"UserParameter",		&CONFIG_USER_PARAMETERS,		TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
-#if defined(_WINDOWS)
+#ifdef _WINDOWS
 		{"PerfCounter",			&CONFIG_PERF_COUNTERS,			TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
 #endif
@@ -344,16 +344,13 @@ static void	zbx_load_config(int optional)
 	/* initialize multistrings */
 	zbx_strarr_init(&CONFIG_ALIASES);
 	zbx_strarr_init(&CONFIG_USER_PARAMETERS);
-#if defined(_WINDOWS)
+#ifdef _WINDOWS
 	zbx_strarr_init(&CONFIG_PERF_COUNTERS);
 #endif
 
 	set_defaults();
 
-	if (optional)
-		parse_opt_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_STRICT);
-	else
-		parse_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_STRICT);
+	parse_cfg_file(CONFIG_FILE, cfg, optional, ZBX_CFG_STRICT);
 
 #ifdef USE_PID_FILE
 	if (NULL == CONFIG_PID_FILE)
@@ -380,7 +377,7 @@ static void	zbx_free_config()
 {
 	zbx_strarr_free(CONFIG_ALIASES);
 	zbx_strarr_free(CONFIG_USER_PARAMETERS);
-#if defined(_WINDOWS)
+#ifdef _WINDOWS
 	zbx_strarr_free(CONFIG_PERF_COUNTERS);
 #endif
 }
@@ -417,8 +414,8 @@ static void	zbx_validate_config()
 	}
 }
 
-#if defined (_WINDOWS)
-static int zbx_exec_service_task(const char *name, const ZBX_TASK_EX *t)
+#ifdef _WINDOWS
+static int	zbx_exec_service_task(const char *name, const ZBX_TASK_EX *t)
 {
 	int	r;
 
@@ -472,7 +469,7 @@ int	MAIN_ZABBIX_ENTRY()
 	/* collector data must be initiated by user 'zabbix' */
 	init_collector_data();
 
-#if defined (_WINDOWS)
+#ifdef _WINDOWS
 	load_perf_counters(CONFIG_PERF_COUNTERS);
 #endif
 	load_user_parameters(CONFIG_USER_PARAMETERS);
@@ -565,7 +562,7 @@ void	zbx_on_exit()
 
 	daemon_stop();
 
-#endif /* USE_PID_FILE */
+#endif
 
 	zbx_sleep(2); /* wait for all threads closing */
 
@@ -584,17 +581,17 @@ void	zbx_on_exit()
 int	main(int argc, char **argv)
 {
 	ZBX_TASK_EX	t;
-#if defined (_WINDOWS)
+#ifdef _WINDOWS
 	int		r;
 #endif
 
-#if defined (_WINDOWS)
+#ifdef _WINDOWS
 	/* Provide, so our process handles errors instead of the system itself. */
 	/* Attention!!! */
 	/* The system does not display the critical-error-handler message box. */
 	/* Instead, the system sends the error to the calling process.*/
 	SetErrorMode(SEM_FAILCRITICALERRORS);
-#endif /* _WINDOWS */
+#endif
 
 	memset(&t, 0, sizeof(t));
 	t.task = ZBX_TASK_START;
@@ -614,7 +611,7 @@ int	main(int argc, char **argv)
 			usage();
 			exit(FAIL);
 			break;
-#if defined (_WINDOWS)
+#ifdef _WINDOWS
 		case ZBX_TASK_INSTALL_SERVICE:
 		case ZBX_TASK_UNINSTALL_SERVICE:
 		case ZBX_TASK_START_SERVICE:
@@ -622,20 +619,24 @@ int	main(int argc, char **argv)
 			zbx_load_config(0);
 			zbx_validate_config();
 			zbx_free_config();
+
 			if (t.flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS)
 			{
-				zbx_snprintf(ZABBIX_SERVICE_NAME, sizeof(ZABBIX_SERVICE_NAME), "%s [%s]", APPLICATION_NAME, CONFIG_HOSTNAME);
-				zbx_snprintf(ZABBIX_EVENT_SOURCE, sizeof(ZABBIX_EVENT_SOURCE), "%s [%s]", APPLICATION_NAME, CONFIG_HOSTNAME);
+				zbx_snprintf(ZABBIX_SERVICE_NAME, sizeof(ZABBIX_SERVICE_NAME), "%s [%s]",
+						APPLICATION_NAME, CONFIG_HOSTNAME);
+				zbx_snprintf(ZABBIX_EVENT_SOURCE, sizeof(ZABBIX_EVENT_SOURCE), "%s [%s]",
+						APPLICATION_NAME, CONFIG_HOSTNAME);
 			}
+
 			r = zbx_exec_service_task(argv[0], &t);
 			free_metrics();
 			exit(r);
 			break;
-#endif	/* _WINDOWS */
+#endif
 		case ZBX_TASK_TEST_METRIC:
 		case ZBX_TASK_PRINT_SUPPORTED:
 			zbx_load_config(1);	/* optional */
-#if defined (_WINDOWS)
+#ifdef _WINDOWS
 			init_collector_data();	/* required for reading PerfCounter */
 			load_perf_counters(CONFIG_PERF_COUNTERS);
 #endif
@@ -646,7 +647,7 @@ int	main(int argc, char **argv)
 				test_parameter(TEST_METRIC, PROCESS_TEST);
 			else
 				test_parameters();
-#if defined (_WINDOWS)
+#ifdef _WINDOWS
 			free_collector_data();
 #endif
 			free_metrics();
