@@ -175,7 +175,7 @@ struct hostent	*zbx_gethost(const char *hostname)
 	if(host)	return host;
 
 
-	zbx_set_tcp_strerror("gethost() failed for address '%s' [%s]", hostname, strerror_from_system(zbx_sock_last_error()));
+	zbx_set_tcp_strerror("gethost() failed for address '%s': %s", hostname, strerror_from_system(zbx_sock_last_error()));
 
 	return (struct hostent *)NULL;
 }
@@ -208,19 +208,19 @@ static int	zbx_tcp_start()
 	switch (WSAStartup(MAKEWORD(2, 2), &sockInfo))
 	{
 		case WSASYSNOTREADY:
-			zbx_set_tcp_strerror("Underlying network subsystem is not ready for network communication.");
+			zbx_set_tcp_strerror("underlying network subsystem is not ready for network communication");
 			return FAIL;
 		case WSAVERNOTSUPPORTED:
-			zbx_set_tcp_strerror("The version of Windows Sockets support requested is not provided.");
+			zbx_set_tcp_strerror("the version of Windows Sockets support requested is not provided");
 			return FAIL;
 		case WSAEINPROGRESS:
-			zbx_set_tcp_strerror("A blocking Windows Sockets 1.1 operation is in progress.");
+			zbx_set_tcp_strerror("a blocking Windows Sockets 1.1 operation is in progress");
 			return FAIL;
 		case WSAEPROCLIM:
-			zbx_set_tcp_strerror("Limit on the number of tasks supported by the Windows Sockets implementation has been reached.");
+			zbx_set_tcp_strerror("limit on the number of tasks supported by the Windows Sockets implementation has been reached");
 			return FAIL;
 		case WSAEFAULT:
-			zbx_set_tcp_strerror("The lpWSAData is not a valid pointer.");
+			zbx_set_tcp_strerror("the lpWSAData is not a valid pointer");
 			return FAIL;
 	}
 
@@ -297,15 +297,11 @@ static void	zbx_tcp_timeout_set(zbx_sock_t *s, int timeout)
 #if defined(_WINDOWS)
 	timeout *= 1000;
 
-	if (setsockopt(s->socket, SOL_SOCKET, SO_RCVTIMEO,
-			(const char *)&timeout, sizeof(timeout)) == ZBX_TCP_ERROR)
-		zbx_set_tcp_strerror("setsockopt() failed with error %d: %s",
-				zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
+	if (ZBX_TCP_ERROR == setsockopt(s->socket, SOL_SOCKET, SO_RCVTIMEO, (const char *)&timeout, sizeof(timeout)))
+		zbx_set_tcp_strerror("setsockopt() failed: %s", strerror_from_system(zbx_sock_last_error()));
 
-	if (setsockopt(s->socket, SOL_SOCKET, SO_SNDTIMEO,
-			(const char *)&timeout, sizeof(timeout)) == ZBX_TCP_ERROR)
-		zbx_set_tcp_strerror("setsockopt() failed with error %d: %s",
-				zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
+	if (ZBX_TCP_ERROR == setsockopt(s->socket, SOL_SOCKET, SO_SNDTIMEO, (const char *)&timeout, sizeof(timeout)))
+		zbx_set_tcp_strerror("setsockopt() failed: %s", strerror_from_system(zbx_sock_last_error()));
 #else
 	alarm(timeout);
 #endif
@@ -372,13 +368,13 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 
 	if (0 != getaddrinfo(ip, service, &hints, &ai))
 	{
-		zbx_set_tcp_strerror("Cannot resolve [%s]", ip);
+		zbx_set_tcp_strerror("cannot resolve [%s]", ip);
 		goto out;
 	}
 
 	if (ZBX_SOCK_ERROR == (s->socket = socket(ai->ai_family, ai->ai_socktype | SOCK_CLOEXEC, ai->ai_protocol)))
 	{
-		zbx_set_tcp_strerror("Cannot create socket [%s]:%d [%s]", ip, port, strerror_from_system(zbx_sock_last_error()));
+		zbx_set_tcp_strerror("cannot create socket [%s:%d]: %s", ip, port, strerror_from_system(zbx_sock_last_error()));
 		goto out;
 	}
 
@@ -395,16 +391,13 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 
 		if (0 != getaddrinfo(source_ip, NULL, &hints, &ai_bind))
 		{
-			zbx_set_tcp_strerror("Invalid source IP address [%s]\n",
-					source_ip);
+			zbx_set_tcp_strerror("invalid source IP address [%s]", source_ip);
 			goto out;
 		}
 
 		if (ZBX_TCP_ERROR == bind(s->socket, ai_bind->ai_addr, ai_bind->ai_addrlen))
 		{
-			zbx_set_tcp_strerror("bind() failed with error %d: %s\n",
-					zbx_sock_last_error(),
-					strerror_from_system(zbx_sock_last_error()));
+			zbx_set_tcp_strerror("bind() failed: %s", strerror_from_system(zbx_sock_last_error()));
 			goto out;
 		}
 	}
@@ -414,7 +407,7 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 
 	if (ZBX_TCP_ERROR == connect(s->socket, ai->ai_addr, ai->ai_addrlen))
 	{
-		zbx_set_tcp_strerror("Cannot connect to [%s]:%d [%s]", ip, port, strerror_from_system(zbx_sock_last_error()));
+		zbx_set_tcp_strerror("cannot connect to [%s:%d]: %s", ip, port, strerror_from_system(zbx_sock_last_error()));
 		zbx_tcp_close(s);
 		goto out;
 	}
@@ -448,7 +441,7 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 
 	if (ZBX_SOCK_ERROR == (s->socket = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0)))
 	{
-		zbx_set_tcp_strerror("Cannot create socket [%s:%d] [%s]", ip, port, strerror_from_system(zbx_sock_last_error()));
+		zbx_set_tcp_strerror("cannot create socket [%s:%d]: %s", ip, port, strerror_from_system(zbx_sock_last_error()));
 		return FAIL;
 	}
 
@@ -464,9 +457,7 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 
 		if (ZBX_TCP_ERROR == bind(s->socket, (struct sockaddr *)&source_addr, sizeof(ZBX_SOCKADDR)))
 		{
-			zbx_set_tcp_strerror("bind() failed with error %d: %s\n",
-					zbx_sock_last_error(),
-					strerror_from_system(zbx_sock_last_error()));
+			zbx_set_tcp_strerror("bind() failed: %s", strerror_from_system(zbx_sock_last_error()));
 			return FAIL;
 		}
 	}
@@ -476,7 +467,7 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 
 	if (ZBX_TCP_ERROR == connect(s->socket, (struct sockaddr *)&servaddr_in, sizeof(ZBX_SOCKADDR)))
 	{
-		zbx_set_tcp_strerror("Cannot connect to [%s:%d] [%s]", ip, port, strerror_from_system(zbx_sock_last_error()));
+		zbx_set_tcp_strerror("cannot connect to [%s:%d]: %s", ip, port, strerror_from_system(zbx_sock_last_error()));
 		zbx_tcp_close(s);
 		return FAIL;
 	}
@@ -523,7 +514,7 @@ int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags, int t
 		/* write header */
 		if (ZBX_TCP_ERROR == ZBX_TCP_WRITE(s->socket, ZBX_TCP_HEADER, ZBX_TCP_HEADER_LEN))
 		{
-			zbx_set_tcp_strerror("ZBX_TCP_WRITE() failed [%s]", strerror_from_system(zbx_sock_last_error()));
+			zbx_set_tcp_strerror("ZBX_TCP_WRITE() failed: %s", strerror_from_system(zbx_sock_last_error()));
 			ret = FAIL;
 			goto cleanup;
 		}
@@ -534,7 +525,7 @@ int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags, int t
 		/* write data length */
 		if (ZBX_TCP_ERROR == ZBX_TCP_WRITE(s->socket, (char *)&len64, sizeof(len64)))
 		{
-			zbx_set_tcp_strerror("ZBX_TCP_WRITE() failed [%s]", strerror_from_system(zbx_sock_last_error()));
+			zbx_set_tcp_strerror("ZBX_TCP_WRITE() failed: %s", strerror_from_system(zbx_sock_last_error()));
 			ret = FAIL;
 			goto cleanup;
 		}
@@ -544,7 +535,7 @@ int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags, int t
 	{
 		if (ZBX_TCP_ERROR == (i = ZBX_TCP_WRITE(s->socket, data + written, (int)(strlen(data) - written))))
 		{
-			zbx_set_tcp_strerror("ZBX_TCP_WRITE() failed [%s]", strerror_from_system(zbx_sock_last_error()));
+			zbx_set_tcp_strerror("ZBX_TCP_WRITE() failed: %s", strerror_from_system(zbx_sock_last_error()));
 			ret = FAIL;
 			goto cleanup;
 		}
@@ -621,7 +612,7 @@ int	get_address_family(const char *addr, int *family, char *error, int max_error
 
 	if (PF_INET != ai->ai_family && PF_INET6 != ai->ai_family)
 	{
-		zbx_snprintf(error, max_error_len, "%s: Unsupported address family", addr);
+		zbx_snprintf(error, max_error_len, "%s: unsupported address family", addr);
 		goto out;
 	}
 
@@ -679,7 +670,7 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 
 		if (0 != (err = getaddrinfo(ip, port, &hints, &ai)))
 		{
-			zbx_set_tcp_strerror("Cannot resolve address [[%s]:%s], error %d: %s",
+			zbx_set_tcp_strerror("cannot resolve address [[%s]:%s]: [%d] %s",
 					ip ? ip : "-", port, err, gai_strerror(err));
 			goto out;
 		}
@@ -688,7 +679,7 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 		{
 			if (ZBX_SOCKET_COUNT == s->num_socks)
 			{
-				zbx_set_tcp_strerror("Not enough space for socket [[%s]:%s]",
+				zbx_set_tcp_strerror("not enough space for socket [[%s]:%s]",
 						ip ? ip : "-", port);
 				goto out;
 			}
@@ -699,8 +690,8 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 			if (ZBX_SOCK_ERROR == (s->sockets[s->num_socks] =
 					socket(current_ai->ai_family, current_ai->ai_socktype | SOCK_CLOEXEC, current_ai->ai_protocol)))
 			{
-				zbx_set_tcp_strerror("socket() for [[%s]:%s] failed with error %d: %s",
-						ip ? ip : "-", port, zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
+				zbx_set_tcp_strerror("socket() for [[%s]:%s] failed: %s",
+						ip ? ip : "-", port, strerror_from_system(zbx_sock_last_error()));
 #ifdef _WINDOWS
 				if (WSAEAFNOSUPPORT == zbx_sock_last_error())
 #else
@@ -721,23 +712,23 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 			on = 1;
 			if (ZBX_TCP_ERROR == setsockopt(s->sockets[s->num_socks], SOL_SOCKET, SO_REUSEADDR, (void *)&on, sizeof(on)))
 			{
-				zbx_set_tcp_strerror("setsockopt() with SO_REUSEADDR for [[%s]:%s] failed with error %d: %s",
-						ip ? ip : "-", port, zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
+				zbx_set_tcp_strerror("setsockopt() with SO_REUSEADDR for [[%s]:%s] failed: %s",
+						ip ? ip : "-", port, strerror_from_system(zbx_sock_last_error()));
 			}
 
 #if defined(IPPROTO_IPV6) && defined(IPV6_V6ONLY)
 			if (PF_INET6 == current_ai->ai_family &&
 				ZBX_TCP_ERROR == setsockopt(s->sockets[s->num_socks], IPPROTO_IPV6, IPV6_V6ONLY, (void *)&on, sizeof(on)))
 			{
-				zbx_set_tcp_strerror("setsockopt() with IPV6_V6ONLY for [[%s]:%s] failed with error %d: %s",
-						ip ? ip : "-", port, zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
+				zbx_set_tcp_strerror("setsockopt() with IPV6_V6ONLY for [[%s]:%s] failed: %s",
+						ip ? ip : "-", port, strerror_from_system(zbx_sock_last_error()));
 			}
 #endif
 
 			if (ZBX_TCP_ERROR == bind(s->sockets[s->num_socks], current_ai->ai_addr, current_ai->ai_addrlen))
 			{
-				zbx_set_tcp_strerror("bind() for [[%s]:%s] failed with error %d: %s",
-						ip ? ip : "-", port, zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
+				zbx_set_tcp_strerror("bind() for [[%s]:%s] failed: %s",
+						ip ? ip : "-", port, strerror_from_system(zbx_sock_last_error()));
 				zbx_sock_close(s->sockets[s->num_socks]);
 #ifdef _WINDOWS
 				if (WSAEADDRINUSE == zbx_sock_last_error())
@@ -751,8 +742,8 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 
 			if (ZBX_TCP_ERROR == listen(s->sockets[s->num_socks], SOMAXCONN))
 			{
-				zbx_set_tcp_strerror("listen() for [[%s]:%s] failed with error %d: %s",
-						ip ? ip : "-", port, zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
+				zbx_set_tcp_strerror("listen() for [[%s]:%s] failed: %s",
+						ip ? ip : "-", port, strerror_from_system(zbx_sock_last_error()));
 				zbx_sock_close(s->sockets[s->num_socks]);
 				goto out;
 			}
@@ -813,21 +804,21 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 
 		if (NULL != ip && FAIL == is_ip4(ip))
 		{
-			zbx_set_tcp_strerror("Incorrect IPv4 address [%s]", ip);
+			zbx_set_tcp_strerror("incorrect IPv4 address [%s]", ip);
 			goto out;
 		}
 
 		if (ZBX_SOCKET_COUNT == s->num_socks)
 		{
-			zbx_set_tcp_strerror("Not enough space for socket [[%s]:%hu]",
+			zbx_set_tcp_strerror("not enough space for socket [[%s]:%hu]",
 					ip ? ip : "-", listen_port);
 			goto out;
 		}
 
 		if (ZBX_SOCK_ERROR == (s->sockets[s->num_socks] = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0)))
 		{
-			zbx_set_tcp_strerror("socket() for [[%s]:%hu] failed with error %d: %s",
-					ip ? ip : "-", listen_port, zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
+			zbx_set_tcp_strerror("socket() for [[%s]:%hu] failed: %s",
+					ip ? ip : "-", listen_port, strerror_from_system(zbx_sock_last_error()));
 			goto out;
 		}
 
@@ -841,8 +832,8 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 		on = 1;
 		if (ZBX_TCP_ERROR == setsockopt(s->sockets[s->num_socks], SOL_SOCKET, SO_REUSEADDR, (void *)&on, sizeof(on)))
 		{
-			zbx_set_tcp_strerror("setsockopt() for [[%s]:%hu] failed with error %d: %s",
-					ip ? ip : "-", listen_port, zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
+			zbx_set_tcp_strerror("setsockopt() for [[%s]:%hu] failed: %s",
+					ip ? ip : "-", listen_port, strerror_from_system(zbx_sock_last_error()));
 		}
 
 		memset(&serv_addr, 0, sizeof(ZBX_SOCKADDR));
@@ -853,16 +844,16 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 
 		if (ZBX_TCP_ERROR == bind(s->sockets[s->num_socks], (struct sockaddr *)&serv_addr, sizeof(ZBX_SOCKADDR)))
 		{
-			zbx_set_tcp_strerror("bind() for [[%s]:%hu] failed with error %d: %s",
-					ip ? ip : "-", listen_port, zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
+			zbx_set_tcp_strerror("bind() for [[%s]:%hu] failed: %s",
+					ip ? ip : "-", listen_port, strerror_from_system(zbx_sock_last_error()));
 			zbx_sock_close(s->sockets[s->num_socks]);
 			goto out;
 		}
 
 		if (ZBX_TCP_ERROR == listen(s->sockets[s->num_socks], SOMAXCONN))
 		{
-			zbx_set_tcp_strerror("listen() for [[%s]:%hu] failed with error %d: %s",
-					ip ? ip : "-", listen_port, zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
+			zbx_set_tcp_strerror("listen() for [[%s]:%hu] failed: %s",
+					ip ? ip : "-", listen_port, strerror_from_system(zbx_sock_last_error()));
 			zbx_sock_close(s->sockets[s->num_socks]);
 			goto out;
 		}
@@ -934,8 +925,7 @@ int	zbx_tcp_accept(zbx_sock_t *s)
 
 	if (ZBX_TCP_ERROR == select(n + 1, &sock_set, NULL, NULL, NULL))
 	{
-		zbx_set_tcp_strerror("select() failed with error %d: %s",
-				zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
+		zbx_set_tcp_strerror("select() failed: %s", strerror_from_system(zbx_sock_last_error()));
 		return FAIL;
 	}
 
@@ -948,8 +938,7 @@ int	zbx_tcp_accept(zbx_sock_t *s)
 	nlen = sizeof(serv_addr);
 	if (ZBX_SOCK_ERROR == (accepted_socket = (ZBX_SOCKET)accept(s->sockets[i], (struct sockaddr *)&serv_addr, &nlen)))
 	{
-		zbx_set_tcp_strerror("accept() failed with error %d: %s",
-				zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
+		zbx_set_tcp_strerror("accept() failed: %s", strerror_from_system(zbx_sock_last_error()));
 		return FAIL;
 	}
 
@@ -1144,7 +1133,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 
 	if (ZBX_TCP_ERROR == nbytes)
 	{
-		zbx_set_tcp_strerror("ZBX_TCP_READ() failed [%s]", strerror_from_system(zbx_sock_last_error()));
+		zbx_set_tcp_strerror("ZBX_TCP_READ() failed: %s", strerror_from_system(zbx_sock_last_error()));
 		total_bytes = FAIL;
 	}
 	else
@@ -1167,7 +1156,7 @@ char	*get_ip_by_socket(zbx_sock_t *s)
 	sz = sizeof(sa);
 	if (ZBX_TCP_ERROR == getpeername(s->socket, (struct sockaddr*)&sa, &sz))
 	{
-		zbx_set_tcp_strerror("Connection rejected. getpeername failed [%s]",
+		zbx_set_tcp_strerror("connection rejected, getpeername() failed: %s",
 				strerror_from_system(zbx_sock_last_error()));
 		return buffer;
 	}
@@ -1175,7 +1164,7 @@ char	*get_ip_by_socket(zbx_sock_t *s)
 #if defined(HAVE_IPV6)
 	if (0 != getnameinfo((struct sockaddr*)&sa, sizeof(sa), buffer, sizeof(buffer), NULL, 0, NI_NUMERICHOST))
 	{
-		zbx_set_tcp_strerror("Connection rejected. getnameinfo failed [%s] ",
+		zbx_set_tcp_strerror("connection rejected, getnameinfo() failed: %s",
 				strerror_from_system(zbx_sock_last_error()));
 	}
 #else
@@ -1231,7 +1220,7 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 	nlen = sizeof(name);
 	if( ZBX_TCP_ERROR == getpeername(s->socket, (struct sockaddr*)&name, &nlen))
 	{
-		zbx_set_tcp_strerror("Connection rejected. Getpeername failed [%s]", strerror_from_system(zbx_sock_last_error()));
+		zbx_set_tcp_strerror("connection rejected, getpeername() failed: %s", strerror_from_system(zbx_sock_last_error()));
 		return FAIL;
 	}
 	else
@@ -1243,7 +1232,7 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 		{
 			return FAIL;
 		}
-#endif /*HAVE_IPV6*/
+#endif
 		strscpy(tmp,ip_list);
 
 		for (start = tmp; *start != '\0';)
@@ -1337,14 +1326,14 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 #if defined(HAVE_IPV6)
 	if (0 == getnameinfo((struct sockaddr*)&name, sizeof(name), sname, sizeof(sname), NULL, 0, NI_NUMERICHOST))
 	{
-		zbx_set_tcp_strerror("Connection from [%s] rejected. Allowed server is [%s] ", sname, ip_list);
+		zbx_set_tcp_strerror("Connection from [%s] rejected. Allowed server is [%s]", sname, ip_list);
 	}
 	else
 	{
-		zbx_set_tcp_strerror("Connection rejected. Allowed server is [%s] ", ip_list);
+		zbx_set_tcp_strerror("Connection rejected. Allowed server is [%s]", ip_list);
 	}
 #else
-	zbx_set_tcp_strerror("Connection from [%s] rejected. Allowed server is [%s] ", sname, ip_list);
-#endif /*HAVE_IPV6*/
+	zbx_set_tcp_strerror("Connection from [%s] rejected. Allowed server is [%s]", sname, ip_list);
+#endif
 	return	FAIL;
 }
