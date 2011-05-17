@@ -54,7 +54,7 @@ include_once('include/page_header.php');
 	$header = array();
 	$db_users = DBselect('select * from users where '.DBin_node('userid').' order by alias,userid');
 	while($user_data = DBfetch($db_users)){
-		array_push($header, new CImg('vtext.php?text='.$user_data['alias'].$vTextColor));
+		array_push($header, new CImg('vtext.php?text='.urlencode($user_data['alias']).$vTextColor));
 		$users[$user_data['userid']] = $user_data['alias'];
 	}
 
