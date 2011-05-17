@@ -303,7 +303,7 @@ UPDATE opcommand_hst
 	WHERE operationid >= 100000000000;
 
 INSERT INTO opgroup (opgroupid, operationid, groupid)
-	SELECT NEXTVAL('opgroup_seq'), o.operationid, o.objectid
+	SELECT NEXTVAL('opgroup_seq'), o.new_operationid, o.objectid
 		FROM t_operations o, groups g
 		WHERE o.objectid = g.groupid
 			AND o.operationtype IN (4,5);	-- OPERATION_TYPE_GROUP_ADD, OPERATION_TYPE_GROUP_REMOVE
@@ -313,7 +313,7 @@ UPDATE opgroup
 	WHERE operationid >= 100000000000;
 
 INSERT INTO optemplate (optemplateid, operationid, templateid)
-	SELECT NEXTVAL('optemplate_seq'), o.operationid, o.objectid
+	SELECT NEXTVAL('optemplate_seq'), o.new_operationid, o.objectid
 		FROM t_operations o, hosts h
 		WHERE o.objectid = h.hostid
 			AND o.operationtype IN (6,7);	-- OPERATION_TYPE_TEMPLATE_ADD, OPERATION_TYPE_TEMPLATE_REMOVE

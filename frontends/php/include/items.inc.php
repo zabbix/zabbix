@@ -323,7 +323,7 @@
 			'output' => API_OUTPUT_EXTEND,
 			'inherited' => false,
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
-			'select_applications' => API_OUTPUT_REFER,
+			'selectApplications' => API_OUTPUT_REFER,
 		);
 		$srcItems = API::Item()->get($options);
 
@@ -455,7 +455,7 @@
 					'snmp_community,snmp_oid,value_type,data_type,trapper_hosts,port,units,multiplier,delta,'.
 					'snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,'.
 					'formula,trends,logtimefmt,valuemapid,delay_flex,params,ipmi_sensor,templateid,'.
-					'authtype,username,password,publickey,privatekey,flags, filter, description '.
+					'authtype,username,password,publickey,privatekey,flags,filter,description,profile_link'.
 			' FROM items '.
 			' WHERE itemid='.$itemid;
 		$row = DBfetch(DBselect($sql));
@@ -596,7 +596,7 @@
 			$key = expand_item_key_by_data($item);
 
 			// parsing key to get the parameters out of it
-			$ItemKey = new cItemKey($key);
+			$ItemKey = new CItemKey($key);
 
 			if($ItemKey->isValid()){
 				$keyParameters = $ItemKey->getParameters();
@@ -712,7 +712,7 @@
 		if($view_style == STYLE_TOP){
 			$header=array(new CCol(S_ITEMS,'center'));
 			foreach($hosts as $hostname){
-				$header = array_merge($header,array(new CImg('vtext.php?text='.$hostname.'&theme='.$css)));
+				$header = array_merge($header,array(new CImg('vtext.php?text='.urlencode($hostname).'&theme='.$css)));
 			}
 
 			$table->SetHeader($header,'vertical_header');
@@ -728,7 +728,7 @@
 		else{
 			$header=array(new CCol(S_HOSTS,'center'));
 			foreach($items as $descr => $ithosts){
-				$header = array_merge($header,array(new CImg('vtext.php?text='.$descr.'&theme='.$css)));
+				$header = array_merge($header,array(new CImg('vtext.php?text='.urlencode($descr).'&theme='.$css)));
 			}
 
 			$table->SetHeader($header,'vertical_header');

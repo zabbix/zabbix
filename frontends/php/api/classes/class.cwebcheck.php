@@ -58,12 +58,12 @@ class CWebCheck extends CZBXAPI{
 			'filter'				=> null,
 			'search'				=> null,
 			'searchByAny'			=> null,
-			'startSearch'				=> null,
+			'startSearch'			=> null,
 			'exludeSearch'			=> null,
 
 // OutPut
 			'output'				=> API_OUTPUT_REFER,
-			'select_hosts'			=> null,
+			'selectHosts'			=> null,
 			'selectSteps'			=> null,
 			'countOutput'			=> null,
 			'groupCount'			=> null,
@@ -239,7 +239,7 @@ class CWebCheck extends CZBXAPI{
 					if(!isset($result[$webcheck['webcheckid']])) $result[$webcheck['webcheckid']] = array();
 
 
-					if(!is_null($options['select_hosts']) && !isset($result[$webcheck['webcheckid']]['hosts'])){
+					if(!is_null($options['selectHosts']) && !isset($result[$webcheck['webcheckid']]['hosts'])){
 						$result[$webcheck['webcheckid']]['hosts'] = array();
 					}
 					if(!is_null($options['selectSteps']) && !isset($result[$webcheck['webcheckid']]['steps'])){
@@ -247,7 +247,7 @@ class CWebCheck extends CZBXAPI{
 					}
 
 // hostids
-					if(isset($webcheck['hostid']) && is_null($options['select_hosts'])){
+					if(isset($webcheck['hostid']) && is_null($options['selectHosts'])){
 						if(!isset($result[$webcheck['webcheckid']]['hosts']))
 							$result[$webcheck['webcheckid']]['hosts'] = array();
 
@@ -266,9 +266,9 @@ COpt::memoryPick();
 		}
 
 // Adding Hosts
-		if(!is_null($options['select_hosts']) && str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselects_allowed_outputs)){
 			$obj_params = array(
-				'output' => $options['select_hosts'],
+				'output' => $options['selectHosts'],
 				'webcheckids' => $webcheckids,
 				'nopermissions' => true,
 				'preservekeys' => true
@@ -385,11 +385,11 @@ COpt::memoryPick();
 
 				$webcheck['curstate'] = HTTPTEST_STATE_UNKNOWN;
 				$webcheck['error'] = '';
-				$update = array(
+
+				DB::update('httptest', array(
 					'values' => $webcheck,
-					'where' => array('httptestid='.$webcheck['webcheckid'])
-				);
-				DB::update('httptest', $update);
+					'where' => array('httptestid' => $webcheck['webcheckid'])
+				));
 
 
 				$checkitems_update = $update_fields = array();
@@ -420,7 +420,7 @@ COpt::memoryPick();
 					if(!empty($update_fields)){
 						$checkitems_update[] = array(
 							'values' => $update_fields,
-							'where' => array('itemid='.$checkitem['itemid'])
+							'where' => array('itemid' => $checkitem['itemid'])
 						);
 					}
 				}
@@ -430,7 +430,7 @@ COpt::memoryPick();
 				if(isset($webcheck['applicationid'])){
 					DB::update('items_applications', array(
 						'values' => array('applicationid' => $webcheck['applicationid']),
-						'where' => array(DBcondition('itemid', $itemids))
+						'where' => array('itemid' => $itemids)
 					));
 				}
 
@@ -470,7 +470,7 @@ COpt::memoryPick();
 				'httptestids' => $webcheckids,
 				'output' => API_OUTPUT_EXTEND,
 				'editable' => true,
-				'select_hosts' => API_OUTPUT_EXTEND,
+				'selectHosts' => API_OUTPUT_EXTEND,
 				'preservekeys' => true
 			);
 			$del_webchecks = $this->get($options);
@@ -693,14 +693,14 @@ COpt::memoryPick();
 			if($webstep['no'] <= 0)
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Scenario step number cannot be less than 1'));
 
-			$update = array(
+			DB::update('httpstep', array(
 				'values' => $webstep,
-				'where' => array('httpstepid='.$webstep['webstepid'])
-			);
-			DB::update('httpstep', $update);
+				'where' => array('httpstepid' => $webstep['webstepid'])
+			));
 
 
 // update item keys
+			$itemids = array();
 			$stepitems_update = $update_fields = array();
 			$sql = 'SELECT i.itemid, hi.type'.
 				' FROM items i, httpstepitem hi '.
@@ -731,7 +731,7 @@ COpt::memoryPick();
 				if(!empty($update_fields)){
 					$stepitems_update[] = array(
 						'values' => $update_fields,
-						'where' => array('itemid='.$stepitem['itemid'])
+						'where' => array('itemid' => $stepitem['itemid'])
 					);
 				}
 			}
@@ -742,7 +742,7 @@ COpt::memoryPick();
 			if(isset($webcheck['applicationid'])){
 				DB::update('items_applications', array(
 					'values' => array('applicationid' => $webcheck['applicationid']),
-					'where' => array(DBcondition('itemid', $itemids))
+					'where' => array('itemid' => $itemids)
 				));
 			}
 		}

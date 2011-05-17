@@ -261,11 +261,27 @@ sub process_field
 	newstate("field");
 
 	($name, $type, $default, $null, $flags, $relN, $fk_table, $fk_field, $fk_flags) = split(/\|/, $line, 9);
-	($type_short) = split(/\(/, $type, 2);
+	($type_short, $length) = split(/\(/, $type, 2);
 
 	if ($output{"type"} eq "code")
 	{
 		$type = $output{$type_short};
+
+		if ($type eq "ZBX_TYPE_CHAR")
+		{
+			for ($length)
+			{
+				s/\)//;
+			}
+		}
+		elsif ($type eq "ZBX_TYPE_TEXT")
+		{
+			$length = 65535;
+		}
+		else
+		{
+			$length = 0;
+		}
 
 		if ($null eq "NOT NULL")
 		{
@@ -310,7 +326,7 @@ sub process_field
 			$fk_flags = "0";
 		}
 
-		print "\t\t{\"${name}\",\t$type,\t${flags},\t${fk_table},\t${fk_field},\t${fk_flags}}";
+		print "\t\t{\"${name}\",\t${fk_table},\t${fk_field},\t${length},\t$type,\t${flags},\t${fk_flags}}";
 	}
 	else
 	{
