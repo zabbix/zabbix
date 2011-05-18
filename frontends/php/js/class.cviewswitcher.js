@@ -290,13 +290,21 @@ ActionProcessor.prototype = {
 					else{
 						this.actionHide(action.value);
 					}
-				break;
+					break;
 				case 'hide':
 					if(this.checkConditions(action.cond)){
 						this.actionHide(action.value);
 					}
 					else{
 						this.actionShow(action.value);
+					}
+					break;
+				case 'enable':
+					if(this.checkConditions(action.cond)){
+						this.actionEnable(action.value);
+					}
+					else{
+						this.actionDisable(action.value);
 					}
 					break;
 			}
@@ -307,14 +315,24 @@ ActionProcessor.prototype = {
 		jQuery(value)
 				.toggle(true)
 				.find(':input')
-				.attr('disabled', false);
+				.prop('disabled', false);
 	},
 
 	actionHide: function(value){
 		jQuery(value)
 				.toggle(false)
 				.find(':input')
-				.attr('disabled', true);
+				.prop('disabled', true);
+	},
+
+	actionEnable: function(value){
+		jQuery(value)
+				.prop('disabled', false);
+	},
+
+	actionDisable: function(value){
+		jQuery(value)
+				.prop('disabled', true);
 	}
 
 };
