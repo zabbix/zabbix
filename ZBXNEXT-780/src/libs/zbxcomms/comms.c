@@ -478,7 +478,7 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tcp_send                                                     *
+ * Function: zbx_tcp_send_ext                                                 *
  *                                                                            *
  * Purpose: send data                                                         *
  *                                                                            *
@@ -999,7 +999,7 @@ void	zbx_tcp_free(zbx_sock_t *s)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tcp_recv                                                     *
+ * Function: zbx_tcp_recv_ext                                                 *
  *                                                                            *
  * Purpose: receive data                                                      *
  *                                                                            *
@@ -1027,28 +1027,22 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 
 	zbx_free(s->buf_dyn);
 
-	memset(s->buf_stat, 0, sizeof(s->buf_stat));
-	*data = s->buf_stat;
-
 	total_bytes = 0;
 	read_bytes = 0;
 	s->buf_type = ZBX_BUF_TYPE_STAT;
+
+	*data = s->buf_stat;
 
 	left = ZBX_TCP_HEADER_LEN;
 	nbytes = ZBX_TCP_READ(s->socket, s->buf_stat, left);
 
 	if (ZBX_TCP_HEADER_LEN == nbytes && 0 == strncmp(s->buf_stat, ZBX_TCP_HEADER, ZBX_TCP_HEADER_LEN))
 	{
-		/* ZBX header was received */
-
 		total_bytes += nbytes;
 
 		left = sizeof(zbx_uint64_t);
 		nbytes = ZBX_TCP_READ(s->socket, (void *)&expected_len, left);
 		expected_len = zbx_letoh_uint64(expected_len);
-
-		/* the rest was already cleared */
-		memset(s->buf_stat, 0, ZBX_TCP_HEADER_LEN);
 
 		flags |= ZBX_TCP_READ_UNTIL_CLOSE;
 	}
@@ -1060,6 +1054,8 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 
 	if (ZBX_TCP_ERROR != nbytes)
 	{
+		s->buf_stat[read_bytes] = '\0';
+
 		if (0 != (flags & ZBX_TCP_READ_UNTIL_CLOSE))
 		{
 			if (0 == nbytes)
@@ -1074,11 +1070,11 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 		left = sizeof(s->buf_stat) - read_bytes - 1;
 
 		/* check for an empty socket if exactly ZBX_TCP_HEADER_LEN bytes (without a header) were sent */
-		if (0 == read_bytes  || '\n' != s->buf_stat[read_bytes - 1])	/* assume the data ends with a '\n' */
+		if (0 == read_bytes || '\n' != s->buf_stat[read_bytes - 1])	/* requests to passive agents end with '\n' */
 		{
 			/* fill static buffer */
 			while (read_bytes < expected_len && 0 < left &&
-					ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ( s->socket, s->buf_stat + read_bytes, left)))
+					ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ(s->socket, s->buf_stat + read_bytes, left)))
 			{
 				read_bytes += nbytes;
 
@@ -1105,7 +1101,6 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 			s->buf_type = ZBX_BUF_TYPE_DYN;
 			s->buf_dyn = zbx_malloc(s->buf_dyn, allocated);
 
-			memset(s->buf_dyn, 0, allocated);
 			memcpy(s->buf_dyn, s->buf_stat, sizeof(s->buf_stat));
 
 			offset = read_bytes;
