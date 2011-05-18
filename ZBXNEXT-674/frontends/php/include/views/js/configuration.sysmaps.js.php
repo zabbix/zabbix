@@ -165,6 +165,20 @@
 			</table>
 		</form>
 
+		<div id="mapLinksContainer" style="max-height: 128px; overflow-y: auto; display: none;">
+			<table class="tableinfo">
+				<thead>
+				<tr class="header">
+					<td></td>
+					<td><?php echo _('Element type'); ?></td>
+					<td><?php echo _('Element name'); ?></td>
+					<td><?php echo _('Link status indicator'); ?></td>
+				</tr>
+				</thead>
+				<tbody id=linksList></tbody>
+			</table>
+		</div>
+
 		<form id="linkForm" name="linkForm" style="display: none;">
 			<input type="hidden" value="" id="linkid" name="linkid">
 
@@ -267,14 +281,14 @@
 						<input type="checkbox" name="chkbox_label" id="chkboxLabel" class="checkbox" style="display: inline; ">
 						<label for="chkboxLabel"><?php echo _('Label'); ?></label>
 					</td>
-					<td><textarea cols="56" rows="4" name="label" class="input"></textarea></td>
+					<td><textarea id="massLabel" cols="56" rows="4" name="label" class="input"></textarea></td>
 				</tr>
 				<tr>
 					<td>
 						<input type="checkbox" name="chkbox_label_location" id="chkboxLabelLocation" class="checkbox" style="display: inline; ">
 						<label for="chkboxLabelLocation"><?php echo _('Label location'); ?></label>
 					</td>
-					<td><select class="input" name="label_location">
+					<td><select id="massLabalLocation" class="input" name="label_location">
 							<option value="-1">-</option>
 							<option value="0"><?php echo _('Bottom'); ?></option>
 							<option value="1"><?php echo _('Left'); ?></option>
@@ -335,22 +349,6 @@
 		<td>#{elementType}</td>
 		<td>#{elementName}</td>
 	</tr>
-</script>
-
-<script type="text/x-jquery-tmpl" id="mapLinksContainer">
-	<div style="max-height: 128px; overflow-y: auto;">
-		<table class="tableinfo">
-			<thead>
-			<tr class="header">
-				<td></td>
-				<td><?php echo _('Element type'); ?></td>
-				<td><?php echo _('Element name'); ?></td>
-				<td><?php echo _('Link status indicator'); ?></td>
-			</tr>
-			</thead>
-			<tbody id=linksList></tbody>
-		</table>
-	</div>
 </script>
 
 <script type="text/x-jquery-tmpl" id="mapLinksRow">

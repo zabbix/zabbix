@@ -110,6 +110,53 @@ function CMap(containerid, sysmapid, id){
 			this.selectElements(ids, event.ctrlKey);
 		}, this)
 	});
+
+
+	var listeners = {};
+
+	this.bind = function(event, callback){
+		var i;
+
+		if(typeof callback == 'function'){
+			event = ('' + event).toLowerCase().split(/\s+/);
+
+			for(i = 0; i < event.length; i++){
+				if(listeners[event[i]] === void(0)){
+					listeners[event[i]] = [];
+				}
+				listeners[event[i]].push(callback);
+			}
+		}
+		return this;
+	};
+
+	this.trigger = function(event, target){
+		event = event.toLowerCase();
+		var	handlers = listeners[event] || [],
+			i;
+
+		if(handlers.length){
+			event = jQuery.Event(event);
+			for(i = 0; i < handlers.length; i++){
+				try{
+					if(handlers[i](event, target) === false || event.isDefaultPrevented()){
+						break;
+					}
+				}catch(ex){
+					window.console && window.console.log && window.console.log(ex);
+				}
+			}
+		}
+		return this;
+	};
+
+	// bind events
+	this.bind('elementMoved', jQuery.proxy(function(event, target){
+		if((this.selection.count === 1) && (this.selection.selements[target.id]) !== void(0)){
+			jQuery('#x').val(target.data.x);
+			jQuery('#y').val(target.data.y);
+		}
+	}, this));
 }
 CMap.prototype = {
 	id:	null,							// own id
@@ -140,6 +187,7 @@ CMap.prototype = {
 		drawtype:		0,
 		color:			'CC0000'
 	},
+
 
 	save: function(){
 		var url = new Curl(location.href);
@@ -172,8 +220,9 @@ CMap.prototype = {
 			data: {
 				'output': 'json',
 				'sysmapid': this.sysmapid,
-				'noselements':	1,
-				'nolinks':	1,
+				'noselements': 1,
+				'nolinks': 1,
+				'nocalculations': 1,
 				'selements': Object.toJSON(this.data.selements),
 				'links': Object.toJSON(this.data.links)
 			},
@@ -394,6 +443,13 @@ CMap.prototype = {
 
 		// FORM EVENTS
 		// close element form
+
+		// when change elementType, we clear elementnames and elementid
+		jQuery('#elementType').change(function(){
+			jQuery('input[name=elementName]').val('');
+			jQuery('#elementid').val('0');
+		});
+
 		jQuery('#elementClose').click(function(){
 			that.clearSelection();
 			that.toggleForm();
@@ -432,6 +488,8 @@ CMap.prototype = {
 		jQuery('#formList').delegate('.link_menu', 'click', function(){
 			that.linkForm.show();
 		});
+
+
 	},
 
 	clearSelection: function(){
@@ -613,7 +671,7 @@ function CSelement(sysmap, selementData){
 			label_location: this.sysmap.data.label_location, // set default map label location
 			x: 0,
 			y: 0,
-			urls: {},
+			urls: [],
 			elementName: this.sysmap.iconList[0].name, // image name
 			image: this.sysmap.iconList[0].imageid
 		};
@@ -653,6 +711,7 @@ function CSelement(sysmap, selementData){
 				x: parseInt(data.position.left, 10),
 				y: parseInt(data.position.top, 10)
 			});
+			this.sysmap.trigger('elementMoved', this);
 		}, this)
 	});
 
@@ -677,14 +736,13 @@ CSelement.prototype = {
 	elementName: '', // element name
 
 	getData: function(){
-		return jQuery.extend({}, this.data, { elementName: this.elementName});
+		return jQuery.extend({}, this.data, { elementName: this.elementName });
 	},
 
 	update: function(data, unsetUndefined){
 		unsetUndefined = unsetUndefined || false;
 
 		var	fieldName;
-
 
 		if(typeof data.elementName !== 'undefined'){
 			this.elementName = data.elementName;
@@ -721,7 +779,6 @@ CSelement.prototype = {
 		if(typeof this.sysmap.selection.selements[this.id] !== 'undefined')
 			this.sysmap.selection.count--;
 		delete this.sysmap.selection.selements[this.id];
-
 	},
 
 	toggleSelect: function(state){
@@ -783,7 +840,6 @@ CSelement.prototype = {
 	},
 
 	updateIcon: function(){
-
 		var oldIconClass = this.domNode.get(0).className.match(/sysmap_iconid_\d+/);
 		if(oldIconClass !== null){
 			this.domNode.removeClass(oldIconClass[0]);
@@ -967,7 +1023,7 @@ CElementForm.prototype = {
 		var urlNames = {};
 		for(var i = 0; i < data.urls.length; i++){
 			if((data.urls[i].name === '') && (data.urls[i].url === '')){
-				delete data.urls[i];
+				data.urls.splice(i, 1);
 				continue;
 			}
 
@@ -984,7 +1040,7 @@ CElementForm.prototype = {
 		}
 
 
-		if((data.elementid === 0) && (data.elementtype !== 4)){
+		if((data.elementid === '0') && (data.elementtype !== '4')){
 			switch(data.elementtype){
 				case '0': alert('Host is not selected.');
 					return false;
@@ -1012,25 +1068,24 @@ CElementForm.prototype = {
 			i,
 			link,
 			linkedSelementid,
-			elementData,
+				element,
 			elementTypeText;
 
 		if(links.length){
+			jQuery('#mapLinksContainer').toggle(true);
 			jQuery('#linksList').empty();
 
 			rowTpl = new Template(jQuery('#mapLinksRow').html());
-
-			this.formContainer.append(jQuery('#mapLinksContainer').html());
 
 			list = new Array();
 			for(i = 0; i < links.length; i++){
 				link = this.sysmap.links[links[i]].data;
 
 				linkedSelementid = (selementid == link.selementid1) ? link.selementid2 : link.selementid1;
-				elementData = this.sysmap.selements[linkedSelementid].data;
+				element = this.sysmap.selements[linkedSelementid];
 
 				elementTypeText = '';
-				switch(elementData.elementtype){
+				switch(element.data.elementtype){
 					case '0': elementTypeText = locale['S_HOST']; break;
 					case '1': elementTypeText = locale['S_MAP']; break;
 					case '2': elementTypeText = locale['S_TRIGGER']; break;
@@ -1039,7 +1094,7 @@ CElementForm.prototype = {
 				}
 				list.push({
 					elementType: elementTypeText,
-					elementName: elementData.elementName,
+					elementName: element.elementName,
 					linkid: link.id
 				});
 			}
@@ -1058,11 +1113,14 @@ CElementForm.prototype = {
 				return 0;
 			});
 			for(i = 0; i < list.length; i++){
-				jQuery(rowTpl.evaluate(list[i])).appendTo('#formList');
+				jQuery(rowTpl.evaluate(list[i])).appendTo('#linksList');
 			}
 
-			jQuery('#formList tr:nth-child(odd)').addClass('odd_row');
-			jQuery('#formList tr:nth-child(even)').addClass('even_row');
+			jQuery('#linksList tr:nth-child(odd)').addClass('odd_row');
+			jQuery('#linksList tr:nth-child(even)').addClass('even_row');
+		}
+		else{
+			jQuery('#mapLinksContainer').toggle(false);
 		}
 	},
 
@@ -1297,6 +1355,53 @@ function CMassForm(formContainer, sysmap){
 
 	// apply jQuery UI elements
 	jQuery('#massApply, #massRemove, #massClose').button();
+
+	var formActions = [
+		{
+			action: 'enable',
+			value: '#massLabel',
+			cond: {
+				chkboxLabel: 'checked'
+			}
+		},
+		{
+			action: 'enable',
+			value: '#massLabalLocation',
+			cond: {
+				chkboxLabelLocation: 'checked'
+			}
+		},
+		{
+			action: 'enable',
+			value: '#massLabel',
+			cond: {
+				chkboxLabel: 'checked'
+			}
+		},
+		{
+			action: 'enable',
+			value: '#massLabel',
+			cond: {
+				chkboxLabel: 'checked'
+			}
+		},
+		{
+			action: 'enable',
+			value: '#massLabel',
+			cond: {
+				chkboxLabel: 'checked'
+			}
+		},
+		{
+			action: 'enable',
+			value: '#massLabel',
+			cond: {
+				chkboxLabel: 'checked'
+			}
+		}
+	];
+	this.actionProcessor = new ActionProcessor(formActions);
+	this.actionProcessor.process();
 }
 CMassForm.prototype = {
 	sysmap: null, // reference to CMap object
@@ -1316,39 +1421,18 @@ CMassForm.prototype = {
 		jQuery(':checkbox', this.domNode).prop('checked', false);
 		jQuery('option', this.domNode).prop('selected', false);
 		jQuery('textarea', this.domNode).val('');
+		this.actionProcessor.process();
 	},
 
 	getValues: function(){
-		if(this.selementForm.massEdit.chkboxLabel.checked)
-			params.label = this.selementForm.label.value;
+		// filter chekboxes
+		var values = jQuery('#selementForm').serializeArray(),
+			data,
+			i;
 
-// Label Location
-		if(this.selementForm.massEdit.chkboxLabelLocation.checked)
-			params.label_location = parseInt(this.selementForm.label_location.selectedIndex, 10) - 1;
-
-// Icon OK
-		if(this.selementForm.massEdit.chkboxIconid_off.checked)
-			params.iconid_off = this.selementForm.iconid_off.options[this.selementForm.iconid_off.selectedIndex].value;
-
-// Icon PROBLEM
-		if(this.selementForm.massEdit.chkboxIconid_on.checked)
-			params.iconid_on = this.selementForm.iconid_on.options[this.selementForm.iconid_on.selectedIndex].value;
-
-// Icon MAINTENANCE
-		if(this.selementForm.massEdit.chkboxIconid_maintenance.checked)
-			params.iconid_maintenance = this.selementForm.iconid_maintenance.options[this.selementForm.iconid_maintenance.selectedIndex].value;
-
-// Icon DISABLED
-		if(this.selementForm.massEdit.chkboxIconid_disabled.checked)
-			params.iconid_disabled = this.selementForm.iconid_disabled.options[this.selementForm.iconid_disabled.selectedIndex].value;
-
-		for(var selementid in this.sysmap.selection.selements){
-			if(!isset(selementid, this.sysmap.selements)) continue;
-			this.sysmap.selements[selementid].reload(params);
+		for(i = 0; i < values.length; i++){
+			data[values[i].name] = values[i].value.toString();
 		}
-
-		this.sysmap.updateImage();
-		this.update_multiContainer(e);
 	},
 
 	updateList: function(){

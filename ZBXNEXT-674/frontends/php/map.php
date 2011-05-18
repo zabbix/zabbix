@@ -106,7 +106,7 @@ $x = imagesx($im) / 2 - ImageFontWidth(4) * zbx_strlen($name) / 2;
 imagetext($im, 10, 0, $x, 25, $colors['Dark Red'], $name);
 
 
-$str = zbx_date2str(S_MAPS_DATE_FORMAT, time(NULL));
+$str = zbx_date2str(S_MAPS_DATE_FORMAT);
 imagestring($im, 0, imagesx($im) - 120, imagesy($im) - 12, $str, $colors['Gray']);
 
 if(isset($_REQUEST['grid'])){
