@@ -38,6 +38,7 @@ set_time_limit(10);
 		'links'=>			array(T_ZBX_STR, O_OPT,	P_SYS,	DB_ID,		NULL),
 		'noselements'=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1"),	NULL),
 		'nolinks'=>			array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1"),	NULL),
+		'nocalculations'=>	array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1"),	NULL),
 
 		'show_triggers'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1,2,3"),	NULL),
 		'grid'=>			array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,500),	NULL),
@@ -87,39 +88,41 @@ set_time_limit(10);
 	$colors['Orange']	= imagecolorallocate($im,238,96,0);
 
 
-	$x=imagesx($im);
-	$y=imagesy($im);
+	$x = imagesx($im);
+	$y = imagesy($im);
 
-	imagefilledrectangle($im,0,0,$width,$height,$colors['White']);
+	imagefilledrectangle($im, 0, 0, $width, $height, $colors['White']);
 
 	if(($db_image = get_image_by_imageid($backgroundid))){
 		$back = imagecreatefromstring($db_image['image']);
-		imagecopy($im,$back,0,0,0,0,imagesx($back),imagesy($back));
+		imagecopy($im, $back, 0, 0, 0, 0, imagesx($back), imagesy($back));
 	}
 	unset($db_image);
 
-	$x=imagesx($im)/2-ImageFontWidth(4)*zbx_strlen($name)/2;
+	$x = imagesx($im) / 2 - ImageFontWidth(4) * zbx_strlen($name) / 2;
 	imagetext($im, 10, 0, $x, 25, $colors['Dark Red'], $name);
 
 
-	$str = zbx_date2str(S_MAPS_DATE_FORMAT,time(NULL));
-	imagestring($im, 0,imagesx($im)-120,imagesy($im)-12,$str, $colors['Gray']);
+	$str = zbx_date2str(S_MAPS_DATE_FORMAT, time(NULL));
+	imagestring($im, 0, imagesx($im) - 120, imagesy($im) - 12, $str, $colors['Gray']);
 
 	if(isset($_REQUEST['grid'])){
 		$grid = get_request('grid', 50);
-		if(!is_numeric($grid)) $grid = 50;
+		if(!is_numeric($grid)) {
+			$grid = 50;
+		}
 
 		$dims = imageTextSize(8, 0, '11');
-		for($x=$grid; $x<$width; $x+=$grid){
-			MyDrawLine($im,$x,0,$x,$height,$colors['Black'], MAP_LINK_DRAWTYPE_DASHED_LINE);
-			imageText($im, 8, 0, $x+3, $dims['height']+3, $colors['Black'],$x);
+		for($x = $grid; $x < $width; $x += $grid){
+			MyDrawLine($im, $x, 0, $x, $height, $colors['Black'], MAP_LINK_DRAWTYPE_DASHED_LINE);
+			imageText($im, 8, 0, $x + 3, $dims['height'] + 3, $colors['Black'], $x);
 		}
-		for($y=$grid;$y<$height;$y+=$grid){
-			MyDrawLine($im,0,$y,$width,$y,$colors['Black'], MAP_LINK_DRAWTYPE_DASHED_LINE);
-			imageText($im, 8, 0, 3, $y+$dims['height']+3, $colors['Black'], $y);
+		for($y = $grid; $y < $height; $y += $grid){
+			MyDrawLine($im, 0, $y, $width, $y, $colors['Black'], MAP_LINK_DRAWTYPE_DASHED_LINE);
+			imageText($im, 8, 0, 3, $y + $dims['height'] + 3, $colors['Black'], $y);
 		}
 
-		imageText($im, 8, 0, 2, $dims['height']+3, $colors['Black'], 'Y X:');
+		imageText($im, 8, 0, 2, $dims['height'] + 3, $colors['Black'], 'Y X:');
 	}
 // ACTION /////////////////////////////////////////////////////////////////////////////
 
@@ -141,7 +144,18 @@ set_time_limit(10);
 		$map['links'] = zbx_toHash($map['links'],'linkid');
 	}
 
-	$map_info = getSelementsInfo($map);
+$map_info = array();
+foreach($map['selements'] as $selement){
+	$map_info[$selement['selementid']] = array(
+		'iconid' => $selement['iconid_off'],
+		'icon_type' => SYSMAP_ELEMENT_ICON_OFF,
+	);
+}
+//	$map_info = getSelementsInfo($map);
+
+
+
+
 
 // Draw MAP
 	drawMapConnectors($im, $map, $map_info);
@@ -169,8 +183,6 @@ set_time_limit(10);
 
 	imageOut($im);
 	imagedestroy($im);
-?>
-<?php
 
 include_once('include/page_footer.php');
 

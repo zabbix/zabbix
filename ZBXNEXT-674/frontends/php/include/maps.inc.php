@@ -284,47 +284,6 @@
 	return imagecreatefromstring($image['image']);
 	}
 
-	function get_selement_iconid($selement, $info=null){
-		if($selement['selementid'] > 0){
-			if(is_null($info)){
-// get sysmap
-				$options = array(
-					'sysmapids' => $selement['sysmapid'],
-					'output' => API_OUTPUT_EXTEND
-				);
-				$sysmaps = API::Map()->get($options);
-				$sysmap = reset($sysmaps);
-				$sysmap['selements'] = array($selement);
-
-				$map_info = getSelementsInfo($sysmap);
-				$info = reset($map_info);
-//-----
-			}
-//SDI($info);
-
-			switch($info['icon_type']){
-				case SYSMAP_ELEMENT_ICON_OFF:
-					$info['iconid'] = $selement['iconid_off'];
-					break;
-				case SYSMAP_ELEMENT_ICON_ON:
-					$info['iconid'] = $selement['iconid_on'];
-					break;
-				case SYSMAP_ELEMENT_ICON_MAINTENANCE:
-					$info['iconid'] = $selement['iconid_maintenance'];
-					break;
-			}
-
-// Process for default icons
-			if($info['iconid'] == 0) $info['iconid'] = $selement['iconid_off'];
-//------
-		}
-		else{
-			$info['iconid'] = $selement['iconid_off'];
-		}
-
-	return $info['iconid'];
-	}
-
 	function convertColor($im,$color){
 
 		$RGB = array(
@@ -335,16 +294,6 @@
 
 
 	return imagecolorallocate($im,$RGB[0],$RGB[1],$RGB[2]);
-	}
-
-	function expandMapLabels(&$map){
-		foreach($map['selements'] as $snum => $selement){
-			$map['selements'][$snum]['label_expanded'] = resolveMapLabelMacrosAll($selement);
-		}
-
-		foreach($map['links'] as $lnum => $link){
-			$map['links'][$lnum]['label_expanded'] = resolveMapLabelMacros($link['label']);
-		}
 	}
 
 
