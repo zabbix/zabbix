@@ -596,6 +596,30 @@ function zbx_array_push(&$array, $add){
 	}
 }
 
+/**
+ * Find if array has any duplicate values and return an array with info about them.
+ * In case of no duplicates, empty array is returned.
+ * Example of usage:
+ *     $result = zbx_arrayFindDuplicates(
+ *         array('a', 'b', 'c', 'c', 'd', 'd', 'd', 'e')
+ *     );
+ *     array(
+ *         'd' => 3,
+ *         'c' => 2,
+ *     )
+ * @param array $array
+ * @return array
+ */
+function zbx_arrayFindDuplicates(array $array){
+	function moreThanOne($a){
+		return $a > 1;
+	}
+	$countValues = array_count_values($array); // counting occurrences of every value in array
+	$countValues = array_filter($countValues, 'moreThanOne'); // removing all values that appear only once
+	arsort($countValues); // sorting, so that the most duplicates would be at the top
+	return $countValues;
+}
+
 // STRING FUNCTIONS {{{
 if(!function_exists('zbx_stripslashes')){
 function zbx_stripslashes($value){

@@ -712,7 +712,7 @@
 		if($view_style == STYLE_TOP){
 			$header=array(new CCol(S_ITEMS,'center'));
 			foreach($hosts as $hostname){
-				$header = array_merge($header,array(new CImg('vtext.php?text='.$hostname.'&theme='.$css)));
+				$header = array_merge($header,array(new CImg('vtext.php?text='.urlencode($hostname).'&theme='.$css)));
 			}
 
 			$table->SetHeader($header,'vertical_header');
@@ -728,7 +728,7 @@
 		else{
 			$header=array(new CCol(S_HOSTS,'center'));
 			foreach($items as $descr => $ithosts){
-				$header = array_merge($header,array(new CImg('vtext.php?text='.$descr.'&theme='.$css)));
+				$header = array_merge($header,array(new CImg('vtext.php?text='.urlencode($descr).'&theme='.$css)));
 			}
 
 			$table->SetHeader($header,'vertical_header');
