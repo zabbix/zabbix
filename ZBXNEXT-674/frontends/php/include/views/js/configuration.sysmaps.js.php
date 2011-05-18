@@ -1,16 +1,14 @@
 <script type="text/x-jquery-tmpl" id="mapElementFormTpl">
 	<div class="floatWindow" style="display: none;">
-		<form name="selementForm">
-			<input type="hidden" id="selementid" name="selementid">
+		<form id="selementForm" name="selementForm">
 			<input type="hidden" id="elementid" name="elementid">
 			<table id="elementFormTable" class="formtable" style="width:100%">
-				<caption>asd</caption>
 				<thead>
 				<tr class="header">
 					<td id="formDragHandler" colspan="2" class="form_row_first move"><?php echo _('Edit map element'); ?></td>
 				</tr>
 				</thead>
-				</tbody>
+				<tbody>
 				<tr>
 					<td><label for="elementType"><?php echo _('Type'); ?></label></td>
 					<td>
@@ -167,19 +165,89 @@
 			</table>
 		</form>
 
-		<div style="max-height: 128px; overflow-y: auto;">
-			<table class="tableinfo">
-				<thead>
-				<tr class="header">
-					<td><?php echo _('Link'); ?></td>
-					<td><?php echo _('Element type'); ?></td>
-					<td><?php echo _('Element name'); ?></td>
-					<td><?php echo _('Link status indicator'); ?></td>
+		<form id="linkForm" name="linkForm" style="display: none;">
+			<input type="hidden" value="" id="linkid" name="linkid">
+
+			<input name="link_triggers[12795][linktriggerid]" type="hidden" value="1" id="link_triggers[12795][linktriggerid]">
+			<input name="link_triggers[12795][triggerid]" id="link_triggers[12795][triggerid]" type="hidden" value="12795">
+			<input name="link_triggers[12795][desc_exp]" id="link_triggers[12795][desc_exp]" type="hidden" value="Zabbix server:/etc/passwd has been changed on server Zabbix server">
+
+			<table class="formtable" style="width: 100%; ">
+				<tbody>
+				<tr>
+					<td><?php echo _('Label'); ?></td>
+					<td><textarea cols="48" rows="4" name="linklabel" id="linklabel" class="input"></textarea></td>
 				</tr>
-				</thead>
-				<tbody id=formList></tbody>
+				<tr>
+					<td><?php echo _('Connect to'); ?></td>
+					<td>
+						<select class="input" name="selementid" id="selementid"></select>
+					</td>
+				</tr>
+				<tr class="edit">
+					<td><?php echo _('Link indicators'); ?></td>
+					<td>
+						<table id="linktriggers" class="tableinfo">
+							<tbody>
+							<tr class="header">
+								<td><?php echo _('Triggers'); ?></td>
+								<td><?php echo _('Type'); ?></td>
+								<td><?php echo _('Colour'); ?></td>
+								<td></td>
+							</tr>
+							<tr>
+								<td>
+									<span>Zabbix server:/etc/passwd has been changed on server Zabbix server</span>
+								</td>
+								<td>
+									<select id="link_triggers[12795][drawtype]" name="link_triggers[12795][drawtype]" class="input">
+										<option value="0"><?php echo _('Line'); ?></option>
+										<option value="2"><?php echo _('Bold line'); ?></option>
+										<option value="3"><?php echo _('Dot'); ?></option>
+										<option value="4"><?php echo _('Dashed line'); ?></option>
+									</select>
+								</td>
+								<td>
+									<input style="margin-top: 0px; margin-bottom: 0px;" onchange="set_color_by_name('link_triggers[12795][color]',this.value)" maxlength="6" value="DD0000" size="7" id="link_triggers[12795][color]" name="link_triggers[12795][color]" class="input">
+									<div title="#DD0000" id="lbl_link_triggers[12795][color]" name="lbl_link_triggers[12795][color]" class="pointer" style="margin-left: 2px; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-top-style: solid; border-right-style: solid; border-bottom-style: solid; border-left-style: solid; border-top-color: black; border-right-color: black; border-bottom-color: black; border-left-color: black; display: inline; width: 10px; height: 10px; text-decoration: none; background-color: rgb(221, 0, 0); ">&nbsp;&nbsp;&nbsp;</div>
+								</td>
+								<td>
+									<input type="button" name="Remove" value="Remove" class="input button link_menu">
+								</td>
+							</tr>
+							</tbody>
+						</table>
+						<input type="button" name="Add" value="Add" class="input button link_menu">
+					</td>
+				</tr>
+				<tr>
+					<td><?php echo _('Type (OK)'); ?></td>
+					<td >
+						<select size="1" class="input" name="drawtype" id="drawtype">
+							<option value="0"><?php echo _('Line'); ?></option>
+							<option value="2"><?php echo _('Bold line'); ?></option>
+							<option value="3"><?php echo _('Dot'); ?></option>
+							<option value="4"><?php echo _('Dashed line'); ?></option>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td><?php echo _('Colour (OK)'); ?></td>
+					<td>
+						<input style="margin-top: 0px; margin-bottom: 0px;" onchange="set_color_by_name('color',this.value)" maxlength="6" value="000055" size="7" id="color" name="color" class="input">
+						<div title="#000055" id="lbl_color" name="lbl_color" class="pointer" style="margin-left: 2px; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-top-style: solid; border-right-style: solid; border-bottom-style: solid; border-left-style: solid; border-top-color: black; border-right-color: black; border-bottom-color: black; border-left-color: black; display: inline; width: 10px; height: 10px; text-decoration: none; background-color: rgb(0, 204, 0); ">&nbsp;&nbsp;&nbsp;</div>
+					</td>
+				</tr>
+				<tr class="footer">
+					<td colspan="2" class="form_row_last">
+						<input type="button" name="apply" class="input button shadow" value="Apply">
+						<input type="button" name="remove" class="input button shadow" value="Remove">
+						<input type="button" name="close" class="input button shadow" value="Close">
+					</td>
+				</tr>
+				</tbody>
 			</table>
-		</div>
+		</form>
 	</div>
 </script>
 
@@ -262,105 +330,6 @@
 	</div>
 </script>
 
-<script type="text/x-jquery-tmpl" id="mapLinkForm">
-	<div id="linkForm" class="floatWindow" style="display: none;">
-		<form name="linkForm">
-			<input type="hidden" value="" id="linkid" name="linkid">
-
-			<input name="link_triggers[12795][linktriggerid]" type="hidden" value="1" id="link_triggers[12795][linktriggerid]">
-			<input name="link_triggers[12795][triggerid]" id="link_triggers[12795][triggerid]" type="hidden" value="12795">
-			<input name="link_triggers[12795][desc_exp]" id="link_triggers[12795][desc_exp]" type="hidden" value="Zabbix server:/etc/passwd has been changed on server Zabbix server">
-
-			<table class="formtable" style="width: 100%; ">
-				<tbody>
-				<tr class="header">
-					<td colspan="2" class="form_row_first">
-						<?php echo _('Edit connector'); ?>
-					</td>
-				</tr>
-				<tr>
-					<td><?php echo _('Label'); ?></td>
-					<td><textarea cols="48" rows="4" name="linklabel" id="linklabel" class="input"></textarea></td>
-				</tr>
-				<tr>
-					<td><?php echo _('Element 1'); ?></td>
-					<td>
-						<select class="input" name="selementid1" id="selementid1"></select>
-					</td>
-				</tr>
-				<tr>
-					<td><?php echo _('Element 2'); ?></td>
-					<td>
-						<select class="input" name="selementid2" id="selementid2"></select>
-					</td>
-				</tr>
-				<tr class="edit">
-					<td><?php echo _('Link indicators'); ?></td>
-					<td>
-						<table id="linktriggers" class="tableinfo">
-							<tbody>
-							<tr class="header">
-								<td><?php echo _('Triggers'); ?></td>
-								<td><?php echo _('Type'); ?></td>
-								<td><?php echo _('Colour'); ?></td>
-								<td></td>
-							</tr>
-							<tr>
-								<td>
-									<span>Zabbix server:/etc/passwd has been changed on server Zabbix server</span>
-								</td>
-								<td>
-									<select id="link_triggers[12795][drawtype]" name="link_triggers[12795][drawtype]" class="input">
-										<option value="0"><?php echo _('Line'); ?></option>
-										<option value="2"><?php echo _('Bold line'); ?></option>
-										<option value="3"><?php echo _('Dot'); ?></option>
-										<option value="4"><?php echo _('Dashed line'); ?></option>
-									</select>
-								</td>
-								<td>
-									<input style="margin-top: 0px; margin-bottom: 0px;" onchange="set_color_by_name('link_triggers[12795][color]',this.value)" maxlength="6" value="DD0000" size="7" id="link_triggers[12795][color]" name="link_triggers[12795][color]" class="input">
-									<div title="#DD0000" id="lbl_link_triggers[12795][color]" name="lbl_link_triggers[12795][color]" class="pointer" style="margin-left: 2px; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-top-style: solid; border-right-style: solid; border-bottom-style: solid; border-left-style: solid; border-top-color: black; border-right-color: black; border-bottom-color: black; border-left-color: black; display: inline; width: 10px; height: 10px; text-decoration: none; background-color: rgb(221, 0, 0); ">&nbsp;&nbsp;&nbsp;</div>
-								</td>
-								<td>
-									<input type="button" name="Remove" value="Remove" class="input button link_menu">
-								</td>
-							</tr>
-							</tbody>
-						</table>
-						<input type="button" name="Add" value="Add" class="input button link_menu">
-					</td>
-				</tr>
-				<tr>
-					<td><?php echo _('Type (OK)'); ?></td>
-					<td >
-						<select size="1" class="input" name="drawtype" id="drawtype">
-							<option value="0"><?php echo _('Line'); ?></option>
-							<option value="2"><?php echo _('Bold line'); ?></option>
-							<option value="3"><?php echo _('Dot'); ?></option>
-							<option value="4"><?php echo _('Dashed line'); ?></option>
-						</select>
-					</td>
-				</tr>
-				<tr>
-					<td><?php echo _('Colour (OK)'); ?></td>
-					<td>
-						<input style="margin-top: 0px; margin-bottom: 0px;" onchange="set_color_by_name('color',this.value)" maxlength="6" value="000055" size="7" id="color" name="color" class="input">
-						<div title="#000055" id="lbl_color" name="lbl_color" class="pointer" style="margin-left: 2px; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-top-style: solid; border-right-style: solid; border-bottom-style: solid; border-left-style: solid; border-top-color: black; border-right-color: black; border-bottom-color: black; border-left-color: black; display: inline; width: 10px; height: 10px; text-decoration: none; background-color: rgb(0, 204, 0); ">&nbsp;&nbsp;&nbsp;</div>
-					</td>
-				</tr>
-				<tr class="footer">
-					<td colspan="2" class="form_row_last">
-						<input type="button" name="apply" class="input button shadow" value="Apply">
-						<input type="button" name="remove" class="input button shadow" value="Remove">
-						<input type="button" name="close" class="input button shadow" value="Close">
-					</td>
-				</tr>
-				</tbody>
-			</table>
-		</form>
-	</div>
-</script>
-
 <script type="text/x-jquery-tmpl" id="mapMassFormListRow">
 	<tr>
 		<td>#{elementType}</td>
@@ -368,21 +337,36 @@
 	</tr>
 </script>
 
-<script type="text/x-jquery-tmpl" id="mapElementsFormListRow">
-	<tr class="even_row">
-		<td><span class="link" onclick="jQuery('#linkForm').toggle();">#{linkName}</span></td>
+<script type="text/x-jquery-tmpl" id="mapLinksContainer">
+	<div style="max-height: 128px; overflow-y: auto;">
+		<table class="tableinfo">
+			<thead>
+			<tr class="header">
+				<td></td>
+				<td><?php echo _('Element type'); ?></td>
+				<td><?php echo _('Element name'); ?></td>
+				<td><?php echo _('Link status indicator'); ?></td>
+			</tr>
+			</thead>
+			<tbody id=linksList></tbody>
+		</table>
+	</div>
+</script>
+
+<script type="text/x-jquery-tmpl" id="mapLinksRow">
+	<tr>
+		<td><span class="link_menu" data-id="#{linkid}">Edit</span></td>
 		<td>#{elementType}</td>
 		<td>#{elementName}</td>
-		<td>#{linkIndicators}<br>
-		</td>
+		<td>#{linkIndicators}</td>
 	</tr>
 </script>
 
 
 <script type="text/x-jquery-tmpl" id="selementFormUrls">
 	<tr id="urlrow_#{selementurlid}">
-	<td><input class="input" name="urls[#{selementurlid}][name]" type="text" size="16" value="#{name}"></td>
-	<td><input class="input" name="urls[#{selementurlid}][url]" type="text" size="32" value="#{url}"></td>
+	<td><input class="input" name="url_#{selementurlid}_name" type="text" size="16" value="#{name}"></td>
+	<td><input class="input" name="url_#{selementurlid}_url" type="text" size="32" value="#{url}"></td>
 	<td><span class="link_menu" onclick="jQuery('#urlrow_#{selementurlid}').remove();"><?php echo _('Remove'); ?></span></td>
 	</tr>
 </script>

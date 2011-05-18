@@ -87,11 +87,6 @@ include_once('include/page_header.php');
 					$map_info = getSelementsInfo($mapData);
 					add_elementNames($mapData['selements']);
 
-					foreach($mapData['selements'] as &$selement){
-						$selement['image'] = get_selement_iconid($selement, $map_info[$selement['selementid']]);
-						$selement['urls'] = zbx_toHash($selement['urls'], 'name');
-					}
-					unset($selement);
 
 					foreach($mapData['links'] as &$link){
 						$link['linktriggers'] = zbx_toHash($link['linktriggers'], 'linktriggerid');
@@ -211,18 +206,18 @@ echo SBR;
 
 // ELEMENTS
 $el_add = new CIcon(_('Add element'), 'iconplus');
-$el_add->setAttribute('id','selement_add');
+$el_add->setAttribute('id', 'selement_add');
 
 $el_rmv = new CIcon(_('Remove element'), 'iconminus');
-$el_rmv->setAttribute('id','selement_rmv');
+$el_rmv->setAttribute('id', 'selement_remove');
 //-----------------
 
 // CONNECTORS
 $cn_add = new CIcon(_('Add link'), 'iconplus');
-$cn_add->setAttribute('id','link_add');
+$cn_add->setAttribute('id', 'link_add');
 
 $cn_rmv = new CIcon(_('Remove link'), 'iconminus');
-$cn_rmv->setAttribute('id','link_rmv');
+$cn_rmv->setAttribute('id', 'link_remove');
 //------------------------
 
 
