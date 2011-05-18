@@ -112,7 +112,6 @@ include_once('include/page_header.php');
 						'iconList' => $iconList
 					));
 					$ajaxResponse->send();
-						sdi();
 					break;
 				case 'save':
 					@ob_start();

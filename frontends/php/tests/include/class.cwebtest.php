@@ -282,7 +282,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 // Check that page does not have real (not visible) host or template names
 	public function checkNoRealHostnames()
 	{
-		$result = DBselect('select host from hosts where status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')');
+		$result = DBselect('select host from hosts where status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.') and name <> host');
 		while($row = DBfetch($result))
 		{
 			$this->nok($row['host']);
