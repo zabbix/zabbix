@@ -83,8 +83,6 @@ include_once('include/page_header.php');
 					$sysmaps = API::Map()->get($options);
 					$mapData = reset($sysmaps);
 
-					expandMapLabels($mapData);
-					$map_info = getSelementsInfo($mapData);
 					add_elementNames($mapData['selements']);
 
 
@@ -114,6 +112,7 @@ include_once('include/page_header.php');
 						'iconList' => $iconList
 					));
 					$ajaxResponse->send();
+						sdi();
 					break;
 				case 'save':
 					@ob_start();
@@ -153,26 +152,6 @@ include_once('include/page_header.php');
 					@ob_flush();
 					exit();
 					break;
-			}
-		}
-		else if('selements' == $_REQUEST['favobj']){
-			$sysmapid = get_request('sysmapid', 0);
-
-			switch($_REQUEST['action']){
-				case 'getIcon':
-					$selements = get_request('selements', '[]');
-					$selements = $json->decode($selements, true);
-
-					$selement = reset($selements);
-					$selement['sysmapid'] = $sysmapid;
-
-					$resultData = array(
-						'image' => get_selement_iconid($selement),
-						'label_expanded' => resolveMapLabelMacrosAll($selement)
-					);
-
-					print(zbx_jsvalue($resultData, true));
-				break;
 			}
 		}
 	}

@@ -611,8 +611,8 @@ function CSelement(sysmap, selementData){
 			iconid_off: this.sysmap.iconList[0].imageid, // first imageid
 			label: locale['S_NEW_ELEMENT'],
 			label_location: this.sysmap.data.label_location, // set default map label location
-			x: '0',
-			y: '0',
+			x: 0,
+			y: 0,
 			urls: {},
 			elementName: this.sysmap.iconList[0].name, // image name
 			image: this.sysmap.iconList[0].imageid
@@ -650,11 +650,9 @@ function CSelement(sysmap, selementData){
 		helper: 'clone',
 		stop: jQuery.proxy(function(event, data){
 			this.update({
-				x: data.position.left,
-				y: data.position.top
+				x: parseInt(data.position.left, 10),
+				y: parseInt(data.position.top, 10)
 			});
-
-			this.sysmap.updateImage();
 		}, this)
 	});
 
@@ -703,8 +701,15 @@ CSelement.prototype = {
 			}
 		}
 
-		this.align();
+		// if we update all data and advanced_icons turned off, reset advanced iconids
+		if(unsetUndefined && (typeof data.advanced_icons === 'undefined')){
+			this.data.iconid_on = '0';
+			this.data.iconid_maintenance = '0';
+			this.data.iconid_disabled = '0';
+		}
+
 		this.updateIcon();
+		this.align();
 		this.sysmap.updateImage();
 	},
 
@@ -772,13 +777,18 @@ CSelement.prototype = {
 		this.data.x = newX;
 
 		jQuery(this.domNode).css({
-			top: newY+"px",
-			left: newX+"px"
+			top: newY + 'px',
+			left: newX + 'px'
 		});
 	},
 
 	updateIcon: function(){
-		this.domNode.get(0).className.replace(/sysmap_iconid_.*?/g, '');
+
+		var oldIconClass = this.domNode.get(0).className.match(/sysmap_iconid_\d+/);
+		if(oldIconClass !== null){
+			this.domNode.removeClass(oldIconClass[0]);
+		}
+
 		this.domNode
 				.addClass('sysmap_iconid_'+this.data.iconid_off)
 				.css({
@@ -974,7 +984,7 @@ CElementForm.prototype = {
 		}
 
 
-		if((data.elementid == 0) && (data.elementtype != 4)){
+		if((data.elementid === 0) && (data.elementtype !== 4)){
 			switch(data.elementtype){
 				case '0': alert('Host is not selected.');
 					return false;
