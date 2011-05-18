@@ -605,7 +605,6 @@ switch($itemType) {
 				'params'			=> get_request('params'),
 				'ipmi_sensor'		=> get_request('ipmi_sensor'),
 				'data_type'		=> get_request('data_type'),
-				// item will not be added to applications on another host
 				'applications'  => get_request('applications',array())
 			);
 		$delay_flex = get_request('delay_flex',array());
@@ -621,13 +620,12 @@ switch($itemType) {
 			// create item on all hosts inside selected group
 			case 'add to group':
 				DBstart();
-				$itemid = add_item_to_group($_REQUEST['add_groupid'], $item);
-				$result = DBend($itemid);
+				$result = add_item_to_group($_REQUEST['add_groupid'], $item);
+				$result = DBend($result);
 				show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 				if($result){
 					unset($_REQUEST['form']);
 					unset($_REQUEST['itemid']);
-					unset($itemid);
 				}
 			break;
 			// update item on all hosts inside selected group
