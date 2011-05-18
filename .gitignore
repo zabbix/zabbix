@@ -260,6 +260,10 @@ src/zabbix_server/watchdog/.deps
 src/zabbix_server/watchdog/Makefile
 src/zabbix_server/watchdog/Makefile.in
 src/zabbix_server/zabbix_server
+src/zabbix_snmphandler/.deps
+src/zabbix_snmphandler/Makefile
+src/zabbix_snmphandler/Makefile.in
+src/zabbix_snmphandler/zabbix_snmphandler
 /tags
 upgrades/Makefile
 upgrades/Makefile.in
