@@ -249,7 +249,7 @@ function __autoload($class_name){
 			}
 
 			if(!$locale_found && CWebUser::$data['lang'] != 'en_GB' && CWebUser::$data['lang'] != 'en_gb'){
-				error('Locale for language "'.CWebUser::$data['lang'].'" is not found on the web server. Tried to set: '.implode(', ', $locales).'. Unable to translate zabbix interface.');
+				error('Locale for language "'.CWebUser::$data['lang'].'" is not found on the web server. Tried to set: '.implode(', ', $locales).'. Unable to translate Zabbix interface.');
 			}
 			bindtextdomain('frontend', 'locale');
 			bind_textdomain_codeset('frontend', 'UTF-8');
@@ -260,10 +260,6 @@ function __autoload($class_name){
 		}
 // Numeric Locale to default
 		setLocale(LC_NUMERIC, array('en','en_US','en_US.UTF-8','English_United States.1252'));
-
-
-		include_once('include/locales/en_gb.inc.php');
-		process_locales();
 	}
 	else{
 		CWebUser::$data = array(
