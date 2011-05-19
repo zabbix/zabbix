@@ -27,8 +27,8 @@
 #include "net.h"
 
 #ifdef _WINDOWS
-#include <windns.h>
-#pragma comment(lib, "Dnsapi.lib") /* add the library for DnsQuery function */
+#	include <windns.h>
+#	pragma comment(lib, "Dnsapi.lib") /* add the library for DnsQuery function */
 #endif
 
 /*
@@ -106,92 +106,35 @@ int	NET_TCP_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 }
 
 #if defined(HAVE_RES_QUERY) || defined(_WINDOWS)
-
-#if !defined(C_IN) && !defined(_WINDOWS)
-#	define C_IN	ns_c_in
-#endif	/* C_IN */
-/* define DNS record types to use common names on all systems, see RFC1035 standard for the types */
-#ifndef T_ANY
-#	define T_ANY	255
-#endif	/* T_ANY */
-#ifndef T_A
-#	define T_A	1
-#endif	/* T_A */
-#ifndef T_NS
-#	define T_NS	2
-#endif	/* T_NS */
-#ifndef T_MD
-#	define T_MD	3
-#endif	/* T_MD */
-#ifndef T_MF
-#	define T_MF	4
-#endif	/* T_MF */
-#ifndef T_CNAME
-#	define T_CNAME	5
-#endif	/* T_CNAME */
-#ifndef T_SOA
-#	define T_SOA	6
-#endif	/* T_SOA */
-#ifndef T_MB
-#	define T_MB	7
-#endif	/* T_MB */
-#ifndef T_MG
-#	define T_MG	8
-#endif	/* T_MG */
-#ifndef T_MR
-#	define T_MR	9
-#endif	/* T_MR */
-#ifndef T_NULL
-#	define T_NULL	10
-#endif	/* T_NULL */
-#ifndef T_WKS
-#	define T_WKS	11
-#endif	/* T_WKS */
-#ifndef T_PTR
-#	define T_PTR	12
-#endif	/* T_PTR */
-#ifndef T_HINFO
-#	define T_HINFO	13
-#endif	/* T_HINFO */
-#ifndef T_MINFO
-#	define T_MINFO	14
-#endif	/* T_MINFO */
-#ifndef T_MX
-#	define T_MX	15
-#endif	/* T_MX */
-#ifndef T_TXT
-#	define T_TXT	16
-#endif	/* T_TXT */
-
 static char	*decode_type(int q_type)
 {
 	static char	buf[16];
 
 	switch (q_type)
 	{
-		case T_A:	return "A";	/* "address"; */
-		case T_NS:	return "NS";	/* "name server"; */
-		case T_MD:	return "MD";	/* "mail forwarder"; */
-		case T_MF:	return "MF";	/* "mail forwarder"; */
-		case T_CNAME:	return "CNAME";	/* "canonical name"; */
-		case T_SOA:	return "SOA";	/* "start of authority"; */
-		case T_MB:	return "MB";	/* "mailbox"; */
-		case T_MG:	return "MG";	/* "mail group member"; */
-		case T_MR:	return "MR";	/* "mail rename"; */
-		case T_NULL:	return "NULL";	/* "null"; */
-		case T_WKS:	return "WKS";	/* "well-known service"; */
-		case T_PTR:	return "PTR";	/* "domain name pointer"; */
-		case T_HINFO:	return "HINFO";	/* "host information"; */
-		case T_MINFO:	return "MINFO";	/* "mailbox information"; */
-		case T_MX:	return "MX";	/* "mail exchanger"; */
-		case T_TXT:	return "TXT";	/* "text"; */
+		case T_A:	return "A";	/* address */
+		case T_NS:	return "NS";	/* name server */
+		case T_MD:	return "MD";	/* mail forwarder */
+		case T_MF:	return "MF";	/* mail forwarder */
+		case T_CNAME:	return "CNAME";	/* canonical name */
+		case T_SOA:	return "SOA";	/* start of authority */
+		case T_MB:	return "MB";	/* mailbox */
+		case T_MG:	return "MG";	/* mail group member */
+		case T_MR:	return "MR";	/* mail rename */
+		case T_NULL:	return "NULL";	/* null */
+		case T_WKS:	return "WKS";	/* well-known service */
+		case T_PTR:	return "PTR";	/* domain name pointer */
+		case T_HINFO:	return "HINFO";	/* host information */
+		case T_MINFO:	return "MINFO";	/* mailbox information */
+		case T_MX:	return "MX";	/* mail exchanger */
+		case T_TXT:	return "TXT";	/* text */
 		default:
 			zbx_snprintf(buf, sizeof(buf), "T_%d", q_type);
 			return buf;
 	}
 }
 
-#ifndef _WINDOWS
+#	if !defined(_WINDOWS)
 static char	*get_name(unsigned char *msg, unsigned char *msg_end, unsigned char **msg_ptr)
 {
 	int		res;
@@ -204,7 +147,7 @@ static char	*get_name(unsigned char *msg, unsigned char *msg_end, unsigned char 
 
 	return buffer;
 }
-#endif /* not _WINDOWS*/
+#	endif
 
 #endif /* defined(HAVE_RES_QUERY) || defined(_WINDOWS) */
 
@@ -256,7 +199,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 	PDNS_RECORD	pDnsRecord;
 	PIP4_ARRAY	pSrvList = NULL;
 	LPTSTR		wzone;
-#else /* not _WINDOWS */
+#else
 	char		*name;
 	unsigned char	*msg_end, *msg_ptr, *p;
 	int		num_answers, num_query, q_type, q_class, q_ttl, q_len, value, c, n;
@@ -278,12 +221,12 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 		unsigned char	buffer[PACKETSZ];
 #else
 		unsigned char	buffer[512];
-#endif
+#endif	/* ifdef _WINDOWS */
 	}
 	answer_t;
 
 	answer_t	answer;
-#endif /* ifdef _WINDOWS */
+#endif	/* defined(HAVE_RES_QUERY) || defined(_WINDOWS) */
 
 	*buffer = '\0';
 
@@ -360,8 +303,11 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 		if (NULL == pDnsRecord->pName)
 			return SYSINFO_RET_FAIL;
 
-		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%-20s", zbx_unicode_to_utf8(pDnsRecord->pName));
-		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %-8s", decode_type(pDnsRecord->wType));
+		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%-20s",
+				zbx_unicode_to_utf8(pDnsRecord->pName));
+		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %-8s",
+				decode_type(pDnsRecord->wType));
+
 		switch (pDnsRecord->wType)
 		{
 			case T_A:
@@ -441,8 +387,8 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "\n");
 		pDnsRecord = pDnsRecord->pNext;
 	}
-#else /* not _WINDOWS*/
-	if (!(_res.options & RES_INIT))
+#else	/* not _WINDOWS */
+	if (0 == (_res.options & RES_INIT))
 		res_init();
 
 	if ('\0' != *ip)
@@ -456,7 +402,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 	}
 
 	res = res_mkquery(QUERY, zone, C_IN, type, NULL, 0, NULL, buf, sizeof(buf));
-	if (res <= 0)
+	if (0 >= res)
 		return SYSINFO_RET_FAIL;
 
 	_res.retrans = retrans;
@@ -469,6 +415,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 		SET_UI64_RESULT(result, NOERROR != hp->rcode || 0 == ntohs(hp->ancount) || -1 == res ? 0 : 1);
 		return SYSINFO_RET_OK;
 	}
+
 	if (NOERROR != hp->rcode || 0 == ntohs(hp->ancount) || -1 == res)
 		return SYSINFO_RET_FAIL;
 
@@ -483,13 +430,14 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 	msg_ptr = answer.buffer + HFIXEDSZ;
 
 	/* skipping query records*/
-	for (; num_query > 0 && msg_ptr < msg_end; num_query--)
+	for (; 0 < num_query && msg_ptr < msg_end; num_query--)
 		msg_ptr += dn_skipname(msg_ptr, msg_end) + QFIXEDSZ;
 
-	for (; num_answers > 0 && msg_ptr < msg_end; num_answers--)
+	for (; 0 < num_answers && msg_ptr < msg_end; num_answers--)
 	{
 		if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
 			return SYSINFO_RET_FAIL;
+
 		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%-20s", name);
 
 		GETSHORT(q_type, msg_ptr);
@@ -513,6 +461,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 				}
 				msg_ptr += q_len;
 				break;
+
 			case T_NS:
 			case T_CNAME:
 			case T_MB:
@@ -523,44 +472,48 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 					return SYSINFO_RET_FAIL;
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 				break;
+
 			case T_MD:
 			case T_MF:
 			case T_MX:
-				GETSHORT(value, msg_ptr); /* preference */
+				GETSHORT(value, msg_ptr);	/* preference */
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
 
-				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr))) /* exchange */
+				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* exchange */
 					return SYSINFO_RET_FAIL;
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 				break;
+
 			case T_SOA:
-				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr))) /* source host */
+				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* source host */
 					return SYSINFO_RET_FAIL;
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 
-				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr))) /* administrator */
+				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* administrator */
 					return SYSINFO_RET_FAIL;
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 
-				GETLONG(value, msg_ptr); /* serial number */
+				GETLONG(value, msg_ptr);	/* serial number */
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
 
-				GETLONG(value, msg_ptr); /* refresh time */
+				GETLONG(value, msg_ptr);	/* refresh time */
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
 
-				GETLONG(value, msg_ptr); /* retry time */
+				GETLONG(value, msg_ptr);	/* retry time */
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
 
-				GETLONG(value, msg_ptr); /* expire time */
+				GETLONG(value, msg_ptr);	/* expire time */
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
 
-				GETLONG(value, msg_ptr); /* minimum TTL */
+				GETLONG(value, msg_ptr);	/* minimum TTL */
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
 				break;
+
 			case T_NULL:
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " len:%d", q_len);
 				msg_ptr += q_len;
 				break;
+
 			case T_WKS:
 				if (INT32SZ + 1 > q_len )
 					return SYSINFO_RET_FAIL;
@@ -585,19 +538,20 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 					c = *msg_ptr++;
 					do
 					{
-						if (c & 0200)
+						if (0 != (c & 0200))
 						{
 							s = getservbyport((int)htons(n), pr ? pr->p_name : NULL);
-							if (s != NULL)
+							if (NULL != s)
 								offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", s->s_name);
 							else
 								offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " #%d", n);
 						}
 						c <<= 1;
 					}
-					while (++n & 07);
+					while (0 != (++n & 07));
 				}
 				break;
+
 			case T_HINFO:
 				p = msg_ptr + q_len;
 				c = *msg_ptr++;
@@ -619,25 +573,29 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 					}
 				}
 				break;
+
 			case T_MINFO:
-				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr))) /* mailbox responsible for mailing lists */
+				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* mailbox responsible for mailing lists */
 					return SYSINFO_RET_FAIL;
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 
-				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr))) /* mailbox for error messages */
+				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* mailbox for error messages */
 					return SYSINFO_RET_FAIL;
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 				break;
+
 			case T_TXT:
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " \"");
 				p = msg_ptr + q_len;
+
 				while (msg_ptr < p)
 				{
-					for (c = *msg_ptr++; c > 0 && msg_ptr < p; c--)
+					for (c = *msg_ptr++; 0 < c && msg_ptr < p; c--)
 						offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%c", *msg_ptr++);
 				}
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "\"");
 				break;
+
 			default:
 				msg_ptr += q_len;
 		}
