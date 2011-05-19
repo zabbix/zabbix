@@ -365,7 +365,7 @@ options = array(
 
 			// no graphid provided
 			if(is_null($graphid)){
-				// if there is one saved in profile, lets take it from there
+				// if there is one saved in profile, let's take it from there
 				$graphid = is_null($this->_profileIds['graphid'])
 							? 0
 							: $this->_profileIds['graphid'];
