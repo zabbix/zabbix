@@ -131,9 +131,9 @@ int     SYSTEM_SW_PACKAGES(const char *cmd, const char *param, unsigned flags, A
 	if (0 != get_param(param, 2, manager, sizeof(manager)) || 0 == strcmp(manager, "all"))
 		*manager = '\0';
 
-	if (0 != get_param(param, 3, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "showpms"))
-		show_pm = 1;
-	else if (0 == strcmp(tmp, "onlylist"))
+	if (0 != get_param(param, 3, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "full"))
+		show_pm = 1;	/* show package managers' names */
+	else if (0 == strcmp(tmp, "short"))
 		show_pm = 0;
 	else
 		return ret;
