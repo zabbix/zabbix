@@ -2,6 +2,7 @@
 Changes for 1.9.5
 
 New features:
+ - [ZBXNEXT-677] added system.hw.* and system.sw.* items for Linux (rudolfs)
  - [ZBXNEXT-780] all items (including user parameters and external checks) can also return only whitespace (rudolfs)
 
 --------------------------------------------------------------------------------
