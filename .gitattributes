@@ -349,6 +349,10 @@ misc/init.d/ubuntu/zabbix-agent.conf -text
 misc/init.d/ubuntu/zabbix-server.conf -text
 src/libs/zbxcomms/telnet.c -text
 src/libs/zbxself/Makefile.am -text
+src/libs/zbxsysinfo/linux/hardware.c -text
+src/libs/zbxsysinfo/linux/hardware.h -text
+src/libs/zbxsysinfo/linux/software.c -text
+src/libs/zbxsysinfo/linux/software.h -text
 src/zabbix_java/lib/logback-classic-0.9.27.jar -text
 src/zabbix_java/lib/logback-console.xml -text
 src/zabbix_java/lib/logback-core-0.9.27.jar -text
@@ -384,8 +388,10 @@ upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/UPS_small.png -text svneol=unset#i
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Workstation.png -text svneol=unset#image/png
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Workstation_small.png -text svneol=unset#image/png
 upgrades/dbpatches/2.0/ibm_db2/patch/graph_discovery.sql -text
+upgrades/dbpatches/2.0/ibm_db2/patch/help_items.sql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/item_discovery.sql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/trigger_discovery.sql -text
+upgrades/dbpatches/2.0/mysql/patch/help_items.sql -text
 upgrades/dbpatches/2.0/mysql/patch/interface.sql -text
 upgrades/dbpatches/2.0/mysql/patch/opcommand_grp.sql -text
 upgrades/dbpatches/2.0/mysql/patch/opcommand_hst.sql -text
@@ -394,5 +400,7 @@ upgrades/dbpatches/2.0/mysql/patch/opmessage.sql -text
 upgrades/dbpatches/2.0/mysql/patch/opmessage_grp.sql -text
 upgrades/dbpatches/2.0/mysql/patch/opmessage_usr.sql -text
 upgrades/dbpatches/2.0/mysql/patch/optemplate.sql -text
+upgrades/dbpatches/2.0/oracle/patch/help_items.sql -text
 upgrades/dbpatches/2.0/oracle/patch/interface.sql -text
+upgrades/dbpatches/2.0/postgresql/patch/help_items.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/interface.sql -text
