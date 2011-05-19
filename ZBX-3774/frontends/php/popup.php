@@ -33,102 +33,102 @@
 	switch($srctbl){
 		case 'host_templates':
 		case 'templates':
-			$page['title'] = 'S_TEMPLATES_BIG';
+			$page['title'] = _('Templates');
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			$templated_hosts = true;
 			break;
 		case 'hosts_and_templates':
-			$page['title'] = 'S_HOSTS_AND_TEMPLATES_BIG';
+			$page['title'] = _('Hosts and templates');
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 		break;
 		case 'hosts':
-			$page['title'] = 'S_HOSTS_BIG';
+			$page['title'] = _('Hosts');
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
 		case 'proxies':
-			$page['title'] = 'S_PROXIES_BIG';
+			$page['title'] = _('Proxies');
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
 		case 'applications':
-			$page['title'] = 'S_APPLICATIONS_BIG';
+			$page['title'] = _('Applications');
 			$min_user_type = USER_TYPE_ZABBIX_USER;
 			break;
 		case 'host_group':
-			$page['title'] = 'S_HOST_GROUPS_BIG';
+			$page['title'] = _('Host groups');
 			$min_user_type = USER_TYPE_ZABBIX_USER;
 			break;
 		case 'triggers':
-			$page['title'] = 'S_TRIGGERS_BIG';
+			$page['title'] = _('Triggers');
 			$min_user_type = USER_TYPE_ZABBIX_USER;
 			break;
 		case 'usrgrp':
-			$page['title'] = 'S_GROUPS';
+			$page['title'] = _('User groups');
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
 		case 'users':
-			$page['title'] = 'S_USERS';
+			$page['title'] = _('Users');
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
 		case 'items':
-			$page['title'] = 'S_ITEMS_BIG';
+			$page['title'] = _('Items');
 			$min_user_type = USER_TYPE_ZABBIX_USER;
 			break;
 		case 'prototypes':
-			$page['title'] = 'S_PROTOTYPES_BIG';
+			$page['title'] = _('Prototypes');
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
 		case 'help_items':
-			$page['title'] = 'S_STANDARD_ITEMS_BIG';
+			$page['title'] = _('Standard items');
 			$min_user_type = USER_TYPE_ZABBIX_USER;
 			break;
 		case 'screens':
-			$page['title'] = 'S_SCREENS_BIG';
+			$page['title'] = _('Screens');
 			$min_user_type = USER_TYPE_ZABBIX_USER;
 			break;
 		case 'slides':
-			$page['title'] = 'S_SLIDESHOWS_BIG';
+			$page['title'] = _('Slide shows');
 			$min_user_type = USER_TYPE_ZABBIX_USER;
 			break;
 		case 'graphs':
-			$page['title'] = 'S_GRAPHS_BIG';
+			$page['title'] = _('Graphs');
 			$min_user_type = USER_TYPE_ZABBIX_USER;
 			break;
 		case 'simple_graph':
-			$page['title'] = 'S_SIMPLE_GRAPH_BIG';
+			$page['title'] = _('Simple graph');
 			$min_user_type = USER_TYPE_ZABBIX_USER;
 			break;
 		case 'sysmaps':
-			$page['title'] = 'S_MAPS_BIG';
+			$page['title'] = _('Maps');
 			$min_user_type = USER_TYPE_ZABBIX_USER;
 			break;
 		case 'plain_text':
-			$page['title'] = 'S_PLAIN_TEXT_BIG';
+			$page['title'] = _('Plain text');
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
 		case 'screens2':
-			$page['title'] = 'S_SCREENS_BIG';
+			$page['title'] = _('Screens');
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
 		case 'overview':
-			$page['title'] = 'S_OVERVIEW_BIG';
+			$page['title'] = _('Overview');
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
 		case 'host_group_scr':
-			$page['title'] = 'S_HOST_GROUPS_BIG';
+			$page['title'] = _('Host groups');
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
 		case 'nodes':
 			if(ZBX_DISTRIBUTED){
-				$page['title'] = 'S_NODES_BIG';
+				$page['title'] = _('Nodes');
 				$min_user_type = USER_TYPE_ZABBIX_USER;
 				break;
 			}
 		case 'drules':
-			$page['title'] = 'S_DISCOVERY_RULES_BIG';
+			$page['title'] = _('Discovery rules');
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
 		case 'dchecks':
-			$page['title'] = 'S_DISCOVERY_CHECKS_BIG';
+			$page['title'] = _('Discovery checks');
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
 		case 'scripts':
@@ -136,7 +136,7 @@
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
 		default:
-			$page['title'] = 'S_ERROR';
+			$page['title'] = _('Error');
 			$error = true;
 			break;
 	}
@@ -1049,23 +1049,23 @@ include_once('include/page_header.php');
 		$form->setName('itemform');
 		$form->setAttribute('id', 'items');
 
-		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
+		$table = new CTableInfo(_('No item prototypes defined'));
 
 		if($multiselect)
 			$header = array(
 				array(new CCheckBox("all_items", NULL, "javascript: checkAll('".$form->getName()."', 'all_items','items');"), _('Name')),
-				S_KEY,
-				S_TYPE,
-				S_TYPE_OF_INFORMATION,
-				S_STATUS
+				_('Key'),
+				_('Type'),
+				_('Type of information'),
+				_('Status')
 			);
 		else
 			$header = array(
 				_('Name'),
-				S_KEY,
-				S_TYPE,
-				S_TYPE_OF_INFORMATION,
-				S_STATUS
+				_('Key'),
+				_('Type'),
+				_('Type of information'),
+				_('Status')
 			);
 
 		$table->setHeader($header);
@@ -1113,7 +1113,7 @@ include_once('include/page_header.php');
 		}
 
 		if($multiselect){
-			$button = new CButton('select', S_SELECT, "javascript: addSelectedValues('items', ".zbx_jsvalue($reference).");");
+			$button = new CButton('select', _('Select'), "javascript: addSelectedValues('items', ".zbx_jsvalue($reference).");");
 			$table->setFooter(new CCol($button, 'right'));
 
 			insert_js('var popupReference = '.zbx_jsvalue($items, true).';');
