@@ -87,7 +87,7 @@ int	add_user_parameter(const char *key, char *command)
 		{
 			commands[i].key = zbx_strdup(NULL, usr_cmd);
 			commands[i].flags = flag;
-			commands[i].function = &EXECUTE_USER_PARAM;
+			commands[i].function = &EXECUTE_USER_PARAMETER;
 			commands[i].main_param = zbx_strdup(NULL, command);
 			commands[i].test_param = 0;
 
