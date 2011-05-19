@@ -965,7 +965,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 		if (SUCCEED != evaluate_expression(&exp_value, &tr[i].exp, tr[i].clock,
 					tr[i].triggerid, tr[i].value, error, sizeof(error)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Expression [%s] cannot be evaluated: %s", tr[i].exp, error);
+			zabbix_log(LOG_LEVEL_DEBUG, "expression [%s] cannot be evaluated: %s", tr[i].exp, error);
 
 			DBupdate_trigger_value(tr[i].triggerid, tr[i].type, tr[i].value,
 					tr[i].error, TRIGGER_VALUE_UNKNOWN, tr[i].clock, error);
