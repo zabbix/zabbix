@@ -44,7 +44,7 @@ static void process_traps()
 	FILE		*f = NULL;
 	char 		line[MAX_STRING_LEN];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(), tmp file [%s]", __function_name, tmp_trap_file);
+	zabbix_log(LOG_LEVEL_ERR, "In %s(), tmp file [%s]", __function_name, tmp_trap_file);
 
 	if (NULL == (f = fopen(tmp_trap_file, "r")))
 	{
@@ -62,14 +62,14 @@ close:
 	zbx_fclose(f);
 	remove(tmp_trap_file);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_ERR, "End of %s()", __function_name);
 }
 
 void	main_snmptrapper_loop(int server_num)
 {
 	const char	*__function_name = "main_snmptrapper_loop";
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(), trapfile [%s]", __function_name, CONFIG_SNMPTRAP_FILE);
+	zabbix_log(LOG_LEVEL_ERR, "In %s(), trapfile [%s]", __function_name, CONFIG_SNMPTRAP_FILE);
 
 	zbx_snprintf(tmp_trap_file, sizeof(tmp_trap_file), "%s_%d", CONFIG_SNMPTRAP_FILE, server_num);
 
