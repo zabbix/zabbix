@@ -399,7 +399,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 #else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for SSH checks was not compiled in"));
 			res = NOTSUPPORTED;
-#endif	/* HAVE_SSH2 */
+#endif
 			break;
 		case ITEM_TYPE_TELNET:
 			alarm(CONFIG_TIMEOUT);
@@ -474,7 +474,6 @@ static int	get_values(unsigned char poller_type)
 	DCinit_nextchecks();
 
 	/* prepare items */
-
 	for (i = 0; i < num; i++)
 	{
 		init_result(&results[i]);
@@ -586,7 +585,6 @@ static int	get_values(unsigned char poller_type)
 	}
 
 	/* retrieve item values */
-
 	if (SUCCEED == errcodes[0])
 	{
 		if (SUCCEED != is_bunch_poller(poller_type))
@@ -603,7 +601,6 @@ static int	get_values(unsigned char poller_type)
 	}
 
 	/* process item values */
-
 	for (i = 0; i < num; i++)
 	{
 		switch (errcodes[i])

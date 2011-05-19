@@ -131,16 +131,14 @@ static char*	ZABBIX_KEY = NULL;
 static char*	ZABBIX_KEY_VALUE = NULL;
 
 #if !defined(_WINDOWS)
-
 static void	send_signal_handler(int sig)
 {
 	if (SIGALRM == sig)
-		zabbix_log(LOG_LEVEL_WARNING, "Timeout while executing operation");
+		zabbix_log(LOG_LEVEL_WARNING, "timeout while executing operation");
 
 	exit(FAIL);
 }
-
-#endif /* NOT _WINDOWS */
+#endif
 
 typedef struct
 {
@@ -182,7 +180,7 @@ static int	check_response(char *response)
 		ret = FAIL;
 
 	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_INFO, info, sizeof(info)))
-		printf("Info from server: \"%s\"\n", info);
+		printf("info from server: \"%s\"\n", info);
 
 	return ret;
 }
@@ -204,7 +202,7 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	signal(SIGTERM, send_signal_handler);
 	signal(SIGQUIT, send_signal_handler);
 	signal(SIGALRM, send_signal_handler);
-#endif /* NOT _WINDOWS */
+#endif
 
 	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, CONFIG_SOURCE_IP, sentdval_args->server, sentdval_args->port, GET_SENDER_TIMEOUT)))
 	{
@@ -214,9 +212,7 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "answer [%s]", answer);
 				if (NULL == answer || SUCCEED != check_response(answer))
-				{
 					zabbix_log(LOG_LEVEL_WARNING, "incorrect answer from server [%s]", answer);
-				}
 				else
 					ret = SUCCEED;
 			}
@@ -231,15 +227,15 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	zbx_thread_exit(ret);
 }
 
-static void    init_config(const char* config_file)
+static void    init_config(const char *config_file)
 {
-	char*	config_source_ip_from_conf = NULL;
-	char*	zabbix_server_from_conf = NULL;
+	char	*config_source_ip_from_conf = NULL;
+	char	*zabbix_server_from_conf = NULL;
 	int	zabbix_server_port_from_conf = 0;
-	char*	zabbix_hostname_from_conf = NULL;
-	char*	c = NULL;
+	char	*zabbix_hostname_from_conf = NULL;
+	char	*c = NULL;
 
-	struct cfg_line cfg[]=
+	struct cfg_line	cfg[]=
 	{
 		/* PARAMETER	,VAR				,FUNC	,TYPE(0i,1s)	,MANDATORY	,MIN			,MAX		*/
 		{"SourceIP"	,&config_source_ip_from_conf	,0	,TYPE_STRING	,PARM_OPT	,0			,0		},
@@ -249,43 +245,42 @@ static void    init_config(const char* config_file)
 		{0}
 	};
 
-	if( config_file )
+	if (NULL != config_file)
 	{
 		parse_cfg_file(config_file, cfg);
 
 		if (NULL != config_source_ip_from_conf)
 		{
-			if (NULL == CONFIG_SOURCE_IP)	/* apply parameter only if unset */
-			{
+			if (NULL == CONFIG_SOURCE_IP)
 				CONFIG_SOURCE_IP = strdup(config_source_ip_from_conf);
-			}
+
 			zbx_free(config_source_ip_from_conf);
 		}
 
-		if( zabbix_server_from_conf )
+		if (NULL != zabbix_server_from_conf)
 		{
-			if( !ZABBIX_SERVER )
-			{ /* apply parameter only if unset */
-				if( (c = strchr(zabbix_server_from_conf, ',')) )
-				{ /* get only first server */
-					*c = '\0';
-				}
+			if (NULL == ZABBIX_SERVER)
+			{
+				if (NULL != (c = strchr(zabbix_server_from_conf, ',')))
+					*c = '\0';	/* get only first server */
+
 				ZABBIX_SERVER = strdup(zabbix_server_from_conf);
 			}
+
 			zbx_free(zabbix_server_from_conf);
 		}
 
-		if( !ZABBIX_SERVER_PORT && zabbix_server_port_from_conf )
-		{ /* apply parameter only if unset */
-			ZABBIX_SERVER_PORT = zabbix_server_port_from_conf;
+		if (0 != zabbix_server_port_from_conf)
+		{
+			if (0 == ZABBIX_SERVER_PORT)
+				ZABBIX_SERVER_PORT = zabbix_server_port_from_conf;
 		}
 
-		if( zabbix_hostname_from_conf )
+		if (NULL != zabbix_hostname_from_conf)
 		{
-			if( !ZABBIX_HOSTNAME )
-			{ /* apply parameter only if unset */
+			if (NULL == ZABBIX_HOSTNAME)
 				ZABBIX_HOSTNAME = strdup(zabbix_hostname_from_conf);
-			}
+
 			zbx_free(zabbix_hostname_from_conf);
 		}
 	}
@@ -293,12 +288,14 @@ static void    init_config(const char* config_file)
 
 static zbx_task_t parse_commandline(int argc, char **argv)
 {
-	zbx_task_t      task    = ZBX_TASK_START;
-	char    ch      = '\0';
+	zbx_task_t      task = ZBX_TASK_START;
+	char    	ch = '\0';
 
-	/* Parse the command-line. */
-	while ((ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)) != (char)EOF)
-		switch (ch) {
+	/* parse the command-line */
+	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
+	{
+		switch (ch)
+		{
 			case 'c':
 				CONFIG_FILE = strdup(zbx_optarg);
 				break;
@@ -338,7 +335,7 @@ static zbx_task_t parse_commandline(int argc, char **argv)
 				REAL_TIME = 1;
 				break;
 			case 'v':
-				if(CONFIG_LOG_LEVEL == LOG_LEVEL_WARNING)
+				if (LOG_LEVEL_WARNING == CONFIG_LOG_LEVEL)
 					CONFIG_LOG_LEVEL = LOG_LEVEL_DEBUG;
 				else
 					CONFIG_LOG_LEVEL = LOG_LEVEL_WARNING;
@@ -348,6 +345,7 @@ static zbx_task_t parse_commandline(int argc, char **argv)
 				exit(FAIL);
 				break;
 		}
+	}
 
 	if (NULL == ZABBIX_SERVER && NULL == CONFIG_FILE)
 	{

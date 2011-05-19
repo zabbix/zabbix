@@ -1,16 +1,37 @@
 <?php
 // get language translations {{{
 require_once('include/gettextwrapper.inc.php');
-require_once('include/locales/en_gb.inc.php');
 require_once('include/js.inc.php');
+require_once('include/locales.inc.php');
+
+// if we must provide language constants on language different from English
+if(isset($_GET['lang'])){
+	if(function_exists('bindtextdomain')){
+		//initializing gettext translations depending on language selected by user
+		$locales = zbx_locale_variants($_GET['lang']);
+
+		foreach($locales as $locale){
+			putenv('LC_ALL='.$locale);
+			putenv('LANG='.$locale);
+			putenv('LANGUAGE='.$locale);
+
+			if(setlocale(LC_ALL, $locale)){
+				break;
+			}
+		}
+
+		bindtextdomain('frontend', 'locale');
+		bind_textdomain_codeset('frontend', 'UTF-8');
+		textdomain('frontend');
+	}
+	// Numeric Locale to default
+	setLocale(LC_NUMERIC, array('en','en_US','en_US.UTF-8','English_United States.1252'));
+}
+
+require_once('include/locales/en_gb.inc.php');
 $translations = $TRANSLATION;
 
-if(isset($_GET['lang']) && ($_GET['lang'] != 'en_gb') && preg_match('/^[a-z]{2}_[a-z]{2}$/', $_GET['lang'])){
-	require_once('include/locales/'.$_GET['lang'].'.inc.php');
-	$translations = array_merge($translations, $TRANSLATION);
-}
 // }}} get language translations
-
 
 // available scripts 'scriptFileName' => 'path relative to js/'
 $availableJScripts = array(
