@@ -42,6 +42,7 @@ switch($itemType) {
 }
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
+		'description_visible'=>			array(T_ZBX_STR, O_OPT,  null, null,           null),
 		'type_visible'=>			array(T_ZBX_STR, O_OPT,  null, null,           null),
 		'community_visible'=>		array(T_ZBX_STR, O_OPT,  null, null,           null),
 		'securityname_visible'=>	array(T_ZBX_STR, O_OPT,  null, null,           null),
@@ -78,7 +79,8 @@ switch($itemType) {
 		'copy_mode'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0'),	null),
 
 		'itemid'=>			array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))'),
-		'description'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
+		'name'=>			array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
+		'description'=>		array(T_ZBX_STR, O_OPT,  null,	null,		'isset({save})'),
 		'key'=>				array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,		'isset({save})'),
 		'delay'=>			array(T_ZBX_INT, O_OPT,  null,  '(('.BETWEEN(1,86400).
 				'(!isset({delay_flex}) || !({delay_flex}) || is_array({delay_flex}) && !count({delay_flex}))) ||'.
@@ -93,12 +95,12 @@ switch($itemType) {
 				IN(array(-1,ITEM_TYPE_ZABBIX,ITEM_TYPE_SNMPV1,ITEM_TYPE_TRAPPER,ITEM_TYPE_SIMPLE,
 					ITEM_TYPE_SNMPV2C,ITEM_TYPE_INTERNAL,ITEM_TYPE_SNMPV3,ITEM_TYPE_ZABBIX_ACTIVE,
 					ITEM_TYPE_AGGREGATE,ITEM_TYPE_EXTERNAL,ITEM_TYPE_DB_MONITOR,
-					ITEM_TYPE_IPMI,ITEM_TYPE_SSH,ITEM_TYPE_TELNET,ITEM_TYPE_CALCULATED)),'isset({save})'),
+					ITEM_TYPE_IPMI,ITEM_TYPE_SSH,ITEM_TYPE_TELNET,ITEM_TYPE_JMX,ITEM_TYPE_CALCULATED)),'isset({save})'),
 		'trends'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	'isset({save})&&isset({value_type})&&'.IN(
 												ITEM_VALUE_TYPE_FLOAT.','.
 												ITEM_VALUE_TYPE_UINT64, 'value_type')),
 		'value_type'=>		array(T_ZBX_INT, O_OPT,  null,  IN('0,1,2,3,4'),	'isset({save})'),
-		'data_type'=>		array(T_ZBX_INT, O_OPT,  null,  IN(ITEM_DATA_TYPE_DECIMAL.','.ITEM_DATA_TYPE_OCTAL.','.ITEM_DATA_TYPE_HEXADECIMAL),
+		'data_type'=>		array(T_ZBX_INT, O_OPT,  null,  IN(ITEM_DATA_TYPE_DECIMAL.','.ITEM_DATA_TYPE_OCTAL.','.ITEM_DATA_TYPE_HEXADECIMAL.','.ITEM_DATA_TYPE_BOOLEAN),
 					'isset({save})&&(isset({value_type})&&({value_type}=='.ITEM_VALUE_TYPE_UINT64.'))'),
 		'valuemapid'=>		array(T_ZBX_INT, O_OPT,	 null,	DB_ID,		'isset({save})&&isset({value_type})&&'.IN(
 												ITEM_VALUE_TYPE_FLOAT.','.
@@ -107,10 +109,12 @@ switch($itemType) {
 											'isset({save})&&isset({type})&&({type}=='.ITEM_TYPE_SSH.')'),
 		'username'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,		'isset({save})&&isset({type})&&'.IN(
 												ITEM_TYPE_SSH.','.
-												ITEM_TYPE_TELNET, 'type')),
+												ITEM_TYPE_TELNET.','.
+												ITEM_TYPE_JMX, 'type')),
 		'password'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,		'isset({save})&&isset({type})&&'.IN(
 												ITEM_TYPE_SSH.','.
-												ITEM_TYPE_TELNET, 'type')),
+												ITEM_TYPE_TELNET.','.
+												ITEM_TYPE_JMX, 'type')),
 		'publickey'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,		'isset({save})&&isset({type})&&({type})=='.ITEM_TYPE_SSH.'&&({authtype})=='.ITEM_AUTHTYPE_PUBLICKEY),
 		'privatekey'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,		'isset({save})&&isset({type})&&({type})=='.ITEM_TYPE_SSH.'&&({authtype})=='.ITEM_AUTHTYPE_PUBLICKEY),
 		'params'=>		array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,	'isset({save})&&isset({type})&&'.IN(
@@ -118,6 +122,8 @@ switch($itemType) {
 												ITEM_TYPE_DB_MONITOR.','.
 												ITEM_TYPE_TELNET.','.
 												ITEM_TYPE_CALCULATED,'type'), $paramsFieldName),
+		'profile_link' =>       array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),'isset({save})&&{value_type}!='.ITEM_VALUE_TYPE_LOG),
+
 		//hidden fields for better gui
 		'params_script'=>	array(T_ZBX_STR, O_OPT, NULL, NULL, NULL),
 		'params_dbmonitor'=>	array(T_ZBX_STR, O_OPT, NULL, NULL, NULL),
@@ -143,9 +149,9 @@ switch($itemType) {
 		'ipmi_sensor'=>		array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,	'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_IPMI.'))', S_IPMI_SENSOR),
 
 		'trapper_hosts'=>	array(T_ZBX_STR, O_OPT,  null,  null,			'isset({save})&&isset({type})&&({type}==2)'),
-		'units'=>		array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&isset({value_type})&&'.IN('0,3','value_type')),
+		'units'=>		array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&isset({value_type})&&'.IN('0,3','value_type').'(isset({data_type})&&({data_type}!='.ITEM_DATA_TYPE_BOOLEAN.'))'),
 		'multiplier'=>		array(T_ZBX_INT, O_OPT,  null,  null,		null),
-		'delta'=>		array(T_ZBX_INT, O_OPT,  null,  IN('0,1,2'),	'isset({save})&&isset({value_type})&&'.IN('0,3','value_type')),
+		'delta'=>		array(T_ZBX_INT, O_OPT,  null,  IN('0,1,2'),	'isset({save})&&isset({value_type})&&'.IN('0,3','value_type').'(isset({data_type})&&({data_type}!='.ITEM_DATA_TYPE_BOOLEAN.'))'),
 
 		'formula'=>		array(T_ZBX_DBL, O_OPT,  null,  '({value_type}==0&&{}!=0)||({value_type}==3&&{}>0)',	'isset({save})&&isset({multiplier})&&({multiplier}==1)', S_CUSTOM_MULTIPLIER),
 		'logtimefmt'=>		array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({value_type})&&({value_type}==2))'),
@@ -177,22 +183,22 @@ switch($itemType) {
 		'filter_set' =>		array(T_ZBX_STR, O_OPT,	P_ACT,	null,	null),
 
 		'filter_group'=>			array(T_ZBX_STR, O_OPT,  null,	null,		null),
-		'filter_host'=>				array(T_ZBX_STR, O_OPT,  null,	null,		null),
+		'filter_hostname'=>			array(T_ZBX_STR, O_OPT,  null,	null,		null),
 		'filter_hostid'=>			array(T_ZBX_INT, O_OPT,  null,	DB_ID,		null),
 		'filter_application'=>		array(T_ZBX_STR, O_OPT,  null,	null,		null),
-		'filter_description'=>		array(T_ZBX_STR, O_OPT,  null,	null,		null),
+		'filter_name'=>		array(T_ZBX_STR, O_OPT,  null,	null,		null),
 		'filter_type'=>				array(T_ZBX_INT, O_OPT,  null,
 				IN(array(-1,ITEM_TYPE_ZABBIX,ITEM_TYPE_SNMPV1,ITEM_TYPE_TRAPPER,ITEM_TYPE_SIMPLE,
 				ITEM_TYPE_SNMPV2C,ITEM_TYPE_INTERNAL,ITEM_TYPE_SNMPV3,ITEM_TYPE_ZABBIX_ACTIVE,
 				ITEM_TYPE_AGGREGATE,ITEM_TYPE_EXTERNAL,ITEM_TYPE_DB_MONITOR,
-				ITEM_TYPE_IPMI,ITEM_TYPE_SSH,ITEM_TYPE_TELNET,ITEM_TYPE_CALCULATED)),null),
+				ITEM_TYPE_IPMI,ITEM_TYPE_SSH,ITEM_TYPE_TELNET,ITEM_TYPE_JMX,ITEM_TYPE_CALCULATED)),null),
 		'filter_key'=>				array(T_ZBX_STR, O_OPT,  null,  null,		null),
 		'filter_snmp_community'=>array(T_ZBX_STR, O_OPT,  null,  null,	null),
 		'filter_snmpv3_securityname'=>array(T_ZBX_STR, O_OPT,  null,  null,  null),
 		'filter_snmp_oid'=>			array(T_ZBX_STR, O_OPT,  null,  null,	null),
 		'filter_port'=>				array(T_ZBX_INT, O_OPT,  P_UNSET_EMPTY,  BETWEEN(0,65535),	null),
 		'filter_value_type'=>		array(T_ZBX_INT, O_OPT,  null,  IN('-1,0,1,2,3,4'),null),
-		'filter_data_type'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(-1,ITEM_DATA_TYPE_HEXADECIMAL),null),
+		'filter_data_type'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(-1,ITEM_DATA_TYPE_BOOLEAN),null),
 		'filter_delay'=>			array(T_ZBX_INT, O_OPT,  P_UNSET_EMPTY,  BETWEEN(0,86400),null),
 		'filter_history'=>			array(T_ZBX_INT, O_OPT,  P_UNSET_EMPTY,  BETWEEN(0,65535),null),
 		'filter_trends'=>			array(T_ZBX_INT, O_OPT,  P_UNSET_EMPTY,  BETWEEN(0,65535),null),
@@ -219,7 +225,7 @@ switch($itemType) {
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder('description', ZBX_SORT_UP);
+	validate_sort_and_sortorder('name', ZBX_SORT_UP);
 	$_REQUEST['go'] = get_request('go', 'none');
 
 // PERMISSIONS
@@ -260,17 +266,17 @@ switch($itemType) {
 
 	$hostid = get_request('hostid', 0);
 	if($hostid > 0){
-		$_REQUEST['filter_host'] = reset($hosts);
-		$_REQUEST['filter_host'] = $_REQUEST['filter_host']['host'];
+		$_REQUEST['filter_hostname'] = reset($hosts);
+		$_REQUEST['filter_hostname'] = $_REQUEST['filter_hostname']['name'];
 		$_REQUEST['filter_set'] = 1;
 	}
 
 /* FILTER */
 	if(isset($_REQUEST['filter_set'])){
 		$_REQUEST['filter_group'] = get_request('filter_group');
-		$_REQUEST['filter_host'] = get_request('filter_host');
+		$_REQUEST['filter_hostname'] = get_request('filter_hostname');
 		$_REQUEST['filter_application'] = get_request('filter_application');
-		$_REQUEST['filter_description'] = get_request('filter_description');
+		$_REQUEST['filter_name'] = get_request('filter_name');
 		$_REQUEST['filter_type'] = get_request('filter_type', -1);
 		$_REQUEST['filter_key'] = get_request('filter_key');
 		$_REQUEST['filter_snmp_community'] = get_request('filter_snmp_community');
@@ -288,9 +294,9 @@ switch($itemType) {
 		$_REQUEST['filter_ipmi_sensor'] = get_request('filter_ipmi_sensor');
 
 		CProfile::update('web.items.filter_group', $_REQUEST['filter_group'], PROFILE_TYPE_STR);
-		CProfile::update('web.items.filter_host', $_REQUEST['filter_host'], PROFILE_TYPE_STR);
+		CProfile::update('web.items.filter_hostname', $_REQUEST['filter_hostname'], PROFILE_TYPE_STR);
 		CProfile::update('web.items.filter_application', $_REQUEST['filter_application'], PROFILE_TYPE_STR);
-		CProfile::update('web.items.filter_description', $_REQUEST['filter_description'], PROFILE_TYPE_STR);
+		CProfile::update('web.items.filter_name', $_REQUEST['filter_name'], PROFILE_TYPE_STR);
 		CProfile::update('web.items.filter_type', $_REQUEST['filter_type'], PROFILE_TYPE_INT);
 		CProfile::update('web.items.filter_key', $_REQUEST['filter_key'], PROFILE_TYPE_STR);
 		CProfile::update('web.items.filter_snmp_community', $_REQUEST['filter_snmp_community'], PROFILE_TYPE_STR);
@@ -309,9 +315,9 @@ switch($itemType) {
 	}
 	else{
 		$_REQUEST['filter_group'] = CProfile::get('web.items.filter_group');
-		$_REQUEST['filter_host'] = CProfile::get('web.items.filter_host');
+		$_REQUEST['filter_hostname'] = CProfile::get('web.items.filter_hostname');
 		$_REQUEST['filter_application'] = CProfile::get('web.items.filter_application');
-		$_REQUEST['filter_description'] = CProfile::get('web.items.filter_description');
+		$_REQUEST['filter_name'] = CProfile::get('web.items.filter_name');
 		$_REQUEST['filter_type'] = CProfile::get('web.items.filter_type', -1);
 		$_REQUEST['filter_key'] = CProfile::get('web.items.filter_key');
 		$_REQUEST['filter_snmp_community'] = CProfile::get('web.items.filter_snmp_community');
@@ -329,10 +335,10 @@ switch($itemType) {
 		$_REQUEST['filter_ipmi_sensor'] = CProfile::get('web.items.filter_ipmi_sensor');
 	}
 
-	if(isset($_REQUEST['filter_host']) && !zbx_empty($_REQUEST['filter_host'])){
-		$hostid = API::Host()->getObjects(array('host' => $_REQUEST['filter_host']));
+	if(isset($_REQUEST['filter_hostname']) && !zbx_empty($_REQUEST['filter_hostname'])){
+		$hostid = API::Host()->getObjects(array('name' => $_REQUEST['filter_hostname']));
 		if(empty($hostid))
-			$hostid = API::Template()->getObjects(array('host' => $_REQUEST['filter_host']));
+			$hostid = API::Template()->getObjects(array('name' => $_REQUEST['filter_hostname']));
 
 		$hostid = reset($hostid);
 
@@ -408,6 +414,7 @@ switch($itemType) {
 		}
 
 		$item = array(
+			'name'	=> get_request('name'),
 			'description'	=> get_request('description'),
 			'key_'			=> get_request('key'),
 			'hostid'		=> get_request('form_hostid'),
@@ -442,6 +449,7 @@ switch($itemType) {
 			'ipmi_sensor'		=> get_request('ipmi_sensor'),
 			'data_type'		=> get_request('data_type'),
 			'applications' => $applications,
+			'profile_link' => get_request('profile_link'),
 		);
 
 		if(isset($_REQUEST['itemid'])){
@@ -485,13 +493,12 @@ switch($itemType) {
 
 			$host = get_host_by_hostid($item['hostid']);
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
-				S_ITEM.' ['.$item['key_'].'] ['.$_REQUEST['itemid'].'] '.S_HOST.' ['.$host['host'].'] '.S_HISTORY_CLEARED);
+				S_ITEM.' ['.$item['key_'].'] ['.$_REQUEST['itemid'].'] '.S_HOST.' ['.$host['name'].'] '.S_HISTORY_CLEARED);
 		}
 		show_messages($result, S_HISTORY_CLEARED, S_CANNOT_CLEAR_HISTORY);
 
 	}
 	else if(isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_REQUEST['group_itemid'])){
-
 		$delay_flex = get_request('delay_flex');
 		if(!is_null($delay_flex)){
 			$db_delay_flex = '';
@@ -511,6 +518,7 @@ switch($itemType) {
 
 		$item = array(
 			'interfaceid'	=> get_request('interfaceid'),
+			'description'	=> get_request('description'),
 			'delay'			=> get_request('delay'),
 			'history'		=> get_request('history'),
 			'status'		=> get_request('status'),
@@ -556,9 +564,10 @@ switch($itemType) {
 		show_messages($result, S_ITEMS_UPDATED);
 		unset($_REQUEST['group_itemid'], $_REQUEST['massupdate'], $_REQUEST['update'], $_REQUEST['form']);
 	}
+	// if button "Do" is pressed
 	else if(isset($_REQUEST['register'])){
-		if($_REQUEST['register']=='do'){
-			$item = array(
+		// getting data about how item should look after update or creation
+		$item = array(
 				'description'	=> get_request('description'),
 				'key_'			=> get_request('key'),
 				'hostid'		=> get_request('hostid'),
@@ -566,11 +575,11 @@ switch($itemType) {
 				'history'		=> get_request('history'),
 				'status'		=> get_request('status'),
 				'type'			=> get_request('type'),
-				'snmp_community'	=> get_request('snmp_community'),
+				'snmp_community'=> get_request('snmp_community'),
 				'snmp_oid'		=> get_request('snmp_oid'),
 				'value_type'	=> get_request('value_type'),
 				'trapper_hosts'	=> get_request('trapper_hosts'),
-				'port'		=> get_request('port'),
+				'snmp_port'		=> get_request('snmp_port'),
 				'units'			=> get_request('units'),
 				'multiplier'	=> get_request('multiplier'),
 				'delta'			=> get_request('delta'),
@@ -582,7 +591,6 @@ switch($itemType) {
 				'trends'			=> get_request('trends'),
 				'logtimefmt'		=> get_request('logtimefmt'),
 				'valuemapid'		=> get_request('valuemapid'),
-//					'delay_flex'		=> $db_delay_flex,
 				'authtype'		=> get_request('authtype'),
 				'username'		=> get_request('username'),
 				'password'		=> get_request('password'),
@@ -590,74 +598,52 @@ switch($itemType) {
 				'privatekey'		=> get_request('privatekey'),
 				'params'			=> get_request('params'),
 				'ipmi_sensor'		=> get_request('ipmi_sensor'),
-//				'applications'		=> $applications
 				'data_type'		=> get_request('data_type'),
+				'applications'  => get_request('applications',array())
 			);
+		$delay_flex = get_request('delay_flex',array());
+		$db_delay_flex = '';
+		foreach($delay_flex as $val){
+			$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
+		}
+		$db_delay_flex = trim($db_delay_flex, ';');
+		$item['delay_flex'] = $db_delay_flex;
 
-			if($_REQUEST['action']=='add to group'){
-				$applications = get_request('applications',array());
-				$delay_flex = get_request('delay_flex',array());
-				$db_delay_flex = '';
-
-				foreach($delay_flex as $val){
-					$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
-				}
-
-				$db_delay_flex = trim($db_delay_flex,';');
-
-				$item['delay_flex'] = $db_delay_flex;
-				$item['applications'] = $applications;
-
+		// what exactly user wants us to do?
+		switch($_REQUEST['action']){
+			// create item on all hosts inside selected group
+			case 'add to group':
 				DBstart();
-				$itemid=add_item_to_group($_REQUEST['add_groupid'],$item);
-
-				$result = DBend($itemid);
+				$result = add_item_to_group($_REQUEST['add_groupid'], $item);
+				$result = DBend($result);
 				show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 				if($result){
 					unset($_REQUEST['form']);
 					unset($_REQUEST['itemid']);
-					unset($itemid);
 				}
-			}
-
-			if($_REQUEST['action']=='update in group'){
-
-				$applications = get_request('applications',array());
-				$delay_flex = get_request('delay_flex',array());
-				$db_delay_flex = '';
-
-				foreach($delay_flex as $val){
-					$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
-				}
-
-				$db_delay_flex = trim($db_delay_flex,';');
-
-				$item['delay_flex'] = $db_delay_flex;
-				$item['applications'] = $applications;
-
+			break;
+			// update item on all hosts inside selected group
+			case 'update in group':
 				DBstart();
-					$result = update_item_in_group($_REQUEST['add_groupid'],$_REQUEST['itemid'],$item);
+				$result = update_item_in_group($_REQUEST['add_groupid'], $_REQUEST['itemid'], $item);
 				$result = DBend($result);
-
 				show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 				if($result){
 					unset($_REQUEST['form']);
 					unset($_REQUEST['itemid']);
 				}
-			}
-
-			if($_REQUEST['action']=='delete FROM group'){
-
+			break;
+			// delete item from all hosts inside selected group
+			case 'delete from group':
 				DBstart();
-					$result = delete_item_from_group($_REQUEST['add_groupid'],$_REQUEST['itemid']);
+				$result = delete_item_from_group($_REQUEST['add_groupid'], $_REQUEST['itemid']);
 				$result = DBend($result);
-
 				show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
 				if($result){
 					unset($_REQUEST['form']);
 					unset($_REQUEST['itemid']);
 				}
-			}
+			break;
 		}
 	}
 // ----- GO -----
@@ -729,7 +715,7 @@ switch($itemType) {
 			if($cur_result){
 				$host = get_host_by_hostid($item['hostid']);
 				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
-					S_ITEM.' ['.$item['key_'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].'] '.S_HISTORY_CLEARED);
+					S_ITEM.' ['.$item['key_'].'] ['.$id.'] '.S_HOST.' ['.$host['name'].'] '.S_HISTORY_CLEARED);
 			}
 		}
 		$go_result = DBend($go_result);
@@ -743,7 +729,7 @@ switch($itemType) {
 
 		$group_itemid = $_REQUEST['group_itemid'];
 
-		$sql = 'SELECT h.host, i.itemid, i.description, i.key_, i.templateid, i.type'.
+		$sql = 'SELECT h.name AS hostname,i.itemid,i.name,i.key_,i.templateid,i.type'.
 				' FROM items i, hosts h '.
 				' WHERE '.DBcondition('i.itemid',$group_itemid).
 					' AND h.hostid=i.hostid'.
@@ -752,16 +738,16 @@ switch($itemType) {
 		while($item = DBfetch($db_items)) {
 			if($item['templateid'] != ITEM_TYPE_ZABBIX) {
 				unset($group_itemid[$item['itemid']]);
-				error(S_ITEM.SPACE."'".$item['host'].':'.item_description($item)."'".SPACE.S_CANNOT_DELETE_ITEM.SPACE.'('.S_TEMPLATED_ITEM.')');
+				error(S_ITEM.SPACE."'".$item['hostname'].':'.itemName($item)."'".SPACE.S_CANNOT_DELETE_ITEM.SPACE.'('.S_TEMPLATED_ITEM.')');
 				continue;
 			}
 			else if($item['type'] == ITEM_TYPE_HTTPTEST) {
 				unset($group_itemid[$item['itemid']]);
-				error(S_ITEM.SPACE."'".$item['host'].':'.item_description($item)."'".SPACE.S_CANNOT_DELETE_ITEM.SPACE.'('.S_WEB_ITEM.')');
+				error(S_ITEM.SPACE."'".$item['hostname'].':'.itemName($item)."'".SPACE.S_CANNOT_DELETE_ITEM.SPACE.'('.S_WEB_ITEM.')');
 				continue;
 			}
 
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$item['itemid'].'] '.S_HOST.' ['.$item['host'].']');
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$item['itemid'].'] '.S_HOST.' ['.$item['hostname'].']');
 		}
 
 		$go_result &= !empty($group_itemid);
@@ -795,7 +781,7 @@ switch($itemType) {
 		$items_wdgt->addItem(insert_item_form());
 	}
 	else if((($_REQUEST['go'] == 'massupdate') || isset($_REQUEST['massupdate'])) && isset($_REQUEST['group_itemid'])){
-		$items_wdgt->addItem(insert_mass_update_item_form('group_itemid'));
+		$items_wdgt->addItem(insert_mass_update_item_form());
 	}
 	else if(($_REQUEST['go'] == 'copy_to') && isset($_REQUEST['group_itemid'])){
 		$items_wdgt->addItem(insert_copy_elements_to_forms('group_itemid'));
@@ -821,7 +807,7 @@ switch($itemType) {
 // ----------------
 
 // Items Filter{
-		$sortfield = getPageSortField('description');
+		$sortfield = getPageSortField('name');
 		$sortorder = getPageSortOrder();
 		$options = array(
 			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
@@ -829,8 +815,8 @@ switch($itemType) {
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1,
 			'selectHosts' => API_OUTPUT_EXTEND,
-			'select_triggers' => API_OUTPUT_EXTEND,
-			'select_applications' => API_OUTPUT_EXTEND,
+			'selectTriggers' => API_OUTPUT_REFER,
+			'selectApplications' => API_OUTPUT_EXTEND,
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
@@ -844,14 +830,14 @@ switch($itemType) {
 		if(isset($_REQUEST['filter_group']) && !zbx_empty($_REQUEST['filter_group']))
 			$options['group'] = $_REQUEST['filter_group'];
 
-		if(isset($_REQUEST['filter_host']) && !zbx_empty($_REQUEST['filter_host']))
-			$options['host'] = $_REQUEST['filter_host'];
+		if(isset($_REQUEST['filter_hostname']) && !zbx_empty($_REQUEST['filter_hostname']))
+			$options['name'] = $_REQUEST['filter_hostname'];
 
 		if(isset($_REQUEST['filter_application']) && !zbx_empty($_REQUEST['filter_application']))
 			$options['application'] = $_REQUEST['filter_application'];
 
-		if(isset($_REQUEST['filter_description']) && !zbx_empty($_REQUEST['filter_description']))
-			$options['search']['description'] = $_REQUEST['filter_description'];
+		if(isset($_REQUEST['filter_name']) && !zbx_empty($_REQUEST['filter_name']))
+			$options['search']['name'] = $_REQUEST['filter_name'];
 
 		if(isset($_REQUEST['filter_type']) && !zbx_empty($_REQUEST['filter_type']) && ($_REQUEST['filter_type'] != -1))
 			$options['filter']['type'] = $_REQUEST['filter_type'];
@@ -924,7 +910,7 @@ switch($itemType) {
 			new CCheckBox('all_items',null,"checkAll('".$form->GetName()."','all_items','group_itemid');"),
 			S_WIZARD,
 			$show_host?S_HOST:null,
-			make_sorting_header(S_DESCRIPTION,'description'),
+			make_sorting_header(_('Name'),'name'),
 			S_TRIGGERS,
 			make_sorting_header(S_KEY,'key_'),
 			make_sorting_header(S_INTERVAL,'delay'),
@@ -1005,11 +991,27 @@ switch($itemType) {
 		$paging = getPagingLine($items);
 //---------
 
+		$itemTriggerIds = array();
+		foreach($items as $num => $item)
+			$itemTriggerIds = array_merge($itemTriggerIds, zbx_objectValues($item['triggers'], 'triggerid'));
+
+		$itemTriggers = API::Trigger()->get(array(
+			'triggerids' => $itemTriggerIds,
+			'expandDescription' => true,
+			'output' => API_OUTPUT_EXTEND,
+			'selectHosts' => array('hostid','name','host'),
+			'selectFunctions' => API_OUTPUT_EXTEND,
+			'selectItems' => API_OUTPUT_EXTEND,
+			'preservekeys' => true
+		));
+
+		$trigRealHosts = getParentHostsByTriggers($itemTriggers);
+
 		foreach($items as $inum => $item){
 
 			if($show_host){
 				$host = reset($item['hosts']);
-				$host = $host['host'];
+				$host = $host['name'];
 			}
 			else{
 				$host = null;
@@ -1019,18 +1021,18 @@ switch($itemType) {
 			if($item['templateid']){
 				$template_host = get_realhost_by_itemid($item['templateid']);
 
-				$description[] = new CLink($template_host['host'],'?hostid='.$template_host['hostid'], 'unknown');
+				$description[] = new CLink($template_host['name'],'?hostid='.$template_host['hostid'], 'unknown');
 				$description[] = ':';
 			}
-			$item['description_expanded'] = item_description($item);
+			$item['name_expanded'] = itemName($item);
 
 			if(!empty($item['discoveryRule'])){
-				$description[] = new CLink($item['discoveryRule']['description'], 'disc_prototypes.php?parent_discoveryid='.
+				$description[] = new CLink($item['discoveryRule']['name'], 'disc_prototypes.php?parent_discoveryid='.
 					$item['discoveryRule']['itemid'], 'gold');
-				$description[] = ':'.$item['description_expanded'];
+				$description[] = ':'.$item['name_expanded'];
 			}
 			else{
-				$description[] = new CLink($item['description_expanded'], '?form=update&itemid='.$item['itemid']);
+				$description[] = new CLink($item['name_expanded'], '?form=update&itemid='.$item['itemid']);
 			}
 
 			$status = new CCol(new CLink(item_status2str($item['status']), '?group_itemid='.$item['itemid'].'&go='.
@@ -1065,23 +1067,33 @@ switch($itemType) {
 			));
 
 // TRIGGERS INFO
-			foreach($item['triggers'] as $tnum => $trigger){
+			foreach($item['triggers'] as $tnum => &$trigger){
 				$triggerid = $trigger['triggerid'];
-				$tr_description = array();
+				$trigger = $itemTriggers[$triggerid];
 
+				$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
+				$trigger['items'] = zbx_toHash($trigger['items'], 'itemid');
+				$trigger['functions'] = zbx_toHash($trigger['functions'], 'functionid');
+
+				$tr_description = array();
 				if($trigger['templateid'] > 0){
-					$real_hosts = get_realhosts_by_triggerid($triggerid);
-					$real_host = DBfetch($real_hosts);
-					$tr_description[] = new CLink($real_host['host'], 'triggers.php?&hostid='.$real_host['hostid'], 'unknown');
-					$tr_description[] = ':';
+					if(!isset($trigRealHosts[$triggerid])){
+						$tr_description[] = new CSpan('HOST','unknown');
+						$tr_description[] = ':';
+					}
+					else{
+						$real_hosts = $trigRealHosts[$triggerid];
+						$real_host = reset($real_hosts);
+						$tr_description[] = new CLink($real_host['name'], 'triggers.php?&hostid='.$real_host['hostid'], 'unknown');
+						$tr_description[] = ':';
+					}
 				}
 
-				$trigger['description_expanded'] = expand_trigger_description($triggerid);
 				if($trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED){
-					$tr_description[] = new CSpan($trigger['description_expanded']);
+					$tr_description[] = new CSpan($trigger['description']);
 				}
 				else{
-					$tr_description[] = new CLink($trigger['description_expanded'], 'triggers.php?form=update&triggerid='.$triggerid);
+					$tr_description[] = new CLink($trigger['description'], 'triggers.php?form=update&triggerid='.$triggerid);
 				}
 
 				if($trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN) $trigger['error'] = '';
@@ -1096,12 +1108,13 @@ switch($itemType) {
 				$trigger_hint->addRow(array(
 					getSeverityCell($trigger['priority']),
 					$tr_description,
-					explode_exp($trigger['expression'], 1),
+					triggerExpression($trigger,1),
 					$tstatus,
 				));
 
 				$item['triggers'][$tnum] = $trigger;
 			}
+			unset($trigger);
 
 			if(!empty($item['triggers'])){
 				$trigger_info = new CSpan(S_TRIGGERS,'link_menu');
@@ -1115,14 +1128,17 @@ switch($itemType) {
 				$trigger_info = SPACE;
 			}
 //-------
-			//if item type is 'Log' we must show log menu
+// if item type is 'Log' we must show log menu
 			if(in_array($item['value_type'],array(ITEM_VALUE_TYPE_LOG,ITEM_VALUE_TYPE_STR,ITEM_VALUE_TYPE_TEXT))){
 
 				$triggers_flag = false;
 				$triggers="Array('".S_EDIT_TRIGGER."',null,null,{'outer' : 'pum_o_submenu','inner' : ['pum_i_submenu']}\n";
 
 				foreach($item['triggers'] as $num => $trigger){
-					$triggers .= ',["'.$trigger['description_expanded'].'",'.
+					foreach($trigger['functions'] as $fnum => $function)
+						if(!str_in_array($function['function'], array('regexp','iregexp'))) continue 2;
+
+					$triggers .= ',["'.$trigger['description'].'",'.
 										zbx_jsvalue("javascript: openWinCentered('tr_logform.php?sform=1&itemid=".$item['itemid'].
 																"&triggerid=".$trigger['triggerid'].
 																"','TriggerLog',760,540,".
@@ -1139,7 +1155,7 @@ switch($itemType) {
 
 				$menuicon = new CIcon(S_MENU,'iconmenu_b',
 						'call_triggerlog_menu(event, '.zbx_jsvalue($item['itemid']).','.
-						zbx_jsvalue($item['description_expanded']).','.$triggers.');');
+						zbx_jsvalue($item['name_expanded']).','.$triggers.');');
 			}
 			else{
 				$menuicon = SPACE;

@@ -28,6 +28,7 @@ class zbxXML{
 				'host' 				=> 'name'
 			),
 			'elements' => array(
+				'name'				=> '',
 				'proxy_hostid'		=> '',
 				'useip'				=> '',
 				'dns'				=> '',
@@ -143,7 +144,7 @@ class zbxXML{
 				'value_type'		=> ''
 			),
 			'elements' => array(
-				'description'		=> '',
+				'name'		=> 'description',
 				'ipmi_sensor'		=> '',
 				'delay'				=> '',
 				'history'			=> '',
@@ -157,17 +158,17 @@ class zbxXML{
 				'lastlogsize'		=> '',
 				'logtimefmt'		=> '',
 				'delay_flex'		=> '',
-				'authtype'		=> '',
-				'username'		=> '',
-				'password'		=> '',
-				'publickey'		=> '',
+				'authtype'			=> '',
+				'username'			=> '',
+				'password'			=> '',
+				'publickey'			=> '',
 				'privatekey'		=> '',
 				'params'			=> '',
 				'trapper_hosts'		=> '',
 				'snmp_community'	=> '',
 				'snmp_oid'			=> '',
-				'port'			=> '',
-				'snmp_port' => '',
+				'port'				=> '',
+				'snmp_port'			=> '',
 				'snmpv3_securityname'	=> '',
 				'snmpv3_securitylevel'	=> '',
 				'snmpv3_authpassphrase'	=> '',
@@ -223,6 +224,55 @@ class zbxXML{
 			)
 		)
 	);
+
+	protected static function mapProfileName($name){
+		$map = array(
+			'devicetype' => 'type',
+			'serialno' => 'serialno_a',
+			'macaddress' => 'macaddress_a',
+			'hardware' => 'hardware_full',
+			'software' => 'software_full',
+			'device_type' => 'type_full',
+			'device_alias' => 'alias',
+			'device_os' => 'os_full',
+			'device_os_short' => 'os_short',
+			'device_serial' => 'serialno_b',
+			'device_tag' => 'asset_tag',
+			'ip_macaddress' => 'macaddress_b',
+			'device_hardware' => 'hardware',
+			'device_software' => 'software',
+			'device_app_01' => 'software_app_a',
+			'device_app_02' => 'software_app_b',
+			'device_app_03' => 'software_app_c',
+			'device_app_04' => 'software_app_d',
+			'device_app_05' => 'software_app_e',
+			'device_chassis' => 'chassis',
+			'device_model' => 'model',
+			'device_hw_arch' => 'hw_arch',
+			'device_vendor' => 'vendor',
+			'device_contract' => 'contract_number',
+			'device_who' => 'installer_name',
+			'device_status' => 'deployment_status',
+			'device_url_1' => 'url_a',
+			'device_url_2' => 'url_b',
+			'device_url_3' => 'url_c',
+			'device_networks' => 'host_networks',
+			'ip_subnet_mask' => 'host_netmask',
+			'ip_router' => 'host_router',
+			'oob_subnet_mask' => 'oob_netmask',
+			'date_hw_buy' => 'date_hw_purchase',
+			'site_street_1' => 'site_address_a',
+			'site_street_2' => 'site_address_b',
+			'site_street_3' => 'site_address_c',
+			'poc_1_phone_1' => 'poc_1_phone_a',
+			'poc_1_phone_2' => 'poc_1_phone_b',
+			'poc_2_phone_1' => 'poc_2_phone_a',
+			'poc_2_phone_2' => 'poc_2_phone_b',
+			'device_notes' => 'notes',
+		);
+
+		return isset($map[$name]) ? $map[$name] : $name;
+	}
 
 	protected static function createDOMDocument(){
 		$doc = new DOMDocument('1.0', 'UTF-8');
@@ -432,7 +482,7 @@ class zbxXML{
 				unset($screen['screenid']);
 				$exists = API::Screen()->exists(array('name' => $screen['name']));
 
-				if($exists && isset($rules['screens']['exist'])){
+				if($exists && isset($rules['screen']['exist'])){
 					$db_screens = API::Screen()->get(array('filter' => array('name' => $screen['name'])));
 					if(empty($db_screens)) throw new Exception(S_NO_PERMISSIONS_FOR_SCREEN.' "'.$screen['name'].'" import');
 
@@ -440,7 +490,7 @@ class zbxXML{
 
 					$screen['screenid'] = $db_screen['screenid'];
 				}
-				else if($exists || !isset($rules['screens']['missed'])){
+				else if($exists || !isset($rules['screen']['missed'])){
 					info('Screen ['.$screen['name'].'] skipped - user rule');
 					unset($importScreens[$mnum]);
 					continue; // break if not update exist
@@ -588,6 +638,8 @@ class zbxXML{
 							$img = reset($imgs);
 
 							$image['imageid'] = $img['imageid'];
+
+							// image will be decoded in class.image.php
 							$image['image'] = $image['encodedImage'];
 							unset($image['encodedImage']);
 
@@ -621,7 +673,6 @@ class zbxXML{
 
 
 			$importMaps = $importMaps['zabbix_export']['sysmaps'];
-			$sysmaps = array();
 			foreach($importMaps as $mnum => &$sysmap){
 				unset($sysmap['sysmapid']);
 				$exists = API::Map()->exists(array('name' => $sysmap['name']));
@@ -654,10 +705,17 @@ class zbxXML{
 					$sysmap['backgroundid'] = 0;
 				}
 
-				if(!isset($sysmap['selements'])) $sysmap['selements'] = array();
-				if(!isset($sysmap['links'])) $sysmap['links'] = array();
+				if(!isset($sysmap['selements']))
+					$sysmap['selements'] = array();
+				else
+					$sysmap['selements'] = array_values($sysmap['selements']);
 
-				foreach($sysmap['selements'] as $snum => &$selement){
+				if(!isset($sysmap['links']))
+					$sysmap['links'] = array();
+				else
+					$sysmap['links'] = array_values($sysmap['links']);
+
+				foreach($sysmap['selements'] as &$selement){
 					$nodeCaption = isset($selement['elementid']['node'])?$selement['elementid']['node'].':':'';
 
 					if(!isset($selement['elementid'])) $selement['elementid'] = 0;
@@ -704,7 +762,6 @@ class zbxXML{
 						break;
 						case SYSMAP_ELEMENT_TYPE_IMAGE:
 						default:
-						break;
 					}
 
 					$icons = array('iconid_off','iconid_on','iconid_disabled','iconid_maintenance');
@@ -728,10 +785,9 @@ class zbxXML{
 					if(!isset($link['linktriggers'])) continue;
 
 					foreach($link['linktriggers'] as $ltnum => &$linktrigger){
-						$nodeCaption = isset($linktrigger['triggerid']['node'])?$linktrigger['triggerid']['node'].':':'';
-
 						$db_triggers = API::Trigger()->getObjects($linktrigger['triggerid']);
 						if(empty($db_triggers)){
+							$nodeCaption = isset($linktrigger['triggerid']['node'])?$linktrigger['triggerid']['node'].':':'';
 							$error = S_CANNOT_FIND_TRIGGER.' "'.$nodeCaption.$linktrigger['triggerid']['host'].':'.$linktrigger['triggerid']['description'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
 							throw new Exception($error);
 						}
@@ -742,69 +798,28 @@ class zbxXML{
 					unset($linktrigger);
 				}
 				unset($link);
-
-				$sysmaps[] = $sysmap;
 			}
 			unset($sysmap);
 
-			$importMaps = $sysmaps;
-			foreach($importMaps as $mnum => $importMap){
-				$sysmap = $importMap;
+
+			foreach($importMaps as $importMap){
 				if(isset($importMap['sysmapid'])){
 					$result = API::Map()->update($importMap);
-					$sysmapids = $result['sysmapids'];
-
-// Deleting all selements (with links)
-					$db_selementids = array();
-					$res = DBselect('SELECT selementid FROM sysmaps_elements WHERE sysmapid='.$sysmap['sysmapid']);
-					while($db_selement = DBfetch($res)){
-						$db_selementids[$db_selement['selementid']] = $db_selement['selementid'];
+					if($result === false){
+						throw new Exception(_s('Cannot update map "%s".', $importMap['name']));
 					}
-					delete_sysmaps_element($db_selementids);
-//----
+					else{
+						info(_s('Map "%s" updated.', $importMap['name']));
+					}
 				}
 				else{
 					$result = API::Map()->create($importMap);
-					$sysmapids = $result['sysmapids'];
-					$sysmap['sysmapid'] = reset($sysmapids);
-				}
-
-				$selements = $importMap['selements'];
-				$links = $importMap['links'];
-
-				foreach($selements as $id => $selement){
-					if(!isset($selement['elementid']) || ($selement['elementid'] == 0)){
-						$selement['elementid'] = 0;
-						$selement['elementtype'] = SYSMAP_ELEMENT_TYPE_IMAGE;
+					if($result === false){
+						throw new Exception(_s('Cannot create map "%s".', $importMap['name']));
 					}
-
-					if(!isset($selement['iconid_off']) || ($selement['iconid_off'] == 0)){
-						throw new Exception(S_NO_ICON_FOR_MAP_ELEMENT.' '.$sysmap['name'].':'.$selement['label']);
+					else{
+						info(_s('Map "%s" create.', $importMap['name']));
 					}
-
-					$selement['sysmapid'] = $sysmap['sysmapid'];
-					$selementids = API::Map()->addElements($selement);
-					$selementid = reset($selementids);
-
-					foreach($links as $id => &$link){
-						if(bccomp($link['selementid1'],$selement['selementid']) == 0) $links[$id]['selementid1'] = $selementid;
-						else if(bccomp($link['selementid2'],$selement['selementid']) == 0) $links[$id]['selementid2'] = $selementid;
-					}
-					unset($link);
-				}
-
-				foreach($links as $id => $link){
-					if(!isset($link['linktriggers'])) $link['linktriggers'] = array();
-					$link['sysmapid'] = $sysmap['sysmapid'];
-
-					$result = API::Map()->addLinks($link);
-				}
-
-				if(isset($importMap['sysmapid'])){
-					info(S_MAP.' ['.$sysmap['name'].'] '.S_UPDATED_SMALL);
-				}
-				else{
-					info(S_MAP.' ['.$sysmap['name'].'] '.S_ADDED_SMALL);
 				}
 			}
 
@@ -820,17 +835,19 @@ class zbxXML{
 		$triggers_for_dependencies = array();
 
 		try{
-
 			if(isset($rules['host']['exist']) || isset($rules['host']['missed'])){
 				$xpath = new DOMXPath(self::$xml);
 
 				$hosts = $xpath->query('hosts/host');
 
-				foreach($hosts as $hnum => $host){
+				foreach($hosts as $host){
 					$host_db = self::mapXML2arr($host, XML_TAG_HOST);
 
 					if(!isset($host_db['status'])) $host_db['status'] = HOST_STATUS_TEMPLATE;
-					$current_host = ($host_db['status'] == HOST_STATUS_TEMPLATE) ? API::Template()->exists($host_db) : API::Host()->exists($host_db);
+					$current_host = ($host_db['status'] == HOST_STATUS_TEMPLATE)
+							? API::Template()->exists($host_db)
+							: API::Host()->exists($host_db);
+
 					if(!$current_host && !isset($rules['host']['missed'])){
 						info('Host ['.$host_db['host'].'] skipped - user rule');
 						continue; // break if update nonexist
@@ -840,8 +857,12 @@ class zbxXML{
 						continue; // break if not update exist
 					}
 
+					// there were no host visible names in 1.8
+					if(!isset($host_db['name'])){
+						$host_db['name'] = $host_db['host'];
+					}
 
-					// host will have no interfaces - we will be creating them seperatly
+					// host will have no interfaces - we will be creating them separately
 					$host_db['interfaces'] = null;
 
 					// it is possible, that data is imported from 1.8, where there was only one network interface per host
@@ -1058,20 +1079,40 @@ class zbxXML{
 
 
 // HOST PROFILES {{{
-					$profile_node = $xpath->query('host_profile/*', $host);
-					if($profile_node->length > 0){
-						$host_db['profile'] = array();
-						foreach($profile_node as $num => $field){
-							$host_db['profile'][$field->nodeName] = $field->nodeValue;
+					if($old_version_input){
+						$profile_node = $xpath->query('host_profile/*', $host);
+						if($profile_node->length > 0){
+							$host_db['profile'] = array();
+							foreach($profile_node as $field){
+								$newProfileName = self::mapProfileName($field->nodeName);
+								if(isset($host_db['profile'][$newProfileName]) && $field->nodeValue !== ''){
+									$host_db['profile'][$newProfileName] .= "\n";
+									$host_db['profile'][$newProfileName] .= $field->nodeValue;
+								}
+								else{
+									$host_db['profile'][$newProfileName] = $field->nodeValue;
+								}
+							}
 						}
-					}
 
-					$profile_ext_node = $xpath->query('host_profiles_ext/*', $host);
-					if($profile_ext_node->length > 0){
-						$host_db['extendedProfile'] = array();
-						foreach($profile_ext_node as $num => $field){
-							$host_db['extendedProfile'][$field->nodeName] = $field->nodeValue;
+						$profile_ext_node = $xpath->query('host_profiles_ext/*', $host);
+						if($profile_ext_node->length > 0){
+							if(!isset($host_db['profile'])){
+								$host_db['profile'] = array();
+							}
+							foreach($profile_ext_node as $field){
+								$newProfileName = self::mapProfileName($field->nodeName);
+								if(isset($host_db['profile'][$newProfileName]) && $field->nodeValue !== ''){
+									$host_db['profile'][$newProfileName] .= "\n";
+									$host_db['profile'][$newProfileName] .= $field->nodeValue;
+								}
+								else{
+									$host_db['profile'][$newProfileName] = $field->nodeValue;
+								}
+							}
 						}
+
+						$host_db['profile_mode'] = isset($host_db['profile']) ? HOST_PROFILE_MANUAL : HOST_PROFILE_DISABLED;
 					}
 // }}} HOST PROFILES
 
@@ -1164,6 +1205,7 @@ class zbxXML{
 						foreach($items as $inum => $item){
 							$item_db = self::mapXML2arr($item, XML_TAG_ITEM);
 							$item_db['hostid'] = $current_hostid;
+							$item_db['profile_link'] = 0;
 
 							// item needs interfaces
 							if($old_version_input){
@@ -1326,7 +1368,9 @@ class zbxXML{
 						foreach($triggers as $trigger){
 							$trigger_db = self::mapXML2arr($trigger, XML_TAG_TRIGGER);
 
-							$trigger_db['expression'] = str_replace('{{HOSTNAME}:', '{'.$host_db['host'].':', $trigger_db['expression']);
+							// {HOSTNAME} is here for backward compatibility
+							$trigger_db['expression'] = str_replace('{{HOSTNAME}:', '{'.$host_db['name'].':', $trigger_db['expression']);
+							$trigger_db['expression'] = str_replace('{{HOST.HOST}:', '{'.$host_db['host'].':', $trigger_db['expression']);
 							$trigger_db['hostid'] = $current_hostid;
 
 							if($current_trigger = API::Trigger()->exists($trigger_db)){
@@ -1341,7 +1385,7 @@ class zbxXML{
 
 								$current_trigger = false;
 								foreach($ctriggers as $tnum => $ct){
-									$tmp_exp = explode_exp($ct['expression'], false);
+									$tmp_exp = explode_exp($ct['expression']);
 									if(strcmp($trigger_db['expression'], $tmp_exp) == 0){
 										$current_trigger = $ct;
 										break;
@@ -1419,7 +1463,9 @@ class zbxXML{
 
 								$data = explode(':', $gitem_db['host_key_']);
 								$gitem_host = array_shift($data);
+								// {HOSTNAME} is here for backward compatibility
 								$gitem_db['host'] = ($gitem_host == '{HOSTNAME}') ? $host_db['host'] : $gitem_host;
+								$gitem_db['host'] = ($gitem_host == '{HOST.HOST}') ? $host_db['host'] : $gitem_host;
 								$gitem_db['key_'] = implode(':', $data);
 
 								if($current_item = API::Item()->exists($gitem_db)){
@@ -1499,7 +1545,7 @@ class zbxXML{
 								}
 
 								if(!$item = get_item_by_key($item_data[1], $item_data[0])){
-									throw new APIException(1, 'Missed item ['.$graph_db['ymin_item_key'].'] for host ['.$host_db['host'].']');
+									throw new APIException(1, 'Missing item ['.$graph_db['ymin_item_key'].'] for host ['.$host_db['host'].']');
 								}
 
 								$graph_db['ymin_itemid'] = $item['itemid'];
@@ -1512,7 +1558,7 @@ class zbxXML{
 								}
 
 								if(!$item = get_item_by_key($item_data[1], $item_data[0])){
-									throw new APIException(1, 'Missed item ['.$graph_db['ymax_item_key'].'] for host ['.$host_db['host'].']');
+									throw new APIException(1, 'Missing item ['.$graph_db['ymax_item_key'].'] for host ['.$host_db['host'].']');
 								}
 
 								$graph_db['ymax_itemid'] = $item['itemid'];
@@ -1845,7 +1891,6 @@ class zbxXML{
 
 		return self::outputXML($root);
 	}
-
 
 }
 

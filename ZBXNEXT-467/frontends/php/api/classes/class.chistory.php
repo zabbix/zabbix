@@ -24,7 +24,7 @@
  * @package API
  */
 /**
- * Class containing methods for operations with HIstory of Items
+ * Class containing methods for operations with History of Items
  *
  */
 class CHistory extends CZBXAPI{
@@ -65,11 +65,11 @@ class CHistory extends CZBXAPI{
 			'nopermissions'			=> null,
 
 // filter
-			'filter'					=> null,
-			'search'					=> null,
+			'filter'				=> null,
+			'search'				=> null,
 			'searchByAny'			=> null,
-			'startSearch'				=> null,
-			'excludeSearch'				=> null,
+			'startSearch'			=> null,
+			'excludeSearch'			=> null,
 
 			'time_from'				=> null,
 			'time_till'				=> null,

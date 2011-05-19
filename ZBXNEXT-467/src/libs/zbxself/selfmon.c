@@ -52,9 +52,10 @@ static ZBX_MUTEX	sm_lock;
 
 extern char	*CONFIG_FILE;
 extern int	CONFIG_POLLER_FORKS;
-extern int	CONFIG_PINGER_FORKS;
-extern int	CONFIG_IPMIPOLLER_FORKS;
 extern int	CONFIG_UNREACHABLE_POLLER_FORKS;
+extern int	CONFIG_IPMIPOLLER_FORKS;
+extern int	CONFIG_PINGER_FORKS;
+extern int	CONFIG_JAVAPOLLER_FORKS;
 extern int	CONFIG_HTTPPOLLER_FORKS;
 extern int	CONFIG_TRAPPER_FORKS;
 extern int	CONFIG_PROXYPOLLER_FORKS;
@@ -98,6 +99,8 @@ int	get_process_type_forks(unsigned char process_type)
 			return CONFIG_IPMIPOLLER_FORKS;
 		case ZBX_PROCESS_TYPE_PINGER:
 			return CONFIG_PINGER_FORKS;
+		case ZBX_PROCESS_TYPE_JAVAPOLLER:
+			return CONFIG_JAVAPOLLER_FORKS;
 		case ZBX_PROCESS_TYPE_HTTPPOLLER:
 			return CONFIG_HTTPPOLLER_FORKS;
 		case ZBX_PROCESS_TYPE_TRAPPER:
@@ -161,6 +164,8 @@ const char	*get_process_type_string(unsigned char process_type)
 			return "ipmi poller";
 		case ZBX_PROCESS_TYPE_PINGER:
 			return "icmp pinger";
+		case ZBX_PROCESS_TYPE_JAVAPOLLER:
+			return "java poller";
 		case ZBX_PROCESS_TYPE_HTTPPOLLER:
 			return "http poller";
 		case ZBX_PROCESS_TYPE_TRAPPER:
@@ -231,30 +236,30 @@ void	init_selfmon_collector()
 		sz_total += sz_process[process_type] =
 			sizeof(zbx_stat_process_t) * get_process_type_forks(process_type);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() size:%d", __function_name, (int)sz_total);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() size:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)sz_total);
 
 	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_SELFMON_ID)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Cannot create IPC key for a self-monitoring collector");
+		zabbix_log(LOG_LEVEL_CRIT, "cannot create IPC key for a self-monitoring collector");
 		exit(FAIL);
 	}
 
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&sm_lock, ZBX_MUTEX_SELFMON))
 	{
-		zbx_error("Unable to create mutex for a self-monitoring collector");
+		zbx_error("unable to create mutex for a self-monitoring collector");
 		exit(FAIL);
 	}
 
 	if (-1 == (shm_id = zbx_shmget(shm_key, sz_total)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Cannot allocate shared memory for a self-monitoring collector");
+		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate shared memory for a self-monitoring collector");
 		exit(FAIL);
 	}
 
 	if ((void *)(-1) == (p = shmat(shm_id, NULL, 0)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Cannot attach shared memory for a self-monitoring collector [%s]",
-				strerror(errno));
+		zabbix_log(LOG_LEVEL_CRIT, "cannot attach shared memory for a self-monitoring collector: %s",
+				zbx_strerror(errno));
 		exit(FAIL);
 	}
 
@@ -308,8 +313,10 @@ void	free_selfmon_collector()
 	collector = NULL;
 
 	if (-1 == shmctl(shm_id, IPC_RMID, 0))
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot remove shared memory for self-monitoring collector [%s]",
-				strerror(errno));
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot remove shared memory for self-monitoring collector: %s",
+				zbx_strerror(errno));
+	}
 
 	UNLOCK_SM;
 

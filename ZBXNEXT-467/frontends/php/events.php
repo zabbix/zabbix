@@ -120,7 +120,7 @@ include_once('include/page_header.php');
 			'output' => array('triggerid', 'description', 'expression'),
 			'selectHosts' => array('hostid', 'host'),
 			'selectItems' => API_OUTPUT_EXTEND,
-			'select_functions' => API_OUTPUT_EXTEND,
+			'selectFunctions' => API_OUTPUT_EXTEND,
 			'triggerids' => $_REQUEST['triggerid'],
 		));
 
@@ -137,7 +137,7 @@ include_once('include/page_header.php');
 				'output' => array('triggerid', 'description', 'expression'),
 				'selectHosts' => array('hostid', 'host'),
 				'selectItems' => API_OUTPUT_EXTEND,
-				'select_functions' => API_OUTPUT_EXTEND,
+				'selectFunctions' => API_OUTPUT_EXTEND,
 				'filter' => array('description' => $oldTrigger['description']),
 				'hostids' => $hostid,
 			));
@@ -388,7 +388,7 @@ include_once('include/page_header.php');
 				'eventids' => zbx_objectValues($dsc_events,'eventid'),
 				'output' => API_OUTPUT_EXTEND,
 				'selectHosts' => API_OUTPUT_EXTEND,
-				'select_triggers' => API_OUTPUT_EXTEND,
+				'selectTriggers' => API_OUTPUT_EXTEND,
 				'selectItems' => API_OUTPUT_EXTEND,
 			);
 			$dsc_events = API::Event()->get($options);
@@ -580,7 +580,7 @@ include_once('include/page_header.php');
 			$triggersOptions = array(
 				'triggerids' => zbx_objectValues($events, 'objectid'),
 				'selectHosts' => API_OUTPUT_EXTEND,
-				'select_triggers' => API_OUTPUT_EXTEND,
+				'selectTriggers' => API_OUTPUT_EXTEND,
 				'selectItems' => API_OUTPUT_EXTEND,
 				'output' => API_OUTPUT_EXTEND
 			);
@@ -597,7 +597,7 @@ include_once('include/page_header.php');
 					$i['itemid'] = $item['itemid'];
 					$i['value_type'] = $item['value_type']; //ZBX-3059: So it would be possible to show different caption for history for chars and numbers (KB)
 					$i['action'] = str_in_array($item['value_type'],array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64))? 'showgraph':'showvalues';
-					$i['description'] = item_description($item);
+					$i['name'] = itemName($item);
 					$items[] = $i;
 				}
 
@@ -626,7 +626,7 @@ include_once('include/page_header.php');
 						'action'
 						),
 					is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
-					$_REQUEST['hostid'] == 0 ? $host['host'] : null,
+					$_REQUEST['hostid'] == 0 ? $host['name'] : null,
 					new CSpan($tr_desc, 'link_menu'),
 					new CCol(trigger_value2str($event['value']), get_trigger_value_style($event['value'])),
 					getSeverityCell($trigger['priority'], null, !$event['value']),
@@ -639,7 +639,7 @@ include_once('include/page_header.php');
 					$csvRows[] = array(
 						zbx_date2str(S_EVENTS_ACTION_TIME_FORMAT,$event['clock']),
 						is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
-						$_REQUEST['hostid'] == 0 ? $host['host'] : null,
+						$_REQUEST['hostid'] == 0 ? $host['name'] : null,
 						$description,
 						trigger_value2str($event['value']),
 						getSeverityCaption($trigger['priority']),

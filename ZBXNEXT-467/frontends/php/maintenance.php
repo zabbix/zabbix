@@ -330,7 +330,7 @@ include_once('include/page_header.php');
 	}
 
 	$maintenance_wdgt = new CWidget();
-	$maintenance_wdgt->addPageHeader(S_CONFIGURATION_OF_MAINTENANCE_PERIODS, $frmForm);
+	$maintenance_wdgt->addPageHeader(_('CONFIGURATION OF MAINTENANCE PERIODS'), $frmForm);
 ?>
 <?php
 	if(isset($_REQUEST['form'])){
@@ -552,10 +552,10 @@ include_once('include/page_header.php');
 
 		$hosts = array_merge($hosts, $hosts_selected);
 		$hosts = zbx_toHash($hosts, 'hostid');
-		order_result($hosts, 'host');
+		order_result($hosts, 'name');
 
 		foreach($hosts as $host){
-			$host_tb->addItem($host['hostid'], $host['host']);
+			$host_tb->addItem($host['hostid'], $host['name']);
 		}
 
 		$tblHlink = new CTable(null, 'formElementTable');
@@ -670,7 +670,7 @@ include_once('include/page_header.php');
 					$mnt_status = new CSpan(S_EXPIRED,'red');
 					break;
 				case MAINTENANCE_STATUS_APPROACH:
-					$mnt_status = new CSpan(S_APPROACH,'blue');
+					$mnt_status = new CSpan(S_APPROACHING,'blue');
 					break;
 				case MAINTENANCE_STATUS_ACTIVE:
 					$mnt_status = new CSpan(S_ACTIVE,'green');

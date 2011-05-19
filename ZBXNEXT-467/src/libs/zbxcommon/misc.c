@@ -89,12 +89,24 @@ int	get_nodeid_by_id(zbx_uint64_t id)
  ******************************************************************************/
 void	zbx_timespec(zbx_timespec_t *ts)
 {
+	static zbx_timespec_t	*last_ts = NULL;
+	static int		corr = 0;
 #ifdef _WINDOWS
-
 	LARGE_INTEGER	tickPerSecond, tick;
 	static int	boottime = 0;
 	BOOL		rc = FALSE;
+#else	/* not _WINDOWS */
+	struct timeval	tv;
+	int		rc = -1;
+#ifdef HAVE_TIME_CLOCK_GETTIME
+	struct timespec	tp;
+#endif	/* HAVE_TIME_CLOCK_GETTIME */
+#endif	/* not _WINDOWS */
 
+	if (NULL == last_ts)
+		last_ts = zbx_malloc(last_ts, sizeof(zbx_timespec_t));
+
+#ifdef _WINDOWS
 	if (TRUE == (rc = QueryPerformanceFrequency(&tickPerSecond)))
 	{
 		if (TRUE == (rc = QueryPerformanceCounter(&tick)))
@@ -119,14 +131,8 @@ void	zbx_timespec(zbx_timespec_t *ts)
 		ts->sec = (int)tb.time;
 		ts->ns = tb.millitm * 1000000;
 	}
-
 #else	/* not _WINDOWS */
-
-	struct timeval	tv;
-	int		rc = -1;
 #ifdef HAVE_TIME_CLOCK_GETTIME
-	struct timespec	tp;
-
 	if (0 == (rc = clock_gettime(CLOCK_REALTIME, &tp)))
 	{
 		ts->sec = (int)tp.tv_sec;
@@ -145,8 +151,24 @@ void	zbx_timespec(zbx_timespec_t *ts)
 		ts->sec = (int)time(NULL);
 		ts->ns = 0;
 	}
-
 #endif	/* not _WINDOWS */
+
+	if (last_ts->ns == ts->ns && last_ts->sec == ts->sec)
+	{
+		ts->ns += ++corr;
+
+		while (ts->ns >= 1000000000)
+		{
+			ts->sec++;
+			ts->ns -= 1000000000;
+		}
+	}
+	else
+	{
+		last_ts->sec = ts->sec;
+		last_ts->ns = ts->ns;
+		corr = 0;
+	}
 }
 
 /******************************************************************************
@@ -231,7 +253,8 @@ void    *zbx_malloc2(const char *filename, int line, void *old, size_t size)
 	if (NULL != ptr)
 		return ptr;
 
-	zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_malloc: out of memory. Requested %lu bytes.", filename, line, size);
+	zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_malloc: out of memory. Requested " ZBX_FS_SIZE_T " bytes.",
+			filename, line, (zbx_fs_size_t)size);
 	exit(FAIL);
 
 	/* Program will never reach this point. */
@@ -242,7 +265,7 @@ void    *zbx_malloc2(const char *filename, int line, void *old, size_t size)
  *                                                                            *
  * Function: zbx_realloc2                                                     *
  *                                                                            *
- * Purpose: changes the size of the memory block pointed to by src            *
+ * Purpose: changes the size of the memory block pointed to by old            *
  *          to size bytes                                                     *
  *                                                                            *
  * Parameters:                                                                *
@@ -254,7 +277,7 @@ void    *zbx_malloc2(const char *filename, int line, void *old, size_t size)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void    *zbx_realloc2(const char *filename, int line, void *src, size_t size)
+void    *zbx_realloc2(const char *filename, int line, void *old, size_t size)
 {
 	int	max_attempts;
 	void	*ptr = NULL;
@@ -262,13 +285,14 @@ void    *zbx_realloc2(const char *filename, int line, void *src, size_t size)
 	for (
 		max_attempts = 10, size = MAX(size, 1);
 		max_attempts > 0 && NULL == ptr;
-		ptr = realloc(src, size), max_attempts--
+		ptr = realloc(old, size), max_attempts--
 	);
 
 	if (NULL != ptr)
 		return ptr;
 
-	zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_realloc: out of memory. Requested %lu bytes.", filename, line, size);
+	zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_realloc: out of memory. Requested " ZBX_FS_SIZE_T " bytes.",
+			filename, line, (zbx_fs_size_t)size);
 	exit(FAIL);
 
 	/* Program will never reach this point. */
@@ -288,7 +312,8 @@ char    *zbx_strdup2(const char *filename, int line, char *old, const char *str)
 	if (NULL != ptr)
 		return ptr;
 
-	zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_strdup: out of memory. Requested %lu bytes.", filename, line, strlen(str) + 1);
+	zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_strdup: out of memory. Requested " ZBX_FS_SIZE_T " bytes.",
+			filename, line, (zbx_fs_size_t)(strlen(str) + 1));
 	exit(FAIL);
 
 	/* Program will never reach this point. */
@@ -313,11 +338,10 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...)
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 
 	char	title[MAX_STRING_LEN];
-
 	va_list args;
 
 	va_start(args, fmt);
-	vsnprintf(title, MAX_STRING_LEN - 1, fmt, args);
+	zbx_vsnprintf(title, sizeof(title), fmt, args);
 	va_end(args);
 
 	setproctitle(title);
@@ -589,26 +613,28 @@ static int	get_next_delay_interval(const char *flex_intervals, time_t now, time_
  *           !!! Don't forget to sync code with PHP !!!                       *
  *                                                                            *
  ******************************************************************************/
-int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay,
-		const char *flex_intervals, time_t now, int *effective_delay)
+int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int item_type,
+		int delay, const char *flex_intervals, time_t now, int *effective_delay)
 {
-	int	nextcheck;
+	const char	*__function_name = "calculate_item_nextcheck";
+	int		nextcheck;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In calculate_item_nextcheck (" ZBX_FS_UI64 ",%d,\"%s\",%d)",
-			itemid, delay, NULL == flex_intervals ? "" : flex_intervals, now);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() interfaceid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " delay:%d flex_intervals:'%s' now:%d",
+			__function_name, interfaceid, itemid, delay, NULL == flex_intervals ? "" : flex_intervals, (int)now);
 
 	if (0 == delay)
 		delay = SEC_PER_YEAR;
 
-	/* Special processing of active items to see better view in queue */
-	if (item_type == ITEM_TYPE_ZABBIX_ACTIVE)
+	/* special processing of active items to see better view in queue */
+	if (ITEM_TYPE_ZABBIX_ACTIVE == item_type)
 	{
 		nextcheck = (int)now + delay;
 	}
 	else
 	{
-		int	current_delay;
-		time_t	next_interval;
+		int		current_delay;
+		time_t		next_interval;
+		zbx_uint64_t	shift;
 
 		current_delay = get_current_delay(delay, flex_intervals, now);
 
@@ -631,7 +657,8 @@ int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay,
 		}
 
 		delay = current_delay;
-		nextcheck = delay * (int)(now / (time_t)delay) + (int)(itemid % (zbx_uint64_t)delay);
+		shift = (ITEM_TYPE_JMX == item_type ? interfaceid : itemid);
+		nextcheck = delay * (int)(now / (time_t)delay) + (int)(shift % (zbx_uint64_t)delay);
 
 		while (nextcheck <= now)
 			nextcheck += delay;
@@ -640,7 +667,7 @@ int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay,
 	if (NULL != effective_delay)
 		*effective_delay = delay;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End calculate_item_nextcheck (nextcheck:%d delay:%d)", nextcheck, delay);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d delay:%d", __function_name, nextcheck, delay);
 
 	return nextcheck;
 }
@@ -1597,6 +1624,44 @@ int	is_ushort(const char *str, unsigned short *value)
 
 /******************************************************************************
  *                                                                            *
+ * Function: is_boolean                                                       *
+ *                                                                            *
+ * Purpose: check if the string is boolean                                    *
+ *                                                                            *
+ * Parameters: str - string to check                                          *
+ *                                                                            *
+ * Return value:  SUCCEED - the string is boolean                             *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ * Author: Aleksandrs Saveljevs                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	is_boolean(const char *str, zbx_uint64_t *value)
+{
+	int	res;
+
+	if (SUCCEED == (res = is_double(str)))
+		*value = (0 != atof(str));
+	else
+	{
+		char	tmp[16];
+
+		strscpy(tmp, str);
+		zbx_strlower(tmp);
+
+		if (SUCCEED == (res = str_in_list("true,t,yes,y,on,up,running,enabled,available", tmp, ',')))
+			*value = 1;
+		else if (SUCCEED == (res = str_in_list("false,f,no,n,off,down,unused,disabled,unavailable", tmp, ',')))
+			*value = 0;
+	}
+
+	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: is_uoct                                                          *
  *                                                                            *
  * Purpose: check if the string is unsigned octal                             *
@@ -1719,7 +1784,7 @@ int	is_hex_string(const char *str)
  *                                                                            *
  * Purpose: check if uin64 integer matches a list of integers                 *
  *                                                                            *
- * Parameters: list -  integers [i1-i2,i3,i4,i5-i6] (10-25,45,67-699          *
+ * Parameters: list -  integers [i1-i2,i3,i4,i5-i6] (10-25,45,67-699)         *
  *             value-  value                                                  *
  *                                                                            *
  * Return value: FAIL - out of period, SUCCEED - within the list              *
@@ -2162,10 +2227,10 @@ int	is_key_char(char c)
 	if (c >= 'a' && c <= 'z')
 		return SUCCEED;
 
-	if (c >= 'A' && c <= 'Z')
+	if (c == '.' || c == ',' || c == '_' || c == '-')
 		return SUCCEED;
 
-	if (c == '.' || c == ',' || c == '_' || c == '-')
+	if (c >= 'A' && c <= 'Z')
 		return SUCCEED;
 
 	if (c >= '0' && c <= '9')
@@ -2244,13 +2309,16 @@ unsigned char	get_interface_type_by_item_type(unsigned char type)
 {
 	switch (type)
 	{
+		case ITEM_TYPE_ZABBIX:
+			return INTERFACE_TYPE_AGENT;
 		case ITEM_TYPE_SNMPv1:
 		case ITEM_TYPE_SNMPv2c:
 		case ITEM_TYPE_SNMPv3:
 			return INTERFACE_TYPE_SNMP;
 		case ITEM_TYPE_IPMI:
 			return INTERFACE_TYPE_IPMI;
-		case ITEM_TYPE_ZABBIX:
+		case ITEM_TYPE_JMX:
+			return INTERFACE_TYPE_JMX;
 		default:
 			return INTERFACE_TYPE_AGENT;
 	}
@@ -2279,7 +2347,7 @@ int	calculate_sleeptime(int nextcheck, int max_sleeptime)
 	if (FAIL == nextcheck)
 		return max_sleeptime;
 
-	sleeptime = nextcheck - time(NULL);
+	sleeptime = nextcheck - (int)time(NULL);
 
 	if (sleeptime < 0)
 		return 0;

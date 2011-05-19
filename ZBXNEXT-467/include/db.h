@@ -39,12 +39,15 @@ extern int	CONFIG_REFRESH_UNSUPPORTED;
 extern int	CONFIG_UNAVAILABLE_DELAY;
 extern int	CONFIG_LOG_SLOW_QUERIES;
 
-typedef enum {
+typedef enum
+{
 	GRAPH_TYPE_NORMAL = 0,
 	GRAPH_TYPE_STACKED = 1
-} zbx_graph_types;
+}
+zbx_graph_types;
 
-typedef enum {
+typedef enum
+{
 	SCREEN_RESOURCE_GRAPH = 0,
 	SCREEN_RESOURCE_SIMPLE_GRAPH,
 	SCREEN_RESOURCE_MAP,
@@ -62,19 +65,24 @@ typedef enum {
 	SCREEN_RESOURCE_HOSTGROUP_TRIGGERS,
 	SCREEN_RESOURCE_SYSTEM_STATUS,
 	SCREEN_RESOURCE_HOST_TRIGGERS
-} zbx_screen_resources;
+}
+zbx_screen_resources;
 
-typedef enum {
+typedef enum
+{
 	CALC_FNC_MIN = 1,
 	CALC_FNC_AVG = 2,
 	CALC_FNC_MAX = 4,
 	CALC_FNC_ALL = 7
-} zbx_graph_item_calc_function;
+}
+zbx_graph_item_calc_function;
 
-typedef enum {
+typedef enum
+{
 	GRAPH_ITEM_SIMPLE = 0,
 	GRAPH_ITEM_AGGREGATED = 1
-} zbx_graph_item_type;
+}
+zbx_graph_item_type;
 
 #define	ZBX_DB_CONNECT_NORMAL	0
 #define	ZBX_DB_CONNECT_EXIT	1
@@ -275,19 +283,28 @@ DB_DSERVICE;
 
 typedef struct
 {
+	zbx_uint64_t	triggerid;
+	char		description[TRIGGER_DESCRIPTION_LEN_MAX];
+	char		expression[TRIGGER_EXPRESSION_LEN_MAX];
+	char		*url;
+	char		*comments;
+	unsigned char	priority;
+	unsigned char	type;
+}
+DB_TRIGGER;
+
+typedef struct
+{
+	DB_TRIGGER	trigger;
 	zbx_uint64_t	eventid;
+	zbx_uint64_t	objectid;
+	zbx_uint64_t	ack_eventid;
 	int		source;
 	int		object;
-	zbx_uint64_t	objectid;
 	int		clock;
 	int		value;
 	int		value_changed;
 	int		acknowledged;
-	char		trigger_description[TRIGGER_DESCRIPTION_LEN_MAX];
-	int		trigger_priority;
-	char		*trigger_url;
-	char		*trigger_comments;
-	int		trigger_type;
 	int		ns;
 }
 DB_EVENT;
@@ -329,16 +346,6 @@ DB_ITEM;
 
 typedef struct
 {
-	zbx_uint64_t     functionid;
-	zbx_uint64_t     itemid;
-	zbx_uint64_t     triggerid;
-	char    *function;
-	char	*parameter;
-}
-DB_FUNCTION;
-
-typedef struct
-{
 	zbx_uint64_t	mediaid;
 	zbx_uint64_t	mediatypeid;
 	char	*sendto;
@@ -362,22 +369,6 @@ typedef struct
 	char	*passwd;
 }
 DB_MEDIATYPE;
-
-typedef struct
-{
-	zbx_uint64_t	triggerid;
-	char	expression[TRIGGER_EXPRESSION_LEN_MAX];
-	char	description[TRIGGER_DESCRIPTION_LEN_MAX];
-	char	*url;
-	char	*comments;
-	int	status;
-	int	value;
-	int	value_flags;
-	int	priority;
-	int	type;
-	char	error[TRIGGER_ERROR_LEN_MAX];
-}
-DB_TRIGGER;
 
 typedef struct
 {
@@ -569,7 +560,7 @@ int	DBget_row_count(const char *table_name);
 int	DBget_items_unsupported_count();
 int	DBget_queue_count(int from, int to);
 double	DBget_requiredperformance();
-zbx_uint64_t DBget_proxy_lastaccess(const char *hostname);
+int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error);
 
 char	*DBdyn_escape_string(const char *src);
 char	*DBdyn_escape_string_len(const char *src, int max_src_len);
@@ -587,7 +578,6 @@ int	DBadd_template_linkage(int hostid,int templateid,int items,int triggers,int 
 
 int	DBget_item_by_itemid(int itemid,DB_ITEM *item);
 
-int	DBget_trigger_by_triggerid(int triggerid,DB_TRIGGER *trigger);
 int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid);
 void	DBdelete_sysmaps_hosts_by_hostid(zbx_uint64_t hostid);
 
@@ -623,5 +613,8 @@ char	*DBsql_id_ins(zbx_uint64_t id);
 
 zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
 		unsigned char useip, const char *ip, const char *dns, unsigned short port);
+
+const char	*DBget_profile_field(unsigned char profile_link);
+unsigned short	DBget_profile_field_len(unsigned char profile_link);
 
 #endif

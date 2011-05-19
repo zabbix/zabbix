@@ -23,35 +23,24 @@
 
 int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char	mode[128];
-	int	sysinfo_name = -1;
-	long	ncpu = 0;
+	char	mode[8];
+	int	name;
+	long	ncpu;
 
-        if(num_param(param) > 1)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	if (1 < num_param(param))
+		return SYSINFO_RET_FAIL;
 
-        if(get_param(param, 1, mode, sizeof(mode)) != 0)
-        {
-                mode[0] = '\0';
-        }
-        if(mode[0] == '\0')
-	{
-		/* default parameter */
-		zbx_snprintf(mode, sizeof(mode), "online");
-	}
+	if (0 != get_param(param, 1, mode, sizeof(mode)))
+		*mode = '\0';
 
-	if(0 == strncmp(mode, "online", sizeof(mode)))
-	{
-		sysinfo_name = _SC_NPROCESSORS_ONLN;
-	}
-	else if(0 == strncmp(mode, "max", sizeof(mode)))
-	{
-		sysinfo_name = _SC_NPROCESSORS_CONF;
-	}
+	if ('\0' == *mode || 0 == strcmp(mode, "online"))	/* default parameter */
+		name = _SC_NPROCESSORS_ONLN;
+	else if (0 == strcmp(mode, "max"))
+		name = _SC_NPROCESSORS_CONF;
+	else
+		return SYSINFO_RET_FAIL;
 
-	if ( -1 == sysinfo_name || (-1 == (ncpu = sysconf(sysinfo_name)) && EINVAL == errno) )
+	if (-1 == (ncpu = sysconf(name)))
 		return SYSINFO_RET_FAIL;
 
 	SET_UI64_RESULT(result, ncpu);
@@ -61,14 +50,8 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char	tmp[32], type[32];
-	int	cpu_num, mode;
-
-	if (!CPU_COLLECTOR_STARTED(collector))
-	{
-		SET_MSG_RESULT(result, strdup("Collector is not started!"));
-		return SYSINFO_RET_OK;
-	}
+	char	tmp[16];
+	int	cpu_num, mode, state;
 
 	if (num_param(param) > 3)
 		return SYSINFO_RET_FAIL;
@@ -78,15 +61,22 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	if ('\0' == *tmp || 0 == strcmp(tmp, "all"))	/* default parameter */
 		cpu_num = 0;
-	else
-	{
-		cpu_num = atoi(tmp) + 1;
-		if (cpu_num < 1 || cpu_num > collector->cpus.count)
-			return SYSINFO_RET_FAIL;
-	}
+	else if (1 > (cpu_num = atoi(tmp) + 1))
+		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 2, type, sizeof(type)))
-		*type = '\0';
+	if (0 != get_param(param, 2, tmp, sizeof(tmp)))
+		*tmp = '\0';
+
+	if ('\0' == *tmp || 0 == strcmp(tmp, "user"))	/* default parameter */
+		state = ZBX_CPU_STATE_USER;
+	else if (0 == strcmp(tmp, "wait"))
+		state = ZBX_CPU_STATE_IOWAIT;
+	else if (0 == strcmp(tmp, "kernel"))
+		state = ZBX_CPU_STATE_SYSTEM;
+	else if (0 == strcmp(tmp, "idle"))
+		state = ZBX_CPU_STATE_IDLE;
+	else
+		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 3, tmp, sizeof(tmp)))
 		*tmp = '\0';
@@ -100,18 +90,7 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	else
 		return SYSINFO_RET_FAIL;
 
-	if ('\0' == *type || 0 == strcmp(type, "user"))	/* default parameter */
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].user[mode]);
-	else if (0 == strcmp(type, "wait"))
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].nice[mode]);
-	else if (0 == strcmp(type, "kernel"))
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].system[mode]);
-	else if (0 == strcmp(type, "idle"))
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].idle[mode]);
-	else
-		return SYSINFO_RET_FAIL;
-
-	return SYSINFO_RET_OK;
+	return get_cpustat(result, cpu_num, state, mode);
 }
 
 #ifdef HAVE_KSTAT_H

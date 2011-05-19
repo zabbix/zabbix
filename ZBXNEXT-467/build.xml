@@ -11,6 +11,7 @@
 		<!-- Build agent binaries -->
 		<exec executable="./configure" dir="${builddir}" failonerror="on">
 			<arg value="--enable-agent"/>
+			<arg value="--with-libcurl"/>
 		</exec>
 		<exec executable="make" dir="${builddir}" failonerror="on"/>
 	</target>
@@ -56,6 +57,9 @@
 		<exec executable="./configure" dir="${builddir}" failonerror="on"></exec>
 		<exec executable="make" dir="${builddir}" failonerror="on">
 			<arg line="dbschema"/>
+		</exec>
+		<exec executable="make" dir="${builddir}" failonerror="on">
+			<arg line="dist"/>
 		</exec>
 	</target>
 

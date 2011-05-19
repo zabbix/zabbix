@@ -118,9 +118,9 @@ searchServer: function(needle){
 		'method': 'host.get',
 		'params': {
 			'startSearch': 1,
-			'search': {'host': needle},
-			'output': ['hostid', 'host'],
-			'sortfield': 'host',
+			'search': {'name': needle},
+			'output': ['hostid', 'name', 'host'],
+			'sortfield': 'name',
 			'limit': this.suggestLimit
 		},
 		'onSuccess': this.serverRespond.bind(this, needle),
@@ -143,7 +143,7 @@ serverRespond: function(needle, respond){
 
 	for(var i=0; i < respond.length; i++){
 		if(!isset(i, respond) || empty(respond[i])) continue;
-		params.list[i] = respond[i].host.toLowerCase();
+		params.list[i] = respond[i].name.toLowerCase();
 	}
 	this.needles[params.needle].list = params.list;
 

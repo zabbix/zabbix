@@ -53,7 +53,10 @@ INSERT INTO interface (interfaceid,hostid,main,type,ip,dns,useip,port)
 /
 	
 ---- Patching table `items`
-
+ALTER TABLE items RENAME COLUMN description TO name
+/
+REORG TABLE items
+/
 ALTER TABLE items ALTER COLUMN itemid SET WITH DEFAULT NULL
 /
 REORG TABLE items
@@ -99,6 +102,14 @@ ALTER TABLE items ADD interfaceid bigint NULL
 REORG TABLE items
 /
 ALTER TABLE items ADD port varchar(64) WITH DEFAULT '' NOT NULL
+/
+REORG TABLE items
+/
+ALTER TABLE items ADD description varchar(2048) WITH DEFAULT '' NOT NULL
+/
+REORG TABLE items
+/
+ALTER TABLE items ADD profile_link integer WITH DEFAULT '0' NOT NULL
 /
 REORG TABLE items
 /
@@ -218,9 +229,31 @@ ALTER TABLE hosts DROP COLUMN outbytes
 /
 REORG TABLE hosts
 /
+ALTER TABLE hosts ADD jmx_disable_until integer WITH DEFAULT '0' NOT NULL
+/
+REORG TABLE hosts
+/
+ALTER TABLE hosts ADD jmx_available integer WITH DEFAULT '0' NOT NULL
+/
+REORG TABLE hosts
+/
+ALTER TABLE hosts ADD jmx_errors_from integer WITH DEFAULT '0' NOT NULL
+/
+REORG TABLE hosts
+/
+ALTER TABLE hosts ADD jmx_error varchar(128) WITH DEFAULT '' NOT NULL
+/
+REORG TABLE hosts
+/
+ALTER TABLE hosts ADD name varchar(64) WITH DEFAULT '' NOT NULL
+/
+REORG TABLE hosts
+/
 UPDATE hosts SET proxy_hostid=NULL WHERE proxy_hostid=0
 /
 UPDATE hosts SET maintenanceid=NULL WHERE maintenanceid=0
+/
+UPDATE hosts SET name=host WHERE status in (0,1,3)
 /
 ALTER TABLE hosts ADD CONSTRAINT c_hosts_1 FOREIGN KEY (proxy_hostid) REFERENCES hosts (hostid)
 /

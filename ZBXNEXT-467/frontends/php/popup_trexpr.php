@@ -223,13 +223,19 @@
 			'params' => $param2_val_sec,
 			'allowed_types' => $allowed_types_str
 		),
+		'logeventid' => array(
+			'description' => 'N {OP} X, where X is 1 - last Event ID matches regular expression T, 0 - otherwise.',
+			'operators' => $limited_operators,
+			'params' => $param1_str,
+			'allowed_types' => $allowed_types_log
+		),
 		'logseverity' => array(
 			'description' => 'Log severity of the last log entry is {OP} N',
 			'operators' => $operators,
 			'allowed_types' => $allowed_types_log
 		),
 		'logsource' => array(
-			'description' => 'N {OP} X, where X is 1 - last log source of the last log entry matches T',
+			'description' => 'N {OP} X, where X is 1 - last log source of the last log entry matches T, 0 - otherwise.',
 			'operators' => $limited_operators,
 			'params' => $param1_str,
 			'allowed_types' => $allowed_types_log
@@ -336,7 +342,7 @@
 		$item_host = reset($item_data['hosts']);
 		$item_host = $item_host['host'];
 
-		$description = $item_host.':'.item_description($item_data);
+		$description = $item_host.':'.itemName($item_data);
 	}
 	else{
 		$item_key = $item_host = $description = '';
@@ -445,12 +451,12 @@ if(form){
 		new CTextBox('description', $description, 50, 'yes'),
 		new CButton('select', S_SELECT, "return PopUp('popup.php?dstfrm=".$form->GetName().
 				"&dstfld1=itemid&dstfld2=description&submitParent=1".$normal_only.
-				"&srctbl=items&srcfld1=itemid&srcfld2=description',0,0,'zbx_popup_item');"),
+				"&srctbl=items&srcfld1=itemid&srcfld2=name',0,0,'zbx_popup_item');"),
 	);
 	if($parent_discoveryid){
 		$row[] = new CButton('select', S_SELECT_PROTOTYPE, "return PopUp('popup.php?dstfrm=".$form->GetName().
 				"&dstfld1=itemid&dstfld2=description&submitParent=1".url_param('parent_discoveryid', true).
-				"&srctbl=prototypes&srcfld1=itemid&srcfld2=description',0,0,'zbx_popup_item');");
+				"&srctbl=prototypes&srcfld1=itemid&srcfld2=name',0,0,'zbx_popup_item');");
 	}
 
 	$form->addRow(S_ITEM, $row);

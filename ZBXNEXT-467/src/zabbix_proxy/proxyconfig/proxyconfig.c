@@ -56,18 +56,18 @@ static void	process_configuration_sync()
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	while (FAIL == connect_to_server(&sock, 600))	/* alarm */
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Connect to the server failed."
-				" Retry after %d seconds",
-				CONFIG_PROXYCONFIG_RETRY);
-
-		sleep(CONFIG_PROXYCONFIG_RETRY);
-	}
+	connect_to_server(&sock, 600, CONFIG_PROXYCONFIG_RETRY); /* retry till have a connection */
 
 	if (FAIL == get_data_from_server(&sock,
 			ZBX_PROTO_VALUE_PROXY_CONFIG, &data))
 		goto exit;
+
+	if ('\0' != *data)
+		zabbix_log(LOG_LEVEL_WARNING, "Received configuration data from server. Datalen " ZBX_FS_SIZE_T,
+				(zbx_fs_size_t)strlen(data));
+	else
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot obtain configuration data from server. "
+				"Proxy host name might not be matching that on the server.");
 
 	if (FAIL == zbx_json_open(data, &jp))
 		goto exit;

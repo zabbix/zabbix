@@ -30,6 +30,7 @@ require_once(dirname(__FILE__).'/../../../include/func.inc.php');
 require_once(dirname(__FILE__).'/../../../include/items.inc.php');
 require_once(dirname(__FILE__).'/../../../include/triggers.inc.php');
 require_once(dirname(__FILE__).'/../../../api/classes/class.ctriggerexpression.php');
+require_once(dirname(__FILE__).'/../../../api/classes/class.citemkey.php');
 
 class class_triggerexpressionTest extends PHPUnit_Framework_TestCase{
 	public static function provider(){
@@ -670,7 +671,7 @@ class class_triggerexpressionTest extends PHPUnit_Framework_TestCase{
 
 			array('{host:key.str("\")}=0',false),
 			array('{host:key.str("\"")}=0',true),
-			array('{host:key.str("\\"")}=0',true),
+			array('{host:key.str("\\\\"")}=0',true),
 			array('{host:key.str("\""")}=0',false),
 			array('{host:key.str("\"""")}=0',false),
 
@@ -769,7 +770,7 @@ class class_triggerexpressionTest extends PHPUnit_Framework_TestCase{
 			array('0={host:key["a"b].str()}', false),
 			array('0={host:key[].str(a"b"c)}', true),
 			array('0={host:key[].str("a\"b\"c")}', true),
-			array('0={host:key[].str("a\\"b\\"c")}', true),
+			array('0={host:key[].str("a\\\\"b\\\\"c")}', true),
 			array('0={host:key[].str("a"b)}', false),
 			array('0={host:key[].str(,"a"b,)}', false),
 			array('0={host:key[].str("","a"b,"")}', false),
@@ -1340,7 +1341,7 @@ class class_triggerexpressionTest extends PHPUnit_Framework_TestCase{
 		}
 		else {
 //			print_r($trigger->errors);
-			$this->assertEquals($b,false,$trigger->errors[0]);
+			$this->assertEquals($b, false, "\nError with expression $a: ".$trigger->errors[0]);
 		}
 	}
 }

@@ -105,25 +105,22 @@ private $flicker;
 			$flicker_tab->setCellPadding(0);
 			$flicker_tab->setCellSpacing(0);
 
-			$div = new CDiv($this->flicker);
-			$div->setAttribute('id',$flicker_domid);
+			$div = new CDiv($this->flicker,null,$flicker_domid);
 			if(!$this->flicker_state) $div->setAttribute('style','display: none;');
 
 //			$flicker_tab->addRow($div);
 
-			$icon_l = new CDiv(SPACE.SPACE, $this->flicker_state?'dbl_arrow_up':'dbl_arrow_down');
+			$icon_l = new CDiv(SPACE.SPACE, $this->flicker_state?'dbl_arrow_up':'dbl_arrow_down','flicker_icon_l');
 			$icon_l->setAttribute('title',S_MAXIMIZE.'/'.S_MINIMIZE);
-			$icon_l->setAttribute('id','flicker_icon_l');
 
-			$icon_r = new CDiv(SPACE.SPACE, $this->flicker_state?'dbl_arrow_up':'dbl_arrow_down');
+			$icon_r = new CDiv(SPACE.SPACE, $this->flicker_state?'dbl_arrow_up':'dbl_arrow_down','flicker_icon_r');
 			$icon_r->setAttribute('title',S_MAXIMIZE.'/'.S_MINIMIZE);
-			$icon_r->setAttribute('id','flicker_icon_r');
 
 			$icons_row = new CTable(null,'textwhite');
 			$icons_row->addRow(array($icon_l,new CSpan(SPACE.S_FILTER.SPACE),$icon_r));
 
 			$thin_tab = $this->createFlicker($icons_row);
-			$thin_tab->setAttribute('id','filter_icon');
+			$thin_tab->attr('id','filter_icon');
 			$thin_tab->addAction('onclick', "javascript: change_flicker_state('".$flicker_domid."');");
 
 			$flicker_tab->addRow($thin_tab,'textcolorstyles pointer');
@@ -285,88 +282,4 @@ private $flicker;
 	}
 }
 
-class CUIWidget extends CDiv{
-
-public $domid;
-public $state;
-public $css_class;
-
-private $header;
-private $body;
-private $footer;
-
-	public function __construct($id, $body=null, $state=null){
-		$this->domid = $id;
-		$this->state = $state;		// 0 - closed, 1 - opened
-
-		$this->css_class = 'header';
-
-		$this->header = null;
-		$this->body = array($body);
-		$this->footer = null;
-
-		parent::__construct(null, 'ui-widget ui-widget-content ui-helper-clearfix ui-corner-all widget');
-		$this->setAttribute('id', $id.'_widget');
-	}
-
-	public function addItem($item){
-		if(!is_null($item)) $this->body[] = $item;
-	}
-
-	public function setHeader($caption=null, $icons = SPACE){
-		zbx_value2array($icons);
-
-		if(is_null($caption) && !is_null($icons)) $caption = SPACE;
-
-		$this->header = new CDiv(null, 'nowrap ui-corner-all ui-widget-header '.$this->css_class);
-
-		if(!is_null($this->state)){
-			$icon = new CIcon(
-				S_SHOW.'/'.S_HIDE,
-				$this->state?'arrowup':'arrowdown',
-				"changeHatStateUI(this,'".$this->domid."');"
-			);
-			$icon->setAttribute('id',$this->domid.'_icon');
-			$this->header->addItem($icon);
-		}
-
-		$this->header->addItem($icons);
-		$this->header->addItem($caption);
-
-	return $this->header;
-	}
-
-	public function setFooter($footer, $right=false){
-		$this->footer = new CDiv($footer, 'nowrap ui-corner-all ui-widget-header footer '.($right?' right':' left'));
-
-	return $this->footer;
-	}
-
-	public function get(){
-		$this->cleanItems();
-		parent::addItem($this->header);
-
-		if(is_null($this->state)){
-			$this->state = true;
-		}
-
-		$div = new CDiv($this->body, 'body');
-		$div->setAttribute('id',$this->domid);
-
-		if(!$this->state){
-			$div->setAttribute('style','display: none;');
-			$this->footer->setAttribute('style','display: none;');
-		}
-
-		parent::addItem($div);
-		parent::addItem($this->footer);
-
-	return $this;
-	}
-
-	public function toString($destroy=true){
-		$this->get();
-	return parent::toString($destroy);
-	}
-}
 ?>

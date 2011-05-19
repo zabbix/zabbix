@@ -57,7 +57,7 @@ class CTriggersInfo extends CTable{
 		$ok = $uncl = $info = $warn = $avg = $high = $dis = 0;
 
 		$options = array(
-			'active' => 1,
+			'monitored' => 1,
 			'skipDependent' => 1,
 			'output' => API_OUTPUT_SHORTEN
 		);

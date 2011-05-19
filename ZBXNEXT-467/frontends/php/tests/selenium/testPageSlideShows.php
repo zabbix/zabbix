@@ -108,7 +108,7 @@ class testPageSlideShows extends CWebTest
 
 		$this->chooseOkOnNextConfirmation();
 
-		DBsave_tables(array('slideshows','slides'));
+		DBsave_tables('slideshows');
 
 		$this->login('slideconf.php');
 		$this->assertTitle('Configuration of slideshows');
@@ -128,7 +128,7 @@ class testPageSlideShows extends CWebTest
 		$sql="select * from slides where slideshowid=$slideshowid";
 		$this->assertEquals(0,DBcount($sql));
 
-		DBrestore_tables(array('slideshows','slides'));
+		DBrestore_tables('slideshows');
 	}
 
 	public function testPageSlideShows_Sorting()

@@ -22,42 +22,28 @@
 
 #ifdef _WINDOWS
 
-#	include "perfmon.h"
+#define PERF_COLLECTOR_STARTED(collector)	((collector) && (collector)->perfs.pdh_query)
+#define UNSUPPORTED_REFRESH_PERIOD		600
+#define USE_DEFAULT_INTERVAL			0
 
-#	define PERF_COLLECTOR_STARTED(collector)	((collector) && (collector)->perfs.pdh_query)
-#	define UNSUPPORTED_REFRESH_PERIOD		600
-
-struct zbx_perfs
+typedef struct
 {
-   struct zbx_perfs	*next;
-   char			*name;
-   char			*counterPath;
-   int			interval;
-   PDH_RAW_COUNTER	*rawValueArray;
-   HCOUNTER		handle;
-   double		lastValue;
-   int			CurrentCounter;
-   int			CurrentNum;
-   int			status;
-   char			*error;
-};
+	PERF_COUNTER_DATA	*pPerfCounterList;
+	PDH_HQUERY		pdh_query;
+	time_t			nextcheck;	/* refresh time of not supported counters */
+}
+ZBX_PERF_STAT_DATA;
 
-typedef struct zbx_perfs PERF_COUNTERS;
+PERF_COUNTER_DATA	*add_perf_counter(const char *name, const char *counterpath, int interval);
+int			add_perf_counter_from_config(const char *line);
+void			remove_perf_counter(PERF_COUNTER_DATA *counter);
 
-typedef struct s_perfs_stat_data
-{
-	PERF_COUNTERS	*pPerfCounterList;
-	HQUERY		pdh_query;
-	time_t		nextcheck;	/* refresh time of not supported counters */
-} ZBX_PERF_STAT_DATA;
-
-int	add_perf_counter(const char *name, const char *counterPath, int interval);
-int	add_perfs_from_config(const char *line);
-void	perfs_list_free(void);
+double	compute_average_value(const char *function, PERF_COUNTER_DATA *counter, int interval);
 
 int	init_perf_collector(ZBX_PERF_STAT_DATA *pperf);
+void	free_perf_collector();
 void	collect_perfstat();
-void	close_perf_collector();
+
 #endif /* _WINDOWS */
 
 #endif /* ZABBIX_PERFSTAT_H */

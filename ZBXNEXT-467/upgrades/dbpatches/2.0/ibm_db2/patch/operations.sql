@@ -1,4 +1,91 @@
----- Patching table `opmessage`
+CREATE TABLE t_operations (
+	operationid		bigint,
+	actionid		bigint,
+	operationtype		integer,
+	object			integer,
+	objectid		bigint,
+	shortdata		varchar(255),
+	longdata		varchar(2048),
+	esc_period		integer,
+	esc_step_from		integer,
+	esc_step_to		integer,
+	default_msg		integer,
+	evaltype		integer,
+	mediatypeid		bigint
+)
+/
+
+CREATE TABLE t_opconditions (
+	operationid		bigint,
+	conditiontype		integer,
+	operator		integer,
+	value			varchar(255)
+)
+/
+
+INSERT INTO t_operations
+	SELECT o.operationid, o.actionid, o.operationtype, o.object, o.objectid, o.shortdata, o.longdata,
+			o.esc_period, o.esc_step_from, o.esc_step_to, o.default_msg, o.evaltype, omt.mediatypeid
+		FROM actions a, operations o
+			LEFT JOIN opmediatypes omt ON omt.operationid=o.operationid
+		WHERE a.actionid=o.actionid
+/
+
+INSERT INTO t_opconditions
+	SELECT operationid, conditiontype, operator, value FROM opconditions
+/
+
+UPDATE t_operations
+	SET mediatypeid = NULL
+	WHERE NOT EXISTS (SELECT 1 FROM media_type mt WHERE mt.mediatypeid = t_operations.mediatypeid)
+/
+
+UPDATE t_operations
+	SET objectid = NULL
+	WHERE operationtype = 0		-- OPERATION_TYPE_MESSAGE
+		AND object = 0		-- OPERATION_OBJECT_USER
+		AND NOT EXISTS (SELECT 1 FROM users u WHERE u.userid = t_operations.objectid)
+/
+
+UPDATE t_operations
+	SET objectid = NULL
+	WHERE operationtype = 0		-- OPERATION_TYPE_MESSAGE
+		AND object = 1		-- OPERATION_OBJECT_GROUP
+		AND NOT EXISTS (SELECT 1 FROM usrgrp g WHERE g.usrgrpid = t_operations.objectid)
+/
+
+DELETE FROM t_operations
+	WHERE operationtype IN (4,5)	-- OPERATION_TYPE_GROUP_ADD, OPERATION_TYPE_GROUP_REMOVE
+		AND NOT EXISTS (SELECT 1 FROM groups g WHERE g.groupid = t_operations.objectid)
+/
+
+DELETE FROM t_operations
+	WHERE operationtype IN (6,7)	-- OPERATION_TYPE_TEMPLATE_ADD, OPERATION_TYPE_TEMPLATE_REMOVE
+		AND NOT EXISTS (SELECT 1 FROM hosts h WHERE h.hostid = t_operations.objectid)
+/
+
+DROP TABLE operations
+/
+DROP TABLE opmediatypes
+/
+DROP TABLE opconditions
+/
+
+CREATE TABLE operations (
+	operationid              bigint                                    NOT NULL,
+	actionid                 bigint                                    NOT NULL,
+	operationtype            integer         WITH DEFAULT '0'          NOT NULL,
+	esc_period               integer         WITH DEFAULT '0'          NOT NULL,
+	esc_step_from            integer         WITH DEFAULT '1'          NOT NULL,
+	esc_step_to              integer         WITH DEFAULT '1'          NOT NULL,
+	evaltype                 integer         WITH DEFAULT '0'          NOT NULL,
+	PRIMARY KEY (operationid)
+)
+/
+CREATE INDEX operations_1 ON operations (actionid)
+/
+ALTER TABLE operations ADD CONSTRAINT c_operations_1 FOREIGN KEY (actionid) REFERENCES actions (actionid) ON DELETE CASCADE
+/
 
 CREATE TABLE opmessage (
 	operationid              bigint                                    NOT NULL,
@@ -14,25 +101,6 @@ ALTER TABLE opmessage ADD CONSTRAINT c_opmessage_1 FOREIGN KEY (operationid) REF
 ALTER TABLE opmessage ADD CONSTRAINT c_opmessage_2 FOREIGN KEY (mediatypeid) REFERENCES media_type (mediatypeid)
 /
 
-INSERT INTO opmessage (operationid, default_msg, subject, message)
-	SELECT operationid, default_msg, shortdata, longdata
-		FROM operations
-		WHERE operationtype IN (0)	-- OPERATION_TYPE_MESSAGE
-/
-
-UPDATE opmessage
-	SET mediatypeid = (
-		SELECT mediatypeid
-			FROM opmediatypes
-			WHERE operationid = opmessage.operationid)
-	WHERE operationid IN (
-		SELECT omt.operationid
-			FROM opmediatypes omt, media_type mt
-			WHERE omt.mediatypeid = mt.mediatypeid)
-/
-
----- Patching table `opmessage_grp`
-
 CREATE TABLE opmessage_grp (
 	opmessage_grpid          bigint                                    NOT NULL,
 	operationid              bigint                                    NOT NULL,
@@ -46,26 +114,6 @@ ALTER TABLE opmessage_grp ADD CONSTRAINT c_opmessage_grp_1 FOREIGN KEY (operatio
 /
 ALTER TABLE opmessage_grp ADD CONSTRAINT c_opmessage_grp_2 FOREIGN KEY (usrgrpid) REFERENCES usrgrp (usrgrpid)
 /
-
-CREATE SEQUENCE opmessage_grp_seq AS bigint
-/
-
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid)
-	SELECT NEXTVAL FOR opmessage_grp_seq, o.operationid, o.objectid
-		FROM operations o, usrgrp g
-		WHERE o.objectid = g.usrgrpid
-			AND o.object IN (1)	-- OPERATION_OBJECT_GROUP
-/
-
-DROP SEQUENCE opmessage_grp_seq
-/
-
-UPDATE opmessage_grp
-	SET opmessage_grpid = TRUNC(operationid / 100000000000) * 100000000000 + opmessage_grpid
-	WHERE operationid >= 100000000000
-/
-
----- Patching table `opmessage_usr`
 
 CREATE TABLE opmessage_usr (
 	opmessage_usrid          bigint                                    NOT NULL,
@@ -81,35 +129,34 @@ ALTER TABLE opmessage_usr ADD CONSTRAINT c_opmessage_usr_1 FOREIGN KEY (operatio
 ALTER TABLE opmessage_usr ADD CONSTRAINT c_opmessage_usr_2 FOREIGN KEY (userid) REFERENCES users (userid)
 /
 
-CREATE SEQUENCE opmessage_usr_seq
+CREATE TABLE opcommand (
+	operationid              bigint                                    NOT NULL,
+	type                     integer         WITH DEFAULT '0'          NOT NULL,
+	scriptid                 bigint                                    NULL,
+	execute_on               integer         WITH DEFAULT '0'          NOT NULL,
+	port                     varchar(64)     WITH DEFAULT ''           NOT NULL,
+	authtype                 integer         WITH DEFAULT '0'          NOT NULL,
+	username                 varchar(64)     WITH DEFAULT ''           NOT NULL,
+	password                 varchar(64)     WITH DEFAULT ''           NOT NULL,
+	publickey                varchar(64)     WITH DEFAULT ''           NOT NULL,
+	privatekey               varchar(64)     WITH DEFAULT ''           NOT NULL,
+	command                  varchar(2048)   WITH DEFAULT ''           NOT NULL,
+	PRIMARY KEY (operationid)
+)
 /
-
-INSERT INTO opmessage_usr (opmessage_usrid, operationid, userid)
-	SELECT NEXTVAL FOR opmessage_usr_seq, o.operationid, o.objectid
-		FROM operations o, users u
-		WHERE o.objectid = u.userid
-			AND o.object IN (0)	-- OPERATION_OBJECT_USER
+ALTER TABLE opcommand ADD CONSTRAINT c_opcommand_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE
 /
-
-DROP SEQUENCE opmessage_usr_seq
+ALTER TABLE opcommand ADD CONSTRAINT c_opcommand_2 FOREIGN KEY (scriptid) REFERENCES scripts (scriptid)
 /
-
-UPDATE opmessage_usr
-	SET opmessage_usrid = TRUNC(operationid / 100000000000) * 100000000000 + opmessage_usrid
-	WHERE operationid >= 100000000000
-/
-
----- Patching tables `opcommand_hst` and `opcommand_grp`
 
 CREATE TABLE opcommand_hst (
 	opcommand_hstid          bigint                                    NOT NULL,
 	operationid              bigint                                    NOT NULL,
 	hostid                   bigint                                    NULL,
-	command                  varchar(2048)   WITH DEFAULT ''           NOT NULL,
 	PRIMARY KEY (opcommand_hstid)
 )
 /
-CREATE INDEX opcommand_hst_1 on opcommand_hst (operationid)
+CREATE INDEX opcommand_hst_1 ON opcommand_hst (operationid)
 /
 ALTER TABLE opcommand_hst ADD CONSTRAINT c_opcommand_hst_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE
 /
@@ -120,201 +167,15 @@ CREATE TABLE opcommand_grp (
 	opcommand_grpid          bigint                                    NOT NULL,
 	operationid              bigint                                    NOT NULL,
 	groupid                  bigint                                    NOT NULL,
-	command                  varchar(2048)   WITH DEFAULT ''           NOT NULL,
 	PRIMARY KEY (opcommand_grpid)
 )
 /
-CREATE INDEX opcommand_grp_1 on opcommand_grp (operationid)
+CREATE INDEX opcommand_grp_1 ON opcommand_grp (operationid)
 /
 ALTER TABLE opcommand_grp ADD CONSTRAINT c_opcommand_grp_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE
 /
 ALTER TABLE opcommand_grp ADD CONSTRAINT c_opcommand_grp_2 FOREIGN KEY (groupid) REFERENCES groups (groupid)
 /
-
--- creating temporary table `tmp_opcommand`
-
-CREATE TABLE tmp_opcommand (
-	operationid bigint,
-	longdata varchar(2048)
-)
-/
-
-CREATE PROCEDURE split_commands()
-LANGUAGE SQL
-BEGIN
-	DECLARE v_longdata	varchar(2048);
-	DECLARE v_cur_string	varchar(2048);
-	DECLARE v_operationid	bigint;
-	DECLARE r_pos		integer;
-	DECLARE l_pos		integer;
-	DECLARE done		integer DEFAULT 0;
-	DECLARE not_found	CONDITION FOR SQLSTATE '02000';
-	DECLARE	op_cur		CURSOR FOR SELECT operationid, longdata FROM operations WHERE operationtype = 1;
-	DECLARE			CONTINUE HANDLER FOR not_found SET done = 1;
-
-	OPEN op_cur;
-
-	read_loop: LOOP
-		FETCH op_cur INTO v_operationid, v_longdata;
-
-		IF done = 1 THEN
-			LEAVE read_loop;
-		END IF;
-
-		SET r_pos = 1;
-		SET l_pos = 1;
-
-		parse_loop: LOOP
-			SET r_pos = INSTR(v_longdata, CHR(10), l_pos);
-
-			IF r_pos = 0 THEN
-				SET v_cur_string = SUBSTR(v_longdata, l_pos);
-			ELSE
-				SET v_cur_string = SUBSTR(v_longdata, l_pos, r_pos - l_pos);
-			END IF;
-
-			SET v_cur_string = STRIP(v_cur_string, TRAILING, X'0D');
-
-			IF LENGTH(v_cur_string) > 0 THEN
-				INSERT INTO tmp_opcommand (operationid, longdata)
-					VALUES (v_operationid, v_cur_string);
-			END IF;
-
-			IF r_pos = 0 THEN
-				LEAVE parse_loop;
-			END IF;
-
-			SET l_pos = r_pos + 1;
-		END LOOP;
-	END LOOP;
-
-	CLOSE op_cur;
-END
-/
-
-CALL split_commands()
-/
-
-DROP PROCEDURE split_commands()
-/
-
--- creating temporary table `tmp_opcommand_hst`
-
-CREATE TABLE tmp_opcommand_hst (
-	operationid bigint,
-	name varchar(64),
-	longdata varchar(2048),
-	hostid bigint
-)
-/
-
-INSERT INTO tmp_opcommand_hst (operationid, longdata)
-	SELECT operationid, longdata
-		FROM tmp_opcommand
-		WHERE INSTR(longdata, ':') <> 0 AND (INSTR(longdata, '#') = 0 OR INSTR(longdata, ':') < INSTR(longdata, '#'))
-/
-
-UPDATE tmp_opcommand_hst
-	SET name = TRIM(SUBSTR(longdata, 1, INSTR(longdata, ':') - 1)),
-		longdata = TRIM(SUBSTR(longdata, INSTR(longdata, ':') + 1))
-/
-
-DELETE FROM tmp_opcommand_hst
-	WHERE name <> '{HOSTNAME}'
-		AND NOT EXISTS (
-			SELECT h.hostid
-				FROM hosts h
-				WHERE h.host = tmp_opcommand_hst.name
-					AND TRUNC(h.hostid / 100000000000000) = TRUNC(tmp_opcommand_hst.operationid / 100000000000000))
-/
-
-UPDATE tmp_opcommand_hst
-	SET hostid = (
-		SELECT MIN(h.hostid)
-			FROM hosts h
-			WHERE h.host = tmp_opcommand_hst.name
-				AND TRUNC(h.hostid / 100000000000000) = TRUNC(tmp_opcommand_hst.operationid / 100000000000000))
-	WHERE name <> '{HOSTNAME}'
-/
-
-CREATE SEQUENCE opcommand_hst_seq AS bigint
-/
-
-INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid, command)
-	SELECT NEXTVAL FOR opcommand_hst_seq, operationid, hostid, longdata
-		FROM tmp_opcommand_hst
-/
-
-DROP SEQUENCE opcommand_hst_seq
-/
-
-UPDATE opcommand_hst
-	SET opcommand_hstid = TRUNC(operationid / 100000000000) * 100000000000 + opcommand_hstid
-	WHERE operationid >= 100000000000
-/
-
-DROP TABLE tmp_opcommand_hst
-/
-
--- creating temporary table `tmp_opcommand_grp`
-
-CREATE TABLE tmp_opcommand_grp (
-	operationid bigint,
-	name varchar(64),
-	longdata varchar(2048),
-	groupid bigint
-)
-/
-
-INSERT INTO tmp_opcommand_grp (operationid, longdata)
-	SELECT operationid, longdata
-		FROM tmp_opcommand
-		WHERE INSTR(longdata, '#') <> 0 AND (INSTR(longdata, ':') = 0 OR INSTR(longdata, '#') < INSTR(longdata, ':'))
-/
-
-UPDATE tmp_opcommand_grp
-	SET name = TRIM(SUBSTR(longdata, 1, INSTR(longdata, '#') - 1)),
-		longdata = TRIM(SUBSTR(longdata, INSTR(longdata, '#') + 1))
-/
-
-DELETE FROM tmp_opcommand_grp
-	WHERE NOT EXISTS (
-		SELECT g.groupid
-			FROM groups g
-			WHERE g.name = tmp_opcommand_grp.name
-				AND TRUNC(g.groupid / 100000000000000) = TRUNC(tmp_opcommand_grp.operationid / 100000000000000))
-/
-
-UPDATE tmp_opcommand_grp
-	SET groupid = (
-		SELECT MIN(g.groupid)
-			FROM groups g
-			WHERE g.name = tmp_opcommand_grp.name
-				AND TRUNC(g.groupid / 100000000000000) = TRUNC(tmp_opcommand_grp.operationid / 100000000000000))
-/
-
-CREATE SEQUENCE opcommand_grp_seq AS bigint
-/
-
-INSERT INTO opcommand_grp (opcommand_grpid, operationid, groupid, command)
-	SELECT NEXTVAL FOR opcommand_grp_seq, operationid, groupid, longdata
-		FROM tmp_opcommand_grp
-/
-
-DROP SEQUENCE opcommand_grp_seq
-/
-
-UPDATE opcommand_grp
-	SET opcommand_grpid = TRUNC(operationid / 100000000000) * 100000000000 + opcommand_grpid
-	WHERE operationid >= 100000000000
-/
-
-DROP TABLE tmp_opcommand_grp
-/
-DROP TABLE tmp_opcommand
-/
-
----- Patching table `opgroup`
 
 CREATE TABLE opgroup (
 	opgroupid                bigint                                    NOT NULL,
@@ -330,26 +191,6 @@ ALTER TABLE opgroup ADD CONSTRAINT c_opgroup_1 FOREIGN KEY (operationid) REFEREN
 ALTER TABLE opgroup ADD CONSTRAINT c_opgroup_2 FOREIGN KEY (groupid) REFERENCES groups (groupid)
 /
 
-CREATE SEQUENCE opgroup_seq AS bigint
-/
-
-INSERT INTO opgroup (opgroupid, operationid, groupid)
-	SELECT NEXTVAL FOR opgroup_seq, o.operationid, o.objectid
-		FROM operations o, groups g
-		WHERE o.objectid = g.groupid
-			AND o.operationtype IN (4,5)	-- OPERATION_TYPE_GROUP_ADD, OPERATION_TYPE_GROUP_REMOVE
-/
-
-DROP SEQUENCE opgroup_seq
-/
-
-UPDATE opgroup
-	SET opgroupid = TRUNC(operationid / 100000000000) * 100000000000 + opgroupid
-	WHERE operationid >= 100000000000
-/
-
----- Patching table `optemplate`
-
 CREATE TABLE optemplate (
 	optemplateid             bigint                                    NOT NULL,
 	operationid              bigint                                    NOT NULL,
@@ -364,64 +205,266 @@ ALTER TABLE optemplate ADD CONSTRAINT c_optemplate_1 FOREIGN KEY (operationid) R
 ALTER TABLE optemplate ADD CONSTRAINT c_optemplate_2 FOREIGN KEY (templateid) REFERENCES hosts (hostid)
 /
 
-CREATE SEQUENCE optemplate_seq AS bigint
+CREATE TABLE opconditions (
+	opconditionid            bigint                                    NOT NULL,
+	operationid              bigint                                    NOT NULL,
+	conditiontype            integer         WITH DEFAULT '0'          NOT NULL,
+	operator                 integer         WITH DEFAULT '0'          NOT NULL,
+	value                    varchar(255)    WITH DEFAULT ''           NOT NULL,
+	PRIMARY KEY (opconditionid)
+)
+/
+CREATE INDEX opconditions_1 ON opconditions (operationid)
+/
+ALTER TABLE opconditions ADD CONSTRAINT c_opconditions_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE
 /
 
-INSERT INTO optemplate (optemplateid, operationid, templateid)
-	SELECT NEXTVAL FOR optemplate_seq, o.operationid, o.objectid
-		FROM operations o, hosts h
-		WHERE o.objectid = h.hostid
-			AND o.operationtype IN (6,7)	-- OPERATION_TYPE_TEMPLATE_ADD, OPERATION_TYPE_TEMPLATE_REMOVE
+CREATE SEQUENCE opconditions_seq AS bigint
 /
 
-DROP SEQUENCE optemplate_seq
+CREATE PROCEDURE zbx_convert_operations()
+LANGUAGE SQL
+BEGIN
+	DECLARE v_nodeid integer;
+	DECLARE minid, maxid bigint;
+	DECLARE new_operationid bigint;
+	DECLARE new_opmessage_grpid bigint;
+	DECLARE new_opmessage_usrid bigint;
+	DECLARE new_opgroupid bigint;
+	DECLARE new_optemplateid bigint;
+	DECLARE new_opcommand_hstid bigint;
+	DECLARE new_opcommand_grpid bigint;
+	DECLARE n_done integer DEFAULT 0;
+	DECLARE n_not_found CONDITION FOR SQLSTATE '02000';
+	DECLARE n_cur CURSOR FOR (SELECT DISTINCT TRUNC(operationid / 100000000000000) FROM t_operations);
+	DECLARE CONTINUE HANDLER FOR n_not_found SET n_done = 1;
+
+	OPEN n_cur;
+
+	n_loop: LOOP
+		FETCH n_cur INTO v_nodeid;
+
+		IF n_done = 1 THEN
+			LEAVE n_loop;
+		END IF;
+
+		SET minid = v_nodeid * 100000000000000;
+		SET maxid = minid + 99999999999999;
+		SET new_operationid = minid;
+		SET new_opmessage_grpid = minid;
+		SET new_opmessage_usrid = minid;
+		SET new_opgroupid = minid;
+		SET new_optemplateid = minid;
+		SET new_opcommand_hstid = minid;
+		SET new_opcommand_grpid = minid;
+
+		BEGIN
+			DECLARE v_operationid bigint;
+			DECLARE v_actionid bigint;
+			DECLARE v_operationtype integer;
+			DECLARE v_esc_period integer;
+			DECLARE v_esc_step_from integer;
+			DECLARE v_esc_step_to integer;
+			DECLARE v_evaltype integer;
+			DECLARE v_default_msg integer;
+			DECLARE v_shortdata varchar(255);
+			DECLARE v_longdata varchar(2048);
+			DECLARE v_mediatypeid bigint;
+			DECLARE v_object integer;
+			DECLARE v_objectid bigint;
+			DECLARE l_pos, r_pos, h_pos, g_pos integer;
+			DECLARE cur_string varchar(2048);
+			DECLARE v_host, v_group varchar(64);
+			DECLARE v_hostid, v_groupid bigint;
+			DECLARE o_done integer DEFAULT 0;
+			DECLARE o_not_found CONDITION FOR SQLSTATE '02000';
+			DECLARE o_cur CURSOR FOR (
+				SELECT operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to,
+						evaltype, default_msg, shortdata, longdata, mediatypeid, object, objectid
+					FROM t_operations
+					WHERE operationid BETWEEN minid AND maxid);
+			DECLARE CONTINUE HANDLER FOR o_not_found SET o_done = 1;
+
+			OPEN o_cur;
+
+			o_loop: LOOP
+				FETCH o_cur INTO v_operationid, v_actionid, v_operationtype, v_esc_period, v_esc_step_from,
+						v_esc_step_to, v_evaltype, v_default_msg, v_shortdata, v_longdata,
+						v_mediatypeid, v_object, v_objectid;
+
+				IF o_done = 1 THEN
+					LEAVE o_loop;
+				END IF;
+
+				IF v_operationtype IN (0) THEN			-- OPERATION_TYPE_MESSAGE
+					SET new_operationid = new_operationid + 1;
+
+					INSERT INTO operations (operationid, actionid, operationtype, esc_period,
+							esc_step_from, esc_step_to, evaltype)
+						VALUES (new_operationid, v_actionid, v_operationtype, v_esc_period,
+							v_esc_step_from, v_esc_step_to, v_evaltype);
+
+					INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid)
+						VALUES (new_operationid, v_default_msg, v_shortdata, v_longdata, v_mediatypeid);
+
+					IF v_object = 0 AND v_objectid IS NOT NULL THEN	-- OPERATION_OBJECT_USER
+						SET new_opmessage_usrid = new_opmessage_usrid + 1;
+
+						INSERT INTO opmessage_usr (opmessage_usrid, operationid, userid)
+							VALUES (new_opmessage_usrid, new_operationid, v_objectid);
+					END IF;
+
+					IF v_object = 1 AND v_objectid IS NOT NULL THEN	-- OPERATION_OBJECT_GROUP
+						SET new_opmessage_grpid = new_opmessage_grpid + 1;
+
+						INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid)
+							VALUES (new_opmessage_grpid, new_operationid, v_objectid);
+					END IF;
+
+					INSERT INTO opconditions
+						SELECT minid + (NEXTVAL FOR opconditions_seq), new_operationid, conditiontype,
+								operator, value
+							FROM t_opconditions
+							WHERE operationid = v_operationid;
+				ELSEIF v_operationtype IN (1) THEN		-- OPERATION_TYPE_COMMAND
+					SET r_pos = 1;
+					SET l_pos = 1;
+
+					WHILE r_pos > 0 DO
+						SET r_pos = INSTR(v_longdata, CHR(10), l_pos);
+
+						IF r_pos = 0 THEN
+							SET cur_string = SUBSTR(v_longdata, l_pos);
+						ELSE
+							SET cur_string = SUBSTR(v_longdata, l_pos, r_pos - l_pos);
+						END IF;
+
+						SET cur_string = STRIP(cur_string, TRAILING, X'0D');
+						SET cur_string = TRIM(cur_string);
+
+						IF LENGTH(cur_string) <> 0 THEN
+							SET h_pos = INSTR(cur_string, ':');
+							SET g_pos = INSTR(cur_string, '#');
+
+							IF h_pos <> 0 OR g_pos <> 0 THEN
+								SET new_operationid = new_operationid + 1;
+
+								INSERT INTO operations (operationid, actionid, operationtype,
+										esc_period, esc_step_from, esc_step_to, evaltype)
+								VALUES (new_operationid, v_actionid, v_operationtype, v_esc_period,
+										v_esc_step_from, v_esc_step_to, v_evaltype);
+
+								INSERT INTO opconditions
+									SELECT minid + (NEXTVAL FOR opconditions_seq),
+											new_operationid, conditiontype,
+											operator, value
+										FROM t_opconditions
+										WHERE operationid = v_operationid;
+
+								IF h_pos <> 0 AND (g_pos = 0 OR h_pos < g_pos) THEN
+									INSERT INTO opcommand (operationid, command)
+										VALUES (new_operationid, TRIM(SUBSTR(cur_string, h_pos + 1)));
+
+									SET v_host = TRIM(SUBSTR(cur_string, 1, h_pos - 1));
+
+									IF v_host = '{HOSTNAME}' THEN
+										SET new_opcommand_hstid = new_opcommand_hstid + 1;
+
+										INSERT INTO opcommand_hst
+											VALUES (new_opcommand_hstid, new_operationid, NULL);
+									ELSE
+										SET v_hostid = (
+											SELECT MIN(hostid)
+												FROM hosts
+												WHERE host = v_host
+													AND TRUNC(hostid / 100000000000000) = v_nodeid);
+
+										IF v_hostid IS NOT NULL THEN
+											SET new_opcommand_hstid = new_opcommand_hstid + 1;
+
+											INSERT INTO opcommand_hst
+												VALUES (new_opcommand_hstid, new_operationid, v_hostid);
+										END IF;
+									END IF;
+								END IF;
+
+								IF g_pos <> 0 AND (h_pos = 0 OR g_pos < h_pos) THEN
+									INSERT INTO opcommand (operationid, command)
+										VALUES (new_operationid, TRIM(SUBSTR(cur_string, g_pos + 1)));
+
+									SET v_group = TRIM(SUBSTR(cur_string, 1, g_pos - 1));
+
+									SET v_groupid = (
+										SELECT MIN(groupid)
+											FROM groups
+											WHERE name = v_group
+												AND TRUNC(groupid / 100000000000000) = v_nodeid);
+
+									IF v_groupid IS NOT NULL THEN
+										SET new_opcommand_grpid = new_opcommand_grpid + 1;
+
+										INSERT INTO opcommand_grp
+											VALUES (new_opcommand_grpid, new_operationid, v_groupid);
+									END IF;
+								END IF;
+							END IF;
+						END IF;
+
+						SET l_pos = r_pos + 1;
+					END WHILE;
+				ELSEIF v_operationtype IN (2, 3, 8, 9) THEN	-- OPERATION_TYPE_HOST_(ADD, REMOVE, ENABLE, DISABLE)
+					SET new_operationid = new_operationid + 1;
+
+					INSERT INTO operations (operationid, actionid, operationtype)
+						VALUES (new_operationid, v_actionid, v_operationtype);
+				ELSEIF v_operationtype IN (4, 5) THEN		-- OPERATION_TYPE_GROUP_(ADD, REMOVE)
+					SET new_operationid = new_operationid + 1;
+
+					INSERT INTO operations (operationid, actionid, operationtype)
+						VALUES (new_operationid, v_actionid, v_operationtype);
+
+					SET new_opgroupid = new_opgroupid + 1;
+
+					INSERT INTO opgroup (opgroupid, operationid, groupid)
+						VALUES (new_opgroupid, new_operationid, v_objectid);
+				ELSEIF v_operationtype IN (6, 7) THEN		-- OPERATION_TYPE_TEMPLATE_(ADD, REMOVE)
+					SET new_operationid = new_operationid + 1;
+
+					INSERT INTO operations (operationid, actionid, operationtype)
+						VALUES (new_operationid, v_actionid, v_operationtype);
+
+					SET new_optemplateid = new_optemplateid + 1;
+
+					INSERT INTO optemplate (optemplateid, operationid, templateid)
+						VALUES (new_optemplateid, new_operationid, v_objectid);
+				END IF;
+			END LOOP o_loop;
+
+			CLOSE o_cur;
+		END;
+	END LOOP n_loop;
+
+	CLOSE n_cur;
+END
 /
 
-UPDATE optemplate
-	SET optemplateid = TRUNC(operationid / 100000000000) * 100000000000 + optemplateid
-	WHERE operationid >= 100000000000
+CALL zbx_convert_operations
 /
 
----- Patching table `operations`
-
-ALTER TABLE operations ALTER COLUMN operationid SET WITH DEFAULT NULL
-/
-REORG TABLE operations
-/
-ALTER TABLE operations ALTER COLUMN actionid SET WITH DEFAULT NULL
-/
-REORG TABLE operations
-/
-ALTER TABLE operations ALTER COLUMN esc_step_from SET WITH DEFAULT '1'
-/
-REORG TABLE operations
-/
-ALTER TABLE operations DROP COLUMN object
-/
-REORG TABLE operations
-/
-ALTER TABLE operations DROP COLUMN objectid
-/
-REORG TABLE operations
-/
-ALTER TABLE operations DROP COLUMN shortdata
-/
-REORG TABLE operations
-/
-ALTER TABLE operations DROP COLUMN longdata
-/
-REORG TABLE operations
-/
-ALTER TABLE operations DROP COLUMN default_msg
-/
-REORG TABLE operations
-/
-DELETE FROM operations WHERE actionid NOT IN (SELECT actionid FROM actions)
-/
-ALTER TABLE operations ADD CONSTRAINT c_operations_1 FOREIGN KEY (actionid) REFERENCES actions (actionid) ON DELETE CASCADE
+DROP SEQUENCE opconditions_seq
 /
 
----- Dropping table `opmediatypes`
+DROP TABLE t_operations
+/
+DROP TABLE t_opconditions
+/
+DROP PROCEDURE zbx_convert_operations
+/
 
-DROP TABLE opmediatypes
+UPDATE opcommand
+	SET type = 1, command = TRIM(SUBSTR(command, 5))
+	WHERE SUBSTR(command, 1, 4) = 'IPMI'
+/
+
+DELETE FROM ids WHERE table_name IN ('operations', 'opconditions', 'opmediatypes')
 /

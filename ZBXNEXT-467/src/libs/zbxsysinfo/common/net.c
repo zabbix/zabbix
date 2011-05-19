@@ -42,16 +42,12 @@ int	tcp_expect(const char *host, unsigned short port, int timeout, const char *r
 	char		*buf;
 	int		net, val = SUCCEED;
 
-	assert(value_int);
-
 	*value_int = 0;
 
 	if (SUCCEED == (net = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout)))
 	{
 		if (NULL != request)
-		{
 			net = zbx_tcp_send_raw(&s, request);
-		}
 
 		if (NULL != expect && SUCCEED == net)
 		{
@@ -65,14 +61,10 @@ int	tcp_expect(const char *host, unsigned short port, int timeout, const char *r
 		}
 
 		if (NULL != sendtoclose && SUCCEED == net && SUCCEED == val)
-		{
 			zbx_tcp_send_raw(&s, sendtoclose);
-		}
 
 		if (SUCCEED == net && SUCCEED == val)
-		{
 			*value_int = 1;
-		}
 
 		zbx_tcp_close(&s);
 	}
@@ -92,7 +84,7 @@ int	NET_TCP_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	int		value_int, ret;
 	char		ip[64], port_str[8];
 
-	if (num_param(param) > 2)
+	if (2 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 1, ip, sizeof(ip)))
@@ -108,9 +100,7 @@ int	NET_TCP_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 		return SYSINFO_RET_FAIL;
 
 	if (SYSINFO_RET_OK == (ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, NULL, NULL, &value_int)))
-	{
 		SET_UI64_RESULT(result, value_int);
-	}
 
 	return ret;
 }
@@ -656,7 +646,9 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 #endif
 	if (0 != offset)
 		buffer[--offset] = '\0';
+
 	SET_TEXT_RESULT(result, strdup(buffer));
+
 	return SYSINFO_RET_OK;
 #else /* both HAVE_RES_QUERY and _WINDOWS not defined */
 	return SYSINFO_RET_FAIL;

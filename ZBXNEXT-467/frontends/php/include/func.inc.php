@@ -61,12 +61,8 @@ function resetGetParams($params, $newURL=null){
 }
 
 function get_request($name, $def=NULL){
-	if(isset($_REQUEST[$name]))
-		return $_REQUEST[$name];
-	else
-		return $def;
+	return isset($_REQUEST[$name]) ? $_REQUEST[$name] : $def;
 }
-
 
 function inarr_isset($keys, $array=null){
 	if(is_null($array)) $array =& $_REQUEST;
@@ -435,9 +431,9 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 // Any other unit
 //-------------------
 // black list wich do not require units metrics..
-	$blackList = array('%','ms','rpm');
+	$blackList = array('%','ms','rpm','RPM');
 
-	if(in_array(strtolower($units), $blackList) || (zbx_empty($units) && (($convert == ITEM_CONVERT_WITH_UNITS) || ($value < 1)))){
+	if(in_array($units, $blackList) || (zbx_empty($units) && (($convert == ITEM_CONVERT_WITH_UNITS) || ($value < 1)))){
 		if(abs($value) >= ZBX_UNITS_ROUNDOFF_THRESHOLD)
 			$value = round($value, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT);
 		$value = sprintf('%.'.ZBX_UNITS_ROUNDOFF_LOWER_LIMIT.'f', $value);
@@ -557,10 +553,9 @@ function zbx_is_int($var){
 return preg_match("/^\-?\d{1,20}+$/", $var);
 }
 
-function zbx_array_diff($array1, $array2, $field){
-
-	$fields1 = zbx_objectValues($array1, $field);
-	$fields2 = zbx_objectValues($array2, $field);
+function zbx_array_diff($primary, $secondary, $field){
+	$fields1 = zbx_objectValues($primary, $field);
+	$fields2 = zbx_objectValues($secondary, $field);
 
 	$first = array_diff($fields1, $fields2);
 	$first = zbx_toHash($first);
@@ -574,7 +569,7 @@ function zbx_array_diff($array1, $array2, $field){
 		'both' => array()
 	);
 
-	foreach($array1 as $array){
+	foreach($primary as $array){
 		if(!isset($array[$field]))
 			$result['first'][] = $array;
 		else if(isset($first[$array[$field]]))
@@ -583,13 +578,11 @@ function zbx_array_diff($array1, $array2, $field){
 			$result['both'][$array[$field]] = $array;
 	}
 
-	foreach($array2 as $array){
+	foreach($secondary as $array){
 		if(!isset($array[$field]))
 			$result['second'][] = $array;
 		else if(isset($second[$array[$field]]))
 			$result['second'][] = $array;
-		else
-			$result['both'][$array[$field]] = $array;
 	}
 
 	return $result;
@@ -601,6 +594,30 @@ function zbx_array_push(&$array, $add){
 			$array[$key][$newKey] = $newValue;
 		}
 	}
+}
+
+/**
+ * Find if array has any duplicate values and return an array with info about them.
+ * In case of no duplicates, empty array is returned.
+ * Example of usage:
+ *     $result = zbx_arrayFindDuplicates(
+ *         array('a', 'b', 'c', 'c', 'd', 'd', 'd', 'e')
+ *     );
+ *     array(
+ *         'd' => 3,
+ *         'c' => 2,
+ *     )
+ * @param array $array
+ * @return array
+ */
+function zbx_arrayFindDuplicates(array $array){
+	function moreThanOne($a){
+		return $a > 1;
+	}
+	$countValues = array_count_values($array); // counting occurrences of every value in array
+	$countValues = array_filter($countValues, 'moreThanOne'); // removing all values that appear only once
+	arsort($countValues); // sorting, so that the most duplicates would be at the top
+	return $countValues;
 }
 
 // STRING FUNCTIONS {{{
@@ -630,6 +647,10 @@ return $str_res;
 
 function zbx_htmlstr($str){
 	return str_replace(array('<','>','"'),array('&lt;','&gt;','&quot;'), $str);
+}
+
+function zbx_formatDomId($value){
+	return str_replace(array('[',']'),array('_',''), $value);
 }
 
 function zbx_strlen($str){
@@ -765,6 +786,15 @@ function zbx_strpos($haystack, $needle, $offset=0){
 	}
 }
 
+function zbx_stripos($haystack, $needle, $offset=0){
+	if(defined('ZBX_MBSTRINGS_ENABLED')){
+		return mb_stripos($haystack, $needle, $offset);
+	}
+	else{
+		return stripos($haystack, $needle, $offset);
+	}
+}
+
 function zbx_strrpos($haystack, $needle){
 	if(defined('ZBX_MBSTRINGS_ENABLED')){
 		return mb_strrpos($haystack, $needle);
@@ -773,6 +803,7 @@ function zbx_strrpos($haystack, $needle){
 		return strrpos($haystack, $needle);
 	}
 }
+
 // }}} STRING FUNCTIONS
 
 
@@ -894,7 +925,6 @@ function morder_result(&$data, $sortfields, $sortorder=ZBX_SORT_UP){
 	return true;
 }
 
-
 function order_result(&$data, $sortfield=null, $sortorder=ZBX_SORT_UP){
 	if(empty($data)) return false;
 
@@ -945,6 +975,12 @@ function order_by($def,$allways=''){
 return ' ORDER BY '.$tabfield.' '.$sortorder.$allways;
 }
 /************* END SORT *************/
+
+function unsetExcept(&$array, $allowedFields){
+	foreach($array as $key => $value){
+		if(!isset($allowedFields[$key])) unset($array[$key]);
+	}
+}
 
 function zbx_implodeHash($glue1, $glue2, $hash){
 	if(is_null($glue2)) $glue2 = $glue1;

@@ -186,7 +186,7 @@
 
 
 	if(isset($_REQUEST['form'])){
-		$proxyForm = new CGetForm('proxy.edit');
+		$proxyForm = new CView('administration.proxy.edit');
 		$proxies_wdgt->addItem($proxyForm->render());
 		$proxies_wdgt->show();
 	}
@@ -268,7 +268,7 @@
 
 			foreach($proxy['hosts'] as $host){
 				$style = ($host['status']==HOST_STATUS_MONITORED) ? 'off':(($host['status']==HOST_STATUS_TEMPLATE)?'unknown' :'on');
-				$hosts[] = new CLink($host['host'], 'hosts.php?form=update&hostid='.$host['hostid'], $style);
+				$hosts[] = new CLink($host['name'], 'hosts.php?form=update&hostid='.$host['hostid'], $style);
 				$hosts[] = ', ';
 			}
 			array_pop($hosts);

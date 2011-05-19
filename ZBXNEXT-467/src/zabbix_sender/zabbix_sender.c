@@ -131,23 +131,22 @@ static char*	ZABBIX_KEY = NULL;
 static char*	ZABBIX_KEY_VALUE = NULL;
 
 #if !defined(_WINDOWS)
-
 static void	send_signal_handler(int sig)
 {
 	if (SIGALRM == sig)
-		zabbix_log(LOG_LEVEL_WARNING, "Timeout while executing operation");
+		zabbix_log(LOG_LEVEL_WARNING, "timeout while executing operation");
 
 	exit(FAIL);
 }
+#endif
 
-#endif /* NOT _WINDOWS */
-
-typedef struct zbx_active_metric_type
+typedef struct
 {
 	char		*source_ip, *server;
 	unsigned short	port;
 	struct zbx_json	json;
-} ZBX_THREAD_SENDVAL_ARGS;
+}
+ZBX_THREAD_SENDVAL_ARGS;
 
 /******************************************************************************
  *                                                                            *
@@ -181,31 +180,29 @@ static int	check_response(char *response)
 		ret = FAIL;
 
 	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_INFO, info, sizeof(info)))
-		printf("Info from server: \"%s\"\n", info);
+		printf("info from server: \"%s\"\n", info);
 
 	return ret;
 }
 
 static	ZBX_THREAD_ENTRY(send_value, args)
 {
-	ZBX_THREAD_SENDVAL_ARGS *sentdval_args;
-
-	zbx_sock_t	sock;
-
-	char	*answer = NULL;
-
-	int	tcp_ret = FAIL, ret = FAIL;
+	ZBX_THREAD_SENDVAL_ARGS	*sentdval_args;
+	zbx_sock_t		sock;
+	char			*answer = NULL;
+	int			tcp_ret = FAIL, ret = FAIL;
 
 	assert(args);
+	assert(((zbx_thread_args_t *)args)->args);
 
-	sentdval_args = ((ZBX_THREAD_SENDVAL_ARGS *)args);
+	sentdval_args = (ZBX_THREAD_SENDVAL_ARGS *)((zbx_thread_args_t *)args)->args;
 
 #if !defined(_WINDOWS)
 	signal(SIGINT,  send_signal_handler);
 	signal(SIGTERM, send_signal_handler);
 	signal(SIGQUIT, send_signal_handler);
 	signal(SIGALRM, send_signal_handler);
-#endif /* NOT _WINDOWS */
+#endif
 
 	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, CONFIG_SOURCE_IP, sentdval_args->server, sentdval_args->port, GET_SENDER_TIMEOUT)))
 	{
@@ -213,11 +210,9 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 		{
 			if (SUCCEED == (tcp_ret = zbx_tcp_recv(&sock, &answer)))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "Answer [%s]", answer);
+				zabbix_log(LOG_LEVEL_DEBUG, "answer [%s]", answer);
 				if (NULL == answer || SUCCEED != check_response(answer))
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "Incorrect answer from server [%s]", answer);
-				}
+					zabbix_log(LOG_LEVEL_WARNING, "incorrect answer from server [%s]", answer);
 				else
 					ret = SUCCEED;
 			}
@@ -227,20 +222,20 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	}
 
 	if (FAIL == tcp_ret)
-		zabbix_log(LOG_LEVEL_DEBUG, "Send value error: %s", zbx_tcp_strerror());
+		zabbix_log(LOG_LEVEL_DEBUG, "send value error: %s", zbx_tcp_strerror());
 
 	zbx_thread_exit(ret);
 }
 
-static void    init_config(const char* config_file)
+static void    init_config(const char *config_file)
 {
-	char*	config_source_ip_from_conf = NULL;
-	char*	zabbix_server_from_conf = NULL;
+	char	*config_source_ip_from_conf = NULL;
+	char	*zabbix_server_from_conf = NULL;
 	int	zabbix_server_port_from_conf = 0;
-	char*	zabbix_hostname_from_conf = NULL;
-	char*	c = NULL;
+	char	*zabbix_hostname_from_conf = NULL;
+	char	*c = NULL;
 
-	struct cfg_line cfg[]=
+	struct cfg_line	cfg[]=
 	{
 		/* PARAMETER	,VAR				,FUNC	,TYPE(0i,1s)	,MANDATORY	,MIN			,MAX		*/
 		{"SourceIP"	,&config_source_ip_from_conf	,0	,TYPE_STRING	,PARM_OPT	,0			,0		},
@@ -250,43 +245,42 @@ static void    init_config(const char* config_file)
 		{0}
 	};
 
-	if( config_file )
+	if (NULL != config_file)
 	{
 		parse_cfg_file(config_file, cfg);
 
 		if (NULL != config_source_ip_from_conf)
 		{
-			if (NULL == CONFIG_SOURCE_IP)	/* apply parameter only if unset */
-			{
+			if (NULL == CONFIG_SOURCE_IP)
 				CONFIG_SOURCE_IP = strdup(config_source_ip_from_conf);
-			}
+
 			zbx_free(config_source_ip_from_conf);
 		}
 
-		if( zabbix_server_from_conf )
+		if (NULL != zabbix_server_from_conf)
 		{
-			if( !ZABBIX_SERVER )
-			{ /* apply parameter only if unset */
-				if( (c = strchr(zabbix_server_from_conf, ',')) )
-				{ /* get only first server */
-					*c = '\0';
-				}
+			if (NULL == ZABBIX_SERVER)
+			{
+				if (NULL != (c = strchr(zabbix_server_from_conf, ',')))
+					*c = '\0';	/* get only first server */
+
 				ZABBIX_SERVER = strdup(zabbix_server_from_conf);
 			}
+
 			zbx_free(zabbix_server_from_conf);
 		}
 
-		if( !ZABBIX_SERVER_PORT && zabbix_server_port_from_conf )
-		{ /* apply parameter only if unset */
-			ZABBIX_SERVER_PORT = zabbix_server_port_from_conf;
+		if (0 != zabbix_server_port_from_conf)
+		{
+			if (0 == ZABBIX_SERVER_PORT)
+				ZABBIX_SERVER_PORT = zabbix_server_port_from_conf;
 		}
 
-		if( zabbix_hostname_from_conf )
+		if (NULL != zabbix_hostname_from_conf)
 		{
-			if( !ZABBIX_HOSTNAME )
-			{ /* apply parameter only if unset */
+			if (NULL == ZABBIX_HOSTNAME)
 				ZABBIX_HOSTNAME = strdup(zabbix_hostname_from_conf);
-			}
+
 			zbx_free(zabbix_hostname_from_conf);
 		}
 	}
@@ -294,12 +288,14 @@ static void    init_config(const char* config_file)
 
 static zbx_task_t parse_commandline(int argc, char **argv)
 {
-	zbx_task_t      task    = ZBX_TASK_START;
-	char    ch      = '\0';
+	zbx_task_t      task = ZBX_TASK_START;
+	char    	ch = '\0';
 
-	/* Parse the command-line. */
-	while ((ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)) != (char)EOF)
-		switch (ch) {
+	/* parse the command-line */
+	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
+	{
+		switch (ch)
+		{
 			case 'c':
 				CONFIG_FILE = strdup(zbx_optarg);
 				break;
@@ -339,7 +335,7 @@ static zbx_task_t parse_commandline(int argc, char **argv)
 				REAL_TIME = 1;
 				break;
 			case 'v':
-				if(CONFIG_LOG_LEVEL == LOG_LEVEL_WARNING)
+				if (LOG_LEVEL_WARNING == CONFIG_LOG_LEVEL)
 					CONFIG_LOG_LEVEL = LOG_LEVEL_DEBUG;
 				else
 					CONFIG_LOG_LEVEL = LOG_LEVEL_WARNING;
@@ -349,6 +345,7 @@ static zbx_task_t parse_commandline(int argc, char **argv)
 				exit(FAIL);
 				break;
 		}
+	}
 
 	if (NULL == ZABBIX_SERVER && NULL == CONFIG_FILE)
 	{
@@ -359,6 +356,8 @@ static zbx_task_t parse_commandline(int argc, char **argv)
 	return task;
 }
 
+/* sending a huge amount of values in a single connection is likely to */
+/* take long and hit timeout, so we limit values to 250 per connection */
 #define VALUES_MAX	250
 
 int main(int argc, char **argv)
@@ -382,6 +381,7 @@ int main(int argc, char **argv)
 
 	const char	*p;
 
+	zbx_thread_args_t	thread_args;
 	ZBX_THREAD_SENDVAL_ARGS sentdval_args;
 
 	progname = get_program_name(argv[0]);
@@ -407,8 +407,11 @@ int main(int argc, char **argv)
 		goto exit;
 	}
 
-	sentdval_args.server	= ZABBIX_SERVER;
-	sentdval_args.port	= ZABBIX_SERVER_PORT;
+	thread_args.thread_num = 0;
+	thread_args.args = &sentdval_args;
+
+	sentdval_args.server = ZABBIX_SERVER;
+	sentdval_args.port = ZABBIX_SERVER_PORT;
 
 	zbx_json_init(&sentdval_args.json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA, ZBX_JSON_TYPE_STRING);
@@ -427,7 +430,7 @@ int main(int argc, char **argv)
 		}
 		else if (NULL == (in = fopen(INPUT_FILE, "r")) )
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot open [%s] [%s]", INPUT_FILE, strerror(errno));
+			zabbix_log(LOG_LEVEL_WARNING, "cannot open [%s]: %s", INPUT_FILE, zbx_strerror(errno));
 			ret = FAIL;
 			goto exit;
 		}
@@ -510,8 +513,7 @@ int main(int argc, char **argv)
 
 				if (-1 == (read_more = select(1, &read_set, NULL, NULL, &tv)))
 				{
-					zabbix_log(LOG_LEVEL_WARNING, "select() failed with errno:%d error:[%s]",
-							errno, strerror(errno));
+					zabbix_log(LOG_LEVEL_WARNING, "select() failed: %s", zbx_strerror(errno));
 				}
 				else if (1 <= read_more)
 				{
@@ -531,7 +533,7 @@ int main(int argc, char **argv)
 
 				last_send = zbx_time();
 
-				ret = zbx_thread_wait(zbx_thread_start(send_value, &sentdval_args));
+				ret = zbx_thread_wait(zbx_thread_start(send_value, &thread_args));
 
 				buffer_count = 0;
 				zbx_json_clean(&sentdval_args.json);
@@ -547,7 +549,7 @@ int main(int argc, char **argv)
 			if (1 == WITH_TIMESTAMPS)
 				zbx_json_adduint64(&sentdval_args.json, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
 
-			ret = zbx_thread_wait(zbx_thread_start(send_value, &sentdval_args));
+			ret = zbx_thread_wait(zbx_thread_start(send_value, &thread_args));
 		}
 
 		if (in != stdin)
@@ -583,7 +585,7 @@ int main(int argc, char **argv)
 
 			succeed_count++;
 
-			ret = zbx_thread_wait(zbx_thread_start(send_value, &sentdval_args));
+			ret = zbx_thread_wait(zbx_thread_start(send_value, &thread_args));
 		}
 		while(0); /* try block simulation */
 	}

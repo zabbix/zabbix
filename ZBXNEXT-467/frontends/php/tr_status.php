@@ -37,7 +37,7 @@ if($page['type'] == PAGE_TYPE_HTML){
 include_once('include/page_header.php');
 
 // js templates
-require_once('include/templates/scriptConfirm.js.php');
+require_once('include/views/js/general.script.confirm.js.php');
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -298,7 +298,7 @@ require_once('include/templates/scriptConfirm.js.php');
 	$options = array(
 		'nodeids' => get_current_nodeid(),
 		'filter' => array(),
-		'active' => 1,
+		'monitored' => 1,
 		'output' => API_OUTPUT_EXTEND,
 		'skipDependent' => 1,
 		'sortfield' => $sortfield,
@@ -347,11 +347,12 @@ require_once('include/templates/scriptConfirm.js.php');
 		'nodeids' => get_current_nodeid(),
 		'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => array('hostid', 'host', 'maintenance_status', 'maintenance_type', 'maintenanceid'),
+		'selectHosts' => array('hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid'),
 		'selectItems' => API_OUTPUT_EXTEND,
-		'select_dependencies' => API_OUTPUT_EXTEND
+		'selectDependencies' => API_OUTPUT_EXTEND
 	);
 	$triggers = API::Trigger()->get($options);
+
 	$triggers = zbx_toHash($triggers, 'triggerid');
 
 	order_result($triggers, $sortfield, $sortorder);
@@ -431,22 +432,22 @@ require_once('include/templates/scriptConfirm.js.php');
 
 		$used_hosts = array();
 		foreach($trigger['hosts'] as $th){
-			$used_hosts[$th['hostid']] = $th['host'];
+			$used_hosts[$th['hostid']] = $th['name'];
 		}
 		$used_host_count = count($used_hosts);
 
 		foreach($trigger['items'] as $inum => $item){
-			$item_description = item_description($item);
+			$item_name = itemName($item);
 
 			//if we have items from different hosts, we must prefix a host name
 			if ($used_host_count > 1) {
-				$item_description = $used_hosts[$item['hostid']].':'.$item_description;
+				$item_name = $used_hosts[$item['hostid']].':'.$item_name;
 			}
 
 			$items[$inum]['itemid'] = $item['itemid'];
 			$items[$inum]['value_type'] = $item['value_type']; //ZBX-3059: So it would be possible to show different caption for history for chars and numbers (KB)
 			$items[$inum]['action'] = str_in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64)) ? 'showgraph' : 'showvalues';
-			$items[$inum]['description'] = $item_description;
+			$items[$inum]['name'] = $item_name;
 		}
 		$trigger['items'] = $items;
 
@@ -460,8 +461,9 @@ require_once('include/templates/scriptConfirm.js.php');
 
 		$menu_trigger_conf = 'null';
 		if($admin_links && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL){
-			$menu_trigger_conf = "['".S_CONFIGURATION_OF_TRIGGERS."',\"javascript:
-				redirect('triggers.php?form=update&triggerid=".$trigger['triggerid'].'&switch_node='.id2nodeid($trigger['triggerid'])."')\",
+			$str_tmp = zbx_jsvalue('javascript: redirect("triggers.php?form=update&triggerid='.
+					$trigger['triggerid'].'&switch_node='.id2nodeid($trigger['triggerid']).'")');
+			$menu_trigger_conf = "['".S_CONFIGURATION_OF_TRIGGERS."',". $str_tmp .",
 				null, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 		}
 		$menu_trigger_url = 'null';
@@ -483,7 +485,7 @@ require_once('include/templates/scriptConfirm.js.php');
 			$font = new CTag('font', 'yes');
 			$font->setAttribute('color', '#000');
 			$font->setAttribute('size', '-2');
-			$font->addItem(explode_exp($trigger['expression'], 1, false, true));
+			$font->addItem(explode_exp($trigger['expression'], true, true));
 			$description = array($description, BR(), $font);
 		}
 
@@ -549,7 +551,7 @@ require_once('include/templates/scriptConfirm.js.php');
 				}
 			}
 			if(!empty($scripts_by_hosts)){
-				$menus = "[".zbx_jsvalue(S_TOOLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus;
+				$menus = "[".zbx_jsvalue(_('Scripts')).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus;
 			}
 
 			$menus.= "[".zbx_jsvalue(S_LINKS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
@@ -578,7 +580,7 @@ require_once('include/templates/scriptConfirm.js.php');
 				$maint_span->setHint($maint_hint);
 			}
 
-			$hosts_span = new CSpan($trigger_host['host'], 'link_menu');
+			$hosts_span = new CSpan($trigger_host['name'], 'link_menu');
 			$hosts_span->setAttribute('onclick','javascript: '.$menus);
 			$hosts_list[] = $hosts_span;
 			$hosts_list[] = $maint_span;

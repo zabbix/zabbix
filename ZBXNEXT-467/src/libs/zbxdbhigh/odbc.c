@@ -19,7 +19,6 @@
 
 #include "common.h"
 #include "log.h"
-#include "zlog.h"
 #include "zbxodbc.h"
 
 static char	zbx_last_odbc_strerror[255];

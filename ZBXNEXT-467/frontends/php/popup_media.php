@@ -100,7 +100,7 @@ include_once('include/page_header.php');
 	$sendto		=  get_request('sendto','');
 	$mediatypeid	= get_request('mediatypeid',0);
 	$active		= get_request('active',0);
-	$period		= get_request('period','1-7,00:00-23:59');
+	$period		= get_request('period',ZBX_DEFAULT_INTERVAL);
 
 
 	$frmMedia = new CFormTable(S_NEW_MEDIA);
