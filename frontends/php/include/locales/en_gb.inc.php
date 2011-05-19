@@ -733,7 +733,6 @@
 	'S_DELETED'=>					_('Deleted'),
 	'S_UNKNOWN'=>					_('Unknown'),
 	'S_GROUPS'=>					_('Groups'),
-	'S_MINUS_ALL_GROUPS_MINUS'=>			_(' - all groups - '),
 	'S_ALL_GROUPS'=>				_('All groups'),
 	'S_NO_GROUPS_DEFINED'=>				_('No groups defined'),
 	'S_DNS_NAME'=>					_('DNS name'),
@@ -1002,7 +1001,6 @@
 	'S_MAINTENANCE_BIG'=>			_('MAINTENANCE'),
 
 //	sysmaps.php
-	'S_IMAGE_IS_USED_IN_ZABBIX_MAP' => _('Image is used in Zabbix map'),
 	'S_EDIT_MAP_ELEMENT'=>			_('Edit map element'),
 	'S_ICON_DEFAULT'=>			_('Icon (default)'),
 	'S_APPLY'=>					_('Apply'),
@@ -1795,7 +1793,6 @@
 	'S_ADDED_SMALL'=>				_('added'),
 
 //	hosts.inc.php
-	'S_CIRCULAR_LINK_CANNOT_BE_CREATED'=>		_('Circular link can not be created'),
 	'S_INTERNAL_AND_CANNOT_DELETED_SMALL'=>		_('is internal and can not be deleted'),
 	'S_NO_HOST_WITH'=>				_('No host with'),
 	'S_USED_BY_SCENARIO_SMALL'=>			_('used by scenario'),

@@ -213,6 +213,8 @@ class CImage extends CZBXAPI{
 		if(!is_null($options['select_image'])){
 			$db_img = DBselect('SELECT imageid, image FROM images WHERE '.DBCondition('imageid', $imageids));
 			while($img = DBfetch($db_img)){
+				// PostgreSQL and SQLite images are stored escaped in the DB
+				$img['image'] = zbx_unescape_image($img['image']);
 				$result[$img['imageid']]['image'] = base64_encode($img['image']);
 			}
 		}
@@ -521,17 +523,17 @@ class CImage extends CZBXAPI{
 					')';
 			$db_sysmaps = DBselect($sql);
 
-			$errors = array();
+			$used_in_maps = array();
 			while($sysmap = DBfetch($db_sysmaps)){
-				$errors[] = S_IMAGE_IS_USED_IN_ZABBIX_MAP.' "'.get_node_name_by_elid($sysmap['sysmapid'],true,':').$sysmap['name'].'"';
+				$used_in_maps[] = $sysmap['name'];
 			}
-			if(!empty($errors)) self::exception(ZBX_API_ERROR_PARAMETERS, $errors);
 
+			if(!empty($used_in_maps))
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+						_n('The image is used in map %2$s', 'The image is used in maps %2$s',
+						count($used_in_maps), '"'.implode('", "', $used_in_maps).'"'));
 
-			$sql = 'DELETE FROM images WHERE '.DBcondition('imageid', $imageids);
-			if(!DBexecute($sql)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-			}
+			DB::delete('images', array('imageid' => $imageids));
 
 			return array('imageids' => $imageids);
 	}
