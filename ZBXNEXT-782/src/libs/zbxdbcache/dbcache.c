@@ -167,7 +167,7 @@ void	*DCget_stats(int request)
 	static double		value_double;
 	char			*first_text = NULL;
 	size_t			free_len = 0;
-	int			i, index;
+	int			n, f;
 
 	switch (request)
 	{
@@ -178,16 +178,20 @@ void	*DCget_stats(int request)
 
 		LOCK_CACHE;
 
-		for (i = 0; i < cache->history_num; i++)
+		f = cache->history_first;
+
+		for (n = cache->history_num; 0 < n; n--)
 		{
-			index = (cache->history_first + i) % ZBX_HISTORY_SIZE;
-			if (cache->history[index].value_type == ITEM_VALUE_TYPE_STR
-					|| cache->history[index].value_type == ITEM_VALUE_TYPE_TEXT
-					|| cache->history[index].value_type == ITEM_VALUE_TYPE_LOG)
+			if (cache->history[f].value_type == ITEM_VALUE_TYPE_STR ||
+					cache->history[f].value_type == ITEM_VALUE_TYPE_TEXT ||
+					cache->history[f].value_type == ITEM_VALUE_TYPE_LOG)
 			{
-				first_text = cache->history[index].value_orig.str;
+				first_text = cache->history[f].value_orig.str;
 				break;
 			}
+
+			if (ZBX_HISTORY_SIZE == ++f)
+				f = 0;
 		}
 
 		if (NULL != first_text)
@@ -1011,6 +1015,7 @@ static int	DBchk_double(double value)
  ******************************************************************************/
 static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 {
+	const char	*__function_name = "DCmass_update_items";
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_ITEM		item;
@@ -1021,7 +1026,7 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	int		ids_alloc, ids_num = 0;
 	unsigned char	status;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In DCmass_update_items()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	ids_alloc = history_num;
 	ids = zbx_malloc(ids, ids_alloc * sizeof(zbx_uint64_t));
@@ -1302,6 +1307,8 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 
 	if (sql_offset > 16) /* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -1320,12 +1327,13 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
  ******************************************************************************/
 static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
 {
+	const char	*__function_name = "DCmass_proxy_update_items";
 	int		sql_offset = 0, i, j;
 	zbx_uint64_t	*ids = NULL;
 	int		ids_alloc, ids_num = 0;
 	int		lastlogsize, mtime;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In DCmass_proxy_update_items()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	ids_alloc = history_num;
 	ids = zbx_malloc(ids, ids_alloc * sizeof(zbx_uint64_t));
@@ -1376,6 +1384,8 @@ static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
 
 	if (sql_offset > 16) /* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 }
 
 /******************************************************************************
@@ -1853,13 +1863,14 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
  ******************************************************************************/
 static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 {
+	const char	*__function_name = "DCmass_proxy_add_history";
 	int		sql_offset = 0, i;
 	char		*value_esc, *source_esc;
 #ifdef HAVE_MULTIROW_INSERT
 	int		tmp_offset;
 #endif
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In DCmass_proxy_add_history()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 #ifdef HAVE_ORACLE
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "begin\n");
@@ -2076,6 +2087,8 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 	if (sql_offset > 16) /* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 static int	DCskip_items(int index, int n)
@@ -2567,14 +2580,14 @@ static void	DCadd_history(zbx_uint64_t itemid, double value_orig, int clock)
 
 	history = DCget_history_ptr(0);
 
-	history->itemid			= itemid;
-	history->clock			= clock;
-	history->value_type		= ITEM_VALUE_TYPE_FLOAT;
+	history->itemid = itemid;
+	history->clock = clock;
+	history->value_type = ITEM_VALUE_TYPE_FLOAT;
 	history->value_orig.dbl = value_orig;
 	history->value.dbl = 0;
-	history->value_null		= 0;
-	history->keep_history		= 0;
-	history->keep_trends		= 0;
+	history->value_null = 0;
+	history->keep_history = 0;
+	history->keep_trends = 0;
 
 	cache->stats.history_counter++;
 	cache->stats.history_float_counter++;
@@ -2605,14 +2618,14 @@ static void	DCadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value_orig, int
 
 	history = DCget_history_ptr(0);
 
-	history->itemid				= itemid;
-	history->clock				= clock;
-	history->value_type			= ITEM_VALUE_TYPE_UINT64;
+	history->itemid = itemid;
+	history->clock = clock;
+	history->value_type = ITEM_VALUE_TYPE_UINT64;
 	history->value_orig.u64 = value_orig;
 	history->value.u64 = 0;
-	history->value_null			= 0;
-	history->keep_history			= 0;
-	history->keep_trends			= 0;
+	history->value_null = 0;
+	history->keep_history = 0;
+	history->keep_trends = 0;
 
 	cache->stats.history_counter++;
 	cache->stats.history_uint_counter++;
@@ -2640,22 +2653,23 @@ static void	DCadd_history_str(zbx_uint64_t itemid, char *value_orig, int clock)
 	ZBX_DC_HISTORY	*history;
 	size_t		len;
 
-	LOCK_CACHE;
-
 	if (HISTORY_STR_VALUE_LEN_MAX < (len = strlen(value_orig) + 1))
 		len = HISTORY_STR_VALUE_LEN_MAX;
+
+	LOCK_CACHE;
+
 	history = DCget_history_ptr(len);
 
-	history->itemid			= itemid;
-	history->clock			= clock;
-	history->value_type		= ITEM_VALUE_TYPE_STR;
+	history->itemid = itemid;
+	history->clock = clock;
+	history->value_type = ITEM_VALUE_TYPE_STR;
 	history->value_orig.str = cache->last_text;
 	history->value.str = NULL;
 	zbx_strlcpy(cache->last_text, value_orig, len);
-	history->value_null		= 0;
-	cache->last_text		+= len;
-	history->keep_history		= 0;
-	history->keep_trends		= 0;
+	history->value_null = 0;
+	cache->last_text += len;
+	history->keep_history = 0;
+	history->keep_trends = 0;
 
 	cache->stats.history_counter++;
 	cache->stats.history_str_counter++;
@@ -2683,22 +2697,23 @@ static void	DCadd_history_text(zbx_uint64_t itemid, char *value_orig, int clock)
 	ZBX_DC_HISTORY	*history;
 	size_t		len;
 
-	LOCK_CACHE;
-
 	if (HISTORY_TEXT_VALUE_LEN_MAX < (len = strlen(value_orig) + 1))
 		len = HISTORY_TEXT_VALUE_LEN_MAX;
+
+	LOCK_CACHE;
+
 	history = DCget_history_ptr(len);
 
-	history->itemid			= itemid;
-	history->clock			= clock;
-	history->value_type		= ITEM_VALUE_TYPE_TEXT;
+	history->itemid = itemid;
+	history->clock = clock;
+	history->value_type = ITEM_VALUE_TYPE_TEXT;
 	history->value_orig.str = cache->last_text;
 	history->value.str = NULL;
 	zbx_strlcpy(cache->last_text, value_orig, len);
-	history->value_null		= 0;
-	cache->last_text		+= len;
-	history->keep_history		= 0;
-	history->keep_trends		= 0;
+	history->value_null = 0;
+	cache->last_text += len;
+	history->keep_history = 0;
+	history->keep_trends = 0;
 
 	cache->stats.history_counter++;
 	cache->stats.history_text_counter++;
@@ -2727,39 +2742,40 @@ static void	DCadd_history_log(zbx_uint64_t itemid, char *value_orig, int clock, 
 	ZBX_DC_HISTORY	*history;
 	size_t		len1, len2;
 
-	LOCK_CACHE;
-
 	if (HISTORY_LOG_VALUE_LEN_MAX < (len1 = strlen(value_orig) + 1))
 		len1 = HISTORY_LOG_VALUE_LEN_MAX;
 	if (HISTORY_LOG_SOURCE_LEN_MAX < (len2 = (NULL != source && *source != '\0') ? strlen(source) + 1 : 0))
 		len2 = HISTORY_LOG_SOURCE_LEN_MAX;
+
+	LOCK_CACHE;
+
 	history = DCget_history_ptr(len1 + len2);
 
-	history->itemid			= itemid;
-	history->clock			= clock;
-	history->value_type		= ITEM_VALUE_TYPE_LOG;
+	history->itemid = itemid;
+	history->clock = clock;
+	history->value_type = ITEM_VALUE_TYPE_LOG;
 	history->value_orig.str = cache->last_text;
 	history->value.str = NULL;
 	zbx_strlcpy(cache->last_text, value_orig, len1);
-	history->value_null		= 0;
-	cache->last_text		+= len1;
-	history->timestamp		= timestamp;
+	history->value_null = 0;
+	cache->last_text += len1;
+	history->timestamp = timestamp;
 
 	if (0 != len2)
 	{
 		history->value.str = cache->last_text;
 		zbx_strlcpy(cache->last_text, source, len2);
-		cache->last_text	+= len2;
+		cache->last_text += len2;
 	}
 	else
 		history->value.str = NULL;
 
-	history->severity		= severity;
-	history->logeventid		= logeventid;
-	history->lastlogsize		= lastlogsize;
-	history->mtime			= mtime;
-	history->keep_history		= 0;
-	history->keep_trends		= 0;
+	history->severity = severity;
+	history->logeventid = logeventid;
+	history->lastlogsize = lastlogsize;
+	history->mtime = mtime;
+	history->keep_history = 0;
+	history->keep_trends = 0;
 
 	cache->stats.history_counter++;
 	cache->stats.history_log_counter++;
