@@ -155,6 +155,8 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #define	TIMEOUT_ERROR	(-4)
 #define	AGENT_ERROR	(-5)
 #define	PROXY_ERROR	(-6)
+
+#define SUCCEED_OR_FAIL(result) (FAIL != (result) ? SUCCEED : FAIL)
 const char	*zbx_result_string(int result);
 
 #define MAX_ID_LEN	21
