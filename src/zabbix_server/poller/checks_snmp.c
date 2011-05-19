@@ -180,7 +180,7 @@ static struct snmp_session	*snmp_open_session(DC_ITEM *item, char *err)
 	char			addr[128];
 #ifdef HAVE_IPV6
 	int			family;
-#endif	/* HAVE_IPV6 */
+#endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -462,7 +462,7 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM *item, char *OID, cha
 			}
 			else if (status == STAT_TIMEOUT)
 			{
-				zbx_snprintf(err, MAX_STRING_LEN, "Timeout while connecting to [%s:%d]",
+				zbx_snprintf(err, MAX_STRING_LEN, "Timeout while connecting to [[%s]:%d]",
 						item->interface.addr, (int)item->interface.port);
 				running = 0;
 				ret = NETWORK_ERROR;
@@ -698,7 +698,7 @@ static int	snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID, AG
 			}
 			else if (status == STAT_TIMEOUT)
 			{
-				SET_MSG_RESULT(value, zbx_dsprintf(NULL, "Timeout while connecting to [%s:%d]",
+				SET_MSG_RESULT(value, zbx_dsprintf(NULL, "Timeout while connecting to [[%s]:%d]",
 						item->interface.addr, (int)item->interface.port));
 				ret = NETWORK_ERROR;
 				running = 0;
@@ -768,7 +768,7 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGEN
 		}
 		else if (status == STAT_TIMEOUT)
 		{
-			SET_MSG_RESULT(value, zbx_dsprintf(NULL, "Timeout while connecting to [%s:%d]",
+			SET_MSG_RESULT(value, zbx_dsprintf(NULL, "Timeout while connecting to [[%s]:%d]",
 					item->interface.addr, (int)item->interface.port));
 			ret = NETWORK_ERROR;
 		}

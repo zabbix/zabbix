@@ -87,7 +87,7 @@ int	add_user_parameter(const char *key, char *command)
 		{
 			commands[i].key = zbx_strdup(NULL, usr_cmd);
 			commands[i].flags = flag;
-			commands[i].function = &EXECUTE_STR;
+			commands[i].function = &EXECUTE_USER_PARAMETER;
 			commands[i].main_param = zbx_strdup(NULL, command);
 			commands[i].test_param = 0;
 
@@ -117,17 +117,17 @@ void	init_metrics()
 #if defined(WITH_COMMON_METRICS)
 	for (i = 0; NULL != parameters_common[i].key; i++)
 		add_metric(&parameters_common[i]);
-#endif /* USE_COMMON_METRICS */
+#endif
 
 #if defined(WITH_SPECIFIC_METRICS)
 	for (i = 0; NULL != parameters_specific[i].key; i++)
 		add_metric(&parameters_specific[i]);
-#endif /* USE_SPECIFIC_METRICS */
+#endif
 
 #if defined(WITH_SIMPLE_METRICS)
 	for (i = 0; NULL != parameters_simple[i].key; i++)
 		add_metric(&parameters_simple[i]);
-#endif /* USE_SIMPLE_METRICS */
+#endif
 }
 
 void	free_metrics()
@@ -332,7 +332,7 @@ static int	replace_param(const char *cmd, const char *param, char *out, int outl
 		}
 		else if ('$' == pr[1])
 		{
-			pr++; /* remove second '$' symbol */
+			pr++;	/* remove second '$' symbol */
 		}
 
 		pl = pr + 1;
@@ -450,10 +450,10 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 
 		i += (int)strlen(usr_cmd);
 
-#define COLUMN_2_X 45 /* max space count */
+#define COLUMN_2_X 45	/* max space count */
 		i = (i > COLUMN_2_X ? 1 : COLUMN_2_X - i);
 
-		printf("%-*.*s", i, i, " "); /* print spaces */
+		printf("%-*.*s", i, i, " ");	/* print spaces */
 	}
 
 	if (NOTSUPPORTED == err)
