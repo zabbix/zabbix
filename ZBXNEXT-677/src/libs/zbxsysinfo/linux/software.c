@@ -125,7 +125,7 @@ int     SYSTEM_SW_PACKAGES(const char *cmd, const char *param, unsigned flags, A
 	if (3 < num_param(param))
 		return ret;
 
-	if (0 != get_param(param, 1, regex, sizeof(regex)))
+	if (0 != get_param(param, 1, regex, sizeof(regex)) || 0 == strcmp(regex, "all"))
 		*regex = '\0';
 
 	if (0 != get_param(param, 2, manager, sizeof(manager)) || 0 == strcmp(manager, "all"))

@@ -395,7 +395,7 @@ int     SYSTEM_HW_MACADDR(const char *cmd, const char *param, unsigned flags, AG
 	if (2 < num_param(param))
 		return ret;
 
-	if (0 != get_param(param, 1, regex, sizeof(regex)))
+	if (0 != get_param(param, 1, regex, sizeof(regex)) || 0 == strcmp(regex, "all"))
 		*regex = '\0';
 
 	if (0 != get_param(param, 2, buffer, sizeof(buffer)) || '\0' == *buffer || 0 == strcmp(buffer, "full"))
