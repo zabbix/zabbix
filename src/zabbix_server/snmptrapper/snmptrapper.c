@@ -69,7 +69,7 @@ void	main_snmptrapper_loop(int server_num)
 {
 	const char	*__function_name = "main_snmptrapper_loop";
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(), trapfile [%s]", __function_name, CONFIG_SNMPTRAP_FILE);
 
 	zbx_snprintf(tmp_trap_file, sizeof(tmp_trap_file), "%s_%d", CONFIG_SNMPTRAP_FILE, server_num);
 
