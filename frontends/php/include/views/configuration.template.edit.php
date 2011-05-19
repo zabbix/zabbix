@@ -48,11 +48,11 @@
 		));
 		$dbTemplate = reset($dbTemplates);
 
-		$frm_title .= SPACE.' ['.$dbTemplate['host'].']';
+		$frm_title .= SPACE.' ['.$dbTemplate['name'].']';
 
 		$original_templates = array();
 		foreach($dbTemplate['parentTemplates'] as $tnum => $tpl){
-			$original_templates[$tpl['templateid']] = $tpl['host'];
+			$original_templates[$tpl['templateid']] = $tpl['name'];
 		}
 	}
 	else{
