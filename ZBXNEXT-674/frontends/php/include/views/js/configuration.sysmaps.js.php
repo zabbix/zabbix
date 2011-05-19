@@ -137,20 +137,24 @@
 					<td><label for="y"><?php echo _('Coordinate Y'); ?></label></td>
 					<td><input onchange="if(isNaN(parseInt(this.value,10))) this.value = 0;" style="text-align: right;" maxlength="5" value="0" size="5" id="y" name="y" class="input"></td>
 				</tr>
-				<tr class="edit">
+				<tr>
 					<td><?php echo _('Links'); ?></td>
 					<td>
-						<table>
-							<tbody id="urlContainer">
-							<tr class="header">
+						<table class="gridTable">
+							<thead>
+							<tr>
 								<td><?php echo _('Name'); ?></td>
 								<td><?php echo _('URL'); ?></td>
 								<td></td>
 							</tr>
-							<tr id="urlfooter">
+							</thead>
+							<tbody id="urlContainer">
+							</tbody>
+							<tfoot>
+							<tr>
 								<td colspan="3"><span id="newSelementUrl" class="link_menu" title="Add"><?php echo _('Add'); ?></span></td>
 							</tr>
-							</tbody>
+							</tfoot>
 						</table>
 					</td>
 				</tr>
@@ -182,21 +186,15 @@
 		<form id="linkForm" name="linkForm" style="display: none;">
 			<input type="hidden" value="" id="linkid" name="linkid">
 
-			<input name="link_triggers[12795][linktriggerid]" type="hidden" value="1" id="link_triggers[12795][linktriggerid]">
-			<input name="link_triggers[12795][triggerid]" id="link_triggers[12795][triggerid]" type="hidden" value="12795">
-			<input name="link_triggers[12795][desc_exp]" id="link_triggers[12795][desc_exp]" type="hidden" value="Zabbix server:/etc/passwd has been changed on server Zabbix server">
-
 			<table class="formtable" style="width: 100%; ">
 				<tbody>
 				<tr>
-					<td><?php echo _('Label'); ?></td>
+					<td><label for="linklabel"><?php echo _('Label'); ?></label></td>
 					<td><textarea cols="48" rows="4" name="linklabel" id="linklabel" class="input"></textarea></td>
 				</tr>
 				<tr>
-					<td><?php echo _('Connect to'); ?></td>
-					<td>
-						<select class="input" name="selementid" id="selementid"></select>
-					</td>
+					<td><label for="selementid"><?php echo _('Connect to'); ?></label></td>
+					<td><select class="input" name="selementid" id="selementid"></select></td>
 				</tr>
 				<tr class="edit">
 					<td><?php echo _('Link indicators'); ?></td>
@@ -235,7 +233,7 @@
 					</td>
 				</tr>
 				<tr>
-					<td><?php echo _('Type (OK)'); ?></td>
+					<td><label for="drawtype"><?php echo _('Type (OK)'); ?></label></td>
 					<td >
 						<select size="1" class="input" name="drawtype" id="drawtype">
 							<option value="0"><?php echo _('Line'); ?></option>
@@ -246,7 +244,7 @@
 					</td>
 				</tr>
 				<tr>
-					<td><?php echo _('Colour (OK)'); ?></td>
+					<td><label for="color"><?php echo _('Colour (OK)'); ?></label></td>
 					<td>
 						<input style="margin-top: 0px; margin-bottom: 0px;" onchange="set_color_by_name('color',this.value)" maxlength="6" value="000055" size="7" id="color" name="color" class="input">
 						<div title="#000055" id="lbl_color" name="lbl_color" class="pointer" style="margin-left: 2px; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-top-style: solid; border-right-style: solid; border-bottom-style: solid; border-left-style: solid; border-top-color: black; border-right-color: black; border-bottom-color: black; border-left-color: black; display: inline; width: 10px; height: 10px; text-decoration: none; background-color: rgb(0, 204, 0); ">&nbsp;&nbsp;&nbsp;</div>
@@ -254,9 +252,9 @@
 				</tr>
 				<tr class="footer">
 					<td colspan="2" class="form_row_last">
-						<input type="button" name="apply" class="input button shadow" value="Apply">
-						<input type="button" name="remove" class="input button shadow" value="Remove">
-						<input type="button" name="close" class="input button shadow" value="Close">
+						<input id="linkApply" type="button" value="Apply">
+						<input id="linkRemove" type="button" value="Remove">
+						<input id="linkClose" type="button" value="Close">
 					</td>
 				</tr>
 				</tbody>
@@ -267,7 +265,7 @@
 
 <script type="text/x-jquery-tmpl" id="mapMassFormTpl">
 	<div class="floatWindow" style="display: none;">
-		<form>
+		<form id="massForm">
 			<table class="formtable">
 				<tbody>
 				<tr class="header">
@@ -288,7 +286,7 @@
 						<input type="checkbox" name="chkbox_label_location" id="chkboxLabelLocation" class="checkbox" style="display: inline; ">
 						<label for="chkboxLabelLocation"><?php echo _('Label location'); ?></label>
 					</td>
-					<td><select id="massLabalLocation" class="input" name="label_location">
+					<td><select id="massLabelLocation" class="input" name="label_location">
 							<option value="-1">-</option>
 							<option value="0"><?php echo _('Bottom'); ?></option>
 							<option value="1"><?php echo _('Left'); ?></option>
@@ -353,7 +351,7 @@
 
 <script type="text/x-jquery-tmpl" id="mapLinksRow">
 	<tr>
-		<td><span class="link_menu" data-id="#{linkid}">Edit</span></td>
+		<td><span class="link_menu openlink" data-linkid="#{linkid}">Edit</span></td>
 		<td>#{elementType}</td>
 		<td>#{elementName}</td>
 		<td>#{linkIndicators}</td>
@@ -362,9 +360,9 @@
 
 
 <script type="text/x-jquery-tmpl" id="selementFormUrls">
-	<tr id="urlrow_#{selementurlid}">
-	<td><input class="input" name="url_#{selementurlid}_name" type="text" size="16" value="#{name}"></td>
-	<td><input class="input" name="url_#{selementurlid}_url" type="text" size="32" value="#{url}"></td>
-	<td><span class="link_menu" onclick="jQuery('#urlrow_#{selementurlid}').remove();"><?php echo _('Remove'); ?></span></td>
+	<tr id="urlrow_#{selementurlid}" class="even_row">
+		<td><input class="input" name="url_#{selementurlid}_name" type="text" size="16" value="#{name}"></td>
+		<td><input class="input" name="url_#{selementurlid}_url" type="text" size="32" value="#{url}"></td>
+		<td><span class="link_menu" onclick="jQuery('#urlrow_#{selementurlid}').remove();"><?php echo _('Remove'); ?></span></td>
 	</tr>
 </script>

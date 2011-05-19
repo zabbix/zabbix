@@ -466,6 +466,27 @@ table.tableinfo tr td.message { text-align: center;}
 table.tableinfo tr td.pre { white-space: pre;}
 table.tableinfo tr > td.center { vertical-align: middle; text-align: center; }
 
+table.gridTable{
+	empty-cells:show;
+	padding: 1px 3px;
+	white-space: nowrap;
+	text-align: left;
+	height: 22px;
+	border-collapse: collapse;
+}
+table.gridTable thead{
+	font-weight: bold;
+	background-color:#CED7DF;
+}
+table.gridTable tfoot{
+	background-color:#CED7DF;
+}
+table.gridTable tbody{
+	background-color: #F2F7FA;
+}
+table.gridTable tr td{
+	border: 2px solid white;
+}
 
 /****** HEADER *********/
 .header a { color: #FFFFFF; }
