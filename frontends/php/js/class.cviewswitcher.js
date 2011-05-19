@@ -326,13 +326,11 @@ ActionProcessor.prototype = {
 	},
 
 	actionEnable: function(value){
-		jQuery(value)
-				.prop('disabled', false);
+		jQuery(value).prop('disabled', false);
 	},
 
 	actionDisable: function(value){
-		jQuery(value)
-				.prop('disabled', true);
+		jQuery(value).prop('disabled', true);
 	}
 
 };
