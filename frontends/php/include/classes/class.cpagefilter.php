@@ -363,10 +363,16 @@ options = array(
 				$this->data['graphs'][$graph['graphid']] = $graph['name'];
 			}
 
-			if(is_null($graphid)) $graphid = $this->_profileIds['graphid'];
+			// no graphid provided
+			if(is_null($graphid)){
+				// if there is one saved in profile, lets take it from there
+				$graphid = is_null($this->_profileIds['graphid'])
+							? 0
+							: $this->_profileIds['graphid'];
+			}
 
 			// if there is no graph with given id in selected host
-			if(!isset($this->data['graphs'][$graphid])){
+			if($graphid > 0 && !isset($this->data['graphs'][$graphid])){
 				// then let's take a look how the desired graph is named
 				$options = array(
 					'output' => array('name'),
