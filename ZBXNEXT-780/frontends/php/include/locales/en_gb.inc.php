@@ -733,7 +733,6 @@
 	'S_DELETED'=>					_('Deleted'),
 	'S_UNKNOWN'=>					_('Unknown'),
 	'S_GROUPS'=>					_('Groups'),
-	'S_MINUS_ALL_GROUPS_MINUS'=>			_(' - all groups - '),
 	'S_ALL_GROUPS'=>				_('All groups'),
 	'S_NO_GROUPS_DEFINED'=>				_('No groups defined'),
 	'S_DNS_NAME'=>					_('DNS name'),
