@@ -161,7 +161,9 @@ include_once('include/page_header.php');
 		$group = API::UserGroup()->get(array('usrgrpids' => $_REQUEST['usrgrpid'], 'output' => API_OUTPUT_EXTEND));
 		$group = reset($group);
 
+		DBstart();
 		$result = API::UserGroup()->delete($_REQUEST['usrgrpid']);
+		$result = DBend($result);
 
 		show_messages($result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
 		if($result){
@@ -342,7 +344,7 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'output' => API_OUTPUT_EXTEND,
-			'select_users' => API_OUTPUT_EXTEND,
+			'selectUsers' => API_OUTPUT_EXTEND,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
@@ -423,7 +425,7 @@ include_once('include/page_header.php');
 // goBox
 		$goBox = new CComboBox('go');
 
-		$goOption = new CComboItem('enable_status',S_ENABLE_SELECTED);
+		$goOption = new CComboItem('enable_status', _('Enable selected'));
 		$goOption->setAttribute('confirm',S_ENABLE_SELECTED_GROUPS_Q);
 		$goBox->addItem($goOption);
 

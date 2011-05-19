@@ -6,7 +6,6 @@ bin/win32/zabbix_sender.exe -text
 bin/win64/zabbix_agentd.exe -text
 bin/win64/zabbix_get.exe -text
 bin/win64/zabbix_sender.exe -text
-/bootstrap.sh -text
 /build.xml -text
 build/win32/project/Makefile_agent -text
 build/win32/project/Makefile_agent_x64 -text
@@ -18,26 +17,71 @@ create/data/create_data_sql/create_data_sql.sh svneol=native#text/x-sh
 create/data/create_data_sql/data_sql_blacklist.txt svneol=native#text/plain
 create/data/create_data_sql/data_sql_filter.txt svneol=native#text/plain
 create/data/create_data_sql/data_sql_predumphooks.txt svneol=native#text/plain
-create/data/images/Hub.png -text svneol=unset#unset
-create/data/images/Hub_small.png -text svneol=unset#unset
-create/data/images/Network.png -text svneol=unset#unset
-create/data/images/Network_small.png -text svneol=unset#unset
-create/data/images/Notebook.png -text svneol=unset#unset
-create/data/images/Notebook_small.png -text svneol=unset#unset
-create/data/images/Phone.png -text svneol=unset#unset
-create/data/images/Phone_small.png -text svneol=unset#unset
-create/data/images/Printer.png -text svneol=unset#unset
-create/data/images/Printer_small.png -text svneol=unset#unset
-create/data/images/Router.png -text svneol=unset#unset
-create/data/images/Router_small.png -text svneol=unset#unset
-create/data/images/Satellite.png -text svneol=unset#unset
-create/data/images/Satellite_small.png -text svneol=unset#unset
-create/data/images/Server.png -text svneol=unset#unset
-create/data/images/Server_small.png -text svneol=unset#unset
-create/data/images/UPS.png -text svneol=unset#unset
-create/data/images/UPS_small.png -text svneol=unset#unset
-create/data/images/Workstation.png -text svneol=unset#unset
-create/data/images/Workstation_small.png -text svneol=unset#unset
+create/images/elements/Cloud.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/Crypto-router.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/Crypto-router_symbol.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/Disk_array_2D.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/Disk_array_3D.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/Firewall.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/House.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/Hub.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/IP_PBX.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/IP_PBX_symbol.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/Modem.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/Network.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/Network_adapter.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/Notebook.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/PBX.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/Phone.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/Printer.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/Rackmountable_1U_server_2D.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/Rackmountable_1U_server_3D.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/Rackmountable_2U_server_2D.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/Rackmountable_2U_server_3D.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/Rackmountable_3U_server_2D.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/Rackmountable_3U_server_3D.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/Rackmountable_4U_server_2D.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/Rackmountable_4U_server_3D.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/Rackmountable_5U_server_2D.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/Rackmountable_5U_server_3D.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/Router.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/Router_symbol.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/SAN.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/Satellite.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/Satellite_antenna.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/Server.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/Switch.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/UPS.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/UPS_rackmountable_2D.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/UPS_rackmountable_3D.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/Video_terminal.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/Workstation.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/Zabbix_server_2D.svg -text svneol=native#image/svg%2Bxml
+create/images/elements/Zabbix_server_3D.svg -text svneol=native#image/svg%2Bxml
+create/images/equipment_rack/Rack_42.svg -text svneol=native#image/svg%2Bxml
+create/images/equipment_rack/Rack_42_with_door.svg -text svneol=native#image/svg%2Bxml
+create/images/old_images/Hub.png -text svneol=unset#image/png
+create/images/old_images/Hub_small.png -text svneol=unset#image/png
+create/images/old_images/Network.png -text svneol=unset#image/png
+create/images/old_images/Network_small.png -text svneol=unset#image/png
+create/images/old_images/Notebook.png -text svneol=unset#image/png
+create/images/old_images/Notebook_small.png -text svneol=unset#image/png
+create/images/old_images/Phone.png -text svneol=unset#image/png
+create/images/old_images/Phone_small.png -text svneol=unset#image/png
+create/images/old_images/Printer.png -text svneol=unset#image/png
+create/images/old_images/Printer_small.png -text svneol=unset#image/png
+create/images/old_images/Router.png -text svneol=unset#image/png
+create/images/old_images/Router_small.png -text svneol=unset#image/png
+create/images/old_images/Satellite.png -text svneol=unset#image/png
+create/images/old_images/Satellite_small.png -text svneol=unset#image/png
+create/images/old_images/Server.png -text svneol=unset#image/png
+create/images/old_images/Server_small.png -text svneol=unset#image/png
+create/images/old_images/UPS.png -text svneol=unset#image/png
+create/images/old_images/UPS_small.png -text svneol=unset#image/png
+create/images/old_images/Workstation.png -text svneol=unset#image/png
+create/images/old_images/Workstation_small.png -text svneol=unset#image/png
+create/images/png_to_sql.sh -text
+create/images/svg_to_png.sh svneol=native#text/x-sh
 frontends/php/audio/alarm_average.wav -text
 frontends/php/audio/alarm_disaster.wav -text
 frontends/php/audio/alarm_high.wav -text
@@ -97,6 +141,10 @@ frontends/php/images/general/ipmi_available.png -text
 frontends/php/images/general/ipmi_available_bb.png -text
 frontends/php/images/general/ipmi_unavailable.png -text
 frontends/php/images/general/ipmi_unknown.png -text
+frontends/php/images/general/jmx_available.png -text
+frontends/php/images/general/jmx_available_bb.png -text
+frontends/php/images/general/jmx_unavailable.png -text
+frontends/php/images/general/jmx_unknown.png -text
 frontends/php/images/general/login/background.png -text
 frontends/php/images/general/login/logo.png -text
 frontends/php/images/general/login/username_pass_field.png -text
@@ -188,6 +236,7 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
+frontends/php/include/views/administration.script.list.php -text
 frontends/php/locale/cs/LC_MESSAGES/frontend.po -text
 frontends/php/locale/de/LC_MESSAGES/frontend.po -text
 frontends/php/locale/es/LC_MESSAGES/frontend.po -text
@@ -246,6 +295,8 @@ frontends/php/styles/originalblue/images/ui-icons_d40000_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_ffffff_256x240.png -text
 frontends/php/tests/api_json/APIInfo.php -text
 frontends/php/tests/api_json/ApiJsonTests.php -text
+frontends/php/tests/api_json/CHost.php -text
+frontends/php/tests/api_json/CItem.php -text
 frontends/php/tests/api_json/CMap.php -text
 frontends/php/tests/api_json/General.php -text
 frontends/php/tests/api_json/User.php -text
@@ -266,6 +317,14 @@ frontends/php/tests/general/function_DBstart.php -text
 frontends/php/tests/include/class.cwebtest.php -text
 frontends/php/tests/include/class.czabbixtest.php -text
 frontends/php/tests/include/dbfunc.php -text
+frontends/php/tests/selenium/testFormAction.php -text
+frontends/php/tests/selenium/testPageAvailabilityReport.php -text
+frontends/php/tests/selenium/testPageHistory.php -text
+frontends/php/tests/selenium/testPageLatestData.php -text
+frontends/php/tests/selenium/testPageOverview.php -text
+frontends/php/tests/selenium/testPageStatusOfTriggers.php -text
+frontends/php/tests/selenium/testPageWeb.php -text
+include/telnet.h -text
 m4/ax_lib_ibm_db2.m4 -text
 m4/ax_lib_oracle_oci.m4 -text
 m4/iconv.m4 -text
@@ -288,7 +347,15 @@ misc/init.d/freebsd/zabbix_server -text
 misc/init.d/tru64/zabbix_server -text
 misc/init.d/ubuntu/zabbix-agent.conf -text
 misc/init.d/ubuntu/zabbix-server.conf -text
+src/libs/zbxcomms/telnet.c -text
 src/libs/zbxself/Makefile.am -text
+src/zabbix_java/lib/logback-classic-0.9.27.jar -text
+src/zabbix_java/lib/logback-console.xml -text
+src/zabbix_java/lib/logback-core-0.9.27.jar -text
+src/zabbix_java/lib/logback.xml -text
+src/zabbix_java/lib/org-json-2010-12-28.jar -text
+src/zabbix_java/lib/slf4j-api-1.6.1.jar -text
+src/zabbix_java/tests/junit-4.8.2.jar -text
 src/zabbix_server/selfmon/Makefile.am -text
 tests/data/README -text
 tests/data/data_test.sql -text

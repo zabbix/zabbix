@@ -23,8 +23,8 @@
 #include "system.h"
 
 #ifdef _WINDOWS
-	#include "perfmon.h"
-#endif /* _WINDOWS */
+#	include "perfmon.h"
+#endif
 
 int	SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
@@ -105,7 +105,7 @@ int	SYSTEM_USERS_NUM(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	zbx_snprintf(counter_path, sizeof(counter_path), "\\%d\\%d", PCI_TERMINAL_SERVICES, PCI_TOTAL_SESSIONS);
 
-	return PERF_MONITOR(cmd, counter_path, flags, result);
+	return PERF_COUNTER(cmd, counter_path, flags, result);
 #else
 	return EXECUTE_INT(cmd, "who|wc -l", flags, result);
 #endif /* _WINDOWS */
@@ -215,7 +215,7 @@ int	SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	return SYSINFO_RET_OK;
 #else
 	return EXECUTE_STR(cmd, "uname -a", flags, result);
-#endif /* _WINDOWS */
+#endif	/* _WINDOWS */
 }
 
 int	SYSTEM_HOSTNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -235,5 +235,5 @@ int	SYSTEM_HOSTNAME(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	return SYSINFO_RET_OK;
 #else
 	return EXECUTE_STR(cmd, "hostname", flags, result);
-#endif /* _WINDOWS */
+#endif
 }

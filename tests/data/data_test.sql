@@ -1,5 +1,5 @@
--- Activate Zabbix Server
-UPDATE hosts SET status=0 WHERE host='Zabbix server';
+-- Activate Zabbix Server, set visible name and make it a more unique name
+UPDATE hosts SET status=0,name='ЗАББИКС Сервер',host='Test host' WHERE host='Zabbix server';
 
 -- Enabling debug mode
 UPDATE usrgrp SET debug_mode = 1 WHERE usrgrpid = 7;
@@ -8,11 +8,11 @@ UPDATE usrgrp SET debug_mode = 1 WHERE usrgrpid = 7;
 INSERT INTO media_type (mediatypeid, type, description, smtp_server, smtp_helo, smtp_email, exec_path, gsm_modem, username, passwd) VALUES (4,100,'SMS via IP','','','','0','','test','test');
 
 -- More medias for user 'Admin'
-INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (1,1,1,'test@zabbix.com',0,63,'1-7,00:00-23:59;');
-INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (2,1,1,'test2@zabbix.com',1,60,'1-7,00:00-23:59;');
-INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (3,1,3,'123456789',0,32,'1-7,00:00-23:59;');
-INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (4,1,2,'test@jabber.com',0,16,'1-7,00:00-23:59;');
-INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (5,1,4,'test_account',0,63,'6-7,09:00-17:59;');
+INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (1,1,1,'test@zabbix.com',0,63,'1-7,00:00-24:00;');
+INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (2,1,1,'test2@zabbix.com',1,60,'1-7,00:00-24:00;');
+INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (3,1,3,'123456789',0,32,'1-7,00:00-24:00;');
+INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (4,1,2,'test@jabber.com',0,16,'1-7,00:00-24:00;');
+INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (5,1,4,'test_account',0,63,'6-7,09:00-18:00;');
 
 -- More user scripts
 INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation) VALUES (3,'Reboot','/sbin/shutdown -r',3,7,4,'This command reboots server.','Do you really want to reboot it?');
@@ -28,6 +28,12 @@ INSERT INTO hosts (hostid, proxy_hostid, host, status, disable_until, error, ava
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (10018,10050,1,0,1,'127.0.0.1','proxy1.zabbix.com','10051');
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (10019,10051,1,0,1,'127.0.0.1','proxy2.zabbix.com','10333');
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (10020,10052,1,0,0,'127.0.0.1','proxy3.zabbix.com','10051');
+
+-- create an empty host "Template linkage test host"
+INSERT INTO hosts (hostid, proxy_hostid, host, status, disable_until, error, available, errors_from, lastaccess, ipmi_authtype, ipmi_privilege, ipmi_username, ipmi_password, ipmi_disable_until, ipmi_available, snmp_disable_until, snmp_available, maintenanceid, maintenance_status, maintenance_type, maintenance_from, ipmi_errors_from, snmp_errors_from, ipmi_error, snmp_error,name) VALUES (10053,NULL,'Template linkage test host',0,0,'',0,0,0,0,2,'','',0,0,0,0,NULL,0,0,0,0,0,'','','Test host for template linkage');
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (10021,10053,1,0,1,'127.0.0.1','','10050');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (47,10053,4);
+
 
 -- Add Trigger Actions
 INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period, def_shortdata, def_longdata, recovery_msg, r_shortdata, r_longdata) VALUES (4,'Simple action',0,0,0,60,'{TRIGGER.NAME}: {TRIGGER.STATUS}','{TRIGGER.NAME}: {TRIGGER.STATUS}\r\nLast value: {ITEM.LASTVALUE}\r\n\r\n{TRIGGER.URL}',0,'{TRIGGER.NAME}: {TRIGGER.STATUS}','{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}');
@@ -58,8 +64,8 @@ INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) V
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (27,6,4,6,'4');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (28,6,4,0,'5');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (29,6,5,0,'0');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (30,6,6,4,'1-7,00:00-23:59');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (31,6,6,7,'6-7,08:00-17:59');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (30,6,6,4,'1-7,00:00-24:00');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (31,6,6,7,'6-7,08:00-18:00');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (32,6,16,4,'');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (33,6,16,7,'');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (34,7,5,0,'1');
@@ -82,8 +88,8 @@ INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) V
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (51,7,4,6,'4');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (52,7,4,0,'5');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (53,7,5,0,'0');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (54,7,6,4,'1-7,00:00-23:59');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (55,7,6,7,'6-7,08:00-17:59');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (54,7,6,4,'1-7,00:00-24:00');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (55,7,6,7,'6-7,08:00-18:00');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (56,7,16,4,'');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (57,7,16,7,'');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (58,8,5,0,'1');
@@ -106,8 +112,8 @@ INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) V
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (75,8,4,6,'4');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (76,8,4,0,'5');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (77,8,5,0,'0');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (78,8,6,4,'1-7,00:00-23:59');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (79,8,6,7,'6-7,08:00-17:59');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (78,8,6,4,'1-7,00:00-24:00');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (79,8,6,7,'6-7,08:00-18:00');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (80,8,16,4,'');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (81,8,16,7,'');
 
@@ -143,7 +149,9 @@ INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (7, 14
 INSERT INTO opmessage_usr (opmessage_usrid, operationid, userid) VALUES (2, 12, 1);
 INSERT INTO opmessage_usr (opmessage_usrid, operationid, userid) VALUES (3, 15, 1);
 
-INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid, command) VALUES (1, 16, NULL, '/sbin/shutdown -r');
+INSERT INTO opcommand (operationid, type, scriptid, execute_on, port, authtype, username, password, publickey, privatekey, command) VALUES (16, 0, NULL, 0, '', 0, '', '', '', '', '/sbin/shutdown -r');
+
+INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid) VALUES (1, 16, NULL);
 
 INSERT INTO opconditions (opconditionid, operationid, conditiontype, operator, value) VALUES (1,11,14,0,'0');
 INSERT INTO opconditions (opconditionid, operationid, conditiontype, operator, value) VALUES (2,11,14,0,'1');
@@ -191,8 +199,11 @@ INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (9, 18
 INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (10, 24, 1);
 INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (11, 25, 4);
 
-INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid, command) VALUES (2, 19, NULL, 'echo TEST');
-INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid, command) VALUES (3, 26, NULL, 'echo TEST');
+INSERT INTO opcommand (operationid, type, command) VALUES (19, 0, 'echo TEST');
+INSERT INTO opcommand (operationid, type, command) VALUES (26, 0, 'echo TEST');
+
+INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid) VALUES (2, 19, NULL);
+INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid) VALUES (3, 26, NULL);
 
 INSERT INTO opgroup (opgroupid, operationid, groupid) VALUES (3, 22, 5);
 INSERT INTO opgroup (opgroupid, operationid, groupid) VALUES (4, 29, 5);
@@ -319,9 +330,7 @@ INSERT INTO sysmap_element_url (sysmapelementurlid, selementid, name, url) VALUE
 INSERT INTO sysmap_element_url (sysmapelementurlid, selementid, name, url) VALUES (2,5,'www.wikipedia.org','www.wikipedia.org');
 
 -- Host profiles
-INSERT INTO hosts_profiles (hostid, devicetype, name, os, serialno, tag, macaddress, hardware, software, contact, location, notes) VALUES (10017,'Device type #1','Name #2','OS #3','SerialNo #4','Tag #5','MAC Address #6','Hardware #7','Software #7','Contact #8','Location #9','Notes #10');
-
-INSERT INTO hosts_profiles_ext (hostid, device_alias, device_type, device_chassis, device_os, device_os_short, device_hw_arch, device_serial, device_model, device_tag, device_vendor, device_contract, device_who, device_status, device_app_01, device_app_02, device_app_03, device_app_04, device_app_05, device_url_1, device_url_2, device_url_3, device_networks, device_notes, device_hardware, device_software, ip_subnet_mask, ip_router, ip_macaddress, oob_ip, oob_subnet_mask, oob_router, date_hw_buy, date_hw_install, date_hw_expiry, date_hw_decomm, site_street_1, site_street_2, site_street_3, site_city, site_state, site_country, site_zip, site_rack, site_notes, poc_1_name, poc_1_email, poc_1_phone_1, poc_1_phone_2, poc_1_cell, poc_1_screen, poc_1_notes, poc_2_name, poc_2_email, poc_2_phone_1, poc_2_phone_2, poc_2_cell, poc_2_screen, poc_2_notes) VALUES (10017,'Alias','Device type','Device Chassis','OS (Full Details)','OS (Short)','HW Architecture','Serial Number','Model Number','Asset Tag','Device Vendor','Device Contract Number','Installer Name','Device Deployment Status','Software Application #1','Software Application #2','Software Application #3','Software Application #4','Software Application #5','URL #1','URL #2','URL #3','Device Port Connections','Device Notes','Device Hardware','Device Software','Host Subnet Mask','Host Router','Host MAC Address','OOB IP Address','OOB Subnet Mask','OOB Router','Date HW Purchased','Date HW Installed','Date HW Maintenance Expires','Date HW Decommissioned','Site Address 1','Site Address 2','Site Address 3','Site City','Site State / Province','Site Country','Site Zip / Postal','Site Rack Location','Site Notes','Primary POC Name','Primary POC Email','Primary POC Phone 1','Primary POC Phone 2','Primary POC Cell','Primary POC Screen Name','Primary POC Comments','Secondary POC Name','Secondary POC Email','Secondary POC Phone 1','Secondary POC Phone 2','Secondary POC Cell','Secondary POC Screen Name','Secondary POC Comments');
+INSERT INTO host_profile (type,type_full,name,alias,os,os_full,os_short,serialno_a,serialno_b,tag,asset_tag,macaddress_a,macaddress_b,hardware,hardware_full,software,software_full,software_app_a,software_app_b,software_app_c,software_app_d,software_app_e,contact,location,location_lat,location_lon,notes,chassis,model,hw_arch,vendor,contract_number,installer_name,deployment_status,url_a,url_b,url_c,host_networks,host_netmask,host_router,oob_ip,oob_netmask,oob_router,date_hw_purchase,date_hw_install,date_hw_expiry,date_hw_decomm,site_address_a,site_address_b,site_address_c,site_city,site_state,site_country,site_zip,site_rack,site_notes,poc_1_name,poc_1_email,poc_1_phone_a,poc_1_phone_b,poc_1_cell,poc_1_screen,poc_1_notes,poc_2_name,poc_2_email,poc_2_phone_a,poc_2_phone_b,poc_2_cell,poc_2_screen,poc_2_notes,hostid) VALUES ('Type','Type (Full details)','Name','Alias','OS','OS (Full details)','OS (Short)','Serial number A','Serial number B','Tag','Asset tag','MAC address A','MAC address B','Hardware','Hardware (Full details)','Software','Software (Full details)','Software application A','Software application B','Software application C','Software application D','Software application E','Contact','Location','Location latitud','Location longitu','Notes','Chassis','Model','HW architecture','Vendor','Contract number','Installer name','Deployment status','URL A','URL B','URL C','Host networks','Host subnet mask','Host router','OOB IP address','OOB subnet mask','OOB router','Date HW purchased','Date HW installed','Date HW maintenance expires','Date hw decommissioned','Site address A','Site address B','Site address C','Site city','Site state / province','Site country','Site ZIP / postal','Site rack location','Site notes','Primary POC name','Primary POC email','Primary POC phone A','Primary POC phone B','Primary POC cell','Primary POC screen name','Primary POC notes','Secondary POC name','Secondary POC email','Secondary POC phone A','Secondary POC phone B','Secondary POC cell','Secondary POC screen name','Secondary POC notes',10017);
 
 -- delete Discovery Rule
 INSERT INTO items (itemid, type, snmp_community, snmp_oid, hostid, description, key_, delay, history, trends, lastvalue, lastclock, prevvalue, status, value_type, trapper_hosts, units, multiplier, delta, prevorgvalue, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, formula, error, lastlogsize, logtimefmt, templateid, valuemapid, delay_flex, params, ipmi_sensor, data_type, authtype, username, password, publickey, privatekey, mtime, lastns, flags, filter, interfaceid, port) VALUES (22188, 0, '', '', 10017, 'rule', 'key', 30, 90, 365, NULL, NULL, NULL, 0, 0, '', '', 0, 0, NULL, '', 0, '', '', '1', '', 0, '', NULL, NULL, '', '', '', 0, 0, '', '', '', '', 0, NULL, 1, ':', 10017, '');
@@ -329,3 +338,4 @@ INSERT INTO items (itemid, type, snmp_community, snmp_oid, hostid, description, 
 -- add some test items
 -- first, one that references a non-existent user macro in the key and then references that key parameter in the item name using a positional reference
 INSERT INTO items (itemid, type, snmp_community, snmp_oid, hostid, description, key_, delay, history, trends, lastvalue, lastclock, prevvalue, status, value_type, trapper_hosts, units, multiplier, delta, prevorgvalue, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, formula, error, lastlogsize, logtimefmt, templateid, valuemapid, delay_flex, params, ipmi_sensor, data_type, authtype, username, password, publickey, privatekey, mtime, lastns, flags, filter, interfaceid, port) VALUES (22189, 0, '', '', 10017, 'a. i am referencing a non-existent user macro $1', 'key[{$I_DONT_EXIST}]', 30, 90, 365, NULL, NULL, NULL, 0, 0, '', '', 0, 0, NULL, '', 0, '', '', '1', '', 0, '', NULL, NULL, '', '', '', 0, 0, '', '', '', '', 0, NULL, 0, ':', 10017, '');
+INSERT INTO items (itemid, type, snmp_community, snmp_oid, hostid, description, key_, delay, history, trends, lastvalue, lastclock, prevvalue, status, value_type, trapper_hosts, units, multiplier, delta, prevorgvalue, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, formula, error, lastlogsize, logtimefmt, templateid, valuemapid, delay_flex, params, ipmi_sensor, data_type, authtype, username, password, publickey, privatekey, mtime, lastns, flags, filter, interfaceid, port, profile_link) VALUES (22190, 0, '', '', 10017, 'i am populating filed Type', 'key.test.pop.type', 30, 90, 365, NULL, NULL, NULL, 0, 0, '', '', 0, 0, NULL, '', 0, '', '', '1', '', 0, '', NULL, NULL, '', '', '', 0, 0, '', '', '', '', 0, NULL, 0, ':', 10017, '', 1);

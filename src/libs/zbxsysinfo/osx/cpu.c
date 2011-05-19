@@ -23,100 +23,47 @@
 
 int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char	cpuname[MAX_STRING_LEN];
-	char	type[MAX_STRING_LEN];
-	char	mode[MAX_STRING_LEN];
+	char	tmp[16];
+	int	cpu_num, mode, state;
 
-	int	cpu_num = 0;
+	if (num_param(param) > 3)
+		return SYSINFO_RET_FAIL;
 
-        if(num_param(param) > 3)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	if (0 != get_param(param, 1, tmp, sizeof(tmp)))
+		*tmp = '\0';
 
-        if(get_param(param, 1, cpuname, sizeof(cpuname)) != 0)
-        {
-                cpuname[0] = '\0';
-        }
-
-	if(cpuname[0] == '\0')
-	{
-		/* default parameter */
-		zbx_snprintf(cpuname, sizeof(cpuname), "all");
-	}
-
-	if(get_param(param, 2, type, sizeof(type)) != 0)
-        {
-                type[0] = '\0';
-        }
-        if(type[0] == '\0')
-	{
-		/* default parameter */
-		zbx_snprintf(type, sizeof(type), "user");
-	}
-
-	if(get_param(param, 3, mode, sizeof(mode)) != 0)
-        {
-                mode[0] = '\0';
-        }
-
-        if(mode[0] == '\0')
-	{
-		/* default parameter */
-		zbx_snprintf(mode, sizeof(mode), "avg1");
-	}
-
-	if ( !CPU_COLLECTOR_STARTED(collector) )
-	{
-		SET_MSG_RESULT(result, strdup("Collector is not started!"));
-		return SYSINFO_RET_OK;
-	}
-
-	if(strcmp(cpuname,"all") == 0)
-	{
+	if ('\0' == *tmp || 0 == strcmp(tmp, "all"))	/* default parameter */
 		cpu_num = 0;
-	}
-	else
-	{
-		cpu_num = atoi(cpuname)+1;
-		if ((cpu_num < 1) || (cpu_num > collector->cpus.count))
-			return SYSINFO_RET_FAIL;
-	}
+	else if (1 > (cpu_num = atoi(tmp) + 1))
+		return SYSINFO_RET_FAIL;
 
-	if( 0 == strcmp(type,"idle"))
-	{
-		if( 0 == strcmp(mode,"avg1"))		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].idle[ZBX_AVG1]);
-		else if( 0 == strcmp(mode,"avg5"))	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].idle[ZBX_AVG5]);
-		else if( 0 == strcmp(mode,"avg15"))	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].idle[ZBX_AVG15]);
-		else return SYSINFO_RET_FAIL;
+	if (0 != get_param(param, 2, tmp, sizeof(tmp)))
+		*tmp = '\0';
 
-	}
-	else if( 0 == strcmp(type,"nice"))
-	{
-		if( 0 == strcmp(mode,"avg1")) 		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].nice[ZBX_AVG1]);
-		else if( 0 == strcmp(mode,"avg5")) 	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].nice[ZBX_AVG5]);
-		else if( 0 == strcmp(mode,"avg15"))	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].nice[ZBX_AVG15]);
-		else return SYSINFO_RET_FAIL;
-
-	}
-	else if( 0 == strcmp(type,"user"))
-	{
-		if( 0 == strcmp(mode,"avg1")) 		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].user[ZBX_AVG1]);
-		else if( 0 == strcmp(mode,"avg5")) 	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].user[ZBX_AVG5]);
-		else if( 0 == strcmp(mode,"avg15"))	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].user[ZBX_AVG15]);
-		else return SYSINFO_RET_FAIL;
-	}
-	else if( 0 == strcmp(type,"system"))
-	{
-		if( 0 == strcmp(mode,"avg1")) 		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].system[ZBX_AVG1]);
-		else if( 0 == strcmp(mode,"avg5")) 	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].system[ZBX_AVG5]);
-		else if( 0 == strcmp(mode,"avg15"))	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].system[ZBX_AVG15]);
-		else return SYSINFO_RET_FAIL;
-	}
+	if ('\0' == *tmp || 0 == strcmp(tmp, "user"))	/* default parameter */
+		state = ZBX_CPU_STATE_USER;
+	else if (0 == strcmp(tmp, "nice"))
+		state = ZBX_CPU_STATE_NICE;
+	else if (0 == strcmp(tmp, "system"))
+		state = ZBX_CPU_STATE_SYSTEM;
+	else if (0 == strcmp(tmp, "idle"))
+		state = ZBX_CPU_STATE_IDLE;
 	else
 		return SYSINFO_RET_FAIL;
 
-	return SYSINFO_RET_OK;
+	if (0 != get_param(param, 3, tmp, sizeof(tmp)))
+		*tmp = '\0';
+
+	if ('\0' == *tmp || 0 == strcmp(tmp, "avg1"))	/* default parameter */
+		mode = ZBX_AVG1;
+	else if (0 == strcmp(tmp, "avg5"))
+		mode = ZBX_AVG5;
+	else if (0 == strcmp(tmp, "avg15"))
+		mode = ZBX_AVG15;
+	else
+		return SYSINFO_RET_FAIL;
+
+	return get_cpustat(result, cpu_num, state, mode);
 }
 
 /* AIX CPU info */

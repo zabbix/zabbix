@@ -3,14 +3,14 @@ DELETE FROM hosts_templates WHERE hostid NOT IN (SELECT hostid FROM hosts)
 DELETE FROM hosts_templates WHERE templateid NOT IN (SELECT hostid FROM hosts)
 /
 
-CREATE TABLE __upgr_hosts_templates (
+CREATE TABLE t_hosts_templates (
 	hosttemplateid           bigint                                    NOT NULL,
 	hostid                   bigint                                    NOT NULL,
 	templateid               bigint                                    NOT NULL
 )
 /
 
-INSERT INTO __upgr_hosts_templates (SELECT hosttemplateid, hostid, templateid FROM hosts_templates)
+INSERT INTO t_hosts_templates (SELECT hosttemplateid, hostid, templateid FROM hosts_templates)
 /
 
 DROP TABLE hosts_templates
@@ -32,8 +32,8 @@ ALTER TABLE hosts_templates ADD CONSTRAINT c_hosts_templates_1 FOREIGN KEY (host
 ALTER TABLE hosts_templates ADD CONSTRAINT c_hosts_templates_2 FOREIGN KEY (templateid) REFERENCES hosts (hostid) ON DELETE CASCADE
 /
 
-INSERT INTO hosts_templates (SELECT hosttemplateid, hostid, templateid FROM __upgr_hosts_templates)
+INSERT INTO hosts_templates (SELECT hosttemplateid, hostid, templateid FROM t_hosts_templates)
 /
 
-DROP TABLE __upgr_hosts_templates
+DROP TABLE t_hosts_templates
 /

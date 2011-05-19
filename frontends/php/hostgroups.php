@@ -148,6 +148,7 @@ include_once('include/page_header.php');
 			$msg_ok		= S_GROUP_ADDED;
 			$msg_fail	= S_CANNOT_ADD_GROUP;
 		}
+
 		show_messages($result, $msg_ok, $msg_fail);
 		if($result){
 			unset($_REQUEST['form']);
@@ -159,16 +160,20 @@ include_once('include/page_header.php');
 		$result = API::HostGroup()->delete($_REQUEST['groupid']);
 		$result = DBend($result);
 
-		unset($_REQUEST['form']);
 		show_messages($result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
-		unset($_REQUEST['groupid']);
+
+		if($result){
+			unset($_REQUEST['form']);
+		}
+		unset($_REQUEST['delete']);
 	}
 // --------- GO  ----------
 	else if($_REQUEST['go'] == 'delete'){
-			$groups = get_request('groups', array());
-			$go_result = API::HostGroup()->delete($groups);
-			show_messages($go_result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
-		}
+		$groups = get_request('groups', array());
+		$go_result = API::HostGroup()->delete($groups);
+
+		show_messages($go_result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
+	}
 	else if(str_in_array($_REQUEST['go'], array('activate', 'disable'))){
 
 		$status = ($_REQUEST['go'] == 'activate') ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
@@ -289,7 +294,7 @@ include_once('include/page_header.php');
 			//get all hosts from all groups
 			$params = array(
 				'templated_hosts' => 1,
-				'sortfield' => 'host',
+				'sortfield' => 'name',
 				'editable' => 1,
 				'output' => API_OUTPUT_EXTEND
 			);
@@ -300,7 +305,7 @@ include_once('include/page_header.php');
 			$params = array(
 				'groupids' => $twb_groupid,
 				'templated_hosts' => 1,
-				'sortfield' => 'host',
+				'sortfield' => 'name',
 				'editable' => 1,
 				'output' => API_OUTPUT_EXTEND
 			);
@@ -311,7 +316,7 @@ include_once('include/page_header.php');
 		foreach($db_hosts as $num => $db_host){
 // add all except selected hosts
 			if(!isset($hosts[$db_host['hostid']]))
-				$cmbHosts->addItem($db_host['hostid'], $db_host['host']);
+				$cmbHosts->addItem($db_host['hostid'], $db_host['name']);
 		}
 
 // select selected hosts and add them
@@ -390,7 +395,7 @@ include_once('include/page_header.php');
 		$options = array(
 			'groupids' => zbx_objectValues($groups, 'groupid'),
 			'selectHosts' => API_OUTPUT_COUNT,
-			'select_templates' => API_OUTPUT_COUNT,
+			'selectTemplates' => API_OUTPUT_COUNT,
 			'nopermissions' => 1
 		);
 		$groupCounts = API::HostGroup()->get($options);
@@ -400,8 +405,8 @@ include_once('include/page_header.php');
 // Data
 		$options = array(
 			'groupids' => zbx_objectValues($groups, 'groupid'),
-			'selectHosts' => array('hostid','host','status'),
-			'select_templates' => array('hostid','host','status'),
+			'selectHosts' => array('hostid','name','status'),
+			'selectTemplates' => array('hostid','name','status'),
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => 1,
 			'limitSelects' => $config['max_in_table']+1
@@ -427,7 +432,7 @@ include_once('include/page_header.php');
 				}
 
 				$url = 'templates.php?form=update&templateid='.$template['hostid'].'&groupid='.$group['groupid'];
-				$hosts_output[] = new CLink($template['host'], $url, 'unknown');
+				$hosts_output[] = new CLink($template['name'], $url, 'unknown');
 				$hosts_output[] = ', ';
 			}
 			if(!empty($hosts_output)){
@@ -454,7 +459,7 @@ include_once('include/page_header.php');
 						$url = 'hosts.php?form=update&hostid='.$host['hostid'].'&groupid='.$group['groupid'];
 					break;
 				}
-				$hosts_output[] = new CLink($host['host'], $url, $style);
+				$hosts_output[] = new CLink($host['name'], $url, $style);
 				$hosts_output[] = ', ';
 
 			}

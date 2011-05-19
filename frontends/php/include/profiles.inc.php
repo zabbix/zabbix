@@ -226,7 +226,7 @@ function update_config($configs){
 	}
 	if(isset($configs['alert_usrgrpid']) && !is_null($configs['alert_usrgrpid'])){
 		if(($configs['alert_usrgrpid'] != 0) && !DBfetch(DBselect('select usrgrpid from usrgrp where usrgrpid='.$configs['alert_usrgrpid']))){
-			error(S_INCORRECT_GROUP);
+			error(_('Incorrect group'));
 			return false;
 		}
 	}
@@ -296,10 +296,10 @@ function get_user_history(){
 			FROM user_history WHERE userid='.CWebUser::$data['userid'];
 	$history = DBfetch(DBSelect($sql));
 
-	if($history)
+	if($history && !zbx_empty($history['url4']))
 		CWebUser::$data['last_page'] = array('title' => $history['title4'], 'url' => $history['url4']);
 	else
-		CWebUser::$data['last_page'] = false;
+		CWebUser::$data['last_page'] = array('title' => S_DASHBOARD, 'url' => 'dashboard.php');
 
 	for($i = 1; $i<6; $i++){
 		if(defined($history['title'.$i])){
@@ -345,7 +345,7 @@ function add_user_history($page){
 			return; // no need to change anything;
 	}
 	else{ // new page with new title is added
-		if(!CWebUser::$data['last_page']){
+		if($history5 === false){
 			$userhistoryid = get_dbid('user_history', 'userhistoryid');
 			$sql = 'INSERT INTO user_history (userhistoryid, userid, title5, url5)'.
 					' VALUES('.$userhistoryid.', '.$userid.', '.zbx_dbstr($title).', '.zbx_dbstr($url).')';

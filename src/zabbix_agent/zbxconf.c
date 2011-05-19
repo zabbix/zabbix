@@ -24,7 +24,7 @@
 #include "log.h"
 #include "alias.h"
 #include "sysinfo.h"
-#include "perfstat.h"
+#include "stats.h"
 #include "comms.h"
 
 #if defined(ZABBIX_DAEMON)
@@ -93,7 +93,7 @@ void	load_config()
 		{"DebugLevel",			&CONFIG_LOG_LEVEL,			NULL,
 			TYPE_INT,	PARM_OPT,	0,			4},
 		{"StartAgents",			&CONFIG_ZABBIX_FORKS,			NULL,
-			TYPE_INT,	PARM_OPT,	1,			16},
+			TYPE_INT,	PARM_OPT,	1,			100},
 		{"RefreshActiveChecks",		&CONFIG_REFRESH_ACTIVE_CHECKS,		NULL,
 			TYPE_INT,	PARM_OPT,	SEC_PER_MIN,		SEC_PER_HOUR},
 		{"MaxLinesPerSecond",		&CONFIG_MAX_LINES_PER_SECOND,		NULL,
@@ -185,7 +185,7 @@ void	load_user_parameters(int optional)
 		{"UserParameter",		NULL,					&add_parameter,
 			0,		0,		0,			0},
 #ifdef _WINDOWS
-		{"PerfCounter",			NULL,					&add_perfs_from_config,
+		{"PerfCounter",			NULL,					&add_perf_counter_from_config,
 			TYPE_STRING,	PARM_OPT,	0,			0},
 #endif	/* _WINDOWS */
 		{NULL}

@@ -30,9 +30,9 @@ ZBX_METRIC	parameters_specific[] =
 
 	{"net.tcp.listen",	CF_USEUPARAM,	NET_TCP_LISTEN,		NULL,	"80"},
 
-	{"net.if.in",		CF_USEUPARAM,	NET_IF_IN,		NULL,	"lo,bytes"},
-	{"net.if.out",		CF_USEUPARAM,	NET_IF_OUT,		NULL,	"lo,bytes"},
-	{"net.if.total",	CF_USEUPARAM,	NET_IF_TOTAL,		NULL,	"lo,bytes"},
+	{"net.if.in",		CF_USEUPARAM,	NET_IF_IN,		NULL,	"MS TCP Loopback interface,bytes"},
+	{"net.if.out",		CF_USEUPARAM,	NET_IF_OUT,		NULL,	"MS TCP Loopback interface,bytes"},
+	{"net.if.total",	CF_USEUPARAM,	NET_IF_TOTAL,		NULL,	"MS TCP Loopback interface,bytes"},
 	{"net.if.discovery",	0,		NET_IF_DISCOVERY,	NULL,	NULL},
 	{"net.if.list",		0,		NET_IF_LIST,		NULL,	NULL},
 
@@ -50,10 +50,10 @@ ZBX_METRIC	parameters_specific[] =
 
 	{"service_state",	CF_USEUPARAM,	SERVICE_STATE,		NULL,	ZABBIX_SERVICE_NAME},
 	{"services",		CF_USEUPARAM,	SERVICES,		NULL,	NULL},
-	{"perf_counter",	CF_USEUPARAM,	PERF_MONITOR,		NULL,	"\\System\\Processes"},
+	{"perf_counter",	CF_USEUPARAM,	PERF_COUNTER,		NULL,	"\\System\\Processes"},
 	{"proc_info",		CF_USEUPARAM,	PROC_INFO,		NULL,	"svchost.exe"},
 
-	{"__UserPerfCounter",	CF_USEUPARAM,	USER_PERFCOUNTER,	NULL,	""},
+	{"__UserPerfCounter",	CF_USEUPARAM,	USER_PERF_COUNTER,	NULL,	""},
 
 	{0}
 };

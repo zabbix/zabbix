@@ -160,7 +160,7 @@ options = array(
 			'graphids' => $options['graphid'],
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => API_OUTPUT_REFER,
-			'select_templates' => API_OUTPUT_REFER,
+			'selectTemplates' => API_OUTPUT_REFER,
 			'selectGroups' => API_OUTPUT_REFER,
 		));
 
@@ -223,7 +223,7 @@ options = array(
 			'triggerids' => $options['triggerid'],
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => API_OUTPUT_REFER,
-			'select_templates' => API_OUTPUT_REFER,
+			'selectTemplates' => API_OUTPUT_REFER,
 			'selectGroups' => API_OUTPUT_REFER,
 		));
 
@@ -307,7 +307,7 @@ options = array(
 		else{
 			$def_options = array(
 				'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
-				'output' => array('hostid', 'host'),
+				'output' => array('hostid', 'name'),
 				'groupids' => (($this->groupid > 0) ? $this->groupid : null),
 			);
 			$options = zbx_array_merge($def_options, $options);
@@ -315,7 +315,7 @@ options = array(
 			order_result($hosts, 'host');
 
 			foreach($hosts as $host){
-				$this->data['hosts'][$host['hostid']] = $host['host'];
+				$this->data['hosts'][$host['hostid']] = $host['name'];
 			}
 
 			if(is_null($hostid)) $hostid = $this->_profileIds['hostid'];
@@ -352,8 +352,8 @@ options = array(
 			$def_ptions = array(
 				'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
 				'output' => API_OUTPUT_EXTEND,
-				'groupids' => ((($this->groupid > 0) && ($this->hostid == 0)) ? $this->groupid : null),
-				'hostids' => (($this->hostid > 0) ? $this->hostid : null),
+				'groupids' => $this->groupid > 0 && $this->hostid == 0 ? $this->groupid : null,
+				'hostids' => $this->hostid > 0 ? $this->hostid : null
 			);
 			$options = zbx_array_merge($def_ptions, $options);
 			$graphs = API::Graph()->get($options);
@@ -363,9 +363,32 @@ options = array(
 				$this->data['graphs'][$graph['graphid']] = $graph['name'];
 			}
 
-			if(is_null($graphid)) $graphid = $this->_profileIds['graphid'];
+			// no graphid provided
+			if(is_null($graphid)){
+				// if there is one saved in profile, let's take it from there
+				$graphid = is_null($this->_profileIds['graphid'])
+							? 0
+							: $this->_profileIds['graphid'];
+			}
 
-			$graphid = isset($this->data['graphs'][$graphid]) ? $graphid : 0;
+			// if there is no graph with given id in selected host
+			if($graphid > 0 && !isset($this->data['graphs'][$graphid])){
+				// then let's take a look how the desired graph is named
+				$options = array(
+					'output' => array('name'),
+					'graphids' => array($graphid)
+				);
+				$selectedGraphInfo = API::Graph()->get($options);
+				$selectedGraphInfo = reset($selectedGraphInfo);
+				$graphid = 0;
+				// if there is a graph with the same name on new host, why not show it then?
+				foreach($this->data['graphs'] as $gid => $graph){
+					if($graph === $selectedGraphInfo['name']){
+						$graphid = $gid;
+						break;
+					}
+				}
+			}
 		}
 
 		if(!is_null($this->_requestIds['graphid'])){

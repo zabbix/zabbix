@@ -127,7 +127,7 @@ int	main(int argc, char **argv)
 				break;
 		}
 
-	if (CONFIG_FILE == NULL)
+	if (NULL == CONFIG_FILE)
 		CONFIG_FILE = DEFAULT_CONFIG_FILE;
 
 	init_metrics();
@@ -138,7 +138,7 @@ int	main(int argc, char **argv)
 		load_user_parameters(0);
 	}
 
-	/* Do not create debug files */
+	/* do not create debug files */
 	zabbix_open_log(LOG_TYPE_SYSLOG, LOG_LEVEL_EMPTY, NULL);
 
 	switch (task)
@@ -169,9 +169,9 @@ int	main(int argc, char **argv)
 	zbx_tcp_init(&s_in, (ZBX_SOCKET)fileno(stdin));
 	zbx_tcp_init(&s_out, (ZBX_SOCKET)fileno(stdout));
 
-	if( SUCCEED == (ret = zbx_tcp_check_security(&s_in, CONFIG_HOSTS_ALLOWED, 0)) )
+	if (SUCCEED == (ret = zbx_tcp_check_security(&s_in, CONFIG_HOSTS_ALLOWED, 0)))
 	{
-		if( SUCCEED == (ret = zbx_tcp_recv(&s_in, &command)) )
+		if (SUCCEED == (ret = zbx_tcp_recv(&s_in, &command)))
 		{
 			zbx_rtrim(command, "\r\n");
 
@@ -181,10 +181,10 @@ int	main(int argc, char **argv)
 
 			process(command, 0, &result);
 
-			if( NULL == (value = GET_TEXT_RESULT(&result)) )
+			if (NULL == (value = GET_TEXT_RESULT(&result)))
 				value = GET_MSG_RESULT(&result);
 
-			if(value)
+			if (NULL != value)
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "Sending back [%s]", *value);
 
@@ -194,10 +194,8 @@ int	main(int argc, char **argv)
 			free_result(&result);
 		}
 
-		if( FAIL == ret )
-		{
+		if (FAIL == ret)
 			zabbix_log(LOG_LEVEL_DEBUG, "Processing error: %s", zbx_tcp_strerror());
-		}
 	}
 
 	fflush(stdout);

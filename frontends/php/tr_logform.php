@@ -84,7 +84,7 @@ if(isset($_REQUEST['save_trigger'])){
 			$options = array(
 				'triggerids' => $_REQUEST['triggerid'],
 				'output' => API_OUTPUT_EXTEND,
-				'select_dependencies' => API_OUTPUT_REFER
+				'selectDependencies' => API_OUTPUT_REFER
 			);
 			$triggersData = API::Trigger()->get($options);
 			$triggerData = reset($triggersData);
@@ -101,7 +101,7 @@ if(isset($_REQUEST['save_trigger'])){
 //---
 			if($triggerData['templateid']){
 				$_REQUEST['description'] = $triggerData['description'];
-				$expression = explode_exp($triggerData['expression'],0);
+				$expression = explode_exp($triggerData['expression']);
 			}
 
 			$trigger = array();
@@ -229,7 +229,7 @@ if(isset($_REQUEST['sform'])){
 			}
 
 			$value = preg_replace('/([=|#]0)/','',$expr);
-			$value = preg_replace('/\((.*?)\)/u','$1',$value);
+			$value = preg_replace('/^\((.*)\)$/u','$1',$value); // removing wrapping parentheses
 
 			$expressions[$id]['value'] = trim($value);
 			$expressions[$id]['type'] = (zbx_strpos($expr,'#0',zbx_strlen($expr)-3) === false)?(REGEXP_EXCLUDE):(REGEXP_INCLUDE);
@@ -279,14 +279,14 @@ if(isset($_REQUEST['sform'])){
 			$item = $template_host['host'].':';
 		}
 
-		$item .= item_description($db_item,$db_item['key_']);
+		$item .= itemName($db_item,$db_item['key_']);
 	}
 
 	$ctb = new CTextBox('item',$item,80);
 	$ctb->setAttribute('id','item');
 	$ctb->setAttribute('disabled','disabled');
 
-	$script = "javascript: return PopUp('popup.php?dstfrm=".$frmTRLog->getName()."&dstfld1=itemid&dstfld2=item&srctbl=items&srcfld1=itemid&srcfld2=description',800,450);";
+	$script = "javascript: return PopUp('popup.php?dstfrm=".$frmTRLog->getName()."&dstfld1=itemid&dstfld2=item&srctbl=items&srcfld1=itemid&srcfld2=name',800,450);";
 	$cbtn = new CSubmit('select_item',S_SELECT,$script);
 
 	$frmTRLog->addRow(S_ITEM,array($ctb, $cbtn));

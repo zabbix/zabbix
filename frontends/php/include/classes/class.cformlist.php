@@ -29,11 +29,11 @@ class CFormList extends CDiv{
 		$this->formList = new CList(null, 'formlist');
 
 		parent::__construct();
-		$this->setAttribute('id', $id);
-		$this->setAttribute('class', $class);
+		$this->attr('id', zbx_formatDomId($id));
+		$this->attr('class', $class);
 	}
 
-	public function addRow($term, $description=null){
+	public function addRow($term, $description=null, $hidden=false){
 		$label = $term;
 		if(is_object($description)){
 			$inputClass = zbx_strtolower(get_class($description));
@@ -42,10 +42,13 @@ class CFormList extends CDiv{
 			}
 		}
 
-		if(!is_null($description))
-			$this->formList->addItem(array(new CDiv($label, 'dt floatleft right'), new CDiv($description, 'dd')), 'formrow');
-		else
-			$this->formList->addItem(array(new CDiv(SPACE, 'dt floatleft right'), new CDiv($label, 'dd')), 'formrow');
+		$class = $hidden ? 'formrow hidden' : 'formrow';
+		if(!is_null($description)){
+			$this->formList->addItem(array(new CDiv($label, 'dt floatleft right'), new CDiv($description, 'dd')), $class);
+		}
+		else{
+			$this->formList->addItem(array(new CDiv(SPACE, 'dt floatleft right'), new CDiv($label, 'dd')), $class);
+		}
 	}
 
 	public function addInfo($text){

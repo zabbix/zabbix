@@ -20,7 +20,6 @@
 #include "zbxdb.h"
 #include "db.h"
 #include "log.h"
-#include "zlog.h"
 #include "common.h"
 #include "events.h"
 #include "threads.h"
@@ -578,7 +577,7 @@ void	DBupdate_triggers_status_after_restart()
 	DB_RESULT	result2;
 	DB_ROW		row;
 	DB_ROW		row2;
-	zbx_uint64_t	itemid, triggerid;
+	zbx_uint64_t	interfaceid, itemid, triggerid;
 	int		trigger_type, trigger_value, trigger_flags,
 			type, lastclock, delay, nextcheck, min_nextcheck, now;
 	const char	*trigger_error;
@@ -618,7 +617,7 @@ void	DBupdate_triggers_status_after_restart()
 		trigger_error = row[4];
 
 		result2 = DBselect(
-				"select distinct i.itemid,i.type,i.lastclock,i.delay,i.delay_flex"
+				"select distinct i.itemid,i.type,i.lastclock,i.delay,i.delay_flex,i.interfaceid"
 				" from items i,functions f,triggers t"
 				" where i.itemid=f.itemid"
 					" and f.triggerid=t.triggerid"
@@ -632,13 +631,11 @@ void	DBupdate_triggers_status_after_restart()
 		{
 			ZBX_STR2UINT64(itemid, row2[0]);
 			type = atoi(row2[1]);
-			if (SUCCEED == DBis_null(row2[2]))
-				lastclock = 0;
-			else
-				lastclock = atoi(row2[2]);
+			lastclock = (SUCCEED == DBis_null(row2[2]) ? 0 : atoi(row2[2]));
 			delay = atoi(row2[3]);
+			ZBX_DBROW2UINT64(interfaceid, row2[5]);
 
-			nextcheck = calculate_item_nextcheck(itemid, type, delay, row2[4], lastclock, NULL);
+			nextcheck = calculate_item_nextcheck(interfaceid, itemid, type, delay, row2[4], lastclock, NULL);
 			if (-1 == min_nextcheck || nextcheck < min_nextcheck)
 				min_nextcheck = nextcheck;
 		}
@@ -767,29 +764,19 @@ int	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock)
 int	DBget_row_count(const char *table_name)
 {
 	const char	*__function_name = "DBget_row_count";
-	int		count;
+	int		count = 0;
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): %s", __function_name, table_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table_name:'%s'", __function_name, table_name);
 
 	result = DBselect("select count(*) from %s", table_name);
 
-	row = DBfetch(result);
-
-	if (NULL == row || SUCCEED == DBis_null(row[0]))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query");
-		zabbix_syslog("Cannot execute query");
-		DBfree_result(result);
-		return 0;
-	}
-
-	count = atoi(row[0]);
-
+	if (NULL != (row = DBfetch(result)))
+		count = atoi(row[0]);
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %s %d", __function_name, table_name, count);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, count);
 
 	return count;
 }
@@ -797,7 +784,7 @@ int	DBget_row_count(const char *table_name)
 int	DBget_items_unsupported_count()
 {
 	const char	*__function_name = "DBget_items_unsupported_count";
-	int		count;
+	int		count = 0;
 	DB_RESULT	result;
 	DB_ROW		row;
 
@@ -805,21 +792,11 @@ int	DBget_items_unsupported_count()
 
 	result = DBselect("select count(*) from items where status=%d", ITEM_STATUS_NOTSUPPORTED);
 
-	row = DBfetch(result);
-
-	if (NULL == row || SUCCEED == DBis_null(row[0]))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query");
-		zabbix_syslog("Cannot execute query");
-		DBfree_result(result);
-		return 0;
-	}
-
-	count = atoi(row[0]);
-
+	if (NULL != (row = DBfetch(result)))
+		count = atoi(row[0]);
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %d", __function_name, count);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, count);
 
 	return count;
 }
@@ -830,7 +807,7 @@ int	DBget_queue_count(int from, int to)
 	int		count = 0, now;
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	itemid, proxy_hostid;
+	zbx_uint64_t	interfaceid, itemid, proxy_hostid;
 	int		item_type, delay, effective_delay, nextcheck;
 	char		*delay_flex;
 	time_t		lastclock;
@@ -840,7 +817,7 @@ int	DBget_queue_count(int from, int to)
 	now = time(NULL);
 
 	result = DBselect(
-			"select i.itemid,i.type,i.delay,i.delay_flex,i.lastclock,h.proxy_hostid"
+			"select i.itemid,i.type,i.delay,i.delay_flex,i.lastclock,i.interfaceid,h.proxy_hostid"
 			" from items i,hosts h"
 			" where i.hostid=h.hostid"
 				" and h.status=%d"
@@ -856,6 +833,7 @@ int	DBget_queue_count(int from, int to)
 					" or (h.available<>%d and i.type in (%d))"
 					" or (h.snmp_available<>%d and i.type in (%d,%d,%d))"
 					" or (h.ipmi_available<>%d and i.type in (%d))"
+					" or (h.jmx_available<>%d and i.type in (%d))"
 					")"
 				DB_NODE,
 			HOST_STATUS_MONITORED,
@@ -872,19 +850,25 @@ int	DBget_queue_count(int from, int to)
 				ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3,
 			HOST_AVAILABLE_FALSE,
 				ITEM_TYPE_IPMI,
+			HOST_AVAILABLE_FALSE,
+				ITEM_TYPE_JMX,
 			DBnode_local("i.itemid"));
+
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(itemid, row[0]);
 		item_type	= atoi(row[1]);
 		delay		= atoi(row[2]);
 		delay_flex	= row[3];
-		ZBX_DBROW2UINT64(proxy_hostid, row[5]);
+		ZBX_DBROW2UINT64(interfaceid, row[5]);
+		ZBX_DBROW2UINT64(proxy_hostid, row[6]);
 
 		if (FAIL == (lastclock = DCget_item_lastclock(itemid)))
 			lastclock = (time_t)atoi(row[4]);
 
-		nextcheck = calculate_item_nextcheck(itemid, item_type, delay, delay_flex, lastclock, &effective_delay);
+		nextcheck = calculate_item_nextcheck(interfaceid, itemid, item_type,
+				delay, delay_flex, lastclock, &effective_delay);
+
 		if (0 != proxy_hostid)
 			nextcheck = lastclock + effective_delay;
 
@@ -921,39 +905,33 @@ double	DBget_requiredperformance()
 	return qps_total;
 }
 
-zbx_uint64_t	DBget_proxy_lastaccess(const char *hostname)
+int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error)
 {
 	const char	*__function_name = "DBget_proxy_lastaccess";
-	zbx_uint64_t	lastaccess;
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*host_esc;
+	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	host_esc = DBdyn_escape_string(hostname);
 	result = DBselect("select lastaccess from hosts where host='%s' and status in (%d,%d)",
-			host_esc,
-			HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE);
+			host_esc, HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE);
 	zbx_free(host_esc);
 
-	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
+	if (NULL != (row = DBfetch(result)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Proxy \"%s\" does not exist",
-				hostname);
-		zabbix_syslog("Proxy \"%s\" does not exist",
-				hostname);
-		DBfree_result(result);
-		return FAIL;
+		*lastaccess = atoi(row[0]);
+		ret = SUCCEED;
 	}
-
-	ZBX_STR2UINT64(lastaccess, row[0]);
-
+	else
+		*error = zbx_dsprintf(*error, "Proxy \"%s\" does not exist", hostname);
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): " ZBX_FS_UI64, __function_name, lastaccess);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
-	return lastaccess;
+	return ret;
 }
 
 int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid)
@@ -1445,7 +1423,7 @@ const ZBX_TABLE *DBget_table(const char *tablename)
 {
 	int	t;
 
-	for (t = 0; tables[t].table != 0; t++ )
+	for (t = 0; NULL != tables[t].table; t++)
 		if (0 == strcmp(tables[t].table, tablename))
 			return &tables[t];
 	return NULL;
@@ -1455,7 +1433,7 @@ const ZBX_FIELD *DBget_field(const ZBX_TABLE *table, const char *fieldname)
 {
 	int	f;
 
-	for (f = 0; table->fields[f].name != 0; f++ )
+	for (f = 0; NULL != table->fields[f].name; f++)
 		if (0 == strcmp(table->fields[f].name, fieldname))
 			return &table->fields[f];
 	return NULL;
@@ -2178,3 +2156,90 @@ char	*DBsql_id_ins(zbx_uint64_t id)
 
 	return buf[n];
 }
+
+#define ZBX_MAX_PROFILE_FIELDS	70
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBget_profile_field                                              *
+ *                                                                            *
+ * Purpose: get corresponding host_profile field name                         *
+ *                                                                            *
+ * Parameters: profile_link - [IN] field number; 1..ZBX_MAX_PROFILE_FIELDS    *
+ *                                                                            *
+ * Return value: field name or NULL if value of profile_link is incorrect     *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+const char	*DBget_profile_field(unsigned char profile_link)
+{
+	static const char	*profile_fields[ZBX_MAX_PROFILE_FIELDS] =
+	{
+		"type", "type_full", "name", "alias", "os", "os_full", "os_short", "serialno_a", "serialno_b", "tag",
+		"asset_tag", "macaddress_a", "macaddress_b", "hardware", "hardware_full", "software", "software_full",
+		"software_app_a", "software_app_b", "software_app_c", "software_app_d", "software_app_e", "contact",
+		"location", "location_lat", "location_lon", "notes", "chassis", "model", "hw_arch", "vendor",
+		"contract_number", "installer_name", "deployment_status", "url_a", "url_b", "url_c", "host_networks",
+		"host_netmask", "host_router", "oob_ip", "oob_netmask", "oob_router", "date_hw_purchase",
+		"date_hw_install", "date_hw_expiry", "date_hw_decomm", "site_address_a", "site_address_b",
+		"site_address_c", "site_city", "site_state", "site_country", "site_zip", "site_rack", "site_notes",
+		"poc_1_name", "poc_1_email", "poc_1_phone_a", "poc_1_phone_b", "poc_1_cell", "poc_1_screen",
+		"poc_1_notes", "poc_2_name", "poc_2_email", "poc_2_phone_a", "poc_2_phone_b", "poc_2_cell",
+		"poc_2_screen", "poc_2_notes"
+	};
+
+	if (1 > profile_link || profile_link > ZBX_MAX_PROFILE_FIELDS)
+		return NULL;
+
+	return profile_fields[profile_link - 1];
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBget_profile_field_len                                          *
+ *                                                                            *
+ * Purpose: get host_profile field length by profile_link                     *
+ *                                                                            *
+ * Parameters: profile_link - [IN] field number; 1..ZBX_MAX_PROFILE_FIELDS    *
+ *                                                                            *
+ * Return value: field length                                                 *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+unsigned short	DBget_profile_field_len(unsigned char profile_link)
+{
+	static unsigned short	*profile_field_len = NULL;
+	const char		*profile_field;
+	const ZBX_TABLE		*table;
+	const ZBX_FIELD		*field;
+
+	if (1 > profile_link || profile_link > ZBX_MAX_PROFILE_FIELDS)
+		assert(0);
+
+	profile_link--;
+
+	if (NULL == profile_field_len)
+	{
+		profile_field_len = zbx_malloc(profile_field_len, ZBX_MAX_PROFILE_FIELDS * sizeof(unsigned short));
+		memset(profile_field_len, 0, ZBX_MAX_PROFILE_FIELDS * sizeof(unsigned short));
+	}
+
+	if (0 != profile_field_len[profile_link])
+		return profile_field_len[profile_link];
+
+	profile_field = DBget_profile_field(profile_link + 1);
+	assert(table = DBget_table("host_profile"));
+	assert(field = DBget_field(table, profile_field));
+
+	profile_field_len[profile_link] = field->length;
+
+	return profile_field_len[profile_link];
+}
+
+#undef ZBX_MAX_PROFILE_FIELDS

@@ -19,35 +19,17 @@
 **/
 ?>
 <?php
-class CRadioButton extends CDiv{
-	protected $count;
-	protected $name;
-	protected $value;
-
-	public function __construct($name='radio', $value='yes'){
-		$this->count = 0;
-		$this->name = $name;
-		$this->value = $value;
-
-		parent::__construct();
-	}
-
-
-	public function addValue($name, $value, $checked=null){
-		$this->count++;
-
-		$id = $name.'_'.$this->count;
-
-		$radio = new CInput('radio', $this->name, $value);
-		$radio->setAttribute('id', $id);
-
-		if((strcmp($value,$this->value) == 0) || !is_null($checked) || $checked){
-			$radio->setAttribute('checked', 'checked');
+class CRadioButton extends CTag{
+	public function __construct($name, $value, $class=null, $id=null, $checked=false){
+		parent::__construct('input','no'); // no means not paired
+		$this->setAttribute('class', $class);
+		$this->setAttribute('name', $name);
+		$this->setAttribute('value', $value);
+		$this->setAttribute('id', $id);
+		$this->setAttribute('type', 'radio');
+		if($checked){
+			$this->setAttribute('checked', 'checked');
 		}
-
-		$label = new CLabel($name, $id);
-
-		parent::addItem(array($radio, $label));
 	}
 }
 ?>

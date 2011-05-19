@@ -142,7 +142,7 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 
 		if (SUCCEED == (ret = zbx_tcp_send(&s, request)))
 		{
-			if (SUCCEED == (ret = zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE, 0)))
+			if (SUCCEED == (ret = SUCCEED_OR_FAIL(zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE, 0))))
 			{
 				zbx_rtrim(buf, "\r\n");
 				*value = strdup(buf);
@@ -175,19 +175,17 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
  ******************************************************************************/
 int main(int argc, char **argv)
 {
-	unsigned short	port	= ZBX_DEFAULT_AGENT_PORT;
-	int	ret	= SUCCEED;
-	char	*value	= NULL;
-	char	*host	= NULL;
-	char	*key	= NULL;
-	char	*source_ip = NULL;
-	char	ch;
+	unsigned short	port = ZBX_DEFAULT_AGENT_PORT;
+	int		ret = SUCCEED;
+	char		*value = NULL, *host = NULL, *key = NULL, *source_ip = NULL, ch;
 
 	progname = get_program_name(argv[0]);
 
-	/* Parse the command-line. */
-	while ((ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)) != (char)EOF)
-		switch (ch) {
+	/* parse the command-line */
+	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
+	{
+		switch (ch)
+		{
 			case 'k':
 				key = strdup(zbx_optarg);
 				break;
@@ -213,14 +211,15 @@ int main(int argc, char **argv)
 				exit(-1);
 				break;
 		}
+	}
 
-	if( (host==NULL) || (key==NULL))
+	if (NULL == host || NULL == key)
 	{
 		usage();
 		ret = FAIL;
 	}
 
-	if(ret == SUCCEED)
+	if (SUCCEED == ret)
 	{
 
 #if !defined(_WINDOWS)
@@ -228,14 +227,12 @@ int main(int argc, char **argv)
 		signal(SIGTERM, get_signal_handler);
 		signal(SIGQUIT, get_signal_handler);
 		signal(SIGALRM, get_signal_handler);
-#endif /* not WINDOWS */
+#endif
 
 		ret = get_value(source_ip, host, port, key, &value);
 
-		if(ret == SUCCEED)
-		{
+		if (SUCCEED == ret)
 			printf("%s\n",value);
-		}
 
 		zbx_free(value);
 	}

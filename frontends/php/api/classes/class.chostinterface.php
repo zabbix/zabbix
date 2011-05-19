@@ -76,7 +76,7 @@ class CHostInterface extends CZBXAPI{
 // filter
 			'filter'					=> null,
 			'search'					=> null,
-			'searchByAny'			=> null,
+			'searchByAny'				=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 
@@ -381,7 +381,7 @@ Copt::memoryPick();
 				$obj_params['output'] = $options['selectItems'];
 				$items = API::Item()->get($obj_params);
 
-				if(!is_null($options['limitSelects'])) order_result($items, 'description');
+				if(!is_null($options['limitSelects'])) order_result($items, 'name');
 
 				$count = array();
 				foreach($items as $itemid => $item){
@@ -599,7 +599,7 @@ Copt::memoryPick();
 					if($interface['main'] != INTERFACE_PRIMARY){
 						$updateData[] = array(
 							'values' => array('main' => INTERFACE_PRIMARY),
-							'where'=> array('interfaceid='.$interface['interfaceid'])
+							'where'=> array('interfaceid'=>$interface['interfaceid'])
 						);
 					}
 					continue;
@@ -608,7 +608,7 @@ Copt::memoryPick();
 				if($interface['main'] == INTERFACE_PRIMARY){
 					$updateData[] = array(
 						'values' => array('main' => INTERFACE_SECONDARY),
-						'where'=> array('interfaceid='.$interface['interfaceid'])
+						'where'=> array('interfaceid'=>$interface['interfaceid'])
 					);
 				}
 			}
@@ -650,7 +650,7 @@ Copt::memoryPick();
 
 			$data = array();
 			foreach($interfaces as $inum => $interface){
-				$data[] = array('values' => $interface, 'where'=> array('interfaceid='.$interface['interfaceid']));
+				$data[] = array('values' => $interface, 'where'=> array('interfaceid'=>$interface['interfaceid']));
 			}
 			$result = DB::update('interface', $data);
 

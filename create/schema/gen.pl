@@ -51,7 +51,6 @@ local $uniq;
 	"t_varchar"	=>	"varchar",
 	"t_char"	=>	"char",
 	"t_image"	=>	"longblob",
-	"t_text"	=>	"text",
 	"t_history_log"	=>	"text",
 	"t_history_text"=>	"text",
 	"t_blob"	=>	"blob",
@@ -73,7 +72,6 @@ local $uniq;
 	"t_varchar"	=>	"ZBX_TYPE_CHAR",
 	"t_char"	=>	"ZBX_TYPE_CHAR",
 	"t_image"	=>	"ZBX_TYPE_BLOB",
-	"t_text"	=>	"ZBX_TYPE_TEXT",
 	"t_history_log"	=>	"ZBX_TYPE_TEXT",
 	"t_history_text"=>	"ZBX_TYPE_TEXT",
 	"t_blob"	=>	"ZBX_TYPE_BLOB",
@@ -121,11 +119,10 @@ const ZBX_TABLE	tables[]={
 	"t_varchar"	=>	"nvarchar2",
 	"t_char"	=>	"nvarchar2",
 	"t_image"	=>	"blob",
-	"t_text"	=>	"nclob",
 	"t_history_log"	=>	"nclob",
 	"t_history_text"=>	"nclob",
 	"t_blob"	=>	"nvarchar2(2048)",
-	"t_text"	=>	"nvarchar2(2048)",
+	"t_text"	=>	"nclob",
 	"t_item_param"	=>	"nvarchar2(2048)",
 	"t_cksum_text"	=>	"nclob"
 );
@@ -143,7 +140,6 @@ const ZBX_TABLE	tables[]={
 	"t_varchar"	=>	"varchar",
 	"t_char"	=>	"varchar",
 	"t_image"	=>	"blob",
-	"t_text"	=>	"varchar(2048)",
 	"t_history_log"	=>	"varchar(2048)",
 	"t_history_text"=>	"varchar(2048)",
 	"t_time"	=>	"integer",
@@ -167,7 +163,6 @@ const ZBX_TABLE	tables[]={
 	"t_varchar"	=>	"varchar",
 	"t_char"	=>	"char",
 	"t_image"	=>	"bytea",
-	"t_text"	=>	"text",
 	"t_history_log"	=>	"text",
 	"t_history_text"=>	"text",
 	"t_time"	=>	"integer",
@@ -192,7 +187,6 @@ const ZBX_TABLE	tables[]={
 	"t_varchar"	=>	"varchar",
 	"t_char"	=>	"char",
 	"t_image"	=>	"longblob",
-	"t_text"	=>	"text",
 	"t_history_log"	=>	"text",
 	"t_history_text"=>	"text",
 	"t_blob"	=>	"blob",
@@ -267,11 +261,27 @@ sub process_field
 	newstate("field");
 
 	($name, $type, $default, $null, $flags, $relN, $fk_table, $fk_field, $fk_flags) = split(/\|/, $line, 9);
-	($type_short) = split(/\(/, $type, 2);
+	($type_short, $length) = split(/\(/, $type, 2);
 
 	if ($output{"type"} eq "code")
 	{
 		$type = $output{$type_short};
+
+		if ($type eq "ZBX_TYPE_CHAR")
+		{
+			for ($length)
+			{
+				s/\)//;
+			}
+		}
+		elsif ($type eq "ZBX_TYPE_TEXT")
+		{
+			$length = 65535;
+		}
+		else
+		{
+			$length = 0;
+		}
 
 		if ($null eq "NOT NULL")
 		{
@@ -316,7 +326,7 @@ sub process_field
 			$fk_flags = "0";
 		}
 
-		print "\t\t{\"${name}\",\t$type,\t${flags},\t${fk_table},\t${fk_field},\t${fk_flags}}";
+		print "\t\t{\"${name}\",\t${fk_table},\t${fk_field},\t${length},\t$type,\t${flags},\t${fk_flags}}";
 	}
 	else
 	{

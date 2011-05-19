@@ -27,12 +27,11 @@ table { border-collapse:collapse; border-spacing:0; }
 body{
 	background-color:  #EBEFF2;
 	margin: 1px;
-	padding: 0px;
+	padding: 0;
 	color: #2F2F2F;
 	font-family: verdana, arial, helvetica, sans-serif;
 	font-size: 10px;
 	line-height: 1.8em;
-	margin: 1px;
 }
 
 label{ cursor: pointer; }
@@ -42,11 +41,8 @@ iframe { border: 0; }
 table{ border-spacing: 0;}
 td,tr{ color: inherit; text-decoration: none; padding: 0;}
 
-a{text-decoration: underline;}
-a:link 		{	color:#3C3089;  }
-a:visited 	{	color:#3C3089;  }
-a:hover 	{	color:#6C80B9;  }
-a:active 	{	color:#3C3089;  }
+a{ text-decoration: underline; color:#3C3089; }
+a:hover{ color:#6C80B9; }
 
 ul{ margin-left: 0; padding-left: 1em; }
 
@@ -56,6 +52,9 @@ form { margin: 0 }
 @media screen { .printless{ visibility:visible; display:block; } .printonly{ visibility: hidden; display:none; } }
 
 /**************** OTHERS ****************/
+
+.hidden { display: none; }
+.pre {white-space: pre; }
 
 /* ALIGN */
 .floatleft {float: left;}
@@ -78,10 +77,10 @@ form { margin: 0 }
 .marginless {margin: 0;}
 /* COLOR */
 
-.img 		{	border-color:black; border-width:1px;		}
-img.top		{	vertical-align:text-top;			}
-img.bottom	{	vertical-align:text-bottom;			}
-img.borderless	{	border-width: 0; vertical-align: bottom;	}
+.img{ border: 1px black; }
+img.top { vertical-align:text-top; }
+img.bottom { vertical-align:text-bottom; }
+img.borderless { border-width: 0; vertical-align: bottom; }
 
 
 .vert{ width:1px;}
@@ -138,7 +137,9 @@ a.underline:active  { text-decoration: underline; }
 
 
 /* CSS LIST */
-ul.itservices{ margin: 0; margin-left: 5px; }
+ul.itservices{
+	margin: 0 0 0 5px;
+}
 
 ul li.linear{ float: left; list-style-type: none; margin-right: 2px; }
 ul.formlist { list-style-type: none; margin: 0; padding: 0; }
@@ -183,21 +184,10 @@ div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonse
 .select{ cursor: pointer; margin: 1px 2px; }
 .selectShorten{ width: 200px; }
 
-
-.formrow .listInfoLabel{
-	vertical-align: middle;
-	display: table-cell;
-	height:100%;
-}
-
-.formrow .listInfoText{
-	margin-left: 1%;
-}
-
-.listInfo{
-	width: 100%;
-	display: table;
-}
+.radio{ margin: 2px 2px; vertical-align: top; }
+.formrow .listInfoLabel{ vertical-align: middle; display: table-cell; height:100%; }
+.formrow .listInfoText{ margin-left: 1%; }
+.listInfo{ width: 100%; display: table; }
 
 /******************* BUTTONS *********************/
 .button{ border: 1px solid #808080; vertical-align: top; margin: 1px 2px; background: #F0F0F0 url('../images/gradients/button.gif') repeat-x top left; }
@@ -253,17 +243,16 @@ div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonse
 .underline{ text-decoration: underline; }
 
 /* Sortable */
-.header{ height: 18px; line-height: 18px; font-size: 1.1em; font-weight: bold; padding: 3px; margin-bottom: 2px;}
-.column{ margin: 5px 0 5px 5px; min-width: 240px; padding-bottom: 100px; }
-.column .widget{ padding: 2px; margin-bottom: 5px; overflow: hidden;}
-.column .widget .header{ }
+.header{ height: 18px; line-height: 18px; font-size: 1.1em; font-weight: bold; margin-bottom: 2px;}
 
+.widget .header{ padding: 3px; }
 .widget .header .menu_icon{ float: right; margin-right: 2px; }
-
 .widget .footer { color: white; line-height: 12px; height: 12px; padding: 4px 4px; margin-top: 2px;}
 
-.inlineblock{ display: inline-block; }
+.column{ margin: 5px 0 5px 5px; min-width: 240px; padding-bottom: 100px; }
+.column .widget{ padding: 2px; margin-bottom: 5px; overflow: hidden; }
 
+.inlineblock{ display: inline-block; }
 
 span.footer_sign{ padding-right: 5px; padding-left: 5px; }
 span.divider{ color: #558; font-weight: normal;}
@@ -344,11 +333,11 @@ div.formElement_footer{ color: #FFFFFF;  background: #5c9ccc url(originalblue/im
 /* CSS Document */
 /**************** PAGE TABLE ****************/
 /* page_header */
-table.page_header{ background-color: #FFFFFF; border: 0 solid #000000; padding-right: 0; padding-left: 0; }
+table.page_header{ background-color: #FFFFFF; border: 0; padding-right: 0; padding-left: 0; }
 table.page_header tr td.page_header_l{ vertical-align: middle; padding: 0; }
 table.page_header tr td.page_header_r{ vertical-align: middle; text-align: right; }
 table.page_header tr td.page_header_r a{ margin: 0 5px; }
-table.page_footer{ margin-top: 20px;}
+table.page_footer{ margin-top: 20px; padding: 3px;}
 
 /********** FORM TABLE *************/
 table.formtable { background-color: #FFFFFF; color: #000000; border: 1px solid #AAAAAA; width: 50%; margin: auto;}
@@ -685,9 +674,9 @@ table.suggest tr td{ text-align: left; padding-left: 4px; line-height: 2.2em; fo
 .dservice_disabled { background: #A00F0F; }
 /********** END OF DISCOVERY STATUS *********/
 
-.loginBG{ background-color: #AABBCC; background-image: url(../images/gradients/texture_diagonal.gif); }
-.loginForm{ margin: auto; padding: 15px; height: 260px; width: 582px; background-image: url(../images/general/login/background.png); background-repeat: no-repeat; *position: relative; *top: -50%;}
-.loginLogo{ height: 53px; width: 163px; background-image: url(../images/general/login/logo.png); background-repeat: no-repeat; }
+.loginBG{ background: #AABBCC url(../images/gradients/texture_diagonal.gif); }
+.loginForm{ margin: auto; padding: 15px; height: 260px; width: 582px; background: url(../images/general/login/background.png) no-repeat; *position: relative; *top: -50%; }
+.loginLogo{ height: 53px; width: 163px; background: url(../images/general/login/logo.png) no-repeat; }
 
 .vertical-middle {width: 100%; display: table-cell; vertical-align: middle; *position: absolute; *top: 50%;}
 

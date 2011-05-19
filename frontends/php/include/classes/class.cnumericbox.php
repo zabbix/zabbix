@@ -23,10 +23,10 @@ class CNumericBox extends CInput{
 	public function __construct($name='number',$value='0',$size=20,$readonly='no',$allowempty=false){
 		parent::__construct('text', $name, $value);
 		$this->setReadonly($readonly);
-		$this->setAttribute('size', $size);
-		$this->setAttribute('maxlength', $size);
+		$this->attr('size', $size);
+		$this->attr('maxlength', $size);
 
-		$this->setAttribute('style', 'text-align: right;');
+		$this->attr('style', 'text-align: right;');
 
 		$this->addAction('onchange',
 				($allowempty ? ' if(this.value.length==0 || this.value==null) this.value = \'\'; else ' : '').

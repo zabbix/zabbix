@@ -44,9 +44,11 @@ function __autoload($class_name){
 		'chostinterface'=> 1,
 		'cimage' => 1,
 		'citem' => 1,
+		'citemgeneral' => 1,
 		'citemprototype' => 1,
 		'cmaintenance' => 1,
 		'cmap' => 1,
+		'cmapelement' => 1,
 		'cmediatype' => 1,
 		'cproxy' => 1,
 		'cscreen' => 1,
@@ -55,10 +57,12 @@ function __autoload($class_name){
 		'ctemplatescreen' => 1,
 		'ctrigger' => 1,
 		'ctriggerexpression' => 1,
+		'citemkey' => 1,
 		'ctriggerprototype' => 1,
 		'cuser' => 1,
 		'cusergroup' => 1,
 		'cusermacro' => 1,
+		'cusermedia' => 1,
 		'cwebcheck' => 1,
 		'czbxapi' => 1,
 	);
@@ -245,7 +249,7 @@ function __autoload($class_name){
 			}
 
 			if(!$locale_found && CWebUser::$data['lang'] != 'en_GB' && CWebUser::$data['lang'] != 'en_gb'){
-				error('Locale for language "'.CWebUser::$data['lang'].'" is not found on the web server. Tried to set: '.implode(', ', $locales).'. Unable to translate zabbix interface.');
+				error('Locale for language "'.CWebUser::$data['lang'].'" is not found on the web server. Tried to set: '.implode(', ', $locales).'. Unable to translate Zabbix interface.');
 			}
 			bindtextdomain('frontend', 'locale');
 			bind_textdomain_codeset('frontend', 'UTF-8');
@@ -256,10 +260,6 @@ function __autoload($class_name){
 		}
 // Numeric Locale to default
 		setLocale(LC_NUMERIC, array('en','en_US','en_US.UTF-8','English_United States.1252'));
-
-
-		include_once('include/locales/en_gb.inc.php');
-		process_locales();
 	}
 	else{
 		CWebUser::$data = array(
@@ -382,7 +382,6 @@ function __autoload($class_name){
 		$message = array();
 		$width = 0;
 		$height= 0;
-		$img_space = null;
 
 		if(!$bool && !is_null($errmsg))		$msg=S_CONFIG_ERROR_HEAD.': '.$errmsg;
 		else if($bool && !is_null($okmsg))	$msg=$okmsg;
@@ -422,8 +421,6 @@ function __autoload($class_name){
 
 					$msg_tab->addRow($row);
 					$msg_tab->show();
-
-					$img_space = new CImg('images/general/tree/zero.gif','space','100','2');
 					break;
 			}
 		}
@@ -491,8 +488,6 @@ function __autoload($class_name){
 			}
 			$ZBX_MESSAGES = null;
 		}
-
-		if(!is_null($img_space)) print(unpack_object($img_space));
 
 		if($page['type'] == PAGE_TYPE_IMAGE && count($message) > 0){
 			$width += 2;
@@ -734,11 +729,11 @@ function __autoload($class_name){
 
 		if(is_null($format)) $format = $IMAGE_FORMAT_DEFAULT;
 
-		if(IMAGE_FORMAT_JPEG == $format)	Header( "Content-type:  image/jpeg");
-		if(IMAGE_FORMAT_TEXT == $format)	Header( "Content-type:  text/html");
-		else								Header( "Content-type:  image/png");
+		if(IMAGE_FORMAT_JPEG == $format)	header( "Content-type:  image/jpeg");
+		if(IMAGE_FORMAT_TEXT == $format)	header( "Content-type:  text/html");
+		else								header( "Content-type:  image/png");
 
-		Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT");
+		header("Expires:  Mon, 17 Aug 1998 12:51:50 GMT");
 	}
 
 	function ImageOut(&$image,$format=NULL){
