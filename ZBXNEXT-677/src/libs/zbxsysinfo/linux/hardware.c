@@ -398,9 +398,9 @@ int     SYSTEM_HW_MACADDR(const char *cmd, const char *param, unsigned flags, AG
 	if (0 != get_param(param, 1, regex, sizeof(regex)))
 		*regex = '\0';
 
-	if (0 != get_param(param, 2, buffer, sizeof(buffer)) || '\0' == *buffer || 0 == strcmp(buffer, "shownames"))
-		show_names = 1;
-	else if (0 == strcmp(buffer, "onlymacs"))
+	if (0 != get_param(param, 2, buffer, sizeof(buffer)) || '\0' == *buffer || 0 == strcmp(buffer, "full"))
+		show_names = 1;	/* show interface names */
+	else if (0 == strcmp(buffer, "short"))
 		show_names = 0;
 	else
 		return ret;
