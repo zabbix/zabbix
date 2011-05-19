@@ -721,7 +721,6 @@
 	'S_NO_HOSTS_DEFINED'=>				_('No hosts defined'),
 	'S_NO_TEMPLATES_DEFINED'=>			_('No templates defined'),
 	'S_NO_PROXIES_DEFINED'=>			_('No proxies defined'),
-	'S_HOSTS_BIG'=>					_('HOSTS'),
 	'S_HOST'=>					_('Host'),
 	'S_CONNECT_TO'=>				_('Connect to'),
 	'S_DNS'=>					_('DNS'),
