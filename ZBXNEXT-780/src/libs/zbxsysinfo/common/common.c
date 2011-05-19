@@ -143,7 +143,7 @@ static int	AGENT_VERSION(const char *cmd, const char *param, unsigned flags, AGE
 	return SYSINFO_RET_OK;
 }
 
-int	EXECUTE_USER_PARAM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	EXECUTE_USER_PARAMETER(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	int	ret;
 
