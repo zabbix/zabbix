@@ -197,7 +197,6 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 #ifdef _WINDOWS
 	PDNS_RECORD	pDnsRecord;
-	PIP4_ARRAY	pSrvList = NULL;
 	LPTSTR		wzone;
 #else
 	char		*name;
@@ -272,16 +271,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 #ifdef _WINDOWS
 	wzone = zbx_utf8_to_unicode(zone);
-	if ('\0' != *ip)
-	{
-		pSrvList = (PIP4_ARRAY)zbx_malloc(pSrvList, sizeof(IP4_ARRAY));
-		pSrvList->AddrCount = 1;
-		pSrvList->AddrArray[0] = inet_addr(ip);
-		res = DnsQuery(wzone, type, DNS_QUERY_BYPASS_CACHE, pSrvList, &pDnsRecord, NULL);
-		zbx_free(pSrvList);
-	}
-	else
-		res = DnsQuery(wzone, type, DNS_QUERY_STANDARD, NULL, &pDnsRecord, NULL);
+	res = DnsQuery(wzone, type, DNS_QUERY_STANDARD, NULL, &pDnsRecord, NULL);
 
 	if (1 == short_answer)
 	{
