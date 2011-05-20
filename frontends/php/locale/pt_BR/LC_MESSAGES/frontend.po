@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-05-17 20:55+0300\n"
+"POT-Creation-Date: 2011-05-20 13:43+0300\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -5339,7 +5339,7 @@ msgid "Maximum visible host name length is %2$d characters, \"%3$s\" is %1$d cha
 msgid_plural "Maximum visible host name length is %2$d characters, \"%3$s\" is %1$d characters."
 msgstr[0] ""
 msgstr[1] ""
-1;6F
+
 #: include/locales/en_gb.inc.php:58 include/locales/en_gb.inc.php:71
 #: include/locales/en_gb.inc.php:660
 msgid "May"
@@ -5581,7 +5581,7 @@ msgstr "Autenticação NTLM"
 #: include/views/configuration.action.edit.php:47
 #: include/views/configuration.discovery.edit.php:42
 #: include/views/configuration.sysmap.edit.php:48
-#: include/views/configuration.sysmap.edit.php:134 items.php:937
+#: include/views/configuration.sysmap.edit.php:134 items.php:915
 #: latest.php:209 popup.php:824 popup.php:955 popup.php:1056 popup.php:1064
 #: popup.php:1281 popup.php:1289 popup.php:1438 popup.php:1781 popup.php:1787
 #: queue.php:250 trigger_prototypes.php:45 triggers.php:46
@@ -8608,6 +8608,10 @@ msgstr "Qui"
 #: include/locales/en_gb.inc.php:48 include/locales/en_gb.inc.php:1393
 msgid "Tuesday"
 msgstr "Quinta-feira"
+
+#: include/locales.inc.php:76
+msgid "Turkish (TR)"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1024
 msgid "Two elements should be selected"
