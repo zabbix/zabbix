@@ -371,6 +371,9 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%s ",
 							zbx_unicode_to_utf8(pDnsRecord->Data.TXT.pStringArray[i]));
 
+				if (0 < i)
+					offset -= 1;	/* remove the trailing space */
+
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "\"");
 				break;
 			default:
