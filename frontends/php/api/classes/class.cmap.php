@@ -395,8 +395,8 @@ COpt::memoryPick();
 				$db_map_urls = DBselect($sql);
 				while($map_url = DBfetch($db_map_urls)){
 					foreach($selements as $snum => $selement){
-						if((bccomp($selement['sysmapid'],$map_url['sysmapid']) == 0) && ($selement['elementtype'] == $map_url['elementtype'])){
-							$selements[$snum]['urls'][] = $this->expandUrlMacro($map_url, $selement);
+						if((bccomp($selement['sysmapid'], $map_url['sysmapid']) == 0) && ($selement['elementtype'] == $map_url['elementtype'])){
+							$selements[$snum]['urls'][$map_url['sysmapurlid']] = $this->expandUrlMacro($map_url, $selement);
 						}
 					}
 				}
@@ -408,9 +408,9 @@ COpt::memoryPick();
 			$db_selement_urls = DBselect($sql);
 			while($selement_url = DBfetch($db_selement_urls)){
 				if(is_null($options['expandUrls']))
-					$selements[$selement_url['selementid']]['urls'][] = $selement_url;
+					$selements[$selement_url['selementid']]['urls'][$selement_url['sysmapelementurlid']] = $selement_url;
 				else
-				$selements[$selement_url['selementid']]['urls'][] = $this->expandUrlMacro($selement_url, $selements[$selement_url['selementid']]);
+					$selements[$selement_url['selementid']]['urls'][$selement_url['sysmapelementurlid']] = $this->expandUrlMacro($selement_url, $selements[$selement_url['selementid']]);
 			}
 
 			foreach($selements as $selement){
@@ -441,7 +441,7 @@ COpt::memoryPick();
 			$sql = 'SELECT DISTINCT slt.* FROM sysmaps_link_triggers slt WHERE '.DBcondition('slt.linkid', $linkids);
 			$db_link_triggers = DBselect($sql);
 			while($link_trigger = DBfetch($db_link_triggers)){
-				$map_links[$link_trigger['linkid']]['linktriggers'][] = $link_trigger;
+				$map_links[$link_trigger['linkid']]['linktriggers'][$link_trigger['linktriggerid']] = $link_trigger;
 			}
 
 			foreach($map_links as $link){

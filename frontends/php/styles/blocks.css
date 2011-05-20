@@ -38,6 +38,42 @@
 	box-shadow: 0 0 5px 5px rgba(204, 204, 204, 0.5);
 }
 
+fieldset{
+	margin: 0;
+	padding: 0;
+}
+
+table.gridTable{
+	empty-cells:show;
+	padding: 1px 3px;
+	white-space: nowrap;
+	text-align: left;
+	height: 22px;
+	border-collapse: collapse;
+	width: 100%
+}
+table.gridTable thead tr td{
+	font-weight: bold;
+	background-color: #CED7DF;
+}
+table.gridTable tfoot tr td{
+	text-align: right;
+	background-color: #CED7DF;
+}
+table.gridTable tbody tr td{
+	background-color: #F2F7FA;
+}
+table.gridTable tr td{
+	border: 2px solid white;
+}
+
+.colorpickerLabel{
+	border: 1px solid black;
+	display: inline-block;
+	width: 10px;
+	height: 10px;
+}
+
 /************************************************************/
 /*					ZABBIX MESSAGING						*/
 /************************************************************/
