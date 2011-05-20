@@ -174,7 +174,7 @@
 	'S_GRAPH_DELETED'=>			'Diagram togs bort',
 	'S_CANNOT_DELETE_GRAPH'=>			'Kan inte ta bort diagram',
 	'S_CANNOT_ADD_GRAPH'=>			'Kan inte lägga till diagram',
-	'S_ID'=>			'Id',
+	'S_ID'=>			'ID',
 	'S_NO_GRAPHS_DEFINED'=>			'Inga diagram har definierats',
 	'S_DELETE_GRAPH_Q'=>			'Ta bort diagram?',
 	'S_YAXIS_MIN_VALUE'=>			'MIN-värde för Y-axel',

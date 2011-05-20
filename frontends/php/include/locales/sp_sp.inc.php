@@ -337,7 +337,7 @@
 	'S_GRAPH_DELETED'=>			'Gráfico eliminado',
 	'S_CANNOT_DELETE_GRAPH'=>			'No es posible eliminar el gráfico',
 	'S_CANNOT_ADD_GRAPH'=>			'No es posible añadir el gráfico',
-	'S_ID'=>			'Id',
+	'S_ID'=>			'ID',
 	'S_NO_GRAPHS_DEFINED'=>			'No se han definido gráficos',
 	'S_NO_GRAPH_DEFINED'=>			'No se ha definido gráfico',
 	'S_DELETE_GRAPH_Q'=>			'¿Eliminar el gráfico?',
