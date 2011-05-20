@@ -129,7 +129,7 @@ static int	get_ifdata(const char *if_name, zbx_uint64_t *ibytes, zbx_uint64_t *i
 	}
 	else
 	{
-		/* Fallback to using SIOCGIFDATA */
+		/* fallback to using SIOCGIFDATA */
 
 		int		if_s;
 		struct ifreq	ifr;

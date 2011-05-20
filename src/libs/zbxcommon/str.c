@@ -412,9 +412,9 @@ void	del_zeroes(char *s)
  * Parameters: str - string for processing                                    *
  *             charlist - null terminated list of characters                  *
  *                                                                            *
- * Return value: length of stripped string                                    *
+ * Return value: number of trimmed characters                                 *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
+ * Author: Eugene Grigorjev, Aleksandrs Saveljevs                             *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -422,14 +422,18 @@ void	del_zeroes(char *s)
 int	zbx_rtrim(char *str, const char *charlist)
 {
 	char	*p;
+	int	count = 0;
 
 	if (NULL == str || '\0' == *str)
-		return 0;
+		return count;
 
 	for (p = str + strlen(str) - 1; p >= str && NULL != strchr(charlist, *p); p--)
+	{
 		*p = '\0';
+		count++;
+	}
 
-	return (int)(p - str);
+	return count;
 }
 
 /******************************************************************************
