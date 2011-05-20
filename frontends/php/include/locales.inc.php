@@ -73,6 +73,7 @@ function set_zbx_locales(){
 		'sk_SK'=>  _('Slovak (SK)'),
 		'es_ES'=>  S_SPANISH_ES,
 		'sv_SE'=>  S_SWEDISH_SE,
+		'tr_TR'=>  _('Turkish (TR)'),
 		'uk_UA'=>  S_UKRAINIAN_UA,
 	);
 }
