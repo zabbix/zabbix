@@ -87,7 +87,6 @@ include_once('include/page_header.php');
 
 
 					foreach($mapData['links'] as &$link){
-						$link['linktriggers'] = zbx_toHash($link['linktriggers'], 'linktriggerid');
 						foreach($link['linktriggers'] as $lnum => $linktrigger){
 							$hosts = get_hosts_by_triggerid($linktrigger['triggerid']);
 							if($host = DBfetch($hosts)){

@@ -162,7 +162,6 @@ function create_map(container, sysmapid){
 		}, this));
 	};
 	CMap.prototype = {
-		id:	null,							// own id
 		data: {},							// local sysmap DB :)
 		iconList: {}, // list of available icons [{imageid: name}, ...]
 
@@ -183,6 +182,8 @@ function create_map(container, sysmapid){
 			selements: {} // selected elements { elementid: elementid, ... }
 		},
 
+		currentLinkId: '0', // linkid of currently edited link
+
 		mlinktrigger: {
 			linktriggerid:	0,					// ALWAYS must be a STRING (js doesn't support uint64)
 			triggerid:		0,					// ALWAYS must be a STRING (js doesn't support uint64)
@@ -190,7 +191,6 @@ function create_map(container, sysmapid){
 			drawtype:		0,
 			color:			'CC0000'
 		},
-
 
 		save: function(){
 			var url = new Curl(location.href);
@@ -268,70 +268,32 @@ function create_map(container, sysmapid){
 		},
 
 	// CONNECTORS
-		createLink: function(e, linkData){
-			linkData = linkData || {};
-
-			if(!isset('linkid', linkData) || (linkData['linkid'] == 0)){
-				if(this.selection.count != 2){
-					this.info(locale['S_TWO_ELEMENTS_SHOULD_BE_SELECTED']);
-					return false;
-				}
-
-				do{
-					linkData.linkid = parseInt(Math.random(1000000000) * 1000000000);
-					linkData.linkid = linkData.linkid.toString();
-				} while(isset(linkData.linkid, this.links));
-
-				linkData.selementid1 = null;
-				linkData.selementid2 = null;
-
-				for(var selementid in this.selection.selements){
-					if(!is_null(linkData.selementid2)) break;
-
-					if(is_null(linkData.selementid1))
-						linkData.selementid1 = selementid; else
-						linkData.selementid2 = selementid;
-				}
-			}
-
-			this.links[linkData.linkid] = new CLink(this, linkData);
-			this.links[linkData.linkid].create();
-
-
-	// link created by event (need to update sysmap)
-			if(!is_null(e))
-				this.updateImage();
-		},
-
-		removeLinks: function(e){
-			if(this.selection.count != 2){
-				this.info(locale['S_PLEASE_SELECT_TWO_ELEMENTS']);
-				return false;
-			}
-
+		removeLinks: function(){
 			var selementid1 = null;
 			var selementid2 = null;
 
-			for(var selementid in this.selection.selements){
-				if(!is_null(selementid2)) break;
+			if(this.selection.count !== 2){
+				alert(locale['S_PLEASE_SELECT_TWO_ELEMENTS']);
+				return false;
+			}
 
-				if(is_null(selementid1))
-					selementid1 = selementid; else
+			for(var selementid in this.selection.selements){
+				if(selementid1 === null)
+					selementid1 = selementid;
+				else
 					selementid2 = selementid;
 			}
 
 			var linkids = this.getLinksBySelementIds(selementid1, selementid2);
-
-			if(linkids.length == 0) return false;
+			if(linkids.length === 0)
+				return false;
 
 			if(Confirm(locale['S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q'])){
 				for(var i = 0; i < linkids.length; i++){
 					this.links[linkids[i]].remove();
 				}
 
-				if(!is_null(this.form))
-					this.form.hide(e);
-
+				this.linkForm.hide();
 				this.updateImage();
 			}
 		},
@@ -372,7 +334,6 @@ function create_map(container, sysmapid){
 			// resize div on window resize
 			jQuery(window).resize(jQuery.proxy(this.setContainer, this));
 			// resize div on image change
-			// TODO: maybe it's not needed, or needed only when image sizes changed
 			this.mapimg.load(jQuery.proxy(this.setContainer, this));
 
 
@@ -421,11 +382,15 @@ function create_map(container, sysmapid){
 
 			// remove element
 			jQuery('#selement_remove').click(function(){
-				that.deleteSelectedElements();
+				that.removeLinks();
 			});
 
 			// add link
 			jQuery('#link_add').click(function(){
+				if(that.selection.count != 2){
+					alert(locale['S_TWO_ELEMENTS_SHOULD_BE_SELECTED']);
+					return false;
+				}
 				var link = new CLink(that);
 				that.links[link.id] = link;
 				that.updateImage();
@@ -488,15 +453,36 @@ function create_map(container, sysmapid){
 
 			// open link form
 			jQuery('#linksList').delegate('.openlink', 'click', function(){
-				that.linkForm.show(jQuery(this).data('linkid'));
+				that.currentLinkId = jQuery(this).data('linkid');
+				var linkData = that.links[that.currentLinkId].getData();
+				that.linkForm.setValues(linkData);
+				that.linkForm.show();
 			});
 
 			// link form
-//			jQuery('#elementRemove').click();
-//			jQuery('#elementApply').click();
-			jQuery('#linkClose').click(jQuery.proxy(function(){
-				this.linkForm.hide();
-			}, this));
+			jQuery('#linkRemove').click(function(){
+				that.links[that.currentLinkId].remove();
+				that.linkForm.hide();
+				that.updateImage();
+			});
+			jQuery('#linkApply').click(function(){
+				var linkData = that.linkForm.getValues();
+				that.links[that.currentLinkId].update(linkData)
+			});
+			jQuery('#linkClose').click(function(){
+				that.linkForm.hide();
+			});
+
+			// changes for color inputs
+			this.linkForm.domNode.delegate('.colorpicker', 'change', function(){
+				var id = jQuery(this).attr('id');
+				set_color_by_name(id, this.value);
+			});
+			this.linkForm.domNode.delegate('.colorpickerLabel', 'click', function(){
+				var id = jQuery(this).attr('id');
+				var input = id.match(/^lbl_(.+)$/);
+				show_color_picker(input[1]);
+			});
 
 		},
 
@@ -530,10 +516,10 @@ function create_map(container, sysmapid){
 		},
 
 		toggleForm: function(){
+			this.linkForm.hide();
 			if(this.selection.count == 0){
 				this.form.hide();
 				this.massForm.hide();
-				this.linkForm.hide();
 			}
 			else if(this.selection.count == 1){
 				for(var selementid in this.selection.selements){
@@ -545,7 +531,6 @@ function create_map(container, sysmapid){
 			else{
 				this.form.hide();
 				this.massForm.show();
-				this.linkForm.hide();
 			}
 		}
 
@@ -555,76 +540,64 @@ function create_map(container, sysmapid){
 	// *******************************************************************
 	//		LINK object
 	// *******************************************************************
-	var CLink = Class.create(CDebug, {
-		id: null,
-		sysmap: null,
-		data: null,
+	function CLink(sysmap, linkData){
+		this.sysmap = sysmap;
 
-		initialize: function($super, sysmap, linkData){
-			this.id = linkData.linkid;
-			$super('CLink['+this.id+']');
-		//--
-			this.sysmap = sysmap;
+		var linkid;
 
-			this.data = {
-				linkid:			0,				// ALWAYS must be a STRING (js doesn't support uint64)
-				label:			'',				// Link label
-				selementid1:	0,				// ALWAYS must be a STRING (js doesn't support uint64)
-				selementid2:	0,				// ALWAYS must be a STRING (js doesn't support uint64)
-				linktriggers:	{},				// linktriggers list
-				tr_desc:		locale['S_SELECT'],		// default trigger caption
+		if(!linkData){
+			linkData = {
+				label:			'',
+				selementid1:	null,
+				selementid2:	null,
+				linktriggers:	{},
 				drawtype:		0,
-				color:			'00CC00',
-				status:			1				// status of link 1 - active, 2 - passive
+				color:			'00CC00'
 			};
 
-			for(var key in linkData){
-				if(is_null(linkData[key])) continue;
-
-				if(is_number(linkData[key]))
-					linkData[key] = linkData[key].toString();
-
-				this.data[key] = linkData[key];
+			for(var selementid in this.sysmap.selection.selements){
+				if(linkData.selementid1 === null)
+					linkData.selementid1 = selementid;
+				else
+					linkData.selementid2 = selementid;
 			}
-		},
 
-		create: function(e){
-		// assign by reference!!
-			this.sysmap.data.links[this.id] = this.data;
-			//this.sysmap.links[this.id] = this;
-		//--
-		},
-
-		update: function(params){ // params = [{'key': key, 'value':value},{'key': key, 'value':value},...]
-			for(var key in params){
-				if(is_null(params[key])) continue;
-
-		//SDI(key+' : '+params[key]);
-				if(key == 'selementid1'){
-					if(this.data.selementid2 == params[key])
-					return false;
-				}
-
-				if(key == 'selementid2'){
-					if(this.data.selementid1 == params[key])
-					return false;
-				}
-
-				if(is_number(params[key])) params[key] = params[key].toString();
-				this.data[key] = params[key];
+			// generate unique linkid
+			do{
+				linkid = parseInt(Math.random(1000000000) * 10000000);
+				linkid = linkid.toString();
+			} while(typeof this.sysmap.data.links[linkid] !== 'undefined');
+			linkData.linkid = linkid;
+		}
+		else{
+			if(jQuery.isArray(linkData.linktriggers)){
+				linkData.linktriggers = {};
 			}
+		}
+
+		this.data = linkData;
+		this.id = this.data.linkid;
+
+		// assign by reference
+		this.sysmap.data.links[this.id] = this.data;
+	}
+	CLink.prototype = {
+
+		update: function(data){
+			for(var key in data){
+				this.data[key] = data[key];
+			}
+
+			this.sysmap.updateImage();
 		},
 
 		remove: function(){
-			this.sysmap.links[this.id] = null;
-			delete(this.sysmap.links[this.id]);
+			delete this.sysmap.data.links[this.id];
+			delete this.sysmap.links[this.id];
 		},
 
-		reload: function(data){
-			if(typeof(data) != "undefined")
-				this.update(data);
-
-			this.sysmap.updateImage();
+		getData: function(){
+			return this.data;
 		},
 
 		createLinkTrigger: function(linktrigger){
@@ -649,35 +622,86 @@ function create_map(container, sysmapid){
 			}
 
 			this.data.linktriggers[linktriggerid] = linktrigger;
-		},
-
-		updateLinkTrigger: function(linktriggerid, params){
-			for(var key in params){
-				if(is_null(params[key])) continue;
-
-				if(is_number(params[key])) params[key] = params[key].toString();
-				this.data.linktriggers[linktriggerid][key] = params[key];
-			}
-		},
-
-		removeLinkTrigger: function(linktriggerid){
-			this.data.linktriggers[linktriggerid] = null;
-			delete(this.data.linktriggers[linktriggerid]);
 		}
-	});
 
-	var CSelement = function(sysmap, selementData){
-		this.selected = false;
+	};
+
+	function CSelement(sysmap, selementData){
 		this.sysmap = sysmap;
 
 		var selementid;
 
-		// METHODS
-		this.getData = function(){
-			return jQuery.extend({}, this.data, { elementName: this.elementName });
-		};
+		if(!selementData){
+			selementData = {
+				elementtype: '4', // image
+				iconid_off: this.sysmap.iconList[0].imageid, // first imageid
+				label: locale['S_NEW_ELEMENT'],
+				label_location: this.sysmap.data.label_location, // set default map label location
+				x: 0,
+				y: 0,
+				urls: {},
+				elementName: this.sysmap.iconList[0].name, // image name
+				image: this.sysmap.iconList[0].imageid
+			};
 
-		this.update = function(data, unsetUndefined){
+			// generate unique selementid
+			do{
+				selementid = parseInt(Math.random(1000000000) * 10000000);
+				selementid = selementid.toString();
+			} while(typeof this.sysmap.data.selements[selementid] !== 'undefined');
+			selementData.selementid = selementid;
+		}
+		else{
+			if(jQuery.isArray(selementData.urls)){
+				selementData.urls = {};
+			}
+		}
+
+		this.elementName = selementData.elementName;
+		delete selementData.elementName;
+
+		this.data = selementData;
+
+		this.id = this.data.selementid;
+		// assign by reference
+		this.sysmap.data.selements[this.id] = this.data;
+
+
+		// create dom
+		this.domNode = jQuery('<div></div>')
+				.appendTo(this.sysmap.container)
+				.addClass('pointer sysmap_element')
+				.data('id', this.id);
+
+
+		jQuery(this.domNode).draggable({
+			containment: 'parent',
+			opacity: 0.5,
+			helper: 'clone',
+			stop: jQuery.proxy(function(event, data){
+				this.update({
+					x: parseInt(data.position.left, 10),
+					y: parseInt(data.position.top, 10)
+				});
+			}, this)
+		});
+
+		this.updateIcon();
+		this.align();
+
+		// TODO: grid snap
+		//	if(this.sysmap.auto_align){
+		//		jQuery(this.domNode).draggable('option', 'grid', [this.sysmap.grid_size, this.sysmap.grid_size]);
+		//	}
+	}
+	CSelement.prototype = {
+		selected: false,
+
+		getData: function(){
+			return jQuery.extend({}, this.data, { elementName: this.elementName });
+		},
+
+		update: function(data, unsetUndefined){
 			unsetUndefined = unsetUndefined || false;
 
 			var	fieldName,
@@ -724,9 +748,9 @@ function create_map(container, sysmapid){
 			this.sysmap.trigger('elementMoved', this);
 
 			this.sysmap.updateImage();
-		};
+		},
 
-		this.remove = function(){
+		remove: function(){
 			this.domNode.remove();
 			delete this.sysmap.data.selements[this.id];
 			delete this.sysmap.selements[this.id];
@@ -734,9 +758,9 @@ function create_map(container, sysmapid){
 			if(typeof this.sysmap.selection.selements[this.id] !== 'undefined')
 				this.sysmap.selection.count--;
 			delete this.sysmap.selection.selements[this.id];
-		};
+		},
 
-		this.toggleSelect = function(state){
+		toggleSelect: function(state){
 			state = state || !this.selected;
 
 			this.selected = state;
@@ -746,9 +770,9 @@ function create_map(container, sysmapid){
 				this.domNode.removeClass('selected');
 
 			return this.selected;
-		};
+		},
 
-		this.align = function(force){
+		align: function(force){
 			force = force || false;
 
 			var dims = {
@@ -803,74 +827,16 @@ function create_map(container, sysmapid){
 				top: this.data.y + 'px',
 				left: this.data.x + 'px'
 			});
-		};
+		},
 
-		this.updateIcon = function(){
+		updateIcon: function(){
 			var oldIconClass = this.domNode.get(0).className.match(/sysmap_iconid_\d+/);
 			if(oldIconClass !== null){
 				this.domNode.removeClass(oldIconClass[0]);
 			}
 
 			this.domNode.addClass('sysmap_iconid_'+this.data.iconid_off)
-		};
-
-		if(!selementData){
-			selementData = {
-				elementtype: '4', // image
-				iconid_off: this.sysmap.iconList[0].imageid, // first imageid
-				label: locale['S_NEW_ELEMENT'],
-				label_location: this.sysmap.data.label_location, // set default map label location
-				x: 0,
-				y: 0,
-				urls: [],
-				elementName: this.sysmap.iconList[0].name, // image name
-				image: this.sysmap.iconList[0].imageid
-			};
-
-			// generate unique selementid
-			do{
-				selementid = parseInt(Math.random(1000000000) * 10000000);
-				selementid = selementid.toString();
-			} while(typeof this.sysmap.data.selements[selementid] !== 'undefined');
-			selementData.selementid = selementid;
 		}
-
-		this.elementName = selementData.elementName;
-		delete selementData.elementName;
-
-		this.data = selementData;
-
-		this.id = this.data.selementid;
-		// assign by reference
-		this.sysmap.data.selements[this.id] = this.data;
-
-
-		// create dom
-		this.domNode = jQuery('<div></div>')
-				.appendTo(this.sysmap.container)
-				.addClass('pointer sysmap_element')
-				.data('id', this.id);
-
-
-		jQuery(this.domNode).draggable({
-			containment: 'parent',
-			opacity: 0.5,
-			helper: 'clone',
-			stop: jQuery.proxy(function(event, data){
-				this.update({
-					x: parseInt(data.position.left, 10),
-					y: parseInt(data.position.top, 10)
-				});
-			}, this)
-		});
-
-		this.updateIcon();
-		this.align();
-
-		// TODO: grid snap
-		//	if(this.sysmap.auto_align){
-		//		jQuery(this.domNode).draggable('option', 'grid', [this.sysmap.grid_size, this.sysmap.grid_size]);
-		//	}
 	};
 
 	// *******************************************************************
@@ -967,9 +933,6 @@ function create_map(container, sysmapid){
 		this.actionProcessor.process();
 	}
 	CElementForm.prototype = {
-		sysmap: null, // reference to CMap object
-		domNode: null, // jQuery dom object
-		formContainer: null, // jQuery object
 
 		show: function(){
 			this.formContainer.draggable("option", "handle", '#formDragHandler');
@@ -981,13 +944,13 @@ function create_map(container, sysmapid){
 		},
 
 		addUrls: function(urls){
-			if((typeof urls === 'undefined') || (urls.length === 0)){
-				urls = [{}];
+			if((typeof urls === 'undefined') || jQuery.isEmptyObject(urls)){
+				urls = {empty: {}};
 			}
 
 			var tpl = new Template(jQuery('#selementFormUrls').html());
 
-			for(var i = 0; i < urls.length; i++){
+			for(var i in urls){
 				var url = urls[i];
 
 				// generate unique urlid
@@ -1008,7 +971,7 @@ function create_map(container, sysmapid){
 			jQuery('#advanced_icons').attr('checked', (selement.iconid_on != 0) || (selement.iconid_maintenance != 0) || (selement.iconid_disabled != 0));
 
 			// clear urls
-			jQuery('#urlContainer tr[id^=urlrow]').remove();
+			jQuery('#urlContainer tr').remove();
 			this.addUrls(selement.urls);
 
 			this.actionProcessor.process();
@@ -1020,7 +983,7 @@ function create_map(container, sysmapid){
 		getValues: function(){
 			var values = jQuery('#selementForm').serializeArray(),
 				data = {
-					urls: []
+					urls: {}
 				},
 				i,
 				urlPattern = /^url_(\d+)_(name|url)$/,
@@ -1040,9 +1003,9 @@ function create_map(container, sysmapid){
 			}
 
 			var urlNames = {};
-			for(i = 0; i < data.urls.length; i++){
+			for(i in data.urls){
 				if((data.urls[i].name === '') && (data.urls[i].url === '')){
-					data.urls.splice(i, 1);
+					delete data.urls[i];
 					continue;
 				}
 
@@ -1085,8 +1048,10 @@ function create_map(container, sysmapid){
 				i,
 				link,
 				linkedSelementid,
-					element,
-				elementTypeText;
+				element,
+				elementTypeText,
+				linktrigger,
+				linktriggers;
 
 			if(links.length){
 				jQuery('#mapLinksContainer').toggle(true);
@@ -1109,10 +1074,17 @@ function create_map(container, sysmapid){
 						case '3': elementTypeText = locale['S_HOST_GROUP']; break;
 						case '4': elementTypeText = locale['S_IMAGE']; break;
 					}
+
+					linktriggers = [];
+					for(linktrigger in link.linktriggers){
+						linktriggers.push(link.linktriggers[linktrigger].desc_exp);
+					}
+
 					list.push({
 						elementType: elementTypeText,
 						elementName: element.elementName,
-						linkid: link.id
+						linkid: link.linkid,
+						linktriggers: linktriggers.join('\n')
 					});
 				}
 
@@ -1139,214 +1111,6 @@ function create_map(container, sysmapid){
 			else{
 				jQuery('#mapLinksContainer').toggle(false);
 			}
-		},
-
-	// LINK FORM
-		form_link_addLinktrigger: function(linktrigger){
-			var triggerid = linktrigger.triggerid;
-
-			if(!isset('linkIndicatorsBody', this.linkForm) || empty(this.linkForm.linkIndicatorsBody)) return false;
-			if(!isset('form', this.linkForm) || is_null(this.linkForm.form)) return false;
-
-	// If allready exsts just rewrite
-			if($('link_triggers['+triggerid+'][triggerid]') != null){
-				$('link_triggers['+triggerid+'][drawtype]').selectedIndex = (linktrigger.drawtype > 0)?(linktrigger.drawtype - 1):0;
-
-				$('link_triggers['+triggerid+'][color]').value = linktrigger.color;
-				$('lbl_link_triggers['+triggerid+'][color]').style.backgroundColor = '#'+linktrigger.color;
-				return false;
-			}
-
-
-	// ADD Linktrigger
-			var e_tr_8 = document.createElement('tr');
-			this.linkForm.linkIndicatorsBody.appendChild(e_tr_8);
-
-
-			var e_td_9 = document.createElement('td');
-			e_tr_8.appendChild(e_td_9);
-
-
-	// HIDDEN initialization
-			if(isset('linktriggerid', linktrigger)){
-				var e_input_10 = document.createElement('input');
-				e_input_10.setAttribute('name',"link_triggers["+triggerid+"][linktriggerid]");
-				e_input_10.setAttribute('type',"hidden");
-				e_input_10.setAttribute('value',linktrigger.linktriggerid);
-				e_input_10.setAttribute('id',"link_triggers["+triggerid+"][linktriggerid]");
-				e_td_9.appendChild(e_input_10);
-			}
-
-			var e_input_10 = document.createElement('input');
-			e_input_10.setAttribute('name',"link_triggers["+triggerid+"][triggerid]");
-			e_input_10.setAttribute('id',"link_triggers["+triggerid+"][triggerid]");
-			e_input_10.setAttribute('type',"hidden");
-			e_input_10.setAttribute('value',linktrigger.triggerid);
-			e_td_9.appendChild(e_input_10);
-
-			var e_input_10 = document.createElement('input');
-			e_input_10.setAttribute('name',"link_triggers["+triggerid+"][desc_exp]");
-			e_input_10.setAttribute('id',"link_triggers["+triggerid+"][desc_exp]");
-			e_input_10.setAttribute('type',"hidden");
-			e_input_10.setAttribute('value',linktrigger.desc_exp);
-			e_td_9.appendChild(e_input_10);
-
-	//-----
-			var linktriggerid = isset('linktriggerid', linktrigger)?linktrigger.linktriggerid:0;
-
-			var e_input_10 = document.createElement('input');
-			e_input_10.setAttribute('type',"checkbox");
-			e_input_10.setAttribute('name',"link_triggerids");
-			e_input_10.setAttribute('value',triggerid);
-			e_input_10.className = "checkbox";
-			e_td_9.appendChild(e_input_10);
-
-	// Triggers
-			var e_td_9 = document.createElement('td');
-			e_tr_8.appendChild(e_td_9);
-
-
-			var e_span_10 = document.createElement('span');
-			e_span_10.appendChild(document.createTextNode(linktrigger.desc_exp));
-			e_td_9.appendChild(e_span_10);
-
-	//	e_span_10.className = "link";
-	//	var url = 'popup_link_tr.php?form=1&mapid='+this.id+'&triggerid='+linktrigger.triggerid+'&drawtype='+linktrigger.drawtype+'&color='+linktrigger.color
-	//	addListener(e_span_10, 'click', function(){ PopUp(url,640, 480, 'ZBX_Link_Indicator'); });
-
-	// LINE
-			var e_select_10 = document.createElement('select');
-
-			var e_td_9 = document.createElement('td');
-			e_tr_8.appendChild(e_td_9);
-			e_td_9.appendChild(e_select_10);
-
-			e_select_10.setAttribute('id',"link_triggers["+triggerid+"][drawtype]");
-			e_select_10.setAttribute('name', 'link_triggers['+triggerid+'][drawtype]');
-			e_select_10.className = 'input';
-
-	// items
-			var e_option_11 = document.createElement('option');
-			e_option_11.setAttribute('value', 0);
-			e_option_11.appendChild(document.createTextNode(locale['S_LINE']));
-			e_select_10.appendChild(e_option_11);
-
-			var e_option_11 = document.createElement('option');
-			e_option_11.setAttribute('value', 2);
-			e_option_11.appendChild(document.createTextNode(locale['S_BOLD_LINE']));
-			e_select_10.appendChild(e_option_11);
-
-			var e_option_11 = document.createElement('option');
-			e_option_11.setAttribute('value', 3);
-			e_option_11.appendChild(document.createTextNode(locale['S_DOT']));
-			e_select_10.appendChild(e_option_11);
-
-			var e_option_11 = document.createElement('option');
-			e_option_11.setAttribute('value', 4);
-			e_option_11.appendChild(document.createTextNode(locale['S_DASHED_LINE']));
-			e_select_10.appendChild(e_option_11);
-	//--
-			e_select_10.selectedIndex = (linktrigger.drawtype > 0)?(linktrigger.drawtype - 1):0;
-
-	// COLOR
-			var e_td_9 = document.createElement('td');
-			e_tr_8.appendChild(e_td_9);
-
-			var e_input_22 = document.createElement('input');
-			e_input_22.setAttribute('style',"margin-top: 0px; margin-bottom: 0px;");
-			e_input_22.setAttribute('onchange',"set_color_by_name('link_triggers["+triggerid+"][color]',this.value)");
-			e_input_22.setAttribute('maxlength',"6");
-			e_input_22.setAttribute('value',linktrigger.color);
-			e_input_22.setAttribute('size',"7");
-			e_input_22.setAttribute('id',"link_triggers["+triggerid+"][color]");
-			e_input_22.setAttribute('name',"link_triggers["+triggerid+"][color]");
-			e_input_22.className = "input";
-			e_td_9.appendChild(e_input_22);
-
-			var e_div_10 = document.createElement('div');
-	//this.linkForm.colorPicker = e_div_10;
-
-			e_div_10.setAttribute('title', '#'+linktrigger.color);
-			e_div_10.setAttribute('id',"lbl_link_triggers["+triggerid+"][color]");
-			e_div_10.setAttribute('name',"lbl_link_triggers["+triggerid+"][color]");
-			e_div_10.className = "pointer";
-			addListener(e_div_10, 'click', function(){show_color_picker("link_triggers["+triggerid+"][color]");});
-			// e_div_10.setAttribute('onclick',"javascript: show_color_picker('color')");
-
-			e_div_10.style.marginLeft = '2px';
-			e_div_10.style.border = '1px solid black';
-			e_div_10.style.display = 'inline';
-			e_div_10.style.width = '10px';
-			e_div_10.style.height = '10px';
-			e_div_10.style.textDecoration = 'none';
-			e_div_10.style.backgroundColor = '#'+linktrigger.color;
-
-			e_div_10.innerHTML = '&nbsp;&nbsp;&nbsp;';
-			e_td_9.appendChild(e_div_10);
-		},
-
-		form_link_save: function(e){
-			var linkid = this.linkForm.linkid.value;
-			if(!isset(linkid, this.sysmap.data.links)) return false;
-
-			var maplink = this.sysmap.data.links[linkid];
-
-
-			var params = {};
-
-	// Label
-			params.label = this.linkForm.linklabel.value;
-
-	// Selementid1
-			params.selementid1 = this.linkForm.selementid1.options[this.linkForm.selementid1.selectedIndex].value;
-
-	// Selementid2
-			params.selementid2 = this.linkForm.selementid2.options[this.linkForm.selementid2.selectedIndex].value;
-
-	// Type OK
-			params.drawtype = this.linkForm.drawtype.options[this.linkForm.drawtype.selectedIndex].value;
-
-	// Color
-			params.color = this.linkForm.color.value;
-
-
-	// LINK INDICATORS
-			for(var linktriggerid in maplink.linktriggers){
-				this.sysmap.links[maplink.linkid].removeLinkTrigger(linktriggerid);
-			}
-
-			var triggerid = null;
-			var linktrigger = {};
-			var linktriggerid = null;
-
-			var indicators = $$('input[name=link_triggerids]');
-			for(var i=0; i<indicators.length; i++){
-				if(!isset(i, indicators)) continue;
-
-				linktrigger = {};
-				triggerid = indicators[i].value;
-
-				linktrigger.triggerid = $('link_triggers['+triggerid+'][triggerid]').value;
-				linktrigger.desc_exp = $('link_triggers['+triggerid+'][desc_exp]').value;
-
-				var dom_drawtype = $('link_triggers['+triggerid+'][drawtype]');
-
-				linktrigger.drawtype = dom_drawtype.options[dom_drawtype.selectedIndex].value;
-
-				linktrigger.color = $('link_triggers['+triggerid+'][color]').value;
-
-				linktriggerid = $('link_triggers['+triggerid+'][linktriggerid]');
-
-				if(!is_null(linktriggerid))
-					linktrigger.linktriggerid = linktriggerid.value;
-
-				this.sysmap.links[linkid].createLinkTrigger(linktrigger);
-			}
-	//--
-
-			this.sysmap.links[linkid].update(params);
-			this.update_linkContainer(e);
-			this.sysmap.updateImage();
 		}
 
 	};
@@ -1527,49 +1291,96 @@ function create_map(container, sysmapid){
 			this.domNode.toggle(false);
 		},
 
-		updateList: function(){
-			var tpl = new Template(jQuery('#mapMassFormListRow').html());
+		getValues: function(){
+			var values = jQuery('#linkForm').serializeArray(),
+					data = {},
+					i;
 
-			jQuery('#massList').empty();
-			var list = new Array();
-			for(var id in this.sysmap.selection.selements){
-				var elementData = this.sysmap.selements[id].data;
+			for(i = 0; i < values.length; i++){
+				data[values[i].name] = values[i].value.toString();
+			}
 
-				var elementTypeText = '';
-				switch(elementData.elementtype){
-					case '0': elementTypeText = locale['S_HOST']; break;
-					case '1': elementTypeText = locale['S_MAP']; break;
-					case '2': elementTypeText = locale['S_TRIGGER']; break;
-					case '3': elementTypeText = locale['S_HOST_GROUP']; break;
-					case '4': elementTypeText = locale['S_IMAGE']; break;
+			return data;
+		},
+
+		setValues: function(link){
+			var selement1,
+				tmp,
+				selementid,
+				selement,
+				optgroups = {},
+				optgroupType,
+				optgroupLabel,
+				optgroupDom,
+				i;
+
+			// get currenlty selected element
+			for(selementid in this.sysmap.selection.selements){
+				selement1 = this.sysmap.selements[selementid];
+			}
+			// make that selementi1 always equal to selected element and selementid2 to connected
+			if(selement1.id !== link.selementid1){
+				tmp = link.selementid1;
+				link.selementid1 = selement1.id;
+				link.selementid2 = tmp;
+			}
+
+			// populate list of elements to connect with
+			jQuery('#selementid2').empty();
+
+			// sort by type
+			for(selementid in this.sysmap.selements){
+				selement = this.sysmap.selements[selementid];
+				if(selement.id == link.selementid1) continue;
+
+				if(optgroups[selement.data.elementtype] === void(0)){
+					optgroups[selement.data.elementtype] = [];
 				}
-				list.push({
-					elementType: elementTypeText,
-					elementName: elementData.elementName
-				});
+				optgroups[selement.data.elementtype].push(selement);
 			}
 
-			// sort by element type and then by element name
-			list.sort(function(a, b){
-				var elementTypeA = a.elementType.toLowerCase();
-				var elementTypeB = b.elementType.toLowerCase();
-				if(elementTypeA < elementTypeB){ return -1; }
-				if(elementTypeA > elementTypeB){ return 1; }
+			for(optgroupType in optgroups){
+				switch(optgroupType){
+					case '0': optgroupLabel = locale['S_HOST']; break;
+					case '1': optgroupLabel = locale['S_MAP']; break;
+					case '2': optgroupLabel = locale['S_TRIGGER']; break;
+					case '3': optgroupLabel = locale['S_HOST_GROUP']; break;
+					case '4': optgroupLabel = locale['S_IMAGE']; break;
+				}
 
-				var elementNameA = a.elementName.toLowerCase();
-				var elementNameB = b.elementName.toLowerCase();
-				if(elementNameA < elementNameB){ return -1; }
-				if(elementNameA > elementNameB){ return 1; }
+				optgroupDom = jQuery('<optgroup label="'+optgroupLabel+'"></optgroup>');
+				for(i = 0; i < optgroups[optgroupType].length; i++){
+					optgroupDom.append('<option value="' + optgroups[optgroupType][i].id + '">' + optgroups[optgroupType][i].elementName + '</option>')
+				}
 
-				return 0;
-			});
-			for(var i = 0; i < list.length; i++){
-				jQuery(tpl.evaluate(list[i])).appendTo('#massList');
+				jQuery('#selementid2').append(optgroupDom);
 			}
 
-			jQuery('#massList tr:nth-child(odd)').addClass('odd_row');
-			jQuery('#massList tr:nth-child(even)').addClass('even_row');
+
+			// set values for form elements
+			for(var elementName in link){
+				jQuery('[name='+elementName+']', this.domNode).val(link[elementName]);
+			}
+
+			// clear triggers
+			jQuery('#linkTriggerscontainer tr').remove();
+			this.addTriggers(link.linktriggers);
+
+			// trigger color change
+			jQuery('.colorpicker', this.domNode).change();
+		},
+
+		addTriggers: function(triggers){
+			var tpl = new Template(jQuery('#linkTriggerRow').html()),
+				linkTrigger;
+
+			for(linkTrigger in triggers){
+				jQuery(tpl.evaluate(triggers[linkTrigger])).appendTo('#linkTriggerscontainer');
+
+				jQuery('#link_triggers_'+triggers[linkTrigger].linktriggerid+'_drawtype').val(triggers[linkTrigger].drawtype);
+			}
 		}
 
 	};
+
 }(window));

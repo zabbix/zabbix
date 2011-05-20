@@ -138,24 +138,25 @@
 					<td><input onchange="if(isNaN(parseInt(this.value,10))) this.value = 0;" style="text-align: right;" maxlength="5" value="0" size="5" id="y" name="y" class="input"></td>
 				</tr>
 				<tr>
-					<td><?php echo _('Links'); ?></td>
-					<td>
-						<table class="gridTable">
-							<thead>
-							<tr>
-								<td><?php echo _('Name'); ?></td>
-								<td><?php echo _('URL'); ?></td>
-								<td></td>
-							</tr>
-							</thead>
-							<tbody id="urlContainer">
-							</tbody>
-							<tfoot>
-							<tr>
-								<td colspan="3"><span id="newSelementUrl" class="link_menu" title="Add"><?php echo _('Add'); ?></span></td>
-							</tr>
-							</tfoot>
-						</table>
+					<td colspan="2">
+						<fieldset>
+							<legend><?php echo _('Links'); ?></legend>
+							<table class="gridTable">
+								<thead>
+								<tr>
+									<td><?php echo _('Name'); ?></td>
+									<td><?php echo _('URL'); ?></td>
+									<td></td>
+								</tr>
+								</thead>
+								<tbody id="urlContainer"></tbody>
+								<tfoot>
+								<tr>
+									<td colspan="3"><span id="newSelementUrl" class="link_menu" title="Add"><?php echo _('Add'); ?></span></td>
+								</tr>
+								</tfoot>
+							</table>
+						</fieldset>
 					</td>
 				</tr>
 				<tr class="footer">
@@ -184,53 +185,17 @@
 		</div>
 
 		<form id="linkForm" name="linkForm" style="display: none;">
-			<input type="hidden" value="" id="linkid" name="linkid">
+			<input type="hidden" name="selementid1">
 
-			<table class="formtable" style="width: 100%; ">
+			<table class="formtable" style="width: 100%;">
 				<tbody>
 				<tr>
 					<td><label for="linklabel"><?php echo _('Label'); ?></label></td>
-					<td><textarea cols="48" rows="4" name="linklabel" id="linklabel" class="input"></textarea></td>
+					<td><textarea cols="48" rows="4" name="label" id="linklabel" class="input"></textarea></td>
 				</tr>
 				<tr>
-					<td><label for="selementid"><?php echo _('Connect to'); ?></label></td>
-					<td><select class="input" name="selementid" id="selementid"></select></td>
-				</tr>
-				<tr class="edit">
-					<td><?php echo _('Link indicators'); ?></td>
-					<td>
-						<table id="linktriggers" class="tableinfo">
-							<tbody>
-							<tr class="header">
-								<td><?php echo _('Triggers'); ?></td>
-								<td><?php echo _('Type'); ?></td>
-								<td><?php echo _('Colour'); ?></td>
-								<td></td>
-							</tr>
-							<tr>
-								<td>
-									<span>Zabbix server:/etc/passwd has been changed on server Zabbix server</span>
-								</td>
-								<td>
-									<select id="link_triggers[12795][drawtype]" name="link_triggers[12795][drawtype]" class="input">
-										<option value="0"><?php echo _('Line'); ?></option>
-										<option value="2"><?php echo _('Bold line'); ?></option>
-										<option value="3"><?php echo _('Dot'); ?></option>
-										<option value="4"><?php echo _('Dashed line'); ?></option>
-									</select>
-								</td>
-								<td>
-									<input style="margin-top: 0px; margin-bottom: 0px;" onchange="set_color_by_name('link_triggers[12795][color]',this.value)" maxlength="6" value="DD0000" size="7" id="link_triggers[12795][color]" name="link_triggers[12795][color]" class="input">
-									<div title="#DD0000" id="lbl_link_triggers[12795][color]" name="lbl_link_triggers[12795][color]" class="pointer" style="margin-left: 2px; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-top-style: solid; border-right-style: solid; border-bottom-style: solid; border-left-style: solid; border-top-color: black; border-right-color: black; border-bottom-color: black; border-left-color: black; display: inline; width: 10px; height: 10px; text-decoration: none; background-color: rgb(221, 0, 0); ">&nbsp;&nbsp;&nbsp;</div>
-								</td>
-								<td>
-									<input type="button" name="Remove" value="Remove" class="input button link_menu">
-								</td>
-							</tr>
-							</tbody>
-						</table>
-						<input type="button" name="Add" value="Add" class="input button link_menu">
-					</td>
+					<td><label for="selementid2"><?php echo _('Connect to'); ?></label></td>
+					<td><select class="input" name="selementid2" id="selementid2"></select></td>
 				</tr>
 				<tr>
 					<td><label for="drawtype"><?php echo _('Type (OK)'); ?></label></td>
@@ -246,8 +211,33 @@
 				<tr>
 					<td><label for="color"><?php echo _('Colour (OK)'); ?></label></td>
 					<td>
-						<input style="margin-top: 0px; margin-bottom: 0px;" onchange="set_color_by_name('color',this.value)" maxlength="6" value="000055" size="7" id="color" name="color" class="input">
-						<div title="#000055" id="lbl_color" name="lbl_color" class="pointer" style="margin-left: 2px; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-top-style: solid; border-right-style: solid; border-bottom-style: solid; border-left-style: solid; border-top-color: black; border-right-color: black; border-bottom-color: black; border-left-color: black; display: inline; width: 10px; height: 10px; text-decoration: none; background-color: rgb(0, 204, 0); ">&nbsp;&nbsp;&nbsp;</div>
+						<input maxlength="6" size="7" id="color" name="color" class="input colorpicker">
+						<div id="lbl_color" class="pointer colorpickerLabel">&nbsp;</div>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2">
+						<fieldset>
+							<legend><?php echo _('Link indicators'); ?></legend>
+							<table class="gridTable">
+								<thead>
+								<tr>
+									<td><?php echo _('Triggers'); ?></td>
+									<td><?php echo _('Type'); ?></td>
+									<td><?php echo _('Colour'); ?></td>
+									<td></td>
+								</tr>
+								</thead>
+								<tbody id="linkTriggerscontainer"></tbody>
+								<tfoot>
+								<tr>
+									<td colspan="4">
+										<input type="button" name="Add" value="Add" class="input button link_menu">
+									</td>
+								</tr>
+								</tfoot>
+							</table>
+						</fieldset>
 					</td>
 				</tr>
 				<tr class="footer">
@@ -354,10 +344,30 @@
 		<td><span class="link_menu openlink" data-linkid="#{linkid}">Edit</span></td>
 		<td>#{elementType}</td>
 		<td>#{elementName}</td>
-		<td>#{linkIndicators}</td>
+		<td class="pre">#{linktriggers}</td>
 	</tr>
 </script>
 
+<script type="text/x-jquery-tmpl" id="linkTriggerRow">
+	<tr id="linktrigger_#{linktriggerid}" >
+		<td>#{desc_exp}</td>
+		<td>
+			<select id="link_triggers_#{linktriggerid}_drawtype" name="link_triggers[#{linktriggerid}][drawtype]" class="input">
+				<option value="0"><?php echo _('Line'); ?></option>
+				<option value="2"><?php echo _('Bold line'); ?></option>
+				<option value="3"><?php echo _('Dot'); ?></option>
+				<option value="4"><?php echo _('Dashed line'); ?></option>
+			</select>
+		</td>
+		<td>
+			<input maxlength="6" value="#{color}" size="7" id="link_triggers_#{linktriggerid}_color" name="link_triggers[#{linktriggerid}][color]" class="input colorpicker">
+			<div id="lbl_link_triggers_#{linktriggerid}_color" class="pointer colorpickerLabel">&nbsp;</div>
+		</td>
+		<td>
+			<span class="link_menu" onclick="jQuery('#linktrigger_#{linktriggerid}').remove();"><?php echo _('Remove'); ?></span>
+		</td>
+	</tr>
+</script>
 
 <script type="text/x-jquery-tmpl" id="selementFormUrls">
 	<tr id="urlrow_#{selementurlid}" class="even_row">
