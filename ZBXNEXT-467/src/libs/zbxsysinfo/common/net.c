@@ -320,7 +320,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 						zbx_unicode_to_utf8(pDnsRecord->Data.CNAME.pNameHost));
 				break;
 			case T_SOA:
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s %s %d %d %d %d %d",
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s %s %lu %lu %lu %lu %lu",
 						zbx_unicode_to_utf8(pDnsRecord->Data.SOA.pNamePrimaryServer),
 						zbx_unicode_to_utf8(pDnsRecord->Data.SOA.pNameAdministrator),
 						pDnsRecord->Data.SOA.dwSerialNo,
@@ -342,7 +342,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 						zbx_unicode_to_utf8(pDnsRecord->Data.MR.pNameHost));
 				break;
 			case T_NULL:
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " len:%d",
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " len:%lu",
 						pDnsRecord->Data.Null.dwByteCount);
 				break;
 			case T_PTR:
@@ -360,14 +360,18 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 						zbx_unicode_to_utf8(pDnsRecord->Data.MINFO.pNameErrorsMailbox));
 				break;
 			case T_MX:
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d %s",
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %hu %s",
 						pDnsRecord->Data.MX.wPreference,
 						zbx_unicode_to_utf8(pDnsRecord->Data.MX.pNameExchange));
 				break;
 			case T_TXT:
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " \"");
+
 				for (i = 0; i < (int)(pDnsRecord->Data.TXT.dwStringCount); i++)
-					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " \"%s\"",
+					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%s ",
 							zbx_unicode_to_utf8(pDnsRecord->Data.TXT.pStringArray[i]));
+
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "\"");
 				break;
 			default:
 				break;
