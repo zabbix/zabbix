@@ -40,7 +40,7 @@ static char		tmp_trap_file[MAX_STRING_LEN];
  ******************************************************************************/
 static void process_traps()
 {
-	const char	*__function_name = "process_value";
+	const char	*__function_name = "process_traps";
 	int		fd, ret = FAIL;
 	char		buffer[MAX_BUFFER_LEN];
 
@@ -62,8 +62,14 @@ static void process_traps()
 
 
 	if (-1 == read(fd, buffer, sizeof(buffer)))
+	{
 		zabbix_log(LOG_LEVEL_ERR, "could not read from [%s]: %s",tmp_trap_file, zbx_strerror(errno));
-	else
+		goto close;
+	}
+
+	zbx_rtrim(buffer, " \r\n");
+
+	if ('\0' != *buffer)
 		ret = SUCCEED;
 close:
 	close(fd);
@@ -72,7 +78,9 @@ close:
 		zabbix_log(LOG_LEVEL_ERR, "could not remove [%s]: %s",tmp_trap_file, zbx_strerror(errno));
 
 	if (SUCCEED == ret)
-		zabbix_log(LOG_LEVEL_ERR, "trap: %s", buffer);
+		zabbix_log(LOG_LEVEL_ERR, "%s", buffer);
+	else
+		zabbix_log(LOG_LEVEL_ERR, "%s() FAILED", __function_name);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -81,7 +89,7 @@ void	main_snmptrapper_loop(int server_num)
 {
 	const char	*__function_name = "main_snmptrapper_loop";
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(), trapfile [%s]", __function_name, CONFIG_SNMPTRAP_FILE);
+	zabbix_log(LOG_LEVEL_ERR, "In %s(), trapfile [%s]", __function_name, CONFIG_SNMPTRAP_FILE);
 
 	zbx_snprintf(tmp_trap_file, sizeof(tmp_trap_file), "%s_%d", CONFIG_SNMPTRAP_FILE, server_num);
 
@@ -99,6 +107,8 @@ void	main_snmptrapper_loop(int server_num)
 		/* if file exists, process the new traps */
 		if (0 == rename(CONFIG_SNMPTRAP_FILE, tmp_trap_file))
 			process_traps();
+		else
+			zabbix_log(LOG_LEVEL_ERR, "could not rename [%s]: %s",tmp_trap_file, zbx_strerror(errno));
 
 		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 		zbx_setproctitle("%s [waiting for traps]", get_process_type_string(process_type));
