@@ -269,6 +269,8 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 	wzone = zbx_utf8_to_unicode(zone);
 	res = DnsQuery(wzone, type, DNS_QUERY_STANDARD, NULL, &pDnsRecord, NULL);
 
+	zbx_free(wzone);
+
 	if (1 == short_answer)
 	{
 		SET_UI64_RESULT(result, DNS_RCODE_NOERROR == res ? 1 : 0);
