@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-05-20 13:56+0300\n"
+"POT-Creation-Date: 2011-05-20 18:14+0300\n"
 "PO-Revision-Date: 2011-05-20 12:36+0300\n"
 "Last-Translator: Murat Koç\n"
 "Language-Team: Zabbix translation team\n"
@@ -3787,6 +3787,10 @@ msgstr ""
 msgid "ICMP ping"
 msgstr ""
 
+#: include/locales/en_gb.inc.php:548
+msgid "ID"
+msgstr ""
+
 #: include/locales/en_gb.inc.php:386
 msgid "IMAGES"
 msgstr ""
@@ -3921,10 +3925,6 @@ msgstr "İkon etiket konumu"
 #: include/views/configuration.sysmap.edit.php:114
 msgid "Icon label type"
 msgstr "İkon etiket tipi"
-
-#: include/locales/en_gb.inc.php:548
-msgid "Id"
-msgstr ""
 
 #: include/locales/en_gb.inc.php:136
 msgid "Idle till"
