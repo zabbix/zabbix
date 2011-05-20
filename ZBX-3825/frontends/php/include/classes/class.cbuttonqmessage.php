@@ -51,7 +51,9 @@ class CButtonQMessage extends CButton{
 		if(!is_string($value)){
 			return $this->error('Incorrect value for setMessage ['.$value.']');
 		}
-		$this->msg = $value;
+		// if message will contain single quotes, it will break everything, so it must be escaped
+		// escaping gives unneeded quotes at the beginning and in the end, so they should be trimmed
+		$this->msg = trim(zbx_jsvalue($value), "'");
 		$this->setAction(NULL);
 	}
 
