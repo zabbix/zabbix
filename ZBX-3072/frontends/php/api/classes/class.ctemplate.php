@@ -1541,12 +1541,12 @@ COpt::memoryPick();
 	private static function link($templateids, $targetids){
 		if(empty($templateids)) return true;
 
-		//check if someone passed duplicate templates in the same query
+		// check if someone passed duplicate templates in the same query
 		$templateIdDuplicates = zbx_arrayFindDuplicates($templateids);
 		if(!zbx_empty($templateIdDuplicates)){
 			$duplicatesFound = array();
 			foreach($templateIdDuplicates as $value => $count){
-				$duplicatesFound[] = sprintf(S_TEMPLATE_ID_X_IN_PASSED_N_TIMES, $value, $count);
+				$duplicatesFound[] = sprintf(S_TEMPLATE_ID_X_IS_PASSED_N_TIMES, $value, $count);
 			}
 			self::exception(
 				ZBX_API_ERROR_PARAMETERS,

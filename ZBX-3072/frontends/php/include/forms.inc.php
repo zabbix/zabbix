@@ -2119,7 +2119,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$cmbAction->addItem('add to group',S_ADD_TO_GROUP);
 		if(isset($_REQUEST['itemid'])){
 			$cmbAction->addItem('update in group',S_UPDATE_IN_GROUP);
-			$cmbAction->addItem('delete FROM group',S_DELETE_FROM_GROUP);
+			$cmbAction->addItem('delete from group',S_DELETE_FROM_GROUP);
 		}
 		$frmItem->addItemToBottomRow(array($cmbAction, SPACE, new CButton('register',S_DO)));
 

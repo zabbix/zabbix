@@ -895,7 +895,7 @@
 	'S_DELETED'=>					'Deleted',
 	'S_UNKNOWN'=>					'Unknown',
 	'S_GROUPS'=>					'Groups',
-	'S_MINUS_ALL_GROUPS_MINUS'=>			' - all groups - ',
+	'S_MINUS_ALL_GROUPS_MINUS'=>			'- all groups -',
 	'S_ALL_GROUPS'=>				'All groups',
 	'S_NO_GROUPS_DEFINED'=>				'No groups defined',
 	'S_NEW_GROUP'=>					'New group',
@@ -2462,7 +2462,7 @@
 
 // class.ctemplate.php
 	'S_CANNOT_SYNC_TEMPLATE' => 'Cannot sync template',
-	'S_TEMPLATE_ID_X_IN_PASSED_N_TIMES' => 'template ID "%1$s" is passed %2$s times',
+	'S_TEMPLATE_ID_X_IS_PASSED_N_TIMES' => 'template ID "%1$s" is passed %2$s times',
 	'S_CANNOT_PASS_DUPLICATE_TEMPLATE_IDS' => 'Cannot pass duplicate template IDs for the linkage: %s.',
 
 // class.chost.php

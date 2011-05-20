@@ -874,7 +874,7 @@
 	'S_DELETED'=>					'Deleted',
 	'S_UNKNOWN'=>					'Neznámý',
 	'S_GROUPS'=>					'Skupiny',
-	'S_MINUS_ALL_GROUPS_MINUS'=>			' - všechny skupiny - ',
+	'S_MINUS_ALL_GROUPS_MINUS'=>			'- všechny skupiny -',
 	'S_ALL_GROUPS'=>				'Všechny skupiny',
 	'S_NO_GROUPS_DEFINED'=>				'Nejsou definovány žádné skupiny',
 	'S_NEW_GROUP'=>					'Nová skupina',

@@ -2524,7 +2524,7 @@ function utf8RawUrlDecode($source){
 			$header = array(new CCol(S_TRIGGERS,'center'));
 
 			foreach($hosts as $hostname){
-				$header = array_merge($header,array(new CCol(array(new CImg('vtext.php?text='.$hostname.$vTextColor)), 'hosts')));
+				$header = array_merge($header,array(new CCol(array(new CImg('vtext.php?text='.urlencode($hostname).$vTextColor)), 'hosts')));
 			}
 			$table->setHeader($header,'vertical_header');
 
@@ -2539,7 +2539,7 @@ function utf8RawUrlDecode($source){
 		else{
 			$header=array(new CCol(S_HOSTS,'center'));
 			foreach($triggers as $descr => $trhosts){
-				$descr = array(new CImg('vtext.php?text='.$descr.$vTextColor));
+				$descr = array(new CImg('vtext.php?text='.urlencode($descr).$vTextColor));
 				array_push($header,$descr);
 			}
 			$table->setHeader($header,'vertical_header');
