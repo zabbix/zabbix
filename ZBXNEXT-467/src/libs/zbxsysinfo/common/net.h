@@ -51,7 +51,7 @@
 #		define T_SOA	6
 #	endif
 #	ifndef T_MB
-#	define T_MB	7
+#		define T_MB	7
 #	endif
 #	ifndef T_MG
 #		define T_MG	8
@@ -80,8 +80,8 @@
 #	ifndef T_TXT
 #		define T_TXT	16
 #	endif
-#endif /* defined(HAVE_RES_QUERY) || defined(_WINDOWS) */
 
+#endif /* defined(HAVE_RES_QUERY) || defined(_WINDOWS) */
 
 extern char	*CONFIG_SOURCE_IP;
 
