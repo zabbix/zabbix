@@ -41,35 +41,47 @@ static char		tmp_trap_file[MAX_STRING_LEN];
 static void process_traps()
 {
 	const char	*__function_name = "process_value";
-	FILE		*f = NULL;
-	char 		line[MAX_STRING_LEN];
+	int		fd, ret = FAIL;
+	char		buffer[MAX_BUFFER_LEN];
 
-	zabbix_log(LOG_LEVEL_ERR, "In %s(), tmp file [%s]", __function_name, tmp_trap_file);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(), tmp file [%s]", __function_name, tmp_trap_file);
 
-	if (NULL == (f = fopen(tmp_trap_file, "r")))
+	*buffer = 0;
+
+	if (-1 == (fd = open(tmp_trap_file, O_RDONLY)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "%s(): could not open [%s]", __function_name, tmp_trap_file);
+		zabbix_log(LOG_LEVEL_ERR, "could not open [%s]: %s",tmp_trap_file, zbx_strerror(errno));
 		goto close;
 	}
 
-	while (NULL != fgets(line, sizeof(line), f))
+	if (-1 == flock(fd, LOCK_EX))	/* do no read the file before it is closed by zabbix_handler */
 	{
-		zbx_rtrim(line, " \r\n");
-		zabbix_log(LOG_LEVEL_ERR, "trap: %s", line);
+		zabbix_log(LOG_LEVEL_ERR, "could lock [%s]: %s",tmp_trap_file, zbx_strerror(errno));
+		goto close;
 	}
 
-close:
-	zbx_fclose(f);
-	remove(tmp_trap_file);
 
-	zabbix_log(LOG_LEVEL_ERR, "End of %s()", __function_name);
+	if (-1 == read(fd, buffer, sizeof(buffer)))
+		zabbix_log(LOG_LEVEL_ERR, "could not read from [%s]: %s",tmp_trap_file, zbx_strerror(errno));
+	else
+		ret = SUCCEED;
+close:
+	close(fd);
+
+	if (0 != remove(tmp_trap_file))
+		zabbix_log(LOG_LEVEL_ERR, "could not remove [%s]: %s",tmp_trap_file, zbx_strerror(errno));
+
+	if (SUCCEED == ret)
+		zabbix_log(LOG_LEVEL_ERR, "trap: %s", buffer);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 void	main_snmptrapper_loop(int server_num)
 {
 	const char	*__function_name = "main_snmptrapper_loop";
 
-	zabbix_log(LOG_LEVEL_ERR, "In %s(), trapfile [%s]", __function_name, CONFIG_SNMPTRAP_FILE);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(), trapfile [%s]", __function_name, CONFIG_SNMPTRAP_FILE);
 
 	zbx_snprintf(tmp_trap_file, sizeof(tmp_trap_file), "%s_%d", CONFIG_SNMPTRAP_FILE, server_num);
 
@@ -85,7 +97,7 @@ void	main_snmptrapper_loop(int server_num)
 		zbx_setproctitle("%s [processing data]", get_process_type_string(process_type));
 
 		/* if file exists, process the new traps */
-		while (0 == rename(CONFIG_SNMPTRAP_FILE, tmp_trap_file))
+		if (0 == rename(CONFIG_SNMPTRAP_FILE, tmp_trap_file))
 			process_traps();
 
 		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
