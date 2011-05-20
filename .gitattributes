@@ -347,6 +347,7 @@ misc/init.d/freebsd/zabbix_server -text
 misc/init.d/tru64/zabbix_server -text
 misc/init.d/ubuntu/zabbix-agent.conf -text
 misc/init.d/ubuntu/zabbix-server.conf -text
+misc/snmptrap/zabbix_trap_receiver.pl -text
 src/libs/zbxcomms/telnet.c -text
 src/libs/zbxself/Makefile.am -text
 src/zabbix_java/lib/logback-classic-0.9.27.jar -text
