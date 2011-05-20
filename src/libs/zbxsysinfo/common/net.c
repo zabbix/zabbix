@@ -216,7 +216,6 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 		unsigned char	buffer[PACKETSZ];
 #else
 		unsigned char	buffer[512];
-
 #endif	/* ifdef _WINDOWS */
 	}
 	answer_t;
