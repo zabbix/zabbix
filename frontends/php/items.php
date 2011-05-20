@@ -568,6 +568,7 @@ switch($itemType) {
 	else if(isset($_REQUEST['register'])){
 		// getting data about how item should look after update or creation
 		$item = array(
+				'name'	=> get_request('name'),
 				'description'	=> get_request('description'),
 				'key_'			=> get_request('key'),
 				'hostid'		=> get_request('hostid'),
@@ -579,7 +580,7 @@ switch($itemType) {
 				'snmp_oid'		=> get_request('snmp_oid'),
 				'value_type'	=> get_request('value_type'),
 				'trapper_hosts'	=> get_request('trapper_hosts'),
-				'snmp_port'		=> get_request('snmp_port'),
+				'port'		    => get_request('port'),
 				'units'			=> get_request('units'),
 				'multiplier'	=> get_request('multiplier'),
 				'delta'			=> get_request('delta'),
@@ -599,6 +600,7 @@ switch($itemType) {
 				'params'			=> get_request('params'),
 				'ipmi_sensor'		=> get_request('ipmi_sensor'),
 				'data_type'		=> get_request('data_type'),
+				'profile_link'  => get_request('profile_link'),
 				'applications'  => get_request('applications',array())
 			);
 		$delay_flex = get_request('delay_flex',array());
