@@ -501,7 +501,7 @@ function insert_js_function($fnct_name){
 					var parent = window.opener;
 					if(!parent) return close_window();
 
-					var items = { "object": object, "values": new Array() };
+					var items = { object: object, values: [] };
 
 					var chkBoxes = form.getInputs("checkbox");
 					for(var i=0; i < chkBoxes.length; i++){
@@ -532,7 +532,7 @@ function insert_js_function($fnct_name){
 					else
 						value[object] = singleValue;
 
-					var items = { "object": object, "values": new Array(value) };
+					var items = { object: object, values: new Array(value) };
 
 					parent.addPopupValues(items);
 					close_window();
