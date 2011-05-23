@@ -1192,19 +1192,16 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 
 			if (ITEM_STATUS_NOTSUPPORTED == status)
 			{
-				const char	*hostkey_name;
-
-				hostkey_name = zbx_host_key_string(h->itemid);
-
 				message = zbx_dsprintf(message, "Type of received value"
 						" [" ZBX_FS_DBL "] is not suitable for value type [%s]",
 						h->value.value_float,
 						zbx_item_value_type_string(h->value_type));
 
-				zabbix_log(LOG_LEVEL_WARNING, "Item [%s] error: %s", hostkey_name, message);
-
 				if (ITEM_STATUS_NOTSUPPORTED != item.status)
-					zabbix_log(LOG_LEVEL_WARNING, "Item [%s] is not supported", hostkey_name);
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "Item [%s] became unsupported: %s",
+							zbx_host_key_string(h->itemid), message);
+				}
 
 				DCadd_nextcheck(h->itemid, h->clock, message);	/* update error & status field in items table */
 				DCrequeue_reachable_item(h->itemid, ITEM_STATUS_NOTSUPPORTED, h->clock);
