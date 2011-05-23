@@ -604,7 +604,7 @@
 	'S_CANNOT_DELETE_GRAPHS'=>			'Impossible de supprimer les graphiques',
 	'S_CANNOT_ADD_GRAPH'=>			'Impossible d\'ajouter le graphique',
 	'S_ANOTHER_ITEM_SUM'=>			'Impossible d\'ajouter un élément de type "Somme"',
-	'S_ID'=>			'Id',
+	'S_ID'=>			'ID',
 	'S_NO_GRAPHS_DEFINED'=>			'Aucun graphique n\'est défini',
 	'S_NO_GRAPH_DEFINED'=>			'Aucun graphique n\'est défini',
 	'S_DELETE_GRAPH_Q'=>			'Supprimer le graphique ?',
