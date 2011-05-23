@@ -630,10 +630,12 @@ static int	get_values(unsigned char poller_type)
 		{
 			if (ITEM_STATUS_NOTSUPPORTED != items[i].status)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] is not supported",
-						items[i].host.host, items[i].key_orig);
-				zabbix_syslog("Item [%s:%s] is not supported",
-						items[i].host.host, items[i].key_orig);
+				zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] became unsupported: %s",
+						items[i].host.host, items[i].key_orig,
+						ISSET_MSG(&results[i]) ? results[i].msg : "(null)");
+				zabbix_syslog("Item [%s:%s] became unsupported: %s",
+						items[i].host.host, items[i].key_orig,
+						ISSET_MSG(&results[i]) ? results[i].msg : "(null)");
 			}
 
 			DCadd_nextcheck(items[i].itemid, timespecs[i].sec, results[i].msg);
