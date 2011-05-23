@@ -755,14 +755,14 @@ FIELD		|passwd		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 
 TABLE|profiles|profileid|ZBX_SYNC
 FIELD		|profileid	|t_id		|'0'	|NOT NULL	|0
-FIELD		|userid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|users
-FIELD		|idx		|t_varchar(96)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|idx2		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|value_id	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|value_int	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|value_str	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|source		|t_varchar(96)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|userid		|t_id		|'0'	|NOT NULL	|0			|users
+FIELD		|idx		|t_varchar(96)	|''	|NOT NULL	|0
+FIELD		|idx2		|t_id		|'0'	|NOT NULL	|0
+FIELD		|value_id	|t_id		|'0'	|NOT NULL	|0
+FIELD		|value_int	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|value_str	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|source		|t_varchar(96)	|''	|NOT NULL	|0
+FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|userid,idx,idx2
 INDEX		|2		|userid,profileid
 
