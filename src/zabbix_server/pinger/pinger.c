@@ -385,7 +385,10 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 					timeout, items[i].itemid, addr, icmpping, type);
 		}
 		else
+		{
 			DCadd_nextcheck(items[i].itemid, now, error);
+			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_NOTSUPPORTED, now);
+		}
 
 		zbx_free(items[i].interface.addr);
 		zbx_free(items[i].key);
