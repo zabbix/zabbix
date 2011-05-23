@@ -156,6 +156,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.6rc1
 
+ - [ZBX-3826] fixed recovering unsupported icmpping* items when a key has been entered incorrectly (Sasha)
  - [ZBX-3417] fixed "Do" button in item form (KB)
  - [ZBX-3417] removed trailing and leading space from phrase " - all groups - " (Alexei)
  - [ZBX-3806] fixed HTTP pollers being started on Zabbix proxy (asaveljevs)
