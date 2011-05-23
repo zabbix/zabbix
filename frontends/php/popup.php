@@ -424,7 +424,7 @@ include_once('include/page_header.php');
 			$epmtyScript.= get_window_opener($dstfrm, $dstfld2, $value2);
 			$epmtyScript.= ' close_window(); return false;';
 
-			$frmTitle->addItem(array(SPACE,new CSubmit('empty',S_EMPTY, $epmtyScript)));
+			$frmTitle->addItem(new CSubmit('empty', S_EMPTY, $epmtyScript));
 		}
 	}
 
@@ -844,20 +844,20 @@ include_once('include/page_header.php');
 		$form->setName('triggerform');
 		$form->setAttribute('id', 'triggers');
 
-		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
+		$table = new CTableInfo(_('No triggers defined'));
 
 		$table->setHeader(array(
-			($multiselect ? new CCheckBox("all_triggers", NULL, "javascript: checkAll('".$form->getName()."', 'all_triggers','triggers');") : null),
-			S_NAME,
-			S_SEVERITY,
-			S_STATUS
+			($multiselect ? new CCheckBox('all_triggers', NULL, "checkAll('".$form->getName()."', 'all_triggers','triggers');") : null),
+			_('Name'),
+			_('Severity'),
+			_('Status')
 		));
 
 		$options = array(
 			'nodeids' => $nodeid,
 			'hostids' => $hostid,
 			'output' => array('triggerid', 'description', 'expression', 'priority', 'status'),
-			'selectHosts' => array('hostid','name'),
+			'selectHosts' => array('hostid', 'name'),
 			'selectDependencies' => API_OUTPUT_EXTEND,
 			'expandDescription' => true
 		);
@@ -880,7 +880,7 @@ include_once('include/page_header.php');
 			$trigger['description'] = $trigger['hostname'].':'.$trigger['description'];
 
 			if($multiselect){
-				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", ".zbx_jsvalue($trigger['triggerid']).");";
+				$js_action = "addValue(".zbx_jsvalue($reference).", ".zbx_jsvalue($trigger['triggerid']).");";
 			}
 			else{
 				$values = array(
@@ -888,7 +888,7 @@ include_once('include/page_header.php');
 					$dstfld2 => $trigger[$srcfld2],
 				);
 
-				$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).','.zbx_jsvalue($values).'); return false;';
+				$js_action = 'addValues('.zbx_jsvalue($dstfrm).','.zbx_jsvalue($values).'); return false;';
 			}
 
 			$description->setAttribute('onclick', $js_action);
@@ -896,19 +896,19 @@ include_once('include/page_header.php');
 			if(count($trigger['dependencies']) > 0){
 				$description = array(
 					$description, BR(),
-					bold(S_DEPENDS_ON), BR()
+					bold(_('Depends on')), BR()
 				);
 
 				foreach($trigger['dependencies'] as $val)
-					$description[] = array(expand_trigger_description_by_data($val),BR());
+					$description[] = array(expand_trigger_description_by_data($val), BR());
 			}
 
 			switch($trigger['status']) {
 				case TRIGGER_STATUS_DISABLED:
-					$status = new CSpan(S_DISABLED, 'disabled');
+					$status = new CSpan(_('Disabled'), 'disabled');
 				break;
 				case TRIGGER_STATUS_ENABLED:
-					$status = new CSpan(S_ENABLED, 'enabled');
+					$status = new CSpan(_('Enabled'), 'enabled');
 				break;
 			}
 
@@ -933,7 +933,7 @@ include_once('include/page_header.php');
 		}
 
 		if($multiselect){
-			$button = new CButton('select', S_SELECT, "javascript: addSelectedValues('triggers', ".zbx_jsvalue($reference).");");
+			$button = new CButton('select', S_SELECT, "addSelectedValues('triggers', ".zbx_jsvalue($reference).");");
 			$table->setFooter(new CCol($button, 'right'));
 
 			insert_js('var popupReference = '.zbx_jsValue($jsTriggers, true).';');

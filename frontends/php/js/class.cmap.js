@@ -18,30 +18,26 @@
 **
 */
 
-var ZBX_SYSMAPS = new Array();			// sysmaps obj reference
-
-// sysmapid ALWAYS must be a STRING (js doesn't support uint64) !!!!
-function create_map(container, sysmapid){
-	if(is_number(sysmapid) && (sysmapid > 100000000000000)){
-		throw('Error: Wrong type of arguments passed to function [create_map]');
-	}
-
-	var id = ZBX_SYSMAPS.length;
-	ZBX_SYSMAPS[id] = {
-		map: new CMap(container, sysmapid, id)
-	};
-}
-
-(function(window){
+function createMap(containerid, mapdata){
 	"use strict";
 
-	window.CMap = function(containerid, sysmapid, id){
-		this.id = id;
-		this.sysmapid = sysmapid;
+	var CMap = function(containerid, mapdata){
+		this.mapimg = jQuery('#sysmap_img');
+		this.sysmapid = mapdata.sysmap.sysmapid;
+		this.data = mapdata.sysmap;
+		this.iconList = mapdata.iconList;
 
 		this.container = jQuery('#' + containerid);
 		if(this.container.length == 0){
 			this.container = jQuery(document.body);
+		}
+
+
+		for(var selementid in this.data.selements){
+			this.selements[selementid] = new CSelement(this, this.data.selements[selementid]);
+		}
+		for(var linkid in this.data.links){
+			this.links[linkid] = new CLink(this, this.data.links[linkid]);
 		}
 
 		// create container for forms
@@ -57,43 +53,12 @@ function create_map(container, sysmapid){
 					containment: [0,0,3200,3200]
 				});
 
-		this.mapimg = jQuery('#sysmap_img');
 
-		// getting map data from server
-		var url = new Curl();
-		var ajaxData = jQuery.ajax({
-			url: url.getPath() + '?output=json&sid=' + url.getArgument('sid'),
-			type: 'post',
-			data: {
-				'favobj': 'sysmap',
-				'sysmapid': this.sysmapid,
-				'action': 'get'
-			},
-			success: jQuery.proxy(function(result){
-				this.data = result.data.mapData;
-				this.iconList = result.data.iconList;
-			}, this),
-			error: function(){
-				throw('Get selements FAILED.');
-			}
-		});
-
-		// perform initialization actions after data recieved from server
-		jQuery.when(ajaxData).then(jQuery.proxy(function(){
-			for(var selementid in this.data.selements){
-				this.selements[selementid] = new CSelement(this, this.data.selements[selementid]);
-			}
-			for(var linkid in this.data.links){
-				this.links[linkid] = new CLink(this, this.data.links[linkid]);
-			}
-
-			this.updateImage();
-			this.form = new CElementForm(this.formContainer, this);
-			this.massForm = new CMassForm(this.formContainer, this);
-			this.linkForm = new CLinkForm(this.formContainer, this);
-			this.bindActions();
-		}, this));
-
+		this.updateImage();
+		this.form = new CElementForm(this.formContainer, this);
+		this.massForm = new CMassForm(this.formContainer, this);
+		this.linkForm = new CLinkForm(this.formContainer, this);
+		this.bindActions();
 
 		// initialize SELECTABLE
 		this.container.selectable({
@@ -113,6 +78,7 @@ function create_map(container, sysmapid){
 				this.selectElements(ids, event.ctrlKey);
 			}, this)
 		});
+
 
 
 		var listeners = {};
@@ -162,7 +128,7 @@ function create_map(container, sysmapid){
 		}, this));
 	};
 	CMap.prototype = {
-		data: {},							// local sysmap DB :)
+		data: {}, // local sysmap DB :)
 		iconList: {}, // list of available icons [{imageid: name}, ...]
 
 		container: null, // selements and links HTML container (D&D droppable area)
@@ -598,30 +564,6 @@ function create_map(container, sysmapid){
 
 		getData: function(){
 			return this.data;
-		},
-
-		createLinkTrigger: function(linktrigger){
-			for(var ltid in this.data.linktriggers){
-				if(this.data.linktriggers[ltid].triggerid === linktrigger.triggerid){
-					linktrigger.linktriggerid = ltid;
-					break;
-				}
-			}
-
-			var linktriggerid = 0;
-			if(!isset('linktriggerid',linktrigger) || (linktrigger['linktriggerid'] == 0)){
-				do{
-					linktriggerid = parseInt(Math.random(1000000000) * 1000000000);
-					linktriggerid = linktriggerid.toString();
-				}while(typeof(this.data.linktriggers[linktriggerid]) != 'undefined');
-
-				linktrigger['linktriggerid'] = linktriggerid;
-			}
-			else{
-				linktriggerid = linktrigger.linktriggerid;
-			}
-
-			this.data.linktriggers[linktriggerid] = linktrigger;
 		}
 
 	};
@@ -705,12 +647,12 @@ function create_map(container, sysmapid){
 			unsetUndefined = unsetUndefined || false;
 
 			var	fieldName,
-					dataFelds = [
-						'elementtype', 'elementid', 'iconid_off', 'iconid_on', 'iconid_maintenance',
-						'iconid_disabled', 'label', 'label_location', 'x', 'y', 'elementsubtype',  'areatype', 'width',
-						'height', 'viewtype', 'urls'
-					],
-					i;
+				dataFelds = [
+					'elementtype', 'elementid', 'iconid_off', 'iconid_on', 'iconid_maintenance',
+					'iconid_disabled', 'label', 'label_location', 'x', 'y', 'elementsubtype',  'areatype', 'width',
+					'height', 'viewtype', 'urls'
+				],
+				i;
 
 			// elementName
 			if(typeof data.elementName !== 'undefined'){
@@ -839,9 +781,7 @@ function create_map(container, sysmapid){
 		}
 	};
 
-	// *******************************************************************
-	//		FORM object
-	// *******************************************************************
+
 	function CElementForm(formContainer, sysmap){
 		this.sysmap = sysmap;
 		this.formContainer = formContainer;
@@ -853,9 +793,8 @@ function create_map(container, sysmapid){
 		var tpl = new Template(jQuery('#mapElementFormTpl').html());
 		this.domNode = jQuery(tpl.evaluate(formTplData)).appendTo(formContainer);
 
-
 		// populate icons selects
-		for(var i = 0; i < this.sysmap.iconList.length; i++){
+		for(var i in this.sysmap.iconList){
 			var icon = this.sysmap.iconList[i];
 			jQuery('#iconid_off, #iconid_on, #iconid_maintenance, #iconid_disabled')
 					.append('<option value="' + icon.imageid + '">' + icon.name + '</option>');
@@ -1115,7 +1054,6 @@ function create_map(container, sysmapid){
 
 	};
 
-
 	function CMassForm(formContainer, sysmap){
 		this.sysmap = sysmap;
 		this.formContainer = formContainer;
@@ -1126,7 +1064,7 @@ function create_map(container, sysmapid){
 
 
 		// populate icons selects
-		for(var i = 0; i < this.sysmap.iconList.length; i++){
+		for(var i in this.sysmap.iconList){
 			var icon = this.sysmap.iconList[i];
 			jQuery('#massIconidOff, #massIconidOn, #massIconidMaintenance, #massIconidDisabled')
 					.append('<option value="' + icon.imageid + '">' + icon.name + '</option>')
@@ -1293,11 +1231,24 @@ function create_map(container, sysmapid){
 
 		getValues: function(){
 			var values = jQuery('#linkForm').serializeArray(),
-					data = {},
-					i;
+					data = {
+						linktriggers: {}
+					},
+					i,
+					linkTriggerPattern = /^linktrigger_(\d+)_(triggerid|linktriggerid|drawtype|color|desc_exp)$/,
+					linkTrigger;
 
 			for(i = 0; i < values.length; i++){
-				data[values[i].name] = values[i].value.toString();
+				linkTrigger = linkTriggerPattern.exec(values[i].name);
+				if(linkTrigger !== null){
+					if(typeof data.linktriggers[linkTrigger[1]] === 'undefined'){
+						data.linktriggers[linkTrigger[1]] = {};
+					}
+					data.linktriggers[linkTrigger[1]][linkTrigger[2]] = values[i].value.toString();
+				}
+				else{
+					data[values[i].name] = values[i].value.toString();
+				}
 			}
 
 			return data;
@@ -1365,9 +1316,6 @@ function create_map(container, sysmapid){
 			// clear triggers
 			jQuery('#linkTriggerscontainer tr').remove();
 			this.addTriggers(link.linktriggers);
-
-			// trigger color change
-			jQuery('.colorpicker', this.domNode).change();
 		},
 
 		addTriggers: function(triggers){
@@ -1377,10 +1325,47 @@ function create_map(container, sysmapid){
 			for(linkTrigger in triggers){
 				jQuery(tpl.evaluate(triggers[linkTrigger])).appendTo('#linkTriggerscontainer');
 
-				jQuery('#link_triggers_'+triggers[linkTrigger].linktriggerid+'_drawtype').val(triggers[linkTrigger].drawtype);
+				jQuery('#linktrigger_'+triggers[linkTrigger].linktriggerid+'_drawtype').val(triggers[linkTrigger].drawtype);
 			}
+			jQuery('.colorpicker', this.domNode).change();
+		},
+
+		addNewTriggers: function(triggers){
+			var tpl = new Template(jQuery('#linkTriggerRow').html()),
+				linkTrigger = {},
+				linktriggerid,
+				i,
+				ln;
+
+			for(i = 0, ln = triggers.length; i < ln; i++){
+				linktriggerid = 0;
+				do{
+					linktriggerid = parseInt(Math.random(1000000000) * 1000000000);
+					linktriggerid = linktriggerid.toString();
+				}while(false);
+				// TODO: make id unique
+
+				linkTrigger.linktriggerid = linktriggerid;
+
+				linkTrigger.desc_exp = triggers[i].description;
+				linkTrigger.triggerid = triggers[i].triggerid;
+				linkTrigger.color = 'DD0000';
+
+				jQuery(tpl.evaluate(linkTrigger)).appendTo('#linkTriggerscontainer');
+			}
+			jQuery('.colorpicker', this.domNode).change();
 		}
 
 	};
 
-}(window));
+	return new CMap(containerid, mapdata);
+}
+
+
+// function require for trigger popup to work
+// sysmap - global variable only for this functionality
+function addPopupValues(list){
+	if(list.object === 'linktrigger'){
+		sysmap.linkForm.addNewTriggers(list.values);
+	}
+}

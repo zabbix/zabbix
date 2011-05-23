@@ -71,47 +71,6 @@ include_once('include/page_header.php');
 			$sysmapid = get_request('sysmapid', 0);
 
 			switch($_REQUEST['action']){
-				case 'get':
-					$options = array(
-						'sysmapids'=> $sysmapid,
-						'editable' => true,
-						'output' => API_OUTPUT_EXTEND,
-						'selectSelements' => API_OUTPUT_EXTEND,
-						'selectLinks' => API_OUTPUT_EXTEND,
-						'preservekeys' => true,
-					);
-					$sysmaps = API::Map()->get($options);
-					$mapData = reset($sysmaps);
-
-					add_elementNames($mapData['selements']);
-
-
-					foreach($mapData['links'] as &$link){
-						foreach($link['linktriggers'] as $lnum => $linktrigger){
-							$hosts = get_hosts_by_triggerid($linktrigger['triggerid']);
-							if($host = DBfetch($hosts)){
-								$description = $host['host'].':'.expand_trigger_description($linktrigger['triggerid']);
-							}
-
-							$link['linktriggers'][$lnum]['desc_exp'] = $description;
-						}
-						order_result($link['linktriggers'], 'desc_exp');
-					}
-					unset($link);
-
-
-					$iconList = array();
-					$result = DBselect('SELECT imageid, name FROM images WHERE imagetype=1 AND '.DBin_node('imageid'));
-					while($row = DBfetch($result)){
-						$iconList[] = array('imageid' => $row['imageid'], 'name' => $row['name']);
-					}
-
-					$ajaxResponse = new ajaxResponse(array(
-						'mapData' => $mapData,
-						'iconList' => $iconList
-					));
-					$ajaxResponse->send();
-					break;
 				case 'save':
 					@ob_start();
 					try{
@@ -170,8 +129,11 @@ show_table_header(_('CONFIGURATION OF NETWORK MAPS'));
 if(isset($_REQUEST['sysmapid'])){
 	$options = array(
 		'sysmapids' => $_REQUEST['sysmapid'],
-		'editable' => 1,
+		'editable' => true,
 		'output' => API_OUTPUT_EXTEND,
+		'selectSelements' => API_OUTPUT_EXTEND,
+		'selectLinks' => API_OUTPUT_EXTEND,
+		'preservekeys' => true,
 	);
 	$maps = API::Map()->get($options);
 
@@ -264,7 +226,31 @@ $container->Show();
 
 insert_show_color_picker_javascript();
 
-zbx_add_post_js('create_map("sysmap_cnt", "'.$sysmap['sysmapid'].'");');
+
+
+add_elementNames($sysmap['selements']);
+
+foreach($sysmap['links'] as &$link){
+	foreach($link['linktriggers'] as $lnum => $linktrigger){
+		$hosts = get_hosts_by_triggerid($linktrigger['triggerid']);
+		if($host = DBfetch($hosts)){
+			$description = $host['host'].':'.expand_trigger_description($linktrigger['triggerid']);
+		}
+
+		$link['linktriggers'][$lnum]['desc_exp'] = $description;
+	}
+	order_result($link['linktriggers'], 'desc_exp');
+}
+unset($link);
+
+
+$iconList = array();
+$result = DBselect('SELECT imageid, name FROM images WHERE imagetype=1 AND '.DBin_node('imageid'));
+while($row = DBfetch($result)){
+	$iconList[] = array('imageid' => $row['imageid'], 'name' => $row['name']);
+}
+
+zbx_add_post_js('sysmap = createMap("sysmap_cnt", '.zbx_jsvalue(array('sysmap' => $sysmap, 'iconList' => $iconList), true).');');
 
 
 include_once('include/page_footer.php');

@@ -170,7 +170,7 @@
 			</table>
 		</form>
 
-		<div id="mapLinksContainer" style="max-height: 128px; overflow-y: auto; display: none;">
+		<div id="mapLinksContainer" style="max-height: 128px; width: 100%; overflow-y: auto; overflow-x: hidden; display: none;">
 			<table class="tableinfo">
 				<thead>
 				<tr class="header">
@@ -232,7 +232,7 @@
 								<tfoot>
 								<tr>
 									<td colspan="4">
-										<input type="button" name="Add" value="Add" class="input button link_menu">
+										<input type="button" name="Add" value="Add" class="input button link_menu" onclick="PopUp('popup.php?srctbl=triggers&srcfld1=triggerid&real_hosts=1&reference=linktrigger&multiselect=1&writeonly=1');">
 									</td>
 								</tr>
 								</tfoot>
@@ -352,7 +352,10 @@
 	<tr id="linktrigger_#{linktriggerid}" >
 		<td>#{desc_exp}</td>
 		<td>
-			<select id="link_triggers_#{linktriggerid}_drawtype" name="link_triggers[#{linktriggerid}][drawtype]" class="input">
+			<input type="hidden" name="linktrigger_#{linktriggerid}_desc_exp" value="#{desc_exp}">
+			<input type="hidden" name="linktrigger_#{linktriggerid}_triggerid" value="#{triggerid}">
+			<input type="hidden" name="linktrigger_#{linktriggerid}_linktriggerid" value="#{linktriggerid}">
+			<select id="linktrigger_#{linktriggerid}_drawtype" name="linktrigger_#{linktriggerid}_drawtype" class="input">
 				<option value="0"><?php echo _('Line'); ?></option>
 				<option value="2"><?php echo _('Bold line'); ?></option>
 				<option value="3"><?php echo _('Dot'); ?></option>
@@ -360,8 +363,8 @@
 			</select>
 		</td>
 		<td>
-			<input maxlength="6" value="#{color}" size="7" id="link_triggers_#{linktriggerid}_color" name="link_triggers[#{linktriggerid}][color]" class="input colorpicker">
-			<div id="lbl_link_triggers_#{linktriggerid}_color" class="pointer colorpickerLabel">&nbsp;</div>
+			<input maxlength="6" value="#{color}" size="7" id="linktrigger_#{linktriggerid}_color" name="linktrigger_#{linktriggerid}_color" class="input colorpicker">
+			<div id="lbl_linktrigger_#{linktriggerid}_color" class="pointer colorpickerLabel">&nbsp;</div>
 		</td>
 		<td>
 			<span class="link_menu" onclick="jQuery('#linktrigger_#{linktriggerid}').remove();"><?php echo _('Remove'); ?></span>
