@@ -2845,7 +2845,7 @@ LPSTR	zbx_unicode_to_utf8_static(LPCTSTR wide_string, LPSTR utf8_string, int utf
 {
 	/* convert from wide_string to utf8_string */
 	if (0 == WideCharToMultiByte(CP_UTF8, 0, wide_string, -1, utf8_string, utf8_size, NULL, NULL))
-		return NULL;
+		*utf8_string = '\0';
 
 	return utf8_string;
 }
