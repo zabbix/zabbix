@@ -74,7 +74,7 @@
 		$auditid = get_dbid('auditlog','auditid');
 
 		if(zbx_strlen($details) > 128)
-			$details = substr($details, 0, 125).'...';
+			$details = zbx_substr($details, 0, 125).'...';
 
 		$ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))?$_SERVER['HTTP_X_FORWARDED_FOR']:$_SERVER['REMOTE_ADDR'];
 
