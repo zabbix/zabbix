@@ -768,8 +768,22 @@ Copt::memoryPick();
 		}
 
 // Adding Profiles
-		if(!is_null($options['selectProfile']) && $options['selectProfile']){
-			$sql = 'SELECT hp.* '.
+		if(!is_null($options['selectProfile']) && $options['selectProfile'] !== false){
+			if(is_array($options['selectProfile'])){
+				// if we are given a list of fields that needs to be fetched
+				$dbTable = DB::getSchema('host_profile');
+				$selectHP = array('hp.hostid');
+				foreach($options['selectProfile'] as $field){
+					if(isset($dbTable['fields'][$field]))
+						$selectHP[] = 'hp.'.$field;
+				}
+			}
+			else{
+				// all fields are needed
+				$selectHP = array('hp.*');
+			}
+
+			$sql = 'SELECT '.implode(', ', $selectHP).
 				' FROM host_profile hp '.
 				' WHERE '.DBcondition('hp.hostid', $hostids);
 			$db_profile = DBselect($sql);
