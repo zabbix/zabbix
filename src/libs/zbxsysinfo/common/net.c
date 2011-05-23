@@ -106,7 +106,7 @@ int	NET_TCP_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 }
 
 #if defined(HAVE_RES_QUERY) || defined(_WINDOWS)
-static char	*decode_type(int q_type)
+static const char	*decode_type(int q_type)
 {
 	static char	buf[16];
 
@@ -156,8 +156,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 #if defined(HAVE_RES_QUERY) || defined(_WINDOWS)
 
 	int		res, type, retrans, retry, i, offset = 0;
-	char		ip[MAX_STRING_LEN], zone[MAX_STRING_LEN], retransStr[MAX_STRING_LEN],
-			retryStr[MAX_STRING_LEN], tmp[MAX_STRING_LEN], buffer[MAX_STRING_LEN];
+	char		ip[MAX_STRING_LEN], zone[MAX_STRING_LEN], tmp[MAX_STRING_LEN], buffer[MAX_STRING_LEN];
 	struct in_addr	inaddr;
 
 	typedef struct
@@ -194,7 +193,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 #ifdef _WINDOWS
 	PDNS_RECORD	pDnsRecord;
 	LPTSTR		wzone;
-	char		utf8_string[MAX_STRING_LEN];
+	char		tmp2[MAX_STRING_LEN];
 #else
 	char		*name;
 	unsigned char	*msg_end, *msg_ptr, *p;
@@ -256,15 +255,15 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 			return SYSINFO_RET_FAIL;
 	}
 
-	if (0 != get_param(param, 4, retransStr, sizeof(retransStr)) || '\0' == *retransStr)
+	if (0 != get_param(param, 4, tmp, sizeof(tmp)) || '\0' == *tmp)
 		retrans = 1;
 	else
-		retrans = atoi(retransStr);
+		retrans = atoi(tmp);
 
-	if (0 != get_param(param, 5, retryStr, sizeof(retryStr)) || '\0' == *retryStr)
+	if (0 != get_param(param, 5, tmp, sizeof(tmp)) || '\0' == *tmp)
 		retry = 2;
 	else
-		retry = atoi(retryStr);
+		retry = atoi(tmp);
 
 #ifdef _WINDOWS
 	wzone = zbx_utf8_to_unicode(zone);
@@ -292,7 +291,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 			return SYSINFO_RET_FAIL;
 
 		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%-20s",
-				zbx_unicode_to_utf8_static(pDnsRecord->pName, utf8_string, sizeof(utf8_string)));
+				zbx_unicode_to_utf8_static(pDnsRecord->pName, tmp, sizeof(tmp)));
 		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %-8s",
 				decode_type(pDnsRecord->wType));
 
@@ -305,24 +304,24 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 				break;
 			case T_NS:
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s",
-						zbx_unicode_to_utf8_static(pDnsRecord->Data.NS.pNameHost, utf8_string, sizeof(utf8_string)));
+						zbx_unicode_to_utf8_static(pDnsRecord->Data.NS.pNameHost, tmp, sizeof(tmp)));
 				break;
 			case T_MD:
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s",
-						zbx_unicode_to_utf8_static(pDnsRecord->Data.MD.pNameHost, utf8_string, sizeof(utf8_string)));
+						zbx_unicode_to_utf8_static(pDnsRecord->Data.MD.pNameHost, tmp, sizeof(tmp)));
 				break;
 			case T_MF:
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s",
-						zbx_unicode_to_utf8_static(pDnsRecord->Data.MF.pNameHost, utf8_string, sizeof(utf8_string)));
+						zbx_unicode_to_utf8_static(pDnsRecord->Data.MF.pNameHost, tmp, sizeof(tmp)));
 				break;
 			case T_CNAME:
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s",
-						zbx_unicode_to_utf8_static(pDnsRecord->Data.CNAME.pNameHost, utf8_string, sizeof(utf8_string)));
+						zbx_unicode_to_utf8_static(pDnsRecord->Data.CNAME.pNameHost, tmp, sizeof(tmp)));
 				break;
 			case T_SOA:
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s %s %lu %lu %lu %lu %lu",
-						zbx_unicode_to_utf8_static(pDnsRecord->Data.SOA.pNamePrimaryServer, utf8_string, sizeof(utf8_string)),
-						zbx_unicode_to_utf8_static(pDnsRecord->Data.SOA.pNameAdministrator, utf8_string, sizeof(utf8_string)),
+						zbx_unicode_to_utf8_static(pDnsRecord->Data.SOA.pNamePrimaryServer, tmp, sizeof(tmp)),
+						zbx_unicode_to_utf8_static(pDnsRecord->Data.SOA.pNameAdministrator, tmp2, sizeof(tmp2)),
 						pDnsRecord->Data.SOA.dwSerialNo,
 						pDnsRecord->Data.SOA.dwRefresh,
 						pDnsRecord->Data.SOA.dwRetry,
@@ -331,15 +330,15 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 				break;
 			case T_MB:
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s",
-						zbx_unicode_to_utf8_static(pDnsRecord->Data.MB.pNameHost, utf8_string, sizeof(utf8_string)));
+						zbx_unicode_to_utf8_static(pDnsRecord->Data.MB.pNameHost, tmp, sizeof(tmp)));
 				break;
 			case T_MG:
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s",
-						zbx_unicode_to_utf8_static(pDnsRecord->Data.MG.pNameHost, utf8_string, sizeof(utf8_string)));
+						zbx_unicode_to_utf8_static(pDnsRecord->Data.MG.pNameHost, tmp, sizeof(tmp)));
 				break;
 			case T_MR:
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s",
-						zbx_unicode_to_utf8_static(pDnsRecord->Data.MR.pNameHost, utf8_string, sizeof(utf8_string)));
+						zbx_unicode_to_utf8_static(pDnsRecord->Data.MR.pNameHost, tmp, sizeof(tmp)));
 				break;
 			case T_NULL:
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " len:%lu",
@@ -347,29 +346,29 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 				break;
 			case T_PTR:
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s",
-						zbx_unicode_to_utf8_static(pDnsRecord->Data.PTR.pNameHost, utf8_string, sizeof(utf8_string)));
+						zbx_unicode_to_utf8_static(pDnsRecord->Data.PTR.pNameHost, tmp, sizeof(tmp)));
 				break;
 			case T_HINFO:
 				for (i = 0; i < (int)(pDnsRecord->Data.HINFO.dwStringCount); i++)
 					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s",
-							zbx_unicode_to_utf8_static(pDnsRecord->Data.HINFO.pStringArray[i], utf8_string, sizeof(utf8_string)));
+							zbx_unicode_to_utf8_static(pDnsRecord->Data.HINFO.pStringArray[i], tmp, sizeof(tmp)));
 				break;
 			case T_MINFO:
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s %s",
-						zbx_unicode_to_utf8_static(pDnsRecord->Data.MINFO.pNameMailbox, utf8_string, sizeof(utf8_string)),
-						zbx_unicode_to_utf8_static(pDnsRecord->Data.MINFO.pNameErrorsMailbox, utf8_string, sizeof(utf8_string)));
+						zbx_unicode_to_utf8_static(pDnsRecord->Data.MINFO.pNameMailbox, tmp, sizeof(tmp)),
+						zbx_unicode_to_utf8_static(pDnsRecord->Data.MINFO.pNameErrorsMailbox, tmp2, sizeof(tmp2)));
 				break;
 			case T_MX:
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %hu %s",
 						pDnsRecord->Data.MX.wPreference,
-						zbx_unicode_to_utf8_static(pDnsRecord->Data.MX.pNameExchange, utf8_string, sizeof(utf8_string)));
+						zbx_unicode_to_utf8_static(pDnsRecord->Data.MX.pNameExchange, tmp, sizeof(tmp)));
 				break;
 			case T_TXT:
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " \"");
 
 				for (i = 0; i < (int)(pDnsRecord->Data.TXT.dwStringCount); i++)
 					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%s ",
-							zbx_unicode_to_utf8_static(pDnsRecord->Data.TXT.pStringArray[i], utf8_string, sizeof(utf8_string)));
+							zbx_unicode_to_utf8_static(pDnsRecord->Data.TXT.pStringArray[i], tmp, sizeof(tmp)));
 
 				if (0 < i)
 					offset -= 1;	/* remove the trailing space */
@@ -599,8 +598,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 	}
 #endif	/* _WINDOWS */
 
-	if (0 != offset)
-		buffer[--offset] = '\0';
+	zbx_rtrim(buffer, "\n");
 
 	SET_TEXT_RESULT(result, strdup(buffer));
 
