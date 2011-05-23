@@ -134,7 +134,7 @@ static char	*decode_type(int q_type)
 	}
 }
 
-#	if !defined(_WINDOWS)
+#if !defined(_WINDOWS)
 static char	*get_name(unsigned char *msg, unsigned char *msg_end, unsigned char **msg_ptr)
 {
 	int		res;
@@ -147,9 +147,9 @@ static char	*get_name(unsigned char *msg, unsigned char *msg_end, unsigned char 
 
 	return buffer;
 }
-#	endif
+#endif	/* !defined(_WINDOWS) */
 
-#endif /* defined(HAVE_RES_QUERY) || defined(_WINDOWS) */
+#endif	/* defined(HAVE_RES_QUERY) || defined(_WINDOWS) */
 
 static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result, int short_answer)
 {
@@ -180,7 +180,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 		{"MG", T_MG},
 		{"MR", T_MR},
 		{"NULL", T_NULL},
-#ifndef _WINDOWS /* obsolete, don't add for Windows */
+#ifndef _WINDOWS	/* obsolete, will not add for Windows */
 		{"WKS", T_WKS},
 #endif
 		{"PTR", T_PTR},
@@ -216,12 +216,12 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 		unsigned char	buffer[PACKETSZ];
 #else
 		unsigned char	buffer[512];
-#endif	/* ifdef _WINDOWS */
+#endif
 	}
 	answer_t;
 
 	answer_t	answer;
-#endif	/* defined(HAVE_RES_QUERY) || defined(_WINDOWS) */
+#endif	/* _WINDOWS */
 
 	*buffer = '\0';
 
