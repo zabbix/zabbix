@@ -693,7 +693,7 @@
 	'S_CANNOT_DELETE_GRAPHS'=>		'Cannot delete graphs',
 	'S_CANNOT_ADD_GRAPH'=>			'Cannot add graph',
 	'S_ANOTHER_ITEM_SUM'=>			'Cannot add more than one item with type "Graph sum"',
-	'S_ID'=>				'Id',
+	'S_ID'=>				'ID',
 	'S_NO_GRAPHS_DEFINED'=>			'No graphs defined',
 	'S_NO_GRAPH_DEFINED'=>			'No graph defined',
 	'S_DELETE_GRAPH_Q'=>			'Delete graph?',
@@ -895,7 +895,7 @@
 	'S_DELETED'=>					'Deleted',
 	'S_UNKNOWN'=>					'Unknown',
 	'S_GROUPS'=>					'Groups',
-	'S_MINUS_ALL_GROUPS_MINUS'=>			' - all groups - ',
+	'S_MINUS_ALL_GROUPS_MINUS'=>			'- all groups -',
 	'S_ALL_GROUPS'=>				'All groups',
 	'S_NO_GROUPS_DEFINED'=>				'No groups defined',
 	'S_NEW_GROUP'=>					'New group',
@@ -2462,6 +2462,8 @@
 
 // class.ctemplate.php
 	'S_CANNOT_SYNC_TEMPLATE' => 'Cannot sync template',
+	'S_TEMPLATE_ID_X_IS_PASSED_N_TIMES' => 'template ID "%1$s" is passed %2$s times',
+	'S_CANNOT_PASS_DUPLICATE_TEMPLATE_IDS' => 'Cannot pass duplicate template IDs for the linkage: %s.',
 
 // class.chost.php
 	'S_YOU_DO_NOT_HAVE_ENOUGH_RIGHTS' => 'You do not have enough rights for operation',

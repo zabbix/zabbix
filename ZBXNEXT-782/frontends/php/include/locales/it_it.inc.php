@@ -123,7 +123,7 @@
 	'S_GRAPH_DELETED'=>			'Grafico rimosso!',
 	'S_CANNOT_DELETE_GRAPH'=>			'Non posso rimuovere il grafico',
 	'S_CANNOT_ADD_GRAPH'=>			'Non posso aggiungere il grafico',
-	'S_ID'=>			'Id',
+	'S_ID'=>			'ID',
 	'S_NO_GRAPHS_DEFINED'=>			'Nessun grafico definito',
 	'S_DELETE_GRAPH_Q'=>			'Rimuovere il grafico?',
 	'S_YAXIS_MIN_VALUE'=>			'Y minimo',

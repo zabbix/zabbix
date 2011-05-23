@@ -969,7 +969,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 		if (SUCCEED != evaluate_expression(&exp_value, &tr[i].exp, tr[i].clock,
 					tr[i].triggerid, tr[i].value, error, sizeof(error)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Expression [%s] cannot be evaluated: %s", tr[i].exp, error);
+			zabbix_log(LOG_LEVEL_DEBUG, "expression [%s] cannot be evaluated: %s", tr[i].exp, error);
 
 			DBupdate_trigger_value(tr[i].triggerid, tr[i].type, tr[i].value,
 					tr[i].error, TRIGGER_VALUE_UNKNOWN, tr[i].clock, error);
@@ -1197,19 +1197,16 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 
 			if (ITEM_STATUS_NOTSUPPORTED == status)
 			{
-				const char	*hostkey_name;
-
-				hostkey_name = zbx_host_key_string(h->itemid);
-
 				message = zbx_dsprintf(message, "Type of received value"
 						" [" ZBX_FS_DBL "] is not suitable for value type [%s]",
 						h->value.dbl,
 						zbx_item_value_type_string(h->value_type));
 
-				zabbix_log(LOG_LEVEL_WARNING, "Item [%s] error: %s", hostkey_name, message);
-
 				if (ITEM_STATUS_NOTSUPPORTED != item.status)
-					zabbix_log(LOG_LEVEL_WARNING, "Item [%s] is not supported", hostkey_name);
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "Item [%s] became unsupported: %s",
+							zbx_host_key_string(h->itemid), message);
+				}
 
 				DCadd_nextcheck(h->itemid, h->clock, message);	/* update error & status field in items table */
 				DCrequeue_reachable_item(h->itemid, ITEM_STATUS_NOTSUPPORTED, h->clock);
