@@ -97,8 +97,7 @@ static void	process_time_functions()
 
 		if (SUCCEED != evaluate_expression(&exp_value, &exp, ts.sec, triggerid, trigger_value, error, sizeof(error)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Expression [%s] cannot be evaluated: %s", exp, error);
-			zabbix_syslog("Expression [%s] cannot be evaluated: %s", exp, error);
+			zabbix_log(LOG_LEVEL_DEBUG, "expression [%s] cannot be evaluated: %s", exp, error);
 
 			DBupdate_trigger_value(triggerid, trigger_type, trigger_value, trigger_flags,
 					trigger_error, trigger_value, TRIGGER_VALUE_FLAG_UNKNOWN, &ts, error);
