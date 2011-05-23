@@ -2841,13 +2841,13 @@ LPSTR	zbx_unicode_to_utf8(LPCTSTR wide_string)
 }
 
 /* convert from unicode to utf8 */
-int	zbx_unicode_to_utf8_static(LPCTSTR wide_string, LPSTR utf8_string, int utf8_size)
+LPSTR	zbx_unicode_to_utf8_static(LPCTSTR wide_string, LPSTR utf8_string, int utf8_size)
 {
 	/* convert from wide_string to utf8_string */
 	if (0 == WideCharToMultiByte(CP_UTF8, 0, wide_string, -1, utf8_string, utf8_size, NULL, NULL))
-		return FAIL;
+		return NULL;
 
-	return SUCCEED;
+	return utf8_string;
 }
 #endif
 
