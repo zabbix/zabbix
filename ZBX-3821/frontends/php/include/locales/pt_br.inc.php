@@ -601,7 +601,7 @@
 	'S_CANNOT_DELETE_GRAPHS'=>			'Não foi possível remover gráficos',
 	'S_CANNOT_ADD_GRAPH'=>			'Gráfico não foi adicionado',
 	'S_ANOTHER_ITEM_SUM'=>			'Não é possível adicionar outro item do tipo "Graph sum"',
-	'S_ID'=>			'Id',
+	'S_ID'=>			'ID',
 	'S_NO_GRAPHS_DEFINED'=>			'Não há gráficos definidos',
 	'S_NO_GRAPH_DEFINED'=>			'Não há gráfico definido',
 	'S_DELETE_GRAPH_Q'=>			'Remover gráfico?',

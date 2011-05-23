@@ -575,7 +575,7 @@
 	'S_CANNOT_DELETE_GRAPHS'=>			'kann Graphen nicht löschen',
 	'S_CANNOT_ADD_GRAPH'=>			'Graph konnte nicht hinzugefügt werden',
 	'S_ANOTHER_ITEM_SUM'=>			'Kann kein weiteres Element mit dem Typ "Graph Summe" hinzufügen',
-	'S_ID'=>			'Id',
+	'S_ID'=>			'ID',
 	'S_NO_GRAPHS_DEFINED'=>			'Keine Graphen definiert',
 	'S_NO_GRAPH_DEFINED'=>			'Kein Graph definiert',
 	'S_DELETE_GRAPH_Q'=>			'Soll dieser Graph wirklich gelöscht werden?',

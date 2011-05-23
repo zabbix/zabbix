@@ -174,7 +174,7 @@
 	'S_GRAPH_DELETED'=>			'Grafiek verwijderd',
 	'S_CANNOT_DELETE_GRAPH'=>			'Kan grafiek niet verwijderen',
 	'S_CANNOT_ADD_GRAPH'=>			'Kan grefiek niet toevoegen',
-	'S_ID'=>			'Id',
+	'S_ID'=>			'ID',
 	'S_NO_GRAPHS_DEFINED'=>			'Geen grafieken gedefineerd',
 	'S_DELETE_GRAPH_Q'=>			'Verwijder grafiek?',
 	'S_YAXIS_MIN_VALUE'=>			'Y lijn MIN waarde',
