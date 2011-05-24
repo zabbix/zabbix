@@ -876,18 +876,18 @@ int	MAIN_ZABBIX_ENTRY()
 
 void	zbx_on_exit()
 {
-	sigset_t	set;
 	int		i;
-
-	/* ignore SIGCHLD signals in order for zbx_sleep() to work  */
-	sigemptyset(&set);
-	sigaddset(&set, SIGCHLD);
-	sigprocmask(SIG_BLOCK, &set, NULL);
+	sigset_t	set;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called");
 
-	if (threads != NULL)
+	if (NULL != threads)
 	{
+		/* ignore SIGCHLD signals in order for zbx_sleep() to work  */
+		sigemptyset(&set);
+		sigaddset(&set, SIGCHLD);
+		sigprocmask(SIG_BLOCK, &set, NULL);
+
 		for (i = 1; i <= CONFIG_CONFSYNCER_FORKS + CONFIG_POLLER_FORKS
 				+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS
 				+ CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS
