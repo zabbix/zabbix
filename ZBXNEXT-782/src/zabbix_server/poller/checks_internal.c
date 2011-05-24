@@ -309,6 +309,8 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCget_stats(ZBX_STATS_HISTORY_LOG_COUNTER));
 			else if (0 == strcmp(tmp1, "text"))
 				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCget_stats(ZBX_STATS_HISTORY_TEXT_COUNTER));
+			else if (0 == strcmp(tmp1, "not supported"))
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCget_stats(ZBX_STATS_HISTORY_NS_COUNTER));
 			else
 				goto not_supported;
 		}

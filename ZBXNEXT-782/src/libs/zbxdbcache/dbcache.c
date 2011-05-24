@@ -122,12 +122,13 @@ ZBX_DC_TREND
 
 ZBX_DC_STATS
 {
-	zbx_uint64_t	history_counter;	/* Total number of saved values in the DB */
-	zbx_uint64_t	history_float_counter;	/* Number of saved float values in the DB */
-	zbx_uint64_t	history_uint_counter;	/* Number of saved uint values in the DB */
-	zbx_uint64_t	history_str_counter;	/* Number of saved str values in the DB */
-	zbx_uint64_t	history_log_counter;	/* Number of saved log values in the DB */
-	zbx_uint64_t	history_text_counter;	/* Number of saved text values in the DB */
+	zbx_uint64_t	history_counter;	/* the total number of processed values */
+	zbx_uint64_t	history_float_counter;	/* the number of processed float values */
+	zbx_uint64_t	history_uint_counter;	/* the number of processed uint values */
+	zbx_uint64_t	history_str_counter;	/* the number of processed str values */
+	zbx_uint64_t	history_log_counter;	/* the number of processed log values */
+	zbx_uint64_t	history_text_counter;	/* the number of processed text values */
+	zbx_uint64_t	history_ns_counter;	/* the number of processed not-supported items */
 };
 
 ZBX_DC_CACHE
@@ -187,6 +188,9 @@ void	*DCget_stats(int request)
 		return &value_uint;
 	case ZBX_STATS_HISTORY_TEXT_COUNTER:
 		value_uint = cache->stats.history_text_counter;
+		return &value_uint;
+	case ZBX_STATS_HISTORY_NS_COUNTER:
+		value_uint = cache->stats.history_ns_counter;
 		return &value_uint;
 	case ZBX_STATS_HISTORY_TOTAL:
 		value_uint = CONFIG_HISTORY_CACHE_SIZE;
@@ -2716,7 +2720,7 @@ static void	DCadd_history_notsupported(zbx_uint64_t itemid, const char *error, i
 	history->value_null = 1;
 
 	cache->stats.history_counter++;
-	cache->stats.history_float_counter++;
+	cache->stats.history_ns_counter++;
 
 	UNLOCK_CACHE;
 }
