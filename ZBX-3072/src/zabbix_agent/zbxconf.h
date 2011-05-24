@@ -32,12 +32,20 @@ extern int	CONFIG_REFRESH_ACTIVE_CHECKS;
 extern char	*CONFIG_LISTEN_IP;
 extern int	CONFIG_LOG_LEVEL;
 extern int	CONFIG_MAX_LINES_PER_SECOND;
+extern char	**CONFIG_ALIASES;
+extern char	**CONFIG_USER_PARAMETERS;
+#ifdef _WINDOWS
+extern char	**CONFIG_PERF_COUNTERS;
+#endif
 
-void    load_config();
-void    load_user_parameters(int optional);
+void	load_aliases(char **lines);
+void	load_user_parameters(char **lines);
+#ifdef _WINDOWS
+void	load_perf_counters(const char **lines);
+#endif
 
 #ifdef _AIX
 void	tl_version();
-#endif /* _AIX */
+#endif
 
 #endif /* ZABBIX_ZBXCONF_H */

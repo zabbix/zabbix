@@ -673,7 +673,7 @@
 	'S_CANNOT_DELETE_GRAPHS'=>		'Nelze smazat grafy',
 	'S_CANNOT_ADD_GRAPH'=>			'Nelze přidat graf',
 	'S_ANOTHER_ITEM_SUM'=>			'Nelze přidat další položku typu "souhrn grafu"',
-	'S_ID'=>				'Id',
+	'S_ID'=>				'ID',
 	'S_NO_GRAPHS_DEFINED'=>			'Nejsou definovány žádné grafy',
 	'S_NO_GRAPH_DEFINED'=>			'Není definován žádný graf',
 	'S_DELETE_GRAPH_Q'=>			'Smazat graf?',
