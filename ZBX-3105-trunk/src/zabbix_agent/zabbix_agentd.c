@@ -45,9 +45,9 @@ const char	*progname = NULL;
 /* Default config file location */
 #ifdef _WINDOWS
 	static char	DEFAULT_CONFIG_FILE[]	= "C:\\zabbix_agentd.conf";
-#else /* not _WINDOWS */
+#else
 	static char	DEFAULT_CONFIG_FILE[]	= "/etc/zabbix/zabbix_agentd.conf";
-#endif /* _WINDOWS */
+#endif
 
 /* application TITLE */
 
@@ -70,9 +70,9 @@ const char	title_message[] = APPLICATION_NAME
 
 const char	usage_message[] =
 	"[-Vhp]"
-#if defined(_WINDOWS)
+#ifdef _WINDOWS
 	" [-idsx] [-m]"
-#endif /* _WINDOWS */
+#endif
 	" [-c <file>] [-t <item>]";
 
 /*end of application USAGE message */
@@ -91,7 +91,7 @@ const char	*help_message[] = {
 	"  -t --test <item>      test specified item and exit",
 /*	"  -u --usage <item>     test specified item and exit",	*/ /* !!! TODO - print item usage !!! */
 
-#if defined (_WINDOWS)
+#ifdef _WINDOWS
 
 	"",
 	"Functions:",
@@ -104,7 +104,7 @@ const char	*help_message[] = {
 
 	"  -m --multiple-agents  service name will include hostname",
 
-#endif /* _WINDOWS */
+#endif
 
 	0 /* end of text */
 };
@@ -125,7 +125,7 @@ static struct zbx_option longopts[] =
 	{"print",		0,	0,	'p'},
 	{"test",		1,	0,	't'},
 
-#if defined (_WINDOWS)
+#ifdef _WINDOWS
 
 	{"install",		0,	0,	'i'},
 	{"uninstall",		0,	0,	'd'},
@@ -135,7 +135,7 @@ static struct zbx_option longopts[] =
 
 	{"multiple-agents",	0,	0,	'm'},
 
-#endif /* _WINDOWS */
+#endif
 
 	{0,0,0,0}
 };
@@ -144,14 +144,12 @@ static struct zbx_option longopts[] =
 
 static char	shortopts[] =
 	"c:hVpt:"
-#if defined (_WINDOWS)
+#ifdef _WINDOWS
 	"idsxm"
-#endif /* _WINDOWS */
+#endif
 	;
 
 /* end of COMMAND LINE OPTIONS*/
-
-
 
 static char	*TEST_METRIC = NULL;
 
@@ -173,14 +171,14 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 			break;
 		case 'h':
 			help();
-			exit(-1);
+			exit(FAIL);
 			break;
 		case 'V':
 			version();
 #ifdef _AIX
 			tl_version();
-#endif /* _AIX */
-			exit(-1);
+#endif
+			exit(FAIL);
 			break;
 		case 'p':
 			if(t->task == ZBX_TASK_START)
@@ -193,7 +191,7 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				TEST_METRIC = strdup(zbx_optarg);
 			}
 			break;
-#if defined (_WINDOWS)
+#ifdef _WINDOWS
 		case 'i':
 			t->task = ZBX_TASK_INSTALL_SERVICE;
 			break;
@@ -209,7 +207,7 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 		case 'm':
 			t->flags = ZBX_TASK_FLAG_MULTIPLE_AGENTS;
 			break;
-#endif /* _WINDOWS */
+#endif
 		default:
 			t->task = ZBX_TASK_SHOW_USAGE;
 			break;
@@ -222,13 +220,235 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: set_defaults                                                     *
+ *                                                                            *
+ * Purpose: set non-static configuration defaults                             *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Vladimir Levijev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	set_defaults()
+{
+	AGENT_RESULT	result;
+	char		**value = NULL;
+
+	memset(&result, 0, sizeof(AGENT_RESULT));
+
+	/* hostname */
+	if (SUCCEED == process("system.hostname", 0, &result))
+	{
+		if (NULL == (value = GET_STR_RESULT(&result)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "failed to get system hostname (system.hostname)");
+		}
+		else
+		{
+			assert(*value);
+
+			CONFIG_HOSTNAME = zbx_strdup(CONFIG_HOSTNAME, *value);
+
+			/* If auto registration is used, our CONFIG_HOSTNAME will make it into the  */
+			/* server's database, where it is limited by HOST_HOST_LEN (currently, 64), */
+			/* so to make it work properly we need to truncate our hostname.            */
+			if (strlen(CONFIG_HOSTNAME) > 64)
+				CONFIG_HOSTNAME[64] = '\0';
+		}
+	}
+	free_result(&result);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_load_config                                                  *
+ *                                                                            *
+ * Purpose: load configuration from config file                               *
+ *                                                                            *
+ * Parameters: optional - do not produce error if config file missing         *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_load_config(int optional)
+{
+	struct cfg_line	cfg[] =
+	{
+		/* PARAMETER,			VAR,					TYPE,
+			MANDATORY,	MIN,			MAX */
+		{"Server",			&CONFIG_HOSTS_ALLOWED,			TYPE_STRING,
+			PARM_MAND,	0,			0},
+		{"Hostname",			&CONFIG_HOSTNAME,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"BufferSize",			&CONFIG_BUFFER_SIZE,			TYPE_INT,
+			PARM_OPT,	2,			65535},
+		{"BufferSend",			&CONFIG_BUFFER_SEND,			TYPE_INT,
+			PARM_OPT,	1,			SEC_PER_HOUR},
+#ifdef USE_PID_FILE
+		{"PidFile",			&CONFIG_PID_FILE,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+#endif
+		{"LogFile",			&CONFIG_LOG_FILE,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"LogFileSize",			&CONFIG_LOG_FILE_SIZE,			TYPE_INT,
+			PARM_OPT,	0,			1024},
+		{"DisableActive",		&CONFIG_DISABLE_ACTIVE,			TYPE_INT,
+			PARM_OPT,	0,			1},
+		{"DisablePassive",		&CONFIG_DISABLE_PASSIVE,		TYPE_INT,
+			PARM_OPT,	0,			1},
+		{"Timeout",			&CONFIG_TIMEOUT,			TYPE_INT,
+			PARM_OPT,	1,			30},
+		{"ListenPort",			&CONFIG_LISTEN_PORT,			TYPE_INT,
+			PARM_OPT,	1024,			32767},
+		{"ServerPort",			&CONFIG_SERVER_PORT,			TYPE_INT,
+			PARM_OPT,	1024,			32767},
+		{"ListenIP",			&CONFIG_LISTEN_IP,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"SourceIP",			&CONFIG_SOURCE_IP,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"DebugLevel",			&CONFIG_LOG_LEVEL,			TYPE_INT,
+			PARM_OPT,	0,			4},
+		{"StartAgents",			&CONFIG_ZABBIX_FORKS,			TYPE_INT,
+			PARM_OPT,	1,			100},
+		{"RefreshActiveChecks",		&CONFIG_REFRESH_ACTIVE_CHECKS,		TYPE_INT,
+			PARM_OPT,	SEC_PER_MIN,		SEC_PER_HOUR},
+		{"MaxLinesPerSecond",		&CONFIG_MAX_LINES_PER_SECOND,		TYPE_INT,
+			PARM_OPT,	1,			1000},
+		{"AllowRoot",			&CONFIG_ALLOW_ROOT,			TYPE_INT,
+			PARM_OPT,	0,			1},
+		{"EnableRemoteCommands",	&CONFIG_ENABLE_REMOTE_COMMANDS,		TYPE_INT,
+			PARM_OPT,	0,			1},
+		{"LogRemoteCommands",		&CONFIG_LOG_REMOTE_COMMANDS,		TYPE_INT,
+			PARM_OPT,	0,			1},
+		{"UnsafeUserParameters",	&CONFIG_UNSAFE_USER_PARAMETERS,		TYPE_INT,
+			PARM_OPT,	0,			1},
+		{"Alias",			&CONFIG_ALIASES,			TYPE_MULTISTRING,
+			PARM_OPT,	0,			0},
+		{"UserParameter",		&CONFIG_USER_PARAMETERS,		TYPE_MULTISTRING,
+			PARM_OPT,	0,			0},
+#ifdef _WINDOWS
+		{"PerfCounter",			&CONFIG_PERF_COUNTERS,			TYPE_MULTISTRING,
+			PARM_OPT,	0,			0},
+#endif
+		{NULL}
+	};
+
+	/* initialize multistrings */
+	zbx_strarr_init(&CONFIG_ALIASES);
+	zbx_strarr_init(&CONFIG_USER_PARAMETERS);
+#ifdef _WINDOWS
+	zbx_strarr_init(&CONFIG_PERF_COUNTERS);
+#endif
+
+	set_defaults();
+
+	parse_cfg_file(CONFIG_FILE, cfg, optional, ZBX_CFG_STRICT);
+
+#ifdef USE_PID_FILE
+	if (NULL == CONFIG_PID_FILE)
+		CONFIG_PID_FILE = "/tmp/zabbix_agentd.pid";
+#endif
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_free_config                                                  *
+ *                                                                            *
+ * Purpose: free configuration memory                                         *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Vladimir Levijev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_free_config()
+{
+	zbx_strarr_free(CONFIG_ALIASES);
+	zbx_strarr_free(CONFIG_USER_PARAMETERS);
+#ifdef _WINDOWS
+	zbx_strarr_free(CONFIG_PERF_COUNTERS);
+#endif
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_validate_config                                              *
+ *                                                                            *
+ * Purpose: validate configuration parameters                                 *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Vladimir Levijev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_validate_config()
+{
+	/* hostname */
+	if (NULL == CONFIG_HOSTNAME)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "hostname is not defined");
+		exit(FAIL);
+	}
+
+	/* make sure active or passive check is enabled */
+	if (1 == CONFIG_DISABLE_ACTIVE && 1 == CONFIG_DISABLE_PASSIVE)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "either active or passive checks must be enabled");
+		exit(FAIL);
+	}
+}
+
+#ifdef _WINDOWS
+static int	zbx_exec_service_task(const char *name, const ZBX_TASK_EX *t)
+{
+	int	r;
+
+	switch (t->task)
+	{
+		case ZBX_TASK_INSTALL_SERVICE:
+			r = ZabbixCreateService(name, t->flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS);
+			break;
+		case ZBX_TASK_UNINSTALL_SERVICE:
+			r = ZabbixRemoveService();
+			break;
+		case ZBX_TASK_START_SERVICE:
+			r = ZabbixStartService();
+			break;
+		case ZBX_TASK_STOP_SERVICE:
+			r = ZabbixStopService();
+			break;
+		default:
+			/* there can not be other choice */
+			assert(0);
+	}
+
+	return r;
+}
+#endif	/* _WINDOWS */
+
 int	MAIN_ZABBIX_ENTRY()
 {
 	zbx_thread_args_t		*thread_args;
 	ZBX_THREAD_ACTIVECHK_ARGS	activechk_args;
 	zbx_sock_t			listen_sock;
 	int				i, thread_num = 0;
-	
+
 	if (NULL == CONFIG_LOG_FILE || '\0' == *CONFIG_LOG_FILE)
 		zabbix_open_log(LOG_TYPE_SYSLOG, CONFIG_LOG_LEVEL, NULL);
 	else
@@ -246,9 +466,16 @@ int	MAIN_ZABBIX_ENTRY()
 		}
 	}
 
+	/* collector data must be initiated by user 'zabbix' */
 	init_collector_data();
 
-	load_user_parameters(0);
+#ifdef _WINDOWS
+	load_perf_counters(CONFIG_PERF_COUNTERS);
+#endif
+	load_user_parameters(CONFIG_USER_PARAMETERS);
+	load_aliases(CONFIG_ALIASES);
+
+	zbx_free_config();
 
 	/* --- START THREADS ---*/
 
@@ -331,10 +558,6 @@ void	zbx_on_exit()
 		zbx_free(threads);
 	}
 
-	free_metrics();
-	free_collector_data();
-	alias_list_free();
-
 	zbx_sleep(2); /* wait for all threads closing */
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent stopped. Zabbix %s (revision %s).",
@@ -342,21 +565,28 @@ void	zbx_on_exit()
 
 	zabbix_close_log();
 
+	free_metrics();
+	alias_list_free();
+	free_collector_data();
+
 	exit(SUCCEED);
 }
 
 int	main(int argc, char **argv)
 {
 	ZBX_TASK_EX	t;
+#ifdef _WINDOWS
+	int		r;
+#endif
 
-#if defined (_WINDOWS)
+#ifdef _WINDOWS
 	/* Provide, so our process handles errors instead of the system itself. */
 	/* Attention!!! */
 	/* The system does not display the critical-error-handler message box. */
 	/* Instead, the system sends the error to the calling process.*/
 	SetErrorMode(SEM_FAILCRITICALERRORS);
-#endif /* _WINDOWS */	
-	
+#endif
+
 	memset(&t, 0, sizeof(t));
 	t.task = ZBX_TASK_START;
 
@@ -366,58 +596,61 @@ int	main(int argc, char **argv)
 
 	import_symbols();
 
-	init_metrics(); /* Must be before load_config().  load_config - use metrics!!! */
-
-	if (ZBX_TASK_START == t.task || ZBX_TASK_INSTALL_SERVICE == t.task || ZBX_TASK_UNINSTALL_SERVICE == t.task || ZBX_TASK_START_SERVICE == t.task || ZBX_TASK_STOP_SERVICE == t.task)
-		load_config();
-
-#if defined (_WINDOWS)
-	if (t.flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS)
-	{
-		zbx_snprintf(ZABBIX_SERVICE_NAME, sizeof(ZABBIX_SERVICE_NAME), "%s [%s]", APPLICATION_NAME, CONFIG_HOSTNAME);
-		zbx_snprintf(ZABBIX_EVENT_SOURCE, sizeof(ZABBIX_EVENT_SOURCE), "%s [%s]", APPLICATION_NAME, CONFIG_HOSTNAME);
-	}
-#endif /* _WINDOWS */
+	/* this is needed to set default hostname in zbx_load_config() */
+	init_metrics();
 
 	switch (t.task)
 	{
-#if defined (_WINDOWS)
-		case ZBX_TASK_INSTALL_SERVICE:
-			exit(ZabbixCreateService(argv[0], t.flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS));
-			break;
-		case ZBX_TASK_UNINSTALL_SERVICE:
-			exit(ZabbixRemoveService());
-			break;
-		case ZBX_TASK_START_SERVICE:
-			exit(ZabbixStartService());
-			break;
-		case ZBX_TASK_STOP_SERVICE:
-			exit(ZabbixStopService());
-			break;
-#endif /* _WINDOWS */
-		case ZBX_TASK_PRINT_SUPPORTED:
-#if defined (_WINDOWS)
-			init_collector_data(); /* required for reading PerfCounter */
-#endif /* _WINDOWS */
-			load_user_parameters(1);
-			test_parameters();
-			free_metrics();
-			exit(SUCCEED);
-			break;
-		case ZBX_TASK_TEST_METRIC:
-#if defined (_WINDOWS)
-			init_collector_data(); /* required for reading PerfCounter */
-#endif /* _WINDOWS */
-			load_user_parameters(1);
-			test_parameter(TEST_METRIC, PROCESS_TEST);
-			exit(SUCCEED);
-			break;
 		case ZBX_TASK_SHOW_USAGE:
 			usage();
 			exit(FAIL);
 			break;
+#ifdef _WINDOWS
+		case ZBX_TASK_INSTALL_SERVICE:
+		case ZBX_TASK_UNINSTALL_SERVICE:
+		case ZBX_TASK_START_SERVICE:
+		case ZBX_TASK_STOP_SERVICE:
+			zbx_load_config(ZBX_CFG_FILE_REQUIRED);
+			zbx_validate_config();
+			zbx_free_config();
+
+			if (t.flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS)
+			{
+				zbx_snprintf(ZABBIX_SERVICE_NAME, sizeof(ZABBIX_SERVICE_NAME), "%s [%s]",
+						APPLICATION_NAME, CONFIG_HOSTNAME);
+				zbx_snprintf(ZABBIX_EVENT_SOURCE, sizeof(ZABBIX_EVENT_SOURCE), "%s [%s]",
+						APPLICATION_NAME, CONFIG_HOSTNAME);
+			}
+
+			r = zbx_exec_service_task(argv[0], &t);
+			free_metrics();
+			exit(r);
+			break;
+#endif
+		case ZBX_TASK_TEST_METRIC:
+		case ZBX_TASK_PRINT_SUPPORTED:
+			zbx_load_config(ZBX_CFG_FILE_OPTIONAL);
+#ifdef _WINDOWS
+			init_collector_data();	/* required for reading PerfCounter */
+			load_perf_counters(CONFIG_PERF_COUNTERS);
+#endif
+			load_user_parameters(CONFIG_USER_PARAMETERS);
+			load_aliases(CONFIG_ALIASES);
+			zbx_free_config();
+			if (ZBX_TASK_TEST_METRIC == t.task)
+				test_parameter(TEST_METRIC, PROCESS_TEST);
+			else
+				test_parameters();
+#ifdef _WINDOWS
+			free_collector_data();
+#endif
+			free_metrics();
+			alias_list_free();
+			exit(SUCCEED);
+			break;
 		default:
-			/* do nothing */
+			zbx_load_config(ZBX_CFG_FILE_REQUIRED);
+			zbx_validate_config();
 			break;
 	}
 

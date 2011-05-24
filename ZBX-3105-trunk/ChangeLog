@@ -156,6 +156,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.6rc1
 
+ - [ZBX-3105] added processing of garbage in configuration files (dimir)
  - [ZBX-2083] fixed audit.details field cutting (Vedmak)
  - [ZBX-3824] fixed unnecessary synchronization of "profiles" table in DM setup (asaveljevs)
  - [ZBX-3821] removed warning messages about failed evaluation of trigger expressions (asaveljevs)

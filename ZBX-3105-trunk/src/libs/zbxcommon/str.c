@@ -3236,3 +3236,79 @@ char	*str_linefeed(const char *src, size_t maxline, const char *delim)
 
 	return dst;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_strarr_init                                                  *
+ *                                                                            *
+ * Purpose: initialize dynamic string array                                   *
+ *                                                                            *
+ * Parameters: arr - a pointer to array of strings                            *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Vladimir Levijev                                                   *
+ *                                                                            *
+ * Comments: allocates memory, calls assert() if that fails                   *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_strarr_init(char ***arr)
+{
+	*arr = zbx_malloc(*arr, sizeof(char **));
+	**arr = NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_strarr_add                                                   *
+ *                                                                            *
+ * Purpose: add a string to dynamic string array                              *
+ *                                                                            *
+ * Parameters: arr - a pointer to array of strings                            *
+ *             entry - string to add                                          *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Vladimir Levijev                                                   *
+ *                                                                            *
+ * Comments: allocates memory, calls assert() if that fails                   *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_strarr_add(char ***arr, const char *entry)
+{
+	int	i;
+
+	assert(entry);
+
+	for (i = 0; NULL != (*arr)[i]; i++)
+		;
+
+	*arr = zbx_realloc(*arr, sizeof(char **) * (i + 2));
+
+	(*arr)[i] = zbx_strdup((*arr)[i], entry);
+	(*arr)[++i] = NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_strarr_free                                                  *
+ *                                                                            *
+ * Purpose: free dynamic string array memory                                  *
+ *                                                                            *
+ * Parameters: arr - array of strings                                         *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Vladimir Levijev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_strarr_free(char **arr)
+{
+	char	**p;
+
+	for (p = arr; NULL != *p; p++)
+		zbx_free(*p);
+	zbx_free(arr);
+}

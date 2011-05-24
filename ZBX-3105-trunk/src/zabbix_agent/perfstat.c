@@ -63,13 +63,13 @@ PERF_COUNTER_DATA	*add_perf_counter(const char *name, const char *counterpath, i
 
 	if (NULL == ppsd->pdh_query)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "PerfCounter '%s' FAILED: Collector is not started!", counterpath);
+		zabbix_log(LOG_LEVEL_WARNING, "PerfCounter '%s' FAILED: collector is not started!", counterpath);
 		return NULL;
 	}
 
 	if (1 > interval || 900 < interval)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "PerfCounter '%s' FAILED: Interval value out of range", counterpath);
+		zabbix_log(LOG_LEVEL_WARNING, "PerfCounter '%s' FAILED: interval value out of range", counterpath);
 		return NULL;
 	}
 
@@ -98,7 +98,10 @@ PERF_COUNTER_DATA	*add_perf_counter(const char *name, const char *counterpath, i
 			zbx_mutex_unlock(&perfstat_access);
 
 			if (ERROR_SUCCESS != pdh_status && PDH_CSTATUS_NO_INSTANCE != pdh_status)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "PerfCounter '%s' FAILED: invalid format");
 				cptr = NULL;	/* indicate a failure */
+			}
 
 			result = SUCCEED;
 			break;
@@ -123,43 +126,6 @@ PERF_COUNTER_DATA	*add_perf_counter(const char *name, const char *counterpath, i
 	}
 
 	return cptr;
-}
-
-int	add_perf_counter_from_config(const char *line)
-{
-	char	name[MAX_STRING_LEN], counterpath[PDH_MAX_COUNTER_PATH], interval[MAX_STRING_LEN];
-	LPTSTR	wcounterPath;
-	int	ret = FAIL;
-	
-	assert(line);
-
-	if (3 < num_param(line))
-		goto lbl_syntax_error;
-
-        if (0 != get_param(line, 1, name, sizeof(name)))
-		goto lbl_syntax_error;
-
-	if (0 != get_param(line, 2, counterpath, sizeof(counterpath)))
-		goto lbl_syntax_error;
-
-        if (0 != get_param(line, 3, interval, sizeof(interval)))
-		goto lbl_syntax_error;
-
-	wcounterPath = zbx_acp_to_unicode(counterpath);
-	zbx_unicode_to_utf8_static(wcounterPath, counterpath, PDH_MAX_COUNTER_PATH);
-	zbx_free(wcounterPath);
-
-	if (FAIL == check_counter_path(counterpath))
-		goto lbl_syntax_error;
-
-	if (NULL != add_perf_counter(name, counterpath, atoi(interval)))
-		ret = SUCCEED;
-
-	return ret;
-lbl_syntax_error:
-	zabbix_log(LOG_LEVEL_WARNING, "PerfCounter \"%s\" FAILED: Invalid format.", line);
-
-	return FAIL;
 }
 
 /******************************************************************************
