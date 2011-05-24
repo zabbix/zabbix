@@ -1654,6 +1654,9 @@
 //	hostprofiles.php
 	'S_HOST_PROFILES'=>			_('Host profiles'),
 
+//	hostprofilesoverview.php
+	'S_HOST_PROFILE_OVERVIEW'=>			_('Host profile overview'),
+
 //	search.php
 	'S_EDIT_HOSTS' => _('Edit hosts'),
 	'S_SEARCH_BIG'=>			_('SEARCH'),

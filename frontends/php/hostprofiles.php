@@ -38,6 +38,7 @@ $fields=array(
 	'filter_set' =>		array(T_ZBX_STR, O_OPT,	P_ACT,	null,	null),
 	'filter_field'=>		array(T_ZBX_STR, O_OPT,  null,	null,	null),
 	'filter_field_value'=>	array(T_ZBX_STR, O_OPT,  null,	null,	null),
+	'filter_exact'=>        array(T_ZBX_INT, O_OPT,  null,	'IN(1,0)',	null),
 	//ajax
 	'favobj'=>			array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 	'favref'=>			array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
@@ -96,28 +97,38 @@ else{
 	if(isset($_REQUEST['filter_set'])){
 		$_REQUEST['filter_field'] = get_request('filter_field');
 		$_REQUEST['filter_field_value'] = get_request('filter_field_value');
+		$_REQUEST['filter_exact'] = get_request('filter_exact');
 		CProfile::update('web.hostprofiles.filter_field', $_REQUEST['filter_field'], PROFILE_TYPE_STR);
 		CProfile::update('web.hostprofiles.filter_field_value', $_REQUEST['filter_field_value'], PROFILE_TYPE_STR);
+		CProfile::update('web.hostprofiles.filter_exact', $_REQUEST['filter_exact'], PROFILE_TYPE_INT);
 	}
 	else{
 		$_REQUEST['filter_field'] = CProfile::get('web.hostprofiles.filter_field');
 		$_REQUEST['filter_field_value'] = CProfile::get('web.hostprofiles.filter_field_value');
+		$_REQUEST['filter_exact'] = CProfile::get('web.hostprofiles.filter_exact');
 	}
 
 	$filter_table = new CTable('', 'filter_config');
 	// getting profile fields to make a drop down
 	$profileFields = getHostProfiles(true); // 'true' means list should be ordered by title
-	$profileFieldsComboBox = new CComboBox('filter_field');
+	$profileFieldsComboBox = new CComboBox('filter_field', $_REQUEST['filter_field']);
 	foreach($profileFields as $profileField){
 		$profileFieldsComboBox->addItem(
 			$profileField['db_field'],
-			$profileField['title'],
-			$_REQUEST['filter_field'] === $profileField['db_field'] ? 'yes' : null // selected?
+			$profileField['title']
 		);
 	}
+	$exactComboBox = new CComboBox('filter_exact', $_REQUEST['filter_exact']);
+	$exactComboBox->addItem('0', _('like:'));
+	$exactComboBox->addItem('1', _('exactly:'));
 	$filter_table->addRow(array(
-		array(array(bold(_('Field:')), $profileFieldsComboBox)),
-		array(array(bold(_('Value like:')), new CTextBox('filter_field_value', $_REQUEST['filter_field_value'], 20))),
+		array(
+			array(bold(_('Field:')), $profileFieldsComboBox),
+			array(
+				$exactComboBox,
+				new CTextBox('filter_field_value', $_REQUEST['filter_field_value'], 20)
+			),
+		),
 	));
 
 	$reset = new CSpan(S_RESET,'link_menu');
@@ -193,12 +204,14 @@ else{
 			$hosts[$num]['pr_macaddress_a'] = $host['profile']['macaddress_a'];
 			// if we are filtering by profile field
 			if(!empty($_REQUEST['filter_field']) && !empty($_REQUEST['filter_field_value'])){
-				if(
-					zbx_strpos(
-						zbx_strtolower($hosts[$num]['profile'][$_REQUEST['filter_field']]),
-						zbx_strtolower($_REQUEST['filter_field_value'])
-					) === false
-				){
+				// must we filter exactly or using a substring (both are case insensitive)
+				$match = $_REQUEST['filter_exact']
+						? zbx_strtolower($hosts[$num]['profile'][$_REQUEST['filter_field']]) === zbx_strtolower($_REQUEST['filter_field_value'])
+						: zbx_strpos(
+							zbx_strtolower($hosts[$num]['profile'][$_REQUEST['filter_field']]),
+							zbx_strtolower($_REQUEST['filter_field_value'])
+						) !== false;
+				if(!$match){
 					unset($hosts[$num]);
 				}
 			}
