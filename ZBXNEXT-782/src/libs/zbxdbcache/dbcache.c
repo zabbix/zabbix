@@ -956,8 +956,8 @@ exit:
 static int	DBchk_double(double value)
 {
 	/* field with precision 16, scale 4 [NUMERIC(16,4)] */
-	register double	pg_min_numeric = (double)-1E12;
-	register double	pg_max_numeric = (double)1E12;
+	const double	pg_min_numeric = -1e12;
+	const double	pg_max_numeric = 1e12;
 
 	if (value <= pg_min_numeric || value >= pg_max_numeric)
 		return FAIL;
@@ -1077,7 +1077,7 @@ static void	DCadd_update_item_sql(int *sql_offset, DB_ITEM *item, ZBX_DC_HISTORY
 					zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 64,
 							",prevorgvalue='" ZBX_FS_UI64 "'", h->value_orig.u64);
 
-					if (item->prevorgvalue_null == 0 && item->prevorgvalue_uint64 <= h->value_orig.u64)
+					if (0 == item->prevorgvalue_null && item->prevorgvalue_uint64 <= h->value_orig.u64)
 					{
 						h->value.u64 = h->value_orig.u64 - item->prevorgvalue_uint64;
 						h->value.u64 = DBmultiply_value_uint64(item, h->value.u64);
@@ -1130,7 +1130,8 @@ notsupported:
 	}
 	else
 	{
-		/* Update item status if required */
+		/* update item status if required */
+
 		if (ITEM_STATUS_NOTSUPPORTED == item->status)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Item [%s] became supported", zbx_host_key_string(item->itemid));
@@ -2411,6 +2412,7 @@ static void	DCmove_text(char **str)
 		memmove(cache->last_text, *str, sz);
 		*str = cache->last_text;
 	}
+
 	cache->last_text += sz;
 }
 
@@ -2666,6 +2668,7 @@ static void	DCadd_history_log(zbx_uint64_t itemid, const char *value_orig, int c
 
 	if (HISTORY_LOG_VALUE_LEN_MAX < (len1 = strlen(value_orig) + 1))
 		len1 = HISTORY_LOG_VALUE_LEN_MAX;
+
 	if (NULL != source && '\0' != *source)
 	{
 		if (HISTORY_LOG_SOURCE_LEN_MAX < (len2 = strlen(source) + 1))
