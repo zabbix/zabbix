@@ -1119,7 +1119,7 @@ notsupported:
 			zabbix_log(LOG_LEVEL_WARNING, "Item [%s] became unsupported: %s",
 					zbx_host_key_string(h->itemid), h->value_orig.err);
 
-			zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 20, ",status=%d", h->status);
+			zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 20, ",status=%d", (int)h->status);
 		}
 
 		if (0 != strcmp(item->error, h->value_orig.err))
@@ -1134,18 +1134,15 @@ notsupported:
 	}
 	else
 	{
-		/* update item status if required */
 		if (ITEM_STATUS_NOTSUPPORTED == item->status)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Item [%s] became supported", zbx_host_key_string(item->itemid));
 
-			zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 32, ",status=%d,error=''",
-					h->status);
+			zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 32, ",status=%d,error=''", (int)h->status);
 		}
 	}
 
-	zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 32, " where itemid=" ZBX_FS_UI64 ";\n",
-			item->itemid);
+	zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 32, " where itemid=" ZBX_FS_UI64 ";\n", item->itemid);
 }
 
 /******************************************************************************
@@ -1218,31 +1215,36 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 		if (NULL == h)
 			continue;
 
-		item.status	= atoi(row[1]);
+		item.status = atoi(row[1]);
+
 		if (SUCCEED != DBis_null(row[2]))
-			item.lastclock	= atoi(row[2]);
+			item.lastclock = atoi(row[2]);
 		else
-			item.lastclock	= 0;
+			item.lastclock = 0;
+
 		if (SUCCEED != DBis_null(row[3]))
 		{
-			item.prevorgvalue_null	= 0;
-			switch (h->value_type) {
-			case ITEM_VALUE_TYPE_FLOAT:
-				item.prevorgvalue_dbl = atof(row[3]);
-				break;
-			case ITEM_VALUE_TYPE_UINT64:
-				ZBX_STR2UINT64(item.prevorgvalue_uint64, row[3]);
-				break;
+			item.prevorgvalue_null = 0;
+
+			switch (h->value_type)
+			{
+				case ITEM_VALUE_TYPE_FLOAT:
+					item.prevorgvalue_dbl = atof(row[3]);
+					break;
+				case ITEM_VALUE_TYPE_UINT64:
+					ZBX_STR2UINT64(item.prevorgvalue_uint64, row[3]);
+					break;
 			}
 		}
 		else
 			item.prevorgvalue_null = 1;
-		item.delta	= atoi(row[4]);
-		item.multiplier	= atoi(row[5]);
-		item.formula	= row[6];
-		item.history	= atoi(row[7]);
-		item.trends	= atoi(row[8]);
-		item.error	= row[9];
+
+		item.delta = atoi(row[4]);
+		item.multiplier = atoi(row[5]);
+		item.formula = row[6];
+		item.history = atoi(row[7]);
+		item.trends = atoi(row[8]);
+		item.error = row[9];
 
 		if (0 != (zbx_process & ZBX_PROCESS_PROXY))
 		{
