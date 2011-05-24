@@ -51,151 +51,132 @@ int	CONFIG_BUFFER_SEND		= 5;
 
 int	CONFIG_MAX_LINES_PER_SECOND	= 100;
 
-void	load_config()
+char	**CONFIG_ALIASES                = NULL;
+char	**CONFIG_USER_PARAMETERS        = NULL;
+#if defined(_WINDOWS)
+char	**CONFIG_PERF_COUNTERS          = NULL;
+#endif
+
+/******************************************************************************
+ *                                                                            *
+ * Function: load_aliases                                                     *
+ *                                                                            *
+ * Purpose: load aliases from configuration                                   *
+ *                                                                            *
+ * Parameters: lines - aliase entries from configuration file                 *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Vladimir Levijev                                                   *
+ *                                                                            *
+ * Comments: calls add_alias() for each entry                                 *
+ *                                                                            *
+ ******************************************************************************/
+void	load_aliases(char **lines)
 {
-	AGENT_RESULT	result;
-	char		**value = NULL;
+	char	*value, **pline;
 
-	struct cfg_line	cfg[] =
+	for (pline = lines; NULL != *pline; pline++)
 	{
-		/* PARAMETER,			VAR,					FUNC,
-			TYPE,		MANDATORY,	MIN,			MAX */
-		{"Server",			&CONFIG_HOSTS_ALLOWED,			NULL,
-			TYPE_STRING,	PARM_MAND,	0,			0},
-		{"Hostname",			&CONFIG_HOSTNAME,			NULL,
-			TYPE_STRING,	PARM_OPT,	0,			0},
-		{"BufferSize",			&CONFIG_BUFFER_SIZE,			NULL,
-			TYPE_INT,	PARM_OPT,	2,			65535},
-		{"BufferSend",			&CONFIG_BUFFER_SEND,			NULL,
-			TYPE_INT,	PARM_OPT,	1,			SEC_PER_HOUR},
-#ifdef USE_PID_FILE
-		{"PidFile",			&CONFIG_PID_FILE,			NULL,
-			TYPE_STRING,	PARM_OPT,	0,			0},
-#endif	/* USE_PID_FILE */
-		{"LogFile",			&CONFIG_LOG_FILE,			NULL,
-			TYPE_STRING,	PARM_OPT,	0,			0},
-		{"LogFileSize",			&CONFIG_LOG_FILE_SIZE,			NULL,
-			TYPE_INT,	PARM_OPT,	0,			1024},
-		{"DisableActive",		&CONFIG_DISABLE_ACTIVE,			NULL,
-			TYPE_INT,	PARM_OPT,	0,			1},
-		{"DisablePassive",		&CONFIG_DISABLE_PASSIVE,		NULL,
-			TYPE_INT,	PARM_OPT,	0,			1},
-		{"Timeout",			&CONFIG_TIMEOUT,			NULL,
-			TYPE_INT,	PARM_OPT,	1,			30},
-		{"ListenPort",			&CONFIG_LISTEN_PORT,			NULL,
-			TYPE_INT,	PARM_OPT,	1024,			32767},
-		{"ServerPort",			&CONFIG_SERVER_PORT,			NULL,
-			TYPE_INT,	PARM_OPT,	1024,			32767},
-		{"ListenIP",			&CONFIG_LISTEN_IP,			NULL,
-			TYPE_STRING,	PARM_OPT,	0,			0},
-		{"SourceIP",			&CONFIG_SOURCE_IP,			NULL,
-			TYPE_STRING,	PARM_OPT,	0,			0},
-		{"DebugLevel",			&CONFIG_LOG_LEVEL,			NULL,
-			TYPE_INT,	PARM_OPT,	0,			4},
-		{"StartAgents",			&CONFIG_ZABBIX_FORKS,			NULL,
-			TYPE_INT,	PARM_OPT,	1,			100},
-		{"RefreshActiveChecks",		&CONFIG_REFRESH_ACTIVE_CHECKS,		NULL,
-			TYPE_INT,	PARM_OPT,	SEC_PER_MIN,		SEC_PER_HOUR},
-		{"MaxLinesPerSecond",		&CONFIG_MAX_LINES_PER_SECOND,		NULL,
-			TYPE_INT,	PARM_OPT,	1,			1000},
-		{"AllowRoot",			&CONFIG_ALLOW_ROOT,			NULL,
-			TYPE_INT,	PARM_OPT,	0,			1},
-		{NULL}
-	};
-
-	memset(&result, 0, sizeof(AGENT_RESULT));
-
-	parse_cfg_file(CONFIG_FILE, cfg);
-
-#ifdef USE_PID_FILE
-	if (NULL == CONFIG_PID_FILE)
-	{
-		CONFIG_PID_FILE = "/tmp/zabbix_agentd.pid";
-	}
-#endif	/* USE_PID_FILE */
-
-	if (NULL == CONFIG_HOSTNAME || '\0'== *CONFIG_HOSTNAME)
-	{
-		if (NULL != CONFIG_HOSTNAME)
-			zbx_free(CONFIG_HOSTNAME);
-
-		if (SUCCEED == process("system.hostname", 0, &result))
+		if (NULL == (value = strchr(*pline, ':')))
 		{
-			if (NULL != (value = GET_STR_RESULT(&result)))
-			{
-				CONFIG_HOSTNAME = strdup(*value);
-
-				/* If auto registration is used, our CONFIG_HOSTNAME will make it into the  */
-				/* server's database, where it is limited by HOST_HOST_LEN (currently, 64), */
-				/* so to make it work properly we need to truncate our hostname.            */
-				if (strlen(CONFIG_HOSTNAME) > 64)
-					CONFIG_HOSTNAME[64] = '\0';
-			}
+			zabbix_log(LOG_LEVEL_CRIT, "Alias \"%s\" FAILED: not colon-separated", *pline);
+			exit(FAIL);
 		}
-		free_result(&result);
+		*value++ = '\0';
 
-		if (NULL == CONFIG_HOSTNAME)
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "Hostname is not defined");
-			exit(1);
-		}
-	}
-	else
-	{
-		if (strlen(CONFIG_HOSTNAME) > 64)
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "Hostname too long");
-			exit(1);
-		}
-	}
-
-	if (1 == CONFIG_DISABLE_ACTIVE && 1 == CONFIG_DISABLE_PASSIVE)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "Either active or passive checks must be enabled");
-		exit(1);
+		add_alias(*pline, value);
 	}
 }
 
-static int	add_parameter(char *key)
+/******************************************************************************
+ *                                                                            *
+ * Function: load_user_parameters                                             *
+ *                                                                            *
+ * Purpose: load user parameters from configuration                           *
+ *                                                                            *
+ * Parameters: lines - user parameter entries from configuration file         *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Vladimir Levijev                                                   *
+ *                                                                            *
+ * Comments: calls add_user_parameter() for each entry                        *
+ *                                                                            *
+ ******************************************************************************/
+void	load_user_parameters(char **lines)
 {
-	char	*command;
+	char	*command, **pline;
 
-	if (NULL == (command = strchr(key, ',')))
-		return FAIL;
+	for (pline = lines; NULL != *pline; pline++)
+	{
+		if (NULL == (command = strchr(*pline, ',')))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "UserParameter \"%s\" FAILED: not comma-separated", *pline);
+			exit(FAIL);
+		}
+		*command++ = '\0';
 
-	*command++ = '\0';
-
-	return add_user_parameter(key, command);
+		add_user_parameter(*pline, command);
+	}
 }
 
-void	load_user_parameters(int optional)
+#if defined(_WINDOWS)
+/******************************************************************************
+ *                                                                            *
+ * Function: load_perf_counters                                               *
+ *                                                                            *
+ * Purpose: load performance counters from configuration                      *
+ *                                                                            *
+ * Parameters: lines - array of PerfCounter configuration entries             *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Vladimir Levijev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	load_perf_counters(const char **lines)
 {
-	struct cfg_line	cfg[] =
+	char		name[MAX_STRING_LEN], counterpath[PDH_MAX_COUNTER_PATH], interval[8];
+	const char	**pline, *msg;
+	LPTSTR		wcounterPath;
+
+#define ZBX_PC_FAIL(_msg) {msg = _msg; goto pc_fail;}
+
+	for (pline = lines; NULL != *pline; pline++)
 	{
-		/* PARAMETER,			VAR,					FUNC,
-			TYPE,		MANDATORY,	MIN,			MAX */
-		{"EnableRemoteCommands",	&CONFIG_ENABLE_REMOTE_COMMANDS,		NULL,
-			TYPE_INT,	PARM_OPT,	0,			1},
-		{"LogRemoteCommands",		&CONFIG_LOG_REMOTE_COMMANDS,		NULL,
-			TYPE_INT,	PARM_OPT,	0,			1},
-		{"UnsafeUserParameters",	&CONFIG_UNSAFE_USER_PARAMETERS,		NULL,
-			TYPE_INT,	PARM_OPT,	0,			1},
-		{"Alias",			NULL,					&add_alias_from_config,
-			TYPE_STRING,	PARM_OPT,	0,			0},
-		{"UserParameter",		NULL,					&add_parameter,
-			0,		0,		0,			0},
-#ifdef _WINDOWS
-		{"PerfCounter",			NULL,					&add_perf_counter_from_config,
-			TYPE_STRING,	PARM_OPT,	0,			0},
+		if (3 < num_param(*pline))
+			ZBX_PC_FAIL("required parameter missing");
+
+		if (0 != get_param(*pline, 1, name, sizeof(name)))
+			ZBX_PC_FAIL("cannot parse key");
+
+		if (0 != get_param(*pline, 2, counterpath, sizeof(counterpath)))
+			ZBX_PC_FAIL("cannot parse counter path");
+
+		if (0 != get_param(*pline, 3, interval, sizeof(interval)))
+			ZBX_PC_FAIL("cannot parse interval");
+
+		wcounterPath = zbx_acp_to_unicode(counterpath);
+		zbx_unicode_to_utf8_static(wcounterPath, counterpath, PDH_MAX_COUNTER_PATH);
+		zbx_free(wcounterPath);
+
+		if (FAIL == check_counter_path(counterpath))
+			ZBX_PC_FAIL("invalid counter path");
+
+		if (NULL == add_perf_counter(name, counterpath, atoi(interval)))
+			ZBX_PC_FAIL("cannot add counter");
+
+		continue;
+pc_fail:
+		zabbix_log(LOG_LEVEL_CRIT, "PerfCounter '%s' FAILED: %s", *pline, msg);
+		exit(FAIL);
+	}
+#undef ZBX_PC_FAIL
+}
 #endif	/* _WINDOWS */
-		{NULL}
-	};
-
-	if (!optional)
-		parse_cfg_file(CONFIG_FILE, cfg);
-	else
-		parse_opt_cfg_file(CONFIG_FILE, cfg);
-}
 
 #ifdef _AIX
 void	tl_version()
