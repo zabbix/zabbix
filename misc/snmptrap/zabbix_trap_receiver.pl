@@ -41,24 +41,19 @@
 #
 # Mandatory: yes
 # Default:
-# $SNMPTrapperfile = "/tmp/zabbix_traps.tmp";
-$SNMPTrapperfile = "/home/rudolfs/stuff/snmp/test";
+$SNMPTrapperfile = "/tmp/zabbix_traps.tmp";
 
 ###################################
 #### ZABBIX SNMP TRAP RECEIVER ####
 ###################################
 
-use Fcntl qw(O_WRONLY O_APPEND O_CREAT LOCK_EX);
+use Fcntl qw(O_WRONLY O_APPEND O_CREAT);
 
 sub zabbix_receiver
 {
 	# open the output file
 	sysopen(OUTPUT_FILE, $SNMPTrapperfile, O_WRONLY|O_APPEND|O_CREAT, 0666) or
 		die "Cannot open [$SNMPTrapperfile]: $!\n";
-
-	# lock the output file for the Zabbix SNMP trapper
-	flock(OUTPUT_FILE, LOCK_EX) or
-		die "Cannot lock [$SNMPTrapperfile]: $!\n";
 
 	# print trap header
 	print OUTPUT_FILE "\n********** PERL RECEIVED A NOTIFICATION:\n";
