@@ -294,14 +294,14 @@ void	DCflush_nextchecks()
 		if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 			DBexecute("%s", sql);
 
+		DBcommit();
+
 		zbx_free(sql);
 	}
 
 	zbx_free(ids);
 
 	DCrelease_nextchecks();
-
-	DBcommit();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
