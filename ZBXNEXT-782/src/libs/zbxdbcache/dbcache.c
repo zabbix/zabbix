@@ -2573,8 +2573,6 @@ static void	DCadd_history(zbx_uint64_t itemid, double value_orig, int clock)
 	history->value_orig.dbl = value_orig;
 	history->value.dbl = 0;
 	history->value_null = 0;
-	history->keep_history = 0;
-	history->keep_trends = 0;
 
 	cache->stats.history_counter++;
 	cache->stats.history_float_counter++;
@@ -2597,8 +2595,6 @@ static void	DCadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value_orig, int
 	history->value_orig.ui64 = value_orig;
 	history->value.ui64 = 0;
 	history->value_null = 0;
-	history->keep_history = 0;
-	history->keep_trends = 0;
 
 	cache->stats.history_counter++;
 	cache->stats.history_uint_counter++;
@@ -2624,8 +2620,6 @@ static void	DCadd_history_str(zbx_uint64_t itemid, const char *value_orig, int c
 	history->value_type = ITEM_VALUE_TYPE_STR;
 	DCadd_text(&history->value_orig.str, value_orig, len);
 	history->value_null = 0;
-	history->keep_history = 0;
-	history->keep_trends = 0;
 
 	cache->stats.history_counter++;
 	cache->stats.history_str_counter++;
@@ -2651,8 +2645,6 @@ static void	DCadd_history_text(zbx_uint64_t itemid, const char *value_orig, int 
 	history->value_type = ITEM_VALUE_TYPE_TEXT;
 	DCadd_text(&history->value_orig.str, value_orig, len);
 	history->value_null = 0;
-	history->keep_history = 0;
-	history->keep_trends = 0;
 
 	cache->stats.history_counter++;
 	cache->stats.history_text_counter++;
@@ -2698,8 +2690,6 @@ static void	DCadd_history_log(zbx_uint64_t itemid, const char *value_orig, int c
 	history->logeventid = logeventid;
 	history->lastlogsize = lastlogsize;
 	history->mtime = mtime;
-	history->keep_history = 0;
-	history->keep_trends = 0;
 
 	cache->stats.history_counter++;
 	cache->stats.history_log_counter++;
@@ -2724,8 +2714,6 @@ static void	DCadd_history_notsupported(zbx_uint64_t itemid, const char *error, i
 	history->status = ITEM_STATUS_NOTSUPPORTED;
 	DCadd_text(&history->value_orig.err, error, len);
 	history->value_null = 1;
-	history->keep_history = 0;
-	history->keep_trends = 0;
 
 	cache->stats.history_counter++;
 	cache->stats.history_float_counter++;
