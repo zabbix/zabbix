@@ -1135,14 +1135,12 @@ notsupported:
 	else
 	{
 		/* update item status if required */
-
 		if (ITEM_STATUS_NOTSUPPORTED == item->status)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Item [%s] became supported", zbx_host_key_string(item->itemid));
 
-			item->status = ITEM_STATUS_ACTIVE;
 			zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 32, ",status=%d,error=''",
-					item->status);
+					h->status);
 		}
 	}
 
