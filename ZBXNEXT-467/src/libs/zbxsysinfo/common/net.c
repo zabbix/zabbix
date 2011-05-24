@@ -598,7 +598,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 	}
 #endif	/* _WINDOWS */
 
-	zbx_rtrim(buffer, "\n");
+	zbx_rtrim(buffer + MAX(offset - 1, 0), "\n");
 
 	SET_TEXT_RESULT(result, strdup(buffer));
 
