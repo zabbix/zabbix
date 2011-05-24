@@ -78,7 +78,7 @@ ZBX_DC_IDS		*ids = NULL;
 typedef union
 {
 	double		dbl;
-	zbx_uint64_t	u64;
+	zbx_uint64_t	ui64;
 	char		*str;
 	char		*err;
 }
@@ -440,25 +440,25 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 			}
 			else
 			{
-				ZBX_STR2UINT64(value_min.u64, row[2]);
-				ZBX_STR2UINT64(value_avg.u64, row[3]);
-				ZBX_STR2UINT64(value_max.u64, row[4]);
+				ZBX_STR2UINT64(value_min.ui64, row[2]);
+				ZBX_STR2UINT64(value_avg.ui64, row[3]);
+				ZBX_STR2UINT64(value_max.ui64, row[4]);
 
-				if (value_min.u64 < trend->value_min.u64)
-					trend->value_min.u64 = value_min.u64;
-				if (value_max.u64 > trend->value_max.u64)
-					trend->value_max.u64 = value_max.u64;
-				trend->value_avg.u64 = (trend->num * trend->value_avg.u64
-						+ num * value_avg.u64) / (trend->num + num);
+				if (value_min.ui64 < trend->value_min.ui64)
+					trend->value_min.ui64 = value_min.ui64;
+				if (value_max.ui64 > trend->value_max.ui64)
+					trend->value_max.ui64 = value_max.ui64;
+				trend->value_avg.ui64 = (trend->num * trend->value_avg.ui64
+						+ num * value_avg.ui64) / (trend->num + num);
 				trend->num += num;
 
 				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 						"update trends_uint set num=%d,value_min=" ZBX_FS_UI64 ",value_avg=" ZBX_FS_UI64
 						",value_max=" ZBX_FS_UI64 " where itemid=" ZBX_FS_UI64 " and clock=%d;\n",
 						trend->num,
-						trend->value_min.u64,
-						trend->value_avg.u64,
-						trend->value_max.u64,
+						trend->value_min.ui64,
+						trend->value_avg.ui64,
+						trend->value_max.ui64,
 						trend->itemid,
 						trend->clock);
 			}
@@ -582,9 +582,9 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 					trend->itemid,
 					trend->clock,
 					trend->num,
-					trend->value_min.u64,
-					trend->value_avg.u64,
-					trend->value_max.u64);
+					trend->value_min.ui64,
+					trend->value_avg.ui64,
+					trend->value_max.ui64);
 #else
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 256,
 					"insert into trends_uint (itemid,clock,num,value_min,value_avg,value_max)"
@@ -592,9 +592,9 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 					trend->itemid,
 					trend->clock,
 					trend->num,
-					trend->value_min.u64,
-					trend->value_avg.u64,
-					trend->value_max.u64);
+					trend->value_min.ui64,
+					trend->value_avg.ui64,
+					trend->value_max.ui64);
 #endif
 			trend->itemid = 0;
 
@@ -701,12 +701,12 @@ static void	DCadd_trend(ZBX_DC_HISTORY *history, ZBX_DC_TREND **trends, int *tre
 				+ history->value.dbl) / (trend->num + 1);
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
-			if (trend->num == 0 || history->value.u64 < trend->value_min.u64)
-				trend->value_min.u64 = history->value.u64;
-			if (trend->num == 0 || history->value.u64 > trend->value_max.u64)
-				trend->value_max.u64 = history->value.u64;
-			trend->value_avg.u64 = (trend->num * trend->value_avg.u64
-				+ history->value.u64) / (trend->num + 1);
+			if (trend->num == 0 || history->value.ui64 < trend->value_min.ui64)
+				trend->value_min.ui64 = history->value.ui64;
+			if (trend->num == 0 || history->value.ui64 > trend->value_max.ui64)
+				trend->value_max.ui64 = history->value.ui64;
+			trend->value_avg.ui64 = (trend->num * trend->value_avg.ui64
+				+ history->value.ui64) / (trend->num + 1);
 			break;
 	}
 	trend->num++;
@@ -1056,31 +1056,31 @@ static void	DCadd_update_item_sql(int *sql_offset, DB_ITEM *item, ZBX_DC_HISTORY
 						zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 19,
 								",prevorgvalue=null");
 
-					h->value.u64 = DBmultiply_value_uint64(item, h->value_orig.u64);
+					h->value.ui64 = DBmultiply_value_uint64(item, h->value_orig.ui64);
 					break;
 				case ITEM_STORE_SPEED_PER_SECOND:
 					zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 64,
-							",prevorgvalue='" ZBX_FS_UI64 "'", h->value_orig.u64);
+							",prevorgvalue='" ZBX_FS_UI64 "'", h->value_orig.ui64);
 
 					if (0 == item->prevorgvalue_null &&
-							item->prevorgvalue_uint64 <= h->value_orig.u64 &&
+							item->prevorgvalue_uint64 <= h->value_orig.ui64 &&
 							item->lastclock < h->clock)
 					{
-						h->value.u64 = (h->value_orig.u64 - item->prevorgvalue_uint64) /
+						h->value.ui64 = (h->value_orig.ui64 - item->prevorgvalue_uint64) /
 								(h->clock - item->lastclock);
-						h->value.u64 = DBmultiply_value_uint64(item, h->value.u64);
+						h->value.ui64 = DBmultiply_value_uint64(item, h->value.ui64);
 					}
 					else
 						h->value_null = 1;
 					break;
 				case ITEM_STORE_SIMPLE_CHANGE:
 					zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 64,
-							",prevorgvalue='" ZBX_FS_UI64 "'", h->value_orig.u64);
+							",prevorgvalue='" ZBX_FS_UI64 "'", h->value_orig.ui64);
 
-					if (0 == item->prevorgvalue_null && item->prevorgvalue_uint64 <= h->value_orig.u64)
+					if (0 == item->prevorgvalue_null && item->prevorgvalue_uint64 <= h->value_orig.ui64)
 					{
-						h->value.u64 = h->value_orig.u64 - item->prevorgvalue_uint64;
-						h->value.u64 = DBmultiply_value_uint64(item, h->value.u64);
+						h->value.ui64 = h->value_orig.ui64 - item->prevorgvalue_uint64;
+						h->value.ui64 = DBmultiply_value_uint64(item, h->value.ui64);
 					}
 					else
 						h->value_null = 1;
@@ -1091,7 +1091,7 @@ static void	DCadd_update_item_sql(int *sql_offset, DB_ITEM *item, ZBX_DC_HISTORY
 			{
 				zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 64,
 						",prevvalue=lastvalue,lastvalue='" ZBX_FS_UI64 "'",
-						h->value.u64);
+						h->value.ui64);
 			}
 			break;
 		case ITEM_VALUE_TYPE_STR:
@@ -1496,14 +1496,14 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 				"(" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 "),",
 				history[i].itemid,
 				history[i].clock,
-				history[i].value.u64);
+				history[i].value.ui64);
 #else
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 				"insert into history_uint (itemid,clock,value) values "
 				"(" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ");\n",
 				history[i].itemid,
 				history[i].clock,
-				history[i].value.u64);
+				history[i].value.ui64);
 #endif
 	}
 
@@ -1542,7 +1542,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 					get_nodeid_by_id(history[i].itemid),
 					history[i].itemid,
 					history[i].clock,
-					history[i].value.u64);
+					history[i].value.ui64);
 #else
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 					"insert into history_uint_sync (nodeid,itemid,clock,value) values "
@@ -1550,7 +1550,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 					get_nodeid_by_id(history[i].itemid),
 					history[i].itemid,
 					history[i].clock,
-					history[i].value.u64);
+					history[i].value.ui64);
 #endif
 		}
 
@@ -1894,14 +1894,14 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 				"(" ZBX_FS_UI64 ",%d,'" ZBX_FS_UI64 "'),",
 				history[i].itemid,
 				history[i].clock,
-				history[i].value_orig.u64);
+				history[i].value_orig.ui64);
 #else
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 				"insert into proxy_history (itemid,clock,value) values "
 				"(" ZBX_FS_UI64 ",%d,'" ZBX_FS_UI64 "');\n",
 				history[i].itemid,
 				history[i].clock,
-				history[i].value_orig.u64);
+				history[i].value_orig.ui64);
 #endif
 	}
 
@@ -2594,8 +2594,8 @@ static void	DCadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value_orig, int
 	history->clock = clock;
 	history->status = ITEM_STATUS_ACTIVE;
 	history->value_type = ITEM_VALUE_TYPE_UINT64;
-	history->value_orig.u64 = value_orig;
-	history->value.u64 = 0;
+	history->value_orig.ui64 = value_orig;
+	history->value.ui64 = 0;
 	history->value_null = 0;
 	history->keep_history = 0;
 	history->keep_trends = 0;
