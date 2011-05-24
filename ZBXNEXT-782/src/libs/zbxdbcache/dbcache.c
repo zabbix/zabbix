@@ -2661,7 +2661,7 @@ static void	DCadd_history_text(zbx_uint64_t itemid, const char *value_orig, int 
 }
 
 static void	DCadd_history_log(zbx_uint64_t itemid, const char *value_orig, int clock,
-		int timestamp, char *source, int severity, int logeventid, int lastlogsize, int mtime)
+		int timestamp, const char *source, int severity, int logeventid, int lastlogsize, int mtime)
 {
 	ZBX_DC_HISTORY	*history;
 	size_t		len1, len2;
@@ -2747,7 +2747,7 @@ static void	DCadd_history_notsupported(zbx_uint64_t itemid, const char *error, i
  *                                                                            *
  ******************************************************************************/
 void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, AGENT_RESULT *value, int now,
-		unsigned char status, const char *error, int timestamp, char *source, int severity,
+		unsigned char status, const char *error, int timestamp, const char *source, int severity,
 		int logeventid, int lastlogsize, int mtime)
 {
 	if (ITEM_STATUS_NOTSUPPORTED == status)

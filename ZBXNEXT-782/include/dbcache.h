@@ -115,7 +115,7 @@ DC_ITEM
 };
 
 void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, AGENT_RESULT *value, int now,
-		unsigned char status, const char *error, int timestamp, char *source, int severity,
+		unsigned char status, const char *error, int timestamp, const char *source, int severity,
 		int logeventid, int lastlogsize, int mtime);
 int	DCsync_history(int sync_type);
 void	init_database_cache(unsigned char p);
