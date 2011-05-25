@@ -36,9 +36,9 @@
 
 #if defined(ZABBIX_SERVICE)
 #	include "service.h"
-#elif defined(ZABBIX_DAEMON) /* ZABBIX_SERVICE */
+#elif defined(ZABBIX_DAEMON)
 #	include "daemon.h"
-#endif /* ZABBIX_DAEMON */
+#endif
 
 const char	*progname = NULL;
 
@@ -50,37 +50,31 @@ const char	*progname = NULL;
 #endif
 
 /* application TITLE */
-
 const char	title_message[] = APPLICATION_NAME
 #if defined(_WIN64)
 				" Win64"
 #elif defined(WIN32)
 				" Win32"
-#endif /* WIN32 */
+#endif
 #if defined(ZABBIX_SERVICE)
 				" (service)"
 #elif defined(ZABBIX_DAEMON)
 				" (daemon)"
-#endif /* ZABBIX_SERVICE */
+#endif
 	;
 /* end of application TITLE */
 
 
 /* application USAGE message */
-
 const char	usage_message[] =
 	"[-Vhp]"
 #ifdef _WINDOWS
 	" [-idsx] [-m]"
 #endif
 	" [-c <file>] [-t <item>]";
-
 /*end of application USAGE message */
 
-
-
 /* application HELP message */
-
 const char	*help_message[] = {
 	"Options:",
 	"",
@@ -106,17 +100,11 @@ const char	*help_message[] = {
 
 #endif
 
-	0 /* end of text */
+	0	/* end of text */
 };
-
 /* end of application HELP message */
 
-
-
 /* COMMAND LINE OPTIONS */
-
-/* long options */
-
 static struct zbx_option longopts[] =
 {
 	{"config",		1,	0,	'c'},
@@ -140,19 +128,15 @@ static struct zbx_option longopts[] =
 	{0,0,0,0}
 };
 
-/* short options */
-
 static char	shortopts[] =
 	"c:hVpt:"
 #ifdef _WINDOWS
 	"idsxm"
 #endif
 	;
+/* end of COMMAND LINE OPTIONS */
 
-/* end of COMMAND LINE OPTIONS*/
-
-static char	*TEST_METRIC = NULL;
-
+static char		*TEST_METRIC = NULL;
 int			threads_num = 0;
 ZBX_THREAD_HANDLE	*threads = NULL;
 
@@ -162,62 +146,61 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 
 	t->task = ZBX_TASK_START;
 
-	/* Parse the command-line. */
-	while ((ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)) != (char)EOF)
+	/* parse the command-line */
+	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
 	{
-		switch (ch) {
-		case 'c':
-			CONFIG_FILE = strdup(zbx_optarg);
-			break;
-		case 'h':
-			help();
-			exit(FAIL);
-			break;
-		case 'V':
-			version();
+		switch (ch)
+		{
+			case 'c':
+				CONFIG_FILE = strdup(zbx_optarg);
+				break;
+			case 'h':
+				help();
+				exit(FAIL);
+				break;
+			case 'V':
+				version();
 #ifdef _AIX
-			tl_version();
+				tl_version();
 #endif
-			exit(FAIL);
-			break;
-		case 'p':
-			if(t->task == ZBX_TASK_START)
-				t->task = ZBX_TASK_PRINT_SUPPORTED;
-			break;
-		case 't':
-			if(t->task == ZBX_TASK_START)
-			{
-				t->task = ZBX_TASK_TEST_METRIC;
-				TEST_METRIC = strdup(zbx_optarg);
-			}
-			break;
+				exit(FAIL);
+				break;
+			case 'p':
+				if(t->task == ZBX_TASK_START)
+					t->task = ZBX_TASK_PRINT_SUPPORTED;
+				break;
+			case 't':
+				if(t->task == ZBX_TASK_START)
+				{
+					t->task = ZBX_TASK_TEST_METRIC;
+					TEST_METRIC = strdup(zbx_optarg);
+				}
+				break;
 #ifdef _WINDOWS
-		case 'i':
-			t->task = ZBX_TASK_INSTALL_SERVICE;
-			break;
-		case 'd':
-			t->task = ZBX_TASK_UNINSTALL_SERVICE;
-			break;
-		case 's':
-			t->task = ZBX_TASK_START_SERVICE;
-			break;
-		case 'x':
-			t->task = ZBX_TASK_STOP_SERVICE;
-			break;
-		case 'm':
-			t->flags = ZBX_TASK_FLAG_MULTIPLE_AGENTS;
-			break;
+			case 'i':
+				t->task = ZBX_TASK_INSTALL_SERVICE;
+				break;
+			case 'd':
+				t->task = ZBX_TASK_UNINSTALL_SERVICE;
+				break;
+			case 's':
+				t->task = ZBX_TASK_START_SERVICE;
+				break;
+			case 'x':
+				t->task = ZBX_TASK_STOP_SERVICE;
+				break;
+			case 'm':
+				t->flags = ZBX_TASK_FLAG_MULTIPLE_AGENTS;
+				break;
 #endif
-		default:
-			t->task = ZBX_TASK_SHOW_USAGE;
-			break;
+			default:
+				t->task = ZBX_TASK_SHOW_USAGE;
+				break;
 		}
 	}
 
-	if(CONFIG_FILE == NULL)
-	{
+	if (NULL == CONFIG_FILE)
 		CONFIG_FILE = DEFAULT_CONFIG_FILE;
-	}
 }
 
 /******************************************************************************
@@ -551,7 +534,7 @@ void	zbx_on_exit()
 
 	ZBX_DO_EXIT();
 
-	if (threads != NULL)
+	if (NULL != threads)
 	{
 		int	i;
 
@@ -568,12 +551,10 @@ void	zbx_on_exit()
 	}
 
 #ifdef USE_PID_FILE
-
 	daemon_stop();
-
 #endif
 
-	zbx_sleep(2); /* wait for all threads closing */
+	zbx_sleep(2);	/* wait for all threads closing */
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent stopped. Zabbix %s (revision %s).",
 			ZABBIX_VERSION, ZABBIX_REVISION);
@@ -592,9 +573,7 @@ int	main(int argc, char **argv)
 	ZBX_TASK_EX	t;
 #ifdef _WINDOWS
 	int		r;
-#endif
 
-#ifdef _WINDOWS
 	/* Provide, so our process handles errors instead of the system itself. */
 	/* Attention!!! */
 	/* The system does not display the critical-error-handler message box. */
