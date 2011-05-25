@@ -16,7 +16,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-// javascript document
+
 
 // jQuery no conflict
 if(typeof(jQuery) != 'undefined'){
@@ -138,7 +138,7 @@ function SDJ(obj, name){
 
 	var debug = '';
 
-	var name = name || 'none';
+	name = name || 'none';
 	for(var key in obj){
 		if(typeof(obj[key]) == name) continue;
 
@@ -149,7 +149,7 @@ function SDJ(obj, name){
 
 /// Alpha-Betic sorting
 function addListener(element, eventname, expression, bubbling){
-	var bubbling = bubbling || false;
+	bubbling = bubbling || false;
 
 	element = $(element);
 	if(element.addEventListener){
@@ -500,7 +500,7 @@ function PopUp(url,width,height,form_name){
 }
 
 function redirect(uri, method, needle) {
-	var method = method || 'get';
+	method = method || 'get';
 	var url = new Curl(uri);
 
 	if(method.toLowerCase() == 'get'){

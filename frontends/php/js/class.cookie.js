@@ -1,4 +1,3 @@
-//Javascript document
 /*
 ** Zabbix
 ** Copyright (C) 2000-2011 Zabbix SIA
@@ -16,7 +15,7 @@
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-**/ 
+**/
 
 /************************************************************************************/
 /*								COOKIES CONTROL 									*/
@@ -40,7 +39,7 @@ init: function(){
 		}
 		else{
 			this.cookies[cookiePair[0]] = cookiePair[1];
-//SDI(cookiePair[0] + ' ' + cookiePair[1]);			
+//SDI(cookiePair[0] + ' ' + cookiePair[1]);
 		}
 	}
 },
@@ -51,12 +50,12 @@ create: function(name,value,days){
 		date.setTime(date.getTime()+(days*24*60*60*1000));
 		var expires = "; expires="+date.toGMTString();
 	}
-	else{ 
+	else{
 		var expires = "";
 	}
 
 	document.cookie = name+"="+value+expires+"; path=/";
-	
+
 // Apache header size limit
 	if(document.cookie.length > 8000){
 		document.cookie = name+"=; path=/";
@@ -74,10 +73,10 @@ createArray: function(name,value,days){
 	var list = value.join(',');
 	var list_part = "";
 	var part = 1;
-	
+
 	var part_count = parseInt(this.read(name+'_parts'),10);
 	if(is_null(part_count)) part_count = 1;
-	
+
 	var tmp_index = 0
 	var result = true;
 	while(list.length > 0){
@@ -99,7 +98,7 @@ createArray: function(name,value,days){
 	}
 
 	this.create(name+'_parts', part-1);
-	
+
 	while(part <= part_count){
 		this.erase(name+'_'+part);
 		part++;
@@ -118,7 +117,7 @@ createJSON: function(name,value,days){
 read: function(name){
 	if(typeof(this.cookies[name]) != 'undefined'){
 		return this.cookies[name];
-	} 
+	}
 	else if(document.cookie.indexOf(name) != -1){
 		var nameEQ = name + "=";
 		var ca = document.cookie.split(';');
@@ -167,7 +166,7 @@ printall: function(){
 	var allCookies = document.cookie.split('; ');
 	for (var i=0;i<allCookies.length;i++) {
 		var cookiePair = allCookies[i].split('=');
-		
+
 		SDI("[" + cookiePair[0] + "] is " + cookiePair[1]); // assumes print is already defined
 	}
 },
@@ -197,7 +196,7 @@ eraseArrayByPattern: function(pattern){
 		}
 	}
 }
-}
+};
 
 /*jslint browser: true */ /*global jQuery: true */
 

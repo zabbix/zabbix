@@ -452,7 +452,7 @@ function menu_item (o_parent, n_order) {
 			this.e_ielement.innerHTML = nText.substring(0, nText.length-10);
 			x--;
 			if(newResult < 1) {
-				this.e_ielement.innerHTML = this.e_ielement.innerHTML + '...';
+				this.e_ielement.innerHTML += '...';
 				x=0;
 				break;
 			}

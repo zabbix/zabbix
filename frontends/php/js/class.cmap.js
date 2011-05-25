@@ -144,14 +144,6 @@ function createMap(containerid, mapdata){
 
 		currentLinkId: '0', // linkid of currently edited link
 
-		mlinktrigger: {
-			linktriggerid:	0,					// ALWAYS must be a STRING (js doesn't support uint64)
-			triggerid:		0,					// ALWAYS must be a STRING (js doesn't support uint64)
-			desc_exp:		locale['S_SET_TRIGGER'],		// default trigger caption
-			drawtype:		0,
-			color:			'CC0000'
-		},
-
 		save: function(){
 			var url = new Curl(location.href);
 			jQuery.ajax({
@@ -198,6 +190,7 @@ function createMap(containerid, mapdata){
 				}
 			});
 		},
+
 		setContainer: function(){
 			var sysmap_pn = this.mapimg.position(),
 				sysmapHeight = this.mapimg.height(),

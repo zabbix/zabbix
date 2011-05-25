@@ -1,4 +1,3 @@
-//Javascript document
 /*
  ** Zabbix
  ** Copyright (C) 2000-2011 Zabbix SIA
@@ -147,4 +146,4 @@ toHtml: function(mstr, crlf, tag, option, tagEnd, offset, string){
 
 return mstr;
 }
-}
+};

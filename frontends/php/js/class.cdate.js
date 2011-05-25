@@ -1,4 +1,3 @@
-// JavaScript Document
 /*
 ** Zabbix
 ** Copyright (C) 2000-2011 Zabbix SIA
@@ -21,7 +20,6 @@
 // Title: CDate class
 // Author: Aly
 
-// [!CDATA[
 // Should be commented!!!
 //var PHP_TZ_OFFSET = 0;			// PHP Server TimeZone offset (seconds)
 
@@ -239,8 +237,8 @@ setMinutes: function(arg){
 //--
 
 	this.server = 1;
-	
-	this.serverDate.setMinutes(arg);;
+
+	this.serverDate.setMinutes(arg);
 	this.calcTZdiff();
 },
 
