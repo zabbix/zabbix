@@ -399,7 +399,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 #else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for SSH checks was not compiled in"));
 			res = NOTSUPPORTED;
-#endif	/* HAVE_SSH2 */
+#endif
 			break;
 		case ITEM_TYPE_TELNET:
 			alarm(CONFIG_TIMEOUT);
@@ -474,7 +474,6 @@ static int	get_values(unsigned char poller_type)
 	DCinit_nextchecks();
 
 	/* prepare items */
-
 	for (i = 0; i < num; i++)
 	{
 		init_result(&results[i]);
@@ -586,7 +585,6 @@ static int	get_values(unsigned char poller_type)
 	}
 
 	/* retrieve item values */
-
 	if (SUCCEED == errcodes[0])
 	{
 		if (SUCCEED != is_bunch_poller(poller_type))
@@ -603,7 +601,6 @@ static int	get_values(unsigned char poller_type)
 	}
 
 	/* process item values */
-
 	for (i = 0; i < num; i++)
 	{
 		switch (errcodes[i])
@@ -633,10 +630,12 @@ static int	get_values(unsigned char poller_type)
 		{
 			if (ITEM_STATUS_NOTSUPPORTED != items[i].status)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] is not supported",
-						items[i].host.host, items[i].key_orig);
-				zabbix_syslog("Item [%s:%s] is not supported",
-						items[i].host.host, items[i].key_orig);
+				zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] became unsupported: %s",
+						items[i].host.host, items[i].key_orig,
+						ISSET_MSG(&results[i]) ? results[i].msg : "(null)");
+				zabbix_syslog("Item [%s:%s] became unsupported: %s",
+						items[i].host.host, items[i].key_orig,
+						ISSET_MSG(&results[i]) ? results[i].msg : "(null)");
 			}
 
 			DCadd_nextcheck(items[i].itemid, timespecs[i].sec, results[i].msg);

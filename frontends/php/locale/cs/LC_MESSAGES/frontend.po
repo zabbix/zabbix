@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-05-17 20:13+0300\n"
+"POT-Creation-Date: 2011-05-20 18:14+0300\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -3788,6 +3788,10 @@ msgstr "ICMP Ping"
 msgid "ICMP ping"
 msgstr ""
 
+#: include/locales/en_gb.inc.php:548
+msgid "ID"
+msgstr "ID"
+
 #: include/locales/en_gb.inc.php:386
 msgid "IMAGES"
 msgstr "OBRÁZKY"
@@ -3922,10 +3926,6 @@ msgstr "Umístění popisku ikony"
 #: include/views/configuration.sysmap.edit.php:114
 msgid "Icon label type"
 msgstr "Typ popisku ikony"
-
-#: include/locales/en_gb.inc.php:548
-msgid "Id"
-msgstr "Id"
 
 #: include/locales/en_gb.inc.php:136
 msgid "Idle till"
@@ -5585,7 +5585,7 @@ msgstr ""
 #: include/views/configuration.action.edit.php:47
 #: include/views/configuration.discovery.edit.php:42
 #: include/views/configuration.sysmap.edit.php:48
-#: include/views/configuration.sysmap.edit.php:134 items.php:937
+#: include/views/configuration.sysmap.edit.php:134 items.php:915
 #: latest.php:209 popup.php:824 popup.php:955 popup.php:1056 popup.php:1064
 #: popup.php:1281 popup.php:1289 popup.php:1438 popup.php:1781 popup.php:1787
 #: queue.php:250 trigger_prototypes.php:45 triggers.php:46
@@ -8613,6 +8613,10 @@ msgstr "út"
 #: include/locales/en_gb.inc.php:48 include/locales/en_gb.inc.php:1393
 msgid "Tuesday"
 msgstr "úterý"
+
+#: include/locales.inc.php:76
+msgid "Turkish (TR)"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1024
 msgid "Two elements should be selected"
