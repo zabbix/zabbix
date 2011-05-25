@@ -166,9 +166,9 @@ int	SYSTEM_HOSTNAME(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	if (1 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, buffer, sizeof(buffer)) || '\0' == *buffer || 0 == strcmp(buffer, "NetBIOS"))
+	if (0 != get_param(param, 1, buffer, sizeof(buffer)) || '\0' == *buffer || 0 == strcmp(buffer, "netbios"))
 		netbios = 1;
-	else if (0 == strcmp(buffer, "hostname"))
+	else if (0 == strcmp(buffer, "host"))
 		netbios = 0;
 	else
 		return SYSINFO_RET_FAIL;
