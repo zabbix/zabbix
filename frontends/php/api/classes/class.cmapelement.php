@@ -674,7 +674,7 @@ COpt::memoryPick();
 
 		$update = array();
 		$urlsToDelete = $urlsToUpdate = $urlsToAdd = array();
-		foreach($selements as $snumm => $selement){
+		foreach($selements as $selement){
 			$update[] = array(
 				'values' => $selement,
 				'where' => array('selementid'=>$selement['selementid']),
