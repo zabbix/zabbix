@@ -64,7 +64,7 @@
 		if($condition)
 			return add_audit($action,$resourcetype,$details);
 
-	return false;
+		return false;
 	}
 
 	function add_audit($action,$resourcetype,$details){
@@ -74,7 +74,7 @@
 		$auditid = get_dbid('auditlog','auditid');
 
 		if(zbx_strlen($details) > 128)
-			$details = substr($details, 0, 125).'...';
+			$details = zbx_substr($details, 0, 125).'...';
 
 		$ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))?$_SERVER['HTTP_X_FORWARDED_FOR']:$_SERVER['REMOTE_ADDR'];
 
@@ -86,15 +86,15 @@
 			$result = $auditid;
 		}
 
-	return $result;
+		return $result;
 	}
 
 	function add_audit_ext($action, $resourcetype, $resourceid, $resourcename, $table_name, $values_old, $values_new){
 
 		if($action == AUDIT_ACTION_UPDATE){
 			$values_diff = array();
-			foreach ($values_new as $id => $value){
-				if ($values_old[$id] !== $value)
+			foreach($values_new as $id => $value){
+				if($values_old[$id] !== $value)
 					array_push($values_diff, $id);
 			}
 
@@ -104,8 +104,8 @@
 
 		$auditid = get_dbid('auditlog', 'auditid');
 
-		if (zbx_strlen($resourcename) > 255)
-			$resourcename = substr($resourcename, 0, 252).'...';
+		if(zbx_strlen($resourcename) > 255)
+			$resourcename = zbx_substr($resourcename, 0, 252).'...';
 
 		$ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))?$_SERVER['HTTP_X_FORWARDED_FOR']:$_SERVER['REMOTE_ADDR'];
 		/*SDI(
@@ -125,9 +125,9 @@
 			}
 		}
 
-		if ($result)
+		if($result)
 			$result = $auditid;
 
-	return $result;
+		return $result;
 	}
 ?>

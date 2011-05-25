@@ -215,7 +215,7 @@ int	SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	return SYSINFO_RET_OK;
 #else
 	return EXECUTE_STR(cmd, "uname -a", flags, result);
-#endif /* _WINDOWS */
+#endif	/* _WINDOWS */
 }
 
 int	SYSTEM_HOSTNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -235,5 +235,5 @@ int	SYSTEM_HOSTNAME(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	return SYSINFO_RET_OK;
 #else
 	return EXECUTE_STR(cmd, "hostname", flags, result);
-#endif /* _WINDOWS */
+#endif
 }
