@@ -136,8 +136,8 @@ updateSettings: function(){
 		'method': 'message.settings',
 		'params': {},
 		'onSuccess': this.setSettings.bind(this),
-		'onFailure': function(resp){zbx_throw('Messages Widget: settings request failed.');}
-	}
+		'onFailure': function(){zbx_throw('Messages Widget: settings request failed.');}
+	};
 
 	new RPC.Call(rpcRequest);
 },
@@ -146,7 +146,7 @@ addMessage: function(newMessage){
 	this.debug('addMessage');
 //--
 
-	var newMessage = newMessage || {};
+	newMessage = newMessage || {};
 
 	while(isset(this.msgcounter, this.messageList)){
 		this.msgcounter++;
@@ -199,8 +199,8 @@ mute: function(e){
 	var rpcRequest = {
 		'method': action,
 		'params': {},
-		'onFailure': function(resp){zbx_throw('Messages Widget: mute request failed.');}
-	}
+		'onFailure': function(){zbx_throw('Messages Widget: mute request failed.');}
+	};
 
 	new RPC.Call(rpcRequest);
 
@@ -237,7 +237,7 @@ playSound: function(messages){
 	}
 },
 
-stopSound: function(e){
+stopSound: function(){
 	this.debug('stopSound');
 //--
 	if(!is_null(this.sounds.sound)){
@@ -263,18 +263,18 @@ closeMessage: function(messageid, withEffect){
 		this.messageList[messageid] = null;
 	}
 
-	this.messagePipe = new Array();
+	this.messagePipe = [];
 	for(var messageid in this.messageList) this.messagePipe.push(messageid);
 
 	if(this.messagePipe.length < 1){
-		this.messagePipe = new Array();
+		this.messagePipe = [];
 		this.messageList = {};
 
 		setTimeout(Element.hide.bind(Element, this.dom.container), IE6?100:this.effectTimeout);
 	}
 },
 
-closeAllMessages: function(e){
+closeAllMessages: function(){
 	this.debug('closeAllMessages');
 //--
 	var lastMessageId = this.messagePipe.pop();
@@ -289,7 +289,7 @@ closeAllMessages: function(e){
 		},
 //		'onSuccess': function(resp){ SDI(resp)},
 		'onFailure': function(resp){zbx_throw('Messages Widget: message request failed.');}
-	}
+	};
 
 	new RPC.Call(rpcRequest);
 
@@ -300,7 +300,7 @@ closeAllMessages: function(e){
 	for(var messageid in this.messageList){
 		if(empty(this.messageList[messageid])) continue;
 
-		if(!effect) 
+		if(!effect)
 			this.closeMessage(this, messageid, effect);
 		else
 			setTimeout(this.closeMessage.bind(this, messageid, effect), count * this.effectTimeout * 0.5);
@@ -343,8 +343,8 @@ getServerMessages: function(){
 			'messageLast': this.messageLast
 		},
 		'onSuccess': this.serverRespond.bind(this),
-		'onFailure': function(resp){zbx_throw('Messages Widget: message request failed.');}
-	}
+		'onFailure': function(){zbx_throw('Messages Widget: message request failed.');}
+	};
 
 //SDJ(rpcRequest.params.messageLast);
 
@@ -358,7 +358,7 @@ serverRespond: function(messages){
 //--
 
 	for(var i=0; i < messages.length; i++){
-		var message = this.addMessage(messages[i]);
+		this.addMessage(messages[i]);
 	}
 
 	this.playSound(messages);

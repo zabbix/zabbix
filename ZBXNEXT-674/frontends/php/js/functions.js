@@ -17,7 +17,7 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **
 */
-// JavaScript Document
+
 
 /**********************************************************************************************************************/
 //	Trigger log expression
@@ -353,7 +353,6 @@ function add_keyword(bt_type){
 	}
 	catch(e){
 		throw('Error: '+(IE?e.description:e));
-		return false;
 	}
 
 	if(typeof(expr.value) == 'undefined' || expr.value == '') return false;
@@ -502,7 +501,7 @@ submit : function(obj){
 	}
 	document.getElementsByName('frm_graph')[0].submit();
 }
-}
+};
 
 /************************************************************************************/
 /*										SERVICES 									*/
@@ -606,7 +605,7 @@ function check_childs(form_name, chkMain, chkName){
 
 	for (var i=0; i < frmForm.length; i++){
 		if(frmForm.elements[i].type != 'checkbox') continue;
-		if(frmForm.elements[i].disabled == true) continue;
+		if(frmForm.elements[i].disabled) continue;
 
 		var splt = frmForm.elements[i].name.split('[');
 		var name = splt[0];
@@ -657,7 +656,7 @@ function cloneRow(elementid, count){
 //------------------------------------------------------
 
 function create_page_menu(e,id){
-	if(!e) var e = window.event;
+	if(!e) e = window.event;
 	id='menu_'+id;
 
 	var dbrd_menu = new Array();

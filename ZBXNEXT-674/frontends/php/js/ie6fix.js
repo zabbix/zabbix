@@ -7,7 +7,7 @@ run: function(el) {
 	this.root = el;
 	this.fnLoadPngs();
 },
-		
+
 fnLoadPngs: function(){
 	if(this.root){
 		this.root = document.getElementById(this.root);
@@ -82,7 +82,7 @@ function showPopupDiv(divID,iFrameID){
 	}
 
 //Increase default zIndex of div by 1, so that DIV appears before IFrame
-	divPopup.style.zIndex=divPopup.style.zIndex+1;
+	divPopup.style.zIndex += 1;
 	//iFrame.style.zIndex = 1;
 
 	var divCumOff = $(divID).cumulativeOffset();
