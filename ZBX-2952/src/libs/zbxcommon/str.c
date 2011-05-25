@@ -3147,8 +3147,8 @@ char	*str_linefeed(const char *src, size_t maxline, const char *delim)
 	char		*p_dst;	/* working pointer to output */
 
 	/* check input */
-	if (NULL == src || 1 > maxline)
-		return NULL;
+	assert(NULL != src);
+	assert(0 < maxline);
 
 	/* default delimiter */
 	if (NULL == delim)
@@ -3158,7 +3158,7 @@ char	*str_linefeed(const char *src, size_t maxline, const char *delim)
 	delim_size = strlen(delim);
 
 	/* make sure we don't feed the last line */
-	feeds = src_size / maxline - (0 != src_size % maxline ? 0 : 0 < src_size ? 1 : 0);
+	feeds = src_size / maxline - (0 != src_size % maxline || 0 == src_size ? 0 : 1);
 
 	left = src_size - feeds * maxline;
 	dst_size = src_size + feeds * delim_size + 1;
