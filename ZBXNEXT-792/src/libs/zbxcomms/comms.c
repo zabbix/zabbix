@@ -229,29 +229,16 @@ struct hostent	*zbx_gethost(const char *hostname)
 
 #define ZBX_TCP_START() { if( FAIL == tcp_started ) tcp_started = zbx_tcp_start(); }
 
-/* static (winXX threads require OFF) */ int	tcp_started = FAIL;
+int	tcp_started = FAIL;	/* winXX threads require tcp_started not to be static */
 
 static int	zbx_tcp_start()
 {
-	WSADATA sockInfo;
+	WSADATA	sockInfo;
+	int	ret;
 
-	switch (WSAStartup(MAKEWORD(2, 2), &sockInfo))
+	if (SUCCEED != (ret = WSAStartup(MAKEWORD(2, 2), &sockInfo)))
 	{
-		case WSASYSNOTREADY:
-			zbx_set_tcp_strerror("Underlying network subsystem is not ready for network communication.");
-			return FAIL;
-		case WSAVERNOTSUPPORTED:
-			zbx_set_tcp_strerror("The version of Windows Sockets support requested is not provided.");
-			return FAIL;
-		case WSAEINPROGRESS:
-			zbx_set_tcp_strerror("A blocking Windows Sockets 1.1 operation is in progress.");
-			return FAIL;
-		case WSAEPROCLIM:
-			zbx_set_tcp_strerror("Limit on the number of tasks supported by the Windows Sockets implementation has been reached.");
-			return FAIL;
-		case WSAEFAULT:
-			zbx_set_tcp_strerror("The lpWSAData is not a valid pointer.");
-			return FAIL;
+		zbx_set_tcp_strerror("WSAStartup() failed: %s", strerror_from_system(ret));
 	}
 
 	return SUCCEED;
