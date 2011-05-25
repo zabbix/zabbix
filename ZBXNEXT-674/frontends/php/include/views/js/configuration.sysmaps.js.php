@@ -45,9 +45,9 @@
 					<td><?php echo _('Area size'); ?></td>
 					<td>
 						<label for="areaSizeWidth"><?php echo _('Width'); ?></label>
-						<input id="areaSizeWidth" type="text" class="input text" name="areasizewidth" value="200">
+						<input id="areaSizeWidth" type="text" class="input text" name="width" value="200">
 						<label for="areaSizeHeight"><?php echo _('Height'); ?></label>
-						<input id="areaSizeHeight" type="text" class="input text" name="areasizeheight" value="200">
+						<input id="areaSizeHeight" type="text" class="input text" name="height" value="200">
 					</td>
 				</tr>
 				<tr id="areaPlacingRow">
