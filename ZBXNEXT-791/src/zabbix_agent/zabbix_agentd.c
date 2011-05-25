@@ -230,7 +230,7 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Vladimir Levijev                                                   *
+ * Author: Vladimir Levijev, Rudolfs Kreicbergs                               *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -242,26 +242,34 @@ static void	set_defaults()
 
 	memset(&result, 0, sizeof(AGENT_RESULT));
 
-	/* hostname */
-	if (SUCCEED == process("system.hostname", 0, &result))
+	if (NULL == CONFIG_HOSTNAME)
 	{
-		if (NULL == (value = GET_STR_RESULT(&result)))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed to get system hostname (system.hostname)");
-		}
-		else
-		{
-			assert(*value);
+		if (NULL == CONFIG_HOSTNAME_ITEM)
+			CONFIG_HOSTNAME_ITEM = zbx_strdup(CONFIG_HOSTNAME_ITEM, "system.hostname");
 
-			CONFIG_HOSTNAME = zbx_strdup(CONFIG_HOSTNAME, *value);
+		if (SUCCEED == process(CONFIG_HOSTNAME_ITEM, PROCESS_LOCAL_COMMAND, &result))
+		{
+			if (NULL != (value = GET_STR_RESULT(&result)))
+			{
+				assert(*value);
 
-			/* If auto registration is used, our CONFIG_HOSTNAME will make it into the  */
-			/* server's database, where it is limited by HOST_HOST_LEN (currently, 64), */
-			/* so to make it work properly we need to truncate our hostname.            */
-			if (strlen(CONFIG_HOSTNAME) > 64)
-				CONFIG_HOSTNAME[64] = '\0';
+				CONFIG_HOSTNAME = zbx_strdup(CONFIG_HOSTNAME, *value);
+				/* If auto registration is used, our CONFIG_HOSTNAME will make it into the  */
+				/* server's database, where it is limited by HOST_HOST_LEN (currently, 64), */
+				/* so to make it work properly we need to truncate our hostname.            */
+				if (strlen(CONFIG_HOSTNAME) > 64)
+				{
+					CONFIG_HOSTNAME[64] = '\0';
+					zabbix_log(LOG_LEVEL_WARNING, "hostname truncated to [%s])", CONFIG_HOSTNAME);
+				}
+			}
+			else
+				zabbix_log(LOG_LEVEL_WARNING, "failed to get system hostname from [%s])", CONFIG_HOSTNAME_ITEM);
 		}
 	}
+	else if (NULL != CONFIG_HOSTNAME_ITEM)
+		zabbix_log(LOG_LEVEL_WARNING, "both Hostname and HostnameItem defined, using [%s]", CONFIG_HOSTNAME);
+
 	free_result(&result);
 }
 
@@ -287,6 +295,8 @@ static void	zbx_load_config(int optional)
 		{"Server",			&CONFIG_HOSTS_ALLOWED,			TYPE_STRING,
 			PARM_MAND,	0,			0},
 		{"Hostname",			&CONFIG_HOSTNAME,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"HostnameItem",		&CONFIG_HOSTNAME_ITEM,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"BufferSize",			&CONFIG_BUFFER_SIZE,			TYPE_INT,
 			PARM_OPT,	2,			65535},
@@ -348,9 +358,9 @@ static void	zbx_load_config(int optional)
 	zbx_strarr_init(&CONFIG_PERF_COUNTERS);
 #endif
 
-	set_defaults();
-
 	parse_cfg_file(CONFIG_FILE, cfg, optional, ZBX_CFG_STRICT);
+
+	set_defaults();
 
 #ifdef USE_PID_FILE
 	if (NULL == CONFIG_PID_FILE)
@@ -399,7 +409,6 @@ static void	zbx_free_config()
  ******************************************************************************/
 static void	zbx_validate_config()
 {
-	/* hostname */
 	if (NULL == CONFIG_HOSTNAME)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "hostname is not defined");
@@ -454,8 +463,8 @@ int	MAIN_ZABBIX_ENTRY()
 	else
 		zabbix_open_log(LOG_TYPE_FILE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "Starting Zabbix Agent. Zabbix %s (revision %s).",
-			ZABBIX_VERSION, ZABBIX_REVISION);
+	zabbix_log(LOG_LEVEL_INFORMATION, "Starting Zabbix Agent '%s'. Zabbix %s (revision %s).",
+			CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
 
 	if (0 == CONFIG_DISABLE_PASSIVE)
 	{

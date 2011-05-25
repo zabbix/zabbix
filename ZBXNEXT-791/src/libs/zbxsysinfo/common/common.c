@@ -35,7 +35,7 @@
 #else
 #	define VFS_TEST_FILE "c:\\windows\\win.ini"
 #	define VFS_TEST_REGEXP "fonts"
-#endif /* _WINDOWS */
+#endif
 
 extern int	CONFIG_TIMEOUT;
 
@@ -230,17 +230,14 @@ static int	SYSTEM_RUN(const char *cmd, const char *param, unsigned flags, AGENT_
 	char			full_command[MAX_STRING_LEN];
 	LPTSTR			wcommand;
 	int			ret = SYSINFO_RET_FAIL;
-#else /* not _WINDOWS */
+#else
 	pid_t			pid;
 #endif
 
-	if (1 != CONFIG_ENABLE_REMOTE_COMMANDS)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "ZBX_NOTSUPPORTED"));
+	if (1 != CONFIG_ENABLE_REMOTE_COMMANDS && 0 == (flags & PROCESS_LOCAL_COMMAND))
 		return SYSINFO_RET_FAIL;
-	}
 
-	if (num_param(param) > 2)
+	if (2 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 1, command, sizeof(command)))
