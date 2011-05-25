@@ -128,7 +128,7 @@ ZBX_DC_STATS
 	zbx_uint64_t	history_str_counter;	/* the number of processed str values */
 	zbx_uint64_t	history_log_counter;	/* the number of processed log values */
 	zbx_uint64_t	history_text_counter;	/* the number of processed text values */
-	zbx_uint64_t	history_ns_counter;	/* the number of processed not-supported items */
+	zbx_uint64_t	notsupported_counter;	/* the number of processed not supported items */
 };
 
 ZBX_DC_CACHE
@@ -189,8 +189,8 @@ void	*DCget_stats(int request)
 	case ZBX_STATS_HISTORY_TEXT_COUNTER:
 		value_uint = cache->stats.history_text_counter;
 		return &value_uint;
-	case ZBX_STATS_HISTORY_NS_COUNTER:
-		value_uint = cache->stats.history_ns_counter;
+	case ZBX_STATS_NOTSUPPORTED_COUNTER:
+		value_uint = cache->stats.notsupported_counter;
 		return &value_uint;
 	case ZBX_STATS_HISTORY_TOTAL:
 		value_uint = CONFIG_HISTORY_CACHE_SIZE;
@@ -2719,8 +2719,7 @@ static void	DCadd_history_notsupported(zbx_uint64_t itemid, const char *error, i
 	DCadd_text(&history->value_orig.err, error, len);
 	history->value_null = 1;
 
-	cache->stats.history_counter++;
-	cache->stats.history_ns_counter++;
+	cache->stats.notsupported_counter++;
 
 	UNLOCK_CACHE;
 }
