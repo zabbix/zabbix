@@ -446,7 +446,7 @@ int	MAIN_ZABBIX_ENTRY()
 	else
 		zabbix_open_log(LOG_TYPE_FILE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "Starting Zabbix Agent '%s'. Zabbix %s (revision %s).",
+	zabbix_log(LOG_LEVEL_INFORMATION, "Starting Zabbix Agent [%s]. Zabbix %s (revision %s).",
 			CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
 
 	if (0 == CONFIG_DISABLE_PASSIVE)
