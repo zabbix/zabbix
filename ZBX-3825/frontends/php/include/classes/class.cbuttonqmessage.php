@@ -46,14 +46,13 @@ class CButtonQMessage extends CButton{
 
 	public function setMessage($value=NULL){
 		if(is_null($value))
-			$value = 'Are You Sure?';
+			$value = 'Are you sure you want perform this action?';
 
 		if(!is_string($value)){
 			return $this->error('Incorrect value for setMessage ['.$value.']');
 		}
 		// if message will contain single quotes, it will break everything, so it must be escaped
-		// escaping gives unneeded quotes at the beginning and in the end, so they should be trimmed
-		$this->msg = trim(zbx_jsvalue($value), "'");
+		$this->msg = zbx_jsvalue($value, null, false); // false - do not add quotes to the string
 		$this->setAction(NULL);
 	}
 

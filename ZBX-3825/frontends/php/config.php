@@ -647,6 +647,7 @@ include_once('include/page_header.php');
 	elseif($_REQUEST["config"]==3){ // Images
 		if(isset($_REQUEST["form"])){
 			$frmImages = new CFormTable(S_IMAGE, 'config.php', 'post', 'multipart/form-data');
+			$frmImages->setHelp('web.config.images.php');
 			$frmImages->addVar('config', get_request('config',3));
 
 			if(isset($_REQUEST['imageid'])){

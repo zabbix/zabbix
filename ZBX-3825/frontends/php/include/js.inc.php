@@ -1,28 +1,38 @@
 <?php
 
-/* function:
- *     zbx_jsvalue
- *
- * description:
- *	convert PHP variable to string version
- *      of JavaScrip style
- *
- * author: Eugene Grigorjev
+/**
+ * Convert PHP variable to string version of JavaScript style
+ * @author Eugene Grigorjev
+ * @param string $value
+ * @param null $object
+ * @param bool $addQuotes whether quotes should be added at the beginning and at the end of string
+ * @return string
  */
-function zbx_jsvalue($value, $object = null){
+function zbx_jsvalue($value, $object = null, $addQuotes=true){
 	if(!is_array($value)) {
-		if(is_object($value)) return unpack_object($value);
-		if(is_string($value)) return '\''.str_replace('\'','\\\'',			/*  '	=> \'	*/
-							str_replace("\n", '\n', 		/*  LF	=> \n	*/
-								str_replace('"', '\"', 	/*  "	=> \" */
-									str_replace("\\", "\\\\", 	/*  \	=> \\	*/
-										str_replace("\r", '', 	/*  CR	=> remove */
-										($value)))))).'\'';
-		if(is_null($value)) return 'null';
-	return strval($value);
+		if(is_object($value)){
+			return unpack_object($value);
+		}
+		if(is_string($value)){
+			$escaped = str_replace("\r", '', $value); // removing caret returns
+			$escaped = str_replace("\\", "\\\\", $escaped); // escaping slashes: \ => \\
+			$escaped = str_replace('"', '\"', $escaped); // escaping quotes: " => \"
+			$escaped = str_replace("\n", '\n', $escaped); // changing LF to '\n' string
+			$escaped = str_replace('\'', '\\\'', $escaped); // escaping single quotes: ' => \'
+			if($addQuotes){
+				$escaped = "'".$escaped."'";
+			}
+			return $escaped;
+		}
+		if(is_null($value)){
+			return 'null';
+		}
+		return strval($value);
 	}
 
-	if(count($value) == 0) return ($object)?'{}':'[]';
+	if(count($value) == 0){
+		return ($object)?'{}':'[]';
+	}
 
 
 	foreach($value as $id => $v){
@@ -30,10 +40,12 @@ function zbx_jsvalue($value, $object = null){
 		$value[$id] = (isset($is_object) ? '\''.$id.'\' : ' : '').zbx_jsvalue($v, $object);
 	}
 
-	if(isset($is_object))
+	if(isset($is_object)){
 		return '{'.implode(',',$value).'}';
-	else
+	}
+	else{
 		return '['.implode(',',$value).']';
+	}
 }
 
 /* function:
