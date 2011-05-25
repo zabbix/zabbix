@@ -1116,7 +1116,7 @@ notsupported:
 	{
 		if (ITEM_STATUS_NOTSUPPORTED != item->status)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Item [%s] became unsupported: %s",
+			zabbix_log(LOG_LEVEL_WARNING, "Item [%s] became not supported: %s",
 					zbx_host_key_string(h->itemid), h->value_orig.err);
 
 			zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 20, ",status=%d", (int)h->status);
