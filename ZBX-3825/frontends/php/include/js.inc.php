@@ -52,7 +52,7 @@ function zbx_jsvalue($value, $object = null, $addQuotes=true){
  *     zbx_add_post_js
  *
  * description:
- *	add JavaScript for calling after page loaging.
+ *	add JavaScript for calling after page loading.
  *
  * author: Eugene Grigorjev
  */
