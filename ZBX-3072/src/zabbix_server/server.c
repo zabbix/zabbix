@@ -899,10 +899,7 @@ void	zbx_on_exit()
 		{
 			if (threads[i])
 			{
-				if (-1 == kill(threads[i], SIGTERM))
-					zabbix_log(LOG_LEVEL_ERR, "failed to send SIGTERM to child process %d: %s",
-							threads[i], zbx_strerror(errno));
-
+				kill(threads[i], SIGTERM);
 				threads[i] = ZBX_THREAD_HANDLE_NULL;
 			}
 		}
