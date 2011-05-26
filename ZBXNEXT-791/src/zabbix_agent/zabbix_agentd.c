@@ -230,27 +230,25 @@ static void	set_defaults()
 		if (NULL == CONFIG_HOSTNAME_ITEM)
 			CONFIG_HOSTNAME_ITEM = zbx_strdup(CONFIG_HOSTNAME_ITEM, "system.hostname");
 
-		if (SUCCEED == process(CONFIG_HOSTNAME_ITEM, PROCESS_LOCAL_COMMAND, &result))
+		if (SUCCEED == process(CONFIG_HOSTNAME_ITEM, PROCESS_LOCAL_COMMAND, &result) &&
+				NULL != (value = GET_STR_RESULT(&result)))
 		{
-			if (NULL != (value = GET_STR_RESULT(&result)))
+			assert(*value);
+
+			CONFIG_HOSTNAME = zbx_strdup(CONFIG_HOSTNAME, *value);
+
+			/* If auto registration is used, our CONFIG_HOSTNAME will make it into the  */
+			/* server's database, where it is limited by HOST_HOST_LEN (currently, 64), */
+			/* so to make it work properly we need to truncate our hostname.            */
+
+			if (64 < strlen(CONFIG_HOSTNAME))
 			{
-				assert(*value);
-
-				CONFIG_HOSTNAME = zbx_strdup(CONFIG_HOSTNAME, *value);
-
-				/* If auto registration is used, our CONFIG_HOSTNAME will make it into the  */
-				/* server's database, where it is limited by HOST_HOST_LEN (currently, 64), */
-				/* so to make it work properly we need to truncate our hostname.            */
-
-				if (64 < strlen(CONFIG_HOSTNAME))
-				{
-					CONFIG_HOSTNAME[64] = '\0';
-					zabbix_log(LOG_LEVEL_WARNING, "hostname truncated to [%s])", CONFIG_HOSTNAME);
-				}
+				CONFIG_HOSTNAME[64] = '\0';
+				zabbix_log(LOG_LEVEL_WARNING, "hostname truncated to [%s])", CONFIG_HOSTNAME);
 			}
-			else
-				zabbix_log(LOG_LEVEL_WARNING, "failed to get system hostname from [%s])", CONFIG_HOSTNAME_ITEM);
 		}
+		else
+			zabbix_log(LOG_LEVEL_WARNING, "failed to get system hostname from [%s])", CONFIG_HOSTNAME_ITEM);
 	}
 	else if (NULL != CONFIG_HOSTNAME_ITEM)
 		zabbix_log(LOG_LEVEL_WARNING, "both Hostname and HostnameItem defined, using [%s]", CONFIG_HOSTNAME);
