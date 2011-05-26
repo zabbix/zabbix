@@ -876,13 +876,13 @@ int	MAIN_ZABBIX_ENTRY()
 
 void	zbx_on_exit()
 {
-	int		i;
-	sigset_t	set;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called");
 
 	if (NULL != threads)
 	{
+		int		i;
+		sigset_t	set;
+
 		/* ignore SIGCHLD signals in order for zbx_sleep() to work  */
 		sigemptyset(&set);
 		sigaddset(&set, SIGCHLD);
