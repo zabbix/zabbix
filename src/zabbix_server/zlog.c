@@ -66,7 +66,8 @@ void	__zbx_zabbix_syslog(const char *fmt, ...)
 
 	num = DCconfig_get_items(0, SERVER_ZABBIXLOG_KEY, &items);
 	for (i = 0; i < num; i++)
-		dc_add_history(items[i].itemid, items[i].value_type, &agent, now, 0, NULL, 0, 0, 0, 0);
+		dc_add_history(items[i].itemid, items[i].value_type, &agent, now,
+				ITEM_STATUS_ACTIVE, NULL, 0, NULL, 0, 0, 0, 0);
 
 	zbx_free(items);
 	free_result(&agent);
