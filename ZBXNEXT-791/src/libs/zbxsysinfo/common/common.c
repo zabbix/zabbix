@@ -295,14 +295,14 @@ lbl_exit:
 	switch(pid)
 	{
 		case -1:
-			zabbix_log(LOG_LEVEL_WARNING, "fork failed for command '%s'",command);
+			zabbix_log(LOG_LEVEL_WARNING, "fork failed for command '%s'", command);
 			return SYSINFO_RET_FAIL;
 		case 0:
 			pid = zbx_fork();	/* run new thread 2 to replace by command */
 			switch(pid)
 			{
 				case -1:
-					zabbix_log(LOG_LEVEL_WARNING, "fork2 failed for '%s'",command);
+					zabbix_log(LOG_LEVEL_WARNING, "fork2 failed for '%s'", command);
 					return SYSINFO_RET_FAIL;
 				case 0:
 					/*
@@ -316,7 +316,7 @@ lbl_exit:
 
 					/* replace thread 2 by the execution of command */
 					if (execl("/bin/sh", "sh", "-c", command, (char *)0))
-						zabbix_log(LOG_LEVEL_WARNING, "execl failed for command '%s'",command);
+						zabbix_log(LOG_LEVEL_WARNING, "execl failed for command '%s'", command);
 
 					/* in a normal case the program will never reach this point */
 					exit(0);

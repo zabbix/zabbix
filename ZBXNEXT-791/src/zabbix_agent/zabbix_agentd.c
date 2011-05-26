@@ -166,11 +166,11 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				exit(FAIL);
 				break;
 			case 'p':
-				if(t->task == ZBX_TASK_START)
+				if (ZBX_TASK_START == t->task)
 					t->task = ZBX_TASK_PRINT_SUPPORTED;
 				break;
 			case 't':
-				if(t->task == ZBX_TASK_START)
+				if (ZBX_TASK_START == t->task)
 				{
 					t->task = ZBX_TASK_TEST_METRIC;
 					TEST_METRIC = strdup(zbx_optarg);
