@@ -1,21 +1,10 @@
-/*
-** Copyright (C) 2010-2011 Zabbix SIA
-**
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
-**
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-**/
-// JavaScript Document
+/*!
+ * This file is part of Zabbix software
+ *
+ * Copyright 2000-2011, Zabbix SIA
+ * Licensed under the GPL Version 2 license.
+ * http://www.zabbix.com/licence.php
+ */
 
 var ZBX_MESSAGES = new Array();				// obj instances
 function initMessages(args){					// use this function to initialize Messaging system
@@ -25,7 +14,6 @@ function initMessages(args){					// use this function to initialize Messaging sy
 return messagesListId;
 }
 
-// Puppet master Class
 // Author: Aly
 var CMessageList = Class.create(CDebug,{
 messageListId:			0,				// reference id
@@ -449,9 +437,6 @@ fixIE: function(){
 }
 });
 
-// JavaScript Document
-// Message Class
-// Author: Aly
 var CMessage = Class.create(CDebug,{
 list:				null,			// link to message list containing this message
 messageid:			null,			// msg id
@@ -574,11 +559,6 @@ fixIE: function(){
 	}
 }
 });
-
-
-// JavaScript Document
-// DOM Classes
-// Author: Aly
 
 var CNode = Class.create({
 node:		null,			// main node (ul)

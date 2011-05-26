@@ -1,26 +1,14 @@
-/*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
-**
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
-**
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-**/
+/*!
+ * This file is part of Zabbix software
+ *
+ * Copyright 2000-2011, Zabbix SIA
+ * Licensed under the GPL Version 2 license.
+ * http://www.zabbix.com/licence.php
+ */
 
-/************************************************************************************/
-/*								PAGE REFRESH										*/
-/************************************************************************************/
 // Author: Aly
+
+/*								PAGE REFRESH										*/
 var PageRefresh = {
 delay:			null,	// refresh timeout
 delayLeft:		null,	// left till refresh
@@ -59,11 +47,7 @@ restart: function(){
 }
 };
 
-/************************************************************************************/
 /*								MAIN MENU stuff										*/
-/************************************************************************************/
-// Author: Aly
-
 var MMenu = {
 menus:			{'empty': 0, 'view': 0, 'cm': 0, 'reports': 0, 'config': 0, 'admin': 0},
 def_label:		null,
@@ -106,11 +90,7 @@ showSubMenu: function(show_label){
 }
 };
 
-/************************************************************************************/
 /*						Automatic checkbox range selection 							*/
-/************************************************************************************/
-// Author: Aly
-
 var chkbxRange = {
 startbox:			null,			// start checkbox obj
 startbox_name: 		null,			// start checkbox name
@@ -353,9 +333,7 @@ submitGo: function(e){
 }
 };
 
-/************************************************************************************/
 /*								Audio Control System 								*/
-/************************************************************************************/
 var AudioList = {
 list:		{},		// audio files options
 dom:		{},		// dom objects links
@@ -560,10 +538,7 @@ remove: function(audiofile){
 }
 };
 
-/************************************************************************************/
 /*						Replace Standart Blink functionality						*/
-/************************************************************************************/
-// Author: Aly
 var blink = {
 	blinkobjs: new Array(),
 
@@ -591,9 +566,7 @@ var blink = {
 };
 
 
-/************************************************************************************/
 /*								ZABBIX HintBoxes 									*/
-/************************************************************************************/
 var hintBox = {
 boxes:				{},				// array of dom Hint Boxes
 boxesCount: 		0,				// unique box id
@@ -813,9 +786,7 @@ debug: function(fnc_name, id){
 }
 };
 
-/************************************************************************************/
 /*								COLOR PICKER FUNCTIONS 								*/
-/************************************************************************************/
 function hide_color_picker(){
 	if(!color_picker) return;
 
@@ -872,10 +843,7 @@ function set_color_by_name(name, color){
 	set_color(color);
 }
 
-/************************************************************************************/
 /*								ZABBIX AJAX REQUESTS 								*/
-/************************************************************************************/
-
 function add2favorites(favobj,favid){
 	if('undefined' == typeof(Ajax)){
 		throw("Prototype.js lib is required!");

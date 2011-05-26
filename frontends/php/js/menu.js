@@ -1,21 +1,10 @@
-/*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
-**
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
-**
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-**/
+/*!
+ * This file is part of Zabbix software
+ *
+ * Copyright 2000-2011, Zabbix SIA
+ * Licensed under the GPL Version 2 license.
+ * http://www.zabbix.com/licence.php
+ */
 
 // Title: tigra menu
 // Description: See the demo at url
@@ -304,7 +293,6 @@ function menu_onmousedown (n_id) {
 
 // --------------------------------------------------------------------------------
 // menu item Class
-
 function menu_item (o_parent, n_order) {
 
 	// store parameters passed to the constructor
@@ -504,8 +492,6 @@ function mitem_getstyle (n_pos, n_state) {
 	if(!a_css)
 		a_css = this.o_root.a_css_def;
 
-	//var a_css = this.o_root.a_css;
-
 	var a_oclass = a_css[n_pos ? 'inner' : 'outer'];
 
 	// same class for all states
@@ -514,7 +500,7 @@ function mitem_getstyle (n_pos, n_state) {
 
 
 	// inherit class from previous state if not explicitly defined
-	for (var n_currst = n_state; n_currst >= 0; n_currst--){
+	for(var n_currst = n_state; n_currst >= 0; n_currst--){
 		if(a_oclass[n_currst]) return a_oclass[n_currst];
 	}
 }

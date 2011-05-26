@@ -1,27 +1,12 @@
-/*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
-**
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
-**
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-**
-*/
+/*!
+ * This file is part of Zabbix software
+ *
+ * Copyright 2000-2011, Zabbix SIA
+ * Licensed under the GPL Version 2 license.
+ * http://www.zabbix.com/licence.php
+ */
 
-
-/**********************************************************************************************************************/
 //	Trigger log expression
-/**********************************************************************************************************************/
 var logexpr_count = 0;
 var key_count = 0;
 
@@ -486,9 +471,8 @@ function set_macro(v){
 
 	expr_temp.value = '{TRIGGER.VALUE}' + sign + v;
 }
-/************************************************************************************/
+
 /*								GRAPH RELATED STUFF 								*/
-/************************************************************************************/
 var graphs = {
 graphtype : 0,
 
@@ -503,9 +487,7 @@ submit : function(obj){
 }
 };
 
-/************************************************************************************/
 /*										SERVICES 									*/
-/************************************************************************************/
 function call_menu(evnt,id,name){
 	if(id != 0){
 		show_popup_menu(evnt,
@@ -650,11 +632,7 @@ function cloneRow(elementid, count){
 	newEntry.style.display = '';
 }
 
-
-//------------------------------------------------------
 //					DASHBOARD JS MENU
-//------------------------------------------------------
-
 function create_page_menu(e,id){
 	if(!e) e = window.event;
 	id='menu_'+id;
@@ -679,10 +657,7 @@ function create_page_menu(e,id){
 	show_popup_menu(e,dbrd_menu,280);// JavaScript Document
 }
 
-//------------------------------------------------------
 //					TRIGGERS JS MENU
-//------------------------------------------------------
-
 function create_mon_trigger_menu(e, args, items){
 	var tr_menu = new Array(['Triggers',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],
 								['Events','events.php?triggerid='+args[0].triggerid+'&nav_time='+args[0].lastchange,null]);
@@ -740,11 +715,7 @@ function create_mon_trigger_menu(e, args, items){
 	show_popup_menu(e,tr_menu,280);
 }
 
-
-//------------------------------------------------------
 //					USERS FORM
-//------------------------------------------------------
-
 function testUserSound(idx){
 	var sound = $(idx).options[$(idx).selectedIndex].value;
 	var repeat = $('messages[sounds.repeat]').options[$('messages[sounds.repeat]').selectedIndex].value;
