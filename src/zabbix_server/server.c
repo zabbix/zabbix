@@ -145,7 +145,7 @@ char	*CONFIG_TMPDIR			= NULL;
 char	*CONFIG_FPING_LOCATION		= NULL;
 #ifdef HAVE_IPV6
 char	*CONFIG_FPING6_LOCATION		= NULL;
-#endif /* HAVE_IPV6 */
+#endif
 char	*CONFIG_DBHOST			= NULL;
 char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBSCHEMA		= NULL;
@@ -254,7 +254,7 @@ static void	zbx_load_config()
 #ifdef HAVE_IPV6
 		{"Fping6Location",		&CONFIG_FPING6_LOCATION,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-#endif	/* HAVE_IPV6 */
+#endif
 		{"Timeout",			&CONFIG_TIMEOUT,			TYPE_INT,
 			PARM_OPT,	1,			30},
 		{"TrapperTimeout",		&CONFIG_TRAPPER_TIMEOUT,		TYPE_INT,
@@ -349,7 +349,7 @@ static void	zbx_load_config()
 #ifdef HAVE_IPV6
 	if (NULL == CONFIG_FPING6_LOCATION)
 		CONFIG_FPING6_LOCATION = zbx_strdup(CONFIG_FPING6_LOCATION, "/usr/sbin/fping6");
-#endif	/* HAVE_IPV6 */
+#endif
 
 	if (NULL == CONFIG_EXTERNALSCRIPTS)
 		CONFIG_EXTERNALSCRIPTS = zbx_strdup(CONFIG_EXTERNALSCRIPTS, "/etc/zabbix/externalscripts");
@@ -455,39 +455,39 @@ int	MAIN_ZABBIX_ENTRY()
 		zabbix_open_log(LOG_TYPE_FILE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
 
 #ifdef	HAVE_SNMP
-#	define SNMP_FEATURE_STATUS "YES"
+#	define SNMP_FEATURE_STATUS	"YES"
 #else
-#	define SNMP_FEATURE_STATUS " NO"
+#	define SNMP_FEATURE_STATUS	" NO"
 #endif
 #ifdef	HAVE_OPENIPMI
-#	define IPMI_FEATURE_STATUS "YES"
+#	define IPMI_FEATURE_STATUS	"YES"
 #else
-#	define IPMI_FEATURE_STATUS " NO"
+#	define IPMI_FEATURE_STATUS	" NO"
 #endif
 #ifdef	HAVE_LIBCURL
-#	define LIBCURL_FEATURE_STATUS "YES"
+#	define LIBCURL_FEATURE_STATUS	"YES"
 #else
-#	define LIBCURL_FEATURE_STATUS " NO"
+#	define LIBCURL_FEATURE_STATUS	" NO"
 #endif
 #ifdef	HAVE_JABBER
-#	define JABBER_FEATURE_STATUS "YES"
+#	define JABBER_FEATURE_STATUS	"YES"
 #else
-#	define JABBER_FEATURE_STATUS " NO"
+#	define JABBER_FEATURE_STATUS	" NO"
 #endif
 #ifdef	HAVE_ODBC
-#	define ODBC_FEATURE_STATUS "YES"
+#	define ODBC_FEATURE_STATUS	"YES"
 #else
-#	define ODBC_FEATURE_STATUS " NO"
+#	define ODBC_FEATURE_STATUS	" NO"
 #endif
 #ifdef	HAVE_SSH2
-#	define SSH2_FEATURE_STATUS "YES"
+#	define SSH2_FEATURE_STATUS	"YES"
 #else
-#	define SSH2_FEATURE_STATUS " NO"
+#	define SSH2_FEATURE_STATUS	" NO"
 #endif
 #ifdef	HAVE_IPV6
-#	define IPV6_FEATURE_STATUS "YES"
+#	define IPV6_FEATURE_STATUS	"YES"
 #else
-#	define IPV6_FEATURE_STATUS " NO"
+#	define IPV6_FEATURE_STATUS	" NO"
 #endif
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "Starting Zabbix Server. Zabbix %s (revision %s).",
@@ -512,7 +512,7 @@ int	MAIN_ZABBIX_ENTRY()
 
 #ifdef	HAVE_SQLITE3
 	zbx_create_sqlite3_mutex(CONFIG_DBNAME);
-#endif /* HAVE_SQLITE3 */
+#endif
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
 
@@ -613,7 +613,7 @@ int	MAIN_ZABBIX_ENTRY()
 	{
 #ifdef HAVE_SNMP
 		init_snmp("zabbix_server");
-#endif	/* HAVE_SNMP */
+#endif
 
 		process_type = ZBX_PROCESS_TYPE_POLLER;
 		process_num = server_num - CONFIG_CONFSYNCER_FORKS;
@@ -628,7 +628,7 @@ int	MAIN_ZABBIX_ENTRY()
 	{
 #ifdef HAVE_SNMP
 		init_snmp("zabbix_server");
-#endif	/* HAVE_SNMP */
+#endif
 
 		process_type = ZBX_PROCESS_TYPE_UNREACHABLE;
 		process_num = server_num - CONFIG_CONFSYNCER_FORKS - CONFIG_POLLER_FORKS;
@@ -752,7 +752,7 @@ int	MAIN_ZABBIX_ENTRY()
 	{
 #ifdef HAVE_SNMP
 		init_snmp("zabbix_server");
-#endif	/* HAVE_SNMP */
+#endif
 
 		process_type = ZBX_PROCESS_TYPE_DISCOVERER;
 		process_num = server_num - CONFIG_CONFSYNCER_FORKS - CONFIG_POLLER_FORKS
@@ -909,9 +909,15 @@ void	zbx_on_exit()
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called");
 
-	if (threads != NULL)
+	if (NULL != threads)
 	{
-		int	i;
+		int		i;
+		sigset_t	set;
+
+		/* ignore SIGCHLD signals in order for zbx_sleep() to work  */
+		sigemptyset(&set);
+		sigaddset(&set, SIGCHLD);
+		sigprocmask(SIG_BLOCK, &set, NULL);
 
 		for (i = 1; i <= CONFIG_CONFSYNCER_FORKS + CONFIG_POLLER_FORKS
 				+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS
@@ -950,7 +956,7 @@ void	zbx_on_exit()
 
 #ifdef HAVE_SQLITE3
 	php_sem_remove(&sqlite_access);
-#endif	/* HAVE_SQLITE3 */
+#endif
 
 	free_selfmon_collector();
 
