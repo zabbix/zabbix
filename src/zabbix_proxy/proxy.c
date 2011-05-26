@@ -148,7 +148,7 @@ char	*CONFIG_TMPDIR			= NULL;
 char	*CONFIG_FPING_LOCATION		= NULL;
 #ifdef HAVE_IPV6
 char	*CONFIG_FPING6_LOCATION		= NULL;
-#endif /* HAVE_IPV6 */
+#endif
 char	*CONFIG_DBHOST			= NULL;
 char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBSCHEMA		= NULL;
@@ -267,7 +267,7 @@ static void	zbx_load_config()
 #ifdef HAVE_IPV6
 		{"Fping6Location",		&CONFIG_FPING6_LOCATION,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-#endif	/* HAVE_IPV6 */
+#endif
 		{"Timeout",			&CONFIG_TIMEOUT,			TYPE_INT,
 			PARM_OPT,	1,			30},
 		{"TrapperTimeout",		&CONFIG_TRAPPER_TIMEOUT,		TYPE_INT,
@@ -388,7 +388,7 @@ static void	zbx_load_config()
 #ifdef HAVE_IPV6
 	if (NULL == CONFIG_FPING6_LOCATION)
 		CONFIG_FPING6_LOCATION = zbx_strdup(CONFIG_FPING6_LOCATION, "/usr/sbin/fping6");
-#endif /* HAVE_IPV6 */
+#endif
 
 	if (NULL == CONFIG_EXTERNALSCRIPTS)
 		CONFIG_EXTERNALSCRIPTS = zbx_strdup(CONFIG_EXTERNALSCRIPTS, "/etc/zabbix/externalscripts");
@@ -594,7 +594,7 @@ int	MAIN_ZABBIX_ENTRY()
 	{
 #ifdef HAVE_SNMP
 		init_snmp("zabbix_server");
-#endif	/* HAVE_SNMP */
+#endif
 
 		process_type = ZBX_PROCESS_TYPE_POLLER;
 		process_num = server_num - CONFIG_CONFSYNCER_FORKS - CONFIG_DATASENDER_FORKS;
@@ -609,7 +609,7 @@ int	MAIN_ZABBIX_ENTRY()
 	{
 #ifdef HAVE_SNMP
 		init_snmp("zabbix_server");
-#endif	/* HAVE_SNMP */
+#endif
 
 		process_type = ZBX_PROCESS_TYPE_UNREACHABLE;
 		process_num = server_num - CONFIG_CONFSYNCER_FORKS - CONFIG_DATASENDER_FORKS
@@ -686,7 +686,7 @@ int	MAIN_ZABBIX_ENTRY()
 	{
 #ifdef HAVE_SNMP
 		init_snmp("zabbix_server");
-#endif	/* HAVE_SNMP */
+#endif
 
 		process_type = ZBX_PROCESS_TYPE_DISCOVERER;
 		process_num = server_num - CONFIG_CONFSYNCER_FORKS - CONFIG_DATASENDER_FORKS
@@ -787,7 +787,13 @@ void	zbx_on_exit()
 
 	if (NULL != threads)
 	{
-		int	i;
+		int		i;
+		sigset_t	set;
+
+		/* ignore SIGCHLD signals in order for zbx_sleep() to work  */
+		sigemptyset(&set);
+		sigaddset(&set, SIGCHLD);
+		sigprocmask(SIG_BLOCK, &set, NULL);
 
 		for (i = 1; i <= CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS
 				+ CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
@@ -822,7 +828,7 @@ void	zbx_on_exit()
 
 #ifdef HAVE_SQLITE3
 	php_sem_remove(&sqlite_access);
-#endif	/* HAVE_SQLITE3 */
+#endif
 
 	free_selfmon_collector();
 
