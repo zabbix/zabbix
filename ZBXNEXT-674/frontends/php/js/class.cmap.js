@@ -1,22 +1,10 @@
-/*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
-**
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
-**
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-**
-*/
+/*!
+ * This file is part of Zabbix software
+ *
+ * Copyright 2000-2011, Zabbix SIA
+ * Licensed under the GPL Version 2 license.
+ * http://www.zabbix.com/licence.php
+ */
 
 function createMap(containerid, mapdata){
 	"use strict";
@@ -60,7 +48,7 @@ function createMap(containerid, mapdata){
 
 
 		this.updateImage();
-		this.form = new ElementForm(this.formContainer, this);
+		this.form = new SelementForm(this.formContainer, this);
 		this.massForm = new MassForm(this.formContainer, this);
 		this.linkForm = new LinkForm(this.formContainer, this);
 		this.bindActions();
@@ -555,8 +543,7 @@ function createMap(containerid, mapdata){
 
 			// generate unique linkid
 			do{
-				linkid = parseInt(Math.random(1000000000) * 10000000);
-				linkid = linkid.toString();
+				linkid = Math.floor(Math.random() * 10000000).toString();
 			} while(typeof this.sysmap.data.links[linkid] !== 'undefined');
 			linkData.linkid = linkid;
 		}
@@ -639,8 +626,7 @@ function createMap(containerid, mapdata){
 
 			// generate unique selementid
 			do{
-				selementid = parseInt(Math.random(1000000000) * 10000000);
-				selementid = selementid.toString();
+				selementid = Math.floor(Math.random() * 10000000).toString();
 			} while(typeof this.sysmap.data.selements[selementid] !== 'undefined');
 			selementData.selementid = selementid;
 		}
@@ -831,12 +817,20 @@ function createMap(containerid, mapdata){
 				this.domNode.removeClass(oldIconClass[0]);
 			}
 
-			this.domNode.addClass('sysmap_iconid_'+this.data.iconid_off)
+			this.domNode.addClass('sysmap_iconid_'+this.data.iconid_off);
+
+			if((this.data.elementtype === '3') && (this.data.elementsubtype === '1')){
+				this.domNode.css({
+					width: this.data.width + 'px',
+					height: this.data.height + 'px',
+					border: '1px dotted blue'
+				});
+			}
 		}
 	};
 
 
-	function ElementForm(formContainer, sysmap){
+	function SelementForm(formContainer, sysmap){
 		var formTplData = {
 				sysmapid: sysmap.sysmapid
 			},
@@ -928,7 +922,7 @@ function createMap(containerid, mapdata){
 		this.actionProcessor = new ActionProcessor(formActions);
 		this.actionProcessor.process();
 	}
-	ElementForm.prototype = {
+	SelementForm.prototype = {
 
 		show: function(){
 			this.formContainer.draggable("option", "handle", '#formDragHandler');
@@ -1415,10 +1409,8 @@ function createMap(containerid, mapdata){
 				ln;
 
 			for(i = 0, ln = triggers.length; i < ln; i++){
-				linktriggerid = 0;
 				do{
-					linktriggerid = parseInt(Math.random(1000000000) * 1000000000);
-					linktriggerid = linktriggerid.toString();
+					linktriggerid = Math.floor(Math.random() * 10000000).toString();
 				}while(false);
 				// TODO: make id unique
 

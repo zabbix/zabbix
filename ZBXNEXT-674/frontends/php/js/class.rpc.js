@@ -1,26 +1,14 @@
-/*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
-**
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
-**
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-**/
+/*!
+ * This file is part of Zabbix software
+ *
+ * Copyright 2000-2011, Zabbix SIA
+ * Licensed under the GPL Version 2 license.
+ * http://www.zabbix.com/licence.php
+ */
 
 // JSON RPC by Artem "Aly" Suharev (based on Prototype)
 
 var RPC = {
-//'_rpcurl':		'api_jsonrpc.php',	// rpc url
 '_rpcurl':		'jsrpc.php?output=json-rpc',		// rpc url
 '_callid':		0,					// rpc request id
 '_auth':		null,				// authentication hash
@@ -69,7 +57,6 @@ initialize: function(userParams){
 	this.auth = RPC.auth();
 },
 
-// DEBUG
 debug: function(fnc_name, id){
 	if(this.debug_status){
 		var str = 'RPC.Call['+RPC.id+'].'+fnc_name;
@@ -93,7 +80,6 @@ initialize: function($super, userParams) {
 	this.call();
 },
 
-// CALL RPC
 call: function(){
 	this.debug('call');
 //---

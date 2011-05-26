@@ -64,8 +64,7 @@ include_once('include/page_header.php');
 			$css.= 'div.sysmap_iconid_'.$image['imageid'].'{'.
 						' height: '.$h.'px; '.
 						' width: '.$w.'px; '.
-						' background-image: url("imgstore.php?iconid='.$image['imageid'].'");'.
-						' background-repeat:no-repeat; }'."\n";
+						' background: url("imgstore.php?iconid='.$image['imageid'].'") no-repeat center center;}'."\n";
 		}
 
 		print($css);

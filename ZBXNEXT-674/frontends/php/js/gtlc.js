@@ -1,35 +1,15 @@
-/*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
-**
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
-**
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-**
-*/
+/*!
+ * This file is part of Zabbix software
+ *
+ * Copyright 2000-2011, Zabbix SIA
+ * Licensed under the GPL Version 2 license.
+ * http://www.zabbix.com/licence.php
+ */
 
-/************************************************************************************/
 // GRAPHS TIMELINE CONTROLS (GTLC)
 // author: Aly
-/************************************************************************************/
 
-/************************************************************************************/
 // Title: graph magic initialization
-// Author: Aly
-/************************************************************************************/
-
-//timeControl.addObject(id, time, objData)
-
 var timeControl = {
 objectList: {},				// objects needs to be controlled
 
@@ -383,11 +363,7 @@ function onload_update_scroll(id,w,period,stime,timel,bar_stime){
 }
 
 
-/************************************************************************************/
 // Title: TimeLine COntrol CORE
-// Author: Aly
-/************************************************************************************/
-
 var ZBX_TIMELINES = {};
 
 function create_timeline(tlid, period, starttime, usertime, endtime){
@@ -521,10 +497,7 @@ debug: function(fnc_name, id){
 }
 });
 
-/************************************************************************************/
 // Title: graph scrolling
-// Author: Aly
-/************************************************************************************/
 var ZBX_SCROLLBARS = {};
 
 function scrollCreate(sbid, w, timelineid){
@@ -687,9 +660,7 @@ scrollmouseover: function(){		//  U may use this func to attach some function on
 onchange: function(){			//  executed every time the bar period or bar time is changed(mouse button released)
 },
 
-//----------------------------------------------------------------
 //-------   MOVE   -----------------------------------------------
-//----------------------------------------------------------------
 setFullPeriod: function(){
 	this.debug('setFullPeriod');
 	if(this.disabled) return false;
@@ -930,9 +901,7 @@ setBarByGhost: function(){
 	this.onBarChange();
 },
 
-//----------------------------------------------------------------
 //-------   CALENDAR   -------------------------------------------
-//----------------------------------------------------------------
 calendarShowLeft: function(){
 	this.debug('calendarShowLeft');
 	if(this.disabled) return false;
@@ -1017,10 +986,8 @@ setCalendarRight: function(time){
 
 	this.onBarChange();
 },
-//----------------------------------------------------------------
-//-------   DRAG & DROP   ----------------------------------------
-//----------------------------------------------------------------
 
+//-------   DRAG & DROP   ----------------------------------------
 // <BAR>
 barDragStart: function(e, ui){
 	this.debug('barDragStart');
@@ -1867,10 +1834,7 @@ resizeBox: function(px){
 });
 
 
-/************************************************************************************/
 // Title: selection box uppon graphs
-// Author: Aly
-/************************************************************************************/
 var ZBX_SBOX = {};		//selection box obj reference
 
 function sbox_init(sbid, timeline, domobjectid){
@@ -2274,4 +2238,3 @@ function moveSBoxes(){
 		ZBX_SBOX[key].sbox.moveSBoxByObj();
 	}
 }
-//]]

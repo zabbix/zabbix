@@ -327,7 +327,6 @@ COpt::compare_files_with_menu($ZBX_MENU);
 
 				$div_node_tree = new CDiv();
 				$div_node_tree->addItem($node_tree->getHTML());
-
 				$div_node_tree->addItem(new CSubmit('select_nodes', _('Select'), "javascript: ".
 																				" if(IE6) hidePopupDiv('select_iframe');".	//IE6 fix
 																				" \$('div_node_tree').setStyle({display:'none'});"));
