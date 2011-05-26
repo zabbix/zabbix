@@ -257,7 +257,7 @@ function insert_javascript_for_tweenbox(){
 		}';
 
 	insert_js($js);
-	zbx_add_post_js('if(IE6 || IE7 ) $$("select option[disabled]").each(function(e){e.setStyle({color: "gray"});});');
+	zbx_add_post_js('if(IE7 ) $$("select option[disabled]").each(function(e){e.setStyle({color: "gray"});});');
 }
 
 function insert_javascript_for_visibilitybox(){

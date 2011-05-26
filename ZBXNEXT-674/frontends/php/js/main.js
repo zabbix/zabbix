@@ -733,10 +733,6 @@ show: function(e, obj, hintbox){
 	hintbox.style.top	= hintbox.y + 10 + parseInt(obj.offsetHeight/2) + 'px';
 	hintbox.style.visibility = 'visible';
 	hintbox.style.zIndex = '999';
-
-// IE6 z-index bug
-	//if(IE6) showPopupDiv(hintid, 'frame_'+hintid);
-
 },
 
 hide: function(e, boxid){
@@ -749,13 +745,11 @@ hide: function(e, boxid){
 	if(!is_null(hint)){
 		delete(this.boxes[boxid]);
 
-		//hidePopupDiv('frame_'+hint.id);
 // Opera refresh bug!
 		hint.style.display = 'none';
 		//hintbox.setAttribute('byclick', 'true');
 		if(OP) setTimeout(function(){hint.remove();}, 200);
 		else hint.remove();
-
 	}
 },
 
