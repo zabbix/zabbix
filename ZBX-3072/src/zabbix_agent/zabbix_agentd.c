@@ -558,7 +558,7 @@ void	zbx_on_exit()
 		{
 			if (threads[i])
 			{
-				zbx_thread_kill(threads[i], SIGTERM);
+				zbx_thread_kill(threads[i]);
 				threads[i] = ZBX_THREAD_HANDLE_NULL;
 			}
 		}
