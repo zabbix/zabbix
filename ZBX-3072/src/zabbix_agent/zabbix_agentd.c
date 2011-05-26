@@ -545,12 +545,14 @@ void	zbx_on_exit()
 	if (NULL != threads)
 	{
 		int		i;
+#ifndef _WINDOWS
 		sigset_t	set;
 
 		/* ignore SIGCHLD signals in order for zbx_sleep() to work  */
 		sigemptyset(&set);
 		sigaddset(&set, SIGCHLD);
 		sigprocmask(SIG_BLOCK, &set, NULL);
+#endif
 
 		for (i = 0; i < 1 + CONFIG_ZABBIX_FORKS + (0 == CONFIG_DISABLE_ACTIVE ? 1 : 0); i++)
 		{
