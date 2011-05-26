@@ -17,7 +17,6 @@ var IE = (agt.indexOf("msie") != -1) && document.all && !OP;
 var IE9 = (agt.indexOf("msie 9.0") != -1) && document.all && !OP;
 var IE8 = (agt.indexOf("msie 8.0") != -1) && document.all && !OP;
 var IE7 = (agt.indexOf("msie 7.0") != -1) && document.all && !OP;
-var IE6 = (agt.indexOf("msie 6.0") != -1) && document.all && !OP;
 var CR = (agt.indexOf("chrome") != -1);
 var SF = (agt.indexOf("safari") != -1) && !CR;
 var WK = (agt.indexOf("applewebkit") != -1);
@@ -28,7 +27,6 @@ var MC = (agt.indexOf("mac") != -1);
 function checkBrowser(){
  if(OP) alert('Opera');
  if(IE) alert('IE');
- if(IE6) alert('IE6');
  if(IE7) alert('IE7');
  if(IE8) alert('IE8');
  if(IE9) alert('IE9');
@@ -628,12 +626,6 @@ function switchElementsClass(obj,class1,class2){
 	else{
 		obj.className = class1 + ' ' + obj.className;
 		result = class1;
-	}
-
-	if(IE6){
-		obj.style.filter = '';
-		obj.style.backgroundImage = '';
-		ie6pngfix.run();
 	}
 
 return result;

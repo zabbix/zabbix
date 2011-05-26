@@ -58,23 +58,16 @@ initialize: function($super, messagesListId, args){
 	this.updateSettings();
 
 	this.createContainer();
-	if(IE) this.fixIE();
 
 	addListener(this.dom.closeAll, 'click', this.closeAllMessages.bindAsEventListener(this));
 	addListener(this.dom.snooze, 'click', this.stopSound.bindAsEventListener(this));
 	addListener(this.dom.mute, 'click', this.mute.bindAsEventListener(this));
 
-	if(!IE6){
-		//jQuery(this.dom.container).mouseenter(function(){ jQuery(this).fadeTo('fast', 1); });
-		//jQuery(this.dom.container).mouseleave(function(){ jQuery(this).fadeTo('fast', 0.1); });
-
-		jQuery(this.dom.container).draggable({
-			handle: [this.dom.caption, this.dom.move], //this.dom.header,
-			axis: 'y',
-			containment: [0,0,0,1600],//'document',
-			stop: this.fixIE.bind(this)
-		});
-	}
+	jQuery(this.dom.container).draggable({
+		handle: [this.dom.caption, this.dom.move], //this.dom.header,
+		axis: 'y',
+		containment: [0,0,0,1600],//'document',
+	});
 },
 
 start: function(){
@@ -258,7 +251,7 @@ closeMessage: function(messageid, withEffect){
 		this.messagePipe = [];
 		this.messageList = {};
 
-		setTimeout(Element.hide.bind(Element, this.dom.container), IE6?100:this.effectTimeout);
+		setTimeout(Element.hide.bind(Element, this.dom.container), this.effectTimeout);
 	}
 },
 
@@ -426,15 +419,8 @@ createContainer: function(){
 // Message List
 	this.dom.list = new CList().node;
 	this.dom.container.appendChild(this.dom.list);
-},
-
-fixIE: function(){
-	if(IE6){
-		this.dom.header.style.width = '100px';
-		showPopupDiv('zbx_messages','zbx_messages_frame');
-//		ie6pngfix.run(false);
-	}
 }
+
 });
 
 var CMessage = Class.create(CDebug,{
@@ -469,7 +455,6 @@ initialize: function($super, messageList, message){
 	}
 
 	this.createMessage();
-	if(IE) this.fixIE();
 },
 
 show: function(){
@@ -480,7 +465,6 @@ close: function(){
 //--
 	$(this.dom.listItem).remove();
 
-	if(IE) this.fixIE();
 	this.dom = {};
 },
 
@@ -491,13 +475,8 @@ remove: function(){
 	this.debug('remove');
 //--
 
-	if(IE6){
-		$(this.dom.listItem).hide();
-	}
-	else{
-		jQuery(this.dom.listItem).slideUp(this.list.effectTimeout);
-		jQuery(this.dom.listItem).fadeOut(this.list.effectTimeout);
-	}
+	jQuery(this.dom.listItem).slideUp(this.list.effectTimeout);
+	jQuery(this.dom.listItem).fadeOut(this.list.effectTimeout);
 
 	setTimeout(this.close.bind(this), this.list.effectTimeout);
 },
@@ -541,23 +520,8 @@ createMessage: function(){
 		$(this.dom.body).update(BBCode.Parse(this.body[i]));
 		this.dom.body.className = 'body';
 	}
-},
-
-fixIE: function(){
-	if(IE6){
-/*
-		var maxWidth = 60;
-		for(var tmpmsg in this.list.messageList){
-			var msgDims = getDimensions(this.list.messageList[tmpmsg].dom.message);
-			msgDims.width += 4;
-			if(maxWidth < msgDims.width) maxWidth = msgDims.width;
-		}
-
-		this.list.dom.header.style.width = maxWidth+'px';
-//*/
-		showPopupDiv('zbx_messages','zbx_messages_frame');
-	}
 }
+
 });
 
 var CNode = Class.create({
