@@ -3198,12 +3198,20 @@ char	*str_linefeed(const char *src, size_t maxline, const char *delim)
 	const char	*p_src;	/* working pointer to input */
 	char		*p_dst;	/* working pointer to output */
 
+	/* check input */
+	assert(NULL != src);
+	assert(0 < maxline);
+
+	/* default delimiter */
 	if (NULL == delim)
 		delim = "\n";
 
 	src_size = strlen(src);
 	delim_size = strlen(delim);
-	feeds = src_size / maxline - (0 != src_size % maxline ? 0 : 1);	/* we don't want to feed the last line */
+
+	/* make sure we don't feed the last line */
+	feeds = src_size / maxline - (0 != src_size % maxline || 0 == src_size ? 0 : 1);
+
 	left = src_size - feeds * maxline;
 	dst_size = src_size + feeds * delim_size + 1;
 
@@ -3227,7 +3235,6 @@ char	*str_linefeed(const char *src, size_t maxline, const char *delim)
 	if (0 < left)
 	{
 		/* copy what's left */
-
 		memcpy(p_dst, p_src, left);
 		p_dst += left;
 	}
