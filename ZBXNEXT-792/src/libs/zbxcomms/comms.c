@@ -236,7 +236,7 @@ static int	zbx_tcp_start()
 	WSADATA	sockInfo;
 	int	ret;
 
-	if (SUCCEED != (ret = WSAStartup(MAKEWORD(2, 2), &sockInfo)))
+	if (0 != (ret = WSAStartup(MAKEWORD(2, 2), &sockInfo)))
 	{
 		zbx_set_tcp_strerror("WSAStartup() failed: %s", strerror_from_system(ret));
 		return FAIL;
