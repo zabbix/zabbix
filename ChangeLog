@@ -156,6 +156,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.6rc1
 
+ - [ZBXNEXT-782] added support of not supported items in the history cache (Sasha)
  - [ZBX-3072] fixed mysql error when shutting down server (dimir)
  - [ZBX-3105] added processing of garbage in configuration files (dimir)
  - [ZBX-2083] fixed audit.details field cutting (Vedmak)
