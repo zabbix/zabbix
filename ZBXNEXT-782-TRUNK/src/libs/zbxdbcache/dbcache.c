@@ -2625,12 +2625,12 @@ static void	DCadd_history_str(zbx_uint64_t itemid, const char *value_orig, zbx_t
 	ZBX_DC_HISTORY	*history;
 	size_t		len;
 
-	DCcheck_ns(ts);
-
 	if (HISTORY_STR_VALUE_LEN_MAX < (len = strlen(value_orig) + 1))
 		len = HISTORY_STR_VALUE_LEN_MAX;
 
 	LOCK_CACHE;
+
+	DCcheck_ns(ts);
 
 	history = DCget_history_ptr(len);
 
@@ -2653,12 +2653,12 @@ static void	DCadd_history_text(zbx_uint64_t itemid, const char *value_orig, zbx_
 	ZBX_DC_HISTORY	*history;
 	size_t		len;
 
-	DCcheck_ns(ts);
-
 	if (HISTORY_TEXT_VALUE_LEN_MAX < (len = strlen(value_orig) + 1))
 		len = HISTORY_TEXT_VALUE_LEN_MAX;
 
 	LOCK_CACHE;
+
+	DCcheck_ns(ts);
 
 	history = DCget_history_ptr(len);
 
@@ -2682,8 +2682,6 @@ static void	DCadd_history_log(zbx_uint64_t itemid, const char *value_orig, zbx_t
 	ZBX_DC_HISTORY	*history;
 	size_t		len1, len2;
 
-	DCcheck_ns(ts);
-
 	if (HISTORY_LOG_VALUE_LEN_MAX < (len1 = strlen(value_orig) + 1))
 		len1 = HISTORY_LOG_VALUE_LEN_MAX;
 
@@ -2696,6 +2694,8 @@ static void	DCadd_history_log(zbx_uint64_t itemid, const char *value_orig, zbx_t
 		len2 = 0;
 
 	LOCK_CACHE;
+
+	DCcheck_ns(ts);
 
 	history = DCget_history_ptr(len1 + len2);
 
@@ -2733,6 +2733,8 @@ static void	DCadd_history_notsupported(zbx_uint64_t itemid, const char *error, z
 		len = ITEM_ERROR_LEN_MAX;
 
 	LOCK_CACHE;
+
+	DCcheck_ns(ts);
 
 	history = DCget_history_ptr(len);
 
