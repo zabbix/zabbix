@@ -1249,7 +1249,7 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	for (i = 0; i < history_num; i++)
 		uint64_array_add(&ids, &ids_alloc, &ids_num, history[i].itemid, 64);
 
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 240,
+	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 247,
 			"select i.itemid,i.status,i.lastclock,i.prevorgvalue,i.delta,i.multiplier,i.formula,"
 				"i.history,i.trends,i.lastns,i.hostid,i.profile_link,hp.profile_mode,i.valuemapid,"
 				"i.units,i.error"
