@@ -341,6 +341,8 @@ typedef struct
 	char	*units;
 	char	*formula;
 	zbx_uint64_t	valuemapid;
+
+	char	*error;
 }
 DB_ITEM;
 
