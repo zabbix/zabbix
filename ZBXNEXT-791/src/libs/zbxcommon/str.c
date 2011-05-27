@@ -933,7 +933,7 @@ char	*__zbx_zbx_strdcatf(char *dest, const char *f, ...)
  *                                                                            *
  * Return value: return SUCCEED if hostname is valid                          *
  *               or FAIL if hostname contains invalid chars, is empty         *
- *               or is longer than MAX_HOSTNAME_LEN                           *
+ *               or is longer than MAX_ZBX_HOSTNAME_LEN                       *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
@@ -950,7 +950,7 @@ int	zbx_check_hostname(const char *hostname)
 			return FAIL;
 	}
 
-	if (0 == len || MAX_HOSTNAME_LEN < len)
+	if (0 == len || MAX_ZBX_HOSTNAME_LEN < len)
 		return FAIL;
 
 	return SUCCEED;
