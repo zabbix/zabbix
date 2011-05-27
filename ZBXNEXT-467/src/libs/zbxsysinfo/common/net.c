@@ -106,28 +106,45 @@ int	NET_TCP_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 }
 
 #if defined(HAVE_RES_QUERY) || defined(_WINDOWS)
+
 static const char	*decode_type(int q_type)
 {
 	static char	buf[16];
 
 	switch (q_type)
 	{
-		case T_A:	return "A";	/* address */
-		case T_NS:	return "NS";	/* name server */
-		case T_MD:	return "MD";	/* mail forwarder */
-		case T_MF:	return "MF";	/* mail forwarder */
-		case T_CNAME:	return "CNAME";	/* canonical name */
-		case T_SOA:	return "SOA";	/* start of authority */
-		case T_MB:	return "MB";	/* mailbox */
-		case T_MG:	return "MG";	/* mail group member */
-		case T_MR:	return "MR";	/* mail rename */
-		case T_NULL:	return "NULL";	/* null */
-		case T_WKS:	return "WKS";	/* well-known service */
-		case T_PTR:	return "PTR";	/* domain name pointer */
-		case T_HINFO:	return "HINFO";	/* host information */
-		case T_MINFO:	return "MINFO";	/* mailbox information */
-		case T_MX:	return "MX";	/* mail exchanger */
-		case T_TXT:	return "TXT";	/* text */
+		case T_A:
+			return "A";	/* address */
+		case T_NS:
+			return "NS";	/* name server */
+		case T_MD:
+			return "MD";	/* mail destination */		/* obsolete */
+		case T_MF:
+			return "MF";	/* mail forwarder */		/* obsolete */
+		case T_CNAME:
+			return "CNAME";	/* canonical name */
+		case T_SOA:
+			return "SOA";	/* start of authority */
+		case T_MB:
+			return "MB";	/* mailbox */			/* experimental */
+		case T_MG:
+			return "MG";	/* mail group member */		/* experimental */
+		case T_MR:
+			return "MR";	/* mail rename */		/* experimental */
+		case T_NULL:
+			return "NULL";	/* null */			/* obsolete */
+		case T_WKS:
+			return "WKS";	/* well-known service */	/* obsolete */
+		case T_PTR:
+			return "PTR";	/* domain name pointer */
+		case T_HINFO:
+			return "HINFO";	/* host information */
+		case T_MINFO:
+			return "MINFO";	/* mailbox information */	/* experimental */
+		case T_MX:
+			return "MX";	/* mail exchanger */
+		case T_TXT:
+			return "TXT";	/* text */
 		default:
 			zbx_snprintf(buf, sizeof(buf), "T_%d", q_type);
 			return buf;
@@ -168,25 +185,25 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	static const resolv_querytype_t	qt[] =
 	{
-		{"ANY", T_ANY},
-		{"A", T_A},
-		{"NS", T_NS},
-		{"MD", T_MD},
-		{"MF", T_MF},
-		{"CNAME", T_CNAME},
-		{"SOA", T_SOA},
-		{"MB", T_MB},
-		{"MG", T_MG},
-		{"MR", T_MR},
-		{"NULL", T_NULL},
-#ifndef _WINDOWS	/* obsolete, will not add for Windows */
-		{"WKS", T_WKS},
+		{"ANY",		T_ANY},
+		{"A",		T_A},
+		{"NS",		T_NS},
+		{"MD",		T_MD},
+		{"MF",		T_MF},
+		{"CNAME",	T_CNAME},
+		{"SOA",		T_SOA},
+		{"MB",		T_MB},
+		{"MG",		T_MG},
+		{"MR",		T_MR},
+		{"NULL",	T_NULL},
+#ifndef _WINDOWS
+		{"WKS",		T_WKS},
 #endif
-		{"PTR", T_PTR},
-		{"HINFO", T_HINFO},
-		{"MINFO", T_MINFO},
-		{"MX", T_MX},
-		{"TXT", T_TXT},
+		{"PTR",		T_PTR},
+		{"HINFO",	T_HINFO},
+		{"MINFO",	T_MINFO},
+		{"MX",		T_MX},
+		{"TXT",		T_TXT},
 		{NULL}
 	};
 
@@ -374,11 +391,14 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 					offset -= 1;	/* remove the trailing space */
 
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "\"");
+
 				break;
 			default:
 				break;
 		}
+
 		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "\n");
+
 		pDnsRecord = pDnsRecord->pNext;
 	}
 #else	/* not _WINDOWS */
@@ -454,9 +474,10 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 					default:
 						;
 				}
-				msg_ptr += q_len;
-				break;
 
+				msg_ptr += q_len;
+
+				break;
 			case T_NS:
 			case T_CNAME:
 			case T_MB:
@@ -467,7 +488,6 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 					return SYSINFO_RET_FAIL;
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 				break;
-
 			case T_MD:
 			case T_MF:
 			case T_MX:
@@ -477,8 +497,8 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* exchange */
 					return SYSINFO_RET_FAIL;
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
-				break;
 
+				break;
 			case T_SOA:
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* source host */
 					return SYSINFO_RET_FAIL;
@@ -502,15 +522,14 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 				GETLONG(value, msg_ptr);	/* minimum TTL */
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
-				break;
 
+				break;
 			case T_NULL:
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " len:%d", q_len);
 				msg_ptr += q_len;
 				break;
-
 			case T_WKS:
-				if (INT32SZ + 1 > q_len )
+				if (INT32SZ + 1 > q_len)
 					return SYSINFO_RET_FAIL;
 
 				p = msg_ptr + q_len;
@@ -531,22 +550,25 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 				while (msg_ptr < p)
 				{
 					c = *msg_ptr++;
+
 					do
 					{
 						if (0 != (c & 0200))
 						{
 							s = getservbyport((int)htons(n), pr ? pr->p_name : NULL);
+
 							if (NULL != s)
 								offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", s->s_name);
 							else
 								offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " #%d", n);
 						}
+
 						c <<= 1;
 					}
 					while (0 != (++n & 07));
 				}
-				break;
 
+				break;
 			case T_HINFO:
 				p = msg_ptr + q_len;
 				c = *msg_ptr++;
@@ -567,8 +589,8 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 						msg_ptr += c;
 					}
 				}
-				break;
 
+				break;
 			case T_MINFO:
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* mailbox responsible for mailing lists */
 					return SYSINFO_RET_FAIL;
@@ -577,8 +599,8 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* mailbox for error messages */
 					return SYSINFO_RET_FAIL;
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
-				break;
 
+				break;
 			case T_TXT:
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " \"");
 				p = msg_ptr + q_len;
@@ -588,12 +610,15 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 					for (c = *msg_ptr++; 0 < c && msg_ptr < p; c--)
 						offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%c", *msg_ptr++);
 				}
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "\"");
-				break;
 
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "\"");
+
+				break;
 			default:
 				msg_ptr += q_len;
+				break;
 		}
+
 		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "\n");
 	}
 #endif	/* _WINDOWS */
@@ -603,9 +628,11 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 	SET_TEXT_RESULT(result, strdup(buffer));
 
 	return SYSINFO_RET_OK;
+
 #else	/* both HAVE_RES_QUERY and _WINDOWS not defined */
 
 	return SYSINFO_RET_FAIL;
+
 #endif	/* defined(HAVE_RES_QUERY) || defined(_WINDOWS) */
 }
 
