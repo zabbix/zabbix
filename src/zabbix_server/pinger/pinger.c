@@ -385,6 +385,7 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 			zbx_timespec_t	ts;
 
 			zbx_timespec(&ts);
+
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL, &ts,
 					ITEM_STATUS_NOTSUPPORTED, error, 0, NULL, 0, 0, 0, 0);
 
