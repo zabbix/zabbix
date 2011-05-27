@@ -298,7 +298,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	while (NULL != pDnsRecord)
 	{
-		if (T_ANY != type && type != pDnsRecord->wType)
+		if ((T_ANY != type && type != pDnsRecord->wType) || pDnsRecord->Flags.S.Section != DnsSectionAnswer)
 		{
 			pDnsRecord = pDnsRecord->pNext;
 			continue;
@@ -367,7 +367,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 				break;
 			case T_HINFO:
 				for (i = 0; i < (int)(pDnsRecord->Data.HINFO.dwStringCount); i++)
-					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s",
+					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " \"%s\"",
 							zbx_unicode_to_utf8_static(pDnsRecord->Data.HINFO.pStringArray[i], tmp, sizeof(tmp)));
 				break;
 			case T_MINFO:
@@ -401,6 +401,8 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 		pDnsRecord = pDnsRecord->pNext;
 	}
+
+	DnsRecordListFree(pDnsRecord, DnsFreeRecordList);
 #else	/* not _WINDOWS */
 	if (0 == (_res.options & RES_INIT))
 		res_init();
@@ -481,6 +483,8 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 			case T_NS:
 			case T_CNAME:
 			case T_MB:
+			case T_MD:
+			case T_MF:
 			case T_MG:
 			case T_MR:
 			case T_PTR:
@@ -488,8 +492,6 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 					return SYSINFO_RET_FAIL;
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 				break;
-			case T_MD:
-			case T_MF:
 			case T_MX:
 				GETSHORT(value, msg_ptr);	/* preference */
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
@@ -575,7 +577,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 				if (0 != c)
 				{
-					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %.*s", c, msg_ptr);
+					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " \"%.*s\"", c, msg_ptr);
 					msg_ptr += c;
 				}
 
@@ -585,7 +587,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 					if (0 != c)
 					{
-						offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %.*s", c, msg_ptr);
+						offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " \"%.*s\"", c, msg_ptr);
 						msg_ptr += c;
 					}
 				}
