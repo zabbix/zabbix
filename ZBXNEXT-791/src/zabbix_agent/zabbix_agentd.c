@@ -236,16 +236,6 @@ static void	set_defaults()
 			assert(*value);
 
 			CONFIG_HOSTNAME = zbx_strdup(CONFIG_HOSTNAME, *value);
-
-			/* If auto registration is used, our CONFIG_HOSTNAME will make it into the  */
-			/* server's database, where it is limited by HOST_HOST_LEN (currently, 64), */
-			/* so to make it work properly we need to truncate our hostname.            */
-
-			if (64 < strlen(CONFIG_HOSTNAME))
-			{
-				CONFIG_HOSTNAME[64] = '\0';
-				zabbix_log(LOG_LEVEL_WARNING, "hostname truncated to [%s])", CONFIG_HOSTNAME);
-			}
 		}
 		else
 			zabbix_log(LOG_LEVEL_WARNING, "failed to get system hostname from [%s])", CONFIG_HOSTNAME_ITEM);
@@ -395,6 +385,12 @@ static void	zbx_validate_config()
 	if (NULL == CONFIG_HOSTNAME)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "hostname is not defined");
+		exit(FAIL);
+	}
+
+	if (FAIL == zbx_check_hostname(CONFIG_HOSTNAME))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid host name: [%s]", CONFIG_HOSTNAME);
 		exit(FAIL);
 	}
 
