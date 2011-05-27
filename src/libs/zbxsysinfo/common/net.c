@@ -208,7 +208,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 	};
 
 #ifdef _WINDOWS
-	PDNS_RECORD	pDnsRecord;
+	PDNS_RECORD	pQueryResults, pDnsRecord;
 	LPTSTR		wzone;
 	char		tmp2[MAX_STRING_LEN];
 #else
@@ -284,21 +284,30 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 #ifdef _WINDOWS
 	wzone = zbx_utf8_to_unicode(zone);
-	res = DnsQuery(wzone, type, DNS_QUERY_STANDARD, NULL, &pDnsRecord, NULL);
+	res = DnsQuery(wzone, type, DNS_QUERY_STANDARD, NULL, &pQueryResults, NULL);
 	zbx_free(wzone);
 
 	if (1 == short_answer)
 	{
-		SET_UI64_RESULT(result, DNS_RCODE_NOERROR == res ? 1 : 0);
+		if (DNS_RCODE_NOERROR != res)
+		{
+			SET_UI64_RESULT(result, 0);
+			DnsRecordListFree(pQueryResults, DnsFreeRecordList);
+		}
+		else
+			SET_UI64_RESULT(result, 1);
+
 		return SYSINFO_RET_OK;
 	}
 
-	if (NULL == pDnsRecord)
+	if (DNS_RCODE_NOERROR != res)
 		return SYSINFO_RET_FAIL;
+
+	pDnsRecord = pQueryResults;
 
 	while (NULL != pDnsRecord)
 	{
-		if ((T_ANY != type && type != pDnsRecord->wType) || pDnsRecord->Flags.S.Section != DnsSectionAnswer)
+		if (pDnsRecord->Flags.S.Section != DnsSectionAnswer)
 		{
 			pDnsRecord = pDnsRecord->pNext;
 			continue;
@@ -402,7 +411,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 		pDnsRecord = pDnsRecord->pNext;
 	}
 
-	DnsRecordListFree(pDnsRecord, DnsFreeRecordList);
+	DnsRecordListFree(pQueryResults, DnsFreeRecordList);
 #else	/* not _WINDOWS */
 	if (0 == (_res.options & RES_INIT))
 		res_init();
@@ -418,7 +427,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 		_res.nscount = 1;
 	}
 
-	if (0 >= (res = res_mkquery(QUERY, zone, C_IN, type, NULL, 0, NULL, buf, sizeof(buf))))
+	if (FAIL == (res = res_mkquery(QUERY, zone, C_IN, type, NULL, 0, NULL, buf, sizeof(buf))))
 		return SYSINFO_RET_FAIL;
 
 	_res.retrans = retrans;
