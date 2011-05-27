@@ -84,7 +84,8 @@ static int	process_value(zbx_uint64_t itemid, AGENT_RESULT *value)
 	if (NULL != (row = DBfetch(result)))
 	{
 		zbx_timespec(&ts);
-		dc_add_history(itemid, (unsigned char)atoi(row[0]), 0, value, &ts, 0, NULL, 0, 0, 0, 0);
+		dc_add_history(itemid, (unsigned char)atoi(row[0]), 0, value, &ts,
+				ITEM_STATUS_ACTIVE, NULL, 0, NULL, 0, 0, 0, 0);
 		ret = SUCCEED;
 	}
 	else
