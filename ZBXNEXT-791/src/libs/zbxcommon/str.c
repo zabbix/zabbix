@@ -942,7 +942,7 @@ char	*__zbx_zbx_strdcatf(char *dest, const char *f, ...)
  ******************************************************************************/
 int	zbx_check_hostname(const char *hostname)
 {
-	int len = 0;
+	int	len = 0;
 
 	while ('\0' != hostname[len])
 	{

@@ -235,6 +235,12 @@ static void	set_defaults()
 		{
 			assert(*value);
 
+			if (strlen(*value) > MAX_ZBX_HOSTNAME_LEN)
+			{
+				(*value)[MAX_ZBX_HOSTNAME_LEN] = '\0';
+				zabbix_log(LOG_LEVEL_WARNING, "hostname truncated to [%s])", *value);
+			}
+
 			CONFIG_HOSTNAME = zbx_strdup(CONFIG_HOSTNAME, *value);
 		}
 		else

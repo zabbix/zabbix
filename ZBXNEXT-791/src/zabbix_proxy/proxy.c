@@ -324,41 +324,40 @@ static void	zbx_load_config()
 	else
 		zbx_process = ZBX_PROCESS_PROXY_ACTIVE;
 
-	if (NULL == CONFIG_HOSTNAME || '\0' == *CONFIG_HOSTNAME)
+	if (NULL == CONFIG_HOSTNAME)
 	{
-		if (NULL != CONFIG_HOSTNAME)
-			zbx_free(CONFIG_HOSTNAME);
-
-		if (SUCCEED == process("system.hostname", 0, &result))
+		if (SUCCEED == process("system.hostname", 0, &result) &&
+				NULL != (value = GET_STR_RESULT(&result)))
 		{
-			if (NULL != (value = GET_STR_RESULT(&result)))
+			assert(*value);
+
+			if (strlen(*value) > HOST_HOST_LEN)
 			{
-				CONFIG_HOSTNAME = zbx_strdup(CONFIG_HOSTNAME, *value);
-				if (strlen(CONFIG_HOSTNAME) > HOST_HOST_LEN)
-					CONFIG_HOSTNAME[HOST_HOST_LEN] = '\0';
+				(*value)[HOST_HOST_LEN] = '\0';
+				zabbix_log(LOG_LEVEL_WARNING, "hostname truncated to [%s])", *value);
 			}
+
+			CONFIG_HOSTNAME = zbx_strdup(CONFIG_HOSTNAME, *value);
 		}
 		free_result(&result);
-
-		if (NULL == CONFIG_HOSTNAME)
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "hostname is not defined");
-			exit(1);
-		}
 	}
-	else
+
+	if (NULL == CONFIG_HOSTNAME)
 	{
-		if (strlen(CONFIG_HOSTNAME) > HOST_HOST_LEN)
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "hostname too long");
-			exit(1);
-		}
+		zabbix_log(LOG_LEVEL_CRIT, "hostname is not defined");
+		exit(FAIL);
+	}
+
+	if (FAIL == zbx_check_hostname(CONFIG_HOSTNAME))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid host name: [%s]", CONFIG_HOSTNAME);
+		exit(FAIL);
 	}
 
 	if (NULL == CONFIG_DBNAME)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "DBName not in config file");
-		exit(1);
+		exit(FAIL);
 	}
 
 	if (NULL == CONFIG_PID_FILE)
