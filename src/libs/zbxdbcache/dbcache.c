@@ -1098,17 +1098,16 @@ static void	DCadd_update_item_sql(int *sql_offset, DB_ITEM *item, ZBX_DC_HISTORY
 						h->value.ui64);
 			}
 			break;
+		case ITEM_VALUE_TYPE_LOG:
+			zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 41, ",lastlogsize=%d,mtime=%d",
+					h->lastlogsize, h->mtime);
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
 			value_esc = DBdyn_escape_string_len(h->value_orig.str, ITEM_LASTVALUE_LEN);
-			zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 576,
+			zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 34 + strlen(value_esc),
 					",prevvalue=lastvalue,lastvalue='%s'",
 					value_esc);
 			zbx_free(value_esc);
-		case ITEM_VALUE_TYPE_LOG:
-			zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 64,
-					",lastlogsize=%d,mtime=%d",
-					h->lastlogsize, h->mtime);
 			break;
 	}
 notsupported:
