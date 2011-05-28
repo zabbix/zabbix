@@ -230,13 +230,36 @@ static void	lookup_jabber(const char *server, int port, char *real_server, size_
 
 	if (SYSINFO_RET_OK == NET_TCP_DNS_QUERY(command, buffer, 0, &result))
 	{
+		int		max_priority = 65536, max_weight = -1;
+		int		cur_priority, cur_weight, cur_port;
+		const char	*p = result.text;
+
 		zabbix_log(LOG_LEVEL_DEBUG, "response to DNS query: [%s]", result.text);
 
-		zbx_snprintf(buffer, sizeof(buffer), "_xmpp-client._tcp.%s SRV %%*d %%*d %%d %%" ZBX_FS_SIZE_T "s",
-				server, (zbx_fs_size_t)real_server_len);
+		/* let us now choose the server with the highest priority and maximum weight */
 
-		if (2 == sscanf(result.text, buffer, real_port, real_server))
-			ret = SYSINFO_RET_OK;
+		zbx_snprintf(command, sizeof(command), "_xmpp-client._tcp.%s SRV %%d %%d %%d %%" ZBX_FS_SIZE_T "s",
+				server, (zbx_fs_size_t)sizeof(buffer));
+
+		while (NULL != p)
+		{
+			if (4 == sscanf(p, command, &cur_priority, &cur_weight, &cur_port, buffer))
+			{
+				if (cur_priority < max_priority || cur_priority == max_priority && cur_weight > max_weight)
+				{
+					ret = SYSINFO_RET_OK;
+
+					max_priority = cur_priority;
+					max_weight = cur_weight;
+
+					zbx_strlcpy(real_server, buffer, real_server_len);
+					*real_port = cur_port;
+				}
+			}
+
+			if (NULL != (p = strchr(p, '\n')))
+				p++;
+		}
 	}
 
 	free_result(&result);
