@@ -145,6 +145,8 @@ static const char	*decode_type(int q_type)
 			return "MX";	/* mail exchanger */
 		case T_TXT:
 			return "TXT";	/* text */
+		case T_SRV:
+			return "SRV";	/* service locator */
 		default:
 			zbx_snprintf(buf, sizeof(buf), "T_%d", q_type);
 			return buf;
@@ -204,6 +206,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 		{"MINFO",	T_MINFO},
 		{"MX",		T_MX},
 		{"TXT",		T_TXT},
+		{"SRV",		T_SRV},
 		{NULL}
 	};
 
@@ -623,6 +626,23 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 				}
 
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "\"");
+
+				break;
+			case T_SRV:
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %-8s", decode_type(q_type));
+
+				GETSHORT(value, msg_ptr);       /* priority */
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
+
+				GETSHORT(value, msg_ptr);       /* weight */
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
+
+				GETSHORT(value, msg_ptr);       /* port */
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
+
+				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
+					return SYSINFO_RET_FAIL;
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 
 				break;
 			default:
