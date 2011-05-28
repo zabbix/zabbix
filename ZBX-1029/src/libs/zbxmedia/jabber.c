@@ -18,6 +18,7 @@
 **/
 
 #include "common.h"
+#include "sysinfo.h"
 #include "log.h"
 
 #include "zbxmedia.h"
@@ -198,6 +199,60 @@ static int	on_result(jabber_session_p sess, ikspak *pak)
 
 /******************************************************************************
  *                                                                            *
+ * Function: lookup_jabber                                                    *
+ *                                                                            *
+ * Purpose: lookup Jabber SRV record                                          *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Aleksandrs Saveljevs, based on code by Edward Rudd                 *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	lookup_jabber(const char *server, int port, char *real_server, size_t real_server_len, int *real_port)
+{
+	const char	*__function_name = "lookup_jabber";
+
+	char		buffer[MAX_STRING_LEN], command[MAX_STRING_LEN];
+	AGENT_RESULT	result;
+	int		ret = SYSINFO_RET_FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s: In %s() server:'%s' port:%d",
+			__module_name, __function_name, server, port);
+
+	init_result(&result);
+
+	zbx_snprintf(buffer, sizeof(buffer), ",_xmpp-client._tcp.%s,SRV", server);
+	zbx_snprintf(command, sizeof(command), "net.tcp.dns.query[%s]", buffer);
+
+	if (SYSINFO_RET_OK == NET_TCP_DNS_QUERY(command, buffer, 0, &result))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "response to DNS query: [%s]", result.text);
+
+		zbx_snprintf(buffer, sizeof(buffer), "_xmpp-client._tcp.%s SRV %%*d %%*d %%d %%" ZBX_FS_SIZE_T "s",
+				server, (zbx_fs_size_t)real_server_len);
+
+		if (2 == sscanf(result.text, buffer, real_port, real_server))
+			ret = SYSINFO_RET_OK;
+	}
+
+	free_result(&result);
+
+	if (SYSINFO_RET_OK != ret)
+	{
+		zbx_strlcpy(real_server, server, real_server_len);
+		*real_port = port;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s: End of %s() real_server:'%s' real_port:%d",
+			__module_name, __function_name, real_server, *real_port);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: disconnect_jabber                                                *
  *                                                                            *
  * Purpose: disconnect from Jabber server                                     *
@@ -368,7 +423,8 @@ static int	connect_jabber(const char *jabber_id, const char *password, int use_s
 {
 	const char	*__function_name = "connect_jabber";
 	char		*buf = NULL;
-	int		iks_error, timeout, ret = FAIL;
+	char		real_server[MAX_STRING_LEN];
+	int		real_port, iks_error, timeout, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s: In %s() jabber_id:'%s'", __module_name, __function_name, jabber_id);
 
@@ -423,7 +479,9 @@ static int	connect_jabber(const char *jabber_id, const char *password, int use_s
 		IKS_RULE_ID, "auth",
 		IKS_RULE_DONE);
 
-	switch (iks_connect_with(jsess->prs, jsess->acc->server, port, jsess->acc->server, &zbx_iks_transport))
+	lookup_jabber(jsess->acc->server, port, real_server, sizeof(real_server), &real_port);
+
+	switch (iks_connect_with(jsess->prs, real_server, real_port, jsess->acc->server, &zbx_iks_transport))
 	{
 		case IKS_OK:
 			break;
