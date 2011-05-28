@@ -405,6 +405,13 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "\"");
 
 				break;
+			case T_SRV:
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %hu %hu %hu %s",
+						pDnsRecord->Data.SRV.wPriority,
+						pDnsRecord->Data.SRV.wWeight,
+						pDnsRecord->Data.SRV.wPort,
+						zbx_unicode_to_utf8_static(pDnsRecord->Data.SRV.pNameTarget, tmp, sizeof(tmp)));
+				break;
 			default:
 				break;
 		}
