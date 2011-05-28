@@ -80,6 +80,9 @@
 #	ifndef T_TXT
 #		define T_TXT	16
 #	endif
+#	ifndef T_SRV
+#		define T_SRV	33
+#	endif
 
 #endif /* defined(HAVE_RES_QUERY) || defined(_WINDOWS) */
 
