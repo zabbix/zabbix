@@ -162,6 +162,7 @@ int	CONFIG_UNSAFE_USER_PARAMETERS	= 0;
 char	*CONFIG_SERVER			= NULL;
 int	CONFIG_SERVER_PORT		= 10051;
 char	*CONFIG_HOSTNAME		= NULL;
+char	*CONFIG_HOSTNAME_ITEM		= NULL;
 int	CONFIG_NODEID			= -1;
 int	CONFIG_MASTER_NODEID		= 0;
 int	CONFIG_NODE_NOHISTORY		= 0;
@@ -183,13 +184,102 @@ ZBX_MUTEX	node_sync_access;
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_set_defaults                                                 *
+ *                                                                            *
+ * Purpose: set configuration defaults                                        *
+ *                                                                            *
+ * Author: Rudolfs Kreicbergs                                                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_set_defaults()
+{
+	AGENT_RESULT	result;
+	char		**value = NULL;
+
+	memset(&result, 0, sizeof(AGENT_RESULT));
+
+	if (NULL == CONFIG_HOSTNAME)
+	{
+		if (NULL == CONFIG_HOSTNAME_ITEM)
+			CONFIG_HOSTNAME_ITEM = zbx_strdup(CONFIG_HOSTNAME_ITEM, "system.hostname");
+
+		if (SUCCEED == process(CONFIG_HOSTNAME_ITEM, PROCESS_LOCAL_COMMAND, &result) &&
+				NULL != (value = GET_STR_RESULT(&result)))
+		{
+			assert(*value);
+
+			if (MAX_ZBX_HOSTNAME_LEN < strlen(*value))
+			{
+				(*value)[MAX_ZBX_HOSTNAME_LEN] = '\0';
+				zabbix_log(LOG_LEVEL_WARNING, "proxy name truncated to [%s])", *value);
+			}
+
+			CONFIG_HOSTNAME = zbx_strdup(CONFIG_HOSTNAME, *value);
+		}
+		else
+			zabbix_log(LOG_LEVEL_WARNING, "failed to get proxy name from [%s])", CONFIG_HOSTNAME_ITEM);
+	}
+	else if (NULL != CONFIG_HOSTNAME_ITEM)
+		zabbix_log(LOG_LEVEL_WARNING, "both Hostname and HostnameItem defined, using [%s]", CONFIG_HOSTNAME);
+
+	free_result(&result);
+
+	if (NULL == CONFIG_PID_FILE)
+		CONFIG_PID_FILE = zbx_strdup(CONFIG_PID_FILE, "/tmp/zabbix_proxy.pid");
+
+	if (NULL == CONFIG_TMPDIR)
+		CONFIG_TMPDIR = zbx_strdup(CONFIG_TMPDIR, "/tmp");
+
+	if (NULL == CONFIG_FPING_LOCATION)
+		CONFIG_FPING_LOCATION = zbx_strdup(CONFIG_FPING_LOCATION, "/usr/sbin/fping");
+
+#ifdef HAVE_IPV6
+	if (NULL == CONFIG_FPING6_LOCATION)
+		CONFIG_FPING6_LOCATION = zbx_strdup(CONFIG_FPING6_LOCATION, "/usr/sbin/fping6");
+#endif
+
+	if (NULL == CONFIG_EXTERNALSCRIPTS)
+		CONFIG_EXTERNALSCRIPTS = zbx_strdup(CONFIG_EXTERNALSCRIPTS, "/etc/zabbix/externalscripts");
+
+	if (ZBX_PROXYMODE_ACTIVE != CONFIG_PROXYMODE || 0 == CONFIG_HEARTBEAT_FREQUENCY)
+		CONFIG_HEARTBEAT_FORKS = 0;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_validate_config                                              *
+ *                                                                            *
+ * Purpose: validate configuration parameters                                 *
+ *                                                                            *
+ * Author: Alexei Vladishev, Rudolfs Kreicbergs                               *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_validate_config()
+{
+	if (ZBX_PROXYMODE_ACTIVE == CONFIG_PROXYMODE &&	NULL == CONFIG_SERVER)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "missing active proxy mandatory parameter [Server] in config file [%s]", CONFIG_FILE);
+		exit(FAIL);
+	}
+
+	if (NULL == CONFIG_HOSTNAME)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "hostname is not defined");
+		exit(FAIL);
+	}
+
+	if (FAIL == zbx_check_hostname(CONFIG_HOSTNAME))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid host name: [%s]", CONFIG_HOSTNAME);
+		exit(FAIL);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_load_config                                                  *
  *                                                                            *
  * Purpose: parse config file and update configuration parameters             *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
@@ -198,9 +288,6 @@ ZBX_MUTEX	node_sync_access;
  ******************************************************************************/
 static void	zbx_load_config()
 {
-	AGENT_RESULT	result;
-	char		**value = NULL;
-
 	static struct cfg_line	cfg[] =
 	{
 		/* PARAMETER,			VAR,					TYPE,
@@ -212,6 +299,8 @@ static void	zbx_load_config()
 		{"ServerPort",			&CONFIG_SERVER_PORT,			TYPE_INT,
 			PARM_OPT,	1024,			32767},
 		{"Hostname",			&CONFIG_HOSTNAME,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"HostnameItem",		&CONFIG_HOSTNAME_ITEM,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"StartDBSyncers",		&CONFIG_HISTSYNCER_FORKS,		TYPE_INT,
 			PARM_OPT,	1,			100},
@@ -258,7 +347,7 @@ static void	zbx_load_config()
 #ifdef HAVE_IPV6
 		{"Fping6Location",		&CONFIG_FPING6_LOCATION,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-#endif	/* HAVE_IPV6 */
+#endif
 		{"Timeout",			&CONFIG_TIMEOUT,			TYPE_INT,
 			PARM_OPT,	1,			30},
 		{"TrapperTimeout",		&CONFIG_TRAPPER_TIMEOUT,		TYPE_INT,
@@ -310,12 +399,6 @@ static void	zbx_load_config()
 
 	parse_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_STRICT);
 
-	if (ZBX_PROXYMODE_ACTIVE == CONFIG_PROXYMODE &&
-			(NULL == CONFIG_SERVER || '\0' == *CONFIG_SERVER))
-	{
-		zbx_error("Missing mandatory parameter [Server].");
-	}
-
 	if (ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE)
 	{
 		CONFIG_CONFSYNCER_FORKS = CONFIG_DATASENDER_FORKS = 0;
@@ -324,70 +407,9 @@ static void	zbx_load_config()
 	else
 		zbx_process = ZBX_PROCESS_PROXY_ACTIVE;
 
-	if (NULL == CONFIG_HOSTNAME)
-	{
-		if (SUCCEED == process("system.hostname", 0, &result) &&
-				NULL != (value = GET_STR_RESULT(&result)))
-		{
-			assert(*value);
+	zbx_set_defaults();
 
-			if (strlen(*value) > HOST_HOST_LEN)
-			{
-				(*value)[HOST_HOST_LEN] = '\0';
-				zabbix_log(LOG_LEVEL_WARNING, "hostname truncated to [%s])", *value);
-			}
-
-			CONFIG_HOSTNAME = zbx_strdup(CONFIG_HOSTNAME, *value);
-		}
-		free_result(&result);
-	}
-
-	if (NULL == CONFIG_HOSTNAME)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "hostname is not defined");
-		exit(FAIL);
-	}
-
-	if (FAIL == zbx_check_hostname(CONFIG_HOSTNAME))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "invalid host name: [%s]", CONFIG_HOSTNAME);
-		exit(FAIL);
-	}
-
-	if (NULL == CONFIG_DBNAME)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "DBName not in config file");
-		exit(FAIL);
-	}
-
-	if (NULL == CONFIG_PID_FILE)
-	{
-		CONFIG_PID_FILE = zbx_strdup(CONFIG_PID_FILE, "/tmp/zabbix_proxy.pid");
-	}
-
-	if (NULL == CONFIG_TMPDIR)
-	{
-		CONFIG_TMPDIR = zbx_strdup(CONFIG_TMPDIR, "/tmp");
-	}
-
-	if (NULL == CONFIG_FPING_LOCATION)
-	{
-		CONFIG_FPING_LOCATION = zbx_strdup(CONFIG_FPING_LOCATION, "/usr/sbin/fping");
-	}
-#ifdef HAVE_IPV6
-	if (NULL == CONFIG_FPING6_LOCATION)
-	{
-		CONFIG_FPING6_LOCATION = zbx_strdup(CONFIG_FPING6_LOCATION, "/usr/sbin/fping6");
-	}
-#endif /* HAVE_IPV6 */
-
-	if (NULL == CONFIG_EXTERNALSCRIPTS)
-	{
-		CONFIG_EXTERNALSCRIPTS = zbx_strdup(CONFIG_EXTERNALSCRIPTS, "/etc/zabbix/externalscripts");
-	}
-
-	if (ZBX_PROXYMODE_ACTIVE != CONFIG_PROXYMODE || 0 == CONFIG_HEARTBEAT_FREQUENCY)
-		CONFIG_HEARTBEAT_FORKS = 0;
+	zbx_validate_config();
 }
 
 /******************************************************************************
@@ -396,13 +418,7 @@ static void	zbx_load_config()
  *                                                                            *
  * Purpose: executes server processes                                         *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	main(int argc, char **argv)
@@ -451,21 +467,14 @@ int	main(int argc, char **argv)
 
 int	MAIN_ZABBIX_ENTRY()
 {
-	int	i;
-	pid_t	pid;
-
+	int		i, server_num = 0;
+	pid_t		pid;
 	zbx_sock_t	listen_sock;
 
-	int		server_num = 0;
-
 	if (NULL == CONFIG_LOG_FILE || '\0' == *CONFIG_LOG_FILE)
-	{
-		zabbix_open_log(LOG_TYPE_SYSLOG,CONFIG_LOG_LEVEL,NULL);
-	}
+		zabbix_open_log(LOG_TYPE_SYSLOG, CONFIG_LOG_LEVEL, NULL);
 	else
-	{
-		zabbix_open_log(LOG_TYPE_FILE,CONFIG_LOG_LEVEL,CONFIG_LOG_FILE);
-	}
+		zabbix_open_log(LOG_TYPE_FILE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
 
 #ifdef	HAVE_SNMP
 #	define SNMP_FEATURE_STATUS "YES"
@@ -493,8 +502,8 @@ int	MAIN_ZABBIX_ENTRY()
 #	define IPV6_FEATURE_STATUS " NO"
 #endif
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "Starting Zabbix Proxy. Zabbix %s (revision %s).",
-			ZABBIX_VERSION, ZABBIX_REVISION);
+	zabbix_log(LOG_LEVEL_INFORMATION, "Starting Zabbix Proxy [%s]. Zabbix %s (revision %s).",
+			CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "**** Enabled features ****");
 	zabbix_log(LOG_LEVEL_INFORMATION, "SNMP monitoring:       " SNMP_FEATURE_STATUS);

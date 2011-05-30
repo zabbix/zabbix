@@ -207,15 +207,9 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
  *                                                                            *
  * Function: set_defaults                                                     *
  *                                                                            *
- * Purpose: set non-static configuration defaults                             *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
+ * Purpose: set configuration defaults                                        *
  *                                                                            *
  * Author: Vladimir Levijev, Rudolfs Kreicbergs                               *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	set_defaults()
@@ -235,7 +229,7 @@ static void	set_defaults()
 		{
 			assert(*value);
 
-			if (strlen(*value) > MAX_ZBX_HOSTNAME_LEN)
+			if (MAX_ZBX_HOSTNAME_LEN < strlen(*value))
 			{
 				(*value)[MAX_ZBX_HOSTNAME_LEN] = '\0';
 				zabbix_log(LOG_LEVEL_WARNING, "hostname truncated to [%s])", *value);
@@ -250,6 +244,43 @@ static void	set_defaults()
 		zabbix_log(LOG_LEVEL_WARNING, "both Hostname and HostnameItem defined, using [%s]", CONFIG_HOSTNAME);
 
 	free_result(&result);
+
+#ifdef USE_PID_FILE
+	if (NULL == CONFIG_PID_FILE)
+		CONFIG_PID_FILE = "/tmp/zabbix_agentd.pid";
+#endif
+
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_validate_config                                              *
+ *                                                                            *
+ * Purpose: validate configuration parameters                                 *
+ *                                                                            *
+ * Author: Vladimir Levijev                                                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_validate_config()
+{
+	if (NULL == CONFIG_HOSTNAME)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "hostname is not defined");
+		exit(FAIL);
+	}
+
+	if (FAIL == zbx_check_hostname(CONFIG_HOSTNAME))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid host name: [%s]", CONFIG_HOSTNAME);
+		exit(FAIL);
+	}
+
+	/* make sure active or passive check is enabled */
+	if (1 == CONFIG_DISABLE_ACTIVE && 1 == CONFIG_DISABLE_PASSIVE)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "either active or passive checks must be enabled");
+		exit(FAIL);
+	}
 }
 
 /******************************************************************************
@@ -259,10 +290,6 @@ static void	set_defaults()
  * Purpose: load configuration from config file                               *
  *                                                                            *
  * Parameters: optional - do not produce error if config file missing         *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_load_config(int optional)
@@ -341,10 +368,8 @@ static void	zbx_load_config(int optional)
 
 	set_defaults();
 
-#ifdef USE_PID_FILE
-	if (NULL == CONFIG_PID_FILE)
-		CONFIG_PID_FILE = "/tmp/zabbix_agentd.pid";
-#endif
+	if (ZBX_CFG_FILE_REQUIRED == optional)
+		zbx_validate_config();
 }
 
 /******************************************************************************
@@ -353,13 +378,7 @@ static void	zbx_load_config(int optional)
  *                                                                            *
  * Purpose: free configuration memory                                         *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Vladimir Levijev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_free_config()
@@ -369,43 +388,6 @@ static void	zbx_free_config()
 #ifdef _WINDOWS
 	zbx_strarr_free(CONFIG_PERF_COUNTERS);
 #endif
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_validate_config                                              *
- *                                                                            *
- * Purpose: validate configuration parameters                                 *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Vladimir Levijev                                                   *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-static void	zbx_validate_config()
-{
-	if (NULL == CONFIG_HOSTNAME)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "hostname is not defined");
-		exit(FAIL);
-	}
-
-	if (FAIL == zbx_check_hostname(CONFIG_HOSTNAME))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "invalid host name: [%s]", CONFIG_HOSTNAME);
-		exit(FAIL);
-	}
-
-	/* make sure active or passive check is enabled */
-	if (1 == CONFIG_DISABLE_ACTIVE && 1 == CONFIG_DISABLE_PASSIVE)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "either active or passive checks must be enabled");
-		exit(FAIL);
-	}
 }
 
 #ifdef _WINDOWS
@@ -607,7 +589,6 @@ int	main(int argc, char **argv)
 		case ZBX_TASK_START_SERVICE:
 		case ZBX_TASK_STOP_SERVICE:
 			zbx_load_config(ZBX_CFG_FILE_REQUIRED);
-			zbx_validate_config();
 			zbx_free_config();
 
 			if (t.flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS)
@@ -646,7 +627,6 @@ int	main(int argc, char **argv)
 			break;
 		default:
 			zbx_load_config(ZBX_CFG_FILE_REQUIRED);
-			zbx_validate_config();
 			break;
 	}
 
