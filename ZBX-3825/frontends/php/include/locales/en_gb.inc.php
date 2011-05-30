@@ -2479,6 +2479,6 @@
 
 // class.cbuttonqmessage.php
 	'S_ARE_YOU_SURE_YOU_WANT_TO_PERFORM_THIS_ACTION' => 'Are you sure you want perform this action?',
-	'S_INCORRECT_VALUE_FOR_SETMESSAGE' => 'Incorrect value for setMessage "%s"',
+	'S_INCORRECT_VALUE_FOR_SETMESSAGE' => 'Incorrect value for setMessage(): "%s".',
 );
 ?>
