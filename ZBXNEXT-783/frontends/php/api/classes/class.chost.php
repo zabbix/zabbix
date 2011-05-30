@@ -52,7 +52,8 @@ class CHost extends CZBXAPI{
  * @param boolean $options['selectGraphs'] select Graphs
  * @param boolean $options['selectApplications'] select Applications
  * @param boolean $options['selectMacros'] select Macros
- * @param boolean $options['selectProfile'] select Profile
+ * @param boolean|array $options['selectProfile'] select Profile
+ * @param boolean $options['withProfiles'] select only hosts wth profiles
  * @param int $options['count'] count Hosts, returned column name is rowscount
  * @param string $options['pattern'] search hosts by pattern in Host name
  * @param string $options['extendPattern'] search hosts by pattern in Host name, ip and DNS
@@ -767,7 +768,7 @@ Copt::memoryPick();
 			}
 		}
 
-// Adding Profiles
+// Adding Profiles to the resulting list
 		if(!is_null($options['selectProfile']) && $options['selectProfile'] !== false){
 			if(is_array($options['selectProfile'])){
 				// if we are given a list of fields that needs to be fetched

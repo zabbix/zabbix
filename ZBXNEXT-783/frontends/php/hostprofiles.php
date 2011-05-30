@@ -38,7 +38,7 @@ $fields=array(
 	'filter_set' =>		array(T_ZBX_STR, O_OPT,	P_ACT,	null,	null),
 	'filter_field'=>		array(T_ZBX_STR, O_OPT,  null,	null,	null),
 	'filter_field_value'=>	array(T_ZBX_STR, O_OPT,  null,	null,	null),
-	'filter_exact'=>        array(T_ZBX_INT, O_OPT,  null,	'IN(1,0)',	null),
+	'filter_exact'=>        array(T_ZBX_INT, O_OPT,  null,	'IN(0,1)',	null),
 	//ajax
 	'favobj'=>			array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 	'favref'=>			array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
@@ -119,8 +119,8 @@ else{
 		);
 	}
 	$exactComboBox = new CComboBox('filter_exact', $_REQUEST['filter_exact']);
-	$exactComboBox->addItem('0', _('like:'));
-	$exactComboBox->addItem('1', _('exactly:'));
+	$exactComboBox->addItem('0', _('like'));
+	$exactComboBox->addItem('1', _('exactly'));
 	$filter_table->addRow(array(
 		array(
 			array(bold(_('Field:')), $profileFieldsComboBox),
@@ -203,7 +203,7 @@ else{
 			$hosts[$num]['pr_tag'] = $host['profile']['tag'];
 			$hosts[$num]['pr_macaddress_a'] = $host['profile']['macaddress_a'];
 			// if we are filtering by profile field
-			if(!empty($_REQUEST['filter_field']) && !empty($_REQUEST['filter_field_value'])){
+			if(!empty($_REQUEST['filter_field']) && !empty($_REQUEST['filter_field_value']) && isset($hosts[$num]['profile'][$_REQUEST['filter_field']])){
 				// must we filter exactly or using a substring (both are case insensitive)
 				$match = $_REQUEST['filter_exact']
 						? zbx_strtolower($hosts[$num]['profile'][$_REQUEST['filter_field']]) === zbx_strtolower($_REQUEST['filter_field_value'])

@@ -401,7 +401,7 @@
 			function sortProfilesByTitle($a, $b){
 				return strcmp($a['title'], $b['title']);
 			}
-			uasort($profileFields , 'sortProfilesByTitle');
+			uasort($profileFields, 'sortProfilesByTitle');
 		}
 
 		return $profileFields;
