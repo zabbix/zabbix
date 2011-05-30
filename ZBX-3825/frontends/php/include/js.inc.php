@@ -3,17 +3,17 @@
 /**
  * Convert PHP variable to string version of JavaScript style
  * @author Eugene Grigorjev
- * @param string $value
- * @param null $object
+ * @param mixed $value
+ * @param bool $asObject return string containing javascript object
  * @param bool $addQuotes whether quotes should be added at the beginning and at the end of string
  * @return string
  */
-function zbx_jsvalue($value, $object = null, $addQuotes=true){
+function zbx_jsvalue($value, $asObject=false, $addQuotes=true){
 	if(!is_array($value)) {
 		if(is_object($value)){
 			return unpack_object($value);
 		}
-		if(is_string($value)){
+		elseif(is_string($value)){
 			$escaped = str_replace("\r", '', $value); // removing caret returns
 			$escaped = str_replace("\\", "\\\\", $escaped); // escaping slashes: \ => \\
 			$escaped = str_replace('"', '\"', $escaped); // escaping quotes: " => \"
@@ -24,20 +24,20 @@ function zbx_jsvalue($value, $object = null, $addQuotes=true){
 			}
 			return $escaped;
 		}
-		if(is_null($value)){
+		elseif(is_null($value)){
 			return 'null';
 		}
-		return strval($value);
+		else{
+			return strval($value);
+		}
 	}
-
-	if(count($value) == 0){
-		return ($object)?'{}':'[]';
+	elseif(count($value) == 0){
+		return $asObject ? '{}' : '[]';
 	}
-
 
 	foreach($value as $id => $v){
-		if((!isset($is_object) && is_string($id)) || $object) $is_object = true;
-		$value[$id] = (isset($is_object) ? '\''.$id.'\' : ' : '').zbx_jsvalue($v, $object);
+		if((!isset($is_object) && is_string($id)) || $asObject) $is_object = true;
+		$value[$id] = (isset($is_object) ? '\''.$id.'\' : ' : '').zbx_jsvalue($v, $asObject, $addQuotes);
 	}
 
 	if(isset($is_object)){

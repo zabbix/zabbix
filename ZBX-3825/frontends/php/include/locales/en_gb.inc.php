@@ -2475,7 +2475,10 @@
 	'S_SECOND_IN_PARENTHESES' => '(seconds)',
 
 // class.cscreen.php
-	'S_INCORRECT_RESOURCE_PROVIDED_FOR_SCREEN_ITEM' => 'Incorrect resource provided for screen item'
+	'S_INCORRECT_RESOURCE_PROVIDED_FOR_SCREEN_ITEM' => 'Incorrect resource provided for screen item',
 
+// class.cbuttonqmessage.php
+	'S_ARE_YOU_SURE_YOU_WANT_TO_PERFORM_THIS_ACTION' => 'Are you sure you want perform this action?',
+	'S_INCORRECT_VALUE_FOR_SETMESSAGE' => 'Incorrect value for setMessage "%s"',
 );
 ?>
