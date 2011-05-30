@@ -6,6 +6,9 @@ New features:
  - [ZBXNEXT-677] added system.hw.* and system.sw.* items for Linux (rudolfs)
  - [ZBXNEXT-780] all items (including user parameters and external checks) can also return only whitespace (rudolfs)
 
+Bug fixes:
+ - [ZBX-3846] fixed typo in map creation info message during export (Vedmak)
+  
 --------------------------------------------------------------------------------
 Changes for 1.9.4
 
