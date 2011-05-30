@@ -423,8 +423,10 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	DnsRecordListFree(pQueryResults, DnsFreeRecordList);
 #else	/* not _WINDOWS */
-	if (0 == (_res.options & RES_INIT))
-		res_init();
+	res_init();	/* initialize always, settings might have changed */
+
+	if (FAIL == (res = res_mkquery(QUERY, zone, C_IN, type, NULL, 0, NULL, buf, sizeof(buf))))
+		return SYSINFO_RET_FAIL;
 
 	if ('\0' != *ip)
 	{
@@ -436,9 +438,6 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 		_res.nsaddr_list[0].sin_port = htons(NS_DEFAULTPORT);
 		_res.nscount = 1;
 	}
-
-	if (FAIL == (res = res_mkquery(QUERY, zone, C_IN, type, NULL, 0, NULL, buf, sizeof(buf))))
-		return SYSINFO_RET_FAIL;
 
 	_res.retrans = retrans;
 	_res.retry = retry;
