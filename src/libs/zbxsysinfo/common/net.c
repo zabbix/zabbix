@@ -635,8 +635,6 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 				break;
 			case T_SRV:
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %-8s", decode_type(q_type));
-
 				GETSHORT(value, msg_ptr);       /* priority */
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
 
@@ -646,7 +644,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 				GETSHORT(value, msg_ptr);       /* port */
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
 
-				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
+				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* target */
 					return SYSINFO_RET_FAIL;
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 
