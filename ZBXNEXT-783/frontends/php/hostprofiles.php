@@ -203,16 +203,23 @@ else{
 			$hosts[$num]['pr_tag'] = $host['profile']['tag'];
 			$hosts[$num]['pr_macaddress_a'] = $host['profile']['macaddress_a'];
 			// if we are filtering by profile field
-			if(!empty($_REQUEST['filter_field']) && !empty($_REQUEST['filter_field_value']) && isset($hosts[$num]['profile'][$_REQUEST['filter_field']])){
-				// must we filter exactly or using a substring (both are case insensitive)
-				$match = $_REQUEST['filter_exact']
-						? zbx_strtolower($hosts[$num]['profile'][$_REQUEST['filter_field']]) === zbx_strtolower($_REQUEST['filter_field_value'])
-						: zbx_strpos(
-							zbx_strtolower($hosts[$num]['profile'][$_REQUEST['filter_field']]),
-							zbx_strtolower($_REQUEST['filter_field_value'])
-						) !== false;
-				if(!$match){
-					unset($hosts[$num]);
+			if(!empty($_REQUEST['filter_field']) && !empty($_REQUEST['filter_field_value'])){
+				if(!isset($hosts[$num]['profile'][$_REQUEST['filter_field']])){
+					error(_s('Impossible to filter by profile field "%s", which does not exist.', $_REQUEST['filter_field']));
+					$hosts = array();
+					break;
+				}
+				else{
+					// must we filter exactly or using a substring (both are case insensitive)
+					$match = $_REQUEST['filter_exact']
+							? zbx_strtolower($hosts[$num]['profile'][$_REQUEST['filter_field']]) === zbx_strtolower($_REQUEST['filter_field_value'])
+							: zbx_strpos(
+								zbx_strtolower($hosts[$num]['profile'][$_REQUEST['filter_field']]),
+								zbx_strtolower($_REQUEST['filter_field_value'])
+							) !== false;
+					if(!$match){
+						unset($hosts[$num]);
+					}
 				}
 			}
 		}

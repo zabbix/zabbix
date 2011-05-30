@@ -122,7 +122,7 @@ if($pageFilter->groupsSelected && $groupFieldTitle !== ''){
 
 	foreach($report as $rep){
 		$row = array(
-			$rep['profile_field'],
+			new CSpan($rep['profile_field'], 'pre'),
 			new CLink($rep['host_count'],'hostprofiles.php?filter_field='.$_REQUEST['groupby'].'&filter_field_value='.urlencode($rep['profile_field']).'&filter_set=1&filter_exact=1'.url_param('groupid')),
 		);
 		$table->addRow($row);
