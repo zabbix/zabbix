@@ -768,7 +768,7 @@ Copt::memoryPick();
 			}
 		}
 
-// Adding Profiles to the resulting list
+// Adding Profiles
 		if(!is_null($options['selectProfile']) && $options['selectProfile'] !== false){
 			if(is_array($options['selectProfile'])){
 				// if we are given a list of fields that needs to be fetched
