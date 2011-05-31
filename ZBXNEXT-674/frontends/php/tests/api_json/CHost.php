@@ -155,5 +155,76 @@ class API_JSON_Host extends CZabbixTest
 		}
 
 	}
+
+
+	public static function profileGetRequests()
+	{
+		return array(
+			array(
+				// request
+				array(
+					'withProfile' => true,
+					'selectProfile'=> array('type'),
+					'hostids' => 10017
+				),
+				// expected result
+				array(
+					'hostid' => 10017,
+					'type' => 'Type'
+				)
+			),
+			array(
+				// request
+				array(
+					'withProfile' => true,
+					'selectProfile'=> array('os', 'tag'),
+					'hostids' => 10017
+				),
+				// expected result
+				array(
+					'hostid' => 10017,
+					'os' => 'OS',
+					'tag' => 'Tag'
+				)
+			),
+			array(
+				// request
+				array(
+					'withProfile' => true,
+					'selectProfile'=> array('blabla'), // non existent field
+					'hostids' => 10017
+				),
+				// expected result
+				array(
+					'hostid' => 10017
+				)
+			),
+		);
+	}
+
+
+	/**
+	 * @dataProvider profileGetRequests
+	 */
+	public function testCHostGetProfiles($request, $expectedResult)
+	{
+		$debug = null;
+
+		$result = $this->api_acall(
+			'host.get',
+			$request,
+			&$debug
+		);
+
+		$this->assertFalse(
+			!isset($result['result'][0]['profile']) || $result['result'][0]['profile'] != $expectedResult,
+			"Chuck Norris: I was expecting that host.get would return this result in 'profiles' element: ".print_r($expectedResult, true).", but it returned: ".print_r($result, true)." \nDebug: ".print_r($debug, true)
+		);
+
+	}
+
+
+
+
 }
 ?>
