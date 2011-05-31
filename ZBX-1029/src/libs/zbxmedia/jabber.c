@@ -233,7 +233,7 @@ static void	lookup_jabber(const char *server, int port, char *real_server, size_
 		{
 			if (4 == sscanf(p, command, &cur_priority, &cur_weight, &cur_port, buffer))
 			{
-				if (cur_priority < max_priority || cur_priority == max_priority && cur_weight > max_weight)
+				if (cur_priority < max_priority || (cur_priority == max_priority && cur_weight > max_weight))
 				{
 					ret = SYSINFO_RET_OK;
 
